@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_3d_solver.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_clustering_longrange.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_clustering_lrange_hash.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_clustering_visual_hash.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_clustering_visualizer.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_coll_del_root_mindist.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_collision_filter.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_compact_ledge.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_compact_ledge_solver.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_i_collision_vhash.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist_debug.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist_event.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist_mcases.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist_minimize.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist_recursive.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_oo_watcher.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_range_manager.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_ray_solver.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_sphere_solver.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_airboat.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_fake_jetski.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_actuator.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_actuator_spring.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_buoyancy_solver.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_car_system.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_constraint.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_constraint_car.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_constraint_fixed_keyed.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_constraint_local.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_buoyancy.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_floating.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_motion.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_raycast_car.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_stiff_spring.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_world_frict.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_forcefield.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_multidimensional_interp.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_template_constraint.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_ball.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_calc_next_psi_solver.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_controller_phantom.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_core.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_environment.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_friction.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_friction_gaps.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_great_matrix.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_hull_manager.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_i_friction_hash.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_i_object_vhash.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_impact.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_merge_core.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_mindist_friction.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_object.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_object_attach.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_physic.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_physic_private.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_polygon.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_sim_unit.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_solver_core_reaction.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_time.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_anomaly_manager.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_betterdebugmanager.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_betterstatisticsmanager.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_cache_object.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_liquid_surface_descript.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_material.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_performancecounter.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_stat_manager_cback_con.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_surface_manager.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_templates.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_surface_manager\ivp_compact_surface.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_surface_manager\ivp_gridbuild_array.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_surface_manager\ivp_surman_grid.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_surface_manager\ivp_surman_polygon.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_active_value.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_bigvector.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_geometry.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_hash.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_linear.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_mapping.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_memory.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_min_hash.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_min_list.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_os_dep.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_quat.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_string.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_types.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_vector.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_vhash.cxx">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

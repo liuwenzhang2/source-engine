@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{febcf479-411d-4a07-a3a5-6226970fc0a3}</ProjectGuid>
+    <RootNamespace>ivpcompactbuilder</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;IVP_VERSION_SDK;HAVOK_MOPP;IVPCOMPACTBUILDER_EXPORTS;_WINDOWS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\ivp\ivp_compact_builder;..\..\..\ivp\havana;..\..\..\ivp\havana\havok;..\..\..\ivp\ivp_physics;..\..\..\ivp\ivp_utility;..\..\..\ivp\ivp_controller;..\..\..\ivp\ivp_surface_manager;..\..\..\ivp\ivp_collision;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <Optimization>Disabled</Optimization>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ivp_physics.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;IVP_VERSION_SDK;HAVOK_MOPP;IVPCOMPACTBUILDER_EXPORTS;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\ivp\ivp_compact_builder;..\..\..\ivp\havana;..\..\..\ivp\havana\havok;..\..\..\ivp\ivp_physics;..\..\..\ivp\ivp_utility;..\..\..\ivp\ivp_controller;..\..\..\ivp\ivp_surface_manager;..\..\..\ivp\ivp_collision;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>ivp_physics.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;IVPCOMPACTBUILDER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;IVPCOMPACTBUILDER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\3dsimport_co.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_cutfac.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_cvdec3.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_drdec3.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_dsphdc.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_edght.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_initcb.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_insed3.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_insfac.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_insvr3.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_prime.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_ptpolg.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\geompack_resedg.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_compact_ledge_gen.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_compact_modify.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_compact_recursive.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_convex_decompositor.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_halfspacesoup.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_i_fpoint_vhash.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_i_point_vhash.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_object_polygon_tetra.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_rot_inertia_solver.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_surbuild_halfspacesoup.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_surbuild_ledge_soup.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_surbuild_pointsoup.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_surbuild_polygon_convex.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_surbuild_polyhdrn_cncv.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_surbuild_q12.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_templates_intern.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivp_tetra_intrude.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\ivv_cluster_min_hash.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull_geom.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull_geom2.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull_global.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull_io.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull_mem.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull_merge.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull_poly.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull_poly2.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull_qset.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull_stat.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_compact_builder\qhull_user.cxx" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

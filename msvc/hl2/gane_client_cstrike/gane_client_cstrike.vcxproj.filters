@@ -1,0 +1,1806 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="源文件\game_controls">
+      <UniqueIdentifier>{db710bec-3904-46d1-a5de-ef5a0d46a0dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\MP3">
+      <UniqueIdentifier>{a3af3693-671a-4376-8db1-9e1ce2180cc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Replay">
+      <UniqueIdentifier>{e887eab7-af02-4cec-b518-9fac9e6433b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Sixense">
+      <UniqueIdentifier>{3f175f13-8a8a-46ab-8d8b-ed7a8b8c7fe5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Source Files">
+      <UniqueIdentifier>{a84c58c7-99d5-4ca3-b6c8-f3c4cae7bdec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Temporary Entities">
+      <UniqueIdentifier>{976e55f9-0f00-41a5-950b-7bb7458155a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Tool Framework">
+      <UniqueIdentifier>{8cceb855-27da-479e-8719-08585514780f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\UI">
+      <UniqueIdentifier>{c43db553-d87c-4b7d-a4b5-9a538c2009a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\CounterStrike DLL">
+      <UniqueIdentifier>{7f9817a8-3a7d-4886-9c83-5201ea30f22d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Weapon">
+      <UniqueIdentifier>{35b4e8ca-14f5-4d3a-8dfa-9dcac24b2c2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\vgui">
+      <UniqueIdentifier>{63ad860e-3b7c-43e9-861b-ae07f47b4bbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\NextBot">
+      <UniqueIdentifier>{912832c6-a61d-464f-9d2f-5446862f8ad6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\game\client\game_controls\basemodelpanel.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\basemodel_panel.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\baseviewport.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\ClientScoreBoardDialog.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\commandmenu.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\IconPanel.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\intromenu.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\MapOverview.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\NavProgress.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\SpectatorGUI.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\teammenu.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\vguitextwindow.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\mp3player.cpp">
+      <Filter>源文件\MP3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\cdll_replay.cpp">
+      <Filter>源文件\Replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\genericclassbased_replay.cpp">
+      <Filter>源文件\Replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\replaycamera.cpp">
+      <Filter>源文件\Replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\replayperformanceplaybackhandler.cpp">
+      <Filter>源文件\Replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\replayrenderer.cpp">
+      <Filter>源文件\Replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\replayvideo.cpp">
+      <Filter>源文件\Replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\replay_ragdoll.cpp">
+      <Filter>源文件\Replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\replay_screenshot.cpp">
+      <Filter>源文件\Replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\sixense\in_sixense.cpp">
+      <Filter>源文件\Sixense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\sixense\in_sixense_gesture_bindings.cpp">
+      <Filter>源文件\Sixense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\sixense\sixense_convars.cpp">
+      <Filter>源文件\Sixense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\compiledcaptionswap.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\language.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\randoverride.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\achievement_notification_panel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\alphamaterialproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\animatedentitytextureproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\animatedoffsettextureproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\animatedtextureproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\AnimateSpecificTextureProxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\baseanimatedtextureproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\baseclientrendertargets.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\basepresence.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\beamdraw.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\bone_merge_cache.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\camomaterialproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cdll_bounded_cvars.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cdll_client_int.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cdll_util.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\classmap.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\clienteffectprecachesystem.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cliententitylist.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\clientleafsystem.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\clientmode_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\clientshadowmgr.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\clientsideeffects.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\clientsideeffects_test.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\clientsteamcontext.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\client_factorylist.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\client_thinklist.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\client_virtualreality.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cl_mat_stub.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\colorcorrectionmgr.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\commentary_modelviewer.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_ai_basehumanoid.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_ai_basenpc.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_baseanimating.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_baseanimatingoverlay.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_basecombatcharacter.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_basecombatweapon.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_basedoor.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_baseentity.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_baseflex.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_baseplayer.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_baseviewmodel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_breakableprop.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_colorcorrection.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_colorcorrectionvolume.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_dynamiclight.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_entitydissolve.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_entityparticletrail.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_env_fog_controller.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_env_particlescript.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_env_projectedtexture.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_env_screenoverlay.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_env_tonemap_controller.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_fire_smoke.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_fish.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_func_areaportalwindow.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_func_breakablesurf.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_func_conveyor.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_func_dust.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_func_lod.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_func_occluder.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_func_reflective_glass.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_func_rotating.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_func_smokevolume.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_func_tracktrain.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_gib.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_hairball.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_info_overlay_accessor.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_lightglow.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\C_MaterialModifyControl.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_particle_system.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_physbox.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_physicsprop.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_physmagnet.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_pixel_visibility.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_plasma.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_playerresource.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_point_camera.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_point_commentary_node.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_props.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_ragdoll_manager.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_rope.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_rumble.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_sceneentity.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_shadowcontrol.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_slideshow_display.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_soundscape.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_spotlight_end.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_sprite.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_sprite_perfmonitor.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_sun.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_team.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_tesla.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_test_proxytoggle.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_user_message_register.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_vehicle_choreo_generic.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_vehicle_jeep.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_vguiscreen.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_vote_controller.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\C_WaterLODControl.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_world.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\detailobjectsystem.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\dummyproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\EffectsClient.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\entityoriginmaterialproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\flashlighteffect.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\functionproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_blood.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_cube.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_explosion.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_fleck.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_impact.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_interpvalue.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_quad.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_shelleject.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_staticline.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_tracer.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_trail.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_water.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\gametrace_client.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\geiger.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\glow_outline_effect.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\glow_overlay.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\history_resource.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl2\C_Func_Monitor.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl2\c_waterbullet.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl2\hud_autoaim.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl2\hud_filmdemo.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl2\hud_hdrdemo.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hltvcamera.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_animationinfo.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_basechat.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_basetimer.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_bitmapnumericdisplay.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_closecaption.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_crosshair.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_element_helper.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_hintdisplay.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_lcd.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_msg.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_numericdisplay.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_pdump.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_redraw.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_vehicle.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_weapon.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\initializer.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\interpolatedvar.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\in_camera.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\in_joystick.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\in_main.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\in_mouse.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\in_touch.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\IsNPCProxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\lampbeamproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\lamphaloproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\mathproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\matrixproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\menu.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\message.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\movehelper_client.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\mumble.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\panelmetaclassmgr.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\particlemgr.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\particles_attractor.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\particles_ez.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\particles_localspace.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\particles_new.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\particles_simple.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\particle_collision.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\particle_litsmokeemitter.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\particle_proxies.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\particle_simple3d.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\perfvisualbenchmark.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\physics.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\physics_main_client.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\physpropclientside.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\playerandobjectenumerator.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\playerspawncache.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\prediction.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\proxyentity.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\ProxyHealth.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\proxyplayer.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\proxypupil.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\ragdoll.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\recvproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\rendertexture.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\ScreenSpaceEffects.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\simple_keys.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\splinepatch.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\spritemodel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\studio_stats.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\texturescrollmaterialproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\text_message.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\timematerialproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\toggletextureproxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\touch.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\train.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_avatarimage.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_basepanel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_bitmapbutton.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_bitmapimage.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_bitmappanel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_centerstringpanel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_consolepanel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_debugoverlaypanel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_fpspanel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_game_viewport.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_grid.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_int.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_loadingdiscpanel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_messagechars.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_netgraphpanel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_schemevisualizer.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_slideshow_display_screen.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_video.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\vgui_video_player.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\view.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\viewangleanim.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\ViewConeImage.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\viewdebug.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\viewpostprocess.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\viewrender.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\view_beams.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\view_effects.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\view_scene.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\warp_overlay.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\WaterLODMaterialProxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\weapons_resource.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\weapon_selection.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\WorldDimsProxy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\achievementmgr.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\achievements_hlx.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\achievement_saverestore.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\activitylist.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\ammodef.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\animation.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\baseachievement.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\basecombatcharacter_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\basecombatweapon_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\baseentity_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\basegrenade_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\baseparticleentity.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\baseplayer_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\baseprojectile.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\baseviewmodel_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\base_playeranimstate.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\beam_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cam_thirdperson.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\collisionproperty.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\death_pose.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\debugoverlay_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\decals.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\effect_dispatch_data.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\ehandle.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\entitylist_base.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\EntityParticleTrail_Shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\env_detail_controller.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\env_wind_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\eventlist.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\func_ladder.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\gamemovement.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\gamerules.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\gamerules_register.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\GameStats.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\gamestringpool.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\gamevars_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hintmessage.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hintsystem.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\igamesystem.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\interval.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\mapentities_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\movevars_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\mp_shareddefs.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\multiplay_gamerules.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\obstacle_pushaway.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\particlesystemquery.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\particle_parse.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\particle_property.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\physics_main_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\physics_saverestore.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\physics_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\point_bonusmaps_accessor.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\point_posecontroller.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\precache_register.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\predictableid.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\predictioncopy.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\props_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\ragdoll_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\rope_helpers.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\saverestore.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\sceneentity_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\sequence_Transitioner.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\sheetsimulator.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\simtimer.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\singleplay_gamerules.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\SoundEmitterSystem.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\soundenvelope.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\Sprite.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\SpriteTrail.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\studio_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\takedamageinfo.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\teamplayroundbased_gamerules.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\teamplay_gamerules.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\test_ehandle.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\usercmd.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\usermessages.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\util_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\vehicle_viewblend_shared.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\voice_banmgr.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\voice_status.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\weapon_parse.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\bone_accessor.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\bone_setup.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\client_class.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\collisionutils.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\crtmemdebug.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\dt_recv.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\dt_utlvector_common.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\dt_utlvector_recv.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\filesystem_helpers.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\haptics\haptic_msgs.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\haptics\haptic_utils.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\interpolatortypes.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\jigglebones.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\networkvar.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\posedebugger.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\renamed_recvtable_compat.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\rope_physics.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\scratchpad3d.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\ScratchPadUtils.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\sentence.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\simple_physics.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\SoundParametersInternal.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\stringregistry.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\studio.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\tier0\memoverride.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\vallocator.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\vgui_controls\vgui_controls.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_basetempentity.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_effects.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_impact_effects.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_movie_explosion.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_particle_fire.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_particle_smokegrenade.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_prop_vehicle.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_recipientfilter.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_smokestack.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_smoke_trail.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_steamjet.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_stickybolt.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_testtraceline.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_armorricochet.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_basebeam.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_beamentpoint.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_beaments.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_beamfollow.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_beamlaser.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_beampoints.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_beamring.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_beamringpoint.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_beamspline.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_bloodsprite.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_bloodstream.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_breakmodel.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_bspdecal.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_bubbles.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_bubbletrail.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_clientprojectile.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_decal.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_dynamiclight.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_effect_dispatch.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_energysplash.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_explosion.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_fizz.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_footprint.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_glassshatter.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_glowsprite.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_impact.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_killplayerattachments.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_largefunnel.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_legacytempents.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_muzzleflash.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_particlesystem.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_physicsprop.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_playerdecal.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_projecteddecal.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_showline.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_smoke.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_sparks.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_sprite.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_spritespray.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_te_worlddecal.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_tracer.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_discreetline.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_envelope.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_line.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\fx_sparks.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\particlesphererenderer.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\smoke_fog_overlay.cpp">
+      <Filter>源文件\Temporary Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\entity_client_tools.cpp">
+      <Filter>源文件\Tool Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\toolframework_client.cpp">
+      <Filter>源文件\Tool Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\tools\bonelist.cpp">
+      <Filter>源文件\Tool Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\common\movieobjects\timeutils.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\slideshowpanel.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replaybrowserbasepage.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replaybrowserbasepanel.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replaybrowserdetailspanel.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replaybrowseritemmanager.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replaybrowserlistitempanel.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replaybrowserlistpanel.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replaybrowsermainpanel.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replaybrowsermovieplayerpanel.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replaybrowserpreviewpanel.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replaybrowserrenderdialog.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replayconfirmquitdlg.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replayinputpanel.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replaymessagepanel.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replayperformanceeditor.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replayperformancesavedlg.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replayreminderpanel.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\replay\vgui\replayrenderoverlay.cpp">
+      <Filter>源文件\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_replay.cpp">
+      <Filter>源文件\Replay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_team_objectiveresource.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\c_team_train_watcher.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_base_account.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_voicestatus.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_baseachievement_tracker.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hud_vote.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\predicted_viewmodel.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cs_achievements_and_stats_interface.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\achievements_cs.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\basecsgrenade_projectile.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\buy_presets\buy_preset.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\buy_presets\buy_preset_debug.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\buy_presets\buy_preset_weapon_info.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\buy_presets\buy_presets.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\c_cs_hostage.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\c_cs_player.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\c_cs_playerresource.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\c_cs_team.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\c_csrootpanel.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\c_plantedc4.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\c_te_radioicon.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\c_te_shotgun_shot.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\clientmode_csnormal.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\cs_ammodef.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\cs_gamemovement.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\cs_gamerules.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\cs_gamestats_shared.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_in_main.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\cs_player_shared.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\cs_playeranimstate.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_prediction.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\cs_shareddefs.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_client_gamestats.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\cs_usermessages.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_view_scene.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\cs_weapon_parse.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\fx_cs_blood.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\fx_cs_impacts.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\fx_cs_knifeslash.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\fx_cs_muzzleflash.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\fx_cs_shared.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\fx_cs_weaponfx.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\bot\shared_util.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\vgui_rootpanel_cs.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_hud_ammo.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_hud_chat.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_hud_damageindicator.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_hud_freezepanel.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_hud_playerhealth.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_hud_health.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_hud_scope.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_hud_target_id.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_hud_weaponselection.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_account.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_armor.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_c4.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_deathnotice.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_defuser.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_flashbang.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_hostagerescue.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_progressbar.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_radar.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_roundtimer.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_scenarioicon.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\hud_shopping_cart.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_hud_achievement_announce.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\cs_hud_achievement_tracker.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\radio_status.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_ak47.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_aug.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_awp.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_basecsgrenade.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_c4.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_csbase.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_csbasegun.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_deagle.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_elite.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_famas.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_fiveseven.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_flashbang.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_g3sg1.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_galil.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_glock.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_hegrenade.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_knife.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_m249.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_m3.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_m4a1.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_mac10.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_mp5navy.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_p228.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_p90.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_scout.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_sg550.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_sg552.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_smokegrenade.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_tmp.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_ump45.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_usp.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\cstrike\weapon_xm1014.cpp">
+      <Filter>源文件\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\achievement_stats_summary.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\achievements_page.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\backgroundpanel.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\base_stats_page.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\bordered_panel.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\buypreset_imageinfo.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\buypreset_listbox.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\buypreset_panel.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\career_box.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\career_button.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\counterstrikeviewport.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\cstrikebuyequipmenu.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\cstrikebuymenu.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\cstrikeclassmenu.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\cstrikeclientscoreboard.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\cstrikespectatorgui.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\cstriketeammenu.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\cstriketextwindow.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\lifetime_stats_page.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\match_stats_page.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\stat_card.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\stats_summary.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\VGUI\win_panel_round.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\vgui_c4panel.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\cstrike\vgui_viewc4panel.cpp">
+      <Filter>源文件\vgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\NextBot\C_NextBot.cpp">
+      <Filter>源文件\NextBot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\buymenu.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\buysubmenu.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\game_controls\classmenu.cpp">
+      <Filter>源文件\game_controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\steamworks_gamestats.cpp">
+      <Filter>源文件\CounterStrike DLL</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\game\client\view.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\game\client\viewrender.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

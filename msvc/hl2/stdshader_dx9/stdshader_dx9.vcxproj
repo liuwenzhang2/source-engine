@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{c543efa8-bdac-48d1-921d-766d8b7ccfe6}</ProjectGuid>
+    <RootNamespace>stdshaderdx9</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;STDSHADER_DX9_DLL_EXPORT;FAST_MATERIALVAR_ACCESS;STDSHADERDX9_EXPORTS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\materialsystem\stdshaders;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\materialsystem\stdshaders\fxctmp9;..\..\..\materialsystem\stdshaders\vshtmp9;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <Optimization>Disabled</Optimization>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>tier0.lib;shaderlib.lib;tier1.lib;mathlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;STDSHADER_DX9_DLL_EXPORT;FAST_MATERIALVAR_ACCESS;STDSHADERDX9_EXPORTS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\materialsystem\stdshaders;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\materialsystem\stdshaders\fxctmp9;..\..\..\materialsystem\stdshaders\vshtmp9;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>tier0.lib;shaderlib.lib;tier1.lib;mathlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;STDSHADERDX9_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;STDSHADERDX9_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\AccumBuff4Sample.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\accumbuff5sample.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\aftershock.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\aftershock_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\BaseVSShader.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\bik_dx90.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\Bloom.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\BlurFilterX.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\BlurFilterY.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\BufferClearObeyStencil_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\cable_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\cloak.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\cloak_blended_pass_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\cloak_dx9_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\cloud_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\colorcorrection.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\color_projection.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\compositor.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\core_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\debugmrttexture.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\DebugTextureView.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\DecalBaseTimesLightmapAlphaBlendSelfIllum_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\DecalModulate_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\depthwrite.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\Downsample.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\downsample_nohdr.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\emissive_scroll_blended_pass_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\Engine_Post_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\eyeball.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\eyeglint_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\eyes_dx8_dx9_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\eyes_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\eye_refract.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\eye_refract_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\filmdust_dx8_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\filmgrain_dx8_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\flesh_interior_blended_pass_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\floatcombine.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\floatcombine_autoexpose.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\floattoscreen.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\floattoscreen_vanilla.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\HDRCombineTo16Bit.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\HDRSelectRange.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\hsl_filmgrain_pass1.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\hsl_filmgrain_pass2.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\hsv.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\introscreenspaceeffect.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\lightmappedgeneric_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\lightmappedgeneric_dx9_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\lightmappedreflective.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\modulate_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\MonitorScreen_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\motion_blur_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\occlusion_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\particlelitgeneric_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\particlelitgeneric_dx9_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\particlesphere_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\pbr_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\portal.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\portalstaticoverlay.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\portal_refract.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\portal_refract_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\pyro_vision.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\refract.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\refract_dx9_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\sample4x4.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\sample4x4_blend.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\screenspace_general.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\sfm_blurfilterx.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\sfm_blurfiltery.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\sfm_downsample.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\sfm_integercombine.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\shadow.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\shadowbuild_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\shadowmodel_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\shatteredglass.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\showz.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\skin_dx9_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\sky_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\sky_hdr_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\spritecard.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\sprite_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\teeth.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\TreeLeaf.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\unlitgeneric_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\unlittwotexture_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\vertexlitgeneric_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\vertexlitgeneric_dx9_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\volume_clouds.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\volume_clouds_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\vortwarp_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\vr_distort_hud.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\vr_distort_texture.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\warp.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\water.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\weapon_sheen_pass_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\windowimposter_dx90.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\wireframe_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\worldtwotextureblend.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\worldvertexalpha.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\worldvertextransition.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\worldvertextransition_dx8_helper.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\writestencil_dx9.cpp" />
+    <ClCompile Include="..\..\..\materialsystem\stdshaders\writez_dx9.cpp" />
+    <ClCompile Include="..\..\..\public\tier0\memoverride.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

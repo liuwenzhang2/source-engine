@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{35d4bf75-72ab-4c36-9ee6-a5a4a3dc30dc}</ProjectGuid>
+    <RootNamespace>engine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER;USE_CONVARS;VOICE_OVER_IP;MEM_OVERRIDE_ON;HAVE_JPEG;ENGINE_EXPORTS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\engine;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\common;..\..\..\engine\audio;..\..\..\public\engine\audio;..\..\..\thirdparty\SDL;..\..\..\public\matsys_controls;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <Optimization>Disabled</Optimization>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\;..\..\..\utils\vmpi_private\mysql\lib\opt;..\..\..\dx9sdk\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>tier0.lib;tier1.lib;tier2.lib;tier3.lib;vgui_controls.lib;matsys_controls.lib;dmxloader.lib;bitmap.lib;vstdlib.lib;appframework.lib;vtf.lib;mathlib.lib;steam_api.lib;SDL2.lib;libjpeg.lib;libpng.lib;libz.lib;nvtc.lib;zlib.lib;amstrmid.lib;d3d8.lib;d3d9.lib;d3dx.lib;d3dx8.lib;d3dx8d.lib;d3dx8dt.lib;d3dx9.lib;d3dx9d.lib;d3dx9dt.lib;d3dxd.lib;d3dxof.lib;ddraw.lib;dinput.lib;dinput8.lib;dmoguids.lib;dplayx.lib;dsetup.lib;dsound.lib;DxErr8.lib;DxErr9.lib;dxguid.lib;dxtrans.lib;encapi.lib;ksproxy.lib;ksuser.lib;msdmo.lib;quartz.lib;strmiids.lib;XInput.lib;Winmm.lib;Ws2_32.lib;Wininet.lib;Rpcrt4.lib;bzip2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER;USE_CONVARS;VOICE_OVER_IP;MEM_OVERRIDE_ON;HAVE_JPEG;ENGINE_EXPORTS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\engine;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\common;..\..\..\engine\audio;..\..\..\public\engine\audio;..\..\..\thirdparty\SDL;..\..\..\public\matsys_controls;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\;..\..\..\utils\vmpi_private\mysql\lib\opt;..\..\..\dx9sdk\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>tier0.lib;tier1.lib;tier2.lib;tier3.lib;vgui_controls.lib;matsys_controls.lib;dmxloader.lib;bitmap.lib;vstdlib.lib;appframework.lib;vtf.lib;mathlib.lib;steam_api.lib;SDL2.lib;libjpeg.lib;libpng.lib;libz.lib;nvtc.lib;zlib.lib;amstrmid.lib;d3d8.lib;d3d9.lib;d3dx.lib;d3dx8.lib;d3dx8d.lib;d3dx8dt.lib;d3dx9.lib;d3dx9d.lib;d3dx9dt.lib;d3dxd.lib;d3dxof.lib;ddraw.lib;dinput.lib;dinput8.lib;dmoguids.lib;dplayx.lib;dsetup.lib;dsound.lib;DxErr8.lib;DxErr9.lib;dxguid.lib;dxtrans.lib;encapi.lib;ksproxy.lib;ksuser.lib;msdmo.lib;quartz.lib;strmiids.lib;XInput.lib;Winmm.lib;Ws2_32.lib;Wininet.lib;Rpcrt4.lib;bzip2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\public\tier1\utlmemory.h" />
+    <ClInclude Include="..\..\..\public\tier1\utlvector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\common\language.cpp" />
+    <ClCompile Include="..\..\..\common\netmessages.cpp" />
+    <ClCompile Include="..\..\..\common\randoverride.cpp" />
+    <ClCompile Include="..\..\..\common\SourceAppInfo.cpp" />
+    <ClCompile Include="..\..\..\common\steamid.cpp" />
+    <ClCompile Include="..\..\..\common\vgui\vgui_basebudgetpanel.cpp" />
+    <ClCompile Include="..\..\..\common\vgui\vgui_budgetbargraphpanel.cpp" />
+    <ClCompile Include="..\..\..\common\vgui\vgui_budgethistorypanel.cpp" />
+    <ClCompile Include="..\..\..\common\vgui\vgui_budgetpanelshared.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\circularbuffer.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\MPAFile.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\MPAHeader.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_dev_common.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_dev_direct.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_dev_sdl.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_dev_wave.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_dma.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_dsp.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_mix.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_mp3_source.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_sentence_mixer.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_wave_data.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_wave_mixer.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_wave_mixer_adpcm.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_wave_mixer_mp3.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_wave_source.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_wave_temp.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\snd_win.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\VBRHeader.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\voice.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\voice_gain.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\voice_mixer_controls.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\voice_record_dsound.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\voice_sound_engine_interface.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\voice_wavefile.cpp" />
+    <ClCompile Include="..\..\..\engine\audio\vox.cpp" />
+    <ClCompile Include="..\..\..\engine\baseautocompletefilelist.cpp" />
+    <ClCompile Include="..\..\..\engine\baseclient.cpp" />
+    <ClCompile Include="..\..\..\engine\baseclientstate.cpp" />
+    <ClCompile Include="..\..\..\engine\baseserver.cpp" />
+    <ClCompile Include="..\..\..\engine\bitbuf_errorhandler.cpp" />
+    <ClCompile Include="..\..\..\engine\bugreporter.cpp" />
+    <ClCompile Include="..\..\..\engine\buildcubemaps.cpp" />
+    <ClCompile Include="..\..\..\engine\cbenchmark.cpp" />
+    <ClCompile Include="..\..\..\engine\ccs.cpp" />
+    <ClCompile Include="..\..\..\engine\cdll_engine_int.cpp" />
+    <ClCompile Include="..\..\..\engine\changeframelist.cpp" />
+    <ClCompile Include="..\..\..\engine\cheatcodes.cpp" />
+    <ClCompile Include="..\..\..\engine\checksum_engine.cpp" />
+    <ClCompile Include="..\..\..\engine\client.cpp" />
+    <ClCompile Include="..\..\..\engine\clientframe.cpp" />
+    <ClCompile Include="..\..\..\engine\client_pch.cpp" />
+    <ClCompile Include="..\..\..\engine\clockdriftmgr.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_bounded_cvars.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_check_process.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_demo.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_demoaction.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_demoactioneditors.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_demoactionmanager.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_demoaction_types.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_demoeditorpanel.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_demosmootherpanel.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_demouipanel.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_entityreport.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_ents_parse.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_foguipanel.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_localnetworkbackdoor.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_main.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_parse_event.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_pluginhelpers.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_pred.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_rcon.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_steamauth.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_texturelistpanel.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_txviewpanel.cpp" />
+    <ClCompile Include="..\..\..\engine\cmd.cpp" />
+    <ClCompile Include="..\..\..\engine\cmodel.cpp" />
+    <ClCompile Include="..\..\..\engine\cmodel_bsp.cpp" />
+    <ClCompile Include="..\..\..\engine\cmodel_disp.cpp" />
+    <ClCompile Include="..\..\..\engine\colorcorrectionpanel.cpp" />
+    <ClCompile Include="..\..\..\engine\common.cpp" />
+    <ClCompile Include="..\..\..\engine\console.cpp" />
+    <ClCompile Include="..\..\..\engine\cvar.cpp" />
+    <ClCompile Include="..\..\..\engine\debugoverlay.cpp" />
+    <ClCompile Include="..\..\..\engine\debug_leafvis.cpp" />
+    <ClCompile Include="..\..\..\engine\decals.cpp" />
+    <ClCompile Include="..\..\..\engine\decal_clip.cpp" />
+    <ClCompile Include="..\..\..\engine\demofile.cpp" />
+    <ClCompile Include="..\..\..\engine\DevShotGenerator.cpp" />
+    <ClCompile Include="..\..\..\engine\disp.cpp" />
+    <ClCompile Include="..\..\..\engine\disp_defs.cpp" />
+    <ClCompile Include="..\..\..\engine\disp_helpers.cpp" />
+    <ClCompile Include="..\..\..\engine\disp_interface.cpp" />
+    <ClCompile Include="..\..\..\engine\disp_mapload.cpp" />
+    <ClCompile Include="..\..\..\engine\download.cpp" />
+    <ClCompile Include="..\..\..\engine\DownloadListGenerator.cpp" />
+    <ClCompile Include="..\..\..\engine\downloadthread.cpp" />
+    <ClCompile Include="..\..\..\engine\dt.cpp" />
+    <ClCompile Include="..\..\..\engine\dt_common_eng.cpp" />
+    <ClCompile Include="..\..\..\engine\dt_encode.cpp" />
+    <ClCompile Include="..\..\..\engine\dt_instrumentation.cpp" />
+    <ClCompile Include="..\..\..\engine\dt_instrumentation_server.cpp" />
+    <ClCompile Include="..\..\..\engine\dt_localtransfer.cpp" />
+    <ClCompile Include="..\..\..\engine\dt_recv_decoder.cpp" />
+    <ClCompile Include="..\..\..\engine\dt_recv_eng.cpp" />
+    <ClCompile Include="..\..\..\engine\dt_send_eng.cpp" />
+    <ClCompile Include="..\..\..\engine\dt_stack.cpp" />
+    <ClCompile Include="..\..\..\engine\dt_test.cpp" />
+    <ClCompile Include="..\..\..\engine\enginesingleuserfilter.cpp" />
+    <ClCompile Include="..\..\..\engine\EngineSoundClient.cpp" />
+    <ClCompile Include="..\..\..\engine\EngineSoundServer.cpp" />
+    <ClCompile Include="..\..\..\engine\enginestats.cpp" />
+    <ClCompile Include="..\..\..\engine\enginethreads.cpp" />
+    <ClCompile Include="..\..\..\engine\enginetool.cpp" />
+    <ClCompile Include="..\..\..\engine\enginetrace.cpp" />
+    <ClCompile Include="..\..\..\engine\engine_replay_int.cpp" />
+    <ClCompile Include="..\..\..\engine\engsoundservice.cpp" />
+    <ClCompile Include="..\..\..\engine\filesystem_engine.cpp" />
+    <ClCompile Include="..\..\..\engine\filetransfermgr.cpp" />
+    <ClCompile Include="..\..\..\engine\GameEventManager.cpp" />
+    <ClCompile Include="..\..\..\engine\GameEventManagerOld.cpp" />
+    <ClCompile Include="..\..\..\engine\gametrace_engine.cpp" />
+    <ClCompile Include="..\..\..\engine\gl_draw.cpp" />
+    <ClCompile Include="..\..\..\engine\gl_drawlights.cpp" />
+    <ClCompile Include="..\..\..\engine\gl_lightmap.cpp" />
+    <ClCompile Include="..\..\..\engine\gl_matsysiface.cpp" />
+    <ClCompile Include="..\..\..\engine\gl_rlight.cpp" />
+    <ClCompile Include="..\..\..\engine\gl_rmain.cpp" />
+    <ClCompile Include="..\..\..\engine\gl_rmisc.cpp" />
+    <ClCompile Include="..\..\..\engine\gl_rsurf.cpp" />
+    <ClCompile Include="..\..\..\engine\gl_screen.cpp" />
+    <ClCompile Include="..\..\..\engine\gl_shader.cpp" />
+    <ClCompile Include="..\..\..\engine\gl_warp.cpp" />
+    <ClCompile Include="..\..\..\engine\hltvclient.cpp" />
+    <ClCompile Include="..\..\..\engine\hltvclientstate.cpp" />
+    <ClCompile Include="..\..\..\engine\hltvdemo.cpp" />
+    <ClCompile Include="..\..\..\engine\hltvserver.cpp" />
+    <ClCompile Include="..\..\..\engine\hltvtest.cpp" />
+    <ClCompile Include="..\..\..\engine\host.cpp" />
+    <ClCompile Include="..\..\..\engine\host_cmd.cpp" />
+    <ClCompile Include="..\..\..\engine\host_listmaps.cpp" />
+    <ClCompile Include="..\..\..\engine\host_phonehome.cpp" />
+    <ClCompile Include="..\..\..\engine\host_saverestore.cpp" />
+    <ClCompile Include="..\..\..\engine\host_state.cpp" />
+    <ClCompile Include="..\..\..\engine\initmathlib.cpp" />
+    <ClCompile Include="..\..\..\engine\keys.cpp" />
+    <ClCompile Include="..\..\..\engine\lightcache.cpp" />
+    <ClCompile Include="..\..\..\engine\LoadScreenUpdate.cpp" />
+    <ClCompile Include="..\..\..\engine\LocalNetworkBackdoor.cpp" />
+    <ClCompile Include="..\..\..\engine\l_studio.cpp" />
+    <ClCompile Include="..\..\..\engine\MapReslistGenerator.cpp" />
+    <ClCompile Include="..\..\..\engine\masterserver.cpp" />
+    <ClCompile Include="..\..\..\engine\matchmakingclient.cpp" />
+    <ClCompile Include="..\..\..\engine\matchmakinghost.cpp" />
+    <ClCompile Include="..\..\..\engine\matchmakingmigrate.cpp" />
+    <ClCompile Include="..\..\..\engine\matchmakingqos.cpp" />
+    <ClCompile Include="..\..\..\engine\matchmakingshared.cpp" />
+    <ClCompile Include="..\..\..\engine\materialproxyfactory.cpp" />
+    <ClCompile Include="..\..\..\engine\matsys_interface.cpp" />
+    <ClCompile Include="..\..\..\engine\mem_fgets.cpp" />
+    <ClCompile Include="..\..\..\engine\ModelInfo.cpp" />
+    <ClCompile Include="..\..\..\engine\modelloader.cpp" />
+    <ClCompile Include="..\..\..\engine\mod_vis.cpp" />
+    <ClCompile Include="..\..\..\engine\networkstringtable.cpp" />
+    <ClCompile Include="..\..\..\engine\networkstringtableclient.cpp" />
+    <ClCompile Include="..\..\..\engine\NetworkStringTableItem.cpp" />
+    <ClCompile Include="..\..\..\engine\networkstringtableserver.cpp" />
+    <ClCompile Include="..\..\..\engine\net_chan.cpp" />
+    <ClCompile Include="..\..\..\engine\net_synctags.cpp" />
+    <ClCompile Include="..\..\..\engine\net_ws.cpp" />
+    <ClCompile Include="..\..\..\engine\net_ws_queued_packet_sender.cpp" />
+    <ClCompile Include="..\..\..\engine\OcclusionSystem.cpp" />
+    <ClCompile Include="..\..\..\engine\Overlay.cpp" />
+    <ClCompile Include="..\..\..\engine\packed_entity.cpp" />
+    <ClCompile Include="..\..\..\engine\perfuipanel.cpp" />
+    <ClCompile Include="..\..\..\engine\precache.cpp" />
+    <ClCompile Include="..\..\..\engine\pr_edict.cpp" />
+    <ClCompile Include="..\..\..\engine\pure_server.cpp" />
+    <ClCompile Include="..\..\..\engine\quakedef.cpp" />
+    <ClCompile Include="..\..\..\engine\randomstream.cpp" />
+    <ClCompile Include="..\..\..\engine\render_pch.cpp" />
+    <ClCompile Include="..\..\..\engine\replaydemo.cpp" />
+    <ClCompile Include="..\..\..\engine\replaydemoplayer.cpp" />
+    <ClCompile Include="..\..\..\engine\replayserver.cpp" />
+    <ClCompile Include="..\..\..\engine\replay_internal.cpp" />
+    <ClCompile Include="..\..\..\engine\rpt_engine.cpp" />
+    <ClCompile Include="..\..\..\engine\r_areaportal.cpp" />
+    <ClCompile Include="..\..\..\engine\r_decal.cpp" />
+    <ClCompile Include="..\..\..\engine\r_efx.cpp" />
+    <ClCompile Include="..\..\..\engine\r_linefile.cpp" />
+    <ClCompile Include="..\..\..\engine\saverestore_filesystem.cpp" />
+    <ClCompile Include="..\..\..\engine\servermsghandler.cpp" />
+    <ClCompile Include="..\..\..\engine\server_pch.cpp" />
+    <ClCompile Include="..\..\..\engine\Session.cpp" />
+    <ClCompile Include="..\..\..\engine\shadowmgr.cpp" />
+    <ClCompile Include="..\..\..\engine\snd_io.cpp" />
+    <ClCompile Include="..\..\..\engine\socketcreator.cpp" />
+    <ClCompile Include="..\..\..\engine\sound_shared.cpp" />
+    <ClCompile Include="..\..\..\engine\spatialpartition.cpp" />
+    <ClCompile Include="..\..\..\engine\staticpropmgr.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_client.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_ents_write.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_filter.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_framesnapshot.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_ipratelimit.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_log.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_main.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_packedentities.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_plugin.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_precache.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_rcon.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_redirect.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_remoteaccess.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_steamauth.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_uploaddata.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_uploadgamestats.cpp" />
+    <ClCompile Include="..\..\..\engine\sys_dll.cpp" />
+    <ClCompile Include="..\..\..\engine\sys_dll2.cpp" />
+    <ClCompile Include="..\..\..\engine\sys_engine.cpp" />
+    <ClCompile Include="..\..\..\engine\sys_getmodes.cpp" />
+    <ClCompile Include="..\..\..\engine\sys_mainwind.cpp" />
+    <ClCompile Include="..\..\..\engine\testscriptmgr.cpp" />
+    <ClCompile Include="..\..\..\engine\tmessage.cpp" />
+    <ClCompile Include="..\..\..\engine\toolframework.cpp" />
+    <ClCompile Include="..\..\..\engine\traceinit.cpp" />
+    <ClCompile Include="..\..\..\engine\vengineserver_impl.cpp" />
+    <ClCompile Include="..\..\..\engine\vgui_askconnectpanel.cpp" />
+    <ClCompile Include="..\..\..\engine\vgui_basepanel.cpp" />
+    <ClCompile Include="..\..\..\engine\vgui_baseui_interface.cpp" />
+    <ClCompile Include="..\..\..\engine\vgui_budgetpanel.cpp" />
+    <ClCompile Include="..\..\..\engine\vgui_DebugSystemPanel.cpp" />
+    <ClCompile Include="..\..\..\engine\vgui_drawtreepanel.cpp" />
+    <ClCompile Include="..\..\..\engine\vgui_helpers.cpp" />
+    <ClCompile Include="..\..\..\engine\vgui_texturebudgetpanel.cpp" />
+    <ClCompile Include="..\..\..\engine\vgui_vprofgraphpanel.cpp" />
+    <ClCompile Include="..\..\..\engine\vgui_vprofpanel.cpp" />
+    <ClCompile Include="..\..\..\engine\view.cpp" />
+    <ClCompile Include="..\..\..\engine\voiceserver_impl.cpp" />
+    <ClCompile Include="..\..\..\engine\vprof_engine.cpp" />
+    <ClCompile Include="..\..\..\engine\vprof_record.cpp" />
+    <ClCompile Include="..\..\..\engine\world.cpp" />
+    <ClCompile Include="..\..\..\engine\xboxsystem.cpp" />
+    <ClCompile Include="..\..\..\engine\zone.cpp" />
+    <ClCompile Include="..\..\..\public\blockingudpsocket.cpp" />
+    <ClCompile Include="..\..\..\public\bsptreedata.cpp" />
+    <ClCompile Include="..\..\..\public\builddisp.cpp" />
+    <ClCompile Include="..\..\..\public\collisionutils.cpp" />
+    <ClCompile Include="..\..\..\public\crtmemdebug.cpp" />
+    <ClCompile Include="..\..\..\public\dispcoll_common.cpp" />
+    <ClCompile Include="..\..\..\public\disp_common.cpp" />
+    <ClCompile Include="..\..\..\public\disp_powerinfo.cpp" />
+    <ClCompile Include="..\..\..\public\dt_recv.cpp" />
+    <ClCompile Include="..\..\..\public\dt_send.cpp" />
+    <ClCompile Include="..\..\..\public\dt_utlvector_common.cpp" />
+    <ClCompile Include="..\..\..\public\dt_utlvector_recv.cpp" />
+    <ClCompile Include="..\..\..\public\dt_utlvector_send.cpp" />
+    <ClCompile Include="..\..\..\public\editor_sendcommand.cpp" />
+    <ClCompile Include="..\..\..\public\filesystem_helpers.cpp" />
+    <ClCompile Include="..\..\..\public\filesystem_init.cpp" />
+    <ClCompile Include="..\..\..\public\lumpfiles.cpp" />
+    <ClCompile Include="..\..\..\public\networkvar.cpp" />
+    <ClCompile Include="..\..\..\public\registry.cpp" />
+    <ClCompile Include="..\..\..\public\scratchpad3d.cpp" />
+    <ClCompile Include="..\..\..\public\sentence.cpp" />
+    <ClCompile Include="..\..\..\public\studio.cpp" />
+    <ClCompile Include="..\..\..\public\tier0\memoverride.cpp" />
+    <ClCompile Include="..\..\..\public\vallocator.cpp" />
+    <ClCompile Include="..\..\..\public\vgui_controls\vgui_controls.cpp" />
+    <ClCompile Include="..\..\..\public\XUnzip.cpp" />
+    <ClCompile Include="..\..\..\public\XZip.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

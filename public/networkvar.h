@@ -118,8 +118,8 @@ inline int CheckDeclareClass_Access(T*, const char* pShouldBe)
 template<typename type, class T, int (*OffsetFun)(void), void (T::* ChangeFun)(void*)>
 class NetworkVarEmbed : public type \
 {
-	template< class T >
-	NetworkVarEmbed& operator=(const T& val) {
+	template< class C >
+	NetworkVarEmbed& operator=(const C& val) {
 		*((type*)this) = val;
 		return *this;
 	}

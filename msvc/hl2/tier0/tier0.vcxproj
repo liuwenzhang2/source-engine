@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{0341bac8-5a93-4ff9-8bbe-8f8b53a75868}</ProjectGuid>
+    <RootNamespace>tier0</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;WAF_CFLAGS;WAF_LDFLAGS;TIER0_DLL_EXPORT;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;TIER0_EXPORTS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\tier0;..\..\..\public;..\..\..\public\tier0;..\..\..\thirdparty\SDL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <Optimization>Disabled</Optimization>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ADVAPI32.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;WAF_CFLAGS;WAF_LDFLAGS;TIER0_DLL_EXPORT;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;TIER0_EXPORTS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\tier0;..\..\..\public;..\..\..\public\tier0;..\..\..\thirdparty\SDL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ADVAPI32.lib;WS2_32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;TIER0_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;TIER0_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\public\tier0\annotations.h" />
+    <ClInclude Include="..\..\..\public\tier0\basetypes.h" />
+    <ClInclude Include="..\..\..\public\tier0\commonmacros.h" />
+    <ClInclude Include="..\..\..\public\tier0\cpumonitoring.h" />
+    <ClInclude Include="..\..\..\public\tier0\dbg.h" />
+    <ClInclude Include="..\..\..\public\tier0\dbgflag.h" />
+    <ClInclude Include="..\..\..\public\tier0\dynfunction.h" />
+    <ClInclude Include="..\..\..\public\tier0\etwprof.h" />
+    <ClInclude Include="..\..\..\public\tier0\EventMasks.h" />
+    <ClInclude Include="..\..\..\public\tier0\EventModes.h" />
+    <ClInclude Include="..\..\..\public\tier0\fasttimer.h" />
+    <ClInclude Include="..\..\..\public\tier0\ia32detect.h" />
+    <ClInclude Include="..\..\..\public\tier0\icommandline.h" />
+    <ClInclude Include="..\..\..\public\tier0\IOCTLCodes.h" />
+    <ClInclude Include="..\..\..\public\tier0\K8PerformanceCounters.h" />
+    <ClInclude Include="..\..\..\public\tier0\l2cache.h" />
+    <ClInclude Include="..\..\..\public\tier0\mem.h" />
+    <ClInclude Include="..\..\..\public\tier0\memalloc.h" />
+    <ClInclude Include="..\..\..\public\tier0\memdbgoff.h" />
+    <ClInclude Include="..\..\..\public\tier0\memdbgon.h" />
+    <ClInclude Include="..\..\..\public\tier0\memvirt.h" />
+    <ClInclude Include="..\..\..\public\tier0\minidump.h" />
+    <ClInclude Include="..\..\..\public\tier0\P4PerformanceCounters.h" />
+    <ClInclude Include="..\..\..\public\tier0\P5P6PerformanceCounters.h" />
+    <ClInclude Include="..\..\..\public\tier0\platform.h" />
+    <ClInclude Include="..\..\..\public\tier0\pmc360.h" />
+    <ClInclude Include="..\..\..\public\tier0\PMELib.h" />
+    <ClInclude Include="..\..\..\public\tier0\progressbar.h" />
+    <ClInclude Include="..\..\..\public\tier0\protected_things.h" />
+    <ClInclude Include="..\..\..\public\tier0\stacktools.h" />
+    <ClInclude Include="..\..\..\public\tier0\systeminformation.h" />
+    <ClInclude Include="..\..\..\public\tier0\testthread.h" />
+    <ClInclude Include="..\..\..\public\tier0\threadtools.h" />
+    <ClInclude Include="..\..\..\public\tier0\tmapi_dummy.h" />
+    <ClInclude Include="..\..\..\public\tier0\tslist.h" />
+    <ClInclude Include="..\..\..\public\tier0\type_traits.h" />
+    <ClInclude Include="..\..\..\public\tier0\validator.h" />
+    <ClInclude Include="..\..\..\public\tier0\valobject.h" />
+    <ClInclude Include="..\..\..\public\tier0\valve_minmax_off.h" />
+    <ClInclude Include="..\..\..\public\tier0\valve_minmax_on.h" />
+    <ClInclude Include="..\..\..\public\tier0\valve_off.h" />
+    <ClInclude Include="..\..\..\public\tier0\valve_on.h" />
+    <ClInclude Include="..\..\..\public\tier0\vcrmode.h" />
+    <ClInclude Include="..\..\..\public\tier0\vcr_shared.h" />
+    <ClInclude Include="..\..\..\public\tier0\vprof.h" />
+    <ClInclude Include="..\..\..\public\tier0\vprof_telemetry.h" />
+    <ClInclude Include="..\..\..\public\tier0\wchartypes.h" />
+    <ClInclude Include="..\..\..\public\tier0\xbox_codeline_defines.h" />
+    <ClInclude Include="..\..\..\tier0\extendedtrace.h" />
+    <ClInclude Include="..\..\..\tier0\memstd.h" />
+    <ClInclude Include="..\..\..\tier0\mem_helpers.h" />
+    <ClInclude Include="..\..\..\tier0\mem_impl_type.h" />
+    <ClInclude Include="..\..\..\tier0\pch_tier0.h" />
+    <ClInclude Include="..\..\..\tier0\resource.h" />
+    <ClInclude Include="..\..\..\tier0\tier0_strtools.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\tier0\assert_dialog.cpp" />
+    <ClCompile Include="..\..\..\tier0\commandline.cpp" />
+    <ClCompile Include="..\..\..\tier0\cpu.cpp" />
+    <ClCompile Include="..\..\..\tier0\cpumonitoring.cpp" />
+    <ClCompile Include="..\..\..\tier0\cpu_usage.cpp" />
+    <ClCompile Include="..\..\..\tier0\dbg.cpp" />
+    <ClCompile Include="..\..\..\tier0\dynfunction.cpp" />
+    <ClCompile Include="..\..\..\tier0\fasttimer.cpp" />
+    <ClCompile Include="..\..\..\tier0\mem.cpp" />
+    <ClCompile Include="..\..\..\tier0\memdbg.cpp" />
+    <ClCompile Include="..\..\..\tier0\memstd.cpp" />
+    <ClCompile Include="..\..\..\tier0\memvalidate.cpp" />
+    <ClCompile Include="..\..\..\tier0\mem_helpers.cpp" />
+    <ClCompile Include="..\..\..\tier0\minidump.cpp" />
+    <ClCompile Include="..\..\..\tier0\platform.cpp" />
+    <ClCompile Include="..\..\..\tier0\pme.cpp" />
+    <ClCompile Include="..\..\..\tier0\PMELib.cpp" />
+    <ClCompile Include="..\..\..\tier0\progressbar.cpp" />
+    <ClCompile Include="..\..\..\tier0\security.cpp" />
+    <ClCompile Include="..\..\..\tier0\stacktools.cpp" />
+    <ClCompile Include="..\..\..\tier0\systeminformation.cpp" />
+    <ClCompile Include="..\..\..\tier0\thread.cpp" />
+    <ClCompile Include="..\..\..\tier0\threadtools.cpp" />
+    <ClCompile Include="..\..\..\tier0\tier0_strtools.cpp" />
+    <ClCompile Include="..\..\..\tier0\tslist.cpp" />
+    <ClCompile Include="..\..\..\tier0\vcrmode.cpp" />
+    <ClCompile Include="..\..\..\tier0\vprof.cpp" />
+    <ClCompile Include="..\..\..\tier0\win32consoleio.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\tier0\assert_dialog.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\public\tier0\threadtools.inl" />
+    <None Include="..\..\..\tier0\InterlockedCompareExchange128.masm" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

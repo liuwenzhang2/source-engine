@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{47800747-f239-47db-90e6-b6dba07ef66b}</ProjectGuid>
+    <RootNamespace>ivpphysics</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;HAVOK_MOPP;IVP_VERSION_SDK;VPHYSICS_EXPORTS;HAVANA_CONSTRAINTS;IVPPHYSICS_EXPORTS;_WINDOWS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\ivp\ivp_physics;..\..\..\ivp\havana;..\..\..\ivp\ivp_utility;..\..\..\ivp\ivp_controller;..\..\..\ivp\ivp_collision;..\..\..\ivp\ivp_surface_manager;..\..\..\ivp\ivp_intern;..\..\..\ivp\havana\havok;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <Optimization>Disabled</Optimization>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;HAVOK_MOPP;IVP_VERSION_SDK;VPHYSICS_EXPORTS;HAVANA_CONSTRAINTS;IVPPHYSICS_EXPORTS;_WINDOWS;NDEBUG;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\ivp\ivp_physics;..\..\..\ivp\havana;..\..\..\ivp\ivp_utility;..\..\..\ivp\ivp_controller;..\..\..\ivp\ivp_collision;..\..\..\ivp\ivp_surface_manager;..\..\..\ivp\ivp_intern;..\..\..\ivp\havana\havok;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;IVPPHYSICS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;IVPPHYSICS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_3d_solver.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_clustering_longrange.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_clustering_lrange_hash.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_clustering_visualizer.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_clustering_visual_hash.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_collision_filter.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_coll_del_root_mindist.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_compact_ledge.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_compact_ledge_solver.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_i_collision_vhash.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist_debug.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist_event.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist_mcases.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist_minimize.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_mindist_recursive.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_oo_watcher.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_range_manager.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_ray_solver.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_collision\ivp_sphere_solver.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_actuator.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_actuator_spring.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_buoyancy_solver.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_car_system.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_constraint.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_constraint_car.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_constraint_fixed_keyed.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_constraint_local.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_airboat.cpp" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_buoyancy.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_fake_jetski.cpp" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_floating.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_motion.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_raycast_car.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_stiff_spring.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_controller_world_frict.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_forcefield.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_multidimensional_interp.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_controller\ivp_template_constraint.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_ball.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_calc_next_psi_solver.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_controller_phantom.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_core.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_environment.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_friction.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_friction_gaps.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_great_matrix.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_hull_manager.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_impact.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_i_friction_hash.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_i_object_vhash.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_merge_core.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_mindist_friction.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_object.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_object_attach.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_physic.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_physic_private.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_polygon.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_sim_unit.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_solver_core_reaction.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_intern\ivp_time.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_anomaly_manager.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_betterdebugmanager.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_betterstatisticsmanager.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_cache_object.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_liquid_surface_descript.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_material.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_performancecounter.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_stat_manager_cback_con.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_surface_manager.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_physics\ivp_templates.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_surface_manager\ivp_compact_surface.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_surface_manager\ivp_gridbuild_array.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_surface_manager\ivp_surman_grid.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_surface_manager\ivp_surman_polygon.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_active_value.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_bigvector.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_geometry.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_hash.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_linear.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_mapping.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_memory.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_min_hash.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_min_list.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_os_dep.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_quat.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_string.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_types.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_vector.cxx" />
+    <ClCompile Include="..\..\..\ivp\ivp_utility\ivu_vhash.cxx" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
