@@ -20,7 +20,14 @@ class CSmokeStackLightInfo
 public:
 	DECLARE_CLASS_NOBASE( CSmokeStackLightInfo );
 	DECLARE_SIMPLE_DATADESC();
-	DECLARE_NETWORKVAR_CHAIN();
+	//DECLARE_NETWORKVAR_CHAIN();
+	DECLARE_EMBEDDED_NETWORKVAR();
+
+	CSmokeStackLightInfo() {
+		m_vPos.Init();
+		m_vColor.Init();
+		m_flIntensity = 0;
+	}
 
 	CNetworkVector( m_vPos );
 	CNetworkVector( m_vColor );
@@ -66,8 +73,8 @@ public:
 	CNetworkVar( int, m_bEmit );		// Emit particles?
 	CNetworkVar( float, m_flBaseSpread );
 	
-	CSmokeStackLightInfo		m_AmbientLight;
-	CSmokeStackLightInfo		m_DirLight;
+	CNetworkVarEmbedded(CSmokeStackLightInfo, m_AmbientLight);
+	CNetworkVarEmbedded(CSmokeStackLightInfo, m_DirLight);
 
 	CNetworkVar( float, m_flTwist );
 	

@@ -1001,11 +1001,11 @@ void CDescribeData::DescribeString( const string_t *instring, int count )
 	{
 		if ( count == 1 )
 		{
-			Describe( " string (%s)\n", instring[ i ] ? instring[ i ]  : "" );
+			Describe( " string (%s)\n", STRING(instring[ i ]) ? STRING(instring[ i ])  : "" );
 		}
 		else
 		{
-			Describe( "[%i] string (%s)\n", i, instring[ i ] ? instring[ i ]  : "" );
+			Describe( "[%i] string (%s)\n", i, STRING(instring[ i ]) ? STRING(instring[ i ])  : "" );
 		}
 	}
 }

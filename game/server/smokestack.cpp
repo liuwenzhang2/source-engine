@@ -95,11 +95,11 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 CSmokeStack::CSmokeStack()
 {
-	memset( &m_AmbientLight, 0, sizeof(m_AmbientLight) ); 
-	memset( &m_DirLight, 0, sizeof(m_DirLight) ); 
+	//memset( &m_AmbientLight, 0, sizeof(m_AmbientLight) ); //has bug with virtual methods
+	//memset( &m_DirLight, 0, sizeof(m_DirLight) ); //has bug with virtual methods
 
-	IMPLEMENT_NETWORKVAR_CHAIN( &m_AmbientLight );
-	IMPLEMENT_NETWORKVAR_CHAIN( &m_DirLight );
+	//IMPLEMENT_NETWORKVAR_CHAIN( &m_AmbientLight );
+	//IMPLEMENT_NETWORKVAR_CHAIN( &m_DirLight );
 
 	m_flTwist = 0;
 	SetRenderColor( 0, 0, 0, 255 );

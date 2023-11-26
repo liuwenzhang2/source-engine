@@ -110,7 +110,9 @@ int APIENTRY WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 #endif
 	_snprintf( szBuffer, sizeof( szBuffer ), "PATH=%s\\bin\\;%s", pRootDir, pPath );
 	szBuffer[sizeof( szBuffer ) - 1] = '\0';
+#ifdef _DEBUG
 	assert( len < sizeof( szBuffer ) );
+#endif
 	_putenv( szBuffer );
 
 	// Assemble the full path to our "launcher.dll"
