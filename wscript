@@ -51,7 +51,7 @@ projects={
 		'datacache',
 		'datamodel',
 		'dmxloader',
-#		'engine',
+		'engine',
 		'engine/voice_codecs/minimp3',
 		'filesystem',
 		'game/client',
