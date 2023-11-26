@@ -110,8 +110,8 @@ inline int CheckDeclareClass_Access(T*, const char* pShouldBe)
 
 
 #define DECLARE_EMBEDDED_NETWORKVAR() \
-	template <typename T> friend int ServerClassInit(T *);	\
-	template <typename T> friend int ClientClassInit(T *); \
+	template <typename U> friend int ServerClassInit(U *);	\
+	template <typename U> friend int ClientClassInit(U *); \
 	virtual void NetworkStateChanged() {}  \
 	virtual void NetworkStateChanged( void *pProp ) {}
 
@@ -920,7 +920,7 @@ public:
 			NetworkVarConstruct(m_Value[i]);
 		}
 	}
-	template <typename T> friend int ServerClassInit(T*);
+	template <typename U> friend int ServerClassInit(U*);
 	const type& operator[](int i) const
 	{
 		return Get(i);
