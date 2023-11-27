@@ -2096,7 +2096,7 @@ void C_CSPlayer::PlayReloadEffect()
 				if ( pEvent->event == CL_EVENT_SOUND )
 				{
 					CCSSoundEvent event;
-					event.m_SoundName = pEvent->options;
+					event.m_SoundName = MAKE_STRING( pEvent->options);
 					event.m_flEventTime = gpGlobals->curtime + pEvent->cycle / cyclesPerSecond;
 					m_SoundEvents.AddToTail( event );
 				}

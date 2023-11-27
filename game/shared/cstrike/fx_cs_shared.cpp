@@ -59,7 +59,7 @@ ConVar weapon_accuracy_logging( "weapon_accuracy_logging", "0", FCVAR_REPLICATED
 
 			if ( vEndPos.DistToSqr( pSound->m_vPos ) < 300*300 )
 			{
-				if ( Q_stricmp( pSound->m_SoundName, pSoundName ) == 0 )
+				if ( Q_stricmp(STRING(pSound->m_SoundName), pSoundName ) == 0 )
 					return;
 			}
 		}
@@ -69,7 +69,7 @@ ConVar weapon_accuracy_logging( "weapon_accuracy_logging", "0", FCVAR_REPLICATED
 		C_BaseEntity::EmitSound( filter, NULL, pSoundName, &vEndPos );
 
 		i = g_GroupedSounds.AddToTail();
-		g_GroupedSounds[i].m_SoundName = pSoundName;
+		g_GroupedSounds[i].m_SoundName = MAKE_STRING(pSoundName);
 		g_GroupedSounds[i].m_vPos = vEndPos;
 	}
 

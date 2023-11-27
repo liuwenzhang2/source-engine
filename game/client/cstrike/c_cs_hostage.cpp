@@ -207,7 +207,7 @@ C_CHostage::C_CHostage()
 	m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
 
 	// set the model so the PlayerAnimState uses the Hostage activities/sequences
-	SetModelName( "models/Characters/Hostage_01.mdl" );
+	SetModelName(MAKE_STRING("models/Characters/Hostage_01.mdl") );
 
 	m_PlayerAnimState = CreateHostageAnimState( this, this, LEGANIM_8WAY, false );
 	
