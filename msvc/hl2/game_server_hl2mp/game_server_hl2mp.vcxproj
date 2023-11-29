@@ -18,141 +18,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
-    <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{ec1c69e8-deec-4421-b05f-6f5db9a06030}</ProjectGuid>
-    <RootNamespace>gameserverhl2</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v143</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v143</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>server</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>server</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;GAME_DLL;GAMESERVERHL2_EXPORTS;HL2_DLL;USES_SAVERESTORE;_CRT_SECURE_NO_WARNINGS;VERSION_SAFE_STEAM_API_INTERFACES</PreprocessorDefinitions>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\game\server;..\..\..\game\shared;..\..\..\utils\common;..\..\..\game\shared\econ;..\..\..\game\server\NextBot;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\game\server\hl2;..\..\..\game\shared\hl2;..\..\..\game\server\hl2mp;..\..\..\game\shared\hl2mp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
-      <Optimization>Disabled</Optimization>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-    </ClCompile>
-    <Link>
-      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>tier0.lib;particles.lib;dmxloader.lib;tier1.lib;tier2.lib;tier3.lib;mathlib.lib;vstdlib.lib;choreoobjects.lib;steam_api.lib;Rpcrt4.lib;USER32.lib;</AdditionalDependencies>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;GAME_DLL;GAMESERVERHL2_EXPORTS;HL2_DLL;USES_SAVERESTORE;_CRT_SECURE_NO_WARNINGS;VERSION_SAFE_STEAM_API_INTERFACES</PreprocessorDefinitions>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\game\server;..\..\..\game\shared;..\..\..\utils\common;..\..\..\game\shared\econ;..\..\..\game\server\NextBot;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\game\server\hl2;..\..\..\game\shared\hl2;..\..\..\game\server\hl2mp;..\..\..\game\shared\hl2mp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
-    </ClCompile>
-    <Link>
-      <AdditionalDependencies>tier0.lib;particles.lib;dmxloader.lib;tier1.lib;tier2.lib;tier3.lib;mathlib.lib;vstdlib.lib;choreoobjects.lib;steam_api.lib;Rpcrt4.lib;USER32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;GAMESERVERHL2_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableUAC>false</EnableUAC>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;GAMESERVERHL2_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <EnableUAC>false</EnableUAC>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\common\language.cpp" />
     <ClCompile Include="..\..\..\common\randoverride.cpp" />
@@ -180,7 +45,6 @@
     <ClCompile Include="..\..\..\game\server\ai_default.cpp" />
     <ClCompile Include="..\..\..\game\server\ai_dynamiclink.cpp" />
     <ClCompile Include="..\..\..\game\server\ai_event.cpp" />
-    <ClCompile Include="..\..\..\game\server\ai_eventresponse.cpp" />
     <ClCompile Include="..\..\..\game\server\ai_goalentity.cpp" />
     <ClCompile Include="..\..\..\game\server\ai_hint.cpp" />
     <ClCompile Include="..\..\..\game\server\ai_hull.cpp" />
@@ -232,7 +96,6 @@
     <ClCompile Include="..\..\..\game\server\basemultiplayerplayer.cpp" />
     <ClCompile Include="..\..\..\game\server\basetempentity.cpp" />
     <ClCompile Include="..\..\..\game\server\baseviewmodel.cpp" />
-    <ClCompile Include="..\..\..\game\server\base_gameinterface.cpp" />
     <ClCompile Include="..\..\..\game\server\base_transmit_proxy.cpp" />
     <ClCompile Include="..\..\..\game\server\bitstring.cpp" />
     <ClCompile Include="..\..\..\game\server\bmodels.cpp" />
@@ -311,11 +174,18 @@
     <ClCompile Include="..\..\..\game\server\grenadethrown.cpp" />
     <ClCompile Include="..\..\..\game\server\guntarget.cpp" />
     <ClCompile Include="..\..\..\game\server\hierarchy.cpp" />
+    <ClCompile Include="..\..\..\game\server\hl2mp\grenade_satchel.cpp" />
+    <ClCompile Include="..\..\..\game\server\hl2mp\grenade_tripmine.cpp" />
+    <ClCompile Include="..\..\..\game\server\hl2mp\hl2mp_bot_temp.cpp" />
+    <ClCompile Include="..\..\..\game\server\hl2mp\hl2mp_client.cpp" />
+    <ClCompile Include="..\..\..\game\server\hl2mp\hl2mp_cvars.cpp" />
+    <ClCompile Include="..\..\..\game\server\hl2mp\hl2mp_gameinterface.cpp" />
+    <ClCompile Include="..\..\..\game\server\hl2mp\hl2mp_player.cpp" />
+    <ClCompile Include="..\..\..\game\server\hl2mp\te_hl2mp_shotgun_shot.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\ai_allymanager.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\ai_behavior_actbusy.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\ai_behavior_functank.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\ai_behavior_holster.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\ai_behavior_operator.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\ai_behavior_police.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\ai_goal_police.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\ai_spotlight.cpp" />
@@ -343,14 +213,11 @@
     <ClCompile Include="..\..\..\game\server\hl2\grenade_pathfollower.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\grenade_spit.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\hl2_ai_network.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\hl2_client.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\hl2_eventlog.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\hl2_gamestats.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\hl2_player.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\hl2_playerlocaldata.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\hl2_triggers.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\hl_playermove.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\info_darknessmode_lightsource.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\info_teleporter_countdown.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\item_ammo.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\item_battery.cpp" />
@@ -370,7 +237,6 @@
     <ClCompile Include="..\..\..\game\server\hl2\npc_barney.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\npc_basescanner.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\npc_BaseZombie.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\npc_blob.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\npc_breen.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\npc_bullseye.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\npc_citizen17.cpp" />
@@ -384,7 +250,6 @@
     <ClCompile Include="..\..\..\game\server\hl2\npc_dog.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\npc_eli.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\npc_enemyfinder.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\npc_fastzombie.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\npc_fisherman.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\npc_gman.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\npc_headcrab.cpp" />
@@ -417,28 +282,13 @@
     <ClCompile Include="..\..\..\game\server\hl2\te_gaussexplosion.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\vehicle_airboat.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\vehicle_apc.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\vehicle_cannon.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\vehicle_crane.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\vehicle_jeep.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\vehicle_prisoner_pod.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\vehicle_viewcontroller.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_357.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_alyxgun.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\weapon_annabelle.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_ar2.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\weapon_bugbait.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\weapon_cguard.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_citizenpackage.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_crossbow.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_crowbar.cpp" />
     <ClCompile Include="..\..\..\game\server\hl2\weapon_flaregun.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_frag.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_physcannon.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_pistol.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_rpg.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_shotgun.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_smg1.cpp" />
-    <ClCompile Include="..\..\..\game\server\hl2\weapon_stunstick.cpp" />
     <ClCompile Include="..\..\..\game\server\hltvdirector.cpp" />
     <ClCompile Include="..\..\..\game\server\h_ai.cpp" />
     <ClCompile Include="..\..\..\game\server\h_cycler.cpp" />
@@ -453,7 +303,6 @@
     <ClCompile Include="..\..\..\game\server\logicauto.cpp" />
     <ClCompile Include="..\..\..\game\server\logicentities.cpp" />
     <ClCompile Include="..\..\..\game\server\logicrelay.cpp" />
-    <ClCompile Include="..\..\..\game\server\logic_achievement.cpp" />
     <ClCompile Include="..\..\..\game\server\logic_measure_movement.cpp" />
     <ClCompile Include="..\..\..\game\server\logic_navigation.cpp" />
     <ClCompile Include="..\..\..\game\server\mapentities.cpp" />
@@ -534,7 +383,12 @@
     <ClCompile Include="..\..\..\game\server\tanktrain.cpp" />
     <ClCompile Include="..\..\..\game\server\te.cpp" />
     <ClCompile Include="..\..\..\game\server\team.cpp" />
+    <ClCompile Include="..\..\..\game\server\team_control_point.cpp" />
+    <ClCompile Include="..\..\..\game\server\team_control_point_master.cpp" />
+    <ClCompile Include="..\..\..\game\server\team_control_point_round.cpp" />
+    <ClCompile Include="..\..\..\game\server\team_objectiveresource.cpp" />
     <ClCompile Include="..\..\..\game\server\team_spawnpoint.cpp" />
+    <ClCompile Include="..\..\..\game\server\team_train_watcher.cpp" />
     <ClCompile Include="..\..\..\game\server\TemplateEntities.cpp" />
     <ClCompile Include="..\..\..\game\server\tempmonster.cpp" />
     <ClCompile Include="..\..\..\game\server\tesla.cpp" />
@@ -587,11 +441,11 @@
     <ClCompile Include="..\..\..\game\server\toolframework_server.cpp" />
     <ClCompile Include="..\..\..\game\server\trains.cpp" />
     <ClCompile Include="..\..\..\game\server\triggers.cpp" />
+    <ClCompile Include="..\..\..\game\server\trigger_area_capture.cpp" />
     <ClCompile Include="..\..\..\game\server\util.cpp" />
     <ClCompile Include="..\..\..\game\server\variant_t.cpp" />
     <ClCompile Include="..\..\..\game\server\vehicle_base.cpp" />
     <ClCompile Include="..\..\..\game\server\vehicle_baseserver.cpp" />
-    <ClCompile Include="..\..\..\game\server\vehicle_choreo_generic.cpp" />
     <ClCompile Include="..\..\..\game\server\vguiscreen.cpp" />
     <ClCompile Include="..\..\..\game\server\vote_controller.cpp" />
     <ClCompile Include="..\..\..\game\server\waterbullet.cpp" />
@@ -637,7 +491,25 @@
     <ClCompile Include="..\..\..\game\shared\gamevars_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\hintmessage.cpp" />
     <ClCompile Include="..\..\..\game\shared\hintsystem.cpp" />
-    <ClCompile Include="..\..\..\game\shared\hl2\achievements_hl2.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\hl2mp_gamerules.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\hl2mp_player_shared.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\hl2mp_weapon_parse.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_357.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_ar2.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_crossbow.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_crowbar.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_frag.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_hl2mpbase.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_hl2mpbasebasebludgeon.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_hl2mpbasehlmpcombatweapon.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_hl2mpbase_machinegun.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_physcannon.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_pistol.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_rpg.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_shotgun.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_slam.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_smg1.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl2mp\weapon_stunstick.cpp" />
     <ClCompile Include="..\..\..\game\shared\hl2\basehlcombatweapon_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\hl2\env_headcrabcanister_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\hl2\hl2_gamerules.cpp" />
@@ -661,6 +533,7 @@
     <ClCompile Include="..\..\..\game\shared\point_posecontroller.cpp" />
     <ClCompile Include="..\..\..\game\shared\precache_register.cpp" />
     <ClCompile Include="..\..\..\game\shared\predictableid.cpp" />
+    <ClCompile Include="..\..\..\game\shared\predicted_viewmodel.cpp" />
     <ClCompile Include="..\..\..\game\shared\props_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\querycache.cpp" />
     <ClCompile Include="..\..\..\game\shared\ragdoll_shared.cpp" />
@@ -679,7 +552,9 @@
     <ClCompile Include="..\..\..\game\shared\SpriteTrail.cpp" />
     <ClCompile Include="..\..\..\game\shared\studio_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\takedamageinfo.cpp" />
+    <ClCompile Include="..\..\..\game\shared\teamplayroundbased_gamerules.cpp" />
     <ClCompile Include="..\..\..\game\shared\teamplay_gamerules.cpp" />
+    <ClCompile Include="..\..\..\game\shared\teamplay_round_timer.cpp" />
     <ClCompile Include="..\..\..\game\shared\test_ehandle.cpp" />
     <ClCompile Include="..\..\..\game\shared\usercmd.cpp" />
     <ClCompile Include="..\..\..\game\shared\usermessages.cpp" />
@@ -687,7 +562,6 @@
     <ClCompile Include="..\..\..\game\shared\vehicle_viewblend_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\voice_gamemgr.cpp" />
     <ClCompile Include="..\..\..\game\shared\weapon_parse.cpp" />
-    <ClCompile Include="..\..\..\game\shared\weapon_parse_default.cpp" />
     <ClCompile Include="..\..\..\game\shared\weapon_proficiency.cpp" />
     <ClCompile Include="..\..\..\public\bone_setup.cpp" />
     <ClCompile Include="..\..\..\public\collisionutils.cpp" />
@@ -713,6 +587,139 @@
     <ClCompile Include="..\..\..\public\studio.cpp" />
     <ClCompile Include="..\..\..\public\tier0\memoverride.cpp" />
   </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{6ff4a838-a2db-4095-9633-f49dde3facc9}</ProjectGuid>
+    <RootNamespace>gameserverhl2mp</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>server</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>server</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;GAME_DLL;GAMESERVERHL2_EXPORTS;HL2_DLL;HL2MP;USES_SAVERESTORE;_CRT_SECURE_NO_WARNINGS;VERSION_SAFE_STEAM_API_INTERFACES</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\game\server;..\..\..\game\shared;..\..\..\utils\common;..\..\..\game\shared\econ;..\..\..\game\server\NextBot;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\game\server\hl2;..\..\..\game\shared\hl2;..\..\..\game\server\hl2mp;..\..\..\game\shared\hl2mp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>tier0.lib;particles.lib;dmxloader.lib;tier1.lib;tier2.lib;tier3.lib;mathlib.lib;vstdlib.lib;choreoobjects.lib;steam_api.lib;Rpcrt4.lib;USER32.lib;</AdditionalDependencies>
+      <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;GAME_DLL;GAMESERVERHL2_EXPORTS;HL2_DLL;HL2MP;USES_SAVERESTORE;_CRT_SECURE_NO_WARNINGS;VERSION_SAFE_STEAM_API_INTERFACES</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\game\server;..\..\..\game\shared;..\..\..\utils\common;..\..\..\game\shared\econ;..\..\..\game\server\NextBot;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\game\server\hl2;..\..\..\game\shared\hl2;..\..\..\game\server\hl2mp;..\..\..\game\shared\hl2mp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
+      <DisableSpecificWarnings>4819</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>tier0.lib;particles.lib;dmxloader.lib;tier1.lib;tier2.lib;tier3.lib;mathlib.lib;vstdlib.lib;choreoobjects.lib;steam_api.lib;Rpcrt4.lib;USER32.lib;</AdditionalDependencies>
+      <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;GAMESERVERHL2MP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;GAMESERVERHL2MP_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+  </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
