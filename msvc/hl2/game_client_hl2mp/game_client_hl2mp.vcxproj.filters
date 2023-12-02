@@ -1245,9 +1245,6 @@
     <ClCompile Include="..\..\..\game\shared\weapon_parse.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\weapon_parse_default.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\public\bone_accessor.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>

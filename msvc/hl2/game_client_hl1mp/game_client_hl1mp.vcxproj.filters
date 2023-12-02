@@ -14,34 +14,34 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="源文件\game_controls">
-      <UniqueIdentifier>{abd368ff-e974-4919-99bd-e2ce8fadbae3}</UniqueIdentifier>
+      <UniqueIdentifier>{a1da9cdf-3e5c-461c-8f55-08762aec3376}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\HL2 DLL">
-      <UniqueIdentifier>{fddcaeb0-3fc7-4086-860d-aaf88741a0bd}</UniqueIdentifier>
+      <UniqueIdentifier>{973d5c56-4485-4872-9a0b-f161db043929}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\MP3">
-      <UniqueIdentifier>{8aef320f-0a45-4f98-b93f-4e8358f91730}</UniqueIdentifier>
+      <UniqueIdentifier>{4e538c40-d0f4-4650-8acb-4827a15d7558}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\HL1 DLL">
+      <UniqueIdentifier>{3c68073f-a1c9-4465-b306-a1eaf8c13763}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\Replay">
-      <UniqueIdentifier>{37d8492e-41a8-4d93-b5e0-59dfd038e557}</UniqueIdentifier>
+      <UniqueIdentifier>{9b697536-f96b-404c-ba1c-643810782098}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\Sixense">
-      <UniqueIdentifier>{ed5ad683-588e-4062-a68b-3a0feb5d1e3b}</UniqueIdentifier>
+      <UniqueIdentifier>{d93b5d55-351d-457b-9df9-5843be871f9e}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\Source Files">
-      <UniqueIdentifier>{6d3f5cb8-a4eb-45c5-8573-e9ffeedd286f}</UniqueIdentifier>
+      <UniqueIdentifier>{b98a0b16-7412-40b7-b2a5-acaad5c2b7e8}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\Temporary Entities">
-      <UniqueIdentifier>{9d2acfd0-9980-4a88-86d5-f0a6357924cb}</UniqueIdentifier>
+      <UniqueIdentifier>{32a40199-9bc6-4967-8cb8-3eb664a5ac13}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\Tool Framework">
-      <UniqueIdentifier>{49587727-3684-4fd0-9340-5f0c669df8fb}</UniqueIdentifier>
+      <UniqueIdentifier>{9293a680-2821-44b5-893d-926f48952695}</UniqueIdentifier>
     </Filter>
     <Filter Include="源文件\UI">
-      <UniqueIdentifier>{35c96ff7-e6be-4a44-99d8-7338ed2bce46}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Portal">
-      <UniqueIdentifier>{7355a802-e649-40c6-8f4d-04d1d4cecd6e}</UniqueIdentifier>
+      <UniqueIdentifier>{11e5b32d-8d27-4fda-a1bd-e342f341f9a8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -84,121 +84,25 @@
     <ClCompile Include="..\..\..\game\client\c_team_objectiveresource.cpp">
       <Filter>源文件\HL2 DLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\death.cpp">
+    <ClCompile Include="..\..\..\game\client\hud_chat.cpp">
       <Filter>源文件\HL2 DLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\episodic\c_vort_charge_token.cpp">
+    <ClCompile Include="..\..\..\game\shared\predicted_viewmodel.cpp">
       <Filter>源文件\HL2 DLL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\client\hl2\c_antlion_dust.cpp">
       <Filter>源文件\HL2 DLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_ar2_explosion.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_barnacle.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_barney.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\client\hl2\c_basehelicopter.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_basehlcombatweapon.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_basehlplayer.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_citadel_effects.cpp">
       <Filter>源文件\HL2 DLL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\client\hl2\c_corpse.cpp">
       <Filter>源文件\HL2 DLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_env_alyxtemp.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_env_headcrabcanister.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_env_starfield.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_func_tankmortar.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_hl2_playerlocaldata.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_info_teleporter_countdown.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_npc_antlionguard.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_npc_combinegunship.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_npc_manhack.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_npc_rollermine.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_plasma_beam_node.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_prop_combine_ball.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\client\hl2\c_rotorwash.cpp">
       <Filter>源文件\HL2 DLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_script_intro.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_strider.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_te_concussiveexplosion.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_te_flare.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_thumper_dust.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_vehicle_airboat.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_vehicle_cannon.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_vehicle_crane.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_vehicle_prisoner_pod.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_weapon_crossbow.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\c_weapon_stunstick.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\fx_antlion.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\client\hl2\fx_bugbait.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\fx_hl2_impacts.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\fx_hl2_tracers.cpp">
       <Filter>源文件\HL2 DLL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\client\hl2\hl_in_main.cpp">
@@ -207,68 +111,128 @@
     <ClCompile Include="..\..\..\game\client\hl2\hl_prediction.cpp">
       <Filter>源文件\HL2 DLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_ammo.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_battery.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_blood.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_credits.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_damageindicator.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_flashlight.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_health.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_poisondamageindicator.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_suitpower.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_weaponselection.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_zoom.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\shieldproxy.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\client\hl2\vgui_rootpanel_hl2.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hud_chat.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hud_squadstatus.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\hl2\basehlcombatweapon_shared.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\hl2\env_headcrabcanister_shared.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\hl2\hl2_gamerules.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\hl2\hl_gamemovement.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\script_intro_shared.cpp">
       <Filter>源文件\HL2 DLL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\client\mp3player.cpp">
       <Filter>源文件\MP3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\c_hl1mp_player.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_c_legacytempents.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_c_player.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_c_rpg_rocket.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_c_weapon__stubs.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_clientmode.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_fx_gauss.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_fx_gibs.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_fx_impacts.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_fx_shelleject.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_ammo.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_battery.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_damageindicator.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_damagetiles.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_flashlight.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_geiger.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_health.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_history_resource.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_numbers.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_train.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_weaponselection.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1_basecombatweapon_shared.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1_gamemovement.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1_gamerules.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1_player_shared.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1_usermessages.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_basecombatweapon_shared.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_357.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_crossbow.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_egon.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_gauss.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_glock.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_handgrenade.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_hornetgun.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_mp5.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_rpg.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_sachel.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_shotgun.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\game\server\hl1\hl1_weapon_crowbar.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\client\replay\cdll_replay.cpp">
       <Filter>源文件\Replay</Filter>
@@ -669,16 +633,10 @@
     <ClCompile Include="..\..\..\game\client\gametrace_client.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\geiger.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\client\glow_outline_effect.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\client\glow_overlay.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\history_resource.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\client\hl2\C_Func_Monitor.cpp">
@@ -898,9 +856,6 @@
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\client\touch.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\train.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\game\client\vgui_avatarimage.cpp">
@@ -1245,6 +1200,9 @@
     <ClCompile Include="..\..\..\game\shared\weapon_parse.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\game\shared\weapon_parse_default.cpp">
+      <Filter>源文件\Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\public\bone_accessor.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
@@ -1581,158 +1539,14 @@
     <ClCompile Include="..\..\..\game\client\replay\vgui\replayrenderoverlay.cpp">
       <Filter>源文件\UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\episodic\flesh_internal_material_proxy.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_gamerules.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\hl2\survival_gamerules.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_deathnotice.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_bonusprogress.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\episodic\c_vehicle_jeep_episodic.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\episodic\c_weapon_hopwire.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\hl2\hud_radar.cpp">
-      <Filter>源文件\HL2 DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_env_lightraill_endpoint.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_env_portal_path_track.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_func_liquidportal.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_neurotoxin_countdown.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_npc_portal_turret_floor.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_npc_rocket_turret.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_portal_player.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_portal_radio.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\C_PortalGhostRenderable.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_prop_energy_ball.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_prop_portal.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_prop_portal_stats_display.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_weapon_physcannon.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_weapon_portalgun.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\c_weapon_stubs_portal.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\clientmode_portal.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\fx_portal.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\hud_quickinfo.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\MaterialProxy_Portal_PickAlphaMask.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\materialproxy_portalstatic.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\portal_credits.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\Portal_DynamicMeshRenderingUtils.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\portal_hud_crosshair.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\portal_render_targets.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\PortalRender.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\portalrenderable_flatbasic.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\vgui_neurotoxin_countdown_screen.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\client\portal\vgui_portal_stats_display_screen.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\achievements_portal.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_collideable_enumerator.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_gamemovement.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_gamerules.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_player_shared.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_playeranimstate.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_shareddefs.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_usermessages.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_util_shared.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\portal_weapon_parse.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\PortalSimulation.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\prop_portal_shared.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\StaticCollisionPolyhedronCache.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\weapon_portalbase.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\weapon_portalbasecombatweapon.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\portal\weapon_portalgun_shared.cpp">
-      <Filter>源文件\Portal</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\Multiplayer\multiplayer_animstate.cpp">
-      <Filter>源文件\Portal</Filter>
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_clientscoreboard.cpp">
+      <Filter>源文件\HL1 DLL</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

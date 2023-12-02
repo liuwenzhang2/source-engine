@@ -537,7 +537,6 @@
     <ClCompile Include="..\..\..\game\shared\voice_banmgr.cpp" />
     <ClCompile Include="..\..\..\game\shared\voice_status.cpp" />
     <ClCompile Include="..\..\..\game\shared\weapon_parse.cpp" />
-    <ClCompile Include="..\..\..\game\shared\weapon_parse_default.cpp" />
     <ClCompile Include="..\..\..\public\bone_accessor.cpp" />
     <ClCompile Include="..\..\..\public\bone_setup.cpp" />
     <ClCompile Include="..\..\..\public\client_class.cpp" />

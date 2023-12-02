@@ -180,16 +180,11 @@
     <ClCompile Include="..\..\..\game\client\c_vote_controller.cpp" />
     <ClCompile Include="..\..\..\game\client\C_WaterLODControl.cpp" />
     <ClCompile Include="..\..\..\game\client\c_world.cpp" />
-    <ClCompile Include="..\..\..\game\client\death.cpp" />
     <ClCompile Include="..\..\..\game\client\detailobjectsystem.cpp" />
     <ClCompile Include="..\..\..\game\client\dummyproxy.cpp" />
     <ClCompile Include="..\..\..\game\client\EffectsClient.cpp" />
     <ClCompile Include="..\..\..\game\client\entityoriginmaterialproxy.cpp" />
     <ClCompile Include="..\..\..\game\client\entity_client_tools.cpp" />
-    <ClCompile Include="..\..\..\game\client\episodic\c_vehicle_jeep_episodic.cpp" />
-    <ClCompile Include="..\..\..\game\client\episodic\c_vort_charge_token.cpp" />
-    <ClCompile Include="..\..\..\game\client\episodic\c_weapon_hopwire.cpp" />
-    <ClCompile Include="..\..\..\game\client\episodic\flesh_internal_material_proxy.cpp" />
     <ClCompile Include="..\..\..\game\client\flashlighteffect.cpp" />
     <ClCompile Include="..\..\..\game\client\functionproxy.cpp" />
     <ClCompile Include="..\..\..\game\client\fx.cpp" />
@@ -223,68 +218,41 @@
     <ClCompile Include="..\..\..\game\client\game_controls\SpectatorGUI.cpp" />
     <ClCompile Include="..\..\..\game\client\game_controls\teammenu.cpp" />
     <ClCompile Include="..\..\..\game\client\game_controls\vguitextwindow.cpp" />
-    <ClCompile Include="..\..\..\game\client\geiger.cpp" />
     <ClCompile Include="..\..\..\game\client\glow_outline_effect.cpp" />
     <ClCompile Include="..\..\..\game\client\glow_overlay.cpp" />
-    <ClCompile Include="..\..\..\game\client\history_resource.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\c_hl1mp_player.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_clientmode.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_c_legacytempents.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_c_player.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_c_rpg_rocket.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_c_weapon__stubs.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_fx_gauss.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_fx_gibs.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_fx_impacts.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_fx_shelleject.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_ammo.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_battery.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_damageindicator.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_damagetiles.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_flashlight.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_geiger.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_health.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_history_resource.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_numbers.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_train.cpp" />
+    <ClCompile Include="..\..\..\game\client\hl1\hl1_hud_weaponselection.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\c_antlion_dust.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_ar2_explosion.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_barnacle.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_barney.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\c_basehelicopter.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_basehlcombatweapon.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_basehlplayer.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_citadel_effects.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\c_corpse.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_env_alyxtemp.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_env_headcrabcanister.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_env_starfield.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\C_Func_Monitor.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_func_tankmortar.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_hl2_playerlocaldata.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_info_teleporter_countdown.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_npc_antlionguard.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_npc_combinegunship.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_npc_manhack.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_npc_rollermine.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_plasma_beam_node.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_prop_combine_ball.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\c_rotorwash.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_script_intro.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_strider.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_te_concussiveexplosion.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_te_flare.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_thumper_dust.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_vehicle_airboat.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_vehicle_cannon.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_vehicle_crane.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_vehicle_prisoner_pod.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\c_waterbullet.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_weapon_crossbow.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\c_weapon_stunstick.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\fx_antlion.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\fx_bugbait.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\fx_hl2_impacts.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\fx_hl2_tracers.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\hl_in_main.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\hl_prediction.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_ammo.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\hud_autoaim.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_battery.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_blood.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_bonusprogress.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_credits.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_damageindicator.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\hud_filmdemo.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_flashlight.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\hud_hdrdemo.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_health.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_poisondamageindicator.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_radar.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_suitpower.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_weaponselection.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\hud_zoom.cpp" />
-    <ClCompile Include="..\..\..\game\client\hl2\shieldproxy.cpp" />
     <ClCompile Include="..\..\..\game\client\hl2\vgui_rootpanel_hl2.cpp" />
     <ClCompile Include="..\..\..\game\client\hltvcamera.cpp" />
     <ClCompile Include="..\..\..\game\client\hud.cpp" />
@@ -302,7 +270,6 @@
     <ClCompile Include="..\..\..\game\client\hud_numericdisplay.cpp" />
     <ClCompile Include="..\..\..\game\client\hud_pdump.cpp" />
     <ClCompile Include="..\..\..\game\client\hud_redraw.cpp" />
-    <ClCompile Include="..\..\..\game\client\hud_squadstatus.cpp" />
     <ClCompile Include="..\..\..\game\client\hud_vehicle.cpp" />
     <ClCompile Include="..\..\..\game\client\hud_weapon.cpp" />
     <ClCompile Include="..\..\..\game\client\initializer.cpp" />
@@ -340,34 +307,6 @@
     <ClCompile Include="..\..\..\game\client\physpropclientside.cpp" />
     <ClCompile Include="..\..\..\game\client\playerandobjectenumerator.cpp" />
     <ClCompile Include="..\..\..\game\client\playerspawncache.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\clientmode_portal.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_env_lightraill_endpoint.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_env_portal_path_track.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_func_liquidportal.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_neurotoxin_countdown.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_npc_portal_turret_floor.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_npc_rocket_turret.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\C_PortalGhostRenderable.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_portal_player.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_portal_radio.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_prop_energy_ball.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_prop_portal.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_prop_portal_stats_display.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_weapon_physcannon.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_weapon_portalgun.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\c_weapon_stubs_portal.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\fx_portal.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\hud_quickinfo.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\materialproxy_portalstatic.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\MaterialProxy_Portal_PickAlphaMask.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\PortalRender.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\portalrenderable_flatbasic.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\portal_credits.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\Portal_DynamicMeshRenderingUtils.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\portal_hud_crosshair.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\portal_render_targets.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\vgui_neurotoxin_countdown_screen.cpp" />
-    <ClCompile Include="..\..\..\game\client\portal\vgui_portal_stats_display_screen.cpp" />
     <ClCompile Include="..\..\..\game\client\prediction.cpp" />
     <ClCompile Include="..\..\..\game\client\proxyentity.cpp" />
     <ClCompile Include="..\..\..\game\client\ProxyHealth.cpp" />
@@ -415,7 +354,6 @@
     <ClCompile Include="..\..\..\game\client\toggletextureproxy.cpp" />
     <ClCompile Include="..\..\..\game\client\toolframework_client.cpp" />
     <ClCompile Include="..\..\..\game\client\touch.cpp" />
-    <ClCompile Include="..\..\..\game\client\train.cpp" />
     <ClCompile Include="..\..\..\game\client\vgui_avatarimage.cpp" />
     <ClCompile Include="..\..\..\game\client\vgui_basepanel.cpp" />
     <ClCompile Include="..\..\..\game\client\vgui_bitmapbutton.cpp" />
@@ -449,6 +387,7 @@
     <ClCompile Include="..\..\..\game\client\weapons_resource.cpp" />
     <ClCompile Include="..\..\..\game\client\weapon_selection.cpp" />
     <ClCompile Include="..\..\..\game\client\WorldDimsProxy.cpp" />
+    <ClCompile Include="..\..\..\game\server\hl1\hl1_weapon_crowbar.cpp" />
     <ClCompile Include="..\..\..\game\shared\achievementmgr.cpp" />
     <ClCompile Include="..\..\..\game\shared\achievements_hlx.cpp" />
     <ClCompile Include="..\..\..\game\shared\achievement_saverestore.cpp" />
@@ -487,17 +426,28 @@
     <ClCompile Include="..\..\..\game\shared\gamevars_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\hintmessage.cpp" />
     <ClCompile Include="..\..\..\game\shared\hintsystem.cpp" />
-    <ClCompile Include="..\..\..\game\shared\hl2\basehlcombatweapon_shared.cpp" />
-    <ClCompile Include="..\..\..\game\shared\hl2\env_headcrabcanister_shared.cpp" />
-    <ClCompile Include="..\..\..\game\shared\hl2\hl2_gamerules.cpp" />
-    <ClCompile Include="..\..\..\game\shared\hl2\hl_gamemovement.cpp" />
-    <ClCompile Include="..\..\..\game\shared\hl2\survival_gamerules.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_basecombatweapon_shared.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_357.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_crossbow.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_egon.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_gauss.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_glock.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_handgrenade.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_hornetgun.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_mp5.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_rpg.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_sachel.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1mp_weapon_shotgun.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1_basecombatweapon_shared.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1_gamemovement.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1_gamerules.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1_player_shared.cpp" />
+    <ClCompile Include="..\..\..\game\shared\hl1\hl1_usermessages.cpp" />
     <ClCompile Include="..\..\..\game\shared\igamesystem.cpp" />
     <ClCompile Include="..\..\..\game\shared\interval.cpp" />
     <ClCompile Include="..\..\..\game\shared\mapentities_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\movevars_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\mp_shareddefs.cpp" />
-    <ClCompile Include="..\..\..\game\shared\Multiplayer\multiplayer_animstate.cpp" />
     <ClCompile Include="..\..\..\game\shared\multiplay_gamerules.cpp" />
     <ClCompile Include="..\..\..\game\shared\obstacle_pushaway.cpp" />
     <ClCompile Include="..\..\..\game\shared\particlesystemquery.cpp" />
@@ -508,31 +458,15 @@
     <ClCompile Include="..\..\..\game\shared\physics_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\point_bonusmaps_accessor.cpp" />
     <ClCompile Include="..\..\..\game\shared\point_posecontroller.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\achievements_portal.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\PortalSimulation.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\portal_collideable_enumerator.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\portal_gamemovement.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\portal_gamerules.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\portal_playeranimstate.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\portal_player_shared.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\portal_shareddefs.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\portal_usermessages.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\portal_util_shared.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\portal_weapon_parse.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\prop_portal_shared.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\StaticCollisionPolyhedronCache.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\weapon_portalbase.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\weapon_portalbasecombatweapon.cpp" />
-    <ClCompile Include="..\..\..\game\shared\portal\weapon_portalgun_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\precache_register.cpp" />
     <ClCompile Include="..\..\..\game\shared\predictableid.cpp" />
+    <ClCompile Include="..\..\..\game\shared\predicted_viewmodel.cpp" />
     <ClCompile Include="..\..\..\game\shared\predictioncopy.cpp" />
     <ClCompile Include="..\..\..\game\shared\props_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\ragdoll_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\rope_helpers.cpp" />
     <ClCompile Include="..\..\..\game\shared\saverestore.cpp" />
     <ClCompile Include="..\..\..\game\shared\sceneentity_shared.cpp" />
-    <ClCompile Include="..\..\..\game\shared\script_intro_shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\sequence_Transitioner.cpp" />
     <ClCompile Include="..\..\..\game\shared\sheetsimulator.cpp" />
     <ClCompile Include="..\..\..\game\shared\simtimer.cpp" />
@@ -554,6 +488,7 @@
     <ClCompile Include="..\..\..\game\shared\voice_banmgr.cpp" />
     <ClCompile Include="..\..\..\game\shared\voice_status.cpp" />
     <ClCompile Include="..\..\..\game\shared\weapon_parse.cpp" />
+    <ClCompile Include="..\..\..\game\shared\weapon_parse_default.cpp" />
     <ClCompile Include="..\..\..\public\bone_accessor.cpp" />
     <ClCompile Include="..\..\..\public\bone_setup.cpp" />
     <ClCompile Include="..\..\..\public\client_class.cpp" />
@@ -586,8 +521,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{6234f319-929e-46a5-8ad8-dec22d9a6e06}</ProjectGuid>
-    <RootNamespace>gameclientportal</RootNamespace>
+    <ProjectGuid>{78d1b9e1-a424-48f3-82b4-33accbafce60}</ProjectGuid>
+    <RootNamespace>gameclienthl1</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -630,20 +565,20 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>client</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>client</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;CLIENT_DLL;GAMECLIENTHL2_EXPORTS;HL2_CLIENT_DLL;PORTAL;HL2_EPISODIC;VERSION_SAFE_STEAM_API_INTERFACES;_CRT_SECURE_NO_WARNINGS;NO_STRING_T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;CLIENT_DLL;GAMECLIENTHL2_EXPORTS;HL1_CLIENT_DLL;VERSION_SAFE_STEAM_API_INTERFACES;_CRT_SECURE_NO_WARNINGS;NO_STRING_T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\game\client;..\..\..\game\client\hl2;..\..\..\game\client\portal;..\..\..\game\client\game_controls;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\vgui2;..\..\..\game\shared;..\..\..\game\shared\hl2;..\..\..\game\shared\portal;..\..\..\game\shared\Multiplayer;..\..\..\thirdparty\SDL;..\..\..\public\matsys_controls;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\game\client;..\..\..\game\client\hl2;..\..\..\game\client\hl1;..\..\..\game\client\game_controls;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\vgui2;..\..\..\game\shared;..\..\..\game\shared\hl2;..\..\..\game\shared\hl1;..\..\..\thirdparty\SDL;..\..\..\public\matsys_controls;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -664,10 +599,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;CLIENT_DLL;GAMECLIENTHL2_EXPORTS;HL2_CLIENT_DLL;PORTAL;HL2_EPISODIC;VERSION_SAFE_STEAM_API_INTERFACES;_CRT_SECURE_NO_WARNINGS;NO_STRING_T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;CLIENT_DLL;GAMECLIENTHL2_EXPORTS;HL1_CLIENT_DLL;VERSION_SAFE_STEAM_API_INTERFACES;_CRT_SECURE_NO_WARNINGS;NO_STRING_T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\..\game\client;..\..\..\game\client\hl2;..\..\..\game\client\portal;..\..\..\game\client\game_controls;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\vgui2;..\..\..\game\shared;..\..\..\game\shared\hl2;..\..\..\game\shared\portal;..\..\..\game\shared\Multiplayer;..\..\..\thirdparty\SDL;..\..\..\public\matsys_controls;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\game\client;..\..\..\game\client\hl2;..\..\..\game\client\hl1;..\..\..\game\client\game_controls;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\vgui2;..\..\..\game\shared;..\..\..\game\shared\hl2;..\..\..\game\shared\hl1;..\..\..\thirdparty\SDL;..\..\..\public\matsys_controls;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
@@ -687,7 +622,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;GAMECLIENTPORTAL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;GAMECLIENTHL1_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -704,7 +639,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;GAMECLIENTPORTAL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;GAMECLIENTHL1_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
