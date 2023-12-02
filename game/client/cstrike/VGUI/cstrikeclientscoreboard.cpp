@@ -440,8 +440,8 @@ void CCSClientScoreBoardDialog::SetupTeamDisplay( TeamDisplayInfo& teamDisplay, 
 			delete playerDisplay.pMVPImage;
 			playerDisplay.pMVPImage = (ImagePanel*)SETUP_PANEL( new ImagePanel( this, tmpName ) );
 			playerDisplay.pMVPImage->SetBounds( x, startY + yMVP, wideMVP, tallMVP );
+			playerDisplay.pMVPImage->SetShouldScaleImage(true);
 			playerDisplay.pMVPImage->SetImage( "../hud/scoreboard_mvp" );
-			playerDisplay.pMVPImage->SetShouldScaleImage( true );
 			playerDisplay.pMVPImage->SetVisible( false );
 
 			// mvp count
@@ -510,8 +510,8 @@ void CCSClientScoreBoardDialog::SetupTeamDisplay( TeamDisplayInfo& teamDisplay, 
 			delete playerDisplay.pStatusImage;
 			playerDisplay.pStatusImage = (ImagePanel*)SETUP_PANEL( new ImagePanel( this, tmpName ) );
 			playerDisplay.pStatusImage->SetBounds( x, startY, wide, tall );
+			playerDisplay.pStatusImage->SetShouldScaleImage(true);
 			playerDisplay.pStatusImage->SetImage( "../hud/scoreboard_dead" );
-			playerDisplay.pStatusImage->SetShouldScaleImage( true );
 			playerDisplay.pStatusImage->SetVisible( false );
 		}
 
@@ -526,8 +526,8 @@ void CCSClientScoreBoardDialog::SetupTeamDisplay( TeamDisplayInfo& teamDisplay, 
 			delete playerDisplay.pSelect;
 			playerDisplay.pSelect = (ImagePanel*)SETUP_PANEL( new ImagePanel( this, tmpName ) );
 			playerDisplay.pSelect->SetBounds( x1, y1, x2 - x1, y2 - y1 );
+			playerDisplay.pSelect->SetShouldScaleImage(true);
 			playerDisplay.pSelect->SetImage( "../vgui/scoreboard/scoreboard-select" );
-			playerDisplay.pSelect->SetShouldScaleImage( true );
 			playerDisplay.pSelect->SetVisible( false );
 		}
 	}
