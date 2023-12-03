@@ -3382,7 +3382,7 @@ bool CTeamplayRoundBasedRules::AreTeamsUnbalanced( int &iHeaviestTeam, int &iLig
 //-----------------------------------------------------------------------------
 void CTeamplayRoundBasedRules::SetRoundState( int iRoundState )
 {
-	m_iRoundState = iRoundState;
+	m_iRoundState = gamerules_roundstate_t(iRoundState);
 	m_flLastRoundStateChangeTime = gpGlobals->curtime;
 }
 

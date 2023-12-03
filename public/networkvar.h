@@ -171,17 +171,27 @@ public:
 		NetworkVarConstruct(m_Value);
 	}
 
-	template< class C >
-	const Type& operator=(const C& val)
+	const Type& operator=(const Type& val)
 	{
-		return Set((const Type)val);
+		return this->Set(val);
 	}
 
-	template< class C >
-	const Type& operator=(const CNetworkVarBase< C, T, OffsetFun, ChangeFun >& val)
+	const Type& operator=(const CNetworkVarBase< Type, T, OffsetFun, ChangeFun, debug >& val)
 	{
 		return Set((const Type)val.m_Value);
 	}
+
+	//template< class C >
+	//const Type& operator=(const C& val)
+	//{
+	//	return Set((const Type)val);
+	//}
+
+	//template< class C, class U, int (*OffsetFun2)(void), void (U::* ChangeFun2)(void*), bool debug2 = false >
+	//const Type& operator=(const CNetworkVarBase< C, U, OffsetFun2, ChangeFun2, debug2 >& val)
+	//{
+	//	return Set((const Type)val.m_Value);
+	//}
 
 	const Type& Set(const Type& val)
 	{
@@ -599,147 +609,16 @@ private:
 	public:\
 	CNetworkVectorBase<QAngle, ThisClass, &GetOffsetOf_##name, &ThisClass::NetworkStateChangedDispatch_##name,true> name;
 
-// Network vector wrapper.
-template< class Type, class T, int (*OffsetFun)(void), void (T::* ChangeFun)(void*), bool debug = false >
-class CNetworkQuaternionBase : public CNetworkVarBase< Type, T, OffsetFun, ChangeFun, debug >
-{
-	typedef CNetworkVarBase< Type, T, OffsetFun, ChangeFun > NetworkVarBaseClass;
-public:
-	inline void Init(float ix = 0, float iy = 0, float iz = 0, float iw = 0)
-	{
-		SetX(ix);
-		SetY(iy);
-		SetZ(iz);
-		SetW(iw);
-	}
-
-	const Type& operator=(const Type& val)
-	{
-		return NetworkVarBaseClass::Set(val);
-	}
-
-	const Type& operator=(const CNetworkQuaternionBase< Type, T, OffsetFun, ChangeFun >& val)
-	{
-		return NetworkVarBaseClass::Set(val.m_Value);
-	}
-
-	inline float GetX() const { return NetworkVarBaseClass::m_Value.x; }
-	inline float GetY() const { return NetworkVarBaseClass::m_Value.y; }
-	inline float GetZ() const { return NetworkVarBaseClass::m_Value.z; }
-	inline float GetW() const { return NetworkVarBaseClass::m_Value.w; }
-	inline float operator[](int i) const { return NetworkVarBaseClass::m_Value[i]; }
-
-	inline void SetX(float val) { DetectChange(NetworkVarBaseClass::m_Value.x, val); }
-	inline void SetY(float val) { DetectChange(NetworkVarBaseClass::m_Value.y, val); }
-	inline void SetZ(float val) { DetectChange(NetworkVarBaseClass::m_Value.z, val); }
-	inline void SetW(float val) { DetectChange(NetworkVarBaseClass::m_Value.w, val); }
-	inline void Set(int i, float val) { DetectChange(NetworkVarBaseClass::m_Value[i], val); }
-
-	bool operator==(const Type& val) const
-	{
-		return NetworkVarBaseClass::m_Value == (Type)val;
-	}
-
-	bool operator!=(const Type& val) const
-	{
-		return NetworkVarBaseClass::m_Value != (Type)val;
-	}
-
-	const Type operator+(const Type& val) const
-	{
-		return NetworkVarBaseClass::m_Value + val;
-	}
-
-	const Type operator-(const Type& val) const
-	{
-		return NetworkVarBaseClass::m_Value - val;
-	}
-
-	const Type operator*(const Type& val) const
-	{
-		return NetworkVarBaseClass::m_Value * val;
-	}
-
-	const Type& operator*=(float val)
-	{
-		return NetworkVarBaseClass::Set(NetworkVarBaseClass::m_Value * val);
-	}
-
-	const Type operator*(float val) const
-	{
-		return NetworkVarBaseClass::m_Value * val;
-	}
-
-	const Type operator/(const Type& val) const
-	{
-		return NetworkVarBaseClass::m_Value / val;
-	}
-
-private:
-	inline void DetectChange(float& out, float in)
-	{
-		if (out != in)
-		{
-			NetworkVarBaseClass::NetworkStateChanged();
-			out = in;
-		}
-	}
-};
-
-#define CNetworkQuaternion( name ) \
-	static int GetOffsetOf_##name(){\
-		return MyOffsetOf(ThisClass, name);\
-	}\
-	void NetworkStateChangedDispatch_##name( void *ptr ) \
-	{ \
-		NetworkStateChanged(ptr);\
-	}\
-	public:\
-	CNetworkQuaternionBase<Quaternion, ThisClass, &GetOffsetOf_##name, &ThisClass::NetworkStateChangedDispatch_##name> name;
-
-
-template< class Type, class T, int (*OffsetFun)(void), void (T::* ChangeFun)(void*), bool debug = false >
-class CNetworkStringTBase : public CNetworkVarBase< Type, T, OffsetFun, ChangeFun, debug >
-{
-	typedef CNetworkVarBase< Type, T, OffsetFun, ChangeFun > NetworkVarBaseClass;
-public:
-
-	const char* ToCStr() {
-		return NetworkVarBaseClass::m_Value.ToCStr();
-	}
-
-	const Type& operator=(const Type& val)
-	{
-		return NetworkVarBaseClass::Set(val);
-	}
-
-	const Type& operator=(const CNetworkStringTBase< Type, T, OffsetFun, ChangeFun >& val)
-	{
-		return NetworkVarBaseClass::Set(val.m_Value);
-	}
-};
-
-#define CNetworkStringT( name ) \
-	static int GetOffsetOf_##name(){\
-		return MyOffsetOf(ThisClass, name);\
-	}\
-	void NetworkStateChangedDispatch_##name( void *ptr ) \
-	{ \
-		NetworkStateChanged(ptr);\
-	}\
-	public:\
-	CNetworkStringTBase<string_t, ThisClass, &GetOffsetOf_##name, &ThisClass::NetworkStateChangedDispatch_##name> name;
-
-
 // Network ehandle wrapper.
 #if defined( CLIENT_DLL ) || defined( GAME_DLL )
 inline void NetworkVarConstruct(CBaseHandle& x) {}
 
 template< class Type, class T, int (*OffsetFun)(void), void (T::* ChangeFun)(void*), bool debug = false >
-class CNetworkHandleBase : public CNetworkVarBase< CBaseHandle, T, OffsetFun, ChangeFun, debug >
+class CNetworkHandleBase// : public CNetworkVarBase< CBaseHandle, T, OffsetFun, ChangeFun, debug >
 {
-	typedef CNetworkVarBase< CBaseHandle, T, OffsetFun, ChangeFun > NetworkVarBaseClass;
+	//typedef CNetworkVarBase< CBaseHandle, T, OffsetFun, ChangeFun > NetworkVarBaseClass;
 public:
+
 	const Type* operator=(const Type* val)
 	{
 		return Set(val);
@@ -747,18 +626,18 @@ public:
 
 	const Type& operator=(const CNetworkHandleBase< CBaseHandle, T, OffsetFun, ChangeFun >& val)
 	{
-		const CBaseHandle& handle = NetworkVarBaseClass::Set(val.m_Value);
+		const CBaseHandle& handle = Set(val.m_Value);//NetworkVarBaseClass::
 		return *(const Type*)handle.Get();
 	}
 
 	bool operator !() const
 	{
-		return NetworkVarBaseClass::m_Value.Get();
+		return m_Value.Get();//NetworkVarBaseClass::
 	}
 
 	operator Type* () const
 	{
-		return static_cast<Type*>(NetworkVarBaseClass::m_Value.Get());
+		return static_cast<Type*>(m_Value.Get());//NetworkVarBaseClass::
 	}
 
 	//operator int() {
@@ -767,55 +646,70 @@ public:
 
 	const Type* Set(const Type* val)
 	{
-		if (NetworkVarBaseClass::m_Value != val)
+		if (m_Value != val)//NetworkVarBaseClass::
 		{
-			NetworkVarBaseClass::NetworkStateChanged();
-			NetworkVarBaseClass::m_Value = val;
+			NetworkStateChanged();//NetworkVarBaseClass::
+			m_Value = val;//NetworkVarBaseClass::
 		}
 		return val;
 	}
 
+	CBaseHandle& GetForModify()
+	{
+		NetworkStateChanged();
+		return m_Value;
+	}
+
 	Type* Get() const
 	{
-		return static_cast<Type*>(NetworkVarBaseClass::m_Value.Get());
+		return static_cast<Type*>(m_Value.Get());//NetworkVarBaseClass::
 	}
 
 	bool IsValid() const {
-		return NetworkVarBaseClass::m_Value.IsValid();
+		return m_Value.IsValid();//NetworkVarBaseClass::
 	}
 
 	int ToInt() {
-		return NetworkVarBaseClass::m_Value.ToInt();
+		return m_Value.ToInt();//NetworkVarBaseClass::
 	}
 
 	int GetEntryIndex() const {
-		return NetworkVarBaseClass::m_Value.GetEntryIndex();
+		return m_Value.GetEntryIndex();//NetworkVarBaseClass::
 	}
 	int GetSerialNumber() const {
-		return NetworkVarBaseClass::m_Value.GetSerialNumber();
+		return m_Value.GetSerialNumber();//NetworkVarBaseClass::
 	}
 
 	void Init(int iEntity, int iSerialNum) {
-		NetworkVarBaseClass::m_Value.Init(iEntity, iSerialNum);
+		m_Value.Init(iEntity, iSerialNum);//NetworkVarBaseClass::
 	}
 
 	void Term() {
-		NetworkVarBaseClass::m_Value.Term();
+		m_Value.Term();//NetworkVarBaseClass::
 	}
 
 	Type* operator->() const
 	{
-		return static_cast<Type*>(NetworkVarBaseClass::m_Value.Get());
+		return static_cast<Type*>(m_Value.Get());//NetworkVarBaseClass::
 	}
 
 	bool operator==(const Type* val) const
 	{
-		return NetworkVarBaseClass::m_Value == val;
+		return m_Value == val;//NetworkVarBaseClass::
 	}
 
 	bool operator!=(const Type* val) const
 	{
-		return NetworkVarBaseClass::m_Value != val;
+		return m_Value != val;//NetworkVarBaseClass::
+	}
+
+	CBaseHandle m_Value;
+
+protected:
+	inline void NetworkStateChanged()
+	{
+		//Changer::NetworkStateChanged( this );
+		CHECK_USENETWORKVARS((T*)(((char*)this) - OffsetFun())->*ChangeFun)(this);
 	}
 };
 

@@ -5164,7 +5164,7 @@ void CDODGameRules::GetTaggedConVarList( KeyValues *pCvarTagList )
 
 void CDODGameRules::SetRoundState( int iRoundState )
 {
-	m_iRoundState = iRoundState;
+	m_iRoundState = DODRoundState(iRoundState);
 
 	m_flLastRoundStateChangeTime = gpGlobals->curtime;
 }
