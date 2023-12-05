@@ -697,7 +697,7 @@ C_BaseEntity* CClientEntityList<T>::NextBaseEntity(C_BaseEntity* pEnt) const
 	const CEntInfo<T>* pList = BaseClass::GetEntInfoPtr(pEnt->GetRefEHandle());
 	if (pList)
 	{
-		pList = NextEntInfo(pList);
+		pList = BaseClass::NextEntInfo(pList);
 	}
 
 	while (pList)
