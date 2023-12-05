@@ -1084,7 +1084,7 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 
 	index = entnum;
 
-	cl_entitylist->AddNetworkableEntity( GetIClientUnknown(), entnum, iSerialNum );
+	cl_entitylist->AddNetworkableEntity( this, entnum, iSerialNum );//GetIClientUnknown()
 
 	CollisionProp()->CreatePartitionHandle();
 
@@ -1134,7 +1134,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 	SetModelByIndex( iIndex );
 
 	// Add the client entity to the master entity list.
-	cl_entitylist->AddNonNetworkableEntity( GetIClientUnknown() );
+	cl_entitylist->AddNonNetworkableEntity( this );//GetIClientUnknown()
 	Assert( GetClientHandle() != ClientEntityList().InvalidHandle() );
 
 	// Add the client entity to the renderable "leaf system." (Renderable)

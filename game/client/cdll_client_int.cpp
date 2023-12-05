@@ -2039,10 +2039,10 @@ void UpdateClientRenderableInPVSStatus()
 	// Vis for this view should already be setup at this point.
 
 	// For each client-only entity, notify it if it's newly coming into the PVS.
-	CUtlLinkedList<CClientEntityList::CPVSNotifyInfo,unsigned short> &theList = ClientEntityList().GetPVSNotifiers();
+	CUtlLinkedList<CPVSNotifyInfo,unsigned short> &theList = ClientEntityList().GetPVSNotifiers();//CClientEntityList<>::
 	FOR_EACH_LL( theList, i )
 	{
-		CClientEntityList::CPVSNotifyInfo *pInfo = &theList[i];
+		CPVSNotifyInfo *pInfo = &theList[i];//CClientEntityList<>::
 
 		if ( pInfo->m_InPVSStatus & INPVS_YES )
 		{
@@ -2074,10 +2074,10 @@ void UpdatePVSNotifiers()
 
 	// At this point, all the entities that were rendered in the previous frame have INPVS_THISFRAME set
 	// so we can tell the entities that aren't in the PVS anymore so.
-	CUtlLinkedList<CClientEntityList::CPVSNotifyInfo,unsigned short> &theList = ClientEntityList().GetPVSNotifiers();
+	CUtlLinkedList<CPVSNotifyInfo,unsigned short> &theList = ClientEntityList().GetPVSNotifiers();//CClientEntityList<>::
 	FOR_EACH_LL( theList, i )
 	{
-		CClientEntityList::CPVSNotifyInfo *pInfo = &theList[i];
+		CPVSNotifyInfo *pInfo = &theList[i];//CClientEntityList<>::
 
 		// If this entity thinks it's in the PVS, but it wasn't in the PVS this frame, tell it so.
 		if ( pInfo->m_InPVSStatus & INPVS_YES )

@@ -24,6 +24,7 @@ class IHandleEntity;
 
 class CBaseHandle
 {
+template<class T>
 friend class CBaseEntityList;
 
 public:

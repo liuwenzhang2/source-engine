@@ -56,7 +56,7 @@ public:
 
 	virtual ITempEntsSystem *GetTempEntsSystem( void );
 	virtual CBaseTempEntity *GetTempEntList( void );
-	virtual CGlobalEntityList *GetEntityList( void );
+	virtual CGlobalEntityList<CBaseEntity> *GetEntityList( void );
 	virtual bool IsEntityPtr( void *pTest );
 	virtual CBaseEntity *FindEntityByClassname( CBaseEntity *pStartEntity, const char *szName );
 	virtual CBaseEntity *FindEntityByName( CBaseEntity *pStartEntity, const char *szName, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL, IEntityFindFilter *pFilter = NULL );
@@ -373,7 +373,7 @@ CBaseTempEntity *CServerTools::GetTempEntList( void )
 	return CBaseTempEntity::GetList();
 }
 
-CGlobalEntityList *CServerTools::GetEntityList( void )
+CGlobalEntityList<CBaseEntity> *CServerTools::GetEntityList( void )
 {
 	return &gEntList;
 }

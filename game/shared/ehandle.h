@@ -19,21 +19,12 @@
 
 #include "const.h"
 #include "basehandle.h"
-#include "entitylist_base.h"
+//#include "entitylist_base.h"
 
 
 class IHandleEntity;
 
 
-// -------------------------------------------------------------------------------------------------- //
-// Game-code CBaseHandle implementation.
-// -------------------------------------------------------------------------------------------------- //
-
-inline IHandleEntity* CBaseHandle::Get() const
-{
-	extern CBaseEntityList *g_pEntityList;
-	return g_pEntityList->LookupEntity( *this );
-}
 
 
 // -------------------------------------------------------------------------------------------------- //
