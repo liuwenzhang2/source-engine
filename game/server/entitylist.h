@@ -218,7 +218,7 @@ extern CGlobalEntityList<CBaseEntity> gEntList;
 template<class T>
 inline edict_t* CGlobalEntityList<T>::GetEdict( CBaseHandle hEnt ) const
 {
-	IServerUnknown *pUnk = static_cast<IServerUnknown*>(BaseClass::LookupEntity( hEnt ));
+	T *pUnk = (BaseClass::LookupEntity( hEnt ));
 	if ( pUnk )
 		return pUnk->GetNetworkable()->GetEdict();
 	else
@@ -228,7 +228,7 @@ inline edict_t* CGlobalEntityList<T>::GetEdict( CBaseHandle hEnt ) const
 template<class T>
 inline CBaseNetworkable* CGlobalEntityList<T>::GetBaseNetworkable( CBaseHandle hEnt ) const
 {
-	IServerUnknown *pUnk = static_cast<IServerUnknown*>(BaseClass::LookupEntity( hEnt ));
+	T *pUnk = (BaseClass::LookupEntity( hEnt ));
 	if ( pUnk )
 		return pUnk->GetNetworkable()->GetBaseNetworkable();
 	else
@@ -238,7 +238,7 @@ inline CBaseNetworkable* CGlobalEntityList<T>::GetBaseNetworkable( CBaseHandle h
 template<class T>
 inline IServerNetworkable* CGlobalEntityList<T>::GetServerNetworkable( CBaseHandle hEnt ) const
 {
-	IServerUnknown *pUnk = static_cast<IServerUnknown*>(BaseClass::LookupEntity( hEnt ));
+	T *pUnk = (BaseClass::LookupEntity( hEnt ));
 	if ( pUnk )
 		return pUnk->GetNetworkable();
 	else
@@ -248,7 +248,7 @@ inline IServerNetworkable* CGlobalEntityList<T>::GetServerNetworkable( CBaseHand
 template<class T>
 inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntity( CBaseHandle hEnt ) const
 {
-	IServerUnknown *pUnk = static_cast<IServerUnknown*>(BaseClass::LookupEntity( hEnt ));
+	T *pUnk = (BaseClass::LookupEntity( hEnt ));
 	if ( pUnk )
 		return pUnk->GetBaseEntity();
 	else
@@ -385,7 +385,7 @@ CBaseEntity* CGlobalEntityList<T>::NextEnt(CBaseEntity* pCurrentEnt)
 #if 0
 		if (pList->m_pEntity)
 		{
-			IServerUnknown* pUnk = static_cast<IServerUnknown*>(const_cast<T*>(pList->m_pEntity));
+			T* pUnk = (const_cast<T*>(pList->m_pEntity));
 			CBaseEntity* pRet = pUnk->GetBaseEntity();
 			if (pRet)
 				return pRet;
@@ -1077,7 +1077,7 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 		m_iHighestEnt = i;
 
 	// If it's a CBaseEntity, notify the listeners.
-	CBaseEntity* pBaseEnt = static_cast<IServerUnknown*>(pEnt)->GetBaseEntity();
+	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
 	if (pBaseEnt->edict())
 		m_iNumEdicts++;
 
@@ -1109,7 +1109,7 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	}
 #endif
 
-	CBaseEntity* pBaseEnt = static_cast<IServerUnknown*>(pEnt)->GetBaseEntity();
+	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
 	if (pBaseEnt->edict())
 		m_iNumEdicts--;
 
