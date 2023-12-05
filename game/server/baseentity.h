@@ -13,7 +13,7 @@
 
 #define TEAMNUM_NUM_BITS	6
 
-#include "entitylist.h"
+//#include "entitylist.h"
 #include "entityoutput.h"
 #include "networkvar.h"
 #include "collisionproperty.h"
@@ -33,6 +33,7 @@ class CRecipientFilter;
 class CStudioHdr;
 template<class T>
 class CGlobalEntityList;
+enum notify_system_event_t;
 
 // Matching the high level concept is significantly better than other criteria
 // FIXME:  Could do this in the script file by making it required and bumping up weighting there instead...

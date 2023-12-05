@@ -5,6 +5,7 @@
 //===========================================================================//
 
 #include "cbase.h"
+#include "entitylist.h"
 #include "globalstate.h"
 #include "isaverestore.h"
 #include "client.h"

@@ -19,7 +19,7 @@
 #include "datacache/imdlcache.h"
 #include "tier0/vprof.h"
 
-class CBaseEntity;
+//class CBaseEntity;
 
 // Implement this class and register with gEntList to receive entity create/delete notification
 class IEntityListener
