@@ -31,6 +31,8 @@ class IResponseSystem;
 class IEntitySaveUtils;
 class CRecipientFilter;
 class CStudioHdr;
+template<class T>
+class CGlobalEntityList;
 
 // Matching the high level concept is significantly better than other criteria
 // FIXME:  Could do this in the script file by making it required and bumping up weighting there instead...

@@ -14,7 +14,7 @@
 #endif
 
 #include "entitylist_base.h"
-//#include "baseentity.h"
+#include "baseentity.h"
 #include "collisionutils.h"
 #include "datacache/imdlcache.h"
 #include "tier0/vprof.h"
