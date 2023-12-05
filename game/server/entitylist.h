@@ -111,6 +111,7 @@ extern bool g_fInCleanupDelete;
 template<class T>
 class CGlobalEntityList : public CBaseEntityList<T>
 {
+	typedef CBaseEntityList<T> BaseClass;
 public:
 private:
 	int m_iHighestEnt; // the topmost used array index
@@ -216,7 +217,7 @@ extern CGlobalEntityList<CBaseEntity> gEntList;
 template<class T>
 inline edict_t* CGlobalEntityList<T>::GetEdict( CBaseHandle hEnt ) const
 {
-	IServerUnknown *pUnk = static_cast<IServerUnknown*>(LookupEntity( hEnt ));
+	IServerUnknown *pUnk = static_cast<IServerUnknown*>(BaseClass::LookupEntity( hEnt ));
 	if ( pUnk )
 		return pUnk->GetNetworkable()->GetEdict();
 	else
@@ -226,7 +227,7 @@ inline edict_t* CGlobalEntityList<T>::GetEdict( CBaseHandle hEnt ) const
 template<class T>
 inline CBaseNetworkable* CGlobalEntityList<T>::GetBaseNetworkable( CBaseHandle hEnt ) const
 {
-	IServerUnknown *pUnk = static_cast<IServerUnknown*>(LookupEntity( hEnt ));
+	IServerUnknown *pUnk = static_cast<IServerUnknown*>(BaseClass::LookupEntity( hEnt ));
 	if ( pUnk )
 		return pUnk->GetNetworkable()->GetBaseNetworkable();
 	else
@@ -236,7 +237,7 @@ inline CBaseNetworkable* CGlobalEntityList<T>::GetBaseNetworkable( CBaseHandle h
 template<class T>
 inline IServerNetworkable* CGlobalEntityList<T>::GetServerNetworkable( CBaseHandle hEnt ) const
 {
-	IServerUnknown *pUnk = static_cast<IServerUnknown*>(LookupEntity( hEnt ));
+	IServerUnknown *pUnk = static_cast<IServerUnknown*>(BaseClass::LookupEntity( hEnt ));
 	if ( pUnk )
 		return pUnk->GetNetworkable();
 	else
@@ -246,7 +247,7 @@ inline IServerNetworkable* CGlobalEntityList<T>::GetServerNetworkable( CBaseHand
 template<class T>
 inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntity( CBaseHandle hEnt ) const
 {
-	IServerUnknown *pUnk = static_cast<IServerUnknown*>(LookupEntity( hEnt ));
+	IServerUnknown *pUnk = static_cast<IServerUnknown*>(BaseClass::LookupEntity( hEnt ));
 	if ( pUnk )
 		return pUnk->GetBaseEntity();
 	else
@@ -324,8 +325,8 @@ void CGlobalEntityList<T>::Clear(void)
 	m_bClearingEntities = true;
 
 	// Add all remaining entities in the game to the delete list and call appropriate UpdateOnRemove
-	CBaseHandle hCur = FirstHandle();
-	while (hCur != InvalidHandle())
+	CBaseHandle hCur = BaseClass::FirstHandle();
+	while (hCur != BaseClass::InvalidHandle())
 	{
 		IServerNetworkable* ent = GetServerNetworkable(hCur);
 		if (ent)
@@ -334,7 +335,7 @@ void CGlobalEntityList<T>::Clear(void)
 			// Force UpdateOnRemove to be called
 			UTIL_Remove(ent);
 		}
-		hCur = NextHandle(hCur);
+		hCur = BaseClass::NextHandle(hCur);
 	}
 
 	CleanupDeleteList();
@@ -366,7 +367,7 @@ CBaseEntity* CGlobalEntityList<T>::NextEnt(CBaseEntity* pCurrentEnt)
 {
 	if (!pCurrentEnt)
 	{
-		const CEntInfo<T>* pInfo = FirstEntInfo();
+		const CEntInfo<T>* pInfo = BaseClass::FirstEntInfo();
 		if (!pInfo)
 			return NULL;
 
@@ -374,9 +375,9 @@ CBaseEntity* CGlobalEntityList<T>::NextEnt(CBaseEntity* pCurrentEnt)
 	}
 
 	// Run through the list until we get a CBaseEntity.
-	const CEntInfo<T>* pList = GetEntInfoPtr(pCurrentEnt->GetRefEHandle());
+	const CEntInfo<T>* pList = BaseClass::GetEntInfoPtr(pCurrentEnt->GetRefEHandle());
 	if (pList)
-		pList = NextEntInfo(pList);
+		pList = BaseClass::NextEntInfo(pList);
 
 	while (pList)
 	{
@@ -432,7 +433,7 @@ bool CGlobalEntityList<T>::IsEntityPtr(void* pTest)
 {
 	if (pTest)
 	{
-		const CEntInfo<T>* pInfo = FirstEntInfo();
+		const CEntInfo<T>* pInfo = BaseClass::FirstEntInfo();
 		for (; pInfo; pInfo = pInfo->m_pNext)
 		{
 			if (pTest == (void*)pInfo->m_pEntity)
@@ -451,7 +452,7 @@ bool CGlobalEntityList<T>::IsEntityPtr(void* pTest)
 template<class T>
 CBaseEntity* CGlobalEntityList<T>::FindEntityByClassname(CBaseEntity* pStartEntity, const char* szName)
 {
-	const CEntInfo<T>* pInfo = pStartEntity ? GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
@@ -564,7 +565,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByName(CBaseEntity* pStartEntity, c
 		return NULL;
 	}
 
-	const CEntInfo<T>* pInfo = pStartEntity ? GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
@@ -598,7 +599,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByName(CBaseEntity* pStartEntity, c
 template<class T>
 CBaseEntity* CGlobalEntityList<T>::FindEntityByModel(CBaseEntity* pStartEntity, const char* szModelName)
 {
-	const CEntInfo<T>* pInfo = pStartEntity ? GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
@@ -629,7 +630,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByModel(CBaseEntity* pStartEntity, 
 template<class T>
 CBaseEntity* CGlobalEntityList<T>::FindEntityByTarget(CBaseEntity* pStartEntity, const char* szName)
 {
-	const CEntInfo<T>* pInfo = pStartEntity ? GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
@@ -660,7 +661,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByTarget(CBaseEntity* pStartEntity,
 template<class T>
 CBaseEntity* CGlobalEntityList<T>::FindEntityInSphere(CBaseEntity* pStartEntity, const Vector& vecCenter, float flRadius)
 {
-	const CEntInfo<T>* pInfo = pStartEntity ? GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
@@ -981,7 +982,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityClassNearestFacing(const Vector& or
 	float bestDot = threshold;
 	CBaseEntity* best_ent = NULL;
 
-	const CEntInfo<T>* pInfo = FirstEntInfo();
+	const CEntInfo<T>* pInfo = BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
@@ -1031,7 +1032,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityNearestFacing(const Vector& origin,
 	float bestDot = threshold;
 	CBaseEntity* best_ent = NULL;
 
-	const CEntInfo<T>* pInfo = FirstEntInfo();
+	const CEntInfo<T>* pInfo = BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
