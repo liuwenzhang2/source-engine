@@ -670,7 +670,7 @@ void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 template<class T>
 C_BaseEntity* CClientEntityList<T>::FirstBaseEntity() const
 {
-	const CEntInfo<T>* pList = FirstEntInfo();
+	const CEntInfo<T>* pList = BaseClass::FirstEntInfo();
 	while (pList)
 	{
 		if (pList->m_pEntity)
@@ -694,7 +694,7 @@ C_BaseEntity* CClientEntityList<T>::NextBaseEntity(C_BaseEntity* pEnt) const
 		return FirstBaseEntity();
 
 	// Run through the list until we get a C_BaseEntity.
-	const CEntInfo<T>* pList = GetEntInfoPtr(pEnt->GetRefEHandle());
+	const CEntInfo<T>* pList = BaseClass::GetEntInfoPtr(pEnt->GetRefEHandle());
 	if (pList)
 	{
 		pList = NextEntInfo(pList);
