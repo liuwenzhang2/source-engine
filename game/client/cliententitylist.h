@@ -34,7 +34,14 @@
 										// it is not in the PVS anymore (at the end of the frame).
 #define INPVS_NEEDSNOTIFY	0x0004		// The entity thinks it's in the PVS.
 							   
-class IClientEntityListener;
+// Implement this class and register with entlist to receive entity create/delete notification
+class IClientEntityListener
+{
+public:
+	virtual void OnEntityCreated(C_BaseEntity* pEntity) {};
+	//virtual void OnEntitySpawned( C_BaseEntity *pEntity ) {};
+	virtual void OnEntityDeleted(C_BaseEntity* pEntity) {};
+};
 
 abstract_class C_BaseEntityClassList
 {
@@ -726,14 +733,7 @@ inline CClientEntityList<C_BaseEntity>& ClientEntityList()
 	return *cl_entitylist;
 }
 
-// Implement this class and register with entlist to receive entity create/delete notification
-class IClientEntityListener
-{
-public:
-	virtual void OnEntityCreated( C_BaseEntity *pEntity ) {};
-	//virtual void OnEntitySpawned( C_BaseEntity *pEntity ) {};
-	virtual void OnEntityDeleted( C_BaseEntity *pEntity ) {};
-};
+
 
 
 #endif // CLIENTENTITYLIST_H
