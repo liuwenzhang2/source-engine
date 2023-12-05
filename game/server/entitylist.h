@@ -13,11 +13,25 @@
 #pragma once
 #endif
 
+#include "cbase.h"
+#include "entitylist.h"
 #include "entitylist_base.h"
 #include "baseentity.h"
+#include "utlvector.h"
+#include "igamesystem.h"
 #include "collisionutils.h"
-#include "datacache/imdlcache.h"
+#include "UtlSortVector.h"
 #include "tier0/vprof.h"
+#include "mapentities.h"
+#include "client.h"
+#include "ai_initutils.h"
+#include "globalstate.h"
+#include "datacache/imdlcache.h"
+
+#ifdef HL2_DLL
+#include "npc_playercompanion.h"
+#endif // HL2_DLL
+
 
 // Implement this class and register with gEntList to receive entity create/delete notification
 class IEntityListener
