@@ -261,13 +261,13 @@ inline bool	CClientEntityList<T>::IsHandleValid( ClientEntityHandle_t handle ) c
 template<class T>
 inline IClientUnknown* CClientEntityList<T>::GetListedEntity( int entnum )
 {
-	return (IClientUnknown*)LookupEntityByNetworkIndex( entnum );
+	return (IClientUnknown*)Base::LookupEntityByNetworkIndex( entnum );
 }
 
 template<class T>
 inline IClientUnknown* CClientEntityList<T>::GetClientUnknownFromHandle( ClientEntityHandle_t hEnt )
 {
-	return (IClientUnknown*)LookupEntity( hEnt );
+	return (IClientUnknown*)Base::LookupEntity( hEnt );
 }
 
 template<class T>
@@ -320,8 +320,8 @@ template<class T>
 void CClientEntityList<T>::Release(void)
 {
 	// Free all the entities.
-	ClientEntityHandle_t iter = FirstHandle();
-	while (iter != InvalidHandle())
+	ClientEntityHandle_t iter = Base::FirstHandle();
+	while (iter != Base::InvalidHandle())
 	{
 		// Try to call release on anything we can.
 		IClientNetworkable* pNet = GetClientNetworkableFromHandle(iter);
@@ -338,9 +338,9 @@ void CClientEntityList<T>::Release(void)
 				pThinkable->Release();
 			}
 		}
-		RemoveEntity(iter);
+		Base::RemoveEntity(iter);
 
-		iter = FirstHandle();
+		iter = Base::FirstHandle();
 	}
 
 	m_iNumServerEnts = 0;
