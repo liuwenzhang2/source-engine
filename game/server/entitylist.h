@@ -152,11 +152,12 @@ public:
 	CBaseEntity *FirstEnt() { return NextEnt(NULL); }
 
 	// returns the next entity of the specified class, using RTTI
-	T *NextEntByClass( T *start )
+	template< class U >
+	U *NextEntByClass( U *start )
 	{
 		for ( CBaseEntity *x = NextEnt( start ); x; x = NextEnt( x ) )
 		{
-			start = dynamic_cast<T*>( x );
+			start = dynamic_cast<U*>( x );
 			if ( start )
 				return start;
 		}
