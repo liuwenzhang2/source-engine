@@ -1223,11 +1223,7 @@ public:
 	void DeleteEntity( CBaseEntity * );
 };
 
-enum notify_system_event_t
-{
-	NOTIFY_EVENT_TELEPORT = 0,
-	NOTIFY_EVENT_DESTROY,
-};
+
 
 struct notify_teleport_params_t
 {
