@@ -206,6 +206,7 @@ protected:
 
 };
 
+extern CGlobalEntityList<CBaseEntity> gEntList;
 
 //-----------------------------------------------------------------------------
 // Inlines.
@@ -1154,7 +1155,6 @@ void CGlobalEntityList<T>::NotifyRemoveEntity(CBaseHandle hEnt)
 	}
 }
 
-extern CGlobalEntityList<CBaseEntity> gEntList;
 
 //-----------------------------------------------------------------------------
 // Common finds
