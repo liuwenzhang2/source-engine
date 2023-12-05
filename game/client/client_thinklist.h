@@ -14,7 +14,7 @@
 
 #include "igamesystem.h"
 #include "utllinkedlist.h"
-#include "cliententitylist.h"
+//#include "cliententitylist.h"
 #include "iclientthinkable.h"
 #include "utlrbtree.h"
 

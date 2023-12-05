@@ -22,10 +22,11 @@
 #include "cdll_util.h"
 #include "entitylist_base.h"
 #include "utlmap.h"
+#include "c_baseentity.h"
 
-class C_Beam;
-class C_BaseViewModel;
-class C_BaseEntity;
+//class C_Beam;
+//class C_BaseViewModel;
+//class C_BaseEntity;
 
 
 #define INPVS_YES			0x0001		// The entity thinks it's in the PVS.
@@ -104,7 +105,7 @@ class CClientEntityList : public CBaseEntityList<T>, public IClientEntityList
 {
 friend class C_BaseEntityIterator;
 friend class C_AllBaseEntityIterator;
-
+typedef CBaseEntityList<T> BaseClass;
 public:
 	// Constructor, destructor
 								CClientEntityList( void );
@@ -261,13 +262,13 @@ inline bool	CClientEntityList<T>::IsHandleValid( ClientEntityHandle_t handle ) c
 template<class T>
 inline IClientUnknown* CClientEntityList<T>::GetListedEntity( int entnum )
 {
-	return (IClientUnknown*)Base::LookupEntityByNetworkIndex( entnum );
+	return (IClientUnknown*)BaseClass::LookupEntityByNetworkIndex( entnum );
 }
 
 template<class T>
 inline IClientUnknown* CClientEntityList<T>::GetClientUnknownFromHandle( ClientEntityHandle_t hEnt )
 {
-	return (IClientUnknown*)Base::LookupEntity( hEnt );
+	return (IClientUnknown*)BaseClass::LookupEntity( hEnt );
 }
 
 template<class T>
@@ -320,8 +321,8 @@ template<class T>
 void CClientEntityList<T>::Release(void)
 {
 	// Free all the entities.
-	ClientEntityHandle_t iter = Base::FirstHandle();
-	while (iter != Base::InvalidHandle())
+	ClientEntityHandle_t iter = BaseClass::FirstHandle();
+	while (iter != BaseClass::InvalidHandle())
 	{
 		// Try to call release on anything we can.
 		IClientNetworkable* pNet = GetClientNetworkableFromHandle(iter);
@@ -338,9 +339,9 @@ void CClientEntityList<T>::Release(void)
 				pThinkable->Release();
 			}
 		}
-		Base::RemoveEntity(iter);
+		BaseClass::RemoveEntity(iter);
 
-		iter = Base::FirstHandle();
+		iter = BaseClass::FirstHandle();
 	}
 
 	m_iNumServerEnts = 0;
