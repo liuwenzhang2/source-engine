@@ -80,7 +80,14 @@ public:
 // Maximum size of entity list
 #define INVALID_CLIENTENTITY_HANDLE CBaseHandle( INVALID_EHANDLE_INDEX )
 
-
+class CPVSNotifyInfo
+{
+public:
+	IPVSNotify* m_pNotify;
+	IClientRenderable* m_pRenderable;
+	unsigned char m_InPVSStatus;				// Combination of the INPVS_ flags.
+	unsigned short m_PVSNotifiersLink;			// Into m_PVSNotifyInfos.
+};
 //
 // This is the IClientEntityList implemenation. It serves two functions:
 //
@@ -92,7 +99,8 @@ public:
 //	  given ClientEntityHandle_t's, and the handlers for spatial partition callbacks can
 //    use the client entity list to look them up and check for supported interfaces.
 //
-class CClientEntityList : public CBaseEntityList, public IClientEntityList
+template<class T>// = IHandleEntity
+class CClientEntityList : public CBaseEntityList<T>, public IClientEntityList
 {
 friend class C_BaseEntityIterator;
 friend class C_AllBaseEntityIterator;
@@ -126,8 +134,8 @@ public:
 // CBaseEntityList overrides.
 protected:
 
-	virtual void OnAddEntity( IHandleEntity *pEnt, CBaseHandle handle );
-	virtual void OnRemoveEntity( IHandleEntity *pEnt, CBaseHandle handle );
+	virtual void OnAddEntity( T *pEnt, CBaseHandle handle );
+	virtual void OnRemoveEntity( T *pEnt, CBaseHandle handle );
 
 
 // Internal to client DLL.
@@ -162,14 +170,7 @@ public:
 	C_BaseEntity* FirstBaseEntity() const;
 	C_BaseEntity* NextBaseEntity( C_BaseEntity *pEnt ) const;
 
-	class CPVSNotifyInfo
-	{
-	public:
-		IPVSNotify *m_pNotify;
-		IClientRenderable *m_pRenderable;
-		unsigned char m_InPVSStatus;				// Combination of the INPVS_ flags.
-		unsigned short m_PVSNotifiersLink;			// Into m_PVSNotifyInfos.
-	};
+	
 
 	// Get the list of all PVS notifiers.
 	CUtlLinkedList<CPVSNotifyInfo,unsigned short>& GetPVSNotifiers();
@@ -251,22 +252,26 @@ private:
 //-----------------------------------------------------------------------------
 // Inline methods
 //-----------------------------------------------------------------------------
-inline bool	CClientEntityList::IsHandleValid( ClientEntityHandle_t handle ) const
+template<class T>
+inline bool	CClientEntityList<T>::IsHandleValid( ClientEntityHandle_t handle ) const
 {
 	return handle.Get() != 0;
 }
 
-inline IClientUnknown* CClientEntityList::GetListedEntity( int entnum )
+template<class T>
+inline IClientUnknown* CClientEntityList<T>::GetListedEntity( int entnum )
 {
 	return (IClientUnknown*)LookupEntityByNetworkIndex( entnum );
 }
 
-inline IClientUnknown* CClientEntityList::GetClientUnknownFromHandle( ClientEntityHandle_t hEnt )
+template<class T>
+inline IClientUnknown* CClientEntityList<T>::GetClientUnknownFromHandle( ClientEntityHandle_t hEnt )
 {
 	return (IClientUnknown*)LookupEntity( hEnt );
 }
 
-inline CUtlLinkedList<CClientEntityList::CPVSNotifyInfo,unsigned short>& CClientEntityList::GetPVSNotifiers()
+template<class T>
+inline CUtlLinkedList<CPVSNotifyInfo,unsigned short>& CClientEntityList<T>::GetPVSNotifiers()//CClientEntityList<T>::
 {
 	return m_PVSNotifyInfos;
 }
@@ -275,7 +280,8 @@ inline CUtlLinkedList<CClientEntityList::CPVSNotifyInfo,unsigned short>& CClient
 //-----------------------------------------------------------------------------
 // Convenience methods to convert between entindex + ClientEntityHandle_t
 //-----------------------------------------------------------------------------
-inline ClientEntityHandle_t CClientEntityList::EntIndexToHandle( int entnum )
+template<class T>
+inline ClientEntityHandle_t CClientEntityList<T>::EntIndexToHandle( int entnum )
 {
 	if ( entnum < -1 )
 		return INVALID_EHANDLE_INDEX;
@@ -283,13 +289,438 @@ inline ClientEntityHandle_t CClientEntityList::EntIndexToHandle( int entnum )
 	return pUnk ? pUnk->GetRefEHandle() : INVALID_EHANDLE_INDEX; 
 }
 
+bool PVSNotifierMap_LessFunc(IClientUnknown* const& a, IClientUnknown* const& b);
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+template<class T>
+CClientEntityList<T>::CClientEntityList(void) :
+	m_PVSNotifierMap(0, 0, PVSNotifierMap_LessFunc)
+{
+	m_iMaxUsedServerIndex = -1;
+	m_iMaxServerEnts = 0;
+	Release();
+
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+template<class T>
+CClientEntityList<T>::~CClientEntityList(void)
+{
+	Release();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Clears all entity lists and releases entities
+//-----------------------------------------------------------------------------
+template<class T>
+void CClientEntityList<T>::Release(void)
+{
+	// Free all the entities.
+	ClientEntityHandle_t iter = FirstHandle();
+	while (iter != InvalidHandle())
+	{
+		// Try to call release on anything we can.
+		IClientNetworkable* pNet = GetClientNetworkableFromHandle(iter);
+		if (pNet)
+		{
+			pNet->Release();
+		}
+		else
+		{
+			// Try to call release on anything we can.
+			IClientThinkable* pThinkable = GetClientThinkableFromHandle(iter);
+			if (pThinkable)
+			{
+				pThinkable->Release();
+			}
+		}
+		RemoveEntity(iter);
+
+		iter = FirstHandle();
+	}
+
+	m_iNumServerEnts = 0;
+	m_iMaxServerEnts = 0;
+	m_iNumClientNonNetworkable = 0;
+	m_iMaxUsedServerIndex = -1;
+}
+
+template<class T>
+IClientNetworkable* CClientEntityList<T>::GetClientNetworkable(int entnum)
+{
+	Assert(entnum >= 0);
+	Assert(entnum < MAX_EDICTS);
+	return m_EntityCacheInfo[entnum].m_pNetworkable;
+}
+
+template<class T>
+IClientEntity* CClientEntityList<T>::GetClientEntity(int entnum)
+{
+	IClientUnknown* pEnt = GetListedEntity(entnum);
+	return pEnt ? pEnt->GetIClientEntity() : 0;
+}
+
+template<class T>
+int CClientEntityList<T>::NumberOfEntities(bool bIncludeNonNetworkable)
+{
+	if (bIncludeNonNetworkable == true)
+		return m_iNumServerEnts + m_iNumClientNonNetworkable;
+
+	return m_iNumServerEnts;
+}
+
+template<class T>
+void CClientEntityList<T>::SetMaxEntities(int maxents)
+{
+	m_iMaxServerEnts = maxents;
+}
+
+template<class T>
+int CClientEntityList<T>::GetMaxEntities(void)
+{
+	return m_iMaxServerEnts;
+}
+
+
+//-----------------------------------------------------------------------------
+// Convenience methods to convert between entindex + ClientEntityHandle_t
+//-----------------------------------------------------------------------------
+template<class T>
+int CClientEntityList<T>::HandleToEntIndex(ClientEntityHandle_t handle)
+{
+	if (handle == INVALID_EHANDLE_INDEX)
+		return -1;
+	C_BaseEntity* pEnt = GetBaseEntityFromHandle(handle);
+	return pEnt ? pEnt->entindex() : -1;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Because m_iNumServerEnts != last index
+// Output : int
+//-----------------------------------------------------------------------------
+template<class T>
+int CClientEntityList<T>::GetHighestEntityIndex(void)
+{
+	return m_iMaxUsedServerIndex;
+}
+
+template<class T>
+void CClientEntityList<T>::RecomputeHighestEntityUsed(void)
+{
+	m_iMaxUsedServerIndex = -1;
+
+	// Walk backward looking for first valid index
+	int i;
+	for (i = MAX_EDICTS - 1; i >= 0; i--)
+	{
+		if (GetListedEntity(i) != NULL)
+		{
+			m_iMaxUsedServerIndex = i;
+			break;
+		}
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Add a raw C_BaseEntity to the entity list.
+// Input  : index - 
+//-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : index - 
+//-----------------------------------------------------------------------------
+template<class T>
+C_BaseEntity* CClientEntityList<T>::GetBaseEntity(int entnum)
+{
+	IClientUnknown* pEnt = GetListedEntity(entnum);
+	return pEnt ? pEnt->GetBaseEntity() : 0;
+}
+
+template<class T>
+ICollideable* CClientEntityList<T>::GetCollideable(int entnum)
+{
+	IClientUnknown* pEnt = GetListedEntity(entnum);
+	return pEnt ? pEnt->GetCollideable() : 0;
+}
+
+template<class T>
+IClientNetworkable* CClientEntityList<T>::GetClientNetworkableFromHandle(ClientEntityHandle_t hEnt)
+{
+	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	return pEnt ? pEnt->GetClientNetworkable() : 0;
+}
+
+template<class T>
+IClientEntity* CClientEntityList<T>::GetClientEntityFromHandle(ClientEntityHandle_t hEnt)
+{
+	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	return pEnt ? pEnt->GetIClientEntity() : 0;
+}
+
+template<class T>
+IClientRenderable* CClientEntityList<T>::GetClientRenderableFromHandle(ClientEntityHandle_t hEnt)
+{
+	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	return pEnt ? pEnt->GetClientRenderable() : 0;
+}
+
+template<class T>
+C_BaseEntity* CClientEntityList<T>::GetBaseEntityFromHandle(ClientEntityHandle_t hEnt)
+{
+	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	return pEnt ? pEnt->GetBaseEntity() : 0;
+}
+
+template<class T>
+ICollideable* CClientEntityList<T>::GetCollideableFromHandle(ClientEntityHandle_t hEnt)
+{
+	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	return pEnt ? pEnt->GetCollideable() : 0;
+}
+
+template<class T>
+IClientThinkable* CClientEntityList<T>::GetClientThinkableFromHandle(ClientEntityHandle_t hEnt)
+{
+	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	return pEnt ? pEnt->GetClientThinkable() : 0;
+}
+
+template<class T>
+void CClientEntityList<T>::AddPVSNotifier(IClientUnknown* pUnknown)
+{
+	IClientRenderable* pRen = pUnknown->GetClientRenderable();
+	if (pRen)
+	{
+		IPVSNotify* pNotify = pRen->GetPVSNotifyInterface();
+		if (pNotify)
+		{
+			unsigned short index = m_PVSNotifyInfos.AddToTail();
+			CPVSNotifyInfo* pInfo = &m_PVSNotifyInfos[index];
+			pInfo->m_pNotify = pNotify;
+			pInfo->m_pRenderable = pRen;
+			pInfo->m_InPVSStatus = 0;
+			pInfo->m_PVSNotifiersLink = index;
+
+			m_PVSNotifierMap.Insert(pUnknown, index);
+		}
+	}
+}
+
+template<class T>
+void CClientEntityList<T>::RemovePVSNotifier(IClientUnknown* pUnknown)
+{
+	IClientRenderable* pRenderable = pUnknown->GetClientRenderable();
+	if (pRenderable)
+	{
+		IPVSNotify* pNotify = pRenderable->GetPVSNotifyInterface();
+		if (pNotify)
+		{
+			unsigned short index = m_PVSNotifierMap.Find(pUnknown);
+			if (!m_PVSNotifierMap.IsValidIndex(index))
+			{
+				Warning("PVS notifier not in m_PVSNotifierMap\n");
+				Assert(false);
+				return;
+			}
+
+			unsigned short indexIntoPVSNotifyInfos = m_PVSNotifierMap[index];
+
+			Assert(m_PVSNotifyInfos[indexIntoPVSNotifyInfos].m_pNotify == pNotify);
+			Assert(m_PVSNotifyInfos[indexIntoPVSNotifyInfos].m_pRenderable == pRenderable);
+
+			m_PVSNotifyInfos.Remove(indexIntoPVSNotifyInfos);
+			m_PVSNotifierMap.RemoveAt(index);
+			return;
+		}
+	}
+
+	// If it didn't report itself as a notifier, let's hope it's not in the notifier list now
+	// (which would mean that it reported itself as a notifier earlier, but not now).
+#ifdef _DEBUG
+	unsigned short index = m_PVSNotifierMap.Find(pUnknown);
+	Assert(!m_PVSNotifierMap.IsValidIndex(index));
+#endif
+}
+
+template<class T>
+void CClientEntityList<T>::AddListenerEntity(IClientEntityListener* pListener)
+{
+	if (m_entityListeners.Find(pListener) >= 0)
+	{
+		AssertMsg(0, "Can't add listeners multiple times\n");
+		return;
+	}
+	m_entityListeners.AddToTail(pListener);
+}
+
+template<class T>
+void CClientEntityList<T>::RemoveListenerEntity(IClientEntityListener* pListener)
+{
+	m_entityListeners.FindAndRemove(pListener);
+}
+
+template<class T>
+void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
+{
+	int entnum = handle.GetEntryIndex();
+	EntityCacheInfo_t* pCache = &m_EntityCacheInfo[entnum];
+
+	if (entnum >= 0 && entnum < MAX_EDICTS)
+	{
+		// Update our counters.
+		m_iNumServerEnts++;
+		if (entnum > m_iMaxUsedServerIndex)
+		{
+			m_iMaxUsedServerIndex = entnum;
+		}
+
+
+		// Cache its networkable pointer.
+		Assert(dynamic_cast<IClientUnknown*>(pEnt));
+		Assert(((IClientUnknown*)pEnt)->GetClientNetworkable()); // Server entities should all be networkable.
+		pCache->m_pNetworkable = ((IClientUnknown*)pEnt)->GetClientNetworkable();
+	}
+
+	IClientUnknown* pUnknown = (IClientUnknown*)pEnt;
+
+	// If this thing wants PVS notifications, hook it up.
+	AddPVSNotifier(pUnknown);
+
+	// Store it in a special list for fast iteration if it's a C_BaseEntity.
+	C_BaseEntity* pBaseEntity = pUnknown->GetBaseEntity();
+	if (pBaseEntity)
+	{
+		pCache->m_BaseEntitiesIndex = m_BaseEntities.AddToTail(pBaseEntity);
+
+		if (pBaseEntity->ObjectCaps() & FCAP_SAVE_NON_NETWORKABLE)
+		{
+			m_iNumClientNonNetworkable++;
+		}
+
+		//DevMsg(2,"Created %s\n", pBaseEnt->GetClassname() );
+		for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+		{
+			m_entityListeners[i]->OnEntityCreated(pBaseEntity);
+		}
+	}
+	else
+	{
+		pCache->m_BaseEntitiesIndex = m_BaseEntities.InvalidIndex();
+	}
+
+
+}
+
+template<class T>
+void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
+{
+	int entnum = handle.GetEntryIndex();
+	EntityCacheInfo_t* pCache = &m_EntityCacheInfo[entnum];
+
+	if (entnum >= 0 && entnum < MAX_EDICTS)
+	{
+		// This is a networkable ent. Clear out our cache info for it.
+		pCache->m_pNetworkable = NULL;
+		m_iNumServerEnts--;
+
+		if (entnum >= m_iMaxUsedServerIndex)
+		{
+			RecomputeHighestEntityUsed();
+		}
+	}
+
+
+	IClientUnknown* pUnknown = (IClientUnknown*)pEnt;
+
+	// If this is a PVS notifier, remove it.
+	RemovePVSNotifier(pUnknown);
+
+	C_BaseEntity* pBaseEntity = pUnknown->GetBaseEntity();
+
+	if (pBaseEntity)
+	{
+		if (pBaseEntity->ObjectCaps() & FCAP_SAVE_NON_NETWORKABLE)
+		{
+			m_iNumClientNonNetworkable--;
+		}
+
+		//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
+		for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+		{
+			m_entityListeners[i]->OnEntityDeleted(pBaseEntity);
+		}
+	}
+
+	if (pCache->m_BaseEntitiesIndex != m_BaseEntities.InvalidIndex())
+		m_BaseEntities.Remove(pCache->m_BaseEntitiesIndex);
+
+	pCache->m_BaseEntitiesIndex = m_BaseEntities.InvalidIndex();
+}
+
+
+// Use this to iterate over all the C_BaseEntities.
+template<class T>
+C_BaseEntity* CClientEntityList<T>::FirstBaseEntity() const
+{
+	const CEntInfo<T>* pList = FirstEntInfo();
+	while (pList)
+	{
+		if (pList->m_pEntity)
+		{
+			IClientUnknown* pUnk = static_cast<IClientUnknown*>(pList->m_pEntity);
+			C_BaseEntity* pRet = pUnk->GetBaseEntity();
+			if (pRet)
+				return pRet;
+		}
+		pList = pList->m_pNext;
+	}
+
+	return NULL;
+
+}
+
+template<class T>
+C_BaseEntity* CClientEntityList<T>::NextBaseEntity(C_BaseEntity* pEnt) const
+{
+	if (pEnt == NULL)
+		return FirstBaseEntity();
+
+	// Run through the list until we get a C_BaseEntity.
+	const CEntInfo<T>* pList = GetEntInfoPtr(pEnt->GetRefEHandle());
+	if (pList)
+	{
+		pList = NextEntInfo(pList);
+	}
+
+	while (pList)
+	{
+		if (pList->m_pEntity)
+		{
+			IClientUnknown* pUnk = static_cast<IClientUnknown*>(pList->m_pEntity);
+			C_BaseEntity* pRet = pUnk->GetBaseEntity();
+			if (pRet)
+				return pRet;
+		}
+		pList = pList->m_pNext;
+	}
+
+	return NULL;
+}
 
 //-----------------------------------------------------------------------------
 // Returns the client entity list
 //-----------------------------------------------------------------------------
-extern CClientEntityList *cl_entitylist;
+//template<class T>
+extern CClientEntityList<C_BaseEntity> *cl_entitylist;
 
-inline CClientEntityList& ClientEntityList()
+inline CClientEntityList<C_BaseEntity>& ClientEntityList()
 {
 	return *cl_entitylist;
 }

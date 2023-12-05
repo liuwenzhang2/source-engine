@@ -13,9 +13,20 @@
 #pragma once
 #endif
 
+#include "entitylist_base.h"
 #include "baseentity.h"
+#include "collisionutils.h"
+#include "datacache/imdlcache.h"
+#include "tier0/vprof.h"
 
-class IEntityListener;
+// Implement this class and register with gEntList to receive entity create/delete notification
+class IEntityListener
+{
+public:
+	virtual void OnEntityCreated(CBaseEntity* pEntity) {};
+	virtual void OnEntitySpawned(CBaseEntity* pEntity) {};
+	virtual void OnEntityDeleted(CBaseEntity* pEntity) {};
+};
 
 abstract_class CBaseEntityClassList
 {
@@ -25,6 +36,27 @@ public:
 	virtual void LevelShutdownPostEntity() = 0;
 
 	CBaseEntityClassList *m_pNextClassList;
+};
+
+class CAimTargetManager : public IEntityListener
+{
+public:
+	// Called by CEntityListSystem
+	void LevelInitPreEntity();
+	void LevelShutdownPostEntity();
+	void Clear();
+	void ForceRepopulateList();
+	bool ShouldAddEntity(CBaseEntity* pEntity);
+	// IEntityListener
+	virtual void OnEntityCreated(CBaseEntity* pEntity);
+	virtual void OnEntityDeleted(CBaseEntity* pEntity);
+	void AddEntity(CBaseEntity* pEntity);
+	void RemoveEntity(CBaseEntity* pEntity);
+	int ListCount();
+	int ListCopy(CBaseEntity* pList[], int listMax);
+
+private:
+	CUtlVector<CBaseEntity*>	m_targetList;
 };
 
 template< class T >
@@ -70,7 +102,8 @@ public:
 // Purpose: a global list of all the entities in the game.  All iteration through
 //			entities is done through this object.
 //-----------------------------------------------------------------------------
-class CGlobalEntityList : public CBaseEntityList
+template<class T>
+class CGlobalEntityList : public CBaseEntityList<T>
 {
 public:
 private:
@@ -164,18 +197,17 @@ public:
 // CBaseEntityList overrides.
 protected:
 
-	virtual void OnAddEntity( IHandleEntity *pEnt, CBaseHandle handle );
-	virtual void OnRemoveEntity( IHandleEntity *pEnt, CBaseHandle handle );
+	virtual void OnAddEntity( T *pEnt, CBaseHandle handle );
+	virtual void OnRemoveEntity( T *pEnt, CBaseHandle handle );
 
 };
-
-extern CGlobalEntityList gEntList;
 
 
 //-----------------------------------------------------------------------------
 // Inlines.
 //-----------------------------------------------------------------------------
-inline edict_t* CGlobalEntityList::GetEdict( CBaseHandle hEnt ) const
+template<class T>
+inline edict_t* CGlobalEntityList<T>::GetEdict( CBaseHandle hEnt ) const
 {
 	IServerUnknown *pUnk = static_cast<IServerUnknown*>(LookupEntity( hEnt ));
 	if ( pUnk )
@@ -184,7 +216,8 @@ inline edict_t* CGlobalEntityList::GetEdict( CBaseHandle hEnt ) const
 		return NULL;
 }
 
-inline CBaseNetworkable* CGlobalEntityList::GetBaseNetworkable( CBaseHandle hEnt ) const
+template<class T>
+inline CBaseNetworkable* CGlobalEntityList<T>::GetBaseNetworkable( CBaseHandle hEnt ) const
 {
 	IServerUnknown *pUnk = static_cast<IServerUnknown*>(LookupEntity( hEnt ));
 	if ( pUnk )
@@ -193,7 +226,8 @@ inline CBaseNetworkable* CGlobalEntityList::GetBaseNetworkable( CBaseHandle hEnt
 		return NULL;
 }
 
-inline IServerNetworkable* CGlobalEntityList::GetServerNetworkable( CBaseHandle hEnt ) const
+template<class T>
+inline IServerNetworkable* CGlobalEntityList<T>::GetServerNetworkable( CBaseHandle hEnt ) const
 {
 	IServerUnknown *pUnk = static_cast<IServerUnknown*>(LookupEntity( hEnt ));
 	if ( pUnk )
@@ -202,7 +236,8 @@ inline IServerNetworkable* CGlobalEntityList::GetServerNetworkable( CBaseHandle 
 		return NULL;
 }
 
-inline CBaseEntity* CGlobalEntityList::GetBaseEntity( CBaseHandle hEnt ) const
+template<class T>
+inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntity( CBaseHandle hEnt ) const
 {
 	IServerUnknown *pUnk = static_cast<IServerUnknown*>(LookupEntity( hEnt ));
 	if ( pUnk )
@@ -211,6 +246,914 @@ inline CBaseEntity* CGlobalEntityList::GetBaseEntity( CBaseHandle hEnt ) const
 		return NULL;
 }
 
+template<class T>
+CGlobalEntityList<T>::CGlobalEntityList()
+{
+	m_iHighestEnt = m_iNumEnts = m_iNumEdicts = 0;
+	m_bClearingEntities = false;
+}
+
+// mark an entity as deleted
+template<class T>
+void CGlobalEntityList<T>::AddToDeleteList(IServerNetworkable* ent)
+{
+	if (ent && ent->GetEntityHandle()->GetRefEHandle() != INVALID_EHANDLE_INDEX)
+	{
+		g_DeleteList.AddToTail(ent);
+	}
+}
+
+extern bool g_bDisableEhandleAccess;
+// call this before and after each frame to delete all of the marked entities.
+template<class T>
+void CGlobalEntityList<T>::CleanupDeleteList(void)
+{
+	VPROF("CGlobalEntityList::CleanupDeleteList");
+	g_fInCleanupDelete = true;
+	// clean up the vphysics delete list as well
+	PhysOnCleanupDeleteList();
+
+	g_bDisableEhandleAccess = true;
+	for (int i = 0; i < g_DeleteList.Count(); i++)
+	{
+		g_DeleteList[i]->Release();
+	}
+	g_bDisableEhandleAccess = false;
+	g_DeleteList.RemoveAll();
+
+	g_fInCleanupDelete = false;
+}
+
+template<class T>
+int CGlobalEntityList<T>::ResetDeleteList(void)
+{
+	int result = g_DeleteList.Count();
+	g_DeleteList.RemoveAll();
+	return result;
+}
+
+
+// add a class that gets notified of entity events
+template<class T>
+void CGlobalEntityList<T>::AddListenerEntity(IEntityListener* pListener)
+{
+	if (m_entityListeners.Find(pListener) >= 0)
+	{
+		AssertMsg(0, "Can't add listeners multiple times\n");
+		return;
+	}
+	m_entityListeners.AddToTail(pListener);
+}
+
+template<class T>
+void CGlobalEntityList<T>::RemoveListenerEntity(IEntityListener* pListener)
+{
+	m_entityListeners.FindAndRemove(pListener);
+}
+
+template<class T>
+void CGlobalEntityList<T>::Clear(void)
+{
+	m_bClearingEntities = true;
+
+	// Add all remaining entities in the game to the delete list and call appropriate UpdateOnRemove
+	CBaseHandle hCur = FirstHandle();
+	while (hCur != InvalidHandle())
+	{
+		IServerNetworkable* ent = GetServerNetworkable(hCur);
+		if (ent)
+		{
+			MDLCACHE_CRITICAL_SECTION();
+			// Force UpdateOnRemove to be called
+			UTIL_Remove(ent);
+		}
+		hCur = NextHandle(hCur);
+	}
+
+	CleanupDeleteList();
+	// free the memory
+	g_DeleteList.Purge();
+
+	CBaseEntity::m_nDebugPlayer = -1;
+	CBaseEntity::m_bInDebugSelect = false;
+	m_iHighestEnt = 0;
+	m_iNumEnts = 0;
+
+	m_bClearingEntities = false;
+}
+
+template<class T>
+int CGlobalEntityList<T>::NumberOfEntities(void)
+{
+	return m_iNumEnts;
+}
+
+template<class T>
+int CGlobalEntityList<T>::NumberOfEdicts(void)
+{
+	return m_iNumEdicts;
+}
+
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::NextEnt(CBaseEntity* pCurrentEnt)
+{
+	if (!pCurrentEnt)
+	{
+		const CEntInfo<T>* pInfo = FirstEntInfo();
+		if (!pInfo)
+			return NULL;
+
+		return (CBaseEntity*)pInfo->m_pEntity;
+	}
+
+	// Run through the list until we get a CBaseEntity.
+	const CEntInfo<T>* pList = GetEntInfoPtr(pCurrentEnt->GetRefEHandle());
+	if (pList)
+		pList = NextEntInfo(pList);
+
+	while (pList)
+	{
+#if 0
+		if (pList->m_pEntity)
+		{
+			IServerUnknown* pUnk = static_cast<IServerUnknown*>(const_cast<T*>(pList->m_pEntity));
+			CBaseEntity* pRet = pUnk->GetBaseEntity();
+			if (pRet)
+				return pRet;
+		}
+#else
+		return (CBaseEntity*)pList->m_pEntity;
+#endif
+		pList = pList->m_pNext;
+	}
+
+	return NULL;
+
+}
+
+extern CAimTargetManager g_AimManager;
+
+template<class T>
+void CGlobalEntityList<T>::ReportEntityFlagsChanged(CBaseEntity* pEntity, unsigned int flagsOld, unsigned int flagsNow)
+{
+	if (pEntity->IsMarkedForDeletion())
+		return;
+	// UNDONE: Move this into IEntityListener instead?
+	unsigned int flagsChanged = flagsOld ^ flagsNow;
+	if (flagsChanged & FL_AIMTARGET)
+	{
+		unsigned int flagsAdded = flagsNow & flagsChanged;
+		unsigned int flagsRemoved = flagsOld & flagsChanged;
+
+		if (flagsAdded & FL_AIMTARGET)
+		{
+			g_AimManager.AddEntity(pEntity);
+		}
+		if (flagsRemoved & FL_AIMTARGET)
+		{
+			g_AimManager.RemoveEntity(pEntity);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Used to confirm a pointer is a pointer to an entity, useful for
+//			asserts.
+//-----------------------------------------------------------------------------
+template<class T>
+bool CGlobalEntityList<T>::IsEntityPtr(void* pTest)
+{
+	if (pTest)
+	{
+		const CEntInfo<T>* pInfo = FirstEntInfo();
+		for (; pInfo; pInfo = pInfo->m_pNext)
+		{
+			if (pTest == (void*)pInfo->m_pEntity)
+				return true;
+		}
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Iterates the entities with a given classname.
+// Input  : pStartEntity - Last entity found, NULL to start a new iteration.
+//			szName - Classname to search for.
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityByClassname(CBaseEntity* pStartEntity, const char* szName)
+{
+	const CEntInfo<T>* pInfo = pStartEntity ? GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+
+	for (; pInfo; pInfo = pInfo->m_pNext)
+	{
+		CBaseEntity* pEntity = (CBaseEntity*)pInfo->m_pEntity;
+		if (!pEntity)
+		{
+			DevWarning("NULL entity in global entity list!\n");
+			continue;
+		}
+
+		if (pEntity->ClassMatches(szName))
+			return pEntity;
+	}
+
+	return NULL;
+}
+
+CBaseEntity* FindPickerEntity(CBasePlayer* pPlayer);
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds an entity given a procedural name.
+// Input  : szName - The procedural name to search for, should start with '!'.
+//			pSearchingEntity - 
+//			pActivator - The activator entity if this was called from an input
+//				or Use handler.
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityProcedural(const char* szName, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+{
+	//
+	// Check for the name escape character.
+	//
+	if (szName[0] == '!')
+	{
+		const char* pName = szName + 1;
+
+		//
+		// It is a procedural name, look for the ones we understand.
+		//
+		if (FStrEq(pName, "player"))
+		{
+			return (CBaseEntity*)UTIL_PlayerByIndex(1);
+		}
+		else if (FStrEq(pName, "pvsplayer"))
+		{
+			if (pSearchingEntity)
+			{
+				return CBaseEntity::Instance(UTIL_FindClientInPVS(pSearchingEntity->edict()));
+			}
+			else if (pActivator)
+			{
+				// FIXME: error condition?
+				return CBaseEntity::Instance(UTIL_FindClientInPVS(pActivator->edict()));
+			}
+			else
+			{
+				// FIXME: error condition?
+				return (CBaseEntity*)UTIL_PlayerByIndex(1);
+			}
+
+		}
+		else if (FStrEq(pName, "activator"))
+		{
+			return pActivator;
+		}
+		else if (FStrEq(pName, "caller"))
+		{
+			return pCaller;
+		}
+		else if (FStrEq(pName, "picker"))
+		{
+			return FindPickerEntity(UTIL_PlayerByIndex(1));
+		}
+		else if (FStrEq(pName, "self"))
+		{
+			return pSearchingEntity;
+		}
+		else
+		{
+			Warning("Invalid entity search name %s\n", szName);
+			Assert(0);
+		}
+	}
+
+	return NULL;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Iterates the entities with a given name.
+// Input  : pStartEntity - Last entity found, NULL to start a new iteration.
+//			szName - Name to search for.
+//			pActivator - Activator entity if this was called from an input
+//				handler or Use handler.
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityByName(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller, IEntityFindFilter* pFilter)
+{
+	if (!szName || szName[0] == 0)
+		return NULL;
+
+	if (szName[0] == '!')
+	{
+		//
+		// Avoid an infinite loop, only find one match per procedural search!
+		//
+		if (pStartEntity == NULL)
+			return FindEntityProcedural(szName, pSearchingEntity, pActivator, pCaller);
+
+		return NULL;
+	}
+
+	const CEntInfo<T>* pInfo = pStartEntity ? GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+
+	for (; pInfo; pInfo = pInfo->m_pNext)
+	{
+		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		if (!ent)
+		{
+			DevWarning("NULL entity in global entity list!\n");
+			continue;
+		}
+
+		if (!ent->m_iName)
+			continue;
+
+		if (ent->NameMatches(szName))
+		{
+			if (pFilter && !pFilter->ShouldFindEntity(ent))
+				continue;
+
+			return ent;
+		}
+	}
+
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : pStartEntity - 
+//			szModelName - 
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityByModel(CBaseEntity* pStartEntity, const char* szModelName)
+{
+	const CEntInfo<T>* pInfo = pStartEntity ? GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+
+	for (; pInfo; pInfo = pInfo->m_pNext)
+	{
+		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		if (!ent)
+		{
+			DevWarning("NULL entity in global entity list!\n");
+			continue;
+		}
+
+		if (!ent->edict() || !ent->GetModelName())
+			continue;
+
+		if (FStrEq(STRING(ent->GetModelName()), szModelName))
+			return ent;
+	}
+
+	return NULL;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Iterates the entities with a given target.
+// Input  : pStartEntity - 
+//			szName - 
+//-----------------------------------------------------------------------------
+// FIXME: obsolete, remove
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityByTarget(CBaseEntity* pStartEntity, const char* szName)
+{
+	const CEntInfo<T>* pInfo = pStartEntity ? GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+
+	for (; pInfo; pInfo = pInfo->m_pNext)
+	{
+		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		if (!ent)
+		{
+			DevWarning("NULL entity in global entity list!\n");
+			continue;
+		}
+
+		if (!ent->m_target)
+			continue;
+
+		if (FStrEq(STRING(ent->m_target), szName))
+			return ent;
+	}
+
+	return NULL;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Used to iterate all the entities within a sphere.
+// Input  : pStartEntity - 
+//			vecCenter - 
+//			flRadius - 
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityInSphere(CBaseEntity* pStartEntity, const Vector& vecCenter, float flRadius)
+{
+	const CEntInfo<T>* pInfo = pStartEntity ? GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+
+	for (; pInfo; pInfo = pInfo->m_pNext)
+	{
+		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		if (!ent)
+		{
+			DevWarning("NULL entity in global entity list!\n");
+			continue;
+		}
+
+		if (!ent->edict())
+			continue;
+
+		Vector vecRelativeCenter;
+		ent->CollisionProp()->WorldToCollisionSpace(vecCenter, &vecRelativeCenter);
+		if (!IsBoxIntersectingSphere(ent->CollisionProp()->OBBMins(), ent->CollisionProp()->OBBMaxs(), vecRelativeCenter, flRadius))
+			continue;
+
+		return ent;
+	}
+
+	// nothing found
+	return NULL;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds the nearest entity by name within a radius
+// Input  : szName - Entity name to search for.
+//			vecSrc - Center of search radius.
+//			flRadius - Search radius for classname search, 0 to search everywhere.
+//			pSearchingEntity - The entity that is doing the search.
+//			pActivator - The activator entity if this was called from an input
+//				or Use handler, NULL otherwise.
+// Output : Returns a pointer to the found entity, NULL if none.
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityByNameNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+{
+	CBaseEntity* pEntity = NULL;
+
+	//
+	// Check for matching class names within the search radius.
+	//
+	float flMaxDist2 = flRadius * flRadius;
+	if (flMaxDist2 == 0)
+	{
+		flMaxDist2 = MAX_TRACE_LENGTH * MAX_TRACE_LENGTH;
+	}
+
+	CBaseEntity* pSearch = NULL;
+	while ((pSearch = gEntList.FindEntityByName(pSearch, szName, pSearchingEntity, pActivator, pCaller)) != NULL)
+	{
+		if (!pSearch->edict())
+			continue;
+
+		float flDist2 = (pSearch->GetAbsOrigin() - vecSrc).LengthSqr();
+
+		if (flMaxDist2 > flDist2)
+		{
+			pEntity = pSearch;
+			flMaxDist2 = flDist2;
+		}
+	}
+
+	return pEntity;
+}
+
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds the first entity by name within a radius
+// Input  : pStartEntity - The entity to start from when doing the search.
+//			szName - Entity name to search for.
+//			vecSrc - Center of search radius.
+//			flRadius - Search radius for classname search, 0 to search everywhere.
+//			pSearchingEntity - The entity that is doing the search.
+//			pActivator - The activator entity if this was called from an input
+//				or Use handler, NULL otherwise.
+// Output : Returns a pointer to the found entity, NULL if none.
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityByNameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+{
+	//
+	// Check for matching class names within the search radius.
+	//
+	CBaseEntity* pEntity = pStartEntity;
+	float flMaxDist2 = flRadius * flRadius;
+	if (flMaxDist2 == 0)
+	{
+		return gEntList.FindEntityByName(pEntity, szName, pSearchingEntity, pActivator, pCaller);
+	}
+
+	while ((pEntity = gEntList.FindEntityByName(pEntity, szName, pSearchingEntity, pActivator, pCaller)) != NULL)
+	{
+		if (!pEntity->edict())
+			continue;
+
+		float flDist2 = (pEntity->GetAbsOrigin() - vecSrc).LengthSqr();
+
+		if (flMaxDist2 > flDist2)
+		{
+			return pEntity;
+		}
+	}
+
+	return NULL;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds the nearest entity by class name withing given search radius.
+// Input  : szName - Entity name to search for. Treated as a target name first,
+//				then as an entity class name, ie "info_target".
+//			vecSrc - Center of search radius.
+//			flRadius - Search radius for classname search, 0 to search everywhere.
+// Output : Returns a pointer to the found entity, NULL if none.
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameNearest(const char* szName, const Vector& vecSrc, float flRadius)
+{
+	CBaseEntity* pEntity = NULL;
+
+	//
+	// Check for matching class names within the search radius.
+	//
+	float flMaxDist2 = flRadius * flRadius;
+	if (flMaxDist2 == 0)
+	{
+		flMaxDist2 = MAX_TRACE_LENGTH * MAX_TRACE_LENGTH;
+	}
+
+	CBaseEntity* pSearch = NULL;
+	while ((pSearch = gEntList.FindEntityByClassname(pSearch, szName)) != NULL)
+	{
+		if (!pSearch->edict())
+			continue;
+
+		float flDist2 = (pSearch->GetAbsOrigin() - vecSrc).LengthSqr();
+
+		if (flMaxDist2 > flDist2)
+		{
+			pEntity = pSearch;
+			flMaxDist2 = flDist2;
+		}
+	}
+
+	return pEntity;
+}
+
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds the first entity within radius distance by class name.
+// Input  : pStartEntity - The entity to start from when doing the search.
+//			szName - Entity class name, ie "info_target".
+//			vecSrc - Center of search radius.
+//			flRadius - Search radius for classname search, 0 to search everywhere.
+// Output : Returns a pointer to the found entity, NULL if none.
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius)
+{
+	//
+	// Check for matching class names within the search radius.
+	//
+	CBaseEntity* pEntity = pStartEntity;
+	float flMaxDist2 = flRadius * flRadius;
+	if (flMaxDist2 == 0)
+	{
+		return gEntList.FindEntityByClassname(pEntity, szName);
+	}
+
+	while ((pEntity = gEntList.FindEntityByClassname(pEntity, szName)) != NULL)
+	{
+		if (!pEntity->edict())
+			continue;
+
+		float flDist2 = (pEntity->GetAbsOrigin() - vecSrc).LengthSqr();
+
+		if (flMaxDist2 > flDist2)
+		{
+			return pEntity;
+		}
+	}
+
+	return NULL;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds the first entity within an extent by class name.
+// Input  : pStartEntity - The entity to start from when doing the search.
+//			szName - Entity class name, ie "info_target".
+//			vecMins - Search mins.
+//			vecMaxs - Search maxs.
+// Output : Returns a pointer to the found entity, NULL if none.
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecMins, const Vector& vecMaxs)
+{
+	//
+	// Check for matching class names within the search radius.
+	//
+	CBaseEntity* pEntity = pStartEntity;
+
+	while ((pEntity = gEntList.FindEntityByClassname(pEntity, szName)) != NULL)
+	{
+		if (!pEntity->edict() && !pEntity->IsEFlagSet(EFL_SERVER_ONLY))
+			continue;
+
+		// check if the aabb intersects the search aabb.
+		Vector entMins, entMaxs;
+		pEntity->CollisionProp()->WorldSpaceAABB(&entMins, &entMaxs);
+		if (IsBoxIntersectingBox(vecMins, vecMaxs, entMins, entMaxs))
+		{
+			return pEntity;
+		}
+	}
+
+	return NULL;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds an entity by target name or class name.
+// Input  : pStartEntity - The entity to start from when doing the search.
+//			szName - Entity name to search for. Treated as a target name first,
+//				then as an entity class name, ie "info_target".
+//			vecSrc - Center of search radius.
+//			flRadius - Search radius for classname search, 0 to search everywhere.
+//			pSearchingEntity - The entity that is doing the search.
+//			pActivator - The activator entity if this was called from an input
+//				or Use handler, NULL otherwise.
+// Output : Returns a pointer to the found entity, NULL if none.
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityGeneric(CBaseEntity* pStartEntity, const char* szName, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+{
+	CBaseEntity* pEntity = NULL;
+
+	pEntity = gEntList.FindEntityByName(pStartEntity, szName, pSearchingEntity, pActivator, pCaller);
+	if (!pEntity)
+	{
+		pEntity = gEntList.FindEntityByClassname(pStartEntity, szName);
+	}
+
+	return pEntity;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds the first entity by target name or class name within a radius
+// Input  : pStartEntity - The entity to start from when doing the search.
+//			szName - Entity name to search for. Treated as a target name first,
+//				then as an entity class name, ie "info_target".
+//			vecSrc - Center of search radius.
+//			flRadius - Search radius for classname search, 0 to search everywhere.
+//			pSearchingEntity - The entity that is doing the search.
+//			pActivator - The activator entity if this was called from an input
+//				or Use handler, NULL otherwise.
+// Output : Returns a pointer to the found entity, NULL if none.
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityGenericWithin(CBaseEntity* pStartEntity, const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+{
+	CBaseEntity* pEntity = NULL;
+
+	pEntity = gEntList.FindEntityByNameWithin(pStartEntity, szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller);
+	if (!pEntity)
+	{
+		pEntity = gEntList.FindEntityByClassnameWithin(pStartEntity, szName, vecSrc, flRadius);
+	}
+
+	return pEntity;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds the nearest entity by target name or class name within a radius.
+// Input  : pStartEntity - The entity to start from when doing the search.
+//			szName - Entity name to search for. Treated as a target name first,
+//				then as an entity class name, ie "info_target".
+//			vecSrc - Center of search radius.
+//			flRadius - Search radius for classname search, 0 to search everywhere.
+//			pSearchingEntity - The entity that is doing the search.
+//			pActivator - The activator entity if this was called from an input
+//				or Use handler, NULL otherwise.
+// Output : Returns a pointer to the found entity, NULL if none.
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityGenericNearest(const char* szName, const Vector& vecSrc, float flRadius, CBaseEntity* pSearchingEntity, CBaseEntity* pActivator, CBaseEntity* pCaller)
+{
+	CBaseEntity* pEntity = NULL;
+
+	pEntity = gEntList.FindEntityByNameNearest(szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller);
+	if (!pEntity)
+	{
+		pEntity = gEntList.FindEntityByClassnameNearest(szName, vecSrc, flRadius);
+	}
+
+	return pEntity;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Find the nearest entity along the facing direction from the given origin
+//			within the angular threshold (ignores worldspawn) with the
+//			given classname.
+// Input  : origin - 
+//			facing - 
+//			threshold - 
+//			classname - 
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityClassNearestFacing(const Vector& origin, const Vector& facing, float threshold, char* classname)
+{
+	float bestDot = threshold;
+	CBaseEntity* best_ent = NULL;
+
+	const CEntInfo<T>* pInfo = FirstEntInfo();
+
+	for (; pInfo; pInfo = pInfo->m_pNext)
+	{
+		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		if (!ent)
+		{
+			DevWarning("NULL entity in global entity list!\n");
+			continue;
+		}
+
+		// FIXME: why is this skipping pointsize entities?
+		if (ent->IsPointSized())
+			continue;
+
+		// Make vector to entity
+		Vector	to_ent = (ent->GetAbsOrigin() - origin);
+
+		VectorNormalize(to_ent);
+		float dot = DotProduct(facing, to_ent);
+		if (dot > bestDot)
+		{
+			if (FClassnameIs(ent, classname))
+			{
+				// Ignore if worldspawn
+				if (!FClassnameIs(ent, "worldspawn") && !FClassnameIs(ent, "soundent"))
+				{
+					bestDot = dot;
+					best_ent = ent;
+				}
+			}
+		}
+	}
+	return best_ent;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Find the nearest entity along the facing direction from the given origin
+//			within the angular threshold (ignores worldspawn)
+// Input  : origin - 
+//			facing - 
+//			threshold - 
+//-----------------------------------------------------------------------------
+template<class T>
+CBaseEntity* CGlobalEntityList<T>::FindEntityNearestFacing(const Vector& origin, const Vector& facing, float threshold)
+{
+	float bestDot = threshold;
+	CBaseEntity* best_ent = NULL;
+
+	const CEntInfo<T>* pInfo = FirstEntInfo();
+
+	for (; pInfo; pInfo = pInfo->m_pNext)
+	{
+		CBaseEntity* ent = (CBaseEntity*)pInfo->m_pEntity;
+		if (!ent)
+		{
+			DevWarning("NULL entity in global entity list!\n");
+			continue;
+		}
+
+		// Ignore logical entities
+		if (!ent->edict())
+			continue;
+
+		// Make vector to entity
+		Vector	to_ent = ent->WorldSpaceCenter() - origin;
+		VectorNormalize(to_ent);
+
+		float dot = DotProduct(facing, to_ent);
+		if (dot <= bestDot)
+			continue;
+
+		// Ignore if worldspawn
+		if (!FStrEq(STRING(ent->m_iClassname), "worldspawn") && !FStrEq(STRING(ent->m_iClassname), "soundent"))
+		{
+			bestDot = dot;
+			best_ent = ent;
+		}
+	}
+	return best_ent;
+}
+
+template<class T>
+void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
+{
+	int i = handle.GetEntryIndex();
+
+	// record current list details
+	m_iNumEnts++;
+	if (i > m_iHighestEnt)
+		m_iHighestEnt = i;
+
+	// If it's a CBaseEntity, notify the listeners.
+	CBaseEntity* pBaseEnt = static_cast<IServerUnknown*>(pEnt)->GetBaseEntity();
+	if (pBaseEnt->edict())
+		m_iNumEdicts++;
+
+	// NOTE: Must be a CBaseEntity on server
+	Assert(pBaseEnt);
+	//DevMsg(2,"Created %s\n", pBaseEnt->GetClassname() );
+	for (i = m_entityListeners.Count() - 1; i >= 0; i--)
+	{
+		m_entityListeners[i]->OnEntityCreated(pBaseEnt);
+	}
+}
+
+extern CUtlVector<IServerNetworkable*> g_DeleteList;
+extern bool g_fInCleanupDelete;
+
+template<class T>
+void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
+{
+#ifdef DEBUG
+	if (!g_fInCleanupDelete)
+	{
+		int i;
+		for (i = 0; i < g_DeleteList.Count(); i++)
+		{
+			if (g_DeleteList[i]->GetEntityHandle() == pEnt)
+			{
+				g_DeleteList.FastRemove(i);
+				Msg("ERROR: Entity being destroyed but previously threaded on g_DeleteList\n");
+				break;
+			}
+		}
+	}
+#endif
+
+	CBaseEntity* pBaseEnt = static_cast<IServerUnknown*>(pEnt)->GetBaseEntity();
+	if (pBaseEnt->edict())
+		m_iNumEdicts--;
+
+	m_iNumEnts--;
+}
+
+template<class T>
+void CGlobalEntityList<T>::NotifyCreateEntity(CBaseEntity* pEnt)
+{
+	if (!pEnt)
+		return;
+
+	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
+	for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+	{
+		m_entityListeners[i]->OnEntityCreated(pEnt);
+	}
+}
+
+template<class T>
+void CGlobalEntityList<T>::NotifySpawn(CBaseEntity* pEnt)
+{
+	if (!pEnt)
+		return;
+
+	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
+	for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+	{
+		m_entityListeners[i]->OnEntitySpawned(pEnt);
+	}
+}
+
+// NOTE: This doesn't happen in OnRemoveEntity() specifically because 
+// listeners may want to reference the object as it's being deleted
+// OnRemoveEntity isn't called until the destructor and all data is invalid.
+template<class T>
+void CGlobalEntityList<T>::NotifyRemoveEntity(CBaseHandle hEnt)
+{
+	CBaseEntity* pBaseEnt = GetBaseEntity(hEnt);
+	if (!pBaseEnt)
+		return;
+
+	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
+	for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+	{
+		m_entityListeners[i]->OnEntityDeleted(pBaseEnt);
+	}
+}
+
+extern CGlobalEntityList<CBaseEntity> gEntList;
 
 //-----------------------------------------------------------------------------
 // Common finds
@@ -340,14 +1283,7 @@ public:
 	virtual void ClearEntity( CBaseEntity *pNotify ) = 0;
 };
 
-// Implement this class and register with gEntList to receive entity create/delete notification
-class IEntityListener
-{
-public:
-	virtual void OnEntityCreated( CBaseEntity *pEntity ) {};
-	virtual void OnEntitySpawned( CBaseEntity *pEntity ) {};
-	virtual void OnEntityDeleted( CBaseEntity *pEntity ) {};
-};
+
 
 // singleton
 extern INotify *g_pNotify;

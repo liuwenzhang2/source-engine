@@ -519,7 +519,7 @@ void DrawAllDebugOverlays( void )
 	if ( g_pDeveloper->GetInt() && !engine->IsDedicatedServer() )
 	{
 		// iterate through all objects for debug overlays
-		const CEntInfo *pInfo = gEntList.FirstEntInfo();
+		const CEntInfo<CBaseEntity> *pInfo = gEntList.FirstEntInfo();
 
 		for ( ;pInfo; pInfo = pInfo->m_pNext )
 		{
@@ -536,7 +536,7 @@ void DrawAllDebugOverlays( void )
 	if ( sv_massreport.GetInt() )
 	{
 		// iterate through all objects for debug overlays
-		const CEntInfo *pInfo = gEntList.FirstEntInfo();
+		const CEntInfo<CBaseEntity> *pInfo = gEntList.FirstEntInfo();
 
 		for ( ;pInfo; pInfo = pInfo->m_pNext )
 		{

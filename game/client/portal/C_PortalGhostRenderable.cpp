@@ -20,7 +20,7 @@ C_PortalGhostRenderable::C_PortalGhostRenderable( C_Prop_Portal *pOwningPortal, 
 {
 	m_bSourceIsBaseAnimating = (dynamic_cast<C_BaseAnimating *>(pGhostSource) != NULL);
 
-	cl_entitylist->AddNonNetworkableEntity( GetIClientUnknown() );
+	cl_entitylist->AddNonNetworkableEntity( this );//GetIClientUnknown()
 	g_pClientLeafSystem->AddRenderable( this, sourceRenderGroup );
 }
 

@@ -33,6 +33,7 @@ class CTakeDamageInfo;
 class ITempEntsSystem;
 class IEntityFactoryDictionary;
 class CBaseTempEntity;
+template<class T>
 class CGlobalEntityList;
 class IEntityFindFilter;
 
@@ -222,7 +223,7 @@ public:
 	virtual ITempEntsSystem *GetTempEntsSystem( void ) = 0;
 	virtual CBaseTempEntity *GetTempEntList( void ) = 0;
 
-	virtual CGlobalEntityList *GetEntityList( void ) = 0;
+	virtual CGlobalEntityList<CBaseEntity> *GetEntityList( void ) = 0;
 	virtual bool IsEntityPtr( void *pTest ) = 0;
 	virtual CBaseEntity *FindEntityByClassname( CBaseEntity *pStartEntity, const char *szName ) = 0;
 	virtual CBaseEntity *FindEntityByName( CBaseEntity *pStartEntity, const char *szName, CBaseEntity *pSearchingEntity = NULL, CBaseEntity *pActivator = NULL, CBaseEntity *pCaller = NULL, IEntityFindFilter *pFilter = NULL ) = 0;

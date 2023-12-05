@@ -859,6 +859,7 @@ private:
 	CBaseEntity( CBaseEntity& );
 
 	// list handling
+	template<class T>
 	friend class CGlobalEntityList;
 	friend class CThinkSyncTester;
 
