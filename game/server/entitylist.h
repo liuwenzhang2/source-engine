@@ -98,6 +98,10 @@ public:
 	virtual CBaseEntity *GetFilterResult( void ) = 0;
 };
 
+
+extern CUtlVector<IServerNetworkable*> g_DeleteList;
+extern bool g_fInCleanupDelete;
+
 //-----------------------------------------------------------------------------
 // Purpose: a global list of all the entities in the game.  All iteration through
 //			entities is done through this object.
@@ -1080,9 +1084,6 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 		m_entityListeners[i]->OnEntityCreated(pBaseEnt);
 	}
 }
-
-extern CUtlVector<IServerNetworkable*> g_DeleteList;
-extern bool g_fInCleanupDelete;
 
 template<class T>
 void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
