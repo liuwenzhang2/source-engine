@@ -103,6 +103,7 @@ public:
 
 extern CUtlVector<IServerNetworkable*> g_DeleteList;
 extern bool g_fInCleanupDelete;
+extern void PhysOnCleanupDeleteList();
 
 //-----------------------------------------------------------------------------
 // Purpose: a global list of all the entities in the game.  All iteration through
@@ -452,7 +453,7 @@ bool CGlobalEntityList<T>::IsEntityPtr(void* pTest)
 template<class T>
 CBaseEntity* CGlobalEntityList<T>::FindEntityByClassname(CBaseEntity* pStartEntity, const char* szName)
 {
-	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
@@ -565,7 +566,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByName(CBaseEntity* pStartEntity, c
 		return NULL;
 	}
 
-	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
@@ -599,7 +600,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByName(CBaseEntity* pStartEntity, c
 template<class T>
 CBaseEntity* CGlobalEntityList<T>::FindEntityByModel(CBaseEntity* pStartEntity, const char* szModelName)
 {
-	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
@@ -630,7 +631,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByModel(CBaseEntity* pStartEntity, 
 template<class T>
 CBaseEntity* CGlobalEntityList<T>::FindEntityByTarget(CBaseEntity* pStartEntity, const char* szName)
 {
-	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
@@ -661,7 +662,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByTarget(CBaseEntity* pStartEntity,
 template<class T>
 CBaseEntity* CGlobalEntityList<T>::FindEntityInSphere(CBaseEntity* pStartEntity, const Vector& vecCenter, float flRadius)
 {
-	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : FirstEntInfo();
+	const CEntInfo<T>* pInfo = pStartEntity ? BaseClass::GetEntInfoPtr(pStartEntity->GetRefEHandle())->m_pNext : BaseClass::FirstEntInfo();
 
 	for (; pInfo; pInfo = pInfo->m_pNext)
 	{
