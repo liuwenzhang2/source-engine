@@ -268,7 +268,7 @@ inline T* CBaseEntityList<T>::LookupEntity( const CBaseHandle &handle ) const
 
 	const CEntInfo<T> *pInfo = &m_EntPtrArray[ handle.GetEntryIndex() ];
 	if ( pInfo->m_SerialNumber == handle.GetSerialNumber() )
-		return (T*)pInfo->m_pEntity;
+		return pInfo->m_pEntity;
 	else
 		return NULL;
 }
@@ -281,7 +281,7 @@ inline T* CBaseEntityList<T>::LookupEntityByNetworkIndex( int edictIndex ) const
 		return NULL;
 
 	Assert( edictIndex < NUM_ENT_ENTRIES );
-	return (T*)m_EntPtrArray[edictIndex].m_pEntity;
+	return m_EntPtrArray[edictIndex].m_pEntity;
 }
 
 template<class T>

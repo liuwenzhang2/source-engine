@@ -111,7 +111,7 @@ template<class T>// = IHandleEntity
 class CClientEntityList : public CBaseEntityList<T>, public IClientEntityList
 {
 friend class C_BaseEntityIterator;
-friend class C_AllBaseEntityIterator;
+//friend class C_AllBaseEntityIterator;
 typedef CBaseEntityList<T> BaseClass;
 public:
 	// Constructor, destructor
@@ -129,7 +129,7 @@ public:
 
 	virtual int					NumberOfEntities( bool bIncludeNonNetworkable = false );
 
-	virtual IClientUnknown*		GetClientUnknownFromHandle( ClientEntityHandle_t hEnt );
+	virtual T*					GetClientUnknownFromHandle( ClientEntityHandle_t hEnt );
 	virtual IClientNetworkable*	GetClientNetworkableFromHandle( ClientEntityHandle_t hEnt );
 	virtual IClientEntity*		GetClientEntityFromHandle( ClientEntityHandle_t hEnt );
 
@@ -150,7 +150,7 @@ protected:
 public:
 
 	// All methods of accessing specialized IClientUnknown's go through here.
-	IClientUnknown*			GetListedEntity( int entnum );
+	T*			GetListedEntity( int entnum );
 	
 	// Simple wrappers for convenience..
 	C_BaseEntity*			GetBaseEntity( int entnum );
@@ -233,17 +233,17 @@ private:
 
 
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.
-class C_AllBaseEntityIterator
-{
-public:
-	C_AllBaseEntityIterator();
-
-	void Restart();
-	C_BaseEntity* Next();	// keep calling this until it returns null.
-
-private:
-	unsigned short m_CurBaseEntity;
-};
+//class C_AllBaseEntityIterator
+//{
+//public:
+//	C_AllBaseEntityIterator();
+//
+//	void Restart();
+//	C_BaseEntity* Next();	// keep calling this until it returns null.
+//
+//private:
+//	unsigned short m_CurBaseEntity;
+//};
 
 class C_BaseEntityIterator
 {
@@ -267,15 +267,15 @@ inline bool	CClientEntityList<T>::IsHandleValid( ClientEntityHandle_t handle ) c
 }
 
 template<class T>
-inline IClientUnknown* CClientEntityList<T>::GetListedEntity( int entnum )
+inline T* CClientEntityList<T>::GetListedEntity( int entnum )
 {
-	return (IClientUnknown*)BaseClass::LookupEntityByNetworkIndex( entnum );
+	return BaseClass::LookupEntityByNetworkIndex( entnum );
 }
 
 template<class T>
-inline IClientUnknown* CClientEntityList<T>::GetClientUnknownFromHandle( ClientEntityHandle_t hEnt )
+inline T* CClientEntityList<T>::GetClientUnknownFromHandle( ClientEntityHandle_t hEnt )
 {
-	return (IClientUnknown*)BaseClass::LookupEntity( hEnt );
+	return BaseClass::LookupEntity( hEnt );
 }
 
 template<class T>
@@ -293,7 +293,7 @@ inline ClientEntityHandle_t CClientEntityList<T>::EntIndexToHandle( int entnum )
 {
 	if ( entnum < -1 )
 		return INVALID_EHANDLE_INDEX;
-	IClientUnknown *pUnk = GetListedEntity( entnum );
+	T *pUnk = GetListedEntity( entnum );
 	return pUnk ? pUnk->GetRefEHandle() : INVALID_EHANDLE_INDEX; 
 }
 
@@ -368,7 +368,7 @@ IClientNetworkable* CClientEntityList<T>::GetClientNetworkable(int entnum)
 template<class T>
 IClientEntity* CClientEntityList<T>::GetClientEntity(int entnum)
 {
-	IClientUnknown* pEnt = GetListedEntity(entnum);
+	T* pEnt = GetListedEntity(entnum);
 	return pEnt ? pEnt->GetIClientEntity() : 0;
 }
 
@@ -447,56 +447,56 @@ void CClientEntityList<T>::RecomputeHighestEntityUsed(void)
 template<class T>
 C_BaseEntity* CClientEntityList<T>::GetBaseEntity(int entnum)
 {
-	IClientUnknown* pEnt = GetListedEntity(entnum);
+	T* pEnt = GetListedEntity(entnum);
 	return pEnt ? pEnt->GetBaseEntity() : 0;
 }
 
 template<class T>
 ICollideable* CClientEntityList<T>::GetCollideable(int entnum)
 {
-	IClientUnknown* pEnt = GetListedEntity(entnum);
+	T* pEnt = GetListedEntity(entnum);
 	return pEnt ? pEnt->GetCollideable() : 0;
 }
 
 template<class T>
 IClientNetworkable* CClientEntityList<T>::GetClientNetworkableFromHandle(ClientEntityHandle_t hEnt)
 {
-	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetClientNetworkable() : 0;
 }
 
 template<class T>
 IClientEntity* CClientEntityList<T>::GetClientEntityFromHandle(ClientEntityHandle_t hEnt)
 {
-	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetIClientEntity() : 0;
 }
 
 template<class T>
 IClientRenderable* CClientEntityList<T>::GetClientRenderableFromHandle(ClientEntityHandle_t hEnt)
 {
-	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetClientRenderable() : 0;
 }
 
 template<class T>
 C_BaseEntity* CClientEntityList<T>::GetBaseEntityFromHandle(ClientEntityHandle_t hEnt)
 {
-	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetBaseEntity() : 0;
 }
 
 template<class T>
 ICollideable* CClientEntityList<T>::GetCollideableFromHandle(ClientEntityHandle_t hEnt)
 {
-	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetCollideable() : 0;
 }
 
 template<class T>
 IClientThinkable* CClientEntityList<T>::GetClientThinkableFromHandle(ClientEntityHandle_t hEnt)
 {
-	IClientUnknown* pEnt = GetClientUnknownFromHandle(hEnt);
+	T* pEnt = GetClientUnknownFromHandle(hEnt);
 	return pEnt ? pEnt->GetClientThinkable() : 0;
 }
 
@@ -593,10 +593,10 @@ void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 		// Cache its networkable pointer.
 		Assert(dynamic_cast<IClientUnknown*>(pEnt));
 		Assert(((IClientUnknown*)pEnt)->GetClientNetworkable()); // Server entities should all be networkable.
-		pCache->m_pNetworkable = ((IClientUnknown*)pEnt)->GetClientNetworkable();
+		pCache->m_pNetworkable = (pEnt)->GetClientNetworkable();//(IClientUnknown*)
 	}
 
-	IClientUnknown* pUnknown = (IClientUnknown*)pEnt;
+	IClientUnknown* pUnknown = pEnt;//(IClientUnknown*)
 
 	// If this thing wants PVS notifications, hook it up.
 	AddPVSNotifier(pUnknown);
@@ -645,7 +645,7 @@ void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	}
 
 
-	IClientUnknown* pUnknown = (IClientUnknown*)pEnt;
+	IClientUnknown* pUnknown = pEnt;//(IClientUnknown*)
 
 	// If this is a PVS notifier, remove it.
 	RemovePVSNotifier(pUnknown);
@@ -682,7 +682,7 @@ C_BaseEntity* CClientEntityList<T>::FirstBaseEntity() const
 	{
 		if (pList->m_pEntity)
 		{
-			IClientUnknown* pUnk = static_cast<IClientUnknown*>(pList->m_pEntity);
+			T* pUnk = (pList->m_pEntity);//static_cast<IClientUnknown*>
 			C_BaseEntity* pRet = pUnk->GetBaseEntity();
 			if (pRet)
 				return pRet;
@@ -711,7 +711,7 @@ C_BaseEntity* CClientEntityList<T>::NextBaseEntity(C_BaseEntity* pEnt) const
 	{
 		if (pList->m_pEntity)
 		{
-			IClientUnknown* pUnk = static_cast<IClientUnknown*>(pList->m_pEntity);
+			T* pUnk = (pList->m_pEntity);//static_cast<IClientUnknown*>
 			C_BaseEntity* pRet = pUnk->GetBaseEntity();
 			if (pRet)
 				return pRet;

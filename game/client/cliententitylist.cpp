@@ -54,27 +54,27 @@ bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b
 // -------------------------------------------------------------------------------------------------- //
 // C_AllBaseEntityIterator
 // -------------------------------------------------------------------------------------------------- //
-C_AllBaseEntityIterator::C_AllBaseEntityIterator()
-{
-	Restart();
-}
-
-
-void C_AllBaseEntityIterator::Restart()
-{
-	m_CurBaseEntity = ClientEntityList().m_BaseEntities.Head();
-}
-
-	
-C_BaseEntity* C_AllBaseEntityIterator::Next()
-{
-	if ( m_CurBaseEntity == ClientEntityList().m_BaseEntities.InvalidIndex() )
-		return NULL;
-
-	C_BaseEntity *pRet = ClientEntityList().m_BaseEntities[m_CurBaseEntity];
-	m_CurBaseEntity = ClientEntityList().m_BaseEntities.Next( m_CurBaseEntity );
-	return pRet;
-}
+//C_AllBaseEntityIterator::C_AllBaseEntityIterator()
+//{
+//	Restart();
+//}
+//
+//
+//void C_AllBaseEntityIterator::Restart()
+//{
+//	m_CurBaseEntity = ClientEntityList().m_BaseEntities.Head();
+//}
+//
+//	
+//C_BaseEntity* C_AllBaseEntityIterator::Next()
+//{
+//	if ( m_CurBaseEntity == ClientEntityList().m_BaseEntities.InvalidIndex() )
+//		return NULL;
+//
+//	C_BaseEntity *pRet = ClientEntityList().m_BaseEntities[m_CurBaseEntity];
+//	m_CurBaseEntity = ClientEntityList().m_BaseEntities.Next( m_CurBaseEntity );
+//	return pRet;
+//}
 
 
 // -------------------------------------------------------------------------------------------------- //
