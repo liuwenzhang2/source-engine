@@ -30,7 +30,8 @@ class IServerEntity	: public IServerUnknown
 {
 public:
 	virtual					~IServerEntity() {}
-
+	// Delete yourself.
+	virtual void			Release(void) = 0;
 // Previously in pev
 	virtual int				GetModelIndex( void ) const = 0;
  	virtual string_t		GetModelName( void ) const = 0;
@@ -38,5 +39,18 @@ public:
 	virtual void			SetModelIndex( int index ) = 0;
 };
 
+
+//-----------------------------------------------------------------------------
+// Purpose: Exposes IClientEntity's to engine
+//-----------------------------------------------------------------------------
+abstract_class IServerEntityList
+{
+public:
+	
+};
+
+extern IServerEntityList* serverEntitylist;
+
+#define VSERVERENTITYLIST_INTERFACE_VERSION	"VServerEntityList003"
 
 #endif // ISERVERENTITY_H

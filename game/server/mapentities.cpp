@@ -72,9 +72,10 @@ void FreeContainingEntity( edict_t *ed )
 		if ( ent )
 		{
 			ed->SetEdict( NULL, false );
-			CBaseEntity::PhysicsRemoveTouchedList( ent );
-			CBaseEntity::PhysicsRemoveGroundList( ent );
-			UTIL_RemoveImmediate( ent );
+			//CBaseEntity::PhysicsRemoveTouchedList( ent );
+			//CBaseEntity::PhysicsRemoveGroundList( ent );
+			//UTIL_RemoveImmediate( ent );
+			ent->Release();
 		}
 	}
 }

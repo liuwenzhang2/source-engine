@@ -110,7 +110,7 @@ extern void PhysOnCleanupDeleteList();
 //			entities is done through this object.
 //-----------------------------------------------------------------------------
 template<class T>
-class CGlobalEntityList : public CBaseEntityList<T>
+class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList
 {
 	typedef CBaseEntityList<T> BaseClass;
 public:

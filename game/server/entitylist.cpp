@@ -32,6 +32,13 @@ CUtlVector<IServerNetworkable*> g_DeleteList;
 CGlobalEntityList<CBaseEntity> gEntList;
 CBaseEntityList<CBaseEntity> *g_pEntityList = &gEntList;
 
+// Expose list to engine
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGlobalEntityList, IServerEntityList, VSERVERENTITYLIST_INTERFACE_VERSION, gEntList);
+
+// Store local pointer to interface for rest of client .dll only 
+//  (CClientEntityList instead of IClientEntityList )
+CGlobalEntityList<CBaseEntity>* sv_entitylist = &gEntList;
+
 // -------------------------------------------------------------------------------------------------- //
 // Game-code CBaseHandle implementation.
 // -------------------------------------------------------------------------------------------------- //

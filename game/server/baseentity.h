@@ -402,6 +402,7 @@ public:
 	virtual const			CBaseHandle& GetRefEHandle() const;
 
 // IServerUnknown overrides
+	virtual void					Release();
 	virtual ICollideable	*GetCollideable();
 	virtual IServerNetworkable *GetNetworkable();
 	virtual CBaseEntity		*GetBaseEntity();

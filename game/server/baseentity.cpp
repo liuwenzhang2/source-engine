@@ -516,6 +516,12 @@ void CBaseEntity::PostClientActive( void )
 {
 }
 
+void CBaseEntity::Release() {
+	CBaseEntity::PhysicsRemoveTouchedList(this);
+	CBaseEntity::PhysicsRemoveGroundList(this);
+	UTIL_RemoveImmediate(this);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Verifies that this entity's data description is valid in debug builds.
 //-----------------------------------------------------------------------------

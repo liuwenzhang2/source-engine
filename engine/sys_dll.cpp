@@ -127,6 +127,7 @@ typedef void (DLLEXPORT * PFN_GlobalMethod)( edict_t *pEntity );
 
 IServerGameDLL	*serverGameDLL = NULL;
 int g_iServerGameDLLVersion = 0;
+IServerEntityList* serverEntitylist = NULL;
 IServerGameEnts *serverGameEnts = NULL;
 
 IServerGameClients *serverGameClients = NULL;
@@ -1164,13 +1165,20 @@ static bool LoadThisDll( char *szDllFilename, bool bIsServerOnly )
 			}
 		}
 
+		serverEntitylist = (IServerEntityList*)g_ServerFactory(VSERVERENTITYLIST_INTERFACE_VERSION, NULL);
+		if (!serverEntitylist)
+		{
+			ConMsg("Could not get IServerEntityList interface from library %s", szDllFilename);
+			goto IgnoreThisDLL;
+		}
+
 		serverGameEnts = (IServerGameEnts*)g_ServerFactory(INTERFACEVERSION_SERVERGAMEENTS, NULL);
 		if ( !serverGameEnts )
 		{
 			ConMsg( "Could not get IServerGameEnts interface from library %s", szDllFilename );
 			goto IgnoreThisDLL;
 		}
-		
+
 		serverGameClients = (IServerGameClients*)g_ServerFactory(INTERFACEVERSION_SERVERGAMECLIENTS, NULL);
 		if ( serverGameClients )
 		{

@@ -103,7 +103,6 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\..\..\engine;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\common;..\..\..\engine\audio;..\..\..\public\engine\audio;..\..\..\thirdparty\SDL;..\..\..\public\matsys_controls;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
-      <DebugInformationFormat>None</DebugInformationFormat>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -111,7 +110,7 @@
     <Link>
       <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\;..\..\..\utils\vmpi_private\mysql\lib\opt;..\..\..\dx9sdk\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>tier0.lib;tier1.lib;tier2.lib;tier3.lib;vgui_controls.lib;matsys_controls.lib;dmxloader.lib;bitmap.lib;vstdlib.lib;appframework.lib;vtf.lib;mathlib.lib;steam_api.lib;SDL2.lib;libjpeg.lib;libpng.lib;libz.lib;nvtc.lib;zlib.lib;amstrmid.lib;d3d8.lib;d3d9.lib;d3dx.lib;d3dx8.lib;d3dx8d.lib;d3dx8dt.lib;d3dx9.lib;d3dx9d.lib;d3dx9dt.lib;d3dxd.lib;d3dxof.lib;ddraw.lib;dinput.lib;dinput8.lib;dmoguids.lib;dplayx.lib;dsetup.lib;dsound.lib;DxErr8.lib;DxErr9.lib;dxguid.lib;dxtrans.lib;encapi.lib;ksproxy.lib;ksuser.lib;msdmo.lib;quartz.lib;strmiids.lib;XInput.lib;Winmm.lib;Ws2_32.lib;Wininet.lib;Rpcrt4.lib;bzip2.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
