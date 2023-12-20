@@ -135,7 +135,7 @@ CWindowPane* CWindowPane::CreateWindowPane( const Vector &vecOrigin, const QAngl
 		return NULL;
 	}
 
-	if ( pGlass->edict() )
+	if ( pGlass->entindex()!=-1 )
 	{
 		pGlass->SetLocalOrigin( vecOrigin );
 		pGlass->SetLocalAngles( vecAngles );

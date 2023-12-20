@@ -180,7 +180,7 @@ public:
 	virtual void PlayerSpawn( CBasePlayer *pPlayer );
 			void ShowSpawnPoints();
 
-	virtual void ClientCommandKeyValues( edict_t *pEntity, KeyValues *pKeyValues );
+	virtual void ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues );
 
 	//=============================================================================
 	// HPE_BEGIN:
@@ -243,7 +243,7 @@ public:
 
 	virtual float FlPlayerFallDamage( CBasePlayer *pPlayer );
 
-	virtual void ClientDisconnected( edict_t *pClient );
+	virtual void ClientDisconnected( int pClient );
 
 	// Recreate all the map entities from the map data (preserving their indices),
 	// then remove everything else except the players.

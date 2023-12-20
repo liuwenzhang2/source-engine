@@ -1323,7 +1323,7 @@ void CCollisionProperty::UpdateServerPartitionMask( )
 	partition->Remove( handle );
 
 	// Don't bother with deleted things
-	if ( !m_pOuter->edict() )
+	if ( m_pOuter->entindex()==-1 )
 		return;
 
 	// don't add the world
@@ -1392,7 +1392,7 @@ void CCollisionProperty::UpdatePartition( )
 		Assert( m_pOuter->entindex() != 0 );
 
 		// Don't bother with deleted things
-		if ( !m_pOuter->edict() )
+		if ( m_pOuter->entindex()==-1 )
 			return;
 
 		if ( GetPartitionHandle() == PARTITION_INVALID_HANDLE )

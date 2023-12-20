@@ -1190,7 +1190,7 @@ void CPhysImpact::InputImpact( inputdata_t &inputdata )
 		{
 			trace.plane.normal = -dir;
 		}
-		CBaseEntity	*pEnt = trace.m_pEnt;
+		CBaseEntity	*pEnt = (CBaseEntity*)trace.m_pEnt;
 	
 		IPhysicsObject *pPhysics = pEnt->VPhysicsGetObject();
 		//If the entity is valid, hit it

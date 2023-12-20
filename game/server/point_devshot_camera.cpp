@@ -112,11 +112,11 @@ void CPointDevShotCamera::DevShotThink_Setup( void )
 		return;
 
 	// Hide stuff
-	engine->ClientCommand( pPlayer->edict(), "developer 0" );
-	engine->ClientCommand( pPlayer->edict(), "cl_drawhud 0" );
-	engine->ClientCommand( pPlayer->edict(), "sv_cheats 1" );
-	engine->ClientCommand( pPlayer->edict(), "god" );
-	engine->ClientCommand( pPlayer->edict(), "notarget" );
+	engine->ClientCommand( pPlayer->entindex(), "developer 0" );
+	engine->ClientCommand( pPlayer->entindex(), "cl_drawhud 0" );
+	engine->ClientCommand( pPlayer->entindex(), "sv_cheats 1" );
+	engine->ClientCommand( pPlayer->entindex(), "god" );
+	engine->ClientCommand( pPlayer->entindex(), "notarget" );
 
 	pPlayer->AddSolidFlags( FSOLID_NOT_SOLID );
 	pPlayer->EnableControl(FALSE);
@@ -146,7 +146,7 @@ void CPointDevShotCamera::DevShotThink_TakeShot( void )
 	if ( !pPlayer )
 		return;
 
-	engine->ClientCommand( pPlayer->edict(), "devshots_screenshot \"%s\"", STRING(m_iszCameraName) );
+	engine->ClientCommand( pPlayer->entindex(), "devshots_screenshot \"%s\"", STRING(m_iszCameraName) );
 
 	// Now take the shot next frame
 	SetThink( &CPointDevShotCamera::DevShotThink_PostShot );
@@ -169,7 +169,7 @@ void CPointDevShotCamera::DevShotThink_PostShot( void )
 	g_iDevShotCameraCount--;
 	if ( !g_iDevShotCameraCount )
 	{
-		engine->ClientCommand( pPlayer->edict(), "devshots_nextmap" );
+		engine->ClientCommand( pPlayer->entindex(), "devshots_nextmap" );
 	}
 }
 
@@ -252,7 +252,7 @@ public:
 				CBasePlayer *pPlayer = UTIL_GetLocalPlayerOrListenServerHost();
 				if ( pPlayer )
 				{
-					engine->ClientCommand( pPlayer->edict(), "devshots_nextmap" );
+					engine->ClientCommand( pPlayer->entindex(), "devshots_nextmap" );
 					m_bIssuedNextMapCommand = true;
 					return;
 				}

@@ -464,7 +464,7 @@ END_DATADESC()
 BEGIN_SIMPLE_DATADESC( levellist_t )
 	DEFINE_ARRAY( mapName, FIELD_CHARACTER, 32 ),
 	DEFINE_ARRAY( landmarkName, FIELD_CHARACTER, 32 ),
-	DEFINE_FIELD( pentLandmark, FIELD_EDICT ),
+	DEFINE_FIELD( pentLandmark, FIELD_CLASSPTR),
 	DEFINE_FIELD( vecLandmarkOrigin, FIELD_VECTOR ),
 END_DATADESC()
 
@@ -622,7 +622,7 @@ int CSaveRestore::IsValidSave( void )
 	{
 		Assert( serverGameClients );
 		CGameClient *pGameClient = sv.Client( 0 );
-		CPlayerState *pl = serverGameClients->GetPlayerState( pGameClient->edict );
+		CPlayerState *pl = serverGameClients->GetPlayerState( pGameClient->m_nEntityIndex );
 		if ( !pl )
 		{
 			ConMsg ("Can't savegame without a player!\n");
@@ -1666,11 +1666,11 @@ void CSaveRestore::ReapplyDecal( bool adjacent, RestoreLookupTable *table, decal
 			if ( dot >= 0.99 )
 			{
 				// Hack, have to use server traceline stuff to get at an actuall index here
-				edict_t *hit = tr.GetEdict();
+				IHandleEntity *hit = tr.m_pEnt;
 				if ( hit != NULL )
 				{
 					// Looks like a good match for original splat plane, reapply the decal
-					int entityToHit = NUM_FOR_EDICT( hit );
+					int entityToHit = hit->GetRefEHandle().GetEntryIndex();// NUM_FOR_EDICT(hit);
 					if ( entityToHit >= 0 )
 					{
 						IClientEntity *clientEntity = entitylist->GetClientEntity( entityToHit );
@@ -1720,14 +1720,10 @@ void CSaveRestore::ReapplyDecal( bool adjacent, RestoreLookupTable *table, decal
 			else
 			{
 				// This breaks client/server.  However, non-world entities are not in your PVS potentially.
-				edict_t *pEdict = EDICT_NUM( entityToHit );
-				if ( pEdict )
+				IServerEntity* pServerEntity = serverEntitylist->GetServerEntity(entityToHit);
+				if (pServerEntity)
 				{
-					IServerEntity *pServerEntity = pEdict->GetIServerEntity();
-					if ( pServerEntity )
-					{
-						pModel = sv.GetModel( pServerEntity->GetModelIndex() );						
-					}
+					pModel = sv.GetModel( pServerEntity->GetModelIndex() );						
 				}
 			}
 

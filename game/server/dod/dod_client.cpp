@@ -84,7 +84,7 @@ ClientPutInServer
 called each time a player is spawned into the game
 ============
 */
-void ClientPutInServer( edict_t *pEdict, const char *playername )
+void ClientPutInServer( int pEdict, const char *playername )
 {
 	// Allocate a CBaseTFPlayer for pev, and call spawn
 	CDODPlayer *pPlayer = CDODPlayer::CreatePlayer( "player", pEdict );
@@ -93,7 +93,7 @@ void ClientPutInServer( edict_t *pEdict, const char *playername )
 }
 
 
-void ClientActive( edict_t *pEdict, bool bLoadGame )
+void ClientActive( int pEdict, bool bLoadGame )
 {
 	// Can't load games in CS!
 	Assert( !bLoadGame );

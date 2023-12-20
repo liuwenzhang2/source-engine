@@ -476,8 +476,7 @@ const Vector &CBeam::GetAbsStartPos( void ) const
 {
 	if ( GetType() == BEAM_ENTS && GetStartEntity() )
 	{
-		edict_t *pent =  engine->PEntityOfEntIndex( GetStartEntity() );
-		CBaseEntity *ent = CBaseEntity::Instance( pent );
+		CBaseEntity* ent =  (CBaseEntity*)gEntList.GetServerEntity( GetStartEntity() );
 		if ( !ent )
 		{
 			return GetAbsOrigin();
@@ -492,8 +491,7 @@ const Vector &CBeam::GetAbsEndPos( void ) const
 {
 	if ( GetType() != BEAM_POINTS && GetType() != BEAM_HOSE && GetEndEntity() ) 
 	{
-		edict_t *pent =  engine->PEntityOfEntIndex( GetEndEntity() );
-		CBaseEntity *ent = CBaseEntity::Instance( pent );
+		CBaseEntity *ent =  (CBaseEntity*)gEntList.GetServerEntity( GetEndEntity() );
 		if ( ent )
 			return ent->GetAbsOrigin();
 	}
@@ -772,7 +770,7 @@ void CBeam::BeamDamage( trace_t *ptr )
 #if !defined( CLIENT_DLL )
 	if ( ptr->fraction != 1.0 && ptr->m_pEnt != NULL )
 	{
-		CBaseEntity *pHit = ptr->m_pEnt;
+		CBaseEntity *pHit = (CBaseEntity*)ptr->m_pEnt;
 		if ( pHit )
 		{
 			ClearMultiDamage();

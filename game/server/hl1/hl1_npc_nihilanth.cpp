@@ -1484,7 +1484,7 @@ void CNihilanthHVR::ZapThink( void  )
 
 		UTIL_TraceLine( GetAbsOrigin(), GetEnemy()->WorldSpaceCenter(), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 
 		if (pEntity != NULL && pEntity->m_takedamage )
 		{

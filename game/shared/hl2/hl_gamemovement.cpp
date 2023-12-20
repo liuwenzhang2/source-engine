@@ -357,7 +357,7 @@ void CHL2GameMovement::Findladder( float maxdist, CFuncLadder **ppLadder, Vector
 			if ( tr.fraction != 1.0f &&
 				 tr.m_pEnt &&
 				 tr.m_pEnt != ladder &&
-				 !tr.m_pEnt->IsSolidFlagSet( FSOLID_TRIGGER ) )
+				 !((CBaseEntity*)tr.m_pEnt)->IsSolidFlagSet( FSOLID_TRIGGER ) )
 			{
 				continue;
 			}
@@ -1117,7 +1117,7 @@ bool CHL2GameMovement::LadderMove( void )
 
 void CHL2GameMovement::SetGroundEntity( trace_t *pm )
 {
-	CBaseEntity *newGround = pm ? pm->m_pEnt : NULL;
+	CBaseEntity *newGround = pm ? ((CBaseEntity*)pm->m_pEnt) : NULL;
 
 	//Adrian: Special case for combine balls.
 	if ( newGround && newGround->GetCollisionGroup() == HL2COLLISION_GROUP_COMBINE_BALL_NPC )

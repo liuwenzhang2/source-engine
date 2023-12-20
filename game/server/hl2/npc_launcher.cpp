@@ -274,7 +274,7 @@ void CNPC_Launcher::LaunchGrenade( CBaseEntity* pEnemy )
 	// If a path following missile, create a path following missile
 	if (m_sPathCornerName != NULL_STRING)
 	{
-		CGrenadePathfollower *pGrenade = CGrenadePathfollower::CreateGrenadePathfollower( m_sMissileModel, m_sFlySound,  GetAbsOrigin(), vec3_angle, edict() );
+		CGrenadePathfollower *pGrenade = CGrenadePathfollower::CreateGrenadePathfollower( m_sMissileModel, m_sFlySound,  GetAbsOrigin(), vec3_angle, this );
 		pGrenade->SetDamage(m_flDamage);
 		pGrenade->SetDamageRadius(m_flDamageRadius);
 		pGrenade->Launch(m_flLaunchSpeed,m_sPathCornerName);
@@ -285,7 +285,7 @@ void CNPC_Launcher::LaunchGrenade( CBaseEntity* pEnemy )
 		AngleVectors( GetAbsAngles(), NULL, NULL, &vUp );
 		Vector vLaunchVelocity = (vUp * m_flLaunchSpeed);
 
-		CGrenadeHomer *pGrenade = CGrenadeHomer::CreateGrenadeHomer( m_sMissileModel, m_sFlySound,  GetAbsOrigin(), vec3_angle, edict() );
+		CGrenadeHomer *pGrenade = CGrenadeHomer::CreateGrenadeHomer( m_sMissileModel, m_sFlySound,  GetAbsOrigin(), vec3_angle, this );
 		pGrenade->Spawn( );
 		pGrenade->SetSpin(m_flSpinMagnitude,m_flSpinSpeed);
 		pGrenade->SetHoming((0.01*m_nHomingStrength),m_flHomingDelay,m_flHomingRampUp,m_flHomingDuration,m_flHomingRampDown);

@@ -16,8 +16,8 @@
 #include "hierarchy.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-static void PlatSpawnInsideTrigger(edict_t *pevPlatform);
+class CFuncPlat;
+static void PlatSpawnInsideTrigger(CFuncPlat *pevPlatform);
 
 #define SF_PLAT_TOGGLE				0x0001
 
@@ -335,7 +335,7 @@ void CFuncPlat::Precache( )
 	if ( IsTogglePlat() == false )
 	{
 		// Create the "start moving" trigger
-		PlatSpawnInsideTrigger( edict() );
+		PlatSpawnInsideTrigger( this );
 	}
 }
 
@@ -368,11 +368,11 @@ bool CFuncPlat::CreateVPhysics()
 }
 
 
-static void PlatSpawnInsideTrigger(edict_t* pevPlatform)
+static void PlatSpawnInsideTrigger(CFuncPlat* pevPlatform)
 {
 	// old code: //GetClassPtr( (CPlatTrigger *)NULL)->SpawnInsideTrigger( GetClassPtr( (CFuncPlat *)pevPlatform ) );
 	CPlatTrigger *plattrig = CREATE_UNSAVED_ENTITY( CPlatTrigger, "plat_trigger" );
-	plattrig->SpawnInsideTrigger( (CFuncPlat *)GetContainingEntity( pevPlatform ) );
+	plattrig->SpawnInsideTrigger( pevPlatform );
 }
 		
 
@@ -2629,13 +2629,13 @@ void CFuncTrackTrain::OnRestore( void )
 }
 
 
-CFuncTrackTrain *CFuncTrackTrain::Instance( edict_t *pent )
-{ 
-	CBaseEntity *pEntity = CBaseEntity::Instance( pent );
-	if ( FClassnameIs( pEntity, "func_tracktrain" ) )
-		return (CFuncTrackTrain *)pEntity;
-	return NULL;
-}
+//CFuncTrackTrain *CFuncTrackTrain::Instance( edict_t *pent )
+//{ 
+//	CBaseEntity *pEntity = CBaseEntity::Instance( pent );
+//	if ( FClassnameIs( pEntity, "func_tracktrain" ) )
+//		return (CFuncTrackTrain *)pEntity;
+//	return NULL;
+//}
 
 
 //-----------------------------------------------------------------------------

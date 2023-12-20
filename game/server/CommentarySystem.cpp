@@ -1122,8 +1122,8 @@ void CPointCommentaryNode::StartCommentary( void )
 	if ( m_iszPreCommands != NULL_STRING )
 	{
 		g_CommentarySystem.SetCommentaryConvarsChanging( true );
-		engine->ClientCommand( pPlayer->edict(), STRING(m_iszPreCommands) );
-		engine->ClientCommand( pPlayer->edict(), "commentary_cvarsnotchanging\n" );
+		engine->ClientCommand( pPlayer->entindex(), STRING(m_iszPreCommands) );
+		engine->ClientCommand( pPlayer->entindex(), "commentary_cvarsnotchanging\n" );
 	}
 
 	// Start the commentary
@@ -1321,8 +1321,8 @@ void CPointCommentaryNode::FinishCommentary( bool bBlendOut )
 	if ( m_iszPostCommands != NULL_STRING )
 	{
 		g_CommentarySystem.SetCommentaryConvarsChanging( true );
-		engine->ClientCommand( pPlayer->edict(), STRING(m_iszPostCommands) );
-		engine->ClientCommand( pPlayer->edict(), "commentary_cvarsnotchanging\n" );
+		engine->ClientCommand( pPlayer->entindex(), STRING(m_iszPostCommands) );
+		engine->ClientCommand( pPlayer->entindex(), "commentary_cvarsnotchanging\n" );
 	}
 
 	// Stop the commentary

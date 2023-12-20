@@ -56,7 +56,7 @@ void CPlayerMove::StartCommand( CBasePlayer *player, CUserCmd *cmd )
 	for (i = 0; i < cmd->entitygroundcontact.Count(); i++)
 	{
 		int entindex =  cmd->entitygroundcontact[i].entindex;
-		CBaseEntity *pEntity = CBaseEntity::Instance( engine->PEntityOfEntIndex( entindex) );
+		CBaseEntity *pEntity = gEntList.GetBaseEntity( entindex);
 		if (pEntity)
 		{
 			CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
@@ -377,7 +377,7 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 	// Do weapon selection
 	if ( ucmd->weaponselect != 0 )
 	{
-		CBaseCombatWeapon *weapon = dynamic_cast< CBaseCombatWeapon * >( CBaseEntity::Instance( ucmd->weaponselect ) );
+		CBaseCombatWeapon *weapon = dynamic_cast< CBaseCombatWeapon * >( gEntList.GetBaseEntity( ucmd->weaponselect ) );
 		if ( weapon )
 		{
 			VPROF( "player->SelectItem()" );

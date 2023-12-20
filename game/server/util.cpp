@@ -366,7 +366,7 @@ int UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgn
 		return 0;
 
 	pEntity->SetAbsOrigin( trace.endpos );
-	pEntity->SetGroundEntity( trace.m_pEnt );
+	pEntity->SetGroundEntity( (CBaseEntity*)trace.m_pEnt );
 
 	return 1;
 }
@@ -563,11 +563,7 @@ CBasePlayer	*UTIL_PlayerByIndex( int playerIndex )
 
 	if ( playerIndex > 0 && playerIndex <= gpGlobals->maxClients )
 	{
-		edict_t *pPlayerEdict = INDEXENT( playerIndex );
-		if ( pPlayerEdict && !pPlayerEdict->IsFree() )
-		{
-			pPlayer = (CBasePlayer*)GetContainingEntity( pPlayerEdict );
-		}
+		pPlayer = (CBasePlayer*)gEntList.GetBaseEntity(playerIndex);
 	}
 	
 	return pPlayer;
@@ -609,7 +605,7 @@ CBasePlayer* UTIL_PlayerByUserId( int userID )
 		if ( !pPlayer->IsConnected() )
 			continue;
 
-		if ( engine->GetPlayerUserId(pPlayer->edict()) == userID )
+		if ( engine->GetPlayerUserId(pPlayer->entindex()) == userID )
 		{
 			return pPlayer;
 		}
@@ -698,29 +694,18 @@ bool UTIL_IsCommandIssuedByServerAdmin( void )
  */
 CBaseEntity	*UTIL_EntityByIndex( int entityIndex )
 {
-	CBaseEntity *entity = NULL;
-
-	if ( entityIndex > 0 )
-	{
-		edict_t *edict = INDEXENT( entityIndex );
-		if ( edict && !edict->IsFree() )
-		{
-			entity = GetContainingEntity( edict );
-		}
-	}
-	
-	return entity;
+	return gEntList.GetBaseEntity(entityIndex);
 }
 
 
-int ENTINDEX( CBaseEntity *pEnt )
-{
-	// This works just like ENTINDEX for edicts.
-	if ( pEnt )
-		return pEnt->entindex();
-	else
-		return 0;
-}
+//int ENTINDEX( CBaseEntity *pEnt )
+//{
+//	// This works just like ENTINDEX for edicts.
+//	if ( pEnt )
+//		return pEnt->entindex();
+//	else
+//		return 0;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1233,7 +1218,7 @@ void UTIL_ShowMessageAll( const char *pString )
 // So we always return a valid surface
 static csurface_t	g_NullSurface = { "**empty**", 0 };
 
-void UTIL_SetTrace(trace_t& trace, const Ray_t &ray, edict_t *ent, float fraction, 
+void UTIL_SetTrace(trace_t& trace, const Ray_t &ray, CBaseEntity *ent, float fraction, 
 				   int hitgroup, unsigned int contents, const Vector& normal, float intercept )
 {
 	trace.startsolid = (fraction == 0.0f);
@@ -1242,7 +1227,7 @@ void UTIL_SetTrace(trace_t& trace, const Ray_t &ray, edict_t *ent, float fractio
 	VectorMA( ray.m_Start, fraction, ray.m_Delta, trace.endpos );
 	VectorCopy( normal, trace.plane.normal );
 	trace.plane.dist = intercept;
-	trace.m_pEnt = CBaseEntity::Instance( ent );
+	trace.m_pEnt = ent;
 	trace.hitgroup = hitgroup;
 	trace.surface =	g_NullSurface;
 	trace.contents = contents;
@@ -1416,7 +1401,7 @@ Vector UTIL_RandomBloodVector( void )
 //------------------------------------------------------------------------------
 void UTIL_ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName )
 {
-	CBaseEntity *pEntity = pTrace->m_pEnt;
+	CBaseEntity *pEntity = (CBaseEntity*)pTrace->m_pEnt;
 
 	// Is the entity valid, is the surface sky?
 	if ( !pEntity || !UTIL_IsValidEntity( pEntity ) || (pTrace->surface.flags & SURF_SKY) )
@@ -1445,7 +1430,7 @@ void UTIL_PlayerDecalTrace( trace_t *pTrace, int playernum )
 	CBroadcastRecipientFilter filter;
 
 	te->PlayerDecal( filter, 0.0,
-		&pTrace->endpos, playernum, pTrace->m_pEnt->entindex() );
+		&pTrace->endpos, playernum, ((CBaseEntity*)pTrace->m_pEnt)->entindex() );
 }
 
 bool UTIL_TeamsMatch( const char *pTeamName1, const char *pTeamName2 )
@@ -1702,8 +1687,8 @@ void UTIL_Beam( Vector &Start, Vector &End, int nModelIndex, int nHaloIndex, uns
 
 bool UTIL_IsValidEntity( CBaseEntity *pEnt )
 {
-	edict_t *pEdict = pEnt->edict();
-	if ( !pEdict || pEdict->IsFree() )
+	//edict_t *pEdict = pEnt->edict();
+	if ( pEnt->entindex()==-1  )//|| pEdict->IsFree()
 		return false;
 	return true;
 }
@@ -2010,7 +1995,7 @@ void EntityMatrix::InitFromEntity( CBaseEntity *pEntity, int iAttachment )
 
 void EntityMatrix::InitFromEntityLocal( CBaseEntity *entity )
 {
-	if ( !entity || !entity->edict() )
+	if ( !entity || entity->entindex()==-1 )
 	{
 		Identity();
 		return;
@@ -2112,7 +2097,7 @@ CCheckClient g_CheckClient( "CCheckClient" );
 static int UTIL_GetNewCheckClient( int check )
 {
 	int		i;
-	edict_t	*ent;
+	CBaseEntity	*ent;
 	Vector	org;
 
 // cycle to the next one
@@ -2134,7 +2119,7 @@ static int UTIL_GetNewCheckClient( int check )
 			i = 1;
 		}
 
-		ent = engine->PEntityOfEntIndex( i );
+		ent = gEntList.GetBaseEntity( i );
 		if ( !ent )
 			continue;
 
@@ -2142,10 +2127,10 @@ static int UTIL_GetNewCheckClient( int check )
 		if ( i == check )
 			break;	
 
-		if ( !ent->GetUnknown() )
-			continue;
+		//if ( !ent->GetUnknown() )
+		//	continue;
 
-		CBaseEntity *entity = GetContainingEntity( ent );
+		CBaseEntity *entity = ent;
 		if ( !entity )
 			continue;
 
@@ -2165,7 +2150,7 @@ static int UTIL_GetNewCheckClient( int check )
 	if ( ent )
 	{
 		// get the PVS for the entity
-		CBaseEntity *pce = GetContainingEntity( ent );
+		CBaseEntity *pce = ent;
 		if ( !pce )
 			return i;
 
@@ -2186,9 +2171,9 @@ static int UTIL_GetNewCheckClient( int check )
 //-----------------------------------------------------------------------------
 // Gets the current check client....
 //-----------------------------------------------------------------------------
-static edict_t *UTIL_GetCurrentCheckClient()
+static CBaseEntity *UTIL_GetCurrentCheckClient()
 {
-	edict_t	*ent;
+	CBaseEntity	*ent;
 
 	// find a new check if on a new frame
 	float delta = gpGlobals->curtime - g_CheckClient.m_lastchecktime;
@@ -2199,13 +2184,13 @@ static edict_t *UTIL_GetCurrentCheckClient()
 	}
 
 	// return check if it might be visible	
-	ent = engine->PEntityOfEntIndex( g_CheckClient.m_lastcheck );
+	ent = gEntList.GetBaseEntity( g_CheckClient.m_lastcheck );
 
 	// Allow dead clients -- JAY
 	// Our monsters know the difference, and this function gates alot of behavior
 	// It's annoying to die and see monsters stop thinking because you're no longer
 	// "in" their PVS
-	if ( !ent || ent->IsFree() || !ent->GetUnknown())
+	if ( !ent )//|| ent->IsFree() || !ent->GetUnknown()
 	{
 		return NULL;
 	}
@@ -2213,7 +2198,7 @@ static edict_t *UTIL_GetCurrentCheckClient()
 	return ent;
 }
 
-void UTIL_SetClientVisibilityPVS( edict_t *pClient, const unsigned char *pvs, int pvssize )
+void UTIL_SetClientVisibilityPVS( CBaseEntity *pClient, const unsigned char *pvs, int pvssize )
 {
 	if ( pClient == UTIL_GetCurrentCheckClient() )
 	{
@@ -2266,7 +2251,7 @@ bool UTIL_ClientPVSIsExpanded()
 //-----------------------------------------------------------------------------
 CBaseEntity *UTIL_FindClientInPVS( const Vector &vecBoxMins, const Vector &vecBoxMaxs )
 {
-	edict_t	*ent = UTIL_GetCurrentCheckClient();
+	CBaseEntity	*ent = UTIL_GetCurrentCheckClient();
 	if ( !ent )
 	{
 		return NULL;
@@ -2278,7 +2263,7 @@ CBaseEntity *UTIL_FindClientInPVS( const Vector &vecBoxMins, const Vector &vecBo
 	}
 
 	// might be able to see it
-	return GetContainingEntity( ent );
+	return ent;
 }
 
 //-----------------------------------------------------------------------------
@@ -2290,17 +2275,17 @@ CBaseEntity *UTIL_FindClientInPVS( const Vector &vecBoxMins, const Vector &vecBo
 //-----------------------------------------------------------------------------
 ConVar sv_strict_notarget( "sv_strict_notarget", "0", 0, "If set, notarget will cause entities to never think they are in the pvs" );
 
-static edict_t *UTIL_FindClientInPVSGuts(edict_t *pEdict, unsigned char *pvs, unsigned pvssize )
+static CBaseEntity *UTIL_FindClientInPVSGuts(CBaseEntity *pEdict, unsigned char *pvs, unsigned pvssize )
 {
 	Vector	view;
 
-	edict_t	*ent = UTIL_GetCurrentCheckClient();
+	CBaseEntity	*ent = UTIL_GetCurrentCheckClient();
 	if ( !ent )
 	{
 		return NULL;
 	}
 
-	CBaseEntity *pPlayerEntity = GetContainingEntity( ent );
+	CBaseEntity *pPlayerEntity = (CBaseEntity*)ent;
 	if( (!pPlayerEntity || (pPlayerEntity->GetFlags() & FL_NOTARGET)) && sv_strict_notarget.GetBool() )
 	{
 		return NULL;
@@ -2308,7 +2293,7 @@ static edict_t *UTIL_FindClientInPVSGuts(edict_t *pEdict, unsigned char *pvs, un
 	// if current entity can't possibly see the check entity, return 0
 	// UNDONE: Build a box for this and do it over that box
 	// UNDONE: Use CM_BoxLeafnums()
-	CBaseEntity *pe = GetContainingEntity( pEdict );
+	CBaseEntity *pe = pEdict;
 	if ( pe )
 	{
 		view = pe->EyePosition();
@@ -2327,7 +2312,7 @@ static edict_t *UTIL_FindClientInPVSGuts(edict_t *pEdict, unsigned char *pvs, un
 // Purpose: Returns a client that could see the entity directly
 //-----------------------------------------------------------------------------
 
-edict_t *UTIL_FindClientInPVS(edict_t *pEdict)
+CBaseEntity *UTIL_FindClientInPVS(CBaseEntity *pEdict)
 {
 	return UTIL_FindClientInPVSGuts( pEdict, g_CheckClient.m_checkPVS, sizeof( g_CheckClient.m_checkPVS ) );
 }
@@ -2335,7 +2320,7 @@ edict_t *UTIL_FindClientInPVS(edict_t *pEdict)
 //-----------------------------------------------------------------------------
 // Purpose: Returns a client that could see the entity, including through a camera
 //-----------------------------------------------------------------------------
-edict_t *UTIL_FindClientInVisibilityPVS( edict_t *pEdict )
+CBaseEntity *UTIL_FindClientInVisibilityPVS( CBaseEntity *pEdict )
 {
 	return UTIL_FindClientInPVSGuts( pEdict, g_CheckClient.m_checkVisibilityPVS, sizeof( g_CheckClient.m_checkVisibilityPVS ) );
 }
@@ -2377,7 +2362,7 @@ CBaseEntity *UTIL_EntitiesInPVS( CBaseEntity *pPVSEntity, CBaseEntity *pStarting
 	for ( CBaseEntity *pEntity = gEntList.NextEnt(pStartingEntity); pEntity; pEntity = gEntList.NextEnt(pEntity) )
 	{
 		// Only return attached ents.
-		if ( !pEntity->edict() )
+		if ( pEntity->entindex()==-1 )
 			continue;
 
 		CBaseEntity *pParent = pEntity->GetRootMoveParent();

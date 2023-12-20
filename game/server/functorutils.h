@@ -4,6 +4,7 @@
 
 #ifndef _FUNCTOR_UTILS_H_
 #define _FUNCTOR_UTILS_H_
+#include "player.h"
 
 #ifdef NEXT_BOT
 #include "NextBotInterface.h"
@@ -314,7 +315,7 @@ inline bool ForEachActor( Functor &func )
 		if ( player == NULL )
 			continue;
 
-		if ( FNullEnt( player->edict() ) )
+		if ( player->entindex()<=0 )
 			continue;
 
 		if ( !player->IsPlayer() )
@@ -384,7 +385,7 @@ inline bool ForEachActor( IActorFunctor &func )
 		if ( player == NULL )
 			continue;
 
-		if ( FNullEnt( player->edict() ) )
+		if ( player->entindex()==-1 )
 			continue;
 
 		if ( !player->IsPlayer() )

@@ -369,7 +369,7 @@ void C_Portal_Player::UpdateIDTarget()
 
 	if ( !tr.startsolid && tr.DidHitNonWorldEntity() )
 	{
-		C_BaseEntity *pEntity = tr.m_pEnt;
+		C_BaseEntity *pEntity = (C_BaseEntity*)tr.m_pEnt;
 
 		if ( pEntity && (pEntity != this) )
 		{

@@ -79,7 +79,7 @@ bool CBaseEntity::m_bInDebugSelect = false;	// Used for selection in debug overl
 int CBaseEntity::m_nDebugPlayer = -1;		// Player doing the selection
 
 // This can be set before creating an entity to force it to use a particular edict.
-edict_t *g_pForceAttachEdict = NULL;
+int g_pForceAttachEdict = -1;
 
 bool CBaseEntity::m_bDebugPause = false;		// Whether entity i/o is paused.
 int CBaseEntity::m_nDebugSteps = 1;				// Number of entity outputs to fire before pausing again.
@@ -489,19 +489,19 @@ void CBaseEntity::PostConstructor( const char *szClassname )
 		if ( !IsEFlagSet( EFL_NO_AUTO_EDICT_ATTACH ) )
 		{
 			NetworkProp()->AttachEdict( g_pForceAttachEdict );
-			g_pForceAttachEdict = NULL;
+			g_pForceAttachEdict = -1;
 		}
 		
 		// Some ents like the player override the AttachEdict function and do it at a different time.
 		// While precaching, they don't ever have an edict, so we don't need to add them to
 		// the entity list in that case.
-		if ( edict() )
+		if ( entindex()!=-1 )
 		{
 			gEntList.AddNetworkableEntity( this, entindex() );
 			
 			// Cache our IServerNetworkable pointer for the engine for fast access.
-			if ( edict() )
-				edict()->m_pNetworkable = NetworkProp();
+			//if ( edict() )
+			//	edict()->m_pNetworkable = NetworkProp();
 		}
 	}
 
@@ -725,7 +725,7 @@ void CBaseEntity::AddTimedOverlay( const char *msg, int endTime )
 //-----------------------------------------------------------------------------
 void CBaseEntity::DrawBBoxOverlay( float flDuration )
 {
-	if (edict())
+	if (entindex()!=-1)
 	{
 		NDebugOverlay::EntityBounds(this, 255, 100, 0, 0, flDuration );
 
@@ -752,7 +752,7 @@ void CBaseEntity::DrawAbsBoxOverlay()
 		green = 120;
 	}
 
-	if (edict())
+	if (entindex()!=-1)
 	{
 		// Surrounding boxes are axially aligned, so ignore angles
 		Vector vecSurroundMins, vecSurroundMaxs;
@@ -773,7 +773,7 @@ void CBaseEntity::DrawRBoxOverlay()
 //-----------------------------------------------------------------------------
 void CBaseEntity::SendDebugPivotOverlay( void )
 {
-	if ( edict() )
+	if ( entindex()!=-1 )
 	{
 		NDebugOverlay::Axis( GetAbsOrigin(), GetAbsAngles(), 20, true, 0 );
 	}
@@ -1179,7 +1179,7 @@ void CBaseEntity::SetParent( CBaseEntity *pParentEntity, int iAttachment )
 		}
 	}
 	// set the move parent if we have one
-	if ( edict() )
+	if ( entindex()!=-1 )
 	{
 		// add ourselves to the list
 		LinkChild( m_pParent, this );
@@ -1356,7 +1356,7 @@ void CBaseEntity::Activate( void )
 // Returns the amount of health actually taken.
 int CBaseEntity::TakeHealth( float flHealth, int bitsDamageType )
 {
-	if ( !edict() || m_takedamage < DAMAGE_YES )
+	if ( entindex()==-1 || m_takedamage < DAMAGE_YES)
 		return 0;
 
 	int iMax = GetMaxHealth();
@@ -1381,7 +1381,7 @@ int CBaseEntity::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	Vector			vecTemp;
 
-	if ( !edict() || !m_takedamage )
+	if ( entindex()==-1 || !m_takedamage)
 		return 0;
 
 	if ( info.GetInflictor() )
@@ -1999,7 +1999,7 @@ void CBaseEntity::UpdateOnRemove( void )
 	// Notifies entity listeners, etc
 	gEntList.NotifyRemoveEntity( GetRefEHandle() );
 
-	if ( edict() )
+	if ( entindex()!=-1 )
 	{
 		AddFlag( FL_KILLME );
 		if ( GetFlags() & FL_GRAPHED )
@@ -2604,8 +2604,7 @@ void CBaseEntity::PhysicsRelinkChildren( float dt )
 
 void CBaseEntity::PhysicsTouchTriggers( const Vector *pPrevAbsOrigin )
 {
-	edict_t *pEdict = edict();
-	if ( pEdict && !IsWorld() )
+	if ( entindex()!=-1 && !IsWorld())
 	{
 		Assert(CollisionProp());
 		bool isTriggerCheckSolids = IsSolidFlagSet( FSOLID_TRIGGER );
@@ -2626,11 +2625,11 @@ void CBaseEntity::PhysicsTouchTriggers( const Vector *pPrevAbsOrigin )
 		SetCheckUntouch( true );
 		if ( isSolidCheckTriggers )
 		{
-			engine->SolidMoved( pEdict, CollisionProp(), pPrevAbsOrigin, sm_bAccurateTriggerBboxChecks );
+			engine->SolidMoved( this, CollisionProp(), pPrevAbsOrigin, sm_bAccurateTriggerBboxChecks );
 		}
 		if ( isTriggerCheckSolids )
 		{
-			engine->TriggerMoved( pEdict, sm_bAccurateTriggerBboxChecks );
+			engine->TriggerMoved( this, sm_bAccurateTriggerBboxChecks );
 		}
 	}
 }
@@ -2757,7 +2756,7 @@ bool CBaseEntity::VPhysicsIsFlesh( void )
 
 bool CBaseEntity::Intersects( CBaseEntity *pOther )
 {
-	if ( !edict() || !pOther->edict() )
+	if ( entindex()==-1 || pOther->entindex()==-1)
 		return false;
 
 	CCollisionProperty *pMyProp = CollisionProp();
@@ -2832,7 +2831,7 @@ bool CBaseEntity::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **p
 
 		if (ppBlocker)
 		{
-			*ppBlocker = tr.m_pEnt;
+			*ppBlocker = (CBaseEntity*)tr.m_pEnt;
 		}
 
 		return false;// Line of sight is not established
@@ -2890,7 +2889,7 @@ bool CBaseEntity::FVisible( const Vector &vecTarget, int traceMask, CBaseEntity 
 	{
 		if (ppBlocker)
 		{
-			*ppBlocker = tr.m_pEnt;
+			*ppBlocker = (CBaseEntity*)tr.m_pEnt;
 		}
 		return false;// Line of sight is not established
 	}
@@ -3034,7 +3033,7 @@ void CBaseEntity::MakeDormant( void )
 	// disable thinking for dormant entities
 	SetThink( NULL );
 
-	if ( !edict() )
+	if ( entindex()==-1 )
 		return;
 
 	SETBITS( m_iEFlags, EFL_DORMANT );
@@ -3057,7 +3056,7 @@ int CBaseEntity::IsDormant( void )
 
 bool CBaseEntity::IsInWorld( void ) const
 {  
-	if ( !edict() )
+	if ( entindex()==-1 )
 		return true;
 
 	// position 
@@ -3217,7 +3216,7 @@ int CBaseEntity::Restore( IRestore &restore )
 	RemoveEFlags( EFL_DIRTY_SPATIAL_PARTITION );
 	CollisionProp()->MarkSurroundingBoundsDirty();
 
-	if ( edict() && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode() )
+	if ( entindex()!=-1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
 	{
 		PrecacheModel( STRING( GetModelName() ) );
 
@@ -3487,34 +3486,49 @@ CBaseEntity* CBaseEntity::Instance( const CBaseHandle &hEnt )
 	return gEntList.GetBaseEntity( hEnt );
 }
 
+//CBaseEntity* CBaseEntity::Instance(const edict_t* pent)
+//{
+//	return gEntList.GetBaseEntity(const_cast<edict_t*>(pent)->m_EdictIndex);
+//}
+//
+//CBaseEntity* CBaseEntity::Instance(edict_t* pent)
+//{
+//	if (!pent)
+//	{
+//		pent = INDEXENT(0);
+//	}
+//	return gEntList.GetBaseEntity(pent->m_EdictIndex);
+//}
+
+CBaseEntity* CBaseEntity::Instance(int iEnt)
+{
+	return gEntList.GetBaseEntity(iEnt);
+}
+
 int CBaseEntity::GetTransmitState( void )
 {
-	edict_t *ed = edict();
-
-	if ( !ed )
+	if ( entindex()==-1 )
 		return 0;
 
-	return ed->m_fStateFlags;
+	return engine->GetEdictFlag(entindex());
 }
 
 int	CBaseEntity::SetTransmitState( int nFlag)
 {
-	edict_t *ed = edict();
-
-	if ( !ed )
+	if ( entindex()==-1 )
 		return 0;
 
 	// clear current flags = check ShouldTransmit()
-	ed->ClearTransmitState();	
+	engine->ClearTransmitState(entindex());	
 	
-	int oldFlags = ed->m_fStateFlags;
-	ed->m_fStateFlags |= nFlag;
+	int oldFlags = engine->GetEdictFlag(entindex());
+	engine->GetEdictFlag(entindex()) |= nFlag;
 	
 	// Tell the engine (used for a network backdoor optimization).
-	if ( (oldFlags & FL_EDICT_DONTSEND) != (ed->m_fStateFlags & FL_EDICT_DONTSEND) )
+	if ( (oldFlags & FL_EDICT_DONTSEND) != (engine->GetEdictFlag(entindex()) & FL_EDICT_DONTSEND) )
 		engine->NotifyEdictFlagsChange( entindex() );
 
-	return ed->m_fStateFlags;
+	return engine->GetEdictFlag(entindex());
 }
 
 int CBaseEntity::UpdateTransmitState()
@@ -3556,9 +3570,8 @@ int CBaseEntity::UpdateTransmitState()
 
 int CBaseEntity::DispatchUpdateTransmitState()
 {
-	edict_t *ed = edict();
 	if ( m_nTransmitStateOwnedCounter != 0 )
-		return ed ? ed->m_fStateFlags : 0;
+		return entindex()!=-1 ? engine->GetEdictFlag(entindex()) : 0;
 	
 	g_nInsideDispatchUpdateTransmitState++;
 	int ret = UpdateTransmitState();
@@ -3597,7 +3610,7 @@ int CBaseEntity::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 //		return FL_EDICT_ALWAYS;
 //	}
 
-	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+	CBaseEntity *pRecipientEntity = gEntList.GetBaseEntity( pInfo->m_pClientEnt );
 
 	Assert( pRecipientEntity->IsPlayer() );
 	
@@ -5053,7 +5066,7 @@ void CC_Ent_Remove( const CCommand& args )
 		int index = atoi( args[1] );
 		if ( index )
 		{
-			pEntity = CBaseEntity::Instance( index );
+			pEntity = gEntList.GetBaseEntity( index );
 		}
 		else
 		{
@@ -6335,7 +6348,7 @@ void CBaseEntity::ModifyOrAppendCriteria( AI_CriteriaSet& set )
 	}
 
 	// Append anything from world I/O/keyvalues with "world" as prefix
-	CWorld *world = dynamic_cast< CWorld * >( CBaseEntity::Instance( engine->PEntityOfEntIndex( 0 ) ) );
+	CWorld *world = (CWorld*)gEntList.GetBaseEntity( 0 );
 	if ( world )
 	{
 		world->AppendContextToCriteria( set, "world" );
@@ -6992,7 +7005,7 @@ void CBaseEntity::RemoveRecipientsIfNotCloseCaptioning( CRecipientFilter& filter
 	{
 		int playerIndex = filter.GetRecipientIndex( i );
 
-		CBasePlayer *player = static_cast< CBasePlayer * >( CBaseEntity::Instance( playerIndex ) );
+		CBasePlayer *player = static_cast< CBasePlayer * >( gEntList.GetBaseEntity( playerIndex ) );
 		if ( !player )
 			continue;
 #if !defined( _XBOX )
@@ -7050,10 +7063,10 @@ void CBaseEntity::EmitSentenceByIndex( IRecipientFilter& filter, int iEntIndex, 
 void CBaseEntity::SetRefEHandle( const CBaseHandle &handle )
 {
 	m_RefEHandle = handle;
-	if ( edict() )
+	if ( entindex()!=-1 )
 	{
-		COMPILE_TIME_ASSERT( NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS <= 8*sizeof( edict()->m_NetworkSerialNumber ) );
-		edict()->m_NetworkSerialNumber = (m_RefEHandle.GetSerialNumber() & (1 << NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS) - 1);
+		COMPILE_TIME_ASSERT( NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS <= 8*sizeof( engine->GetNetworkSerialNumber(entindex()) ) );
+		engine->GetNetworkSerialNumber(entindex()) = (m_RefEHandle.GetSerialNumber() & (1 << NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS) - 1);
 	}
 }
 
@@ -7390,7 +7403,7 @@ bool CC_GetCommandEnt( const CCommand& args, CBaseEntity **ent, Vector *vecTarge
 	int iEntIndex = atoi( args[1] );
 	if ( iEntIndex )
 	{
-		*ent = CBaseEntity::Instance( iEntIndex );
+		*ent = gEntList.GetBaseEntity( iEntIndex );
 	}
 	else
 	{

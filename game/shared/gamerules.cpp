@@ -301,13 +301,13 @@ bool IsExplosionTraceBlocked( trace_t *ptr )
 	if( ptr->m_pEnt == NULL )
 		return false;
 
-	if( ptr->m_pEnt->GetMoveType() == MOVETYPE_PUSH )
+	if(((CBaseEntity*)ptr->m_pEnt)->GetMoveType() == MOVETYPE_PUSH )
 	{
 		// All doors are push, but not all things that push are doors. This 
 		// narrows the search before we start to do classname compares.
-		if( FClassnameIs(ptr->m_pEnt, "prop_door_rotating") ||
-        FClassnameIs(ptr->m_pEnt, "func_door") ||
-        FClassnameIs(ptr->m_pEnt, "func_door_rotating") )
+		if( FClassnameIs((CBaseEntity*)ptr->m_pEnt, "prop_door_rotating") ||
+        FClassnameIs((CBaseEntity*)ptr->m_pEnt, "func_door") ||
+        FClassnameIs((CBaseEntity*)ptr->m_pEnt, "func_door_rotating") )
 			return true;
 	}
 
@@ -431,12 +431,12 @@ void CGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc
 
 				// UNDONE: Probably shouldn't let children block parents either?  Or maybe those guys should set their owner if they want this behavior?
 				// HL2 - Dissolve damage is not reduced by interposing non-world objects
-				if( tr.m_pEnt && tr.m_pEnt != pEntity && tr.m_pEnt->GetOwnerEntity() != pEntity )
+				if( tr.m_pEnt && tr.m_pEnt != pEntity && ((CBaseEntity*)tr.m_pEnt)->GetOwnerEntity() != pEntity )
 				{
 					// Some entity was hit by the trace, meaning the explosion does not have clear
 					// line of sight to the entity that it's trying to hurt. If the world is also
 					// blocking, we do no damage.
-					CBaseEntity *pBlockingEntity = tr.m_pEnt;
+					CBaseEntity *pBlockingEntity = (CBaseEntity*)tr.m_pEnt;
 					//Msg( "%s may be blocked by %s...", pEntity->GetClassname(), pBlockingEntity->GetClassname() );
 
 					UTIL_TraceLine( vecSrc, vecSpot, CONTENTS_SOLID, info.GetInflictor(), COLLISION_GROUP_NONE, &tr );
@@ -533,7 +533,7 @@ void CGameRules::RadiusDamage( const CTakeDamageInfo &info, const Vector &vecSrc
 		pEntity->TraceAttackToTriggers( adjustedInfo, vecSrc, tr.endpos, dir );
 
 #if defined( GAME_DLL )
-		if ( info.GetAttacker() && info.GetAttacker()->IsPlayer() && ToBaseCombatCharacter( tr.m_pEnt ) )
+		if ( info.GetAttacker() && info.GetAttacker()->IsPlayer() && ToBaseCombatCharacter((CBaseEntity*)tr.m_pEnt ) )
 		{
 
 			// This is a total hack!!!

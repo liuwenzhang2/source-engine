@@ -371,7 +371,7 @@ void CSnark::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity )
 	float flSpeedSqr = DotProduct( vecVelocity, vecVelocity );
 
 	// Verify that we have an entity.
-	CBaseEntity *pEntity = trace.m_pEnt;
+	CBaseEntity *pEntity = (CBaseEntity*)trace.m_pEnt;
 	Assert( pEntity );
 
 	if ( vecVelocity.z < ( 800 * gpGlobals->frametime ) )
@@ -436,7 +436,7 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 		if ( tr.m_pEnt == pOther )
 		{
 			// and it's not another squeakgrenade
-			if ( tr.m_pEnt->GetModelIndex() != GetModelIndex() )
+			if (((CBaseEntity*)tr.m_pEnt)->GetModelIndex() != GetModelIndex() )
 			{
 				// ALERT( at_console, "hit enemy\n");
 				ClearMultiDamage();

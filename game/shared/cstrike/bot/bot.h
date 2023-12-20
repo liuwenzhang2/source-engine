@@ -59,7 +59,7 @@ inline Vector GetCentroid( const CBaseEntity *player )
 }
 
 
-CBasePlayer* ClientPutInServerOverride_Bot( edict_t *pEdict, const char *playername );
+CBasePlayer* ClientPutInServerOverride_Bot( int pEdict, const char *playername );
 
 /// @todo Remove this nasty hack - CreateFakeClient() calls CBot::Spawn, which needs the profile
 extern const BotProfile *g_botInitProfile;
@@ -92,13 +92,13 @@ template < class T > T * CreateBot( const BotProfile *profile, int team )
 	// NOTE: This will ultimately invoke CBot::Spawn(), so set the profile now
 	g_botInitProfile = profile;
 	g_botInitTeam = team;
-	edict_t *botEdict = engine->CreateFakeClient( botName );
+	int botEdict = engine->CreateFakeClient( botName );
 
 	ClientPutInServerOverride( NULL );
 	Assert( g_nClientPutInServerOverrides == 1 );
 
 
-	if ( botEdict == NULL )
+	if ( !botEdict )
 	{
 		CONSOLE_ECHO( "Unable to create bot: CreateFakeClient() returned null.\n" );
 		return NULL;
@@ -106,7 +106,7 @@ template < class T > T * CreateBot( const BotProfile *profile, int team )
 
 
 	// create an instance of the bot's class and bind it to the edict
-	T *bot = dynamic_cast< T * >( CBaseEntity::Instance( botEdict ) );
+	T *bot = dynamic_cast< T * >( gEntList.GetBaseEntity( botEdict ) );
 
 	if ( bot == NULL )
 	{

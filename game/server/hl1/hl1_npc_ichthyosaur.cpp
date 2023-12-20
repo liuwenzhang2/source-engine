@@ -886,7 +886,7 @@ Vector CNPC_Ichthyosaur::DoProbe( const Vector &Probe )
 	//NDebugOverlay::Line( tr.startpos, tr.endpos, 255.0f*(1.0f-tr.fraction), 255.0f * tr.fraction, 0.0f, true, 0.05f );
 	//NOTENOTE: Debug end
 
-	if (bBumpedSomething && (GetEnemy() == NULL || !tr.m_pEnt || tr.m_pEnt->entindex() != GetEnemy()->entindex()))
+	if (bBumpedSomething && (GetEnemy() == NULL || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->entindex() != GetEnemy()->entindex()))
 	{
 		Vector ProbeDir = Probe - GetAbsOrigin();
 

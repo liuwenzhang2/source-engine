@@ -29,7 +29,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-void Host_Say( edict_t *pEdict, bool teamonly );
+void Host_Say( int pEdict, bool teamonly );
 
 extern CBaseEntity*	FindPickerEntityClass( CBasePlayer *pPlayer, char *classname );
 extern bool			g_fGameOver;
@@ -41,7 +41,7 @@ ClientPutInServer
 called each time a player is spawned into the game
 ============
 */
-void ClientPutInServer( edict_t *pEdict, const char *playername )
+void ClientPutInServer( int pEdict, const char *playername )
 {
 	// Allocate a CBasePlayer for pev, and call spawn
 	CPortal_Player *pPlayer = CPortal_Player::CreatePlayer( "player", pEdict );
@@ -49,9 +49,9 @@ void ClientPutInServer( edict_t *pEdict, const char *playername )
 }
 
 
-void ClientActive( edict_t *pEdict, bool bLoadGame )
+void ClientActive( int pEdict, bool bLoadGame )
 {
-	CPortal_Player *pPlayer = dynamic_cast< CPortal_Player* >( CBaseEntity::Instance( pEdict ) );
+	CPortal_Player *pPlayer = dynamic_cast< CPortal_Player* >( gEntList.GetBaseEntity( pEdict ) );
 	Assert( pPlayer );
 
 	pPlayer->InitialSpawn();
@@ -85,12 +85,12 @@ const char *GetGameDescription()
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-CBaseEntity* FindEntity( edict_t *pEdict, char *classname)
+CBaseEntity* FindEntity( int pEdict, char *classname)
 {
 	// If no name was given set bits based on the picked
 	if (FStrEq(classname,"")) 
 	{
-		return (FindPickerEntityClass( static_cast<CBasePlayer*>(GetContainingEntity(pEdict)), classname ));
+		return (FindPickerEntityClass( static_cast<CBasePlayer*>(gEntList.GetBaseEntity(pEdict)), classname ));
 	}
 	return NULL;
 }

@@ -1513,7 +1513,7 @@ void CNPC_Manhack::Slice( CBaseEntity *pHitEntity, float flInterval, trace_t &tr
 	Vector dir = (tr.endpos - tr.startpos);
 	if ( dir == vec3_origin )
 	{
-		dir = tr.m_pEnt->GetAbsOrigin() - GetAbsOrigin();
+		dir = ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin() - GetAbsOrigin();
 	}
 	CalculateMeleeDamageForce( &info, dir, tr.endpos );
 	pHitEntity->TakeDamage( info );
@@ -1737,10 +1737,10 @@ void CNPC_Manhack::CheckCollisions(float flInterval)
 
 	if ( (tr.fraction != 1.0 || tr.startsolid) && tr.m_pEnt)
 	{
-		PhysicsMarkEntitiesAsTouching( tr.m_pEnt, tr );
-		pHitEntity = tr.m_pEnt;
+		PhysicsMarkEntitiesAsTouching((CBaseEntity*)tr.m_pEnt, tr );
+		pHitEntity = (CBaseEntity*)tr.m_pEnt;
 
-		if( m_bHeld && tr.m_pEnt->MyNPCPointer() && tr.m_pEnt->MyNPCPointer()->IsPlayerAlly() )
+		if( m_bHeld && ((CBaseEntity*)tr.m_pEnt)->MyNPCPointer() && ((CBaseEntity*)tr.m_pEnt)->MyNPCPointer()->IsPlayerAlly() )
 		{
 			// Don't slice Alyx when she approaches to hack. We need a better solution for this!!
 			//Msg("Ignoring!\n");

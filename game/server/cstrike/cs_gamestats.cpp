@@ -1258,7 +1258,7 @@ void CCSGameStats::FireGameEvent( IGameEvent *event )
 	{
 		int userid = event->GetInt("userid", 0);
 		int entindex = event->GetInt("entindex", 0);
- 		CBreakableProp* pProp = static_cast<CBreakableProp*>(CBaseEntity::Instance(entindex));
+ 		CBreakableProp* pProp = static_cast<CBreakableProp*>(gEntList.GetBaseEntity(entindex));
  		Event_BreakProp(ToCSPlayer(UTIL_PlayerByUserId(userid)), pProp);
 	}
 	else if ( V_strcmp(pEventName, "player_decal") == 0 )

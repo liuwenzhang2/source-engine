@@ -340,7 +340,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 		pHead->SetMoveType( MOVETYPE_FLYGRAVITY );
 		pHead->SetAbsVelocity( pCorpse->GetAbsVelocity() );
 		pHead->ClearFlags();
-		pHead->m_nReferencePlayer	= ENTINDEX( pCorpse );
+		pHead->m_nReferencePlayer	= ( pCorpse )->entindex();
 
 		pHead->SetLocalAngles( pCorpse->GetAbsAngles() );
 		UTIL_SetOrigin(pHead, pCorpse->GetAbsOrigin());
@@ -1679,7 +1679,7 @@ bool CHalfLife2::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
 #ifndef CLIENT_DLL
 //---------------------------------------------------------
 //---------------------------------------------------------
-bool CHalfLife2::ShouldAutoAim( CBasePlayer *pPlayer, edict_t *target )
+bool CHalfLife2::ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target )
 {
 	return sk_allow_autoaim.GetBool() != 0;
 }

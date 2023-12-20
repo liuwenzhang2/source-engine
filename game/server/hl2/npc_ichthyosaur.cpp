@@ -799,7 +799,7 @@ bool CNPC_Ichthyosaur::SteerAvoidObstacles(Vector &Steer, const Vector &Velocity
 
 	if ( tr.fraction < 1.0f )
 	{
-		CBaseEntity *pBlocker = tr.m_pEnt;
+		CBaseEntity *pBlocker = (CBaseEntity*)tr.m_pEnt;
 		
 		if ( ( pBlocker != NULL ) && ( pBlocker->MyNPCPointer() != NULL ) )
 		{

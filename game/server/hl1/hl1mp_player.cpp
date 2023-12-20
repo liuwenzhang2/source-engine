@@ -534,7 +534,7 @@ void CHL1MP_Player::SetPlayerTeamModel( void )
 void CHL1MP_Player::SetPlayerModel( void )
 {
 	char szBaseName[128];
-	Q_FileBase( engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_playermodel" ), szBaseName, 128 );
+	Q_FileBase( engine->GetClientConVarValue( entindex(), "cl_playermodel" ), szBaseName, 128 );
 
 	// Don't let it be 'none'; default to Barney
 	if ( Q_stricmp( "none", szBaseName ) == 0 )
@@ -550,7 +550,7 @@ void CHL1MP_Player::SetPlayerModel( void )
     if ( i == -1 )
     {
 		SetModel( "models/player/mp/gordon/gordon.mdl" );
-		engine->ClientCommand ( edict(), "cl_playermodel models/gordon.mdl\n" );
+		engine->ClientCommand ( entindex(), "cl_playermodel models/gordon.mdl\n" );
         return;
     }
 

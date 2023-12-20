@@ -2119,7 +2119,7 @@ void CNPC_Vortigaunt::ZapBeam( int nHand )
 		WRITE_VEC3COORD( tr.endpos );
 	MessageEnd();
 
-	CBaseEntity *pEntity = tr.m_pEnt;
+	CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 	if ( pEntity != NULL && m_takedamage )
 	{
 		if ( g_debug_vortigaunt_aim.GetBool() )

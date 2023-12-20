@@ -581,9 +581,9 @@ void CEnvBeam::UpdateThink( void )
 			enginetrace->TraceRay( ray, MASK_SHOT, &traceFilter, &tr );
 		}
 
-		if( tr.fraction != 1.0 && PassesTouchFilters( tr.m_pEnt ) )
+		if( tr.fraction != 1.0 && PassesTouchFilters( (CBaseEntity*)tr.m_pEnt ) )
 		{
-			m_OnTouchedByEntity.FireOutput( tr.m_pEnt, this, 0 );
+			m_OnTouchedByEntity.FireOutput((CBaseEntity*)tr.m_pEnt, this, 0 );
 			return;
 		}
 	}

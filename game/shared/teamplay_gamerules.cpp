@@ -211,11 +211,11 @@ void CTeamplayRules::ChangePlayerTeam( CBasePlayer *pPlayer, const char *pTeamNa
 //-----------------------------------------------------------------------------
 // Purpose: Player has just left the game
 //-----------------------------------------------------------------------------
-void CTeamplayRules::ClientDisconnected( edict_t *pClient )
+void CTeamplayRules::ClientDisconnected( int pClient )
 {
 	// Msg( "CLIENT DISCONNECTED, REMOVING FROM TEAM.\n" );
 
-	CBasePlayer *pPlayer = (CBasePlayer *)CBaseEntity::Instance( pClient );
+	CBasePlayer *pPlayer = (CBasePlayer *)gEntList.GetBaseEntity( pClient );
 	if ( pPlayer )
 	{
 		pPlayer->SetConnected( PlayerDisconnecting );
@@ -397,10 +397,10 @@ bool CTeamplayRules::PlayerCanHearChat( CBasePlayer *pListener, CBasePlayer *pSp
 
 //=========================================================
 //=========================================================
-bool CTeamplayRules::ShouldAutoAim( CBasePlayer *pPlayer, edict_t *target )
+bool CTeamplayRules::ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target )
 {
 	// always autoaim, unless target is a teammate
-	CBaseEntity *pTgt = CBaseEntity::Instance( target );
+	CBaseEntity *pTgt =  target ;
 	if ( pTgt && pTgt->IsPlayer() )
 	{
 		if ( PlayerRelationship( pPlayer, pTgt ) == GR_TEAMMATE )
@@ -430,7 +430,7 @@ int CTeamplayRules::IPointsForKill( CBasePlayer *pAttacker, CBasePlayer *pKilled
 //=========================================================
 const char *CTeamplayRules::GetTeamID( CBaseEntity *pEntity )
 {
-	if ( pEntity == NULL || pEntity->edict() == NULL )
+	if ( pEntity == NULL || pEntity->entindex() == -1 )
 		return "";
 
 	// return their team name

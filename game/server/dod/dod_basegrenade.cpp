@@ -171,7 +171,7 @@ void CDODBaseGrenade::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelo
 	float flSurfaceElasticity = 1.0;
 
 	//Don't bounce off of players with perfect elasticity
-	if( trace.m_pEnt && trace.m_pEnt->IsPlayer() )
+	if( trace.m_pEnt && ((CBaseEntity*)trace.m_pEnt)->IsPlayer() )
 	{
 		flSurfaceElasticity = 0.3;
 	}
@@ -192,7 +192,7 @@ void CDODBaseGrenade::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelo
 	if ( trace.plane.normal.z > 0.7f )			// Floor
 	{
 		// Verify that we have an entity.
-		CBaseEntity *pEntity = trace.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)trace.m_pEnt;
 		Assert( pEntity );
 
 		// Are we on the ground?
@@ -390,7 +390,7 @@ void CDODBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	RadiusDamage( info, vecOrigin, GetDamageRadius(), CLASS_NONE, NULL );
 
 	// Don't decal players with scorch.
-	if ( pTrace->m_pEnt && !pTrace->m_pEnt->IsPlayer() )
+	if ( pTrace->m_pEnt && !((CBaseEntity*)pTrace->m_pEnt)->IsPlayer() )
 	{
 		UTIL_DecalTrace( pTrace, "Scorch" );
 	}
@@ -457,7 +457,7 @@ void CDODBaseGrenade::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 	bool bHitTeammate = false;
 
-	if ( m_bCollideWithTeammates == false && tr.m_pEnt && tr.m_pEnt->IsPlayer() && tr.m_pEnt->GetTeamNumber() == GetTeamNumber() )
+	if ( m_bCollideWithTeammates == false && tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() && ((CBaseEntity*)tr.m_pEnt)->GetTeamNumber() == GetTeamNumber() )
 	{
 		bHitTeammate = true;
 	}
@@ -484,13 +484,13 @@ void CDODBaseGrenade::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 		// send a tiny amount of damage so the character will react to getting bonked
 		CTakeDamageInfo info( this, GetThrower(), pPhysics->GetMass() * vel, GetAbsOrigin(), flDmg, DMG_CRUSH );
-		tr.m_pEnt->DispatchTraceAttack( info, dir, &tr );
+		((CBaseEntity*)tr.m_pEnt)->DispatchTraceAttack( info, dir, &tr );
 		ApplyMultiDamage();
 
 		if ( vel.Length() > 1000 )
 		{
 			CTakeDamageInfo stunInfo( this, GetThrower(), vec3_origin, GetAbsOrigin(), flDmg, DMG_STUN );
-			tr.m_pEnt->TakeDamage( stunInfo );
+			((CBaseEntity*)tr.m_pEnt)->TakeDamage( stunInfo );
 		}
 
 		// reflect velocity around normal

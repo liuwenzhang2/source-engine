@@ -163,7 +163,8 @@ bool CNPC_Roach::ShouldEat( void )
 //=========================================================
 void CNPC_Roach::NPCThink( void  )
 {
-	if ( FNullEnt( UTIL_FindClientInPVS( edict() ) ) )
+	CBaseEntity* pEnt = UTIL_FindClientInPVS(this);
+	if (pEnt==NULL||pEnt->entindex()<=0)
 		SetNextThink( gpGlobals->curtime + random->RandomFloat( 1.0f , 1.5f ) );
 	else
 		SetNextThink( gpGlobals->curtime + 0.1f );// keep monster thinking
@@ -332,7 +333,8 @@ void CNPC_Roach::Look ( int iDistance )
 
 	// don't let monsters outside of the player's PVS act up, or most of the interesting
 	// things will happen before the player gets there!
-	if ( FNullEnt( UTIL_FindClientInPVS( edict() ) ) )
+	CBaseEntity* pEnt = UTIL_FindClientInPVS(this);
+	if (pEnt==NULL||pEnt->entindex()<=0)
 	{
 		return;
 	}

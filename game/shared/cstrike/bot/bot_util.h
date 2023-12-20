@@ -110,7 +110,7 @@ inline bool IsEntityValid( CBaseEntity *entity )
 	if (entity == NULL)
 		return false;
 
-	if (FNullEnt( entity->edict() ))
+	if (entity->entindex()<=0)
 		return false;
 
 	return true;

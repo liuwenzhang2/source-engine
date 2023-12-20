@@ -962,17 +962,17 @@ void CSave::BufferData( const char *pdata, int size )
 //
 // Game centric save methods.
 //
-int	CSave::EntityIndex( const edict_t *pentLookup )
-{
-#if !defined( CLIENT_DLL )
-	if ( pentLookup == NULL )
-		return -1;
-	return EntityIndex( CBaseEntity::Instance(pentLookup) );
-#else
-	Assert( !"CSave::EntityIndex( edict_t * ) not valid on client!" );
-	return -1;
-#endif
-}
+//int	CSave::EntityIndex( const edict_t *pentLookup )
+//{
+//#if !defined( CLIENT_DLL )
+//	if ( pentLookup == NULL )
+//		return -1;
+//	return EntityIndex( CBaseEntity::Instance(pentLookup) );
+//#else
+//	Assert( !"CSave::EntityIndex( edict_t * ) not valid on client!" );
+//	return -1;
+//#endif
+//}
 
 
 //-------------------------------------
@@ -1182,29 +1182,29 @@ void CSave::WriteEntityPtr( CBaseEntity **ppEntity, int count )
 
 //-------------------------------------
 
-void CSave::WriteEdictPtr( const char *pname, edict_t **ppEdict, int count )
-{
-	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
-	int entityArray[MAX_ENTITYARRAY];
-	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
-	{
-		entityArray[i] = EntityIndex( ppEdict[i] );
-	}
-	WriteInt( pname, entityArray, count );
-}
+//void CSave::WriteEdictPtr( const char *pname, edict_t **ppEdict, int count )
+//{
+//	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
+//	int entityArray[MAX_ENTITYARRAY];
+//	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
+//	{
+//		entityArray[i] = EntityIndex( ppEdict[i] );
+//	}
+//	WriteInt( pname, entityArray, count );
+//}
 
 //-------------------------------------
 
-void CSave::WriteEdictPtr( edict_t **ppEdict, int count )
-{
-	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
-	int entityArray[MAX_ENTITYARRAY];
-	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
-	{
-		entityArray[i] = EntityIndex( ppEdict[i] );
-	}
-	WriteInt( entityArray, count );
-}
+//void CSave::WriteEdictPtr( edict_t **ppEdict, int count )
+//{
+//	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
+//	int entityArray[MAX_ENTITYARRAY];
+//	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
+//	{
+//		entityArray[i] = EntityIndex( ppEdict[i] );
+//	}
+//	WriteInt( entityArray, count );
+//}
 
 //-------------------------------------
 
@@ -1245,7 +1245,8 @@ bool CSave::WriteGameField( const char *pname, void *pData, datamap_t *pRootMap,
 			break;
 
 		case FIELD_EDICT:
-			WriteEdictPtr( pField->fieldName, (edict_t **)pData, pField->fieldSize );
+			//WriteEdictPtr( pField->fieldName, (edict_t **)pData, pField->fieldSize );
+			Error("WriteEdictPtr has been removed!");
 			break;
 
 		case FIELD_EHANDLE:
@@ -1955,31 +1956,31 @@ int CRestore::ReadEntityPtr( CBaseEntity **ppEntity, int count, int nBytesAvaila
 }
 
 //-------------------------------------
-int CRestore::ReadEdictPtr( edict_t **ppEdict, int count, int nBytesAvailable )
-{
-#if !defined( CLIENT_DLL )
-	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
-	int entityArray[MAX_ENTITYARRAY];
-	CBaseEntity	*pEntity;
-	
-	int nRead = ReadInt( entityArray, count, nBytesAvailable );
-	
-	for ( int i = 0; i < nRead; i++ ) // nRead is never greater than count
-	{
-		pEntity = EntityFromIndex( entityArray[i] );
-		ppEdict[i] = (pEntity) ? pEntity->edict() : NULL;
-	}
-	
-	if ( nRead < count)
-	{
-		memset( &ppEdict[nRead], 0, ( count - nRead ) * sizeof(ppEdict[0]) );
-	}
-	
-	return nRead;
-#else
-	return 0;
-#endif
-}
+//int CRestore::ReadEdictPtr( edict_t **ppEdict, int count, int nBytesAvailable )
+//{
+//#if !defined( CLIENT_DLL )
+//	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
+//	int entityArray[MAX_ENTITYARRAY];
+//	CBaseEntity	*pEntity;
+//	
+//	int nRead = ReadInt( entityArray, count, nBytesAvailable );
+//	
+//	for ( int i = 0; i < nRead; i++ ) // nRead is never greater than count
+//	{
+//		pEntity = EntityFromIndex( entityArray[i] );
+//		ppEdict[i] = (pEntity) ? pEntity->edict() : NULL;
+//	}
+//	
+//	if ( nRead < count)
+//	{
+//		memset( &ppEdict[nRead], 0, ( count - nRead ) * sizeof(ppEdict[0]) );
+//	}
+//	
+//	return nRead;
+//#else
+//	return 0;
+//#endif
+//}
 
 
 //-------------------------------------
@@ -2132,7 +2133,8 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 			
 		case FIELD_EDICT:
 #if !defined( CLIENT_DLL )
-			ReadEdictPtr( (edict_t **)pDest, pField->fieldSize, header.size );
+			//ReadEdictPtr( (edict_t **)pDest, pField->fieldSize, header.size );
+			Error("ReadEdictPtr has been removed!");
 #else
 			Assert( !"FIELD_EDICT not valid for client .dll" );
 #endif
@@ -2484,7 +2486,7 @@ void CEntitySaveRestoreBlockHandler::Save( ISave *pSave )
 		{
 			MDLCACHE_CRITICAL_SECTION();
 #if !defined( CLIENT_DLL )
-			AssertMsg( !pEnt->edict() || ( pEnt->m_iClassname != NULL_STRING && 
+			AssertMsg( pEnt->entindex()==-1 || ( pEnt->m_iClassname != NULL_STRING && 
 										   (STRING(pEnt->m_iClassname)[0] != 0) && 
 										   FStrEq( STRING(pEnt->m_iClassname), pEnt->GetClassname()) ), 
 					   "Saving entity with invalid classname" );
@@ -2501,7 +2503,7 @@ void CEntitySaveRestoreBlockHandler::Save( ISave *pSave )
 #if !defined( CLIENT_DLL )
 			pEntInfo->globalname = pEnt->m_iGlobalname; // remember global name
 			pEntInfo->landmarkModelSpace = ModelSpaceLandmark( pEnt->GetModelIndex() );
-			int nEntIndex = pEnt->edict() ? ENTINDEX(pEnt->edict()) : -1;
+			int nEntIndex = pEnt->entindex();
 			bool bIsPlayer = ( ( nEntIndex >= 1 ) && ( nEntIndex <= gpGlobals->maxClients ) ) ? true : false;
 			if ( bIsPlayer )
 			{
@@ -2606,12 +2608,10 @@ void CEntitySaveRestoreBlockHandler::Restore( IRestore *pRestore, bool createPla
 					Assert(0);
 				}
 
-				edict_t *ed = INDEXENT( pEntInfo->edictindex );
-
-				if ( ed && createPlayers )
+				if ( createPlayers )//ed && 
 				{
 					// create the player
-					pent = CBasePlayer::CreatePlayer( STRING(pEntInfo->classname), ed );
+					pent = CBasePlayer::CreatePlayer( STRING(pEntInfo->classname), pEntInfo->edictindex);
 				}
 				else
 					pent = NULL;
@@ -3336,9 +3336,7 @@ void CreateEntitiesInTransitionList( CSaveRestoreData *pSaveData, int levelMask 
 		pent = NULL;
 		if ( (pEntInfo->edictindex > 0) && (pEntInfo->edictindex <= gpGlobals->maxClients) )	
 		{
-			edict_t *ed = INDEXENT( pEntInfo->edictindex );
-
-			if ( active && ed && !ed->IsFree() )
+			if ( active  )//&& ed && !ed->IsFree()
 			{
 				if ( !(pEntInfo->flags & FENTTABLE_PLAYER) )
 				{
@@ -3346,7 +3344,7 @@ void CreateEntitiesInTransitionList( CSaveRestoreData *pSaveData, int levelMask 
 					Assert(0);
 				}
 
-				pent = CBasePlayer::CreatePlayer( STRING(pEntInfo->classname), ed );
+				pent = CBasePlayer::CreatePlayer( STRING(pEntInfo->classname), pEntInfo->edictindex);
 			}
 		}
 		else if ( active )
@@ -3406,7 +3404,7 @@ int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask )
 			}
 			else 
 			{
-				DevMsg( 2, "Transferring %s (%d)\n", STRING(pEntInfo->classname), pent->edict() ? ENTINDEX(pent->edict()) : -1 );
+				DevMsg( 2, "Transferring %s (%d)\n", STRING(pEntInfo->classname), pent->entindex());
 				CRestore restoreHelper( pSaveData );
 				if ( g_EntitySaveRestoreBlockHandler.RestoreEntity( pent, &restoreHelper, pEntInfo ) < 0 )
 				{

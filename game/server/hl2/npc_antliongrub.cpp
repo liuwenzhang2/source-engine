@@ -339,7 +339,7 @@ int CAntlionGrub::OnTakeDamage( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 inline bool CAntlionGrub::InPVS( void )
 {
-	return ( UTIL_FindClientInPVS( edict() ) != NULL ) || (UTIL_ClientPVSIsExpanded() && UTIL_FindClientInVisibilityPVS( edict() ));
+	return ( UTIL_FindClientInPVS( this ) != NULL ) || (UTIL_ClientPVSIsExpanded() && UTIL_FindClientInVisibilityPVS( this ));
 }
 
 //-----------------------------------------------------------------------------
@@ -945,7 +945,7 @@ void CGrubNugget::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		if ( pHitEntity == NULL )
 		{
 			// hit world
-			pHitEntity = GetContainingEntity( INDEXENT(0) );
+			pHitEntity = gEntList.GetBaseEntity( 0 );
 		}
 		
 		Vector damagePos;

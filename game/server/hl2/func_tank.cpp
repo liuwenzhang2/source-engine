@@ -871,7 +871,7 @@ void CFuncTank::Activate( void )
 	
 	CBaseEntity *pParent = gEntList.FindEntityByName( NULL, m_iParent );
 
-	if ((pParent != NULL) && (pParent->edict() != NULL))
+	if ((pParent != NULL) && (pParent->entindex() != -1))
 	{
 		SetParent( pParent );
 	}
@@ -1221,9 +1221,9 @@ void CFuncTank::ControllerPostFrame( void )
 		
 		UTIL_TraceHull( start, start + forward * 8192, -Vector(8,8,8), Vector(8,8,8), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 		
-		if( tr.m_pEnt && tr.m_pEnt->m_takedamage != DAMAGE_NO && (tr.m_pEnt->GetFlags() & FL_AIMTARGET) )
+		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_NO && (((CBaseEntity*)tr.m_pEnt)->GetFlags() & FL_AIMTARGET) )
 		{
-			forward = tr.m_pEnt->WorldSpaceCenter() - start;
+			forward = ((CBaseEntity*)tr.m_pEnt)->WorldSpaceCenter() - start;
 			VectorNormalize( forward );
 		}
 	}
@@ -2461,7 +2461,7 @@ bool CFuncTank::HasLOSTo( CBaseEntity *pEntity )
 	// UNDONE: Should this hit BLOCKLOS brushes?
 	AI_TraceLine( vecBarrelEnd, vecTarget, MASK_BLOCKLOS_AND_NPCS, &traceFilter, &tr );
 	
-	CBaseEntity	*pHitEntity = tr.m_pEnt;
+	CBaseEntity	*pHitEntity = (CBaseEntity*)tr.m_pEnt;
 	
 	// Is entity in a vehicle? if so, verify vehicle is target and return if so (so npc shoots at vehicle)
 	CBaseCombatCharacter *pCCEntity = pEntity->MyCombatCharacterPointer();
@@ -3688,7 +3688,7 @@ void CMortarShell::Impact( void )
 	CEffectData	data;
 
 	// Do an extra effect if we struck the world
-	if ( tr.m_pEnt && tr.m_pEnt->IsWorld() )
+	if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsWorld() )
 	{
 		data.m_flRadius = flRadius * 0.5f;
 		data.m_vNormal	= tr.plane.normal;

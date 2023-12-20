@@ -1857,8 +1857,8 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	trace_t tr;
 	UTIL_TraceHull( start, end, -Vector(8,8,8), Vector(8,8,8), MASK_SHOT|CONTENTS_GRATE, &filter, &tr );
 	bool bValid = true;
-	CBaseEntity *pEntity = tr.m_pEnt;
-	if ( tr.fraction == 1 || !tr.m_pEnt || tr.m_pEnt->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
+	CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
+	if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
 	{
 		bValid = false;
 	}
@@ -1871,14 +1871,14 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	if ( !bValid )
 	{
 		UTIL_TraceLine( start, end, MASK_SHOT|CONTENTS_GRATE, &filter, &tr );
-		if ( tr.fraction == 1 || !tr.m_pEnt || tr.m_pEnt->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
+		if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
 		{
 			// Play dry-fire sequence
 			DryFire();
 			return;
 		}
 
-		pEntity = tr.m_pEnt;
+		pEntity = (CBaseEntity*)tr.m_pEnt;
 	}
 
 	// See if we hit something
@@ -2089,17 +2089,17 @@ CWeaponPhysCannon::FindObjectResult_t CWeaponPhysCannon::FindObject( void )
 	UTIL_TraceLine( start, end, MASK_SHOT|CONTENTS_GRATE, &filter, &tr );
 	
 	// Try again with a hull trace
-	if ( ( tr.fraction == 1.0 ) || ( tr.m_pEnt == NULL ) || ( tr.m_pEnt->IsWorld() ) )
+	if ( ( tr.fraction == 1.0 ) || ( tr.m_pEnt == NULL ) || (((CBaseEntity*)tr.m_pEnt)->IsWorld() ) )
 	{
 		UTIL_TraceHull( start, end, -Vector(4,4,4), Vector(4,4,4), MASK_SHOT|CONTENTS_GRATE, &filter, &tr );
 	}
 
-	CBaseEntity *pEntity = tr.m_pEnt ? tr.m_pEnt->GetRootMoveParent() : NULL;
+	CBaseEntity *pEntity = tr.m_pEnt ? ((CBaseEntity*)tr.m_pEnt)->GetRootMoveParent() : NULL;
 	bool	bAttach = false;
 	bool	bPull = false;
 
 	// If we hit something, pick it up or pull it
-	if ( ( tr.fraction != 1.0f ) && ( tr.m_pEnt ) && ( tr.m_pEnt->IsWorld() == false ) )
+	if ( ( tr.fraction != 1.0f ) && ( tr.m_pEnt ) && (((CBaseEntity*)tr.m_pEnt)->IsWorld() == false ) )
 	{
 		// Attempt to attach if within range
 		if ( tr.fraction <= 0.25f )
@@ -2573,7 +2573,7 @@ void CWeaponPhysCannon::CheckForTarget( void )
 	if ( ( tr.fraction != 1.0f ) && ( tr.m_pEnt != NULL ) )
 	{
 		// FIXME: Try just having the elements always open when pointed at a physics object
-		if ( CanPickupObject( tr.m_pEnt ) || Pickup_ForcePhysGunOpen( tr.m_pEnt, pOwner ) )
+		if ( CanPickupObject((CBaseEntity*)tr.m_pEnt ) || Pickup_ForcePhysGunOpen((CBaseEntity*)tr.m_pEnt, pOwner ) )
 		// if ( ( tr.m_pEnt->VPhysicsGetObject() != NULL ) && ( tr.m_pEnt->GetMoveType() == MOVETYPE_VPHYSICS ) )
 		{
 			m_nChangeState = ELEMENT_STATE_NONE;

@@ -44,4 +44,5 @@
 #include "proto_version.h"
 #include "proto_oob.h"
 #include "edict.h"
+#include "pr_edict.h"
 #include "server_class.h"

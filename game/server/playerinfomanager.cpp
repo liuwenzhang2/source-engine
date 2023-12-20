@@ -45,22 +45,22 @@ namespace
 	abstract_class IPlayerInfoManager_V1
 	{
 	public:
-		virtual IPlayerInfo_V1 *GetPlayerInfo( edict_t *pEdict ) = 0;
+		virtual IPlayerInfo_V1 *GetPlayerInfo( int pEdict ) = 0;
 	};
 
 
 	class CPlayerInfoManager_V1: public IPlayerInfoManager_V1
 	{
 	public:
-		virtual IPlayerInfo_V1 *GetPlayerInfo( edict_t *pEdict );
+		virtual IPlayerInfo_V1 *GetPlayerInfo( int pEdict );
 	};
 
 	static CPlayerInfoManager_V1 s_PlayerInfoManager_V1;
 
 
-	IPlayerInfo_V1 *CPlayerInfoManager_V1::GetPlayerInfo( edict_t *pEdict )
+	IPlayerInfo_V1 *CPlayerInfoManager_V1::GetPlayerInfo( int pEdict )
 	{
-		CBasePlayer *pPlayer = ( ( CBasePlayer * )CBaseEntity::Instance( pEdict ));
+		CBasePlayer *pPlayer = ( ( CBasePlayer * )gEntList.GetBaseEntity( pEdict ));
 		if ( pPlayer )
 		{
 			return (IPlayerInfo_V1 *)pPlayer->GetPlayerInfo();
@@ -74,9 +74,9 @@ namespace
 	EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CPlayerInfoManager_V1, IPlayerInfoManager_V1, "PlayerInfoManager001", s_PlayerInfoManager_V1);
 }
 
-IPlayerInfo *CPlayerInfoManager::GetPlayerInfo( edict_t *pEdict )
+IPlayerInfo *CPlayerInfoManager::GetPlayerInfo( int pEdict )
 {
-	CBasePlayer *pPlayer = ( ( CBasePlayer * )CBaseEntity::Instance( pEdict ));
+	CBasePlayer *pPlayer = ( ( CBasePlayer * )gEntList.GetBaseEntity( pEdict ));
 	if ( pPlayer )
 	{
 		return pPlayer->GetPlayerInfo();
@@ -94,9 +94,9 @@ CGlobalVars *CPlayerInfoManager::GetGlobalVars()
 
 
 
-IBotController *CPluginBotManager::GetBotController( edict_t *pEdict )
+IBotController *CPluginBotManager::GetBotController( int pEdict )
 {
-	CBasePlayer *pPlayer = ( ( CBasePlayer * )CBaseEntity::Instance( pEdict ));
+	CBasePlayer *pPlayer = ( ( CBasePlayer * )gEntList.GetBaseEntity( pEdict ));
 	if ( pPlayer && pPlayer->IsBot() )
 	{
 		return pPlayer->GetBotController();
@@ -107,9 +107,9 @@ IBotController *CPluginBotManager::GetBotController( edict_t *pEdict )
 	}
 }
 
-edict_t *CPluginBotManager::CreateBot( const char *botname )
+int CPluginBotManager::CreateBot( const char *botname )
 {	
-	edict_t *pEdict = engine->CreateFakeClient( botname );
+	int pEdict = engine->CreateFakeClient( botname );
 	if (!pEdict)
 	{
 		Msg( "Failed to create Bot.\n");
@@ -117,7 +117,7 @@ edict_t *CPluginBotManager::CreateBot( const char *botname )
 	}
 
 	// Allocate a player entity for the bot, and call spawn
-	CBasePlayer *pPlayer = ((CBasePlayer*)CBaseEntity::Instance( pEdict ));
+	CBasePlayer *pPlayer = ((CBasePlayer*)gEntList.GetBaseEntity( pEdict ));
 
 	pPlayer->ClearFlags();
 	pPlayer->AddFlag( FL_CLIENT | FL_FAKECLIENT );

@@ -242,8 +242,9 @@ void CEngineSoundServer::EmitSoundInternal( IRecipientFilter& filter, int iEntIn
 		return;
 	}
 
-	edict_t *pEdict = (iEntIndex >= 0) ? &sv.edicts[iEntIndex] : NULL; 
-	SV_StartSound( filter, pEdict, iChannel, pSample, flVolume, iSoundLevel, 
+	//edict_t *pEdict = (iEntIndex >= 0) ? &sv.edicts[iEntIndex] : NULL; 
+	IServerEntity* serverEntity = serverEntitylist->GetServerEntity(iEntIndex);
+	SV_StartSound( filter, serverEntity, iChannel, pSample, flVolume, iSoundLevel,
 		iFlags, iPitch, iSpecialDSP, pOrigin, soundtime, speakerentity, pUtlVecOrigins );
 }
 
@@ -304,7 +305,7 @@ void CEngineSoundServer::EmitSound( IRecipientFilter& filter, int iEntIndex, int
 	}
 }
 
-void BuildRecipientList( CUtlVector< edict_t * >& list, const IRecipientFilter& filter )
+void BuildRecipientList( CUtlVector< int >& list, const IRecipientFilter& filter )
 {
 	int c = filter.GetRecipientCount();
 	for ( int i = 0; i < c; i++ )
@@ -321,7 +322,7 @@ void BuildRecipientList( CUtlVector< edict_t * >& list, const IRecipientFilter& 
 		if ( !cl->IsSpawned() )
 			continue;
 
-		list.AddToTail( cl->edict );
+		list.AddToTail( cl->m_nEntityIndex );
 	}
 }
 
@@ -332,7 +333,7 @@ void BuildRecipientList( CUtlVector< edict_t * >& list, const IRecipientFilter& 
 //-----------------------------------------------------------------------------
 void CEngineSoundServer::SetRoomType( IRecipientFilter& filter, int roomType )
 {
-	CUtlVector< edict_t * > players;
+	CUtlVector< int > players;
 	BuildRecipientList( players, filter );
 
 	for ( int i = 0 ; i < players.Count(); i++ )
@@ -355,7 +356,7 @@ void CEngineSoundServer::SetPlayerDSP( IRecipientFilter& filter, int dspType, bo
 		Warning( "SetPlayerDSP:  fastReset only valid from client\n" );
 	}
 
-	CUtlVector< edict_t * > players;
+	CUtlVector< int > players;
 	BuildRecipientList( players, filter );
 
 	for ( int i = 0 ; i < players.Count(); i++ )

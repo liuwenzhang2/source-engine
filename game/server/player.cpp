@@ -463,7 +463,7 @@ END_DATADESC()
 
 int giPrecacheGrunt = 0;
 
-edict_t *CBasePlayer::s_PlayerEdict = NULL;
+int CBasePlayer::s_PlayerEdict = -1;
 
 
 inline bool ShouldRunCommandsInContext( const CCommandContext *ctx )
@@ -533,7 +533,7 @@ void CBasePlayer::DestroyViewModels( void )
 //			*ed - 
 // Output : CBasePlayer
 //-----------------------------------------------------------------------------
-CBasePlayer *CBasePlayer::CreatePlayer( const char *className, edict_t *ed )
+CBasePlayer *CBasePlayer::CreatePlayer( const char *className, int ed )
 {
 	CBasePlayer *player;
 	CBasePlayer::s_PlayerEdict = ed;
@@ -561,12 +561,12 @@ CBasePlayer::CBasePlayer( )
 	m_vecSmoothedVelocity.Init();
 #endif
 
-	if ( s_PlayerEdict )
+	if ( s_PlayerEdict!=-1 )
 	{
 		// take the assigned edict_t and attach it
-		Assert( s_PlayerEdict != NULL );
+		Assert( s_PlayerEdict != -1 );
 		NetworkProp()->AttachEdict( s_PlayerEdict );
-		s_PlayerEdict = NULL;
+		s_PlayerEdict = -1;
 	}
 
 	m_flFlashTime = -1;
@@ -688,7 +688,7 @@ int CBasePlayer::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 {
 	// Allow me to introduce myself to, err, myself.
 	// I.e., always update the recipient player data even if it's nodraw (first person mode)
-	if ( pInfo->m_pClientEnt == edict() )
+	if ( pInfo->m_pClientEnt == entindex() )
 	{
 		return FL_EDICT_ALWAYS;
 	}
@@ -698,7 +698,7 @@ int CBasePlayer::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	// so transmit these 'cameramans' to the HLTV or Replay client
 	if ( HLTVDirector()->GetCameraMan() == entindex() )
 	{
-		CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+		CBaseEntity *pRecipientEntity = gEntList.GetBaseEntity( pInfo->m_pClientEnt );
 		
 		Assert( pRecipientEntity->IsPlayer() );
 		
@@ -835,7 +835,7 @@ void CBasePlayer::DeathSound( const CTakeDamageInfo &info )
 	// play one of the suit death alarms
 	if ( IsSuitEquipped() )
 	{
-		UTIL_EmitGroupnameSuit(edict(), "HEV_DEAD");
+		UTIL_EmitGroupnameSuit(this, "HEV_DEAD");
 	}
 }
 
@@ -1213,7 +1213,7 @@ int CBasePlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	// add to the damage total for clients, which will be sent as a single
 	// message at the end of the frame
 	// todo: remove after combining shotgun blasts?
-	if ( info.GetInflictor() && info.GetInflictor()->edict() )
+	if ( info.GetInflictor() && info.GetInflictor()->entindex()!=-1 )
 		m_DmgOrigin = info.GetInflictor()->GetAbsOrigin();
 
 	m_DmgTake += (int)info.GetDamage();
@@ -1669,7 +1669,7 @@ void CBasePlayer::Event_Killed( const CTakeDamageInfo &info )
 	ClearUseEntity();
 	
 	// this client isn't going to be thinking for a while, so reset the sound until they respawn
-	pSound = CSoundEnt::SoundPointerForIndex( CSoundEnt::ClientSoundIndex( edict() ) );
+	pSound = CSoundEnt::SoundPointerForIndex( CSoundEnt::ClientSoundIndex( this ) );
 	{
 		if ( pSound )
 		{
@@ -1988,7 +1988,7 @@ void CBasePlayer::WaterMove()
 					m_nDrownDmgRate = DROWNING_DAMAGE_MAX;
 				}
 
-				OnTakeDamage( CTakeDamageInfo( GetContainingEntity(INDEXENT(0)), GetContainingEntity(INDEXENT(0)), m_nDrownDmgRate, DMG_DROWN ) );
+				OnTakeDamage( CTakeDamageInfo( gEntList.GetBaseEntity(0), gEntList.GetBaseEntity(0), m_nDrownDmgRate, DMG_DROWN ) );
 				m_PainFinished = gpGlobals->curtime + 1;
 				
 				// track drowning damage, give it back when
@@ -3778,7 +3778,7 @@ void CBasePlayer::HandleFuncTrain(void)
 				MASK_PLAYERSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trainTrace );
 
 			if ( trainTrace.fraction != 1.0 && trainTrace.m_pEnt )
-				pTrain = trainTrace.m_pEnt;
+				pTrain = (CBaseEntity*)trainTrace.m_pEnt;
 
 
 			if ( !pTrain || !(pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) || !pTrain->OnControls(this) )
@@ -4227,12 +4227,12 @@ void CBasePlayer::CheckSuitUpdate()
 
 				char sentence[512];
 				Q_snprintf( sentence, sizeof( sentence ), "!%s", engine->SentenceNameFromIndex( isentence ) );
-				UTIL_EmitSoundSuit( edict(), sentence );
+				UTIL_EmitSoundSuit( this, sentence );
 			}
 			else
 			{
 				// play sentence group
-				UTIL_EmitGroupIDSuit(edict(), -isentence);
+				UTIL_EmitGroupIDSuit(this, -isentence);
 			}
 		m_flSuitUpdate = gpGlobals->curtime + SUITUPDATETIME;
 		}
@@ -4351,7 +4351,7 @@ void CBasePlayer::UpdatePlayerSound ( void )
 	int iVolume;
 	CSound *pSound;
 
-	pSound = CSoundEnt::SoundPointerForIndex( CSoundEnt::ClientSoundIndex( edict() ) );
+	pSound = CSoundEnt::SoundPointerForIndex( CSoundEnt::ClientSoundIndex( this ) );
 
 	if ( !pSound )
 	{
@@ -4793,9 +4793,9 @@ USES AND SETS GLOBAL g_pLastSpawn
 CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 {
 	CBaseEntity *pSpot;
-	edict_t		*player;
+	//edict_t		*player;
 
-	player = edict();
+	//player = edict();
 
 // choose a info_player_deathmatch point
 	if (g_pGameRules->IsCoOp())
@@ -4846,8 +4846,8 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 			for ( CEntitySphereQuery sphere( pSpot->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 			{
 				// if ent is a client, kill em (unless they are ourselves)
-				if ( ent->IsPlayer() && !(ent->edict() == player) )
-					ent->TakeDamage( CTakeDamageInfo( GetContainingEntity(INDEXENT(0)), GetContainingEntity(INDEXENT(0)), 300, DMG_GENERIC ) );
+				if ( ent->IsPlayer() && !(ent->entindex() == entindex()) )
+					ent->TakeDamage( CTakeDamageInfo( gEntList.GetBaseEntity(0), gEntList.GetBaseEntity(0), 300, DMG_GENERIC ) );
 			}
 			goto ReturnSpot;
 		}
@@ -4871,7 +4871,7 @@ ReturnSpot:
 	if ( !pSpot  )
 	{
 		Warning( "PutClientInServer: no info_player_start on level\n");
-		return CBaseEntity::Instance( INDEXENT( 0 ) );
+		return gEntList.GetBaseEntity( 0 );
 	}
 
 	g_pLastSpawn = pSpot;
@@ -5718,7 +5718,7 @@ CBaseEntity *FindEntityClassForward( CBasePlayer *pMe, char *classname )
 		MASK_SOLID, pMe, COLLISION_GROUP_NONE, &tr );
 	if ( tr.fraction != 1.0 && tr.DidHitNonWorldEntity() )
 	{
-		CBaseEntity *pHit = tr.m_pEnt;
+		CBaseEntity *pHit = (CBaseEntity*)tr.m_pEnt;
 		if (FClassnameIs( pHit,classname ) )
 		{
 			return pHit;
@@ -5758,7 +5758,7 @@ CBaseEntity *FindEntityForward( CBasePlayer *pMe, bool fHull )
 			mask, pMe, COLLISION_GROUP_NONE, &tr );
 		if ( tr.fraction != 1.0 && tr.DidHitNonWorldEntity() )
 		{
-			return tr.m_pEnt;
+			return (CBaseEntity*)tr.m_pEnt;
 		}
 	}
 	return NULL;
@@ -6231,15 +6231,13 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 		{
 			trace_t tr;
 
-			edict_t		*pWorld = engine->PEntityOfEntIndex( 0 );
 
 			Vector start = EyePosition();
 			Vector forward;
 			EyeVectors( &forward );
 			Vector end = start + forward * 1024;
 			UTIL_TraceLine( start, end, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
-			if ( tr.m_pEnt )
-				pWorld = tr.m_pEnt->edict();
+			
 
 			const char *pTextureName = tr.surface.name;
 
@@ -6441,13 +6439,13 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 			if ( !SetObserverMode( mode ) )
 				ClientPrint( this, HUD_PRINTCONSOLE, "#Spectator_Mode_Unkown");
 			else
-				engine->ClientCommand( edict(), "cl_spec_mode %d", mode );
+				engine->ClientCommand( entindex(), "cl_spec_mode %d", mode );
 		}
 		else
 		{
 			// remember spectator mode for later use
 			m_iObserverLastMode = mode;
-			engine->ClientCommand( edict(), "cl_spec_mode %d", mode );
+			engine->ClientCommand( entindex(), "cl_spec_mode %d", mode );
 		}
 
 		return true;
@@ -7078,7 +7076,7 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 
 	UTIL_TraceLine( vecSrc, vecSrc + bestdir * MAX_COORD_FLOAT, MASK_SHOT, &traceFilter, &tr );
 
-	CBaseEntity *pEntHit = tr.m_pEnt;
+	CBaseEntity *pEntHit = (CBaseEntity*)tr.m_pEnt;
 
 	if ( pEntHit && pEntHit->m_takedamage != DAMAGE_NO && pEntHit->GetHealth() > 0 )
 	{
@@ -7141,10 +7139,10 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 			if ( pEntity == this )
 				continue;
 
-			if ( (pEntity->IsNPC() && !pEntity->IsAlive()) || !pEntity->edict() )
+			if ( (pEntity->IsNPC() && !pEntity->IsAlive()) || pEntity->entindex()==-1 )
 				continue;
 
-			if ( !g_pGameRules->ShouldAutoAim( this, pEntity->edict() ) )
+			if ( !g_pGameRules->ShouldAutoAim( this, pEntity ) )
 				continue;
 
 			// don't look through water
@@ -7254,7 +7252,7 @@ void CBasePlayer::ResetAutoaim( void )
 	if (m_vecAutoAim.x != 0 || m_vecAutoAim.y != 0)
 	{
 		m_vecAutoAim = QAngle( 0, 0, 0 );
-		engine->CrosshairAngle( edict(), 0, 0 );
+		engine->CrosshairAngle( entindex(), 0, 0 );
 	}
 	m_fOnTarget = false;
 }
@@ -8594,11 +8592,11 @@ CBaseEntity *CBasePlayer::DoubleCheckUseNPC( CBaseEntity *pNPC, const Vector &ve
 
 	UTIL_TraceLine( vecSrc, vecSrc + vecDir * 1024, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
-	if( tr.m_pEnt != NULL && tr.m_pEnt->MyNPCPointer() && tr.m_pEnt != pNPC )
+	if( tr.m_pEnt != NULL && ((CBaseEntity*)tr.m_pEnt)->MyNPCPointer() && tr.m_pEnt != pNPC )
 	{
 		// Player is selecting a different NPC through some negative space
 		// in the first NPC's hitboxes (between legs, over shoulder, etc).
-		return tr.m_pEnt;
+		return (CBaseEntity*)tr.m_pEnt;
 	}
 
 	return pNPC;
@@ -8721,11 +8719,11 @@ void CBasePlayer::SetViewEntity( CBaseEntity *pEntity )
 
 	if ( m_hViewEntity )
 	{
-		engine->SetView( edict(), m_hViewEntity->edict() );
+		engine->SetView( entindex(), m_hViewEntity );
 	}
 	else
 	{
-		engine->SetView( edict(), edict() );
+		engine->SetView( entindex(), this );
 	}
 }
 
@@ -8848,7 +8846,7 @@ bool CBasePlayer::HandleVoteCommands( const CCommand &args )
 //-----------------------------------------------------------------------------
 const char *CBasePlayer::GetNetworkIDString()
 {
-	const char *pStr = engine->GetPlayerNetworkIDString( edict() );
+	const char *pStr = engine->GetPlayerNetworkIDString( entindex() );
 	Q_strncpy( m_szNetworkIDString, pStr ? pStr : "", sizeof(m_szNetworkIDString) );
 	return m_szNetworkIDString; 
 }
@@ -8971,7 +8969,7 @@ const char *CPlayerInfo::GetName()
 int	CPlayerInfo::GetUserID() 
 { 
 	Assert( m_pParent );
-	return engine->GetPlayerUserId( m_pParent->edict() ); 
+	return engine->GetPlayerUserId( m_pParent->entindex() ); 
 }
 
 const char *CPlayerInfo::GetNetworkIDString() 
@@ -9353,7 +9351,7 @@ void CBasePlayer::AdjustDrownDmg( int nAmount )
 //-----------------------------------------------------------------------------
 bool CBasePlayer::GetSteamID( CSteamID *pID )
 {
-	const CSteamID *pClientID = engine->GetClientSteamID( edict() );
+	const CSteamID *pClientID = engine->GetClientSteamID( entindex() );
 	if ( pClientID )
 	{
 		*pID = *pClientID;

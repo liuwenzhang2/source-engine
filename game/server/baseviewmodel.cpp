@@ -70,13 +70,13 @@ int CBaseViewModel::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	// check if receipient owns this weapon viewmodel
 	CBasePlayer *pOwner = ToBasePlayer( m_hOwner );
 
-	if ( pOwner && pOwner->edict() == pInfo->m_pClientEnt )
+	if ( pOwner && pOwner->entindex() == pInfo->m_pClientEnt )
 	{
 		return FL_EDICT_ALWAYS;
 	}
 
 	// check if recipient spectates the own of this viewmodel
-	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+	CBaseEntity *pRecipientEntity = gEntList.GetBaseEntity( pInfo->m_pClientEnt );
 
 	if ( pRecipientEntity->IsPlayer() )
 	{

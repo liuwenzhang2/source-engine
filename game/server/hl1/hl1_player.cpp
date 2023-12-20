@@ -215,7 +215,7 @@ void CHL1_Player::PreThink(void)
 					MASK_PLAYERSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trainTrace );
 
 				if ( trainTrace.fraction != 1.0 && trainTrace.m_pEnt )
-					pTrain = trainTrace.m_pEnt;
+					pTrain = (CBaseEntity*)trainTrace.m_pEnt;
 
 
 				if ( !pTrain || !(pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) || !pTrain->OnControls(this) )
@@ -835,7 +835,7 @@ int	CHL1_Player::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		// add to the damage total for clients, which will be sent as a single
 		// message at the end of the frame
 		// todo: remove after combining shotgun blasts?
-		if ( info.GetInflictor() && info.GetInflictor()->edict() )
+		if ( info.GetInflictor() && info.GetInflictor()->entindex()!=-1 )
 			m_DmgOrigin = info.GetInflictor()->GetAbsOrigin();
 
 		m_DmgTake += (int)info.GetDamage();

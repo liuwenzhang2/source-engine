@@ -1132,7 +1132,7 @@ void CNPC_ControllerHeadBall::HuntThink( void  )
 
 		UTIL_TraceLine( GetAbsOrigin(), GetEnemy()->WorldSpaceCenter(), MASK_ALL, this, COLLISION_GROUP_NONE, &tr );
 
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		if (pEntity != NULL && pEntity->m_takedamage == DAMAGE_YES)
 		{
 			ClearMultiDamage( );
@@ -1147,7 +1147,7 @@ void CNPC_ControllerHeadBall::HuntThink( void  )
 			int fadelength = 0;
 			int amplitude = 0;
 			const Vector vecEnd = tr.endpos;
-			te->BeamEntPoint( filter, 0.0, entindex(), NULL, 0, &(tr.m_pEnt->GetAbsOrigin()), 
+			te->BeamEntPoint( filter, 0.0, entindex(), NULL, 0, &(((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin()),
 				g_sModelIndexLaser, haloindex /* no halo */, 0, 10, 3, 20, 20, fadelength, 
 				amplitude, 255, 255, 255, 255, 10 );
 

@@ -18,6 +18,7 @@
 #include "server.h"
 #include "client_class.h"
 #include "icliententitylist.h"
+#include "iserverentity.h"
 #include "mathlib/vmatrix.h"
 #include "icliententity.h"
 #include "overlaytext.h"
@@ -277,15 +278,10 @@ static bool GetEntityOriginClientOrServer( int ent_num, Vector& origin )
 
 	if ( sv.IsActive() )
 	{
-		edict_t *e = EDICT_NUM( ent_num );
-		if ( e )
+		IServerEntity* serverEntity = serverEntitylist->GetServerEntity(ent_num);
+		if (serverEntity)
 		{
-			IServerEntity *serverEntity = e->GetIServerEntity();
-			if ( serverEntity )
-			{
-				CM_WorldSpaceCenter( serverEntity->GetCollideable(), &origin );
-			}
-
+			CM_WorldSpaceCenter( serverEntity->GetCollideable(), &origin );
 			return true;
 		}
 	}

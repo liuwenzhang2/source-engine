@@ -781,7 +781,7 @@ void CHL2_Player::PreThink(void)
 					MASK_PLAYERSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trainTrace );
 
 				if ( trainTrace.fraction != 1.0 && trainTrace.m_pEnt )
-					pTrain = trainTrace.m_pEnt;
+					pTrain = (CBaseEntity*)trainTrace.m_pEnt;
 
 
 				if ( !pTrain || !(pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) || !pTrain->OnControls(this) )
@@ -1413,9 +1413,9 @@ bool CHL2_Player::CommanderFindGoal( commandgoal_t *pGoal )
 
 		for( int i = 0 ; i < Allies.Count() ; i++ )
 		{
-			if( Allies[ i ]->IsValidCommandTarget( tr.m_pEnt ) )
+			if( Allies[ i ]->IsValidCommandTarget((CBaseEntity*)tr.m_pEnt ) )
 			{
-				pGoal->m_pGoalEntity = tr.m_pEnt;
+				pGoal->m_pGoalEntity = (CBaseEntity*)tr.m_pEnt;
 				return true;
 			}
 		}
@@ -1428,9 +1428,9 @@ bool CHL2_Player::CommanderFindGoal( commandgoal_t *pGoal )
 		return false;
 	}
 
-	if ( tr.m_pEnt->IsNPC() && ((CAI_BaseNPC *)(tr.m_pEnt))->IsCommandable() )
+	if (((CBaseEntity*)tr.m_pEnt)->IsNPC() && ((CAI_BaseNPC *)(tr.m_pEnt))->IsCommandable() )
 	{
-		pGoal->m_vecGoalLocation = tr.m_pEnt->GetAbsOrigin();
+		pGoal->m_vecGoalLocation = ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin();
 	}
 	else
 	{
@@ -2933,7 +2933,7 @@ void CHL2_Player::UpdateWeaponPosture( void )
 		trace_t	tr;
 		UTIL_TraceLine( EyePosition(), EyePosition() + vecAim * CHECK_FRIENDLY_RANGE, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
-		CBaseEntity *aimTarget = tr.m_pEnt;
+		CBaseEntity *aimTarget = (CBaseEntity*)tr.m_pEnt;
 
 		//If we're over something
 		if (  aimTarget && !tr.DidHitWorld() )

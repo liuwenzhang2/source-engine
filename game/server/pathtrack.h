@@ -124,7 +124,7 @@ private:
 	void		SetPrevious( CPathTrack *pprevious );
 	void		Link( void );
 	
-	static CPathTrack *Instance( edict_t *pent );
+	//static CPathTrack *Instance( edict_t *pent );
 
 	DECLARE_DATADESC();
 

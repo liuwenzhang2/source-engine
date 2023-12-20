@@ -215,7 +215,7 @@ void CStomp::Think( void )
 	
 	if ( tr.m_pEnt )
 	{
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		CTakeDamageInfo info( this, this, 50, DMG_SONIC );
 		CalculateMeleeDamageForce( &info, m_vecMoveDir, tr.endpos );
 		pEntity->TakeDamage( info );
@@ -468,7 +468,7 @@ CBaseEntity* CNPC_Gargantua::GargantuaCheckTraceHullAttack(float flDist, int iDa
 	
 	if ( tr.m_pEnt )
 	{
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 
 		if ( iDamage > 0 )
 		{

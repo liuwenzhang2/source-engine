@@ -515,7 +515,7 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 	GetAttachment( m_iBarrelAttachments[ iBarrelIndex ], info.m_vecSrc, angBarrelDir );
 	Vector vecCenter = GetAbsOrigin();
 	UTIL_TraceLine( vecCenter, info.m_vecSrc, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
-	if ( !tr.m_pEnt || !tr.m_pEnt->IsWorld() )
+	if ( !tr.m_pEnt || !((CBaseEntity*)tr.m_pEnt)->IsWorld() )
 	{
 		FireBullets( info );
 	}
@@ -524,7 +524,7 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 	GetAttachment( m_iBarrelAttachments[ iBarrelIndex + 1 ], info.m_vecSrc, angBarrelDir );
 	vecCenter = GetAbsOrigin();
 	UTIL_TraceLine( vecCenter, info.m_vecSrc, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
-	if ( !tr.m_pEnt || !tr.m_pEnt->IsWorld() )
+	if ( !tr.m_pEnt || !((CBaseEntity*)tr.m_pEnt)->IsWorld() )
 	{
 		FireBullets( info );
 	}

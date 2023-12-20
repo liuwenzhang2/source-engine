@@ -933,7 +933,7 @@ CBaseEntity *CWeaponDODBase::MeleeAttack( int iDamageAmount, int iDamageType, fl
 		{
 			// Calculate the point of intersection of the line (or hull) and the object we hit
 			// This is and approximation of the "best" intersection
-			CBaseEntity *pHit = tr.m_pEnt;
+			CBaseEntity *pHit = (CBaseEntity*)tr.m_pEnt;
 			if ( !pHit || pHit->IsBSPModel() )
 				FindHullIntersection( vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, pPlayer );
 			vecEnd = tr.endpos;	// This is the point on the actual surface (the hull could have hit space)
@@ -967,7 +967,7 @@ CBaseEntity *CWeaponDODBase::MeleeAttack( int iDamageAmount, int iDamageType, fl
 		m_trHit = tr;
 
 		// Store the ent in an EHANDLE, just in case it goes away by the time we get into our think function.
-		m_pTraceHitEnt = tr.m_pEnt; 
+		m_pTraceHitEnt = (CBaseEntity*)tr.m_pEnt;
 
 		m_iSmackDamage = iDamageAmount;
 		m_iSmackDamageType = iDamageType;
@@ -997,7 +997,7 @@ CBaseEntity *CWeaponDODBase::MeleeAttack( int iDamageAmount, int iDamageType, fl
 	lagcompensation->FinishLagCompensation( pPlayer );
 #endif	//CLIENT_DLL
 
-	return tr.m_pEnt;
+	return (CBaseEntity*)tr.m_pEnt;
 }
 
 //Think function to delay the impact decal until the animation is finished playing
@@ -1039,7 +1039,7 @@ void CWeaponDODBase::Smack()
 		{
 			// Calculate the point of intersection of the line (or hull) and the object we hit
 			// This is and approximation of the "best" intersection
-			CBaseEntity *pHit = tr.m_pEnt;
+			CBaseEntity *pHit = (CBaseEntity*)tr.m_pEnt;
 			if ( !pHit || pHit->IsBSPModel() )
 				FindHullIntersection( vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, pPlayer );
 			vecEnd = tr.endpos;	// This is the point on the actual surface (the hull could have hit space)
@@ -1057,7 +1057,7 @@ void CWeaponDODBase::Smack()
 	CPASAttenuationFilter attenuationFilter( this );
 	attenuationFilter.UsePredictionRules();
 
-	if( m_trHit.m_pEnt->IsPlayer() )
+	if(((CBaseEntity*)m_trHit.m_pEnt)->IsPlayer() )
 	{
 		if ( m_iSmackDamageType & MELEE_DMG_STRONGATTACK )
 			WeaponSound( SPECIAL1 );
@@ -1089,7 +1089,7 @@ void CWeaponDODBase::Smack()
 
 	Assert( m_trHit.m_pEnt != GetPlayerOwner() );
 
-	m_trHit.m_pEnt->DispatchTraceAttack( info, vForward, &m_trHit ); 
+	((CBaseEntity*)m_trHit.m_pEnt)->DispatchTraceAttack( info, vForward, &m_trHit );
 	ApplyMultiDamage();
 #endif
 
@@ -1105,7 +1105,7 @@ void CWeaponDODBase::Smack()
 #ifdef CLIENT_DLL
 	data.m_hEntity = m_trHit.m_pEnt->GetRefEHandle();
 #else
-	data.m_nEntIndex = m_trHit.m_pEnt->entindex();
+	data.m_nEntIndex = ((CBaseEntity*)m_trHit.m_pEnt)->entindex();
 #endif
 
 	CPASFilter effectfilter( data.m_vOrigin );
@@ -1118,11 +1118,11 @@ void CWeaponDODBase::Smack()
 	data.m_fFlags = 0x1;	//IMPACT_NODECAL;
 	data.m_nDamageType = iDamageType;
 
-	bool bHitPlayer = m_trHit.m_pEnt && m_trHit.m_pEnt->IsPlayer();
+	bool bHitPlayer = m_trHit.m_pEnt && ((CBaseEntity*)m_trHit.m_pEnt)->IsPlayer();
 
 	// don't do any impacts if we hit a teammate and ff is off
 	if ( bHitPlayer && 
-		m_trHit.m_pEnt->GetTeamNumber() == GetPlayerOwner()->GetTeamNumber() && 
+		((CBaseEntity*)m_trHit.m_pEnt)->GetTeamNumber() == GetPlayerOwner()->GetTeamNumber() &&
 		!friendlyfire.GetBool() )
 		return;
 

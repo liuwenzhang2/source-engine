@@ -581,7 +581,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	bool CMultiplayRules::ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
+	bool CMultiplayRules::ClientConnected( int pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
 	{
 		GetVoiceGameMgr()->ClientConnected( pEntity );
 		return true;
@@ -593,11 +593,11 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	//=========================================================
 	//=========================================================
-	void CMultiplayRules::ClientDisconnected( edict_t *pClient )
+	void CMultiplayRules::ClientDisconnected( int pClient )
 	{
 		if ( pClient )
 		{
-			CBasePlayer *pPlayer = (CBasePlayer *)CBaseEntity::Instance( pClient );
+			CBasePlayer *pPlayer = (CBasePlayer *)gEntList.GetBaseEntity( pClient );
 
 			if ( pPlayer )
 			{
@@ -1597,9 +1597,9 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		return BaseClass::ClientCommand( pEdict, args );
 	}
 
-	void CMultiplayRules::ClientCommandKeyValues( edict_t *pEntity, KeyValues *pKeyValues )
+	void CMultiplayRules::ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues )
 	{
-		CBaseMultiplayerPlayer *pPlayer = dynamic_cast< CBaseMultiplayerPlayer * >( CBaseEntity::Instance( pEntity ) );
+		CBaseMultiplayerPlayer *pPlayer = dynamic_cast< CBaseMultiplayerPlayer * >( gEntList.GetBaseEntity( pEntity ) );
 
 		if ( !pPlayer )
 			return;

@@ -270,7 +270,7 @@ bool CNPC_EnemyFinder::FVisible( CBaseEntity *pTarget, int traceMask, CBaseEntit
 	AI_TraceLine( vStartPos, vEndPos, MASK_SHOT, &traceFilter, &tr );
 	if ( ppBlocker )
 	{
-		*ppBlocker = tr.m_pEnt;
+		*ppBlocker = (CBaseEntity*)tr.m_pEnt;
 	}
 	return (tr.fraction == 1.0);
 }

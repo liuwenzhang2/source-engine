@@ -835,7 +835,7 @@ CBaseEntity *PathFollower::FindBlocker( INextBot *bot )
 		if ( result.DidHitNonWorldEntity() )
 		{
 			// if blocker is close, they could be behind us - check
-			Vector toBlocker = result.m_pEnt->GetAbsOrigin() - bot->GetLocomotionInterface()->GetFeet();
+			Vector toBlocker = ((CBaseEntity*)result.m_pEnt)->GetAbsOrigin() - bot->GetLocomotionInterface()->GetFeet();
 
 			Vector alongPath = s->pos - from;
 			alongPath.z = 0.0f;
@@ -843,16 +843,16 @@ CBaseEntity *PathFollower::FindBlocker( INextBot *bot )
 			if ( DotProduct( toBlocker, alongPath ) > 0.0f )
 			{
 				// ask the bot if this really is a hindrance
-				if ( think->IsHindrance( bot, result.m_pEnt ) == ANSWER_YES )
+				if ( think->IsHindrance( bot, (CBaseEntity*)result.m_pEnt ) == ANSWER_YES )
 				{
 					if ( bot->IsDebugging( NEXTBOT_PATH ) )
 					{
 						NDebugOverlay::Circle( bot->GetLocomotionInterface()->GetFeet(), QAngle( -90.0f, 0, 0 ), 10.0f, 255, 0, 0, 255, true, 1.0f );
-						NDebugOverlay::HorzArrow( bot->GetLocomotionInterface()->GetFeet(), result.m_pEnt->GetAbsOrigin(), 1.0f, 255, 0, 0, 255, true, 1.0f );
+						NDebugOverlay::HorzArrow( bot->GetLocomotionInterface()->GetFeet(), ((CBaseEntity*)result.m_pEnt)->GetAbsOrigin(), 1.0f, 255, 0, 0, 255, true, 1.0f );
 					}
 
 					// we are blocked
-					return result.m_pEnt;
+					return (CBaseEntity*)result.m_pEnt;
 				}
 			}
 		}
@@ -1401,7 +1401,7 @@ bool PathFollower::Climbing( INextBot *bot, const Path::Segment *goal, const Vec
 		}
 
 		// what are we climbing over?
-		CBaseEntity *obstacle = result.m_pEnt;
+		CBaseEntity *obstacle = (CBaseEntity*)result.m_pEnt;
 
 		if ( !result.DidHitNonWorldEntity() || bot->IsAbleToClimbOnto( obstacle ) )
 		{			

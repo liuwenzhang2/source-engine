@@ -134,7 +134,7 @@ void CEnvMicrophone::Activate(void)
 		//
 		// If we were given a bad measure target, just measure sound where we are.
 		//
-		if ((m_hMeasureTarget == NULL) || (m_hMeasureTarget->edict() == NULL))
+		if ((m_hMeasureTarget == NULL) || (m_hMeasureTarget->entindex() == -1))
 		{
 			// We've decided to disable this warning since this seems to be the 90% case.
 			//Warning( "EnvMicrophone - Measure target not found or measure target with no origin. Using Self.!\n");
@@ -305,7 +305,7 @@ bool CEnvMicrophone::CanHearSound( int entindex, soundlevel_t soundlevel, float 
 	CBaseEntity *pEntity = NULL;
 	if ( entindex )
 	{
-		pEntity = CBaseEntity::Instance( engine->PEntityOfEntIndex(entindex) );
+		pEntity = gEntList.GetBaseEntity(entindex) ;
 	}
 			    
 	// Cull out sounds except from specific entities

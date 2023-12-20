@@ -9,7 +9,7 @@
 #ifdef _WIN32
 #pragma once
 #endif
-
+#include "basetoggle.h"
 
 class CBaseButton : public CBaseToggle
 {
@@ -122,7 +122,7 @@ public:
 
 	int		DrawDebugTextOverlays(void);
 
-	static CMomentaryRotButton *Instance( edict_t *pent ) { return (CMomentaryRotButton *)GetContainingEntity(pent); }
+	//static CMomentaryRotButton *Instance( edict_t *pent ) { return (CMomentaryRotButton *)GetContainingEntity(pent); }
 
 	float GetPos(const QAngle &vecAngles);
 

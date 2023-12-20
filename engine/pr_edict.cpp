@@ -59,7 +59,7 @@ static void ED_ClearEdict( edict_t *e )
 	e->ClearStateChanged();
 	e->SetChangeInfoSerialNumber( 0 );
 	
-	serverGameEnts->FreeContainingEntity(e);
+	serverGameEnts->FreeContainingEntity(e->m_EdictIndex);
 	InitializeEntityDLLFields(e);
 
 	e->m_NetworkSerialNumber = -1;  // must be filled by game.dll
@@ -307,7 +307,7 @@ void ED_Free (edict_t *ed)
 		return;
 
 	// release the DLL entity that's attached to this edict, if any
-	serverGameEnts->FreeContainingEntity( ed );
+	serverGameEnts->FreeContainingEntity( ed->m_EdictIndex );
 
 	ed->SetFree();
 	ed->freetime = sv.GetTime();
@@ -328,8 +328,9 @@ void ED_Free (edict_t *ed)
 void InitializeEntityDLLFields( edict_t *pEdict )
 {
 	// clear all the game variables
-	size_t sz = offsetof( edict_t, m_pUnk ) + sizeof( void* );
-	memset( ((byte*)pEdict) + sz, 0, sizeof(edict_t) - sz );
+	//size_t sz = offsetof( edict_t, m_pUnk ) + sizeof( void* );
+	//memset( ((byte*)pEdict) + sz, 0, sizeof(edict_t) - sz );
+	pEdict->freetime = 0;
 }
 
 int NUM_FOR_EDICT(const edict_t *e)

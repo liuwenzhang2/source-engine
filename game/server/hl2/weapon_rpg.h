@@ -62,7 +62,7 @@ public:
 
 	CHandle<CWeaponRPG>		m_hOwner;
 
-	static CMissile *Create( const Vector &vecOrigin, const QAngle &vecAngles, edict_t *pentOwner );
+	static CMissile *Create( const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pentOwner );
 
 	void CreateDangerSounds( bool bState ){ m_bCreateDangerSounds = bState; }
 

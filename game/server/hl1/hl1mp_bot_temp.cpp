@@ -18,7 +18,7 @@
 #include "in_buttons.h"
 #include "movehelper_server.h"
 
-void ClientPutInServer( edict_t *pEdict, const char *playername );
+void ClientPutInServer( int pEdict, const char *playername );
 void Bot_Think( CHL1MP_Player *pBot );
 
 #ifdef DEBUG
@@ -76,7 +76,7 @@ CBasePlayer *BotPutInServer( bool bFrozen, int iTeam )
 
 	// This is an evil hack, but we use it to prevent sv_autojointeam from kicking in.
 
-	edict_t *pEdict = engine->CreateFakeClient( botname );
+	int pEdict = engine->CreateFakeClient( botname );
 
 	if (!pEdict)
 	{
@@ -96,7 +96,7 @@ CBasePlayer *BotPutInServer( bool bFrozen, int iTeam )
 	char szReturnString[512];
 
 	Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", "gman" );
-	engine->ClientCommand ( pPlayer->edict(), szReturnString );
+	engine->ClientCommand ( pPlayer->entindex(), szReturnString );
 
 	BotNumber++;
 
@@ -211,7 +211,7 @@ void Bot_Think( CHL1MP_Player *pBot )
 	// Make sure we stay being a bot
 	pBot->AddFlag( FL_FAKECLIENT );
 
-	botdata_t *botdata = &g_BotData[ ENTINDEX( pBot->edict() ) - 1 ];
+	botdata_t *botdata = &g_BotData[ ( pBot->entindex() ) - 1 ];
 
 	QAngle vecViewAngles;
 	float forwardmove = 0.0;

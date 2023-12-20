@@ -71,7 +71,7 @@ public:
 	virtual int PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget );
 	virtual bool PlayerCanHearChat( CBasePlayer *pListener, CBasePlayer *pSpeaker );
 	virtual const char *GetTeamID( CBaseEntity *pEntity );
-	virtual bool ShouldAutoAim( CBasePlayer *pPlayer, edict_t *target );
+	virtual bool ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target );
 	virtual int IPointsForKill( CBasePlayer *pAttacker, CBasePlayer *pKilled );
 	virtual void InitHUD( CBasePlayer *pl );
 	virtual void DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &info );
@@ -83,7 +83,7 @@ public:
 	virtual bool IsValidTeam( const char *pTeamName );
 	virtual const char *SetDefaultPlayerTeam( CBasePlayer *pPlayer );
 	virtual void ChangePlayerTeam( CBasePlayer *pPlayer, const char *pTeamName, bool bKill, bool bGib );
-	virtual void ClientDisconnected( edict_t *pClient );
+	virtual void ClientDisconnected( int pClient );
 	virtual bool TimerMayExpire( void ) { return true; }
 
 	// A game has been won by the specified team

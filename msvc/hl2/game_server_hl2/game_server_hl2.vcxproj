@@ -107,7 +107,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\..\..\game\server;..\..\..\game\shared;..\..\..\utils\common;..\..\..\game\shared\econ;..\..\..\game\server\NextBot;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\game\server\hl2;..\..\..\game\shared\hl2;..\..\..\game\server\hl2mp;..\..\..\game\shared\hl2mp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
-      <DebugInformationFormat>None</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -115,7 +115,7 @@
     <Link>
       <AdditionalDependencies>tier0.lib;particles.lib;dmxloader.lib;tier1.lib;tier2.lib;tier3.lib;mathlib.lib;vstdlib.lib;choreoobjects.lib;steam_api.lib;Rpcrt4.lib;USER32.lib;</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>

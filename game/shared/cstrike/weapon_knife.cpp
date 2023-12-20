@@ -266,7 +266,7 @@ void CKnife::Smack( void )
 		CPASAttenuationFilter filter( this );
 		filter.UsePredictionRules();
 
-		if( m_trHit.m_pEnt->IsPlayer()  )
+		if(((CBaseEntity*)m_trHit.m_pEnt)->IsPlayer()  )
 		{
 			EmitSound( filter, entindex(), m_bStab?"Weapon_Knife.Stab":"Weapon_Knife.Hit" );
 		}
@@ -283,9 +283,9 @@ void CKnife::Smack( void )
 	data.m_nDamageType = DMG_SLASH;
 	data.m_nHitBox = m_trHit.hitbox;
 #ifdef CLIENT_DLL
-	data.m_hEntity = m_trHit.m_pEnt->GetRefEHandle();
+	data.m_hEntity = ((C_BaseEntity*)m_trHit.m_pEnt)->GetRefEHandle();
 #else
-	data.m_nEntIndex = m_trHit.m_pEnt->entindex();
+	data.m_nEntIndex = ((CBaseEntity*)m_trHit.m_pEnt)->entindex();
 #endif
 
 	CPASFilter filter( data.m_vOrigin );
@@ -358,7 +358,7 @@ bool CKnife::SwingOrStab( bool bStab )
 		{
 			// Calculate the point of intersection of the line (or hull) and the object we hit
 			// This is and approximation of the "best" intersection
-			CBaseEntity *pHit = tr.m_pEnt;
+			CBaseEntity *pHit = (CBaseEntity*)tr.m_pEnt;
 			if ( !pHit || pHit->IsBSPModel() )
 				FindHullIntersection( vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, pPlayer );
 			vecEnd = tr.endpos;	// This is the point on the actual surface (the hull could have hit space)
@@ -416,7 +416,7 @@ bool CKnife::SwingOrStab( bool bStab )
 	{
 		// play thwack, smack, or dong sound
 
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 				
 		// player "shoot" animation
 		pPlayer->SetAnimation( PLAYER_ATTACK1 );
@@ -488,7 +488,7 @@ bool CKnife::SwingOrStab( bool bStab )
 		m_trHit = tr;
 		
 		// Store the ent in an EHANDLE, just in case it goes away by the time we get into our think function.
-		m_pTraceHitEnt = tr.m_pEnt; 
+		m_pTraceHitEnt = (CBaseEntity*)tr.m_pEnt;
 
 		m_bStab = bStab;	//store this so we know what hit sound to play
 

@@ -636,7 +636,7 @@ bool CDODBipodWeapon::TestDeployAngle( CDODPlayer *pPlayer, float *flDeployedHei
 		if ( tr.endpos.z > flHighestTraceEnd )
 		{
 			flHighestTraceEnd = tr.endpos.z;
-			pBestDeployEnt = tr.m_pEnt;
+			pBestDeployEnt = (CBaseEntity*)tr.m_pEnt;
 		}
 
 		--maxAttempts;

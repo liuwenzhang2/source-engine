@@ -262,10 +262,10 @@ void CItem_DynamicResupply::Precache( void )
 //-----------------------------------------------------------------------------
 void CItem_DynamicResupply::CheckPVSThink( void )
 {
-	edict_t *pentPlayer = UTIL_FindClientInPVS( edict() );
+	CBaseEntity *pentPlayer = UTIL_FindClientInPVS( this );
 	if ( pentPlayer )
 	{
-		CBasePlayer *pPlayer = (CBasePlayer *)CBaseEntity::Instance( pentPlayer );
+		CBasePlayer *pPlayer = (CBasePlayer *)pentPlayer;
 		if ( pPlayer )
 		{
 			SpawnDynamicItem( pPlayer );

@@ -22,7 +22,7 @@ class SINGLE_INHERITANCE CBaseEntity;
 
 class Vector;
 class VMatrix;
-struct edict_t;
+//struct edict_t;
 template< class T > class CHandle;
 typedef CHandle<CBaseEntity> EHANDLE;
 struct matrix3x4_t;
@@ -196,11 +196,11 @@ public:
 	virtual void	WritePositionVector( const Vector *value, int count = 1 ) = 0;	// array of pos vectors
 
 	virtual void	WriteEntityPtr( const char *pname, CBaseEntity **ppEntity, int count = 1 ) = 0;
-	virtual void	WriteEdictPtr( const char *pname, edict_t **ppEdict, int count = 1 ) = 0;
+	//virtual void	WriteEdictPtr( const char *pname, edict_t **ppEdict, int count = 1 ) = 0;
 	virtual void	WriteEHandle( const char *pname, const EHANDLE *pEHandle, int count = 1 ) = 0;
 
 	virtual void	WriteEntityPtr( CBaseEntity **ppEntity, int count = 1 ) = 0;
-	virtual void	WriteEdictPtr( edict_t **ppEdict, int count = 1 ) = 0;
+	//virtual void	WriteEdictPtr( edict_t **ppEdict, int count = 1 ) = 0;
 	virtual void	WriteEHandle( const EHANDLE *pEHandle, int count = 1 ) = 0;
 
 	//---------------------------------
@@ -288,7 +288,7 @@ public:
 	virtual int		ReadFunction( datamap_t *pMap, inputfunc_t **pValue, int count = 1, int nBytesAvailable = 0) = 0;
 	
 	virtual int		ReadEntityPtr( CBaseEntity **ppEntity, int count = 1, int nBytesAvailable = 0 ) = 0;
-	virtual int		ReadEdictPtr( edict_t **ppEdict, int count = 1, int nBytesAvailable = 0 ) = 0;
+	//virtual int		ReadEdictPtr( edict_t **ppEdict, int count = 1, int nBytesAvailable = 0 ) = 0;
 	virtual int		ReadEHandle( EHANDLE *pEHandle, int count = 1, int nBytesAvailable = 0 ) = 0;
 	virtual int		ReadVMatrix( VMatrix *pValue, int count = 1, int nBytesAvailable = 0) = 0;
 	virtual int		ReadVMatrixWorldspace( VMatrix *pValue, int count = 1, int nBytesAvailable = 0) = 0;

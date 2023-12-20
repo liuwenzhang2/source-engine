@@ -32,7 +32,7 @@ public:
 public:
 // IServerNetworkable implementation.
 	virtual IHandleEntity  *GetEntityHandle( );
-	virtual edict_t			*GetEdict() const;
+	//virtual edict_t			*GetEdict() const;
 	virtual CBaseNetworkable* GetBaseNetworkable();
 	virtual CBaseEntity*	GetBaseEntity();
 	virtual ServerClass*	GetServerClass();
@@ -44,16 +44,16 @@ public:
 public:
 	// Other public methods
 	void Init( CBaseEntity *pEntity );
-
-	void AttachEdict( edict_t *pRequiredEdict = NULL );
+	void SetEntIndex(int entindex);
+	void AttachEdict( int pRequiredEdict = -1 );
 	
 	// Methods to get the entindex + edict
 	int	entindex() const;
-	edict_t *edict();
-	const edict_t *edict() const;
+	//edict_t *edict();
+	//const edict_t *edict() const;
 
 	// Sets the edict pointer (for swapping edicts)
-	void SetEdict( edict_t *pEdict );
+	//void SetEdict( edict_t *pEdict );
 
 	// All these functions call through to CNetStateMgr. 
 	// See CNetStateMgr for details about these functions.
@@ -93,7 +93,7 @@ public:
 	bool IsInPVS( const CCheckTransmitInfo *pInfo );
 
 	// This version doesn't do the area check
-	bool IsInPVS( const edict_t *pRecipient, const void *pvs, int pvssize );
+	bool IsInPVS( const CBaseEntity *pRecipient, const void *pvs, int pvssize );
 
 	// Called by the timed event manager when it's time to detect a state change.
 	virtual void FireEvent();
@@ -112,7 +112,8 @@ private:
 private:
 	CBaseEntity *m_pOuter;
 	// CBaseTransmitProxy *m_pTransmitProxy;
-	edict_t	*m_pPev;
+	int		m_entindex = -1;
+	//edict_t	*m_pPev;
 	PVSInfo_t m_PVSInfo;
 	ServerClass *m_pServerClass;
 
@@ -157,9 +158,9 @@ inline PVSInfo_t *CServerNetworkProperty::GetPVSInfo()
 //-----------------------------------------------------------------------------
 inline void CServerNetworkProperty::MarkPVSInformationDirty()
 {
-	if ( m_pPev )
+	if ( m_entindex!=-1 )
 	{
-		m_pPev->m_fStateFlags |= FL_EDICT_DIRTY_PVS_INFORMATION;
+		engine->GetEdictFlag(m_entindex) |= FL_EDICT_DIRTY_PVS_INFORMATION;
 	}
 }
 
@@ -178,8 +179,8 @@ inline void CServerNetworkProperty::SetNetworkParent( EHANDLE hParent )
 //-----------------------------------------------------------------------------
 inline void CServerNetworkProperty::NetworkStateForceUpdate()
 { 
-	if ( m_pPev )
-		m_pPev->StateChanged();
+	if ( m_entindex!=-1 )
+		engine->EdictFlagChanged(m_entindex);
 }
 
 inline void CServerNetworkProperty::NetworkStateChanged()
@@ -193,8 +194,8 @@ inline void CServerNetworkProperty::NetworkStateChanged()
 	}
 	else
 	{
-		if ( m_pPev )
-			m_pPev->StateChanged();
+		if (m_entindex != -1)
+			engine->EdictFlagChanged(m_entindex);
 	}
 }
 
@@ -209,8 +210,8 @@ inline void CServerNetworkProperty::NetworkStateChanged( unsigned short varOffse
 	}
 	else
 	{
-		if ( m_pPev )
-			m_pPev->StateChanged( varOffset );
+		if (m_entindex != -1)
+			engine->EdictFlagChanged(m_entindex, varOffset);
 	}
 }
 
@@ -219,33 +220,39 @@ inline void CServerNetworkProperty::NetworkStateChanged( unsigned short varOffse
 //-----------------------------------------------------------------------------
 inline int CServerNetworkProperty::entindex() const
 {
-	return ENTINDEX( m_pPev );
+	return m_entindex;
 }
 
-inline edict_t* CServerNetworkProperty::GetEdict() const
-{
-	// This one's virtual, that's why we have to two other versions
-	return m_pPev;
-}
+//inline edict_t* CServerNetworkProperty::GetEdict() const
+//{
+//	// This one's virtual, that's why we have to two other versions
+//	return m_pPev;
+//}
 
-inline edict_t *CServerNetworkProperty::edict()
-{
-	return m_pPev;
-}
-
-inline const edict_t *CServerNetworkProperty::edict() const
-{
-	return m_pPev;
-}
+//inline edict_t *CServerNetworkProperty::edict()
+//{
+//	if (m_entindex == -1) {
+//		return NULL;
+//	}
+//	return INDEXENT(m_entindex);
+//}
+//
+//inline const edict_t *CServerNetworkProperty::edict() const
+//{
+//	if (m_entindex == -1) {
+//		return NULL;
+//	}
+//	return INDEXENT(m_entindex);
+//}
 
 
 //-----------------------------------------------------------------------------
 // Sets the edict pointer (for swapping edicts)
 //-----------------------------------------------------------------------------
-inline void CServerNetworkProperty::SetEdict( edict_t *pEdict )
-{
-	m_pPev = pEdict;
-}
+//inline void CServerNetworkProperty::SetEdict( edict_t *pEdict )
+//{
+//	m_entindex = pEdict->m_EdictIndex;
+//}
 
 
 inline int CServerNetworkProperty::AreaNum() const

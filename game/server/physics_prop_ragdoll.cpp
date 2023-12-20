@@ -507,7 +507,7 @@ void CRagdollProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			if ( !pHitEntity )
 			{
 				// hit world
-				pHitEntity = GetContainingEntity( INDEXENT(0) );
+				pHitEntity = gEntList.GetBaseEntity( 0 );
 			}
 			Vector damagePos;
 			pEvent->pInternalData->GetContactPoint( damagePos );

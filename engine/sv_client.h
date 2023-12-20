@@ -139,7 +139,7 @@ public:
 	edict_t					*edict;				// EDICT_NUM(clientnum+1)
 	CUtlVector<SoundInfo_t>	m_Sounds;			// game sounds
 		
-	const edict_t			*m_pViewEntity;		// View Entity (camera or the client itself)
+	const IServerEntity			*m_pViewEntity;		// View Entity (camera or the client itself)
 
 	CClientFrame			*m_pCurrentFrame;	// last added frame
 

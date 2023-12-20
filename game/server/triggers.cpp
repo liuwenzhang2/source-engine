@@ -1294,7 +1294,7 @@ private:
 	void WarnAboutActiveLead( void );
 
 	static CBaseEntity *FindLandmark( const char *pLandmarkName );
-	static int AddTransitionToList( levellist_t *pLevelList, int listCount, const char *pMapName, const char *pLandmarkName, edict_t *pentLandmark );
+	static int AddTransitionToList( levellist_t *pLevelList, int listCount, const char *pMapName, const char *pLandmarkName, CBaseEntity *pentLandmark );
 	static int InTransitionVolume( CBaseEntity *pEntity, const char *pVolumeName );
 
 	// Builds the list of entities to save when moving across a transition
@@ -1683,7 +1683,7 @@ void CChangeLevel::TouchChangeLevel( CBaseEntity *pOther )
 
 // Add a transition to the list, but ignore duplicates 
 // (a designer may have placed multiple trigger_changelevels with the same landmark)
-int CChangeLevel::AddTransitionToList( levellist_t *pLevelList, int listCount, const char *pMapName, const char *pLandmarkName, edict_t *pentLandmark )
+int CChangeLevel::AddTransitionToList( levellist_t *pLevelList, int listCount, const char *pMapName, const char *pLandmarkName, CBaseEntity *pentLandmark )
 {
 	int i;
 
@@ -1703,7 +1703,7 @@ int CChangeLevel::AddTransitionToList( levellist_t *pLevelList, int listCount, c
 	Q_strncpy( pLevelList[listCount].landmarkName, pLandmarkName, sizeof(pLevelList[listCount].landmarkName) );
 	pLevelList[listCount].pentLandmark = pentLandmark;
 
-	CBaseEntity *ent = CBaseEntity::Instance( pentLandmark );
+	CBaseEntity *ent = ( pentLandmark );
 	Assert( ent );
 
 	pLevelList[listCount].vecLandmarkOrigin = ent->GetAbsOrigin();
@@ -1845,7 +1845,7 @@ int CChangeLevel::BuildChangeLevelList( levellist_t *pLevelList, int maxList )
 			if ( pentLandmark )
 			{
 				// Build a list of unique transitions
-				if ( AddTransitionToList( pLevelList, nCount, pTrigger->m_szMapName, pTrigger->m_szLandmarkName, pentLandmark->edict() ) )
+				if ( AddTransitionToList( pLevelList, nCount, pTrigger->m_szMapName, pTrigger->m_szLandmarkName, pentLandmark ) )
 				{
 					++nCount;
 					if ( nCount >= maxList )		// FULL!!
@@ -2106,7 +2106,7 @@ int CChangeLevel::ChangeList( levellist_t *pLevelList, int maxList )
 		int			 entityFlags[ MAX_ENTITY ];
 
 		// First, figure out which entities are near the transition
-		CBaseEntity *pLandmarkEntity = CBaseEntity::Instance( pLevelList[i].pentLandmark );
+		CBaseEntity *pLandmarkEntity = ( pLevelList[i].pentLandmark );
 		int iEntity = BuildEntityTransitionList( pLandmarkEntity, pLevelList[i].landmarkName, pEntList, entityFlags, MAX_ENTITY );
 
 		// FIXME: Activate if we have a dependency problem on level transition
@@ -3436,10 +3436,10 @@ void CTriggerCDAudio::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 //-----------------------------------------------------------------------------
 static void PlayCDTrack( int iTrack )
 {
-	edict_t *pClient;
+	int pClient;
 	
 	// manually find the single player. 
-	pClient = engine->PEntityOfEntIndex( 1 );
+	pClient = 1;
 
 	Assert(gpGlobals->maxClients == 1);
 	
@@ -3556,7 +3556,7 @@ void CTriggerProximity::Activate(void)
 	//
 	// Disable our Touch function if we were given a bad measure target.
 	//
-	if ((m_hMeasureTarget == NULL) || (m_hMeasureTarget->edict() == NULL))
+	if ((m_hMeasureTarget == NULL) || (m_hMeasureTarget->entindex() == -1))
 	{
 		Warning( "TriggerProximity - Missing measure target or measure target with no origin!\n");
 	}
@@ -3611,7 +3611,7 @@ void CTriggerProximity::EndTouch(CBaseEntity *pOther)
 //-----------------------------------------------------------------------------
 void CTriggerProximity::MeasureThink( void )
 {
-	if ( ( m_hMeasureTarget == NULL ) || ( m_hMeasureTarget->edict() == NULL ) )
+	if ( ( m_hMeasureTarget == NULL ) || ( m_hMeasureTarget->entindex() == -1 ) )
 	{
 		SetThink(NULL);
 		SetNextThink( TICK_NEVER_THINK );

@@ -304,7 +304,7 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 			if ( trace.startsolid )
 			{
 				pResult->fStartSolid = true;
-				pResult->pBlocker = trace.m_pEnt;
+				pResult->pBlocker = (CBaseEntity*)trace.m_pEnt;
 				pResult->hitNormal = trace.plane.normal;
 				return false;
 			}
@@ -334,7 +334,7 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 
 					bRejectStep = true;
 					if ( landingTrace.m_pEnt )
-						pResult->pBlocker = landingTrace.m_pEnt;
+						pResult->pBlocker = (CBaseEntity*)landingTrace.m_pEnt;
 				}
 			}
 			else if ( ( stepTrace.endpos.AsVector2D() - stepStart.AsVector2D() ).LengthSqr() < requiredLandingDistSq )
@@ -355,7 +355,7 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 		if ( trace.fraction < 1.0 )
 		{
 			if ( !pResult->pBlocker )
-				pResult->pBlocker = trace.m_pEnt;
+				pResult->pBlocker = (CBaseEntity*)trace.m_pEnt;
 			pResult->hitNormal = trace.plane.normal;
 		}
 
@@ -386,7 +386,7 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 		}
 		else
 		{
-			pResult->pBlocker = GetContainingEntity( INDEXENT(0) );
+			pResult->pBlocker = gEntList.GetBaseEntity( 0 );
 		}
 		return false;
 	}
@@ -399,7 +399,7 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 	// Checks to see if the thing we're on is a *type* of thing we
 	// are capable of standing on. Always true ffor our current ground ent
 	// otherwise we'll be stuck forever
-	CBaseEntity *pFloor = trace.m_pEnt;
+	CBaseEntity *pFloor = (CBaseEntity*)trace.m_pEnt;
 	if ( pFloor != GetOuter()->GetGroundEntity() && !CanStandOn( pFloor ) )
 	{
 		if ( g_bAIDebugStep )
@@ -659,7 +659,7 @@ bool CAI_MoveProbe::TestGroundMove( const Vector &vecActualStart, const Vector &
 			NDebugOverlay::Cross3D( pMoveTrace->vEndPosition, 8, 255, 0, 0, false, 0.1 );
 #endif
 			// Ok, we ended up on a ledge above or below the desired destination
-			pMoveTrace->pObstruction = GetContainingEntity( INDEXENT(0) );
+			pMoveTrace->pObstruction = gEntList.GetBaseEntity( 0 );
 			pMoveTrace->vHitNormal	 = vec3_origin;
 			pMoveTrace->fStatus = AIMR_BLOCKED_WORLD;
 			pMoveTrace->flDistObstructed = ComputePathDistance( NAV_GROUND, pMoveTrace->vEndPosition, vecDesiredEnd );
@@ -690,7 +690,7 @@ void CAI_MoveProbe::GroundMoveLimit( const Vector &vecStart, const Vector &vecEn
 	if ( !IterativeFloorPoint( vecStart, collisionMask, &vecActualStart ) )
 	{
 		pTrace->flDistObstructed = pTrace->flTotalDist;
-		pTrace->pObstruction	= GetContainingEntity( INDEXENT(0) );
+		pTrace->pObstruction	= gEntList.GetBaseEntity( 0 );
 		pTrace->vHitNormal		= vec3_origin;
 		pTrace->fStatus			= AIMR_BLOCKED_WORLD;
 		pTrace->vEndPosition	= vecStart;
@@ -753,7 +753,7 @@ void CAI_MoveProbe::FlyMoveLimit( const Vector &vecStart, const Vector &vecEnd,
 
 	if ( tr.fraction < 1 )
 	{
-		CBaseEntity *pBlocker = tr.m_pEnt;
+		CBaseEntity *pBlocker = (CBaseEntity*)tr.m_pEnt;
 		if ( pBlocker )
 		{
 			if ( pTarget == pBlocker )
@@ -894,7 +894,7 @@ void CAI_MoveProbe::JumpMoveLimit( const Vector &vecStart, const Vector &vecEnd,
 					// NDebugOverlay::Box( trace.endpos, WorldAlignMins(), WorldAlignMaxs(), 255, 255, 0, 0, 10.0 );
 					
 					// save error state
-					pObstruction = trace.m_pEnt;
+					pObstruction = (CBaseEntity*)trace.m_pEnt;
 					fStatus = AIComputeBlockerMoveResult( pObstruction );
 					flDistObstructed = ComputePathDistance( NAV_JUMP, vecTest, vecTo );
 
@@ -976,7 +976,7 @@ void CAI_MoveProbe::ClimbMoveLimit( const Vector &vecStart, const Vector &vecEnd
 
 	if (tr.fraction < 1.0)
 	{
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		if (pEntity == pTarget)
 		{
 			return;
@@ -1048,7 +1048,7 @@ bool CAI_MoveProbe::MoveLimit( Navigation_t navType, const Vector &vecStart,
 			GroundMoveLimit(vecStart, vecEnd, collisionMask, pTarget, testGroundMoveFlags, pctToCheckStandPositions, pTrace);
 		else
 		{
-			pTrace->pObstruction = GetContainingEntity( INDEXENT(0) );
+			pTrace->pObstruction = gEntList.GetBaseEntity( 0 );
 			pTrace->vHitNormal	 = vec3_origin;
 			pTrace->fStatus		= AIMR_BLOCKED_WORLD;
 			pTrace->flDistObstructed = ComputePathDistance( NAV_GROUND, vecStart, vecEnd );
@@ -1186,10 +1186,10 @@ bool CAI_MoveProbe::CheckStandPosition( const Vector &vecStart, unsigned int col
 
 		// Try diagonal from lower left to upper right
 		TraceHull( vecUp, vecDown, contactMin, vHullBottomCenter, collisionMask, &trace1 );
-		if ( trace1.fraction != 1.0 && CanStandOn( trace1.m_pEnt ) )
+		if ( trace1.fraction != 1.0 && CanStandOn((CBaseEntity*)trace1.m_pEnt ) )
 		{
 			TraceHull( vecUp, vecDown, vHullBottomCenter, contactMax, collisionMask, &trace2 );
-			if ( trace2.fraction != 1.0 && ( trace1.m_pEnt == trace2.m_pEnt || CanStandOn( trace2.m_pEnt ) ) )
+			if ( trace2.fraction != 1.0 && ( trace1.m_pEnt == trace2.m_pEnt || CanStandOn((CBaseEntity*)trace2.m_pEnt ) ) )
 			{
 				return true;
 			}
@@ -1202,12 +1202,12 @@ bool CAI_MoveProbe::CheckStandPosition( const Vector &vecStart, unsigned int col
 		testMax.Init(0, contactMax.y, vHullMins.z);
 
 		TraceHull( vecUp, vecDown, testMin, testMax, collisionMask, &trace1 );
-		if ( trace1.fraction != 1.0 && CanStandOn( trace1.m_pEnt ) )
+		if ( trace1.fraction != 1.0 && CanStandOn((CBaseEntity*)trace1.m_pEnt ) )
 		{
 			testMin.Init(0, contactMin.y, vHullMins.z);
 			testMax.Init(contactMax.x, 0, vHullMins.z);
 			TraceHull( vecUp, vecDown, testMin, testMax, collisionMask, &trace2 );
-			if ( trace2.fraction != 1.0 && ( trace1.m_pEnt == trace2.m_pEnt || CanStandOn( trace2.m_pEnt ) ) )
+			if ( trace2.fraction != 1.0 && ( trace1.m_pEnt == trace2.m_pEnt || CanStandOn((CBaseEntity*)trace2.m_pEnt ) ) )
 			{
 				return true;
 			}
@@ -1217,7 +1217,7 @@ bool CAI_MoveProbe::CheckStandPosition( const Vector &vecStart, unsigned int col
 	{
 		AI_PROFILE_SCOPE( CAI_Motor_CheckStandPosition_Center );
 		TraceHull( vecUp, vecDown, contactMin, contactMax, collisionMask, &trace1 );
-		if ( trace1.fraction != 1.0 && CanStandOn( trace1.m_pEnt ) )
+		if ( trace1.fraction != 1.0 && CanStandOn((CBaseEntity*)trace1.m_pEnt ) )
 			return true;
 	}
 
@@ -1253,7 +1253,7 @@ bool CAI_MoveProbe::OldCheckStandPosition( const Vector &vecStart, unsigned int 
 	TraceHull( vecUp, vecDown, contactMin, contactMax, collisionMask, &trace );
 	AI_PROFILE_SCOPE_END();
 
-	if (trace.fraction == 1.0 || !CanStandOn( trace.m_pEnt ))
+	if (trace.fraction == 1.0 || !CanStandOn((CBaseEntity*)trace.m_pEnt ))
 		return false;
 
 	float sumFraction = 0;
@@ -1279,7 +1279,7 @@ bool CAI_MoveProbe::OldCheckStandPosition( const Vector &vecStart, unsigned int 
 				sumFraction += trace.fraction;
 
 				// this should hit something, if it doesn't allow one failure
-				if (trace.fraction == 1.0 || !CanStandOn( trace.m_pEnt ))
+				if (trace.fraction == 1.0 || !CanStandOn((CBaseEntity*)trace.m_pEnt ))
 				{
 					if (already_failed)
 						return false;
@@ -1326,7 +1326,7 @@ bool CAI_MoveProbe::FloorPoint( const Vector &vecStart, unsigned int collisionMa
 	if (trace.startsolid)
 	{
 		if ( trace.m_pEnt && 
-			 ( trace.m_pEnt->GetMoveType() == MOVETYPE_VPHYSICS || trace.m_pEnt->IsNPC() ) &&
+			 (((CBaseEntity*)trace.m_pEnt)->GetMoveType() == MOVETYPE_VPHYSICS || ((CBaseEntity*)trace.m_pEnt)->IsNPC() ) &&
 			 ( vecStart - GetLocalOrigin() ).Length() < 0.1 )
 		{
 			fStartedInObject = true;

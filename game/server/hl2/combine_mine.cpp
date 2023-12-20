@@ -478,7 +478,7 @@ void CBounceBomb::BounceThink()
 
 		float height;
 
-		if( tr.m_pEnt && tr.m_pEnt->VPhysicsGetObject() )
+		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject() )
 		{
 			// Physics object resting on me. Jump as hard as allowed to try to knock it away.
 			height = MINE_MAX_JUMP_HEIGHT;
@@ -540,7 +540,7 @@ void CBounceBomb::CavernBounceThink()
 
 		float height;
 
-		if( tr.m_pEnt && tr.m_pEnt->VPhysicsGetObject() )
+		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject() )
 		{
 			// Physics object resting on me. Jump as hard as allowed to try to knock it away.
 			height = MINE_MAX_JUMP_HEIGHT;
@@ -635,14 +635,14 @@ void CBounceBomb::SettleThink()
 			bool bHop = false;
 			if( tr.m_pEnt )
 			{
-				IPhysicsObject *pPhysics = tr.m_pEnt->VPhysicsGetObject();
+				IPhysicsObject *pPhysics = ((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject();
 
 				if( pPhysics && pPhysics->GetMass() <= 1000 )
 				{
 					// Light physics objects can be moved out from under the mine.
 					bHop = true;
 				}
-				else if( tr.m_pEnt->m_takedamage != DAMAGE_NO )
+				else if(((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_NO )
 				{
 					// Things that can be harmed can likely be broken.
 					bHop = true;
@@ -953,7 +953,7 @@ bool CBounceBomb::IsFriend( CBaseEntity *pEntity )
 //---------------------------------------------------------
 void CBounceBomb::SearchThink()
 {
-	if( !UTIL_FindClientInPVS(edict()) )
+	if( !UTIL_FindClientInPVS(this) )
 	{
 		// Sleep!
 		SetNextThink( gpGlobals->curtime + 0.5 );

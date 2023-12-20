@@ -17,12 +17,13 @@
 
 struct edict_t;
 class ICollideable;
+class IServerEntity;
 
 void SV_ClearWorld (void);
 // called after the world model has been loaded, before linking any entities
 
-void SV_SolidMoved( edict_t *pSolidEnt, ICollideable *pSolidCollide, const Vector *pPrevAbsOrigin, bool testSurroundingBoundsOnly );
-void SV_TriggerMoved( edict_t *pTriggerEnt, bool testSurroundingBoundsOnly );
+void SV_SolidMoved( IServerEntity *pSolidEnt, ICollideable *pSolidCollide, const Vector *pPrevAbsOrigin, bool testSurroundingBoundsOnly );
+void SV_TriggerMoved( IServerEntity *pTriggerEnt, bool testSurroundingBoundsOnly );
 
 // Needs to be called any time an entity changes origin, mins, maxs, or solid
 // flags ent->v.modified

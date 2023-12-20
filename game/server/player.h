@@ -241,7 +241,7 @@ public:
 protected:
 	// HACK FOR BOTS
 	friend class CBotManager;
-	static edict_t *s_PlayerEdict; // must be set before calling constructor
+	static int s_PlayerEdict; // must be set before calling constructor
 public:
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();
@@ -258,7 +258,7 @@ public:
 
 	virtual void			UpdateOnRemove( void );
 
-	static CBasePlayer		*CreatePlayer( const char *className, edict_t *ed );
+	static CBasePlayer		*CreatePlayer( const char *className, int ed );
 
 	virtual void			CreateViewModel( int viewmodelindex = 0 );
 	CBaseViewModel			*GetViewModel( int viewmodelindex = 0, bool bObserverOK = true );
@@ -267,7 +267,7 @@ public:
 
 	CPlayerState			*PlayerData( void ) { return &pl; }
 	
-	int						RequiredEdictIndex( void ) { return ENTINDEX(edict()); } 
+	int						RequiredEdictIndex( void ) { return entindex(); } 
 
 	void					LockPlayerInPlace( void );
 	void					UnlockPlayer( void );
@@ -365,13 +365,13 @@ public:
 	virtual bool			IsFakeClient( void ) const;
 
 	// Get the client index (entindex-1).
-	int						GetClientIndex()	{ return ENTINDEX( edict() ) - 1; }
+	int						GetClientIndex()	{ return entindex() - 1; }
 
 	// returns the player name
 	const char *			GetPlayerName() { return m_szNetname; }
 	void					SetPlayerName( const char *name );
 
-	int						GetUserID() { return engine->GetPlayerUserId( edict() ); }
+	int						GetUserID() { return engine->GetPlayerUserId( entindex() ); }
 	const char *			GetNetworkIDString(); 
 	virtual const Vector	GetPlayerMins( void ) const; // uses local player
 	virtual const Vector	GetPlayerMaxs( void ) const; // uses local player
@@ -1388,7 +1388,7 @@ bool ForEachPlayer( Functor &func )
 		if (player == NULL)
 			continue;
 
-		if (FNullEnt( player->edict() ))
+		if (player->entindex()<=0)
 			continue;
 
 		if (!player->IsPlayer())
@@ -1439,7 +1439,7 @@ inline bool ForEachPlayer( IPlayerFunctor &func )
 		if (player == NULL)
 			continue;
 
-		if (FNullEnt( player->edict() ))
+		if (player->entindex()<=0)
 			continue;
 
 		if (!player->IsPlayer())
@@ -1482,7 +1482,7 @@ int CollectPlayers( CUtlVector< T * > *playerVector, int team = TEAM_ANY, bool i
 		if ( player == NULL )
 			continue;
 
-		if ( FNullEnt( player->edict() ) )
+		if (player->entindex() <= 0)
 			continue;
 
 		if ( !player->IsPlayer() )
@@ -1518,7 +1518,7 @@ int CollectHumanPlayers( CUtlVector< T * > *playerVector, int team = TEAM_ANY, b
 		if ( player == NULL )
 			continue;
 
-		if ( FNullEnt( player->edict() ) )
+		if (  player->emtindex()<=0  )
 			continue;
 
 		if ( !player->IsPlayer() )

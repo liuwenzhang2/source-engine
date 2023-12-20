@@ -10,7 +10,7 @@
 #pragma once
 
 class CBaseGrenade;
-struct edict_t;
+//struct edict_t;
 
 CBaseGrenade *Fraggrenade_Create( const Vector &position, const QAngle &angles, const Vector &velocity, const AngularImpulse &angVelocity, CBaseEntity *pOwner, float timer, bool combineSpawned );
 bool	Fraggrenade_WasPunted( const CBaseEntity *pEntity );

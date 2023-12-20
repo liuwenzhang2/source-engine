@@ -715,7 +715,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 			//NDebugOverlay::Box( tr2.endpos, Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 255, 0, 0, 10 );
 			//NDebugOverlay::Box( GetAbsOrigin(), Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 0, 255, 0, 10 );
 
-			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && tr2.m_pEnt->GetMoveType() == MOVETYPE_NONE ) )
+			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && ((CBaseEntity*)tr2.m_pEnt)->GetMoveType() == MOVETYPE_NONE ) )
 			{
 				CEffectData	data;
 
@@ -2692,7 +2692,7 @@ bool CNPC_Hunter::ShouldCharge( const Vector &startPos, const Vector &endPos, bo
 		if ( moveTrace.pObstruction != NULL )
 		{
 			// If we've hit the world, see if it's a cliff
-			if ( moveTrace.pObstruction == GetContainingEntity( INDEXENT(0) ) )
+			if ( moveTrace.pObstruction == gEntList.GetBaseEntity(0) )
 			{	
 				// Can't be too far above/below the target
 				if ( fabs( moveTrace.vEndPosition.z - vecTargetPos.z ) > StepHeight() )
@@ -3903,7 +3903,7 @@ bool CNPC_Hunter::EnemyIsRightInFrontOfMe( CBaseEntity **pEntity )
 			UTIL_TraceHull( WorldSpaceCenter(), GetEnemy()->WorldSpaceCenter(), GetHullMins() * 0.5, GetHullMaxs() * 0.5, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 			if ( tr.m_pEnt == GetEnemy() )
 			{
-				*pEntity = tr.m_pEnt;
+				*pEntity = (CBaseEntity*)tr.m_pEnt;
 				return true;
 			}
 		}
@@ -4903,7 +4903,7 @@ int CNPC_Hunter::MeleeAttack1Conditions ( float flDot, float flDist )
 		return COND_TOO_FAR_TO_ATTACK;
 	}
 
-	if ( tr.m_pEnt == GetEnemy() || tr.m_pEnt->IsNPC() || (tr.m_pEnt->m_takedamage == DAMAGE_YES && (dynamic_cast<CBreakableProp*>(tr.m_pEnt))) )
+	if ( tr.m_pEnt == GetEnemy() || ((CBaseEntity*)tr.m_pEnt)->IsNPC() || (((CBaseEntity*)tr.m_pEnt)->m_takedamage == DAMAGE_YES && (dynamic_cast<CBreakableProp*>(tr.m_pEnt))) )
 	{
 		// Let the hunter swipe at his enemy if he's going to hit them.
 		// Also let him swipe at NPC's that happen to be between the hunter and the enemy. 
@@ -4926,7 +4926,7 @@ int CNPC_Hunter::MeleeAttack1Conditions ( float flDot, float flDist )
 		}
 	}*/
 
-	if ( !tr.m_pEnt->IsWorld() && GetEnemy() && GetEnemy()->GetGroundEntity() == tr.m_pEnt )
+	if ( !((CBaseEntity*)tr.m_pEnt)->IsWorld() && GetEnemy() && GetEnemy()->GetGroundEntity() == tr.m_pEnt )
 	{
 		// Try to swat whatever the player is standing on instead of acting like a dill.
 		return COND_CAN_MELEE_ATTACK1;
@@ -5056,7 +5056,7 @@ bool CNPC_Hunter::WeaponLOSCondition(const Vector &ownerPos, const Vector &targe
 	else if ( bSetConditions )
 	{
 		SetCondition( COND_WEAPON_SIGHT_OCCLUDED );
-		SetEnemyOccluder( tr.m_pEnt );
+		SetEnemyOccluder((CBaseEntity*)tr.m_pEnt );
 	}
 
 	return false;
@@ -5255,13 +5255,13 @@ bool CNPC_Hunter::CanShootThrough( const trace_t &tr, const Vector &vecTarget )
 		return false;
 	}
 
-	if ( !tr.m_pEnt->GetHealth() )
+	if ( !((CBaseEntity*)tr.m_pEnt)->GetHealth() )
 	{
 		return false;
 	}
 	
 	// Don't try to shoot through allies.
-	CAI_BaseNPC *pNPC = tr.m_pEnt->MyNPCPointer();
+	CAI_BaseNPC *pNPC = ((CBaseEntity*)tr.m_pEnt)->MyNPCPointer();
 	if ( pNPC && ( IRelationType( pNPC ) == D_LI ) )
 	{
 		return false;

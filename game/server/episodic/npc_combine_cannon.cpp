@@ -729,7 +729,7 @@ bool CNPC_Combine_Cannon::VerifyShot( CBaseEntity *pTarget )
 		// Trace hit something.
 		if( tr.m_pEnt )
 		{
-			if( tr.m_pEnt->m_takedamage == DAMAGE_YES )
+			if(((CBaseEntity*)tr.m_pEnt)->m_takedamage == DAMAGE_YES )
 			{
 				// Just shoot it if I can hurt it. Probably a breakable or glass pane.
 				return true;
@@ -1228,7 +1228,7 @@ bool CNPC_Combine_Cannon::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEn
 			// Everything failed.
 			if (ppBlocker)
 			{
-				*ppBlocker = tr.m_pEnt;
+				*ppBlocker = (CBaseEntity*)tr.m_pEnt;
 			}
 			return false;
 		}
@@ -1241,7 +1241,7 @@ bool CNPC_Combine_Cannon::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEn
 
 	if (ppBlocker)
 	{
-		*ppBlocker = tr.m_pEnt;
+		*ppBlocker = (CBaseEntity*)tr.m_pEnt;
 	}
 
 	return false;

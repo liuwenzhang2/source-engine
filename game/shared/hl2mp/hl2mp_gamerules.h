@@ -135,7 +135,7 @@ public:
 	const char *GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer );
 
 #endif
-	virtual void ClientDisconnected( edict_t *pClient );
+	virtual void ClientDisconnected( int pClient );
 
 	bool CheckGameOver( void );
 	bool IsIntermission( void );

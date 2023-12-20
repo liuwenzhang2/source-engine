@@ -26,6 +26,7 @@
 #include "keys.h"
 #include "cdll_int.h"
 #include "eiface.h"
+#include "pr_edict.h"
 #include "sv_main.h"
 #include "sv_log.h"
 #include "shadowmgr.h"

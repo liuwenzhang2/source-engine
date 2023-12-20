@@ -246,7 +246,7 @@ void CGameWeaponManager::Think()
 			// all we're really doing inside this loop is marking them for removal by
 			// the entity system. We don't want to count the same weapon as removed
 			// more than once.
-			if( !UTIL_FindClientInPVS( pCandidate->edict() ) )
+			if( !UTIL_FindClientInPVS( pCandidate ) )
 			{
 				fRemovedOne = true;
 			}

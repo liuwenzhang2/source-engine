@@ -893,7 +893,7 @@ void CC4::ItemPostFrame()
 		// The gamerules will give another C4 to some lucky player.
 		CCSPlayer *pPlayer = GetPlayerOwner();
 		if ( pPlayer && pPlayer->GetActiveWeapon() == this )
-			engine->ClientCommand( pPlayer->edict(), "lastinv reset\n" );
+			engine->ClientCommand( pPlayer->entindex(), "lastinv reset\n" );
 		return true;
 	}
 

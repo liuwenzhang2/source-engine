@@ -152,7 +152,7 @@ void CAI_AllyManager::CountAllies( int *pTotal, int *pMedics )
 
 			// Skip distant NPCs
 			if ( !ppAIs[i]->IsInPlayerSquad() && 
-				!UTIL_FindClientInPVS( ppAIs[i]->edict() ) && 
+				!UTIL_FindClientInPVS( ppAIs[i] ) &&
 				( ( ppAIs[i]->GetAbsOrigin() - vPlayerPos ).LengthSqr() > 150*12 ||
 				  fabsf( ppAIs[i]->GetAbsOrigin().z - vPlayerPos.z ) > 192 ) )
 				continue;

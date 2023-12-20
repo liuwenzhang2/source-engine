@@ -57,9 +57,9 @@ extern bool IsInCommentaryMode( void );
 
 ConVar  *sv_cheats = NULL;
 
-void ClientKill( edict_t *pEdict, const Vector &vecForce, bool bExplode = false )
+void ClientKill( CBaseEntity *pEdict, const Vector &vecForce, bool bExplode = false )
 {
-	CBasePlayer *pPlayer = static_cast<CBasePlayer*>( GetContainingEntity( pEdict ) );
+	CBasePlayer *pPlayer = static_cast<CBasePlayer*>( pEdict );
 	pPlayer->CommitSuicide( vecForce, bExplode );
 }
 
@@ -96,7 +96,7 @@ char * CheckChatText( CBasePlayer *pPlayer, char *text )
 // or as
 // blah blah blah
 //
-void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
+void Host_Say( CBaseEntity *pEdict, const CCommand &args, bool teamonly )
 {
 	CBasePlayer *client;
 	int		j;
@@ -141,7 +141,7 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 	CBasePlayer *pPlayer = NULL;
 	if ( pEdict )
 	{
-		pPlayer = ((CBasePlayer *)CBaseEntity::Instance( pEdict ));
+		pPlayer = ((CBasePlayer *) pEdict );
 		Assert( pPlayer );
 
 		// make sure the text has valid content
@@ -213,10 +213,10 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 	{
 		client = ToBaseMultiplayerPlayer( UTIL_PlayerByIndex( i ) );
-		if ( !client || !client->edict() )
+		if ( !client || client->entindex()==-1 )
 			continue;
 		
-		if ( client->edict() == pEdict )
+		if ( client->entindex() == pEdict->entindex() )
 			continue;
 
 		if ( !(client->IsNetClient()) )	// Not a client ? (should never be true)
@@ -350,10 +350,10 @@ CON_COMMAND_F( cast_ray, "Tests collision detection", FCVAR_CHEAT )
 
 	if ( tr.DidHit() )
 	{
-		DevMsg(1, "Hit %s\nposition %.2f, %.2f, %.2f\nangles %.2f, %.2f, %.2f\n", tr.m_pEnt->GetClassname(),
-			tr.m_pEnt->GetAbsOrigin().x, tr.m_pEnt->GetAbsOrigin().y, tr.m_pEnt->GetAbsOrigin().z,
-			tr.m_pEnt->GetAbsAngles().x, tr.m_pEnt->GetAbsAngles().y, tr.m_pEnt->GetAbsAngles().z );
-		DevMsg(1, "Hit: hitbox %d, hitgroup %d, physics bone %d, solid %d, surface %s, surfaceprop %s, contents %08x\n", tr.hitbox, tr.hitgroup, tr.physicsbone, tr.m_pEnt->GetSolid(), tr.surface.name, physprops->GetPropName( tr.surface.surfaceProps ), tr.contents );
+		DevMsg(1, "Hit %s\nposition %.2f, %.2f, %.2f\nangles %.2f, %.2f, %.2f\n", ((CBaseEntity*)tr.m_pEnt)->GetClassname(),
+			((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().x, ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().y, ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().z,
+			((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().x, ((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().y, ((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().z );
+		DevMsg(1, "Hit: hitbox %d, hitgroup %d, physics bone %d, solid %d, surface %s, surfaceprop %s, contents %08x\n", tr.hitbox, tr.hitgroup, tr.physicsbone, ((CBaseEntity*)tr.m_pEnt)->GetSolid(), tr.surface.name, physprops->GetPropName( tr.surface.surfaceProps ), tr.contents );
 		NDebugOverlay::Line( start, tr.endpos, 0, 255, 0, false, 10 );
 		NDebugOverlay::Line( tr.endpos, tr.endpos + tr.plane.normal * 12, 255, 255, 0, false, 10 );
 	}
@@ -373,10 +373,10 @@ CON_COMMAND_F( cast_hull, "Tests hull collision detection", FCVAR_CHEAT )
 	UTIL_TraceHull(start, start + forward * MAX_COORD_RANGE, -extents, extents, MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &tr );
 	if ( tr.DidHit() )
 	{
-		DevMsg(1, "Hit %s\nposition %.2f, %.2f, %.2f\nangles %.2f, %.2f, %.2f\n", tr.m_pEnt->GetClassname(),
-			tr.m_pEnt->GetAbsOrigin().x, tr.m_pEnt->GetAbsOrigin().y, tr.m_pEnt->GetAbsOrigin().z,
-			tr.m_pEnt->GetAbsAngles().x, tr.m_pEnt->GetAbsAngles().y, tr.m_pEnt->GetAbsAngles().z );
-		DevMsg(1, "Hit: hitbox %d, hitgroup %d, physics bone %d, solid %d, surface %s, surfaceprop %s\n", tr.hitbox, tr.hitgroup, tr.physicsbone, tr.m_pEnt->GetSolid(), tr.surface.name, physprops->GetPropName( tr.surface.surfaceProps ) );
+		DevMsg(1, "Hit %s\nposition %.2f, %.2f, %.2f\nangles %.2f, %.2f, %.2f\n", ((CBaseEntity*)tr.m_pEnt)->GetClassname(),
+			((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().x, ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().y, ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().z,
+			((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().x, ((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().y, ((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().z );
+		DevMsg(1, "Hit: hitbox %d, hitgroup %d, physics bone %d, solid %d, surface %s, surfaceprop %s\n", tr.hitbox, tr.hitgroup, tr.physicsbone, ((CBaseEntity*)tr.m_pEnt)->GetSolid(), tr.surface.name, physprops->GetPropName( tr.surface.surfaceProps ) );
 		NDebugOverlay::SweptBox( start, tr.endpos, -extents, extents, vec3_angle, 0, 0, 255, 0, 10 );
 		Vector end = tr.endpos;// - tr.plane.normal * DotProductAbs( tr.plane.normal, extents );
 		NDebugOverlay::Line( end, end + tr.plane.normal * 24, 255, 255, 64, false, 10 );
@@ -412,7 +412,7 @@ CBaseEntity *GetNextCommandEntity( CBasePlayer *pPlayer, const char *name, CBase
 		if ( ent )
 			return NULL;
 
-		return CBaseEntity::Instance( index );
+		return gEntList.GetBaseEntity( index );
 	}
 		
 	// Loop through all entities matching, starting from the specified previous
@@ -516,10 +516,10 @@ void CPointClientCommand::InputCommand( inputdata_t& inputdata )
 	if ( !inputdata.value.String()[0] )
 		return;
 
-	edict_t *pClient = NULL;
+	int pClient = NULL;
 	if ( gpGlobals->maxClients == 1 )
 	{
-		pClient = engine->PEntityOfEntIndex( 1 );
+		pClient = 1;
 	}
 	else
 	{
@@ -527,20 +527,20 @@ void CPointClientCommand::InputCommand( inputdata_t& inputdata )
 		CBasePlayer *player = dynamic_cast< CBasePlayer * >( inputdata.pActivator );
 		if ( player )
 		{
-			pClient = player->edict();
+			pClient = player->entindex();
 		}
 
 		if ( IsInCommentaryMode() && !pClient )
 		{
 			// Commentary is stuffing a command in. We'll pretend it came from the first player.
-			pClient = engine->PEntityOfEntIndex( 1 );
+			pClient = 1;
 		}
 	}
 
-	if ( !pClient || !pClient->GetUnknown() )
+	if ( !pClient  )//|| !pClient->GetUnknown()
 		return;
 
-	engine->ClientCommand( pClient, "%s\n", inputdata.value.String() );
+	engine->ClientCommand( pClient, "%s\n", inputdata.value.String());
 }
 
 BEGIN_DATADESC( CPointClientCommand )
@@ -701,7 +701,7 @@ void killvector_helper( const CCommand &args, bool bExplode )
 					vecForce.y = atof( args[3] );
 					vecForce.z = atof( args[4] );
 
-					ClientKill( pPlayer->edict(), vecForce, bExplode );
+					ClientKill( pPlayer, vecForce, bExplode );
 				}
 			}
 		}
@@ -754,7 +754,7 @@ CON_COMMAND( say, "Display player message" )
 	{
 		if (( pPlayer->LastTimePlayerTalked() + TALK_INTERVAL ) < gpGlobals->curtime) 
 		{
-			Host_Say( pPlayer->edict(), args, 0 );
+			Host_Say( pPlayer, args, 0 );
 			pPlayer->NotePlayerTalked();
 		}
 	}
@@ -778,7 +778,7 @@ CON_COMMAND( say_team, "Display player message to team" )
 	{
 		if (( pPlayer->LastTimePlayerTalked() + TALK_INTERVAL ) < gpGlobals->curtime) 
 		{
-			Host_Say( pPlayer->edict(), args, 1 );
+			Host_Say( pPlayer, args, 1 );
 			pPlayer->NotePlayerTalked();
 		}
 	}
@@ -960,7 +960,7 @@ void CC_Player_PhysSwap( void )
 		if ( pWeapon )
 		{
 			// Tell the client to stop selecting weapons
-			engine->ClientCommand( UTIL_GetCommandClient()->edict(), "cancelselect" );
+			engine->ClientCommand( UTIL_GetCommandClient()->entindex(), "cancelselect" );
 
 			const char *strWeaponName = pWeapon->GetName();
 
@@ -993,7 +993,7 @@ void CC_Player_BugBaitSwap( void )
 		if ( pWeapon )
 		{
 			// Tell the client to stop selecting weapons
-			engine->ClientCommand( UTIL_GetCommandClient()->edict(), "cancelselect" );
+			engine->ClientCommand( UTIL_GetCommandClient()->entindex(), "cancelselect" );
 
 			const char *strWeaponName = pWeapon->GetName();
 
@@ -1424,7 +1424,7 @@ void CC_GroundList_f(const CCommand &args)
 	{
 		int idx = atoi( args[1] );
 
-		CBaseEntity *ground = CBaseEntity::Instance( idx );
+		CBaseEntity *ground = gEntList.GetBaseEntity( idx );
 		if ( ground )
 		{
 			DescribeGroundList( ground );

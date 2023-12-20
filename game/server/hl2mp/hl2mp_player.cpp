@@ -218,7 +218,7 @@ void CHL2MP_Player::GiveDefaultItems( void )
 	GiveNamedItem( "weapon_frag" );
 	GiveNamedItem( "weapon_physcannon" );
 
-	const char *szDefaultWeaponName = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_defaultweapon" );
+	const char *szDefaultWeaponName = engine->GetClientConVarValue( entindex(), "cl_defaultweapon" );
 
 	CBaseCombatWeapon *pDefaultWeapon = Weapon_OwnsThisType( szDefaultWeaponName );
 
@@ -241,14 +241,14 @@ void CHL2MP_Player::PickDefaultSpawnTeam( void )
 			if ( GetModelPtr() == NULL )
 			{
 				const char *szModelName = NULL;
-				szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_playermodel" );
+				szModelName = engine->GetClientConVarValue( entindex(), "cl_playermodel" );
 
 				if ( ValidatePlayerModel( szModelName ) == false )
 				{
 					char szReturnString[512];
 
 					Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel models/combine_soldier.mdl\n" );
-					engine->ClientCommand ( edict(), szReturnString );
+					engine->ClientCommand ( entindex(), szReturnString );
 				}
 
 				ChangeTeam( TEAM_UNASSIGNED );
@@ -367,7 +367,7 @@ bool CHL2MP_Player::ValidatePlayerModel( const char *pModel )
 void CHL2MP_Player::SetPlayerTeamModel( void )
 {
 	const char *szModelName = NULL;
-	szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_playermodel" );
+	szModelName = engine->GetClientConVarValue( entindex(), "cl_playermodel" );
 
 	int modelIndex = modelinfo->GetModelIndex( szModelName );
 
@@ -379,7 +379,7 @@ void CHL2MP_Player::SetPlayerTeamModel( void )
 		char szReturnString[512];
 
 		Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", szModelName );
-		engine->ClientCommand ( edict(), szReturnString );
+		engine->ClientCommand ( entindex(), szReturnString );
 	}
 
 	if ( GetTeamNumber() == TEAM_COMBINE )
@@ -418,7 +418,7 @@ void CHL2MP_Player::SetPlayerModel( void )
 	const char *szModelName = NULL;
 	const char *pszCurrentModelName = modelinfo->GetModelName( GetModel());
 
-	szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_playermodel" );
+	szModelName = engine->GetClientConVarValue( entindex(), "cl_playermodel" );
 
 	if ( ValidatePlayerModel( szModelName ) == false )
 	{
@@ -430,7 +430,7 @@ void CHL2MP_Player::SetPlayerModel( void )
 		}
 
 		Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pszCurrentModelName );
-		engine->ClientCommand ( edict(), szReturnString );
+		engine->ClientCommand ( entindex(), szReturnString );
 
 		szModelName = pszCurrentModelName;
 	}
@@ -480,7 +480,7 @@ void CHL2MP_Player::SetPlayerModel( void )
 		char szReturnString[512];
 
 		Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", szModelName );
-		engine->ClientCommand ( edict(), szReturnString );
+		engine->ClientCommand ( entindex(), szReturnString );
 	}
 
 	SetModel( szModelName );
@@ -1314,7 +1314,7 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 {
 	CBaseEntity *pSpot = NULL;
 	CBaseEntity *pLastSpawnPoint = g_pLastSpawn;
-	edict_t		*player = edict();
+	//edict_t		*player = edict();
 	const char *pSpawnpointName = "info_player_deathmatch";
 
 	if ( HL2MPRules()->IsTeamplay() == true )
@@ -1374,8 +1374,8 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 		for ( CEntitySphereQuery sphere( pSpot->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 		{
 			// if ent is a client, kill em (unless they are ourselves)
-			if ( ent->IsPlayer() && !(ent->edict() == player) )
-				ent->TakeDamage( CTakeDamageInfo( GetContainingEntity(INDEXENT(0)), GetContainingEntity(INDEXENT(0)), 300, DMG_GENERIC ) );
+			if ( ent->IsPlayer() && !(ent->entindex() == entindex()) )
+				ent->TakeDamage( CTakeDamageInfo( gEntList.GetBaseEntity(0), gEntList.GetBaseEntity(0), 300, DMG_GENERIC ) );
 		}
 		goto ReturnSpot;
 	}
@@ -1570,7 +1570,7 @@ void CHL2MP_Player::State_Enter_OBSERVER_MODE()
 	int observerMode = m_iObserverLastMode;
 	if ( IsNetClient() )
 	{
-		const char *pIdealMode = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_spec_mode" );
+		const char *pIdealMode = engine->GetClientConVarValue( entindex(), "cl_spec_mode" );
 		if ( pIdealMode )
 		{
 			observerMode = atoi( pIdealMode );

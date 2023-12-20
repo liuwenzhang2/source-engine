@@ -387,7 +387,7 @@ void CNPC_HGrunt::SpeakSentence( void )
 
 	if ( FOkToSpeak() )
 	{
-		SENTENCEG_PlayRndSz( edict(), pGruntSentences[ m_iSentence ], HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
+		SENTENCEG_PlayRndSz( this, pGruntSentences[ m_iSentence ], HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
 		JustSpoke();
 	}
 }
@@ -914,15 +914,15 @@ void CNPC_HGrunt::IdleSound( void )
 			switch ( random->RandomInt( 0,2 ) )
 			{
 			case 0: // check in
-				SENTENCEG_PlayRndSz( edict(), "HG_CHECK", HGRUNT_SENTENCE_VOLUME, SNDLVL_NORM, 0, m_voicePitch);
+				SENTENCEG_PlayRndSz( this, "HG_CHECK", HGRUNT_SENTENCE_VOLUME, SNDLVL_NORM, 0, m_voicePitch);
 				g_fGruntQuestion = 1;
 				break;
 			case 1: // question
-				SENTENCEG_PlayRndSz( edict(), "HG_QUEST", HGRUNT_SENTENCE_VOLUME, SNDLVL_NORM, 0, m_voicePitch);
+				SENTENCEG_PlayRndSz( this, "HG_QUEST", HGRUNT_SENTENCE_VOLUME, SNDLVL_NORM, 0, m_voicePitch);
 				g_fGruntQuestion = 2;
 				break;
 			case 2: // statement
-				SENTENCEG_PlayRndSz( edict(), "HG_IDLE", HGRUNT_SENTENCE_VOLUME, SNDLVL_NORM, 0, m_voicePitch);
+				SENTENCEG_PlayRndSz( this, "HG_IDLE", HGRUNT_SENTENCE_VOLUME, SNDLVL_NORM, 0, m_voicePitch);
 				break;
 			}
 		}
@@ -931,10 +931,10 @@ void CNPC_HGrunt::IdleSound( void )
 			switch (g_fGruntQuestion)
 			{
 			case 1: // check in
-				SENTENCEG_PlayRndSz( edict(), "HG_CLEAR", HGRUNT_SENTENCE_VOLUME, SNDLVL_NORM, 0, m_voicePitch);
+				SENTENCEG_PlayRndSz( this, "HG_CLEAR", HGRUNT_SENTENCE_VOLUME, SNDLVL_NORM, 0, m_voicePitch);
 				break;
 			case 2: // question 
-				SENTENCEG_PlayRndSz( edict(), "HG_ANSWER", HGRUNT_SENTENCE_VOLUME, SNDLVL_NORM, 0, m_voicePitch);
+				SENTENCEG_PlayRndSz( this, "HG_ANSWER", HGRUNT_SENTENCE_VOLUME, SNDLVL_NORM, 0, m_voicePitch);
 				break;
 			}
 			g_fGruntQuestion = 0;
@@ -1011,7 +1011,7 @@ CBaseEntity *CNPC_HGrunt::Kick( void )
 	
 	if ( tr.m_pEnt )
 	{
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		return pEntity;
 	}
 
@@ -1194,7 +1194,7 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 		{
 			if ( FOkToSpeak() )
 			{
-				SENTENCEG_PlayRndSz( edict(), "HG_ALERT", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
+				SENTENCEG_PlayRndSz( this, "HG_ALERT", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
 				 JustSpoke();
 			}
 
@@ -1502,7 +1502,7 @@ int CNPC_HGrunt::SelectSchedule( void )
 				
 		if (FOkToSpeak())
 		{
-			SENTENCEG_PlayRndSz( edict(), "HG_GREN", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
+			SENTENCEG_PlayRndSz( this, "HG_GREN", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
 			JustSpoke();
 		}
 
@@ -1556,13 +1556,13 @@ int CNPC_HGrunt::SelectSchedule( void )
 						{
 							if ((GetEnemy() != NULL) && GetEnemy()->IsPlayer())
 								// player
-								SENTENCEG_PlayRndSz( edict(), "HG_ALERT", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
+								SENTENCEG_PlayRndSz( this, "HG_ALERT", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
 							else if ((GetEnemy() != NULL) &&
 									(GetEnemy()->Classify() != CLASS_PLAYER_ALLY) && 
 									(GetEnemy()->Classify() != CLASS_HUMAN_PASSIVE) && 
 									(GetEnemy()->Classify() != CLASS_MACHINE) )
 								// monster
-								SENTENCEG_PlayRndSz( edict(), "HG_MONST", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
+								SENTENCEG_PlayRndSz( this, "HG_MONST", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
 
 							JustSpoke();
 						}
@@ -1669,7 +1669,7 @@ int CNPC_HGrunt::SelectSchedule( void )
 					//!!!KELLY - this grunt is about to throw or fire a grenade at the player. Great place for "fire in the hole"  "frag out" etc
 					if (FOkToSpeak())
 					{
-						SENTENCEG_PlayRndSz( edict(), "HG_THROW", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
+						SENTENCEG_PlayRndSz( this, "HG_THROW", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
 						JustSpoke();
 					}
 					return SCHED_RANGE_ATTACK2;
@@ -1694,7 +1694,7 @@ int CNPC_HGrunt::SelectSchedule( void )
 					// grunt's covered position. Good place for a taunt, I guess?
 					if (FOkToSpeak() && random->RandomInt(0,1))
 					{
-						SENTENCEG_PlayRndSz( edict(), "HG_TAUNT", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
+						SENTENCEG_PlayRndSz( this, "HG_TAUNT", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
 						JustSpoke();
 					}
 					return SCHED_STANDOFF;
@@ -1735,7 +1735,7 @@ int CNPC_HGrunt::TranslateSchedule( int scheduleType )
 				{
 					if (FOkToSpeak())
 					{
-						SENTENCEG_PlayRndSz( edict(), "HG_THROW", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
+						SENTENCEG_PlayRndSz( this, "HG_THROW", HGRUNT_SENTENCE_VOLUME, GRUNT_SNDLVL, 0, m_voicePitch);
 						JustSpoke();
 					}
 					return SCHED_GRUNT_TOSS_GRENADE_COVER;

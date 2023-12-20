@@ -501,7 +501,7 @@ void CBreakableProp::HandleFirstCollisionInteractions( int index, gamevcollision
 		{
 #ifdef HL2_DLL
 			// Don't paintsplat friendlies
-			int iClassify = tr.m_pEnt->Classify();
+			int iClassify = ((CBaseEntity*)tr.m_pEnt)->Classify();
 			if ( iClassify != CLASS_PLAYER_ALLY_VITAL && iClassify != CLASS_PLAYER_ALLY && 
 				 iClassify != CLASS_CITIZEN_PASSIVE && iClassify != CLASS_CITIZEN_REBEL ) 
 #endif
@@ -3044,7 +3044,7 @@ void CPhysicsProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 			if ( !pHitEntity )
 			{
 				// hit world
-				pHitEntity = GetContainingEntity( INDEXENT(0) );
+				pHitEntity = gEntList.GetBaseEntity( 0 );
 			}
 			Vector damagePos;
 			pEvent->pInternalData->GetContactPoint( damagePos );
@@ -5067,7 +5067,7 @@ bool CPropDoorRotating::CheckDoorClear( doorCheck_e state )
 
 			if ( tr.m_pEnt )
 			{
-				NDebugOverlay::Box( tr.m_pEnt->GetAbsOrigin(), tr.m_pEnt->CollisionProp()->OBBMins(), tr.m_pEnt->CollisionProp()->OBBMaxs(), 220, 220, 0, true, 10.0f );
+				NDebugOverlay::Box(((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin(), ((CBaseEntity*)tr.m_pEnt)->CollisionProp()->OBBMins(), ((CBaseEntity*)tr.m_pEnt)->CollisionProp()->OBBMaxs(), 220, 220, 0, true, 10.0f );
 			}
 		}
 

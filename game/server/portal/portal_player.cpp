@@ -491,7 +491,7 @@ void CPortal_Player::SetPlayerModel( void )
 	const char *szModelName = NULL;
 	const char *pszCurrentModelName = modelinfo->GetModelName( GetModel());
 
-	szModelName = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_playermodel" );
+	szModelName = engine->GetClientConVarValue( entindex(), "cl_playermodel" );
 
 	if ( ValidatePlayerModel( szModelName ) == false )
 	{
@@ -503,7 +503,7 @@ void CPortal_Player::SetPlayerModel( void )
 		}
 
 		Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pszCurrentModelName );
-		engine->ClientCommand ( edict(), szReturnString );
+		engine->ClientCommand ( entindex(), szReturnString );
 
 		szModelName = pszCurrentModelName;
 	}
@@ -517,7 +517,7 @@ void CPortal_Player::SetPlayerModel( void )
 		char szReturnString[512];
 
 		Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", szModelName );
-		engine->ClientCommand ( edict(), szReturnString );
+		engine->ClientCommand ( entindex(), szReturnString );
 	}
 
 	SetModel( szModelName );
@@ -2033,7 +2033,7 @@ void CPortal_Player::UpdatePortalViewAreaBits( unsigned char *pvs, int pvssize )
 
 			// Make sure this portal's linked portal is in the PVS before we add what it can see
 			if ( pRemotePortal && pRemotePortal->m_bActivated && pRemotePortal->NetworkProp() && 
-				pRemotePortal->NetworkProp()->IsInPVS( edict(), pvs, pvssize ) )
+				pRemotePortal->NetworkProp()->IsInPVS( this, pvs, pvssize ) )
 			{
 				portalArea[ i ] = engine->GetArea( pPortals[ i ]->GetAbsOrigin() );
 
@@ -2110,7 +2110,7 @@ void PortalSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *pvs, 
 
 		if ( pPortal && pPortal->m_bActivated )
 		{
-			if ( pPortal->NetworkProp()->IsInPVS( pPlayer->edict(), pvs, pvssize ) )
+			if ( pPortal->NetworkProp()->IsInPVS( pPlayer, pvs, pvssize ) )
 			{
 				if ( engine->CheckAreasConnected( area, pPortal->NetworkProp()->AreaNum() ) )
 				{
@@ -2175,7 +2175,7 @@ CBaseEntity* CPortal_Player::EntSelectSpawnPoint( void )
 {
 	CBaseEntity *pSpot = NULL;
 	CBaseEntity *pLastSpawnPoint = g_pLastSpawn;
-	edict_t		*player = edict();
+	//edict_t		*player = edict();
 	const char *pSpawnpointName = "info_player_start";
 
 	/*if ( HL2MPRules()->IsTeamplay() == true )
@@ -2235,8 +2235,8 @@ CBaseEntity* CPortal_Player::EntSelectSpawnPoint( void )
 		for ( CEntitySphereQuery sphere( pSpot->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 		{
 			// if ent is a client, kill em (unless they are ourselves)
-			if ( ent->IsPlayer() && !(ent->edict() == player) )
-				ent->TakeDamage( CTakeDamageInfo( GetContainingEntity(INDEXENT(0)), GetContainingEntity(INDEXENT(0)), 300, DMG_GENERIC ) );
+			if ( ent->IsPlayer() && !(ent->entindex() == entindex()) )
+				ent->TakeDamage( CTakeDamageInfo( gEntList.GetBaseEntity(0), gEntList.GetBaseEntity(0), 300, DMG_GENERIC ) );
 		}
 		goto ReturnSpot;
 	}

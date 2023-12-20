@@ -383,7 +383,7 @@ void CNPC_HAssassin::RunTask ( const Task_t *pTask )
 
 			if( trace.DidHitWorld() )
 			{
-				SetGroundEntity( trace.m_pEnt );
+				SetGroundEntity((CBaseEntity*)trace.m_pEnt );
 			}
 			else
 			{

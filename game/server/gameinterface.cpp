@@ -67,7 +67,7 @@
 #include "util.h"
 #include "tier0/icommandline.h"
 #include "datacache/imdlcache.h"
-#include "engine/iserverplugin.h"
+//#include "engine/iserverplugin.h"
 #ifdef _WIN32
 #include "ienginevgui.h"
 #endif
@@ -177,7 +177,7 @@ IGameEventManager2 *gameeventmanager = NULL;
 IDataCache *datacache = NULL;
 IVDebugOverlay * debugoverlay = NULL;
 ISoundEmitterSystemBase *soundemitterbase = NULL;
-IServerPluginHelpers *serverpluginhelpers = NULL;
+//IServerPluginHelpers *serverpluginhelpers = NULL;
 IServerEngineTools *serverenginetools = NULL;
 ISceneFileCache *scenefilecache = NULL;
 IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
@@ -229,7 +229,7 @@ CStringTableSaveRestoreOps g_VguiScreenStringOps;
 
 // Holds global variables shared between engine and game.
 CGlobalVars *gpGlobals;
-edict_t *g_pDebugEdictBase = 0;
+IServerEntity *g_pDebugEdictBase = 0;
 static int		g_nCommandClientIndex = 0;
 
 // The chapter number of the current
@@ -247,20 +247,20 @@ static void UpdateChapterRestrictions( const char *mapname );
 static void UpdateRichPresence ( void );
 
 
-#if !defined( _XBOX ) // Don't doubly define this symbol.
-CSharedEdictChangeInfo *g_pSharedChangeInfo = NULL;
+//#if !defined( _XBOX ) // Don't doubly define this symbol.
+//CSharedEdictChangeInfo *g_pSharedChangeInfo = NULL;
+//
+//#endif
 
-#endif
+//IChangeInfoAccessor *CBaseEdict::GetChangeAccessor()
+//{
+//	return engine->GetChangeAccessor( (const edict_t *)this );
+//}
 
-IChangeInfoAccessor *CBaseEdict::GetChangeAccessor()
-{
-	return engine->GetChangeAccessor( (const edict_t *)this );
-}
-
-const IChangeInfoAccessor *CBaseEdict::GetChangeAccessor() const
-{
-	return engine->GetChangeAccessor( (const edict_t *)this );
-}
+//const IChangeInfoAccessor *CBaseEdict::GetChangeAccessor() const
+//{
+//	return engine->GetChangeAccessor( (const edict_t *)this );
+//}
 
 const char *GetHintTypeDescription( CAI_Hint *pHint );
 
@@ -617,8 +617,8 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 #endif
 	if ( !mdlcache )
 		return false;
-	if ( (serverpluginhelpers = (IServerPluginHelpers *)appSystemFactory(INTERFACEVERSION_ISERVERPLUGINHELPERS, NULL)) == NULL )
-		return false;
+//	if ( (serverpluginhelpers = (IServerPluginHelpers *)appSystemFactory(INTERFACEVERSION_ISERVERPLUGINHELPERS, NULL)) == NULL )
+//		return false;
 	if ( (scenefilecache = (ISceneFileCache *)appSystemFactory( SCENE_FILE_CACHE_INTERFACE_VERSION, NULL )) == NULL )
 		return false;
 	if ( IsX360() && (xboxsystem = (IXboxSystem *)appSystemFactory( XBOXSYSTEM_INTERFACE_VERSION, NULL )) == NULL )
@@ -642,7 +642,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	// cache the globals
 	gpGlobals = pGlobals;
 
-	g_pSharedChangeInfo = engine->GetSharedEdictChangeInfo();
+	//g_pSharedChangeInfo = engine->GetSharedEdictChangeInfo();
 	
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
 
@@ -1084,7 +1084,7 @@ bool g_bCheckForChainedActivate;
 #define EndCheckChainedActivate( bCheck )	((void)0)
 #endif
 
-void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
+void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, int clientMax )
 {
 	// HACKHACK: UNDONE: We need to redesign the main loop with respect to save/load/server activate
 	if ( g_InRestore )
@@ -1321,7 +1321,7 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 		return;
 	}
 
-	CBaseAnimating *anim = dynamic_cast< CBaseAnimating * >( CBaseEntity::Instance( engine->PEntityOfEntIndex( sv_showhitboxes.GetInt() ) ) );
+	CBaseAnimating *anim = dynamic_cast< CBaseAnimating * >( gEntList.GetBaseEntity( sv_showhitboxes.GetInt() )  );
 	if ( !anim )
 		return;
 
@@ -1352,9 +1352,9 @@ void CServerGameDLL::Think( bool finalTick )
 	}
 }
 
-void CServerGameDLL::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue )
-{
-}
+//void CServerGameDLL::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, IServerEntity *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue )
+//{
+//}
 
 
 // Called when a level is shutdown (including changing levels)
@@ -2372,16 +2372,16 @@ bool IsEngineThreaded()
 class CServerGameEnts : public IServerGameEnts
 {
 public:
-	virtual void			SetDebugEdictBase(edict_t *base);
-	virtual void			MarkEntitiesAsTouching( edict_t *e1, edict_t *e2 );
-	virtual void			FreeContainingEntity( edict_t * ); 
-	virtual edict_t*		BaseEntityToEdict( CBaseEntity *pEnt );
-	virtual CBaseEntity*	EdictToBaseEntity( edict_t *pEdict );
+	virtual void			SetDebugEdictBase(IServerEntity *base);
+	virtual void			MarkEntitiesAsTouching( IServerEntity *e1, IServerEntity *e2 );
+	virtual void			FreeContainingEntity( int entindex ); 
+	//virtual edict_t*		BaseEntityToEdict( CBaseEntity *pEnt );
+	//virtual CBaseEntity*	EdictToBaseEntity( edict_t *pEdict );
 	virtual void			CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned short *pEdictIndices, int nEdicts );
 };
 EXPOSE_SINGLE_INTERFACE(CServerGameEnts, IServerGameEnts, INTERFACEVERSION_SERVERGAMEENTS);
 
-void CServerGameEnts::SetDebugEdictBase(edict_t *base)
+void CServerGameEnts::SetDebugEdictBase(IServerEntity *base)
 {
 	g_pDebugEdictBase = base;
 }
@@ -2391,10 +2391,10 @@ void CServerGameEnts::SetDebugEdictBase(edict_t *base)
 // Input  : *e1 - 
 //			*e2 - 
 //-----------------------------------------------------------------------------
-void CServerGameEnts::MarkEntitiesAsTouching( edict_t *e1, edict_t *e2 )
+void CServerGameEnts::MarkEntitiesAsTouching( IServerEntity *e1, IServerEntity *e2 )
 {
-	CBaseEntity *entity = GetContainingEntity( e1 );
-	CBaseEntity *entityTouched = GetContainingEntity( e2 );
+	CBaseEntity *entity = e1->GetBaseEntity();
+	CBaseEntity *entityTouched = e2->GetBaseEntity();
 	if ( entity && entityTouched )
 	{
 		// HACKHACK: UNDONE: Pass in the trace here??!?!?
@@ -2405,26 +2405,28 @@ void CServerGameEnts::MarkEntitiesAsTouching( edict_t *e1, edict_t *e2 )
 	}
 }
 
-void CServerGameEnts::FreeContainingEntity( edict_t *e )
+void CServerGameEnts::FreeContainingEntity( int e )
 {
 	::FreeContainingEntity(e);
 }
 
-edict_t* CServerGameEnts::BaseEntityToEdict( CBaseEntity *pEnt )
-{
-	if ( pEnt )
-		return pEnt->edict();
-	else
-		return NULL;
-}
+//edict_t* CServerGameEnts::BaseEntityToEdict( CBaseEntity *pEnt )
+//{
+//	if (pEnt) {
+//		return NULL;// pEnt->edict();
+//	}
+//	else {
+//		return NULL;
+//	}
+//}
 
-CBaseEntity* CServerGameEnts::EdictToBaseEntity( edict_t *pEdict )
-{
-	if ( pEdict )
-		return CBaseEntity::Instance( pEdict );
-	else
-		return NULL;
-}
+//CBaseEntity* CServerGameEnts::EdictToBaseEntity( edict_t *pEdict )
+//{
+//	if ( pEdict )
+//		return gEntList.GetBaseEntity( pEdict->m_EdictIndex );
+//	else
+//		return NULL;
+//}
 
 
 /* Yuck.. ideally this would be in CServerNetworkProperty's header, but it requires CBaseEntity and
@@ -2449,10 +2451,9 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 	// is consecutive in memory. If either of these things change, then this routine needs to change, but
 	// ideally we won't be calling any virtual from this routine. This speedy routine was added as an
 	// optimization which would be nice to keep.
-	edict_t *pBaseEdict = engine->PEntityOfEntIndex( 0 );
 
 	// get recipient player's skybox:
-	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+	CBaseEntity *pRecipientEntity = gEntList.GetBaseEntity( pInfo->m_pClientEnt );
 
 	Assert( pRecipientEntity && pRecipientEntity->IsPlayer() );
 	if ( !pRecipientEntity )
@@ -2475,9 +2476,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 	{
 		int iEdict = pEdictIndices[i];
 
-		edict_t *pEdict = &pBaseEdict[iEdict];
-		Assert( pEdict == engine->PEntityOfEntIndex( iEdict ) );
-		int nFlags = pEdict->m_fStateFlags & (FL_EDICT_DONTSEND|FL_EDICT_ALWAYS|FL_EDICT_PVSCHECK|FL_EDICT_FULLCHECK);
+		int nFlags = engine->GetEdictFlag(iEdict) & (FL_EDICT_DONTSEND | FL_EDICT_ALWAYS | FL_EDICT_PVSCHECK | FL_EDICT_FULLCHECK);
 
 		// entity needs no transmit
 		if ( nFlags & FL_EDICT_DONTSEND )
@@ -2502,7 +2501,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 					pInfo->m_pTransmitAlways->Set( iEdict );
 				}
 #endif	
-				CServerNetworkProperty *pEnt = static_cast<CServerNetworkProperty*>( pEdict->GetNetworkable() );
+				CServerNetworkProperty *pEnt = static_cast<CServerNetworkProperty*>( gEntList.GetServerNetworkable(iEdict) );
 				if ( !pEnt )
 					break;
 
@@ -2510,15 +2509,15 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				if ( !pParent )
 					break;
 
-				pEdict = pParent->edict();
+				//pEdict = pParent->edict();
 				iEdict = pParent->entindex();
 			}
 			continue;
 		}
 
 		// FIXME: Would like to remove all dependencies
-		CBaseEntity *pEnt = ( CBaseEntity * )pEdict->GetUnknown();
-		Assert( dynamic_cast< CBaseEntity* >( pEdict->GetUnknown() ) == pEnt );
+		CBaseEntity *pEnt = ( CBaseEntity * )gEntList.GetBaseEntity(iEdict);
+		//Assert( dynamic_cast< CBaseEntity* >( pEdict->GetUnknown() ) == pEnt );
 
 		if ( nFlags == FL_EDICT_FULLCHECK )
 		{
@@ -2538,7 +2537,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 		if ( !( nFlags & FL_EDICT_PVSCHECK ) )
 			continue;
 
-		CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>( pEdict->GetNetworkable() );
+		CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>(gEntList.GetServerNetworkable(iEdict));
 
 #ifndef _X360
 		if ( bIsHLTV || bIsReplay )
@@ -2591,8 +2590,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				break;
 			}
 
-			edict_t *checkEdict = check->edict();
-			int checkFlags = checkEdict->m_fStateFlags & (FL_EDICT_DONTSEND|FL_EDICT_ALWAYS|FL_EDICT_PVSCHECK|FL_EDICT_FULLCHECK);
+			int checkFlags = engine->GetEdictFlag(checkIndex) & (FL_EDICT_DONTSEND | FL_EDICT_ALWAYS | FL_EDICT_PVSCHECK | FL_EDICT_FULLCHECK);
 			if ( checkFlags & FL_EDICT_DONTSEND )
 				break;
 
@@ -2653,7 +2651,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameClients, IServerGameClients, INTERF
 //			the player was not allowed to connect.
 // Output : Returns TRUE if player is allowed to join, FALSE if connection is denied.
 //-----------------------------------------------------------------------------
-bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
+bool CServerGameClients::ClientConnect( int pEdict, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
 {	
 	if ( !g_pGameRules )
 		return false;
@@ -2665,7 +2663,7 @@ bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, co
 // Purpose: Called when a player is fully active (i.e. ready to receive messages)
 // Input  : *pEntity - the player
 //-----------------------------------------------------------------------------
-void CServerGameClients::ClientActive( edict_t *pEdict, bool bLoadGame )
+void CServerGameClients::ClientActive( int pEdict, bool bLoadGame )
 {
 	MDLCACHE_CRITICAL_SECTION();
 	
@@ -2684,7 +2682,7 @@ void CServerGameClients::ClientActive( edict_t *pEdict, bool bLoadGame )
 	}
 
 	// Tell the sound controller to check looping sounds
-	CBasePlayer *pPlayer = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
+	CBasePlayer *pPlayer = ( CBasePlayer * )gEntList.GetBaseEntity( pEdict );
 	CSoundEnvelopeController::GetController().CheckLoopingSoundsForPlayer( pPlayer );
 	SceneManager_ClientActive( pPlayer );
 
@@ -2712,7 +2710,7 @@ void CServerGameClients::ClientActive( edict_t *pEdict, bool bLoadGame )
 // Purpose: 
 // Input  : *pPlayer - the player
 //-----------------------------------------------------------------------------
-void CServerGameClients::ClientSpawned( edict_t *pPlayer )
+void CServerGameClients::ClientSpawned( int pPlayer )
 {
 	if ( g_pGameRules )
 	{
@@ -2724,11 +2722,11 @@ void CServerGameClients::ClientSpawned( edict_t *pPlayer )
 // Purpose: called when a player disconnects from a server
 // Input  : *pEdict - the player
 //-----------------------------------------------------------------------------
-void CServerGameClients::ClientDisconnect( edict_t *pEdict )
+void CServerGameClients::ClientDisconnect( int pEdict )
 {
 	extern bool	g_fGameOver;
 
-	CBasePlayer *player = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
+	CBasePlayer *player = ( CBasePlayer * )gEntList.GetBaseEntity( pEdict );
 	if ( player )
 	{
 		if ( !g_fGameOver )
@@ -2736,7 +2734,7 @@ void CServerGameClients::ClientDisconnect( edict_t *pEdict )
 			player->SetMaxSpeed( 0.0f );
 
 			CSound *pSound;
-			pSound = CSoundEnt::SoundPointerForIndex( CSoundEnt::ClientSoundIndex( pEdict ) );
+			pSound = CSoundEnt::SoundPointerForIndex( CSoundEnt::ClientSoundIndex(player) );
 			{
 				// since this client isn't around to think anymore, reset their sound. 
 				if ( pSound )
@@ -2786,7 +2784,7 @@ void CServerGameClients::ClientDisconnect( edict_t *pEdict )
 	}
 }
 
-void CServerGameClients::ClientPutInServer( edict_t *pEntity, const char *playername )
+void CServerGameClients::ClientPutInServer( int pEntity, const char *playername )
 {
 	if ( g_pClientPutInServerOverride )
 		g_pClientPutInServerOverride( pEntity, playername );
@@ -2794,9 +2792,9 @@ void CServerGameClients::ClientPutInServer( edict_t *pEntity, const char *player
 		::ClientPutInServer( pEntity, playername );
 }
 
-void CServerGameClients::ClientCommand( edict_t *pEntity, const CCommand &args )
+void CServerGameClients::ClientCommand( int pEntity, const CCommand &args )
 {
-	CBasePlayer *pPlayer = ToBasePlayer( GetContainingEntity( pEntity ) );
+	CBasePlayer *pPlayer = ToBasePlayer( gEntList.GetBaseEntity( pEntity ) );
 	::ClientCommand( pPlayer, args );
 }
 
@@ -2806,13 +2804,13 @@ void CServerGameClients::ClientCommand( edict_t *pEntity, const CCommand &args )
 // Input  : *pEdict - the player
 //			*infobuffer - their infobuffer
 //-----------------------------------------------------------------------------
-void CServerGameClients::ClientSettingsChanged( edict_t *pEdict )
+void CServerGameClients::ClientSettingsChanged( int pEdict )
 {
 	// Is the client spawned yet?
-	if ( !pEdict->GetUnknown() )
+	if ( !gEntList.GetBaseEntity(pEdict) )
 		return;
 
-	CBasePlayer *player = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
+	CBasePlayer *player = ( CBasePlayer * )gEntList.GetBaseEntity( pEdict );
 	
 	if ( !player )
 		return;
@@ -2892,7 +2890,7 @@ void CServerGameClients::ClientSettingsChanged( edict_t *pEdict )
 // Input  : pAreaPortal - The Area portal to test for visibility from portals
 // Output : int - 1 if any portal needs this area portal open, 0 otherwise.
 //-----------------------------------------------------------------------------
-int TestAreaPortalVisibilityThroughPortals ( CFuncAreaPortalBase* pAreaPortal, edict_t *pViewEntity, unsigned char *pvs, int pvssize  )
+int TestAreaPortalVisibilityThroughPortals ( CFuncAreaPortalBase* pAreaPortal, IServerEntity *pViewEntity, unsigned char *pvs, int pvssize  )
 {
 	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount == 0 )
@@ -2909,7 +2907,7 @@ int TestAreaPortalVisibilityThroughPortals ( CFuncAreaPortalBase* pAreaPortal, e
 
 			// Make sure this portal's linked portal is in the PVS before we add what it can see
 			if ( pRemotePortal && pRemotePortal->m_bActivated && pRemotePortal->NetworkProp() && 
-				pRemotePortal->NetworkProp()->IsInPVS( pViewEntity, pvs, pvssize ) )
+				pRemotePortal->NetworkProp()->IsInPVS( (CBaseEntity*)pViewEntity, pvs, pvssize ) )
 			{
 				bool bIsOpenOnClient = true;
 				float fovDistanceAdjustFactor = 1.0f;
@@ -2941,7 +2939,7 @@ int TestAreaPortalVisibilityThroughPortals ( CFuncAreaPortalBase* pAreaPortal, e
 //			**pvs - 
 //			**pas - 
 //-----------------------------------------------------------------------------
-void CServerGameClients::ClientSetupVisibility( edict_t *pViewEntity, edict_t *pClient, unsigned char *pvs, int pvssize )
+void CServerGameClients::ClientSetupVisibility(const IServerEntity *pViewEntity, int pClient, unsigned char *pvs, int pvssize )
 {
 	Vector org;
 
@@ -2954,7 +2952,7 @@ void CServerGameClients::ClientSetupVisibility( edict_t *pViewEntity, edict_t *p
 	CBaseEntity *pVE = NULL;
 	if ( pViewEntity )
 	{
-		pVE = GetContainingEntity( pViewEntity );
+		pVE = (CBaseEntity*)pViewEntity;
 		// If we have a viewentity, it overrides the player's origin
 		if ( pVE )
 		{
@@ -2965,12 +2963,12 @@ void CServerGameClients::ClientSetupVisibility( edict_t *pViewEntity, edict_t *p
 
 	float fovDistanceAdjustFactor = 1;
 
-	CBasePlayer *pPlayer = ( CBasePlayer * )GetContainingEntity( pClient );
+	CBasePlayer *pPlayer = ( CBasePlayer * )gEntList.GetBaseEntity( pClient );
 	if ( pPlayer )
 	{
 		org = pPlayer->EyePosition();
 		pPlayer->SetupVisibility( pVE, pvs, pvssize );
-		UTIL_SetClientVisibilityPVS( pClient, pvs, pvssize );
+		UTIL_SetClientVisibilityPVS(pPlayer, pvs, pvssize );
 		fovDistanceAdjustFactor = pPlayer->GetFOVDistanceAdjustFactorForNetworking();
 	}
 
@@ -2995,7 +2993,7 @@ void CServerGameClients::ClientSetupVisibility( edict_t *pViewEntity, edict_t *p
 		// If the client doesn't need this open, test if portals might need this area portal open
 		if ( isOpen[iOutPortal] == 0 )
 		{
-			isOpen[iOutPortal] = TestAreaPortalVisibilityThroughPortals( pCur, pViewEntity, pvs, pvssize );
+			isOpen[iOutPortal] = TestAreaPortalVisibilityThroughPortals( pCur, (IServerEntity*)pViewEntity, pvs, pvssize );
 		}
 #endif
 
@@ -3057,7 +3055,7 @@ void CServerGameClients::ClientSetupVisibility( edict_t *pViewEntity, edict_t *p
 //-----------------------------------------------------------------------------
 #define CMD_MAXBACKUP 64
 
-float CServerGameClients::ProcessUsercmds( edict_t *player, bf_read *buf, int numcmds, int totalcmds,
+float CServerGameClients::ProcessUsercmds( int player, bf_read *buf, int numcmds, int totalcmds,
 	int dropped_packets, bool ignore, bool paused )
 {
 	int				i;
@@ -3073,7 +3071,7 @@ float CServerGameClients::ProcessUsercmds( edict_t *player, bf_read *buf, int nu
 	Assert( ( totalcmds - numcmds ) >= 0 );
 
 	CBasePlayer *pPlayer = NULL;
-	CBaseEntity *pEnt = CBaseEntity::Instance(player);
+	CBaseEntity *pEnt = gEntList.GetBaseEntity(player);
 	if ( pEnt && pEnt->IsPlayer() )
 	{
 		pPlayer = static_cast< CBasePlayer * >( pEnt );
@@ -3127,9 +3125,9 @@ void CServerGameClients::SetCommandClient( int index )
 	g_nCommandClientIndex = index;
 }
 
-int	CServerGameClients::GetReplayDelay( edict_t *pEdict, int &entity )
+int	CServerGameClients::GetReplayDelay( int pEdict, int &entity )
 {
-	CBasePlayer *pPlayer = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
+	CBasePlayer *pPlayer = ( CBasePlayer * )gEntList.GetBaseEntity( pEdict );
 
 	if ( !pPlayer )
 		return 0;
@@ -3143,9 +3141,9 @@ int	CServerGameClients::GetReplayDelay( edict_t *pEdict, int &entity )
 //-----------------------------------------------------------------------------
 // The client's userinfo data lump has changed
 //-----------------------------------------------------------------------------
-void CServerGameClients::ClientEarPosition( edict_t *pEdict, Vector *pEarOrigin )
+void CServerGameClients::ClientEarPosition( int pEdict, Vector *pEarOrigin )
 {
-	CBasePlayer *pPlayer = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
+	CBasePlayer *pPlayer = ( CBasePlayer * )gEntList.GetBaseEntity( pEdict );
 	if (pPlayer)
 	{
 		*pEarOrigin = pPlayer->EarPosition();
@@ -3163,13 +3161,13 @@ void CServerGameClients::ClientEarPosition( edict_t *pEdict, Vector *pEarOrigin 
 // Input  : *player - 
 // Output : CPlayerState
 //-----------------------------------------------------------------------------
-CPlayerState *CServerGameClients::GetPlayerState( edict_t *player )
+CPlayerState *CServerGameClients::GetPlayerState( int player )
 {
 	// Is the client spawned yet?
-	if ( !player || !player->GetUnknown() )
+	if ( !player || !gEntList.GetBaseEntity(player) )
 		return NULL;
 
-	CBasePlayer *pBasePlayer = ( CBasePlayer * )CBaseEntity::Instance( player );
+	CBasePlayer *pBasePlayer = ( CBasePlayer * )gEntList.GetBaseEntity( player );
 	if ( !pBasePlayer )
 		return NULL;
 
@@ -3224,7 +3222,7 @@ void CServerGameClients::NetworkIDValidated( const char *pszUserName, const char
 }
 
 // The client has submitted a keyvalues command
-void CServerGameClients::ClientCommandKeyValues( edict_t *pEntity, KeyValues *pKeyValues )
+void CServerGameClients::ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues )
 {
 	if ( !pKeyValues )
 		return;

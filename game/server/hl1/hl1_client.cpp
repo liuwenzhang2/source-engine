@@ -27,7 +27,7 @@
 
 #include "tier0/vprof.h"
 
-void Host_Say( edict_t *pEdict, bool teamonly );
+void Host_Say( int pEdict, bool teamonly );
 
 extern CBaseEntity*	FindPickerEntityClass( CBasePlayer *pPlayer, char *classname );
 extern bool			g_fGameOver;
@@ -39,7 +39,7 @@ ClientPutInServer
 called each time a player is spawned into the game
 ============
 */
-void ClientPutInServer( edict_t *pEdict, const char *playername )
+void ClientPutInServer( int pEdict, const char *playername )
 {
 	CHL1_Player *pPlayer = NULL;
 
@@ -53,7 +53,7 @@ void ClientPutInServer( edict_t *pEdict, const char *playername )
 }
 
 
-void ClientActive( edict_t *pEdict, bool bLoadGame )
+void ClientActive( int pEdict, bool bLoadGame )
 {
 	CHL1_Player *pPlayer = dynamic_cast< CHL1_Player* >( CBaseEntity::Instance( pEdict ) );
 
@@ -88,12 +88,12 @@ const char *GetGameDescription()
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-CBaseEntity* FindEntity( edict_t *pEdict, char *classname)
+CBaseEntity* FindEntity( int pEdict, char *classname)
 {
 	// If no name was given set bits based on the picked
 	if (FStrEq(classname,"")) 
 	{
-		return (FindPickerEntityClass( static_cast<CBasePlayer*>(GetContainingEntity(pEdict)), classname ));
+		return (FindPickerEntityClass( static_cast<CBasePlayer*>(gEntList.GetBaseEntity(pEdict)), classname ));
 	}
 	return NULL;
 }

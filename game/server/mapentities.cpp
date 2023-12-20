@@ -30,7 +30,7 @@ struct HierarchicalSpawnMapData_t
 };
 
 static CStringRegistry *g_pClassnameSpawnPriority = NULL;
-extern edict_t *g_pForceAttachEdict;
+extern int g_pForceAttachEdict;
 
 // creates an entity by string name, but does not spawn it
 CBaseEntity *CreateEntityByName( const char *className, int iForceEdictIndex )
@@ -38,12 +38,12 @@ CBaseEntity *CreateEntityByName( const char *className, int iForceEdictIndex )
 	if ( iForceEdictIndex != -1 )
 	{
 		g_pForceAttachEdict = engine->CreateEdict( iForceEdictIndex );
-		if ( !g_pForceAttachEdict )
+		if ( g_pForceAttachEdict==-1 )
 			Error( "CreateEntityByName( %s, %d ) - CreateEdict failed.", className, iForceEdictIndex );
 	}
 
 	IServerNetworkable *pNetwork = EntityFactoryDictionary()->Create( className );
-	g_pForceAttachEdict = NULL;
+	g_pForceAttachEdict = -1;
 
 	if ( !pNetwork )
 		return NULL;
@@ -64,14 +64,14 @@ CBaseNetworkable *CreateNetworkableByName( const char *className )
 	return pNetworkable;
 }
 
-void FreeContainingEntity( edict_t *ed )
+void FreeContainingEntity( int ed )
 {
-	if ( ed )
+	if ( ed!=-1 )
 	{
-		CBaseEntity *ent = GetContainingEntity( ed );
+		CBaseEntity *ent = gEntList.GetBaseEntity( ed );
 		if ( ent )
 		{
-			ed->SetEdict( NULL, false );
+			engine->SetEdict(ed, false );
 			//CBaseEntity::PhysicsRemoveTouchedList( ent );
 			//CBaseEntity::PhysicsRemoveGroundList( ent );
 			//UTIL_RemoveImmediate( ent );
@@ -221,7 +221,7 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 			{
 				CBaseEntity *pParent = gEntList.FindEntityByName( NULL, pEntity->m_iParent );
 
-				if ((pParent != NULL) && (pParent->edict() != NULL))
+				if ((pParent != NULL) && (pParent->entindex() != -1))
 				{
 					pEntity->SetParent( pParent ); 
 				}

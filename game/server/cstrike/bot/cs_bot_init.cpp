@@ -41,7 +41,7 @@ static void PrefixChanged( IConVar *c, const char *oldPrefix, float flOldValue )
 			char botName[MAX_PLAYER_NAME_LENGTH];
 			UTIL_ConstructBotNetName( botName, MAX_PLAYER_NAME_LENGTH, bot->GetProfile() );
 
-			engine->SetFakeClientConVarValue( bot->edict(), "name", botName );
+			engine->SetFakeClientConVarValue( bot->entindex(), "name", botName );
 		}
 	}
 }

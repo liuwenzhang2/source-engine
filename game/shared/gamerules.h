@@ -176,7 +176,7 @@ public:
 	//Allow thirdperson camera.
 	virtual bool AllowThirdPersonCamera( void ) { return false; }
 
-	virtual void ClientCommandKeyValues( edict_t *pEntity, KeyValues *pKeyValues ) {} 
+	virtual void ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues ) {} 
 
 	// IsConnectedUserInfoChangeAllowed allows the clients to change
 	// cvars with the FCVAR_NOT_CONNECTED rule if it returns true
@@ -265,14 +265,14 @@ public:
 	virtual const char *GetGameDescription( void ) { return "Half-Life 2"; }  // this is the game name that gets seen in the server browser
 	
 // Client connection/disconnection
-	virtual bool ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen ) = 0;// a client just connected to the server (player hasn't spawned yet)
+	virtual bool ClientConnected( int pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen ) = 0;// a client just connected to the server (player hasn't spawned yet)
 	virtual void InitHUD( CBasePlayer *pl ) = 0;		// the client dll is ready for updating
-	virtual void ClientDisconnected( edict_t *pClient ) = 0;// a client just disconnected from the server
+	virtual void ClientDisconnected( int pClient ) = 0;// a client just disconnected from the server
 	
 // Client damage rules
 	virtual float FlPlayerFallDamage( CBasePlayer *pPlayer ) = 0;// this client just hit the ground after a fall. How much damage?
 	virtual bool  FPlayerCanTakeDamage( CBasePlayer *pPlayer, CBaseEntity *pAttacker, const CTakeDamageInfo &info ) {return TRUE;};// can this player take damage from this attacker?
-	virtual bool ShouldAutoAim( CBasePlayer *pPlayer, edict_t *target ) { return TRUE; }
+	virtual bool ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target ) { return TRUE; }
 	virtual float GetAutoAimScale( CBasePlayer *pPlayer ) { return 1.0f; }
 	virtual int	GetAutoAimMode()	{ return AUTOAIM_ON; }
 
@@ -410,7 +410,7 @@ public:
 
 	virtual bool ShouldDrawHeadLabels(){ return true; }
 
-	virtual void ClientSpawned( edict_t * pPlayer ) { return; }
+	virtual void ClientSpawned( int  pPlayer ) { return; }
 
 	virtual void OnFileReceived( const char * fileName, unsigned int transferID ) { return; }
 

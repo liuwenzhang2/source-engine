@@ -44,12 +44,12 @@ CON_COMMAND(soundscape_flush, "Flushes the server & client side soundscapes")
 		{
 			CBasePlayer	*pSendToPlayer = UTIL_PlayerByIndex( i );
 			if ( pSendToPlayer )
-				engine->ClientCommand( pSendToPlayer->edict(), "cl_soundscape_flush\n" );
+				engine->ClientCommand( pSendToPlayer->entindex(), "cl_soundscape_flush\n" );
 		}
 	}
 	else
 	{
-		engine->ClientCommand( pPlayer->edict(), "cl_soundscape_flush\n" );
+		engine->ClientCommand( pPlayer->entindex(), "cl_soundscape_flush\n" );
 	}
 }
 

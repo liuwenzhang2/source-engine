@@ -130,7 +130,7 @@ public:
 	CDODPlayer();
 	~CDODPlayer();
 
-	static CDODPlayer *CreatePlayer( const char *className, edict_t *ed );
+	static CDODPlayer *CreatePlayer( const char *className, int ed );
 	static CDODPlayer* Instance( int iEnt );
 
 	// This passes the event to the client's and server's CPlayerAnimState.

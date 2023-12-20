@@ -46,7 +46,28 @@ public:
 abstract_class IServerEntityList
 {
 public:
-	
+	//virtual edict_t* GetEdict(CBaseHandle hEnt) const = 0;
+	virtual int NumberOfEdicts(void) = 0;
+
+	// Get IServerNetworkable interface for specified entity
+	virtual IServerNetworkable* GetServerNetworkable(int entnum) const = 0;
+	virtual IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const = 0;
+	virtual IServerUnknown* GetServerUnknownFromHandle(CBaseHandle hEnt) const = 0;
+
+	// NOTE: This function is only a convenience wrapper.
+	// It returns GetServerNetworkable( entnum )->GetIServerEntity().
+	virtual IServerEntity* GetServerEntity(int entnum) const = 0;
+	virtual IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const = 0;
+
+	// Returns number of entities currently in use
+	virtual int					NumberOfEntities() = 0;
+
+	// Returns highest index actually used
+	//virtual int					GetHighestEntityIndex(void) = 0;
+
+	// Sizes entity list to specified size
+	//virtual void				SetMaxEntities(int maxents) = 0;
+	//virtual int					GetMaxEntities() = 0;
 };
 
 extern IServerEntityList* serverEntitylist;

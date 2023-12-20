@@ -124,9 +124,15 @@ private:
 
 public:
 	IServerNetworkable* GetServerNetworkable( CBaseHandle hEnt ) const;
+	IServerNetworkable* GetServerNetworkable(int entnum) const;
+	IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const;
+	IServerUnknown* GetServerUnknownFromHandle(CBaseHandle hEnt) const;
+	IServerEntity* GetServerEntity(int entnum) const;
+	IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const;
 	CBaseNetworkable* GetBaseNetworkable( CBaseHandle hEnt ) const;
 	CBaseEntity* GetBaseEntity( CBaseHandle hEnt ) const;
-	edict_t* GetEdict( CBaseHandle hEnt ) const;
+	CBaseEntity* GetBaseEntity(int entnum) const;
+	//edict_t* GetEdict( CBaseHandle hEnt ) const;
 	
 	int NumberOfEntities( void );
 	int NumberOfEdicts( void );
@@ -215,15 +221,15 @@ extern CGlobalEntityList<CBaseEntity> gEntList;
 //-----------------------------------------------------------------------------
 // Inlines.
 //-----------------------------------------------------------------------------
-template<class T>
-inline edict_t* CGlobalEntityList<T>::GetEdict( CBaseHandle hEnt ) const
-{
-	T *pUnk = (BaseClass::LookupEntity( hEnt ));
-	if ( pUnk )
-		return pUnk->GetNetworkable()->GetEdict();
-	else
-		return NULL;
-}
+//template<class T>
+//inline edict_t* CGlobalEntityList<T>::GetEdict( CBaseHandle hEnt ) const
+//{
+//	T *pUnk = (BaseClass::LookupEntity( hEnt ));
+//	if ( pUnk )
+//		return pUnk->GetNetworkable()->GetEdict();
+//	else
+//		return NULL;
+//}
 
 template<class T>
 inline CBaseNetworkable* CGlobalEntityList<T>::GetBaseNetworkable( CBaseHandle hEnt ) const
@@ -246,10 +252,53 @@ inline IServerNetworkable* CGlobalEntityList<T>::GetServerNetworkable( CBaseHand
 }
 
 template<class T>
+IServerNetworkable* CGlobalEntityList<T>::GetServerNetworkable(int entnum) const {
+	T* pUnk = (BaseClass::LookupEntityByNetworkIndex(entnum));
+	if (pUnk)
+		return pUnk->GetNetworkable();
+	else
+		return NULL;
+}
+
+template<class T>
+IServerNetworkable* CGlobalEntityList<T>::GetServerNetworkableFromHandle(CBaseHandle hEnt) const {
+	T* pUnk = (BaseClass::LookupEntity(hEnt));
+	if (pUnk)
+		return pUnk->GetNetworkable();
+	else
+		return NULL;
+}
+
+template<class T>
+IServerUnknown* CGlobalEntityList<T>::GetServerUnknownFromHandle(CBaseHandle hEnt) const {
+	return BaseClass::LookupEntity(hEnt);
+}
+
+template<class T>
+IServerEntity* CGlobalEntityList<T>::GetServerEntity(int entnum) const {
+	return BaseClass::LookupEntityByNetworkIndex(entnum);
+}
+
+template<class T>
+IServerEntity* CGlobalEntityList<T>::GetServerEntityFromHandle(CBaseHandle hEnt) const {
+	return BaseClass::LookupEntity(hEnt);
+}
+
+template<class T>
 inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntity( CBaseHandle hEnt ) const
 {
 	T *pUnk = (BaseClass::LookupEntity( hEnt ));
 	if ( pUnk )
+		return pUnk->GetBaseEntity();
+	else
+		return NULL;
+}
+
+template<class T>
+inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntity(int entnum) const
+{
+	T* pUnk = (BaseClass::LookupEntityByNetworkIndex(entnum));
+	if (pUnk)
 		return pUnk->GetBaseEntity();
 	else
 		return NULL;
@@ -501,12 +550,12 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityProcedural(const char* szName, CBas
 		{
 			if (pSearchingEntity)
 			{
-				return CBaseEntity::Instance(UTIL_FindClientInPVS(pSearchingEntity->edict()));
+				return UTIL_FindClientInPVS(pSearchingEntity);
 			}
 			else if (pActivator)
 			{
 				// FIXME: error condition?
-				return CBaseEntity::Instance(UTIL_FindClientInPVS(pActivator->edict()));
+				return UTIL_FindClientInPVS(pActivator);
 			}
 			else
 			{
@@ -611,7 +660,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByModel(CBaseEntity* pStartEntity, 
 			continue;
 		}
 
-		if (!ent->edict() || !ent->GetModelName())
+		if (ent->entindex()==-1 || !ent->GetModelName())
 			continue;
 
 		if (FStrEq(STRING(ent->GetModelName()), szModelName))
@@ -673,7 +722,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityInSphere(CBaseEntity* pStartEntity,
 			continue;
 		}
 
-		if (!ent->edict())
+		if (ent->entindex()==-1)
 			continue;
 
 		Vector vecRelativeCenter;
@@ -716,7 +765,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByNameNearest(const char* szName, c
 	CBaseEntity* pSearch = NULL;
 	while ((pSearch = gEntList.FindEntityByName(pSearch, szName, pSearchingEntity, pActivator, pCaller)) != NULL)
 	{
-		if (!pSearch->edict())
+		if (pSearch->entindex()==-1)
 			continue;
 
 		float flDist2 = (pSearch->GetAbsOrigin() - vecSrc).LengthSqr();
@@ -759,7 +808,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByNameWithin(CBaseEntity* pStartEnt
 
 	while ((pEntity = gEntList.FindEntityByName(pEntity, szName, pSearchingEntity, pActivator, pCaller)) != NULL)
 	{
-		if (!pEntity->edict())
+		if (pEntity->entindex()==-1)
 			continue;
 
 		float flDist2 = (pEntity->GetAbsOrigin() - vecSrc).LengthSqr();
@@ -799,7 +848,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameNearest(const char* szNa
 	CBaseEntity* pSearch = NULL;
 	while ((pSearch = gEntList.FindEntityByClassname(pSearch, szName)) != NULL)
 	{
-		if (!pSearch->edict())
+		if (pSearch->entindex()==-1)
 			continue;
 
 		float flDist2 = (pSearch->GetAbsOrigin() - vecSrc).LengthSqr();
@@ -839,7 +888,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pSta
 
 	while ((pEntity = gEntList.FindEntityByClassname(pEntity, szName)) != NULL)
 	{
-		if (!pEntity->edict())
+		if (pEntity->entindex()==-1)
 			continue;
 
 		float flDist2 = (pEntity->GetAbsOrigin() - vecSrc).LengthSqr();
@@ -872,7 +921,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pSta
 
 	while ((pEntity = gEntList.FindEntityByClassname(pEntity, szName)) != NULL)
 	{
-		if (!pEntity->edict() && !pEntity->IsEFlagSet(EFL_SERVER_ONLY))
+		if (pEntity->entindex()==-1 && !pEntity->IsEFlagSet(EFL_SERVER_ONLY))
 			continue;
 
 		// check if the aabb intersects the search aabb.
@@ -1045,7 +1094,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityNearestFacing(const Vector& origin,
 		}
 
 		// Ignore logical entities
-		if (!ent->edict())
+		if (ent->entindex()==-1)
 			continue;
 
 		// Make vector to entity
@@ -1078,7 +1127,7 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 
 	// If it's a CBaseEntity, notify the listeners.
 	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
-	if (pBaseEnt->edict())
+	if (pBaseEnt->entindex()!=-1)
 		m_iNumEdicts++;
 
 	// NOTE: Must be a CBaseEntity on server
@@ -1110,7 +1159,7 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 #endif
 
 	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
-	if (pBaseEnt->edict())
+	if (pBaseEnt->entindex()!=-1)
 		m_iNumEdicts--;
 
 	m_iNumEnts--;

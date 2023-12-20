@@ -1135,7 +1135,7 @@ bool CNPC_AntlionGuard::ShouldCharge( const Vector &startPos, const Vector &endP
 		if ( moveTrace.pObstruction != NULL )
 		{
 			// If we've hit the world, see if it's a cliff
-			if ( moveTrace.pObstruction == GetContainingEntity( INDEXENT(0) ) )
+			if ( moveTrace.pObstruction == gEntList.GetBaseEntity( 0 ) )
 			{	
 				// Can't be too far above/below the target
 				if ( fabs( moveTrace.vEndPosition.z - vecTargetPos.z ) > StepHeight() )
@@ -1445,7 +1445,7 @@ void CNPC_AntlionGuard::Shove( void )
 	Ray_t ray;
 	ray.Init( WorldSpaceCenter(), vecEnd, Vector(-16,-16,-16), Vector(16,16,16) );
 	enginetrace->TraceRay( ray, MASK_SHOT_HULL, &traceFilter, &tr );
-	pHurt = tr.m_pEnt;
+	pHurt = (CBaseEntity*)tr.m_pEnt;
 
 	// Knock things around
 	ImpactShock( tr.endpos, 100.0f, 250.0f );
@@ -2669,7 +2669,7 @@ bool CNPC_AntlionGuard::EnemyIsRightInFrontOfMe( CBaseEntity **pEntity )
 			UTIL_TraceLine( WorldSpaceCenter(), GetEnemy()->EyePosition(), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 			if ( tr.m_pEnt == GetEnemy() )
 			{
-				*pEntity = tr.m_pEnt;
+				*pEntity = (CBaseEntity*)tr.m_pEnt;
 				return true;
 			}
 		}

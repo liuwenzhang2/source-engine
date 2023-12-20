@@ -148,7 +148,7 @@ void CTripmineGrenade::MakeBeam( void )
 
 	// If I hit a living thing, send the beam through me so it turns on briefly
 	// and then blows the living thing up
-	CBaseEntity *pEntity = tr.m_pEnt;
+	CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 	CBaseCombatCharacter *pBCC  = ToBaseCombatCharacter( pEntity );
 
 	// Draw length is not the beam length if entity is in the way
@@ -210,11 +210,11 @@ void CTripmineGrenade::BeamBreakThink( void  )
 	{
 		MakeBeam( );
 		if ( tr.m_pEnt )
-			m_hOwner = tr.m_pEnt;	// reset owner too
+			m_hOwner = (CBaseEntity*)tr.m_pEnt;	// reset owner too
 	}
 
 
-	CBaseEntity *pEntity = tr.m_pEnt;
+	CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 	CBaseCombatCharacter *pBCC  = ToBaseCombatCharacter( pEntity );
 
 	if (pBCC || fabs( m_flBeamLength - tr.fraction ) > 0.001)

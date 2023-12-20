@@ -31,7 +31,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-void Host_Say( edict_t *pEdict, bool teamonly );
+void Host_Say( int pEdict, bool teamonly );
 
 ConVar sv_motd_unload_on_dismissal( "sv_motd_unload_on_dismissal", "0", 0, "If enabled, the MOTD contents will be unloaded when the player closes the MOTD." );
 
@@ -84,7 +84,7 @@ ClientPutInServer
 called each time a player is spawned into the game
 ============
 */
-void ClientPutInServer( edict_t *pEdict, const char *playername )
+void ClientPutInServer( int pEdict, const char *playername )
 {
 	// Allocate a CBaseTFPlayer for pev, and call spawn
 	CHL2MP_Player *pPlayer = CHL2MP_Player::CreatePlayer( "player", pEdict );
@@ -92,7 +92,7 @@ void ClientPutInServer( edict_t *pEdict, const char *playername )
 }
 
 
-void ClientActive( edict_t *pEdict, bool bLoadGame )
+void ClientActive( int pEdict, bool bLoadGame )
 {
 	// Can't load games in CS!
 	Assert( !bLoadGame );
@@ -124,12 +124,12 @@ const char *GetGameDescription()
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-CBaseEntity* FindEntity( edict_t *pEdict, char *classname)
+CBaseEntity* FindEntity( int pEdict, char *classname)
 {
 	// If no name was given set bits based on the picked
 	if (FStrEq(classname,"")) 
 	{
-		return (FindPickerEntityClass( static_cast<CBasePlayer*>(GetContainingEntity(pEdict)), classname ));
+		return (FindPickerEntityClass( static_cast<CBasePlayer*>(gEntList.GetBaseEntity(pEdict)), classname ));
 	}
 	return NULL;
 }

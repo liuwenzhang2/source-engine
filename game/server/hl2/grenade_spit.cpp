@@ -146,7 +146,7 @@ void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
 	// call below may cause another trace that overwrites the one global pTrace points
 	// at.
 	bool bHitWater = ( ( pTrace->contents & CONTENTS_WATER ) != 0 );
-	CBaseEntity *const pTraceEnt = pTrace->m_pEnt;
+	CBaseEntity *const pTraceEnt = (CBaseEntity*)pTrace->m_pEnt;
 	const Vector tracePlaneNormal = pTrace->plane.normal;
 
 	if ( bHitWater )

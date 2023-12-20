@@ -426,7 +426,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 				{
 					bool bIsDynamicProp = ( NULL != dynamic_cast<CDynamicProp *>( trace.m_pEnt ) );
 					bool bIsDoor = ( NULL != dynamic_cast<CBaseDoor *>( trace.m_pEnt ) );
-					if ( !bIsDynamicProp && !bIsDoor && !trace.m_pEnt->IsWorld() ) // Die on props, doors, and the world.
+					if ( !bIsDynamicProp && !bIsDoor && !((C_BaseEntity*)trace.m_pEnt)->IsWorld() ) // Die on props, doors, and the world.
 						return true;
 				}
 
@@ -512,7 +512,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 
 				if ( trace.m_pEnt )
 				{
-					data.m_hEntity = ClientEntityList().EntIndexToHandle( trace.m_pEnt->entindex() );
+					data.m_hEntity = ClientEntityList().EntIndexToHandle(((C_BaseEntity*)trace.m_pEnt)->entindex() );
 				}
 				DispatchEffect( m_pszImpactEffect, data );
 			}

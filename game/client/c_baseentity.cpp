@@ -5483,7 +5483,7 @@ CBaseEntity *FindEntityInFrontOfLocalPlayer()
 		UTIL_TraceLine( pPlayer->EyePosition(), pPlayer->EyePosition() + forward * MAX_COORD_RANGE,	MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &tr );
 		if ( tr.fraction != 1.0 && tr.DidHitNonWorldEntity() )
 		{
-			return tr.m_pEnt;
+			return (C_BaseEntity*)tr.m_pEnt;
 		}
 	}
 	return NULL;

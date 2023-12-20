@@ -24,7 +24,7 @@
 //-----------------------------------------------------------------------------
 class Vector2D;
 class CBaseEntity;
-struct edict_t;
+//struct edict_t;
 class CAI_BaseNPC;
 class CAI_Motor;
 class CAI_Navigator;

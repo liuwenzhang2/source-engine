@@ -4358,9 +4358,9 @@ int CSceneEntity::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 		{
 			int iRecipient = m_pRecipientFilter->GetRecipientIndex(i);
 
-			CBasePlayer *player = static_cast< CBasePlayer * >( CBaseEntity::Instance( iRecipient ) );
+			CBasePlayer *player = static_cast< CBasePlayer * >( gEntList.GetBaseEntity( iRecipient ) );
 
-			if ( player && player->edict() == pInfo->m_pClientEnt )
+			if ( player && player->entindex() == pInfo->m_pClientEnt )
 			{
 				bFound = true;
 				break;

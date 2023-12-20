@@ -1647,7 +1647,7 @@ void CTriggerEndSection::InputEndSection( inputdata_t &data )
 		//HACKY MCHACK - This works, but it's nasty. Alfred is going to fix a
 		//bug in gameui that prevents you from dropping to the main menu after
 		// calling disconnect.
-		 engine->ClientCommand ( pPlayer->edict(), "toggleconsole;disconnect\n");
+		 engine->ClientCommand ( pPlayer->entindex(), "toggleconsole;disconnect\n");
 	}
 
 	UTIL_Remove( this );

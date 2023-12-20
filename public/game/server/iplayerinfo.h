@@ -154,7 +154,7 @@ public:
 abstract_class IPlayerInfoManager
 {
 public:
-	virtual IPlayerInfo *GetPlayerInfo( edict_t *pEdict ) = 0;
+	virtual IPlayerInfo *GetPlayerInfo( int pEdict ) = 0;
 	virtual CGlobalVars *GetGlobalVars() = 0;
 };
 
@@ -187,9 +187,9 @@ public:
 abstract_class IBotManager
 {
 public:
-	virtual IBotController *GetBotController( edict_t *pEdict ) = 0;
+	virtual IBotController *GetBotController( int pEdict ) = 0;
 	// create a new bot and spawn it into the server
-	virtual edict_t *CreateBot( const char *botname ) = 0;
+	virtual int CreateBot( const char *botname ) = 0;
 };
 
 #endif // IPLAYERINFO_H

@@ -136,7 +136,7 @@ void CBaseHL2MPBludgeonWeapon::Hit( trace_t &traceHit, Activity nHitActivity )
 	//Do view kick
 //	AddViewKick();
 
-	CBaseEntity	*pHitEntity = traceHit.m_pEnt;
+	CBaseEntity	*pHitEntity = (CBaseEntity*)traceHit.m_pEnt;
 
 	//Apply damage to a hit target
 	if ( pHitEntity != NULL )
@@ -314,7 +314,7 @@ void CBaseHL2MPBludgeonWeapon::Swing( int bIsSecondary )
 		UTIL_TraceHull( swingStart, swingEnd, g_bludgeonMins, g_bludgeonMaxs, MASK_SHOT_HULL, pOwner, COLLISION_GROUP_NONE, &traceHit );
 		if ( traceHit.fraction < 1.0 && traceHit.m_pEnt )
 		{
-			Vector vecToTarget = traceHit.m_pEnt->GetAbsOrigin() - swingStart;
+			Vector vecToTarget = ((CBaseEntity*)traceHit.m_pEnt)->GetAbsOrigin() - swingStart;
 			VectorNormalize( vecToTarget );
 
 			float dot = vecToTarget.Dot( forward );

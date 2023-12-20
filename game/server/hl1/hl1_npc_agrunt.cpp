@@ -918,7 +918,7 @@ void CNPC_AlienGrunt::TraceAttack( const CTakeDamageInfo &info, const Vector &ve
 
 			Vector vEndPos = ptr->endpos + vecTracerDir;
 
-			UTIL_Tracer( ptr->endpos, vEndPos, ENTINDEX( edict() ) );
+			UTIL_Tracer( ptr->endpos, vEndPos, entindex() );
 		}
 
 		flDamage -= 20;

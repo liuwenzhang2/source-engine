@@ -265,7 +265,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
+	bool CSingleplayRules::ClientConnected( int pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
 	{
 		return true;
 	}
@@ -276,7 +276,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 
 	//=========================================================
 	//=========================================================
-	void CSingleplayRules::ClientDisconnected( edict_t *pClient )
+	void CSingleplayRules::ClientDisconnected( int pClient )
 	{
 	}
 

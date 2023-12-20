@@ -72,7 +72,7 @@ LINK_ENTITY_TO_CLASS( grenade_homer, CGrenadeHomer );
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-CGrenadeHomer* CGrenadeHomer::CreateGrenadeHomer( string_t sModelName, string_t sFlySound, const Vector &vecOrigin, const QAngle &vecAngles, edict_t *pentOwner )
+CGrenadeHomer* CGrenadeHomer::CreateGrenadeHomer( string_t sModelName, string_t sFlySound, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pentOwner )
 {
 	CGrenadeHomer *pGrenade = (CGrenadeHomer*)CreateEntityByName( "grenade_homer" );
 	if ( !pGrenade )
@@ -81,10 +81,10 @@ CGrenadeHomer* CGrenadeHomer::CreateGrenadeHomer( string_t sModelName, string_t 
 		return NULL;
 	}
 
-	if ( pGrenade->edict() )
+	if ( pGrenade->entindex()!=-1 )
 	{
 		pGrenade->m_sFlySound	= sFlySound;
-		pGrenade->SetOwnerEntity( Instance( pentOwner ) );
+		pGrenade->SetOwnerEntity( pentOwner );
 		pGrenade->SetLocalOrigin( vecOrigin );
 		pGrenade->SetLocalAngles( vecAngles );
 		pGrenade->SetModel( STRING(sModelName) );

@@ -16,11 +16,11 @@
 #include "ihandleentity.h"
 #include "ispatialpartition.h"
 
-#if defined( CLIENT_DLL )
-	class C_BaseEntity;
-#else
-	class CBaseEntity;
-#endif
+//#if defined( CLIENT_DLL )
+	class IHandleEntity;
+//#else
+//	class IServerEntity;
+//#endif
 
 
 //-----------------------------------------------------------------------------
@@ -48,8 +48,8 @@ public:
 	// The engine doesn't know what a CBaseEntity is, so it has a backdoor to 
 	// let it get at the edict.
 #if defined( ENGINE_DLL )
-	void SetEdict( edict_t *pEdict );
-	edict_t* GetEdict() const;
+	//void SetEdict( edict_t *pEdict );
+	//edict_t* GetEdict() const;
 #endif	
 
 
@@ -61,11 +61,11 @@ public:
 	int			hitgroup;				// 0 == generic, non-zero is specific body part
 	short		physicsbone;			// physics bone hit by trace in studio
 
-#if defined( CLIENT_DLL )
-		C_BaseEntity *m_pEnt;
-#else
-		CBaseEntity *m_pEnt;
-#endif
+//#if defined( CLIENT_DLL )
+	IHandleEntity *m_pEnt;
+//#else
+//		IServerEntity *m_pEnt;
+//#endif
 
 	// NOTE: this member is overloaded.
 	// If hEnt points at the world entity, then this is the static prop index.

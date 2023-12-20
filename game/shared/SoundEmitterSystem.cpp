@@ -445,7 +445,13 @@ public:
 
 		// Try to deduce the actor's gender
 		gender_t gender = GENDER_NONE;
-		CBaseEntity *ent = CBaseEntity::Instance( entindex );
+		CBaseEntity* ent = NULL;
+#ifdef GAME_DLL
+		ent = gEntList.GetBaseEntity(entindex);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+		ent = CBaseEntity::Instance(entindex);
+#endif // CLIENT_DLL
 		if ( ent )
 		{
 			char const *actorModel = STRING( ent->GetModelName() );
@@ -711,7 +717,7 @@ public:
 				byteflags |= CLOSE_CAPTION_FROMPLAYER;
 			}
 
-			CBaseEntity *pActor = CBaseEntity::Instance( entindex );
+			CBaseEntity *pActor = gEntList.GetBaseEntity( entindex );
 			if ( pActor )
 			{
 				char const *pszActorModel = STRING( pActor->GetModelName() );
@@ -782,7 +788,13 @@ public:
 		}
 
 		bool fromplayer = false;
-		CBaseEntity *ent = CBaseEntity::Instance( entindex );
+		CBaseEntity* ent = NULL;
+#ifdef GAME_DLL
+		ent = gEntList.GetBaseEntity(entindex);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+		ent = CBaseEntity::Instance(entindex);
+#endif // CLIENT_DLL
 		if ( ent )
 		{
 			while ( ent )
@@ -1471,7 +1483,13 @@ float CBaseEntity::GetSoundDuration( const char *soundname, char const *actormod
 void CBaseEntity::EmitCloseCaption( IRecipientFilter& filter, int entindex, char const *token, CUtlVector< Vector >& soundorigin, float duration, bool warnifmissing /*= false*/ )
 {
 	bool fromplayer = false;
-	CBaseEntity *ent = CBaseEntity::Instance( entindex );
+	CBaseEntity* ent = NULL;
+#ifdef GAME_DLL
+	ent = gEntList.GetBaseEntity(entindex);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+	ent = CBaseEntity::Instance(entindex);
+#endif // CLIENT_DLL
 	while ( ent )
 	{
 		if ( ent->IsPlayer() )

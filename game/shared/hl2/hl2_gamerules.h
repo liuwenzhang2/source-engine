@@ -41,7 +41,7 @@ public:
 	virtual bool			ShouldCollide( int collisionGroup0, int collisionGroup1 );
 	virtual bool			ShouldUseRobustRadiusDamage(CBaseEntity *pEntity);
 #ifndef CLIENT_DLL
-	virtual bool			ShouldAutoAim( CBasePlayer *pPlayer, edict_t *target );
+	virtual bool			ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target );
 	virtual float			GetAutoAimScale( CBasePlayer *pPlayer );
 	virtual float			GetAmmoQuantityScale( int iAmmoIndex );
 	virtual void			LevelInitPreEntity();

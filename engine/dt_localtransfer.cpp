@@ -10,6 +10,7 @@
 #include "dt_localtransfer.h"
 #include "mathlib/vector.h"
 #include "edict.h"
+#include "pr_edict.h"
 #include "convar.h"
 #include "con_nprint.h"
 #include "utldict.h"

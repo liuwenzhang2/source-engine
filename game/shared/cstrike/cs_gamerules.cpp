@@ -543,7 +543,7 @@ ConVar cl_autohelp(
 		{
 			CCSPlayer *entity = CCSPlayer::Instance( i );
 
-			if ( entity && !FNullEnt( entity->edict() ) )
+			if ( entity && entity->entindex()>0 )
 			{
 				if ( FStrEq( entity->GetPlayerName(), "" ) )
 					continue;
@@ -792,9 +792,9 @@ ConVar cl_autohelp(
 	//-----------------------------------------------------------------------------
 	// Purpose: Player has just spawned. Equip them.
 	//-----------------------------------------------------------------------------
-	void CCSGameRules::ClientCommandKeyValues( edict_t *pEntity, KeyValues *pKeyValues )
+	void CCSGameRules::ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues )
 	{
-		CCSPlayer *pPlayer = dynamic_cast< CCSPlayer * >( CBaseEntity::Instance( pEntity ) );
+		CCSPlayer *pPlayer = dynamic_cast< CCSPlayer * >( gEntList.GetBaseEntity( pEntity ) );
 		if ( pPlayer )
 		{
 			char const *pszCommand = pKeyValues->GetName();
@@ -890,11 +890,11 @@ ConVar cl_autohelp(
 		{
 			retval = 1.0;
 		}
-		else if (!(tr.DidHitWorld()) && (tr.m_pEnt != NULL) && (tr.m_pEnt != pEntityToIgnore) && (tr.m_pEnt->GetOwnerEntity() != pEntityToIgnore))
+		else if (!(tr.DidHitWorld()) && (tr.m_pEnt != NULL) && (tr.m_pEnt != pEntityToIgnore) && (((CBaseEntity*)tr.m_pEnt)->GetOwnerEntity() != pEntityToIgnore))
 		{
 			// if we didn't hit world geometry perhaps there's still damage to be done here.
 
-			CBaseEntity *blockingEntity = tr.m_pEnt;
+			CBaseEntity *blockingEntity = (CBaseEntity*)tr.m_pEnt;
 
 			// check to see if this part of the player is visible if entities are ignored.
 			UTIL_TraceLine(vecSrc, vecEnd, CONTENTS_SOLID, NULL, COLLISION_GROUP_NONE, &tr);
@@ -1531,7 +1531,7 @@ ConVar cl_autohelp(
 		if ( pPlayer->GetActiveWeapon() && pPlayer->IsNetClient() && !bIsBeingGivenItem )
 		{
 			// Player has an active item, so let's check cl_autowepswitch.
-			const char *cl_autowepswitch = engine->GetClientConVarValue( engine->IndexOfEdict( pPlayer->edict() ), "cl_autowepswitch" );
+			const char *cl_autowepswitch = engine->GetClientConVarValue( pPlayer->entindex(), "cl_autowepswitch" );
 			if ( cl_autowepswitch && atoi( cl_autowepswitch ) <= 0 )
 			{
 				return false;
@@ -1644,7 +1644,7 @@ ConVar cl_autohelp(
 	} 
 
 	
-	void CCSGameRules::ClientDisconnected( edict_t *pClient )
+	void CCSGameRules::ClientDisconnected( int pClient )
 	{
 		BaseClass::ClientDisconnected( pClient );
 
@@ -1653,7 +1653,7 @@ ConVar cl_autohelp(
         // [tj] Clear domination data when a player disconnects
         //=============================================================================
          
-        CCSPlayer *pPlayer = ToCSPlayer( GetContainingEntity( pClient ) );
+        CCSPlayer *pPlayer = ToCSPlayer( gEntList.GetBaseEntity(pClient) );
         if ( pPlayer )
         {
             pPlayer->RemoveNemesisRelationships();
@@ -2372,7 +2372,7 @@ ConVar cl_autohelp(
 			{
 				CCSPlayer *pPlayer = CCSPlayer::Instance( i );
 
-				if ( pPlayer && !FNullEnt( pPlayer->edict() ) )
+				if ( pPlayer && pPlayer->entindex()>0 )
 					pPlayer->Reset();
 			}
 		}
@@ -3188,7 +3188,7 @@ ConVar cl_autohelp(
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
 			CCSPlayer *pPlayer = CCSPlayer::Instance( i );
-			if ( pPlayer && !FNullEnt( pPlayer->edict() ) )
+			if ( pPlayer && pPlayer->entindex()>0 )
 			{
 				if ( pPlayer->State_Get() == STATE_ACTIVE )
 				{
@@ -3842,10 +3842,10 @@ ConVar cl_autohelp(
 				if ( pPlayer &&
 					 ( m_pVIP != pPlayer ) && 
 					 ( pPlayer->GetTeamNumber() == iTeamToSwap ) && 
-					 ( engine->GetPlayerUserId( pPlayer->edict() ) > iHighestUserID ) &&
+					 ( engine->GetPlayerUserId( pPlayer->entindex() ) > iHighestUserID ) &&
 					 ( pPlayer->State_Get() != STATE_PICKINGCLASS ) )
 					{
-						iHighestUserID = engine->GetPlayerUserId( pPlayer->edict() );
+						iHighestUserID = engine->GetPlayerUserId( pPlayer->entindex() );
 						pPlayerToSwap = pPlayer;
 					}
 			}
@@ -4636,7 +4636,7 @@ ConVar cl_autohelp(
 					CMapEntityRef &ref = g_MapEntityRefs[m_iIterator];
 					m_iIterator = g_MapEntityRefs.Next( m_iIterator );	// Seek to the next entity.
 
-					if ( ref.m_iEdict == -1 || engine->PEntityOfEntIndex( ref.m_iEdict ) )
+					if ( ref.m_iEdict == -1 || gEntList.GetBaseEntity( ref.m_iEdict ) )
 					{
 						// Doh! The entity was delete and its slot was reused.
 						// Just use any old edict slot. This case sucks because we lose the baseline.
@@ -4669,7 +4669,7 @@ ConVar cl_autohelp(
 		{
 			CCSPlayer *pPlayer = CCSPlayer::Instance( i );
 
-			if ( pPlayer && !FNullEnt( pPlayer->edict() ) )
+			if ( pPlayer && pPlayer->entindex()>0 )
 			{
 				if ( pPlayer->GetTeamNumber() == TEAM_CT )
 					continue;
@@ -5281,7 +5281,7 @@ void CCSGameRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 	pCSPlayer->m_bShowHints = true;
 	if ( pCSPlayer->IsNetClient() )
 	{
-		const char *pShowHints = engine->GetClientConVarValue( engine->IndexOfEdict( pCSPlayer->edict() ), "cl_autohelp" );
+		const char *pShowHints = engine->GetClientConVarValue( pCSPlayer->entindex(), "cl_autohelp" );
 		if ( pShowHints && atoi( pShowHints ) <= 0 )
 		{
 			pCSPlayer->m_bShowHints = false;

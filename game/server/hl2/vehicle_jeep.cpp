@@ -976,7 +976,7 @@ void CPropJeep::FireChargedCannon( void )
 	//FIXME: Use ConVars!
 	float flDamage = 15 + ( ( 250 - 15 ) * flChargeAmount );
 
-	CBaseEntity *pHit = tr.m_pEnt;
+	CBaseEntity *pHit = (CBaseEntity*)tr.m_pEnt;
 	
 	//Look for wall penetration
 	if ( tr.DidHitWorld() && !(tr.surface.flags & SURF_SKY) )

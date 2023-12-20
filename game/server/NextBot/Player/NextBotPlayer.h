@@ -48,19 +48,19 @@ T * NextBotCreatePlayerBot( const char *name, bool bReportFakeClient = true )
 	ClientPutInServerOverride( T::AllocatePlayerEntity );
 
 	// create the bot and spawn it into the environment
-	edict_t *botEdict = engine->CreateFakeClientEx( name, bReportFakeClient );
+	int botEdict = engine->CreateFakeClientEx( name, bReportFakeClient );
 
 	// close the "back door"
 	ClientPutInServerOverride( NULL );
 
-	if ( botEdict == NULL )
+	if ( !botEdict )
 	{
 		Msg( "CreatePlayerBot: Unable to create bot %s - CreateFakeClient() returned NULL.\n", name );
 		return NULL;
 	}
 
 	// create an instance of the bot's class and bind it to the edict
-	T *bot = dynamic_cast< T * >( CBaseEntity::Instance( botEdict ) );
+	T *bot = dynamic_cast< T * >( gEntList.GetBaseEntity( botEdict ) );
 
 	if ( bot == NULL )
 	{
@@ -164,7 +164,7 @@ public:
 	virtual bool IsDormantWhenDead( void ) const	{ return true; }			// should this player-bot continue to update itself when dead (respawn logic, etc)
 
 	// allocate a bot and bind it to the edict
-	static CBasePlayer *AllocatePlayerEntity( edict_t *edict, const char *playerName );
+	//static CBasePlayer *AllocatePlayerEntity( edict_t *edict, const char *playerName );
 
 	//------------------------------------------------------------------------
 	// utility methods

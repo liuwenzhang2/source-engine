@@ -17,7 +17,7 @@
 
 #include "ai_hull.h"	// For num hulls
 
-struct edict_t;
+//struct edict_t;
 
 enum Link_Info_t
 {

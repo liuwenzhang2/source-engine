@@ -282,7 +282,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 //			NDebugOverlay::Box( tr2.endpos, Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 255, 0, 0, 10 );
 //			NDebugOverlay::Box( GetAbsOrigin(), Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 0, 255, 0, 10 );
 
-			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && tr2.m_pEnt->GetMoveType() == MOVETYPE_NONE ) )
+			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && ((CBaseEntity*)tr2.m_pEnt)->GetMoveType() == MOVETYPE_NONE ) )
 			{
 				CEffectData	data;
 
@@ -655,7 +655,7 @@ void CWeaponCrossbow::FireBolt( void )
 		trace_t tr;
 		UTIL_TraceLine( vecSrc, vecSrc + vecAiming * 24.0f, MASK_SOLID, pOwner, COLLISION_GROUP_NONE, &tr );
 
-		if( tr.m_pEnt != NULL && tr.m_pEnt->Classify() == CLASS_PLAYER_ALLY_VITAL )
+		if( tr.m_pEnt != NULL && ((CBaseEntity*)tr.m_pEnt)->Classify() == CLASS_PLAYER_ALLY_VITAL )
 		{
 			// If Alyx is right in front of the player, make sure the bolt starts outside of the player's BBOX, or the bolt
 			// will instantly collide with the player after the owner of the bolt is switched to Alyx in ::BoltTouch(). We 

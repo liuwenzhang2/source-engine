@@ -667,7 +667,7 @@ void CBaseEntity::ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCu
 	VPROF( "CBaseEntity::ImpactTrace" );
 	Assert( pTrace->m_pEnt );
 
-	CBaseEntity *pEntity = pTrace->m_pEnt;
+	CBaseEntity *pEntity = (CBaseEntity*)pTrace->m_pEnt;
  
 	// Build the impact data
 	CEffectData data;
@@ -1284,7 +1284,7 @@ bool CBaseEntity::VPhysicsInitSetup()
 {
 #ifndef CLIENT_DLL
 	// don't support logical ents
-	if ( !edict() || IsMarkedForDeletion() )
+	if ( entindex()==-1 || IsMarkedForDeletion() )
 		return false;
 #endif
 
@@ -1872,14 +1872,14 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 			// Adrian: Make sure to use the currect value if we hit a vehicle the player is currently driving.
 			if ( iPlayerDamage )
 			{
-				if ( tr.m_pEnt->IsPlayer() )
+				if (((CBaseEntity*)tr.m_pEnt)->IsPlayer() )
 				{
 					flActualDamage = iPlayerDamage;
 				}
 #ifdef GAME_DLL
-				else if ( tr.m_pEnt->GetServerVehicle() )
+				else if (((CBaseEntity*)tr.m_pEnt)->GetServerVehicle() )
 				{
-					if ( tr.m_pEnt->GetServerVehicle()->GetPassenger() && tr.m_pEnt->GetServerVehicle()->GetPassenger()->IsPlayer() )
+					if (((CBaseEntity*)tr.m_pEnt)->GetServerVehicle()->GetPassenger() && ((CBaseEntity*)tr.m_pEnt)->GetServerVehicle()->GetPassenger()->IsPlayer() )
 					{
 						flActualDamage = iPlayerDamage;
 					}
@@ -1890,7 +1890,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 			int nActualDamageType = nDamageType;
 			if ( flActualDamage == 0.0 )
 			{
-				flActualDamage = g_pGameRules->GetAmmoDamage( pAttacker, tr.m_pEnt, info.m_iAmmoType );
+				flActualDamage = g_pGameRules->GetAmmoDamage( pAttacker, (CBaseEntity*)tr.m_pEnt, info.m_iAmmoType );
 			}
 			else
 			{
@@ -1905,9 +1905,9 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 				CalculateBulletDamageForce( &dmgInfo, info.m_iAmmoType, vecDir, tr.endpos );
 				dmgInfo.ScaleDamageForce( info.m_flDamageForceScale );
 				dmgInfo.SetAmmoType( info.m_iAmmoType );
-				tr.m_pEnt->DispatchTraceAttack( dmgInfo, vecDir, &tr );
+				((CBaseEntity*)tr.m_pEnt)->DispatchTraceAttack( dmgInfo, vecDir, &tr );
 			
-				if ( ToBaseCombatCharacter( tr.m_pEnt ) )
+				if ( ToBaseCombatCharacter((CBaseEntity*)tr.m_pEnt ) )
 				{
 					flCumulativeDamage += dmgInfo.GetDamage();
 				}
@@ -1938,7 +1938,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 				if ( nAmmoFlags & AMMO_FORCE_DROP_IF_CARRIED )
 				{
 					// Make sure if the player is holding this, he drops it
-					Pickup_ForcePlayerToDropThisObject( tr.m_pEnt );		
+					Pickup_ForcePlayerToDropThisObject((CBaseEntity*)tr.m_pEnt );
 				}
 #endif
 			}
@@ -1949,10 +1949,10 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 		{
 #ifdef GAME_DLL
 			surfacedata_t *psurf = physprops->GetSurfaceData( tr.surface.surfaceProps );
-			if ( ( psurf != NULL ) && ( psurf->game.material == CHAR_TEX_GLASS ) && ( tr.m_pEnt->ClassMatches( "func_breakable" ) ) )
+			if ( ( psurf != NULL ) && ( psurf->game.material == CHAR_TEX_GLASS ) && (((CBaseEntity*)tr.m_pEnt)->ClassMatches( "func_breakable" ) ) )
 			{
 				// Query the func_breakable for whether it wants to allow for bullet penetration
-				if ( tr.m_pEnt->HasSpawnFlags( SF_BREAK_NO_BULLET_PENETRATION ) == false )
+				if (((CBaseEntity*)tr.m_pEnt)->HasSpawnFlags( SF_BREAK_NO_BULLET_PENETRATION ) == false )
 				{
 					bHitGlass = true;
 				}
