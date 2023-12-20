@@ -3501,10 +3501,12 @@ void _Host_RunFrame (float time)
 			//-------------------
 			_Host_RunFrame_Sound();
 
+#ifndef DEDICATED
 			if ( g_bVCRSingleStep )
 			{
 				VCR_EnterPausedState();
 			}
+#endif
 		}
 		else
 		{

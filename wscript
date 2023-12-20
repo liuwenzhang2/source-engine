@@ -140,6 +140,7 @@ projects={
 		'tier1',
 		'tier2',
 		'tier3',
+		'vgui2/vgui_controls',
 		'vphysics',
 		'vpklib',
 		'vstdlib',
@@ -331,7 +332,7 @@ def options(opt):
 def check_deps(conf):
 	if conf.env.DEST_OS != 'win32':
 		conf.check_cc(lib='dl', mandatory=False)
-		conf.check_cc(lib='bz2', mandatory=False)
+		conf.check_cc(lib='bz2', mandatory=True)
 		conf.check_cc(lib='rt', mandatory=False)
 
 		if not conf.env.LIB_M: # HACK: already added in xcompile!
@@ -526,7 +527,7 @@ def configure(conf):
 		flags += ['-fsigned-char']
 
 	if conf.env.DEST_CPU == 'arm':
-		flags += ['-mfpu=neon-vfpv4']
+		flags += ['-march=armv7-a', '-mfpu=neon-vfpv4']
 
 	if conf.env.DEST_OS == 'freebsd':
 		linkflags += ['-lexecinfo']
@@ -550,11 +551,11 @@ def configure(conf):
 
 		if conf.options.BUILD_TYPE == 'debug':
 			linkflags += [
+				'/FORCE:MULTIPLE',
 				'/INCREMENTAL:NO',
 				'/NODEFAULTLIB:libc',
 				'/NODEFAULTLIB:libcd',
 				'/NODEFAULTLIB:libcmt',
-				'/FORCE',
 				'/LARGEADDRESSAWARE'
 			]
 		else:
