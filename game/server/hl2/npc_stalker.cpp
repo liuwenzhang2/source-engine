@@ -1018,7 +1018,7 @@ void CNPC_Stalker::DrawAttackBeam(void)
 	// --------------------------------------------
 	//  Play burn sounds
 	// --------------------------------------------
-	CBaseCombatCharacter *pBCC = ToBaseCombatCharacter( tr.m_pEnt );
+	CBaseCombatCharacter *pBCC = ToBaseCombatCharacter((CBaseEntity*)tr.m_pEnt );
 	if (pBCC)
 	{
 		if (gpGlobals->curtime > m_fNextDamageTime)
@@ -1160,7 +1160,7 @@ bool CNPC_Stalker::InnateWeaponLOSCondition( const Vector &ownerPos, const Vecto
 		return true;
 	}
 
-	CBaseEntity *pBE = tr.m_pEnt;
+	CBaseEntity *pBE = (CBaseEntity*)tr.m_pEnt;
 	CBaseCombatCharacter *pBCC = ToBaseCombatCharacter( pBE );
 	if ( pBE == GetEnemy() )
 	{

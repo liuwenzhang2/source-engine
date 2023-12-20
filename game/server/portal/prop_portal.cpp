@@ -411,7 +411,7 @@ void CProp_Portal::TestRestingSurfaceThink( void )
 		enginetrace->TraceRay( ray, MASK_SOLID_BRUSHONLY, &traceFilterPortalShot, &tr );
 
 		// This corner isn't on a valid brush (skipping phys converts or physboxes because they frequently go through portals and can't be placed upon).
-		if ( tr.fraction == 1.0f && !tr.startsolid && ( !tr.m_pEnt || ( tr.m_pEnt && !FClassnameIs( tr.m_pEnt, "func_physbox" ) && !FClassnameIs( tr.m_pEnt, "simple_physics_brush" ) ) ) )
+		if ( tr.fraction == 1.0f && !tr.startsolid && ( !tr.m_pEnt || ( tr.m_pEnt && !FClassnameIs((CBaseEntity*)tr.m_pEnt, "func_physbox" ) && !FClassnameIs((CBaseEntity*)tr.m_pEnt, "simple_physics_brush" ) ) ) )
 		{
 			DevMsg( "Surface removed from behind portal.\n" );
 			Fizzle();
@@ -1371,7 +1371,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 						DoFizzleEffect( PORTAL_FIZZLE_KILLED, false );
 						Fizzle();
 					}
-					else if ( tr.m_pEnt && tr.m_pEnt->IsMoving() )
+					else if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsMoving() )
 					{
 						DevMsg( "Surface behind portal is moving.\n" );
 

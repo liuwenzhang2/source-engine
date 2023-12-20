@@ -102,10 +102,10 @@ IMoveHelperServer* MoveHelperServer()
 // Converts the entity handle into a edict_t
 //-----------------------------------------------------------------------------
 
-static inline edict_t* GetEdict( EntityHandle_t handle )
-{
-	return gEntList.GetEdict( handle );
-}
+//static inline edict_t* GetEdict( EntityHandle_t handle )
+//{
+//	return gEntList.GetEdict( handle );
+//}
 
 
 //-----------------------------------------------------------------------------
@@ -142,11 +142,10 @@ void CMoveHelperServer::SetHost( CBasePlayer *host )
 char const* CMoveHelperServer::GetName( EntityHandle_t handle ) const
 {
 	// This ain't pertickulerly fast, but it's for debugging anyways
-	edict_t* pEdict = GetEdict(handle);
-	CBaseEntity *ent = CBaseEntity::Instance( pEdict );
+	CBaseEntity *ent = gEntList.GetBaseEntity(handle);
 	
 	// Is it the world?
-	if (ENTINDEX(pEdict) == 0)
+	if (ent->entindex() == 0)
 		return STRING(gpGlobals->mapname);
 
 	// Is it a model?
@@ -232,12 +231,8 @@ void CMoveHelperServer::ProcessImpacts( void )
 		// We should have culled negative indices by now
 		Assert( entindex.IsValid() );
 
-		edict_t* ent = GetEdict( entindex );
-		if (!ent)
-			continue;
-
 		// Run the impact function as if we had run it during movement.
-		CBaseEntity *entity = GetContainingEntity( ent );
+		CBaseEntity *entity = gEntList.GetBaseEntity(entindex);
 		if ( !entity )
 			continue;
 
@@ -247,7 +242,7 @@ void CMoveHelperServer::ProcessImpacts( void )
 			continue;
 
 		// Reconstruct trace results.
-		m_TouchList[i].trace.m_pEnt = CBaseEntity::Instance( ent );
+		m_TouchList[i].trace.m_pEnt = entity;
 
 		// Use the velocity we had when we collided, so boxes will move, etc.
 		m_pHostPlayer->SetAbsVelocity( m_TouchList[i].deltavelocity );
@@ -362,7 +357,7 @@ bool CMoveHelperServer::PlayerFallingDamage( void )
 	float flFallDamage = g_pGameRules->FlPlayerFallDamage( m_pHostPlayer );	
 	if ( flFallDamage > 0 )
 	{
-		m_pHostPlayer->TakeDamage( CTakeDamageInfo( GetContainingEntity(INDEXENT(0)), GetContainingEntity(INDEXENT(0)), flFallDamage, DMG_FALL ) ); 
+		m_pHostPlayer->TakeDamage( CTakeDamageInfo( gEntList.GetBaseEntity(0), gEntList.GetBaseEntity(0), flFallDamage, DMG_FALL ) ); 
 		StartSound( m_pHostPlayer->GetAbsOrigin(), "Player.FallDamage" );
 
         //=============================================================================
@@ -412,5 +407,5 @@ void CMoveHelperServer::PlayerSetAnimation( PLAYER_ANIM eAnim )
 
 bool CMoveHelperServer::IsWorldEntity( const CBaseHandle &handle )
 {
-	return handle == CBaseEntity::Instance( 0 );
+	return handle == gEntList.GetBaseEntity( 0 );
 }

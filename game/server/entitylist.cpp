@@ -611,11 +611,11 @@ public:
 			// Allocate a CBasePlayer for pev, and call spawn
 			if ( nPlayerIndex >= 0 )
 			{
-				edict_t *pEdict = engine->PEntityOfEntIndex( nPlayerIndex );
-				ClientPutInServer( pEdict, "unnamed" );
-				ClientActive( pEdict, false );
+				CBaseEntity *pEdict = gEntList.GetBaseEntity( nPlayerIndex );
+				ClientPutInServer(nPlayerIndex, "unnamed" );
+				ClientActive(nPlayerIndex, false );
 
-				CBasePlayer *pPlayer = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
+				CBasePlayer *pPlayer = ( CBasePlayer * )pEdict;
 				SceneManager_ClientActive( pPlayer );
 			}
 		}
@@ -676,7 +676,7 @@ public:
 			if ( !pEntity )
 				continue;
 
-			if ( pEntity->edict() )
+			if ( pEntity->entindex()!=-1 )
 				edicts++;
 
 			const char *pClassname = pEntity->GetClassname();

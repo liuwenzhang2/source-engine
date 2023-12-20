@@ -430,7 +430,7 @@ void cc_CreatePredictionError_f( const CCommand &args )
 		distance = atof(args[1]);
 	}
 
-	CBaseEntity *pEnt = CBaseEntity::Instance( 1 );
+	CBaseEntity *pEnt = gEntList.GetBaseEntity( 1 );
 	pEnt->SetAbsOrigin( pEnt->GetAbsOrigin() + Vector( distance, 0, 0 ) );
 }
 
@@ -558,7 +558,7 @@ CCSPlayer::~CCSPlayer()
 }
 
 
-CCSPlayer *CCSPlayer::CreatePlayer( const char *className, edict_t *ed )
+CCSPlayer *CCSPlayer::CreatePlayer( const char *className, int ed )
 {
 	CCSPlayer::s_PlayerEdict = ed;
 	return (CCSPlayer*)CreateEntityByName( className );
@@ -1563,7 +1563,7 @@ void CCSPlayer::UpdateMouseoverHints()
 	{
 		if (tr.DidHitNonWorldEntity() && tr.m_pEnt)
 		{
-			CBaseEntity *pObject = tr.m_pEnt;
+			CBaseEntity *pObject = (CBaseEntity*)tr.m_pEnt;
 			switch ( pObject->Classify() )
 			{
 			case CLASS_PLAYER:
@@ -2340,7 +2340,7 @@ void CCSPlayer::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, 
 		CEffectData	data;
 		data.m_vOrigin = ptr->endpos;
 		data.m_vNormal = vecDir * -1;
-		data.m_nEntIndex = ptr->m_pEnt ?  ptr->m_pEnt->entindex() : 0;
+		data.m_nEntIndex = ptr->m_pEnt ? ((CBaseEntity*)ptr->m_pEnt)->entindex() : 0;
 		data.m_flMagnitude = flDamage;
 
 		// reduce blood effect if target has armor
@@ -2443,7 +2443,7 @@ bool CCSPlayer::DoesPlayerGetRoundStartMoney()
 
 CCSPlayer* CCSPlayer::Instance( int iEnt )
 {
-	return dynamic_cast< CCSPlayer* >( CBaseEntity::Instance( INDEXENT( iEnt ) ) );
+	return dynamic_cast< CCSPlayer* >( gEntList.GetBaseEntity( iEnt ) );
 }
 
 
@@ -5168,7 +5168,7 @@ ReturnSpot:
 		else
 			Warning( "PutClientInServer: no info_player_start on level\n" );
 
-		return CBaseEntity::Instance( INDEXENT(0) );
+		return gEntList.GetBaseEntity(0);
 	}
 
 	return pSpot;
@@ -5289,7 +5289,7 @@ void CCSPlayer::State_Enter_WELCOME()
 	{
 		if ( CommandLine()->FindParm( "-makereslists" ) ) // don't show the MOTD when making reslists
 		{
-			engine->ClientCommand( edict(), "jointeam 3\n" );
+			engine->ClientCommand( entindex(), "jointeam 3\n" );
 		}
 		else
 		{
@@ -5475,7 +5475,7 @@ void CCSPlayer::State_Enter_OBSERVER_MODE()
 	int observerMode = m_iObserverLastMode;
 	if ( IsNetClient() )
 	{
-		const char *pIdealMode = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_spec_mode" );
+		const char *pIdealMode = engine->GetClientConVarValue( entindex(), "cl_spec_mode");
 		if ( pIdealMode )
 		{
 			int nIdealMode = atoi( pIdealMode );
@@ -5516,7 +5516,7 @@ void CCSPlayer::State_Enter_PICKINGCLASS()
 {
 	if ( CommandLine()->FindParm( "-makereslists" ) ) // don't show the menu when making reslists
 	{
-		engine->ClientCommand( edict(), "joinclass 0\n" );
+		engine->ClientCommand( entindex(), "joinclass 0\n" );
 		return;
 	}
 
@@ -5867,7 +5867,7 @@ void CCSPlayer::AutoBuy()
 		return;
 	}
 
-	const char *autobuyString = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_autobuy" );
+	const char *autobuyString = engine->GetClientConVarValue( entindex(), "cl_autobuy");
 	if ( !autobuyString || !*autobuyString )
 	{
 		EmitPrivateSound( "BuyPreset.AlreadyBought" );
@@ -6267,7 +6267,7 @@ void CCSPlayer::Rebuy( void )
 		return;
 	}
 
-	const char *rebuyString = engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_rebuy" );
+	const char *rebuyString = engine->GetClientConVarValue( entindex(), "cl_rebuy" );
 	if ( !rebuyString || !*rebuyString )
 	{
 		EmitPrivateSound( "BuyPreset.AlreadyBought" );
@@ -7377,7 +7377,7 @@ void CCSPlayer::ChangeName( const char *pszNewName )
 	SetPlayerName( trimmedName );
 
 	// tell engine to use new name
-	engine->ClientCommand( edict(), "name \"%s\"", trimmedName );
+	engine->ClientCommand( entindex(), "name \"%s\"", trimmedName );
 
 	// remember time of name change
 	for ( int i=NAME_CHANGE_HISTORY_SIZE-1; i>0; i-- )
@@ -7940,7 +7940,7 @@ CBaseEntity* CCSPlayer::GetNearestSurfaceBelow(float maxTrace)
 	ray.Init( traceStart, traceEnd, minExtent, maxExtent );
 	UTIL_TraceRay( ray, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 
-	return trace.m_pEnt;
+	return (CBaseEntity*)trace.m_pEnt;
 }
 
 // [tj] Added a way to react to the round ending before we reset.

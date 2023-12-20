@@ -364,7 +364,7 @@ void CCSPlayer::FireBullet(
 #if 0
 	for ( int k = 1; k <= gpGlobals->maxClients; k++ )
 	{
-		CBasePlayer *clientClass = (CBasePlayer *)CBaseEntity::Instance( k );
+		CBasePlayer *clientClass = (CBasePlayer *)gEntList.GetBaseEntity( k );
 
 		if ( clientClass == NULL )
 			 continue;
@@ -432,7 +432,7 @@ void CCSPlayer::FireBullet(
 			UTIL_ClipTraceToPlayers( vecSrc, vecEnd + vecDir * rayExtension, CS_MASK_SHOOT|CONTENTS_HITBOX, &filter, &tr );
 		}
 
-		lastPlayerHit = ToBasePlayer(tr.m_pEnt);
+		lastPlayerHit = ToBasePlayer((CBaseEntity*)tr.m_pEnt);
 
 		if ( tr.fraction == 1.0f )
 			break; // we didn't hit anything, stop tracing shoot
@@ -483,9 +483,9 @@ void CCSPlayer::FireBullet(
 			// draw red client impact markers
 			debugoverlay->AddBoxOverlay( tr.endpos, Vector(-2,-2,-2), Vector(2,2,2), QAngle( 0, 0, 0), 255,0,0,127, 4 );
 
-			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
+			if ( tr.m_pEnt && ((C_BaseEntity*)tr.m_pEnt)->IsPlayer() )
 			{
-				C_BasePlayer *player = ToBasePlayer( tr.m_pEnt );
+				C_BasePlayer *player = ToBasePlayer((C_BaseEntity*)tr.m_pEnt );
 				player->DrawClientHitboxes( 4, true );
 			}
 		}
@@ -495,9 +495,9 @@ void CCSPlayer::FireBullet(
 			// draw blue server impact markers
 			NDebugOverlay::Box( tr.endpos, Vector(-2,-2,-2), Vector(2,2,2), 0,0,255,127, 4 );
 
-			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
+			if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() )
 			{
-				CBasePlayer *player = ToBasePlayer( tr.m_pEnt );
+				CBasePlayer *player = ToBasePlayer((CBaseEntity*)tr.m_pEnt );
 				player->DrawServerHitboxes( 4, true );
 			}
 		}
@@ -548,7 +548,7 @@ void CCSPlayer::FireBullet(
 				// Don't decal nodraw surfaces
 				if ( !( tr.surface.flags & (SURF_SKY|SURF_NODRAW|SURF_HINT|SURF_SKIP) ) )
 				{
-					CBaseEntity *pEntity = tr.m_pEnt;
+					CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 					if ( !( !friendlyfire.GetBool() && pEntity && pEntity->GetTeamNumber() == GetTeamNumber() ) )
 					{
 						UTIL_ImpactTrace( &tr, iDamageType );
@@ -568,7 +568,7 @@ void CCSPlayer::FireBullet(
 		// add them to the iPenetrationKills count
 		//=============================================================================
 		
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 
 		CTakeDamageInfo info( pevAttacker, pevAttacker, fCurrentDamage, iDamageType );
 		CalculateBulletDamageForce( &info, iBulletType, vecDir, tr.endpos );

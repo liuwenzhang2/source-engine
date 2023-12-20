@@ -83,7 +83,7 @@ public:
 	CHL2_Player();
 	~CHL2_Player( void );
 	
-	static CHL2_Player *CreatePlayer( const char *className, edict_t *ed )
+	static CHL2_Player *CreatePlayer( const char *className, int ed )
 	{
 		CHL2_Player::s_PlayerEdict = ed;
 		return (CHL2_Player*)CreateEntityByName( className );

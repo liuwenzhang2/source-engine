@@ -171,7 +171,7 @@ int CNPC_Houndeye::RangeAttack1Conditions ( float flDot, float flDist )
 					MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
 	if (tr.startsolid)
 	{
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		if (pEntity->Classify() == CLASS_ALIEN_MONSTER)
 		{
 			return( COND_NONE );
@@ -865,7 +865,8 @@ int CNPC_Houndeye::TranslateSchedule( int scheduleType )
 		{
 			if ( m_NPCState == NPC_STATE_COMBAT )
 			{
-				if ( !FNullEnt( UTIL_FindClientInPVS( edict() ) ) )
+				CBaseEntity* pEnt = UTIL_FindClientInPVS(this);
+				if (pEnt!=NULL && pEnt->entindex()>0)
 				{
 					// client in PVS
 					return SCHED_HOUND_COMBAT_FAIL_PVS;

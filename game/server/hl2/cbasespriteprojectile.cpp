@@ -31,7 +31,7 @@ END_DATADESC()
 void CBaseSpriteProjectile::Spawn(	char *pszModel,
 								const Vector &vecOrigin,
 								const Vector &vecVelocity,
-								edict_t *pOwner,
+								CBaseEntity *pOwner,
 								MoveType_t	iMovetype,
 								MoveCollide_t nMoveCollide,
 								int	iDamage,
@@ -53,7 +53,7 @@ void CBaseSpriteProjectile::Spawn(	char *pszModel,
 	UTIL_SetOrigin( this, vecOrigin );
 	SetAbsVelocity( vecVelocity );
 
-	SetOwnerEntity( Instance( pOwner ) );
+	SetOwnerEntity( pOwner );
 
 	m_hIntendedTarget.Set( pIntendedTarget );
 

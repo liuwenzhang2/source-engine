@@ -494,7 +494,7 @@ bool CBaseCombatCharacter::FVisibleThroughPortal( const CProp_Portal *pPortal, C
 
 		if (ppBlocker)
 		{
-			*ppBlocker = tr.m_pEnt;
+			*ppBlocker = (CBaseEntity*)tr.m_pEnt;
 		}
 
 		return false;// Line of sight is not established
@@ -2559,7 +2559,7 @@ void CBaseCombatCharacter::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways 
 
 	BaseClass::SetTransmit( pInfo, bAlways );
 
-	bool bLocalPlayer = ( pInfo->m_pClientEnt == edict() );
+	bool bLocalPlayer = ( pInfo->m_pClientEnt == entindex() );
 
 	if ( bLocalPlayer )
 	{

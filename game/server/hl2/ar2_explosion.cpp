@@ -36,7 +36,7 @@ AR2Explosion* AR2Explosion::CreateAR2Explosion(const Vector &pos)
 	if(pEnt)
 	{
 		AR2Explosion *pEffect = dynamic_cast<AR2Explosion*>(pEnt);
-		if(pEffect && pEffect->edict())
+		if(pEffect && pEffect->entindex()!=-1)
 		{
 			pEffect->SetLocalOrigin( pos );
 			pEffect->Activate();

@@ -262,7 +262,7 @@ void CGrenadeFrag::VPhysicsUpdate( IPhysicsObject *pPhysics )
 		VectorNormalize(dir);
 		// send a tiny amount of damage so the character will react to getting bonked
 		CTakeDamageInfo info( this, GetThrower(), pPhysics->GetMass() * vel, GetAbsOrigin(), 0.1f, DMG_CRUSH );
-		tr.m_pEnt->TakeDamage( info );
+		((CBaseEntity*)tr.m_pEnt)->TakeDamage( info );
 
 		// reflect velocity around normal
 		vel = -2.0f * tr.plane.normal * DotProduct(vel,tr.plane.normal) + vel;

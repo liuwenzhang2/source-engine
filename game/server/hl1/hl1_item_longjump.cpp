@@ -50,7 +50,7 @@ public:
 				WRITE_STRING( STRING(m_iClassname) );
 			MessageEnd();
 
-			UTIL_EmitSoundSuit( pHL1Player->edict(), "!HEV_A1" );	// Play the longjump sound UNDONE: Kelly? correct sound?
+			UTIL_EmitSoundSuit( pHL1Player, "!HEV_A1" );	// Play the longjump sound UNDONE: Kelly? correct sound?
 			return true;		
 		}
 		return false;

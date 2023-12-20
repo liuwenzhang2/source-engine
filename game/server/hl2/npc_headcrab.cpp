@@ -2203,7 +2203,7 @@ bool CBaseHeadcrab::ValidBurrowPoint( const Vector &point )
 	// See if we were able to get there
 	if ( ( tr.startsolid ) || ( tr.allsolid ) || ( tr.fraction < 1.0f ) )
 	{
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 
 		//If it's a physics object, attempt to knock is away, unless it's a car
 		if ( ( pEntity ) && ( pEntity->VPhysicsGetObject() ) && ( pEntity->GetServerVehicle() == NULL ) )

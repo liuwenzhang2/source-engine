@@ -638,7 +638,7 @@ void CNPC_Apache::LaunchRocket( Vector &viewDir, int damage, int radius, Vector 
 	CGrenadeHomer *pGrenade = CGrenadeHomer::CreateGrenadeHomer( 
 		MAKE_STRING("models/weapons/w_missile.mdl"), 
 		MAKE_STRING( "Apache.RPG" ), 
-		vecLaunchPoint, vec3_angle, edict() );
+		vecLaunchPoint, vec3_angle, this );
 	pGrenade->Spawn( );
 	pGrenade->SetHoming(MISSILE_HOMING_STRENGTH, MISSILE_HOMING_DELAY,
 						MISSILE_HOMING_RAMP_UP,	MISSILE_HOMING_DURATION,

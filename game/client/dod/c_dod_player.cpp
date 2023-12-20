@@ -1476,7 +1476,7 @@ void C_DODPlayer::UpdateIDTarget()
 	C_BaseEntity *pEntity = NULL;
 	if ( !tr.startsolid && tr.DidHitNonWorldEntity() )
 	{
-		pEntity = tr.m_pEnt;
+		pEntity = (C_BaseEntity*)tr.m_pEnt;
 
 		if ( pEntity && (pEntity != this) )
 		{

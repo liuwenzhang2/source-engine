@@ -324,7 +324,7 @@ extern void SpawnEntityByName( const char *className, CEntityMapData *mapData = 
 // calls the spawn functions for an entity
 extern int DispatchSpawn( CBaseEntity *pEntity );
 
-inline CBaseEntity *GetContainingEntity( edict_t *pent );
+//inline CBaseEntity *GetContainingEntity( edict_t *pent );
 
 //-----------------------------------------------------------------------------
 // Purpose: think contexts
@@ -541,8 +541,8 @@ public:
 	virtual const char	*GetTracerType( void );
 
 	// returns a pointer to the entities edict, if it has one.  should be removed!
-	inline edict_t			*edict( void )			{ return NetworkProp()->edict(); }
-	inline const edict_t	*edict( void ) const	{ return NetworkProp()->edict(); }
+	//inline edict_t			*edict( void )			{ return NetworkProp()->edict(); }
+	//inline const edict_t	*edict( void ) const	{ return NetworkProp()->edict(); }
 	inline int				entindex( ) const		{ return m_Network.entindex(); };
 	inline int				GetSoundSourceIndex() const		{ return entindex(); }
 
@@ -752,8 +752,8 @@ public:
 
 	// Why do we have two separate static Instance functions?
 	static CBaseEntity *Instance( const CBaseHandle &hEnt );
-	static CBaseEntity *Instance( const edict_t *pent );
-	static CBaseEntity *Instance( edict_t *pent );
+	//static CBaseEntity *Instance( const edict_t *pent );
+	//static CBaseEntity *Instance( edict_t *pent );
 	static CBaseEntity* Instance( int iEnt );
 
 	// Think function handling
@@ -987,7 +987,7 @@ public:
 
 	// UNDONE: Do these three functions actually need to be virtual???
 	virtual bool	CanStandOn( CBaseEntity *pSurface ) const { return (pSurface && !pSurface->IsStandable()) ? false : true; }
-	virtual bool	CanStandOn( edict_t	*ent ) const { return CanStandOn( GetContainingEntity( ent ) ); }
+	//virtual bool	CanStandOn( edict_t	*ent ) const { return CanStandOn( GetContainingEntity( ent ) ); }
 	virtual CBaseEntity		*GetEnemy( void ) { return NULL; }
 	virtual CBaseEntity		*GetEnemy( void ) const { return NULL; }
 
@@ -1497,7 +1497,7 @@ public:
 	void					PhysicsStepRecheckGround();
 	// Computes the water level + type
 	void					UpdateWaterState();
-	bool					IsEdictFree() const { return edict()->IsFree(); }
+	//bool					IsEdictFree() const { return edict()->IsFree(); }
 
 	// Callbacks for the physgun/cannon picking up an entity
 	virtual	CBasePlayer		*HasPhysicsAttacker( float dt ) { return NULL; }
@@ -1872,15 +1872,15 @@ EXTERN_SEND_TABLE(DT_BaseEntity);
 #endif
 
 // handling entity/edict transforms
-inline CBaseEntity *GetContainingEntity( edict_t *pent )
-{
-	if ( pent && pent->GetUnknown() )
-	{
-		return pent->GetUnknown()->GetBaseEntity();
-	}
-
-	return NULL;
-}
+//inline CBaseEntity *GetContainingEntity( edict_t *pent )
+//{
+//	if ( pent && pent->GetUnknown() )
+//	{
+//		return pent->GetUnknown()->GetBaseEntity();
+//	}
+//
+//	return NULL;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Pauses or resumes entity i/o events. When paused, no outputs will
@@ -2319,25 +2319,6 @@ inline void CBaseEntity::IncrementLocalTime( float flTimeDelta )
 inline float CBaseEntity::GetMoveDoneTime( ) const
 {
 	return (m_flMoveDoneTime >= 0) ? m_flMoveDoneTime - GetLocalTime() : -1;
-}
-
-inline CBaseEntity *CBaseEntity::Instance( const edict_t *pent )
-{
-	return GetContainingEntity( const_cast<edict_t*>(pent) );
-}
-
-inline CBaseEntity *CBaseEntity::Instance( edict_t *pent ) 
-{ 
-	if ( !pent )
-	{
-		pent = INDEXENT(0);
-	}
-	return GetContainingEntity( pent );
-}
-
-inline CBaseEntity* CBaseEntity::Instance( int iEnt )
-{
-	return Instance( INDEXENT( iEnt ) );
 }
 
 inline int CBaseEntity::GetWaterLevel() const

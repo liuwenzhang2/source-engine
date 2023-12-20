@@ -478,7 +478,7 @@ bool CAI_PassengerBehavior::FindGroundAtPosition( const Vector &in, float flUpDe
 	}
 
 	// Must have ended up with feet on the ground
-	if ( tr.DidHitWorld() || ( tr.m_pEnt && tr.m_pEnt->IsStandable() ) )
+	if ( tr.DidHitWorld() || ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsStandable() ) )
 	{
 		// Debug
 		if ( passenger_debug_transition.GetBool() )

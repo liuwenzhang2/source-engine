@@ -43,7 +43,7 @@ public:
 	CHL2MP_Player();
 	~CHL2MP_Player( void );
 	
-	static CHL2MP_Player *CreatePlayer( const char *className, edict_t *ed )
+	static CHL2MP_Player *CreatePlayer( const char *className, int ed )
 	{
 		CHL2MP_Player::s_PlayerEdict = ed;
 		return (CHL2MP_Player*)CreateEntityByName( className );

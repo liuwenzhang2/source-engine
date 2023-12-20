@@ -592,7 +592,7 @@ CSpriteTrail *CSpriteTrail::SpriteTrailCreate( const char *pSpriteName, const Ve
 
 int CSpriteTrail::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 {
-	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+	CBaseEntity *pRecipientEntity = gEntList.GetBaseEntity( pInfo->m_pClientEnt );
 
 	Assert( pRecipientEntity->IsPlayer() );
 

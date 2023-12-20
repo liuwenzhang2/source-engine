@@ -17,7 +17,7 @@
 #include "in_buttons.h"
 #include "movehelper_server.h"
 
-void ClientPutInServer( edict_t *pEdict, const char *playername );
+void ClientPutInServer( int pEdict, const char *playername );
 void Bot_Think( CDODPlayer *pBot );
 
 ConVar bot_forcefireweapon( "bot_forcefireweapon", "", 0, "Force bots with the specified weapon to fire." );
@@ -73,7 +73,7 @@ CBasePlayer *BotPutInServer( bool bFrozen, int iTeam, int iClass )
 	Q_snprintf( botname, sizeof( botname ), "Bot%02i", BotNumber );
 
 	// This is an evil hack, but we use it to prevent sv_autojointeam from kicking in.
-	edict_t *pEdict = engine->CreateFakeClient( botname );
+	int pEdict = engine->CreateFakeClient( botname );
 
 	if (!pEdict)
 	{
@@ -204,7 +204,7 @@ void Bot_Think( CDODPlayer *pBot )
 	// Make sure we stay being a bot
 	pBot->AddFlag( FL_FAKECLIENT );
 
-	botdata_t *botdata = &g_BotData[ ENTINDEX( pBot->edict() ) - 1 ];
+	botdata_t *botdata = &g_BotData[ pBot->entindex() - 1 ];
 
 	QAngle vecViewAngles;
 	float forwardmove = 0.0;

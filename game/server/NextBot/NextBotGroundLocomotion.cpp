@@ -505,7 +505,7 @@ bool NextBotGroundLocomotion::DetectCollision( trace_t *pTrace, int &recursionLi
 	// bust through "flimsy" breakables and keep on going
 	if ( pTrace->DidHitNonWorldEntity() && pTrace->m_pEnt != NULL )
 	{
-		CBaseEntity *other = pTrace->m_pEnt;
+		CBaseEntity *other = (CBaseEntity*)pTrace->m_pEnt;
 
 		if ( !other->MyCombatCharacterPointer() && IsEntityTraversable( other, IMMEDIATELY ) /*&& IsFlimsy( other )*/ )
 		{
@@ -526,9 +526,9 @@ bool NextBotGroundLocomotion::DetectCollision( trace_t *pTrace, int &recursionLi
 
 	/// @todo Only invoke OnContact() and Touch() once per collision pair
 	// inform other components of collision
-	if ( GetBot()->ShouldTouch( pTrace->m_pEnt ) )
+	if ( GetBot()->ShouldTouch( (CBaseEntity*)pTrace->m_pEnt ) )
 	{
-		GetBot()->OnContact( pTrace->m_pEnt, pTrace );
+		GetBot()->OnContact((CBaseEntity*)pTrace->m_pEnt, pTrace );
 	}
 
 	INextBot *them = dynamic_cast< INextBot * >( pTrace->m_pEnt );
@@ -539,7 +539,7 @@ bool NextBotGroundLocomotion::DetectCollision( trace_t *pTrace, int &recursionLi
 	}
 	else
 	{
-		pTrace->m_pEnt->Touch( GetBot()->GetEntity() );
+		((CBaseEntity*)pTrace->m_pEnt)->Touch( GetBot()->GetEntity() );
 	}
 
 	return true;
@@ -626,7 +626,7 @@ Vector NextBotGroundLocomotion::ResolveCollision( const Vector &from, const Vect
 
 			nPosture = body->GetDesiredPosture();
 
-			if ( !trace.m_pEnt->MyNextBotPointer() && !trace.m_pEnt->IsPlayer() )
+			if ( !((CBaseEntity*)trace.m_pEnt)->MyNextBotPointer() && !((CBaseEntity*)trace.m_pEnt)->IsPlayer() )
 			{
 				// Here, our standing trace hit the world or something non-breakable
 				// If we're not currently crouching, then see if we could travel
@@ -674,16 +674,16 @@ Vector NextBotGroundLocomotion::ResolveCollision( const Vector &from, const Vect
 		{
 			// stuck inside solid; don't move
 
-			if ( trace.m_pEnt && !trace.m_pEnt->IsWorld() )
+			if ( trace.m_pEnt && !((CBaseEntity*)trace.m_pEnt)->IsWorld() )
 			{
 				// only ignore physics props that are not doors
 				if ( dynamic_cast< CPhysicsProp * >( trace.m_pEnt ) != NULL && dynamic_cast< CBasePropDoor * >( trace.m_pEnt ) == NULL )
 				{
-					IPhysicsObject *physics = trace.m_pEnt->VPhysicsGetObject();
+					IPhysicsObject *physics = ((CBaseEntity*)trace.m_pEnt)->VPhysicsGetObject();
 					if ( physics && physics->IsMoveable() )
 					{
 						// we've intersected a (likely moving) physics prop - ignore it for awhile so we can move out of it
-						m_ignorePhysicsProp = trace.m_pEnt;
+						m_ignorePhysicsProp = (CBaseEntity*)trace.m_pEnt;
 						m_ignorePhysicsPropTimer.Start( 1.0f );
 					}
 				}
@@ -988,7 +988,7 @@ void NextBotGroundLocomotion::UpdateGroundConstraint( void )
 			// too steep to be ground - treat it like a wall hit
 			if ( ( m_velocity.x * ground.plane.normal.x + m_velocity.y * ground.plane.normal.y ) <= 0.0f )
 			{
-				GetBot()->OnContact( ground.m_pEnt, &ground );			
+				GetBot()->OnContact((CBaseEntity*)ground.m_pEnt, &ground );
 			}
 			
 			// we're contacting some kind of ground
@@ -1011,9 +1011,9 @@ void NextBotGroundLocomotion::UpdateGroundConstraint( void )
 		}
 		
 		// inform other components of collision if we didn't land on the 'world'
-		if ( ground.m_pEnt && !ground.m_pEnt->IsWorld() )
+		if ( ground.m_pEnt && !((CBaseEntity*)ground.m_pEnt)->IsWorld() )
 		{
-			GetBot()->OnContact( ground.m_pEnt, &ground );
+			GetBot()->OnContact((CBaseEntity*)ground.m_pEnt, &ground );
 		}
 
 		// snap us to the ground 
@@ -1022,14 +1022,14 @@ void NextBotGroundLocomotion::UpdateGroundConstraint( void )
 		if ( !IsOnGround() )
 		{
 			// just landed
-			m_nextBot->SetGroundEntity( ground.m_pEnt );
-			m_ground = ground.m_pEnt;
+			m_nextBot->SetGroundEntity((CBaseEntity*)ground.m_pEnt );
+			m_ground = (CBaseEntity*)ground.m_pEnt;
 
 			// landing stops any jump in progress
 			m_isJumping = false;
 			m_isJumpingAcrossGap = false;
 
-			GetBot()->OnLandOnGround( ground.m_pEnt );
+			GetBot()->OnLandOnGround((CBaseEntity*)ground.m_pEnt );
 		}
 	}
 	else

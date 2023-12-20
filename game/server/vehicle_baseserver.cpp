@@ -1381,7 +1381,7 @@ int CBaseServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAll
 		if ( tr.fraction != 1.0 )
 		{
 #ifdef HL2_EPISODIC
-			if ( ShouldVehicleIgnoreEntity( GetVehicleEnt(), tr.m_pEnt ) == false )
+			if ( ShouldVehicleIgnoreEntity( GetVehicleEnt(), (CBaseEntity*)tr.m_pEnt ) == false )
 #endif //HL2_EPISODIC
 			{
 				if ( g_debug_vehicleexit.GetBool() )

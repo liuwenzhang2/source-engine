@@ -278,7 +278,7 @@ void CNPC_Bullseye::DecalTrace( trace_t *pOldTrace, char const *decalName )
 
 	CBroadcastRecipientFilter filter;
 	te->Decal( filter, 0.0, &pNewTrace.endpos, &pNewTrace.startpos,
-		ENTINDEX( pNewTrace.m_pEnt ), pNewTrace.hitbox, index );
+		((CBaseEntity*)pNewTrace.m_pEnt )->entindex(), pNewTrace.hitbox, index);
 }
 
 //-----------------------------------------------------------------------------
@@ -297,7 +297,7 @@ void CNPC_Bullseye::ImpactTrace( trace_t *pTrace, int iDamageType, const char *p
 	trace_t pNewTrace;
 	AI_TraceLine(vStartTrace, vEndTrace, MASK_SHOT, this, COLLISION_GROUP_NONE, &pNewTrace);
 
-	CBaseEntity	*pEntity = pNewTrace.m_pEnt;
+	CBaseEntity	*pEntity = (CBaseEntity*)pNewTrace.m_pEnt;
 
 	// Only do this for BSP model entities
 	if ( ( pEntity ) && ( pEntity->IsBSPModel() == false ) )

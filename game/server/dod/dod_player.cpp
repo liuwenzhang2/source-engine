@@ -379,7 +379,7 @@ CDODPlayer::~CDODPlayer()
 }
 
 
-CDODPlayer *CDODPlayer::CreatePlayer( const char *className, edict_t *ed )
+CDODPlayer *CDODPlayer::CreatePlayer( const char *className, int ed )
 {
 	CDODPlayer::s_PlayerEdict = ed;
 	return (CDODPlayer*)CreateEntityByName( className );
@@ -1441,7 +1441,7 @@ void CDODPlayer::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir,
 		data.m_vNormal = vecDir * -1;
 		data.m_flScale = 4;
 		data.m_fFlags = FX_BLOODSPRAY_ALL;
-		data.m_nEntIndex = ptr->m_pEnt ?  ptr->m_pEnt->entindex() : 0;
+		data.m_nEntIndex = ptr->m_pEnt ? ((CBaseEntity*)ptr->m_pEnt)->entindex() : 0;
 		data.m_flMagnitude = flDamage;
 
 		DispatchEffect( "dodblood", data );
@@ -3010,7 +3010,7 @@ CBaseEntity* CDODPlayer::EntSelectSpawnPoint()
 	case TEAM_UNASSIGNED:
 	default:
 		{
-			pSpot = CBaseEntity::Instance( INDEXENT(0) );
+			pSpot = gEntList.GetBaseEntity(0);
 		}
 		break;		
 	}
@@ -3018,7 +3018,7 @@ CBaseEntity* CDODPlayer::EntSelectSpawnPoint()
 	if ( !pSpot )
 	{
 		Warning( "PutClientInServer: no valid spawns on level\n" );
-		return CBaseEntity::Instance( INDEXENT(0) );
+		return gEntList.GetBaseEntity(0);
 	}
 
 	return pSpot;
@@ -4001,7 +4001,7 @@ CBaseEntity *CDODPlayer::FindUseEntity()
 
 	// try the hit entity if there is one, or the ground entity if there isn't.
 	CBaseEntity *pNearest = NULL;
-	CBaseEntity *pObject = tr.m_pEnt;
+	CBaseEntity *pObject = (CBaseEntity*)tr.m_pEnt;
 	
 	// UNDONE: Might be faster to just fold this range into the sphere query
 	int count = 0;
@@ -4014,7 +4014,7 @@ CBaseEntity *CDODPlayer::FindUseEntity()
 		Vector down = forward - tangents[count]*up;
 		VectorNormalize(down);
 		UTIL_TraceHull( searchCenter, searchCenter + down * 72, -Vector(16,16,16), Vector(16,16,16), useableContents, this, COLLISION_GROUP_NONE, &tr );
-		pObject = tr.m_pEnt;
+		pObject = (CBaseEntity*)tr.m_pEnt;
 		count++;
 	}
 	float nearestDot = CONE_90_DEGREES;

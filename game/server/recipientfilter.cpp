@@ -384,7 +384,7 @@ void CPASAttenuationFilter::Filter( const Vector& origin, float attenuation /*= 
 	{
 		int index = GetRecipientIndex( i );
 
-		CBaseEntity *ent = CBaseEntity::Instance( index );
+		CBaseEntity *ent = gEntList.GetBaseEntity( index );
 		if ( !ent || !ent->IsPlayer() )
 		{
 			Assert( 0 );

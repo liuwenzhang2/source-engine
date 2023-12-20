@@ -352,7 +352,7 @@ bool CTriggerBrush::PassesInputFilter( CBaseEntity *pOther, int filter )
 		return false;
 
 	// NPCs
-	if ( (filter & TRIGGER_IGNORENPCS) && pOther->edict() && (pOther->GetFlags() & FL_NPC) )
+	if ( (filter & TRIGGER_IGNORENPCS) && pOther->entindex()!=-1 && (pOther->GetFlags() & FL_NPC) )
 		return false;
 
 	// pushables

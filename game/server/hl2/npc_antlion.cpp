@@ -1950,7 +1950,7 @@ bool CNPC_Antlion::IsJumpLegal( const Vector &startPos, const Vector &apex, cons
 		
 		if ( tr.m_pEnt )
 		{
-			CAI_BaseNPC *pBlocker = tr.m_pEnt->MyNPCPointer();
+			CAI_BaseNPC *pBlocker = ((CBaseEntity*)tr.m_pEnt)->MyNPCPointer();
 
 			if ( pBlocker && pBlocker->Classify() == CLASS_ANTLION )
 			{
@@ -2887,7 +2887,7 @@ int CNPC_Antlion::MeleeAttack1Conditions( float flDot, float flDist )
 	AI_TraceHull( WorldSpaceCenter(), GetEnemy()->WorldSpaceCenter(), -Vector(8,8,8), Vector(8,8,8), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
 
 	// If the hit entity isn't our target and we don't hate it, don't hit it
-	if ( tr.m_pEnt != GetEnemy() && tr.fraction < 1.0f && IRelationType( tr.m_pEnt ) != D_HT )
+	if ( tr.m_pEnt != GetEnemy() && tr.fraction < 1.0f && IRelationType((CBaseEntity*)tr.m_pEnt ) != D_HT )
 		return 0;
 
 #else
@@ -3182,7 +3182,7 @@ bool CNPC_Antlion::ValidBurrowPoint( const Vector &point )
 	//See if we were able to get there
 	if ( ( tr.startsolid ) || ( tr.allsolid ) || ( tr.fraction < 1.0f ) )
 	{
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 
 		//If it's a physics object, attempt to knock is away, unless it's a car
 		if ( ( pEntity ) && ( pEntity->VPhysicsGetObject() ) && ( pEntity->GetServerVehicle() == NULL ) )

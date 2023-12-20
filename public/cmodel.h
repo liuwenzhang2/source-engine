@@ -17,7 +17,7 @@
 #include "tier0/dbg.h"
 #include "basehandle.h"
 
-struct edict_t;
+//struct edict_t;
 struct model_t;
 
 /*

@@ -112,7 +112,7 @@ public:
 	void InputTeleportToPathTrack( inputdata_t &inputdata );
 	void InputSetSpeedForwardModifier( inputdata_t &inputdata );
 
-	static CFuncTrackTrain *Instance( edict_t *pent );
+	//static CFuncTrackTrain *Instance( edict_t *pent );
 
 #ifdef TF_DLL
 	int UpdateTransmitState()

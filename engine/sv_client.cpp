@@ -188,7 +188,7 @@ bool CGameClient::ProcessMove(CLC_Move *msg)
 
 	serverGameClients->ProcessUsercmds
 	( 
-		edict,					// Player edict
+		m_nEntityIndex,					// Player edict
 		&msg->m_DataIn,
 		msg->m_nNewCommands,
 		totalcmds,							// Commands in packet
@@ -227,7 +227,7 @@ bool CGameClient::ProcessVoiceData( CLC_VoiceData *msg )
 
 bool CGameClient::ProcessCmdKeyValues( CLC_CmdKeyValues *msg )
 {
-	serverGameClients->ClientCommandKeyValues( edict, msg->GetKeyValues() );
+	serverGameClients->ClientCommandKeyValues( m_nEntityIndex, msg->GetKeyValues() );
 	return true;
 }
 
@@ -236,7 +236,7 @@ bool CGameClient::ProcessRespondCvarValue( CLC_RespondCvarValue *msg )
 	if ( msg->m_iCookie > 0 )
 	{
 		if ( g_pServerPluginHandler )
-			g_pServerPluginHandler->OnQueryCvarValueFinished( msg->m_iCookie, edict, msg->m_eStatusCode, msg->m_szCvarName, msg->m_szCvarValue );
+			g_pServerPluginHandler->OnQueryCvarValueFinished( msg->m_iCookie, m_nEntityIndex, msg->m_eStatusCode, msg->m_szCvarName, msg->m_szCvarValue );
 	}
 	else
 	{
@@ -363,7 +363,7 @@ void CGameClient::Connect( const char * szName, int nUserID, INetChannel *pNetCh
 	edict = EDICT_NUM( m_nEntityIndex );
 	
 	// init PackInfo
-	m_PackInfo.m_pClientEnt = edict;
+	m_PackInfo.m_pClientEnt = m_nEntityIndex;
 	m_PackInfo.m_nPVSSize = sizeof( m_PackInfo.m_PVS );
 				
 	// fire global game event - server only
@@ -396,7 +396,7 @@ void CGameClient::SetupPackInfo( CFrameSnapshot *pSnapshot )
 {
 	// Compute Vis for each client
 	m_PackInfo.m_nPVSSize = (GetCollisionBSPData()->numclusters + 7) / 8;
-	serverGameClients->ClientSetupVisibility( (edict_t *)m_pViewEntity,
+	serverGameClients->ClientSetupVisibility( m_pViewEntity,
 		m_PackInfo.m_pClientEnt, m_PackInfo.m_PVS, m_PackInfo.m_nPVSSize );
 
 	// This is the frame we are creating, i.e., the next
@@ -519,7 +519,7 @@ void CGameClient::UpdateUserSettings()
 	// Give entity dll a chance to look at the changes.
 	// Do this after CBaseClient::UpdateUserSettings() so name changes like prepending a (1)
 	// take effect before the server dll sees the name.
-	g_pServerPluginHandler->ClientSettingsChanged( edict );
+	g_pServerPluginHandler->ClientSettingsChanged( m_nEntityIndex );
 }
 
 
@@ -875,7 +875,7 @@ bool CGameClient::CheckConnect( void )
 	char szRejectReason[128];
 	Q_strncpy( szRejectReason, "Connection rejected by game\n", sizeof( szRejectReason ) );
 
-	if ( !g_pServerPluginHandler->ClientConnect( edict, m_Name, m_NetChannel->GetAddress(), szRejectReason, sizeof( szRejectReason ) ) )
+	if ( !g_pServerPluginHandler->ClientConnect( m_nEntityIndex, m_Name, m_NetChannel->GetAddress(), szRejectReason, sizeof( szRejectReason ) ) )
 	{
 		// Reject the connection and drop the client.
 		Disconnect( szRejectReason, m_Name );
@@ -898,16 +898,16 @@ void CGameClient::ActivatePlayer( void )
 
 		COM_TimestampedLog( "g_pServerPluginHandler->ClientPutInServer" );
 
-		g_pServerPluginHandler->ClientPutInServer( edict, m_Name );
+		g_pServerPluginHandler->ClientPutInServer( m_nEntityIndex, m_Name );
 	}
 
     COM_TimestampedLog( "g_pServerPluginHandler->ClientActive" );
 
-	g_pServerPluginHandler->ClientActive( edict, sv.m_bLoadgame );
+	g_pServerPluginHandler->ClientActive( m_nEntityIndex, sv.m_bLoadgame );
 
 	COM_TimestampedLog( "g_pServerPluginHandler->ClientSettingsChanged" );
 
-	g_pServerPluginHandler->ClientSettingsChanged( edict );
+	g_pServerPluginHandler->ClientSettingsChanged( m_nEntityIndex );
 
 	COM_TimestampedLog( "GetTestScriptMgr()->CheckPoint" );
 
@@ -994,7 +994,7 @@ void CGameClient::SpawnPlayer( void )
 	{
 		// set up the edict
 		Assert( serverGameEnts );
-		serverGameEnts->FreeContainingEntity( edict );
+		serverGameEnts->FreeContainingEntity( edict->m_EdictIndex );
 		InitializeEntityDLLFields( edict );
 		
 	}
@@ -1012,7 +1012,7 @@ void CGameClient::SpawnPlayer( void )
 	CBaseClient::SpawnPlayer();
 
 	// notify that the player is spawning
-	serverGameClients->ClientSpawned( edict );
+	serverGameClients->ClientSpawned( m_nEntityIndex );
 }
 
 CClientFrame *CGameClient::GetDeltaFrame( int nTick )
@@ -1028,7 +1028,7 @@ CClientFrame *CGameClient::GetDeltaFrame( int nTick )
 	{
 		int followEntity; 
 
-		serverGameClients->GetReplayDelay( edict, followEntity );
+		serverGameClients->GetReplayDelay( m_nEntityIndex, followEntity );
 
 		Assert( followEntity > 0 );
 
@@ -1052,7 +1052,7 @@ void CGameClient::WriteViewAngleUpdate()
 		return;
 
 	Assert( serverGameClients );
-	CPlayerState *pl = serverGameClients->GetPlayerState( edict );
+	CPlayerState *pl = serverGameClients->GetPlayerState( m_nEntityIndex );
 	Assert( pl );
 
 	if ( pl && pl->fixangle != FIXANGLE_NONE	 )
@@ -1163,7 +1163,7 @@ bool CGameClient::ExecuteStringCommand( const char *pCommandString )
 	}
 	else
 	{
-		g_pServerPluginHandler->ClientCommand( edict, args ); // TODO pass client id and string
+		g_pServerPluginHandler->ClientCommand( m_nEntityIndex, args ); // TODO pass client id and string
 	}
 
 	return true;
@@ -1378,7 +1378,7 @@ CClientFrame *CGameClient::GetSendFrame()
 			
 	int followEntity;
 
-	int delayTicks = serverGameClients->GetReplayDelay( edict, followEntity );
+	int delayTicks = serverGameClients->GetReplayDelay( m_nEntityIndex, followEntity );
 
 	bool isInReplayMode = ( delayTicks > 0 );
 

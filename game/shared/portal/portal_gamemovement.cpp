@@ -728,7 +728,7 @@ CBaseHandle CPortalGameMovement::TestPlayerPosition( const Vector& pos, int coll
 		return pm.m_pEnt->GetRefEHandle();
 	}
 #ifndef CLIENT_DLL
-	else if ( pm.startsolid && pm.m_pEnt && CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pm.m_pEnt ) )
+	else if ( pm.startsolid && pm.m_pEnt && CPSCollisionEntity::IsPortalSimulatorCollisionEntity((CBaseEntity*)pm.m_pEnt ) )
 	{
 		// Stuck in a portal environment object, so unstick them!
 		CPortal_Player *pPortalPlayer = (CPortal_Player *)((CBaseEntity *)mv->m_nPlayerHandle.Get());

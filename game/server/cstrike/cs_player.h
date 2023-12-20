@@ -242,7 +242,7 @@ public:
 	CCSPlayer();
 	~CCSPlayer();
 
-	static CCSPlayer *CreatePlayer( const char *className, edict_t *ed );
+	static CCSPlayer *CreatePlayer( const char *className, int ed );
 	static CCSPlayer* Instance( int iEnt );
 
 	virtual void		Precache();

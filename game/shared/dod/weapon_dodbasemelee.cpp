@@ -129,7 +129,7 @@ CBaseEntity *CWeaponDODBaseMelee::MeleeAttack( int iDamageAmount, int iDamageTyp
 		{
 			// Calculate the point of intersection of the line (or hull) and the object we hit
 			// This is and approximation of the "best" intersection
-			CBaseEntity *pHit = tr.m_pEnt;
+			CBaseEntity *pHit = (CBaseEntity*)tr.m_pEnt;
 			if ( !pHit || pHit->IsBSPModel() )
 				FindHullIntersection( vecSrc, tr, VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, pPlayer );
 			vecEnd = tr.endpos;	// This is the point on the actual surface (the hull could have hit space)
@@ -157,7 +157,7 @@ CBaseEntity *CWeaponDODBaseMelee::MeleeAttack( int iDamageAmount, int iDamageTyp
 
 	bool bDoStrongAttack = false;
 
-	if ( bDidHit && tr.m_pEnt->IsPlayer() && tr.m_pEnt->m_takedamage != DAMAGE_YES )
+	if ( bDidHit && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() && ((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_YES )
 	{
 		bDidHit = 0;	// still play the animation, we just dont attempt to damage this player
 	}
@@ -168,7 +168,7 @@ CBaseEntity *CWeaponDODBaseMelee::MeleeAttack( int iDamageAmount, int iDamageTyp
 		m_trHit = tr;
 
 		// Store the ent in an EHANDLE, just in case it goes away by the time we get into our think function.
-		m_pTraceHitEnt = tr.m_pEnt; 
+		m_pTraceHitEnt = (CBaseEntity*)tr.m_pEnt;
 
 		m_iSmackDamage = iDamageAmount;
 		m_iSmackDamageType = iDamageType;
@@ -176,14 +176,14 @@ CBaseEntity *CWeaponDODBaseMelee::MeleeAttack( int iDamageAmount, int iDamageTyp
 		m_flSmackTime = gpGlobals->curtime + flDmgDelay;
 
 		int iOwnerTeam = pPlayer->GetTeamNumber();
-		int iVictimTeam = tr.m_pEnt->GetTeamNumber();
+		int iVictimTeam = ((CBaseEntity*)tr.m_pEnt)->GetTeamNumber();
 
 		// do the mega attack if its a player, and we would do damage
-		if ( tr.m_pEnt->IsPlayer() &&
-			tr.m_pEnt->m_takedamage == DAMAGE_YES && 
+		if (((CBaseEntity*)tr.m_pEnt)->IsPlayer() &&
+			((CBaseEntity*)tr.m_pEnt)->m_takedamage == DAMAGE_YES &&
 			( iVictimTeam != iOwnerTeam || ( iVictimTeam == iOwnerTeam && friendlyfire.GetBool() ) ) )
 		{
-			CDODPlayer *pVictim = ToDODPlayer( tr.m_pEnt );
+			CDODPlayer *pVictim = ToDODPlayer((CBaseEntity*)tr.m_pEnt );
 
 			Vector victimForward;
 			AngleVectors( pVictim->GetAbsAngles(), &victimForward );
@@ -233,5 +233,5 @@ CBaseEntity *CWeaponDODBaseMelee::MeleeAttack( int iDamageAmount, int iDamageTyp
 	lagcompensation->FinishLagCompensation( pPlayer );
 #endif	//CLIENT_DLL
 
-	return tr.m_pEnt;
+	return (CBaseEntity*)tr.m_pEnt;
 }

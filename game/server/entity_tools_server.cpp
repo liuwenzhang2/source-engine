@@ -308,11 +308,7 @@ void CServerTools::RemoveEntityImmediate( CBaseEntity *pEntity )
 
 CBaseEntity *CServerTools::GetBaseEntityByEntIndex( int iEntIndex )
 {
-	edict_t *pEdict = INDEXENT( iEntIndex );
-	if ( pEdict )
-		return CBaseEntity::Instance( pEdict );
-	else
-		return NULL;
+	return gEntList.GetBaseEntity(iEntIndex);
 }
 
 IEntityFactoryDictionary *CServerTools::GetEntityFactoryDictionary( void )
@@ -500,7 +496,7 @@ public:
 
 	virtual void ReloadSceneFromDisk( int entindex )
 	{
-		CBaseEntity *ent = CBaseEntity::Instance( entindex );
+		CBaseEntity *ent = gEntList.GetBaseEntity( entindex );
 		if ( !ent )
 			return;
 

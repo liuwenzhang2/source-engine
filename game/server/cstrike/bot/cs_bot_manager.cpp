@@ -80,7 +80,7 @@ void RemoveBotControl( void )
 
 
 //--------------------------------------------------------------------------------------------------------------
-CBasePlayer* ClientPutInServerOverride_Bot( edict_t *pEdict, const char *playername )
+CBasePlayer* ClientPutInServerOverride_Bot( int pEdict, const char *playername )
 {
 	CBasePlayer *pPlayer = TheBots->AllocateAndBindBotEntity( pEdict );
 	if ( pPlayer )
@@ -1345,7 +1345,7 @@ void CCSBotManager::ExtractScenarioData( void )
 	int i;
 	for( i=1; i<gpGlobals->maxEntities; ++i )
 	{
-		entity = CBaseEntity::Instance( engine->PEntityOfEntIndex( i ) );
+		entity = gEntList.GetBaseEntity( i );
 
 		if (entity == NULL)
 			continue;
@@ -1416,7 +1416,7 @@ void CCSBotManager::ExtractScenarioData( void )
 	if (m_zoneCount == 0 && m_gameScenario == SCENARIO_RESCUE_HOSTAGES)
 	{
 		for( entity = gEntList.FindEntityByClassname( NULL, "info_player_start" );
-			 entity && !FNullEnt( entity->edict() );
+			 entity && entity->entindex()>0;
 			 entity = gEntList.FindEntityByClassname( entity, "info_player_start" ) )
 		{
 			if (m_zoneCount < MAX_ZONES)

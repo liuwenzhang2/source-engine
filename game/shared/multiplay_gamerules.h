@@ -130,9 +130,9 @@ public:
 	// If ClientConnected returns FALSE, the connection is rejected and the user is provided the reason specified in
 	//  svRejectReason
 	// Only the client's name and remote address are provided to the dll for verification.
-	virtual bool ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen );
+	virtual bool ClientConnected( int pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen );
 	virtual void InitHUD( CBasePlayer *pl );		// the client dll is ready for updating
-	virtual void ClientDisconnected( edict_t *pClient );
+	virtual void ClientDisconnected( int pClient );
 
 // Client damage rules
 	virtual float FlPlayerFallDamage( CBasePlayer *pPlayer );
@@ -221,7 +221,7 @@ public:
 
 	void SkipNextMapInCycle();
 
-	virtual void	ClientCommandKeyValues( edict_t *pEntity, KeyValues *pKeyValues );
+	virtual void	ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues );
 
 public:
 

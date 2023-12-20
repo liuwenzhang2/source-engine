@@ -362,7 +362,7 @@ void CWeapon_SLAM::TripmineAttach( void )
 	
 	if (tr.fraction < 1.0)
 	{
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		if (pEntity && !(pEntity->GetFlags() & FL_CONVEYOR))
 		{
 
@@ -415,7 +415,7 @@ void CWeapon_SLAM::StartTripmineAttach( void )
 	{
 		// ALERT( at_console, "hit %f\n", tr.flFraction );
 
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		if (pEntity && !(pEntity->GetFlags() & FL_CONVEYOR))
 		{
 			// player "shoot" animation
@@ -556,7 +556,7 @@ void CWeapon_SLAM::SatchelAttach( void )
 	
 	if (tr.fraction < 1.0)
 	{
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		if (pEntity && !(pEntity->GetFlags() & FL_CONVEYOR))
 		{
 			QAngle angles;
@@ -602,7 +602,7 @@ void CWeapon_SLAM::StartSatchelAttach( void )
 	
 	if (tr.fraction < 1.0)
 	{
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		if (pEntity && !(pEntity->GetFlags() & FL_CONVEYOR))
 		{
 			// Only the player fires this way so we can cast
@@ -724,7 +724,7 @@ bool CWeapon_SLAM::CanAttachSLAM( void )
 		// Don't attach to a living creature
 		if (tr.m_pEnt)
 		{
-			CBaseEntity *pEntity = tr.m_pEnt;
+			CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 			CBaseCombatCharacter *pBCC		= ToBaseCombatCharacter( pEntity );
 			if (pBCC)
 			{

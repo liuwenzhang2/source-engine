@@ -24,7 +24,7 @@ class CSaveRestoreData;
 class CSaveRestoreSegment;
 class CGameSaveRestoreInfo;
 struct typedescription_t;
-struct edict_t;
+//struct edict_t;
 struct datamap_t;
 class CBaseEntity;
 struct interval_t;
@@ -111,7 +111,7 @@ public:
 	void			WriteFunction( datamap_t *pMap, const char *pname, inputfunc_t **value, int count = 1 ); // Save a function pointer
 
 	void			WriteEntityPtr( const char *pname, CBaseEntity **ppEntity, int count = 1 );
-	void			WriteEdictPtr( const char *pname, edict_t **ppEdict, int count = 1 );
+	//void			WriteEdictPtr( const char *pname, edict_t **ppEdict, int count = 1 );
 	void			WriteEHandle( const char *pname, const EHANDLE *pEHandle, int count = 1 );
 
 	virtual void	WriteTime( const float *value, int count = 1 );	// Save a float (timevalue)
@@ -120,7 +120,7 @@ public:
 	virtual void	WritePositionVector( const Vector *value, int count = 1 );	// array of pos vectors
 
 	virtual void	WriteEntityPtr( CBaseEntity **ppEntity, int count = 1 );
-	virtual void	WriteEdictPtr( edict_t **ppEdict, int count = 1 );
+	//virtual void	WriteEdictPtr( edict_t **ppEdict, int count = 1 );
 	virtual void	WriteEHandle( const EHANDLE *pEHandle, int count = 1 );
 	void			WriteVMatrixWorldspace( const char *pname, const VMatrix *value, int count = 1 );	       // Save a vmatrix array
 	void			WriteVMatrixWorldspace( const VMatrix *value, int count = 1 );	       // Save a vmatrix array
@@ -165,7 +165,7 @@ private:
 	//
 	
 	bool			WriteGameField( const char *pname, void *pData, datamap_t *pRootMap, typedescription_t *pField );
-	int				EntityIndex( const edict_t *pentLookup );
+	//int				EntityIndex( const edict_t *pentLookup );
 	
 	//---------------------------------
 	
@@ -251,7 +251,7 @@ public:
 	int				ReadFunction( datamap_t *pMap, inputfunc_t **pValue, int count = 1, int nBytesAvailable = 0);
 	
 	int 			ReadEntityPtr( CBaseEntity **ppEntity, int count = 1, int nBytesAvailable = 0 );
-	int				ReadEdictPtr( edict_t **ppEdict, int count = 1, int nBytesAvailable = 0 );
+	//int				ReadEdictPtr( edict_t **ppEdict, int count = 1, int nBytesAvailable = 0 );
 	int				ReadEHandle( EHANDLE *pEHandle, int count = 1, int nBytesAvailable = 0 );
 	int				ReadVMatrixWorldspace( VMatrix *pValue, int count = 1, int nBytesAvailable = 0);
 	int				ReadMatrix3x4Worldspace( matrix3x4_t *pValue, int nElems = 1, int nBytesAvailable = 0 );

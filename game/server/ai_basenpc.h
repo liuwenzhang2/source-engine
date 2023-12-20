@@ -3030,10 +3030,10 @@ inline const QAngle &CAI_Component::GetLocalAngles( void ) const
 
 //-----------------------------------------------------------------------------
 
-inline edict_t *CAI_Component::GetEdict()
-{
-	return GetOuter()->NetworkProp()->edict();
-}
+//inline edict_t *CAI_Component::GetEdict()
+//{
+//	return GetOuter()->NetworkProp()->edict();
+//}
 
 //-----------------------------------------------------------------------------
 

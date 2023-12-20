@@ -403,7 +403,7 @@ void CServerPlugin::LevelInit(	char const *pMapName,
 
 }
 
-void CServerPlugin::ServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
+void CServerPlugin::ServerActivate( IServerEntity *pEdictList, int edictCount, int clientMax )
 {
 	MDLCACHE_COARSE_LOCK_(g_pMDLCache);
 	FORALL_PLUGINS
@@ -436,7 +436,7 @@ void CServerPlugin::LevelShutdown( void )
 }
 
 
-void CServerPlugin::ClientActive( edict_t *pEntity, bool bLoadGame )
+void CServerPlugin::ClientActive( int pEntity, bool bLoadGame )
 {
 	FORALL_PLUGINS
 	{
@@ -446,7 +446,7 @@ void CServerPlugin::ClientActive( edict_t *pEntity, bool bLoadGame )
 	serverGameClients->ClientActive( pEntity, bLoadGame );
 }
 
-void CServerPlugin::ClientDisconnect( edict_t *pEntity )
+void CServerPlugin::ClientDisconnect( int pEntity )
 {
 	FORALL_PLUGINS
 	{
@@ -456,7 +456,7 @@ void CServerPlugin::ClientDisconnect( edict_t *pEntity )
 	serverGameClients->ClientDisconnect( pEntity );
 }
 
-void CServerPlugin::ClientPutInServer( edict_t *pEntity, char const *playername )
+void CServerPlugin::ClientPutInServer( int pEntity, char const *playername )
 {
 	FORALL_PLUGINS
 	{
@@ -476,7 +476,7 @@ void CServerPlugin::SetCommandClient( int index )
 	serverGameClients->SetCommandClient( index );
 }
 
-void CServerPlugin::ClientSettingsChanged( edict_t *pEdict )
+void CServerPlugin::ClientSettingsChanged( int pEdict )
 {
 	FORALL_PLUGINS
 	{
@@ -486,7 +486,7 @@ void CServerPlugin::ClientSettingsChanged( edict_t *pEdict )
 	serverGameClients->ClientSettingsChanged( pEdict );
 }
 
-bool CServerPlugin::ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
+bool CServerPlugin::ClientConnect( int pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
 {
 	PLUGIN_RESULT result = PLUGIN_CONTINUE;
 	bool bAllowConnect = true, bSavedRetVal = true, bRetValOverridden = false;
@@ -512,7 +512,7 @@ bool CServerPlugin::ClientConnect( edict_t *pEntity, const char *pszName, const 
 	return bRetValOverridden ? bSavedRetVal : bAllowConnect;
 }
 
-void CServerPlugin::ClientCommand( edict_t *pEntity, const CCommand &args )
+void CServerPlugin::ClientCommand( int pEntity, const CCommand &args )
 {
 	PLUGIN_RESULT result = PLUGIN_CONTINUE;
 	FORALL_PLUGINS
@@ -528,10 +528,10 @@ void CServerPlugin::ClientCommand( edict_t *pEntity, const CCommand &args )
 	serverGameClients->ClientCommand( pEntity, args );
 }
 
-QueryCvarCookie_t CServerPlugin::StartQueryCvarValue( edict_t *pEntity, const char *pCvarName )
+QueryCvarCookie_t CServerPlugin::StartQueryCvarValue( int pEntity, const char *pCvarName )
 {
 	// Figure out which client they're talking about.
-	int clientnum = NUM_FOR_EDICT( pEntity );
+	int clientnum = pEntity;
 	if (clientnum < 1 || clientnum > sv.GetClientCount() )
 	{
 		Warning( "StartQueryCvarValue: Invalid entity\n" );
@@ -558,7 +558,7 @@ void CServerPlugin::NetworkIDValidated( const char *pszUserName, const char *psz
 	}
 }
 
-void CServerPlugin::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue )
+void CServerPlugin::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, int pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue )
 {
 	FORALL_PLUGINS
 	{
@@ -606,7 +606,7 @@ void CServerPlugin::OnEdictFreed( const edict_t *edict )
 //---------------------------------------------------------------------------------
 // Purpose: creates a VGUI menu on a clients screen
 //---------------------------------------------------------------------------------
-void  CServerPlugin::CreateMessage( edict_t *pEntity, DIALOG_TYPE type, KeyValues *data, IServerPluginCallbacks *plugin )
+void  CServerPlugin::CreateMessage( int pEntity, DIALOG_TYPE type, KeyValues *data, IServerPluginCallbacks *plugin )
 {
 	if ( !pEntity )
 	{
@@ -632,7 +632,7 @@ void  CServerPlugin::CreateMessage( edict_t *pEntity, DIALOG_TYPE type, KeyValue
 		return;
 	}
 
-	int clientnum = NUM_FOR_EDICT( pEntity );
+	int clientnum = pEntity;
 	if (clientnum < 1 || clientnum > sv.GetClientCount() )
 	{
 		ConMsg( "Invalid entity\n" );
@@ -645,9 +645,9 @@ void  CServerPlugin::CreateMessage( edict_t *pEntity, DIALOG_TYPE type, KeyValue
 	client->SendNetMsg( menu );
 }
 
-void CServerPlugin::ClientCommand( edict_t *pEntity, const char *cmd )
+void CServerPlugin::ClientCommand( int pEntity, const char *cmd )
 {
-	int entnum = NUM_FOR_EDICT( pEntity );
+	int entnum = pEntity;
 	
 	if ( ( entnum < 1 ) || ( entnum >  sv.GetClientCount() ) )
 	{

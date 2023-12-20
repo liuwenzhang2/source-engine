@@ -660,11 +660,11 @@ void CMissile::SeekThink( void )
 //
 // Output : CMissile
 //-----------------------------------------------------------------------------
-CMissile *CMissile::Create( const Vector &vecOrigin, const QAngle &vecAngles, edict_t *pentOwner = NULL )
+CMissile *CMissile::Create( const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pentOwner = NULL )
 {
 	//CMissile *pMissile = (CMissile *)CreateEntityByName("rpg_missile" );
-	CMissile *pMissile = (CMissile *) CBaseEntity::Create( "rpg_missile", vecOrigin, vecAngles, CBaseEntity::Instance( pentOwner ) );
-	pMissile->SetOwnerEntity( Instance( pentOwner ) );
+	CMissile *pMissile = (CMissile *) CBaseEntity::Create( "rpg_missile", vecOrigin, vecAngles, pentOwner );
+	pMissile->SetOwnerEntity( pentOwner );
 	pMissile->Spawn();
 	pMissile->AddEffects( EF_NOSHADOW );
 	
@@ -1463,7 +1463,7 @@ void CWeaponRPG::PrimaryAttack( void )
 	QAngle vecAngles;
 	VectorAngles( vForward, vecAngles );
 
-	CMissile *pMissile = CMissile::Create( muzzlePoint, vecAngles, GetOwner()->edict() );
+	CMissile *pMissile = CMissile::Create( muzzlePoint, vecAngles, GetOwner() );
 	pMissile->m_hOwner = this;
 
 	// If the shot is clear to the player, give the missile a grace period
@@ -1768,7 +1768,7 @@ void CWeaponRPG::UpdateLaserPosition( Vector vecMuzzlePos, Vector vecEndPos )
 				
 		if ( tr.DidHitNonWorldEntity() )
 		{
-			CBaseEntity *pHit = tr.m_pEnt;
+			CBaseEntity *pHit = (CBaseEntity*)tr.m_pEnt;
 
 			if ( ( pHit != NULL ) && ( pHit->m_takedamage ) )
 			{

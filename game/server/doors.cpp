@@ -155,7 +155,7 @@ void PlayLockSounds(CBaseEntity *pEdict, locksound_t *pls, int flocked, int fbut
 			// play next 'door locked' sentence in group
 			int iprev = pls->iLockedSentence;
 			
-			pls->iLockedSentence = SENTENCEG_PlaySequentialSz(	pEdict->edict(), 
+			pls->iLockedSentence = SENTENCEG_PlaySequentialSz(	pEdict, 
 																STRING(pls->sLockedSentence), 
 																0.85f, 
 																SNDLVL_NORM, 
@@ -202,7 +202,7 @@ void PlayLockSounds(CBaseEntity *pEdict, locksound_t *pls, int flocked, int fbut
 		{
 			int iprev = pls->iUnlockedSentence;
 			
-			pls->iUnlockedSentence = SENTENCEG_PlaySequentialSz(pEdict->edict(), STRING(pls->sUnlockedSentence), 
+			pls->iUnlockedSentence = SENTENCEG_PlaySequentialSz(pEdict, STRING(pls->sUnlockedSentence), 
 					  0.85, SNDLVL_NORM, 0, 100, pls->iUnlockedSentence, FALSE);
 			pls->iLockedSentence = 0;
 
@@ -940,7 +940,7 @@ int CBaseDoor::DoorActivate( )
 //-----------------------------------------------------------------------------
 void CBaseDoor::DoorGoUp( void )
 {
-	edict_t	*pevActivator;
+	//edict_t	*pevActivator;
 
 	UpdateAreaPortals( true );
 	// It could be going-down, if blocked.
@@ -966,7 +966,7 @@ void CBaseDoor::DoorGoUp( void )
 
 		if ( m_hActivator != NULL )
 		{
-			pevActivator = m_hActivator->edict();
+			//pevActivator = m_hActivator->edict();
 			
 			if ( !HasSpawnFlags( SF_DOOR_ONEWAY ) && m_vecMoveAng.y ) 		// Y axis rotation, move away from the player
 			{

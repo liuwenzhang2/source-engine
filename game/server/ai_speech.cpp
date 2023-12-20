@@ -477,7 +477,7 @@ bool CAI_Expresser::SpeakDispatchResponse( AIConcept_t concept, AI_Response *res
 
 		if ( result->IsApplyContextToWorld() )
 		{
-			CBaseEntity *pEntity = CBaseEntity::Instance( engine->PEntityOfEntIndex( 0 ) );
+			CBaseEntity *pEntity = gEntList.GetBaseEntity( 0 ) ;
 			if ( pEntity )
 			{
 				pEntity->AddContext( result->GetContext() );
@@ -633,7 +633,7 @@ int CAI_Expresser::SpeakRawSentence( const char *pszSentence, float delay, float
 	}
 	else
 	{
-		sentenceIndex = SENTENCEG_PlayRndSz( GetOuter()->NetworkProp()->edict(), pszSentence, volume, soundlevel, 0, GetVoicePitch() );
+		sentenceIndex = SENTENCEG_PlayRndSz( GetOuter(), pszSentence, volume, soundlevel, 0, GetVoicePitch() );
 	}
 
 	SpeechMsg( GetOuter(), "SpeakRawSentence( %s, %f) %f\n", pszSentence, delay, engine->SentenceLength( sentenceIndex ) );

@@ -18,7 +18,7 @@
 #include "tier1/utlhash.h"
 
 #include <string_t.h> // NULL_STRING define
-struct edict_t;
+//struct edict_t;
 
 
 #ifdef EHANDLE_H // not available to engine
@@ -92,7 +92,7 @@ struct levellist_t
 
 	char	mapName[ MAX_MAP_NAME_SAVE ];
 	char	landmarkName[ 32 ];
-	edict_t	*pentLandmark;
+	CBaseEntity	*pentLandmark;
 	Vector	vecLandmarkOrigin;
 };
 

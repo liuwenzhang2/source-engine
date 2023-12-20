@@ -966,17 +966,17 @@ void CNPC_CombineGunship::ManageWarningBeam( void )
 			{
 				CTakeDamageInfo	info( this, this, 1.0f, DMG_ENERGYBEAM );
 
-				Vector vTargetDir = tr.m_pEnt->BodyTarget( tr.endpos, false ) - tr.endpos;
+				Vector vTargetDir = ((CBaseEntity*)tr.m_pEnt)->BodyTarget( tr.endpos, false ) - tr.endpos;
 
 				VectorNormalize( vTargetDir );
 
 				info.SetDamagePosition( tr.endpos + ( tr.plane.normal * 64.0f ) );
 				info.SetDamageForce( vTargetDir * 100 );
 
-				if ( tr.m_pEnt->m_takedamage != DAMAGE_NO )
+				if (((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_NO )
 				{
 					// Deal damage
-					tr.m_pEnt->TakeDamage( info );
+					((CBaseEntity*)tr.m_pEnt)->TakeDamage( info );
 				}
 			}
 
@@ -1133,7 +1133,7 @@ void CNPC_CombineGunship::DoGroundAttackExplosion( void )
 	CEffectData	data;
 
 	// Do an extra effect if we struck the world
-	if ( tr.m_pEnt && tr.m_pEnt->IsWorld() )
+	if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsWorld() )
 	{
 		data.m_flRadius = GUNSHIP_BELLY_BLAST_RADIUS;
 		data.m_vNormal	= tr.plane.normal;

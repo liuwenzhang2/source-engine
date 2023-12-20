@@ -34,7 +34,7 @@ public:
 	void Spawn(	char *pszModel,
 									const Vector &vecOrigin,
 									const Vector &vecVelocity,
-									edict_t *pOwner,
+									CBaseEntity *pOwner,
 									MoveType_t	iMovetype,
 									MoveCollide_t nMoveCollide,
 									int	iDamage,

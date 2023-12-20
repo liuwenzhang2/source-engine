@@ -28,8 +28,9 @@
 
 class ServerClass;
 class SendTable;
-struct edict_t;
+//struct edict_t;
 class CBaseEntity;
+class IServerEntity;
 class CSerialEntity;
 class CBaseNetworkable;
 
@@ -37,7 +38,7 @@ class CBaseNetworkable;
 class CCheckTransmitInfo
 {
 public:
-	edict_t	*m_pClientEnt;	// pointer to receiver edict
+	int		m_pClientEnt;	// pointer to receiver edict
 	byte	m_PVS[PAD_NUMBER( MAX_MAP_CLUSTERS,8 ) / 8];
 	int		m_nPVSSize;		// PVS size in bytes
 
@@ -93,7 +94,7 @@ public:
 	// Tell the engine which class this object is.
 	virtual ServerClass*	GetServerClass() = 0;
 
-	virtual edict_t			*GetEdict() const = 0;
+	//virtual edict_t			*GetEdict() const = 0;
 
 	virtual const char*		GetClassName() const = 0;
 	virtual void			Release() = 0;

@@ -754,7 +754,7 @@ CON_COMMAND( hammer_update_entity, "Updates the entity's position/angles when in
 
 		if ( tr.DidHit() && !tr.DidHitWorld() )
 		{
-			NWCEdit::UpdateEntityPosition( tr.m_pEnt );
+			NWCEdit::UpdateEntityPosition( (CBaseEntity*)tr.m_pEnt );
 		}
 	}
 	else

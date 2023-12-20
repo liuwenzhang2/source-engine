@@ -145,7 +145,7 @@ CBaseEntity *CPortal_Player::FindUseEntity()
 	UTIL_TraceLine( searchCenter, searchCenter + forward * 1024, useableContents, this, COLLISION_GROUP_NONE, &tr );
 	// try the hit entity if there is one, or the ground entity if there isn't.
 	CBaseEntity *pNearest = NULL;
-	CBaseEntity *pObject = tr.m_pEnt;
+	CBaseEntity *pObject = (CBaseEntity*)tr.m_pEnt;
 
 	// TODO: Removed because we no longer have ghost animatings. We may need similar code that clips rays against transformed objects.
 //#ifndef CLIENT_DLL
@@ -196,7 +196,7 @@ CBaseEntity *CPortal_Player::FindUseEntity()
 		Vector down = forward - tangents[count]*up;
 		VectorNormalize(down);
 		UTIL_TraceHull( searchCenter, searchCenter + down * 72, -Vector(16,16,16), Vector(16,16,16), useableContents, this, COLLISION_GROUP_NONE, &tr );
-		pObject = tr.m_pEnt;
+		pObject = (CBaseEntity*)tr.m_pEnt;
 		count++;
 	}
 	float nearestDot = CONE_90_DEGREES;
@@ -286,10 +286,10 @@ CBaseEntity *CPortal_Player::FindUseEntity()
 		trace_t trAllies;
 		UTIL_TraceLine( searchCenter, searchCenter + forward * PLAYER_USE_RADIUS, MASK_OPAQUE_AND_NPCS, this, COLLISION_GROUP_NONE, &trAllies );
 
-		if ( trAllies.m_pEnt && IsUseableEntity( trAllies.m_pEnt, 0 ) && trAllies.m_pEnt->MyNPCPointer() && trAllies.m_pEnt->MyNPCPointer()->IsPlayerAlly( this ) )
+		if ( trAllies.m_pEnt && IsUseableEntity((CBaseEntity*)trAllies.m_pEnt, 0 ) && ((CBaseEntity*)trAllies.m_pEnt)->MyNPCPointer() && ((CBaseEntity*)trAllies.m_pEnt)->MyNPCPointer()->IsPlayerAlly( this ) )
 		{
 			// This is an NPC, take it!
-			pNearest = trAllies.m_pEnt;
+			pNearest = (CBaseEntity*)trAllies.m_pEnt;
 		}
 	}
 
@@ -352,7 +352,7 @@ CBaseEntity* CPortal_Player::FindUseEntityThroughPortal( void )
 
 	// try the hit entity if there is one, or the ground entity if there isn't.
 	CBaseEntity *pNearest = NULL;
-	CBaseEntity *pObject = tr.m_pEnt;
+	CBaseEntity *pObject = (CBaseEntity*)tr.m_pEnt;
 	int count = 0;
 	// UNDONE: Might be faster to just fold this range into the sphere query
 	const int NUM_TANGENTS = 7;
@@ -364,7 +364,7 @@ CBaseEntity* CPortal_Player::FindUseEntityThroughPortal( void )
 		Vector down = vTransformedForward - tangents[count]*vTransformedUp;
 		VectorNormalize(down);
 		UTIL_TraceHull( vTransformedSearchCenter, vTransformedSearchCenter + down * 72, -Vector(16,16,16), Vector(16,16,16), useableContents, this, COLLISION_GROUP_NONE, &tr );
-		pObject = tr.m_pEnt;
+		pObject = (CBaseEntity*)tr.m_pEnt;
 		count++;
 	}
 	float nearestDot = CONE_90_DEGREES;
@@ -442,10 +442,10 @@ CBaseEntity* CPortal_Player::FindUseEntityThroughPortal( void )
 		trace_t trAllies;
 		UTIL_TraceLine( vTransformedSearchCenter, vTransformedSearchCenter + vTransformedForward * PLAYER_USE_RADIUS, MASK_OPAQUE_AND_NPCS, this, COLLISION_GROUP_NONE, &trAllies );
 
-		if ( trAllies.m_pEnt && IsUseableEntity( trAllies.m_pEnt, 0 ) && trAllies.m_pEnt->MyNPCPointer() && trAllies.m_pEnt->MyNPCPointer()->IsPlayerAlly( this ) )
+		if ( trAllies.m_pEnt && IsUseableEntity((CBaseEntity*)trAllies.m_pEnt, 0 ) && ((CBaseEntity*)trAllies.m_pEnt)->MyNPCPointer() && ((CBaseEntity*)trAllies.m_pEnt)->MyNPCPointer()->IsPlayerAlly( this ) )
 		{
 			// This is an NPC, take it!
-			pNearest = trAllies.m_pEnt;
+			pNearest = (CBaseEntity*)trAllies.m_pEnt;
 		}
 	}
 

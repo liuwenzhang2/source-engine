@@ -597,8 +597,8 @@ int CNPC_BaseZombie::MeleeAttack1Conditions ( float flDot, float flDist )
 	}
 
 	if( tr.m_pEnt == GetEnemy() || 
-		tr.m_pEnt->IsNPC() || 
-		( tr.m_pEnt->m_takedamage == DAMAGE_YES && (dynamic_cast<CBreakableProp*>(tr.m_pEnt) ) ) )
+		((CBaseEntity*)tr.m_pEnt)->IsNPC() ||
+		(((CBaseEntity*)tr.m_pEnt)->m_takedamage == DAMAGE_YES && (dynamic_cast<CBreakableProp*>(tr.m_pEnt) ) ) )
 	{
 		// -Let the zombie swipe at his enemy if he's going to hit them.
 		// -Also let him swipe at NPC's that happen to be between the zombie and the enemy. 
@@ -618,7 +618,7 @@ int CNPC_BaseZombie::MeleeAttack1Conditions ( float flDot, float flDist )
 		}
 	}
 
-	if( tr.m_pEnt->IsBSPModel() )
+	if(((CBaseEntity*)tr.m_pEnt)->IsBSPModel() )
 	{
 		// The trace hit something solid, but it's not the enemy. If this item is closer to the zombie than
 		// the enemy is, treat this as an obstruction.
@@ -632,7 +632,7 @@ int CNPC_BaseZombie::MeleeAttack1Conditions ( float flDot, float flDist )
 
 #ifdef HL2_EPISODIC
 
-	if ( !tr.m_pEnt->IsWorld() && GetEnemy() && GetEnemy()->GetGroundEntity() == tr.m_pEnt )
+	if ( !((CBaseEntity*)tr.m_pEnt)->IsWorld() && GetEnemy() && GetEnemy()->GetGroundEntity() == tr.m_pEnt )
 	{
 		//Try to swat whatever the player is standing on instead of acting like a dill.
 		return COND_CAN_MELEE_ATTACK1;

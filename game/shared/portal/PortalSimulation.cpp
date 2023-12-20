@@ -1705,7 +1705,7 @@ void CPortalSimulator::CreateLocalCollision( void )
 		{
 			m_InternalData.Simulation.Static.SurfaceProperties.contents = Trace.contents;
 			m_InternalData.Simulation.Static.SurfaceProperties.surface = Trace.surface;
-			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = Trace.m_pEnt;
+			m_InternalData.Simulation.Static.SurfaceProperties.pEntity = (CBaseEntity*)Trace.m_pEnt;
 		}
 		else
 		{

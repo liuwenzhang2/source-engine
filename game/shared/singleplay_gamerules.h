@@ -69,9 +69,9 @@ public:
 	virtual bool IsCoOp( void );
 
 // Client connection/disconnection
-	virtual bool ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen );
+	virtual bool ClientConnected( int pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen );
 	virtual void InitHUD( CBasePlayer *pl );		// the client dll is ready for updating
-	virtual void ClientDisconnected( edict_t *pClient );
+	virtual void ClientDisconnected( int pClient );
 
 // Client damage rules
 	virtual float FlPlayerFallDamage( CBasePlayer *pPlayer );

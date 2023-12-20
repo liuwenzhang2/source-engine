@@ -213,7 +213,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 		pHead->SetMoveType( MOVETYPE_FLYGRAVITY );
 		pHead->SetAbsVelocity( pCorpse->GetAbsVelocity() );
 		pHead->ClearFlags();
-		pHead->m_nReferencePlayer	= ENTINDEX( pCorpse );
+		pHead->m_nReferencePlayer	= ( pCorpse )->entindex();
 
 		pHead->SetLocalAngles( pCorpse->GetAbsAngles() );
 		UTIL_SetOrigin(pHead, pCorpse->GetAbsOrigin());

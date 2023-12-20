@@ -48,10 +48,10 @@ void CTargetCDAudioRep::InputChangeCDTrack( inputdata_t &inputdata )
 	int iTrack = m_iTrack;
 	
 
-	edict_t *pClient = NULL;
+	int pClient = NULL;
 	if ( gpGlobals->maxClients == 1 )
 	{
-		pClient = engine->PEntityOfEntIndex( 1 );
+		pClient = 1;
 	}
 	else
 	{
@@ -59,7 +59,7 @@ void CTargetCDAudioRep::InputChangeCDTrack( inputdata_t &inputdata )
 		CBasePlayer *player = dynamic_cast< CBasePlayer * >( inputdata.pActivator );
 		if ( player )
 		{
-			pClient = player->edict();
+			pClient = player->entindex();
 		}
 	}
 	

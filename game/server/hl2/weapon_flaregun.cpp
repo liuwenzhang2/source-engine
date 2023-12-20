@@ -461,7 +461,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 						if ( index >= 0 )
 						{
 							CBroadcastRecipientFilter filter;
-							te->Decal( filter, 0.0, &tr.endpos, &tr.startpos, ENTINDEX( tr.m_pEnt ), tr.hitbox, index );
+							te->Decal( filter, 0.0, &tr.endpos, &tr.startpos, ((CBaseEntity*)tr.m_pEnt )->entindex(), tr.hitbox, index);
 						}
 						
 						CPASAttenuationFilter filter2( this, "Flare.Touch" );
@@ -480,7 +480,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 			if ( index >= 0 )
 			{
 				CBroadcastRecipientFilter filter;
-				te->Decal( filter, 0.0, &tr.endpos, &tr.startpos, ENTINDEX( tr.m_pEnt ), tr.hitbox, index );
+				te->Decal( filter, 0.0, &tr.endpos, &tr.startpos, ((CBaseEntity*)tr.m_pEnt )->entindex(), tr.hitbox, index);
 			}
 		}
 

@@ -13,10 +13,11 @@
 #pragma once
 #endif
 
+#include "eiface.h"
 #include "edict.h"
 #include "tier1/interface.h"
 #include "tier1/KeyValues.h"
-
+struct edict_t;
 class CCommand;
 
 //
@@ -74,7 +75,7 @@ public:
 	virtual void			LevelInit( char const *pMapName ) = 0;
 
 	// The server is about to activate
-	virtual void			ServerActivate( edict_t *pEdictList, int edictCount, int clientMax ) = 0;
+	virtual void			ServerActivate( IServerEntity *pEdictList, int edictCount, int clientMax ) = 0;
 
 	// The server should run physics/think on all edicts
 	virtual void			GameFrame( bool simulating ) = 0;
@@ -83,26 +84,26 @@ public:
 	virtual void			LevelShutdown( void ) = 0;
 
 	// Client is going active
-	virtual void			ClientActive( edict_t *pEntity ) = 0;
+	virtual void			ClientActive( int pEntity ) = 0;
 	
 	// Client is disconnecting from server
-	virtual void			ClientDisconnect( edict_t *pEntity ) = 0;
+	virtual void			ClientDisconnect( int pEntity ) = 0;
 	
 	// Client is connected and should be put in the game
-	virtual void			ClientPutInServer( edict_t *pEntity, char const *playername ) = 0;
+	virtual void			ClientPutInServer( int pEntity, char const *playername ) = 0;
 
 	// Sets the client index for the client who typed the command into their console
 	virtual void			SetCommandClient( int index ) = 0;
 
 	// A player changed one/several replicated cvars (name etc)
-	virtual void			ClientSettingsChanged( edict_t *pEdict ) = 0;
+	virtual void			ClientSettingsChanged( int pEdict ) = 0;
 
 	// Client is connecting to server ( set retVal to false to reject the connection )
 	//	You can specify a rejection message by writing it into reject
-	virtual PLUGIN_RESULT	ClientConnect( bool *bAllowConnect, edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen ) = 0;
+	virtual PLUGIN_RESULT	ClientConnect( bool *bAllowConnect, int pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen ) = 0;
 
 	// The client has typed a command at the console
-	virtual PLUGIN_RESULT	ClientCommand( edict_t *pEntity, const CCommand &args ) = 0;
+	virtual PLUGIN_RESULT	ClientCommand( int pEntity, const CCommand &args ) = 0;
 
 	// A user has had their network id setup and validated 
 	virtual PLUGIN_RESULT	NetworkIDValidated( const char *pszUserName, const char *pszNetworkID ) = 0;
@@ -110,7 +111,7 @@ public:
 	// This is called when a query from IServerPluginHelpers::StartQueryCvarValue is finished.
 	// iCookie is the value returned by IServerPluginHelpers::StartQueryCvarValue.
 	// Added with version 2 of the interface.
-	virtual void			OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue ) = 0;
+	virtual void			OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, int pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue ) = 0;
 
 	// added with version 3 of the interface.
 	virtual void			OnEdictAllocated( edict_t *edict ) = 0;
@@ -120,14 +121,7 @@ public:
 #define INTERFACEVERSION_ISERVERPLUGINHELPERS			"ISERVERPLUGINHELPERS001"
 
 
-typedef enum
-{
-	DIALOG_MSG = 0,		// just an on screen message
-	DIALOG_MENU,		// an options menu
-	DIALOG_TEXT,		// a richtext dialog
-	DIALOG_ENTRY,		// an entry box
-	DIALOG_ASKCONNECT	// Ask the client to connect to a specified IP address. Only the "time" and "title" keys are used.
-} DIALOG_TYPE;
+
 
 //-----------------------------------------------------------------------------
 // Purpose: functions that only 3rd party plugins need
@@ -147,8 +141,8 @@ public:
 	//  "command" - (string) client command to run if selected
 	//  "msg" - (string) button text for this option
 	//
-	virtual void CreateMessage( edict_t *pEntity, DIALOG_TYPE type, KeyValues *data, IServerPluginCallbacks *plugin ) = 0;
-	virtual void ClientCommand( edict_t *pEntity, const char *cmd ) = 0;
+	virtual void CreateMessage( int pEntity, DIALOG_TYPE type, KeyValues *data, IServerPluginCallbacks *plugin ) = 0;
+	virtual void ClientCommand( int pEntity, const char *cmd ) = 0;
 	
 	// Call this to find out the value of a cvar on the client.
 	//
@@ -157,7 +151,7 @@ public:
 	//
 	// Store the return value if you want to match this specific query to the OnQueryCvarValueFinished call.
 	// Returns InvalidQueryCvarCookie if the entity is invalid.
-	virtual QueryCvarCookie_t StartQueryCvarValue( edict_t *pEntity, const char *pName ) = 0;
+	virtual QueryCvarCookie_t StartQueryCvarValue( int pEntity, const char *pName ) = 0;
 };
 
 #endif //ISERVERPLUGIN_H

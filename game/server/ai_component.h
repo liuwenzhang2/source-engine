@@ -51,7 +51,7 @@ protected:
 	//
 	// Common services provided by CAI_BaseNPC, Convenience methods to simplify derived code
 	//
-	edict_t *			GetEdict();
+	//edict_t *			GetEdict();
 	
 	const Vector &		GetLocalOrigin() const;
 	void 				SetLocalOrigin( const Vector &origin );

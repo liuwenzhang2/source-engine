@@ -233,7 +233,7 @@ CBaseEntity *CAI_TrackPather::FindTrackBlocker( const Vector &vecViewPoint, cons
 {
 	trace_t	tr;
 	AI_TraceHull( vecViewPoint, vecTargetPos, -Vector(4,4,4), Vector(4,4,4), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
-	return (tr.fraction != 1.0f) ? tr.m_pEnt : NULL;
+	return (tr.fraction != 1.0f) ? (CBaseEntity*)tr.m_pEnt : NULL;
 }
 
 

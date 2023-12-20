@@ -157,7 +157,7 @@ END_NETWORK_TABLE()
 		float flSurfaceElasticity = 1.0;
 
 		//Don't bounce off of players with perfect elasticity
-		if( trace.m_pEnt && trace.m_pEnt->IsPlayer() )
+		if( trace.m_pEnt && ((CBaseEntity*)trace.m_pEnt)->IsPlayer() )
 		{
 			flSurfaceElasticity = 0.3;
 		}
@@ -167,12 +167,12 @@ END_NETWORK_TABLE()
 		// through it.
 		bool breakthrough = false;
 
-		if( trace.m_pEnt && FClassnameIs( trace.m_pEnt, "func_breakable" ) )
+		if( trace.m_pEnt && FClassnameIs((CBaseEntity*)trace.m_pEnt, "func_breakable" ) )
 		{
 			breakthrough = true;
 		}
 
-		if( trace.m_pEnt && FClassnameIs( trace.m_pEnt, "func_breakable_surf" ) )
+		if( trace.m_pEnt && FClassnameIs((CBaseEntity*)trace.m_pEnt, "func_breakable_surf" ) )
 		{
 			breakthrough = true;
 		}
@@ -180,11 +180,11 @@ END_NETWORK_TABLE()
 		if (breakthrough)
 		{
 			CTakeDamageInfo info( this, this, 10, DMG_CLUB );
-			trace.m_pEnt->DispatchTraceAttack( info, GetAbsVelocity(), &trace );
+			((CBaseEntity*)trace.m_pEnt)->DispatchTraceAttack( info, GetAbsVelocity(), &trace );
 
 			ApplyMultiDamage();
 
-			if( trace.m_pEnt->m_iHealth <= 0 )
+			if(((CBaseEntity*)trace.m_pEnt)->m_iHealth <= 0 )
 			{
 				// slow our flight a little bit
 				Vector vel = GetAbsVelocity();
@@ -212,7 +212,7 @@ END_NETWORK_TABLE()
 		if ( trace.plane.normal.z > 0.7f )			// Floor
 		{
 			// Verify that we have an entity.
-			CBaseEntity *pEntity = trace.m_pEnt;
+			CBaseEntity *pEntity = (CBaseEntity*)trace.m_pEnt;
 			Assert( pEntity );
 
 			SetAbsVelocity( vecAbsVelocity );

@@ -130,7 +130,7 @@ void CRopeKeyframe::SetAttachmentPoint( CBaseHandle &hOutEnt, short &iOutAttachm
 {
 	// Unforce our previously attached entity from transmitting.
 	CBaseEntity *pCurEnt = gEntList.GetBaseEntity( hOutEnt );
-	if ( pCurEnt && pCurEnt->edict() )
+	if ( pCurEnt && pCurEnt->entindex()!=-1 )
 	{
 		pCurEnt->DecrementTransmitStateOwnedCounter();
 		pCurEnt->DispatchUpdateTransmitState();
@@ -345,7 +345,7 @@ void CRopeKeyframe::Activate()
 
 	// Find the next entity in our chain.
 	CBaseEntity *pEnt = gEntList.FindEntityByName( NULL, m_iNextLinkName );
-	if( pEnt && pEnt->edict() )
+	if( pEnt && pEnt->entindex()!=-1 )
 	{
 		SetEndPoint( pEnt );
 
@@ -589,7 +589,7 @@ void CRopeKeyframe::NotifyPositionChanged( CBaseEntity *pEntity )
 	UpdateBBox( false );
 
 	CBaseEntity *ents[2] = { m_hStartPoint.Get(), m_hEndPoint.Get() };
-	if ( (m_RopeFlags & ROPE_RESIZE) && ents[0] && ents[0]->edict() && ents[1] && ents[1]->edict() )
+	if ( (m_RopeFlags & ROPE_RESIZE) && ents[0] && ents[0]->entindex()!=-1 && ents[1] && ents[1]->entindex()!=-1 )
 	{
 		int len = (int)( ents[0]->GetAbsOrigin() - ents[1]->GetAbsOrigin() ).Length() + m_Slack;
 		if ( len != m_RopeLength )

@@ -28,35 +28,35 @@ extern INetworkStringTable *g_pStringTableServerPopFiles;
 class CServerGameClients : public IServerGameClients
 {
 public:
-	virtual bool			ClientConnect( edict_t *pEntity, char const* pszName, char const* pszAddress, char *reject, int maxrejectlen ) OVERRIDE;
-	virtual void			ClientActive( edict_t *pEntity, bool bLoadGame ) OVERRIDE;
-	virtual void			ClientDisconnect( edict_t *pEntity ) OVERRIDE;
-	virtual void			ClientPutInServer( edict_t *pEntity, const char *playername ) OVERRIDE;
-	virtual void			ClientCommand( edict_t *pEntity, const CCommand &args ) OVERRIDE;
-	virtual void			ClientSettingsChanged( edict_t *pEntity ) OVERRIDE;
-	virtual void			ClientSetupVisibility( edict_t *pViewEntity, edict_t *pClient, unsigned char *pvs, int pvssize ) OVERRIDE;
-	virtual float			ProcessUsercmds( edict_t *player, bf_read *buf, int numcmds, int totalcmds,
+	virtual bool			ClientConnect( int pEntity, char const* pszName, char const* pszAddress, char *reject, int maxrejectlen ) OVERRIDE;
+	virtual void			ClientActive( int pEntity, bool bLoadGame ) OVERRIDE;
+	virtual void			ClientDisconnect( int pEntity ) OVERRIDE;
+	virtual void			ClientPutInServer( int pEntity, const char *playername ) OVERRIDE;
+	virtual void			ClientCommand( int pEntity, const CCommand &args ) OVERRIDE;
+	virtual void			ClientSettingsChanged( int pEntity ) OVERRIDE;
+	virtual void			ClientSetupVisibility(const IServerEntity *pViewEntity, int pClient, unsigned char *pvs, int pvssize ) OVERRIDE;
+	virtual float			ProcessUsercmds( int player, bf_read *buf, int numcmds, int totalcmds,
 								int dropped_packets, bool ignore, bool paused ) OVERRIDE;
 	// Player is running a command
 	virtual void			PostClientMessagesSent_DEPRECIATED( void ) OVERRIDE;
 	virtual void			SetCommandClient( int index ) OVERRIDE;
-	virtual CPlayerState	*GetPlayerState( edict_t *player ) OVERRIDE;
-	virtual void			ClientEarPosition( edict_t *pEntity, Vector *pEarOrigin ) OVERRIDE;
+	virtual CPlayerState	*GetPlayerState( int player ) OVERRIDE;
+	virtual void			ClientEarPosition( int pEntity, Vector *pEarOrigin ) OVERRIDE;
 
 	virtual void			GetPlayerLimits( int& minplayers, int& maxplayers, int &defaultMaxPlayers ) const OVERRIDE;
 	
 	// returns number of delay ticks if player is in Replay mode (0 = no delay)
-	virtual int				GetReplayDelay( edict_t *player, int& entity ) OVERRIDE;
+	virtual int				GetReplayDelay( int player, int& entity ) OVERRIDE;
 	// Anything this game .dll wants to add to the bug reporter text (e.g., the entity/model under the picker crosshair)
 	//  can be added here
 	virtual void			GetBugReportInfo( char *buf, int buflen ) OVERRIDE;
 	virtual void			NetworkIDValidated( const char *pszUserName, const char *pszNetworkID ) OVERRIDE;
 
 	// The client has submitted a keyvalues command
-	virtual void			ClientCommandKeyValues( edict_t *pEntity, KeyValues *pKeyValues ) OVERRIDE;
+	virtual void			ClientCommandKeyValues( int pEntity, KeyValues *pKeyValues ) OVERRIDE;
 
 	// Notify that the player is spawned
-	virtual void			ClientSpawned( edict_t *pPlayer ) OVERRIDE;
+	virtual void			ClientSpawned( int pPlayer ) OVERRIDE;
 };
 
 
@@ -72,7 +72,7 @@ public:
 	virtual bool			GameInit( void ) OVERRIDE;
 	virtual void			GameShutdown( void ) OVERRIDE;
 	virtual bool			LevelInit( const char *pMapName, char const *pMapEntities, char const *pOldLevel, char const *pLandmarkName, bool loadGame, bool background ) OVERRIDE;
-	virtual void			ServerActivate( edict_t *pEdictList, int edictCount, int clientMax ) OVERRIDE;
+	virtual void			ServerActivate( IServerEntity *pEdictList, int edictCount, int clientMax ) OVERRIDE;
 	virtual void			LevelShutdown( void ) OVERRIDE;
 	virtual void			GameFrame( bool simulating ) OVERRIDE; // could be called multiple times before sending data to clients
 	virtual void			PreClientUpdate( bool simulating ) OVERRIDE; // called after all GameFrame() calls, before sending data to clients
@@ -110,7 +110,7 @@ public:
 	virtual void			PostInit() OVERRIDE;
 	virtual void			Think( bool finalTick ) OVERRIDE;
 
-	virtual void			OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue ) OVERRIDE;
+	//virtual void			OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, IServerEntity *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue ) OVERRIDE;
 
 	virtual void			PreSaveGameLoaded( char const *pSaveName, bool bInGame ) OVERRIDE;
 
@@ -165,7 +165,7 @@ private:
 
 // Normally, when the engine calls ClientPutInServer, it calls a global function in the game DLL
 // by the same name. Use this to override the function that it calls. This is used for bots.
-typedef CBasePlayer* (*ClientPutInServerOverrideFn)( edict_t *pEdict, const char *playername );
+typedef CBasePlayer* (*ClientPutInServerOverrideFn)( int pEdict, const char *playername );
 
 void ClientPutInServerOverride( ClientPutInServerOverrideFn fn );
 
@@ -205,8 +205,8 @@ public:
 		if ( pRet )
 		{
 			ref.m_iEdict = pRet->entindex();
-			if ( pRet->edict() )
-				ref.m_iSerialNumber = pRet->edict()->m_NetworkSerialNumber;
+			if ( pRet->entindex()!=-1 )
+				ref.m_iSerialNumber = engine->GetNetworkSerialNumber(pRet->entindex());
 		}
 
 		g_MapEntityRefs.AddToTail( ref );

@@ -534,7 +534,7 @@ void CAmbientGeneric::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 		return;
 
 	Assert( pInfo->m_pClientEnt );
-	CBaseEntity *pClient = (CBaseEntity*)(pInfo->m_pClientEnt->GetUnknown());
+	CBaseEntity *pClient = gEntList.GetBaseEntity( pInfo->m_pClientEnt);
 	if ( !pClient )
 		return;
 
@@ -1175,7 +1175,7 @@ int fSentencesInit = false;
 // Ipick is only needed if you plan on stopping the sound before playback is done (see SENTENCEG_Stop). 
 // sentenceIndex can be used to find the name/length of the sentence
 
-int SENTENCEG_PlayRndI(edict_t *entity, int isentenceg, 
+int SENTENCEG_PlayRndI(CBaseEntity *entity, int isentenceg, 
 					  float volume, soundlevel_t soundlevel, int flags, int pitch)
 {
 	char name[64];
@@ -1190,8 +1190,8 @@ int SENTENCEG_PlayRndI(edict_t *entity, int isentenceg,
 	if (ipick > 0 && name)
 	{
 		int sentenceIndex = SENTENCEG_Lookup( name );
-		CPASAttenuationFilter filter( GetContainingEntity( entity ), soundlevel );
-		CBaseEntity::EmitSentenceByIndex( filter, ENTINDEX(entity), CHAN_VOICE, sentenceIndex, volume, soundlevel, flags, pitch );
+		CPASAttenuationFilter filter( entity , soundlevel );
+		CBaseEntity::EmitSentenceByIndex( filter, (entity)->entindex(), CHAN_VOICE, sentenceIndex, volume, soundlevel, flags, pitch);
 		return sentenceIndex;
 	}
 
@@ -1231,17 +1231,17 @@ int SENTENCEG_PickRndSz(const char *szgroupname)
 //-----------------------------------------------------------------------------
 // Plays a sentence by sentence index
 //-----------------------------------------------------------------------------
-void SENTENCEG_PlaySentenceIndex( edict_t *entity, int iSentenceIndex, float volume, soundlevel_t soundlevel, int flags, int pitch )
+void SENTENCEG_PlaySentenceIndex( CBaseEntity *entity, int iSentenceIndex, float volume, soundlevel_t soundlevel, int flags, int pitch )
 {
 	if ( iSentenceIndex >= 0 )
 	{
-		CPASAttenuationFilter filter( GetContainingEntity( entity ), soundlevel );
-		CBaseEntity::EmitSentenceByIndex( filter, ENTINDEX(entity), CHAN_VOICE, iSentenceIndex, volume, soundlevel, flags, pitch );
+		CPASAttenuationFilter filter( entity , soundlevel );
+		CBaseEntity::EmitSentenceByIndex( filter, (entity)->entindex(), CHAN_VOICE, iSentenceIndex, volume, soundlevel, flags, pitch);
 	}
 }
 
 
-int SENTENCEG_PlayRndSz(edict_t *entity, const char *szgroupname, 
+int SENTENCEG_PlayRndSz(CBaseEntity *entity, const char *szgroupname, 
 					  float volume, soundlevel_t soundlevel, int flags, int pitch)
 {
 	char name[64];
@@ -1264,8 +1264,8 @@ int SENTENCEG_PlayRndSz(edict_t *entity, const char *szgroupname,
 	if (ipick >= 0 && name[0])
 	{
 		int sentenceIndex = SENTENCEG_Lookup( name );
-		CPASAttenuationFilter filter( GetContainingEntity( entity ), soundlevel );
-		CBaseEntity::EmitSentenceByIndex( filter, ENTINDEX(entity), CHAN_VOICE, sentenceIndex, volume, soundlevel, flags, pitch );
+		CPASAttenuationFilter filter( entity , soundlevel );
+		CBaseEntity::EmitSentenceByIndex( filter, (entity)->entindex(), CHAN_VOICE, sentenceIndex, volume, soundlevel, flags, pitch);
 		return sentenceIndex;
 	}
 
@@ -1274,7 +1274,7 @@ int SENTENCEG_PlayRndSz(edict_t *entity, const char *szgroupname,
 
 // play sentences in sequential order from sentence group.  Reset after last sentence.
 
-int SENTENCEG_PlaySequentialSz(edict_t *entity, const char *szgroupname, 
+int SENTENCEG_PlaySequentialSz(CBaseEntity *entity, const char *szgroupname, 
 					  float volume, soundlevel_t soundlevel, int flags, int pitch, int ipick, int freset)
 {
 	char name[64];
@@ -1294,8 +1294,8 @@ int SENTENCEG_PlaySequentialSz(edict_t *entity, const char *szgroupname,
 	if (ipicknext >= 0 && name[0])
 	{
 		int sentenceIndex = SENTENCEG_Lookup( name );
-		CPASAttenuationFilter filter( GetContainingEntity( entity ), soundlevel );
-		CBaseEntity::EmitSentenceByIndex( filter, ENTINDEX(entity), CHAN_VOICE, sentenceIndex, volume, soundlevel, flags, pitch );
+		CPASAttenuationFilter filter( entity , soundlevel );
+		CBaseEntity::EmitSentenceByIndex( filter, (entity)->entindex(), CHAN_VOICE, sentenceIndex, volume, soundlevel, flags, pitch);
 		return sentenceIndex;
 	}
 	
@@ -1307,7 +1307,7 @@ int SENTENCEG_PlaySequentialSz(edict_t *entity, const char *szgroupname,
 // for this entity, for the given sentence within the sentence group, stop
 // the sentence.
 
-void SENTENCEG_Stop(edict_t *entity, int isentenceg, int ipick)
+void SENTENCEG_Stop(CBaseEntity *entity, int isentenceg, int ipick)
 {
 	char buffer[64];
 	char sznum[8];
@@ -1368,7 +1368,7 @@ void UTIL_RestartAmbientSounds( void )
 
 // play a specific sentence over the HEV suit speaker - just pass player entity, and !sentencename
 
-void UTIL_EmitSoundSuit(edict_t *entity, const char *sample)
+void UTIL_EmitSoundSuit(CBaseEntity *entity, const char *sample)
 {
 	float fvol;
 	int pitch = PITCH_NORM;
@@ -1378,14 +1378,14 @@ void UTIL_EmitSoundSuit(edict_t *entity, const char *sample)
 		pitch = random->RandomInt(0,6) + 98;
 
 	// If friendlies are talking, reduce the volume of the suit
-	if ( !g_AIFriendliesTalkSemaphore.IsAvailable( GetContainingEntity( entity ) ) )
+	if ( !g_AIFriendliesTalkSemaphore.IsAvailable( entity ) )
 	{
 		fvol *= 0.3;
 	}
 
 	if (fvol > 0.05)
 	{
-		CPASAttenuationFilter filter( GetContainingEntity( entity ) );
+		CPASAttenuationFilter filter( entity );
 		filter.MakeReliable();
 
 		EmitSound_t ep;
@@ -1395,13 +1395,13 @@ void UTIL_EmitSoundSuit(edict_t *entity, const char *sample)
 		ep.m_SoundLevel = SNDLVL_NORM;
 		ep.m_nPitch = pitch;
 
-		CBaseEntity::EmitSound( filter, ENTINDEX(entity), ep );
+		CBaseEntity::EmitSound( filter, (entity)->entindex(), ep);
 	}
 }
 
 // play a sentence, randomly selected from the passed in group id, over the HEV suit speaker
 
-int UTIL_EmitGroupIDSuit(edict_t *entity, int isentenceg)
+int UTIL_EmitGroupIDSuit(CBaseEntity *entity, int isentenceg)
 {
 	float fvol;
 	int pitch = PITCH_NORM;
@@ -1412,7 +1412,7 @@ int UTIL_EmitGroupIDSuit(edict_t *entity, int isentenceg)
 		pitch = random->RandomInt(0,6) + 98;
 
 	// If friendlies are talking, reduce the volume of the suit
-	if ( !g_AIFriendliesTalkSemaphore.IsAvailable( GetContainingEntity( entity ) ) )
+	if ( !g_AIFriendliesTalkSemaphore.IsAvailable( entity ) )
 	{
 		fvol *= 0.3;
 	}
@@ -1425,7 +1425,7 @@ int UTIL_EmitGroupIDSuit(edict_t *entity, int isentenceg)
 
 // play a sentence, randomly selected from the passed in groupname
 
-int UTIL_EmitGroupnameSuit(edict_t *entity, const char *groupname)
+int UTIL_EmitGroupnameSuit(CBaseEntity *entity, const char *groupname)
 {
 	float fvol;
 	int pitch = PITCH_NORM;
@@ -1436,7 +1436,7 @@ int UTIL_EmitGroupnameSuit(edict_t *entity, const char *groupname)
 		pitch = random->RandomInt(0,6) + 98;
 
 	// If friendlies are talking, reduce the volume of the suit
-	if ( !g_AIFriendliesTalkSemaphore.IsAvailable( GetContainingEntity( entity ) ) )
+	if ( !g_AIFriendliesTalkSemaphore.IsAvailable( entity ) )
 	{
 		fvol *= 0.3;
 	}

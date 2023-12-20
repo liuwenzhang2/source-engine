@@ -3452,7 +3452,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 	case TASK_WAIT_PVS:
 		{
 			if ( ShouldAlwaysThink() || 
-				 UTIL_FindClientInPVS(edict()) || 
+				 UTIL_FindClientInPVS(this) ||
 				 ( GetState() == NPC_STATE_COMBAT && GetEnemy() && gpGlobals->curtime - GetEnemies()->LastTimeSeen( GetEnemy() ) < 15 ) )
 			{
 				TaskComplete();
@@ -4116,7 +4116,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 				if( trace.m_pEnt )
 				{
 					// Found something!
-					SetGroundEntity( trace.m_pEnt );
+					SetGroundEntity((CBaseEntity*)trace.m_pEnt );
 					TaskComplete();
 				}
 				else

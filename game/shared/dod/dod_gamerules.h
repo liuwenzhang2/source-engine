@@ -236,7 +236,7 @@ public:
 	void RadiusStun( const CTakeDamageInfo &info, const Vector &vecSrc, float flRadius );
 	virtual void Think();
 	virtual void PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info );
-	virtual void ClientDisconnected( edict_t *pClient );
+	virtual void ClientDisconnected( int pClient );
 	virtual float FlPlayerFallDamage( CBasePlayer *pPlayer );
 
 	virtual const char *GetGameDescription( void )

@@ -237,7 +237,7 @@ public:
 	static int		FreeList( void );// return the head of the free list
 	static CSound*	SoundPointerForIndex( int iIndex );// return a pointer for this index in the sound list
 	static CSound*	GetLoudestSoundOfType( int iType, const Vector &vecEarPosition );
-	static int		ClientSoundIndex ( edict_t *pClient );
+	static int		ClientSoundIndex ( CBasePlayer *pClient );
 
 	bool	IsEmpty( void );
 	int		ISoundsInList ( int iListType );

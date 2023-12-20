@@ -303,7 +303,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 // barnacle has no prey right now, so just idle and check to see if anything is touching the tongue.
 
 		// If idle and no nearby client, don't think so often. Client should be out of PVS and not within 50 feet.
-		if ( !UTIL_FindClientInPVS(edict()) )
+		if ( !UTIL_FindClientInPVS(this) )
 		{
 			CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
 

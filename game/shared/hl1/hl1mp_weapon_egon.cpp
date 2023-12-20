@@ -305,7 +305,7 @@ void CWeaponEgon::Fire( const Vector &vecOrigSrc, const Vector &vecDir )
 	if ( tr.allsolid )
 		return;
 
-	CBaseEntity *pEntity = tr.m_pEnt;
+	CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 	if ( pEntity == NULL )
 		return;
 

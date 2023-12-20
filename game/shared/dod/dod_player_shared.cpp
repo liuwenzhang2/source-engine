@@ -229,14 +229,14 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 
 		// New hitbox code that uses hitbox groups instead of trying to trace
 		// through the player
-		if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
+		if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() )
 		{
 			switch( tr.hitgroup )
 			{
 #ifdef GAME_DLL
 			case HITGROUP_HEAD:
 				{
-					if ( tr.m_pEnt->GetTeamNumber() != GetTeamNumber() )
+					if (((CBaseEntity*)tr.m_pEnt)->GetTeamNumber() != GetTeamNumber() )
 					{
 						iNumHeadshots++;
 					}
@@ -249,7 +249,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 				{
 					//DevMsg( 2, "Hit arms, tracing against alt hitboxes.. \n" );
 
-					CDODPlayer *pPlayer = ToDODPlayer( tr.m_pEnt );
+					CDODPlayer *pPlayer = ToDODPlayer((CBaseEntity*)tr.m_pEnt );
 
 					// set hitbox set to "dod_no_arms"
 					pPlayer->SetHitboxSet( 1 );
@@ -280,7 +280,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 			}			
 		}
 			
-		pLastHitEntity = tr.m_pEnt;
+		pLastHitEntity = (CBaseEntity*)tr.m_pEnt;
 
 		if ( sv_showimpacts.GetBool() )
 		{
@@ -288,18 +288,18 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 			// draw red client impact markers
 			debugoverlay->AddBoxOverlay( tr.endpos, Vector(-1,-1,-1), Vector(1,1,1), QAngle(0,0,0), 255, 0, 0, 127, 4 );
 
-			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
+			if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() )
 			{
-				C_BasePlayer *player = ToBasePlayer( tr.m_pEnt );
+				C_BasePlayer *player = ToBasePlayer((CBaseEntity*)tr.m_pEnt );
 				player->DrawClientHitboxes( 4, true );
 			}
 #else
 			// draw blue server impact markers
 			NDebugOverlay::Box( tr.endpos, Vector(-1,-1,-1), Vector(1,1,1), 0,0,255,127, 4 );
 
-			if ( tr.m_pEnt && tr.m_pEnt->IsPlayer() )
+			if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->IsPlayer() )
 			{
-				CBasePlayer *player = ToBasePlayer( tr.m_pEnt );
+				CBasePlayer *player = ToBasePlayer((CBaseEntity*)tr.m_pEnt );
 				player->DrawServerHitboxes( 4, true );
 			}
 #endif
@@ -334,7 +334,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 			// Don't decal nodraw surfaces
 			if ( !( tr.surface.flags & (SURF_SKY|SURF_NODRAW|SURF_HINT|SURF_SKIP) ) )
 			{
-				CBaseEntity *pEntity = tr.m_pEnt;
+				CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 				if ( !( !friendlyfire.GetBool() && pEntity && pEntity->GetTeamNumber() == GetTeamNumber() ) )
 				{
 					UTIL_ImpactTrace( &tr, iDamageType );
@@ -365,9 +365,9 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 
 		CTakeDamageInfo dmgInfo( info.m_pAttacker, info.m_pAttacker, flActualDamage, iDamageType );
 		CalculateBulletDamageForce( &dmgInfo, info.m_iAmmoType, info.m_vecDirShooting, tr.endpos );
-		tr.m_pEnt->DispatchTraceAttack( dmgInfo, info.m_vecDirShooting, &tr );
+		((CBaseEntity*)tr.m_pEnt)->DispatchTraceAttack( dmgInfo, info.m_vecDirShooting, &tr );
 
-		DevMsg( 2, "Giving damage ( %.1f ) to entity of type %s\n", flActualDamage, tr.m_pEnt->GetClassname() );
+		DevMsg( 2, "Giving damage ( %.1f ) to entity of type %s\n", flActualDamage, ((CBaseEntity*)tr.m_pEnt)->GetClassname() );
 
 		TraceAttackToTriggers( dmgInfo, tr.startpos, tr.endpos, info.m_vecDirShooting );
 #endif
@@ -419,7 +419,7 @@ void CDODPlayer::FireBullets( const FireBulletsInfo_t &info )
 		// bullet did penetrate object, exit Decal
 		if ( !( reverseTr.surface.flags & (SURF_SKY|SURF_NODRAW|SURF_HINT|SURF_SKIP) ) )
 		{
-			CBaseEntity *pEntity = reverseTr.m_pEnt;
+			CBaseEntity *pEntity = (CBaseEntity*)reverseTr.m_pEnt;
 			if ( !( !friendlyfire.GetBool() && pEntity && pEntity->GetTeamNumber() == GetTeamNumber() ) )
 			{
 				UTIL_ImpactTrace( &reverseTr, iDamageType );

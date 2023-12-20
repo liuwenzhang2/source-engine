@@ -551,13 +551,13 @@ QAngle CPathTrack::GetOrientation( bool bForwardDir )
 // Input  : *pent - 
 // Output : CPathTrack
 //-----------------------------------------------------------------------------
-CPathTrack *CPathTrack::Instance( edict_t *pent )
-{
-	CBaseEntity *pEntity = CBaseEntity::Instance( pent );
-	if ( FClassnameIs( pEntity, "path_track" ) )
-		return (CPathTrack *)pEntity;
-	return NULL;
-}
+//CPathTrack *CPathTrack::Instance( edict_t *pent )
+//{
+//	CBaseEntity *pEntity = CBaseEntity::Instance( pent );
+//	if ( FClassnameIs( pEntity, "path_track" ) )
+//		return (CPathTrack *)pEntity;
+//	return NULL;
+//}
 
 
 //-----------------------------------------------------------------------------

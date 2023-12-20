@@ -153,25 +153,25 @@ public:
 //
 // Conversion among the three types of "entity", including identity-conversions.
 //
-inline int	  ENTINDEX( edict_t *pEdict)			
-{ 
-	int nResult = pEdict ? pEdict->m_EdictIndex : 0;
-	Assert( nResult == engine->IndexOfEdict(pEdict) );
-	return nResult;
-}
+//inline int	  ENTINDEX( edict_t *pEdict)			
+//{ 
+//	int nResult = pEdict ? pEdict->m_EdictIndex : 0;
+//	Assert( nResult == engine->IndexOfEdict(pEdict) );
+//	return nResult;
+//}
 
-int	  ENTINDEX( CBaseEntity *pEnt );
+//int	  ENTINDEX( CBaseEntity *pEnt );
 
-inline edict_t* INDEXENT( int iEdictNum )		
-{ 
-	return engine->PEntityOfEntIndex(iEdictNum); 
-}
+//inline edict_t* INDEXENT( int iEdictNum )		
+//{ 
+//	return engine->PEntityOfEntIndex(iEdictNum); 
+//}
 
 // Testing the three types of "entity" for nullity
-inline bool FNullEnt(const edict_t* pent)
-{ 
-	return pent == NULL || ENTINDEX((edict_t*)pent) == 0; 
-}
+//inline bool FNullEnt(const edict_t* pent)
+//{ 
+//	return pent == NULL || ENTINDEX((edict_t*)pent) == 0; 
+//}
 
 // Dot products for view cone checking
 #define VIEW_FIELD_FULL		(float)-1.0 // +-180 degrees
@@ -205,7 +205,7 @@ const char *nexttoken(char *token, const char *str, char sep);
 // Misc. Prototypes
 void		UTIL_SetSize			(CBaseEntity *pEnt, const Vector &vecMin, const Vector &vecMax);
 void		UTIL_ClearTrace			( trace_t &trace );
-void		UTIL_SetTrace			(trace_t& tr, const Ray_t &ray, edict_t* edict, float fraction, int hitgroup, unsigned int contents, const Vector& normal, float intercept );
+void		UTIL_SetTrace			(trace_t& tr, const Ray_t &ray, CBaseEntity* edict, float fraction, int hitgroup, unsigned int contents, const Vector& normal, float intercept );
 
 int			UTIL_PrecacheDecal		( const char *name, bool preload = false );
 
@@ -242,11 +242,11 @@ CBaseEntity* UTIL_EntityByIndex( int entityIndex );
 
 void		UTIL_GetPlayerConnectionInfo( int playerIndex, int& ping, int &packetloss );
 
-void		UTIL_SetClientVisibilityPVS( edict_t *pClient, const unsigned char *pvs, int pvssize );
+void		UTIL_SetClientVisibilityPVS( CBaseEntity *pClient, const unsigned char *pvs, int pvssize );
 bool		UTIL_ClientPVSIsExpanded();
 
-edict_t		*UTIL_FindClientInPVS( edict_t *pEdict );
-edict_t		*UTIL_FindClientInVisibilityPVS( edict_t *pEdict );
+CBaseEntity		*UTIL_FindClientInPVS( CBaseEntity *pEdict );
+CBaseEntity		*UTIL_FindClientInVisibilityPVS( CBaseEntity *pEdict );
 
 // This is a version which finds any clients whose PVS intersects the box
 CBaseEntity *UTIL_FindClientInPVS( const Vector &vecBoxMins, const Vector &vecBoxMaxs );
@@ -534,20 +534,20 @@ float UTIL_ScaleForGravity( float desiredGravity );
 enum soundlevel_t;
 
 void SENTENCEG_Init();
-void SENTENCEG_Stop(edict_t *entity, int isentenceg, int ipick);
-int SENTENCEG_PlayRndI(edict_t *entity, int isentenceg, float volume, soundlevel_t soundlevel, int flags, int pitch);
-int SENTENCEG_PlayRndSz(edict_t *entity, const char *szrootname, float volume, soundlevel_t soundlevel, int flags, int pitch);
-int SENTENCEG_PlaySequentialSz(edict_t *entity, const char *szrootname, float volume, soundlevel_t soundlevel, int flags, int pitch, int ipick, int freset);
-void SENTENCEG_PlaySentenceIndex( edict_t *entity, int iSentenceIndex, float volume, soundlevel_t soundlevel, int flags, int pitch );
+void SENTENCEG_Stop(CBaseEntity *entity, int isentenceg, int ipick);
+int SENTENCEG_PlayRndI(CBaseEntity *entity, int isentenceg, float volume, soundlevel_t soundlevel, int flags, int pitch);
+int SENTENCEG_PlayRndSz(CBaseEntity *entity, const char *szrootname, float volume, soundlevel_t soundlevel, int flags, int pitch);
+int SENTENCEG_PlaySequentialSz(CBaseEntity *entity, const char *szrootname, float volume, soundlevel_t soundlevel, int flags, int pitch, int ipick, int freset);
+void SENTENCEG_PlaySentenceIndex( CBaseEntity *entity, int iSentenceIndex, float volume, soundlevel_t soundlevel, int flags, int pitch );
 int SENTENCEG_PickRndSz(const char *szrootname);
 int SENTENCEG_GetIndex(const char *szrootname);
 int SENTENCEG_Lookup(const char *sample);
 
 char TEXTURETYPE_Find( trace_t *ptr );
 
-void UTIL_EmitSoundSuit(edict_t *entity, const char *sample);
-int  UTIL_EmitGroupIDSuit(edict_t *entity, int isentenceg);
-int  UTIL_EmitGroupnameSuit(edict_t *entity, const char *groupname);
+void UTIL_EmitSoundSuit(CBaseEntity *entity, const char *sample);
+int  UTIL_EmitGroupIDSuit(CBaseEntity *entity, int isentenceg);
+int  UTIL_EmitGroupnameSuit(CBaseEntity *entity, const char *groupname);
 void UTIL_RestartAmbientSounds( void );
 
 class EntityMatrix : public VMatrix

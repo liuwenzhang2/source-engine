@@ -479,10 +479,10 @@ void CWeaponCrossbow::FireBolt( void )
         pBolt->SetAbsOrigin( trace.endpos );
 
         // We hit someone
-        if ( trace.m_pEnt && trace.m_pEnt->m_takedamage )
+        if ( trace.m_pEnt && ((CBaseEntity*)trace.m_pEnt)->m_takedamage )
         {
             pBolt->SetExplode( false );            
-            pBolt->BoltTouch( trace.m_pEnt );
+            pBolt->BoltTouch((CBaseEntity*)trace.m_pEnt );
             return;
         }
     }

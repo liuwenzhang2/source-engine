@@ -987,11 +987,11 @@ static CDODViewVectors g_DODViewVectors(
 		{
 			retval = 1.0;
 		}
-		else if (!(tr.DidHitWorld()) && (tr.m_pEnt != NULL) && (tr.m_pEnt->GetOwnerEntity() != pEntityToIgnore))
+		else if (!(tr.DidHitWorld()) && (tr.m_pEnt != NULL) && (((CBaseEntity*)tr.m_pEnt)->GetOwnerEntity() != pEntityToIgnore))
 		{
 			// if we didn't hit world geometry perhaps there's still damage to be done here.
 
-			CBaseEntity *blockingEntity = tr.m_pEnt;
+			CBaseEntity *blockingEntity = (CBaseEntity*)tr.m_pEnt;
 
 			// check to see if this part of the player is visible if entities are ignored.
 			UTIL_TraceLine(vecSrc, vecEnd, CONTENTS_SOLID, NULL, COLLISION_GROUP_NONE, &tr);
@@ -3025,7 +3025,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 			if (pDODPlayer == NULL)
 				continue;
 
-			if (FNullEnt( pDODPlayer->edict() ))
+			if ( pDODPlayer->entindex()<=0 )
 				continue;
 
 			pDODPlayer->ResetScores();
@@ -3114,7 +3114,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 					CMapEntityRef &ref = g_MapEntityRefs[m_iIterator];
 					m_iIterator = g_MapEntityRefs.Next( m_iIterator );	// Seek to the next entity.
 
-					if ( ref.m_iEdict == -1 || engine->PEntityOfEntIndex( ref.m_iEdict ) )
+					if ( ref.m_iEdict == -1 || gEntList.GetBaseEntity( ref.m_iEdict ) )
 					{
 						// Doh! The entity was delete and its slot was reused.
 						// Just use any old edict slot. This case sucks because we lose the baseline.
@@ -3782,7 +3782,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 			if (pDODPlayer == NULL)
 				continue;
 
-			if (FNullEnt( pDODPlayer->edict() ))
+			if (pDODPlayer->entindex()<=0 )
 				continue;
 
 			if( pDODPlayer->GetTeamNumber() != team )
@@ -4331,7 +4331,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 			if (pPlayer == NULL)
 				continue;
 
-			if (FNullEnt( pPlayer->edict() ))
+			if (pPlayer->entindex()<=0 )
 				continue;
 
 			if( pPlayer && pPlayer->GetTeamNumber() == team && pPlayer->IsAlive() )
@@ -4347,9 +4347,9 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		}
 	}	
 
-	void CDODGameRules::ClientDisconnected( edict_t *pClient )
+	void CDODGameRules::ClientDisconnected( int pClient )
 	{
-		CDODPlayer *pPlayer = ToDODPlayer( GetContainingEntity( pClient ) );
+		CDODPlayer *pPlayer = ToDODPlayer( gEntList.GetBaseEntity( pClient ) );
 
 		if( pPlayer )
 		{

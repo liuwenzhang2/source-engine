@@ -998,7 +998,7 @@ bool CAI_Pathfinder::CanGiveWay( const Vector& vStart, const Vector& vEnd, CBase
 {
 	// FIXME: make this a CAI_BaseNPC member function
 	CAI_BaseNPC *pNPCBlocker = pBlocker->MyNPCPointer();
-	if (pNPCBlocker && pNPCBlocker->edict()) 
+	if (pNPCBlocker && pNPCBlocker->entindex()!=-1) 
 	{
 		Disposition_t eDispBlockerToMe = pNPCBlocker->IRelationType( GetOuter() );
 		if ( ( eDispBlockerToMe == D_LI ) || ( eDispBlockerToMe == D_NU ) )

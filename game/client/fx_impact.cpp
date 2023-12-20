@@ -288,9 +288,9 @@ static void PerformNewCustomEffects( const Vector &vecOrigin, trace_t &tr, const
 	Vector vecImpactPoint = ( tr.fraction != 1.0f ) ? tr.endpos : vecOrigin;
 	Assert( VectorsAreEqual( vecOrigin, tr.endpos, 1e-1 ) );
 
-	SetImpactControlPoint( pEffect.GetObject(), 0, vecImpactPoint, tr.plane.normal, tr.m_pEnt ); 
-	SetImpactControlPoint( pEffect.GetObject(), 1, vecImpactPoint, vecReflect,		tr.m_pEnt ); 
-	SetImpactControlPoint( pEffect.GetObject(), 2, vecImpactPoint, vecShotBackward,	tr.m_pEnt ); 
+	SetImpactControlPoint( pEffect.GetObject(), 0, vecImpactPoint, tr.plane.normal, (C_BaseEntity*)tr.m_pEnt );
+	SetImpactControlPoint( pEffect.GetObject(), 1, vecImpactPoint, vecReflect, (C_BaseEntity*)tr.m_pEnt );
+	SetImpactControlPoint( pEffect.GetObject(), 2, vecImpactPoint, vecShotBackward, (C_BaseEntity*)tr.m_pEnt );
 	pEffect->SetControlPoint( 3, Vector( iScale, iScale, iScale ) );
 	if ( pEffect->m_pDef->ReadsControlPoint( 4 ) )
 	{

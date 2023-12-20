@@ -337,11 +337,11 @@ void CWeaponIFMSteadyCam::LockCamera()
 		return;
 	}
 
-	m_hLockTarget = tr.m_pEnt;
+	m_hLockTarget = (CBaseEntity*)tr.m_pEnt;
 	m_vecOffset = tr.endpos;
 	if ( tr.m_pEnt )
 	{
-		m_vecOffset -= tr.m_pEnt->GetAbsOrigin();
+		m_vecOffset -= ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin();
 	}
 }
 

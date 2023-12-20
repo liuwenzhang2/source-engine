@@ -434,7 +434,7 @@ void CWeaponGauss::Fire( Vector vecOrigSrc, Vector vecDir, float flDamage )
 		if ( tr.allsolid )
 			break;
 
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		if (pEntity == NULL)
 			break;
 

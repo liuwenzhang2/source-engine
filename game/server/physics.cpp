@@ -511,7 +511,7 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 	if ( pEntity0->ForceVPhysicsCollide( pEntity1 ) || pEntity1->ForceVPhysicsCollide( pEntity0 ) )
 		return 1;
 
-	if ( pEntity0->edict() && pEntity1->edict() )
+	if ( pEntity0->entindex()!=-1 && pEntity1->entindex()!=-1 )
 	{
 		// don't collide with your owner
 		if ( pEntity0->GetOwnerEntity() == pEntity1 || pEntity1->GetOwnerEntity() == pEntity0 )
@@ -1309,8 +1309,8 @@ CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR
 
 	if ( tr.DidHit() )
 	{
-		const model_t *pModel = modelinfo->GetModel( tr.m_pEnt->GetModelIndex() );
-		const char *pModelName = STRING(tr.m_pEnt->GetModelName());
+		const model_t *pModel = modelinfo->GetModel(((CBaseEntity*)tr.m_pEnt)->GetModelIndex() );
+		const char *pModelName = STRING(((CBaseEntity*)tr.m_pEnt)->GetModelName());
 		if ( tr.DidHitWorld() && tr.hitbox > 0 )
 		{
 			ICollideable *pCollide = staticpropmgr->GetStaticPropByIndex( tr.hitbox-1 );
@@ -1328,7 +1328,7 @@ CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR
 		Vector vecVelocity = tr.startpos - tr.endpos;
 		int length = vecVelocity.Length();
 
-		Msg("Hit surface \"%s\" (entity %s, model \"%s\" %s), texture \"%s\"\n", physprops->GetPropName( tr.surface.surfaceProps ), tr.m_pEnt->GetClassname(), pModelName, modelStuff.Access(), tr.surface.name);
+		Msg("Hit surface \"%s\" (entity %s, model \"%s\" %s), texture \"%s\"\n", physprops->GetPropName( tr.surface.surfaceProps ), ((CBaseEntity*)tr.m_pEnt)->GetClassname(), pModelName, modelStuff.Access(), tr.surface.name);
 		Msg("Distance to surface: %d\n", length );
 	}
 }
@@ -1387,7 +1387,7 @@ public:
 
 	bool IsWorldEntity( CBaseEntity *pEnt )
 	{
-		if ( pEnt->edict() )
+		if ( pEnt->entindex()!=-1 )
 			return pEnt->IsWorld();
 		return false;
 	}
@@ -1525,7 +1525,7 @@ void PhysicsCommand( const CCommand &args, void (*func)( CBaseEntity *pEntity ) 
 
 		if ( tr.DidHit() )
 		{
-			func( tr.m_pEnt );
+			func((CBaseEntity*)tr.m_pEnt );
 		}
 	}
 	else

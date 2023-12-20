@@ -378,7 +378,7 @@ void UTIL_Tracer( const Vector &vecStart, const Vector &vecEnd, int iEntIndex, i
 //------------------------------------------------------------------------------
 void UTIL_ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName )
 {
-	C_BaseEntity *pEntity = pTrace->m_pEnt;
+	C_BaseEntity *pEntity = (C_BaseEntity*)pTrace->m_pEnt;
 
 	// Is the entity valid, is the surface sky?
 	if ( !pEntity || (pTrace->surface.flags & SURF_SKY) )

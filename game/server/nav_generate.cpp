@@ -4675,9 +4675,9 @@ bool IsWalkableTraceLineClear( const Vector &from, const Vector &to, unsigned in
 		UTIL_TraceLine( useFrom, to, MASK_NPCSOLID, &traceFilter, &result );
 
 		// if we hit a walkable entity, try again
-		if (result.fraction != 1.0f && IsEntityWalkable( result.m_pEnt, flags ))
+		if (result.fraction != 1.0f && IsEntityWalkable((CBaseEntity*)result.m_pEnt, flags ))
 		{
-			ignore = result.m_pEnt;
+			ignore = (CBaseEntity*)result.m_pEnt;
 
 			// start from just beyond where we hit to avoid infinite loops
 			Vector dir = to - from;

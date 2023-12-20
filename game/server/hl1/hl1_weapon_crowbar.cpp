@@ -165,7 +165,7 @@ void CWeaponCrowbar::Hit( void )
 
 	CSoundEnt::InsertSound( SOUND_BULLET_IMPACT, m_traceHit.endpos, 400, 0.2f, pPlayer );
 
-	CBaseEntity	*pHitEntity = m_traceHit.m_pEnt;
+	CBaseEntity	*pHitEntity = (CBaseEntity*)m_traceHit.m_pEnt;
 
 	//Apply damage to a hit target
 	if ( pHitEntity != NULL )

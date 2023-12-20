@@ -251,7 +251,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 //			NDebugOverlay::Box( tr2.endpos, Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 255, 0, 0, 10 );
 //			NDebugOverlay::Box( GetAbsOrigin(), Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 0, 255, 0, 10 );
 
-			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && tr2.m_pEnt->GetMoveType() == MOVETYPE_NONE ) )
+			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && ((CBaseEntity*)tr2.m_pEnt)->GetMoveType() == MOVETYPE_NONE ) )
 			{
 				CEffectData	data;
 

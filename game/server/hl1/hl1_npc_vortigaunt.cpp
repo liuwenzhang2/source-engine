@@ -169,7 +169,7 @@ void CNPC_Vortigaunt::AlertSound( void )
 {
 	if ( GetEnemy() != NULL )
 	{
-		SENTENCEG_PlayRndSz( edict(), "SLV_ALERT", 0.85, SNDLVL_NORM, 0, m_iVoicePitch );
+		SENTENCEG_PlayRndSz( this, "SLV_ALERT", 0.85, SNDLVL_NORM, 0, m_iVoicePitch );
 
 		Vector vecTmp = GetEnemy()->GetAbsOrigin();
 		CallForHelp( "monster_alien_slave", 512, GetEnemy(), vecTmp );
@@ -182,7 +182,7 @@ void CNPC_Vortigaunt::AlertSound( void )
 void CNPC_Vortigaunt::IdleSound( void )
 {
 	if ( random->RandomInt( 0, 2 ) == 0)
-	  	 SENTENCEG_PlayRndSz( edict(), "SLV_IDLE", 0.85, SNDLVL_NORM, 0, m_iVoicePitch);
+	  	 SENTENCEG_PlayRndSz( this, "SLV_IDLE", 0.85, SNDLVL_NORM, 0, m_iVoicePitch);
 }
 
 //=========================================================
@@ -579,12 +579,12 @@ void CNPC_Vortigaunt::ArmBeam( int side )
 	if ( flDist == 1.0 )
 		 return;
 
-	if( tr.m_pEnt && tr.m_pEnt->m_takedamage && !tr.m_pEnt->IsNPC() )
+	if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->m_takedamage && !((CBaseEntity*)tr.m_pEnt)->IsNPC() )
 	{
 		CTakeDamageInfo info( this, this, 10, DMG_SHOCK );
 		CalculateMeleeDamageForce( &info, vecAim, tr.endpos );
 
-		tr.m_pEnt->TakeDamage( info );
+		((CBaseEntity*)tr.m_pEnt)->TakeDamage( info );
 	}
 
 	UTIL_DecalTrace( &tr, "FadingScorch" );
@@ -685,7 +685,7 @@ void CNPC_Vortigaunt::ZapBeam( int side )
 	m_pBeam[m_iBeams]->AddSpawnFlags( SF_BEAM_TEMPORARY );
 	m_iBeams++;
 
-	pEntity = tr.m_pEnt;
+	pEntity = (CBaseEntity*)tr.m_pEnt;
 
 	if ( pEntity != NULL && m_takedamage )
 	{

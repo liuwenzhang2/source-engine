@@ -263,7 +263,7 @@ bool CEnvEntityMaker::HasRoomToSpawn()
 	if ( tr.m_pEnt || tr.startsolid )
 	{
 		// Store off our blocker to check later
-		m_hCurrentBlocker = tr.m_pEnt;
+		m_hCurrentBlocker = (CBaseEntity*)tr.m_pEnt;
 		if ( m_hCurrentBlocker )
 		{
 			m_vecBlockerOrigin = m_hCurrentBlocker->GetAbsOrigin();

@@ -343,9 +343,9 @@ public:
 			g_pLocalNetworkBackdoor->NotifyEdictFlagsChange( iEdict );
 	}
 
-	virtual const CCheckTransmitInfo* GetPrevCheckTransmitInfo( edict_t *pPlayerEdict )
+	virtual const CCheckTransmitInfo* GetPrevCheckTransmitInfo( int pPlayerEdict )
 	{
-		int entnum = NUM_FOR_EDICT( pPlayerEdict );
+		int entnum = pPlayerEdict;
 		if ( entnum < 1 || entnum > sv.GetClientCount() )
 		{
 			Error( "Invalid client specified in GetPrevCheckTransmitInfo\n" );
@@ -529,7 +529,7 @@ public:
 		return true;
 	}
 	
-	virtual int GetPlayerUserId( const edict_t *e )
+	virtual int GetPlayerUserId( int e )
 	{
 		if ( !sv.IsActive() || !e)
 			return -1;
@@ -538,7 +538,7 @@ public:
 		{
 			CGameClient *pClient = sv.Client(i);
 			
-			if ( pClient->edict == e )
+			if ( pClient->m_nEntityIndex == e )
 			{
 				return pClient->m_UserID;
 			}
@@ -548,7 +548,7 @@ public:
 		return -1;
 	}
 
-	virtual const char *GetPlayerNetworkIDString( const edict_t *e )
+	virtual const char *GetPlayerNetworkIDString( int e )
 	{
 		if ( !sv.IsActive() || !e)
 			return NULL;
@@ -557,7 +557,7 @@ public:
 		{
 			CGameClient *pGameClient = sv.Client(i);
 			
-			if ( pGameClient->edict == e )
+			if ( pGameClient->m_nEntityIndex == e )
 			{
 				return pGameClient->GetNetworkIDString();
 			}
@@ -568,7 +568,7 @@ public:
 
 	}
 	
-	virtual bool IsPlayerNameLocked( const edict_t *pEdict )
+	virtual bool IsPlayerNameLocked( int pEdict )
 	{
 		if ( !sv.IsActive() || !pEdict )
 			return false;
@@ -577,7 +577,7 @@ public:
 		{
 			CGameClient *pClient = sv.Client( i );
 
-			if ( pClient->edict == pEdict )
+			if ( pClient->m_nEntityIndex == pEdict )
 			{
 				return pClient->IsPlayerNameLocked();
 			}
@@ -586,7 +586,7 @@ public:
 		return false;
 	}
 
-	virtual bool CanPlayerChangeName( const edict_t *pEdict )
+	virtual bool CanPlayerChangeName( int pEdict )
 	{
 		if ( !sv.IsActive() || !pEdict )
 			return false;
@@ -595,7 +595,7 @@ public:
 		{
 			CGameClient *pClient = sv.Client( i );
 
-			if ( pClient->edict == pEdict )
+			if ( pClient->m_nEntityIndex == pEdict )
 			{
 				return ( !pClient->IsPlayerNameLocked() && !pClient->IsNameChangeOnCooldown() );
 			}
@@ -673,19 +673,19 @@ public:
 	
 	// Returns a pointer to an entity from an index,  but only if the entity
 	// is a valid DLL entity (ie. has an attached class)
-	virtual edict_t* PEntityOfEntIndex(int iEntIndex)
-	{
-		if ( iEntIndex >= 0 && iEntIndex < sv.max_edicts )
-		{
-			edict_t *pEdict = EDICT_NUM( iEntIndex );
-			if ( !pEdict->IsFree() )
-			{
-				return pEdict;
-			}
-		}
-		
-		return NULL;
-	}
+	//virtual edict_t* PEntityOfEntIndex(int iEntIndex)
+	//{
+	//	if ( iEntIndex >= 0 && iEntIndex < sv.max_edicts )
+	//	{
+	//		edict_t *pEdict = EDICT_NUM( iEntIndex );
+	//		if ( !pEdict->IsFree() )
+	//		{
+	//			return pEdict;
+	//		}
+	//	}
+	//	
+	//	return NULL;
+	//}
 	
 	virtual int	GetEntityCount( void )
 	{
@@ -704,26 +704,86 @@ public:
 		return client->m_NetChannel;
 	}
 
-	virtual edict_t* CreateEdict( int iForceEdictIndex )
+	virtual int CreateEdict( int iForceEdictIndex )
 	{
 		edict_t	*pedict = ED_Alloc( iForceEdictIndex );
 		if ( g_pServerPluginHandler )
 		{
 			g_pServerPluginHandler->OnEdictAllocated( pedict );
 		}
-		return pedict;
+		return pedict->m_EdictIndex;
 	}
 	
 	
-	virtual void RemoveEdict(edict_t* ed)
+	virtual void RemoveEdict(int ed)
 	{
+		edict_t* pEdict = EDICT_NUM(ed);
 		if ( g_pServerPluginHandler )
 		{
-			g_pServerPluginHandler->OnEdictFreed( ed );
+			g_pServerPluginHandler->OnEdictFreed(pEdict);
 		}
-		ED_Free(ed);
+		ED_Free(pEdict);
 	}
+
+	virtual int& GetEdictFlag(int entindex) {
+		if (entindex >= 0 && entindex < sv.max_edicts)
+		{
+			edict_t* pEdict = EDICT_NUM(entindex);
+			return pEdict->m_fStateFlags;
+		}
+		Error("GetEdictFlag");
+	}
+
+	virtual void EdictFlagChanged(int entindex) {
+		if (entindex >= 0 && entindex < sv.max_edicts)
+		{
+			edict_t* pEdict = EDICT_NUM(entindex);
+			return pEdict->StateChanged();
+		}
+	}
+
+	virtual void		EdictFlagChanged(int entindex, unsigned short offset) {
+		if (entindex >= 0 && entindex < sv.max_edicts)
+		{
+			edict_t* pEdict = EDICT_NUM(entindex);
+			return pEdict->StateChanged(offset);
+		}
+	};
 	
+	virtual void		ClearTransmitState(int entindex) {
+		if (entindex >= 0 && entindex < sv.max_edicts)
+		{
+			edict_t* pEdict = EDICT_NUM(entindex);
+			return pEdict->ClearTransmitState();
+		}
+	}
+
+	virtual void		SetEdict(int entindex, bool bFullEdict) {
+		if (entindex >= 0 && entindex < sv.max_edicts)
+		{
+			edict_t* pEdict = EDICT_NUM(entindex);
+			return pEdict->SetEdict(bFullEdict);
+		}
+	}
+
+	virtual bool		IsEdictFree(int entindex) {
+		if (entindex >= 0 && entindex < sv.max_edicts)
+		{
+			edict_t* pEdict = EDICT_NUM(entindex);
+			return pEdict->IsFree();
+		}
+		return true;
+	}
+
+	virtual short& GetNetworkSerialNumber(int entindex) {
+		if (entindex >= 0 && entindex < sv.max_edicts)
+		{
+			edict_t* pEdict = EDICT_NUM(entindex);
+			return pEdict->m_NetworkSerialNumber;
+		}
+		Error("GetEdictFlag");
+	}
+
 	//
 	// Request engine to allocate "cb" bytes on the entity's private data pointer.
 	//
@@ -856,10 +916,10 @@ public:
 	}
 	
 	
-	virtual void FadeClientVolume(const edict_t *clientent,
+	virtual void FadeClientVolume(int clientent,
 		float fadePercent, float fadeOutSeconds, float holdTime, float fadeInSeconds)
 	{
-		int entnum = NUM_FOR_EDICT(clientent);
+		int entnum = clientent;
 		
 		if (entnum < 1 || entnum > sv.GetClientCount() )
 		{
@@ -1003,7 +1063,7 @@ public:
 		stuffcmd (clientent, value)
 		=================
 	*/
-	virtual void ClientCommand(edict_t* pEdict, const char* szFmt, ...)
+	virtual void ClientCommand(int pEdict, const char* szFmt, ...)
 	{
 		va_list		argptr; 
 		static char	szOut[1024];
@@ -1018,7 +1078,7 @@ public:
 			return;
 		}
 
-		int entnum = NUM_FOR_EDICT( pEdict );
+		int entnum = pEdict;
 		
 		if ( ( entnum < 1 ) || ( entnum >  sv.GetClientCount() ) )
 		{
@@ -1034,12 +1094,12 @@ public:
 
 	// Send a client command keyvalues
 	// keyvalues are deleted inside the function
-	virtual void ClientCommandKeyValues( edict_t *pEdict, KeyValues *pCommand )
+	virtual void ClientCommandKeyValues( int pEdict, KeyValues *pCommand )
 	{
 		if ( !pCommand )
 			return;
 
-		int entnum = NUM_FOR_EDICT( pEdict );
+		int entnum = pEdict;
 
 		if ( ( entnum < 1 ) || ( entnum >  sv.GetClientCount() ) )
 		{
@@ -1247,9 +1307,9 @@ public:
 	}
 	
 	/* single print to a specific client */
-	virtual void ClientPrintf( edict_t *pEdict, const char *szMsg )
+	virtual void ClientPrintf( int pEdict, const char *szMsg )
 	{
-		int entnum = NUM_FOR_EDICT( pEdict );
+		int entnum = pEdict;
 		
 		if (entnum < 1 || entnum > sv.GetClientCount() )
 		{
@@ -1299,9 +1359,9 @@ public:
 	}
 #endif
 
-	virtual void SetView(const edict_t *clientent, const edict_t *viewent)
+	virtual void SetView(int clientent, const IServerEntity *viewent)
 	{
-		int clientnum = NUM_FOR_EDICT( clientent );
+		int clientnum = clientent;
 		if (clientnum < 1 || clientnum > sv.GetClientCount() )
 			Host_Error ("DLL_SetView: not a client");
 		
@@ -1309,7 +1369,7 @@ public:
 
 		client->m_pViewEntity = viewent;
 		
-		SVC_SetView view( NUM_FOR_EDICT(viewent) );
+		SVC_SetView view( viewent->GetRefEHandle().GetEntryIndex() );
 		client->SendNetMsg( view );
 	}
 	
@@ -1318,9 +1378,9 @@ public:
 		return Sys_FloatTime();
 	}
 	
-	virtual void CrosshairAngle(const edict_t *clientent, float pitch, float yaw)
+	virtual void CrosshairAngle(int clientent, float pitch, float yaw)
 	{
-		int clientnum = NUM_FOR_EDICT( clientent );
+		int clientnum = clientent;
 
 		if (clientnum < 1 || clientnum > sv.GetClientCount() )
 			Host_Error ("DLL_Crosshairangle: not a client");
@@ -1362,7 +1422,7 @@ public:
 	}
 
 	// For use with FAKE CLIENTS
-	virtual edict_t* CreateFakeClient( const char *netname )
+	virtual int CreateFakeClient( const char *netname )
 	{
 		CGameClient *fcl = static_cast<CGameClient*>( sv.CreateFakeClient( netname ) );
 		if ( !fcl )
@@ -1371,14 +1431,14 @@ public:
 			return NULL;
 		}
 
-		return fcl->edict;
+		return fcl->m_nEntityIndex;
 	}
 
 	// For use with FAKE CLIENTS
-	virtual edict_t* CreateFakeClientEx( const char *netname, bool bReportFakeClient /*= true*/ )
+	virtual int CreateFakeClientEx( const char *netname, bool bReportFakeClient /*= true*/ )
 	{
 		sv.SetReportNewFakeClients( bReportFakeClient );
-		edict_t *ret = CreateFakeClient( netname );
+		int ret = CreateFakeClient( netname );
 		sv.SetReportNewFakeClients( true ); // Leave this set as true so other callers of sv.CreateFakeClient behave correctly.
 
 		return ret;
@@ -1473,9 +1533,9 @@ public:
 		return sv.IsPaused();
 	}
 
-	virtual void SetFakeClientConVarValue( edict_t *pEntity, const char *pCvarName, const char *value )
+	virtual void SetFakeClientConVarValue( int pEntity, const char *pCvarName, const char *value )
 	{
-		int clientnum = NUM_FOR_EDICT( pEntity );
+		int clientnum = pEntity;
 		if (clientnum < 1 || clientnum > sv.GetClientCount() )
 			Host_Error ("DLL_SetView: not a client");
 
@@ -1497,9 +1557,9 @@ public:
 		return &sv.edictchangeinfo[ NUM_FOR_EDICT( pEdict ) ];
 	}
 
-	virtual QueryCvarCookie_t StartQueryCvarValue( edict_t *pPlayerEntity, const char *pCvarName )
+	virtual QueryCvarCookie_t StartQueryCvarValue( int pPlayerEntity, const char *pCvarName )
 	{
-		int clientnum = NUM_FOR_EDICT( pPlayerEntity );
+		int clientnum = pPlayerEntity;
 		if (clientnum < 1 || clientnum > sv.GetClientCount() )
 			Host_Error( "StartQueryCvarValue: not a client" );
 
@@ -1595,9 +1655,9 @@ public:
 		return sv.GetPlayerInfo( (ent_num-1), pinfo );
 	}
 
-	bool IsClientFullyAuthenticated( edict_t *pEdict )
+	bool IsClientFullyAuthenticated( int pEdict )
 	{
-		int entnum = NUM_FOR_EDICT( pEdict );
+		int entnum = pEdict;
 		if (entnum < 1 || entnum > sv.GetClientCount() )
 			return false;
 
@@ -1629,9 +1689,9 @@ public:
 	}
 
 	// Returns the SteamID of the specified player. It'll be NULL if the player hasn't authenticated yet.
-	const CSteamID	*GetClientSteamID( edict_t *pPlayerEdict )
+	const CSteamID	*GetClientSteamID( int pPlayerEdict )
 	{
-		int entnum = NUM_FOR_EDICT( pPlayerEdict );
+		int entnum = pPlayerEdict;
 		return GetClientSteamIDByPlayerIndex( entnum );
 	}
 	
@@ -1746,10 +1806,10 @@ private:
 	virtual void ClearSaveDirAfterClientLoad();
 
 	virtual const char* GetMapEntitiesString();
-	virtual void BuildEntityClusterList( edict_t *pEdict, PVSInfo_t *pPVSInfo );
+	virtual void BuildEntityClusterList( IServerEntity *pEdict, PVSInfo_t *pPVSInfo );
 	virtual void CleanUpEntityClusterList( PVSInfo_t *pPVSInfo );
-	virtual void SolidMoved( edict_t *pSolidEnt, ICollideable *pSolidCollide, const Vector* pPrevAbsOrigin, bool accurateBboxTriggerChecks );
-	virtual void TriggerMoved( edict_t *pTriggerEnt, bool accurateBboxTriggerChecks );
+	virtual void SolidMoved( IServerEntity *pSolidEnt, ICollideable *pSolidCollide, const Vector* pPrevAbsOrigin, bool accurateBboxTriggerChecks );
+	virtual void TriggerMoved( IServerEntity *pTriggerEnt, bool accurateBboxTriggerChecks );
 
 	virtual ISpatialPartition *CreateSpatialPartition( const Vector& worldmin, const Vector& worldmax ) { return ::CreateSpatialPartition( worldmin, worldmax );	}
 	virtual void 		DestroySpatialPartition( ISpatialPartition *pPartition )						{ ::DestroySpatialPartition( pPartition );					}
@@ -1931,7 +1991,7 @@ inline bool SortClusterLessFunc( const int &left, const int &right )
 	return left < right;
 }
 
-void CVEngineServer::BuildEntityClusterList( edict_t *pEdict, PVSInfo_t *pPVSInfo )
+void CVEngineServer::BuildEntityClusterList( IServerEntity *pEdict, PVSInfo_t *pPVSInfo )
 {
 	int		i, j;
 	int		topnode;
@@ -2084,12 +2144,12 @@ void CVEngineServer::CleanUpEntityClusterList( PVSInfo_t *pPVSInfo )
 //-----------------------------------------------------------------------------
 // Adds a handle to the list of entities to update when a partition query occurs
 //-----------------------------------------------------------------------------
-void CVEngineServer::SolidMoved( edict_t *pSolidEnt, ICollideable *pSolidCollide, const Vector* pPrevAbsOrigin, bool accurateBboxTriggerChecks )
+void CVEngineServer::SolidMoved( IServerEntity *pSolidEnt, ICollideable *pSolidCollide, const Vector* pPrevAbsOrigin, bool accurateBboxTriggerChecks )
 {
 	SV_SolidMoved( pSolidEnt, pSolidCollide, pPrevAbsOrigin, accurateBboxTriggerChecks );
 }
 
-void CVEngineServer::TriggerMoved( edict_t *pTriggerEnt, bool accurateBboxTriggerChecks )
+void CVEngineServer::TriggerMoved( IServerEntity *pTriggerEnt, bool accurateBboxTriggerChecks )
 {
 	SV_TriggerMoved( pTriggerEnt, accurateBboxTriggerChecks );
 }

@@ -30,7 +30,7 @@ class CGrenadeHomer : public CBaseGrenade
 public:
 	DECLARE_CLASS( CGrenadeHomer, CBaseGrenade );
 
-	static CGrenadeHomer* CreateGrenadeHomer(  string_t nModelName, string_t sFlySound, const Vector &vecOrigin, const QAngle &vecAngles, edict_t *pentOwner );
+	static CGrenadeHomer* CreateGrenadeHomer(  string_t nModelName, string_t sFlySound, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pentOwner );
 
 	virtual void Precache( void );
 	void		Spawn( void );

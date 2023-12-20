@@ -2404,9 +2404,9 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 				ray.Init( p1, p2, Vector(-r,-r,0), Vector(r,r,r*2) );
 				enginetrace->TraceRay( ray, PhysicsSolidMaskForEntity(), &traceFilter, &trace );
 
-				if ( trace.m_pEnt != NULL && trace.m_pEnt->GetMoveType() == MOVETYPE_PUSH )
+				if ( trace.m_pEnt != NULL && ((C_BaseEntity*)trace.m_pEnt)->GetMoveType() == MOVETYPE_PUSH )
 				{
-					pTarget->SetOwner( trace.m_pEnt->entindex(), trace.m_pEnt->GetAbsOrigin(), trace.m_pEnt->GetAbsAngles() );
+					pTarget->SetOwner(((C_BaseEntity*)trace.m_pEnt)->entindex(), ((C_BaseEntity*)trace.m_pEnt)->GetAbsOrigin(), ((C_BaseEntity*)trace.m_pEnt)->GetAbsAngles() );
 				}
 				else
 				{

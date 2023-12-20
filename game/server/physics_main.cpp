@@ -422,7 +422,7 @@ void CPhysicsPushedEntities::FinishPush( bool bIsRotPush, const RotatingPushMove
 		// Register physics impacts...
 		if (info.m_Trace.m_pEnt)
 		{
-			pPushedEntity->PhysicsImpact( info.m_Trace.m_pEnt, info.m_Trace );
+			pPushedEntity->PhysicsImpact((CBaseEntity*)info.m_Trace.m_pEnt, info.m_Trace );
 		}
 
 		if (bIsRotPush)
@@ -473,7 +473,7 @@ CBaseEntity *CPhysicsPushedEntities::RegisterBlockage()
 	PhysicsPushedInfo_t &info = m_rgMoved[m_nBlocker];
 	if ( info.m_Trace.m_pEnt )
 	{
-		info.m_pEntity->PhysicsImpact( info.m_Trace.m_pEnt, info.m_Trace );
+		info.m_pEntity->PhysicsImpact((CBaseEntity*)info.m_Trace.m_pEnt, info.m_Trace );
 	}
 
 	// This is the dude 
@@ -1063,7 +1063,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 		if (trace.plane.normal[2] > 0.7)
 		{
 			blocked |= 1;		// floor
-			if (CanStandOn( trace.m_pEnt ))
+			if (CanStandOn((CBaseEntity*)trace.m_pEnt ))
 			{
 				// keep track of time when changing ground entity
 				if (GetGroundEntity() != trace.m_pEnt)
@@ -1071,7 +1071,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 					SetGroundChangeTime( gpGlobals->curtime + (flTime - (1 - trace.fraction) * time_left) );
 				}
 
-				SetGroundEntity( trace.m_pEnt );
+				SetGroundEntity((CBaseEntity*)trace.m_pEnt );
 			}
 		}
 		if (!trace.plane.normal[2])
@@ -1082,9 +1082,9 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 		}
 
 		// run the impact function
-		PhysicsImpact( trace.m_pEnt, trace );
+		PhysicsImpact((CBaseEntity*)trace.m_pEnt, trace );
 		// Removed by the impact function
-		if ( IsMarkedForDeletion() || IsEdictFree() )
+		if ( IsMarkedForDeletion() || engine->IsEdictFree(entindex()) )
 			break;		
 	
 		time_left -= time_left * trace.fraction;
@@ -1241,7 +1241,7 @@ void CBaseEntity::PhysicsPushEntity( const Vector& push, trace_t *pTrace )
 
 	if ( pTrace->m_pEnt )
 	{
-		PhysicsImpact( pTrace->m_pEnt, *pTrace );
+		PhysicsImpact((CBaseEntity*)pTrace->m_pEnt, *pTrace );
 	}
 }
 
@@ -1265,7 +1265,7 @@ bool CBaseEntity::PhysicsTestEntityPosition( CBaseEntity **ppEntity /*=NULL*/ )
 	{
 		if ( ppEntity )
 		{
-			*ppEntity = trace.m_pEnt;
+			*ppEntity = (CBaseEntity*)trace.m_pEnt;
 		}
 		return true;
 	}
@@ -1549,7 +1549,7 @@ void CBaseEntity::PhysicsCustom()
 		return;
 	}
 	
-	if (IsEdictFree())
+	if (engine->IsEdictFree(entindex()))
 		return;
 
 	// check for in water
@@ -1825,7 +1825,7 @@ void CBaseEntity::PhysicsStepRecheckGround()
 
 			if ( trace.startsolid )
 			{
-				SetGroundEntity( trace.m_pEnt );
+				SetGroundEntity((CBaseEntity*)trace.m_pEnt );
 				return;
 			}
 		}
@@ -1945,7 +1945,7 @@ void Physics_SimulateEntity( CBaseEntity *pEntity )
 			"Physics_SimulateEntity" : 
 			EntityFactoryDictionary()->GetCannonicalName( pEntity->GetClassname() ) );
 
-	if ( pEntity->edict() )
+	if ( pEntity->entindex()!=-1 )
 	{
 #if !defined( NO_ENTITY_PREDICTION )
 		// Player drives simulation of this entity

@@ -448,7 +448,7 @@ CAI_BaseNPC *CNPC_Osprey::MakeGrunt( Vector vecSrc )
 	trace_t tr;
 	UTIL_TraceLine( vecSrc, vecSrc + Vector( 0, 0, -4096.0), MASK_NPCSOLID,  this, COLLISION_GROUP_NONE, &tr);
 	
-	if ( tr.m_pEnt && tr.m_pEnt->GetSolid() != SOLID_BSP) 
+	if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->GetSolid() != SOLID_BSP) 
 		return NULL;
 
 	for (int i = 0; i < m_iUnits; i++)

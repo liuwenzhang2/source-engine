@@ -87,7 +87,7 @@ void CFuncLadder::Spawn()
 				m_vecPlayerMountPositionBottom.GetZ(),
 				bottomtrace.m_pEnt 
 					? 
-					UTIL_VarArgs( "%s/%s", bottomtrace.m_pEnt->GetClassname(), bottomtrace.m_pEnt->GetEntityName().ToCStr() ) 
+					UTIL_VarArgs( "%s/%s", ((CBaseEntity*)bottomtrace.m_pEnt)->GetClassname(), ((CBaseEntity*)bottomtrace.m_pEnt)->GetEntityName().ToCStr() )
 					: 
 					"NULL" );
 		}
@@ -99,7 +99,7 @@ void CFuncLadder::Spawn()
 				m_vecPlayerMountPositionTop.GetZ(),
 				toptrace.m_pEnt 
 					? 
-					UTIL_VarArgs( "%s/%s", toptrace.m_pEnt->GetClassname(), toptrace.m_pEnt->GetEntityName().ToCStr() ) 
+					UTIL_VarArgs( "%s/%s", ((CBaseEntity*)toptrace.m_pEnt)->GetClassname(), ((CBaseEntity*)toptrace.m_pEnt)->GetEntityName().ToCStr() )
 					: 
 					"NULL" );
 		}

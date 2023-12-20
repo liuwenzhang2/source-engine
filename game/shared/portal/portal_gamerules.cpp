@@ -1163,7 +1163,7 @@ bool CPortalGameRules::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
 #ifndef CLIENT_DLL
 //---------------------------------------------------------
 //---------------------------------------------------------
-bool CPortalGameRules::ShouldAutoAim( CBasePlayer *pPlayer, edict_t *target )
+bool CPortalGameRules::ShouldAutoAim( CBasePlayer *pPlayer, CBaseEntity *target )
 {
 	return sk_allow_autoaim.GetBool() != 0;
 }

@@ -16,6 +16,7 @@
 #include "staticpropmgr.h"
 #include "server.h"
 #include "edict.h"
+#include "pr_edict.h"
 #include "gl_model_private.h"
 #include "world.h"
 #include "vphysics_interface.h"
@@ -1023,12 +1024,12 @@ void CEngineTraceClient::SetTraceEntity( ICollideable *pCollideable, trace_t *pT
 	IClientUnknown *pUnk = (IClientUnknown*)pCollideable->GetEntityHandle();
 	if ( !StaticPropMgr()->IsStaticProp( pUnk ) )
 	{
-		pTrace->m_pEnt = (CBaseEntity*)(pUnk->GetIClientEntity());
+		pTrace->m_pEnt = (pUnk->GetIClientEntity());
 	}
 	else
 	{
 		// For static props, point to the world, hitbox is the prop index
-		pTrace->m_pEnt = (CBaseEntity*)(entitylist->GetClientEntity(0));
+		pTrace->m_pEnt = (entitylist->GetClientEntity(0));
 		pTrace->hitbox = StaticPropMgr()->GetStaticPropIndex( pUnk ) + 1;
 	}
 }
@@ -1042,12 +1043,12 @@ void CEngineTraceServer::SetTraceEntity( ICollideable *pCollideable, trace_t *pT
 	IHandleEntity *pHandleEntity = pCollideable->GetEntityHandle();
 	if ( !StaticPropMgr()->IsStaticProp( pHandleEntity ) )
 	{
-		pTrace->m_pEnt = (CBaseEntity*)(pHandleEntity);
+		pTrace->m_pEnt = (pHandleEntity);
 	}
 	else
 	{
 		// For static props, point to the world, hitbox is the prop index
-		pTrace->m_pEnt = (CBaseEntity*)(sv.edicts->GetIServerEntity());
+		pTrace->m_pEnt = (sv.edicts->GetIServerEntity());
 		pTrace->hitbox = StaticPropMgr()->GetStaticPropIndex( pHandleEntity ) + 1;
 	}
 }

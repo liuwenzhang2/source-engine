@@ -133,7 +133,7 @@ void CWeaponTripMine::PrimaryAttack( void )
 
 	if ( tr.fraction < 1.0 )
 	{
-		CBaseEntity *pEntity = tr.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		if ( pEntity && !( pEntity->GetFlags() & FL_CONVEYOR ) )
 		{
 			QAngle angles;
@@ -395,8 +395,8 @@ void CTripmineGrenade::PowerupThink( void  )
 		}
 		if ( tr.fraction < 1.0 )
 		{
-			SetOwnerEntity( tr.m_pEnt );
-			m_hStuckOn		= tr.m_pEnt;
+			SetOwnerEntity((CBaseEntity*)tr.m_pEnt );
+			m_hStuckOn		= (CBaseEntity*)tr.m_pEnt;
 			m_posStuckOn	= m_hStuckOn->GetAbsOrigin();
 			m_angStuckOn	= m_hStuckOn->GetAbsAngles();
 		}
@@ -501,11 +501,11 @@ void CTripmineGrenade::BeamBreakThink( void  )
 
 		if ( stuckOnTrace.m_pEnt )
 		{
-			m_hStuckOn = stuckOnTrace.m_pEnt;	// reset stuck on ent too
+			m_hStuckOn = (CBaseEntity*)stuckOnTrace.m_pEnt;	// reset stuck on ent too
 		}
 	}
 
-	CBaseEntity *pEntity = tr.m_pEnt;
+	CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 	CBaseCombatCharacter *pBCC  = ToBaseCombatCharacter( pEntity );
 
 	if ( pBCC || fabs( m_flBeamLength - tr.fraction ) > 0.001 )

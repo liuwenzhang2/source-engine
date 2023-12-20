@@ -717,7 +717,7 @@ void CNPC_BaseScanner::AttackDivebombCollide(float flInterval)
 
 	if (tr.m_pEnt)
 	{
-		pHitEntity = tr.m_pEnt;
+		pHitEntity = (CBaseEntity*)tr.m_pEnt;
 
 		// Did I hit an entity that isn't another scanner?
 		if (pHitEntity && pHitEntity->Classify()!=CLASS_SCANNER)

@@ -2107,10 +2107,10 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 			if ( tr.fraction < 1.0f )
 			{
 				// Damage anything that's blocking me
-				if ( tr.m_pEnt && tr.m_pEnt->m_takedamage != DAMAGE_NO )
+				if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_NO )
 				{
 					CTakeDamageInfo info( this, this, 20 * dt, DMG_BURN );
-					tr.m_pEnt->TakeDamage( info );
+					((CBaseEntity*)tr.m_pEnt)->TakeDamage( info );
 				}
 			}
 

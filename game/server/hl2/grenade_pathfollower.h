@@ -23,7 +23,7 @@ class CGrenadePathfollower : public CBaseGrenade
 public:
 	DECLARE_CLASS( CGrenadePathfollower, CBaseGrenade );
 
-	static CGrenadePathfollower* CreateGrenadePathfollower( string_t sModelName, string_t sFlySound, const Vector &vecOrigin, const QAngle &vecAngles, edict_t *pentOwner );
+	static CGrenadePathfollower* CreateGrenadePathfollower( string_t sModelName, string_t sFlySound, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pentOwner );
 
 	CHandle<RocketTrail>	m_hRocketTrail;
 	CBaseEntity*	m_pPathTarget;				// path corner we are heading towards

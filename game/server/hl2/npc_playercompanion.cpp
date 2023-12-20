@@ -2106,7 +2106,7 @@ bool CNPC_PlayerCompanion::HasAimLOS( CBaseEntity *pAimTarget )
 	trace_t tr;
 	UTIL_TraceLine( Weapon_ShootPosition(), pAimTarget->WorldSpaceCenter(), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
-	if( tr.fraction < 0.5 || (tr.m_pEnt && (tr.m_pEnt->IsNPC()||tr.m_pEnt->IsPlayer())) )
+	if( tr.fraction < 0.5 || (tr.m_pEnt && (((CBaseEntity*)tr.m_pEnt)->IsNPC()|| ((CBaseEntity*)tr.m_pEnt)->IsPlayer())) )
 	{
 		return false;
 	}

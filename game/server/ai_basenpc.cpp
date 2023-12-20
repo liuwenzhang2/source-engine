@@ -1320,7 +1320,7 @@ CBaseEntity *CAI_BaseNPC::PlayerInRange( const Vector &vecLocation, float flDist
 #define BULLET_WIZZDIST	80.0
 #define SLOPE ( -1.0 / BULLET_WIZZDIST )
 
-void BulletWizz( Vector vecSrc, Vector vecEndPos, edict_t *pShooter, bool isTracer )
+void BulletWizz( Vector vecSrc, Vector vecEndPos, CBaseEntity *pShooter, bool isTracer )
 {
 	CBasePlayer *pPlayer;
 	Vector vecBulletPath;
@@ -1344,7 +1344,7 @@ void BulletWizz( Vector vecSrc, Vector vecEndPos, edict_t *pShooter, bool isTrac
 			continue;
 
 		// Don't hear one's own bullets
-		if( pPlayer->edict() == pShooter )
+		if( pPlayer->entindex() == pShooter->entindex() )
 			continue;
 
 		vecPlayerPath = pPlayer->EarPosition() - vecSrc;
@@ -3141,7 +3141,7 @@ void CAI_BaseNPC::UpdateEfficiency( bool bInPVS )
 
 	//---------------------------------
 
-	bool bInVisibilityPVS = ( bClientPVSExpanded && UTIL_FindClientInVisibilityPVS( edict() ) != NULL );
+	bool bInVisibilityPVS = ( bClientPVSExpanded && UTIL_FindClientInVisibilityPVS( this ) != NULL );
 
 	//---------------------------------
 
@@ -3589,7 +3589,7 @@ void CAI_BaseNPC::RebalanceThinks()
 				else if ( pPlayer )
 				{
 					Vector vToCandidate = pCandidate->EyePosition() - vPlayerEyePosition;
-					rebalanceCandidates[iInfo].bInPVS = ( UTIL_FindClientInPVS( pCandidate->edict() ) != NULL );
+					rebalanceCandidates[iInfo].bInPVS = ( UTIL_FindClientInPVS( pCandidate ) != NULL );
 					rebalanceCandidates[iInfo].distPlayer = VectorNormalize( vToCandidate );
 					rebalanceCandidates[iInfo].dotPlayer = vPlayerForward.Dot( vToCandidate );
 				}
@@ -3882,7 +3882,7 @@ void CAI_BaseNPC::PlayerPenetratingVPhysics( void )
 
 bool CAI_BaseNPC::CheckPVSCondition()
 {
-	bool bInPVS = ( UTIL_FindClientInPVS( edict() ) != NULL ) || (UTIL_ClientPVSIsExpanded() && UTIL_FindClientInVisibilityPVS( edict() ));
+	bool bInPVS = ( UTIL_FindClientInPVS( this ) != NULL ) || (UTIL_ClientPVSIsExpanded() && UTIL_FindClientInVisibilityPVS( this ));
 
 	if ( bInPVS )
 		SetCondition( COND_IN_PVS );
@@ -4534,12 +4534,12 @@ void CAI_BaseNPC::CheckOnGround( void )
 					}
 					else
 					{
-						if ( trace.startsolid && trace.m_pEnt->GetMoveType() == MOVETYPE_VPHYSICS && 
-							trace.m_pEnt->VPhysicsGetObject() && trace.m_pEnt->VPhysicsGetObject()->GetMass() < VPHYSICS_LARGE_OBJECT_MASS )
+						if ( trace.startsolid && ((CBaseEntity*)trace.m_pEnt)->GetMoveType() == MOVETYPE_VPHYSICS &&
+							((CBaseEntity*)trace.m_pEnt)->VPhysicsGetObject() && ((CBaseEntity*)trace.m_pEnt)->VPhysicsGetObject()->GetMass() < VPHYSICS_LARGE_OBJECT_MASS )
 						{
 							// stuck inside a small physics object?  
 							m_CheckOnGroundTimer.Set(0.1f);
-							NPCPhysics_CreateSolver( this, trace.m_pEnt, true, 0.25f );
+							NPCPhysics_CreateSolver( this, (CBaseEntity*)trace.m_pEnt, true, 0.25f );
 							if ( VPhysicsGetObject() )
 							{
 								VPhysicsGetObject()->RecheckContactPoints();
@@ -4548,7 +4548,7 @@ void CAI_BaseNPC::CheckOnGround( void )
 						// Check to see if someone changed the ground on us...
 						if ( trace.m_pEnt && trace.m_pEnt != GetGroundEntity() )
 						{
-							SetGroundEntity( trace.m_pEnt );
+							SetGroundEntity((CBaseEntity*)trace.m_pEnt );
 						}
 					}
 				}
@@ -4655,7 +4655,7 @@ void CAI_BaseNPC::GatherConditions( void )
 
 		if ( m_pfnThink != (BASEPTR)&CAI_BaseNPC::CallNPCThink )
 		{
-			if ( UTIL_FindClientInPVS( edict() ) != NULL )
+			if ( UTIL_FindClientInPVS( this ) != NULL )
 				SetCondition( COND_IN_PVS );
 			else
 				ClearCondition( COND_IN_PVS );
@@ -5363,7 +5363,7 @@ bool CAI_BaseNPC::InnateWeaponLOSCondition( const Vector &ownerPos, const Vector
 		return true;
 	}
 	
-	CBaseEntity	*pHitEntity = tr.m_pEnt;
+	CBaseEntity	*pHitEntity = (CBaseEntity*)tr.m_pEnt;
 	
 	// Translate a hit vehicle into its passenger if found
 	if ( GetEnemy() != NULL )
@@ -5398,7 +5398,7 @@ bool CAI_BaseNPC::InnateWeaponLOSCondition( const Vector &ownerPos, const Vector
 	else if (bSetConditions)
 	{
 		SetCondition(COND_WEAPON_SIGHT_OCCLUDED);
-		SetEnemyOccluder(tr.m_pEnt);
+		SetEnemyOccluder((CBaseEntity*)tr.m_pEnt);
 	}
 
 	return false;
@@ -6519,7 +6519,7 @@ float CAI_BaseNPC::ThrowLimit(	const Vector &vecStart,
 
 		if (tr.startsolid || tr.fraction < 1.0)
 		{
-			CBaseEntity *pEntity = tr.m_pEnt;
+			CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 
 			// If we hit the target we are good to go!
 			if (pEntity == pTarget)
@@ -8162,7 +8162,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			break;
 		// fall through...
 	case SCRIPT_EVENT_SENTENCE:			// Play a named sentence group
-		SENTENCEG_PlayRndSz( edict(), pEvent->options, 1.0, SNDLVL_TALKING, 0, 100 );
+		SENTENCEG_PlayRndSz( this, pEvent->options, 1.0, SNDLVL_TALKING, 0, 100 );
 		break;
 
 	case SCRIPT_EVENT_FIREEVENT:
@@ -9767,7 +9767,7 @@ Vector CAI_BaseNPC::GetActualShootTrajectory( const Vector &shootOrigin )
 
 		AI_TraceLine(shootOrigin, vecEnd, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr);
 
-		if( tr.fraction != 1.0 && tr.m_pEnt && tr.m_pEnt->m_takedamage != DAMAGE_NO )
+		if( tr.fraction != 1.0 && tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_NO )
 		{
 			// Hit something we can harm. Just shoot it.
 			return manipulator.GetResult();
@@ -9874,7 +9874,7 @@ int CAI_BaseNPC::PlaySentence( const char *pszSentence, float delay, float volum
 		}
 		else
 		{
-			sentenceIndex = SENTENCEG_PlayRndSz( edict(), pszSentence, volume, soundlevel, 0, PITCH_NORM );
+			sentenceIndex = SENTENCEG_PlayRndSz( this, pszSentence, volume, soundlevel, 0, PITCH_NORM );
 		}
 	}
 
@@ -12452,7 +12452,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 	}
 
 	// the move is ok
-	SetGroundEntity( trace.m_pEnt );
+	SetGroundEntity((CBaseEntity*)trace.m_pEnt );
 	PhysicsTouchTriggers();
 	return true;
 }
@@ -12610,7 +12610,7 @@ bool CAI_BaseNPC::IsCoverPosition( const Vector &vecThreat, const Vector &vecPos
 
 	if( tr.fraction != 1.0 && hl2_episodic.GetBool() )
 	{
-		if( tr.m_pEnt->m_iClassname == m_iClassname )
+		if(((CBaseEntity*)tr.m_pEnt)->m_iClassname == m_iClassname )
 		{
 			// Don't hide behind buddies!
 			return false;

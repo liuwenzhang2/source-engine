@@ -753,7 +753,7 @@ void CServerRemoteAccess::GetPlayerList(CUtlBuffer &value)
 		if ( !client || !client->IsActive() )
 			continue;
 
-		CPlayerState *pl = serverGameClients->GetPlayerState( client->edict );
+		CPlayerState *pl = serverGameClients->GetPlayerState( client->m_nEntityIndex );
 		if ( !pl )
 			continue;
 

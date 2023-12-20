@@ -131,7 +131,7 @@ public:
 	virtual float	GetLaserTurretMoveSpeed( void );
 	virtual float	GetRocketTurretDamage( void );
 #endif
-	virtual void ClientDisconnected( edict_t *pClient );
+	virtual void ClientDisconnected( int pClient );
 
 	bool CheckGameOver( void );
 	bool IsIntermission( void );

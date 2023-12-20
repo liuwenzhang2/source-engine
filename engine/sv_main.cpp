@@ -1097,7 +1097,7 @@ Pitch should be PITCH_NORM (100) for no pitch shift. Values over 100 (up to 255)
 shift pitch higher, values lower than 100 lower the pitch.
 ==================
 */
-void SV_StartSound ( IRecipientFilter& filter, edict_t *pSoundEmittingEntity, int iChannel, 
+void SV_StartSound ( IRecipientFilter& filter, IServerEntity *pSoundEmittingEntity, int iChannel, 
 	const char *pSample, float flVolume, soundlevel_t iSoundLevel, int iFlags, 
 	int iPitch, int iSpecialDSP, const Vector *pOrigin, float soundtime, int speakerentity, CUtlVector< Vector >* pUtlVecOrigins )
 {
@@ -1105,7 +1105,7 @@ void SV_StartSound ( IRecipientFilter& filter, edict_t *pSoundEmittingEntity, in
 	SoundInfo_t sound; 
 	sound.SetDefault();
 
-	sound.nEntityIndex = pSoundEmittingEntity ? NUM_FOR_EDICT( pSoundEmittingEntity ) : 0;
+	sound.nEntityIndex = pSoundEmittingEntity ? pSoundEmittingEntity->GetRefEHandle().GetEntryIndex()  : 0;
 	sound.nChannel = iChannel;
 	sound.fVolume = flVolume;
 	sound.Soundlevel = iSoundLevel;
@@ -1126,7 +1126,7 @@ void SV_StartSound ( IRecipientFilter& filter, edict_t *pSoundEmittingEntity, in
 	}
 	else if ( pSoundEmittingEntity )
 	{
-		IServerEntity *serverEntity = pSoundEmittingEntity->GetIServerEntity();
+		IServerEntity *serverEntity = pSoundEmittingEntity;
 		if ( serverEntity )
 		{
 			CM_WorldSpaceCenter( serverEntity->GetCollideable(), &sound.vOrigin );
@@ -1224,7 +1224,7 @@ void SV_DetermineMulticastRecipients( bool usepas, const Vector& origin, CBitVec
 		}
 
 		Vector vecEarPosition;
-		serverGameClients->ClientEarPosition( pClient->edict, &vecEarPosition );
+		serverGameClients->ClientEarPosition( pClient->m_nEntityIndex, &vecEarPosition );
 
 		int iBitNumber = CM_LeafCluster( CM_PointLeafnum( vecEarPosition ) );
 		if ( iBitNumber < 0 || !(pMask[iBitNumber>>3] & (1<<(iBitNumber&7)) ) )
@@ -1320,9 +1320,9 @@ void CGameServer::RemoveClientFromGame( CBaseClient *client )
 
 	Assert( g_pServerPluginHandler );
 
-	g_pServerPluginHandler->ClientDisconnect( pClient->edict );
+	g_pServerPluginHandler->ClientDisconnect( pClient->m_nEntityIndex );
 	// release the DLL entity that's attached to this edict, if any
-	serverGameEnts->FreeContainingEntity( pClient->edict );
+	serverGameEnts->FreeContainingEntity( pClient->edict->m_EdictIndex );
 
 }
 
@@ -2177,7 +2177,7 @@ bool SV_ActivateServer()
 
 	bool bPrevState = networkStringTableContainerServer->Lock( false );
 	// Activate the DLL server code
-	g_pServerPluginHandler->ServerActivate( sv.edicts, sv.num_edicts, sv.GetMaxClients() );
+	g_pServerPluginHandler->ServerActivate( serverEntitylist->GetServerEntity(0), serverEntitylist->NumberOfEdicts(), sv.GetMaxClients());
 
 	// all setup is completed, any further precache statements are errors
 	sv.m_State = ss_active;
@@ -2541,7 +2541,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 
 	SV_AllocateEdicts();
 
-	serverGameEnts->SetDebugEdictBase( edicts );
+	serverGameEnts->SetDebugEdictBase( serverEntitylist->GetServerEntity(0) );
 
 	allowsignonwrites = true;
 
@@ -2748,7 +2748,7 @@ void CGameServer::UpdateMasterServerPlayers()
 		if ( !client->IsConnected() )
 			continue;
 
-		CPlayerState *pl = serverGameClients->GetPlayerState( client->edict );
+		CPlayerState *pl = serverGameClients->GetPlayerState( client->m_nEntityIndex );
 		if ( !pl )
 			continue;
 

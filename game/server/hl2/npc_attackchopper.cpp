@@ -1694,7 +1694,7 @@ CBaseEntity *CNPC_AttackHelicopter::FindTrackBlocker( const Vector &vecViewPoint
 		Assert( tr.m_pEnt );
 	}
 
-	return (tr.fraction != 1.0f) ? tr.m_pEnt : NULL;
+	return (tr.fraction != 1.0f) ? (CBaseEntity*)tr.m_pEnt : NULL;
 }
 
 
@@ -1738,7 +1738,7 @@ bool CNPC_AttackHelicopter::FVisible( CBaseEntity *pEntity, int traceMask, CBase
 
 		if (ppBlocker)
 		{
-			*ppBlocker = tr.m_pEnt;
+			*ppBlocker = (CBaseEntity*)tr.m_pEnt;
 		}
 		return false;// Line of sight is not established
 	}

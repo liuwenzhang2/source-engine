@@ -509,7 +509,7 @@ bool FitPortalOnSurface( const CProp_Portal *pIgnorePortal, Vector &vOrigin, con
 		// Remember soft bumpers so we don't bump with it twice
 		if ( sFitData[ iIntersection ].bSoftBump )
 		{
-			g_FuncBumpingEntityList.AddToTail( sFitData[ iIntersection ].trCornerTrace.m_pEnt );
+			g_FuncBumpingEntityList.AddToTail((CBaseEntity*)sFitData[ iIntersection ].trCornerTrace.m_pEnt );
 		}
 	}
 
@@ -1121,7 +1121,7 @@ bool IsPortalOnValidSurface( const Vector &vOrigin, const Vector &vForward, cons
 			}
 		}
 
-		if ( tr.m_pEnt && FClassnameIs( tr.m_pEnt, "func_door" ) )
+		if ( tr.m_pEnt && FClassnameIs((CBaseEntity*)tr.m_pEnt, "func_door" ) )
 		{
 			if ( sv_portal_placement_debug.GetBool() )
 			{
@@ -1192,7 +1192,7 @@ float VerifyPortalPlacement( const CProp_Portal *pIgnorePortal, Vector &vOrigin,
 	Vector vVelocityCheck;
 	AngularImpulse vAngularImpulseCheck;
 
-	IPhysicsObject *pPhysicsObject = tr.m_pEnt->VPhysicsGetObject();
+	IPhysicsObject *pPhysicsObject = ((CBaseEntity*)tr.m_pEnt)->VPhysicsGetObject();
 
 	if ( pPhysicsObject )
 	{
@@ -1200,7 +1200,7 @@ float VerifyPortalPlacement( const CProp_Portal *pIgnorePortal, Vector &vOrigin,
 	}
 	else
 	{
-		tr.m_pEnt->GetVelocity( &vVelocityCheck, &vAngularImpulseCheck );
+		((CBaseEntity*)tr.m_pEnt)->GetVelocity( &vVelocityCheck, &vAngularImpulseCheck );
 	}
 
 	if ( vVelocityCheck != vec3_origin || vAngularImpulseCheck != vec3_origin )

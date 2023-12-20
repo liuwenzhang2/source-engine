@@ -2779,7 +2779,7 @@ void CNPC_Strider::DoImpactEffect( trace_t &tr, int nDamageType )
 	g_pEffects->EnergySplash( tr.endpos, tr.plane.normal );
 	
 	// Punch the effect through?
-	if( tr.m_pEnt && !tr.m_pEnt->MyNPCPointer() )
+	if( tr.m_pEnt && !((CBaseEntity*)tr.m_pEnt)->MyNPCPointer() )
 	{
 		Vector vecDir = tr.endpos - tr.startpos;
 		VectorNormalize( vecDir );
@@ -2815,7 +2815,7 @@ bool CNPC_Strider::CanShootThrough( const trace_t &tr, const Vector &vecTarget )
 		return false;
 	}
 
-	if( !tr.m_pEnt->GetHealth() )
+	if( !((CBaseEntity*)tr.m_pEnt)->GetHealth() )
 	{
 		return false;
 	}

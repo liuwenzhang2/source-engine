@@ -52,17 +52,13 @@ static CBasePlayer* FindPlayerByName(const char *pTestName)
 {
 	for(int i=1; i <= gpGlobals->maxClients; i++)
 	{
-		edict_t *pEdict = engine->PEntityOfEntIndex(i);
-		if(pEdict)
-		{
-			CBaseEntity *pEnt = CBaseEntity::Instance(pEdict);
-			if(pEnt && pEnt->IsPlayer())
-			{			
-				const char *pNetName = STRING(pEnt->GetEntityName());
-				if(stricmp(pNetName, pTestName) == 0)
-				{
-					return (CBasePlayer*)pEnt;
-				}
+		CBaseEntity *pEnt = gEntList.GetBaseEntity(i);
+		if(pEnt && pEnt->IsPlayer())
+		{			
+			const char *pNetName = STRING(pEnt->GetEntityName());
+			if(stricmp(pNetName, pTestName) == 0)
+			{
+				return (CBasePlayer*)pEnt;
 			}
 		}
 	}
@@ -137,9 +133,9 @@ void CVoiceGameMgr::Update(double frametime)
 }
 
 
-void CVoiceGameMgr::ClientConnected(struct edict_t *pEdict)
+void CVoiceGameMgr::ClientConnected(int pEdict)
 {
-	int index = ENTINDEX(pEdict) - 1;
+	int index = pEdict - 1;
 	
 	// Clear out everything we use for deltas on this guy.
 	g_bWantModEnable[index] = true;

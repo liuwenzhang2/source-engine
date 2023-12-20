@@ -224,7 +224,7 @@ void CGrenadeAR2::Detonate(void)
 	if ((tr.m_pEnt != GetWorldEntity()) || (tr.hitbox != 0))
 	{
 		// non-world needs smaller decals
-		if( tr.m_pEnt && !tr.m_pEnt->IsNPC() )
+		if( tr.m_pEnt && !((CBaseEntity*)tr.m_pEnt)->IsNPC() )
 		{
 			UTIL_DecalTrace( &tr, "SmallScorch" );
 		}

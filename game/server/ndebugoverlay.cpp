@@ -126,7 +126,7 @@ float GetLongFloorZ(const Vector &origin)
 		// If it was a world brush entity, copy the node location
 		if ( trEnt.m_pEnt )
 		{
-			CBaseEntity *e = trEnt.m_pEnt;
+			CBaseEntity *e = (CBaseEntity*)trEnt.m_pEnt;
 			if ( e && (e->GetFlags() & FL_WORLDBRUSH) )
 			{
 				tr.endpos = trEnt.endpos;

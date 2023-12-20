@@ -654,9 +654,9 @@ CSound*	CSoundEnt::SoundPointerForIndex( int iIndex )
 // so this function ensures that a client gets the proper index
 // to his reserved sound in the soundlist.
 //=========================================================
-int CSoundEnt::ClientSoundIndex ( edict_t *pClient )
+int CSoundEnt::ClientSoundIndex ( CBasePlayer *pClient )
 {
-	int iReturn = ENTINDEX( pClient ) - 1;
+	int iReturn = ( pClient )->entindex() - 1;
 
 #ifdef _DEBUG
 	if ( iReturn < 0 || iReturn >= gpGlobals->maxClients )

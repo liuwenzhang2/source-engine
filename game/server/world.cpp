@@ -121,7 +121,7 @@ void CDecal::TriggerDecal ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_T
 
 	UTIL_TraceLine( GetAbsOrigin() - Vector(5,5,5), GetAbsOrigin() + Vector(5,5,5), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trace );
 
-	entityIndex = trace.m_pEnt ? trace.m_pEnt->entindex() : 0;
+	entityIndex = trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->entindex() : 0;
 
 	CBroadcastRecipientFilter filter;
 
@@ -188,10 +188,10 @@ void CDecal::StaticDecal( void )
 
 	bool canDraw = true;
 
-	entityIndex = trace.m_pEnt ? (short)trace.m_pEnt->entindex() : 0;
+	entityIndex = trace.m_pEnt ? (short)((CBaseEntity*)trace.m_pEnt)->entindex() : 0;
 	if ( entityIndex )
 	{
-		CBaseEntity *ent = trace.m_pEnt;
+		CBaseEntity *ent = (CBaseEntity*)trace.m_pEnt;
 		if ( ent )
 		{
 			modelIndex = ent->GetModelIndex();
@@ -459,7 +459,7 @@ CWorld* GetWorldEntity()
 CWorld::CWorld( )
 {
 	AddEFlags( EFL_NO_AUTO_EDICT_ATTACH | EFL_KEEP_ON_RECREATE_ENTITIES );
-	NetworkProp()->AttachEdict( INDEXENT(RequiredEdictIndex()) );
+	NetworkProp()->AttachEdict( RequiredEdictIndex() );
 	ActivityList_Init();
 	EventList_Init();
 	

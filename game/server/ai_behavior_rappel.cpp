@@ -350,12 +350,12 @@ void CAI_RappelBehavior::BeginRappel()
 
 	UTIL_TraceEntity( GetOuter(), GetAbsOrigin(), GetAbsOrigin()-Vector(0,0,4096), MASK_SHOT, GetOuter(), COLLISION_GROUP_NONE, &tr );
 
-	if( tr.m_pEnt != NULL && tr.m_pEnt->IsNPC() )
+	if( tr.m_pEnt != NULL && ((CBaseEntity*)tr.m_pEnt)->IsNPC() )
 	{
 		Vector forward;
 		GetOuter()->GetVectors( &forward, NULL, NULL );
 
-		CSoundEnt::InsertSound( SOUND_DANGER, tr.m_pEnt->EarPosition() - forward * 12.0f, 32.0f, 0.2f, GetOuter() );
+		CSoundEnt::InsertSound( SOUND_DANGER, ((CBaseEntity*)tr.m_pEnt)->EarPosition() - forward * 12.0f, 32.0f, 0.2f, GetOuter() );
 	}
 }
 

@@ -59,7 +59,7 @@ CServerNetworkProperty::~CServerNetworkProperty()
 //-----------------------------------------------------------------------------
 void CServerNetworkProperty::Init( CBaseEntity *pEntity )
 {
-	m_pPev = NULL;
+	//m_pPev = NULL;
 	m_pOuter = pEntity;
 	m_pServerClass = NULL;
 //	m_pTransmitProxy = NULL;
@@ -68,31 +68,33 @@ void CServerNetworkProperty::Init( CBaseEntity *pEntity )
 	m_TimerEvent.Init( &g_NetworkPropertyEventMgr, this );
 }
 
-
+void CServerNetworkProperty::SetEntIndex(int entindex) {
+	m_entindex = entindex;
+}
 //-----------------------------------------------------------------------------
 // Connects, disconnects edicts
 //-----------------------------------------------------------------------------
-void CServerNetworkProperty::AttachEdict( edict_t *pRequiredEdict )
+void CServerNetworkProperty::AttachEdict( int pRequiredEdict )
 {
-	Assert ( !m_pPev );
+	Assert (pRequiredEdict == -1);
 
 	// see if there is an edict allocated for it, otherwise get one from the engine
-	if ( !pRequiredEdict )
+	if ( pRequiredEdict==-1 )
 	{
 		pRequiredEdict = engine->CreateEdict();
 	}
 
-	m_pPev = pRequiredEdict;
-	m_pPev->SetEdict( GetBaseEntity(), true );
+	m_entindex = pRequiredEdict;
+	engine->SetEdict(m_entindex, true );
 }
 
 void CServerNetworkProperty::DetachEdict()
 {
-	if ( m_pPev )
+	if ( m_entindex!=-1 )
 	{
-		m_pPev->SetEdict( NULL, false );
-		engine->RemoveEdict( m_pPev );
-		m_pPev = NULL;
+		engine->SetEdict(m_entindex, false );
+		engine->RemoveEdict(m_entindex);
+		m_entindex = -1;
 	}
 }
 
@@ -140,10 +142,10 @@ bool CServerNetworkProperty::IsMarkedForDeletion() const
 //-----------------------------------------------------------------------------
 void CServerNetworkProperty::RecomputePVSInformation()
 {
-	if ( m_pPev && ( ( m_pPev->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION ) != 0 ) )
+	if ( m_entindex!=-1 && ( ( engine->GetEdictFlag(m_entindex) & FL_EDICT_DIRTY_PVS_INFORMATION) != 0))
 	{
-		m_pPev->m_fStateFlags &= ~FL_EDICT_DIRTY_PVS_INFORMATION;
-		engine->BuildEntityClusterList( edict(), &m_PVSInfo );
+		engine->GetEdictFlag(m_entindex) &= ~FL_EDICT_DIRTY_PVS_INFORMATION;
+		engine->BuildEntityClusterList(m_pOuter, &m_PVSInfo );
 	}
 }
 
@@ -185,7 +187,7 @@ void CServerNetworkProperty::SetTransmitProxy( CBaseTransmitProxy *pProxy )
 //-----------------------------------------------------------------------------
 // PVS rules
 //-----------------------------------------------------------------------------
-bool CServerNetworkProperty::IsInPVS( const edict_t *pRecipient, const void *pvs, int pvssize )
+bool CServerNetworkProperty::IsInPVS( const CBaseEntity *pRecipient, const void *pvs, int pvssize )
 {
 	RecomputePVSInformation();
 
@@ -193,7 +195,7 @@ bool CServerNetworkProperty::IsInPVS( const edict_t *pRecipient, const void *pvs
 	// negative leaf count is a node number
 	// If no pvs, add any entity
 
-	Assert( pvs && ( edict() != pRecipient ) );
+	Assert( pvs && ( GetOuter() != pRecipient ) );
 
 	unsigned char *pPVS = ( unsigned char * )pvs;
 	
@@ -218,7 +220,7 @@ bool CServerNetworkProperty::IsInPVS( const edict_t *pRecipient, const void *pvs
 bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 {
 	// PVS data must be up to date
-	Assert( !m_pPev || ( ( m_pPev->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION ) == 0 ) );
+	//Assert( !m_pPev || ( ( m_pPev->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION ) == 0 ) );
 	
 	int i;
 
@@ -260,7 +262,7 @@ bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 	// negative leaf count is a node number
 	// If no pvs, add any entity
 
-	Assert( edict() != pInfo->m_pClientEnt );
+	Assert( entindex() !=  pInfo->m_pClientEnt );
 
 	unsigned char *pPVS = ( unsigned char * )pInfo->m_PVS;
 	
@@ -296,7 +298,8 @@ void CServerNetworkProperty::FireEvent()
 	// trigger a state change in the edict.
 	if ( m_bPendingStateChange )
 	{
-		m_pPev->StateChanged();
+		if (m_entindex != -1)
+			engine->EdictFlagChanged(m_entindex);
 		m_bPendingStateChange = false;
 	}
 }

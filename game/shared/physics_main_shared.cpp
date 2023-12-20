@@ -1393,7 +1393,7 @@ void CBaseEntity::ResolveFlyCollisionBounce( trace_t &trace, Vector &vecVelocity
 	if ( trace.plane.normal.z > 0.7f )			// Floor
 	{
 		// Verify that we have an entity.
-		CBaseEntity *pEntity = trace.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)trace.m_pEnt;
 		Assert( pEntity );
 
 		// Are we on the ground?
@@ -1474,7 +1474,7 @@ void CBaseEntity::ResolveFlyCollisionSlide( trace_t &trace, Vector &vecVelocity 
 	float flSpeedSqr = DotProduct( vecVelocity, vecVelocity );
 
 	// Verify that we have an entity.
-	CBaseEntity *pEntity = trace.m_pEnt;
+	CBaseEntity *pEntity = (CBaseEntity*)trace.m_pEnt;
 	Assert( pEntity );
 
 	// Are we on the ground?
@@ -1520,7 +1520,7 @@ void CBaseEntity::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity
 		VectorAdd( GetAbsVelocity(), GetBaseVelocity(), vecVelocity );
 
 		// Verify that we have an entity.
-		CBaseEntity *pEntity = trace.m_pEnt;
+		CBaseEntity *pEntity = (CBaseEntity*)trace.m_pEnt;
 		Assert( pEntity );
 
 		// Are we on the ground?
@@ -1702,7 +1702,7 @@ void CBaseEntity::PhysicsToss( void )
 	}
 	
 #if !defined( CLIENT_DLL )
-	if (IsEdictFree())
+	if (engine->IsEdictFree(entindex()))
 		return;
 #endif
 

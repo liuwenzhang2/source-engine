@@ -100,7 +100,7 @@ static void CM_GetCollideableTriggerTestBox( ICollideable *pCollide, Vector *pMi
 class CTouchLinks : public IPartitionEnumerator
 {
 public:
-	CTouchLinks( edict_t* pEnt, const Vector* pPrevAbsOrigin, bool accurateBboxTriggerChecks ) : m_TouchedEntities( 8, 8 )
+	CTouchLinks( IServerEntity* pEnt, const Vector* pPrevAbsOrigin, bool accurateBboxTriggerChecks ) : m_TouchedEntities( 8, 8 )
 	{
 		m_pEnt = pEnt;
 		m_pCollide = pEnt->GetCollideable();
@@ -125,19 +125,12 @@ public:
 		// Static props should never be in the trigger list 
 		Assert( !StaticPropMgr()->IsStaticProp( pHandleEntity ) );
 
-		IServerUnknown *pUnk = static_cast<IServerUnknown*>( pHandleEntity );
-		Assert( pUnk );
-
-		// Convert the IHandleEntity to an edict_t*...
-		// Context is the thing we're testing everything against		
-		edict_t* pTouch = pUnk->GetNetworkable()->GetEdict();
-
-		// Can't bump against itself
-		if ( pTouch == m_pEnt )
+		IServerEntity * pTriggerEntity = static_cast<IServerEntity*>( pHandleEntity );
+		if ( !pTriggerEntity )
 			return ITERATION_CONTINUE;
 
-		IServerEntity *pTriggerEntity = pTouch->GetIServerEntity();
-		if ( !pTriggerEntity )
+		// Can't bump against itself
+		if (pTriggerEntity == m_pEnt)
 			return ITERATION_CONTINUE;
 
 		// Hmmm.. everything in this list should be a trigger....
@@ -164,7 +157,7 @@ public:
 				return ITERATION_CONTINUE;
 		}
 
-		m_TouchedEntities.AddToTail( pTouch );
+		m_TouchedEntities.AddToTail(pTriggerEntity);
 
 		return ITERATION_CONTINUE;
 	}
@@ -180,9 +173,9 @@ public:
 	Ray_t m_Ray;
 
 private:
-	edict_t *m_pEnt;
+	IServerEntity *m_pEnt;
 	ICollideable *m_pCollide;
-	CUtlVector< edict_t* > m_TouchedEntities;
+	CUtlVector< IServerEntity* > m_TouchedEntities;
 };
 
 
@@ -196,7 +189,7 @@ public:
 		m_bAccurateBBoxCheck = accurateBboxTriggerChecks;
 	}
 
-	void TriggerMoved( edict_t *pTriggerEntity )
+	void TriggerMoved( IServerEntity *pTriggerEntity )
 	{
 		m_pTriggerEntity = pTriggerEntity;
 		m_pTrigger = pTriggerEntity->GetCollideable();
@@ -213,13 +206,11 @@ public:
 		if ( StaticPropMgr()->IsStaticProp( pHandleEntity ) )
 			return ITERATION_CONTINUE;
 
-		IServerUnknown *pUnk = static_cast< IServerUnknown* >( pHandleEntity );
-		Assert( pUnk );
-
-		// Convert the user ID to and edict_t*...
-		edict_t* pTouch = pUnk->GetNetworkable()->GetEdict();
-		Assert( pTouch );
-		ICollideable *pTouchCollide = pUnk->GetCollideable();
+		IServerEntity * serverEntity = static_cast<IServerEntity* >( pHandleEntity );
+		if (!serverEntity)
+			return ITERATION_CONTINUE;
+		
+		ICollideable *pTouchCollide = serverEntity->GetCollideable();
 
 		// Can't ever touch itself because it's in the other list
 		if ( pTouchCollide == m_pTrigger )
@@ -228,9 +219,7 @@ public:
 		if ( !pTouchCollide->ShouldTouchTrigger(m_triggerSolidFlags) )
 			return ITERATION_CONTINUE;
 
-		IServerEntity *serverEntity = pTouch->GetIServerEntity();
-		if ( !serverEntity )
-			return ITERATION_CONTINUE;
+		
 
 		// FIXME: Should we be using the surrounding bounds here?
 		Vector vecMins, vecMaxs;
@@ -257,7 +246,7 @@ public:
 				return ITERATION_CONTINUE;
 		}
 
-		m_TouchedEntities.AddToTail( pTouch );
+		m_TouchedEntities.AddToTail(serverEntity);
 
 		return ITERATION_CONTINUE;
 	}
@@ -271,11 +260,11 @@ public:
 	}
 
 private:
-	edict_t* m_pTriggerEntity;
+	IServerEntity* m_pTriggerEntity;
 	ICollideable* m_pTrigger;
 	int m_triggerSolidFlags;
 	Vector m_vecDelta;
-	CUtlVector< edict_t* > m_TouchedEntities;
+	CUtlVector< IServerEntity* > m_TouchedEntities;
 	bool m_bAccurateBBoxCheck;
 };
 
@@ -284,7 +273,7 @@ private:
 // Touches triggers. Or, if it is a trigger, causes other things to touch it
 // returns true if untouch needs to be checked
 //-----------------------------------------------------------------------------
-void SV_TriggerMoved( edict_t *pTriggerEnt, bool accurateBboxTriggerChecks )
+void SV_TriggerMoved( IServerEntity *pTriggerEnt, bool accurateBboxTriggerChecks )
 {
 	CTriggerMoved triggerEnum( accurateBboxTriggerChecks );
 	triggerEnum.TriggerMoved( pTriggerEnt ); 
@@ -292,7 +281,7 @@ void SV_TriggerMoved( edict_t *pTriggerEnt, bool accurateBboxTriggerChecks )
 }
 
 
-void SV_SolidMoved( edict_t *pSolidEnt, ICollideable *pSolidCollide, const Vector* pPrevAbsOrigin, bool accurateBboxTriggerChecks )
+void SV_SolidMoved( IServerEntity *pSolidEnt, ICollideable *pSolidCollide, const Vector* pPrevAbsOrigin, bool accurateBboxTriggerChecks )
 {
 	if (!pPrevAbsOrigin)
 	{

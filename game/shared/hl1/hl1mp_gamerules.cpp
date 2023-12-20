@@ -403,7 +403,7 @@ void CHL1MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 	const char *pCurrentModel = szTempCurrentModel;
 
 	char szTempModelName[128];
-	Q_FileBase( engine->GetClientConVarValue( engine->IndexOfEdict( pPlayer->edict() ), "cl_playermodel" ), szTempModelName, 128 );	
+	Q_FileBase( engine->GetClientConVarValue( pPlayer->entindex(), "cl_playermodel" ), szTempModelName, 128 );	
 	const char *szModelName = szTempModelName;
 
 	//If we're different.
@@ -417,7 +417,7 @@ void CHL1MPRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 			char szReturnString[512];
 
 			Q_snprintf( szReturnString, sizeof (szReturnString ), "cl_playermodel %s\n", pCurrentModel );
-			engine->ClientCommand ( pHL1Player->edict(), szReturnString );
+			engine->ClientCommand ( pHL1Player->entindex(), szReturnString );
 
 			Q_snprintf( szReturnString, sizeof( szReturnString ), "Please wait %d more seconds before trying to switch.\n", (int)(pHL1Player->GetNextModelChangeTime() - gpGlobals->curtime) );
 			ClientPrint( pHL1Player, HUD_PRINTTALK, szReturnString );
