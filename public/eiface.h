@@ -23,6 +23,7 @@
 #include "bitvec.h"
 //#include "engine/iserverplugin.h"
 #include "tier1/KeyValues.h"
+#include "tier1/interface.h"
 #include "tier1/bitbuf.h"
 
 //-----------------------------------------------------------------------------
@@ -61,6 +62,7 @@ class CSteamID;
 class IReplayFactory;
 class IReplaySystem;
 class IServer;
+class CCommand;
 
 typedef struct player_info_s player_info_t;
 
@@ -599,7 +601,7 @@ public:
 	virtual const char *GetServerBrowserGameData() = 0;
 
 	// Called to add output to the status command
-	virtual void 			Status( void (*print) (const char *fmt, ...) ) = 0;
+	//virtual void 			Status( void (*print) (const char *fmt, ...) ) = 0;
 
 	// Informs the game we would like to load this level, giving it a chance to prepare dynamic resources.
 	//

@@ -139,7 +139,7 @@ public:
 	virtual const char *GetServerBrowserGameData() OVERRIDE;
 
 	// Called to add output to the status command
-	virtual void 			Status( void (*print) (const char *fmt, ...) ) OVERRIDE;
+	//virtual void 			Status( void (*print) (const char *fmt, ...) ) OVERRIDE;
 
 	virtual void PrepareLevelResources( /* in/out */ char *pszMapName, size_t nMapNameSize,
 	                                    /* in/out */ char *pszMapFile, size_t nMapFileSize ) OVERRIDE;

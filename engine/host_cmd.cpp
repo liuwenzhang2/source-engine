@@ -611,7 +611,7 @@ CON_COMMAND( status, "Display map and connection status." )
 
 	if ( ( g_iServerGameDLLVersion >= 10 ) && serverGameDLL )
 	{
-		serverGameDLL->Status( print );
+		//serverGameDLL->Status( print );
 	}
 
 	// Early exit for this server.

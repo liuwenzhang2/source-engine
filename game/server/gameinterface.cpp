@@ -1923,13 +1923,13 @@ const char *CServerGameDLL::GetServerBrowserGameData()
 }
 
 //-----------------------------------------------------------------------------
-void CServerGameDLL::Status( void (*print) (const char *fmt, ...) )
-{
+//void CServerGameDLL::Status( void (*print) (const char *fmt, ...) )
+//{
 /*	if ( g_pGameRules )
 	{
 		g_pGameRules->Status( print );
 	}*/
-}
+//}
 
 //-----------------------------------------------------------------------------
 void CServerGameDLL::PrepareLevelResources( /* in/out */ char *pszMapName, size_t nMapNameSize,
