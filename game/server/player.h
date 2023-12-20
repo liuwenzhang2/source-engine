@@ -1518,7 +1518,7 @@ int CollectHumanPlayers( CUtlVector< T * > *playerVector, int team = TEAM_ANY, b
 		if ( player == NULL )
 			continue;
 
-		if (  player->emtindex()<=0  )
+		if (  player->entindex()<=0  )
 			continue;
 
 		if ( !player->IsPlayer() )
