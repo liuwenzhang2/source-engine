@@ -155,13 +155,13 @@ public:
 	// Remove the specified edict and place back into the free edict list
 	virtual void		RemoveEdict( int entindex ) = 0;
 	
-	virtual int&		GetEdictFlag(int entindex) = 0;
+	//virtual int&		GetEdictFlag(int entindex) = 0;
 
-	virtual void		EdictFlagChanged(int entindex) = 0;
+	//virtual void		EdictFlagChanged(int entindex) = 0;
 
-	virtual void		EdictFlagChanged(int entindex, unsigned short offset) = 0;
+	//virtual void		EdictFlagChanged(int entindex, unsigned short offset) = 0;
 
-	virtual void		ClearTransmitState(int entindex) = 0;
+	//virtual void		ClearTransmitState(int entindex) = 0;
 
 	virtual void		SetEdict(int entindex, bool bFullEdict) = 0;
 
@@ -344,6 +344,8 @@ public:
 	// Mark some area portals as open/closed. It's more efficient to use this
 	// than a bunch of individual SetAreaPortalState calls.
 	virtual void		SetAreaPortalStates( const int *portalNumbers, const int *isOpen, int nPortals ) = 0;
+
+	//virtual int			GetStateChangedTickCount() = 0;
 
 	// Called when relevant edict state flags change.
 	virtual void		NotifyEdictFlagsChange( int iEdict ) = 0;

@@ -328,8 +328,8 @@ static inline void SV_WritePropsFromPackedEntity(
 	CServerDTITimer timer( pSendTable, SERVERDTI_WRITE_DELTA_PROPS );
 	if ( g_bServerDTIEnabled && !u.m_pServer->IsHLTV() && !u.m_pServer->IsReplay() )
 	{
-		ICollideable *pEnt = sv.edicts[pTo->m_nEntityIndex].GetCollideable();
-		ICollideable *pClientEnt = sv.edicts[u.m_nClientEntity].GetCollideable();
+		ICollideable *pEnt = serverEntitylist->GetServerEntity(pTo->m_nEntityIndex)->GetCollideable();
+		ICollideable *pClientEnt = serverEntitylist->GetServerEntity(u.m_nClientEntity)->GetCollideable();
 		if ( pEnt && pClientEnt )
 		{
 			float flDist = (pEnt->GetCollisionOrigin() - pClientEnt->GetCollisionOrigin()).Length();
@@ -623,10 +623,10 @@ static inline void SV_DetermineUpdateType( CEntityWriteInfo &u )
 	}
 }
 
-static inline ServerClass* GetEntServerClass(edict_t *pEdict)
-{
-	return pEdict->GetNetworkable()->GetServerClass();
-}
+//static inline ServerClass* GetEntServerClass(edict_t *pEdict)
+//{
+//	return pEdict->GetNetworkable()->GetServerClass();
+//}
 
 
 
@@ -979,7 +979,7 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 				break;
 			case EnterPVS:
 				{
-					char const *eString = sv.edicts[ u.m_pNewPack->m_nEntityIndex ].GetNetworkable()->GetClassName();
+					char const *eString = serverEntitylist->GetServerEntity( u.m_pNewPack->m_nEntityIndex )->GetNetworkable()->GetClassName();
 					client->TraceNetworkData( pBuf, "enter [%s]", eString );
 					ETWMark1I( eString, pBuf.GetNumBitsWritten() - nEntityStartBit );
 				}
@@ -994,7 +994,7 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 				break;
 			case DeltaEnt:
 				{
-					char const *eString = sv.edicts[ u.m_pOldPack->m_nEntityIndex ].GetNetworkable()->GetClassName();
+					char const *eString = serverEntitylist->GetServerEntity( u.m_pOldPack->m_nEntityIndex )->GetNetworkable()->GetClassName();
 					client->TraceNetworkData( pBuf, "delta [%s]", eString );
 					ETWMark1I( eString, pBuf.GetNumBitsWritten() - nEntityStartBit );
 				}

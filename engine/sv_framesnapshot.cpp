@@ -125,7 +125,7 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot( int tickcount )
 		edict++;
 		entry++;
 
-		IServerUnknown *pUnk = edict->GetUnknown();
+		IServerUnknown *pUnk = serverEntitylist->GetServerEntity(i);
 
 		if ( !pUnk )
 			continue;
@@ -143,11 +143,11 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot( int tickcount )
 		
 		// entity exists and is not marked as 'free'
 		Assert( edict->m_NetworkSerialNumber != -1 );
-		Assert( edict->GetNetworkable() );
-		Assert( edict->GetNetworkable()->GetServerClass() );
+		Assert( serverEntitylist->GetServerNetworkable(i));
+		Assert( serverEntitylist->GetServerNetworkable(i)->GetServerClass() );
 
 		entry->m_nSerialNumber	= edict->m_NetworkSerialNumber;
-		entry->m_pClass			= edict->GetNetworkable()->GetServerClass();
+		entry->m_pClass			= serverEntitylist->GetServerNetworkable(i)->GetServerClass();
 		nValidEntities[snap->m_nValidEntities++] = i;
 	}
 

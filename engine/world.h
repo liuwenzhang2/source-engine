@@ -15,7 +15,7 @@
 #endif
 
 
-struct edict_t;
+//struct edict_t;
 class ICollideable;
 class IServerEntity;
 
@@ -32,8 +32,8 @@ void SV_TriggerMoved( IServerEntity *pTriggerEnt, bool testSurroundingBoundsOnly
 
 // This is to temporarily remove an object from the collision tree.
 // Unlink returns a handle we have to use to relink
-int SV_FastUnlink( edict_t *ent );
-void SV_FastRelink( edict_t *ent, int tempHandle );
+//int SV_FastUnlink( edict_t *ent );
+//void SV_FastRelink( edict_t *ent, int tempHandle );
 
 
 #endif // WORLD_H

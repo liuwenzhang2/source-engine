@@ -14,6 +14,7 @@
 
 #include "dt_send.h"
 #include "dt_recv.h"
+#include "iservernetworkable.h"
 
 
 class CBaseEdict;
@@ -32,7 +33,7 @@ void LocalTransfer_InitFastCopy(
 
 // Transfer the data from pSrcEnt to pDestEnt using the specified SendTable and RecvTable.
 void LocalTransfer_TransferEntity( 
-	const CBaseEdict *pEdict, 
+	const IServerNetworkable *pEdict, 
 	const SendTable *pSendTable, 
 	const void *pSrcEnt, 
 	RecvTable *pRecvTable, 

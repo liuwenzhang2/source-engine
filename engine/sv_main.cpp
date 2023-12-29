@@ -1209,7 +1209,7 @@ void SV_DetermineMulticastRecipients( bool usepas, const Vector& origin, CBitVec
 			continue;
 
 		// HACK:  Should above also check pClient->spawned instead of this
-		if ( !pClient->edict || pClient->edict->IsFree() || pClient->edict->GetUnknown() == NULL )
+		if ( !pClient->edict || pClient->edict->IsFree() || serverEntitylist->GetServerEntity(pClient->m_nEntityIndex) == NULL)
 			continue;
 		
 		// Always add the  or Replay client
@@ -2080,10 +2080,10 @@ void SV_CreateBaseline (void)
 			// get the current server version
 			edict_t *edict = sv.edicts + entnum;
 
-			if ( edict->IsFree() || !edict->GetUnknown() )
+			if ( edict->IsFree() || !serverEntitylist->GetServerEntity(entnum))
 				continue;
 
-			ServerClass *pClass   = edict->GetNetworkable() ? edict->GetNetworkable()->GetServerClass() : 0;
+			ServerClass *pClass   = serverEntitylist->GetServerNetworkable(entnum) ? serverEntitylist->GetServerNetworkable(entnum)->GetServerClass() : 0;
 
 			if ( !pClass )
 			{
@@ -2107,7 +2107,7 @@ void SV_CreateBaseline (void)
 			// create basline from zero values
 			if ( !SendTable_Encode(
 				pSendTable, 
-				edict->GetUnknown(), 
+				serverEntitylist->GetServerEntity(entnum),
 				&writeBuf, 
 				entnum,
 				NULL,
@@ -2326,7 +2326,7 @@ static void SV_AllocateEdicts()
 	}
 	ED_ClearFreeEdictList();
 
-	sv.edictchangeinfo = (IChangeInfoAccessor *)Hunk_AllocName( sv.max_edicts * sizeof( IChangeInfoAccessor ), "edictchangeinfo" );
+	//sv.edictchangeinfo = (IChangeInfoAccessor *)Hunk_AllocName( sv.max_edicts * sizeof( IChangeInfoAccessor ), "edictchangeinfo" );
 }
 
 #include "tier0/memdbgon.h"

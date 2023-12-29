@@ -44,24 +44,24 @@ IClientEntityList *entitylist = NULL;
 ConVar sv_debugmanualmode( "sv_debugmanualmode", "0", 0, "Make sure entities correctly report whether or not their network data has changed." );
 
 // Returns false and calls Host_Error if the edict's pvPrivateData is NULL.
-static inline bool SV_EnsurePrivateData(edict_t *pEdict)
-{
-	if(pEdict->GetUnknown())
-	{
-		return true;
-	}
-	else
-	{
-		Host_Error("SV_EnsurePrivateData: pEdict->pvPrivateData==NULL (ent %d).\n", pEdict - sv.edicts);
-		return false;
-	}
-}
+//static inline bool SV_EnsurePrivateData(edict_t *pEdict)
+//{
+//	if(pEdict->GetUnknown())
+//	{
+//		return true;
+//	}
+//	else
+//	{
+//		Host_Error("SV_EnsurePrivateData: pEdict->pvPrivateData==NULL (ent %d).\n", pEdict - sv.edicts);
+//		return false;
+//	}
+//}
 
 // This function makes sure that this entity class has an instance baseline.
 // If it doesn't have one yet, it makes a new one.
 void SV_EnsureInstanceBaseline( ServerClass *pServerClass, int iEdict, const void *pData, int nBytes )
 {
-	edict_t *pEnt = &sv.edicts[iEdict];
+	IServerEntity *pEnt = serverEntitylist->GetServerEntity(iEdict);
 	ErrorIfNot( pEnt->GetNetworkable(),
 		("SV_EnsureInstanceBaseline: edict %d missing ent", iEdict)
 	);
@@ -108,7 +108,7 @@ void SV_EnsureInstanceBaseline( ServerClass *pServerClass, int iEdict, const voi
 
 static inline void SV_PackEntity( 
 	int edictIdx, 
-	edict_t* edict, 
+	IServerNetworkable* edict,
 	ServerClass* pServerClass,
 	CFrameSnapshot *pSnapshot )
 {
@@ -144,7 +144,7 @@ static inline void SV_PackEntity(
 	unsigned char tempData[ sizeof( CSendProxyRecipients ) * MAX_DATATABLE_PROXIES ];
 	CUtlMemory< CSendProxyRecipients > recip( (CSendProxyRecipients*)tempData, pSendTable->m_pPrecalc->GetNumDataTableProxies() );
 
-	if( !SendTable_Encode( pSendTable, edict->GetUnknown(), &writeBuf, edictIdx, &recip, false ) )
+	if( !SendTable_Encode( pSendTable, edict->GetEntityHandle(), &writeBuf, edictIdx, &recip, false ) )
 	{							 
 		Host_Error( "SV_PackEntity: SendTable_Encode returned false (ent %d).\n", edictIdx );
 	}
@@ -274,14 +274,14 @@ static inline void SV_PackEntity(
 }
 
 // in HLTV mode we ALWAYS have to store position and PVS info, even if entity didnt change
-void SV_FillHLTVData( CFrameSnapshot *pSnapshot, edict_t *edict, int iValidEdict )
+void SV_FillHLTVData( CFrameSnapshot *pSnapshot, IServerNetworkable *edict, int iValidEdict )
 {
 #if !defined( _XBOX )
 	if ( pSnapshot->m_pHLTVEntityData && edict )
 	{
 		CHLTVEntityData *pHLTVData = &pSnapshot->m_pHLTVEntityData[iValidEdict];
 
-		PVSInfo_t *pvsInfo = edict->GetNetworkable()->GetPVSInfo();
+		PVSInfo_t *pvsInfo = edict->GetPVSInfo();
 
 		if ( pvsInfo->m_nClusterCount == 1 )
 		{
@@ -303,14 +303,14 @@ void SV_FillHLTVData( CFrameSnapshot *pSnapshot, edict_t *edict, int iValidEdict
 }
 
 // in Replay mode we ALWAYS have to store position and PVS info, even if entity didnt change
-void SV_FillReplayData( CFrameSnapshot *pSnapshot, edict_t *edict, int iValidEdict )
+void SV_FillReplayData( CFrameSnapshot *pSnapshot, IServerNetworkable *edict, int iValidEdict )
 {
 #if !defined( _XBOX )
 	if ( pSnapshot->m_pReplayEntityData && edict )
 	{
 		CReplayEntityData *pReplayData = &pSnapshot->m_pReplayEntityData[iValidEdict];
 
-		PVSInfo_t *pvsInfo = edict->GetNetworkable()->GetPVSInfo();
+		PVSInfo_t *pvsInfo = edict->GetPVSInfo();
 
 		if ( pvsInfo->m_nClusterCount == 1 )
 		{
@@ -332,19 +332,19 @@ void SV_FillReplayData( CFrameSnapshot *pSnapshot, edict_t *edict, int iValidEdi
 }
 
 // Returns the SendTable that should be used with the specified edict.
-SendTable* GetEntSendTable(edict_t *pEdict)
-{
-	if ( pEdict->GetNetworkable() )
-	{
-		ServerClass *pClass = pEdict->GetNetworkable()->GetServerClass();
-		if ( pClass )
-		{
-			return pClass->m_pTable;
-		}
-	}
-
-	return NULL;
-}
+//SendTable* GetEntSendTable(edict_t *pEdict)
+//{
+//	if ( pEdict->GetNetworkable() )
+//	{
+//		ServerClass *pClass = pEdict->GetNetworkable()->GetServerClass();
+//		if ( pClass )
+//		{
+//			return pClass->m_pTable;
+//		}
+//	}
+//
+//	return NULL;
+//}
 
 
 void PackEntities_NetworkBackDoor( 
@@ -363,6 +363,7 @@ void PackEntities_NetworkBackDoor(
 	{
 		int index = snapshot->m_pValidEntities[iValidEdict];
 		edict_t* edict = &sv.edicts[ index ];
+		IServerNetworkable* serverNetworkable = serverEntitylist->GetServerNetworkable(index);
 		
 		// this is a bit of a hack to ensure that we get a "preview" of the
 		//  packet timstamp that the server will send so that things that
@@ -377,8 +378,8 @@ void PackEntities_NetworkBackDoor(
 		Assert( index < snapshot->m_nNumEntities );
 		ServerClass *pSVClass = snapshot->m_pEntities[ index ].m_pClass;
 		g_pLocalNetworkBackdoor->EntState( index, edict->m_NetworkSerialNumber, 
-			pSVClass->m_ClassID, pSVClass->m_pTable, edict->GetUnknown(), edict->HasStateChanged(), bShouldTransmit );
-		edict->ClearStateChanged();
+			pSVClass->m_ClassID, pSVClass->m_pTable, serverNetworkable->GetEntityHandle(), serverNetworkable->HasStateChanged(), bShouldTransmit );
+		serverNetworkable->ClearStateChanged();
 	}
 	
 	// Tell the client about any entities that are now dormant.
@@ -391,7 +392,7 @@ static ConVar sv_parallel_packentities( "sv_parallel_packentities", "1" );
 struct PackWork_t
 {
 	int				nIdx;
-	edict_t			*pEdict;
+	IServerNetworkable* pEdict;
 	CFrameSnapshot	*pSnapshot;
 
 	static void Process( PackWork_t &item )
@@ -418,13 +419,14 @@ void PackEntities_Normal(
 		
 		Assert( index < snapshot->m_nNumEntities );
 
-		edict_t* edict = &sv.edicts[ index ];
+		//edict_t* edict = &sv.edicts[ index ];
+		IServerNetworkable* serverNetworkable = serverEntitylist->GetServerNetworkable(index);
 
 		// if HLTV is running save PVS info for each entity
-		SV_FillHLTVData( snapshot, edict, iValidEdict );
+		SV_FillHLTVData( snapshot, serverNetworkable, iValidEdict );
 		
 		// if Replay is running save PVS info for each entity
-		SV_FillReplayData( snapshot, edict, iValidEdict );
+		SV_FillReplayData( snapshot, serverNetworkable, iValidEdict );
 
 		// Check to see if the entity changed this frame...
 		//ServerDTI_RegisterNetworkStateChange( pSendTable, ent->m_bStateChanged );
@@ -439,7 +441,7 @@ void PackEntities_Normal(
 			{	
 				PackWork_t w;
 				w.nIdx = index;
-				w.pEdict = edict;
+				w.pEdict = serverNetworkable;
 				w.pSnapshot = snapshot;
 
 				workItems.AddToTail( w );
@@ -681,7 +683,7 @@ const char* GetObjectClassName( int objectID )
 {
 	if ( objectID >= 0 && objectID < sv.num_edicts )
 	{
-		return sv.edicts[objectID].GetClassName();
+		return serverEntitylist->GetServerNetworkable(objectID)?serverEntitylist->GetServerNetworkable(objectID)->GetClassName():"";
 	}
 	else
 	{

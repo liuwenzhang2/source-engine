@@ -56,8 +56,12 @@ Sets everything to NULL, done when new entity is allocated for game.dll
 static void ED_ClearEdict( edict_t *e )
 {
 	e->ClearFree();
-	e->ClearStateChanged();
-	e->SetChangeInfoSerialNumber( 0 );
+	if (serverEntitylist->GetServerNetworkable(e->m_EdictIndex)) {
+		serverEntitylist->GetServerNetworkable(e->m_EdictIndex)->ClearStateChanged();
+		//serverEntitylist->GetServerNetworkable(e->m_EdictIndex)->SetStateChangedTickCount(0);
+	}
+	//e->ClearStateChanged();
+	//e->SetChangeInfoSerialNumber( 0 );
 	
 	serverGameEnts->FreeContainingEntity(e->m_EdictIndex);
 	InitializeEntityDLLFields(e);
@@ -87,7 +91,10 @@ static void SpewEdicts()
 	int nEdictNum = 1;
 	for( int i=0; i<sv.num_edicts; ++i )
 	{
-		edict_t *e = &sv.edicts[i];
+		IServerNetworkable *e = serverEntitylist->GetServerNetworkable(i);
+		if (!e) {
+			continue;
+		}
 		++nEdictNum;
 		unsigned short nIndex = mapEnts.Find( e->GetClassName() );
 		if ( nIndex == mapEnts.InvalidIndex() )
@@ -362,12 +369,12 @@ static inline int NUM_FOR_EDICTINFO(const edict_t *e)
 }
 
 
-IChangeInfoAccessor *CBaseEdict::GetChangeAccessor()
-{
-	return &sv.edictchangeinfo[ NUM_FOR_EDICTINFO( (const edict_t*)this ) ];
-}
-
-const IChangeInfoAccessor *CBaseEdict::GetChangeAccessor() const
-{
-	return &sv.edictchangeinfo[ NUM_FOR_EDICTINFO( (const edict_t*)this ) ];
-}
+//IChangeInfoAccessor *CBaseEdict::GetChangeAccessor()
+//{
+//	return &sv.edictchangeinfo[ NUM_FOR_EDICTINFO( (const edict_t*)this ) ];
+//}
+//
+//const IChangeInfoAccessor *CBaseEdict::GetChangeAccessor() const
+//{
+//	return &sv.edictchangeinfo[ NUM_FOR_EDICTINFO( (const edict_t*)this ) ];
+//}

@@ -2294,10 +2294,13 @@ CON_COMMAND( sv_dump_edicts, "Display a list of edicts allocated on the server."
 	Msg( "\nCurrent server edicts:\n");
 	for ( int i = 0; i < sv.num_edicts; ++i )
 	{
-		CUtlMap<CUtlString, int>::IndexType_t index = classNameCountMap.Find( sv.edicts[ i ].GetClassName() );
+		if (!serverEntitylist->GetServerNetworkable(i)) {
+			continue;
+		}
+		CUtlMap<CUtlString, int>::IndexType_t index = classNameCountMap.Find( serverEntitylist->GetServerNetworkable( i )->GetClassName() );
 		if ( index == classNameCountMap.InvalidIndex() )
 		{
-			index = classNameCountMap.Insert( sv.edicts[ i ].GetClassName(), 0 );
+			index = classNameCountMap.Insert(serverEntitylist->GetServerNetworkable(i)->GetClassName(), 0 );
 		}
 
 		classNameCountMap[ index ]++;

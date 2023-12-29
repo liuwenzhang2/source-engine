@@ -62,25 +62,39 @@ int MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose,
 
 extern CNetworkStringTableContainer *networkStringTableContainerServer;
 
-CSharedEdictChangeInfo g_SharedEdictChangeInfo;
-CSharedEdictChangeInfo *g_pSharedChangeInfo = &g_SharedEdictChangeInfo;
+//CSharedEdictChangeInfo g_SharedEdictChangeInfo;
+//CSharedEdictChangeInfo *g_pSharedChangeInfo = &g_SharedEdictChangeInfo;
 IAchievementMgr *g_pAchievementMgr = NULL;
 CGamestatsData *g_pGamestatsData = NULL;
 
+//int g_SharedEdictChangeInfom_iSerialNumber = 1;
+//int g_LastSharedEdictChangeInfom_iSerialNumber = 0;
+//int g_lastServerTick = 0;
 void InvalidateSharedEdictChangeInfos()
 {
-	if ( g_SharedEdictChangeInfo.m_iSerialNumber == 0xFFFF )
-	{
-		// Reset all edicts to 0.
-		g_SharedEdictChangeInfo.m_iSerialNumber = 1;
-		for ( int i=0; i < sv.num_edicts; i++ )
-			sv.edicts[i].SetChangeInfoSerialNumber( 0 );
-	}
-	else
-	{
-		g_SharedEdictChangeInfo.m_iSerialNumber++;
-	}
-	g_SharedEdictChangeInfo.m_nChangeInfos = 0;
+	//if (g_LastSharedEdictChangeInfom_iSerialNumber != 0) {
+	//	if (g_lastServerTick + 1 != sv.m_nTickCount) {
+	//		int aaa = 0;
+	//	}
+	//}
+	//g_LastSharedEdictChangeInfom_iSerialNumber = g_SharedEdictChangeInfom_iSerialNumber;
+	//g_lastServerTick = sv.m_nTickCount;
+	//if ( g_SharedEdictChangeInfom_iSerialNumber == 0xFFFFFFFF )
+	//{
+	//	// Reset all edicts to 0.
+	//	g_SharedEdictChangeInfom_iSerialNumber = 1;
+	//	for (int i = 0; i < sv.num_edicts; i++) {
+	//		if (serverEntitylist->GetServerNetworkable(i)) {
+	//			serverEntitylist->GetServerNetworkable(i)->SetStateChangedTickCount(0);
+	//		}
+	//	}
+	//}
+	//else
+	//{
+	//	g_SharedEdictChangeInfom_iSerialNumber++;
+	//}
+	//g_SharedEdictChangeInfo.m_nChangeInfos = 0;
+	
 }
 
 
@@ -336,6 +350,10 @@ public:
 		return g_bInCommentaryMode;
 #endif
 	}
+
+	//virtual int			GetStateChangedTickCount() {
+	//	return g_SharedEdictChangeInfom_iSerialNumber;
+	//}
 	
 	virtual void NotifyEdictFlagsChange( int iEdict )
 	{
@@ -653,22 +671,22 @@ public:
 		return eFindMap_NotFound;
 	}
 
-	virtual int IndexOfEdict(const edict_t *pEdict)
-	{
-		if ( !pEdict )
-		{
-			return 0;
-		}
-		
-		int index = (int) ( pEdict - sv.edicts );
-		if ( index < 0 || index > sv.max_edicts )
-		{
-			Sys_Error( "Bad entity in IndexOfEdict() index %i pEdict %p sv.edicts %p\n",
-				index, pEdict, sv.edicts );
-		}
-		
-		return index;
-	}
+	//virtual int IndexOfEdict(const edict_t *pEdict)
+	//{
+	//	if ( !pEdict )
+	//	{
+	//		return 0;
+	//	}
+	//	
+	//	int index = (int) ( pEdict - sv.edicts );
+	//	if ( index < 0 || index > sv.max_edicts )
+	//	{
+	//		Sys_Error( "Bad entity in IndexOfEdict() index %i pEdict %p sv.edicts %p\n",
+	//			index, pEdict, sv.edicts );
+	//	}
+	//	
+	//	return index;
+	//}
 	
 	
 	// Returns a pointer to an entity from an index,  but only if the entity
@@ -725,38 +743,38 @@ public:
 		ED_Free(pEdict);
 	}
 
-	virtual int& GetEdictFlag(int entindex) {
-		if (entindex >= 0 && entindex < sv.max_edicts)
-		{
-			edict_t* pEdict = EDICT_NUM(entindex);
-			return pEdict->m_fStateFlags;
-		}
-		Error("GetEdictFlag");
-	}
+	//virtual int& GetEdictFlag(int entindex) {
+	//	if (entindex >= 0 && entindex < sv.max_edicts)
+	//	{
+	//		edict_t* pEdict = EDICT_NUM(entindex);
+	//		return pEdict->m_fStateFlags;
+	//	}
+	//	Error("GetEdictFlag");
+	//}
 
-	virtual void EdictFlagChanged(int entindex) {
-		if (entindex >= 0 && entindex < sv.max_edicts)
-		{
-			edict_t* pEdict = EDICT_NUM(entindex);
-			return pEdict->StateChanged();
-		}
-	}
+	//virtual void EdictFlagChanged(int entindex) {
+	//	if (entindex >= 0 && entindex < sv.max_edicts)
+	//	{
+	//		edict_t* pEdict = EDICT_NUM(entindex);
+	//		return pEdict->StateChanged();
+	//	}
+	//}
 
-	virtual void		EdictFlagChanged(int entindex, unsigned short offset) {
-		if (entindex >= 0 && entindex < sv.max_edicts)
-		{
-			edict_t* pEdict = EDICT_NUM(entindex);
-			return pEdict->StateChanged(offset);
-		}
-	};
+	//virtual void		EdictFlagChanged(int entindex, unsigned short offset) {
+	//	if (entindex >= 0 && entindex < sv.max_edicts)
+	//	{
+	//		edict_t* pEdict = EDICT_NUM(entindex);
+	//		return pEdict->StateChanged(offset);
+	//	}
+	//};
 	
-	virtual void		ClearTransmitState(int entindex) {
-		if (entindex >= 0 && entindex < sv.max_edicts)
-		{
-			edict_t* pEdict = EDICT_NUM(entindex);
-			return pEdict->ClearTransmitState();
-		}
-	}
+	//virtual void		ClearTransmitState(int entindex) {
+	//	if (entindex >= 0 && entindex < sv.max_edicts)
+	//	{
+	//		edict_t* pEdict = EDICT_NUM(entindex);
+	//		return pEdict->ClearTransmitState();
+	//	}
+	//}
 
 	virtual void		SetEdict(int entindex, bool bFullEdict) {
 		if (entindex >= 0 && entindex < sv.max_edicts)
@@ -1547,15 +1565,15 @@ public:
 		}
 	}
 
-	virtual CSharedEdictChangeInfo* GetSharedEdictChangeInfo()
-	{
-		return &g_SharedEdictChangeInfo;
-	}
+	//virtual CSharedEdictChangeInfo* GetSharedEdictChangeInfo()
+	//{
+	//	return &g_SharedEdictChangeInfo;
+	//}
 
-	virtual IChangeInfoAccessor *GetChangeAccessor( const edict_t *pEdict )
-	{
-		return &sv.edictchangeinfo[ NUM_FOR_EDICT( pEdict ) ];
-	}
+	//virtual IChangeInfoAccessor *GetChangeAccessor( const edict_t *pEdict )
+	//{
+	//	return &sv.edictchangeinfo[ NUM_FOR_EDICT( pEdict ) ];
+	//}
 
 	virtual QueryCvarCookie_t StartQueryCvarValue( int pPlayerEntity, const char *pCvarName )
 	{

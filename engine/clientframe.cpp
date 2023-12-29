@@ -104,7 +104,7 @@ CClientFrame *CClientFrameManager::GetClientFrame( int nTick, bool bExact )
 	CClientFrame *frame = m_Frames;
 	CClientFrame *lastFrame = frame;
 
-	while ( frame != NULL )
+	while ( frame )
 	{
 		if ( frame->tick_count >= nTick  )
 		{
@@ -200,36 +200,39 @@ void CClientFrameManager::DeleteClientFrames(int nTick)
 	}
 	else
 	{
-		CClientFrame *frame = m_Frames;
-		// rebuild m_LastFrame while iterating forward through the list
-		m_LastFrame = NULL;
-		while ( frame )
-		{
-			if ( frame->tick_count < nTick )
-			{
-				// Delete this frame
-				CClientFrame* next = frame->m_pNext;
-				if ( m_Frames == frame )
-					m_Frames = next;
-				FreeFrame( frame );
-				if ( --m_nFrames == 0 )
-				{
-					Assert( next == NULL );
-					m_LastFrame = m_Frames = NULL;
-					break;
-				}
-				Assert( m_LastFrame != frame && m_nFrames > 0 );
-				frame = next;
-				if ( m_LastFrame )
-					m_LastFrame->m_pNext = next;
-			}
-			else
-			{
-				Assert( m_LastFrame == NULL || m_LastFrame->m_pNext == frame );
-				m_LastFrame = frame;
-				frame = frame->m_pNext;
-			}
+		while (m_Frames && m_Frames->tick_count < nTick) {
+			RemoveOldestFrame();
 		}
+		//CClientFrame *frame = m_Frames;
+		//// rebuild m_LastFrame while iterating forward through the list
+		//m_LastFrame = NULL;
+		//while ( frame )
+		//{
+		//	if ( frame->tick_count < nTick )
+		//	{
+		//		// Delete this frame
+		//		CClientFrame* next = frame->m_pNext;
+		//		if ( m_Frames == frame )
+		//			m_Frames = next;
+		//		FreeFrame( frame );
+		//		if ( --m_nFrames == 0 )
+		//		{
+		//			Assert( next == NULL );
+		//			m_LastFrame = m_Frames = NULL;
+		//			break;
+		//		}
+		//		Assert( m_LastFrame != frame && m_nFrames > 0 );
+		//		frame = next;
+		//		if ( m_LastFrame )
+		//			m_LastFrame->m_pNext = next;
+		//	}
+		//	else
+		//	{
+		//		Assert( m_LastFrame == NULL || m_LastFrame->m_pNext == frame );
+		//		m_LastFrame = frame;
+		//		frame = frame->m_pNext;
+		//	}
+		//}
 	}
 
 

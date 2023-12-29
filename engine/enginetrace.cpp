@@ -1048,7 +1048,7 @@ void CEngineTraceServer::SetTraceEntity( ICollideable *pCollideable, trace_t *pT
 	else
 	{
 		// For static props, point to the world, hitbox is the prop index
-		pTrace->m_pEnt = (sv.edicts->GetIServerEntity());
+		pTrace->m_pEnt = serverEntitylist->GetServerEntity(0);
 		pTrace->hitbox = StaticPropMgr()->GetStaticPropIndex( pHandleEntity ) + 1;
 	}
 }
@@ -1338,9 +1338,9 @@ ICollideable *CEngineTraceClient::GetWorldCollideable()
 
 ICollideable *CEngineTraceServer::GetWorldCollideable()
 {
-	if (!sv.edicts)
+	if (!serverEntitylist->GetServerEntity(0))
 		return NULL;
-	return sv.edicts->GetCollideable();
+	return serverEntitylist->GetServerEntity(0)->GetCollideable();
 }
 
 

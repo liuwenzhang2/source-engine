@@ -223,10 +223,10 @@ void CLocalNetworkBackdoor::EntityDormant( int iEnt, int iSerialNum )
 
 void CLocalNetworkBackdoor::AddToPendingDormantEntityList( unsigned short iEdict )
 {
-	edict_t *e = &sv.edicts[iEdict];
-	if ( !( e->m_fStateFlags & FL_EDICT_PENDING_DORMANT_CHECK ) )
+	//edict_t *e = &sv.edicts[iEdict];
+	if ( !( serverEntitylist->GetServerNetworkable(iEdict)->GetTransmitState() & FL_EDICT_PENDING_DORMANT_CHECK))
 	{
-		e->m_fStateFlags |= FL_EDICT_PENDING_DORMANT_CHECK;
+		serverEntitylist->GetServerNetworkable(iEdict)->GetTransmitState() |= FL_EDICT_PENDING_DORMANT_CHECK;
 		m_PendingDormantEntities.AddToTail( iEdict );
 	}
 }		
@@ -239,14 +239,16 @@ void CLocalNetworkBackdoor::ProcessDormantEntities()
 		edict_t *e = &sv.edicts[iEdict];
 
 		// Make sure the entity still exists and stil has the dontsend flag set.
-		if ( e->IsFree() || !(e->m_fStateFlags & FL_EDICT_DONTSEND) )
+		if ( e->IsFree() || !(serverEntitylist->GetServerNetworkable(iEdict)->GetTransmitState() & FL_EDICT_DONTSEND) )
 		{
-			e->m_fStateFlags &= ~FL_EDICT_PENDING_DORMANT_CHECK;
+			if (serverEntitylist->GetServerNetworkable(iEdict)) {
+				serverEntitylist->GetServerNetworkable(iEdict)->GetTransmitState() &= ~FL_EDICT_PENDING_DORMANT_CHECK;
+			}
 			continue;
 		}
 
 		EntityDormant( iEdict, e->m_NetworkSerialNumber );
-		e->m_fStateFlags &= ~FL_EDICT_PENDING_DORMANT_CHECK;
+		serverEntitylist->GetServerNetworkable(iEdict)->GetTransmitState() &= ~FL_EDICT_PENDING_DORMANT_CHECK;
 	}
 	m_PendingDormantEntities.Purge();
 }
@@ -351,7 +353,7 @@ void CLocalNetworkBackdoor::EntState(
 		Assert( pCached->m_pDataPointer == pNet->GetDataTableBasePtr() );
 
 		LocalTransfer_TransferEntity( 
-			&sv.edicts[iEnt], 
+			serverEntitylist->GetServerNetworkable(iEnt), 
 			pSendTable, 
 			pSourceEnt, 
 			pClientClass->m_pRecvTable, 

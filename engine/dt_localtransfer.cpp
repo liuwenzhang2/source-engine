@@ -293,7 +293,7 @@ void LocalTransfer_InitFastCopy(
 
 
 inline int MapPropOffsetsToIndices( 
-	const CBaseEdict *pEdict,
+	const IServerNetworkable *pEdict,
 	CSendTablePrecalc *pPrecalc, 
 	const unsigned short *pOffsets,
 	unsigned short nOffsets,
@@ -471,9 +471,9 @@ void PrintPartialChangeEntsList()
 #endif
 }
 
-
+//extern int g_SharedEdictChangeInfom_iSerialNumber;
 void LocalTransfer_TransferEntity( 
-	const CBaseEdict *pEdict,
+	const IServerNetworkable *pEdict,
 	const SendTable *pSendTable, 
 	const void *pSrcEnt, 
 	RecvTable *pRecvTable, 
@@ -483,24 +483,28 @@ void LocalTransfer_TransferEntity(
 	int objectID )
 {
 	++g_nTotalEntChanges;
-	CEdictChangeInfo *pCI = &g_pSharedChangeInfo->m_ChangeInfos[pEdict->GetChangeInfo()];
+	//CEdictChangeInfo *pCI = &g_pSharedChangeInfo->m_ChangeInfos[pEdict->GetChangeInfo()];
 
 	unsigned short propIndices[MAX_CHANGE_OFFSETS*3];
 	
 	// This code tries to only copy fields expressly marked as "changed" (by having the field offsets added to the changeoffsets vectors)
-	if ( pEdict->GetChangeInfoSerialNumber() == g_pSharedChangeInfo->m_iSerialNumber &&
+	if ( pEdict->GetNumStateChangedOffsets() > 0 &&
 		 !bNewlyCreated &&
 		 !bJustEnteredPVS &&
 		 dt_UsePartialChangeEnts.GetInt()
 		 )
 	{
+		if (pEdict->entindex() == 1) {
+			int aaa = 0;
+		}
+
 		CSendTablePrecalc *pPrecalc = pSendTable->m_pPrecalc;
 
-		int nChangeOffsets = MapPropOffsetsToIndices( pEdict, pPrecalc, pCI->m_ChangeOffsets, pCI->m_nChangeOffsets, propIndices );
+		int nChangeOffsets = MapPropOffsetsToIndices( pEdict, pPrecalc, pEdict->GetStateChangedOffsets(), pEdict->GetNumStateChangedOffsets(), propIndices);
 		if ( nChangeOffsets == 0 )
 			return;
 		
-		AddToPartialChangeEntsList( (edict_t*)pEdict - sv.edicts, true );
+		AddToPartialChangeEntsList(pEdict->entindex(), true);//(edict_t*)pEdict - sv.edicts
 		FastSortList( propIndices, nChangeOffsets );
 
 		// Setup the structure to traverse the source tree.
@@ -554,7 +558,7 @@ void LocalTransfer_TransferEntity(
 		CClientDatatableStack clientStack( pDecoder, (unsigned char*)pDestEnt, objectID );
 		clientStack.Init();
 
-		AddToPartialChangeEntsList( (edict_t*)pEdict - sv.edicts, false );
+		AddToPartialChangeEntsList(pEdict->entindex(), false );//(edict_t*)pEdict - sv.edicts
 
 		// Copy the properties that require proxies.
 		CFastLocalTransferPropInfo *pPropList = pPrecalc->m_FastLocalTransfer.m_OtherProps.Base();

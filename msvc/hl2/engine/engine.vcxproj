@@ -106,6 +106,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\;..\..\..\utils\vmpi_private\mysql\lib\opt;..\..\..\dx9sdk\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

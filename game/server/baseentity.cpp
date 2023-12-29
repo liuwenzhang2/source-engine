@@ -3510,7 +3510,7 @@ int CBaseEntity::GetTransmitState( void )
 	if ( entindex()==-1 )
 		return 0;
 
-	return engine->GetEdictFlag(entindex());
+	return NetworkProp()->GetTransmitState();
 }
 
 int	CBaseEntity::SetTransmitState( int nFlag)
@@ -3519,16 +3519,16 @@ int	CBaseEntity::SetTransmitState( int nFlag)
 		return 0;
 
 	// clear current flags = check ShouldTransmit()
-	engine->ClearTransmitState(entindex());	
+	NetworkProp()->ClearTransmitState();	
 	
-	int oldFlags = engine->GetEdictFlag(entindex());
-	engine->GetEdictFlag(entindex()) |= nFlag;
+	int oldFlags = NetworkProp()->GetTransmitState();
+	NetworkProp()->GetTransmitState() |= nFlag;
 	
 	// Tell the engine (used for a network backdoor optimization).
-	if ( (oldFlags & FL_EDICT_DONTSEND) != (engine->GetEdictFlag(entindex()) & FL_EDICT_DONTSEND) )
+	if ( (oldFlags & FL_EDICT_DONTSEND) != (NetworkProp()->GetTransmitState() & FL_EDICT_DONTSEND) )
 		engine->NotifyEdictFlagsChange( entindex() );
 
-	return engine->GetEdictFlag(entindex());
+	return NetworkProp()->GetTransmitState();
 }
 
 int CBaseEntity::UpdateTransmitState()
@@ -3571,7 +3571,7 @@ int CBaseEntity::UpdateTransmitState()
 int CBaseEntity::DispatchUpdateTransmitState()
 {
 	if ( m_nTransmitStateOwnedCounter != 0 )
-		return entindex()!=-1 ? engine->GetEdictFlag(entindex()) : 0;
+		return entindex() != -1 ? NetworkProp()->GetTransmitState() : 0;
 	
 	g_nInsideDispatchUpdateTransmitState++;
 	int ret = UpdateTransmitState();

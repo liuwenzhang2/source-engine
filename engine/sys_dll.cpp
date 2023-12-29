@@ -57,7 +57,7 @@
 #include "cdll_engine_int.h"
 #include "dt_send.h"
 #include "idedicatedexports.h"
-#include "eifacev21.h"
+//#include "eifacev21.h"
 #include "cl_steamauth.h"
 #include "tier0/etwprof.h"
 
@@ -123,7 +123,7 @@ static FileFindHandle_t	g_hfind = FILESYSTEM_INVALID_FIND_HANDLE;
 CSysModule *g_GameDLL = NULL;
 
 // Prototype of an global method function
-typedef void (DLLEXPORT * PFN_GlobalMethod)( edict_t *pEntity );
+//typedef void (DLLEXPORT * PFN_GlobalMethod)( edict_t *pEntity );
 
 IServerGameDLL	*serverGameDLL = NULL;
 int g_iServerGameDLLVersion = 0;

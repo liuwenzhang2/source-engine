@@ -95,16 +95,26 @@ public:
 	virtual ServerClass*	GetServerClass() = 0;
 
 	//virtual edict_t			*GetEdict() const = 0;
+	virtual bool			HasStateChanged() const = 0;
+	virtual void			ClearStateChanged() = 0;
+	//virtual void			StateChanged() = 0;
+	//virtual void			StateChanged(unsigned short offset) = 0;
+	virtual const unsigned short*	GetStateChangedOffsets() const = 0;
+	virtual const unsigned short	GetNumStateChangedOffsets() const = 0;
+	//virtual int						GetStateChangedTickCount() const = 0;
+	//virtual void					SetStateChangedTickCount(int nTickCount) = 0;
 
 	virtual const char*		GetClassName() const = 0;
 	virtual void			Release() = 0;
-
+	virtual int				entindex() const = 0;
 	virtual int				AreaNum() const = 0;
 
 	// In place of a generic QueryInterface.
 	virtual CBaseNetworkable* GetBaseNetworkable() = 0;
 	virtual CBaseEntity*	GetBaseEntity() = 0; // Only used by game code.
 	virtual PVSInfo_t*		GetPVSInfo() = 0; // get current visibilty data
+	virtual int&			GetTransmitState() = 0;
+	virtual void			ClearTransmitState() = 0;
 
 protected:
 	// Should never call delete on this! 

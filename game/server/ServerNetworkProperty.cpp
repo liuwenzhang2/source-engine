@@ -66,6 +66,7 @@ void CServerNetworkProperty::Init( CBaseEntity *pEntity )
 	m_bPendingStateChange = false;
 	m_PVSInfo.m_nClusterCount = 0;
 	m_TimerEvent.Init( &g_NetworkPropertyEventMgr, this );
+	ClearStateChanged();
 }
 
 void CServerNetworkProperty::SetEntIndex(int entindex) {
@@ -142,9 +143,9 @@ bool CServerNetworkProperty::IsMarkedForDeletion() const
 //-----------------------------------------------------------------------------
 void CServerNetworkProperty::RecomputePVSInformation()
 {
-	if ( m_entindex!=-1 && ( ( engine->GetEdictFlag(m_entindex) & FL_EDICT_DIRTY_PVS_INFORMATION) != 0))
+	if ( m_entindex!=-1 && ( (GetTransmitState() & FL_EDICT_DIRTY_PVS_INFORMATION) != 0))
 	{
-		engine->GetEdictFlag(m_entindex) &= ~FL_EDICT_DIRTY_PVS_INFORMATION;
+		GetTransmitState() &= ~FL_EDICT_DIRTY_PVS_INFORMATION;
 		engine->BuildEntityClusterList(m_pOuter, &m_PVSInfo );
 	}
 }
@@ -299,7 +300,7 @@ void CServerNetworkProperty::FireEvent()
 	if ( m_bPendingStateChange )
 	{
 		if (m_entindex != -1)
-			engine->EdictFlagChanged(m_entindex);
+			StateChanged();
 		m_bPendingStateChange = false;
 	}
 }

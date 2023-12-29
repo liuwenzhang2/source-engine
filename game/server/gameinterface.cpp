@@ -2476,7 +2476,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 	{
 		int iEdict = pEdictIndices[i];
 
-		int nFlags = engine->GetEdictFlag(iEdict) & (FL_EDICT_DONTSEND | FL_EDICT_ALWAYS | FL_EDICT_PVSCHECK | FL_EDICT_FULLCHECK);
+		int nFlags = gEntList.GetBaseEntity(iEdict)->GetTransmitState() & (FL_EDICT_DONTSEND | FL_EDICT_ALWAYS | FL_EDICT_PVSCHECK | FL_EDICT_FULLCHECK);
 
 		// entity needs no transmit
 		if ( nFlags & FL_EDICT_DONTSEND )
@@ -2590,7 +2590,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				break;
 			}
 
-			int checkFlags = engine->GetEdictFlag(checkIndex) & (FL_EDICT_DONTSEND | FL_EDICT_ALWAYS | FL_EDICT_PVSCHECK | FL_EDICT_FULLCHECK);
+			int checkFlags = gEntList.GetBaseEntity(checkIndex)->GetTransmitState() & (FL_EDICT_DONTSEND | FL_EDICT_ALWAYS | FL_EDICT_PVSCHECK | FL_EDICT_FULLCHECK);
 			if ( checkFlags & FL_EDICT_DONTSEND )
 				break;
 

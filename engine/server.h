@@ -31,7 +31,7 @@ class ITraceFilter;
 class CEventInfo;
 typedef CGameTrace trace_t;
 typedef int TABLEID;
-class IChangeInfoAccessor;
+//class IChangeInfoAccessor;
 class CPureServerWhitelist;
 
 
@@ -101,7 +101,7 @@ public:
 	int			max_edicts;
 	int			free_edicts; // how many edicts in num_edicts are free, in use is num_edicts - free_edicts
 	edict_t		*edicts;			// Can array index now, edict_t is fixed
-	IChangeInfoAccessor *edictchangeinfo; // HACK to allow backward compat since we can't change edict_t layout
+	//IChangeInfoAccessor *edictchangeinfo; // HACK to allow backward compat since we can't change edict_t layout
 
 	int			m_nMaxClientsLimit;    // Max allowed on server.
 	
