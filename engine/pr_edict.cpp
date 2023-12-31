@@ -305,7 +305,7 @@ FIXME: walk all entities and NULL out references to this entity
 */
 void ED_Free (edict_t *ed)
 {
-	if (!serverEntitylist->GetServerEntity(ed->m_EdictIndex))
+	if (g_FreeEdicts.IsBitSet(ed->m_EdictIndex))
 	{
 #ifdef _DEBUG
 //		ConDMsg("duplicate free on '%s'\n", pr_strings + ed->classname );
