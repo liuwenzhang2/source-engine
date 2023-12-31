@@ -7063,11 +7063,11 @@ void CBaseEntity::EmitSentenceByIndex( IRecipientFilter& filter, int iEntIndex, 
 void CBaseEntity::SetRefEHandle( const CBaseHandle &handle )
 {
 	m_RefEHandle = handle;
-	if ( entindex()!=-1 )
-	{
-		COMPILE_TIME_ASSERT( NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS <= 8*sizeof( engine->GetNetworkSerialNumber(entindex()) ) );
-		engine->GetNetworkSerialNumber(entindex()) = (m_RefEHandle.GetSerialNumber() & (1 << NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS) - 1);
-	}
+	//if ( entindex()!=-1 )
+	//{
+	//	COMPILE_TIME_ASSERT( NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS <= 8*sizeof( engine->GetNetworkSerialNumber(entindex()) ) );
+	//	engine->SetNetworkSerialNumber(entindex(), (m_RefEHandle.GetSerialNumber() & (1 << NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS) - 1));
+	//}
 }
 
 

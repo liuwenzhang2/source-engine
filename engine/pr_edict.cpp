@@ -55,7 +55,7 @@ Sets everything to NULL, done when new entity is allocated for game.dll
 */
 static void ED_ClearEdict( edict_t *e )
 {
-	e->ClearFree();
+	//e->ClearFree();
 	if (serverEntitylist->GetServerNetworkable(e->m_EdictIndex)) {
 		serverEntitylist->GetServerNetworkable(e->m_EdictIndex)->ClearStateChanged();
 		//serverEntitylist->GetServerNetworkable(e->m_EdictIndex)->SetStateChangedTickCount(0);
@@ -64,15 +64,15 @@ static void ED_ClearEdict( edict_t *e )
 	//e->SetChangeInfoSerialNumber( 0 );
 	
 	serverGameEnts->FreeContainingEntity(e->m_EdictIndex);
-	InitializeEntityDLLFields(e);
+	//InitializeEntityDLLFields(e);
 
-	e->m_NetworkSerialNumber = -1;  // must be filled by game.dll
+	//e->m_NetworkSerialNumber = -1;  // must be filled by game.dll
 	Assert( (int) e->m_EdictIndex == (e - sv.edicts) );
 }
 
 void ED_ClearFreeFlag( edict_t *e )
 {
-	e->ClearFree();
+	//e->ClearFree();
 	g_FreeEdicts.Clear( e->m_EdictIndex );
 }
 
@@ -168,7 +168,7 @@ edict_t *ED_Alloc( int iForceEdictIndex )
 		}
 		
 		edict_t *e = &sv.edicts[ iForceEdictIndex ];
-		if ( e->IsFree() )
+		if ( !serverEntitylist->GetServerEntity(iForceEdictIndex) )
 		{
 			Assert( iForceEdictIndex == e->m_EdictIndex );
 			--sv.free_edicts;
@@ -193,18 +193,22 @@ edict_t *ED_Alloc( int iForceEdictIndex )
 
 		edict_t *pEdict = &sv.edicts[ iBit ];
 
+		if (serverEntitylist->GetServerEntity(pEdict->m_EdictIndex)) {
+			Error("not free edict");
+		}
+
 		// If this assert goes off, someone most likely called pedict->ClearFree() and not ED_ClearFreeFlag()?
-		Assert( pEdict->IsFree() );
+		Assert( !serverEntitylist->GetServerEntity(iBit) );
 		Assert( iBit == pEdict->m_EdictIndex );
-		if ( ( pEdict->freetime < 2 ) || ( sv.GetTime() - pEdict->freetime >= EDICT_FREETIME ) )
+		if ( 1 /*(pEdict->freetime < 2) || (sv.GetTime() - pEdict->freetime >= EDICT_FREETIME)*/)
 		{
 			// If we have no freetime, we've had AllowImmediateReuse() called. We need
 			// to explicitly delete this old entity.
-			if ( pEdict->freetime == 0 && sv_useexplicitdelete.GetBool() )
-			{
-				//Warning("ADDING SLOT to snapshot: %d\n", i );
-				framesnapshotmanager->AddExplicitDelete( iBit );
-			}
+			//if ( sv_useexplicitdelete.GetBool() )//pEdict->freetime == 0 && 
+			//{
+			//	//Warning("ADDING SLOT to snapshot: %d\n", i );
+			//	framesnapshotmanager->AddExplicitDelete( iBit );
+			//}
 
 			--sv.free_edicts;
 			g_FreeEdicts.Clear( pEdict->m_EdictIndex );
@@ -281,9 +285,9 @@ void ED_AllowImmediateReuse()
 	edict_t *pEdict = sv.edicts + sv.GetMaxClients() + 1;
 	for ( int i=sv.GetMaxClients()+1; i < sv.num_edicts; i++ )
 	{
-		if ( pEdict->IsFree() )
+		if ( !serverEntitylist->GetServerEntity(i) )
 		{
-			pEdict->freetime = 0;
+			//pEdict->freetime = 0;
 		}
 
 		pEdict++;
@@ -301,7 +305,7 @@ FIXME: walk all entities and NULL out references to this entity
 */
 void ED_Free (edict_t *ed)
 {
-	if (ed->IsFree())
+	if (!serverEntitylist->GetServerEntity(ed->m_EdictIndex))
 	{
 #ifdef _DEBUG
 //		ConDMsg("duplicate free on '%s'\n", pr_strings + ed->classname );
@@ -316,15 +320,15 @@ void ED_Free (edict_t *ed)
 	// release the DLL entity that's attached to this edict, if any
 	serverGameEnts->FreeContainingEntity( ed->m_EdictIndex );
 
-	ed->SetFree();
-	ed->freetime = sv.GetTime();
+	//ed->SetFree();
+	//ed->freetime = sv.GetTime();
 
 	++sv.free_edicts;
 	Assert( !g_FreeEdicts.IsBitSet( ed->m_EdictIndex ) );
 	g_FreeEdicts.Set( ed->m_EdictIndex );
 
 	// Increment the serial number so it knows to send explicit deletes the clients.
-	ed->m_NetworkSerialNumber++; 
+	//ed->m_NetworkSerialNumber++; 
 }
 
 //
@@ -332,13 +336,13 @@ void ED_Free (edict_t *ed)
 // InitializeEntityDLLFields clears out fields to NULL or UNKNOWN.
 // Release is for terminating a DLL entity.  Initialize is for initializing one.
 //
-void InitializeEntityDLLFields( edict_t *pEdict )
-{
+//void InitializeEntityDLLFields( edict_t *pEdict )
+//{
 	// clear all the game variables
 	//size_t sz = offsetof( edict_t, m_pUnk ) + sizeof( void* );
 	//memset( ((byte*)pEdict) + sz, 0, sizeof(edict_t) - sz );
-	pEdict->freetime = 0;
-}
+	//pEdict->freetime = 0;
+//}
 
 int NUM_FOR_EDICT(const edict_t *e)
 {

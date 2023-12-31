@@ -58,6 +58,7 @@ public:
 	// It returns GetServerNetworkable( entnum )->GetIServerEntity().
 	virtual IServerEntity* GetServerEntity(int entnum) const = 0;
 	virtual IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const = 0;
+	virtual short		GetNetworkSerialNumber(int entnum) const = 0;
 
 	// Returns number of entities currently in use
 	virtual int					NumberOfEntities() = 0;

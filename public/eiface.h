@@ -163,11 +163,13 @@ public:
 
 	//virtual void		ClearTransmitState(int entindex) = 0;
 
-	virtual void		SetEdict(int entindex, bool bFullEdict) = 0;
+	//virtual void		SetEdict(int entindex, bool bFullEdict) = 0;
 
-	virtual bool		IsEdictFree(int entindex) = 0;
+	//virtual bool		IsEdictFree(int entindex) = 0;
 
-	virtual short&		GetNetworkSerialNumber(int entindex) = 0;
+	//virtual short&		GetNetworkSerialNumber(int entindex) = 0;
+
+	//virtual void		SetNetworkSerialNumber(int entindex, short nNetworkSerialNumber) = 0;
 	// Memory allocation for entity class data
 	virtual void		*PvAllocEntPrivateData( long cb ) = 0;
 	virtual void		FreeEntPrivateData( void *pEntity ) = 0;

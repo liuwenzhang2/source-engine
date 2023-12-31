@@ -360,7 +360,7 @@ void CGameClient::Connect( const char * szName, int nUserID, INetChannel *pNetCh
 {
 	CBaseClient::Connect( szName, nUserID, pNetChannel, bFakePlayer, clientChallenge );
 
-	edict = EDICT_NUM( m_nEntityIndex );
+	//edict = EDICT_NUM( m_nEntityIndex );
 	
 	// init PackInfo
 	m_PackInfo.m_pClientEnt = m_nEntityIndex;
@@ -593,7 +593,7 @@ bool CGameClient::IsProximityHearingClient( int index ) const
 
 void CGameClient::Inactivate( void )
 {
-	if ( edict && !edict->IsFree() )
+	if ( serverEntitylist->GetServerEntity(m_nEntityIndex) )
 	{
 		m_Server->RemoveClientFromGame( this );
 	}
@@ -666,7 +666,7 @@ void CGameClient::Clear()
 	m_Sounds.Purge();
 	m_VoiceStreams.ClearAll();
 	m_VoiceProximity.ClearAll();
-	edict = NULL;
+	//edict = NULL;
 	m_pViewEntity = NULL;
 	m_bVoiceLoopback = false;
 	m_LastMovementTick = 0;
@@ -994,8 +994,8 @@ void CGameClient::SpawnPlayer( void )
 	{
 		// set up the edict
 		Assert( serverGameEnts );
-		serverGameEnts->FreeContainingEntity( edict->m_EdictIndex );
-		InitializeEntityDLLFields( edict );
+		serverGameEnts->FreeContainingEntity( m_nEntityIndex );
+		//InitializeEntityDLLFields( edict );
 		
 	}
 

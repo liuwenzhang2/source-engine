@@ -1702,7 +1702,7 @@ void CBaseEntity::PhysicsToss( void )
 	}
 	
 #if !defined( CLIENT_DLL )
-	if (engine->IsEdictFree(entindex()))
+	if (IsMarkedForDeletion())//engine->IsEdictFree(entindex())
 		return;
 #endif
 

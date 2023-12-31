@@ -476,6 +476,10 @@ static inline void SV_DetermineUpdateType( CEntityWriteInfo &u )
 		u.m_UpdateType = LeavePVS;
 		return;
 	}
+
+	if (u.m_nNewEntity != u.m_nOldEntity) {
+		Error("state error");
+	}
 	
 	Assert( u.m_pToSnapshot->m_pEntities[ u.m_nNewEntity ].m_pClass );
 
@@ -839,6 +843,9 @@ static inline int SV_WriteDeletions( CEntityWriteInfo &u )
 			bNeedsExplicitDelete = ( pToSnapShot->m_iExplicitDeleteSlots.Find(i) != pToSnapShot->m_iExplicitDeleteSlots.InvalidIndex() );
 			// We used to do more stuff here as a sanity check, but I don't think it was necessary since the only thing that would unset the bould would be a "recreate" in the same slot which is
 			// already implied by the u.m_pTo->transmit_entity.Get(i) check
+			if (bNeedsExplicitDelete) {
+				int aaa = 0;
+			}
 		}
 
 		// Check conditions
@@ -1000,6 +1007,13 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 				}
 				break;
 			}
+		}
+
+		if (u.m_nOldEntity == ENTITY_SENTINEL && u.m_nNewEntity == ENTITY_SENTINEL) {
+			
+		}
+		else {
+			Error("state error");
 		}
 
 		// Now write out the express deletions

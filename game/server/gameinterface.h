@@ -206,7 +206,7 @@ public:
 		{
 			ref.m_iEdict = pRet->entindex();
 			if ( pRet->entindex()!=-1 )
-				ref.m_iSerialNumber = engine->GetNetworkSerialNumber(pRet->entindex());
+				ref.m_iSerialNumber = gEntList.GetNetworkSerialNumber(pRet->entindex());
 		}
 
 		g_MapEntityRefs.AddToTail( ref );

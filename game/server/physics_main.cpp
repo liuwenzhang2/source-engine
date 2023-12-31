@@ -1084,7 +1084,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 		// run the impact function
 		PhysicsImpact((CBaseEntity*)trace.m_pEnt, trace );
 		// Removed by the impact function
-		if ( IsMarkedForDeletion() || engine->IsEdictFree(entindex()) )
+		if ( IsMarkedForDeletion())// || engine->IsEdictFree(entindex()) 
 			break;		
 	
 		time_left -= time_left * trace.fraction;
@@ -1549,7 +1549,7 @@ void CBaseEntity::PhysicsCustom()
 		return;
 	}
 	
-	if (engine->IsEdictFree(entindex()))
+	if (IsMarkedForDeletion())//engine->IsEdictFree(entindex())
 		return;
 
 	// check for in water

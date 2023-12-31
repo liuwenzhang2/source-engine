@@ -236,10 +236,10 @@ void CLocalNetworkBackdoor::ProcessDormantEntities()
 	FOR_EACH_LL( m_PendingDormantEntities, i )
 	{
 		int iEdict = m_PendingDormantEntities[i];
-		edict_t *e = &sv.edicts[iEdict];
+		//edict_t *e = &sv.edicts[iEdict];
 
 		// Make sure the entity still exists and stil has the dontsend flag set.
-		if ( e->IsFree() || !(serverEntitylist->GetServerNetworkable(iEdict)->GetTransmitState() & FL_EDICT_DONTSEND) )
+		if (!serverEntitylist->GetServerNetworkable(iEdict)|| !(serverEntitylist->GetServerNetworkable(iEdict)->GetTransmitState() & FL_EDICT_DONTSEND) )//e->IsFree() || 
 		{
 			if (serverEntitylist->GetServerNetworkable(iEdict)) {
 				serverEntitylist->GetServerNetworkable(iEdict)->GetTransmitState() &= ~FL_EDICT_PENDING_DORMANT_CHECK;
@@ -247,7 +247,7 @@ void CLocalNetworkBackdoor::ProcessDormantEntities()
 			continue;
 		}
 
-		EntityDormant( iEdict, e->m_NetworkSerialNumber );
+		EntityDormant( iEdict, serverEntitylist->GetNetworkSerialNumber(iEdict) );
 		serverEntitylist->GetServerNetworkable(iEdict)->GetTransmitState() &= ~FL_EDICT_PENDING_DORMANT_CHECK;
 	}
 	m_PendingDormantEntities.Purge();

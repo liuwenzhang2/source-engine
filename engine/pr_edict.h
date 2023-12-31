@@ -83,14 +83,14 @@ public:
 	//IServerUnknown* GetUnknown();
 
 	// Set when initting an entity. If it's only a networkable, this is false.
-	void				SetEdict(bool bFullEdict);
+	//void				SetEdict(bool bFullEdict);
 
 	//int					AreaNum() const;
 	//const char*			GetClassName() const;
 
-	bool				IsFree() const;
-	void				SetFree();
-	void				ClearFree();
+	//bool				IsFree() const;
+	//void				SetFree();
+	//void				ClearFree();
 
 	//bool				HasStateChanged() const;
 	//void				ClearStateChanged();
@@ -114,7 +114,7 @@ public:
 //	int	m_fStateFlags;
 //#endif	
 	//bool m_bIsReady = false;
-	bool m_bIsFree = true;
+	//bool m_bIsFree = true;
 
 	// NOTE: this is in the edict instead of being accessed by a virtual because the engine needs fast access to it.
 	// int m_NetworkSerialNumber;
@@ -126,11 +126,11 @@ public:
 	// the overall layout or size of this struct. existing mods compiled with
 	// a full 32-bit serial number field should still work. henryg 8/17/2011
 #if VALVE_LITTLE_ENDIAN
-	short m_NetworkSerialNumber;
+	//short m_NetworkSerialNumber;
 	short m_EdictIndex;
 #else
 	short m_EdictIndex;
-	short m_NetworkSerialNumber;
+	//short m_NetworkSerialNumber;
 #endif
 
 	// NOTE: this is in the edict instead of being accessed by a virtual because the engine needs fast access to it.
@@ -152,7 +152,7 @@ public:
 	//unsigned short m_iChangeInfo;
 	//unsigned short m_iChangeInfoSerialNumber;
 
-	friend void InitializeEntityDLLFields(edict_t* pEdict);
+	//friend void InitializeEntityDLLFields(edict_t* pEdict);
 };
 
 
@@ -167,10 +167,10 @@ public:
 //		return 0;
 //}
 
-inline bool CBaseEdict::IsFree() const
-{
-	return m_bIsFree;
-}
+//inline bool CBaseEdict::IsFree() const
+//{
+//	return m_bIsFree;
+//}
 
 
 
@@ -248,17 +248,17 @@ inline bool CBaseEdict::IsFree() const
 
 
 
-inline void CBaseEdict::SetFree()
-{
-	m_bIsFree = true;
-}
+//inline void CBaseEdict::SetFree()
+//{
+//	m_bIsFree = true;
+//}
 
 // WARNING: Make sure you don't really want to call ED_ClearFreeFlag which will also
 //  remove this edict from the g_FreeEdicts bitset.
-inline void CBaseEdict::ClearFree()
-{
-	m_bIsFree = false;
-}
+//inline void CBaseEdict::ClearFree()
+//{
+//	m_bIsFree = false;
+//}
 
 //inline void	CBaseEdict::ClearTransmitState()
 //{
@@ -283,8 +283,8 @@ inline void CBaseEdict::ClearFree()
 //	return serverEntitylist->GetServerEntity(m_EdictIndex)->GetNetworkable();
 //}
 
-inline void CBaseEdict::SetEdict(bool bFullEdict)
-{
+//inline void CBaseEdict::SetEdict(bool bFullEdict)
+//{
 	//m_pUnk = pUnk;
 	//if (bFullEdict)
 	//{
@@ -294,8 +294,8 @@ inline void CBaseEdict::SetEdict(bool bFullEdict)
 	//{
 	//	m_bIsReady = false;
 	//}
-	m_bIsFree = false;
-}
+	//m_bIsFree = false;
+//}
 
 //inline int CBaseEdict::AreaNum() const
 //{
@@ -348,7 +348,7 @@ public:
 	//ICollideable* GetCollideable();
 
 	// The server timestampe at which the edict was freed (so we can try to use other edicts before reallocating this one)
-	float		freetime;
+	//float		freetime;
 };
 
 //inline ICollideable* edict_t::GetCollideable()
@@ -360,7 +360,7 @@ public:
 //		return NULL;
 //}
 
-void InitializeEntityDLLFields( edict_t *pEdict );
+//void InitializeEntityDLLFields( edict_t *pEdict );
 
 // If iForceEdictIndex is not -1, then it will return the edict with that index. If that edict index
 // is already used, it'll return null.

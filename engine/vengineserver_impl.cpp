@@ -776,31 +776,44 @@ public:
 	//	}
 	//}
 
-	virtual void		SetEdict(int entindex, bool bFullEdict) {
-		if (entindex >= 0 && entindex < sv.max_edicts)
-		{
-			edict_t* pEdict = EDICT_NUM(entindex);
-			return pEdict->SetEdict(bFullEdict);
-		}
-	}
+	//virtual void		SetEdict(int entindex, bool bFullEdict) {
+	//	if (entindex >= 0 && entindex < sv.max_edicts)
+	//	{
+	//		edict_t* pEdict = EDICT_NUM(entindex);
+	//		return pEdict->SetEdict(bFullEdict);
+	//	}
+	//}
 
-	virtual bool		IsEdictFree(int entindex) {
-		if (entindex >= 0 && entindex < sv.max_edicts)
-		{
-			edict_t* pEdict = EDICT_NUM(entindex);
-			return pEdict->IsFree();
-		}
-		return true;
-	}
+	//virtual bool		IsEdictFree(int entindex) {
+	//	if (entindex >= 0 && entindex < sv.max_edicts)
+	//	{
+	//		edict_t* pEdict = EDICT_NUM(entindex);
+	//		return pEdict->IsFree();
+	//	}
+	//	return true;
+	//}
 
-	virtual short& GetNetworkSerialNumber(int entindex) {
-		if (entindex >= 0 && entindex < sv.max_edicts)
-		{
-			edict_t* pEdict = EDICT_NUM(entindex);
-			return pEdict->m_NetworkSerialNumber;
-		}
-		Error("GetEdictFlag");
-	}
+	//virtual short& GetNetworkSerialNumber(int entindex) {
+	//	if (entindex >= 0 && entindex < sv.max_edicts)
+	//	{
+	//		edict_t* pEdict = EDICT_NUM(entindex);
+	//		return pEdict->m_NetworkSerialNumber;
+	//	}
+	//	Error("GetEdictFlag");
+	//}
+
+	//virtual void SetNetworkSerialNumber(int entindex, short nNetworkSerialNumber) {
+	//	if (entindex == 41) {
+	//		int aaa = 0;
+	//	}
+	//	if (entindex >= 0 && entindex < sv.max_edicts)
+	//	{
+	//		edict_t* pEdict = EDICT_NUM(entindex);
+	//		pEdict->m_NetworkSerialNumber = nNetworkSerialNumber;
+	//		return;
+	//	}
+	//	Error("GetEdictFlag");
+	//}
 
 	//
 	// Request engine to allocate "cb" bytes on the entity's private data pointer.

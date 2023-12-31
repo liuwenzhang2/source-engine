@@ -71,7 +71,7 @@ void FreeContainingEntity( int ed )
 		CBaseEntity *ent = gEntList.GetBaseEntity( ed );
 		if ( ent )
 		{
-			engine->SetEdict(ed, false );
+			//engine->SetEdict(ed, false );
 			//CBaseEntity::PhysicsRemoveTouchedList( ent );
 			//CBaseEntity::PhysicsRemoveGroundList( ent );
 			//UTIL_RemoveImmediate( ent );

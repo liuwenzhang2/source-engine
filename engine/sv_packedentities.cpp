@@ -362,13 +362,13 @@ void PackEntities_NetworkBackDoor(
 	for ( int iValidEdict=0; iValidEdict < snapshot->m_nValidEntities; iValidEdict++ )
 	{
 		int index = snapshot->m_pValidEntities[iValidEdict];
-		edict_t* edict = &sv.edicts[ index ];
+		//edict_t* edict = &sv.edicts[ index ];
 		IServerNetworkable* serverNetworkable = serverEntitylist->GetServerNetworkable(index);
 		
 		// this is a bit of a hack to ensure that we get a "preview" of the
 		//  packet timstamp that the server will send so that things that
 		//  are encoded relative to packet time will be correct
-		Assert( edict->m_NetworkSerialNumber != -1 );
+		Assert(serverEntitylist->GetNetworkSerialNumber(index) != -1 );
 
 		bool bShouldTransmit = pInfo->m_pTransmitEdict->Get( index ) ? true : false;
 
@@ -377,7 +377,7 @@ void PackEntities_NetworkBackDoor(
 		// directly over to the client.
 		Assert( index < snapshot->m_nNumEntities );
 		ServerClass *pSVClass = snapshot->m_pEntities[ index ].m_pClass;
-		g_pLocalNetworkBackdoor->EntState( index, edict->m_NetworkSerialNumber, 
+		g_pLocalNetworkBackdoor->EntState( index, serverEntitylist->GetNetworkSerialNumber(index),
 			pSVClass->m_ClassID, pSVClass->m_pTable, serverNetworkable->GetEntityHandle(), serverNetworkable->HasStateChanged(), bShouldTransmit );
 		serverNetworkable->ClearStateChanged();
 	}

@@ -129,6 +129,7 @@ public:
 	IServerUnknown* GetServerUnknownFromHandle(CBaseHandle hEnt) const;
 	IServerEntity* GetServerEntity(int entnum) const;
 	IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const;
+	short		GetNetworkSerialNumber(int iEntity) const;
 	CBaseNetworkable* GetBaseNetworkable( CBaseHandle hEnt ) const;
 	CBaseEntity* GetBaseEntity( CBaseHandle hEnt ) const;
 	CBaseEntity* GetBaseEntity(int entnum) const;
@@ -282,6 +283,11 @@ IServerEntity* CGlobalEntityList<T>::GetServerEntity(int entnum) const {
 template<class T>
 IServerEntity* CGlobalEntityList<T>::GetServerEntityFromHandle(CBaseHandle hEnt) const {
 	return BaseClass::LookupEntity(hEnt);
+}
+
+template<class T>
+short		CGlobalEntityList<T>::GetNetworkSerialNumber(int iEntity) const {
+	return BaseClass::GetNetworkSerialNumber(iEntity);
 }
 
 template<class T>

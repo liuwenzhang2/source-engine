@@ -136,7 +136,7 @@ public:
 	int						m_nSoundSequence;	// increases with each reliable sound
 
 	// Identity information.
-	edict_t					*edict;				// EDICT_NUM(clientnum+1)
+	//edict_t					*edict;				// EDICT_NUM(clientnum+1)
 	CUtlVector<SoundInfo_t>	m_Sounds;			// game sounds
 		
 	const IServerEntity			*m_pViewEntity;		// View Entity (camera or the client itself)

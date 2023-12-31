@@ -86,14 +86,14 @@ void CServerNetworkProperty::AttachEdict( int pRequiredEdict )
 	}
 
 	m_entindex = pRequiredEdict;
-	engine->SetEdict(m_entindex, true );
+	//engine->SetEdict(m_entindex, true );
 }
 
 void CServerNetworkProperty::DetachEdict()
 {
 	if ( m_entindex!=-1 )
 	{
-		engine->SetEdict(m_entindex, false );
+		//engine->SetEdict(m_entindex, false );
 		engine->RemoveEdict(m_entindex);
 		m_entindex = -1;
 	}

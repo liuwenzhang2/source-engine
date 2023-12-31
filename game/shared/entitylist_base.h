@@ -201,7 +201,7 @@ public:
 	// Get an ehandle from a networkable entity's index (note: if there is no entity in that slot,
 	// then the ehandle will be invalid and produce NULL).
 	CBaseHandle GetNetworkableHandle( int iEntity ) const;
-
+	short		GetNetworkSerialNumber(int iEntity) const;
 	// ehandles use this in their Get() function to produce a pointer to the entity.
 	T* LookupEntity( const CBaseHandle &handle ) const;
 	T* LookupEntityByNetworkIndex( int edictIndex ) const;
@@ -258,6 +258,12 @@ inline CBaseHandle CBaseEntityList<T>::GetNetworkableHandle( int iEntity ) const
 		return CBaseHandle( iEntity, m_EntPtrArray[iEntity].m_SerialNumber );
 	else
 		return CBaseHandle();
+}
+
+template<class T>
+inline short CBaseEntityList<T>::GetNetworkSerialNumber(int iEntity) const {
+	Assert(iEntity >= 0 && iEntity < MAX_EDICTS);
+	return m_EntPtrArray[iEntity].m_SerialNumber & (1 << NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS) - 1;
 }
 
 template<class T>

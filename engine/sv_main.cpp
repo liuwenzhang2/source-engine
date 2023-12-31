@@ -1209,7 +1209,7 @@ void SV_DetermineMulticastRecipients( bool usepas, const Vector& origin, CBitVec
 			continue;
 
 		// HACK:  Should above also check pClient->spawned instead of this
-		if ( !pClient->edict || pClient->edict->IsFree() || serverEntitylist->GetServerEntity(pClient->m_nEntityIndex) == NULL)
+		if ( !serverEntitylist->GetServerEntity(pClient->m_nEntityIndex))
 			continue;
 		
 		// Always add the  or Replay client
@@ -1315,14 +1315,14 @@ void CGameServer::RemoveClientFromGame( CBaseClient *client )
 
 	// we must have an active server and a spawned client 
 	// If we are a local server and we're disconnecting just return
-	if ( !pClient->edict || !pClient->IsSpawned() || !IsActive() || (pClient->GetNetChannel() && pClient->GetNetChannel()->IsLoopback() ) )
+	if ( !serverEntitylist->GetServerEntity(pClient->m_nEntityIndex) || !pClient->IsSpawned() || !IsActive() || (pClient->GetNetChannel() && pClient->GetNetChannel()->IsLoopback()))
 		return;
 
 	Assert( g_pServerPluginHandler );
 
 	g_pServerPluginHandler->ClientDisconnect( pClient->m_nEntityIndex );
 	// release the DLL entity that's attached to this edict, if any
-	serverGameEnts->FreeContainingEntity( pClient->edict->m_EdictIndex );
+	serverGameEnts->FreeContainingEntity( pClient->m_nEntityIndex);
 
 }
 
@@ -2075,15 +2075,16 @@ void SV_CreateBaseline (void)
 		int		count = 0;
 		int		bytes = 0;
 		
-		for ( int entnum = 0; entnum < sv.num_edicts ; entnum++)
+		for ( int entnum = 0; entnum < serverEntitylist->NumberOfEdicts() ; entnum++)
 		{
 			// get the current server version
-			edict_t *edict = sv.edicts + entnum;
+			//edict_t *edict = sv.edicts + entnum;
+			IServerNetworkable* serverNetworkable = serverEntitylist->GetServerNetworkable(entnum);
 
-			if ( edict->IsFree() || !serverEntitylist->GetServerEntity(entnum))
+			if (!serverNetworkable)
 				continue;
 
-			ServerClass *pClass   = serverEntitylist->GetServerNetworkable(entnum) ? serverEntitylist->GetServerNetworkable(entnum)->GetServerClass() : 0;
+			ServerClass *pClass   = serverNetworkable->GetServerClass();
 
 			if ( !pClass )
 			{
@@ -2322,7 +2323,7 @@ static void SV_AllocateEdicts()
 	{
 		new( &sv.edicts[i] ) edict_t;
 		sv.edicts[i].m_EdictIndex = i;
-		sv.edicts[i].freetime = 0;
+		//sv.edicts[i].freetime = 0;
 	}
 	ED_ClearFreeEdictList();
 
@@ -2560,10 +2561,10 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 		CGameClient * pClient = Client(i);
 
 		// edict for a player is slot + 1, world = 0
-		pClient->edict = edicts + i + 1;
+		//pClient->edict = edicts + i + 1;
 	
 		// Setup up the edict
-		InitializeEntityDLLFields( pClient->edict );
+		//InitializeEntityDLLFields( pClient->edict );
 	}
 
 	COM_TimestampedLog( "Set up players(done)" );
@@ -2675,9 +2676,9 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	// load the rest of the entities
 	//
 
-	COM_TimestampedLog( "InitializeEntityDLLFields" );
+	//COM_TimestampedLog( "InitializeEntityDLLFields" );
 
-	InitializeEntityDLLFields( edicts );
+	//InitializeEntityDLLFields( edicts );
 
 	// Clear the free bit on the world edict (entindex: 0).
 	ED_ClearFreeFlag( &edicts[0] );
