@@ -142,7 +142,7 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot( int tickcount )
 		}
 		
 		// entity exists and is not marked as 'free'
-		Assert( serverEntitylist->GetNetworkSerialNumber(iEdict) != -1 );
+		Assert( serverEntitylist->GetNetworkSerialNumber(i) != -1 );
 		Assert( serverEntitylist->GetServerNetworkable(i));
 		Assert( serverEntitylist->GetServerNetworkable(i)->GetServerClass() );
 
