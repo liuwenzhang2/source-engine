@@ -2075,7 +2075,7 @@ void SV_CreateBaseline (void)
 		int		count = 0;
 		int		bytes = 0;
 		
-		for ( int entnum = 0; entnum < serverEntitylist->NumberOfEdicts() ; entnum++)
+		for ( int entnum = 0; entnum < serverEntitylist->IndexOfHighestEdict() ; entnum++)
 		{
 			// get the current server version
 			//edict_t *edict = sv.edicts + entnum;

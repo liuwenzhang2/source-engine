@@ -239,13 +239,6 @@ inline void CServerNetworkProperty::NetworkStateChanged(unsigned short varOffset
 	}
 }
 
-//-----------------------------------------------------------------------------
-// Methods to get the entindex + edict
-//-----------------------------------------------------------------------------
-inline int CServerNetworkProperty::entindex() const
-{
-	return m_entindex;
-}
 
 //inline edict_t* CServerNetworkProperty::GetEdict() const
 //{

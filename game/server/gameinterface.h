@@ -202,7 +202,7 @@ public:
 		ref.m_iEdict = -1;
 		ref.m_iSerialNumber = -1;
 
-		if ( pRet )
+		if ( pRet && !pRet->IsEFlagSet(EFL_SERVER_ONLY))
 		{
 			ref.m_iEdict = pRet->entindex();
 			if ( pRet->entindex()!=-1 )

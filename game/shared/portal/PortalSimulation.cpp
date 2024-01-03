@@ -674,6 +674,10 @@ void CPortalSimulator::TakeOwnershipOfEntity( CBaseEntity *pEntity )
 	if( pEntity == NULL )
 		return;
 
+	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+		return;
+	}
+
 	if( pEntity->IsWorld() )
 		return;
 	
@@ -731,6 +735,10 @@ void CPortalSimulator::TakeOwnershipOfEntity( CBaseEntity *pEntity )
 
 void CPortalSimulator::TakePhysicsOwnership( CBaseEntity *pEntity )
 {
+	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+		return;
+	}
+
 	if( m_InternalData.Simulation.pPhysicsEnvironment == NULL )
 		return;
 
@@ -865,6 +873,10 @@ void CPortalSimulator::ReleaseOwnershipOfEntity( CBaseEntity *pEntity, bool bMov
 	if( pEntity == NULL )
 		return;
 
+	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+		return;
+	}
+
 	if( pEntity->IsWorld() )
 		return;
 
@@ -926,6 +938,10 @@ void CPortalSimulator::ReleaseAllEntityOwnership( void )
 
 void CPortalSimulator::ReleasePhysicsOwnership( CBaseEntity *pEntity, bool bContinuePhysicsCloning /*= true*/, bool bMovingToLinkedSimulator /*= false*/ )
 {
+	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+		return;
+	}
+
 	if( CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEntity ) )
 		return;
 
@@ -1039,6 +1055,10 @@ void CPortalSimulator::ReleasePhysicsOwnership( CBaseEntity *pEntity, bool bCont
 
 void CPortalSimulator::StartCloningEntity( CBaseEntity *pEntity )
 {
+	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+		return;
+	}
+
 	if( CPhysicsShadowClone::IsShadowClone( pEntity ) || CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEntity ) )
 		return;
 
@@ -1058,6 +1078,10 @@ void CPortalSimulator::StartCloningEntity( CBaseEntity *pEntity )
 
 void CPortalSimulator::StopCloningEntity( CBaseEntity *pEntity )
 {
+	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+		return;
+	}
+
 	if( (m_InternalData.Simulation.Dynamic.EntFlags[pEntity->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) == 0 )
 	{
 		Assert( m_InternalData.Simulation.Dynamic.ShadowClones.ShouldCloneFromMain.Find( pEntity ) == -1 );
@@ -1081,6 +1105,10 @@ void CPortalSimulator::StopCloningEntity( CBaseEntity *pEntity )
 
 void CPortalSimulator::MarkAsOwned( CBaseEntity *pEntity )
 {
+	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+		return;
+	}
+
 	Assert( pEntity != NULL );
 	int iEntIndex = pEntity->entindex();
 	Assert( s_OwnedEntityMap[iEntIndex] == NULL );
@@ -1102,6 +1130,10 @@ void CPortalSimulator::MarkAsOwned( CBaseEntity *pEntity )
 
 void CPortalSimulator::MarkAsReleased( CBaseEntity *pEntity )
 {
+	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+		return;
+	}
+
 	Assert( pEntity != NULL );
 	int iEntIndex = pEntity->entindex();
 	Assert( s_OwnedEntityMap[iEntIndex] == this );
@@ -2489,6 +2521,9 @@ int CPortalSimulator::GetMoveableOwnedEntities( CBaseEntity **pEntsOut, int iEnt
 
 CPortalSimulator *CPortalSimulator::GetSimulatorThatOwnsEntity( const CBaseEntity *pEntity )
 {
+	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+		return NULL;
+	}
 #ifdef _DEBUG
 	int iEntIndex = pEntity->entindex();
 	CPortalSimulator *pOwningSimulatorCheck = NULL;
@@ -2726,6 +2761,9 @@ static CUtlVector<UTIL_Remove_PhysicsStack_t> s_UTIL_Remove_PhysicsStack;
 
 void CPortalSimulator::Pre_UTIL_Remove( CBaseEntity *pEntity )
 {
+	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+		return;
+	}
 	int index = s_UTIL_Remove_PhysicsStack.AddToTail();
 	s_UTIL_Remove_PhysicsStack[index].pPhysicsEnvironment = physenv;
 	s_UTIL_Remove_PhysicsStack[index].pShadowList = g_pShadowEntities;
@@ -2977,6 +3015,9 @@ int CPSCollisionEntity::VPhysicsGetObjectList( IPhysicsObject **pList, int listM
 
 bool CPSCollisionEntity::IsPortalSimulatorCollisionEntity( const CBaseEntity *pEntity )
 {
+	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+		return false;
+	}
 	return s_PortalSimulatorCollisionEntities[pEntity->entindex()];
 }
 #endif //#ifndef CLIENT_DLL

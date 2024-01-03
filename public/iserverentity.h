@@ -48,6 +48,7 @@ abstract_class IServerEntityList
 public:
 	//virtual edict_t* GetEdict(CBaseHandle hEnt) const = 0;
 	virtual int NumberOfEdicts(void) = 0;
+	virtual int IndexOfHighestEdict(void) = 0;
 
 	// Get IServerNetworkable interface for specified entity
 	virtual IServerNetworkable* GetServerNetworkable(int entnum) const = 0;

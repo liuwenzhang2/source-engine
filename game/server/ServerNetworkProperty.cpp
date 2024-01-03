@@ -101,6 +101,17 @@ void CServerNetworkProperty::DetachEdict()
 
 
 //-----------------------------------------------------------------------------
+// Methods to get the entindex + edict
+//-----------------------------------------------------------------------------
+inline int CServerNetworkProperty::entindex() const
+{
+	if (m_pOuter->IsEFlagSet(EFL_SERVER_ONLY)) {
+		Error("can not call entindex on server only entity!");
+	}
+	return m_entindex;
+}
+
+//-----------------------------------------------------------------------------
 // Entity handles
 //-----------------------------------------------------------------------------
 IHandleEntity *CServerNetworkProperty::GetEntityHandle( )

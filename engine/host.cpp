@@ -2325,7 +2325,7 @@ void CFrameTimer::MarkFrame()
 		last_host_tickcount = host_tickcount;
 
 		// count used entities
-		for (i=0 ; i<serverEntitylist->NumberOfEdicts() ; i++)
+		for (i=0 ; i<serverEntitylist->IndexOfHighestEdict() ; i++)
 		{
 			if (serverEntitylist->GetServerEntity(i))
 				ent_count++;

@@ -2503,7 +2503,7 @@ void CEntitySaveRestoreBlockHandler::Save( ISave *pSave )
 #if !defined( CLIENT_DLL )
 			pEntInfo->globalname = pEnt->m_iGlobalname; // remember global name
 			pEntInfo->landmarkModelSpace = ModelSpaceLandmark( pEnt->GetModelIndex() );
-			int nEntIndex = pEnt->entindex();
+			int nEntIndex = !pEnt->IsEFlagSet(EFL_SERVER_ONLY) ? pEnt->entindex() : -1;
 			bool bIsPlayer = ( ( nEntIndex >= 1 ) && ( nEntIndex <= gpGlobals->maxClients ) ) ? true : false;
 			if ( bIsPlayer )
 			{
@@ -2621,7 +2621,7 @@ void CEntitySaveRestoreBlockHandler::Restore( IRestore *pRestore, bool createPla
 				pent = CreateEntityByName( STRING(pEntInfo->classname) );
 			}
 			pEntInfo->hEnt = pent;
-			pEntInfo->restoreentityindex = pent ? pent->entindex() : - 1;
+			pEntInfo->restoreentityindex = pent && !pent->IsEFlagSet(EFL_SERVER_ONLY) ? pent->entindex() : - 1;
 			if ( pent && pEntInfo->restoreentityindex == 0 )
 			{
 				if ( !FClassnameIs( pent, "worldspawn" ) )
@@ -2768,7 +2768,7 @@ void SaveEntityOnTable( CBaseEntity *pEntity, CSaveRestoreData *pSaveData, int &
 #endif
 	pEntInfo->modelname = pEntity->GetModelName();
 	pEntInfo->restoreentityindex = -1;
-	pEntInfo->saveentityindex = pEntity ? pEntity->entindex() : -1;
+	pEntInfo->saveentityindex = pEntity && !pEntity->IsEFlagSet(EFL_SERVER_ONLY) ? pEntity->entindex() : -1;
 	pEntInfo->hEnt = pEntity;
 	pEntInfo->flags = 0;
 	pEntInfo->location = 0;

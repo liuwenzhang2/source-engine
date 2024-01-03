@@ -1945,7 +1945,7 @@ void Physics_SimulateEntity( CBaseEntity *pEntity )
 			"Physics_SimulateEntity" : 
 			EntityFactoryDictionary()->GetCannonicalName( pEntity->GetClassname() ) );
 
-	if ( pEntity->entindex()!=-1 )
+	if (!pEntity->IsEFlagSet(EFL_SERVER_ONLY) && pEntity->entindex()!=-1 )
 	{
 #if !defined( NO_ENTITY_PREDICTION )
 		// Player drives simulation of this entity

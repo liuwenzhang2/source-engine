@@ -117,6 +117,7 @@ public:
 private:
 	int m_iHighestEnt; // the topmost used array index
 	int m_iNumEnts;
+	int m_iHighestEdicts;
 	int m_iNumEdicts;
 
 	bool m_bClearingEntities;
@@ -137,6 +138,7 @@ public:
 	
 	int NumberOfEntities( void );
 	int NumberOfEdicts( void );
+	int IndexOfHighestEdict( void );
 
 	// mark an entity as deleted
 	void AddToDeleteList( IServerNetworkable *ent );
@@ -313,7 +315,7 @@ inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntity(int entnum) const
 template<class T>
 CGlobalEntityList<T>::CGlobalEntityList()
 {
-	m_iHighestEnt = m_iNumEnts = m_iNumEdicts = 0;
+	m_iHighestEnt = m_iNumEnts = m_iHighestEdicts = m_iNumEdicts = 0;
 	m_bClearingEntities = false;
 }
 
@@ -402,6 +404,8 @@ void CGlobalEntityList<T>::Clear(void)
 	CBaseEntity::m_bInDebugSelect = false;
 	m_iHighestEnt = 0;
 	m_iNumEnts = 0;
+	m_iHighestEdicts = 0;
+	m_iNumEdicts = 0;
 
 	m_bClearingEntities = false;
 }
@@ -416,6 +420,11 @@ template<class T>
 int CGlobalEntityList<T>::NumberOfEdicts(void)
 {
 	return m_iNumEdicts;
+}
+
+template<class T>
+int CGlobalEntityList<T>::IndexOfHighestEdict(void) {
+	return m_iHighestEdicts;
 }
 
 template<class T>
@@ -1133,8 +1142,13 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 
 	// If it's a CBaseEntity, notify the listeners.
 	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
-	if (pBaseEnt->entindex()!=-1)
-		m_iNumEdicts++;
+	if (!pBaseEnt->IsEFlagSet(EFL_SERVER_ONLY)) {
+		if (pBaseEnt->entindex() != -1)
+			m_iNumEdicts++;
+		if (pBaseEnt->entindex() > m_iHighestEdicts) {
+			m_iHighestEdicts = pBaseEnt->entindex();
+		}
+	}
 
 	// NOTE: Must be a CBaseEntity on server
 	Assert(pBaseEnt);
@@ -1165,8 +1179,10 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 #endif
 
 	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
-	if (pBaseEnt->entindex()!=-1)
-		m_iNumEdicts--;
+	if (!pBaseEnt->IsEFlagSet(EFL_SERVER_ONLY)) {
+		if (pBaseEnt->entindex() != -1)
+			m_iNumEdicts--;
+	}
 
 	m_iNumEnts--;
 }

@@ -1999,7 +1999,7 @@ void CBaseEntity::UpdateOnRemove( void )
 	// Notifies entity listeners, etc
 	gEntList.NotifyRemoveEntity( GetRefEHandle() );
 
-	if ( entindex()!=-1 )
+	if (IsEFlagSet(EFL_SERVER_ONLY) || entindex()!=-1 )
 	{
 		AddFlag( FL_KILLME );
 		if ( GetFlags() & FL_GRAPHED )
@@ -2604,7 +2604,7 @@ void CBaseEntity::PhysicsRelinkChildren( float dt )
 
 void CBaseEntity::PhysicsTouchTriggers( const Vector *pPrevAbsOrigin )
 {
-	if ( entindex()!=-1 && !IsWorld())
+	if (!IsEFlagSet(EFL_SERVER_ONLY) && entindex()!=-1 && !IsWorld())
 	{
 		Assert(CollisionProp());
 		bool isTriggerCheckSolids = IsSolidFlagSet( FSOLID_TRIGGER );
@@ -3216,7 +3216,7 @@ int CBaseEntity::Restore( IRestore &restore )
 	RemoveEFlags( EFL_DIRTY_SPATIAL_PARTITION );
 	CollisionProp()->MarkSurroundingBoundsDirty();
 
-	if ( entindex()!=-1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
+	if (!IsEFlagSet(EFL_SERVER_ONLY) && entindex()!=-1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
 	{
 		PrecacheModel( STRING( GetModelName() ) );
 

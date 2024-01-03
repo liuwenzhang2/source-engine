@@ -480,7 +480,11 @@ void UTIL_Remove( IServerNetworkable *oldObj )
 	if ( pBaseEnt )
 	{
 #ifdef PORTAL //make sure entities are in the primary physics environment for the portal mod, this code should be safe even if the entity is in neither extra environment
-		CPortalSimulator::Pre_UTIL_Remove( pBaseEnt );
+		bool bServerOnly = !pBaseEnt->IsEFlagSet(EFL_SERVER_ONLY);
+		int nEntIndex = bServerOnly ? oldObj->entindex() : -1;
+		if (!bServerOnly && nEntIndex != -1) {
+			CPortalSimulator::Pre_UTIL_Remove(pBaseEnt);
+		}
 #endif
 		g_bReceivedChainedUpdateOnRemove = false;
 		pBaseEnt->UpdateOnRemove();
@@ -491,7 +495,9 @@ void UTIL_Remove( IServerNetworkable *oldObj )
 		pBaseEnt->SetName( NULL_STRING );
 
 #ifdef PORTAL
-		CPortalSimulator::Post_UTIL_Remove( pBaseEnt );
+		if (!bServerOnly && nEntIndex != -1) {
+			CPortalSimulator::Post_UTIL_Remove(pBaseEnt);
+		}
 #endif
 	}
 
@@ -533,7 +539,11 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 	}
 
 #ifdef PORTAL //make sure entities are in the primary physics environment for the portal mod, this code should be safe even if the entity is in neither extra environment
-	CPortalSimulator::Pre_UTIL_Remove( oldObj );
+	bool bServerOnly = !oldObj->IsEFlagSet(EFL_SERVER_ONLY);
+	int nEntIndex = bServerOnly ? oldObj->entindex() : -1;
+	if (!bServerOnly && nEntIndex != -1) {
+		CPortalSimulator::Pre_UTIL_Remove(oldObj);
+	}
 #endif
 
 	oldObj->AddEFlags( EFL_KILLME );	// Make sure to ignore further calls into here or UTIL_Remove.
@@ -549,7 +559,9 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 	g_bDisableEhandleAccess = false;
 
 #ifdef PORTAL
-	CPortalSimulator::Post_UTIL_Remove( oldObj );
+	if (!bServerOnly && nEntIndex != -1) {
+		CPortalSimulator::Post_UTIL_Remove(oldObj);
+	}
 #endif
 }
 
