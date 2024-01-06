@@ -32,7 +32,7 @@ class	INetChannel;
 class	CClientFrame;
 class	CFrameSnapshot;
 class	CClientMsgHandler;
-struct	edict_t;
+//struct	edict_t;
 struct	SoundInfo_t;
 class	KeyValues;
 class	CHLTVServer;

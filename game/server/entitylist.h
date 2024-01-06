@@ -119,11 +119,14 @@ private:
 	int m_iNumEnts;
 	int m_iHighestEdicts;
 	int m_iNumEdicts;
+	int m_iNumReservedEdicts;
 
 	bool m_bClearingEntities;
 	CUtlVector<IEntityListener *>	m_entityListeners;
 
 public:
+	void ReserveEdict(int index);
+	int AllocateFreeEdict(int index = -1);
 	IServerNetworkable* GetServerNetworkable( CBaseHandle hEnt ) const;
 	IServerNetworkable* GetServerNetworkable(int entnum) const;
 	IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const;
@@ -138,6 +141,7 @@ public:
 	
 	int NumberOfEntities( void );
 	int NumberOfEdicts( void );
+	int NumberOfReservedEdicts(void);
 	int IndexOfHighestEdict( void );
 
 	// mark an entity as deleted
@@ -235,6 +239,16 @@ extern CGlobalEntityList<CBaseEntity> gEntList;
 //}
 
 template<class T>
+inline void CGlobalEntityList<T>::ReserveEdict(int index) {
+	BaseClass::ReserveEdict(index);
+}
+
+template<class T>
+inline int CGlobalEntityList<T>::AllocateFreeEdict(int index) {
+	return BaseClass::AllocateFreeEdict(index);
+}
+
+template<class T>
 inline CBaseNetworkable* CGlobalEntityList<T>::GetBaseNetworkable( CBaseHandle hEnt ) const
 {
 	T *pUnk = (BaseClass::LookupEntity( hEnt ));
@@ -315,7 +329,7 @@ inline CBaseEntity* CGlobalEntityList<T>::GetBaseEntity(int entnum) const
 template<class T>
 CGlobalEntityList<T>::CGlobalEntityList()
 {
-	m_iHighestEnt = m_iNumEnts = m_iHighestEdicts = m_iNumEdicts = 0;
+	m_iHighestEnt = m_iNumEnts = m_iHighestEdicts = m_iNumEdicts = m_iNumReservedEdicts = 0;
 	m_bClearingEntities = false;
 }
 
@@ -406,8 +420,10 @@ void CGlobalEntityList<T>::Clear(void)
 	m_iNumEnts = 0;
 	m_iHighestEdicts = 0;
 	m_iNumEdicts = 0;
+	m_iNumReservedEdicts = 0;
 
 	m_bClearingEntities = false;
+	BaseClass::Clear();
 }
 
 template<class T>
@@ -420,6 +436,11 @@ template<class T>
 int CGlobalEntityList<T>::NumberOfEdicts(void)
 {
 	return m_iNumEdicts;
+}
+
+template<class T>
+int CGlobalEntityList<T>::NumberOfReservedEdicts(void) {
+	return m_iNumReservedEdicts;
 }
 
 template<class T>
@@ -936,7 +957,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pSta
 
 	while ((pEntity = gEntList.FindEntityByClassname(pEntity, szName)) != NULL)
 	{
-		if (pEntity->entindex()==-1 && !pEntity->IsEFlagSet(EFL_SERVER_ONLY))
+		if (!pEntity->IsEFlagSet(EFL_SERVER_ONLY) && pEntity->entindex()==-1)
 			continue;
 
 		// check if the aabb intersects the search aabb.
@@ -1109,7 +1130,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityNearestFacing(const Vector& origin,
 		}
 
 		// Ignore logical entities
-		if (ent->entindex()==-1)
+		if (ent->IsEFlagSet(EFL_SERVER_ONLY) || ent->entindex()==-1)
 			continue;
 
 		// Make vector to entity
@@ -1145,6 +1166,9 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 	if (!pBaseEnt->IsEFlagSet(EFL_SERVER_ONLY)) {
 		if (pBaseEnt->entindex() != -1)
 			m_iNumEdicts++;
+		if (IsReservedEdicts(pBaseEnt->entindex())) {
+			m_iNumReservedEdicts++;
+		}
 		if (pBaseEnt->entindex() > m_iHighestEdicts) {
 			m_iHighestEdicts = pBaseEnt->entindex();
 		}
@@ -1182,6 +1206,9 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	if (!pBaseEnt->IsEFlagSet(EFL_SERVER_ONLY)) {
 		if (pBaseEnt->entindex() != -1)
 			m_iNumEdicts--;
+		if (IsReservedEdicts(pBaseEnt->entindex())) {
+			m_iNumReservedEdicts--;
+		}
 	}
 
 	m_iNumEnts--;

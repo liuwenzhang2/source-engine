@@ -13,7 +13,7 @@
 #include "host_saverestore.h"
 #include "sv_filter.h"
 #include "gl_matsysiface.h"
-#include "pr_edict.h"
+//#include "pr_edict.h"
 #include "world.h"
 #include "checksum_engine.h"
 #include "const.h"
@@ -607,7 +607,7 @@ CON_COMMAND( status, "Display map and connection status." )
 	print( "players : %i humans, %i bots (%i max)\n", nHumans, nBots, sv.GetMaxClients() );
 	// ============================================================
 
-	print( "edicts  : %d used of %d max\n", sv.num_edicts - sv.free_edicts, sv.max_edicts );
+	print( "edicts  : %d used of %d max\n", serverEntitylist->NumberOfEdicts(), sv.max_edicts);
 
 	if ( ( g_iServerGameDLLVersion >= 10 ) && serverGameDLL )
 	{
@@ -2292,7 +2292,7 @@ CON_COMMAND( sv_dump_edicts, "Display a list of edicts allocated on the server."
 	classNameCountMap.SetLessFunc( UtlStringLessFunc );
 
 	Msg( "\nCurrent server edicts:\n");
-	for ( int i = 0; i < sv.num_edicts; ++i )
+	for ( int i = 0; i <= serverEntitylist->IndexOfHighestEdict(); ++i )
 	{
 		if (!serverEntitylist->GetServerNetworkable(i)) {
 			continue;
@@ -2311,8 +2311,8 @@ CON_COMMAND( sv_dump_edicts, "Display a list of edicts allocated on the server."
 	{
 		Msg("%5d %s\n", classNameCountMap[ i ], classNameCountMap.Key(i).String() );
 	}
-	Msg( "NumEdicts: %d\n", sv.num_edicts );
-	Msg( "FreeEdicts: %d\n\n", sv.free_edicts );
+	Msg( "NumEdicts: %d\n", serverEntitylist->NumberOfEdicts() );
+	Msg( "FreeEdicts: %d\n\n", 0 );
 }
 
 // make valve_ds only?

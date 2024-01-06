@@ -37,7 +37,7 @@
 #include "con_nprint.h"
 #include "tmessage.h"
 #include "iscratchpad3d.h"
-#include "pr_edict.h"
+//#include "pr_edict.h"
 #include "networkstringtableserver.h"
 #include "networkstringtable.h"
 #include "LocalNetworkBackdoor.h"
@@ -705,10 +705,10 @@ public:
 	//	return NULL;
 	//}
 	
-	virtual int	GetEntityCount( void )
-	{
-		return sv.num_edicts - sv.free_edicts;
-	}
+	//virtual int	GetEntityCount( void )
+	//{
+	//	return sv.num_edicts - sv.free_edicts;
+	//}
 	
 	
 
@@ -722,26 +722,26 @@ public:
 		return client->m_NetChannel;
 	}
 
-	virtual int CreateEdict( int iForceEdictIndex )
-	{
-		edict_t	*pedict = ED_Alloc( iForceEdictIndex );
-		if ( g_pServerPluginHandler )
-		{
-			g_pServerPluginHandler->OnEdictAllocated( pedict );
-		}
-		return pedict->m_EdictIndex;
-	}
-	
-	
-	virtual void RemoveEdict(int ed)
-	{
-		edict_t* pEdict = EDICT_NUM(ed);
-		if ( g_pServerPluginHandler )
-		{
-			g_pServerPluginHandler->OnEdictFreed(pEdict);
-		}
-		ED_Free(pEdict);
-	}
+	//virtual int CreateEdict( int iForceEdictIndex )
+	//{
+	//	edict_t	*pedict = ED_Alloc( iForceEdictIndex );
+	//	if ( g_pServerPluginHandler )
+	//	{
+	//		g_pServerPluginHandler->OnEdictAllocated( pedict );
+	//	}
+	//	return pedict->m_EdictIndex;
+	//}
+	//
+	//
+	//virtual void RemoveEdict(int ed)
+	//{
+	//	edict_t* pEdict = EDICT_NUM(ed);
+	//	if ( g_pServerPluginHandler )
+	//	{
+	//		g_pServerPluginHandler->OnEdictFreed(pEdict);
+	//	}
+	//	ED_Free(pEdict);
+	//}
 
 	//virtual int& GetEdictFlag(int entindex) {
 	//	if (entindex >= 0 && entindex < sv.max_edicts)
@@ -1619,10 +1619,10 @@ public:
 
 	// Tells the engine we can immdiately re-use all edict indices
 	// even though we may not have waited enough time
-	virtual void AllowImmediateEdictReuse( )
-	{
-		ED_AllowImmediateReuse();
-	}
+	//virtual void AllowImmediateEdictReuse( )
+	//{
+	//	ED_AllowImmediateReuse();
+	//}
 			
 	virtual void MultiplayerEndGame()
 	{

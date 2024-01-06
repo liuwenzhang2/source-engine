@@ -241,7 +241,7 @@ public:
 protected:
 	// HACK FOR BOTS
 	friend class CBotManager;
-	static int s_PlayerEdict; // must be set before calling constructor
+	//static int s_PlayerEdict; // must be set before calling constructor
 public:
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();

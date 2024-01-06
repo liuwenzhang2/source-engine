@@ -119,7 +119,7 @@ class CCSBotManager : public CBotManager
 public:
 	CCSBotManager();
 
-	virtual CBasePlayer *AllocateBotEntity( void );			///< factory method to allocate the appropriate entity for the bot
+	virtual CBasePlayer *AllocateBotEntity( int ed );			///< factory method to allocate the appropriate entity for the bot
 
 	virtual void ClientDisconnect( CBaseEntity *entity );
 	virtual bool ClientCommand( CBasePlayer *player, const CCommand &args );
@@ -377,9 +377,9 @@ private:
 	void EnableEventListeners( bool enable );
 };
 
-inline CBasePlayer *CCSBotManager::AllocateBotEntity( void )
+inline CBasePlayer *CCSBotManager::AllocateBotEntity( int ed )
 {
-	return static_cast<CBasePlayer *>( CreateEntityByName( "cs_bot" ) );
+	return static_cast<CBasePlayer *>( CreateEntityByName( "cs_bot", ed ) );
 }
 
 inline bool CCSBotManager::IsTimeToPlantBomb( void ) const

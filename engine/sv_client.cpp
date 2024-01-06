@@ -17,7 +17,7 @@
 #include "LocalNetworkBackdoor.h"
 #include "testscriptmgr.h"
 #include "hltvserver.h"
-#include "pr_edict.h"
+//#include "pr_edict.h"
 #include "logofile_shared.h"
 #include "dt_send_eng.h"
 #include "sv_plugin.h"

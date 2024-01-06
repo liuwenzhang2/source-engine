@@ -459,7 +459,7 @@ CWorld* GetWorldEntity()
 CWorld::CWorld( )
 {
 	AddEFlags( EFL_NO_AUTO_EDICT_ATTACH | EFL_KEEP_ON_RECREATE_ENTITIES );
-	NetworkProp()->AttachEdict( RequiredEdictIndex() );
+	//NetworkProp()->AttachEdict( RequiredEdictIndex() );
 	ActivityList_Init();
 	EventList_Init();
 	

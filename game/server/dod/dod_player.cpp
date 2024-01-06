@@ -381,8 +381,8 @@ CDODPlayer::~CDODPlayer()
 
 CDODPlayer *CDODPlayer::CreatePlayer( const char *className, int ed )
 {
-	CDODPlayer::s_PlayerEdict = ed;
-	return (CDODPlayer*)CreateEntityByName( className );
+	//CDODPlayer::s_PlayerEdict = ed;
+	return (CDODPlayer*)CreateEntityByName( className, ed );
 }
 
 void CDODPlayer::PrecachePlayerModel( const char *szPlayerModel )

@@ -73,7 +73,7 @@ public:
 	CEntityFactoryDictionary();
 
 	virtual void InstallFactory( IEntityFactory *pFactory, const char *pClassName );
-	virtual IServerNetworkable *Create( const char *pClassName );
+	virtual IServerNetworkable *Create( const char *pClassName, int iForceEdictIndex);
 	virtual void Destroy( const char *pClassName, IServerNetworkable *pNetworkable );
 	virtual const char *GetCannonicalName( const char *pClassName );
 	void ReportEntitySizes();
@@ -156,7 +156,7 @@ void CEntityFactoryDictionary::InstallFactory( IEntityFactory *pFactory, const c
 //-----------------------------------------------------------------------------
 // Instantiate something using a factory
 //-----------------------------------------------------------------------------
-IServerNetworkable *CEntityFactoryDictionary::Create( const char *pClassName )
+IServerNetworkable *CEntityFactoryDictionary::Create( const char *pClassName, int iForceEdictIndex)
 {
 	IEntityFactory *pFactory = FindFactory( pClassName );
 	if ( !pFactory )
@@ -167,7 +167,7 @@ IServerNetworkable *CEntityFactoryDictionary::Create( const char *pClassName )
 #if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
 	MEM_ALLOC_CREDIT_( m_Factories.GetElementName( m_Factories.Find( pClassName ) ) );
 #endif
-	return pFactory->Create( pClassName );
+	return pFactory->Create( pClassName, iForceEdictIndex);
 }
 
 //-----------------------------------------------------------------------------
@@ -2374,7 +2374,7 @@ CBaseEntity *UTIL_EntitiesInPVS( CBaseEntity *pPVSEntity, CBaseEntity *pStarting
 	for ( CBaseEntity *pEntity = gEntList.NextEnt(pStartingEntity); pEntity; pEntity = gEntList.NextEnt(pEntity) )
 	{
 		// Only return attached ents.
-		if ( pEntity->entindex()==-1 )
+		if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex()==-1 )
 			continue;
 
 		CBaseEntity *pParent = pEntity->GetRootMoveParent();

@@ -112,7 +112,7 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot( int tickcount )
 {
 	unsigned short nValidEntities[MAX_EDICTS];
 
-	CFrameSnapshot *snap = CreateEmptySnapshot( tickcount, sv.num_edicts );
+	CFrameSnapshot *snap = CreateEmptySnapshot( tickcount, serverEntitylist->IndexOfHighestEdict()+1 );
 	
 	int maxclients = sv.GetClientCount();
 
@@ -120,7 +120,7 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot( int tickcount )
 	//edict_t *edict= sv.edicts - 1;
 	
 	// Build the snapshot.
-	for ( int i = 0; i < sv.num_edicts; i++ )
+	for ( int i = 0; i <= serverEntitylist->IndexOfHighestEdict(); i++ )
 	{
 		//edict++;
 		entry++;
@@ -148,6 +148,9 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot( int tickcount )
 
 		entry->m_nSerialNumber	= serverEntitylist->GetNetworkSerialNumber(i);
 		entry->m_pClass			= serverEntitylist->GetServerNetworkable(i)->GetServerClass();
+		if(!entry->m_pClass){
+			int aaa = 0;
+		}
 		nValidEntities[snap->m_nValidEntities++] = i;
 	}
 

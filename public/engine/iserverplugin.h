@@ -17,7 +17,7 @@
 #include "edict.h"
 #include "tier1/interface.h"
 #include "tier1/KeyValues.h"
-struct edict_t;
+//struct edict_t;
 class CCommand;
 
 //
@@ -114,8 +114,8 @@ public:
 	virtual void			OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, int pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue ) = 0;
 
 	// added with version 3 of the interface.
-	virtual void			OnEdictAllocated( edict_t *edict ) = 0;
-	virtual void			OnEdictFreed( const edict_t *edict  ) = 0;	
+	//virtual void			OnEdictAllocated( edict_t *edict ) = 0;
+	//virtual void			OnEdictFreed( const edict_t *edict  ) = 0;	
 };
 
 #define INTERFACEVERSION_ISERVERPLUGINHELPERS			"ISERVERPLUGINHELPERS001"

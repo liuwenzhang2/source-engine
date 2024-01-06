@@ -14,7 +14,7 @@
 #include "sys.h"
 #include "client.h"
 #include "sys_dll.h"
-#include "pr_edict.h"
+//#include "pr_edict.h"
 #include "networkstringtable.h"
 #include "networkstringtableserver.h"
 #include "tier0/etwprof.h"
@@ -573,36 +573,36 @@ void CServerPlugin::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, int pPl
 		}
 	}
 }
-void CServerPlugin::OnEdictAllocated( edict_t *edict )
-{
-	FORALL_PLUGINS
-	{
-		CPlugin *p = m_Plugins[i];
-		if ( !p->IsDisabled() )
-		{
-			// OnEdictAllocated was added in version 3 of this interface.
-			if ( p->GetPluginInterfaceVersion() >= 3 )
-			{
-				p->GetCallback()->OnEdictAllocated( edict );
-			}
-		}
-	}
-}
-void CServerPlugin::OnEdictFreed( const edict_t *edict )
-{
-	FORALL_PLUGINS
-	{
-		CPlugin *p = m_Plugins[i];
-		if ( !p->IsDisabled() )
-		{
-			// OnEdictFreed was added in version 3 of this interface.
-			if ( p->GetPluginInterfaceVersion() >= 3 )
-			{
-				p->GetCallback()->OnEdictFreed( edict );
-			}
-		}
-	}
-}
+//void CServerPlugin::OnEdictAllocated( edict_t *edict )
+//{
+//	FORALL_PLUGINS
+//	{
+//		CPlugin *p = m_Plugins[i];
+//		if ( !p->IsDisabled() )
+//		{
+//			// OnEdictAllocated was added in version 3 of this interface.
+//			if ( p->GetPluginInterfaceVersion() >= 3 )
+//			{
+//				p->GetCallback()->OnEdictAllocated( edict );
+//			}
+//		}
+//	}
+//}
+//void CServerPlugin::OnEdictFreed( const edict_t *edict )
+//{
+//	FORALL_PLUGINS
+//	{
+//		CPlugin *p = m_Plugins[i];
+//		if ( !p->IsDisabled() )
+//		{
+//			// OnEdictFreed was added in version 3 of this interface.
+//			if ( p->GetPluginInterfaceVersion() >= 3 )
+//			{
+//				p->GetCallback()->OnEdictFreed( edict );
+//			}
+//		}
+//	}
+//}
 //---------------------------------------------------------------------------------
 // Purpose: creates a VGUI menu on a clients screen
 //---------------------------------------------------------------------------------

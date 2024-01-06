@@ -316,7 +316,7 @@ a list of all CBaseEntitys is kept in gEntList
 // If iForceEdictIndex is not -1, then it will use the edict by that index. If the index is 
 // invalid or there is already an edict using that index, it will error out.
 CBaseEntity *CreateEntityByName( const char *className, int iForceEdictIndex = -1 );
-CBaseNetworkable *CreateNetworkableByName( const char *className );
+//CBaseNetworkable *CreateNetworkableByName( const char *className );
 
 // creates an entity and calls all the necessary spawn functions
 extern void SpawnEntityByName( const char *className, CEntityMapData *mapData = NULL );
@@ -564,7 +564,7 @@ protected:
 	virtual CStudioHdr *OnNewModel();
 
 public:
-	virtual void PostConstructor( const char *szClassname );
+	virtual void PostConstructor( const char *szClassname, int iForceEdictIndex);
 	virtual void PostClientActive( void );
 	virtual void ParseMapData( CEntityMapData *mapData );
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );

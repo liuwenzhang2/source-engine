@@ -45,8 +45,8 @@ public:
 public:
 	// Other public methods
 	void Init(CBaseEntity* pEntity);
-	void SetEntIndex(int entindex);
-	void AttachEdict(int pRequiredEdict = -1);
+	//void SetEntIndex(int entindex);
+	//void AttachEdict(int pRequiredEdict = -1);
 
 	// Methods to get the entindex + edict
 	int	entindex() const;
@@ -111,7 +111,7 @@ public:
 
 private:
 	// Detaches the edict.. should only be called by CBaseNetworkable's destructor.
-	void DetachEdict();
+	//void DetachEdict();
 	CBaseEntity* GetOuter();
 
 	// Marks the networkable that it will should transmit
@@ -120,7 +120,7 @@ private:
 private:
 	CBaseEntity* m_pOuter;
 	// CBaseTransmitProxy *m_pTransmitProxy;
-	int		m_entindex = -1;
+	//int		m_entindex = -1;
 	//edict_t	*m_pPev;
 #ifdef _XBOX
 	unsigned short m_fStateFlags = 0;
@@ -182,10 +182,10 @@ inline void CServerNetworkProperty::ClearTransmitState() {
 //-----------------------------------------------------------------------------
 inline void CServerNetworkProperty::MarkPVSInformationDirty()
 {
-	if (m_entindex != -1)
-	{
+	//if (m_entindex != -1)
+	//{
 		GetTransmitState() |= FL_EDICT_DIRTY_PVS_INFORMATION;
-	}
+	//}
 }
 
 
@@ -203,7 +203,7 @@ inline void CServerNetworkProperty::SetNetworkParent(EHANDLE hParent)
 //-----------------------------------------------------------------------------
 inline void CServerNetworkProperty::NetworkStateForceUpdate()
 {
-	if (m_entindex != -1)
+	//if (m_entindex != -1)
 		StateChanged();
 }
 
@@ -218,7 +218,7 @@ inline void CServerNetworkProperty::NetworkStateChanged()
 	}
 	else
 	{
-		if (m_entindex != -1)
+		//if (m_entindex != -1)
 			StateChanged();
 	}
 }
@@ -234,7 +234,7 @@ inline void CServerNetworkProperty::NetworkStateChanged(unsigned short varOffset
 	}
 	else
 	{
-		if (m_entindex != -1)
+		//if (m_entindex != -1)
 			StateChanged(varOffset);
 	}
 }

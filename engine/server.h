@@ -97,10 +97,10 @@ public:
 	
 	char		m_szStartspot[64];
 	
-	int			num_edicts;
+	//int			num_edicts;
 	int			max_edicts;
-	int			free_edicts; // how many edicts in num_edicts are free, in use is num_edicts - free_edicts
-	edict_t		*edicts;			// Can array index now, edict_t is fixed
+	//int			free_edicts; // how many edicts in num_edicts are free, in use is num_edicts - free_edicts
+	//edict_t		*edicts;			// Can array index now, edict_t is fixed
 	//IChangeInfoAccessor *edictchangeinfo; // HACK to allow backward compat since we can't change edict_t layout
 
 	int			m_nMaxClientsLimit;    // Max allowed on server.

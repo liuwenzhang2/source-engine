@@ -16,7 +16,7 @@
 #include "staticpropmgr.h"
 #include "server.h"
 #include "edict.h"
-#include "pr_edict.h"
+//#include "pr_edict.h"
 #include "gl_model_private.h"
 #include "world.h"
 #include "vphysics_interface.h"

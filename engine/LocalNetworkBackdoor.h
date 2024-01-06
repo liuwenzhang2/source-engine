@@ -24,7 +24,7 @@
 #include "sys_dll.h"
 #include "utllinkedlist.h"
 #include "edict.h"
-#include "pr_edict.h"
+//#include "pr_edict.h"
 #include "server.h"
 
 

@@ -560,8 +560,8 @@ CCSPlayer::~CCSPlayer()
 
 CCSPlayer *CCSPlayer::CreatePlayer( const char *className, int ed )
 {
-	CCSPlayer::s_PlayerEdict = ed;
-	return (CCSPlayer*)CreateEntityByName( className );
+	//CCSPlayer::s_PlayerEdict = ed;
+	return (CCSPlayer*)CreateEntityByName( className, ed );
 }
 
 

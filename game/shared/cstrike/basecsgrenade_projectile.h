@@ -47,7 +47,7 @@ public:
 #else
 	DECLARE_DATADESC();
 
-	virtual void PostConstructor( const char *className );
+	virtual void PostConstructor( const char *className, int iForceEdictIndex);
 	virtual ~CBaseCSGrenadeProjectile();
 
 	//Constants for all CS Grenades

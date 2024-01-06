@@ -46,9 +46,9 @@ CAI_Expresser *CBaseMultiplayerPlayer::CreateExpresser( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBaseMultiplayerPlayer::PostConstructor( const char *szClassname )
+void CBaseMultiplayerPlayer::PostConstructor( const char *szClassname, int iForceEdictIndex)
 {
-	BaseClass::PostConstructor( szClassname );
+	BaseClass::PostConstructor( szClassname, iForceEdictIndex);
 	CreateExpresser();
 }
 

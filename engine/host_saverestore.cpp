@@ -48,7 +48,7 @@
 #include "vgui_baseui_interface.h"
 #include "gl_matsysiface.h"
 #include "cl_main.h"
-#include "pr_edict.h"
+//#include "pr_edict.h"
 #include "tier0/vprof.h"
 #include <vgui/ILocalize.h>
 #include "vgui_controls/Controls.h"

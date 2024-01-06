@@ -513,7 +513,7 @@ public:
 
 	//---------------------------------
 	
-	virtual void		PostConstructor( const char *szClassname );
+	virtual void		PostConstructor( const char *szClassname, int iForceEdictIndex);
 	virtual void		Activate( void );
 	virtual void		Precache( void ); // derived calls at start of Spawn()
 	virtual bool 		CreateVPhysics();

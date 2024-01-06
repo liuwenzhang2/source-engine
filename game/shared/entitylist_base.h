@@ -25,7 +25,7 @@ public:
 	int				m_SerialNumber;
 	CEntInfo<T>		*m_pPrev;
 	CEntInfo<T>		*m_pNext;
-
+	bool			m_bReserved = false;
 	void			ClearLinks();
 };
 
@@ -191,6 +191,8 @@ public:
 	CBaseEntityList();
 	~CBaseEntityList();
 	
+	void ReserveEdict(int index);
+	int AllocateFreeEdict(int index = -1);
 	// Add and remove entities. iForcedSerialNum should only be used on the client. The server
 	// gets to dictate what the networkable serial numbers are on the client so it can send
 	// ehandles over and they work.
@@ -226,6 +228,9 @@ protected:
 	// calling OnRemoveEntity.
 	virtual void OnRemoveEntity( T *pEnt, CBaseHandle handle );
 
+	virtual void Clear(void);
+
+	virtual bool IsReservedEdicts(int index);
 private:
 	CBaseHandle AddEntityAtSlot( T *pEnt, int iSlot, int iForcedSerialNum );
 	void RemoveEntityAtSlot( int iSlot );
@@ -234,9 +239,46 @@ private:
 	// The first MAX_EDICTS entities are networkable. The rest are client-only or server-only.
 	CEntInfo<T> m_EntPtrArray[NUM_ENT_ENTRIES];
 	CEntInfoList<T>	m_activeList;
+	CEntInfoList<T>	m_freeNetworkableList;
+	CEntInfoList<T>	m_ReservedNetworkableList;
 	CEntInfoList<T>	m_freeNonNetworkableList;
 };
 
+template<class T>
+inline void CBaseEntityList<T>::ReserveEdict(int index) {
+	if (m_activeList.Head()) {
+		Error("already actived");
+	}
+	CEntInfo<T>* pSlot = &m_EntPtrArray[index];
+	if (pSlot->m_bReserved) {
+		Error("already reserved");
+	}
+	pSlot->m_bReserved = true;
+	m_freeNetworkableList.Unlink(pSlot);
+	m_ReservedNetworkableList.AddToTail(pSlot);
+}
+
+template<class T>
+inline int CBaseEntityList<T>::AllocateFreeEdict(int index) {
+	Assert(index >= 0 && index < MAX_EDICTS);
+	CEntInfo<T>* pSlot = NULL;
+	if (index == -1) {
+		pSlot = m_freeNetworkableList.Head();
+	}
+	else {
+		pSlot = &m_EntPtrArray[index];
+	}
+	if (!pSlot)
+	{
+		Error("no free edict");
+	}
+	if (pSlot->m_bReserved) {
+		Error("has been reserved");
+	}
+	m_freeNetworkableList.Unlink(pSlot);
+	int iSlot = GetEntInfoIndex(pSlot);
+	return iSlot;
+};
 
 // ------------------------------------------------------------------------------------ //
 // Inlines.
@@ -357,6 +399,10 @@ CBaseEntityList<T>::CBaseEntityList()
 		m_EntPtrArray[i].m_pEntity = NULL;
 	}
 
+	for (i = 0; i < MAX_EDICTS; i++) {
+		CEntInfo<T>* pList = &m_EntPtrArray[i];
+		m_freeNetworkableList.AddToTail(pList);
+	}
 	// make a free list of the non-networkable entities
 	// Initially, all the slots are free.
 	for (i = MAX_EDICTS + 1; i < NUM_ENT_ENTRIES; i++)
@@ -369,20 +415,22 @@ CBaseEntityList<T>::CBaseEntityList()
 template<class T>
 CBaseEntityList<T>::~CBaseEntityList()
 {
-	CEntInfo<T>* pList = m_activeList.Head();
-
-	while (pList)
-	{
-		CEntInfo<T>* pNext = pList->m_pNext;
-		RemoveEntityAtSlot(GetEntInfoIndex(pList));
-		pList = pNext;
-	}
+	Clear();
 }
 
 template<class T>
 CBaseHandle CBaseEntityList<T>::AddNetworkableEntity(T* pEnt, int index, int iForcedSerialNum)
 {
 	Assert(index >= 0 && index < MAX_EDICTS);
+	CEntInfo<T>* pSlot = &m_EntPtrArray[index];
+	if (pSlot->m_bReserved) {
+		m_ReservedNetworkableList.Unlink(pSlot);
+	}
+	else {
+		if(m_freeNetworkableList.IsInList(pSlot)) {
+			m_freeNetworkableList.Unlink(pSlot);
+		}
+	}
 	return AddEntityAtSlot(pEnt, index, iForcedSerialNum);
 }
 
@@ -417,6 +465,9 @@ CBaseHandle CBaseEntityList<T>::AddEntityAtSlot(T* pEnt, int iSlot, int iForcedS
 	// Init the CSerialEntity.
 	CEntInfo<T>* pSlot = &m_EntPtrArray[iSlot];
 	Assert(pSlot->m_pEntity == NULL);
+	if (pSlot->m_pEntity) {
+		Error("pSlot->m_pEntity must be NULL");
+	}
 	pSlot->m_pEntity = pEnt;
 
 	// Force the serial number (client-only)?
@@ -467,6 +518,14 @@ void CBaseEntityList<T>::RemoveEntityAtSlot(int iSlot)
 		{
 			m_freeNonNetworkableList.AddToTail(pInfo);
 		}
+		else {
+			if (pInfo->m_bReserved) {
+				m_ReservedNetworkableList.AddToTail(pInfo);
+			}
+			else {
+				m_freeNetworkableList.AddToTail(pInfo);
+			}
+		}
 	}
 }
 
@@ -479,6 +538,35 @@ void CBaseEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 template<class T>
 void CBaseEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 {
+}
+
+template<class T>
+bool CBaseEntityList<T>::IsReservedEdicts(int index) {
+	CEntInfo<T>* pSlot = &m_EntPtrArray[index];
+	return pSlot->m_bReserved;
+}
+
+template<class T>
+void CBaseEntityList<T>::Clear(void) {
+	CEntInfo<T>* pList = m_activeList.Head();
+
+	while (pList)
+	{
+		CEntInfo<T>* pNext = pList->m_pNext;
+		RemoveEntityAtSlot(GetEntInfoIndex(pList));
+		pList = pNext;
+	}
+
+	pList = m_ReservedNetworkableList.Head();
+
+	while (pList)
+	{
+		CEntInfo<T>* pNext = pList->m_pNext;
+		pList->m_bReserved = false;
+		m_ReservedNetworkableList.Unlink(pList);
+		m_freeNetworkableList.AddToTail(pList);
+		pList = pNext;
+	}
 }
 
 #ifdef CLIENT_DLL

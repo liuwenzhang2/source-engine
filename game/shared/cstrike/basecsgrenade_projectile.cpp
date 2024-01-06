@@ -98,9 +98,9 @@ END_NETWORK_TABLE()
 
 #else
 
-	void CBaseCSGrenadeProjectile::PostConstructor( const char *className )
+	void CBaseCSGrenadeProjectile::PostConstructor( const char *className, int iForceEdictIndex)
 	{
-		BaseClass::PostConstructor( className );
+		BaseClass::PostConstructor( className, iForceEdictIndex);
 		TheBots->AddGrenade( this );
 	}
 

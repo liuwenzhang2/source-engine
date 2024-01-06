@@ -463,7 +463,7 @@ END_DATADESC()
 
 int giPrecacheGrunt = 0;
 
-int CBasePlayer::s_PlayerEdict = -1;
+//int CBasePlayer::s_PlayerEdict = -1;
 
 
 inline bool ShouldRunCommandsInContext( const CCommandContext *ctx )
@@ -536,8 +536,8 @@ void CBasePlayer::DestroyViewModels( void )
 CBasePlayer *CBasePlayer::CreatePlayer( const char *className, int ed )
 {
 	CBasePlayer *player;
-	CBasePlayer::s_PlayerEdict = ed;
-	player = ( CBasePlayer * )CreateEntityByName( className );
+	//CBasePlayer::s_PlayerEdict = ed;
+	player = ( CBasePlayer * )CreateEntityByName( className, ed );
 	return player;
 }
 
@@ -561,13 +561,13 @@ CBasePlayer::CBasePlayer( )
 	m_vecSmoothedVelocity.Init();
 #endif
 
-	if ( s_PlayerEdict!=-1 )
-	{
-		// take the assigned edict_t and attach it
-		Assert( s_PlayerEdict != -1 );
-		NetworkProp()->AttachEdict( s_PlayerEdict );
-		s_PlayerEdict = -1;
-	}
+	//if ( s_PlayerEdict!=-1 )
+	//{
+	//	// take the assigned edict_t and attach it
+	//	Assert( s_PlayerEdict != -1 );
+	//	NetworkProp()->AttachEdict( s_PlayerEdict );
+	//	s_PlayerEdict = -1;
+	//}
 
 	m_flFlashTime = -1;
 	pl.fixangle = FIXANGLE_ABSOLUTE;

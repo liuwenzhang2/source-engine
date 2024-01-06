@@ -100,8 +100,8 @@ private:
 
 public:
 	//New plugin interface callbacks
-	virtual void			OnEdictAllocated( edict_t *edict );
-	virtual void			OnEdictFreed( const edict_t *edict  ); 
+	//virtual void			OnEdictAllocated( edict_t *edict );
+	//virtual void			OnEdictFreed( const edict_t *edict  ); 
 };
 
 extern CServerPlugin *g_pServerPluginHandler;

@@ -600,7 +600,7 @@ public:
 			GlobalEntity_EnableStateUpdates( true );
 
 			// Allows us to immediately re-use the edict indices we just freed to avoid edict overflow
-			engine->AllowImmediateEdictReuse();
+			//engine->AllowImmediateEdictReuse();
 
 			// Reset node counter used during load
 			CNodeEnt::m_nNodeCount = 0;

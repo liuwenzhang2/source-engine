@@ -50,7 +50,7 @@ CServerNetworkProperty::~CServerNetworkProperty()
 	engine->CleanUpEntityClusterList( &m_PVSInfo );
 
 	// remove the attached edict if it exists
-	DetachEdict();
+	//DetachEdict();
 }
 
 
@@ -69,35 +69,35 @@ void CServerNetworkProperty::Init( CBaseEntity *pEntity )
 	ClearStateChanged();
 }
 
-void CServerNetworkProperty::SetEntIndex(int entindex) {
-	m_entindex = entindex;
-}
+//void CServerNetworkProperty::SetEntIndex(int entindex) {
+//	m_entindex = entindex;
+//}
 //-----------------------------------------------------------------------------
 // Connects, disconnects edicts
 //-----------------------------------------------------------------------------
-void CServerNetworkProperty::AttachEdict( int pRequiredEdict )
-{
-	Assert (pRequiredEdict == -1);
+//void CServerNetworkProperty::AttachEdict( int pRequiredEdict )
+//{
+//	Assert (pRequiredEdict == -1);
+//
+//	// see if there is an edict allocated for it, otherwise get one from the engine
+//	if ( pRequiredEdict==-1 )
+//	{
+//		//pRequiredEdict = engine->CreateEdict();
+//	}
+//
+//	m_entindex = pRequiredEdict;
+//	//engine->SetEdict(m_entindex, true );
+//}
 
-	// see if there is an edict allocated for it, otherwise get one from the engine
-	if ( pRequiredEdict==-1 )
-	{
-		pRequiredEdict = engine->CreateEdict();
-	}
-
-	m_entindex = pRequiredEdict;
-	//engine->SetEdict(m_entindex, true );
-}
-
-void CServerNetworkProperty::DetachEdict()
-{
-	if ( m_entindex!=-1 )
-	{
-		//engine->SetEdict(m_entindex, false );
-		engine->RemoveEdict(m_entindex);
-		m_entindex = -1;
-	}
-}
+//void CServerNetworkProperty::DetachEdict()
+//{
+//	if ( m_entindex!=-1 )
+//	{
+//		//engine->SetEdict(m_entindex, false );
+//		//engine->RemoveEdict(m_entindex);
+//		m_entindex = -1;
+//	}
+//}
 
 
 //-----------------------------------------------------------------------------
@@ -105,10 +105,16 @@ void CServerNetworkProperty::DetachEdict()
 //-----------------------------------------------------------------------------
 inline int CServerNetworkProperty::entindex() const
 {
-	if (m_pOuter->IsEFlagSet(EFL_SERVER_ONLY)) {
-		Error("can not call entindex on server only entity!");
+//	if (m_pOuter->IsEFlagSet(EFL_SERVER_ONLY)) {
+//		Error("can not call entindex on server only entity!");
+//	}
+	CBaseHandle Handle = m_pOuter->GetRefEHandle();
+	if (Handle == INVALID_ENTITY_HANDLE) {
+		return -1;
 	}
-	return m_entindex;
+	else {
+		return Handle.GetEntryIndex();
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -154,7 +160,7 @@ bool CServerNetworkProperty::IsMarkedForDeletion() const
 //-----------------------------------------------------------------------------
 void CServerNetworkProperty::RecomputePVSInformation()
 {
-	if ( m_entindex!=-1 && ( (GetTransmitState() & FL_EDICT_DIRTY_PVS_INFORMATION) != 0))
+	if (( (GetTransmitState() & FL_EDICT_DIRTY_PVS_INFORMATION) != 0))// m_entindex!=-1 && 
 	{
 		GetTransmitState() &= ~FL_EDICT_DIRTY_PVS_INFORMATION;
 		engine->BuildEntityClusterList(m_pOuter, &m_PVSInfo );
@@ -310,7 +316,7 @@ void CServerNetworkProperty::FireEvent()
 	// trigger a state change in the edict.
 	if ( m_bPendingStateChange )
 	{
-		if (m_entindex != -1)
+		//if (m_entindex != -1)
 			StateChanged();
 		m_bPendingStateChange = false;
 	}

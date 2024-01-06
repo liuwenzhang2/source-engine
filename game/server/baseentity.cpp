@@ -79,7 +79,7 @@ bool CBaseEntity::m_bInDebugSelect = false;	// Used for selection in debug overl
 int CBaseEntity::m_nDebugPlayer = -1;		// Player doing the selection
 
 // This can be set before creating an entity to force it to use a particular edict.
-int g_pForceAttachEdict = -1;
+//int g_pForceAttachEdict = -1;
 
 bool CBaseEntity::m_bDebugPause = false;		// Whether entity i/o is paused.
 int CBaseEntity::m_nDebugSteps = 1;				// Number of entity outputs to fire before pausing again.
@@ -469,7 +469,7 @@ CBaseEntity::~CBaseEntity( )
 	}
 }
 
-void CBaseEntity::PostConstructor( const char *szClassname )
+void CBaseEntity::PostConstructor( const char *szClassname, int iForceEdictIndex)
 {
 	if ( szClassname )
 	{
@@ -485,24 +485,42 @@ void CBaseEntity::PostConstructor( const char *szClassname )
 	}
 	else
 	{
-		// Certain entities set up their edicts in the constructor
-		if ( !IsEFlagSet( EFL_NO_AUTO_EDICT_ATTACH ) )
-		{
-			NetworkProp()->AttachEdict( g_pForceAttachEdict );
-			g_pForceAttachEdict = -1;
+		if (RequiredEdictIndex() != -1) {
+			if (iForceEdictIndex != -1) {
+				Error("iForceEdictIndex must be -1 if RequiredEdictIndex() not equals -1!");
+			}
+			gEntList.AddNetworkableEntity(this, RequiredEdictIndex());
+		} else {
+			// Certain entities set up their edicts in the constructor
+			if (IsEFlagSet(EFL_NO_AUTO_EDICT_ATTACH)) {
+				if (iForceEdictIndex == -1) {
+					//Error("iForceEdictIndex can not be -1 if set EFL_NO_AUTO_EDICT_ATTACH!");
+					iForceEdictIndex = gEntList.AllocateFreeEdict();
+				}
+				gEntList.AddNetworkableEntity(this, iForceEdictIndex);
+			}
+			else
+			{
+				if (iForceEdictIndex == -1) {
+					iForceEdictIndex = gEntList.AllocateFreeEdict();
+				}
+				gEntList.AddNetworkableEntity(this, iForceEdictIndex);
+				//NetworkProp()->AttachEdict();
+				//g_pForceAttachEdict = -1;
+			}
 		}
 		
 		// Some ents like the player override the AttachEdict function and do it at a different time.
 		// While precaching, they don't ever have an edict, so we don't need to add them to
 		// the entity list in that case.
-		if ( entindex()!=-1 )
-		{
-			gEntList.AddNetworkableEntity( this, entindex() );
-			
-			// Cache our IServerNetworkable pointer for the engine for fast access.
-			//if ( edict() )
-			//	edict()->m_pNetworkable = NetworkProp();
-		}
+		//if ( entindex()!=-1 )
+		//{
+		//	gEntList.AddNetworkableEntity( this, entindex() );
+		//	
+		//	// Cache our IServerNetworkable pointer for the engine for fast access.
+		//	//if ( edict() )
+		//	//	edict()->m_pNetworkable = NetworkProp();
+		//}
 	}
 
 	CheckHasThinkFunction( false );

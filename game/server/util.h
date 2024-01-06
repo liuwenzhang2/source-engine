@@ -60,10 +60,10 @@ void DBG_AssertFunction(bool fExpr, const char* szExpr, const char* szFile, int 
 // entity creation
 // creates an entity that has not been linked to a classname
 template< class T >
-T *_CreateEntityTemplate( T *newEnt, const char *className )
+T *_CreateEntityTemplate( T *newEnt, const char *className, int iForceEdictIndex)
 {
 	newEnt = new T; // this is the only place 'new' should be used!
-	newEnt->PostConstructor( className );
+	newEnt->PostConstructor( className, iForceEdictIndex);
 	return newEnt;
 }
 
@@ -88,7 +88,7 @@ T *_CreateEntity( T *newClass, const char *className )
 }
 
 #define CREATE_ENTITY( newClass, className ) _CreateEntity( (newClass*)NULL, className )
-#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className )
+#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className, -1 )
 
 
 // This is the glue that hooks .MAP entity class names to our CPP classes
@@ -96,7 +96,7 @@ abstract_class IEntityFactoryDictionary
 {
 public:
 	virtual void InstallFactory( IEntityFactory *pFactory, const char *pClassName ) = 0;
-	virtual IServerNetworkable *Create( const char *pClassName ) = 0;
+	virtual IServerNetworkable *Create( const char *pClassName , int iForceEdictIndex) = 0;
 	virtual void Destroy( const char *pClassName, IServerNetworkable *pNetworkable ) = 0;
 	virtual IEntityFactory *FindFactory( const char *pClassName ) = 0;
 	virtual const char *GetCannonicalName( const char *pClassName ) = 0;
@@ -112,7 +112,7 @@ inline bool CanCreateEntityClass( const char *pszClassname )
 abstract_class IEntityFactory
 {
 public:
-	virtual IServerNetworkable *Create( const char *pClassName ) = 0;
+	virtual IServerNetworkable *Create( const char *pClassName, int iForceEdictIndex) = 0;
 	virtual void Destroy( IServerNetworkable *pNetworkable ) = 0;
 	virtual size_t GetEntitySize() = 0;
 };
@@ -126,9 +126,9 @@ public:
 		EntityFactoryDictionary()->InstallFactory( this, pClassName );
 	}
 
-	IServerNetworkable *Create( const char *pClassName )
+	IServerNetworkable *Create( const char *pClassName, int iForceEdictIndex)
 	{
-		T* pEnt = _CreateEntityTemplate((T*)NULL, pClassName);
+		T* pEnt = _CreateEntityTemplate((T*)NULL, pClassName, iForceEdictIndex);
 		return pEnt->NetworkProp();
 	}
 

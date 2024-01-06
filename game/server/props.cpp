@@ -3493,7 +3493,7 @@ bool PropBreakableCapEdictsOnCreateAll(int modelindex, IPhysicsObject *pPhysics,
 		}
 	}
 
-	return ( !numToCreate || ( engine->GetEntityCount() + numToCreate + BREATHING_ROOM < MAX_EDICTS ) );
+	return ( !numToCreate || ( (gpGlobals->maxClients + 1 + gEntList.NumberOfEdicts()- gEntList.NumberOfReservedEdicts()) + numToCreate + BREATHING_ROOM < MAX_EDICTS));
 }
 
 

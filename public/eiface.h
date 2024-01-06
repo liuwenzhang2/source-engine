@@ -139,7 +139,7 @@ public:
 	virtual const char	*GetPlayerNetworkIDString( int e ) = 0;
 
 	// Return the current number of used edict slots
-	virtual int			GetEntityCount( void ) = 0;
+	//virtual int			GetEntityCount( void ) = 0;
 	// Given an edict, returns the entity index
 	//virtual int			IndexOfEdict( const edict_t *pEdict ) = 0;
 	// Given and entity index, returns the corresponding edict pointer
@@ -151,9 +151,9 @@ public:
 	// Allocate space for string and return index/offset of string in global string list
 	// If iForceEdictIndex is not -1, then it will return the edict with that index. If that edict index
 	// is already used, it'll return null.
-	virtual int			CreateEdict( int iForceEdictIndex = -1 ) = 0;
+	//virtual int			CreateEdict( int iForceEdictIndex = -1 ) = 0;
 	// Remove the specified edict and place back into the free edict list
-	virtual void		RemoveEdict( int entindex ) = 0;
+	//virtual void		RemoveEdict( int entindex ) = 0;
 	
 	//virtual int&		GetEdictFlag(int entindex) = 0;
 
@@ -360,7 +360,7 @@ public:
 
 	// Tells the engine we can immdiately re-use all edict indices
 	// even though we may not have waited enough time
-	virtual void			AllowImmediateEdictReuse( ) = 0;
+	//virtual void			AllowImmediateEdictReuse( ) = 0;
 
 	// Returns true if the engine is an internal build. i.e. is using the internal bugreporter.
 	virtual bool		IsInternalBuild( void ) = 0;

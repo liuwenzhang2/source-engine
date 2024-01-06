@@ -20,7 +20,7 @@
 #include "keys.h"
 #include "vengineserver_impl.h"
 #include "sv_filter.h"
-#include "pr_edict.h"
+//#include "pr_edict.h"
 #include "screen.h"
 #include "sys_dll.h"
 #include "world.h"
@@ -386,10 +386,10 @@ void CGameServer::Clear( void )
 
 	Q_memset( m_szStartspot, 0, sizeof( m_szStartspot ) );
 	
-	num_edicts = 0;
+	//num_edicts = 0;
 	max_edicts = 0;
-	free_edicts = 0;
-	edicts = NULL;
+	//free_edicts = 0;
+	//edicts = NULL;
 	
 	// Clear the instance baseline indices in the ServerClasses.
 	if ( serverGameDLL )
@@ -2314,18 +2314,18 @@ bool SV_ActivateServer()
 
 static void SV_AllocateEdicts()
 {
-	sv.edicts = (edict_t *)Hunk_AllocName( sv.max_edicts*sizeof(edict_t), "edicts" );
+	//sv.edicts = (edict_t *)Hunk_AllocName( sv.max_edicts*sizeof(edict_t), "edicts" );
 
-	COMPILE_TIME_ASSERT( MAX_EDICT_BITS+1 <= 8*sizeof(sv.edicts[0].m_EdictIndex) );
+	//COMPILE_TIME_ASSERT( MAX_EDICT_BITS+1 <= 8*sizeof(sv.edicts[0].m_EdictIndex) );
 
 	// Invoke the constructor so the vtable is set correctly..
-	for (int i = 0; i < sv.max_edicts; ++i)
-	{
-		new( &sv.edicts[i] ) edict_t;
-		sv.edicts[i].m_EdictIndex = i;
+	//for (int i = 0; i < sv.max_edicts; ++i)
+	//{
+	//	new( &sv.edicts[i] ) edict_t;
+	//	sv.edicts[i].m_EdictIndex = i;
 		//sv.edicts[i].freetime = 0;
-	}
-	ED_ClearFreeEdictList();
+	//}
+	//ED_ClearFreeEdictList();
 
 	//sv.edictchangeinfo = (IChangeInfoAccessor *)Hunk_AllocName( sv.max_edicts * sizeof( IChangeInfoAccessor ), "edictchangeinfo" );
 }
@@ -2536,7 +2536,10 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 #endif
 
 	// Assume no entities beyond world and client slots
-	num_edicts = GetMaxClients()+1;
+	//num_edicts = GetMaxClients()+1;
+	for (int i = 0; i < GetMaxClients() + 1; i++) {
+		serverEntitylist->ReserveEdict(i);
+	}
 
 	COM_TimestampedLog( "SV_AllocateEdicts" );
 
@@ -2681,7 +2684,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	//InitializeEntityDLLFields( edicts );
 
 	// Clear the free bit on the world edict (entindex: 0).
-	ED_ClearFreeFlag( &edicts[0] );
+	//ED_ClearFreeFlag( &edicts[0] );
 
 	if (coop.GetFloat())
 	{

@@ -10834,9 +10834,9 @@ END_DATADESC()
 
 //-------------------------------------
 
-void CAI_BaseNPC::PostConstructor( const char *szClassname )
+void CAI_BaseNPC::PostConstructor( const char *szClassname, int iForceEdictIndex)
 {
-	BaseClass::PostConstructor( szClassname );
+	BaseClass::PostConstructor( szClassname, iForceEdictIndex);
 	CreateComponents();
 }
 

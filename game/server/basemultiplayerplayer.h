@@ -23,7 +23,7 @@ public:
 
 	virtual void		Spawn( void );
 
-	virtual void		PostConstructor( const char *szClassname );
+	virtual void		PostConstructor( const char *szClassname, int iForceEdictIndex);
 	virtual void		ModifyOrAppendCriteria( AI_CriteriaSet& criteriaSet );
 
 	virtual bool			SpeakIfAllowed( AIConcept_t concept, const char *modifiers = NULL, char *pszOutResponseChosen = NULL, size_t bufsize = 0, IRecipientFilter *filter = NULL );

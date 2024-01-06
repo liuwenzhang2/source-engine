@@ -30,20 +30,20 @@ struct HierarchicalSpawnMapData_t
 };
 
 static CStringRegistry *g_pClassnameSpawnPriority = NULL;
-extern int g_pForceAttachEdict;
+//extern int g_pForceAttachEdict;
 
 // creates an entity by string name, but does not spawn it
 CBaseEntity *CreateEntityByName( const char *className, int iForceEdictIndex )
 {
-	if ( iForceEdictIndex != -1 )
-	{
-		g_pForceAttachEdict = engine->CreateEdict( iForceEdictIndex );
-		if ( g_pForceAttachEdict==-1 )
-			Error( "CreateEntityByName( %s, %d ) - CreateEdict failed.", className, iForceEdictIndex );
-	}
+	//if ( iForceEdictIndex != -1 )
+	//{
+	//	g_pForceAttachEdict = iForceEdictIndex;// engine->CreateEdict(iForceEdictIndex);
+	//	if ( g_pForceAttachEdict==-1 )
+	//		Error( "CreateEntityByName( %s, %d ) - CreateEdict failed.", className, iForceEdictIndex );
+	//}
 
-	IServerNetworkable *pNetwork = EntityFactoryDictionary()->Create( className );
-	g_pForceAttachEdict = -1;
+	IServerNetworkable *pNetwork = EntityFactoryDictionary()->Create( className, iForceEdictIndex);
+	//g_pForceAttachEdict = -1;
 
 	if ( !pNetwork )
 		return NULL;
@@ -53,16 +53,16 @@ CBaseEntity *CreateEntityByName( const char *className, int iForceEdictIndex )
 	return pEntity;
 }
 
-CBaseNetworkable *CreateNetworkableByName( const char *className )
-{
-	IServerNetworkable *pNetwork = EntityFactoryDictionary()->Create( className );
-	if ( !pNetwork )
-		return NULL;
-
-	CBaseNetworkable *pNetworkable = pNetwork->GetBaseNetworkable();
-	Assert( pNetworkable );
-	return pNetworkable;
-}
+//CBaseNetworkable *CreateNetworkableByName( const char *className )
+//{
+//	IServerNetworkable *pNetwork = EntityFactoryDictionary()->Create( className );
+//	if ( !pNetwork )
+//		return NULL;
+//
+//	CBaseNetworkable *pNetworkable = pNetwork->GetBaseNetworkable();
+//	Assert( pNetworkable );
+//	return pNetworkable;
+//}
 
 void FreeContainingEntity( int ed )
 {

@@ -14,6 +14,7 @@
 
 #include "iserverunknown.h"
 #include "string_t.h"
+#include "platform.h"
 
 
 
@@ -46,8 +47,11 @@ public:
 abstract_class IServerEntityList
 {
 public:
+	virtual void ReserveEdict(int index) = 0;
+	virtual int AllocateFreeEdict(int index = -1) = 0;
 	//virtual edict_t* GetEdict(CBaseHandle hEnt) const = 0;
 	virtual int NumberOfEdicts(void) = 0;
+	virtual int NumberOfReservedEdicts(void) = 0;
 	virtual int IndexOfHighestEdict(void) = 0;
 
 	// Get IServerNetworkable interface for specified entity

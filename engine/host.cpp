@@ -26,7 +26,7 @@
 #include "keys.h"
 #include "cdll_int.h"
 #include "eiface.h"
-#include "pr_edict.h"
+//#include "pr_edict.h"
 #include "sv_main.h"
 #include "sv_log.h"
 #include "shadowmgr.h"
@@ -2325,7 +2325,7 @@ void CFrameTimer::MarkFrame()
 		last_host_tickcount = host_tickcount;
 
 		// count used entities
-		for (i=0 ; i<serverEntitylist->IndexOfHighestEdict() ; i++)
+		for (i=0 ; i<=serverEntitylist->IndexOfHighestEdict() ; i++)
 		{
 			if (serverEntitylist->GetServerEntity(i))
 				ent_count++;
