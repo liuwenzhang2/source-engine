@@ -1166,7 +1166,7 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 	if (!pBaseEnt->IsEFlagSet(EFL_SERVER_ONLY)) {
 		if (pBaseEnt->entindex() != -1)
 			m_iNumEdicts++;
-		if (IsReservedEdicts(pBaseEnt->entindex())) {
+		if (BaseClass::IsReservedEdicts(pBaseEnt->entindex())) {
 			m_iNumReservedEdicts++;
 		}
 		if (pBaseEnt->entindex() > m_iHighestEdicts) {
@@ -1206,7 +1206,7 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	if (!pBaseEnt->IsEFlagSet(EFL_SERVER_ONLY)) {
 		if (pBaseEnt->entindex() != -1)
 			m_iNumEdicts--;
-		if (IsReservedEdicts(pBaseEnt->entindex())) {
+		if (BaseClass::IsReservedEdicts(pBaseEnt->entindex())) {
 			m_iNumReservedEdicts--;
 		}
 	}
