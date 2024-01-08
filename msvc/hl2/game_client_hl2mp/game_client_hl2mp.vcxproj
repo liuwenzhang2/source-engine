@@ -452,7 +452,6 @@
     <ClCompile Include="..\..\..\game\shared\decals.cpp" />
     <ClCompile Include="..\..\..\game\shared\effect_dispatch_data.cpp" />
     <ClCompile Include="..\..\..\game\shared\ehandle.cpp" />
-    <ClCompile Include="..\..\..\game\shared\entitylist_base.cpp" />
     <ClCompile Include="..\..\..\game\shared\EntityParticleTrail_Shared.cpp" />
     <ClCompile Include="..\..\..\game\shared\env_detail_controller.cpp" />
     <ClCompile Include="..\..\..\game\shared\env_wind_shared.cpp" />
@@ -545,6 +544,7 @@
     <ClCompile Include="..\..\..\public\dt_recv.cpp" />
     <ClCompile Include="..\..\..\public\dt_utlvector_common.cpp" />
     <ClCompile Include="..\..\..\public\dt_utlvector_recv.cpp" />
+    <ClCompile Include="..\..\..\public\entitylist_base.cpp" />
     <ClCompile Include="..\..\..\public\filesystem_helpers.cpp" />
     <ClCompile Include="..\..\..\public\haptics\haptic_msgs.cpp" />
     <ClCompile Include="..\..\..\public\haptics\haptic_utils.cpp" />

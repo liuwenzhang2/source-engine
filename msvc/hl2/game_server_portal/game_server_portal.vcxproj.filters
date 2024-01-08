@@ -1281,9 +1281,6 @@
     <ClCompile Include="..\..\..\game\shared\ehandle.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\game\shared\entitylist_base.cpp">
-      <Filter>源文件\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\game\shared\EntityParticleTrail_Shared.cpp">
       <Filter>源文件\Source Files</Filter>
     </ClCompile>
@@ -1853,6 +1850,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\game\shared\Multiplayer\multiplayer_animstate.cpp">
       <Filter>源文件\Portal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\public\entitylist_base.cpp">
+      <Filter>源文件\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
