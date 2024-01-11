@@ -125,10 +125,10 @@ IHandleEntity *CServerNetworkProperty::GetEntityHandle( )
 	return m_pOuter;
 }
 
-void CServerNetworkProperty::Release()
-{
-	delete m_pOuter;
-}
+//void CServerNetworkProperty::Release()
+//{
+//	delete m_pOuter;
+//}
 
 
 //-----------------------------------------------------------------------------

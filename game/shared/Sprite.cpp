@@ -386,7 +386,7 @@ void CSprite::OnRestore()
 //-----------------------------------------------------------------------------
 CSprite *CSprite::SpriteCreate( const char *pSpriteName, const Vector &origin, bool animate )
 {
-	CSprite *pSprite = CREATE_ENTITY( CSprite, "env_sprite" );
+	CSprite *pSprite = (CSprite*)CreateEntityByName( "env_sprite" );
 	pSprite->SpriteInit( pSpriteName, origin );
 	pSprite->SetSolid( SOLID_NONE );
 	UTIL_SetSize( pSprite, vec3_origin, vec3_origin );

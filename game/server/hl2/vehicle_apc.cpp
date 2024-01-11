@@ -355,7 +355,7 @@ void CPropAPC::ExplodeAndThrowChunk( const Vector &vecExplosionPos )
 	UTIL_ScreenShake( vecExplosionPos, 25.0, 150.0, 1.0, 750.0f, SHAKE_START );
 
 	// Drop a flaming, smoking chunk.
-	CGib *pChunk = CREATE_ENTITY( CGib, "gib" );
+	CGib *pChunk = (CGib*)CreateEntityByName( "gib" );
 	pChunk->Spawn( "models/gibs/hgibs.mdl" );
 	pChunk->SetBloodColor( DONT_BLEED );
 
@@ -443,7 +443,7 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 	for ( int i = 0; i < nGibs; i++)
 	{
 		// Throw a flaming, smoking chunk.
-		CGib *pChunk = CREATE_ENTITY( CGib, "gib" );
+		CGib *pChunk = (CGib*)CreateEntityByName( "gib" );
 		pChunk->Spawn( "models/gibs/hgibs.mdl" );
 		pChunk->SetBloodColor( DONT_BLEED );
 

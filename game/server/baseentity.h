@@ -40,20 +40,20 @@ class CGlobalEntityList;
 
 typedef CHandle<CBaseEntity> EHANDLE;
 
-#define MANUALMODE_GETSET_PROP(type, accessorName, varName) \
-	private:\
-		type varName;\
-	public:\
-		inline const type& Get##accessorName##() const { return varName; } \
-		inline type& Get##accessorName##() { return varName; } \
-		inline void Set##accessorName##( const type &val ) { varName = val; m_NetStateMgr.StateChanged(); }
-
-#define MANUALMODE_GETSET_EHANDLE(type, accessorName, varName) \
-	private:\
-		CHandle<type> varName;\
-	public:\
-		inline type* Get##accessorName##() { return varName.Get(); } \
-		inline void Set##accessorName##( type *pType ) { varName = pType; m_NetStateMgr.StateChanged(); }
+//#define MANUALMODE_GETSET_PROP(type, accessorName, varName) \
+//	private:\
+//		type varName;\
+//	public:\
+//		inline const type& Get##accessorName##() const { return varName; } \
+//		inline type& Get##accessorName##() { return varName; } \
+//		inline void Set##accessorName##( const type &val ) { varName = val; m_NetStateMgr.StateChanged(); }
+//
+//#define MANUALMODE_GETSET_EHANDLE(type, accessorName, varName) \
+//	private:\
+//		CHandle<type> varName;\
+//	public:\
+//		inline type* Get##accessorName##() { return varName.Get(); } \
+//		inline void Set##accessorName##( type *pType ) { varName = pType; m_NetStateMgr.StateChanged(); }
 
 
 // saverestore.h declarations
@@ -315,7 +315,7 @@ a list of all CBaseEntitys is kept in gEntList
 // creates an entity by string name, but does not spawn it
 // If iForceEdictIndex is not -1, then it will use the edict by that index. If the index is 
 // invalid or there is already an edict using that index, it will error out.
-CBaseEntity *CreateEntityByName( const char *className, int iForceEdictIndex = -1 );
+//CBaseEntity *CreateEntityByName( const char *className, int iForceEdictIndex = -1 );
 //CBaseNetworkable *CreateNetworkableByName( const char *className );
 
 // creates an entity and calls all the necessary spawn functions

@@ -138,25 +138,25 @@ private:
 	C_BaseEntity *m_pList[MAX_SPHERE_QUERY];
 };
 
-C_BaseEntity *CreateEntityByName( const char *className );
+//C_BaseEntity *CreateEntityByName( const char *className );
 // creates an entity by name, and ensure it's correctness
 // does not spawn the entity
 // use the CREATE_ENTITY() macro which wraps this, instead of using it directly
-template< class T >
-T *_CreateEntity( T *newClass, const char *className )
-{
-	T *newEnt = dynamic_cast<T*>( CreateEntityByName(className) );
-	if ( !newEnt )
-	{
-		Warning( "classname %s used to create wrong class type\n", className );
-		Assert(0);
-	}
+//template< class T >
+//T *_CreateEntity( T *newClass, const char *className )
+//{
+//	T *newEnt = dynamic_cast<T*>( CreateEntityByName(className) );
+//	if ( !newEnt )
+//	{
+//		Warning( "classname %s used to create wrong class type\n", className );
+//		Assert(0);
+//	}
+//
+//	return newEnt;
+//}
 
-	return newEnt;
-}
-
-#define CREATE_ENTITY( newClass, className ) _CreateEntity( (newClass*)NULL, className )
-#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className )
+//#define CREATE_ENTITY( newClass, className ) _CreateEntity( (newClass*)NULL, className )
+//#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className )
 
 // Misc useful
 inline bool FStrEq(const char *sz1, const char *sz2)

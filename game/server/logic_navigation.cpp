@@ -21,7 +21,7 @@ enum navproperties_t
 // Purpose: 
 //-----------------------------------------------------------------------------
 class CLogicNavigation : public CLogicalEntity,
-						 public IEntityListener
+						 public IEntityListener<CBaseEntity>
 {
 	DECLARE_CLASS( CLogicNavigation, CLogicalEntity );
 

@@ -2194,6 +2194,6 @@ inline bool C_BaseEntity::ShouldRecordInTools() const
 #endif
 }
 
-C_BaseEntity *CreateEntityByName( const char *className );
+//C_BaseEntity *CreateEntityByName( const char *className );
 
 #endif // C_BASEENTITY_H

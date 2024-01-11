@@ -628,7 +628,7 @@ void CNPC_Gargantua::RunTask( const Task_t *pTask )
 
 			for ( i = 0; i < 10; i++ )
 			{
-				CGib *pGib = CREATE_ENTITY( CGib, "gib" );
+				CGib *pGib = (CGib*)CreateEntityByName( "gib" );
 
 				pGib->Spawn( GARG_GIB_MODEL);
 				

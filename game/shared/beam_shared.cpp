@@ -544,7 +544,7 @@ const Vector &C_Beam::GetAbsEndPos( void ) const
 CBeam *CBeam::BeamCreate( const char *pSpriteName, float width )
 {
 	// Create a new entity with CBeam private data
-	CBeam *pBeam  = CREATE_ENTITY( CBeam, "beam" );
+	CBeam *pBeam  = (CBeam*)CreateEntityByName( "beam" );
 	pBeam->BeamInit( pSpriteName, width );
 
 	return pBeam;

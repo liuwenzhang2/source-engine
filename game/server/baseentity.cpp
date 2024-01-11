@@ -2015,7 +2015,7 @@ void CBaseEntity::UpdateOnRemove( void )
 	StopLoopingSounds();
 
 	// Notifies entity listeners, etc
-	gEntList.NotifyRemoveEntity( GetRefEHandle() );
+	gEntList.NotifyRemoveEntity( this );
 
 	if (IsEFlagSet(EFL_SERVER_ONLY) || entindex()!=-1 )
 	{

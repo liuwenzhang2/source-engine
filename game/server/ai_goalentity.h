@@ -24,7 +24,7 @@
 //
 
 class CAI_GoalEntity : public CBaseEntity,
-					   public IEntityListener
+					   public IEntityListener<CBaseEntity>
 {
 	DECLARE_CLASS( CAI_GoalEntity, CBaseEntity );
 public:

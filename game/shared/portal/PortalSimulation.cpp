@@ -2837,7 +2837,7 @@ void UpdateShadowClonesPortalSimulationFlags( const CBaseEntity *pSourceEntity, 
 
 
 #ifndef CLIENT_DLL
-	class CPS_AutoGameSys_EntityListener : public CAutoGameSystem, public IEntityListener
+	class CPS_AutoGameSys_EntityListener : public CAutoGameSystem, public IEntityListener<CBaseEntity>
 #else
 	class CPS_AutoGameSys_EntityListener : public CAutoGameSystem
 #endif

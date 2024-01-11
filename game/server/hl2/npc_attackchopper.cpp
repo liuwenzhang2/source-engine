@@ -3341,7 +3341,7 @@ void CNPC_AttackHelicopter::DestroySmokeTrails()
 void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, const QAngle &vecChunkAngles, const char *pszChunkName, bool bSmall )
 {
 	// Drop a flaming, smoking chunk.
-	CGib *pChunk = CREATE_ENTITY( CGib, "gib" );
+	CGib *pChunk = (CGib*)CreateEntityByName( "gib" );
 	pChunk->Spawn( pszChunkName );
 	pChunk->SetBloodColor( DONT_BLEED );
 
@@ -6051,7 +6051,7 @@ void CHelicopterChunk::CollisionCallback( CHelicopterChunk *pCaller )
 CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos, const QAngle &vecAngles, const Vector &vecVelocity, const char *pszModelName, int chunkID )
 {
 	// Drop a flaming, smoking chunk.
-	CHelicopterChunk *pChunk = CREATE_ENTITY( CHelicopterChunk, "helicopter_chunk" );
+	CHelicopterChunk *pChunk = (CHelicopterChunk*)CreateEntityByName( "helicopter_chunk" );
 	
 	if ( pChunk == NULL )
 		return NULL;

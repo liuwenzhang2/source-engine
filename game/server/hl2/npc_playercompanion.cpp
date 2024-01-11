@@ -3854,7 +3854,7 @@ AI_END_CUSTOM_NPC()
 
 #define NUM_OVERRIDE_MOVE_CLASSNAMES	4
 
-class COverrideMoveCache : public IEntityListener
+class COverrideMoveCache : public IEntityListener<CBaseEntity>
 {
 public:
 

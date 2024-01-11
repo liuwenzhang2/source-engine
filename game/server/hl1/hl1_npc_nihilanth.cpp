@@ -449,7 +449,7 @@ bool CNPC_Nihilanth::EmitSphere( void )
 		return false;
 
 	Vector vecSrc = m_hRecharger->GetAbsOrigin();
-	CNihilanthHVR *pEntity = (CNihilanthHVR *)CREATE_ENTITY( CNihilanthHVR,  "nihilanth_energy_ball" );
+	CNihilanthHVR *pEntity = (CNihilanthHVR *)CreateEntityByName( "nihilanth_energy_ball" );
 	
 	
 	pEntity->SetAbsOrigin( vecSrc );
@@ -922,7 +922,7 @@ void CNPC_Nihilanth::ShootBalls( void )
 				VectorNormalize( vecDir );
 				vecSrc = vecSrc + vecDir * (gpGlobals->curtime - m_flShootTime);
 				
-				pEntity = (CNihilanthHVR *)CREATE_ENTITY( CNihilanthHVR,  "nihilanth_energy_ball" );
+				pEntity = (CNihilanthHVR *)CreateEntityByName( "nihilanth_energy_ball" );
 
 				pEntity->SetAbsOrigin( vecSrc );
 				pEntity->SetAbsAngles( vecAngle );
@@ -939,7 +939,7 @@ void CNPC_Nihilanth::ShootBalls( void )
 				
 				vecSrc = vecSrc + vecDir * (gpGlobals->curtime - m_flShootTime);
 				
-				pEntity = (CNihilanthHVR *)CREATE_ENTITY( CNihilanthHVR,  "nihilanth_energy_ball" );
+				pEntity = (CNihilanthHVR *)CreateEntityByName( "nihilanth_energy_ball" );
 
 				pEntity->SetAbsOrigin( vecSrc );
 				pEntity->SetAbsAngles( vecAngle );
@@ -1111,7 +1111,7 @@ void CNPC_Nihilanth::DyingThink( void )
 	pBeam->LiveForTime( 0.5 );
 	
 	GetAttachment( 2, vecSrc, vecAngles ); 
-	CNihilanthHVR *pEntity = (CNihilanthHVR *)CREATE_ENTITY( CNihilanthHVR, "nihilanth_energy_ball" );
+	CNihilanthHVR *pEntity = (CNihilanthHVR *)CreateEntityByName( "nihilanth_energy_ball" );
 	
 	pEntity->SetAbsOrigin( vecSrc );
 	pEntity->SetAbsAngles( GetAbsAngles() );
@@ -1177,7 +1177,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 
 				GetAttachment( 2, vecSrc, vecAngles ); 
 
-				CNihilanthHVR *pEntity = (CNihilanthHVR *)CREATE_ENTITY( CNihilanthHVR, "nihilanth_energy_ball" );
+				CNihilanthHVR *pEntity = (CNihilanthHVR *)CreateEntityByName( "nihilanth_energy_ball" );
 				
 				pEntity->SetAbsOrigin( vecSrc );
 				pEntity->SetAbsAngles( vecAngles );
@@ -1240,7 +1240,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 			QAngle vecAngles;
 			GetAttachment( 3, vecSrc, vecAngles ); 
 						
-			CNihilanthHVR *pEntity = (CNihilanthHVR *)CREATE_ENTITY( CNihilanthHVR,  "nihilanth_energy_ball" );
+			CNihilanthHVR *pEntity = (CNihilanthHVR *)CreateEntityByName( "nihilanth_energy_ball" );
 
 			pEntity->SetAbsOrigin( vecSrc );
 			pEntity->SetAbsAngles( vecAngles );

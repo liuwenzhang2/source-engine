@@ -33,8 +33,8 @@ static CStringRegistry *g_pClassnameSpawnPriority = NULL;
 //extern int g_pForceAttachEdict;
 
 // creates an entity by string name, but does not spawn it
-CBaseEntity *CreateEntityByName( const char *className, int iForceEdictIndex )
-{
+//CBaseEntity *CreateEntityByName( const char *className, int iForceEdictIndex )
+//{
 	//if ( iForceEdictIndex != -1 )
 	//{
 	//	g_pForceAttachEdict = iForceEdictIndex;// engine->CreateEdict(iForceEdictIndex);
@@ -42,16 +42,16 @@ CBaseEntity *CreateEntityByName( const char *className, int iForceEdictIndex )
 	//		Error( "CreateEntityByName( %s, %d ) - CreateEdict failed.", className, iForceEdictIndex );
 	//}
 
-	IServerNetworkable *pNetwork = EntityFactoryDictionary()->Create( className, iForceEdictIndex);
+//	IServerEntity *pHandleEntity = (IServerEntity*)EntityFactoryDictionary()->Create( className, iForceEdictIndex);
 	//g_pForceAttachEdict = -1;
 
-	if ( !pNetwork )
-		return NULL;
+//	if ( !pHandleEntity)
+//		return NULL;
 
-	CBaseEntity *pEntity = pNetwork->GetBaseEntity();
-	Assert( pEntity );
-	return pEntity;
-}
+//	CBaseEntity *pEntity = pHandleEntity->GetBaseEntity();
+//	Assert( pEntity );
+//	return pEntity;
+//}
 
 //CBaseNetworkable *CreateNetworkableByName( const char *className )
 //{

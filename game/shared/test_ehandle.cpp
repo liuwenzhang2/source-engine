@@ -83,8 +83,8 @@
 		}
 		else
 		{
-			CHandleTest *pHolder = CREATE_ENTITY( CHandleTest, "handle_test" );
-			pHolder->m_Handle = CREATE_ENTITY( CHandleDummy, "handle_dummy" );
+			CHandleTest *pHolder = (CHandleTest*)CreateEntityByName( "handle_test" );
+			pHolder->m_Handle = (CHandleDummy*)CreateEntityByName( "handle_dummy" );
 			pHolder->Spawn();
 			g_HandleTest = pHolder;
 			Msg( "Created EHANDLE test entity. Run this command again to transmit the second ent.\n" );

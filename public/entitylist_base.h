@@ -184,6 +184,16 @@ bool CEntInfoList<T>::IsInList(CEntInfo<T>* pElement)
 	return pElement->m_pPrev != pElement;
 }
 
+// Implement this class and register with gEntList to receive entity create/delete notification
+template< class T >
+class IEntityListener
+{
+public:
+	virtual void OnEntityCreated(T* pEntity) {};
+	virtual void OnEntitySpawned(T* pEntity) {};
+	virtual void OnEntityDeleted(T* pEntity) {};
+};
+
 template<class T>// = IHandleEntity
 class CBaseEntityList
 {
@@ -218,7 +228,15 @@ public:
 	const CEntInfo<T> *GetEntInfoPtr( const CBaseHandle &hEnt ) const;
 	const CEntInfo<T> *GetEntInfoPtrByIndex( int index ) const;
 
+	// add a class that gets notified of entity events
+	void AddListenerEntity(IEntityListener<T>* pListener);
+	void RemoveListenerEntity(IEntityListener<T>* pListener);
 // Overridables.
+
+	// entity is about to be removed, notify the listeners
+	void NotifyCreateEntity(T* pEnt);
+	void NotifySpawn(T* pEnt);
+	void NotifyRemoveEntity(T* pEnt);
 protected:
 
 	// These are notifications to the derived class. It can cache info here if it wants.
@@ -242,6 +260,7 @@ private:
 	CEntInfoList<T>	m_freeNetworkableList;
 	CEntInfoList<T>	m_ReservedNetworkableList;
 	CEntInfoList<T>	m_freeNonNetworkableList;
+	CUtlVector<IEntityListener<T>*>	m_entityListeners;
 };
 
 template<class T>
@@ -529,9 +548,76 @@ void CBaseEntityList<T>::RemoveEntityAtSlot(int iSlot)
 	}
 }
 
+// add a class that gets notified of entity events
+template<class T>
+void CBaseEntityList<T>::AddListenerEntity(IEntityListener<T>* pListener)
+{
+	if (m_entityListeners.Find(pListener) >= 0)
+	{
+		AssertMsg(0, "Can't add listeners multiple times\n");
+		return;
+	}
+	m_entityListeners.AddToTail(pListener);
+}
+
+template<class T>
+void CBaseEntityList<T>::RemoveListenerEntity(IEntityListener<T>* pListener)
+{
+	m_entityListeners.FindAndRemove(pListener);
+}
+
+template<class T>
+void CBaseEntityList<T>::NotifyCreateEntity(T* pEnt)
+{
+	if (!pEnt)
+		return;
+
+	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
+	for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+	{
+		m_entityListeners[i]->OnEntityCreated(pEnt);
+	}
+}
+
+template<class T>
+void CBaseEntityList<T>::NotifySpawn(T* pEnt)
+{
+	if (!pEnt)
+		return;
+
+	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
+	for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+	{
+		m_entityListeners[i]->OnEntitySpawned(pEnt);
+	}
+}
+
+// NOTE: This doesn't happen in OnRemoveEntity() specifically because 
+// listeners may want to reference the object as it's being deleted
+// OnRemoveEntity isn't called until the destructor and all data is invalid.
+template<class T>
+void CBaseEntityList<T>::NotifyRemoveEntity(T* pEnt)
+{
+	if (!pEnt)
+		return;
+
+	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
+	for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+	{
+		m_entityListeners[i]->OnEntityDeleted(pEnt);
+	}
+}
+
 template<class T>
 void CBaseEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 {
+	// NOTE: Must be a CBaseEntity on server
+	Assert(pEnt);
+	//DevMsg(2,"Created %s\n", pBaseEnt->GetClassname() );
+	for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
+	{
+		m_entityListeners[i]->OnEntityCreated(pEnt);
+	}
 }
 
 
@@ -576,5 +662,142 @@ extern CBaseEntityList<C_BaseEntity>* g_pEntityList;
 extern CBaseEntityList<CBaseEntity>* g_pEntityList;
 #endif // GAME_DLL
 
+class IEntityFactory;
+
+// This is the glue that hooks .MAP entity class names to our CPP classes
+abstract_class IEntityFactoryDictionary
+{
+public:
+	virtual void InstallFactory(IEntityFactory * pFactory, const char* pClassName) = 0;
+	virtual IHandleEntity* Create(const char* pClassName , int iForceEdictIndex) = 0;
+	virtual void Destroy(const char* pClassName, IHandleEntity* pEntity) = 0;
+	virtual IEntityFactory* FindFactory(const char* pClassName) = 0;
+	virtual const char* GetMapClassName(const char* pClassName) = 0;
+	virtual const char* GetDllClassName(const char* pClassName) = 0;
+	virtual size_t		GetEntitySize(const char* pClassName) = 0;
+	virtual const char* GetCannonicalName(const char* pClassName) = 0;
+	virtual void ReportEntitySizes() = 0;
+};
+
+IEntityFactoryDictionary* EntityFactoryDictionary();
+
+inline bool CanCreateEntityClass(const char* pszClassname)
+{
+	return (EntityFactoryDictionary() != NULL && EntityFactoryDictionary()->FindFactory(pszClassname) != NULL);
+}
+
+#ifdef CLIENT_DLL
+inline C_BaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1)
+{
+	return (C_BaseEntity*)EntityFactoryDictionary()->Create(className, iForceEdictIndex);
+}
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+inline CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1)
+{
+	return (CBaseEntity*)EntityFactoryDictionary()->Create(className, iForceEdictIndex);
+}
+#endif // GAME_DLL
+
+inline const char* GetEntityMapClassName(const char* className)
+{
+	return EntityFactoryDictionary()->GetMapClassName(className);
+}
+
+inline const char* GetEntityDllClassName(const char* className)
+{
+	return EntityFactoryDictionary()->GetDllClassName(className);
+}
+
+inline size_t GetEntitySize(const char* className)
+{
+	return EntityFactoryDictionary()->GetEntitySize(className);
+}
+
+
+abstract_class IEntityFactory
+{
+public:
+	virtual IHandleEntity * Create(int iForceEdictIndex) = 0;//const char* pClassName, 
+	virtual void Destroy(IHandleEntity* pEntity) = 0;
+	virtual const char* GetMapClassName() = 0;
+	virtual const char* GetDllClassName() = 0;
+	virtual size_t GetEntitySize() = 0;
+};
+
+#include "tier0/memdbgon.h"
+
+// entity creation
+// creates an entity that has not been linked to a classname
+template< class T >
+T* _CreateEntityTemplate(T* newEnt, const char* className, int iForceEdictIndex)
+{
+	newEnt = new T; // this is the only place 'new' should be used!
+#ifdef GAME_DLL
+	newEnt->PostConstructor(className, iForceEdictIndex);
+#endif // GAME_DLL
+	return newEnt;
+}
+
+#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className, -1 )
+
+#include "tier0/memdbgoff.h"
+
+template <class T>
+class CEntityFactory : public IEntityFactory
+{
+public:
+	CEntityFactory(const char* pMapClassName, const char* pDllClassName)
+	{
+		m_pMapClassName = pMapClassName;
+		m_pDllClassName = pDllClassName;
+		if (pMapClassName && pMapClassName[0]) {
+			EntityFactoryDictionary()->InstallFactory(this, pMapClassName);
+		}
+		if (pDllClassName && pDllClassName[0]) {
+			EntityFactoryDictionary()->InstallFactory(this, pDllClassName);
+		}
+	}
+
+	IHandleEntity* Create(int iForceEdictIndex)
+	{
+		T* pEnt = _CreateEntityTemplate((T*)NULL, m_pMapClassName, iForceEdictIndex);
+		return pEnt;
+	}
+
+	void Destroy(IHandleEntity* pEntity)
+	{
+		if (pEntity)
+		{
+			delete ((T*)pEntity);//Release();
+		}
+	}
+
+	virtual const char* GetMapClassName() {
+		return m_pMapClassName;
+	}
+
+	virtual const char* GetDllClassName() {
+		return m_pDllClassName;
+	}
+
+	virtual size_t GetEntitySize()
+	{
+		return sizeof(T);
+	}
+private:
+	const char* m_pMapClassName;
+	const char* m_pDllClassName;
+};
+
+#ifdef CLIENT_DLL
+#define LINK_ENTITY_TO_CLASS( mapClassName, DLLClassName )\
+	static CEntityFactory<DLLClassName> mapClassName( #mapClassName, #DLLClassName );
+#endif
+
+#ifdef GAME_DLL
+#define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
+	static CEntityFactory<DLLClassName> mapClassName( #mapClassName, #DLLClassName );
+#endif
 
 #endif // ENTITYLIST_BASE_H

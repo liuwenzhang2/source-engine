@@ -105,7 +105,7 @@ public:
 	//virtual void					SetStateChangedTickCount(int nTickCount) = 0;
 
 	virtual const char*		GetClassName() const = 0;
-	virtual void			Release() = 0;
+	//virtual void			Release() = 0;
 	virtual int				entindex() const = 0;
 	virtual int				AreaNum() const = 0;
 

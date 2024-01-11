@@ -23,7 +23,7 @@ enum
 
 //=========================================================
 //=========================================================
-class CAI_Relationship : public CBaseEntity, public IEntityListener
+class CAI_Relationship : public CBaseEntity, public IEntityListener<CBaseEntity>
 {
 	DECLARE_CLASS( CAI_Relationship, CBaseEntity );
 

@@ -84,7 +84,7 @@ public:
 // Purpose: Stores a node graph through which an AI may pathfind
 //-----------------------------------------------------------------------------
 
-class CAI_Network : public IPartitionEnumerator, public IEntityListener
+class CAI_Network : public IPartitionEnumerator, public IEntityListener<CBaseEntity>
 {
 public:
 	CAI_Network();

@@ -37,7 +37,7 @@ public:
 	virtual CBaseEntity*	GetBaseEntity();
 	virtual ServerClass*	GetServerClass();
 	virtual const char*		GetClassName() const;
-	virtual void			Release();
+	//virtual void			Release();
 	virtual int				AreaNum() const;
 	virtual PVSInfo_t*		GetPVSInfo();
 	virtual int&			GetTransmitState();

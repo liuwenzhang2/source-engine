@@ -83,7 +83,7 @@ private:
 //			are all satisfied, fires the relevant output
 //-----------------------------------------------------------------------------
 
-class CAI_ScriptConditions : public CBaseEntity, public IEntityListener
+class CAI_ScriptConditions : public CBaseEntity, public IEntityListener<CBaseEntity>
 {
 	DECLARE_CLASS( CAI_ScriptConditions, CBaseEntity );
 

@@ -485,7 +485,7 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 
 				if ( showlist >= 2 )
 				{
-					int size = GetClassMap().GetClassSize( ent->GetClassname() );
+					int size = GetEntitySize( ent->GetClassname() );
 					int intermediate_size = ent->GetIntermediateDataSize() * ( MULTIPLAYER_BACKUP + 1 );
 
 					engine->Con_NXPrintf( &np, "%15s %30s (%5i / %5i bytes): %15s", 

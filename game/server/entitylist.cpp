@@ -27,8 +27,6 @@
 
 void SceneManager_ClientActive( CBasePlayer *player );
 
-CUtlVector<IServerNetworkable*> g_DeleteList;
-
 CGlobalEntityList<CBaseEntity> gEntList;
 CBaseEntityList<CBaseEntity> *g_pEntityList = &gEntList;
 
@@ -148,7 +146,7 @@ struct simthinkentry_t
 	unsigned short	unused0;
 	int				nextThinkTick;
 };
-class CSimThinkManager : public IEntityListener
+class CSimThinkManager : public IEntityListener<CBaseEntity>
 {
 public:
 	CSimThinkManager()
@@ -321,7 +319,7 @@ struct entitynotify_t
 	CBaseEntity	*pNotify;
 	CBaseEntity	*pWatched;
 };
-class CNotifyList : public INotify, public IEntityListener
+class CNotifyList : public INotify, public IEntityListener<CBaseEntity>
 {
 public:
 	// INotify
@@ -433,7 +431,7 @@ void CNotifyList::ReportSystemEvent( CBaseEntity *pEntity, notify_system_event_t
 static CNotifyList g_NotifyList;
 INotify *g_pNotify = &g_NotifyList;
 
-class CEntityTouchManager : public IEntityListener
+class CEntityTouchManager : public IEntityListener<CBaseEntity>
 {
 public:
 	// called by CEntityListSystem

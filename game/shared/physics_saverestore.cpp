@@ -118,7 +118,7 @@ END_DATADESC()
 class CPhysSaveRestoreBlockHandler : public CDefSaveRestoreBlockHandler, 
 									 public IPhysSaveRestoreManager
 #if !defined( CLIENT_DLL )
-									 , public IEntityListener
+									 , public IEntityListener<CBaseEntity>
 #endif
 {
 	struct QueuedItem_t;

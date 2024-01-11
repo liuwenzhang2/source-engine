@@ -10,10 +10,12 @@
 #pragma once
 #endif
 
+#include "cbase.h"
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CAI_SpeechFilter : public CBaseEntity, public IEntityListener
+class CAI_SpeechFilter : public CBaseEntity, public IEntityListener<CBaseEntity>
 {
 	DECLARE_CLASS( CAI_SpeechFilter, CBaseEntity );
 public:

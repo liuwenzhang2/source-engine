@@ -1188,7 +1188,7 @@ void CBMortar::Animate( void )
 
 CBMortar *CBMortar::Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVelocity )
 {
-	CBMortar *pSpit = CREATE_ENTITY( CBMortar, "bmortar" ); 
+	CBMortar *pSpit = (CBMortar*)CreateEntityByName( "bmortar" );
 	pSpit->Spawn();
 	
 	UTIL_SetOrigin( pSpit, vecStart );

@@ -21,15 +21,6 @@
 
 //class CBaseEntity;
 
-// Implement this class and register with gEntList to receive entity create/delete notification
-class IEntityListener
-{
-public:
-	virtual void OnEntityCreated(CBaseEntity* pEntity) {};
-	virtual void OnEntitySpawned(CBaseEntity* pEntity) {};
-	virtual void OnEntityDeleted(CBaseEntity* pEntity) {};
-};
-
 abstract_class CBaseEntityClassList
 {
 public:
@@ -40,7 +31,7 @@ public:
 	CBaseEntityClassList *m_pNextClassList;
 };
 
-class CAimTargetManager : public IEntityListener
+class CAimTargetManager : public IEntityListener<CBaseEntity>
 {
 public:
 	// Called by CEntityListSystem
@@ -101,7 +92,7 @@ public:
 };
 
 
-extern CUtlVector<IServerNetworkable*> g_DeleteList;
+//extern CUtlVector<IServerNetworkable*> g_DeleteList;
 extern bool g_fInCleanupDelete;
 extern void PhysOnCleanupDeleteList();
 
@@ -122,8 +113,7 @@ private:
 	int m_iNumReservedEdicts;
 
 	bool m_bClearingEntities;
-	CUtlVector<IEntityListener *>	m_entityListeners;
-
+	CUtlVector<T*> m_DeleteList;
 public:
 	void ReserveEdict(int index);
 	int AllocateFreeEdict(int index = -1);
@@ -145,7 +135,7 @@ public:
 	int IndexOfHighestEdict( void );
 
 	// mark an entity as deleted
-	void AddToDeleteList( IServerNetworkable *ent );
+	void AddToDeleteList( T *ent );
 	// call this before and after each frame to delete all of the marked entities.
 	void CleanupDeleteList( void );
 	int ResetDeleteList( void );
@@ -155,17 +145,9 @@ public:
 
 	// Returns true while in the Clear() call.
 	bool	IsClearingEntities()	{return m_bClearingEntities;}
-	
-	// add a class that gets notified of entity events
-	void AddListenerEntity( IEntityListener *pListener );
-	void RemoveListenerEntity( IEntityListener *pListener );
 
 	void ReportEntityFlagsChanged( CBaseEntity *pEntity, unsigned int flagsOld, unsigned int flagsNow );
-
-	// entity is about to be removed, notify the listeners
-	void NotifyCreateEntity( CBaseEntity *pEnt );
-	void NotifySpawn( CBaseEntity *pEnt );
-	void NotifyRemoveEntity( CBaseHandle hEnt );
+	
 	// iteration functions
 
 	// returns the next entity after pCurrentEnt;  if pCurrentEnt is NULL, return the first entity
@@ -335,11 +317,11 @@ CGlobalEntityList<T>::CGlobalEntityList()
 
 // mark an entity as deleted
 template<class T>
-void CGlobalEntityList<T>::AddToDeleteList(IServerNetworkable* ent)
+void CGlobalEntityList<T>::AddToDeleteList(T* ent)
 {
-	if (ent && ent->GetEntityHandle()->GetRefEHandle() != INVALID_EHANDLE_INDEX)
+	if (ent && ent->GetRefEHandle() != INVALID_EHANDLE_INDEX)
 	{
-		g_DeleteList.AddToTail(ent);
+		m_DeleteList.AddToTail(ent);
 	}
 }
 
@@ -354,12 +336,12 @@ void CGlobalEntityList<T>::CleanupDeleteList(void)
 	PhysOnCleanupDeleteList();
 
 	g_bDisableEhandleAccess = true;
-	for (int i = 0; i < g_DeleteList.Count(); i++)
+	for (int i = 0; i < m_DeleteList.Count(); i++)
 	{
-		g_DeleteList[i]->Release();
+		delete m_DeleteList[i];// ->Release();
 	}
 	g_bDisableEhandleAccess = false;
-	g_DeleteList.RemoveAll();
+	m_DeleteList.RemoveAll();
 
 	g_fInCleanupDelete = false;
 }
@@ -367,29 +349,11 @@ void CGlobalEntityList<T>::CleanupDeleteList(void)
 template<class T>
 int CGlobalEntityList<T>::ResetDeleteList(void)
 {
-	int result = g_DeleteList.Count();
-	g_DeleteList.RemoveAll();
+	int result = m_DeleteList.Count();
+	m_DeleteList.RemoveAll();
 	return result;
 }
 
-
-// add a class that gets notified of entity events
-template<class T>
-void CGlobalEntityList<T>::AddListenerEntity(IEntityListener* pListener)
-{
-	if (m_entityListeners.Find(pListener) >= 0)
-	{
-		AssertMsg(0, "Can't add listeners multiple times\n");
-		return;
-	}
-	m_entityListeners.AddToTail(pListener);
-}
-
-template<class T>
-void CGlobalEntityList<T>::RemoveListenerEntity(IEntityListener* pListener)
-{
-	m_entityListeners.FindAndRemove(pListener);
-}
 
 template<class T>
 void CGlobalEntityList<T>::Clear(void)
@@ -412,7 +376,7 @@ void CGlobalEntityList<T>::Clear(void)
 
 	CleanupDeleteList();
 	// free the memory
-	g_DeleteList.Purge();
+	m_DeleteList.Purge();
 
 	CBaseEntity::m_nDebugPlayer = -1;
 	CBaseEntity::m_bInDebugSelect = false;
@@ -1174,13 +1138,7 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 		}
 	}
 
-	// NOTE: Must be a CBaseEntity on server
-	Assert(pBaseEnt);
-	//DevMsg(2,"Created %s\n", pBaseEnt->GetClassname() );
-	for (i = m_entityListeners.Count() - 1; i >= 0; i--)
-	{
-		m_entityListeners[i]->OnEntityCreated(pBaseEnt);
-	}
+	BaseClass::OnAddEntity(pEnt, handle);
 }
 
 template<class T>
@@ -1190,12 +1148,12 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	if (!g_fInCleanupDelete)
 	{
 		int i;
-		for (i = 0; i < g_DeleteList.Count(); i++)
+		for (i = 0; i < m_DeleteList.Count(); i++)
 		{
-			if (g_DeleteList[i]->GetEntityHandle() == pEnt)
+			if (m_DeleteList[i]->GetEntityHandle() == pEnt)
 			{
-				g_DeleteList.FastRemove(i);
-				Msg("ERROR: Entity being destroyed but previously threaded on g_DeleteList\n");
+				m_DeleteList.FastRemove(i);
+				Msg("ERROR: Entity being destroyed but previously threaded on m_DeleteList\n");
 				break;
 			}
 		}
@@ -1213,50 +1171,6 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 
 	m_iNumEnts--;
 }
-
-template<class T>
-void CGlobalEntityList<T>::NotifyCreateEntity(CBaseEntity* pEnt)
-{
-	if (!pEnt)
-		return;
-
-	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
-	for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
-	{
-		m_entityListeners[i]->OnEntityCreated(pEnt);
-	}
-}
-
-template<class T>
-void CGlobalEntityList<T>::NotifySpawn(CBaseEntity* pEnt)
-{
-	if (!pEnt)
-		return;
-
-	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
-	for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
-	{
-		m_entityListeners[i]->OnEntitySpawned(pEnt);
-	}
-}
-
-// NOTE: This doesn't happen in OnRemoveEntity() specifically because 
-// listeners may want to reference the object as it's being deleted
-// OnRemoveEntity isn't called until the destructor and all data is invalid.
-template<class T>
-void CGlobalEntityList<T>::NotifyRemoveEntity(CBaseHandle hEnt)
-{
-	CBaseEntity* pBaseEnt = GetBaseEntity(hEnt);
-	if (!pBaseEnt)
-		return;
-
-	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
-	for (int i = m_entityListeners.Count() - 1; i >= 0; i--)
-	{
-		m_entityListeners[i]->OnEntityDeleted(pBaseEnt);
-	}
-}
-
 
 //-----------------------------------------------------------------------------
 // Common finds

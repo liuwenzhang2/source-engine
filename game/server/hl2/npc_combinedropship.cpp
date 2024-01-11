@@ -537,7 +537,7 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 	CollisionProp()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint);
 
 	// Throw a flaming, smoking chunk.
-	CGib *pChunk = CREATE_ENTITY( CGib, "gib" );
+	CGib *pChunk = (CGib*)CreateEntityByName( "gib" );
 	pChunk->Spawn( "models/gibs/hgibs.mdl" );
 	pChunk->SetBloodColor( DONT_BLEED );
 

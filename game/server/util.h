@@ -34,7 +34,6 @@
 
 struct levellist_t;
 class IServerNetworkable;
-class IEntityFactory;
 
 #ifdef _WIN32
 	#define SETUP_EXTERNC(mapClassName)\
@@ -55,99 +54,26 @@ void DBG_AssertFunction(bool fExpr, const char* szExpr, const char* szFile, int 
 #define ASSERTSZ(f, sz)
 #endif	// !DEBUG
 
-#include "tier0/memdbgon.h"
 
-// entity creation
-// creates an entity that has not been linked to a classname
-template< class T >
-T *_CreateEntityTemplate( T *newEnt, const char *className, int iForceEdictIndex)
-{
-	newEnt = new T; // this is the only place 'new' should be used!
-	newEnt->PostConstructor( className, iForceEdictIndex);
-	return newEnt;
-}
-
-#include "tier0/memdbgoff.h"
-
-CBaseEntity *CreateEntityByName( const char *className, int iForceEdictIndex );
 
 // creates an entity by name, and ensure it's correctness
 // does not spawn the entity
 // use the CREATE_ENTITY() macro which wraps this, instead of using it directly
-template< class T >
-T *_CreateEntity( T *newClass, const char *className )
-{
-	T *newEnt = dynamic_cast<T*>( CreateEntityByName(className, -1) );
-	if ( !newEnt )
-	{
-		Warning( "classname %s used to create wrong class type\n", className );
-		Assert(0);
-	}
+//template< class T >
+//T *_CreateEntity( T *newClass, const char *className )
+//{
+//	T *newEnt = dynamic_cast<T*>( CreateEntityByName(className, -1) );
+//	if ( !newEnt )
+//	{
+//		Warning( "classname %s used to create wrong class type\n", className );
+//		Assert(0);
+//	}
+//
+//	return newEnt;
+//}
 
-	return newEnt;
-}
-
-#define CREATE_ENTITY( newClass, className ) _CreateEntity( (newClass*)NULL, className )
-#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className, -1 )
-
-
-// This is the glue that hooks .MAP entity class names to our CPP classes
-abstract_class IEntityFactoryDictionary
-{
-public:
-	virtual void InstallFactory( IEntityFactory *pFactory, const char *pClassName ) = 0;
-	virtual IServerNetworkable *Create( const char *pClassName , int iForceEdictIndex) = 0;
-	virtual void Destroy( const char *pClassName, IServerNetworkable *pNetworkable ) = 0;
-	virtual IEntityFactory *FindFactory( const char *pClassName ) = 0;
-	virtual const char *GetCannonicalName( const char *pClassName ) = 0;
-};
-
-IEntityFactoryDictionary *EntityFactoryDictionary();
-
-inline bool CanCreateEntityClass( const char *pszClassname )
-{
-	return ( EntityFactoryDictionary() != NULL && EntityFactoryDictionary()->FindFactory( pszClassname ) != NULL );
-}
-
-abstract_class IEntityFactory
-{
-public:
-	virtual IServerNetworkable *Create( const char *pClassName, int iForceEdictIndex) = 0;
-	virtual void Destroy( IServerNetworkable *pNetworkable ) = 0;
-	virtual size_t GetEntitySize() = 0;
-};
-
-template <class T>
-class CEntityFactory : public IEntityFactory
-{
-public:
-	CEntityFactory( const char *pClassName )
-	{
-		EntityFactoryDictionary()->InstallFactory( this, pClassName );
-	}
-
-	IServerNetworkable *Create( const char *pClassName, int iForceEdictIndex)
-	{
-		T* pEnt = _CreateEntityTemplate((T*)NULL, pClassName, iForceEdictIndex);
-		return pEnt->NetworkProp();
-	}
-
-	void Destroy( IServerNetworkable *pNetworkable )
-	{
-		if ( pNetworkable )
-		{
-			pNetworkable->Release();
-		}
-	}
-
-	virtual size_t GetEntitySize()
-	{
-		return sizeof(T);
-	}
-};
-
-#define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) \
-	static CEntityFactory<DLLClassName> mapClassName( #mapClassName );
+//#define CREATE_ENTITY( newClass, className ) _CreateEntity( (newClass*)NULL, className )
+//#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className, -1 )
 
 
 //

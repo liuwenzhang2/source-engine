@@ -117,7 +117,7 @@ void CGib::SpawnStickyGibs( CBaseEntity *pVictim, Vector vecOrigin, int cGibs )
 
 void CGib::SpawnHeadGib( CBaseEntity *pVictim )
 {
-	CGib *pGib = CREATE_ENTITY( CGib, "gib" );
+	CGib *pGib = (CGib*)CreateEntityByName( "gib" );
 
 	if ( g_Language.GetInt() == LANGUAGE_GERMAN )
 	{
@@ -275,7 +275,7 @@ void CGib::SpawnSpecificGibs(	CBaseEntity*	pVictim,
 {
 	for (int i=0;i<nNumGibs;i++)
 	{
-		CGib *pGib = CREATE_ENTITY( CGib, "gib" );
+		CGib *pGib = (CGib*)CreateEntityByName( "gib" );
 		pGib->Spawn( cModelName );
 		pGib->m_nBody = i;
 		pGib->InitGib( pVictim, vMinVelocity, vMaxVelocity );
@@ -299,7 +299,7 @@ void CGib::SpawnRandomGibs( CBaseEntity *pVictim, int cGibs, GibType_e eGibType 
 
 	for ( cSplat = 0 ; cSplat < cGibs ; cSplat++ )
 	{
-		CGib *pGib = CREATE_ENTITY( CGib, "gib" );
+		CGib *pGib = (CGib*)CreateEntityByName( "gib" );
 
 		if ( g_Language.GetInt() == LANGUAGE_GERMAN )
 		{

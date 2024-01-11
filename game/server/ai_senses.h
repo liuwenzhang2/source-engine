@@ -142,7 +142,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-class CAI_SensedObjectsManager : public IEntityListener
+class CAI_SensedObjectsManager : public IEntityListener<CBaseEntity>
 {
 public:
 	void Init();

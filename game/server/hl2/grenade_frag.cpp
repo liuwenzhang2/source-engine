@@ -36,10 +36,9 @@ class CGrenadeFrag : public CBaseGrenade
 #if !defined( CLIENT_DLL )
 	DECLARE_DATADESC();
 #endif
-					
-	~CGrenadeFrag( void );
-
+	
 public:
+	~CGrenadeFrag(void);
 	void	Spawn( void );
 	void	OnRestore( void );
 	void	Precache( void );

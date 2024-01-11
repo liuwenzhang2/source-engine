@@ -64,48 +64,21 @@ void DBG_AssertFunction( bool fExpr, const char *szExpr, const char *szFile, int
 #endif	// DEBUG
 
 
-//-----------------------------------------------------------------------------
-// Entity creation factory
-//-----------------------------------------------------------------------------
-class CEntityFactoryDictionary : public IEntityFactoryDictionary
-{
-public:
-	CEntityFactoryDictionary();
 
-	virtual void InstallFactory( IEntityFactory *pFactory, const char *pClassName );
-	virtual IServerNetworkable *Create( const char *pClassName, int iForceEdictIndex);
-	virtual void Destroy( const char *pClassName, IServerNetworkable *pNetworkable );
-	virtual const char *GetCannonicalName( const char *pClassName );
-	void ReportEntitySizes();
-
-private:
-	IEntityFactory *FindFactory( const char *pClassName );
-public:
-	CUtlDict< IEntityFactory *, unsigned short > m_Factories;
-};
-
-//-----------------------------------------------------------------------------
-// Singleton accessor
-//-----------------------------------------------------------------------------
-IEntityFactoryDictionary *EntityFactoryDictionary()
-{
-	static CEntityFactoryDictionary s_EntityFactory;
-	return &s_EntityFactory;
-}
 
 void DumpEntityFactories_f()
 {
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	CEntityFactoryDictionary *dict = ( CEntityFactoryDictionary * )EntityFactoryDictionary();
-	if ( dict )
-	{
-		for ( int i = dict->m_Factories.First(); i != dict->m_Factories.InvalidIndex(); i = dict->m_Factories.Next( i ) )
-		{
-			Warning( "%s\n", dict->m_Factories.GetElementName( i ) );
-		}
-	}
+	//CEntityFactoryDictionary *dict = ( CEntityFactoryDictionary * )EntityFactoryDictionary();
+	//if ( dict )
+	//{
+	//	for ( int i = dict->m_Factories.First(); i != dict->m_Factories.InvalidIndex(); i = dict->m_Factories.Next( i ) )
+	//	{
+	//		Warning( "%s\n", dict->m_Factories.GetElementName( i ) );
+	//	}
+	//}
 }
 
 static ConCommand dumpentityfactories( "dumpentityfactories", DumpEntityFactories_f, "Lists all entity factory names.", FCVAR_GAMEDLL );
@@ -119,91 +92,8 @@ CON_COMMAND( dump_entity_sizes, "Print sizeof(entclass)" )
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 
-	((CEntityFactoryDictionary*)EntityFactoryDictionary())->ReportEntitySizes();
+	EntityFactoryDictionary()->ReportEntitySizes();
 }
-
-
-//-----------------------------------------------------------------------------
-// Constructor
-//-----------------------------------------------------------------------------
-CEntityFactoryDictionary::CEntityFactoryDictionary() : m_Factories( true, 0, 128 )
-{
-}
-
-
-//-----------------------------------------------------------------------------
-// Finds a new factory
-//-----------------------------------------------------------------------------
-IEntityFactory *CEntityFactoryDictionary::FindFactory( const char *pClassName )
-{
-	unsigned short nIndex = m_Factories.Find( pClassName );
-	if ( nIndex == m_Factories.InvalidIndex() )
-		return NULL;
-	return m_Factories[nIndex];
-}
-
-
-//-----------------------------------------------------------------------------
-// Install a new factory
-//-----------------------------------------------------------------------------
-void CEntityFactoryDictionary::InstallFactory( IEntityFactory *pFactory, const char *pClassName )
-{
-	Assert( FindFactory( pClassName ) == NULL );
-	m_Factories.Insert( pClassName, pFactory );
-}
-
-
-//-----------------------------------------------------------------------------
-// Instantiate something using a factory
-//-----------------------------------------------------------------------------
-IServerNetworkable *CEntityFactoryDictionary::Create( const char *pClassName, int iForceEdictIndex)
-{
-	IEntityFactory *pFactory = FindFactory( pClassName );
-	if ( !pFactory )
-	{
-		Warning("Attempted to create unknown entity type %s!\n", pClassName );
-		return NULL;
-	}
-#if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
-	MEM_ALLOC_CREDIT_( m_Factories.GetElementName( m_Factories.Find( pClassName ) ) );
-#endif
-	return pFactory->Create( pClassName, iForceEdictIndex);
-}
-
-//-----------------------------------------------------------------------------
-// 
-//-----------------------------------------------------------------------------
-const char *CEntityFactoryDictionary::GetCannonicalName( const char *pClassName )
-{
-	return m_Factories.GetElementName( m_Factories.Find( pClassName ) );
-}
-
-//-----------------------------------------------------------------------------
-// Destroy a networkable
-//-----------------------------------------------------------------------------
-void CEntityFactoryDictionary::Destroy( const char *pClassName, IServerNetworkable *pNetworkable )
-{
-	IEntityFactory *pFactory = FindFactory( pClassName );
-	if ( !pFactory )
-	{
-		Warning("Attempted to destroy unknown entity type %s!\n", pClassName );
-		return;
-	}
-
-	pFactory->Destroy( pNetworkable );
-}
-
-//-----------------------------------------------------------------------------
-// 
-//-----------------------------------------------------------------------------
-void CEntityFactoryDictionary::ReportEntitySizes()
-{
-	for ( int i = m_Factories.First(); i != m_Factories.InvalidIndex(); i = m_Factories.Next( i ) )
-	{
-		Msg( " %s: %d", m_Factories.GetElementName( i ), m_Factories[i]->GetEntitySize() );
-	}
-}
-
 
 //-----------------------------------------------------------------------------
 // class CFlaggedEntitiesEnum
@@ -499,9 +389,9 @@ void UTIL_Remove( IServerNetworkable *oldObj )
 			CPortalSimulator::Post_UTIL_Remove(pBaseEnt);
 		}
 #endif
-	}
 
-	gEntList.AddToDeleteList( oldObj );
+		gEntList.AddToDeleteList(pBaseEnt);
+	}
 }
 
 void UTIL_Remove( CBaseEntity *oldObj )
