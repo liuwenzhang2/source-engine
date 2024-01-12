@@ -1150,7 +1150,7 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 		int i;
 		for (i = 0; i < m_DeleteList.Count(); i++)
 		{
-			if (m_DeleteList[i]->GetEntityHandle() == pEnt)
+			if (m_DeleteList[i] == pEnt)//->GetEntityHandle()
 			{
 				m_DeleteList.FastRemove(i);
 				Msg("ERROR: Entity being destroyed but previously threaded on m_DeleteList\n");
