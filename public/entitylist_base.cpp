@@ -19,8 +19,8 @@ class CEntityFactoryDictionary : public IEntityFactoryDictionary
 public:
 	CEntityFactoryDictionary();
 
-	virtual void InstallFactory(IEntityFactory* pFactory, const char* pClassName);
-	virtual IHandleEntity* Create(const char* pClassName, int iForceEdictIndex);
+	virtual void InstallFactory(IEntityFactory* pFactory);
+	virtual IHandleEntity* Create(const char* pClassName, int iForceEdictIndex, int iSerialNum);
 	virtual void Destroy(const char* pClassName, IHandleEntity* pEntity);
 	virtual const char* GetMapClassName(const char* pClassName);
 	virtual const char* GetDllClassName(const char* pClassName);
@@ -66,17 +66,58 @@ IEntityFactory* CEntityFactoryDictionary::FindFactory(const char* pClassName)
 //-----------------------------------------------------------------------------
 // Install a new factory
 //-----------------------------------------------------------------------------
-void CEntityFactoryDictionary::InstallFactory(IEntityFactory* pFactory, const char* pClassName)
+void CEntityFactoryDictionary::InstallFactory(IEntityFactory* pFactory)
 {
-	Assert(FindFactory(pClassName) == NULL);
-	m_Factories.Insert(pClassName, pFactory);
+	//Assert(FindFactory(pClassName) == NULL);
+	if (pFactory->GetMapClassName() && pFactory->GetMapClassName()[0]) {
+		IEntityFactory* pExistFactory = FindFactory(pFactory->GetMapClassName());
+		if (pExistFactory) {
+			if (!V_strcmp(pExistFactory->GetDllClassName(), pFactory->GetDllClassName())) {
+				Error("InstallFactory %s already exist\n", pFactory->GetMapClassName());
+			}
+			else {
+				Msg("InstallFactory %s already exist\n", pFactory->GetMapClassName());
+				m_Factories.Remove(pExistFactory->GetMapClassName());
+				m_Factories.Remove(pExistFactory->GetDllClassName());
+				m_Factories.Insert(pFactory->GetMapClassName(), pFactory);
+			}
+		}
+		else {
+			m_Factories.Insert(pFactory->GetMapClassName(), pFactory);
+		}
+	}
+	if (pFactory->GetDllClassName() && pFactory->GetDllClassName()[0]) {
+		IEntityFactory* pExistFactory = FindFactory(pFactory->GetDllClassName());
+		if (pExistFactory) {
+			if(pExistFactory->GetMapClassName() && pExistFactory->GetMapClassName()[0]){
+				if (pFactory->GetMapClassName() && pFactory->GetMapClassName()[0]) {
+					Msg("InstallFactory %s already exist\n", pFactory->GetDllClassName());
+				}
+				else {
+					Msg("InstallFactory %s already exist\n", pFactory->GetDllClassName());
+				}
+			}
+			else {
+				if (pFactory->GetMapClassName() && pFactory->GetMapClassName()[0]) {
+					m_Factories.Remove(pExistFactory->GetDllClassName());
+					m_Factories.Insert(pFactory->GetDllClassName(), pFactory);
+				}
+				else {
+					Error("InstallFactory %s already exist\n", pFactory->GetDllClassName());
+				}
+			}
+		}
+		else {
+			m_Factories.Insert(pFactory->GetDllClassName(), pFactory);
+		}
+	}
 }
 
 
 //-----------------------------------------------------------------------------
 // Instantiate something using a factory
 //-----------------------------------------------------------------------------
-IHandleEntity* CEntityFactoryDictionary::Create(const char* pClassName, int iForceEdictIndex)
+IHandleEntity* CEntityFactoryDictionary::Create(const char* pClassName, int iForceEdictIndex, int iSerialNum)
 {
 	IEntityFactory* pFactory = FindFactory(pClassName);
 	if (!pFactory)
@@ -87,7 +128,7 @@ IHandleEntity* CEntityFactoryDictionary::Create(const char* pClassName, int iFor
 #if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
 	MEM_ALLOC_CREDIT_(m_Factories.GetElementName(m_Factories.Find(pClassName)));
 #endif
-	return pFactory->Create(iForceEdictIndex);
+	return pFactory->Create(iForceEdictIndex, iSerialNum);
 }
 
 const char* CEntityFactoryDictionary::GetMapClassName(const char* pClassName) {

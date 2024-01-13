@@ -24,5 +24,5 @@ void CServerGameClients::GetPlayerLimits( int& minplayers, int& maxplayers, int 
 
 void CServerGameDLL::LevelInit_ParseAllEntities( const char *pMapEntities )
 {
-	MapEntity_ParseAllEntities( pMapEntities, NULL );
+	//MapEntity_ParseAllEntities( pMapEntities, NULL );
 }

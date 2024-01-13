@@ -23,30 +23,30 @@
 #endif
 
 C_GameRules *g_pGameRules = NULL;
-static C_World *g_pClientWorld;
+//static C_World *g_pClientWorld;
 
 
-void ClientWorldFactoryInit()
-{
-	g_pClientWorld = new C_World;
-}
+//void ClientWorldFactoryInit()
+//{
+//	g_pClientWorld = new C_World;
+//}
 
-void ClientWorldFactoryShutdown()
-{
-	delete g_pClientWorld;
-	g_pClientWorld = NULL;
-}
+//void ClientWorldFactoryShutdown()
+//{
+//	delete g_pClientWorld;
+//	g_pClientWorld = NULL;
+//}
 
-static IClientNetworkable* ClientWorldFactory( int entnum, int serialNum )
-{
-	Assert( g_pClientWorld != NULL );
+//static IClientNetworkable* ClientWorldFactory( int entnum, int serialNum )
+//{
+//	Assert( g_pClientWorld != NULL );
+//
+//	g_pClientWorld->Init( entnum, serialNum );
+//	return g_pClientWorld;
+//}
 
-	g_pClientWorld->Init( entnum, serialNum );
-	return g_pClientWorld;
-}
 
-
-IMPLEMENT_CLIENTCLASS_FACTORY( C_World, DT_World, CWorld, ClientWorldFactory );
+IMPLEMENT_CLIENTCLASS( C_World, DT_World, CWorld );//, ClientWorldFactory
 
 BEGIN_RECV_TABLE( C_World, DT_World )
 	RecvPropFloat(RECVINFO(m_flWaveHeight)),
@@ -188,7 +188,7 @@ void C_World::Spawn( void )
 
 C_World *GetClientWorldEntity()
 {
-	Assert( g_pClientWorld != NULL );
-	return g_pClientWorld;
+	//Assert( g_pClientWorld != NULL );
+	return (C_World*)cl_entitylist->GetBaseEntity(0);
 }
 

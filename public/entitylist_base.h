@@ -668,8 +668,8 @@ class IEntityFactory;
 abstract_class IEntityFactoryDictionary
 {
 public:
-	virtual void InstallFactory(IEntityFactory * pFactory, const char* pClassName) = 0;
-	virtual IHandleEntity* Create(const char* pClassName , int iForceEdictIndex) = 0;
+	virtual void InstallFactory(IEntityFactory * pFactory) = 0;
+	virtual IHandleEntity* Create(const char* pClassName , int iForceEdictIndex, int iSerialNum) = 0;
 	virtual void Destroy(const char* pClassName, IHandleEntity* pEntity) = 0;
 	virtual IEntityFactory* FindFactory(const char* pClassName) = 0;
 	virtual const char* GetMapClassName(const char* pClassName) = 0;
@@ -687,15 +687,15 @@ inline bool CanCreateEntityClass(const char* pszClassname)
 }
 
 #ifdef CLIENT_DLL
-inline C_BaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1)
+inline C_BaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1)
 {
-	return (C_BaseEntity*)EntityFactoryDictionary()->Create(className, iForceEdictIndex);
+	return (C_BaseEntity*)EntityFactoryDictionary()->Create(className, iForceEdictIndex, iSerialNum);
 }
 #endif // CLIENT_DLL
 #ifdef GAME_DLL
-inline CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1)
+inline CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1)
 {
-	return (CBaseEntity*)EntityFactoryDictionary()->Create(className, iForceEdictIndex);
+	return (CBaseEntity*)EntityFactoryDictionary()->Create(className, iForceEdictIndex, iSerialNum);
 }
 #endif // GAME_DLL
 
@@ -718,7 +718,7 @@ inline size_t GetEntitySize(const char* className)
 abstract_class IEntityFactory
 {
 public:
-	virtual IHandleEntity * Create(int iForceEdictIndex) = 0;//const char* pClassName, 
+	virtual IHandleEntity * Create(int iForceEdictIndex,int iSerialNum) = 0;//const char* pClassName, 
 	virtual void Destroy(IHandleEntity* pEntity) = 0;
 	virtual const char* GetMapClassName() = 0;
 	virtual const char* GetDllClassName() = 0;
@@ -730,38 +730,44 @@ public:
 // entity creation
 // creates an entity that has not been linked to a classname
 template< class T >
-T* _CreateEntityTemplate(T* newEnt, const char* className, int iForceEdictIndex)
+T* _CreateEntityTemplate(T* newEnt, const char* className, int iForceEdictIndex, int iSerialNum)
 {
 	newEnt = new T; // this is the only place 'new' should be used!
+#ifdef CLIENT_DLL
+	newEnt->Init(iForceEdictIndex, iSerialNum);
+#endif
 #ifdef GAME_DLL
 	newEnt->PostConstructor(className, iForceEdictIndex);
 #endif // GAME_DLL
 	return newEnt;
 }
 
-#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className, -1 )
+#define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className, -1, -1 )
 
 #include "tier0/memdbgoff.h"
 
 template <class T>
 class CEntityFactory : public IEntityFactory
 {
+	class CEntityProxy : public T {
+
+
+	};
+
 public:
 	CEntityFactory(const char* pMapClassName, const char* pDllClassName)
 	{
+		if (!pDllClassName || !pDllClassName[0]) {
+			Error("pDllClassName can not be null");
+		}
 		m_pMapClassName = pMapClassName;
 		m_pDllClassName = pDllClassName;
-		if (pMapClassName && pMapClassName[0]) {
-			EntityFactoryDictionary()->InstallFactory(this, pMapClassName);
-		}
-		if (pDllClassName && pDllClassName[0]) {
-			EntityFactoryDictionary()->InstallFactory(this, pDllClassName);
-		}
+		EntityFactoryDictionary()->InstallFactory(this);
 	}
 
-	IHandleEntity* Create(int iForceEdictIndex)
+	IHandleEntity* Create(int iForceEdictIndex, int iSerialNum)
 	{
-		T* pEnt = _CreateEntityTemplate((T*)NULL, m_pMapClassName, iForceEdictIndex);
+		T* pEnt = _CreateEntityTemplate((CEntityProxy*)NULL, m_pMapClassName, iForceEdictIndex, iSerialNum);
 		return pEnt;
 	}
 
@@ -773,11 +779,11 @@ public:
 		}
 	}
 
-	virtual const char* GetMapClassName() {
+	const char* GetMapClassName() {
 		return m_pMapClassName;
 	}
 
-	virtual const char* GetDllClassName() {
+	const char* GetDllClassName() {
 		return m_pDllClassName;
 	}
 
@@ -790,14 +796,7 @@ private:
 	const char* m_pDllClassName;
 };
 
-#ifdef CLIENT_DLL
 #define LINK_ENTITY_TO_CLASS( mapClassName, DLLClassName )\
 	static CEntityFactory<DLLClassName> mapClassName( #mapClassName, #DLLClassName );
-#endif
-
-#ifdef GAME_DLL
-#define LINK_ENTITY_TO_CLASS(mapClassName, DLLClassName) \
-	static CEntityFactory<DLLClassName> mapClassName( #mapClassName, #DLLClassName );
-#endif
 
 #endif // ENTITYLIST_BASE_H

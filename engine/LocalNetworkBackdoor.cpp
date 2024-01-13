@@ -271,7 +271,7 @@ void CLocalNetworkBackdoor::EntState(
 	if ( !pClientClass )
 		Error( "CLocalNetworkBackdoor::EntState - missing client class %d", iClass );
 
-	IClientNetworkable *pNet = pCached->m_pNetworkable;
+	IClientEntity *pNet = pCached->m_pNetworkable;
 	Assert( pNet == entitylist->GetClientNetworkable( iEnt ) );
 
 	if ( !bShouldTransmit )
@@ -333,7 +333,7 @@ void CLocalNetworkBackdoor::EntState(
 	else		
 	{
 		updateType = DATA_UPDATE_CREATED;
-		pNet = pClientClass->m_pCreateFn( iEnt, iSerialNum );
+		pNet = entitylist->CreateEntityByName(pClientClass->m_pClassName, iEnt, iSerialNum );
 		bCreated = true;
 		m_EntsCreatedIndices[m_nEntsCreated++] = iEnt;
 
@@ -400,14 +400,14 @@ void CLocalNetworkBackdoor::StartBackdoorMode()
 
 	for ( int i=0; i < MAX_EDICTS; i++ )
 	{
-		IClientNetworkable *pNet = entitylist->GetClientNetworkable( i );
+		IClientEntity *pNet = entitylist->GetClientEntity( i );
 
 		CCachedEntState &ces = m_CachedEntState[i];
 
 		if ( pNet )
 		{
 			ces.m_pNetworkable = pNet;
-			ces.m_iSerialNumber = pNet->GetIClientUnknown()->GetRefEHandle().GetSerialNumber();
+			ces.m_iSerialNumber = pNet->GetRefEHandle().GetSerialNumber();
 			ces.m_bDormant = pNet->IsDormant();
 			ces.m_pDataPointer = pNet->GetDataTableBasePtr();
 			m_PrevEntsAlive.Set( i );

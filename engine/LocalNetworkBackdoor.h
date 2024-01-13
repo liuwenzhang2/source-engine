@@ -19,6 +19,7 @@
 #include "client_class.h"
 #include "dt_localtransfer.h"
 #include "client.h"
+#include "client_pch.h"
 #include "cdll_engine_int.h"
 #include "datacache/imdlcache.h"
 #include "sys_dll.h"
@@ -98,7 +99,7 @@ private:
 		bool	m_bDormant;
 		int		m_iSerialNumber;
 		void	*m_pDataPointer;
-		IClientNetworkable *m_pNetworkable;
+		IClientEntity *m_pNetworkable;
 	};
 	
 	CCachedEntState 	m_CachedEntState[MAX_EDICTS];

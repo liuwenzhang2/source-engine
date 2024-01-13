@@ -1077,7 +1077,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetPhysSaveRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetViewEffectsRestoreBlockHandler() );
 
-	ClientWorldFactoryInit();
+	//ClientWorldFactoryInit();
 
 	C_BaseAnimating::InitBoneSetupThreadPool();
 
@@ -1175,7 +1175,7 @@ void CHLClient::Shutdown( void )
 #endif
 
 	C_BaseAnimating::ShutdownBoneSetupThreadPool();
-	ClientWorldFactoryShutdown();
+	//ClientWorldFactoryShutdown();
 
 	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetViewEffectsRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetPhysSaveRestoreBlockHandler() );

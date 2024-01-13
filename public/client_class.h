@@ -40,7 +40,7 @@ class ClientClass;
 extern ClientClass *g_pClientClassHead;
 
 // The serial number that gets passed in is used for ehandles.
-typedef IClientNetworkable*	(*CreateClientClassFn)( int entnum, int serialNum );
+//typedef IClientNetworkable*	(*CreateClientClassFn)( int entnum, int serialNum );
 typedef IClientNetworkable*	(*CreateEventFn)();
 
 //-----------------------------------------------------------------------------
@@ -49,10 +49,11 @@ typedef IClientNetworkable*	(*CreateEventFn)();
 class ClientClass
 {
 public:
-	ClientClass( const char *pNetworkName, CreateClientClassFn createFn, CreateEventFn createEventFn, RecvTable *pRecvTable )
+	ClientClass(const char* pClassName, const char *pNetworkName, CreateEventFn createEventFn, RecvTable *pRecvTable )
 	{
+		m_pClassName = pClassName;
 		m_pNetworkName	= pNetworkName;
-		m_pCreateFn		= createFn;
+		//m_pCreateFn		= createFn;
 		m_pCreateEventFn= createEventFn;
 		m_pRecvTable	= pRecvTable;
 		
@@ -67,7 +68,8 @@ public:
 	}
 
 public:
-	CreateClientClassFn		m_pCreateFn;
+	const char*				m_pClassName;
+	//CreateClientClassFn		m_pCreateFn;
 	CreateEventFn			m_pCreateEventFn;	// Only called for event objects.
 	const char				*m_pNetworkName;
 	RecvTable				*m_pRecvTable;
@@ -95,25 +97,18 @@ public:
 // networkName must match the network name of a class registered on the server.
 #define IMPLEMENT_CLIENTCLASS(clientClassName, dataTable, serverClassName) \
 	INTERNAL_IMPLEMENT_CLIENTCLASS_PROLOGUE(clientClassName, dataTable, serverClassName) \
-	static IClientNetworkable* _##clientClassName##_CreateObject( int entnum, int serialNum ) \
-	{ \
-		clientClassName *pRet = new clientClassName; \
-		if ( !pRet ) \
-			return 0; \
-		pRet->Init( entnum, serialNum ); \
-		return pRet; \
-	} \
-	ClientClass __g_##clientClassName##ClientClass(#serverClassName, \
-													_##clientClassName##_CreateObject, \
+	ClientClass __g_##clientClassName##ClientClass(#clientClassName,\
+													#serverClassName, \
 													NULL,\
-													&dataTable::g_RecvTable);
+													&dataTable::g_RecvTable);\
+	static CEntityFactory<clientClassName> __g_##clientClassName##Factory( "", #clientClassName );
 
 // Implement a client class and provide a factory so you can allocate and delete it yourself
 // (or make it a singleton).
 #define IMPLEMENT_CLIENTCLASS_FACTORY(clientClassName, dataTable, serverClassName, factory) \
 	INTERNAL_IMPLEMENT_CLIENTCLASS_PROLOGUE(clientClassName, dataTable, serverClassName) \
-	ClientClass __g_##clientClassName##ClientClass(#serverClassName, \
-													factory, \
+	ClientClass __g_##clientClassName##ClientClass(#clientClassName,\
+													#serverClassName, \
 													NULL,\
 													&dataTable::g_RecvTable);
 
@@ -133,8 +128,8 @@ public:
 	INTERNAL_IMPLEMENT_CLIENTCLASS_PROLOGUE(clientClassName, dataTable, serverClassName)\
 	static clientClassName __g_##clientClassName; \
 	static IClientNetworkable* _##clientClassName##_CreateObject() {return &__g_##clientClassName;}\
-	ClientClass __g_##clientClassName##ClientClass(#serverClassName, \
-													NULL,\
+	ClientClass __g_##clientClassName##ClientClass(#clientClassName,\
+													#serverClassName, \
 													_##clientClassName##_CreateObject, \
 													&dataTable::g_RecvTable);
 
@@ -150,8 +145,8 @@ public:
 #define IMPLEMENT_CLIENTCLASS_EVENT_POINTER(clientClassName, dataTable, serverClassName, ptr)\
 	INTERNAL_IMPLEMENT_CLIENTCLASS_PROLOGUE(clientClassName, dataTable, serverClassName)\
 	static IClientNetworkable* _##clientClassName##_CreateObject() {return ptr;}\
-	ClientClass __g_##clientClassName##ClientClass(#serverClassName, \
-													NULL,\
+	ClientClass __g_##clientClassName##ClientClass(#clientClassName,\
+													#serverClassName, \
 													_##clientClassName##_CreateObject, \
 													&dataTable::g_RecvTable);
 
@@ -163,8 +158,8 @@ public:
 			p->Init( -1, 0 ); \
 		return p; \
 	} \
-	ClientClass __g_##clientClassName##ClientClass(#serverClassName, \
-													NULL,\
+	ClientClass __g_##clientClassName##ClientClass(#clientClassName,\
+													#serverClassName, \
 													_##clientClassName##_CreateObject, \
 													&dataTable::g_RecvTable);
 

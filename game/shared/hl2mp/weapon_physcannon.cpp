@@ -712,6 +712,7 @@ float CGrabController::GetSavedMass( IPhysicsObject *pObject )
 	return 0.0f;
 }
 
+#ifdef GAME_DLL
 //-----------------------------------------------------------------------------
 // Player pickup controller
 //-----------------------------------------------------------------------------
@@ -925,6 +926,26 @@ void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject )
 #endif
 
 }
+
+bool PlayerPickupControllerIsHoldingEntity(CBaseEntity* pPickupControllerEntity, CBaseEntity* pHeldEntity)
+{
+	CPlayerPickupController* pController = dynamic_cast<CPlayerPickupController*>(pPickupControllerEntity);
+
+	return pController ? pController->IsHoldingEntity(pHeldEntity) : false;
+}
+
+float PlayerPickupGetHeldObjectMass(CBaseEntity* pPickupControllerEntity, IPhysicsObject* pHeldObject)
+{
+	float mass = 0.0f;
+	CPlayerPickupController* pController = dynamic_cast<CPlayerPickupController*>(pPickupControllerEntity);
+	if (pController)
+	{
+		CGrabController& grab = pController->GetGrabController();
+		mass = grab.GetSavedMass(pHeldObject);
+	}
+	return mass;
+}
+#endif // GAME_DLL
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
 //  CInterpolatedValue class
@@ -3559,12 +3580,7 @@ void PhysCannonForceDrop( CBaseCombatWeapon *pActiveWeapon, CBaseEntity *pOnlyIf
 	}
 }
 
-bool PlayerPickupControllerIsHoldingEntity( CBaseEntity *pPickupControllerEntity, CBaseEntity *pHeldEntity )
-{
-	CPlayerPickupController *pController = dynamic_cast<CPlayerPickupController *>(pPickupControllerEntity);
 
-	return pController ? pController->IsHoldingEntity( pHeldEntity ) : false;
-}
 
 
 float PhysCannonGetHeldObjectMass( CBaseCombatWeapon *pActiveWeapon, IPhysicsObject *pHeldObject )
@@ -3592,17 +3608,7 @@ CBaseEntity *PhysCannonGetHeldEntity( CBaseCombatWeapon *pActiveWeapon )
 	return NULL;
 }
 
-float PlayerPickupGetHeldObjectMass( CBaseEntity *pPickupControllerEntity, IPhysicsObject *pHeldObject )
-{
-	float mass = 0.0f;
-	CPlayerPickupController *pController = dynamic_cast<CPlayerPickupController *>(pPickupControllerEntity);
-	if ( pController )
-	{
-		CGrabController &grab = pController->GetGrabController();
-		mass = grab.GetSavedMass( pHeldObject );
-	}
-	return mass;
-}
+
 
 #ifdef CLIENT_DLL
 

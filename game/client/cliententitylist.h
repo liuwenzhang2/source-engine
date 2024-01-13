@@ -124,6 +124,8 @@ public:
 // Implement IClientEntityList
 public:
 
+	virtual IClientEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
+
 	virtual IClientNetworkable*	GetClientNetworkable( int entnum );
 	virtual IClientEntity*		GetClientEntity( int entnum );
 
@@ -256,6 +258,12 @@ public:
 private:
 	unsigned short m_CurBaseEntity;
 };
+
+
+template<class T>
+inline IClientEntity* CClientEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {
+	return ::CreateEntityByName(className, iForceEdictIndex, iSerialNum);
+}
 
 //-----------------------------------------------------------------------------
 // Inline methods

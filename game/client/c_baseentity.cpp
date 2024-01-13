@@ -1084,7 +1084,9 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 
 	index = entnum;
 
-	cl_entitylist->AddNetworkableEntity( this, entnum, iSerialNum );//GetIClientUnknown()
+	if (entnum >= 0) {
+		cl_entitylist->AddNetworkableEntity(this, entnum, iSerialNum);//GetIClientUnknown()
+	}
 
 	CollisionProp()->CreatePartitionHandle();
 

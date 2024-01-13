@@ -140,7 +140,7 @@ void CL_DeleteDLLEntity( int iEnt, const char *reason, bool bOnRecreatingAllEnti
 //			iClass - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-IClientNetworkable* CL_CreateDLLEntity( int iEnt, int iClass, int iSerialNum )
+IClientEntity* CL_CreateDLLEntity( int iEnt, int iClass, int iSerialNum )
 {
 #if defined( _DEBUG )
 	IClientNetworkable *pOldNetworkable = entitylist->GetClientNetworkable( iEnt );
@@ -161,7 +161,7 @@ IClientNetworkable* CL_CreateDLLEntity( int iEnt, int iClass, int iSerialNum )
 		}
 
 		// Create the entity.
-		return pClientClass->m_pCreateFn( iEnt, iSerialNum );
+		return entitylist->CreateEntityByName(pClientClass->m_pClassName, iEnt, iSerialNum );
 	}
 
 	Assert(false);
@@ -307,7 +307,7 @@ void CL_CopyNewEntity(
 	}
 
 	// If it's new, make sure we have a slot for it.
-	IClientNetworkable *ent = entitylist->GetClientNetworkable( u.m_nNewEntity );
+	IClientEntity *ent = entitylist->GetClientEntity( u.m_nNewEntity );
 
 	if( iClass >= cl.m_nServerClasses )
 	{
@@ -321,7 +321,7 @@ void CL_CopyNewEntity(
 	if ( ent )
 	{
 		// if serial number is different, destory old entity
-		if ( ent->GetIClientUnknown()->GetRefEHandle().GetSerialNumber() != iSerialNum )
+		if ( ent->GetRefEHandle().GetSerialNumber() != iSerialNum )
 		{
 			CL_DeleteDLLEntity( u.m_nNewEntity, "CopyNewEntity" );
 			ent = NULL; // force a recreate
