@@ -19,7 +19,6 @@
 #include "client_class.h"
 #include "dt_localtransfer.h"
 #include "client.h"
-#include "client_pch.h"
 #include "cdll_engine_int.h"
 #include "datacache/imdlcache.h"
 #include "sys_dll.h"
