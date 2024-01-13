@@ -24,7 +24,6 @@
 #include "qlimits.h"
 #include "iprediction.h"
 #include "icliententitylist.h"
-#include "icliententity.h"
 
 #include "sysexternal.h"
 #include "cmd.h"

@@ -10,6 +10,7 @@
 #include "eiface.h"
 #include "cdll_engine_int.h"
 #include "dt_localtransfer.h"
+#include "icliententity.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

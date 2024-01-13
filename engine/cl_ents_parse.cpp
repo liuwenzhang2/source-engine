@@ -20,6 +20,7 @@
 #include "netmessages.h"
 #include "ents_shared.h"
 #include "cl_ents_parse.h"
+#include "icliententity.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
