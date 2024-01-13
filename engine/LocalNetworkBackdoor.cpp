@@ -279,7 +279,7 @@ void CLocalNetworkBackdoor::EntState(
 	{
 		if ( pNet )
 		{
-			Assert( pCached->m_iSerialNumber == pNet->GetIClientUnknown()->GetRefEHandle().GetSerialNumber() );
+			Assert( pCached->m_iSerialNumber == pNet->GetRefEHandle().GetSerialNumber() );
 			if ( pCached->m_iSerialNumber == iSerialNum )
 			{
 				// Tell the game code that this guy is now dormant.
@@ -311,7 +311,7 @@ void CLocalNetworkBackdoor::EntState(
 	if ( pNet )
 	{
 		// If the serial numbers are different, make it recreate the ent.
-		Assert( pCached->m_iSerialNumber == pNet->GetIClientUnknown()->GetRefEHandle().GetSerialNumber() );
+		Assert( pCached->m_iSerialNumber == pNet->GetRefEHandle().GetSerialNumber() );
 		if ( iSerialNum == pCached->m_iSerialNumber )
 		{
 			bExistedAndWasDormant = pCached->m_bDormant;
