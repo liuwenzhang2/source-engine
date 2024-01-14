@@ -39,6 +39,7 @@ using namespace vgui;
 
 DECLARE_BUILD_FACTORY( CModelPanel );
 
+static CEntityFactory<CModelPanelModel> g_CModelPanelModel_Factory("","CModelPanelModel");
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -271,7 +272,7 @@ void CModelPanel::DeleteVCDData( void )
 	{
 		m_hScene->StopClientOnlyScene();
 
-		m_hScene->Remove();
+		DestroyEntity(m_hScene);// ->Remove();
 		m_hScene = NULL;
 	}
 }
@@ -286,7 +287,7 @@ void CModelPanel::SetupVCD( void )
 
 	DeleteVCDData();
 
-	C_SceneEntity *pEnt = new class C_SceneEntity;
+	C_SceneEntity *pEnt = (C_SceneEntity*)CreateEntityByName( "C_SceneEntity" );
 
 	if ( !pEnt )
 		return;
@@ -294,7 +295,7 @@ void CModelPanel::SetupVCD( void )
 	if ( pEnt->InitializeAsClientEntity( "", RENDER_GROUP_OTHER ) == false )
 	{
 		// we failed to initialize this entity so just return gracefully
-		pEnt->Remove();
+		DestroyEntity(pEnt);// ->Remove();
 		return;
 	}
 
@@ -323,7 +324,7 @@ void CModelPanel::DeleteModelData( void )
 {
 	if ( m_hModel.Get() )
 	{
-		m_hModel->Remove();
+		DestroyEntity(m_hModel);// ->Remove();
 		m_hModel = NULL;
 		m_flFrameDistance = 0;
 	}
@@ -332,7 +333,7 @@ void CModelPanel::DeleteModelData( void )
 	{
 		if ( m_AttachedModels[i].Get() )
 		{
-			m_AttachedModels[i]->Remove();
+			DestroyEntity(m_AttachedModels[i]);// ->Remove();
 		}
 		m_AttachedModels.Remove( i );
 	}
@@ -399,7 +400,7 @@ void CModelPanel::SetupModel( void )
 		return;
 
 	// create the new model
-	CModelPanelModel *pEnt = new CModelPanelModel;
+	CModelPanelModel *pEnt = (CModelPanelModel*)CreateEntityByName( "CModelPanelMode" );
 
 	if ( !pEnt )
 		return;
@@ -407,7 +408,7 @@ void CModelPanel::SetupModel( void )
 	if ( pEnt->InitializeAsClientEntity( pszModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 	{
 		// we failed to initialize this entity so just return gracefully
-		pEnt->Remove();
+		DestroyEntity(pEnt);// ->Remove();
 		return;
 	}
 	
@@ -465,14 +466,14 @@ void CModelPanel::SetupModel( void )
 	for ( int i = 0 ; i < m_pModelInfo->m_AttachedModelsInfo.Count() ; i++ )
 	{
 		CModelPanelAttachedModelInfo *pInfo = m_pModelInfo->m_AttachedModelsInfo[i];
-		C_BaseAnimating *pTemp = new C_BaseAnimating;
+		C_BaseAnimating *pTemp = (C_BaseAnimating*)CreateEntityByName( "C_BaseAnimating" );
 
 		if ( pTemp )
 		{
 			if ( pTemp->InitializeAsClientEntity( pInfo->m_pszModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 			{	
 				// we failed to initialize this model so just skip it
-				pTemp->Remove();
+				DestroyEntity(pTemp);// ->Remove();
 				continue;
 			}
 

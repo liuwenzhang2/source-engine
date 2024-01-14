@@ -31,14 +31,14 @@ extern int g_cl_particle_show_bbox_cost;
 CNewParticleEffect::CNewParticleEffect( CBaseEntity *pOwner, CParticleSystemDefinition *pEffect )
 {
 	m_hOwner = pOwner;
-	Init( pEffect );
+	CParticleCollection::Init( pEffect );
 	Construct();
 }
 
 CNewParticleEffect::CNewParticleEffect( CBaseEntity *pOwner, const char* pEffectName )
 {
 	m_hOwner = pOwner;
-	Init( pEffectName );
+	CParticleCollection::Init( pEffectName );
 	Construct();
 }
 

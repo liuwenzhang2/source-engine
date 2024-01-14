@@ -472,7 +472,7 @@ void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 			// double-check that the EHANDLE is still valid
 			if ( g_HostageRagdolls[i] )
 			{
-				g_HostageRagdolls[i]->Release();
+				DestroyEntity(g_HostageRagdolls[i]);// ->Release();
 			}
 		}
 		g_HostageRagdolls.RemoveAll();
@@ -737,15 +737,15 @@ void RemoveClassImageEntity()
 	C_BaseAnimating *pEnt = g_ClassImagePlayer.Get();
 	if ( pEnt )
 	{
-		pEnt->Remove();
+		DestroyEntity(pEnt);// ->Remove();
 		g_ClassImagePlayer = NULL;
 	}
 
 	pEnt = g_ClassImageWeapon.Get();
 	if ( pEnt )
 	{
-		pEnt->Remove();
-		g_ClassImagePlayer = NULL;
+		DestroyEntity(pEnt);// ->Remove();
+		g_ClassImageWeapon = NULL;
 	}
 }
 
@@ -816,10 +816,10 @@ void UpdateClassImageEntity(
 	bool recreatePlayer = ShouldRecreateClassImageEntity( pPlayerModel, pModelName );
 	if ( recreatePlayer )
 	{
-		if ( pPlayerModel )
-			pPlayerModel->Remove();
+		if (pPlayerModel)
+			DestroyEntity(pPlayerModel);// ->Remove();
 
-		pPlayerModel = new C_BaseAnimatingOverlay;
+		pPlayerModel = (C_BaseAnimatingOverlay*)CreateEntityByName( "C_BaseAnimatingOverlay" );
 		pPlayerModel->InitializeAsClientEntity( pModelName, RENDER_GROUP_OPAQUE_ENTITY );
 		pPlayerModel->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 
@@ -840,10 +840,10 @@ void UpdateClassImageEntity(
 	// Does the entity even exist yet?
 	if ( recreatePlayer || ShouldRecreateClassImageEntity( pWeaponModel, pWeaponName ) )
 	{
-		if ( pWeaponModel )
-			pWeaponModel->Remove();
+		if (pWeaponModel)
+			DestroyEntity(pWeaponModel);// ->Remove();
 
-		pWeaponModel = new C_BaseAnimating;
+		pWeaponModel = (C_BaseAnimating*)CreateEntityByName( "C_BaseAnimating" );
 		pWeaponModel->InitializeAsClientEntity( pWeaponName, RENDER_GROUP_OPAQUE_ENTITY );
 		pWeaponModel->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 		pWeaponModel->FollowEntity( pPlayerModel ); // attach to player model

@@ -143,7 +143,7 @@ void CLocalNetworkBackdoor::EndEntityStateUpdate()
 					{
 						if ( m_CachedEntState[iEdict].m_pNetworkable )
 						{
-							m_CachedEntState[iEdict].m_pNetworkable->Release();
+							entitylist->DestroyEntity(m_CachedEntState[iEdict].m_pNetworkable);// ->Release();
 							m_CachedEntState[iEdict].m_pNetworkable = NULL;
 						}
 						else
@@ -195,26 +195,26 @@ void CLocalNetworkBackdoor::EntityDormant( int iEnt, int iSerialNum )
 {
 	CCachedEntState *pCached = &m_CachedEntState[iEnt];
 
-	IClientNetworkable *pNet = pCached->m_pNetworkable;
-	Assert( pNet == entitylist->GetClientNetworkable( iEnt ) );
+	IClientEntity *pNet = pCached->m_pNetworkable;
+	Assert( pNet == entitylist->GetClientEntity( iEnt ) );
 	if ( pNet )
 	{
-		Assert( pCached->m_iSerialNumber == pNet->GetIClientUnknown()->GetRefEHandle().GetSerialNumber() );
+		Assert( pCached->m_iSerialNumber == pNet->GetRefEHandle().GetSerialNumber() );
 		if ( pCached->m_iSerialNumber == iSerialNum )
 		{
 			m_EntsAlive.Set( iEnt );
 
 			// Tell the game code that this guy is now dormant.
-			Assert( pCached->m_bDormant == pNet->IsDormant() );
+			Assert( pCached->m_bDormant == pNet->GetClientNetworkable()->IsDormant());
 			if ( !pCached->m_bDormant )
 			{
-				pNet->NotifyShouldTransmit( SHOULDTRANSMIT_END );
+				pNet->GetClientNetworkable()->NotifyShouldTransmit(SHOULDTRANSMIT_END);
 				pCached->m_bDormant = true;
 			}
 		}
 		else
 		{
-			pNet->Release();
+			entitylist->DestroyEntity(pNet);// ->Release();
 			pCached->m_pNetworkable = NULL;
 			m_PrevEntsAlive.Clear( iEnt ); 
 		}
@@ -273,7 +273,7 @@ void CLocalNetworkBackdoor::EntState(
 		Error( "CLocalNetworkBackdoor::EntState - missing client class %d", iClass );
 
 	IClientEntity *pNet = pCached->m_pNetworkable;
-	Assert( pNet == entitylist->GetClientNetworkable( iEnt ) );
+	Assert( pNet == entitylist->GetClientEntity( iEnt ) );
 
 	if ( !bShouldTransmit )
 	{
@@ -283,16 +283,16 @@ void CLocalNetworkBackdoor::EntState(
 			if ( pCached->m_iSerialNumber == iSerialNum )
 			{
 				// Tell the game code that this guy is now dormant.
-				Assert( pCached->m_bDormant == pNet->IsDormant() );
+				Assert( pCached->m_bDormant == pNet->GetClientNetworkable()->IsDormant());
 				if ( !pCached->m_bDormant )
 				{
-					pNet->NotifyShouldTransmit( SHOULDTRANSMIT_END );
+					pNet->GetClientNetworkable()->NotifyShouldTransmit(SHOULDTRANSMIT_END);
 					pCached->m_bDormant = true;
 				}
 			}
 			else
 			{
-				pNet->Release();
+				entitylist->DestroyEntity(pNet);// ->Release();
 				pNet = NULL;
 				pCached->m_pNetworkable = NULL;
 				// Since we set this above, need to clear it now to avoid assertion in EndEntityStateUpdate()
@@ -318,7 +318,7 @@ void CLocalNetworkBackdoor::EntState(
 		}
 		else
 		{
-			pNet->Release();
+			entitylist->DestroyEntity(pNet);// ->Release();
 			pNet = NULL;
 			m_PrevEntsAlive.Clear(iEnt);
 		}
@@ -339,19 +339,19 @@ void CLocalNetworkBackdoor::EntState(
 		m_EntsCreatedIndices[m_nEntsCreated++] = iEnt;
 
 		pCached->m_iSerialNumber = iSerialNum;
-		pCached->m_pDataPointer = pNet->GetDataTableBasePtr();
+		pCached->m_pDataPointer = pNet->GetClientNetworkable()->GetDataTableBasePtr();
 		pCached->m_pNetworkable = pNet;
 		// Tracker 73192:  ywb 8/1/07:  We used to get an assertion that the pCached->m_bDormant was not equal to pNet->IsDormant() in ProcessDormantEntities.
 		// This appears to be the case if when we get here, the entity is set for Transmit still, but is a dormant entity on the server.
 		// Seems safe to go ahead an fill in the cache with the correct data.  Probably was just an oversight.
-		pCached->m_bDormant = pNet->IsDormant();
+		pCached->m_bDormant = pNet->GetClientNetworkable()->IsDormant();
 	}
 
 	if ( bChanged || bCreated || bExistedAndWasDormant )
 	{
-		pNet->PreDataUpdate( updateType );
+		pNet->GetClientNetworkable()->PreDataUpdate(updateType);
 
-		Assert( pCached->m_pDataPointer == pNet->GetDataTableBasePtr() );
+		Assert( pCached->m_pDataPointer == pNet->GetClientNetworkable()->GetDataTableBasePtr());
 
 		LocalTransfer_TransferEntity( 
 			serverEntitylist->GetServerNetworkable(iEnt), 

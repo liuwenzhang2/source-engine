@@ -51,7 +51,7 @@ public:
 	
 	static C_HL1Gib *CreateClientsideGib( const char *pszModelName, Vector vecOrigin, Vector vecForceDir, AngularImpulse vecAngularImp )
 	{
-		C_HL1Gib *pGib = new C_HL1Gib;
+		C_HL1Gib *pGib = (C_HL1Gib*)CreateEntityByName( "C_HL1Gib" );
 
 		if ( pGib == NULL )
 			return NULL;
@@ -106,6 +106,8 @@ public:
 	int m_iType;
 };
 
+static CEntityFactory<C_HL1Gib> g_C_HL1Gib_Factory("","C_HL1Gib");
+
 void C_HL1Gib::ClientThink( void )
 {
 	SetRenderMode( kRenderTransAlpha );
@@ -113,7 +115,7 @@ void C_HL1Gib::ClientThink( void )
 
 	if ( m_clrRender->a == 5 )
 	{
-		Release();
+		DestroyEntity(this);//Release();
 		return;
 	}
 

@@ -1073,7 +1073,7 @@ C_RopeKeyframe* C_RopeKeyframe::Create(
 	int ropeFlags
 	)
 {
-	C_RopeKeyframe *pRope = new C_RopeKeyframe;
+	C_RopeKeyframe *pRope = (C_RopeKeyframe*)CreateEntityByName( "C_RopeKeyframe" );
 
 	pRope->InitializeAsClientEntity( NULL, RENDER_GROUP_OPAQUE_ENTITY );
 	

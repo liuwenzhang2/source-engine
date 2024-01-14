@@ -125,6 +125,7 @@ public:
 public:
 
 	virtual IClientEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
+	virtual void				DestroyEntity(IClientEntity* pEntity);
 
 	virtual IClientNetworkable*	GetClientNetworkable( int entnum );
 	virtual IClientEntity*		GetClientEntity( int entnum );
@@ -265,6 +266,11 @@ inline IClientEntity* CClientEntityList<T>::CreateEntityByName(const char* class
 	return ::CreateEntityByName(className, iForceEdictIndex, iSerialNum);
 }
 
+template<class T>
+inline void	CClientEntityList<T>::DestroyEntity(IClientEntity* pEntity) {
+	::DestroyEntity(pEntity);
+}
+
 //-----------------------------------------------------------------------------
 // Inline methods
 //-----------------------------------------------------------------------------
@@ -340,10 +346,10 @@ void CClientEntityList<T>::Release(void)
 	while (iter != BaseClass::InvalidHandle())
 	{
 		// Try to call release on anything we can.
-		IClientNetworkable* pNet = GetClientNetworkableFromHandle(iter);
+		IClientEntity* pNet = GetClientEntityFromHandle(iter);
 		if (pNet)
 		{
-			pNet->Release();
+			DestroyEntity(pNet);// ->Release();
 		}
 		else
 		{

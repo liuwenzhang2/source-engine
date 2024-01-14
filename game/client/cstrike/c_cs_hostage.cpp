@@ -59,6 +59,8 @@ private:
 	float m_flFadeOutStart;
 };
 
+static CEntityFactory<C_LowViolenceHostageDeathModel> g_C_LowViolenceHostageDeathModel_Factory("","C_LowViolenceHostageDeathModel");
+
 //-----------------------------------------------------------------------------
 C_LowViolenceHostageDeathModel::C_LowViolenceHostageDeathModel()
 {
@@ -95,14 +97,14 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 	const char *pModelName = modelinfo->GetModelName( model );
 	if ( InitializeAsClientEntity( pModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 	{
-		Release();
+		DestroyEntity(this);// Release();
 		return false;
 	}
 
 	// Play the low-violence death anim
 	if ( LookupSequence( "death1" ) == -1 )
 	{
-		Release();
+		DestroyEntity(this); //Release();
 		return false;
 	}
 
@@ -157,7 +159,7 @@ void C_LowViolenceHostageDeathModel::ClientThink( void )
 
 	if ( iAlpha == 0 )
 	{
-		Release();
+		DestroyEntity(this);//Release();
 	}
 }
 
@@ -259,7 +261,7 @@ C_BaseAnimating * C_CHostage::BecomeRagdollOnClient()
 	{
 		// We can't just play the low-violence anim ourselves, since we're about to be deleted by the server.
 		// So, let's create another entity that can play the anim and stick around.
-		C_LowViolenceHostageDeathModel *pLowViolenceModel = new C_LowViolenceHostageDeathModel();
+		C_LowViolenceHostageDeathModel *pLowViolenceModel = (C_LowViolenceHostageDeathModel*)CreateEntityByName( "C_LowViolenceHostageDeathModel" );
 		m_createdLowViolenceRagdoll = pLowViolenceModel->SetupLowViolenceModel( this );
 		if ( m_createdLowViolenceRagdoll )
 		{

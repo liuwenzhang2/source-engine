@@ -1356,12 +1356,14 @@ public:
 	}
 };
 
+static CEntityFactory<C_FadingPhysPropClientside> g_C_FadingPhysPropClientside_Factory("","C_FadingPhysPropClientside");
+
 void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 {
 	if ( IsDormant() )
 		return;	// We can't see them anyway, just bail
 
-	C_FadingPhysPropClientside *pEntity = new C_FadingPhysPropClientside();
+	C_FadingPhysPropClientside *pEntity = (C_FadingPhysPropClientside*)CreateEntityByName( "C_FadingPhysPropClientside" );
 
 	if ( !pEntity )
 		return;
@@ -1390,7 +1392,7 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 
 	if ( !pEntity->Initialize() )
 	{
-		pEntity->Release();
+		DestroyEntity(pEntity);// ->Release();
 		return;
 	}
 
@@ -1412,7 +1414,7 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 	else
 	{
 		// failed to create a physics object
-		pEntity->Release();
+		DestroyEntity(pEntity);// ->Release();
 		return;
 	}
 

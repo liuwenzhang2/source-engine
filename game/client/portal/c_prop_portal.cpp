@@ -196,7 +196,7 @@ C_Prop_Portal::~C_Prop_Portal( void )
 
 	for( int i = m_GhostRenderables.Count(); --i >= 0; )
 	{
-		delete m_GhostRenderables[i];
+		DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
 	}
 	m_GhostRenderables.RemoveAll();
 }
@@ -270,7 +270,7 @@ void C_Prop_Portal::Simulate()
 		//remove all ghost renderables
 		for( int i = m_GhostRenderables.Count(); --i >= 0; )
 		{
-			delete m_GhostRenderables[i];
+			DestroyEntity((IHandleEntity*)m_GhostRenderables[i]);
 		}
 		
 		m_GhostRenderables.RemoveAll();
@@ -408,13 +408,15 @@ void C_Prop_Portal::Simulate()
 			if ( pWeapon && ToPortalPlayer( pWeapon->GetOwner() ) )
 				bIsHeldWeapon = true;
 
-			C_PortalGhostRenderable *pNewGhost = new C_PortalGhostRenderable( this,
-																				pRenderable, 
-																				pEntity->GetRenderGroup(), 
-																				m_matrixThisToLinked, 
-																				m_fGhostRenderablesClip,
-																				(pEntity == pLocalPlayer || bIsHeldWeapon) );
+			C_PortalGhostRenderable *pNewGhost = (C_PortalGhostRenderable*)CreateEntityByName( "C_PortalGhostRenderable" );
+
 			Assert( pNewGhost );
+			pNewGhost->Init(this,
+				pRenderable,
+				pEntity->GetRenderGroup(),
+				m_matrixThisToLinked,
+				m_fGhostRenderablesClip,
+				(pEntity == pLocalPlayer || bIsHeldWeapon));
 
 			bStillInUse[ m_GhostRenderables.AddToTail( pNewGhost ) ] = true;
 			pNewGhost->PerFrameUpdate();
@@ -464,7 +466,7 @@ void C_Prop_Portal::Simulate()
 				}
 			}
 
-			delete pGhost;
+			DestroyEntity( pGhost);
 			m_GhostRenderables.FastRemove( i );
 		}
 	}

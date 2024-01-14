@@ -1121,7 +1121,7 @@ void CTempEnts::PhysicsProp( int modelindex, int skin, const Vector& pos, const 
 
 	if ( !pEntity->Initialize() )
 	{
-		pEntity->Release();
+		DestroyEntity(pEntity);// ->Release();
 		return;
 	}
 
@@ -1134,7 +1134,7 @@ void CTempEnts::PhysicsProp( int modelindex, int skin, const Vector& pos, const 
 	else
 	{
 		// failed to create a physics object
-		pEntity->Release();
+		DestroyEntity(pEntity);// ->Release();
 		return;
 	}
 

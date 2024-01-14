@@ -1085,11 +1085,11 @@ void CRagdollLRURetirement::MoveToTopOfLRU( CBaseAnimating *pRagdoll, bool bImpo
 
 C_EntityDissolve *DissolveEffect( C_BaseEntity *pTarget, float flTime )
 {
-	C_EntityDissolve *pDissolve = new C_EntityDissolve;
+	C_EntityDissolve *pDissolve = (C_EntityDissolve*)CreateEntityByName( "C_EntityDissolve" );
 
 	if ( pDissolve->InitializeAsClientEntity( "sprites/blueglow1.vmt", RENDER_GROUP_TRANSLUCENT_ENTITY ) == false )
 	{
-		pDissolve->Release();
+		DestroyEntity(pDissolve);// ->Release();
 		return NULL;
 	}
 
@@ -1122,11 +1122,11 @@ C_EntityDissolve *DissolveEffect( C_BaseEntity *pTarget, float flTime )
 
 C_EntityFlame *FireEffect( C_BaseAnimating *pTarget, C_BaseEntity *pServerFire, float *flScaleEnd, float *flTimeStart, float *flTimeEnd )
 {
-	C_EntityFlame *pFire = new C_EntityFlame;
+	C_EntityFlame *pFire = (C_EntityFlame*)CreateEntityByName( "C_EntityFlame" );
 
 	if ( pFire->InitializeAsClientEntity( NULL, RENDER_GROUP_TRANSLUCENT_ENTITY ) == false )
 	{
-		pFire->Release();
+		DestroyEntity(pFire);// ->Release();
 		return NULL;
 	}
 

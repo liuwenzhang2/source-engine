@@ -649,7 +649,7 @@ class C_ClientRagdoll : public C_BaseAnimating, public IPVSNotify
 {
 	
 public:
-	C_ClientRagdoll( bool bRestoring = true );
+	C_ClientRagdoll( );//bool bRestoring 
 	DECLARE_CLASS( C_ClientRagdoll, C_BaseAnimating );
 	DECLARE_DATADESC();
 

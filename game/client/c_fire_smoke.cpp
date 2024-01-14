@@ -405,5 +405,5 @@ void C_EntityFlame::Simulate( void )
 void C_EntityFlame::ClientThink( void )
 {
 	StopEffect();
-	Release();
+	DestroyEntity(this);//Release();
 }

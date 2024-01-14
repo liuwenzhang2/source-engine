@@ -33,8 +33,10 @@ public:
 		matrix3x4_t matRenderableToWorldTransform;
 	} m_ReferencedReturns; //when returning a reference, it has to actually exist somewhere
 
-	C_PortalGhostRenderable( C_Prop_Portal *pOwningPortal, C_BaseEntity *pGhostSource, RenderGroup_t sourceRenderGroup, const VMatrix &matGhostTransform, float *pSharedRenderClipPlane, bool bLocalPlayer );
+	C_PortalGhostRenderable( );
 	virtual ~C_PortalGhostRenderable( void );
+
+	void Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* pGhostSource, RenderGroup_t sourceRenderGroup, const VMatrix& matGhostTransform, float* pSharedRenderClipPlane, bool bLocalPlayer);
 
 	void PerFrameUpdate( void ); //called once per frame for misc updating
 

@@ -16,6 +16,13 @@
 #include "utllinkedlist.h"
 #include "ihandleentity.h"
 
+#ifdef CLIENT_DLL
+class C_BaseEntity;
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+class CBaseEntity;
+#endif // GAME_DLL
+
 
 template<class T>
 class CEntInfo
@@ -441,6 +448,9 @@ template<class T>
 CBaseHandle CBaseEntityList<T>::AddNetworkableEntity(T* pEnt, int index, int iForcedSerialNum)
 {
 	Assert(index >= 0 && index < MAX_EDICTS);
+	if (pEnt->GetEntityFactory() == NULL) {
+		Error("EntityFactory can not be NULL!");
+	}
 	CEntInfo<T>* pSlot = &m_EntPtrArray[index];
 	if (pSlot->m_bReserved) {
 		m_ReservedNetworkableList.Unlink(pSlot);
@@ -456,6 +466,9 @@ CBaseHandle CBaseEntityList<T>::AddNetworkableEntity(T* pEnt, int index, int iFo
 template<class T>
 CBaseHandle CBaseEntityList<T>::AddNonNetworkableEntity(T* pEnt)
 {
+	if (pEnt->GetEntityFactory() == NULL) {
+		Error("EntityFactory can not be NULL!");
+	}
 	// Find a slot for it.
 	CEntInfo<T>* pSlot = m_freeNonNetworkableList.Head();
 	if (!pSlot)
@@ -662,15 +675,13 @@ extern CBaseEntityList<C_BaseEntity>* g_pEntityList;
 extern CBaseEntityList<CBaseEntity>* g_pEntityList;
 #endif // GAME_DLL
 
-class IEntityFactory;
-
 // This is the glue that hooks .MAP entity class names to our CPP classes
 abstract_class IEntityFactoryDictionary
 {
 public:
 	virtual void InstallFactory(IEntityFactory * pFactory) = 0;
 	virtual IHandleEntity* Create(const char* pClassName , int iForceEdictIndex, int iSerialNum) = 0;
-	virtual void Destroy(const char* pClassName, IHandleEntity* pEntity) = 0;
+	virtual void Destroy(IHandleEntity* pEntity) = 0;
 	virtual IEntityFactory* FindFactory(const char* pClassName) = 0;
 	virtual const char* GetMapClassName(const char* pClassName) = 0;
 	virtual const char* GetDllClassName(const char* pClassName) = 0;
@@ -714,16 +725,10 @@ inline size_t GetEntitySize(const char* className)
 	return EntityFactoryDictionary()->GetEntitySize(className);
 }
 
+inline void DestroyEntity(IHandleEntity* pEntity) {
+	EntityFactoryDictionary()->Destroy(pEntity);
+}
 
-abstract_class IEntityFactory
-{
-public:
-	virtual IHandleEntity * Create(int iForceEdictIndex,int iSerialNum) = 0;//const char* pClassName, 
-	virtual void Destroy(IHandleEntity* pEntity) = 0;
-	virtual const char* GetMapClassName() = 0;
-	virtual const char* GetDllClassName() = 0;
-	virtual size_t GetEntitySize() = 0;
-};
 
 #include "tier0/memdbgon.h"
 
@@ -751,7 +756,26 @@ class CEntityFactory : public IEntityFactory
 {
 	class CEntityProxy : public T {
 
+		CEntityProxy(CEntityFactory<T>* pEntityFactory) 
+		:m_pEntityFactory(pEntityFactory)
+		{
 
+		}
+		~CEntityProxy() {
+			if (!m_pEntityFactory->IsInDestruction(this)) {
+				Error("Must be destroy by IEntityFactory!");
+			}
+		}
+		IEntityFactory* GetEntityFactory() { 
+			return m_pEntityFactory; 
+		}
+
+	private:
+		CEntityFactory<T>* const m_pEntityFactory;
+		bool m_bInDestruction = false;
+
+		template <class T>
+		friend class CEntityFactory;
 	};
 
 public:
@@ -767,16 +791,30 @@ public:
 
 	IHandleEntity* Create(int iForceEdictIndex, int iSerialNum)
 	{
-		T* pEnt = _CreateEntityTemplate((CEntityProxy*)NULL, m_pMapClassName, iForceEdictIndex, iSerialNum);
-		return pEnt;
+		T* newEnt = new CEntityProxy(this); // this is the only place 'new' should be used!
+#ifdef CLIENT_DLL
+		((IHandleEntity*)newEnt)->Init(iForceEdictIndex, iSerialNum);
+#endif
+#ifdef GAME_DLL
+		newEnt->PostConstructor(m_pMapClassName, iForceEdictIndex);
+#endif // GAME_DLL
+		return newEnt;
 	}
 
 	void Destroy(IHandleEntity* pEntity)
 	{
-		if (pEntity)
+		CEntityProxy* pEntityProxy = (CEntityProxy*)pEntity;
+		if (!pEntityProxy)
 		{
-			delete ((T*)pEntity);//Release();
+			Error("not created by IEntityFactory!");
 		}
+		pEntityProxy->m_bInDestruction = true;
+#ifdef CLIENT_DLL
+		((C_BaseEntity*)pEntityProxy)->Remove();
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+		delete pEntityProxy;
+#endif // GAME_DLL
 	}
 
 	const char* GetMapClassName() {
@@ -792,8 +830,14 @@ public:
 		return sizeof(T);
 	}
 private:
+
+	bool IsInDestruction(CEntityProxy* entityProxy) const{
+		return entityProxy->m_bInDestruction;
+	}
 	const char* m_pMapClassName;
 	const char* m_pDllClassName;
+
+	friend class CEntityProxy;
 };
 
 #define LINK_ENTITY_TO_CLASS( mapClassName, DLLClassName )\

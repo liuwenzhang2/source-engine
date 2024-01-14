@@ -21,7 +21,7 @@ public:
 
 	virtual void InstallFactory(IEntityFactory* pFactory);
 	virtual IHandleEntity* Create(const char* pClassName, int iForceEdictIndex, int iSerialNum);
-	virtual void Destroy(const char* pClassName, IHandleEntity* pEntity);
+	virtual void Destroy(IHandleEntity* pEntity);
 	virtual const char* GetMapClassName(const char* pClassName);
 	virtual const char* GetDllClassName(const char* pClassName);
 	virtual size_t		GetEntitySize(const char* pClassName);
@@ -172,12 +172,12 @@ const char* CEntityFactoryDictionary::GetCannonicalName(const char* pClassName)
 //-----------------------------------------------------------------------------
 // Destroy a networkable
 //-----------------------------------------------------------------------------
-void CEntityFactoryDictionary::Destroy(const char* pClassName, IHandleEntity* pEntity)
+void CEntityFactoryDictionary::Destroy(IHandleEntity* pEntity)
 {
-	IEntityFactory* pFactory = FindFactory(pClassName);
+	IEntityFactory* pFactory = pEntity->GetEntityFactory();
 	if (!pFactory)
 	{
-		Warning("Attempted to destroy unknown entity type %s!\n", pClassName);
+		Error("Attempted to destroy unknown entity \n");
 		return;
 	}
 

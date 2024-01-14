@@ -445,7 +445,7 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 	// Entities shouldn't reference other entities in their destructors
 	//  that type of code should only occur in an UpdateOnRemove call
 	g_bDisableEhandleAccess = true;
-	delete oldObj;
+	DestroyEntity(oldObj);
 	g_bDisableEhandleAccess = false;
 
 #ifdef PORTAL

@@ -11,6 +11,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+static CEntityFactory<C_Gib> g_C_Gib_Factory("","C_Gib");
+
 //NOTENOTE: This is not yet coupled with the server-side implementation of CGib
 //			This is only a client-side version of gibs at the moment
 
@@ -32,7 +34,7 @@ C_Gib::~C_Gib( void )
 //-----------------------------------------------------------------------------
 C_Gib *C_Gib::CreateClientsideGib( const char *pszModelName, Vector vecOrigin, Vector vecForceDir, AngularImpulse vecAngularImp, float flLifetime )
 {
-	C_Gib *pGib = new C_Gib;
+	C_Gib *pGib = (C_Gib*)CreateEntityByName( "C_Gib" );
 
 	if ( pGib == NULL )
 		return NULL;
@@ -55,7 +57,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 {
 	if ( InitializeAsClientEntity( pszModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 	{
-		Release();
+		DestroyEntity(this);//Release();
 		return false;
 	}
 
@@ -78,7 +80,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 	else
 	{
 		// failed to create a physics object
-		Release();
+		DestroyEntity(this);//Release();
 		return false;
 	}
 
@@ -100,7 +102,7 @@ void C_Gib::ClientThink( void )
 #ifdef HL2_CLIENT_DLL
 		s_AntlionGibManager.RemoveGib( this );
 #endif
-		Release();
+		DestroyEntity(this);//Release();
 		return;
 	}
 

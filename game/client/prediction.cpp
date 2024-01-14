@@ -222,7 +222,7 @@ void CPrediction::ShutdownPredictables( void )
 		// Otherwise, release client created entities
 		else
 		{
-			ent->Release();
+			DestroyEntity(ent);// ->Release();
 			release_count++;
 		}
 	}
@@ -1090,7 +1090,7 @@ void CPrediction::RemoveStalePredictedEntities( int sequence_number )
 		}
 
 		// This will remove it from predictables list and will also free the entity, etc.
-		ent->Release();
+		DestroyEntity(ent);// ->Release();
 	}
 #endif
 }

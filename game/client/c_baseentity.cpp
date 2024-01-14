@@ -2084,7 +2084,7 @@ void C_BaseEntity::NotifyShouldTransmit( ShouldTransmitState_t state )
 					if ( OnPredictedEntityRemove( false, otherEntity ) )
 					{
 						// Mark it for delete after receive all network data
-						otherEntity->Release();
+						DestroyEntity(otherEntity);// ->Release();
 					}
 				}
 			}

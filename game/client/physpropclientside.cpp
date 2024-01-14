@@ -42,6 +42,10 @@ static int PropBreakablePrecacheAll( int modelIndex )
 static CUtlVector<C_PhysPropClientside*> s_PhysPropList;
 static CUtlVector<C_FuncPhysicsRespawnZone*> s_RespawnZoneList;
 
+static CEntityFactory<C_PhysPropClientside> g_C_PhysPropClientside_Factory("", "C_PhysPropClientside");
+static CEntityFactory<C_FuncPhysicsRespawnZone> g_C_FuncPhysicsRespawnZone_Factory("","C_FuncPhysicsRespawnZone");
+
+
 C_PhysPropClientside *C_PhysPropClientside::CreateNew( bool bForce )
 {
 	if ( (s_PhysPropList.Count() >= cl_phys_props_max.GetInt()) && !bForce )
@@ -50,7 +54,7 @@ C_PhysPropClientside *C_PhysPropClientside::CreateNew( bool bForce )
 		return NULL;
 	}
 
-	return new C_PhysPropClientside();
+	return (C_PhysPropClientside*)CreateEntityByName("C_PhysPropClientside");
 }
 
 C_PhysPropClientside::C_PhysPropClientside()
@@ -190,12 +194,12 @@ void C_PhysPropClientside::DestroyAll()
 	while (s_PhysPropList.Count() > 0 )
 	{
 		C_PhysPropClientside *p = s_PhysPropList[0];
-		p->Release();
+		DestroyEntity(p);// ->Release();
 	}
 	while (s_RespawnZoneList.Count() > 0)
 	{
 		C_FuncPhysicsRespawnZone *p = s_RespawnZoneList[0];
-		p->Release();
+		DestroyEntity(p);// ->Release();
 	}
 }
 
@@ -411,7 +415,7 @@ void C_PhysPropClientside::ClientThink( void )
 
 	if ( m_fDeathTime <= gpGlobals->curtime )
 	{
-		Release(); // Die
+		DestroyEntity(this);//Release(); // Die
 		return;
 	}
 
@@ -476,7 +480,7 @@ void C_PhysPropClientside::Break()
 	// spwan break chunks
 	PropBreakableCreateAll( GetModelIndex(), pPhysics, params, this, -1, false );
 
-	Release(); // destroy object
+	DestroyEntity(this);// Release(); // destroy object
 }
 
 void C_PhysPropClientside::Clone( Vector &velocity )
@@ -503,7 +507,7 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 
 	if ( !pEntity->Initialize() )
 	{
-		pEntity->Release();
+		DestroyEntity(pEntity);// ->Release();
 		return;
 	}
 
@@ -530,7 +534,7 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 	else
 	{
 		// failed to create a physics object
-		pEntity->Release();
+		DestroyEntity(pEntity);// ->Release();
 	}
 }
 
@@ -621,8 +625,8 @@ const char *C_PhysPropClientside::ParseEntity( const char *pEntData )
 		{	// Set up keyvalues.
 			pEntity->ParseMapData(&entData);
 			
-			if ( !pEntity->Initialize() )
-				pEntity->Release();
+			if (!pEntity->Initialize())
+				DestroyEntity(pEntity);//->Release();
 		
 			return entData.CurrentBufferPosition();
 		}
@@ -630,15 +634,15 @@ const char *C_PhysPropClientside::ParseEntity( const char *pEntData )
 
 	if ( !Q_strcmp( className, "func_proprrespawnzone" ) )
 	{
-		C_FuncPhysicsRespawnZone *pEntity = new C_FuncPhysicsRespawnZone();
+		C_FuncPhysicsRespawnZone *pEntity = (C_FuncPhysicsRespawnZone*)CreateEntityByName( "C_FuncPhysicsRespawnZone" );
 
 		if ( pEntity )
 		{	
 			// Set up keyvalues.
 			pEntity->ParseMapData(&entData);
 
-			if ( !pEntity->Initialize() )
-				pEntity->Release();
+			if (!pEntity->Initialize())
+				DestroyEntity(pEntity);// ->Release();
 
 			return entData.CurrentBufferPosition();
 		}
@@ -742,7 +746,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 
 	if ( !pEntity->Initialize() )
 	{
-		pEntity->Release();
+		DestroyEntity(pEntity);// ->Release();
 		return NULL;
 	}
 
@@ -797,7 +801,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 	else
 	{
 		// failed to create a physics object
-		pEntity->Release();
+		DestroyEntity(pEntity);// ->Release();
 		return NULL;
 	}
 
@@ -983,7 +987,7 @@ void C_FuncPhysicsRespawnZone::RespawnProps( void )
 
 				if ( !pEntity->Initialize() )
 				{
-					pEntity->Release();
+					DestroyEntity(pEntity);// ->Release();
 				}
 				else
 				{

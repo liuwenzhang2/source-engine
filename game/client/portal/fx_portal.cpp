@@ -45,10 +45,11 @@ private:
 	float	m_fDeathTime;
 };
 
+static CEntityFactory<C_PortalBlast> g_C_PortalBlast_Factory("","C_PortalBlast");
 
 void C_PortalBlast::Create( bool bIsPortal2, PortalPlacedByType ePlacedBy, const Vector &vStart, const Vector &vEnd, const QAngle &qAngles, float fDeathTime )
 {
-	C_PortalBlast *pPortalBlast = new C_PortalBlast;
+	C_PortalBlast *pPortalBlast = (C_PortalBlast*)CreateEntityByName( "C_PortalBlast" );
 	pPortalBlast->Init( bIsPortal2, ePlacedBy, vStart, vEnd, qAngles, fDeathTime );
 }
 
@@ -92,7 +93,7 @@ void C_PortalBlast::ClientThink( void )
 	if ( m_fCreationTime == 0.0f && m_fDeathTime == 0.0f )
 	{
 		// Die!
-		Remove();
+		DestroyEntity(this);// Remove();
 		return;
 	}
 

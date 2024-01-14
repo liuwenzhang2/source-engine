@@ -1129,7 +1129,7 @@ public:
 	{
 		if ( r_RainHack.GetInt() )
 		{
-			CClient_Precipitation *pPrecipHackEnt = new CClient_Precipitation;
+			CClient_Precipitation *pPrecipHackEnt = (CClient_Precipitation*)CreateEntityByName( "CClient_Precipitation" );
 			pPrecipHackEnt->InitializeAsClientEntity( NULL, RENDER_GROUP_TRANSLUCENT_ENTITY );
 			g_pPrecipHackEnt = pPrecipHackEnt;
 		}
@@ -1140,7 +1140,7 @@ public:
 	{
 		if ( r_RainHack.GetInt() && g_pPrecipHackEnt )
 		{
-			g_pPrecipHackEnt->Release();
+			DestroyEntity(g_pPrecipHackEnt);// ->Release();
 		}
 		m_bLevelInitted = false;
 	}
@@ -1664,6 +1664,8 @@ private:
 
 	CUtlVector<SnowFall_t>		m_aSnow;
 };
+
+static CEntityFactory<CSnowFallManager> g_CSnowFallManager_Factory("","CSnowFallManager");
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2197,7 +2199,7 @@ bool SnowFallManagerCreate( CClient_Precipitation *pSnowEntity )
 {
 	if ( !s_pSnowFallMgr )
 		{
-		s_pSnowFallMgr = new CSnowFallManager();
+		s_pSnowFallMgr = (CSnowFallManager*)CreateEntityByName( "CSnowFallManager");
 		s_pSnowFallMgr->CreateEmitter();
 		s_pSnowFallMgr->InitializeAsClientEntity( NULL, RENDER_GROUP_OTHER );
 		if ( !s_pSnowFallMgr )
@@ -2215,7 +2217,7 @@ void SnowFallManagerDestroy( void )
 {
 	if ( s_pSnowFallMgr )
 	{
-		delete s_pSnowFallMgr;
+		DestroyEntity(s_pSnowFallMgr);
 		s_pSnowFallMgr = NULL;
 	}
 }

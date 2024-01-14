@@ -30,6 +30,7 @@ abstract_class IClientEntityList
 public:
 
 	virtual IClientEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
+	virtual void				DestroyEntity(IClientEntity* pEntity) = 0;
 
 	// Get IClientNetworkable interface for specified entity
 	virtual IClientNetworkable*	GetClientNetworkable( int entnum ) = 0;

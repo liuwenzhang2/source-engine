@@ -565,7 +565,7 @@ void C_CSRagdoll::OnDataChanged( DataUpdateType_t type )
 		// until the first render. 
 		if ( engine->IsPlayingDemo() && m_bCreatedWhilePlaybackSkipping )
 		{
-			Release();
+			DestroyEntity(this);//Release();
 			return;
 		}
 
@@ -1063,7 +1063,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 	if ( iAttachment <= 0 )
 		return;
 
-	C_BreakableProp *pEnt = new C_BreakableProp;
+	C_BreakableProp *pEnt = (C_BreakableProp*)CreateEntityByName("C_BreakableProp");
 
 	int addonType = (1<<i);
 	if ( addonType == ADDON_PISTOL || addonType == ADDON_PRIMARY )
@@ -1072,7 +1072,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 		if ( !weaponInfo )
 		{
 			Warning( "C_CSPlayer::CreateAddonModel: Unable to get weapon info.\n" );
-			pEnt->Release();
+			DestroyEntity(pEnt);// ->Release();
 			return;
 		}
 		if ( weaponInfo->m_szAddonModel[0] == 0 )
@@ -1114,7 +1114,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 		}
 		else
 		{
-			pEnt->Release();
+			DestroyEntity(pEnt);// ->Release();
 			Warning( "C_CSPlayer::CreateAddonModel: Unable to get weapon info for %s.\n", pAddonInfo->m_pWeaponClassName );
 			return;
 		}
@@ -1183,8 +1183,8 @@ void C_CSPlayer::UpdateAddonModels()
 		int addonBit = 1<<pModel->m_iAddon;
 		if ( !( iCurAddonBits & addonBit ) || (rebuildPistol2Addon && addonBit == ADDON_PISTOL2) )
 		{
-			if ( pModel->m_hEnt.Get() )
-				pModel->m_hEnt->Release();
+			if (pModel->m_hEnt.Get())
+				DestroyEntity(pModel->m_hEnt);// ->Release();
 
 			m_AddonModels.Remove( i );
 		}

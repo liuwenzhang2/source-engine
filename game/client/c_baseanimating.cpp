@@ -278,7 +278,7 @@ BEGIN_DATADESC( C_ClientRagdoll )
 
 END_DATADESC()
 
-C_ClientRagdoll::C_ClientRagdoll( bool bRestoring )
+C_ClientRagdoll::C_ClientRagdoll( )//bool bRestoring 
 {
 	m_iCurrentFriction = 0;
 	m_iFrictionAnimState = RAGDOLL_FRICTION_NONE;
@@ -290,10 +290,10 @@ C_ClientRagdoll::C_ClientRagdoll( bool bRestoring )
 
 	SetClassname("client_ragdoll");
 
-	if ( bRestoring == true )
-	{
-		m_pRagdoll = new CRagdoll;
-	}
+	//if ( bRestoring == true )
+	//{
+	//	m_pRagdoll = new CRagdoll;
+	//}
 }
 
 void C_ClientRagdoll::OnSave( void )
@@ -557,7 +557,7 @@ void C_ClientRagdoll::ClientThink( void )
 	if ( m_bReleaseRagdoll == true )
 	{
 		DestroyBoneAttachments();
-		Release();
+		DestroyEntity(this);// Release();
 		return;
 	}
 
@@ -623,7 +623,7 @@ void C_ClientRagdoll::Release( void )
 
 	if ( pChild && pChild->IsMarkedForDeletion() == false )
 	{
-		pChild->Release();
+		DestroyEntity(pChild);// ->Release();
 	}
 
 	if ( GetThinkHandle() != INVALID_THINK_HANDLE )
@@ -1321,8 +1321,8 @@ void C_BaseAnimating::DelayedInitModelEffects( void )
 
 void C_BaseAnimating::TermRopes()
 {
-	FOR_EACH_LL( m_Ropes, i )
-		m_Ropes[i]->Release();
+	FOR_EACH_LL(m_Ropes, i)
+		DestroyEntity(m_Ropes[i]);// ->Release();
 
 	m_Ropes.Purge();
 }
@@ -4559,7 +4559,7 @@ C_BaseAnimating *C_BaseAnimating::CreateRagdollCopy()
 	//Adrian: We now create a separate entity that becomes this entity's ragdoll.
 	//That way the server side version of this entity can go away. 
 	//Plus we can hook save/restore code to these ragdolls so they don't fall on restore anymore.
-	C_ClientRagdoll *pRagdoll = new C_ClientRagdoll( false );
+	C_ClientRagdoll *pRagdoll = (C_ClientRagdoll*)CreateEntityByName( "C_ClientRagdoll" );//false
 	if ( pRagdoll == NULL )
 		return NULL;
 
@@ -4570,7 +4570,7 @@ C_BaseAnimating *C_BaseAnimating::CreateRagdollCopy()
 
 	if ( pRagdoll->InitializeAsClientEntity( pModelName, RENDER_GROUP_OPAQUE_ENTITY ) == false )
 	{
-		pRagdoll->Release();
+		DestroyEntity(pRagdoll);// ->Release();
 		return NULL;
 	}
 
@@ -6403,7 +6403,7 @@ void C_BaseAnimating::DestroyBoneAttachments()
 		C_BaseAnimating *pAttachment = GetBoneAttachment(0);
 		if ( pAttachment )
 		{
-			pAttachment->Release();
+			DestroyEntity(pAttachment);// ->Release();
 		}
 		else
 		{

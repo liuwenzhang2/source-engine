@@ -117,21 +117,21 @@ void SpewToFile( char const* pFmt, ... )
 //-----------------------------------------------------------------------------
 void CL_DeleteDLLEntity( int iEnt, const char *reason, bool bOnRecreatingAllEntities )
 {
-	IClientNetworkable *pNet = entitylist->GetClientNetworkable( iEnt );
+	IClientEntity *pNet = entitylist->GetClientEntity( iEnt );
 
 	if ( pNet )
 	{
-		ClientClass *pClientClass = pNet->GetClientClass();
+		ClientClass *pClientClass = pNet->GetClientNetworkable()->GetClientClass();
 		TRACE_DELTA( va( "Trace %i (%s): delete (%s)\n", iEnt, pClientClass ? pClientClass->m_pNetworkName : "unknown", reason ) );
 #ifndef _XBOX
 		CL_RecordDeleteEntity( iEnt, pClientClass );
 #endif
 		if ( bOnRecreatingAllEntities )
 		{
-			pNet->SetDestroyedOnRecreateEntities();
+			pNet->GetClientNetworkable()->SetDestroyedOnRecreateEntities();
 		}
 
-		pNet->Release();
+		entitylist->DestroyEntity(pNet);// ->Release();
 	}
 }
 

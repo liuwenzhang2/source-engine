@@ -60,8 +60,8 @@ END_RECV_TABLE()
 C_NPC_Portal_FloorTurret::~C_NPC_Portal_FloorTurret( void )
 {
 	LaserOff();
-	if( m_pBeam )
-		m_pBeam->Remove();
+	if (m_pBeam)
+		DestroyEntity(m_pBeam);// ->Remove();
 }
 
 

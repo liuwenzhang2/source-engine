@@ -338,7 +338,7 @@ void CGlobalEntityList<T>::CleanupDeleteList(void)
 	g_bDisableEhandleAccess = true;
 	for (int i = 0; i < m_DeleteList.Count(); i++)
 	{
-		delete m_DeleteList[i];// ->Release();
+		DestroyEntity(m_DeleteList[i]);// ->Release();
 	}
 	g_bDisableEhandleAccess = false;
 	m_DeleteList.RemoveAll();

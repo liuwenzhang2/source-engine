@@ -11,17 +11,10 @@
 #include "c_portal_player.h"
 #include "model_types.h"
 
-C_PortalGhostRenderable::C_PortalGhostRenderable( C_Prop_Portal *pOwningPortal, C_BaseEntity *pGhostSource, RenderGroup_t sourceRenderGroup, const VMatrix &matGhostTransform, float *pSharedRenderClipPlane, bool bLocalPlayer )
-: m_pGhostedRenderable( pGhostSource ), 
-	m_matGhostTransform( matGhostTransform ), 
-	m_pSharedRenderClipPlane( pSharedRenderClipPlane ),
-	m_bLocalPlayer( bLocalPlayer ),
-	m_pOwningPortal( pOwningPortal )
-{
-	m_bSourceIsBaseAnimating = (dynamic_cast<C_BaseAnimating *>(pGhostSource) != NULL);
+static CEntityFactory<C_PortalGhostRenderable> g_C_PortalGhostRenderable_Factory("","C_PortalGhostRenderable");
 
-	cl_entitylist->AddNonNetworkableEntity( this );//GetIClientUnknown()
-	g_pClientLeafSystem->AddRenderable( this, sourceRenderGroup );
+C_PortalGhostRenderable::C_PortalGhostRenderable( )
+{
 }
 
 C_PortalGhostRenderable::~C_PortalGhostRenderable( void )
@@ -31,6 +24,19 @@ C_PortalGhostRenderable::~C_PortalGhostRenderable( void )
 	cl_entitylist->RemoveEntity( GetIClientUnknown()->GetRefEHandle() );
 
 	DestroyModelInstance();
+}
+
+void C_PortalGhostRenderable::Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* pGhostSource, RenderGroup_t sourceRenderGroup, const VMatrix& matGhostTransform, float* pSharedRenderClipPlane, bool bLocalPlayer) {
+	m_pGhostedRenderable = pGhostSource,
+	m_matGhostTransform = matGhostTransform,
+	m_pSharedRenderClipPlane = pSharedRenderClipPlane,
+	m_bLocalPlayer = bLocalPlayer,
+	m_pOwningPortal = pOwningPortal;
+
+	m_bSourceIsBaseAnimating = (dynamic_cast<C_BaseAnimating*>(pGhostSource) != NULL);
+
+	cl_entitylist->AddNonNetworkableEntity(this);//GetIClientUnknown()
+	g_pClientLeafSystem->AddRenderable(this, sourceRenderGroup);
 }
 
 void C_PortalGhostRenderable::PerFrameUpdate( void )
