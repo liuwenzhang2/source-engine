@@ -774,7 +774,7 @@ class CEntityFactory : public IEntityFactory
 		CEntityFactory<T>* const m_pEntityFactory;
 		bool m_bInDestruction = false;
 
-		template <class T>
+		template <class U>
 		friend class CEntityFactory;
 	};
 
