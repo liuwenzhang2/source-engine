@@ -85,9 +85,9 @@ public:
 	void							SetDrawHelper( pfnDrawHelper helper ) { m_pfnDrawHelper = helper; }
 	void							OnRemoveTempEntity();
 
-	void							SetImpactEffect( const char *pszImpactEffect ) { m_pszImpactEffect = pszImpactEffect; }
-	CNewParticleEffect*				AddParticleEffect( const char *pszParticleEffect );
-	void							SetParticleEffect( const char *pszParticleEffect ) { m_pszParticleEffect = pszParticleEffect; }
+	//void							SetImpactEffect( const char *pszImpactEffect ) { m_pszImpactEffect = pszImpactEffect; }
+	//CNewParticleEffect*				AddParticleEffect( const char *pszParticleEffect );
+	//void							SetParticleEffect( const char *pszParticleEffect ) { m_pszParticleEffect = pszParticleEffect; }
 
 protected:
 
@@ -125,9 +125,9 @@ public:
 
 	RenderGroup_t					m_RenderGroup;
 
-	const char						*m_pszImpactEffect;
-	const char						*m_pszParticleEffect;
-	bool							m_bParticleCollision;
+	//const char						*m_pszImpactEffect;
+	//const char						*m_pszParticleEffect;
+	//bool							m_bParticleCollision;
 
 	int								m_iLastCollisionFrame;
 	Vector							m_vLastCollisionOrigin;

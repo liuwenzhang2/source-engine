@@ -124,8 +124,8 @@ public:
 	void	Start( void );
 	void	Simulate( void );
 
-	void	StartClientOnly( void );
-	void	RemoveClientOnly( void );
+	//void	StartClientOnly( void );
+	//void	RemoveClientOnly( void );
 
 protected:
 	void	Update( void );

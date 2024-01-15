@@ -92,7 +92,7 @@ C_LocalTempEntity::C_LocalTempEntity()
 #endif
 	m_vecTempEntAcceleration.Init();
 	m_pfnDrawHelper = 0;
-	m_pszImpactEffect = NULL;
+	//m_pszImpactEffect = NULL;
 }
 
 
@@ -129,7 +129,7 @@ void C_LocalTempEntity::Prepare( const model_t *pmodel, float time )
 	clientIndex = -1;
 	bounceFactor = 1;
 	m_nFlickerFrame = 0;
-	m_bParticleCollision = false;
+	//m_bParticleCollision = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -488,42 +488,42 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 				tempents->PlaySound(this, damp);
 			}
 
-			if ( m_pszImpactEffect )
-			{
-				CEffectData data;
-				//data.m_vOrigin = newOrigin;
-				data.m_vOrigin = trace.endpos;
-				data.m_vStart = trace.startpos;
-				data.m_nSurfaceProp = trace.surface.surfaceProps;
-				data.m_nHitBox = trace.hitbox;
+			//if ( m_pszImpactEffect )
+			//{
+			//	CEffectData data;
+			//	//data.m_vOrigin = newOrigin;
+			//	data.m_vOrigin = trace.endpos;
+			//	data.m_vStart = trace.startpos;
+			//	data.m_nSurfaceProp = trace.surface.surfaceProps;
+			//	data.m_nHitBox = trace.hitbox;
 
-				data.m_nDamageType = TEAM_UNASSIGNED;
+			//	data.m_nDamageType = TEAM_UNASSIGNED;
 
-				IClientNetworkable *pClient = cl_entitylist->GetClientEntity( clientIndex );
+			//	IClientNetworkable *pClient = cl_entitylist->GetClientEntity( clientIndex );
 
-				if ( pClient )
-				{
-					C_BasePlayer *pPlayer = dynamic_cast<C_BasePlayer*>(pClient);
-					if( pPlayer )
-					{
-						data.m_nDamageType = pPlayer->GetTeamNumber();
-					}
-				}
+			//	if ( pClient )
+			//	{
+			//		C_BasePlayer *pPlayer = dynamic_cast<C_BasePlayer*>(pClient);
+			//		if( pPlayer )
+			//		{
+			//			data.m_nDamageType = pPlayer->GetTeamNumber();
+			//		}
+			//	}
 
-				if ( trace.m_pEnt )
-				{
-					data.m_hEntity = ClientEntityList().EntIndexToHandle(((C_BaseEntity*)trace.m_pEnt)->entindex() );
-				}
-				DispatchEffect( m_pszImpactEffect, data );
-			}
+			//	if ( trace.m_pEnt )
+			//	{
+			//		data.m_hEntity = ClientEntityList().EntIndexToHandle(((C_BaseEntity*)trace.m_pEnt)->entindex() );
+			//	}
+			//	DispatchEffect( m_pszImpactEffect, data );
+			//}
 
 			// Check for a collision and stop the particle system.
-			if ( flags & FTENT_CLIENTSIDEPARTICLES )
-			{
-				// Stop the emission of particles on collision - removed from the ClientEntityList on removal from the tempent pool.
-				ParticleProp()->StopEmission();
-				m_bParticleCollision = true;
-			}
+			//if ( flags & FTENT_CLIENTSIDEPARTICLES )
+			//{
+			//	// Stop the emission of particles on collision - removed from the ClientEntityList on removal from the tempent pool.
+			//	ParticleProp()->StopEmission();
+			//	m_bParticleCollision = true;
+			//}
 
 			if (flags & FTENT_COLLIDEKILL)
 			{
@@ -627,26 +627,26 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 //-----------------------------------------------------------------------------
 // Purpose: Attach a particle effect to a temp entity.
 //-----------------------------------------------------------------------------
-CNewParticleEffect* C_LocalTempEntity::AddParticleEffect( const char *pszParticleEffect )
-{
-	// Do we have a valid particle effect.
-	if ( !pszParticleEffect || ( pszParticleEffect[0] == '\0' ) )
-		return NULL;
-
-	// Check to see that we don't already have a particle effect.
-	if ( ( flags & FTENT_CLIENTSIDEPARTICLES ) != 0 )
-		return NULL;
-
-	// Add the entity to the ClientEntityList and create the particle system.
-	ClientEntityList().AddNonNetworkableEntity( this );
-	CNewParticleEffect* pEffect = ParticleProp()->Create( pszParticleEffect, PATTACH_ABSORIGIN_FOLLOW );
-
-	// Set the particle flag on the temp entity and save the name of the particle effect.
-	flags |= FTENT_CLIENTSIDEPARTICLES;
-	SetParticleEffect( pszParticleEffect );
-
-	return pEffect;
-}
+//CNewParticleEffect* C_LocalTempEntity::AddParticleEffect( const char *pszParticleEffect )
+//{
+//	// Do we have a valid particle effect.
+//	if ( !pszParticleEffect || ( pszParticleEffect[0] == '\0' ) )
+//		return NULL;
+//
+//	// Check to see that we don't already have a particle effect.
+//	if ( ( flags & FTENT_CLIENTSIDEPARTICLES ) != 0 )
+//		return NULL;
+//
+//	// Add the entity to the ClientEntityList and create the particle system.
+//	ClientEntityList().AddNonNetworkableEntity( this );
+//	CNewParticleEffect* pEffect = ParticleProp()->Create( pszParticleEffect, PATTACH_ABSORIGIN_FOLLOW );
+//
+//	// Set the particle flag on the temp entity and save the name of the particle effect.
+//	flags |= FTENT_CLIENTSIDEPARTICLES;
+//	SetParticleEffect( pszParticleEffect );
+//
+//	return pEffect;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: This helper keeps track of batches of "breakmodels" so that they can all share the lighting origin
@@ -1153,7 +1153,7 @@ void CTempEnts::PhysicsProp( int modelindex, int skin, const Vector& pos, const 
 //			lifetime - 
 //			*pOwner - 
 //-----------------------------------------------------------------------------
-C_LocalTempEntity *CTempEnts::ClientProjectile( const Vector& vecOrigin, const Vector& vecVelocity, const Vector& vecAcceleration, int modelIndex, int lifetime, CBaseEntity *pOwner, const char *pszImpactEffect, const char *pszParticleEffect )
+C_LocalTempEntity *CTempEnts::ClientProjectile( const Vector& vecOrigin, const Vector& vecVelocity, const Vector& vecAcceleration, int modelIndex, int lifetime, CBaseEntity *pOwner)//, const char *pszImpactEffect, const char *pszParticleEffect 
 {
 	C_LocalTempEntity	*pTemp;
 	const model_t		*model;
@@ -1182,17 +1182,17 @@ C_LocalTempEntity *CTempEnts::ClientProjectile( const Vector& vecOrigin, const V
 	pTemp->flags = FTENT_COLLIDEALL | FTENT_ATTACHTOTARGET | FTENT_ALIGNTOMOTION;
 	pTemp->clientIndex = ( pOwner != NULL ) ? pOwner->entindex() : 0; 
 	pTemp->SetOwnerEntity( pOwner );
-	pTemp->SetImpactEffect( pszImpactEffect );
-	if ( pszParticleEffect )
-	{
-		// Add the entity to the ClientEntityList and create the particle system.
-		ClientEntityList().AddNonNetworkableEntity( pTemp );
-		pTemp->ParticleProp()->Create( pszParticleEffect, PATTACH_ABSORIGIN_FOLLOW );
+	//pTemp->SetImpactEffect( pszImpactEffect );
+	//if ( pszParticleEffect )
+	//{
+	//	// Add the entity to the ClientEntityList and create the particle system.
+	//	ClientEntityList().AddNonNetworkableEntity( pTemp );
+	//	pTemp->ParticleProp()->Create( pszParticleEffect, PATTACH_ABSORIGIN_FOLLOW );
 
-		// Set the particle flag on the temp entity and save the name of the particle effect.
-		pTemp->flags |= FTENT_CLIENTSIDEPARTICLES;
-	 	pTemp->SetParticleEffect( pszParticleEffect );
-	}
+	//	// Set the particle flag on the temp entity and save the name of the particle effect.
+	//	pTemp->flags |= FTENT_CLIENTSIDEPARTICLES;
+	// 	pTemp->SetParticleEffect( pszParticleEffect );
+	//}
 	return pTemp;
 }
 
@@ -2032,15 +2032,15 @@ void CTempEnts::TempEntFree( int index )
 		pTemp->RemoveFromLeafSystem();
 
 		// Remove the tempent from the ClientEntityList before removing it from the pool.
-		if ( ( pTemp->flags & FTENT_CLIENTSIDEPARTICLES ) )
-		{			
-			// Stop the particle emission if this hasn't happened already - collision or system timing out on its own.
-			if ( !pTemp->m_bParticleCollision )
-			{
-				pTemp->ParticleProp()->StopEmission();
-			}
-			ClientEntityList().RemoveEntity( pTemp->GetRefEHandle() );
-		}
+		//if ( ( pTemp->flags & FTENT_CLIENTSIDEPARTICLES ) )
+		//{			
+		//	// Stop the particle emission if this hasn't happened already - collision or system timing out on its own.
+		//	if ( !pTemp->m_bParticleCollision )
+		//	{
+		//		pTemp->ParticleProp()->StopEmission();
+		//	}
+		//	ClientEntityList().RemoveEntity( pTemp->GetRefEHandle() );
+		//}
 
 		pTemp->OnRemoveTempEntity();
 	

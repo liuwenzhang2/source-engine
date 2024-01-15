@@ -196,31 +196,31 @@ void C_FireSmoke::Start( void )
 //-----------------------------------------------------------------------------
 // Purpose: FIXME: what's the right way to do this?
 //-----------------------------------------------------------------------------
-void C_FireSmoke::StartClientOnly( void )
-{
-	Start();
-
-	ClientEntityList().AddNonNetworkableEntity(	this );
-	CollisionProp()->CreatePartitionHandle();
-	AddEffects( EF_NORECEIVESHADOW | EF_NOSHADOW );
-	AddToLeafSystem();
-}
+//void C_FireSmoke::StartClientOnly( void )
+//{
+//	Start();
+//
+//	ClientEntityList().AddNonNetworkableEntity(	this );
+//	CollisionProp()->CreatePartitionHandle();
+//	AddEffects( EF_NORECEIVESHADOW | EF_NOSHADOW );
+//	AddToLeafSystem();
+//}
 
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_FireSmoke::RemoveClientOnly(void)
-{
-	ClientThinkList()->RemoveThinkable( GetClientHandle() );
-
-	// Remove from the client entity list.
-	ClientEntityList().RemoveEntity( GetClientHandle() );
-
-	partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, CollisionProp()->GetPartitionHandle() );
-
-	RemoveFromLeafSystem();
-}
+//void C_FireSmoke::RemoveClientOnly(void)
+//{
+//	ClientThinkList()->RemoveThinkable( GetClientHandle() );
+//
+//	// Remove from the client entity list.
+//	ClientEntityList().RemoveEntity( GetClientHandle() );
+//
+//	partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, CollisionProp()->GetPartitionHandle() );
+//
+//	RemoveFromLeafSystem();
+//}
 
 
 //-----------------------------------------------------------------------------
