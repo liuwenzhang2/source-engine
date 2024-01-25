@@ -252,7 +252,7 @@ int CAntlionGrub::GetNuggetDenomination( void )
 //-----------------------------------------------------------------------------
 void CAntlionGrub::CreateNugget( void )
 {
-	CGrubNugget *pNugget = (CGrubNugget *) CreateEntityByName( "item_grubnugget" );
+	CGrubNugget *pNugget = (CGrubNugget *)gEntList.CreateEntityByName( "item_grubnugget" );
 	if ( pNugget == NULL )
 		return;
 

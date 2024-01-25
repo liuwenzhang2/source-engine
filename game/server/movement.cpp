@@ -228,7 +228,7 @@ CPathKeyFrame *CPathKeyFrame::PrevKey( int direction )
 //-----------------------------------------------------------------------------
 CPathKeyFrame *CPathKeyFrame::InsertNewKey( Vector newPos, QAngle newAngles )
 {
-	CPathKeyFrame *newKey = (CPathKeyFrame*)CreateEntityByName( "keyframe_track" );
+	CPathKeyFrame *newKey = (CPathKeyFrame*)gEntList.CreateEntityByName( "keyframe_track" );
 
 	// copy data across
 	newKey->SetKeyAngles( newAngles );

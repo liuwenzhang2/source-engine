@@ -710,7 +710,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSpawnHeadcrabThink()
 	int nHeadCrabAttachment = LookupAttachment( "headcrab" );
 	if ( GetAttachment( nHeadCrabAttachment, vecSpawnPosition, vecSpawnAngles ) )
 	{
-		CBaseEntity *pEnt = CreateEntityByName( s_pHeadcrabClass[m_nHeadcrabType] );
+		CBaseEntity *pEnt = gEntList.CreateEntityByName( s_pHeadcrabClass[m_nHeadcrabType] );
 		CBaseHeadcrab *pHeadCrab = assert_cast<CBaseHeadcrab*>(pEnt);
 
 		// Necessary to get it to eject properly (don't allow the NPC

@@ -360,7 +360,7 @@ void CNPC_CScanner::Gib( void )
 	// Add a random chance of spawning a battery...
 	if ( !HasSpawnFlags(SF_NPC_NO_WEAPON_DROP) && random->RandomFloat( 0.0f, 1.0f) < 0.3f )
 	{
-		CItem *pBattery = (CItem*)CreateEntityByName("item_battery");
+		CItem *pBattery = (CItem*)gEntList.CreateEntityByName("item_battery");
 		if ( pBattery )
 		{
 			pBattery->SetAbsOrigin( GetAbsOrigin() );
@@ -993,7 +993,7 @@ void CNPC_CScanner::InputEquipMine(inputdata_t &inputdata)
 
 	CBaseEntity *pEnt;
 
-	pEnt = CreateEntityByName( "combine_mine" );
+	pEnt = gEntList.CreateEntityByName( "combine_mine" );
 	bool bPlacedMine = false;
 
 	if( m_bIsClawScanner )
@@ -1590,7 +1590,7 @@ void CNPC_CScanner::SpotlightCreate(void)
 	trace_t tr;
 	AI_TraceLine ( GetAbsOrigin(), GetAbsOrigin() + m_vSpotlightDir * 2024, MASK_OPAQUE, this, COLLISION_GROUP_NONE, &tr );
 
-	m_hSpotlightTarget = (CSpotlightEnd*)CreateEntityByName( "spotlight_end" );
+	m_hSpotlightTarget = (CSpotlightEnd*)gEntList.CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
 	m_hSpotlightTarget->SetLocalOrigin( tr.endpos );
 	m_hSpotlightTarget->SetOwnerEntity( this );

@@ -3079,7 +3079,7 @@ m_hTarget( NULL )
 //-----------------------------------------------------------------------------
 CVortigauntChargeToken *CVortigauntChargeToken::CreateChargeToken( const Vector &vecOrigin, CBaseEntity *pOwner, CBaseEntity *pTarget )
 {
-	CVortigauntChargeToken *pToken = (CVortigauntChargeToken *) CreateEntityByName( "vort_charge_token" );
+	CVortigauntChargeToken *pToken = (CVortigauntChargeToken *)gEntList.CreateEntityByName( "vort_charge_token" );
 	if ( pToken == NULL )
 		return NULL;
 
@@ -3309,7 +3309,7 @@ CVortigauntEffectDispel::CVortigauntEffectDispel( void )
 //-----------------------------------------------------------------------------
 CVortigauntEffectDispel *CVortigauntEffectDispel::CreateEffectDispel( const Vector &vecOrigin, CBaseEntity *pOwner, CBaseEntity *pTarget )
 {
-	CVortigauntEffectDispel *pToken = (CVortigauntEffectDispel *) CreateEntityByName( "vort_effect_dispel" );
+	CVortigauntEffectDispel *pToken = (CVortigauntEffectDispel *)gEntList.CreateEntityByName( "vort_effect_dispel" );
 	if ( pToken == NULL )
 		return NULL;
 

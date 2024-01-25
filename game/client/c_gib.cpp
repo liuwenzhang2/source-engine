@@ -34,7 +34,7 @@ C_Gib::~C_Gib( void )
 //-----------------------------------------------------------------------------
 C_Gib *C_Gib::CreateClientsideGib( const char *pszModelName, Vector vecOrigin, Vector vecForceDir, AngularImpulse vecAngularImp, float flLifetime )
 {
-	C_Gib *pGib = (C_Gib*)CreateEntityByName( "C_Gib" );
+	C_Gib *pGib = (C_Gib*)cl_entitylist->CreateEntityByName( "C_Gib" );
 
 	if ( pGib == NULL )
 		return NULL;

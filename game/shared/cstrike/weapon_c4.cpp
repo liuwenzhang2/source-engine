@@ -245,7 +245,7 @@ END_PREDICTION_DATA()
 
 	CPlantedC4* CPlantedC4::ShootSatchelCharge( CCSPlayer *pevOwner, Vector vecStart, QAngle vecAngles )
 	{
-		CPlantedC4 *pGrenade = dynamic_cast< CPlantedC4* >( CreateEntityByName( "planted_c4" ) );
+		CPlantedC4 *pGrenade = dynamic_cast< CPlantedC4* >(gEntList.CreateEntityByName( "planted_c4" ) );
 		if ( pGrenade )
 		{
 			vecAngles[0] = 0;

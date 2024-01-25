@@ -471,7 +471,7 @@ void UTIL_PrecacheOther( const char *szClassname )
 	// Client should only do this once entities are coming down from server!!!
 	// Assert( engine->IsConnected() );
 
-	C_BaseEntity	*pEntity = CreateEntityByName( szClassname );
+	C_BaseEntity	*pEntity = cl_entitylist->CreateEntityByName( szClassname );
 	if ( !pEntity )
 	{
 		Warning( "NULL Ent in UTIL_PrecacheOther\n" );

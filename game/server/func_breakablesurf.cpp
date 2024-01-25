@@ -128,7 +128,7 @@ void CWindowPane::Die( void )
 //------------------------------------------------------------------------------
 CWindowPane* CWindowPane::CreateWindowPane( const Vector &vecOrigin, const QAngle &vecAngles )
 {
-	CWindowPane *pGlass = (CWindowPane*)CreateEntityByName( "window_pane" );
+	CWindowPane *pGlass = (CWindowPane*)gEntList.CreateEntityByName( "window_pane" );
 	if ( !pGlass )
 	{
 		Msg( "NULL Ent in CreateWindowPane!\n" );

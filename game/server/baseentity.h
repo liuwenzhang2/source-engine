@@ -377,7 +377,7 @@ public:
 public:
 	// If bServerOnly is true, then the ent never goes to the client. This is used
 	// by logical entities.
-	CBaseEntity( bool bServerOnly=false );
+	CBaseEntity();
 	virtual ~CBaseEntity();
 
 	// prediction system
@@ -744,7 +744,10 @@ public:
 
 	// returns the edict index the entity requires when used in save/restore (eg players, world)
 	// -1 means it doesn't require any special index
-	virtual int RequiredEdictIndex( void ) { return -1; } 
+	static int RequiredEdictIndexStatic( void ) { return -1; } 
+	virtual int RequiredEdictIndex(void) { return CBaseEntity::RequiredEdictIndexStatic(); }
+	static bool IsNetworkableStatic(void) { return true; }
+	virtual bool IsNetworkable(void) { return CBaseEntity::IsNetworkableStatic(); }
 
 	// interface function pts
 	void (CBaseEntity::*m_pfnMoveDone)(void);
@@ -2673,8 +2676,10 @@ class CServerOnlyEntity : public CBaseEntity
 {
 	DECLARE_CLASS( CServerOnlyEntity, CBaseEntity );
 public:
-	CServerOnlyEntity() : CBaseEntity( true ) {}
+	CServerOnlyEntity() : CBaseEntity() {}
 	
+	static bool IsNetworkableStatic(void) { return false; }
+	virtual bool IsNetworkable(void) { return CServerOnlyEntity::IsNetworkableStatic(); }
 	virtual int ObjectCaps( void ) { return (BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
 };
 

@@ -56,7 +56,7 @@ CRagdollBoogie *CRagdollBoogie::Create( CBaseEntity *pTarget, float flMagnitude,
 	if ( !pRagdoll )
 		return NULL;
 
-	CRagdollBoogie *pBoogie = (CRagdollBoogie *)CreateEntityByName( "env_ragdoll_boogie" );
+	CRagdollBoogie *pBoogie = (CRagdollBoogie *)gEntList.CreateEntityByName( "env_ragdoll_boogie" );
 	if ( pBoogie == NULL )
 		return NULL;
 

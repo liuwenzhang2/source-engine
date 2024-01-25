@@ -215,7 +215,7 @@ CEntityDissolve *CEntityDissolve::Create( CBaseEntity *pTarget, const char *pMat
 		return NULL;
 	}
 
-	CEntityDissolve *pDissolve = (CEntityDissolve *) CreateEntityByName( "env_entity_dissolver" );
+	CEntityDissolve *pDissolve = (CEntityDissolve *)gEntList.CreateEntityByName( "env_entity_dissolver" );
 
 	if ( pDissolve == NULL )
 		return NULL;

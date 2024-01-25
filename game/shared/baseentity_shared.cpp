@@ -2090,7 +2090,7 @@ bool CBaseEntity::HandleShotImpactingWater( const FireBulletsInfo_t &info,
 #ifdef GAME_DLL
 	if ( ShouldDrawUnderwaterBulletBubbles() )
 	{
-		CWaterBullet *pWaterBullet = ( CWaterBullet * )CreateEntityByName( "waterbullet" );
+		CWaterBullet *pWaterBullet = ( CWaterBullet * )gEntList.CreateEntityByName( "waterbullet" );
 		if ( pWaterBullet )
 		{
 			pWaterBullet->Spawn( waterTrace.endpos, info.m_vecDirShooting );

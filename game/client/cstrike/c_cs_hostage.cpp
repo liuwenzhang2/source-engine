@@ -261,7 +261,7 @@ C_BaseAnimating * C_CHostage::BecomeRagdollOnClient()
 	{
 		// We can't just play the low-violence anim ourselves, since we're about to be deleted by the server.
 		// So, let's create another entity that can play the anim and stick around.
-		C_LowViolenceHostageDeathModel *pLowViolenceModel = (C_LowViolenceHostageDeathModel*)CreateEntityByName( "C_LowViolenceHostageDeathModel" );
+		C_LowViolenceHostageDeathModel *pLowViolenceModel = (C_LowViolenceHostageDeathModel*)cl_entitylist->CreateEntityByName( "C_LowViolenceHostageDeathModel" );
 		m_createdLowViolenceRagdoll = pLowViolenceModel->SetupLowViolenceModel( this );
 		if ( m_createdLowViolenceRagdoll )
 		{

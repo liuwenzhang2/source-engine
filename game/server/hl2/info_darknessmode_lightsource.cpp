@@ -391,7 +391,7 @@ void CV_Debug_Darkness( IConVar *pConVar, const char *pOldString, float flOldVal
 void AddEntityToDarknessCheck( CBaseEntity *pEntity, float flLightRadius /*=DARKNESS_LIGHTSOURCE_SIZE*/ )
 {
 	// Create a light source, and attach it to the entity
-	CInfoDarknessLightSource *pLightSource = (CInfoDarknessLightSource *) CreateEntityByName( "info_darknessmode_lightsource" );
+	CInfoDarknessLightSource *pLightSource = (CInfoDarknessLightSource *)gEntList.CreateEntityByName( "info_darknessmode_lightsource" );
 	if ( pLightSource )	
 	{
 		pLightSource->SetLightRadius( flLightRadius );

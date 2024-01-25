@@ -193,7 +193,7 @@ void CNPC_FlockingFlyerFlock::SpawnFlock( void )
 
 	for ( iCount = 0 ; iCount < m_cFlockSize ; iCount++ )
 	{
-		pBoid = (CNPC_FlockingFlyer*)CreateEntityByName( "monster_flyer" );
+		pBoid = (CNPC_FlockingFlyer*)gEntList.CreateEntityByName( "monster_flyer" );
 		
 		if ( !pLeader ) 
 		{

@@ -247,7 +247,7 @@ bool CServerTools::SetKeyValue( CBaseEntity *pEntity, const char *szField, const
 //-----------------------------------------------------------------------------
 CBaseEntity *CServerTools::CreateEntityByName( const char *szClassName )
 {
-	return ::CreateEntityByName( szClassName );
+	return gEntList.CreateEntityByName( szClassName );
 }
 
 void CServerTools::DispatchSpawn( CBaseEntity *pEntity )

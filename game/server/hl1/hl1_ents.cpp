@@ -1147,7 +1147,7 @@ LINK_ENTITY_TO_CLASS( xen_ttrigger, CXenTreeTrigger );
 
 CXenTreeTrigger *CXenTreeTrigger::TriggerCreate( CBaseEntity *pOwner, const Vector &position )
 {
-	CXenTreeTrigger *pTrigger = (CXenTreeTrigger*)CreateEntityByName( "xen_ttrigger" );
+	CXenTreeTrigger *pTrigger = (CXenTreeTrigger*)gEntList.CreateEntityByName( "xen_ttrigger" );
 	pTrigger->SetAbsOrigin( position );
 
 	pTrigger->SetSolid( SOLID_BBOX );
@@ -1359,7 +1359,7 @@ public:
 
 CXenHull *CXenHull::CreateHull( CBaseEntity *source, const Vector &mins, const Vector &maxs, const Vector &offset )
 {
-	CXenHull *pHull = (CXenHull*)CreateEntityByName( "xen_hull" );
+	CXenHull *pHull = (CXenHull*)gEntList.CreateEntityByName( "xen_hull" );
 
 	UTIL_SetOrigin( pHull, source->GetAbsOrigin() + offset );
 	pHull->SetSolid( SOLID_BBOX );

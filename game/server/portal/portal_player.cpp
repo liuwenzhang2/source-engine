@@ -1607,7 +1607,7 @@ void CPortal_Player::CreateViewModel( int index /*=0*/ )
 	if ( GetViewModel( index ) )
 		return;
 
-	CPredictedViewModel *vm = ( CPredictedViewModel * )CreateEntityByName( "predicted_viewmodel" );
+	CPredictedViewModel *vm = ( CPredictedViewModel * )gEntList.CreateEntityByName( "predicted_viewmodel" );
 	if ( vm )
 	{
 		vm->SetAbsOrigin( GetAbsOrigin() );

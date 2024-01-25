@@ -20,11 +20,13 @@ public:
 	CEntityFactoryDictionary();
 
 	virtual void InstallFactory(IEntityFactory* pFactory);
-	virtual IHandleEntity* Create(const char* pClassName, int iForceEdictIndex, int iSerialNum);
+	virtual IHandleEntity* Create(IEntityList* pEntityList, const char* pClassName, int iForceEdictIndex, int iSerialNum);
 	virtual void Destroy(IHandleEntity* pEntity);
 	virtual const char* GetMapClassName(const char* pClassName);
 	virtual const char* GetDllClassName(const char* pClassName);
 	virtual size_t		GetEntitySize(const char* pClassName);
+	virtual int RequiredEdictIndex(const char* pClassName);
+	virtual bool IsNetworkable(const char* pClassName);
 	virtual const char* GetCannonicalName(const char* pClassName);
 	void ReportEntitySizes();
 
@@ -69,6 +71,12 @@ IEntityFactory* CEntityFactoryDictionary::FindFactory(const char* pClassName)
 void CEntityFactoryDictionary::InstallFactory(IEntityFactory* pFactory)
 {
 	//Assert(FindFactory(pClassName) == NULL);
+	if (pFactory->RequiredEdictIndex() != -1) {
+		int aaa = 0;
+	}
+	if (!pFactory->IsNetworkable()) {
+		int aaa = 0;
+	}
 	if (pFactory->GetMapClassName() && pFactory->GetMapClassName()[0]) {
 		IEntityFactory* pExistFactory = FindFactory(pFactory->GetMapClassName());
 		if (pExistFactory) {
@@ -117,7 +125,7 @@ void CEntityFactoryDictionary::InstallFactory(IEntityFactory* pFactory)
 //-----------------------------------------------------------------------------
 // Instantiate something using a factory
 //-----------------------------------------------------------------------------
-IHandleEntity* CEntityFactoryDictionary::Create(const char* pClassName, int iForceEdictIndex, int iSerialNum)
+IHandleEntity* CEntityFactoryDictionary::Create(IEntityList* pEntityList, const char* pClassName, int iForceEdictIndex, int iSerialNum)
 {
 	IEntityFactory* pFactory = FindFactory(pClassName);
 	if (!pFactory)
@@ -128,7 +136,7 @@ IHandleEntity* CEntityFactoryDictionary::Create(const char* pClassName, int iFor
 #if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
 	MEM_ALLOC_CREDIT_(m_Factories.GetElementName(m_Factories.Find(pClassName)));
 #endif
-	return pFactory->Create(iForceEdictIndex, iSerialNum);
+	return pFactory->Create(pEntityList, iForceEdictIndex, iSerialNum);
 }
 
 const char* CEntityFactoryDictionary::GetMapClassName(const char* pClassName) {
@@ -159,6 +167,26 @@ size_t		CEntityFactoryDictionary::GetEntitySize(const char* pClassName) {
 		return -1;
 	}
 	return pFactory->GetEntitySize();
+}
+
+int CEntityFactoryDictionary::RequiredEdictIndex(const char* pClassName) {
+	IEntityFactory* pFactory = FindFactory(pClassName);
+	if (!pFactory)
+	{
+		Warning("Attempted to create unknown entity type %s!\n", pClassName);
+		return -1;
+	}
+	return pFactory->RequiredEdictIndex();
+}
+
+bool CEntityFactoryDictionary::IsNetworkable(const char* pClassName) {
+	IEntityFactory* pFactory = FindFactory(pClassName);
+	if (!pFactory)
+	{
+		Warning("Attempted to create unknown entity type %s!\n", pClassName);
+		return -1;
+	}
+	return pFactory->IsNetworkable();
 }
 
 //-----------------------------------------------------------------------------

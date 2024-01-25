@@ -67,7 +67,7 @@ static const char *s_pRemoveContext = "RemoveContext";
 //-----------------------------------------------------------------------------
 CBaseEntity *CreateCombineBall( const Vector &origin, const Vector &velocity, float radius, float mass, float lifetime, CBaseEntity *pOwner )
 {
-	CPropCombineBall *pBall = static_cast<CPropCombineBall*>( CreateEntityByName( "prop_combine_ball" ) );
+	CPropCombineBall *pBall = static_cast<CPropCombineBall*>(gEntList.CreateEntityByName( "prop_combine_ball" ) );
 	pBall->SetRadius( radius );
 
 	pBall->SetAbsOrigin( origin );
@@ -1730,7 +1730,7 @@ CFuncCombineBallSpawner::CFuncCombineBallSpawner()
 //-----------------------------------------------------------------------------
 void CFuncCombineBallSpawner::SpawnBall()
 {
-	CPropCombineBall *pBall = static_cast<CPropCombineBall*>( CreateEntityByName( "prop_combine_ball" ) );
+	CPropCombineBall *pBall = static_cast<CPropCombineBall*>(gEntList.CreateEntityByName( "prop_combine_ball" ) );
 
 	float flRadius = m_flBallRadius;
 	pBall->SetRadius( flRadius );
@@ -2104,7 +2104,7 @@ void CPointCombineBallLauncher::InputLaunchBall ( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPointCombineBallLauncher::SpawnBall()
 {
-	CPropCombineBall *pBall = static_cast<CPropCombineBall*>( CreateEntityByName( "prop_combine_ball" ) );
+	CPropCombineBall *pBall = static_cast<CPropCombineBall*>(gEntList.CreateEntityByName( "prop_combine_ball" ) );
 
 	if ( pBall == NULL )
 		 return;
@@ -2142,7 +2142,7 @@ void CPointCombineBallLauncher::SpawnBall()
 
 	if( GetSpawnFlags() & SF_COMBINE_BALL_LAUNCHER_ATTACH_BULLSEYE )
 	{
-		CNPC_Bullseye *pBullseye = static_cast<CNPC_Bullseye*>( CreateEntityByName( "npc_bullseye" ) );
+		CNPC_Bullseye *pBullseye = static_cast<CNPC_Bullseye*>(gEntList.CreateEntityByName( "npc_bullseye" ) );
 
 		if( pBullseye )
 		{

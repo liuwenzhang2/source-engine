@@ -115,8 +115,10 @@ private:
 	bool m_bClearingEntities;
 	CUtlVector<T*> m_DeleteList;
 public:
-	void ReserveEdict(int index);
-	int AllocateFreeEdict(int index = -1);
+	void ReserveSlot(int index);
+	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
+	CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
+	void				DestroyEntity(IHandleEntity* pEntity);
 	IServerNetworkable* GetServerNetworkable( CBaseHandle hEnt ) const;
 	IServerNetworkable* GetServerNetworkable(int entnum) const;
 	IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const;
@@ -221,13 +223,23 @@ extern CGlobalEntityList<CBaseEntity> gEntList;
 //}
 
 template<class T>
-inline void CGlobalEntityList<T>::ReserveEdict(int index) {
-	BaseClass::ReserveEdict(index);
+inline void CGlobalEntityList<T>::ReserveSlot(int index) {
+	BaseClass::ReserveSlot(index);
 }
 
 template<class T>
-inline int CGlobalEntityList<T>::AllocateFreeEdict(int index) {
-	return BaseClass::AllocateFreeEdict(index);
+inline int CGlobalEntityList<T>::AllocateFreeSlot(bool bNetworkable, int index) {
+	return BaseClass::AllocateFreeSlot(bNetworkable, index);
+}
+
+template<class T>
+inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {
+	return (CBaseEntity*)EntityFactoryDictionary()->Create(this, className, iForceEdictIndex, iSerialNum);
+}
+
+template<class T>
+inline void	CGlobalEntityList<T>::DestroyEntity(IHandleEntity* pEntity) {
+	EntityFactoryDictionary()->Destroy(pEntity);
 }
 
 template<class T>
@@ -921,7 +933,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pSta
 
 	while ((pEntity = gEntList.FindEntityByClassname(pEntity, szName)) != NULL)
 	{
-		if (!pEntity->IsEFlagSet(EFL_SERVER_ONLY) && pEntity->entindex()==-1)
+		if (pEntity->IsNetworkable() && pEntity->entindex()==-1)
 			continue;
 
 		// check if the aabb intersects the search aabb.
@@ -1094,7 +1106,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityNearestFacing(const Vector& origin,
 		}
 
 		// Ignore logical entities
-		if (ent->IsEFlagSet(EFL_SERVER_ONLY) || ent->entindex()==-1)
+		if (!ent->IsNetworkable() || ent->entindex()==-1)
 			continue;
 
 		// Make vector to entity
@@ -1127,10 +1139,10 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 
 	// If it's a CBaseEntity, notify the listeners.
 	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
-	if (!pBaseEnt->IsEFlagSet(EFL_SERVER_ONLY)) {
+	if (pBaseEnt->IsNetworkable()) {
 		if (pBaseEnt->entindex() != -1)
 			m_iNumEdicts++;
-		if (BaseClass::IsReservedEdicts(pBaseEnt->entindex())) {
+		if (BaseClass::IsReservedSlot(pBaseEnt->entindex())) {
 			m_iNumReservedEdicts++;
 		}
 		if (pBaseEnt->entindex() > m_iHighestEdicts) {
@@ -1161,10 +1173,10 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 #endif
 
 	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
-	if (!pBaseEnt->IsEFlagSet(EFL_SERVER_ONLY)) {
+	if (pBaseEnt->IsNetworkable()) {
 		if (pBaseEnt->entindex() != -1)
 			m_iNumEdicts--;
-		if (BaseClass::IsReservedEdicts(pBaseEnt->entindex())) {
+		if (BaseClass::IsReservedSlot(pBaseEnt->entindex())) {
 			m_iNumReservedEdicts--;
 		}
 	}

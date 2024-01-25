@@ -74,7 +74,7 @@ LINK_ENTITY_TO_CLASS( grenade_homer, CGrenadeHomer );
 //------------------------------------------------------------------------------
 CGrenadeHomer* CGrenadeHomer::CreateGrenadeHomer( string_t sModelName, string_t sFlySound, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pentOwner )
 {
-	CGrenadeHomer *pGrenade = (CGrenadeHomer*)CreateEntityByName( "grenade_homer" );
+	CGrenadeHomer *pGrenade = (CGrenadeHomer*)gEntList.CreateEntityByName( "grenade_homer" );
 	if ( !pGrenade )
 	{
 		Warning( "NULL Ent in Create!\n" );

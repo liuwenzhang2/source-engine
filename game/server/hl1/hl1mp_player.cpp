@@ -611,7 +611,7 @@ void CHL1MP_Player::CreateRagdollEntity( void )
     if ( !pRagdoll )
     {
         // Create a new one
-        pRagdoll = dynamic_cast< CHL1MPRagdoll* >( CreateEntityByName( "hl1mp_ragdoll" ) );
+        pRagdoll = dynamic_cast< CHL1MPRagdoll* >(gEntList.CreateEntityByName( "hl1mp_ragdoll" ) );
     }
 
     if ( pRagdoll )

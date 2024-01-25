@@ -261,7 +261,7 @@ void CFlare::StartBurnSound( void )
 //-----------------------------------------------------------------------------
 CFlare *CFlare::Create( Vector vecOrigin, QAngle vecAngles, CBaseEntity *pOwner, float lifetime )
 {
-	CFlare *pFlare = (CFlare *) CreateEntityByName( "env_flare" );
+	CFlare *pFlare = (CFlare *)gEntList.CreateEntityByName( "env_flare" );
 
 	if ( pFlare == NULL )
 		return NULL;

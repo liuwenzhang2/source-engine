@@ -151,7 +151,7 @@ void CAI_Spotlight::CreateSpotlightEntities( void )
 	Vector vecEndPoint;
 	ComputeEndpoint( vecStartPoint, &vecEndPoint );
 
-	m_hSpotlightTarget = (CSpotlightEnd*)CreateEntityByName( "spotlight_end" );
+	m_hSpotlightTarget = (CSpotlightEnd*)gEntList.CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
 	m_hSpotlightTarget->SetAbsOrigin( vecEndPoint );
 	m_hSpotlightTarget->SetOwnerEntity( GetOuter() );

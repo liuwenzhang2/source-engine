@@ -86,11 +86,11 @@ CBaseEntity* ConvertToSimpleProp ( CBaseEntity* pEnt )
 	const model_t *model = modelinfo->GetModel( modelindex );
 	if ( model && modelinfo->GetModelType(model) == mod_brush )
 	{
-		pRetVal = CreateEntityByName( "simple_physics_brush" );
+		pRetVal = gEntList.CreateEntityByName( "simple_physics_brush" );
 	}
 	else
 	{
-		pRetVal = CreateEntityByName( "simple_physics_prop" );
+		pRetVal = gEntList.CreateEntityByName( "simple_physics_prop" );
 	}
 
 	pRetVal->KeyValue( "model", STRING(pEnt->GetModelName()) );

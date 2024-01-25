@@ -419,7 +419,7 @@ void CNPCMaker::MakeNPC( void )
 	if (!CanMakeNPC())
 		return;
 
-	CAI_BaseNPC	*pent = (CAI_BaseNPC*)CreateEntityByName( STRING(m_iszNPCClassname) );
+	CAI_BaseNPC	*pent = (CAI_BaseNPC*)gEntList.CreateEntityByName( STRING(m_iszNPCClassname) );
 
 	if ( !pent )
 	{

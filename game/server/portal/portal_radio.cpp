@@ -563,7 +563,7 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 
 	Assert( vSpawnPos != vec3_origin );
 
-	CPortal_Dinosaur *pDinosaur = (CPortal_Dinosaur*)CreateEntityByName( "updateitem2" );
+	CPortal_Dinosaur *pDinosaur = (CPortal_Dinosaur*)gEntList.CreateEntityByName( "updateitem2" );
 	Assert ( pDinosaur );
 	if ( pDinosaur )
 	{
@@ -577,7 +577,7 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 
 CDinosaurSignal *CSpawnDinosaurHack::SpawnSignal( radiolocs& loc )
 {
-	CDinosaurSignal *pSignal = (CDinosaurSignal*)CreateEntityByName( "updateitem1" );
+	CDinosaurSignal *pSignal = (CDinosaurSignal*)gEntList.CreateEntityByName( "updateitem1" );
 	Assert ( pSignal );
 	if ( pSignal )
 	{
@@ -605,7 +605,7 @@ void CSpawnDinosaurHack::ApplyMapSpecificHacks()
 {
 	if ( V_strcmp( STRING(gpGlobals->mapname), "testchmb_a_02" ) == 0 )
 	{
-		CBaseEntity *pFilter = CreateEntityByName( "filter_activator_name" );
+		CBaseEntity *pFilter = gEntList.CreateEntityByName( "filter_activator_name" );
 		Assert( pFilter );
 		if ( pFilter )
 		{

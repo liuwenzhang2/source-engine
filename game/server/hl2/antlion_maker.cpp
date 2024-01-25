@@ -318,7 +318,7 @@ void CAntlionTemplateMaker::ActivateSpore( const char* sporename, Vector vOrigin
 		return;
 	}
 
-	CBaseEntity *pEnt = CreateEntityByName( "env_sporeexplosion" );
+	CBaseEntity *pEnt = gEntList.CreateEntityByName( "env_sporeexplosion" );
 
 	if ( pEnt )
 	{
@@ -549,7 +549,7 @@ void CAntlionTemplateMaker::CreateProxyTarget( const Vector &position )
 	// Create if we don't have one
 	if ( m_hProxyTarget == NULL )
 	{
-		m_hProxyTarget = CreateEntityByName( "info_target" );
+		m_hProxyTarget = gEntList.CreateEntityByName( "info_target" );
 	}
 
 	// Update if we do

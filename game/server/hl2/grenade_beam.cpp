@@ -85,7 +85,7 @@ void CGrenadeBeamChaser::ChaserThink( void )
 //------------------------------------------------------------------------------
 CGrenadeBeamChaser* CGrenadeBeamChaser::ChaserCreate( CGrenadeBeam *pTarget )
 {
-	CGrenadeBeamChaser *pChaser = (CGrenadeBeamChaser *)CreateEntityByName( "grenade_beam_chaser" );
+	CGrenadeBeamChaser *pChaser = (CGrenadeBeamChaser *)gEntList.CreateEntityByName( "grenade_beam_chaser" );
 	pChaser->SetLocalOrigin( pTarget->GetLocalOrigin() );
 	pChaser->m_pTarget		= pTarget;
 	pChaser->Spawn();
@@ -150,7 +150,7 @@ void CGrenadeBeam::Spawn( void )
 //------------------------------------------------------------------------------
 CGrenadeBeam* CGrenadeBeam::Create( CBaseEntity* pOwner, const Vector &vStart)
 {
-	CGrenadeBeam *pEnergy = (CGrenadeBeam *)CreateEntityByName( "grenade_beam" );
+	CGrenadeBeam *pEnergy = (CGrenadeBeam *)gEntList.CreateEntityByName( "grenade_beam" );
 	pEnergy->Spawn();
 	pEnergy->SetOwnerEntity( pOwner );
 	pEnergy->SetRenderColor( 255, 0, 0, 0 );

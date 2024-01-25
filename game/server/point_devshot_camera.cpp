@@ -231,7 +231,7 @@ public:
 					const char *pCameraName = pkvCamera->GetName();
 
 					// Make a camera, and move it to the position specified
-					CPointDevShotCamera	*pCamera = (CPointDevShotCamera*)CreateEntityByName( "point_devshot_camera" );
+					CPointDevShotCamera	*pCamera = (CPointDevShotCamera*)gEntList.CreateEntityByName( "point_devshot_camera" );
 					Assert( pCamera );
 					pCamera->KeyValue( "cameraname", pCameraName );
 					pCamera->KeyValue( "origin", pkvCamera->GetString( "origin", "0 0 0" ) );

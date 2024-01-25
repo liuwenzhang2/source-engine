@@ -86,7 +86,7 @@ void CAI_DynamicLinkController::GenerateLinksFromVolume()
 						{
 							Assert( IsBoxIntersectingRay( vAbsMins, vAbsMaxs, originOther, nodeOrigin - originOther ) );
 
-							CAI_DynamicLink *pLink = (CAI_DynamicLink *)CreateEntityByName( "info_node_link" );
+							CAI_DynamicLink *pLink = (CAI_DynamicLink *)gEntList.CreateEntityByName( "info_node_link" );
 							pLink->m_nSrcID = i;
 							pLink->m_nDestID = iLinkDest;
 							pLink->m_nSrcEditID = g_pAINetworkManager->GetEditOps()->GetWCIdFromNodeId( pLink->m_nSrcID );

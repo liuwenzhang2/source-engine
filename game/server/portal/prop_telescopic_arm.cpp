@@ -151,7 +151,7 @@ void CPropTelescopicArm::Spawn( void )
 
 	CPoseController *pPoseController;
 
-	pPoseController = static_cast<CPoseController*>( CreateEntityByName( "point_posecontroller" ) );
+	pPoseController = static_cast<CPoseController*>(gEntList.CreateEntityByName( "point_posecontroller" ) );
 	DispatchSpawn( pPoseController );
 	if ( pPoseController )
 	{
@@ -161,7 +161,7 @@ void CPropTelescopicArm::Spawn( void )
 		m_hRotXPoseController = pPoseController;
 	}
 
-	pPoseController = static_cast<CPoseController*>( CreateEntityByName( "point_posecontroller" ) );
+	pPoseController = static_cast<CPoseController*>(gEntList.CreateEntityByName( "point_posecontroller" ) );
 	DispatchSpawn( pPoseController );
 	if ( pPoseController )
 	{
@@ -171,7 +171,7 @@ void CPropTelescopicArm::Spawn( void )
 		m_hRotYPoseController = pPoseController;
 	}
 
-	pPoseController = static_cast<CPoseController*>( CreateEntityByName( "point_posecontroller" ) );
+	pPoseController = static_cast<CPoseController*>(gEntList.CreateEntityByName( "point_posecontroller" ) );
 	DispatchSpawn( pPoseController );
 	if ( pPoseController )
 	{

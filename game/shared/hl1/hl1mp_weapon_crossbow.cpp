@@ -89,7 +89,7 @@ END_DATADESC()
 CCrossbowBolt *CCrossbowBolt::BoltCreate( const Vector &vecOrigin, const QAngle &angAngles, CBasePlayer *pentOwner )
 {
 	// Create a new entity with CCrossbowBolt private data
-	CCrossbowBolt *pBolt = (CCrossbowBolt *)CreateEntityByName( "crossbow_bolt" );
+	CCrossbowBolt *pBolt = (CCrossbowBolt *)gEntList.CreateEntityByName( "crossbow_bolt" );
 	UTIL_SetOrigin( pBolt, vecOrigin );
 	pBolt->SetAbsAngles( angAngles );
 	pBolt->Spawn();

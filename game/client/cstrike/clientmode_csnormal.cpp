@@ -819,7 +819,7 @@ void UpdateClassImageEntity(
 		if (pPlayerModel)
 			DestroyEntity(pPlayerModel);// ->Remove();
 
-		pPlayerModel = (C_BaseAnimatingOverlay*)CreateEntityByName( "C_BaseAnimatingOverlay" );
+		pPlayerModel = (C_BaseAnimatingOverlay*)cl_entitylist->CreateEntityByName( "C_BaseAnimatingOverlay" );
 		pPlayerModel->InitializeAsClientEntity( pModelName, RENDER_GROUP_OPAQUE_ENTITY );
 		pPlayerModel->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 
@@ -843,7 +843,7 @@ void UpdateClassImageEntity(
 		if (pWeaponModel)
 			DestroyEntity(pWeaponModel);// ->Remove();
 
-		pWeaponModel = (C_BaseAnimating*)CreateEntityByName( "C_BaseAnimating" );
+		pWeaponModel = (C_BaseAnimating*)cl_entitylist->CreateEntityByName( "C_BaseAnimating" );
 		pWeaponModel->InitializeAsClientEntity( pWeaponName, RENDER_GROUP_OPAQUE_ENTITY );
 		pWeaponModel->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 		pWeaponModel->FollowEntity( pPlayerModel ); // attach to player model

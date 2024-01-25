@@ -448,7 +448,7 @@ CBaseEntity *NPC_Rollermine_DropFromPoint( const Vector &originStart, CBaseEntit
 	}
 	else
 	{
-		pMine = (CNPC_RollerMine*)CreateEntityByName("npc_rollermine");
+		pMine = (CNPC_RollerMine*)gEntList.CreateEntityByName("npc_rollermine");
 	}
 
 	if ( pMine )

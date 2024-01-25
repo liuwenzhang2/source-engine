@@ -87,7 +87,7 @@ int CRotorWashEmitter::UpdateTransmitState( void )
 //-----------------------------------------------------------------------------
 CBaseEntity *CreateRotorWashEmitter( const Vector &localOrigin, const QAngle &localAngles, CBaseEntity *pOwner, float flAltitude )
 {
-	CRotorWashEmitter *pEmitter = (CRotorWashEmitter *) CreateEntityByName( "env_rotorwash_emitter" );
+	CRotorWashEmitter *pEmitter = (CRotorWashEmitter *)gEntList.CreateEntityByName( "env_rotorwash_emitter" );
 
 	if ( pEmitter == NULL )
 		return NULL;

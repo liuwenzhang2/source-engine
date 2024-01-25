@@ -544,10 +544,16 @@ const Vector &C_Beam::GetAbsEndPos( void ) const
 CBeam *CBeam::BeamCreate( const char *pSpriteName, float width )
 {
 	// Create a new entity with CBeam private data
-	CBeam *pBeam  = (CBeam*)CreateEntityByName( "beam" );
-	pBeam->BeamInit( pSpriteName, width );
-
+#ifdef GAME_DLL
+	CBeam* pBeam = (CBeam*)gEntList.CreateEntityByName("beam");
+	pBeam->BeamInit(pSpriteName, width);
 	return pBeam;
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+	CBeam* pBeam = (CBeam*)cl_entitylist->CreateEntityByName("beam");
+	pBeam->BeamInit(pSpriteName, width);
+	return pBeam;
+#endif // CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------

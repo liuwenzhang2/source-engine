@@ -29,7 +29,7 @@ CON_COMMAND_F( simple_bot_add, "Add a simple bot.", FCVAR_CHEAT )
 		return;
 	}
 
-	CSimpleBot *bot = static_cast< CSimpleBot * >( CreateEntityByName( "simple_bot" ) );
+	CSimpleBot *bot = static_cast< CSimpleBot * >(gEntList.CreateEntityByName( "simple_bot" ) );
 	if ( bot )
 	{
 		Vector forward = player->GetAbsOrigin() - result.endpos;

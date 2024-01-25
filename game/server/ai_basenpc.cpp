@@ -5880,7 +5880,7 @@ void CAI_BaseNPC::CheckTarget( CBaseEntity *pTarget )
 CAI_BaseNPC *CAI_BaseNPC::CreateCustomTarget( const Vector &vecOrigin, float duration )
 {
 #ifdef HL2_DLL
-	CNPC_Bullseye *pTarget = (CNPC_Bullseye*)CreateEntityByName( "npc_bullseye" );
+	CNPC_Bullseye *pTarget = (CNPC_Bullseye*)gEntList.CreateEntityByName( "npc_bullseye" );
 
 	ASSERT( pTarget != NULL );
 
@@ -7228,7 +7228,7 @@ void CAI_BaseNPC::AddRelationship( const char *pszRelationship, CBaseEntity *pAc
 			else
 			{
 				// HACKHACK:
-				CBaseEntity *pEntity = CanCreateEntityClass( entityString ) ? CreateEntityByName( entityString ) : NULL;
+				CBaseEntity *pEntity = CanCreateEntityClass( entityString ) ? gEntList.CreateEntityByName( entityString ) : NULL;
 				if (pEntity)
 				{
 					AddClassRelationship( pEntity->Classify(), disposition, priority );
@@ -13233,7 +13233,7 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 	pInteraction->flNextAttemptTime = gpGlobals->curtime + pInteraction->flDelay + RandomFloat(-2,2);
 
 	// Spawn a scripted sequence for this NPC to play the interaction anim
-   	CAI_ScriptedSequence *pMySequence = (CAI_ScriptedSequence*)CreateEntityByName( "scripted_sequence" );
+   	CAI_ScriptedSequence *pMySequence = (CAI_ScriptedSequence*)gEntList.CreateEntityByName( "scripted_sequence" );
 	pMySequence->KeyValue( "m_iszEntry", pszEntrySequence );
 	pMySequence->KeyValue( "m_iszPlay", pszSequence );
 	pMySequence->KeyValue( "m_iszPostIdle", pszExitSequence );
@@ -13262,7 +13262,7 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 	CAI_ScriptedSequence *pTheirSequence = NULL;
 	if ( pOtherNPC )
 	{
-		pTheirSequence = (CAI_ScriptedSequence*)CreateEntityByName( "scripted_sequence" );
+		pTheirSequence = (CAI_ScriptedSequence*)gEntList.CreateEntityByName( "scripted_sequence" );
 		pTheirSequence->KeyValue( "m_iszEntry", pszEntrySequence );
 		pTheirSequence->KeyValue( "m_iszPlay", pszSequence );
 		pTheirSequence->KeyValue( "m_iszPostIdle", pszExitSequence );

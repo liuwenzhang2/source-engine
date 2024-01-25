@@ -310,7 +310,7 @@ CGrenadePathfollower::~CGrenadePathfollower(void)
 //------------------------------------------------------------------------------
 CGrenadePathfollower* CGrenadePathfollower::CreateGrenadePathfollower( string_t sModelName, string_t sFlySound, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pentOwner )
 {
-	CGrenadePathfollower *pGrenade = (CGrenadePathfollower*)CreateEntityByName( "grenade_pathfollower" );
+	CGrenadePathfollower *pGrenade = (CGrenadePathfollower*)gEntList.CreateEntityByName( "grenade_pathfollower" );
 	if ( !pGrenade )
 	{
 		Warning( "NULL Ent in CGrenadePathfollower!\n" );

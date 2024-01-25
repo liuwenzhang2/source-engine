@@ -1098,7 +1098,7 @@ void CNPC_AttackHelicopter::Spawn( void )
 	SetActivity( ACT_IDLE );
 
 	int nBombAttachment = LookupAttachment("bomb");
-	m_hSensor = static_cast<CBombDropSensor*>(CreateEntityByName( "npc_helicoptersensor" ));
+	m_hSensor = static_cast<CBombDropSensor*>(gEntList.CreateEntityByName( "npc_helicoptersensor" ));
 	m_hSensor->Spawn();
 	m_hSensor->SetParent( this, nBombAttachment );
 	m_hSensor->SetLocalOrigin( vec3_origin );
@@ -2771,7 +2771,7 @@ bool CNPC_AttackHelicopter::IsBombDropFair( const Vector &vecBombStartPos, const
 CGrenadeHelicopter *CNPC_AttackHelicopter::SpawnBombEntity( const Vector &vecPos, const Vector &vecVelocity )
 {
 	// Create the grenade and set it up
-	CGrenadeHelicopter *pGrenade = static_cast<CGrenadeHelicopter*>(CreateEntityByName( "grenade_helicopter" ));
+	CGrenadeHelicopter *pGrenade = static_cast<CGrenadeHelicopter*>(gEntList.CreateEntityByName( "grenade_helicopter" ));
 	pGrenade->SetAbsOrigin( vecPos );
 	pGrenade->SetOwnerEntity( this );
 	pGrenade->SetThrower( this );
@@ -3341,7 +3341,7 @@ void CNPC_AttackHelicopter::DestroySmokeTrails()
 void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, const QAngle &vecChunkAngles, const char *pszChunkName, bool bSmall )
 {
 	// Drop a flaming, smoking chunk.
-	CGib *pChunk = (CGib*)CreateEntityByName( "gib" );
+	CGib *pChunk = (CGib*)gEntList.CreateEntityByName( "gib" );
 	pChunk->Spawn( pszChunkName );
 	pChunk->SetBloodColor( DONT_BLEED );
 
@@ -3772,7 +3772,7 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 void CNPC_AttackHelicopter::CreateChopperHusk()
 {
 	// We're embedded into the ground
-	CBaseEntity *pCorpse = CreateEntityByName( "prop_physics" );
+	CBaseEntity *pCorpse = gEntList.CreateEntityByName( "prop_physics" );
 	pCorpse->SetAbsOrigin( GetAbsOrigin() );
 	pCorpse->SetAbsAngles( GetAbsAngles() );
 	pCorpse->SetModel( CHOPPER_MODEL_CORPSE_NAME );
@@ -5605,7 +5605,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 CBaseEntity *CreateHelicopterAvoidanceSphere( CBaseEntity *pParent, int nAttachment, float flRadius, bool bAvoidBelow )
 {
-	CAvoidSphere *pSphere = static_cast<CAvoidSphere*>(CreateEntityByName( "npc_heli_avoidsphere" ));
+	CAvoidSphere *pSphere = static_cast<CAvoidSphere*>(gEntList.CreateEntityByName( "npc_heli_avoidsphere" ));
 	pSphere->Init( flRadius );
 	if ( bAvoidBelow )
 	{
@@ -6051,7 +6051,7 @@ void CHelicopterChunk::CollisionCallback( CHelicopterChunk *pCaller )
 CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos, const QAngle &vecAngles, const Vector &vecVelocity, const char *pszModelName, int chunkID )
 {
 	// Drop a flaming, smoking chunk.
-	CHelicopterChunk *pChunk = (CHelicopterChunk*)CreateEntityByName( "helicopter_chunk" );
+	CHelicopterChunk *pChunk = (CHelicopterChunk*)gEntList.CreateEntityByName( "helicopter_chunk" );
 	
 	if ( pChunk == NULL )
 		return NULL;

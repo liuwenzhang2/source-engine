@@ -155,7 +155,7 @@ END_DATADESC()
 LINK_ENTITY_TO_CLASS( garg_stomp, CStomp );
 CStomp *CStomp::StompCreate( Vector &origin, Vector &end, float speed, CBaseEntity* pOwner )
 {
-	CStomp *pStomp = (CStomp*)CreateEntityByName( "garg_stomp" );
+	CStomp *pStomp = (CStomp*)gEntList.CreateEntityByName( "garg_stomp" );
 
 	pStomp->SetAbsOrigin( origin );
 	Vector dir = (end - origin);
@@ -628,7 +628,7 @@ void CNPC_Gargantua::RunTask( const Task_t *pTask )
 
 			for ( i = 0; i < 10; i++ )
 			{
-				CGib *pGib = (CGib*)CreateEntityByName( "gib" );
+				CGib *pGib = (CGib*)gEntList.CreateEntityByName( "gib" );
 
 				pGib->Spawn( GARG_GIB_MODEL);
 				

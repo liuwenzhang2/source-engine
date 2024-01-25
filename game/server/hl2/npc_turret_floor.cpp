@@ -2132,7 +2132,7 @@ void CNPC_FloorTurret::InputSelfDestruct( inputdata_t &inputdata )
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Create the dust effect in place
-	m_hFizzleEffect = (CParticleSystem *) CreateEntityByName( "info_particle_system" );
+	m_hFizzleEffect = (CParticleSystem *)gEntList.CreateEntityByName( "info_particle_system" );
 	if ( m_hFizzleEffect != NULL )
 	{
 		Vector vecUp;

@@ -499,7 +499,7 @@ CNPC_CombineGunship::CNPC_CombineGunship( void )
 
 void CNPC_CombineGunship::CreateBellyBlastEnergyCore( void )
 {
-	CCitadelEnergyCore *pCore = static_cast<CCitadelEnergyCore*>( CreateEntityByName( "env_citadel_energy_core" ) );
+	CCitadelEnergyCore *pCore = static_cast<CCitadelEnergyCore*>(gEntList.CreateEntityByName( "env_citadel_energy_core" ) );
 
 	if ( pCore == NULL )
 		return;

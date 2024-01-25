@@ -370,9 +370,9 @@ void UTIL_Remove( IServerNetworkable *oldObj )
 	if ( pBaseEnt )
 	{
 #ifdef PORTAL //make sure entities are in the primary physics environment for the portal mod, this code should be safe even if the entity is in neither extra environment
-		bool bServerOnly = !pBaseEnt->IsEFlagSet(EFL_SERVER_ONLY);
-		int nEntIndex = bServerOnly ? oldObj->entindex() : -1;
-		if (!bServerOnly && nEntIndex != -1) {
+		bool bNetworkable = pBaseEnt->IsNetworkable();
+		int nEntIndex = bNetworkable ? oldObj->entindex() : -1;
+		if (bNetworkable && nEntIndex != -1) {
 			CPortalSimulator::Pre_UTIL_Remove(pBaseEnt);
 		}
 #endif
@@ -385,7 +385,7 @@ void UTIL_Remove( IServerNetworkable *oldObj )
 		pBaseEnt->SetName( NULL_STRING );
 
 #ifdef PORTAL
-		if (!bServerOnly && nEntIndex != -1) {
+		if (bNetworkable && nEntIndex != -1) {
 			CPortalSimulator::Post_UTIL_Remove(pBaseEnt);
 		}
 #endif
@@ -429,9 +429,9 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 	}
 
 #ifdef PORTAL //make sure entities are in the primary physics environment for the portal mod, this code should be safe even if the entity is in neither extra environment
-	bool bServerOnly = !oldObj->IsEFlagSet(EFL_SERVER_ONLY);
-	int nEntIndex = bServerOnly ? oldObj->entindex() : -1;
-	if (!bServerOnly && nEntIndex != -1) {
+	bool bNetworkable = oldObj->IsNetworkable();
+	int nEntIndex = bNetworkable ? oldObj->entindex() : -1;
+	if (bNetworkable && nEntIndex != -1) {
 		CPortalSimulator::Pre_UTIL_Remove(oldObj);
 	}
 #endif
@@ -449,7 +449,7 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 	g_bDisableEhandleAccess = false;
 
 #ifdef PORTAL
-	if (!bServerOnly && nEntIndex != -1) {
+	if (bNetworkable && nEntIndex != -1) {
 		CPortalSimulator::Post_UTIL_Remove(oldObj);
 	}
 #endif
@@ -1657,7 +1657,7 @@ void UTIL_PrecacheOther( const char *szClassname, const char *modelName )
 		return;
 #endif
 
-	CBaseEntity	*pEntity = CreateEntityByName( szClassname );
+	CBaseEntity	*pEntity = gEntList.CreateEntityByName( szClassname );
 	if ( !pEntity )
 	{
 		Warning( "NULL Ent in UTIL_PrecacheOther\n" );
@@ -2264,7 +2264,7 @@ CBaseEntity *UTIL_EntitiesInPVS( CBaseEntity *pPVSEntity, CBaseEntity *pStarting
 	for ( CBaseEntity *pEntity = gEntList.NextEnt(pStartingEntity); pEntity; pEntity = gEntList.NextEnt(pEntity) )
 	{
 		// Only return attached ents.
-		if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex()==-1 )
+		if (!pEntity->IsNetworkable() || pEntity->entindex()==-1 )
 			continue;
 
 		CBaseEntity *pParent = pEntity->GetRootMoveParent();
@@ -2629,7 +2629,7 @@ bool UTIL_LoadAndSpawnEntitiesFromScript( CUtlVector <CBaseEntity*> &entities, c
 			}
 
 			// Spawn the entity
-			CBaseEntity *pNode = CreateEntityByName( pNodeName );
+			CBaseEntity *pNode = gEntList.CreateEntityByName( pNodeName );
 
 			if ( pNode )
 			{

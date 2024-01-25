@@ -263,7 +263,7 @@ CSceneManager *GetSceneManager()
 	static CHandle< CSceneManager >	s_SceneManager;
 	if ( s_SceneManager == NULL )
 	{
-		s_SceneManager = ( CSceneManager * )CreateEntityByName( "scene_manager" );
+		s_SceneManager = ( CSceneManager * )gEntList.CreateEntityByName( "scene_manager" );
 		Assert( s_SceneManager );
 		if ( s_SceneManager )
 		{

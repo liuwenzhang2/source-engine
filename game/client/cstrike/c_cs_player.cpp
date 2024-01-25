@@ -1063,7 +1063,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 	if ( iAttachment <= 0 )
 		return;
 
-	C_BreakableProp *pEnt = (C_BreakableProp*)CreateEntityByName("C_BreakableProp");
+	C_BreakableProp *pEnt = (C_BreakableProp*)cl_entitylist->CreateEntityByName("C_BreakableProp");
 
 	int addonType = (1<<i);
 	if ( addonType == ADDON_PISTOL || addonType == ADDON_PRIMARY )

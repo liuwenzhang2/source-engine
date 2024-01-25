@@ -253,7 +253,7 @@ static CDODViewVectors g_DODViewVectors(
 				if ( CanLoadEntityFromEntText( pNodeName ) )
 				{
 					// Spawn the entity
-					CBaseEntity *pNode = CreateEntityByName( pNodeName );
+					CBaseEntity *pNode = gEntList.CreateEntityByName( pNodeName );
 					if ( pNode )
 					{
 						ParseEntKVBlock( pNode, pkvNode );
@@ -2426,7 +2426,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		int i;
 		for ( i = 0; i < 2; i++ )	// Unassigned and Spectators
 		{
-			CTeam *pTeam = static_cast<CTeam*>(CreateEntityByName( "dod_team_manager" ));
+			CTeam *pTeam = static_cast<CTeam*>(gEntList.CreateEntityByName( "dod_team_manager" ));
 			pTeam->Init( sTeamNames[i], i );
 
 			g_Teams.AddToTail( pTeam );
@@ -2435,12 +2435,12 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 		// clear the player class data
 		ResetFilePlayerClassInfoDatabase();
 
-		CTeam *pAllies = static_cast<CTeam*>(CreateEntityByName( "dod_team_allies" ));
+		CTeam *pAllies = static_cast<CTeam*>(gEntList.CreateEntityByName( "dod_team_allies" ));
 		Assert( pAllies );
 		pAllies->Init( sTeamNames[TEAM_ALLIES], TEAM_ALLIES );
 		g_Teams.AddToTail( pAllies );
 
-		CTeam *pAxis = static_cast<CTeam*>(CreateEntityByName( "dod_team_axis" ));
+		CTeam *pAxis = static_cast<CTeam*>(gEntList.CreateEntityByName( "dod_team_axis" ));
 		Assert( pAxis );
 		pAxis->Init( sTeamNames[TEAM_AXIS], TEAM_AXIS );
 		g_Teams.AddToTail( pAxis );
@@ -2588,7 +2588,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 					// Timer starts paused
 					if ( !m_pRoundTimer.Get() )
 					{
-						m_pRoundTimer = ( CDODRoundTimer *) CreateEntityByName( "dod_round_timer" );
+						m_pRoundTimer = ( CDODRoundTimer *)gEntList.CreateEntityByName( "dod_round_timer" );
 					}
 					
 					Assert( m_pRoundTimer );
@@ -3118,13 +3118,13 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 					{
 						// Doh! The entity was delete and its slot was reused.
 						// Just use any old edict slot. This case sucks because we lose the baseline.
-						return CreateEntityByName( pClassname );
+						return gEntList.CreateEntityByName( pClassname );
 					}
 					else
 					{
 						// Cool, the slot where this entity was is free again (most likely, the entity was 
 						// freed above). Now create an entity with this specific index.
-						return CreateEntityByName( pClassname, ref.m_iEdict );
+						return gEntList.CreateEntityByName( pClassname, ref.m_iEdict );
 					}
 				}
 			}

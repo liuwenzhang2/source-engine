@@ -46,7 +46,7 @@ public:
 	static CHL2MP_Player *CreatePlayer( const char *className, int ed )
 	{
 		//CHL2MP_Player::s_PlayerEdict = ed;
-		return (CHL2MP_Player*)CreateEntityByName( className, ed );
+		return (CHL2MP_Player*)gEntList.CreateEntityByName( className, ed );
 	}
 
 	DECLARE_SERVERCLASS();

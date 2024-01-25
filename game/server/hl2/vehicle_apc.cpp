@@ -355,7 +355,7 @@ void CPropAPC::ExplodeAndThrowChunk( const Vector &vecExplosionPos )
 	UTIL_ScreenShake( vecExplosionPos, 25.0, 150.0, 1.0, 750.0f, SHAKE_START );
 
 	// Drop a flaming, smoking chunk.
-	CGib *pChunk = (CGib*)CreateEntityByName( "gib" );
+	CGib *pChunk = (CGib*)gEntList.CreateEntityByName( "gib" );
 	pChunk->Spawn( "models/gibs/hgibs.mdl" );
 	pChunk->SetBloodColor( DONT_BLEED );
 
@@ -443,7 +443,7 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 	for ( int i = 0; i < nGibs; i++)
 	{
 		// Throw a flaming, smoking chunk.
-		CGib *pChunk = (CGib*)CreateEntityByName( "gib" );
+		CGib *pChunk = (CGib*)gEntList.CreateEntityByName( "gib" );
 		pChunk->Spawn( "models/gibs/hgibs.mdl" );
 		pChunk->SetBloodColor( DONT_BLEED );
 
@@ -868,7 +868,7 @@ void CPropAPC::CreateCorpse( )
 
 	for ( int i = 0; i < APC_MAX_GIBS; ++i )
 	{
-		CPhysicsProp *pGib = assert_cast<CPhysicsProp*>(CreateEntityByName( "prop_physics" ));
+		CPhysicsProp *pGib = assert_cast<CPhysicsProp*>(gEntList.CreateEntityByName( "prop_physics" ));
 		pGib->SetAbsOrigin( GetAbsOrigin() );
 		pGib->SetAbsAngles( GetAbsAngles() );
 		pGib->SetAbsVelocity( GetAbsVelocity() );

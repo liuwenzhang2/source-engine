@@ -408,7 +408,7 @@ void C_Prop_Portal::Simulate()
 			if ( pWeapon && ToPortalPlayer( pWeapon->GetOwner() ) )
 				bIsHeldWeapon = true;
 
-			C_PortalGhostRenderable *pNewGhost = (C_PortalGhostRenderable*)CreateEntityByName( "C_PortalGhostRenderable" );
+			C_PortalGhostRenderable *pNewGhost = (C_PortalGhostRenderable*)cl_entitylist->CreateEntityByName( "C_PortalGhostRenderable" );
 
 			Assert( pNewGhost );
 			pNewGhost->Init(this,

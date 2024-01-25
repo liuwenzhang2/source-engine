@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "c_tracer.h"
 #include "view.h"
-#include "initializer.h"
+//#include "initializer.h"
 #include "particles_simple.h"
 #include "env_wind_shared.h"
 #include "engine/IEngineTrace.h"
@@ -1129,7 +1129,7 @@ public:
 	{
 		if ( r_RainHack.GetInt() )
 		{
-			CClient_Precipitation *pPrecipHackEnt = (CClient_Precipitation*)CreateEntityByName( "CClient_Precipitation" );
+			CClient_Precipitation *pPrecipHackEnt = (CClient_Precipitation*)cl_entitylist->CreateEntityByName( "CClient_Precipitation" );
 			pPrecipHackEnt->InitializeAsClientEntity( NULL, RENDER_GROUP_TRANSLUCENT_ENTITY );
 			g_pPrecipHackEnt = pPrecipHackEnt;
 		}
@@ -2199,7 +2199,7 @@ bool SnowFallManagerCreate( CClient_Precipitation *pSnowEntity )
 {
 	if ( !s_pSnowFallMgr )
 		{
-		s_pSnowFallMgr = (CSnowFallManager*)CreateEntityByName( "CSnowFallManager");
+		s_pSnowFallMgr = (CSnowFallManager*)cl_entitylist->CreateEntityByName( "CSnowFallManager");
 		s_pSnowFallMgr->CreateEmitter();
 		s_pSnowFallMgr->InitializeAsClientEntity( NULL, RENDER_GROUP_OTHER );
 		if ( !s_pSnowFallMgr )

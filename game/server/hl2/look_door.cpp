@@ -128,7 +128,7 @@ void CLookDoor::Spawn(void)
 		Warning( "ERROR: DoorLook (%s) given no target.  Rejecting spawn.\n",GetDebugName());
 		return;
 	}
-	CLookDoorThinker* pLookThinker = (CLookDoorThinker*)CreateEntityByName("lookdoorthinker");
+	CLookDoorThinker* pLookThinker = (CLookDoorThinker*)gEntList.CreateEntityByName("lookdoorthinker");
 	if (pLookThinker)
 	{
 		pLookThinker->SetThink(&CLookDoorThinker::LookThink);

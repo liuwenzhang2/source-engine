@@ -195,7 +195,7 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 		switch( m_CrateType )
 		{
 		case CRATE_SPECIFIC_ITEM:
-			pSpawn = CreateEntityByName( STRING(m_strItemClass) );
+			pSpawn = gEntList.CreateEntityByName( STRING(m_strItemClass) );
 			break;
 
 		default:

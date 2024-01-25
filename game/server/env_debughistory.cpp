@@ -281,7 +281,7 @@ CDebugHistory *GetDebugHistory()
 		}
 		else
 		{
-			s_DebugHistory = ( CDebugHistory * )CreateEntityByName( "env_debughistory" );
+			s_DebugHistory = ( CDebugHistory * )gEntList.CreateEntityByName( "env_debughistory" );
 			if ( s_DebugHistory )
 			{
 				s_DebugHistory->Spawn();

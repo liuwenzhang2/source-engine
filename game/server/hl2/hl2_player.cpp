@@ -1715,7 +1715,7 @@ void CHL2_Player::CheatImpulseCommands( int iImpulse )
 		// Cheat to create a dynamic resupply item
 		Vector vecForward;
 		AngleVectors( EyeAngles(), &vecForward );
-		CBaseEntity *pItem = (CBaseEntity *)CreateEntityByName( "item_dynamic_resupply" );
+		CBaseEntity *pItem = (CBaseEntity *)gEntList.CreateEntityByName( "item_dynamic_resupply" );
 		if ( pItem )
 		{
 			Vector vecOrigin = GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);

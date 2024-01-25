@@ -22,7 +22,7 @@ LINK_ENTITY_TO_CLASS(env_movieexplosion, MovieExplosion);
 
 MovieExplosion* MovieExplosion::CreateMovieExplosion(const Vector &pos)
 {
-	CBaseEntity *pEnt = CreateEntityByName(MOVIEEXPLOSION_ENTITYNAME);
+	CBaseEntity *pEnt = gEntList.CreateEntityByName(MOVIEEXPLOSION_ENTITYNAME);
 	if(pEnt)
 	{
 		MovieExplosion *pEffect = dynamic_cast<MovieExplosion*>(pEnt);

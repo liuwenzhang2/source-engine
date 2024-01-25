@@ -561,7 +561,7 @@ CCSPlayer::~CCSPlayer()
 CCSPlayer *CCSPlayer::CreatePlayer( const char *className, int ed )
 {
 	//CCSPlayer::s_PlayerEdict = ed;
-	return (CCSPlayer*)CreateEntityByName( className, ed );
+	return (CCSPlayer*)gEntList.CreateEntityByName( className, ed );
 }
 
 
@@ -1009,7 +1009,7 @@ void CCSPlayer::CreateRagdollEntity()
 	if ( !pRagdoll )
 	{
 		// create a new one
-		pRagdoll = dynamic_cast< CCSRagdoll* >( CreateEntityByName( "cs_ragdoll" ) );
+		pRagdoll = dynamic_cast< CCSRagdoll* >(gEntList.CreateEntityByName( "cs_ragdoll" ) );
 	}
 
 	if ( pRagdoll )
@@ -6688,7 +6688,7 @@ CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 		return NULL;
 #endif
 
-	pent = CreateEntityByName(pszName);
+	pent = gEntList.CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -7240,7 +7240,7 @@ void CCSPlayer::CreateViewModel( int index /*=0*/ )
 	if ( GetViewModel( index ) )
 		return;
 
-	CPredictedViewModel *vm = ( CPredictedViewModel * )CreateEntityByName( "predicted_viewmodel" );
+	CPredictedViewModel *vm = ( CPredictedViewModel * )gEntList.CreateEntityByName( "predicted_viewmodel" );
 	if ( vm )
 	{
 		vm->SetAbsOrigin( GetAbsOrigin() );

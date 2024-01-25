@@ -124,8 +124,8 @@ public:
 // Implement IClientEntityList
 public:
 
-	virtual IClientEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
-	virtual void				DestroyEntity(IClientEntity* pEntity);
+	virtual C_BaseEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
+	virtual void				DestroyEntity(IHandleEntity* pEntity);
 
 	virtual IClientNetworkable*	GetClientNetworkable( int entnum );
 	virtual IClientEntity*		GetClientEntity( int entnum );
@@ -262,13 +262,13 @@ private:
 
 
 template<class T>
-inline IClientEntity* CClientEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {
-	return ::CreateEntityByName(className, iForceEdictIndex, iSerialNum);
+inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {
+	return (C_BaseEntity*)EntityFactoryDictionary()->Create(this, className, iForceEdictIndex, iSerialNum);
 }
 
 template<class T>
-inline void	CClientEntityList<T>::DestroyEntity(IClientEntity* pEntity) {
-	::DestroyEntity(pEntity);
+inline void	CClientEntityList<T>::DestroyEntity(IHandleEntity* pEntity) {
+	EntityFactoryDictionary()->Destroy(pEntity);
 }
 
 //-----------------------------------------------------------------------------

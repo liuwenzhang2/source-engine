@@ -407,7 +407,7 @@ bool FireSystem_StartFire( const Vector &position, float fireHeight, float attac
 	}
 
 	//Create a new fire entity
-	CFire *fire = (CFire *) CreateEntityByName( "env_fire" );
+	CFire *fire = (CFire *)gEntList.CreateEntityByName( "env_fire" );
 	
 	if ( fire == NULL )
 		return false;
@@ -457,7 +457,7 @@ bool FireSystem_StartFire( CBaseAnimating *pEntity, float fireHeight, float atta
 	}
 
 	// Create a new fire entity
-	CFire *fire = (CFire *) CreateEntityByName( "env_fire" );
+	CFire *fire = (CFire *)gEntList.CreateEntityByName( "env_fire" );
 	if ( fire == NULL )
 	{
 		return false;
@@ -780,7 +780,7 @@ void CFire::SpawnEffect( fireType_e type, float scale )
 	default:
 	case FIRE_NATURAL:
 		{
-			CFireSmoke	*fireSmoke = (CFireSmoke *) CreateEntityByName( "_firesmoke" );
+			CFireSmoke	*fireSmoke = (CFireSmoke *)gEntList.CreateEntityByName( "_firesmoke" );
 			fireSmoke->EnableSmoke( ( m_spawnflags & SF_FIRE_SMOKELESS )==false );
 			fireSmoke->EnableGlow( ( m_spawnflags & SF_FIRE_NO_GLOW )==false );
 			fireSmoke->EnableVisibleFromAbove( ( m_spawnflags & SF_FIRE_VISIBLE_FROM_ABOVE )!=false );
@@ -793,7 +793,7 @@ void CFire::SpawnEffect( fireType_e type, float scale )
 
 	case FIRE_PLASMA:
 		{
-			CPlasma	*plasma = (CPlasma *) CreateEntityByName( "_plasma" );
+			CPlasma	*plasma = (CPlasma *)gEntList.CreateEntityByName( "_plasma" );
 			plasma->EnableSmoke( true );
 		
 			pEffect			= plasma;

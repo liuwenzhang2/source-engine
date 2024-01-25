@@ -379,7 +379,7 @@ private:
 
 inline CBasePlayer *CCSBotManager::AllocateBotEntity( int ed )
 {
-	return static_cast<CBasePlayer *>( CreateEntityByName( "cs_bot", ed ) );
+	return static_cast<CBasePlayer *>(gEntList.CreateEntityByName( "cs_bot", ed ) );
 }
 
 inline bool CCSBotManager::IsTimeToPlantBomb( void ) const

@@ -33,7 +33,7 @@ CON_COMMAND( viewanim_create, "viewanim_create" )
 		flags = atoi( args[1] );
 	}
 
-	g_pTestAnimation = (CViewAngleAnimation*)CreateEntityByName( "viewangleanim" );
+	g_pTestAnimation = (CViewAngleAnimation*)cl_entitylist->CreateEntityByName( "viewangleanim" );
 
 	if ( g_pTestAnimation )
 	{

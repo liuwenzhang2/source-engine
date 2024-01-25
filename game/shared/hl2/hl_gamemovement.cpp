@@ -76,7 +76,7 @@ public:
 CReservePlayerSpot *CReservePlayerSpot::ReserveSpot( 
 	CBasePlayer *owner, const Vector& org, const Vector& mins, const Vector& maxs, bool& validspot )
 {
-	CReservePlayerSpot *spot = ( CReservePlayerSpot * )CreateEntityByName( "reserved_spot" );
+	CReservePlayerSpot *spot = ( CReservePlayerSpot * )gEntList.CreateEntityByName( "reserved_spot" );
 	Assert( spot );
 
 	spot->SetAbsOrigin( org );

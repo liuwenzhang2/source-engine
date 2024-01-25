@@ -196,13 +196,13 @@ public:
 
 	virtual CBaseEntity* CreateNextEntity( const char *pClassname )
 	{
-		CBaseEntity *pRet = CreateEntityByName( pClassname );
+		CBaseEntity *pRet = gEntList.CreateEntityByName( pClassname );
 
 		CMapEntityRef ref;
 		ref.m_iEdict = -1;
 		ref.m_iSerialNumber = -1;
 
-		if ( pRet && !pRet->IsEFlagSet(EFL_SERVER_ONLY))
+		if ( pRet && pRet->IsNetworkable())
 		{
 			ref.m_iEdict = pRet->entindex();
 			if ( pRet->entindex()!=-1 )

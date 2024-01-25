@@ -44,11 +44,13 @@ public:
 //-----------------------------------------------------------------------------
 // Purpose: Exposes IClientEntity's to engine
 //-----------------------------------------------------------------------------
-abstract_class IServerEntityList
+abstract_class IServerEntityList : public IEntityList
 {
 public:
-	virtual void ReserveEdict(int index) = 0;
-	virtual int AllocateFreeEdict(int index = -1) = 0;
+	virtual void ReserveSlot(int index) = 0;
+	virtual int AllocateFreeSlot(bool bNetworkable = true, int index = -1) = 0;
+	virtual IServerEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
+	virtual void DestroyEntity(IHandleEntity* pEntity) = 0;
 	//virtual edict_t* GetEdict(CBaseHandle hEnt) const = 0;
 	virtual int NumberOfEdicts(void) = 0;
 	virtual int NumberOfReservedEdicts(void) = 0;

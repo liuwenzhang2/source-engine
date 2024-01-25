@@ -666,7 +666,7 @@ void CTriggerWateryDeath::SpawnLeeches( CBaseEntity *pOther )
 	
 	for ( int i = 0; i < iMaxLeeches; i++ )
 	{
-		CWateryDeathLeech *pLeech = (CWateryDeathLeech*)CreateEntityByName( "ent_watery_leech" );
+		CWateryDeathLeech *pLeech = (CWateryDeathLeech*)gEntList.CreateEntityByName( "ent_watery_leech" );
 
 		if ( pLeech )
 		{

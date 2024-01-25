@@ -481,7 +481,7 @@ void CNPC_Alyx::CreateEmpTool( void )
 	if (!m_bShouldHaveEMP || m_hEmpTool)
 		return;
 
-	m_hEmpTool = (CBaseAnimating*)CreateEntityByName( "prop_dynamic" );
+	m_hEmpTool = (CBaseAnimating*)gEntList.CreateEntityByName( "prop_dynamic" );
 	if ( m_hEmpTool )
 	{
 		m_hEmpTool->SetModel( "models/alyx_emptool_prop.mdl" );
@@ -2531,7 +2531,7 @@ void CNPC_Alyx::EmpZapTarget( CBaseEntity *pTarget )
 {
 	g_pEffects->Sparks( pTarget->WorldSpaceCenter() );
 
-	CAlyxEmpEffect *pEmpEffect = (CAlyxEmpEffect*)CreateEntityByName( "env_alyxemp" );
+	CAlyxEmpEffect *pEmpEffect = (CAlyxEmpEffect*)gEntList.CreateEntityByName( "env_alyxemp" );
 
 	if( pEmpEffect )
 	{

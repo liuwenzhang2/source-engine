@@ -5841,7 +5841,7 @@ void CC_Prop_Dynamic_Create( const CCommand &args )
 	MatrixToAngles( entToWorld, angles );
 
 	// Try to create entity
-	CDynamicProp *pProp = dynamic_cast< CDynamicProp * >( CreateEntityByName( "dynamic_prop" ) );
+	CDynamicProp *pProp = dynamic_cast< CDynamicProp * >(gEntList.CreateEntityByName( "dynamic_prop" ) );
 	if ( pProp )
 	{
 		char buf[512];
@@ -5926,7 +5926,7 @@ CPhysicsProp* CreatePhysicsProp( const char *pModelName, const Vector &vTraceSta
 	CBaseEntity::SetAllowPrecache( true );
 				  
 	// Try to create entity
-	CPhysicsProp *pProp = dynamic_cast< CPhysicsProp * >( CreateEntityByName( pClassName ) );
+	CPhysicsProp *pProp = dynamic_cast< CPhysicsProp * >(gEntList.CreateEntityByName( pClassName ) );
 	if ( pProp )
 	{
 		char buf[512];

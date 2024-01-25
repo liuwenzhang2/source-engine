@@ -455,7 +455,7 @@ CGib *CGibShooter::CreateGib ( void )
 	if ( violence_hgibs.IsValid() && !violence_hgibs.GetInt() )
 		return NULL;
 
-	CGib *pGib = (CGib*)CreateEntityByName( "gib" );
+	CGib *pGib = (CGib*)gEntList.CreateEntityByName( "gib" );
 	pGib->Spawn( "models/gibs/hgibs.mdl" );
 	pGib->SetBloodColor( BLOOD_COLOR_RED );
 
@@ -733,7 +733,7 @@ void CEnvShooter::Precache ( void )
 
 CGib *CEnvShooter::CreateGib ( void )
 {
-	CGib *pGib = (CGib*)CreateEntityByName( "gib" );
+	CGib *pGib = (CGib*)gEntList.CreateEntityByName( "gib" );
 
 	if ( m_bIsSprite == true )
 	{

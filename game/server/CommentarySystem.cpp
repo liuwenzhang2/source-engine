@@ -591,7 +591,7 @@ public:
 			return;
 
 		// Spawn the commentary semaphore entity
-		CBaseEntity *pSemaphore = CreateEntityByName( "info_target" );
+		CBaseEntity *pSemaphore = gEntList.CreateEntityByName( "info_target" );
 		pSemaphore->SetName( MAKE_STRING(COMMENTARY_SPAWNED_SEMAPHORE) );
 
 		bool oldLock = engine->LockNetworkStringTables( false );
@@ -626,7 +626,7 @@ public:
 				}
 
 				// Spawn the commentary entity
-				CBaseEntity *pNode = CreateEntityByName( pNodeName );
+				CBaseEntity *pNode = gEntList.CreateEntityByName( pNodeName );
 				if ( pNode )
 				{
 					ParseEntKVBlock( pNode, pkvNode );
@@ -1169,7 +1169,7 @@ void CPointCommentaryNode::UpdateViewThink( void )
 		if ( !m_hViewTargetAngles && !m_hViewPositionMover )
 		{
 			// Make an invisible entity to attach view angles to
-			m_hViewTargetAngles = CreateEntityByName( "point_commentary_viewpoint" );
+			m_hViewTargetAngles = gEntList.CreateEntityByName( "point_commentary_viewpoint" );
 			m_hViewTargetAngles->SetAbsOrigin( pPlayer->EyePosition() );
 			m_hViewTargetAngles->SetAbsAngles( pPlayer->EyeAngles() );
 			pPlayer->SetViewEntity( m_hViewTargetAngles );
@@ -1237,7 +1237,7 @@ void CPointCommentaryNode::UpdateViewThink( void )
 		{
 			// Make an invisible info target entity for us to attach the view to, 
 			// and move it to the desired view position.
-			m_hViewPositionMover = CreateEntityByName( "point_commentary_viewpoint" );
+			m_hViewPositionMover = gEntList.CreateEntityByName( "point_commentary_viewpoint" );
 			m_hViewPositionMover->SetAbsAngles( pPlayer->EyeAngles() );
 			pPlayer->SetViewEntity( m_hViewPositionMover );
 		}

@@ -100,7 +100,7 @@ public:
 	
 	static C_AntlionGib *CreateClientsideGib( const char *pszModelName, Vector vecOrigin, Vector vecForceDir, AngularImpulse vecAngularImp, float m_flLifetime = DEFAULT_GIB_LIFETIME )
 	{
-		C_AntlionGib *pGib = (C_AntlionGib*)CreateEntityByName( "C_AntlionGib" );
+		C_AntlionGib *pGib = (C_AntlionGib*)cl_entitylist->CreateEntityByName( "C_AntlionGib" );
 
 		if ( pGib == NULL )
 			return NULL;

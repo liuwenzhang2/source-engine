@@ -368,7 +368,7 @@ void CAI_RappelBehavior::CutZipline()
 		UTIL_Remove( m_hLine );
 	}
 
-	CBaseEntity *pAnchor = CreateEntityByName( "rope_anchor" );
+	CBaseEntity *pAnchor = gEntList.CreateEntityByName( "rope_anchor" );
 	pAnchor->SetOwnerEntity( GetOuter() ); // Boy, this is a hack!!
 	pAnchor->SetAbsOrigin( m_vecRopeAnchor );
 	pAnchor->Spawn();

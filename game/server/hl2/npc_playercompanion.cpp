@@ -1388,7 +1388,7 @@ void CNPC_PlayerCompanion::HandleAnimEvent( animevent_t *pEvent )
 	// Create a flare and parent to our hand
 	if ( pEvent->event == AE_COMPANION_PRODUCE_FLARE )
 	{
-		m_hFlare = static_cast<CPhysicsProp *>(CreateEntityByName( "prop_physics" ));
+		m_hFlare = static_cast<CPhysicsProp *>(gEntList.CreateEntityByName( "prop_physics" ));
 		if ( m_hFlare != NULL )
 		{
 			// Set the model

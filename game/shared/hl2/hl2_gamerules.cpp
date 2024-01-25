@@ -307,7 +307,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 
 	void InitBodyQue(void)
 	{
-		CCorpse *pEntity = ( CCorpse * )CreateEntityByName( "bodyque" );
+		CCorpse *pEntity = ( CCorpse * )gEntList.CreateEntityByName( "bodyque" );
 		pEntity->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
 		g_pBodyQueueHead = pEntity;
 		CCorpse *p = g_pBodyQueueHead;
@@ -315,7 +315,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 		// Reserve 3 more slots for dead bodies
 		for ( int i = 0; i < 3; i++ )
 		{
-			CCorpse *next = ( CCorpse * )CreateEntityByName( "bodyque" );
+			CCorpse *next = ( CCorpse * )gEntList.CreateEntityByName( "bodyque" );
 			next->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
 			p->SetOwnerEntity( next );
 			p = next;

@@ -222,7 +222,7 @@ void CC_AI_Hull( const CCommand &args )
 		if ( !pEnt )
 		{
 			// Not found, try to create one.
-			pEnt = (CAI_BaseNPC *)CreateEntityByName( args[1] );
+			pEnt = (CAI_BaseNPC *)gEntList.CreateEntityByName( args[1] );
 			if ( !pEnt )
 			{
 				DevMsg( "Entity %s not found, and couldn't create!\n", args[1] );
@@ -401,7 +401,7 @@ void CC_NPC_Create( const CCommand &args )
 	CBaseEntity::SetAllowPrecache( true );
 
 	// Try to create entity
-	CAI_BaseNPC *baseNPC = dynamic_cast< CAI_BaseNPC * >( CreateEntityByName(args[1]) );
+	CAI_BaseNPC *baseNPC = dynamic_cast< CAI_BaseNPC * >(gEntList.CreateEntityByName(args[1]) );
 	if (baseNPC)
 	{
 		baseNPC->KeyValue( "additionalequipment", npc_create_equipment.GetString() );
@@ -468,7 +468,7 @@ void CC_NPC_Create_Aimed( const CCommand &args )
 	CBaseEntity::SetAllowPrecache( true );
 
 	// Try to create entity
-	CAI_BaseNPC *baseNPC = dynamic_cast< CAI_BaseNPC * >( CreateEntityByName(args[1]) );
+	CAI_BaseNPC *baseNPC = dynamic_cast< CAI_BaseNPC * >(gEntList.CreateEntityByName(args[1]) );
 	if (baseNPC)
 	{
 		baseNPC->KeyValue( "additionalequipment", npc_create_equipment.GetString() );

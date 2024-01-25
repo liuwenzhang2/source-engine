@@ -521,7 +521,7 @@ public:
 
 	virtual CBaseEntity* CreateNextEntity( const char *pClassname )
 	{
-		return CreateEntityByName( pClassname );
+		return gEntList.CreateEntityByName( pClassname );
 	}
 };
 

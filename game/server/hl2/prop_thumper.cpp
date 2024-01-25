@@ -122,7 +122,7 @@ void CPropThumper::Spawn( void )
 
 	m_iHammerAttachment = LookupAttachment( "hammer" );
 	
-	CAntlionRepellant *pRepellant = (CAntlionRepellant*)CreateEntityByName( "point_antlion_repellant" );
+	CAntlionRepellant *pRepellant = (CAntlionRepellant*)gEntList.CreateEntityByName( "point_antlion_repellant" );
 
 	if ( pRepellant )
 	{

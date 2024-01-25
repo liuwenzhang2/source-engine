@@ -287,7 +287,7 @@ void CModelPanel::SetupVCD( void )
 
 	DeleteVCDData();
 
-	C_SceneEntity *pEnt = (C_SceneEntity*)CreateEntityByName( "C_SceneEntity" );
+	C_SceneEntity *pEnt = (C_SceneEntity*)cl_entitylist->CreateEntityByName( "C_SceneEntity" );
 
 	if ( !pEnt )
 		return;
@@ -400,7 +400,7 @@ void CModelPanel::SetupModel( void )
 		return;
 
 	// create the new model
-	CModelPanelModel *pEnt = (CModelPanelModel*)CreateEntityByName( "CModelPanelMode" );
+	CModelPanelModel *pEnt = (CModelPanelModel*)cl_entitylist->CreateEntityByName( "CModelPanelMode" );
 
 	if ( !pEnt )
 		return;
@@ -466,7 +466,7 @@ void CModelPanel::SetupModel( void )
 	for ( int i = 0 ; i < m_pModelInfo->m_AttachedModelsInfo.Count() ; i++ )
 	{
 		CModelPanelAttachedModelInfo *pInfo = m_pModelInfo->m_AttachedModelsInfo[i];
-		C_BaseAnimating *pTemp = (C_BaseAnimating*)CreateEntityByName( "C_BaseAnimating" );
+		C_BaseAnimating *pTemp = (C_BaseAnimating*)cl_entitylist->CreateEntityByName( "C_BaseAnimating" );
 
 		if ( pTemp )
 		{

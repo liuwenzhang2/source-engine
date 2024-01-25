@@ -1323,11 +1323,11 @@ static CBaseEntity *CreateSimplePhysicsObject( CBaseEntity *pEntity, bool create
 	const model_t *model = modelinfo->GetModel( modelindex );
 	if ( model && modelinfo->GetModelType(model) == mod_brush )
 	{
-		pPhysEntity = CreateEntityByName( "simple_physics_brush" );
+		pPhysEntity = gEntList.CreateEntityByName( "simple_physics_brush" );
 	}
 	else
 	{
-		pPhysEntity = CreateEntityByName( "simple_physics_prop" );
+		pPhysEntity = gEntList.CreateEntityByName( "simple_physics_prop" );
 	}
 
 	pPhysEntity->KeyValue( "model", STRING(pEntity->GetModelName()) );

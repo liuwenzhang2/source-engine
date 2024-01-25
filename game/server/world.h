@@ -22,7 +22,8 @@ public:
 
 	DECLARE_SERVERCLASS();
 
-	virtual int RequiredEdictIndex( void ) { return 0; }   // the world always needs to be in slot 0
+	static int RequiredEdictIndexStatic( void ) { return 0; }   // the world always needs to be in slot 0
+	virtual int RequiredEdictIndex(void) { return CWorld::RequiredEdictIndexStatic(); }
 	
 	static void RegisterSharedActivities( void );
 	static void RegisterSharedEvents( void );

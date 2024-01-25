@@ -967,7 +967,7 @@ CPhysicsShadowClone *CPhysicsShadowClone::CreateShadowClone( IPhysicsEnvironment
 	}
 	++g_iShadowCloneCount;
 
-	CPhysicsShadowClone *pClone = (CPhysicsShadowClone*)CreateEntityByName("physicsshadowclone");
+	CPhysicsShadowClone *pClone = (CPhysicsShadowClone*)gEntList.CreateEntityByName("physicsshadowclone");
 	s_IsShadowClone[pClone->entindex()] = true;
 	pClone->m_pOwnerPhysEnvironment = pInPhysicsEnvironment;
 	pClone->m_hClonedEntity = hEntToClone;

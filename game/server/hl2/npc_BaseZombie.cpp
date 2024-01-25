@@ -2433,7 +2433,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 	}
 	else
 	{
-		pCrab = (CAI_BaseNPC*)CreateEntityByName( GetHeadcrabClassname() );
+		pCrab = (CAI_BaseNPC*)gEntList.CreateEntityByName( GetHeadcrabClassname() );
 
 		if ( !pCrab )
 		{

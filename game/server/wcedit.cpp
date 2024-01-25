@@ -228,11 +228,11 @@ void NWCEdit::CreateAINode( CBasePlayer *pPlayer )
 			CNodeEnt *pNodeEnt;
 			if (g_pAINetworkManager->GetEditOps()->m_bAirEditMode)
 			{
-				pNodeEnt = (CNodeEnt*)CreateEntityByName("info_node_air");
+				pNodeEnt = (CNodeEnt*)gEntList.CreateEntityByName("info_node_air");
 			}
 			else
 			{
-				pNodeEnt = (CNodeEnt*)CreateEntityByName("info_node");
+				pNodeEnt = (CNodeEnt*)gEntList.CreateEntityByName("info_node");
 			}
 
 			// Note this is a new entity being created as part of wc editing
@@ -437,7 +437,7 @@ void NWCEdit::DestroyAILink( CBasePlayer *pPlayer )
 		else if (status == Editor_OK)
 		{
 			// Create dynamic link and mark the link
-			CAI_DynamicLink* pNewLink	= (CAI_DynamicLink*)CreateEntityByName("info_node_link" );;
+			CAI_DynamicLink* pNewLink	= (CAI_DynamicLink*)gEntList.CreateEntityByName("info_node_link" );;
 			pNewLink->m_nSrcID			= pAILink->m_iSrcID;
 			pNewLink->m_nDestID			= pAILink->m_iDestID;
 			pNewLink->m_nLinkState		= LINK_OFF;

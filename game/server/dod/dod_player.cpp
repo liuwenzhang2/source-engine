@@ -382,7 +382,7 @@ CDODPlayer::~CDODPlayer()
 CDODPlayer *CDODPlayer::CreatePlayer( const char *className, int ed )
 {
 	//CDODPlayer::s_PlayerEdict = ed;
-	return (CDODPlayer*)CreateEntityByName( className, ed );
+	return (CDODPlayer*)gEntList.CreateEntityByName( className, ed );
 }
 
 void CDODPlayer::PrecachePlayerModel( const char *szPlayerModel )
@@ -599,7 +599,7 @@ void CDODPlayer::CreateRagdollEntity()
 	if ( !pRagdoll )
 	{
 		// and create a new one
-		pRagdoll = dynamic_cast< CDODRagdoll* >( CreateEntityByName( "dod_ragdoll" ) );
+		pRagdoll = dynamic_cast< CDODRagdoll* >(gEntList.CreateEntityByName( "dod_ragdoll" ) );
 	}
 
 	if ( pRagdoll )
@@ -989,7 +989,7 @@ CBaseEntity	*CDODPlayer::GiveNamedItem( const char *pszName, int iSubType )
 {
 	EHANDLE pent;
 
-	pent = CreateEntityByName(pszName);
+	pent = gEntList.CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -2963,7 +2963,7 @@ CBaseEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int
 				QAngle spotAngles = pSpot->GetAbsAngles();
 
 				// make a new spawnpoint so we don't have to do this a bunch of times
-				pSpot = CreateEntityByName( pSpot->GetClassname() );
+				pSpot = gEntList.CreateEntityByName( pSpot->GetClassname() );
 				pSpot->SetAbsOrigin( origin );
 				pSpot->SetAbsAngles( spotAngles );
 
@@ -3653,7 +3653,7 @@ void CDODPlayer::CreateViewModel( int index /*=0*/ )
 	if ( GetViewModel( index ) )
 		return;
 
-	CDODViewModel *vm = ( CDODViewModel * )CreateEntityByName( "dod_viewmodel" );
+	CDODViewModel *vm = ( CDODViewModel * )gEntList.CreateEntityByName( "dod_viewmodel" );
 	if ( vm )
 	{
 		vm->SetAbsOrigin( GetAbsOrigin() );

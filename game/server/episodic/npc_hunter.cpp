@@ -397,7 +397,7 @@ END_DATADESC()
 CHunterFlechette *CHunterFlechette::FlechetteCreate( const Vector &vecOrigin, const QAngle &angAngles, CBaseEntity *pentOwner )
 {
 	// Create a new entity with CHunterFlechette private data
-	CHunterFlechette *pFlechette = (CHunterFlechette *)CreateEntityByName( "hunter_flechette" );
+	CHunterFlechette *pFlechette = (CHunterFlechette *)gEntList.CreateEntityByName( "hunter_flechette" );
 	UTIL_SetOrigin( pFlechette, vecOrigin );
 	pFlechette->SetAbsAngles( angAngles );
 	pFlechette->Spawn();
@@ -1993,7 +1993,7 @@ void CNPC_Hunter::Activate()
 	if ( gm_flMinigunDistZ == 0 )
 	{
 		// Have to create a virgin hunter to ensure proper pose
-		CNPC_Hunter *pHunter = (CNPC_Hunter *)CreateEntityByName( "npc_hunter" );
+		CNPC_Hunter *pHunter = (CNPC_Hunter *)gEntList.CreateEntityByName( "npc_hunter" );
 		Assert(pHunter);
 		pHunter->Spawn();
 
@@ -5414,7 +5414,7 @@ void CNPC_Hunter::PhysicsDamageEffect( const Vector &vecPos, const Vector &vecDi
 
 	if ( random->RandomInt( 0, 1 ) == 0 )
 	{
-		CBaseEntity *pTrail = CreateEntityByName( "sparktrail" );
+		CBaseEntity *pTrail = gEntList.CreateEntityByName( "sparktrail" );
 		pTrail->SetOwnerEntity( this );
 		pTrail->Spawn();
 	}

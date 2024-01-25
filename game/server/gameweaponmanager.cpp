@@ -73,7 +73,7 @@ LINK_ENTITY_TO_CLASS( game_weapon_manager, CGameWeaponManager );
 
 void CreateWeaponManager( const char *pWeaponName, int iMaxPieces )
 {
-	CGameWeaponManager *pManager = (CGameWeaponManager *)CreateEntityByName( "game_weapon_manager");
+	CGameWeaponManager *pManager = (CGameWeaponManager *)gEntList.CreateEntityByName( "game_weapon_manager");
 
 	if( pManager )
 	{
@@ -141,7 +141,7 @@ void CGameWeaponManager::Spawn()
 {
 	SetThink( &CGameWeaponManager::Think );
 	SetNextThink( gpGlobals->curtime );
-	CBaseEntity *pEntity = CreateEntityByName( STRING(m_iszWeaponName) );
+	CBaseEntity *pEntity = gEntList.CreateEntityByName( STRING(m_iszWeaponName) );
 	if ( !pEntity )
 	{
 		DevMsg("%s removed itself!\n", GetDebugName() );

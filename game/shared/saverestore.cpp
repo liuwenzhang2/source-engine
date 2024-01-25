@@ -2503,7 +2503,7 @@ void CEntitySaveRestoreBlockHandler::Save( ISave *pSave )
 #if !defined( CLIENT_DLL )
 			pEntInfo->globalname = pEnt->m_iGlobalname; // remember global name
 			pEntInfo->landmarkModelSpace = ModelSpaceLandmark( pEnt->GetModelIndex() );
-			int nEntIndex = !pEnt->IsEFlagSet(EFL_SERVER_ONLY) ? pEnt->entindex() : -1;
+			int nEntIndex = pEnt->IsNetworkable() ? pEnt->entindex() : -1;
 			bool bIsPlayer = ( ( nEntIndex >= 1 ) && ( nEntIndex <= gpGlobals->maxClients ) ) ? true : false;
 			if ( bIsPlayer )
 			{
@@ -2586,7 +2586,7 @@ void CEntitySaveRestoreBlockHandler::Restore( IRestore *pRestore, bool createPla
 			if ( pEntInfo->edictindex == 0 )	// worldspawn
 			{
 				Assert( i == 0 );
-				pent = CreateEntityByName( STRING(pEntInfo->classname) );
+				pent = gEntList.CreateEntityByName( STRING(pEntInfo->classname) );
 				pRestore->SetReadPos( pEntInfo->location );
 				if ( RestoreEntity( pent, pRestore, pEntInfo ) < 0 )
 				{
@@ -2618,10 +2618,10 @@ void CEntitySaveRestoreBlockHandler::Restore( IRestore *pRestore, bool createPla
 			}
 			else
 			{
-				pent = CreateEntityByName( STRING(pEntInfo->classname) );
+				pent = gEntList.CreateEntityByName( STRING(pEntInfo->classname) );
 			}
 			pEntInfo->hEnt = pent;
-			pEntInfo->restoreentityindex = pent && !pent->IsEFlagSet(EFL_SERVER_ONLY) ? pent->entindex() : - 1;
+			pEntInfo->restoreentityindex = pent && pent->IsNetworkable() ? pent->entindex() : - 1;
 			if ( pent && pEntInfo->restoreentityindex == 0 )
 			{
 				if ( !FClassnameIs( pent, "worldspawn" ) )
@@ -2721,7 +2721,7 @@ void CEntitySaveRestoreBlockHandler::Restore( IRestore *pRestore, bool createPla
 		{
 			if ( pEntInfo->classname != NULL_STRING )
 			{
-				pent = CreateEntityByName( STRING(pEntInfo->classname) );
+				pent = cl_entitylist->CreateEntityByName( STRING(pEntInfo->classname) );
 				pent->InitializeAsClientEntity( NULL, RENDER_GROUP_OPAQUE_ENTITY );
 				
 				pRestore->SetReadPos( pEntInfo->location );
@@ -2768,7 +2768,7 @@ void SaveEntityOnTable( CBaseEntity *pEntity, CSaveRestoreData *pSaveData, int &
 #endif
 	pEntInfo->modelname = pEntity->GetModelName();
 	pEntInfo->restoreentityindex = -1;
-	pEntInfo->saveentityindex = pEntity && !pEntity->IsEFlagSet(EFL_SERVER_ONLY) ? pEntity->entindex() : -1;
+	pEntInfo->saveentityindex = pEntity && pEntity->IsNetworkable() ? pEntity->entindex() : -1;
 	pEntInfo->hEnt = pEntity;
 	pEntInfo->flags = 0;
 	pEntInfo->location = 0;
@@ -3349,7 +3349,7 @@ void CreateEntitiesInTransitionList( CSaveRestoreData *pSaveData, int levelMask 
 		}
 		else if ( active )
 		{
-			pent = CreateEntityByName( STRING(pEntInfo->classname) );
+			pent = gEntList.CreateEntityByName( STRING(pEntInfo->classname) );
 		}
 
 		pEntInfo->hEnt = pent;

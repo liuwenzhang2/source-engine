@@ -536,7 +536,7 @@ void CNPC_Citizen::PostNPCInit()
 {
 	if ( !gEntList.FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME ) )
 	{
-		CreateEntityByName( COMMAND_POINT_CLASSNAME );
+		gEntList.CreateEntityByName( COMMAND_POINT_CLASSNAME );
 	}
 	
 	if ( IsInPlayerSquad() )
@@ -787,7 +787,7 @@ void CNPC_Citizen::OnRestore()
 
 	if ( !gEntList.FindEntityByClassname( NULL, COMMAND_POINT_CLASSNAME ) )
 	{
-		CreateEntityByName( COMMAND_POINT_CLASSNAME );
+		gEntList.CreateEntityByName( COMMAND_POINT_CLASSNAME );
 	}
 }
 
@@ -3161,7 +3161,7 @@ void CNPC_Citizen::UpdateFollowCommandPoint()
 			if( !pCommandPoint )
 			{
 				DevMsg("**\nVERY BAD THING\nCommand point vanished! Creating a new one\n**\n");
-				pCommandPoint = CreateEntityByName( COMMAND_POINT_CLASSNAME );
+				pCommandPoint = gEntList.CreateEntityByName( COMMAND_POINT_CLASSNAME );
 			}
 
 			if ( pFollowTarget != pCommandPoint )
@@ -3693,7 +3693,7 @@ void	CNPC_Citizen::TossHealthKit(CBaseCombatCharacter *pThrowAt, const Vector &o
 	}
 
 	// create a healthkit and toss it into the world
-	CBaseEntity *pHealthKit = CreateEntityByName( "item_healthkit" );
+	CBaseEntity *pHealthKit = gEntList.CreateEntityByName( "item_healthkit" );
 	Assert(pHealthKit);
 	if (pHealthKit)
 	{
@@ -4190,7 +4190,7 @@ void CCitizenResponseSystem::ResponseThink()
 
 void CNPC_Citizen::AddInsignia()
 {
-	CBaseEntity *pMark = CreateEntityByName( "squadinsignia" );
+	CBaseEntity *pMark = gEntList.CreateEntityByName( "squadinsignia" );
 	pMark->SetOwnerEntity( this );
 	pMark->Spawn();
 }

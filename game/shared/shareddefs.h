@@ -592,7 +592,7 @@ enum
 	EFL_FORCE_CHECK_TRANSMIT =	(1<<7),
 
 	EFL_BOT_FROZEN =			(1<<8),	// This is set on bots that are frozen.
-	EFL_SERVER_ONLY =			(1<<9),	// Non-networked entity.
+	//EFL_SERVER_ONLY =			(1<<9),	// Non-networked entity.
 	EFL_NO_AUTO_EDICT_ATTACH =	(1<<10), // Don't attach the edict; we're doing it explicitly
 	
 	// Some dirty bits with respect to abs computations

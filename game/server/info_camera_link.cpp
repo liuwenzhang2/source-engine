@@ -129,7 +129,7 @@ void CInfoCameraLink::InputSetCamera(inputdata_t &inputdata)
 //-----------------------------------------------------------------------------
 CBaseEntity *CreateInfoCameraLink( CBaseEntity *pTarget, CPointCamera *pCamera )
 {
-	CInfoCameraLink *pInfoCameraLink = (CInfoCameraLink*)CreateEntityByName( "info_camera_link" );
+	CInfoCameraLink *pInfoCameraLink = (CInfoCameraLink*)gEntList.CreateEntityByName( "info_camera_link" );
 	if ( !pInfoCameraLink )
 		return NULL;
 

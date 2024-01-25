@@ -57,7 +57,7 @@ public:
 	static CHL1_Player *CreatePlayer( const char *className, int ed )
 	{
 		//CHL1_Player::s_PlayerEdict = ed;
-		return (CHL1_Player*)CreateEntityByName( className, ed );
+		return (CHL1_Player*)gEntList.CreateEntityByName( className, ed );
 	}
 
 	void		CreateCorpse( void ) { CopyToBodyQue( this ); };

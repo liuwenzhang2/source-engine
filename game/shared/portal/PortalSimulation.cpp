@@ -149,7 +149,7 @@ CPortalSimulator::CPortalSimulator( void )
 #ifndef CLIENT_DLL
 	PS_SD_Static_World_StaticProps_ClippedProp_t::pTraceEntity = GetWorldEntity(); //will overinitialize, but it's cheap
 
-	m_InternalData.Simulation.pCollisionEntity = (CPSCollisionEntity *)CreateEntityByName( "portalsimulator_collisionentity" );
+	m_InternalData.Simulation.pCollisionEntity = (CPSCollisionEntity *)gEntList.CreateEntityByName( "portalsimulator_collisionentity" );
 	Assert( m_InternalData.Simulation.pCollisionEntity != NULL );
 	if( m_InternalData.Simulation.pCollisionEntity )
 	{
@@ -674,7 +674,7 @@ void CPortalSimulator::TakeOwnershipOfEntity( CBaseEntity *pEntity )
 	if( pEntity == NULL )
 		return;
 
-	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
 		return;
 	}
 
@@ -735,7 +735,7 @@ void CPortalSimulator::TakeOwnershipOfEntity( CBaseEntity *pEntity )
 
 void CPortalSimulator::TakePhysicsOwnership( CBaseEntity *pEntity )
 {
-	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
 		return;
 	}
 
@@ -873,7 +873,7 @@ void CPortalSimulator::ReleaseOwnershipOfEntity( CBaseEntity *pEntity, bool bMov
 	if( pEntity == NULL )
 		return;
 
-	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
 		return;
 	}
 
@@ -938,7 +938,7 @@ void CPortalSimulator::ReleaseAllEntityOwnership( void )
 
 void CPortalSimulator::ReleasePhysicsOwnership( CBaseEntity *pEntity, bool bContinuePhysicsCloning /*= true*/, bool bMovingToLinkedSimulator /*= false*/ )
 {
-	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
 		return;
 	}
 
@@ -1055,7 +1055,7 @@ void CPortalSimulator::ReleasePhysicsOwnership( CBaseEntity *pEntity, bool bCont
 
 void CPortalSimulator::StartCloningEntity( CBaseEntity *pEntity )
 {
-	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
 		return;
 	}
 
@@ -1078,7 +1078,7 @@ void CPortalSimulator::StartCloningEntity( CBaseEntity *pEntity )
 
 void CPortalSimulator::StopCloningEntity( CBaseEntity *pEntity )
 {
-	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
 		return;
 	}
 
@@ -1105,7 +1105,7 @@ void CPortalSimulator::StopCloningEntity( CBaseEntity *pEntity )
 
 void CPortalSimulator::MarkAsOwned( CBaseEntity *pEntity )
 {
-	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
 		return;
 	}
 
@@ -1130,7 +1130,7 @@ void CPortalSimulator::MarkAsOwned( CBaseEntity *pEntity )
 
 void CPortalSimulator::MarkAsReleased( CBaseEntity *pEntity )
 {
-	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
 		return;
 	}
 
@@ -2521,7 +2521,7 @@ int CPortalSimulator::GetMoveableOwnedEntities( CBaseEntity **pEntsOut, int iEnt
 
 CPortalSimulator *CPortalSimulator::GetSimulatorThatOwnsEntity( const CBaseEntity *pEntity )
 {
-	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+	if (!((CBaseEntity*)pEntity)->IsNetworkable() || pEntity->entindex() == -1) {
 		return NULL;
 	}
 #ifdef _DEBUG
@@ -2761,7 +2761,7 @@ static CUtlVector<UTIL_Remove_PhysicsStack_t> s_UTIL_Remove_PhysicsStack;
 
 void CPortalSimulator::Pre_UTIL_Remove( CBaseEntity *pEntity )
 {
-	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+	if (!pEntity->IsNetworkable() || pEntity->entindex() == -1) {
 		return;
 	}
 	int index = s_UTIL_Remove_PhysicsStack.AddToTail();
@@ -3015,7 +3015,7 @@ int CPSCollisionEntity::VPhysicsGetObjectList( IPhysicsObject **pList, int listM
 
 bool CPSCollisionEntity::IsPortalSimulatorCollisionEntity( const CBaseEntity *pEntity )
 {
-	if (pEntity->IsEFlagSet(EFL_SERVER_ONLY) || pEntity->entindex() == -1) {
+	if (!((CBaseEntity*)pEntity)->IsNetworkable() || pEntity->entindex() == -1) {
 		return false;
 	}
 	return s_PortalSimulatorCollisionEntities[pEntity->entindex()];

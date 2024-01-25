@@ -182,7 +182,7 @@ void CNPC_Alyx::SetupAlyxWithoutParent( void )
 
 void CNPC_Alyx::CreateEmpTool( void )
 {
-	m_hEmpTool = (CBaseAnimating*)CreateEntityByName( "prop_dynamic" );
+	m_hEmpTool = (CBaseAnimating*)gEntList.CreateEntityByName( "prop_dynamic" );
 	if ( m_hEmpTool )
 	{
 		m_hEmpTool->SetModel( "models/alyx_emptool_prop.mdl" );

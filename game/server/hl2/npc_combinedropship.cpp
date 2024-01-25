@@ -537,7 +537,7 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 	CollisionProp()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint);
 
 	// Throw a flaming, smoking chunk.
-	CGib *pChunk = (CGib*)CreateEntityByName( "gib" );
+	CGib *pChunk = (CGib*)gEntList.CreateEntityByName( "gib" );
 	pChunk->Spawn( "models/gibs/hgibs.mdl" );
 	pChunk->SetBloodColor( DONT_BLEED );
 
@@ -874,7 +874,7 @@ void CNPC_CombineDropship::Spawn( void )
 		break;
 
 	case CRATE_SOLDIER:
-		m_hContainer = (CBaseAnimating*)CreateEntityByName( "prop_dropship_container" );
+		m_hContainer = (CBaseAnimating*)gEntList.CreateEntityByName( "prop_dropship_container" );
 		if ( m_hContainer )
 		{
 			m_hContainer->SetName( AllocPooledString("dropship_container") );
@@ -908,7 +908,7 @@ void CNPC_CombineDropship::Spawn( void )
 		break;
 
 	case CRATE_STRIDER:
-		m_hContainer = (CBaseAnimating*)CreateEntityByName( "npc_strider" );
+		m_hContainer = (CBaseAnimating*)gEntList.CreateEntityByName( "npc_strider" );
 		m_hContainer->SetAbsOrigin( GetAbsOrigin() - Vector( 0, 0 , 100 ) );
 		m_hContainer->SetAbsAngles( GetAbsAngles() );
 		m_hContainer->SetParent(this, 0);
@@ -954,7 +954,7 @@ void CNPC_CombineDropship::Spawn( void )
 		break;
 
 	case CRATE_JEEP:
-		m_hContainer = (CBaseAnimating*)CreateEntityByName( "prop_dynamic_override" );
+		m_hContainer = (CBaseAnimating*)gEntList.CreateEntityByName( "prop_dynamic_override" );
 		if ( m_hContainer )
 		{
 			m_hContainer->SetModel( "models/buggy.mdl" );
@@ -2464,7 +2464,7 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	pNPC->Activate();
 
 	// Spawn a scripted sequence entity to make the NPC run out of the dropship
-	CAI_ScriptedSequence *pSequence = (CAI_ScriptedSequence*)CreateEntityByName( "scripted_sequence" );
+	CAI_ScriptedSequence *pSequence = (CAI_ScriptedSequence*)gEntList.CreateEntityByName( "scripted_sequence" );
 	pSequence->KeyValue( "m_iszEntity", STRING(pNPC->GetEntityName()) );
 	pSequence->KeyValue( "m_iszPlay", "Dropship_Deploy" );
 	pSequence->KeyValue( "m_fMoveTo", "4" );	// CINE_MOVETO_TELEPORT

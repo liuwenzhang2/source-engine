@@ -1109,7 +1109,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 
 				for ( int i = 0; i < 6; i++ )
 				{
-					CGrenadeSpit *pGrenade = (CGrenadeSpit*) CreateEntityByName( "grenade_spit" );
+					CGrenadeSpit *pGrenade = (CGrenadeSpit*)gEntList.CreateEntityByName( "grenade_spit" );
 					pGrenade->SetAbsOrigin( vSpitPos );
 					pGrenade->SetAbsAngles( vec3_angle );
 					DispatchSpawn( pGrenade );

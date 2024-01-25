@@ -1363,7 +1363,7 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 	if ( IsDormant() )
 		return;	// We can't see them anyway, just bail
 
-	C_FadingPhysPropClientside *pEntity = (C_FadingPhysPropClientside*)CreateEntityByName( "C_FadingPhysPropClientside" );
+	C_FadingPhysPropClientside *pEntity = (C_FadingPhysPropClientside*)cl_entitylist->CreateEntityByName( "C_FadingPhysPropClientside" );
 
 	if ( !pEntity )
 		return;

@@ -498,7 +498,7 @@ void CBasePlayer::CreateViewModel( int index /*=0*/ )
 	if ( GetViewModel( index ) )
 		return;
 
-	CBaseViewModel *vm = ( CBaseViewModel * )CreateEntityByName( "viewmodel" );
+	CBaseViewModel *vm = ( CBaseViewModel * )gEntList.CreateEntityByName( "viewmodel" );
 	if ( vm )
 	{
 		vm->SetAbsOrigin( GetAbsOrigin() );
@@ -537,7 +537,7 @@ CBasePlayer *CBasePlayer::CreatePlayer( const char *className, int ed )
 {
 	CBasePlayer *player;
 	//CBasePlayer::s_PlayerEdict = ed;
-	player = ( CBasePlayer * )CreateEntityByName( className, ed );
+	player = ( CBasePlayer * )gEntList.CreateEntityByName( className, ed );
 	return player;
 }
 
@@ -5675,7 +5675,7 @@ CBaseEntity	*CBasePlayer::GiveNamedItem( const char *pszName, int iSubType )
 
 	EHANDLE pent;
 
-	pent = CreateEntityByName(pszName);
+	pent = gEntList.CreateEntityByName(pszName);
 	if ( pent == NULL )
 	{
 		Msg( "NULL Ent in GiveNamedItem!\n" );
@@ -5992,7 +5992,7 @@ static void CreateJalopy( CBasePlayer *pPlayer )
 	// Cheat to create a jeep in front of the player
 	Vector vecForward;
 	AngleVectors( pPlayer->EyeAngles(), &vecForward );
-	CBaseEntity *pJeep = (CBaseEntity *)CreateEntityByName( "prop_vehicle_jeep" );
+	CBaseEntity *pJeep = (CBaseEntity *)gEntList.CreateEntityByName( "prop_vehicle_jeep" );
 	if ( pJeep )
 	{
 		Vector vecOrigin = pPlayer->GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);
@@ -6029,7 +6029,7 @@ static void CreateJeep( CBasePlayer *pPlayer )
 	// Cheat to create a jeep in front of the player
 	Vector vecForward;
 	AngleVectors( pPlayer->EyeAngles(), &vecForward );
-	CBaseEntity *pJeep = (CBaseEntity *)CreateEntityByName( "prop_vehicle_jeep" );
+	CBaseEntity *pJeep = (CBaseEntity *)gEntList.CreateEntityByName( "prop_vehicle_jeep" );
 	if ( pJeep )
 	{
 		Vector vecOrigin = pPlayer->GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);
@@ -6066,7 +6066,7 @@ static void CreateAirboat( CBasePlayer *pPlayer )
 	// Cheat to create a jeep in front of the player
 	Vector vecForward;
 	AngleVectors( pPlayer->EyeAngles(), &vecForward );
-	CBaseEntity *pJeep = ( CBaseEntity* )CreateEntityByName( "prop_vehicle_airboat" );
+	CBaseEntity *pJeep = ( CBaseEntity* )gEntList.CreateEntityByName( "prop_vehicle_airboat" );
 	if ( pJeep )
 	{
 		Vector vecOrigin = pPlayer->GetAbsOrigin() + vecForward * 256 + Vector( 0,0,64 );
@@ -6316,7 +6316,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 	{
 		if ( sv_cheats && sv_cheats->GetBool() )
 		{
-			ParticleSmokeGrenade *pSmoke = dynamic_cast<ParticleSmokeGrenade*>( CreateEntityByName(PARTICLESMOKEGRENADE_ENTITYNAME) );
+			ParticleSmokeGrenade *pSmoke = dynamic_cast<ParticleSmokeGrenade*>(gEntList.CreateEntityByName(PARTICLESMOKEGRENADE_ENTITYNAME) );
 			if ( pSmoke )
 			{
 				Vector vForward;
@@ -7679,7 +7679,7 @@ END_DATADESC()
 
 CBaseEntity *CreatePlayerLoadSave( Vector vOrigin, float flDuration, float flHoldTime, float flLoadTime )
 {
-	CRevertSaved *pRevertSaved = (CRevertSaved *) CreateEntityByName( "player_loadsaved" );
+	CRevertSaved *pRevertSaved = (CRevertSaved *)gEntList.CreateEntityByName( "player_loadsaved" );
 
 	if ( pRevertSaved == NULL )
 		return NULL;

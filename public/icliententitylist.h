@@ -14,8 +14,9 @@
 #endif
 
 #include "interface.h"
+#include "icliententity.h"
 
-class IClientEntity;
+//class IClientEntity;
 class ClientClass;
 class IClientNetworkable;
 class CBaseHandle;
@@ -25,12 +26,12 @@ class IClientUnknown;
 //-----------------------------------------------------------------------------
 // Purpose: Exposes IClientEntity's to engine
 //-----------------------------------------------------------------------------
-abstract_class IClientEntityList
+abstract_class IClientEntityList : public IEntityList
 {
 public:
 
 	virtual IClientEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
-	virtual void				DestroyEntity(IClientEntity* pEntity) = 0;
+	virtual void				DestroyEntity(IHandleEntity* pEntity) = 0;
 
 	// Get IClientNetworkable interface for specified entity
 	virtual IClientNetworkable*	GetClientNetworkable( int entnum ) = 0;

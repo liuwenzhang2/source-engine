@@ -527,7 +527,7 @@ void MapEntity_PrecacheEntity( const char *pEntData, int &nStringSize )
 	}
 
 	// Construct via the LINK_ENTITY_TO_CLASS factory.
-	CBaseEntity *pEntity = CreateEntityByName(className);
+	CBaseEntity *pEntity = gEntList.CreateEntityByName(className);
 
 	//
 	// Set up keyvalues, which can set the model name, which is why we don't just do UTIL_PrecacheOther here...
@@ -565,7 +565,7 @@ const char *MapEntity_ParseEntity(CBaseEntity *&pEntity, const char *pEntData, I
 		if ( pFilter )
 			pEntity = pFilter->CreateNextEntity( className );
 		else
-			pEntity = CreateEntityByName(className);
+			pEntity = gEntList.CreateEntityByName(className);
 
 		//
 		// Set up keyvalues.

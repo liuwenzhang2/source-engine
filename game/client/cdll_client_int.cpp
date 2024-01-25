@@ -16,7 +16,7 @@
 #include "clientsideeffects.h"
 #include "particlemgr.h"
 #include "steam/steam_api.h"
-#include "initializer.h"
+//#include "initializer.h"
 #include "smoke_fog_overlay.h"
 #include "view.h"
 #include "ienginevgui.h"
@@ -984,8 +984,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	g_pcv_ThreadMode = g_pCVar->FindVar( "host_thread_mode" );
 
-	if (!Initializer::InitializeAllObjects())
-		return false;
+	//if (!Initializer::InitializeAllObjects())
+	//	return false;
 
 	if (!ParticleMgr()->Init(MAX_TOTAL_PARTICLES, materials))
 		return false;
@@ -1183,7 +1183,7 @@ void CHLClient::Shutdown( void )
 
 	ClientVoiceMgr_Shutdown();
 
-	Initializer::FreeAllObjects();
+	//Initializer::FreeAllObjects();
 
 	g_pClientMode->Disable();
 	g_pClientMode->Shutdown();

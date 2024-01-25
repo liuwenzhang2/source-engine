@@ -693,7 +693,7 @@ void CNPC_Strider::Activate()
 	if ( gm_zCannonDist == 0 )
 	{
 		// Have to create a virgin strider to ensure proper pose
-		CNPC_Strider *pStrider = (CNPC_Strider *)CreateEntityByName( "npc_strider" );
+		CNPC_Strider *pStrider = (CNPC_Strider *)gEntList.CreateEntityByName( "npc_strider" );
 		Assert(pStrider);
 		pStrider->m_bDisableBoneFollowers = true; // don't create these since we're just going to destroy him
 		DispatchSpawn( pStrider );
@@ -928,7 +928,7 @@ void CNPC_Strider::PrescheduleThink()
 	// Next missile will kill me!
 	if( GetHealth() <= 50 && random->RandomInt( 0, 20 ) == 0 )
 	{
-		CBaseEntity *pTrail = CreateEntityByName( "sparktrail" );
+		CBaseEntity *pTrail = gEntList.CreateEntityByName( "sparktrail" );
 		pTrail->SetOwnerEntity( this );
 		pTrail->Spawn();
 	}
@@ -2839,7 +2839,7 @@ bool CNPC_Strider::CanShootThrough( const trace_t &tr, const Vector &vecTarget )
 //---------------------------------------------------------
 void CNPC_Strider::CreateFocus()
 {
-	m_hFocus = CreateEntityByName( "bullseye_strider_focus" );
+	m_hFocus = gEntList.CreateEntityByName( "bullseye_strider_focus" );
 
 	ASSERT( m_hFocus != NULL );
 	m_hFocus->AddSpawnFlags( SF_BULLSEYE_NONSOLID | SF_BULLSEYE_NODAMAGE );
@@ -4465,7 +4465,7 @@ void AdjustStriderNodePosition( CAI_Network *pNetwork, CAI_Node *pNode )
 		{
 			bool allowPrecache = CBaseEntity::IsPrecacheAllowed();
 			CBaseEntity::SetAllowPrecache( true );
-			pStrider = (CNPC_Strider *)CreateEntityByName( "npc_strider" );
+			pStrider = (CNPC_Strider *)gEntList.CreateEntityByName( "npc_strider" );
 			pStrider->m_bDisableBoneFollowers = true; // don't create these since we're just going to destroy him
 			DispatchSpawn( pStrider );
 			CBaseEntity::SetAllowPrecache( allowPrecache );

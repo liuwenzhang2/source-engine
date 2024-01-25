@@ -927,7 +927,7 @@ void CAI_NetworkManager::InitializeAINetworks()
 	// For not just create a single AI Network called "BigNet"
 	// At some later point we may have mulitple AI networks
 	CAI_NetworkManager *pNetwork;
-	g_pAINetworkManager = pNetwork = (CAI_NetworkManager*)CreateEntityByName("ai_network");
+	g_pAINetworkManager = pNetwork = (CAI_NetworkManager*)gEntList.CreateEntityByName("ai_network");
 	pNetwork->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
 	g_pBigAINet = pNetwork->GetNetwork();
 	pNetwork->SetName( AllocPooledString("BigNet") );
@@ -2235,7 +2235,7 @@ void CAI_NetworkBuilder::Build( CAI_Network *pNetwork )
 	if ( !nNodes )
 		return;
 
-	CAI_NetworkBuildHelper *pHelper = (CAI_NetworkBuildHelper *)CreateEntityByName( "ai_network_build_helper" );
+	CAI_NetworkBuildHelper *pHelper = (CAI_NetworkBuildHelper *)gEntList.CreateEntityByName( "ai_network_build_helper" );
 
 	VPROF( "AINet" );
 

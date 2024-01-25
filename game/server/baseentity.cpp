@@ -343,7 +343,7 @@ void CBaseEntityModelLoadProxy::Handler::OnModelLoadComplete( const model_t *pMo
 }
 
 
-CBaseEntity::CBaseEntity( bool bServerOnly )
+CBaseEntity::CBaseEntity()
 {
 	COMPILE_TIME_ASSERT( MOVETYPE_LAST < (1 << MOVETYPE_MAX_BITS) );
 	COMPILE_TIME_ASSERT( MOVECOLLIDE_COUNT < (1 << MOVECOLLIDE_MAX_BITS) );
@@ -404,10 +404,10 @@ CBaseEntity::CBaseEntity( bool bServerOnly )
 
 	SetFriction( 1.0f );
 
-	if ( bServerOnly )
-	{
-		AddEFlags( EFL_SERVER_ONLY );
-	}
+	//if ( bServerOnly )
+	//{
+	//	AddEFlags( EFL_SERVER_ONLY );
+	//}
 	NetworkProp()->MarkPVSInformationDirty();
 
 #ifndef _XBOX
@@ -479,7 +479,7 @@ void CBaseEntity::PostConstructor( const char *szClassname, int iForceEdictIndex
 	Assert( m_iClassname != NULL_STRING && STRING(m_iClassname) != NULL );
 
 	// Possibly get an edict, and add self to global list of entites.
-	if ( IsEFlagSet( EFL_SERVER_ONLY ) )
+	if ( !IsNetworkable() )
 	{
 		gEntList.AddNonNetworkableEntity( this );
 	}
@@ -495,14 +495,14 @@ void CBaseEntity::PostConstructor( const char *szClassname, int iForceEdictIndex
 			if (IsEFlagSet(EFL_NO_AUTO_EDICT_ATTACH)) {
 				if (iForceEdictIndex == -1) {
 					//Error("iForceEdictIndex can not be -1 if set EFL_NO_AUTO_EDICT_ATTACH!");
-					iForceEdictIndex = gEntList.AllocateFreeEdict();
+					iForceEdictIndex = gEntList.AllocateFreeSlot();
 				}
 				gEntList.AddNetworkableEntity(this, iForceEdictIndex);
 			}
 			else
 			{
 				if (iForceEdictIndex == -1) {
-					iForceEdictIndex = gEntList.AllocateFreeEdict();
+					iForceEdictIndex = gEntList.AllocateFreeSlot();
 				}
 				gEntList.AddNetworkableEntity(this, iForceEdictIndex);
 				//NetworkProp()->AttachEdict();
@@ -2017,7 +2017,7 @@ void CBaseEntity::UpdateOnRemove( void )
 	// Notifies entity listeners, etc
 	gEntList.NotifyRemoveEntity( this );
 
-	if (IsEFlagSet(EFL_SERVER_ONLY) || entindex()!=-1 )
+	if (!IsNetworkable() || entindex()!=-1 )
 	{
 		AddFlag( FL_KILLME );
 		if ( GetFlags() & FL_GRAPHED )
@@ -2622,7 +2622,7 @@ void CBaseEntity::PhysicsRelinkChildren( float dt )
 
 void CBaseEntity::PhysicsTouchTriggers( const Vector *pPrevAbsOrigin )
 {
-	if (!IsEFlagSet(EFL_SERVER_ONLY) && entindex()!=-1 && !IsWorld())
+	if (IsNetworkable() && entindex()!=-1 && !IsWorld())
 	{
 		Assert(CollisionProp());
 		bool isTriggerCheckSolids = IsSolidFlagSet( FSOLID_TRIGGER );
@@ -3146,7 +3146,7 @@ CBaseEntity *CBaseEntity::Create( const char *szName, const Vector &vecOrigin, c
 // will keep a pointer to it after this call.
 CBaseEntity * CBaseEntity::CreateNoSpawn( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner )
 {
-	CBaseEntity *pEntity = CreateEntityByName( szName );
+	CBaseEntity *pEntity = gEntList.CreateEntityByName( szName );
 	if ( !pEntity )
 	{
 		Assert( !"CreateNoSpawn: only works for CBaseEntities" );
@@ -3234,7 +3234,7 @@ int CBaseEntity::Restore( IRestore &restore )
 	RemoveEFlags( EFL_DIRTY_SPATIAL_PARTITION );
 	CollisionProp()->MarkSurroundingBoundsDirty();
 
-	if (!IsEFlagSet(EFL_SERVER_ONLY) && entindex()!=-1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
+	if (IsNetworkable() && entindex()!=-1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
 	{
 		PrecacheModel( STRING( GetModelName() ) );
 
@@ -5618,7 +5618,7 @@ void CC_Ent_Info( const CCommand& args )
 	else
 	{
 		// iterate through all the ents printing out their details
-		CBaseEntity *ent = CreateEntityByName( args[1] );
+		CBaseEntity *ent = gEntList.CreateEntityByName( args[1] );
 
 		if ( ent )
 		{
@@ -6247,7 +6247,7 @@ CBaseEntity *CBaseEntity::CreatePredictedEntityByName( const char *classname, co
 	CPredictableId testId;
 	testId.Init( player_index, command_number, classname, module, line );
 
-	ent = CreateEntityByName( classname );
+	ent = gEntList.CreateEntityByName( classname );
 	// No factory???
 	if ( !ent )
 		return NULL;
@@ -7374,7 +7374,7 @@ void CC_Ent_Create( const CCommand& args )
 	CBaseEntity::SetAllowPrecache( true );
 
 	// Try to create entity
-	CBaseEntity *entity = dynamic_cast< CBaseEntity * >( CreateEntityByName(args[1]) );
+	CBaseEntity *entity = dynamic_cast< CBaseEntity * >(gEntList.CreateEntityByName(args[1]) );
 	if (entity)
 	{
 		entity->Precache();

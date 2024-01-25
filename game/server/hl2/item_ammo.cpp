@@ -901,7 +901,7 @@ void CItem_AmmoCrate::HandleAnimEvent( animevent_t *pEvent )
 		{
 			if ( m_pGiveWeapon[m_nAmmoType] && !m_hActivator->Weapon_OwnsThisType( m_pGiveWeapon[m_nAmmoType] ) )
 			{
-				CBaseEntity *pEntity = CreateEntityByName( m_pGiveWeapon[m_nAmmoType] );
+				CBaseEntity *pEntity = gEntList.CreateEntityByName( m_pGiveWeapon[m_nAmmoType] );
 				CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>(pEntity);
 				if ( pWeapon )
 				{

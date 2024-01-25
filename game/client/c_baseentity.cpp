@@ -4900,7 +4900,7 @@ C_BaseEntity *C_BaseEntity::CreatePredictedEntityByName( const char *classname, 
 	}
 
 	// Try to create it
-	ent = CreateEntityByName( classname );
+	ent = cl_entitylist->CreateEntityByName( classname );
 	if ( !ent )
 	{
 		return NULL;

@@ -570,7 +570,7 @@ const QAngle &CSpriteTrail::GetRenderAngles( void )
 //-----------------------------------------------------------------------------
 CSpriteTrail *CSpriteTrail::SpriteTrailCreate( const char *pSpriteName, const Vector &origin, bool animate )
 {
-	CSpriteTrail *pSprite = (CSpriteTrail*)CreateEntityByName( "env_spritetrail" );
+	CSpriteTrail *pSprite = (CSpriteTrail*)gEntList.CreateEntityByName( "env_spritetrail" );
 
 	pSprite->SpriteInit( pSpriteName, origin );
 	pSprite->SetSolid( SOLID_NONE );

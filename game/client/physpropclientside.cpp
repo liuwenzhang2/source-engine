@@ -54,7 +54,7 @@ C_PhysPropClientside *C_PhysPropClientside::CreateNew( bool bForce )
 		return NULL;
 	}
 
-	return (C_PhysPropClientside*)CreateEntityByName("C_PhysPropClientside");
+	return (C_PhysPropClientside*)cl_entitylist->CreateEntityByName("C_PhysPropClientside");
 }
 
 C_PhysPropClientside::C_PhysPropClientside()
@@ -634,7 +634,7 @@ const char *C_PhysPropClientside::ParseEntity( const char *pEntData )
 
 	if ( !Q_strcmp( className, "func_proprrespawnzone" ) )
 	{
-		C_FuncPhysicsRespawnZone *pEntity = (C_FuncPhysicsRespawnZone*)CreateEntityByName( "C_FuncPhysicsRespawnZone" );
+		C_FuncPhysicsRespawnZone *pEntity = (C_FuncPhysicsRespawnZone*)cl_entitylist->CreateEntityByName( "C_FuncPhysicsRespawnZone" );
 
 		if ( pEntity )
 		{	

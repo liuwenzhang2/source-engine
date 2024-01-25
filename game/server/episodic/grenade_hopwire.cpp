@@ -187,7 +187,7 @@ bool CGravityVortexController::KillNPCInRange( CBaseEntity *pVictim, IPhysicsObj
 //-----------------------------------------------------------------------------
 void CGravityVortexController::CreateDenseBall( void )
 {
-	CBaseEntity *pBall = CreateEntityByName( "prop_physics" );
+	CBaseEntity *pBall = gEntList.CreateEntityByName( "prop_physics" );
 	
 	pBall->SetModel( DENSE_BALL_MODEL );
 	pBall->SetAbsOrigin( GetAbsOrigin() );
@@ -313,7 +313,7 @@ void CGravityVortexController::StartPull( const Vector &origin, float radius, fl
 CGravityVortexController *CGravityVortexController::Create( const Vector &origin, float radius, float strength, float duration )
 {
 	// Create an instance of the vortex
-	CGravityVortexController *pVortex = (CGravityVortexController *) CreateEntityByName( "vortex_controller" );
+	CGravityVortexController *pVortex = (CGravityVortexController *)gEntList.CreateEntityByName( "vortex_controller" );
 	if ( pVortex == NULL )
 		return NULL;
 

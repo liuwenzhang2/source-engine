@@ -1884,13 +1884,13 @@ void CProp_Portal::UpdatePortalLinkage( void )
 			{
 				inputdata_t inputdata;
 
-				m_hMicrophone = CreateEntityByName( "env_microphone" );
+				m_hMicrophone = gEntList.CreateEntityByName( "env_microphone" );
 				CEnvMicrophone *pMicrophone = static_cast<CEnvMicrophone*>( m_hMicrophone.Get() );
 				pMicrophone->AddSpawnFlags( SF_MICROPHONE_IGNORE_NONATTENUATED );
 				pMicrophone->AddSpawnFlags( SF_MICROPHONE_SOUND_COMBAT | SF_MICROPHONE_SOUND_WORLD | SF_MICROPHONE_SOUND_PLAYER | SF_MICROPHONE_SOUND_BULLET_IMPACT | SF_MICROPHONE_SOUND_EXPLOSION );
 				DispatchSpawn( pMicrophone );
 
-				m_hSpeaker = CreateEntityByName( "env_speaker" );
+				m_hSpeaker = gEntList.CreateEntityByName( "env_speaker" );
 				CSpeaker *pSpeaker = static_cast<CSpeaker*>( m_hSpeaker.Get() );
 
 				if( !m_bIsPortal2 )
@@ -1915,13 +1915,13 @@ void CProp_Portal::UpdatePortalLinkage( void )
 			{
 				inputdata_t inputdata;
 
-				m_hLinkedPortal->m_hMicrophone = CreateEntityByName( "env_microphone" );
+				m_hLinkedPortal->m_hMicrophone = gEntList.CreateEntityByName( "env_microphone" );
 				CEnvMicrophone *pLinkedMicrophone = static_cast<CEnvMicrophone*>( m_hLinkedPortal->m_hMicrophone.Get() );
 				pLinkedMicrophone->AddSpawnFlags( SF_MICROPHONE_IGNORE_NONATTENUATED );
 				pLinkedMicrophone->AddSpawnFlags( SF_MICROPHONE_SOUND_COMBAT | SF_MICROPHONE_SOUND_WORLD | SF_MICROPHONE_SOUND_PLAYER | SF_MICROPHONE_SOUND_BULLET_IMPACT | SF_MICROPHONE_SOUND_EXPLOSION );
 				DispatchSpawn( pLinkedMicrophone );
 
-				m_hLinkedPortal->m_hSpeaker = CreateEntityByName( "env_speaker" );
+				m_hLinkedPortal->m_hSpeaker = gEntList.CreateEntityByName( "env_speaker" );
 				CSpeaker *pLinkedSpeaker = static_cast<CSpeaker*>( m_hLinkedPortal->m_hSpeaker.Get() );
 
 				if ( !m_bIsPortal2 )
@@ -2296,7 +2296,7 @@ CProp_Portal *CProp_Portal::FindPortal( unsigned char iLinkageGroupID, bool bPor
 
 	if( bCreateIfNothingFound )
 	{
-		CProp_Portal *pPortal = (CProp_Portal *)CreateEntityByName( "prop_portal" );
+		CProp_Portal *pPortal = (CProp_Portal *)gEntList.CreateEntityByName( "prop_portal" );
 		pPortal->m_iLinkageGroupID = iLinkageGroupID;
 		pPortal->m_bIsPortal2 = bPortal2;
 		DispatchSpawn( pPortal );

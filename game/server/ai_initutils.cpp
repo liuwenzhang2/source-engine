@@ -88,7 +88,7 @@ CAI_TestHull* CAI_TestHull::GetTestHull(void)
 {
 	if (!CAI_TestHull::pTestHull)
 	{
-		CAI_TestHull::pTestHull = (CAI_TestHull*)CreateEntityByName("aitesthull");
+		CAI_TestHull::pTestHull = (CAI_TestHull*)gEntList.CreateEntityByName("aitesthull");
 		CAI_TestHull::pTestHull->Spawn();
 		CAI_TestHull::pTestHull->AddFlag( FL_NPC );
 	}

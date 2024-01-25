@@ -2118,7 +2118,7 @@ C_LocalTempEntity *CTempEnts::TempEntAllocHigh( const Vector& org, const model_t
 
 	if ( CommandLine()->CheckParm( "-tools" ) != NULL )
 	{
-		ClientEntityList().AddNonNetworkableEntity(	pTemp );
+//		ClientEntityList().AddNonNetworkableEntity(	pTemp );
 	}
 
 	return pTemp;

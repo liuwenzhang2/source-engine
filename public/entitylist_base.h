@@ -208,8 +208,9 @@ public:
 	CBaseEntityList();
 	~CBaseEntityList();
 	
-	void ReserveEdict(int index);
-	int AllocateFreeEdict(int index = -1);
+	void ReserveSlot(int index);
+	bool IsReservedSlot(int index);
+	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
 	// Add and remove entities. iForcedSerialNum should only be used on the client. The server
 	// gets to dictate what the networkable serial numbers are on the client so it can send
 	// ehandles over and they work.
@@ -255,7 +256,6 @@ protected:
 
 	virtual void Clear(void);
 
-	virtual bool IsReservedEdicts(int index);
 private:
 	CBaseHandle AddEntityAtSlot( T *pEnt, int iSlot, int iForcedSerialNum );
 	void RemoveEntityAtSlot( int iSlot );
@@ -271,7 +271,8 @@ private:
 };
 
 template<class T>
-inline void CBaseEntityList<T>::ReserveEdict(int index) {
+inline void CBaseEntityList<T>::ReserveSlot(int index) {
+	Assert(index >= 0 && index < MAX_EDICTS);
 	if (m_activeList.Head()) {
 		Error("already actived");
 	}
@@ -285,23 +286,56 @@ inline void CBaseEntityList<T>::ReserveEdict(int index) {
 }
 
 template<class T>
-inline int CBaseEntityList<T>::AllocateFreeEdict(int index) {
-	Assert(index >= 0 && index < MAX_EDICTS);
+bool CBaseEntityList<T>::IsReservedSlot(int index) {
+	CEntInfo<T>* pSlot = &m_EntPtrArray[index];
+	return pSlot->m_bReserved;
+}
+
+template<class T>
+inline int CBaseEntityList<T>::AllocateFreeSlot(bool bNetworkable, int index) {
+	if (index != -1) {
+		if (bNetworkable) {
+			if (index >= 0 && index < MAX_EDICTS) {
+
+			}
+			else {
+				Error("error index\n");
+			}
+		}
+		else {
+			if (index >= MAX_EDICTS + 1 && index < NUM_ENT_ENTRIES) {
+
+			}
+			else {
+				Error("error index\n");
+			}
+		}
+	}
 	CEntInfo<T>* pSlot = NULL;
 	if (index == -1) {
-		pSlot = m_freeNetworkableList.Head();
+		if (bNetworkable) {
+			pSlot = m_freeNetworkableList.Head();
+		}
+		else {
+			pSlot = m_freeNonNetworkableList.Head();
+		}
 	}
 	else {
 		pSlot = &m_EntPtrArray[index];
 	}
 	if (!pSlot)
 	{
-		Error("no free edict");
+		Error("no free slot");
 	}
 	if (pSlot->m_bReserved) {
 		Error("has been reserved");
 	}
-	m_freeNetworkableList.Unlink(pSlot);
+	if (bNetworkable) {
+		m_freeNetworkableList.Unlink(pSlot);
+	}
+	else {
+		m_freeNonNetworkableList.Unlink(pSlot);
+	}
 	int iSlot = GetEntInfoIndex(pSlot);
 	return iSlot;
 };
@@ -640,12 +674,6 @@ void CBaseEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 }
 
 template<class T>
-bool CBaseEntityList<T>::IsReservedEdicts(int index) {
-	CEntInfo<T>* pSlot = &m_EntPtrArray[index];
-	return pSlot->m_bReserved;
-}
-
-template<class T>
 void CBaseEntityList<T>::Clear(void) {
 	CEntInfo<T>* pList = m_activeList.Head();
 
@@ -675,40 +703,23 @@ extern CBaseEntityList<C_BaseEntity>* g_pEntityList;
 extern CBaseEntityList<CBaseEntity>* g_pEntityList;
 #endif // GAME_DLL
 
-// This is the glue that hooks .MAP entity class names to our CPP classes
-abstract_class IEntityFactoryDictionary
-{
-public:
-	virtual void InstallFactory(IEntityFactory * pFactory) = 0;
-	virtual IHandleEntity* Create(const char* pClassName , int iForceEdictIndex, int iSerialNum) = 0;
-	virtual void Destroy(IHandleEntity* pEntity) = 0;
-	virtual IEntityFactory* FindFactory(const char* pClassName) = 0;
-	virtual const char* GetMapClassName(const char* pClassName) = 0;
-	virtual const char* GetDllClassName(const char* pClassName) = 0;
-	virtual size_t		GetEntitySize(const char* pClassName) = 0;
-	virtual const char* GetCannonicalName(const char* pClassName) = 0;
-	virtual void ReportEntitySizes() = 0;
-};
-
-IEntityFactoryDictionary* EntityFactoryDictionary();
-
 inline bool CanCreateEntityClass(const char* pszClassname)
 {
 	return (EntityFactoryDictionary() != NULL && EntityFactoryDictionary()->FindFactory(pszClassname) != NULL);
 }
 
-#ifdef CLIENT_DLL
-inline C_BaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1)
-{
-	return (C_BaseEntity*)EntityFactoryDictionary()->Create(className, iForceEdictIndex, iSerialNum);
-}
-#endif // CLIENT_DLL
-#ifdef GAME_DLL
-inline CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1)
-{
-	return (CBaseEntity*)EntityFactoryDictionary()->Create(className, iForceEdictIndex, iSerialNum);
-}
-#endif // GAME_DLL
+//#ifdef CLIENT_DLL
+//inline C_BaseEntity* CreateEntityByName2(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1)
+//{
+//	return (C_BaseEntity*)EntityFactoryDictionary()->Create(className, iForceEdictIndex, iSerialNum);
+//}
+//#endif // CLIENT_DLL
+//#ifdef GAME_DLL
+//inline CBaseEntity* CreateEntityByName2(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1)
+//{
+//	return (CBaseEntity*)EntityFactoryDictionary()->Create(className, iForceEdictIndex, iSerialNum);
+//}
+//#endif // GAME_DLL
 
 inline const char* GetEntityMapClassName(const char* className)
 {
@@ -756,8 +767,8 @@ class CEntityFactory : public IEntityFactory
 {
 	class CEntityProxy : public T {
 
-		CEntityProxy(CEntityFactory<T>* pEntityFactory) 
-		:m_pEntityFactory(pEntityFactory)
+		CEntityProxy(CEntityFactory<T>* pEntityFactory, IEntityList* pEntityList)
+		:m_pEntityFactory(pEntityFactory), m_pEntityList(pEntityList)
 		{
 
 		}
@@ -770,10 +781,14 @@ class CEntityFactory : public IEntityFactory
 			return m_pEntityFactory; 
 		}
 
+		IEntityList* GetEntityList() { 
+			return m_pEntityList;
+		}
+
 	private:
 		CEntityFactory<T>* const m_pEntityFactory;
 		bool m_bInDestruction = false;
-
+		IEntityList* const m_pEntityList;
 		template <class U>
 		friend class CEntityFactory;
 	};
@@ -789,15 +804,18 @@ public:
 		EntityFactoryDictionary()->InstallFactory(this);
 	}
 
-	IHandleEntity* Create(int iForceEdictIndex, int iSerialNum)
+	IHandleEntity* Create(IEntityList* pEntityList, int iForceEdictIndex, int iSerialNum)
 	{
-		T* newEnt = new CEntityProxy(this); // this is the only place 'new' should be used!
+		IHandleEntity* newEnt = new CEntityProxy(this, pEntityList); // this is the only place 'new' should be used!
 #ifdef CLIENT_DLL
 		((IHandleEntity*)newEnt)->Init(iForceEdictIndex, iSerialNum);
 #endif
 #ifdef GAME_DLL
-		newEnt->PostConstructor(m_pMapClassName, iForceEdictIndex);
+		((CBaseEntity*)newEnt)->PostConstructor(m_pMapClassName, iForceEdictIndex);
 #endif // GAME_DLL
+		if (newEnt->GetEntityList()) {
+			int aaa = 0;
+		}
 		return newEnt;
 	}
 
@@ -828,6 +846,14 @@ public:
 	virtual size_t GetEntitySize()
 	{
 		return sizeof(T);
+	}
+
+	virtual int RequiredEdictIndex() {
+		return T::RequiredEdictIndexStatic();
+	}
+
+	virtual bool IsNetworkable() {
+		return T::IsNetworkableStatic();
 	}
 private:
 

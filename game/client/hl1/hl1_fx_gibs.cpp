@@ -51,7 +51,7 @@ public:
 	
 	static C_HL1Gib *CreateClientsideGib( const char *pszModelName, Vector vecOrigin, Vector vecForceDir, AngularImpulse vecAngularImp )
 	{
-		C_HL1Gib *pGib = (C_HL1Gib*)CreateEntityByName( "C_HL1Gib" );
+		C_HL1Gib *pGib = (C_HL1Gib*)cl_entitylist->CreateEntityByName( "C_HL1Gib" );
 
 		if ( pGib == NULL )
 			return NULL;

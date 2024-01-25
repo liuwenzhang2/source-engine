@@ -158,7 +158,7 @@ void CSquidSpit:: Spawn( void )
 
 void CSquidSpit::Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVelocity )
 {
-	CSquidSpit *pSpit = (CSquidSpit*)CreateEntityByName( "squidspit" );
+	CSquidSpit *pSpit = (CSquidSpit*)gEntList.CreateEntityByName( "squidspit" );
 	pSpit->Spawn();
 	
 	UTIL_SetOrigin( pSpit, vecStart );

@@ -1282,7 +1282,7 @@ void CNPC_Blob::AdvanceBatch()
 //-----------------------------------------------------------------------------
 CBlobElement *CNPC_Blob::CreateNewElement()
 {
-	CBlobElement *pElement = static_cast<CBlobElement*>(CreateEntityByName( "blob_element" ));
+	CBlobElement *pElement = static_cast<CBlobElement*>(gEntList.CreateEntityByName( "blob_element" ));
 
 	if( pElement != NULL )
 	{

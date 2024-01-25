@@ -258,7 +258,7 @@ void CC_CreateFlashlight( const CCommand &args )
 	QAngle angles = pPlayer->EyeAngles();
 	Vector origin = pPlayer->EyePosition();		
 
-	CEnvProjectedTexture *pFlashlight = dynamic_cast< CEnvProjectedTexture * >( CreateEntityByName("env_projectedtexture") );
+	CEnvProjectedTexture *pFlashlight = dynamic_cast< CEnvProjectedTexture * >(gEntList.CreateEntityByName("env_projectedtexture") );
 	if( args.ArgC() > 1 )
 	{
 		pFlashlight->SetName( AllocPooledString( args[1] ) );

@@ -187,6 +187,9 @@ public:
 									C_BaseEntity();
 	virtual							~C_BaseEntity();
 
+	static int RequiredEdictIndexStatic(void) { return -1; }
+	static bool IsNetworkableStatic(void) { return true; }
+	virtual bool IsNetworkable(void) { return C_BaseEntity::IsNetworkableStatic(); }
 	static C_BaseEntity				*CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist = false );
 	
 	// FireBullets uses shared code for prediction.

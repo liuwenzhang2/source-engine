@@ -335,7 +335,7 @@ void CPointSpotlight::SpotlightCreate(void)
 	trace_t tr;
 	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + m_vSpotlightDir * m_flSpotlightMaxLength, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 
-	m_hSpotlightTarget = (CSpotlightEnd*)CreateEntityByName( "spotlight_end" );
+	m_hSpotlightTarget = (CSpotlightEnd*)gEntList.CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
 	m_hSpotlightTarget->SetAbsOrigin( tr.endpos );
 	m_hSpotlightTarget->SetOwnerEntity( this );

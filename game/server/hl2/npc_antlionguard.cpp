@@ -3196,7 +3196,7 @@ void CNPC_AntlionGuard::SummonAntlions( void )
 			continue;
 		}
 
-		CAI_BaseNPC	*pent = (CAI_BaseNPC*)CreateEntityByName( "npc_antlion" );
+		CAI_BaseNPC	*pent = (CAI_BaseNPC*)gEntList.CreateEntityByName( "npc_antlion" );
 		if ( !pent )
 			break;
 

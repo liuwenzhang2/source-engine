@@ -50,7 +50,7 @@ bool CFuncLadderEndPoint::Validate()
 
 	Vector endPos = other->GetAbsOrigin();
 
-	CFuncLadder *ladder = ( CFuncLadder * )CreateEntityByName( "func_useableladder" );
+	CFuncLadder *ladder = ( CFuncLadder * )gEntList.CreateEntityByName( "func_useableladder" );
 	if ( ladder )
 	{
 		ladder->SetEndPoints( startPos, endPos );

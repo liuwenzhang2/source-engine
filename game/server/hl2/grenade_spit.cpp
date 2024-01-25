@@ -76,7 +76,7 @@ void CGrenadeSpit::Spawn( void )
 	AddEffects( EF_NOSHADOW|EF_NORECEIVESHADOW );
 
 	// Create the dust effect in place
-	m_hSpitEffect = (CParticleSystem *) CreateEntityByName( "info_particle_system" );
+	m_hSpitEffect = (CParticleSystem *)gEntList.CreateEntityByName( "info_particle_system" );
 	if ( m_hSpitEffect != NULL )
 	{
 		// Setup our basic parameters

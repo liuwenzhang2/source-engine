@@ -3387,7 +3387,7 @@ void CMortarShell::FixUpImpactPoint( const Vector &initialPos, const Vector &ini
 
 CMortarShell *CMortarShell::Create( const Vector &vecStart, const Vector &vecTarget, const Vector &vecShotDir, float flImpactDelay, float flWarnDelay, string_t warnSound )
 {
-	CMortarShell *pShell = (CMortarShell *)CreateEntityByName("mortarshell" );
+	CMortarShell *pShell = (CMortarShell *)gEntList.CreateEntityByName("mortarshell" );
 
 	// Place the mortar shell at the target location so that it can make the sound and explode.
 	trace_t	tr;

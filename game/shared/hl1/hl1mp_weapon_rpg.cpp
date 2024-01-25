@@ -330,7 +330,7 @@ void CRpgRocket::Detonate( void )
 //-----------------------------------------------------------------------------
 CRpgRocket *CRpgRocket::Create( const Vector &vecOrigin, const QAngle &angAngles, CBasePlayer *pentOwner )
 {
-	CRpgRocket *pRocket = (CRpgRocket *)CreateEntityByName( "rpg_rocket" );
+	CRpgRocket *pRocket = (CRpgRocket *)gEntList.CreateEntityByName( "rpg_rocket" );
 	UTIL_SetOrigin( pRocket, vecOrigin );
 	pRocket->SetAbsAngles( angAngles );
 	pRocket->Spawn();

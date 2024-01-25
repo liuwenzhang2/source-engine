@@ -2538,7 +2538,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	// Assume no entities beyond world and client slots
 	//num_edicts = GetMaxClients()+1;
 	for (int i = 0; i < GetMaxClients() + 1; i++) {
-		serverEntitylist->ReserveEdict(i);
+		serverEntitylist->ReserveSlot(i);
 	}
 
 	COM_TimestampedLog( "SV_AllocateEdicts" );

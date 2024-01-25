@@ -32,7 +32,9 @@ public:
 									C_BaseTempEntity( void );
 	virtual							~C_BaseTempEntity( void );
 
-
+	static int RequiredEdictIndexStatic(void) { return -1; }
+	static bool IsNetworkableStatic(void) { return true; }
+	virtual bool IsNetworkable(void) { return C_BaseTempEntity::IsNetworkableStatic(); }
 // IClientUnknown implementation.
 public:
 

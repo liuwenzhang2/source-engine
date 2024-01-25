@@ -22,11 +22,11 @@ public:
 	virtual ~CEffectsClient();
 
 	// Members of the IEffect interface
-	virtual void Beam( const Vector &Start, const Vector &End, int nModelIndex, 
-		int nHaloIndex, unsigned char frameStart, unsigned char frameRate,
-		float flLife, unsigned char width, unsigned char endWidth, unsigned char fadeLength, 
-		unsigned char noise, unsigned char red, unsigned char green,
-		unsigned char blue, unsigned char brightness, unsigned char speed);
+	//virtual void Beam( const Vector &Start, const Vector &End, int nModelIndex, 
+	//	int nHaloIndex, unsigned char frameStart, unsigned char frameRate,
+	//	float flLife, unsigned char width, unsigned char endWidth, unsigned char fadeLength, 
+	//	unsigned char noise, unsigned char red, unsigned char green,
+	//	unsigned char blue, unsigned char brightness, unsigned char speed);
 	virtual void Smoke( const Vector &origin, int modelIndex, float scale, float framerate );
 	virtual void Sparks( const Vector &position, int nMagnitude = 1, int nTrailLength = 1, const Vector *pvecDir = NULL );
 	virtual void Dust( const Vector &pos, const Vector &dir, float size, float speed );
@@ -101,13 +101,13 @@ void CEffectsClient::SuppressEffectsSounds( bool bSuppress )
 //-----------------------------------------------------------------------------
 // Generates a beam
 //-----------------------------------------------------------------------------
-void CEffectsClient::Beam( const Vector &vecStartPoint, const Vector &vecEndPoint, 
-	int nModelIndex, int nHaloIndex, unsigned char frameStart, unsigned char nFrameRate,
-	float flLife, unsigned char nWidth, unsigned char nEndWidth, unsigned char nFadeLength, 
-	unsigned char noise, unsigned char r, unsigned char g,
-	unsigned char b, unsigned char brightness, unsigned char nSpeed)
-{
-	Assert(0);
+//void CEffectsClient::Beam( const Vector &vecStartPoint, const Vector &vecEndPoint, 
+//	int nModelIndex, int nHaloIndex, unsigned char frameStart, unsigned char nFrameRate,
+//	float flLife, unsigned char nWidth, unsigned char nEndWidth, unsigned char nFadeLength, 
+//	unsigned char noise, unsigned char r, unsigned char g,
+//	unsigned char b, unsigned char brightness, unsigned char nSpeed)
+//{
+//	Assert(0);
 //	CBroadcastRecipientFilter filter;
 //	if ( !SuppressTE( filter ) )
 //	{
@@ -116,7 +116,7 @@ void CEffectsClient::Beam( const Vector &vecStartPoint, const Vector &vecEndPoin
 //		flLife, 0.1 * nWidth,  0.1 * nEndWidth, nFadeLength, 0.01 * nAmplitude, a, 0.1 * nSpeed, 
 //		m_nStartFrame, 0.1 * nFrameRate, r, g, b );
 //	}
-}
+//}
 
 
 //-----------------------------------------------------------------------------

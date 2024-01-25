@@ -204,7 +204,7 @@ CRopeKeyframe* CRopeKeyframe::Create(
 	int numSegments
 	)
 {
-	CRopeKeyframe *pRet = (CRopeKeyframe*)CreateEntityByName( "keyframe_rope" );
+	CRopeKeyframe *pRet = (CRopeKeyframe*)gEntList.CreateEntityByName( "keyframe_rope" );
 	if( !pRet )
 		return NULL;
 
@@ -233,7 +233,7 @@ CRopeKeyframe* CRopeKeyframe::CreateWithSecondPointDetached(
 	bool bInitialHang
 	)
 {
-	CRopeKeyframe *pRet = (CRopeKeyframe*)CreateEntityByName( "keyframe_rope" );
+	CRopeKeyframe *pRet = (CRopeKeyframe*)gEntList.CreateEntityByName( "keyframe_rope" );
 	if( !pRet )
 		return NULL;
 

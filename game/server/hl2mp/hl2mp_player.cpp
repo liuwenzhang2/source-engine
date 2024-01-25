@@ -1062,7 +1062,7 @@ void CHL2MP_Player::CreateViewModel( int index /*=0*/ )
 	if ( GetViewModel( index ) )
 		return;
 
-	CPredictedViewModel *vm = ( CPredictedViewModel * )CreateEntityByName( "predicted_viewmodel" );
+	CPredictedViewModel *vm = ( CPredictedViewModel * )gEntList.CreateEntityByName( "predicted_viewmodel" );
 	if ( vm )
 	{
 		vm->SetAbsOrigin( GetAbsOrigin() );
@@ -1130,7 +1130,7 @@ void CHL2MP_Player::CreateRagdollEntity( void )
 	if ( !pRagdoll )
 	{
 		// create a new one
-		pRagdoll = dynamic_cast< CHL2MPRagdoll* >( CreateEntityByName( "hl2mp_ragdoll" ) );
+		pRagdoll = dynamic_cast< CHL2MPRagdoll* >(gEntList.CreateEntityByName( "hl2mp_ragdoll" ) );
 	}
 
 	if ( pRagdoll )
