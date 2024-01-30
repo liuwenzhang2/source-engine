@@ -73,8 +73,7 @@ CPhysicsShadowClone::~CPhysicsShadowClone( void )
 	VPhysicsSetObject( NULL );
 	m_hClonedEntity = NULL;
 	s_ActiveShadowClones.FindAndRemove( this ); //also removed in UpdateOnRemove()
-	Assert( s_IsShadowClone[entindex()] == true );
-	s_IsShadowClone[entindex()] = false;
+	
 }
 
 void CPhysicsShadowClone::UpdateOnRemove( void )
@@ -123,6 +122,8 @@ void CPhysicsShadowClone::UpdateOnRemove( void )
 	VPhysicsSetObject( NULL );
 	m_hClonedEntity = NULL;
 	s_ActiveShadowClones.FindAndRemove( this ); //also removed in Destructor
+	Assert(s_IsShadowClone[entindex()] == true);
+	s_IsShadowClone[entindex()] = false;
 	BaseClass::UpdateOnRemove();
 }
 

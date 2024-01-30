@@ -247,7 +247,7 @@ public:
 	const CBaseFlex *	GetOuter() const 	{ return m_pOuter; }
 
 private:
-	CHandle<CBaseFlex>	m_pOuter;
+	CBaseFlex*	m_pOuter;
 };
 
 class CMultiplayer_Expresser : public CAI_Expresser

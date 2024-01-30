@@ -685,7 +685,7 @@ void CPrediction::FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *m
 #if !defined( NO_ENTITY_PREDICTION )
 	VPROF( "CPrediction::FinishMove" );
 
-	player->m_RefEHandle = move->m_nPlayerHandle;
+	//player->m_RefEHandle = move->m_nPlayerHandle;
 
 	player->m_vecVelocity = move->m_vecVelocity;
 

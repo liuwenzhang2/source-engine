@@ -262,8 +262,8 @@ public:
 // IClientUnknown overrides.
 public:
 
-	virtual void SetRefEHandle( const CBaseHandle &handle );
-	virtual const CBaseHandle& GetRefEHandle() const;
+	//virtual void SetRefEHandle( const CBaseHandle &handle );
+	//virtual const CBaseHandle& GetRefEHandle() const;
 
 	void					SetToolHandle( HTOOLHANDLE handle );
 	HTOOLHANDLE				GetToolHandle() const;
@@ -675,7 +675,7 @@ public:
 	C_BaseEntity *FirstMoveChild( void ) const;
 	C_BaseEntity *NextMovePeer( void ) const;
 
-	inline ClientEntityHandle_t		GetClientHandle() const	{ return ClientEntityHandle_t( m_RefEHandle ); }
+	inline ClientEntityHandle_t		GetClientHandle() const	{ return ClientEntityHandle_t( GetRefEHandle() ); }
 	inline bool						IsServerEntity( void );
 
 	virtual RenderGroup_t			GetRenderGroup();
@@ -1389,7 +1389,7 @@ protected:
 	// FIXME: Should I move the functions handling these out of C_ClientEntity
 	// and into C_BaseEntity? Then we could make these private.
 	// Client handle
-	CBaseHandle m_RefEHandle;	// Reference ehandle. Used to generate ehandles off this entity.
+	//CBaseHandle m_RefEHandle;	// Reference ehandle. Used to generate ehandles off this entity.
 
 private:
 	// Set by tools if this entity should route "info" to various tools listening to HTOOLENTITIES

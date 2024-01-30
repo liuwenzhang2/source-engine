@@ -2899,12 +2899,13 @@ CPSCollisionEntity::~CPSCollisionEntity( void )
 {
 	if( m_pOwningSimulator )
 	{
-		m_pOwningSimulator->m_InternalData.Simulation.Dynamic.EntFlags[entindex()] &= ~PSEF_OWNS_PHYSICS;
-		m_pOwningSimulator->MarkAsReleased( this );
-		m_pOwningSimulator->m_InternalData.Simulation.pCollisionEntity = NULL;
-		m_pOwningSimulator = NULL;
+		Error("entindex() not valid in destruct");
+		//m_pOwningSimulator->m_InternalData.Simulation.Dynamic.EntFlags[entindex()] &= ~PSEF_OWNS_PHYSICS;
+		//m_pOwningSimulator->MarkAsReleased( this );
+		//m_pOwningSimulator->m_InternalData.Simulation.pCollisionEntity = NULL;
+		//m_pOwningSimulator = NULL;
 	}
-	s_PortalSimulatorCollisionEntities[entindex()] = false;
+	//s_PortalSimulatorCollisionEntities[entindex()] = false;
 }
 
 void CPSCollisionEntity::UpdateOnRemove( void )

@@ -49,7 +49,7 @@ public:
 			int				GetNumBreakableChunks( void ) { return m_iNumBreakableChunks; }
 	
 			void			SetRespawnZone( C_FuncPhysicsRespawnZone *pZone );
-
+			void			UpdateOnRemove(void);
 // IBreakableWithPropData interface:
 public:
 // IBreakableWithPropData

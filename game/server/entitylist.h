@@ -101,7 +101,7 @@ extern void PhysOnCleanupDeleteList();
 //			entities is done through this object.
 //-----------------------------------------------------------------------------
 template<class T>
-class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList
+class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, public IEntityCallBack
 {
 	typedef CBaseEntityList<T> BaseClass;
 public:
@@ -201,7 +201,8 @@ public:
 
 // CBaseEntityList overrides.
 protected:
-
+	virtual void AfterCreated(IHandleEntity* pEntity);
+	virtual void BeforeDestroy(IHandleEntity* pEntity);
 	virtual void OnAddEntity( T *pEnt, CBaseHandle handle );
 	virtual void OnRemoveEntity( T *pEnt, CBaseHandle handle );
 
@@ -234,7 +235,12 @@ inline int CGlobalEntityList<T>::AllocateFreeSlot(bool bNetworkable, int index) 
 
 template<class T>
 inline CBaseEntity* CGlobalEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {
-	return (CBaseEntity*)EntityFactoryDictionary()->Create(this, className, iForceEdictIndex, iSerialNum);
+	if (EntityFactoryDictionary()->RequiredEdictIndex(className) != -1) {
+		iForceEdictIndex = EntityFactoryDictionary()->RequiredEdictIndex(className);
+	}
+	iForceEdictIndex = BaseClass::AllocateFreeSlot(EntityFactoryDictionary()->IsNetworkable(className), iForceEdictIndex);
+	iSerialNum = BaseClass::GetNetworkSerialNumber(iForceEdictIndex);
+	return (CBaseEntity*)EntityFactoryDictionary()->Create(this, className, iForceEdictIndex, iSerialNum, this);
 }
 
 template<class T>
@@ -1125,6 +1131,17 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityNearestFacing(const Vector& origin,
 		}
 	}
 	return best_ent;
+}
+
+template<class T>
+void CGlobalEntityList<T>::AfterCreated(IHandleEntity* pEntity) {
+	BaseClass::AddEntity((T*)pEntity);
+}
+
+
+template<class T>
+void CGlobalEntityList<T>::BeforeDestroy(IHandleEntity* pEntity) {
+	BaseClass::RemoveEntity((T*)pEntity);
 }
 
 template<class T>

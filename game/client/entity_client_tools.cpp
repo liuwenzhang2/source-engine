@@ -227,7 +227,7 @@ void CClientTools::AddClientRenderable( IClientRenderable *pRenderable, int rend
 {
 	Assert( pRenderable );
 
-	cl_entitylist->AddNonNetworkableEntity( (C_BaseEntity*)pRenderable->GetIClientUnknown() );
+	//cl_entitylist->AddNonNetworkableEntity( (C_BaseEntity*)pRenderable->GetIClientUnknown() );
 
 	ClientRenderHandle_t handle = pRenderable->RenderHandle();
 	if ( INVALID_CLIENT_RENDER_HANDLE == handle )
@@ -251,7 +251,7 @@ void CClientTools::RemoveClientRenderable( IClientRenderable *pRenderable )
 	{
 		ClientLeafSystem()->RemoveRenderable( handle );
 	}
-	cl_entitylist->RemoveEntity( pRenderable->GetIClientUnknown()->GetRefEHandle() );
+	//cl_entitylist->RemoveEntity( pRenderable->GetIClientUnknown()->GetBaseEntity() );
 }
 
 void CClientTools::MarkClientRenderableDirty( IClientRenderable *pRenderable )

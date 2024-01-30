@@ -155,7 +155,7 @@ void CViewAngleAnimation::Spawn( void )
 
 	m_bFinished = true;	// don't run right away
 
-	ClientEntityList().AddNonNetworkableEntity(	this );
+	//ClientEntityList().AddNonNetworkableEntity(	this );
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
 }
 

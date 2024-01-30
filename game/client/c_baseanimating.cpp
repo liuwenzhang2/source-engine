@@ -630,7 +630,7 @@ void C_ClientRagdoll::Release( void )
 	{
 		ClientThinkList()->RemoveThinkable( GetClientHandle() );
 	}
-	ClientEntityList().RemoveEntity( GetClientHandle() );
+	//ClientEntityList().RemoveEntity( this );
 
 	partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, CollisionProp()->GetPartitionHandle() );
 	RemoveFromLeafSystem();

@@ -28,10 +28,16 @@ public:
 	virtual bool Init(int entnum, int iSerialNum) { return true; }
 };
 
+abstract_class IEntityCallBack{
+public:
+	virtual void AfterCreated(IHandleEntity* pEntity) = 0;
+	virtual void BeforeDestroy(IHandleEntity* pEntity) = 0;
+};
+
 abstract_class IEntityFactory
 {
 public:
-	virtual IHandleEntity * Create(IEntityList* pEntityList, int iForceEdictIndex,int iSerialNum ) = 0;//const char* pClassName, 
+	virtual IHandleEntity * Create(IEntityList* pEntityList, int iForceEdictIndex,int iSerialNum ,IEntityCallBack* pCallBack) = 0;//const char* pClassName, 
 	virtual void Destroy(IHandleEntity* pEntity) = 0;
 	virtual const char* GetMapClassName() = 0;
 	virtual const char* GetDllClassName() = 0;
@@ -45,7 +51,7 @@ abstract_class IEntityFactoryDictionary
 {
 public:
 	virtual void InstallFactory(IEntityFactory * pFactory) = 0;
-	virtual IHandleEntity* Create(IEntityList* pEntityList, const char* pClassName , int iForceEdictIndex, int iSerialNum) = 0;
+	virtual IHandleEntity* Create(IEntityList* pEntityList, const char* pClassName , int iForceEdictIndex, int iSerialNum, IEntityCallBack* pCallBack) = 0;
 	virtual void Destroy(IHandleEntity* pEntity) = 0;
 	virtual IEntityFactory* FindFactory(const char* pClassName) = 0;
 	virtual const char* GetMapClassName(const char* pClassName) = 0;

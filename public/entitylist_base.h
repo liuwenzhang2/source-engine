@@ -208,16 +208,7 @@ public:
 	CBaseEntityList();
 	~CBaseEntityList();
 	
-	void ReserveSlot(int index);
-	bool IsReservedSlot(int index);
-	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
-	// Add and remove entities. iForcedSerialNum should only be used on the client. The server
-	// gets to dictate what the networkable serial numbers are on the client so it can send
-	// ehandles over and they work.
-	CBaseHandle AddNetworkableEntity( T *pEnt, int index, int iForcedSerialNum = -1 );
-	CBaseHandle AddNonNetworkableEntity( T *pEnt );
-	void RemoveEntity( CBaseHandle handle );
-
+	
 	// Get an ehandle from a networkable entity's index (note: if there is no entity in that slot,
 	// then the ehandle will be invalid and produce NULL).
 	CBaseHandle GetNetworkableHandle( int iEntity ) const;
@@ -246,6 +237,16 @@ public:
 	void NotifySpawn(T* pEnt);
 	void NotifyRemoveEntity(T* pEnt);
 protected:
+	void ReserveSlot(int index);
+	bool IsReservedSlot(int index);
+	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
+	// Add and remove entities. iForcedSerialNum should only be used on the client. The server
+	// gets to dictate what the networkable serial numbers are on the client so it can send
+	// ehandles over and they work.
+	//CBaseHandle AddNetworkableEntity( T *pEnt, int index, int iForcedSerialNum = -1 );
+	//CBaseHandle AddNonNetworkableEntity( T *pEnt );
+	void AddEntity(T* pEnt);
+	void RemoveEntity(T* pEnt);
 
 	// These are notifications to the derived class. It can cache info here if it wants.
 	virtual void OnAddEntity( T *pEnt, CBaseHandle handle );
@@ -257,8 +258,8 @@ protected:
 	virtual void Clear(void);
 
 private:
-	CBaseHandle AddEntityAtSlot( T *pEnt, int iSlot, int iForcedSerialNum );
-	void RemoveEntityAtSlot( int iSlot );
+	//CBaseHandle AddEntityAtSlot( T *pEnt, int iSlot, int iForcedSerialNum );
+	//void RemoveEntityAtSlot( int iSlot );
 	int GetEntInfoIndex( const CEntInfo<T> *pEntInfo ) const;
 
 	// The first MAX_EDICTS entities are networkable. The rest are client-only or server-only.
@@ -327,14 +328,19 @@ inline int CBaseEntityList<T>::AllocateFreeSlot(bool bNetworkable, int index) {
 	{
 		Error("no free slot");
 	}
-	if (pSlot->m_bReserved) {
-		Error("has been reserved");
+	if (pSlot->m_pEntity) {
+		Error("pSlot->m_pEntity must be NULL");
 	}
-	if (bNetworkable) {
-		m_freeNetworkableList.Unlink(pSlot);
+	if (pSlot->m_bReserved) {
+		m_ReservedNetworkableList.Unlink(pSlot);
 	}
 	else {
-		m_freeNonNetworkableList.Unlink(pSlot);
+		if (bNetworkable) {
+			m_freeNetworkableList.Unlink(pSlot);
+		}
+		else {
+			m_freeNonNetworkableList.Unlink(pSlot);
+		}
 	}
 	int iSlot = GetEntInfoIndex(pSlot);
 	return iSlot;
@@ -478,56 +484,52 @@ CBaseEntityList<T>::~CBaseEntityList()
 	Clear();
 }
 
-template<class T>
-CBaseHandle CBaseEntityList<T>::AddNetworkableEntity(T* pEnt, int index, int iForcedSerialNum)
-{
-	Assert(index >= 0 && index < MAX_EDICTS);
-	if (pEnt->GetEntityFactory() == NULL) {
-		Error("EntityFactory can not be NULL!");
-	}
-	CEntInfo<T>* pSlot = &m_EntPtrArray[index];
-	if (pSlot->m_bReserved) {
-		m_ReservedNetworkableList.Unlink(pSlot);
-	}
-	else {
-		if(m_freeNetworkableList.IsInList(pSlot)) {
-			m_freeNetworkableList.Unlink(pSlot);
-		}
-	}
-	return AddEntityAtSlot(pEnt, index, iForcedSerialNum);
-}
+//template<class T>
+//CBaseHandle CBaseEntityList<T>::AddNetworkableEntity(T* pEnt, int index, int iForcedSerialNum)
+//{
+//	Assert(index >= 0 && index < MAX_EDICTS);
+//	if (pEnt->GetEntityFactory() == NULL) {
+//		Error("EntityFactory can not be NULL!");
+//	}
+//	CEntInfo<T>* pSlot = &m_EntPtrArray[index];
+//	if (pSlot->m_bReserved) {
+//		m_ReservedNetworkableList.Unlink(pSlot);
+//	}
+//	else {
+//		if(m_freeNetworkableList.IsInList(pSlot)) {
+//			m_freeNetworkableList.Unlink(pSlot);
+//		}
+//	}
+//	return AddEntityAtSlot(pEnt, index, iForcedSerialNum);
+//}
+
+//template<class T>
+//CBaseHandle CBaseEntityList<T>::AddNonNetworkableEntity(T* pEnt)
+//{
+//	if (pEnt->GetEntityFactory() == NULL) {
+//		Error("EntityFactory can not be NULL!");
+//	}
+//	// Find a slot for it.
+//	CEntInfo<T>* pSlot = m_freeNonNetworkableList.Head();
+//	if (!pSlot)
+//	{
+//		Warning("CBaseEntityList::AddNonNetworkableEntity: no free slots!\n");
+//		AssertMsg(0, ("CBaseEntityList::AddNonNetworkableEntity: no free slots!\n"));
+//		return CBaseHandle();
+//	}
+//
+//	// Move from the free list into the allocated list.
+//	m_freeNonNetworkableList.Unlink(pSlot);
+//	int iSlot = GetEntInfoIndex(pSlot);
+//
+//	return AddEntityAtSlot(pEnt, iSlot, -1);
+//}
 
 template<class T>
-CBaseHandle CBaseEntityList<T>::AddNonNetworkableEntity(T* pEnt)
+void CBaseEntityList<T>::AddEntity(T* pEnt)
 {
-	if (pEnt->GetEntityFactory() == NULL) {
-		Error("EntityFactory can not be NULL!");
-	}
-	// Find a slot for it.
-	CEntInfo<T>* pSlot = m_freeNonNetworkableList.Head();
-	if (!pSlot)
-	{
-		Warning("CBaseEntityList::AddNonNetworkableEntity: no free slots!\n");
-		AssertMsg(0, ("CBaseEntityList::AddNonNetworkableEntity: no free slots!\n"));
-		return CBaseHandle();
-	}
-
-	// Move from the free list into the allocated list.
-	m_freeNonNetworkableList.Unlink(pSlot);
-	int iSlot = GetEntInfoIndex(pSlot);
-
-	return AddEntityAtSlot(pEnt, iSlot, -1);
-}
-
-template<class T>
-void CBaseEntityList<T>::RemoveEntity(CBaseHandle handle)
-{
-	RemoveEntityAtSlot(handle.GetEntryIndex());
-}
-
-template<class T>
-CBaseHandle CBaseEntityList<T>::AddEntityAtSlot(T* pEnt, int iSlot, int iForcedSerialNum)
-{
+	int iSlot = ((IHandleEntity*)pEnt)->GetRefEHandle().GetEntryIndex();
+	int iSerialNum = ((IHandleEntity*)pEnt)->GetRefEHandle().GetSerialNumber();
 	// Init the CSerialEntity.
 	CEntInfo<T>* pSlot = &m_EntPtrArray[iSlot];
 	Assert(pSlot->m_pEntity == NULL);
@@ -537,14 +539,9 @@ CBaseHandle CBaseEntityList<T>::AddEntityAtSlot(T* pEnt, int iSlot, int iForcedS
 	pSlot->m_pEntity = pEnt;
 
 	// Force the serial number (client-only)?
-	if (iForcedSerialNum != -1)
+	if (iSerialNum != pSlot->m_SerialNumber)
 	{
-		pSlot->m_SerialNumber = iForcedSerialNum;
-
-#if !defined( CLIENT_DLL )
-		// Only the client should force the serial numbers.
-		Assert(false);
-#endif
+		pSlot->m_SerialNumber = iSerialNum;
 	}
 
 	// Update our list of active entities.
@@ -552,48 +549,119 @@ CBaseHandle CBaseEntityList<T>::AddEntityAtSlot(T* pEnt, int iSlot, int iForcedS
 	CBaseHandle retVal(iSlot, pSlot->m_SerialNumber);
 
 	// Tell the entity to store its handle.
-	pEnt->SetRefEHandle(retVal);
+	//pEnt->SetRefEHandle(retVal);
 
 	// Notify any derived class.
 	OnAddEntity(pEnt, retVal);
-	return retVal;
 }
 
 template<class T>
-void CBaseEntityList<T>::RemoveEntityAtSlot(int iSlot)
+void CBaseEntityList<T>::RemoveEntity(T* pEnt)
 {
+	int iSlot = ((IHandleEntity*)pEnt)->GetRefEHandle().GetEntryIndex();
 	Assert(iSlot >= 0 && iSlot < NUM_ENT_ENTRIES);
 
 	CEntInfo<T>* pInfo = &m_EntPtrArray[iSlot];
 
-	if (pInfo->m_pEntity)
+	if (pEnt != pInfo->m_pEntity) {
+		Error("pSlot->m_pEntity must not be NULL");
+	}
+	
+	//pInfo->m_pEntity->SetRefEHandle(INVALID_EHANDLE_INDEX);
+
+	// Notify the derived class that we're about to remove this entity.
+	OnRemoveEntity(pInfo->m_pEntity, CBaseHandle(iSlot, pInfo->m_SerialNumber));
+
+	// Increment the serial # so ehandles go invalid.
+	pInfo->m_pEntity = NULL;
+	pInfo->m_SerialNumber = (pInfo->m_SerialNumber + 1) & SERIAL_MASK;
+
+	m_activeList.Unlink(pInfo);
+
+	// Add the slot back to the free list if it's a non-networkable entity.
+	if (iSlot >= MAX_EDICTS)
 	{
-		pInfo->m_pEntity->SetRefEHandle(INVALID_EHANDLE_INDEX);
-
-		// Notify the derived class that we're about to remove this entity.
-		OnRemoveEntity(pInfo->m_pEntity, CBaseHandle(iSlot, pInfo->m_SerialNumber));
-
-		// Increment the serial # so ehandles go invalid.
-		pInfo->m_pEntity = NULL;
-		pInfo->m_SerialNumber = (pInfo->m_SerialNumber + 1) & SERIAL_MASK;
-
-		m_activeList.Unlink(pInfo);
-
-		// Add the slot back to the free list if it's a non-networkable entity.
-		if (iSlot >= MAX_EDICTS)
-		{
-			m_freeNonNetworkableList.AddToTail(pInfo);
+		m_freeNonNetworkableList.AddToTail(pInfo);
+	}
+	else {
+		if (pInfo->m_bReserved) {
+			m_ReservedNetworkableList.AddToTail(pInfo);
 		}
 		else {
-			if (pInfo->m_bReserved) {
-				m_ReservedNetworkableList.AddToTail(pInfo);
-			}
-			else {
-				m_freeNetworkableList.AddToTail(pInfo);
-			}
+			m_freeNetworkableList.AddToTail(pInfo);
 		}
 	}
 }
+
+//template<class T>
+//CBaseHandle CBaseEntityList<T>::AddEntityAtSlot(T* pEnt, int iSlot, int iForcedSerialNum)
+//{
+//	// Init the CSerialEntity.
+//	CEntInfo<T>* pSlot = &m_EntPtrArray[iSlot];
+//	Assert(pSlot->m_pEntity == NULL);
+//	if (pSlot->m_pEntity) {
+//		Error("pSlot->m_pEntity must be NULL");
+//	}
+//	pSlot->m_pEntity = pEnt;
+//
+//	// Force the serial number (client-only)?
+//	if (iForcedSerialNum != -1)
+//	{
+//		pSlot->m_SerialNumber = iForcedSerialNum;
+//
+//#if !defined( CLIENT_DLL )
+//		// Only the client should force the serial numbers.
+//		Assert(false);
+//#endif
+//	}
+//
+//	// Update our list of active entities.
+//	m_activeList.AddToTail(pSlot);
+//	CBaseHandle retVal(iSlot, pSlot->m_SerialNumber);
+//
+//	// Tell the entity to store its handle.
+//	pEnt->SetRefEHandle(retVal);
+//
+//	// Notify any derived class.
+//	OnAddEntity(pEnt, retVal);
+//	return retVal;
+//}
+
+//template<class T>
+//void CBaseEntityList<T>::RemoveEntityAtSlot(int iSlot)
+//{
+//	Assert(iSlot >= 0 && iSlot < NUM_ENT_ENTRIES);
+//
+//	CEntInfo<T>* pInfo = &m_EntPtrArray[iSlot];
+//
+//	if (pInfo->m_pEntity)
+//	{
+//		pInfo->m_pEntity->SetRefEHandle(INVALID_EHANDLE_INDEX);
+//
+//		// Notify the derived class that we're about to remove this entity.
+//		OnRemoveEntity(pInfo->m_pEntity, CBaseHandle(iSlot, pInfo->m_SerialNumber));
+//
+//		// Increment the serial # so ehandles go invalid.
+//		pInfo->m_pEntity = NULL;
+//		pInfo->m_SerialNumber = (pInfo->m_SerialNumber + 1) & SERIAL_MASK;
+//
+//		m_activeList.Unlink(pInfo);
+//
+//		// Add the slot back to the free list if it's a non-networkable entity.
+//		if (iSlot >= MAX_EDICTS)
+//		{
+//			m_freeNonNetworkableList.AddToTail(pInfo);
+//		}
+//		else {
+//			if (pInfo->m_bReserved) {
+//				m_ReservedNetworkableList.AddToTail(pInfo);
+//			}
+//			else {
+//				m_freeNetworkableList.AddToTail(pInfo);
+//			}
+//		}
+//	}
+//}
 
 // add a class that gets notified of entity events
 template<class T>
@@ -676,13 +744,15 @@ void CBaseEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 template<class T>
 void CBaseEntityList<T>::Clear(void) {
 	CEntInfo<T>* pList = m_activeList.Head();
-
-	while (pList)
-	{
-		CEntInfo<T>* pNext = pList->m_pNext;
-		RemoveEntityAtSlot(GetEntInfoIndex(pList));
-		pList = pNext;
+	if (pList) {
+		Error("entity must been cleared by sub class");
 	}
+	//while (pList)
+	//{
+	//	CEntInfo<T>* pNext = pList->m_pNext;
+	//	RemoveEntityAtSlot(GetEntInfoIndex(pList));
+	//	pList = pNext;
+	//}
 
 	pList = m_ReservedNetworkableList.Head();
 
@@ -767,8 +837,8 @@ class CEntityFactory : public IEntityFactory
 {
 	class CEntityProxy : public T {
 
-		CEntityProxy(CEntityFactory<T>* pEntityFactory, IEntityList* pEntityList)
-		:m_pEntityFactory(pEntityFactory), m_pEntityList(pEntityList)
+		CEntityProxy(CEntityFactory<T>* pEntityFactory, IEntityList* pEntityList, int iForceEdictIndex, int iSerialNum, IEntityCallBack* pCallBack)
+		:m_pEntityFactory(pEntityFactory), m_pEntityList(pEntityList), m_RefEHandle(iForceEdictIndex, iSerialNum), m_pCallBack(pCallBack)
 		{
 
 		}
@@ -785,10 +855,16 @@ class CEntityFactory : public IEntityFactory
 			return m_pEntityList;
 		}
 
+		const CBaseHandle& GetRefEHandle() const {
+			return m_RefEHandle;
+		}
+
 	private:
 		CEntityFactory<T>* const m_pEntityFactory;
 		bool m_bInDestruction = false;
 		IEntityList* const m_pEntityList;
+		const CBaseHandle m_RefEHandle;
+		IEntityCallBack* const m_pCallBack;
 		template <class U>
 		friend class CEntityFactory;
 	};
@@ -804,9 +880,11 @@ public:
 		EntityFactoryDictionary()->InstallFactory(this);
 	}
 
-	IHandleEntity* Create(IEntityList* pEntityList, int iForceEdictIndex, int iSerialNum)
+	IHandleEntity* Create(IEntityList* pEntityList, int iForceEdictIndex, int iSerialNum, IEntityCallBack* pCallBack)
 	{
-		IHandleEntity* newEnt = new CEntityProxy(this, pEntityList); // this is the only place 'new' should be used!
+		CEntityProxy* newEnt = new CEntityProxy(this, pEntityList, iForceEdictIndex, iSerialNum, pCallBack); // this is the only place 'new' should be used!
+		//CBaseHandle refHandle(iForceEdictIndex, iSerialNum);
+		//newEnt->SetRefEHandle(refHandle);
 #ifdef CLIENT_DLL
 		((IHandleEntity*)newEnt)->Init(iForceEdictIndex, iSerialNum);
 #endif
@@ -816,6 +894,7 @@ public:
 		if (newEnt->GetEntityList()) {
 			int aaa = 0;
 		}
+		newEnt->m_pCallBack->AfterCreated(newEnt);
 		return newEnt;
 	}
 
@@ -826,13 +905,14 @@ public:
 		{
 			Error("not created by IEntityFactory!");
 		}
-		pEntityProxy->m_bInDestruction = true;
+		pEntityProxy->m_pCallBack->BeforeDestroy(pEntity);
 #ifdef CLIENT_DLL
 		((C_BaseEntity*)pEntityProxy)->Remove();
 #endif // CLIENT_DLL
-#ifdef GAME_DLL
+//#ifdef GAME_DLL
+		pEntityProxy->m_bInDestruction = true;
 		delete pEntityProxy;
-#endif // GAME_DLL
+//#endif // GAME_DLL
 	}
 
 	const char* GetMapClassName() {
@@ -855,6 +935,7 @@ public:
 	virtual bool IsNetworkable() {
 		return T::IsNetworkableStatic();
 	}
+
 private:
 
 	bool IsInDestruction(CEntityProxy* entityProxy) const{

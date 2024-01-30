@@ -398,8 +398,8 @@ public:
 
 // IHandleEntity overrides.
 public:
-	virtual void			SetRefEHandle( const CBaseHandle &handle );
-	virtual const			CBaseHandle& GetRefEHandle() const;
+	//virtual void			SetRefEHandle( const CBaseHandle &handle );
+	//virtual const			CBaseHandle& GetRefEHandle() const;
 
 // IServerUnknown overrides
 	virtual void					Release();
@@ -1752,7 +1752,7 @@ private:
 
 	CNetworkVector( m_vecOrigin );
 	CNetworkQAngle( m_angRotation );
-	CBaseHandle m_RefEHandle;
+	//CBaseHandle m_RefEHandle;
 
 	// was pev->view_ofs ( FIXME:  Move somewhere up the hierarch, CBaseAnimating, etc. )
 	CNetworkVectorForDerived( m_vecViewOffset );
@@ -2593,10 +2593,10 @@ inline void	CBaseEntity::NetworkStateChanged( void *pVar )
 //-----------------------------------------------------------------------------
 // IHandleEntity overrides.
 //-----------------------------------------------------------------------------
-inline const CBaseHandle& CBaseEntity::GetRefEHandle() const
-{
-	return m_RefEHandle;
-}
+//inline const CBaseHandle& CBaseEntity::GetRefEHandle() const
+//{
+//	return m_RefEHandle;
+//}
 
 inline void CBaseEntity::IncrementTransmitStateOwnedCounter()
 {

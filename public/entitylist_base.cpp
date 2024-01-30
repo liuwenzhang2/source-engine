@@ -20,7 +20,7 @@ public:
 	CEntityFactoryDictionary();
 
 	virtual void InstallFactory(IEntityFactory* pFactory);
-	virtual IHandleEntity* Create(IEntityList* pEntityList, const char* pClassName, int iForceEdictIndex, int iSerialNum);
+	virtual IHandleEntity* Create(IEntityList* pEntityList, const char* pClassName, int iForceEdictIndex, int iSerialNum, IEntityCallBack* pCallBack);
 	virtual void Destroy(IHandleEntity* pEntity);
 	virtual const char* GetMapClassName(const char* pClassName);
 	virtual const char* GetDllClassName(const char* pClassName);
@@ -125,7 +125,7 @@ void CEntityFactoryDictionary::InstallFactory(IEntityFactory* pFactory)
 //-----------------------------------------------------------------------------
 // Instantiate something using a factory
 //-----------------------------------------------------------------------------
-IHandleEntity* CEntityFactoryDictionary::Create(IEntityList* pEntityList, const char* pClassName, int iForceEdictIndex, int iSerialNum)
+IHandleEntity* CEntityFactoryDictionary::Create(IEntityList* pEntityList, const char* pClassName, int iForceEdictIndex, int iSerialNum, IEntityCallBack* pCallBack)
 {
 	IEntityFactory* pFactory = FindFactory(pClassName);
 	if (!pFactory)
@@ -136,7 +136,7 @@ IHandleEntity* CEntityFactoryDictionary::Create(IEntityList* pEntityList, const 
 #if defined(TRACK_ENTITY_MEMORY) && defined(USE_MEM_DEBUG)
 	MEM_ALLOC_CREDIT_(m_Factories.GetElementName(m_Factories.Find(pClassName)));
 #endif
-	return pFactory->Create(pEntityList, iForceEdictIndex, iSerialNum);
+	return pFactory->Create(pEntityList, iForceEdictIndex, iSerialNum, pCallBack);
 }
 
 const char* CEntityFactoryDictionary::GetMapClassName(const char* pClassName) {

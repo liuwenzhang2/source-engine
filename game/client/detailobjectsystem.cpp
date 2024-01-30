@@ -222,8 +222,8 @@ public:
 
 	// IHandleEntity stubs.
 public:
-	virtual void SetRefEHandle( const CBaseHandle &handle )	{ Assert( false ); }
-	virtual const CBaseHandle& GetRefEHandle() const		{ Assert( false ); return *((CBaseHandle*)0); }
+	//virtual void SetRefEHandle( const CBaseHandle &handle )	{ Assert( false ); }
+	//virtual const CBaseHandle& GetRefEHandle() const		{ Assert( false ); return *((CBaseHandle*)0); }
 
 	//---------------------------------
 	struct LightStyleInfo_t

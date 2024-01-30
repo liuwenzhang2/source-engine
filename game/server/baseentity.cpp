@@ -465,7 +465,7 @@ CBaseEntity::~CBaseEntity( )
 		g_bDisableEhandleAccess = true;
 
 		// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
-		gEntList.RemoveEntity( GetRefEHandle() );
+		//gEntList.RemoveEntity( this );
 	}
 }
 
@@ -479,49 +479,49 @@ void CBaseEntity::PostConstructor( const char *szClassname, int iForceEdictIndex
 	Assert( m_iClassname != NULL_STRING && STRING(m_iClassname) != NULL );
 
 	// Possibly get an edict, and add self to global list of entites.
-	if ( !IsNetworkable() )
-	{
-		gEntList.AddNonNetworkableEntity( this );
-	}
-	else
-	{
-		if (RequiredEdictIndex() != -1) {
-			if (iForceEdictIndex != -1) {
-				Error("iForceEdictIndex must be -1 if RequiredEdictIndex() not equals -1!");
-			}
-			gEntList.AddNetworkableEntity(this, RequiredEdictIndex());
-		} else {
-			// Certain entities set up their edicts in the constructor
-			if (IsEFlagSet(EFL_NO_AUTO_EDICT_ATTACH)) {
-				if (iForceEdictIndex == -1) {
-					//Error("iForceEdictIndex can not be -1 if set EFL_NO_AUTO_EDICT_ATTACH!");
-					iForceEdictIndex = gEntList.AllocateFreeSlot();
-				}
-				gEntList.AddNetworkableEntity(this, iForceEdictIndex);
-			}
-			else
-			{
-				if (iForceEdictIndex == -1) {
-					iForceEdictIndex = gEntList.AllocateFreeSlot();
-				}
-				gEntList.AddNetworkableEntity(this, iForceEdictIndex);
-				//NetworkProp()->AttachEdict();
-				//g_pForceAttachEdict = -1;
-			}
-		}
-		
-		// Some ents like the player override the AttachEdict function and do it at a different time.
-		// While precaching, they don't ever have an edict, so we don't need to add them to
-		// the entity list in that case.
-		//if ( entindex()!=-1 )
-		//{
-		//	gEntList.AddNetworkableEntity( this, entindex() );
-		//	
-		//	// Cache our IServerNetworkable pointer for the engine for fast access.
-		//	//if ( edict() )
-		//	//	edict()->m_pNetworkable = NetworkProp();
-		//}
-	}
+	//if ( !IsNetworkable() )
+	//{
+	//	gEntList.AddNonNetworkableEntity( this );
+	//}
+	//else
+	//{
+	//	if (RequiredEdictIndex() != -1) {
+	//		if (iForceEdictIndex != -1) {
+	//			Error("iForceEdictIndex must be -1 if RequiredEdictIndex() not equals -1!");
+	//		}
+	//		gEntList.AddNetworkableEntity(this, RequiredEdictIndex());
+	//	} else {
+	//		// Certain entities set up their edicts in the constructor
+	//		if (IsEFlagSet(EFL_NO_AUTO_EDICT_ATTACH)) {
+	//			if (iForceEdictIndex == -1) {
+	//				//Error("iForceEdictIndex can not be -1 if set EFL_NO_AUTO_EDICT_ATTACH!");
+	//				iForceEdictIndex = gEntList.AllocateFreeSlot();
+	//			}
+	//			gEntList.AddNetworkableEntity(this, iForceEdictIndex);
+	//		}
+	//		else
+	//		{
+	//			if (iForceEdictIndex == -1) {
+	//				iForceEdictIndex = gEntList.AllocateFreeSlot();
+	//			}
+	//			gEntList.AddNetworkableEntity(this, iForceEdictIndex);
+	//			//NetworkProp()->AttachEdict();
+	//			//g_pForceAttachEdict = -1;
+	//		}
+	//	}
+	//	
+	//	// Some ents like the player override the AttachEdict function and do it at a different time.
+	//	// While precaching, they don't ever have an edict, so we don't need to add them to
+	//	// the entity list in that case.
+	//	//if ( entindex()!=-1 )
+	//	//{
+	//	//	gEntList.AddNetworkableEntity( this, entindex() );
+	//	//	
+	//	//	// Cache our IServerNetworkable pointer for the engine for fast access.
+	//	//	//if ( edict() )
+	//	//	//	edict()->m_pNetworkable = NetworkProp();
+	//	//}
+	//}
 
 	CheckHasThinkFunction( false );
 	CheckHasGamePhysicsSimulation();
@@ -7078,15 +7078,15 @@ void CBaseEntity::EmitSentenceByIndex( IRecipientFilter& filter, int iEntIndex, 
 }
 
 
-void CBaseEntity::SetRefEHandle( const CBaseHandle &handle )
-{
-	m_RefEHandle = handle;
-	//if ( entindex()!=-1 )
-	//{
-	//	COMPILE_TIME_ASSERT( NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS <= 8*sizeof( engine->GetNetworkSerialNumber(entindex()) ) );
-	//	engine->SetNetworkSerialNumber(entindex(), (m_RefEHandle.GetSerialNumber() & (1 << NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS) - 1));
-	//}
-}
+//void CBaseEntity::SetRefEHandle( const CBaseHandle &handle )
+//{
+//	m_RefEHandle = handle;
+//	//if ( entindex()!=-1 )
+//	//{
+//	//	COMPILE_TIME_ASSERT( NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS <= 8*sizeof( engine->GetNetworkSerialNumber(entindex()) ) );
+//	//	engine->SetNetworkSerialNumber(entindex(), (m_RefEHandle.GetSerialNumber() & (1 << NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS) - 1));
+//	//}
+//}
 
 
 bool CPointEntity::KeyValue( const char *szKeyName, const char *szValue ) 

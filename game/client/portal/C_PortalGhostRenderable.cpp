@@ -21,7 +21,7 @@ C_PortalGhostRenderable::~C_PortalGhostRenderable( void )
 {
 	m_pGhostedRenderable = NULL;
 	g_pClientLeafSystem->RemoveRenderable( RenderHandle() );
-	cl_entitylist->RemoveEntity( GetIClientUnknown()->GetRefEHandle() );
+	//cl_entitylist->RemoveEntity( GetIClientUnknown()->GetRefEHandle() );
 
 	DestroyModelInstance();
 }
@@ -35,7 +35,7 @@ void C_PortalGhostRenderable::Init(C_Prop_Portal* pOwningPortal, C_BaseEntity* p
 
 	m_bSourceIsBaseAnimating = (dynamic_cast<C_BaseAnimating*>(pGhostSource) != NULL);
 
-	cl_entitylist->AddNonNetworkableEntity(this);//GetIClientUnknown()
+	//cl_entitylist->AddNonNetworkableEntity(this);//GetIClientUnknown()
 	g_pClientLeafSystem->AddRenderable(this, sourceRenderGroup);
 }
 

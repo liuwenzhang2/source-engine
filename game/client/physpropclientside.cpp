@@ -71,14 +71,9 @@ C_PhysPropClientside::C_PhysPropClientside()
 
 C_PhysPropClientside::~C_PhysPropClientside()
 {
-	if ( m_pRespawnZone )
-	{
-		m_pRespawnZone->PropDestroyed( this );
-	}
+	
 
-	PhysCleanupFrictionSounds( this );
-	VPhysicsDestroyObject();
-	s_PhysPropList.FindAndRemove( this );
+	
 }
 
 void C_PhysPropClientside::SetPhysicsMode(int iMode)
@@ -206,6 +201,19 @@ void C_PhysPropClientside::DestroyAll()
 void C_PhysPropClientside::SetRespawnZone( C_FuncPhysicsRespawnZone *pZone ) 
 { 
 	m_pRespawnZone = pZone; 
+}
+
+void C_PhysPropClientside::UpdateOnRemove(void)
+{
+	if (m_pRespawnZone)
+	{
+		m_pRespawnZone->PropDestroyed(this);
+	}
+	PhysCleanupFrictionSounds(this);
+	VPhysicsDestroyObject();
+	s_PhysPropList.FindAndRemove(this);
+
+	BaseClass::UpdateOnRemove();
 }
 
 //-----------------------------------------------------------------------------

@@ -108,7 +108,7 @@ public:
 //    use the client entity list to look them up and check for supported interfaces.
 //
 template<class T>// = IHandleEntity
-class CClientEntityList : public CBaseEntityList<T>, public IClientEntityList
+class CClientEntityList : public CBaseEntityList<T>, public IClientEntityList, public IEntityCallBack
 {
 friend class C_BaseEntityIterator;
 //friend class C_AllBaseEntityIterator;
@@ -145,9 +145,10 @@ public:
 // CBaseEntityList overrides.
 protected:
 
+	virtual void AfterCreated(IHandleEntity* pEntity);
+	virtual void BeforeDestroy(IHandleEntity* pEntity);
 	virtual void OnAddEntity( T *pEnt, CBaseHandle handle );
 	virtual void OnRemoveEntity( T *pEnt, CBaseHandle handle );
-
 
 // Internal to client DLL.
 public:
@@ -263,7 +264,17 @@ private:
 
 template<class T>
 inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {
-	return (C_BaseEntity*)EntityFactoryDictionary()->Create(this, className, iForceEdictIndex, iSerialNum);
+	if (iForceEdictIndex == -1) {
+		iForceEdictIndex = BaseClass::AllocateFreeSlot(false, iForceEdictIndex);
+		iSerialNum = BaseClass::GetNetworkSerialNumber(iForceEdictIndex);
+	}
+	else {
+		iForceEdictIndex = BaseClass::AllocateFreeSlot(true, iForceEdictIndex);
+		if (iSerialNum == -1) {
+			Error("iSerialNum == -1");
+		}
+	}
+	return (C_BaseEntity*)EntityFactoryDictionary()->Create(this, className, iForceEdictIndex, iSerialNum, this);
 }
 
 template<class T>
@@ -360,7 +371,7 @@ void CClientEntityList<T>::Release(void)
 				pThinkable->Release();
 			}
 		}
-		BaseClass::RemoveEntity(iter);
+		//BaseClass::RemoveEntity(iter);
 
 		iter = BaseClass::FirstHandle();
 	}
@@ -586,6 +597,17 @@ template<class T>
 void CClientEntityList<T>::RemoveListenerEntity(IClientEntityListener* pListener)
 {
 	m_entityListeners.FindAndRemove(pListener);
+}
+
+template<class T>
+void CClientEntityList<T>::AfterCreated(IHandleEntity* pEntity) {
+	BaseClass::AddEntity((T*)pEntity);
+}
+
+
+template<class T>
+void CClientEntityList<T>::BeforeDestroy(IHandleEntity* pEntity) {
+	BaseClass::RemoveEntity((T*)pEntity);
 }
 
 template<class T>

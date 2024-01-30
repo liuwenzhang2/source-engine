@@ -26,9 +26,13 @@ class IServerUnknown : public IHandleEntity
 {
 public:
 	// Gets the interface to the collideable + networkable representation of the entity
+	virtual void SetRefEHandle(const CBaseHandle& handle) { m_RefEHandle = handle; }
+	virtual const CBaseHandle& GetRefEHandle() const { return m_RefEHandle; }
 	virtual ICollideable*		GetCollideable() = 0;
 	virtual IServerNetworkable*	GetNetworkable() = 0;
 	virtual CBaseEntity*		GetBaseEntity() = 0;
+private:
+	CBaseHandle m_RefEHandle;
 };
 
 

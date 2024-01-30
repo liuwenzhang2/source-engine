@@ -975,20 +975,14 @@ C_BaseEntity::C_BaseEntity() :
 //-----------------------------------------------------------------------------
 C_BaseEntity::~C_BaseEntity()
 {
-	Term();
-	ClearDataChangedEvent( m_DataChangeEventRef );
-#if !defined( NO_ENTITY_PREDICTION )
-	delete m_pPredictionContext;
-#endif
-	RemoveFromInterpolationList();
-	RemoveFromTeleportList();
+	
 }
 
 void C_BaseEntity::Clear( void )
 {
 	m_bDormant = true;
 	m_nCreationTick = -1;
-	m_RefEHandle.Term();
+	//m_RefEHandle.Term();
 	m_ModelInstance = MODEL_INSTANCE_INVALID;
 	m_ShadowHandle = CLIENTSHADOW_INVALID_HANDLE;
 	m_hRender = INVALID_CLIENT_RENDER_HANDLE;
@@ -1085,7 +1079,7 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 	index = entnum;
 
 	if (entnum >= 0) {
-		cl_entitylist->AddNetworkableEntity(this, entnum, iSerialNum);//GetIClientUnknown()
+		//cl_entitylist->AddNetworkableEntity(this, entnum, iSerialNum);//GetIClientUnknown()
 	}
 
 	CollisionProp()->CreatePartitionHandle();
@@ -1136,7 +1130,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 	SetModelByIndex( iIndex );
 
 	// Add the client entity to the master entity list.
-	cl_entitylist->AddNonNetworkableEntity( this );//GetIClientUnknown()
+	//cl_entitylist->AddNonNetworkableEntity( this );//GetIClientUnknown()
 	Assert( GetClientHandle() != ClientEntityList().InvalidHandle() );
 
 	// Add the client entity to the renderable "leaf system." (Renderable)
@@ -1179,9 +1173,9 @@ void C_BaseEntity::Term()
 		}
 
 		// Remove from the client entity list.
-		ClientEntityList().RemoveEntity( GetClientHandle() );
+		//ClientEntityList().RemoveEntity( this );
 
-		m_RefEHandle = INVALID_CLIENTENTITY_HANDLE;
+		//m_RefEHandle = INVALID_CLIENTENTITY_HANDLE;
 	}
 	
 	// Are we in the partition?
@@ -1203,16 +1197,16 @@ void C_BaseEntity::Term()
 }
 
 
-void C_BaseEntity::SetRefEHandle( const CBaseHandle &handle )
-{
-	m_RefEHandle = handle;
-}
+//void C_BaseEntity::SetRefEHandle( const CBaseHandle &handle )
+//{
+//	m_RefEHandle = handle;
+//}
 
 
-const CBaseHandle& C_BaseEntity::GetRefEHandle() const
-{
-	return m_RefEHandle;
-}
+//const CBaseHandle& C_BaseEntity::GetRefEHandle() const
+//{
+//	return m_RefEHandle;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Free beams and destroy object
@@ -1233,7 +1227,7 @@ void C_BaseEntity::Release()
 
 	UpdateOnRemove();
 
-	delete this;
+	//delete this;
 }
 
 
@@ -4923,7 +4917,7 @@ C_BaseEntity *C_BaseEntity::CreatePredictedEntityByName( const char *classname, 
 	ent->m_pPredictionContext = context;
 
 	// Add to client entity list
-	ClientEntityList().AddNonNetworkableEntity( ent );
+	//ClientEntityList().AddNonNetworkableEntity( ent );
 
 	//  and predictables
 	g_Predictables.AddToPredictableList( ent->GetClientHandle() );
@@ -5042,6 +5036,14 @@ void C_BaseEntity::UpdateOnRemove( void )
 	Assert( !GetMoveParent() );
 	UnlinkFromHierarchy();
 	SetGroundEntity( NULL );
+
+	Term();
+	ClearDataChangedEvent(m_DataChangeEventRef);
+#if !defined( NO_ENTITY_PREDICTION )
+	delete m_pPredictionContext;
+#endif
+	RemoveFromInterpolationList();
+	RemoveFromTeleportList();
 }
 
 //-----------------------------------------------------------------------------
