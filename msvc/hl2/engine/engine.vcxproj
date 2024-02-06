@@ -83,9 +83,9 @@
       <AdditionalIncludeDirectories>..\..\..\engine;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\common;..\..\..\engine\audio;..\..\..\public\engine\audio;..\..\..\thirdparty\SDL;..\..\..\public\matsys_controls;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <Optimization>Disabled</Optimization>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\;..\..\..\utils\vmpi_private\mysql\lib\opt;..\..\..\dx9sdk\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -104,9 +104,9 @@
       <AdditionalIncludeDirectories>..\..\..\engine;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\common;..\..\..\engine\audio;..\..\..\public\engine\audio;..\..\..\thirdparty\SDL;..\..\..\public\matsys_controls;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <Optimization>Disabled</Optimization>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\;..\..\..\utils\vmpi_private\mysql\lib\opt;..\..\..\dx9sdk\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
