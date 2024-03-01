@@ -754,7 +754,7 @@ void C_Strider::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 //-----------------------------------------------------------------------------
 // Strider muzzle flashes
 //-----------------------------------------------------------------------------
-void MuzzleFlash_Strider( ClientEntityHandle_t hEntity, int attachmentIndex )
+void MuzzleFlash_Strider( C_BaseEntity* hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_Strider", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
@@ -924,7 +924,7 @@ void MuzzleFlash_Strider( ClientEntityHandle_t hEntity, int attachmentIndex )
 	Vector		origin;
 	MatrixGetColumn( matAttachment, 3, &origin );
 
-	int entityIndex = ClientEntityList().HandleToEntIndex( hEntity );
+	int entityIndex = hEntity->entindex();// ClientEntityList().HandleToEntIndex(hEntity);
 	if ( entityIndex >= 0 )
 	{
 		dlight_t *el = effects->CL_AllocElight( LIGHT_INDEX_MUZZLEFLASH + entityIndex );

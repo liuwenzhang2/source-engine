@@ -1103,7 +1103,7 @@ void CWeaponDODBase::Smack()
 	data.m_nSurfaceProp = m_trHit.surface.surfaceProps;
 	data.m_nHitBox = m_trHit.hitbox;
 #ifdef CLIENT_DLL
-	data.m_hEntity = m_trHit.m_pEnt->GetRefEHandle();
+	data.m_hEntity = (C_BaseEntity*)m_trHit.m_pEnt;
 #else
 	data.m_nEntIndex = ((CBaseEntity*)m_trHit.m_pEnt)->entindex();
 #endif
@@ -1312,7 +1312,7 @@ void CWeaponDODBase::Smack()
 		{
 			CEffectData data;
 			data.m_nHitBox = atoi( options );
-			data.m_hEntity = GetPlayerOwner() ? GetPlayerOwner()->GetRefEHandle() : INVALID_EHANDLE_INDEX;
+			data.m_hEntity = GetPlayerOwner() ? GetPlayerOwner() : NULL;
 			pViewModel->GetAttachment( 2, data.m_vOrigin, data.m_vAngles );
 
 			DispatchEffect( "DOD_EjectBrass", data );

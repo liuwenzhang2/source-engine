@@ -405,11 +405,11 @@ DECLARE_CLIENT_EFFECT( "AR2Impact", AR2ImpactCallback );
 //-----------------------------------------------------------------------------
 // Creates a muzzleflash elight
 //-----------------------------------------------------------------------------
-void CreateMuzzleflashELight( const Vector &origin, int exponent, int nMinRadius, int nMaxRadius, ClientEntityHandle_t hEntity )
+void CreateMuzzleflashELight( const Vector &origin, int exponent, int nMinRadius, int nMaxRadius, C_BaseEntity* hEntity )
 {
 	if ( muzzleflash_light.GetInt() )
 	{
-		int entityIndex = ClientEntityList().HandleToEntIndex( hEntity );
+		int entityIndex = hEntity->entindex();// ClientEntityList().HandleToEntIndex(hEntity);
 		if ( entityIndex >= 0 )
 		{
 			dlight_t *el = effects->CL_AllocElight( LIGHT_INDEX_MUZZLEFLASH + entityIndex );
@@ -432,7 +432,7 @@ void CreateMuzzleflashELight( const Vector &origin, int exponent, int nMinRadius
 //-----------------------------------------------------------------------------
 // Airboat muzzle flashes
 //-----------------------------------------------------------------------------
-void MuzzleFlash_Airboat( ClientEntityHandle_t hEntity, int attachmentIndex )
+void MuzzleFlash_Airboat( C_BaseEntity* hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_Airboat", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
@@ -531,7 +531,7 @@ DECLARE_CLIENT_EFFECT( "AirboatMuzzleFlash", AirboatMuzzleFlashCallback );
 //-----------------------------------------------------------------------------
 // Chopper muzzle flashes
 //-----------------------------------------------------------------------------
-void MuzzleFlash_Chopper( ClientEntityHandle_t hEntity, int attachmentIndex )
+void MuzzleFlash_Chopper( C_BaseEntity* hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_Chopper", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
@@ -596,7 +596,7 @@ DECLARE_CLIENT_EFFECT( "ChopperMuzzleFlash", ChopperMuzzleFlashCallback );
 //-----------------------------------------------------------------------------
 // Gunship muzzle flashes
 //-----------------------------------------------------------------------------
-void MuzzleFlash_Gunship( ClientEntityHandle_t hEntity, int attachmentIndex )
+void MuzzleFlash_Gunship( C_BaseEntity* hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_Gunship", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
@@ -657,7 +657,7 @@ DECLARE_CLIENT_EFFECT( "GunshipMuzzleFlash", GunshipMuzzleFlashCallback );
 //-----------------------------------------------------------------------------
 // Hunter muzzle flashes
 //-----------------------------------------------------------------------------
-void MuzzleFlash_Hunter( ClientEntityHandle_t hEntity, int attachmentIndex )
+void MuzzleFlash_Hunter( C_BaseEntity* hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_Hunter", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 

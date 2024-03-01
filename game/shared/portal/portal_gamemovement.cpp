@@ -401,7 +401,7 @@ void TracePlayerBBoxForGround2( const Vector& start, const Vector& end, const Ve
 
 	VPROF( "TracePlayerBBoxForGround" );
 
-	CPortal_Player *pPortalPlayer = dynamic_cast<CPortal_Player *>(player->GetRefEHandle().Get());
+	CPortal_Player *pPortalPlayer = dynamic_cast<CPortal_Player *>(player);
 	CProp_Portal *pPlayerPortal = pPortalPlayer->m_hPortalEnvironment;
 
 #ifndef CLIENT_DLL
@@ -538,7 +538,7 @@ void CPortalGameMovement::CategorizePosition( void )
 			// Test four sub-boxes, to see if any of them would have found shallower slope we could
 			// actually stand on
 
-			TracePlayerBBoxForGround2( bumpOrigin, point, GetPlayerMins(), GetPlayerMaxs(), mv->m_nPlayerHandle.Get(), MASK_PLAYERSOLID, COLLISION_GROUP_PLAYER_MOVEMENT, pm );
+			TracePlayerBBoxForGround2( bumpOrigin, point, GetPlayerMins(), GetPlayerMaxs(), mv->m_nPlayerHandle, MASK_PLAYERSOLID, COLLISION_GROUP_PLAYER_MOVEMENT, pm );
 			if ( pm.plane.normal[2] < 0.7)
 			{
 
@@ -683,15 +683,15 @@ void CPortalGameMovement::TracePlayerBBox( const Vector& start, const Vector& en
 {
 	VPROF( "CGameMovement::TracePlayerBBox" );
 	
-	CPortal_Player *pPortalPlayer = (CPortal_Player *)((CBaseEntity *)mv->m_nPlayerHandle.Get());
+	CPortal_Player *pPortalPlayer = (CPortal_Player *)((CBaseEntity *)mv->m_nPlayerHandle);
 
 	Ray_t ray;
 	ray.Init( start, end, GetPlayerMins(), GetPlayerMaxs() );
 
 #ifdef CLIENT_DLL
-	CTraceFilterSimple traceFilter( mv->m_nPlayerHandle.Get(), collisionGroup );
+	CTraceFilterSimple traceFilter( mv->m_nPlayerHandle, collisionGroup );
 #else
-	CTraceFilterSimple baseFilter( mv->m_nPlayerHandle.Get(), collisionGroup );
+	CTraceFilterSimple baseFilter( mv->m_nPlayerHandle, collisionGroup );
 	CTraceFilterTranslateClones traceFilter( &baseFilter );
 #endif
 
@@ -731,7 +731,7 @@ CBaseHandle CPortalGameMovement::TestPlayerPosition( const Vector& pos, int coll
 	else if ( pm.startsolid && pm.m_pEnt && CPSCollisionEntity::IsPortalSimulatorCollisionEntity((CBaseEntity*)pm.m_pEnt ) )
 	{
 		// Stuck in a portal environment object, so unstick them!
-		CPortal_Player *pPortalPlayer = (CPortal_Player *)((CBaseEntity *)mv->m_nPlayerHandle.Get());
+		CPortal_Player *pPortalPlayer = (CPortal_Player *)((CBaseEntity *)mv->m_nPlayerHandle);
 		pPortalPlayer->SetStuckOnPortalCollisionObject();
 
 		return INVALID_EHANDLE_INDEX;

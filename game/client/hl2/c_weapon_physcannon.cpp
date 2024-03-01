@@ -73,7 +73,7 @@ bool C_WeaponPhysCannon::SetupEmitter( void )
 {
 	if ( !m_pLocalEmitter.IsValid() )
 	{
-		m_pLocalEmitter = CLocalSpaceEmitter::Create( "physpowerup", GetRefEHandle(), LookupAttachment( "core" ) );
+		m_pLocalEmitter = CLocalSpaceEmitter::Create( "physpowerup", this, LookupAttachment( "core" ) );
 
 		if ( m_pLocalEmitter.IsValid() == false )
 			return false;

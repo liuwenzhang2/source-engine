@@ -3308,7 +3308,7 @@ void CWeaponPhysCannon::DoEffectLaunch( Vector *pos )
 	CEffectData	data;
 	data.m_vOrigin = endPos;
 #ifdef CLIENT_DLL
-	data.m_hEntity = GetRefEHandle();
+	data.m_hEntity = this;
 #else
 	data.m_nEntIndex = entindex();
 #endif

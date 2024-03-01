@@ -800,7 +800,7 @@ void CWeaponCrossbow::DoLoadEffect( void )
 	CEffectData	data;
 
 #ifdef CLIENT_DLL
-	data.m_hEntity = pViewModel->GetRefEHandle();
+	data.m_hEntity = pViewModel;
 #else
 	data.m_nEntIndex = pViewModel->entindex();
 #endif
