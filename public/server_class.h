@@ -108,16 +108,7 @@ class CBaseNetworkable;
 
 
 #ifdef VALIDATE_DECLARE_CLASS
-	#define CHECK_DECLARE_CLASS( DLLClassName, sendTable ) \
-		template <typename T> int CheckDeclareClass_Access(T *); \
-		template <> int CheckDeclareClass_Access<sendTable::ignored>(sendTable::ignored *, const char *pIgnored) \
-		{ \
-			return DLLClassName::CheckDeclareClass( #DLLClassName ); \
-		} \
-		namespace sendTable \
-		{ \
-			int verifyDeclareClass = CheckDeclareClass_Access( (sendTable::ignored*)0 ); \
-		}
+	#define CHECK_DECLARE_CLASS( DLLClassName, sendTable )
 #else
 	#define CHECK_DECLARE_CLASS( DLLClassName, sendTable )
 #endif
