@@ -288,7 +288,7 @@ inline void	CClientEntityList<T>::DestroyEntity(IHandleEntity* pEntity) {
 template<class T>
 inline bool	CClientEntityList<T>::IsHandleValid( ClientEntityHandle_t handle ) const
 {
-	return handle.Get() != 0;
+	return BaseClass::LookupEntity(handle) != NULL;
 }
 
 template<class T>
