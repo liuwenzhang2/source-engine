@@ -25,7 +25,7 @@ void SendProxy_EHandleToInt( const SendProp *pProp, const void *pStruct, const v
 {
 	CBaseHandle *pHandle = (CBaseHandle*)pVarData;
 
-	if ( pHandle && pHandle->Get() )
+	if ( pHandle && pHandle->IsValid() )
 	{
 		int iSerialNum = pHandle->GetSerialNumber() & (1 << NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS) - 1;
 		pOut->m_Int = pHandle->GetEntryIndex() | (iSerialNum << MAX_EDICT_BITS);

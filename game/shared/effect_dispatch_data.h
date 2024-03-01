@@ -47,7 +47,7 @@ public:
 	QAngle m_vAngles;
 	int		m_fFlags;
 #ifdef CLIENT_DLL
-	ClientEntityHandle_t m_hEntity;
+	C_BaseEntity* m_hEntity;
 #else
 	int		m_nEntIndex;
 #endif
@@ -82,7 +82,7 @@ public:
 
 		m_fFlags = 0;
 #ifdef CLIENT_DLL
-		m_hEntity = INVALID_EHANDLE_INDEX;
+		m_hEntity = NULL;
 #else
 		m_nEntIndex = 0;
 #endif

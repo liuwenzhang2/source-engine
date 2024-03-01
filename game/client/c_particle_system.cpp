@@ -188,7 +188,7 @@ void ParticleEffectCallback( const CEffectData &data )
 	CSmartPtr<CNewParticleEffect> pEffect = NULL;
 	if ( data.m_fFlags & PARTICLE_DISPATCH_FROM_ENTITY )
 	{
-		if ( data.m_hEntity.Get() )
+		if ( data.m_hEntity )
 		{
 			C_BaseEntity *pEnt = C_BaseEntity::Instance( data.m_hEntity );
 			if ( pEnt && !pEnt->IsDormant() )
@@ -261,7 +261,7 @@ DECLARE_CLIENT_EFFECT( "ParticleEffect", ParticleEffectCallback );
 //-----------------------------------------------------------------------------
 void ParticleEffectStopCallback( const CEffectData &data )
 {
-	if ( data.m_hEntity.Get() )
+	if ( data.m_hEntity )
 	{
 		C_BaseEntity *pEnt = C_BaseEntity::Instance( data.m_hEntity );
 		if ( pEnt )

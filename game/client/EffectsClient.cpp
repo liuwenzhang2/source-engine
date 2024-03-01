@@ -165,7 +165,7 @@ void CEffectsClient::MuzzleFlash( const Vector &vecOrigin, const QAngle &vecAngl
 		switch( iType )
 		{
 		case MUZZLEFLASH_TYPE_DEFAULT:
-			FX_MuzzleEffect( vecOrigin, vecAngles, flScale, INVALID_EHANDLE_INDEX );
+			FX_MuzzleEffect( vecOrigin, vecAngles, flScale, NULL );
 			break;
 
 		case MUZZLEFLASH_TYPE_GUNSHIP:

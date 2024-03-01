@@ -113,10 +113,10 @@ void FX_RicochetSound( const Vector& pos )
 //			*angles - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool FX_GetAttachmentTransform( ClientEntityHandle_t hEntity, int attachmentIndex, Vector *origin, QAngle *angles )
+bool FX_GetAttachmentTransform(C_BaseEntity* hEntity, int attachmentIndex, Vector *origin, QAngle *angles )
 {
 	// Validate our input
-	if ( ( hEntity == INVALID_EHANDLE_INDEX ) || ( attachmentIndex < 1 ) )
+	if ( ( hEntity == NULL ) || ( attachmentIndex < 1 ) )
 	{
 		if ( origin != NULL )
 		{
@@ -132,7 +132,7 @@ bool FX_GetAttachmentTransform( ClientEntityHandle_t hEntity, int attachmentInde
 	}
 
 	// Get the actual entity
-	IClientRenderable *pRenderable = ClientEntityList().GetClientRenderableFromHandle( hEntity );
+	IClientRenderable *pRenderable = hEntity;//ClientEntityList().GetClientRenderableFromHandle( 
 	if ( pRenderable )
 	{
 		Vector attachOrigin;
@@ -163,7 +163,7 @@ bool FX_GetAttachmentTransform( ClientEntityHandle_t hEntity, int attachmentInde
 //			attachmentIndex - 
 //			&transform - 
 //-----------------------------------------------------------------------------
-bool FX_GetAttachmentTransform( ClientEntityHandle_t hEntity, int attachmentIndex, matrix3x4_t &transform )
+bool FX_GetAttachmentTransform(C_BaseEntity* hEntity, int attachmentIndex, matrix3x4_t &transform )
 {
 	Vector	origin;
 	QAngle	angles;
@@ -186,7 +186,7 @@ void FX_MuzzleEffect(
 	const Vector &origin, 
 	const QAngle &angles, 
 	float scale, 
-	ClientEntityHandle_t hEntity, 
+	C_BaseEntity* hEntity, 
 	unsigned char *pFlashColor,
 	bool bOneFrame )
 {
@@ -297,7 +297,7 @@ void FX_MuzzleEffect(
 //-----------------------------------------------------------------------------
 void FX_MuzzleEffectAttached( 
 	float scale, 
-	ClientEntityHandle_t hEntity, 
+	C_BaseEntity* hEntity, 
 	int attachmentIndex, 
 	unsigned char *pFlashColor,
 	bool bOneFrame )
@@ -380,7 +380,7 @@ void FX_MuzzleEffectAttached(
 	if ( !clienttools->IsInRecordingMode() )
 		return;
 
-	C_BaseEntity *pEnt = ClientEntityList().GetBaseEntityFromHandle( hEntity );
+	C_BaseEntity *pEnt = hEntity;//ClientEntityList().GetBaseEntityFromHandle( 
 	if ( pEnt )
 	{
 		pEnt->RecordToolMessage();
@@ -601,7 +601,7 @@ class CSmokeEmitter : public CSimpleEmitter
 {
 	typedef CSimpleEmitter BaseClass;
 public:
-	CSmokeEmitter( ClientEntityHandle_t hEntity, int nAttachment, const char *pDebugName ) : CSimpleEmitter( pDebugName ) 
+	CSmokeEmitter( C_BaseEntity* hEntity, int nAttachment, const char *pDebugName ) : CSimpleEmitter( pDebugName ) 
 	{
 		m_hEntity = hEntity;
 		m_nAttachmentIndex = nAttachment;
@@ -610,7 +610,7 @@ public:
 	}
 	
 	// Create
-	static CSmokeEmitter *Create( ClientEntityHandle_t hEntity, int nAttachment, const char *pDebugName="smoke" )
+	static CSmokeEmitter *Create( C_BaseEntity* hEntity, int nAttachment, const char *pDebugName="smoke" )
 	{
 		return new CSmokeEmitter( hEntity, nAttachment, pDebugName );
 	}
@@ -644,7 +644,7 @@ public:
 		// PMaterialHandle hMaterial = GetPMaterial( "particle/particle_smokegrenade" );
 
 		Vector vecOrigin = m_vSortOrigin;
-		IClientRenderable *pRenderable = ClientEntityList().GetClientRenderableFromHandle(m_hEntity);
+		IClientRenderable *pRenderable = m_hEntity;//ClientEntityList().GetClientRenderableFromHandle(
 		if ( pRenderable && m_nAttachmentIndex )
 		{
 			QAngle tmp;
@@ -720,7 +720,7 @@ private:
 	float		m_flSpawnRate;
 	Vector		m_vecSpurtForward;
 	Vector4D	m_SpurtColor;
-	ClientEntityHandle_t m_hEntity;
+	C_BaseEntity* m_hEntity;
 	int			m_nAttachmentIndex;
 
 	CSmokeEmitter( const CSmokeEmitter & ); // not defined, not accessible
@@ -729,7 +729,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Small hose gas spurt
 //-----------------------------------------------------------------------------
-void FX_BuildSmoke( Vector &vecOrigin, QAngle &vecAngles, ClientEntityHandle_t hEntity, int nAttachment, float flLifeTime, const Vector4D &pColor )
+void FX_BuildSmoke( Vector &vecOrigin, QAngle &vecAngles, C_BaseEntity* hEntity, int nAttachment, float flLifeTime, const Vector4D &pColor )
 {
 	CSmartPtr<CSmokeEmitter> pSimple = CSmokeEmitter::Create( hEntity, nAttachment, "FX_Smoke" );
 	pSimple->SetSortOrigin( vecOrigin );

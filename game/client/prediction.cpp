@@ -606,7 +606,7 @@ void CPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *
 
 	move->m_bFirstRunOfFunctions = IsFirstTimePredicted();
 	
-	move->m_nPlayerHandle = player->GetClientHandle();
+	move->m_nPlayerHandle = player;// ->GetClientHandle();
 	move->m_vecVelocity		= player->GetAbsVelocity();
 	move->SetAbsOrigin( player->GetNetworkOrigin() );
 	move->m_vecOldAngles	= move->m_vecAngles;

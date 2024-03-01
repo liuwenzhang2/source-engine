@@ -1815,7 +1815,7 @@ void C_CSPlayer::ProcessMuzzleFlashEvent()
 		{
 			float flScale = pWeapon->GetCSWpnData().m_flMuzzleScale;
 			flScale *= 0.75;
-			FX_MuzzleEffectAttached( flScale, pWeapon->GetRefEHandle(), iAttachment, NULL, false );
+			FX_MuzzleEffectAttached( flScale, pWeapon, iAttachment, NULL, false );
 
 		}
 	}

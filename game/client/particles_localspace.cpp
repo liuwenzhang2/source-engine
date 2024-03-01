@@ -29,7 +29,7 @@ inline const matrix3x4_t& CLocalSpaceEmitter::GetTransformMatrix() const
 // Purpose: Creates a local space emitter
 //-----------------------------------------------------------------------------
 CSmartPtr<CLocalSpaceEmitter> CLocalSpaceEmitter::Create( const char *pDebugName, 
-	ClientEntityHandle_t hEntity, int nAttachment, int fFlags )
+	C_BaseEntity* hEntity, int nAttachment, int fFlags )
 {
 	CLocalSpaceEmitter *pRet = new CLocalSpaceEmitter( pDebugName );
 	pRet->SetDynamicallyAllocated( true );
@@ -123,7 +123,7 @@ void CLocalSpaceEmitter::RenderParticles( CParticleRenderIterator *pIterator )
 //-----------------------------------------------------------------------------
 void CLocalSpaceEmitter::SetupTransformMatrix( void )
 {
-	IClientRenderable *pRenderable = ClientEntityList().GetClientRenderableFromHandle( m_hEntity );
+	IClientRenderable *pRenderable = m_hEntity;//ClientEntityList().GetClientRenderableFromHandle( 
 	if ( pRenderable )
 	{
 		matrix3x4_t mat;

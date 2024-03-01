@@ -51,8 +51,8 @@ public:
 
 	virtual void				BloodSprite( const Vector &org, int r, int g, int b, int a, int modelIndex, int modelIndex2, float size ) = 0;
 	virtual void				RicochetSprite( const Vector &pos, model_t *pmodel, float duration, float scale ) = 0;
-	virtual void				MuzzleFlash( int type, ClientEntityHandle_t hEntity, int attachmentIndex, bool firstPerson ) = 0;
-	virtual void				MuzzleFlash( const Vector &pos1, const QAngle &angles, int type, ClientEntityHandle_t hEntity, bool firstPerson ) = 0;
+	virtual void				MuzzleFlash( int type, C_BaseEntity* hEntity, int attachmentIndex, bool firstPerson ) = 0;
+	virtual void				MuzzleFlash( const Vector &pos1, const QAngle &angles, int type, C_BaseEntity* hEntity, bool firstPerson ) = 0;
 	virtual void				EjectBrass( const Vector& pos1, const QAngle& angles, const QAngle& gunAngles, int type ) = 0;
 	virtual C_LocalTempEntity   *SpawnTempModel( const model_t *pModel, const Vector &vecOrigin, const QAngle &vecAngles, const Vector &vecVelocity, float flLifeTime, int iFlags ) = 0;
 	virtual void				BreakModel( const Vector &pos, const QAngle &angles, const Vector &size, const Vector &dir, float random, float life, int count, int modelIndex, char flags) = 0;
@@ -104,8 +104,8 @@ public:
 	virtual void			BloodSprite( const Vector &org, int r, int g, int b, int a, int modelIndex, int modelIndex2, float size );
 	virtual void			RicochetSprite( const Vector &pos, model_t *pmodel, float duration, float scale );
 
-	virtual void			MuzzleFlash( int type, ClientEntityHandle_t hEntity, int attachmentIndex, bool firstPerson );
-	virtual void			MuzzleFlash( const Vector &pos1, const QAngle &angles, int type, ClientEntityHandle_t hEntity, bool firstPerson = false );
+	virtual void			MuzzleFlash( int type, C_BaseEntity* hEntity, int attachmentIndex, bool firstPerson );
+	virtual void			MuzzleFlash( const Vector &pos1, const QAngle &angles, int type, C_BaseEntity* hEntity, bool firstPerson = false );
 	
 	virtual void			BreakModel(const Vector &pos, const QAngle &angles, const Vector &size, const Vector &dir, float random, float life, int count, int modelIndex, char flags);
 	virtual void			Bubbles( const Vector &mins, const Vector &maxs, float height, int modelIndex, int count, float speed );
@@ -188,30 +188,30 @@ private:
 	int						AddVisibleTempEntity( C_LocalTempEntity *pEntity );
 
 	// AR2
-	void					MuzzleFlash_AR2_Player( const Vector &origin, const QAngle &angles, ClientEntityHandle_t hEntity );
-	void					MuzzleFlash_AR2_NPC( const Vector &origin, const QAngle &angles, ClientEntityHandle_t hEntity );
+	void					MuzzleFlash_AR2_Player( const Vector &origin, const QAngle &angles, C_BaseEntity* hEntity );
+	void					MuzzleFlash_AR2_NPC( const Vector &origin, const QAngle &angles, C_BaseEntity* hEntity );
 							
 	// SMG1					
-	void					MuzzleFlash_SMG1_Player( ClientEntityHandle_t hEntity, int attachmentIndex );
-	void					MuzzleFlash_SMG1_NPC( ClientEntityHandle_t hEntity, int attachmentIndex );
+	void					MuzzleFlash_SMG1_Player(C_BaseEntity* hEntity, int attachmentIndex );
+	void					MuzzleFlash_SMG1_NPC(C_BaseEntity* hEntity, int attachmentIndex );
 							
 	// Shotgun				
-	void					MuzzleFlash_Shotgun_Player( ClientEntityHandle_t hEntity, int attachmentIndex );
-	void					MuzzleFlash_Shotgun_NPC( ClientEntityHandle_t hEntity, int attachmentIndex );
+	void					MuzzleFlash_Shotgun_Player(C_BaseEntity* hEntity, int attachmentIndex );
+	void					MuzzleFlash_Shotgun_NPC(C_BaseEntity* hEntity, int attachmentIndex );
 							
 	// Pistol				
-	void					MuzzleFlash_Pistol_Player( ClientEntityHandle_t hEntity, int attachmentIndex );
-	void					MuzzleFlash_Pistol_NPC( ClientEntityHandle_t hEntity, int attachmentIndex );
+	void					MuzzleFlash_Pistol_Player(C_BaseEntity* hEntity, int attachmentIndex );
+	void					MuzzleFlash_Pistol_NPC(C_BaseEntity* hEntity, int attachmentIndex );
 							
 	// Combine				
-	void					MuzzleFlash_Combine_Player( ClientEntityHandle_t hEntity, int attachmentIndex );
-	void					MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attachmentIndex );
+	void					MuzzleFlash_Combine_Player( C_BaseEntity* hEntity, int attachmentIndex );
+	void					MuzzleFlash_Combine_NPC( C_BaseEntity* hEntity, int attachmentIndex );
 
 	// 357
-	void					MuzzleFlash_357_Player( ClientEntityHandle_t hEntity, int attachmentIndex );
+	void					MuzzleFlash_357_Player(C_BaseEntity* hEntity, int attachmentIndex );
 
 	// RPG
-	void					MuzzleFlash_RPG_NPC( ClientEntityHandle_t hEntity, int attachmentIndex );
+	void					MuzzleFlash_RPG_NPC(C_BaseEntity* hEntity, int attachmentIndex );
 };
 
 

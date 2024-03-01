@@ -1201,6 +1201,20 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	m_iNumEnts--;
 }
 
+
+template<class T>
+inline T* CHandle<T>::Get() const
+{
+#ifdef CLIENT_DLL
+	//extern CBaseEntityList<IHandleEntity>* g_pEntityList;
+	return (T*)g_pEntityList->LookupEntity(*this);
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+	//extern CBaseEntityList<IHandleEntity>* g_pEntityList;
+	return (T*)gEntList.LookupEntity(*this);
+#endif // GAME_DLL
+}
+
 //-----------------------------------------------------------------------------
 // Common finds
 #if 0

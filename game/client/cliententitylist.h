@@ -769,7 +769,18 @@ inline CClientEntityList<C_BaseEntity>& ClientEntityList()
 	return *cl_entitylist;
 }
 
-
+template<class T>
+inline T* CHandle<T>::Get() const
+{
+#ifdef CLIENT_DLL
+	//extern CBaseEntityList<IHandleEntity>* g_pEntityList;
+	return (T*)ClientEntityList().LookupEntity(*this);
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+	//extern CBaseEntityList<IHandleEntity>* g_pEntityList;
+	return (T*)g_pEntityList->LookupEntity(*this);
+#endif // GAME_DLL
+}
 
 
 #endif // CLIENTENTITYLIST_H

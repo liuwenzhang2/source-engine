@@ -594,7 +594,7 @@ void C_PhysPropClientside::ImpactTrace( trace_t *pTrace, int iDamageType, const 
 		data.m_nSurfaceProp = pTrace->surface.surfaceProps;
 		data.m_nDamageType = iDamageType;
 		data.m_nHitBox = pTrace->hitbox;
-		data.m_hEntity = GetRefEHandle();
+		data.m_hEntity = this;
 
 		// Send it on its way
 		if ( !pCustomImpactName )

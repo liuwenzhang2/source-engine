@@ -297,7 +297,7 @@ void CWeaponElite::WeaponIdle()
 			
 			CEffectData data;
 			data.m_fFlags = 0;
-			data.m_hEntity = pViewModel->GetRefEHandle();
+			data.m_hEntity = pViewModel;
 			data.m_nAttachmentIndex = FiringLeft() ? 1 : 2; // toggle muzzle flash
 			data.m_flScale = GetCSWpnData().m_flMuzzleScale;
 		

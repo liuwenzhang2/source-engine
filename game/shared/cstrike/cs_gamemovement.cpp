@@ -394,7 +394,7 @@ void CCSGameMovement::PlayerMove()
 		trace_t trace;
 		Ray_t ray;
 		ray.Init( start, end, vHullMin, vHullMax );
-		UTIL_TraceRay( ray, PlayerSolidMask(), mv->m_nPlayerHandle.Get(), COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
+		UTIL_TraceRay( ray, PlayerSolidMask(), mv->m_nPlayerHandle, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 
 		if ( trace.fraction < 1.0f )
 		{
@@ -1142,6 +1142,6 @@ void  CCSGameMovement::TryTouchGround( const Vector& start, const Vector& end, c
 
 	ShouldHitFunc_t pStandingTestCallback = sv_enableboost.GetBool() ? NULL : CheckForStandable;
 
-	UTIL_TraceRay( ray, fMask, mv->m_nPlayerHandle.Get(), collisionGroup, &pm,  pStandingTestCallback );
+	UTIL_TraceRay( ray, fMask, mv->m_nPlayerHandle, collisionGroup, &pm,  pStandingTestCallback );
 
 }

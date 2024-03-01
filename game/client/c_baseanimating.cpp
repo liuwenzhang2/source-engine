@@ -3601,7 +3601,7 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 	}
 
 	// Send it out
-	tempents->MuzzleFlash( weaponType, GetRefEHandle(), attachmentIndex, isFirstPerson );
+	tempents->MuzzleFlash( weaponType, this, attachmentIndex, isFirstPerson );
 
 	return true;
 }
@@ -3991,7 +3991,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 				data.m_vOrigin = attachOrigin;
 				data.m_vAngles = attachAngles;
 				AngleVectors( attachAngles, &data.m_vNormal );
-				data.m_hEntity = GetRefEHandle();
+				data.m_hEntity = this;
 				data.m_nAttachmentIndex = iAttachment + 1;
 				data.m_fFlags = iParam;
 
@@ -4067,7 +4067,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 				data.m_vOrigin = attachOrigin;
 				data.m_vAngles = attachAngles;
 				AngleVectors( attachAngles, &data.m_vNormal );
-				data.m_hEntity = GetRefEHandle();
+				data.m_hEntity = this;
 				data.m_nAttachmentIndex = iAttachment + 1;
 
 				DispatchEffect( options, data );
@@ -4133,7 +4133,7 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 			{
 				GetAttachment( iAttachment+1, attachOrigin, attachAngles );
 				int entId = render->GetViewEntity();
-				ClientEntityHandle_t hEntity = ClientEntityList().EntIndexToHandle( entId );
+				C_BaseEntity* hEntity = ClientEntityList().GetBaseEntity( entId );
 				tempents->MuzzleFlash( attachOrigin, attachAngles, atoi( options ), hEntity, bFirstPerson );
 			}
 		}

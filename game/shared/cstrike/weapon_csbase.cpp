@@ -1317,7 +1317,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 
 			CEffectData data;
 			data.m_fFlags = 0;
-			data.m_hEntity = pViewModel->GetRefEHandle();
+			data.m_hEntity = pViewModel;
 			data.m_nAttachmentIndex = 1;
 			data.m_flScale = GetCSWpnData().m_flMuzzleScale;
 

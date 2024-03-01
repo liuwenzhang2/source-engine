@@ -1724,7 +1724,7 @@ C_LocalTempEntity * CTempEnts::SpawnTempModel( const model_t *pModel, const Vect
 //			attachmentIndex - 
 //			firstPerson - 
 //-----------------------------------------------------------------------------
-void CTempEnts::MuzzleFlash( int type, ClientEntityHandle_t hEntity, int attachmentIndex, bool firstPerson )
+void CTempEnts::MuzzleFlash( int type, C_BaseEntity* hEntity, int attachmentIndex, bool firstPerson )
 {
 	switch( type )
 	{
@@ -1801,7 +1801,7 @@ void CTempEnts::MuzzleFlash( int type, ClientEntityHandle_t hEntity, int attachm
 // Input  : *pos1 - 
 //			type - 
 //-----------------------------------------------------------------------------
-void CTempEnts::MuzzleFlash( const Vector& pos1, const QAngle& angles, int type, ClientEntityHandle_t hEntity, bool firstPerson )
+void CTempEnts::MuzzleFlash( const Vector& pos1, const QAngle& angles, int type, C_BaseEntity* hEntity, bool firstPerson )
 {
 #ifdef CSTRIKE_DLL
 
@@ -2522,7 +2522,7 @@ inline void CTempEnts::CacheMuzzleFlashes( void )
 // Input  : entityIndex - 
 //			attachmentIndex - 
 //-----------------------------------------------------------------------------
-void CTempEnts::MuzzleFlash_Combine_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
+void CTempEnts::MuzzleFlash_Combine_Player( C_BaseEntity* hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_Combine_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CLocalSpaceEmitter> pSimple = CLocalSpaceEmitter::Create( "MuzzleFlash", hEntity, attachmentIndex, FLE_VIEWMODEL );
@@ -2595,7 +2595,7 @@ void CTempEnts::MuzzleFlash_Combine_Player( ClientEntityHandle_t hEntity, int at
 //			&angles - 
 //			entityIndex - 
 //-----------------------------------------------------------------------------
-void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attachmentIndex )
+void CTempEnts::MuzzleFlash_Combine_NPC( C_BaseEntity* hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_Combine_NPC", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
@@ -2778,7 +2778,7 @@ void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attac
 
 	if ( muzzleflash_light.GetBool() )
 	{
-		C_BaseEntity *pEnt = ClientEntityList().GetBaseEntityFromHandle( hEntity );
+		C_BaseEntity *pEnt = hEntity;//ClientEntityList().GetBaseEntityFromHandle( 
 		if ( pEnt )
 		{
 			dlight_t *el = effects->CL_AllocElight( LIGHT_INDEX_MUZZLEFLASH + pEnt->entindex() );
@@ -2802,7 +2802,7 @@ void CTempEnts::MuzzleFlash_Combine_NPC( ClientEntityHandle_t hEntity, int attac
 // Input: 
 //==================================================
 
-void CTempEnts::MuzzleFlash_AR2_NPC( const Vector &origin, const QAngle &angles, ClientEntityHandle_t hEntity )
+void CTempEnts::MuzzleFlash_AR2_NPC( const Vector &origin, const QAngle &angles, C_BaseEntity* hEntity )
 {
 	//Draw the cloud of fire
 	FX_MuzzleEffect( origin, angles, 1.0f, hEntity );
@@ -2811,7 +2811,7 @@ void CTempEnts::MuzzleFlash_AR2_NPC( const Vector &origin, const QAngle &angles,
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTempEnts::MuzzleFlash_SMG1_NPC( ClientEntityHandle_t hEntity, int attachmentIndex )
+void CTempEnts::MuzzleFlash_SMG1_NPC(C_BaseEntity* hEntity, int attachmentIndex )
 {
 	//Draw the cloud of fire
 	FX_MuzzleEffectAttached( 1.0f, hEntity, attachmentIndex, NULL, true );
@@ -2820,7 +2820,7 @@ void CTempEnts::MuzzleFlash_SMG1_NPC( ClientEntityHandle_t hEntity, int attachme
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CTempEnts::MuzzleFlash_SMG1_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
+void CTempEnts::MuzzleFlash_SMG1_Player(C_BaseEntity* hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_SMG1_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CLocalSpaceEmitter> pSimple = CLocalSpaceEmitter::Create( "MuzzleFlash_SMG1_Player", hEntity, attachmentIndex, FLE_VIEWMODEL );
@@ -2868,7 +2868,7 @@ void CTempEnts::MuzzleFlash_SMG1_Player( ClientEntityHandle_t hEntity, int attac
 // Input: 
 //==================================================
 
-void CTempEnts::MuzzleFlash_Shotgun_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
+void CTempEnts::MuzzleFlash_Shotgun_Player(C_BaseEntity* hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_Shotgun_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "MuzzleFlash_Shotgun_Player" );
@@ -2927,7 +2927,7 @@ void CTempEnts::MuzzleFlash_Shotgun_Player( ClientEntityHandle_t hEntity, int at
 // Input: 
 //==================================================
 
-void CTempEnts::MuzzleFlash_Shotgun_NPC( ClientEntityHandle_t hEntity, int attachmentIndex )
+void CTempEnts::MuzzleFlash_Shotgun_NPC(C_BaseEntity* hEntity, int attachmentIndex )
 {
 	//Draw the cloud of fire
 	FX_MuzzleEffectAttached( 0.75f, hEntity, attachmentIndex );
@@ -2945,7 +2945,7 @@ void CTempEnts::MuzzleFlash_Shotgun_NPC( ClientEntityHandle_t hEntity, int attac
 
 	// Setup the origin.
 	Vector	origin;
-	IClientRenderable *pRenderable = ClientEntityList().GetClientRenderableFromHandle( hEntity );
+	IClientRenderable *pRenderable = hEntity;//ClientEntityList().GetClientRenderableFromHandle( 
 	if ( !pRenderable )
 		return;
 
@@ -3041,7 +3041,7 @@ void CTempEnts::MuzzleFlash_Shotgun_NPC( ClientEntityHandle_t hEntity, int attac
 //==================================================
 // Purpose: 
 //==================================================
-void CTempEnts::MuzzleFlash_357_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
+void CTempEnts::MuzzleFlash_357_Player(C_BaseEntity* hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_357_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "MuzzleFlash_357_Player" );
@@ -3128,7 +3128,7 @@ void CTempEnts::MuzzleFlash_357_Player( ClientEntityHandle_t hEntity, int attach
 // Input: 
 //==================================================
 
-void CTempEnts::MuzzleFlash_Pistol_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
+void CTempEnts::MuzzleFlash_Pistol_Player(C_BaseEntity* hEntity, int attachmentIndex )
 {
 	VPROF_BUDGET( "MuzzleFlash_Pistol_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "MuzzleFlash_Pistol_Player" );
@@ -3217,7 +3217,7 @@ void CTempEnts::MuzzleFlash_Pistol_Player( ClientEntityHandle_t hEntity, int att
 // Input: 
 //==================================================
 
-void CTempEnts::MuzzleFlash_Pistol_NPC( ClientEntityHandle_t hEntity, int attachmentIndex )
+void CTempEnts::MuzzleFlash_Pistol_NPC(C_BaseEntity* hEntity, int attachmentIndex )
 {
 	FX_MuzzleEffectAttached( 0.5f, hEntity, attachmentIndex, NULL, true );
 }
@@ -3230,7 +3230,7 @@ void CTempEnts::MuzzleFlash_Pistol_NPC( ClientEntityHandle_t hEntity, int attach
 // Input: 
 //==================================================
 
-void CTempEnts::MuzzleFlash_RPG_NPC( ClientEntityHandle_t hEntity, int attachmentIndex )
+void CTempEnts::MuzzleFlash_RPG_NPC(C_BaseEntity* hEntity, int attachmentIndex )
 {
 	//Draw the cloud of fire
 	FX_MuzzleEffectAttached( 1.5f, hEntity, attachmentIndex );

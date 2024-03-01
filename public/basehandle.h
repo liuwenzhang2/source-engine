@@ -58,7 +58,7 @@ public:
 
 	// Use this to dereference the handle.
 	// Note: this is implemented in game code (ehandle.h)
-	IHandleEntity* Get() const;
+	//IHandleEntity* Get() const;
 
 
 protected:
@@ -136,12 +136,12 @@ inline bool CBaseHandle::operator ==( const CBaseHandle &other ) const
 
 inline bool CBaseHandle::operator ==( const IHandleEntity* pEnt ) const
 {
-	return Get() == pEnt;
+	return operator==( pEnt->GetRefEHandle());
 }
 
 inline bool CBaseHandle::operator !=( const IHandleEntity* pEnt ) const
 {
-	return Get() != pEnt;
+	return operator!=(pEnt->GetRefEHandle());
 }
 
 inline bool CBaseHandle::operator <( const CBaseHandle &other ) const

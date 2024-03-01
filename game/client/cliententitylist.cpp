@@ -34,17 +34,7 @@ CClientEntityList<C_BaseEntity> *cl_entitylist = &s_EntityList;
 // Game-code CBaseHandle implementation.
 // -------------------------------------------------------------------------------------------------- //
 
-IHandleEntity* CBaseHandle::Get() const
-{
-#ifdef CLIENT_DLL
-	//extern CBaseEntityList<IHandleEntity>* g_pEntityList;
-	return g_pEntityList->LookupEntity(*this);
-#endif // CLIENT_DLL
-#ifdef GAME_DLL
-	//extern CBaseEntityList<IHandleEntity>* g_pEntityList;
-	return g_pEntityList->LookupEntity(*this);
-#endif // GAME_DLL
-}
+
 
 bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b )
 {

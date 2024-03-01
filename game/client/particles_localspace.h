@@ -20,7 +20,7 @@ public:
 
 	DECLARE_CLASS( CLocalSpaceEmitter, CParticleEffect );
 	
-	static CSmartPtr<CLocalSpaceEmitter> Create( const char *pDebugName, ClientEntityHandle_t hEntity, int nAttachment, int flags = 0 );
+	static CSmartPtr<CLocalSpaceEmitter> Create( const char *pDebugName, C_BaseEntity* hEntity, int nAttachment, int flags = 0 );
 
 	virtual void RenderParticles( CParticleRenderIterator *pIterator );
 	virtual void SimulateParticles( CParticleSimulateIterator *pIterator );
@@ -34,7 +34,7 @@ protected:
 
 	CLocalSpaceEmitter( const char *pDebugName );
 
-	ClientEntityHandle_t m_hEntity;
+	C_BaseEntity* m_hEntity;
 	int	m_nAttachment;
 	int m_fFlags;
 

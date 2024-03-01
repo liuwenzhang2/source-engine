@@ -742,7 +742,7 @@ void UTIL_Tracer( const Vector &vecStart, const Vector &vecEnd, int iEntIndex,
 	data.m_vStart = vecStart;
 	data.m_vOrigin = vecEnd;
 #ifdef CLIENT_DLL
-	data.m_hEntity = ClientEntityList().EntIndexToHandle( iEntIndex );
+	data.m_hEntity = ClientEntityList().GetBaseEntity( iEntIndex );
 #else
 	data.m_nEntIndex = iEntIndex;
 #endif

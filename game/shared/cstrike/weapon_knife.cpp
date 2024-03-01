@@ -283,7 +283,7 @@ void CKnife::Smack( void )
 	data.m_nDamageType = DMG_SLASH;
 	data.m_nHitBox = m_trHit.hitbox;
 #ifdef CLIENT_DLL
-	data.m_hEntity = ((C_BaseEntity*)m_trHit.m_pEnt)->GetRefEHandle();
+	data.m_hEntity = ((C_BaseEntity*)m_trHit.m_pEnt);
 #else
 	data.m_nEntIndex = ((CBaseEntity*)m_trHit.m_pEnt)->entindex();
 #endif

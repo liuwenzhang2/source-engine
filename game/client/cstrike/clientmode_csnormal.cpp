@@ -71,8 +71,8 @@ ConVar default_fov( "default_fov", "90", FCVAR_CHEAT );
 IClientMode *g_pClientMode = NULL;
 
 // This is a temporary entity used to render the player's model while drawing the class selection menu.
-CHandle<C_BaseAnimatingOverlay> g_ClassImagePlayer;	// player
-CHandle<C_BaseAnimating> g_ClassImageWeapon;	// weapon
+C_BaseAnimatingOverlay* g_ClassImagePlayer=NULL;	// player
+C_BaseAnimating* g_ClassImageWeapon=NULL;	// weapon
 
 STUB_WEAPON_CLASS( cycler_weapon,	WeaponCycler,	C_BaseCombatWeapon );
 STUB_WEAPON_CLASS( weapon_cubemap,	WeaponCubemap,	C_BaseCombatWeapon );
@@ -273,10 +273,11 @@ void CCSModeManager::LevelInit( const char *newmap )
 		cl_detail_avoid_recover_speed.SetValue( "0.25" );
 	}
 }
-
+void RemoveClassImageEntity();
 void CCSModeManager::LevelShutdown( void )
 {
 	g_pClientMode->LevelShutdown();
+	RemoveClassImageEntity();
 }
 
 //-----------------------------------------------------------------------------
@@ -734,14 +735,14 @@ void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 
 void RemoveClassImageEntity()
 {
-	C_BaseAnimating *pEnt = g_ClassImagePlayer.Get();
+	C_BaseAnimating *pEnt = g_ClassImagePlayer;
 	if ( pEnt )
 	{
 		DestroyEntity(pEnt);// ->Remove();
 		g_ClassImagePlayer = NULL;
 	}
 
-	pEnt = g_ClassImageWeapon.Get();
+	pEnt = g_ClassImageWeapon;
 	if ( pEnt )
 	{
 		DestroyEntity(pEnt);// ->Remove();
@@ -810,7 +811,7 @@ void UpdateClassImageEntity(
 		}
 	}
 
-	C_BaseAnimatingOverlay *pPlayerModel = g_ClassImagePlayer.Get();
+	C_BaseAnimatingOverlay *pPlayerModel = g_ClassImagePlayer;
 
 	// Does the entity even exist yet?
 	bool recreatePlayer = ShouldRecreateClassImageEntity( pPlayerModel, pModelName );
@@ -835,7 +836,7 @@ void UpdateClassImageEntity(
 		g_ClassImagePlayer = pPlayerModel;
 	}
 
-	C_BaseAnimating *pWeaponModel = g_ClassImageWeapon.Get();
+	C_BaseAnimating *pWeaponModel = g_ClassImageWeapon;
 
 	// Does the entity even exist yet?
 	if ( recreatePlayer || ShouldRecreateClassImageEntity( pWeaponModel, pWeaponName ) )

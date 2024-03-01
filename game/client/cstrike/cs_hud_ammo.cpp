@@ -37,7 +37,7 @@ protected:
 	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
 	
 private:
-	CHandle< C_BaseCombatWeapon > m_hCurrentActiveWeapon;
+	CBaseHandle m_hCurrentActiveWeapon;
 	int		m_iAmmo;
 	int		m_iAmmo2;
 
@@ -143,7 +143,7 @@ void CHudAmmo::OnThink()
 	hudlcd->SetGlobalStat( "(ammo_primary)", VarArgs( "%d", ammo1 ) );
 	hudlcd->SetGlobalStat( "(ammo_secondary)", VarArgs( "%d", ammo2 ) );
 
-	if (wpn == m_hCurrentActiveWeapon)
+	if (wpn->GetRefEHandle() == m_hCurrentActiveWeapon)
 	{
 		// same weapon, just update counts
 		SetAmmo(ammo1, true);
