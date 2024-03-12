@@ -95,36 +95,36 @@ void RecvProxy_Beam_ScrollSpeed( const CRecvProxyData *pData, void *pStruct, voi
 	beam->m_fSpeed = val;
 }
 #else
-#if !defined( NO_ENTITY_PREDICTION )
-static void* SendProxy_SendPredictableId( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
-{
-	CBaseEntity *pEntity = (CBaseEntity *)pStruct;
-	if ( !pEntity || !pEntity->m_PredictableID->IsActive() )
-		return NULL;
-
-	if ( !pEntity->GetOwnerEntity() )
-		return NULL;
-
-	CBaseEntity *owner = pEntity->GetOwnerEntity();
-	if ( !owner || !owner->IsPlayer() )
-		return NULL;
-
-	CBasePlayer *pOwner = static_cast< CBasePlayer * >( owner );
-	if ( !pOwner )
-		return NULL;
-
-	int id_player_index = pEntity->m_PredictableID->GetPlayer();
-	int owner_player_index = pOwner->entindex() - 1;
-	// Only send to owner player
-	// FIXME:  Is this ever not the case due to the SetOnly call?
-	if ( id_player_index != owner_player_index )
-		return NULL;
-
-	pRecipients->SetOnly( owner_player_index );
-	return ( void * )pVarData;
-}
-REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendPredictableId );
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//static void* SendProxy_SendPredictableId( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
+//{
+//	CBaseEntity *pEntity = (CBaseEntity *)pStruct;
+//	if ( !pEntity || !pEntity->m_PredictableID->IsActive() )
+//		return NULL;
+//
+//	if ( !pEntity->GetOwnerEntity() )
+//		return NULL;
+//
+//	CBaseEntity *owner = pEntity->GetOwnerEntity();
+//	if ( !owner || !owner->IsPlayer() )
+//		return NULL;
+//
+//	CBasePlayer *pOwner = static_cast< CBasePlayer * >( owner );
+//	if ( !pOwner )
+//		return NULL;
+//
+//	int id_player_index = pEntity->m_PredictableID->GetPlayer();
+//	int owner_player_index = pOwner->entindex() - 1;
+//	// Only send to owner player
+//	// FIXME:  Is this ever not the case due to the SetOnly call?
+//	if ( id_player_index != owner_player_index )
+//		return NULL;
+//
+//	pRecipients->SetOnly( owner_player_index );
+//	return ( void * )pVarData;
+//}
+//REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendPredictableId );
+//#endif
 #endif
 
 LINK_ENTITY_TO_CLASS( beam, CBeam );
@@ -132,17 +132,17 @@ LINK_ENTITY_TO_CLASS( beam, CBeam );
 // This table encodes the CBeam data.
 IMPLEMENT_NETWORKCLASS_ALIASED( Beam, DT_Beam )
 
-#if !defined( NO_ENTITY_PREDICTION )
-BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_BeamPredictableId )
-#if !defined( CLIENT_DLL )
-	SendPropPredictableId( SENDINFO( m_PredictableID ) ),
-	SendPropInt( SENDINFO( m_bIsPlayerSimulated ), 1, SPROP_UNSIGNED ),
-#else
-	RecvPropPredictableId( RECVINFO( m_PredictableID ) ),
-	RecvPropInt( RECVINFO( m_bIsPlayerSimulated ) ),
-#endif
-END_NETWORK_TABLE()
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_BeamPredictableId )
+//#if !defined( CLIENT_DLL )
+//	SendPropPredictableId( SENDINFO( m_PredictableID ) ),
+//	SendPropInt( SENDINFO( m_bIsPlayerSimulated ), 1, SPROP_UNSIGNED ),
+//#else
+//	RecvPropPredictableId( RECVINFO( m_PredictableID ) ),
+//	RecvPropInt( RECVINFO( m_bIsPlayerSimulated ) ),
+//#endif
+//END_NETWORK_TABLE()
+//#endif
 
 BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_Beam )
 #if !defined( CLIENT_DLL )
@@ -182,9 +182,9 @@ BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_Beam )
 	SendPropVector (SENDINFO(m_vecOrigin), 19, SPROP_CHANGES_OFTEN,	MIN_COORD_INTEGER, MAX_COORD_INTEGER),
 	SendPropEHandle(SENDINFO_NAME(m_hMoveParent, moveparent) ),
 	SendPropInt		(SENDINFO(m_nMinDXLevel),	8,	SPROP_UNSIGNED ),
-#if !defined( NO_ENTITY_PREDICTION )
-	SendPropDataTable( "beampredictable_id", 0, &REFERENCE_SEND_TABLE( DT_BeamPredictableId ), SendProxy_SendPredictableId ),
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	SendPropDataTable( "beampredictable_id", 0, &REFERENCE_SEND_TABLE( DT_BeamPredictableId ), SendProxy_SendPredictableId ),
+//#endif
 
 #else
 	RecvPropInt		(RECVINFO(m_nBeamType)),
@@ -224,9 +224,9 @@ BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_Beam )
 
 	RecvPropVector(RECVINFO_NAME(m_vecNetworkOrigin, m_vecOrigin)),
 	RecvPropInt( RECVINFO_NAME(m_hNetworkMoveParent, moveparent), 0, RecvProxy_IntToMoveParent ),
-#if !defined( NO_ENTITY_PREDICTION )
-	RecvPropDataTable( "beampredictable_id", 0, 0, &REFERENCE_RECV_TABLE( DT_BeamPredictableId ) ),
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	RecvPropDataTable( "beampredictable_id", 0, 0, &REFERENCE_RECV_TABLE( DT_BeamPredictableId ) ),
+//#endif
 
 #endif
 END_NETWORK_TABLE()
@@ -563,22 +563,22 @@ CBeam *CBeam::BeamCreate( const char *pSpriteName, float width )
 //			animate - 
 // Output : CSprite
 //-----------------------------------------------------------------------------
-CBeam *CBeam::BeamCreatePredictable( const char *module, int line, bool persist, const char *pSpriteName, float width, CBasePlayer *pOwner )
-{
-#if !defined( NO_ENTITY_PREDICTION )
-	CBeam *pBeam = ( CBeam * )CBaseEntity::CreatePredictedEntityByName( "beam", module, line, persist );
-	if ( pBeam )
-	{
-		pBeam->BeamInit( pSpriteName, width );
-		pBeam->SetOwnerEntity( pOwner );
-		pBeam->SetPlayerSimulated( pOwner );
-	}
-
-	return pBeam;
-#else
-	return NULL;
-#endif
-}
+//CBeam *CBeam::BeamCreatePredictable( const char *module, int line, bool persist, const char *pSpriteName, float width, CBasePlayer *pOwner )
+//{
+//#if !defined( NO_ENTITY_PREDICTION )
+//	CBeam *pBeam = ( CBeam * )CBaseEntity::CreatePredictedEntityByName( "beam", module, line, persist );
+//	if ( pBeam )
+//	{
+//		pBeam->BeamInit( pSpriteName, width );
+//		pBeam->SetOwnerEntity( pOwner );
+//		pBeam->SetPlayerSimulated( pOwner );
+//	}
+//
+//	return pBeam;
+//#else
+//	return NULL;
+//#endif
+//}
 
 void CBeam::BeamInit( const char *pSpriteName, float width )
 {
@@ -940,29 +940,29 @@ int CBeam::DrawDebugTextOverlays(void)
 //			*predicted - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CBeam::OnPredictedEntityRemove( bool isbeingremoved, C_BaseEntity *predicted )
-{
-	BaseClass::OnPredictedEntityRemove( isbeingremoved, predicted );
-
-	CBeam *beam = dynamic_cast< CBeam * >( predicted );
-	if ( !beam )
-	{
-		// Hrm, we didn't link up to correct type!!!
-		Assert( 0 );
-		// Delete right away since it's fucked up
-		return true;
-	}
-
-	if ( beam->IsEFlagSet( EFL_KILLME ) )
-	{
-		// Don't delete right away
-		AddEFlags( EFL_KILLME );
-		return false;
-	}
-
-	// Go ahead and delete if it's not short-lived
-	return true;
-}
+//bool CBeam::OnPredictedEntityRemove( bool isbeingremoved, C_BaseEntity *predicted )
+//{
+//	BaseClass::OnPredictedEntityRemove( isbeingremoved, predicted );
+//
+//	CBeam *beam = dynamic_cast< CBeam * >( predicted );
+//	if ( !beam )
+//	{
+//		// Hrm, we didn't link up to correct type!!!
+//		Assert( 0 );
+//		// Delete right away since it's fucked up
+//		return true;
+//	}
+//
+//	if ( beam->IsEFlagSet( EFL_KILLME ) )
+//	{
+//		// Don't delete right away
+//		AddEFlags( EFL_KILLME );
+//		return false;
+//	}
+//
+//	// Go ahead and delete if it's not short-lived
+//	return true;
+//}
 
 extern bool g_bRenderingScreenshot;
 extern ConVar r_drawviewmodel;

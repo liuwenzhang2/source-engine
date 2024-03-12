@@ -113,7 +113,7 @@ private:
 	void			ShutdownPredictables( void );
 	void			ReinitPredictables( void );
 
-	void			RemoveStalePredictedEntities( int last_command_packet );
+	//void			RemoveStalePredictedEntities( int last_command_packet );
 	void			RestoreOriginalEntityState( void );
 	void			RunSimulation( int current_command, float curtime, CUserCmd *cmd, C_BasePlayer *localPlayer );
 	void			Untouch( void );

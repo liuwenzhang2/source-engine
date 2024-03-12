@@ -19,6 +19,8 @@
 #include "debugoverlay_shared.h"
 #include "coordsize.h"
 #include "vphysics/performance.h"
+#include "isaverestore.h"
+#include "saverestoretypes.h"
 
 #ifdef CLIENT_DLL
 	#include "c_te_effect_dispatch.h"
@@ -64,6 +66,81 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 	extern bool ExtractKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, char *szValue, int iMaxLen );
 #endif
 
+class CEngineObjectSaveDataOps : public CDefSaveRestoreOps
+{
+	// saves the entire array of variables
+	virtual void Save(const SaveRestoreFieldInfo_t& fieldInfo, ISave* pSave)
+	{
+		CBaseEntity* pEntity = pSave->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
+		if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecOrigin")) {
+			Vector verOrigin = pEntity->GetLocalOrigin();
+			pSave->WriteVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angRotation")) {
+			QAngle angel = pEntity->GetLocalAngles();
+			pSave->WriteVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecVelocity")) {
+			Vector verOrigin = pEntity->GetLocalVelocity();
+			pSave->WriteVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsOrigin")) {
+			Vector verOrigin = pEntity->GetAbsOrigin();
+			pSave->WritePositionVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angAbsRotation")) {
+			QAngle angel = pEntity->GetAbsAngles();
+			pSave->WriteVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsVelocity")) {
+			Vector verOrigin = pEntity->GetAbsVelocity();
+			pSave->WritePositionVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
+		}
+	}
+
+	// restores a single instance of the variable
+	virtual void Restore(const SaveRestoreFieldInfo_t& fieldInfo, IRestore* pRestore)
+	{
+		CBaseEntity* pEntity = pRestore->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
+		if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecOrigin")) {
+			Vector vecOrigin;
+			pRestore->ReadVector(&vecOrigin, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->SetLocalOrigin(vecOrigin);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angRotation")) {
+			QAngle angel;
+			pRestore->ReadVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->SetLocalAngles(angel);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecVelocity")) {
+			Vector vecVelocity;
+			pRestore->ReadVector(&vecVelocity, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->SetLocalVelocity(vecVelocity);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsOrigin")) {
+			Vector vecOrigin;
+			pRestore->ReadPositionVector(&vecOrigin, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->SetAbsOrigin(vecOrigin);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angAbsRotation")) {
+			QAngle angel;
+			pRestore->ReadVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->SetAbsAngles(angel);
+		} else if(!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsVelocity")) {
+			Vector vecVelocity;
+			pRestore->ReadVector(&vecVelocity, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->SetAbsVelocity(vecVelocity);
+		}
+	}
+
+
+	virtual bool IsEmpty(const SaveRestoreFieldInfo_t& fieldInfo)
+	{
+		return false;
+	}
+
+	virtual void MakeEmpty(const SaveRestoreFieldInfo_t& fieldInfo)
+	{
+		// Don't no how to. This is okay, since objects of this type
+		// are always born clean before restore, and not reused
+	}
+};
+
+CEngineObjectSaveDataOps g_EngineObjectSaveDataOps;
+ISaveRestoreOps* engineObjectFuncs = &g_EngineObjectSaveDataOps;
+
+
 bool CBaseEntity::m_bAllowPrecache = false;
 
 // Set default max values for entities based on the existing constants from elsewhere
@@ -106,27 +183,27 @@ void SpawnBlood(Vector vecSpot, const Vector &vecDir, int bloodColor, float flDa
 	UTIL_BloodDrips( vecSpot, vecDir, bloodColor, (int)flDamage );
 }
 
-#if !defined( NO_ENTITY_PREDICTION )
-//-----------------------------------------------------------------------------
-// The player drives simulation of this entity
-//-----------------------------------------------------------------------------
-void CBaseEntity::SetPlayerSimulated( CBasePlayer *pOwner )
-{
-	m_bIsPlayerSimulated = true;
-	pOwner->AddToPlayerSimulationList( this );
-	m_hPlayerSimulationOwner = pOwner;
-}
-
-void CBaseEntity::UnsetPlayerSimulated( void )
-{
-	if ( m_hPlayerSimulationOwner != NULL )
-	{
-		m_hPlayerSimulationOwner->RemoveFromPlayerSimulationList( this );
-	}
-	m_hPlayerSimulationOwner = NULL;
-	m_bIsPlayerSimulated = false;
-}
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+////-----------------------------------------------------------------------------
+//// The player drives simulation of this entity
+////-----------------------------------------------------------------------------
+//void CBaseEntity::SetPlayerSimulated( CBasePlayer *pOwner )
+//{
+//	m_bIsPlayerSimulated = true;
+//	pOwner->AddToPlayerSimulationList( this );
+//	m_hPlayerSimulationOwner = pOwner;
+//}
+//
+//void CBaseEntity::UnsetPlayerSimulated( void )
+//{
+//	if ( m_hPlayerSimulationOwner != NULL )
+//	{
+//		m_hPlayerSimulationOwner->RemoveFromPlayerSimulationList( this );
+//	}
+//	m_hPlayerSimulationOwner = NULL;
+//	m_bIsPlayerSimulated = false;
+//}
+//#endif
 
 // position of eyes
 Vector CBaseEntity::EyePosition( void )

@@ -233,12 +233,12 @@ public:
 	virtual bool				ViewModel_IsTransparent( void );
 	virtual bool				ViewModel_IsUsingFBTexture( void );
 
-#if !defined( NO_ENTITY_PREDICTION )
-	void						AddToPlayerSimulationList( C_BaseEntity *other );
-	void						SimulatePlayerSimulatedEntities( void );
-	void						RemoveFromPlayerSimulationList( C_BaseEntity *ent );
-	void						ClearPlayerSimulationList( void );
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	void						AddToPlayerSimulationList( C_BaseEntity *other );
+//	void						SimulatePlayerSimulatedEntities( void );
+//	void						RemoveFromPlayerSimulationList( C_BaseEntity *ent );
+//	void						ClearPlayerSimulationList( void );
+//#endif
 
 	virtual void				PhysicsSimulate( void );
 	virtual unsigned int	PhysicsSolidMaskForEntity( void ) const { return MASK_PLAYERSOLID; }
@@ -532,9 +532,9 @@ private:
 	typedef CHandle<C_BaseCombatWeapon> CBaseCombatWeaponHandle;
 	CNetworkVar( CBaseCombatWeaponHandle, m_hLastWeapon );
 
-#if !defined( NO_ENTITY_PREDICTION )
-	CUtlVector< CHandle< C_BaseEntity > > m_SimulatedByThisPlayer;
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	CUtlVector< CHandle< C_BaseEntity > > m_SimulatedByThisPlayer;
+//#endif
 
 	// players own view models, left & right hand
 	CHandle< C_BaseViewModel >	m_hViewModel[ MAX_VIEWMODELS ];		

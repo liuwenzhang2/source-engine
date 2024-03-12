@@ -199,7 +199,7 @@ public:
 	int				m_iScore;
 
 	// Simulates a single frame of movement for a player
-	void RunPlayerMove( const QAngle& viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, float frametime );
+	//void RunPlayerMove( const QAngle& viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, float frametime );
 
 
 	//Damage record functions

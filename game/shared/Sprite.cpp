@@ -405,21 +405,21 @@ CSprite *CSprite::SpriteCreate( const char *pSpriteName, const Vector &origin, b
 //			animate - 
 // Output : CSprite
 //-----------------------------------------------------------------------------
-CSprite *CSprite::SpriteCreatePredictable( const char *module, int line, const char *pSpriteName, const Vector &origin, bool animate )
-{
-	CSprite *pSprite = ( CSprite * )CBaseEntity::CreatePredictedEntityByName( "env_sprite", module, line );
-	if ( pSprite )
-	{
-		pSprite->SpriteInit( pSpriteName, origin );
-		pSprite->SetSolid( SOLID_NONE );
-		pSprite->SetSize( vec3_origin, vec3_origin );
-		pSprite->SetMoveType( MOVETYPE_NONE );
-		if ( animate )
-			pSprite->TurnOn();
-	}
-
-	return pSprite;
-}
+//CSprite *CSprite::SpriteCreatePredictable( const char *module, int line, const char *pSpriteName, const Vector &origin, bool animate )
+//{
+//	CSprite *pSprite = ( CSprite * )CBaseEntity::CreatePredictedEntityByName( "env_sprite", module, line );
+//	if ( pSprite )
+//	{
+//		pSprite->SpriteInit( pSpriteName, origin );
+//		pSprite->SetSolid( SOLID_NONE );
+//		pSprite->SetSize( vec3_origin, vec3_origin );
+//		pSprite->SetMoveType( MOVETYPE_NONE );
+//		if ( animate )
+//			pSprite->TurnOn();
+//	}
+//
+//	return pSprite;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

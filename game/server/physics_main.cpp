@@ -1947,66 +1947,66 @@ void Physics_SimulateEntity( CBaseEntity *pEntity )
 
 	if (pEntity->IsNetworkable() && pEntity->entindex()!=-1 )
 	{
-#if !defined( NO_ENTITY_PREDICTION )
-		// Player drives simulation of this entity
-		if ( pEntity->IsPlayerSimulated() )
-		{
-			// If the player is gone, dropped, crashed, then return
-			//  control to the game code.
-			CBasePlayer *simulatingPlayer = pEntity->GetSimulatingPlayer();
-			if ( simulatingPlayer &&
-				( simulatingPlayer->GetTimeBase() > gpGlobals->curtime - PLAYER_PACKETS_STOPPED_SO_RETURN_TO_PHYSICS_TIME ) )
-			{
-				// Okay, the guy is still around
-				return;
-			}
-
-			pEntity->UnsetPlayerSimulated();
-		}
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//		// Player drives simulation of this entity
+//		if ( pEntity->IsPlayerSimulated() )
+//		{
+//			// If the player is gone, dropped, crashed, then return
+//			//  control to the game code.
+//			CBasePlayer *simulatingPlayer = pEntity->GetSimulatingPlayer();
+//			if ( simulatingPlayer &&
+//				( simulatingPlayer->GetTimeBase() > gpGlobals->curtime - PLAYER_PACKETS_STOPPED_SO_RETURN_TO_PHYSICS_TIME ) )
+//			{
+//				// Okay, the guy is still around
+//				return;
+//			}
+//
+//			pEntity->UnsetPlayerSimulated();
+//		}
+//#endif
 
 		MDLCACHE_CRITICAL_SECTION();
 
-#if !defined( NO_ENTITY_PREDICTION )
-		// If an object was at one point player simulated, but had that status revoked (as just
-		//  above when no packets have arrived in a while ), then we still will assume that the
-		//  owner/player will be predicting the entity locally (even if the game is playing like butt)
-		//  and so we won't spam that player with additional network data such as effects/sounds 
-		//  that are theoretically being predicted by the player anyway.
-		if ( pEntity->m_PredictableID->IsActive() )
-		{
-			CBasePlayer *playerowner = ToBasePlayer( pEntity->GetOwnerEntity() );
-			if ( playerowner )
-			{
-				CBasePlayer *pl = ToBasePlayer( UTIL_PlayerByIndex( pEntity->m_PredictableID->GetPlayer() + 1 ) );
-				// Is the player who created it still the owner?
-				if ( pl == playerowner )
-				{
-					// Set up to suppress sending events to owner player
-					if ( pl->IsPredictingWeapons() )
-					{
-						IPredictionSystem::SuppressHostEvents( playerowner );
-					}
-				}
-			}	
-			{
-				VPROF( ( !vprof_scope_entity_gamephys.GetBool() ) ? 
-						"pEntity->PhysicsSimulate" : 
-						EntityFactoryDictionary()->GetCannonicalName( pEntity->GetClassname() ) );
-
-				// Run entity physics
-				pEntity->PhysicsSimulate();
-			}
-
-			// Restore suppression filter
-			IPredictionSystem::SuppressHostEvents( NULL );
-		}
-		else
-#endif
-		{
+//#if !defined( NO_ENTITY_PREDICTION )
+//		// If an object was at one point player simulated, but had that status revoked (as just
+//		//  above when no packets have arrived in a while ), then we still will assume that the
+//		//  owner/player will be predicting the entity locally (even if the game is playing like butt)
+//		//  and so we won't spam that player with additional network data such as effects/sounds 
+//		//  that are theoretically being predicted by the player anyway.
+//		if ( pEntity->m_PredictableID->IsActive() )
+//		{
+//			CBasePlayer *playerowner = ToBasePlayer( pEntity->GetOwnerEntity() );
+//			if ( playerowner )
+//			{
+//				CBasePlayer *pl = ToBasePlayer( UTIL_PlayerByIndex( pEntity->m_PredictableID->GetPlayer() + 1 ) );
+//				// Is the player who created it still the owner?
+//				if ( pl == playerowner )
+//				{
+//					// Set up to suppress sending events to owner player
+//					if ( pl->IsPredictingWeapons() )
+//					{
+//						IPredictionSystem::SuppressHostEvents( playerowner );
+//					}
+//				}
+//			}	
+//			{
+//				VPROF( ( !vprof_scope_entity_gamephys.GetBool() ) ? 
+//						"pEntity->PhysicsSimulate" : 
+//						EntityFactoryDictionary()->GetCannonicalName( pEntity->GetClassname() ) );
+//
+//				// Run entity physics
+//				pEntity->PhysicsSimulate();
+//			}
+//
+//			// Restore suppression filter
+//			IPredictionSystem::SuppressHostEvents( NULL );
+//		}
+//		else
+//#endif
+		//{
 			// Run entity physics
 			pEntity->PhysicsSimulate();
-		}
+		//}
 	}
 	else
 	{

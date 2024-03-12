@@ -959,12 +959,12 @@ void C_BasePlayer::OnRestore()
 //-----------------------------------------------------------------------------
 void C_BasePlayer::OnDataChanged( DataUpdateType_t updateType )
 {
-#if !defined( NO_ENTITY_PREDICTION )
-	if ( IsLocalPlayer() )
-	{
-		SetPredictionEligible( true );
-	}
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	if ( IsLocalPlayer() )
+//	{
+//		SetPredictionEligible( true );
+//	}
+//#endif
 
 	BaseClass::OnDataChanged( updateType );
 
@@ -2045,7 +2045,7 @@ void C_BasePlayer::PostThink( void )
 	}
 
 	// Even if dead simulate entities
-	SimulatePlayerSimulatedEntities();
+	//SimulatePlayerSimulatedEntities();
 #endif
 }
 

@@ -696,57 +696,57 @@ bool CCSPlayer::RunMimicCommand( CUserCmd& cmd )
 //-----------------------------------------------------------------------------
 // Purpose: Simulates a single frame of movement for a player
 //-----------------------------------------------------------------------------
-void CCSPlayer::RunPlayerMove( const QAngle& viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, float frametime )
-{
-	CUserCmd cmd;
-
-	// Store off the globals.. they're gonna get whacked
-	float flOldFrametime = gpGlobals->frametime;
-	float flOldCurtime = gpGlobals->curtime;
-
-	float flTimeBase = gpGlobals->curtime + gpGlobals->frametime - frametime;
-	this->SetTimeBase( flTimeBase );
-
-	CUserCmd lastUserCmd = *GetLastUserCommand();
-	Q_memset( &cmd, 0, sizeof( cmd ) );
-
-	if ( !RunMimicCommand( cmd ) )
-	{
-		cmd.forwardmove = forwardmove;
-		cmd.sidemove = sidemove;
-		cmd.upmove = upmove;
-		cmd.buttons = buttons;
-		cmd.impulse = impulse;
-
-		VectorCopy( viewangles, cmd.viewangles );
-		cmd.random_seed = random->RandomInt( 0, 0x7fffffff );
-	}
-
-	MoveHelperServer()->SetHost( this );
-	PlayerRunCommand( &cmd, MoveHelperServer() );
-
-	// save off the last good usercmd
-	if ( -bot_mimic.GetInt() == entindex() )
-	{
-		CUserCmd lastCmd = *GetLastUserCommand();
-		lastCmd.command_number = cmd.command_number;
-		lastCmd.tick_count = cmd.tick_count;
-		SetLastUserCommand( lastCmd );
-	}
-	else
-	{
-		SetLastUserCommand( cmd );
-	}
-
-	// Clear out any fixangle that has been set
-	pl.fixangle = FIXANGLE_NONE;
-
-	// Restore the globals..
-	gpGlobals->frametime = flOldFrametime;
-	gpGlobals->curtime = flOldCurtime;
-
-	MoveHelperServer()->SetHost( NULL );
-}
+//void CCSPlayer::RunPlayerMove( const QAngle& viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, float frametime )
+//{
+//	CUserCmd cmd;
+//
+//	// Store off the globals.. they're gonna get whacked
+//	float flOldFrametime = gpGlobals->frametime;
+//	float flOldCurtime = gpGlobals->curtime;
+//
+//	float flTimeBase = gpGlobals->curtime + gpGlobals->frametime - frametime;
+//	this->SetTimeBase( flTimeBase );
+//
+//	CUserCmd lastUserCmd = *GetLastUserCommand();
+//	Q_memset( &cmd, 0, sizeof( cmd ) );
+//
+//	if ( !RunMimicCommand( cmd ) )
+//	{
+//		cmd.forwardmove = forwardmove;
+//		cmd.sidemove = sidemove;
+//		cmd.upmove = upmove;
+//		cmd.buttons = buttons;
+//		cmd.impulse = impulse;
+//
+//		VectorCopy( viewangles, cmd.viewangles );
+//		cmd.random_seed = random->RandomInt( 0, 0x7fffffff );
+//	}
+//
+//	MoveHelperServer()->SetHost( this );
+//	PlayerRunCommand( &cmd, MoveHelperServer() );
+//
+//	// save off the last good usercmd
+//	if ( -bot_mimic.GetInt() == entindex() )
+//	{
+//		CUserCmd lastCmd = *GetLastUserCommand();
+//		lastCmd.command_number = cmd.command_number;
+//		lastCmd.tick_count = cmd.tick_count;
+//		SetLastUserCommand( lastCmd );
+//	}
+//	else
+//	{
+//		SetLastUserCommand( cmd );
+//	}
+//
+//	// Clear out any fixangle that has been set
+//	pl.fixangle = FIXANGLE_NONE;
+//
+//	// Restore the globals..
+//	gpGlobals->frametime = flOldFrametime;
+//	gpGlobals->curtime = flOldCurtime;
+//
+//	MoveHelperServer()->SetHost( NULL );
+//}
 
 
 void CCSPlayer::InitialSpawn( void )

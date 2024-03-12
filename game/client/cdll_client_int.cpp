@@ -2217,7 +2217,7 @@ void OnRenderStart()
 #endif
 
 	// Finally, link all the entities into the leaf system right before rendering.
-	C_BaseEntity::AddVisibleEntities();
+	//C_BaseEntity::AddVisibleEntities();
 }
 
 

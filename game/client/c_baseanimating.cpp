@@ -856,7 +856,7 @@ void C_BaseAnimating::UpdateRelevantInterpolatedVars()
 {
 	MDLCACHE_CRITICAL_SECTION();
 	// Remove any interpolated vars that need to be removed.
-	if ( !GetPredictable() && !IsClientCreated() && GetModelPtr() && GetModelPtr()->SequencesAvailable() )
+	if ( !GetPredictable() /*&& !IsClientCreated()*/ && GetModelPtr() && GetModelPtr()->SequencesAvailable())
 	{
 		AddBaseAnimatingInterpolatedVars();
 	}			

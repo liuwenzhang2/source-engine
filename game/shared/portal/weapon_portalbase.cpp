@@ -95,7 +95,7 @@ LINK_ENTITY_TO_CLASS( weapon_portal_base, CWeaponPortalBase );
 // ----------------------------------------------------------------------------- //
 CWeaponPortalBase::CWeaponPortalBase()
 {
-	SetPredictionEligible( true );
+	//SetPredictionEligible( true );
 	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 
 	m_flNextResetCheckTime = 0.0f;

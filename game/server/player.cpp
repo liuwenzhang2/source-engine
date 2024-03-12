@@ -409,9 +409,9 @@ BEGIN_DATADESC( CBasePlayer )
 	DEFINE_FIELD( m_fLastPlayerTalkTime, FIELD_FLOAT ),
 	DEFINE_FIELD( m_hLastWeapon, FIELD_EHANDLE ),
 
-#if !defined( NO_ENTITY_PREDICTION )
-	// DEFINE_FIELD( m_SimulatedByThisPlayer, CUtlVector < CHandle < CBaseEntity > > ),
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	DEFINE_FIELD( m_SimulatedByThisPlayer, CUtlVector < CHandle < CBaseEntity > > ),
+//#endif
 
 	DEFINE_FIELD( m_flOldPlayerZ, FIELD_FLOAT ),
 	DEFINE_FIELD( m_flOldPlayerViewOffsetZ, FIELD_FLOAT ),
@@ -4616,10 +4616,10 @@ void CBasePlayer::PostThink()
 		VPROF_SCOPE_END();
 	}
 
-#if !defined( NO_ENTITY_PREDICTION )
-	// Even if dead simulate entities
-	SimulatePlayerSimulatedEntities();
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	// Even if dead simulate entities
+//	SimulatePlayerSimulatedEntities();
+//#endif
 
 }
 
@@ -9213,48 +9213,48 @@ bool CPlayerInfo::IsEFlagSet( int nEFlagMask )
 	return false;
 }
 
-void CPlayerInfo::RunPlayerMove( CBotCmd *ucmd ) 
-{ 
-	if ( m_pParent->IsBot() )
-	{
-		Assert( m_pParent );
-		CUserCmd cmd;
-		cmd.buttons = ucmd->buttons;
-		cmd.command_number = ucmd->command_number;
-		cmd.forwardmove = ucmd->forwardmove;
-		cmd.hasbeenpredicted = ucmd->hasbeenpredicted;
-		cmd.impulse = ucmd->impulse;
-		cmd.mousedx = ucmd->mousedx;
-		cmd.mousedy = ucmd->mousedy;
-		cmd.random_seed = ucmd->random_seed;
-		cmd.sidemove = ucmd->sidemove;
-		cmd.tick_count = ucmd->tick_count;
-		cmd.upmove = ucmd->upmove;
-		cmd.viewangles = ucmd->viewangles;
-		cmd.weaponselect = ucmd->weaponselect;
-		cmd.weaponsubtype = ucmd->weaponsubtype;
-
-		// Store off the globals.. they're gonna get whacked
-		float flOldFrametime = gpGlobals->frametime;
-		float flOldCurtime = gpGlobals->curtime;
-
-		m_pParent->SetTimeBase( gpGlobals->curtime );
-
-		MoveHelperServer()->SetHost( m_pParent );
-		m_pParent->PlayerRunCommand( &cmd, MoveHelperServer() );
-
-		// save off the last good usercmd
-		m_pParent->SetLastUserCommand( cmd );
-
-		// Clear out any fixangle that has been set
-		m_pParent->pl.fixangle = FIXANGLE_NONE;
-
-		// Restore the globals..
-		gpGlobals->frametime = flOldFrametime;
-		gpGlobals->curtime = flOldCurtime;
-		MoveHelperServer()->SetHost( NULL );
-	}
-}
+//void CPlayerInfo::RunPlayerMove( CBotCmd *ucmd ) 
+//{ 
+//	if ( m_pParent->IsBot() )
+//	{
+//		Assert( m_pParent );
+//		CUserCmd cmd;
+//		cmd.buttons = ucmd->buttons;
+//		cmd.command_number = ucmd->command_number;
+//		cmd.forwardmove = ucmd->forwardmove;
+//		cmd.hasbeenpredicted = ucmd->hasbeenpredicted;
+//		cmd.impulse = ucmd->impulse;
+//		cmd.mousedx = ucmd->mousedx;
+//		cmd.mousedy = ucmd->mousedy;
+//		cmd.random_seed = ucmd->random_seed;
+//		cmd.sidemove = ucmd->sidemove;
+//		cmd.tick_count = ucmd->tick_count;
+//		cmd.upmove = ucmd->upmove;
+//		cmd.viewangles = ucmd->viewangles;
+//		cmd.weaponselect = ucmd->weaponselect;
+//		cmd.weaponsubtype = ucmd->weaponsubtype;
+//
+//		// Store off the globals.. they're gonna get whacked
+//		float flOldFrametime = gpGlobals->frametime;
+//		float flOldCurtime = gpGlobals->curtime;
+//
+//		m_pParent->SetTimeBase( gpGlobals->curtime );
+//
+//		MoveHelperServer()->SetHost( m_pParent );
+//		m_pParent->PlayerRunCommand( &cmd, MoveHelperServer() );
+//
+//		// save off the last good usercmd
+//		m_pParent->SetLastUserCommand( cmd );
+//
+//		// Clear out any fixangle that has been set
+//		m_pParent->pl.fixangle = FIXANGLE_NONE;
+//
+//		// Restore the globals..
+//		gpGlobals->frametime = flOldFrametime;
+//		gpGlobals->curtime = flOldCurtime;
+//		MoveHelperServer()->SetHost( NULL );
+//	}
+//}
 
 void CPlayerInfo::SetLastUserCommand( const CBotCmd &ucmd ) 
 { 

@@ -58,7 +58,7 @@ typedef CHandle<CBaseEntity> EHANDLE;
 
 // saverestore.h declarations
 class CSaveRestoreData;
-struct typedescription_t;
+class typedescription_t;
 class ISave;
 class IRestore;
 class CBaseEntity;
@@ -324,6 +324,8 @@ extern void SpawnEntityByName( const char *className, CEntityMapData *mapData = 
 // calls the spawn functions for an entity
 extern int DispatchSpawn( CBaseEntity *pEntity );
 
+extern ISaveRestoreOps* engineObjectFuncs;
+
 //inline CBaseEntity *GetContainingEntity( edict_t *pent );
 
 //-----------------------------------------------------------------------------
@@ -342,8 +344,8 @@ struct thinkfunc_t
 struct EmitSound_t;
 struct rotatingpushmove_t;
 
-#define CREATE_PREDICTED_ENTITY( className )	\
-	CBaseEntity::CreatePredictedEntityByName( className, __FILE__, __LINE__ );
+//#define CREATE_PREDICTED_ENTITY( className )	\
+//	CBaseEntity::CreatePredictedEntityByName( className, __FILE__, __LINE__ );
 
 //
 // Base Entity.  All entity types derive from this
@@ -394,7 +396,7 @@ public:
 	void operator delete( void *pMem, int nBlockUse, const char *pFileName, int nLine ) { operator delete(pMem); }
 
 	// Class factory
-	static CBaseEntity				*CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist = false );
+	//static CBaseEntity				*CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist = false );
 
 // IHandleEntity overrides.
 public:
@@ -827,10 +829,10 @@ public:
 
 	int				m_nLastThinkTick;
 
-#if !defined( NO_ENTITY_PREDICTION )
-	// Certain entities (projectiles) can be created on the client and thus need a matching id number
-	CNetworkVar( CPredictableId, m_PredictableID );
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	// Certain entities (projectiles) can be created on the client and thus need a matching id number
+//	CNetworkVar( CPredictableId, m_PredictableID );
+//#endif
 
 	// used so we know when things are no longer touching
 	int			touchStamp;			
@@ -1482,13 +1484,13 @@ public:
 	// --------------------------------------------------------------------
 
 public:
-#if !defined( NO_ENTITY_PREDICTION )
-	// The player drives simulation of this entity
-	void					SetPlayerSimulated( CBasePlayer *pOwner );
-	void					UnsetPlayerSimulated( void );
-	bool					IsPlayerSimulated( void ) const;
-	CBasePlayer				*GetSimulatingPlayer( void );
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	// The player drives simulation of this entity
+//	void					SetPlayerSimulated( CBasePlayer *pOwner );
+//	void					UnsetPlayerSimulated( void );
+//	bool					IsPlayerSimulated( void ) const;
+//	CBasePlayer				*GetSimulatingPlayer( void );
+//#endif
 	// FIXME: Make these private!
 	void					PhysicsCheckForEntityUntouch( void );
  	bool					PhysicsRunThink( thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS );
@@ -1514,7 +1516,7 @@ public:
 	// Computes the abs position of a direction specified in local space
 	void					ComputeAbsDirection( const Vector &vecLocalDirection, Vector *pAbsDirection );
 
-	void					SetPredictionEligible( bool canpredict );
+	//void					SetPredictionEligible( bool canpredict );
 
 protected:
 	// Invalidates the abs state of all children
@@ -1772,11 +1774,11 @@ public:
 	bool IsDynamicModelLoading() const { return m_bDynamicModelPending; } 
 	void SetCollisionBoundsFromModel();
 
-#if !defined( NO_ENTITY_PREDICTION )
-	CNetworkVar( bool, m_bIsPlayerSimulated );
-	// Player who is driving my simulation
-	CHandle< CBasePlayer >			m_hPlayerSimulationOwner;
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	CNetworkVar( bool, m_bIsPlayerSimulated );
+//	// Player who is driving my simulation
+//	CHandle< CBasePlayer >			m_hPlayerSimulationOwner;
+//#endif
 
 	int								m_fDataObjectTypes;
 

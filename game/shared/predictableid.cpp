@@ -5,13 +5,14 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
+#include "predictableid.h"
 #include "checksum_crc.h"
 #include "tier1/strtools.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#if !defined( NO_ENTITY_PREDICTION )
+#if !defined( NO_ENTITY_PREDICTION ) && 0
 //-----------------------------------------------------------------------------
 // Purpose: Helper class for resetting instance numbers, etc.
 //-----------------------------------------------------------------------------

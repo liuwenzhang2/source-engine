@@ -164,26 +164,26 @@ BEGIN_SEND_TABLE_NOBASE( CBaseEntity, DT_AnimTimeMustBeFirst )
 	SendPropInt	(SENDINFO(m_flAnimTime), 8, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_AnimTime),
 END_SEND_TABLE()
 
-#if !defined( NO_ENTITY_PREDICTION )
-BEGIN_SEND_TABLE_NOBASE( CBaseEntity, DT_PredictableId )
-	SendPropPredictableId( SENDINFO( m_PredictableID ) ),
-	SendPropInt( SENDINFO( m_bIsPlayerSimulated ), 1, SPROP_UNSIGNED ),
-END_SEND_TABLE()
-
-
-static void* SendProxy_SendPredictableId( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
-{
-	CBaseEntity *pEntity = (CBaseEntity *)pStruct;
-	if ( !pEntity || !pEntity->m_PredictableID->IsActive() )
-		return NULL;
-
-	int id_player_index = pEntity->m_PredictableID->GetPlayer();
-	pRecipients->SetOnly( id_player_index );
-	
-	return ( void * )pVarData;
-}
-REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendPredictableId );
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//BEGIN_SEND_TABLE_NOBASE( CBaseEntity, DT_PredictableId )
+//	SendPropPredictableId( SENDINFO( m_PredictableID ) ),
+//	SendPropInt( SENDINFO( m_bIsPlayerSimulated ), 1, SPROP_UNSIGNED ),
+//END_SEND_TABLE()
+//
+//
+//static void* SendProxy_SendPredictableId( const SendProp *pProp, const void *pStruct, const void *pVarData, CSendProxyRecipients *pRecipients, int objectID )
+//{
+//	CBaseEntity *pEntity = (CBaseEntity *)pStruct;
+//	if ( !pEntity || !pEntity->m_PredictableID->IsActive() )
+//		return NULL;
+//
+//	int id_player_index = pEntity->m_PredictableID->GetPlayer();
+//	pRecipients->SetOnly( id_player_index );
+//	
+//	return ( void * )pVarData;
+//}
+//REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendPredictableId );
+//#endif
 
 void SendProxy_Origin( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
 {
@@ -294,9 +294,9 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 
 	SendPropInt		( SENDINFO( m_iTextureFrameIndex ),		8, SPROP_UNSIGNED ),
 
-#if !defined( NO_ENTITY_PREDICTION )
-	SendPropDataTable( "predictable_id", 0, &REFERENCE_SEND_TABLE( DT_PredictableId ), SendProxy_SendPredictableId ),
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	SendPropDataTable( "predictable_id", 0, &REFERENCE_SEND_TABLE( DT_PredictableId ), SendProxy_SendPredictableId ),
+//#endif
 
 	// FIXME: Collapse into another flag field?
 	SendPropInt		(SENDINFO(m_bSimulatedEveryTick),		1, SPROP_UNSIGNED ),
@@ -1806,9 +1806,9 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_KEYFIELD( m_fEffects, FIELD_INTEGER, "effects" ),
 	DEFINE_KEYFIELD( m_clrRender, FIELD_COLOR32, "rendercolor" ),
 	DEFINE_GLOBAL_KEYFIELD( m_nModelIndex, FIELD_SHORT, "modelindex" ),
-#if !defined( NO_ENTITY_PREDICTION )
-	// DEFINE_FIELD( m_PredictableID, CPredictableId ),
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	DEFINE_FIELD( m_PredictableID, CPredictableId ),
+//#endif
 	DEFINE_FIELD( touchStamp, FIELD_INTEGER ),
 	DEFINE_CUSTOM_FIELD( m_aThinkFunctions, thinkcontextFuncs ),
 	//								m_iCurrentThinkContext (not saved, debug field only, and think transient to boot)
@@ -1865,7 +1865,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_GLOBAL_KEYFIELD( m_ModelName, FIELD_MODELNAME, "model" ),
 	
 	DEFINE_KEYFIELD( m_vecBaseVelocity, FIELD_VECTOR, "basevelocity" ),
-	DEFINE_FIELD( m_vecAbsVelocity, FIELD_VECTOR ),
+	DEFINE_CUSTOM_FIELD( m_vecAbsVelocity, engineObjectFuncs),
 	DEFINE_KEYFIELD( m_vecAngVelocity, FIELD_VECTOR, "avelocity" ),
 //	DEFINE_FIELD( m_vecAbsAngVelocity, FIELD_VECTOR ),
 	DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
@@ -1885,25 +1885,25 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 //	DEFINE_FIELD( m_nPushEnumCount, FIELD_INTEGER ),
 
-	DEFINE_FIELD( m_vecAbsOrigin, FIELD_POSITION_VECTOR ),
-	DEFINE_KEYFIELD( m_vecVelocity, FIELD_VECTOR, "velocity" ),
+	DEFINE_CUSTOM_FIELD( m_vecAbsOrigin, engineObjectFuncs),
+	DEFINE_CUSTOM_KEYFIELD( m_vecVelocity, engineObjectFuncs, "velocity" ),
 	DEFINE_KEYFIELD( m_iTextureFrameIndex, FIELD_CHARACTER, "texframeindex" ),
 	DEFINE_FIELD( m_bSimulatedEveryTick, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bAnimatedEveryTick, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bAlternateSorting, FIELD_BOOLEAN ),
 	DEFINE_KEYFIELD( m_spawnflags, FIELD_INTEGER, "spawnflags" ),
 	DEFINE_FIELD( m_nTransmitStateOwnedCounter, FIELD_CHARACTER ),
-	DEFINE_FIELD( m_angAbsRotation, FIELD_VECTOR ),
-	DEFINE_FIELD( m_vecOrigin, FIELD_VECTOR ),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
-	DEFINE_FIELD( m_angRotation, FIELD_VECTOR ),
+	DEFINE_CUSTOM_FIELD( m_angAbsRotation, engineObjectFuncs),
+	DEFINE_CUSTOM_FIELD( m_vecOrigin, engineObjectFuncs),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
+	DEFINE_CUSTOM_FIELD( m_angRotation, engineObjectFuncs),
 
 	DEFINE_KEYFIELD( m_vecViewOffset, FIELD_VECTOR, "view_ofs" ),
 
 	DEFINE_FIELD( m_fFlags, FIELD_INTEGER ),
-#if !defined( NO_ENTITY_PREDICTION )
+//#if !defined( NO_ENTITY_PREDICTION )
 //	DEFINE_FIELD( m_bIsPlayerSimulated, FIELD_INTEGER ),
 //	DEFINE_FIELD( m_hPlayerSimulationOwner, FIELD_EHANDLE ),
-#endif
+//#endif
 	// DEFINE_FIELD( m_pTimedOverlay, TimedOverlay_t* ),
 	DEFINE_FIELD( m_nSimulationTick, FIELD_TICK ),
 	// DEFINE_FIELD( m_RefEHandle, CBaseHandle ),
@@ -6233,41 +6233,41 @@ bool CBaseEntity::IsFloating()
 //			persist - 
 // Output : CBaseEntity
 //-----------------------------------------------------------------------------
-CBaseEntity *CBaseEntity::CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist /* = false */ )
-{
-#if !defined( NO_ENTITY_PREDICTION )
-	CBasePlayer *player = CBaseEntity::GetPredictionPlayer();
-	Assert( player );
+//CBaseEntity *CBaseEntity::CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist /* = false */ )
+//{
+//#if !defined( NO_ENTITY_PREDICTION )
+//	CBasePlayer *player = CBaseEntity::GetPredictionPlayer();
+//	Assert( player );
+//
+//	CBaseEntity *ent = NULL;
+//
+//	int command_number = player->CurrentCommandNumber();
+//	int player_index = player->entindex() - 1;
+//
+//	CPredictableId testId;
+//	testId.Init( player_index, command_number, classname, module, line );
+//
+//	ent = gEntList.CreateEntityByName( classname );
+//	// No factory???
+//	if ( !ent )
+//		return NULL;
+//
+//	ent->SetPredictionEligible( true );
+//
+//	// Set up "shared" id number
+//	ent->m_PredictableID.GetForModify().SetRaw( testId.GetRaw() );
+//
+//	return ent;
+//#else
+//	return NULL;
+//#endif
+//
+//}
 
-	CBaseEntity *ent = NULL;
-
-	int command_number = player->CurrentCommandNumber();
-	int player_index = player->entindex() - 1;
-
-	CPredictableId testId;
-	testId.Init( player_index, command_number, classname, module, line );
-
-	ent = gEntList.CreateEntityByName( classname );
-	// No factory???
-	if ( !ent )
-		return NULL;
-
-	ent->SetPredictionEligible( true );
-
-	// Set up "shared" id number
-	ent->m_PredictableID.GetForModify().SetRaw( testId.GetRaw() );
-
-	return ent;
-#else
-	return NULL;
-#endif
-
-}
-
-void CBaseEntity::SetPredictionEligible( bool canpredict )
-{
+//void CBaseEntity::SetPredictionEligible( bool canpredict )
+//{
 // Nothing in game code	m_bPredictionEligible = canpredict;
-}
+//}
 
 //-----------------------------------------------------------------------------
 // These could be virtual, but only the player is overriding them

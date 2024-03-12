@@ -30,7 +30,7 @@ END_PREDICTION_DATA()
 
 CBaseHL1MPCombatWeapon::CBaseHL1MPCombatWeapon()
 {
-	SetPredictionEligible( true );
+	//SetPredictionEligible( true );
 	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 }
 

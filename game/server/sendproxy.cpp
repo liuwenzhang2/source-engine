@@ -138,9 +138,9 @@ SendProp SendPropTime(
 	return SendPropFloat( pVarName, offset, sizeofVar, -1, SPROP_NOSCALE );
 }
 
-#if !defined( NO_ENTITY_PREDICTION )
+//#if !defined( NO_ENTITY_PREDICTION )
 
-#define PREDICTABLE_ID_BITS 31
+//#define PREDICTABLE_ID_BITS 31
 
 //-----------------------------------------------------------------------------
 // Purpose: Converts a predictable Id to an integer
@@ -150,18 +150,18 @@ SendProp SendPropTime(
 //			iElement - 
 //			objectID - 
 //-----------------------------------------------------------------------------
-static void SendProxy_PredictableIdToInt( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID )
-{
-	CPredictableId* pId = ( CPredictableId * )pVarData;
-	if ( pId )
-	{
-		pOut->m_Int = pId->GetRaw();
-	}
-	else
-	{
-		pOut->m_Int = 0;
-	}
-}
+//static void SendProxy_PredictableIdToInt( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID )
+//{
+//	CPredictableId* pId = ( CPredictableId * )pVarData;
+//	if ( pId )
+//	{
+//		pOut->m_Int = pId->GetRaw();
+//	}
+//	else
+//	{
+//		pOut->m_Int = 0;
+//	}
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -171,15 +171,15 @@ static void SendProxy_PredictableIdToInt( const SendProp *pProp, const void *pSt
 //			pId - 
 // Output : SendProp
 //-----------------------------------------------------------------------------
-SendProp SendPropPredictableId(
-	const char *pVarName,
-	int offset,
-	int sizeofVar )
-{
-	return SendPropInt( pVarName, offset, sizeofVar, PREDICTABLE_ID_BITS, SPROP_UNSIGNED, SendProxy_PredictableIdToInt );
-}
+//SendProp SendPropPredictableId(
+//	const char *pVarName,
+//	int offset,
+//	int sizeofVar )
+//{
+//	return SendPropInt( pVarName, offset, sizeofVar, PREDICTABLE_ID_BITS, SPROP_UNSIGNED, SendProxy_PredictableIdToInt );
+//}
 
-#endif
+//#endif
 
 void SendProxy_StringT_To_String( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID )
 {

@@ -191,25 +191,25 @@ RecvProp RecvPropTime(
 //			*pStruct - 
 //			*pOut - 
 //-----------------------------------------------------------------------------
-#if !defined( NO_ENTITY_PREDICTION )
-static void RecvProxy_IntToPredictableId( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	CPredictableId *pId = (CPredictableId*)pOut;
-	Assert( pId );
-	pId->SetRaw( pData->m_Value.m_Int );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *pVarName - 
-//			sizeofVar - 
-// Output : RecvProp
-//-----------------------------------------------------------------------------
-RecvProp RecvPropPredictableId(
-	const char *pVarName, 
-	int offset, 
-	int sizeofVar/*=SIZEOF_IGNORE*/ )
-{
-	return RecvPropInt( pVarName, offset, sizeofVar, 0, RecvProxy_IntToPredictableId );
-}
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//static void RecvProxy_IntToPredictableId( const CRecvProxyData *pData, void *pStruct, void *pOut )
+//{
+//	CPredictableId *pId = (CPredictableId*)pOut;
+//	Assert( pId );
+//	pId->SetRaw( pData->m_Value.m_Int );
+//}
+//
+////-----------------------------------------------------------------------------
+//// Purpose: 
+//// Input  : *pVarName - 
+////			sizeofVar - 
+//// Output : RecvProp
+////-----------------------------------------------------------------------------
+//RecvProp RecvPropPredictableId(
+//	const char *pVarName, 
+//	int offset, 
+//	int sizeofVar/*=SIZEOF_IGNORE*/ )
+//{
+//	return RecvPropInt( pVarName, offset, sizeofVar, 0, RecvProxy_IntToPredictableId );
+//}
+//#endif

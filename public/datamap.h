@@ -236,7 +236,7 @@ extern ISaveRestoreOps *eventFuncs;
 
 #define TD_MSECTOLERANCE		0.001f		// This is a FIELD_FLOAT and should only be checked to be within 0.001 of the networked info
 
-struct typedescription_t;
+class typedescription_t;
 
 
 class ISaveRestoreOps;
@@ -247,7 +247,7 @@ class ISaveRestoreOps;
 typedef void (CBaseEntity::*inputfunc_t)(inputdata_t &data);
 
 struct datamap_t;
-struct typedescription_t;
+class typedescription_t;
 
 enum
 {
@@ -258,8 +258,9 @@ enum
 	TD_OFFSET_COUNT,
 };
 
-struct typedescription_t
+class typedescription_t
 {
+public:
 	fieldtype_t			fieldType;
 	const char			*fieldName;
 	int					fieldOffset[ TD_OFFSET_COUNT ]; // 0 == normal, 1 == packed offset
@@ -278,7 +279,7 @@ struct typedescription_t
 	int					fieldSizeInBytes;
 
 	// FTYPEDESC_OVERRIDE point to first baseclass instance if chains_validated has occurred
-	struct typedescription_t *override_field;
+	class typedescription_t *override_field;
 
 	// Used to track exclusion of baseclass fields
 	int					override_count;

@@ -44,7 +44,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 CWeaponIFMBase::CWeaponIFMBase()
 {
-	SetPredictionEligible( true );
+	//SetPredictionEligible( true );
 	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 }
 

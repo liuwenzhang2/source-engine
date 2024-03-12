@@ -883,126 +883,126 @@ void CBasePlayer::AbortReload( void )
 	}
 }
 
-#if !defined( NO_ENTITY_PREDICTION )
-void CBasePlayer::AddToPlayerSimulationList( CBaseEntity *other )
-{
-	CHandle< CBaseEntity > h;
-	h = other;
-	// Already in list
-	if ( m_SimulatedByThisPlayer.Find( h ) != m_SimulatedByThisPlayer.InvalidIndex() )
-		return;
-
-	Assert( other->IsPlayerSimulated() );
-
-	m_SimulatedByThisPlayer.AddToTail( h );
-}
+//#if !defined( NO_ENTITY_PREDICTION )
+//void CBasePlayer::AddToPlayerSimulationList( CBaseEntity *other )
+//{
+//	CHandle< CBaseEntity > h;
+//	h = other;
+//	// Already in list
+//	if ( m_SimulatedByThisPlayer.Find( h ) != m_SimulatedByThisPlayer.InvalidIndex() )
+//		return;
+//
+//	Assert( other->IsPlayerSimulated() );
+//
+//	m_SimulatedByThisPlayer.AddToTail( h );
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Fixme, this should occur if the player fails to drive simulation
 //  often enough!!!
 // Input  : *other - 
 //-----------------------------------------------------------------------------
-void CBasePlayer::RemoveFromPlayerSimulationList( CBaseEntity *other )
-{
-	if ( !other )
-		return;
+//void CBasePlayer::RemoveFromPlayerSimulationList( CBaseEntity *other )
+//{
+//	if ( !other )
+//		return;
+//
+//	Assert( other->IsPlayerSimulated() );
+//	Assert( other->GetSimulatingPlayer() == this );
+//
+//
+//	CHandle< CBaseEntity > h;
+//	h = other;
+//
+//	m_SimulatedByThisPlayer.FindAndRemove( h );
+//}
 
-	Assert( other->IsPlayerSimulated() );
-	Assert( other->GetSimulatingPlayer() == this );
-
-
-	CHandle< CBaseEntity > h;
-	h = other;
-
-	m_SimulatedByThisPlayer.FindAndRemove( h );
-}
-
-void CBasePlayer::SimulatePlayerSimulatedEntities( void )
-{
-	int c = m_SimulatedByThisPlayer.Count();
-	int i;
-
-	for ( i = c - 1; i >= 0; i-- )
-	{
-		CHandle< CBaseEntity > h;
-		
-		h = m_SimulatedByThisPlayer[ i ];
-		CBaseEntity *e = h;
-
-		if ( !e || !e->IsPlayerSimulated() )
-		{
-			m_SimulatedByThisPlayer.Remove( i );
-			continue;
-		}
-
-#if defined( CLIENT_DLL )
-		if ( e->IsClientCreated() && prediction->InPrediction() && !prediction->IsFirstTimePredicted() )
-		{
-			continue;
-		}
-#endif
-		Assert( e->IsPlayerSimulated() );
-		Assert( e->GetSimulatingPlayer() == this );
-
-		e->PhysicsSimulate();
-	}
-
-	// Loop through all entities again, checking their untouch if flagged to do so
-	c = m_SimulatedByThisPlayer.Count();
-
-	for ( i = c - 1; i >= 0; i-- )
-	{
-		CHandle< CBaseEntity > h;
-		
-		h = m_SimulatedByThisPlayer[ i ];
-
-		CBaseEntity *e = h;
-		if ( !e || !e->IsPlayerSimulated() )
-		{
-			m_SimulatedByThisPlayer.Remove( i );
-			continue;
-		}
-
-#if defined( CLIENT_DLL )
-		if ( e->IsClientCreated() && prediction->InPrediction() && !prediction->IsFirstTimePredicted() )
-		{
-			continue;
-		}
-#endif
-
-		Assert( e->IsPlayerSimulated() );
-		Assert( e->GetSimulatingPlayer() == this );
-
-		if ( !e->GetCheckUntouch() )
-			continue;
-
-		e->PhysicsCheckForEntityUntouch();
-	}
-}
+//void CBasePlayer::SimulatePlayerSimulatedEntities( void )
+//{
+//	int c = m_SimulatedByThisPlayer.Count();
+//	int i;
+//
+//	for ( i = c - 1; i >= 0; i-- )
+//	{
+//		CHandle< CBaseEntity > h;
+//		
+//		h = m_SimulatedByThisPlayer[ i ];
+//		CBaseEntity *e = h;
+//
+//		if ( !e || !e->IsPlayerSimulated() )
+//		{
+//			m_SimulatedByThisPlayer.Remove( i );
+//			continue;
+//		}
+//
+//#if defined( CLIENT_DLL )
+//		if ( e->IsClientCreated() && prediction->InPrediction() && !prediction->IsFirstTimePredicted() )
+//		{
+//			continue;
+//		}
+//#endif
+//		Assert( e->IsPlayerSimulated() );
+//		Assert( e->GetSimulatingPlayer() == this );
+//
+//		e->PhysicsSimulate();
+//	}
+//
+//	// Loop through all entities again, checking their untouch if flagged to do so
+//	c = m_SimulatedByThisPlayer.Count();
+//
+//	for ( i = c - 1; i >= 0; i-- )
+//	{
+//		CHandle< CBaseEntity > h;
+//		
+//		h = m_SimulatedByThisPlayer[ i ];
+//
+//		CBaseEntity *e = h;
+//		if ( !e || !e->IsPlayerSimulated() )
+//		{
+//			m_SimulatedByThisPlayer.Remove( i );
+//			continue;
+//		}
+//
+//#if defined( CLIENT_DLL )
+//		if ( e->IsClientCreated() && prediction->InPrediction() && !prediction->IsFirstTimePredicted() )
+//		{
+//			continue;
+//		}
+//#endif
+//
+//		Assert( e->IsPlayerSimulated() );
+//		Assert( e->GetSimulatingPlayer() == this );
+//
+//		if ( !e->GetCheckUntouch() )
+//			continue;
+//
+//		e->PhysicsCheckForEntityUntouch();
+//	}
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBasePlayer::ClearPlayerSimulationList( void )
-{
-	int c = m_SimulatedByThisPlayer.Size();
-	int i;
-
-	for ( i = c - 1; i >= 0; i-- )
-	{
-		CHandle< CBaseEntity > h;
-		
-		h = m_SimulatedByThisPlayer[ i ];
-		CBaseEntity *e = h;
-		if ( e )
-		{
-			e->UnsetPlayerSimulated();
-		}
-	}
-
-	m_SimulatedByThisPlayer.RemoveAll();
-}
-#endif
+//void CBasePlayer::ClearPlayerSimulationList( void )
+//{
+//	int c = m_SimulatedByThisPlayer.Size();
+//	int i;
+//
+//	for ( i = c - 1; i >= 0; i-- )
+//	{
+//		CHandle< CBaseEntity > h;
+//		
+//		h = m_SimulatedByThisPlayer[ i ];
+//		CBaseEntity *e = h;
+//		if ( e )
+//		{
+//			e->UnsetPlayerSimulated();
+//		}
+//	}
+//
+//	m_SimulatedByThisPlayer.RemoveAll();
+//}
+//#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Return true if we should allow selection of the specified item

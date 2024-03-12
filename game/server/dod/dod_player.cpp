@@ -464,30 +464,30 @@ void CDODPlayer::PlayerRunCommand( CUserCmd *ucmd, IMoveHelper *moveHelper )
 //-----------------------------------------------------------------------------
 // Purpose: Simulates a single frame of movement for a player
 //-----------------------------------------------------------------------------
-void CDODPlayer::RunPlayerMove( const QAngle& viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, float frametime )
-{
-	CUserCmd cmd;
-
-	// Store off the globals.. they're gonna get whacked
-	float flOldFrametime = gpGlobals->frametime;
-	float flOldCurtime = gpGlobals->curtime;
-
-	float flTimeBase = gpGlobals->curtime + gpGlobals->frametime - frametime;
-	this->SetTimeBase( flTimeBase );
-
-	CUserCmd lastUserCmd = *GetLastUserCommand();
-	Q_memset( &cmd, 0, sizeof( cmd ) );
-	MoveHelperServer()->SetHost( this );
-	this->PlayerRunCommand( &cmd, MoveHelperServer() );
-	this->SetLastUserCommand( cmd );
-
-	// Clear out any fixangle that has been set
-	this->pl.fixangle = FIXANGLE_NONE;
-
-	// Restore the globals..
-	gpGlobals->frametime = flOldFrametime;
-	gpGlobals->curtime = flOldCurtime;
-}
+//void CDODPlayer::RunPlayerMove( const QAngle& viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, float frametime )
+//{
+//	CUserCmd cmd;
+//
+//	// Store off the globals.. they're gonna get whacked
+//	float flOldFrametime = gpGlobals->frametime;
+//	float flOldCurtime = gpGlobals->curtime;
+//
+//	float flTimeBase = gpGlobals->curtime + gpGlobals->frametime - frametime;
+//	this->SetTimeBase( flTimeBase );
+//
+//	CUserCmd lastUserCmd = *GetLastUserCommand();
+//	Q_memset( &cmd, 0, sizeof( cmd ) );
+//	MoveHelperServer()->SetHost( this );
+//	this->PlayerRunCommand( &cmd, MoveHelperServer() );
+//	this->SetLastUserCommand( cmd );
+//
+//	// Clear out any fixangle that has been set
+//	this->pl.fixangle = FIXANGLE_NONE;
+//
+//	// Restore the globals..
+//	gpGlobals->frametime = flOldFrametime;
+//	gpGlobals->curtime = flOldCurtime;
+//}
 
 
 void CDODPlayer::InitialSpawn( void )

@@ -68,18 +68,18 @@ enum InvalidatePhysicsBits_t
 
 #endif
 
-#if !defined( NO_ENTITY_PREDICTION )
-// CBaseEntity inlines
-inline bool CBaseEntity::IsPlayerSimulated( void ) const
-{
-	return m_bIsPlayerSimulated;
-}
-
-inline CBasePlayer *CBaseEntity::GetSimulatingPlayer( void )
-{
-	return m_hPlayerSimulationOwner;
-}
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//// CBaseEntity inlines
+//inline bool CBaseEntity::IsPlayerSimulated( void ) const
+//{
+//	return m_bIsPlayerSimulated;
+//}
+//
+//inline CBasePlayer *CBaseEntity::GetSimulatingPlayer( void )
+//{
+//	return m_hPlayerSimulationOwner;
+//}
+//#endif
 
 inline MoveType_t CBaseEntity::GetMoveType() const
 {

@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#if !defined( NO_ENTITY_PREDICTION )
+#if !defined( NO_ENTITY_PREDICTION ) && 0
 //-----------------------------------------------------------------------------
 // Purpose: Wraps 32bit predictID to allow access and creation
 //-----------------------------------------------------------------------------

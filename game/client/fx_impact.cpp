@@ -118,10 +118,10 @@ bool Impact( Vector &vecOrigin, Vector &vecStart, int iMaterial, int iDamageType
 	
 	bool bHitRagdoll = false;
 	
-	if ( !pEntity->IsClientCreated() )
-	{
+	//if ( !pEntity->IsClientCreated() )
+	//{
 		bHitRagdoll = FX_AffectRagdolls( vecOrigin, vecStart, iDamageType );
-	}
+	//}
 
 	if ( (nFlags & IMPACT_NODECAL) == 0 )
 	{

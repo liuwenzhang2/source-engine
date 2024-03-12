@@ -156,7 +156,7 @@ void FindHullIntersection( const Vector &vecSrc, trace_t &tr, const Vector &mins
 // ----------------------------------------------------------------------------- //
 CWeaponDODBase::CWeaponDODBase()
 {
-	SetPredictionEligible( true );
+	//SetPredictionEligible( true );
 	m_bInAttack = false;
 	m_iAltFireHint = 0;
 	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.

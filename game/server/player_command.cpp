@@ -41,9 +41,9 @@ void CPlayerMove::StartCommand( CBasePlayer *player, CUserCmd *cmd )
 {
 	VPROF( "CPlayerMove::StartCommand" );
 
-#if !defined( NO_ENTITY_PREDICTION )
-	CPredictableId::ResetInstanceCounters();
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	CPredictableId::ResetInstanceCounters();
+//#endif
 
 	player->m_pCurrentCommand = cmd;
 	CBaseEntity::SetPredictionRandomSeed( cmd );

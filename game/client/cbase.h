@@ -28,7 +28,7 @@ struct studiohdr_t;
 #include "string_t.h"
 
 // These two have to be included very early
-#include <predictableid.h>
+//#include <predictableid.h>
 #include <predictable_entity.h>
 
 #include "cdll_util.h"

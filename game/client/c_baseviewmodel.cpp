@@ -156,7 +156,7 @@ bool C_BaseViewModel::Interpolate( float currentTime )
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 
 	// Predicted viewmodels have fixed up interval
-	if ( GetPredictable() || IsClientCreated() )
+	if ( GetPredictable() /*|| IsClientCreated()*/)
 	{
 		Assert( pPlayer );
 		float curtime = pPlayer ? pPlayer->GetFinalPredictedTime() : gpGlobals->curtime;
@@ -450,7 +450,7 @@ void C_BaseViewModel::UpdateAnimationParity( void )
 //-----------------------------------------------------------------------------
 void C_BaseViewModel::OnDataChanged( DataUpdateType_t updateType )
 {
-	SetPredictionEligible( true );
+	//SetPredictionEligible( true );
 	BaseClass::OnDataChanged(updateType);
 }
 

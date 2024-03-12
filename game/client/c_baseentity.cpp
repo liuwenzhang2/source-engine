@@ -206,26 +206,26 @@ int CPredictableList::GetPredictableCount( void )
 // Input  : testId - 
 // Output : static C_BaseEntity
 //-----------------------------------------------------------------------------
-static C_BaseEntity *FindPreviouslyCreatedEntity( CPredictableId& testId )
-{
-	int c = predictables->GetPredictableCount();
-
-	int i;
-	for ( i = 0; i < c; i++ )
-	{
-		C_BaseEntity *e = predictables->GetPredictable( i );
-		if ( !e || !e->IsClientCreated() )
-			continue;
-
-		// Found it, note use of operator ==
-		if ( testId == e->m_PredictableID )
-		{
-			return e;
-		}
-	}
-
-	return NULL;
-}
+//static C_BaseEntity *FindPreviouslyCreatedEntity( CPredictableId& testId )
+//{
+//	int c = predictables->GetPredictableCount();
+//
+//	int i;
+//	for ( i = 0; i < c; i++ )
+//	{
+//		C_BaseEntity *e = predictables->GetPredictable( i );
+//		if ( !e || !e->IsClientCreated() )
+//			continue;
+//
+//		// Found it, note use of operator ==
+//		if ( testId == e->m_PredictableID )
+//		{
+//			return e;
+//		}
+//	}
+//
+//	return NULL;
+//}
 #endif
 
 abstract_class IRecordingList
@@ -421,12 +421,12 @@ BEGIN_RECV_TABLE_NOBASE( C_BaseEntity, DT_AnimTimeMustBeFirst )
 END_RECV_TABLE()
 
 
-#ifndef NO_ENTITY_PREDICTION
-BEGIN_RECV_TABLE_NOBASE( C_BaseEntity, DT_PredictableId )
-	RecvPropPredictableId( RECVINFO( m_PredictableID ) ),
-	RecvPropInt( RECVINFO( m_bIsPlayerSimulated ) ),
-END_RECV_TABLE()
-#endif
+//#ifndef NO_ENTITY_PREDICTION
+//BEGIN_RECV_TABLE_NOBASE( C_BaseEntity, DT_PredictableId )
+//	RecvPropPredictableId( RECVINFO( m_PredictableID ) ),
+//	RecvPropInt( RECVINFO( m_bIsPlayerSimulated ) ),
+//END_RECV_TABLE()
+//#endif
 
 
 BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
@@ -465,9 +465,9 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 	RecvPropDataTable( RECVINFO_DT( m_Collision ), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty) ),
 	
 	RecvPropInt( RECVINFO ( m_iTextureFrameIndex ) ),
-#if !defined( NO_ENTITY_PREDICTION )
-	RecvPropDataTable( "predictable_id", 0, 0, &REFERENCE_RECV_TABLE( DT_PredictableId ) ),
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	RecvPropDataTable( "predictable_id", 0, 0, &REFERENCE_RECV_TABLE( DT_PredictableId ) ),
+//#endif
 
 	RecvPropInt		( RECVINFO( m_bSimulatedEveryTick ), 0, RecvProxy_InterpolationAmountChanged ),
 	RecvPropInt		( RECVINFO( m_bAnimatedEveryTick ), 0, RecvProxy_InterpolationAmountChanged ),
@@ -908,7 +908,7 @@ C_BaseEntity::C_BaseEntity() :
 	m_iParentAttachment = 0;
 	m_nRenderFXBlend = 255;
 
-	SetPredictionEligible( false );
+	//SetPredictionEligible( false );
 	m_bPredictable = false;
 
 	m_bSimulatedEveryTick = false;
@@ -938,9 +938,9 @@ C_BaseEntity::C_BaseEntity() :
 	m_flProxyRandomValue = 0.0f;
 
 	m_fBBoxVisFlags = 0;
-#if !defined( NO_ENTITY_PREDICTION )
-	m_pPredictionContext = NULL;
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	m_pPredictionContext = NULL;
+//#endif
 	//NOTE: not virtual! we are in the constructor!
 	C_BaseEntity::Clear();
 
@@ -1028,10 +1028,10 @@ void C_BaseEntity::Clear( void )
 #endif
 
 	// Remove prediction context if it exists
-#if !defined( NO_ENTITY_PREDICTION )
-	delete m_pPredictionContext;
-	m_pPredictionContext = NULL;
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	delete m_pPredictionContext;
+//	m_pPredictionContext = NULL;
+//#endif
 	// Do not enable this on all entities. It forces bone setup for entities that
 	// don't need it.
 	//AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
@@ -1153,16 +1153,16 @@ void C_BaseEntity::Term()
 
 #if !defined( NO_ENTITY_PREDICTION )
 	// Remove from the predictables list
-	if ( GetPredictable() || IsClientCreated() )
+	if ( GetPredictable() /*|| IsClientCreated()*/)
 	{
 		g_Predictables.RemoveFromPredictablesList( GetClientHandle() );
 	}
 
 	// If it's play simulated, remove from simulation list if the player still exists...
-	if ( IsPlayerSimulated() && C_BasePlayer::GetLocalPlayer() )
-	{
-		C_BasePlayer::GetLocalPlayer()->RemoveFromPlayerSimulationList( this );
-	}
+	//if ( IsPlayerSimulated() && C_BasePlayer::GetLocalPlayer() )
+	//{
+	//	C_BasePlayer::GetLocalPlayer()->RemoveFromPlayerSimulationList( this );
+	//}
 #endif
 
 	if ( GetClientHandle() != INVALID_CLIENTENTITY_HANDLE )
@@ -2059,30 +2059,30 @@ void C_BaseEntity::NotifyShouldTransmit( ShouldTransmitState_t state )
 			
 			UpdatePartitionListEntry();
 
-#if !defined( NO_ENTITY_PREDICTION )
-			// Note that predictables get a chance to hook up to their server counterparts here
-			if ( m_PredictableID.IsActive() )
-			{
-				// Find corresponding client side predicted entity and remove it from predictables
-				m_PredictableID.SetAcknowledged( true );
-
-				C_BaseEntity *otherEntity = FindPreviouslyCreatedEntity( m_PredictableID );
-				if ( otherEntity )
-				{
-					Assert( otherEntity->IsClientCreated() );
-					Assert( otherEntity->m_PredictableID.IsActive() );
-					Assert( ClientEntityList().IsHandleValid( otherEntity->GetClientHandle() ) );
-
-					otherEntity->m_PredictableID.SetAcknowledged( true );
-
-					if ( OnPredictedEntityRemove( false, otherEntity ) )
-					{
-						// Mark it for delete after receive all network data
-						DestroyEntity(otherEntity);// ->Release();
-					}
-				}
-			}
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//			// Note that predictables get a chance to hook up to their server counterparts here
+//			if ( m_PredictableID.IsActive() )
+//			{
+//				// Find corresponding client side predicted entity and remove it from predictables
+//				m_PredictableID.SetAcknowledged( true );
+//
+//				C_BaseEntity *otherEntity = FindPreviouslyCreatedEntity( m_PredictableID );
+//				if ( otherEntity )
+//				{
+//					Assert( otherEntity->IsClientCreated() );
+//					Assert( otherEntity->m_PredictableID.IsActive() );
+//					Assert( ClientEntityList().IsHandleValid( otherEntity->GetClientHandle() ) );
+//
+//					otherEntity->m_PredictableID.SetAcknowledged( true );
+//
+//					if ( OnPredictedEntityRemove( false, otherEntity ) )
+//					{
+//						// Mark it for delete after receive all network data
+//						DestroyEntity(otherEntity);// ->Release();
+//					}
+//				}
+//			}
+//#endif
 		}
 		break;
 
@@ -2139,7 +2139,7 @@ void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 		Interp_RestoreToLastNetworked( GetVarMapping() );
 	}
 
-	if ( bnewentity && !IsClientCreated() )
+	if ( bnewentity /*&& !IsClientCreated()*/)
 	{
 		m_flSpawnTime = engine->GetLastTimeStamp();
 		MDLCACHE_CRITICAL_SECTION();
@@ -2551,7 +2551,7 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 	bool bPredictable = GetPredictable();
 
 	// For non-predicted and non-client only ents, we need to latch network values into the interpolation histories
-	if ( !bPredictable && !IsClientCreated() )
+	if ( !bPredictable /*&& !IsClientCreated()*/)
 	{
 		if ( animTimeChanged )
 		{
@@ -2596,25 +2596,25 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 
 	// It's possible that a new entity will need to be forceably added to the 
 	//   player simulation list.  If so, do this here
-#if !defined( NO_ENTITY_PREDICTION )
-	C_BasePlayer *local = C_BasePlayer::GetLocalPlayer();
-	if ( IsPlayerSimulated() &&
-		( NULL != local ) && 
-		( local == m_hOwnerEntity ) )
-	{
-		// Make sure player is driving simulation (field is only ever sent to local player)
-		SetPlayerSimulated( local );
-	}
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	C_BasePlayer *local = C_BasePlayer::GetLocalPlayer();
+//	if ( IsPlayerSimulated() &&
+//		( NULL != local ) && 
+//		( local == m_hOwnerEntity ) )
+//	{
+//		// Make sure player is driving simulation (field is only ever sent to local player)
+//		SetPlayerSimulated( local );
+//	}
+//#endif
 
 	UpdatePartitionListEntry();
 	
 	// Add the entity to the nointerp list.
-	if ( !IsClientCreated() )
-	{
+//	if ( !IsClientCreated() )
+//	{
 		if ( Teleported() || IsNoInterpolationFrame() )
 			AddToTeleportList();
-	}
+//	}
 
 	// if we changed parents, recalculate visibility
 	if ( m_hOldMoveParent != m_hNetworkMoveParent )
@@ -2639,22 +2639,22 @@ void C_BaseEntity::CheckInitPredictable( const char *context )
 	if ( !player )
 		return;
 
-	if ( !GetPredictionEligible() )
-	{
-		if ( m_PredictableID.IsActive() &&
-			( player->index - 1 ) == m_PredictableID.GetPlayer() )
-		{
-			// If it comes through with an ID, it should be eligible
-			SetPredictionEligible( true );
-		}
-		else
-		{
-			return;
-		}
-	}
+	//if ( !GetPredictionEligible() )
+	//{
+	//	if ( m_PredictableID.IsActive() &&
+	//		( player->index - 1 ) == m_PredictableID.GetPlayer() )
+	//	{
+	//		// If it comes through with an ID, it should be eligible
+	//		SetPredictionEligible( true );
+	//	}
+	//	else
+	//	{
+	//		return;
+	//	}
+	//}
 
-	if ( IsClientCreated() )
-		return;
+	//if ( IsClientCreated() )
+	//	return;
 
 	if ( !ShouldPredict() )
 		return;
@@ -2806,7 +2806,7 @@ int CBaseEntity::BaseInterpolatePart1( float &currentTime, Vector &oldOrigin, QA
 	}
 
 
-	if ( GetPredictable() || IsClientCreated() )
+	if ( GetPredictable() /*|| IsClientCreated()*/)
 	{
 		C_BasePlayer *localplayer = C_BasePlayer::GetLocalPlayer();
 		if ( localplayer && currentTime == gpGlobals->curtime )
@@ -3222,34 +3222,34 @@ void C_BaseEntity::InterpolateServerEntities()
 
 
 // (static function)
-void C_BaseEntity::AddVisibleEntities()
-{
-#if !defined( NO_ENTITY_PREDICTION )
-	VPROF_BUDGET( "C_BaseEntity::AddVisibleEntities", VPROF_BUDGETGROUP_WORLD_RENDERING );
-
-	// Let non-dormant client created predictables get added, too
-	int c = predictables->GetPredictableCount();
-	for ( int i = 0 ; i < c ; i++ )
-	{
-		C_BaseEntity *pEnt = predictables->GetPredictable( i );
-		if ( !pEnt )
-			continue;
-
-		if ( !pEnt->IsClientCreated() )
-			continue;
-
-		// Only draw until it's ack'd since that means a real entity has arrived
-		if ( pEnt->m_PredictableID.GetAcknowledged() )
-			continue;
-
-		// Don't draw if dormant
-		if ( pEnt->IsDormantPredictable() )
-			continue;
-
-		pEnt->UpdateVisibility();	
-	}
-#endif
-}
+//void C_BaseEntity::AddVisibleEntities()
+//{
+//#if !defined( NO_ENTITY_PREDICTION )
+//	VPROF_BUDGET( "C_BaseEntity::AddVisibleEntities", VPROF_BUDGETGROUP_WORLD_RENDERING );
+//
+//	// Let non-dormant client created predictables get added, too
+//	int c = predictables->GetPredictableCount();
+//	for ( int i = 0 ; i < c ; i++ )
+//	{
+//		C_BaseEntity *pEnt = predictables->GetPredictable( i );
+//		if ( !pEnt )
+//			continue;
+//
+//		if ( !pEnt->IsClientCreated() )
+//			continue;
+//
+//		// Only draw until it's ack'd since that means a real entity has arrived
+//		if ( pEnt->m_PredictableID.GetAcknowledged() )
+//			continue;
+//
+//		// Don't draw if dormant
+//		if ( pEnt->IsDormantPredictable() )
+//			continue;
+//
+//		pEnt->UpdateVisibility();	
+//	}
+//#endif
+//}
 
 
 //-----------------------------------------------------------------------------
@@ -4696,7 +4696,7 @@ int C_BaseEntity::PrecacheModel( const char *name )
 void C_BaseEntity::Remove( )
 {
 	// Nothing for now, if it's a predicted entity, could flag as "delete" or dormant
-	if ( GetPredictable() || IsClientCreated() )
+	if ( GetPredictable() /*|| IsClientCreated()*/)
 	{
 		// Make it solid
 		AddSolidFlags( FSOLID_NOT_SOLID );
@@ -4713,14 +4713,14 @@ void C_BaseEntity::Remove( )
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool C_BaseEntity::GetPredictionEligible( void ) const
-{
-#if !defined( NO_ENTITY_PREDICTION )
-	return m_bPredictionEligible;
-#else
-	return false;
-#endif
-}
+//bool C_BaseEntity::GetPredictionEligible( void ) const
+//{
+//#if !defined( NO_ENTITY_PREDICTION )
+//	return m_bPredictionEligible;
+//#else
+//	return false;
+//#endif
+//}
 
 
 C_BaseEntity* C_BaseEntity::Instance( CBaseHandle hEnt )
@@ -4837,18 +4837,18 @@ CON_COMMAND_F( dlight_debug, "Creates a dlight in front of the player", FCVAR_CH
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool C_BaseEntity::IsClientCreated( void ) const
-{
-#ifndef NO_ENTITY_PREDICTION
-	if ( m_pPredictionContext != NULL )
-	{
-		// For now can't be both
-		Assert( !GetPredictable() );
-		return true;
-	}
-#endif
-	return false;
-}
+//bool C_BaseEntity::IsClientCreated( void ) const
+//{
+//#ifndef NO_ENTITY_PREDICTION
+//	if ( m_pPredictionContext != NULL )
+//	{
+//		// For now can't be both
+//		Assert( !GetPredictable() );
+//		return true;
+//	}
+//#endif
+//	return false;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -4857,139 +4857,139 @@ bool C_BaseEntity::IsClientCreated( void ) const
 //			line - 
 // Output : C_BaseEntity
 //-----------------------------------------------------------------------------
-C_BaseEntity *C_BaseEntity::CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist /*= false */ )
-{
-#if !defined( NO_ENTITY_PREDICTION )
-	C_BasePlayer *player = C_BaseEntity::GetPredictionPlayer();
-
-	Assert( player );
-	Assert( player->m_pCurrentCommand );
-	Assert( prediction->InPrediction() );
-
-	C_BaseEntity *ent = NULL;
-
-	// What's my birthday (should match server)
-	int command_number	= player->m_pCurrentCommand->command_number;
-	// Who's my daddy?
-	int player_index	= player->entindex() - 1;
-
-	// Create id/context
-	CPredictableId testId;
-	testId.Init( player_index, command_number, classname, module, line );
-
-	// If repredicting, should be able to find the entity in the previously created list
-	if ( !prediction->IsFirstTimePredicted() )
-	{
-		// Only find previous instance if entity was created with persist set
-		if ( persist )
-		{
-			ent = FindPreviouslyCreatedEntity( testId );
-			if ( ent )
-			{
-				return ent;
-			}
-		}
-
-		return NULL;
-	}
-
-	// Try to create it
-	ent = cl_entitylist->CreateEntityByName( classname );
-	if ( !ent )
-	{
-		return NULL;
-	}
-
-	// It's predictable
-	ent->SetPredictionEligible( true );
-
-	// Set up "shared" id number
-	ent->m_PredictableID.SetRaw( testId.GetRaw() );
-
-	// Get a context (mostly for debugging purposes)
-	PredictionContext *context			= new PredictionContext;
-	context->m_bActive					= true;
-	context->m_nCreationCommandNumber	= command_number;
-	context->m_nCreationLineNumber		= line;
-	context->m_pszCreationModule		= module;
-
-	// Attach to entity
-	ent->m_pPredictionContext = context;
-
-	// Add to client entity list
-	//ClientEntityList().AddNonNetworkableEntity( ent );
-
-	//  and predictables
-	g_Predictables.AddToPredictableList( ent->GetClientHandle() );
-
-	// Duhhhh..., but might as well be safe
-	Assert( !ent->GetPredictable() );
-	Assert( ent->IsClientCreated() );
-
-	// Add the client entity to the spatial partition. (Collidable)
-	ent->CollisionProp()->CreatePartitionHandle();
-
-	// CLIENT ONLY FOR NOW!!!
-	ent->index = -1;
-
-	if ( AddDataChangeEvent( ent, DATA_UPDATE_CREATED, &ent->m_DataChangeEventRef ) )
-	{
-		ent->OnPreDataChanged( DATA_UPDATE_CREATED );
-	}
-
-	ent->Interp_UpdateInterpolationAmounts( ent->GetVarMapping() );
-	
-	return ent;
-#else
-	return NULL;
-#endif
-}
+//C_BaseEntity *C_BaseEntity::CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist /*= false */ )
+//{
+//#if !defined( NO_ENTITY_PREDICTION )
+//	C_BasePlayer *player = C_BaseEntity::GetPredictionPlayer();
+//
+//	Assert( player );
+//	Assert( player->m_pCurrentCommand );
+//	Assert( prediction->InPrediction() );
+//
+//	C_BaseEntity *ent = NULL;
+//
+//	// What's my birthday (should match server)
+//	int command_number	= player->m_pCurrentCommand->command_number;
+//	// Who's my daddy?
+//	int player_index	= player->entindex() - 1;
+//
+//	// Create id/context
+//	CPredictableId testId;
+//	testId.Init( player_index, command_number, classname, module, line );
+//
+//	// If repredicting, should be able to find the entity in the previously created list
+//	if ( !prediction->IsFirstTimePredicted() )
+//	{
+//		// Only find previous instance if entity was created with persist set
+//		if ( persist )
+//		{
+//			ent = FindPreviouslyCreatedEntity( testId );
+//			if ( ent )
+//			{
+//				return ent;
+//			}
+//		}
+//
+//		return NULL;
+//	}
+//
+//	// Try to create it
+//	ent = cl_entitylist->CreateEntityByName( classname );
+//	if ( !ent )
+//	{
+//		return NULL;
+//	}
+//
+//	// It's predictable
+//	ent->SetPredictionEligible( true );
+//
+//	// Set up "shared" id number
+//	ent->m_PredictableID.SetRaw( testId.GetRaw() );
+//
+//	// Get a context (mostly for debugging purposes)
+//	PredictionContext *context			= new PredictionContext;
+//	context->m_bActive					= true;
+//	context->m_nCreationCommandNumber	= command_number;
+//	context->m_nCreationLineNumber		= line;
+//	context->m_pszCreationModule		= module;
+//
+//	// Attach to entity
+//	ent->m_pPredictionContext = context;
+//
+//	// Add to client entity list
+//	//ClientEntityList().AddNonNetworkableEntity( ent );
+//
+//	//  and predictables
+//	g_Predictables.AddToPredictableList( ent->GetClientHandle() );
+//
+//	// Duhhhh..., but might as well be safe
+//	Assert( !ent->GetPredictable() );
+//	Assert( ent->IsClientCreated() );
+//
+//	// Add the client entity to the spatial partition. (Collidable)
+//	ent->CollisionProp()->CreatePartitionHandle();
+//
+//	// CLIENT ONLY FOR NOW!!!
+//	ent->index = -1;
+//
+//	if ( AddDataChangeEvent( ent, DATA_UPDATE_CREATED, &ent->m_DataChangeEventRef ) )
+//	{
+//		ent->OnPreDataChanged( DATA_UPDATE_CREATED );
+//	}
+//
+//	ent->Interp_UpdateInterpolationAmounts( ent->GetVarMapping() );
+//	
+//	return ent;
+//#else
+//	return NULL;
+//#endif
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Called each packet that the entity is created on and finally gets called after the next packet
 //  that doesn't have a create message for the "parent" entity so that the predicted version
 //  can be removed.  Return true to delete entity right away.
 //-----------------------------------------------------------------------------
-bool C_BaseEntity::OnPredictedEntityRemove( bool isbeingremoved, C_BaseEntity *predicted )
-{
-#if !defined( NO_ENTITY_PREDICTION )
-	// Nothing right now, but in theory you could look at the error in origins and set
-	//  up something to smooth out the error
-	PredictionContext *ctx = predicted->m_pPredictionContext;
-	Assert( ctx );
-	if ( ctx )
-	{
-		// Create backlink to actual entity
-		ctx->m_hServerEntity = this;
-
-		/*
-		Msg( "OnPredictedEntity%s:  %s created %s(%i) instance(%i)\n",
-			isbeingremoved ? "Remove" : "Acknowledge",
-			predicted->GetClassname(),
-			ctx->m_pszCreationModule,
-			ctx->m_nCreationLineNumber,
-			predicted->m_PredictableID.GetInstanceNumber() );
-		*/
-	}
-
-	// If it comes through with an ID, it should be eligible
-	SetPredictionEligible( true );
-
-	// Start predicting simulation forward from here
-	CheckInitPredictable( "OnPredictedEntityRemove" );
-
-	// Always mark it dormant since we are the "real" entity now
-	predicted->SetDormantPredictable( true );
-
-	InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED );
-
-	// By default, signal that it should be deleted right away
-	// If a derived class implements this method, it might chain to here but return
-	// false if it wants to keep the dormant predictable around until the chain of
-	//  DATA_UPDATE_CREATED messages passes
-#endif
-	return true;
-}
+//bool C_BaseEntity::OnPredictedEntityRemove( bool isbeingremoved, C_BaseEntity *predicted )
+//{
+//#if !defined( NO_ENTITY_PREDICTION )
+//	// Nothing right now, but in theory you could look at the error in origins and set
+//	//  up something to smooth out the error
+//	PredictionContext *ctx = predicted->m_pPredictionContext;
+//	Assert( ctx );
+//	if ( ctx )
+//	{
+//		// Create backlink to actual entity
+//		ctx->m_hServerEntity = this;
+//
+//		/*
+//		Msg( "OnPredictedEntity%s:  %s created %s(%i) instance(%i)\n",
+//			isbeingremoved ? "Remove" : "Acknowledge",
+//			predicted->GetClassname(),
+//			ctx->m_pszCreationModule,
+//			ctx->m_nCreationLineNumber,
+//			predicted->m_PredictableID.GetInstanceNumber() );
+//		*/
+//	}
+//
+//	// If it comes through with an ID, it should be eligible
+//	SetPredictionEligible( true );
+//
+//	// Start predicting simulation forward from here
+//	CheckInitPredictable( "OnPredictedEntityRemove" );
+//
+//	// Always mark it dormant since we are the "real" entity now
+//	predicted->SetDormantPredictable( true );
+//
+//	InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED );
+//
+//	// By default, signal that it should be deleted right away
+//	// If a derived class implements this method, it might chain to here but return
+//	// false if it wants to keep the dormant predictable around until the chain of
+//	//  DATA_UPDATE_CREATED messages passes
+//#endif
+//	return true;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -5039,9 +5039,9 @@ void C_BaseEntity::UpdateOnRemove( void )
 
 	Term();
 	ClearDataChangedEvent(m_DataChangeEventRef);
-#if !defined( NO_ENTITY_PREDICTION )
-	delete m_pPredictionContext;
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+//	delete m_pPredictionContext;
+//#endif
 	RemoveFromInterpolationList();
 	RemoveFromTeleportList();
 }
@@ -5050,12 +5050,12 @@ void C_BaseEntity::UpdateOnRemove( void )
 // Purpose: 
 // Input  : canpredict - 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::SetPredictionEligible( bool canpredict )
-{
-#if !defined( NO_ENTITY_PREDICTION )
-	m_bPredictionEligible = canpredict;
-#endif
-}
+//void C_BaseEntity::SetPredictionEligible( bool canpredict )
+//{
+//#if !defined( NO_ENTITY_PREDICTION )
+//	m_bPredictionEligible = canpredict;
+//#endif
+//}
 
 
 //-----------------------------------------------------------------------------
@@ -5077,56 +5077,56 @@ float C_BaseEntity::GetAttackDamageScale( void )
 	return flScale;
 }
 
-#if !defined( NO_ENTITY_PREDICTION )
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : Returns true on success, false on failure.
-//-----------------------------------------------------------------------------
-bool C_BaseEntity::IsDormantPredictable( void ) const
-{
-	return m_bDormantPredictable;
-}
-#endif
+//#if !defined( NO_ENTITY_PREDICTION )
+////-----------------------------------------------------------------------------
+//// Purpose: 
+//// Output : Returns true on success, false on failure.
+////-----------------------------------------------------------------------------
+//bool C_BaseEntity::IsDormantPredictable( void ) const
+//{
+//	return m_bDormantPredictable;
+//}
+//#endif
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : dormant - 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::SetDormantPredictable( bool dormant )
-{
-#if !defined( NO_ENTITY_PREDICTION )
-	Assert( IsClientCreated() );
-
-	m_bDormantPredictable = true;
-	m_nIncomingPacketEntityBecameDormant = prediction->GetIncomingPacketNumber();
-
-// Do we need to do the following kinds of things?
-#if 0
-	// Remove from collisions
-	SetSolid( SOLID_NOT );
-	// Don't render
-	AddEffects( EF_NODRAW );
-#endif
-#endif
-}
+//void C_BaseEntity::SetDormantPredictable( bool dormant )
+//{
+//#if !defined( NO_ENTITY_PREDICTION )
+//	Assert( IsClientCreated() );
+//
+//	m_bDormantPredictable = true;
+//	m_nIncomingPacketEntityBecameDormant = prediction->GetIncomingPacketNumber();
+//
+//// Do we need to do the following kinds of things?
+//#if 0
+//	// Remove from collisions
+//	SetSolid( SOLID_NOT );
+//	// Don't render
+//	AddEffects( EF_NODRAW );
+//#endif
+//#endif
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Used to determine when a dorman client predictable can be safely deleted
 //  Note that it can be deleted earlier than this by OnPredictedEntityRemove returning true
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool C_BaseEntity::BecameDormantThisPacket( void ) const
-{
-#if !defined( NO_ENTITY_PREDICTION )
-	Assert( IsDormantPredictable() );
-
-	if ( m_nIncomingPacketEntityBecameDormant != prediction->GetIncomingPacketNumber() )
-		return false;
-
-	return true;
-#else
-	return false;
-#endif
-}
+//bool C_BaseEntity::BecameDormantThisPacket( void ) const
+//{
+//#if !defined( NO_ENTITY_PREDICTION )
+//	Assert( IsDormantPredictable() );
+//
+//	if ( m_nIncomingPacketEntityBecameDormant != prediction->GetIncomingPacketNumber() )
+//		return false;
+//
+//	return true;
+//#else
+//	return false;
+//#endif
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -5846,8 +5846,8 @@ void C_BaseEntity::Interp_Reset( VarMapping_t *map )
 
 void C_BaseEntity::ResetLatched()
 {
-	if ( IsClientCreated() )
-		return;
+//	if ( IsClientCreated() )
+//		return;
 
 	Interp_Reset( GetVarMapping() );
 }
@@ -5890,7 +5890,7 @@ float C_BaseEntity::GetInterpolationAmount( int flags )
 		serverTickMultiple = 2;
 	}
 
-	if ( GetPredictable() || IsClientCreated() )
+	if ( GetPredictable() /*|| IsClientCreated()*/)
 	{
 		return TICK_INTERVAL * serverTickMultiple;
 	}
@@ -5931,7 +5931,7 @@ float C_BaseEntity::GetInterpolationAmount( int flags )
 
 float C_BaseEntity::GetLastChangeTime( int flags )
 {
-	if ( GetPredictable() || IsClientCreated() )
+	if ( GetPredictable() /*|| IsClientCreated()*/)
 	{
 		return gpGlobals->curtime;
 	}

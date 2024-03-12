@@ -346,7 +346,7 @@ public:
 public:
 
 	// Simulates a single frame of movement for a player
-	void RunPlayerMove( const QAngle& viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, float frametime );
+	//void RunPlayerMove( const QAngle& viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, float frametime );
 	virtual void HandleAnimEvent( animevent_t *pEvent );
 
 	virtual void UpdateStepSound( surfacedata_t *psurface, const Vector &vecOrigin, const Vector &vecVelocity  );

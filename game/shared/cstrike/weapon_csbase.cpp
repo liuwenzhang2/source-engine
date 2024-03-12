@@ -365,7 +365,7 @@ void DrawCrosshairRect( int x0, int y0, int x1, int y1, bool bAdditive )
 // ----------------------------------------------------------------------------- //
 CWeaponCSBase::CWeaponCSBase()
 {
-	SetPredictionEligible( true );
+	//SetPredictionEligible( true );
 	m_bDelayFire = true;
 	m_nextPrevOwnerTouchTime = 0.0;
 	m_prevOwner = NULL;

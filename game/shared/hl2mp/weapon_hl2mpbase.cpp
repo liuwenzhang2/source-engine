@@ -94,7 +94,7 @@ LINK_ENTITY_TO_CLASS( weapon_hl2mp_base, CWeaponHL2MPBase );
 // ----------------------------------------------------------------------------- //
 CWeaponHL2MPBase::CWeaponHL2MPBase()
 {
-	SetPredictionEligible( true );
+	//SetPredictionEligible( true );
 	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 
 	m_flNextResetCheckTime = 0.0f;

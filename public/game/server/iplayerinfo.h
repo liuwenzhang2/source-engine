@@ -179,7 +179,7 @@ public:
 	// check various effect flags
 	virtual bool IsEFlagSet( int nEFlagMask ) = 0;
 	// fire a virtual move command to the bot
-	virtual void RunPlayerMove( CBotCmd *ucmd ) = 0;
+	//virtual void RunPlayerMove( CBotCmd *ucmd ) = 0;
 };
 
 
