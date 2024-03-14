@@ -25,7 +25,7 @@ class CSaveRestoreSegment;
 class CGameSaveRestoreInfo;
 class typedescription_t;
 //struct edict_t;
-struct datamap_t;
+class datamap_t;
 class CBaseEntity;
 struct interval_t;
 

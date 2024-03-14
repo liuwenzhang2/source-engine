@@ -48,7 +48,7 @@ class CGlobalVarsBase;
 class CPhysCollide;
 class CSaveRestoreData;
 class INetChannelInfo;
-struct datamap_t;
+class datamap_t;
 class typedescription_t;
 class CStandardRecvProxies;
 struct client_textmessage_t;

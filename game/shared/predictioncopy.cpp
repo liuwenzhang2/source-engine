@@ -1067,13 +1067,13 @@ void CPredictionCopy::CopyFields( int chain_count, datamap_t *pRootMap, typedesc
 				// FIXME: Should this be done outside the FIELD_EMBEDDED case??
 				// Don't follow the pointer if we're reading from a compressed packet
 				m_pSrc = pInputData;
-				if ( ( flags & FTYPEDESC_PTR ) && (m_nSrcOffsetIndex == PC_DATA_NORMAL) )
+				if ( ( flags & FTYPEDESC_PTR ) && (m_nSrcOffsetIndex == TD_OFFSET_NORMAL) )
 				{
 					m_pSrc = *((void**)m_pSrc);
 				}
 
 				m_pDest = pOutputData;
-				if ( ( flags & FTYPEDESC_PTR ) && (m_nDestOffsetIndex == PC_DATA_NORMAL) )
+				if ( ( flags & FTYPEDESC_PTR ) && (m_nDestOffsetIndex == TD_OFFSET_NORMAL) )
 				{
 					m_pDest = *((void**)m_pDest);
 				}
@@ -1646,7 +1646,7 @@ void CPredictionDescribeData::DescribeFields_R( int chain_count, datamap_t *pRoo
 				m_pCurrentClassName = m_pCurrentField->td->dataClassName;
 				
 				m_pSrc = pInputData;
-				if ( ( flags & FTYPEDESC_PTR ) && (m_nSrcOffsetIndex == PC_DATA_NORMAL) )
+				if ( ( flags & FTYPEDESC_PTR ) && (m_nSrcOffsetIndex == TD_OFFSET_NORMAL) )
 				{
 					m_pSrc = *((void**)m_pSrc);
 				}

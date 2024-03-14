@@ -38,8 +38,8 @@ enum
 	PC_NETWORKED_ONLY,
 };
 
-#define PC_DATA_PACKED			true
-#define PC_DATA_NORMAL			false
+//#define PC_DATA_PACKED			true
+//#define PC_DATA_NORMAL			false
 
 typedef void ( *FN_FIELD_COMPARE )( const char *classname, const char *fieldname, const char *fieldtype,
 	bool networked, bool noterrorchecked, bool differs, bool withintolerance, const char *value );

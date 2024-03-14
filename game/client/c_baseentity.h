@@ -67,6 +67,7 @@ typedef unsigned int			AimEntsListHandle_t;
 
 extern void RecvProxy_IntToColor32( const CRecvProxyData *pData, void *pStruct, void *pOut );
 extern void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *pOut );
+extern ISaveRestoreOps* engineObjectFuncs;
 
 enum CollideType_t
 {

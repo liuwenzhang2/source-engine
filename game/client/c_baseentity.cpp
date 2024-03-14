@@ -4658,8 +4658,8 @@ bool C_BaseEntity::PostNetworkDataReceived( int commands_acknowledged )
 		bool copydata	= false;
 
 		CPredictionCopy errorCheckHelper( PC_NETWORKED_ONLY, 
-			predicted_state_data, PC_DATA_PACKED, 
-			original_state_data, PC_DATA_PACKED, 
+			predicted_state_data, TD_OFFSET_PACKED,
+			original_state_data, TD_OFFSET_PACKED,
 			counterrors, reporterrors, copydata );
 		// Suppress debugging output
 		int ecount = errorCheckHelper.TransferData( "", -1, GetPredDescMap() );
@@ -5710,7 +5710,7 @@ int C_BaseEntity::SaveData( const char *context, int slot, int type )
 		m_nIntermediateDataCount = slot;
 	}
 
-	CPredictionCopy copyHelper( type, dest, PC_DATA_PACKED, this, PC_DATA_NORMAL );
+	CPredictionCopy copyHelper( type, dest, TD_OFFSET_PACKED, this, TD_OFFSET_NORMAL);
 	int error_count = copyHelper.TransferData( sz, entindex(), GetPredDescMap() );
 	return error_count;
 #else
@@ -5764,7 +5764,7 @@ int C_BaseEntity::RestoreData( const char *context, int slot, int type )
 	// model index needs to be set manually for dynamic model refcounting purposes
 	int oldModelIndex = m_nModelIndex;
 
-	CPredictionCopy copyHelper( type, this, PC_DATA_NORMAL, src, PC_DATA_PACKED );
+	CPredictionCopy copyHelper( type, this, TD_OFFSET_NORMAL, src, TD_OFFSET_PACKED);
 	int error_count = copyHelper.TransferData( sz, entindex(), GetPredDescMap() );
 
 	// set non-predicting flags back to their prior state
@@ -5982,8 +5982,8 @@ bool C_BaseEntity::IsFloating()
 
 BEGIN_DATADESC_NO_BASE( C_BaseEntity )
 	DEFINE_FIELD( m_ModelName, FIELD_STRING ),
-	DEFINE_FIELD( m_vecAbsOrigin, FIELD_POSITION_VECTOR ),
-	DEFINE_FIELD( m_angAbsRotation, FIELD_VECTOR ),
+	DEFINE_CUSTOM_FIELD( m_vecAbsOrigin, engineObjectFuncs),
+	DEFINE_CUSTOM_FIELD( m_angAbsRotation, engineObjectFuncs),
 	DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
 	DEFINE_FIELD( m_fFlags, FIELD_INTEGER ),
 END_DATADESC()

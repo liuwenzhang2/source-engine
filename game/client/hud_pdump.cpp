@@ -205,8 +205,8 @@ void CPDumpPanel::DumpEntity( C_BaseEntity *ent, int commands_acknowledged )
 	void *original_state_data = NULL;	
 	const void *predicted_state_data	= NULL;
 	
-	bool data_type_original		= PC_DATA_PACKED;
-	bool data_type_predicted	= PC_DATA_PACKED;
+	bool data_type_original		= TD_OFFSET_PACKED;
+	bool data_type_predicted	= TD_OFFSET_PACKED;
 
 	if ( ent->GetPredictable() )
 	{
@@ -217,7 +217,7 @@ void CPDumpPanel::DumpEntity( C_BaseEntity *ent, int commands_acknowledged )
 	{
 		// Compare against self so that we're just dumping data to screen
 		original_state_data = ( void * )ent;
-		data_type_original = PC_DATA_NORMAL;
+		data_type_original = TD_OFFSET_NORMAL;
 		predicted_state_data = original_state_data;
 		data_type_predicted = data_type_original;
 	}

@@ -228,9 +228,9 @@ END_RECV_TABLE()
 		RecvPropEHandle		( RECVINFO( m_hLastWeapon ) ),
 		RecvPropEHandle		( RECVINFO( m_hGroundEntity ) ),
 
- 		RecvPropFloat		( RECVINFO(m_vecVelocity[0]), 0, RecvProxy_LocalVelocityX ),
- 		RecvPropFloat		( RECVINFO(m_vecVelocity[1]), 0, RecvProxy_LocalVelocityY ),
- 		RecvPropFloat		( RECVINFO(m_vecVelocity[2]), 0, RecvProxy_LocalVelocityZ ),
+ 		RecvPropFloat		(RECVINFO_INVALID(m_vecVelocity[0]), 0, RecvProxy_LocalVelocityX ),
+ 		RecvPropFloat		(RECVINFO_INVALID(m_vecVelocity[1]), 0, RecvProxy_LocalVelocityY ),
+ 		RecvPropFloat		(RECVINFO_INVALID(m_vecVelocity[2]), 0, RecvProxy_LocalVelocityZ ),
 
 		RecvPropVector		( RECVINFO( m_vecBaseVelocity ) ),
 

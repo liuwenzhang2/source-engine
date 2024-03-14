@@ -605,6 +605,7 @@ inline void SendTable::SetHasPropsEncodedAgainstTickcount( bool bState )
 #define SENDINFO_DT_NAME(varName, remoteVarName)		#remoteVarName, _hacky_dtsend_offsetof(currentSendDTClass, varName)
 #define SENDINFO_NAME(varName,remoteVarName)			#remoteVarName, _hacky_dtsend_offsetof(currentSendDTClass, varName), sizeof(((currentSendDTClass*)0)->varName)
 
+#define SENDINFO_INVALID(varName)						#varName, -99999, -1
 // ------------------------------------------------------------------------ //
 // Built-in proxy types.
 // See the definition of SendVarProxyFn for information about these.

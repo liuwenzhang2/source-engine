@@ -37,7 +37,7 @@ class	CGameTrace;
 typedef	CGameTrace trace_t;
 class	typedescription_t;
 class	CSaveRestoreData;
-struct	datamap_t;
+class	datamap_t;
 class	SendTable;
 class	ServerClass;
 class	IMoveHelper;

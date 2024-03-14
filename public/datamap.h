@@ -246,7 +246,7 @@ class ISaveRestoreOps;
 //
 typedef void (CBaseEntity::*inputfunc_t)(inputdata_t &data);
 
-struct datamap_t;
+class datamap_t;
 class typedescription_t;
 
 enum
@@ -293,8 +293,9 @@ public:
 // Purpose: stores the list of objects in the hierarchy
 //			used to iterate through an object's data descriptions
 //-----------------------------------------------------------------------------
-struct datamap_t
+class datamap_t
 {
+public:
 	typedescription_t	*dataDesc;
 	int					dataNumFields;
 	char const			*dataClassName;

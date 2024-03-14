@@ -1102,7 +1102,7 @@ void CDescribeData::DescribeFields_R( int chain_count, datamap_t *pRootMap, type
 				m_FieldPath.AddToTail( str );
 
 				m_pSrc = pInputData;
-				if ( ( flags & FTYPEDESC_PTR ) && (m_nSrcOffsetIndex == PC_DATA_NORMAL) )
+				if ( ( flags & FTYPEDESC_PTR ) && (m_nSrcOffsetIndex == TD_OFFSET_NORMAL) )
 				{
 					m_pSrc = *((void**)m_pSrc);
 				}
