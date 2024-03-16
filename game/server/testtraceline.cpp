@@ -62,10 +62,10 @@ void SendProxy_AnglesZ(const SendProp* pProp, const void* pStruct, const void* p
 // This table encodes the CBaseEntity data.
 IMPLEMENT_SERVERCLASS_ST_NOBASE(CTestTraceline, DT_TestTraceline)
 	SendPropInt		(SENDINFO(m_clrRender),	32, SPROP_UNSIGNED ),
-	SendPropVector (SENDINFO_INVALID(m_vecOrigin), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_Origin),
-	SendPropFloat	(SENDINFO_INVALID(m_angRotation[0]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesX),
-	SendPropFloat	(SENDINFO_INVALID(m_angRotation[1]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesY),
-	SendPropFloat	(SENDINFO_INVALID(m_angRotation[2]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesZ),
+	SendPropVector (SENDINFO_ORIGIN(m_vecOrigin), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_Origin),
+	SendPropFloat	(SENDINFO_ANGELS(m_angRotation[0]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesX),
+	SendPropFloat	(SENDINFO_ANGELS(m_angRotation[1]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesY),
+	SendPropFloat	(SENDINFO_ANGELS(m_angRotation[2]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesZ),
 	SendPropEHandle (SENDINFO_NAME(m_hMoveParent, moveparent)),
 END_SEND_TABLE()
 

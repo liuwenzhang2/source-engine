@@ -1513,7 +1513,7 @@ void CBaseEntity::PhysicsCustom()
 		return;
 
 	// Moving upward, off the ground, or  resting on a client/monster, remove FL_ONGROUND
-	if ( m_vecVelocity[2] > 0 || !GetGroundEntity() || !GetGroundEntity()->IsStandable() )
+	if (GetEngineObject()->GetLocalVelocity()[2] > 0 || !GetGroundEntity() || !GetGroundEntity()->IsStandable() )
 	{
 		SetGroundEntity( NULL );
 	}
@@ -1685,8 +1685,9 @@ void CBaseEntity::PhysicsStep()
 	// The underlying values don't actually change, but we need the network sendproxy on origin/angles
 	//  to get triggered, and that only happens if NetworkStateChanged() appears to have occured.
 	// Getting them for modify marks them as changed automagically.
-	m_vecOrigin.GetForModify();
-	m_angRotation.GetForModify();
+	//m_vecOrigin.GetForModify();
+	//m_angRotation.GetForModify();
+	NetworkStateChanged();
 	
 	// HACK:  Make sure that the client latches the networked origin/orientation changes with the current server tick count
 	//  so that we don't get jittery interpolation.  All of this is necessary to mimic actual continuous simulation of the underlying

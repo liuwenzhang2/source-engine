@@ -106,16 +106,17 @@
       <AdditionalIncludeDirectories>..\..\..\game\client;..\..\..\game\client\hl2;..\..\..\game\client\game_controls;..\..\..\common;..\..\..\public;..\..\..\public\tier0;..\..\..\public\tier1;..\..\..\vgui2;..\..\..\game\shared;..\..\..\game\shared\hl2;..\..\..\thirdparty\SDL;..\..\..\public\matsys_controls;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WIN32;_WINDOWS;_DLL_EXT=.dll;COMPILER_MSVC;COMPILER_MSVC32;MSVC;_ALLOW_RUNTIME_LIBRARY_MISMATCH;_ALLOW_ITERATOR_DEBUG_LEVEL_MISMATCH;CLIENT_DLL;GAMECLIENTHL2_EXPORTS;HL2_CLIENT_DLL;VERSION_SAFE_STEAM_API_INTERFACES;_CRT_SECURE_NO_WARNINGS;NO_STRING_T;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
-      <DebugInformationFormat>None</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link />
     <Link>
       <AdditionalDependencies>tier0.lib;particles.lib;dmxloader.lib;tier1.lib;tier2.lib;tier3.lib;mathlib.lib;vstdlib.lib;choreoobjects.lib;steam_api.lib;bitmap.lib;vgui_controls.lib;matsys_controls.lib;vtf.lib;Rpcrt4.lib;SHELL32.lib;USER32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\..\lib\win32\x86;$(SolutionDir)$(Configuration)\</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalOptions> /FORCE %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>

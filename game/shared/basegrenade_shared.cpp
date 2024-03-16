@@ -80,7 +80,7 @@ BEGIN_NETWORK_TABLE( CBaseGrenade, DT_BaseGrenade )
 //	SendPropTime( SENDINFO( m_flDetonateTime ) ),
 	SendPropEHandle( SENDINFO( m_hThrower ) ),
 
-	SendPropVector( SENDINFO_INVALID( m_vecVelocity ), 0, SPROP_NOSCALE, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocity),
+	SendPropVector( SENDINFO_VELOCITY( m_vecVelocity ), 0, SPROP_NOSCALE, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocity),
 	// HACK: Use same flag bits as player for now
 	SendPropInt			( SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED, SendProxy_CropFlagsToPlayerFlagBitsLength ),
 #else

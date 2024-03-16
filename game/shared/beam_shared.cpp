@@ -179,7 +179,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_Beam )
 	SendPropBool	(SENDINFO(m_bDrawInPortalRender) ),
 #endif
 	SendPropModelIndex(SENDINFO(m_nModelIndex) ),
-	SendPropVector (SENDINFO_INVALID(m_vecOrigin), 19, SPROP_CHANGES_OFTEN,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_Origin),
+	SendPropVector (SENDINFO_ORIGIN(m_vecOrigin), 19, SPROP_CHANGES_OFTEN,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_Origin),
 	SendPropEHandle(SENDINFO_NAME(m_hMoveParent, moveparent) ),
 	SendPropInt		(SENDINFO(m_nMinDXLevel),	8,	SPROP_UNSIGNED ),
 //#if !defined( NO_ENTITY_PREDICTION )

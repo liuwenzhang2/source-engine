@@ -628,6 +628,9 @@ bool CL_ProcessPacketEntities ( SVC_PacketEntities *entmsg )
 		// Clear out the client's entity states..
 		for ( int i=0; i <= entitylist->GetHighestEntityIndex(); i++ )
 		{
+			if (i == 0) {
+				continue;
+			}
 			CL_DeleteDLLEntity( i, "ProcessPacketEntities", true );
 		}
 	}

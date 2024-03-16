@@ -2493,7 +2493,13 @@ void CBaseEntity::ApplyLocalVelocityImpulse( const Vector &inVecImpulse )
 		else
 		{
 			InvalidatePhysicsRecursive( VELOCITY_CHANGED );
-			m_vecVelocity += vecImpulse;
+#ifdef GAME_DLL
+			GetEngineObject()->SetLocalVelocity(GetEngineObject()->GetLocalVelocity() + vecImpulse);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+			SetLocalVelocity(GetLocalVelocity() + vecImpulse);
+#endif // CLIENT_DLL
+
 		}
 	}
 }

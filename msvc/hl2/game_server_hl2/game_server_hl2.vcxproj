@@ -111,6 +111,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions512</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <AdditionalDependencies>tier0.lib;particles.lib;dmxloader.lib;tier1.lib;tier2.lib;tier3.lib;mathlib.lib;vstdlib.lib;choreoobjects.lib;steam_api.lib;Rpcrt4.lib;USER32.lib;</AdditionalDependencies>

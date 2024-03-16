@@ -5163,12 +5163,12 @@ public:
 
 	const Vector &GetAbsOrigin( CBaseEntity *pent )
 	{
-		return pent->m_vecAbsOrigin;
+		return pent->GetEngineObject()->GetAbsOrigin();
 	}
 
 	const Vector &GetAbsVelocity( CBaseEntity *pent )
 	{
-		return pent->m_vecAbsVelocity;
+		return pent->GetEngineObject()->GetAbsVelocity();
 	}
 };
 
@@ -7976,9 +7976,9 @@ void SendProxy_LocalVelocityZ(const SendProp* pProp, const void* pStruct, const 
 		SendPropEHandle		( SENDINFO( m_hLastWeapon ) ),
 		SendPropEHandle		( SENDINFO( m_hGroundEntity ), SPROP_CHANGES_OFTEN ),
 
-		SendPropFloat		( SENDINFO_INVALID(m_vecVelocity[0]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityX),
-		SendPropFloat		( SENDINFO_INVALID(m_vecVelocity[1]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityY),
-		SendPropFloat		( SENDINFO_INVALID(m_vecVelocity[2]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityZ),
+		SendPropFloat		( SENDINFO_VELOCITY(m_vecVelocity[0]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityX),
+		SendPropFloat		( SENDINFO_VELOCITY(m_vecVelocity[1]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityY),
+		SendPropFloat		( SENDINFO_VELOCITY(m_vecVelocity[2]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityZ),
 
 #if PREDICTION_ERROR_CHECK_LEVEL > 1 
 		SendPropVector		( SENDINFO( m_vecBaseVelocity ), -1, SPROP_COORD ),

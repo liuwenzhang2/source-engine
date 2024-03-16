@@ -102,7 +102,7 @@ public:
 
 BEGIN_DATADESC( CRpgRocket )
 	DEFINE_FIELD( m_hOwner,			FIELD_EHANDLE ),
-	DEFINE_FIELD( m_vecAbsVelocity,	FIELD_VECTOR ),
+	DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsVelocity, engineObjectFuncs),
 	DEFINE_FIELD( m_flIgniteTime,	FIELD_TIME ),
 	//DEFINE_FIELD( m_iTrail,			FIELD_INTEGER ),
 

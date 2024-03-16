@@ -344,6 +344,55 @@ struct thinkfunc_t
 struct EmitSound_t;
 struct rotatingpushmove_t;
 
+class CEngineObject {
+public:
+	DECLARE_CLASS_NOBASE(CEngineObject);
+	//DECLARE_EMBEDDED_NETWORKVAR();
+
+	void Init(CBaseEntity* pOuter) {
+		m_pOuter = pOuter;
+	}
+
+	void					SetAbsVelocity(const Vector& vecVelocity);
+	Vector&					GetAbsVelocity();
+	const Vector&			GetAbsVelocity() const;
+	// NOTE: Setting the abs origin or angles will cause the local origin + angles to be set also
+	void					SetAbsOrigin(const Vector& origin);
+	Vector&					GetAbsOrigin(void);
+	const Vector&			GetAbsOrigin(void) const;
+
+	void					SetAbsAngles(const QAngle& angles);
+	QAngle&					GetAbsAngles(void);
+	const QAngle&			GetAbsAngles(void) const;
+
+	// Origin and angles in local space ( relative to parent )
+	// NOTE: Setting the local origin or angles will cause the abs origin + angles to be set also
+	void					SetLocalOrigin(const Vector& origin);
+	const Vector&			GetLocalOrigin(void) const;
+
+	void					SetLocalAngles(const QAngle& angles);
+	const QAngle&			GetLocalAngles(void) const;
+
+	void					SetLocalVelocity(const Vector& vecVelocity);
+	const Vector&			GetLocalVelocity() const;
+
+	void					CalcAbsolutePosition();
+	void					CalcAbsoluteVelocity();
+private:
+
+	friend class CBaseEntity;
+	Vector			m_vecOrigin;
+	QAngle			m_angRotation;
+	Vector			m_vecVelocity;
+	Vector			m_vecAbsOrigin;
+	QAngle			m_angAbsRotation;
+	// Global velocity
+	Vector			m_vecAbsVelocity;
+	CBaseEntity*	m_pOuter;
+};
+
+
+
 //#define CREATE_PREDICTED_ENTITY( className )	\
 //	CBaseEntity::CreatePredictedEntityByName( className, __FILE__, __LINE__ );
 
@@ -433,8 +482,7 @@ public:
 	const CServerNetworkProperty *NetworkProp() const;
 
 	bool					IsCurrentlyTouching( void ) const;
-	const Vector&			GetAbsOrigin( void ) const;
-	const QAngle&			GetAbsAngles( void ) const;
+	
 
 	SolidType_t				GetSolid() const;
 	int			 			GetSolidFlags( void ) const;
@@ -740,9 +788,9 @@ public:
 	// Networking related methods
 	void	NetworkStateChanged();
 	void	NetworkStateChanged( void *pVar );
-
+	void	NetworkStateChanged(unsigned short varOffset);
+	
 public:
- 	void CalcAbsolutePosition();
 
 	// returns the edict index the entity requires when used in save/restore (eg players, world)
 	// -1 means it doesn't require any special index
@@ -1243,16 +1291,21 @@ public:
 	virtual const Vector &GetViewOffset() const;
 	virtual void SetViewOffset( const Vector &v );
 
+	friend class CEngineObject;
+
+	CEngineObject* GetEngineObject() {
+		return &m_EngineObject;
+	}
+	const CEngineObject* GetEngineObject() const{
+		return &m_EngineObject;
+	}
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel
-	void			SetLocalVelocity( const Vector &vecVelocity );
 	void			ApplyLocalVelocityImpulse( const Vector &vecImpulse );
-	void			SetAbsVelocity( const Vector &vecVelocity );
 	void			ApplyAbsVelocityImpulse( const Vector &vecImpulse );
 	void			ApplyLocalAngularVelocityImpulse( const AngularImpulse &angImpulse );
 
-	const Vector&	GetLocalVelocity( ) const;
-	const Vector&	GetAbsVelocity( ) const;
+	
 
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel
@@ -1339,17 +1392,7 @@ public:
 	float					BoundingRadius() const;
 	bool					IsPointSized() const;
 
-	// NOTE: Setting the abs origin or angles will cause the local origin + angles to be set also
-	void					SetAbsOrigin( const Vector& origin );
-	void					SetAbsAngles( const QAngle& angles );
-
-	// Origin and angles in local space ( relative to parent )
-	// NOTE: Setting the local origin or angles will cause the abs origin + angles to be set also
-	void					SetLocalOrigin( const Vector& origin );
-	const Vector&			GetLocalOrigin( void ) const;
-
-	void					SetLocalAngles( const QAngle& angles );
-	const QAngle&			GetLocalAngles( void ) const;
+	
 
 	void					SetElasticity( float flElasticity );
 	float					GetElasticity( void ) const;
@@ -1568,7 +1611,6 @@ private:
 	void					PhysicsAddHalfGravity( float timestep );
 	void					PhysicsAddGravityMove( Vector &move );
 
-	void					CalcAbsoluteVelocity();
 	void					CalcAbsoluteAngularVelocity();
 
 	// Checks a sweep without actually performing the move
@@ -1671,6 +1713,8 @@ private:
 	// generated from m_pMoveParent
 	EHANDLE m_hMovePeer;	
 
+	CEngineObject m_EngineObject;
+
 	friend class CCollisionProperty;
 	friend class CServerNetworkProperty;
 	CNetworkVarEmbedded( CCollisionProperty, m_Collision );
@@ -1703,8 +1747,7 @@ private:
 	// Velocity of the thing we're standing on (world space)
 	CNetworkVarForDerived( Vector, m_vecBaseVelocity );
 
-	// Global velocity
-	Vector			m_vecAbsVelocity;
+	
 
 	// Local angular velocity
 	QAngle			m_vecAngVelocity;
@@ -1734,8 +1777,6 @@ private:
 	// A counter to help quickly build a list of potentially pushed objects for physics
 	int				m_nPushEnumCount;
 
-	Vector			m_vecAbsOrigin;
-	CNetworkVectorForDerived( m_vecVelocity );
 	
 	//Adrian
 	CNetworkVar( unsigned char, m_iTextureFrameIndex );
@@ -1750,10 +1791,8 @@ private:
 	COutputEvent m_OnUser3;
 	COutputEvent m_OnUser4;
 
-	QAngle			m_angAbsRotation;
 
-	CNetworkVector( m_vecOrigin );
-	CNetworkQAngle( m_angRotation );
+	
 	//CBaseHandle m_RefEHandle;
 
 	// was pev->view_ofs ( FIXME:  Move somewhere up the hierarch, CBaseAnimating, etc. )
@@ -1850,6 +1889,55 @@ public:
 	{
 		return s_bAbsQueriesValid;
 	}
+
+
+public:
+	void					SetAbsVelocity(const Vector& vecVelocity) {
+		GetEngineObject()->SetAbsVelocity(vecVelocity);
+	}
+	const Vector& GetAbsVelocity() const {
+		return GetEngineObject()->GetAbsVelocity();
+	}
+	// NOTE: Setting the abs origin or angles will cause the local origin + angles to be set also
+	void					SetAbsOrigin(const Vector& origin) {
+		GetEngineObject()->SetAbsOrigin(origin);
+	}
+	const Vector& GetAbsOrigin(void) const {
+		return GetEngineObject()->GetAbsOrigin();
+	}
+
+	void					SetAbsAngles(const QAngle& angles) {
+		GetEngineObject()->SetAbsAngles(angles);
+	}
+	const QAngle& GetAbsAngles(void) const {
+		return GetEngineObject()->GetAbsAngles();
+	}
+
+	// Origin and angles in local space ( relative to parent )
+	// NOTE: Setting the local origin or angles will cause the abs origin + angles to be set also
+	void					SetLocalOrigin(const Vector& origin) {
+		GetEngineObject()->SetLocalOrigin(origin);
+	}
+	const Vector& GetLocalOrigin(void) const {
+		return GetEngineObject()->GetLocalOrigin();
+	}
+
+	void					SetLocalAngles(const QAngle& angles) {
+		GetEngineObject()->SetLocalAngles(angles);
+	}
+	const QAngle& GetLocalAngles(void) const {
+		return GetEngineObject()->GetLocalAngles();
+	}
+
+	void					SetLocalVelocity(const Vector& vecVelocity) {
+		GetEngineObject()->SetLocalVelocity(vecVelocity);
+	}
+	const Vector& GetLocalVelocity() const {
+		return GetEngineObject()->GetLocalVelocity();
+	}
+
+	void					CalcAbsolutePosition();
+	void					CalcAbsoluteVelocity();
 };
 
 // Send tables exposed in this module.
@@ -2125,40 +2213,7 @@ inline CBaseCombatCharacter *ToBaseCombatCharacter( CBaseEntity *pEntity )
 }
 
 
-//-----------------------------------------------------------------------------
-// Physics state accessor methods
-//-----------------------------------------------------------------------------
-inline const Vector& CBaseEntity::GetLocalOrigin( void ) const
-{
-	return m_vecOrigin.Get();
-}
 
-inline const QAngle& CBaseEntity::GetLocalAngles( void ) const
-{
-	return m_angRotation.Get();
-}
-
-inline const Vector& CBaseEntity::GetAbsOrigin( void ) const
-{
-	Assert( CBaseEntity::IsAbsQueriesValid() );
-
-	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
-	{
-		const_cast<CBaseEntity*>(this)->CalcAbsolutePosition();
-	}
-	return m_vecAbsOrigin;
-}
-
-inline const QAngle& CBaseEntity::GetAbsAngles( void ) const
-{
-	Assert( CBaseEntity::IsAbsQueriesValid() );
-
-	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
-	{
-		const_cast<CBaseEntity*>(this)->CalcAbsolutePosition();
-	}
-	return m_angAbsRotation;
-}
 
 
 
@@ -2171,7 +2226,7 @@ inline matrix3x4_t &CBaseEntity::EntityToWorldTransform()
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
-		CalcAbsolutePosition();
+		GetEngineObject()->CalcAbsolutePosition();
 	}
 	return m_rgflCoordinateFrame; 
 }
@@ -2182,7 +2237,7 @@ inline const matrix3x4_t &CBaseEntity::EntityToWorldTransform() const
 
 	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
-		const_cast<CBaseEntity*>(this)->CalcAbsolutePosition();
+		const_cast<CBaseEntity*>(this)->GetEngineObject()->CalcAbsolutePosition();
 	}
 	return m_rgflCoordinateFrame; 
 }
@@ -2193,9 +2248,9 @@ inline const matrix3x4_t &CBaseEntity::EntityToWorldTransform() const
 //-----------------------------------------------------------------------------
 inline void CBaseEntity::EntityToWorldSpace( const Vector &in, Vector *pOut ) const
 {
-	if ( GetAbsAngles() == vec3_angle )
+	if (const_cast<CBaseEntity*>(this)->GetEngineObject()->GetAbsAngles() == vec3_angle )
 	{
-		VectorAdd( in, GetAbsOrigin(), *pOut );
+		VectorAdd( in, const_cast<CBaseEntity*>(this)->GetEngineObject()->GetAbsOrigin(), *pOut );
 	}
 	else
 	{
@@ -2205,9 +2260,9 @@ inline void CBaseEntity::EntityToWorldSpace( const Vector &in, Vector *pOut ) co
 
 inline void CBaseEntity::WorldToEntitySpace( const Vector &in, Vector *pOut ) const
 {
-	if ( GetAbsAngles() == vec3_angle )
+	if (const_cast<CBaseEntity*>(this)->GetEngineObject()->GetAbsAngles() == vec3_angle )
 	{
-		VectorSubtract( in, GetAbsOrigin(), *pOut );
+		VectorSubtract( in, const_cast<CBaseEntity*>(this)->GetEngineObject()->GetAbsOrigin(), *pOut );
 	}
 	else
 	{
@@ -2226,21 +2281,7 @@ inline Vector CBaseEntity::GetSmoothedVelocity( void )
 	return vel;
 }
 
-inline const Vector &CBaseEntity::GetLocalVelocity( ) const
-{
-	return m_vecVelocity.Get();
-}
 
-inline const Vector &CBaseEntity::GetAbsVelocity( ) const
-{
-	Assert( CBaseEntity::IsAbsQueriesValid() );
-
-	if (IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
-	{
-		const_cast<CBaseEntity*>(this)->CalcAbsoluteVelocity();
-	}
-	return m_vecAbsVelocity;
-}
 
 inline const QAngle &CBaseEntity::GetLocalAngularVelocity( ) const
 {
@@ -2589,6 +2630,17 @@ inline void	CBaseEntity::NetworkStateChanged( void *pVar )
 	// Good, they passed an offset so we can track this variable's change
 	// and avoid sending the whole entity.
 	NetworkProp()->NetworkStateChanged( (char*)pVar - (char*)this );
+}
+
+inline void	CBaseEntity::NetworkStateChanged(unsigned short varOffset)
+{
+	// Make sure it's a semi-reasonable pointer.
+	//Assert((char*)pVar > (char*)this);
+	//Assert((char*)pVar - (char*)this < 32768);
+
+	// Good, they passed an offset so we can track this variable's change
+	// and avoid sending the whole entity.
+	NetworkProp()->NetworkStateChanged(varOffset);
 }
 
 

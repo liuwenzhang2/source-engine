@@ -226,7 +226,7 @@ public:
 LINK_ENTITY_TO_CLASS( cs_ragdoll, CCSRagdoll );
 
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CCSRagdoll, DT_CSRagdoll )
-	SendPropVector	(SENDINFO_INVALID(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+	SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 	SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
 	SendPropEHandle( SENDINFO( m_hPlayer ) ),
 	SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
@@ -310,7 +310,7 @@ BEGIN_SEND_TABLE_NOBASE( CCSPlayer, DT_CSLocalPlayerExclusive )
 	SendPropFloat( SENDINFO( m_flVelocityModifier ), 8, 0, 0, 1  ),
 
 	// send a hi-res origin to the local player for use in prediction
-	SendPropVector	(SENDINFO_INVALID(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+	SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 
 	//=============================================================================
 	// HPE_BEGIN:
@@ -329,7 +329,7 @@ END_SEND_TABLE()
 
 BEGIN_SEND_TABLE_NOBASE( CCSPlayer, DT_CSNonLocalPlayerExclusive )
 	// send a lo-res origin to other players
-	SendPropVector	(SENDINFO_INVALID(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+	SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 END_SEND_TABLE()
 
 

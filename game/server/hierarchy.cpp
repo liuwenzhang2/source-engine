@@ -82,9 +82,9 @@ void TransferChildren( CBaseEntity *pOldParent, CBaseEntity *pNewParent )
 		LinkChild( pNewParent, pChild );
 
 		// FIXME: This is a hack to guarantee update of the local origin, angles, etc.
-		pChild->m_vecAbsOrigin.Init( FLT_MAX, FLT_MAX, FLT_MAX );
-		pChild->m_angAbsRotation.Init( FLT_MAX, FLT_MAX, FLT_MAX );
-		pChild->m_vecAbsVelocity.Init( FLT_MAX, FLT_MAX, FLT_MAX );
+		pChild->GetEngineObject()->GetAbsOrigin().Init(FLT_MAX, FLT_MAX, FLT_MAX);
+		pChild->GetEngineObject()->GetAbsAngles().Init(FLT_MAX, FLT_MAX, FLT_MAX);
+		pChild->GetEngineObject()->GetAbsVelocity().Init(FLT_MAX, FLT_MAX, FLT_MAX);
 
 		pChild->SetAbsOrigin(vecAbsOrigin);
 		pChild->SetAbsAngles(angAbsRotation);

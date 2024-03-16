@@ -194,7 +194,7 @@ void SendProxy_Origin( const SendProp *pProp, const void *pStruct, const void *p
 
 	if ( !entity->UseStepSimulationNetworkOrigin( &v ) )
 	{
-		v = &entity->GetLocalOrigin();
+		v = &entity->GetEngineObject()->GetLocalOrigin();
 	}
 
 	pOut->m_Vector[ 0 ] = v->x;
@@ -214,7 +214,7 @@ void SendProxy_OriginXY( const SendProp *pProp, const void *pStruct, const void 
 
 	if ( !entity->UseStepSimulationNetworkOrigin( &v ) )
 	{
-		v = &entity->GetLocalOrigin();
+		v = &entity->GetEngineObject()->GetLocalOrigin();
 	}
 
 	pOut->m_Vector[ 0 ] = v->x;
@@ -233,7 +233,7 @@ void SendProxy_OriginZ( const SendProp *pProp, const void *pStruct, const void *
 
 	if ( !entity->UseStepSimulationNetworkOrigin( &v ) )
 	{
-		v = &entity->GetLocalOrigin();
+		v = &entity->GetEngineObject()->GetLocalOrigin();
 	}
 
 	pOut->m_Float = v->z;
@@ -249,7 +249,7 @@ void SendProxy_Angles( const SendProp *pProp, const void *pStruct, const void *p
 
 	if ( !entity->UseStepSimulationNetworkAngles( &a ) )
 	{
-		a = &entity->GetLocalAngles();
+		a = &entity->GetEngineObject()->GetLocalAngles();
 	}
 
 	pOut->m_Vector[ 0 ] = anglemod( a->x );
@@ -263,9 +263,9 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt			(SENDINFO(m_flSimulationTime),	SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_SimulationTime),
 
 #if PREDICTION_ERROR_CHECK_LEVEL > 1 
-	SendPropVector	(SENDINFO_INVALID(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+	SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 #else
-	SendPropVector	(SENDINFO_INVALID(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+	SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 #endif
 
 	SendPropInt		(SENDINFO( m_ubInterpolationFrame ), NOINTERP_PARITY_MAX_BITS, SPROP_UNSIGNED ),
@@ -287,9 +287,9 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt		(SENDINFO_NAME( m_MoveType, movetype ), MOVETYPE_MAX_BITS, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO_NAME( m_MoveCollide, movecollide ), MOVECOLLIDE_MAX_BITS, SPROP_UNSIGNED ),
 #if PREDICTION_ERROR_CHECK_LEVEL > 1 
-	SendPropVector	(SENDINFO_INVALID(m_angRotation), -1, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0, HIGH_DEFAULT, SendProxy_Angles ),
+	SendPropVector	(SENDINFO_ANGELS(m_angRotation), -1, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0, HIGH_DEFAULT, SendProxy_Angles ),
 #else
-	SendPropQAngles	(SENDINFO_INVALID(m_angRotation), 13, SPROP_CHANGES_OFTEN, SendProxy_Angles ),
+	SendPropQAngles	(SENDINFO_ANGELS(m_angRotation), 13, SPROP_CHANGES_OFTEN, SendProxy_Angles ),
 #endif
 
 	SendPropInt		( SENDINFO( m_iTextureFrameIndex ),		8, SPROP_UNSIGNED ),
@@ -361,6 +361,7 @@ CBaseEntity::CBaseEntity()
 	m_bAlternateSorting = false;
 	m_CollisionGroup = COLLISION_GROUP_NONE;
 	m_iParentAttachment = 0;
+	GetEngineObject()->Init(this);
 	CollisionProp()->Init( this );
 	NetworkProp()->Init( this );
 
@@ -793,7 +794,7 @@ void CBaseEntity::SendDebugPivotOverlay( void )
 {
 	if ( entindex()!=-1 )
 	{
-		NDebugOverlay::Axis( GetAbsOrigin(), GetAbsAngles(), 20, true, 0 );
+		NDebugOverlay::Axis(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), 20, true, 0 );
 	}
 }
 
@@ -941,11 +942,11 @@ void CBaseEntity::DrawDebugGeometryOverlays(void)
 				Vector pos;
 				QAngle angles;
 				VPhysicsGetObject()->GetPosition( &pos, &angles );
-				float dist = (pos - GetAbsOrigin()).Length();
+				float dist = (pos - GetEngineObject()->GetAbsOrigin()).Length();
 
 				Vector axis;
 				float deltaAngle;
-				RotationDeltaAxisAngle( angles, GetAbsAngles(), axis, deltaAngle );
+				RotationDeltaAxisAngle( angles, GetEngineObject()->GetAbsAngles(), axis, deltaAngle );
 				if ( dist > 2 || fabsf(deltaAngle) > 2 )
 				{
 					Vector mins, maxs;
@@ -1036,7 +1037,7 @@ int CBaseEntity::DrawDebugTextOverlays(void)
 			offset++;
 		}
 
-		Vector vecOrigin = GetAbsOrigin();
+		Vector vecOrigin = GetEngineObject()->GetAbsOrigin();
 		Q_snprintf( tempstr, sizeof(tempstr), "Position: %0.1f, %0.1f, %0.1f\n", vecOrigin.x, vecOrigin.y, vecOrigin.z );
 		EntityText( offset, tempstr, 0 );
 		offset++;
@@ -1207,7 +1208,7 @@ void CBaseEntity::SetParent( CBaseEntity *pParentEntity, int iAttachment )
 		EntityMatrix matrix, childMatrix;
 		matrix.InitFromEntity( const_cast<CBaseEntity *>(pParentEntity), m_iParentAttachment ); // parent->world
 		childMatrix.InitFromEntityLocal( this ); // child->world
-		Vector localOrigin = matrix.WorldToLocal( GetLocalOrigin() );
+		Vector localOrigin = matrix.WorldToLocal(GetEngineObject()->GetLocalOrigin() );
 		
 		// I have the axes of local space in world space. (childMatrix)
 		// I want to compute those world space axes in the parent's local space
@@ -1217,7 +1218,7 @@ void CBaseEntity::SetParent( CBaseEntity *pParentEntity, int iAttachment )
 		tmp.MatrixMul( childMatrix, matrix ); // child->parent
 		QAngle angles;
 		MatrixToAngles( matrix, angles );
-		SetLocalAngles( angles );
+		GetEngineObject()->SetLocalAngles( angles );
 		UTIL_SetOrigin( this, localOrigin );
 
 		// Move our step data into the correct space
@@ -1865,7 +1866,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_GLOBAL_KEYFIELD( m_ModelName, FIELD_MODELNAME, "model" ),
 	
 	DEFINE_KEYFIELD( m_vecBaseVelocity, FIELD_VECTOR, "basevelocity" ),
-	DEFINE_CUSTOM_FIELD( m_vecAbsVelocity, engineObjectFuncs),
+	DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsVelocity, engineObjectFuncs),
 	DEFINE_KEYFIELD( m_vecAngVelocity, FIELD_VECTOR, "avelocity" ),
 //	DEFINE_FIELD( m_vecAbsAngVelocity, FIELD_VECTOR ),
 	DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
@@ -1885,17 +1886,17 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 //	DEFINE_FIELD( m_nPushEnumCount, FIELD_INTEGER ),
 
-	DEFINE_CUSTOM_FIELD( m_vecAbsOrigin, engineObjectFuncs),
-	DEFINE_CUSTOM_KEYFIELD( m_vecVelocity, engineObjectFuncs, "velocity" ),
+	DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsOrigin, engineObjectFuncs),
+	DEFINE_CUSTOM_KEYFIELD_INVALID( m_vecVelocity, engineObjectFuncs, "velocity" ),
 	DEFINE_KEYFIELD( m_iTextureFrameIndex, FIELD_CHARACTER, "texframeindex" ),
 	DEFINE_FIELD( m_bSimulatedEveryTick, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bAnimatedEveryTick, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bAlternateSorting, FIELD_BOOLEAN ),
 	DEFINE_KEYFIELD( m_spawnflags, FIELD_INTEGER, "spawnflags" ),
 	DEFINE_FIELD( m_nTransmitStateOwnedCounter, FIELD_CHARACTER ),
-	DEFINE_CUSTOM_FIELD( m_angAbsRotation, engineObjectFuncs),
-	DEFINE_CUSTOM_FIELD( m_vecOrigin, engineObjectFuncs),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
-	DEFINE_CUSTOM_FIELD( m_angRotation, engineObjectFuncs),
+	DEFINE_CUSTOM_FIELD_INVALID( m_angAbsRotation, engineObjectFuncs),
+	DEFINE_CUSTOM_FIELD_INVALID( m_vecOrigin, engineObjectFuncs),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
+	DEFINE_CUSTOM_FIELD_INVALID( m_angRotation, engineObjectFuncs),
 
 	DEFINE_KEYFIELD( m_vecViewOffset, FIELD_VECTOR, "view_ofs" ),
 
@@ -2263,8 +2264,8 @@ static void ComputePushStartMatrix( matrix3x4_t &start, CBaseEntity *pEntity, co
 	}
 	else
 	{
-		localOrigin = params.pRootParent->GetAbsOrigin() - params.pRootParent->GetAbsVelocity() * params.movetime;
-		localAngles = params.pRootParent->GetAbsAngles() - params.pRootParent->GetLocalAngularVelocity() * params.movetime;
+		localOrigin = params.pRootParent->GetEngineObject()->GetAbsOrigin() - params.pRootParent->GetEngineObject()->GetAbsVelocity() * params.movetime;
+		localAngles = params.pRootParent->GetEngineObject()->GetAbsAngles() - params.pRootParent->GetLocalAngularVelocity() * params.movetime;
 	}
 	matrix3x4_t xform, delta;
 	AngleMatrix( localAngles, localOrigin, xform );
@@ -2305,7 +2306,7 @@ static void CheckPushedEntity( CBaseEntity *pEntity, pushblock_t &params )
 	{
 		if ( pEntity->GetLocalAngularVelocity() == vec3_angle )
 			checkrot = false;
-		if ( pEntity->GetLocalVelocity() == vec3_origin)
+		if ( pEntity->GetEngineObject()->GetLocalVelocity() == vec3_origin)
 			checkmove = false;
 	}
 	else
@@ -2321,13 +2322,13 @@ static void CheckPushedEntity( CBaseEntity *pEntity, pushblock_t &params )
 	if ( checkmove )
 	{
 		// project error onto the axis of movement
-		Vector dir = pEntity->GetAbsVelocity();
+		Vector dir = pEntity->GetEngineObject()->GetAbsVelocity();
 		float speed = VectorNormalize(dir);
 		Vector targetPos;
 		pPhysics->GetShadowController()->GetTargetPosition( &targetPos, NULL );
 		float targetAmount = DotProduct(targetPos, dir);
 		float currentAmount = DotProduct(origin, dir);
-		float entityAmount = DotProduct(pEntity->GetAbsOrigin(), dir);
+		float entityAmount = DotProduct(pEntity->GetEngineObject()->GetAbsOrigin(), dir);
 
 		// if target and entity origin are not in sync, then the position of the entity was updated
 		// by something outside of push physics
@@ -2352,9 +2353,9 @@ static void CheckPushedEntity( CBaseEntity *pEntity, pushblock_t &params )
 				{
 					if ( params.pList )
 					{
-						Vector localVel = pEntity->GetLocalVelocity();
+						Vector localVel = pEntity->GetEngineObject()->GetLocalVelocity();
 						VectorNormalize(localVel);
-						float localTargetAmt = DotProduct(pEntity->GetLocalOrigin(), localVel);
+						float localTargetAmt = DotProduct(pEntity->GetEngineObject()->GetLocalOrigin(), localVel);
 						movementAmount = targetAmount + DotProduct(params.pList->localOrigin, localVel) - localTargetAmt;
 					}
 				}
@@ -2385,7 +2386,7 @@ static void CheckPushedEntity( CBaseEntity *pEntity, pushblock_t &params )
 	{
 		Vector axis;
 		float deltaAngle;
-		RotationDeltaAxisAngle( angles, pEntity->GetAbsAngles(), axis, deltaAngle );
+		RotationDeltaAxisAngle( angles, pEntity->GetEngineObject()->GetAbsAngles(), axis, deltaAngle );
 		if ( fabsf(deltaAngle) > 0.5f )
 		{
 			Vector targetAxis;
@@ -2421,7 +2422,7 @@ static void CheckPushedEntity( CBaseEntity *pEntity, pushblock_t &params )
 					Vector startPos;
 					QAngle startAngles;
 					MatrixAngles( start, startAngles, startPos );
-					RotationDeltaAxisAngle( startAngles, pEntity->GetAbsAngles(), startAxis, startAngle );
+					RotationDeltaAxisAngle( startAngles, pEntity->GetEngineObject()->GetAbsAngles(), startAxis, startAngle );
 					expectedDist = startAngle * DotProduct( startAxis, axis );
 				}
 
@@ -2474,7 +2475,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 			Assert(pList);
 		}
 		bool checkrot = (GetLocalAngularVelocity() != vec3_angle) ? true : false;
-		bool checkmove = (GetLocalVelocity() != vec3_origin) ? true : false;
+		bool checkmove = (GetEngineObject()->GetLocalVelocity() != vec3_origin) ? true : false;
 
 		pushblock_t params;
 		params.pRootParent = this;
@@ -2509,8 +2510,8 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 					// UNDONE: Need to traverse hierarchy here?  Shouldn't.
 					if ( pList )
 					{
-						SetLocalOrigin( pList->localOrigin );
-						SetLocalAngles( pList->localAngles );
+						GetEngineObject()->SetLocalOrigin( pList->localOrigin );
+						GetEngineObject()->SetLocalAngles( pList->localAngles );
 						physLocalTime = pList->localMoveTime;
 						for ( int i = 0; i < pList->pushedCount; i++ )
 						{
@@ -2518,7 +2519,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 							if ( !pEntity )
 								continue;
 
-							pEntity->SetAbsOrigin( pEntity->GetAbsOrigin() - pList->pushVec[i] );
+							pEntity->GetEngineObject()->SetAbsOrigin( pEntity->GetEngineObject()->GetAbsOrigin() - pList->pushVec[i] );
 						}
 						CBaseEntity *pPhysicsBlocker = FindPhysicsBlocker( VPhysicsGetObject(), *pList, pList->pushVec[0] );
 						if ( pPhysicsBlocker )
@@ -2528,12 +2529,12 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 					}
 					else
 					{
-						Vector origin = GetLocalOrigin();
-						QAngle angles = GetLocalAngles();
+						Vector origin = GetEngineObject()->GetLocalOrigin();
+						QAngle angles = GetEngineObject()->GetLocalAngles();
 
 						if ( checkmove )
 						{
-							origin -= GetLocalVelocity() * moveback;
+							origin -= GetEngineObject()->GetLocalVelocity() * moveback;
 						}
 						if ( checkrot )
 						{
@@ -2541,8 +2542,8 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 							angles -= GetLocalAngularVelocity() * moveback;
 						}
 
-						SetLocalOrigin( origin );
-						SetLocalAngles( angles );
+						GetEngineObject()->SetLocalOrigin( origin );
+						GetEngineObject()->SetLocalAngles( angles );
 					}
 
 					if ( pBlocked )
@@ -2734,7 +2735,7 @@ void CBaseEntity::UpdatePhysicsShadowToCurrentPosition( float deltaTime )
 		IPhysicsObject *pPhys = VPhysicsGetObject();
 		if ( pPhys )
 		{
-			pPhys->UpdateShadow( GetAbsOrigin(), GetAbsAngles(), false, deltaTime );
+			pPhys->UpdateShadow(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), false, deltaTime );
 		}
 	}
 }
@@ -3078,19 +3079,19 @@ bool CBaseEntity::IsInWorld( void ) const
 		return true;
 
 	// position 
-	if (GetAbsOrigin().x >= MAX_COORD_INTEGER) return false;
-	if (GetAbsOrigin().y >= MAX_COORD_INTEGER) return false;
-	if (GetAbsOrigin().z >= MAX_COORD_INTEGER) return false;
-	if (GetAbsOrigin().x <= MIN_COORD_INTEGER) return false;
-	if (GetAbsOrigin().y <= MIN_COORD_INTEGER) return false;
-	if (GetAbsOrigin().z <= MIN_COORD_INTEGER) return false;
+	if (GetEngineObject()->GetAbsOrigin().x >= MAX_COORD_INTEGER) return false;
+	if (GetEngineObject()->GetAbsOrigin().y >= MAX_COORD_INTEGER) return false;
+	if (GetEngineObject()->GetAbsOrigin().z >= MAX_COORD_INTEGER) return false;
+	if (GetEngineObject()->GetAbsOrigin().x <= MIN_COORD_INTEGER) return false;
+	if (GetEngineObject()->GetAbsOrigin().y <= MIN_COORD_INTEGER) return false;
+	if (GetEngineObject()->GetAbsOrigin().z <= MIN_COORD_INTEGER) return false;
 	// speed
-	if (GetAbsVelocity().x >= 2000) return false;
-	if (GetAbsVelocity().y >= 2000) return false;
-	if (GetAbsVelocity().z >= 2000) return false;
-	if (GetAbsVelocity().x <= -2000) return false;
-	if (GetAbsVelocity().y <= -2000) return false;
-	if (GetAbsVelocity().z <= -2000) return false;
+	if (GetEngineObject()->GetAbsVelocity().x >= 2000) return false;
+	if (GetEngineObject()->GetAbsVelocity().y >= 2000) return false;
+	if (GetEngineObject()->GetAbsVelocity().z >= 2000) return false;
+	if (GetEngineObject()->GetAbsVelocity().x <= -2000) return false;
+	if (GetEngineObject()->GetAbsVelocity().y <= -2000) return false;
+	if (GetEngineObject()->GetAbsVelocity().z <= -2000) return false;
 
 	return true;
 }
@@ -3153,8 +3154,8 @@ CBaseEntity * CBaseEntity::CreateNoSpawn( const char *szName, const Vector &vecO
 		return NULL;
 	}
 
-	pEntity->SetLocalOrigin( vecOrigin );
-	pEntity->SetLocalAngles( vecAngles );
+	pEntity->GetEngineObject()->SetLocalOrigin( vecOrigin );
+	pEntity->GetEngineObject()->SetLocalAngles( vecAngles );
 	pEntity->SetOwnerEntity( pOwner );
 
 	gEntList.NotifyCreateEntity( pEntity );
@@ -3221,9 +3222,9 @@ int CBaseEntity::Restore( IRestore &restore )
 		
 		// NOTE: Do *not* use GetAbsOrigin() here because it will
 		// try to recompute m_rgflCoordinateFrame!
-		MatrixSetColumn( m_vecAbsOrigin, 3, m_rgflCoordinateFrame );
+		MatrixSetColumn(GetEngineObject()->m_vecAbsOrigin, 3, m_rgflCoordinateFrame );
 
-		m_vecOrigin += parentSpaceOffset;
+		GetEngineObject()->m_vecOrigin += parentSpaceOffset;
 	}
 
 	// Gotta do this after the coordframe is set up as it depends on it.
@@ -3259,8 +3260,8 @@ void CBaseEntity::OnSave( IEntitySaveUtils *pUtils )
 {
 	// Here, we must force recomputation of all abs data so it gets saved correctly
 	// We can't leave the dirty bits set because the loader can't cope with it.
-	CalcAbsolutePosition();
-	CalcAbsoluteVelocity();
+	GetEngineObject()->CalcAbsolutePosition();
+	GetEngineObject()->CalcAbsoluteVelocity();
 }
 
 //-----------------------------------------------------------------------------
@@ -3911,12 +3912,12 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 	{
 		if ( pCaller != NULL )
 		{
-			NDebugOverlay::Line( pCaller->GetAbsOrigin(), GetAbsOrigin(), 255, 255, 255, false, 3 );
-			NDebugOverlay::Box( pCaller->GetAbsOrigin(), Vector(-4, -4, -4), Vector(4, 4, 4), 255, 0, 0, 0, 3 );
+			NDebugOverlay::Line( pCaller->GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), 255, 255, 255, false, 3 );
+			NDebugOverlay::Box( pCaller->GetEngineObject()->GetAbsOrigin(), Vector(-4, -4, -4), Vector(4, 4, 4), 255, 0, 0, 0, 3 );
 		}
 
-		NDebugOverlay::Text( GetAbsOrigin(), szInputName, false, 3 );	
-		NDebugOverlay::Box( GetAbsOrigin(), Vector(-4, -4, -4), Vector(4, 4, 4), 0, 255, 0, 0, 3 );
+		NDebugOverlay::Text(GetEngineObject()->GetAbsOrigin(), szInputName, false, 3 );
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), Vector(-4, -4, -4), Vector(4, 4, 4), 0, 255, 0, 0, 3 );
 	}
 
 	// loop through the data description list, restoring each data desc block
@@ -4138,8 +4139,8 @@ void CBaseEntity::InputDispatchEffect( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CBaseEntity::GetInputDispatchEffectPosition( const char *sInputString, Vector &pOrigin, QAngle &pAngles )
 {
-	pOrigin = GetAbsOrigin();
-	pAngles = GetAbsAngles();
+	pOrigin = GetEngineObject()->GetAbsOrigin();
+	pAngles = GetEngineObject()->GetAbsAngles();
 }
 
 //-----------------------------------------------------------------------------
@@ -4228,8 +4229,8 @@ void CBaseEntity::SetParentAttachment( const char *szInputName, const char *szAt
 
 	if ( !bMaintainOffset )
 	{
-		SetLocalOrigin( vec3_origin );
-		SetLocalAngles( vec3_angle );
+		GetEngineObject()->SetLocalOrigin( vec3_origin );
+		GetEngineObject()->SetLocalAngles( vec3_angle );
 	}
 }
 
@@ -4274,7 +4275,7 @@ void CBaseEntity::GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity)
 	{
 		if (vVelocity != NULL)
 		{
-			*vVelocity = GetAbsVelocity();
+			*vVelocity = GetEngineObject()->GetAbsVelocity();
 		}
 		if (vAngVelocity != NULL)
 		{
@@ -4460,7 +4461,7 @@ static void TeleportEntity( CBaseEntity *pSourceEntity, TeleportListEntry_t &ent
 	{
 		if ( newAngles )
 		{
-			pTeleport->SetLocalAngles( *newAngles );
+			pTeleport->GetEngineObject()->SetLocalAngles( *newAngles );
 			if ( pTeleport->IsPlayer() )
 			{
 				CBasePlayer *pPlayer = (CBasePlayer *)pTeleport;
@@ -4470,7 +4471,7 @@ static void TeleportEntity( CBaseEntity *pSourceEntity, TeleportListEntry_t &ent
 
 		if ( newVelocity )
 		{
-			pTeleport->SetAbsVelocity( *newVelocity );
+			pTeleport->GetEngineObject()->SetAbsVelocity( *newVelocity );
 			pTeleport->SetBaseVelocity( vec3_origin );
 		}
 
@@ -4483,7 +4484,7 @@ static void TeleportEntity( CBaseEntity *pSourceEntity, TeleportListEntry_t &ent
 	else
 	{
 		// My parent is teleporting, just update my position & physics
-		pTeleport->CalcAbsolutePosition();
+		pTeleport->GetEngineObject()->CalcAbsolutePosition();
 	}
 	IPhysicsObject *pPhys = pTeleport->VPhysicsGetObject();
 	bool rotatePhysics = false;
@@ -4495,7 +4496,7 @@ static void TeleportEntity( CBaseEntity *pSourceEntity, TeleportListEntry_t &ent
 		{
 			pPhys->SetVelocity( newVelocity, NULL );
 		}
-		const QAngle *rotAngles = &pTeleport->GetAbsAngles();
+		const QAngle *rotAngles = &pTeleport->GetEngineObject()->GetAbsAngles();
 		// don't rotate physics on players or bbox entities
 		if (pTeleport->IsPlayer() || pTeleport->GetSolid() == SOLID_BBOX )
 		{
@@ -4506,7 +4507,7 @@ static void TeleportEntity( CBaseEntity *pSourceEntity, TeleportListEntry_t &ent
 			rotatePhysics = true;
 		}
 
-		pPhys->SetPosition( pTeleport->GetAbsOrigin(), *rotAngles, true );
+		pPhys->SetPosition( pTeleport->GetEngineObject()->GetAbsOrigin(), *rotAngles, true );
 	}
 
 	g_pNotify->ReportTeleportEvent( pTeleport, prevOrigin, prevAngles, rotatePhysics );
@@ -4527,8 +4528,8 @@ static void BuildTeleportList_r( CBaseEntity *pTeleport, CUtlVector<TeleportList
 	TeleportListEntry_t entry;
 	
 	entry.pEntity = pTeleport;
-	entry.prevAbsOrigin = pTeleport->GetAbsOrigin();
-	entry.prevAbsAngles = pTeleport->GetAbsAngles();
+	entry.prevAbsOrigin = pTeleport->GetEngineObject()->GetAbsOrigin();
+	entry.prevAbsAngles = pTeleport->GetEngineObject()->GetAbsAngles();
 
 	teleportList.AddToTail( entry );
 
@@ -5761,61 +5762,61 @@ model_t *CBaseEntity::GetModel( void )
 // Purpose: Calculates the absolute position of an edict in the world
 //			assumes the parent's absolute origin has already been calculated
 //-----------------------------------------------------------------------------
-void CBaseEntity::CalcAbsolutePosition( void )
+void CEngineObject::CalcAbsolutePosition( void )
 {
-	if (!IsEFlagSet( EFL_DIRTY_ABSTRANSFORM ))
+	if (!m_pOuter->IsEFlagSet( EFL_DIRTY_ABSTRANSFORM ))
 		return;
 
-	RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
+	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
 
 	// Plop the entity->parent matrix into m_rgflCoordinateFrame
-	AngleMatrix( m_angRotation, m_vecOrigin, m_rgflCoordinateFrame );
+	AngleMatrix( m_angRotation, m_vecOrigin, m_pOuter->m_rgflCoordinateFrame );
 
-	CBaseEntity *pMoveParent = GetMoveParent();
+	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
 	if ( !pMoveParent )
 	{
 		// no move parent, so just copy existing values
 		m_vecAbsOrigin = m_vecOrigin;
 		m_angAbsRotation = m_angRotation;
-		if ( HasDataObjectType( POSITIONWATCHER ) )
+		if ( m_pOuter->HasDataObjectType( POSITIONWATCHER ) )
 		{
-			ReportPositionChanged( this );
+			ReportPositionChanged( this->m_pOuter );
 		}
 		return;
 	}
 
 	// concatenate with our parent's transform
 	matrix3x4_t tmpMatrix, scratchSpace;
-	ConcatTransforms( GetParentToWorldTransform( scratchSpace ), m_rgflCoordinateFrame, tmpMatrix );
-	MatrixCopy( tmpMatrix, m_rgflCoordinateFrame );
+	ConcatTransforms( m_pOuter->GetParentToWorldTransform( scratchSpace ), m_pOuter->m_rgflCoordinateFrame, tmpMatrix );
+	MatrixCopy( tmpMatrix, m_pOuter->m_rgflCoordinateFrame );
 
 	// pull our absolute position out of the matrix
-	MatrixGetColumn( m_rgflCoordinateFrame, 3, m_vecAbsOrigin ); 
+	MatrixGetColumn( m_pOuter->m_rgflCoordinateFrame, 3, m_vecAbsOrigin ); 
 
 	// if we have any angles, we have to extract our absolute angles from our matrix
-	if (( m_angRotation == vec3_angle ) && ( m_iParentAttachment == 0 ))
+	if (( m_angRotation == vec3_angle ) && ( m_pOuter->m_iParentAttachment == 0 ))
 	{
 		// just copy our parent's absolute angles
-		VectorCopy( pMoveParent->GetAbsAngles(), m_angAbsRotation );
+		VectorCopy( pMoveParent->GetEngineObject()->GetAbsAngles(), m_angAbsRotation );
 	}
 	else
 	{
-		MatrixAngles( m_rgflCoordinateFrame, m_angAbsRotation );
+		MatrixAngles( m_pOuter->m_rgflCoordinateFrame, m_angAbsRotation );
 	}
-	if ( HasDataObjectType( POSITIONWATCHER ) )
+	if ( m_pOuter->HasDataObjectType( POSITIONWATCHER ) )
 	{
-		ReportPositionChanged( this );
+		ReportPositionChanged( this->m_pOuter );
 	}
 }
 
-void CBaseEntity::CalcAbsoluteVelocity()
+void CEngineObject::CalcAbsoluteVelocity()
 {
-	if (!IsEFlagSet( EFL_DIRTY_ABSVELOCITY ))
+	if (!m_pOuter->IsEFlagSet( EFL_DIRTY_ABSVELOCITY ))
 		return;
 
-	RemoveEFlags( EFL_DIRTY_ABSVELOCITY );
+	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSVELOCITY );
 
-	CBaseEntity *pMoveParent = GetMoveParent();
+	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
 	if ( !pMoveParent )
 	{
 		m_vecAbsVelocity = m_vecVelocity;
@@ -5826,7 +5827,7 @@ void CBaseEntity::CalcAbsoluteVelocity()
 	VectorRotate( m_vecVelocity, pMoveParent->EntityToWorldTransform(), m_vecAbsVelocity );
 
 	// Now add in the parent abs velocity
-	m_vecAbsVelocity += pMoveParent->GetAbsVelocity();
+	m_vecAbsVelocity += pMoveParent->GetEngineObject()->GetAbsVelocity();
 }
 
 // FIXME: While we're using (dPitch, dYaw, dRoll) as our local angular velocity
@@ -5917,7 +5918,7 @@ matrix3x4_t& CBaseEntity::GetParentToWorldTransform( matrix3x4_t &tempMatrix )
 //-----------------------------------------------------------------------------
 // These methods recompute local versions as well as set abs versions
 //-----------------------------------------------------------------------------
-void CBaseEntity::SetAbsOrigin( const Vector& absOrigin )
+void CEngineObject::SetAbsOrigin( const Vector& absOrigin )
 {
 	AssertMsg( absOrigin.IsValid(), "Invalid origin set" );
 	
@@ -5926,17 +5927,18 @@ void CBaseEntity::SetAbsOrigin( const Vector& absOrigin )
 
 	if ( m_vecAbsOrigin == absOrigin )
 		return;
+	//m_pOuter->NetworkStateChanged(55551);
 
 	// All children are invalid, but we are not
-	InvalidatePhysicsRecursive( POSITION_CHANGED );
-	RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
+	m_pOuter->InvalidatePhysicsRecursive( POSITION_CHANGED );
+	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
 
 	m_vecAbsOrigin = absOrigin;
 		
-	MatrixSetColumn( absOrigin, 3, m_rgflCoordinateFrame ); 
+	MatrixSetColumn( absOrigin, 3, m_pOuter->m_rgflCoordinateFrame ); 
 
 	Vector vecNewOrigin;
-	CBaseEntity *pMoveParent = GetMoveParent();
+	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
 	if (!pMoveParent)
 	{
 		vecNewOrigin = absOrigin;
@@ -5944,7 +5946,7 @@ void CBaseEntity::SetAbsOrigin( const Vector& absOrigin )
 	else
 	{
 		matrix3x4_t tempMat;
-		matrix3x4_t &parentTransform = GetParentToWorldTransform( tempMat );
+		matrix3x4_t &parentTransform = m_pOuter->GetParentToWorldTransform( tempMat );
 
 		// Moveparent case: transform the abs position into local space
 		VectorITransform( absOrigin, parentTransform, vecNewOrigin );
@@ -5952,12 +5954,13 @@ void CBaseEntity::SetAbsOrigin( const Vector& absOrigin )
 
 	if (m_vecOrigin != vecNewOrigin)
 	{
+		m_pOuter->NetworkStateChanged(55554);
 		m_vecOrigin = vecNewOrigin;
-		SetSimulationTime( gpGlobals->curtime );
+		m_pOuter->SetSimulationTime( gpGlobals->curtime );
 	}
 }
 
-void CBaseEntity::SetAbsAngles( const QAngle& absAngles )
+void CEngineObject::SetAbsAngles( const QAngle& absAngles )
 {
 	// This is necessary to get the other fields of m_rgflCoordinateFrame ok
 	CalcAbsolutePosition();
@@ -5968,24 +5971,25 @@ void CBaseEntity::SetAbsAngles( const QAngle& absAngles )
 
 	if ( m_angAbsRotation == absAngles )
 		return;
+	//m_pOuter->NetworkStateChanged(55552);
 
 	// All children are invalid, but we are not
-	InvalidatePhysicsRecursive( ANGLES_CHANGED );
-	RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
+	m_pOuter->InvalidatePhysicsRecursive( ANGLES_CHANGED );
+	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
 
 	m_angAbsRotation = absAngles;
-	AngleMatrix( absAngles, m_rgflCoordinateFrame );
-	MatrixSetColumn( m_vecAbsOrigin, 3, m_rgflCoordinateFrame ); 
+	AngleMatrix( absAngles, m_pOuter->m_rgflCoordinateFrame );
+	MatrixSetColumn( m_vecAbsOrigin, 3, m_pOuter->m_rgflCoordinateFrame );
 
 	QAngle angNewRotation;
-	CBaseEntity *pMoveParent = GetMoveParent();
+	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
 	if (!pMoveParent)
 	{
 		angNewRotation = absAngles;
 	}
 	else
 	{
-		if ( m_angAbsRotation == pMoveParent->GetAbsAngles() )
+		if ( m_angAbsRotation == pMoveParent->GetEngineObject()->GetAbsAngles() )
 		{
 			angNewRotation.Init( );
 		}
@@ -5994,33 +5998,35 @@ void CBaseEntity::SetAbsAngles( const QAngle& absAngles )
 			// Moveparent case: transform the abs transform into local space
 			matrix3x4_t worldToParent, localMatrix;
 			MatrixInvert( pMoveParent->EntityToWorldTransform(), worldToParent );
-			ConcatTransforms( worldToParent, m_rgflCoordinateFrame, localMatrix );
+			ConcatTransforms( worldToParent, m_pOuter->m_rgflCoordinateFrame, localMatrix );
 			MatrixAngles( localMatrix, angNewRotation );
 		}
 	}
 
 	if (m_angRotation != angNewRotation)
 	{
+		m_pOuter->NetworkStateChanged(55555);
 		m_angRotation = angNewRotation;
-		SetSimulationTime( gpGlobals->curtime );
+		m_pOuter->SetSimulationTime( gpGlobals->curtime );
 	}
 }
 
-void CBaseEntity::SetAbsVelocity( const Vector &vecAbsVelocity )
+void CEngineObject::SetAbsVelocity( const Vector &vecAbsVelocity )
 {
 	if ( m_vecAbsVelocity == vecAbsVelocity )
 		return;
-
+	m_pOuter->NetworkStateChanged(55556);
+	//m_pOuter->NetworkStateChanged(55553);
 	// The abs velocity won't be dirty since we're setting it here
 	// All children are invalid, but we are not
-	InvalidatePhysicsRecursive( VELOCITY_CHANGED );
-	RemoveEFlags( EFL_DIRTY_ABSVELOCITY );
+	m_pOuter->InvalidatePhysicsRecursive( VELOCITY_CHANGED );
+	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSVELOCITY );
 
 	m_vecAbsVelocity = vecAbsVelocity;
 
 	// NOTE: Do *not* do a network state change in this case.
 	// m_vecVelocity is only networked for the player, which is not manual mode
-	CBaseEntity *pMoveParent = GetMoveParent();
+	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
 	if (!pMoveParent)
 	{
 		m_vecVelocity = vecAbsVelocity;
@@ -6030,7 +6036,7 @@ void CBaseEntity::SetAbsVelocity( const Vector &vecAbsVelocity )
 	// First subtract out the parent's abs velocity to get a relative
 	// velocity measured in world space
 	Vector relVelocity;
-	VectorSubtract( vecAbsVelocity, pMoveParent->GetAbsVelocity(), relVelocity );
+	VectorSubtract( vecAbsVelocity, pMoveParent->GetEngineObject()->GetAbsVelocity(), relVelocity );
 
 	// Transform relative velocity into parent space
 	Vector vNew;
@@ -6072,14 +6078,14 @@ void CBaseEntity::SetAbsAngularVelocity( const QAngle &vecAbsAngVelocity )
 //-----------------------------------------------------------------------------
 // Methods that modify local physics state, and let us know to compute abs state later
 //-----------------------------------------------------------------------------
-void CBaseEntity::SetLocalOrigin( const Vector& origin )
+void CEngineObject::SetLocalOrigin( const Vector& origin )
 {
 	// Safety check against NaN's or really huge numbers
 	if ( !IsEntityPositionReasonable( origin ) )
 	{
 		if ( CheckEmitReasonablePhysicsSpew() )
 		{
-			Warning( "Bad SetLocalOrigin(%f,%f,%f) on %s\n", origin.x, origin.y, origin.z, GetDebugName() );
+			Warning( "Bad SetLocalOrigin(%f,%f,%f) on %s\n", origin.x, origin.y, origin.z, m_pOuter->GetDebugName() );
 		}
 		Assert( false );
 		return;
@@ -6100,14 +6106,14 @@ void CBaseEntity::SetLocalOrigin( const Vector& origin )
 		Assert( origin.y >= -largeVal && origin.y <= largeVal );
 		Assert( origin.z >= -largeVal && origin.z <= largeVal );
 #endif
-		
-		InvalidatePhysicsRecursive( POSITION_CHANGED );
+		m_pOuter->NetworkStateChanged(55554);
+		m_pOuter->InvalidatePhysicsRecursive( POSITION_CHANGED );
 		m_vecOrigin = origin;
-		SetSimulationTime( gpGlobals->curtime );
+		m_pOuter->SetSimulationTime( gpGlobals->curtime );
 	}
 }
 
-void CBaseEntity::SetLocalAngles( const QAngle& angles )
+void CEngineObject::SetLocalAngles( const QAngle& angles )
 {
 	// NOTE: The angle normalize is a little expensive, but we can save
 	// a bunch of time in interpolation if we don't have to invalidate everything
@@ -6122,7 +6128,7 @@ void CBaseEntity::SetLocalAngles( const QAngle& angles )
 	{
 		if ( CheckEmitReasonablePhysicsSpew() )
 		{
-			Warning( "Bad SetLocalAngles(%f,%f,%f) on %s\n", angles.x, angles.y, angles.z, GetDebugName() );
+			Warning( "Bad SetLocalAngles(%f,%f,%f) on %s\n", angles.x, angles.y, angles.z, m_pOuter->GetDebugName() );
 		}
 		Assert( false );
 		return;
@@ -6130,13 +6136,14 @@ void CBaseEntity::SetLocalAngles( const QAngle& angles )
 
 	if (m_angRotation != angles)
 	{
-		InvalidatePhysicsRecursive( ANGLES_CHANGED );
+		m_pOuter->NetworkStateChanged(55555);
+		m_pOuter->InvalidatePhysicsRecursive( ANGLES_CHANGED );
 		m_angRotation = angles;
-		SetSimulationTime( gpGlobals->curtime );
+		m_pOuter->SetSimulationTime( gpGlobals->curtime );
 	}
 }
 
-void CBaseEntity::SetLocalVelocity( const Vector &inVecVelocity )
+void CEngineObject::SetLocalVelocity( const Vector &inVecVelocity )
 {
 	Vector vecVelocity = inVecVelocity;
 
@@ -6144,22 +6151,107 @@ void CBaseEntity::SetLocalVelocity( const Vector &inVecVelocity )
 	switch ( CheckEntityVelocity( vecVelocity ) )
 	{
 		case -1:
-			Warning( "Discarding SetLocalVelocity(%f,%f,%f) on %s\n", vecVelocity.x, vecVelocity.y, vecVelocity.z, GetDebugName() );
+			Warning( "Discarding SetLocalVelocity(%f,%f,%f) on %s\n", vecVelocity.x, vecVelocity.y, vecVelocity.z, m_pOuter->GetDebugName() );
 			Assert( false );
 			return;
 		case 0:
 			if ( CheckEmitReasonablePhysicsSpew() )
 			{
-				Warning( "Clamping SetLocalVelocity(%f,%f,%f) on %s\n", inVecVelocity.x, inVecVelocity.y, inVecVelocity.z, GetDebugName() );
+				Warning( "Clamping SetLocalVelocity(%f,%f,%f) on %s\n", inVecVelocity.x, inVecVelocity.y, inVecVelocity.z, m_pOuter->GetDebugName() );
 			}
 			break;
 	}
 
 	if (m_vecVelocity != vecVelocity)
 	{
-		InvalidatePhysicsRecursive( VELOCITY_CHANGED );
+		m_pOuter->NetworkStateChanged(55556);
+		m_pOuter->InvalidatePhysicsRecursive( VELOCITY_CHANGED );
 		m_vecVelocity = vecVelocity;
 	}
+}
+
+const Vector& CEngineObject::GetLocalVelocity() const
+{
+	return m_vecVelocity;
+}
+
+Vector& CEngineObject::GetAbsVelocity()
+{
+	Assert(CBaseEntity::IsAbsQueriesValid());
+
+	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
+	{
+		const_cast<CEngineObject*>(this)->CalcAbsoluteVelocity();
+	}
+	return m_vecAbsVelocity;
+}
+
+const Vector& CEngineObject::GetAbsVelocity() const
+{
+	Assert(CBaseEntity::IsAbsQueriesValid());
+
+	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
+	{
+		const_cast<CEngineObject*>(this)->CalcAbsoluteVelocity();
+	}
+	return m_vecAbsVelocity;
+}
+
+//-----------------------------------------------------------------------------
+// Physics state accessor methods
+//-----------------------------------------------------------------------------
+const Vector& CEngineObject::GetLocalOrigin(void) const
+{
+	return m_vecOrigin;
+}
+
+const QAngle& CEngineObject::GetLocalAngles(void) const
+{
+	return m_angRotation;
+}
+
+Vector& CEngineObject::GetAbsOrigin(void)
+{
+	Assert(CBaseEntity::IsAbsQueriesValid());
+
+	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	{
+		const_cast<CEngineObject*>(this)->CalcAbsolutePosition();
+	}
+	return m_vecAbsOrigin;
+}
+
+const Vector& CEngineObject::GetAbsOrigin(void) const
+{
+	Assert(CBaseEntity::IsAbsQueriesValid());
+
+	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	{
+		const_cast<CEngineObject*>(this)->CalcAbsolutePosition();
+	}
+	return m_vecAbsOrigin;
+}
+
+QAngle& CEngineObject::GetAbsAngles(void)
+{
+	Assert(CBaseEntity::IsAbsQueriesValid());
+
+	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	{
+		const_cast<CEngineObject*>(this)->CalcAbsolutePosition();
+	}
+	return m_angAbsRotation;
+}
+
+const QAngle& CEngineObject::GetAbsAngles(void) const
+{
+	Assert(CBaseEntity::IsAbsQueriesValid());
+
+	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	{
+		const_cast<CEngineObject*>(this)->CalcAbsolutePosition();
+	}
+	return m_angAbsRotation;
 }
 
 void CBaseEntity::SetLocalAngularVelocity( const QAngle &vecAngVelocity )
@@ -6193,8 +6285,8 @@ void CBaseEntity::SetLocalTransform( const matrix3x4_t &localTransform )
 	QAngle vecLocalAngles;
 	MatrixGetColumn( localTransform, 3, vecLocalOrigin );
 	MatrixAngles( localTransform, vecLocalAngles );
-	SetLocalOrigin( vecLocalOrigin );
-	SetLocalAngles( vecLocalAngles );
+	GetEngineObject()->SetLocalOrigin( vecLocalOrigin );
+	GetEngineObject()->SetLocalAngles( vecLocalAngles );
 }
 
 
@@ -7003,12 +7095,12 @@ bool CBaseEntity::AddStepDiscontinuity( float flTime, const Vector &vecOrigin, c
 
 Vector CBaseEntity::GetStepOrigin( void ) const 
 { 
-	return GetLocalOrigin();
+	return GetEngineObject()->GetLocalOrigin();
 }
 
 QAngle CBaseEntity::GetStepAngles( void ) const
 {
-	return GetLocalAngles();
+	return GetEngineObject()->GetLocalAngles();
 }
 
 //-----------------------------------------------------------------------------
@@ -7182,7 +7274,7 @@ void CBaseEntity::SUB_Vanish( void )
 		//Get the next client
 		if ( ( pPlayer = UTIL_PlayerByIndex( i ) ) != NULL )
 		{
-			Vector corpseDir = (GetAbsOrigin() - pPlayer->WorldSpaceCenter() );
+			Vector corpseDir = (GetEngineObject()->GetAbsOrigin() - pPlayer->WorldSpaceCenter() );
 
 			float flDistSqr = corpseDir.LengthSqr();
 			//If the player is close enough, don't fade out
@@ -7501,7 +7593,7 @@ void CC_Ent_Orient( const CCommand& args )
 	QAngle vecPlayerAngles;
 	if ( CC_GetCommandEnt( args, &pEnt, NULL, &vecPlayerAngles ) )
 	{
-		QAngle vecEntAngles = pEnt->GetAbsAngles();
+		QAngle vecEntAngles = pEnt->GetEngineObject()->GetAbsAngles();
 		if ( args.ArgC() == 3 && !Q_strncmp( args[2], "allangles", 9 ) )
 		{
 			vecEntAngles = vecPlayerAngles;
@@ -7511,7 +7603,7 @@ void CC_Ent_Orient( const CCommand& args )
 			vecEntAngles[YAW] = vecPlayerAngles[YAW];
 		}
 
-		pEnt->SetAbsAngles( vecEntAngles );
+		pEnt->GetEngineObject()->SetAbsAngles( vecEntAngles );
 	}
 }
 
