@@ -156,8 +156,8 @@ void C_PortalRagdoll::Interp_Copy( C_BaseAnimatingOverlay *pSourceEntity )
 	if ( !pSourceEntity )
 		return;
 
-	VarMapping_t *pSrc = pSourceEntity->GetVarMapping();
-	VarMapping_t *pDest = GetVarMapping();
+	VarMapping_t *pSrc = pSourceEntity->GetEngineObject()->GetVarMapping();
+	VarMapping_t *pDest = GetEngineObject()->GetVarMapping();
 
 	// Find all the VarMapEntry_t's that represent the same variable.
 	for ( int i = 0; i < pDest->m_Entries.Count(); i++ )
@@ -207,7 +207,7 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 		// Move my current model instance to the ragdoll's so decals are preserved.
 		pPlayer->SnatchModelInstance( this );
 
-		VarMapping_t *varMap = GetVarMapping();
+		VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
 		// This is the local player, so set them in a default
 		// pose and slam their velocity, angles and origin
@@ -225,7 +225,7 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 		SetSequence( iSeq );
 		SetCycle( 0.0 );
 
-		Interp_Reset( varMap );
+		GetEngineObject()->Interp_Reset( varMap );
 
 		m_nBody = pPlayer->GetBody();
 		SetModelIndex( m_nModelIndex );	
@@ -322,7 +322,7 @@ C_Portal_Player::C_Portal_Player()
 
 	m_angEyeAngles.Init();
 
-	AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
+	GetEngineObject()->AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
 
 	m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
 	m_blinkTimer.Invalidate();

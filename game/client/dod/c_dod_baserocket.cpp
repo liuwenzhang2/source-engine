@@ -65,7 +65,7 @@ void C_DODBaseRocket::PostDataUpdate( DataUpdateType_t type )
 	if ( type == DATA_UPDATE_CREATED )
 	{
 		// Now stick our initial velocity into the interpolation history 
-		CInterpolatedVar< Vector > &interpolator = GetOriginInterpolator();
+		CInterpolatedVar< Vector > &interpolator = GetEngineObject()->GetOriginInterpolator();
 		
 		interpolator.ClearHistory();
 		float changeTime = GetLastChangeTime( LATCH_SIMULATION_VAR );
@@ -79,7 +79,7 @@ void C_DODBaseRocket::PostDataUpdate( DataUpdateType_t type )
 		interpolator.AddToHead( changeTime, &vCurOrigin, false );
 
 		// do the same for angles
-		CInterpolatedVar< QAngle > &rotInterpolator = GetRotationInterpolator();
+		CInterpolatedVar< QAngle > &rotInterpolator = GetEngineObject()->GetRotationInterpolator();
 
 		rotInterpolator.ClearHistory();
 

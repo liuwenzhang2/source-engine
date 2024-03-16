@@ -52,7 +52,7 @@ C_HL2MP_Player::C_HL2MP_Player() : m_PlayerAnimState( this ), m_iv_angEyeAngles(
 
 	m_angEyeAngles.Init();
 
-	AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
+	GetEngineObject()->AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
 
 	m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
 	m_blinkTimer.Invalidate();
@@ -778,8 +778,8 @@ void C_HL2MPRagdoll::Interp_Copy( C_BaseAnimatingOverlay *pSourceEntity )
 	if ( !pSourceEntity )
 		return;
 	
-	VarMapping_t *pSrc = pSourceEntity->GetVarMapping();
-	VarMapping_t *pDest = GetVarMapping();
+	VarMapping_t *pSrc = pSourceEntity->GetEngineObject()->GetVarMapping();
+	VarMapping_t *pDest = GetEngineObject()->GetVarMapping();
     	
 	// Find all the VarMapEntry_t's that represent the same variable.
 	for ( int i = 0; i < pDest->m_Entries.Count(); i++ )
@@ -845,7 +845,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 		// move my current model instance to the ragdoll's so decals are preserved.
 		pPlayer->SnatchModelInstance( this );
 
-		VarMapping_t *varMap = GetVarMapping();
+		VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.
@@ -855,7 +855,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 			Interp_Copy( pPlayer );
 
 			SetAbsAngles( pPlayer->GetRenderAngles() );
-			GetRotationInterpolator().Reset();
+			GetEngineObject()->GetRotationInterpolator().Reset();
 
 			m_flAnimTime = pPlayer->m_flAnimTime;
 			SetSequence( pPlayer->GetSequence() );
@@ -881,7 +881,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 			SetSequence( iSeq );	// walk_lower, basic pose
 			SetCycle( 0.0 );
 
-			Interp_Reset( varMap );
+			GetEngineObject()->Interp_Reset( varMap );
 		}		
 	}
 	else
@@ -893,7 +893,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 		SetAbsOrigin( m_vecRagdollOrigin );
 		SetAbsVelocity( m_vecRagdollVelocity );
 
-		Interp_Reset( GetVarMapping() );
+		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
 		
 	}
 

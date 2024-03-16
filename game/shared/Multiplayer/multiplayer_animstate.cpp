@@ -1775,7 +1775,7 @@ const QAngle& CMultiPlayerAnimState::GetRenderAngles()
 void CMultiPlayerAnimState::GetOuterAbsVelocity( Vector& vel )
 {
 #if defined( CLIENT_DLL )
-	GetBasePlayer()->EstimateAbsVelocity( vel );
+	GetBasePlayer()->GetEngineObject()->EstimateAbsVelocity( vel );
 #else
 	vel = GetBasePlayer()->GetAbsVelocity();
 #endif

@@ -236,7 +236,8 @@ public:
 
 	virtual void					PreDataUpdate( DataUpdateType_t updateType );
 	virtual void					PostDataUpdate( DataUpdateType_t updateType );
-	virtual int						RestoreData( const char *context, int slot, int type );
+	//virtual int						RestoreData( const char *context, int slot, int type );
+	virtual void					OnPostRestoreData();
 
 	virtual void					NotifyShouldTransmit( ShouldTransmitState_t state );
 	virtual void					OnPreDataChanged( DataUpdateType_t updateType );

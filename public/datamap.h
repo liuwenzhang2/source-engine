@@ -290,6 +290,44 @@ public:
 	float				fieldTolerance;
 };
 
+static int g_FieldSizes[FIELD_TYPECOUNT] =
+{
+	FIELD_SIZE(FIELD_VOID),
+	FIELD_SIZE(FIELD_FLOAT),
+	FIELD_SIZE(FIELD_STRING),
+	FIELD_SIZE(FIELD_VECTOR),
+	FIELD_SIZE(FIELD_QUATERNION),
+	FIELD_SIZE(FIELD_INTEGER),
+	FIELD_SIZE(FIELD_BOOLEAN),
+	FIELD_SIZE(FIELD_SHORT),
+	FIELD_SIZE(FIELD_CHARACTER),
+	FIELD_SIZE(FIELD_COLOR32),
+	FIELD_SIZE(FIELD_EMBEDDED),
+	FIELD_SIZE(FIELD_CUSTOM),
+
+	FIELD_SIZE(FIELD_CLASSPTR),
+	FIELD_SIZE(FIELD_EHANDLE),
+	FIELD_SIZE(FIELD_EDICT),
+
+	FIELD_SIZE(FIELD_POSITION_VECTOR),
+	FIELD_SIZE(FIELD_TIME),
+	FIELD_SIZE(FIELD_TICK),
+	FIELD_SIZE(FIELD_MODELNAME),
+	FIELD_SIZE(FIELD_SOUNDNAME),
+
+	FIELD_SIZE(FIELD_INPUT),
+	FIELD_SIZE(FIELD_FUNCTION),
+	FIELD_SIZE(FIELD_VMATRIX),
+	FIELD_SIZE(FIELD_VMATRIX_WORLDSPACE),
+	FIELD_SIZE(FIELD_MATRIX3X4_WORLDSPACE),
+	FIELD_SIZE(FIELD_INTERVAL),
+	FIELD_SIZE(FIELD_MODELINDEX),
+	FIELD_SIZE(FIELD_MATERIALINDEX),
+
+	FIELD_SIZE(FIELD_VECTOR2D),
+	FIELD_SIZE(FIELD_INTEGER64),
+	FIELD_SIZE(FIELD_POINTER),
+};
 
 //-----------------------------------------------------------------------------
 // Purpose: stores the list of objects in the hierarchy
@@ -311,6 +349,156 @@ public:
 #if defined( _DEBUG )
 	bool				bValidityChecked;
 #endif // _DEBUG
+
+	//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+	void ComputePackedOffsets(void)
+	{
+#if !defined( NO_ENTITY_PREDICTION )
+		if (this->packed_offsets_computed)
+			return;
+
+		this->ComputePackedSize_R();
+
+		Assert(this->packed_offsets_computed);
+#endif
+	}
+
+	//-----------------------------------------------------------------------------
+	// Purpose: 
+	// Output : int
+	//-----------------------------------------------------------------------------
+	int GetIntermediateDataSize(void)
+	{
+#if !defined( NO_ENTITY_PREDICTION )
+		ComputePackedOffsets();
+
+		Assert(this->packed_offsets_computed);
+
+		int size = this->packed_size;
+
+		Assert(size > 0);
+
+		// At least 4 bytes to avoid some really bad stuff
+		return MAX(size, 4);
+#else
+		return 0;
+#endif
+	}
+	//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *map - 
+// Output : int
+//-----------------------------------------------------------------------------
+	int ComputePackedSize_R()
+	{
+		// Already computed
+		if (this->packed_offsets_computed)
+		{
+			return this->packed_size;
+		}
+
+		int current_position = 0;
+
+		// Recurse to base classes first...
+		if (this->baseMap)
+		{
+			current_position += this->baseMap->ComputePackedSize_R();
+		}
+
+		int c = this->dataNumFields;
+		int i;
+		typedescription_t* field;
+
+		for (i = 0; i < c; i++)
+		{
+			field = &this->dataDesc[i];
+
+			// Always descend into embedded types...
+			if (field->fieldType != FIELD_EMBEDDED)
+			{
+				// Skip all private fields
+				if (field->flags & FTYPEDESC_PRIVATE)
+					continue;
+			}
+
+			switch (field->fieldType)
+			{
+			default:
+			case FIELD_MODELINDEX:
+			case FIELD_MODELNAME:
+			case FIELD_SOUNDNAME:
+			case FIELD_TIME:
+			case FIELD_TICK:
+			case FIELD_CUSTOM:
+			case FIELD_CLASSPTR:
+			case FIELD_EDICT:
+			case FIELD_POSITION_VECTOR:
+			case FIELD_FUNCTION:
+				Assert(0);
+				break;
+
+			case FIELD_EMBEDDED:
+			{
+				Assert(field->td != NULL);
+
+				int embeddedsize = field->td->ComputePackedSize_R();
+
+				field->fieldOffset[TD_OFFSET_PACKED] = current_position;
+
+				current_position += embeddedsize;
+			}
+			break;
+
+			case FIELD_FLOAT:
+			case FIELD_VECTOR:
+			case FIELD_QUATERNION:
+			case FIELD_INTEGER:
+			case FIELD_EHANDLE:
+			{
+				// These should be dword aligned
+				current_position = (current_position + 3) & ~3;
+				field->fieldOffset[TD_OFFSET_PACKED] = current_position;
+				Assert(field->fieldSize >= 1);
+				current_position += g_FieldSizes[field->fieldType] * field->fieldSize;
+			}
+			break;
+
+			case FIELD_SHORT:
+			{
+				// This should be word aligned
+				current_position = (current_position + 1) & ~1;
+				field->fieldOffset[TD_OFFSET_PACKED] = current_position;
+				Assert(field->fieldSize >= 1);
+				current_position += g_FieldSizes[field->fieldType] * field->fieldSize;
+			}
+			break;
+
+			case FIELD_STRING:
+			case FIELD_COLOR32:
+			case FIELD_BOOLEAN:
+			case FIELD_CHARACTER:
+			{
+				field->fieldOffset[TD_OFFSET_PACKED] = current_position;
+				Assert(field->fieldSize >= 1);
+				current_position += g_FieldSizes[field->fieldType] * field->fieldSize;
+			}
+			break;
+			case FIELD_VOID:
+			{
+				// Special case, just skip it
+			}
+			break;
+			}
+		}
+
+		this->packed_size = current_position;
+		this->packed_offsets_computed = true;
+
+		return current_position;
+	}
+
 };
 
 

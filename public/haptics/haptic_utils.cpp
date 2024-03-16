@@ -231,7 +231,7 @@ void UpdateAvatarEffect(void)
 
 	if(pPlayer->IsInAVehicle() && pPlayer->GetVehicle())
 	{
-		pPlayer->GetVehicle()->GetVehicleEnt()->EstimateAbsVelocity(vvel);
+		pPlayer->GetVehicle()->GetVehicleEnt()->GetEngineObject()->EstimateAbsVelocity(vvel);
 		eye = pPlayer->GetVehicle()->GetVehicleEnt()->EyeAngles();
 
 		if(!Q_stristr(pPlayer->GetVehicle()->GetVehicleEnt()->GetClassname(),"choreo"))

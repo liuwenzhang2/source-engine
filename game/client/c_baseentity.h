@@ -169,6 +169,180 @@ struct thinkfunc_t
 #define ENTCLIENTFLAG_DONTUSEIK					0x0002		// Don't use IK on this entity even if its model has IK.
 #define ENTCLIENTFLAG_ALWAYS_INTERPOLATE		0x0004		// Used by view models.
 
+enum
+{
+	INTERPOLATE_STOP = 0,
+	INTERPOLATE_CONTINUE
+};
+
+class C_EngineObject {
+public:
+	DECLARE_CLASS_NOBASE(C_EngineObject);
+	DECLARE_PREDICTABLE();
+
+	C_EngineObject() :
+	m_iv_vecOrigin("C_BaseEntity::m_iv_vecOrigin"),
+	m_iv_angRotation("C_BaseEntity::m_iv_angRotation"),
+	m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity")
+	{
+		AddVar(&m_vecOrigin, &m_iv_vecOrigin, LATCH_SIMULATION_VAR);
+		AddVar(&m_angRotation, &m_iv_angRotation, LATCH_SIMULATION_VAR);
+// Removing this until we figure out why velocity introduces view hitching.
+// One possible fix is removing the player->ResetLatched() call in CGameMovement::FinishDuck(), 
+// but that re-introduces a third-person hitching bug.  One possible cause is the abrupt change
+// in player size/position that occurs when ducking, and how prediction tries to work through that.
+//
+// AddVar( &m_vecVelocity, &m_iv_vecVelocity, LATCH_SIMULATION_VAR );
+	}
+
+	void Init(C_BaseEntity* pOuter) {
+		m_pOuter = pOuter;
+	}
+
+	// NOTE: Setting the abs velocity in either space will cause a recomputation
+	// in the other space, so setting the abs velocity will also set the local vel
+	void				SetAbsVelocity(const Vector& vecVelocity);
+	Vector&				GetAbsVelocity();
+	const Vector&		GetAbsVelocity() const;
+
+	// Sets abs angles, but also sets local angles to be appropriate
+	void				SetAbsOrigin(const Vector& origin);
+	Vector&				GetAbsOrigin(void);
+	const Vector&		GetAbsOrigin(void) const;
+
+	void				SetAbsAngles(const QAngle& angles);
+	QAngle&				GetAbsAngles(void);
+	const QAngle&		GetAbsAngles(void) const;
+
+	void				SetLocalOrigin(const Vector& origin);
+	void				SetLocalOriginDim(int iDim, vec_t flValue);
+	const Vector&		GetLocalOrigin(void) const;
+	vec_t				GetLocalOriginDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
+
+	void				SetLocalAngles(const QAngle& angles);
+	void				SetLocalAnglesDim(int iDim, vec_t flValue);
+	const QAngle&		GetLocalAngles(void) const;
+	vec_t				GetLocalAnglesDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
+
+	void				SetLocalVelocity(const Vector& vecVelocity);
+	const Vector&		GetLocalVelocity() const;
+
+	const Vector&		GetPrevLocalOrigin() const;
+	const QAngle&		GetPrevLocalAngles() const;
+
+	CInterpolatedVar< QAngle >& GetRotationInterpolator();
+	CInterpolatedVar< Vector >& GetOriginInterpolator();
+
+	// Determine approximate velocity based on updates from server
+	void					EstimateAbsVelocity(Vector& vel);
+	// Computes absolute position based on hierarchy
+	void CalcAbsolutePosition();
+	void CalcAbsoluteVelocity();
+
+public:
+
+	void AddVar(void* data, IInterpolatedVar* watcher, int type, bool bSetup = false);
+	void RemoveVar(void* data, bool bAssert = true);
+	VarMapping_t* GetVarMapping();
+
+	// Set appropriate flags and store off data when these fields are about to change
+	void							OnLatchInterpolatedVariables(int flags);
+	// For predictable entities, stores last networked value
+	void							OnStoreLastNetworkedValue();
+
+	void							Interp_SetupMappings(VarMapping_t* map);
+
+	// Returns 1 if there are no more changes (ie: we could call RemoveFromInterpolationList).
+	int								Interp_Interpolate(VarMapping_t* map, float currentTime);
+
+	void							Interp_RestoreToLastNetworked(VarMapping_t* map);
+	void							Interp_UpdateInterpolationAmounts(VarMapping_t* map);
+	void							Interp_Reset(VarMapping_t* map);
+
+	
+
+	// Returns INTERPOLATE_STOP or INTERPOLATE_CONTINUE.
+	// bNoMoreChanges is set to 1 if you can call RemoveFromInterpolationList on the entity.
+	int BaseInterpolatePart1(float& currentTime, Vector& oldOrigin, QAngle& oldAngles, Vector& oldVel, int& bNoMoreChanges);
+	void BaseInterpolatePart2(Vector& oldOrigin, QAngle& oldAngles, Vector& oldVel, int nChangeFlags);
+
+	void							AllocateIntermediateData(void);
+	void							DestroyIntermediateData(void);
+	void							ShiftIntermediateDataForward(int slots_to_remove, int previous_last_slot);
+
+	void*							GetPredictedFrame(int framenumber);
+	void*							GetOuterPredictedFrame(int framenumber);
+	void*							GetOriginalNetworkDataObject(void);
+	void*							GetOuterOriginalNetworkDataObject(void);
+	bool							IsIntermediateDataAllocated(void) const;
+
+	void							PreEntityPacketReceived(int commands_acknowledged);
+	void							PostEntityPacketReceived(void);
+	bool							PostNetworkDataReceived(int commands_acknowledged);
+
+	enum
+	{
+		SLOT_ORIGINALDATA = -1,
+	};
+
+	int								SaveData(const char* context, int slot, int type);
+	int								RestoreData(const char* context, int slot, int type);
+
+#if !defined( NO_ENTITY_PREDICTION )
+	// For storing prediction results and pristine network state
+	byte* m_pIntermediateData[MULTIPLAYER_BACKUP];
+	byte* m_pOriginalData;
+	byte* m_pOuterIntermediateData[MULTIPLAYER_BACKUP];
+	byte* m_pOuterOriginalData;
+	int								m_nIntermediateDataCount;
+
+	//bool							m_bIsPlayerSimulated;
+#endif
+
+	void					Clear(void) {
+		m_pOriginalData = NULL;
+	}
+
+	VarMapping_t	m_VarMap;
+private:
+
+	friend class C_BaseEntity;
+	Vector							m_vecOrigin;
+	CInterpolatedVar< Vector >		m_iv_vecOrigin;
+	QAngle							m_angRotation;
+	CInterpolatedVar< QAngle >		m_iv_angRotation;
+	// Object velocity
+	Vector							m_vecVelocity;
+	CInterpolatedVar< Vector >		m_iv_vecVelocity;
+	Vector							m_vecAbsOrigin;
+	// Object orientation
+	QAngle							m_angAbsRotation;
+	Vector							m_vecAbsVelocity;
+	C_BaseEntity* m_pOuter;
+};
+
+inline Vector& C_EngineObject::GetAbsVelocity()
+{
+	Assert(s_bAbsQueriesValid);
+	const_cast<C_EngineObject*>(this)->CalcAbsoluteVelocity();
+	return m_vecAbsVelocity;
+}
+
+inline const Vector& C_EngineObject::GetAbsVelocity() const
+{
+	Assert(s_bAbsQueriesValid);
+	const_cast<C_EngineObject*>(this)->CalcAbsoluteVelocity();
+	return m_vecAbsVelocity;
+}
+
+//-----------------------------------------------------------------------------
+// Velocity
+//-----------------------------------------------------------------------------
+inline const Vector& C_EngineObject::GetLocalVelocity() const
+{
+	return m_vecVelocity;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Base client side entity object
 //-----------------------------------------------------------------------------
@@ -230,13 +404,7 @@ public:
 	bool							IsAIWalkable( void );
 
 
-	void							Interp_SetupMappings( VarMapping_t *map );
-	
-	// Returns 1 if there are no more changes (ie: we could call RemoveFromInterpolationList).
-	int								Interp_Interpolate( VarMapping_t *map, float currentTime );
-	
-	void							Interp_RestoreToLastNetworked( VarMapping_t *map );
-	void							Interp_UpdateInterpolationAmounts( VarMapping_t *map );
+
 	void							Interp_HierarchyUpdateInterpolationAmounts();
 
 	// Called by the CLIENTCLASS macros.
@@ -379,13 +547,7 @@ public:
 	virtual void					SetThinkHandle( ClientThinkHandle_t hThink );
 
 
-public:
 
-	void AddVar( void *data, IInterpolatedVar *watcher, int type, bool bSetup=false );
-	void RemoveVar( void *data, bool bAssert=true );
-	VarMapping_t* GetVarMapping();
-
-	VarMapping_t	m_VarMap;
 
 
 public:
@@ -414,10 +576,11 @@ private:
 	int SaveDataDescBlock( ISave &save, datamap_t *dmap );
 	int RestoreDataDescBlock( IRestore &restore, datamap_t *dmap );
 
+protected:
 	// Called after restoring data into prediction slots. This function is used in place of proxies
 	// on the variables, so if some variable like m_nModelIndex needs to update other state (like 
 	// the model pointer), it is done here.
-	void OnPostRestoreData();
+	virtual void OnPostRestoreData();
 
 public:
 
@@ -460,8 +623,7 @@ public:
 	// Add entity to visible entities list?
 	virtual void					AddEntity( void );
 
-	virtual const Vector&			GetAbsOrigin( void ) const;
-	virtual const QAngle&			GetAbsAngles( void ) const;
+	
 
 	const Vector&					GetNetworkOrigin() const;
 	const QAngle&					GetNetworkAngles() const;
@@ -469,18 +631,9 @@ public:
 	void SetNetworkOrigin( const Vector& org );
 	void SetNetworkAngles( const QAngle& ang );
 
-	const Vector&					GetLocalOrigin( void ) const;
-	void							SetLocalOrigin( const Vector& origin );
-	vec_t							GetLocalOriginDim( int iDim ) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
-	void							SetLocalOriginDim( int iDim, vec_t flValue );
+	
 
-	const QAngle&					GetLocalAngles( void ) const;
-	void							SetLocalAngles( const QAngle& angles );
-	vec_t							GetLocalAnglesDim( int iDim ) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
-	void							SetLocalAnglesDim( int iDim, vec_t flValue );
 
-	virtual const Vector&			GetPrevLocalOrigin() const;
-	virtual const QAngle&			GetPrevLocalAngles() const;
 
 	void							SetLocalTransform( const matrix3x4_t &localTransform );
 
@@ -538,9 +691,7 @@ public:
 
 	void							GetVectors(Vector* forward, Vector* right, Vector* up) const;
 
-	// Sets abs angles, but also sets local angles to be appropriate
-	void							SetAbsOrigin( const Vector& origin );
- 	void							SetAbsAngles( const QAngle& angles );
+	
 
 	void							AddFlag( int flags );
 	void							RemoveFlag( int flagsToRemove );
@@ -697,10 +848,7 @@ public:
 	// animtime in OnDataChanged and the position history is correct for interpolation.
 	virtual bool					IsSelfAnimating();
 
-	// Set appropriate flags and store off data when these fields are about to change
-	virtual	void					OnLatchInterpolatedVariables( int flags );
-	// For predictable entities, stores last networked value
-	void							OnStoreLastNetworkedValue();
+
 
 	// Initialize things given a new model.
 	virtual CStudioHdr				*OnNewModel();
@@ -711,7 +859,6 @@ public:
 	void							SetSimulatedEveryTick( bool sim );
 	void							SetAnimatedEveryTick( bool anim );
 
-	void							Interp_Reset( VarMapping_t *map );
 	virtual void					ResetLatched();
 	
 	float							GetInterpolationAmount( int flags );
@@ -800,32 +947,18 @@ public:
 	/////////////////
 	void							CheckInitPredictable( const char *context );
 
-	void							AllocateIntermediateData( void );
-	void							DestroyIntermediateData( void );
-	void							ShiftIntermediateDataForward( int slots_to_remove, int previous_last_slot );
 
-	void							*GetPredictedFrame( int framenumber );
-	void							*GetOriginalNetworkDataObject( void );
-	bool							IsIntermediateDataAllocated( void ) const;
 
 	void							InitPredictable( void );
 	void							ShutdownPredictable( void );
 
 	virtual void					SetPredictable( bool state );
 	bool							GetPredictable( void ) const;
-	void							PreEntityPacketReceived( int commands_acknowledged );
-	void							PostEntityPacketReceived( void );
-	bool							PostNetworkDataReceived( int commands_acknowledged );
+
 	//bool							GetPredictionEligible( void ) const;
 	//void							SetPredictionEligible( bool canpredict );
 
-	enum
-	{
-		SLOT_ORIGINALDATA = -1,
-	};
 
-	int								SaveData( const char *context, int slot, int type );
-	virtual int						RestoreData( const char *context, int slot, int type );
 
 	virtual char const *			DamageDecal( int bitsDamageType, int gameMaterial );
 	virtual void					DecalTrace( trace_t *pTrace, char const *decalName );
@@ -883,8 +1016,7 @@ public:
 	void					DestroyDataObject( int type );
 	void					DestroyAllDataObjects( void );
 
-	// Determine approximate velocity based on updates from server
-	void					EstimateAbsVelocity( Vector& vel );
+	
 
 //#if !defined( NO_ENTITY_PREDICTION )
 //	// The player drives simulation of this entity
@@ -1054,12 +1186,14 @@ public:
 	void				SetMoveCollide( MoveCollide_t val );	// Set to one of the MOVECOLLIDE_ defines.
 	void				SetSolid( SolidType_t val );	// Set to one of the SOLID_ defines.
 
-	// NOTE: Setting the abs velocity in either space will cause a recomputation
-	// in the other space, so setting the abs velocity will also set the local vel
-	void				SetLocalVelocity( const Vector &vecVelocity );
-	void				SetAbsVelocity( const Vector &vecVelocity );
-	const Vector&		GetLocalVelocity() const;
-	const Vector&		GetAbsVelocity( ) const;
+	friend class C_EngineObject;
+
+	C_EngineObject* GetEngineObject() {
+		return &m_EngineObject;
+	}
+	const C_EngineObject* GetEngineObject() const {
+		return &m_EngineObject;
+	}
 
 	void				ApplyLocalVelocityImpulse( const Vector &vecImpulse );
 	void				ApplyAbsVelocityImpulse( const Vector &vecImpulse );
@@ -1202,16 +1336,7 @@ protected:
 
 protected:
 	// Two part guts of Interpolate(). Shared with C_BaseAnimating.
-	enum
-	{
-		INTERPOLATE_STOP=0,
-		INTERPOLATE_CONTINUE
-	};
 
-	// Returns INTERPOLATE_STOP or INTERPOLATE_CONTINUE.
-	// bNoMoreChanges is set to 1 if you can call RemoveFromInterpolationList on the entity.
-	int BaseInterpolatePart1( float &currentTime, Vector &oldOrigin, QAngle &oldAngles, Vector &oldVel, int &bNoMoreChanges );
-	void BaseInterpolatePart2( Vector &oldOrigin, QAngle &oldAngles, Vector &oldVel, int nChangeFlags );
 
 
 public:
@@ -1372,8 +1497,7 @@ public:
 	virtual C_BaseEntity 			*GetShadowUseOtherEntity( void ) const;
 	virtual void					SetShadowUseOtherEntity( C_BaseEntity *pEntity );
 
-	CInterpolatedVar< QAngle >& GetRotationInterpolator();
-	CInterpolatedVar< Vector >& GetOriginInterpolator();
+
 	virtual bool					AddRagdollToFadeQueue( void ) { return true; }
 
 	// Dirty bits
@@ -1460,9 +1584,7 @@ private:
 	// Simulation in local space of rigid children
 	void PhysicsRigidChild( void );
 
-	// Computes absolute position based on hierarchy
-	void CalcAbsolutePosition( );
-	void CalcAbsoluteVelocity();
+	
 
 	// Computes new angles based on the angular velocity
 	void SimulateAngles( float flFrameTime );
@@ -1474,10 +1596,6 @@ private:
 	void AddStudioDecal( const Ray_t& ray, int hitbox, int decalIndex, bool doTrace, trace_t& tr, int maxLODToDecal = ADDDECAL_TO_ALL_LODS );
 	void AddColoredStudioDecal( const Ray_t& ray, int hitbox, int decalIndex, bool doTrace, trace_t& tr, Color cColor, int maxLODToDecal );
 	void AddBrushModelDecal( const Ray_t& ray, const Vector& decalCenter, int decalIndex, bool doTrace, trace_t& tr );
-
-	void ComputePackedOffsets( void );
-	int ComputePackedSize_R( datamap_t *map );
-	int GetIntermediateDataSize( void );
 
 	void UnlinkChild( C_BaseEntity *pParent, C_BaseEntity *pChild );
 	void LinkChild( C_BaseEntity *pParent, C_BaseEntity *pChild );
@@ -1499,11 +1617,8 @@ private:
 	float GetNextThink( int nContextIndex ) const;
 	int	GetNextThinkTick( int nContextIndex ) const;
 
-	// Object velocity
-	Vector							m_vecVelocity;
-	CInterpolatedVar< Vector >		m_iv_vecVelocity;
+	
 
-	Vector							m_vecAbsVelocity;
 
 	// was pev->avelocity
 	QAngle							m_vecAngVelocity;
@@ -1570,6 +1685,8 @@ private:
 
 	string_t						m_ModelName;
 
+	C_EngineObject m_EngineObject;
+
 	CNetworkVarEmbedded( CCollisionProperty, m_Collision );
 	CNetworkVarEmbedded( CParticleProperty, m_Particles );
 
@@ -1586,18 +1703,13 @@ private:
 	// Friction.
 	float							m_flFriction;       
 
-	Vector							m_vecAbsOrigin;
 
-	// Object orientation
-	QAngle							m_angAbsRotation;
+	
 
 	Vector							m_vecOldOrigin;
 	QAngle							m_vecOldAngRotation;
 
-	Vector							m_vecOrigin;
-	CInterpolatedVar< Vector >		m_iv_vecOrigin;
-	QAngle							m_angRotation;
-	CInterpolatedVar< QAngle >		m_iv_angRotation;
+	
 
 	// Specifies the entity-to-world transform
 	matrix3x4_t						m_rgflCoordinateFrame;
@@ -1612,14 +1724,7 @@ private:
 	// used to cull collision tests
 	int								m_CollisionGroup;
 
-#if !defined( NO_ENTITY_PREDICTION )
-	// For storing prediction results and pristine network state
-	byte							*m_pIntermediateData[ MULTIPLAYER_BACKUP ];
-	byte							*m_pOriginalData;
-	int								m_nIntermediateDataCount;
 
-	//bool							m_bIsPlayerSimulated;
-#endif
 
 	CNetworkVar( bool, m_bSimulatedEveryTick );
 	CNetworkVar( bool, m_bAnimatedEveryTick );
@@ -1691,6 +1796,71 @@ protected:
 	RenderMode_t m_PreviousRenderMode;
 	color32 m_PreviousRenderColor;
 #endif
+
+public:
+	void				SetAbsVelocity(const Vector& vecVelocity) {
+		GetEngineObject()->SetAbsVelocity(vecVelocity);
+	}
+	Vector& GetAbsVelocity() {
+		return GetEngineObject()->GetAbsVelocity();
+	}
+	const Vector& GetAbsVelocity() const {
+		return GetEngineObject()->GetAbsVelocity();
+	}
+
+	// Sets abs angles, but also sets local angles to be appropriate
+	void				SetAbsOrigin(const Vector& origin) {
+		GetEngineObject()->SetAbsOrigin(origin);
+	}
+	Vector& GetAbsOrigin(void) {
+		return GetEngineObject()->GetAbsOrigin();
+	}
+	const Vector& GetAbsOrigin(void) const {
+		return GetEngineObject()->GetAbsOrigin();
+	}
+
+	void				SetAbsAngles(const QAngle& angles) {
+		GetEngineObject()->SetAbsAngles(angles);
+	}
+	QAngle& GetAbsAngles(void) {
+		return GetEngineObject()->GetAbsAngles();
+	}
+	const QAngle& GetAbsAngles(void) const {
+		return GetEngineObject()->GetAbsAngles();
+	}
+
+	void				SetLocalOrigin(const Vector& origin) {
+		GetEngineObject()->SetLocalOrigin(origin);
+	}
+	void				SetLocalOriginDim(int iDim, vec_t flValue) {
+		GetEngineObject()->SetLocalOriginDim(iDim, flValue);
+	}
+	const Vector& GetLocalOrigin(void) const {
+		return GetEngineObject()->GetLocalOrigin();
+	}
+	vec_t				GetLocalOriginDim(int iDim) const {
+		return GetEngineObject()->GetLocalOriginDim(iDim);
+	}
+
+	void				SetLocalAngles(const QAngle& angles) {
+		GetEngineObject()->SetLocalAngles(angles);
+	}
+	void				SetLocalAnglesDim(int iDim, vec_t flValue) {
+		GetEngineObject()->SetLocalAnglesDim(iDim, flValue);
+	}
+	const QAngle& GetLocalAngles(void) const {
+		return GetEngineObject()->GetLocalAngles();
+	}
+	vec_t				GetLocalAnglesDim(int iDim) const {
+		return GetEngineObject()->GetLocalAnglesDim(iDim);
+	}
+
+	void				SetLocalVelocity(const Vector& vecVelocity) {
+		GetEngineObject()->SetLocalVelocity(vecVelocity);
+	}
+	const Vector& GetLocalVelocity() const {
+		return GetEngineObject()->GetLocalVelocity();
+	}
 };
 
 EXTERN_RECV_TABLE(DT_BaseEntity);
@@ -1756,14 +1926,14 @@ inline bool C_BaseEntity::IsServerEntity( void )
 inline matrix3x4_t &C_BaseEntity::EntityToWorldTransform()
 { 
 	Assert( s_bAbsQueriesValid );
-	CalcAbsolutePosition();
+	GetEngineObject()->CalcAbsolutePosition();
 	return m_rgflCoordinateFrame; 
 }
 
 inline const matrix3x4_t &C_BaseEntity::EntityToWorldTransform() const
 {
 	Assert( s_bAbsQueriesValid );
-	const_cast<C_BaseEntity*>(this)->CalcAbsolutePosition();
+	const_cast<C_BaseEntity*>(this)->GetEngineObject()->CalcAbsolutePosition();
 	return m_rgflCoordinateFrame; 
 }
 
@@ -1792,9 +1962,9 @@ inline int C_BaseEntity::GetModelIndex( void ) const
 //-----------------------------------------------------------------------------
 inline void C_BaseEntity::EntityToWorldSpace( const Vector &in, Vector *pOut ) const
 {
-	if ( GetAbsAngles() == vec3_angle )
+	if ( GetEngineObject()->GetAbsAngles() == vec3_angle )
 	{
-		VectorAdd( in, GetAbsOrigin(), *pOut );
+		VectorAdd( in, GetEngineObject()->GetAbsOrigin(), *pOut );
 	}
 	else
 	{
@@ -1804,9 +1974,9 @@ inline void C_BaseEntity::EntityToWorldSpace( const Vector &in, Vector *pOut ) c
 
 inline void C_BaseEntity::WorldToEntitySpace( const Vector &in, Vector *pOut ) const
 {
-	if ( GetAbsAngles() == vec3_angle )
+	if (GetEngineObject()->GetAbsAngles() == vec3_angle )
 	{
-		VectorSubtract( in, GetAbsOrigin(), *pOut );
+		VectorSubtract( in, GetEngineObject()->GetAbsOrigin(), *pOut );
 	}
 	else
 	{
@@ -1814,12 +1984,7 @@ inline void C_BaseEntity::WorldToEntitySpace( const Vector &in, Vector *pOut ) c
 	}
 }
 
-inline const Vector &C_BaseEntity::GetAbsVelocity( ) const
-{
-	Assert( s_bAbsQueriesValid );
-	const_cast<C_BaseEntity*>(this)->CalcAbsoluteVelocity();
-	return m_vecAbsVelocity;
-}
+
 
 inline C_BaseEntity	*C_BaseEntity::Instance( IClientEntity *ent )
 {
@@ -1945,13 +2110,7 @@ inline C_BaseEntity *C_BaseEntity::NextMovePeer( void ) const
 	return m_pMovePeer; 
 }
 
-//-----------------------------------------------------------------------------
-// Velocity
-//-----------------------------------------------------------------------------
-inline const Vector& C_BaseEntity::GetLocalVelocity() const 
-{ 
-	return m_vecVelocity; 
-}
+
 
 inline const QAngle& C_BaseEntity::GetLocalAngularVelocity( ) const
 {
@@ -2125,7 +2284,7 @@ inline Vector	C_BaseEntity::EarPosition( void ) const			// position of ears
 	return const_cast<C_BaseEntity*>(this)->EarPosition();
 }
 
-inline VarMapping_t* C_BaseEntity::GetVarMapping()
+inline VarMapping_t* C_EngineObject::GetVarMapping()
 {
 	return &m_VarMap;
 }

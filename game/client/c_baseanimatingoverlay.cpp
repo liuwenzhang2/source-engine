@@ -84,7 +84,7 @@ void ResizeAnimationLayerCallback( void *pStruct, int offsetToUtlVector, int len
 	// remove all entries
 	for ( int i=0; i < pVec->Count(); i++ )
 	{
-		pEnt->RemoveVar( &pVec->Element( i ) );
+		pEnt->GetEngineObject()->RemoveVar( &pVec->Element( i ) );
 	}
 
 	// adjust vector sizes
@@ -104,7 +104,7 @@ void ResizeAnimationLayerCallback( void *pStruct, int offsetToUtlVector, int len
 	{
 		IInterpolatedVar *pWatcher = &pVecIV->Element( i );
 		pWatcher->SetDebugName( s_m_iv_AnimOverlayNames[i] );
-		pEnt->AddVar( &pVec->Element( i ), pWatcher, LATCH_ANIMATION_VAR, true );
+		pEnt->GetEngineObject()->AddVar( &pVec->Element( i ), pWatcher, LATCH_ANIMATION_VAR, true );
 	}
 	// FIXME: need to set historical values of nOrder in pVecIV to MAX_OVERLAY
 	

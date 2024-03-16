@@ -210,8 +210,8 @@ void CPDumpPanel::DumpEntity( C_BaseEntity *ent, int commands_acknowledged )
 
 	if ( ent->GetPredictable() )
 	{
-		original_state_data		= ent->GetOriginalNetworkDataObject();	
-		predicted_state_data	= ent->GetPredictedFrame( commands_acknowledged - 1 );	
+		original_state_data		= ent->GetEngineObject()->GetOuterOriginalNetworkDataObject();
+		predicted_state_data	= ent->GetEngineObject()->GetOuterPredictedFrame( commands_acknowledged - 1 );
 	}
 	else
 	{

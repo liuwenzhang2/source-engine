@@ -435,7 +435,7 @@ void C_BaseViewModel::UpdateAnimationParity( void )
 	// tells us if we need to reset the animation.
 	if ( m_nOldAnimationParity != m_nAnimationParity && !GetPredictable() )
 	{
-		float curtime = (pPlayer && IsIntermediateDataAllocated()) ? pPlayer->GetFinalPredictedTime() : gpGlobals->curtime;
+		float curtime = (pPlayer && GetEngineObject()->IsIntermediateDataAllocated()) ? pPlayer->GetFinalPredictedTime() : gpGlobals->curtime;
 		// FIXME: this is bad
 		// Simulate a networked m_flAnimTime and m_flCycle
 		// FIXME:  Do we need the magic 0.1?
@@ -457,7 +457,7 @@ void C_BaseViewModel::OnDataChanged( DataUpdateType_t updateType )
 void C_BaseViewModel::PostDataUpdate( DataUpdateType_t updateType )
 {
 	BaseClass::PostDataUpdate(updateType);
-	OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
+	GetEngineObject()->OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
 }
 
 

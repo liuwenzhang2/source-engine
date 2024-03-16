@@ -376,7 +376,7 @@ void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *
 	vecVelocity.z = pData->m_Value.m_Vector[2];
 
 	// SetLocalVelocity checks to see if the value has changed
-	pEnt->SetLocalVelocity( vecVelocity );
+	pEnt->GetEngineObject()->SetLocalVelocity( vecVelocity );
 }
 void RecvProxy_ToolRecording( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
@@ -481,6 +481,15 @@ END_RECV_TABLE()
 
 const float coordTolerance = 2.0f / (float)( 1 << COORD_FRACTIONAL_BITS );
 
+BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObject)
+	DEFINE_FIELD(m_vecAbsVelocity, FIELD_VECTOR),
+	DEFINE_PRED_FIELD_TOL(m_vecVelocity, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, 0.5f),
+	DEFINE_FIELD(m_vecAbsOrigin, FIELD_VECTOR),
+	DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
+	DEFINE_FIELD(m_vecOrigin, FIELD_VECTOR),
+	DEFINE_FIELD(m_angRotation, FIELD_VECTOR),
+END_PREDICTION_DATA()
+
 BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 
 	// These have a special proxy to handle send/receive
@@ -489,8 +498,8 @@ BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 	DEFINE_PRED_FIELD( m_MoveType, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_MoveCollide, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
 
-	DEFINE_FIELD( m_vecAbsVelocity, FIELD_VECTOR ),
-	DEFINE_PRED_FIELD_TOL( m_vecVelocity, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, 0.5f ),
+	//DEFINE_FIELD( m_vecAbsVelocity, FIELD_VECTOR ),
+	//DEFINE_PRED_FIELD_TOL( m_vecVelocity, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, 0.5f ),
 //	DEFINE_PRED_FIELD( m_fEffects, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_nRenderMode, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_nRenderFX, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
@@ -513,10 +522,10 @@ BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 
 	DEFINE_PRED_FIELD_TOL( m_vecNetworkOrigin, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, coordTolerance ),
 	DEFINE_PRED_FIELD( m_angNetworkAngles, FIELD_VECTOR, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK ),
-	DEFINE_FIELD( m_vecAbsOrigin, FIELD_VECTOR ),
-	DEFINE_FIELD( m_angAbsRotation, FIELD_VECTOR ),
-	DEFINE_FIELD( m_vecOrigin, FIELD_VECTOR ),
-	DEFINE_FIELD( m_angRotation, FIELD_VECTOR ),
+	//DEFINE_FIELD( m_vecAbsOrigin, FIELD_VECTOR ),
+	//DEFINE_FIELD( m_angAbsRotation, FIELD_VECTOR ),
+	//DEFINE_FIELD( m_vecOrigin, FIELD_VECTOR ),
+	//DEFINE_FIELD( m_angRotation, FIELD_VECTOR ),
 
 //	DEFINE_FIELD( m_hGroundEntity, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_nWaterLevel, FIELD_CHARACTER ),
@@ -787,7 +796,7 @@ void C_BaseEntity::SetTextureFrameIndex( int iIndex )
 // Purpose: 
 // Input  : *map - 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::Interp_SetupMappings( VarMapping_t *map )
+void C_EngineObject::Interp_SetupMappings( VarMapping_t *map )
 {
 	if( !map )
 		return;
@@ -801,11 +810,11 @@ void C_BaseEntity::Interp_SetupMappings( VarMapping_t *map )
 		int type = e->type;
 
 		watcher->Setup( data, type );
-		watcher->SetInterpolationAmount( GetInterpolationAmount( watcher->GetType() ) ); 
+		watcher->SetInterpolationAmount( m_pOuter->GetInterpolationAmount( watcher->GetType() ) ); 
 	}
 }
 
-void C_BaseEntity::Interp_RestoreToLastNetworked( VarMapping_t *map )
+void C_EngineObject::Interp_RestoreToLastNetworked( VarMapping_t *map )
 {
 	VPROF( "C_BaseEntity::Interp_RestoreToLastNetworked" );
 
@@ -826,7 +835,7 @@ void C_BaseEntity::Interp_RestoreToLastNetworked( VarMapping_t *map )
 	BaseInterpolatePart2( oldOrigin, oldAngles, oldVel, 0 );
 }
 
-void C_BaseEntity::Interp_UpdateInterpolationAmounts( VarMapping_t *map )
+void C_EngineObject::Interp_UpdateInterpolationAmounts( VarMapping_t *map )
 {
 	if( !map )
 		return;
@@ -836,13 +845,13 @@ void C_BaseEntity::Interp_UpdateInterpolationAmounts( VarMapping_t *map )
 	{
 		VarMapEntry_t *e = &map->m_Entries[ i ];
 		IInterpolatedVar *watcher = e->watcher;
-		watcher->SetInterpolationAmount( GetInterpolationAmount( watcher->GetType() ) ); 
+		watcher->SetInterpolationAmount(m_pOuter->GetInterpolationAmount( watcher->GetType() ) );
 	}
 }
 
 void C_BaseEntity::Interp_HierarchyUpdateInterpolationAmounts()
 {
-	Interp_UpdateInterpolationAmounts( GetVarMapping() );
+	GetEngineObject()->Interp_UpdateInterpolationAmounts(GetEngineObject()->GetVarMapping() );
 
 	for ( C_BaseEntity *pChild = FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
 	{
@@ -850,7 +859,7 @@ void C_BaseEntity::Interp_HierarchyUpdateInterpolationAmounts()
 	}
 }
 
-inline int C_BaseEntity::Interp_Interpolate( VarMapping_t *map, float currentTime )
+inline int C_EngineObject::Interp_Interpolate( VarMapping_t *map, float currentTime )
 {
 	int bNoMoreChanges = 1;
 	if ( currentTime < map->m_lastInterpolationTime )
@@ -887,20 +896,8 @@ inline int C_BaseEntity::Interp_Interpolate( VarMapping_t *map, float currentTim
 //-----------------------------------------------------------------------------
 // Functions.
 //-----------------------------------------------------------------------------
-C_BaseEntity::C_BaseEntity() : 
-	m_iv_vecOrigin( "C_BaseEntity::m_iv_vecOrigin" ),
-	m_iv_angRotation( "C_BaseEntity::m_iv_angRotation" ),
-	m_iv_vecVelocity( "C_BaseEntity::m_iv_vecVelocity" )
+C_BaseEntity::C_BaseEntity()
 {
-	AddVar( &m_vecOrigin, &m_iv_vecOrigin, LATCH_SIMULATION_VAR );
-	AddVar( &m_angRotation, &m_iv_angRotation, LATCH_SIMULATION_VAR );
-	// Removing this until we figure out why velocity introduces view hitching.
-	// One possible fix is removing the player->ResetLatched() call in CGameMovement::FinishDuck(), 
-	// but that re-introduces a third-person hitching bug.  One possible cause is the abrupt change
-	// in player size/position that occurs when ducking, and how prediction tries to work through that.
-	//
-	// AddVar( &m_vecVelocity, &m_iv_vecVelocity, LATCH_SIMULATION_VAR );
-
 	m_DataChangeEventRef = -1;
 	m_EntClientFlags = 0;
 	m_bEnableRenderingClipPlane = false;
@@ -914,7 +911,7 @@ C_BaseEntity::C_BaseEntity() :
 	m_bSimulatedEveryTick = false;
 	m_bAnimatedEveryTick = false;
 	m_pPhysicsObject = NULL;
-
+	GetEngineObject()->Init(this);
 #ifdef _DEBUG
 	m_vecAbsOrigin = vec3_origin;
 	m_angAbsRotation = vec3_angle;
@@ -991,13 +988,13 @@ void C_BaseEntity::Clear( void )
 
 	index = -1;
 	m_Collision.Init( this );
-	SetLocalOrigin( vec3_origin );
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetLocalOrigin( vec3_origin );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 	model = NULL;
-	m_pOriginalData = NULL;
-	m_vecAbsOrigin.Init();
-	m_angAbsRotation.Init();
-	m_vecVelocity.Init();
+	GetEngineObject()->Clear();
+	GetEngineObject()->GetAbsOrigin().Init();
+	GetEngineObject()->GetAbsAngles().Init();
+	GetEngineObject()->GetAbsVelocity().Init();//GetLocalVelocity ???
 	ClearFlags();
 	m_vecViewOffset.Init();
 	m_vecBaseVelocity.Init();
@@ -1084,7 +1081,7 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 
 	CollisionProp()->CreatePartitionHandle();
 
-	Interp_SetupMappings( GetVarMapping() );
+	GetEngineObject()->Interp_SetupMappings(GetEngineObject()->GetVarMapping() );
 
 	m_nCreationTick = gpGlobals->tickcount;
 
@@ -1114,7 +1111,7 @@ bool C_BaseEntity::InitializeAsClientEntity( const char *pszModelName, RenderGro
 		nModelIndex = -1;
 	}
 
-	Interp_SetupMappings( GetVarMapping() );
+	GetEngineObject()->Interp_SetupMappings(GetEngineObject()->GetVarMapping() );
 
 	return InitializeAsClientEntityByIndex( nModelIndex, renderGroup );
 }
@@ -1220,9 +1217,9 @@ void C_BaseEntity::Release()
 
 	// Note that this must be called from here, not the destructor, because otherwise the
 	//  vtable is hosed and the derived classes function is not going to get called!!!
-	if ( IsIntermediateDataAllocated() )
+	if (GetEngineObject()->IsIntermediateDataAllocated() )
 	{
-		DestroyIntermediateData();
+		GetEngineObject()->DestroyIntermediateData();
 	}
 
 	UpdateOnRemove();
@@ -1511,12 +1508,12 @@ void C_BaseEntity::SetShadowUseOtherEntity( C_BaseEntity *pEntity )
 	m_ShadowDirUseOtherEntity = pEntity;
 }
 
-CInterpolatedVar< QAngle >& C_BaseEntity::GetRotationInterpolator()
+CInterpolatedVar< QAngle >& C_EngineObject::GetRotationInterpolator()
 {
 	return m_iv_angRotation;
 }
 
-CInterpolatedVar< Vector >& C_BaseEntity::GetOriginInterpolator()
+CInterpolatedVar< Vector >& C_EngineObject::GetOriginInterpolator()
 {
 	return m_iv_vecOrigin;
 }
@@ -1627,12 +1624,12 @@ int C_BaseEntity::GetSoundSourceIndex() const
 //-----------------------------------------------------------------------------
 const Vector& C_BaseEntity::GetRenderOrigin( void )
 {
-	return GetAbsOrigin();
+	return GetEngineObject()->GetAbsOrigin();
 }
 
 const QAngle& C_BaseEntity::GetRenderAngles( void )
 {
-	return GetAbsAngles();
+	return GetEngineObject()->GetAbsAngles();
 }
 
 const matrix3x4_t &C_BaseEntity::RenderableToWorldTransform()
@@ -1699,27 +1696,47 @@ void C_BaseEntity::GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType
 	m_EntClientFlags &= ~ENTCLIENTFLAG_GETTINGSHADOWRENDERBOUNDS;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Last received origin
+// Output : const float
+//-----------------------------------------------------------------------------
+Vector& C_EngineObject::GetAbsOrigin(void)
+{
+	//Assert( s_bAbsQueriesValid );
+	const_cast<C_EngineObject*>(this)->CalcAbsolutePosition();
+	return m_vecAbsOrigin;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Last received origin
 // Output : const float
 //-----------------------------------------------------------------------------
-const Vector& C_BaseEntity::GetAbsOrigin( void ) const
+const Vector& C_EngineObject::GetAbsOrigin( void ) const
 {
 	//Assert( s_bAbsQueriesValid );
-	const_cast<C_BaseEntity*>(this)->CalcAbsolutePosition();
+	const_cast<C_EngineObject*>(this)->CalcAbsolutePosition();
 	return m_vecAbsOrigin;
 }
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Last received angles
 // Output : const
 //-----------------------------------------------------------------------------
-const QAngle& C_BaseEntity::GetAbsAngles( void ) const
+QAngle& C_EngineObject::GetAbsAngles(void)
 {
 	//Assert( s_bAbsQueriesValid );
-	const_cast<C_BaseEntity*>(this)->CalcAbsolutePosition();
+	const_cast<C_EngineObject*>(this)->CalcAbsolutePosition();
+	return m_angAbsRotation;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Last received angles
+// Output : const
+//-----------------------------------------------------------------------------
+const QAngle& C_EngineObject::GetAbsAngles( void ) const
+{
+	//Assert( s_bAbsQueriesValid );
+	const_cast<C_EngineObject*>(this)->CalcAbsolutePosition();
 	return m_angAbsRotation;
 }
 
@@ -1858,7 +1875,7 @@ bool C_BaseEntity::GetSoundSpatialization( SpatializationInfo_t& info )
 	
 	if ( info.pOrigin )
 	{
-		*info.pOrigin = GetAbsOrigin();
+		*info.pOrigin = GetEngineObject()->GetAbsOrigin();
 
 		// move origin to middle of brush
 		if ( modelinfo->GetModelType( pModel ) == mod_brush )
@@ -1875,7 +1892,7 @@ bool C_BaseEntity::GetSoundSpatialization( SpatializationInfo_t& info )
 
 	if ( info.pAngles )
 	{
-		VectorCopy( GetAbsAngles(), *info.pAngles );
+		VectorCopy(GetEngineObject()->GetAbsAngles(), *info.pAngles );
 	}
 
 	return true;
@@ -1888,14 +1905,14 @@ bool C_BaseEntity::GetSoundSpatialization( SpatializationInfo_t& info )
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::GetAttachment( int number, Vector &origin, QAngle &angles )
 {
-	origin = GetAbsOrigin();
-	angles = GetAbsAngles();
+	origin = GetEngineObject()->GetAbsOrigin();
+	angles = GetEngineObject()->GetAbsAngles();
 	return true;
 }
 
 bool C_BaseEntity::GetAttachment( int number, Vector &origin )
 {
-	origin = GetAbsOrigin();
+	origin = GetEngineObject()->GetAbsOrigin();
 	return true;
 }
 
@@ -1907,7 +1924,7 @@ bool C_BaseEntity::GetAttachment( int number, matrix3x4_t &matrix )
 
 bool C_BaseEntity::GetAttachmentVelocity( int number, Vector &originVel, Quaternion &angleVel )
 {
-	originVel = GetAbsVelocity();
+	originVel = GetEngineObject()->GetAbsVelocity();
 	angleVel.Init();
 	return true;
 }
@@ -1947,7 +1964,7 @@ int C_BaseEntity::DrawBrushModel( bool bDrawingTranslucency, int nFlags, bool bT
 
 	if ( DepthMode != DEPTH_MODE_NORMAL )
 	{
-		render->DrawBrushModelShadowDepth( this, (model_t *)model, GetAbsOrigin(), GetAbsAngles(), DepthMode );
+		render->DrawBrushModelShadowDepth( this, (model_t *)model, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), DepthMode );
 	}
 	else
 	{
@@ -1956,7 +1973,7 @@ int C_BaseEntity::DrawBrushModel( bool bDrawingTranslucency, int nFlags, bool bT
 		{
 			mode = bDrawingTranslucency ? DBM_DRAW_TRANSLUCENT_ONLY : DBM_DRAW_OPAQUE_ONLY;
 		}
-		render->DrawBrushModelEx( this, (model_t *)model, GetAbsOrigin(), GetAbsAngles(), mode );
+		render->DrawBrushModelEx( this, (model_t *)model, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), mode );
 	}
 
 	return 1;
@@ -2136,7 +2153,7 @@ void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 
 	if ( !bnewentity )
 	{
-		Interp_RestoreToLastNetworked( GetVarMapping() );
+		GetEngineObject()->Interp_RestoreToLastNetworked(GetEngineObject()->GetVarMapping() );
 	}
 
 	if ( bnewentity /*&& !IsClientCreated()*/)
@@ -2290,7 +2307,7 @@ void C_BaseEntity::CalcAimEntPositions()
 		Assert( pEnt->GetMoveParent() );
 		if ( pEnt->IsEffectActive(EF_BONEMERGE) )
 		{
-			pEnt->CalcAbsolutePosition( );
+			pEnt->GetEngineObject()->CalcAbsolutePosition( );
 		}
 	}
 }
@@ -2393,9 +2410,9 @@ void C_BaseEntity::SetParent( C_BaseEntity *pParentEntity, int iParentAttachment
 		return;
 
 	// NOTE: Have to do this before the unlink to ensure local coords are valid
-	Vector vecAbsOrigin = GetAbsOrigin();
-	QAngle angAbsRotation = GetAbsAngles();
-	Vector vecAbsVelocity = GetAbsVelocity();
+	Vector vecAbsOrigin = GetEngineObject()->GetAbsOrigin();
+	QAngle angAbsRotation = GetEngineObject()->GetAbsAngles();
+	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 
 	// First deal with unlinking
 	if (m_pMoveParent.IsValid())
@@ -2415,13 +2432,13 @@ void C_BaseEntity::SetParent( C_BaseEntity *pParentEntity, int iParentAttachment
 	
 	m_iParentAttachment = iParentAttachment;
 	
-	m_vecAbsOrigin.Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	m_angAbsRotation.Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	m_vecAbsVelocity.Init( FLT_MAX, FLT_MAX, FLT_MAX );
+	GetEngineObject()->GetAbsOrigin().Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	GetEngineObject()->GetAbsAngles().Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	GetEngineObject()->GetAbsVelocity().Init(FLT_MAX, FLT_MAX, FLT_MAX);
 
-	SetAbsOrigin(vecAbsOrigin);
-	SetAbsAngles(angAbsRotation);
-	SetAbsVelocity(vecAbsVelocity);
+	GetEngineObject()->SetAbsOrigin(vecAbsOrigin);
+	GetEngineObject()->SetAbsAngles(angAbsRotation);
+	GetEngineObject()->SetAbsVelocity(vecAbsVelocity);
 
 }
 
@@ -2531,8 +2548,8 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 		SetSolid( SOLID_BSP );
 
 		// FIXME: Should these be assertions?
-		SetAbsOrigin( vec3_origin );
-		SetAbsAngles( vec3_angle );
+		GetEngineObject()->SetAbsOrigin( vec3_origin );
+		GetEngineObject()->SetAbsAngles( vec3_angle );
 	}
 
 	if ( m_nOldRenderMode != m_nRenderMode )
@@ -2541,8 +2558,8 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 	}
 
 	bool animTimeChanged = ( m_flAnimTime != m_flOldAnimTime ) ? true : false;
-	bool originChanged = ( m_vecOldOrigin != GetLocalOrigin() ) ? true : false;
-	bool anglesChanged = ( m_vecOldAngRotation != GetLocalAngles() ) ? true : false;
+	bool originChanged = ( m_vecOldOrigin != GetEngineObject()->GetLocalOrigin() ) ? true : false;
+	bool anglesChanged = ( m_vecOldAngRotation != GetEngineObject()->GetLocalAngles() ) ? true : false;
 	bool simTimeChanged = ( m_flSimulationTime != m_flOldSimulationTime ) ? true : false;
 
 	// Detect simulation changes 
@@ -2555,19 +2572,19 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 	{
 		if ( animTimeChanged )
 		{
-			OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
+			GetEngineObject()->OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
 		}
 
 		if ( simulationChanged )
 		{
-			OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR );
+			GetEngineObject()->OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR );
 		}
 	}
 	// For predictables, we also need to store off the last networked value
 	else if ( bPredictable )
 	{
 		// Just store off last networked value for use in prediction
-		OnStoreLastNetworkedValue();
+		GetEngineObject()->OnStoreLastNetworkedValue();
 	}
 
 	// Deal with hierarchy. Have to do it here (instead of in a proxy)
@@ -2659,7 +2676,7 @@ void C_BaseEntity::CheckInitPredictable( const char *context )
 	if ( !ShouldPredict() )
 		return;
 
-	if ( IsIntermediateDataAllocated() )
+	if (GetEngineObject()->IsIntermediateDataAllocated() )
 		return;
 
 	// Msg( "Predicting init %s at %s\n", GetClassname(), context );
@@ -2715,7 +2732,7 @@ bool C_BaseEntity::SetModel( const char *pModelName )
 	}
 }
 
-void C_BaseEntity::OnStoreLastNetworkedValue()
+void C_EngineObject::OnStoreLastNetworkedValue()
 {
 	bool bRestore = false;
 	Vector savePos;
@@ -2723,13 +2740,13 @@ void C_BaseEntity::OnStoreLastNetworkedValue()
 
 	// Kind of a hack, but we want to latch the actual networked value for origin/angles, not what's sitting in m_vecOrigin in the
 	//  ragdoll case where we don't copy it over in MoveToLastNetworkOrigin
-	if ( m_nRenderFX == kRenderFxRagdoll && GetPredictable() )
+	if (m_pOuter->m_nRenderFX == kRenderFxRagdoll && m_pOuter->GetPredictable() )
 	{
 		bRestore = true;
 		savePos = GetLocalOrigin();
 		saveAng = GetLocalAngles();
 
-		MoveToLastReceivedPosition( true );
+		m_pOuter->MoveToLastReceivedPosition( true );
 	}
 
 	int c = m_VarMap.m_Entries.Count();
@@ -2759,9 +2776,9 @@ void C_BaseEntity::OnStoreLastNetworkedValue()
 // Input  : *pState - the (mostly) previous state data
 //-----------------------------------------------------------------------------
 
-void C_BaseEntity::OnLatchInterpolatedVariables( int flags )
+void C_EngineObject::OnLatchInterpolatedVariables( int flags )
 {
-	float changetime = GetLastChangeTime( flags );
+	float changetime = m_pOuter->GetLastChangeTime( flags );
 
 	bool bUpdateLastNetworkedValue = !(flags & INTERPOLATE_OMIT_UPDATE_LAST_NETWORKED) ? true : false;
 
@@ -2785,28 +2802,28 @@ void C_BaseEntity::OnLatchInterpolatedVariables( int flags )
 			e->m_bNeedsToInterpolate = true;
 	}
 	
-	if ( ShouldInterpolate() )
+	if ( m_pOuter->ShouldInterpolate() )
 	{
-		AddToInterpolationList();
+		m_pOuter->AddToInterpolationList();
 	}
 }
 
-int CBaseEntity::BaseInterpolatePart1( float &currentTime, Vector &oldOrigin, QAngle &oldAngles, Vector &oldVel, int &bNoMoreChanges )
+int C_EngineObject::BaseInterpolatePart1( float &currentTime, Vector &oldOrigin, QAngle &oldAngles, Vector &oldVel, int &bNoMoreChanges )
 {
 	// Don't mess with the world!!!
 	bNoMoreChanges = 1;
 	
 
 	// These get moved to the parent position automatically
-	if ( IsFollowingEntity() || !IsInterpolationEnabled() )
+	if (m_pOuter->IsFollowingEntity() || !m_pOuter->IsInterpolationEnabled() )
 	{
 		// Assume current origin ( no interpolation )
-		MoveToLastReceivedPosition();
+		m_pOuter->MoveToLastReceivedPosition();
 		return INTERPOLATE_STOP;
 	}
 
 
-	if ( GetPredictable() /*|| IsClientCreated()*/)
+	if (m_pOuter->GetPredictable() /*|| IsClientCreated()*/)
 	{
 		C_BasePlayer *localplayer = C_BasePlayer::GetLocalPlayer();
 		if ( localplayer && currentTime == gpGlobals->curtime )
@@ -2822,7 +2839,7 @@ int CBaseEntity::BaseInterpolatePart1( float &currentTime, Vector &oldOrigin, QA
 	oldVel = m_vecVelocity;
 
 	bNoMoreChanges = Interp_Interpolate( GetVarMapping(), currentTime );
-	if ( cl_interp_all.GetInt() || (m_EntClientFlags & ENTCLIENTFLAG_ALWAYS_INTERPOLATE) )
+	if ( cl_interp_all.GetInt() || (m_pOuter->m_EntClientFlags & ENTCLIENTFLAG_ALWAYS_INTERPOLATE) )
 		bNoMoreChanges = 0;
 
 	return INTERPOLATE_CONTINUE;
@@ -2832,7 +2849,7 @@ int CBaseEntity::BaseInterpolatePart1( float &currentTime, Vector &oldOrigin, QA
 static ConVar cl_watchplayer( "cl_watchplayer", "-1", 0 );
 #endif
 
-void C_BaseEntity::BaseInterpolatePart2( Vector &oldOrigin, QAngle &oldAngles, Vector &oldVel, int nChangeFlags )
+void C_EngineObject::BaseInterpolatePart2( Vector &oldOrigin, QAngle &oldAngles, Vector &oldVel, int nChangeFlags )
 {
 	if ( m_vecOrigin != oldOrigin )
 	{
@@ -2851,7 +2868,7 @@ void C_BaseEntity::BaseInterpolatePart2( Vector &oldOrigin, QAngle &oldAngles, V
 
 	if ( nChangeFlags != 0 )
 	{
-		InvalidatePhysicsRecursive( nChangeFlags );
+		m_pOuter->InvalidatePhysicsRecursive( nChangeFlags );
 	}
 
 #if 0
@@ -2876,7 +2893,7 @@ bool C_BaseEntity::Interpolate( float currentTime )
 	Vector oldVel;
 
 	int bNoMoreChanges;
-	int retVal = BaseInterpolatePart1( currentTime, oldOrigin, oldAngles, oldVel, bNoMoreChanges );
+	int retVal = GetEngineObject()->BaseInterpolatePart1( currentTime, oldOrigin, oldAngles, oldVel, bNoMoreChanges );
 
 	// If all the Interpolate() calls returned that their values aren't going to
 	// change anymore, then get us out of the interpolation list.
@@ -2887,7 +2904,7 @@ bool C_BaseEntity::Interpolate( float currentTime )
 		return true;
 
 	int nChangeFlags = 0;
-	BaseInterpolatePart2( oldOrigin, oldAngles, oldVel, nChangeFlags );
+	GetEngineObject()->BaseInterpolatePart2( oldOrigin, oldAngles, oldVel, nChangeFlags );
 
 	return true;
 }
@@ -2957,7 +2974,7 @@ void C_BaseEntity::CreateLightEffects( void )
 	if (IsEffectActive(EF_BRIGHTLIGHT))
 	{
 		dl = effects->CL_AllocDlight ( index );
-		dl->origin = GetAbsOrigin();
+		dl->origin = GetEngineObject()->GetAbsOrigin();
 		dl->origin[2] += 16;
 		dl->color.r = dl->color.g = dl->color.b = 250;
 		dl->radius = random->RandomFloat(400,431);
@@ -2966,7 +2983,7 @@ void C_BaseEntity::CreateLightEffects( void )
 	if (IsEffectActive(EF_DIMLIGHT))
 	{			
 		dl = effects->CL_AllocDlight ( index );
-		dl->origin = GetAbsOrigin();
+		dl->origin = GetEngineObject()->GetAbsOrigin();
 		dl->color.r = dl->color.g = dl->color.b = 100;
 		dl->radius = random->RandomFloat(200,231);
 		dl->die = gpGlobals->curtime + 0.001;
@@ -2977,8 +2994,8 @@ void C_BaseEntity::MoveToLastReceivedPosition( bool force )
 {
 	if ( force || ( m_nRenderFX != kRenderFxRagdoll ) )
 	{
-		SetLocalOrigin( GetNetworkOrigin() );
-		SetLocalAngles( GetNetworkAngles() );
+		GetEngineObject()->SetLocalOrigin( GetNetworkOrigin() );
+		GetEngineObject()->SetLocalAngles( GetNetworkAngles() );
 	}
 }
 
@@ -3114,8 +3131,8 @@ void C_BaseEntity::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pOrigin,
 	// Should be overridden for things that attach to attchment points
 
 	// Slam origin to the origin of the entity we are attached to...
-	*pOrigin = pAttachedTo->GetAbsOrigin();
-	*pAngles = pAttachedTo->GetAbsAngles();
+	*pOrigin = ((C_BaseEntity*)pAttachedTo)->GetEngineObject()->GetAbsOrigin();
+	*pAngles = ((C_BaseEntity*)pAttachedTo)->GetEngineObject()->GetAbsAngles();
 }
 
 
@@ -3203,7 +3220,7 @@ void C_BaseEntity::InterpolateServerEntities()
 		C_BaseEntity *pEnt;
 		while ( (pEnt = iterator.Next()) != NULL )
 		{
-			pEnt->Interp_UpdateInterpolationAmounts( pEnt->GetVarMapping() );
+			pEnt->GetEngineObject()->Interp_UpdateInterpolationAmounts( pEnt->GetEngineObject()->GetVarMapping() );
 		}
 	}
 
@@ -3445,7 +3462,7 @@ void C_BaseEntity::ComputeFxBlend( void )
 			Vector	tmp;
 			float	dist;
 			
-			VectorCopy( GetAbsOrigin(), tmp );
+			VectorCopy(GetEngineObject()->GetAbsOrigin(), tmp );
 			VectorSubtract( tmp, CurrentViewOrigin(), tmp );
 			dist = DotProduct( tmp, CurrentViewForward() );
 			
@@ -3667,7 +3684,7 @@ void C_BaseEntity::AddBrushModelDecal( const Ray_t& ray, const Vector& decalCent
 	}
 
 	effects->DecalShoot( decalIndex, index, 
-		model, GetAbsOrigin(), GetAbsAngles(), decalCenter, 0, 0 );
+		model, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0 );
 }
 
 
@@ -3741,7 +3758,7 @@ void C_BaseEntity::AddColoredDecal( const Vector& rayStart, const Vector& rayEnd
 	case mod_brush:
 		{
 			color32 cColor32 = { (uint8)cColor.r(), (uint8)cColor.g(), (uint8)cColor.b(), (uint8)cColor.a() };
-			effects->DecalColorShoot( decalIndex, index, model, GetAbsOrigin(), GetAbsAngles(), decalCenter, 0, 0, cColor32 );
+			effects->DecalColorShoot( decalIndex, index, model, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0, cColor32 );
 		}
 		break;
 
@@ -4010,7 +4027,7 @@ void C_BaseEntity::SetDestroyedOnRecreateEntities( void )
 //-----------------------------------------------------------------------------
 // These methods recompute local versions as well as set abs versions
 //-----------------------------------------------------------------------------
-void C_BaseEntity::SetAbsOrigin( const Vector& absOrigin )
+void C_EngineObject::SetAbsOrigin( const Vector& absOrigin )
 {
 	// This is necessary to get the other fields of m_rgflCoordinateFrame ok
 	CalcAbsolutePosition();
@@ -4019,13 +4036,13 @@ void C_BaseEntity::SetAbsOrigin( const Vector& absOrigin )
 		return;
 
 	// All children are invalid, but we are not
-	InvalidatePhysicsRecursive( POSITION_CHANGED );
-	RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
+	m_pOuter->InvalidatePhysicsRecursive( POSITION_CHANGED );
+	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
 
 	m_vecAbsOrigin = absOrigin;
-	MatrixSetColumn( absOrigin, 3, m_rgflCoordinateFrame ); 
+	MatrixSetColumn( absOrigin, 3, m_pOuter->m_rgflCoordinateFrame );
 
-	C_BaseEntity *pMoveParent = GetMoveParent();
+	C_BaseEntity *pMoveParent = m_pOuter->GetMoveParent();
 
 	if (!pMoveParent)
 	{
@@ -4037,7 +4054,7 @@ void C_BaseEntity::SetAbsOrigin( const Vector& absOrigin )
 	VectorITransform( absOrigin, pMoveParent->EntityToWorldTransform(), (Vector&)m_vecOrigin );
 }
 
-void C_BaseEntity::SetAbsAngles( const QAngle& absAngles )
+void C_EngineObject::SetAbsAngles( const QAngle& absAngles )
 {
 	// This is necessary to get the other fields of m_rgflCoordinateFrame ok
 	CalcAbsolutePosition();
@@ -4049,14 +4066,14 @@ void C_BaseEntity::SetAbsAngles( const QAngle& absAngles )
 	if ( m_angAbsRotation == absAngles )
 		return;
 
-	InvalidatePhysicsRecursive( ANGLES_CHANGED );
-	RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
+	m_pOuter->InvalidatePhysicsRecursive( ANGLES_CHANGED );
+	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
 
 	m_angAbsRotation = absAngles;
-	AngleMatrix( absAngles, m_rgflCoordinateFrame );
-	MatrixSetColumn( m_vecAbsOrigin, 3, m_rgflCoordinateFrame ); 
+	AngleMatrix( absAngles, m_pOuter->m_rgflCoordinateFrame );
+	MatrixSetColumn( m_vecAbsOrigin, 3, m_pOuter->m_rgflCoordinateFrame );
 
-	C_BaseEntity *pMoveParent = GetMoveParent();
+	C_BaseEntity *pMoveParent = m_pOuter->GetMoveParent();
 	
 	if (!pMoveParent)
 	{
@@ -4065,7 +4082,7 @@ void C_BaseEntity::SetAbsAngles( const QAngle& absAngles )
 	}
 
 	// Moveparent case: we're aligned with the move parent
-	if ( m_angAbsRotation == pMoveParent->GetAbsAngles() )
+	if ( m_angAbsRotation == pMoveParent->GetEngineObject()->GetAbsAngles() )
 	{
 		m_angRotation.Init( );
 	}
@@ -4074,23 +4091,23 @@ void C_BaseEntity::SetAbsAngles( const QAngle& absAngles )
 		// Moveparent case: transform the abs transform into local space
 		matrix3x4_t worldToParent, localMatrix;
 		MatrixInvert( pMoveParent->EntityToWorldTransform(), worldToParent );
-		ConcatTransforms( worldToParent, m_rgflCoordinateFrame, localMatrix );
+		ConcatTransforms( worldToParent, m_pOuter->m_rgflCoordinateFrame, localMatrix );
 		MatrixAngles( localMatrix, (QAngle &)m_angRotation );
 	}
 }
 
-void C_BaseEntity::SetAbsVelocity( const Vector &vecAbsVelocity )
+void C_EngineObject::SetAbsVelocity( const Vector &vecAbsVelocity )
 {
 	if ( m_vecAbsVelocity == vecAbsVelocity )
 		return;
 
 	// The abs velocity won't be dirty since we're setting it here
-	InvalidatePhysicsRecursive( VELOCITY_CHANGED );
-	m_iEFlags &= ~EFL_DIRTY_ABSVELOCITY;
+	m_pOuter->InvalidatePhysicsRecursive( VELOCITY_CHANGED );
+	m_pOuter->m_iEFlags &= ~EFL_DIRTY_ABSVELOCITY;
 
 	m_vecAbsVelocity = vecAbsVelocity;
 
-	C_BaseEntity *pMoveParent = GetMoveParent();
+	C_BaseEntity *pMoveParent = m_pOuter->GetMoveParent();
 
 	if (!pMoveParent)
 	{
@@ -4101,7 +4118,7 @@ void C_BaseEntity::SetAbsVelocity( const Vector &vecAbsVelocity )
 	// First subtract out the parent's abs velocity to get a relative
 	// velocity measured in world space
 	Vector relVelocity;
-	VectorSubtract( vecAbsVelocity, pMoveParent->GetAbsVelocity(), relVelocity );
+	VectorSubtract( vecAbsVelocity, pMoveParent->GetEngineObject()->GetAbsVelocity(), relVelocity );
 
 	// Transform velocity into parent space
 	VectorIRotate( relVelocity, pMoveParent->EntityToWorldTransform(), m_vecVelocity );
@@ -4141,49 +4158,49 @@ void C_BaseEntity::SetAbsAngularVelocity( const QAngle &vecAbsAngVelocity )
 
 
 // Prevent these for now until hierarchy is properly networked
-const Vector& C_BaseEntity::GetLocalOrigin( void ) const
+const Vector& C_EngineObject::GetLocalOrigin( void ) const
 {
 	return m_vecOrigin;
 }
 
-vec_t C_BaseEntity::GetLocalOriginDim( int iDim ) const
+vec_t C_EngineObject::GetLocalOriginDim( int iDim ) const
 {
 	return m_vecOrigin[iDim];
 }
 
 // Prevent these for now until hierarchy is properly networked
-void C_BaseEntity::SetLocalOrigin( const Vector& origin )
+void C_EngineObject::SetLocalOrigin( const Vector& origin )
 {
 	if (m_vecOrigin != origin)
 	{
-		InvalidatePhysicsRecursive( POSITION_CHANGED );
+		m_pOuter->InvalidatePhysicsRecursive( POSITION_CHANGED );
 		m_vecOrigin = origin;
 	}
 }
 
-void C_BaseEntity::SetLocalOriginDim( int iDim, vec_t flValue )
+void C_EngineObject::SetLocalOriginDim( int iDim, vec_t flValue )
 {
 	if (m_vecOrigin[iDim] != flValue)
 	{
-		InvalidatePhysicsRecursive( POSITION_CHANGED );
+		m_pOuter->InvalidatePhysicsRecursive( POSITION_CHANGED );
 		m_vecOrigin[iDim] = flValue;
 	}
 }
 
 
 // Prevent these for now until hierarchy is properly networked
-const QAngle& C_BaseEntity::GetLocalAngles( void ) const
+const QAngle& C_EngineObject::GetLocalAngles( void ) const
 {
 	return m_angRotation;
 }
 
-vec_t C_BaseEntity::GetLocalAnglesDim( int iDim ) const
+vec_t C_EngineObject::GetLocalAnglesDim( int iDim ) const
 {
 	return m_angRotation[iDim];
 }
 
 // Prevent these for now until hierarchy is properly networked
-void C_BaseEntity::SetLocalAngles( const QAngle& angles )
+void C_EngineObject::SetLocalAngles( const QAngle& angles )
 {
 	// NOTE: The angle normalize is a little expensive, but we can save
 	// a bunch of time in interpolation if we don't have to invalidate everything
@@ -4196,27 +4213,27 @@ void C_BaseEntity::SetLocalAngles( const QAngle& angles )
 	if (m_angRotation != angles)
 	{
 		// This will cause the velocities of all children to need recomputation
-		InvalidatePhysicsRecursive( ANGLES_CHANGED );
+		m_pOuter->InvalidatePhysicsRecursive( ANGLES_CHANGED );
 		m_angRotation = angles;
 	}
 }
 
-void C_BaseEntity::SetLocalAnglesDim( int iDim, vec_t flValue )
+void C_EngineObject::SetLocalAnglesDim( int iDim, vec_t flValue )
 {
 	flValue = AngleNormalize( flValue );
 	if (m_angRotation[iDim] != flValue)
 	{
 		// This will cause the velocities of all children to need recomputation
-		InvalidatePhysicsRecursive( ANGLES_CHANGED );
+		m_pOuter->InvalidatePhysicsRecursive( ANGLES_CHANGED );
 		m_angRotation[iDim] = flValue;
 	}
 }
 
-void C_BaseEntity::SetLocalVelocity( const Vector &vecVelocity )
+void C_EngineObject::SetLocalVelocity( const Vector &vecVelocity )
 {
 	if (m_vecVelocity != vecVelocity)
 	{
-		InvalidatePhysicsRecursive( VELOCITY_CHANGED );
+		m_pOuter->InvalidatePhysicsRecursive( VELOCITY_CHANGED );
 		m_vecVelocity = vecVelocity; 
 	}
 }
@@ -4240,8 +4257,8 @@ void C_BaseEntity::SetLocalTransform( const matrix3x4_t &localTransform )
 	QAngle vecLocalAngles;
 	MatrixGetColumn( localTransform, 3, vecLocalOrigin );
 	MatrixAngles( localTransform, vecLocalAngles );
-	SetLocalOrigin( vecLocalOrigin );
-	SetLocalAngles( vecLocalAngles );
+	GetEngineObject()->SetLocalOrigin( vecLocalOrigin );
+	GetEngineObject()->SetLocalAngles( vecLocalAngles );
 }
 
 
@@ -4253,8 +4270,8 @@ void C_BaseEntity::MoveToAimEnt( )
 	Vector vecAimEntOrigin;
 	QAngle vecAimEntAngles;
 	GetAimEntOrigin( GetMoveParent(), &vecAimEntOrigin, &vecAimEntAngles );
-	SetAbsOrigin( vecAimEntOrigin );
-	SetAbsAngles( vecAimEntAngles );
+	GetEngineObject()->SetAbsOrigin( vecAimEntOrigin );
+	GetEngineObject()->SetAbsAngles( vecAimEntAngles );
 }
 
 
@@ -4304,46 +4321,46 @@ matrix3x4_t& C_BaseEntity::GetParentToWorldTransform( matrix3x4_t &tempMatrix )
 // Purpose: Calculates the absolute position of an edict in the world
 //			assumes the parent's absolute origin has already been calculated
 //-----------------------------------------------------------------------------
-void C_BaseEntity::CalcAbsolutePosition( )
+void C_EngineObject::CalcAbsolutePosition( )
 {
 	// There are periods of time where we're gonna have to live with the
 	// fact that we're in an indeterminant state and abs queries (which
 	// shouldn't be happening at all; I have assertions for those), will
 	// just have to accept stale data.
-	if (!s_bAbsRecomputationEnabled)
+	if (!m_pOuter->s_bAbsRecomputationEnabled)
 		return;
 
 	// FIXME: Recompute absbox!!!
-	if ((m_iEFlags & EFL_DIRTY_ABSTRANSFORM) == 0)
+	if ((m_pOuter->m_iEFlags & EFL_DIRTY_ABSTRANSFORM) == 0)
 	{
 		// quick check to make sure we really don't need an update
 		// Assert( m_pMoveParent || m_vecAbsOrigin == GetLocalOrigin() );
 		return;
 	}
 
-	AUTO_LOCK( m_CalcAbsolutePositionMutex );
+	AUTO_LOCK(m_pOuter->m_CalcAbsolutePositionMutex );
 
-	if ((m_iEFlags & EFL_DIRTY_ABSTRANSFORM) == 0) // need second check in event another thread grabbed mutex and did the calculation
+	if ((m_pOuter->m_iEFlags & EFL_DIRTY_ABSTRANSFORM) == 0) // need second check in event another thread grabbed mutex and did the calculation
 	{
 		return;
 	}
 
-	RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
+	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
 
-	if (!m_pMoveParent)
+	if (!m_pOuter->m_pMoveParent)
 	{
 		// Construct the entity-to-world matrix
 		// Start with making an entity-to-parent matrix
-		AngleMatrix( GetLocalAngles(), GetLocalOrigin(), m_rgflCoordinateFrame );
+		AngleMatrix( GetLocalAngles(), GetLocalOrigin(), m_pOuter->m_rgflCoordinateFrame );
 		m_vecAbsOrigin = GetLocalOrigin();
 		m_angAbsRotation = GetLocalAngles();
 		NormalizeAngles( m_angAbsRotation );
 		return;
 	}
 	
-	if ( IsEffectActive(EF_BONEMERGE) )
+	if (m_pOuter->IsEffectActive(EF_BONEMERGE) )
 	{
-		MoveToAimEnt();
+		m_pOuter->MoveToAimEnt();
 		return;
 	}
 
@@ -4355,20 +4372,20 @@ void C_BaseEntity::CalcAbsolutePosition( )
 
 	// concatenate with our parent's transform
 	matrix3x4_t scratchMatrix;
-	ConcatTransforms( GetParentToWorldTransform( scratchMatrix ), matEntityToParent, m_rgflCoordinateFrame );
+	ConcatTransforms(m_pOuter->GetParentToWorldTransform( scratchMatrix ), matEntityToParent, m_pOuter->m_rgflCoordinateFrame );
 
 	// pull our absolute position out of the matrix
-	MatrixGetColumn( m_rgflCoordinateFrame, 3, m_vecAbsOrigin );
+	MatrixGetColumn(m_pOuter->m_rgflCoordinateFrame, 3, m_vecAbsOrigin );
 
 	// if we have any angles, we have to extract our absolute angles from our matrix
-	if ( m_angRotation == vec3_angle && m_iParentAttachment == 0 )
+	if ( m_angRotation == vec3_angle && m_pOuter->m_iParentAttachment == 0 )
 	{
 		// just copy our parent's absolute angles
-		VectorCopy( m_pMoveParent->GetAbsAngles(), m_angAbsRotation );
+		VectorCopy( m_pOuter->m_pMoveParent->GetEngineObject()->GetAbsAngles(), m_angAbsRotation );
 	}
 	else
 	{
-		MatrixAngles( m_rgflCoordinateFrame, m_angAbsRotation );
+		MatrixAngles(m_pOuter->m_rgflCoordinateFrame, m_angAbsRotation );
 	}
 
 	// This is necessary because it's possible that our moveparent's CalculateIKLocks will trigger its move children 
@@ -4377,27 +4394,27 @@ void C_BaseEntity::CalcAbsolutePosition( )
 	//
 	// So here, we keep our absorigin invalidated. It means we're returning an origin that is a frame old to CalculateIKLocks,
 	// but we'll still render with the right origin.
-	if ( m_iParentAttachment != 0 && (m_pMoveParent->GetEFlags() & EFL_SETTING_UP_BONES) )
+	if (m_pOuter->m_iParentAttachment != 0 && (m_pOuter->m_pMoveParent->GetEFlags() & EFL_SETTING_UP_BONES) )
 	{
-		m_iEFlags |= EFL_DIRTY_ABSTRANSFORM;
+		m_pOuter->m_iEFlags |= EFL_DIRTY_ABSTRANSFORM;
 	}
 }
 
-void C_BaseEntity::CalcAbsoluteVelocity()
+void C_EngineObject::CalcAbsoluteVelocity()
 {
-	if ((m_iEFlags & EFL_DIRTY_ABSVELOCITY ) == 0)
+	if ((m_pOuter->m_iEFlags & EFL_DIRTY_ABSVELOCITY ) == 0)
 		return;
 
-	AUTO_LOCK( m_CalcAbsoluteVelocityMutex );
+	AUTO_LOCK(m_pOuter->m_CalcAbsoluteVelocityMutex );
 
-	if ((m_iEFlags & EFL_DIRTY_ABSVELOCITY) == 0) // need second check in event another thread grabbed mutex and did the calculation
+	if ((m_pOuter->m_iEFlags & EFL_DIRTY_ABSVELOCITY) == 0) // need second check in event another thread grabbed mutex and did the calculation
 	{
 		return;
 	}
 
-	m_iEFlags &= ~EFL_DIRTY_ABSVELOCITY;
+	m_pOuter->m_iEFlags &= ~EFL_DIRTY_ABSVELOCITY;
 
-	CBaseEntity *pMoveParent = GetMoveParent();
+	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
 	if ( !pMoveParent )
 	{
 		m_vecAbsVelocity = m_vecVelocity;
@@ -4408,11 +4425,11 @@ void C_BaseEntity::CalcAbsoluteVelocity()
 
 
 	// Add in the attachments velocity if it exists
-	if ( m_iParentAttachment != 0 )
+	if (m_pOuter->m_iParentAttachment != 0 )
 	{
 		Vector vOriginVel;
 		Quaternion vAngleVel;
-		if ( pMoveParent->GetAttachmentVelocity( m_iParentAttachment, vOriginVel, vAngleVel ) )
+		if ( pMoveParent->GetAttachmentVelocity(m_pOuter->m_iParentAttachment, vOriginVel, vAngleVel ) )
 		{
 			m_vecAbsVelocity += vOriginVel;
 			return;
@@ -4420,7 +4437,7 @@ void C_BaseEntity::CalcAbsoluteVelocity()
 	}
 
 	// Now add in the parent abs velocity
-	m_vecAbsVelocity += pMoveParent->GetAbsVelocity();
+	m_vecAbsVelocity += pMoveParent->GetEngineObject()->GetAbsVelocity();
 }
 
 /*
@@ -4507,7 +4524,7 @@ void C_BaseEntity::ShutdownPredictable( void )
 	Assert( GetPredictable() );
 
 	g_Predictables.RemoveFromPredictablesList( GetClientHandle() );
-	DestroyIntermediateData();
+	GetEngineObject()->DestroyIntermediateData();
 	SetPredictable( false );
 #endif
 }
@@ -4523,20 +4540,20 @@ void C_BaseEntity::InitPredictable( void )
 	// Mark as predictable
 	SetPredictable( true );
 	// Allocate buffers into which we copy data
-	AllocateIntermediateData();
+	GetEngineObject()->AllocateIntermediateData();
 	// Add to list of predictables
 	g_Predictables.AddToPredictableList( GetClientHandle() );
 	// Copy everything from "this" into the original_state_data
 	//  object.  Don't care about client local stuff, so pull from slot 0 which
 
 	//  should be empty anyway...
-	PostNetworkDataReceived( 0 );
+	GetEngineObject()->PostNetworkDataReceived( 0 );
 
 	// Copy original data into all prediction slots, so we don't get an error saying we "mispredicted" any
 	//  values which are still at their initial values
 	for ( int i = 0; i < MULTIPLAYER_BACKUP; i++ )
 	{
-		SaveData( "InitPredictable", i, PC_EVERYTHING );
+		GetEngineObject()->SaveData( "InitPredictable", i, PC_EVERYTHING );
 	}
 #endif
 }
@@ -4550,7 +4567,7 @@ void C_BaseEntity::SetPredictable( bool state )
 	m_bPredictable = state;
 
 	// update interpolation times
-	Interp_UpdateInterpolationAmounts( GetVarMapping() );
+	GetEngineObject()->Interp_UpdateInterpolationAmounts(GetEngineObject()->GetVarMapping() );
 }
 
 //-----------------------------------------------------------------------------
@@ -4567,7 +4584,7 @@ bool C_BaseEntity::GetPredictable( void ) const
 // Input  : copyintermediate - 
 //			last_predicted - 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::PreEntityPacketReceived( int commands_acknowledged )					
+void C_EngineObject::PreEntityPacketReceived( int commands_acknowledged )
 {				
 #if !defined( NO_ENTITY_PREDICTION )
 	// Don't need to copy intermediate data if server did ack any new commands
@@ -4601,14 +4618,14 @@ void C_BaseEntity::PreEntityPacketReceived( int commands_acknowledged )
 // Input  : errorcheck - 
 //			last_predicted - 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::PostEntityPacketReceived( void )
+void C_EngineObject::PostEntityPacketReceived( void )
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	Assert( GetPredictable() );
 	Assert( cl_predict->GetInt() );
 
 	// Always mark as changed
-	AddDataChangeEvent( this, DATA_UPDATE_DATATABLE_CHANGED, &m_DataChangeEventRef );
+	AddDataChangeEvent(m_pOuter, DATA_UPDATE_DATATABLE_CHANGED, &m_pOuter->m_DataChangeEventRef );
 
 	// Save networked fields into "original data" store
 	SaveData( "PostEntityPacketReceived", SLOT_ORIGINALDATA, PC_NETWORKED_ONLY );
@@ -4620,11 +4637,11 @@ void C_BaseEntity::PostEntityPacketReceived( void )
 // Input  : errorcheck - 
 //			last_predicted - 
 //-----------------------------------------------------------------------------
-bool C_BaseEntity::PostNetworkDataReceived( int commands_acknowledged )
+bool C_EngineObject::PostNetworkDataReceived( int commands_acknowledged )
 {
 	bool haderrors = false;
 #if !defined( NO_ENTITY_PREDICTION )
-	Assert( GetPredictable() );
+	Assert( m_pOuter->GetPredictable() );
 
 	bool errorcheck = ( commands_acknowledged > 0 ) ? true : false;
 
@@ -4636,7 +4653,7 @@ bool C_BaseEntity::PostNetworkDataReceived( int commands_acknowledged )
 
 	if ( cl_showerror.GetInt() < 0 )
 	{
-		if ( entindex() == -cl_showerror.GetInt() )
+		if (m_pOuter->entindex() == -cl_showerror.GetInt() )
 		{
 			showthis = true;
 		}
@@ -4648,25 +4665,49 @@ bool C_BaseEntity::PostNetworkDataReceived( int commands_acknowledged )
 
 	if ( errorcheck )
 	{
-		void *predicted_state_data = GetPredictedFrame( commands_acknowledged - 1 );	
-		Assert( predicted_state_data );												
-		const void *original_state_data = GetOriginalNetworkDataObject();
-		Assert( original_state_data );
-
-		bool counterrors = true;
-		bool reporterrors = showthis;
-		bool copydata	= false;
-
-		CPredictionCopy errorCheckHelper( PC_NETWORKED_ONLY, 
-			predicted_state_data, TD_OFFSET_PACKED,
-			original_state_data, TD_OFFSET_PACKED,
-			counterrors, reporterrors, copydata );
-		// Suppress debugging output
-		int ecount = errorCheckHelper.TransferData( "", -1, GetPredDescMap() );
-		if ( ecount > 0 )
 		{
-			haderrors = true;
-		//	Msg( "%i errors %i on entity %i %s\n", gpGlobals->tickcount, ecount, index, IsClientCreated() ? "true" : "false" );
+			void* predicted_state_data = GetPredictedFrame(commands_acknowledged - 1);
+			Assert(predicted_state_data);
+			const void* original_state_data = GetOriginalNetworkDataObject();
+			Assert(original_state_data);
+
+			bool counterrors = true;
+			bool reporterrors = showthis;
+			bool copydata = false;
+
+			CPredictionCopy errorCheckHelper(PC_NETWORKED_ONLY,
+				predicted_state_data, TD_OFFSET_PACKED,
+				original_state_data, TD_OFFSET_PACKED,
+				counterrors, reporterrors, copydata);
+			// Suppress debugging output
+			int ecount = errorCheckHelper.TransferData("", -1, this->GetPredDescMap());
+			if (ecount > 0)
+			{
+				haderrors = true;
+				//	Msg( "%i errors %i on entity %i %s\n", gpGlobals->tickcount, ecount, index, IsClientCreated() ? "true" : "false" );
+			}
+		}
+		{
+			void* outer_predicted_state_data = GetOuterPredictedFrame(commands_acknowledged - 1);
+			Assert(outer_predicted_state_data);
+			const void* outer_original_state_data = GetOuterOriginalNetworkDataObject();
+			Assert(outer_original_state_data);
+
+			bool counterrors = true;
+			bool reporterrors = showthis;
+			bool copydata = false;
+
+			CPredictionCopy outerErrorCheckHelper(PC_NETWORKED_ONLY,
+				outer_predicted_state_data, TD_OFFSET_PACKED,
+				outer_original_state_data, TD_OFFSET_PACKED,
+				counterrors, reporterrors, copydata);
+			// Suppress debugging output
+			int outerEcount = outerErrorCheckHelper.TransferData("", -1, m_pOuter->GetPredDescMap());
+			if (outerEcount > 0)
+			{
+				haderrors = true;
+				//	Msg( "%i errors %i on entity %i %s\n", gpGlobals->tickcount, ecount, index, IsClientCreated() ? "true" : "false" );
+			}
 		}
 	}
 #endif
@@ -5132,7 +5173,7 @@ float C_BaseEntity::GetAttackDamageScale( void )
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool C_BaseEntity::IsIntermediateDataAllocated( void ) const
+bool C_EngineObject::IsIntermediateDataAllocated( void ) const
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	return m_pOriginalData != NULL ? true : false;
@@ -5144,20 +5185,26 @@ bool C_BaseEntity::IsIntermediateDataAllocated( void ) const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::AllocateIntermediateData( void )
+void C_EngineObject::AllocateIntermediateData( void )
 {				
 #if !defined( NO_ENTITY_PREDICTION )
 	if ( m_pOriginalData )
 		return;
-	size_t allocsize = GetIntermediateDataSize();
+	size_t allocsize = this->GetPredDescMap()->GetIntermediateDataSize();
 	Assert( allocsize > 0 );
-
 	m_pOriginalData = new unsigned char[ allocsize ];
 	Q_memset( m_pOriginalData, 0, allocsize );
+
+	size_t outerallocsize = m_pOuter->GetPredDescMap()->GetIntermediateDataSize();
+	Assert(outerallocsize > 0);
+	m_pOuterOriginalData = new unsigned char[outerallocsize];
+	Q_memset(m_pOuterOriginalData, 0, outerallocsize);
 	for ( int i = 0; i < MULTIPLAYER_BACKUP; i++ )
 	{
 		m_pIntermediateData[ i ] = new unsigned char[ allocsize ];
 		Q_memset( m_pIntermediateData[ i ], 0, allocsize );
+		m_pOuterIntermediateData[i] = new unsigned char[outerallocsize];
+		Q_memset(m_pOuterIntermediateData[i], 0, outerallocsize);
 	}
 
 	m_nIntermediateDataCount = 0;
@@ -5167,7 +5214,7 @@ void C_BaseEntity::AllocateIntermediateData( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::DestroyIntermediateData( void )
+void C_EngineObject::DestroyIntermediateData( void )
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	if ( !m_pOriginalData )
@@ -5176,9 +5223,13 @@ void C_BaseEntity::DestroyIntermediateData( void )
 	{
 		delete[] m_pIntermediateData[ i ];
 		m_pIntermediateData[ i ] = NULL;
+		delete[] m_pOuterIntermediateData[i];
+		m_pOuterIntermediateData[i] = NULL;
 	}
 	delete[] m_pOriginalData;
 	m_pOriginalData = NULL;
+	delete[] m_pOuterOriginalData;
+	m_pOuterOriginalData = NULL;
 
 	m_nIntermediateDataCount = 0;
 #endif
@@ -5189,7 +5240,7 @@ void C_BaseEntity::DestroyIntermediateData( void )
 // Input  : slots_to_remove - 
 //			number_of_commands_run - 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::ShiftIntermediateDataForward( int slots_to_remove, int number_of_commands_run )
+void C_EngineObject::ShiftIntermediateDataForward( int slots_to_remove, int number_of_commands_run )
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	Assert( m_pIntermediateData );
@@ -5200,18 +5251,21 @@ void C_BaseEntity::ShiftIntermediateDataForward( int slots_to_remove, int number
 
 	// Just moving pointers, yeah
 	CUtlVector< unsigned char * > saved;
+	CUtlVector< unsigned char* > outerSaved;
 
 	// Remember first slots
 	int i = 0;
 	for ( ; i < slots_to_remove; i++ )
 	{
 		saved.AddToTail( m_pIntermediateData[ i ] );
+		outerSaved.AddToTail(m_pOuterIntermediateData[i]);
 	}
 
 	// Move rest of slots forward up to last slot
 	for ( ; i < number_of_commands_run; i++ )
 	{
 		m_pIntermediateData[ i - slots_to_remove ] = m_pIntermediateData[ i ];
+		m_pOuterIntermediateData[i - slots_to_remove] = m_pOuterIntermediateData[i];
 	}
 
 	// Put remembered slots onto end
@@ -5220,6 +5274,7 @@ void C_BaseEntity::ShiftIntermediateDataForward( int slots_to_remove, int number
 		int slot = number_of_commands_run - slots_to_remove + i;
 
 		m_pIntermediateData[ slot ] = saved[ i ];
+		m_pOuterIntermediateData[slot] = outerSaved[i];
 	}
 #endif
 }
@@ -5228,7 +5283,7 @@ void C_BaseEntity::ShiftIntermediateDataForward( int slots_to_remove, int number
 // Purpose: 
 // Input  : framenumber - 
 //-----------------------------------------------------------------------------
-void *C_BaseEntity::GetPredictedFrame( int framenumber )
+void * C_EngineObject::GetPredictedFrame( int framenumber )
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	Assert( framenumber >= 0 );
@@ -5244,10 +5299,26 @@ void *C_BaseEntity::GetPredictedFrame( int framenumber )
 #endif
 }
 
+void* C_EngineObject::GetOuterPredictedFrame(int framenumber)
+{
+#if !defined( NO_ENTITY_PREDICTION )
+	Assert(framenumber >= 0);
+
+	if (!m_pOuterOriginalData)
+	{
+		Assert(0);
+		return NULL;
+	}
+	return (void*)m_pOuterIntermediateData[framenumber % MULTIPLAYER_BACKUP];
+#else
+	return NULL;
+#endif
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void *C_BaseEntity::GetOriginalNetworkDataObject( void )
+void * C_EngineObject::GetOriginalNetworkDataObject( void )
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	if ( !m_pOriginalData )
@@ -5264,203 +5335,21 @@ void *C_BaseEntity::GetOriginalNetworkDataObject( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::ComputePackedOffsets( void )
+void* C_EngineObject::GetOuterOriginalNetworkDataObject(void)
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	datamap_t *map = GetPredDescMap();
-	if ( !map )
-		return;
-
-	if ( map->packed_offsets_computed )
-		return;
-
-	ComputePackedSize_R( map );
-
-	Assert( map->packed_offsets_computed );
-#endif
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : int
-//-----------------------------------------------------------------------------
-int C_BaseEntity::GetIntermediateDataSize( void )
-{
-#if !defined( NO_ENTITY_PREDICTION )
-	ComputePackedOffsets();
-
-	const datamap_t *map = GetPredDescMap();
-
-	Assert( map->packed_offsets_computed );
-
-	int size = map->packed_size;
-
-	Assert( size > 0 );	
-
-	// At least 4 bytes to avoid some really bad stuff
-	return MAX( size, 4 );
+	if (!m_pOuterOriginalData)
+	{
+		Assert(0);
+		return NULL;
+	}
+	return (void*)m_pOuterOriginalData;
 #else
-	return 0;
+	return NULL;
 #endif
-}	
-
-static int g_FieldSizes[FIELD_TYPECOUNT] = 
-{
-	FIELD_SIZE( FIELD_VOID ),
-	FIELD_SIZE( FIELD_FLOAT ),
-	FIELD_SIZE( FIELD_STRING ),
-	FIELD_SIZE( FIELD_VECTOR ),
-	FIELD_SIZE( FIELD_QUATERNION ),
-	FIELD_SIZE( FIELD_INTEGER ),
-	FIELD_SIZE( FIELD_BOOLEAN ),
-	FIELD_SIZE( FIELD_SHORT ),
-	FIELD_SIZE( FIELD_CHARACTER ),
-	FIELD_SIZE( FIELD_COLOR32 ),
-	FIELD_SIZE( FIELD_EMBEDDED ),
-	FIELD_SIZE( FIELD_CUSTOM ),
-	
-	FIELD_SIZE( FIELD_CLASSPTR ),
-	FIELD_SIZE( FIELD_EHANDLE ),
-	FIELD_SIZE( FIELD_EDICT ),
-
-	FIELD_SIZE( FIELD_POSITION_VECTOR ),
-	FIELD_SIZE( FIELD_TIME ),
-	FIELD_SIZE( FIELD_TICK ),
-	FIELD_SIZE( FIELD_MODELNAME ),
-	FIELD_SIZE( FIELD_SOUNDNAME ),
-
-	FIELD_SIZE( FIELD_INPUT ),
-	FIELD_SIZE( FIELD_FUNCTION ),
-	FIELD_SIZE( FIELD_VMATRIX ),
-	FIELD_SIZE( FIELD_VMATRIX_WORLDSPACE ),
-	FIELD_SIZE( FIELD_MATRIX3X4_WORLDSPACE ),
-	FIELD_SIZE( FIELD_INTERVAL ),
-	FIELD_SIZE( FIELD_MODELINDEX ),
-	FIELD_SIZE( FIELD_MATERIALINDEX ),
-
-	FIELD_SIZE( FIELD_VECTOR2D ),
-	FIELD_SIZE( FIELD_INTEGER64 ),
-	FIELD_SIZE( FIELD_POINTER ),
-};
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *map - 
-// Output : int
-//-----------------------------------------------------------------------------
-int C_BaseEntity::ComputePackedSize_R( datamap_t *map )
-{
-	if ( !map )
-	{
-		Assert( 0 );
-		return 0;
-	}
-
-	// Already computed
-	if ( map->packed_offsets_computed )
-	{
-		return map->packed_size;
-	}
-
-	int current_position = 0;
-
-	// Recurse to base classes first...
-	if ( map->baseMap )
-	{
-		current_position += ComputePackedSize_R( map->baseMap );
-	}
-
-	int c = map->dataNumFields;
-	int i;
-	typedescription_t *field;
-
-	for ( i = 0; i < c; i++ )
-	{
-		field = &map->dataDesc[ i ];
-
-		// Always descend into embedded types...
-		if ( field->fieldType != FIELD_EMBEDDED )
-		{
-			// Skip all private fields
-			if ( field->flags & FTYPEDESC_PRIVATE )
-				continue;
-		}
-
-		switch ( field->fieldType )
-		{
-		default:
-		case FIELD_MODELINDEX:
-		case FIELD_MODELNAME:
-		case FIELD_SOUNDNAME:
-		case FIELD_TIME:
-		case FIELD_TICK:
-		case FIELD_CUSTOM:
-		case FIELD_CLASSPTR:
-		case FIELD_EDICT:
-		case FIELD_POSITION_VECTOR:
-		case FIELD_FUNCTION:
-			Assert( 0 );
-			break;
-
-		case FIELD_EMBEDDED:
-			{
-				Assert( field->td != NULL );
-
-				int embeddedsize = ComputePackedSize_R( field->td );
-
-				field->fieldOffset[ TD_OFFSET_PACKED ] = current_position;
-
-				current_position += embeddedsize;
-			}
-			break;
-
-		case FIELD_FLOAT:
-		case FIELD_VECTOR:
-		case FIELD_QUATERNION:
-		case FIELD_INTEGER:
-		case FIELD_EHANDLE:
-			{
-				// These should be dword aligned
-				current_position = (current_position + 3) & ~3;
-				field->fieldOffset[ TD_OFFSET_PACKED ] = current_position;
-				Assert( field->fieldSize >= 1 );
-				current_position += g_FieldSizes[ field->fieldType ] * field->fieldSize;
-			}
-			break;
-
-		case FIELD_SHORT:
-			{
-				// This should be word aligned
-				current_position = (current_position + 1) & ~1;
-				field->fieldOffset[ TD_OFFSET_PACKED ] = current_position;
-				Assert( field->fieldSize >= 1 );
-				current_position += g_FieldSizes[ field->fieldType ] * field->fieldSize;
-			}
-			break;
-
-		case FIELD_STRING:
-		case FIELD_COLOR32:
-		case FIELD_BOOLEAN:
-		case FIELD_CHARACTER:
-			{
-				field->fieldOffset[ TD_OFFSET_PACKED ] = current_position;
-				Assert( field->fieldSize >= 1 );
-				current_position += g_FieldSizes[ field->fieldType ] * field->fieldSize;
-			}
-			break;
-		case FIELD_VOID:
-			{
-				// Special case, just skip it
-			}
-			break;
-		}
-	}
-
-	map->packed_size = current_position;
-	map->packed_offsets_computed = true;
-
-	return current_position;
 }
+
+
 
 // Convenient way to delay removing oneself
 void C_BaseEntity::SUB_Remove( void )
@@ -5680,19 +5569,21 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 //			NULL - 
 // Output : int
 //-----------------------------------------------------------------------------
-int C_BaseEntity::SaveData( const char *context, int slot, int type )
+int C_EngineObject::SaveData( const char *context, int slot, int type )
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	VPROF( "C_BaseEntity::SaveData" );
 
 	void *dest = ( slot == SLOT_ORIGINALDATA ) ? GetOriginalNetworkDataObject() : GetPredictedFrame( slot );
 	Assert( dest );
+	void* outerDest = (slot == SLOT_ORIGINALDATA) ? GetOuterOriginalNetworkDataObject() : GetOuterPredictedFrame(slot);
+	Assert(outerDest);
 
 	char sz[ 64 ];
 	sz[0] = 0;
 	// don't build debug strings per entity per frame, unless we are watching the entity
 	static ConVarRef pwatchent( "pwatchent" );
-	if ( pwatchent.GetInt() == entindex() )
+	if ( pwatchent.GetInt() == m_pOuter->entindex() )
 	{
 		if ( slot == SLOT_ORIGINALDATA )
 		{
@@ -5711,8 +5602,10 @@ int C_BaseEntity::SaveData( const char *context, int slot, int type )
 	}
 
 	CPredictionCopy copyHelper( type, dest, TD_OFFSET_PACKED, this, TD_OFFSET_NORMAL);
-	int error_count = copyHelper.TransferData( sz, entindex(), GetPredDescMap() );
-	return error_count;
+	int error_count = copyHelper.TransferData( sz, m_pOuter->entindex(), this->GetPredDescMap() );
+	CPredictionCopy outerCopyHelper(type, outerDest, TD_OFFSET_PACKED, m_pOuter, TD_OFFSET_NORMAL);
+	int outerError_count = outerCopyHelper.TransferData(sz, m_pOuter->entindex(), m_pOuter->GetPredDescMap());
+	return error_count + outerError_count;
 #else
 	return 0;
 #endif
@@ -5729,13 +5622,16 @@ int C_BaseEntity::SaveData( const char *context, int slot, int type )
 //			NULL - 
 // Output : int
 //-----------------------------------------------------------------------------
-int C_BaseEntity::RestoreData( const char *context, int slot, int type )
+int C_EngineObject::RestoreData( const char *context, int slot, int type )
 {
+	CStudioHdr* pHdr = ((C_BaseAnimating*)m_pOuter)->GetModelPtr();
 #if !defined( NO_ENTITY_PREDICTION )
 	VPROF( "C_BaseEntity::RestoreData" );
 
 	const void *src = ( slot == SLOT_ORIGINALDATA ) ? GetOriginalNetworkDataObject() : GetPredictedFrame( slot );
 	Assert( src );
+	const void* outerSrc = (slot == SLOT_ORIGINALDATA) ? GetOuterOriginalNetworkDataObject() : GetOuterPredictedFrame(slot);
+	Assert(outerSrc);
 
 	// This assert will fire if the server ack'd a CUserCmd which we hadn't predicted yet...
 	// In that case, we'd be comparing "old" data from this "unused" slot with the networked data and reporting all kinds of prediction errors possibly.
@@ -5745,7 +5641,7 @@ int C_BaseEntity::RestoreData( const char *context, int slot, int type )
 	sz[0] = 0;
 	// don't build debug strings per entity per frame, unless we are watching the entity
 	static ConVarRef pwatchent( "pwatchent" );
-	if ( pwatchent.GetInt() == entindex() )
+	if ( pwatchent.GetInt() == m_pOuter->entindex() )
 	{
 		if ( slot == SLOT_ORIGINALDATA )
 		{
@@ -5759,33 +5655,36 @@ int C_BaseEntity::RestoreData( const char *context, int slot, int type )
 
 	// some flags shouldn't be predicted - as we find them, add them to the savedEFlagsMask
 	const int savedEFlagsMask = EFL_DIRTY_SHADOWUPDATE;
-	int savedEFlags = GetEFlags() & savedEFlagsMask;
+	int savedEFlags = m_pOuter->GetEFlags() & savedEFlagsMask;
 
 	// model index needs to be set manually for dynamic model refcounting purposes
-	int oldModelIndex = m_nModelIndex;
+	int oldModelIndex = m_pOuter->m_nModelIndex;
 
 	CPredictionCopy copyHelper( type, this, TD_OFFSET_NORMAL, src, TD_OFFSET_PACKED);
-	int error_count = copyHelper.TransferData( sz, entindex(), GetPredDescMap() );
+	int error_count = copyHelper.TransferData( sz, m_pOuter->entindex(), this->GetPredDescMap() );
+	CPredictionCopy outerCopyHelper(type, m_pOuter, TD_OFFSET_NORMAL, outerSrc, TD_OFFSET_PACKED);
+	int outerError_count = outerCopyHelper.TransferData(sz, m_pOuter->entindex(), m_pOuter->GetPredDescMap());
 
 	// set non-predicting flags back to their prior state
-	RemoveEFlags( savedEFlagsMask );
-	AddEFlags( savedEFlags );
+	m_pOuter->RemoveEFlags( savedEFlagsMask );
+	m_pOuter->AddEFlags( savedEFlags );
 
 	// restore original model index and change via SetModelIndex
-	int newModelIndex = m_nModelIndex;
-	m_nModelIndex = oldModelIndex;
-	int overrideModelIndex = CalcOverrideModelIndex();
+	int newModelIndex = m_pOuter->m_nModelIndex;
+	m_pOuter->m_nModelIndex = oldModelIndex;
+	int overrideModelIndex = m_pOuter->CalcOverrideModelIndex();
 	if( overrideModelIndex != -1 )
 		newModelIndex = overrideModelIndex;
 	if ( oldModelIndex != newModelIndex )
 	{
 		MDLCACHE_CRITICAL_SECTION(); // ???
-		SetModelIndex( newModelIndex );
+		m_pOuter->SetModelIndex( newModelIndex );
 	}
 
-	OnPostRestoreData();
+	
+	m_pOuter->OnPostRestoreData();
 
-	return error_count;
+	return error_count + outerError_count;
 #else
 	return 0;
 #endif
@@ -5817,9 +5716,9 @@ void C_BaseEntity::OnPostRestoreData()
 // Purpose: Determine approximate velocity based on updates from server
 // Input  : vel - 
 //-----------------------------------------------------------------------------
-void C_BaseEntity::EstimateAbsVelocity( Vector& vel )
+void C_EngineObject::EstimateAbsVelocity( Vector& vel )
 {
-	if ( this == C_BasePlayer::GetLocalPlayer() )
+	if ( this->m_pOuter == C_BasePlayer::GetLocalPlayer() )
 	{
 		// This is interpolated and networked
 		vel = GetAbsVelocity();
@@ -5831,7 +5730,7 @@ void C_BaseEntity::EstimateAbsVelocity( Vector& vel )
 	m_iv_vecOrigin.GetDerivative_SmoothVelocity( &vel, gpGlobals->curtime );
 }
 
-void C_BaseEntity::Interp_Reset( VarMapping_t *map )
+void C_EngineObject::Interp_Reset( VarMapping_t *map )
 {
 	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this, "reset" );
 	int c = map->m_Entries.Count();
@@ -5849,7 +5748,7 @@ void C_BaseEntity::ResetLatched()
 //	if ( IsClientCreated() )
 //		return;
 
-	Interp_Reset( GetVarMapping() );
+	GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
 }
 
 //-----------------------------------------------------------------------------
@@ -5959,12 +5858,12 @@ float C_BaseEntity::GetLastChangeTime( int flags )
 	return gpGlobals->curtime;
 }
 
-const Vector& C_BaseEntity::GetPrevLocalOrigin() const
+const Vector& C_EngineObject::GetPrevLocalOrigin() const
 {
 	return m_iv_vecOrigin.GetPrev();
 }
 
-const QAngle& C_BaseEntity::GetPrevLocalAngles() const
+const QAngle& C_EngineObject::GetPrevLocalAngles() const
 {
 	return m_iv_angRotation.GetPrev();
 }
@@ -5982,8 +5881,8 @@ bool C_BaseEntity::IsFloating()
 
 BEGIN_DATADESC_NO_BASE( C_BaseEntity )
 	DEFINE_FIELD( m_ModelName, FIELD_STRING ),
-	DEFINE_CUSTOM_FIELD( m_vecAbsOrigin, engineObjectFuncs),
-	DEFINE_CUSTOM_FIELD( m_angAbsRotation, engineObjectFuncs),
+	DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsOrigin, engineObjectFuncs),
+	DEFINE_CUSTOM_FIELD_INVALID( m_angAbsRotation, engineObjectFuncs),
 	DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
 	DEFINE_FIELD( m_fFlags, FIELD_INTEGER ),
 END_DATADESC()
@@ -6004,8 +5903,8 @@ void C_BaseEntity::OnSave()
 {
 	// Here, we must force recomputation of all abs data so it gets saved correctly
 	// We can't leave the dirty bits set because the loader can't cope with it.
-	CalcAbsolutePosition();
-	CalcAbsoluteVelocity();
+	GetEngineObject()->CalcAbsolutePosition();
+	GetEngineObject()->CalcAbsoluteVelocity();
 }
 
 
@@ -6065,7 +5964,7 @@ int C_BaseEntity::Restore( IRestore &restore )
 
 	// NOTE: Do *not* use GetAbsOrigin() here because it will
 	// try to recompute m_rgflCoordinateFrame!
-	MatrixSetColumn( m_vecAbsOrigin, 3, m_rgflCoordinateFrame );
+	MatrixSetColumn(GetEngineObject()->GetAbsOrigin(), 3, m_rgflCoordinateFrame);
 
 	// Restablish ground entity
 	if ( m_hGroundEntity != NULL )
@@ -6323,7 +6222,7 @@ bool C_BaseEntity::ValidateEntityAttachedToPlayer( bool &bShouldRetry )
 #endif // TF_CLIENT_DLL
 
 
-void C_BaseEntity::AddVar( void *data, IInterpolatedVar *watcher, int type, bool bSetup )
+void C_EngineObject::AddVar( void *data, IInterpolatedVar *watcher, int type, bool bSetup )
 {
 	// Only add it if it hasn't been added yet.
 	bool bAddIt = true;
@@ -6370,12 +6269,12 @@ void C_BaseEntity::AddVar( void *data, IInterpolatedVar *watcher, int type, bool
 	if ( bSetup )
 	{
 		watcher->Setup( data, type );
-		watcher->SetInterpolationAmount( GetInterpolationAmount( watcher->GetType() ) );
+		watcher->SetInterpolationAmount( m_pOuter->GetInterpolationAmount( watcher->GetType() ) );
 	}
 }
 
 
-void C_BaseEntity::RemoveVar( void *data, bool bAssert )
+void C_EngineObject::RemoveVar( void *data, bool bAssert )
 {
 	for ( int i=0; i < m_VarMap.m_Entries.Count(); i++ )
 	{
@@ -6413,7 +6312,7 @@ void C_BaseEntity::CheckCLInterpChanged()
 		C_BaseEntity *pEnt;
 		while ( (pEnt = iterator.Next()) != NULL )
 		{
-			pEnt->Interp_UpdateInterpolationAmounts( pEnt->GetVarMapping() );
+			pEnt->GetEngineObject()->Interp_UpdateInterpolationAmounts( pEnt->GetEngineObject()->GetVarMapping() );
 		}
 	}
 }

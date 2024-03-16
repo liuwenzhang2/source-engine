@@ -130,7 +130,7 @@ void C_BaseEntity::PhysicsCustom()
 		return;
 
 	// Moving upward, off the ground, or  resting on something that isn't ground
-	if ( m_vecVelocity[2] > 0 || !GetGroundEntity() || !GetGroundEntity()->IsStandable() )
+	if ( GetLocalVelocity()[2] > 0 || !GetGroundEntity() || !GetGroundEntity()->IsStandable() )
 	{
 		SetGroundEntity( NULL );
 	}
@@ -144,14 +144,14 @@ void C_BaseEntity::PhysicsCustom()
 		Assert( 0 );
 	}
 
-	Vector vecNewVelocity = m_vecVelocity;
+	Vector vecNewVelocity = GetLocalVelocity();
 	QAngle angNewAngles = GetAbsAngles();
 	QAngle angNewAngVelocity = m_vecAngVelocity;
 
 	PerformCustomPhysics( &vecNewPosition, &vecNewVelocity, &angNewAngles, &angNewAngVelocity );
 
 	// Store off all of the new state information...
-	m_vecVelocity = vecNewVelocity;
+	SetLocalVelocity(vecNewVelocity);
 	SetAbsAngles( angNewAngles );
 	m_vecAngVelocity = angNewAngVelocity;
 
@@ -168,8 +168,10 @@ void C_BaseEntity::PhysicsCustom()
 	{	
 		// entity is trapped in another solid
 		// UNDONE: does this entity needs to be removed?
-		VectorCopy (vec3_origin, m_vecVelocity);
-		VectorCopy (vec3_angle, m_vecAngVelocity);
+		//VectorCopy (vec3_origin, m_vecVelocity);
+		SetLocalVelocity(vec3_origin);
+		//VectorCopy (vec3_angle, m_vecAngVelocity);
+		SetLocalAngularVelocity(vec3_angle);
 		return;
 	}
 	

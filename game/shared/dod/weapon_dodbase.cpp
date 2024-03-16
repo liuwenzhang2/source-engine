@@ -550,7 +550,7 @@ bool CWeaponDODBase::Deploy()
 			// add an interpolation history so the movement is smoother
 
 			// Now stick our initial velocity into the interpolation history 
-			CInterpolatedVar< Vector > &interpolator = GetOriginInterpolator();
+			CInterpolatedVar< Vector > &interpolator = GetEngineObject()->GetOriginInterpolator();
 
 			interpolator.ClearHistory();
 			float changeTime = GetLastChangeTime( LATCH_SIMULATION_VAR );
@@ -564,7 +564,7 @@ bool CWeaponDODBase::Deploy()
 			interpolator.AddToHead( changeTime, &vCurOrigin, false );
 
 			Vector estVel;
-			EstimateAbsVelocity( estVel );
+			GetEngineObject()->EstimateAbsVelocity( estVel );
 
 			/*Msg( "estimated velocity ( %.1f %.1f %.1f )  initial velocity ( %.1f %.1f %.1f )\n",
 				estVel.x,

@@ -133,7 +133,7 @@ void RecvProxy_InterpolationAmountChanged( const CRecvProxyData *pData, void *pS
 		RecvProxy_Int32ToInt8( pData, pStruct, pOut );
 
 		C_BaseEntity *pEntity = (C_BaseEntity *) pStruct;
-		pEntity->Interp_UpdateInterpolationAmounts( pEntity->GetVarMapping() );
+		pEntity->GetEngineObject()->Interp_UpdateInterpolationAmounts( pEntity->GetEngineObject()->GetVarMapping() );
 	}
 }
 

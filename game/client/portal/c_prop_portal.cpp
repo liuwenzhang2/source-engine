@@ -105,8 +105,8 @@ void __MsgFunc_EntityPortalled(bf_read &msg)
 	QAngle qaOldInterpolatedRot;
 	if ( pEntity->IsToolRecording() )
 	{
-		vecOldInterpolatedPos = pEntity->GetOriginInterpolator().GetCurrent();
-		qaOldInterpolatedRot = pEntity->GetRotationInterpolator().GetCurrent();
+		vecOldInterpolatedPos = pEntity->GetEngineObject()->GetOriginInterpolator().GetCurrent();
+		qaOldInterpolatedRot = pEntity->GetEngineObject()->GetRotationInterpolator().GetCurrent();
 	}
 
 	pEntity->AddEFlags( EFL_DIRTY_ABSTRANSFORM );
@@ -114,8 +114,8 @@ void __MsgFunc_EntityPortalled(bf_read &msg)
 	VMatrix matTransform = pPortal->MatrixThisToLinked();
 	//VMatrix matInvTransform = pPortal->m_hLinkedPortal->MatrixThisToLinked();
 
-	CInterpolatedVar< QAngle > &rotInterp = pEntity->GetRotationInterpolator();
-	CInterpolatedVar< Vector > &posInterp = pEntity->GetOriginInterpolator();
+	CInterpolatedVar< QAngle > &rotInterp = pEntity->GetEngineObject()->GetRotationInterpolator();
+	CInterpolatedVar< Vector > &posInterp = pEntity->GetEngineObject()->GetOriginInterpolator();
 
 	Vector ptCurrentPosition = posInterp.GetCurrent();
 	Vector ptInvCurrentPosition = matTransform * ptCurrentPosition;

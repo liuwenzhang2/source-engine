@@ -336,8 +336,8 @@ void C_DODRagdoll::Interp_Copy( C_BaseAnimatingOverlay *pSourceEntity )
 	if ( !pSourceEntity )
 		return;
 	
-	VarMapping_t *pSrc = pSourceEntity->GetVarMapping();
-	VarMapping_t *pDest = GetVarMapping();
+	VarMapping_t *pSrc = pSourceEntity->GetEngineObject()->GetVarMapping();
+	VarMapping_t *pDest = GetEngineObject()->GetVarMapping();
     	
 	// Find all the VarMapEntry_t's that represent the same variable.
 	for ( int i = 0; i < pDest->m_Entries.Count(); i++ )
@@ -435,7 +435,7 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 			SetNetworkAngles( pPlayer->GetRenderAngles() );
 		}
 	
-		Interp_Reset( GetVarMapping() );
+		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
 	}
 }
 
@@ -454,7 +454,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 		// move my current model instance to the ragdoll's so decals are preserved.
 		pPlayer->SnatchModelInstance( this );
 
-		VarMapping_t *varMap = GetVarMapping();
+		VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.		
@@ -463,7 +463,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 			Interp_Copy( pPlayer );
 
 			SetAbsAngles( pPlayer->GetRenderAngles() );
-			GetRotationInterpolator().Reset();
+			GetEngineObject()->GetRotationInterpolator().Reset();
 
 			m_flAnimTime = pPlayer->m_flAnimTime;
 			SetSequence( pPlayer->GetSequence() );
@@ -489,7 +489,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 			SetSequence( iSeq );	// look_idle, basic pose
 			SetCycle( 0.0 );
 
-			Interp_Reset( varMap );
+			GetEngineObject()->Interp_Reset( varMap );
 		}		
 
 		m_nBody = pPlayer->GetBody();
@@ -503,7 +503,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 		SetAbsOrigin( m_vecRagdollOrigin );
 		SetAbsVelocity( m_vecRagdollVelocity );
 
-		Interp_Reset( GetVarMapping() );
+		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
 		
 	}
 
@@ -682,7 +682,7 @@ C_DODPlayer::C_DODPlayer() :
 	m_iProgressBarDuration = 0;
 	m_flProgressBarStartTime = 0.0f;
 
-	AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
+	GetEngineObject()->AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
 
 	m_flProneViewOffset = 0.0;
 	m_bProneSwayingRight = true;

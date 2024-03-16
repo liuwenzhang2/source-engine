@@ -869,20 +869,20 @@ void C_BaseAnimating::UpdateRelevantInterpolatedVars()
 
 void C_BaseAnimating::AddBaseAnimatingInterpolatedVars()
 {
-	AddVar( m_flEncodedController, &m_iv_flEncodedController, LATCH_ANIMATION_VAR, true );
-	AddVar( m_flPoseParameter, &m_iv_flPoseParameter, LATCH_ANIMATION_VAR, true );
+	GetEngineObject()->AddVar( m_flEncodedController, &m_iv_flEncodedController, LATCH_ANIMATION_VAR, true );
+	GetEngineObject()->AddVar( m_flPoseParameter, &m_iv_flPoseParameter, LATCH_ANIMATION_VAR, true );
 	
 	int flags = LATCH_ANIMATION_VAR;
 	if ( m_bClientSideAnimation )
 		flags |= EXCLUDE_AUTO_INTERPOLATE;
 		
-	AddVar( &m_flCycle, &m_iv_flCycle, flags, true );
+	GetEngineObject()->AddVar( &m_flCycle, &m_iv_flCycle, flags, true );
 }
 
 void C_BaseAnimating::RemoveBaseAnimatingInterpolatedVars()
 {
-	RemoveVar( m_flEncodedController, false );
-	RemoveVar( m_flPoseParameter, false );
+	GetEngineObject()->RemoveVar( m_flEncodedController, false );
+	GetEngineObject()->RemoveVar( m_flPoseParameter, false );
 
 #ifdef HL2MP
 	// HACK:  Don't want to remove interpolation for predictables in hl2dm, though
@@ -892,7 +892,7 @@ void C_BaseAnimating::RemoveBaseAnimatingInterpolatedVars()
 	if ( !GetPredictable() )
 #endif
 	{
-		RemoveVar( &m_flCycle, false );
+		GetEngineObject()->RemoveVar( &m_flCycle, false );
 	}
 }
 
@@ -3762,7 +3762,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 			}
 
 			Vector vel;
-			EstimateAbsVelocity( vel );
+			GetEngineObject()->EstimateAbsVelocity( vel );
 
 			// If he's moving fast enough, play the run sound
 			if ( vel.Length2DSqr() > RUN_SPEED_ESTIMATE_SQR )
@@ -3788,7 +3788,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 			}
 
 			Vector vel;
-			EstimateAbsVelocity( vel );
+			GetEngineObject()->EstimateAbsVelocity( vel );
 			// If he's moving fast enough, play the run sound
 			if ( vel.Length2DSqr() > RUN_SPEED_ESTIMATE_SQR )
 			{
@@ -4235,7 +4235,7 @@ bool C_BaseAnimating::Interpolate( float flCurrentTime )
 		m_iv_flCycle.SetLooping( IsSequenceLooping( GetSequence() ) );
 
 	int bNoMoreChanges;
-	int retVal = BaseInterpolatePart1( flCurrentTime, oldOrigin, oldAngles, oldVel, bNoMoreChanges );
+	int retVal = GetEngineObject()->BaseInterpolatePart1( flCurrentTime, oldOrigin, oldAngles, oldVel, bNoMoreChanges );
 	if ( retVal == INTERPOLATE_STOP )
 	{
 		if ( bNoMoreChanges )
@@ -4251,7 +4251,7 @@ bool C_BaseAnimating::Interpolate( float flCurrentTime )
 	if ( bNoMoreChanges )
 		RemoveFromInterpolationList();
 	
-	BaseInterpolatePart2( oldOrigin, oldAngles, oldVel, nChangeFlags );
+	GetEngineObject()->BaseInterpolatePart2( oldOrigin, oldAngles, oldVel, nChangeFlags );
 	return true;
 }
 
@@ -4276,16 +4276,17 @@ bool C_BaseAnimating::IsAboutToRagdoll() const
 //-----------------------------------------------------------------------------
 // Lets us check our sequence number after a network update
 //-----------------------------------------------------------------------------
-int C_BaseAnimating::RestoreData( const char *context, int slot, int type )
+void C_BaseAnimating::OnPostRestoreData()// const char *context, int slot, int type 
 {
-	int retVal = BaseClass::RestoreData( context, slot, type );
+	//int retVal = BaseClass::RestoreData( context, slot, type );
+	BaseClass::OnPostRestoreData();
 	CStudioHdr *pHdr = GetModelPtr();
 	if( pHdr && m_nSequence >= pHdr->GetNumSeq() )
 	{
 		// Don't let a network update give us an invalid sequence
 		m_nSequence = 0;
 	}
-	return retVal;
+	//return retVal;
 }
 
 
@@ -4877,7 +4878,7 @@ void C_BaseAnimating::UpdateClientSideAnimation()
 		if ( GetSequence() != -1 )
 		{
 			// latch old values
-			OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
+			GetEngineObject()->OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
 			// move frame forward
 			FrameAdvance( 0.0f ); // 0 means to use the time we last advanced instead of a constant
 		}

@@ -130,8 +130,8 @@ C_BaseFlex::C_BaseFlex() :
 	((Vector&)m_viewtarget).Init();
 #endif
 
-	AddVar( &m_viewtarget, &m_iv_viewtarget, LATCH_ANIMATION_VAR | INTERPOLATE_LINEAR_ONLY );
-	AddVar( m_flexWeight, &m_iv_flexWeight, LATCH_ANIMATION_VAR );
+	GetEngineObject()->AddVar( &m_viewtarget, &m_iv_viewtarget, LATCH_ANIMATION_VAR | INTERPOLATE_LINEAR_ONLY );
+	GetEngineObject()->AddVar( m_flexWeight, &m_iv_flexWeight, LATCH_ANIMATION_VAR );
 
 	// Fill in phoneme class lookup
 	SetupMappings( "phonemes" );
@@ -144,8 +144,8 @@ C_BaseFlex::C_BaseFlex() :
 
 #ifdef HL2_CLIENT_DLL
 	// Get general lean vector
-	AddVar( &m_vecLean, &m_iv_vecLean, LATCH_ANIMATION_VAR );
-	AddVar( &m_vecShift, &m_iv_vecShift, LATCH_ANIMATION_VAR );
+	GetEngineObject()->AddVar( &m_vecLean, &m_iv_vecLean, LATCH_ANIMATION_VAR );
+	GetEngineObject()->AddVar( &m_vecShift, &m_iv_vecShift, LATCH_ANIMATION_VAR );
 #endif
 }
 

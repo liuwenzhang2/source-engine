@@ -919,7 +919,7 @@ const QAngle& CBasePlayerAnimState::GetRenderAngles()
 void CBasePlayerAnimState::GetOuterAbsVelocity( Vector& vel ) const
 {
 #if defined( CLIENT_DLL )
-	GetOuter()->EstimateAbsVelocity( vel );
+	GetOuter()->GetEngineObject()->EstimateAbsVelocity( vel );
 #else
 	vel = GetOuter()->GetAbsVelocity();
 #endif

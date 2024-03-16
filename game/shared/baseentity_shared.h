@@ -151,7 +151,7 @@ inline void CBaseEntity::SetSimulatedEveryTick( bool sim )
 	{
 		m_bSimulatedEveryTick = sim;
 #ifdef CLIENT_DLL
-		Interp_UpdateInterpolationAmounts( GetVarMapping() );
+		GetEngineObject()->Interp_UpdateInterpolationAmounts(GetEngineObject()->GetVarMapping() );
 #endif
 	}
 }
@@ -162,7 +162,7 @@ inline void CBaseEntity::SetAnimatedEveryTick( bool anim )
 	{
 		m_bAnimatedEveryTick = anim;
 #ifdef CLIENT_DLL
-		Interp_UpdateInterpolationAmounts( GetVarMapping() );
+		GetEngineObject()->Interp_UpdateInterpolationAmounts(GetEngineObject()->GetVarMapping() );
 #endif
 	}
 }

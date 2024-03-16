@@ -278,8 +278,8 @@ void C_CSRagdoll::Interp_Copy( C_BaseAnimatingOverlay *pSourceEntity )
 	if ( !pSourceEntity )
 		return;
 
-	VarMapping_t *pSrc = pSourceEntity->GetVarMapping();
-	VarMapping_t *pDest = GetVarMapping();
+	VarMapping_t *pSrc = pSourceEntity->GetEngineObject()->GetVarMapping();
+	VarMapping_t *pDest = GetEngineObject()->GetVarMapping();
 
 	// Find all the VarMapEntry_t's that represent the same variable.
 	for ( int i = 0; i < pDest->m_Entries.Count(); i++ )
@@ -405,7 +405,7 @@ void C_CSRagdoll::CreateLowViolenceRagdoll( void )
 	SetSequence( LookupSequence( str ) );
 	ForceClientSideAnimationOn();
 
-	Interp_Reset( GetVarMapping() );
+	GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
 }
 
 
@@ -423,7 +423,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 		// move my current model instance to the ragdoll's so decals are preserved.
 		pPlayer->SnatchModelInstance( this );
 
-		VarMapping_t *varMap = GetVarMapping();
+		VarMapping_t *varMap = GetEngineObject()->GetVarMapping();
 
 		// Copy all the interpolated vars from the player entity.
 		// The entity uses the interpolated history to get bone velocity.
@@ -433,7 +433,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 			Interp_Copy( pPlayer );
 
 			SetAbsAngles( pPlayer->GetRenderAngles() );
-			GetRotationInterpolator().Reset();
+			GetEngineObject()->GetRotationInterpolator().Reset();
 
 			m_flAnimTime = pPlayer->m_flAnimTime;
 			SetSequence( pPlayer->GetSequence() );
@@ -464,7 +464,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 			pPlayer->SetSequence( iSeq );	// walk_lower, basic pose
 			pPlayer->SetCycle( 0.0 );
 
-			Interp_Reset( varMap );
+			GetEngineObject()->Interp_Reset( varMap );
 		}
 	}
 	else
@@ -476,7 +476,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 		SetAbsOrigin( m_vecRagdollOrigin );
 		SetAbsVelocity( m_vecRagdollVelocity );
 
-		Interp_Reset( GetVarMapping() );
+		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
 	}
 
 	// Turn it into a ragdoll.
@@ -796,7 +796,7 @@ C_CSPlayer::C_CSPlayer() :
 
 	m_angEyeAngles.Init();
 
-	AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
+	GetEngineObject()->AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
 
 	m_iLastAddonBits = m_iAddonBits = 0;
 	m_iLastPrimaryAddon = m_iLastSecondaryAddon = WEAPON_NONE;
@@ -1736,7 +1736,7 @@ void C_CSPlayer::UpdateClientSideAnimation()
 	if ( GetSequence() != -1 )
 	{
 		// latch old values
-		OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
+		GetEngineObject()->OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
 	}
 }
 

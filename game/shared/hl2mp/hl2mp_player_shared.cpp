@@ -570,7 +570,7 @@ const QAngle& CPlayerAnimState::GetRenderAngles()
 void CPlayerAnimState::GetOuterAbsVelocity( Vector& vel )
 {
 #if defined( CLIENT_DLL )
-	GetOuter()->EstimateAbsVelocity( vel );
+	GetOuter()->GetEngineObject()->EstimateAbsVelocity( vel );
 #else
 	vel = GetOuter()->GetAbsVelocity();
 #endif

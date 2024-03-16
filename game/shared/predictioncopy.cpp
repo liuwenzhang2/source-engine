@@ -995,7 +995,9 @@ void CPredictionCopy::CopyFields( int chain_count, datamap_t *pRootMap, typedesc
 	int				fieldOffsetSrc;
 	int				fieldOffsetDest;
 	int				fieldSize;
-
+	if (m_nDestOffsetIndex == TD_OFFSET_NORMAL && m_nSrcOffsetIndex == TD_OFFSET_PACKED) {
+		int aaa = 0;
+	}
 	m_pCurrentMap = pRootMap;
 	if ( !m_pCurrentClassName )
 	{

@@ -138,7 +138,7 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 		}
 	}
 
-	Interp_Reset( GetVarMapping() );
+	GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
 	return true;
 }
 

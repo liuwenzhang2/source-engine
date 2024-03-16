@@ -143,12 +143,12 @@ void CPrediction::CheckError( int commands_acknowledged )
 		return;
 	
 	// Not predictable yet (flush entity packet?)
-	if ( !player->IsIntermediateDataAllocated() )
+	if ( !player->GetEngineObject()->IsIntermediateDataAllocated() )
 		return;
 
 	origin = player->GetNetworkOrigin();
 		
-	const void *slot = player->GetPredictedFrame( commands_acknowledged - 1 );
+	const void *slot = player->GetEngineObject()->GetOuterPredictedFrame( commands_acknowledged - 1 );
 	if ( !slot )
 		return;
 
@@ -322,7 +322,7 @@ void CPrediction::PreEntityPacketReceived ( int commands_acknowledged, int curre
 		if ( !ent->GetPredictable() )
 			continue;
 
-		ent->PreEntityPacketReceived( commands_acknowledged );
+		ent->GetEngineObject()->PreEntityPacketReceived( commands_acknowledged );
 	}
 #endif
 }
@@ -358,7 +358,7 @@ void CPrediction::PostEntityPacketReceived( void )
 		if ( !ent->GetPredictable() )
 			continue;
 
-		ent->PostEntityPacketReceived();
+		ent->GetEngineObject()->PostEntityPacketReceived();
 	}
 #endif
 }
@@ -463,7 +463,7 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 
 			if ( ent->GetPredictable() )
 			{
-				if ( ent->PostNetworkDataReceived( m_nServerCommandsAcknowledged ) )
+				if ( ent->GetEngineObject()->PostNetworkDataReceived( m_nServerCommandsAcknowledged ) )
 				{
 					m_bPreviousAckHadErrors = true;
 				}
@@ -486,7 +486,7 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 				if ( showlist >= 2 )
 				{
 					int size = GetEntitySize( ent->GetClassname() );
-					int intermediate_size = ent->GetIntermediateDataSize() * ( MULTIPLAYER_BACKUP + 1 );
+					int intermediate_size = ent->GetPredDescMap()->GetIntermediateDataSize() * ( MULTIPLAYER_BACKUP + 1 );
 
 					engine->Con_NXPrintf( &np, "%15s %30s (%5i / %5i bytes): %15s", 
 						sz, 
@@ -687,7 +687,7 @@ void CPrediction::FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *m
 
 	//player->m_RefEHandle = move->m_nPlayerHandle;
 
-	player->m_vecVelocity = move->m_vecVelocity;
+	player->SetLocalVelocity(move->m_vecVelocity);
 
 	player->m_vecNetworkOrigin = move->GetAbsOrigin();
 	
@@ -1117,7 +1117,7 @@ void CPrediction::RestoreOriginalEntityState( void )
 
 		if ( ent->GetPredictable() )
 		{
-			ent->RestoreData( "RestoreOriginalEntityState", C_BaseEntity::SLOT_ORIGINALDATA, PC_EVERYTHING );
+			ent->GetEngineObject()->RestoreData( "RestoreOriginalEntityState", C_EngineObject::SLOT_ORIGINALDATA, PC_EVERYTHING );
 		}
 	}
 #endif
@@ -1212,7 +1212,7 @@ void CPrediction::RunSimulation( int current_command, float curtime, CUserCmd *c
 		//}
 
 		// Don't update last networked data here!!!
-		entity->OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR | LATCH_ANIMATION_VAR | INTERPOLATE_OMIT_UPDATE_LAST_NETWORKED );
+		entity->GetEngineObject()->OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR | LATCH_ANIMATION_VAR | INTERPOLATE_OMIT_UPDATE_LAST_NETWORKED );
 	}
 
 	// Always reset after running command
@@ -1283,7 +1283,7 @@ void CPrediction::StorePredictionResults( int predicted_frame )
 		// FIXME: The lack of this call inexplicably actually creates prediction errors
 		InvalidateEFlagsRecursive( entity, EFL_DIRTY_ABSTRANSFORM | EFL_DIRTY_ABSVELOCITY | EFL_DIRTY_ABSANGVELOCITY );
   
-		entity->SaveData( "StorePredictionResults", predicted_frame, PC_EVERYTHING );
+		entity->GetEngineObject()->SaveData( "StorePredictionResults", predicted_frame, PC_EVERYTHING );
 	}
 #endif
 }
@@ -1322,7 +1322,7 @@ void CPrediction::ShiftIntermediateDataForward( int slots_to_remove, int number_
 		if ( !ent->GetPredictable() )
 			continue;
 
-		ent->ShiftIntermediateDataForward( slots_to_remove, number_of_commands_run );
+		ent->GetEngineObject()->ShiftIntermediateDataForward( slots_to_remove, number_of_commands_run );
 	}
 #endif
 }
@@ -1358,7 +1358,7 @@ void CPrediction::RestoreEntityToPredictedFrame( int predicted_frame )
 		if ( !ent->GetPredictable() )
 			continue;
 
-		ent->RestoreData( "RestoreEntityToPredictedFrame", predicted_frame, PC_EVERYTHING );
+		ent->GetEngineObject()->RestoreData( "RestoreEntityToPredictedFrame", predicted_frame, PC_EVERYTHING );
 	}
 #endif
 }
@@ -1745,7 +1745,7 @@ void CPrediction::SetViewOrigin( Vector& org )
 	player->SetLocalOrigin( org );
 	player->m_vecNetworkOrigin = org;
 
-	player->m_iv_vecOrigin.Reset();
+	player->GetEngineObject()->GetOriginInterpolator().Reset();//m_iv_vecOrigin
 }
 
 //-----------------------------------------------------------------------------
@@ -1776,7 +1776,7 @@ void CPrediction::SetViewAngles( QAngle& ang )
 		return;
 
 	player->SetViewAngles( ang );
-	player->m_iv_angRotation.Reset();
+	player->GetEngineObject()->GetRotationInterpolator().Reset();//m_iv_angRotation
 }
 
 //-----------------------------------------------------------------------------
