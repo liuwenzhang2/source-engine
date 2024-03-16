@@ -354,14 +354,16 @@ CBaseEntity::CBaseEntity()
 //	m_vecAbsAngVelocity.Init();
 	m_vecViewOffset.Init();
 	m_vecBaseVelocity.GetForModify().Init();
-	m_vecVelocity.Init();
-	m_vecAbsVelocity.Init();
 #endif
 
 	m_bAlternateSorting = false;
 	m_CollisionGroup = COLLISION_GROUP_NONE;
 	m_iParentAttachment = 0;
 	GetEngineObject()->Init(this);
+#ifdef _DEBUG
+	((Vector)GetEngineObject()->GetLocalVelocity()).Init();
+	GetEngineObject()->GetAbsVelocity().Init();
+#endif
 	CollisionProp()->Init( this );
 	NetworkProp()->Init( this );
 
