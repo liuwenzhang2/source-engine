@@ -323,14 +323,14 @@ private:
 
 inline Vector& C_EngineObject::GetAbsVelocity()
 {
-	Assert(s_bAbsQueriesValid);
+	Assert(C_BaseEntity::s_bAbsQueriesValid);
 	const_cast<C_EngineObject*>(this)->CalcAbsoluteVelocity();
 	return m_vecAbsVelocity;
 }
 
 inline const Vector& C_EngineObject::GetAbsVelocity() const
 {
-	Assert(s_bAbsQueriesValid);
+	Assert(C_BaseEntity::s_bAbsQueriesValid);
 	const_cast<C_EngineObject*>(this)->CalcAbsoluteVelocity();
 	return m_vecAbsVelocity;
 }
@@ -1925,14 +1925,14 @@ inline bool C_BaseEntity::IsServerEntity( void )
 //-----------------------------------------------------------------------------
 inline matrix3x4_t &C_BaseEntity::EntityToWorldTransform()
 { 
-	Assert( s_bAbsQueriesValid );
+	Assert(C_BaseEntity::s_bAbsQueriesValid );
 	GetEngineObject()->CalcAbsolutePosition();
 	return m_rgflCoordinateFrame; 
 }
 
 inline const matrix3x4_t &C_BaseEntity::EntityToWorldTransform() const
 {
-	Assert( s_bAbsQueriesValid );
+	Assert(C_BaseEntity::s_bAbsQueriesValid );
 	const_cast<C_BaseEntity*>(this)->GetEngineObject()->CalcAbsolutePosition();
 	return m_rgflCoordinateFrame; 
 }
