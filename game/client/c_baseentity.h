@@ -321,27 +321,7 @@ private:
 	C_BaseEntity* m_pOuter;
 };
 
-inline Vector& C_EngineObject::GetAbsVelocity()
-{
-	Assert(C_BaseEntity::s_bAbsQueriesValid);
-	const_cast<C_EngineObject*>(this)->CalcAbsoluteVelocity();
-	return m_vecAbsVelocity;
-}
 
-inline const Vector& C_EngineObject::GetAbsVelocity() const
-{
-	Assert(C_BaseEntity::s_bAbsQueriesValid);
-	const_cast<C_EngineObject*>(this)->CalcAbsoluteVelocity();
-	return m_vecAbsVelocity;
-}
-
-//-----------------------------------------------------------------------------
-// Velocity
-//-----------------------------------------------------------------------------
-inline const Vector& C_EngineObject::GetLocalVelocity() const
-{
-	return m_vecVelocity;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Base client side entity object

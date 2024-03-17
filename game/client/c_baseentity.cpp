@@ -4229,6 +4229,28 @@ void C_EngineObject::SetLocalAnglesDim( int iDim, vec_t flValue )
 	}
 }
 
+Vector& C_EngineObject::GetAbsVelocity()
+{
+	Assert(C_BaseEntity::s_bAbsQueriesValid);
+	const_cast<C_EngineObject*>(this)->CalcAbsoluteVelocity();
+	return m_vecAbsVelocity;
+}
+
+const Vector& C_EngineObject::GetAbsVelocity() const
+{
+	Assert(C_BaseEntity::s_bAbsQueriesValid);
+	const_cast<C_EngineObject*>(this)->CalcAbsoluteVelocity();
+	return m_vecAbsVelocity;
+}
+
+//-----------------------------------------------------------------------------
+// Velocity
+//-----------------------------------------------------------------------------
+const Vector& C_EngineObject::GetLocalVelocity() const
+{
+	return m_vecVelocity;
+}
+
 void C_EngineObject::SetLocalVelocity( const Vector &vecVelocity )
 {
 	if (m_vecVelocity != vecVelocity)
