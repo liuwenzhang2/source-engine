@@ -818,7 +818,7 @@ void C_EngineObject::Interp_RestoreToLastNetworked( VarMapping_t *map )
 {
 	VPROF( "C_BaseEntity::Interp_RestoreToLastNetworked" );
 
-	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this, "restoretolastnetworked" );
+	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this->m_pOuter, "restoretolastnetworked" );
 
 	Vector oldOrigin = GetLocalOrigin();
 	QAngle oldAngles = GetLocalAngles();
@@ -913,14 +913,14 @@ C_BaseEntity::C_BaseEntity()
 	m_pPhysicsObject = NULL;
 	GetEngineObject()->Init(this);
 #ifdef _DEBUG
-	m_vecAbsOrigin = vec3_origin;
-	m_angAbsRotation = vec3_angle;
+	GetEngineObject()->SetAbsOrigin(vec3_origin);
+	GetEngineObject()->SetAbsAngles(vec3_angle);
 	m_vecNetworkOrigin.Init();
 	m_angNetworkAngles.Init();
-	m_vecAbsOrigin.Init();
+	GetEngineObject()->GetAbsOrigin().Init();
 //	m_vecAbsAngVelocity.Init();
-	m_vecVelocity.Init();
-	m_vecAbsVelocity.Init();
+	GetEngineObject()->GetLocalVelocity().Init();
+	GetEngineObject()->GetAbsVelocity().Init();
 	m_vecViewOffset.Init();
 	m_vecBaseVelocity.Init();
 
@@ -994,6 +994,7 @@ void C_BaseEntity::Clear( void )
 	GetEngineObject()->Clear();
 	GetEngineObject()->GetAbsOrigin().Init();
 	GetEngineObject()->GetAbsAngles().Init();
+	GetEngineObject()->GetLocalVelocity().Init();
 	GetEngineObject()->GetAbsVelocity().Init();//GetLocalVelocity ???
 	ClearFlags();
 	m_vecViewOffset.Init();
@@ -2782,7 +2783,7 @@ void C_EngineObject::OnLatchInterpolatedVariables( int flags )
 
 	bool bUpdateLastNetworkedValue = !(flags & INTERPOLATE_OMIT_UPDATE_LAST_NETWORKED) ? true : false;
 
-	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this, bUpdateLastNetworkedValue ? "latch+net" : "latch" );
+	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this->m_pOuter, bUpdateLastNetworkedValue ? "latch+net" : "latch" );
 
 	int c = m_VarMap.m_Entries.Count();
 	for ( int i = 0; i < c; i++ )
@@ -4246,6 +4247,14 @@ const Vector& C_EngineObject::GetAbsVelocity() const
 //-----------------------------------------------------------------------------
 // Velocity
 //-----------------------------------------------------------------------------
+Vector& C_EngineObject::GetLocalVelocity()
+{
+	return m_vecVelocity;
+}
+
+//-----------------------------------------------------------------------------
+// Velocity
+//-----------------------------------------------------------------------------
 const Vector& C_EngineObject::GetLocalVelocity() const
 {
 	return m_vecVelocity;
@@ -4612,7 +4621,7 @@ void C_EngineObject::PreEntityPacketReceived( int commands_acknowledged )
 	// Don't need to copy intermediate data if server did ack any new commands
 	bool copyintermediate = ( commands_acknowledged > 0 ) ? true : false;
 
-	Assert( GetPredictable() );
+	Assert( m_pOuter->GetPredictable() );
 	Assert( cl_predict->GetInt() );
 
 	// First copy in any intermediate predicted data for non-networked fields
@@ -4643,7 +4652,7 @@ void C_EngineObject::PreEntityPacketReceived( int commands_acknowledged )
 void C_EngineObject::PostEntityPacketReceived( void )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	Assert( GetPredictable() );
+	Assert( m_pOuter->GetPredictable() );
 	Assert( cl_predict->GetInt() );
 
 	// Always mark as changed
@@ -5754,7 +5763,7 @@ void C_EngineObject::EstimateAbsVelocity( Vector& vel )
 
 void C_EngineObject::Interp_Reset( VarMapping_t *map )
 {
-	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this, "reset" );
+	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this->m_pOuter, "reset" );
 	int c = map->m_Entries.Count();
 	for ( int i = 0; i < c; i++ )
 	{

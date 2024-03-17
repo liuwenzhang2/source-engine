@@ -225,6 +225,7 @@ public:
 	vec_t				GetLocalAnglesDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
 
 	void				SetLocalVelocity(const Vector& vecVelocity);
+	Vector&				GetLocalVelocity();
 	const Vector&		GetLocalVelocity() const;
 
 	const Vector&		GetPrevLocalOrigin() const;
