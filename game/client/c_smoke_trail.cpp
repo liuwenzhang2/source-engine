@@ -296,7 +296,7 @@ void C_SmokeTrail::Update( float fTimeDelta )
 	VectorMA( GetAbsOrigin(), -fTimeDelta, GetAbsVelocity(), vecOrigin );
 
 	Vector vecForward;
-	GetVectors( &vecForward, NULL, NULL );
+	GetEngineObject()->GetVectors( &vecForward, NULL, NULL );
 
 	while( m_ParticleSpawn.NextEvent( tempDelta ) )
 	{
@@ -385,7 +385,7 @@ void C_SmokeTrail::CleanupToolRecordingState( KeyValues *msg )
 		return;
 	
 	// For now, we can't record smoketrails that don't have a moveparent
-	C_BaseEntity *pEnt = GetMoveParent();
+	C_BaseEntity *pEnt = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 	if ( !pEnt )
 		return;
 
@@ -1810,7 +1810,7 @@ void C_DustTrail::Update( float fTimeDelta )
 	VectorMA( GetAbsOrigin(), -fTimeDelta, GetAbsVelocity(), vecOrigin );
 
 	Vector vecForward;
-	GetVectors( &vecForward, NULL, NULL );
+	GetEngineObject()->GetVectors( &vecForward, NULL, NULL );
 
 	while( m_ParticleSpawn.NextEvent( tempDelta ) )
 	{
@@ -1907,7 +1907,7 @@ void C_DustTrail::CleanupToolRecordingState( KeyValues *msg )
 		return;
 	
 	// For now, we can't record Dusttrails that don't have a moveparent
-	C_BaseEntity *pEnt = GetMoveParent();
+	C_BaseEntity *pEnt = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 	if ( !pEnt )
 		return;
 

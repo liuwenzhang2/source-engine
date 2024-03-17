@@ -970,7 +970,7 @@ touchlink_t *CBaseEntity::PhysicsMarkEntityAsTouched( CBaseEntity *other )
 		return NULL;
 
 	// Entities in hierarchy should not interact
-	if ( (this->GetMoveParent() == other) || (this == other->GetMoveParent()) )
+	if ( (this->GetEngineObject()->GetMoveParent() == other->GetEngineObject()) || (this->GetEngineObject() == other->GetEngineObject()->GetMoveParent()))
 		return NULL;
 
 	// check if either entity doesn't generate touch functions
@@ -1188,7 +1188,7 @@ void CBaseEntity::UpdateWaterState()
 //-----------------------------------------------------------------------------
 bool CBaseEntity::PhysicsCheckWater( void )
 {
-	if (GetMoveParent())
+	if (GetEngineObject()->GetMoveParent())
 		return GetWaterLevel() > 1;
 
 	int cont = GetWaterType();
@@ -1584,7 +1584,7 @@ void CBaseEntity::PhysicsCheckWaterTransition( void )
 	int cont = GetWaterType();
 
 	// We can exit right out if we're a child... don't bother with this...
-	if (GetMoveParent())
+	if (GetEngineObject()->GetMoveParent())
 		return;
 
 	if ( cont & MASK_WATER )
@@ -1798,7 +1798,7 @@ void CBaseEntity::PhysicsSimulate( void )
 	Assert( !IsPlayer() );
 
 	// If we've got a moveparent, we must simulate that first.
-	CBaseEntity *pMoveParent = GetMoveParent();
+	CBaseEntity *pMoveParent = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 
 	if ( (GetMoveType() == MOVETYPE_NONE && !pMoveParent) || (GetMoveType() == MOVETYPE_VPHYSICS ) )
 	{

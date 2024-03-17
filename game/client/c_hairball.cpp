@@ -179,7 +179,7 @@ void C_Hairball::ClientThink()
 	//C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 	//m_vecAngles = SetAbsAngles( pPlayer->GetAbsAngles() ); // copy player angles.
 
-	Assert( !GetMoveParent() );
+	Assert( !GetEngineObject()->GetMoveParent() );
 
 	// Sophisticated AI.
 	m_flCurSpinTime += gpGlobals->frametime;

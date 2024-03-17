@@ -612,9 +612,9 @@ void CAI_RadialLinkController::Activate()
 	// Spread think times out.
 	SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.0f, 1.0f) );
 
-	if( GetParent() != NULL )
+	if(GetMoveParent() != NULL )
 	{
-		float flDist = GetAbsOrigin().DistTo( GetParent()->GetAbsOrigin() );
+		float flDist = GetAbsOrigin().DistTo(GetMoveParent()->GetAbsOrigin() );
 
 		if( flDist > 200.0f )
 		{
@@ -631,7 +631,7 @@ void CAI_RadialLinkController::PollMotionThink()
 {
 	SetNextThink( gpGlobals->curtime + 0.5f );
 
-	CBaseEntity *pParent = GetParent();
+	CBaseEntity *pParent = GetMoveParent();
 
 	if( pParent )
 	{

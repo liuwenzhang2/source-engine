@@ -2682,7 +2682,7 @@ void UTIL_ParentToWorldSpace( CBaseEntity *pEntity, Vector &vecPosition, QAngle 
 	matrix3x4_t matScratch, matResult;
 	matrix3x4_t matParentToWorld;
 	
-	if ( pEntity->GetParent() != NULL )
+	if ( pEntity->GetMoveParent() != NULL )
 	{
 		matParentToWorld = pEntity->GetParentToWorldTransform( matScratch );
 	}
@@ -2732,7 +2732,7 @@ void UTIL_WorldToParentSpace( CBaseEntity *pEntity, Vector &vecPosition, QAngle 
 	matrix3x4_t matScratch, matResult;
 	matrix3x4_t matWorldToParent;
 	
-	if ( pEntity->GetParent() != NULL )
+	if ( pEntity->GetMoveParent() != NULL )
 	{
 		matScratch = pEntity->GetParentToWorldTransform( matScratch );
 	}

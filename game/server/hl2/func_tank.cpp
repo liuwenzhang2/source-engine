@@ -755,9 +755,9 @@ void CFuncTank::Spawn( void )
 
 	m_hControlVolume	= NULL;
 
-	if ( GetParent() && GetParent()->GetBaseAnimating() )
+	if (GetMoveParent() && GetMoveParent()->GetBaseAnimating() )
 	{
-		CBaseAnimating *pAnim = GetParent()->GetBaseAnimating();
+		CBaseAnimating *pAnim = GetMoveParent()->GetBaseAnimating();
 		if ( m_iszBaseAttachment != NULL_STRING )
 		{
 			int nAttachment = pAnim->LookupAttachment( STRING( m_iszBaseAttachment ) );
@@ -798,7 +798,7 @@ void CFuncTank::Spawn( void )
 			SetMoveType( MOVETYPE_NOCLIP );
 
 			// If our parent is a prop_dynamic, make it use hitboxes for renderbox
-			CDynamicProp *pProp = dynamic_cast<CDynamicProp*>(GetParent());
+			CDynamicProp *pProp = dynamic_cast<CDynamicProp*>(GetMoveParent());
 			if ( pProp )
 			{
 				pProp->m_bUseHitboxesForRenderBox = true;
@@ -876,9 +876,9 @@ void CFuncTank::Activate( void )
 		SetParent( pParent );
 	}
 
-	if ( GetParent() && GetParent()->GetBaseAnimating() )
+	if (GetMoveParent() && GetMoveParent()->GetBaseAnimating() )
 	{
-		CBaseAnimating *pAnim = GetParent()->GetBaseAnimating();
+		CBaseAnimating *pAnim = GetMoveParent()->GetBaseAnimating();
 		if ( m_iszBaseAttachment != NULL_STRING )
 		{
 			int nAttachment = pAnim->LookupAttachment( STRING( m_iszBaseAttachment ) );
@@ -919,7 +919,7 @@ void CFuncTank::Activate( void )
 			SetMoveType( MOVETYPE_NOCLIP );
 
 			// If our parent is a prop_dynamic, make it use hitboxes for renderbox
-			CDynamicProp *pProp = dynamic_cast<CDynamicProp*>(GetParent());
+			CDynamicProp *pProp = dynamic_cast<CDynamicProp*>(GetMoveParent());
 			if ( pProp )
 			{
 				pProp->m_bUseHitboxesForRenderBox = true;
@@ -930,9 +930,9 @@ void CFuncTank::Activate( void )
 	// Necessary for save/load
 	if ( (m_iszBarrelAttachment != NULL_STRING) && (m_nBarrelAttachment == 0) )
 	{
-		if ( GetParent() && GetParent()->GetBaseAnimating() )
+		if (GetMoveParent() && GetMoveParent()->GetBaseAnimating() )
 		{
-			CBaseAnimating *pAnim = GetParent()->GetBaseAnimating();
+			CBaseAnimating *pAnim = GetMoveParent()->GetBaseAnimating();
 			m_nBarrelAttachment = pAnim->LookupAttachment( STRING(m_iszBarrelAttachment) );
 		}
 	}
@@ -983,7 +983,7 @@ void CFuncTank::UpdateOnRemove( void )
 //-----------------------------------------------------------------------------
 void CFuncTank::UpdateMatrix( void )
 {
-	m_parentMatrix.InitFromEntity( GetParent(), GetParentAttachment() );
+	m_parentMatrix.InitFromEntity(GetMoveParent(), GetParentAttachment() );
 }
 
 	
@@ -992,7 +992,7 @@ void CFuncTank::UpdateMatrix( void )
 //-----------------------------------------------------------------------------
 Vector CFuncTank::WorldBarrelPosition( void )
 {
-	if ( (m_nBarrelAttachment == 0) || !GetParent() )
+	if ( (m_nBarrelAttachment == 0) || !GetMoveParent() )
 	{
 		EntityMatrix tmp;
 		tmp.InitFromEntity( this );
@@ -1001,7 +1001,7 @@ Vector CFuncTank::WorldBarrelPosition( void )
 
 	Vector vecOrigin;
 	QAngle vecAngles;
-	CBaseAnimating *pAnim = GetParent()->GetBaseAnimating();
+	CBaseAnimating *pAnim = GetMoveParent()->GetBaseAnimating();
 	pAnim->GetAttachment( m_nBarrelAttachment, vecOrigin, vecAngles );
 	return vecOrigin;
 }
@@ -1014,10 +1014,10 @@ void CFuncTank::PhysicsSimulate( void )
 {
 	BaseClass::PhysicsSimulate();
 
-	if ( m_bUsePoseParameters && GetParent() )
+	if ( m_bUsePoseParameters && GetMoveParent() )
 	{
 		const QAngle &angles = GetLocalAngles();
-		CBaseAnimating *pAnim = GetParent()->GetBaseAnimating();
+		CBaseAnimating *pAnim = GetMoveParent()->GetBaseAnimating();
 		pAnim->SetPoseParameter( STRING( m_iszYawPoseParam ), angles.y );
 		pAnim->SetPoseParameter( STRING( m_iszPitchPoseParam ), angles.x );
 		pAnim->StudioFrameAdvance();
@@ -2206,9 +2206,9 @@ void CFuncTank::FiringSequence( const Vector &barrelEnd, const Vector &forward, 
 void CFuncTank::DoMuzzleFlash( void )
 {
 	// If we're parented to something, make it play the muzzleflash
-	if ( m_bUsePoseParameters && GetParent() )
+	if ( m_bUsePoseParameters && GetMoveParent() )
 	{
-		CBaseAnimating *pAnim = GetParent()->GetBaseAnimating();
+		CBaseAnimating *pAnim = GetMoveParent()->GetBaseAnimating();
 		pAnim->DoMuzzleFlash();
 
 		// Do the AR2 muzzle flash
@@ -2456,7 +2456,7 @@ bool CFuncTank::HasLOSTo( CBaseEntity *pEntity )
 	trace_t tr;
 
 	// Ignore the func_tank and any prop it's parented to
-	CTraceFilterSkipTwoEntities traceFilter( this, GetParent(), COLLISION_GROUP_NONE );
+	CTraceFilterSkipTwoEntities traceFilter( this, GetMoveParent(), COLLISION_GROUP_NONE );
 
 	// UNDONE: Should this hit BLOCKLOS brushes?
 	AI_TraceLine( vecBarrelEnd, vecTarget, MASK_BLOCKLOS_AND_NPCS, &traceFilter, &tr );
@@ -2515,7 +2515,7 @@ void CFuncTankGun::Fire( int bulletCount, const Vector &barrelEnd, const Vector 
 	info.m_flDamage = m_iBulletDamage;
 	info.m_iPlayerDamage = m_iBulletDamageVsPlayer;
 	info.m_pAttacker = pAttacker;
-	info.m_pAdditionalIgnoreEnt = GetParent();
+	info.m_pAdditionalIgnoreEnt = GetMoveParent();
 
 #ifdef HL2_EPISODIC
 	if ( m_iAmmoType != -1 )
@@ -4321,7 +4321,7 @@ void CFuncTankCombineCannon::FuncTankPostThink()
 				// Ignore the func_tank and any prop it's parented to, and check line of sight to the point
 				// Trace to the point. If an opaque trace doesn't reach the point, that means the beam hit
 				// something closer, (including a blockLOS), so try again.
-				CTraceFilterSkipTwoEntities traceFilter( this, GetParent(), COLLISION_GROUP_NONE );
+				CTraceFilterSkipTwoEntities traceFilter( this, GetMoveParent(), COLLISION_GROUP_NONE );
 				AI_TraceLine( vecBarrelEnd, vecTest, MASK_BLOCKLOS_AND_NPCS, &traceFilter, &trLOS );
 				AI_TraceLine( vecBarrelEnd, vecTest, MASK_SHOT, &traceFilter, &trShoot );
 

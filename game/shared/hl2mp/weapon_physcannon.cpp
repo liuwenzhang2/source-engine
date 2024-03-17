@@ -484,7 +484,7 @@ QAngle CGrabController::TransformAnglesToPlayerSpace( const QAngle &anglesIn, CB
 		AngleMatrix( angleTest, test );
 		return TransformAnglesToLocalSpace( anglesIn, test );
 	}
-	return TransformAnglesToLocalSpace( anglesIn, pPlayer->EntityToWorldTransform() );
+	return TransformAnglesToLocalSpace( anglesIn, pPlayer->GetEngineObject()->EntityToWorldTransform() );
 }
 
 QAngle CGrabController::TransformAnglesFromPlayerSpace( const QAngle &anglesIn, CBasePlayer *pPlayer )
@@ -497,7 +497,7 @@ QAngle CGrabController::TransformAnglesFromPlayerSpace( const QAngle &anglesIn, 
 		AngleMatrix( angleTest, test );
 		return TransformAnglesToWorldSpace( anglesIn, test );
 	}
-	return TransformAnglesToWorldSpace( anglesIn, pPlayer->EntityToWorldTransform() );
+	return TransformAnglesToWorldSpace( anglesIn, pPlayer->GetEngineObject()->EntityToWorldTransform() );
 }
 
 
@@ -565,7 +565,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 		m_attachedAnglesPlayerSpace = AlignAngles( m_attachedAnglesPlayerSpace, m_angleAlignment );
 	}
 
-	VectorITransform( pEntity->WorldSpaceCenter(), pEntity->EntityToWorldTransform(), m_attachedPositionObjectSpace );
+	VectorITransform( pEntity->WorldSpaceCenter(), pEntity->GetEngineObject()->EntityToWorldTransform(), m_attachedPositionObjectSpace );
 
 #ifndef CLIENT_DLL
 	// If it's a prop, see if it has desired carry angles

@@ -243,7 +243,7 @@ void CClientThinkList::AddEntityToFrameThinkList( ThinkEntry_t *pEntry, bool bAl
 	C_BaseEntity *pEntity = ClientEntityList().GetBaseEntityFromHandle( pEntry->m_hEnt );
 	if ( pEntity )
 	{
-		C_BaseEntity *pParent = pEntity->GetMoveParent();
+		C_BaseEntity *pParent = pEntity->GetEngineObject()->GetMoveParent()?pEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 		if ( pParent && (pParent->GetThinkHandle() != INVALID_THINK_HANDLE) )
 		{
 			ThinkEntry_t *pParentEntry = GetThinkEntry( pParent->GetThinkHandle() );

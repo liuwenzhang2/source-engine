@@ -496,7 +496,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalAngles from within a KeyValues method.. use SetAbsAngles instead!
-		Assert( (GetMoveParent() == NULL) && !IsEFlagSet( EFL_DIRTY_ABSTRANSFORM ) );
+		Assert( (GetEngineObject()->GetMoveParent() == NULL) && !IsEFlagSet( EFL_DIRTY_ABSTRANSFORM ) );
 		SetAbsAngles( angles );
 		return true;
 	}
@@ -508,7 +508,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalOrigin from within a KeyValues method.. use SetAbsOrigin instead!
-		Assert( (GetMoveParent() == NULL) && !IsEFlagSet( EFL_DIRTY_ABSTRANSFORM ) );
+		Assert( (GetEngineObject()->GetMoveParent() == NULL) && !IsEFlagSet( EFL_DIRTY_ABSTRANSFORM ) );
 		SetAbsOrigin( vecOrigin );
 		return true;
 	}
@@ -1218,7 +1218,7 @@ void CBaseEntity::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	{
 	case MOVETYPE_VPHYSICS:
 		{
-			if ( GetMoveParent() )
+			if (GetEngineObject()->GetMoveParent() )
 			{
 				DevWarning("Updating physics on object in hierarchy %s!\n", GetClassname());
 				return;
@@ -1292,7 +1292,7 @@ IPhysicsObject *CBaseEntity::VPhysicsInitStatic( void )
 
 #ifndef CLIENT_DLL
 	// If this entity has a move parent, it needs to be shadow, not static
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
 		// must be SOLID_VPHYSICS if in hierarchy to solve collisions correctly
 		if ( GetSolid() == SOLID_BSP && GetRootMoveParent()->GetSolid() != SOLID_BSP )
@@ -1568,7 +1568,7 @@ void CBaseEntity::InvalidatePhysicsRecursive( int nChangeFlags )
 		nChangeFlags = POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED;
 	}
 
-	for (CBaseEntity *pChild = FirstMoveChild(); pChild; pChild = pChild->NextMovePeer())
+	for (CBaseEntity *pChild = (GetEngineObject()->FirstMoveChild()? GetEngineObject()->FirstMoveChild()->GetOuter():NULL); pChild; pChild = (pChild->GetEngineObject()->NextMovePeer()? pChild->GetEngineObject()->NextMovePeer()->GetOuter():NULL))
 	{
 		// If this is due to the parent animating, only invalidate children that are parented to an attachment
 		// Entities that are following also access attachments points on parents and must be invalidated.
@@ -1604,24 +1604,6 @@ void CBaseEntity::InvalidatePhysicsRecursive( int nChangeFlags )
 	//			pAnim->InvalidateBoneCache();		
 	//	}
 	//#endif
-}
-
-
-
-//-----------------------------------------------------------------------------
-// Returns the highest parent of an entity
-//-----------------------------------------------------------------------------
-CBaseEntity *CBaseEntity::GetRootMoveParent()
-{
-	CBaseEntity *pEntity = this;
-	CBaseEntity *pParent = this->GetMoveParent();
-	while ( pParent )
-	{
-		pEntity = pParent;
-		pParent = pEntity->GetMoveParent();
-	}
-
-	return pEntity;
 }
 
 //-----------------------------------------------------------------------------
@@ -2436,7 +2418,12 @@ void CBaseEntity::FollowEntity( CBaseEntity *pBaseEntity, bool bBoneMerge )
 {
 	if (pBaseEntity)
 	{
-		SetParent( pBaseEntity );
+#ifdef GAME_DLL
+		SetParent(pBaseEntity);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+		GetEngineObject()->SetParent(pBaseEntity->GetEngineObject());
+#endif // CLIENT_DLL
 		SetMoveType( MOVETYPE_NONE );
 		
 		if ( bBoneMerge )

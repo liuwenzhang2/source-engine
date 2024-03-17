@@ -98,7 +98,7 @@ const Vector &CBaseParticleEntity::GetSortOrigin()
 {
 	// By default, we do the cheaper behavior of getting the root parent's abs origin, so we don't have to
 	// setup any bones along the way. If this screws anything up, we can always make it an option.
-	return GetRootMoveParent()->GetAbsOrigin();
+	return GetEngineObject()->GetRootMoveParent()->GetAbsOrigin();
 }
 
 void CBaseParticleEntity::SimulateParticles( CParticleSimulateIterator *pIterator )

@@ -303,7 +303,7 @@ void CBasePlayer::ItemPostFrame()
 const QAngle &CBasePlayer::EyeAngles( )
 {
 	// NOTE: Viewangles are measured *relative* to the parent's coordinate system
-	CBaseEntity *pMoveParent = const_cast<CBasePlayer*>(this)->GetMoveParent();
+	CBaseEntity *pMoveParent = const_cast<CBasePlayer*>(this)->GetEngineObject()->GetMoveParent()? const_cast<CBasePlayer*>(this)->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 
 	if ( !pMoveParent )
 	{
@@ -313,7 +313,7 @@ const QAngle &CBasePlayer::EyeAngles( )
 	// FIXME: Cache off the angles?
 	matrix3x4_t eyesToParent, eyesToWorld;
 	AngleMatrix( pl.v_angle, eyesToParent );
-	ConcatTransforms( pMoveParent->EntityToWorldTransform(), eyesToParent, eyesToWorld );
+	ConcatTransforms( pMoveParent->GetEngineObject()->EntityToWorldTransform(), eyesToParent, eyesToWorld );
 
 	static QAngle angEyeWorld;
 	MatrixAngles( eyesToWorld, angEyeWorld );
@@ -1118,9 +1118,9 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 		pFoundByTrace = pObject;
 #endif
 		bool bUsable = IsUseableEntity(pObject, 0);
-		while ( pObject && !bUsable && pObject->GetMoveParent() )
+		while ( pObject && !bUsable && pObject->GetEngineObject()->GetMoveParent() )
 		{
-			pObject = pObject->GetMoveParent();
+			pObject = pObject->GetEngineObject()->GetMoveParent()->GetOuter();
 			bUsable = IsUseableEntity(pObject, 0);
 		}
 

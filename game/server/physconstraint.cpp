@@ -63,7 +63,7 @@ public:
 		int index = m_list.AddToTail();
 		constraint_anchor_t *pAnchor = &m_list[index];
 
-		pAnchor->hEntity = pEntity->GetParent();
+		pAnchor->hEntity = pEntity->GetMoveParent();
 		pAnchor->parentAttachment = pEntity->GetParentAttachment();
 		pAnchor->name = pEntity->GetEntityName();
 		pAnchor->localOrigin = pEntity->GetLocalOrigin();
@@ -98,7 +98,7 @@ public:
 	}
 	void Spawn( void )
 	{
-		if ( GetParent() )
+		if (GetMoveParent() )
 		{
 			g_AnchorList.AddToList( this, m_massScale );
 			UTIL_Remove( this );

@@ -618,7 +618,7 @@ void CPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *
 	move->m_nImpulseCommand = ucmd->impulse;	
 	move->m_nButtons		= ucmd->buttons;
 
-	CBaseEntity *pMoveParent = player->GetMoveParent();
+	C_EngineObject *pMoveParent = player->GetEngineObject()->GetMoveParent();
 	if (!pMoveParent)
 	{
 		move->m_vecAbsViewAngles = move->m_vecViewAngles;
@@ -1252,9 +1252,9 @@ void InvalidateEFlagsRecursive( C_BaseEntity *pEnt, int nDirtyFlags, int nChildF
 {
 	pEnt->AddEFlags( nDirtyFlags );
 	nDirtyFlags |= nChildFlags;
-	for (CBaseEntity *pChild = pEnt->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer())
+	for (C_EngineObject *pChild = pEnt->GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer())
 	{
-		InvalidateEFlagsRecursive( pChild, nDirtyFlags );
+		InvalidateEFlagsRecursive( pChild->GetOuter(), nDirtyFlags);
 	}
 }
 #endif
@@ -1489,7 +1489,7 @@ bool CPrediction::PerformPrediction( bool received_new_world_update, C_BasePlaye
 	{
 		entity->MoveToLastReceivedPosition();
 		// undo changes for moveparents too
-		entity = entity->GetMoveParent();
+		entity = entity->GetEngineObject()->GetMoveParent()?entity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 	}
 
 	// Start at command after last one server has processed and 

@@ -1101,7 +1101,7 @@ void Playgamesound_f( const CCommand &args )
 		{
 			Vector position = pPlayer->EyePosition();
 			Vector forward;
-			pPlayer->GetVectors( &forward, NULL, NULL );
+			pPlayer->GetEngineObject()->GetVectors( &forward, NULL, NULL );
 			position += atof( args[2] ) * forward;
 			CPASAttenuationFilter filter( pPlayer );
 			EmitSound_t params;

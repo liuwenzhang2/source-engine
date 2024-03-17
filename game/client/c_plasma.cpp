@@ -414,7 +414,7 @@ void C_Plasma::UpdateFlames( void )
 			m_entFlames[i].SetLocalOrigin( offset + ( m_entFlames[i].m_vecMoveDir * ((m_entFlames[i].GetScale())*CHILD_SPREAD) ) );
 		}
 
-		Assert( !m_entFlames[i].GetMoveParent() );
+		Assert( !m_entFlames[i].GetEngineObject()->GetMoveParent() );
 		m_entFlames[i].SetLocalOriginDim( Z_INDEX, m_entFlames[i].GetLocalOriginDim( Z_INDEX ) + ( dScale * 64.0f ) );
 	}
 }

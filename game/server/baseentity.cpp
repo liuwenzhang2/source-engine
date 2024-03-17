@@ -1150,91 +1150,85 @@ void CBaseEntity::TransformStepData_WorldToParent( CBaseEntity *pParent )
 //-----------------------------------------------------------------------------
 void CBaseEntity::SetParent( CBaseEntity *pParentEntity, int iAttachment )
 {
+	if (pParentEntity == this)
+	{
+		// should never set parent to 'this' - makes no sense
+		Assert(0);
+		pParentEntity = NULL;
+	}
 	// If they didn't specify an attachment, use our current
 	if ( iAttachment == -1 )
 	{
 		iAttachment = m_iParentAttachment;
 	}
 
-	bool bWasNotParented = ( GetParent() == NULL );
-	CBaseEntity *pOldParent = m_pParent;
+	bool bWasNotParented = (GetMoveParent() == NULL );
+	CBaseEntity *pOldParent = m_hMoveParent;
 
 	// notify the old parent of the loss
 	UnlinkFromParent( this );
 
-	// set the new name
-	m_pParent = pParentEntity;
-
-	if ( m_pParent == this )
-	{
-		// should never set parent to 'this' - makes no sense
-		Assert(0);
-		m_pParent = NULL;
-	}
-	
-	if ( m_pParent == NULL )
+	if (pParentEntity == NULL)
 	{
 		m_iParent = NULL_STRING;
 
 		// Transform step data from parent to worldspace
-		TransformStepData_ParentToWorld( pOldParent );
+		TransformStepData_ParentToWorld(pOldParent);
 		return;
 	}
-
-	m_iParent = m_pParent->m_iName;
+	// set the new name
+	//m_pParent = pParentEntity;
+	m_iParent = pParentEntity->m_iName;
 
 	RemoveSolidFlags( FSOLID_ROOT_PARENT_ALIGNED );
-	if ( pParentEntity )
+	if ( const_cast<CBaseEntity *>(pParentEntity)->GetRootMoveParent()->GetSolid() == SOLID_BSP )
 	{
-		if ( const_cast<CBaseEntity *>(pParentEntity)->GetRootMoveParent()->GetSolid() == SOLID_BSP )
+		AddSolidFlags( FSOLID_ROOT_PARENT_ALIGNED );
+	}
+	else
+	{
+		if ( GetSolid() == SOLID_BSP )
 		{
-			AddSolidFlags( FSOLID_ROOT_PARENT_ALIGNED );
-		}
-		else
-		{
-			if ( GetSolid() == SOLID_BSP )
-			{
-				// Must be SOLID_VPHYSICS because parent might rotate
-				SetSolid( SOLID_VPHYSICS );
-			}
+			// Must be SOLID_VPHYSICS because parent might rotate
+			SetSolid( SOLID_VPHYSICS );
 		}
 	}
+	
 	// set the move parent if we have one
-	if ( entindex()!=-1 )
-	{
-		// add ourselves to the list
-		LinkChild( m_pParent, this );
+	
+	// add ourselves to the list
+	LinkChild(pParentEntity, this );
 
-		m_iParentAttachment = (char)iAttachment;
+	m_iParentAttachment = (char)iAttachment;
 
-		EntityMatrix matrix, childMatrix;
-		matrix.InitFromEntity( const_cast<CBaseEntity *>(pParentEntity), m_iParentAttachment ); // parent->world
-		childMatrix.InitFromEntityLocal( this ); // child->world
-		Vector localOrigin = matrix.WorldToLocal(GetEngineObject()->GetLocalOrigin() );
+	EntityMatrix matrix, childMatrix;
+	matrix.InitFromEntity( const_cast<CBaseEntity *>(pParentEntity), m_iParentAttachment ); // parent->world
+	childMatrix.InitFromEntityLocal( this ); // child->world
+	Vector localOrigin = matrix.WorldToLocal(GetEngineObject()->GetLocalOrigin() );
 		
-		// I have the axes of local space in world space. (childMatrix)
-		// I want to compute those world space axes in the parent's local space
-		// and set that transform (as angles) on the child's object so the net
-		// result is that the child is now in parent space, but still oriented the same way
-		VMatrix tmp = matrix.Transpose(); // world->parent
-		tmp.MatrixMul( childMatrix, matrix ); // child->parent
-		QAngle angles;
-		MatrixToAngles( matrix, angles );
-		GetEngineObject()->SetLocalAngles( angles );
-		UTIL_SetOrigin( this, localOrigin );
+	// I have the axes of local space in world space. (childMatrix)
+	// I want to compute those world space axes in the parent's local space
+	// and set that transform (as angles) on the child's object so the net
+	// result is that the child is now in parent space, but still oriented the same way
+	VMatrix tmp = matrix.Transpose(); // world->parent
+	tmp.MatrixMul( childMatrix, matrix ); // child->parent
+	QAngle angles;
+	MatrixToAngles( matrix, angles );
+	GetEngineObject()->SetLocalAngles( angles );
+	UTIL_SetOrigin( this, localOrigin );
 
-		// Move our step data into the correct space
-		if ( bWasNotParented )
-		{
-			// Transform step data from world to parent-space
-			TransformStepData_WorldToParent( this );
-		}
-		else
-		{
-			// Transform step data between parent-spaces
-			TransformStepData_ParentToParent( pOldParent, this );
-		}
+	// Move our step data into the correct space
+	if ( bWasNotParented )
+	{
+		// Transform step data from world to parent-space
+		TransformStepData_WorldToParent( this );
 	}
+	else
+	{
+		// Transform step data between parent-spaces
+		TransformStepData_ParentToParent( pOldParent, this );
+	}
+	
 	if ( VPhysicsGetObject() )
 	{
 		if ( VPhysicsGetObject()->IsStatic())
@@ -1837,7 +1831,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	
 	DEFINE_FIELD( m_debugOverlays, FIELD_INTEGER ),
 
-	DEFINE_GLOBAL_FIELD( m_pParent, FIELD_EHANDLE ),
+	//DEFINE_GLOBAL_FIELD( m_pParent, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_iParentAttachment, FIELD_CHARACTER ),
 	DEFINE_GLOBAL_FIELD( m_hMoveParent, FIELD_EHANDLE ),
 	DEFINE_GLOBAL_FIELD( m_hMoveChild, FIELD_EHANDLE ),
@@ -2095,7 +2089,7 @@ int CBaseEntity::ObjectCaps( void )
 
 	// We inherit our parent's use capabilities so that we can forward use commands
 	// to our parent.
-	CBaseEntity *pParent = GetParent();
+	CBaseEntity *pParent = GetMoveParent();
 	if ( pParent )
 	{
 		int caps = pParent->ObjectCaps();
@@ -2120,9 +2114,9 @@ int CBaseEntity::ObjectCaps( void )
 	// We inherit our parent's use capabilities so that we can forward use commands
 	// to our parent.
 	int parentCaps = 0;
-	if (GetParent())
+	if (GetMoveParent())
 	{
-		parentCaps = GetParent()->ObjectCaps();
+		parentCaps = GetMoveParent()->ObjectCaps();
 		parentCaps &= ( FCAP_IMPULSE_USE | FCAP_CONTINUOUS_USE | FCAP_ONOFF_USE | FCAP_DIRECTIONAL_USE );
 	}	
 
@@ -2137,8 +2131,8 @@ int CBaseEntity::ObjectCaps( void )
 void CBaseEntity::StartTouch( CBaseEntity *pOther )
 {
 	// notify parent
-	if ( m_pParent != NULL )
-		m_pParent->StartTouch( pOther );
+	if ( m_hMoveParent != NULL )
+		m_hMoveParent->StartTouch( pOther );
 }
 
 void CBaseEntity::Touch( CBaseEntity *pOther )
@@ -2147,16 +2141,16 @@ void CBaseEntity::Touch( CBaseEntity *pOther )
 		(this->*m_pfnTouch)( pOther );
 
 	// notify parent of touch
-	if ( m_pParent != NULL )
-		m_pParent->Touch( pOther );
+	if (m_hMoveParent != NULL )
+		m_hMoveParent->Touch( pOther );
 }
 
 void CBaseEntity::EndTouch( CBaseEntity *pOther )
 {
 	// notify parent
-	if ( m_pParent != NULL )
+	if (m_hMoveParent != NULL )
 	{
-		m_pParent->EndTouch( pOther );
+		m_hMoveParent->EndTouch( pOther );
 	}
 }
 
@@ -2175,9 +2169,9 @@ void CBaseEntity::Blocked( CBaseEntity *pOther )
 	//
 	// Forward the blocked event to our parent, if any.
 	//
-	if ( m_pParent != NULL )
+	if (m_hMoveParent != NULL )
 	{
-		m_pParent->Blocked( pOther );
+		m_hMoveParent->Blocked( pOther );
 	}
 }
 
@@ -2200,9 +2194,9 @@ void CBaseEntity::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 		//
 		// We don't handle use events. Forward to our parent, if any.
 		//
-		if ( m_pParent != NULL )
+		if (m_hMoveParent != NULL )
 		{
-			m_pParent->Use( pActivator, pCaller, useType, value );
+			m_hMoveParent->Use( pActivator, pCaller, useType, value );
 		}
 	}
 }
@@ -3215,7 +3209,7 @@ int CBaseEntity::Restore( IRestore &restore )
 	{
 		CGameSaveRestoreInfo *pGameInfo = restore.GetGameSaveRestoreInfo();
 		Vector parentSpaceOffset = pGameInfo->modelSpaceOffset;
-		if ( !GetParent() )
+		if ( !GetMoveParent() )
 		{
 			// parent is the world, so parent space is worldspace
 			// so update with the worldspace leveltransition transform
@@ -3310,9 +3304,9 @@ void CBaseEntity::OnRestore()
 		RemoveFlag( FL_DISSOLVING | FL_ONFIRE );
 	}
 
-	if ( m_pParent )
+	if (m_hMoveParent)
 	{
-		CBaseEntity *pChild = m_pParent->FirstMoveChild();
+		CBaseEntity *pChild = m_hMoveParent->FirstMoveChild();
 		while ( pChild )
 		{
 			if ( pChild == this )
@@ -3328,7 +3322,7 @@ void CBaseEntity::OnRestore()
 			Warning("Fixing up parent on %s\n", GetClassname() );
 #endif
 			// We only need to be back in the parent's list because we're already in the right place and with the right data
-			LinkChild( m_pParent, this );
+			LinkChild(m_hMoveParent, this );
 		}
 	}
 
@@ -4201,14 +4195,14 @@ void CBaseEntity::InputSetParent( inputdata_t &inputdata )
 void CBaseEntity::SetParentAttachment( const char *szInputName, const char *szAttachment, bool bMaintainOffset )
 {
 	// Must have a parent
-	if ( !m_pParent )
+	if ( !m_hMoveParent)
 	{
 		Warning("ERROR: Tried to %s for entity %s (%s), but it has no parent.\n", szInputName, GetClassname(), GetDebugName() );
 		return;
 	}
 
 	// Valid only on CBaseAnimating
-	CBaseAnimating *pAnimating = m_pParent->GetBaseAnimating();
+	CBaseAnimating *pAnimating = m_hMoveParent->GetBaseAnimating();
 	if ( !pAnimating )
 	{
 		Warning("ERROR: Tried to %s for entity %s (%s), but its parent has no model.\n", szInputName, GetClassname(), GetDebugName() );
@@ -4224,7 +4218,7 @@ void CBaseEntity::SetParentAttachment( const char *szInputName, const char *szAt
 	}
 
 	m_iParentAttachment = iAttachment;
-	SetParent( m_pParent, m_iParentAttachment );
+	SetParent(m_hMoveParent, m_iParentAttachment );
 
 	// Now move myself directly onto the attachment point
 	SetMoveType( MOVETYPE_NONE );
@@ -5857,6 +5851,24 @@ void CBaseEntity::CalcAbsoluteAngularVelocity()
 }
 */
 
+void CEngineObject::ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition)
+{
+	m_pOuter->ComputeAbsPosition(vecLocalPosition, pAbsPosition);
+}
+
+
+//-----------------------------------------------------------------------------
+// Computes the abs position of a point specified in local space
+//-----------------------------------------------------------------------------
+void CEngineObject::ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection)
+{
+	m_pOuter->ComputeAbsDirection(vecLocalDirection, pAbsDirection);
+}
+
+void CEngineObject::GetVectors(Vector* forward, Vector* right, Vector* up) const {
+	m_pOuter->GetVectors(forward, right, up);
+}
+
 //-----------------------------------------------------------------------------
 // Computes the abs position of a point specified in local space
 //-----------------------------------------------------------------------------
@@ -6276,6 +6288,41 @@ void CBaseEntity::SetLocalAngularVelocity( const QAngle &vecAngVelocity )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Methods relating to traversing hierarchy
+//-----------------------------------------------------------------------------
+CEngineObject* CEngineObject::GetMoveParent(void)
+{
+	return m_pOuter->GetMoveParent() ? m_pOuter->GetMoveParent()->GetEngineObject() : NULL;
+}
+
+CEngineObject* CEngineObject::FirstMoveChild(void)
+{
+	return m_pOuter->FirstMoveChild() ? m_pOuter->FirstMoveChild()->GetEngineObject() : NULL;
+}
+
+CEngineObject* CEngineObject::NextMovePeer(void)
+{
+	return m_pOuter->NextMovePeer() ? m_pOuter->NextMovePeer()->GetEngineObject() : NULL;
+}
+
+CEngineObject* CEngineObject::GetRootMoveParent()
+{
+	return m_pOuter->GetRootMoveParent() ? m_pOuter->GetRootMoveParent()->GetEngineObject() : NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Returns the entity-to-world transform
+//-----------------------------------------------------------------------------
+matrix3x4_t& CEngineObject::EntityToWorldTransform()
+{
+	return m_pOuter->EntityToWorldTransform();
+}
+
+const matrix3x4_t& CEngineObject::EntityToWorldTransform() const
+{
+	return m_pOuter->EntityToWorldTransform();
+}
 
 //-----------------------------------------------------------------------------
 // Sets the local position from a transform

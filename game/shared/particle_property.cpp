@@ -548,7 +548,7 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 
 	// Only update non-follow particles when we're initializing, 
 	// unless we're parented to something, in which case we should always update
-	if ( !bInitializing && !pPoint->hEntity->GetMoveParent() && (pPoint->iAttachType == PATTACH_ABSORIGIN || pPoint->iAttachType == PATTACH_POINT ) )
+	if ( !bInitializing && !pPoint->hEntity->GetEngineObject()->GetMoveParent() && (pPoint->iAttachType == PATTACH_ABSORIGIN || pPoint->iAttachType == PATTACH_POINT ) )
 		return;
 
 	if ( pPoint->iAttachType == PATTACH_CUSTOMORIGIN )
@@ -638,7 +638,7 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 		default:
 			{
 				vecOrigin = pPoint->hEntity->GetAbsOrigin() + pPoint->vecOriginOffset;
-				pPoint->hEntity->GetVectors( &vecForward, &vecRight, &vecUp );
+				pPoint->hEntity->GetEngineObject()->GetVectors( &vecForward, &vecRight, &vecUp );
 			}
 			break;
 

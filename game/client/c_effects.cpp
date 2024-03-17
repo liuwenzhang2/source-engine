@@ -857,7 +857,7 @@ void CClient_Precipitation::CreateAshParticle( void )
 		return;
 
 		Vector vForward;
-		pPlayer->GetVectors( &vForward, NULL, NULL );
+		pPlayer->GetEngineObject()->GetVectors( &vForward, NULL, NULL );
 		vForward.z = 0.0f;
 
 		float curTime = gpGlobals->frametime;
@@ -1907,7 +1907,7 @@ void CSnowFallManager::CreateSnowFall( void )
 	// Get the players data to determine where the snow emitter should reside.
 	VectorCopy( pPlayer->EyePosition(), m_vecSnowFallEmitOrigin );
 	Vector vecForward;
-	pPlayer->GetVectors( &vecForward, NULL, NULL );
+	pPlayer->GetEngineObject()->GetVectors( &vecForward, NULL, NULL );
 	vecForward.z = 0.0f;
 	Vector vecVelocity = pPlayer->GetAbsVelocity();
 	float flSpeed = VectorNormalize( vecVelocity );

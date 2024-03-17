@@ -1314,7 +1314,7 @@ void C_BasePlayer::CreateWaterEffects( void )
 	}
 
 	Vector vecVelocity;
-	GetVectors( &vecVelocity, NULL, NULL );
+	GetEngineObject()->GetVectors( &vecVelocity, NULL, NULL );
 
 	Vector offset = WorldSpaceCenter();
 
@@ -2275,10 +2275,10 @@ void C_BasePlayer::PhysicsSimulate( void )
 #if !defined( NO_ENTITY_PREDICTION )
 	VPROF( "C_BasePlayer::PhysicsSimulate" );
 	// If we've got a moveparent, we must simulate that first.
-	CBaseEntity *pMoveParent = GetMoveParent();
+	C_EngineObject *pMoveParent = GetEngineObject()->GetMoveParent();
 	if (pMoveParent)
 	{
-		pMoveParent->PhysicsSimulate();
+		pMoveParent->GetOuter()->PhysicsSimulate();
 	}
 
 	// Make sure not to simulate this guy twice per frame

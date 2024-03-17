@@ -90,7 +90,7 @@ bool IsReflectiveGlassInView( const CViewSetup& view, cplane_t &plane )
 			continue;
 
 		const model_t *pModel = pReflectiveGlass->GetModel();
-		const matrix3x4_t& mat = pReflectiveGlass->EntityToWorldTransform();
+		const matrix3x4_t& mat = pReflectiveGlass->GetEngineObject()->EntityToWorldTransform();
 
 		int nCount = modelinfo->GetBrushModelPlaneCount( pModel );
 		for ( int i = 0; i < nCount; ++i )

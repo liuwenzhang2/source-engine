@@ -247,7 +247,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 			return;
 
 		// Take our saved collision bounds, and transform into world space
-		TransformAABB( EntityToWorldTransform(), m_collisionMins, m_collisionMaxs, *mins, *maxs );
+		TransformAABB(GetEngineObject()->EntityToWorldTransform(), m_collisionMins, m_collisionMaxs, *mins, *maxs );
 	}
 
 	CNetworkVar( int, m_iPhysicsMode );	// One of the PHYSICS_MULTIPLAYER_ defines.	

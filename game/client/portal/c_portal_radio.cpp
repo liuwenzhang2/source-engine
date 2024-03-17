@@ -248,7 +248,7 @@ int C_Portal_Dinosaur::DrawModel( int flags )
 	color.a = 128;
 
 	Vector vForward, vRight, vUp;
-	GetVectors( &vForward, &vRight, &vUp );
+	GetEngineObject()->GetVectors( &vForward, &vRight, &vUp );
 	Vector vOffset = GetAbsOrigin() + ( vForward * 4.0f ) + ( vUp * 1.85f );
 	DrawSprite( vOffset, 6.0f, 6.0f, color );
 

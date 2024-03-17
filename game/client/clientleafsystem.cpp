@@ -406,7 +406,7 @@ void CalcRenderableWorldSpaceAABB_Fast( IClientRenderable *pRenderable, Vector &
 	C_BaseEntity *pEnt = pRenderable->GetIClientUnknown()->GetBaseEntity();
 	if ( pEnt && pEnt->IsFollowingEntity() )
 	{
-		C_BaseEntity *pParent = pEnt->GetMoveParent();
+		C_BaseEntity *pParent = pEnt->GetEngineObject()->GetMoveParent()?pEnt->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 		Assert( pParent );
 
 		// Get the parent's abs space world bounds.

@@ -95,7 +95,7 @@ bool C_FuncTrackTrain::GetSoundSpatialization( SpatializationInfo_t& info )
 		Vector vecStart, vecEnd, vecWorldDir;
 		Vector vecDir = vec3_origin;
 		vecDir[m_nLongAxis] = 1.0f;
-		VectorRotate( vecDir, EntityToWorldTransform(), vecWorldDir );
+		VectorRotate( vecDir, GetEngineObject()->EntityToWorldTransform(), vecWorldDir );
 		VectorMA( WorldSpaceCenter(), -0.5f * m_flLineLength, vecWorldDir, vecStart );
 		VectorMA( vecStart, m_flLineLength, vecWorldDir, vecEnd );
 

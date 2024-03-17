@@ -96,7 +96,7 @@ void StudioStats_FindClosestEntity( CClientRenderablesList *pClientRenderablesLi
 		C_BaseEntity *pVM = pPlayer->GetViewModel();
 		if ( pVM )
 		{
-			g_pStudioStatsEntity = pVM->FirstMoveChild();
+			g_pStudioStatsEntity = pVM->GetEngineObject()->FirstMoveChild()? pVM->GetEngineObject()->FirstMoveChild()->GetOuter():NULL;
 		}
 		return;
 	}

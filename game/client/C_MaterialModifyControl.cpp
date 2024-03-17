@@ -291,10 +291,10 @@ void CMaterialModifyProxy::OnBind( void *pEntity )
 			}
 			int numChildren = 0;
 			bool gotOne = false;
-			for ( C_BaseEntity *pChild = pBaseEntity->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
+			for ( C_EngineObject *pChild = pBaseEntity->GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
 			{
 				numChildren++;
-				C_MaterialModifyControl *pControl = dynamic_cast<C_MaterialModifyControl*>( pChild );
+				C_MaterialModifyControl *pControl = dynamic_cast<C_MaterialModifyControl*>( pChild->GetOuter() );
 				if ( !pControl )
 					continue;
 
@@ -639,9 +639,9 @@ void CMaterialModifyAnimatedProxy::OnBind( void *pEntity )
 		C_BaseEntity *pBaseEntity = pRend->GetIClientUnknown()->GetBaseEntity();
 		if ( pBaseEntity )
 		{
-			for ( C_BaseEntity *pChild = pBaseEntity->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
+			for ( C_EngineObject *pChild = pBaseEntity->GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
 			{
-				C_MaterialModifyControl *pControl = dynamic_cast<C_MaterialModifyControl*>( pChild );
+				C_MaterialModifyControl *pControl = dynamic_cast<C_MaterialModifyControl*>( pChild->GetOuter() );
 				if ( !pControl )
 					continue;
 

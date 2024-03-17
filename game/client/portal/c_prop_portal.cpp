@@ -316,7 +316,7 @@ void C_Prop_Portal::Simulate()
 					pMoveEntity = NULL;
 				}
 				else
-					pMoveEntity = pMoveEntity->GetMoveParent();
+					pMoveEntity = pMoveEntity->GetEngineObject()->GetMoveParent()? pMoveEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 			}
 
 			if ( !bIsMovable )
@@ -549,7 +549,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 {
 	C_Prop_Portal *pRemote = m_hLinkedPortal;
 	m_pLinkedPortal = pRemote;
-	GetVectors( &m_vForward, &m_vRight, &m_vUp );
+	GetEngineObject()->GetVectors( &m_vForward, &m_vRight, &m_vUp );
 	m_ptOrigin = GetNetworkOrigin();
 
 	bool bPortalMoved = ( (PreDataChanged.m_vOrigin != m_ptOrigin ) ||
@@ -567,7 +567,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 		Vector vRemoteUp, vRemoteRight, vRemoteForward, ptRemoteOrigin;
 		if( pRemote )
 		{
-			pRemote->GetVectors( &vRemoteForward, &vRemoteRight, &vRemoteUp );
+			pRemote->GetEngineObject()->GetVectors( &vRemoteForward, &vRemoteRight, &vRemoteUp );
 			ptRemoteOrigin = pRemote->GetNetworkOrigin();
 		}
 		g_pPortalRender->AddPortal( this ); //will know if we're already added and avoid adding twice
@@ -898,7 +898,7 @@ void C_Prop_Portal::GetToolRecordingState( KeyValues *msg )
 void C_Prop_Portal::UpdateOriginPlane( void )
 {
 	//setup our origin plane
-	GetVectors( &m_plane_Origin.normal, NULL, NULL );
+	GetEngineObject()->GetVectors( &m_plane_Origin.normal, NULL, NULL );
 	m_plane_Origin.dist = m_plane_Origin.normal.Dot( GetAbsOrigin() );
 	m_plane_Origin.signbits = SignbitsForPlane( &m_plane_Origin );
 

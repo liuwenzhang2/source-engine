@@ -550,7 +550,7 @@ int CNewParticleEffect::DrawModel( int flags )
 				{
 					if ( pEntity == pCameraObject )
 						return 0;
-					C_BaseEntity *pRootMove = pEntity->GetRootMoveParent();
+					C_BaseEntity *pRootMove = pEntity->GetEngineObject()->GetRootMoveParent()? pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter():NULL;
 					if ( pRootMove == pCameraObject )
 						return 0;
 

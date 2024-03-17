@@ -353,6 +353,10 @@ public:
 		m_pOuter = pOuter;
 	}
 
+	CBaseEntity* GetOuter() {
+		return m_pOuter;
+	}
+
 	void					SetAbsVelocity(const Vector& vecVelocity);
 	Vector&					GetAbsVelocity();
 	const Vector&			GetAbsVelocity() const;
@@ -378,6 +382,24 @@ public:
 
 	void					CalcAbsolutePosition();
 	void					CalcAbsoluteVelocity();
+
+	CEngineObject* GetMoveParent(void);
+	CEngineObject* GetRootMoveParent();
+	CEngineObject* FirstMoveChild(void);
+	CEngineObject* NextMovePeer(void);
+
+	// Returns the entity-to-world transform
+	matrix3x4_t& EntityToWorldTransform();
+	const matrix3x4_t& EntityToWorldTransform() const;
+
+	// Computes the abs position of a point specified in local space
+	void					ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
+
+	// Computes the abs position of a direction specified in local space
+	void					ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection);
+
+	void	GetVectors(Vector* forward, Vector* right, Vector* up) const;
+
 private:
 
 	friend class CBaseEntity;
@@ -642,7 +664,7 @@ public:
 	// are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
 	// current m_iParentAttachment.
 	virtual void	SetParent( CBaseEntity* pNewParent, int iAttachment = -1 );
-	CBaseEntity* GetParent();
+	//CBaseEntity* GetParent();
 	int			GetParentAttachment();
 
 	string_t	GetEntityName();
@@ -1699,7 +1721,7 @@ private:
 	friend class CDamageModifier;
 	CUtlLinkedList<CDamageModifier*,int>	m_DamageModifiers;
 
-	EHANDLE m_pParent;  // for movement hierarchy
+	//EHANDLE m_pParent;  // for movement hierarchy
 	byte	m_nTransmitStateOwnedCounter;
 	CNetworkVar( unsigned char,  m_iParentAttachment ); // 0 if we're relative to the parent's absorigin and absangles.
 	CNetworkVar( unsigned char, m_MoveType );		// One of the MOVETYPE_ defines.
@@ -2047,11 +2069,27 @@ inline CBaseEntity *CBaseEntity::NextMovePeer( void )
 	return m_hMovePeer.Get();
 }
 
-// FIXME: Remove this! There shouldn't be a difference between moveparent + parent
-inline CBaseEntity* CBaseEntity::GetParent()
+//-----------------------------------------------------------------------------
+// Returns the highest parent of an entity
+//-----------------------------------------------------------------------------
+inline CBaseEntity* CBaseEntity::GetRootMoveParent()
 {
-	return m_pParent.Get();
+	CBaseEntity* pEntity = this;
+	CBaseEntity* pParent = this->GetMoveParent();
+	while (pParent)
+	{
+		pEntity = pParent;
+		pParent = pEntity->GetMoveParent();
+	}
+
+	return pEntity;
 }
+
+// FIXME: Remove this! There shouldn't be a difference between moveparent + parent
+//inline CBaseEntity* CBaseEntity::GetParent()
+//{
+//	return m_hMoveParent.Get();
+//}
 
 inline int CBaseEntity::GetParentAttachment()
 {

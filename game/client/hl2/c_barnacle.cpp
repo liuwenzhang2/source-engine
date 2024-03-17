@@ -210,7 +210,7 @@ void C_NPC_Barnacle::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quate
 	int firstBone = Studio_BoneIndexByName( hdr, "Barnacle.tongue1" );
 
 	Vector vecPrevRight;
-	GetVectors( NULL, &vecPrevRight, NULL );
+	GetEngineObject()->GetVectors( NULL, &vecPrevRight, NULL );
 
 	Vector vecPrev = pos[Studio_BoneIndexByName( hdr, "Barnacle.base" )];
 	Vector vecCurr = vec3_origin;
@@ -230,7 +230,7 @@ void C_NPC_Barnacle::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quate
 		//debugoverlay->AddBoxOverlay( vecCurr, -Vector(2,2,2), Vector(2,2,2), vec3_angle, 0,255,0, 128, 0.1 );
 
 		// Fill out the positions in local space
-		VectorITransform( vecCurr, EntityToWorldTransform(), pos[firstBone+i] );
+		VectorITransform( vecCurr, GetEngineObject()->EntityToWorldTransform(), pos[firstBone+i] );
 		vecCurr = pos[firstBone+i];
 
 		// Disallow twist in the tongue visually

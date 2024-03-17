@@ -121,8 +121,8 @@ void C_InfoLightingRelative::GetLightingOffset( matrix3x4_t &offset )
 	if ( m_hLightingLandmark.Get() )
 	{
 		matrix3x4_t matWorldToLandmark;
- 		MatrixInvert( m_hLightingLandmark->EntityToWorldTransform(), matWorldToLandmark );
-		ConcatTransforms( EntityToWorldTransform(), matWorldToLandmark, offset );
+ 		MatrixInvert( m_hLightingLandmark->GetEngineObject()->EntityToWorldTransform(), matWorldToLandmark );
+		ConcatTransforms(GetEngineObject()->EntityToWorldTransform(), matWorldToLandmark, offset );
 	}
 	else
 	{
@@ -1188,7 +1188,7 @@ void C_BaseAnimating::GetBoneTransform( int iBone, matrix3x4_t &pBoneToWorld )
 
 	if ( !pmatrix )
 	{
-		MatrixCopy( EntityToWorldTransform(), pBoneToWorld );
+		MatrixCopy(GetEngineObject()->EntityToWorldTransform(), pBoneToWorld );
 		return;
 	}
 
@@ -1860,16 +1860,16 @@ void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float curre
 	float		childPoseparam[MAXSTUDIOPOSEPARAM];
 
 	// go through all children
-	for ( C_BaseEntity *pChild = FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
+	for ( C_EngineObject *pChild = GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
 	{
-		C_BaseAnimating *pChildAnimating = pChild->GetBaseAnimating();
+		C_BaseAnimating *pChildAnimating = pChild->GetOuter()->GetBaseAnimating();
 
 		if ( pChildAnimating )
 		{
 			CStudioHdr *pChildHdr = pChildAnimating->GetModelPtr();
 
 			// FIXME: needs a new type of EF_BONEMERGE (EF_CHILDMERGE?)
-			if ( pChildHdr && pChild->IsEffectActive( EF_BONEMERGE ) && pChildHdr->SequencesAvailable() && pChildAnimating->m_pBoneMergeCache )
+			if ( pChildHdr && pChild->GetOuter()->IsEffectActive( EF_BONEMERGE ) && pChildHdr->SequencesAvailable() && pChildAnimating->m_pBoneMergeCache )
 			{
 				// FIXME: these should Inherit from the parent
 				GetPoseParameters( pChildHdr, childPoseparam );
@@ -2147,7 +2147,7 @@ bool C_BaseAnimating::GetAttachmentLocal( int iAttachment, matrix3x4_t &attachme
 		return false;
 
 	matrix3x4_t worldToEntity;
-	MatrixInvert( EntityToWorldTransform(), worldToEntity );
+	MatrixInvert(GetEngineObject()->EntityToWorldTransform(), worldToEntity );
 	ConcatTransforms( worldToEntity, attachmentToWorld, attachmentToLocal ); 
 	return true;
 }
@@ -2184,7 +2184,7 @@ bool C_BaseAnimating::GetRootBone( matrix3x4_t &rootBone )
 {
 	Assert( !IsDynamicModelLoading() );
 
-	if ( IsEffectActive( EF_BONEMERGE ) && GetMoveParent() && m_pBoneMergeCache )
+	if ( IsEffectActive( EF_BONEMERGE ) && GetEngineObject()->GetMoveParent() && m_pBoneMergeCache )
 		return m_pBoneMergeCache->GetRootBone( rootBone );
 
 	GetBoneTransform( 0, rootBone );
@@ -2655,7 +2655,7 @@ ConVar cl_threaded_bone_setup("cl_threaded_bone_setup", "0", 0, "Enable parallel
 
 static void SetupBonesOnBaseAnimating( C_BaseAnimating *&pBaseAnimating )
 {
-	if ( !pBaseAnimating->GetMoveParent() )
+	if ( !pBaseAnimating->GetEngineObject()->GetMoveParent() )
 		pBaseAnimating->SetupBones( NULL, -1, -1, gpGlobals->curtime );
 }
 
@@ -2800,7 +2800,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 	}
 
 	int nBoneCount = m_CachedBoneData.Count();
-	if ( g_bDoThreadedBoneSetup && !g_bInThreadedBoneSetup && ( nBoneCount >= 16 ) && !GetMoveParent() && m_iMostRecentBoneSetupRequest != g_iPreviousBoneCounter )
+	if ( g_bDoThreadedBoneSetup && !g_bInThreadedBoneSetup && ( nBoneCount >= 16 ) && !GetEngineObject()->GetMoveParent() && m_iMostRecentBoneSetupRequest != g_iPreviousBoneCounter )
 	{
 		m_iMostRecentBoneSetupRequest = g_iPreviousBoneCounter;
 		Assert( g_PreviousBoneSetups.Find( this ) == -1 );
@@ -5701,12 +5701,12 @@ float C_BaseAnimating::SetBoneController ( int iController, float flValue )
 
 void C_BaseAnimating::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles )
 {
-	CBaseEntity *pMoveParent;
-	if ( IsEffectActive( EF_BONEMERGE ) && IsEffectActive( EF_BONEMERGE_FASTCULL ) && (pMoveParent = GetMoveParent()) != NULL )
+	C_EngineObject *pMoveParent;
+	if ( IsEffectActive( EF_BONEMERGE ) && IsEffectActive( EF_BONEMERGE_FASTCULL ) && (pMoveParent = GetEngineObject()->GetMoveParent()) != NULL )
 	{
 		// Doing this saves a lot of CPU.
-		*pAbsOrigin = pMoveParent->WorldSpaceCenter();
-		*pAbsAngles = pMoveParent->GetRenderAngles();
+		*pAbsOrigin = pMoveParent->GetOuter()->WorldSpaceCenter();
+		*pAbsAngles = pMoveParent->GetOuter()->GetRenderAngles();
 	}
 	else
 	{
@@ -5835,7 +5835,7 @@ bool C_BaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldM
 	pVecWorldMaxs->Init( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 
 	matrix3x4_t worldToEntity, boneToEntity;
-	MatrixInvert( EntityToWorldTransform(), worldToEntity );
+	MatrixInvert(GetEngineObject()->EntityToWorldTransform(), worldToEntity );
 
 	Vector vecBoxAbsMins, vecBoxAbsMaxs;
 	for ( int i = 0; i < set->numhitboxes; i++ )

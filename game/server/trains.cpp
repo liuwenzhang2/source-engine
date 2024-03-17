@@ -2834,7 +2834,7 @@ void CFuncTrainControls::Spawn( void )
 	SetModel( STRING( GetModelName() ) );
 	AddEffects( EF_NODRAW );
 
-	Assert( GetParent() && "func_traincontrols needs parent to properly align to train" );
+	Assert(GetMoveParent() && "func_traincontrols needs parent to properly align to train" );
 	
 	SetThink( &CFuncTrainControls::Find );
 	SetNextThink( gpGlobals->curtime );

@@ -538,9 +538,9 @@ bool UTIL_EntityHasMatchingRootParent( CBaseEntity *pRootParent, CBaseEntity *pE
 	if ( pRootParent )
 	{
 		// NOTE: Don't let siblings/parents collide.
-		if ( pRootParent == pEntity->GetRootMoveParent() )
+		if ( pRootParent->GetEngineObject() == pEntity->GetEngineObject()->GetRootMoveParent())
 			return true;
-		if ( pEntity->GetOwnerEntity() && pRootParent == pEntity->GetOwnerEntity()->GetRootMoveParent() )
+		if ( pEntity->GetOwnerEntity() && pRootParent->GetEngineObject() == pEntity->GetOwnerEntity()->GetEngineObject()->GetRootMoveParent() )
 			return true;
 	}
 	return false;
@@ -557,7 +557,7 @@ public:
 	CTraceFilterEntity( CBaseEntity *pEntity, int nCollisionGroup ) 
 		: CTraceFilterSimple( pEntity, nCollisionGroup )
 	{
-		m_pRootParent = pEntity->GetRootMoveParent();
+		m_pRootParent = pEntity->GetEngineObject()->GetRootMoveParent()? pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter():NULL;
 		m_pEntity = pEntity;
 		m_checkHash = g_EntityCollisionHash->IsObjectInHash(pEntity);
 	}

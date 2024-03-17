@@ -168,11 +168,11 @@ void C_EntityParticleTrail::Update( float fTimeDelta )
 	mstudiohitboxset_t *set;
 	matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 
-	C_BaseEntity *pMoveParent = GetMoveParent();
+	C_EngineObject *pMoveParent = GetEngineObject()->GetMoveParent();
 	if ( !pMoveParent )
 		return;
 
-	C_BaseAnimating *pAnimating = pMoveParent->GetBaseAnimating();
+	C_BaseAnimating *pAnimating = pMoveParent->GetOuter()->GetBaseAnimating();
 	if (!pAnimating)
 		goto trailNoHitboxes;
 
@@ -200,7 +200,7 @@ void C_EntityParticleTrail::Update( float fTimeDelta )
 trailNoHitboxes:
 	while ( m_teParticleSpawn.NextEvent( tempDelta ) )
 	{
-		AddParticle( tempDelta, pMoveParent->CollisionProp()->OBBMins(), pMoveParent->CollisionProp()->OBBMaxs(), pMoveParent->EntityToWorldTransform() );
+		AddParticle( tempDelta, pMoveParent->GetOuter()->CollisionProp()->OBBMins(), pMoveParent->GetOuter()->CollisionProp()->OBBMaxs(), pMoveParent->EntityToWorldTransform() );
 	}
 }
 

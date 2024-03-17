@@ -229,7 +229,7 @@ bool UTIL_Portal_TraceRay_Bullets( const CProp_Portal *pPortal, const Ray_t &ray
 	VectorNormalize( vRayNormal );
 
 	Vector vPortalForward;
-	pPortal->GetVectors( &vPortalForward, 0, 0 );
+	pPortal->GetEngineObject()->GetVectors( &vPortalForward, 0, 0 );
 
 	// If the ray isn't going into the front of the portal, just use the real trace
 	if ( vPortalForward.Dot( vRayNormal ) > 0.0f )
@@ -388,7 +388,7 @@ void UTIL_Portal_TraceRay_With( const CProp_Portal *pPortal, const Ray_t &ray, u
 		Vector vDirection = ray.m_Delta;
 		VectorNormalize( vDirection );
 		Vector vPortalForward;
-		pPortal->GetVectors( &vPortalForward, 0, 0 );
+		pPortal->GetEngineObject()->GetVectors( &vPortalForward, 0, 0 );
 		
 		float flDot = -1.0f;
 		if ( ray.m_IsSwept )
@@ -1252,7 +1252,7 @@ float UTIL_Portal_ShortestDistanceSqr( const Vector &vPoint1, const Vector &vPoi
 						}
 
 						Vector vRight, vUp;
-						pLinkedPortal->GetVectors( NULL, &vRight, &vUp );
+						pLinkedPortal->GetEngineObject()->GetVectors( NULL, &vRight, &vUp );
 						
 						Vector ptLinkedCenter = pLinkedPortal->GetAbsOrigin();
 						Vector vCenterToIntersection = ptPlaneIntersection - ptLinkedCenter;
@@ -1376,7 +1376,7 @@ float UTIL_IntersectRayWithPortal( const Ray_t &ray, const CProp_Portal *pPortal
 	}
 
 	Vector vForward;
-	pPortal->GetVectors( &vForward, NULL, NULL );
+	pPortal->GetEngineObject()->GetVectors( &vForward, NULL, NULL );
 
 	// Discount rays not coming from the front of the portal
 	float fDot = DotProduct( vForward, ray.m_Delta );
@@ -1500,7 +1500,7 @@ bool FindClosestPassableSpace( CBaseEntity *pEntity, const Vector &vIndecisivePu
 		return true;
 
 	// Don't ever do this to entities with a move parent
-	if ( pEntity->GetMoveParent() )
+	if ( pEntity->GetEngineObject()->GetMoveParent() )
 		return true;
 
 #ifndef CLIENT_DLL
@@ -1679,7 +1679,7 @@ bool UTIL_Portal_EntityIsInPortalHole( const CProp_Portal *pPortal, CBaseEntity 
 	vUp *= vExtents.z;
 
 	Vector vPortalForward, vPortalRight, vPortalUp;
-	pPortal->GetVectors( &vPortalForward, &vPortalRight, &vPortalUp );
+	pPortal->GetEngineObject()->GetVectors( &vPortalForward, &vPortalRight, &vPortalUp );
 	Vector ptPortalCenter = pPortal->GetAbsOrigin();
 
 	return OBBHasFullyContainedIntersectionWithQuad( vForward, vRight, vUp, ptOBBCenter, 

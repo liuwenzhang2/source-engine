@@ -813,7 +813,7 @@ int C_PropAirboat::DrawWake( void )
 
 		Vector vecSplashDir;
 		Vector vForward;
-		GetVectors( &vForward, NULL, NULL );
+		GetEngineObject()->GetVectors( &vForward, NULL, NULL );
 
 		if ( m_vecPhysVelocity.x < -64.0f )
 		{

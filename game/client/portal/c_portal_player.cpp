@@ -450,7 +450,7 @@ void C_Portal_Player::UpdateLookAt( void )
 
 	// defaults if no portals are around
 	Vector vPlayerForward;
-	GetVectors( &vPlayerForward, NULL, NULL );
+	GetEngineObject()->GetVectors( &vPlayerForward, NULL, NULL );
 	Vector vCurLookTarget = EyePosition();
 
 	if ( !IsAlive() )
@@ -476,7 +476,7 @@ void C_Portal_Player::UpdateLookAt( void )
 			{
 				Vector vEyeForward, vPortalForward;
 				EyeVectors( &vEyeForward );
-				pTempPortal->GetVectors( &vPortalForward, NULL, NULL );
+				pTempPortal->GetEngineObject()->GetVectors( &vPortalForward, NULL, NULL );
 				fPortalDot[i] = vEyeForward.Dot( vPortalForward );
 				if ( fPortalDot[i] < flLowDot )
 				{
@@ -1530,7 +1530,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 	Vector vPortalForward;
 
 	ptPortalCenter = pPortal->GetNetworkOrigin();
-	pPortal->GetVectors( &vPortalForward, NULL, NULL );
+	pPortal->GetEngineObject()->GetVectors( &vPortalForward, NULL, NULL );
 	float fPortalPlaneDist = vPortalForward.Dot( ptPortalCenter );
 
 	bool bOverrideSpecialEffects = false; //sometimes to get the best effect we need to kill other effects that are simply for cleanliness
@@ -1557,7 +1557,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 				Vector vIntersectionTest = ptPlaneIntersection - ptPortalCenter;
 
 				Vector vPortalRight, vPortalUp;
-				pPortal->GetVectors( NULL, &vPortalRight, &vPortalUp );
+				pPortal->GetEngineObject()->GetVectors( NULL, &vPortalRight, &vPortalUp );
 
 				if( (vIntersectionTest.Dot( vPortalRight ) <= PORTAL_HALF_WIDTH) &&
 					(vIntersectionTest.Dot( vPortalUp ) <= PORTAL_HALF_HEIGHT) )

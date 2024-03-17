@@ -166,7 +166,7 @@ void CBounceBomb::Spawn()
 
 	m_iFlipAttempts = 0;
 
-	if( !GetParent() )
+	if( !GetMoveParent() )
 	{
 		// Create vphysics now if I'm not being carried.
 		CreateVPhysics();
@@ -601,7 +601,7 @@ void CBounceBomb::SettleThink()
 	SetNextThink( gpGlobals->curtime + 0.05 );
 	StudioFrameAdvance();
 
-	if( GetParent() )
+	if(GetMoveParent() )
 	{
 		// A scanner or something is carrying me. Just keep checking back.
 		return;

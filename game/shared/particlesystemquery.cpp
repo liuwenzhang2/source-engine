@@ -304,7 +304,7 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 			Vector VecOrigin;
 			pMoveParent->GetRenderBounds( vecMin, vecMax  );
 			VecOrigin = pMoveParent->GetRenderOrigin();
-			matOrientation = pMoveParent->EntityToWorldTransform();
+			matOrientation = pMoveParent->GetEngineObject()->EntityToWorldTransform();
 
 			
 
@@ -445,7 +445,7 @@ int CParticleSystemQuery::GetControllingObjectHitBoxInfo(
 			Vector vecMax;
 			matrix3x4_t matOrientation;
 			pMoveParent->GetRenderBounds( vecMin, vecMax  );
-			matOrientation = pMoveParent->EntityToWorldTransform();
+			matOrientation = pMoveParent->GetEngineObject()->EntityToWorldTransform();
 			pHitBoxOutputBuffer[0].m_vecBoxMins = vecMin;
 			pHitBoxOutputBuffer[0].m_vecBoxMaxes = vecMax;
 			pHitBoxOutputBuffer[0].m_Transform = matOrientation;
@@ -486,7 +486,7 @@ bool CParticleSystemQuery::IsPointInControllingObjectHitBox(
 		vecBBoxMax = pMoveParent->CollisionProp()->OBBMaxs();
 
 		matrix3x4_t matOrientation;
-		matOrientation = pMoveParent->EntityToWorldTransform();
+		matOrientation = pMoveParent->GetEngineObject()->EntityToWorldTransform();
 		Vector vecLocalPos;
 		VectorITransform( vecPos, matOrientation, vecLocalPos );
 		if ( IsPointInBox( vecLocalPos, vecBBoxMin, vecBBoxMax ) )

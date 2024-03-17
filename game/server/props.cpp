@@ -1971,7 +1971,7 @@ void CDynamicProp::SetParent( CBaseEntity *pNewParent, int iAttachment )
 void CDynamicProp::BoneFollowerHierarchyChanged()
 {
 	// If we have bone followers and we're parented to something, we need to constantly update our bone followers
-	if ( m_BoneFollowerManager.GetNumBoneFollowers() && GetParent() )
+	if ( m_BoneFollowerManager.GetNumBoneFollowers() && GetMoveParent() )
 	{
 		WatchPositionChanges(this, this);
 	}
@@ -6083,7 +6083,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	// Scale the base model as well
 	pInstance->SetModelScale( flScale );
 
-	if ( pInstance->GetParent() )
+	if ( pInstance->GetMoveParent() )
 	{
 		pNewObject->SetShadow( 1e4, 1e4, false, false );
 		pNewObject->UpdateShadow( pInstance->GetAbsOrigin(), pInstance->GetAbsAngles(), false, 0 );

@@ -199,6 +199,10 @@ public:
 		m_pOuter = pOuter;
 	}
 
+	C_BaseEntity* GetOuter() {
+		return m_pOuter;
+	}
+
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel
 	void				SetAbsVelocity(const Vector& vecVelocity);
@@ -240,6 +244,45 @@ public:
 	void CalcAbsolutePosition();
 	void CalcAbsoluteVelocity();
 
+	// Unlinks from hierarchy
+	// Set the movement parent. Your local origin and angles will become relative to this parent.
+	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
+	// are relative to the attachment on this entity.
+	void SetParent(C_EngineObject* pParentEntity, int iParentAttachment = 0);
+	void UnlinkChild(C_EngineObject* pParent, C_EngineObject* pChild);
+	void LinkChild(C_EngineObject* pParent, C_EngineObject* pChild);
+	void HierarchySetParent(C_EngineObject* pNewParent);
+	void UnlinkFromHierarchy();
+
+	// Methods relating to traversing hierarchy
+	C_EngineObject* GetMoveParent(void) const;
+	C_EngineObject* GetRootMoveParent();
+	C_EngineObject* FirstMoveChild(void) const;
+	C_EngineObject* NextMovePeer(void) const;
+
+	// Returns the entity-to-world transform
+	matrix3x4_t& EntityToWorldTransform();
+	const matrix3x4_t& EntityToWorldTransform() const;
+
+	// Some helper methods that transform a point from entity space to world space + back
+	void							EntityToWorldSpace(const Vector& in, Vector* pOut) const;
+	void							WorldToEntitySpace(const Vector& in, Vector* pOut) const;
+
+	void							GetVectors(Vector* forward, Vector* right, Vector* up) const;
+
+	// This function gets your parent's transform. If you're parented to an attachment,
+// this calculates the attachment's transform and gives you that.
+//
+// You must pass in tempMatrix for scratch space - it may need to fill that in and return it instead of 
+// pointing you right at a variable in your parent.
+	matrix3x4_t&					GetParentToWorldTransform(matrix3x4_t& tempMatrix);
+
+	// Computes the abs position of a point specified in local space
+	void				ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
+
+	// Computes the abs position of a direction specified in local space
+	void				ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection);
+
 public:
 
 	void AddVar(void* data, IInterpolatedVar* watcher, int type, bool bSetup = false);
@@ -259,6 +302,7 @@ public:
 	void							Interp_RestoreToLastNetworked(VarMapping_t* map);
 	void							Interp_UpdateInterpolationAmounts(VarMapping_t* map);
 	void							Interp_Reset(VarMapping_t* map);
+	void							Interp_HierarchyUpdateInterpolationAmounts();
 
 	
 
@@ -308,6 +352,8 @@ public:
 private:
 
 	friend class C_BaseEntity;
+	CThreadFastMutex m_CalcAbsolutePositionMutex;
+	CThreadFastMutex m_CalcAbsoluteVelocityMutex;
 	Vector							m_vecOrigin;
 	CInterpolatedVar< Vector >		m_iv_vecOrigin;
 	QAngle							m_angRotation;
@@ -320,9 +366,76 @@ private:
 	QAngle							m_angAbsRotation;
 	Vector							m_vecAbsVelocity;
 	C_BaseEntity* m_pOuter;
+
+	// Hierarchy
+	C_EngineObject*				m_pMoveParent;
+	C_EngineObject*				m_pMoveChild;
+	C_EngineObject*				m_pMovePeer;
+	C_EngineObject*				m_pMovePrevPeer;
+
+	// Specifies the entity-to-world transform
+	matrix3x4_t						m_rgflCoordinateFrame;
 };
 
+//-----------------------------------------------------------------------------
+// Methods relating to traversing hierarchy
+//-----------------------------------------------------------------------------
+inline C_EngineObject* C_EngineObject::GetMoveParent(void) const
+{
+	return m_pMoveParent;
+}
 
+inline C_EngineObject* C_EngineObject::FirstMoveChild(void) const
+{
+	return m_pMoveChild;
+}
+
+inline C_EngineObject* C_EngineObject::NextMovePeer(void) const
+{
+	return m_pMovePeer;
+}
+
+inline C_EngineObject* C_EngineObject::GetRootMoveParent()
+{
+	C_EngineObject* pEntity = this;
+	C_EngineObject* pParent = this->GetMoveParent();
+	while (pParent)
+	{
+		pEntity = pParent;
+		pParent = pEntity->GetMoveParent();
+	}
+
+	return pEntity;
+}
+
+
+
+//-----------------------------------------------------------------------------
+// Some helper methods that transform a point from entity space to world space + back
+//-----------------------------------------------------------------------------
+inline void C_EngineObject::EntityToWorldSpace(const Vector& in, Vector* pOut) const
+{
+	if (GetAbsAngles() == vec3_angle)
+	{
+		VectorAdd(in, GetAbsOrigin(), *pOut);
+	}
+	else
+	{
+		VectorTransform(in, EntityToWorldTransform(), *pOut);
+	}
+}
+
+inline void C_EngineObject::WorldToEntitySpace(const Vector& in, Vector* pOut) const
+{
+	if (GetAbsAngles() == vec3_angle)
+	{
+		VectorSubtract(in, GetAbsOrigin(), *pOut);
+	}
+	else
+	{
+		VectorITransform(in, EntityToWorldTransform(), *pOut);
+	}
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Base client side entity object
@@ -386,7 +499,6 @@ public:
 
 
 
-	void							Interp_HierarchyUpdateInterpolationAmounts();
 
 	// Called by the CLIENTCLASS macros.
 	virtual bool					Init( int entnum, int iSerialNum );
@@ -612,10 +724,6 @@ public:
 	void SetNetworkOrigin( const Vector& org );
 	void SetNetworkAngles( const QAngle& ang );
 
-	
-
-
-
 	void							SetLocalTransform( const matrix3x4_t &localTransform );
 
 	void							SetModelName( string_t name );
@@ -655,22 +763,12 @@ public:
 	// Used when the collision prop is told to ask game code for the world-space surrounding box
 	virtual void					ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs );
 
-	// Returns the entity-to-world transform
-	matrix3x4_t						&EntityToWorldTransform();
-	const matrix3x4_t				&EntityToWorldTransform() const;
 
-	// Some helper methods that transform a point from entity space to world space + back
-	void							EntityToWorldSpace( const Vector &in, Vector *pOut ) const;
-	void							WorldToEntitySpace( const Vector &in, Vector *pOut ) const;
 
-	// This function gets your parent's transform. If you're parented to an attachment,
-	// this calculates the attachment's transform and gives you that.
-	//
-	// You must pass in tempMatrix for scratch space - it may need to fill that in and return it instead of 
-	// pointing you right at a variable in your parent.
-	matrix3x4_t&					GetParentToWorldTransform( matrix3x4_t &tempMatrix );
 
-	void							GetVectors(Vector* forward, Vector* right, Vector* up) const;
+
+
+
 
 	
 
@@ -802,11 +900,7 @@ public:
 	// get network origin from previous update
 	virtual const Vector&			GetOldOrigin();
 
-	// Methods relating to traversing hierarchy
-	C_BaseEntity *GetMoveParent( void ) const;
-	C_BaseEntity *GetRootMoveParent();
-	C_BaseEntity *FirstMoveChild( void ) const;
-	C_BaseEntity *NextMovePeer( void ) const;
+
 
 	inline ClientEntityHandle_t		GetClientHandle() const	{ return ClientEntityHandle_t( GetRefEHandle() ); }
 	inline bool						IsServerEntity( void );
@@ -1099,11 +1193,7 @@ protected:
 	};
 public:
 
-	// Unlinks from hierarchy
-	// Set the movement parent. Your local origin and angles will become relative to this parent.
-	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
-	// are relative to the attachment on this entity.
-	void SetParent( C_BaseEntity *pParentEntity, int iParentAttachment=0 );
+	
 
 	bool					PhysicsRunThink( thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS );
 	bool					PhysicsRunSpecificThink( int nContextIndex, BASEPTR thinkFunc );
@@ -1217,11 +1307,7 @@ public:
 	void				ClearEffects( void );
 	void				SetEffects( int nEffects );
 
-	// Computes the abs position of a point specified in local space
-	void				ComputeAbsPosition( const Vector &vecLocalPosition, Vector *pAbsPosition );
 
-	// Computes the abs position of a direction specified in local space
-	void				ComputeAbsDirection( const Vector &vecLocalDirection, Vector *pAbsDirection );
 
 	// These methods encapsulate MOVETYPE_FOLLOW, which became obsolete
 	void				FollowEntity( CBaseEntity *pBaseEntity, bool bBoneMerge = true );
@@ -1578,10 +1664,7 @@ private:
 	void AddColoredStudioDecal( const Ray_t& ray, int hitbox, int decalIndex, bool doTrace, trace_t& tr, Color cColor, int maxLODToDecal );
 	void AddBrushModelDecal( const Ray_t& ray, const Vector& decalCenter, int decalIndex, bool doTrace, trace_t& tr );
 
-	void UnlinkChild( C_BaseEntity *pParent, C_BaseEntity *pChild );
-	void LinkChild( C_BaseEntity *pParent, C_BaseEntity *pChild );
-	void HierarchySetParent( C_BaseEntity *pNewParent );
-	void UnlinkFromHierarchy();
+	
 
 	// Computes the water level + type
 	void UpdateWaterState();
@@ -1654,11 +1737,7 @@ private:
 	bool							m_bPredictable;
 
 
-	// Hierarchy
-	CHandle<C_BaseEntity>			m_pMoveParent;
-	CHandle<C_BaseEntity>			m_pMoveChild;
-	CHandle<C_BaseEntity>			m_pMovePeer;
-	CHandle<C_BaseEntity>			m_pMovePrevPeer;
+
 
 	// The moveparent received from networking data
 	CHandle<C_BaseEntity>			m_hNetworkMoveParent;
@@ -1692,8 +1771,7 @@ private:
 
 	
 
-	// Specifies the entity-to-world transform
-	matrix3x4_t						m_rgflCoordinateFrame;
+	
 
 	// Last values to come over the wire. Used for interpolation.
 	Vector							m_vecNetworkOrigin;
@@ -1761,8 +1839,7 @@ protected:
 	void RemoveFromTeleportList();
 	unsigned short m_TeleportListEntry;
 
-	CThreadFastMutex m_CalcAbsolutePositionMutex;
-	CThreadFastMutex m_CalcAbsoluteVelocityMutex;
+
 
 #ifdef TF_CLIENT_DLL
 	// TF prevents drawing of any entity attached to players that aren't items in the inventory of the player.
@@ -1901,22 +1978,7 @@ inline bool C_BaseEntity::IsServerEntity( void )
 	return index != -1;
 }
 
-//-----------------------------------------------------------------------------
-// Inline methods
-//-----------------------------------------------------------------------------
-inline matrix3x4_t &C_BaseEntity::EntityToWorldTransform()
-{ 
-	Assert(C_BaseEntity::s_bAbsQueriesValid );
-	GetEngineObject()->CalcAbsolutePosition();
-	return m_rgflCoordinateFrame; 
-}
 
-inline const matrix3x4_t &C_BaseEntity::EntityToWorldTransform() const
-{
-	Assert(C_BaseEntity::s_bAbsQueriesValid );
-	const_cast<C_BaseEntity*>(this)->GetEngineObject()->CalcAbsolutePosition();
-	return m_rgflCoordinateFrame; 
-}
 
 inline const Vector& C_BaseEntity::GetNetworkOrigin() const
 {
@@ -1938,32 +2000,7 @@ inline int C_BaseEntity::GetModelIndex( void ) const
 	return m_nModelIndex;
 }
 
-//-----------------------------------------------------------------------------
-// Some helper methods that transform a point from entity space to world space + back
-//-----------------------------------------------------------------------------
-inline void C_BaseEntity::EntityToWorldSpace( const Vector &in, Vector *pOut ) const
-{
-	if ( GetEngineObject()->GetAbsAngles() == vec3_angle )
-	{
-		VectorAdd( in, GetEngineObject()->GetAbsOrigin(), *pOut );
-	}
-	else
-	{
-		VectorTransform( in, EntityToWorldTransform(), *pOut );
-	}
-}
 
-inline void C_BaseEntity::WorldToEntitySpace( const Vector &in, Vector *pOut ) const
-{
-	if (GetEngineObject()->GetAbsAngles() == vec3_angle )
-	{
-		VectorSubtract( in, GetEngineObject()->GetAbsOrigin(), *pOut );
-	}
-	else
-	{
-		VectorITransform( in, EntityToWorldTransform(), *pOut );
-	}
-}
 
 
 
@@ -2073,23 +2110,7 @@ inline bool CBaseEntity::IsPointSized() const
 }
 
 
-//-----------------------------------------------------------------------------
-// Methods relating to traversing hierarchy
-//-----------------------------------------------------------------------------
-inline C_BaseEntity *C_BaseEntity::GetMoveParent( void ) const
-{
-	return m_pMoveParent; 
-}
 
-inline C_BaseEntity *C_BaseEntity::FirstMoveChild( void ) const
-{
-	return m_pMoveChild; 
-}
-
-inline C_BaseEntity *C_BaseEntity::NextMovePeer( void ) const
-{
-	return m_pMovePeer; 
-}
 
 
 

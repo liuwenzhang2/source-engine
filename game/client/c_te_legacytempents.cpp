@@ -299,7 +299,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 	float gravitySlow = gravity * 0.5;
 	float traceFraction = 1;
 
-	Assert( !GetMoveParent() );
+	Assert( !GetEngineObject()->GetMoveParent() );
 
 	m_vecPrevLocalOrigin = GetLocalOrigin();
 

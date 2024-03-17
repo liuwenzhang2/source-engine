@@ -1132,7 +1132,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 	pAddon->m_hEnt = pEnt;
 	pAddon->m_iAddon = i;
 	pAddon->m_iAttachmentPoint = iAttachment;
-	pEnt->SetParent( this, pAddon->m_iAttachmentPoint );
+	pEnt->GetEngineObject()->SetParent( this->GetEngineObject(), pAddon->m_iAttachmentPoint );
 	pEnt->SetLocalOrigin( Vector( 0, 0, 0 ) );
 	pEnt->SetLocalAngles( QAngle( 0, 0, 0 ) );
 	if ( IsLocalPlayer() )

@@ -230,7 +230,7 @@ void C_GrenadeTrail::Update( float fTimeDelta )
 	VectorMA( GetAbsOrigin(), -fTimeDelta, GetAbsVelocity(), vecOrigin );
 
 	Vector vecForward;
-	GetVectors( &vecForward, NULL, NULL );
+	GetEngineObject()->GetVectors( &vecForward, NULL, NULL );
 
 	while( m_ParticleSpawn.NextEvent( tempDelta ) )
 	{

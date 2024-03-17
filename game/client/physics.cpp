@@ -271,19 +271,19 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 	bool aiMove0 = (movetype0==MOVETYPE_PUSH) ? true : false;
 	bool aiMove1 = (movetype1==MOVETYPE_PUSH) ? true : false;
 
-	if ( pEntity0->GetMoveParent() )
+	if ( pEntity0->GetEngineObject()->GetMoveParent() )
 	{
 		// if the object & its parent are both MOVETYPE_VPHYSICS, then this must be a special case
 		// like a prop_ragdoll_attached
-		if ( !(movetype0 == MOVETYPE_VPHYSICS && pEntity0->GetRootMoveParent()->GetMoveType() == MOVETYPE_VPHYSICS) )
+		if ( !(movetype0 == MOVETYPE_VPHYSICS && pEntity0->GetEngineObject()->GetRootMoveParent()->GetOuter()->GetMoveType() == MOVETYPE_VPHYSICS))
 		{
 			aiMove0 = true;
 		}
 	}
-	if ( pEntity1->GetMoveParent() )
+	if ( pEntity1->GetEngineObject()->GetMoveParent() )
 	{
 		// if the object & its parent are both MOVETYPE_VPHYSICS, then this must be a special case.
-		if ( !(movetype1 == MOVETYPE_VPHYSICS && pEntity1->GetRootMoveParent()->GetMoveType() == MOVETYPE_VPHYSICS) )
+		if ( !(movetype1 == MOVETYPE_VPHYSICS && pEntity1->GetEngineObject()->GetRootMoveParent()->GetOuter()->GetMoveType() == MOVETYPE_VPHYSICS))
 		{
 			aiMove1 = true;
 		}
@@ -774,7 +774,7 @@ void PhysicsSplash( IPhysicsFluidController *pFluid, IPhysicsObject *pObject, CB
 	float dist;
 	pFluid->GetSurfacePlane( &normal, &dist );
 
-	matrix3x4_t &matrix = pEntity->EntityToWorldTransform();
+	matrix3x4_t &matrix = pEntity->GetEngineObject()->EntityToWorldTransform();
 	
 	// Find the local axis that best matches the water surface normal
 	int bestAxis = BestAxisMatchingNormal( matrix, normal );

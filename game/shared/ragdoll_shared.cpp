@@ -1096,7 +1096,7 @@ C_EntityDissolve *DissolveEffect( C_BaseEntity *pTarget, float flTime )
 	if ( pDissolve != NULL )
 	{
 		pTarget->AddFlag( FL_DISSOLVING );
-		pDissolve->SetParent( pTarget );
+		pDissolve->GetEngineObject()->SetParent( pTarget->GetEngineObject());
 		pDissolve->OnDataChanged( DATA_UPDATE_CREATED );
 		pDissolve->SetAbsOrigin( pTarget->GetAbsOrigin() );
 
@@ -1135,7 +1135,7 @@ C_EntityFlame *FireEffect( C_BaseAnimating *pTarget, C_BaseEntity *pServerFire, 
 		pFire->RemoveFromLeafSystem();
 		
 		pTarget->AddFlag( FL_ONFIRE );
-		pFire->SetParent( pTarget );
+		pFire->GetEngineObject()->SetParent( pTarget->GetEngineObject());
 		pFire->m_hEntAttached = (C_BaseEntity *) pTarget;
 
 		pFire->OnDataChanged( DATA_UPDATE_CREATED );

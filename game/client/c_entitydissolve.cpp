@@ -65,9 +65,9 @@ C_EntityDissolve::C_EntityDissolve( void )
 //-----------------------------------------------------------------------------
 void C_EntityDissolve::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
-		GetMoveParent()->GetRenderBounds( theMins, theMaxs );
+		GetEngineObject()->GetMoveParent()->GetOuter()->GetRenderBounds(theMins, theMaxs);
 	}
 	else
 	{
@@ -191,7 +191,7 @@ void C_EntityDissolve::BuildTeslaEffect( mstudiobbox_t *pHitBox, const matrix3x4
 	QAngle vecAngles;
 	MatrixGetColumn( hitboxToWorld, 3, vecOrigin );
 	MatrixAngles( hitboxToWorld, vecAngles.Base() );
-	C_BaseEntity *pEntity = GetMoveParent();
+	C_BaseEntity *pEntity = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 
 	// Make a couple of tries at it
 	int iTries = -1;
@@ -503,7 +503,7 @@ float C_EntityDissolve::GetModelFadeOutPercentage( void )
 //-----------------------------------------------------------------------------
 void C_EntityDissolve::ClientThink( void )
 {
-	C_BaseEntity *pEnt = GetMoveParent();
+	C_BaseEntity *pEnt = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 	if ( !pEnt )
 		return;
 
@@ -511,7 +511,7 @@ void C_EntityDissolve::ClientThink( void )
 #ifdef TF_CLIENT_DLL
 	bIsRagdoll = true;
 #else
-	C_BaseAnimating *pAnimating = GetMoveParent() ? GetMoveParent()->GetBaseAnimating() : NULL;
+	C_BaseAnimating *pAnimating = GetEngineObject()->GetMoveParent() ? GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating() : NULL;
 	if (!pAnimating)
 		return;
 	bIsRagdoll = pAnimating->IsRagdoll();
@@ -593,7 +593,7 @@ int C_EntityDissolve::DrawModel( int flags )
 	if ( gpGlobals->frametime == 0 || m_bReadyToDraw == false )
 		return 0;
 
-	C_BaseAnimating *pAnimating = GetMoveParent() ? GetMoveParent()->GetBaseAnimating() : NULL;
+	C_BaseAnimating *pAnimating = GetEngineObject()->GetMoveParent() ? GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating() : NULL;
 	if ( pAnimating == NULL )
 		return 0;
 

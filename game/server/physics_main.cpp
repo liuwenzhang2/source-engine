@@ -1738,7 +1738,7 @@ void CBaseEntity::PhysicsStep()
 		}
 	}
 
-	if ( updateFromVPhysics && VPhysicsGetObject() && !GetParent() )
+	if ( updateFromVPhysics && VPhysicsGetObject() && !GetMoveParent() )
 	{
 		Vector position;
 		VPhysicsGetObject()->GetShadowPosition( &position, NULL );

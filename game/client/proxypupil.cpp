@@ -82,7 +82,7 @@ void CPupilProxy::OnBind( C_BaseEntity *pBaseEntity )
 
 	// Compute the lighting at the eye position of the entity; use it to dialate the pupil
 	Vector forward;
-	pBaseEntity->GetVectors( &forward, NULL, NULL );
+	pBaseEntity->GetEngineObject()->GetVectors( &forward, NULL, NULL );
 
 	Vector eyePt = pBaseEntity->EyePosition();
 	Vector color;

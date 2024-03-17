@@ -285,7 +285,7 @@ void CFuncLadder::DrawDebugGeometryOverlays()
 //-----------------------------------------------------------------------------
 void CFuncLadder::GetTopPosition( Vector& org )
 {
-	ComputeAbsPosition( m_vecPlayerMountPositionTop + GetLocalOrigin(), &org );
+	GetEngineObject()->ComputeAbsPosition( m_vecPlayerMountPositionTop + GetLocalOrigin(), &org );
 }
 
 //-----------------------------------------------------------------------------
@@ -294,7 +294,7 @@ void CFuncLadder::GetTopPosition( Vector& org )
 //-----------------------------------------------------------------------------
 void CFuncLadder::GetBottomPosition( Vector& org )
 {
-	ComputeAbsPosition( m_vecPlayerMountPositionBottom + GetLocalOrigin(), &org );
+	GetEngineObject()->ComputeAbsPosition( m_vecPlayerMountPositionBottom + GetLocalOrigin(), &org );
 }
 
 //-----------------------------------------------------------------------------

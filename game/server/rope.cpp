@@ -368,7 +368,7 @@ void CRopeKeyframe::Activate()
 
 	// If we don't do this here, then when we save/load, we won't "own" the transmit 
 	// state of our parent, so the client might get our entity without our parent entity.
-	SetParent( GetParent(), GetParentAttachment() );
+	SetParent(GetMoveParent(), GetParentAttachment() );
 
 	EndpointsChanged();
 

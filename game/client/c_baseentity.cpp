@@ -849,11 +849,11 @@ void C_EngineObject::Interp_UpdateInterpolationAmounts( VarMapping_t *map )
 	}
 }
 
-void C_BaseEntity::Interp_HierarchyUpdateInterpolationAmounts()
+void C_EngineObject::Interp_HierarchyUpdateInterpolationAmounts()
 {
-	GetEngineObject()->Interp_UpdateInterpolationAmounts(GetEngineObject()->GetVarMapping() );
+	Interp_UpdateInterpolationAmounts(GetVarMapping() );
 
-	for ( C_BaseEntity *pChild = FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
+	for ( C_EngineObject *pChild = FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
 	{
 		pChild->Interp_HierarchyUpdateInterpolationAmounts();
 	}
@@ -1213,7 +1213,7 @@ void C_BaseEntity::Release()
 {
 	{
 		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, true );
-		UnlinkFromHierarchy();
+		GetEngineObject()->UnlinkFromHierarchy();
 	}
 
 	// Note that this must be called from here, not the destructor, because otherwise the
@@ -1316,7 +1316,7 @@ float C_BaseEntity::HealthFraction() const
 //			right - Receives the entity's right vector.
 //			up - Receives the entity's up vector.
 //-----------------------------------------------------------------------------
-void C_BaseEntity::GetVectors(Vector* pForward, Vector* pRight, Vector* pUp) const
+void C_EngineObject::GetVectors(Vector* pForward, Vector* pRight, Vector* pUp) const
 {
 	// This call is necessary to cause m_rgflCoordinateFrame to be recomputed
 	const matrix3x4_t &entityToWorld = EntityToWorldTransform();
@@ -1583,20 +1583,20 @@ void C_BaseEntity::MarkShadowDirty( bool bDirty )
 
 IClientRenderable *C_BaseEntity::GetShadowParent()
 {
-	C_BaseEntity *pParent = GetMoveParent();
-	return pParent ? pParent->GetClientRenderable() : NULL;
+	C_EngineObject *pParent = GetEngineObject()->GetMoveParent();
+	return pParent ? pParent->GetOuter()->GetClientRenderable() : NULL;
 }
 
 IClientRenderable *C_BaseEntity::FirstShadowChild()
 {
-	C_BaseEntity *pChild = FirstMoveChild();
-	return pChild ? pChild->GetClientRenderable() : NULL;
+	C_EngineObject*pChild = GetEngineObject()->FirstMoveChild();
+	return pChild ? pChild->GetOuter()->GetClientRenderable() : NULL;
 }
 
 IClientRenderable *C_BaseEntity::NextShadowPeer()
 {
-	C_BaseEntity *pPeer = NextMovePeer();
-	return pPeer ? pPeer->GetClientRenderable() : NULL;
+	C_EngineObject*pPeer = GetEngineObject()->NextMovePeer();
+	return pPeer ? pPeer->GetOuter()->GetClientRenderable() : NULL;
 }
 
 	
@@ -1635,7 +1635,7 @@ const QAngle& C_BaseEntity::GetRenderAngles( void )
 
 const matrix3x4_t &C_BaseEntity::RenderableToWorldTransform()
 {
-	return EntityToWorldTransform();
+	return GetEngineObject()->EntityToWorldTransform();
 }
 
 IPVSNotify* C_BaseEntity::GetPVSNotifyInterface()
@@ -1678,7 +1678,7 @@ void C_BaseEntity::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 				// NOTE: This shouldn't happen! Or at least, I haven't run
 				// into a valid case where it should yet.
 //				Assert(0);
-				IRotateAABB( EntityToWorldTransform(), CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), theMins, theMaxs );
+				IRotateAABB(GetEngineObject()->EntityToWorldTransform(), CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), theMins, theMaxs );
 			}
 		}
 	}
@@ -1919,7 +1919,7 @@ bool C_BaseEntity::GetAttachment( int number, Vector &origin )
 
 bool C_BaseEntity::GetAttachment( int number, matrix3x4_t &matrix )
 {
-	MatrixCopy( EntityToWorldTransform(), matrix );
+	MatrixCopy(GetEngineObject()->EntityToWorldTransform(), matrix );
 	return true;
 }
 
@@ -2107,7 +2107,7 @@ void C_BaseEntity::NotifyShouldTransmit( ShouldTransmitState_t state )
 	case SHOULDTRANSMIT_END:
 		{
 			// Clear out links if we're out of the picture...
-			UnlinkFromHierarchy();
+			GetEngineObject()->UnlinkFromHierarchy();
 
 			// We're no longer being sent by the server. Become dormant.
 			SetDormant( true );
@@ -2195,7 +2195,7 @@ const Vector& C_BaseEntity::GetOldOrigin()
 }
 
 
-void C_BaseEntity::UnlinkChild( C_BaseEntity *pParent, C_BaseEntity *pChild )
+void C_EngineObject::UnlinkChild( C_EngineObject *pParent, C_EngineObject *pChild )
 {
 	Assert( pChild );
 	Assert( pParent != pChild );
@@ -2207,7 +2207,7 @@ void C_BaseEntity::UnlinkChild( C_BaseEntity *pParent, C_BaseEntity *pChild )
 	// remains in the PVS but the parent has not
 	if (pParent && (pParent->m_pMoveChild == pChild))
 	{
-		Assert( !(pChild->m_pMovePrevPeer.IsValid()) );
+		Assert( !(pChild->m_pMovePrevPeer) );
 		pParent->m_pMoveChild = pChild->m_pMovePeer;
 	}
 
@@ -2224,21 +2224,21 @@ void C_BaseEntity::UnlinkChild( C_BaseEntity *pParent, C_BaseEntity *pChild )
 	pChild->m_pMovePeer = NULL;
 	pChild->m_pMovePrevPeer = NULL;
 	pChild->m_pMoveParent = NULL;
-	pChild->RemoveFromAimEntsList();
+	pChild->m_pOuter->RemoveFromAimEntsList();
 
 	Interp_HierarchyUpdateInterpolationAmounts();
 }
 
-void C_BaseEntity::LinkChild( C_BaseEntity *pParent, C_BaseEntity *pChild )
+void C_EngineObject::LinkChild( C_EngineObject *pParent, C_EngineObject *pChild )
 {
-	Assert( !pChild->m_pMovePeer.IsValid() );
-	Assert( !pChild->m_pMovePrevPeer.IsValid() );
-	Assert( !pChild->m_pMoveParent.IsValid() );
+	Assert( !pChild->m_pMovePeer );
+	Assert( !pChild->m_pMovePrevPeer );
+	Assert( !pChild->m_pMoveParent );
 	Assert( pParent != pChild );
 
 #ifdef _DEBUG
 	// Make sure the child isn't already in this list
-	C_BaseEntity *pExistingChild;
+	C_EngineObject *pExistingChild;
 	for ( pExistingChild = pParent->FirstMoveChild(); pExistingChild; pExistingChild = pExistingChild->NextMovePeer() )
 	{
 		Assert( pChild != pExistingChild );
@@ -2253,7 +2253,7 @@ void C_BaseEntity::LinkChild( C_BaseEntity *pParent, C_BaseEntity *pChild )
 	}
 	pParent->m_pMoveChild = pChild;
 	pChild->m_pMoveParent = pParent;
-	pChild->AddToAimEntsList();
+	pChild->m_pOuter->AddToAimEntsList();
 
 	Interp_HierarchyUpdateInterpolationAmounts();
 }
@@ -2287,7 +2287,7 @@ void C_BaseEntity::MarkAimEntsDirty()
 	for ( i = 0; i < c; ++i )
 	{
 		C_BaseEntity *pEnt = g_AimEntsList[ i ];
-		Assert( pEnt && pEnt->GetMoveParent() );
+		Assert( pEnt && pEnt->GetEngineObject()->GetMoveParent() );
 		if ( pEnt->IsEffectActive(EF_BONEMERGE | EF_PARENT_ANIMATES) )
 		{
 			pEnt->AddEFlags( EFL_DIRTY_ABSTRANSFORM );
@@ -2305,7 +2305,7 @@ void C_BaseEntity::CalcAimEntPositions()
 	{
 		C_BaseEntity *pEnt = g_AimEntsList[ i ];
 		Assert( pEnt );
-		Assert( pEnt->GetMoveParent() );
+		Assert( pEnt->GetEngineObject()->GetMoveParent() );
 		if ( pEnt->IsEffectActive(EF_BONEMERGE) )
 		{
 			pEnt->GetEngineObject()->CalcAbsolutePosition( );
@@ -2362,26 +2362,26 @@ void C_BaseEntity::RemoveFromAimEntsList()
 //-----------------------------------------------------------------------------
 void C_BaseEntity::HierarchyUpdateMoveParent()
 {
-	if ( m_hNetworkMoveParent.ToInt() == m_pMoveParent.ToInt() )
+	if (m_hNetworkMoveParent.Get() && m_hNetworkMoveParent.Get()->GetEngineObject() == GetEngineObject()->GetMoveParent())
 		return;
 
-	HierarchySetParent( m_hNetworkMoveParent );
+	GetEngineObject()->HierarchySetParent(m_hNetworkMoveParent.Get()?m_hNetworkMoveParent.Get()->GetEngineObject():NULL);
 }
 
 
 //-----------------------------------------------------------------------------
 // Connects us up to hierarchy
 //-----------------------------------------------------------------------------
-void C_BaseEntity::HierarchySetParent( C_BaseEntity *pNewParent )
+void C_EngineObject::HierarchySetParent( C_EngineObject *pNewParent )
 {
 	// NOTE: When this is called, we expect to have a valid
 	// local origin, etc. that we received from network daa
-	EHANDLE newParentHandle;
-	newParentHandle.Set( pNewParent );
-	if (newParentHandle.ToInt() == m_pMoveParent.ToInt())
+	//EHANDLE newParentHandle;
+	//newParentHandle.Set( pNewParent );
+	if (pNewParent == m_pMoveParent)
 		return;
 	
-	if (m_pMoveParent.IsValid())
+	if (m_pMoveParent)
 	{
 		UnlinkChild( m_pMoveParent, this );
 	}
@@ -2390,7 +2390,7 @@ void C_BaseEntity::HierarchySetParent( C_BaseEntity *pNewParent )
 		LinkChild( pNewParent, this );
 	}
 
-	InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED );
+	m_pOuter->InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED );
 
 #ifdef TF_CLIENT_DLL
 	m_bValidatedOwner = false;
@@ -2401,22 +2401,22 @@ void C_BaseEntity::HierarchySetParent( C_BaseEntity *pNewParent )
 //-----------------------------------------------------------------------------
 // Unlinks from hierarchy
 //-----------------------------------------------------------------------------
-void C_BaseEntity::SetParent( C_BaseEntity *pParentEntity, int iParentAttachment )
+void C_EngineObject::SetParent( C_EngineObject *pParentEntity, int iParentAttachment )
 {
 	// NOTE: This version is meant to be called *outside* of PostDataUpdate
 	// as it assumes the moveparent has a valid handle
-	EHANDLE newParentHandle;
-	newParentHandle.Set( pParentEntity );
-	if (newParentHandle.ToInt() == m_pMoveParent.ToInt())
+	//EHANDLE newParentHandle;
+	//newParentHandle.Set( pParentEntity );
+	if (pParentEntity == m_pMoveParent)
 		return;
 
 	// NOTE: Have to do this before the unlink to ensure local coords are valid
-	Vector vecAbsOrigin = GetEngineObject()->GetAbsOrigin();
-	QAngle angAbsRotation = GetEngineObject()->GetAbsAngles();
-	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
+	Vector vecAbsOrigin = GetAbsOrigin();
+	QAngle angAbsRotation = GetAbsAngles();
+	Vector vecAbsVelocity = GetAbsVelocity();
 
 	// First deal with unlinking
-	if (m_pMoveParent.IsValid())
+	if (m_pMoveParent)
 	{
 		UnlinkChild( m_pMoveParent, this );
 	}
@@ -2426,20 +2426,20 @@ void C_BaseEntity::SetParent( C_BaseEntity *pParentEntity, int iParentAttachment
 		LinkChild( pParentEntity, this );
 	}
 
-	if ( !IsServerEntity() )
+	if ( !m_pOuter->IsServerEntity() )
 	{
-		m_hNetworkMoveParent = pParentEntity;
+		m_pOuter->m_hNetworkMoveParent = pParentEntity?pParentEntity->m_pOuter:NULL;
 	}
 	
-	m_iParentAttachment = iParentAttachment;
+	m_pOuter->m_iParentAttachment = iParentAttachment;
 	
-	GetEngineObject()->GetAbsOrigin().Init(FLT_MAX, FLT_MAX, FLT_MAX);
-	GetEngineObject()->GetAbsAngles().Init(FLT_MAX, FLT_MAX, FLT_MAX);
-	GetEngineObject()->GetAbsVelocity().Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	GetAbsOrigin().Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	GetAbsAngles().Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	GetAbsVelocity().Init(FLT_MAX, FLT_MAX, FLT_MAX);
 
-	GetEngineObject()->SetAbsOrigin(vecAbsOrigin);
-	GetEngineObject()->SetAbsAngles(angAbsRotation);
-	GetEngineObject()->SetAbsVelocity(vecAbsVelocity);
+	SetAbsOrigin(vecAbsOrigin);
+	SetAbsAngles(angAbsRotation);
+	SetAbsVelocity(vecAbsVelocity);
 
 }
 
@@ -2447,10 +2447,10 @@ void C_BaseEntity::SetParent( C_BaseEntity *pParentEntity, int iParentAttachment
 //-----------------------------------------------------------------------------
 // Unlinks from hierarchy
 //-----------------------------------------------------------------------------
-void C_BaseEntity::UnlinkFromHierarchy()
+void C_EngineObject::UnlinkFromHierarchy()
 {
 	// Clear out links if we're out of the picture...
-	if ( m_pMoveParent.IsValid() )
+	if ( m_pMoveParent )
 	{
 		UnlinkChild( m_pMoveParent, this );
 	}
@@ -2461,7 +2461,7 @@ void C_BaseEntity::UnlinkFromHierarchy()
 	//m_iParentAttachment = 0;
 
 	// unlink also all move children
-	C_BaseEntity *pChild = FirstMoveChild();
+	C_EngineObject *pChild = FirstMoveChild();
 	while( pChild )
 	{
 		if ( pChild->m_pMoveParent != this )
@@ -2592,7 +2592,7 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 	// because this is the only point at which all entities are loaded
 	// If this condition isn't met, then a child was sent without its parent
 	Assert( m_hNetworkMoveParent.Get() || !m_hNetworkMoveParent.IsValid() );
-	HierarchySetParent(m_hNetworkMoveParent);
+	GetEngineObject()->HierarchySetParent(m_hNetworkMoveParent.Get()?m_hNetworkMoveParent.Get()->GetEngineObject():NULL);
 
 	MarkMessageReceived();
 
@@ -3013,10 +3013,10 @@ bool C_BaseEntity::ShouldInterpolate()
 		return true;
 
 	// if any movement child needs interpolation, we have to interpolate too
-	C_BaseEntity *pChild = FirstMoveChild();
+	C_EngineObject *pChild = GetEngineObject()->FirstMoveChild();
 	while( pChild )
 	{
-		if ( pChild->ShouldInterpolate() )	
+		if ( pChild->GetOuter()->ShouldInterpolate() )	
 			return true;
 
 		pChild = pChild->NextMovePeer();
@@ -3141,7 +3141,7 @@ void C_BaseEntity::StopFollowingEntity( )
 {
 	Assert( IsFollowingEntity() );
 
-	SetParent( NULL );
+	GetEngineObject()->SetParent( NULL );
 	RemoveEffects( EF_BONEMERGE );
 	RemoveSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
@@ -3149,14 +3149,14 @@ void C_BaseEntity::StopFollowingEntity( )
 
 bool C_BaseEntity::IsFollowingEntity()
 {
-	return IsEffectActive(EF_BONEMERGE) && (GetMoveType() == MOVETYPE_NONE) && GetMoveParent();
+	return IsEffectActive(EF_BONEMERGE) && (GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
 }
 
 C_BaseEntity *CBaseEntity::GetFollowedEntity()
 {
 	if (!IsFollowingEntity())
 		return NULL;
-	return GetMoveParent();
+	return GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 }
 
 
@@ -4041,9 +4041,9 @@ void C_EngineObject::SetAbsOrigin( const Vector& absOrigin )
 	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
 
 	m_vecAbsOrigin = absOrigin;
-	MatrixSetColumn( absOrigin, 3, m_pOuter->m_rgflCoordinateFrame );
+	MatrixSetColumn( absOrigin, 3, m_rgflCoordinateFrame );
 
-	C_BaseEntity *pMoveParent = m_pOuter->GetMoveParent();
+	C_EngineObject *pMoveParent = GetMoveParent();
 
 	if (!pMoveParent)
 	{
@@ -4071,10 +4071,10 @@ void C_EngineObject::SetAbsAngles( const QAngle& absAngles )
 	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
 
 	m_angAbsRotation = absAngles;
-	AngleMatrix( absAngles, m_pOuter->m_rgflCoordinateFrame );
-	MatrixSetColumn( m_vecAbsOrigin, 3, m_pOuter->m_rgflCoordinateFrame );
+	AngleMatrix( absAngles, m_rgflCoordinateFrame );
+	MatrixSetColumn( m_vecAbsOrigin, 3, m_rgflCoordinateFrame );
 
-	C_BaseEntity *pMoveParent = m_pOuter->GetMoveParent();
+	C_EngineObject *pMoveParent = GetMoveParent();
 	
 	if (!pMoveParent)
 	{
@@ -4083,7 +4083,7 @@ void C_EngineObject::SetAbsAngles( const QAngle& absAngles )
 	}
 
 	// Moveparent case: we're aligned with the move parent
-	if ( m_angAbsRotation == pMoveParent->GetEngineObject()->GetAbsAngles() )
+	if ( m_angAbsRotation == pMoveParent->GetAbsAngles() )
 	{
 		m_angRotation.Init( );
 	}
@@ -4092,7 +4092,7 @@ void C_EngineObject::SetAbsAngles( const QAngle& absAngles )
 		// Moveparent case: transform the abs transform into local space
 		matrix3x4_t worldToParent, localMatrix;
 		MatrixInvert( pMoveParent->EntityToWorldTransform(), worldToParent );
-		ConcatTransforms( worldToParent, m_pOuter->m_rgflCoordinateFrame, localMatrix );
+		ConcatTransforms( worldToParent, m_rgflCoordinateFrame, localMatrix );
 		MatrixAngles( localMatrix, (QAngle &)m_angRotation );
 	}
 }
@@ -4108,7 +4108,7 @@ void C_EngineObject::SetAbsVelocity( const Vector &vecAbsVelocity )
 
 	m_vecAbsVelocity = vecAbsVelocity;
 
-	C_BaseEntity *pMoveParent = m_pOuter->GetMoveParent();
+	C_EngineObject *pMoveParent = GetMoveParent();
 
 	if (!pMoveParent)
 	{
@@ -4119,7 +4119,7 @@ void C_EngineObject::SetAbsVelocity( const Vector &vecAbsVelocity )
 	// First subtract out the parent's abs velocity to get a relative
 	// velocity measured in world space
 	Vector relVelocity;
-	VectorSubtract( vecAbsVelocity, pMoveParent->GetEngineObject()->GetAbsVelocity(), relVelocity );
+	VectorSubtract( vecAbsVelocity, pMoveParent->GetAbsVelocity(), relVelocity );
 
 	// Transform velocity into parent space
 	VectorIRotate( relVelocity, pMoveParent->EntityToWorldTransform(), m_vecVelocity );
@@ -4280,6 +4280,23 @@ void C_BaseEntity::SetLocalAngularVelocity( const QAngle &vecAngVelocity )
 
 
 //-----------------------------------------------------------------------------
+// Inline methods
+//-----------------------------------------------------------------------------
+matrix3x4_t& C_EngineObject::EntityToWorldTransform()
+{
+	Assert(C_BaseEntity::s_bAbsQueriesValid);
+	CalcAbsolutePosition();
+	return m_rgflCoordinateFrame;
+}
+
+const matrix3x4_t& C_EngineObject::EntityToWorldTransform() const
+{
+	Assert(C_BaseEntity::s_bAbsQueriesValid);
+	const_cast<C_EngineObject*>(this)->CalcAbsolutePosition();
+	return m_rgflCoordinateFrame;
+}
+
+//-----------------------------------------------------------------------------
 // Sets the local position from a transform
 //-----------------------------------------------------------------------------
 void C_BaseEntity::SetLocalTransform( const matrix3x4_t &localTransform )
@@ -4300,7 +4317,7 @@ void C_BaseEntity::MoveToAimEnt( )
 {
 	Vector vecAimEntOrigin;
 	QAngle vecAimEntAngles;
-	GetAimEntOrigin( GetMoveParent(), &vecAimEntOrigin, &vecAimEntAngles );
+	GetAimEntOrigin((GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL), &vecAimEntOrigin, &vecAimEntAngles);
 	GetEngineObject()->SetAbsOrigin( vecAimEntOrigin );
 	GetEngineObject()->SetAbsAngles( vecAimEntAngles );
 }
@@ -4322,9 +4339,9 @@ void C_BaseEntity::BoneMergeFastCullBloat( Vector &localMins, Vector &localMaxs,
 }
 
 
-matrix3x4_t& C_BaseEntity::GetParentToWorldTransform( matrix3x4_t &tempMatrix )
+matrix3x4_t& C_EngineObject::GetParentToWorldTransform( matrix3x4_t &tempMatrix )
 {
-	CBaseEntity *pMoveParent = GetMoveParent();
+	C_EngineObject *pMoveParent = GetMoveParent();
 	if ( !pMoveParent )
 	{
 		Assert( false );
@@ -4332,11 +4349,11 @@ matrix3x4_t& C_BaseEntity::GetParentToWorldTransform( matrix3x4_t &tempMatrix )
 		return tempMatrix;
 	}
 
-	if ( m_iParentAttachment != 0 )
+	if ( m_pOuter->m_iParentAttachment != 0 )
 	{
 		Vector vOrigin;
 		QAngle vAngles;
-		if ( pMoveParent->GetAttachment( m_iParentAttachment, vOrigin, vAngles ) )
+		if ( pMoveParent->m_pOuter->GetAttachment( m_pOuter->m_iParentAttachment, vOrigin, vAngles ) )
 		{
 			AngleMatrix( vAngles, vOrigin, tempMatrix );
 			return tempMatrix;
@@ -4369,7 +4386,7 @@ void C_EngineObject::CalcAbsolutePosition( )
 		return;
 	}
 
-	AUTO_LOCK(m_pOuter->m_CalcAbsolutePositionMutex );
+	AUTO_LOCK(m_CalcAbsolutePositionMutex );
 
 	if ((m_pOuter->m_iEFlags & EFL_DIRTY_ABSTRANSFORM) == 0) // need second check in event another thread grabbed mutex and did the calculation
 	{
@@ -4378,11 +4395,11 @@ void C_EngineObject::CalcAbsolutePosition( )
 
 	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
 
-	if (!m_pOuter->m_pMoveParent)
+	if (!m_pMoveParent)
 	{
 		// Construct the entity-to-world matrix
 		// Start with making an entity-to-parent matrix
-		AngleMatrix( GetLocalAngles(), GetLocalOrigin(), m_pOuter->m_rgflCoordinateFrame );
+		AngleMatrix( GetLocalAngles(), GetLocalOrigin(), m_rgflCoordinateFrame );
 		m_vecAbsOrigin = GetLocalOrigin();
 		m_angAbsRotation = GetLocalAngles();
 		NormalizeAngles( m_angAbsRotation );
@@ -4403,20 +4420,20 @@ void C_EngineObject::CalcAbsolutePosition( )
 
 	// concatenate with our parent's transform
 	matrix3x4_t scratchMatrix;
-	ConcatTransforms(m_pOuter->GetParentToWorldTransform( scratchMatrix ), matEntityToParent, m_pOuter->m_rgflCoordinateFrame );
+	ConcatTransforms(GetParentToWorldTransform( scratchMatrix ), matEntityToParent, m_rgflCoordinateFrame );
 
 	// pull our absolute position out of the matrix
-	MatrixGetColumn(m_pOuter->m_rgflCoordinateFrame, 3, m_vecAbsOrigin );
+	MatrixGetColumn(m_rgflCoordinateFrame, 3, m_vecAbsOrigin );
 
 	// if we have any angles, we have to extract our absolute angles from our matrix
 	if ( m_angRotation == vec3_angle && m_pOuter->m_iParentAttachment == 0 )
 	{
 		// just copy our parent's absolute angles
-		VectorCopy( m_pOuter->m_pMoveParent->GetEngineObject()->GetAbsAngles(), m_angAbsRotation );
+		VectorCopy( m_pMoveParent->GetAbsAngles(), m_angAbsRotation );
 	}
 	else
 	{
-		MatrixAngles(m_pOuter->m_rgflCoordinateFrame, m_angAbsRotation );
+		MatrixAngles(m_rgflCoordinateFrame, m_angAbsRotation );
 	}
 
 	// This is necessary because it's possible that our moveparent's CalculateIKLocks will trigger its move children 
@@ -4425,7 +4442,7 @@ void C_EngineObject::CalcAbsolutePosition( )
 	//
 	// So here, we keep our absorigin invalidated. It means we're returning an origin that is a frame old to CalculateIKLocks,
 	// but we'll still render with the right origin.
-	if (m_pOuter->m_iParentAttachment != 0 && (m_pOuter->m_pMoveParent->GetEFlags() & EFL_SETTING_UP_BONES) )
+	if (m_pOuter->m_iParentAttachment != 0 && (m_pMoveParent->GetOuter()->GetEFlags() & EFL_SETTING_UP_BONES))
 	{
 		m_pOuter->m_iEFlags |= EFL_DIRTY_ABSTRANSFORM;
 	}
@@ -4436,7 +4453,7 @@ void C_EngineObject::CalcAbsoluteVelocity()
 	if ((m_pOuter->m_iEFlags & EFL_DIRTY_ABSVELOCITY ) == 0)
 		return;
 
-	AUTO_LOCK(m_pOuter->m_CalcAbsoluteVelocityMutex );
+	AUTO_LOCK(m_CalcAbsoluteVelocityMutex );
 
 	if ((m_pOuter->m_iEFlags & EFL_DIRTY_ABSVELOCITY) == 0) // need second check in event another thread grabbed mutex and did the calculation
 	{
@@ -4445,7 +4462,7 @@ void C_EngineObject::CalcAbsoluteVelocity()
 
 	m_pOuter->m_iEFlags &= ~EFL_DIRTY_ABSVELOCITY;
 
-	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
+	C_EngineObject *pMoveParent = GetMoveParent();
 	if ( !pMoveParent )
 	{
 		m_vecAbsVelocity = m_vecVelocity;
@@ -4460,7 +4477,7 @@ void C_EngineObject::CalcAbsoluteVelocity()
 	{
 		Vector vOriginVel;
 		Quaternion vAngleVel;
-		if ( pMoveParent->GetAttachmentVelocity(m_pOuter->m_iParentAttachment, vOriginVel, vAngleVel ) )
+		if ( pMoveParent->GetOuter()->GetAttachmentVelocity(m_pOuter->m_iParentAttachment, vOriginVel, vAngleVel))
 		{
 			m_vecAbsVelocity += vOriginVel;
 			return;
@@ -4468,7 +4485,7 @@ void C_EngineObject::CalcAbsoluteVelocity()
 	}
 
 	// Now add in the parent abs velocity
-	m_vecAbsVelocity += pMoveParent->GetEngineObject()->GetAbsVelocity();
+	m_vecAbsVelocity += pMoveParent->GetAbsVelocity();
 }
 
 /*
@@ -4500,9 +4517,9 @@ void C_BaseEntity::CalcAbsoluteAngularVelocity()
 //-----------------------------------------------------------------------------
 // Computes the abs position of a point specified in local space
 //-----------------------------------------------------------------------------
-void C_BaseEntity::ComputeAbsPosition( const Vector &vecLocalPosition, Vector *pAbsPosition )
+void C_EngineObject::ComputeAbsPosition( const Vector &vecLocalPosition, Vector *pAbsPosition )
 {
-	C_BaseEntity *pMoveParent = GetMoveParent();
+	C_EngineObject *pMoveParent = GetMoveParent();
 	if ( !pMoveParent )
 	{
 		*pAbsPosition = vecLocalPosition;
@@ -4517,9 +4534,9 @@ void C_BaseEntity::ComputeAbsPosition( const Vector &vecLocalPosition, Vector *p
 //-----------------------------------------------------------------------------
 // Computes the abs position of a point specified in local space
 //-----------------------------------------------------------------------------
-void C_BaseEntity::ComputeAbsDirection( const Vector &vecLocalDirection, Vector *pAbsDirection )
+void C_EngineObject::ComputeAbsDirection( const Vector &vecLocalDirection, Vector *pAbsDirection )
 {
-	C_BaseEntity *pMoveParent = GetMoveParent();
+	C_EngineObject *pMoveParent = GetMoveParent();
 	if ( !pMoveParent )
 	{
 		*pAbsDirection = vecLocalDirection;
@@ -5105,8 +5122,8 @@ void C_BaseEntity::UpdateOnRemove( void )
 {
 	VPhysicsDestroyObject(); 
 
-	Assert( !GetMoveParent() );
-	UnlinkFromHierarchy();
+	Assert( !GetEngineObject()->GetMoveParent() );
+	GetEngineObject()->UnlinkFromHierarchy();
 	SetGroundEntity( NULL );
 
 	Term();
@@ -5727,7 +5744,7 @@ void C_BaseEntity::OnPostRestoreData()
 	// HACK Force recomputation of origin
 	InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED );
 
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
 		AddToAimEntsList();
 	}
@@ -5802,7 +5819,7 @@ static float AdjustInterpolationAmount( C_BaseEntity *pEntity, float baseInterpo
 				if ( pEntity->IsNPC() )
 					return minNPCInterpolation;
 
-				pEntity = pEntity->GetMoveParent();
+				pEntity = pEntity->GetEngineObject()->GetMoveParent()?pEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 			}
 		}
 	}
@@ -5914,7 +5931,7 @@ BEGIN_DATADESC_NO_BASE( C_BaseEntity )
 	DEFINE_FIELD( m_ModelName, FIELD_STRING ),
 	DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsOrigin, engineObjectFuncs),
 	DEFINE_CUSTOM_FIELD_INVALID( m_angAbsRotation, engineObjectFuncs),
-	DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
+	//DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
 	DEFINE_FIELD( m_fFlags, FIELD_INTEGER ),
 END_DATADESC()
 
@@ -5995,7 +6012,7 @@ int C_BaseEntity::Restore( IRestore &restore )
 
 	// NOTE: Do *not* use GetAbsOrigin() here because it will
 	// try to recompute m_rgflCoordinateFrame!
-	MatrixSetColumn(GetEngineObject()->GetAbsOrigin(), 3, m_rgflCoordinateFrame);
+	//MatrixSetColumn(m_vecAbsOrigin, 3, m_rgflCoordinateFrame);
 
 	// Restablish ground entity
 	if ( m_hGroundEntity != NULL )
@@ -6115,10 +6132,10 @@ void C_BaseEntity::GetToolRecordingState( KeyValues *msg )
 	{
 		state.m_nEffects |= EF_NOINTERP;
 	}
-	C_BaseEntity *pParent = GetMoveParent();
+	C_EngineObject *pParent = GetEngineObject()->GetMoveParent();
 	while ( pParent )
 	{
-		if ( pParent->IsNoInterpolationFrame() )
+		if ( pParent->GetOuter()->IsNoInterpolationFrame() )
 		{
 			state.m_nEffects |= EF_NOINTERP;
 			break;

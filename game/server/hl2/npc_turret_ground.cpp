@@ -127,7 +127,7 @@ void CNPC_GroundTurret::Spawn( void )
 		m_flSensingDist = 2048;
 	}
 
-	if( !GetParent() )
+	if( !GetMoveParent() )
 	{
 		DevMsg("ERROR! npc_ground_turret with no parent!\n");
 		UTIL_Remove(this);

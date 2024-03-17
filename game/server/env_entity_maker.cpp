@@ -209,9 +209,9 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 			QAngle angSpawnDir( m_angPostSpawnDirection );
 			if ( m_bPostSpawnUseAngles )
 			{
-				if ( GetParent() )
+				if (GetMoveParent() )
 				{
-					angSpawnDir += GetParent()->GetAbsAngles();
+					angSpawnDir += GetMoveParent()->GetAbsAngles();
 				}
 				else
 				{

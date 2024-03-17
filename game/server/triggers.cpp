@@ -322,7 +322,7 @@ bool CBaseTrigger::PointIsWithin( const Vector &vecPoint )
 //-----------------------------------------------------------------------------
 void CBaseTrigger::InitTrigger( )
 {
-	SetSolid( GetParent() ? SOLID_VPHYSICS : SOLID_BSP );	
+	SetSolid(GetMoveParent() ? SOLID_VPHYSICS : SOLID_BSP );
 	AddSolidFlags( FSOLID_NOT_SOLID );
 	if (m_bDisabled)
 	{

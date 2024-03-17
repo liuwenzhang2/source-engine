@@ -406,7 +406,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 		{
 			// the object isn't moving, so try moving opposite the way it's facing
 			Vector vecNPCForward;
-			obj->GetVectors( &vecNPCForward, NULL, NULL );
+			obj->GetEngineObject()->GetVectors( &vecNPCForward, NULL, NULL );
 			
 			Vector vTestPosition = GetAbsOrigin() - vecNPCForward * radius * 2;
 			if ( TestMove( vTestPosition, size.z * 2, radius * 2, obj->GetAbsOrigin(), vMoveDir ) )

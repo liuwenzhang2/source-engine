@@ -2662,7 +2662,7 @@ void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 	// We know what we are focused on, so just add the shadow directly to that receiver
 	Assert( shadow.m_hTargetEntity->GetModel() );
 
-	C_BaseEntity *pChild = shadow.m_hTargetEntity->FirstMoveChild();
+	C_BaseEntity *pChild = shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()?shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()->GetOuter():NULL;
 	while( pChild )
 	{
 		int modelType = modelinfo->GetModelType( pChild->GetModel() );
@@ -2675,7 +2675,7 @@ void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 			AddShadowToReceiver( handle, pChild, SHADOW_RECEIVER_STUDIO_MODEL );
 		}
 
-		pChild = pChild->NextMovePeer();
+		pChild = pChild->GetEngineObject()->NextMovePeer()? pChild->GetEngineObject()->NextMovePeer()->GetOuter():NULL;
 	}
 
 	int modelType = modelinfo->GetModelType( shadow.m_hTargetEntity->GetModel() );
@@ -4169,13 +4169,13 @@ bool CClientShadowMgr::IsFlashlightTarget( ClientShadowHandle_t shadowHandle, IC
 	if( shadow.m_hTargetEntity->GetClientRenderable() == pRenderable )
 		return true;
 
-	C_BaseEntity *pChild = shadow.m_hTargetEntity->FirstMoveChild();
+	C_BaseEntity *pChild = shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()?shadow.m_hTargetEntity->GetEngineObject()->FirstMoveChild()->GetOuter():NULL;
 	while( pChild )
 	{
 		if( pChild->GetClientRenderable()==pRenderable )
 			return true;
 
-		pChild = pChild->NextMovePeer();
+		pChild = pChild->GetEngineObject()->NextMovePeer()? pChild->GetEngineObject()->NextMovePeer()->GetOuter():NULL;
 	}
 							
 	return false;

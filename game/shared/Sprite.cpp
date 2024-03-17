@@ -766,7 +766,7 @@ int CSprite::DrawModel( int flags )
 	//   who have viewmodels as their moveparent
 	if ( g_bRenderingScreenshot || !r_drawviewmodel.GetBool() )
 	{
-		C_BaseViewModel *vm = dynamic_cast< C_BaseViewModel * >( GetMoveParent() );
+		C_BaseViewModel *vm = dynamic_cast< C_BaseViewModel * >(GetEngineObject()->GetMoveParent() );
 		if ( vm )
 		{
 			return 0;

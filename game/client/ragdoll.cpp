@@ -538,7 +538,7 @@ void C_ServerRagdoll::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
 	if( !CollisionProp()->IsBoundsDefinedInEntitySpace() )
 	{
-		IRotateAABB( EntityToWorldTransform(), CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), theMins, theMaxs );
+		IRotateAABB(GetEngineObject()->EntityToWorldTransform(), CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), theMins, theMaxs );
 	}
 	else
 	{
@@ -699,7 +699,7 @@ public:
 	DECLARE_CLIENTCLASS();
 	bool SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
 	{
-		if ( GetMoveParent() )
+		if (GetEngineObject()->GetMoveParent() )
 		{
 			// HACKHACK: Force the attached bone to be set up
 			int index = m_boneIndex[m_ragdollAttachedObjectIndex];
@@ -726,7 +726,7 @@ public:
 		// interpolate offset over some time
 		Vector offset = m_vecOffset * (1-frac);
 
-		C_BaseAnimating *parent = assert_cast< C_BaseAnimating* >( GetMoveParent() );
+		C_BaseAnimating *parent = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating():NULL;
 		Vector worldOrigin;
 		worldOrigin.Init();
 
@@ -792,7 +792,7 @@ void C_ServerRagdollAttached::OnDataChanged( DataUpdateType_t updateType )
 {
 	BaseClass::OnDataChanged( updateType );
 
-	bool bParentNow = GetMoveParent() ? true : false;
+	bool bParentNow = GetEngineObject()->GetMoveParent() ? true : false;
 	if ( m_bHasParent != bParentNow )
 	{
 		if ( m_bHasParent )

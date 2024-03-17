@@ -184,7 +184,7 @@ void CPortalGameMovement::FunnelIntoPortal( CProp_Portal *pPortal, Vector &wishd
 
 	// Get portal vectors
 	Vector vPortalForward, vPortalRight, vPortalUp;
-	pPortal->GetVectors( &vPortalForward, &vPortalRight, &vPortalUp );
+	pPortal->GetEngineObject()->GetVectors( &vPortalForward, &vPortalRight, &vPortalUp );
 
 	// Make sure it's a floor portal
 	if ( vPortalForward.z < 0.8f )
@@ -625,7 +625,7 @@ int CPortalGameMovement::CheckStuck( void )
 		Vector vIndecisive;
 		if( pPortalPlayer->m_hPortalEnvironment )
 		{
-			pPortalPlayer->m_hPortalEnvironment->GetVectors( &vIndecisive, NULL, NULL );
+			pPortalPlayer->m_hPortalEnvironment->GetEngineObject()->GetVectors( &vIndecisive, NULL, NULL );
 		}
 		else
 		{

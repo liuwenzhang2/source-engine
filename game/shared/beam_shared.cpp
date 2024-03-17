@@ -64,7 +64,7 @@ LINK_ENTITY_TO_CLASS( info_target, CInfoTarget );
 //-----------------------------------------------------------------------------
 bool IsStaticPointEntity( CBaseEntity *pEnt )
 {
-	if ( pEnt->GetMoveParent() )
+	if ( pEnt->GetEngineObject()->GetMoveParent() )
 		return false;
 
 	if ( !pEnt->GetModelIndex() )
@@ -441,7 +441,7 @@ void CBeam::SetEndEntity( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 void CBeam::SetAbsStartPos( const Vector &pos )
 {
-	if (!GetMoveParent())
+	if (!GetEngineObject()->GetMoveParent())
 	{
 		SetStartPos( pos );
 		return;
@@ -449,14 +449,14 @@ void CBeam::SetAbsStartPos( const Vector &pos )
 
 	Vector vecLocalPos;
 	matrix3x4_t worldToBeam;
-	MatrixInvert( EntityToWorldTransform(), worldToBeam );
+	MatrixInvert(GetEngineObject()->EntityToWorldTransform(), worldToBeam );
 	VectorTransform( pos, worldToBeam, vecLocalPos );
 	SetStartPos( vecLocalPos );
 }
 
 void CBeam::SetAbsEndPos( const Vector &pos )
 {
-	if (!GetMoveParent())
+	if (!GetEngineObject()->GetMoveParent())
 	{
 		SetEndPos( pos );
 		return;
@@ -464,7 +464,7 @@ void CBeam::SetAbsEndPos( const Vector &pos )
 
 	Vector vecLocalPos;
 	matrix3x4_t worldToBeam;
-	MatrixInvert( EntityToWorldTransform(), worldToBeam );
+	MatrixInvert(GetEngineObject()->EntityToWorldTransform(), worldToBeam );
 	VectorTransform( pos, worldToBeam, vecLocalPos );
 	SetEndPos( vecLocalPos );
 }
@@ -532,11 +532,11 @@ const Vector &C_Beam::GetAbsEndPos( void ) const
 			return vecEndAbsPosition;
 	}
 
-	if (!const_cast<C_Beam*>(this)->GetMoveParent())
+	if (!const_cast<C_Beam*>(this)->GetEngineObject()->GetMoveParent())
 		return m_vecEndPos.Get();
 
 	// FIXME: Cache this off?
-	VectorTransform( m_vecEndPos, EntityToWorldTransform(), vecEndAbsPosition );
+	VectorTransform( m_vecEndPos, GetEngineObject()->EntityToWorldTransform(), vecEndAbsPosition );
 	return vecEndAbsPosition;
 }
 #endif

@@ -1289,7 +1289,7 @@ bool CAI_BaseActor::PickRandomLookTarget( AILookTargetArgs_t *pArgs )
 		// Don't look at any object that is ultimately parented to the player.
 		// These objects will almost always be at the player's origin (feet), and it
 		// looks bad when an actor looks at the player's feet. (sjb)
-		CBaseEntity *pParent = pEntity->GetParent();
+		CBaseEntity *pParent = pEntity->GetMoveParent();
 		bool bObjectParentedToPlayer = false;
 		while( pParent )
 		{
@@ -1299,7 +1299,7 @@ bool CAI_BaseActor::PickRandomLookTarget( AILookTargetArgs_t *pArgs )
 				break;
 			}
 
-			pParent = pParent->GetParent();
+			pParent = pParent->GetMoveParent();
 		}
 
 		if( bObjectParentedToPlayer )

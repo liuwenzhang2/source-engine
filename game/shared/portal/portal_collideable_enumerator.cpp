@@ -16,7 +16,7 @@ CPortalCollideableEnumerator::CPortalCollideableEnumerator( const CProp_Portal *
 	Assert( pAssociatedPortal );
 	m_hTestPortal = pAssociatedPortal;
 
-	pAssociatedPortal->GetVectors( &m_vPlaneNormal, NULL, NULL );
+	pAssociatedPortal->GetEngineObject()->GetVectors( &m_vPlaneNormal, NULL, NULL );
 
 	m_ptForward1000 = pAssociatedPortal->GetAbsOrigin();
 	m_ptForward1000 += m_vPlaneNormal * PORTAL_TELEPORTATION_PLANE_OFFSET;

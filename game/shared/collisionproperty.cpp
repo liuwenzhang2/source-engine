@@ -482,7 +482,7 @@ const matrix3x4_t *CCollisionProperty::GetRootParentToWorldTransform() const
 {
 	if ( IsSolidFlagSet( FSOLID_ROOT_PARENT_ALIGNED ) )
 	{
-		CBaseEntity *pEntity = m_pOuter->GetRootMoveParent();
+		CBaseEntity *pEntity = m_pOuter->GetEngineObject()->GetRootMoveParent()?m_pOuter->GetEngineObject()->GetRootMoveParent()->GetOuter():NULL;
 		Assert(pEntity);
 		if ( pEntity )
 		{
@@ -543,9 +543,9 @@ void CCollisionProperty::SetSolid( SolidType_t val )
 	// OBB is not yet implemented
 	if ( val == SOLID_BSP )
 	{
-		if ( GetOuter()->GetMoveParent() )
+		if ( GetOuter()->GetEngineObject()->GetMoveParent() )
 		{
-			if ( GetOuter()->GetRootMoveParent()->GetSolid() != SOLID_BSP )
+			if ( GetOuter()->GetEngineObject()->GetRootMoveParent()->GetOuter()->GetSolid() != SOLID_BSP)
 			{
 				// must be SOLID_VPHYSICS because parent might rotate
 				val = SOLID_VPHYSICS;
@@ -650,7 +650,7 @@ const matrix3x4_t& CCollisionProperty::CollisionToWorldTransform() const
 
 	if ( IsBoundsDefinedInEntitySpace() )
 	{
-		return m_pOuter->EntityToWorldTransform();
+		return m_pOuter->GetEngineObject()->EntityToWorldTransform();
 	}
 
 	SetIdentityMatrix( matResult );

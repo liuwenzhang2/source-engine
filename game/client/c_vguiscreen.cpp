@@ -497,7 +497,7 @@ bool C_VGuiScreen::IsBackfacing( const Vector &viewOrigin )
 
 	// Figure out the face normal
 	Vector zaxis;
-	GetVectors( NULL, NULL, &zaxis );
+	GetEngineObject()->GetVectors( NULL, NULL, &zaxis );
 
 	// The actual backface cull
 	return (DotProduct( zaxis, cameraToScreen ) > 0.0f);
@@ -742,7 +742,7 @@ C_BaseEntity *FindNearbyVguiScreen( const Vector &viewPosition, const QAngle &vi
 			continue;
 
 		// Test perpendicular distance from the screen...
-		pScreen->GetVectors( NULL, NULL, &vecOut );
+		pScreen->GetEngineObject()->GetVectors( NULL, NULL, &vecOut );
 		VectorSubtract( viewPosition, pScreen->GetAbsOrigin(), vecViewDelta );
 		float flPerpDist = DotProduct(vecViewDelta, vecOut);
 		if ( (flPerpDist < 0) || (flPerpDist > VGUI_SCREEN_MODE_RADIUS) )
