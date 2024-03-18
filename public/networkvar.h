@@ -758,7 +758,7 @@ public:
 
 	bool operator !() const
 	{
-		return m_Value.Get();//NetworkVarBaseClass::
+		return !m_Value.Get();//NetworkVarBaseClass::
 	}
 
 	operator Type* () const
