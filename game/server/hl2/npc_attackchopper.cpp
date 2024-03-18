@@ -2158,7 +2158,7 @@ void CNPC_AttackHelicopter::ShootAtVehicle( const Vector &vBasePos, const Vector
 bool CNPC_AttackHelicopter::PoseGunTowardTargetDirection( const Vector &vTargetDir )
 {
 	Vector vecOut;
-	VectorIRotate( vTargetDir, EntityToWorldTransform(), vecOut );
+	VectorIRotate( vTargetDir, GetEngineObject()->EntityToWorldTransform(), vecOut );
 
 	QAngle angles;
 	VectorAngles(vecOut, angles);

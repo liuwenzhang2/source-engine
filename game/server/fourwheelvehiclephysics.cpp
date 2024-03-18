@@ -261,8 +261,8 @@ void CFourWheelVehiclePhysics::CalcWheelData( vehicleparams_t &vehicle )
 	m_pOuter->InvalidateBoneCache();
 	if ( GetAttachment( "wheel_fl", left, dummy ) && GetAttachment( "wheel_fr", right, dummy ) )
 	{
-		VectorITransform( left, m_pOuter->EntityToWorldTransform(), left );
-		VectorITransform( right, m_pOuter->EntityToWorldTransform(), right );
+		VectorITransform( left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left );
+		VectorITransform( right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right );
 		Vector center = (left + right) * 0.5;
 		vehicle.axles[0].offset = center;
 		vehicle.axles[0].wheelOffset = right - center;
@@ -273,8 +273,8 @@ void CFourWheelVehiclePhysics::CalcWheelData( vehicleparams_t &vehicle )
 
 	if ( GetAttachment( "wheel_rl", left, dummy ) && GetAttachment( "wheel_rr", right, dummy ) )
 	{
-		VectorITransform( left, m_pOuter->EntityToWorldTransform(), left );
-		VectorITransform( right, m_pOuter->EntityToWorldTransform(), right );
+		VectorITransform( left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left );
+		VectorITransform( right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right );
 		Vector center = (left + right) * 0.5;
 		vehicle.axles[1].offset = center;
 		vehicle.axles[1].wheelOffset = right - center;
@@ -289,8 +289,8 @@ void CFourWheelVehiclePhysics::CalcWheelData( vehicleparams_t &vehicle )
 	m_pOuter->InvalidateBoneCache();
 	if ( GetAttachment( "wheel_fl", left, dummy ) && GetAttachment( "wheel_fr", right, dummy ) )
 	{
-		VectorITransform( left, m_pOuter->EntityToWorldTransform(), left );
-		VectorITransform( right, m_pOuter->EntityToWorldTransform(), right );
+		VectorITransform( left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left );
+		VectorITransform( right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right );
 		// Cache the height range of the wheels in body space
 		m_wheelTotalHeight[0] = m_wheelBaseHeight[0] - left.z;
 		m_wheelTotalHeight[1] = m_wheelBaseHeight[1] - right.z;
@@ -299,8 +299,8 @@ void CFourWheelVehiclePhysics::CalcWheelData( vehicleparams_t &vehicle )
 
 	if ( GetAttachment( "wheel_rl", left, dummy ) && GetAttachment( "wheel_rr", right, dummy ) )
 	{
-		VectorITransform( left, m_pOuter->EntityToWorldTransform(), left );
-		VectorITransform( right, m_pOuter->EntityToWorldTransform(), right );
+		VectorITransform( left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left );
+		VectorITransform( right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right );
 		// Cache the height range of the wheels in body space
 		m_wheelTotalHeight[2] = m_wheelBaseHeight[0] - left.z;
 		m_wheelTotalHeight[3] = m_wheelBaseHeight[1] - right.z;
@@ -324,8 +324,8 @@ void CFourWheelVehiclePhysics::CalcWheelData( vehicleparams_t &vehicle )
 	// Get raytrace offsets if they exist.
 	if ( GetAttachment( "raytrace_fl", left, dummy ) && GetAttachment( "raytrace_fr", right, dummy ) )
 	{
-		VectorITransform( left, m_pOuter->EntityToWorldTransform(), left );
-		VectorITransform( right, m_pOuter->EntityToWorldTransform(), right );
+		VectorITransform( left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left );
+		VectorITransform( right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right );
 		Vector center = ( left + right ) * 0.5;
 		vehicle.axles[0].raytraceCenterOffset = center;
 		vehicle.axles[0].raytraceOffset = right - center;
@@ -333,8 +333,8 @@ void CFourWheelVehiclePhysics::CalcWheelData( vehicleparams_t &vehicle )
 
 	if ( GetAttachment( "raytrace_rl", left, dummy ) && GetAttachment( "raytrace_rr", right, dummy ) )
 	{
-		VectorITransform( left, m_pOuter->EntityToWorldTransform(), left );
-		VectorITransform( right, m_pOuter->EntityToWorldTransform(), right );
+		VectorITransform( left, m_pOuter->GetEngineObject()->EntityToWorldTransform(), left );
+		VectorITransform( right, m_pOuter->GetEngineObject()->EntityToWorldTransform(), right );
 		Vector center = ( left + right ) * 0.5;
 		vehicle.axles[1].raytraceCenterOffset = center;
 		vehicle.axles[1].raytraceOffset = right - center;
@@ -821,7 +821,7 @@ bool CFourWheelVehiclePhysics::VPhysicsUpdate( IPhysicsObject *pPhysics )
 			pPhysics->GetPosition( &m_wheelPosition[i], &m_wheelRotation[i] );
 
 			// transform the wheel into body space
-			VectorITransform( m_wheelPosition[i], m_pOuter->EntityToWorldTransform(), tmp );
+			VectorITransform( m_wheelPosition[i], m_pOuter->GetEngineObject()->EntityToWorldTransform(), tmp );
 			SetPoseParameter( m_poseParameters[VEH_FL_WHEEL_HEIGHT + i], (m_wheelBaseHeight[i] - tmp.z) / m_wheelTotalHeight[i] );
 			SetPoseParameter( m_poseParameters[VEH_FL_WHEEL_SPIN + i], -m_wheelRotation[i].z );
 			return false;

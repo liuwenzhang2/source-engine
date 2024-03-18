@@ -169,7 +169,7 @@ void CLogicMeasureMovement::MeasureThink( )
 		switch( m_nMeasureType )
 		{
 		case MEASURE_POSITION:
-			MatrixInvert( m_hMeasureTarget->EntityToWorldTransform(), matWorldToMeasure );
+			MatrixInvert( m_hMeasureTarget->GetEngineObject()->EntityToWorldTransform(), matWorldToMeasure );
 			break;
 
 		case MEASURE_EYE_POSITION:
@@ -179,7 +179,7 @@ void CLogicMeasureMovement::MeasureThink( )
 		// FIXME: Could add attachment point measurement here easily
 		}
 
-		ConcatTransforms( matWorldToMeasure, m_hMeasureReference->EntityToWorldTransform(), matRefToMeasure );
+		ConcatTransforms( matWorldToMeasure, m_hMeasureReference->GetEngineObject()->EntityToWorldTransform(), matRefToMeasure );
 		
 		// Apply the scale factor
 		if ( ( m_flScale != 0.0f ) && ( m_flScale != 1.0f ) )
@@ -194,7 +194,7 @@ void CLogicMeasureMovement::MeasureThink( )
 		matrix3x4_t matMeasureToRef, matNewTargetToWorld;
 		MatrixInvert( matRefToMeasure, matMeasureToRef );
 
-		ConcatTransforms( m_hTargetReference->EntityToWorldTransform(), matMeasureToRef, matNewTargetToWorld );
+		ConcatTransforms( m_hTargetReference->GetEngineObject()->EntityToWorldTransform(), matMeasureToRef, matNewTargetToWorld );
 
 		Vector vecNewOrigin;
 		QAngle vecNewAngles;

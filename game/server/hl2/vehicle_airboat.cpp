@@ -1826,7 +1826,7 @@ void CPropAirboat::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData )
 	Vector vecVelocityWorld;
 	GetVelocity( &vecVelocityWorld, NULL );
 	Vector vecVelocityLocal;
-	WorldToEntitySpace( GetAbsOrigin() + vecVelocityWorld, &vecVelocityLocal );
+	GetEngineObject()->WorldToEntitySpace( GetAbsOrigin() + vecVelocityWorld, &vecVelocityLocal );
 	
 	m_vecPhysVelocity = vecVelocityLocal;
 }

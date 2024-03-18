@@ -568,7 +568,7 @@ void CPhysicsProp::HandleAnyCollisionInteractions( int index, gamevcollisioneven
 		{
 			Vector vecImpaleForward;
  			AngleVectors( angImpaleForward, &vecImpaleForward );
-			VectorRotate( vecImpaleForward, EntityToWorldTransform(), forward );
+			VectorRotate( vecImpaleForward, GetEngineObject()->EntityToWorldTransform(), forward );
 		}
 		else
 		{
@@ -3171,7 +3171,7 @@ void CPhysicsProp::GetMassCenter( Vector *pMassCenter )
 	}
 
 	Vector vecLocal = VPhysicsGetObject()->GetMassCenterLocalSpace();
-	VectorTransform( vecLocal, EntityToWorldTransform(), *pMassCenter );
+	VectorTransform( vecLocal, GetEngineObject()->EntityToWorldTransform(), *pMassCenter );
 }
 
 float CPhysicsProp::GetMass() const
@@ -5648,7 +5648,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 			return;
 
 		// Take our saved collision bounds, and transform into world space
-		TransformAABB( EntityToWorldTransform(), m_collisionMins, m_collisionMaxs, *mins, *maxs );
+		TransformAABB(GetEngineObject()->EntityToWorldTransform(), m_collisionMins, m_collisionMaxs, *mins, *maxs );
 	}
 
 private:

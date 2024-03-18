@@ -184,11 +184,11 @@ void PhysTeleportConstrainedEntity( CBaseEntity *pTeleportSource, IPhysicsObject
 	matrix3x4_t startCoord, startInv, endCoord, xform;
 	AngleMatrix( oldAngles, prevPosition, startCoord );
 	MatrixInvert( startCoord, startInv );
-	ConcatTransforms( pTeleportSource->EntityToWorldTransform(), startInv, xform );
+	ConcatTransforms( pTeleportSource->GetEngineObject()->EntityToWorldTransform(), startInv, xform );
 	QAngle fixupAngles;
 	Vector fixupPos;
 
-	ConcatTransforms( xform, pFixup->EntityToWorldTransform(), endCoord );
+	ConcatTransforms( xform, pFixup->GetEngineObject()->EntityToWorldTransform(), endCoord );
 	MatrixAngles( endCoord, fixupAngles, fixupPos );
 	pFixup->Teleport( &fixupPos, &fixupAngles, NULL );
 }
@@ -1575,11 +1575,11 @@ IPhysicsConstraint *CRagdollConstraint::CreateConstraint( IPhysicsConstraintGrou
 	matrix3x4_t entityToWorld, worldToEntity;
 	info.pObjects[0]->GetPositionMatrix( &entityToWorld );
 	MatrixInvert( entityToWorld, worldToEntity );
-	ConcatTransforms( worldToEntity, EntityToWorldTransform(), ragdoll.constraintToReference );
+	ConcatTransforms( worldToEntity, GetEngineObject()->EntityToWorldTransform(), ragdoll.constraintToReference );
 
 	info.pObjects[1]->GetPositionMatrix( &entityToWorld );
 	MatrixInvert( entityToWorld, worldToEntity );
-	ConcatTransforms( worldToEntity, EntityToWorldTransform(), ragdoll.constraintToAttached );
+	ConcatTransforms( worldToEntity, GetEngineObject()->EntityToWorldTransform(), ragdoll.constraintToAttached );
 
 	ragdoll.onlyAngularLimits = HasSpawnFlags( SF_RAGDOLL_FREEMOVEMENT ) ? true : false;
 

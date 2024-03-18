@@ -709,10 +709,10 @@ void CNPC_Strider::Activate()
 
 		Vector position;
 		pStrider->GetAttachment( "biggun", position );
-		VectorITransform( position, pStrider->EntityToWorldTransform(), gm_vLocalRelativePositionCannon );
+		VectorITransform( position, pStrider->GetEngineObject()->EntityToWorldTransform(), gm_vLocalRelativePositionCannon );
 
 		pStrider->GetAttachment( "minigun", position );
-		VectorITransform( position, pStrider->EntityToWorldTransform(), gm_vLocalRelativePositionMinigun );
+		VectorITransform( position, pStrider->GetEngineObject()->EntityToWorldTransform(), gm_vLocalRelativePositionMinigun );
 		UTIL_Remove( pStrider );
 	}
 }

@@ -2007,7 +2007,7 @@ void CNPC_Hunter::Activate()
 
 		Vector position;
 		pHunter->GetAttachment( gm_nTopGunAttachment, position );
-		VectorITransform( position, pHunter->EntityToWorldTransform(), gm_vecLocalRelativePositionMinigun );
+		VectorITransform( position, pHunter->GetEngineObject()->EntityToWorldTransform(), gm_vecLocalRelativePositionMinigun );
 		UTIL_Remove( pHunter );
 	}
 }
@@ -3471,7 +3471,7 @@ void CNPC_Hunter::StartTask( const Task_t *pTask )
 		case TASK_HUNTER_STAGGER:
 		{
 			// Stagger in the direction the impact force would push us.
-			VMatrix worldToLocalRotation = EntityToWorldTransform();
+			VMatrix worldToLocalRotation = GetEngineObject()->EntityToWorldTransform();
 			Vector vecLocalStaggerDir = worldToLocalRotation.InverseTR().ApplyRotation( m_vecStaggerDir );
 			
 			float flStaggerYaw = VecToYaw( vecLocalStaggerDir );

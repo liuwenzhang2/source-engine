@@ -383,7 +383,7 @@ void CPropTelescopicArm::AimAt( Vector vTarget )
 	Vector vNormalToTarget = vTarget - vFaceOrigin;
 	VectorNormalize( vNormalToTarget );
 
-	VMatrix vWorldToLocalRotation = EntityToWorldTransform();
+	VMatrix vWorldToLocalRotation = GetEngineObject()->EntityToWorldTransform();
 	vNormalToTarget = vWorldToLocalRotation.InverseTR().ApplyRotation( vNormalToTarget );
 
 	Vector vUp;

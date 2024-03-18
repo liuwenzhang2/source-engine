@@ -6012,7 +6012,7 @@ int C_BaseEntity::Restore( IRestore &restore )
 
 	// NOTE: Do *not* use GetAbsOrigin() here because it will
 	// try to recompute m_rgflCoordinateFrame!
-	//MatrixSetColumn(m_vecAbsOrigin, 3, m_rgflCoordinateFrame);
+	MatrixSetColumn(GetEngineObject()->m_vecAbsOrigin, 3, GetEngineObject()->m_rgflCoordinateFrame);
 
 	// Restablish ground entity
 	if ( m_hGroundEntity != NULL )

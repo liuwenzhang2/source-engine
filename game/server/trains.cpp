@@ -1299,7 +1299,7 @@ void CFuncTrackTrain::DrawDebugGeometryOverlays()
 	{
 		NDebugOverlay::Box( GetAbsOrigin(), -Vector(4,4,4),Vector(4,4,4), 255, 0, 255, 0, 0);
 		Vector out;
-		VectorTransform( Vector(m_length,0,0), EntityToWorldTransform(), out );
+		VectorTransform( Vector(m_length,0,0), GetEngineObject()->EntityToWorldTransform(), out );
 		NDebugOverlay::Box( out, -Vector(4,4,4),Vector(4,4,4), 255, 0, 255, 0, 0);
 	}
 }

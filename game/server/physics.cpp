@@ -1205,16 +1205,16 @@ void PhysGetMassCenterOverride( CBaseEntity *pEntity, vcollide_t *pCollide, soli
 		switch ( override.alignType )
 		{
 		case masscenteroverride_t::ALIGN_POINT:
-			VectorITransform( massCenterWS, pEntity->EntityToWorldTransform(), solidOut.massCenterOverride );
+			VectorITransform( massCenterWS, pEntity->GetEngineObject()->EntityToWorldTransform(), solidOut.massCenterOverride );
 			break;
 		case masscenteroverride_t::ALIGN_AXIS:
 			{
 				Vector massCenterLocal, defaultMassCenterWS;
 				physcollision->CollideGetMassCenter( pCollide->solids[solidOut.index], &massCenterLocal );
-				VectorTransform( massCenterLocal, pEntity->EntityToWorldTransform(), defaultMassCenterWS );
+				VectorTransform( massCenterLocal, pEntity->GetEngineObject()->EntityToWorldTransform(), defaultMassCenterWS );
 				massCenterWS += override.axis * 
 					( DotProduct(defaultMassCenterWS,override.axis) - DotProduct( override.axis, override.center ) );
-				VectorITransform( massCenterWS, pEntity->EntityToWorldTransform(), solidOut.massCenterOverride );
+				VectorITransform( massCenterWS, pEntity->GetEngineObject()->EntityToWorldTransform(), solidOut.massCenterOverride );
 			}
 			break;
 		}

@@ -137,12 +137,12 @@ void CPropVehicle::Teleport( const Vector *newPosition, const QAngle *newAngles,
 {
 	matrix3x4_t startMatrixInv;
 
-	MatrixInvert( EntityToWorldTransform(), startMatrixInv );
+	MatrixInvert(GetEngineObject()->EntityToWorldTransform(), startMatrixInv );
 	BaseClass::Teleport( newPosition, newAngles, newVelocity );
 
 	// Calculate the relative transform of the teleport
 	matrix3x4_t xform;
-	ConcatTransforms( EntityToWorldTransform(), startMatrixInv, xform );
+	ConcatTransforms(GetEngineObject()->EntityToWorldTransform(), startMatrixInv, xform );
 	m_VehiclePhysics.Teleport( xform );
 }
 
@@ -514,7 +514,7 @@ void CPropVehicleDriveable::OnRestore( void )
 void CPropVehicleDriveable::GetVectors(Vector* pForward, Vector* pRight, Vector* pUp) const
 {
 	// This call is necessary to cause m_rgflCoordinateFrame to be recomputed
-	const matrix3x4_t &entityToWorld = EntityToWorldTransform();
+	const matrix3x4_t &entityToWorld = GetEngineObject()->EntityToWorldTransform();
 
 	if (pForward != NULL)
 	{

@@ -346,8 +346,8 @@ void CPhysThruster::OnActivate( void )
 	if ( m_attachedObject != NULL )
 	{
 		matrix3x4_t worldToAttached, thrusterToAttached;
-		MatrixInvert( m_attachedObject->EntityToWorldTransform(), worldToAttached );
-		ConcatTransforms( worldToAttached, EntityToWorldTransform(), thrusterToAttached );
+		MatrixInvert( m_attachedObject->GetEngineObject()->EntityToWorldTransform(), worldToAttached );
+		ConcatTransforms( worldToAttached, GetEngineObject()->EntityToWorldTransform(), thrusterToAttached );
 		MatrixGetColumn( thrusterToAttached, 3, m_localOrigin );
 
 		if ( HasSpawnFlags( SF_THRUST_LOCAL_ORIENTATION ) )
@@ -394,7 +394,7 @@ void CPhysThruster::SetupForces( IPhysicsObject *pPhys, Vector &linear, AngularI
 	else
 	{
 		Vector position;
-		VectorTransform( m_localOrigin, m_attachedObject->EntityToWorldTransform(), position );
+		VectorTransform( m_localOrigin, m_attachedObject->GetEngineObject()->EntityToWorldTransform(), position );
 		pPhys->CalculateVelocityOffset( thrustVector, position, &linear, &angular );
 	}
 

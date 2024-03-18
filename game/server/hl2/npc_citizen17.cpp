@@ -3665,7 +3665,7 @@ void	CNPC_Citizen::TossHealthKit(CBaseCombatCharacter *pThrowAt, const Vector &o
 	Vector medKitOriginPoint = WorldSpaceCenter() + ( forward * 20.0f );
 	Vector destinationPoint;
 	// this doesn't work without a moveparent: pThrowAt->ComputeAbsPosition( offset, &destinationPoint );
-	VectorTransform( offset, pThrowAt->EntityToWorldTransform(), destinationPoint );
+	VectorTransform( offset, pThrowAt->GetEngineObject()->EntityToWorldTransform(), destinationPoint );
 	// flatten out any z change due to player looking up/down
 	destinationPoint.z = pThrowAt->EyePosition().z;
 

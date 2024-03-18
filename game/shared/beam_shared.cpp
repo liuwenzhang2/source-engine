@@ -125,6 +125,8 @@ void RecvProxy_Beam_ScrollSpeed( const CRecvProxyData *pData, void *pStruct, voi
 //}
 //REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendPredictableId );
 //#endif
+
+extern void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID);
 #endif
 
 LINK_ENTITY_TO_CLASS( beam, CBeam );
@@ -180,7 +182,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_Beam )
 #endif
 	SendPropModelIndex(SENDINFO(m_nModelIndex) ),
 	SendPropVector (SENDINFO_ORIGIN(m_vecOrigin), 19, SPROP_CHANGES_OFTEN,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_Origin),
-	SendPropEHandle(SENDINFO_NAME(m_hMoveParent, moveparent) ),
+	SendPropEHandle(SENDINFO_NAME(m_hMoveParent, moveparent), 0, SendProxy_MoveParentToInt),
 	SendPropInt		(SENDINFO(m_nMinDXLevel),	8,	SPROP_UNSIGNED ),
 //#if !defined( NO_ENTITY_PREDICTION )
 //	SendPropDataTable( "beampredictable_id", 0, &REFERENCE_SEND_TABLE( DT_BeamPredictableId ), SendProxy_SendPredictableId ),
@@ -501,7 +503,7 @@ const Vector &CBeam::GetAbsEndPos( void ) const
 
 	// FIXME: Cache this off?
 	static Vector vecAbsPos;
-	VectorTransform( m_vecEndPos, EntityToWorldTransform(), vecAbsPos );
+	VectorTransform( m_vecEndPos, GetEngineObject()->EntityToWorldTransform(), vecAbsPos );
 	return vecAbsPos;
 }
 

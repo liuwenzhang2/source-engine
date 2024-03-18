@@ -2168,7 +2168,7 @@ void CTriggerPush::Spawn()
 	AngleVectors(angPushDir, &vecAbsDir);
 
 	// Transform the vector into entity space
-	VectorIRotate( vecAbsDir, EntityToWorldTransform(), m_vecPushDir );
+	VectorIRotate( vecAbsDir, GetEngineObject()->EntityToWorldTransform(), m_vecPushDir );
 
 	BaseClass::Spawn();
 
@@ -2219,7 +2219,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 
 	// Transform the push dir into global space
 	Vector vecAbsDir;
-	VectorRotate( m_vecPushDir, EntityToWorldTransform(), vecAbsDir );
+	VectorRotate( m_vecPushDir, GetEngineObject()->EntityToWorldTransform(), vecAbsDir );
 
 	// Instant trigger, just transfer velocity and remove
 	if (HasSpawnFlags(SF_TRIG_PUSH_ONCE))

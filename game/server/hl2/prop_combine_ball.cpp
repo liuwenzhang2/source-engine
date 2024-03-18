@@ -1738,7 +1738,7 @@ void CFuncCombineBallSpawner::SpawnBall()
 	Vector vecAbsOrigin;
 	ChoosePointInBox( &vecAbsOrigin );
 	Vector zaxis;
-	MatrixGetColumn( EntityToWorldTransform(), 2, zaxis );
+	MatrixGetColumn(GetEngineObject()->EntityToWorldTransform(), 2, zaxis );
 	VectorMA( vecAbsOrigin, flRadius, zaxis, vecAbsOrigin );
 
 	pBall->SetAbsOrigin( vecAbsOrigin );

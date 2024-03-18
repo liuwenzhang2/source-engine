@@ -255,8 +255,8 @@ void CFunc_LiquidPortal::ComputeLinkMatrix( void )
 	{
 		VMatrix matLocalToWorld, matLocalToWorldInv, matRemoteToWorld;
 
-		matLocalToWorld = EntityToWorldTransform();
-		matRemoteToWorld = pLinkedPortal->EntityToWorldTransform();
+		matLocalToWorld = GetEngineObject()->EntityToWorldTransform();
+		matRemoteToWorld = pLinkedPortal->GetEngineObject()->EntityToWorldTransform();
 		
 		MatrixInverseTR( matLocalToWorld, matLocalToWorldInv );
 		m_matrixThisToLinked = matRemoteToWorld * matLocalToWorldInv;

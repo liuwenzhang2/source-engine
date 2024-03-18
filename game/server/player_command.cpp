@@ -154,7 +154,7 @@ void CPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *p
 	{
 		matrix3x4_t viewToParent, viewToWorld;
 		AngleMatrix( move->m_vecViewAngles, viewToParent );
-		ConcatTransforms( pMoveParent->EntityToWorldTransform(), viewToParent, viewToWorld );
+		ConcatTransforms( pMoveParent->GetEngineObject()->EntityToWorldTransform(), viewToParent, viewToWorld );
 		MatrixAngles( viewToWorld, move->m_vecAbsViewAngles );
 	}
 

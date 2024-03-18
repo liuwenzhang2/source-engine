@@ -284,7 +284,7 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 		for ( int checkCount = 0; checkCount < 4; checkCount++ )
 		{
 			Vector move;
-			MatrixGetColumn( m_rgPusher[0].m_pEntity->EntityToWorldTransform(), checkCount>>1, move );
+			MatrixGetColumn( m_rgPusher[0].m_pEntity->GetEngineObject()->EntityToWorldTransform(), checkCount>>1, move );
 			
 			// alternate movements 1/2" in each direction
 			float factor = ( checkCount & 1 ) ? -0.5f : 0.5f;
@@ -781,7 +781,7 @@ void CPhysicsPushedEntities::RotateRootEntity( CBaseEntity *pRoot, float movetim
 
 	// Knowing the initial + ending basis is needed for determining
 	// which corner we're pushing 
-	MatrixCopy( pRoot->EntityToWorldTransform(), rotation.startLocalToWorld );
+	MatrixCopy( pRoot->GetEngineObject()->EntityToWorldTransform(), rotation.startLocalToWorld );
 
 	// rotate the pusher to it's final position
 	QAngle angles = pRoot->GetLocalAngles();
@@ -790,7 +790,7 @@ void CPhysicsPushedEntities::RotateRootEntity( CBaseEntity *pRoot, float movetim
 	pRoot->SetLocalAngles( angles );
 	
 	// Compute the change in absangles
-	MatrixCopy( pRoot->EntityToWorldTransform(), rotation.endLocalToWorld );
+	MatrixCopy( pRoot->GetEngineObject()->EntityToWorldTransform(), rotation.endLocalToWorld );
 }
 
 

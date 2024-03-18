@@ -801,7 +801,7 @@ void CPropCrane::GetCraneTipPosition( Vector *vecOrigin, QAngle *vecAngles )
 void CPropCrane::GetVectors(Vector* pForward, Vector* pRight, Vector* pUp) const
 {
 	// This call is necessary to cause m_rgflCoordinateFrame to be recomputed
-	const matrix3x4_t &entityToWorld = EntityToWorldTransform();
+	const matrix3x4_t &entityToWorld = GetEngineObject()->EntityToWorldTransform();
 
 	if (pForward != NULL)
 	{

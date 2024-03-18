@@ -394,7 +394,7 @@ void CAntlionGrub::Spawn( void )
 
 	// At this point, alter our bounds to make sure we're within them
 	Vector vecMins, vecMaxs;
-	RotateAABB( EntityToWorldTransform(), CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), vecMins, vecMaxs );
+	RotateAABB(GetEngineObject()->EntityToWorldTransform(), CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), vecMins, vecMaxs );
 
 	UTIL_SetSize( this, vecMins, vecMaxs );
 

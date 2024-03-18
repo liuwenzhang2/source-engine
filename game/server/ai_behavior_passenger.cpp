@@ -800,7 +800,7 @@ bool CAI_PassengerBehavior::GetEntryPoint( int nSequence, Vector *vecEntryPoint,
 	// Output the position, if requested
 	if ( vecEntryPoint != NULL )
 	{
-		m_hVehicle->EntityToWorldSpace( vecTargetPos, vecEntryPoint );
+		m_hVehicle->GetEngineObject()->EntityToWorldSpace( vecTargetPos, vecEntryPoint );
 
 		// Trace down to the ground to see where we'll stand
 		Vector vecGroundPos;
@@ -830,7 +830,7 @@ bool CAI_PassengerBehavior::GetEntryPoint( int nSequence, Vector *vecEntryPoint,
 		//Transform those angles to worldspace
 		matrix3x4_t angToParent, angToWorld;
 		AngleMatrix( (*vecEntryAngles), angToParent );
-		ConcatTransforms( m_hVehicle->EntityToWorldTransform(), angToParent, angToWorld );
+		ConcatTransforms( m_hVehicle->GetEngineObject()->EntityToWorldTransform(), angToParent, angToWorld );
 		MatrixAngles( angToWorld, (*vecEntryAngles) );
 	}
 
@@ -1162,12 +1162,12 @@ void CAI_PassengerBehavior::DrawDebugTransitionInfo( const Vector &vecIdealPos, 
 	{	
 		// Green - Ideal location
 		Vector foo;
-		m_hVehicle->EntityToWorldSpace( vecIdealPos, &foo );
+		m_hVehicle->GetEngineObject()->EntityToWorldSpace( vecIdealPos, &foo );
 		NDebugOverlay::Cross3D( foo, 2, 0, 255, 0, true, 0.1f );
 		NDebugOverlay::Axis( foo, vecIdealAngles, 8, true, 0.1f );
 
 		// Blue - Actual location
-		m_hVehicle->EntityToWorldSpace( vecAnimPos, &foo );
+		m_hVehicle->GetEngineObject()->EntityToWorldSpace( vecAnimPos, &foo );
 		NDebugOverlay::Cross3D( foo, 2, 0, 0, 255, true, 0.1f );
 		NDebugOverlay::Axis( foo, vecAnimAngles, 8, true, 0.1f );
 	}
@@ -1262,7 +1262,7 @@ void CAI_PassengerBehavior::GetLocalVehicleVelocity( Vector *pOut  )
 {
 	Vector velocity;
 	m_hVehicle->GetVelocity( &velocity, NULL );
-	m_hVehicle->WorldToEntitySpace( m_hVehicle->GetAbsOrigin() + velocity, pOut );
+	m_hVehicle->GetEngineObject()->WorldToEntitySpace( m_hVehicle->GetAbsOrigin() + velocity, pOut );
 }
 
 //-----------------------------------------------------------------------------

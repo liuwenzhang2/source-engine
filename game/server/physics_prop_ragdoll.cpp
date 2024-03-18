@@ -924,9 +924,9 @@ void CRagdollProp::Teleport( const Vector *newPosition, const QAngle *newAngles,
 	// But a ragdoll entity has identity orientation by design
 	// so we compute a relative transform here based on the previous transform
 	matrix3x4_t startMatrixInv;
-	MatrixInvert( EntityToWorldTransform(), startMatrixInv );
+	MatrixInvert(GetEngineObject()->EntityToWorldTransform(), startMatrixInv );
 	matrix3x4_t endMatrix;
-	MatrixCopy( EntityToWorldTransform(), endMatrix );
+	MatrixCopy(GetEngineObject()->EntityToWorldTransform(), endMatrix );
 	if ( newAngles )
 	{
 		AngleMatrix( *newAngles, endMatrix );
@@ -1366,7 +1366,7 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 				deltaPos, 
 				deltaAngles ))
 			{
-				VectorRotate( deltaPos, pAnimating->EntityToWorldTransform(), vel );
+				VectorRotate( deltaPos, pAnimating->GetEngineObject()->EntityToWorldTransform(), vel );
 				vel /= dt;
 			}
 		}

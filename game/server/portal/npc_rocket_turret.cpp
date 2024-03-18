@@ -887,7 +887,7 @@ void CNPC_RocketTurret::ClosingThink()
 //-----------------------------------------------------------------------------
 void CNPC_RocketTurret::SyncPoseToAimAngles ( void )
 {
-	QAngle localAngles = TransformAnglesToLocalSpace( m_vecCurrentAngles.Get(), EntityToWorldTransform() );
+	QAngle localAngles = TransformAnglesToLocalSpace( m_vecCurrentAngles.Get(), GetEngineObject()->EntityToWorldTransform() );
 
 	// Update pitch
 	SetPoseParameter( m_iPosePitch, localAngles.x );

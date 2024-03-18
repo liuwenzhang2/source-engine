@@ -1815,7 +1815,7 @@ void CProp_Portal::UpdatePortalTeleportMatrix( void )
 
 	if ( m_hLinkedPortal != NULL )
 	{
-		CProp_Portal_Shared::UpdatePortalTransformationMatrix( EntityToWorldTransform(), m_hLinkedPortal->EntityToWorldTransform(), &m_matrixThisToLinked );
+		CProp_Portal_Shared::UpdatePortalTransformationMatrix(GetEngineObject()->EntityToWorldTransform(), m_hLinkedPortal->GetEngineObject()->EntityToWorldTransform(), &m_matrixThisToLinked );
 
 		m_hLinkedPortal->ResetModel();
 		//update the remote portal

@@ -296,7 +296,7 @@ void HapticsDamage(CBasePlayer* pPlayer, const CTakeDamageInfo &info)
 	Vector inflictorPosition = eInflictor->GetLocalOrigin();
 
 	Vector posWithDir = playerPosition + (playerPosition - inflictorPosition);
-	pPlayer->WorldToEntitySpace(posWithDir, &DamageDirection);
+	pPlayer->GetEngineObject()->WorldToEntitySpace(posWithDir, &DamageDirection);
 	QAngle dir(0,0,0);
 	VectorAngles(DamageDirection, dir);
 	float yawAngle = dir[YAW];

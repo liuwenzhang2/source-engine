@@ -37,7 +37,7 @@ void PhysicsSplash( IPhysicsFluidController *pFluid, IPhysicsObject *pObject, CB
 	float dist;
 	pFluid->GetSurfacePlane( &normal, &dist );
 
-	matrix3x4_t &matrix = pEntity->EntityToWorldTransform();
+	matrix3x4_t &matrix = pEntity->GetEngineObject()->EntityToWorldTransform();
 	
 	// Find the local axis that best matches the water surface normal
 	int bestAxis = BestAxisMatchingNormal( matrix, normal );

@@ -701,7 +701,7 @@ QAngle CGrabController::TransformAnglesToPlayerSpace( const QAngle &anglesIn, CB
 		AngleMatrix( angleTest, test );
 		return TransformAnglesToLocalSpace( anglesIn, test );
 	}
-	return TransformAnglesToLocalSpace( anglesIn, pPlayer->EntityToWorldTransform() );
+	return TransformAnglesToLocalSpace( anglesIn, pPlayer->GetEngineObject()->EntityToWorldTransform() );
 }
 
 QAngle CGrabController::TransformAnglesFromPlayerSpace( const QAngle &anglesIn, CBasePlayer *pPlayer )
@@ -714,7 +714,7 @@ QAngle CGrabController::TransformAnglesFromPlayerSpace( const QAngle &anglesIn, 
 		AngleMatrix( angleTest, test );
 		return TransformAnglesToWorldSpace( anglesIn, test );
 	}
-	return TransformAnglesToWorldSpace( anglesIn, pPlayer->EntityToWorldTransform() );
+	return TransformAnglesToWorldSpace( anglesIn, pPlayer->GetEngineObject()->EntityToWorldTransform() );
 }
 
 
@@ -729,7 +729,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	QAngle angles;
 	pPhys->GetPosition( &position, &angles );
 	// If it has a preferred orientation, use that instead.
-	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
+	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->GetEngineObject()->EntityToWorldTransform(), angles );
 
 //	ComputeMaxSpeed( pEntity, pPhys );
 
@@ -801,7 +801,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	}
 	else
 	{
-		VectorITransform( pEntity->WorldSpaceCenter(), pEntity->EntityToWorldTransform(), m_attachedPositionObjectSpace );
+		VectorITransform( pEntity->WorldSpaceCenter(), pEntity->GetEngineObject()->EntityToWorldTransform(), m_attachedPositionObjectSpace );
 	}
 
 	// If it's a prop, see if it has desired carry angles
@@ -2831,7 +2831,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	QAngle angles = TransformAnglesFromPlayerSpace( m_attachedAnglesPlayerSpace, pPlayer );
 	
 	// If it has a preferred orientation, update to ensure we're still oriented correctly.
-	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
+	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->GetEngineObject()->EntityToWorldTransform(), angles );
 
 	// We may be holding a prop that has preferred carry angles
 	if ( m_bHasPreferredCarryAngles )

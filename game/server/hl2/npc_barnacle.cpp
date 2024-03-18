@@ -1448,7 +1448,7 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 		{
 			vecGrabPos = pTouchEnt->EyePosition();
 #if BARNACLE_USE_TONGUE_OFFSET
-			VectorRotate( m_svPlayerHeldTipOffset, pTouchEnt->EntityToWorldTransform(), m_vecTipDrawOffset.GetForModify() );
+			VectorRotate( m_svPlayerHeldTipOffset, pTouchEnt->GetEngineObject()->EntityToWorldTransform(), m_vecTipDrawOffset.GetForModify() );
 			m_vecTipDrawOffset.GetForModify().z = m_svPlayerHeldTipOffset.z;
 #endif
 			// pTonguePhys->GetPosition(&vecGrabPos,NULL);

@@ -2710,7 +2710,7 @@ void CNPC_CombineGunship::UpdateEnemyTarget( void )
 bool CNPC_CombineGunship::PoseGunTowardTargetDirection( const Vector &vTargetDir )
 {
 	Vector vecOut;
-	VectorIRotate( vTargetDir, EntityToWorldTransform(), vecOut );
+	VectorIRotate( vTargetDir, GetEngineObject()->EntityToWorldTransform(), vecOut );
 
 	QAngle angles;
 	VectorAngles(vecOut, angles);

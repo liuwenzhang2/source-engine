@@ -2684,11 +2684,11 @@ void UTIL_ParentToWorldSpace( CBaseEntity *pEntity, Vector &vecPosition, QAngle 
 	
 	if ( pEntity->GetMoveParent() != NULL )
 	{
-		matParentToWorld = pEntity->GetParentToWorldTransform( matScratch );
+		matParentToWorld = pEntity->GetEngineObject()->GetParentToWorldTransform( matScratch );
 	}
 	else
 	{
-		matParentToWorld = pEntity->EntityToWorldTransform();
+		matParentToWorld = pEntity->GetEngineObject()->EntityToWorldTransform();
 	}
 
 	ConcatTransforms( matParentToWorld, matEntityToParent, matResult );
@@ -2734,11 +2734,11 @@ void UTIL_WorldToParentSpace( CBaseEntity *pEntity, Vector &vecPosition, QAngle 
 	
 	if ( pEntity->GetMoveParent() != NULL )
 	{
-		matScratch = pEntity->GetParentToWorldTransform( matScratch );
+		matScratch = pEntity->GetEngineObject()->GetParentToWorldTransform( matScratch );
 	}
 	else
 	{
-		matScratch = pEntity->EntityToWorldTransform();
+		matScratch = pEntity->GetEngineObject()->EntityToWorldTransform();
 	}
 
 	MatrixInvert( matScratch, matWorldToParent );

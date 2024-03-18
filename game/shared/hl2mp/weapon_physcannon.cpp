@@ -513,7 +513,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	pPhys->GetPosition( &position, &angles );
 	// If it has a preferred orientation, use that instead.
 #ifndef CLIENT_DLL
-	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
+	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->GetEngineObject()->EntityToWorldTransform(), angles );
 #endif
 
 //	ComputeMaxSpeed( pEntity, pPhys );
@@ -2352,7 +2352,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	
 #ifndef CLIENT_DLL
 	// If it has a preferred orientation, update to ensure we're still oriented correctly.
-	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->EntityToWorldTransform(), angles );
+	Pickup_GetPreferredCarryAngles( pEntity, pPlayer, pPlayer->GetEngineObject()->EntityToWorldTransform(), angles );
 
 
 	// We may be holding a prop that has preferred carry angles

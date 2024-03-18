@@ -349,6 +349,10 @@ public:
 	DECLARE_CLASS_NOBASE(CEngineObject);
 	//DECLARE_EMBEDDED_NETWORKVAR();
 
+	CEngineObject() {
+		SetIdentityMatrix(m_rgflCoordinateFrame);
+	}
+
 	void Init(CBaseEntity* pOuter) {
 		m_pOuter = pOuter;
 	}
@@ -392,6 +396,17 @@ public:
 	matrix3x4_t& EntityToWorldTransform();
 	const matrix3x4_t& EntityToWorldTransform() const;
 
+	// Some helper methods that transform a point from entity space to world space + back
+	void					EntityToWorldSpace(const Vector& in, Vector* pOut) const;
+	void					WorldToEntitySpace(const Vector& in, Vector* pOut) const;
+
+	// This function gets your parent's transform. If you're parented to an attachment,
+	// this calculates the attachment's transform and gives you that.
+	//
+	// You must pass in tempMatrix for scratch space - it may need to fill that in and return it instead of 
+	// pointing you right at a variable in your parent.
+	matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix);
+
 	// Computes the abs position of a point specified in local space
 	void					ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
 
@@ -411,6 +426,9 @@ private:
 	// Global velocity
 	Vector			m_vecAbsVelocity;
 	CBaseEntity*	m_pOuter;
+
+	// local coordinate frame of entity
+	matrix3x4_t		m_rgflCoordinateFrame;
 };
 
 
@@ -537,20 +555,9 @@ public:
 	void					SetMoveType( MoveType_t val, MoveCollide_t moveCollide = MOVECOLLIDE_DEFAULT );
 	void					SetMoveCollide( MoveCollide_t val );
 
-	// Returns the entity-to-world transform
-	matrix3x4_t				&EntityToWorldTransform();
-	const matrix3x4_t		&EntityToWorldTransform() const;
 
-	// Some helper methods that transform a point from entity space to world space + back
-	void					EntityToWorldSpace( const Vector &in, Vector *pOut ) const;
-	void					WorldToEntitySpace( const Vector &in, Vector *pOut ) const;
 
-	// This function gets your parent's transform. If you're parented to an attachment,
-	// this calculates the attachment's transform and gives you that.
-	//
-	// You must pass in tempMatrix for scratch space - it may need to fill that in and return it instead of 
-	// pointing you right at a variable in your parent.
-	matrix3x4_t&			GetParentToWorldTransform( matrix3x4_t &tempMatrix );
+
 
 	// Externalized data objects ( see sharreddefs.h for DataObjectType_t )
 	bool					HasDataObjectType( int type ) const;
@@ -1777,8 +1784,7 @@ private:
 	// Global angular velocity
 //	QAngle			m_vecAbsAngVelocity;
 
-	// local coordinate frame of entity
-	matrix3x4_t		m_rgflCoordinateFrame;
+	
 
 	// Physics state
 	EHANDLE			m_pBlocker;
@@ -2255,58 +2261,9 @@ inline CBaseCombatCharacter *ToBaseCombatCharacter( CBaseEntity *pEntity )
 
 
 
-//-----------------------------------------------------------------------------
-// Returns the entity-to-world transform
-//-----------------------------------------------------------------------------
-inline matrix3x4_t &CBaseEntity::EntityToWorldTransform() 
-{ 
-	Assert( CBaseEntity::IsAbsQueriesValid() );
-
-	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
-	{
-		GetEngineObject()->CalcAbsolutePosition();
-	}
-	return m_rgflCoordinateFrame; 
-}
-
-inline const matrix3x4_t &CBaseEntity::EntityToWorldTransform() const
-{ 
-	Assert( CBaseEntity::IsAbsQueriesValid() );
-
-	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
-	{
-		const_cast<CBaseEntity*>(this)->GetEngineObject()->CalcAbsolutePosition();
-	}
-	return m_rgflCoordinateFrame; 
-}
 
 
-//-----------------------------------------------------------------------------
-// Some helper methods that transform a point from entity space to world space + back
-//-----------------------------------------------------------------------------
-inline void CBaseEntity::EntityToWorldSpace( const Vector &in, Vector *pOut ) const
-{
-	if (const_cast<CBaseEntity*>(this)->GetEngineObject()->GetAbsAngles() == vec3_angle )
-	{
-		VectorAdd( in, const_cast<CBaseEntity*>(this)->GetEngineObject()->GetAbsOrigin(), *pOut );
-	}
-	else
-	{
-		VectorTransform( in, EntityToWorldTransform(), *pOut );
-	}
-}
 
-inline void CBaseEntity::WorldToEntitySpace( const Vector &in, Vector *pOut ) const
-{
-	if (const_cast<CBaseEntity*>(this)->GetEngineObject()->GetAbsAngles() == vec3_angle )
-	{
-		VectorSubtract( in, const_cast<CBaseEntity*>(this)->GetEngineObject()->GetAbsOrigin(), *pOut );
-	}
-	else
-	{
-		VectorITransform( in, EntityToWorldTransform(), *pOut );
-	}
-}
 
 
 //-----------------------------------------------------------------------------

@@ -1758,8 +1758,8 @@ void CPhysMagnet::DoMagnetSuck( CBaseEntity *pOther )
 	
 	// Look for physics objects underneath the magnet and suck them onto it
 	Vector vecCheckPos, vecSuckPoint;
-	VectorTransform( Vector(0,0,-96), EntityToWorldTransform(), vecCheckPos );
-	VectorTransform( Vector(0,0,-64), EntityToWorldTransform(), vecSuckPoint );
+	VectorTransform( Vector(0,0,-96), GetEngineObject()->EntityToWorldTransform(), vecCheckPos );
+	VectorTransform( Vector(0,0,-64), GetEngineObject()->EntityToWorldTransform(), vecSuckPoint );
 
 	CBaseEntity *pEntities[20];
 	int iNumEntities = UTIL_EntitiesInSphere( pEntities, 20, vecCheckPos, 80.0, 0 );

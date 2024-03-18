@@ -3818,7 +3818,7 @@ void CNPC_MetroPolice::TraceAttack( const CTakeDamageInfo &info, const Vector &v
 		if ( m_takedamage == DAMAGE_YES )
 		{
 			Vector vecLastHitDirection;
-			VectorIRotate( vecDir, EntityToWorldTransform(), vecLastHitDirection );
+			VectorIRotate( vecDir, GetEngineObject()->EntityToWorldTransform(), vecLastHitDirection );
 
 			// Point *at* the shooter
 			vecLastHitDirection *= -1.0f;

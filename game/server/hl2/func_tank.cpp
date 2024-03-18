@@ -785,7 +785,7 @@ void CFuncTank::Spawn( void )
 			Vector vecWorldBarrelPos;
 			QAngle worldBarrelAngle;
 			pAnim->GetAttachment( m_nBarrelAttachment, vecWorldBarrelPos, worldBarrelAngle );
-			VectorITransform( vecWorldBarrelPos, EntityToWorldTransform( ), m_barrelPos );
+			VectorITransform( vecWorldBarrelPos, GetEngineObject()->EntityToWorldTransform( ), m_barrelPos );
 		}
 
 		if ( m_bUsePoseParameters )
@@ -906,7 +906,7 @@ void CFuncTank::Activate( void )
 			Vector vecWorldBarrelPos;
 			QAngle worldBarrelAngle;
 			pAnim->GetAttachment( m_nBarrelAttachment, vecWorldBarrelPos, worldBarrelAngle );
-			VectorITransform( vecWorldBarrelPos, EntityToWorldTransform( ), m_barrelPos );
+			VectorITransform( vecWorldBarrelPos, GetEngineObject()->EntityToWorldTransform( ), m_barrelPos );
 		}
 
 		if ( m_bUsePoseParameters )

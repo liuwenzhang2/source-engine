@@ -257,6 +257,16 @@ void SendProxy_Angles( const SendProp *pProp, const void *pStruct, const void *p
 	pOut->m_Vector[ 2 ] = anglemod( a->z );
 }
 
+void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
+{
+	CBaseEntity* entity = (CBaseEntity*)pStruct;
+	Assert(entity);
+
+	CBaseEntity* pMoveParent = entity->GetMoveParent();
+	CBaseHandle pHandle = pMoveParent ? pMoveParent->GetRefEHandle() : NULL;;
+	SendProxy_EHandleToInt(pProp, pStruct, &pHandle, pOut, iElement, objectID);
+}
+
 // This table encodes the CBaseEntity data.
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropDataTable( "AnimTimeMustBeFirst", 0, &REFERENCE_SEND_TABLE(DT_AnimTimeMustBeFirst), SendProxy_ClientSideAnimation ),
@@ -281,7 +291,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropFloat	(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED ),
 	SendPropEHandle (SENDINFO(m_hOwnerEntity)),
 	SendPropEHandle (SENDINFO(m_hEffectEntity)),
-	SendPropEHandle (SENDINFO_NAME(m_hMoveParent, moveparent)),
+	SendPropEHandle (SENDINFO_NAME(m_hMoveParent, moveparent), 0, SendProxy_MoveParentToInt),
 	SendPropInt		(SENDINFO(m_iParentAttachment), NUM_PARENTATTACHMENT_BITS, SPROP_UNSIGNED),
 
 	SendPropInt		(SENDINFO_NAME( m_MoveType, movetype ), MOVETYPE_MAX_BITS, SPROP_UNSIGNED ),
@@ -380,7 +390,6 @@ CBaseEntity::CBaseEntity()
 	m_iTeamNum = m_iInitialTeamNum = TEAM_UNASSIGNED;
 	m_nLastThinkTick = gpGlobals->tickcount;
 	m_nSimulationTick = -1;
-	SetIdentityMatrix( m_rgflCoordinateFrame );
 	m_pBlocker = NULL;
 #if _DEBUG
 	m_iCurrentThinkContext = NO_THINK_CONTEXT;
@@ -1865,7 +1874,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsVelocity, engineObjectFuncs),
 	DEFINE_KEYFIELD( m_vecAngVelocity, FIELD_VECTOR, "avelocity" ),
 //	DEFINE_FIELD( m_vecAbsAngVelocity, FIELD_VECTOR ),
-	DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
+	//DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
 
 	DEFINE_KEYFIELD( m_nWaterLevel, FIELD_CHARACTER, "waterlevel" ),
 	DEFINE_FIELD( m_nWaterType, FIELD_CHARACTER ),
@@ -2268,9 +2277,9 @@ static void ComputePushStartMatrix( matrix3x4_t &start, CBaseEntity *pEntity, co
 
 	matrix3x4_t srcInv;
 	// xform = src(-1) * dest
-	MatrixInvert( params.pRootParent->EntityToWorldTransform(), srcInv );
+	MatrixInvert( params.pRootParent->GetEngineObject()->EntityToWorldTransform(), srcInv );
 	ConcatTransforms( xform, srcInv, delta );
-	ConcatTransforms( delta, pEntity->EntityToWorldTransform(), start );
+	ConcatTransforms( delta, pEntity->GetEngineObject()->EntityToWorldTransform(), start );
 }
 
 #define DEBUG_PUSH_MESSAGES 0
@@ -3218,7 +3227,7 @@ int CBaseEntity::Restore( IRestore &restore )
 		
 		// NOTE: Do *not* use GetAbsOrigin() here because it will
 		// try to recompute m_rgflCoordinateFrame!
-		MatrixSetColumn(GetEngineObject()->m_vecAbsOrigin, 3, m_rgflCoordinateFrame );
+		MatrixSetColumn(GetEngineObject()->m_vecAbsOrigin, 3, GetEngineObject()->m_rgflCoordinateFrame );
 
 		GetEngineObject()->m_vecOrigin += parentSpaceOffset;
 	}
@@ -4297,7 +4306,7 @@ bool CBaseEntity::IsMoving()
 void CBaseEntity::GetVectors(Vector* pForward, Vector* pRight, Vector* pUp) const
 {
 	// This call is necessary to cause m_rgflCoordinateFrame to be recomputed
-	const matrix3x4_t &entityToWorld = EntityToWorldTransform();
+	const matrix3x4_t &entityToWorld = GetEngineObject()->EntityToWorldTransform();
 
 	if (pForward != NULL)
 	{
@@ -5766,7 +5775,7 @@ void CEngineObject::CalcAbsolutePosition( void )
 	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
 
 	// Plop the entity->parent matrix into m_rgflCoordinateFrame
-	AngleMatrix( m_angRotation, m_vecOrigin, m_pOuter->m_rgflCoordinateFrame );
+	AngleMatrix( m_angRotation, m_vecOrigin, m_rgflCoordinateFrame );
 
 	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
 	if ( !pMoveParent )
@@ -5783,11 +5792,11 @@ void CEngineObject::CalcAbsolutePosition( void )
 
 	// concatenate with our parent's transform
 	matrix3x4_t tmpMatrix, scratchSpace;
-	ConcatTransforms( m_pOuter->GetParentToWorldTransform( scratchSpace ), m_pOuter->m_rgflCoordinateFrame, tmpMatrix );
-	MatrixCopy( tmpMatrix, m_pOuter->m_rgflCoordinateFrame );
+	ConcatTransforms( GetParentToWorldTransform( scratchSpace ), m_rgflCoordinateFrame, tmpMatrix );
+	MatrixCopy( tmpMatrix, m_rgflCoordinateFrame );
 
 	// pull our absolute position out of the matrix
-	MatrixGetColumn( m_pOuter->m_rgflCoordinateFrame, 3, m_vecAbsOrigin ); 
+	MatrixGetColumn( m_rgflCoordinateFrame, 3, m_vecAbsOrigin ); 
 
 	// if we have any angles, we have to extract our absolute angles from our matrix
 	if (( m_angRotation == vec3_angle ) && ( m_pOuter->m_iParentAttachment == 0 ))
@@ -5797,7 +5806,7 @@ void CEngineObject::CalcAbsolutePosition( void )
 	}
 	else
 	{
-		MatrixAngles( m_pOuter->m_rgflCoordinateFrame, m_angAbsRotation );
+		MatrixAngles( m_rgflCoordinateFrame, m_angAbsRotation );
 	}
 	if ( m_pOuter->HasDataObjectType( POSITIONWATCHER ) )
 	{
@@ -5820,7 +5829,7 @@ void CEngineObject::CalcAbsoluteVelocity()
 	}
 
 	// This transforms the local velocity into world space
-	VectorRotate( m_vecVelocity, pMoveParent->EntityToWorldTransform(), m_vecAbsVelocity );
+	VectorRotate( m_vecVelocity, pMoveParent->GetEngineObject()->EntityToWorldTransform(), m_vecAbsVelocity );
 
 	// Now add in the parent abs velocity
 	m_vecAbsVelocity += pMoveParent->GetEngineObject()->GetAbsVelocity();
@@ -5881,7 +5890,7 @@ void CBaseEntity::ComputeAbsPosition( const Vector &vecLocalPosition, Vector *pA
 	}
 	else
 	{
-		VectorTransform( vecLocalPosition, pMoveParent->EntityToWorldTransform(), *pAbsPosition );
+		VectorTransform( vecLocalPosition, pMoveParent->GetEngineObject()->EntityToWorldTransform(), *pAbsPosition );
 	}
 }
 
@@ -5898,14 +5907,14 @@ void CBaseEntity::ComputeAbsDirection( const Vector &vecLocalDirection, Vector *
 	}
 	else
 	{
-		VectorRotate( vecLocalDirection, pMoveParent->EntityToWorldTransform(), *pAbsDirection );
+		VectorRotate( vecLocalDirection, pMoveParent->GetEngineObject()->EntityToWorldTransform(), *pAbsDirection );
 	}
 }
 
 
-matrix3x4_t& CBaseEntity::GetParentToWorldTransform( matrix3x4_t &tempMatrix )
+matrix3x4_t& CEngineObject::GetParentToWorldTransform( matrix3x4_t &tempMatrix )
 {
-	CBaseEntity *pMoveParent = GetMoveParent();
+	CEngineObject *pMoveParent = GetMoveParent();
 	if ( !pMoveParent )
 	{
 		Assert( false );
@@ -5913,12 +5922,12 @@ matrix3x4_t& CBaseEntity::GetParentToWorldTransform( matrix3x4_t &tempMatrix )
 		return tempMatrix;
 	}
 
-	if ( m_iParentAttachment != 0 )
+	if ( m_pOuter->m_iParentAttachment != 0 )
 	{
 		MDLCACHE_CRITICAL_SECTION();
 
-		CBaseAnimating *pAnimating = pMoveParent->GetBaseAnimating();
-		if ( pAnimating && pAnimating->GetAttachment( m_iParentAttachment, tempMatrix ) )
+		CBaseAnimating *pAnimating = pMoveParent->m_pOuter->GetBaseAnimating();
+		if ( pAnimating && pAnimating->GetAttachment(m_pOuter->m_iParentAttachment, tempMatrix ) )
 		{
 			return tempMatrix;
 		}
@@ -5949,7 +5958,7 @@ void CEngineObject::SetAbsOrigin( const Vector& absOrigin )
 
 	m_vecAbsOrigin = absOrigin;
 		
-	MatrixSetColumn( absOrigin, 3, m_pOuter->m_rgflCoordinateFrame ); 
+	MatrixSetColumn( absOrigin, 3, m_rgflCoordinateFrame ); 
 
 	Vector vecNewOrigin;
 	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
@@ -5960,7 +5969,7 @@ void CEngineObject::SetAbsOrigin( const Vector& absOrigin )
 	else
 	{
 		matrix3x4_t tempMat;
-		matrix3x4_t &parentTransform = m_pOuter->GetParentToWorldTransform( tempMat );
+		matrix3x4_t &parentTransform = GetParentToWorldTransform( tempMat );
 
 		// Moveparent case: transform the abs position into local space
 		VectorITransform( absOrigin, parentTransform, vecNewOrigin );
@@ -5992,8 +6001,8 @@ void CEngineObject::SetAbsAngles( const QAngle& absAngles )
 	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSTRANSFORM );
 
 	m_angAbsRotation = absAngles;
-	AngleMatrix( absAngles, m_pOuter->m_rgflCoordinateFrame );
-	MatrixSetColumn( m_vecAbsOrigin, 3, m_pOuter->m_rgflCoordinateFrame );
+	AngleMatrix( absAngles, m_rgflCoordinateFrame );
+	MatrixSetColumn( m_vecAbsOrigin, 3, m_rgflCoordinateFrame );
 
 	QAngle angNewRotation;
 	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
@@ -6011,8 +6020,8 @@ void CEngineObject::SetAbsAngles( const QAngle& absAngles )
 		{
 			// Moveparent case: transform the abs transform into local space
 			matrix3x4_t worldToParent, localMatrix;
-			MatrixInvert( pMoveParent->EntityToWorldTransform(), worldToParent );
-			ConcatTransforms( worldToParent, m_pOuter->m_rgflCoordinateFrame, localMatrix );
+			MatrixInvert( pMoveParent->GetEngineObject()->EntityToWorldTransform(), worldToParent );
+			ConcatTransforms( worldToParent, m_rgflCoordinateFrame, localMatrix );
 			MatrixAngles( localMatrix, angNewRotation );
 		}
 	}
@@ -6054,7 +6063,7 @@ void CEngineObject::SetAbsVelocity( const Vector &vecAbsVelocity )
 
 	// Transform relative velocity into parent space
 	Vector vNew;
-	VectorIRotate( relVelocity, pMoveParent->EntityToWorldTransform(), vNew );
+	VectorIRotate( relVelocity, pMoveParent->GetEngineObject()->EntityToWorldTransform(), vNew );
 	m_vecVelocity = vNew;
 }
 
@@ -6316,13 +6325,53 @@ CEngineObject* CEngineObject::GetRootMoveParent()
 //-----------------------------------------------------------------------------
 matrix3x4_t& CEngineObject::EntityToWorldTransform()
 {
-	return m_pOuter->EntityToWorldTransform();
+	Assert(CBaseEntity::IsAbsQueriesValid());
+
+	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	{
+		CalcAbsolutePosition();
+	}
+	return m_rgflCoordinateFrame;
 }
 
 const matrix3x4_t& CEngineObject::EntityToWorldTransform() const
 {
-	return m_pOuter->EntityToWorldTransform();
+	Assert(CBaseEntity::IsAbsQueriesValid());
+
+	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	{
+		const_cast<CEngineObject*>(this)->CalcAbsolutePosition();
+	}
+	return m_rgflCoordinateFrame;
 }
+
+//-----------------------------------------------------------------------------
+// Some helper methods that transform a point from entity space to world space + back
+//-----------------------------------------------------------------------------
+void CEngineObject::EntityToWorldSpace(const Vector& in, Vector* pOut) const
+{
+	if (const_cast<CEngineObject*>(this)->GetAbsAngles() == vec3_angle)
+	{
+		VectorAdd(in, const_cast<CEngineObject*>(this)->GetAbsOrigin(), *pOut);
+	}
+	else
+	{
+		VectorTransform(in, EntityToWorldTransform(), *pOut);
+	}
+}
+
+void CEngineObject::WorldToEntitySpace(const Vector& in, Vector* pOut) const
+{
+	if (const_cast<CEngineObject*>(this)->GetAbsAngles() == vec3_angle)
+	{
+		VectorSubtract(in, const_cast<CEngineObject*>(this)->GetAbsOrigin(), *pOut);
+	}
+	else
+	{
+		VectorITransform(in, EntityToWorldTransform(), *pOut);
+	}
+}
+
 
 //-----------------------------------------------------------------------------
 // Sets the local position from a transform

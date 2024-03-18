@@ -195,7 +195,7 @@ void CDecal::StaticDecal( void )
 		if ( ent )
 		{
 			modelIndex = ent->GetModelIndex();
-			VectorITransform( GetAbsOrigin(), ent->EntityToWorldTransform(), position );
+			VectorITransform( GetAbsOrigin(), ent->GetEngineObject()->EntityToWorldTransform(), position );
 
 			canDraw = ( modelIndex != 0 );
 			if ( !canDraw )

@@ -1453,7 +1453,7 @@ void CBaseAnimating::GetBoneTransform( int iBone, matrix3x4_t &pBoneToWorld )
 
 	if ( !pmatrix )
 	{
-		MatrixCopy( EntityToWorldTransform(), pBoneToWorld );
+		MatrixCopy(GetEngineObject()->EntityToWorldTransform(), pBoneToWorld );
 		return;
 	}
 
@@ -1945,14 +1945,14 @@ bool CBaseAnimating::GetAttachment( int iAttachment, matrix3x4_t &attachmentToWo
 	CStudioHdr *pStudioHdr = GetModelPtr( );
 	if (!pStudioHdr)
 	{
-		MatrixCopy(EntityToWorldTransform(), attachmentToWorld);
+		MatrixCopy(GetEngineObject()->EntityToWorldTransform(), attachmentToWorld);
 		AssertOnce(!"CBaseAnimating::GetAttachment: model missing");
 		return false;
 	}
 
 	if (iAttachment < 1 || iAttachment > pStudioHdr->GetNumAttachments())
 	{
-		MatrixCopy(EntityToWorldTransform(), attachmentToWorld);
+		MatrixCopy(GetEngineObject()->EntityToWorldTransform(), attachmentToWorld);
 //		Assert(!"CBaseAnimating::GetAttachment: invalid attachment index");
 		return false;
 	}
@@ -2047,7 +2047,7 @@ bool CBaseAnimating::GetAttachmentLocal( int iAttachment, matrix3x4_t &attachmen
 	matrix3x4_t attachmentToWorld;
 	bool bRet = GetAttachment(iAttachment, attachmentToWorld);
 	matrix3x4_t worldToEntity;
-	MatrixInvert( EntityToWorldTransform(), worldToEntity );
+	MatrixInvert(GetEngineObject()->EntityToWorldTransform(), worldToEntity );
 	ConcatTransforms( worldToEntity, attachmentToWorld, attachmentToLocal ); 
 	return bRet;
 }
@@ -3142,7 +3142,7 @@ bool CBaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldMi
 	pVecWorldMaxs->Init( -FLT_MAX, -FLT_MAX, -FLT_MAX );
 
 	matrix3x4_t worldToEntity, boneToEntity;
-	MatrixInvert( EntityToWorldTransform(), worldToEntity );
+	MatrixInvert(GetEngineObject()->EntityToWorldTransform(), worldToEntity );
 
 	Vector vecBoxAbsMins, vecBoxAbsMaxs;
 	for ( int i = 0; i < set->numhitboxes; i++ )
