@@ -2795,7 +2795,7 @@ void CNPC_MetroPolice::OnAnimEventStartDeployManhack( void )
 	pManhack->Spawn();
 
 	// Make us move with his hand until we're deployed
-	pManhack->SetParent( this, handAttachment );
+	pManhack->GetEngineObject()->SetParent( this->GetEngineObject(), handAttachment);
 
 	m_hManhack = pManhack;
 }
@@ -3055,7 +3055,7 @@ void CNPC_MetroPolice::ReleaseManhack( void )
 	// Release us
 	m_hManhack->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	m_hManhack->SetMoveType( MOVETYPE_VPHYSICS );
-	m_hManhack->SetParent( NULL );
+	m_hManhack->GetEngineObject()->SetParent( NULL );
 
 	// Make us active
 	m_hManhack->RemoveSpawnFlags( SF_NPC_WAIT_FOR_SCRIPT );

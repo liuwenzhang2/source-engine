@@ -182,7 +182,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_Beam )
 #endif
 	SendPropModelIndex(SENDINFO(m_nModelIndex) ),
 	SendPropVector (SENDINFO_ORIGIN(m_vecOrigin), 19, SPROP_CHANGES_OFTEN,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_Origin),
-	SendPropEHandle(SENDINFO_NAME(m_hMoveParent, moveparent), 0, SendProxy_MoveParentToInt),
+	SendPropEHandle(SENDINFO_MOVEPARENT(moveparent), 0, SendProxy_MoveParentToInt),
 	SendPropInt		(SENDINFO(m_nMinDXLevel),	8,	SPROP_UNSIGNED ),
 //#if !defined( NO_ENTITY_PREDICTION )
 //	SendPropDataTable( "beampredictable_id", 0, &REFERENCE_SEND_TABLE( DT_BeamPredictableId ), SendProxy_SendPredictableId ),
@@ -498,7 +498,7 @@ const Vector &CBeam::GetAbsEndPos( void ) const
 			return ent->GetAbsOrigin();
 	}
 
-	if (!const_cast<CBeam*>(this)->GetMoveParent())
+	if (!const_cast<CBeam*>(this)->GetEngineObject()->GetMoveParent())
 		return m_vecEndPos.Get();
 
 	// FIXME: Cache this off?
@@ -868,7 +868,7 @@ void CBeam::InputNoise( inputdata_t &inputdata )
 int CBeam::UpdateTransmitState( void )
 {
 	// we must call ShouldTransmit() if we have a move parent
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 		return SetTransmitState( FL_EDICT_FULLCHECK );
 
 	return BaseClass::UpdateTransmitState( );
@@ -898,9 +898,9 @@ int CBeam::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 		return FL_EDICT_DONTSEND;
 
 	// Transmit us with the same rules as our move parent
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
-		return GetMoveParent()->ShouldTransmit( pInfo );
+		return GetEngineObject()->GetMoveParent()->GetOuter()->ShouldTransmit(pInfo);
 	}
 
 	return BaseClass::ShouldTransmit( pInfo );

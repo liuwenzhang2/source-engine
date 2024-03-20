@@ -388,9 +388,12 @@ public:
 	void					CalcAbsoluteVelocity();
 
 	CEngineObject* GetMoveParent(void);
+	void SetMoveParent(EHANDLE hMoveParent);
 	CEngineObject* GetRootMoveParent();
 	CEngineObject* FirstMoveChild(void);
+	void SetFirstMoveChild(EHANDLE hMoveChild);
 	CEngineObject* NextMovePeer(void);
+	void SetNextMovePeer(EHANDLE hMovePeer);
 
 	// Returns the entity-to-world transform
 	matrix3x4_t& EntityToWorldTransform();
@@ -415,6 +418,19 @@ public:
 
 	void	GetVectors(Vector* forward, Vector* right, Vector* up) const;
 
+	// Set the movement parent. Your local origin and angles will become relative to this parent.
+	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
+	// are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
+	// current m_iParentAttachment.
+	void	SetParent(CEngineObject* pNewParent, int iAttachment = -1);
+	// FIXME: Make hierarchy a member of CBaseEntity
+	// or a contained private class...
+	static void UnlinkChild(CEngineObject* pParent, CEngineObject* pChild);
+	static void LinkChild(CEngineObject* pParent, CEngineObject* pChild);
+	static void ClearParent(CEngineObject* pEntity);
+	static void UnlinkAllChildren(CEngineObject* pParent);
+	static void UnlinkFromParent(CEngineObject* pRemove);
+	static void TransferChildren(CEngineObject* pOldParent, CEngineObject* pNewParent);
 private:
 
 	friend class CBaseEntity;
@@ -427,6 +443,13 @@ private:
 	Vector			m_vecAbsVelocity;
 	CBaseEntity*	m_pOuter;
 
+	// Our immediate parent in the movement hierarchy.
+	// FIXME: clarify m_pParent vs. m_pMoveParent
+	EHANDLE m_hMoveParent;
+	// cached child list
+	EHANDLE m_hMoveChild;
+	// generated from m_pMoveParent
+	EHANDLE m_hMovePeer;
 	// local coordinate frame of entity
 	matrix3x4_t		m_rgflCoordinateFrame;
 };
@@ -666,11 +689,10 @@ public:
 	void		SetName( string_t newTarget );
 	void		SetParent( string_t newParent, CBaseEntity *pActivator, int iAttachment = -1 );
 	
-	// Set the movement parent. Your local origin and angles will become relative to this parent.
-	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
-	// are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
-	// current m_iParentAttachment.
-	virtual void	SetParent( CBaseEntity* pNewParent, int iAttachment = -1 );
+	
+	virtual void	BeforeUnlinkParent(CBaseEntity* pNewParent, int iAttachment = -1) {}
+	virtual void	AfterLinkParent(CBaseEntity* pOldParent, int iAttachment = -1) {}
+
 	//CBaseEntity* GetParent();
 	int			GetParentAttachment();
 
@@ -1583,10 +1605,10 @@ public:
 	virtual unsigned int	PhysicsSolidMaskForEntity( void ) const;
 
 	// Computes the abs position of a point specified in local space
-	void					ComputeAbsPosition( const Vector &vecLocalPosition, Vector *pAbsPosition );
+	//void					ComputeAbsPosition( const Vector &vecLocalPosition, Vector *pAbsPosition );
 
 	// Computes the abs position of a direction specified in local space
-	void					ComputeAbsDirection( const Vector &vecLocalDirection, Vector *pAbsDirection );
+	//void					ComputeAbsDirection( const Vector &vecLocalDirection, Vector *pAbsDirection );
 
 	//void					SetPredictionEligible( bool canpredict );
 
@@ -1734,13 +1756,7 @@ private:
 	CNetworkVar( unsigned char, m_MoveType );		// One of the MOVETYPE_ defines.
 	CNetworkVar( unsigned char, m_MoveCollide );
 
-	// Our immediate parent in the movement hierarchy.
-	// FIXME: clarify m_pParent vs. m_pMoveParent
-	CNetworkHandle( CBaseEntity, m_hMoveParent );
-	// cached child list
-	EHANDLE m_hMoveChild;	
-	// generated from m_pMoveParent
-	EHANDLE m_hMovePeer;	
+	
 
 	CEngineObject m_EngineObject;
 
@@ -1868,14 +1884,7 @@ private:
 	static int						m_nPredictionRandomSeed;
 	static CBasePlayer				*m_pPredictionPlayer;
 
-	// FIXME: Make hierarchy a member of CBaseEntity
-	// or a contained private class...
-	friend void UnlinkChild( CBaseEntity *pParent, CBaseEntity *pChild );
-	friend void LinkChild( CBaseEntity *pParent, CBaseEntity *pChild );
-	friend void ClearParent( CBaseEntity *pEntity );
-	friend void UnlinkAllChildren( CBaseEntity *pParent );
-	friend void UnlinkFromParent( CBaseEntity *pRemove );
-	friend void TransferChildren( CBaseEntity *pOldParent, CBaseEntity *pNewParent );
+	
 	
 public:
 	// Accessors for above
@@ -2062,17 +2071,17 @@ inline bool CBaseEntity::Debug_ShouldStep(void)
 //-----------------------------------------------------------------------------
 inline CBaseEntity *CBaseEntity::GetMoveParent( void )
 {
-	return m_hMoveParent.Get(); 
+	return GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 }
 
 inline CBaseEntity *CBaseEntity::FirstMoveChild( void )
 {
-	return m_hMoveChild.Get(); 
+	return GetEngineObject()->FirstMoveChild()? GetEngineObject()->FirstMoveChild()->GetOuter():NULL;
 }
 
 inline CBaseEntity *CBaseEntity::NextMovePeer( void )
 {
-	return m_hMovePeer.Get();
+	return GetEngineObject()->NextMovePeer()? GetEngineObject()->NextMovePeer()->GetOuter():NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -2080,15 +2089,7 @@ inline CBaseEntity *CBaseEntity::NextMovePeer( void )
 //-----------------------------------------------------------------------------
 inline CBaseEntity* CBaseEntity::GetRootMoveParent()
 {
-	CBaseEntity* pEntity = this;
-	CBaseEntity* pParent = this->GetMoveParent();
-	while (pParent)
-	{
-		pEntity = pParent;
-		pParent = pEntity->GetMoveParent();
-	}
-
-	return pEntity;
+	return GetEngineObject()->GetRootMoveParent() ? GetEngineObject()->GetRootMoveParent()->GetOuter() : NULL;
 }
 
 // FIXME: Remove this! There shouldn't be a difference between moveparent + parent

@@ -90,6 +90,18 @@ class CEngineObjectSaveDataOps : public CDefSaveRestoreOps
 		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsVelocity")) {
 			Vector verOrigin = pEntity->GetAbsVelocity();
 			pSave->WritePositionVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveParent")) {
+			CBaseEntity* pMoveParent = pEntity->GetEngineObject()->GetMoveParent()? pEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+			EHANDLE Handle = pMoveParent ? pMoveParent->GetRefEHandle() : INVALID_EHANDLE_INDEX;
+			pSave->WriteEHandle(&Handle, fieldInfo.pTypeDesc->fieldSize);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveChild")) {
+			CBaseEntity* pMoveChild = pEntity->GetEngineObject()->FirstMoveChild() ? pEntity->GetEngineObject()->FirstMoveChild()->GetOuter() : NULL;
+			EHANDLE Handle = pMoveChild ? pMoveChild->GetRefEHandle() : INVALID_EHANDLE_INDEX;
+			pSave->WriteEHandle(&Handle, fieldInfo.pTypeDesc->fieldSize);
+		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMovePeer")) {
+			CBaseEntity* pMovePeer = pEntity->GetEngineObject()->NextMovePeer() ? pEntity->GetEngineObject()->NextMovePeer()->GetOuter() : NULL;
+			EHANDLE Handle = pMovePeer ? pMovePeer->GetRefEHandle() : INVALID_EHANDLE_INDEX;
+			pSave->WriteEHandle(&Handle, fieldInfo.pTypeDesc->fieldSize);
 		}
 	}
 
@@ -121,7 +133,24 @@ class CEngineObjectSaveDataOps : public CDefSaveRestoreOps
 			Vector vecVelocity;
 			pRestore->ReadVector(&vecVelocity, fieldInfo.pTypeDesc->fieldSize, 0);
 			pEntity->SetAbsVelocity(vecVelocity);
+		} 
+#ifdef GAME_DLL
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveParent")) {
+			EHANDLE handle;
+			pRestore->ReadEHandle(&handle, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->GetEngineObject()->SetMoveParent(handle);
 		}
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveChild")) {
+			EHANDLE handle;
+			pRestore->ReadEHandle(&handle, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->GetEngineObject()->SetFirstMoveChild(handle);
+		}
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMovePeer")) {
+			EHANDLE handle;
+			pRestore->ReadEHandle(&handle, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->GetEngineObject()->SetNextMovePeer(handle);
+		}
+#endif // GAME_DLL
 	}
 
 
@@ -1295,7 +1324,7 @@ IPhysicsObject *CBaseEntity::VPhysicsInitStatic( void )
 	if (GetEngineObject()->GetMoveParent() )
 	{
 		// must be SOLID_VPHYSICS if in hierarchy to solve collisions correctly
-		if ( GetSolid() == SOLID_BSP && GetRootMoveParent()->GetSolid() != SOLID_BSP )
+		if ( GetSolid() == SOLID_BSP && GetEngineObject()->GetRootMoveParent()->GetOuter()->GetSolid() != SOLID_BSP)
 		{
 			SetSolid( SOLID_VPHYSICS );
 		}
@@ -2419,7 +2448,7 @@ void CBaseEntity::FollowEntity( CBaseEntity *pBaseEntity, bool bBoneMerge )
 	if (pBaseEntity)
 	{
 #ifdef GAME_DLL
-		SetParent(pBaseEntity);
+		GetEngineObject()->SetParent(pBaseEntity->GetEngineObject());
 #endif // GAME_DLL
 #ifdef CLIENT_DLL
 		GetEngineObject()->SetParent(pBaseEntity->GetEngineObject());

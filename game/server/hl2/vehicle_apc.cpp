@@ -323,7 +323,7 @@ void CPropAPC::AddSmokeTrail( const Vector &vecPos )
 	pSmokeTrail->m_MinDirectedSpeed	= 16.0f;
 	pSmokeTrail->m_MaxDirectedSpeed	= 16.0f;
 	pSmokeTrail->SetLifetime( 5 );
-	pSmokeTrail->SetParent( this, nAttachment );
+	pSmokeTrail->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
 
 	Vector vecForward( 0, 0, 1 );
 	QAngle angles;

@@ -2155,7 +2155,7 @@ void CPointCombineBallLauncher::SpawnBall()
 			DispatchSpawn(pBullseye);
 			pBullseye->Activate();
 
-			pBullseye->SetParent(pBall);
+			pBullseye->GetEngineObject()->SetParent(pBall->GetEngineObject());
 			pBullseye->SetHealth(10);
 		}
 	}

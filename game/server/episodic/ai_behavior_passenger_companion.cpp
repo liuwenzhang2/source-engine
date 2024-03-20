@@ -1236,7 +1236,7 @@ bool CAI_PassengerBehaviorCompanion::ExitStuckVehicle( void )
 		return false;
 
 	// Detach from the parent
-	GetOuter()->SetParent( NULL );
+	GetOuter()->GetEngineObject()->SetParent( NULL );
 
 	// Do all necessary clean-up
 	FinishExitVehicle();

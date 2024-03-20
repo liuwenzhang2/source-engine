@@ -763,7 +763,7 @@ void CFuncTank::Spawn( void )
 			int nAttachment = pAnim->LookupAttachment( STRING( m_iszBaseAttachment ) );
 			if ( nAttachment != 0 )
 			{
-				SetParent( pAnim, nAttachment );
+				GetEngineObject()->SetParent( pAnim->GetEngineObject(), nAttachment);
 				SetLocalOrigin( vec3_origin );
 				SetLocalAngles( vec3_angle );
 			}
@@ -873,7 +873,7 @@ void CFuncTank::Activate( void )
 
 	if ((pParent != NULL) && (pParent->entindex() != -1))
 	{
-		SetParent( pParent );
+		GetEngineObject()->SetParent( pParent->GetEngineObject() );
 	}
 
 	if (GetMoveParent() && GetMoveParent()->GetBaseAnimating() )
@@ -884,7 +884,7 @@ void CFuncTank::Activate( void )
 			int nAttachment = pAnim->LookupAttachment( STRING( m_iszBaseAttachment ) );
 			if ( nAttachment != 0 )
 			{
-				SetParent( pAnim, nAttachment );
+				GetEngineObject()->SetParent( pAnim->GetEngineObject(), nAttachment);
 				SetLocalOrigin( vec3_origin );
 				SetLocalAngles( vec3_angle );
 			}

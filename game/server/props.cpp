@@ -390,7 +390,7 @@ void CBreakableProp::SetEnableMotionPosition( const Vector &position, const QAng
 	CBaseEntity *pFixup = CBaseEntity::Create( "point_enable_motion_fixup", position, angles, this );
 	if ( pFixup )
 	{
-		pFixup->SetParent( this );
+		pFixup->GetEngineObject()->SetParent( this->GetEngineObject() );
 	}
 }
 
@@ -422,7 +422,7 @@ void CBreakableProp::ClearEnableMotionPosition()
 	CBaseEntity *pFixup = FindEnableMotionFixup();
 	if ( pFixup )
 	{
-		UnlinkFromParent( pFixup );
+		CEngineObject::UnlinkFromParent( pFixup->GetEngineObject());
 		UTIL_Remove( pFixup );
 	}
 }
@@ -1492,7 +1492,7 @@ void CBreakableProp::CreateFlare( float flLifetime )
 		pFlare->SetRenderMode( kRenderTransAlpha );
 		pFlare->SetRenderColorA( 1 );
 		pFlare->SetLocalOrigin( vOrigin );
-		pFlare->SetParent( this, iAttachment );
+		pFlare->GetEngineObject()->SetParent( this->GetEngineObject(), iAttachment );
 		RemoveInteraction( PROPINTER_PHYSGUN_CREATE_FLARE );
 		m_hFlareEnt = pFlare;
 
@@ -1961,9 +1961,9 @@ void CDynamicProp::OnRestore( void )
 	BoneFollowerHierarchyChanged();
 }
 
-void CDynamicProp::SetParent( CBaseEntity *pNewParent, int iAttachment )
+void CDynamicProp::AfterLinkParent( CBaseEntity *pOldParent, int iAttachment )
 {
-	BaseClass::SetParent(pNewParent, iAttachment);
+	//BaseClass::SetParent(pNewParent, iAttachment);
 	BoneFollowerHierarchyChanged();
 }
 

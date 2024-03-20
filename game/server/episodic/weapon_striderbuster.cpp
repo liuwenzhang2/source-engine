@@ -257,7 +257,7 @@ void CWeaponStriderBuster::Spawn( void )
 			m_hParticleEffect->Activate();
 		}
 		m_hParticleEffect->SetAbsOrigin( GetAbsOrigin() );
-		m_hParticleEffect->SetParent( this );
+		m_hParticleEffect->GetEngineObject()->SetParent( this->GetEngineObject() );
 	}
 
 	SetHealth( striderbuster_health.GetFloat() );
@@ -467,7 +467,7 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 					{
 						pFlare->KeyValue( "start_active", "1" );
 						pFlare->KeyValue( "effect_name", "striderbuster_attached_pulse" );
-						pFlare->SetParent( this );
+						pFlare->GetEngineObject()->SetParent( this->GetEngineObject() );
 						pFlare->SetLocalOrigin( vec3_origin );
 						DispatchSpawn( pFlare );
 						pFlare->Activate();
@@ -487,7 +487,7 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 						m_hGlowSprite->SetScale( 5.0f );
 						m_hGlowSprite->m_nRenderFX = kRenderFxStrobeFaster;
 						m_hGlowSprite->SetGlowProxySize( 16.0f );
-						m_hGlowSprite->SetParent( this );
+						m_hGlowSprite->GetEngineObject()->SetParent( this->GetEngineObject() );
 					}
 				}
 

@@ -164,7 +164,7 @@ void CWeaponBugBait::Drop( const Vector &vecVelocity )
 
 		pSporeExplosion->SetAbsAngles( angles );
 		pSporeExplosion->SetAbsOrigin( GetAbsOrigin() );
-		pSporeExplosion->SetParent( this );
+		pSporeExplosion->GetEngineObject()->SetParent( this->GetEngineObject() );
 
 		pSporeExplosion->m_flSpawnRate			= 16.0f;
 		pSporeExplosion->m_flParticleLifetime	= 0.5f;

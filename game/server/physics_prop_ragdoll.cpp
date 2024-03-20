@@ -1279,10 +1279,10 @@ CBaseAnimating *CreateServerRagdollSubmodel( CBaseAnimating *pOwner, const char 
 	pRagdoll->ResetSequence( 0 );
 
 	// let bone merging do the work of copying everything over for us
-	pRagdoll->SetParent( pOwner );
+	pRagdoll->GetEngineObject()->SetParent( pOwner?pOwner->GetEngineObject():NULL );
 	pRagdoll->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );
 	// HACKHACK: don't want this parent anymore
-	pRagdoll->SetParent( NULL );
+	pRagdoll->GetEngineObject()->SetParent( NULL );
 
 	memcpy( pBoneToWorldNext, pBoneToWorld, sizeof(pBoneToWorld) );
 
@@ -1461,7 +1461,7 @@ void CRagdollPropAttached::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 void CRagdollPropAttached::Detach()
 {
-	SetParent(NULL);
+	GetEngineObject()->SetParent(NULL);
 	SetOwnerEntity( NULL );
 	SetAbsAngles( vec3_angle );
 	SetMoveType( MOVETYPE_VPHYSICS );
@@ -1544,7 +1544,7 @@ void CRagdollPropAttached::InitRagdollAttached(
 	PhysDisableEntityCollisions( pAttached, m_ragdoll.list[0].pObject );
 	m_pAttachConstraint = physenv->CreateRagdollConstraint( pRefObject, pAttached, m_ragdoll.pGroup, constraint );
 
-	SetParent( pFollow );
+	GetEngineObject()->SetParent( pFollow->GetEngineObject() );
 	SetOwnerEntity( pFollow );
 
 	RagdollActivate( m_ragdoll, modelinfo->GetVCollide( GetModelIndex() ), GetModelIndex() );

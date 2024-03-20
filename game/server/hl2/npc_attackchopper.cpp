@@ -1100,7 +1100,7 @@ void CNPC_AttackHelicopter::Spawn( void )
 	int nBombAttachment = LookupAttachment("bomb");
 	m_hSensor = static_cast<CBombDropSensor*>(gEntList.CreateEntityByName( "npc_helicoptersensor" ));
 	m_hSensor->Spawn();
-	m_hSensor->SetParent( this, nBombAttachment );
+	m_hSensor->GetEngineObject()->SetParent( this->GetEngineObject(), nBombAttachment);
 	m_hSensor->SetLocalOrigin( vec3_origin );
 	m_hSensor->SetLocalAngles( vec3_angle );
 	m_hSensor->SetOwnerEntity( this );
@@ -1146,7 +1146,7 @@ void CNPC_AttackHelicopter::Startup()
 			if ( !m_hLights[i] )
 				continue;
 
-			m_hLights[i]->SetParent( this, nAttachment );
+			m_hLights[i]->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
 			m_hLights[i]->SetLocalOrigin( vec3_origin );
 			m_hLights[i]->SetLocalVelocity( vec3_origin );
 			m_hLights[i]->SetMoveType( MOVETYPE_NONE );
@@ -3289,7 +3289,7 @@ void CNPC_AttackHelicopter::AddSmokeTrail( const Vector &vecPos )
 		m_hSmokeTrail[m_nSmokeTrailCount] = pFireTrail;
 
 		pFireTrail->FollowEntity( this, UTIL_VarArgs( "damage%d", m_nSmokeTrailCount ) );
-		pFireTrail->SetParent( this, nAttachment );
+		pFireTrail->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
 		pFireTrail->SetLocalOrigin( vec3_origin );
 		pFireTrail->SetMoveType( MOVETYPE_NONE );
 		pFireTrail->SetLifetime( -1 );
@@ -3313,7 +3313,7 @@ void CNPC_AttackHelicopter::AddSmokeTrail( const Vector &vecPos )
 		pSmokeTrail->m_MinSpeed = 16;
 		pSmokeTrail->m_MaxSpeed = 64;
 		pSmokeTrail->SetLifetime(-1);
-		pSmokeTrail->SetParent( this, nAttachment );
+		pSmokeTrail->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
 		pSmokeTrail->SetLocalOrigin( vec3_origin );
 		pSmokeTrail->SetMoveType( MOVETYPE_NONE );
 	}
@@ -3399,7 +3399,7 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 		return;
 
 	pFireTrail->FollowEntity( pChunk, "" );
-	pFireTrail->SetParent( pChunk, 0 );
+	pFireTrail->GetEngineObject()->SetParent( pChunk->GetEngineObject(), 0);
 	pFireTrail->SetLocalOrigin( vec3_origin );
 	pFireTrail->SetMoveType( MOVETYPE_NONE );
 	pFireTrail->SetLifetime( pChunk->m_lifeTime );
@@ -5612,7 +5612,7 @@ CBaseEntity *CreateHelicopterAvoidanceSphere( CBaseEntity *pParent, int nAttachm
 		pSphere->AddSpawnFlags( SF_AVOIDSPHERE_AVOID_BELOW );
 	}
 	pSphere->Spawn();
-	pSphere->SetParent( pParent, nAttachment );
+	pSphere->GetEngineObject()->SetParent( pParent?pParent->GetEngineObject():NULL, nAttachment);
 	pSphere->SetLocalOrigin( vec3_origin );
 	pSphere->SetLocalAngles( vec3_angle );
 	pSphere->SetOwnerEntity( pParent );
@@ -6108,7 +6108,7 @@ CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos,
 		return pChunk;
 
 	pFireTrail->FollowEntity( pChunk, "damage" );
-	pFireTrail->SetParent( pChunk, 1 );
+	pFireTrail->GetEngineObject()->SetParent( pChunk->GetEngineObject(), 1);
 	pFireTrail->SetLocalOrigin( vec3_origin );
 	pFireTrail->SetMoveType( MOVETYPE_NONE );
 	pFireTrail->SetLifetime( 10.0f );

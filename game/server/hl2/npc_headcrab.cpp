@@ -1256,7 +1256,7 @@ void CBaseHeadcrab::JumpFromCanister()
 
 	SetActivity( ACT_RANGE_ATTACK1 );
 	StudioFrameAdvanceManual( 0.0 );
-	SetParent( NULL );
+	GetEngineObject()->SetParent( NULL );
 	RemoveFlag( FL_FLY );
 	IncrementInterpolationFrame();
 

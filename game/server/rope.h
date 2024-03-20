@@ -81,7 +81,7 @@ public:
 
 	virtual int		UpdateTransmitState(void);
 	virtual void	SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways );
-	virtual void	SetParent( CBaseEntity *pParentEntity, int iAttachment );
+	virtual void	BeforeUnlinkParent( CBaseEntity *pNewParent, int iAttachment );
 
 // Input functions.
 public:

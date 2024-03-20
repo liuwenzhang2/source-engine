@@ -594,7 +594,7 @@ void CHunterFlechette::StickTo( CBaseEntity *pOther, trace_t &tr )
 	
 	if ( !pOther->IsWorld() )
 	{
-		SetParent( pOther );
+		GetEngineObject()->SetParent( pOther->GetEngineObject() );
 		SetSolid( SOLID_NONE );
 		SetSolidFlags( FSOLID_NOT_SOLID );
 	}

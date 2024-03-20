@@ -447,7 +447,7 @@ void CNPC_Zombine::DropGrenade( Vector vDir )
 	if ( m_hGrenade == NULL )
 		 return;
 
-	m_hGrenade->SetParent( NULL );
+	m_hGrenade->GetEngineObject()->SetParent( NULL );
 	m_hGrenade->SetOwnerEntity( NULL );
 
 	Vector vGunPos;
@@ -557,7 +557,7 @@ void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 				pGrenade->SetAbsOrigin( vecStart );
 				pGrenade->SetAbsAngles( angles );
 
-				pGrenade->SetParent( this, iAttachment );
+				pGrenade->GetEngineObject()->SetParent( this->GetEngineObject(), iAttachment);
 
 				pGrenade->SetDamage( 200.0f );
 				m_hGrenade = pGrenade;

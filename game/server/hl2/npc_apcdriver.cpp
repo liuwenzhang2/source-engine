@@ -96,7 +96,7 @@ void CNPC_APCDriver::Activate( void )
 		UTIL_Remove( this );
 		return;
 	}
-	SetParent( m_hAPC );
+	GetEngineObject()->SetParent( m_hAPC->GetEngineObject() );
 	SetAbsOrigin( m_hAPC->WorldSpaceCenter() );
 	SetLocalAngles( vec3_angle );
 

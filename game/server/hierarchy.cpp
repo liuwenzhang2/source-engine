@@ -18,34 +18,36 @@
 // Input  : pParent - 
 //			pChild - 
 //-----------------------------------------------------------------------------
-void UnlinkChild( CBaseEntity *pParent, CBaseEntity *pChild )
+void CEngineObject::UnlinkChild( CEngineObject *pParent, CEngineObject *pChild )
 {
-	CBaseEntity *pList;
-	EHANDLE *pPrev;
-
-	pList = pParent->m_hMoveChild;
-	pPrev = &pParent->m_hMoveChild;
+	CEngineObject *pList = pParent->FirstMoveChild();
+	CEngineObject *pPrev = NULL;
+	
 	while ( pList )
 	{
-		CBaseEntity *pNext = pList->m_hMovePeer;
+		CEngineObject *pNext = pList->NextMovePeer();
 		if ( pList == pChild )
 		{
 			// patch up the list
-			pPrev->Set( pNext );
+			if (!pPrev) {
+				pParent->SetFirstMoveChild(pNext?pNext->GetOuter():NULL);
+			}else{
+				pPrev->SetNextMovePeer(pNext?pNext->GetOuter():NULL);
+			}
 
 			// Clear hierarchy bits for this guy
-			pList->m_hMoveParent.Set( NULL );
-			pList->m_hMovePeer.Set( NULL );
-			pList->NetworkProp()->SetNetworkParent( CBaseHandle() );
-			pList->DispatchUpdateTransmitState();	
-			pList->OnEntityEvent( ENTITY_EVENT_PARENT_CHANGED, NULL );
+			pList->SetMoveParent( NULL );
+			pList->SetNextMovePeer( NULL );
+			pList->GetOuter()->NetworkProp()->SetNetworkParent( CBaseHandle() );
+			pList->GetOuter()->DispatchUpdateTransmitState();
+			pList->GetOuter()->OnEntityEvent( ENTITY_EVENT_PARENT_CHANGED, NULL );
 			
-			pParent->RecalcHasPlayerChildBit();
+			pParent->GetOuter()->RecalcHasPlayerChildBit();
 			return;
 		}
 		else
 		{
-			pPrev = &pList->m_hMovePeer;
+			pPrev = pList;
 			pList = pNext;
 		}
 	}
@@ -54,22 +56,22 @@ void UnlinkChild( CBaseEntity *pParent, CBaseEntity *pChild )
 	Assert(0);
 }
 
-void LinkChild( CBaseEntity *pParent, CBaseEntity *pChild )
+void CEngineObject::LinkChild( CEngineObject *pParent, CEngineObject *pChild )
 {
-	EHANDLE hParent;
-	hParent.Set( pParent );
-	pChild->m_hMovePeer.Set( pParent->FirstMoveChild() );
-	pParent->m_hMoveChild.Set( pChild );
-	pChild->m_hMoveParent = hParent;
-	pChild->NetworkProp()->SetNetworkParent( hParent );
-	pChild->DispatchUpdateTransmitState();
-	pChild->OnEntityEvent( ENTITY_EVENT_PARENT_CHANGED, NULL );
-	pParent->RecalcHasPlayerChildBit();
+	//EHANDLE hParent;
+	//hParent.Set( pParent->GetOuter() );
+	pChild->SetNextMovePeer( pParent->GetOuter()->FirstMoveChild());
+	pParent->SetFirstMoveChild( pChild->GetOuter() );
+	pChild->SetMoveParent(pParent->GetOuter());
+	pChild->GetOuter()->NetworkProp()->SetNetworkParent(pParent->GetOuter());
+	pChild->GetOuter()->DispatchUpdateTransmitState();
+	pChild->GetOuter()->OnEntityEvent( ENTITY_EVENT_PARENT_CHANGED, NULL );
+	pParent->GetOuter()->RecalcHasPlayerChildBit();
 }
 
-void TransferChildren( CBaseEntity *pOldParent, CBaseEntity *pNewParent )
+void CEngineObject::TransferChildren( CEngineObject *pOldParent, CEngineObject *pNewParent )
 {
-	CBaseEntity *pChild = pOldParent->FirstMoveChild();
+	CEngineObject *pChild = pOldParent->FirstMoveChild();
 	while ( pChild )
 	{
 		// NOTE: Have to do this before the unlink to ensure local coords are valid
@@ -77,14 +79,15 @@ void TransferChildren( CBaseEntity *pOldParent, CBaseEntity *pNewParent )
 		QAngle angAbsRotation = pChild->GetAbsAngles();
 		Vector vecAbsVelocity = pChild->GetAbsVelocity();
 //		QAngle vecAbsAngVelocity = pChild->GetAbsAngularVelocity();
-
+		pChild->GetOuter()->BeforeUnlinkParent(pOldParent->GetOuter());
 		UnlinkChild( pOldParent, pChild );
 		LinkChild( pNewParent, pChild );
+		pChild->GetOuter()->AfterLinkParent(pNewParent->GetOuter());
 
 		// FIXME: This is a hack to guarantee update of the local origin, angles, etc.
-		pChild->GetEngineObject()->GetAbsOrigin().Init(FLT_MAX, FLT_MAX, FLT_MAX);
-		pChild->GetEngineObject()->GetAbsAngles().Init(FLT_MAX, FLT_MAX, FLT_MAX);
-		pChild->GetEngineObject()->GetAbsVelocity().Init(FLT_MAX, FLT_MAX, FLT_MAX);
+		pChild->GetAbsOrigin().Init(FLT_MAX, FLT_MAX, FLT_MAX);
+		pChild->GetAbsAngles().Init(FLT_MAX, FLT_MAX, FLT_MAX);
+		pChild->GetAbsVelocity().Init(FLT_MAX, FLT_MAX, FLT_MAX);
 
 		pChild->SetAbsOrigin(vecAbsOrigin);
 		pChild->SetAbsAngles(angAbsRotation);
@@ -95,7 +98,7 @@ void TransferChildren( CBaseEntity *pOldParent, CBaseEntity *pNewParent )
 	}
 }
 
-void UnlinkFromParent( CBaseEntity *pRemove )
+void CEngineObject::UnlinkFromParent( CEngineObject *pRemove )
 {
 	if ( pRemove->GetMoveParent() )
 	{
@@ -111,7 +114,7 @@ void UnlinkFromParent( CBaseEntity *pRemove )
 		pRemove->SetLocalAngles(angAbsRotation);
 		pRemove->SetLocalVelocity(vecAbsVelocity);
 //		pRemove->SetLocalAngularVelocity(vecAbsAngVelocity);
-		pRemove->UpdateWaterState();
+		pRemove->GetOuter()->UpdateWaterState();
 	}
 }
 
@@ -119,12 +122,12 @@ void UnlinkFromParent( CBaseEntity *pRemove )
 //-----------------------------------------------------------------------------
 // Purpose: Clears the parent of all the children of the given object.
 //-----------------------------------------------------------------------------
-void UnlinkAllChildren( CBaseEntity *pParent )
+void CEngineObject::UnlinkAllChildren( CEngineObject *pParent )
 {
-	CBaseEntity *pChild = pParent->FirstMoveChild();
+	CEngineObject *pChild = pParent->FirstMoveChild();
 	while ( pChild )
 	{
-		CBaseEntity *pNext = pChild->NextMovePeer();
+		CEngineObject *pNext = pChild->NextMovePeer();
 		UnlinkFromParent( pChild );
 		pChild  = pNext;
 	}

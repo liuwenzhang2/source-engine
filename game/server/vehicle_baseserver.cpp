@@ -1147,7 +1147,7 @@ bool CBaseServerVehicle::HandlePassengerExit( CBaseCombatCharacter *pPassenger )
 
 				// We may as well stand where we're going to get out at and stop being parented
 				pPlayer->SetAbsOrigin( vecExitFeetPoint );
-				pPlayer->SetParent( NULL );
+				pPlayer->GetEngineObject()->SetParent( NULL );
 
 				return true;
 			}

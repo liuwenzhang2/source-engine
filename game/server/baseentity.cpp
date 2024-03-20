@@ -262,7 +262,7 @@ void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const
 	CBaseEntity* entity = (CBaseEntity*)pStruct;
 	Assert(entity);
 
-	CBaseEntity* pMoveParent = entity->GetMoveParent();
+	CBaseEntity* pMoveParent = entity->GetEngineObject()->GetMoveParent()? entity->GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 	CBaseHandle pHandle = pMoveParent ? pMoveParent->GetRefEHandle() : NULL;;
 	SendProxy_EHandleToInt(pProp, pStruct, &pHandle, pOut, iElement, objectID);
 }
@@ -291,7 +291,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropFloat	(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED ),
 	SendPropEHandle (SENDINFO(m_hOwnerEntity)),
 	SendPropEHandle (SENDINFO(m_hEffectEntity)),
-	SendPropEHandle (SENDINFO_NAME(m_hMoveParent, moveparent), 0, SendProxy_MoveParentToInt),
+	SendPropEHandle (SENDINFO_MOVEPARENT(/*m_hMoveParent,*/ moveparent), 0, SendProxy_MoveParentToInt),
 	SendPropInt		(SENDINFO(m_iParentAttachment), NUM_PARENTATTACHMENT_BITS, SPROP_UNSIGNED),
 
 	SendPropInt		(SENDINFO_NAME( m_MoveType, movetype ), MOVETYPE_MAX_BITS, SPROP_UNSIGNED ),
@@ -628,7 +628,7 @@ void CBaseEntity::StopFollowingEntity( )
 		return;
 	}
 
-	SetParent( NULL );
+	GetEngineObject()->SetParent( NULL );
 	RemoveEffects( EF_BONEMERGE );
 	RemoveSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
@@ -637,14 +637,14 @@ void CBaseEntity::StopFollowingEntity( )
 
 bool CBaseEntity::IsFollowingEntity()
 {
-	return IsEffectActive( EF_BONEMERGE ) && (GetMoveType() == MOVETYPE_NONE) && GetMoveParent();
+	return IsEffectActive( EF_BONEMERGE ) && (GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
 }
 
 CBaseEntity *CBaseEntity::GetFollowedEntity()
 {
 	if (!IsFollowingEntity())
 		return NULL;
-	return GetMoveParent();
+	return GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 }
 
 void CBaseEntity::SetClassname( const char *className )
@@ -1094,7 +1094,7 @@ void CBaseEntity::SetParent( string_t newParent, CBaseEntity *pActivator, int iA
 		{
 			Msg( "Entity %s(%s) has ambigious parent %s\n", STRING(m_iClassname), GetDebugName(), STRING(newParent) );
 		}
-		SetParent( pParent, iAttachment );
+		GetEngineObject()->SetParent( pParent->GetEngineObject(), iAttachment);
 	}
 }
 
@@ -1157,7 +1157,7 @@ void CBaseEntity::TransformStepData_WorldToParent( CBaseEntity *pParent )
 //			from the parent entity and will then follow the parent entity.
 // Input  : pParentEntity - This entity's new parent in the movement hierarchy.
 //-----------------------------------------------------------------------------
-void CBaseEntity::SetParent( CBaseEntity *pParentEntity, int iAttachment )
+void CEngineObject::SetParent( CEngineObject *pParentEntity, int iAttachment )
 {
 	if (pParentEntity == this)
 	{
@@ -1168,52 +1168,54 @@ void CBaseEntity::SetParent( CBaseEntity *pParentEntity, int iAttachment )
 	// If they didn't specify an attachment, use our current
 	if ( iAttachment == -1 )
 	{
-		iAttachment = m_iParentAttachment;
+		iAttachment = m_pOuter->m_iParentAttachment;
 	}
 
 	bool bWasNotParented = (GetMoveParent() == NULL );
-	CBaseEntity *pOldParent = m_hMoveParent;
+	CEngineObject *pOldParent = GetMoveParent();
 
+	this->m_pOuter->BeforeUnlinkParent(pParentEntity? pParentEntity->m_pOuter:NULL);
 	// notify the old parent of the loss
-	UnlinkFromParent( this );
+	CEngineObject::UnlinkFromParent( this);
 
 	if (pParentEntity == NULL)
 	{
-		m_iParent = NULL_STRING;
+		m_pOuter->m_iParent = NULL_STRING;
 
 		// Transform step data from parent to worldspace
-		TransformStepData_ParentToWorld(pOldParent);
+		m_pOuter->TransformStepData_ParentToWorld(pOldParent?pOldParent->m_pOuter:NULL);
 		return;
 	}
 	// set the new name
 	//m_pParent = pParentEntity;
-	m_iParent = pParentEntity->m_iName;
+	m_pOuter->m_iParent = pParentEntity->m_pOuter->m_iName;
 
-	RemoveSolidFlags( FSOLID_ROOT_PARENT_ALIGNED );
-	if ( const_cast<CBaseEntity *>(pParentEntity)->GetRootMoveParent()->GetSolid() == SOLID_BSP )
+	m_pOuter->RemoveSolidFlags( FSOLID_ROOT_PARENT_ALIGNED );
+	if ( const_cast<CEngineObject*>(pParentEntity)->GetRootMoveParent()->GetOuter()->GetSolid() == SOLID_BSP)
 	{
-		AddSolidFlags( FSOLID_ROOT_PARENT_ALIGNED );
+		m_pOuter->AddSolidFlags( FSOLID_ROOT_PARENT_ALIGNED );
 	}
 	else
 	{
-		if ( GetSolid() == SOLID_BSP )
+		if (m_pOuter->GetSolid() == SOLID_BSP )
 		{
 			// Must be SOLID_VPHYSICS because parent might rotate
-			SetSolid( SOLID_VPHYSICS );
+			m_pOuter->SetSolid( SOLID_VPHYSICS );
 		}
 	}
 	
 	// set the move parent if we have one
 	
 	// add ourselves to the list
-	LinkChild(pParentEntity, this );
+	CEngineObject::LinkChild(pParentEntity, this);
+	this->m_pOuter->AfterLinkParent(pOldParent?pOldParent->m_pOuter:NULL);
 
-	m_iParentAttachment = (char)iAttachment;
+	m_pOuter->m_iParentAttachment = (char)iAttachment;
 
 	EntityMatrix matrix, childMatrix;
-	matrix.InitFromEntity( const_cast<CBaseEntity *>(pParentEntity), m_iParentAttachment ); // parent->world
-	childMatrix.InitFromEntityLocal( this ); // child->world
-	Vector localOrigin = matrix.WorldToLocal(GetEngineObject()->GetLocalOrigin() );
+	matrix.InitFromEntity( const_cast<CBaseEntity *>(pParentEntity->m_pOuter), m_pOuter->m_iParentAttachment ); // parent->world
+	childMatrix.InitFromEntityLocal( this->m_pOuter); // child->world
+	Vector localOrigin = matrix.WorldToLocal(this->GetLocalOrigin() );
 		
 	// I have the axes of local space in world space. (childMatrix)
 	// I want to compute those world space axes in the parent's local space
@@ -1223,34 +1225,34 @@ void CBaseEntity::SetParent( CBaseEntity *pParentEntity, int iAttachment )
 	tmp.MatrixMul( childMatrix, matrix ); // child->parent
 	QAngle angles;
 	MatrixToAngles( matrix, angles );
-	GetEngineObject()->SetLocalAngles( angles );
-	UTIL_SetOrigin( this, localOrigin );
+	this->SetLocalAngles( angles );
+	UTIL_SetOrigin( this->m_pOuter, localOrigin );
 
 	// Move our step data into the correct space
 	if ( bWasNotParented )
 	{
 		// Transform step data from world to parent-space
-		TransformStepData_WorldToParent( this );
+		m_pOuter->TransformStepData_WorldToParent( this->m_pOuter);
 	}
 	else
 	{
 		// Transform step data between parent-spaces
-		TransformStepData_ParentToParent( pOldParent, this );
+		m_pOuter->TransformStepData_ParentToParent( pOldParent->m_pOuter, this->m_pOuter);
 	}
 	
-	if ( VPhysicsGetObject() )
+	if (m_pOuter->VPhysicsGetObject() )
 	{
-		if ( VPhysicsGetObject()->IsStatic())
+		if (m_pOuter->VPhysicsGetObject()->IsStatic())
 		{
-			if ( VPhysicsGetObject()->IsAttachedToConstraint(false) )
+			if (m_pOuter->VPhysicsGetObject()->IsAttachedToConstraint(false) )
 			{
-				Warning("SetParent on static object, all constraints attached to %s (%s)will now be broken!\n", GetDebugName(), GetClassname() );
+				Warning("SetParent on static object, all constraints attached to %s (%s)will now be broken!\n", m_pOuter->GetDebugName(), m_pOuter->GetClassname() );
 			}
-			VPhysicsDestroyObject();
-			VPhysicsInitShadow(false, false);
+			m_pOuter->VPhysicsDestroyObject();
+			m_pOuter->VPhysicsInitShadow(false, false);
 		}
 	}
-	CollisionRulesChanged();
+	m_pOuter->CollisionRulesChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -1842,9 +1844,9 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 	//DEFINE_GLOBAL_FIELD( m_pParent, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_iParentAttachment, FIELD_CHARACTER ),
-	DEFINE_GLOBAL_FIELD( m_hMoveParent, FIELD_EHANDLE ),
-	DEFINE_GLOBAL_FIELD( m_hMoveChild, FIELD_EHANDLE ),
-	DEFINE_GLOBAL_FIELD( m_hMovePeer, FIELD_EHANDLE ),
+	DEFINE_CUSTOM_GLOBAL_FIELD( m_hMoveParent, engineObjectFuncs),
+	DEFINE_CUSTOM_GLOBAL_FIELD( m_hMoveChild, engineObjectFuncs),
+	DEFINE_CUSTOM_GLOBAL_FIELD( m_hMovePeer, engineObjectFuncs),
 	
 	DEFINE_FIELD( m_iEFlags, FIELD_INTEGER ),
 
@@ -2059,7 +2061,8 @@ void CBaseEntity::UpdateOnRemove( void )
 	SetMoveType(MOVETYPE_NONE);
 
 	// If we have a parent, unlink from it.
-	UnlinkFromParent( this );
+	this->BeforeUnlinkParent(NULL);
+	CEngineObject::UnlinkFromParent( this->GetEngineObject());
 
 	// Any children still connected are orphans, mark all for delete
 	CUtlVector<CBaseEntity *> childrenList;
@@ -2098,7 +2101,7 @@ int CBaseEntity::ObjectCaps( void )
 
 	// We inherit our parent's use capabilities so that we can forward use commands
 	// to our parent.
-	CBaseEntity *pParent = GetMoveParent();
+	CBaseEntity *pParent = GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 	if ( pParent )
 	{
 		int caps = pParent->ObjectCaps();
@@ -2140,8 +2143,8 @@ int CBaseEntity::ObjectCaps( void )
 void CBaseEntity::StartTouch( CBaseEntity *pOther )
 {
 	// notify parent
-	if ( m_hMoveParent != NULL )
-		m_hMoveParent->StartTouch( pOther );
+	if ( GetEngineObject()->GetMoveParent() != NULL )
+		GetEngineObject()->GetMoveParent()->GetOuter()->StartTouch(pOther);
 }
 
 void CBaseEntity::Touch( CBaseEntity *pOther )
@@ -2150,16 +2153,16 @@ void CBaseEntity::Touch( CBaseEntity *pOther )
 		(this->*m_pfnTouch)( pOther );
 
 	// notify parent of touch
-	if (m_hMoveParent != NULL )
-		m_hMoveParent->Touch( pOther );
+	if (GetEngineObject()->GetMoveParent() != NULL )
+		GetEngineObject()->GetMoveParent()->GetOuter()->Touch( pOther );
 }
 
 void CBaseEntity::EndTouch( CBaseEntity *pOther )
 {
 	// notify parent
-	if (m_hMoveParent != NULL )
+	if (GetEngineObject()->GetMoveParent() != NULL )
 	{
-		m_hMoveParent->EndTouch( pOther );
+		GetEngineObject()->GetMoveParent()->GetOuter()->EndTouch( pOther );
 	}
 }
 
@@ -2178,9 +2181,9 @@ void CBaseEntity::Blocked( CBaseEntity *pOther )
 	//
 	// Forward the blocked event to our parent, if any.
 	//
-	if (m_hMoveParent != NULL )
+	if (GetEngineObject()->GetMoveParent() != NULL )
 	{
-		m_hMoveParent->Blocked( pOther );
+		GetEngineObject()->GetMoveParent()->GetOuter()->Blocked( pOther );
 	}
 }
 
@@ -2203,9 +2206,9 @@ void CBaseEntity::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 		//
 		// We don't handle use events. Forward to our parent, if any.
 		//
-		if (m_hMoveParent != NULL )
+		if (GetEngineObject()->GetMoveParent() != NULL )
 		{
-			m_hMoveParent->Use( pActivator, pCaller, useType, value );
+			GetEngineObject()->GetMoveParent()->GetOuter()->Use( pActivator, pCaller, useType, value );
 		}
 	}
 }
@@ -2594,25 +2597,25 @@ void CBaseEntity::SetMoveDoneTime( float flDelay )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsRelinkChildren( float dt )
 {
-	CBaseEntity *child;
+	CEngineObject *child;
 
 	// iterate through all children
-	for ( child = FirstMoveChild(); child != NULL; child = child->NextMovePeer() )
+	for ( child = GetEngineObject()->FirstMoveChild(); child != NULL; child = child->NextMovePeer() )
 	{
-		if ( child->IsSolid() || child->IsSolidFlagSet(FSOLID_TRIGGER) )
+		if ( child->GetOuter()->IsSolid() || child->GetOuter()->IsSolidFlagSet(FSOLID_TRIGGER))
 		{
-			child->PhysicsTouchTriggers();
+			child->GetOuter()->PhysicsTouchTriggers();
 		}
 
 		//
 		// Update their physics shadows. We should never have any children of
 		// movetype VPHYSICS.
 		//
-		if ( child->GetMoveType() != MOVETYPE_VPHYSICS )
+		if ( child->GetOuter()->GetMoveType() != MOVETYPE_VPHYSICS )
 		{
-			child->UpdatePhysicsShadowToCurrentPosition( dt );
+			child->GetOuter()->UpdatePhysicsShadowToCurrentPosition( dt );
 		}
-		else if ( child->GetOwnerEntity() != this )
+		else if ( child->GetOuter()->GetOwnerEntity() != this )
 		{
 			// the only case where this is valid is if this entity is an attached ragdoll.
 			// So assert here to catch the non-ragdoll case.
@@ -2621,7 +2624,7 @@ void CBaseEntity::PhysicsRelinkChildren( float dt )
 
 		if ( child->FirstMoveChild() )
 		{
-			child->PhysicsRelinkChildren(dt);
+			child->GetOuter()->PhysicsRelinkChildren(dt);
 		}
 	}
 }
@@ -3218,7 +3221,7 @@ int CBaseEntity::Restore( IRestore &restore )
 	{
 		CGameSaveRestoreInfo *pGameInfo = restore.GetGameSaveRestoreInfo();
 		Vector parentSpaceOffset = pGameInfo->modelSpaceOffset;
-		if ( !GetMoveParent() )
+		if ( !GetEngineObject()->GetMoveParent() )
 		{
 			// parent is the world, so parent space is worldspace
 			// so update with the worldspace leveltransition transform
@@ -3313,9 +3316,9 @@ void CBaseEntity::OnRestore()
 		RemoveFlag( FL_DISSOLVING | FL_ONFIRE );
 	}
 
-	if (m_hMoveParent)
+	if (GetMoveParent())
 	{
-		CBaseEntity *pChild = m_hMoveParent->FirstMoveChild();
+		CBaseEntity *pChild = GetMoveParent()->FirstMoveChild();
 		while ( pChild )
 		{
 			if ( pChild == this )
@@ -3331,7 +3334,8 @@ void CBaseEntity::OnRestore()
 			Warning("Fixing up parent on %s\n", GetClassname() );
 #endif
 			// We only need to be back in the parent's list because we're already in the right place and with the right data
-			LinkChild(m_hMoveParent, this );
+			CEngineObject::LinkChild(GetMoveParent()->GetEngineObject(), this->GetEngineObject());
+			this->AfterLinkParent(NULL);
 		}
 	}
 
@@ -3563,8 +3567,7 @@ int CBaseEntity::UpdateTransmitState()
 	
 	// If an object is the moveparent of something else, don't skip it just because it's marked EF_NODRAW or else
 	//  the client won't have a proper origin for the child since the hierarchy won't be correctly transmitted down
-	if ( IsEffectActive( EF_NODRAW ) && 
-		!m_hMoveChild.Get() )
+	if ( IsEffectActive( EF_NODRAW ) && !GetEngineObject()->FirstMoveChild())
 	{
 		return SetTransmitState( FL_EDICT_DONTSEND );
 	}
@@ -4166,11 +4169,11 @@ void CBaseEntity::InputKill( inputdata_t &inputdata )
 
 void CBaseEntity::InputKillHierarchy( inputdata_t &inputdata )
 {
-	CBaseEntity *pChild, *pNext;
-	for ( pChild = FirstMoveChild(); pChild; pChild = pNext )
+	CEngineObject *pChild, *pNext;
+	for ( pChild = GetEngineObject()->FirstMoveChild(); pChild; pChild = pNext )
 	{
 		pNext = pChild->NextMovePeer();
-		pChild->InputKillHierarchy( inputdata );
+		pChild->GetOuter()->InputKillHierarchy(inputdata);
 	}
 
 	// tell owner ( if any ) that we're dead. This is mostly for NPCMaker functionality.
@@ -4204,14 +4207,14 @@ void CBaseEntity::InputSetParent( inputdata_t &inputdata )
 void CBaseEntity::SetParentAttachment( const char *szInputName, const char *szAttachment, bool bMaintainOffset )
 {
 	// Must have a parent
-	if ( !m_hMoveParent)
+	if ( !GetEngineObject()->GetMoveParent())
 	{
 		Warning("ERROR: Tried to %s for entity %s (%s), but it has no parent.\n", szInputName, GetClassname(), GetDebugName() );
 		return;
 	}
 
 	// Valid only on CBaseAnimating
-	CBaseAnimating *pAnimating = m_hMoveParent->GetBaseAnimating();
+	CBaseAnimating *pAnimating = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
 	if ( !pAnimating )
 	{
 		Warning("ERROR: Tried to %s for entity %s (%s), but its parent has no model.\n", szInputName, GetClassname(), GetDebugName() );
@@ -4227,7 +4230,7 @@ void CBaseEntity::SetParentAttachment( const char *szInputName, const char *szAt
 	}
 
 	m_iParentAttachment = iAttachment;
-	SetParent(m_hMoveParent, m_iParentAttachment );
+	GetEngineObject()->SetParent(GetEngineObject()->GetMoveParent(), m_iParentAttachment );
 
 	// Now move myself directly onto the attachment point
 	SetMoveType( MOVETYPE_NONE );
@@ -4260,7 +4263,7 @@ void CBaseEntity::InputSetParentAttachmentMaintainOffset( inputdata_t &inputdata
 //------------------------------------------------------------------------------
 void CBaseEntity::InputClearParent( inputdata_t &inputdata )
 {
-	SetParent( NULL );
+	GetEngineObject()->SetParent( NULL );
 }
 
 
@@ -4538,10 +4541,10 @@ static void BuildTeleportList_r( CBaseEntity *pTeleport, CUtlVector<TeleportList
 
 	teleportList.AddToTail( entry );
 
-	CBaseEntity *pList = pTeleport->FirstMoveChild();
+	CEngineObject *pList = pTeleport->GetEngineObject()->FirstMoveChild();
 	while ( pList )
 	{
-		BuildTeleportList_r( pList, teleportList );
+		BuildTeleportList_r( pList->GetOuter(), teleportList);
 		pList = pList->NextMovePeer();
 	}
 }
@@ -5777,7 +5780,7 @@ void CEngineObject::CalcAbsolutePosition( void )
 	// Plop the entity->parent matrix into m_rgflCoordinateFrame
 	AngleMatrix( m_angRotation, m_vecOrigin, m_rgflCoordinateFrame );
 
-	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
+	CEngineObject *pMoveParent = GetMoveParent();
 	if ( !pMoveParent )
 	{
 		// no move parent, so just copy existing values
@@ -5802,7 +5805,7 @@ void CEngineObject::CalcAbsolutePosition( void )
 	if (( m_angRotation == vec3_angle ) && ( m_pOuter->m_iParentAttachment == 0 ))
 	{
 		// just copy our parent's absolute angles
-		VectorCopy( pMoveParent->GetEngineObject()->GetAbsAngles(), m_angAbsRotation );
+		VectorCopy( pMoveParent->GetAbsAngles(), m_angAbsRotation );
 	}
 	else
 	{
@@ -5821,7 +5824,7 @@ void CEngineObject::CalcAbsoluteVelocity()
 
 	m_pOuter->RemoveEFlags( EFL_DIRTY_ABSVELOCITY );
 
-	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
+	CEngineObject *pMoveParent = GetMoveParent();
 	if ( !pMoveParent )
 	{
 		m_vecAbsVelocity = m_vecVelocity;
@@ -5829,10 +5832,10 @@ void CEngineObject::CalcAbsoluteVelocity()
 	}
 
 	// This transforms the local velocity into world space
-	VectorRotate( m_vecVelocity, pMoveParent->GetEngineObject()->EntityToWorldTransform(), m_vecAbsVelocity );
+	VectorRotate( m_vecVelocity, pMoveParent->EntityToWorldTransform(), m_vecAbsVelocity );
 
 	// Now add in the parent abs velocity
-	m_vecAbsVelocity += pMoveParent->GetEngineObject()->GetAbsVelocity();
+	m_vecAbsVelocity += pMoveParent->GetAbsVelocity();
 }
 
 // FIXME: While we're using (dPitch, dYaw, dRoll) as our local angular velocity
@@ -5862,7 +5865,15 @@ void CBaseEntity::CalcAbsoluteAngularVelocity()
 
 void CEngineObject::ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition)
 {
-	m_pOuter->ComputeAbsPosition(vecLocalPosition, pAbsPosition);
+	CEngineObject* pMoveParent = GetMoveParent();
+	if (!pMoveParent)
+	{
+		*pAbsPosition = vecLocalPosition;
+	}
+	else
+	{
+		VectorTransform(vecLocalPosition, pMoveParent->EntityToWorldTransform(), *pAbsPosition);
+	}
 }
 
 
@@ -5871,7 +5882,15 @@ void CEngineObject::ComputeAbsPosition(const Vector& vecLocalPosition, Vector* p
 //-----------------------------------------------------------------------------
 void CEngineObject::ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection)
 {
-	m_pOuter->ComputeAbsDirection(vecLocalDirection, pAbsDirection);
+	CEngineObject* pMoveParent = GetMoveParent();
+	if (!pMoveParent)
+	{
+		*pAbsDirection = vecLocalDirection;
+	}
+	else
+	{
+		VectorRotate(vecLocalDirection, pMoveParent->EntityToWorldTransform(), *pAbsDirection);
+	}
 }
 
 void CEngineObject::GetVectors(Vector* forward, Vector* right, Vector* up) const {
@@ -5881,35 +5900,19 @@ void CEngineObject::GetVectors(Vector* forward, Vector* right, Vector* up) const
 //-----------------------------------------------------------------------------
 // Computes the abs position of a point specified in local space
 //-----------------------------------------------------------------------------
-void CBaseEntity::ComputeAbsPosition( const Vector &vecLocalPosition, Vector *pAbsPosition )
-{
-	CBaseEntity *pMoveParent = GetMoveParent();
-	if ( !pMoveParent )
-	{
-		*pAbsPosition = vecLocalPosition;
-	}
-	else
-	{
-		VectorTransform( vecLocalPosition, pMoveParent->GetEngineObject()->EntityToWorldTransform(), *pAbsPosition );
-	}
-}
+//void CBaseEntity::ComputeAbsPosition( const Vector &vecLocalPosition, Vector *pAbsPosition )
+//{
+//
+//}
 
 
 //-----------------------------------------------------------------------------
 // Computes the abs position of a point specified in local space
 //-----------------------------------------------------------------------------
-void CBaseEntity::ComputeAbsDirection( const Vector &vecLocalDirection, Vector *pAbsDirection )
-{
-	CBaseEntity *pMoveParent = GetMoveParent();
-	if ( !pMoveParent )
-	{
-		*pAbsDirection = vecLocalDirection;
-	}
-	else
-	{
-		VectorRotate( vecLocalDirection, pMoveParent->GetEngineObject()->EntityToWorldTransform(), *pAbsDirection );
-	}
-}
+//void CBaseEntity::ComputeAbsDirection( const Vector &vecLocalDirection, Vector *pAbsDirection )
+//{
+//
+//}
 
 
 matrix3x4_t& CEngineObject::GetParentToWorldTransform( matrix3x4_t &tempMatrix )
@@ -5961,7 +5964,7 @@ void CEngineObject::SetAbsOrigin( const Vector& absOrigin )
 	MatrixSetColumn( absOrigin, 3, m_rgflCoordinateFrame ); 
 
 	Vector vecNewOrigin;
-	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
+	CEngineObject *pMoveParent = GetMoveParent();
 	if (!pMoveParent)
 	{
 		vecNewOrigin = absOrigin;
@@ -6005,14 +6008,14 @@ void CEngineObject::SetAbsAngles( const QAngle& absAngles )
 	MatrixSetColumn( m_vecAbsOrigin, 3, m_rgflCoordinateFrame );
 
 	QAngle angNewRotation;
-	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
+	CEngineObject *pMoveParent = GetMoveParent();
 	if (!pMoveParent)
 	{
 		angNewRotation = absAngles;
 	}
 	else
 	{
-		if ( m_angAbsRotation == pMoveParent->GetEngineObject()->GetAbsAngles() )
+		if ( m_angAbsRotation == pMoveParent->GetAbsAngles() )
 		{
 			angNewRotation.Init( );
 		}
@@ -6020,7 +6023,7 @@ void CEngineObject::SetAbsAngles( const QAngle& absAngles )
 		{
 			// Moveparent case: transform the abs transform into local space
 			matrix3x4_t worldToParent, localMatrix;
-			MatrixInvert( pMoveParent->GetEngineObject()->EntityToWorldTransform(), worldToParent );
+			MatrixInvert( pMoveParent->EntityToWorldTransform(), worldToParent );
 			ConcatTransforms( worldToParent, m_rgflCoordinateFrame, localMatrix );
 			MatrixAngles( localMatrix, angNewRotation );
 		}
@@ -6049,7 +6052,7 @@ void CEngineObject::SetAbsVelocity( const Vector &vecAbsVelocity )
 
 	// NOTE: Do *not* do a network state change in this case.
 	// m_vecVelocity is only networked for the player, which is not manual mode
-	CBaseEntity *pMoveParent = m_pOuter->GetMoveParent();
+	CEngineObject *pMoveParent = GetMoveParent();
 	if (!pMoveParent)
 	{
 		m_vecVelocity = vecAbsVelocity;
@@ -6059,11 +6062,11 @@ void CEngineObject::SetAbsVelocity( const Vector &vecAbsVelocity )
 	// First subtract out the parent's abs velocity to get a relative
 	// velocity measured in world space
 	Vector relVelocity;
-	VectorSubtract( vecAbsVelocity, pMoveParent->GetEngineObject()->GetAbsVelocity(), relVelocity );
+	VectorSubtract( vecAbsVelocity, pMoveParent->GetAbsVelocity(), relVelocity );
 
 	// Transform relative velocity into parent space
 	Vector vNew;
-	VectorIRotate( relVelocity, pMoveParent->GetEngineObject()->EntityToWorldTransform(), vNew );
+	VectorIRotate( relVelocity, pMoveParent->EntityToWorldTransform(), vNew );
 	m_vecVelocity = vNew;
 }
 
@@ -6302,22 +6305,43 @@ void CBaseEntity::SetLocalAngularVelocity( const QAngle &vecAngVelocity )
 //-----------------------------------------------------------------------------
 CEngineObject* CEngineObject::GetMoveParent(void)
 {
-	return m_pOuter->GetMoveParent() ? m_pOuter->GetMoveParent()->GetEngineObject() : NULL;
+	return m_hMoveParent.Get()?m_hMoveParent.Get()->GetEngineObject():NULL;
+}
+
+void CEngineObject::SetMoveParent(EHANDLE hMoveParent) {
+	m_hMoveParent = hMoveParent;
+	m_pOuter->NetworkStateChanged();
 }
 
 CEngineObject* CEngineObject::FirstMoveChild(void)
 {
-	return m_pOuter->FirstMoveChild() ? m_pOuter->FirstMoveChild()->GetEngineObject() : NULL;
+	return m_hMoveChild.Get()? m_hMoveChild.Get()->GetEngineObject():NULL;
+}
+
+void CEngineObject::SetFirstMoveChild(EHANDLE hMoveChild) {
+	m_hMoveChild = hMoveChild;
 }
 
 CEngineObject* CEngineObject::NextMovePeer(void)
 {
-	return m_pOuter->NextMovePeer() ? m_pOuter->NextMovePeer()->GetEngineObject() : NULL;
+	return m_hMovePeer.Get()? m_hMovePeer.Get()->GetEngineObject():NULL;
+}
+
+void CEngineObject::SetNextMovePeer(EHANDLE hMovePeer) {
+	m_hMovePeer = hMovePeer;
 }
 
 CEngineObject* CEngineObject::GetRootMoveParent()
 {
-	return m_pOuter->GetRootMoveParent() ? m_pOuter->GetRootMoveParent()->GetEngineObject() : NULL;
+	CEngineObject* pEntity = this;
+	CEngineObject* pParent = this->GetMoveParent();
+	while (pParent)
+	{
+		pEntity = pParent;
+		pParent = pEntity->GetMoveParent();
+	}
+
+	return pEntity;
 }
 
 //-----------------------------------------------------------------------------
@@ -7456,12 +7480,12 @@ void CBaseEntity::SUB_FadeOut( void  )
 }
 
 
-inline bool AnyPlayersInHierarchy_R( CBaseEntity *pEnt )
+inline bool AnyPlayersInHierarchy_R( CEngineObject *pEnt )
 {
-	if ( pEnt->IsPlayer() )
+	if ( pEnt->GetOuter()->IsPlayer())
 		return true;
 
-	for ( CBaseEntity *pCur = pEnt->FirstMoveChild(); pCur; pCur=pCur->NextMovePeer() )
+	for ( CEngineObject *pCur = pEnt->FirstMoveChild(); pCur; pCur = pCur->NextMovePeer())
 	{
 		if ( AnyPlayersInHierarchy_R( pCur ) )
 			return true;
@@ -7473,7 +7497,7 @@ inline bool AnyPlayersInHierarchy_R( CBaseEntity *pEnt )
 
 void CBaseEntity::RecalcHasPlayerChildBit()
 {
-	if ( AnyPlayersInHierarchy_R( this ) )
+	if ( AnyPlayersInHierarchy_R( this->GetEngineObject() ) )
 		AddEFlags( EFL_HAS_PLAYER_CHILD );
 	else
 		RemoveEFlags( EFL_HAS_PLAYER_CHILD );

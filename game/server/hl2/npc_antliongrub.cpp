@@ -171,7 +171,7 @@ void CAntlionGrub::CreateGlow( void )
 	m_hGlowSprite->SetScale( 0.5f );
 	m_hGlowSprite->SetGlowProxySize( 16.0f );
 	int nAttachment = LookupAttachment( "glow" );
-	m_hGlowSprite->SetParent( this, nAttachment );
+	m_hGlowSprite->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment );
 	m_hGlowSprite->SetLocalOrigin( vec3_origin );
 	
 	// Don't uselessly animate, we're a static sprite!
@@ -759,7 +759,7 @@ void CAntlionGrub::Squash( CBaseEntity *pOther, bool bDealDamage, bool bSpawnBlo
 	if ( m_hGlowSprite )
 	{
 		FadeGlow();
-		m_hGlowSprite->SetParent( NULL );
+		m_hGlowSprite->GetEngineObject()->SetParent( NULL );
 	}
 
 	EmitSound( "NPC_Antlion_Grub.Die" );

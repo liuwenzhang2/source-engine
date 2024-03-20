@@ -50,7 +50,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CRopeKeyframe, DT_RopeKeyframe )
 	SendPropFloat( SENDINFO(m_flScrollSpeed), 0, SPROP_NOSCALE ),
 
 	SendPropVector(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD, 0.0f, HIGH_DEFAULT, SendProxy_Origin),
-	SendPropEHandle(SENDINFO_NAME(m_hMoveParent, moveparent), 0, SendProxy_MoveParentToInt),
+	SendPropEHandle(SENDINFO_MOVEPARENT(moveparent), 0, SendProxy_MoveParentToInt),
 
 	SendPropInt		(SENDINFO(m_iParentAttachment), NUM_PARENTATTACHMENT_BITS, SPROP_UNSIGNED),
 END_SEND_TABLE()
@@ -124,7 +124,7 @@ CRopeKeyframe::~CRopeKeyframe()
 	// Release transmit state ownership.
 	SetStartPoint( NULL, 0 );
 	SetEndPoint( NULL, 0 );
-	SetParent( NULL, 0 );
+	GetEngineObject()->SetParent( NULL, 0 );
 }
 
 
@@ -162,13 +162,13 @@ void CRopeKeyframe::SetEndPoint( CBaseEntity *pEndPoint, int attachment )
 	SetAttachmentPoint( m_hEndPoint.GetForModify(), m_iEndAttachment.GetForModify(), pEndPoint, attachment );
 }
 
-void CRopeKeyframe::SetParent( CBaseEntity *pNewParent, int iAttachment )
+void CRopeKeyframe::BeforeUnlinkParent( CBaseEntity *pNewParent, int iAttachment )
 {
-	CBaseEntity *pCurParent = GetMoveParent();
+	CEngineObject *pCurParent = GetEngineObject()->GetMoveParent();
 	if ( pCurParent )
 	{
-		pCurParent->DecrementTransmitStateOwnedCounter();
-		pCurParent->DispatchUpdateTransmitState();
+		pCurParent->GetOuter()->DecrementTransmitStateOwnedCounter();
+		pCurParent->GetOuter()->DispatchUpdateTransmitState();
 	}
 
 	// Make sure our move parent always transmits or we get asserts on the client.
@@ -178,7 +178,7 @@ void CRopeKeyframe::SetParent( CBaseEntity *pNewParent, int iAttachment )
 		pNewParent->SetTransmitState( FL_EDICT_ALWAYS );
 	}
 
-	BaseClass::SetParent( pNewParent, iAttachment );
+	//BaseClass::SetParent( pNewParent, iAttachment );
 }
 
 void CRopeKeyframe::EnablePlayerWeaponAttach( bool bAttach )
@@ -370,7 +370,7 @@ void CRopeKeyframe::Activate()
 
 	// If we don't do this here, then when we save/load, we won't "own" the transmit 
 	// state of our parent, so the client might get our entity without our parent entity.
-	SetParent(GetMoveParent(), GetParentAttachment() );
+	GetEngineObject()->SetParent(GetEngineObject()->GetMoveParent(), GetParentAttachment());
 
 	EndpointsChanged();
 
@@ -382,7 +382,7 @@ void CRopeKeyframe::EndpointsChanged()
 	CBaseEntity *pStartEnt = m_hStartPoint.Get();
 	if ( pStartEnt )
 	{
-		if ( (pStartEnt != this) || GetMoveParent() )
+		if ( (pStartEnt != this) || GetEngineObject()->GetMoveParent() )
 		{
 			WatchPositionChanges( this, pStartEnt );
 		}
@@ -390,7 +390,7 @@ void CRopeKeyframe::EndpointsChanged()
 	CBaseEntity *pEndEnt = m_hEndPoint.Get();
 	if ( pEndEnt )
 	{
-		if ( (pEndEnt != this) || GetMoveParent() )
+		if ( (pEndEnt != this) || GetEngineObject()->GetMoveParent() )
 		{
 			WatchPositionChanges( this, pEndEnt );
 		}

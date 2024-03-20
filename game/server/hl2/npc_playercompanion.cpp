@@ -1395,7 +1395,7 @@ void CNPC_PlayerCompanion::HandleAnimEvent( animevent_t *pEvent )
 			m_hFlare->SetModel( "models/props_junk/flare.mdl" );
 			
 			// Set the parent attachment
-			m_hFlare->SetParent( this );
+			m_hFlare->GetEngineObject()->SetParent( this->GetEngineObject() );
 			m_hFlare->SetParentAttachment( "SetParentAttachment", pEvent->options, false );
 		}
 
@@ -1417,7 +1417,7 @@ void CNPC_PlayerCompanion::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_COMPANION_RELEASE_FLARE )
 	{
 		// Detach
-		m_hFlare->SetParent( NULL );
+		m_hFlare->GetEngineObject()->SetParent( NULL );
 		m_hFlare->Spawn();
 		m_hFlare->RemoveInteraction( PROPINTER_PHYSGUN_CREATE_FLARE );
 

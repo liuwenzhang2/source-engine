@@ -733,7 +733,7 @@ void CBounceBomb::UpdateLight( bool bTurnOn, unsigned int r, unsigned int g, uns
 
 			if( m_hSprite )
 			{
-				pSprite->SetParent( this );		
+				pSprite->GetEngineObject()->SetParent( this->GetEngineObject() );
 				pSprite->SetTransparency( kRenderTransAdd, r, g, b, a, kRenderFxNone );
 				pSprite->SetScale( 0.35, 0.0 );
 			}

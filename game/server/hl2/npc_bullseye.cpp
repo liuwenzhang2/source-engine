@@ -238,7 +238,7 @@ void CNPC_Bullseye::Event_Killed( const CTakeDamageInfo &info )
 			GetMoveParent()->AcceptInput( "explode", this, this, emptyVariant, 0 );
 
 			// Unhook.
-			SetParent(NULL);
+			GetEngineObject()->SetParent(NULL);
 
 			UTIL_Remove(this);
 			return;

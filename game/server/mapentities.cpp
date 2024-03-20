@@ -223,7 +223,7 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 
 				if ((pParent != NULL) && (pParent->entindex() != -1))
 				{
-					pEntity->SetParent( pParent ); 
+					pEntity->GetEngineObject()->SetParent( pParent->GetEngineObject() );
 				}
 			}
 		}
@@ -264,7 +264,7 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 			{
 				iAttachment = pAnim->LookupAttachment(pSpawnList[nEntity].m_pDeferredParentAttachment);
 			}
-			pEntity->SetParent( pParent, iAttachment );
+			pEntity->GetEngineObject()->SetParent( pParent->GetEngineObject(), iAttachment);
 		}
 		if ( pEntity )
 		{

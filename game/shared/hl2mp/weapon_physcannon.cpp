@@ -775,7 +775,7 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	}
 
 	// done so I'll go across level transitions with the player
-	SetParent( pPlayer );
+	GetEngineObject()->SetParent( pPlayer->GetEngineObject() );
 	m_grabController.SetIgnorePitch( true );
 	m_grabController.SetAngleAlignment( DOT_30DEGREE );
 	m_pPlayer = pPlayer;

@@ -419,7 +419,7 @@ void CAI_PassengerBehaviorZombie::StartDismount( void )
 	m_hVehicle->NPC_FinishedExitVehicle( GetOuter(), (IsPassengerHostile()==false) );
 
 	// Detach from the parent
-	GetOuter()->SetParent( NULL );
+	GetOuter()->GetEngineObject()->SetParent( NULL );
 	GetOuter()->SetMoveType( MOVETYPE_STEP );
 	GetMotor()->SetYawLocked( false );
 

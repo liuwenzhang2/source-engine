@@ -65,7 +65,7 @@ void CEnvLaser::Spawn( void )
 
 	if ( m_pSprite )
 	{
-		m_pSprite->SetParent( GetMoveParent() );
+		m_pSprite->GetEngineObject()->SetParent( GetMoveParent()?GetMoveParent()->GetEngineObject():NULL );
 		m_pSprite->SetTransparency( kRenderGlow, m_clrRender->r, m_clrRender->g, m_clrRender->b, m_clrRender->a, m_nRenderFX );
 	}
 

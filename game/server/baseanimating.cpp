@@ -829,7 +829,7 @@ bool CBaseAnimating::BecomeRagdollOnClient( const Vector &force )
 		ClampRagdollForce( force, &vecClampedForce );
 		m_vecForce = vecClampedForce;
 
-		SetParent( NULL );
+		GetEngineObject()->SetParent( NULL );
 
 		AddFlag( FL_TRANSRAGDOLL );
 
@@ -1176,7 +1176,7 @@ void CBaseAnimating::HandleAnimEvent( animevent_t *pEvent )
 					hDustTrail->m_Opacity = 0.5f;  
 					hDustTrail->SetLifetime(flDuration);  // Lifetime of the spawner, in seconds
 					hDustTrail->m_StopEmitTime = gpGlobals->curtime + flDuration;
-					hDustTrail->SetParent( this, LookupAttachment( szAttachment ) );
+					hDustTrail->GetEngineObject()->SetParent( this->GetEngineObject(), LookupAttachment( szAttachment ) );
 					hDustTrail->SetLocalOrigin( vec3_origin );
 				}
 			}

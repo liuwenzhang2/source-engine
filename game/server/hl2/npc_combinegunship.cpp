@@ -519,7 +519,7 @@ void CNPC_CombineGunship::CreateBellyBlastEnergyCore( void )
 	DispatchSpawn( pCore );
 	pCore->Activate();
 
-	pCore->SetParent( this, iAttachment );
+	pCore->GetEngineObject()->SetParent( this->GetEngineObject(), iAttachment );
 	pCore->SetScale( 4.0f );
 }
 

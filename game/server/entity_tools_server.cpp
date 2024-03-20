@@ -151,7 +151,7 @@ bool CServerTools::SnapPlayerToPosition( const Vector &org, const QAngle &ang, I
 	pPlayer->SnapEyeAngles( ang );
 
 	// Disengage from hierarchy
-	pPlayer->SetParent( NULL );
+	pPlayer->GetEngineObject()->SetParent( NULL );
 
 	return true;
 }

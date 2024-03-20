@@ -1962,7 +1962,7 @@ void CNPC_Vortigaunt::StartHandGlow( int beamType, int nHand )
 			}
 
 			// Stomp our settings
-			m_hHandEffect[nHand]->SetParent( this, (nHand==HAND_LEFT) ? m_iLeftHandAttachment : m_iRightHandAttachment );
+			m_hHandEffect[nHand]->GetEngineObject()->SetParent( this->GetEngineObject(), (nHand == HAND_LEFT) ? m_iLeftHandAttachment : m_iRightHandAttachment);
 			m_hHandEffect[nHand]->SetMoveType( MOVETYPE_NONE );
 			m_hHandEffect[nHand]->SetLocalOrigin( Vector( 8.0f, 4.0f, 0.0f ) );
 		}
@@ -3259,7 +3259,7 @@ void CVortigauntChargeToken::SeekTouch( CBaseEntity	*pOther )
 	// Stay attached to the thing we hit as we fade away
 	SetSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
-	SetParent( pOther );
+	GetEngineObject()->SetParent( pOther->GetEngineObject() );
 
 	// TODO: Play a "poof!" effect here?
 	FadeAndDie();

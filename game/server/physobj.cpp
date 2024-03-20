@@ -1422,7 +1422,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 			continue;
 		}
 
-		UnlinkFromParent( pEntity );
+		CEngineObject::UnlinkFromParent( pEntity->GetEngineObject());
 
 		if ( pSwap )
 		{
@@ -1447,7 +1447,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 
 			pPhys->SetName( pEntity->GetEntityName() );
 			UTIL_TransferPoseParameters( pEntity, pPhys );
-			TransferChildren( pEntity, pPhys );
+			CEngineObject::TransferChildren( pEntity->GetEngineObject(), pPhys->GetEngineObject());
 			pEntity->AddSolidFlags( FSOLID_NOT_SOLID );
 			pEntity->AddEffects( EF_NODRAW );
 			UTIL_Remove( pEntity );

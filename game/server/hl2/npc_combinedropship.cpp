@@ -595,7 +595,7 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 		pSmokeTrail->m_MinSpeed = 15;
 		pSmokeTrail->m_MaxSpeed = 25;
 		pSmokeTrail->SetLifetime( pChunk->m_lifeTime );
-		pSmokeTrail->SetParent( pChunk, 0 );
+		pSmokeTrail->GetEngineObject()->SetParent( pChunk->GetEngineObject(), 0);
 		pSmokeTrail->SetLocalOrigin( vec3_origin );
 		pSmokeTrail->SetMoveType( MOVETYPE_NONE );
 	}
@@ -715,7 +715,7 @@ void CCombineDropshipContainer::AddSmokeTrail( const Vector &vecPos )
 	pSmokeTrail->m_MinDirectedSpeed	= 100.0f;
 	pSmokeTrail->m_MaxDirectedSpeed	= 120.0f;
 	pSmokeTrail->SetLifetime( 5 );
-	pSmokeTrail->SetParent( this, nAttachment );
+	pSmokeTrail->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
 	if ( nAttachment == 0 )
 	{
 		pSmokeTrail->SetAbsOrigin( vecPos );
@@ -880,7 +880,7 @@ void CNPC_CombineDropship::Spawn( void )
 			m_hContainer->SetName( AllocPooledString("dropship_container") );
 			m_hContainer->SetAbsOrigin( GetAbsOrigin() );
 			m_hContainer->SetAbsAngles( GetAbsAngles() );
-			m_hContainer->SetParent(this, 0);
+			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 			m_hContainer->SetOwnerEntity(this);
 			m_hContainer->Spawn();
 
@@ -911,7 +911,7 @@ void CNPC_CombineDropship::Spawn( void )
 		m_hContainer = (CBaseAnimating*)gEntList.CreateEntityByName( "npc_strider" );
 		m_hContainer->SetAbsOrigin( GetAbsOrigin() - Vector( 0, 0 , 100 ) );
 		m_hContainer->SetAbsAngles( GetAbsAngles() );
-		m_hContainer->SetParent(this, 0);
+		m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 		m_hContainer->SetOwnerEntity(this);
 		m_hContainer->Spawn();
 		m_hContainer->SetAbsOrigin( GetAbsOrigin() - Vector( 0, 0 , 100 ) );
@@ -945,7 +945,7 @@ void CNPC_CombineDropship::Spawn( void )
 				pPhysicsObject->SetShadow( 1e4, 1e4, false, false );
 			}
 
-			m_hContainer->SetParent(this, 0);
+			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 			m_hContainer->SetOwnerEntity(this);
 			m_hContainer->SetMoveType( MOVETYPE_PUSH );
 			m_hContainer->SetGroundEntity( NULL );
@@ -969,7 +969,7 @@ void CNPC_CombineDropship::Spawn( void )
 			MatrixToAngles( result, angles );
 			m_hContainer->SetAbsAngles( angles );
 
-			m_hContainer->SetParent(this, 0);
+			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 			m_hContainer->SetOwnerEntity(this);
 			m_hContainer->SetSolid( SOLID_VPHYSICS );
 			m_hContainer->Spawn();
@@ -1719,7 +1719,7 @@ void CNPC_CombineDropship::InputDropStrider( inputdata_t &inputdata )
 	angles.x = 0.0;
 	angles.z = 0.0;
 
-	m_hContainer->SetParent(NULL, 0);
+	m_hContainer->GetEngineObject()->SetParent(NULL, 0);
 	m_hContainer->SetOwnerEntity(NULL);
 	m_hContainer->SetAbsAngles( angles );
 	m_hContainer->SetAbsVelocity( vec3_origin );
@@ -1737,7 +1737,7 @@ void CNPC_CombineDropship::InputDropAPC( inputdata_t &inputdata )
 		return;
 	}
 
-	m_hContainer->SetParent(NULL, 0);
+	m_hContainer->GetEngineObject()->SetParent(NULL, 0);
 //	m_hContainer->SetOwnerEntity(NULL);
 
 	Vector vecAbsVelocity = GetAbsVelocity();
@@ -1774,7 +1774,7 @@ void CNPC_CombineDropship::InputDropAPC( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_CombineDropship::DropSoldierContainer( )
 {
-	m_hContainer->SetParent(NULL, 0);
+	m_hContainer->GetEngineObject()->SetParent(NULL, 0);
 //	m_hContainer->SetOwnerEntity(NULL);
 
 	Vector vecAbsVelocity = GetAbsVelocity();
@@ -2224,7 +2224,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 					// detach container from ship
 					if ( m_hContainer && m_leaveCrate )
 					{
-						m_hContainer->SetParent(NULL);
+						m_hContainer->GetEngineObject()->SetParent(NULL);
 						m_hContainer->SetMoveType( (MoveType_t)m_iContainerMoveType );
 
 						Vector vecAbsVelocity( 0, 0, GetAbsVelocity().z );
@@ -2321,7 +2321,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 							pPhysicsObject->UpdateShadow( GetAbsOrigin(), GetAbsAngles(), false, 0 );
 						}
 
-						m_hContainer->SetParent(this, 0);
+						m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 						m_hContainer->SetMoveType( MOVETYPE_PUSH );
 						m_hContainer->SetGroundEntity( NULL );
 

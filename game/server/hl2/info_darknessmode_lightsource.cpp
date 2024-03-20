@@ -397,7 +397,7 @@ void AddEntityToDarknessCheck( CBaseEntity *pEntity, float flLightRadius /*=DARK
 		pLightSource->SetLightRadius( flLightRadius );
 		DispatchSpawn( pLightSource );
   		pLightSource->SetAbsOrigin( pEntity->WorldSpaceCenter() );
-		pLightSource->SetParent( pEntity );
+		pLightSource->GetEngineObject()->SetParent( pEntity->GetEngineObject());
 		pLightSource->Activate();
 
 		// Dynamically created darkness sources can ignore LOS

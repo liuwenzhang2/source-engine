@@ -753,7 +753,7 @@ void CNPC_AntlionGuard::CreateGlow( CSprite **pSprite, const char *pAttachName )
 	(*pSprite)->SetScale( 1.0f );
 	(*pSprite)->SetGlowProxySize( 16.0f );
 	int nAttachment = LookupAttachment( pAttachName );
-	(*pSprite)->SetParent( this, nAttachment );
+	(*pSprite)->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
 	(*pSprite)->SetLocalOrigin( vec3_origin );
 
 	// Don't uselessly animate, we're a static sprite!

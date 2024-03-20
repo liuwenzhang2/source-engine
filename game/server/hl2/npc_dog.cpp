@@ -657,7 +657,7 @@ void CNPC_Dog::CleanCatchAndThrow( bool bClearTimers )
 		{
 			IPhysicsObject *pPhysObj = m_hPhysicsEnt->VPhysicsGetObject();
 
-			m_hPhysicsEnt->SetParent( NULL );
+			m_hPhysicsEnt->GetEngineObject()->SetParent( NULL );
 			m_hPhysicsEnt->SetOwnerEntity( NULL );
 
 			Vector vGunPos;
@@ -820,7 +820,7 @@ void CNPC_Dog::ThrowObject( const char *pAttachmentName )
 
 			if ( pPhysObj->GetShadowController() )
 			{
-				m_hPhysicsEnt->SetParent( NULL );
+				m_hPhysicsEnt->GetEngineObject()->SetParent( NULL );
 				m_hPhysicsEnt->SetMoveType( (MoveType_t)m_iContainerMoveType );
 				m_hPhysicsEnt->SetOwnerEntity( this );
 
@@ -935,7 +935,7 @@ void CNPC_Dog::PickupOrCatchObject( const char *pAttachmentName )
 		m_iContainerMoveType = m_hPhysicsEnt->GetMoveType();
 		m_hPhysicsEnt->SetMoveType( MOVETYPE_NONE );
 		
-		m_hPhysicsEnt->SetParent( this, iAttachment );
+		m_hPhysicsEnt->GetEngineObject()->SetParent( this->GetEngineObject(), iAttachment);
 	
 		m_hPhysicsEnt->SetLocalOrigin( vec3_origin );
 		m_hPhysicsEnt->SetLocalAngles( vec3_angle );

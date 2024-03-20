@@ -4232,7 +4232,7 @@ void CSquadInsignia::Spawn()
 		if ( attachment )
 		{
 			SetAbsAngles( GetOwnerEntity()->GetAbsAngles() );
-			SetParent( GetOwnerEntity(), attachment );
+			GetEngineObject()->SetParent( GetOwnerEntity()->GetEngineObject(), attachment);
 
 			Vector vecPosition;
 			vecPosition.Init( -2.5, 0, 3.9 );

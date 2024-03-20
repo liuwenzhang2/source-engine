@@ -144,7 +144,7 @@ public:
 		UTIL_SetOrigin( pTrigger, vecOrigin );
 		UTIL_SetSize( pTrigger, vecMins, vecMaxs );		
 		pTrigger->SetOwnerEntity( pOwner );
-		pTrigger->SetParent( pOwner );
+		pTrigger->GetEngineObject()->SetParent( pOwner?pOwner->GetEngineObject():NULL );
 
 		pTrigger->Spawn();
 
@@ -196,7 +196,7 @@ public:
 		pOther->SetMoveType( MOVETYPE_NONE );
 
 		// Parent the object to our owner
-		pOther->SetParent( GetOwnerEntity() );
+		pOther->GetEngineObject()->SetParent( GetOwnerEntity()?GetOwnerEntity()->GetEngineObject():NULL );
 
 		// The car now owns the entity
 		pJeep->AddPropToCargoHold( pProp );
@@ -759,7 +759,7 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 			// Setup our basic parameters
 			m_hWheelDust[i]->KeyValue( "start_active", "0" );
 			m_hWheelDust[i]->KeyValue( "effect_name", "WheelDust" );
-			m_hWheelDust[i]->SetParent( this );
+			m_hWheelDust[i]->GetEngineObject()->SetParent( this->GetEngineObject() );
 			m_hWheelDust[i]->SetLocalOrigin( vec3_origin );
 			DispatchSpawn( m_hWheelDust[i] );
 			if ( gpGlobals->curtime > 0.5f )
@@ -777,7 +777,7 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 			// Setup our basic parameters
 			m_hWheelWater[i]->KeyValue( "start_active", "0" );
 			m_hWheelWater[i]->KeyValue( "effect_name", "WheelSplash" );
-			m_hWheelWater[i]->SetParent( this );
+			m_hWheelWater[i]->GetEngineObject()->SetParent( this->GetEngineObject() );
 			m_hWheelWater[i]->SetLocalOrigin( vec3_origin );
 			DispatchSpawn( m_hWheelWater[i] );
 			if ( gpGlobals->curtime > 0.5f )
@@ -1108,7 +1108,7 @@ void CPropJeepEpisodic::AddPropToCargoHold( CPhysicsProp *pProp )
 void CPropJeepEpisodic::ReleasePropFromCargoHold( void )
 {
 	// Pull the object free!
-	m_hCargoProp->SetParent( NULL );
+	m_hCargoProp->GetEngineObject()->SetParent( NULL );
 	m_hCargoProp->CreateVPhysics();
 
 	if ( m_hCargoTrigger )
@@ -1706,7 +1706,7 @@ void CPropJeepEpisodic::InputCreateLinkController( inputdata_t &data )
 		pLinkController->Spawn();
 		pLinkController->SetAbsOrigin( vecFront );
 		pLinkController->SetOwnerEntity( this );
-		pLinkController->SetParent( this );
+		pLinkController->GetEngineObject()->SetParent( this->GetEngineObject() );
 		pLinkController->Activate();
 		m_hLinkControllerFront.Set( pLinkController );
 
@@ -1720,7 +1720,7 @@ void CPropJeepEpisodic::InputCreateLinkController( inputdata_t &data )
 		pLinkController->Spawn();
 		pLinkController->SetAbsOrigin( vecRear );
 		pLinkController->SetOwnerEntity( this );
-		pLinkController->SetParent( this );
+		pLinkController->GetEngineObject()->SetParent( this->GetEngineObject() );
 		pLinkController->Activate();
 		m_hLinkControllerRear.Set( pLinkController );
 

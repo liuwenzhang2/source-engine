@@ -60,7 +60,7 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 		}
 
 		int iAttachment = LookupAttachment( pEvent->options );
-		m_hEmpTool->SetParent(this, iAttachment);
+		m_hEmpTool->GetEngineObject()->SetParent(this->GetEngineObject(), iAttachment);
 		m_hEmpTool->SetLocalOrigin( Vector( 0, 0, 0 ) );
 		m_hEmpTool->SetLocalAngles( QAngle( 0, 0, 0 ) );
 
@@ -188,7 +188,7 @@ void CNPC_Alyx::CreateEmpTool( void )
 		m_hEmpTool->SetModel( "models/alyx_emptool_prop.mdl" );
 		m_hEmpTool->SetName( AllocPooledString("Alyx_Emptool") );
 		int iAttachment = LookupAttachment( "Emp_Holster" );
-		m_hEmpTool->SetParent(this, iAttachment);
+		m_hEmpTool->GetEngineObject()->SetParent(this->GetEngineObject(), iAttachment);
 		m_hEmpTool->SetOwnerEntity(this);
 		m_hEmpTool->SetSolid( SOLID_NONE );
 		m_hEmpTool->SetLocalOrigin( Vector( 0, 0, 0 ) );

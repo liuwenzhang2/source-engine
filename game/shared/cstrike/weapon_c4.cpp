@@ -1054,7 +1054,7 @@ void CC4::PrimaryAttack()
 					{
 						pC4->SetAbsOrigin( pAttachPoint->GetAbsOrigin() );
 						pC4->SetAbsAngles( pAttachPoint->GetAbsAngles() );
-						pC4->SetParent( pAttachPoint );
+						pC4->GetEngineObject()->SetParent( pAttachPoint->GetEngineObject() );
 					}
 
 					variant_t emptyVariant;

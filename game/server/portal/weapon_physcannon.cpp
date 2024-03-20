@@ -1164,7 +1164,7 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	}
 
 	// done so I'll go across level transitions with the player
-	SetParent( pPlayer );
+	GetEngineObject()->SetParent( pPlayer->GetEngineObject() );
 	m_grabController.SetIgnorePitch( true );
 	m_grabController.SetAngleAlignment( DOT_30DEGREE );
 	m_pPlayer = pPlayer;
@@ -3388,7 +3388,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 				DispatchSpawn( pCore );
 				pCore->Activate();
 
-				pCore->SetParent( pBeamEnt, iAttachment );
+				pCore->GetEngineObject()->SetParent( pBeamEnt->GetEngineObject(), iAttachment);
 				pCore->SetScale( 2.5f );
 
 				variant_t variant;

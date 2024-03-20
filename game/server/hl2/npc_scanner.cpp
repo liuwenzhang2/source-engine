@@ -929,7 +929,7 @@ void CNPC_CScanner::DeployMine()
 	{
 		if( FClassnameIs( child, "combine_mine" ) )
 		{
-			child->SetParent( NULL );
+			child->GetEngineObject()->SetParent( NULL );
 			child->SetAbsVelocity( GetAbsVelocity() );
 			child->SetOwnerEntity( this );
 
@@ -1011,7 +1011,7 @@ void CNPC_CScanner::InputEquipMine(inputdata_t &inputdata)
 			pEnt->SetAbsOrigin( vecOrigin );
 			pEnt->SetAbsAngles( angles );
 			pEnt->SetOwnerEntity( this );
-			pEnt->SetParent( this, attachment );
+			pEnt->GetEngineObject()->SetParent( this->GetEngineObject(), attachment);
 
 			m_bIsOpen = true;
 			SetActivity( ACT_IDLE_ANGRY );
@@ -1028,7 +1028,7 @@ void CNPC_CScanner::InputEquipMine(inputdata_t &inputdata)
 		pEnt->SetAbsOrigin( vecMineLocation );
 		pEnt->SetAbsAngles( GetAbsAngles() );
 		pEnt->SetOwnerEntity( this );
-		pEnt->SetParent( this );
+		pEnt->GetEngineObject()->SetParent( this->GetEngineObject() );
 	}
 
 	pEnt->Spawn();

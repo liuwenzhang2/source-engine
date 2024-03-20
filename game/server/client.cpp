@@ -1063,7 +1063,7 @@ static int FindPassableSpace( CBasePlayer *pPlayer, const Vector& direction, flo
 void EnableNoClip( CBasePlayer *pPlayer )
 {
 	// Disengage from hierarchy
-	pPlayer->SetParent( NULL );
+	pPlayer->GetEngineObject()->SetParent( NULL );
 	pPlayer->SetMoveType( MOVETYPE_NOCLIP );
 	ClientPrint( pPlayer, HUD_PRINTCONSOLE, "noclip ON\n");
 	pPlayer->AddEFlags( EFL_NOCLIP_ACTIVE );

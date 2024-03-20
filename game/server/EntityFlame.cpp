@@ -170,7 +170,7 @@ void CEntityFlame::AttachToEntity( CBaseEntity *pTarget )
 	m_bPlayingSound = true;
 
 	// So our heat emitter follows the entity around on the server.
-	SetParent( pTarget );
+	GetEngineObject()->SetParent( pTarget?pTarget->GetEngineObject():NULL );
 }
 
 

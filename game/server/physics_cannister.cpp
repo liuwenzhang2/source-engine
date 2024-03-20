@@ -237,7 +237,7 @@ void CPhysicsCannister::CannisterActivate( CBaseEntity *pActivator, const Vector
 	QAngle angles;
 	VectorAngles( -thrustDirection, angles );
 	m_pJet = dynamic_cast<CSteamJet *>( CBaseEntity::Create( "env_steam", m_thrustOrigin, angles, this ) );
-	m_pJet->SetParent( this );
+	m_pJet->GetEngineObject()->SetParent( this->GetEngineObject() );
 
 	float extra = m_thruster.m_thrust * (1/5000.f);
 	extra = clamp( extra, 0.f, 1.f );

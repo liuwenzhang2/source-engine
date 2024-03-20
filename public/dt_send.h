@@ -612,6 +612,7 @@ inline void SendTable::SetHasPropsEncodedAgainstTickcount( bool bState )
 #define SENDINFO_ORIGIN(varName)						#varName, 55554, -1
 #define SENDINFO_ANGELS(varName)						#varName, 55555, -1
 #define SENDINFO_VELOCITY(varName)						#varName, 55556, -1
+#define SENDINFO_MOVEPARENT(varName)					#varName, 55557, -1
 // ------------------------------------------------------------------------ //
 // Built-in proxy types.
 // See the definition of SendVarProxyFn for information about these.

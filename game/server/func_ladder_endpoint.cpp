@@ -55,7 +55,7 @@ bool CFuncLadderEndPoint::Validate()
 	{
 		ladder->SetEndPoints( startPos, endPos );
 		ladder->SetAbsOrigin( GetAbsOrigin() );
-		ladder->SetParent(GetMoveParent() );
+		ladder->GetEngineObject()->SetParent(GetMoveParent()?GetMoveParent()->GetEngineObject():NULL );
 		ladder->SetName( GetEntityName() );
 		ladder->Spawn();
 	}

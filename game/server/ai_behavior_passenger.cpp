@@ -858,7 +858,7 @@ bool CAI_PassengerBehavior::GetEntryPoint( int nSequence, Vector *vecEntryPoint,
 void CAI_PassengerBehavior::DetachFromVehicle( void )
 {
 	// Detach from the parent
-	GetOuter()->SetParent( NULL );
+	GetOuter()->GetEngineObject()->SetParent(NULL);
 	GetOuter()->SetMoveType( MOVETYPE_STEP );
 	GetOuter()->AddFlag( FL_FLY );
 	GetOuter()->SetGroundEntity( NULL );
@@ -873,7 +873,7 @@ void CAI_PassengerBehavior::AttachToVehicle( void )
 {
 	// Parent to the vehicle
 	GetOuter()->ClearForceCrouch();
-	GetOuter()->SetParent( m_hVehicle );
+	GetOuter()->GetEngineObject()->SetParent( m_hVehicle?m_hVehicle->GetEngineObject():NULL );
 	GetOuter()->AddFlag( FL_FLY );
 	GetOuter()->SetGroundEntity( NULL );
 	GetOuter()->SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE );

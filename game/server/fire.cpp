@@ -808,7 +808,7 @@ void CFire::SpawnEffect( fireType_e type, float scale )
 
 	UTIL_SetOrigin( pEffect, GetAbsOrigin() );
 	pEffect->Spawn();
-	pEffect->SetParent( this );
+	pEffect->GetEngineObject()->SetParent( this->GetEngineObject() );
 	pEffect->Scale( m_flFireSize, m_flFireSize, 0 );
 	//Start it going
 	pEffect->Enable( ( m_spawnflags & SF_FIRE_START_ON ) );

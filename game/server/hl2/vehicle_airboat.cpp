@@ -500,7 +500,7 @@ void CPropAirboat::CreatePlayerBlocker()
 	m_hPlayerBlocker = CEntityBlocker::Create( GetAbsOrigin(), Vector( -84, -32, 0 ), Vector( 54, 32, 84 ), this, false );
 	if ( m_hPlayerBlocker != NULL )
 	{
-		m_hPlayerBlocker->SetParent( this );
+		m_hPlayerBlocker->GetEngineObject()->SetParent( this->GetEngineObject() );
 		m_hPlayerBlocker->SetLocalOrigin( vec3_origin );
 		m_hPlayerBlocker->SetLocalAngles( vec3_angle );
 		m_hPlayerBlocker->SetCollisionGroup( COLLISION_GROUP_PLAYER );

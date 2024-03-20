@@ -5461,7 +5461,7 @@ bool CBasePlayer::GetInVehicle( IServerVehicle *pVehicle, int nRole )
 	SetAbsAngles( qSeatAngles );
 	
 	// Parent to the vehicle
-	SetParent( pEnt );
+	GetEngineObject()->SetParent( pEnt?pEnt->GetEngineObject():NULL );
 
 	SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE );
 	
@@ -5508,7 +5508,7 @@ void CBasePlayer::LeaveVehicle( const Vector &vecExitPoint, const QAngle &vecExi
 	int nRole = pVehicle->GetPassengerRole( this );
 	Assert( nRole >= 0 );
 
-	SetParent( NULL );
+	GetEngineObject()->SetParent( NULL );
 
 	// Find the first non-blocked exit point:
 	Vector vNewPos = GetAbsOrigin();

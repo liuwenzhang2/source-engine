@@ -1904,7 +1904,7 @@ void CEnvMuzzleFlash::Spawn()
 		int nParentAttachment = pAnim->LookupAttachment( STRING(m_iszParentAttachment) );
 		if ( nParentAttachment > 0 )
 		{
-			SetParent(GetMoveParent(), nParentAttachment );
+			GetEngineObject()->SetParent(GetMoveParent()->GetEngineObject(), nParentAttachment);
 			SetLocalOrigin( vec3_origin );
 			SetLocalAngles( vec3_angle );
 		}
