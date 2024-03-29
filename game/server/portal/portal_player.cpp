@@ -2033,7 +2033,7 @@ void CPortal_Player::UpdatePortalViewAreaBits( unsigned char *pvs, int pvssize )
 
 			// Make sure this portal's linked portal is in the PVS before we add what it can see
 			if ( pRemotePortal && pRemotePortal->m_bActivated && pRemotePortal->NetworkProp() && 
-				pRemotePortal->NetworkProp()->IsInPVS( this, pvs, pvssize ) )
+				pRemotePortal->GetEngineObject()->IsInPVS( this, pvs, pvssize ) )
 			{
 				portalArea[ i ] = engine->GetArea( pPortals[ i ]->GetAbsOrigin() );
 
@@ -2110,9 +2110,9 @@ void PortalSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *pvs, 
 
 		if ( pPortal && pPortal->m_bActivated )
 		{
-			if ( pPortal->NetworkProp()->IsInPVS( pPlayer, pvs, pvssize ) )
+			if ( pPortal->GetEngineObject()->IsInPVS( pPlayer, pvs, pvssize ) )
 			{
-				if ( engine->CheckAreasConnected( area, pPortal->NetworkProp()->AreaNum() ) )
+				if ( engine->CheckAreasConnected( area, pPortal->AreaNum() ) )
 				{
 					CProp_Portal *pLinkedPortal = static_cast<CProp_Portal*>( pPortal->m_hLinkedPortal.Get() );
 					if ( pLinkedPortal )
@@ -2129,7 +2129,7 @@ void CPortal_Player::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *p
 {
 	BaseClass::SetupVisibility( pViewEntity, pvs, pvssize );
 
-	int area = pViewEntity ? pViewEntity->NetworkProp()->AreaNum() : NetworkProp()->AreaNum();
+	int area = pViewEntity ? pViewEntity->AreaNum() : AreaNum();
 
 	// At this point the EyePosition has been added as a view origin, but if we are currently stuck
 	// in a portal, our EyePosition may return a point in solid. Find the reflected eye position

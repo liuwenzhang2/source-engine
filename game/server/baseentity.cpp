@@ -352,6 +352,117 @@ void CBaseEntityModelLoadProxy::Handler::OnModelLoadComplete( const model_t *pMo
 	sg_DynamicLoadHandlers.Remove( m_pEntity ); // NOTE: destroys *this!
 }
 
+//-----------------------------------------------------------------------------
+// PVS rules
+//-----------------------------------------------------------------------------
+bool CEngineObject::IsInPVS(const CBaseEntity* pRecipient, const void* pvs, int pvssize)
+{
+	RecomputePVSInformation();
+
+	// ignore if not touching a PV leaf
+	// negative leaf count is a node number
+	// If no pvs, add any entity
+
+	Assert(pvs && (GetOuter() != pRecipient));
+
+	unsigned char* pPVS = (unsigned char*)pvs;
+
+	if (m_PVSInfo.m_nClusterCount < 0)   // too many clusters, use headnode
+	{
+		return (engine->CheckHeadnodeVisible(m_PVSInfo.m_nHeadNode, pPVS, pvssize) != 0);
+	}
+
+	for (int i = m_PVSInfo.m_nClusterCount; --i >= 0; )
+	{
+		if (pPVS[m_PVSInfo.m_pClusters[i] >> 3] & (1 << (m_PVSInfo.m_pClusters[i] & 7)))
+			return true;
+	}
+
+	return false;		// not visible
+}
+
+
+//-----------------------------------------------------------------------------
+// PVS: this function is called a lot, so it avoids function calls
+//-----------------------------------------------------------------------------
+bool CEngineObject::IsInPVS(const CCheckTransmitInfo* pInfo)
+{
+	// PVS data must be up to date
+	//Assert( !m_pPev || ( ( m_pPev->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION ) == 0 ) );
+
+	int i;
+
+	// Early out if the areas are connected
+	if (!m_PVSInfo.m_nAreaNum2)
+	{
+		for (i = 0; i < pInfo->m_AreasNetworked; i++)
+		{
+			int clientArea = pInfo->m_Areas[i];
+			if (clientArea == m_PVSInfo.m_nAreaNum || engine->CheckAreasConnected(clientArea, m_PVSInfo.m_nAreaNum))
+				break;
+		}
+	}
+	else
+	{
+		// doors can legally straddle two areas, so
+		// we may need to check another one
+		for (i = 0; i < pInfo->m_AreasNetworked; i++)
+		{
+			int clientArea = pInfo->m_Areas[i];
+			if (clientArea == m_PVSInfo.m_nAreaNum || clientArea == m_PVSInfo.m_nAreaNum2)
+				break;
+
+			if (engine->CheckAreasConnected(clientArea, m_PVSInfo.m_nAreaNum))
+				break;
+
+			if (engine->CheckAreasConnected(clientArea, m_PVSInfo.m_nAreaNum2))
+				break;
+		}
+	}
+
+	if (i == pInfo->m_AreasNetworked)
+	{
+		// areas not connected
+		return false;
+	}
+
+	// ignore if not touching a PV leaf
+	// negative leaf count is a node number
+	// If no pvs, add any entity
+
+	Assert(entindex() != pInfo->m_pClientEnt);
+
+	unsigned char* pPVS = (unsigned char*)pInfo->m_PVS;
+
+	if (m_PVSInfo.m_nClusterCount < 0)   // too many clusters, use headnode
+	{
+		return (engine->CheckHeadnodeVisible(m_PVSInfo.m_nHeadNode, pPVS, pInfo->m_nPVSSize) != 0);
+	}
+
+	for (i = m_PVSInfo.m_nClusterCount; --i >= 0; )
+	{
+		int nCluster = m_PVSInfo.m_pClusters[i];
+		if (((int)(pPVS[nCluster >> 3])) & BitVec_BitInByte(nCluster))
+			return true;
+	}
+
+	return false;		// not visible
+
+}
+
+//-----------------------------------------------------------------------------
+// PVS information
+//-----------------------------------------------------------------------------
+void CEngineObject::RecomputePVSInformation()
+{
+	if (m_bPVSInfoDirty/*((GetTransmitState() & FL_EDICT_DIRTY_PVS_INFORMATION) != 0)*/)// m_entindex!=-1 && 
+	{
+		//GetTransmitState() &= ~FL_EDICT_DIRTY_PVS_INFORMATION;
+		m_bPVSInfoDirty = false;
+		engine->BuildEntityClusterList(m_pOuter, &m_PVSInfo);
+	}
+}
+
 
 CBaseEntity::CBaseEntity()
 {
@@ -420,7 +531,7 @@ CBaseEntity::CBaseEntity()
 	//{
 	//	AddEFlags( EFL_SERVER_ONLY );
 	//}
-	NetworkProp()->MarkPVSInformationDirty();
+	GetEngineObject()->MarkPVSInformationDirty();
 
 #ifndef _XBOX
 	AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
@@ -3340,7 +3451,7 @@ void CBaseEntity::OnRestore()
 	}
 
 	// We're not save/loading the PVS dirty state. Assume everything is dirty after a restore
-	NetworkProp()->MarkPVSInformationDirty();
+	GetEngineObject()->MarkPVSInformationDirty();
 }
 
 
@@ -3695,7 +3806,7 @@ void CBaseEntity::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 		{
 			// HLTV/Replay will PVS cull this entity, so update the 
 			// node/cluster infos if necessary
-			m_Network.RecomputePVSInformation();
+			GetEngineObject()->RecomputePVSInformation();
 		}
 	}
 

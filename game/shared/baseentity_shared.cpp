@@ -1545,7 +1545,7 @@ void CBaseEntity::InvalidatePhysicsRecursive( int nChangeFlags )
 		nDirtyFlags |= EFL_DIRTY_ABSTRANSFORM;
 
 #ifndef CLIENT_DLL
-		NetworkProp()->MarkPVSInformationDirty();
+		GetEngineObject()->MarkPVSInformationDirty();
 #endif
 
 		// NOTE: This will also mark shadow projection + client leaf dirty

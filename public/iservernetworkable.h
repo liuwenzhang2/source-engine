@@ -107,12 +107,10 @@ public:
 	virtual const char*		GetClassName() const = 0;
 	//virtual void			Release() = 0;
 	virtual int				entindex() const = 0;
-	virtual int				AreaNum() const = 0;
 
 	// In place of a generic QueryInterface.
 	virtual CBaseNetworkable* GetBaseNetworkable() = 0;
 	virtual CBaseEntity*	GetBaseEntity() = 0; // Only used by game code.
-	virtual PVSInfo_t*		GetPVSInfo() = 0; // get current visibilty data
 	virtual int&			GetTransmitState() = 0;
 	virtual void			ClearTransmitState() = 0;
 

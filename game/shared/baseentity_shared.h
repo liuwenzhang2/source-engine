@@ -211,7 +211,7 @@ inline void CBaseEntity::RemoveEffects( int nEffects )
 	if ( nEffects & EF_NODRAW )
 	{
 #ifndef CLIENT_DLL
-		NetworkProp()->MarkPVSInformationDirty();
+		GetEngineObject()->MarkPVSInformationDirty();//NetworkProp()->
 		DispatchUpdateTransmitState();
 #else
 		UpdateVisibility();

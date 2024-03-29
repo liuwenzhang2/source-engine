@@ -707,7 +707,7 @@ int CBasePlayer::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 			 pRecipientPlayer->IsReplay() )
 		{
 			// HACK force calling RecomputePVSInformation to update PVS data
-			NetworkProp()->AreaNum();
+			AreaNum();//NetworkProp()->
 			return FL_EDICT_ALWAYS;
 		}
 	}

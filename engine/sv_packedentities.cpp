@@ -274,7 +274,7 @@ static inline void SV_PackEntity(
 }
 
 // in HLTV mode we ALWAYS have to store position and PVS info, even if entity didnt change
-void SV_FillHLTVData( CFrameSnapshot *pSnapshot, IServerNetworkable *edict, int iValidEdict )
+void SV_FillHLTVData( CFrameSnapshot *pSnapshot, IServerEntity *edict, int iValidEdict )
 {
 #if !defined( _XBOX )
 	if ( pSnapshot->m_pHLTVEntityData && edict )
@@ -303,7 +303,7 @@ void SV_FillHLTVData( CFrameSnapshot *pSnapshot, IServerNetworkable *edict, int 
 }
 
 // in Replay mode we ALWAYS have to store position and PVS info, even if entity didnt change
-void SV_FillReplayData( CFrameSnapshot *pSnapshot, IServerNetworkable *edict, int iValidEdict )
+void SV_FillReplayData( CFrameSnapshot *pSnapshot, IServerEntity *edict, int iValidEdict )
 {
 #if !defined( _XBOX )
 	if ( pSnapshot->m_pReplayEntityData && edict )
@@ -420,13 +420,13 @@ void PackEntities_Normal(
 		Assert( index < snapshot->m_nNumEntities );
 
 		//edict_t* edict = &sv.edicts[ index ];
-		IServerNetworkable* serverNetworkable = serverEntitylist->GetServerNetworkable(index);
+		IServerEntity* pServerEntity = serverEntitylist->GetServerEntity(index);
 
 		// if HLTV is running save PVS info for each entity
-		SV_FillHLTVData( snapshot, serverNetworkable, iValidEdict );
+		SV_FillHLTVData( snapshot, pServerEntity, iValidEdict );
 		
 		// if Replay is running save PVS info for each entity
-		SV_FillReplayData( snapshot, serverNetworkable, iValidEdict );
+		SV_FillReplayData( snapshot, pServerEntity, iValidEdict );
 
 		// Check to see if the entity changed this frame...
 		//ServerDTI_RegisterNetworkStateChange( pSendTable, ent->m_bStateChanged );
@@ -441,7 +441,7 @@ void PackEntities_Normal(
 			{	
 				PackWork_t w;
 				w.nIdx = index;
-				w.pEdict = serverNetworkable;
+				w.pEdict = pServerEntity->GetNetworkable();
 				w.pSnapshot = snapshot;
 
 				workItems.AddToTail( w );

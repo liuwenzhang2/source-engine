@@ -47,7 +47,7 @@ CServerNetworkProperty::~CServerNetworkProperty()
 		m_pTransmitProxy->Release();
 	}*/
 
-	engine->CleanUpEntityClusterList( &m_PVSInfo );
+	//engine->CleanUpEntityClusterList( &m_PVSInfo );
 
 	// remove the attached edict if it exists
 	//DetachEdict();
@@ -64,7 +64,6 @@ void CServerNetworkProperty::Init( CBaseEntity *pEntity )
 	m_pServerClass = NULL;
 //	m_pTransmitProxy = NULL;
 	m_bPendingStateChange = false;
-	m_PVSInfo.m_nClusterCount = 0;
 	m_TimerEvent.Init( &g_NetworkPropertyEventMgr, this );
 	ClearStateChanged();
 }
@@ -155,17 +154,7 @@ bool CServerNetworkProperty::IsMarkedForDeletion() const
 }
 
 
-//-----------------------------------------------------------------------------
-// PVS information
-//-----------------------------------------------------------------------------
-void CServerNetworkProperty::RecomputePVSInformation()
-{
-	if (( (GetTransmitState() & FL_EDICT_DIRTY_PVS_INFORMATION) != 0))// m_entindex!=-1 && 
-	{
-		GetTransmitState() &= ~FL_EDICT_DIRTY_PVS_INFORMATION;
-		engine->BuildEntityClusterList(m_pOuter, &m_PVSInfo );
-	}
-}
+
 
 
 //-----------------------------------------------------------------------------
@@ -202,103 +191,7 @@ void CServerNetworkProperty::SetTransmitProxy( CBaseTransmitProxy *pProxy )
 	}
 }*/
 
-//-----------------------------------------------------------------------------
-// PVS rules
-//-----------------------------------------------------------------------------
-bool CServerNetworkProperty::IsInPVS( const CBaseEntity *pRecipient, const void *pvs, int pvssize )
-{
-	RecomputePVSInformation();
 
-	// ignore if not touching a PV leaf
-	// negative leaf count is a node number
-	// If no pvs, add any entity
-
-	Assert( pvs && ( GetOuter() != pRecipient ) );
-
-	unsigned char *pPVS = ( unsigned char * )pvs;
-	
-	if ( m_PVSInfo.m_nClusterCount < 0 )   // too many clusters, use headnode
-	{
-		return ( engine->CheckHeadnodeVisible( m_PVSInfo.m_nHeadNode, pPVS, pvssize ) != 0);
-	}
-	
-	for ( int i = m_PVSInfo.m_nClusterCount; --i >= 0; )
-	{
-		if (pPVS[m_PVSInfo.m_pClusters[i] >> 3] & (1 << (m_PVSInfo.m_pClusters[i] & 7) ))
-			return true;
-	}
-
-	return false;		// not visible
-}
-
-
-//-----------------------------------------------------------------------------
-// PVS: this function is called a lot, so it avoids function calls
-//-----------------------------------------------------------------------------
-bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
-{
-	// PVS data must be up to date
-	//Assert( !m_pPev || ( ( m_pPev->m_fStateFlags & FL_EDICT_DIRTY_PVS_INFORMATION ) == 0 ) );
-	
-	int i;
-
-	// Early out if the areas are connected
-	if ( !m_PVSInfo.m_nAreaNum2 )
-	{
-		for ( i=0; i< pInfo->m_AreasNetworked; i++ )
-		{
-			int clientArea = pInfo->m_Areas[i];
-			if ( clientArea == m_PVSInfo.m_nAreaNum || engine->CheckAreasConnected( clientArea, m_PVSInfo.m_nAreaNum ) )
-				break;
-		}
-	}
-	else
-	{
-		// doors can legally straddle two areas, so
-		// we may need to check another one
-		for ( i=0; i< pInfo->m_AreasNetworked; i++ )
-		{
-			int clientArea = pInfo->m_Areas[i];
-			if ( clientArea == m_PVSInfo.m_nAreaNum || clientArea == m_PVSInfo.m_nAreaNum2 )
-				break;
-
-			if ( engine->CheckAreasConnected( clientArea, m_PVSInfo.m_nAreaNum ) )
-				break;
-
-			if ( engine->CheckAreasConnected( clientArea, m_PVSInfo.m_nAreaNum2 ) )
-				break;
-		}
-	}
-
-	if ( i == pInfo->m_AreasNetworked )
-	{
-		// areas not connected
-		return false;
-	}
-
-	// ignore if not touching a PV leaf
-	// negative leaf count is a node number
-	// If no pvs, add any entity
-
-	Assert( entindex() !=  pInfo->m_pClientEnt );
-
-	unsigned char *pPVS = ( unsigned char * )pInfo->m_PVS;
-	
-	if ( m_PVSInfo.m_nClusterCount < 0 )   // too many clusters, use headnode
-	{
-		return (engine->CheckHeadnodeVisible( m_PVSInfo.m_nHeadNode, pPVS, pInfo->m_nPVSSize ) != 0);
-	}
-	
-	for ( i = m_PVSInfo.m_nClusterCount; --i >= 0; )
-	{
-		int nCluster = m_PVSInfo.m_pClusters[i];
-		if ( ((int)(pPVS[nCluster >> 3])) & BitVec_BitInByte( nCluster ) )
-			return true;
-	}
-
-	return false;		// not visible
-
-}
 
 
 void CServerNetworkProperty::SetUpdateInterval( float val )

@@ -353,8 +353,14 @@ public:
 		SetIdentityMatrix(m_rgflCoordinateFrame);
 	}
 
+	~CEngineObject()
+	{
+		engine->CleanUpEntityClusterList(&m_PVSInfo);
+	}
+
 	void Init(CBaseEntity* pOuter) {
 		m_pOuter = pOuter;
+		m_PVSInfo.m_nClusterCount = 0;
 	}
 
 	CBaseEntity* GetOuter() {
@@ -431,6 +437,20 @@ public:
 	static void UnlinkAllChildren(CEngineObject* pParent);
 	static void UnlinkFromParent(CEngineObject* pRemove);
 	static void TransferChildren(CEngineObject* pOldParent, CEngineObject* pNewParent);
+
+	virtual int				AreaNum() const;
+	virtual PVSInfo_t* GetPVSInfo();
+
+	// This version does a PVS check which also checks for connected areas
+	bool IsInPVS(const CCheckTransmitInfo* pInfo);
+
+	// This version doesn't do the area check
+	bool IsInPVS(const CBaseEntity* pRecipient, const void* pvs, int pvssize);
+
+	// Recomputes PVS information
+	void RecomputePVSInformation();
+	// Marks the PVS information dirty
+	void MarkPVSInformationDirty();
 private:
 
 	friend class CBaseEntity;
@@ -452,9 +472,34 @@ private:
 	EHANDLE m_hMovePeer;
 	// local coordinate frame of entity
 	matrix3x4_t		m_rgflCoordinateFrame;
+
+	PVSInfo_t m_PVSInfo;
+	bool m_bPVSInfoDirty=false;
+
 };
 
+inline PVSInfo_t* CEngineObject::GetPVSInfo()
+{
+	return &m_PVSInfo;
+}
 
+inline int CEngineObject::AreaNum() const
+{
+	const_cast<CEngineObject*>(this)->RecomputePVSInformation();
+	return m_PVSInfo.m_nAreaNum;
+}
+
+//-----------------------------------------------------------------------------
+// Marks the PVS information dirty
+//-----------------------------------------------------------------------------
+inline void CEngineObject::MarkPVSInformationDirty()
+{
+	//if (m_entindex != -1)
+	//{
+	//GetTransmitState() |= FL_EDICT_DIRTY_PVS_INFORMATION;
+	//}
+	m_bPVSInfoDirty = true;
+}
 
 //#define CREATE_PREDICTED_ENTITY( className )	\
 //	CBaseEntity::CreatePredictedEntityByName( className, __FILE__, __LINE__ );
@@ -543,6 +588,13 @@ public:
 	const CCollisionProperty*CollisionProp() const;
 	CServerNetworkProperty *NetworkProp();
 	const CServerNetworkProperty *NetworkProp() const;
+
+	PVSInfo_t* GetPVSInfo() {
+		return GetEngineObject()->GetPVSInfo();
+	}
+	int				AreaNum() const {
+		return GetEngineObject()->AreaNum();
+	}
 
 	bool					IsCurrentlyTouching( void ) const;
 	

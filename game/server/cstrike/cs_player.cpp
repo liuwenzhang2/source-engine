@@ -1423,7 +1423,7 @@ void CCSPlayer::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *pvs, i
 {
 	BaseClass::SetupVisibility( pViewEntity, pvs, pvssize );
 
-	int area = pViewEntity ? pViewEntity->NetworkProp()->AreaNum() : NetworkProp()->AreaNum();
+	int area = pViewEntity ? pViewEntity->AreaNum() : AreaNum();
 	PointCameraSetupVisibility( this, area, pvs, pvssize );
 }
 

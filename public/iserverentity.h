@@ -24,6 +24,7 @@ class ICollideable;
 class IServerNetworkable;
 class Vector;
 class QAngle;
+struct PVSInfo_t;
 
 // This class is how the engine talks to entities in the game DLL.
 // CBaseEntity implements this interface.
@@ -38,6 +39,9 @@ public:
  	virtual string_t		GetModelName( void ) const = 0;
 
 	virtual void			SetModelIndex( int index ) = 0;
+	virtual PVSInfo_t*		GetPVSInfo() = 0; // get current visibilty data
+	virtual int				AreaNum() const = 0;
+
 };
 
 

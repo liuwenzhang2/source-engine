@@ -746,7 +746,7 @@ void CHL1_Player::CheatImpulseCommands( int iImpulse )
 
 void CHL1_Player::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *pvs, int pvssize )
 {
-	int area = pViewEntity ? pViewEntity->NetworkProp()->AreaNum() : NetworkProp()->AreaNum();
+	int area = pViewEntity ? pViewEntity->AreaNum() : AreaNum();
 	BaseClass::SetupVisibility( pViewEntity, pvs, pvssize );
 	PointCameraSetupVisibility( this, area, pvs, pvssize );
 }

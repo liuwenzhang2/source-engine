@@ -1229,7 +1229,7 @@ void CCollisionProperty::MarkSurroundingBoundsDirty()
 #ifdef CLIENT_DLL
 	g_pClientShadowMgr->MarkRenderToTextureShadowDirty( GetOuter()->GetShadowHandle() );
 #else
-	GetOuter()->NetworkProp()->MarkPVSInformationDirty();
+	GetOuter()->GetEngineObject()->MarkPVSInformationDirty();
 #endif
 }
 

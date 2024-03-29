@@ -2537,13 +2537,13 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 		if ( !( nFlags & FL_EDICT_PVSCHECK ) )
 			continue;
 
-		CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>(gEntList.GetServerNetworkable(iEdict));
+		//CServerNetworkProperty *netProp = static_cast<CServerNetworkProperty*>(gEntList.GetServerNetworkable(iEdict));
 
 #ifndef _X360
 		if ( bIsHLTV || bIsReplay )
 		{
 			// for the HLTV/Replay we don't cull against PVS
-			if ( netProp->AreaNum() == skyBoxArea )
+			if (pEnt->GetEngineObject()->AreaNum() == skyBoxArea)
 			{
 				pEnt->SetTransmit( pInfo, true );
 			}
@@ -2557,14 +2557,14 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 
 		// Always send entities in the player's 3d skybox.
 		// Sidenote: call of AreaNum() ensures that PVS data is up to date for this entity
-		bool bSameAreaAsSky = netProp->AreaNum() == skyBoxArea;
+		bool bSameAreaAsSky = pEnt->GetEngineObject()->AreaNum() == skyBoxArea;
 		if ( bSameAreaAsSky )
 		{
 			pEnt->SetTransmit( pInfo, true );
 			continue;
 		}
 
-		bool bInPVS = netProp->IsInPVS( pInfo );
+		bool bInPVS = pEnt->GetEngineObject()->IsInPVS(pInfo);
 		if ( bInPVS || sv_force_transmit_ents.GetBool() )
 		{
 			// only send if entity is in PVS
@@ -2575,7 +2575,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 		// If the entity is marked "check PVS" but it's in hierarchy, walk up the hierarchy looking for the
 		//  for any parent which is also in the PVS.  If none are found, then we don't need to worry about sending ourself
 		CBaseEntity *orig = pEnt;
-		CServerNetworkProperty *check = netProp->GetNetworkParent();
+		CServerNetworkProperty *check = pEnt->NetworkProp()->GetNetworkParent();
 
 		// BUG BUG:  I think it might be better to build up a list of edict indices which "depend" on other answers and then
 		// resolve them in a second pass.  Not sure what happens if an entity has two parents who both request PVS check?
@@ -2617,8 +2617,8 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 			if ( checkFlags & FL_EDICT_PVSCHECK )
 			{
 				// Check pvs
-				check->RecomputePVSInformation();
-				bool bMoveParentInPVS = check->IsInPVS( pInfo );
+				check->GetBaseEntity()->GetEngineObject()->RecomputePVSInformation();
+				bool bMoveParentInPVS = check->GetBaseEntity()->GetEngineObject()->IsInPVS( pInfo );
 				if ( bMoveParentInPVS )
 				{
 					orig->SetTransmit( pInfo, true );
@@ -2907,7 +2907,7 @@ int TestAreaPortalVisibilityThroughPortals ( CFuncAreaPortalBase* pAreaPortal, I
 
 			// Make sure this portal's linked portal is in the PVS before we add what it can see
 			if ( pRemotePortal && pRemotePortal->m_bActivated && pRemotePortal->NetworkProp() && 
-				pRemotePortal->NetworkProp()->IsInPVS( (CBaseEntity*)pViewEntity, pvs, pvssize ) )
+				pRemotePortal->GetEngineObject()->IsInPVS( (CBaseEntity*)pViewEntity, pvs, pvssize ) )
 			{
 				bool bIsOpenOnClient = true;
 				float fovDistanceAdjustFactor = 1.0f;

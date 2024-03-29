@@ -38,8 +38,6 @@ public:
 	virtual ServerClass*	GetServerClass();
 	virtual const char*		GetClassName() const;
 	//virtual void			Release();
-	virtual int				AreaNum() const;
-	virtual PVSInfo_t*		GetPVSInfo();
 	virtual int&			GetTransmitState();
 	virtual void			ClearTransmitState();
 public:
@@ -69,8 +67,7 @@ public:
 	void NetworkStateChanged();
 	void NetworkStateChanged(unsigned short offset);
 
-	// Marks the PVS information dirty
-	void MarkPVSInformationDirty();
+
 
 	// Marks for deletion
 	void MarkForDeletion();
@@ -97,17 +94,12 @@ public:
 	// You can use this to override any entity's ShouldTransmit behavior.
 	// void SetTransmitProxy( CBaseTransmitProxy *pProxy );
 
-	// This version does a PVS check which also checks for connected areas
-	bool IsInPVS(const CCheckTransmitInfo* pInfo);
 
-	// This version doesn't do the area check
-	bool IsInPVS(const CBaseEntity* pRecipient, const void* pvs, int pvssize);
 
 	// Called by the timed event manager when it's time to detect a state change.
 	virtual void FireEvent();
 
-	// Recomputes PVS information
-	void RecomputePVSInformation();
+	
 
 private:
 	// Detaches the edict.. should only be called by CBaseNetworkable's destructor.
@@ -131,7 +123,6 @@ private:
 	unsigned short m_ChangeOffsets[MAX_CHANGE_OFFSETS];
 	unsigned short m_nChangeOffsets;
 	//int	m_nChangeOffsetsTickCount = 0;
-	PVSInfo_t m_PVSInfo;
 	ServerClass* m_pServerClass;
 
 	// NOTE: This state is 'owned' by the entity. It's only copied here
@@ -164,10 +155,7 @@ inline CBaseEntity* CServerNetworkProperty::GetOuter()
 	return m_pOuter;
 }
 
-inline PVSInfo_t* CServerNetworkProperty::GetPVSInfo()
-{
-	return &m_PVSInfo;
-}
+
 
 inline int& CServerNetworkProperty::GetTransmitState() {
 	return m_fStateFlags;
@@ -177,16 +165,7 @@ inline void CServerNetworkProperty::ClearTransmitState() {
 	m_fStateFlags &= ~(FL_EDICT_ALWAYS | FL_EDICT_PVSCHECK | FL_EDICT_DONTSEND);
 }
 
-//-----------------------------------------------------------------------------
-// Marks the PVS information dirty
-//-----------------------------------------------------------------------------
-inline void CServerNetworkProperty::MarkPVSInformationDirty()
-{
-	//if (m_entindex != -1)
-	//{
-		GetTransmitState() |= FL_EDICT_DIRTY_PVS_INFORMATION;
-	//}
-}
+
 
 
 //-----------------------------------------------------------------------------
@@ -342,11 +321,7 @@ inline const unsigned short	CServerNetworkProperty::GetNumStateChangedOffsets() 
 //}
 
 
-inline int CServerNetworkProperty::AreaNum() const
-{
-	const_cast<CServerNetworkProperty*>(this)->RecomputePVSInformation();
-	return m_PVSInfo.m_nAreaNum;
-}
+
 
 
 #endif // SERVERNETWORKPROPERTY_H

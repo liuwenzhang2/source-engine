@@ -166,10 +166,10 @@ void PointCameraSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *
 		if ( pTargetEnt->IsEffectActive( EF_NODRAW ) )
 			continue;
 
-		if ( !pTargetEnt->NetworkProp()->IsInPVS( pPlayer, pvs, pvssize ) )
+		if ( !pTargetEnt->GetEngineObject()->IsInPVS(pPlayer, pvs, pvssize))
 			continue;
 
-		if ( engine->CheckAreasConnected( area, pTargetEnt->NetworkProp()->AreaNum() ) )
+		if ( engine->CheckAreasConnected( area, pTargetEnt->AreaNum() ) )
 		{
 			CPointCamera *pCameraEnt = g_InfoCameraLinkList[i]->m_hCamera;
 			if ( pCameraEnt )
