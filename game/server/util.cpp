@@ -344,13 +344,18 @@ bool g_bReceivedChainedUpdateOnRemove = false;
 //			until the next frame, so there can be no pointer errors.
 // Input  : *oldObj - object to delete
 //-----------------------------------------------------------------------------
-void UTIL_Remove( IServerNetworkable *oldObj )
+//void UTIL_Remove( IServerNetworkable *oldObj )
+//{
+//	
+//}
+
+void UTIL_Remove( CBaseEntity *oldObj )
 {
-	CServerNetworkProperty* pProp = static_cast<CServerNetworkProperty*>( oldObj );
-	if ( !pProp || pProp->IsMarkedForDeletion() )
+	//CServerNetworkProperty* pProp = static_cast<CServerNetworkProperty*>(oldObj);
+	if (!oldObj || oldObj->IsMarkedForDeletion())
 		return;
 
-	if ( PhysIsInCallback() )
+	if (PhysIsInCallback())
 	{
 		// This assert means that someone is deleting an entity inside a callback.  That isn't supported so
 		// this code will defer the deletion of that object until the end of the current physics simulation frame
@@ -364,10 +369,10 @@ void UTIL_Remove( IServerNetworkable *oldObj )
 	}
 
 	// mark it for deletion	
-	pProp->MarkForDeletion( );
+	oldObj->MarkForDeletion();
 
-	CBaseEntity *pBaseEnt = oldObj->GetBaseEntity();
-	if ( pBaseEnt )
+	CBaseEntity* pBaseEnt = oldObj->GetBaseEntity();
+	if (pBaseEnt)
 	{
 #ifdef PORTAL //make sure entities are in the primary physics environment for the portal mod, this code should be safe even if the entity is in neither extra environment
 		bool bNetworkable = pBaseEnt->IsNetworkable();
@@ -379,10 +384,10 @@ void UTIL_Remove( IServerNetworkable *oldObj )
 		g_bReceivedChainedUpdateOnRemove = false;
 		pBaseEnt->UpdateOnRemove();
 
-		Assert( g_bReceivedChainedUpdateOnRemove );
+		Assert(g_bReceivedChainedUpdateOnRemove);
 
 		// clear oldObj targetname / other flags now
-		pBaseEnt->SetName( NULL_STRING );
+		pBaseEnt->SetName(NULL_STRING);
 
 #ifdef PORTAL
 		if (bNetworkable && nEntIndex != -1) {
@@ -391,14 +396,7 @@ void UTIL_Remove( IServerNetworkable *oldObj )
 #endif
 
 		gEntList.AddToDeleteList(pBaseEnt);
-	}
 }
-
-void UTIL_Remove( CBaseEntity *oldObj )
-{
-	if ( !oldObj )
-		return;
-	UTIL_Remove( oldObj->NetworkProp() );
 }
 
 static int s_RemoveImmediateSemaphore = 0;

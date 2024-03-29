@@ -701,7 +701,7 @@ bool CCollisionEvent::ShouldFreezeObject( IPhysicsObject *pObject )
 				if ( PropIsGib(pEntity) )
 				{
 					// it's always safe to delete gibs, so kill this one to avoid simulation problems
-					PhysCallbackRemove( pEntity->NetworkProp() );
+					PhysCallbackRemove( pEntity );
 				}
 				else
 				{
@@ -2344,7 +2344,7 @@ void PostSimulation_SetVelocityEvent( IPhysicsObject *pPhysicsObject, const Vect
 	pPhysicsObject->SetVelocity( &vecVelocity, NULL );
 }
 
-void CCollisionEvent::AddRemoveObject(IServerNetworkable *pRemove)
+void CCollisionEvent::AddRemoveObject(CBaseEntity *pRemove)
 {
 	if ( pRemove && m_removeObjects.Find(pRemove) == -1 )
 	{
@@ -2777,7 +2777,7 @@ void PhysCallbackDamage( CBaseEntity *pEntity, const CTakeDamageInfo &info )
 	}
 }
 
-void PhysCallbackRemove(IServerNetworkable *pRemove)
+void PhysCallbackRemove(CBaseEntity *pRemove)
 {
 	if ( PhysIsInCallback() )
 	{

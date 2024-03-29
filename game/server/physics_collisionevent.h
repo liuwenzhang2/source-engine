@@ -82,7 +82,7 @@ public:
 	virtual void AddDamageEvent( CBaseEntity *pEntity, const CTakeDamageInfo &info, IPhysicsObject *pInflictorPhysics, bool bRestoreVelocity, const Vector &savedVel, const AngularImpulse &savedAngVel );
 	void AddImpulseEvent( IPhysicsObject *pPhysicsObject, const Vector &vecCenterForce, const AngularImpulse &vecCenterTorque );
 	void AddSetVelocityEvent( IPhysicsObject *pPhysicsObject, const Vector &vecVelocity );
-	void AddRemoveObject(IServerNetworkable *pRemove);
+	void AddRemoveObject(CBaseEntity *pRemove);
 	void FlushQueuedOperations();
 
 	// IPhysicsCollisionSolver
@@ -167,7 +167,7 @@ private:
 	CUtlVector<inflictorstate_t>	m_damageInflictors;
 	CUtlVector<penetrateevent_t> m_penetrateEvents;
 	CUtlVector<fluidevent_t>	m_fluidEvents;
-	CUtlVector<IServerNetworkable *> m_removeObjects;
+	CUtlVector<CBaseEntity *> m_removeObjects;
 	int							m_inCallback;
 	int							m_lastTickFrictionError;	// counter to control printing of the dev warning for large contact systems
 	bool						m_bBufferTouchEvents;

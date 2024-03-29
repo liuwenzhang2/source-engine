@@ -109,7 +109,7 @@ public:
 	virtual int				entindex() const = 0;
 
 	// In place of a generic QueryInterface.
-	virtual CBaseNetworkable* GetBaseNetworkable() = 0;
+	//virtual CBaseNetworkable* GetBaseNetworkable() = 0;
 	virtual CBaseEntity*	GetBaseEntity() = 0; // Only used by game code.
 	virtual int&			GetTransmitState() = 0;
 	virtual void			ClearTransmitState() = 0;

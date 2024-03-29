@@ -126,7 +126,7 @@ public:
 	IServerEntity* GetServerEntity(int entnum) const;
 	IServerEntity* GetServerEntityFromHandle(CBaseHandle hEnt) const;
 	short		GetNetworkSerialNumber(int iEntity) const;
-	CBaseNetworkable* GetBaseNetworkable( CBaseHandle hEnt ) const;
+	//CBaseNetworkable* GetBaseNetworkable( CBaseHandle hEnt ) const;
 	CBaseEntity* GetBaseEntity( CBaseHandle hEnt ) const;
 	CBaseEntity* GetBaseEntity(int entnum) const;
 	//edict_t* GetEdict( CBaseHandle hEnt ) const;
@@ -248,15 +248,15 @@ inline void	CGlobalEntityList<T>::DestroyEntity(IHandleEntity* pEntity) {
 	EntityFactoryDictionary()->Destroy(pEntity);
 }
 
-template<class T>
-inline CBaseNetworkable* CGlobalEntityList<T>::GetBaseNetworkable( CBaseHandle hEnt ) const
-{
-	T *pUnk = (BaseClass::LookupEntity( hEnt ));
-	if ( pUnk )
-		return pUnk->GetNetworkable()->GetBaseNetworkable();
-	else
-		return NULL;
-}
+//template<class T>
+//inline CBaseNetworkable* CGlobalEntityList<T>::GetBaseNetworkable( CBaseHandle hEnt ) const
+//{
+//	T *pUnk = (BaseClass::LookupEntity( hEnt ));
+//	if ( pUnk )
+//		return pUnk->GetNetworkable()->GetBaseNetworkable();
+//	else
+//		return NULL;
+//}
 
 template<class T>
 inline IServerNetworkable* CGlobalEntityList<T>::GetServerNetworkable( CBaseHandle hEnt ) const
@@ -382,7 +382,7 @@ void CGlobalEntityList<T>::Clear(void)
 	CBaseHandle hCur = BaseClass::FirstHandle();
 	while (hCur != BaseClass::InvalidHandle())
 	{
-		IServerNetworkable* ent = GetServerNetworkable(hCur);
+		CBaseEntity* ent = GetBaseEntity(hCur);
 		if (ent)
 		{
 			MDLCACHE_CRITICAL_SECTION();

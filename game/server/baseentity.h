@@ -607,7 +607,9 @@ public:
 	void					AddEFlags( int nEFlagMask );
 	void					RemoveEFlags( int nEFlagMask );
 	bool					IsEFlagSet( int nEFlagMask ) const;
-
+	// Marks for deletion
+	void					MarkForDeletion();
+	bool					IsMarkedForDeletion() const;
 	// Quick way to ask if we have a player entity as a child anywhere in our hierarchy.
 	void					RecalcHasPlayerChildBit();
 	bool					DoesHavePlayerChild();
@@ -2274,6 +2276,19 @@ inline void CBaseEntity::RemoveEFlags( int nEFlagMask )
 inline bool CBaseEntity::IsEFlagSet( int nEFlagMask ) const
 {
 	return (m_iEFlags & nEFlagMask) != 0;
+}
+
+//-----------------------------------------------------------------------------
+// Marks for deletion
+//-----------------------------------------------------------------------------
+inline void CBaseEntity::MarkForDeletion()
+{
+	AddEFlags(EFL_KILLME);
+}
+
+inline bool CBaseEntity::IsMarkedForDeletion() const
+{
+	return (GetEFlags() & EFL_KILLME) != 0;
 }
 
 inline void	CBaseEntity::SetNavIgnore( float duration )

@@ -430,7 +430,7 @@ bool CEngineObject::IsInPVS(const CCheckTransmitInfo* pInfo)
 	// negative leaf count is a node number
 	// If no pvs, add any entity
 
-	Assert(entindex() != pInfo->m_pClientEnt);
+	Assert(m_pOuter->entindex() != pInfo->m_pClientEnt);
 
 	unsigned char* pPVS = (unsigned char*)pInfo->m_PVS;
 
@@ -3788,7 +3788,7 @@ void CBaseEntity::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 	if ( pInfo->m_pTransmitEdict->Get( index ) )
 		return;
 
-	CServerNetworkProperty *pNetworkParent = NetworkProp()->GetNetworkParent();
+	CBaseEntity *pMoveParent = GetMoveParent();
 
 	pInfo->m_pTransmitEdict->Set( index );
 
@@ -3797,7 +3797,7 @@ void CBaseEntity::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 	{
 		// in HLTV/Replay mode always transmit entitys with move-parents
 		// HLTV/Replay can't resolve the mode-parents relationships 
-		if ( bAlways || pNetworkParent )
+		if ( bAlways || pMoveParent)
 		{
 			// tell HLTV/Replay that this entity is always transmitted
 			pInfo->m_pTransmitAlways->Set( index );
@@ -3811,9 +3811,9 @@ void CBaseEntity::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 	}
 
 	// Force our aiment and move parent to be sent.
-	if ( pNetworkParent )
+	if (pMoveParent)
 	{
-		CBaseEntity *pMoveParent = pNetworkParent->GetBaseEntity();
+		//CBaseEntity *pMoveParent = pNetworkParent->GetBaseEntity();
 		pMoveParent->SetTransmit( pInfo, bAlways );
 	}
 }

@@ -161,7 +161,7 @@ void CRagdollBoogie::DecrementSuppressionCount( CBaseEntity *pTarget )
 			float dt = gpGlobals->curtime - pBoogie->m_flStartTime;
 			if ( dt >= pBoogie->m_flBoogieLength )
 			{
-				PhysCallbackRemove( pBoogie->NetworkProp() );
+				PhysCallbackRemove( pBoogie );
 			}
 		}
 	}

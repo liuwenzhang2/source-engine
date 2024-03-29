@@ -1581,7 +1581,7 @@ void CPropCombineBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 
 			// Remove self without affecting the object that was hit. (Unless it was flesh)
 			NotifySpawnerOfRemoval();
-			PhysCallbackRemove( this->NetworkProp() );
+			PhysCallbackRemove( this );
 
 			// disable dissolve damage so we don't kill off the player when he's the one we hit
 			PhysClearGameFlags( VPhysicsGetObject(), FVPHYSICS_DMG_DISSOLVE );

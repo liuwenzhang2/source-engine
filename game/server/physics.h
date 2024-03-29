@@ -117,7 +117,7 @@ void PhysCallbackImpulse( IPhysicsObject *pPhysicsObject, const Vector &vecCente
 void PhysCallbackSetVelocity( IPhysicsObject *pPhysicsObject, const Vector &vecVelocity );
 
 // queue up a delete on this object
-void PhysCallbackRemove(IServerNetworkable *pRemove);
+void PhysCallbackRemove(CBaseEntity *pRemove);
 
 bool PhysGetDamageInflictorVelocityStartOfFrame( IPhysicsObject *pInflictor, Vector &velocity, AngularImpulse &angVelocity );
 

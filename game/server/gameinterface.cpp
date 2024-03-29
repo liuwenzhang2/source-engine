@@ -2501,11 +2501,11 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 					pInfo->m_pTransmitAlways->Set( iEdict );
 				}
 #endif	
-				CServerNetworkProperty *pEnt = static_cast<CServerNetworkProperty*>( gEntList.GetServerNetworkable(iEdict) );
+				CBaseEntity *pEnt = gEntList.GetBaseEntity(iEdict);
 				if ( !pEnt )
 					break;
 
-				CServerNetworkProperty *pParent = pEnt->GetNetworkParent();
+				CBaseEntity *pParent = pEnt->GetMoveParent();
 				if ( !pParent )
 					break;
 
@@ -2575,7 +2575,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 		// If the entity is marked "check PVS" but it's in hierarchy, walk up the hierarchy looking for the
 		//  for any parent which is also in the PVS.  If none are found, then we don't need to worry about sending ourself
 		CBaseEntity *orig = pEnt;
-		CServerNetworkProperty *check = pEnt->NetworkProp()->GetNetworkParent();
+		CBaseEntity *check = pEnt->GetMoveParent();
 
 		// BUG BUG:  I think it might be better to build up a list of edict indices which "depend" on other answers and then
 		// resolve them in a second pass.  Not sure what happens if an entity has two parents who both request PVS check?
@@ -2627,7 +2627,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 			}
 
 			// Continue up chain just in case the parent itself has a parent that's in the PVS...
-			check = check->GetNetworkParent();
+			check = check->GetMoveParent();
 		}
 	}
 

@@ -226,7 +226,7 @@ inline int UTIL_EntitiesInSphere( CBaseEntity **pList, int listMax, const Vector
 }
 
 // marks the entity for deletion so it will get removed next frame
-void UTIL_Remove( IServerNetworkable *oldObj );
+//void UTIL_Remove( IServerNetworkable *oldObj );
 void UTIL_Remove( CBaseEntity *oldObj );
 
 // deletes an entity, without any delay.  Only use this when sure no pointers rely on this entity.

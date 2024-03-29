@@ -33,7 +33,7 @@ public:
 	// IServerNetworkable implementation.
 	virtual IHandleEntity* GetEntityHandle();
 	//virtual edict_t			*GetEdict() const;
-	virtual CBaseNetworkable* GetBaseNetworkable();
+	//virtual CBaseNetworkable* GetBaseNetworkable();
 	virtual CBaseEntity*	GetBaseEntity();
 	virtual ServerClass*	GetServerClass();
 	virtual const char*		GetClassName() const;
@@ -69,13 +69,11 @@ public:
 
 
 
-	// Marks for deletion
-	void MarkForDeletion();
-	bool IsMarkedForDeletion() const;
+	
 
 	// Sets the network parent
-	void SetNetworkParent(EHANDLE hParent);
-	CServerNetworkProperty* GetNetworkParent();
+	//void SetNetworkParent(EHANDLE hParent);
+	//CServerNetworkProperty* GetNetworkParent();
 
 	// This is useful for entities that don't change frequently or that the client
 	// doesn't need updates on very often. If you use this mode, the server will only try to
@@ -127,7 +125,7 @@ private:
 
 	// NOTE: This state is 'owned' by the entity. It's only copied here
 	// also to help improve cache performance in networking code.
-	EHANDLE m_hParent;
+	//EHANDLE m_hParent;
 
 	// Counters for SetUpdateInterval.
 	CEventRegister	m_TimerEvent;
@@ -140,10 +138,10 @@ private:
 //-----------------------------------------------------------------------------
 // inline methods // TODOMO does inline work on virtual functions ?
 //-----------------------------------------------------------------------------
-inline CBaseNetworkable* CServerNetworkProperty::GetBaseNetworkable()
-{
-	return NULL;
-}
+//inline CBaseNetworkable* CServerNetworkProperty::GetBaseNetworkable()
+//{
+//	return NULL;
+//}
 
 inline CBaseEntity* CServerNetworkProperty::GetBaseEntity()
 {
@@ -171,10 +169,10 @@ inline void CServerNetworkProperty::ClearTransmitState() {
 //-----------------------------------------------------------------------------
 // Sets/gets the network parent
 //-----------------------------------------------------------------------------
-inline void CServerNetworkProperty::SetNetworkParent(EHANDLE hParent)
-{
-	m_hParent = hParent;
-}
+//inline void CServerNetworkProperty::SetNetworkParent(EHANDLE hParent)
+//{
+//	m_hParent = hParent;
+//}
 
 
 //-----------------------------------------------------------------------------

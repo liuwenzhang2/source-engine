@@ -38,7 +38,7 @@ void CEngineObject::UnlinkChild( CEngineObject *pParent, CEngineObject *pChild )
 			// Clear hierarchy bits for this guy
 			pList->SetMoveParent( NULL );
 			pList->SetNextMovePeer( NULL );
-			pList->GetOuter()->NetworkProp()->SetNetworkParent( CBaseHandle() );
+			//pList->GetOuter()->NetworkProp()->SetNetworkParent( CBaseHandle() );
 			pList->GetOuter()->DispatchUpdateTransmitState();
 			pList->GetOuter()->OnEntityEvent( ENTITY_EVENT_PARENT_CHANGED, NULL );
 			
@@ -63,7 +63,7 @@ void CEngineObject::LinkChild( CEngineObject *pParent, CEngineObject *pChild )
 	pChild->SetNextMovePeer( pParent->GetOuter()->FirstMoveChild());
 	pParent->SetFirstMoveChild( pChild->GetOuter() );
 	pChild->SetMoveParent(pParent->GetOuter());
-	pChild->GetOuter()->NetworkProp()->SetNetworkParent(pParent->GetOuter());
+	//pChild->GetOuter()->NetworkProp()->SetNetworkParent(pParent->GetOuter());
 	pChild->GetOuter()->DispatchUpdateTransmitState();
 	pChild->GetOuter()->OnEntityEvent( ENTITY_EVENT_PARENT_CHANGED, NULL );
 	pParent->GetOuter()->RecalcHasPlayerChildBit();
