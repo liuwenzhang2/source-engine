@@ -14,6 +14,9 @@
 #include "convar.h"
 #include "con_nprint.h"
 #include "utldict.h"
+#include "server_class.h"
+#include "client_class.h"
+#include "icliententity.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -293,7 +296,7 @@ void LocalTransfer_InitFastCopy(
 
 
 inline int MapPropOffsetsToIndices( 
-	const IServerNetworkable *pEdict,
+	const IServerEntity *pEdict,
 	CSendTablePrecalc *pPrecalc, 
 	const unsigned short *pOffsets,
 	unsigned short nOffsets,
@@ -473,11 +476,11 @@ void PrintPartialChangeEntsList()
 
 //extern int g_SharedEdictChangeInfom_iSerialNumber;
 void LocalTransfer_TransferEntity( 
-	const IServerNetworkable *pEdict,
-	const SendTable *pSendTable, 
-	const void *pSrcEnt, 
-	RecvTable *pRecvTable, 
-	void *pDestEnt,
+	IServerEntity * pServerEntity,
+	//const SendTable *pSendTable, 
+	//const void *pSrcEnt, 
+	//RecvTable *pRecvTable, 
+	IClientEntity *pDestEnt,
 	bool bNewlyCreated,
 	bool bJustEnteredPVS,
 	int objectID )
@@ -486,30 +489,32 @@ void LocalTransfer_TransferEntity(
 	//CEdictChangeInfo *pCI = &g_pSharedChangeInfo->m_ChangeInfos[pEdict->GetChangeInfo()];
 
 	unsigned short propIndices[MAX_CHANGE_OFFSETS*3];
-	
+	SendTable* pSendTable = pServerEntity->GetServerClass()->m_pTable;
+	RecvTable* pRecvTable = pDestEnt->GetClientClass()->m_pRecvTable;
+
 	// This code tries to only copy fields expressly marked as "changed" (by having the field offsets added to the changeoffsets vectors)
-	if ( pEdict->GetNumStateChangedOffsets() > 0 &&
+	if (pServerEntity->GetNetworkable()->GetNumStateChangedOffsets() > 0 &&
 		 !bNewlyCreated &&
 		 !bJustEnteredPVS &&
 		 dt_UsePartialChangeEnts.GetInt()
 		 )
 	{
-		if (pEdict->entindex() == 1) {
+		if (pServerEntity->entindex() == 1) {
 			int aaa = 0;
 		}
 
 		CSendTablePrecalc *pPrecalc = pSendTable->m_pPrecalc;
 
-		int nChangeOffsets = MapPropOffsetsToIndices( pEdict, pPrecalc, pEdict->GetStateChangedOffsets(), pEdict->GetNumStateChangedOffsets(), propIndices);
+		int nChangeOffsets = MapPropOffsetsToIndices(pServerEntity, pPrecalc, pServerEntity->GetNetworkable()->GetStateChangedOffsets(), pServerEntity->GetNetworkable()->GetNumStateChangedOffsets(), propIndices);
 		if ( nChangeOffsets == 0 )
 			return;
 		
-		AddToPartialChangeEntsList(pEdict->entindex(), true);//(edict_t*)pEdict - sv.edicts
+		AddToPartialChangeEntsList(pServerEntity->entindex(), true);//(edict_t*)pEdict - sv.edicts
 		FastSortList( propIndices, nChangeOffsets );
 
 		// Setup the structure to traverse the source tree.
 		ErrorIfNot( pPrecalc, ("SendTable_Encode: Missing m_pPrecalc for SendTable %s.", pSendTable->m_pNetTableName) );
-		CServerDatatableStack serverStack( pPrecalc, (unsigned char*)pSrcEnt, objectID );
+		CServerDatatableStack serverStack( pPrecalc, (unsigned char*)pServerEntity->GetBaseEntity(), objectID);
 		serverStack.Init( true );
 
 		// Setup the structure to traverse the dest tree.
@@ -549,7 +554,7 @@ void LocalTransfer_TransferEntity(
 		// Setup the structure to traverse the source tree.
 		CSendTablePrecalc *pPrecalc = pSendTable->m_pPrecalc;
 		ErrorIfNot( pPrecalc, ("SendTable_Encode: Missing m_pPrecalc for SendTable %s.", pSendTable->m_pNetTableName) );
-		CServerDatatableStack serverStack( pPrecalc, (unsigned char*)pSrcEnt, objectID );
+		CServerDatatableStack serverStack( pPrecalc, (unsigned char*)pServerEntity->GetBaseEntity(), objectID);
 		serverStack.Init();
 
 		// Setup the structure to traverse the dest tree.
@@ -558,7 +563,7 @@ void LocalTransfer_TransferEntity(
 		CClientDatatableStack clientStack( pDecoder, (unsigned char*)pDestEnt, objectID );
 		clientStack.Init();
 
-		AddToPartialChangeEntsList(pEdict->entindex(), false );//(edict_t*)pEdict - sv.edicts
+		AddToPartialChangeEntsList(pServerEntity->entindex(), false );//(edict_t*)pEdict - sv.edicts
 
 		// Copy the properties that require proxies.
 		CFastLocalTransferPropInfo *pPropList = pPrecalc->m_FastLocalTransfer.m_OtherProps.Base();

@@ -46,7 +46,6 @@ enum
 typedef CBaseHandle EntityHandle_t;
 
 
-#define INVALID_ENTITY_HANDLE INVALID_EHANDLE_INDEX
 
 //-----------------------------------------------------------------------------
 // Functions the engine provides to IGameMovement to assist in its movement.

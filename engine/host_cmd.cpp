@@ -2297,10 +2297,10 @@ CON_COMMAND( sv_dump_edicts, "Display a list of edicts allocated on the server."
 		if (!serverEntitylist->GetServerNetworkable(i)) {
 			continue;
 		}
-		CUtlMap<CUtlString, int>::IndexType_t index = classNameCountMap.Find( serverEntitylist->GetServerNetworkable( i )->GetClassName() );
+		CUtlMap<CUtlString, int>::IndexType_t index = classNameCountMap.Find( serverEntitylist->GetServerEntity( i )->GetClassName() );
 		if ( index == classNameCountMap.InvalidIndex() )
 		{
-			index = classNameCountMap.Insert(serverEntitylist->GetServerNetworkable(i)->GetClassName(), 0 );
+			index = classNameCountMap.Insert(serverEntitylist->GetServerEntity(i)->GetClassName(), 0 );
 		}
 
 		classNameCountMap[ index ]++;

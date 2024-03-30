@@ -147,7 +147,7 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot( int tickcount )
 		Assert( serverEntitylist->GetServerNetworkable(i)->GetServerClass() );
 
 		entry->m_nSerialNumber	= serverEntitylist->GetNetworkSerialNumber(i);
-		entry->m_pClass			= serverEntitylist->GetServerNetworkable(i)->GetServerClass();
+		entry->m_pClass			= serverEntitylist->GetServerEntity(i)->GetServerClass();
 		if(!entry->m_pClass){
 			int aaa = 0;
 		}

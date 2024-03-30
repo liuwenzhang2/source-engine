@@ -554,7 +554,7 @@ public:
 		className::m_DataMap.baseMap = className::GetBaseMap(); \
 		static typedescription_t dataDesc[] = \
 		{ \
-		{ FIELD_VOID,0, {0,0},0,0,0,0,0,0}, /* so you can define "empty" tables */
+		{ FIELD_VOID,"", {0,0},0,0,0,0,0,0}, /* so you can define "empty" tables */
 
 #define END_DATADESC() \
 		}; \

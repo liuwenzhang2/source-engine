@@ -31,12 +31,12 @@ public:
 
 public:
 	// IServerNetworkable implementation.
-	virtual IHandleEntity* GetEntityHandle();
+	//virtual IHandleEntity* GetEntityHandle();
 	//virtual edict_t			*GetEdict() const;
 	//virtual CBaseNetworkable* GetBaseNetworkable();
-	virtual CBaseEntity*	GetBaseEntity();
-	virtual ServerClass*	GetServerClass();
-	virtual const char*		GetClassName() const;
+	//virtual CBaseEntity*	GetBaseEntity();
+	//virtual ServerClass*	GetServerClass();
+	//virtual const char*		GetClassName() const;
 	//virtual void			Release();
 	virtual int&			GetTransmitState();
 	virtual void			ClearTransmitState();
@@ -47,7 +47,7 @@ public:
 	//void AttachEdict(int pRequiredEdict = -1);
 
 	// Methods to get the entindex + edict
-	int	entindex() const;
+	//int	entindex() const;
 	//edict_t *edict();
 	//const edict_t *edict() const;
 	bool HasStateChanged() const;
@@ -102,13 +102,13 @@ public:
 private:
 	// Detaches the edict.. should only be called by CBaseNetworkable's destructor.
 	//void DetachEdict();
-	CBaseEntity* GetOuter();
+	//CBaseEntity* GetOuter();
 
 	// Marks the networkable that it will should transmit
 	//void SetTransmit(CCheckTransmitInfo* pInfo);
 
 private:
-	CBaseEntity* m_pOuter;
+	//CBaseEntity* m_pOuter;
 	// CBaseTransmitProxy *m_pTransmitProxy;
 	//int		m_entindex = -1;
 	//edict_t	*m_pPev;
@@ -121,7 +121,7 @@ private:
 	unsigned short m_ChangeOffsets[MAX_CHANGE_OFFSETS];
 	unsigned short m_nChangeOffsets;
 	//int	m_nChangeOffsetsTickCount = 0;
-	ServerClass* m_pServerClass;
+	//ServerClass* m_pServerClass;
 
 	// NOTE: This state is 'owned' by the entity. It's only copied here
 	// also to help improve cache performance in networking code.
@@ -143,15 +143,15 @@ private:
 //	return NULL;
 //}
 
-inline CBaseEntity* CServerNetworkProperty::GetBaseEntity()
-{
-	return m_pOuter;
-}
+//inline CBaseEntity* CServerNetworkProperty::GetBaseEntity()
+//{
+//	return m_pOuter;
+//}
 
-inline CBaseEntity* CServerNetworkProperty::GetOuter()
-{
-	return m_pOuter;
-}
+//inline CBaseEntity* CServerNetworkProperty::GetOuter()
+//{
+//	return m_pOuter;
+//}
 
 
 

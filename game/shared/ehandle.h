@@ -24,6 +24,7 @@
 
 
 //class IHandleEntity;
+#define INVALID_ENTITY_HANDLE INVALID_EHANDLE_INDEX
 
 
 

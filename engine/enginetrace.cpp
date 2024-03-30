@@ -1290,7 +1290,7 @@ void CEngineTraceServer::HandleEntityToCollideable( IHandleEntity *pHandleEntity
 	}
 
 	*ppCollide = pServerUnknown->GetCollideable();
-	*ppDebugName = pServerUnknown->GetNetworkable()->GetClassName();
+	*ppDebugName = pServerUnknown->GetClassName();
 }
 
 #ifndef SWDS

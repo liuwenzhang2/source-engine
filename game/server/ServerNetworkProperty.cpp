@@ -60,8 +60,8 @@ CServerNetworkProperty::~CServerNetworkProperty()
 void CServerNetworkProperty::Init( CBaseEntity *pEntity )
 {
 	//m_pPev = NULL;
-	m_pOuter = pEntity;
-	m_pServerClass = NULL;
+	//m_pOuter = pEntity;
+	//m_pServerClass = NULL;
 //	m_pTransmitProxy = NULL;
 	m_bPendingStateChange = false;
 	m_TimerEvent.Init( &g_NetworkPropertyEventMgr, this );
@@ -102,27 +102,27 @@ void CServerNetworkProperty::Init( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 // Methods to get the entindex + edict
 //-----------------------------------------------------------------------------
-inline int CServerNetworkProperty::entindex() const
-{
-//	if (m_pOuter->IsEFlagSet(EFL_SERVER_ONLY)) {
-//		Error("can not call entindex on server only entity!");
+//inline int CServerNetworkProperty::entindex() const
+//{
+////	if (m_pOuter->IsEFlagSet(EFL_SERVER_ONLY)) {
+////		Error("can not call entindex on server only entity!");
+////	}
+//	CBaseHandle Handle = m_pOuter->GetRefEHandle();
+//	if (Handle == INVALID_ENTITY_HANDLE) {
+//		return -1;
 //	}
-	CBaseHandle Handle = m_pOuter->GetRefEHandle();
-	if (Handle == INVALID_ENTITY_HANDLE) {
-		return -1;
-	}
-	else {
-		return Handle.GetEntryIndex();
-	}
-}
+//	else {
+//		return Handle.GetEntryIndex();
+//	}
+//}
 
 //-----------------------------------------------------------------------------
 // Entity handles
 //-----------------------------------------------------------------------------
-IHandleEntity *CServerNetworkProperty::GetEntityHandle( )
-{
-	return m_pOuter;
-}
+//IHandleEntity *CServerNetworkProperty::GetEntityHandle( )
+//{
+//	return m_pOuter;
+//}
 
 //void CServerNetworkProperty::Release()
 //{
@@ -149,17 +149,17 @@ IHandleEntity *CServerNetworkProperty::GetEntityHandle( )
 //-----------------------------------------------------------------------------
 // Serverclass
 //-----------------------------------------------------------------------------
-ServerClass* CServerNetworkProperty::GetServerClass()
-{
-	if ( !m_pServerClass )
-		m_pServerClass = m_pOuter->GetServerClass();
-	return m_pServerClass;
-}
+//ServerClass* CServerNetworkProperty::GetServerClass()
+//{
+//	if ( !m_pServerClass )
+//		m_pServerClass = m_pOuter->GetServerClass();
+//	return m_pServerClass;
+//}
 
-const char* CServerNetworkProperty::GetClassName() const
-{
-	return STRING(m_pOuter->m_iClassname);
-}
+//const char* CServerNetworkProperty::GetClassName() const
+//{
+//	return STRING(m_pOuter->m_iClassname);
+//}
 
 
 //-----------------------------------------------------------------------------

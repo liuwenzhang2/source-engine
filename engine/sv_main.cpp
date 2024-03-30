@@ -2079,12 +2079,12 @@ void SV_CreateBaseline (void)
 		{
 			// get the current server version
 			//edict_t *edict = sv.edicts + entnum;
-			IServerNetworkable* serverNetworkable = serverEntitylist->GetServerNetworkable(entnum);
+			IServerEntity* pServerEntity = serverEntitylist->GetServerEntity(entnum);
 
-			if (!serverNetworkable)
+			if (!pServerEntity)
 				continue;
 
-			ServerClass *pClass   = serverNetworkable->GetServerClass();
+			ServerClass *pClass   = pServerEntity->GetServerClass();
 
 			if ( !pClass )
 			{
@@ -2108,7 +2108,7 @@ void SV_CreateBaseline (void)
 			// create basline from zero values
 			if ( !SendTable_Encode(
 				pSendTable, 
-				serverEntitylist->GetServerEntity(entnum),
+				pServerEntity,
 				&writeBuf, 
 				entnum,
 				NULL,

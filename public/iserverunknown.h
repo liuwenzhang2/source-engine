@@ -18,6 +18,7 @@
 class ICollideable;
 class IServerNetworkable;
 class CBaseEntity;
+class ServerClass;
 
 
 // This is the server's version of IUnknown. We may want to use a QueryInterface-like
@@ -31,6 +32,9 @@ public:
 	virtual ICollideable*		GetCollideable() = 0;
 	virtual IServerNetworkable*	GetNetworkable() = 0;
 	virtual CBaseEntity*		GetBaseEntity() = 0;
+	virtual int					entindex() const = 0;
+	virtual const char*			GetClassName() const = 0;
+	virtual ServerClass*		GetServerClass() = 0;
 private:
 	CBaseHandle m_RefEHandle;
 };

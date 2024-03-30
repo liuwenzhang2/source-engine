@@ -699,7 +699,15 @@ public:
 	// returns a pointer to the entities edict, if it has one.  should be removed!
 	//inline edict_t			*edict( void )			{ return NetworkProp()->edict(); }
 	//inline const edict_t	*edict( void ) const	{ return NetworkProp()->edict(); }
-	inline int				entindex( ) const		{ return m_Network.entindex(); };
+	inline int				entindex( ) const		{
+		CBaseHandle Handle = this->GetRefEHandle();
+		if (Handle == INVALID_ENTITY_HANDLE) {
+			return -1;
+		}
+		else {
+			return Handle.GetEntryIndex();
+		}
+	};
 	inline int				GetSoundSourceIndex() const		{ return entindex(); }
 
 	// These methods encapsulate MOVETYPE_FOLLOW, which became obsolete
@@ -839,7 +847,11 @@ public:
 
 	// classname access
 	void		SetClassname( const char *className );
-	const char* GetClassname();
+	const char* GetClassname() const;
+	const char* GetClassName() const
+	{
+		return STRING(m_iClassname);
+	}
 
 	// Debug Overlays
 	void		 EntityText( int text_offset, const char *text, float flDuration, int r = 255, int g = 255, int b = 255, int a = 255 );
@@ -2192,7 +2204,7 @@ inline bool CBaseEntity::ClassMatches( const char *pszClassOrWildcard )
 	return ClassMatchesComplex( pszClassOrWildcard );
 }
 
-inline const char* CBaseEntity::GetClassname()
+inline const char* CBaseEntity::GetClassname() const
 {
 	return STRING(m_iClassname);
 }

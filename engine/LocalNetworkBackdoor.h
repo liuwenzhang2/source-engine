@@ -50,11 +50,11 @@ public:
 
 	
 	void EntState( 
-		int iEnt, 
-		int iSerialNum, 
-		int iClass, 
-		const SendTable *pSendTable, 
-		const void *pSourceEnt,
+		IServerEntity* pServerEntity,
+		//int iSerialNum, 
+		//int iClass, 
+		//const SendTable *pSendTable, 
+		//const void *pSourceEnt,
 		bool bChanged,
 		bool bShouldTransmit );
 
@@ -97,8 +97,8 @@ private:
 
 		bool	m_bDormant;
 		int		m_iSerialNumber;
-		void	*m_pDataPointer;
-		IClientEntity *m_pNetworkable;
+		//void	*m_pDataPointer;
+		IClientEntity *m_pClientEntity;
 	};
 	
 	CCachedEntState 	m_CachedEntState[MAX_EDICTS];

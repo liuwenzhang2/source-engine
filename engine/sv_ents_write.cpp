@@ -986,7 +986,7 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 				break;
 			case EnterPVS:
 				{
-					char const *eString = serverEntitylist->GetServerEntity( u.m_pNewPack->m_nEntityIndex )->GetNetworkable()->GetClassName();
+					char const *eString = serverEntitylist->GetServerEntity( u.m_pNewPack->m_nEntityIndex )->GetClassName();
 					client->TraceNetworkData( pBuf, "enter [%s]", eString );
 					ETWMark1I( eString, pBuf.GetNumBitsWritten() - nEntityStartBit );
 				}
@@ -1001,7 +1001,7 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 				break;
 			case DeltaEnt:
 				{
-					char const *eString = serverEntitylist->GetServerEntity( u.m_pOldPack->m_nEntityIndex )->GetNetworkable()->GetClassName();
+					char const *eString = serverEntitylist->GetServerEntity( u.m_pOldPack->m_nEntityIndex )->GetClassName();
 					client->TraceNetworkData( pBuf, "delta [%s]", eString );
 					ETWMark1I( eString, pBuf.GetNumBitsWritten() - nEntityStartBit );
 				}
