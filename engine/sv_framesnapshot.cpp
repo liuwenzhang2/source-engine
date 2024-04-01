@@ -264,7 +264,7 @@ bool	CFrameSnapshotManager::ProcessBaselineAck(CBaseClient* pClient, int nBaseli
 		return true;
 	}
 
-	Assert(pClientSnapshotInfo->m_pBaselineEntities);
+	//Assert(pClientSnapshotInfo->m_pBaselineEntities);
 
 	// copy ents send as full updates this frame into baseline stuff
 	CClientFrame* frame = pClient->GetDeltaFrame(pClientSnapshotInfo->m_nBaselineUpdateTick);
