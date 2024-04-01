@@ -97,10 +97,9 @@ int ClampClientRate( int nRate )
 
 CGameClient::CGameClient(int slot, CBaseServer *pServer )
 {
-	Clear();
-
 	m_nClientSlot = slot;
 	m_nEntityIndex = slot+1;
+	Clear();
 	m_Server = pServer;
 	m_pCurrentFrame = NULL;
 	m_bIsInReplayMode = false;
@@ -1190,13 +1189,14 @@ void CGameClient::SendSnapshot( CClientFrame * pFrame )
 		}
 
 		int maxEnts = tv_transmitall.GetBool()?255:64;
-		hltv->WriteTempEntities( this, pFrame->GetSnapshot(), m_pLastSnapshot.GetObject(), *hltv->GetBuffer( HLTV_BUFFER_TEMPENTS ), maxEnts );
+		CFrameSnapshot* pLastSnapshot = framesnapshotmanager->GetClientSnapshotInfo(this)->m_pLastSnapshot.GetObject();
+		hltv->WriteTempEntities( this, pFrame->GetSnapshot(), pLastSnapshot, *hltv->GetBuffer( HLTV_BUFFER_TEMPENTS ), maxEnts );
 
 		// add snapshot to HLTV server frame list
 		hltv->AddNewFrame( pFrame );
 
 		// remember this snapshot
-		m_pLastSnapshot = pFrame->GetSnapshot(); 
+		framesnapshotmanager->GetClientSnapshotInfo(this)->m_pLastSnapshot = pFrame->GetSnapshot();
 
 		// fake acknowledgement, remove ClientFrame reference immediately 
 		UpdateAcknowledgedFramecount( pFrame->tick_count );
@@ -1413,7 +1413,8 @@ CClientFrame *CGameClient::GetSendFrame()
 		if ( !pFrame )
 			return NULL;
 
-		if ( m_pLastSnapshot == pFrame->GetSnapshot() )
+		CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(this);
+		if (pClientSnapshotInfo->m_pLastSnapshot == pFrame->GetSnapshot() )
 			return NULL;
 	}
 

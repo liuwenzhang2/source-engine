@@ -214,27 +214,7 @@ int CBaseClient::GetUpdateRate(void) const
 		return 0;
 }
 
-void CBaseClient::FreeBaselines()
-{
-	if ( m_pBaselineEntities )
-	{
-		//m_pBaseline->ReleaseReference();
-		for (int i = 0; i < m_nNumBaselineEntities; ++i)
-		{
-			if (m_pBaselineEntities[i].m_pPackedData != INVALID_PACKED_ENTITY_HANDLE)
-			{
-				g_pPackedEntityManager->RemoveEntityReference(m_pBaselineEntities[i].m_pPackedData);
-			}
-		}
-		//m_pBaseline = NULL;
-		m_pBaselineEntities = null;
-		m_nNumBaselineEntities = 0;
-	}
 
-	m_nBaselineUpdateTick = -1;
-	m_nBaselineUsed = 0;
-	m_BaselinesSent.ClearAll();
-}
 
 void CBaseClient::Clear()
 {
@@ -251,7 +231,7 @@ void CBaseClient::Clear()
 		m_ConVars = NULL;
 	}
 
-	FreeBaselines();
+	framesnapshotmanager->FreeClientBaselines(this);
 
 	// This used to be a memset, but memset will screw up any embedded classes
 	// and we want to preserve some things like index.
@@ -259,7 +239,7 @@ void CBaseClient::Clear()
 	m_nDeltaTick = -1;
 	m_nSignonTick = 0;
 	m_nStringTableAckTick = 0;
-	m_pLastSnapshot = NULL;
+	//m_pLastSnapshot = NULL;
 	m_nForceWaitForTick = -1;
 	m_bFakePlayer = false;
 	m_bIsHLTV = false;
@@ -274,8 +254,8 @@ void CBaseClient::Clear()
 	m_nFriendsID = 0;
 	m_FriendsName[0] = 0;
 	m_nSendtableCRC = 0;
-	m_nBaselineUpdateTick = -1;
-	m_nBaselineUsed = 0;
+	//m_nBaselineUpdateTick = -1;
+	//m_nBaselineUsed = 0;
 	m_nFilesDownloaded = 0;
 	m_bConVarsChanged = false;
 	m_bSendServerInfo = false;
@@ -331,12 +311,12 @@ void CBaseClient::Reconnect( void )
 
 void CBaseClient::Inactivate( void )
 {
-	FreeBaselines();
+	framesnapshotmanager->FreeClientBaselines(this);
 
 	m_nDeltaTick = -1;
 	m_nSignonTick = 0;
 	m_nStringTableAckTick = 0;
-	m_pLastSnapshot = NULL;
+	//m_pLastSnapshot = NULL;
 	m_nForceWaitForTick = -1;
 
 	m_nSignonState = SIGNONSTATE_CHANGELEVEL;
@@ -531,12 +511,13 @@ void CBaseClient::SpawnPlayer( void )
 	if ( !IsFakeClient() )
 	{
 		// free old baseline snapshot
-		FreeBaselines();
+		framesnapshotmanager->FreeClientBaselines(this);
 		
 		// create baseline snapshot for real clients
 		//m_pBaseline = framesnapshotmanager->CreateEmptySnapshot( 0, MAX_EDICTS );
-		m_pBaselineEntities = new CFrameSnapshotEntry[MAX_EDICTS];
-		m_nNumBaselineEntities = MAX_EDICTS;
+		//m_pBaselineEntities = new CFrameSnapshotEntry[MAX_EDICTS];
+		//m_nNumBaselineEntities = MAX_EDICTS;
+		framesnapshotmanager->AllocClientBaselines(this);
 	}
 
 	// Set client clock to match server's
@@ -944,78 +925,7 @@ bool CBaseClient::ProcessClientInfo( CLC_ClientInfo *msg )
 
 bool CBaseClient::ProcessBaselineAck( CLC_BaselineAck *msg )
 {
-	if ( msg->m_nBaselineTick != m_nBaselineUpdateTick )
-	{
-		// This occurs when there are multiple ack's queued up for processing from a client.
-		return true;
-	}
-
-	if ( msg->m_nBaselineNr != m_nBaselineUsed )
-	{
-		DevMsg("CBaseClient::ProcessBaselineAck: wrong baseline nr received (%i)\n", msg->m_nBaselineTick );
-		return true;
-	}
-
-	Assert(m_pBaselineEntities);
-
-	// copy ents send as full updates this frame into baseline stuff
-	CClientFrame *frame = GetDeltaFrame( m_nBaselineUpdateTick );
-	if ( frame == NULL )
-	{
-		// Will get here if we have a lot of packet loss and finally receive a stale ack from 
-		//  remote client.  Our "window" could be well beyond what it's acking, so just ignore the ack.
-		return true;
-	}
-
-	CFrameSnapshot *pSnapshot = frame->GetSnapshot();
-
-	if ( pSnapshot == NULL )
-	{
-		// TODO if client lags for a couple of seconds the snapshot is lost
-		// fix: don't remove snapshots that are labled a possible basline candidates
-		// or: send full update
-		DevMsg("CBaseClient::ProcessBaselineAck: invalid frame snapshot (%i)\n", m_nBaselineUpdateTick );
-		return false;
-	}
-	
-	int index = m_BaselinesSent.FindNextSetBit( 0 );
-
-	while ( index >= 0 )
-	{
-		// get new entity
-		PackedEntity* hNewPackedEntity = g_pPackedEntityManager->GetPackedEntity(pSnapshot, index);
-		if (hNewPackedEntity == INVALID_PACKED_ENTITY_HANDLE )
-		{
-			DevMsg("CBaseClient::ProcessBaselineAck: invalid packet handle (%i)\n", index );
-			return false;
-		}
-
-		PackedEntity* hOldPackedEntity = m_pBaselineEntities[index].m_pPackedData;//m_pBaseline->
-
-		if (hOldPackedEntity != INVALID_PACKED_ENTITY_HANDLE )
-		{
-			// remove reference before overwriting packed entity
-			g_pPackedEntityManager->RemoveEntityReference(hOldPackedEntity);
-		}
-
-		// increase reference
-		g_pPackedEntityManager->AddEntityReference(hNewPackedEntity);
-		
-		// copy entity handle, class & serial number to
-		m_pBaselineEntities[index] = *g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, index);//m_pBaseline->
-
-		// go to next entity
-		index = m_BaselinesSent.FindNextSetBit( index + 1 );
-	}
-
-	//m_pBaseline->m_nTickCount = m_nBaselineUpdateTick;
-
-	// flip used baseline flag
-	m_nBaselineUsed = (m_nBaselineUsed==1)?0:1;
-
-	m_nBaselineUpdateTick = -1; // ready to update baselines again
-
-	return true;
+	return framesnapshotmanager->ProcessBaselineAck(this, msg->m_nBaselineTick, msg->m_nBaselineNr);
 }
 
 bool CBaseClient::ProcessListenEvents( CLC_ListenEvents *msg )
@@ -1157,7 +1067,7 @@ void CBaseClient::TraceNetworkMsg( int nBits, char const *fmt, ... )
 void CBaseClient::SendSnapshot( CClientFrame *pFrame )
 {
 	// never send the same snapshot twice
-	if ( m_pLastSnapshot == pFrame->GetSnapshot() )
+	if (framesnapshotmanager->GetClientLastSnapshot(this) == pFrame->GetSnapshot())
 	{
 		m_NetChannel->Transmit();	
 		return;
@@ -1228,7 +1138,8 @@ write_again:
 	// send all unreliable temp entities between last and current frame
 	// send max 64 events in multi player, 255 in SP
 	int nMaxTempEnts = m_Server->IsMultiplayer() ? 64 : 255;
-	m_Server->WriteTempEntities( this, pFrame->GetSnapshot(), m_pLastSnapshot.GetObject(), msg, nMaxTempEnts );
+
+	m_Server->WriteTempEntities( this, pFrame->GetSnapshot(), framesnapshotmanager->GetClientLastSnapshot(this), msg, nMaxTempEnts );
 
 	if ( IsTracing() )
 	{
@@ -1280,7 +1191,7 @@ write_again:
 	}
 
 	// remember this snapshot
-	m_pLastSnapshot = pFrame->GetSnapshot();
+	framesnapshotmanager->SetClientLastSnapshot(this, pFrame->GetSnapshot());
 
 	// Don't send the datagram to fakeplayers unless sv_stressbots is on (which will make m_NetChannel non-null).
 	if ( m_bFakePlayer && !m_NetChannel )
@@ -1522,15 +1433,16 @@ void CBaseClient::OnRequestFullUpdate()
 	VPROF_BUDGET( "CBaseClient::OnRequestFullUpdate", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
 	// client requests a full update 
-	m_pLastSnapshot = NULL;
+	//m_pLastSnapshot = NULL;
 
 	// free old baseline snapshot
-	FreeBaselines();
+	framesnapshotmanager->FreeClientBaselines(this);
 
 	// and create new baseline snapshot
 	//m_pBaseline = framesnapshotmanager->CreateEmptySnapshot( 0, MAX_EDICTS );
-	m_pBaselineEntities = new CFrameSnapshotEntry[MAX_EDICTS];
-	m_nNumBaselineEntities = MAX_EDICTS;
+	//m_pBaselineEntities = new CFrameSnapshotEntry[MAX_EDICTS];
+	//m_nNumBaselineEntities = MAX_EDICTS;
+	framesnapshotmanager->AllocClientBaselines(this);
 
 	DevMsg("Sending full update to Client %s\n", GetClientName() );
 }
@@ -1619,11 +1531,7 @@ bool CBaseClient::UpdateAcknowledgedFramecount(int tick)
 		m_nStringTableAckTick = m_nDeltaTick;
 	}
 
-	if ( (m_nBaselineUpdateTick > -1) && (m_nDeltaTick > m_nBaselineUpdateTick) )
-	{
-		// server sent a baseline update, but it wasn't acknowledged yet so it was probably lost. 
-		m_nBaselineUpdateTick = -1;
-	}
+	framesnapshotmanager->UpdateAcknowledgedFramecount(this, m_nDeltaTick);
 
 	return true;
 }

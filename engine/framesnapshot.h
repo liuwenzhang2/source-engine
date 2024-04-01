@@ -20,21 +20,10 @@ class HLTVEntityData;
 class ReplayEntityData;
 class ServerClass;
 class CEventInfo;
-
-#define INVALID_PACKED_ENTITY_HANDLE (0)
+class CBaseClient;
 //typedef intptr_t PackedEntityHandle_t;
 
-//-----------------------------------------------------------------------------
-// Purpose: Individual entity data, did the entity exist and what was it's serial number
-//-----------------------------------------------------------------------------
-class CFrameSnapshotEntry
-{
-public:
-	ServerClass*			m_pClass = NULL;
-	int						m_nSerialNumber = -1;
-	// Keeps track of the fullpack info for this frame for all entities in any pvs:
-	PackedEntity*			m_pPackedData = INVALID_PACKED_ENTITY_HANDLE;
-};
+
 
 // HLTV needs some more data per entity 
 class CHLTVEntityData
@@ -106,15 +95,18 @@ private:
 	CInterlockedInt			m_nReferences;
 };
 
-class ClientSnapshotInfo {
+class CClientSnapshotInfo {
 public:
-
+	CClientSnapshotInfo() {
+		m_pLastSnapshot = NULL;
+		m_nBaselineUpdateTick = -1;
+		m_nBaselineUsed = 0;
+	}
 	CSmartPtr<CFrameSnapshot, CRefCountAccessorLongName> m_pLastSnapshot;	// last send snapshot
 
 	//CFrameSnapshot	*m_pBaseline;			// current entity baselines as a snapshot
-	int				m_nBaselineUpdateTick;	// last tick we send client a update baseline signal or -1
-	CBitVec<MAX_EDICTS>	m_BaselinesSent;	// baselines sent with last update
-	int				m_nBaselineUsed;		// 0/1 toggling flag, singaling client what baseline to use
+	int				m_nBaselineUpdateTick = -1;	// last tick we send client a update baseline signal or -1
+	int				m_nBaselineUsed = 0;		// 0/1 toggling flag, singaling client what baseline to use
 };
 
 //-----------------------------------------------------------------------------
@@ -147,15 +139,32 @@ public:
 	// List of entities to explicitly delete
 	void			AddExplicitDelete( int iSlot );
 
+	void	OnClientConnected(CBaseClient* pClient);
+
+	void	FreeClientBaselines(CBaseClient* pClient);
+
+	void	AllocClientBaselines(CBaseClient* pClient);
+
+	CClientSnapshotInfo* GetClientSnapshotInfo(CBaseClient* pClient);
+
+	void	UpdateAcknowledgedFramecount(CBaseClient* pClient, int tick);
+
+	bool	ProcessBaselineAck(CBaseClient* pClient, int nBaselineTick, int	nBaselineNr);
+
+	CFrameSnapshot* GetClientLastSnapshot(CBaseClient* pClient);
+
+	void SetClientLastSnapshot(CBaseClient* pClient, CFrameSnapshot* pSnapshot);
+
 private:
 	void	DeleteFrameSnapshot( CFrameSnapshot* pSnapshot );
+	void	CheckClientSnapshotArray(int maxIndex);
 
 	CUtlLinkedList<CFrameSnapshot*, unsigned short>		m_FrameSnapshots;
 
 	CThreadFastMutex		m_WriteMutex;
 	CUtlVector<int>			m_iExplicitDeleteSlots;
 
-
+	CUtlVector<CClientSnapshotInfo> m_ClientSnapshotInfo;
 
 
 };

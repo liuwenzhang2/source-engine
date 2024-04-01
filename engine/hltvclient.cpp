@@ -430,8 +430,8 @@ void CHLTVClient::SendSnapshot( CClientFrame * pFrame )
 
 	// if we send a full snapshot (no delta-compression) before, wait until client
 	// received and acknowledge that update. don't spam client with full updates
-
-	if ( m_pLastSnapshot == pFrame->GetSnapshot() )
+	CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(this);
+	if (pClientSnapshotInfo->m_pLastSnapshot == pFrame->GetSnapshot() )
 	{
 		// never send the same snapshot twice
 		m_NetChannel->Transmit();	
@@ -501,7 +501,7 @@ void CHLTVClient::SendSnapshot( CClientFrame * pFrame )
 	}
 
 	// remember this snapshot
-	m_pLastSnapshot = pFrame->GetSnapshot();
+	pClientSnapshotInfo->m_pLastSnapshot = pFrame->GetSnapshot();
 	m_nLastSendTick = pFrame->tick_count;
 
 	// Don't send the datagram to fakeplayers

@@ -135,6 +135,7 @@ PackedEntityManager::PackedEntityManager() : m_PackedEntitiesPool(MAX_EDICTS / 1
 PackedEntityManager::~PackedEntityManager() {
 	// TODO: This assert has been failing. HenryG says it's a valid assert and that we're probably leaking memory.
 	AssertMsg1(m_PackedEntitiesPool.Count() == 0 || IsInErrorExit(), "Expected m_PackedEntitiesPool to be empty. It had %i items.", m_PackedEntitiesPool.Count());
+	m_ClientSnapshotEntryInfo.Purge();
 }
 
 void PackedEntityManager::OnLevelChanged() {
@@ -395,4 +396,85 @@ PackedEntity* PackedEntityManager::GetPreviouslySentPacket(int iEntity, int iSer
 	}
 
 	return NULL;
+}
+
+void	PackedEntityManager::OnClientConnected(CBaseClient* pClient) {
+	CheckClientSnapshotEntryArray(pClient->m_nClientSlot);
+	CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = &m_ClientSnapshotEntryInfo.Element(pClient->m_nClientSlot);
+	pClientSnapshotEntryInfo->m_BaselinesSent.ClearAll();
+}
+
+void	PackedEntityManager::FreeClientBaselines(CBaseClient* pClient) {
+	CheckClientSnapshotEntryArray(pClient->m_nClientSlot);
+	CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = &m_ClientSnapshotEntryInfo.Element(pClient->m_nClientSlot);
+	pClientSnapshotEntryInfo->m_BaselinesSent.ClearAll();
+	if (pClientSnapshotEntryInfo->m_pBaselineEntities)
+	{
+		//m_pBaseline->ReleaseReference();
+		for (int i = 0; i < pClientSnapshotEntryInfo->m_nNumBaselineEntities; ++i)
+		{
+			if (pClientSnapshotEntryInfo->m_pBaselineEntities[i].m_pPackedData != INVALID_PACKED_ENTITY_HANDLE)
+			{
+				RemoveEntityReference(pClientSnapshotEntryInfo->m_pBaselineEntities[i].m_pPackedData);
+			}
+		}
+		//m_pBaseline = NULL;
+		delete[] pClientSnapshotEntryInfo->m_pBaselineEntities;
+		pClientSnapshotEntryInfo->m_pBaselineEntities = null;
+		pClientSnapshotEntryInfo->m_nNumBaselineEntities = 0;
+	}
+}
+
+void	PackedEntityManager::AllocClientBaselines(CBaseClient* pClient) {
+	CheckClientSnapshotEntryArray(pClient->m_nClientSlot);
+	CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = &m_ClientSnapshotEntryInfo.Element(pClient->m_nClientSlot);
+	pClientSnapshotEntryInfo->m_pBaselineEntities = new CFrameSnapshotEntry[MAX_EDICTS];
+	pClientSnapshotEntryInfo->m_nNumBaselineEntities = MAX_EDICTS;
+}
+
+bool	PackedEntityManager::ProcessBaselineAck(CBaseClient* pClient, CFrameSnapshot* pSnapshot) {
+	CheckClientSnapshotEntryArray(pClient->m_nClientSlot);
+	CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = &m_ClientSnapshotEntryInfo.Element(pClient->m_nClientSlot);
+	
+	int index = pClientSnapshotEntryInfo->m_BaselinesSent.FindNextSetBit(0);
+
+	while (index >= 0)
+	{
+		// get new entity
+		PackedEntity* hNewPackedEntity = g_pPackedEntityManager->GetPackedEntity(pSnapshot, index);
+		if (hNewPackedEntity == INVALID_PACKED_ENTITY_HANDLE)
+		{
+			DevMsg("CBaseClient::ProcessBaselineAck: invalid packet handle (%i)\n", index);
+			return false;
+		}
+
+		PackedEntity* hOldPackedEntity = pClientSnapshotEntryInfo->m_pBaselineEntities[index].m_pPackedData;//m_pBaseline->
+
+		if (hOldPackedEntity != INVALID_PACKED_ENTITY_HANDLE)
+		{
+			// remove reference before overwriting packed entity
+			g_pPackedEntityManager->RemoveEntityReference(hOldPackedEntity);
+		}
+
+		// increase reference
+		g_pPackedEntityManager->AddEntityReference(hNewPackedEntity);
+
+		// copy entity handle, class & serial number to
+		pClientSnapshotEntryInfo->m_pBaselineEntities[index] = *g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, index);//m_pBaseline->
+
+		// go to next entity
+		index = pClientSnapshotEntryInfo->m_BaselinesSent.FindNextSetBit(index + 1);
+	}
+}
+
+CClientSnapshotEntryInfo* PackedEntityManager::GetClientSnapshotEntryInfo(CBaseClient* pClient) {
+	CheckClientSnapshotEntryArray(pClient->m_nClientSlot);
+	CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = &m_ClientSnapshotEntryInfo.Element(pClient->m_nClientSlot);
+	return pClientSnapshotEntryInfo;
+}
+
+void PackedEntityManager::CheckClientSnapshotEntryArray(int maxIndex) {
+	while (m_ClientSnapshotEntryInfo.Count() < maxIndex + 1) {
+		m_ClientSnapshotEntryInfo.AddToTail();
+	}
 }

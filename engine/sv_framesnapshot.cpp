@@ -41,8 +41,7 @@ CFrameSnapshotManager::CFrameSnapshotManager( void )
 CFrameSnapshotManager::~CFrameSnapshotManager( void )
 {
 	AssertMsg1( m_FrameSnapshots.Count() == 0 || IsInErrorExit(), "Expected m_FrameSnapshots to be empty. It had %i items.", m_FrameSnapshots.Count() );
-
-	
+	m_ClientSnapshotInfo.Purge();
 }
 
 //-----------------------------------------------------------------------------
@@ -203,10 +202,113 @@ void CFrameSnapshotManager::AddExplicitDelete( int iSlot )
 	}
 }
 
+void	CFrameSnapshotManager::CheckClientSnapshotArray(int maxIndex) {
+	while (m_ClientSnapshotInfo.Count() < maxIndex + 1) {
+		m_ClientSnapshotInfo.AddToTail();
+	}
+}
 
+void CFrameSnapshotManager::FreeClientBaselines(CBaseClient* pClient)
+{
+	CheckClientSnapshotArray(pClient->m_nClientSlot);
+	CClientSnapshotInfo* pClientSnapshotInfo = &m_ClientSnapshotInfo.Element(pClient->m_nClientSlot);
+	pClientSnapshotInfo->m_pLastSnapshot = NULL;
+	pClientSnapshotInfo->m_nBaselineUpdateTick = -1;
+	pClientSnapshotInfo->m_nBaselineUsed = 0;
+	g_pPackedEntityManager->FreeClientBaselines(pClient);
+}
 
+void CFrameSnapshotManager::AllocClientBaselines(CBaseClient* pClient) {
+	CheckClientSnapshotArray(pClient->m_nClientSlot);
+	g_pPackedEntityManager->AllocClientBaselines(pClient);
+}
 
+void CFrameSnapshotManager::OnClientConnected(CBaseClient* pClient) {
+	CheckClientSnapshotArray(pClient->m_nClientSlot);
+	CClientSnapshotInfo* pClientSnapshotInfo = &m_ClientSnapshotInfo.Element(pClient->m_nClientSlot);
+	pClientSnapshotInfo->m_pLastSnapshot = NULL;
+	pClientSnapshotInfo->m_nBaselineUpdateTick = -1;
+	pClientSnapshotInfo->m_nBaselineUsed = 0;
 
+	g_pPackedEntityManager->OnClientConnected(pClient);
+}
+
+CClientSnapshotInfo* CFrameSnapshotManager::GetClientSnapshotInfo(CBaseClient* pClient) {
+	CheckClientSnapshotArray(pClient->m_nClientSlot);
+	return &m_ClientSnapshotInfo.Element(pClient->m_nClientSlot);
+}
+
+void	CFrameSnapshotManager::UpdateAcknowledgedFramecount(CBaseClient* pClient, int tick) {
+	CheckClientSnapshotArray(pClient->m_nClientSlot);
+	CClientSnapshotInfo* pClientSnapshotInfo = &m_ClientSnapshotInfo.Element(pClient->m_nClientSlot);
+	if ((pClientSnapshotInfo->m_nBaselineUpdateTick > -1) && (tick > pClientSnapshotInfo->m_nBaselineUpdateTick))
+	{
+		// server sent a baseline update, but it wasn't acknowledged yet so it was probably lost. 
+		pClientSnapshotInfo->m_nBaselineUpdateTick = -1;
+	}
+}
+
+bool	CFrameSnapshotManager::ProcessBaselineAck(CBaseClient* pClient, int nBaselineTick, int	nBaselineNr) {
+	CheckClientSnapshotArray(pClient->m_nClientSlot);
+	CClientSnapshotInfo* pClientSnapshotInfo = &m_ClientSnapshotInfo.Element(pClient->m_nClientSlot);
+	
+	if (nBaselineTick != pClientSnapshotInfo->m_nBaselineUpdateTick)
+	{
+		// This occurs when there are multiple ack's queued up for processing from a client.
+		return true;
+	}
+
+	if (nBaselineNr != pClientSnapshotInfo->m_nBaselineUsed)
+	{
+		DevMsg("CBaseClient::ProcessBaselineAck: wrong baseline nr received (%i)\n", nBaselineTick);
+		return true;
+	}
+
+	Assert(m_pBaselineEntities);
+
+	// copy ents send as full updates this frame into baseline stuff
+	CClientFrame* frame = pClient->GetDeltaFrame(pClientSnapshotInfo->m_nBaselineUpdateTick);
+	if (frame == NULL)
+	{
+		// Will get here if we have a lot of packet loss and finally receive a stale ack from 
+		//  remote client.  Our "window" could be well beyond what it's acking, so just ignore the ack.
+		return true;
+	}
+
+	CFrameSnapshot* pSnapshot = frame->GetSnapshot();
+
+	if (pSnapshot == NULL)
+	{
+		// TODO if client lags for a couple of seconds the snapshot is lost
+		// fix: don't remove snapshots that are labled a possible basline candidates
+		// or: send full update
+		DevMsg("CBaseClient::ProcessBaselineAck: invalid frame snapshot (%i)\n", pClientSnapshotInfo->m_nBaselineUpdateTick);
+		return false;
+	}
+
+	g_pPackedEntityManager->ProcessBaselineAck(pClient, pSnapshot);
+
+	//m_pBaseline->m_nTickCount = m_nBaselineUpdateTick;
+
+	// flip used baseline flag
+	pClientSnapshotInfo->m_nBaselineUsed = (pClientSnapshotInfo->m_nBaselineUsed == 1) ? 0 : 1;
+
+	pClientSnapshotInfo->m_nBaselineUpdateTick = -1; // ready to update baselines again
+
+	return true;
+}
+
+CFrameSnapshot* CFrameSnapshotManager::GetClientLastSnapshot(CBaseClient* pClient) {
+	CheckClientSnapshotArray(pClient->m_nClientSlot);
+	CClientSnapshotInfo* pClientSnapshotInfo = &m_ClientSnapshotInfo.Element(pClient->m_nClientSlot);
+	return pClientSnapshotInfo->m_pLastSnapshot.GetObject();
+}
+
+void CFrameSnapshotManager::SetClientLastSnapshot(CBaseClient* pClient, CFrameSnapshot* pSnapshot) {
+	CheckClientSnapshotArray(pClient->m_nClientSlot);
+	CClientSnapshotInfo* pClientSnapshotInfo = &m_ClientSnapshotInfo.Element(pClient->m_nClientSlot);
+	pClientSnapshotInfo->m_pLastSnapshot = pSnapshot;
+}
 //CThreadFastMutex &CFrameSnapshotManager::GetMutex()
 //{
 //	return m_WriteMutex;

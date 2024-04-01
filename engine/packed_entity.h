@@ -19,6 +19,7 @@
 #include <tier0/dbg.h>
 
 #include "common.h"
+#include "bitvec.h"
 
 // Matched with the memdbgoff at end of header
 #include "memdbgon.h"
@@ -49,9 +50,9 @@ class RecvTable;
 class ServerClass;
 class ClientClass;
 class IChangeFrameList;
-class CFrameSnapshotEntry;
+//class CFrameSnapshotEntry;
 class CFrameSnapshot;
-
+class CBaseClient;
 
 // Replaces entity_state_t.
 // This is what we send to clients.
@@ -206,6 +207,34 @@ inline bool PackedEntity::ShouldCheckCreationTick() const
 	return m_nShouldCheckCreationTick == 1 ? true : false;
 }
 
+
+#define INVALID_PACKED_ENTITY_HANDLE (0)
+
+//-----------------------------------------------------------------------------
+// Purpose: Individual entity data, did the entity exist and what was it's serial number
+//-----------------------------------------------------------------------------
+class CFrameSnapshotEntry
+{
+public:
+	ServerClass* m_pClass = NULL;
+	int						m_nSerialNumber = -1;
+	// Keeps track of the fullpack info for this frame for all entities in any pvs:
+	PackedEntity* m_pPackedData = INVALID_PACKED_ENTITY_HANDLE;
+};
+
+class CClientSnapshotEntryInfo {
+public:
+	CClientSnapshotEntryInfo() {
+		m_BaselinesSent.ClearAll();
+		m_pBaselineEntities = NULL;
+		m_nNumBaselineEntities = 0;
+	}
+	// State information
+	CBitVec<MAX_EDICTS>		m_BaselinesSent;	// baselines sent with last update
+	CFrameSnapshotEntry*	m_pBaselineEntities = NULL;
+	int						m_nNumBaselineEntities = 0;
+};
+
 typedef struct
 {
 	PackedEntity* pEntity;	// original packed entity
@@ -252,7 +281,18 @@ public:
 
 	PackedEntity* GetPreviouslySentPacket(int iEntity, int iSerialNumber);
 
+	void	OnClientConnected(CBaseClient* pClient);
+
+	void	FreeClientBaselines(CBaseClient* pClient);
+
+	void	AllocClientBaselines(CBaseClient* pClient);
+
+	bool	ProcessBaselineAck(CBaseClient* pClient, CFrameSnapshot* pSnapshot);
+
+	CClientSnapshotEntryInfo* GetClientSnapshotEntryInfo(CBaseClient* pClient);
+
 private:
+	void CheckClientSnapshotEntryArray(int maxIndex);
 
 	// State information
 	CUtlVector<CFrameSnapshotEntry*> m_pEntities;
@@ -261,16 +301,14 @@ private:
 
 	CClassMemoryPool< PackedEntity > m_PackedEntitiesPool;
 
-	int								m_nPackedEntityCacheCounter;  // increase with every cache access
+	int								m_nPackedEntityCacheCounter = 0;  // increase with every cache access
 	CUtlVector<UnpackedDataCache_t>	m_PackedEntityCache;	// cache for uncompressed packed entities
 
 	// The most recently sent packets for each entity
 	PackedEntity* m_pPackedData[MAX_EDICTS];
 	int						m_pSerialNumber[MAX_EDICTS];
 
-	// State information
-	CFrameSnapshotEntry*	m_pBaselineEntities;
-	int						m_nNumBaselineEntities;
+	CUtlVector<CClientSnapshotEntryInfo> m_ClientSnapshotEntryInfo;
 };
 
 extern PackedEntityManager* g_pPackedEntityManager;

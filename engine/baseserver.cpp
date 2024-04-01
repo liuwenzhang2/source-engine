@@ -562,7 +562,8 @@ IClient *CBaseServer::ConnectClient ( netadr_t &adr, int protocol, int challenge
 	client->m_nDeltaTick = -1;
 	client->m_nSignonTick = 0;
 	client->m_nStringTableAckTick = 0;
-	client->m_pLastSnapshot = NULL;
+	//client->m_pLastSnapshot = NULL;
+	framesnapshotmanager->OnClientConnected(client);
 	
 	// Tell client connection worked, now use netchannels
 	{

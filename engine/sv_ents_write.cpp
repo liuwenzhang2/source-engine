@@ -887,8 +887,11 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 	u.m_pBuf = &pBuf;
 	u.m_pTo = to;
 	u.m_pToSnapshot = to->GetSnapshot();
-	u.m_pBaselineEntities = client->m_pBaselineEntities;
-	u.m_nNumBaselineEntities = client->m_nNumBaselineEntities;
+
+	CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = g_pPackedEntityManager->GetClientSnapshotEntryInfo(client);
+
+	u.m_pBaselineEntities = pClientSnapshotEntryInfo->m_pBaselineEntities;
+	u.m_nNumBaselineEntities = pClientSnapshotEntryInfo->m_nNumBaselineEntities;
 	u.m_nFullProps = 0;
 	u.m_pServer = this;
 	u.m_nClientEntity = client->m_nEntityIndex;
@@ -923,10 +926,10 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 //	u.m_nTotalGapCount = 0;
 
 	// set from_baseline pointer if this snapshot may become a baseline update
-	if ( client->m_nBaselineUpdateTick == -1 )
+	if ( framesnapshotmanager->GetClientSnapshotInfo(client)->m_nBaselineUpdateTick == -1 )
 	{
-		client->m_BaselinesSent.ClearAll();
-		u.from_baseline = &client->m_BaselinesSent;
+		g_pPackedEntityManager->GetClientSnapshotEntryInfo(client)->m_BaselinesSent.ClearAll();
+		u.from_baseline = &g_pPackedEntityManager->GetClientSnapshotEntryInfo(client)->m_BaselinesSent;
 	}
 
 	// Write the header, TODO use class SVC_PacketEntities
@@ -948,7 +951,7 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 		u.m_pBuf->WriteOneBit( 0 );	// use baseline
 	}
 
-	u.m_pBuf->WriteUBitLong ( client->m_nBaselineUsed, 1 );	// tell client what baseline we are using
+	u.m_pBuf->WriteUBitLong (framesnapshotmanager->GetClientSnapshotInfo(client)->m_nBaselineUsed, 1 );	// tell client what baseline we are using
 
 	// Store off current position 
 	bf_write savepos = *u.m_pBuf;
@@ -1037,14 +1040,14 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 	savepos.WriteUBitLong( u.m_nHeaderCount, MAX_EDICT_BITS );
 	savepos.WriteUBitLong( length, DELTASIZE_BITS );
 
-	bool bUpdateBaseline = ( (client->m_nBaselineUpdateTick == -1) && 
+	bool bUpdateBaseline = ( (framesnapshotmanager->GetClientSnapshotInfo(client)->m_nBaselineUpdateTick == -1) &&
 		(u.m_nFullProps > 0 || !u.m_bAsDelta) );
 
 	if ( bUpdateBaseline && u.m_pBaselineEntities )
 	{
 		// tell client to use this snapshot as baseline update
 		savepos.WriteOneBit( 1 ); 
-		client->m_nBaselineUpdateTick = to->tick_count;
+		framesnapshotmanager->GetClientSnapshotInfo(client)->m_nBaselineUpdateTick = to->tick_count;
 	}
 	else
 	{

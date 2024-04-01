@@ -166,7 +166,7 @@ public:
 	virtual void	ActivatePlayer( void );
 	virtual void	SetName( const char * playerName );
 	virtual void	SetUserCVar( const char *cvar, const char *value);
-	virtual void	FreeBaselines();
+	//virtual void	FreeBaselines();
 	virtual bool	IgnoreTempEntity( CEventInfo *event );
 	
 	void			SetSteamID( const CSteamID &steamID );
@@ -234,16 +234,16 @@ public:
 	int				m_nStringTableAckTick; // Highest tick acked for string tables (usually m_nDeltaTick, except when it's -1)
 	int				m_nSignonTick;		// tick the client got his signon data
 
-	CSmartPtr<CFrameSnapshot,CRefCountAccessorLongName> m_pLastSnapshot;	// last send snapshot
+	//CSmartPtr<CFrameSnapshot,CRefCountAccessorLongName> m_pLastSnapshot;	// last send snapshot
 
 	//CFrameSnapshot	*m_pBaseline;			// current entity baselines as a snapshot
-	int				m_nBaselineUpdateTick;	// last tick we send client a update baseline signal or -1
+	//int				m_nBaselineUpdateTick;	// last tick we send client a update baseline signal or -1
 
 	// State information
-	CFrameSnapshotEntry* m_pBaselineEntities;
-	int						m_nNumBaselineEntities;
-	CBitVec<MAX_EDICTS>	m_BaselinesSent;	// baselines sent with last update
-	int				m_nBaselineUsed;		// 0/1 toggling flag, singaling client what baseline to use
+	//CFrameSnapshotEntry* m_pBaselineEntities;
+	//int						m_nNumBaselineEntities;
+	//CBitVec<MAX_EDICTS>	m_BaselinesSent;	// baselines sent with last update
+	//int				m_nBaselineUsed;		// 0/1 toggling flag, singaling client what baseline to use
 	
 		
 	// This is used when we send out a nodelta packet to put the client in a state where we wait 
