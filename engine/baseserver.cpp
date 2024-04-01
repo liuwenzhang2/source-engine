@@ -1354,7 +1354,7 @@ const char *CBaseServer::CompressPackedEntity(ServerClass *pServerClass, const c
 // uncompresses a 
 const char* CBaseServer::UncompressPackedEntity(PackedEntity *pPackedEntity, int &bits)
 {
-	UnpackedDataCache_t *pdc = framesnapshotmanager->GetCachedUncompressedEntity( pPackedEntity );
+	UnpackedDataCache_t *pdc = g_pPackedEntityManager->GetCachedUncompressedEntity( pPackedEntity );
 
 	if ( pdc->bits > 0 )
 	{

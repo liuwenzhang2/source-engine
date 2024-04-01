@@ -12,6 +12,7 @@
 
 #include <mempool.h>
 #include <utllinkedlist.h>
+#include "smartptr.h"
 
 
 class PackedEntity;
@@ -21,7 +22,7 @@ class ServerClass;
 class CEventInfo;
 
 #define INVALID_PACKED_ENTITY_HANDLE (0)
-typedef intptr_t PackedEntityHandle_t;
+//typedef intptr_t PackedEntityHandle_t;
 
 //-----------------------------------------------------------------------------
 // Purpose: Individual entity data, did the entity exist and what was it's serial number
@@ -29,10 +30,10 @@ typedef intptr_t PackedEntityHandle_t;
 class CFrameSnapshotEntry
 {
 public:
-	ServerClass*			m_pClass;
-	int						m_nSerialNumber;
+	ServerClass*			m_pClass = NULL;
+	int						m_nSerialNumber = -1;
 	// Keeps track of the fullpack info for this frame for all entities in any pvs:
-	PackedEntityHandle_t	m_pPackedData;
+	PackedEntity*			m_pPackedData = INVALID_PACKED_ENTITY_HANDLE;
 };
 
 // HLTV needs some more data per entity 
@@ -51,13 +52,7 @@ public:
 	unsigned int	m_nNodeCluster;  // if (1<<31) is set it's a node, otherwise a cluster
 };
 
-typedef struct
-{
-	PackedEntity	*pEntity;	// original packed entity
-	int				counter;	// increaseing counter to find LRU entries
-	int				bits;		// uncompressed data length in bits
-	char			data[MAX_PACKEDENTITY_DATA]; // uncompressed data cache
-} UnpackedDataCache_t;
+
 
 
 
@@ -89,7 +84,7 @@ public:
 	int						m_nTickCount; // = sv.tickcount
 	
 	// State information
-	CFrameSnapshotEntry		*m_pEntities;	
+	//CFrameSnapshotEntry		*m_pEntities;	
 	int						m_nNumEntities; // = sv.num_edicts
 
 	// This list holds the entities that are in use and that also aren't entities for inactive clients.
@@ -109,6 +104,17 @@ private:
 
 	// Snapshots auto-delete themselves when their refcount goes to zero.
 	CInterlockedInt			m_nReferences;
+};
+
+class ClientSnapshotInfo {
+public:
+
+	CSmartPtr<CFrameSnapshot, CRefCountAccessorLongName> m_pLastSnapshot;	// last send snapshot
+
+	//CFrameSnapshot	*m_pBaseline;			// current entity baselines as a snapshot
+	int				m_nBaselineUpdateTick;	// last tick we send client a update baseline signal or -1
+	CBitVec<MAX_EDICTS>	m_BaselinesSent;	// baselines sent with last update
+	int				m_nBaselineUsed;		// 0/1 toggling flag, singaling client what baseline to use
 };
 
 //-----------------------------------------------------------------------------
@@ -136,29 +142,7 @@ public:
 
 	CFrameSnapshot*	NextSnapshot( const CFrameSnapshot *pSnapshot );
 
-	// Creates pack data for a particular entity for a particular snapshot
-	PackedEntity*	CreatePackedEntity( CFrameSnapshot* pSnapshot, int entity );
-
-	// Returns the pack data for a particular entity for a particular snapshot
-	PackedEntity*	GetPackedEntity( CFrameSnapshot* pSnapshot, int entity );
-
-	// if we are copying a Packed Entity, we have to increase the reference counter 
-	void			AddEntityReference( PackedEntityHandle_t handle );
-
-	// if we are removeing a Packed Entity, we have to decrease the reference counter
-	void			RemoveEntityReference( PackedEntityHandle_t handle );
-
-	// Uses a previously sent packet
-	bool			UsePreviouslySentPacket( CFrameSnapshot* pSnapshot, int entity, int entSerialNumber );
-
-	bool			ShouldForceRepack( CFrameSnapshot* pSnapshot, int entity, PackedEntityHandle_t handle );
-
-	PackedEntity*	GetPreviouslySentPacket( int iEntity, int iSerialNumber );
-
-	// Return the entity sitting in iEntity's slot if iSerialNumber matches its number.
-	UnpackedDataCache_t *GetCachedUncompressedEntity( PackedEntity *pPackedEntity );
-
-	CThreadFastMutex	&GetMutex();
+	//CThreadFastMutex	&GetMutex();
 
 	// List of entities to explicitly delete
 	void			AddExplicitDelete( int iSlot );
@@ -167,18 +151,13 @@ private:
 	void	DeleteFrameSnapshot( CFrameSnapshot* pSnapshot );
 
 	CUtlLinkedList<CFrameSnapshot*, unsigned short>		m_FrameSnapshots;
-	CClassMemoryPool< PackedEntity >					m_PackedEntitiesPool;
-
-	int								m_nPackedEntityCacheCounter;  // increase with every cache access
-	CUtlVector<UnpackedDataCache_t>	m_PackedEntityCache;	// cache for uncompressed packed entities
-
-	// The most recently sent packets for each entity
-	PackedEntityHandle_t	m_pPackedData[ MAX_EDICTS ];
-	int						m_pSerialNumber[ MAX_EDICTS ];
 
 	CThreadFastMutex		m_WriteMutex;
-
 	CUtlVector<int>			m_iExplicitDeleteSlots;
+
+
+
+
 };
 
 extern CFrameSnapshotManager *framesnapshotmanager;

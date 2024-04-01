@@ -52,7 +52,7 @@ CBaseClient::CBaseClient()
 	m_NetChannel = NULL;
 	m_ConVars = NULL;
 	m_Server = NULL;
-	m_pBaseline = NULL;
+	//m_pBaseline = NULL;
 	m_bIsHLTV = false;
 #if defined( REPLAY_ENABLED )
 	m_bIsReplay = false;
@@ -216,10 +216,19 @@ int CBaseClient::GetUpdateRate(void) const
 
 void CBaseClient::FreeBaselines()
 {
-	if ( m_pBaseline )
+	if ( m_pBaselineEntities )
 	{
-		m_pBaseline->ReleaseReference();
-		m_pBaseline = NULL;
+		//m_pBaseline->ReleaseReference();
+		for (int i = 0; i < m_nNumBaselineEntities; ++i)
+		{
+			if (m_pBaselineEntities[i].m_pPackedData != INVALID_PACKED_ENTITY_HANDLE)
+			{
+				g_pPackedEntityManager->RemoveEntityReference(m_pBaselineEntities[i].m_pPackedData);
+			}
+		}
+		//m_pBaseline = NULL;
+		m_pBaselineEntities = null;
+		m_nNumBaselineEntities = 0;
 	}
 
 	m_nBaselineUpdateTick = -1;
@@ -525,7 +534,9 @@ void CBaseClient::SpawnPlayer( void )
 		FreeBaselines();
 		
 		// create baseline snapshot for real clients
-		m_pBaseline = framesnapshotmanager->CreateEmptySnapshot( 0, MAX_EDICTS );
+		//m_pBaseline = framesnapshotmanager->CreateEmptySnapshot( 0, MAX_EDICTS );
+		m_pBaselineEntities = new CFrameSnapshotEntry[MAX_EDICTS];
+		m_nNumBaselineEntities = MAX_EDICTS;
 	}
 
 	// Set client clock to match server's
@@ -945,7 +956,7 @@ bool CBaseClient::ProcessBaselineAck( CLC_BaselineAck *msg )
 		return true;
 	}
 
-	Assert( m_pBaseline );	
+	Assert(m_pBaselineEntities);
 
 	// copy ents send as full updates this frame into baseline stuff
 	CClientFrame *frame = GetDeltaFrame( m_nBaselineUpdateTick );
@@ -972,32 +983,32 @@ bool CBaseClient::ProcessBaselineAck( CLC_BaselineAck *msg )
 	while ( index >= 0 )
 	{
 		// get new entity
-		PackedEntityHandle_t hNewEntity = pSnapshot->m_pEntities[index].m_pPackedData;
-		if ( hNewEntity == INVALID_PACKED_ENTITY_HANDLE )
+		PackedEntity* hNewPackedEntity = g_pPackedEntityManager->GetPackedEntity(pSnapshot, index);
+		if (hNewPackedEntity == INVALID_PACKED_ENTITY_HANDLE )
 		{
 			DevMsg("CBaseClient::ProcessBaselineAck: invalid packet handle (%i)\n", index );
 			return false;
 		}
 
-		PackedEntityHandle_t hOldEntity = m_pBaseline->m_pEntities[index].m_pPackedData;
+		PackedEntity* hOldPackedEntity = m_pBaselineEntities[index].m_pPackedData;//m_pBaseline->
 
-		if ( hOldEntity != INVALID_PACKED_ENTITY_HANDLE )
+		if (hOldPackedEntity != INVALID_PACKED_ENTITY_HANDLE )
 		{
 			// remove reference before overwriting packed entity
-			framesnapshotmanager->RemoveEntityReference( hOldEntity );
+			g_pPackedEntityManager->RemoveEntityReference(hOldPackedEntity);
 		}
 
 		// increase reference
-		framesnapshotmanager->AddEntityReference( hNewEntity );
+		g_pPackedEntityManager->AddEntityReference(hNewPackedEntity);
 		
 		// copy entity handle, class & serial number to
-		m_pBaseline->m_pEntities[index] = pSnapshot->m_pEntities[index];
+		m_pBaselineEntities[index] = *g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, index);//m_pBaseline->
 
 		// go to next entity
 		index = m_BaselinesSent.FindNextSetBit( index + 1 );
 	}
 
-	m_pBaseline->m_nTickCount = m_nBaselineUpdateTick;
+	//m_pBaseline->m_nTickCount = m_nBaselineUpdateTick;
 
 	// flip used baseline flag
 	m_nBaselineUsed = (m_nBaselineUsed==1)?0:1;
@@ -1517,7 +1528,9 @@ void CBaseClient::OnRequestFullUpdate()
 	FreeBaselines();
 
 	// and create new baseline snapshot
-	m_pBaseline = framesnapshotmanager->CreateEmptySnapshot( 0, MAX_EDICTS );
+	//m_pBaseline = framesnapshotmanager->CreateEmptySnapshot( 0, MAX_EDICTS );
+	m_pBaselineEntities = new CFrameSnapshotEntry[MAX_EDICTS];
+	m_nNumBaselineEntities = MAX_EDICTS;
 
 	DevMsg("Sending full update to Client %s\n", GetClientName() );
 }

@@ -49,7 +49,8 @@ class RecvTable;
 class ServerClass;
 class ClientClass;
 class IChangeFrameList;
-
+class CFrameSnapshotEntry;
+class CFrameSnapshot;
 
 
 // Replaces entity_state_t.
@@ -204,6 +205,75 @@ inline bool PackedEntity::ShouldCheckCreationTick() const
 {
 	return m_nShouldCheckCreationTick == 1 ? true : false;
 }
+
+typedef struct
+{
+	PackedEntity* pEntity;	// original packed entity
+	int				counter;	// increaseing counter to find LRU entries
+	int				bits;		// uncompressed data length in bits
+	char			data[MAX_PACKEDENTITY_DATA]; // uncompressed data cache
+} UnpackedDataCache_t;
+
+class PackedEntityManager {
+public:
+
+	PackedEntityManager();
+	~PackedEntityManager();
+
+	void OnLevelChanged();
+
+	void OnCreateSnapshot(CFrameSnapshot* pSnapshot);
+
+	void OnDeleteSnapshot(CFrameSnapshot* pSnapshot);
+
+	// if we are copying a Packed Entity, we have to increase the reference counter 
+	void AddEntityReference(PackedEntity* pPackedEntity);
+
+	// if we are removeing a Packed Entity, we have to decrease the reference counter
+	void RemoveEntityReference(PackedEntity* pPackedEntity);
+
+	// Return the entity sitting in iEntity's slot if iSerialNumber matches its number.
+	UnpackedDataCache_t* GetCachedUncompressedEntity(PackedEntity* pPackedEntity);
+	// Keeps track of the fullpack info for this frame for all entities in any pvs:
+	//PackedEntityHandle_t	m_pPackedData;
+
+		// Creates pack data for a particular entity for a particular snapshot
+	PackedEntity* CreatePackedEntity(CFrameSnapshot* pSnapshot, int entity);
+
+	CFrameSnapshotEntry* GetSnapshotEntry(CFrameSnapshot* pSnapshot, int entity);
+
+	// Returns the pack data for a particular entity for a particular snapshot
+	PackedEntity* GetPackedEntity(CFrameSnapshot* pSnapshot, int entity);
+
+	// Uses a previously sent packet
+	bool			UsePreviouslySentPacket(CFrameSnapshot* pSnapshot, int entity, int entSerialNumber);
+
+	bool			ShouldForceRepack(CFrameSnapshot* pSnapshot, int entity, PackedEntity* handle);
+
+	PackedEntity* GetPreviouslySentPacket(int iEntity, int iSerialNumber);
+
+private:
+
+	// State information
+	CUtlVector<CFrameSnapshotEntry*> m_pEntities;
+
+	CThreadFastMutex		m_WriteMutex;
+
+	CClassMemoryPool< PackedEntity > m_PackedEntitiesPool;
+
+	int								m_nPackedEntityCacheCounter;  // increase with every cache access
+	CUtlVector<UnpackedDataCache_t>	m_PackedEntityCache;	// cache for uncompressed packed entities
+
+	// The most recently sent packets for each entity
+	PackedEntity* m_pPackedData[MAX_EDICTS];
+	int						m_pSerialNumber[MAX_EDICTS];
+
+	// State information
+	CFrameSnapshotEntry*	m_pBaselineEntities;
+	int						m_nNumBaselineEntities;
+};
+
+extern PackedEntityManager* g_pPackedEntityManager;
 
 #include "memdbgoff.h"
 

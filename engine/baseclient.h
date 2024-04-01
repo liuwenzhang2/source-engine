@@ -30,6 +30,7 @@ class CClientFrame;
 struct player_info_s;
 class CFrameSnapshot;
 class CEventInfo;
+class CFrameSnapshotEntry;
 
 struct Spike_t
 {
@@ -232,10 +233,15 @@ public:
 										// compressed info from.
 	int				m_nStringTableAckTick; // Highest tick acked for string tables (usually m_nDeltaTick, except when it's -1)
 	int				m_nSignonTick;		// tick the client got his signon data
+
 	CSmartPtr<CFrameSnapshot,CRefCountAccessorLongName> m_pLastSnapshot;	// last send snapshot
 
-	CFrameSnapshot	*m_pBaseline;			// current entity baselines as a snapshot
+	//CFrameSnapshot	*m_pBaseline;			// current entity baselines as a snapshot
 	int				m_nBaselineUpdateTick;	// last tick we send client a update baseline signal or -1
+
+	// State information
+	CFrameSnapshotEntry* m_pBaselineEntities;
+	int						m_nNumBaselineEntities;
 	CBitVec<MAX_EDICTS>	m_BaselinesSent;	// baselines sent with last update
 	int				m_nBaselineUsed;		// 0/1 toggling flag, singaling client what baseline to use
 	

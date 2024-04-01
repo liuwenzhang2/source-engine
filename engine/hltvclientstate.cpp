@@ -87,8 +87,8 @@ void CHLTVClientState::CopyNewEntity(
 
 	// copy class & serial
 	CFrameSnapshot *pSnapshot = u.m_pTo->GetSnapshot();
-	pSnapshot->m_pEntities[ent].m_nSerialNumber = iSerialNum;
-	pSnapshot->m_pEntities[ent].m_pClass = pServerClass;
+	g_pPackedEntityManager->GetSnapshotEntry(pSnapshot,ent)->m_nSerialNumber = iSerialNum;
+	g_pPackedEntityManager->GetSnapshotEntry(pSnapshot,ent)->m_pClass = pServerClass;
 
 	// Get either the static or instance baseline.
 	const void *pFromData = NULL;
@@ -123,7 +123,7 @@ void CHLTVClientState::CopyNewEntity(
 	}
 
 	// Now make a PackedEntity and store the new packed data in there.
-	PackedEntity *pPackedEntity = framesnapshotmanager->CreatePackedEntity( pSnapshot, ent );
+	PackedEntity *pPackedEntity = g_pPackedEntityManager->CreatePackedEntity( pSnapshot, ent );
 	pPackedEntity->SetChangeFrameList( pChangeFrame );
 	pPackedEntity->SetServerAndClientClass( pServerClass, pClientClass );
 
@@ -175,12 +175,12 @@ static inline void HLTV_CopyExitingEnt( CEntityReadInfo &u )
 	
 	// copy ent handle, serial numbers & class info
 	Assert( ent < pFromSnapshot->m_nNumEntities );
-	pSnapshot->m_pEntities[ent] = pFromSnapshot->m_pEntities[ent];
+	*g_pPackedEntityManager->GetSnapshotEntry(pSnapshot,ent) = *g_pPackedEntityManager->GetSnapshotEntry(pFromSnapshot,ent);
 	
-	Assert( pSnapshot->m_pEntities[ent].m_pPackedData != INVALID_PACKED_ENTITY_HANDLE );
+	Assert(g_pPackedEntityManager->GetPackedEntity(pSnapshot, ent) != INVALID_PACKED_ENTITY_HANDLE );
 
 	// increase PackedEntity reference counter
-	PackedEntity *pEntity =	framesnapshotmanager->GetPackedEntity( pSnapshot, ent );
+	PackedEntity *pEntity = g_pPackedEntityManager->GetPackedEntity( pSnapshot, ent );
 	Assert( pEntity );
 	pEntity->m_ReferenceCount++;
 
@@ -630,8 +630,8 @@ bool CHLTVClientState::ProcessPacketEntities( SVC_PacketEntities *entmsg )
 	if ( m_pCurrentClientFrame )
 	{
 		CFrameSnapshot* pLastSnapshot = m_pCurrentClientFrame->GetSnapshot();
-		CFrameSnapshotEntry *pEntry = pSnapshot->m_pEntities;
-		CFrameSnapshotEntry *pLastEntry = pLastSnapshot->m_pEntities;
+		CFrameSnapshotEntry *pEntry = g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, 0);
+		CFrameSnapshotEntry *pLastEntry = g_pPackedEntityManager->GetSnapshotEntry(pLastSnapshot, 0);
 
 		Assert( pLastSnapshot->m_nNumEntities <= pSnapshot->m_nNumEntities );
 
@@ -689,7 +689,7 @@ void CHLTVClientState::ReadLeavePVS( CEntityReadInfo &u )
 	if ( u.m_UpdateFlags & FHDR_DELETE )
 	{
 		CFrameSnapshot *pSnapshot = u.m_pTo->GetSnapshot();
-		CFrameSnapshotEntry *pEntry = &pSnapshot->m_pEntities[u.m_nOldEntity];
+		CFrameSnapshotEntry *pEntry = g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, u.m_nOldEntity);
 
 		// clear entity references
 		pEntry->m_nSerialNumber = -1;
@@ -709,12 +709,12 @@ void CHLTVClientState::ReadDeltaEnt( CEntityReadInfo &u )
 	CFrameSnapshot *pSnapshot = u.m_pTo->GetSnapshot();
 
 	Assert( i < pFromSnapshot->m_nNumEntities );
-	pSnapshot->m_pEntities[i] = pFromSnapshot->m_pEntities[i];
+	*g_pPackedEntityManager->GetSnapshotEntry(pSnapshot,i) = *g_pPackedEntityManager->GetSnapshotEntry(pFromSnapshot,i);
 	
-	PackedEntity *pToPackedEntity = framesnapshotmanager->CreatePackedEntity( pSnapshot, i );
+	PackedEntity *pToPackedEntity = g_pPackedEntityManager->CreatePackedEntity( pSnapshot, i );
 
 	// WARNING! get pFromPackedEntity after new pPackedEntity has been created, otherwise pointer may be wrong
-	PackedEntity *pFromPackedEntity = framesnapshotmanager->GetPackedEntity( pFromSnapshot, i );
+	PackedEntity *pFromPackedEntity = g_pPackedEntityManager->GetPackedEntity( pFromSnapshot, i );
 
 	pToPackedEntity->SetServerAndClientClass( pFromPackedEntity->m_pServerClass, pFromPackedEntity->m_pClientClass );
 
@@ -810,7 +810,7 @@ void CHLTVClientState::ReadDeletions( CEntityReadInfo &u )
 		Assert( !u.m_pTo->transmit_entity.Get( idx ) );
 		
 		CFrameSnapshot *pSnapshot = u.m_pTo->GetSnapshot();
-		CFrameSnapshotEntry *pEntry = &pSnapshot->m_pEntities[idx];
+		CFrameSnapshotEntry *pEntry = g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, idx);
 
 		// clear entity references
 		pEntry->m_nSerialNumber = -1;

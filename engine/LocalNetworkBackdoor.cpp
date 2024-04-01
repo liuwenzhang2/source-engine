@@ -205,7 +205,7 @@ void CLocalNetworkBackdoor::EntityDormant( int iEnt, int iSerialNum )
 			m_EntsAlive.Set( iEnt );
 
 			// Tell the game code that this guy is now dormant.
-			Assert( pCached->m_bDormant == pNet->GetClientNetworkable()->IsDormant());
+			Assert( pCached->m_bDormant == pClientEntity->GetClientNetworkable()->IsDormant());
 			if ( !pCached->m_bDormant )
 			{
 				pClientEntity->GetClientNetworkable()->NotifyShouldTransmit(SHOULDTRANSMIT_END);
@@ -314,7 +314,7 @@ void CLocalNetworkBackdoor::EntState(
 	if (pClientEntity)
 	{
 		// If the serial numbers are different, make it recreate the ent.
-		Assert( pCached->m_iSerialNumber == pNet->GetRefEHandle().GetSerialNumber() );
+		Assert( pCached->m_iSerialNumber == pClientEntity->GetRefEHandle().GetSerialNumber() );
 		if ( iSerialNum == pCached->m_iSerialNumber )
 		{
 			bExistedAndWasDormant = pCached->m_bDormant;

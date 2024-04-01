@@ -71,7 +71,10 @@ public:
 	CFrameSnapshot	*m_pFromSnapshot; // = m_pFrom->GetSnapshot();
 	CFrameSnapshot	*m_pToSnapshot; // = m_pTo->GetSnapshot();
 
-	CFrameSnapshot	*m_pBaseline; // the clients baseline
+	//CFrameSnapshot	*m_pBaseline; // the clients baseline
+	CFrameSnapshotEntry* m_pBaselineEntities;
+	int					m_nNumBaselineEntities;
+	CBitVec<MAX_EDICTS>* from_baseline;
 
 	CBaseServer		*m_pServer;	// the server who writes this entity
 
@@ -159,13 +162,13 @@ static inline bool SV_NeedsExplicitDestroy( int entnum, CFrameSnapshot *from, CF
 {
 	// Never on uncompressed packet
 
-	if( entnum >= to->m_nNumEntities || to->m_pEntities[entnum].m_pClass == NULL ) // doesn't exits in new
+	if( entnum >= to->m_nNumEntities || g_pPackedEntityManager->GetSnapshotEntry(to,entnum)->m_pClass == NULL) // doesn't exits in new
 	{
 		if ( entnum >= from->m_nNumEntities )
 			return false; // didn't exist in old
 
 		// in old, but not in new, destroy.
-		if( from->m_pEntities[ entnum ].m_pClass != NULL ) 
+		if(g_pPackedEntityManager->GetSnapshotEntry( from, entnum )->m_pClass != NULL )
 		{
 			return true;
 		}
@@ -433,8 +436,8 @@ static bool SV_NeedsExplicitCreate( CEntityWriteInfo &u )
 		return true; // entity didn't exist in old frame, so create
 
 	// Server thinks the entity was continues, but the serial # changed, so we might need to destroy and recreate it
-	const CFrameSnapshotEntry *pFromEnt = &u.m_pFromSnapshot->m_pEntities[index];
-	const CFrameSnapshotEntry *pToEnt = &u.m_pToSnapshot->m_pEntities[index];
+	const CFrameSnapshotEntry *pFromEnt = g_pPackedEntityManager->GetSnapshotEntry(u.m_pFromSnapshot, index);//u.m_pFromSnapshot->m_pEntities
+	const CFrameSnapshotEntry *pToEnt = g_pPackedEntityManager->GetSnapshotEntry( u.m_pToSnapshot, index);//u.m_pToSnapshot->m_pEntities
 
 	bool bNeedsExplicitCreate = (pFromEnt->m_pClass == NULL) || pFromEnt->m_nSerialNumber != pToEnt->m_nSerialNumber;
 
@@ -481,7 +484,7 @@ static inline void SV_DetermineUpdateType( CEntityWriteInfo &u )
 		Error("state error");
 	}
 	
-	Assert( u.m_pToSnapshot->m_pEntities[ u.m_nNewEntity ].m_pClass );
+	Assert(g_pPackedEntityManager->GetSnapshotEntry(u.m_pToSnapshot, u.m_nNewEntity)->m_pClass );
 
 	bool recreate = SV_NeedsExplicitCreate( u );
 	
@@ -642,7 +645,7 @@ static inline void SV_WriteEnterPVS( CEntityWriteInfo &u )
 
 	Assert( u.m_nNewEntity < u.m_pToSnapshot->m_nNumEntities );
 
-	CFrameSnapshotEntry *entry = &u.m_pToSnapshot->m_pEntities[u.m_nNewEntity];
+	CFrameSnapshotEntry *entry = g_pPackedEntityManager->GetSnapshotEntry(u.m_pToSnapshot, u.m_nNewEntity);//u.m_pToSnapshot->m_pEntities
 
 	ServerClass *pClass = entry->m_pClass;
 
@@ -664,15 +667,23 @@ static inline void SV_WriteEnterPVS( CEntityWriteInfo &u )
 	// Write some of the serial number's bits. 
 	u.m_pBuf->WriteUBitLong( entry->m_nSerialNumber, NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS );
 
+	if ( u.from_baseline )
+	{
+		// remember that we sent this entity as full update from entity baseline
+		u.from_baseline->Set( u.m_nNewEntity );
+	}
+
+	PackedEntity * hBaselinePackedEntity = u.m_pBaselineEntities[u.m_nNewEntity].m_pPackedData;
+	
 	// Get the baseline.
 	// Since the ent is in the fullpack, then it must have either a static or an instance baseline.
-	PackedEntity *pBaseline = u.m_bAsDelta ? framesnapshotmanager->GetPackedEntity( u.m_pBaseline, u.m_nNewEntity ) : NULL;
-	const void *pFromData;
+	PackedEntity* pBaseline = u.m_bAsDelta && hBaselinePackedEntity != INVALID_PACKED_ENTITY_HANDLE? hBaselinePackedEntity : NULL;
+	const void* pFromData;
 	int nFromBits;
 
-	if ( pBaseline && (pBaseline->m_pServerClass == u.m_pNewPack->m_pServerClass) )
+	if (pBaseline && (pBaseline->m_pServerClass == u.m_pNewPack->m_pServerClass))
 	{
-		Assert( !pBaseline->IsCompressed() );
+		Assert(!pBaseline->IsCompressed());
 		pFromData = pBaseline->GetData();
 		nFromBits = pBaseline->GetNumBits();
 	}
@@ -680,24 +691,18 @@ static inline void SV_WriteEnterPVS( CEntityWriteInfo &u )
 	{
 		// Since the ent is in the fullpack, then it must have either a static or an instance baseline.
 		int nFromBytes;
-		if ( !u.m_pServer->GetClassBaseline( pClass, &pFromData, &nFromBytes ) )
+		if (!u.m_pServer->GetClassBaseline(pClass, &pFromData, &nFromBytes))
 		{
-			Error( "SV_WriteEnterPVS: missing instance baseline for '%s'.", pClass->m_pNetworkName );
+			Error("SV_WriteEnterPVS: missing instance baseline for '%s'.", pClass->m_pNetworkName);
 		}
 
-		ErrorIfNot( pFromData,
+		ErrorIfNot(pFromData,
 			("SV_WriteEnterPVS: missing pFromData for '%s'.", pClass->m_pNetworkName)
 		);
-		
-		nFromBits = nFromBytes * 8;	// NOTE: this isn't the EXACT number of bits but that's ok since it's
-									// only used to detect if we overran the buffer (and if we do, it's probably
-									// by more than 7 bits).
-	}
 
-	if ( u.m_pTo->from_baseline )
-	{
-		// remember that we sent this entity as full update from entity baseline
-		u.m_pTo->from_baseline->Set( u.m_nNewEntity );
+		nFromBits = nFromBytes * 8;	// NOTE: this isn't the EXACT number of bits but that's ok since it's
+		// only used to detect if we overran the buffer (and if we do, it's probably
+		// by more than 7 bits).
 	}
 
 	const void *pToData;
@@ -882,7 +887,8 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 	u.m_pBuf = &pBuf;
 	u.m_pTo = to;
 	u.m_pToSnapshot = to->GetSnapshot();
-	u.m_pBaseline = client->m_pBaseline;
+	u.m_pBaselineEntities = client->m_pBaselineEntities;
+	u.m_nNumBaselineEntities = client->m_nNumBaselineEntities;
 	u.m_nFullProps = 0;
 	u.m_pServer = this;
 	u.m_nClientEntity = client->m_nEntityIndex;
@@ -920,7 +926,7 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 	if ( client->m_nBaselineUpdateTick == -1 )
 	{
 		client->m_BaselinesSent.ClearAll();
-		to->from_baseline = &client->m_BaselinesSent;
+		u.from_baseline = &client->m_BaselinesSent;
 	}
 
 	// Write the header, TODO use class SVC_PacketEntities
@@ -968,8 +974,8 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 		
 		while ( (u.m_nOldEntity != ENTITY_SENTINEL) || (u.m_nNewEntity != ENTITY_SENTINEL) )
 		{
-			u.m_pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? framesnapshotmanager->GetPackedEntity( u.m_pToSnapshot, u.m_nNewEntity ) : NULL;
-			u.m_pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? framesnapshotmanager->GetPackedEntity( u.m_pFromSnapshot, u.m_nOldEntity ) : NULL;
+			u.m_pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity( u.m_pToSnapshot, u.m_nNewEntity ) : NULL;
+			u.m_pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity( u.m_pFromSnapshot, u.m_nOldEntity ) : NULL;
 			int nEntityStartBit = pBuf.GetNumBitsWritten();
 
 			// Figure out how we want to write this entity.
@@ -1034,7 +1040,7 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 	bool bUpdateBaseline = ( (client->m_nBaselineUpdateTick == -1) && 
 		(u.m_nFullProps > 0 || !u.m_bAsDelta) );
 
-	if ( bUpdateBaseline && u.m_pBaseline )
+	if ( bUpdateBaseline && u.m_pBaselineEntities )
 	{
 		// tell client to use this snapshot as baseline update
 		savepos.WriteOneBit( 1 ); 

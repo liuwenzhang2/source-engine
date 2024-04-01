@@ -115,7 +115,7 @@ static inline void SV_PackEntity(
 	Assert( edictIdx < pSnapshot->m_nNumEntities );
 	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "PackEntities_Normal%s", __FUNCTION__ );
 
-	int iSerialNum = pSnapshot->m_pEntities[ edictIdx ].m_nSerialNumber;
+	int iSerialNum = g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, edictIdx )->m_nSerialNumber;
 
 	// Check to see if this entity specifies its changes.
 	// If so, then try to early out making the fullpack
@@ -125,7 +125,7 @@ static inline void SV_PackEntity(
 	{
 		// Now this may not work if we didn't previously send a packet;
 		// if not, then we gotta compute it
-		bUsedPrev = framesnapshotmanager->UsePreviouslySentPacket( pSnapshot, edictIdx, iSerialNum );
+		bUsedPrev = g_pPackedEntityManager->UsePreviouslySentPacket( pSnapshot, edictIdx, iSerialNum );
 	}
 		
 	if ( bUsedPrev && !sv_debugmanualmode.GetInt() )
@@ -165,7 +165,7 @@ static inline void SV_PackEntity(
 	//
 	// If not, then we want to setup a new IChangeFrameList.
 
-	PackedEntity *pPrevFrame = framesnapshotmanager->GetPreviouslySentPacket( edictIdx, pSnapshot->m_pEntities[ edictIdx ].m_nSerialNumber );
+	PackedEntity *pPrevFrame = g_pPackedEntityManager->GetPreviouslySentPacket( edictIdx, g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, edictIdx)->m_nSerialNumber);
 	if ( pPrevFrame )
 	{
 		// Calculate a delta.
@@ -197,7 +197,7 @@ static inline void SV_PackEntity(
 		{
 			if ( pPrevFrame->CompareRecipients( recip ) )
 			{
-				if ( framesnapshotmanager->UsePreviouslySentPacket( pSnapshot, edictIdx, iSerialNum ) )
+				if (g_pPackedEntityManager->UsePreviouslySentPacket( pSnapshot, edictIdx, iSerialNum ) )
 				{
 					edict->GetNetworkable()->ClearStateChanged();
 					return;
@@ -263,7 +263,7 @@ static inline void SV_PackEntity(
 
 	// Now make a PackedEntity and store the new packed data in there.
 	{
-		PackedEntity *pPackedEntity = framesnapshotmanager->CreatePackedEntity( pSnapshot, edictIdx );
+		PackedEntity *pPackedEntity = g_pPackedEntityManager->CreatePackedEntity( pSnapshot, edictIdx );
 		pPackedEntity->SetChangeFrameList( pChangeFrame );
 		pPackedEntity->SetServerAndClientClass( pServerClass, NULL );
 		pPackedEntity->AllocAndCopyPadded( packedData, writeBuf.GetNumBytesWritten() );
@@ -397,7 +397,7 @@ struct PackWork_t
 
 	static void Process( PackWork_t &item )
 	{
-		SV_PackEntity( item.nIdx, item.pEdict, item.pSnapshot->m_pEntities[ item.nIdx ].m_pClass, item.pSnapshot );
+		SV_PackEntity( item.nIdx, item.pEdict, g_pPackedEntityManager->GetSnapshotEntry(item.pSnapshot, item.nIdx)->m_pClass, item.pSnapshot);//item.pSnapshot->m_pEntities
 	}
 };
 
@@ -461,7 +461,7 @@ void PackEntities_Normal(
 		for ( int i = 0; i < c; ++i )
 		{
 			PackWork_t &w = workItems[ i ];
-			SV_PackEntity( w.nIdx, w.pEdict, w.pSnapshot->m_pEntities[ w.nIdx ].m_pClass, w.pSnapshot );
+			SV_PackEntity( w.nIdx, w.pEdict, g_pPackedEntityManager->GetSnapshotEntry(w.pSnapshot, w.nIdx)->m_pClass, w.pSnapshot);//w.pSnapshot->m_pEntities
 		}
 	}
 

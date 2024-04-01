@@ -16,7 +16,7 @@ CClientFrame::CClientFrame( CFrameSnapshot *pSnapshot )
 {
 	last_entity = 0;
 	transmit_always = NULL;	// bit array used only by HLTV and replay client
-	from_baseline = NULL;
+	//from_baseline = NULL;
 	tick_count = pSnapshot->m_nTickCount;
 	m_pSnapshot = NULL;
 	SetSnapshot( pSnapshot );
@@ -27,7 +27,7 @@ CClientFrame::CClientFrame( int tickcount )
 {
 	last_entity = 0;
 	transmit_always = NULL;	// bit array used only by HLTV and replay client
-	from_baseline = NULL;
+	//from_baseline = NULL;
 	tick_count = tickcount;
 	m_pSnapshot = NULL;
 	m_pNext = NULL;
@@ -37,7 +37,7 @@ CClientFrame::CClientFrame( void )
 {
 	last_entity = 0;
 	transmit_always = NULL;	// bit array used only by HLTV and replay client
-	from_baseline = NULL;
+	//from_baseline = NULL;
 	tick_count = 0;
 	m_pSnapshot = NULL;
 	m_pNext = NULL;
