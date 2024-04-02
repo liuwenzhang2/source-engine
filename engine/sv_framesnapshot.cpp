@@ -114,7 +114,7 @@ void CClientSnapshotInfo::SetupPrevPackInfo()
 CClientFrame* CClientSnapshotInfo::GetDeltaFrame(int nTick)
 {
 #ifndef _XBOX
-	Assert(!IsHLTV()); // has no ClientFrames
+	Assert(!m_pClient->IsHLTV()); // has no ClientFrames
 #if defined( REPLAY_ENABLED )
 	Assert(!IsReplay());  // has no ClientFrames
 #endif
