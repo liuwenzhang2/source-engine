@@ -101,12 +101,12 @@ CGameClient::CGameClient(int slot, CBaseServer *pServer )
 	m_nEntityIndex = slot+1;
 	Clear();
 	m_Server = pServer;
-	m_pCurrentFrame = NULL;
+	//m_pCurrentFrame = NULL;
 	m_bIsInReplayMode = false;
 
 	// NULL out data we'll never use.
-	memset( &m_PrevPackInfo, 0, sizeof( m_PrevPackInfo ) );
-	m_PrevPackInfo.m_pTransmitEdict = &m_PrevTransmitEdict;
+	//memset( &m_PrevPackInfo, 0, sizeof( m_PrevPackInfo ) );
+	//m_PrevPackInfo.m_pTransmitEdict = &m_PrevTransmitEdict;
 }
 
 CGameClient::~CGameClient()
@@ -362,8 +362,8 @@ void CGameClient::Connect( const char * szName, int nUserID, INetChannel *pNetCh
 	//edict = EDICT_NUM( m_nEntityIndex );
 	
 	// init PackInfo
-	m_PackInfo.m_pClientEnt = m_nEntityIndex;
-	m_PackInfo.m_nPVSSize = sizeof( m_PackInfo.m_PVS );
+	//m_PackInfo.m_pClientEnt = m_nEntityIndex;
+	//m_PackInfo.m_nPVSSize = sizeof( m_PackInfo.m_PVS );
 				
 	// fire global game event - server only
 	IGameEvent *event = g_GameEventManager.CreateEvent( "player_connect" );
@@ -391,86 +391,7 @@ void CGameClient::Connect( const char * szName, int nUserID, INetChannel *pNetCh
 	}
 }
 
-void CGameClient::SetupPackInfo( CFrameSnapshot *pSnapshot )
-{
-	// Compute Vis for each client
-	m_PackInfo.m_nPVSSize = (GetCollisionBSPData()->numclusters + 7) / 8;
-	serverGameClients->ClientSetupVisibility( m_pViewEntity,
-		m_PackInfo.m_pClientEnt, m_PackInfo.m_PVS, m_PackInfo.m_nPVSSize );
 
-	// This is the frame we are creating, i.e., the next
-	// frame after the last one that the client acknowledged
-
-	m_pCurrentFrame = AllocateFrame();
-	m_pCurrentFrame->Init( pSnapshot );
-
-	m_PackInfo.m_pTransmitEdict = &m_pCurrentFrame->transmit_entity;
-
-	// if this client is the HLTV or Replay client, add the nocheck PVS bit array
-	// normal clients don't need that extra array
-#ifndef _XBOX
-#if defined( REPLAY_ENABLED )
-	if ( IsHLTV() || IsReplay() )
-#else
-	if ( IsHLTV() )
-#endif
-	{
-		// the hltv client doesn't has a ClientFrame list
-		m_pCurrentFrame->transmit_always = new CBitVec<MAX_EDICTS>;
-		m_PackInfo.m_pTransmitAlways = m_pCurrentFrame->transmit_always;
-	}
-	else
-#endif
-	{
-		m_PackInfo.m_pTransmitAlways = NULL;
-	}
-
-	// Add frame to ClientFrame list 
-
-	int nMaxFrames = MAX_CLIENT_FRAMES;
-
-	if ( sv_maxreplay.GetFloat() > 0 )
-	{
-		// if the server has replay features enabled, allow a way bigger frame buffer
-		nMaxFrames = max ( (float)nMaxFrames, sv_maxreplay.GetFloat() / m_Server->GetTickInterval() );
-	}
-		
-	if ( nMaxFrames < AddClientFrame( m_pCurrentFrame ) )
-	{
-		// If the client has more than 64 frames, the server will start to eat too much memory.
-		RemoveOldestFrame(); 
-	}
-		
-	// Since area to area visibility is determined by each player's PVS, copy
-	//  the area network lookups into the ClientPackInfo_t
-	m_PackInfo.m_AreasNetworked = 0;
-	int areaCount = g_AreasNetworked.Count();
-	for ( int j = 0; j < areaCount; j++ )
-	{
-		m_PackInfo.m_Areas[m_PackInfo.m_AreasNetworked] = g_AreasNetworked[ j ];
-		m_PackInfo.m_AreasNetworked++;
-
-		// Msg("CGameClient::SetupPackInfo: too much areas (%i)", areaCount );
-		Assert( m_PackInfo.m_AreasNetworked < MAX_WORLD_AREAS );
-	}
-	
-	CM_SetupAreaFloodNums( m_PackInfo.m_AreaFloodNums, &m_PackInfo.m_nMapAreas );
-}
-
-void CGameClient::SetupPrevPackInfo()
-{
-	memcpy( &m_PrevTransmitEdict, m_PackInfo.m_pTransmitEdict, sizeof( m_PrevTransmitEdict ) );
-	
-	// Copy the relevant fields into m_PrevPackInfo.
-	m_PrevPackInfo.m_AreasNetworked = m_PackInfo.m_AreasNetworked;
-	memcpy( m_PrevPackInfo.m_Areas, m_PackInfo.m_Areas, sizeof( m_PackInfo.m_Areas[0] ) * m_PackInfo.m_AreasNetworked );
-
-	m_PrevPackInfo.m_nPVSSize = m_PackInfo.m_nPVSSize;
-	memcpy( m_PrevPackInfo.m_PVS, m_PackInfo.m_PVS, m_PackInfo.m_nPVSSize );
-	
-	m_PrevPackInfo.m_nMapAreas = m_PackInfo.m_nMapAreas;
-	memcpy( m_PrevPackInfo.m_AreaFloodNums, m_PackInfo.m_AreaFloodNums, m_PackInfo.m_nMapAreas * sizeof( m_PackInfo.m_nMapAreas ) );
-}
 
 
 /*
@@ -616,25 +537,27 @@ void CGameClient::Inactivate( void )
 	m_VoiceProximity.ClearAll();
 
 
-	DeleteClientFrames( -1 ); // delete all
+	//DeleteClientFrames( -1 ); // delete all
+	framesnapshotmanager->OnClientInactivate(this);
 }
 
 bool CGameClient::UpdateAcknowledgedFramecount(int tick)
 {
 	// free old client frames which won't be used anymore
-	if ( tick != m_nDeltaTick )
-	{
-		// delta tick changed, free all frames smaller than tick
-		int removeTick = tick;
-		
-		if ( sv_maxreplay.GetFloat() > 0 )
-			removeTick -= (sv_maxreplay.GetFloat() / m_Server->GetTickInterval() ); // keep a replay buffer
+	//if ( tick != m_nDeltaTick )
+	//{
+	//	// delta tick changed, free all frames smaller than tick
+	//	int removeTick = tick;
+	//	
+	//	if ( sv_maxreplay.GetFloat() > 0 )
+	//		removeTick -= (sv_maxreplay.GetFloat() / m_Server->GetTickInterval() ); // keep a replay buffer
 
-		if ( removeTick > 0 )
-		{
-			DeleteClientFrames( removeTick );	
-		}
-	}
+	//	if ( removeTick > 0 )
+	//	{
+	//		CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(this);
+	//		pClientSnapshotInfo->DeleteClientFrames( removeTick );
+	//	}
+	//}
 
 	return CBaseClient::UpdateAcknowledgedFramecount( tick );
 }
@@ -660,7 +583,7 @@ void CGameClient::Clear()
 	CBaseClient::Clear();
 
 	// free all frames
-	DeleteClientFrames( -1 );
+	//DeleteClientFrames( -1 );
 
 	m_Sounds.Purge();
 	m_VoiceStreams.ClearAll();
@@ -1016,28 +939,30 @@ void CGameClient::SpawnPlayer( void )
 
 CClientFrame *CGameClient::GetDeltaFrame( int nTick )
 {
-#ifndef _XBOX
-	Assert ( !IsHLTV() ); // has no ClientFrames
-#if defined( REPLAY_ENABLED )
-	Assert ( !IsReplay() );  // has no ClientFrames
-#endif
-#endif	
-
-	if ( m_bIsInReplayMode )
-	{
-		int followEntity; 
-
-		serverGameClients->GetReplayDelay( m_nEntityIndex, followEntity );
-
-		Assert( followEntity > 0 );
-
-		CGameClient *pFollowEntity = sv.Client( followEntity-1 );
-
-		if ( pFollowEntity )
-			return pFollowEntity->GetClientFrame( nTick );
-	}
-
-	return GetClientFrame( nTick );
+//#ifndef _XBOX
+//	Assert ( !IsHLTV() ); // has no ClientFrames
+//#if defined( REPLAY_ENABLED )
+//	Assert ( !IsReplay() );  // has no ClientFrames
+//#endif
+//#endif	
+//
+//	if ( m_bIsInReplayMode )
+//	{
+//		int followEntity; 
+//
+//		serverGameClients->GetReplayDelay( m_nEntityIndex, followEntity );
+//
+//		Assert( followEntity > 0 );
+//
+//		CGameClient *pFollowEntity = sv.Client( followEntity-1 );
+//
+//		if ( pFollowEntity )
+//			return pFollowEntity->GetClientFrame( nTick );
+//	}
+//
+//	return GetClientFrame( nTick );
+	CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(this);
+	return pClientSnapshotInfo->GetClientFrame(nTick);
 }
 
 void CGameClient::WriteViewAngleUpdate()
@@ -1370,55 +1295,57 @@ void CGameClient::ConnectionCrashed(const char *reason)
 
 CClientFrame *CGameClient::GetSendFrame()
 {
-	CClientFrame *pFrame = m_pCurrentFrame;
+	//CClientFrame *pFrame = m_pCurrentFrame;
 
-	// just return if replay is disabled
-	if ( sv_maxreplay.GetFloat() <= 0 )
-		return pFrame;
-			
-	int followEntity;
+	//// just return if replay is disabled
+	//if ( sv_maxreplay.GetFloat() <= 0 )
+	//	return pFrame;
+	//		
+	//int followEntity;
 
-	int delayTicks = serverGameClients->GetReplayDelay( m_nEntityIndex, followEntity );
+	//int delayTicks = serverGameClients->GetReplayDelay( m_nEntityIndex, followEntity );
 
-	bool isInReplayMode = ( delayTicks > 0 );
+	//bool isInReplayMode = ( delayTicks > 0 );
 
-	if ( isInReplayMode != m_bIsInReplayMode )
-	{
-		// force a full update when modes are switched
-		m_nDeltaTick = -1; 
+	//if ( isInReplayMode != m_bIsInReplayMode )
+	//{
+	//	// force a full update when modes are switched
+	//	m_nDeltaTick = -1; 
 
-		m_bIsInReplayMode = isInReplayMode;
+	//	m_bIsInReplayMode = isInReplayMode;
 
-		if ( isInReplayMode )
-		{
-			m_nEntityIndex = followEntity;
-		}
-		else
-		{
-			m_nEntityIndex = m_nClientSlot+1;
-		}
-	}
+	//	if ( isInReplayMode )
+	//	{
+	//		m_nEntityIndex = followEntity;
+	//	}
+	//	else
+	//	{
+	//		m_nEntityIndex = m_nClientSlot+1;
+	//	}
+	//}
 
-	Assert( (m_nClientSlot+1 == m_nEntityIndex) || isInReplayMode );
+	//Assert( (m_nClientSlot+1 == m_nEntityIndex) || isInReplayMode );
 
-	if ( isInReplayMode )
-	{
-		CGameClient *pFollowPlayer = sv.Client( followEntity-1 );
+	//if ( isInReplayMode )
+	//{
+	//	CGameClient *pFollowPlayer = sv.Client( followEntity-1 );
 
-		if ( !pFollowPlayer )
-			return NULL;
+	//	if ( !pFollowPlayer )
+	//		return NULL;
 
-		pFrame = pFollowPlayer->GetClientFrame( sv.GetTick() - delayTicks, false );
+	//	pFrame = pFollowPlayer->GetClientFrame( sv.GetTick() - delayTicks, false );
 
-		if ( !pFrame )
-			return NULL;
+	//	if ( !pFrame )
+	//		return NULL;
 
-		CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(this);
-		if (pClientSnapshotInfo->m_pLastSnapshot == pFrame->GetSnapshot() )
-			return NULL;
-	}
+	//	CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(this);
+	//	if (pClientSnapshotInfo->m_pLastSnapshot == pFrame->GetSnapshot() )
+	//		return NULL;
+	//}
 
-	return pFrame;
+	//return pFrame;
+	CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(this);
+	return pClientSnapshotInfo->GetSendFrame();
 }
 
 bool CGameClient::IgnoreTempEntity( CEventInfo *event )
@@ -1431,10 +1358,10 @@ bool CGameClient::IgnoreTempEntity( CEventInfo *event )
 }
 
 
-const CCheckTransmitInfo* CGameClient::GetPrevPackInfo()
-{
-	return &m_PrevPackInfo;
-}
+//const CCheckTransmitInfo* CGameClient::GetPrevPackInfo()
+//{
+//	return &m_PrevPackInfo;
+//}
 
 // This code is useful for verifying that the networking of soundinfo_t stuff isn't borked.
 #if 0  

@@ -49,6 +49,7 @@
 #include "replayserver.h"
 #include "replay/iserverengine.h"
 #include "vcrmode.h"
+#include "framesnapshot.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -361,18 +362,18 @@ public:
 			g_pLocalNetworkBackdoor->NotifyEdictFlagsChange( iEdict );
 	}
 
-	virtual const CCheckTransmitInfo* GetPrevCheckTransmitInfo( int pPlayerEdict )
-	{
-		int entnum = pPlayerEdict;
-		if ( entnum < 1 || entnum > sv.GetClientCount() )
-		{
-			Error( "Invalid client specified in GetPrevCheckTransmitInfo\n" );
-			return NULL;
-		}
-		
-		CGameClient *client = sv.Client( entnum-1 );
-		return client->GetPrevPackInfo();		
-	}
+	//virtual const CCheckTransmitInfo* GetPrevCheckTransmitInfo( int pPlayerEdict )
+	//{
+	//	int entnum = pPlayerEdict;
+	//	if ( entnum < 1 || entnum > sv.GetClientCount() )
+	//	{
+	//		Error( "Invalid client specified in GetPrevCheckTransmitInfo\n" );
+	//		return NULL;
+	//	}
+	//	
+	//	CGameClient *client = sv.Client( entnum-1 );
+	//	return client->GetPrevPackInfo();		
+	//}
 	
 	virtual int PrecacheDecal( const char *name, bool preload /*=false*/ )
 	{
@@ -1552,7 +1553,8 @@ public:
 		}
 
 		CGameClient *pClient = sv.Client( iClientIndex );
-		CClientFrame *deltaFrame = pClient->GetClientFrame( pClient->m_nDeltaTick );
+		CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(pClient);
+		CClientFrame *deltaFrame = pClientSnapshotInfo->GetClientFrame( pClient->m_nDeltaTick );
 		if ( !deltaFrame )
 			return NULL;
 

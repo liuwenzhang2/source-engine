@@ -341,6 +341,12 @@ void CUtlMemoryPool::Free( void *memBlock )
 
 	// the list head is now the new block
 	m_pHeadOfFreeList = memBlock;
+
+	if (m_BlocksAllocated == 0) {
+		if (m_BlobHead.m_pNext != &m_BlobHead|| m_BlobHead.m_pPrev!= &m_BlobHead) {
+			int aaa = 0;
+		}
+	}
 }
 
 int CUtlMemoryPool::Size() const		

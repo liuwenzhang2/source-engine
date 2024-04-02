@@ -1897,13 +1897,13 @@ void CGameServer::SendClientMessages ( bool bSendSnapshots )
 	if ( receivingClientCount )
 	{
 		// if any client wants an update, take new snapshot now
-		CFrameSnapshot* pSnapshot = framesnapshotmanager->TakeTickSnapshot( m_nTickCount );
+		CFrameSnapshot* pSnapshot = framesnapshotmanager->TakeTickSnapshot(receivingClientCount, pReceivingClients, m_nTickCount );
 
 		// copy temp ents references to pSnapshot
 		CopyTempEntities( pSnapshot );
 
 		// Compute the client packs
-		SV_ComputeClientPacks( receivingClientCount, pReceivingClients, pSnapshot );
+		//SV_ComputeClientPacks( receivingClientCount, pReceivingClients, pSnapshot );
 
 		if ( receivingClientCount > 1 && sv_parallel_sendsnapshot.GetBool() )
 		{

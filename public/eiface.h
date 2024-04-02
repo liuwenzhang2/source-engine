@@ -354,7 +354,7 @@ public:
 	
 	// Only valid during CheckTransmit. Also, only the PVS, networked areas, and
 	// m_pTransmitInfo are valid in the returned strucutre.
-	virtual const CCheckTransmitInfo* GetPrevCheckTransmitInfo( int pPlayerEdict ) = 0;
+	//virtual const CCheckTransmitInfo* GetPrevCheckTransmitInfo( int pPlayerEdict ) = 0;
 	
 	//virtual CSharedEdictChangeInfo* GetSharedEdictChangeInfo() = 0;
 

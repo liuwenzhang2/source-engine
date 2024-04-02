@@ -44,7 +44,7 @@ class	CCommand;
 //-----------------------------------------------------------------------------
 // CGameClient: represents a player client in a game server
 //-----------------------------------------------------------------------------
-class CGameClient : public CBaseClient, public CClientFrameManager
+class CGameClient : public CBaseClient//, public CClientFrameManager
 {
 public:
 	CGameClient(int slot, CBaseServer *pServer);
@@ -108,8 +108,7 @@ public:
 	bool	SendSignonData( void );
 	void	ActivatePlayer( void );
 	
-	void	SetupPackInfo( CFrameSnapshot *pSnapshot );
-	void	SetupPrevPackInfo();
+	
 	
 	void	DownloadCustomizations();
 	void	WriteViewAngleUpdate( void );
@@ -118,7 +117,7 @@ public:
 	void	SendSound( SoundInfo_t &sound, bool isReliable );
 	void	GetReplayData( int& ticks, int& entity);
 	bool	IgnoreTempEntity( CEventInfo *event );
-	const CCheckTransmitInfo* GetPrevPackInfo();
+	//const CCheckTransmitInfo* GetPrevPackInfo();
 			
 
 private:
@@ -141,13 +140,9 @@ public:
 		
 	const IServerEntity			*m_pViewEntity;		// View Entity (camera or the client itself)
 
-	CClientFrame			*m_pCurrentFrame;	// last added frame
-
-	CCheckTransmitInfo		m_PackInfo;
+	
 
 	bool					m_bIsInReplayMode;
-	CCheckTransmitInfo		m_PrevPackInfo;		// Used to speed up CheckTransmit.
-	CBitVec<MAX_EDICTS>		m_PrevTransmitEdict;
 
 #if defined( REPLAY_ENABLED )
 	float					m_flLastSaveReplayTime;

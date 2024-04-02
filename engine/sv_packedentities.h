@@ -17,10 +17,10 @@
 #include "server_class.h"
 
 
-void SV_ComputeClientPacks( 
-	int clientCount, 
-	CGameClient** clients,
-	CFrameSnapshot *snapshot );
+//void SV_ComputeClientPacks( 
+//	int clientCount, 
+//	CGameClient** clients,
+//	CFrameSnapshot *snapshot );
 
 void SV_WriteSendTables( ServerClass *pClasses, bf_write &pBuf );
 void SV_WriteClassInfos( ServerClass *pClasses, bf_write &pBuf );
