@@ -20,6 +20,7 @@
 
 #include "common.h"
 #include "bitvec.h"
+#include <iservernetworkable.h>
 
 // Matched with the memdbgoff at end of header
 #include "memdbgon.h"
@@ -216,10 +217,10 @@ inline bool PackedEntity::ShouldCheckCreationTick() const
 class CFrameSnapshotEntry
 {
 public:
-	ServerClass* m_pClass = NULL;
+	ServerClass*			m_pClass = NULL;
 	int						m_nSerialNumber = -1;
 	// Keeps track of the fullpack info for this frame for all entities in any pvs:
-	PackedEntity* m_pPackedData = INVALID_PACKED_ENTITY_HANDLE;
+	PackedEntity*			m_pPackedData = INVALID_PACKED_ENTITY_HANDLE;
 };
 
 class CClientSnapshotEntryInfo {
@@ -267,15 +268,19 @@ public:
 	//PackedEntityHandle_t	m_pPackedData;
 
 		// Creates pack data for a particular entity for a particular snapshot
-	PackedEntity* CreatePackedEntity(CFrameSnapshot* pSnapshot, int entity);
+	PackedEntity* CreatePackedEntity(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity);
 
 	CFrameSnapshotEntry* GetSnapshotEntry(CFrameSnapshot* pSnapshot, int entity);
+
+	void	InitPackedEntity(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity);
+
+	void	DoPackEntity(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity);
 
 	// Returns the pack data for a particular entity for a particular snapshot
 	PackedEntity* GetPackedEntity(CFrameSnapshot* pSnapshot, int entity);
 
 	// Uses a previously sent packet
-	bool			UsePreviouslySentPacket(CFrameSnapshot* pSnapshot, int entity, int entSerialNumber);
+	bool			UsePreviouslySentPacket(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity);
 
 	bool			ShouldForceRepack(CFrameSnapshot* pSnapshot, int entity, PackedEntity* handle);
 
@@ -305,7 +310,7 @@ private:
 	CUtlVector<UnpackedDataCache_t>	m_PackedEntityCache;	// cache for uncompressed packed entities
 
 	// The most recently sent packets for each entity
-	PackedEntity* m_pPackedData[MAX_EDICTS];
+	PackedEntity*			m_pPackedData[MAX_EDICTS];
 	int						m_pSerialNumber[MAX_EDICTS];
 
 	CUtlVector<CClientSnapshotEntryInfo> m_ClientSnapshotEntryInfo;

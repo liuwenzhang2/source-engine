@@ -45,7 +45,7 @@ public:
 
 
 
-
+class CFrameSnapshotManager;
 
 //-----------------------------------------------------------------------------
 // Purpose: For all entities, stores whether the entity existed and what frame the
@@ -58,7 +58,7 @@ class CFrameSnapshot
 
 public:
 
-	CFrameSnapshot();
+	CFrameSnapshot(CFrameSnapshotManager* pFrameSnapshotManager);
 	~CFrameSnapshot();
 
 	// Reference-counting.
@@ -69,6 +69,8 @@ public:
 
 
 public:
+
+	CFrameSnapshotManager* const m_pFrameSnapshotManager;
 	CInterlockedInt			m_ListIndex;	// Index info CFrameSnapshotManager::m_FrameSnapshots.
 
 	// Associated frame. 
@@ -97,9 +99,13 @@ private:
 	CInterlockedInt			m_nReferences;
 };
 
+class CFrameSnapshotManager;
+
 class CClientSnapshotInfo : public CClientFrameManager {
 public:
-	CClientSnapshotInfo() {
+	CClientSnapshotInfo(CFrameSnapshotManager* pFrameSnapshotManager)
+	:m_pFrameSnapshotManager(pFrameSnapshotManager)
+	{
 		m_pLastSnapshot = NULL;
 		m_nBaselineUpdateTick = -1;
 		m_nBaselineUsed = 0;
@@ -120,7 +126,7 @@ public:
 	CClientFrame* GetDeltaFrame(int nTick);
 	CClientFrame* GetSendFrame();
 
-
+	CFrameSnapshotManager* const m_pFrameSnapshotManager;
 	CGameClient* m_pClient = NULL;
 	CSmartPtr<CFrameSnapshot, CRefCountAccessorLongName> m_pLastSnapshot;	// last send snapshot
 
@@ -186,6 +192,9 @@ public:
 private:
 	void	DeleteFrameSnapshot(CFrameSnapshot* pSnapshot);
 	void	CheckClientSnapshotArray(int maxIndex);
+
+	void	PackEntities_NetworkBackDoor(int clientCount, CGameClient** clients, CFrameSnapshot* snapshot);
+	void	PackEntities_Normal(int clientCount, CGameClient** clients, CFrameSnapshot* snapshot);
 
 	CUtlLinkedList<CFrameSnapshot*, unsigned short>		m_FrameSnapshots;
 

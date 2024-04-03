@@ -123,7 +123,8 @@ void CHLTVClientState::CopyNewEntity(
 	}
 
 	// Now make a PackedEntity and store the new packed data in there.
-	PackedEntity *pPackedEntity = g_pPackedEntityManager->CreatePackedEntity( pSnapshot, ent );
+	IServerEntity* pServerEntity = serverEntitylist->GetServerEntity(ent);
+	PackedEntity *pPackedEntity = g_pPackedEntityManager->CreatePackedEntity( pSnapshot, pServerEntity);
 	pPackedEntity->SetChangeFrameList( pChangeFrame );
 	pPackedEntity->SetServerAndClientClass( pServerClass, pClientClass );
 
@@ -711,7 +712,8 @@ void CHLTVClientState::ReadDeltaEnt( CEntityReadInfo &u )
 	Assert( i < pFromSnapshot->m_nNumEntities );
 	*g_pPackedEntityManager->GetSnapshotEntry(pSnapshot,i) = *g_pPackedEntityManager->GetSnapshotEntry(pFromSnapshot,i);
 	
-	PackedEntity *pToPackedEntity = g_pPackedEntityManager->CreatePackedEntity( pSnapshot, i );
+	IServerEntity* pServerEntity = serverEntitylist->GetServerEntity(i);
+	PackedEntity *pToPackedEntity = g_pPackedEntityManager->CreatePackedEntity( pSnapshot, pServerEntity);
 
 	// WARNING! get pFromPackedEntity after new pPackedEntity has been created, otherwise pointer may be wrong
 	PackedEntity *pFromPackedEntity = g_pPackedEntityManager->GetPackedEntity( pFromSnapshot, i );

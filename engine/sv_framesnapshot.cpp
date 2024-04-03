@@ -132,7 +132,7 @@ CClientFrame* CClientSnapshotInfo::GetDeltaFrame(int nTick)
 
 		if (pFollowEntity) {
 
-			CClientSnapshotInfo* pFollowerClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(pFollowEntity);
+			CClientSnapshotInfo* pFollowerClientSnapshotInfo = m_pFrameSnapshotManager->GetClientSnapshotInfo(pFollowEntity);
 			return pFollowerClientSnapshotInfo->GetClientFrame(nTick);
 		}
 	}
@@ -180,13 +180,13 @@ CClientFrame* CClientSnapshotInfo::GetSendFrame()
 		if (!pFollowPlayer)
 			return NULL;
 
-		CClientSnapshotInfo* pFollowerClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(pFollowPlayer);
+		CClientSnapshotInfo* pFollowerClientSnapshotInfo = m_pFrameSnapshotManager->GetClientSnapshotInfo(pFollowPlayer);
 		pFrame = pFollowerClientSnapshotInfo->GetClientFrame(sv.GetTick() - delayTicks, false);
 
 		if (!pFrame)
 			return NULL;
 
-		CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(m_pClient);
+		CClientSnapshotInfo* pClientSnapshotInfo = m_pFrameSnapshotManager->GetClientSnapshotInfo(m_pClient);
 		if (pClientSnapshotInfo->m_pLastSnapshot == pFrame->GetSnapshot())
 			return NULL;
 	}
@@ -195,8 +195,8 @@ CClientFrame* CClientSnapshotInfo::GetSendFrame()
 }
 
 // Expose interface
-static CFrameSnapshotManager g_FrameSnapshotManager;
-CFrameSnapshotManager *framesnapshotmanager = &g_FrameSnapshotManager;
+static CFrameSnapshotManager s_FrameSnapshotManager;
+CFrameSnapshotManager *framesnapshotmanager = &s_FrameSnapshotManager;
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -244,10 +244,9 @@ CFrameSnapshot*	CFrameSnapshotManager::NextSnapshot( const CFrameSnapshot *pSnap
 	return m_FrameSnapshots[ next ];
 }
 
-static int lastSnapIndex = -1;
 CFrameSnapshot*	CFrameSnapshotManager::CreateEmptySnapshot( int tickcount, int maxEntities )
 {
-	CFrameSnapshot *snap = new CFrameSnapshot;
+	CFrameSnapshot *snap = new CFrameSnapshot(this);
 	snap->AddReference();
 	snap->m_nTickCount = tickcount;
 	snap->m_nNumEntities = maxEntities;
@@ -257,15 +256,9 @@ CFrameSnapshot*	CFrameSnapshotManager::CreateEmptySnapshot( int tickcount, int m
 	snap->m_pReplayEntityData = NULL;
 	//snap->m_pEntities = new CFrameSnapshotEntry[maxEntities];
 	snap->m_ListIndex = m_FrameSnapshots.AddToTail( snap );
-	if (snap->m_ListIndex < lastSnapIndex) {
-		int aaa = 0;
-	}
-	lastSnapIndex = snap->m_ListIndex;
+	
 	if (snap->m_ListIndex < 0 || snap->m_ListIndex >= MAX_CLIENT_FRAMES) {
 		Error("snap->m_ListIndex overflow!");
-	}
-	if (snap->m_ListIndex == 0) {
-		int aaa = 0;
 	}
 
 	g_pPackedEntityManager->OnCreateSnapshot(snap);
@@ -273,7 +266,7 @@ CFrameSnapshot*	CFrameSnapshotManager::CreateEmptySnapshot( int tickcount, int m
 	return snap;
 }
 
-void PackEntities_NetworkBackDoor(
+void CFrameSnapshotManager::PackEntities_NetworkBackDoor(
 	int clientCount,
 	CGameClient** clients,
 	CFrameSnapshot* snapshot)
@@ -283,7 +276,7 @@ void PackEntities_NetworkBackDoor(
 	VPROF_BUDGET("PackEntities_NetworkBackDoor", VPROF_BUDGETGROUP_OTHER_NETWORKING);
 
 	CGameClient* client = clients[0];	// update variables cl, pInfo, frame for current client
-	CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(client);
+	CClientSnapshotInfo* pClientSnapshotInfo = GetClientSnapshotInfo(client);
 	CCheckTransmitInfo* pInfo = &pClientSnapshotInfo->m_PackInfo;
 
 	for (int iValidEdict = 0; iValidEdict < snapshot->m_nValidEntities; iValidEdict++)
@@ -312,224 +305,6 @@ void PackEntities_NetworkBackDoor(
 	// Tell the client about any entities that are now dormant.
 	g_pLocalNetworkBackdoor->ProcessDormantEntities();
 	InvalidateSharedEdictChangeInfos();
-}
-
-ConVar sv_debugmanualmode("sv_debugmanualmode", "0", 0, "Make sure entities correctly report whether or not their network data has changed.");
-
-// This function makes sure that this entity class has an instance baseline.
-// If it doesn't have one yet, it makes a new one.
-void SV_EnsureInstanceBaseline(ServerClass* pServerClass, int iEdict, const void* pData, int nBytes)
-{
-	IServerEntity* pEnt = serverEntitylist->GetServerEntity(iEdict);
-	ErrorIfNot(pEnt->GetNetworkable(),
-		("SV_EnsureInstanceBaseline: edict %d missing ent", iEdict)
-	);
-
-	ServerClass* pClass = pEnt->GetServerClass();
-
-	// See if we already have a baseline for this class.
-	if (pClass->m_InstanceBaselineIndex == INVALID_STRING_INDEX)
-	{
-		AUTO_LOCK(g_svInstanceBaselineMutex);
-
-		// We need this second check in case multiple instances of the same class have grabbed the lock.
-		if (pClass->m_InstanceBaselineIndex == INVALID_STRING_INDEX)
-		{
-			char idString[32];
-			Q_snprintf(idString, sizeof(idString), "%d", pClass->m_ClassID);
-
-			// Ok, make a new instance baseline so they can reference it.
-			int temp = sv.GetInstanceBaselineTable()->AddString(
-				true,
-				idString,	// Note we're sending a string with the ID number, not the class name.
-				nBytes,
-				pData);
-
-			// Insert a compiler and/or CPU memory barrier to ensure that all side-effects have
-			// been published before the index is published. Otherwise the string index may
-			// be visible before its initialization has finished. This potential problem is caused
-			// by the use of double-checked locking -- the problem is that the code outside of the
-			// lock is looking at the variable that is protected by the lock. See this article for details:
-			// http://en.wikipedia.org/wiki/Double-checked_locking
-			// Write-release barrier
-			ThreadMemoryBarrier();
-			pClass->m_InstanceBaselineIndex = temp;
-			Assert(pClass->m_InstanceBaselineIndex != INVALID_STRING_INDEX);
-		}
-	}
-	// Read-acquire barrier
-	ThreadMemoryBarrier();
-}
-
-//-----------------------------------------------------------------------------
-// Pack the entity....
-//-----------------------------------------------------------------------------
-
-static inline void SV_PackEntity(
-	int edictIdx,
-	IServerEntity* edict,
-	ServerClass* pServerClass,
-	CFrameSnapshot* pSnapshot)
-{
-	Assert(edictIdx < pSnapshot->m_nNumEntities);
-	tmZoneFiltered(TELEMETRY_LEVEL0, 50, TMZF_NONE, "PackEntities_Normal%s", __FUNCTION__);
-
-	int iSerialNum = g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, edictIdx)->m_nSerialNumber;
-
-	// Check to see if this entity specifies its changes.
-	// If so, then try to early out making the fullpack
-	bool bUsedPrev = false;
-
-	if (!edict->GetNetworkable()->HasStateChanged())
-	{
-		// Now this may not work if we didn't previously send a packet;
-		// if not, then we gotta compute it
-		bUsedPrev = g_pPackedEntityManager->UsePreviouslySentPacket(pSnapshot, edictIdx, iSerialNum);
-	}
-
-	if (bUsedPrev && !sv_debugmanualmode.GetInt())
-	{
-		edict->GetNetworkable()->ClearStateChanged();
-		return;
-	}
-
-	// First encode the entity's data.
-	ALIGN4 char packedData[MAX_PACKEDENTITY_DATA] ALIGN4_POST;
-	bf_write writeBuf("SV_PackEntity->writeBuf", packedData, sizeof(packedData));
-
-	SendTable* pSendTable = pServerClass->m_pTable;
-
-	// (avoid constructor overhead).
-	unsigned char tempData[sizeof(CSendProxyRecipients) * MAX_DATATABLE_PROXIES];
-	CUtlMemory< CSendProxyRecipients > recip((CSendProxyRecipients*)tempData, pSendTable->m_pPrecalc->GetNumDataTableProxies());
-
-	if (!SendTable_Encode(pSendTable, edict, &writeBuf, edictIdx, &recip, false))
-	{
-		Host_Error("SV_PackEntity: SendTable_Encode returned false (ent %d).\n", edictIdx);
-	}
-
-#ifndef NO_VCR
-	// VCR mode stuff..
-	if (vcr_verbose.GetInt() && writeBuf.GetNumBytesWritten() > 0)
-		VCRGenericValueVerify("writebuf", writeBuf.GetBasePointer(), writeBuf.GetNumBytesWritten() - 1);
-#endif
-
-	SV_EnsureInstanceBaseline(pServerClass, edictIdx, packedData, writeBuf.GetNumBytesWritten());
-
-	int nFlatProps = SendTable_GetNumFlatProps(pSendTable);
-	IChangeFrameList* pChangeFrame = NULL;
-
-	// If this entity was previously in there, then it should have a valid IChangeFrameList 
-	// which we can delta against to figure out which properties have changed.
-	//
-	// If not, then we want to setup a new IChangeFrameList.
-
-	PackedEntity* pPrevFrame = g_pPackedEntityManager->GetPreviouslySentPacket(edictIdx, g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, edictIdx)->m_nSerialNumber);
-	if (pPrevFrame)
-	{
-		// Calculate a delta.
-		Assert(!pPrevFrame->IsCompressed());
-
-		int deltaProps[MAX_DATATABLE_PROPS];
-
-		int nChanges = SendTable_CalcDelta(
-			pSendTable,
-			pPrevFrame->GetData(), pPrevFrame->GetNumBits(),
-			packedData, writeBuf.GetNumBitsWritten(),
-
-			deltaProps,
-			ARRAYSIZE(deltaProps),
-
-			edictIdx
-		);
-
-#ifndef NO_VCR
-		if (vcr_verbose.GetInt())
-			VCRGenericValueVerify("nChanges", &nChanges, sizeof(nChanges));
-#endif
-
-		// If it's non-manual-mode, but we detect that there are no changes here, then just
-		// use the previous pSnapshot if it's available (as though the entity were manual mode).
-		// It would be interesting to hook here and see how many non-manual-mode entities 
-		// are winding up with no changes.
-		if (nChanges == 0)
-		{
-			if (pPrevFrame->CompareRecipients(recip))
-			{
-				if (g_pPackedEntityManager->UsePreviouslySentPacket(pSnapshot, edictIdx, iSerialNum))
-				{
-					edict->GetNetworkable()->ClearStateChanged();
-					return;
-				}
-			}
-		}
-		else
-		{
-			if (!edict->GetNetworkable()->HasStateChanged())
-			{
-				for (int iDeltaProp = 0; iDeltaProp < nChanges; iDeltaProp++)
-				{
-					Assert(pSendTable->m_pPrecalc);
-					Assert(deltaProps[iDeltaProp] < pSendTable->m_pPrecalc->GetNumProps());
-
-					const SendProp* pProp = pSendTable->m_pPrecalc->GetProp(deltaProps[iDeltaProp]);
-					// If a field changed, but it changed because it encoded against tickcount, 
-					//   then it's just like the entity changed the underlying field, not an error, that is.
-					if (pProp->GetFlags() & SPROP_ENCODED_AGAINST_TICKCOUNT)
-						continue;
-
-					Msg("Entity %d (class '%s') reported ENTITY_CHANGE_NONE but '%s' changed.\n",
-						edictIdx,
-						edict->GetClassName(),
-						pProp->GetName());
-
-				}
-			}
-		}
-
-#ifndef _XBOX	
-#if defined( REPLAY_ENABLED )
-		if ((hltv && hltv->IsActive()) || (replay && replay->IsActive()))
-#else
-		if (hltv && hltv->IsActive())
-#endif
-		{
-			// in HLTV or Replay mode every PackedEntity keeps it's own ChangeFrameList
-			// we just copy the ChangeFrameList from prev frame and update it
-			pChangeFrame = pPrevFrame->GetChangeFrameList();
-			pChangeFrame = pChangeFrame->Copy(); // allocs and copies ChangeFrameList
-		}
-		else
-#endif
-		{
-			// Ok, now snag the changeframe from the previous frame and update the 'last frame changed'
-			// for the properties in the delta.
-			pChangeFrame = pPrevFrame->SnagChangeFrameList();
-		}
-
-		ErrorIfNot(pChangeFrame,
-			("SV_PackEntity: SnagChangeFrameList returned null"));
-		ErrorIfNot(pChangeFrame->GetNumProps() == nFlatProps,
-			("SV_PackEntity: SnagChangeFrameList mismatched number of props[%d vs %d]", nFlatProps, pChangeFrame->GetNumProps()));
-
-		pChangeFrame->SetChangeTick(deltaProps, nChanges, pSnapshot->m_nTickCount);
-	}
-	else
-	{
-		// Ok, init the change frames for the first time.
-		pChangeFrame = AllocChangeFrameList(nFlatProps, pSnapshot->m_nTickCount);
-	}
-
-	// Now make a PackedEntity and store the new packed data in there.
-	{
-		PackedEntity* pPackedEntity = g_pPackedEntityManager->CreatePackedEntity(pSnapshot, edictIdx);
-		pPackedEntity->SetChangeFrameList(pChangeFrame);
-		pPackedEntity->SetServerAndClientClass(pServerClass, NULL);
-		pPackedEntity->AllocAndCopyPadded(packedData, writeBuf.GetNumBytesWritten());
-		pPackedEntity->SetRecipients(recip);
-	}
-
-	edict->GetNetworkable()->ClearStateChanged();
 }
 
 // in HLTV mode we ALWAYS have to store position and PVS info, even if entity didnt change
@@ -594,17 +369,17 @@ static ConVar sv_parallel_packentities("sv_parallel_packentities", "1");
 
 struct PackWork_t
 {
-	int				nIdx;
+	//int				nIdx;
 	IServerEntity* pEdict;
 	CFrameSnapshot* pSnapshot;
 
 	static void Process(PackWork_t& item)
 	{
-		SV_PackEntity(item.nIdx, item.pEdict, g_pPackedEntityManager->GetSnapshotEntry(item.pSnapshot, item.nIdx)->m_pClass, item.pSnapshot);//item.pSnapshot->m_pEntities
+		g_pPackedEntityManager->DoPackEntity(item.pSnapshot,item.pEdict);//item.pSnapshot->m_pEntities item.nIdx, g_pPackedEntityManager->GetSnapshotEntry(item.pSnapshot, item.nIdx)->m_pClass,
 	}
 };
 
-void PackEntities_Normal(
+void CFrameSnapshotManager::PackEntities_Normal(
 	int clientCount,
 	CGameClient** clients,
 	CFrameSnapshot* snapshot)
@@ -638,13 +413,13 @@ void PackEntities_Normal(
 		{
 			// entities is seen by at least this client, pack it and exit loop
 			CGameClient* client = clients[iClient];	// update variables cl, pInfo, frame for current client
-			CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(client);
+			CClientSnapshotInfo* pClientSnapshotInfo = GetClientSnapshotInfo(client);
 			CClientFrame* frame = pClientSnapshotInfo->m_pCurrentFrame;
 
 			if (frame->transmit_entity.Get(index))
 			{
 				PackWork_t w;
-				w.nIdx = index;
+				//w.nIdx = index;
 				w.pEdict = pServerEntity;
 				w.pSnapshot = snapshot;
 
@@ -665,7 +440,7 @@ void PackEntities_Normal(
 		for (int i = 0; i < c; ++i)
 		{
 			PackWork_t& w = workItems[i];
-			SV_PackEntity(w.nIdx, w.pEdict, g_pPackedEntityManager->GetSnapshotEntry(w.pSnapshot, w.nIdx)->m_pClass, w.pSnapshot);//w.pSnapshot->m_pEntities
+			g_pPackedEntityManager->DoPackEntity(w.pSnapshot, w.pEdict);//w.pSnapshot->m_pEntities g_pPackedEntityManager->GetSnapshotEntry(w.pSnapshot, w.nIdx)->m_pClass, 
 		}
 	}
 
@@ -684,18 +459,18 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot(int clientCount, CGameCl
 	
 	int maxclients = sv.GetClientCount();
 
-	CFrameSnapshotEntry* entry = g_pPackedEntityManager->GetSnapshotEntry(snap, 0) - 1;
+	//CFrameSnapshotEntry* entry = g_pPackedEntityManager->GetSnapshotEntry(snap, 0) - 1;
 	//edict_t *edict= sv.edicts - 1;
 	
 	// Build the snapshot.
 	for ( int i = 0; i <= serverEntitylist->IndexOfHighestEdict(); i++ )
 	{
 		//edict++;
-		entry++;
+		//entry++;
 
-		IServerUnknown *pUnk = serverEntitylist->GetServerEntity(i);
+		IServerEntity *pServerEntity = serverEntitylist->GetServerEntity(i);
 
-		if ( !pUnk )
+		if ( !pServerEntity)
 			continue;
 																		  
 		//if ( edict->IsFree() )
@@ -713,12 +488,8 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot(int clientCount, CGameCl
 		Assert( serverEntitylist->GetNetworkSerialNumber(i) != -1 );
 		Assert( serverEntitylist->GetServerNetworkable(i));
 		Assert( serverEntitylist->GetServerEntity(i)->GetServerClass() );
+		g_pPackedEntityManager->InitPackedEntity(snap, pServerEntity);
 
-		entry->m_nSerialNumber	= serverEntitylist->GetNetworkSerialNumber(i);
-		entry->m_pClass			= serverEntitylist->GetServerEntity(i)->GetServerClass();
-		if(!entry->m_pClass){
-			int aaa = 0;
-		}
 		nValidEntities[snap->m_nValidEntities++] = i;
 	}
 
@@ -842,7 +613,7 @@ void CFrameSnapshotManager::AddExplicitDelete( int iSlot )
 
 void	CFrameSnapshotManager::CheckClientSnapshotArray(int maxIndex) {
 	while (m_ClientSnapshotInfo.Count() < maxIndex + 1) {
-		m_ClientSnapshotInfo.AddToTail(new CClientSnapshotInfo());
+		m_ClientSnapshotInfo.AddToTail(new CClientSnapshotInfo(this));
 	}
 }
 
@@ -985,7 +756,8 @@ void CFrameSnapshotManager::SetClientLastSnapshot(CBaseClient* pClient, CFrameSn
 #endif
 
 
-CFrameSnapshot::CFrameSnapshot()
+CFrameSnapshot::CFrameSnapshot(CFrameSnapshotManager* pFrameSnapshotManager)
+:m_pFrameSnapshotManager(pFrameSnapshotManager)
 {
 	m_nTempEntities = 0;
 	m_pTempEntities = NULL;
@@ -1045,13 +817,13 @@ void CFrameSnapshot::ReleaseReference()
 	--m_nReferences;
 	if ( m_nReferences == 0 )
 	{
-		g_FrameSnapshotManager.DeleteFrameSnapshot( this );
+		m_pFrameSnapshotManager->DeleteFrameSnapshot( this );
 	}
 }
 
 CFrameSnapshot* CFrameSnapshot::NextSnapshot() const
 {
-	return g_FrameSnapshotManager.NextSnapshot( this );
+	return m_pFrameSnapshotManager->NextSnapshot( this );
 }
 
 
