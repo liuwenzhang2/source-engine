@@ -34,7 +34,7 @@
 #include "netmessages.h"
 #include "sys.h"
 #include "framesnapshot.h"
-#include "sv_packedentities.h"
+//#include "sv_packedentities.h"
 #include "dt_send_eng.h"
 #include "dt_recv_eng.h"
 #include "networkstringtable.h"
@@ -57,6 +57,10 @@
 #include "cl_steamauth.h"
 #include "sv_filter.h"
 #include "master.h"
+#include "dt_common_eng.h"
+#include "voice.h"
+#include "LocalNetworkBackdoor.h"
+#include "GameEventManager.h"
 
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"
@@ -76,9 +80,19 @@ static ConVar	sv_max_connects_sec( "sv_max_connects_sec", "2.0", 0, "Maximum con
 static ConVar	sv_max_connects_window( "sv_max_connects_window", "4", 0, "Window over which to average connections per second averages." );
 // This defaults to zero so that somebody spamming the server with packets cannot lock out other clients.
 static ConVar	sv_max_connects_sec_global( "sv_max_connects_sec_global", "0", 0, "Maximum connections per second to respond to from anywhere." );
+/// XXX(JohnS): When steam voice gets ugpraded to Opus we will probably default back to steam.  At that time we should
+///             note that Steam voice is the highest quality codec below.
+static ConVar sv_voicecodec("sv_voicecodec", "vaudio_opus", 0,
+	"Specifies which voice codec to use. Valid options are:\n"
+	"vaudio_speex - Legacy Speex codec (lowest quality)\n"
+	"vaudio_celt - Newer CELT codec\n"
+	"vaudio_opus - Latest Opus codec (highest quality, comes by default)\n"
+	"steam - Use Steam voice API");
 
 static CIPRateLimit s_queryRateChecker( &sv_max_queries_sec, &sv_max_queries_window, &sv_max_queries_sec_global );
 static CIPRateLimit s_connectRateChecker( &sv_max_connects_sec, &sv_max_connects_window, &sv_max_connects_sec_global );
+
+extern ConVar sv_sendtables;
 
 // Give new data to Steam's master server updater every N seconds.
 // This is NOT how often packets are sent to master servers, only how often the
@@ -1669,6 +1683,275 @@ INetworkStringTable *CBaseServer::GetUserInfoTable( void )
 	}
 
 	return m_pUserInfoTable;
+}
+
+/*
+==============================================================================
+SERVER SPAWNING
+
+==============================================================================
+*/
+
+void SV_WriteVoiceCodec(bf_write& pBuf)
+{
+	// Only send in multiplayer. Otherwise, we don't want voice.
+
+	const char* pCodec = sv.IsMultiplayer() ? sv_voicecodec.GetString() : NULL;
+	int nSampleRate = pCodec ? Voice_GetDefaultSampleRate(pCodec) : 0;
+	SVC_VoiceInit voiceinit(pCodec, nSampleRate);
+	voiceinit.WriteToBuffer(pBuf);
+}
+// UNDONE: "player.mdl" ???  This should be set by name in the DLL
+/*
+================
+SV_CreateBaseline
+
+================
+*/
+void CBaseServer::CreateBaseline(void)
+{
+	SV_WriteVoiceCodec(sv.m_Signon);
+
+	ServerClass* pClasses = serverGameDLL->GetAllServerClasses();
+
+	// Send SendTable info.
+	if (sv_sendtables.GetInt())
+	{
+#ifdef _XBOX
+		Error("sv_sendtables not allowed on XBOX.");
+#endif
+		sv.m_FullSendTablesBuffer.EnsureCapacity(NET_MAX_PAYLOAD);
+		sv.m_FullSendTables.StartWriting(sv.m_FullSendTablesBuffer.Base(), sv.m_FullSendTablesBuffer.Count());
+
+		WriteSendTables(pClasses, sv.m_FullSendTables);
+
+		if (sv.m_FullSendTables.IsOverflowed())
+		{
+			Host_Error("SV_CreateBaseline: WriteSendTables overflow.\n");
+			return;
+		}
+
+		// Send class descriptions.
+		WriteClassInfos(pClasses, sv.m_FullSendTables);
+
+		if (sv.m_FullSendTables.IsOverflowed())
+		{
+			Host_Error("SV_CreateBaseline: WriteClassInfos overflow.\n");
+			return;
+		}
+	}
+
+	// If we're using the local network backdoor, we'll never use the instance baselines.
+	if (!g_pLocalNetworkBackdoor)
+	{
+		int		count = 0;
+		int		bytes = 0;
+
+		for (int entnum = 0; entnum < serverEntitylist->IndexOfHighestEdict(); entnum++)
+		{
+			// get the current server version
+			//edict_t *edict = sv.edicts + entnum;
+			IServerEntity* pServerEntity = serverEntitylist->GetServerEntity(entnum);
+
+			if (!pServerEntity)
+				continue;
+
+			ServerClass* pClass = pServerEntity->GetServerClass();
+
+			if (!pClass)
+			{
+				Assert(pClass);
+				continue;	// no Class ?
+			}
+
+			if (pClass->m_InstanceBaselineIndex != INVALID_STRING_INDEX)
+				continue; // we already have a baseline for this class
+
+			SendTable* pSendTable = pClass->m_pTable;
+
+			//
+			// create entity baseline
+			//
+
+			ALIGN4 char packedData[MAX_PACKEDENTITY_DATA] ALIGN4_POST;
+			bf_write writeBuf("SV_CreateBaseline->writeBuf", packedData, sizeof(packedData));
+
+
+			// create basline from zero values
+			if (!SendTable_Encode(
+				pSendTable,
+				pServerEntity,
+				&writeBuf,
+				entnum,
+				NULL,
+				false
+			))
+			{
+				Host_Error("SV_CreateBaseline: SendTable_Encode returned false (ent %d).\n", entnum);
+			}
+
+			// copy baseline into baseline stringtable
+			sv.SetClassBaseline(pClass, packedData, writeBuf.GetNumBytesWritten());
+
+			bytes += writeBuf.GetNumBytesWritten();
+			count++;
+		}
+		DevMsg("Created class baseline: %i classes, %i bytes.\n", count, bytes);
+	}
+
+	g_GameEventManager.ReloadEventDefinitions();
+
+	SVC_GameEventList gameevents;
+	char data[NET_MAX_PAYLOAD];
+	gameevents.m_DataOut.StartWriting(data, sizeof(data));
+
+	g_GameEventManager.WriteEventList(&gameevents);
+	gameevents.WriteToBuffer(sv.m_Signon);
+}
+
+// If the table's ID is -1, writes its info into the buffer and increments curID.
+void SV_MaybeWriteSendTable(SendTable* pTable, bf_write& pBuf, bool bNeedDecoder)
+{
+	// Already sent?
+	if (pTable->GetWriteFlag())
+		return;
+
+	pTable->SetWriteFlag(true);
+
+	SVC_SendTable sndTbl;
+
+	byte	tmpbuf[4096];
+	sndTbl.m_DataOut.StartWriting(tmpbuf, sizeof(tmpbuf));
+
+	// write send table properties into message buffer
+	SendTable_WriteInfos(pTable, &sndTbl.m_DataOut);
+
+	sndTbl.m_bNeedsDecoder = bNeedDecoder;
+
+	// write message to stream
+	sndTbl.WriteToBuffer(pBuf);
+}
+
+// Calls SV_MaybeWriteSendTable recursively.
+void SV_MaybeWriteSendTable_R(SendTable* pTable, bf_write& pBuf)
+{
+	SV_MaybeWriteSendTable(pTable, pBuf, false);
+
+	// Make sure we send child send tables..
+	for (int i = 0; i < pTable->m_nProps; i++)
+	{
+		SendProp* pProp = &pTable->m_pProps[i];
+
+		if (pProp->m_Type == DPT_DataTable)
+			SV_MaybeWriteSendTable_R(pProp->GetDataTable(), pBuf);
+	}
+}
+
+
+// Sets up SendTable IDs and sends an svc_sendtable for each table.
+void CBaseServer::WriteSendTables(ServerClass* pClasses, bf_write& pBuf)
+{
+	ServerClass* pCur;
+
+	DataTable_ClearWriteFlags(pClasses);
+
+	// First, we send all the leaf classes. These are the ones that will need decoders
+	// on the client.
+	for (pCur = pClasses; pCur; pCur = pCur->m_pNext)
+	{
+		SV_MaybeWriteSendTable(pCur->m_pTable, pBuf, true);
+	}
+
+	// Now, we send their base classes. These don't need decoders on the client
+	// because we will never send these SendTables by themselves.
+	for (pCur = pClasses; pCur; pCur = pCur->m_pNext)
+	{
+		SV_MaybeWriteSendTable_R(pCur->m_pTable, pBuf);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : crc - 
+//-----------------------------------------------------------------------------
+void CBaseServer::ComputeClassInfosCRC(CRC32_t* crc)
+{
+	ServerClass* pClasses = serverGameDLL->GetAllServerClasses();
+
+	for (ServerClass* pClass = pClasses; pClass; pClass = pClass->m_pNext)
+	{
+		CRC32_ProcessBuffer(crc, (void*)pClass->m_pNetworkName, Q_strlen(pClass->m_pNetworkName));
+		CRC32_ProcessBuffer(crc, (void*)pClass->m_pTable->GetName(), Q_strlen(pClass->m_pTable->GetName()));
+	}
+}
+
+void CBaseServer::AssignClassIds()
+{
+	ServerClass* pClasses = serverGameDLL->GetAllServerClasses();
+
+	// Count the number of classes.
+	int nClasses = 0;
+	for (ServerClass* pCount = pClasses; pCount; pCount = pCount->m_pNext)
+	{
+		++nClasses;
+	}
+
+	// These should be the same! If they're not, then it should detect an explicit create message.
+	ErrorIfNot(nClasses <= MAX_SERVER_CLASSES,
+		("CGameServer::AssignClassIds: too many server classes (%i, MAX = %i).\n", nClasses, MAX_SERVER_CLASSES);
+	);
+
+	serverclasses = nClasses;
+	serverclassbits = Q_log2(serverclasses) + 1;
+
+	bool bSpew = CommandLine()->FindParm("-netspike") != 0;
+
+	int curID = 0;
+	for (ServerClass* pClass = pClasses; pClass; pClass = pClass->m_pNext)
+	{
+		pClass->m_ClassID = curID++;
+
+		if (bSpew)
+		{
+			Msg("%d == '%s'\n", pClass->m_ClassID, pClass->GetName());
+		}
+	}
+}
+
+// Assign each class and ID and write an svc_classinfo for each one.
+void CBaseServer::WriteClassInfos(ServerClass* pClasses, bf_write& pBuf)
+{
+	// Assert( sv.serverclasses < MAX_SERVER_CLASSES );
+
+	SVC_ClassInfo classinfomsg;
+
+	classinfomsg.m_bCreateOnClient = false;
+
+	for (ServerClass* pClass = pClasses; pClass; pClass = pClass->m_pNext)
+	{
+		SVC_ClassInfo::class_t svclass;
+
+		svclass.classID = pClass->m_ClassID;
+		Q_strncpy(svclass.datatablename, pClass->m_pTable->GetName(), sizeof(svclass.datatablename));
+		Q_strncpy(svclass.classname, pClass->m_pNetworkName, sizeof(svclass.classname));
+
+		classinfomsg.m_Classes.AddToTail(svclass);  // add all known classes to message
+	}
+
+	classinfomsg.WriteToBuffer(pBuf);
+}
+
+// This is implemented for the datatable code so its warnings can include an object's classname.
+const char* GetObjectClassName(int objectID)
+{
+	if (objectID >= 0 && objectID < serverEntitylist->IndexOfHighestEdict())
+	{
+		return serverEntitylist->GetServerNetworkable(objectID) ? serverEntitylist->GetServerEntity(objectID)->GetClassName() : "";
+	}
+	else
+	{
+		return "[unknown]";
+	}
 }
 
 // This function makes sure that this entity class has an instance baseline.

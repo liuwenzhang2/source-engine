@@ -355,13 +355,11 @@
     <ClCompile Include="..\..\..\engine\spatialpartition.cpp" />
     <ClCompile Include="..\..\..\engine\staticpropmgr.cpp" />
     <ClCompile Include="..\..\..\engine\sv_client.cpp" />
-    <ClCompile Include="..\..\..\engine\sv_ents_write.cpp" />
     <ClCompile Include="..\..\..\engine\sv_filter.cpp" />
     <ClCompile Include="..\..\..\engine\sv_framesnapshot.cpp" />
     <ClCompile Include="..\..\..\engine\sv_ipratelimit.cpp" />
     <ClCompile Include="..\..\..\engine\sv_log.cpp" />
     <ClCompile Include="..\..\..\engine\sv_main.cpp" />
-    <ClCompile Include="..\..\..\engine\sv_packedentities.cpp" />
     <ClCompile Include="..\..\..\engine\sv_plugin.cpp" />
     <ClCompile Include="..\..\..\engine\sv_precache.cpp" />
     <ClCompile Include="..\..\..\engine\sv_rcon.cpp" />

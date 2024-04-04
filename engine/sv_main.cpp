@@ -32,7 +32,7 @@
 #include "vstdlib/random.h"
 #include "networkstringtable.h"
 #include "dt_send_eng.h"
-#include "sv_packedentities.h"
+//#include "sv_packedentities.h"
 #include "testscriptmgr.h"
 #include "PlayerState.h"
 #include "saverestoretypes.h"
@@ -90,7 +90,6 @@ ConVar sv_shutdown_timeout_minutes( "sv_shutdown_timeout_minutes", "360", FCVAR_
 static double s_timeForceShutdown = 0.0;
 
 extern ConVar deathmatch;
-extern ConVar sv_sendtables;
 
 // Server default maxplayers value
 #define DEFAULT_SERVER_CLIENTS	6
@@ -208,14 +207,7 @@ static	ConVar sv_voiceenable( "sv_voiceenable", "1", FCVAR_ARCHIVE|FCVAR_NOTIFY 
 
 static ConVar sv_consistency( "sv_consistency", "1", FCVAR_REPLICATED, "Legacy variable with no effect!  This was deleted and then added as a temporary kludge to prevent players from being banned by servers running old versions of SMAC" );
 
-/// XXX(JohnS): When steam voice gets ugpraded to Opus we will probably default back to steam.  At that time we should
-///             note that Steam voice is the highest quality codec below.
-static ConVar sv_voicecodec( "sv_voicecodec", "vaudio_opus", 0,
-                             "Specifies which voice codec to use. Valid options are:\n"
-                             "vaudio_speex - Legacy Speex codec (lowest quality)\n"
-                             "vaudio_celt - Newer CELT codec\n"
-							 "vaudio_opus - Latest Opus codec (highest quality, comes by default)\n"
-                             "steam - Use Steam voice API" );
+
 
 
 ConVar  sv_mincmdrate( "sv_mincmdrate", "20", FCVAR_REPLICATED, "This sets the minimum value for cl_cmdrate. 0 == unlimited." );
@@ -1955,22 +1947,7 @@ void CGameServer::SetMaxClients( int number )
 
 
 
-/*
-==============================================================================
-SERVER SPAWNING
 
-==============================================================================
-*/
-
-void SV_WriteVoiceCodec(bf_write &pBuf)
-{
-	// Only send in multiplayer. Otherwise, we don't want voice.
-
-	const char *pCodec = sv.IsMultiplayer() ? sv_voicecodec.GetString() : NULL;
-	int nSampleRate = pCodec ? Voice_GetDefaultSampleRate( pCodec ) : 0;
-	SVC_VoiceInit voiceinit( pCodec, nSampleRate );
-	voiceinit.WriteToBuffer( pBuf );
-}
 
 // Gets voice data from a client and forwards it to anyone who can hear this client.
 ConVar voice_debugfeedbackfrom( "voice_debugfeedbackfrom", "0" );
@@ -2029,113 +2006,7 @@ void SV_BroadcastVoiceData(IClient * pClient, int nBytes, char * data, int64 xui
 }
 
 
-// UNDONE: "player.mdl" ???  This should be set by name in the DLL
-/*
-================
-SV_CreateBaseline
 
-================
-*/
-void SV_CreateBaseline (void)
-{
-	SV_WriteVoiceCodec( sv.m_Signon );
-
-	ServerClass *pClasses = serverGameDLL->GetAllServerClasses();
-
-	// Send SendTable info.
-	if ( sv_sendtables.GetInt() )
-	{
-#ifdef _XBOX
-		Error( "sv_sendtables not allowed on XBOX." );
-#endif
-		sv.m_FullSendTablesBuffer.EnsureCapacity( NET_MAX_PAYLOAD );
-		sv.m_FullSendTables.StartWriting( sv.m_FullSendTablesBuffer.Base(), sv.m_FullSendTablesBuffer.Count() );
-		
-		SV_WriteSendTables( pClasses, sv.m_FullSendTables );
-		
-		if ( sv.m_FullSendTables.IsOverflowed() )
-		{
-			Host_Error("SV_CreateBaseline: WriteSendTables overflow.\n" );
-			return;
-		}
-
-		// Send class descriptions.
-		SV_WriteClassInfos(pClasses, sv.m_FullSendTables);
-
-		if ( sv.m_FullSendTables.IsOverflowed() )
-		{
-			Host_Error("SV_CreateBaseline: WriteClassInfos overflow.\n" );
-			return;
-		}
-	}
-
-	// If we're using the local network backdoor, we'll never use the instance baselines.
-	if ( !g_pLocalNetworkBackdoor )
-	{
-		int		count = 0;
-		int		bytes = 0;
-		
-		for ( int entnum = 0; entnum < serverEntitylist->IndexOfHighestEdict() ; entnum++)
-		{
-			// get the current server version
-			//edict_t *edict = sv.edicts + entnum;
-			IServerEntity* pServerEntity = serverEntitylist->GetServerEntity(entnum);
-
-			if (!pServerEntity)
-				continue;
-
-			ServerClass *pClass   = pServerEntity->GetServerClass();
-
-			if ( !pClass )
-			{
-				Assert( pClass );
-				continue;	// no Class ?
-			}
-
-			if ( pClass->m_InstanceBaselineIndex != INVALID_STRING_INDEX )
-				continue; // we already have a baseline for this class
-
-			SendTable *pSendTable = pClass->m_pTable;
-
-			//
-			// create entity baseline
-			//
-			
-			ALIGN4 char packedData[MAX_PACKEDENTITY_DATA] ALIGN4_POST;
-			bf_write writeBuf( "SV_CreateBaseline->writeBuf", packedData, sizeof( packedData ) );
-
-
-			// create basline from zero values
-			if ( !SendTable_Encode(
-				pSendTable, 
-				pServerEntity,
-				&writeBuf, 
-				entnum,
-				NULL,
-				false
-				) )
-			{
-				Host_Error("SV_CreateBaseline: SendTable_Encode returned false (ent %d).\n", entnum);
-			}
-
-			// copy baseline into baseline stringtable
-			sv.SetClassBaseline( pClass, packedData, writeBuf.GetNumBytesWritten() );
-
-			bytes += writeBuf.GetNumBytesWritten();
-			count ++;
-		}
-		DevMsg("Created class baseline: %i classes, %i bytes.\n", count,bytes); 
-	}
-
-	g_GameEventManager.ReloadEventDefinitions();
-
-	SVC_GameEventList gameevents;
-	char data[NET_MAX_PAYLOAD];
-	gameevents.m_DataOut.StartWriting( data, sizeof(data) );
-
-	g_GameEventManager.WriteEventList( &gameevents );
-	gameevents.WriteToBuffer( sv.m_Signon );
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Ensure steam context is initialized for multiplayer gameservers. Idempotent.
@@ -2186,7 +2057,7 @@ bool SV_ActivateServer()
 	COM_TimestampedLog( "SV_CreateBaseline" );
 
 	// create a baseline for more efficient communications
-	SV_CreateBaseline();
+	sv.CreateBaseline();
 
 	sv.allowsignonwrites = false;
 

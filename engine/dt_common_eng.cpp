@@ -14,7 +14,7 @@
 #include "server_class.h"
 #include "eiface.h"
 #include "demo.h"
-#include "sv_packedentities.h"
+//#include "sv_packedentities.h"
 
 #ifndef DEDICATED
 #include "renamed_recvtable_compat.h"

@@ -289,7 +289,7 @@ public:
 
 	bool	IsSamePackedEntity(CEntityWriteInfo& u);
 
-	void	GetChangedProps(CEntityWriteInfo& u, int* checkProps, int& nCheckProps, int nMaxCheckProps);
+	void	GetChangedProps(CEntityWriteInfo& u);
 
 	void	WriteDeltaEnt(CBaseClient* pClient, CEntityWriteInfo& u, const int* pCheckProps, const int nCheckProps);
 

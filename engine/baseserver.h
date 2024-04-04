@@ -18,10 +18,12 @@
 #include "netmessages.h"
 #include "net.h"
 #include "event_system.h"
+#include "server_class.h"
+#include "framesnapshot.h"
 
 class CNetworkStringTableContainer;
 class PackedEntity;
-class ServerClass;
+//class ServerClass;
 class INetworkStringTable;	
 
 enum server_state_t
@@ -116,6 +118,12 @@ public: // IConnectionlessPacketHandler implementation
 	virtual void	FillServerInfo(SVC_ServerInfo &serverinfo);
 	virtual void	UserInfoChanged( int nClientIndex );
 
+	void	CreateBaseline(void);
+	void	WriteSendTables(ServerClass* pClasses, bf_write& pBuf);
+	void	WriteClassInfos(ServerClass* pClasses, bf_write& pBuf);
+
+	void	AssignClassIds();
+	void	ComputeClassInfosCRC(CRC32_t* crc);
 	void	SetClassBaseline( ServerClass* pServerClass, const void* pData, int nBytes);
 	bool	GetClassBaseline( ServerClass *pClass, void const **pData, int *pDatalen );
 	void	RunFrame( void );

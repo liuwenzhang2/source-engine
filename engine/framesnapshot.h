@@ -17,11 +17,14 @@
 #include <iservernetworkable.h>
 #include <bitbuf.h>
 #include "ents_shared.h"
+#include "dt_send_eng.h"
+#include "dt.h"
+#include "server_class.h"
 
 class PackedEntity;
 class HLTVEntityData;
 class ReplayEntityData;
-class ServerClass;
+//class ServerClass;
 class CEventInfo;
 class CBaseClient;
 class CGameClient;
@@ -114,9 +117,9 @@ public:
 		m_BaselinesSent.ClearAll();
 		m_pCurrentFrame = NULL;
 		memset(&m_PackInfo, 0, sizeof(m_PackInfo));
-		memset(&m_PrevPackInfo, 0, sizeof(m_PrevPackInfo));
-		m_PrevTransmitEdict.ClearAll();
-		m_PrevPackInfo.m_pTransmitEdict = &m_PrevTransmitEdict;
+		//memset(&m_PrevPackInfo, 0, sizeof(m_PrevPackInfo));
+		//m_PrevTransmitEdict.ClearAll();
+		//m_PrevPackInfo.m_pTransmitEdict = &m_PrevTransmitEdict;
 	}
 
 	virtual ~CClientSnapshotInfo()
@@ -125,7 +128,7 @@ public:
 	}
 
 	void	SetupPackInfo(CFrameSnapshot* pSnapshot, CGameClient* clients);
-	void	SetupPrevPackInfo();
+	//void	SetupPrevPackInfo();
 	CClientFrame* GetDeltaFrame(int nTick);
 	CClientFrame* GetSendFrame();
 
@@ -141,8 +144,8 @@ public:
 	CClientFrame* m_pCurrentFrame = NULL;	// last added frame
 	CCheckTransmitInfo		m_PackInfo;
 
-	CCheckTransmitInfo		m_PrevPackInfo;		// Used to speed up CheckTransmit.
-	CBitVec<MAX_EDICTS>		m_PrevTransmitEdict;
+	//CCheckTransmitInfo		m_PrevPackInfo;		// Used to speed up CheckTransmit.
+	//CBitVec<MAX_EDICTS>		m_PrevTransmitEdict;
 };
 
 // These are the main variables used by the SV_CreatePacketEntities function.
@@ -175,6 +178,9 @@ public:
 	/* Some profiling data
 	int				m_nTotalGap;
 	int				m_nTotalGapCount; */
+
+	int checkProps[MAX_DATATABLE_PROPS];
+	int nCheckProps = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -237,16 +243,16 @@ private:
 	void	PackEntities_NetworkBackDoor(int clientCount, CGameClient** clients, CFrameSnapshot* snapshot);
 	void	PackEntities_Normal(int clientCount, CGameClient** clients, CFrameSnapshot* snapshot);
 
-	void	DetermineUpdateType(CBaseClient* pClient, CEntityWriteInfo& u);
+	void	DetermineUpdateType(CEntityWriteInfo& u);
 	void	WriteEntityUpdate(CBaseClient* pClient, CEntityWriteInfo& u);
 	void	WriteDeltaHeader(CEntityWriteInfo& u, int entnum, int flags);
 	void	UpdateHeaderDelta(CEntityWriteInfo& u, int entnum);
-	void	WriteLeavePVS(CEntityWriteInfo& u);
-	bool	NeedsExplicitDestroy(int entnum, CFrameSnapshot* from, CFrameSnapshot* to);
-	void	WriteDeltaEnt(CEntityWriteInfo& u);
-	void	WritePreserveEnt(CEntityWriteInfo& u);
-	int		WriteDeletions(CEntityWriteInfo& u);
+	//void	WriteLeavePVS(CEntityWriteInfo& u);
 	bool	NeedsExplicitCreate(CEntityWriteInfo& u);
+	bool	NeedsExplicitDestroy(int entnum, CFrameSnapshot* from, CFrameSnapshot* to);
+	//void	WriteDeltaEnt(CEntityWriteInfo& u);
+	//void	WritePreserveEnt(CEntityWriteInfo& u);
+	int		WriteDeletions(CEntityWriteInfo& u);
 
 	CUtlLinkedList<CFrameSnapshot*, unsigned short>		m_FrameSnapshots;
 

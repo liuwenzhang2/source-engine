@@ -86,7 +86,6 @@ protected :
 	bool		FinishCertificateCheck( netadr_t &adr, int nAuthProtocol, const char *szRawCertificate, int clientChallenge );
 	void		SendClientDatagrams ( int clientCount, CGameClient** clients, CFrameSnapshot* pSnapshot );
 	void		CopyTempEntities( CFrameSnapshot* pSnapshot );
-	void		AssignClassIds();
 
 	virtual void UpdateMasterServerPlayers();
 

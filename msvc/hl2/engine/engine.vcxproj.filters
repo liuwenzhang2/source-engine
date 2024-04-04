@@ -125,9 +125,6 @@
     <ClCompile Include="..\..\..\engine\sv_client.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\engine\sv_ents_write.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\engine\sv_filter.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -135,9 +132,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\engine\sv_log.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\engine\sv_packedentities.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\engine\sv_plugin.cpp">

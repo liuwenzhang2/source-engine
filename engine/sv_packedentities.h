@@ -22,13 +22,13 @@
 //	CGameClient** clients,
 //	CFrameSnapshot *snapshot );
 
-void SV_WriteSendTables( ServerClass *pClasses, bf_write &pBuf );
-void SV_WriteClassInfos( ServerClass *pClasses, bf_write &pBuf );
+//void SV_WriteSendTables( ServerClass *pClasses, bf_write &pBuf );
+//void SV_WriteClassInfos( ServerClass *pClasses, bf_write &pBuf );
 
-void SV_ComputeClassInfosCRC( CRC32_t* crc );
+//void SV_ComputeClassInfosCRC( CRC32_t* crc );
 //void SV_EnsureInstanceBaseline( ServerClass *pServerClass, const void *pData, int nBytes );
 
-void SV_EnableChangeFrames( bool state );
+//void SV_EnableChangeFrames( bool state );
 
 
 #endif // SV_PACKEDENTITIES_H

@@ -35,9 +35,7 @@
 //static ConVar		sv_deltatime( "sv_deltatime", "0", 0, "Enable profiling of CalcDelta calls" );
 //static ConVar		sv_deltaprint( "sv_deltaprint", "0", 0, "Print accumulated CalcDelta profiling data (only if sv_deltatime is on)" );
 
-#if defined( DEBUG_NETWORKING )
-ConVar  sv_packettrace( "sv_packettrace", "1", 0, "For debugging, print entity creation/deletion info to console." );
-#endif
+
 
 //class CChangeTrack
 //{

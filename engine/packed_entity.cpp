@@ -34,6 +34,9 @@
 #include "tier0/memdbgon.h"
 
 static ConVar sv_creationtickcheck("sv_creationtickcheck", "1", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Do extended check for encoding of timestamps against tickcount");
+#if defined( DEBUG_NETWORKING )
+ConVar  sv_packettrace("sv_packettrace", "1", 0, "For debugging, print entity creation/deletion info to console.");
+#endif
 extern	CGlobalVars g_ServerGlobalVariables;
 // -------------------------------------------------------------------------------------------------- //
 // PackedEntity.
@@ -570,14 +573,14 @@ bool PackedEntityManager::IsSamePackedEntity(CEntityWriteInfo& u) {
 	return oldFrameSnapshotEntry == toFrameSnapshotEntry;
 }
 
-void PackedEntityManager::GetChangedProps(CEntityWriteInfo& u, int* checkProps, int& nCheckProps, int nMaxCheckProps) {
+void PackedEntityManager::GetChangedProps(CEntityWriteInfo& u) {
 	
 	PackedEntity* pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pToSnapshot, u.m_nNewEntity) : NULL;
 	PackedEntity* pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pFromSnapshot, u.m_nOldEntity) : NULL;
 	
-	nCheckProps = pNewPack->GetPropsChangedAfterTick(u.m_pFromSnapshot->m_nTickCount, checkProps, nMaxCheckProps);
+	u.nCheckProps = pNewPack->GetPropsChangedAfterTick(u.m_pFromSnapshot->m_nTickCount, u.checkProps, ARRAYSIZE(u.checkProps));
 
-	if (nCheckProps == -1)
+	if (u.nCheckProps == -1)
 	{
 		// check failed, we have to recalc delta props based on from & to snapshot
 		// that should happen only in HLTV/Replay demo playback mode, this code is really expensive
@@ -605,14 +608,14 @@ void PackedEntityManager::GetChangedProps(CEntityWriteInfo& u, int* checkProps, 
 			nNewBits = pNewPack->GetNumBits();
 		}
 
-		nCheckProps = SendTable_CalcDelta(
+		u.nCheckProps = SendTable_CalcDelta(
 			pOldPack->m_pServerClass->m_pTable,
 			pOldData,
 			nOldBits,
 			pNewData,
 			nNewBits,
-			checkProps,
-			nMaxCheckProps,
+			u.checkProps,
+			ARRAYSIZE(u.checkProps),
 			u.m_nNewEntity
 		);
 	}
@@ -620,7 +623,7 @@ void PackedEntityManager::GetChangedProps(CEntityWriteInfo& u, int* checkProps, 
 #ifndef NO_VCR
 	if (vcr_verbose.GetInt())
 	{
-		VCRGenericValueVerify("checkProps", checkProps, sizeof(checkProps[0]) * nCheckProps);
+		VCRGenericValueVerify("checkProps", u.checkProps, sizeof(u.checkProps[0]) * u.nCheckProps);
 	}
 #endif
 }
@@ -810,10 +813,6 @@ void PackedEntityManager::WriteEnterPVS(CBaseClient* pClient, CEntityWriteInfo& 
 		u.m_nFullProps += SV_CalcDeltaAndWriteProps( u, pFromData, nFromBits, u.m_pNewPack );
 	}*/
 
-	if (u.m_nNewEntity == u.m_nOldEntity)
-		u.NextOldEntity();  // this was a entity recreate
-
-	u.NextNewEntity();
 }
 
 void PackedEntityManager::CheckClientSnapshotEntryArray(int maxIndex) {

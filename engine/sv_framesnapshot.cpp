@@ -14,8 +14,6 @@
 #include "framesnapshot.h"
 #include "sys_dll.h"
 #include "LocalNetworkBackdoor.h"
-#include "dt_send_eng.h"
-#include "dt.h"
 #include "tier0/vcrmode.h"
 #include "changeframelist.h"
 #include "vstdlib/jobthread.h"
@@ -99,20 +97,20 @@ void CClientSnapshotInfo::SetupPackInfo(CFrameSnapshot* pSnapshot, CGameClient* 
 	CM_SetupAreaFloodNums(m_PackInfo.m_AreaFloodNums, &m_PackInfo.m_nMapAreas);
 }
 
-void CClientSnapshotInfo::SetupPrevPackInfo()
-{
-	memcpy(&m_PrevTransmitEdict, m_PackInfo.m_pTransmitEdict, sizeof(m_PrevTransmitEdict));
-
-	// Copy the relevant fields into m_PrevPackInfo.
-	m_PrevPackInfo.m_AreasNetworked = m_PackInfo.m_AreasNetworked;
-	memcpy(m_PrevPackInfo.m_Areas, m_PackInfo.m_Areas, sizeof(m_PackInfo.m_Areas[0]) * m_PackInfo.m_AreasNetworked);
-
-	m_PrevPackInfo.m_nPVSSize = m_PackInfo.m_nPVSSize;
-	memcpy(m_PrevPackInfo.m_PVS, m_PackInfo.m_PVS, m_PackInfo.m_nPVSSize);
-
-	m_PrevPackInfo.m_nMapAreas = m_PackInfo.m_nMapAreas;
-	memcpy(m_PrevPackInfo.m_AreaFloodNums, m_PackInfo.m_AreaFloodNums, m_PackInfo.m_nMapAreas * sizeof(m_PackInfo.m_nMapAreas));
-}
+//void CClientSnapshotInfo::SetupPrevPackInfo()
+//{
+//	memcpy(&m_PrevTransmitEdict, m_PackInfo.m_pTransmitEdict, sizeof(m_PrevTransmitEdict));
+//
+//	// Copy the relevant fields into m_PrevPackInfo.
+//	m_PrevPackInfo.m_AreasNetworked = m_PackInfo.m_AreasNetworked;
+//	memcpy(m_PrevPackInfo.m_Areas, m_PackInfo.m_Areas, sizeof(m_PackInfo.m_Areas[0]) * m_PackInfo.m_AreasNetworked);
+//
+//	m_PrevPackInfo.m_nPVSSize = m_PackInfo.m_nPVSSize;
+//	memcpy(m_PrevPackInfo.m_PVS, m_PackInfo.m_PVS, m_PackInfo.m_nPVSSize);
+//
+//	m_PrevPackInfo.m_nMapAreas = m_PackInfo.m_nMapAreas;
+//	memcpy(m_PrevPackInfo.m_AreaFloodNums, m_PackInfo.m_AreaFloodNums, m_PackInfo.m_nMapAreas * sizeof(m_PackInfo.m_nMapAreas));
+//}
 
 CClientFrame* CClientSnapshotInfo::GetDeltaFrame(int nTick)
 {
@@ -530,7 +528,7 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot(int clientCount, CGameCl
 			pClientSnapshotInfo->SetupPackInfo(snap, clients[iClient]);
 			CCheckTransmitInfo* pInfo = &pClientSnapshotInfo->m_PackInfo;
 			serverGameEnts->CheckTransmit(pInfo, snap->m_pValidEntities, snap->m_nValidEntities);
-			pClientSnapshotInfo->SetupPrevPackInfo();
+			//pClientSnapshotInfo->SetupPrevPackInfo();
 		}
 	}
 
@@ -766,8 +764,9 @@ void CFrameSnapshotManager::WriteDeltaHeader(CEntityWriteInfo& u, int entnum, in
 //	
 //}
 
-void CFrameSnapshotManager::DetermineUpdateType(CBaseClient* pClient, CEntityWriteInfo& u)
+void CFrameSnapshotManager::DetermineUpdateType(CEntityWriteInfo& u)
 {
+	u.nCheckProps = 0;
 	// Figure out how we want to update the entity.
 	if (u.m_nNewEntity < u.m_nOldEntity)
 	{
@@ -845,22 +844,20 @@ void CFrameSnapshotManager::DetermineUpdateType(CBaseClient* pClient, CEntityWri
 	}
 #endif
 
-	int checkProps[MAX_DATATABLE_PROPS];
-	int nCheckProps = 0;
-	g_pPackedEntityManager->GetChangedProps(u, checkProps, nCheckProps, ARRAYSIZE(checkProps));
+	g_pPackedEntityManager->GetChangedProps(u);
 
-	if (nCheckProps > 0)
+	if (u.nCheckProps > 0)
 	{
 		// Write a header.
-		WriteDeltaHeader(u, u.m_nNewEntity, FHDR_ZERO);
-#if defined( DEBUG_NETWORKING )
-		int startBit = u.m_pBuf->GetNumBitsWritten();
-#endif
-		g_pPackedEntityManager->WriteDeltaEnt(pClient, u, checkProps, nCheckProps);
-#if defined( DEBUG_NETWORKING )
-		int endBit = u.m_pBuf->GetNumBitsWritten();
-		TRACE_PACKET(("    Delta Bits (%d) = %d (%d bytes)\n", u.m_nNewEntity, (endBit - startBit), ((endBit - startBit) + 7) / 8));
-#endif
+//		WriteDeltaHeader(u, u.m_nNewEntity, FHDR_ZERO);
+//#if defined( DEBUG_NETWORKING )
+//		int startBit = u.m_pBuf->GetNumBitsWritten();
+//#endif
+//		g_pPackedEntityManager->WriteDeltaEnt(pClient, u, u.checkProps, u.nCheckProps);
+//#if defined( DEBUG_NETWORKING )
+//		int endBit = u.m_pBuf->GetNumBitsWritten();
+//		TRACE_PACKET(("    Delta Bits (%d) = %d (%d bytes)\n", u.m_nNewEntity, (endBit - startBit), ((endBit - startBit) + 7) / 8));
+//#endif
 		// If the numbers are the same, then the entity was in the old and new packet.
 		// Just delta compress the differences.
 		u.m_UpdateType = DeltaEnt;
@@ -923,53 +920,20 @@ bool CFrameSnapshotManager::NeedsExplicitDestroy(int entnum, CFrameSnapshot* fro
 	return false;
 }
 
-void CFrameSnapshotManager::WriteLeavePVS(CEntityWriteInfo& u)
-{
-	int headerflags = FHDR_LEAVEPVS;
-	bool deleteentity = false;
+//void CFrameSnapshotManager::WriteLeavePVS(CEntityWriteInfo& u)
+//{
+//	
+//}
 
-	if (u.m_bAsDelta)
-	{
-		deleteentity = NeedsExplicitDestroy(u.m_nOldEntity, u.m_pFromSnapshot, u.m_pToSnapshot);
-	}
+//void CFrameSnapshotManager::WriteDeltaEnt(CEntityWriteInfo& u)
+//{
+//
+//}
 
-	if (deleteentity)
-	{
-		// Mark that we handled deletion of this index
-		u.m_DeletionFlags.Set(u.m_nOldEntity);
-
-		headerflags |= FHDR_DELETE;
-	}
-
-	TRACE_PACKET(("  SV Leave PVS (%d) %s %s\n", u.m_nOldEntity,
-		deleteentity ? "deleted" : "left pvs",
-		u.m_pOldPack->m_pServerClass->m_pNetworkName));
-
-	WriteDeltaHeader(u, u.m_nOldEntity, headerflags);
-
-	u.NextOldEntity();
-}
-
-void CFrameSnapshotManager::WriteDeltaEnt(CEntityWriteInfo& u)
-{
-	TRACE_PACKET(("  SV Delta PVS (%d %d) %s\n", u.m_nNewEntity, u.m_nOldEntity, u.m_pOldPack->m_pServerClass->m_pNetworkName));
-
-	// NOTE: it was already written in DetermineUpdateType. By doing it this way, we avoid an expensive
-	// (non-byte-aligned) copy of the data.
-
-	u.NextOldEntity();
-	u.NextNewEntity();
-}
-
-void CFrameSnapshotManager::WritePreserveEnt(CEntityWriteInfo& u)
-{
-	TRACE_PACKET(("  SV Preserve PVS (%d) %s\n", u.m_nOldEntity, u.m_pOldPack->m_pServerClass->m_pNetworkName));
-
-	// updateType is preserveEnt. The client will detect this because our next entity will have a newnum
-	// that is greater than oldnum, in which case the client just keeps the current entity alive.
-	u.NextOldEntity();
-	u.NextNewEntity();
-}
+//void CFrameSnapshotManager::WritePreserveEnt(CEntityWriteInfo& u)
+//{
+//
+//}
 
 void CFrameSnapshotManager::WriteEntityUpdate(CBaseClient* pClient, CEntityWriteInfo& u)
 {
@@ -987,19 +951,62 @@ void CFrameSnapshotManager::WriteEntityUpdate(CBaseClient* pClient, CEntityWrite
 
 	case LeavePVS:
 	{
-		WriteLeavePVS(u);
+		//WriteLeavePVS(u);
+		int headerflags = FHDR_LEAVEPVS;
+		bool deleteentity = false;
+
+		if (u.m_bAsDelta)
+		{
+			deleteentity = NeedsExplicitDestroy(u.m_nOldEntity, u.m_pFromSnapshot, u.m_pToSnapshot);
+		}
+
+		if (deleteentity)
+		{
+			// Mark that we handled deletion of this index
+			u.m_DeletionFlags.Set(u.m_nOldEntity);
+
+			headerflags |= FHDR_DELETE;
+		}
+
+		TRACE_PACKET(("  SV Leave PVS (%d) %s %s\n", u.m_nOldEntity,
+			deleteentity ? "deleted" : "left pvs",
+			u.m_pOldPack->m_pServerClass->m_pNetworkName));
+
+		WriteDeltaHeader(u, u.m_nOldEntity, headerflags);
+
 	}
 	break;
 
 	case DeltaEnt:
 	{
-		WriteDeltaEnt(u);
+		//WriteDeltaEnt(u);
+		TRACE_PACKET(("  SV Delta PVS (%d %d) %s\n", u.m_nNewEntity, u.m_nOldEntity, u.m_pOldPack->m_pServerClass->m_pNetworkName));
+
+		// NOTE: it was already written in DetermineUpdateType. By doing it this way, we avoid an expensive
+		// (non-byte-aligned) copy of the data.
+		if (u.nCheckProps > 0)
+		{
+			// Write a header.
+			WriteDeltaHeader(u, u.m_nNewEntity, FHDR_ZERO);
+#if defined( DEBUG_NETWORKING )
+			int startBit = u.m_pBuf->GetNumBitsWritten();
+#endif
+			g_pPackedEntityManager->WriteDeltaEnt(pClient, u, u.checkProps, u.nCheckProps);
+#if defined( DEBUG_NETWORKING )
+			int endBit = u.m_pBuf->GetNumBitsWritten();
+			TRACE_PACKET(("    Delta Bits (%d) = %d (%d bytes)\n", u.m_nNewEntity, (endBit - startBit), ((endBit - startBit) + 7) / 8));
+#endif
+		}
 	}
 	break;
 
 	case PreserveEnt:
 	{
-		WritePreserveEnt(u);
+		//WritePreserveEnt(u);
+		TRACE_PACKET(("  SV Preserve PVS (%d) %s\n", u.m_nOldEntity, u.m_pOldPack->m_pServerClass->m_pNetworkName));
+
+		// updateType is preserveEnt. The client will detect this because our next entity will have a newnum
+		// that is greater than oldnum, in which case the client just keeps the current entity alive.
 	}
 	break;
 	}
@@ -1165,43 +1172,68 @@ void CFrameSnapshotManager::WriteDeltaEntities(CBaseClient* pClient, CClientFram
 			//u.m_pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity(u.m_pToSnapshot, u.m_nNewEntity) : NULL;
 			//u.m_pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity(u.m_pFromSnapshot, u.m_nOldEntity) : NULL;
 			int nEntityStartBit = pBuf.GetNumBitsWritten();
-			int oldEntityIndex = u.m_nOldEntity;
-			int newEntityIndex = u.m_nNewEntity;
 
 			// Figure out how we want to write this entity.
-			DetermineUpdateType(pClient, u);
+			DetermineUpdateType(u);
 			WriteEntityUpdate(pClient, u);
 
-			if (!bIsTracing)
-				continue;
+			if (bIsTracing) {
+				PackedEntity* pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity(u.m_pToSnapshot, u.m_nNewEntity) : NULL;
+				PackedEntity* pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity(u.m_pFromSnapshot, u.m_nOldEntity) : NULL;
+				switch (u.m_UpdateType)
+				{
+				default:
+				case PreserveEnt:
+					break;
+				case EnterPVS:
+				{
+					char const* eString = serverEntitylist->GetServerEntity(pNewPack->m_nEntityIndex)->GetClassName();
+					pClient->TraceNetworkData(pBuf, "enter [%s]", eString);
+					ETWMark1I(eString, pBuf.GetNumBitsWritten() - nEntityStartBit);
+				}
+				break;
+				case LeavePVS:
+				{
+					// Note, can't use GetNetworkable() since the edict has been freed at this point
+					char const* eString = pOldPack->m_pServerClass->m_pNetworkName;
+					pClient->TraceNetworkData(pBuf, "leave [%s]", eString);
+					ETWMark1I(eString, pBuf.GetNumBitsWritten() - nEntityStartBit);
+				}
+				break;
+				case DeltaEnt:
+				{
+					char const* eString = serverEntitylist->GetServerEntity(pOldPack->m_nEntityIndex)->GetClassName();
+					pClient->TraceNetworkData(pBuf, "delta [%s]", eString);
+					ETWMark1I(eString, pBuf.GetNumBitsWritten() - nEntityStartBit);
+				}
+				break;
+				}
+			}
 
-			PackedEntity* pNewPack = (newEntityIndex != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity(u.m_pToSnapshot, newEntityIndex) : NULL;
-			PackedEntity* pOldPack = (oldEntityIndex != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity(u.m_pFromSnapshot, oldEntityIndex) : NULL;
 			switch (u.m_UpdateType)
 			{
-			default:
-			case PreserveEnt:
-				break;
 			case EnterPVS:
 			{
-				char const* eString = serverEntitylist->GetServerEntity(pNewPack->m_nEntityIndex)->GetClassName();
-				pClient->TraceNetworkData(pBuf, "enter [%s]", eString);
-				ETWMark1I(eString, pBuf.GetNumBitsWritten() - nEntityStartBit);
+				if (u.m_nNewEntity == u.m_nOldEntity)
+					u.NextOldEntity();  // this was a entity recreate
+				u.NextNewEntity();
 			}
 			break;
 			case LeavePVS:
 			{
-				// Note, can't use GetNetworkable() since the edict has been freed at this point
-				char const* eString = pOldPack->m_pServerClass->m_pNetworkName;
-				pClient->TraceNetworkData(pBuf, "leave [%s]", eString);
-				ETWMark1I(eString, pBuf.GetNumBitsWritten() - nEntityStartBit);
+				u.NextOldEntity();
 			}
 			break;
 			case DeltaEnt:
 			{
-				char const* eString = serverEntitylist->GetServerEntity(pOldPack->m_nEntityIndex)->GetClassName();
-				pClient->TraceNetworkData(pBuf, "delta [%s]", eString);
-				ETWMark1I(eString, pBuf.GetNumBitsWritten() - nEntityStartBit);
+				u.NextOldEntity();
+				u.NextNewEntity();
+			}
+			break;
+			case PreserveEnt:
+			{
+				u.NextOldEntity();
+				u.NextNewEntity();
 			}
 			break;
 			}
@@ -1231,13 +1263,6 @@ void CFrameSnapshotManager::WriteDeltaEntities(CBaseClient* pClient, CClientFram
 
 	bool bUpdateBaseline = ((GetClientSnapshotInfo(pClient)->m_nBaselineUpdateTick == -1) &&
 		(u.m_nFullProps > 0 || !u.m_bAsDelta));
-
-	if (u.m_nFullProps > 0) {
-	
-	}
-	else {
-		int aaa = 0;
-	}
 
 	if (bUpdateBaseline)// && u.m_pBaselineEntities
 	{

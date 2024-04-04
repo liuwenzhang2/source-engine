@@ -13,7 +13,7 @@
 #include "demo.h"
 #include "PlayerState.h"
 #include "tier0/vprof.h"
-#include "sv_packedentities.h"
+//#include "sv_packedentities.h"
 #include "LocalNetworkBackdoor.h"
 #include "testscriptmgr.h"
 #include "hltvserver.h"
