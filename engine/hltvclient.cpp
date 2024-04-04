@@ -481,7 +481,7 @@ void CHLTVClient::SendSnapshot( CClientFrame * pFrame )
 
 	// TODO delta cache whole snapshots, not just packet entities. then use net_Align
 	// send entity update, delta compressed if deltaFrame != NULL
-	m_Server->WriteDeltaEntities( this, pFrame, pDeltaFrame, msg );
+	framesnapshotmanager->WriteDeltaEntities( this, pFrame, pDeltaFrame, msg );
 
 	// write message to packet and check for overflow
 	if ( msg.IsOverflowed() )

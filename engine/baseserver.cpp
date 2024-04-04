@@ -1320,77 +1320,6 @@ void CBaseServer::SendPendingServerInfo()
 	}
 }
 
-// compresses a packed entity, returns data & bits
-const char *CBaseServer::CompressPackedEntity(ServerClass *pServerClass, const char *data, int &bits)
-{
-	ALIGN4 static char s_packedData[MAX_PACKEDENTITY_DATA] ALIGN4_POST;
-
-	bf_write writeBuf( "CompressPackedEntity", s_packedData, sizeof( s_packedData ) );
-
-	const void *pBaselineData = NULL;
-	int nBaselineBits = 0;
-
-	Assert( pServerClass != NULL );
-		
-	GetClassBaseline( pServerClass, &pBaselineData, &nBaselineBits );
-	nBaselineBits *= 8;
-
-	Assert( pBaselineData != NULL );
-
-	SendTable_WriteAllDeltaProps(
-		pServerClass->m_pTable,
-		pBaselineData,
-		nBaselineBits,
-		data,
-		bits,
-		-1,
-		&writeBuf );
-	
-	//overwrite in bits with out bits
-	bits = writeBuf.GetNumBitsWritten();
-
-	return s_packedData;
-}
-
-// uncompresses a 
-const char* CBaseServer::UncompressPackedEntity(PackedEntity *pPackedEntity, int &bits)
-{
-	UnpackedDataCache_t *pdc = g_pPackedEntityManager->GetCachedUncompressedEntity( pPackedEntity );
-
-	if ( pdc->bits > 0 )
-	{
-		// found valid uncompressed version in cache
-		bits= pdc->bits;
-		return pdc->data;
-	}
-
-	// not in cache, so uncompress it
-
-	const void *pBaseline;
-	int nBaselineBytes = 0;
-
-	GetClassBaseline( pPackedEntity->m_pServerClass, &pBaseline, &nBaselineBytes );
-
-	Assert( pBaseline != NULL );
-
-	// store this baseline in u.m_pUpdateBaselines
-	bf_read oldBuf( "UncompressPackedEntity1", pBaseline, nBaselineBytes );
-	bf_read newBuf( "UncompressPackedEntity2", pPackedEntity->GetData(), Bits2Bytes(pPackedEntity->GetNumBits()) );
-	bf_write outBuf( "UncompressPackedEntity3", pdc->data, MAX_PACKEDENTITY_DATA );
-
-	Assert( pPackedEntity->m_pClientClass );
-
-	RecvTable_MergeDeltas( 
-		pPackedEntity->m_pClientClass->m_pRecvTable,
-		&oldBuf,
-		&newBuf,
-		&outBuf );
-
-	bits = pdc->bits = outBuf.GetNumBitsWritten();
-		
-	return pdc->data;
-}
-
 /*
 ================
 SV_CheckProtocol
@@ -1740,6 +1669,51 @@ INetworkStringTable *CBaseServer::GetUserInfoTable( void )
 	}
 
 	return m_pUserInfoTable;
+}
+
+// This function makes sure that this entity class has an instance baseline.
+// If it doesn't have one yet, it makes a new one.
+void CBaseServer::SetClassBaseline(ServerClass* pServerClass, const void* pData, int nBytes)//int iEdict, 
+{
+	//IServerEntity* pEnt = serverEntitylist->GetServerEntity(iEdict);
+	//ErrorIfNot(pEnt->GetNetworkable(),
+	//	("SV_EnsureInstanceBaseline: edict %d missing ent", iEdict)
+	//);
+
+	//ServerClass* pClass = pEnt->GetServerClass();
+
+	// See if we already have a baseline for this class.
+	if (pServerClass->m_InstanceBaselineIndex == INVALID_STRING_INDEX)
+	{
+		AUTO_LOCK(g_svInstanceBaselineMutex);
+
+		// We need this second check in case multiple instances of the same class have grabbed the lock.
+		if (pServerClass->m_InstanceBaselineIndex == INVALID_STRING_INDEX)
+		{
+			char idString[32];
+			Q_snprintf(idString, sizeof(idString), "%d", pServerClass->m_ClassID);
+
+			// Ok, make a new instance baseline so they can reference it.
+			int temp = GetInstanceBaselineTable()->AddString(
+				true,
+				idString,	// Note we're sending a string with the ID number, not the class name.
+				nBytes,
+				pData);
+
+			// Insert a compiler and/or CPU memory barrier to ensure that all side-effects have
+			// been published before the index is published. Otherwise the string index may
+			// be visible before its initialization has finished. This potential problem is caused
+			// by the use of double-checked locking -- the problem is that the code outside of the
+			// lock is looking at the variable that is protected by the lock. See this article for details:
+			// http://en.wikipedia.org/wiki/Double-checked_locking
+			// Write-release barrier
+			ThreadMemoryBarrier();
+			pServerClass->m_InstanceBaselineIndex = temp;
+			Assert(pServerClass->m_InstanceBaselineIndex != INVALID_STRING_INDEX);
+		}
+	}
+	// Read-acquire barrier
+	ThreadMemoryBarrier();
 }
 
 bool CBaseServer::GetClassBaseline( ServerClass *pClass, void const **pData, int *pDatalen )
@@ -2243,156 +2217,6 @@ void CBaseServer::BroadcastMessage( INetMessage &msg, IRecipientFilter &filter )
 			}
 		}
 	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Writes events to the client's network buffer
-// Input  : *cl -
-//			*pack -
-//			*msg -
-//-----------------------------------------------------------------------------
-static ConVar sv_debugtempentities( "sv_debugtempentities", "0", 0, "Show temp entity bandwidth usage." );
-
-static bool CEventInfo_LessFunc( CEventInfo * const &lhs, CEventInfo * const &rhs )
-{
-	return lhs->classID < rhs->classID;
-}
-
-void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurrentSnapshot, CFrameSnapshot *pLastSnapshot, bf_write &buf, int ev_max )
-{
-	VPROF_BUDGET( "CBaseServer::WriteTempEntities", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-
-	ALIGN4 char data[NET_MAX_PAYLOAD] ALIGN4_POST;
-	SVC_TempEntities msg;
-	msg.m_DataOut.StartWriting( data, sizeof(data) );
-	bf_write &buffer = msg.m_DataOut; // shortcut
-	
-	CFrameSnapshot *pSnapshot;
-	CEventInfo *pLastEvent = NULL;
-
-	bool bDebug = sv_debugtempentities.GetBool();
-
-	// limit max entities to field bit length
-	ev_max = min( ev_max, ((1<<CEventInfo::EVENT_INDEX_BITS)-1) );
-
-	if ( pLastSnapshot )
-	{
-		pSnapshot = pLastSnapshot->NextSnapshot();
-	} 
-	else
-	{
-		pSnapshot = pCurrentSnapshot;
-	}
-
-	CUtlRBTree< CEventInfo * >	sorted( 0, ev_max, CEventInfo_LessFunc );
-
-	// Build list of events sorted by send table classID (makes the delta work better in cases with a lot of the same message type )
-	while ( pSnapshot && ((int)sorted.Count() < ev_max) )
-	{
-		for( int i = 0; i < pSnapshot->m_nTempEntities; ++i )
-		{
-			CEventInfo *event = pSnapshot->m_pTempEntities[ i ];
-
-			if ( client->IgnoreTempEntity( event ) )
-				continue; // event is not seen by this player
-			
-			sorted.Insert( event );
-			// More space still
-			if ( (int)sorted.Count() >= ev_max )
-				break;	
-		}
-
-		// stop, we reached our current snapshot
-		if ( pSnapshot == pCurrentSnapshot )
-			break; 
-
-		// got to next snapshot
-		pSnapshot = framesnapshotmanager->NextSnapshot( pSnapshot );
-	}
-
-	if ( sorted.Count() <= 0 )
-		return;
-
-	for ( int i = sorted.FirstInorder(); 
-		i != sorted.InvalidIndex(); 
-		i = sorted.NextInorder( i ) )
-	{
-		CEventInfo *event = sorted[ i ];
-
-		if ( event->fire_delay == 0.0f )
-		{
-			buffer.WriteOneBit( 0 );
-		} 
-		else
-		{
-			buffer.WriteOneBit( 1 );
-			buffer.WriteSBitLong( event->fire_delay*100.0f, 8 );
-		}
-
-		if ( pLastEvent && 
-			pLastEvent->classID == event->classID )
-		{
-			buffer.WriteOneBit( 0 ); // delta against last temp entity
-
-			int startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
-
-			SendTable_WriteAllDeltaProps( event->pSendTable, 
-				pLastEvent->pData,
-				pLastEvent->bits,
-				event->pData,
-				event->bits,
-				-1,
-				&buffer );
-
-			if ( bDebug )
-			{
-				int length = buffer.GetNumBitsWritten() - startBit;
-				DevMsg("TE %s delta bits: %i\n", event->pSendTable->GetName(), length );
-			}
-		}
-		else
-		{
-			 // full update, just compressed against zeros in MP
-
-			buffer.WriteOneBit( 1 );
-
-			int startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
-
-			buffer.WriteUBitLong( event->classID, GetClassBits() );
-
-			if ( IsMultiplayer() )
-			{
-				SendTable_WriteAllDeltaProps( event->pSendTable, 
-					NULL,	// will write only non-zero elements
-					0,
-					event->pData,
-					event->bits,
-					-1,
-					&buffer );
-			}
-			else
-			{
-				// write event with zero properties
-				buffer.WriteBits( event->pData, event->bits );
-			}
-
-			if ( bDebug )
-			{
-				int length = buffer.GetNumBitsWritten() - startBit;
-				DevMsg("TE %s full bits: %i\n", event->pSendTable->GetName(), length );
-			}
-		}
-
-		if ( IsMultiplayer() )
-		{
-			// in single player, don't used delta compression, lastEvent remains NULL
-			pLastEvent = event;
-		}
-	}
-
-	// set num entries
-	msg.m_nNumEntries = sorted.Count();
-	msg.WriteToBuffer( buf );
 }
 
 void CBaseServer::SetMaxClients( int number )

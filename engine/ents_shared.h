@@ -11,6 +11,7 @@
 #include <iserver.h>
 #include "clientframe.h"
 #include "packed_entity.h"
+#include "iclientnetworkable.h"
 
 #ifdef _WIN32
 #pragma once

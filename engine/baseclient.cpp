@@ -1127,7 +1127,7 @@ write_again:
 	}
 
 	// send entity update, delta compressed if deltaFrame != NULL
-	m_Server->WriteDeltaEntities( this, pFrame, deltaFrame, msg );
+	framesnapshotmanager->WriteDeltaEntities( this, pFrame, deltaFrame, msg );
 
 	if ( IsTracing() )
 	{
@@ -1139,7 +1139,7 @@ write_again:
 	// send max 64 events in multi player, 255 in SP
 	int nMaxTempEnts = m_Server->IsMultiplayer() ? 64 : 255;
 
-	m_Server->WriteTempEntities( this, pFrame->GetSnapshot(), framesnapshotmanager->GetClientLastSnapshot(this), msg, nMaxTempEnts );
+	framesnapshotmanager->WriteTempEntities( this, pFrame->GetSnapshot(), framesnapshotmanager->GetClientLastSnapshot(this), msg, nMaxTempEnts );
 
 	if ( IsTracing() )
 	{

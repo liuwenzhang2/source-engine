@@ -1115,7 +1115,7 @@ void CGameClient::SendSnapshot( CClientFrame * pFrame )
 
 		int maxEnts = tv_transmitall.GetBool()?255:64;
 		CFrameSnapshot* pLastSnapshot = framesnapshotmanager->GetClientSnapshotInfo(this)->m_pLastSnapshot.GetObject();
-		hltv->WriteTempEntities( this, pFrame->GetSnapshot(), pLastSnapshot, *hltv->GetBuffer( HLTV_BUFFER_TEMPENTS ), maxEnts );
+		framesnapshotmanager->WriteTempEntities( this, pFrame->GetSnapshot(), pLastSnapshot, *hltv->GetBuffer( HLTV_BUFFER_TEMPENTS ), maxEnts );
 
 		// add snapshot to HLTV server frame list
 		hltv->AddNewFrame( pFrame );

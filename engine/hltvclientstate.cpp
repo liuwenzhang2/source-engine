@@ -736,7 +736,7 @@ void CHLTVClientState::ReadDeltaEnt( CEntityReadInfo &u )
 
 	if ( pFromPackedEntity->IsCompressed() )
 	{
-		pFromData = m_pHLTV->UncompressPackedEntity( pFromPackedEntity, nFromBits );
+		pFromData = g_pPackedEntityManager->UncompressPackedEntity( pFromPackedEntity, nFromBits );
 	}
 	else
 	{
@@ -763,7 +763,7 @@ void CHLTVClientState::ReadDeltaEnt( CEntityReadInfo &u )
 	{
 		int bits = writeBuf.GetNumBitsWritten();
 
-		const char *compressedData = m_pHLTV->CompressPackedEntity( 
+		const char *compressedData = g_pPackedEntityManager->CompressPackedEntity(
 			pToPackedEntity->m_pServerClass,
 			(char*)writeBuf.GetData(),
 			bits );

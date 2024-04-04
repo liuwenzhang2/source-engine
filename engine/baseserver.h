@@ -102,8 +102,6 @@ public: // IServer implementation
 
 	virtual void	DisconnectClient(IClient *client, const char *reason );
 	
-	virtual void	WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CClientFrame *from,	bf_write &pBuf );
-	virtual void	WriteTempEntities( CBaseClient *client, CFrameSnapshot *to, CFrameSnapshot *from, bf_write &pBuf, int nMaxEnts );
 	
 public: // IConnectionlessPacketHandler implementation
 
@@ -118,6 +116,7 @@ public: // IConnectionlessPacketHandler implementation
 	virtual void	FillServerInfo(SVC_ServerInfo &serverinfo);
 	virtual void	UserInfoChanged( int nClientIndex );
 
+	void	SetClassBaseline( ServerClass* pServerClass, const void* pData, int nBytes);
 	bool	GetClassBaseline( ServerClass *pClass, void const **pData, int *pDatalen );
 	void	RunFrame( void );
 	void	InactivateClients( void );
@@ -125,9 +124,6 @@ public: // IConnectionlessPacketHandler implementation
 	void	CheckTimeouts (void);
 	void	UpdateUserSettings(void);
 	void	SendPendingServerInfo(void);
-
-	const char	*CompressPackedEntity(ServerClass *pServerClass, const char *data, int &bits);
-	const char	*UncompressPackedEntity(PackedEntity *pPackedEntity, int &size);
 
 	INetworkStringTable *GetInstanceBaselineTable( void );
 	INetworkStringTable *GetLightStyleTable( void );

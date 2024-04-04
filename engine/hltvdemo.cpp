@@ -23,6 +23,7 @@
 #include "server.h"
 #include "networkstringtableclient.h"
 #include "vcrmode.h"
+#include "framesnapshot.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -358,11 +359,11 @@ void CHLTVDemoRecorder::WriteFrame( CHLTVFrame *pFrame )
 	CClientFrame *deltaFrame = hltv->GetClientFrame( m_nDeltaTick ); // NULL if delta_tick is not found or -1
 	
 	// send entity update, delta compressed if deltaFrame != NULL
-	sv.WriteDeltaEntities( hltv->m_MasterClient, pFrame, deltaFrame, msg );
+	framesnapshotmanager->WriteDeltaEntities( hltv->m_MasterClient, pFrame, deltaFrame, msg );
 
 	// send all unreliable temp ents between last and current frame
 	CFrameSnapshot * fromSnapshot = deltaFrame?deltaFrame->GetSnapshot():NULL;
-	sv.WriteTempEntities( hltv->m_MasterClient, pFrame->GetSnapshot(), fromSnapshot, msg, 255 );
+	framesnapshotmanager->WriteTempEntities( hltv->m_MasterClient, pFrame->GetSnapshot(), fromSnapshot, msg, 255 );
 
 	// write sound data
 	data = &pFrame->m_Messages[HLTV_BUFFER_SOUNDS];

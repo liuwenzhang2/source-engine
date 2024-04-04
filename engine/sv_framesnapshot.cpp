@@ -20,6 +20,9 @@
 #include "changeframelist.h"
 #include "vstdlib/jobthread.h"
 #include "sv_main.h"
+#include "tier0/etwprof.h"
+#include "net_synctags.h"
+#include "dt_instrumentation_server.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -624,6 +627,7 @@ void CFrameSnapshotManager::FreeClientBaselines(CBaseClient* pClient)
 	pClientSnapshotInfo->m_pLastSnapshot = NULL;
 	pClientSnapshotInfo->m_nBaselineUpdateTick = -1;
 	pClientSnapshotInfo->m_nBaselineUsed = 0;
+	pClientSnapshotInfo->m_BaselinesSent.ClearAll();
 	g_pPackedEntityManager->FreeClientBaselines(pClient);
 }
 
@@ -638,6 +642,7 @@ void CFrameSnapshotManager::OnClientConnected(CBaseClient* pClient) {
 	pClientSnapshotInfo->m_pLastSnapshot = NULL;
 	pClientSnapshotInfo->m_nBaselineUpdateTick = -1;
 	pClientSnapshotInfo->m_nBaselineUsed = 0;
+	pClientSnapshotInfo->m_BaselinesSent.ClearAll();
 	pClientSnapshotInfo->DeleteClientFrames(-1);
 	g_pPackedEntityManager->OnClientConnected(pClient);
 }
@@ -646,6 +651,759 @@ void CFrameSnapshotManager::OnClientInactivate(CBaseClient* pClient) {
 	CheckClientSnapshotArray(pClient->m_nClientSlot);
 	CClientSnapshotInfo* pClientSnapshotInfo = m_ClientSnapshotInfo.Element(pClient->m_nClientSlot);
 	pClientSnapshotInfo->DeleteClientFrames(-1); // delete all
+}
+
+
+
+//-----------------------------------------------------------------------------
+// Purpose: See if the entity needs a "hard" reset ( i.e., and explicit creation tag )
+//  This should only occur if the entity slot deleted and re-created an entity faster than
+//  the last two updates toa  player.  Should never or almost never occur.  You never know though.
+// Input  : type - 
+//			entnum - 
+//			*from - 
+//			*to - 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool CFrameSnapshotManager::NeedsExplicitCreate(CEntityWriteInfo& u)
+{
+	// Never on uncompressed packet
+	if (!u.m_bAsDelta)
+	{
+		return false;
+	}
+
+	const int index = u.m_nNewEntity;
+
+	if (index >= u.m_pFromSnapshot->m_nNumEntities)
+		return true; // entity didn't exist in old frame, so create
+
+	// Server thinks the entity was continues, but the serial # changed, so we might need to destroy and recreate it
+	const CFrameSnapshotEntry* pFromEnt = g_pPackedEntityManager->GetSnapshotEntry(u.m_pFromSnapshot, index);//u.m_pFromSnapshot->m_pEntities
+	const CFrameSnapshotEntry* pToEnt = g_pPackedEntityManager->GetSnapshotEntry(u.m_pToSnapshot, index);//u.m_pToSnapshot->m_pEntities
+
+	bool bNeedsExplicitCreate = (pFromEnt->m_pClass == NULL) || pFromEnt->m_nSerialNumber != pToEnt->m_nSerialNumber;
+
+#ifdef _DEBUG
+	if (!bNeedsExplicitCreate)
+	{
+		// If it doesn't need explicit create, then the classnames should match.
+		// This assert is analagous to the "Server / Client mismatch" one on the client.
+		static int nWhines = 0;
+		if (pFromEnt->m_pClass->GetName() != pToEnt->m_pClass->GetName())
+		{
+			if (++nWhines < 4)
+			{
+				Msg("ERROR in SV_NeedsExplicitCreate: ent %d from/to classname (%s/%s) mismatch.\n", u.m_nNewEntity, pFromEnt->m_pClass->GetName(), pToEnt->m_pClass->GetName());
+			}
+		}
+	}
+#endif
+
+	return bNeedsExplicitCreate;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Creates a delta header for the entity
+//-----------------------------------------------------------------------------
+void CFrameSnapshotManager::UpdateHeaderDelta(CEntityWriteInfo& u, int entnum)
+{
+	// Profiling info
+	//	u.m_nTotalGap += entnum - u.m_nHeaderBase;
+	//	u.m_nTotalGapCount++;
+
+	// Keep track of number of headers so we can tell the client
+	u.m_nHeaderCount++;
+	u.m_nHeaderBase = entnum;
+}
+
+//
+// Write the delta header. Also update the header delta info if bUpdateHeaderDelta is true.
+//
+// There are some cases where you want to tenatively write a header, then possibly back it out.
+// In these cases:
+// - pass in false for bUpdateHeaderDelta
+// - store the return value from SV_WriteDeltaHeader
+// - call SV_UpdateHeaderDelta ONLY if you want to keep the delta header it wrote
+//
+void CFrameSnapshotManager::WriteDeltaHeader(CEntityWriteInfo& u, int entnum, int flags)
+{
+	bf_write* pBuf = u.m_pBuf;
+
+	// int startbit = pBuf->GetNumBitsWritten();
+
+	int offset = entnum - u.m_nHeaderBase - 1;
+
+	Assert(offset >= 0);
+
+	SyncTag_Write(u.m_pBuf, "Hdr");
+
+	pBuf->WriteUBitVar(offset);
+
+	if (flags & FHDR_LEAVEPVS)
+	{
+		pBuf->WriteOneBit(1); // leave PVS bit
+		pBuf->WriteOneBit(flags & FHDR_DELETE);
+	}
+	else
+	{
+		pBuf->WriteOneBit(0); // delta or enter PVS
+		pBuf->WriteOneBit(flags & FHDR_ENTERPVS);
+	}
+
+	UpdateHeaderDelta(u, entnum);
+}
+
+// NOTE: to optimize this, it could store the bit offsets of each property in the packed entity.
+// It would only have to store the offsets for the entities for each frame, since it only reaches 
+// into the current frame's entities here.
+//static inline void SV_WritePropsFromPackedEntity(
+//	CEntityWriteInfo& u,
+//	const int* pCheckProps,
+//	const int nCheckProps
+//)
+//{
+//	
+//}
+
+void CFrameSnapshotManager::DetermineUpdateType(CBaseClient* pClient, CEntityWriteInfo& u)
+{
+	// Figure out how we want to update the entity.
+	if (u.m_nNewEntity < u.m_nOldEntity)
+	{
+		// If the entity was not in the old packet (oldnum == 9999), then 
+		// delta from the baseline since this is a new entity.
+		u.m_UpdateType = EnterPVS;
+		return;
+	}
+
+	if (u.m_nNewEntity > u.m_nOldEntity)
+	{
+		// If the entity was in the old list, but is not in the new list 
+		// (newnum == 9999), then construct a special remove message.
+		u.m_UpdateType = LeavePVS;
+		return;
+	}
+
+	if (u.m_nNewEntity != u.m_nOldEntity) {
+		Error("state error");
+	}
+
+	Assert(GetSnapshotEntry(u.m_pToSnapshot, u.m_nNewEntity)->m_pClass);
+
+	bool recreate = NeedsExplicitCreate(u);
+
+	if (recreate)
+	{
+		u.m_UpdateType = EnterPVS;
+		return;
+	}
+
+	// These should be the same! If they're not, then it should detect an explicit create message.
+	//Assert(u.m_pOldPack->m_pServerClass == u.m_pNewPack->m_pServerClass);
+
+	// We can early out with the delta bits if we are using the same pack handles...
+	if (g_pPackedEntityManager->IsSamePackedEntity(u))//u.m_pOldPack == u.m_pNewPack
+	{
+		//Assert(u.m_pOldPack != NULL);
+		u.m_UpdateType = PreserveEnt;
+		return;
+	}
+
+#ifndef _X360
+	int nBits;
+#if defined( REPLAY_ENABLED )
+	if (!u.m_bCullProps && (hltv || replay))
+	{
+		unsigned char* pBuffer = hltv ? hltv->m_DeltaCache.FindDeltaBits(u.m_nNewEntity, u.m_pFromSnapshot->m_nTickCount, nBits)
+			: replay->m_DeltaCache.FindDeltaBits(u.m_nNewEntity, u.m_pFromSnapshot->m_nTickCount, nBits);
+#else
+	if (!u.m_bCullProps && hltv)
+	{
+		unsigned char* pBuffer = hltv->m_DeltaCache.FindDeltaBits(u.m_nNewEntity, u.m_pFromSnapshot->m_nTickCount, nBits);
+#endif
+
+		if (pBuffer)
+		{
+			if (nBits > 0)
+			{
+				// Write a header.
+				WriteDeltaHeader(u, u.m_nNewEntity, FHDR_ZERO);
+
+				// just write the cached bit stream 
+				u.m_pBuf->WriteBits(pBuffer, nBits);
+
+				u.m_UpdateType = DeltaEnt;
+			}
+			else
+			{
+				u.m_UpdateType = PreserveEnt;
+			}
+
+			return; // we used the cache, great
+		}
+	}
+#endif
+
+	int checkProps[MAX_DATATABLE_PROPS];
+	int nCheckProps = 0;
+	g_pPackedEntityManager->GetChangedProps(u, checkProps, nCheckProps, ARRAYSIZE(checkProps));
+
+	if (nCheckProps > 0)
+	{
+		// Write a header.
+		WriteDeltaHeader(u, u.m_nNewEntity, FHDR_ZERO);
+#if defined( DEBUG_NETWORKING )
+		int startBit = u.m_pBuf->GetNumBitsWritten();
+#endif
+		g_pPackedEntityManager->WriteDeltaEnt(pClient, u, checkProps, nCheckProps);
+#if defined( DEBUG_NETWORKING )
+		int endBit = u.m_pBuf->GetNumBitsWritten();
+		TRACE_PACKET(("    Delta Bits (%d) = %d (%d bytes)\n", u.m_nNewEntity, (endBit - startBit), ((endBit - startBit) + 7) / 8));
+#endif
+		// If the numbers are the same, then the entity was in the old and new packet.
+		// Just delta compress the differences.
+		u.m_UpdateType = DeltaEnt;
+	}
+	else
+	{
+#ifndef _X360
+		if (!u.m_bCullProps)
+		{
+			if (hltv)
+			{
+				// no bits changed, PreserveEnt
+				hltv->m_DeltaCache.AddDeltaBits(u.m_nNewEntity, u.m_pFromSnapshot->m_nTickCount, 0, NULL);
+			}
+
+#if defined( REPLAY_ENABLED )
+			if (replay)
+			{
+				// no bits changed, PreserveEnt
+				replay->m_DeltaCache.AddDeltaBits(u.m_nNewEntity, u.m_pFromSnapshot->m_nTickCount, 0, NULL);
+			}
+#endif
+		}
+#endif
+		u.m_UpdateType = PreserveEnt;
+	}
+}
+
+//static inline void SV_WriteEnterPVS(CEntityWriteInfo& u)
+//{
+//	
+//
+//}
+
+//-----------------------------------------------------------------------------
+// Purpose: Entity wasn't dealt with in packet, but it has been deleted, we'll flag
+//  the entity for destruction
+// Input  : type - 
+//			entnum - 
+//			*from - 
+//			*to - 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool CFrameSnapshotManager::NeedsExplicitDestroy(int entnum, CFrameSnapshot* from, CFrameSnapshot* to)
+{
+	// Never on uncompressed packet
+
+	if (entnum >= to->m_nNumEntities || g_pPackedEntityManager->GetSnapshotEntry(to, entnum)->m_pClass == NULL) // doesn't exits in new
+	{
+		if (entnum >= from->m_nNumEntities)
+			return false; // didn't exist in old
+
+		// in old, but not in new, destroy.
+		if (g_pPackedEntityManager->GetSnapshotEntry(from, entnum)->m_pClass != NULL)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void CFrameSnapshotManager::WriteLeavePVS(CEntityWriteInfo& u)
+{
+	int headerflags = FHDR_LEAVEPVS;
+	bool deleteentity = false;
+
+	if (u.m_bAsDelta)
+	{
+		deleteentity = NeedsExplicitDestroy(u.m_nOldEntity, u.m_pFromSnapshot, u.m_pToSnapshot);
+	}
+
+	if (deleteentity)
+	{
+		// Mark that we handled deletion of this index
+		u.m_DeletionFlags.Set(u.m_nOldEntity);
+
+		headerflags |= FHDR_DELETE;
+	}
+
+	TRACE_PACKET(("  SV Leave PVS (%d) %s %s\n", u.m_nOldEntity,
+		deleteentity ? "deleted" : "left pvs",
+		u.m_pOldPack->m_pServerClass->m_pNetworkName));
+
+	WriteDeltaHeader(u, u.m_nOldEntity, headerflags);
+
+	u.NextOldEntity();
+}
+
+void CFrameSnapshotManager::WriteDeltaEnt(CEntityWriteInfo& u)
+{
+	TRACE_PACKET(("  SV Delta PVS (%d %d) %s\n", u.m_nNewEntity, u.m_nOldEntity, u.m_pOldPack->m_pServerClass->m_pNetworkName));
+
+	// NOTE: it was already written in DetermineUpdateType. By doing it this way, we avoid an expensive
+	// (non-byte-aligned) copy of the data.
+
+	u.NextOldEntity();
+	u.NextNewEntity();
+}
+
+void CFrameSnapshotManager::WritePreserveEnt(CEntityWriteInfo& u)
+{
+	TRACE_PACKET(("  SV Preserve PVS (%d) %s\n", u.m_nOldEntity, u.m_pOldPack->m_pServerClass->m_pNetworkName));
+
+	// updateType is preserveEnt. The client will detect this because our next entity will have a newnum
+	// that is greater than oldnum, in which case the client just keeps the current entity alive.
+	u.NextOldEntity();
+	u.NextNewEntity();
+}
+
+void CFrameSnapshotManager::WriteEntityUpdate(CBaseClient* pClient, CEntityWriteInfo& u)
+{
+	switch (u.m_UpdateType)
+	{
+	case EnterPVS:
+	{
+		TRACE_PACKET(("  SV Enter PVS (%d) %s\n", u.m_nNewEntity, u.m_pNewPack->m_pServerClass->m_pNetworkName));
+
+		WriteDeltaHeader(u, u.m_nNewEntity, FHDR_ENTERPVS);
+		//SV_WriteEnterPVS(u);
+		g_pPackedEntityManager->WriteEnterPVS(pClient, u);
+	}
+	break;
+
+	case LeavePVS:
+	{
+		WriteLeavePVS(u);
+	}
+	break;
+
+	case DeltaEnt:
+	{
+		WriteDeltaEnt(u);
+	}
+	break;
+
+	case PreserveEnt:
+	{
+		WritePreserveEnt(u);
+	}
+	break;
+	}
+}
+
+int CFrameSnapshotManager::WriteDeletions(CEntityWriteInfo& u)
+{
+	if (!u.m_bAsDelta)
+		return 0;
+
+	int nNumDeletions = 0;
+
+	CFrameSnapshot* pFromSnapShot = u.m_pFromSnapshot;
+	CFrameSnapshot* pToSnapShot = u.m_pToSnapshot;
+
+	int nLast = MAX(pFromSnapShot->m_nNumEntities, pToSnapShot->m_nNumEntities);
+	for (int i = 0; i < nLast; i++)
+	{
+		// Packet update didn't clear it out expressly
+		if (u.m_DeletionFlags.Get(i))
+			continue;
+
+		// If the entity is marked to transmit in the u.m_pTo, then it can never be destroyed by the m_iExplicitDeleteSlots
+		// Another possible fix would be to clear any slots in the explicit deletes list that were actually occupied when a snapshot was taken
+		if (u.m_pTo->transmit_entity.Get(i))
+			continue;
+
+		// Looks like it should be gone
+		bool bNeedsExplicitDelete = NeedsExplicitDestroy(i, pFromSnapShot, pToSnapShot);
+		if (!bNeedsExplicitDelete && u.m_pTo)
+		{
+			bNeedsExplicitDelete = (pToSnapShot->m_iExplicitDeleteSlots.Find(i) != pToSnapShot->m_iExplicitDeleteSlots.InvalidIndex());
+			// We used to do more stuff here as a sanity check, but I don't think it was necessary since the only thing that would unset the bould would be a "recreate" in the same slot which is
+			// already implied by the u.m_pTo->transmit_entity.Get(i) check
+			if (bNeedsExplicitDelete) {
+				int aaa = 0;
+			}
+		}
+
+		// Check conditions
+		if (bNeedsExplicitDelete)
+		{
+			TRACE_PACKET(("  SV Explicit Destroy (%d)\n", i));
+
+			u.m_pBuf->WriteOneBit(1);
+			u.m_pBuf->WriteUBitLong(i, MAX_EDICT_BITS);
+			++nNumDeletions;
+		}
+	}
+	// No more entities..
+	u.m_pBuf->WriteOneBit(0);
+
+	return nNumDeletions;
+}
+
+/*
+=============
+WritePacketEntities
+
+Computes either a compressed, or uncompressed delta buffer for the client.
+Returns the size IN BITS of the message buffer created.
+=============
+*/
+
+void CFrameSnapshotManager::WriteDeltaEntities(CBaseClient* pClient, CClientFrame* to, CClientFrame* from, bf_write& pBuf)
+{
+	VPROF_BUDGET("CBaseServer::WriteDeltaEntities", VPROF_BUDGETGROUP_OTHER_NETWORKING);
+	// Setup the CEntityWriteInfo structure.
+	CEntityWriteInfo u;
+	u.m_pBuf = &pBuf;
+	u.m_pTo = to;
+	u.m_pToSnapshot = to->GetSnapshot();
+
+	//CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = g_pPackedEntityManager->GetClientSnapshotEntryInfo(client);
+
+	//u.m_pBaselineEntities = pClientSnapshotEntryInfo->m_pBaselineEntities;
+	//u.m_nNumBaselineEntities = pClientSnapshotEntryInfo->m_nNumBaselineEntities;
+	u.m_nFullProps = 0;
+	//u.m_pServer = &sv;
+	//u.m_pClient = client;
+#ifndef _XBOX
+	if (sv.IsHLTV() || sv.IsReplay())
+	{
+		// cull props only on master proxy
+		u.m_bCullProps = sv.IsActive();
+	}
+	else
+#endif
+	{
+		u.m_bCullProps = true;	// always cull props for players
+	}
+
+	if (from != NULL)
+	{
+		u.m_bAsDelta = true;
+		u.m_pFrom = from;
+		u.m_pFromSnapshot = from->GetSnapshot();
+		Assert(u.m_pFromSnapshot);
+	}
+	else
+	{
+		u.m_bAsDelta = false;
+		u.m_pFrom = NULL;
+		u.m_pFromSnapshot = NULL;
+	}
+
+	u.m_nHeaderCount = 0;
+	//	u.m_nTotalGap = 0;
+	//	u.m_nTotalGapCount = 0;
+
+		// set from_baseline pointer if this snapshot may become a baseline update
+	if (GetClientSnapshotInfo(pClient)->m_nBaselineUpdateTick == -1)
+	{
+		GetClientSnapshotInfo(pClient)->m_BaselinesSent.ClearAll();
+		u.from_baseline = &GetClientSnapshotInfo(pClient)->m_BaselinesSent;
+	}
+
+	// Write the header, TODO use class SVC_PacketEntities
+
+	TRACE_PACKET(("WriteDeltaEntities (%d)\n", u.m_pToSnapshot->m_nNumEntities));
+
+	u.m_pBuf->WriteUBitLong(svc_PacketEntities, NETMSG_TYPE_BITS);
+
+	u.m_pBuf->WriteUBitLong(u.m_pToSnapshot->m_nNumEntities, MAX_EDICT_BITS);
+
+	if (u.m_bAsDelta)
+	{
+		u.m_pBuf->WriteOneBit(1); // use delta sequence
+
+		u.m_pBuf->WriteLong(u.m_pFrom->tick_count);    // This is the sequence # that we are updating from.
+	}
+	else
+	{
+		u.m_pBuf->WriteOneBit(0);	// use baseline
+	}
+
+	u.m_pBuf->WriteUBitLong(GetClientSnapshotInfo(pClient)->m_nBaselineUsed, 1);	// tell client what baseline we are using
+
+	// Store off current position 
+	bf_write savepos = *u.m_pBuf;
+
+	// Save room for number of headers to parse, too
+	u.m_pBuf->WriteUBitLong(0, MAX_EDICT_BITS + DELTASIZE_BITS + 1);
+
+	int startbit = u.m_pBuf->GetNumBitsWritten();
+
+	bool bIsTracing = pClient->IsTracing();
+	if (bIsTracing)
+	{
+		pClient->TraceNetworkData(pBuf, "Delta Entities Overhead");
+	}
+
+	// Don't work too hard if we're using the optimized single-player mode.
+	if (!g_pLocalNetworkBackdoor)
+	{
+		// Iterate through the in PVS bitfields until we find an entity 
+		// that was either in the old pack or the new pack
+		u.NextOldEntity();
+		u.NextNewEntity();
+
+		while ((u.m_nOldEntity != ENTITY_SENTINEL) || (u.m_nNewEntity != ENTITY_SENTINEL))
+		{
+			//u.m_pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity(u.m_pToSnapshot, u.m_nNewEntity) : NULL;
+			//u.m_pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity(u.m_pFromSnapshot, u.m_nOldEntity) : NULL;
+			int nEntityStartBit = pBuf.GetNumBitsWritten();
+			int oldEntityIndex = u.m_nOldEntity;
+			int newEntityIndex = u.m_nNewEntity;
+
+			// Figure out how we want to write this entity.
+			DetermineUpdateType(pClient, u);
+			WriteEntityUpdate(pClient, u);
+
+			if (!bIsTracing)
+				continue;
+
+			PackedEntity* pNewPack = (newEntityIndex != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity(u.m_pToSnapshot, newEntityIndex) : NULL;
+			PackedEntity* pOldPack = (oldEntityIndex != ENTITY_SENTINEL) ? g_pPackedEntityManager->GetPackedEntity(u.m_pFromSnapshot, oldEntityIndex) : NULL;
+			switch (u.m_UpdateType)
+			{
+			default:
+			case PreserveEnt:
+				break;
+			case EnterPVS:
+			{
+				char const* eString = serverEntitylist->GetServerEntity(pNewPack->m_nEntityIndex)->GetClassName();
+				pClient->TraceNetworkData(pBuf, "enter [%s]", eString);
+				ETWMark1I(eString, pBuf.GetNumBitsWritten() - nEntityStartBit);
+			}
+			break;
+			case LeavePVS:
+			{
+				// Note, can't use GetNetworkable() since the edict has been freed at this point
+				char const* eString = pOldPack->m_pServerClass->m_pNetworkName;
+				pClient->TraceNetworkData(pBuf, "leave [%s]", eString);
+				ETWMark1I(eString, pBuf.GetNumBitsWritten() - nEntityStartBit);
+			}
+			break;
+			case DeltaEnt:
+			{
+				char const* eString = serverEntitylist->GetServerEntity(pOldPack->m_nEntityIndex)->GetClassName();
+				pClient->TraceNetworkData(pBuf, "delta [%s]", eString);
+				ETWMark1I(eString, pBuf.GetNumBitsWritten() - nEntityStartBit);
+			}
+			break;
+			}
+		}
+
+		if (u.m_nOldEntity == ENTITY_SENTINEL && u.m_nNewEntity == ENTITY_SENTINEL) {
+
+		}
+		else {
+			Error("state error");
+		}
+
+		// Now write out the express deletions
+		int nNumDeletions = WriteDeletions(u);
+		if (bIsTracing)
+		{
+			pClient->TraceNetworkData(pBuf, "Delta: [%d] deletions", nNumDeletions);
+		}
+	}
+
+	// get number of written bits
+	int length = u.m_pBuf->GetNumBitsWritten() - startbit;
+
+	// go back to header and fill in correct length now
+	savepos.WriteUBitLong(u.m_nHeaderCount, MAX_EDICT_BITS);
+	savepos.WriteUBitLong(length, DELTASIZE_BITS);
+
+	bool bUpdateBaseline = ((GetClientSnapshotInfo(pClient)->m_nBaselineUpdateTick == -1) &&
+		(u.m_nFullProps > 0 || !u.m_bAsDelta));
+
+	if (u.m_nFullProps > 0) {
+	
+	}
+	else {
+		int aaa = 0;
+	}
+
+	if (bUpdateBaseline)// && u.m_pBaselineEntities
+	{
+		// tell client to use this snapshot as baseline update
+		savepos.WriteOneBit(1);
+		GetClientSnapshotInfo(pClient)->m_nBaselineUpdateTick = to->tick_count;
+	}
+	else
+	{
+		savepos.WriteOneBit(0);
+	}
+
+	if (bIsTracing)
+	{
+		pClient->TraceNetworkData(pBuf, "Delta Finish");
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Writes events to the client's network buffer
+// Input  : *cl -
+//			*pack -
+//			*msg -
+//-----------------------------------------------------------------------------
+static ConVar sv_debugtempentities("sv_debugtempentities", "0", 0, "Show temp entity bandwidth usage.");
+
+static bool CEventInfo_LessFunc(CEventInfo* const& lhs, CEventInfo* const& rhs)
+{
+	return lhs->classID < rhs->classID;
+}
+
+void CFrameSnapshotManager::WriteTempEntities(CBaseClient* pClient, CFrameSnapshot* pCurrentSnapshot, CFrameSnapshot* pLastSnapshot, bf_write& buf, int ev_max)
+{
+	VPROF_BUDGET("CBaseServer::WriteTempEntities", VPROF_BUDGETGROUP_OTHER_NETWORKING);
+
+	ALIGN4 char data[NET_MAX_PAYLOAD] ALIGN4_POST;
+	SVC_TempEntities msg;
+	msg.m_DataOut.StartWriting(data, sizeof(data));
+	bf_write& buffer = msg.m_DataOut; // shortcut
+
+	CFrameSnapshot* pSnapshot;
+	CEventInfo* pLastEvent = NULL;
+
+	bool bDebug = sv_debugtempentities.GetBool();
+
+	// limit max entities to field bit length
+	ev_max = min(ev_max, ((1 << CEventInfo::EVENT_INDEX_BITS) - 1));
+
+	if (pLastSnapshot)
+	{
+		pSnapshot = pLastSnapshot->NextSnapshot();
+	}
+	else
+	{
+		pSnapshot = pCurrentSnapshot;
+	}
+
+	CUtlRBTree< CEventInfo* >	sorted(0, ev_max, CEventInfo_LessFunc);
+
+	// Build list of events sorted by send table classID (makes the delta work better in cases with a lot of the same message type )
+	while (pSnapshot && ((int)sorted.Count() < ev_max))
+	{
+		for (int i = 0; i < pSnapshot->m_nTempEntities; ++i)
+		{
+			CEventInfo* event = pSnapshot->m_pTempEntities[i];
+
+			if (pClient->IgnoreTempEntity(event))
+				continue; // event is not seen by this player
+
+			sorted.Insert(event);
+			// More space still
+			if ((int)sorted.Count() >= ev_max)
+				break;
+		}
+
+		// stop, we reached our current snapshot
+		if (pSnapshot == pCurrentSnapshot)
+			break;
+
+		// got to next snapshot
+		pSnapshot = NextSnapshot(pSnapshot);
+	}
+
+	if (sorted.Count() <= 0)
+		return;
+
+	for (int i = sorted.FirstInorder();
+		i != sorted.InvalidIndex();
+		i = sorted.NextInorder(i))
+	{
+		CEventInfo* event = sorted[i];
+
+		if (event->fire_delay == 0.0f)
+		{
+			buffer.WriteOneBit(0);
+		}
+		else
+		{
+			buffer.WriteOneBit(1);
+			buffer.WriteSBitLong(event->fire_delay * 100.0f, 8);
+		}
+
+		if (pLastEvent &&
+			pLastEvent->classID == event->classID)
+		{
+			buffer.WriteOneBit(0); // delta against last temp entity
+
+			int startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
+
+			SendTable_WriteAllDeltaProps(event->pSendTable,
+				pLastEvent->pData,
+				pLastEvent->bits,
+				event->pData,
+				event->bits,
+				-1,
+				&buffer);
+
+			if (bDebug)
+			{
+				int length = buffer.GetNumBitsWritten() - startBit;
+				DevMsg("TE %s delta bits: %i\n", event->pSendTable->GetName(), length);
+			}
+		}
+		else
+		{
+			// full update, just compressed against zeros in MP
+
+			buffer.WriteOneBit(1);
+
+			int startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
+
+			buffer.WriteUBitLong(event->classID, sv.GetClassBits());
+
+			if (sv.IsMultiplayer())
+			{
+				SendTable_WriteAllDeltaProps(event->pSendTable,
+					NULL,	// will write only non-zero elements
+					0,
+					event->pData,
+					event->bits,
+					-1,
+					&buffer);
+			}
+			else
+			{
+				// write event with zero properties
+				buffer.WriteBits(event->pData, event->bits);
+			}
+
+			if (bDebug)
+			{
+				int length = buffer.GetNumBitsWritten() - startBit;
+				DevMsg("TE %s full bits: %i\n", event->pSendTable->GetName(), length);
+			}
+		}
+
+		if (sv.IsMultiplayer())
+		{
+			// in single player, don't used delta compression, lastEvent remains NULL
+			pLastEvent = event;
+		}
+	}
+
+	// set num entries
+	msg.m_nNumEntries = sorted.Count();
+	msg.WriteToBuffer(buf);
 }
 
 CClientSnapshotInfo* CFrameSnapshotManager::GetClientSnapshotInfo(CBaseClient* pClient) {

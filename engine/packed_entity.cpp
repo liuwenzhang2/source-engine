@@ -18,7 +18,7 @@
 #include "dt_send.h"
 #include "dt_send_eng.h"
 #include "server_class.h"
-#include "framesnapshot.h";
+#include "framesnapshot.h"
 #include "server_pch.h"
 #include "sys_dll.h"
 #include "dt_send_eng.h"
@@ -28,6 +28,7 @@
 #if defined( REPLAY_ENABLED )
 #include "replayserver.h"
 #endif
+#include "dt_instrumentation_server.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -142,7 +143,7 @@ PackedEntityManager::PackedEntityManager() : m_PackedEntitiesPool(MAX_EDICTS / 1
 PackedEntityManager::~PackedEntityManager() {
 	// TODO: This assert has been failing. HenryG says it's a valid assert and that we're probably leaking memory.
 	AssertMsg1(m_PackedEntitiesPool.Count() == 0 || IsInErrorExit(), "Expected m_PackedEntitiesPool to be empty. It had %i items.", m_PackedEntitiesPool.Count());
-	m_ClientSnapshotEntryInfo.Purge();
+	m_ClientBaselineInfo.Purge();
 }
 
 void PackedEntityManager::OnLevelChanged() {
@@ -211,6 +212,77 @@ void PackedEntityManager::AddEntityReference(PackedEntity* pPackedEntity)
 {
 	Assert(pPackedEntity != INVALID_PACKED_ENTITY_HANDLE);
 	pPackedEntity->m_ReferenceCount++;
+}
+
+// compresses a packed entity, returns data & bits
+const char* PackedEntityManager::CompressPackedEntity(ServerClass* pServerClass, const char* data, int& bits)
+{
+	ALIGN4 static char s_packedData[MAX_PACKEDENTITY_DATA] ALIGN4_POST;
+
+	bf_write writeBuf("CompressPackedEntity", s_packedData, sizeof(s_packedData));
+
+	const void* pBaselineData = NULL;
+	int nBaselineBits = 0;
+
+	Assert(pServerClass != NULL);
+
+	sv.GetClassBaseline(pServerClass, &pBaselineData, &nBaselineBits);
+	nBaselineBits *= 8;
+
+	Assert(pBaselineData != NULL);
+
+	SendTable_WriteAllDeltaProps(
+		pServerClass->m_pTable,
+		pBaselineData,
+		nBaselineBits,
+		data,
+		bits,
+		-1,
+		&writeBuf);
+
+	//overwrite in bits with out bits
+	bits = writeBuf.GetNumBitsWritten();
+
+	return s_packedData;
+}
+
+// uncompresses a 
+const char* PackedEntityManager::UncompressPackedEntity(PackedEntity* pPackedEntity, int& bits)
+{
+	UnpackedDataCache_t* pdc = GetCachedUncompressedEntity(pPackedEntity);
+
+	if (pdc->bits > 0)
+	{
+		// found valid uncompressed version in cache
+		bits = pdc->bits;
+		return pdc->data;
+	}
+
+	// not in cache, so uncompress it
+
+	const void* pBaseline;
+	int nBaselineBytes = 0;
+
+	sv.GetClassBaseline(pPackedEntity->m_pServerClass, &pBaseline, &nBaselineBytes);
+
+	Assert(pBaseline != NULL);
+
+	// store this baseline in u.m_pUpdateBaselines
+	bf_read oldBuf("UncompressPackedEntity1", pBaseline, nBaselineBytes);
+	bf_read newBuf("UncompressPackedEntity2", pPackedEntity->GetData(), Bits2Bytes(pPackedEntity->GetNumBits()));
+	bf_write outBuf("UncompressPackedEntity3", pdc->data, MAX_PACKEDENTITY_DATA);
+
+	Assert(pPackedEntity->m_pClientClass);
+
+	RecvTable_MergeDeltas(
+		pPackedEntity->m_pClientClass->m_pRecvTable,
+		&oldBuf,
+		&newBuf,
+		&outBuf);
+
+	bits = pdc->bits = outBuf.GetNumBitsWritten();
+
+	return pdc->data;
 }
 
 // ------------------------------------------------------------------------------------------------ //
@@ -422,43 +494,45 @@ PackedEntity* PackedEntityManager::GetPreviouslySentPacket(int iEntity, int iSer
 
 void	PackedEntityManager::OnClientConnected(CBaseClient* pClient) {
 	CheckClientSnapshotEntryArray(pClient->m_nClientSlot);
-	CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = &m_ClientSnapshotEntryInfo.Element(pClient->m_nClientSlot);
-	pClientSnapshotEntryInfo->m_BaselinesSent.ClearAll();
+	CClientBaselineInfo* pClientBaselineInfo = &m_ClientBaselineInfo.Element(pClient->m_nClientSlot);
 }
 
 void	PackedEntityManager::FreeClientBaselines(CBaseClient* pClient) {
 	CheckClientSnapshotEntryArray(pClient->m_nClientSlot);
-	CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = &m_ClientSnapshotEntryInfo.Element(pClient->m_nClientSlot);
-	pClientSnapshotEntryInfo->m_BaselinesSent.ClearAll();
-	if (pClientSnapshotEntryInfo->m_pBaselineEntities)
+	CClientBaselineInfo* pClientBaselineInfo = &m_ClientBaselineInfo.Element(pClient->m_nClientSlot);
+	if (pClientBaselineInfo->m_pPackedEntities)
 	{
 		//m_pBaseline->ReleaseReference();
-		for (int i = 0; i < pClientSnapshotEntryInfo->m_nNumBaselineEntities; ++i)
+		for (int i = 0; i < pClientBaselineInfo->m_nNumPackedEntities; ++i)
 		{
-			if (pClientSnapshotEntryInfo->m_pBaselineEntities[i].m_pPackedData != INVALID_PACKED_ENTITY_HANDLE)
+			if (pClientBaselineInfo->m_pPackedEntities[i] != INVALID_PACKED_ENTITY_HANDLE)
 			{
-				RemoveEntityReference(pClientSnapshotEntryInfo->m_pBaselineEntities[i].m_pPackedData);
+				RemoveEntityReference(pClientBaselineInfo->m_pPackedEntities[i]);
 			}
 		}
 		//m_pBaseline = NULL;
-		delete[] pClientSnapshotEntryInfo->m_pBaselineEntities;
-		pClientSnapshotEntryInfo->m_pBaselineEntities = null;
-		pClientSnapshotEntryInfo->m_nNumBaselineEntities = 0;
+		delete[] pClientBaselineInfo->m_pPackedEntities;
+		pClientBaselineInfo->m_pPackedEntities = null;
+		pClientBaselineInfo->m_nNumPackedEntities = 0;
 	}
 }
 
 void	PackedEntityManager::AllocClientBaselines(CBaseClient* pClient) {
 	CheckClientSnapshotEntryArray(pClient->m_nClientSlot);
-	CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = &m_ClientSnapshotEntryInfo.Element(pClient->m_nClientSlot);
-	pClientSnapshotEntryInfo->m_pBaselineEntities = new CFrameSnapshotEntry[MAX_EDICTS];
-	pClientSnapshotEntryInfo->m_nNumBaselineEntities = MAX_EDICTS;
+	CClientBaselineInfo* pClientBaselineInfo = &m_ClientBaselineInfo.Element(pClient->m_nClientSlot);
+	pClientBaselineInfo->m_pPackedEntities = new PackedEntity*[MAX_EDICTS];
+	for (int i = 0; i < MAX_EDICTS; i++) {
+		pClientBaselineInfo->m_pPackedEntities[i] = INVALID_PACKED_ENTITY_HANDLE;
+	}
+	pClientBaselineInfo->m_nNumPackedEntities = MAX_EDICTS;
 }
 
 bool	PackedEntityManager::ProcessBaselineAck(CBaseClient* pClient, CFrameSnapshot* pSnapshot) {
 	CheckClientSnapshotEntryArray(pClient->m_nClientSlot);
-	CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = &m_ClientSnapshotEntryInfo.Element(pClient->m_nClientSlot);
+	CClientSnapshotInfo* pClientSnapshotInfo = framesnapshotmanager->GetClientSnapshotInfo(pClient);
+	CClientBaselineInfo* pClientBaselineInfo = &m_ClientBaselineInfo.Element(pClient->m_nClientSlot);
 	
-	int index = pClientSnapshotEntryInfo->m_BaselinesSent.FindNextSetBit(0);
+	int index = pClientSnapshotInfo->m_BaselinesSent.FindNextSetBit(0);
 
 	while (index >= 0)
 	{
@@ -470,7 +544,7 @@ bool	PackedEntityManager::ProcessBaselineAck(CBaseClient* pClient, CFrameSnapsho
 			return false;
 		}
 
-		PackedEntity* hOldPackedEntity = pClientSnapshotEntryInfo->m_pBaselineEntities[index].m_pPackedData;//m_pBaseline->
+		PackedEntity* hOldPackedEntity = pClientBaselineInfo->m_pPackedEntities[index];//m_pBaseline->
 
 		if (hOldPackedEntity != INVALID_PACKED_ENTITY_HANDLE)
 		{
@@ -482,71 +556,275 @@ bool	PackedEntityManager::ProcessBaselineAck(CBaseClient* pClient, CFrameSnapsho
 		AddEntityReference(hNewPackedEntity);
 
 		// copy entity handle, class & serial number to
-		pClientSnapshotEntryInfo->m_pBaselineEntities[index] = *GetSnapshotEntry(pSnapshot, index);//m_pBaseline->
+		pClientBaselineInfo->m_pPackedEntities[index] = GetSnapshotEntry(pSnapshot, index)->m_pPackedData;//m_pBaseline->
 
 		// go to next entity
-		index = pClientSnapshotEntryInfo->m_BaselinesSent.FindNextSetBit(index + 1);
+		index = pClientSnapshotInfo->m_BaselinesSent.FindNextSetBit(index + 1);
+	}
+	return true;
+}
+
+bool PackedEntityManager::IsSamePackedEntity(CEntityWriteInfo& u) {
+	CFrameSnapshotEntry* oldFrameSnapshotEntry = GetSnapshotEntry(u.m_pFromSnapshot, u.m_nOldEntity);
+	CFrameSnapshotEntry* toFrameSnapshotEntry = GetSnapshotEntry(u.m_pToSnapshot, u.m_nNewEntity);
+	return oldFrameSnapshotEntry == toFrameSnapshotEntry;
+}
+
+void PackedEntityManager::GetChangedProps(CEntityWriteInfo& u, int* checkProps, int& nCheckProps, int nMaxCheckProps) {
+	
+	PackedEntity* pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pToSnapshot, u.m_nNewEntity) : NULL;
+	PackedEntity* pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pFromSnapshot, u.m_nOldEntity) : NULL;
+	
+	nCheckProps = pNewPack->GetPropsChangedAfterTick(u.m_pFromSnapshot->m_nTickCount, checkProps, nMaxCheckProps);
+
+	if (nCheckProps == -1)
+	{
+		// check failed, we have to recalc delta props based on from & to snapshot
+		// that should happen only in HLTV/Replay demo playback mode, this code is really expensive
+
+		const void* pOldData, * pNewData;
+		int nOldBits, nNewBits;
+
+		if (pOldPack->IsCompressed())
+		{
+			pOldData = UncompressPackedEntity(pOldPack, nOldBits);
+		}
+		else
+		{
+			pOldData = pOldPack->GetData();
+			nOldBits = pOldPack->GetNumBits();
+		}
+
+		if (pNewPack->IsCompressed())
+		{
+			pNewData = UncompressPackedEntity(pNewPack, nNewBits);
+		}
+		else
+		{
+			pNewData = pNewPack->GetData();
+			nNewBits = pNewPack->GetNumBits();
+		}
+
+		nCheckProps = SendTable_CalcDelta(
+			pOldPack->m_pServerClass->m_pTable,
+			pOldData,
+			nOldBits,
+			pNewData,
+			nNewBits,
+			checkProps,
+			nMaxCheckProps,
+			u.m_nNewEntity
+		);
+	}
+
+#ifndef NO_VCR
+	if (vcr_verbose.GetInt())
+	{
+		VCRGenericValueVerify("checkProps", checkProps, sizeof(checkProps[0]) * nCheckProps);
+	}
+#endif
+}
+
+void PackedEntityManager::WriteDeltaEnt(CBaseClient* pClient, CEntityWriteInfo& u, const int* pCheckProps, const int nCheckProps) {
+	
+	PackedEntity* pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pToSnapshot, u.m_nNewEntity) : NULL;
+	PackedEntity* pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pFromSnapshot, u.m_nOldEntity) : NULL;
+	//PackedEntity* pTo = u.m_pNewPack;
+	//PackedEntity* pFrom = u.m_pOldPack;
+	SendTable* pSendTable = pNewPack->m_pServerClass->m_pTable;
+
+	CServerDTITimer timer(pSendTable, SERVERDTI_WRITE_DELTA_PROPS);
+	if (g_bServerDTIEnabled && !sv.IsHLTV() && !sv.IsReplay())
+	{
+		ICollideable* pEnt = serverEntitylist->GetServerEntity(pNewPack->m_nEntityIndex)->GetCollideable();
+		ICollideable* pClientEnt = serverEntitylist->GetServerEntity(pClient->m_nEntityIndex)->GetCollideable();
+		if (pEnt && pClientEnt)
+		{
+			float flDist = (pEnt->GetCollisionOrigin() - pClientEnt->GetCollisionOrigin()).Length();
+			ServerDTI_AddEntityEncodeEvent(pSendTable, flDist);
+		}
+	}
+
+	const void* pToData;
+	int nToBits;
+
+	if (pNewPack->IsCompressed())
+	{
+		// let server uncompress PackedEntity
+		pToData = UncompressPackedEntity(pNewPack, nToBits);
+	}
+	else
+	{
+		// get raw data direct
+		pToData = pNewPack->GetData();
+		nToBits = pNewPack->GetNumBits();
+	}
+
+	Assert(pToData != NULL);
+
+	// Cull out the properties that their proxies said not to send to this client.
+	int pSendProps[MAX_DATATABLE_PROPS];
+	const int* sendProps = pCheckProps;
+	int nSendProps = nCheckProps;
+	bf_write bufStart;
+
+
+	// cull properties that are removed by SendProxies for this client.
+	// don't do that for HLTV relay proxies
+	if (u.m_bCullProps)
+	{
+		sendProps = pSendProps;
+
+		nSendProps = SendTable_CullPropsFromProxies(
+			pSendTable,
+			pCheckProps,
+			nCheckProps,
+			pClient->m_nClientSlot,
+
+			pOldPack->GetRecipients(),
+			pOldPack->GetNumRecipients(),
+
+			pNewPack->GetRecipients(),
+			pNewPack->GetNumRecipients(),
+
+			pSendProps,
+			ARRAYSIZE(pSendProps)
+		);
+	}
+	else
+	{
+		// this is a HLTV relay proxy
+		bufStart = *u.m_pBuf;
+	}
+
+	SendTable_WritePropList(
+		pSendTable,
+		pToData,
+		nToBits,
+		u.m_pBuf,
+		pNewPack->m_nEntityIndex,
+
+		sendProps,
+		nSendProps
+	);
+
+	if (!u.m_bCullProps && hltv)
+	{
+		// this is a HLTV relay proxy, cache delta bits
+		int nBits = u.m_pBuf->GetNumBitsWritten() - bufStart.GetNumBitsWritten();
+		hltv->m_DeltaCache.AddDeltaBits(pNewPack->m_nEntityIndex, u.m_pFromSnapshot->m_nTickCount, nBits, &bufStart);
 	}
 }
 
-CClientSnapshotEntryInfo* PackedEntityManager::GetClientSnapshotEntryInfo(CBaseClient* pClient) {
-	CheckClientSnapshotEntryArray(pClient->m_nClientSlot);
-	CClientSnapshotEntryInfo* pClientSnapshotEntryInfo = &m_ClientSnapshotEntryInfo.Element(pClient->m_nClientSlot);
-	return pClientSnapshotEntryInfo;
+void PackedEntityManager::WriteEnterPVS(CBaseClient* pClient, CEntityWriteInfo& u) {
+
+	Assert(u.m_nNewEntity < u.m_pToSnapshot->m_nNumEntities);
+
+	PackedEntity* pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pToSnapshot, u.m_nNewEntity) : NULL;
+	PackedEntity* pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pFromSnapshot, u.m_nOldEntity) : NULL;
+
+	CFrameSnapshotEntry* entry = GetSnapshotEntry(u.m_pToSnapshot, u.m_nNewEntity);//u.m_pToSnapshot->m_pEntities
+
+	ServerClass* pClass = entry->m_pClass;
+
+	if (!pClass)
+	{
+		Host_Error("SV_CreatePacketEntities: GetEntServerClass failed for ent %d.\n", u.m_nNewEntity);
+		return;
+	}
+
+	TRACE_PACKET(("  SV Enter Class %s\n", pClass->m_pNetworkName));
+
+	if (pClass->m_ClassID >= sv.serverclasses)
+	{
+		ConMsg("pClass->m_ClassID(%i) >= %i\n", pClass->m_ClassID, sv.serverclasses);
+		Assert(0);
+	}
+
+	u.m_pBuf->WriteUBitLong(pClass->m_ClassID, sv.serverclassbits);
+
+	// Write some of the serial number's bits. 
+	u.m_pBuf->WriteUBitLong(entry->m_nSerialNumber, NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS);
+
+	if (u.from_baseline)
+	{
+		// remember that we sent this entity as full update from entity baseline
+		u.from_baseline->Set(u.m_nNewEntity);
+	}
+
+	CClientBaselineInfo* pClientBaselineInfo = &m_ClientBaselineInfo.Element(pClient->m_nClientSlot);
+	PackedEntity* hBaselinePackedEntity = pClientBaselineInfo->m_pPackedEntities[u.m_nNewEntity];
+
+	// Get the baseline.
+	// Since the ent is in the fullpack, then it must have either a static or an instance baseline.
+	PackedEntity* pBaseline = u.m_bAsDelta && hBaselinePackedEntity != INVALID_PACKED_ENTITY_HANDLE ? hBaselinePackedEntity : NULL;
+	const void* pFromData;
+	int nFromBits;
+
+	if (pBaseline && (pBaseline->m_pServerClass == pNewPack->m_pServerClass))
+	{
+		Assert(!pBaseline->IsCompressed());
+		pFromData = pBaseline->GetData();
+		nFromBits = pBaseline->GetNumBits();
+	}
+	else
+	{
+		// Since the ent is in the fullpack, then it must have either a static or an instance baseline.
+		int nFromBytes;
+		if (!sv.GetClassBaseline(pClass, &pFromData, &nFromBytes))
+		{
+			Error("SV_WriteEnterPVS: missing instance baseline for '%s'.", pClass->m_pNetworkName);
+		}
+
+		ErrorIfNot(pFromData,
+			("SV_WriteEnterPVS: missing pFromData for '%s'.", pClass->m_pNetworkName)
+		);
+
+		nFromBits = nFromBytes * 8;	// NOTE: this isn't the EXACT number of bits but that's ok since it's
+		// only used to detect if we overran the buffer (and if we do, it's probably
+		// by more than 7 bits).
+	}
+
+	const void* pToData;
+	int nToBits;
+
+	if (pNewPack->IsCompressed())
+	{
+		pToData = UncompressPackedEntity(pNewPack, nToBits);
+	}
+	else
+	{
+		pToData = pNewPack->GetData();
+		nToBits = pNewPack->GetNumBits();
+	}
+
+	/*if ( server->IsHLTV() || server->IsReplay() )
+	{*/
+	// send all changed properties when entering PVS (no SendProxy culling since we may use it as baseline
+	u.m_nFullProps += SendTable_WriteAllDeltaProps(pClass->m_pTable, pFromData, nFromBits,
+		pToData, nToBits, pNewPack->m_nEntityIndex, u.m_pBuf);
+	/*}
+	else
+	{
+		// remove all props that are excluded for this client
+		u.m_nFullProps += SV_CalcDeltaAndWriteProps( u, pFromData, nFromBits, u.m_pNewPack );
+	}*/
+
+	if (u.m_nNewEntity == u.m_nOldEntity)
+		u.NextOldEntity();  // this was a entity recreate
+
+	u.NextNewEntity();
 }
 
 void PackedEntityManager::CheckClientSnapshotEntryArray(int maxIndex) {
-	while (m_ClientSnapshotEntryInfo.Count() < maxIndex + 1) {
-		m_ClientSnapshotEntryInfo.AddToTail();
+	while (m_ClientBaselineInfo.Count() < maxIndex + 1) {
+		m_ClientBaselineInfo.AddToTail();
 	}
 }
 
 ConVar sv_debugmanualmode("sv_debugmanualmode", "0", 0, "Make sure entities correctly report whether or not their network data has changed.");
 
-// This function makes sure that this entity class has an instance baseline.
-// If it doesn't have one yet, it makes a new one.
-void SV_EnsureInstanceBaseline(ServerClass* pServerClass, const void* pData, int nBytes)//int iEdict, 
-{
-	//IServerEntity* pEnt = serverEntitylist->GetServerEntity(iEdict);
-	//ErrorIfNot(pEnt->GetNetworkable(),
-	//	("SV_EnsureInstanceBaseline: edict %d missing ent", iEdict)
-	//);
 
-	//ServerClass* pClass = pEnt->GetServerClass();
-
-	// See if we already have a baseline for this class.
-	if (pServerClass->m_InstanceBaselineIndex == INVALID_STRING_INDEX)
-	{
-		AUTO_LOCK(g_svInstanceBaselineMutex);
-
-		// We need this second check in case multiple instances of the same class have grabbed the lock.
-		if (pServerClass->m_InstanceBaselineIndex == INVALID_STRING_INDEX)
-		{
-			char idString[32];
-			Q_snprintf(idString, sizeof(idString), "%d", pServerClass->m_ClassID);
-
-			// Ok, make a new instance baseline so they can reference it.
-			int temp = sv.GetInstanceBaselineTable()->AddString(
-				true,
-				idString,	// Note we're sending a string with the ID number, not the class name.
-				nBytes,
-				pData);
-
-			// Insert a compiler and/or CPU memory barrier to ensure that all side-effects have
-			// been published before the index is published. Otherwise the string index may
-			// be visible before its initialization has finished. This potential problem is caused
-			// by the use of double-checked locking -- the problem is that the code outside of the
-			// lock is looking at the variable that is protected by the lock. See this article for details:
-			// http://en.wikipedia.org/wiki/Double-checked_locking
-			// Write-release barrier
-			ThreadMemoryBarrier();
-			pServerClass->m_InstanceBaselineIndex = temp;
-			Assert(pServerClass->m_InstanceBaselineIndex != INVALID_STRING_INDEX);
-		}
-	}
-	// Read-acquire barrier
-	ThreadMemoryBarrier();
-}
 
 void PackedEntityManager::InitPackedEntity(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity) {
 	int edictIdx = pServerEntity->entindex();
@@ -607,7 +885,7 @@ void PackedEntityManager::DoPackEntity(CFrameSnapshot* pSnapshot, IServerEntity*
 		VCRGenericValueVerify("writebuf", writeBuf.GetBasePointer(), writeBuf.GetNumBytesWritten() - 1);
 #endif
 
-	SV_EnsureInstanceBaseline(pServerClass, packedData, writeBuf.GetNumBytesWritten());// edictIdx, 
+	sv.SetClassBaseline(pServerClass, packedData, writeBuf.GetNumBytesWritten());// edictIdx, 
 
 	int nFlatProps = SendTable_GetNumFlatProps(pSendTable);
 	IChangeFrameList* pChangeFrame = NULL;

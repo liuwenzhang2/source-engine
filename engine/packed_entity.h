@@ -54,7 +54,7 @@ class IChangeFrameList;
 //class CFrameSnapshotEntry;
 class CFrameSnapshot;
 class CBaseClient;
-
+class CEntityWriteInfo;
 // Replaces entity_state_t.
 // This is what we send to clients.
 
@@ -223,18 +223,7 @@ public:
 	PackedEntity*			m_pPackedData = INVALID_PACKED_ENTITY_HANDLE;
 };
 
-class CClientSnapshotEntryInfo {
-public:
-	CClientSnapshotEntryInfo() {
-		m_BaselinesSent.ClearAll();
-		m_pBaselineEntities = NULL;
-		m_nNumBaselineEntities = 0;
-	}
-	// State information
-	CBitVec<MAX_EDICTS>		m_BaselinesSent;	// baselines sent with last update
-	CFrameSnapshotEntry*	m_pBaselineEntities = NULL;
-	int						m_nNumBaselineEntities = 0;
-};
+
 
 typedef struct
 {
@@ -261,6 +250,10 @@ public:
 
 	// if we are removeing a Packed Entity, we have to decrease the reference counter
 	void RemoveEntityReference(PackedEntity* pPackedEntity);
+
+	const char* CompressPackedEntity(ServerClass* pServerClass, const char* data, int& bits);
+
+	const char* UncompressPackedEntity(PackedEntity* pPackedEntity, int& size);
 
 	// Return the entity sitting in iEntity's slot if iSerialNumber matches its number.
 	UnpackedDataCache_t* GetCachedUncompressedEntity(PackedEntity* pPackedEntity);
@@ -294,7 +287,13 @@ public:
 
 	bool	ProcessBaselineAck(CBaseClient* pClient, CFrameSnapshot* pSnapshot);
 
-	CClientSnapshotEntryInfo* GetClientSnapshotEntryInfo(CBaseClient* pClient);
+	bool	IsSamePackedEntity(CEntityWriteInfo& u);
+
+	void	GetChangedProps(CEntityWriteInfo& u, int* checkProps, int& nCheckProps, int nMaxCheckProps);
+
+	void	WriteDeltaEnt(CBaseClient* pClient, CEntityWriteInfo& u, const int* pCheckProps, const int nCheckProps);
+
+	void	WriteEnterPVS(CBaseClient* pClient, CEntityWriteInfo& u);
 
 private:
 	void CheckClientSnapshotEntryArray(int maxIndex);
@@ -313,7 +312,17 @@ private:
 	PackedEntity*			m_pPackedData[MAX_EDICTS];
 	int						m_pSerialNumber[MAX_EDICTS];
 
-	CUtlVector<CClientSnapshotEntryInfo> m_ClientSnapshotEntryInfo;
+	class CClientBaselineInfo {
+	public:
+		CClientBaselineInfo() {
+			m_pPackedEntities = NULL;
+			m_nNumPackedEntities = 0;
+		}
+		// State information
+		PackedEntity** m_pPackedEntities = NULL;
+		int				m_nNumPackedEntities = 0;
+	};
+	CUtlVector<CClientBaselineInfo> m_ClientBaselineInfo;
 };
 
 extern PackedEntityManager* g_pPackedEntityManager;
