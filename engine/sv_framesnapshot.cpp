@@ -789,7 +789,7 @@ void CFrameSnapshotManager::DetermineUpdateType(CBaseClient* pClient, CEntityWri
 		Error("state error");
 	}
 
-	Assert(GetSnapshotEntry(u.m_pToSnapshot, u.m_nNewEntity)->m_pClass);
+	Assert(g_pPackedEntityManager->GetSnapshotEntry(u.m_pToSnapshot, u.m_nNewEntity)->m_pClass);
 
 	bool recreate = NeedsExplicitCreate(u);
 
