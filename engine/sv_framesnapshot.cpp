@@ -486,10 +486,12 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot(int clientCount, CGameCl
 		}
 		
 		// entity exists and is not marked as 'free'
-		Assert( serverEntitylist->GetNetworkSerialNumber(i) != -1 );
+		ServerClass* pServerClass = pServerEntity->GetServerClass();
+		int iSerialNum = serverEntitylist->GetNetworkSerialNumber(i);
+		Assert( iSerialNum != -1 );
 		Assert( serverEntitylist->GetServerNetworkable(i));
-		Assert( serverEntitylist->GetServerEntity(i)->GetServerClass() );
-		g_pPackedEntityManager->InitPackedEntity(snap, pServerEntity);
+		Assert( pServerClass );
+		g_pPackedEntityManager->InitPackedEntity(snap, i, pServerClass, iSerialNum);
 
 		nValidEntities[snap->m_nValidEntities++] = i;
 	}

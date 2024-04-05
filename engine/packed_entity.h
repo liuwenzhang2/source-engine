@@ -261,11 +261,11 @@ public:
 	//PackedEntityHandle_t	m_pPackedData;
 
 		// Creates pack data for a particular entity for a particular snapshot
-	PackedEntity* CreatePackedEntity(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity);
+	PackedEntity* CreatePackedEntity(CFrameSnapshot* pSnapshot, int edictIdx, ServerClass* pServerClass, int iSerialNum);
 
 	CFrameSnapshotEntry* GetSnapshotEntry(CFrameSnapshot* pSnapshot, int entity);
 
-	void	InitPackedEntity(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity);
+	void	InitPackedEntity(CFrameSnapshot* pSnapshot, int edictIdx, ServerClass* pServerClass, int iSerialNum);
 
 	void	DoPackEntity(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity);
 

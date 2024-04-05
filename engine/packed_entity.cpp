@@ -349,16 +349,16 @@ UnpackedDataCache_t* PackedEntityManager::GetCachedUncompressedEntity(PackedEnti
 // Returns the pack data for a particular entity for a particular snapshot
 //-----------------------------------------------------------------------------
 
-PackedEntity* PackedEntityManager::CreatePackedEntity(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity)
+PackedEntity* PackedEntityManager::CreatePackedEntity(CFrameSnapshot* pSnapshot, int edictIdx, ServerClass* pServerClass, int iSerialNum)
 {
 	m_WriteMutex.Lock();
 	PackedEntity* packedEntity = m_PackedEntitiesPool.Alloc();
 	//PackedEntity * handle =  packedEntity ;
 	m_WriteMutex.Unlock();
 
-	int edictIdx = pServerEntity->entindex();
-	ServerClass* pServerClass = pServerEntity->GetServerClass();
-	int iSerialNum = serverEntitylist->GetNetworkSerialNumber(edictIdx);
+	//int edictIdx = pServerEntity->entindex();
+	//ServerClass* pServerClass = pServerEntity->GetServerClass();
+	//int iSerialNum = serverEntitylist->GetNetworkSerialNumber(edictIdx);
 	Assert(edictIdx < pSnapshot->m_nNumEntities);
 
 	// Referenced twice: in the mru 
@@ -831,11 +831,7 @@ ConVar sv_debugmanualmode("sv_debugmanualmode", "0", 0, "Make sure entities corr
 
 
 
-void PackedEntityManager::InitPackedEntity(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity) {
-	int edictIdx = pServerEntity->entindex();
-	ServerClass* pServerClass = pServerEntity->GetServerClass();
-	int iSerialNum = serverEntitylist->GetNetworkSerialNumber(edictIdx);
-
+void PackedEntityManager::InitPackedEntity(CFrameSnapshot* pSnapshot, int edictIdx, ServerClass* pServerClass, int iSerialNum) {
 	CFrameSnapshotEntry* pFrameSnapshotEntry = GetSnapshotEntry(pSnapshot, edictIdx);
 	pFrameSnapshotEntry->m_nSerialNumber = iSerialNum;
 	pFrameSnapshotEntry->m_pClass = pServerClass;
@@ -1000,7 +996,7 @@ void PackedEntityManager::DoPackEntity(CFrameSnapshot* pSnapshot, IServerEntity*
 	//entry->m_nSerialNumber = serverEntitylist->GetNetworkSerialNumber(i);
 	//entry->m_pClass = serverEntitylist->GetServerEntity(i)->GetServerClass();
 	{
-		PackedEntity* pPackedEntity = CreatePackedEntity(pSnapshot, pServerEntity);
+		PackedEntity* pPackedEntity = CreatePackedEntity(pSnapshot, edictIdx, pServerClass, iSerialNum);
 		pPackedEntity->SetChangeFrameList(pChangeFrame);
 		pPackedEntity->SetServerAndClientClass(pServerClass, NULL);
 		pPackedEntity->AllocAndCopyPadded(packedData, writeBuf.GetNumBytesWritten());

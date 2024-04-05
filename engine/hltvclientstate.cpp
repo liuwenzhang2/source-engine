@@ -87,8 +87,8 @@ void CHLTVClientState::CopyNewEntity(
 
 	// copy class & serial
 	CFrameSnapshot *pSnapshot = u.m_pTo->GetSnapshot();
-	g_pPackedEntityManager->GetSnapshotEntry(pSnapshot,ent)->m_nSerialNumber = iSerialNum;
-	g_pPackedEntityManager->GetSnapshotEntry(pSnapshot,ent)->m_pClass = pServerClass;
+	g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, ent)->m_nSerialNumber = iSerialNum;
+	g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, ent)->m_pClass = pServerClass;
 
 	// Get either the static or instance baseline.
 	const void *pFromData = NULL;
@@ -123,8 +123,7 @@ void CHLTVClientState::CopyNewEntity(
 	}
 
 	// Now make a PackedEntity and store the new packed data in there.
-	IServerEntity* pServerEntity = serverEntitylist->GetServerEntity(ent);
-	PackedEntity *pPackedEntity = g_pPackedEntityManager->CreatePackedEntity( pSnapshot, pServerEntity);
+	PackedEntity *pPackedEntity = g_pPackedEntityManager->CreatePackedEntity( pSnapshot, ent, pServerClass, iSerialNum);
 	pPackedEntity->SetChangeFrameList( pChangeFrame );
 	pPackedEntity->SetServerAndClientClass( pServerClass, pClientClass );
 
@@ -704,19 +703,19 @@ void CHLTVClientState::ReadLeavePVS( CEntityReadInfo &u )
 
 void CHLTVClientState::ReadDeltaEnt( CEntityReadInfo &u )
 {
-	const int i = u.m_nNewEntity;
+	const int ent = u.m_nNewEntity;
 	CFrameSnapshot *pFromSnapshot =	u.m_pFrom->GetSnapshot();
 
 	CFrameSnapshot *pSnapshot = u.m_pTo->GetSnapshot();
 
-	Assert( i < pFromSnapshot->m_nNumEntities );
-	*g_pPackedEntityManager->GetSnapshotEntry(pSnapshot,i) = *g_pPackedEntityManager->GetSnapshotEntry(pFromSnapshot,i);
+	Assert(ent < pFromSnapshot->m_nNumEntities );
+	*g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, ent) = *g_pPackedEntityManager->GetSnapshotEntry(pFromSnapshot, ent);
 	
-	IServerEntity* pServerEntity = serverEntitylist->GetServerEntity(i);
-	PackedEntity *pToPackedEntity = g_pPackedEntityManager->CreatePackedEntity( pSnapshot, pServerEntity);
+	CFrameSnapshotEntry* pSnapshotEntry = g_pPackedEntityManager->GetSnapshotEntry(pSnapshot, ent);
+	PackedEntity *pToPackedEntity = g_pPackedEntityManager->CreatePackedEntity( pSnapshot, ent, pSnapshotEntry->m_pClass, pSnapshotEntry->m_nSerialNumber);
 
 	// WARNING! get pFromPackedEntity after new pPackedEntity has been created, otherwise pointer may be wrong
-	PackedEntity *pFromPackedEntity = g_pPackedEntityManager->GetPackedEntity( pFromSnapshot, i );
+	PackedEntity *pFromPackedEntity = g_pPackedEntityManager->GetPackedEntity( pFromSnapshot, ent);
 
 	pToPackedEntity->SetServerAndClientClass( pFromPackedEntity->m_pServerClass, pFromPackedEntity->m_pClientClass );
 
