@@ -17,7 +17,7 @@
 #include <mempool.h>
 #include <utlvector.h>
 #include <tier0/dbg.h>
-
+#include "utlmap.h"
 #include "common.h"
 #include "bitvec.h"
 #include <iservernetworkable.h>
@@ -297,9 +297,13 @@ public:
 
 private:
 	void CheckClientSnapshotEntryArray(int maxIndex);
+	static bool CFrameSnapshot_LessFunc(CFrameSnapshot* const& a, CFrameSnapshot* const& b)
+	{
+		return a < b;
+	}
 
 	// State information
-	CUtlVector<CFrameSnapshotEntry*> m_pEntities;
+	CUtlMap<CFrameSnapshot* ,CFrameSnapshotEntry*> m_pEntities;
 
 	CThreadFastMutex		m_WriteMutex;
 

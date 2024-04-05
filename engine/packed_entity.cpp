@@ -141,6 +141,7 @@ PackedEntityManager* g_pPackedEntityManager = &s_PackedEntityManager;
 PackedEntityManager::PackedEntityManager() : m_PackedEntitiesPool(MAX_EDICTS / 16, CUtlMemoryPool::GROW_SLOW)
 {
 	Q_memset(m_pPackedData, 0x00, MAX_EDICTS * sizeof(PackedEntity*));
+	m_pEntities.SetLessFunc(CFrameSnapshot_LessFunc);
 }
 
 PackedEntityManager::~PackedEntityManager() {
@@ -155,34 +156,38 @@ void PackedEntityManager::OnLevelChanged() {
 }
 
 void PackedEntityManager::OnCreateSnapshot(CFrameSnapshot* pSnapshot) {
-	if (m_pEntities.Count() < pSnapshot->m_ListIndex + 1) {
-		m_pEntities.EnsureCapacity(pSnapshot->m_ListIndex + 1);
+	if (m_pEntities.Find(pSnapshot) != m_pEntities.InvalidIndex()) {
+		Error("m_pEntities.Find(pSnapshot)!");
 	}
-	m_pEntities.Element(pSnapshot->m_ListIndex) = new CFrameSnapshotEntry[pSnapshot->m_nNumEntities];
-
-	CFrameSnapshotEntry* entry = m_pEntities.Element(pSnapshot->m_ListIndex);
-
+	CFrameSnapshotEntry* pSnapshotEntry = new CFrameSnapshotEntry[pSnapshot->m_nNumEntities];
 	// clear entries
 	for (int i = 0; i < pSnapshot->m_nNumEntities; i++)
 	{
-		entry->m_pClass = NULL;
-		entry->m_nSerialNumber = -1;
-		entry->m_pPackedData = INVALID_PACKED_ENTITY_HANDLE;
-		entry++;
+		pSnapshotEntry[i].m_pClass = NULL;
+		pSnapshotEntry[i].m_nSerialNumber = -1;
+		pSnapshotEntry[i].m_pPackedData = INVALID_PACKED_ENTITY_HANDLE;
 	}
+	m_pEntities.Insert(pSnapshot, pSnapshotEntry);
 }
 
 void PackedEntityManager::OnDeleteSnapshot(CFrameSnapshot* pSnapshot) {
+	if (!pSnapshot)
+		return;
+	unsigned short index = m_pEntities.Find(pSnapshot);
+	if (index == m_pEntities.InvalidIndex()) {
+		Error("index == m_pEntities.InvalidIndex()");
+	}
+	CFrameSnapshotEntry* pSnapshotEntry = m_pEntities.Element(index);
 	// Decrement reference counts of all packed entities
 	for (int i = 0; i < pSnapshot->m_nNumEntities; ++i)
 	{
-		if (m_pEntities.Element(pSnapshot->m_ListIndex)[i].m_pPackedData != NULL)
+		if (pSnapshotEntry[i].m_pPackedData != INVALID_PACKED_ENTITY_HANDLE)
 		{
-			RemoveEntityReference(m_pEntities.Element(pSnapshot->m_ListIndex)[i].m_pPackedData);
+			RemoveEntityReference(pSnapshotEntry[i].m_pPackedData);
 		}
 	}
-	delete[] m_pEntities.Element(pSnapshot->m_ListIndex);
-	m_pEntities.Remove(pSnapshot->m_ListIndex);
+	delete[] pSnapshotEntry;
+	m_pEntities.RemoveAt(index);
 }
 
 void PackedEntityManager::RemoveEntityReference(PackedEntity* pPackedEntity)
@@ -383,12 +388,13 @@ PackedEntity* PackedEntityManager::CreatePackedEntity(CFrameSnapshot* pSnapshot,
 CFrameSnapshotEntry* PackedEntityManager::GetSnapshotEntry(CFrameSnapshot* pSnapshot, int entity) {
 	if (!pSnapshot)
 		return NULL;
-
 	Assert(entity < pSnapshot->m_nNumEntities);
-
-	CFrameSnapshotEntry* pSnapshotEntry = &m_pEntities.Element(pSnapshot->m_ListIndex)[entity];
-
-	return pSnapshotEntry;
+	unsigned short index = m_pEntities.Find(pSnapshot);
+	if (index == m_pEntities.InvalidIndex()) {
+		Error("index == m_pEntities.InvalidIndex()");
+	}
+	CFrameSnapshotEntry* pSnapshotEntry = m_pEntities.Element(index);
+	return &pSnapshotEntry[entity];
 }
 
 //-----------------------------------------------------------------------------
