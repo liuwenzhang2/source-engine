@@ -675,7 +675,7 @@ void CClientState::Clear( void )
 	m_bDownloadResources = false;
 	m_bPrepareClientDLL = false;
 
-	DeleteClientFrames( -1 ); // clear all
+	//DeleteClientFrames( -1 ); // clear all
 		
 	viewangles.Init();
 	m_flLastServerTickTime = 0.0f;
@@ -1309,103 +1309,6 @@ void CClientState::DumpPrecacheStats( const char * name )
 
 	ConMsg( "\n" );
 }
-
-void CClientState::ReadDeletions( CEntityReadInfo &u )
-{
-	VPROF( "ReadDeletions" );
-	while ( u.m_pBuf->ReadOneBit()!=0 )
-	{
-		int idx = u.m_pBuf->ReadUBitLong( MAX_EDICT_BITS );	
-		
-		Assert( !u.m_pTo->transmit_entity.Get( idx ) );
-
-		CL_DeleteDLLEntity( idx, "ReadDeletions" );
-	}
-}
-
-void CClientState::ReadEnterPVS( CEntityReadInfo &u )
-{
-	VPROF( "ReadEnterPVS" );
-
-	TRACE_PACKET(( "  CL Enter PVS (%d)\n", u.m_nNewEntity ));
-
-	int iClass = u.m_pBuf->ReadUBitLong( m_nServerClassBits );
-
-	int iSerialNum = u.m_pBuf->ReadUBitLong( NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS );
-
-	CL_CopyNewEntity( u, iClass, iSerialNum );
-
-	if ( u.m_nNewEntity == u.m_nOldEntity ) // that was a recreate
-		u.NextOldEntity();
-}
-
-void CClientState::ReadLeavePVS( CEntityReadInfo &u )
-{
-	VPROF( "ReadLeavePVS" );
-	// Sanity check.
-	if ( !u.m_bAsDelta )
-	{
-		Assert(0); // cl.validsequence = 0;
-		ConMsg( "WARNING: LeavePVS on full update" );
-		u.m_UpdateType = Failed;	// break out
-		return;
-	}
-
-	Assert( !u.m_pTo->transmit_entity.Get( u.m_nOldEntity ) );
-
-	if ( u.m_UpdateFlags & FHDR_DELETE )
-	{
-		CL_DeleteDLLEntity( u.m_nOldEntity, "ReadLeavePVS" );
-	}
-
-	u.NextOldEntity();
-}
-
-void CClientState::ReadDeltaEnt( CEntityReadInfo &u )
-{
-	VPROF( "ReadDeltaEnt" );
-	CL_CopyExistingEntity( u );
-	
-	u.NextOldEntity();
-}
-
-void CClientState::ReadPreserveEnt( CEntityReadInfo &u )
-{
-	VPROF( "ReadPreserveEnt" );
-	if ( !u.m_bAsDelta )  // Should never happen on a full update.
-	{
-		Assert(0); // cl.validsequence = 0;
-		ConMsg( "WARNING: PreserveEnt on full update" );
-		u.m_UpdateType = Failed;	// break out
-		return;
-	}
-
-	Assert( u.m_pFrom->transmit_entity.Get(u.m_nOldEntity) );
-
-	// copy one of the old entities over to the new packet unchanged
-
-	// XXX(JohnS): This was historically checking for NewEntity overflow, though this path does not care (and new entity
-	//             may be -1).  The old entity bounds check here seems like what was intended, but since nNewEntity
-	//             should not be overflowed either, I've left that check in case it was guarding against a case I am
-	//             overlooking.
-	if ( u.m_nOldEntity >= MAX_EDICTS || u.m_nOldEntity < 0 || u.m_nNewEntity >= MAX_EDICTS )
-	{
-		Host_Error( "CL_ReadPreserveEnt: Entity out of bounds. Old: %i, New: %i",
-		            u.m_nOldEntity, u.m_nNewEntity );
-	}
-
-	u.m_pTo->last_entity = u.m_nOldEntity;
-	u.m_pTo->transmit_entity.Set( u.m_nOldEntity );
-
-	// Zero overhead
-	if ( cl_entityreport.GetBool() )
-		CL_RecordEntityBits( u.m_nOldEntity, 0 );
-
-	CL_PreserveExistingEntity( u.m_nOldEntity );
-
-	u.NextOldEntity();
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Starts checking that all the necessary files are local

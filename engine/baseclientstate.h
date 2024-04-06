@@ -61,7 +61,7 @@ class CNetworkStringTableContainer;
 class PackedEntity;
 class INetworkStringTable;
 class CEntityReadInfo;	
-
+class DeltaEntitiesDecoder;
 
 abstract_class CBaseClientState : public INetChannelHandler, public IConnectionlessPacketHandler, public IServerMessageHandler
 {
@@ -88,6 +88,7 @@ public: // INetMsgHandler interface:
 	virtual void FileDenied( const char *fileName, unsigned int transferID );
 	virtual void FileSent( const char *fileName, unsigned int transferID );
 
+	virtual DeltaEntitiesDecoder* GetDeltaEntitiesDecoder() = 0;
 public: // IServerMessageHandlers
 	
 	PROCESS_NET_MESSAGE( Tick );
@@ -145,23 +146,20 @@ public:
 
 	INetworkStringTable *GetStringTable( const char * name ) const;
 	
-	PackedEntity *GetEntityBaseline( int iBaseline, int nEntityIndex );
-	void SetEntityBaseline(int iBaseline, ClientClass *pClientClass, int index, char *packedData, int length);
-	void CopyEntityBaseline( int iFrom, int iTo );
-	void FreeEntityBaselines();
+	
 	bool GetClassBaseline( int iClass, void const **pData, int *pDatalen );
 	ClientClass *GetClientClass( int i );
 
 	void ForceFullUpdate( void );
 	void SendStringCmd(const char * command);
 	
-	void ReadPacketEntities( CEntityReadInfo &u );
+	//void ReadPacketEntities( CEntityReadInfo &u );
 
-	virtual void ReadEnterPVS( CEntityReadInfo &u ) = 0;
-	virtual void ReadLeavePVS( CEntityReadInfo &u ) = 0;
-	virtual void ReadDeltaEnt( CEntityReadInfo &u ) = 0;
-	virtual void ReadPreserveEnt( CEntityReadInfo &u ) = 0;
-	virtual void ReadDeletions( CEntityReadInfo &u ) = 0;
+	//virtual void ReadEnterPVS( CEntityReadInfo &u ) = 0;
+	//virtual void ReadLeavePVS( CEntityReadInfo &u ) = 0;
+	//virtual void ReadDeltaEnt( CEntityReadInfo &u ) = 0;
+	//virtual void ReadPreserveEnt( CEntityReadInfo &u ) = 0;
+	//virtual void ReadDeletions( CEntityReadInfo &u ) = 0;
 
 	bool IsClientConnectionViaMatchMaking( void );
 
@@ -204,7 +202,6 @@ public:
 
 	int			m_nMaxClients;		// max clients on server
 
-	PackedEntity	*m_pEntityBaselines[2][MAX_EDICTS];	// storing entity baselines
 		
 	// This stuff manages the receiving of data tables and instantiating of client versions
 	// of server-side classes.

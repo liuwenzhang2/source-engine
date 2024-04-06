@@ -196,93 +196,6 @@ C_ServerClassInfo::~C_ServerClassInfo()
 	delete [] m_DatatableName;
 }
 
-// Returns false if you should stop reading entities.
-inline static bool CL_DetermineUpdateType( CEntityReadInfo &u )
-{
-	if ( !u.m_bIsEntity || ( u.m_nNewEntity > u.m_nOldEntity ) )
-	{
-		// If we're at the last entity, preserve whatever entities followed it in the old packet.
-		// If newnum > oldnum, then the server skipped sending entities that it wants to leave the state alone for.
-		if ( !u.m_pFrom	 || ( u.m_nOldEntity > u.m_pFrom->last_entity ) )
-		{
-			Assert( !u.m_bIsEntity );
-			u.m_UpdateType = Finished;
-			return false;
-		}
-
-		// Preserve entities until we reach newnum (ie: the server didn't send certain entities because
-		// they haven't changed).
-		u.m_UpdateType = PreserveEnt;
-	}
-	else
-	{
-		if( u.m_UpdateFlags & FHDR_ENTERPVS )
-		{
-			u.m_UpdateType = EnterPVS;
-		}
-		else if( u.m_UpdateFlags & FHDR_LEAVEPVS )
-		{
-			u.m_UpdateType = LeavePVS;
-		}
-		else
-		{
-			u.m_UpdateType = DeltaEnt;
-		}
-	}
-
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: When a delta command is received from the server
-//  We need to grab the entity # out of it any the bit settings, too.
-//  Returns -1 if there are no more entities.
-// Input  : &bRemove - 
-//			&bIsNew - 
-// Output : int
-//-----------------------------------------------------------------------------
-static inline void CL_ParseDeltaHeader( CEntityReadInfo &u )
-{
-	u.m_UpdateFlags = FHDR_ZERO;
-
-#ifdef DEBUG_NETWORKING
-	int startbit = u.m_pBuf->GetNumBitsRead();
-#endif
-	SyncTag_Read( u.m_pBuf, "Hdr" );	
-
-	u.m_nNewEntity = u.m_nHeaderBase + 1 + u.m_pBuf->ReadUBitVar();
-
-
-	u.m_nHeaderBase = u.m_nNewEntity;
-
-	// leave pvs flag
-	if ( u.m_pBuf->ReadOneBit() == 0 )
-	{
-		// enter pvs flag
-		if ( u.m_pBuf->ReadOneBit() != 0 )
-		{
-			u.m_UpdateFlags |= FHDR_ENTERPVS;
-		}
-	}
-	else
-	{
-		u.m_UpdateFlags |= FHDR_LEAVEPVS;
-
-		// Force delete flag
-		if ( u.m_pBuf->ReadOneBit() != 0 )
-		{
-			u.m_UpdateFlags |= FHDR_DELETE;
-		}
-	}
-	// Output the bitstream...
-#ifdef DEBUG_NETWORKING
-	int lastbit = u.m_pBuf->GetNumBitsRead();
-	{
-		void	SpewBitStream( unsigned char* pMem, int bit, int lastbit );
-		SpewBitStream( (byte *)u.m_pBuf->m_pData, startbit, lastbit );
-	}
-#endif
-}
 
 CBaseClientState::CBaseClientState()
 {
@@ -309,7 +222,7 @@ CBaseClientState::CBaseClientState()
 	m_szLevelFileName[0] = 0;
 	m_szLevelBaseName[0] = 0;
 	m_nMaxClients = 0;
-	Q_memset( m_pEntityBaselines, 0, sizeof( m_pEntityBaselines ) );
+	//Q_memset( m_pEntityBaselines, 0, sizeof( m_pEntityBaselines ) );
 	m_nServerClasses = 0;
 	m_nServerClassBits = 0;
 	m_szEncrytionKey[0] = 0;
@@ -350,7 +263,7 @@ void CBaseClientState::Clear( void )
 		m_StringTableContainer = NULL;
 	}
 
-	FreeEntityBaselines();
+	GetDeltaEntitiesDecoder()->FreeEntityBaselines();
 
 	RecvTable_Term( false );
 
@@ -674,7 +587,7 @@ void CBaseClientState::ForceFullUpdate( void )
 	if ( m_nDeltaTick == -1 )
 		return;
 
-	FreeEntityBaselines();
+	GetDeltaEntitiesDecoder()->FreeEntityBaselines();
 	m_nDeltaTick = -1;
 	DevMsg( "Requesting full game update...\n");
 }
@@ -1189,7 +1102,7 @@ bool CBaseClientState::ProcessServerInfo( SVC_ServerInfo *msg )
 #endif
 
 	// clear all baselines still around from last game
-	FreeEntityBaselines();
+	GetDeltaEntitiesDecoder()->FreeEntityBaselines();
 
 	// force changed flag to being reset
 	g_GameEventManager.HasClientListenersChanged( true );
@@ -1495,74 +1408,7 @@ bool CBaseClientState::ProcessPacketEntities( SVC_PacketEntities *msg )
 	return true;
 }
 
-void CBaseClientState::ReadPacketEntities( CEntityReadInfo &u )
-{
-	VPROF( "ReadPacketEntities" );
 
-	// Loop until there are no more entities to read
-	
-	u.NextOldEntity();
-
-	while ( u.m_UpdateType < Finished )
-	{
-		u.m_nHeaderCount--;
-
-		u.m_bIsEntity = ( u.m_nHeaderCount >= 0 ) ? true : false;
-
-		if ( u.m_bIsEntity  )
-		{
-			CL_ParseDeltaHeader( u );
-		}
-
-		u.m_UpdateType = PreserveEnt;
-		
-		while( u.m_UpdateType == PreserveEnt )
-		{
-			// Figure out what kind of an update this is.
-			if( CL_DetermineUpdateType( u ) )
-			{
-				switch( u.m_UpdateType )
-				{
-					case EnterPVS:		ReadEnterPVS( u );
-										break;
-
-					case LeavePVS:		ReadLeavePVS( u );
-										break;
-
-					case DeltaEnt:		ReadDeltaEnt( u );
-										break;
-
-					case PreserveEnt:	ReadPreserveEnt( u );
-										break;
-
-					default:			DevMsg(1, "ReadPacketEntities: unknown updatetype %i\n", u.m_UpdateType );
-										break;
-				}
-			}
-		}
-	}
-
-	// Now process explicit deletes 
-	if ( u.m_bAsDelta && u.m_UpdateType == Finished )
-	{
-		ReadDeletions( u );
-	}
-
-	// Something didn't parse...
-	if ( u.m_pBuf->IsOverflowed() )							
-	{	
-		Host_Error ( "CL_ParsePacketEntities:  buffer read overflow\n" );
-	}
-
-	// If we get an uncompressed packet, then the server is waiting for us to ack the validsequence
-	// that we got the uncompressed packet on. So we stop reading packets here and force ourselves to
-	// send the clc_move on the next frame.
-
-	if ( !u.m_bAsDelta )
-	{
-		m_flNextCmdTime = 0.0; // answer ASAP to confirm full update tick
-	} 
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1635,89 +1481,7 @@ bool CBaseClientState::LinkClasses()
 	return true;
 }
 
-PackedEntity *CBaseClientState::GetEntityBaseline(int iBaseline, int nEntityIndex)
-{
-	Assert( (iBaseline == 0) || (iBaseline == 1) );
-	return m_pEntityBaselines[iBaseline][nEntityIndex];
-}
 
-void CBaseClientState::FreeEntityBaselines()
-{
-	for ( int i=0; i<2; i++ )
-	{
-		for ( int j=0; j<MAX_EDICTS; j++ )
-		if ( m_pEntityBaselines[i][j] )
-		{
-			delete m_pEntityBaselines[i][j];
-			m_pEntityBaselines[i][j] = NULL;
-		}
-	}
-}
-
-void CBaseClientState::SetEntityBaseline(int iBaseline, ClientClass *pClientClass, int index, char *packedData, int length)
-{
-	VPROF( "CBaseClientState::SetEntityBaseline" );
-
-	Assert( index >= 0 && index < MAX_EDICTS );
-	Assert( pClientClass );
-	Assert( (iBaseline == 0) || (iBaseline == 1) );
-	
-	PackedEntity *entitybl = m_pEntityBaselines[iBaseline][index];
-
-	if ( !entitybl )
-	{
-		entitybl = m_pEntityBaselines[iBaseline][index] = new PackedEntity();
-	}
-
-	entitybl->m_pClientClass = pClientClass;
-	entitybl->m_nEntityIndex = index;
-	entitybl->m_pServerClass = NULL;
-
-	// Copy out the data we just decoded.
-	entitybl->AllocAndCopyPadded( packedData, length );
-}
-
-void CBaseClientState::CopyEntityBaseline( int iFrom, int iTo )
-{
-	Assert ( iFrom != iTo );
-	
-
-	for ( int i=0; i<MAX_EDICTS; i++ )
-	{
-		PackedEntity *blfrom = m_pEntityBaselines[iFrom][i];
-		PackedEntity *blto = m_pEntityBaselines[iTo][i];
-
-		if( !blfrom )
-		{
-			// make sure blto doesn't exists
-			if ( blto )
-			{
-				// ups, we already had this entity but our ack got lost
-				// we have to remove it again to stay in sync
-				delete m_pEntityBaselines[iTo][i];
-				m_pEntityBaselines[iTo][i] = NULL;
-			}
-			continue;
-		}
-
-		if ( !blto )
-		{
-			// create new to baseline if none existed before
-			blto = m_pEntityBaselines[iTo][i] = new PackedEntity();
-			blto->m_pClientClass = NULL;
-			blto->m_pServerClass = NULL;
-			blto->m_ReferenceCount = 0;
-		}
-
-		Assert( blfrom->m_nEntityIndex == i );
-		Assert( !blfrom->IsCompressed() );
-
-		blto->m_nEntityIndex	= blfrom->m_nEntityIndex; 
-		blto->m_pClientClass	= blfrom->m_pClientClass;
-		blto->m_pServerClass	= blfrom->m_pServerClass;
-		blto->AllocAndCopyPadded( blfrom->GetData(), blfrom->GetNumBytes() );
-	}
-}
 
 ClientClass *CBaseClientState::GetClientClass( int index )
 {

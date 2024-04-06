@@ -30,7 +30,7 @@
 #include "precache.h"
 #include "baseclientstate.h"
 #include "clientframe.h"
-
+#include "cl_ents_parse.h"
 
 
 struct model_t;
@@ -53,7 +53,7 @@ struct AddAngle
 // Purpose: CClientState should hold all pieces of the client state
 //   The client_state_t structure is wiped completely at every server signon
 //-----------------------------------------------------------------------------
-class CClientState : public CBaseClientState, public CClientFrameManager
+class CClientState : public CBaseClientState//, public CClientFrameManager
 {
 	typedef struct CustomFile_s
 	{
@@ -96,11 +96,11 @@ public: // CBaseClientState overrides:
 	void ConsistencyCheck(bool bForce);
 	void RunFrame();
 
-	void ReadEnterPVS( CEntityReadInfo &u );
-	void ReadLeavePVS( CEntityReadInfo &u );
-	void ReadDeltaEnt( CEntityReadInfo &u );
-	void ReadPreserveEnt( CEntityReadInfo &u );
-	void ReadDeletions( CEntityReadInfo &u );
+	//void ReadEnterPVS( CEntityReadInfo &u );
+	//void ReadLeavePVS( CEntityReadInfo &u );
+	//void ReadDeltaEnt( CEntityReadInfo &u );
+	//void ReadPreserveEnt( CEntityReadInfo &u );
+	//void ReadDeletions( CEntityReadInfo &u );
 
 	// In case the client DLL is using the old interface to set area bits,
 	// copy what they've passed to us into the m_chAreaBits array (and 0xFF-out the m_chAreaPortalBits array).
@@ -224,6 +224,9 @@ public:
 	void				CheckOthersCustomFile(CRC32_t crc); // check if we have to download custom files from server
 	void				AddCustomFile( int slot, const char *resourceFile);
 
+	DeltaEntitiesDecoder* GetDeltaEntitiesDecoder() {
+		return &m_DeltaEntitiesDecoder;
+	}
 public:
 
 
@@ -269,6 +272,8 @@ private:
 	// Set to false when we first connect to a server and true later on before we
 	// respond to a new whitelist.
 	bool		m_bMarkedCRCsUnverified;
+
+	DeltaEntitiesDecoder m_DeltaEntitiesDecoder;
 };  //CClientState
 
 extern	CClientState	cl;

@@ -873,7 +873,7 @@ bool CClientState::ProcessPacketEntities( SVC_PacketEntities *msg )
 		return true;
 	}
 	
-	if ( !CL_ProcessPacketEntities ( msg ) )
+	if ( !GetDeltaEntitiesDecoder()->ProcessPacketEntities ( msg ) )
 		return false;
 
 	return CBaseClientState::ProcessPacketEntities( msg );
