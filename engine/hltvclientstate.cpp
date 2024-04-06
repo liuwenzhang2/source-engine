@@ -65,7 +65,9 @@ CHLTVClientState::CHLTVClientState()
 	m_pNewClientFrame = NULL;
 	m_pCurrentClientFrame = NULL;
 	m_bSaveMemory = false;
+#ifndef SWDS
 	m_HLTVDeltaEntitiesDecoder.Init(this);
+#endif
 }
 
 CHLTVClientState::~CHLTVClientState()
