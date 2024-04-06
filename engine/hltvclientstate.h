@@ -11,7 +11,9 @@
 #endif
 
 #include "baseclientstate.h"
+#ifndef SWDS
 #include "cl_ents_parse.h"
+#endif
 
 class CClientFrame;
 class CHLTVServer;
@@ -44,10 +46,11 @@ public:
 	int GetConnectionRetryNumber() const;
 
 
-
+#ifndef SWDS
 	DeltaEntitiesDecoder* GetDeltaEntitiesDecoder() {
 		return &m_HLTVDeltaEntitiesDecoder;
 	}
+#endif
 public: // IServerMessageHandlers
 
 	PROCESS_NET_MESSAGE( StringCmd );
@@ -80,7 +83,9 @@ public:
 	bool			m_bSaveMemory; //compress data as much as possible to keep whole demos in memory
 	float			m_fNextSendUpdateTime;
 	CHLTVServer		*m_pHLTV;	// HLTV server this client state belongs too.
+#ifndef SWDS
 	CHLTVDeltaEntitiesDecoder m_HLTVDeltaEntitiesDecoder;
+#endif
 };
 
 #endif // HLTVCLIENTSTATE_H

@@ -60,8 +60,10 @@ public:
 class CNetworkStringTableContainer;
 class PackedEntity;
 class INetworkStringTable;
-class CEntityReadInfo;	
+class CEntityReadInfo;
+#ifndef SWDS
 class DeltaEntitiesDecoder;
+#endif
 
 abstract_class CBaseClientState : public INetChannelHandler, public IConnectionlessPacketHandler, public IServerMessageHandler
 {
@@ -87,8 +89,9 @@ public: // INetMsgHandler interface:
 	virtual void FileRequested( const char *fileName, unsigned int transferID );
 	virtual void FileDenied( const char *fileName, unsigned int transferID );
 	virtual void FileSent( const char *fileName, unsigned int transferID );
-
+#ifndef SWDS
 	virtual DeltaEntitiesDecoder* GetDeltaEntitiesDecoder() = 0;
+#endif
 public: // IServerMessageHandlers
 	
 	PROCESS_NET_MESSAGE( Tick );

@@ -22,6 +22,10 @@ public:
 	PackedEntityDecoder() {
 		Q_memset(m_pEntityBaselines, 0, sizeof(m_pEntityBaselines));
 	}
+	~PackedEntityDecoder()
+	{
+
+	}
 
 	void ReadEnterPvsFromBuffer(CEntityReadInfo& u, IClientEntity* pClientEntity);
 
@@ -80,6 +84,13 @@ private:
 
 class CHLTVDeltaEntitiesDecoder : public DeltaEntitiesDecoder {
 public:
+	CHLTVDeltaEntitiesDecoder() {
+	
+	}
+	~CHLTVDeltaEntitiesDecoder()
+	{
+
+	}
 
 	void Init(CHLTVClientState* pHLTVClientState) {
 		m_pHLTVClientState = pHLTVClientState;

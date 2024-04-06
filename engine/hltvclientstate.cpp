@@ -468,8 +468,10 @@ bool CHLTVClientState::ProcessMenu( SVC_Menu *msg )
 
 bool CHLTVClientState::ProcessPacketEntities( SVC_PacketEntities *entmsg )
 {
+#ifndef SWDS
 	if (!GetDeltaEntitiesDecoder()->ProcessPacketEntities(entmsg))
 		return false;
+#endif
 	return CBaseClientState::ProcessPacketEntities( entmsg );
 }
 

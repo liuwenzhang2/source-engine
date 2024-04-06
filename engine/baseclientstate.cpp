@@ -42,7 +42,9 @@
 #include "replay_internal.h"
 #include "replayserver.h"
 #endif
+#ifndef SWDS
 #include "cl_ents_parse.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -264,7 +266,9 @@ void CBaseClientState::Clear( void )
 		m_StringTableContainer = NULL;
 	}
 
+#ifndef SWDS
 	GetDeltaEntitiesDecoder()->FreeEntityBaselines();
+#endif
 
 	RecvTable_Term( false );
 
@@ -588,7 +592,9 @@ void CBaseClientState::ForceFullUpdate( void )
 	if ( m_nDeltaTick == -1 )
 		return;
 
+#ifndef SWDS
 	GetDeltaEntitiesDecoder()->FreeEntityBaselines();
+#endif
 	m_nDeltaTick = -1;
 	DevMsg( "Requesting full game update...\n");
 }
@@ -1102,8 +1108,10 @@ bool CBaseClientState::ProcessServerInfo( SVC_ServerInfo *msg )
 	}
 #endif
 
+#ifndef SWDS
 	// clear all baselines still around from last game
 	GetDeltaEntitiesDecoder()->FreeEntityBaselines();
+#endif
 
 	// force changed flag to being reset
 	g_GameEventManager.HasClientListenersChanged( true );

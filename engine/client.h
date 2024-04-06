@@ -30,7 +30,9 @@
 #include "precache.h"
 #include "baseclientstate.h"
 #include "clientframe.h"
+#ifndef SWDS
 #include "cl_ents_parse.h"
+#endif
 
 
 struct model_t;
@@ -224,9 +226,11 @@ public:
 	void				CheckOthersCustomFile(CRC32_t crc); // check if we have to download custom files from server
 	void				AddCustomFile( int slot, const char *resourceFile);
 
+#ifndef SWDS
 	DeltaEntitiesDecoder* GetDeltaEntitiesDecoder() {
 		return &m_DeltaEntitiesDecoder;
 	}
+#endif
 public:
 
 
@@ -273,7 +277,9 @@ private:
 	// respond to a new whitelist.
 	bool		m_bMarkedCRCsUnverified;
 
+#ifndef SWDS
 	DeltaEntitiesDecoder m_DeltaEntitiesDecoder;
+#endif
 };  //CClientState
 
 extern	CClientState	cl;
