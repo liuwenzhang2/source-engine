@@ -269,32 +269,6 @@ void PackedEntityDecoder::ReadDeltaEntFromBuffer(CEntityReadInfo& u, IClientEnti
 	RecvTable_Decode(pRecvTable, pClientEntity->GetDataTableBasePtr(), u.m_pBuf, u.m_nNewEntity);
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Frees the client DLL's binding to the object.
-// Input  : iEnt - 
-//-----------------------------------------------------------------------------
-void DeltaEntitiesDecoder::DeleteDLLEntity( int iEnt, const char *reason, bool bOnRecreatingAllEntities )
-{
-	IClientEntity *pClientEntity = entitylist->GetClientEntity( iEnt );
-
-	if (pClientEntity)
-	{
-		ClientClass *pClientClass = pClientEntity->GetClientNetworkable()->GetClientClass();
-		TRACE_DELTA( va( "Trace %i (%s): delete (%s)\n", iEnt, pClientClass ? pClientClass->m_pNetworkName : "unknown", reason ) );
-#ifndef _XBOX
-		CL_RecordDeleteEntity( iEnt, pClientClass );
-#endif
-		if ( bOnRecreatingAllEntities )
-		{
-			pClientEntity->GetClientNetworkable()->SetDestroyedOnRecreateEntities();
-		}
-
-		entitylist->DestroyEntity(pClientEntity);// ->Release();
-	}
-}
-
-
-
 void	SpewBitStream( unsigned char* pMem, int bit, int lastbit )
 {
 	int val = 0;
@@ -350,15 +324,7 @@ void	SpewBitStream( unsigned char* pMem, int bit, int lastbit )
 }
 
 
-inline static void CL_AddPostDataUpdateCall( CEntityReadInfo &u, int iEnt, DataUpdateType_t updateType )
-{
-	ErrorIfNot( u.m_nPostDataUpdateCalls < MAX_EDICTS,
-		("CL_AddPostDataUpdateCall: overflowed u.m_PostDataUpdateCalls") );
 
-	u.m_PostDataUpdateCalls[u.m_nPostDataUpdateCalls].m_iEnt = iEnt;
-	u.m_PostDataUpdateCalls[u.m_nPostDataUpdateCalls].m_UpdateType = updateType;
-	++u.m_nPostDataUpdateCalls;
-}
 
 
 
@@ -368,14 +334,14 @@ inline static void CL_AddPostDataUpdateCall( CEntityReadInfo &u, int iEnt, DataU
 // Input  : *pEnt - 
 // Output : RecvTable*
 //-----------------------------------------------------------------------------
-static inline RecvTable* GetEntRecvTable( int entnum )
-{
-	IClientNetworkable *pNet = entitylist->GetClientNetworkable( entnum );
-	if ( pNet )
-		return pNet->GetClientClass()->m_pRecvTable;
-	else
-		return NULL;
-}
+//static inline RecvTable* GetEntRecvTable( int entnum )
+//{
+//	IClientNetworkable *pNet = entitylist->GetClientNetworkable( entnum );
+//	if ( pNet )
+//		return pNet->GetClientClass()->m_pRecvTable;
+//	else
+//		return NULL;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Returns true if the entity index corresponds to a player slot 
@@ -453,6 +419,16 @@ IClientEntity* DeltaEntitiesDecoder::CreateDLLEntity(int iEnt, int iClass, int i
 // Regular handles for ReadPacketEntities.
 // ----------------------------------------------------------------------------- //
 
+void DeltaEntitiesDecoder::AddPostDataUpdateCall(CEntityReadInfo& u, int iEnt, DataUpdateType_t updateType)
+{
+	ErrorIfNot(u.m_nPostDataUpdateCalls < MAX_EDICTS,
+		("CL_AddPostDataUpdateCall: overflowed u.m_PostDataUpdateCalls"));
+
+	u.m_PostDataUpdateCalls[u.m_nPostDataUpdateCalls].m_iEnt = iEnt;
+	u.m_PostDataUpdateCalls[u.m_nPostDataUpdateCalls].m_UpdateType = updateType;
+	++u.m_nPostDataUpdateCalls;
+}
+
 void DeltaEntitiesDecoder::CopyNewEntity(
 	CEntityReadInfo &u,
 	int iClass,
@@ -508,7 +484,7 @@ void DeltaEntitiesDecoder::CopyNewEntity(
 
 	m_PackedEntityDecoder.ReadEnterPvsFromBuffer(u, pClientEntity);
 
-	CL_AddPostDataUpdateCall( u, u.m_nNewEntity, updateType );
+	AddPostDataUpdateCall( u, u.m_nNewEntity, updateType );
 
 	// If ent doesn't think it's in PVS, signal that it is
 	Assert( u.m_pTo->last_entity <= u.m_nNewEntity );
@@ -538,20 +514,7 @@ void DeltaEntitiesDecoder::CopyNewEntity(
 }
 
 
-static void CL_CallPostDataUpdates( CEntityReadInfo &u )
-{
-	for ( int i=0; i < u.m_nPostDataUpdateCalls; i++ )
-	{
-		MDLCACHE_CRITICAL_SECTION_(g_pMDLCache);
-		CPostDataUpdateCall *pCall = &u.m_PostDataUpdateCalls[i];
-	
-		IClientNetworkable *pEnt = entitylist->GetClientNetworkable( pCall->m_iEnt );
-		ErrorIfNot( pEnt, 
-			("CL_CallPostDataUpdates: missing ent %d", pCall->m_iEnt) );
 
-		pEnt->PostDataUpdate( pCall->m_UpdateType );
-	}
-}
 
 static float g_flLastPerfRequest = 0.0f;
 
@@ -672,6 +635,30 @@ void DeltaEntitiesDecoder::ReadEnterPVS(CEntityReadInfo& u)
 
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Frees the client DLL's binding to the object.
+// Input  : iEnt - 
+//-----------------------------------------------------------------------------
+void DeltaEntitiesDecoder::DeleteDLLEntity(int iEnt, const char* reason, bool bOnRecreatingAllEntities)
+{
+	IClientEntity* pClientEntity = entitylist->GetClientEntity(iEnt);
+
+	if (pClientEntity)
+	{
+		ClientClass* pClientClass = pClientEntity->GetClientClass();
+		TRACE_DELTA(va("Trace %i (%s): delete (%s)\n", iEnt, pClientClass ? pClientClass->m_pNetworkName : "unknown", reason));
+#ifndef _XBOX
+		CL_RecordDeleteEntity(iEnt, pClientClass);
+#endif
+		if (bOnRecreatingAllEntities)
+		{
+			pClientEntity->SetDestroyedOnRecreateEntities();
+		}
+
+		entitylist->DestroyEntity(pClientEntity);// ->Release();
+	}
+}
+
 void DeltaEntitiesDecoder::ReadLeavePVS(CEntityReadInfo& u)
 {
 	VPROF("ReadLeavePVS");
@@ -711,7 +698,7 @@ void DeltaEntitiesDecoder::CopyExistingEntity(CEntityReadInfo& u)
 
 	m_PackedEntityDecoder.ReadDeltaEntFromBuffer(u, pClientEntity);
 
-	CL_AddPostDataUpdateCall(u, u.m_nNewEntity, DATA_UPDATE_DATATABLE_CHANGED);
+	AddPostDataUpdateCall(u, u.m_nNewEntity, DATA_UPDATE_DATATABLE_CHANGED);
 
 	u.m_pTo->last_entity = u.m_nNewEntity;
 	Assert(!u.m_pTo->transmit_entity.Get(u.m_nNewEntity));
@@ -917,6 +904,20 @@ void DeltaEntitiesDecoder::MarkEntitiesOutOfPVS(CBitVec<MAX_EDICTS>* pvs_flags)
 	}
 }
 
+void DeltaEntitiesDecoder::CallPostDataUpdates(CEntityReadInfo& u)
+{
+	for (int i = 0; i < u.m_nPostDataUpdateCalls; i++)
+	{
+		MDLCACHE_CRITICAL_SECTION_(g_pMDLCache);
+		CPostDataUpdateCall* pCall = &u.m_PostDataUpdateCalls[i];
+
+		IClientNetworkable* pEnt = entitylist->GetClientNetworkable(pCall->m_iEnt);
+		ErrorIfNot(pEnt,
+			("CL_CallPostDataUpdates: missing ent %d", pCall->m_iEnt));
+
+		pEnt->PostDataUpdate(pCall->m_UpdateType);
+	}
+}
 //-----------------------------------------------------------------------------
 // Purpose: An svc_packetentities has just been parsed, deal with the
 //  rest of the data stream.  This can be a delta from the baseline or from a previous
@@ -1025,7 +1026,7 @@ bool DeltaEntitiesDecoder::ProcessPacketEntities ( SVC_PacketEntities *entmsg )
 	ClientDLL_FrameStageNotify( FRAME_NET_UPDATE_POSTDATAUPDATE_START );
 
 	// call PostDataUpdate() for each entity
-	CL_CallPostDataUpdates( u );
+	CallPostDataUpdates( u );
 
 	ClientDLL_FrameStageNotify( FRAME_NET_UPDATE_POSTDATAUPDATE_END );
 
@@ -1427,7 +1428,7 @@ bool CHLTVDeltaEntitiesDecoder::ProcessPacketEntities(SVC_PacketEntities* entmsg
 	// create new empty snapshot
 	CFrameSnapshot* pSnapshot = framesnapshotmanager->CreateEmptySnapshot(m_pHLTVClientState->GetServerTickCount(), entmsg->m_nMaxEntries);
 
-	Assert(m_pNewClientFrame == NULL);
+	Assert(m_pHLTVClientState->m_pNewClientFrame == NULL);
 
 	m_pHLTVClientState->m_pNewClientFrame = new CClientFrame(pSnapshot);
 

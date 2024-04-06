@@ -222,6 +222,7 @@
     <ClCompile Include="..\..\..\engine\cl_foguipanel.cpp" />
     <ClCompile Include="..\..\..\engine\cl_localnetworkbackdoor.cpp" />
     <ClCompile Include="..\..\..\engine\cl_main.cpp" />
+    <ClCompile Include="..\..\..\engine\cl_null.cpp" />
     <ClCompile Include="..\..\..\engine\cl_parse_event.cpp" />
     <ClCompile Include="..\..\..\engine\cl_pluginhelpers.cpp" />
     <ClCompile Include="..\..\..\engine\cl_pred.cpp" />
@@ -355,6 +356,7 @@
     <ClCompile Include="..\..\..\engine\spatialpartition.cpp" />
     <ClCompile Include="..\..\..\engine\staticpropmgr.cpp" />
     <ClCompile Include="..\..\..\engine\sv_client.cpp" />
+    <ClCompile Include="..\..\..\engine\sv_ents_write.cpp" />
     <ClCompile Include="..\..\..\engine\sv_filter.cpp" />
     <ClCompile Include="..\..\..\engine\sv_framesnapshot.cpp" />
     <ClCompile Include="..\..\..\engine\sv_ipratelimit.cpp" />

@@ -157,11 +157,11 @@ void CClientState::SendClientInfo( void ) {}
 void CClientState::SendServerCmdKeyValues( KeyValues *pKeyValues ) {}
 void CClientState::InstallStringTableCallback( char const *tableName ) {}
 bool CClientState::InstallEngineStringTableCallback( char const *tableName ) { return false;}
-void CClientState::ReadEnterPVS( CEntityReadInfo &u ) {}
-void CClientState::ReadLeavePVS( CEntityReadInfo &u ) {}
-void CClientState::ReadDeltaEnt( CEntityReadInfo &u ) {}
-void CClientState::ReadPreserveEnt( CEntityReadInfo &u ) {}
-void CClientState::ReadDeletions( CEntityReadInfo &u ) {}
+//void CClientState::ReadEnterPVS( CEntityReadInfo &u ) {}
+//void CClientState::ReadLeavePVS( CEntityReadInfo &u ) {}
+//void CClientState::ReadDeltaEnt( CEntityReadInfo &u ) {}
+//void CClientState::ReadPreserveEnt( CEntityReadInfo &u ) {}
+//void CClientState::ReadDeletions( CEntityReadInfo &u ) {}
 const char *CClientState::GetCDKeyHash( void ) { return "123";}
 void CClientState::Clear( void ) {}
 bool CClientState::ProcessGameEvent(SVC_GameEvent *msg) { return true; }

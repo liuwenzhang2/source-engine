@@ -72,7 +72,8 @@ private:
 	bool DetermineUpdateType(CEntityReadInfo& u);
 	IClientEntity* CreateDLLEntity(int iEnt, int iClass, int iSerialNum);
 	void MarkEntitiesOutOfPVS(CBitVec<MAX_EDICTS>* pvs_flags);
-
+	void AddPostDataUpdateCall(CEntityReadInfo& u, int iEnt, DataUpdateType_t updateType);
+	void CallPostDataUpdates(CEntityReadInfo& u);
 
 	PackedEntityDecoder m_PackedEntityDecoder;
 };
