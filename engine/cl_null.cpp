@@ -13,6 +13,7 @@
 #include "bspfile.h" // dworldlight_t
 #include "soundservice.h"
 #include "tier0/systeminformation.h"
+#include "cl_ents_parse.h"
 
 ISoundServices *g_pSoundServices = NULL;
 Vector		listener_origin;

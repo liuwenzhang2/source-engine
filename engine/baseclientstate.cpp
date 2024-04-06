@@ -42,6 +42,7 @@
 #include "replay_internal.h"
 #include "replayserver.h"
 #endif
+#include "cl_ents_parse.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

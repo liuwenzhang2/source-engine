@@ -27,6 +27,7 @@
 #include "dt_recv_decoder.h"
 #include "utllinkedlist.h"
 #include "cl_demo.h"
+#include "cl_ents_parse.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
