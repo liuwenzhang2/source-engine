@@ -986,7 +986,7 @@ void C_BaseEntity::Clear( void )
 	m_hThink = INVALID_THINK_HANDLE;
 	m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
 
-	index = -1;
+	//index = -1;
 	m_Collision.Init( this );
 	GetEngineObject()->SetLocalOrigin( vec3_origin );
 	GetEngineObject()->SetLocalAngles( vec3_angle );
@@ -1074,7 +1074,7 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 {
 	Assert( entnum >= 0 && entnum < NUM_ENT_ENTRIES );
 
-	index = entnum;
+	//index = entnum;
 
 	if (entnum >= 0) {
 		//cl_entitylist->AddNetworkableEntity(this, entnum, iSerialNum);//GetIClientUnknown()
@@ -1122,7 +1122,7 @@ bool C_BaseEntity::InitializeAsClientEntity( const char *pszModelName, RenderGro
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t renderGroup )
 {
-	index = -1;
+	//index = -1;
 
 	// Setup model data.
 	SetModelByIndex( iIndex );
@@ -1180,7 +1180,7 @@ void C_BaseEntity::Term()
 	CollisionProp()->DestroyPartitionHandle();
 
 	// If Client side only entity index will be -1
-	if ( index != -1 )
+	if ( entindex() != -1 )
 	{
 		beams->KillDeadBeams( this );
 	}
@@ -1418,7 +1418,7 @@ bool C_BaseEntity::ShouldDraw()
 	if ( m_nRenderMode == kRenderNone )
 		return false;
 
-	return (model != 0) && !IsEffectActive(EF_NODRAW) && (index != 0);
+	return (model != 0) && !IsEffectActive(EF_NODRAW) && (entindex() != 0);
 }
 
 bool C_BaseEntity::TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trace )
@@ -1604,10 +1604,10 @@ IClientRenderable *C_BaseEntity::NextShadowPeer()
 // Purpose: Returns index into entities list for this entity
 // Output : Index
 //-----------------------------------------------------------------------------
-int	C_BaseEntity::entindex( void ) const
-{
-	return index;
-}
+//int	C_BaseEntity::entindex( void ) const
+//{
+//	return index;
+//}
 
 int C_BaseEntity::GetSoundSourceIndex() const
 {
@@ -2543,7 +2543,7 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 	}
 
 	// If it's the world, force solid flags
-	if ( index == 0 )
+	if (entindex() == 0 )
 	{
 		m_nModelIndex = 1;
 		SetSolid( SOLID_BSP );
@@ -2969,12 +2969,12 @@ void C_BaseEntity::CreateLightEffects( void )
 	dlight_t *dl;
 
 	// Is this for player flashlights only, if so move to linkplayers?
-	if ( index == render->GetViewEntity() )
+	if (entindex() == render->GetViewEntity() )
 		return;
 
 	if (IsEffectActive(EF_BRIGHTLIGHT))
 	{
-		dl = effects->CL_AllocDlight ( index );
+		dl = effects->CL_AllocDlight (entindex());
 		dl->origin = GetEngineObject()->GetAbsOrigin();
 		dl->origin[2] += 16;
 		dl->color.r = dl->color.g = dl->color.b = 250;
@@ -2983,7 +2983,7 @@ void C_BaseEntity::CreateLightEffects( void )
 	}
 	if (IsEffectActive(EF_DIMLIGHT))
 	{			
-		dl = effects->CL_AllocDlight ( index );
+		dl = effects->CL_AllocDlight (entindex());
 		dl->origin = GetEngineObject()->GetAbsOrigin();
 		dl->color.r = dl->color.g = dl->color.b = 100;
 		dl->radius = random->RandomFloat(200,231);
@@ -3002,10 +3002,10 @@ void C_BaseEntity::MoveToLastReceivedPosition( bool force )
 
 bool C_BaseEntity::ShouldInterpolate()
 {
-	if ( render->GetViewEntity() == index )
+	if ( render->GetViewEntity() == entindex())
 		return true;
 
-	if ( index == 0 || !GetModel() )
+	if (entindex() == 0 || !GetModel() )
 		return false;
 
 	// always interpolate if visible
@@ -3116,7 +3116,7 @@ void C_BaseEntity::ProcessInterpolatedList()
 void C_BaseEntity::AddEntity( void )
 {
 	// Don't ever add the world, it's drawn separately
-	if ( index == 0 )
+	if (entindex() == 0 )
 		return;
 
 	// Create flashlight effects, etc.
@@ -3324,7 +3324,7 @@ void C_BaseEntity::ComputeFxBlend( void )
 	int blend=0;
 	float offset;
 
-	offset = ((int)index) * 363.0;// Use ent index to de-sync these fx
+	offset = ((int)entindex()) * 363.0;// Use ent index to de-sync these fx
 
 	switch( m_nRenderFX ) 
 	{
@@ -3684,7 +3684,7 @@ void C_BaseEntity::AddBrushModelDecal( const Ray_t& ray, const Vector& decalCent
 			return;
 	}
 
-	effects->DecalShoot( decalIndex, index, 
+	effects->DecalShoot( decalIndex, entindex(),
 		model, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0 );
 }
 
@@ -3759,7 +3759,7 @@ void C_BaseEntity::AddColoredDecal( const Vector& rayStart, const Vector& rayEnd
 	case mod_brush:
 		{
 			color32 cColor32 = { (uint8)cColor.r(), (uint8)cColor.g(), (uint8)cColor.b(), (uint8)cColor.a() };
-			effects->DecalColorShoot( decalIndex, index, model, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0, cColor32 );
+			effects->DecalColorShoot( decalIndex, entindex(), model, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0, cColor32 );
 		}
 		break;
 

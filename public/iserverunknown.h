@@ -32,7 +32,16 @@ public:
 	virtual ICollideable*		GetCollideable() = 0;
 	virtual IServerNetworkable*	GetNetworkable() = 0;
 	virtual CBaseEntity*		GetBaseEntity() = 0;
-	virtual int					entindex() const = 0;
+	//virtual int					entindex() const = 0;
+	virtual int				entindex() const {
+		CBaseHandle Handle = this->GetRefEHandle();
+		if (Handle == INVALID_ENTITY_HANDLE) {
+			return -1;
+		}
+		else {
+			return Handle.GetEntryIndex();
+		}
+	};
 	virtual const char*			GetClassName() const = 0;
 	virtual ServerClass*		GetServerClass() = 0;
 private:

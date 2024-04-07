@@ -113,7 +113,7 @@ void C_LocalTempEntity::Prepare( const model_t *pmodel, float time )
 {
 	GetEngineObject()->Interp_SetupMappings(GetEngineObject()->GetVarMapping() );
 
-	index = -1;
+	//index = -1;
 	Clear();
 
 	// Use these to set per-frame and termination conditions / actions
@@ -176,7 +176,7 @@ int C_LocalTempEntity::DrawStudioModel( int flags )
 			flags, 
 			this,
 			MODEL_INSTANCE_INVALID,
-			index, 
+			entindex(),
 			GetModel(),
 			GetAbsOrigin(),
 			GetAbsAngles(),
@@ -966,7 +966,7 @@ int BreakModelDrawHelper( C_LocalTempEntity *entity, int flags )
 	sInfo.flags = flags;
 	sInfo.pRenderable = entity;
 	sInfo.instance = MODEL_INSTANCE_INVALID;
-	sInfo.entity_index = entity->index;
+	sInfo.entity_index = entity->entindex();
 	sInfo.pModel = entity->GetModel();
 	sInfo.origin = entity->GetRenderOrigin();
 	sInfo.angles = entity->GetRenderAngles();
@@ -2300,7 +2300,7 @@ int CTempEnts::AddVisibleTempEntity( C_LocalTempEntity *pEntity )
 	//if ( engine->IsBoxInViewCluster( mins, maxs ) )
 	{
 		// Temporary entities have no corresponding element in cl_entitylist
-		pEntity->index = -1;
+		//pEntity->index = -1;//aaa need check
 		
 		// Add to list
 		if( pEntity->m_RenderGroup == RENDER_GROUP_OTHER )

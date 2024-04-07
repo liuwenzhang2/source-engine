@@ -22,6 +22,7 @@
 #include "posedebugger.h"
 
 #include "iclientnetworkable.h"
+#include "icliententity.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -48,7 +49,7 @@ static ConVar ui_posedebug_fade_out_time( "ui_posedebug_fade_out_time", "0.8",
 class CPoseDebuggerStub : public IPoseDebugger
 {
 public:
-	virtual void StartBlending( IClientNetworkable *pEntity, const CStudioHdr *pStudioHdr ) { }
+	virtual void StartBlending( IClientEntity *pEntity, const CStudioHdr *pStudioHdr ) { }
 	virtual void AccumulatePose(
 		const CStudioHdr *pStudioHdr,
 		CIKContext *pIKContext,
@@ -318,7 +319,7 @@ public:
 	bool IsModelShown( int iEntNum ) const;
 
 public:
-	virtual void StartBlending( IClientNetworkable *pEntity, const CStudioHdr *pStudioHdr );
+	virtual void StartBlending( IClientEntity *pEntity, const CStudioHdr *pStudioHdr );
 	virtual void AccumulatePose(
 		const CStudioHdr *pStudioHdr,
 		CIKContext *pIKContext,
@@ -386,7 +387,7 @@ bool CPoseDebuggerImpl::IsModelShown( int iEntNum ) const
 		return false;
 }
 
-void CPoseDebuggerImpl::StartBlending( IClientNetworkable *pEntity, const CStudioHdr *pStudioHdr )
+void CPoseDebuggerImpl::StartBlending( IClientEntity *pEntity, const CStudioHdr *pStudioHdr )
 {
 //	virtualmodel_t const *pVMdl = pStudioHdr->GetVirtualModel();
 // 	if ( !pVMdl )

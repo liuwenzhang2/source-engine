@@ -12,12 +12,13 @@
 #pragma once
 #endif
 
-class IClientNetworkable;
+//class IClientNetworkable;
+class IClientEntity;
 
 abstract_class IPoseDebugger
 {
 public:
-	virtual void StartBlending( IClientNetworkable *pEntity, const CStudioHdr *pStudioHdr ) = 0;
+	virtual void StartBlending( IClientEntity *pEntity, const CStudioHdr *pStudioHdr ) = 0;
 	
 	virtual void AccumulatePose(
 		const CStudioHdr *pStudioHdr,

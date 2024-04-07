@@ -796,7 +796,7 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 		if ( g_nKillCamMode )
 			iLocalPlayerIndex = g_nKillCamTarget1;
 
-		if ( iLocalPlayerIndex == index )
+		if ( iLocalPlayerIndex == entindex())
 		{
 			Assert( s_pLocalPlayer == NULL );
 			s_pLocalPlayer = this;
@@ -1209,7 +1209,7 @@ void C_BasePlayer::UpdateFlashlight()
 		if (!m_pFlashlight)
 		{
 			// Turned on the headlight; create it.
-			m_pFlashlight = new CFlashlightEffect(index);
+			m_pFlashlight = new CFlashlightEffect(entindex());
 
 			if (!m_pFlashlight)
 				return;

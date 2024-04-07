@@ -699,15 +699,15 @@ public:
 	// returns a pointer to the entities edict, if it has one.  should be removed!
 	//inline edict_t			*edict( void )			{ return NetworkProp()->edict(); }
 	//inline const edict_t	*edict( void ) const	{ return NetworkProp()->edict(); }
-	inline int				entindex( ) const		{
-		CBaseHandle Handle = this->GetRefEHandle();
-		if (Handle == INVALID_ENTITY_HANDLE) {
-			return -1;
-		}
-		else {
-			return Handle.GetEntryIndex();
-		}
-	};
+	//inline int				entindex( ) const		{
+	//	CBaseHandle Handle = this->GetRefEHandle();
+	//	if (Handle == INVALID_ENTITY_HANDLE) {
+	//		return -1;
+	//	}
+	//	else {
+	//		return Handle.GetEntryIndex();
+	//	}
+	//};
 	inline int				GetSoundSourceIndex() const		{ return entindex(); }
 
 	// These methods encapsulate MOVETYPE_FOLLOW, which became obsolete

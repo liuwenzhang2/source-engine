@@ -83,7 +83,7 @@ void TracerCallback( const CEffectData &data )
 	bool bWhiz = (data.m_fFlags & TRACER_FLAG_WHIZ);
 	int iEntIndex = data.entindex();
 
-	if ( iEntIndex && iEntIndex == player->index )
+	if ( iEntIndex && iEntIndex == player->entindex())
 	{
 		Vector	foo = data.m_vStart;
 		QAngle	vangles;
@@ -126,7 +126,7 @@ void ParticleTracerCallback( const CEffectData &data )
 
 	// Adjust view model tracers
 	C_BaseEntity *pEntity = data.GetEntity();
-	if ( data.entindex() && data.entindex() == player->index )
+	if ( data.entindex() && data.entindex() == player->entindex())
 	{
 		QAngle	vangles;
 		Vector	vforward, vright, vup;

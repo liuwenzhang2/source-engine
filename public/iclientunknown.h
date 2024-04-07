@@ -32,6 +32,15 @@ abstract_class IClientUnknown : public IHandleEntity
 public:
 	virtual void SetRefEHandle(const CBaseHandle& handle) { m_RefEHandle = handle; }
 	virtual const CBaseHandle& GetRefEHandle() const { return m_RefEHandle; }
+	virtual int				entindex() const {
+		CBaseHandle Handle = this->GetRefEHandle();
+		if (Handle == INVALID_ENTITY_HANDLE) {
+			return -1;
+		}
+		else {
+			return Handle.GetEntryIndex();
+		}
+	};
 	virtual ICollideable*		GetCollideable() = 0;
 	virtual IClientNetworkable*	GetClientNetworkable() = 0;
 	virtual IClientRenderable*	GetClientRenderable() = 0;

@@ -87,7 +87,7 @@ public:
 
 	// Ent Index is the server handle used to reference this entity.
 	// If the index is < 0, that indicates the entity is not known to the server
-	virtual int				entindex( void ) const = 0;
+	//virtual int				entindex( void ) const = 0;
 
 	// Server to client entity message received
 	virtual void			ReceiveMessage( int classID, bf_read &msg ) = 0;

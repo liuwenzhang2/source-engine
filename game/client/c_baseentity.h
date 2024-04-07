@@ -620,7 +620,7 @@ public:
 	// checks to see if the entity is marked for deletion
 	bool							IsMarkedForDeletion( void );
 
-	virtual int						entindex( void ) const;
+	//virtual int						entindex( void ) const;
 	
 	// This works for client-only entities and returns the GetEntryIndex() of the entity's handle,
 	// so the sound system can get an IClientEntity from it.
@@ -1460,7 +1460,7 @@ public:
 public:	
 
 	// Determine what entity this corresponds to
-	int								index;	
+	//int								index;	
 
 	// Render information
 	unsigned char					m_nRenderFX;
@@ -1975,7 +1975,7 @@ inline const CParticleProperty *C_BaseEntity::ParticleProp() const
 //-----------------------------------------------------------------------------
 inline bool C_BaseEntity::IsServerEntity( void )
 {
-	return index != -1;
+	return entindex() != -1;
 }
 
 

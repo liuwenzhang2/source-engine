@@ -2720,7 +2720,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 		// Prevent spammage!!!
 		if ( gpGlobals->realtime >= lastWarning + 1.0f )
 		{
-			DevMsgRT( "*** ERROR: Bone access not allowed (entity %i:%s)\n", index, GetClassname() );
+			DevMsgRT( "*** ERROR: Bone access not allowed (entity %i:%s)\n", entindex(), GetClassname() );
 			lastWarning = gpGlobals->realtime;
 		}
 	}
@@ -3256,7 +3256,7 @@ int C_BaseAnimating::InternalDrawModel( int flags )
 	pInfo->flags = flags;
 	pInfo->pRenderable = this;
 	pInfo->instance = GetModelInstance();
-	pInfo->entity_index = index;
+	pInfo->entity_index = entindex();
 	pInfo->pModel = GetModel();
 	pInfo->origin = GetRenderOrigin();
 	pInfo->angles = GetRenderAngles();
@@ -3318,7 +3318,7 @@ void C_BaseAnimating::ProcessMuzzleFlashEvent()
 			GetAttachment( 1, vAttachment, dummyAngles );
 
 			// Make an elight
-			dlight_t *el = effects->CL_AllocElight( LIGHT_INDEX_MUZZLEFLASH + index );
+			dlight_t *el = effects->CL_AllocElight( LIGHT_INDEX_MUZZLEFLASH + entindex());
 			el->origin = vAttachment;
 			el->radius = random->RandomInt( 32, 64 ); 
 			el->decay = el->radius / 0.05f;

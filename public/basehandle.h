@@ -14,6 +14,7 @@
 #include "const.h"
 #include "tier0/dbg.h"
 
+#define INVALID_ENTITY_HANDLE INVALID_EHANDLE_INDEX
 
 class IHandleEntity;
 
