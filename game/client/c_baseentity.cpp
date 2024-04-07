@@ -1612,9 +1612,9 @@ IClientRenderable *C_BaseEntity::NextShadowPeer()
 int C_BaseEntity::GetSoundSourceIndex() const
 {
 #ifdef _DEBUG
-	if ( index != -1 )
+	if ( entindex() != -1 )
 	{
-		Assert( index == GetRefEHandle().GetEntryIndex() );
+		Assert(entindex() == GetRefEHandle().GetEntryIndex() );
 	}
 #endif
 	return GetRefEHandle().GetEntryIndex();
