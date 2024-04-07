@@ -24,7 +24,7 @@
 #include "tier0/memdbgon.h"
 
 #define MANIFEST_FILE				"scripts/game_sounds_manifest.txt"
-#define GAME_SOUNDS_HEADER_BLOCK	"scripts/game_sounds_header.txt"
+//#define GAME_SOUNDS_HEADER_BLOCK	"scripts/game_sounds_header.txt"
 
 static IFileSystem* filesystem = 0;
 
@@ -1278,157 +1278,157 @@ bool CSoundEmitterSystemBase::IsSoundScriptDirty( int index ) const
 	return m_SoundKeyValues[ index ].dirty;
 }
 
-void CSoundEmitterSystemBase::SaveChangesToSoundScript( int scriptindex )
-{
-	const char *outfile = GetSoundScriptName( scriptindex );
-	if ( !outfile )
-	{
-		Msg( "CSoundEmitterSystemBase::SaveChangesToSoundScript:  No script file for index %i\n", scriptindex );
-		return;
-	}
-
-	if ( filesystem->FileExists( outfile ) &&
-		 !filesystem->IsFileWritable( outfile ) )
-	{
-		Warning( "%s is not writable, can't save data to file\n", outfile );
-		return;
-	}
-
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
-
-	// FIXME:  Write sound script header
-	if ( filesystem->FileExists( GAME_SOUNDS_HEADER_BLOCK ) )
-	{
-		FileHandle_t header = filesystem->Open( GAME_SOUNDS_HEADER_BLOCK, "rb", NULL );
-		if ( header != FILESYSTEM_INVALID_HANDLE )
-		{
-			int len = filesystem->Size( header );
-			
-			unsigned char *data = new unsigned char[ len + 1 ];
-			Q_memset( data, 0, len + 1 );
-			
-			filesystem->Read( data, len, header );
-			filesystem->Close( header );
-
-			data[ len ] = 0;
-
-			char *p = (char *)data;
-			while ( *p )
-			{
-				if ( *p != '\r' )
-				{
-					buf.PutChar( *p );
-				}
-				++p;
-			}
-
-			delete[] data;
-		}
-
-		buf.Printf( "\n" );
-	}
-
-
-	int c = GetSoundCount();
-	for ( int i = 0; i < c; i++ )
-	{
-		if ( Q_stricmp( outfile, GetSourceFileForSound( i ) ) )
-			continue;
-
-		// It's marked for deletion, just skip it
-		if ( m_Sounds[ i ]->m_bRemoved )
-			continue;
-
-		CSoundParametersInternal *p = InternalGetParametersForSound( i );
-		if ( !p )
-			continue;
-		
-		buf.Printf( "\"%s\"\n{\n", GetSoundName( i ) );
-
-		buf.Printf( "\t\"channel\"\t\t\"%s\"\n", p->ChannelToString() );
-		buf.Printf( "\t\"volume\"\t\t\"%s\"\n", p->VolumeToString() );
-		buf.Printf( "\t\"pitch\"\t\t\t\"%s\"\n", p->PitchToString() );
-		buf.Printf( "\n" );
-		buf.Printf( "\t\"soundlevel\"\t\"%s\"\n", p->SoundLevelToString() );
-
-		if ( p->OnlyPlayToOwner() )
-		{
-			buf.Printf( "\t\"play_to_owner_only\"\t\"1\"\n" );
-		}
-
-		if ( p->GetDelayMsec() != 0 )
-		{
-			buf.Printf( "\t\"delay_msec\"\t\"%i\"\n", p->GetDelayMsec() );
-		}
-
-		int totalCount = 0;
-
-		int waveCount = p->NumSoundNames();
-		int convertedCount = p->NumConvertedNames();
-
-		totalCount = ( waveCount - 2 * convertedCount ) + convertedCount;
-
-		if  ( totalCount > 0 )
-		{
-			buf.Printf( "\n" );
-
-			if ( waveCount == 1 )
-			{
-				Assert( p->GetSoundNames()[ 0 ].gender == GENDER_NONE );
-				buf.Printf( "\t\"wave\"\t\t\t\"%s\"\n", GetWaveName( p->GetSoundNames()[ 0 ].symbol ) );
-			}
-			else if ( convertedCount == 1 )
-			{
-				Assert( p->GetConvertedNames()[ 0 ].gender == GENDER_NONE );
-				buf.Printf( "\t\"wave\"\t\t\t\"%s\"\n", GetWaveName( p->GetConvertedNames()[ 0 ].symbol ) );
-			}
-			else
-			{
-				buf.Printf( "\t\"rndwave\"\n" );
-				buf.Printf( "\t{\n" );
-
-				int wave;
-				for ( wave = 0; wave < waveCount; wave++ )
-				{
-					// Skip macro-expanded names
-					if ( p->GetSoundNames()[ wave ].gender != GENDER_NONE )
-						continue;
-
-					buf.Printf( "\t\t\"wave\"\t\"%s\"\n", GetWaveName( p->GetSoundNames()[ wave ].symbol ) );
-				}
-				for ( wave = 0; wave < convertedCount; wave++ )
-				{
-					buf.Printf( "\t\t\"wave\"\t\"%s\"\n", GetWaveName( p->GetConvertedNames()[ wave ].symbol ) );
-				}
-
-				buf.Printf( "\t}\n" );
-			}
-
-		}
-
-		buf.Printf( "}\n" );
-
-		if ( i != c - 1 )
-		{
-			buf.Printf( "\n" );
-		}
-	}
-
-	// Write it out baby
-	FileHandle_t fh = filesystem->Open( outfile, "wt" );
-	if (fh)
-	{
-		filesystem->Write( buf.Base(), buf.TellPut(), fh );
-		filesystem->Close(fh);
-
-		// Changed saved successfully
-		m_SoundKeyValues[ scriptindex ].dirty = false;
-	}
-	else
-	{
-		Warning( "SceneManager_SaveSoundsToScriptFile:  Unable to write file %s!!!\n", outfile );
-	}
-}
+//void CSoundEmitterSystemBase::SaveChangesToSoundScript( int scriptindex )
+//{
+//	const char *outfile = GetSoundScriptName( scriptindex );
+//	if ( !outfile )
+//	{
+//		Msg( "CSoundEmitterSystemBase::SaveChangesToSoundScript:  No script file for index %i\n", scriptindex );
+//		return;
+//	}
+//
+//	if ( filesystem->FileExists( outfile ) &&
+//		 !filesystem->IsFileWritable( outfile ) )
+//	{
+//		Warning( "%s is not writable, can't save data to file\n", outfile );
+//		return;
+//	}
+//
+//	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+//
+//	// FIXME:  Write sound script header
+//	if ( filesystem->FileExists( GAME_SOUNDS_HEADER_BLOCK ) )
+//	{
+//		FileHandle_t header = filesystem->Open( GAME_SOUNDS_HEADER_BLOCK, "rb", NULL );
+//		if ( header != FILESYSTEM_INVALID_HANDLE )
+//		{
+//			int len = filesystem->Size( header );
+//			
+//			unsigned char *data = new unsigned char[ len + 1 ];
+//			Q_memset( data, 0, len + 1 );
+//			
+//			filesystem->Read( data, len, header );
+//			filesystem->Close( header );
+//
+//			data[ len ] = 0;
+//
+//			char *p = (char *)data;
+//			while ( *p )
+//			{
+//				if ( *p != '\r' )
+//				{
+//					buf.PutChar( *p );
+//				}
+//				++p;
+//			}
+//
+//			delete[] data;
+//		}
+//
+//		buf.Printf( "\n" );
+//	}
+//
+//
+//	int c = GetSoundCount();
+//	for ( int i = 0; i < c; i++ )
+//	{
+//		if ( Q_stricmp( outfile, GetSourceFileForSound( i ) ) )
+//			continue;
+//
+//		// It's marked for deletion, just skip it
+//		if ( m_Sounds[ i ]->m_bRemoved )
+//			continue;
+//
+//		CSoundParametersInternal *p = InternalGetParametersForSound( i );
+//		if ( !p )
+//			continue;
+//		
+//		buf.Printf( "\"%s\"\n{\n", GetSoundName( i ) );
+//
+//		buf.Printf( "\t\"channel\"\t\t\"%s\"\n", p->ChannelToString() );
+//		buf.Printf( "\t\"volume\"\t\t\"%s\"\n", p->VolumeToString() );
+//		buf.Printf( "\t\"pitch\"\t\t\t\"%s\"\n", p->PitchToString() );
+//		buf.Printf( "\n" );
+//		buf.Printf( "\t\"soundlevel\"\t\"%s\"\n", p->SoundLevelToString() );
+//
+//		if ( p->OnlyPlayToOwner() )
+//		{
+//			buf.Printf( "\t\"play_to_owner_only\"\t\"1\"\n" );
+//		}
+//
+//		if ( p->GetDelayMsec() != 0 )
+//		{
+//			buf.Printf( "\t\"delay_msec\"\t\"%i\"\n", p->GetDelayMsec() );
+//		}
+//
+//		int totalCount = 0;
+//
+//		int waveCount = p->NumSoundNames();
+//		int convertedCount = p->NumConvertedNames();
+//
+//		totalCount = ( waveCount - 2 * convertedCount ) + convertedCount;
+//
+//		if  ( totalCount > 0 )
+//		{
+//			buf.Printf( "\n" );
+//
+//			if ( waveCount == 1 )
+//			{
+//				Assert( p->GetSoundNames()[ 0 ].gender == GENDER_NONE );
+//				buf.Printf( "\t\"wave\"\t\t\t\"%s\"\n", GetWaveName( p->GetSoundNames()[ 0 ].symbol ) );
+//			}
+//			else if ( convertedCount == 1 )
+//			{
+//				Assert( p->GetConvertedNames()[ 0 ].gender == GENDER_NONE );
+//				buf.Printf( "\t\"wave\"\t\t\t\"%s\"\n", GetWaveName( p->GetConvertedNames()[ 0 ].symbol ) );
+//			}
+//			else
+//			{
+//				buf.Printf( "\t\"rndwave\"\n" );
+//				buf.Printf( "\t{\n" );
+//
+//				int wave;
+//				for ( wave = 0; wave < waveCount; wave++ )
+//				{
+//					// Skip macro-expanded names
+//					if ( p->GetSoundNames()[ wave ].gender != GENDER_NONE )
+//						continue;
+//
+//					buf.Printf( "\t\t\"wave\"\t\"%s\"\n", GetWaveName( p->GetSoundNames()[ wave ].symbol ) );
+//				}
+//				for ( wave = 0; wave < convertedCount; wave++ )
+//				{
+//					buf.Printf( "\t\t\"wave\"\t\"%s\"\n", GetWaveName( p->GetConvertedNames()[ wave ].symbol ) );
+//				}
+//
+//				buf.Printf( "\t}\n" );
+//			}
+//
+//		}
+//
+//		buf.Printf( "}\n" );
+//
+//		if ( i != c - 1 )
+//		{
+//			buf.Printf( "\n" );
+//		}
+//	}
+//
+//	// Write it out baby
+//	FileHandle_t fh = filesystem->Open( outfile, "wt" );
+//	if (fh)
+//	{
+//		filesystem->Write( buf.Base(), buf.TellPut(), fh );
+//		filesystem->Close(fh);
+//
+//		// Changed saved successfully
+//		m_SoundKeyValues[ scriptindex ].dirty = false;
+//	}
+//	else
+//	{
+//		Warning( "SceneManager_SaveSoundsToScriptFile:  Unable to write file %s!!!\n", outfile );
+//	}
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

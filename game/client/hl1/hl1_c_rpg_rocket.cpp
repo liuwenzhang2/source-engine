@@ -37,7 +37,7 @@ void C_RpgRocket::CreateLightEffects( void )
 	dlight_t *dl;
 	if ( IsEffectActive(EF_DIMLIGHT) )
 	{			
-		dl = effects->CL_AllocDlight ( index );
+		dl = effects->CL_AllocDlight (entindex());
 		dl->origin = GetAbsOrigin();
 		dl->color.r = dl->color.g = dl->color.b = 100;
 		dl->radius = 200;

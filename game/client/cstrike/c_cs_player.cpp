@@ -1778,7 +1778,7 @@ void C_CSPlayer::ProcessMuzzleFlashEvent()
 		{
 			if ( hasMuzzleFlash )
 			{
-				dlight_t *el = effects->CL_AllocDlight( LIGHT_INDEX_MUZZLEFLASH + index );
+				dlight_t *el = effects->CL_AllocDlight( LIGHT_INDEX_MUZZLEFLASH + entindex());
 				el->origin = vector;
 				el->radius = 70;
 				el->decay = el->radius / 0.05f;

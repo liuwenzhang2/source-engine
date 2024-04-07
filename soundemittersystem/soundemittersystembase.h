@@ -117,7 +117,7 @@ public:
 	virtual bool		IsSoundScriptDirty( int index ) const;
 	virtual int			FindSoundScript( const char *name ) const;
 
-	virtual void		SaveChangesToSoundScript( int scriptindex );
+	//virtual void		SaveChangesToSoundScript( int scriptindex );
 
 	virtual void		ExpandSoundNameMacros( CSoundParametersInternal& params, char const *wavename );
 	virtual gender_t	GetActorGender( char const *actormodel );

@@ -241,7 +241,7 @@ public:
 	virtual char const		*GetSoundScriptName( int index ) const = 0;
 	virtual bool			IsSoundScriptDirty( int index ) const = 0;
 	virtual int				FindSoundScript( const char *name ) const = 0;
-	virtual void			SaveChangesToSoundScript( int scriptindex ) = 0;
+	//virtual void			SaveChangesToSoundScript( int scriptindex ) = 0;
 
 	virtual void			ExpandSoundNameMacros( CSoundParametersInternal& params, char const *wavename ) = 0;
 	virtual gender_t		GetActorGender( char const *actormodel ) = 0;

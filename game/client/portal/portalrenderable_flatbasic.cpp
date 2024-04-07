@@ -113,8 +113,8 @@ void CPortalRenderable_FlatBasic::GetToolRecordingState( bool bActive, KeyValues
 	C_Prop_Portal *pLinkedPortal = static_cast<C_Prop_Portal*>( m_pLinkedPortal );
 
 	static PortalRecordingState_t state;
-	state.m_nPortalId = static_cast<C_Prop_Portal*>( this )->index;
-	state.m_nLinkedPortalId = pLinkedPortal ? pLinkedPortal->index : -1;
+	state.m_nPortalId = static_cast<C_Prop_Portal*>( this )->entindex();
+	state.m_nLinkedPortalId = pLinkedPortal ? pLinkedPortal->entindex() : -1;
 	state.m_fStaticAmount = m_fStaticAmount;
 	state.m_fSecondaryStaticAmount = m_fSecondaryStaticAmount;
 	state.m_fOpenAmount = m_fOpenAmount;
