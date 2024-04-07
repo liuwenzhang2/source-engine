@@ -214,7 +214,7 @@ public:
 	virtual bool			GetParametersForSound( const char *soundname, CSoundParameters& params, gender_t gender, bool isbeingemitted = false ) = 0;
 
 	virtual const char		*GetWaveName( CUtlSymbol& sym ) = 0;
-	virtual CUtlSymbol		AddWaveName( const char *name ) = 0;
+	//virtual CUtlSymbol		AddWaveName( const char *name ) = 0;
 
 	virtual soundlevel_t	LookupSoundLevel( const char *soundname ) = 0;
 	virtual const char		*GetWavFileForSound( const char *soundname, char const *actormodel ) = 0;
@@ -230,28 +230,28 @@ public:
 	virtual CSoundParametersInternal *InternalGetParametersForSound( int index ) = 0;
 
 	// The host application is responsible for dealing with dirty sound scripts, etc.
-	virtual bool			AddSound( const char *soundname, const char *scriptfile, const CSoundParametersInternal& params ) = 0;
-	virtual void			RemoveSound( const char *soundname ) = 0;
-	virtual void			MoveSound( const char *soundname, const char *newscript ) = 0;
-	virtual void			RenameSound( const char *soundname, const char *newname ) = 0;
+	//virtual bool			AddSound( const char *soundname, const char *scriptfile, const CSoundParametersInternal& params ) = 0;
+	//virtual void			RemoveSound( const char *soundname ) = 0;
+	//virtual void			MoveSound( const char *soundname, const char *newscript ) = 0;
+	//virtual void			RenameSound( const char *soundname, const char *newname ) = 0;
 
-	virtual void			UpdateSoundParameters( const char *soundname, const CSoundParametersInternal& params ) = 0;
+	//virtual void			UpdateSoundParameters( const char *soundname, const CSoundParametersInternal& params ) = 0;
 
-	virtual int				GetNumSoundScripts() const = 0;
-	virtual char const		*GetSoundScriptName( int index ) const = 0;
-	virtual bool			IsSoundScriptDirty( int index ) const = 0;
-	virtual int				FindSoundScript( const char *name ) const = 0;
+	//virtual int				GetNumSoundScripts() const = 0;
+	//virtual char const		*GetSoundScriptName( int index ) const = 0;
+	//virtual bool			IsSoundScriptDirty( int index ) const = 0;
+	//virtual int				FindSoundScript( const char *name ) const = 0;
 	//virtual void			SaveChangesToSoundScript( int scriptindex ) = 0;
 
-	virtual void			ExpandSoundNameMacros( CSoundParametersInternal& params, char const *wavename ) = 0;
+	//virtual void			ExpandSoundNameMacros( CSoundParametersInternal& params, char const *wavename ) = 0;
 	virtual gender_t		GetActorGender( char const *actormodel ) = 0;
 	virtual void			GenderExpandString( char const *actormodel, char const *in, char *out, int maxlen ) = 0;
 	virtual void			GenderExpandString( gender_t gender, char const *in, char *out, int maxlen ) = 0;
-	virtual bool			IsUsingGenderToken( char const *soundname ) = 0;
+	//virtual bool			IsUsingGenderToken( char const *soundname ) = 0;
 
 	// For blowing away caches based on filetimstamps of the manifest, or of any of the
 	//  .txt files that are read into the sound emitter system
-	virtual unsigned int	GetManifestFileTimeChecksum() = 0;
+	//virtual unsigned int	GetManifestFileTimeChecksum() = 0;
 
 	// Called from both client and server (single player) or just one (server only in dedicated server and client only if connected to a remote server)
 	// Called by LevelInitPreEntity to override sound scripts for the mod with level specific overrides based on custom mapnames, etc.
