@@ -92,7 +92,7 @@ struct levellist_t
 
 	char	mapName[ MAX_MAP_NAME_SAVE ];
 	char	landmarkName[ 32 ];
-	CBaseEntity	*pentLandmark;
+	IHandleEntity	*pentLandmark;
 	Vector	vecLandmarkOrigin;
 };
 
@@ -203,8 +203,8 @@ public:
 		return pReturn;
 	}
 
-	CBaseEntity *GetCurrentEntityContext()	{ return m_pCurrentEntity; }
-	void		SetCurrentEntityContext(CBaseEntity *pEntity) { m_pCurrentEntity = pEntity; }
+	IHandleEntity *GetCurrentEntityContext()	{ return m_pCurrentEntity; }
+	void		SetCurrentEntityContext(IHandleEntity *pEntity) { m_pCurrentEntity = pEntity; }
 
 	int NumEntities()						{ return tableCount; }
 	entitytable_t *GetEntityInfo( int i )	{ return (pTable + i); }
@@ -231,7 +231,7 @@ public:
 		m_EntityToIndex.Purge();
 	}
 
-	int	GetEntityIndex( const CBaseEntity *pEntity )
+	int	GetEntityIndex( const IHandleEntity *pEntity )
 	{
 #ifdef SR_ENTS_VISIBLE
 		if ( pEntity )
@@ -268,16 +268,16 @@ public:
 private:
 	int			tableCount;		// Number of elements in the entity table
 	entitytable_t	*pTable;		// Array of entitytable_t elements (1 for each entity)
-	CBaseEntity		*m_pCurrentEntity; // only valid during the save functions of this entity, NULL otherwise
+	IHandleEntity		*m_pCurrentEntity; // only valid during the save functions of this entity, NULL otherwise
 
 
 	struct CHashElement
 	{
-		const CBaseEntity *pEntity; 
+		const IHandleEntity *pEntity; 
 		int index;
 
-		CHashElement( const CBaseEntity *pEntity, int index) : pEntity(pEntity), index(index) {}
-		CHashElement( const CBaseEntity *pEntity ) : pEntity(pEntity) {}
+		CHashElement( const IHandleEntity *pEntity, int index) : pEntity(pEntity), index(index) {}
+		CHashElement( const IHandleEntity *pEntity ) : pEntity(pEntity) {}
 		CHashElement() = default;
 	};
 

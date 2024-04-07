@@ -2106,7 +2106,7 @@ int CChangeLevel::ChangeList( levellist_t *pLevelList, int maxList )
 		int			 entityFlags[ MAX_ENTITY ];
 
 		// First, figure out which entities are near the transition
-		CBaseEntity *pLandmarkEntity = ( pLevelList[i].pentLandmark );
+		CBaseEntity *pLandmarkEntity = (CBaseEntity*)( pLevelList[i].pentLandmark );
 		int iEntity = BuildEntityTransitionList( pLandmarkEntity, pLevelList[i].landmarkName, pEntList, entityFlags, MAX_ENTITY );
 
 		// FIXME: Activate if we have a dependency problem on level transition

@@ -11,20 +11,22 @@
 #include "string_t.h"
 #include "datamap.h"
 #include "mathlib/vmatrix.h"
+#include "basehandle.h"
+#include "ihandleentity.h"
 
 #if defined( _WIN32 )
 #pragma once
 #endif
 
-#ifndef CLIENT_DLL
-class SINGLE_INHERITANCE CBaseEntity;
-#endif
+//#ifndef CLIENT_DLL
+//class SINGLE_INHERITANCE CBaseEntity;
+//#endif
 
 class Vector;
 class VMatrix;
 //struct edict_t;
-template< class T > class CHandle;
-typedef CHandle<CBaseEntity> EHANDLE;
+//template< class T > class CHandle;
+//typedef CHandle<CBaseEntity> EHANDLE;
 struct matrix3x4_t;
 
 class CSaveRestoreData;
@@ -195,13 +197,13 @@ public:
 	virtual void	WritePositionVector( const Vector &value ) = 0;		// Offset for landmark if necessary
 	virtual void	WritePositionVector( const Vector *value, int count = 1 ) = 0;	// array of pos vectors
 
-	virtual void	WriteEntityPtr( const char *pname, CBaseEntity **ppEntity, int count = 1 ) = 0;
+	virtual void	WriteEntityPtr( const char *pname, IHandleEntity **ppEntity, int count = 1 ) = 0;
 	//virtual void	WriteEdictPtr( const char *pname, edict_t **ppEdict, int count = 1 ) = 0;
-	virtual void	WriteEHandle( const char *pname, const EHANDLE *pEHandle, int count = 1 ) = 0;
+	virtual void	WriteEHandle( const char *pname, const CBaseHandle *pEHandle, int count = 1 ) = 0;
 
-	virtual void	WriteEntityPtr( CBaseEntity **ppEntity, int count = 1 ) = 0;
+	virtual void	WriteEntityPtr( IHandleEntity **ppEntity, int count = 1 ) = 0;
 	//virtual void	WriteEdictPtr( edict_t **ppEdict, int count = 1 ) = 0;
-	virtual void	WriteEHandle( const EHANDLE *pEHandle, int count = 1 ) = 0;
+	virtual void	WriteEHandle( const CBaseHandle *pEHandle, int count = 1 ) = 0;
 
 	//---------------------------------
 	// Back door to support somewhat awkward ownership of game save/restore data
@@ -287,9 +289,9 @@ public:
 	virtual int		ReadPositionVector( Vector *pValue, int count = 1, int nBytesAvailable = 0 ) = 0;
 	virtual int		ReadFunction( datamap_t *pMap, inputfunc_t **pValue, int count = 1, int nBytesAvailable = 0) = 0;
 	
-	virtual int		ReadEntityPtr( CBaseEntity **ppEntity, int count = 1, int nBytesAvailable = 0 ) = 0;
+	virtual int		ReadEntityPtr( IHandleEntity **ppEntity, int count = 1, int nBytesAvailable = 0 ) = 0;
 	//virtual int		ReadEdictPtr( edict_t **ppEdict, int count = 1, int nBytesAvailable = 0 ) = 0;
-	virtual int		ReadEHandle( EHANDLE *pEHandle, int count = 1, int nBytesAvailable = 0 ) = 0;
+	virtual int		ReadEHandle( CBaseHandle *pEHandle, int count = 1, int nBytesAvailable = 0 ) = 0;
 	virtual int		ReadVMatrix( VMatrix *pValue, int count = 1, int nBytesAvailable = 0) = 0;
 	virtual int		ReadVMatrixWorldspace( VMatrix *pValue, int count = 1, int nBytesAvailable = 0) = 0;
 	virtual int		ReadMatrix3x4Worldspace( matrix3x4_t *pValue, int nElems = 1, int nBytesAvailable = 0 ) = 0;

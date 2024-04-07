@@ -977,7 +977,7 @@ void CSave::BufferData( const char *pdata, int size )
 
 //-------------------------------------
 
-int	CSave::EntityIndex( const CBaseEntity *pEntity )
+int	CSave::EntityIndex( const IHandleEntity *pEntity )
 {
 	return m_pGameInfo->GetEntityIndex( pEntity );
 }
@@ -1156,7 +1156,7 @@ void CSave::WriteFunction( datamap_t *pRootMap, const char *pname, inputfunc_t *
 
 //-------------------------------------
 
-void CSave::WriteEntityPtr( const char *pname, CBaseEntity **ppEntity, int count )
+void CSave::WriteEntityPtr( const char *pname, IHandleEntity **ppEntity, int count )
 {
 	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
 	int entityArray[MAX_ENTITYARRAY];
@@ -1169,7 +1169,7 @@ void CSave::WriteEntityPtr( const char *pname, CBaseEntity **ppEntity, int count
 
 //-------------------------------------
 
-void CSave::WriteEntityPtr( CBaseEntity **ppEntity, int count )
+void CSave::WriteEntityPtr( IHandleEntity **ppEntity, int count )
 {
 	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
 	int entityArray[MAX_ENTITYARRAY];
@@ -1208,26 +1208,40 @@ void CSave::WriteEntityPtr( CBaseEntity **ppEntity, int count )
 
 //-------------------------------------
 
-void CSave::WriteEHandle( const char *pname, const EHANDLE *pEHandle, int count )
+void CSave::WriteEHandle( const char *pname, const CBaseHandle *pEHandle, int count )
 {
 	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
 	int entityArray[MAX_ENTITYARRAY];
 	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
 	{
-		entityArray[i] = EntityIndex( (CBaseEntity *)(const_cast<EHANDLE *>(pEHandle)[i]) );
+		IHandleEntity* pHandleEntity = NULL;
+#ifdef GAME_DLL
+		pHandleEntity = gEntList.GetServerEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+		pHandleEntity = cl_entitylist->GetClientEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
+#endif // CLIENT_DLL
+		entityArray[i] = EntityIndex(pHandleEntity);
 	}
 	WriteInt( pname, entityArray, count );
 }
 
 //-------------------------------------
 
-void CSave::WriteEHandle( const EHANDLE *pEHandle, int count )
+void CSave::WriteEHandle( const CBaseHandle *pEHandle, int count )
 {
 	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
 	int entityArray[MAX_ENTITYARRAY];
 	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
 	{
-		entityArray[i] = EntityIndex( (CBaseEntity *)(const_cast<EHANDLE *>(pEHandle)[i]) );
+		IHandleEntity* pHandleEntity = NULL;
+#ifdef GAME_DLL
+		pHandleEntity = gEntList.GetServerEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+		pHandleEntity = cl_entitylist->GetClientEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
+#endif // CLIENT_DLL
+		entityArray[i] = EntityIndex(pHandleEntity);
 	}
 	WriteInt( entityArray, count );
 }
@@ -1241,7 +1255,7 @@ bool CSave::WriteGameField( const char *pname, void *pData, datamap_t *pRootMap,
 	switch( pField->fieldType )
 	{
 		case FIELD_CLASSPTR:
-			WriteEntityPtr( pField->fieldName, (CBaseEntity **)pData, pField->fieldSize );
+			WriteEntityPtr( pField->fieldName, (IHandleEntity **)pData, pField->fieldSize );
 			break;
 
 		case FIELD_EDICT:
@@ -1916,7 +1930,7 @@ int CRestore::ReadInterval( interval_t *interval, int count, int nBytesAvailable
 // Game centric restore methods
 //
 
-CBaseEntity *CRestore::EntityFromIndex( int entityIndex )
+IHandleEntity *CRestore::EntityFromIndex( int entityIndex )
 {
 	if ( !m_pGameInfo || entityIndex < 0 )
 		return NULL;
@@ -1935,7 +1949,7 @@ CBaseEntity *CRestore::EntityFromIndex( int entityIndex )
 
 //-------------------------------------
 
-int CRestore::ReadEntityPtr( CBaseEntity **ppEntity, int count, int nBytesAvailable )
+int CRestore::ReadEntityPtr( IHandleEntity **ppEntity, int count, int nBytesAvailable )
 {
 	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
 	int entityArray[MAX_ENTITYARRAY];
@@ -1985,7 +1999,7 @@ int CRestore::ReadEntityPtr( CBaseEntity **ppEntity, int count, int nBytesAvaila
 
 //-------------------------------------
 
-int CRestore::ReadEHandle( EHANDLE *pEHandle, int count, int nBytesAvailable )
+int CRestore::ReadEHandle( CBaseHandle *pEHandle, int count, int nBytesAvailable )
 {
 	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
 	int entityArray[MAX_ENTITYARRAY];
@@ -2128,7 +2142,7 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 		}
 		
 		case FIELD_CLASSPTR:
-			ReadEntityPtr( (CBaseEntity **)pDest, pField->fieldSize, header.size );
+			ReadEntityPtr( (IHandleEntity **)pDest, pField->fieldSize, header.size );
 			break;
 			
 		case FIELD_EDICT:

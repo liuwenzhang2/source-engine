@@ -110,18 +110,18 @@ public:
 	void			WritePositionVector( const char *pname, const Vector *value, int count = 1 );  // array of pos vectors
 	void			WriteFunction( datamap_t *pMap, const char *pname, inputfunc_t **value, int count = 1 ); // Save a function pointer
 
-	void			WriteEntityPtr( const char *pname, CBaseEntity **ppEntity, int count = 1 );
+	void			WriteEntityPtr( const char *pname, IHandleEntity **ppEntity, int count = 1 );
 	//void			WriteEdictPtr( const char *pname, edict_t **ppEdict, int count = 1 );
-	void			WriteEHandle( const char *pname, const EHANDLE *pEHandle, int count = 1 );
+	void			WriteEHandle( const char *pname, const CBaseHandle *pEHandle, int count = 1 );
 
 	virtual void	WriteTime( const float *value, int count = 1 );	// Save a float (timevalue)
 	virtual void	WriteTick( const int *value, int count = 1 );	// Save a int (timevalue)
 	virtual void	WritePositionVector( const Vector &value );		// Offset for landmark if necessary
 	virtual void	WritePositionVector( const Vector *value, int count = 1 );	// array of pos vectors
 
-	virtual void	WriteEntityPtr( CBaseEntity **ppEntity, int count = 1 );
+	virtual void	WriteEntityPtr( IHandleEntity **ppEntity, int count = 1 );
 	//virtual void	WriteEdictPtr( edict_t **ppEdict, int count = 1 );
-	virtual void	WriteEHandle( const EHANDLE *pEHandle, int count = 1 );
+	virtual void	WriteEHandle( const CBaseHandle *pEHandle, int count = 1 );
 	void			WriteVMatrixWorldspace( const char *pname, const VMatrix *value, int count = 1 );	       // Save a vmatrix array
 	void			WriteVMatrixWorldspace( const VMatrix *value, int count = 1 );	       // Save a vmatrix array
 	void			WriteMatrix3x4Worldspace( const matrix3x4_t *value, int count );
@@ -132,7 +132,7 @@ public:
 
 	//---------------------------------
 	
-	int				EntityIndex( const CBaseEntity *pEntity );
+	int				EntityIndex( const IHandleEntity *pEntity );
 	int				EntityFlagsSet( int entityIndex, int flags );
 
 	CGameSaveRestoreInfo *GetGameSaveRestoreInfo()	{ return m_pGameInfo; }
@@ -250,9 +250,9 @@ public:
 	int				ReadPositionVector( Vector *pValue, int count = 1, int nBytesAvailable = 0);
 	int				ReadFunction( datamap_t *pMap, inputfunc_t **pValue, int count = 1, int nBytesAvailable = 0);
 	
-	int 			ReadEntityPtr( CBaseEntity **ppEntity, int count = 1, int nBytesAvailable = 0 );
+	int 			ReadEntityPtr( IHandleEntity **ppEntity, int count = 1, int nBytesAvailable = 0 );
 	//int				ReadEdictPtr( edict_t **ppEdict, int count = 1, int nBytesAvailable = 0 );
-	int				ReadEHandle( EHANDLE *pEHandle, int count = 1, int nBytesAvailable = 0 );
+	int				ReadEHandle( CBaseHandle *pEHandle, int count = 1, int nBytesAvailable = 0 );
 	int				ReadVMatrixWorldspace( VMatrix *pValue, int count = 1, int nBytesAvailable = 0);
 	int				ReadMatrix3x4Worldspace( matrix3x4_t *pValue, int nElems = 1, int nBytesAvailable = 0 );
 	int				ReadInterval( interval_t *interval, int count = 1, int nBytesAvailable = 0 );
@@ -310,7 +310,7 @@ private:
 	//---------------------------------
 	// Game info methods
 	//
-	CBaseEntity *	EntityFromIndex( int entityIndex );
+	IHandleEntity *	EntityFromIndex( int entityIndex );
 	void 			ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDest, datamap_t *pRootMap, typedescription_t *pField );
 	
 	//---------------------------------

@@ -726,7 +726,7 @@ class CPhysObjSaveRestoreOps : public CDefSaveRestoreOps
 public:
 	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
 	{
-		CBaseEntity *pOwnerEntity = pSave->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
+		CBaseEntity *pOwnerEntity = (CBaseEntity*)pSave->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
 
 		bool bFoundEntity = true;
 		
@@ -756,7 +756,7 @@ public:
 	
 	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore )
 	{
-		CBaseEntity *pOwnerEntity = pRestore->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
+		CBaseEntity *pOwnerEntity = (CBaseEntity*)pRestore->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
 
 		bool bFoundEntity = true;
 		

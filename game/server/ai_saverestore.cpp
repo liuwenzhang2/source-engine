@@ -75,7 +75,7 @@ public:
 		{
 			if ( ppAIs[i]->GetEnemies() )
 			{
-				CBaseEntity *p = ppAIs[i];
+				IHandleEntity *p = ppAIs[i];
 				pSave->WriteEntityPtr( &p );
 				pSave->WriteAll( ppAIs[i]->GetEnemies() );
 			}
@@ -140,7 +140,7 @@ public:
 			CAI_Enemies ignoredMem;
 			short nMemories = pRestore->ReadShort();
 			
-			CBaseEntity *pAI; 
+			IHandleEntity *pAI; 
 			
 			while ( nMemories-- )
 			{

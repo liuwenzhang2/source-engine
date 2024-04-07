@@ -71,7 +71,7 @@ class CEngineObjectSaveDataOps : public CDefSaveRestoreOps
 	// saves the entire array of variables
 	virtual void Save(const SaveRestoreFieldInfo_t& fieldInfo, ISave* pSave)
 	{
-		CBaseEntity* pEntity = pSave->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
+		CBaseEntity* pEntity = (CBaseEntity*)pSave->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
 		if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecOrigin")) {
 			Vector verOrigin = pEntity->GetLocalOrigin();
 			pSave->WriteVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
@@ -108,7 +108,7 @@ class CEngineObjectSaveDataOps : public CDefSaveRestoreOps
 	// restores a single instance of the variable
 	virtual void Restore(const SaveRestoreFieldInfo_t& fieldInfo, IRestore* pRestore)
 	{
-		CBaseEntity* pEntity = pRestore->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
+		CBaseEntity* pEntity = (CBaseEntity*)pRestore->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
 		if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecOrigin")) {
 			Vector vecOrigin;
 			pRestore->ReadVector(&vecOrigin, fieldInfo.pTypeDesc->fieldSize, 0);
