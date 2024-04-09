@@ -2700,7 +2700,7 @@ void PhysFrictionSound( CBaseEntity *pEntity, IPhysicsObject *pObject, const cha
 			return;
 
 		CSoundParameters params;
-		if ( !CBaseEntity::GetParametersForSound( pSoundName, handle, params, NULL ) )
+		if ( !g_pSoundEmitterSystem->GetParametersForSound( pSoundName, handle, params, NULL ) )//CBaseEntity::
 			return;
 
 		if ( !pFriction->pObject )

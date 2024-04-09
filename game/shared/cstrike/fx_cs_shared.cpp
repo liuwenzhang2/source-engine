@@ -35,7 +35,7 @@ ConVar weapon_accuracy_logging( "weapon_accuracy_logging", "0", FCVAR_REPLICATED
 		if ( !te->CanPredict() )
 			return;
 				
-		CBaseEntity::EmitSound( filter, iPlayerIndex, shootsound, &vOrigin, flSoundTime ); 
+		g_pSoundEmitterSystem->EmitSound( filter, iPlayerIndex, shootsound, &vOrigin, flSoundTime ); //CBaseEntity::
 	}
 
 	class CGroupedSound
@@ -66,7 +66,7 @@ ConVar weapon_accuracy_logging( "weapon_accuracy_logging", "0", FCVAR_REPLICATED
 
 		// Ok, play the sound and add it to the list.
 		CLocalPlayerFilter filter;
-		C_BaseEntity::EmitSound( filter, NULL, pSoundName, &vEndPos );
+		g_pSoundEmitterSystem->EmitSound( filter, NULL, pSoundName, &vEndPos );//C_BaseEntity::
 
 		i = g_GroupedSounds.AddToTail();
 		g_GroupedSounds[i].m_SoundName = MAKE_STRING(pSoundName);

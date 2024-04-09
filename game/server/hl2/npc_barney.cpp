@@ -55,9 +55,9 @@ public:
 		SelectModel( );
 		BaseClass::Precache();
 
-		PrecacheScriptSound( "NPC_Barney.FootstepLeft" );
-		PrecacheScriptSound( "NPC_Barney.FootstepRight" );
-		PrecacheScriptSound( "NPC_Barney.Die" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barney.FootstepLeft" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barney.FootstepRight" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barney.Die" );
 
 		PrecacheInstancedScene( "scenes/Expressions/BarneyIdle.vcd" );
 		PrecacheInstancedScene( "scenes/Expressions/BarneyAlert.vcd" );
@@ -166,12 +166,12 @@ void CNPC_Barney::HandleAnimEvent( animevent_t *pEvent )
 	{
 	case NPC_EVENT_LEFTFOOT:
 		{
-			EmitSound( "NPC_Barney.FootstepLeft", pEvent->eventtime );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Barney.FootstepLeft", pEvent->eventtime );
 		}
 		break;
 	case NPC_EVENT_RIGHTFOOT:
 		{
-			EmitSound( "NPC_Barney.FootstepRight", pEvent->eventtime );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Barney.FootstepRight", pEvent->eventtime );
 		}
 		break;
 
@@ -188,7 +188,7 @@ void CNPC_Barney::DeathSound( const CTakeDamageInfo &info )
 	// Sentences don't play on dead NPCs
 	SentenceStop();
 
-	EmitSound( "npc_barney.die" );
+	g_pSoundEmitterSystem->EmitSound(this, "npc_barney.die" );
 
 }
 

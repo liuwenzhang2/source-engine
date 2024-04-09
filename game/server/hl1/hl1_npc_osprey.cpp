@@ -242,7 +242,7 @@ void CNPC_Osprey::Precache( void )
 
 	m_nDebrisModel = PrecacheModel( "models/mechgibs.mdl" );
 
-	PrecacheScriptSound( "Apache.RotorSpinup" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Apache.RotorSpinup" );
 
 	BaseClass::Precache();
 }

@@ -272,7 +272,7 @@ void CGrenadeBeam::GrenadeBeamTouch( CBaseEntity *pOther )
 		return;
 	}
 	
-	EmitSound( "GrenadeBeam.HitSound" );
+	g_pSoundEmitterSystem->EmitSound(this, "GrenadeBeam.HitSound" );
 
 	trace_t tr;
 	Vector vDirection = GetAbsVelocity();
@@ -428,7 +428,7 @@ void CGrenadeBeam::Precache( void )
 	//UNDONE/HACK: this model is never used but one is needed
 	PrecacheModel("Models/weapons/flare.mdl");
 
-	PrecacheScriptSound( "GrenadeBeam.HitSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeBeam.HitSound" );
 }
 
 //------------------------------------------------------------------------------

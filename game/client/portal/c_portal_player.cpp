@@ -1225,7 +1225,7 @@ void C_Portal_Player::StartSprinting( void )
 
 	CPASAttenuationFilter filter( this );
 	filter.UsePredictionRules();
-	EmitSound( filter, entindex(), "Player.SprintStart" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Player.SprintStart" );
 
 	SetMaxSpeed( _SPRINT_SPEED );
 	m_fIsSprinting = true;

@@ -305,8 +305,8 @@ void C_EntityFlame::StopEffect( void )
 	{
 		m_hEntAttached->RemoveFlag( FL_ONFIRE );
 		m_hEntAttached->SetEffectEntity( NULL );
-		m_hEntAttached->StopSound( "General.BurningFlesh" );
-		m_hEntAttached->StopSound( "General.BurningObject" );
+		g_pSoundEmitterSystem->StopSound(m_hEntAttached.Get(), "General.BurningFlesh");//m_hEntAttached->
+		g_pSoundEmitterSystem->StopSound(m_hEntAttached.Get(), "General.BurningObject");//m_hEntAttached->
 		
 		
 		m_hEntAttached = NULL;

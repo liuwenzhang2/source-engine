@@ -673,7 +673,7 @@ void C_SceneEntity::DispatchStartSpeak( CChoreoScene *scene, C_BaseFlex *actor, 
 		es.m_bEmitCloseCaption = false;
 		es.m_pSoundName = event->GetParameters();
 
-		EmitSound( filter, actor->entindex(), es );
+		g_pSoundEmitterSystem->EmitSound( filter, actor->entindex(), es );
 		actor->AddSceneEvent( scene, event, NULL, IsClientOnly() );
 
 		// Close captioning only on master token no matter what...

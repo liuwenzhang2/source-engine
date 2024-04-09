@@ -600,7 +600,7 @@ void CWorld::Precache( void )
 	CSoundEnt::InitSoundEnt();
 
 	// Only allow precaching between LevelInitPreEntity and PostEntity
-	CBaseEntity::SetAllowPrecache( true );
+	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
 	IGameSystem::LevelInitPreEntityAllSystems( STRING( GetModelName() ) );
 
 	// Create the player resource
@@ -645,8 +645,8 @@ void CWorld::Precache( void )
 		PrecacheModel( "models/gibs/hgibs.mdl" );
 	}
 
-	PrecacheScriptSound( "BaseEntity.EnterWater" );
-	PrecacheScriptSound( "BaseEntity.ExitWater" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseEntity.EnterWater" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseEntity.ExitWater" );
 
 //
 // Setup light animation tables. 'a' is total darkness, 'z' is maxbright.

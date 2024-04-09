@@ -45,7 +45,7 @@ void C_Tesla::ReceiveMessage( int classID, bf_read &msg )
 	teslaInfo.m_flTimeVisible = msg.ReadFloat();
 	teslaInfo.m_pszSpriteName = m_iszSpriteName;
 
-	EmitSound( m_SoundName );
+	g_pSoundEmitterSystem->EmitSound(this, m_SoundName );
 
 	m_QueuedCommands.AddToTail( teslaInfo );
 	SetNextClientThink( CLIENT_THINK_ALWAYS );

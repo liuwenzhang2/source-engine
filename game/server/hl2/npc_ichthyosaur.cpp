@@ -242,9 +242,9 @@ void CNPC_Ichthyosaur::Precache( void )
 {
 	PrecacheModel( ICHTHYOSAUR_MODEL );
 
-	PrecacheScriptSound( "NPC_Ichthyosaur.Bite" );
-	PrecacheScriptSound( "NPC_Ichthyosaur.BiteMiss" );
-	PrecacheScriptSound( "NPC_Ichthyosaur.AttackGrowl" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Ichthyosaur.Bite" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Ichthyosaur.BiteMiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Ichthyosaur.AttackGrowl" );
 
 	BaseClass::Precache();
 }
@@ -1018,7 +1018,7 @@ void CNPC_Ichthyosaur::HandleAnimEvent( animevent_t *pEvent )
 
 	case ICH_AE_BITE_START:
 		{
-			EmitSound( "NPC_Ichthyosaur.AttackGrowl" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Ichthyosaur.AttackGrowl" );
 		}
 		break;
 	}
@@ -1094,7 +1094,7 @@ void CNPC_Ichthyosaur::Bite( void )
 		UTIL_Bubbles( pHurt->GetAbsOrigin()+Vector(-32.0f,-32.0f,-32.0f), pHurt->GetAbsOrigin()+Vector(32.0f,32.0f,0.0f), random->RandomInt( 16, 32 ) );
 		
 		// Play a random attack hit sound
-		EmitSound( "NPC_Ichthyosaur.Bite" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Ichthyosaur.Bite" );
 
 		if ( GetActivity() == ACT_MELEE_ATTACK1 )
 		{
@@ -1111,7 +1111,7 @@ void CNPC_Ichthyosaur::Bite( void )
 	}
 
 	//Miss sound
-	EmitSound( "NPC_Ichthyosaur.BiteMiss" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Ichthyosaur.BiteMiss" );
 }
 
 //-----------------------------------------------------------------------------

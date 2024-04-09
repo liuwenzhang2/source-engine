@@ -4337,7 +4337,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 			if( pPlayer && pPlayer->GetTeamNumber() == team && pPlayer->IsAlive() )
 			{
 				CPASFilter filter( pPlayer->WorldSpaceCenter() );
-				pPlayer->EmitSound( filter, pPlayer->entindex(), sound );
+				g_pSoundEmitterSystem->EmitSound( filter, pPlayer->entindex(), sound );//pPlayer->
 
 				pPlayer->DoAnimationEvent( PLAYERANIMEVENT_HANDSIGNAL );
 

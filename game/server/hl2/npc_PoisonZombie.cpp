@@ -258,21 +258,21 @@ void CNPC_PoisonZombie::Precache( void )
 {
 	PrecacheModel("models/zombie/poison.mdl");
 
-	PrecacheScriptSound( "NPC_PoisonZombie.Die" );
-	PrecacheScriptSound( "NPC_PoisonZombie.ThrowWarn" );
-	PrecacheScriptSound( "NPC_PoisonZombie.Throw" );
-	PrecacheScriptSound( "NPC_PoisonZombie.Idle" );
-	PrecacheScriptSound( "NPC_PoisonZombie.Pain" );
-	PrecacheScriptSound( "NPC_PoisonZombie.Alert" );
-	PrecacheScriptSound( "NPC_PoisonZombie.FootstepRight" );
-	PrecacheScriptSound( "NPC_PoisonZombie.FootstepLeft" );
-	PrecacheScriptSound( "NPC_PoisonZombie.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.ThrowWarn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.Throw" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.FootstepRight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.FootstepLeft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.Attack" );
 
-	PrecacheScriptSound( "NPC_PoisonZombie.FastBreath" );
-	PrecacheScriptSound( "NPC_PoisonZombie.Moan1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.FastBreath" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.Moan1" );
 
-	PrecacheScriptSound( "Zombie.AttackHit" );
-	PrecacheScriptSound( "Zombie.AttackMiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.AttackHit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.AttackMiss" );
 
 	BaseClass::Precache();
 }
@@ -433,7 +433,7 @@ void CNPC_PoisonZombie::Event_Killed( const CTakeDamageInfo &info )
 {
 	if ( !( info.GetDamageType() & ( DMG_BLAST | DMG_ALWAYSGIB) ) ) 
 	{
-		EmitSound( "NPC_PoisonZombie.Die" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Die" );
 	}
 
 	if ( !m_fIsTorso )
@@ -659,14 +659,14 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ZOMBIE_POISON_THROW_WARN_SOUND )
 	{
 		BreatheOffShort();
-		EmitSound( "NPC_PoisonZombie.ThrowWarn" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.ThrowWarn" );
 		return;
 	}
 
 	if ( pEvent->event == AE_ZOMBIE_POISON_THROW_SOUND )
 	{
 		BreatheOffShort();
-		EmitSound( "NPC_PoisonZombie.Throw" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Throw" );
 		return;
 	}
 
@@ -963,7 +963,7 @@ bool CNPC_PoisonZombie::ShouldPlayIdleSound( void )
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::AttackHitSound( void )
 {
-	EmitSound( "Zombie.AttackHit" );
+	g_pSoundEmitterSystem->EmitSound(this, "Zombie.AttackHit" );
 }
 
 //-----------------------------------------------------------------------------
@@ -971,7 +971,7 @@ void CNPC_PoisonZombie::AttackHitSound( void )
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::AttackMissSound( void )
 {
-	EmitSound( "Zombie.AttackMiss" );
+	g_pSoundEmitterSystem->EmitSound(this, "Zombie.AttackMiss" );
 }
 
 //-----------------------------------------------------------------------------
@@ -979,7 +979,7 @@ void CNPC_PoisonZombie::AttackMissSound( void )
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::AttackSound( void )
 {
-	EmitSound( "NPC_PoisonZombie.Attack" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Attack" );
 }
 
 //-----------------------------------------------------------------------------
@@ -991,7 +991,7 @@ void CNPC_PoisonZombie::IdleSound( void )
 	if ( m_NPCState != NPC_STATE_COMBAT )
 	{
 		BreatheOffShort();
-		EmitSound( "NPC_PoisonZombie.Idle" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Idle" );
 		MakeAISpookySound( 360.0f );
 	}
 }
@@ -1005,7 +1005,7 @@ void CNPC_PoisonZombie::PainSound( const CTakeDamageInfo &info )
 	if ( m_flNextPainSoundTime <= gpGlobals->curtime )
 	{	
 		BreatheOffShort();
-		EmitSound( "NPC_PoisonZombie.Pain" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Pain" );
 		m_flNextPainSoundTime = gpGlobals->curtime + random->RandomFloat( 4.0, 7.0 );
 	}
 }
@@ -1017,7 +1017,7 @@ void CNPC_PoisonZombie::AlertSound( void )
 {
 	BreatheOffShort();
 
-	EmitSound( "NPC_PoisonZombie.Alert" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Alert" );
 }
 
 
@@ -1028,11 +1028,11 @@ void CNPC_PoisonZombie::FootstepSound( bool fRightFoot )
 {
 	if( fRightFoot )
 	{
-		EmitSound( "NPC_PoisonZombie.FootstepRight" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.FootstepRight" );
 	}
 	else
 	{
-		EmitSound( "NPC_PoisonZombie.FootstepLeft" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.FootstepLeft" );
 	}
 
 	if( ShouldPlayFootstepMoan() )

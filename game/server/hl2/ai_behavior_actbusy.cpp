@@ -1634,10 +1634,10 @@ void CAI_ActBusyBehavior::PlaySoundForActBusy( busyanimparts_t AnimPart )
 	{
 		// See if we can treat it as a game sound name
 		CSoundParameters params;
-		if ( GetOuter()->GetParametersForSound( STRING(pBusyAnim->iszSounds[AnimPart]), params, STRING(GetOuter()->GetModelName()) ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( STRING(pBusyAnim->iszSounds[AnimPart]), params, STRING(GetOuter()->GetModelName()) ) )//GetOuter()->
 		{
 			CPASAttenuationFilter filter( GetOuter() );
-			GetOuter()->EmitSound( filter, GetOuter()->entindex(), params );
+			g_pSoundEmitterSystem->EmitSound( filter, GetOuter()->entindex(), params );//GetOuter()->
 		}
 		else
 		{

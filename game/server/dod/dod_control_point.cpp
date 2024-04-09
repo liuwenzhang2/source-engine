@@ -218,7 +218,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 			if( bMakeSound )
 			{
 				CBroadcastRecipientFilter filter;
-				EmitSound( filter, entindex(), STRING(m_iszResetSound) );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), STRING(m_iszResetSound) );
 			}
 			
 			SetModel( STRING(m_iszResetModel) );	
@@ -232,7 +232,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 			if( bMakeSound )
 			{
 				CBroadcastRecipientFilter filter;
-				EmitSound( filter, entindex(), STRING(m_iszAlliesCapSound) );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), STRING(m_iszAlliesCapSound) );
 			}
 			
 			SetModel( STRING(m_iszAlliesModel) );	
@@ -246,7 +246,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 			if( bMakeSound )
 			{
 				CBroadcastRecipientFilter filter;
-				EmitSound( filter, entindex(), STRING(m_iszAxisCapSound) );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), STRING(m_iszAxisCapSound) );
 			}
 			
 			SetModel( STRING(m_iszAxisModel) );	
@@ -454,15 +454,15 @@ void CControlPoint::Precache( void )
 {
 	if ( m_iszAlliesCapSound != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING(m_iszAlliesCapSound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_iszAlliesCapSound) );
 	}
 	if ( m_iszAxisCapSound != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING(m_iszAxisCapSound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_iszAxisCapSound) );
 	}
 	if ( m_iszResetSound != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING(m_iszResetSound) );	
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_iszResetSound) );
 	}
 
 	PrecacheModel( STRING( m_iszAlliesModel ) );

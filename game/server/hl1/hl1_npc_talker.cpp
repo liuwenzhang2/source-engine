@@ -345,7 +345,7 @@ void CHL1NPCTalker::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "Barney.Close" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Barney.Close" );
 }
 
 bool CHL1NPCTalker::HandleInteraction(int interactionType, void *data, CBaseCombatCharacter* sourceEnt)
@@ -365,12 +365,12 @@ bool CHL1NPCTalker::HandleInteraction(int interactionType, void *data, CBaseComb
 
 		CSoundParameters params;
 
-		if ( GetParametersForSound( "Barney.Close", params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( "Barney.Close", params, NULL ) )
 		{
 			EmitSound_t ep( params );
 			ep.m_nPitch = GetExpresser()->GetVoicePitch();
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 		m_bInBarnacleMouth	= false;

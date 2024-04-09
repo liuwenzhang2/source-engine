@@ -570,7 +570,7 @@ int	CDODFreezePanel::HudElementKeyInput( int down, ButtonCode_t keynum, const ch
 			{
 				//Do effects
 				g_flFreezeFlash = gpGlobals->curtime + 0.75f;
-				pPlayer->EmitSound( "Camera.SnapShot" );
+				g_pSoundEmitterSystem->EmitSound(pPlayer, "Camera.SnapShot" );//pPlayer->
 
 				//Extend Freezecam by a couple more seconds.
 				engine->ClientCmd( "extendfreeze" );

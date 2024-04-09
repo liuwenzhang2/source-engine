@@ -347,9 +347,9 @@ void CNPC_Manhack::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 //-----------------------------------------------------------------------------
 void CNPC_Manhack::DeathSound( const CTakeDamageInfo &info )
 {
-	StopSound("NPC_Manhack.Stunned");
+	g_pSoundEmitterSystem->StopSound(this, "NPC_Manhack.Stunned");
 	CPASAttenuationFilter filter2( this, "NPC_Manhack.Die" );
-	EmitSound( filter2, entindex(), "NPC_Manhack.Die" );
+	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "NPC_Manhack.Die" );
 }
 
 //-----------------------------------------------------------------------------
@@ -764,7 +764,7 @@ int	CNPC_Manhack::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		m_vForceVelocity = vecBestDir * info.GetDamage() * 0.5f;
 		m_flBladeSpeed = 10.0;
 
-		EmitSound( "NPC_Manhack.Bat" );	
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Bat" );
 
 		// tdInfo.SetDamage( 1.0 );
 
@@ -1533,14 +1533,14 @@ void CNPC_Manhack::Slice( CBaseEntity *pHitEntity, float flInterval, trace_t &tr
 
 		DispatchEffect( "ManhackSparks", data );
 
-		EmitSound( "NPC_Manhack.Grind" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Grind" );
 
 		//TODO: What we really want to do is get a material reference and emit the proper sprayage! - jdw
 	}
 	else
 	{
 		SpawnBlood(tr.endpos, g_vecAttackDir, pHitEntity->BloodColor(), 6 );
-		EmitSound( "NPC_Manhack.Slice" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Slice" );
 	}
 
 	// Pop back a little bit after hitting the player
@@ -1632,7 +1632,7 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 			
 			if (!(m_spawnflags	& SF_NPC_GAG))
 			{
-				EmitSound( "NPC_Manhack.Grind" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Grind" );
 			}
 
 			// For decals and sparks we must trace a line in the direction of the surface norm
@@ -1850,7 +1850,7 @@ void CNPC_Manhack::PlayFlySound(void)
 	{
 		m_flNextEngineSoundTime	= gpGlobals->curtime + random->RandomFloat( 3.0, 10.0 );
 
-		EmitSound( "NPC_Manhack.EngineNoise" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.EngineNoise" );
 	}
 }
 
@@ -2177,20 +2177,20 @@ void CNPC_Manhack::Precache(void)
 	PrecacheModel( MANHACK_GLOW_SPRITE );
 	PropBreakablePrecacheAll( MAKE_STRING("models/manhack.mdl") );
 	
-	PrecacheScriptSound( "NPC_Manhack.Die" );
-	PrecacheScriptSound( "NPC_Manhack.Bat" );
-	PrecacheScriptSound( "NPC_Manhack.Grind" );
-	PrecacheScriptSound( "NPC_Manhack.Slice" );
-	PrecacheScriptSound( "NPC_Manhack.EngineNoise" );
-	PrecacheScriptSound( "NPC_Manhack.Unpack" );
-	PrecacheScriptSound( "NPC_Manhack.ChargeAnnounce" );
-	PrecacheScriptSound( "NPC_Manhack.ChargeEnd" );
-	PrecacheScriptSound( "NPC_Manhack.Stunned" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.Bat" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.Grind" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.Slice" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.EngineNoise" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.Unpack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.ChargeAnnounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.ChargeEnd" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.Stunned" );
 
 	// Sounds used on Client:
-	PrecacheScriptSound( "NPC_Manhack.EngineSound1" );
-	PrecacheScriptSound( "NPC_Manhack.EngineSound2"  );
-	PrecacheScriptSound( "NPC_Manhack.BladeSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.EngineSound1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.EngineSound2"  );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.BladeSound" );
 
 	BaseClass::Precache();
 }
@@ -2614,7 +2614,7 @@ void CNPC_Manhack::StartTask( const Task_t *pTask )
 	case TASK_MANHACK_UNPACK:
 		{
 			// Just play a sound for now.
-			EmitSound( "NPC_Manhack.Unpack" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Unpack" );
 
 			TaskComplete();
 		}
@@ -3141,11 +3141,11 @@ void CNPC_Manhack::ShowHostile( bool hostile /*= true*/)
 
 	if ( hostile )
 	{
-		EmitSound( "NPC_Manhack.ChargeAnnounce" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.ChargeAnnounce" );
 	}
 	else
 	{
-		EmitSound( "NPC_Manhack.ChargeEnd" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.ChargeEnd" );
 	}
 }
 
@@ -3217,7 +3217,7 @@ void CNPC_Manhack::SetEyeState( int state )
 				m_pLightGlow->m_nRenderFX = kRenderFxStrobeFast;
 			}
 
-			EmitSound("NPC_Manhack.Stunned");
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Stunned");
 
 			break;
 		}

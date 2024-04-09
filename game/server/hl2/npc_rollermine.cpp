@@ -498,30 +498,30 @@ void CNPC_RollerMine::Precache( void )
 	PrecacheModel( "sprites/rollermine_shock.vmt" );
 	PrecacheModel( "sprites/rollermine_shock_yellow.vmt" );
 
-	PrecacheScriptSound( "NPC_RollerMine.Taunt" );
-	PrecacheScriptSound( "NPC_RollerMine.OpenSpikes" );
-	PrecacheScriptSound( "NPC_RollerMine.Warn" );
-	PrecacheScriptSound( "NPC_RollerMine.Shock" );
-	PrecacheScriptSound( "NPC_RollerMine.ExplodeChirp" );
-	PrecacheScriptSound( "NPC_RollerMine.Chirp" );
-	PrecacheScriptSound( "NPC_RollerMine.ChirpRespond" );
-	PrecacheScriptSound( "NPC_RollerMine.ExplodeChirpRespond" );
-	PrecacheScriptSound( "NPC_RollerMine.JoltVehicle" );
-	PrecacheScriptSound( "NPC_RollerMine.Tossed" );
-	PrecacheScriptSound( "NPC_RollerMine.Hurt" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Taunt" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.OpenSpikes" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Warn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Shock" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.ExplodeChirp" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Chirp" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.ChirpRespond" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.ExplodeChirpRespond" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.JoltVehicle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Tossed" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Hurt" );
 
-	PrecacheScriptSound( "NPC_RollerMine.Roll" );
-	PrecacheScriptSound( "NPC_RollerMine.RollWithSpikes" );
-	PrecacheScriptSound( "NPC_RollerMine.Ping" );
-	PrecacheScriptSound( "NPC_RollerMine.Held" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Roll" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.RollWithSpikes" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Ping" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Held" );
 
-	PrecacheScriptSound( "NPC_RollerMine.Reprogram" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Reprogram" );
 
 	PrecacheMaterial( "effects/rollerglow" );
 
 	gm_iszDropshipClassname = AllocPooledString( "npc_combinedropship" ); // For fast string compares.
 #ifdef HL2_EPISODIC
-	PrecacheScriptSound( "RagdollBoogie.Zap" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "RagdollBoogie.Zap" );
 #endif
 
 	BaseClass::Precache();
@@ -1497,7 +1497,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			{
 				m_iSoundEventFlags |= ROLLERMINE_SE_TAUNT; // Don't repeat.
 
-				EmitSound( "NPC_RollerMine.Taunt" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Taunt" );
 			}
 
 			// Jump earlier when chasing a vehicle
@@ -1625,7 +1625,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			{
 				m_flNextHop = gpGlobals->curtime;
 				m_flPowerDownTime = gpGlobals->curtime + RandomFloat( 0.3, 0.9 );
-				EmitSound( "NPC_RollerMine.Hurt" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Hurt" );
 
 				CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), 400, 0.5f, this );
 
@@ -1671,7 +1671,7 @@ void CNPC_RollerMine::Open( void )
 		SetModel( "models/roller_spikes.mdl" );
         SetRollerSkin();
 
-		EmitSound( "NPC_RollerMine.OpenSpikes" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.OpenSpikes" );
 
 		SetTouch( &CNPC_RollerMine::ShockTouch );
 		m_bIsOpen = true;
@@ -1952,7 +1952,7 @@ void CNPC_RollerMine::NotifyInteraction( CAI_BaseNPC *pUser )
 	GetEnemies()->SetFreeKnowledgeDuration( 30.0f );
 
 	// Play the hax0red sound
-	EmitSound( "NPC_RollerMine.Reprogram" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Reprogram" );
 
 	// Force the rollermine open here. At very least, this ensures that the 
 	// correct, smaller bounding box is recomputed around it.
@@ -2007,7 +2007,7 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 	SetTouch( &CNPC_RollerMine::CloseTouch );
 	Vector vel;
 	pPhysics->SetVelocity( &impulse, NULL );
-	EmitSound( "NPC_RollerMine.Shock" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Shock" );
 	// Do a shock effect
 	ShockTarget( pOther );
 
@@ -2211,7 +2211,7 @@ void CNPC_RollerMine::AnnounceArrivalToOthers( CBaseEntity *pOther )
 	if ( iRollers > 1 )
 	{
 		// Chirp to the others
-		EmitSound( "NPC_RollerMine.Chirp" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Chirp" );
 
 		// Tell the others to respond (skip first slot, because that's me)
 		for ( int i = 1; i < iRollers; i++ )
@@ -2247,7 +2247,7 @@ void CNPC_RollerMine::InputConstraintBroken( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::InputRespondToChirp( inputdata_t &inputdata )
 {
-	EmitSound( "NPC_RollerMine.ChirpRespond" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.ChirpRespond" );
 }
 
 //-----------------------------------------------------------------------------
@@ -2256,7 +2256,7 @@ void CNPC_RollerMine::InputRespondToChirp( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::InputRespondToExplodeChirp( inputdata_t &inputdata )
 {
-	EmitSound( "NPC_RollerMine.ExplodeChirpRespond" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.ExplodeChirpRespond" );
 
 	Explode();
 }
@@ -2288,7 +2288,7 @@ void CNPC_RollerMine::InputJoltVehicle( inputdata_t &inputdata )
 	pVehiclePhysics->ApplyForceOffset( vecForce, GetAbsOrigin() );
 
 	// Play sounds & effects
-	EmitSound( "NPC_RollerMine.JoltVehicle" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.JoltVehicle" );
 
 	// UNDONE: Good Zap effects
 	/*
@@ -2403,7 +2403,7 @@ void CNPC_RollerMine::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_
 	m_OnPhysGunPickup.FireOutput( pPhysGunUser, this );
 	m_bHeld = true;
 	m_RollerController.Off();
-	EmitSound( "NPC_RollerMine.Held" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Held" );
 }
 
 //-----------------------------------------------------------------------------
@@ -2426,7 +2426,7 @@ void CNPC_RollerMine::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Re
 			// enable world/prop touch too
 			VPhysicsGetObject()->SetCallbackFlags( VPhysicsGetObject()->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH|CALLBACK_GLOBAL_TOUCH_STATIC );
 		}
-		EmitSound( "NPC_RollerMine.Tossed" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Tossed" );
 	}
 
 	m_OnPhysGunDrop.FireOutput( pPhysGunUser, this );
@@ -2504,7 +2504,7 @@ void CNPC_RollerMine::PreDetonate( void )
 	SetThink( &CNPC_RollerMine::Explode );
 	SetNextThink( gpGlobals->curtime + 0.5f );
 
-	EmitSound( "NPC_RollerMine.Hurt" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Hurt" );
 }
 
 //-----------------------------------------------------------------------------
@@ -2633,10 +2633,10 @@ void CNPC_RollerMine::UpdateRollingSound()
 	switch( soundState )
 	{
 	case ROLL_SOUND_CLOSED:
-		CBaseEntity::GetParametersForSound( "NPC_RollerMine.Roll", params, NULL );
+		g_pSoundEmitterSystem->GetParametersForSound( "NPC_RollerMine.Roll", params, NULL );//CBaseEntity::
 		break;
 	case ROLL_SOUND_OPEN:
-		CBaseEntity::GetParametersForSound( "NPC_RollerMine.RollWithSpikes", params, NULL );
+		g_pSoundEmitterSystem->GetParametersForSound( "NPC_RollerMine.RollWithSpikes", params, NULL );//CBaseEntity::
 		break;
 
 	case ROLL_SOUND_OFF:
@@ -2696,7 +2696,7 @@ void CNPC_RollerMine::UpdatePingSound()
 		pingSpeed = 1-pingSpeed;
 		CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
 		CSoundParameters params;
-		CBaseEntity::GetParametersForSound( "NPC_RollerMine.Ping", params, NULL );
+		g_pSoundEmitterSystem->GetParametersForSound( "NPC_RollerMine.Ping", params, NULL );//CBaseEntity::
 		if ( !m_pPingSound )
 		{
 			CPASAttenuationFilter filter( this );

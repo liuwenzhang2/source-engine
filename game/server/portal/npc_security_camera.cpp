@@ -262,7 +262,7 @@ void CNPC_SecurityCamera::Precache( void )
 {
 	PrecacheModel( SECURITY_CAMERA_MODEL );	
 
-	PrecacheScriptSound( "Portalgun.pedestal_rotate_loop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portalgun.pedestal_rotate_loop" );
 
 	// Scenes for when the player dismounts a security camera. Spoken only if Aperture_AI actor is in the 
 	PrecacheInstancedScene( CAMERA_DESTROYED_SCENE_1 );
@@ -424,7 +424,7 @@ int CNPC_SecurityCamera::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		ExplosionCreate( GetAbsOrigin(), GetLocalAngles(), this, 100, 100, false );
 		SetThink( &CNPC_SecurityCamera::DeathThink );
 
-		StopSound( "NPC_SecurityCamera.Alert" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_SecurityCamera.Alert" );
 
 		m_OnDamaged.FireOutput( info.GetInflictor(), this );
 

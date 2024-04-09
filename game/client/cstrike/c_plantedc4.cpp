@@ -119,13 +119,13 @@ void C_PlantedC4::ClientThink( void )
 		
 		CSoundParameters params;
 
-		if ( GetParametersForSound( "C4.PlantSound", params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( "C4.PlantSound", params, NULL ) )
 		{
 			EmitSound_t ep( params );
 			ep.m_SoundLevel = ATTN_TO_SNDLVL( attenuation );
 			ep.m_pOrigin = &GetAbsOrigin();
 
-			EmitSound( filter, SOUND_FROM_WORLD, ep );
+			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );
 		}
 
 		freq = MAX( 0.1 + 0.9 * fComplete, 0.15 );

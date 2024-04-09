@@ -778,51 +778,6 @@ struct ModelScale
 #include "soundflags.h"
 
 struct CSoundParameters;
-typedef short HSOUNDSCRIPTHANDLE;
-//-----------------------------------------------------------------------------
-// Purpose: Aggregates and sets default parameters for EmitSound function calls
-//-----------------------------------------------------------------------------
-struct EmitSound_t
-{
-	EmitSound_t() :
-		m_nChannel( 0 ),
-		m_pSoundName( 0 ),
-		m_flVolume( VOL_NORM ),
-		m_SoundLevel( SNDLVL_NONE ),
-		m_nFlags( 0 ),
-		m_nPitch( PITCH_NORM ),
-		m_nSpecialDSP( 0 ),
-		m_pOrigin( 0 ),
-		m_flSoundTime( 0.0f ),
-		m_pflSoundDuration( 0 ),
-		m_bEmitCloseCaption( true ),
-		m_bWarnOnMissingCloseCaption( false ),
-		m_bWarnOnDirectWaveReference( false ),
-		m_nSpeakerEntity( -1 ),
-		m_UtlVecSoundOrigin(),
-		m_hSoundScriptHandle( -1 )
-	{
-	}
-
-	EmitSound_t( const CSoundParameters &src );
-
-	int							m_nChannel;
-	char const					*m_pSoundName;
-	float						m_flVolume;
-	soundlevel_t				m_SoundLevel;
-	int							m_nFlags;
-	int							m_nPitch;
-	int							m_nSpecialDSP;
-	const Vector				*m_pOrigin;
-	float						m_flSoundTime; ///< NOT DURATION, but rather, some absolute time in the future until which this sound should be delayed
-	float						*m_pflSoundDuration;
-	bool						m_bEmitCloseCaption;
-	bool						m_bWarnOnMissingCloseCaption;
-	bool						m_bWarnOnDirectWaveReference;
-	int							m_nSpeakerEntity;
-	mutable CUtlVector< Vector >	m_UtlVecSoundOrigin;  ///< Actual sound origin(s) (can be multiple if sound routed through speaker entity(ies) )
-	mutable HSOUNDSCRIPTHANDLE		m_hSoundScriptHandle;
-};
 
 #define MAX_ACTORS_IN_SCENE 16
 

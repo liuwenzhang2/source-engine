@@ -140,9 +140,9 @@ void ClientGamePrecache( void )
 	CBaseEntity::PrecacheModel( "sprites/physbeam.vmt" );
 
 	// Legacy temp ents sounds
-	CBaseEntity::PrecacheScriptSound( "Bounce.PistolShell" );
-	CBaseEntity::PrecacheScriptSound( "Bounce.RifleShell" );
-	CBaseEntity::PrecacheScriptSound( "Bounce.ShotgunShell" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.PistolShell" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.RifleShell" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.ShotgunShell" );
 
 // Moved to pure_server_minimal.txt
 //	// Flashbang-related files

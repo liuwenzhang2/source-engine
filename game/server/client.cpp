@@ -312,27 +312,27 @@ void ClientPrecache( void )
 	CBaseEntity::PrecacheModel( "sprites/purplelaser1.vmt" );	
 	
 #ifndef HL2MP
-	CBaseEntity::PrecacheScriptSound( "Hud.Hint" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Hud.Hint" );
 #endif // HL2MP
-	CBaseEntity::PrecacheScriptSound( "Player.FallDamage" );
-	CBaseEntity::PrecacheScriptSound( "Player.Swim" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.FallDamage" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.Swim" );
 
 	// General HUD sounds
-	CBaseEntity::PrecacheScriptSound( "Player.PickupWeapon" );
-	CBaseEntity::PrecacheScriptSound( "Player.DenyWeaponSelection" );
-	CBaseEntity::PrecacheScriptSound( "Player.WeaponSelected" );
-	CBaseEntity::PrecacheScriptSound( "Player.WeaponSelectionClose" );
-	CBaseEntity::PrecacheScriptSound( "Player.WeaponSelectionMoveSlot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.PickupWeapon" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.DenyWeaponSelection" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.WeaponSelected" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.WeaponSelectionClose" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.WeaponSelectionMoveSlot" );
 
 	// General legacy temp ents sounds
-	CBaseEntity::PrecacheScriptSound( "Bounce.Glass" );
-	CBaseEntity::PrecacheScriptSound( "Bounce.Metal" );
-	CBaseEntity::PrecacheScriptSound( "Bounce.Flesh" );
-	CBaseEntity::PrecacheScriptSound( "Bounce.Wood" );
-	CBaseEntity::PrecacheScriptSound( "Bounce.Shrapnel" );
-	CBaseEntity::PrecacheScriptSound( "Bounce.ShotgunShell" );
-	CBaseEntity::PrecacheScriptSound( "Bounce.Shell" );
-	CBaseEntity::PrecacheScriptSound( "Bounce.Concrete" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.Glass" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.Metal" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.Flesh" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.Wood" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.Shrapnel" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.ShotgunShell" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.Shell" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.Concrete" );
 
 	ClientGamePrecache();
 }

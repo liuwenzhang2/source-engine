@@ -149,9 +149,9 @@ CWeaponEgon::CWeaponEgon( void )
 //-----------------------------------------------------------------------------
 void CWeaponEgon::Precache( void )
 {
-    PrecacheScriptSound( "Weapon_Gluon.Start" );
-    PrecacheScriptSound( "Weapon_Gluon.Run" );
-    PrecacheScriptSound( "Weapon_Gluon.Off" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Gluon.Start" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Gluon.Run" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Gluon.Off" );
 
 	PrecacheModel( EGON_BEAM_SPRITE );
 	PrecacheModel( EGON_FLARE_SPRITE );
@@ -239,7 +239,7 @@ void CWeaponEgon::PrimaryAttack( void )
 
 			m_flAmmoUseTime = gpGlobals->curtime;// start using ammo ASAP.
 
-            EmitSound( "Weapon_Gluon.Start" );                
+			g_pSoundEmitterSystem->EmitSound(this, "Weapon_Gluon.Start" );
 
 			SendWeaponAnim( ACT_VM_PRIMARYATTACK );
 						
@@ -259,7 +259,7 @@ void CWeaponEgon::PrimaryAttack( void )
 		
 			if ( gpGlobals->curtime >= ( m_flStartFireTime + 2.0 ) )
 			{
-                EmitSound( "Weapon_Gluon.Run" );
+				g_pSoundEmitterSystem->EmitSound(this, "Weapon_Gluon.Run" );
 
 				m_fireState = FIRE_CHARGE;
 			}
@@ -477,11 +477,11 @@ void CWeaponEgon::DestroyEffect( void )
 
 void CWeaponEgon::EndAttack( void )
 {
-    StopSound( "Weapon_Gluon.Run" );
+	g_pSoundEmitterSystem->StopSound(this, "Weapon_Gluon.Run" );
 	
 	if ( m_fireState != FIRE_OFF )
 	{
-        EmitSound( "Weapon_Gluon.Off" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_Gluon.Off" );
 	}
 
 	SetWeaponIdleTime( gpGlobals->curtime + 2.0 );

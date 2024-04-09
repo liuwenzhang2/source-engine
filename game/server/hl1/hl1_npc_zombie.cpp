@@ -66,12 +66,12 @@ void CNPC_Zombie::Precache()
 {
 	PrecacheModel( "models/zombie.mdl" );
 
-	PrecacheScriptSound( "Zombie.AttackHit" );
-	PrecacheScriptSound( "Zombie.AttackMiss" );
-	PrecacheScriptSound( "Zombie.Pain" );
-	PrecacheScriptSound( "Zombie.Idle" );
-	PrecacheScriptSound( "Zombie.Alert" );
-	PrecacheScriptSound( "Zombie.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.AttackHit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.AttackMiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.Attack" );
 
 	BaseClass::Precache();
 }
@@ -117,10 +117,10 @@ void CNPC_Zombie::HandleAnimEvent( animevent_t *pEvent )
 					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() - v_right * 100 );
 				}
 				// Play a random attack hit sound
-				EmitSound( filter, entindex(), "Zombie.AttackHit" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Zombie.AttackHit" );
 			}
 			else // Play a random attack miss sound
-				EmitSound( filter, entindex(), "Zombie.AttackMiss" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Zombie.AttackMiss" );
 
 			if ( random->RandomInt( 0, 1 ) )
 				 AttackSound();
@@ -149,11 +149,11 @@ void CNPC_Zombie::HandleAnimEvent( animevent_t *pEvent )
 
 					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() - v_right * 100 );
 				}
-				EmitSound( filter2, entindex(), "Zombie.AttackHit" );
+				g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "Zombie.AttackHit" );
 			}
 			else
 			{
-				EmitSound( filter2, entindex(), "Zombie.AttackMiss" );
+				g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "Zombie.AttackMiss" );
 			}
 
 			if ( random->RandomInt( 0,1 ) ) 
@@ -182,10 +182,10 @@ void CNPC_Zombie::HandleAnimEvent( animevent_t *pEvent )
 					GetVectors( &v_forward, &v_right, NULL );
 					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() - v_right * 100 );
 				}
-				EmitSound( filter3, entindex(), "Zombie.AttackHit" );
+				g_pSoundEmitterSystem->EmitSound( filter3, entindex(), "Zombie.AttackHit" );
 			}
 			else
-				EmitSound( filter3, entindex(),"Zombie.AttackMiss" );
+				g_pSoundEmitterSystem->EmitSound( filter3, entindex(),"Zombie.AttackMiss" );
 
 			if ( random->RandomInt( 0,1 ) )
 				 AttackSound();
@@ -246,28 +246,28 @@ void CNPC_Zombie::PainSound( const CTakeDamageInfo &info )
 	if ( random->RandomInt(0,5) < 2)
 	{
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Zombie.Pain" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Zombie.Pain" );
 	}
 }
 
 void CNPC_Zombie::AlertSound( void )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Zombie.Alert" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Zombie.Alert" );
 }
 
 void CNPC_Zombie::IdleSound( void )
 {
 	// Play a random idle sound
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Zombie.Idle" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Zombie.Idle" );
 }
 
 void CNPC_Zombie::AttackSound( void )
 {
 	// Play a random attack sound
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Zombie.Attack" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Zombie.Attack" );
 }
 
 int CNPC_Zombie::MeleeAttack1Conditions ( float flDot, float flDist )

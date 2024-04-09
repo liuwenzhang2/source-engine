@@ -278,11 +278,11 @@ void CNPC_Controller::Precache()
 	UTIL_PrecacheOther( "controller_energy_ball" );	
 	UTIL_PrecacheOther( "controller_head_ball" );
 
-	PrecacheScriptSound( "Controller.Pain" );
-	PrecacheScriptSound( "Controller.Alert" );
-	PrecacheScriptSound( "Controller.Die" );
-	PrecacheScriptSound( "Controller.Idle" );
-	PrecacheScriptSound( "Controller.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Controller.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Controller.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Controller.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Controller.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Controller.Attack" );
 
 }	
 
@@ -356,32 +356,32 @@ void CNPC_Controller::PainSound( const CTakeDamageInfo &info )
 	if (random->RandomInt(0,5) < 2)
 	{
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Controller.Pain" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Controller.Pain" );
 	}
 }
 
 void CNPC_Controller::AlertSound( void )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Controller.Alert" ); 
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Controller.Alert" );
 }
 
 void CNPC_Controller::IdleSound( void )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Controller.Idle" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Controller.Idle" );
 }
 
 void CNPC_Controller::AttackSound( void )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Controller.Attack" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Controller.Attack" );
 }
 
 void CNPC_Controller::DeathSound( const CTakeDamageInfo &info )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Controller.Die" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Controller.Die" );
 }
 
 //=========================================================

@@ -117,14 +117,13 @@ void CBounceBomb::Precache()
 {
 	PrecacheModel("models/props_combine/combine_mine01.mdl");
 
-	PrecacheScriptSound( "NPC_CombineMine.Hop" );
-	PrecacheScriptSound( "NPC_CombineMine.FlipOver" );
-	PrecacheScriptSound( "NPC_CombineMine.TurnOn" );
-	PrecacheScriptSound( "NPC_CombineMine.TurnOff" );
-	PrecacheScriptSound( "NPC_CombineMine.OpenHooks" );
-	PrecacheScriptSound( "NPC_CombineMine.CloseHooks" );
-
-	PrecacheScriptSound( "NPC_CombineMine.ActiveLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineMine.Hop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineMine.FlipOver" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineMine.TurnOn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineMine.TurnOff" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineMine.OpenHooks" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineMine.CloseHooks" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineMine.ActiveLoop" );
 
 	PrecacheModel( "sprites/glow01.vmt" );
 
@@ -390,7 +389,7 @@ void CBounceBomb::Flip( const Vector &vecForce, const AngularImpulse &torque )
 		return;
 	}
 
-	EmitSound( "NPC_CombineMine.FlipOver" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.FlipOver" );
 	VPhysicsGetObject()->ApplyForceCenter( vecForce );
 	VPhysicsGetObject()->ApplyTorqueCenter( torque );
 	m_iFlipAttempts++;
@@ -513,7 +512,7 @@ void CBounceBomb::BounceThink()
 			pPhysicsObject->ApplyForceCenter( vecPredict * 10 );
 		}
 
-		EmitSound( "NPC_CombineMine.Hop" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.Hop" );
 		SetThink( NULL );
 	}
 }
@@ -574,7 +573,7 @@ void CBounceBomb::CavernBounceThink()
 
 		pPhysicsObject->ApplyTorqueCenter( AngularImpulse( random->RandomFloat( 15, 40 ), random->RandomFloat( 15, 40 ), random->RandomFloat( 30, 60 ) ) );
 		
-		EmitSound( "NPC_CombineMine.Hop" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.Hop" );
 
 		SetThink( &CBounceBomb::ExplodeThink );
 		SetNextThink( gpGlobals->curtime + 0.33f );
@@ -784,7 +783,7 @@ void CBounceBomb::Wake( bool bAwake )
 		// Turning on
 		if( m_bFoeNearest )
 		{
-			EmitSound( "NPC_CombineMine.TurnOn" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.TurnOn" );
 			controller.SoundChangeVolume( m_pWarnSound, 1.0, 0.1 );
 		}
 
@@ -807,7 +806,7 @@ void CBounceBomb::Wake( bool bAwake )
 		// Turning off
 		if( m_bFoeNearest )
 		{
-			EmitSound( "NPC_CombineMine.TurnOff" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.TurnOff" );
 		}
 
 		SetNearestNPC( NULL );
@@ -1096,7 +1095,7 @@ void CBounceBomb::OpenHooks( bool bSilent )
 {
 	if( !bSilent )
 	{
-		EmitSound( "NPC_CombineMine.OpenHooks" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.OpenHooks" );
 	}
 
 	if( VPhysicsGetObject() )
@@ -1121,7 +1120,7 @@ void CBounceBomb::CloseHooks()
 {
 	if( !m_bLockSilently )
 	{
-		EmitSound( "NPC_CombineMine.CloseHooks" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.CloseHooks" );
 	}
 
 	if( VPhysicsGetObject() )

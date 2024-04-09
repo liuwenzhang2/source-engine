@@ -333,8 +333,8 @@ void CTripmineGrenade::Spawn( void )
 	if ( GetOwnerEntity() != NULL )
 	{
 		// play deploy sound
-		EmitSound( "TripmineGrenade.Deploy" );
-		EmitSound( "TripmineGrenade.Charge" );
+		g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.Deploy" );
+		g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.Charge" );
 
 		m_hRealOwner = GetOwnerEntity();
 	}
@@ -348,9 +348,9 @@ void CTripmineGrenade::Precache( void )
 	PrecacheModel( TRIPMINE_MODEL ); 
 	m_iLaserModel = PrecacheModel( TRIPMINE_BEAM_SPRITE );
 
-	PrecacheScriptSound( "TripmineGrenade.Deploy" );
-	PrecacheScriptSound( "TripmineGrenade.Charge" );
-	PrecacheScriptSound( "TripmineGrenade.Activate" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "TripmineGrenade.Deploy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "TripmineGrenade.Charge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "TripmineGrenade.Activate" );
 
 }
 
@@ -405,8 +405,8 @@ void CTripmineGrenade::PowerupThink( void  )
 			// somehow we've been deployed on nothing, or something that was there, but now isn't.
 			// remove ourselves
 
-			StopSound( "TripmineGrenade.Deploy" );
-			StopSound( "TripmineGrenade.Charge" );
+			g_pSoundEmitterSystem->StopSound(this, "TripmineGrenade.Deploy" );
+			g_pSoundEmitterSystem->StopSound(this, "TripmineGrenade.Charge" );
 			SetThink( &CBaseEntity::SUB_Remove );
 			SetNextThink( gpGlobals->curtime + 0.1f );
 //			ALERT( at_console, "WARNING:Tripmine at %.0f, %.0f, %.0f removed\n", pev->origin.x, pev->origin.y, pev->origin.z );
@@ -418,8 +418,8 @@ void CTripmineGrenade::PowerupThink( void  )
 	{
 		// what we were stuck on has moved, or rotated. Create a tripmine weapon and drop to ground
 
-		StopSound( "TripmineGrenade.Deploy" );
-		StopSound( "TripmineGrenade.Charge" );
+		g_pSoundEmitterSystem->StopSound(this, "TripmineGrenade.Deploy" );
+		g_pSoundEmitterSystem->StopSound(this, "TripmineGrenade.Charge" );
 		CBaseEntity *pMine = Create( "weapon_tripmine", GetAbsOrigin() + m_vecDir * 24, GetAbsAngles() );
 		pMine->AddSpawnFlags( SF_NORESPAWN );
 
@@ -437,7 +437,7 @@ void CTripmineGrenade::PowerupThink( void  )
 		m_bIsLive = true;
 
 		// play enabled sound
-		EmitSound( "TripmineGrenade.Activate" );
+		g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.Activate" );
 	}
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -560,7 +560,7 @@ void CTripmineGrenade::Event_Killed( const CTakeDamageInfo &info )
 	SetThink( &CTripmineGrenade::DelayDeathThink );
 	SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1, 0.3 ) );
 
-	StopSound( "TripmineGrenade.Charge" );
+	g_pSoundEmitterSystem->StopSound(this, "TripmineGrenade.Charge" );
 }
 
 void CTripmineGrenade::DelayDeathThink( void )

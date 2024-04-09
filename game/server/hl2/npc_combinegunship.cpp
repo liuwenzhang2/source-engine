@@ -664,21 +664,21 @@ void CNPC_CombineGunship::Precache( void )
 	PrecacheMaterial( "effects/ar2ground2" );
 	PrecacheMaterial( "effects/blueblackflash" );
 	
-	PrecacheScriptSound( "NPC_CombineGunship.SearchPing" );
-	PrecacheScriptSound( "NPC_CombineGunship.PatrolPing" );
-	PrecacheScriptSound( "NPC_Strider.Charge" );
-	PrecacheScriptSound( "NPC_Strider.Shoot" );
-	PrecacheScriptSound( "NPC_CombineGunship.SeeEnemy" );
-	PrecacheScriptSound( "NPC_CombineGunship.CannonStartSound" );
-	PrecacheScriptSound( "NPC_CombineGunship.Explode");
-	PrecacheScriptSound( "NPC_CombineGunship.Pain" );
-	PrecacheScriptSound( "NPC_CombineGunship.CannonStopSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.SearchPing" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.PatrolPing" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Charge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Shoot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.SeeEnemy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.CannonStartSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.Explode");
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.CannonStopSound" );
 
-	PrecacheScriptSound( "NPC_CombineGunship.DyingSound" );
-	PrecacheScriptSound( "NPC_CombineGunship.CannonSound" );
-	PrecacheScriptSound( "NPC_CombineGunship.RotorSound" );
-	PrecacheScriptSound( "NPC_CombineGunship.ExhaustSound" );
-	PrecacheScriptSound( "NPC_CombineGunship.RotorBlastSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.DyingSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.CannonSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.RotorSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.ExhaustSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.RotorBlastSound" );
 
 	if ( hl2_episodic.GetBool() == true )
 	{
@@ -750,7 +750,7 @@ void CNPC_CombineGunship::Ping( void )
 	{
 		if( !HasCondition(COND_SEE_ENEMY) && gpGlobals->curtime > m_flTimeNextPing )
 		{
-			EmitSound( "NPC_CombineGunship.SearchPing" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.SearchPing" );
 			m_flTimeNextPing = gpGlobals->curtime + 3;
 		}
 	}
@@ -758,7 +758,7 @@ void CNPC_CombineGunship::Ping( void )
 	{
 		if( gpGlobals->curtime > m_flTimeNextPing )
 		{
-			EmitSound( "NPC_CombineGunship.PatrolPing" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.PatrolPing" );
 			m_flTimeNextPing = gpGlobals->curtime + 3;
 		}
 	}
@@ -917,7 +917,7 @@ void CNPC_CombineGunship::StartGroundAttack( void )
 	MessageEnd();
 
 	CPASAttenuationFilter filter2( this, "NPC_Strider.Charge" );
-	EmitSound( filter2, entindex(), "NPC_Strider.Charge" );
+	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "NPC_Strider.Charge" );
 
 	Vector	endpos = GetGroundAttackHitPosition();
 	
@@ -1191,7 +1191,7 @@ void CNPC_CombineGunship::StopGroundAttack( bool bDoAttack )
 	if ( bDoAttack )
 	{
 		CPASAttenuationFilter filter2( this, "NPC_Strider.Shoot" );
-		EmitSound( filter2, entindex(), "NPC_Strider.Shoot");
+		g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "NPC_Strider.Shoot");
 
 		ApplyAbsVelocityImpulse( Vector( 0, 0, 200.0f ) );
 
@@ -1257,14 +1257,14 @@ void CNPC_CombineGunship::DoCombat( void )
 
 				if ( !HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 				{
-					EmitSound( "NPC_CombineGunship.SeeEnemy" );
+					g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.SeeEnemy" );
 				}
 			}
 
 			// If we're shooting at a missile, do it immediately!
 			if ( IsTargettingMissile() )
 			{
-				EmitSound( "NPC_CombineGunship.SeeMissile" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.SeeMissile" );
 
 				// Allow the gunship to attack again immediately
 				if ( ( m_flTimeNextAttack > gpGlobals->curtime ) && ( ( m_flTimeNextAttack - gpGlobals->curtime ) > GUNSHIP_MISSILE_MAX_RESPONSE_TIME ) )
@@ -1586,7 +1586,7 @@ bool CNPC_CombineGunship::FireGun( void )
 			m_bPreFire = true;
 			m_flTimeNextAttack = gpGlobals->curtime + 0.5f;
 			
-			EmitSound( "NPC_CombineGunship.CannonStartSound" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.CannonStartSound" );
 			return false;
 		}
 
@@ -2438,13 +2438,13 @@ void CNPC_CombineGunship::SelfDestruct( void )
 	Vector vecOrigin;
 	if ( m_hRagdoll )
 	{
-		m_hRagdoll->EmitSound( "NPC_CombineGunship.Explode" );
+		g_pSoundEmitterSystem->EmitSound(m_hRagdoll.Get(), "NPC_CombineGunship.Explode");//m_hRagdoll->
 		vecOrigin = m_hRagdoll->GetAbsOrigin();
 		pBreakEnt = m_hRagdoll;
 	}
 	else
 	{
-		EmitSound( "NPC_CombineGunship.Explode" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.Explode" );
 		vecOrigin = GetAbsOrigin();
 	}
 
@@ -2929,7 +2929,7 @@ int	CNPC_CombineGunship::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	// Make a pain sound
 	if ( !HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 	{
-		EmitSound( "NPC_CombineGunship.Pain" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.Pain" );
 	}
 
 	Vector	damageDir = info.GetDamageForce();
@@ -3097,7 +3097,7 @@ void CNPC_CombineGunship::StopCannonBurst( void )
 		CSoundEnvelopeController::GetController().SoundChangeVolume( m_pCannonSound, 0.0, 0.05 );
 	}
 
-	EmitSound( "NPC_CombineGunship.CannonStopSound" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.CannonStopSound" );
 }
 
 

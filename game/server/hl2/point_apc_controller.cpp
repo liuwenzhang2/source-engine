@@ -149,7 +149,7 @@ CAPCController::~CAPCController( void )
 {
 	if ( m_soundLoopRotate != NULL_STRING )
 	{
-		StopSound( entindex(), CHAN_STATIC, STRING(m_soundLoopRotate) );
+		g_pSoundEmitterSystem->StopSound( entindex(), CHAN_STATIC, STRING(m_soundLoopRotate) );
 	}
 }
 
@@ -251,11 +251,11 @@ void CAPCController::Spawn( void )
 void CAPCController::Precache( void )
 {
 	if ( m_soundStartRotate != NULL_STRING )
-		PrecacheScriptSound( STRING(m_soundStartRotate) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_soundStartRotate) );
 	if ( m_soundStopRotate != NULL_STRING )
-		PrecacheScriptSound( STRING(m_soundStopRotate) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_soundStopRotate) );
 	if ( m_soundLoopRotate != NULL_STRING )
-		PrecacheScriptSound( STRING(m_soundLoopRotate) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_soundLoopRotate) );
 }
 
 
@@ -459,7 +459,7 @@ void CAPCController::StartRotSound( void )
 		ep.m_SoundLevel = SNDLVL_NORM;
 		ep.m_flVolume = 0.85;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 	
 	if ( m_soundStartRotate != NULL_STRING )
@@ -472,7 +472,7 @@ void CAPCController::StartRotSound( void )
 		ep.m_SoundLevel = SNDLVL_NORM;
 		ep.m_flVolume = 1.0f;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 }
 
@@ -481,7 +481,7 @@ void CAPCController::StopRotSound( void )
 {
 	if ( m_soundLoopRotate != NULL_STRING )
 	{
-		StopSound( entindex(), CHAN_STATIC, (char*)STRING(m_soundLoopRotate) );
+		g_pSoundEmitterSystem->StopSound( entindex(), CHAN_STATIC, (char*)STRING(m_soundLoopRotate) );
 	}
 	if ( m_soundStopRotate != NULL_STRING )
 	{
@@ -492,7 +492,7 @@ void CAPCController::StopRotSound( void )
 		ep.m_pSoundName = (char*)STRING(m_soundStopRotate);
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 }
 

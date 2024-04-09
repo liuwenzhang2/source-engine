@@ -508,21 +508,21 @@ void CHL2MPRules::ManageObjectRelocation( void )
 	{
 		for ( int i = 0; i < iTotal; i++ )
 		{
-			CBaseEntity *pObject = m_hRespawnableItemsAndWeapons[i].Get();
+			CBaseEntity *pEntity = m_hRespawnableItemsAndWeapons[i].Get();
 			
-			if ( pObject )
+			if (pEntity)
 			{
 				Vector vSpawOrigin;
 				QAngle vSpawnAngles;
 
-				if ( GetObjectsOriginalParameters( pObject, vSpawOrigin, vSpawnAngles ) == true )
+				if ( GetObjectsOriginalParameters( pEntity, vSpawOrigin, vSpawnAngles ) == true )
 				{
-					float flDistanceFromSpawn = (pObject->GetAbsOrigin() - vSpawOrigin ).Length();
+					float flDistanceFromSpawn = (pEntity->GetAbsOrigin() - vSpawOrigin ).Length();
 
 					if ( flDistanceFromSpawn > WEAPON_MAX_DISTANCE_FROM_SPAWN )
 					{
 						bool shouldReset = false;
-						IPhysicsObject *pPhysics = pObject->VPhysicsGetObject();
+						IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
 
 						if ( pPhysics )
 						{
@@ -530,15 +530,15 @@ void CHL2MPRules::ManageObjectRelocation( void )
 						}
 						else
 						{
-							shouldReset = (pObject->GetFlags() & FL_ONGROUND) ? true : false;
+							shouldReset = (pEntity->GetFlags() & FL_ONGROUND) ? true : false;
 						}
 
 						if ( shouldReset )
 						{
-							pObject->Teleport( &vSpawOrigin, &vSpawnAngles, NULL );
-							pObject->EmitSound( "AlyxEmp.Charge" );
+							pEntity->Teleport( &vSpawOrigin, &vSpawnAngles, NULL );
+							g_pSoundEmitterSystem->EmitSound(pEntity, "AlyxEmp.Charge" );//pEntity->
 
-							IPhysicsObject *pPhys = pObject->VPhysicsGetObject();
+							IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
 
 							if ( pPhys )
 							{
@@ -872,7 +872,7 @@ float CHL2MPRules::GetMapRemainingTime()
 //-----------------------------------------------------------------------------
 void CHL2MPRules::Precache( void )
 {
-	CBaseEntity::PrecacheScriptSound( "AlyxEmp.Charge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlyxEmp.Charge" );
 }
 
 bool CHL2MPRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )

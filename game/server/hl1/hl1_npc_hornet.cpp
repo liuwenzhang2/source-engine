@@ -120,8 +120,8 @@ void CNPC_Hornet::Precache()
 	iHornetPuff = PrecacheModel( "sprites/muz1.vmt" );
 	iHornetTrail = PrecacheModel("sprites/laserbeam.vmt");
 
-	PrecacheScriptSound( "Hornet.Die" );
-	PrecacheScriptSound( "Hornet.Buzz" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Hornet.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Hornet.Buzz" );
 }	
 
 //=========================================================
@@ -172,7 +172,7 @@ void CNPC_Hornet::DieTouch ( CBaseEntity *pOther )
 	}
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Hornet.Die" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Hornet.Die" );
 			
 	CTakeDamageInfo info( this, GetOwnerEntity(), m_flDamage, DMG_BULLET );
 	CalculateBulletDamageForce( &info, GetAmmoDef()->Index("Hornet"), GetAbsVelocity(), GetAbsOrigin() );
@@ -335,7 +335,7 @@ void CNPC_Hornet::TrackTarget ( void )
 	if ( flDelta < 0.5 )
 	{// hafta turn wide again. play sound
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Hornet.Buzz" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Hornet.Buzz" );
 	}
 
 	if ( flDelta <= 0 && m_iHornetType == HORNET_TYPE_RED )
@@ -390,7 +390,7 @@ void CNPC_Hornet::TrackTarget ( void )
 			);
 
 			CPASAttenuationFilter filter2( this );
-			EmitSound( filter2, entindex(), "Hornet.Buzz" );
+			g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "Hornet.Buzz" );
 			SetAbsVelocity( GetAbsVelocity() * 2 );
 			SetNextThink( gpGlobals->curtime + 1.0f );
 			// don't attack again

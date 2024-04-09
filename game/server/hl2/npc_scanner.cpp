@@ -542,19 +542,19 @@ void CNPC_CScanner::Precache(void)
 		PrecacheModel("models/gibs/Shield_Scanner_Gib5.mdl");
 		PrecacheModel("models/gibs/Shield_Scanner_Gib6.mdl");
 
-		PrecacheScriptSound( "NPC_SScanner.Shoot");
-		PrecacheScriptSound( "NPC_SScanner.Alert" );
-		PrecacheScriptSound( "NPC_SScanner.Die" );
-		PrecacheScriptSound( "NPC_SScanner.Combat" );
-		PrecacheScriptSound( "NPC_SScanner.Idle" );
-		PrecacheScriptSound( "NPC_SScanner.Pain" );
-		PrecacheScriptSound( "NPC_SScanner.TakePhoto" );
-		PrecacheScriptSound( "NPC_SScanner.AttackFlash" );
-		PrecacheScriptSound( "NPC_SScanner.DiveBombFlyby" );
-		PrecacheScriptSound( "NPC_SScanner.DiveBomb" );
-		PrecacheScriptSound( "NPC_SScanner.DeployMine" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.Shoot");
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.Alert" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.Die" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.Combat" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.Idle" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.Pain" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.TakePhoto" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.AttackFlash" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.DiveBombFlyby" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.DiveBomb" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.DeployMine" );
 
-		PrecacheScriptSound( "NPC_SScanner.FlyLoop" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.FlyLoop" );
 		UTIL_PrecacheOther( "combine_mine" );
 	}
 	else
@@ -567,19 +567,19 @@ void CNPC_CScanner::Precache(void)
 		PrecacheModel("models/gibs/scanner_gib04.mdl" );
 		PrecacheModel("models/gibs/scanner_gib05.mdl" );
 
-		PrecacheScriptSound( "NPC_CScanner.Shoot");
-		PrecacheScriptSound( "NPC_CScanner.Alert" );
-		PrecacheScriptSound( "NPC_CScanner.Die" );
-		PrecacheScriptSound( "NPC_CScanner.Combat" );
-		PrecacheScriptSound( "NPC_CScanner.Idle" );
-		PrecacheScriptSound( "NPC_CScanner.Pain" );
-		PrecacheScriptSound( "NPC_CScanner.TakePhoto" );
-		PrecacheScriptSound( "NPC_CScanner.AttackFlash" );
-		PrecacheScriptSound( "NPC_CScanner.DiveBombFlyby" );
-		PrecacheScriptSound( "NPC_CScanner.DiveBomb" );
-		PrecacheScriptSound( "NPC_CScanner.DeployMine" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.Shoot");
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.Alert" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.Die" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.Combat" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.Idle" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.Pain" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.TakePhoto" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.AttackFlash" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.DiveBombFlyby" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.DiveBomb" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.DeployMine" );
 
-		PrecacheScriptSound( "NPC_CScanner.FlyLoop" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.FlyLoop" );
 	}
 
 	// Sprites

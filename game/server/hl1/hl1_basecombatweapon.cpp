@@ -20,7 +20,7 @@ void CBaseHL1CombatWeapon::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "BaseCombatWeapon.WeaponDrop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseCombatWeapon.WeaponDrop" );
 }
 
 bool CBaseHL1CombatWeapon::CreateVPhysics( void )
@@ -102,7 +102,7 @@ void CBaseHL1CombatWeapon::FallThink ( void )
 		// don't clatter if the gun is waiting to respawn (if it's waiting, it is invisible!)
 		if ( GetOwnerEntity() )
 		{
-			EmitSound( "BaseCombatWeapon.WeaponDrop" );
+			g_pSoundEmitterSystem->EmitSound(this, "BaseCombatWeapon.WeaponDrop" );
 		}
 
 		// lie flat

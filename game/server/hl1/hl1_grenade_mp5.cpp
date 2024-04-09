@@ -132,7 +132,7 @@ void CGrenadeMP5::Detonate(void)
 	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetAbsOrigin(), m_flDamage * 2.5, CLASS_NONE, NULL );
 
 	CPASAttenuationFilter filter2( this );
-	EmitSound( filter2, entindex(), "GrenadeMP5.Detonate" );
+	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "GrenadeMP5.Detonate" );
 
 	if ( GetWaterLevel() == 0 )
 	{
@@ -156,5 +156,5 @@ void CGrenadeMP5::Precache( void )
 
 	PrecacheModel( "models/grenade.mdl" ); 
 
-	PrecacheScriptSound( "GrenadeMP5.Detonate" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeMP5.Detonate" );
 }

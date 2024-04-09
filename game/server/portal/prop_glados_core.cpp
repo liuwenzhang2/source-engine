@@ -144,92 +144,92 @@ void CPropGladosCore::Precache( void )
 	BaseClass::Precache();
 
 	// Personality VOs -- Curiosity
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_1" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_2" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_3" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_4" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_5" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_6" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_7" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_8" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_9" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_10" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_11" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_12" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_13" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_15" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_16" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_17" );
-	PrecacheScriptSound ( "Portal.Glados_core.Curiosity_18" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_2" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_3" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_4" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_5" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_6" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_7" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_8" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_9" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_10" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_11" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_12" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_13" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_15" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_16" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_17" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Curiosity_18" );
 
 	// Aggressive
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_00" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_01" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_02" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_03" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_04" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_05" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_06" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_07" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_08" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_09" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_10" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_11" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_12" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_13" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_14" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_15" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_16" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_17" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_18" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_19" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_20" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_21" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_panic_01" );
-	PrecacheScriptSound ( "Portal.Glados_core.Aggressive_panic_02" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_00" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_01" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_02" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_03" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_04" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_05" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_06" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_07" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_08" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_09" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_10" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_11" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_12" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_13" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_14" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_15" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_16" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_17" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_18" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_19" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_20" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_21" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_panic_01" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Aggressive_panic_02" );
 
 	// Crazy
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_01" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_02" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_03" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_04" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_05" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_06" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_07" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_08" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_09" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_10" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_11" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_12" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_13" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_14" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_15" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_16" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_17" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_18" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_19" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_20" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_21" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_22" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_23" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_24" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_25" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_26" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_27" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_28" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_29" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_30" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_31" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_32" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_33" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_34" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_35" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_36" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_37" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_38" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_39" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_40" );
-	PrecacheScriptSound ( "Portal.Glados_core.Crazy_41" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_01" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_02" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_03" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_04" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_05" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_06" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_07" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_08" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_09" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_10" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_11" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_12" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_13" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_14" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_15" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_16" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_17" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_18" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_19" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_20" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_21" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_22" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_23" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_24" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_25" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_26" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_27" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_28" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_29" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_30" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_31" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_32" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_33" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_34" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_35" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_36" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_37" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_38" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_39" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_40" );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_41" );
 
 	PrecacheModel( GLADOS_CORE_MODEL_NAME );
 }
@@ -263,9 +263,9 @@ void CPropGladosCore::PanicThink ( void )
 		return;
 	}
 
-	StopSound( m_speechEvents[m_iSpeechIter].ToCStr() );
-	EmitSound( m_iszPanicSoundScriptName.ToCStr() );
-	float flCurDuration = GetSoundDuration(  m_iszPanicSoundScriptName.ToCStr(), GLADOS_CORE_MODEL_NAME );
+	g_pSoundEmitterSystem->StopSound(this, m_speechEvents[m_iSpeechIter].ToCStr() );
+	g_pSoundEmitterSystem->EmitSound(this, m_iszPanicSoundScriptName.ToCStr() );
+	float flCurDuration = g_pSoundEmitterSystem->GetSoundDuration(  m_iszPanicSoundScriptName.ToCStr(), GLADOS_CORE_MODEL_NAME );
 
 	SetThink( &CPropGladosCore::TalkingThink );
 	SetNextThink( gpGlobals->curtime + m_flBetweenVOPadding + flCurDuration );
@@ -284,7 +284,7 @@ void CPropGladosCore::StartTalking( float flDelay )
 {
 	if ( m_speechEvents.IsValidIndex( m_iSpeechIter ) &&  m_speechEvents.Count() > 0 )
 	{
-		StopSound( m_speechEvents[m_iSpeechIter].ToCStr() );
+		g_pSoundEmitterSystem->StopSound(this, m_speechEvents[m_iSpeechIter].ToCStr() );
 	}
 
 	m_iSpeechIter = 0;
@@ -316,11 +316,11 @@ void CPropGladosCore::TalkingThink( void )
 	if ( iPrevIter < 0 )
 		iPrevIter = 0;
 
-	StopSound( m_speechEvents[iPrevIter].ToCStr() );
+	g_pSoundEmitterSystem->StopSound(this, m_speechEvents[iPrevIter].ToCStr() );
 
-	float flCurDuration = GetSoundDuration( m_speechEvents[m_iSpeechIter].ToCStr(), GLADOS_CORE_MODEL_NAME );
+	float flCurDuration = g_pSoundEmitterSystem->GetSoundDuration( m_speechEvents[m_iSpeechIter].ToCStr(), GLADOS_CORE_MODEL_NAME );
 
-	EmitSound( m_speechEvents[m_iSpeechIter].ToCStr() );
+	g_pSoundEmitterSystem->EmitSound(this, m_speechEvents[m_iSpeechIter].ToCStr() );
 	SetNextThink( gpGlobals->curtime + m_flBetweenVOPadding + flCurDuration );
 
 	// wrap if we hit the end of the list

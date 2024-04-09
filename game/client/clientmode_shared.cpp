@@ -1119,7 +1119,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			et.m_nFlags = event->GetInt("additional_flags");
 
 			CLocalPlayerFilter filter;
-			C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, et );
+			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, et );//C_BaseEntity::
 		}
 	}
 	else if ( Q_strcmp( "server_cvar", eventname ) == 0 )

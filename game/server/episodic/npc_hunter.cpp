@@ -414,8 +414,8 @@ void CC_Hunter_Shoot_Flechette( const CCommand& args )
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-	bool allowPrecache = CBaseEntity::IsPrecacheAllowed();
-	CBaseEntity::SetAllowPrecache( true );
+	bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
+	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
 
 	CBasePlayer *pPlayer = UTIL_GetCommandClient();
 
@@ -433,7 +433,7 @@ void CC_Hunter_Shoot_Flechette( const CCommand& args )
 		entity->Shoot( forward, false );
 	}
 
-	CBaseEntity::SetAllowPrecache( allowPrecache );
+	g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
 }
 
 static ConCommand ent_create("hunter_shoot_flechette", CC_Hunter_Shoot_Flechette, "Fires a hunter flechette where the player is looking.", FCVAR_GAMEDLL | FCVAR_CHEAT);
@@ -572,11 +572,11 @@ void CHunterFlechette::Precache()
 	PrecacheModel( HUNTER_FLECHETTE_MODEL );
 	PrecacheModel( "sprites/light_glow02_noz.vmt" );
 
-	PrecacheScriptSound( "NPC_Hunter.FlechetteNearmiss" );
-	PrecacheScriptSound( "NPC_Hunter.FlechetteHitBody" );
-	PrecacheScriptSound( "NPC_Hunter.FlechetteHitWorld" );
-	PrecacheScriptSound( "NPC_Hunter.FlechettePreExplode" );
-	PrecacheScriptSound( "NPC_Hunter.FlechetteExplode" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FlechetteNearmiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FlechetteHitBody" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FlechetteHitWorld" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FlechettePreExplode" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FlechetteExplode" );
 
 	PrecacheParticleSystem( "hunter_flechette_trail_striderbuster" );
 	PrecacheParticleSystem( "hunter_flechette_trail" );
@@ -588,7 +588,7 @@ void CHunterFlechette::Precache()
 //-----------------------------------------------------------------------------
 void CHunterFlechette::StickTo( CBaseEntity *pOther, trace_t &tr )
 {
-	EmitSound( "NPC_Hunter.FlechetteHitWorld" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechetteHitWorld" );
 
 	SetMoveType( MOVETYPE_NONE );
 	
@@ -699,7 +699,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 		SetAbsVelocity( Vector( 0, 0, 0 ) );
 
 		// play body "thwack" sound
-		EmitSound( "NPC_Hunter.FlechetteHitBody" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechetteHitBody" );
 
 		StopParticleEffects( this );
 
@@ -824,7 +824,7 @@ void CHunterFlechette::DopplerThink()
 
 	if ( flPlayerDot <= flMyDot )
 	{
-		EmitSound( "NPC_Hunter.FlechetteNearMiss" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechetteNearMiss" );
 		
 		// We've played the near miss sound and we're not seeking. Stop thinking.
 		SetThink( NULL );
@@ -871,7 +871,7 @@ void CHunterFlechette::Shoot( Vector &vecVelocity, bool bBrightFX )
 //-----------------------------------------------------------------------------
 void CHunterFlechette::DangerSoundThink()
 {
-	EmitSound( "NPC_Hunter.FlechettePreExplode" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechettePreExplode" );
 
 	CSoundEnt::InsertSound( SOUND_DANGER|SOUND_CONTEXT_EXCLUDE_COMBINE, GetAbsOrigin(), 150.0f, 0.5, this );
 	SetThink( &CHunterFlechette::ExplodeThink );
@@ -896,7 +896,7 @@ void CHunterFlechette::Explode()
 	// Don't catch self in own explosion!
 	m_takedamage = DAMAGE_NO;
 
-	EmitSound( "NPC_Hunter.FlechetteExplode" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechetteExplode" );
 	
 	// Move the explosion effect to the tip to reduce intersection with the world.
 	Vector vecFuse;
@@ -1678,30 +1678,30 @@ void CNPC_Hunter::Precache()
 	PrecacheModel( "models/hunter.mdl" );
 	PropBreakablePrecacheAll( MAKE_STRING("models/hunter.mdl") );
 
-	PrecacheScriptSound( "NPC_Hunter.Idle" );
-	PrecacheScriptSound( "NPC_Hunter.Scan" );
-	PrecacheScriptSound( "NPC_Hunter.Alert" );
-	PrecacheScriptSound( "NPC_Hunter.Pain" );
-	PrecacheScriptSound( "NPC_Hunter.PreCharge" );
-	PrecacheScriptSound( "NPC_Hunter.Angry" );
-	PrecacheScriptSound( "NPC_Hunter.Death" );
-	PrecacheScriptSound( "NPC_Hunter.FireMinigun" );
-	PrecacheScriptSound( "NPC_Hunter.Footstep" );
-	PrecacheScriptSound( "NPC_Hunter.BackFootstep" );
-	PrecacheScriptSound( "NPC_Hunter.FlechetteVolleyWarn" );
-	PrecacheScriptSound( "NPC_Hunter.FlechetteShoot" );
-	PrecacheScriptSound( "NPC_Hunter.FlechetteShootLoop" );
-	PrecacheScriptSound( "NPC_Hunter.FlankAnnounce" );
-	PrecacheScriptSound( "NPC_Hunter.MeleeAnnounce" );
-	PrecacheScriptSound( "NPC_Hunter.MeleeHit" );
-	PrecacheScriptSound( "NPC_Hunter.TackleAnnounce" );
-	PrecacheScriptSound( "NPC_Hunter.TackleHit" );
-	PrecacheScriptSound( "NPC_Hunter.ChargeHitEnemy" );
-	PrecacheScriptSound( "NPC_Hunter.ChargeHitWorld" );
-	PrecacheScriptSound( "NPC_Hunter.FoundEnemy" );
-	PrecacheScriptSound( "NPC_Hunter.FoundEnemyAck" );
-	PrecacheScriptSound( "NPC_Hunter.DefendStrider" );
-	PrecacheScriptSound( "NPC_Hunter.HitByVehicle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.Scan" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.PreCharge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.Angry" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.Death" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FireMinigun" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.Footstep" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.BackFootstep" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FlechetteVolleyWarn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FlechetteShoot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FlechetteShootLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FlankAnnounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.MeleeAnnounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.MeleeHit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.TackleAnnounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.TackleHit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.ChargeHitEnemy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.ChargeHitWorld" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FoundEnemy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FoundEnemyAck" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.DefendStrider" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.HitByVehicle" );
 
 	PrecacheParticleSystem( "hunter_muzzle_flash" );
 	PrecacheParticleSystem( "blood_impact_synth_01" );
@@ -1900,11 +1900,11 @@ void CNPC_Hunter::IdleSound()
 {
 	if ( HasCondition( COND_LOST_ENEMY ) )
 	{
-		EmitSound( "NPC_Hunter.Scan" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Scan" );
 	}
 	else
 	{
-		EmitSound( "NPC_Hunter.Idle" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Idle" );
 	}
 }
 
@@ -2767,7 +2767,7 @@ int CNPC_Hunter::SelectCombatSchedule()
 	{
 		if ( gpGlobals->curtime - CAI_HunterEscortBehavior::gm_flLastDefendSound > 10.0 )
 		{
-			EmitSound( "NPC_Hunter.DefendStrider" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.DefendStrider" );
 			CAI_HunterEscortBehavior::gm_flLastDefendSound = gpGlobals->curtime;
 		}
 
@@ -3381,7 +3381,7 @@ void CNPC_Hunter::StartTask( const Task_t *pTask )
 
 		case TASK_HUNTER_ANNOUNCE_FLANK:
 		{
-			EmitSound( "NPC_Hunter.FlankAnnounce" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlankAnnounce" );
 			TaskComplete();
 			break;
 		}
@@ -3821,7 +3821,7 @@ void CNPC_Hunter::RunTask( const Task_t *pTask )
 							// Shake the screen
 							if ( moveTrace.fStatus != AIMR_BLOCKED_NPC )
 							{
-								EmitSound( "NPC_Hunter.ChargeHitWorld" );
+								g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.ChargeHitWorld" );
 								UTIL_ScreenShake( GetAbsOrigin(), 16.0f, 4.0f, 1.0f, 400.0f, SHAKE_START );
 							}
 							SetIdealActivity( ACT_HUNTER_CHARGE_CRASH );
@@ -4091,7 +4091,7 @@ bool CNPC_Hunter::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEntity )
 	// Hit anything we don't like
 	if ( IRelationType( pEntity ) == D_HT && ( GetNextAttack() < gpGlobals->curtime ) )
 	{
-		EmitSound( "NPC_Hunter.ChargeHitEnemy" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.ChargeHitEnemy" );
 
 		// dvs: TODO:
 		//if ( !IsPlayingGesture( ACT_HUNTER_CHARGE_HIT ) )
@@ -4287,7 +4287,7 @@ void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_HUNTER_MELEE_ANNOUNCE )
 	{
-		EmitSound( "NPC_Hunter.MeleeAnnounce" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.MeleeAnnounce" );
 		return;
 	}
 		
@@ -5096,8 +5096,8 @@ CBaseEntity *CNPC_Hunter::MeleeAttack( float flDist, int iDamage, QAngle &qaView
 
 	if ( pHurt )
 	{
-		EmitSound( "NPC_Hunter.MeleeHit" );
-		EmitSound( "NPC_Hunter.TackleHit" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.MeleeHit" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.TackleHit" );
 
 		CBasePlayer *pPlayer = ToBasePlayer( pHurt );
 
@@ -5306,7 +5306,7 @@ bool CNPC_Hunter::IsInLargeOutdoorMap()
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::AlertSound()
 {
-	EmitSound( "NPC_Hunter.Alert" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Alert" );
 }
 
 
@@ -5316,7 +5316,7 @@ void CNPC_Hunter::PainSound( const CTakeDamageInfo &info )
 {
 	if ( gpGlobals->curtime > m_flNextDamageTime )
 	{
-		EmitSound( "NPC_Hunter.Pain" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Pain" );
 		m_flNextDamageTime = gpGlobals->curtime + random->RandomFloat( 0.5, 1.2 ); 
 	}
 }
@@ -5326,7 +5326,7 @@ void CNPC_Hunter::PainSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::DeathSound( const CTakeDamageInfo &info )
 {
-	EmitSound( "NPC_Hunter.Death" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Death" );
 }
 
 
@@ -5431,7 +5431,7 @@ void CNPC_Hunter::TeslaThink()
 	data.m_flMagnitude = 3;
 	data.m_flScale = 0.5f;
 	DispatchEffect( "TeslaHitboxes", data );
-	EmitSound( "RagdollBoogie.Zap" );
+	g_pSoundEmitterSystem->EmitSound(this, "RagdollBoogie.Zap" );
 
 	if ( gpGlobals->curtime < m_flTeslaStopTime )
 	{
@@ -5685,7 +5685,7 @@ int CNPC_Hunter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				Vector vecVelDir = pInflictor->GetSmoothedVelocity();
 				if ( vecVelDir.Length() >= hunter_jostle_car_min_speed.GetFloat() )
 				{
-					EmitSound( "NPC_Hunter.HitByVehicle" );
+					g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.HitByVehicle" );
 					m_hHitByVehicle = pInflictor;
 					SetContextThink( &CNPC_Hunter::JostleVehicleThink, gpGlobals->curtime, HUNTER_JOSTLE_VEHICLE_THINK );
 				}
@@ -6024,7 +6024,7 @@ void CNPC_Hunter::GetShootDir( Vector &vecDir, const Vector &vecSrc, CBaseEntity
 {
 	//RestartGesture( ACT_HUNTER_GESTURE_SHOOT );
 
-	EmitSound( "NPC_Hunter.FlechetteShoot" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechetteShoot" );
 
 	Vector vecBodyTarget;
 
@@ -6283,7 +6283,7 @@ Vector CNPC_Hunter::LeftFootHit( float eventtime )
 
 	GetAttachment( "left foot", footPosition );
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "NPC_Hunter.Footstep", &footPosition, eventtime );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Hunter.Footstep", &footPosition, eventtime );
 
 	FootFX( footPosition );
 
@@ -6299,7 +6299,7 @@ Vector CNPC_Hunter::RightFootHit( float eventtime )
 
 	GetAttachment( "right foot", footPosition );
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "NPC_Hunter.Footstep", &footPosition, eventtime );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Hunter.Footstep", &footPosition, eventtime );
 	FootFX( footPosition );
 
 	return footPosition;
@@ -6314,7 +6314,7 @@ Vector CNPC_Hunter::BackFootHit( float eventtime )
 
 	GetAttachment( "back foot", footPosition );
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "NPC_Hunter.BackFootstep", &footPosition, eventtime );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Hunter.BackFootstep", &footPosition, eventtime );
 	FootFX( footPosition );
 
 	return footPosition;
@@ -6512,7 +6512,7 @@ void CNPC_Hunter::StriderBusterAttached( CBaseEntity *pAttached )
 	SetCondition( COND_HUNTER_HIT_BY_STICKYBOMB );
 	if (m_hAttachedBusters.Count() == 1)
 	{
-		EmitSound( "NPC_Hunter.Alert" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Alert" );
 	}
 }
 

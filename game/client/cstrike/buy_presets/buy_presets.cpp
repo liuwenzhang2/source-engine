@@ -124,7 +124,7 @@ CON_COMMAND_F( cl_buy_favorite_set, "Saves the current loadout as a favorite", F
 	C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 	if ( pPlayer )
 	{
-		pPlayer->EmitSound( "BuyPreset.Updated" );
+		g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.Updated" );//pPlayer->
 	}
 }
 
@@ -413,7 +413,7 @@ void BuyPresetManager::PurchasePreset( int presetIndex )
 					C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 					if ( pPlayer )
 					{
-						pPlayer->EmitSound( "BuyPreset.AlreadyBought" );
+						g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.AlreadyBought" );//pPlayer->
 					}
 
 					// We have everything already.  Let the player know.
@@ -433,7 +433,7 @@ void BuyPresetManager::PurchasePreset( int presetIndex )
 		C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 		if ( pPlayer )
 		{
-			pPlayer->EmitSound( "BuyPreset.CantBuy" );
+			g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
 		}
 
 		PRESET_DEBUG( "cl_buy_favorite: can't afford anything better from %ls.\n", preset->GetName() );
@@ -444,7 +444,7 @@ void BuyPresetManager::PurchasePreset( int presetIndex )
 	C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 	if ( pPlayer )
 	{
-		pPlayer->EmitSound( "BuyPreset.CantBuy" );
+		g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
 	}
 
 	PRESET_DEBUG( "cl_buy_favorite: preset %d doesn't exist.\n", presetIndex );

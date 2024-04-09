@@ -1366,7 +1366,7 @@ void CTeamTrainWatcher::WatcherAlarmThink( void )
 	CTeamControlPoint *pPoint = m_CPLinks[m_iNumCPLinks-1].hCP.Get();
 	if ( pPoint )
 	{
-		pPoint->EmitSound( TEAM_TRAIN_ALARM_SINGLE );
+		g_pSoundEmitterSystem->EmitSound(pPoint, TEAM_TRAIN_ALARM_SINGLE );//pPoint->
 	}
 
 	SetContextThink( &CTeamTrainWatcher::WatcherAlarmThink, gpGlobals->curtime + TW_ALARM_THINK_INTERVAL, TW_ALARM_THINK );

@@ -141,7 +141,7 @@ IterationRetval_t CFlaggedEntitiesEnum::EnumElement( IHandleEntity *pHandleEntit
 int UTIL_PrecacheDecal( const char *name, bool preload )
 {
 	// If this is out of order, make sure to warn.
-	if ( !CBaseEntity::IsPrecacheAllowed() )
+	if ( !g_pSoundEmitterSystem->IsPrecacheAllowed() )//CBaseEntity::
 	{
 		if ( !engine->IsDecalPrecached( name ) )
 		{

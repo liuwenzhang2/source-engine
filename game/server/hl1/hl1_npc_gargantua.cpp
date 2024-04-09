@@ -175,7 +175,7 @@ void CStomp::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "Garg.Stomp" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.Stomp" );
 	PrecacheModel( GARG_STOMP_SPRITE_NAME );
 }
 
@@ -192,7 +192,7 @@ void CStomp::Spawn( void )
 //	pev->rendermode = kRenderTransTexture;
 //	SetBrightness( 0 );
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Garg.Stomp" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Garg.Stomp" );
 
 }
 
@@ -256,7 +256,7 @@ void CStomp::Think( void )
 			// Life has run out
 			UTIL_Remove(this);
 			CPASAttenuationFilter filter( this );
-			StopSound( entindex(), CHAN_STATIC, "Garg.Stomp" );
+			g_pSoundEmitterSystem->StopSound( entindex(), CHAN_STATIC, "Garg.Stomp" );
 		}
 	}
 }
@@ -324,16 +324,16 @@ void CNPC_Gargantua::Precache()
 	//gStompSprite = PRECACHE_MODEL( GARG_STOMP_SPRITE_NAME );
 	gGargGibModel = PrecacheModel( GARG_GIB_MODEL );
 
-	PrecacheScriptSound( "Garg.AttackHit" );
-	PrecacheScriptSound( "Garg.AttackMiss" );
-	PrecacheScriptSound( "Garg.Footstep" );
-	PrecacheScriptSound( "Garg.Breath" );
-	PrecacheScriptSound( "Garg.Attack" );
-	PrecacheScriptSound( "Garg.Pain" );
-	PrecacheScriptSound( "Garg.BeamAttackOn" );
-	PrecacheScriptSound( "Garg.BeamAttackRun" );
-	PrecacheScriptSound( "Garg.BeamAttackOff" );
-	PrecacheScriptSound( "Garg.StompSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.AttackHit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.AttackMiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.Footstep" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.Breath" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.BeamAttackOn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.BeamAttackRun" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.BeamAttackOff" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.StompSound" );
 }
 
 
@@ -505,11 +505,11 @@ void CNPC_Gargantua::HandleAnimEvent( animevent_t *pEvent )
 					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() - vRight * 100 );
 				}
 
-				EmitSound( filter, entindex(), "Garg.AttackHit" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Garg.AttackHit" );
 			}
 			else // Play a random attack miss sound
 			{
-				EmitSound( filter, entindex(),"Garg.AttackMiss" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(),"Garg.AttackMiss" );
 			}
 		}
 		break;
@@ -518,7 +518,7 @@ void CNPC_Gargantua::HandleAnimEvent( animevent_t *pEvent )
 	case GARG_AE_LEFT_FOOT:
 
 		UTIL_ScreenShake( GetAbsOrigin(), 4.0, 3.0, 1.0, 1500, SHAKE_START );
-		EmitSound( filter, entindex(), "Garg.Footstep" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Garg.Footstep" );
 		break;
 
 	case GARG_AE_STOMP:
@@ -527,7 +527,7 @@ void CNPC_Gargantua::HandleAnimEvent( animevent_t *pEvent )
 		break;
 
 	case GARG_AE_BREATHE:
-		EmitSound( filter, entindex(), "Garg.Breath" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Garg.Breath" );
 		break;
 
 	default:
@@ -583,7 +583,7 @@ void CNPC_Gargantua::StartTask( const Task_t *pTask )
 		if ( random->RandomInt(0,100) < 30 )
 		{
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "Garg.Attack" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Garg.Attack" );
 		}
 			
 		TaskComplete();
@@ -757,8 +757,8 @@ void CNPC_Gargantua::FlameCreate( void )
 	}
 
 	CPASAttenuationFilter filter4( this );
-	EmitSound( filter4, entindex(), "Garg.BeamAttackOn" );
-	EmitSound( filter4, entindex(), "Garg.BeamAttackRun" );
+	g_pSoundEmitterSystem->EmitSound( filter4, entindex(), "Garg.BeamAttackOn" );
+	g_pSoundEmitterSystem->EmitSound( filter4, entindex(), "Garg.BeamAttackRun" );
 }
 
 
@@ -916,7 +916,7 @@ void CNPC_Gargantua::FlameDestroy( void )
 	int i;
 
 	CPASAttenuationFilter filter4( this );
-	EmitSound( filter4, entindex(), "Garg.BeamAttackOff" );
+	g_pSoundEmitterSystem->EmitSound( filter4, entindex(), "Garg.BeamAttackOff" );
 	
 	for ( i = 0; i < 4; i++ )
 	{
@@ -978,7 +978,7 @@ void CNPC_Gargantua::StompAttack( void )
 	CStomp::StompCreate( vecStart, trace.endpos, 0, this );
 	UTIL_ScreenShake( GetAbsOrigin(), 12.0, 100.0, 2.0, 1000, SHAKE_START );
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Garg.StompSound" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Garg.StompSound" );
 
 	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector(0,0,20), MASK_SOLID, this, COLLISION_GROUP_NONE, &trace );
 	if ( trace.fraction < 1.0 )
@@ -1035,7 +1035,7 @@ void CNPC_Gargantua::TraceAttack( const CTakeDamageInfo &info, const Vector &vec
 		if ( m_painSoundTime < gpGlobals->curtime )
 		{
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "Garg.Pain" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Garg.Pain" );
 
 			m_painSoundTime = gpGlobals->curtime + random->RandomFloat( 2.5, 4 );
 		}

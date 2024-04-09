@@ -146,7 +146,7 @@ void CWeaponAWP::SecondaryAttack()
 	//=============================================================================
 	if ( GetPlayerOwner() )
 	{
-		GetPlayerOwner()->EmitSound( "Default.Zoom" );
+		g_pSoundEmitterSystem->EmitSound(GetPlayerOwner(), "Default.Zoom" );//GetPlayerOwner()->
 	}
 	//=============================================================================
 	// HPE_END

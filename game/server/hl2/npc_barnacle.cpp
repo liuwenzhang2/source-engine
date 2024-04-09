@@ -482,7 +482,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 				// bite prey every once in a while
 				if ( random->RandomInt(0,25) == 0 )
 				{
-					EmitSound( "NPC_Barnacle.Digest" );
+					g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Digest" );
 				}
 			}
 			else
@@ -527,7 +527,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 				// bite prey every once in a while
 				if ( random->RandomInt(0,25) == 0 )
 				{
-					EmitSound( "NPC_Barnacle.Digest" );
+					g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Digest" );
 				}
 			}
 			else
@@ -588,7 +588,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 			CGib::SpawnSpecificGibs( this, 1, 50, 1, "models/gibs/hgibs_rib.mdl");
 			m_cGibs--;
 
-			EmitSound( "NPC_Barnacle.Digest" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Digest" );
 		}
 
 		pTouchEnt = TongueTouchEnt( &flLength );
@@ -615,7 +615,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 					Vector vecGrabPos = pTouchEnt->EyePosition();
 					if( !pBCC || pBCC->DispatchInteraction( g_interactionBarnacleVictimGrab, &vecGrabPos, this ) )
 					{
-						EmitSound( "NPC_Barnacle.BreakNeck" );
+						g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.BreakNeck" );
 						AttachTongueToTarget( pTouchEnt, vecGrabPos );
 						
 						// Set the local timer to 60 seconds, which starts the lifting phase on
@@ -794,7 +794,7 @@ void CNPC_Barnacle::PlayLiftingScream( float flBiteZOffset )
 {
 	if ( !m_bPlayedPullSound && m_flAltitude < (flBiteZOffset + 100) )
 	{
-		EmitSound( "NPC_Barnacle.Scream" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Scream" );
 		m_bPlayedPullSound = true;
 	}
 }
@@ -1364,11 +1364,11 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 
 	if ( RandomFloat(0,1) > 0.5 )
 	{
-		EmitSound( "NPC_Barnacle.PullPant" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.PullPant" );
 	}
 	else
 	{
-		EmitSound( "NPC_Barnacle.TongueStretch" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.TongueStretch" );
 	}
 
 	SetActivity( (Activity)ACT_BARNACLE_SLURP );
@@ -1615,7 +1615,7 @@ void CNPC_Barnacle::BitePrey( void )
 		return;
 	}
 
-	EmitSound( "NPC_Barnacle.FinalBite" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.FinalBite" );
 
 	m_flVictimHeight = GetEnemy()->WorldAlignSize().z;
 
@@ -1660,7 +1660,7 @@ void CNPC_Barnacle::BitePrey( void )
 			m_hRagdoll->SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, false );
 			DetachAttachedRagdoll( m_hRagdoll );
 			m_hLastSpitEnemy = m_hRagdoll.Get();
-			m_hRagdoll->EmitSound( "NPC_HeadCrab.Die" );
+			g_pSoundEmitterSystem->EmitSound(m_hRagdoll.Get(), "NPC_HeadCrab.Die");//m_hRagdoll->
 			m_hRagdoll = NULL;
 		}
 
@@ -1797,7 +1797,7 @@ void CNPC_Barnacle::SwallowPrey( void )
 	// bite prey every once in a while
 	if ( random->RandomInt(0,25) == 0 )
 	{
-		EmitSound( "NPC_Barnacle.Digest" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Digest" );
 	}
 
 	// Fully swallowed it?
@@ -2082,7 +2082,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 #endif
 	}
 
-	EmitSound( "NPC_Barnacle.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Die" );
 
 	SetActivity( ACT_DIESIMPLE );
 
@@ -2304,13 +2304,13 @@ void CNPC_Barnacle::Precache()
 		PrecacheModel( m_szGibNames[i] );
 	}
 
-	PrecacheScriptSound( "NPC_Barnacle.Digest" );
-	PrecacheScriptSound( "NPC_Barnacle.Scream" );
-	PrecacheScriptSound( "NPC_Barnacle.PullPant" );
-	PrecacheScriptSound( "NPC_Barnacle.TongueStretch" );
-	PrecacheScriptSound( "NPC_Barnacle.FinalBite" );
-	PrecacheScriptSound( "NPC_Barnacle.Die" );
-	PrecacheScriptSound( "NPC_Barnacle.BreakNeck" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barnacle.Digest" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barnacle.Scream" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barnacle.PullPant" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barnacle.TongueStretch" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barnacle.FinalBite" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barnacle.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barnacle.BreakNeck" );
 
 	PrecacheModel( "models/props_junk/rock001a.mdl" );
 

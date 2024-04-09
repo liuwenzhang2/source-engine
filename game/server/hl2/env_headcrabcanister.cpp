@@ -239,12 +239,12 @@ void CEnvHeadcrabCanister::Precache( void )
 	PrecacheModel( ENV_HEADCRABCANISTER_SKYBOX_MODEL );
 	PrecacheModel("sprites/smoke.vmt");
 
-	PrecacheScriptSound( "HeadcrabCanister.LaunchSound" );
-	PrecacheScriptSound( "HeadcrabCanister.AfterLanding" );
-	PrecacheScriptSound( "HeadcrabCanister.Explosion" );
-	PrecacheScriptSound( "HeadcrabCanister.IncomingSound" );
-	PrecacheScriptSound( "HeadcrabCanister.SkyboxExplosion" );
-	PrecacheScriptSound( "HeadcrabCanister.Open" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.LaunchSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.AfterLanding" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.Explosion" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.IncomingSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.SkyboxExplosion" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.Open" );
 
 	UTIL_PrecacheOther( s_pHeadcrabClass[m_nHeadcrabType] );
 }
@@ -314,7 +314,7 @@ void CEnvHeadcrabCanister::Spawn( void )
 void CEnvHeadcrabCanister::UpdateOnRemove()
 {
 	BaseClass::UpdateOnRemove();
-	StopSound( "HeadcrabCanister.AfterLanding" );
+	g_pSoundEmitterSystem->StopSound(this, "HeadcrabCanister.AfterLanding" );
 	if ( m_hTrail )
 	{
 		UTIL_Remove( m_hTrail );
@@ -482,7 +482,7 @@ void CEnvHeadcrabCanister::InputFireCanister( inputdata_t &inputdata )
 
 	if ( !HasSpawnFlags( SF_NO_LAUNCH_SOUND ) )
 	{
-		EmitSound( filter, entindex(), "HeadcrabCanister.LaunchSound" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HeadcrabCanister.LaunchSound" );
 	}
 
 	// Place the canister
@@ -802,7 +802,7 @@ void CEnvHeadcrabCanister::OpenCanister( void )
 	int nOpenSequence = LookupSequence( "open" );
 	if ( nOpenSequence != ACT_INVALID )
 	{
-		EmitSound( "HeadcrabCanister.Open" );
+		g_pSoundEmitterSystem->EmitSound(this, "HeadcrabCanister.Open" );
 
 		ResetSequence( nOpenSequence );
 		SetContextThink( &CEnvHeadcrabCanister::WaitForOpenSequenceThink, gpGlobals->curtime + 0.01f, s_pOpenThinkContext );
@@ -833,7 +833,7 @@ void CEnvHeadcrabCanister::SetLanded( void )
 //-----------------------------------------------------------------------------
 void CEnvHeadcrabCanister::Landed( void )
 {
-	EmitSound( "HeadcrabCanister.AfterLanding" );
+	g_pSoundEmitterSystem->EmitSound(this, "HeadcrabCanister.AfterLanding" );
 
 	// Lock us now that we've stopped
 	SetLanded();
@@ -896,8 +896,8 @@ void CEnvHeadcrabCanister::Detonate( )
 
 	if ( !HasSpawnFlags( SF_NO_IMPACT_SOUND ) )
 	{
-		StopSound( "HeadcrabCanister.IncomingSound" );
-		EmitSound( "HeadcrabCanister.Explosion" );
+		g_pSoundEmitterSystem->StopSound(this, "HeadcrabCanister.IncomingSound" );
+		g_pSoundEmitterSystem->EmitSound(this, "HeadcrabCanister.Explosion" );
 	}
 
 	// If we're supposed to be removed, do that now
@@ -974,7 +974,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterWorldThink( void )
 		if ( vecEndPosition.DistToSqr(m_vecImpactPosition) <= flDistSq )
 		{
 			// Figure out if we're close enough to play the incoming sound
-			EmitSound( "HeadcrabCanister.IncomingSound" );
+			g_pSoundEmitterSystem->EmitSound(this, "HeadcrabCanister.IncomingSound" );
 			m_bIncomingSoundStarted = true;
 		}
 	}
@@ -1058,7 +1058,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSkyboxOnlyThink( void )
 	if ( !HasSpawnFlags( SF_NO_IMPACT_SOUND ) )
 	{	
 		CPASAttenuationFilter filter( this, ATTN_NONE );
-		EmitSound( filter, entindex(), "HeadcrabCanister.SkyboxExplosion" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HeadcrabCanister.SkyboxExplosion" );
 	}
 
 	if ( m_nSkyboxCannisterCount != 0 )

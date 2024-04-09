@@ -104,16 +104,16 @@ void ClientGamePrecache( void )
 	CBaseEntity::PrecacheModel( "models/gibs/agibs.mdl" );
 	CBaseEntity::PrecacheModel("models/weapons/v_hands.mdl");
 
-	CBaseEntity::PrecacheScriptSound( "HUDQuickInfo.LowAmmo" );
-	CBaseEntity::PrecacheScriptSound( "HUDQuickInfo.LowHealth" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HUDQuickInfo.LowAmmo" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HUDQuickInfo.LowHealth" );
 
-	CBaseEntity::PrecacheScriptSound( "Missile.ShotDown" );
-	CBaseEntity::PrecacheScriptSound( "Bullets.DefaultNearmiss" );
-	CBaseEntity::PrecacheScriptSound( "Bullets.GunshipNearmiss" );
-	CBaseEntity::PrecacheScriptSound( "Bullets.StriderNearmiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Missile.ShotDown" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullets.DefaultNearmiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullets.GunshipNearmiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullets.StriderNearmiss" );
 	
-	CBaseEntity::PrecacheScriptSound( "Geiger.BeepHigh" );
-	CBaseEntity::PrecacheScriptSound( "Geiger.BeepLow" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Geiger.BeepHigh" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Geiger.BeepLow" );
 
 	CBaseEntity::PrecacheModel( "models/portals/portal1.mdl" );
 	CBaseEntity::PrecacheModel( "models/portals/portal2.mdl" );

@@ -8147,13 +8147,13 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 
 	case SCRIPT_EVENT_SOUND:			// Play a named wave file
 		{
-			EmitSound( pEvent->options );
+			g_pSoundEmitterSystem->EmitSound(this, pEvent->options );
 		}
 		break;
 
 	case SCRIPT_EVENT_SOUND_VOICE:
 		{
-			EmitSound( pEvent->options );
+			g_pSoundEmitterSystem->EmitSound(this, pEvent->options );
 		}
 		break;
 
@@ -8215,21 +8215,21 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 	case NPC_EVENT_BODYDROP_HEAVY:
 		if ( GetFlags() & FL_ONGROUND )
 		{
-			EmitSound( "AI_BaseNPC.BodyDrop_Heavy" );
+			g_pSoundEmitterSystem->EmitSound(this, "AI_BaseNPC.BodyDrop_Heavy" );
 		}
 		break;
 
 	case NPC_EVENT_BODYDROP_LIGHT:
 		if ( GetFlags() & FL_ONGROUND )
 		{
-			EmitSound( "AI_BaseNPC.BodyDrop_Light" );
+			g_pSoundEmitterSystem->EmitSound(this, "AI_BaseNPC.BodyDrop_Light" );
 		}
 		break;
 
 	case NPC_EVENT_SWISHSOUND:
 		{
 			// NO NPC may use this anim event unless that npc's precache precaches this sound!!!
-			EmitSound( "AI_BaseNPC.SwishSound" );
+			g_pSoundEmitterSystem->EmitSound(this, "AI_BaseNPC.SwishSound" );
 			break;
 		}
 
@@ -8479,7 +8479,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			{
 				if ( GetFlags() & FL_ONGROUND )
 				{
-					EmitSound( "AI_BaseNPC.BodyDrop_Heavy" );
+					g_pSoundEmitterSystem->EmitSound(this, "AI_BaseNPC.BodyDrop_Heavy" );
 				}
 				return;
 			}
@@ -10885,10 +10885,10 @@ void CAI_BaseNPC::Precache( void )
 		return;
 	}
 
-	PrecacheScriptSound( "AI_BaseNPC.SwishSound" );
-	PrecacheScriptSound( "AI_BaseNPC.BodyDrop_Heavy" );
-	PrecacheScriptSound( "AI_BaseNPC.BodyDrop_Light" );
-	PrecacheScriptSound( "AI_BaseNPC.SentenceStop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AI_BaseNPC.SwishSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AI_BaseNPC.BodyDrop_Heavy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AI_BaseNPC.BodyDrop_Light" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AI_BaseNPC.SentenceStop" );
 
 	BaseClass::Precache();
 }

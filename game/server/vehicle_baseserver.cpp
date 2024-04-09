@@ -160,14 +160,14 @@ void CBaseServerVehicle::Precache( void )
 	{
 		if ( m_vehicleSounds.iszSound[i] != NULL_STRING )
 		{
-			CBaseEntity::PrecacheScriptSound( STRING(m_vehicleSounds.iszSound[i]) );
+			g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_vehicleSounds.iszSound[i]) );
 		}
 	}
 	for ( i = 0; i < m_vehicleSounds.crashSounds.Count(); i++ )
 	{
 		if ( m_vehicleSounds.crashSounds[i].iszCrashSound != NULL_STRING )
 		{
-			CBaseEntity::PrecacheScriptSound( STRING(m_vehicleSounds.crashSounds[i].iszCrashSound) );
+			g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_vehicleSounds.crashSounds[i].iszCrashSound) );
 		}
 	}
 
@@ -175,7 +175,7 @@ void CBaseServerVehicle::Precache( void )
 	{
 		if ( m_vehicleSounds.iszStateSounds[i] != NULL_STRING )
 		{
-			CBaseEntity::PrecacheScriptSound( STRING(m_vehicleSounds.iszStateSounds[i]) );
+			g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_vehicleSounds.iszStateSounds[i]) );
 		}
 	}
 }
@@ -1766,7 +1766,7 @@ void CBaseServerVehicle::PlaySound( const char *pSound )
 	{
 		Msg("Playing non-looping vehicle sound: %s\n", pSound );
 	}
-	m_pVehicle->EmitSound( pSound );
+	g_pSoundEmitterSystem->EmitSound(m_pVehicle, pSound );//m_pVehicle->
 }
 
 void CBaseServerVehicle::StopLoopingSound( float fadeTime )
@@ -2303,7 +2303,7 @@ void CBaseServerVehicle::PlaySound( vehiclesound iSound )
 		ep.m_flVolume = m_flVehicleVolume;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		CBaseEntity::EmitSound( filter, m_pVehicle->entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, m_pVehicle->entindex(), ep );//CBaseEntity::
 		if ( g_debug_vehiclesound.GetInt() )
 		{
 			Msg("Playing vehicle sound: %s\n", ep.m_pSoundName );
@@ -2318,7 +2318,7 @@ void CBaseServerVehicle::StopSound( vehiclesound iSound )
 {
 	if ( m_vehicleSounds.iszSound[iSound] != NULL_STRING )
 	{
-		CBaseEntity::StopSound( m_pVehicle->entindex(), CHAN_VOICE, STRING(m_vehicleSounds.iszSound[iSound]) );
+		g_pSoundEmitterSystem->StopSound( m_pVehicle->entindex(), CHAN_VOICE, STRING(m_vehicleSounds.iszSound[iSound]) );//CBaseEntity::
 	}
 }
 

@@ -1197,7 +1197,7 @@ void CHudWeaponSelection::CycleToNextWeapon( void )
 		}
 
 		// Play the "cycle to next weapon" sound
-		pPlayer->EmitSound( "Player.WeaponSelectionMoveSlot" );
+		g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 	}
 }
 
@@ -1250,7 +1250,7 @@ void CHudWeaponSelection::CycleToPrevWeapon( void )
 		}
 
 		// Play the "cycle to next weapon" sound
-		pPlayer->EmitSound( "Player.WeaponSelectionMoveSlot" );
+		g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 	}
 }
 
@@ -1344,7 +1344,7 @@ void CHudWeaponSelection::FastWeaponSwitch( int iWeaponSlot )
 	else if ( pNextWeapon != pActiveWeapon )
 	{
 		// error sound
-		pPlayer->EmitSound( "Player.DenyWeaponSelection" );
+		g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.DenyWeaponSelection" );//pPlayer->
 	}
 
 	if ( HUDTYPE_CAROUSEL != hud_fastswitch.GetInt() )
@@ -1412,7 +1412,7 @@ void CHudWeaponSelection::PlusTypeFastWeaponSwitch( int iWeaponSlot )
 		else
 		{
 			// error sound
-			pPlayer->EmitSound( "Player.DenyWeaponSelection" );
+			g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.DenyWeaponSelection" );//pPlayer->
 			return;
 		}
 	}
@@ -1521,5 +1521,5 @@ void CHudWeaponSelection::SelectWeaponSlot( int iSlot )
 		break;
 	}
 
-	pPlayer->EmitSound( "Player.WeaponSelectionMoveSlot" );
+	g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 }

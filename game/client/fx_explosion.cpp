@@ -721,7 +721,7 @@ void C_BaseExplosionEffect::PlaySound( void )
 		return;
 
 	CLocalPlayerFilter filter;
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, "BaseExplosionEffect.Sound", &m_vecOrigin );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, "BaseExplosionEffect.Sound", &m_vecOrigin );//C_BaseEntity::
 }
 
 //-----------------------------------------------------------------------------
@@ -1291,15 +1291,15 @@ void C_WaterExplosionEffect::PlaySound( void )
 		return;
 
 	CLocalPlayerFilter filter;
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, "Physics.WaterSplash", &m_vecWaterSurface );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, "Physics.WaterSplash", &m_vecWaterSurface );//C_BaseEntity::
 
 	if ( m_flDepth > 128 )
 	{
-		C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, "WaterExplosionEffect.Sound", &m_vecOrigin );
+		g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, "WaterExplosionEffect.Sound", &m_vecOrigin );//C_BaseEntity::
 	}
 	else
 	{
-		C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, "BaseExplosionEffect.Sound", &m_vecOrigin );
+		g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, "BaseExplosionEffect.Sound", &m_vecOrigin );//C_BaseEntity::
 	}
 }
 

@@ -2132,7 +2132,7 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 						}
 						else if ( pField->fieldType == FIELD_SOUNDNAME )
 						{
-							CBaseEntity::PrecacheScriptSound( STRING( pStringDest[i] ) );
+							g_pSoundEmitterSystem->PrecacheScriptSound( STRING( pStringDest[i] ) );
 						}
 #endif
 					}

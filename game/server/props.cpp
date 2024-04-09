@@ -243,8 +243,8 @@ void CBaseProp::Precache( void )
 
 	PrecacheModel( STRING( GetModelName() ) );
 
-	PrecacheScriptSound( "Metal.SawbladeStick" );
-	PrecacheScriptSound( "PropaneTank.Burst" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Metal.SawbladeStick" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "PropaneTank.Burst" );
 
 #ifdef HL2_EPISODIC
 	UTIL_PrecacheOther( "env_flare" );
@@ -645,7 +645,7 @@ void CBreakableProp::StickAtPosition( const Vector &stickPosition, const Vector 
 	if ( !VPhysicsGetObject()->IsMotionEnabled() )
 		return;
 
-	EmitSound("Metal.SawbladeStick");
+	g_pSoundEmitterSystem->EmitSound(this, "Metal.SawbladeStick");
 	Teleport( &stickPosition, NULL, NULL );
 	SetEnableMotionPosition( savePosition, saveAngles );  // this uses hierarchy, so it must be set after teleport
 
@@ -1572,7 +1572,7 @@ void CBreakableProp::PlayPuntSound()
 	if( m_iszPuntSound == NULL_STRING )
 		return;
 
-	EmitSound( STRING(m_iszPuntSound) );
+	g_pSoundEmitterSystem->EmitSound(this, STRING(m_iszPuntSound) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1584,7 +1584,7 @@ void CBreakableProp::Precache()
 
 	if( m_iszPuntSound != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING(m_iszPuntSound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_iszPuntSound) );
 	}
 
 	BaseClass::Precache();
@@ -1696,7 +1696,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 			ExplosionCreate( WorldSpaceCenter(), angles, pAttacker, m_explodeDamage, m_explodeRadius, 
 				SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE | SF_ENVEXPLOSION_SURFACEONLY | SF_ENVEXPLOSION_NOSOUND,
 				0.0f, this );
-			EmitSound("PropaneTank.Burst");
+			g_pSoundEmitterSystem->EmitSound(this, "PropaneTank.Burst");
 		}
 		else
 		{
@@ -2128,7 +2128,7 @@ void CDynamicProp::HandleAnimEvent( animevent_t *pEvent )
 		
 		case SCRIPT_EVENT_SOUND:
 		{
-			EmitSound( pEvent->options );
+			g_pSoundEmitterSystem->EmitSound(this, pEvent->options );
 			break;
 		}
 		
@@ -3822,11 +3822,11 @@ void CBasePropDoor::CalcDoorSounds()
 	UTIL_ValidateSoundName( m_ls.sLockedSound, "DoorSound.Null" );
 	UTIL_ValidateSoundName( m_ls.sUnlockedSound, "DoorSound.Null" );
 
-	PrecacheScriptSound( STRING( m_SoundMoving ) );
-	PrecacheScriptSound( STRING( m_SoundOpen ) );
-	PrecacheScriptSound( STRING( m_SoundClose ) );
-	PrecacheScriptSound( STRING( m_ls.sLockedSound ) );
-	PrecacheScriptSound( STRING( m_ls.sUnlockedSound ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_SoundMoving ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_SoundOpen ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_SoundClose ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_ls.sLockedSound ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_ls.sUnlockedSound ) );
 }
 
 
@@ -4092,7 +4092,7 @@ void CBasePropDoor::DoorOpen(CBaseEntity *pOpenAwayFrom)
 	// filter them out and leave a client stuck with looping door sounds!
 	if (!HasSpawnFlags(SF_DOOR_SILENT))
 	{
-		EmitSound( STRING( m_SoundMoving ) );
+		g_pSoundEmitterSystem->EmitSound(this, STRING( m_SoundMoving ) );
 
 		if ( m_hActivator && m_hActivator->IsPlayer() && !HasSpawnFlags( SF_DOOR_SILENT_TO_NPCS ) )
 		{
@@ -4141,7 +4141,7 @@ void CBasePropDoor::DoorOpenMoveDone(void)
 
 	if (!HasSpawnFlags(SF_DOOR_SILENT))
 	{
-		EmitSound( STRING( m_SoundOpen ) );
+		g_pSoundEmitterSystem->EmitSound(this, STRING( m_SoundOpen ) );
 	}
 
 	ASSERT(IsDoorOpening());
@@ -4214,7 +4214,7 @@ void CBasePropDoor::DoorClose(void)
 
 	if (!HasSpawnFlags(SF_DOOR_SILENT))
 	{
-		EmitSound( STRING( m_SoundMoving ) );
+		g_pSoundEmitterSystem->EmitSound(this, STRING( m_SoundMoving ) );
 
 		if ( m_hActivator && m_hActivator->IsPlayer() )
 		{
@@ -4262,8 +4262,8 @@ void CBasePropDoor::DoorCloseMoveDone(void)
 
 	if (!HasSpawnFlags(SF_DOOR_SILENT))
 	{
-		StopSound( STRING( m_SoundMoving ) );
-		EmitSound( STRING( m_SoundClose ) );
+		g_pSoundEmitterSystem->StopSound(this, STRING( m_SoundMoving ) );
+		g_pSoundEmitterSystem->EmitSound(this, STRING( m_SoundClose ) );
 	}
 
 	ASSERT(IsDoorClosing());
@@ -4340,7 +4340,7 @@ void CBasePropDoor::OnStartBlocked( CBaseEntity *pOther )
 
 	if (!HasSpawnFlags(SF_DOOR_SILENT))
 	{
-		StopSound( STRING( m_SoundMoving ) );
+		g_pSoundEmitterSystem->StopSound(this, STRING( m_SoundMoving ) );
 	}
 
 	//
@@ -4502,7 +4502,7 @@ void CBasePropDoor::EndBlocked( void )
 	// filter them out and leave a client stuck with looping door sounds!
 	if (!HasSpawnFlags(SF_DOOR_SILENT))
 	{
-		EmitSound( STRING( m_SoundMoving ) );
+		g_pSoundEmitterSystem->EmitSound(this, STRING( m_SoundMoving ) );
 	}
 
 	//
@@ -5817,8 +5817,8 @@ void CC_Prop_Dynamic_Create( const CCommand &args )
 	if ( h == MDLHANDLE_INVALID )
 		return;
 
-	bool bAllowPrecache = CBaseEntity::IsPrecacheAllowed();
-	CBaseEntity::SetAllowPrecache( true );
+	bool bAllowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
+	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
 
 	vcollide_t *pVCollide = mdlcache->GetVCollide( h );
 
@@ -5861,7 +5861,7 @@ void CC_Prop_Dynamic_Create( const CCommand &args )
 		DispatchSpawn( pProp );
 		pProp->Activate();
 	}
-	CBaseEntity::SetAllowPrecache( bAllowPrecache );
+	g_pSoundEmitterSystem->SetAllowPrecache( bAllowPrecache );//CBaseEntity::
 }
 
 static ConCommand prop_dynamic_create("prop_dynamic_create", CC_Prop_Dynamic_Create, "Creates a dynamic prop with a specific .mdl aimed away from where the player is looking.\n\tArguments: {.mdl name}", FCVAR_CHEAT);
@@ -5922,8 +5922,8 @@ CPhysicsProp* CreatePhysicsProp( const char *pModelName, const Vector &vTraceSta
 		    
 	VectorMA( tr.endpos, 1.0f, tr.plane.normal, tr.endpos );
 
-	bool bAllowPrecache = CBaseEntity::IsPrecacheAllowed();
-	CBaseEntity::SetAllowPrecache( true );
+	bool bAllowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
+	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
 				  
 	// Try to create entity
 	CPhysicsProp *pProp = dynamic_cast< CPhysicsProp * >(gEntList.CreateEntityByName( pClassName ) );
@@ -5945,7 +5945,7 @@ CPhysicsProp* CreatePhysicsProp( const char *pModelName, const Vector &vTraceSta
 		DispatchSpawn( pProp );
 		pProp->Activate();
 	}
-	CBaseEntity::SetAllowPrecache( bAllowPrecache );
+	g_pSoundEmitterSystem->SetAllowPrecache( bAllowPrecache );//CBaseEntity::
 
 	return pProp;
 }

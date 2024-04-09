@@ -94,34 +94,34 @@ C_Portal_Dinosaur::~C_Portal_Dinosaur( void )
 
 void C_Portal_Dinosaur::Precache( void )
 {
-	PrecacheScriptSound( "Portal.room1_radio" );
-	PrecacheScriptSound( "UpdateItem.Static" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur01" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur02" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur03" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur04" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur05" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur06" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur07" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur08" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur09" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur10" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur11" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur12" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur13" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur14" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur15" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur16" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur17" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur18" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur19" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur20" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur21" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur22" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur23" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur24" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur25" );
-	PrecacheScriptSound( "UpdateItem.Dinosaur26" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.room1_radio" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Static" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur01" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur02" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur03" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur04" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur05" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur06" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur07" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur08" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur09" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur10" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur11" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur12" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur13" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur14" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur15" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur16" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur17" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur18" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur19" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur20" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur21" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur22" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur23" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur24" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur25" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Dinosaur26" );
 }
 
 void C_Portal_Dinosaur::SetupSounds()

@@ -436,11 +436,11 @@ bool CWeaponCSBase::PlayEmptySound()
 
 	if ( IsPistol() )
 	{
-		EmitSound( filter, entindex(), "Default.ClipEmpty_Pistol" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Default.ClipEmpty_Pistol" );
 	}
 	else
 	{
-		EmitSound( filter, entindex(), "Default.ClipEmpty_Rifle" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Default.ClipEmpty_Rifle" );
 	}
 
 	return 0;
@@ -775,10 +775,10 @@ void CWeaponCSBase::Precache( void )
 	}
 #endif
 
-	PrecacheScriptSound( "Default.ClipEmpty_Pistol" );
-	PrecacheScriptSound( "Default.ClipEmpty_Rifle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Default.ClipEmpty_Pistol" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Default.ClipEmpty_Rifle" );
 
-	PrecacheScriptSound( "Default.Zoom" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Default.Zoom" );
 }
 
 Activity CWeaponCSBase::GetDeployActivity( void )
@@ -1807,7 +1807,7 @@ void CWeaponCSBase::OnPickedUp( CBaseCombatCharacter *pNewOwner )
 		}
 		if ( filter.GetRecipientCount() )
 		{
-			CBaseEntity::EmitSound( filter, pNewOwner->entindex(), "Player.PickupWeapon" );
+			g_pSoundEmitterSystem->EmitSound( filter, pNewOwner->entindex(), "Player.PickupWeapon" );//CBaseEntity::
 		}
 
 		// Robin: We don't want to delete weapons the player has picked up, so

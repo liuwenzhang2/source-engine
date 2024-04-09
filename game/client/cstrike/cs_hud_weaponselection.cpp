@@ -569,7 +569,7 @@ void CHudWeaponSelection::CycleToNextWeapon( void )
 
 		// Play the "cycle to next weapon" sound
 		if( m_bPlaySelectionSounds )
-			pPlayer->EmitSound( "Player.WeaponSelectionMoveSlot" );
+			g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 	}
 }
 
@@ -627,7 +627,7 @@ void CHudWeaponSelection::CycleToPrevWeapon( void )
 
 		// Play the "cycle to next weapon" sound
 		if( m_bPlaySelectionSounds )
-			pPlayer->EmitSound( "Player.WeaponSelectionMoveSlot" );
+			g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 	}
 }
 
@@ -725,7 +725,7 @@ void CHudWeaponSelection::SelectWeapon( void )
 	// Don't allow selections of weapons that can't be selected (out of ammo, etc)
 	if ( !GetSelectedWeapon()->CanBeSelected() )
 	{
-		player->EmitSound( "Player.DenyWeaponSelection" );
+		g_pSoundEmitterSystem->EmitSound(player, "Player.DenyWeaponSelection" );//player->
 	}
 	else
 	{
@@ -734,7 +734,7 @@ void CHudWeaponSelection::SelectWeapon( void )
 		if (GetSelectedWeapon() != activeWeapon)
 		{
 			// Play the "weapon selected" sound
-			player->EmitSound( "Player.WeaponSelected" );
+			g_pSoundEmitterSystem->EmitSound(player, "Player.WeaponSelected" );//player->
 		}
 
 		SetWeaponSelected();
@@ -841,5 +841,5 @@ void CHudWeaponSelection::SelectWeaponSlot( int iSlot )
 	}
 
 	if( m_bPlaySelectionSounds )
-			pPlayer->EmitSound( "Player.WeaponSelectionMoveSlot" );
+		g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 }

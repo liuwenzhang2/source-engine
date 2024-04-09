@@ -195,9 +195,9 @@ void CNPC_HAssassin::Precache()
 
 	UTIL_PrecacheOther( "npc_handgrenade" );
 
-	PrecacheScriptSound( "HAssassin.Shot" );
-	PrecacheScriptSound( "HAssassin.Beamsound" );
-	PrecacheScriptSound( "HAssassin.Footstep" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HAssassin.Shot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HAssassin.Beamsound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HAssassin.Footstep" );
 }
 
 int CNPC_HAssassin::GetSoundInterests( void )
@@ -604,7 +604,7 @@ void CNPC_HAssassin::Shoot ( void )
 	//NDebugOverlay::Line( vecShootOrigin, vecShootOrigin + vecShootDir * 2048, 255, 0, 0, true, 2.0 );
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "HAssassin.Shot" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HAssassin.Shot" );
 
 	DoMuzzleFlash();
 
@@ -688,7 +688,7 @@ void CNPC_HAssassin::RunAI( void )
 	{
 		if ( GetRenderColor().a == 255)
 		{
-			EmitSound( filter, entindex(), "HAssassin.Beamsound" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HAssassin.Beamsound" );
 		}
 
 		SetRenderColorA( MAX( GetRenderColor().a - 50, m_iTargetRanderamt ) );
@@ -707,7 +707,7 @@ void CNPC_HAssassin::RunAI( void )
 		iStep = ! iStep;
 		if (iStep)
 		{
-			EmitSound( filter, entindex(), "HAssassin.Footstep" );	
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HAssassin.Footstep" );
 		}
 	}
 }

@@ -275,8 +275,8 @@ void CNPC_FlockingFlyer::Precache( )
 	PrecacheModel("models/boid.mdl");
 	CNPC_FlockingFlyerFlock::PrecacheFlockSounds();
 
-	PrecacheScriptSound( "FlockingFlyer.Alert" );
-	PrecacheScriptSound( "FlockingFlyer.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "FlockingFlyer.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "FlockingFlyer.Idle" );
 }
 
 //=========================================================
@@ -717,14 +717,14 @@ void CNPC_FlockingFlyer::MakeSound( void )
 		CPASAttenuationFilter filter1( this );
 
 		// make agitated sounds
-		EmitSound( filter1, entindex(), "FlockingFlyer.Alert" );
+		g_pSoundEmitterSystem->EmitSound( filter1, entindex(), "FlockingFlyer.Alert" );
 		return;
 	}
 
 	// make normal sound
 	CPASAttenuationFilter filter2( this );
 
-	EmitSound( filter2, entindex(), "FlockingFlyer.Idle" );
+	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "FlockingFlyer.Idle" );
 }
 
 //=========================================================

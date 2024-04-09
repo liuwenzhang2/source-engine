@@ -35,7 +35,7 @@ void CDODSmokeGrenade::Spawn()
 
 void CDODSmokeGrenade::Precache()
 {
-	PrecacheScriptSound( "SmokeGrenade.Bounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "SmokeGrenade.Bounce" );
 	PrecacheParticleSystem( "smokegrenade" );
 	PrecacheParticleSystem( "smokegrenade_jet" );
 	BaseClass::Precache();
@@ -43,7 +43,7 @@ void CDODSmokeGrenade::Precache()
 
 void CDODSmokeGrenade::BounceSound( void )
 {
-	EmitSound( "SmokeGrenade.Bounce" );
+	g_pSoundEmitterSystem->EmitSound(this, "SmokeGrenade.Bounce" );
 }
 
 void CDODSmokeGrenade::Think_Emit( void )
@@ -63,7 +63,7 @@ void CDODSmokeGrenade::Think_Emit( void )
 		// Smoke Jet
 		DispatchParticleEffect( "smokegrenade_jet", PATTACH_POINT, this, "jet" );
 
-		EmitSound( "BaseSmokeEffect.Sound" );
+		g_pSoundEmitterSystem->EmitSound(this, "BaseSmokeEffect.Sound" );
 
 		m_flRemoveTime = gpGlobals->curtime + 10;
 

@@ -275,7 +275,7 @@ void CHUDQuickInfo::Paint()
 				m_warnHealth = true;
 				
 				CLocalPlayerFilter filter;
-				C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HUDQuickInfo.LowHealth" );
+				g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HUDQuickInfo.LowHealth" );//C_BaseEntity::
 			}
 		}
 		else
@@ -303,7 +303,7 @@ void CHUDQuickInfo::Paint()
 				m_warnAmmo = true;
 
 				CLocalPlayerFilter filter;
-				C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HUDQuickInfo.LowAmmo" );
+				g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HUDQuickInfo.LowAmmo" );//C_BaseEntity::
 			}
 		}
 		else

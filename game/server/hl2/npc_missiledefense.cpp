@@ -86,9 +86,9 @@ void CNPC_MissileDefense::Precache( void )
 	PrecacheModel("models/missile_defense.mdl");
 	PrecacheModel(MD_GIB_MODEL);
 
-	PrecacheScriptSound( "NPC_MissileDefense.Attack" );
-	PrecacheScriptSound( "NPC_MissileDefense.Reload" );
-	PrecacheScriptSound( "NPC_MissileDefense.Turn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_MissileDefense.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_MissileDefense.Reload" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_MissileDefense.Turn" );
 
 }
 
@@ -183,7 +183,7 @@ void CNPC_MissileDefense::FireCannons( void )
 	}
 
 
-	EmitSound( "NPC_MissileDefense.Attack" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_MissileDefense.Attack" );
 
 	Vector vecGun;
 	QAngle vecAng;
@@ -218,7 +218,7 @@ void CNPC_MissileDefense::FireCannons( void )
 	if( m_iAmmoLoaded < 1 )
 	{
 		// Incite a reload.
-		EmitSound( "NPC_MissileDefense.Reload" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_MissileDefense.Reload" );
 		m_flReloadedTime = gpGlobals->curtime + 0.3;
 		return;
 	}
@@ -313,7 +313,7 @@ int CNPC_MissileDefense::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 //------------------------------------------------------------------------------
 void CNPC_MissileDefense::Event_Killed( const CTakeDamageInfo &info )
 {
-	StopSound( "NPC_MissileDefense.Turn" );
+	g_pSoundEmitterSystem->StopSound(this, "NPC_MissileDefense.Turn" );
 	Gib();
 }
 
@@ -424,7 +424,7 @@ void CNPC_MissileDefense::AimGun( void )
 {
 	if (GetEnemy() == NULL)
 	{
-		StopSound( "NPC_MissileDefense.Turn" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_MissileDefense.Turn" );
 		return;
 	}
 
@@ -476,11 +476,11 @@ void CNPC_MissileDefense::AimGun( void )
 
 	if (flOldX != m_vGunAng.x || flOldY != m_vGunAng.y)
 	{
-		EmitSound( "NPC_MissileDefense.Turn" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_MissileDefense.Turn" );
 	}
 	else
 	{
-		StopSound( "NPC_MissileDefense.Turn" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_MissileDefense.Turn" );
 	}
 }
 
@@ -492,5 +492,5 @@ void CNPC_MissileDefense::AimGun( void )
 //------------------------------------------------------------------------------
 CNPC_MissileDefense::~CNPC_MissileDefense(void)
 {
-	StopSound( "NPC_MissileDefense.Turn" );
+	g_pSoundEmitterSystem->StopSound(this, "NPC_MissileDefense.Turn" );
 }

@@ -80,7 +80,7 @@ CBaseEntity *CreateCombineBall( const Vector &origin, const Vector &velocity, fl
 	pBall->SetState( CPropCombineBall::STATE_THROWN );
 	pBall->SetSpeed( velocity.Length() );
 
-	pBall->EmitSound( "NPC_CombineBall.Launch" );
+	g_pSoundEmitterSystem->EmitSound(pBall, "NPC_CombineBall.Launch" );//pBall->
 
 	PhysSetGameFlags( pBall->VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
 
@@ -258,23 +258,23 @@ void CPropCombineBall::Precache( void )
 
 	s_nExplosionTexture = PrecacheModel( "sprites/lgtning.vmt" );
 
-	PrecacheScriptSound( "NPC_CombineBall.Launch" );
-	PrecacheScriptSound( "NPC_CombineBall.KillImpact" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineBall.Launch" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineBall.KillImpact" );
 
 	if ( hl2_episodic.GetBool() )
 	{
-		PrecacheScriptSound( "NPC_CombineBall_Episodic.Explosion" );
-		PrecacheScriptSound( "NPC_CombineBall_Episodic.WhizFlyby" );
-		PrecacheScriptSound( "NPC_CombineBall_Episodic.Impact" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineBall_Episodic.Explosion" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineBall_Episodic.WhizFlyby" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineBall_Episodic.Impact" );
 	}
 	else
 	{
-		PrecacheScriptSound( "NPC_CombineBall.Explosion" );
-		PrecacheScriptSound( "NPC_CombineBall.WhizFlyby" );
-		PrecacheScriptSound( "NPC_CombineBall.Impact" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineBall.Explosion" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineBall.WhizFlyby" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineBall.Impact" );
 	}
 
-	PrecacheScriptSound( "NPC_CombineBall.HoldingInPhysCannon" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineBall.HoldingInPhysCannon" );
 }
 
 
@@ -736,7 +736,7 @@ void CPropCombineBall::WhizSoundThink()
 					ep.m_flVolume = 1.0f;
 					ep.m_SoundLevel = SNDLVL_NORM;
 
-					EmitSound( filter, entindex(), ep );
+					g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 
 					SetContextThink( &CPropCombineBall::WhizSoundThink, gpGlobals->curtime + 0.5f, s_pWhizThinkContext );
 					return;
@@ -764,7 +764,7 @@ void CPropCombineBall::SetBallAsLaunched( void )
 	VPhysicsGetObject()->SetInertia( Vector( 1e30, 1e30, 1e30 ) );
 
 	StopLoopingSounds();
-	EmitSound( "NPC_CombineBall.Launch" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall.Launch" );
 	
 	WhizSoundThink();
 }
@@ -1024,11 +1024,11 @@ void CPropCombineBall::DoExplosion( )
 	{
 		if ( hl2_episodic.GetBool() )
 		{
-			EmitSound( "NPC_CombineBall_Episodic.Explosion" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall_Episodic.Explosion" );
 		}
 		else
 		{
-			EmitSound( "NPC_CombineBall.Explosion" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall.Explosion" );
 		}
 
 		UTIL_ScreenShake( GetAbsOrigin(), 20.0f, 150.0, 1.0, 1250.0f, SHAKE_START );
@@ -1229,7 +1229,7 @@ void CPropCombineBall::OnHitEntity( CBaseEntity *pHitEntity, float flSpeed, int 
 				// damage. 
 				if( gpGlobals->curtime >= m_flNextDamageTime )
 				{
-					EmitSound( "NPC_CombineBall.KillImpact" );
+					g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall.KillImpact" );
 
 					if ( pHitEntity->IsNPC() && pHitEntity->Classify() != CLASS_PLAYER_ALLY_VITAL && hl2_episodic.GetBool() == true )
 					{
@@ -1252,7 +1252,7 @@ void CPropCombineBall::OnHitEntity( CBaseEntity *pHitEntity, float flSpeed, int 
 			{
 				if ( (m_nState == STATE_THROWN) && (pHitEntity->IsNPC() || dynamic_cast<CRagdollProp*>(pHitEntity) ))
 				{
-					EmitSound( "NPC_CombineBall.KillImpact" );
+					g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall.KillImpact" );
 				}
 				if ( (m_nState != STATE_HOLDING) )
 				{
@@ -1324,11 +1324,11 @@ void CPropCombineBall::DoImpactEffect( const Vector &preVelocity, int index, gam
 
 	if ( hl2_episodic.GetBool() )
 	{
-		EmitSound( "NPC_CombineBall_Episodic.Impact" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall_Episodic.Impact" );
 	}
 	else
 	{
-		EmitSound( "NPC_CombineBall.Impact" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall.Impact" );
 	}
 }
 

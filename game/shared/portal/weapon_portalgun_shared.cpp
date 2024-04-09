@@ -65,16 +65,16 @@ void CWeaponPortalgun::Precache()
 	PrecacheModel( "models/portals/portal1.mdl" );
 	PrecacheModel( "models/portals/portal2.mdl" );
 
-	PrecacheScriptSound( "Portal.ambient_loop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.ambient_loop" );
 
-	PrecacheScriptSound( "Portal.open_blue" );
-	PrecacheScriptSound( "Portal.open_red" );
-	PrecacheScriptSound( "Portal.close_blue" );
-	PrecacheScriptSound( "Portal.close_red" );
-	PrecacheScriptSound( "Portal.fizzle_moved" );
-	PrecacheScriptSound( "Portal.fizzle_invalid_surface" );
-	PrecacheScriptSound( "Weapon_Portalgun.powerup" );
-	PrecacheScriptSound( "Weapon_PhysCannon.HoldSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.open_blue" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.open_red" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.close_blue" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.close_red" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.fizzle_moved" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.fizzle_invalid_surface" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Portalgun.powerup" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_PhysCannon.HoldSound" );
 
 #ifndef CLIENT_DLL
 	PrecacheParticleSystem( "portal_1_projectile_stream" );
@@ -166,7 +166,7 @@ void CWeaponPortalgun::SetCanFirePortal1( bool bCanFire /*= true*/ )
 
 	pOwner->ViewPunch( QAngle( random->RandomFloat( -1, -0.5f ), random->RandomFloat( -1, 1 ), 0 ) );
 
-	EmitSound( "Weapon_Portalgun.powerup" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_Portalgun.powerup" );
 }
 
 void CWeaponPortalgun::SetCanFirePortal2( bool bCanFire /*= true*/ )
@@ -196,7 +196,7 @@ void CWeaponPortalgun::SetCanFirePortal2( bool bCanFire /*= true*/ )
 
 	pOwner->ViewPunch( QAngle( random->RandomFloat( -1, -0.5f ), random->RandomFloat( -1, 1 ), 0 ) );
 
-	EmitSound( "Weapon_Portalgun.powerup" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_Portalgun.powerup" );
 }
 
 //-----------------------------------------------------------------------------

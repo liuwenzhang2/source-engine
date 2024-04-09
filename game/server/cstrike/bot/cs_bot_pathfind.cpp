@@ -1784,7 +1784,7 @@ CCSBot::PathResult CCSBot::UpdatePathMovement( bool allowSpeedChange )
 			{
 				CBasePlayer *localPlayer = UTIL_GetListenServerHost();
 				CSingleUserRecipientFilter filter( localPlayer );
-				EmitSound( filter, localPlayer->entindex(), "Bot.FellOff" );
+				g_pSoundEmitterSystem->EmitSound( filter, localPlayer->entindex(), "Bot.FellOff" );
 			}
 		}
 

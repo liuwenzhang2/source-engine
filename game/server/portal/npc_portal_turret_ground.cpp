@@ -170,7 +170,7 @@ void CNPC_Portal_GroundTurret::Shoot()
 
 			TakeDamage( damageInfo );
 
-			EmitSound( "NPC_FloorTurret.DryFire" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.DryFire" );
 		}
 	}
 
@@ -182,7 +182,7 @@ void CNPC_Portal_GroundTurret::Shoot()
 	data.m_fFlags = MUZZLEFLASH_COMBINE;
 	DispatchEffect( "MuzzleFlash", data );
 
-	EmitSound( "NPC_FloorTurret.ShotSounds" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.ShotSounds" );
 
 	m_flTimeNextShoot = gpGlobals->curtime + 0.09;
 }
@@ -214,7 +214,7 @@ void CNPC_Portal_GroundTurret::Scan( void )
 
 	if( gpGlobals->curtime >= m_flTimeNextPing )
 	{
-		EmitSound( "NPC_FloorTurret.Ping" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Ping" );
 		m_flTimeNextPing = gpGlobals->curtime + 1.0f;
 	}
 

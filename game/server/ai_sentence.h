@@ -138,7 +138,7 @@ void CAI_Sentence< NPC_CLASS >::Init( NPC_CLASS *pOuter, const char *pGameSound 
 	{
 		// init the sentence parameters using a dummy gamesounds entry
 		CSoundParameters params;
-		if ( GetOuter()->GetParametersForSound( pGameSound, params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( pGameSound, params, NULL ) )//GetOuter()->
 		{
 			m_sentenceVolume = params.volume;
 			m_sentenceSoundlevel = params.soundlevel;

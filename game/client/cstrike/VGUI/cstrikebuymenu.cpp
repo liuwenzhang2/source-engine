@@ -727,7 +727,7 @@ void CCSBuySubMenu::OnCommand( const char *command )
 			C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 			if ( pPlayer )
 			{
-				pPlayer->EmitSound( "BuyPreset.CantBuy" );
+				g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
 			}
 
 			if ( cl_buy_favorite_nowarn.GetBool() )
@@ -769,7 +769,7 @@ void CCSBuySubMenu::OnCommand( const char *command )
 		C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 		if ( pPlayer )
 		{
-			pPlayer->EmitSound( "BuyPreset.CantBuy" );
+			g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
 		}
 		BaseClass::OnCommand( "vguicancel" );
 		return;

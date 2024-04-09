@@ -248,7 +248,7 @@ CFuncTank::~CFuncTank( void )
 {
 	if ( m_soundLoopRotate != NULL_STRING && (m_spawnflags & SF_TANK_SOUNDON) )
 	{
-		StopSound( entindex(), CHAN_STATIC, STRING(m_soundLoopRotate) );
+		g_pSoundEmitterSystem->StopSound( entindex(), CHAN_STATIC, STRING(m_soundLoopRotate) );
 	}
 }
 
@@ -637,11 +637,11 @@ void CFuncTank::Precache( void )
 		PrecacheModel( STRING(m_iszSpriteFlash) );
 
 	if ( m_soundStartRotate != NULL_STRING )
-		PrecacheScriptSound( STRING(m_soundStartRotate) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_soundStartRotate) );
 	if ( m_soundStopRotate != NULL_STRING )
-		PrecacheScriptSound( STRING(m_soundStopRotate) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_soundStopRotate) );
 	if ( m_soundLoopRotate != NULL_STRING )
-		PrecacheScriptSound( STRING(m_soundLoopRotate) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_soundLoopRotate) );
 }
 
 
@@ -1160,7 +1160,7 @@ void CFuncTank::StartRotSound( void )
 		ep.m_flVolume = 0.85f;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 	
 	if ( m_soundStartRotate != NULL_STRING )
@@ -1173,7 +1173,7 @@ void CFuncTank::StartRotSound( void )
 		ep.m_flVolume = 1.0f;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 }
 
@@ -1184,7 +1184,7 @@ void CFuncTank::StopRotSound( void )
 	{
 		if ( m_soundLoopRotate != NULL_STRING )
 		{
-			StopSound( entindex(), CHAN_STATIC, (char*)STRING(m_soundLoopRotate) );
+			g_pSoundEmitterSystem->StopSound( entindex(), CHAN_STATIC, (char*)STRING(m_soundLoopRotate) );
 		}
 		if ( m_soundStopRotate != NULL_STRING )
 		{
@@ -1196,7 +1196,7 @@ void CFuncTank::StopRotSound( void )
 			ep.m_flVolume = 1.0f;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 	}
 	m_spawnflags &= ~SF_TANK_SOUNDON;
@@ -1284,7 +1284,7 @@ void CFuncTankPulseLaser::Precache(void)
 
 	if ( m_sPulseFireSound != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING(m_sPulseFireSound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_sPulseFireSound) );
 	}
 	BaseClass::Precache();
 }
@@ -1329,7 +1329,7 @@ void CFuncTankPulseLaser::Fire( int bulletCount, const Vector &barrelEnd, const 
 			ep.m_flVolume = 1.0f;
 			ep.m_SoundLevel = ATTN_TO_SNDLVL( 0.6 );
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 	}
@@ -1524,9 +1524,9 @@ END_DATADESC()
 void CFuncTankMortar::Precache( void )
 {
 	if ( m_fireStartSound != NULL_STRING )
-		PrecacheScriptSound( STRING(m_fireStartSound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_fireStartSound) );
 	if ( m_fireEndSound != NULL_STRING )
-		PrecacheScriptSound( STRING(m_fireEndSound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_fireEndSound) );
 	BaseClass::Precache();
 }
 
@@ -1574,7 +1574,7 @@ void CFuncTankMortar::FiringSequence( const Vector &barrelEnd, const Vector &for
 				ep.m_flVolume = 1.0f;
 				ep.m_SoundLevel = SNDLVL_NORM;
 
-				EmitSound( filter, entindex(), ep );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 			}
 
 			if ( m_fireDelay != 0 )
@@ -1606,7 +1606,7 @@ void CFuncTankMortar::Fire( int bulletCount, const Vector &barrelEnd, const Vect
 		ep.m_flVolume = 1.0f;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 
 	trace_t tr;

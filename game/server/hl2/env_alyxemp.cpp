@@ -149,9 +149,9 @@ void CAlyxEmpEffect::Precache( void )
 {
 	PrecacheModel( EMP_BEAM_SPRITE );
 
-	PrecacheScriptSound( "AlyxEmp.Charge" );
-	PrecacheScriptSound( "AlyxEmp.Discharge" );
-	PrecacheScriptSound( "AlyxEmp.Stop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlyxEmp.Charge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlyxEmp.Discharge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlyxEmp.Stop" );
 }
 
 //-----------------------------------------------------------------------------
@@ -167,7 +167,7 @@ void CAlyxEmpEffect::InputStartCharge( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CAlyxEmpEffect::StartCharge( float flDuration )
 {
-	EmitSound( "AlyxEmp.Charge" );
+	g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Charge" );
 
 	m_nState = (int)ALYXEMP_STATE_CHARGING;
 	m_flDuration = flDuration;
@@ -190,7 +190,7 @@ void CAlyxEmpEffect::InputStartDischarge( inputdata_t &inputdata )
 
 void CAlyxEmpEffect::StartDischarge()
 {
-	EmitSound( "AlyxEmp.Discharge" );
+	g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Discharge" );
 
 	m_nState = (int)ALYXEMP_STATE_DISCHARGING;
 	m_flStartTime = gpGlobals->curtime;
@@ -243,7 +243,7 @@ void CAlyxEmpEffect::InputStop( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CAlyxEmpEffect::Stop( float flDuration )
 {
-	EmitSound( "AlyxEmp.Stop" );
+	g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Stop" );
 
 	m_nState = (int)ALYXEMP_STATE_OFF;
 	m_flDuration = flDuration;

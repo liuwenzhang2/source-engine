@@ -109,12 +109,12 @@ void CNPC_Headcrab::Precache( void )
 //	PrecacheModel( "models/hc_squashed01.mdl" );
 //	PrecacheModel( "models/gibs/hc_gibs.mdl" );
 
-	PrecacheScriptSound( "Headcrab.Bite" );
-	PrecacheScriptSound( "Headcrab.Attack" );
-	PrecacheScriptSound( "Headcrab.Idle" );
-	PrecacheScriptSound( "Headcrab.Die" );
-	PrecacheScriptSound( "Headcrab.Alert" );
-	PrecacheScriptSound( "Headcrab.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Headcrab.Bite" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Headcrab.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Headcrab.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Headcrab.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Headcrab.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Headcrab.Pain" );
 
 	BaseClass::Precache();
 }
@@ -149,14 +149,14 @@ void CNPC_Headcrab::HeadCrabSound( const char *pchSound )
 	CPASAttenuationFilter filter( this, ATTN_IDLE );
 
 	CSoundParameters params;
-	if ( GetParametersForSound( pchSound, params, NULL ) )
+	if (g_pSoundEmitterSystem->GetParametersForSound( pchSound, params, NULL ) )
 	{
 		EmitSound_t ep( params );
 
 		ep.m_flVolume = GetSoundVolume();
 		ep.m_nPitch = GetVoicePitch();
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 }
 

@@ -1021,7 +1021,7 @@ static HSOUNDSCRIPTHANDLE PrecachePhysicsSoundByStringIndex( int idx )
 	// Only precache if a value was set in the script file...
 	if ( idx != 0 )
 	{
-		return CBaseEntity::PrecacheScriptSound( physprops->GetString( idx ) );
+		return g_pSoundEmitterSystem->PrecacheScriptSound( physprops->GetString( idx ) );
 	}
 
 	return SOUNDEMITTER_INVALID_HANDLE;

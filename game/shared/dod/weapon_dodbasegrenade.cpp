@@ -100,7 +100,7 @@ bool CWeaponDODBaseGrenade::CanHolster( void )
 	//-----------------------------------------------------------------------------
 	void CWeaponDODBaseGrenade::Precache()
 	{
-		PrecacheScriptSound( "Weapon_Grenade.Throw" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Grenade.Throw" );
 
 		// Precache all the grenade minimap icons. 
 		PrecacheMaterial( "sprites/minimap_icons/minimap_riflegren_ger" );
@@ -411,7 +411,7 @@ enum
 
 		EmitGrenade( vecSrc, vec3_angle, vecThrow, AngularImpulse(600,random->RandomInt(-1200,1200),0), pPlayer, flTimeLeft );
 
-		pPlayer->EmitSound( "Weapon_Grenade.Throw" );
+		g_pSoundEmitterSystem->EmitSound(pPlayer, "Weapon_Grenade.Throw" );//pPlayer->
 
 #ifndef CLIENT_DLL
 		IGameEvent * event = gameeventmanager->CreateEvent( "dod_stats_weapon_attack" );

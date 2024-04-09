@@ -491,7 +491,7 @@ void CAchievementTrackerItem::AchievementIncremented( int iNewCount )
 		}
 
 		CLocalPlayerFilter filter;
-		C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Hud.AchievementIncremented" );
+		g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Hud.AchievementIncremented" );//C_BaseEntity::
 	}
 }
 

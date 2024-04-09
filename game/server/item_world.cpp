@@ -492,9 +492,9 @@ void CItem::Materialize( void )
 		// changing from invisible state to visible.
 
 #ifdef HL2MP
-		EmitSound( "AlyxEmp.Charge" );
+		g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Charge" );
 #else
-		EmitSound( "Item.Materialize" );
+		g_pSoundEmitterSystem->EmitSound(this, "Item.Materialize" );
 #endif
 		RemoveEffects( EF_NODRAW );
 		DoMuzzleFlash();
@@ -510,7 +510,7 @@ void CItem::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "Item.Materialize" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Item.Materialize" );
 }
 
 //-----------------------------------------------------------------------------

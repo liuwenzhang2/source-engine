@@ -258,16 +258,16 @@ void CNPC_CeilingTurret::Precache( void )
 	ADD_CUSTOM_ACTIVITY( CNPC_CeilingTurret, ACT_CEILING_TURRET_FIRE );
 	ADD_CUSTOM_ACTIVITY( CNPC_CeilingTurret, ACT_CEILING_TURRET_DRYFIRE );
 
-	PrecacheScriptSound( "NPC_CeilingTurret.Retire" );
-	PrecacheScriptSound( "NPC_CeilingTurret.Deploy" );
-	PrecacheScriptSound( "NPC_CeilingTurret.Move" );
-	PrecacheScriptSound( "NPC_CeilingTurret.Active" );
-	PrecacheScriptSound( "NPC_CeilingTurret.Alert" );
-	PrecacheScriptSound( "NPC_CeilingTurret.ShotSounds" );
-	PrecacheScriptSound( "NPC_CeilingTurret.Ping" );
-	PrecacheScriptSound( "NPC_CeilingTurret.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CeilingTurret.Retire" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CeilingTurret.Deploy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CeilingTurret.Move" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CeilingTurret.Active" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CeilingTurret.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CeilingTurret.ShotSounds" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CeilingTurret.Ping" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CeilingTurret.Die" );
 
-	PrecacheScriptSound( "NPC_FloorTurret.DryFire" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FloorTurret.DryFire" );
 	
 	BaseClass::Precache();
 }
@@ -361,7 +361,7 @@ int CNPC_CeilingTurret::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		ExplosionCreate( GetAbsOrigin(), GetLocalAngles(), this, 100, 100, false );
 		SetThink( &CNPC_CeilingTurret::DeathThink );
 
-		StopSound( "NPC_CeilingTurret.Alert" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_CeilingTurret.Alert" );
 
 		m_OnDamaged.FireOutput( info.GetInflictor(), this );
 
@@ -397,7 +397,7 @@ void CNPC_CeilingTurret::Retire( void )
 		if ( UpdateFacing() == false )
 		{
 			SetActivity( (Activity) ACT_CEILING_TURRET_CLOSE );
-			EmitSound( "NPC_CeilingTurret.Retire" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_CeilingTurret.Retire" );
 
 			//Notify of the retraction
 			m_OnRetire.FireOutput( NULL, this );
@@ -447,7 +447,7 @@ void CNPC_CeilingTurret::Deploy( void )
 	{
 		m_bActive = true;
 		SetActivity( (Activity) ACT_CEILING_TURRET_OPEN );
-		EmitSound( "NPC_CeilingTurret.Deploy" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CeilingTurret.Deploy" );
 
 		//Notify we're deploying
 		m_OnDeploy.FireOutput( NULL, this );
@@ -465,7 +465,7 @@ void CNPC_CeilingTurret::Deploy( void )
 		m_flPlaybackRate = 0;
 		SetThink( &CNPC_CeilingTurret::SearchThink );
 
-		EmitSound( "NPC_CeilingTurret.Move" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CeilingTurret.Move" );
 	}
 
 	SetLastSightTime();
@@ -748,7 +748,7 @@ void CNPC_CeilingTurret::SearchThink( void )
 		SetEyeState( TURRET_EYE_SEE_TARGET );
 
 		SpinUp();
-		EmitSound( "NPC_CeilingTurret.Active" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CeilingTurret.Active" );
 		return;
 	}
 
@@ -799,7 +799,7 @@ void CNPC_CeilingTurret::AutoSearchThink( void )
 	if ( GetEnemy() != NULL )
 	{
 		SetThink( &CNPC_CeilingTurret::Deploy );
-		EmitSound( "NPC_CeilingTurret.Alert" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CeilingTurret.Alert" );
 	}
 }
 
@@ -810,8 +810,8 @@ void CNPC_CeilingTurret::Shoot( const Vector &vecSrc, const Vector &vecDirToEnem
 {
 	if ( m_spawnflags & SF_CEILING_TURRET_OUT_OF_AMMO )
 	{
-		EmitSound( "NPC_FloorTurret.DryFire");
-		EmitSound( "NPC_CeilingTurret.Activate" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.DryFire");
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CeilingTurret.Activate" );
 
   		if ( RandomFloat( 0, 1 ) > 0.7 )
 		{
@@ -856,7 +856,7 @@ void CNPC_CeilingTurret::Shoot( const Vector &vecSrc, const Vector &vecDirToEnem
 	}
 
 	FireBullets( info );
-	EmitSound( "NPC_CeilingTurret.ShotSounds" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_CeilingTurret.ShotSounds" );
 	DoMuzzleFlash();
 }
 
@@ -946,7 +946,7 @@ void CNPC_CeilingTurret::Ping( void )
 		return;
 
 	//Ping!
-	EmitSound( "NPC_CeilingTurret.Ping" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_CeilingTurret.Ping" );
 
 	SetEyeState( TURRET_EYE_SEEKING_TARGET );
 
@@ -1055,7 +1055,7 @@ void CNPC_CeilingTurret::DeathThink( void )
 	{
 		m_lifeState = LIFE_DEAD;
 
-		EmitSound( "NPC_CeilingTurret.Die" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CeilingTurret.Die" );
 
 		SetActivity( (Activity) ACT_CEILING_TURRET_CLOSE );
 	}

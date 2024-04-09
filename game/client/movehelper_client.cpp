@@ -181,7 +181,7 @@ void CMoveHelperClient::StartSound( const Vector& origin, const char *soundname 
 
 	CLocalPlayerFilter filter;
 	filter.UsePredictionRules();
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, soundname, &origin );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, soundname, &origin );//C_BaseEntity::
 }
 
 
@@ -194,7 +194,7 @@ void CMoveHelperClient::StartSound( const Vector& origin, int channel,
 {
 	if ( pSample )
 	{
-		C_BaseEntity::PrecacheScriptSound( pSample );
+		g_pSoundEmitterSystem->PrecacheScriptSound( pSample );
 		CLocalPlayerFilter filter;
 		filter.UsePredictionRules();
 
@@ -206,7 +206,7 @@ void CMoveHelperClient::StartSound( const Vector& origin, int channel,
 		ep.m_nPitch = pitch;
 		ep.m_pOrigin = &origin;
 
-		C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, ep );
+		g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, ep );//C_BaseEntity::
 	}
 }
 

@@ -3657,7 +3657,7 @@ void MaterialFootstepSound( C_BaseAnimating *pEnt, bool bLeftFoot, float flVolum
 			params.m_bWarnOnDirectWaveReference = true;
 			params.m_flVolume = flVolume;
 
-			pEnt->EmitSound( filter, pEnt->entindex(), params );
+			g_pSoundEmitterSystem->EmitSound( filter, pEnt->entindex(), params );//pEnt->
 		}
 	}
 }
@@ -3738,17 +3738,17 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 			if ( m_Attachments.Count() > 0)
 			{
 				GetAttachment( 1, attachOrigin, attachAngles );
-				EmitSound( filter, GetSoundSourceIndex(), options, &attachOrigin );
+				g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), options, &attachOrigin );
 			}
 			else
 			{
-				EmitSound( filter, GetSoundSourceIndex(), options, &GetAbsOrigin() );
+				g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), options, &GetAbsOrigin() );
 			} 
 		}
 		break;
 	case AE_CL_STOPSOUND:
 		{
-			StopSound( GetSoundSourceIndex(), options );
+		g_pSoundEmitterSystem->StopSound( GetSoundSourceIndex(), options );
 		}
 		break;
 
@@ -3773,7 +3773,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 			{
 				Q_snprintf( pSoundName, 256, "%s.FootstepLeft", options );
 			}
-			EmitSound( pSoundName );
+			g_pSoundEmitterSystem->EmitSound(this, pSoundName );
 #endif
 		}
 		break;
@@ -3798,7 +3798,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 			{
 				Q_snprintf( pSoundName, 256, "%s.FootstepRight", options );
 			}
-			EmitSound( pSoundName );
+			g_pSoundEmitterSystem->EmitSound(this, pSoundName );
 #endif
 		}
 		break;
@@ -4157,11 +4157,11 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 			if ( m_Attachments.Count() > 0)
 			{
 				GetAttachment( 1, attachOrigin, attachAngles );
-				EmitSound( filter, GetSoundSourceIndex(), options, &attachOrigin );
+				g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), options, &attachOrigin );
 			}
 			else
 			{
-				EmitSound( filter, GetSoundSourceIndex(), options );
+				g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), options );
 			}
 		}
 		break;

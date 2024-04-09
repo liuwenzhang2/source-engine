@@ -358,7 +358,7 @@ void CSoundPatch::Init( IRecipientFilter *pFilter, CBaseEntity *pEnt, int channe
 	// Get the volume from the script
 	CSoundParameters params;
 	if ( !Q_stristr( pSoundName, ".wav" ) && !Q_stristr( pSoundName, ".mp3" ) &&
-		CBaseEntity::GetParametersForSound( pSoundName, params, NULL ) )
+		g_pSoundEmitterSystem->GetParametersForSound( pSoundName, params, NULL ) )//CBaseEntity::
 	{
 		m_flScriptVolume = params.volume;
 		// This has to be the actual .wav because rndwave would cause a bunch of new .wavs to play... bad...
@@ -484,7 +484,7 @@ void CSoundPatch::Shutdown( void )
 		// BUGBUG: Don't crash in release mode
 		if ( entIndex >= 0 )
 		{
-			CBaseEntity::StopSound( entIndex, m_entityChannel, STRING( m_iszSoundName ) );
+			g_pSoundEmitterSystem->StopSound( entIndex, m_entityChannel, STRING( m_iszSoundName ) );//CBaseEntity::
 		}
 		m_isPlaying = false;
 	}
@@ -547,7 +547,7 @@ bool CSoundPatch::Update( float time, float deltaTime )
 		ep.m_nFlags = m_flags;
 		ep.m_nPitch = (int)m_pitch.Value();
 
-		CBaseEntity::EmitSound( m_Filter, EntIndex(), ep );
+		g_pSoundEmitterSystem->EmitSound( m_Filter, EntIndex(), ep );//CBaseEntity::
 
 		m_flags = 0;
 	}
@@ -586,8 +586,8 @@ void CSoundPatch::StartSound( float flStartTime )
 			ep.m_flSoundTime = flStartTime;
 		}
 
-		CBaseEntity::EmitSound( m_Filter, EntIndex(), ep );
-		CBaseEntity::EmitCloseCaption( m_Filter, EntIndex(), STRING( m_iszSoundScriptName ), ep.m_UtlVecSoundOrigin, m_flCloseCaptionDuration, true );
+		g_pSoundEmitterSystem->EmitSound( m_Filter, EntIndex(), ep );//CBaseEntity::
+		g_pSoundEmitterSystem->EmitCloseCaption( m_Filter, EntIndex(), STRING( m_iszSoundScriptName ), ep.m_UtlVecSoundOrigin, m_flCloseCaptionDuration, true );//CBaseEntity::
 	}
 	m_isPlaying = true;
 }
@@ -610,7 +610,7 @@ void CSoundPatch::ResumeSound( void )
 			ep.m_nFlags = (SND_CHANGE_VOL | SND_CHANGE_PITCH | m_baseFlags);
 			ep.m_nPitch = (int)m_pitch.Value();
 
-			CBaseEntity::EmitSound( m_Filter, EntIndex(), ep );
+			g_pSoundEmitterSystem->EmitSound( m_Filter, EntIndex(), ep );//CBaseEntity::
 		}
 		else
 		{
@@ -642,7 +642,7 @@ void CSoundPatch::AddPlayerPost( CBasePlayer *pPlayer )
 		ep.m_nFlags = (SND_CHANGE_VOL | m_baseFlags);
 		ep.m_nPitch = (int)m_pitch.Value();
 
-		CBaseEntity::EmitSound( filter, EntIndex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, EntIndex(), ep );//CBaseEntity::
 	}
 }
 

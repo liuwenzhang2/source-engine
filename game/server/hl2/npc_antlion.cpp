@@ -456,32 +456,32 @@ void CNPC_Antlion::Precache( void )
 		PrecacheModel( pszAntlionGibs_Small[ i ] );
 	}
 
-	PrecacheScriptSound( "NPC_Antlion.RunOverByVehicle" );
-	PrecacheScriptSound( "NPC_Antlion.MeleeAttack" );
-	m_hFootstep = PrecacheScriptSound( "NPC_Antlion.Footstep" );
-	PrecacheScriptSound( "NPC_Antlion.BurrowIn" );
-	PrecacheScriptSound( "NPC_Antlion.BurrowOut" );
-	PrecacheScriptSound( "NPC_Antlion.FootstepSoft" );
-	PrecacheScriptSound( "NPC_Antlion.FootstepHeavy" );
-	PrecacheScriptSound( "NPC_Antlion.MeleeAttackSingle" );
-	PrecacheScriptSound( "NPC_Antlion.MeleeAttackDouble" );
-	PrecacheScriptSound( "NPC_Antlion.Distracted" );
-	PrecacheScriptSound( "NPC_Antlion.Idle" );
-	PrecacheScriptSound( "NPC_Antlion.Pain" );
-	PrecacheScriptSound( "NPC_Antlion.Land" );
-	PrecacheScriptSound( "NPC_Antlion.WingsOpen" );
-	PrecacheScriptSound( "NPC_Antlion.LoopingAgitated" );
-	PrecacheScriptSound( "NPC_Antlion.Distracted" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.RunOverByVehicle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.MeleeAttack" );
+	m_hFootstep = g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.Footstep" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.BurrowIn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.BurrowOut" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.FootstepSoft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.FootstepHeavy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.MeleeAttackSingle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.MeleeAttackDouble" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.Distracted" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.Land" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.WingsOpen" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.LoopingAgitated" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.Distracted" );
 
 #ifdef HL2_EPISODIC
-	PrecacheScriptSound( "NPC_Antlion.PoisonBurstScream" );
-	PrecacheScriptSound( "NPC_Antlion.PoisonBurstScreamSubmerged" );
-	PrecacheScriptSound( "NPC_Antlion.PoisonBurstExplode" );
-	PrecacheScriptSound( "NPC_Antlion.MeleeAttack_Muffled" );
-	PrecacheScriptSound( "NPC_Antlion.TrappedMetal" );
-	PrecacheScriptSound( "NPC_Antlion.ZappedFlip" );
-	PrecacheScriptSound( "NPC_Antlion.PoisonShoot" );
-	PrecacheScriptSound( "NPC_Antlion.PoisonBall" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.PoisonBurstScream" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.PoisonBurstScreamSubmerged" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.PoisonBurstExplode" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.MeleeAttack_Muffled" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.TrappedMetal" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.ZappedFlip" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.PoisonShoot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.PoisonBall" );
 #endif
 
 	BaseClass::Precache();
@@ -627,7 +627,7 @@ void CNPC_Antlion::Event_Killed( const CTakeDamageInfo &info )
 		SpawnBlood( GetAbsOrigin(), g_vecAttackDir, BloodColor(), info.GetDamage() );
 
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "NPC_Antlion.RunOverByVehicle" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Antlion.RunOverByVehicle" );
 	}
 
 	// Stop our zap effect!
@@ -688,7 +688,7 @@ void CNPC_Antlion::MeleeAttack( float distance, float damage, QAngle &viewPunch,
 		}
 
 		// Play a random attack hit sound
-		EmitSound( "NPC_Antlion.MeleeAttack" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.MeleeAttack" );
 	}
 }
 
@@ -1139,7 +1139,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 					DispatchParticleEffect( "blood_impact_yellow_01", vSpitPos + RandomVector( -12.0f, 12.0f ), RandomAngle( 0, 360 ) );
 				}
 
-				EmitSound( "NPC_Antlion.PoisonShoot" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.PoisonShoot" );
 			}
 			return;
 		}
@@ -1155,7 +1155,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ANTLION_WALK_FOOTSTEP )
 	{
 		MakeAIFootstepSound( 240.0f );
-		EmitSound( "NPC_Antlion.Footstep", m_hFootstep, pEvent->eventtime );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Footstep", m_hFootstep, pEvent->eventtime );
 		return;
 	}
 
@@ -1208,7 +1208,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ANTLION_BURROW_IN )
 	{
 		//Burrowing sound
-		EmitSound( "NPC_Antlion.BurrowIn" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.BurrowIn" );
 
 		//Shake the screen
 		UTIL_ScreenShake( GetAbsOrigin(), 0.5f, 80.0f, 1.0f, 256.0f, SHAKE_START );
@@ -1226,7 +1226,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLION_BURROW_OUT )
 	{
-		EmitSound( "NPC_Antlion.BurrowOut" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.BurrowOut" );
 
 		//Shake the screen
 		UTIL_ScreenShake( GetAbsOrigin(), 0.5f, 80.0f, 1.0f, 256.0f, SHAKE_START );
@@ -1242,26 +1242,26 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLION_FOOTSTEP_SOFT )
 	{
-		EmitSound( "NPC_Antlion.FootstepSoft", pEvent->eventtime );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.FootstepSoft", pEvent->eventtime );
 		return;
 	}
 
 	if ( pEvent->event == AE_ANTLION_FOOTSTEP_HEAVY )
 	{
-		EmitSound( "NPC_Antlion.FootstepHeavy", pEvent->eventtime );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.FootstepHeavy", pEvent->eventtime );
 		return;
 	}
 	
 	
 	if ( pEvent->event == AE_ANTLION_MELEE1_SOUND )
 	{
-		EmitSound( "NPC_Antlion.MeleeAttackSingle" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.MeleeAttackSingle" );
 		return;
 	}
 	
 	if ( pEvent->event == AE_ANTLION_MELEE2_SOUND )
 	{
-		EmitSound( "NPC_Antlion.MeleeAttackDouble" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.MeleeAttackDouble" );
 		return;
 	}
 
@@ -1277,11 +1277,11 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 	{
 		if ( GetWaterLevel() < 2 )
 		{
-			EmitSound( "NPC_Antlion.PoisonBurstScream" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.PoisonBurstScream" );
 		}
 		else
 		{
-			EmitSound( "NPC_Antlion.PoisonBurstScreamSubmerged" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.PoisonBurstScreamSubmerged" );
 		}
 		return;
 	}
@@ -1450,7 +1450,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 
 	case TASK_ANNOUNCE_ATTACK:
 		{
-			EmitSound( "NPC_Antlion.MeleeAttackSingle" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.MeleeAttackSingle" );
 			TaskComplete();
 			break;
 		}
@@ -2354,7 +2354,7 @@ int CNPC_Antlion::SelectSchedule( void )
 		//Play a special sound
 		if ( m_flNextAcknowledgeTime < gpGlobals->curtime )
 		{
-			EmitSound( "NPC_Antlion.Distracted" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Distracted" );
 			m_flNextAcknowledgeTime = gpGlobals->curtime + 1.0f;
 		}
 		
@@ -2455,7 +2455,7 @@ int CNPC_Antlion::SelectSchedule( void )
 				{
 					if ( OccupyStrategySlot( SQUAD_SLOT_ANTLION_WORKER_FIRE ) )
 					{
-						EmitSound( "NPC_Antlion.PoisonBurstScream" );
+						g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.PoisonBurstScream" );
 						SetNextAttack( gpGlobals->curtime + random->RandomFloat( 0.5f, 2.5f ) );
 						if ( GetEnemy() )
 						{
@@ -2727,12 +2727,12 @@ void CNPC_Antlion::StopLoopingSounds( void )
 {
 	if ( m_bLoopingStarted )
 	{
-		StopSound( "NPC_Antlion.WingsOpen" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_Antlion.WingsOpen" );
 		m_bLoopingStarted = false;
 	}
 	if ( m_bAgitatedSound )
 	{
-		StopSound( "NPC_Antlion.LoopingAgitated" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_Antlion.LoopingAgitated" );
 		m_bAgitatedSound = false;
 	}
 }
@@ -2742,7 +2742,7 @@ void CNPC_Antlion::StopLoopingSounds( void )
 //-----------------------------------------------------------------------------
 void CNPC_Antlion::IdleSound( void )
 {
-	EmitSound( "NPC_Antlion.Idle" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Idle" );
 	m_flIdleDelay = gpGlobals->curtime + 4.0f;
 }
 
@@ -2751,7 +2751,7 @@ void CNPC_Antlion::IdleSound( void )
 //-----------------------------------------------------------------------------
 void CNPC_Antlion::PainSound( const CTakeDamageInfo &info )
 {
-	EmitSound( "NPC_Antlion.Pain" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Pain" );
 }
 
 //-----------------------------------------------------------------------------
@@ -3345,7 +3345,7 @@ bool CNPC_Antlion::CheckLanding( void )
 			SetIdealActivity( (Activity) ACT_ANTLION_LAND );
 
 			CreateDust( false );
-			EmitSound( "NPC_Antlion.Land" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Land" );
 
 			if ( GetEnemy() && GetEnemy()->IsPlayer()  )
 			{
@@ -3401,13 +3401,13 @@ void CNPC_Antlion::SetWings( bool state )
 		CPASAttenuationFilter filter( this, "NPC_Antlion.WingsOpen" );
 		filter.MakeReliable();
 
-		EmitSound( filter, entindex(), "NPC_Antlion.WingsOpen" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Antlion.WingsOpen" );
 		SetBodygroup( 1, 1 );
 		m_bLoopingStarted = true;
 	}
 	else
 	{
-		StopSound( "NPC_Antlion.WingsOpen" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_Antlion.WingsOpen" );
 		SetBodygroup( 1, 0 );
 	}
 }
@@ -3738,13 +3738,13 @@ void CNPC_Antlion::PrescheduleThink( void )
 		CPASAttenuationFilter filter( this, "NPC_Antlion.LoopingAgitated" );
 		filter.MakeReliable();
 
-		EmitSound( filter, entindex(), "NPC_Antlion.LoopingAgitated" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Antlion.LoopingAgitated" );
 		m_bAgitatedSound = true;
 	}
 	else if ( ( eActivity != ACT_ANTLION_RUN_AGITATED ) && ( m_bAgitatedSound == true ) )
 	{
 		//Stop sound
-		StopSound( "NPC_Antlion.LoopingAgitated" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_Antlion.LoopingAgitated" );
 		m_bAgitatedSound = false;
 	}
 
@@ -4219,7 +4219,7 @@ void CNPC_Antlion::SetFollowTarget( CBaseEntity *pTarget )
 	// Play an acknowledgement noise
 	if ( m_flNextAcknowledgeTime < gpGlobals->curtime )
 	{
-		EmitSound( "NPC_Antlion.Distracted" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Distracted" );
 		m_flNextAcknowledgeTime = gpGlobals->curtime + 1.0f;
 	}
 }
@@ -4332,7 +4332,7 @@ void CNPC_Antlion::Flip( bool bZapped /*= false*/ )
 	{
 		m_flZapDuration = gpGlobals->curtime + SequenceDuration( SelectWeightedSequence( (Activity) ACT_ANTLION_ZAP_FLIP) ) + 0.1f;
 
-		EmitSound( "NPC_Antlion.ZappedFlip"  );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.ZappedFlip"  );
 	}
 }
 
@@ -4412,7 +4412,7 @@ void CNPC_Antlion::DoPoisonBurst()
 		DispatchEffect( "WaterSurfaceExplosion", data );
 	}
 
-	EmitSound( "NPC_Antlion.PoisonBurstExplode" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.PoisonBurstExplode" );
 }
 #endif
 

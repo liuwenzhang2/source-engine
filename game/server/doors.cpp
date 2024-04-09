@@ -145,7 +145,7 @@ void PlayLockSounds(CBaseEntity *pEdict, locksound_t *pls, int flocked, int fbut
 			ep.m_flVolume = fvol;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			CBaseEntity::EmitSound( filter, pEdict->entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, pEdict->entindex(), ep );//CBaseEntity::
 			pls->flwaitSound = gpGlobals->curtime + flsoundwait;
 		}
 
@@ -193,7 +193,7 @@ void PlayLockSounds(CBaseEntity *pEdict, locksound_t *pls, int flocked, int fbut
 			ep.m_flVolume = fvol;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			CBaseEntity::EmitSound( filter, pEdict->entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, pEdict->entindex(), ep );//CBaseEntity::
 			pls->flwaitSound = gpGlobals->curtime + flsoundwait;
 		}
 
@@ -366,7 +366,7 @@ void CBaseDoor::MovingSoundThink( void )
 	ep.m_flVolume = 1;
 	ep.m_SoundLevel = SNDLVL_NORM;
 
-	EmitSound( filter, entindex(), ep );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 
 	//Only loop sounds in HL1 to maintain HL2 behavior
 	if( ShouldLoopMoveSound() )
@@ -406,7 +406,7 @@ void CBaseDoor::StopMovingSound(void)
 	{
 		pSoundName = (char*)STRING(m_NoiseMovingClosed);
 	}
-	StopSound( entindex(), CHAN_STATIC, pSoundName );
+	g_pSoundEmitterSystem->StopSound( entindex(), CHAN_STATIC, pSoundName );
 }
  
 
@@ -563,12 +563,12 @@ void CBaseDoor::Precache( void )
 #endif//HL1_DLL
 
 	//Precache them all
-	PrecacheScriptSound( (char *) STRING(m_NoiseMoving) );
-	PrecacheScriptSound( (char *) STRING(m_NoiseArrived) );
-	PrecacheScriptSound( (char *) STRING(m_NoiseMovingClosed) );
-	PrecacheScriptSound( (char *) STRING(m_NoiseArrivedClosed) );
-	PrecacheScriptSound( (char *) STRING(m_ls.sLockedSound) );
-	PrecacheScriptSound( (char *) STRING(m_ls.sUnlockedSound) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( (char *) STRING(m_NoiseMoving) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( (char *) STRING(m_NoiseArrived) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( (char *) STRING(m_NoiseMovingClosed) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( (char *) STRING(m_NoiseArrivedClosed) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( (char *) STRING(m_ls.sLockedSound) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( (char *) STRING(m_ls.sUnlockedSound) );
 
 	//Get sentence group names, for doors which are directly 'touched' to open
 	switch (m_bLockedSentence)
@@ -1022,7 +1022,7 @@ void CBaseDoor::DoorHitTop( void )
 		ep.m_flVolume = 1;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 
 	ASSERT(m_toggle_state == TS_GOING_UP);
@@ -1108,7 +1108,7 @@ void CBaseDoor::DoorHitBottom( void )
 		ep.m_flVolume = 1;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 
 	ASSERT(m_toggle_state == TS_GOING_DOWN);

@@ -289,7 +289,7 @@ void CBaseCombatWeapon::Precache( void )
 			const char *shootsound = GetShootSound( i );
 			if ( shootsound && shootsound[0] )
 			{
-				CBaseEntity::PrecacheScriptSound( shootsound );
+				g_pSoundEmitterSystem->PrecacheScriptSound( shootsound );
 			}
 		}
 	}
@@ -741,7 +741,7 @@ void CBaseCombatWeapon::OnPickedUp( CBaseCombatCharacter *pNewOwner )
 		}
 		if ( filter.GetRecipientCount() )
 		{
-			CBaseEntity::EmitSound( filter, pNewOwner->entindex(), "Player.PickupWeapon" );
+			g_pSoundEmitterSystem->EmitSound( filter, pNewOwner->entindex(), "Player.PickupWeapon" );//CBaseEntity::
 		}
 
 		// Robin: We don't want to delete weapons the player has picked up, so 
@@ -1866,7 +1866,7 @@ void CBaseCombatWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /
 
 	CSoundParameters params;
 	
-	if ( !GetParametersForSound( shootsound, params, NULL ) )
+	if ( !g_pSoundEmitterSystem->GetParametersForSound( shootsound, params, NULL ) )
 		return;
 
 	if ( params.play_to_owner_only )
@@ -1879,7 +1879,7 @@ void CBaseCombatWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /
 			{
 				filter.UsePredictionRules();
 			}
-			EmitSound( filter, GetOwner()->entindex(), shootsound, NULL, soundtime );
+			g_pSoundEmitterSystem->EmitSound( filter, GetOwner()->entindex(), shootsound, NULL, soundtime );
 		}
 	}
 	else
@@ -1892,7 +1892,7 @@ void CBaseCombatWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /
 			{
 				filter.UsePredictionRules();
 			}
-			EmitSound( filter, GetOwner()->entindex(), shootsound, NULL, soundtime ); 
+			g_pSoundEmitterSystem->EmitSound( filter, GetOwner()->entindex(), shootsound, NULL, soundtime );
 
 #if !defined( CLIENT_DLL )
 			if( sound_type == EMPTY )
@@ -1909,7 +1909,7 @@ void CBaseCombatWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /
 			{
 				filter.UsePredictionRules();
 			}
-			EmitSound( filter, entindex(), shootsound, NULL, soundtime ); 
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), shootsound, NULL, soundtime );
 		}
 	}
 }
@@ -1928,7 +1928,7 @@ void CBaseCombatWeapon::StopWeaponSound( WeaponSound_t sound_type )
 		return;
 	
 	CSoundParameters params;
-	if ( !GetParametersForSound( shootsound, params, NULL ) )
+	if ( !g_pSoundEmitterSystem->GetParametersForSound( shootsound, params, NULL ) )
 		return;
 
 	// Am I only to play to my owner?
@@ -1936,7 +1936,7 @@ void CBaseCombatWeapon::StopWeaponSound( WeaponSound_t sound_type )
 	{
 		if ( GetOwner() )
 		{
-			StopSound( GetOwner()->entindex(), shootsound );
+			g_pSoundEmitterSystem->StopSound( GetOwner()->entindex(), shootsound );
 		}
 	}
 	else
@@ -1944,12 +1944,12 @@ void CBaseCombatWeapon::StopWeaponSound( WeaponSound_t sound_type )
 		// Play weapon sound from the owner
 		if ( GetOwner() )
 		{
-			StopSound( GetOwner()->entindex(), shootsound );
+			g_pSoundEmitterSystem->StopSound( GetOwner()->entindex(), shootsound );
 		}
 		// If no owner play from the weapon (this is used for thrown items)
 		else
 		{
-			StopSound( entindex(), shootsound );
+			g_pSoundEmitterSystem->StopSound( entindex(), shootsound );
 		}
 	}
 }

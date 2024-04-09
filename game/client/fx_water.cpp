@@ -245,7 +245,7 @@ void FX_GunshotSplash( const Vector &origin, const Vector &normal, float scale )
 	ep.m_pOrigin = &origin;
 
 
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, ep );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );//C_BaseEntity::
 }
 
 //-----------------------------------------------------------------------------
@@ -406,7 +406,7 @@ void FX_GunshotSlimeSplash( const Vector &origin, const Vector &normal, float sc
 	ep.m_SoundLevel = SNDLVL_NORM;
 	ep.m_pOrigin = &origin;
 
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, ep );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );//C_BaseEntity::
 }
 
 //-----------------------------------------------------------------------------

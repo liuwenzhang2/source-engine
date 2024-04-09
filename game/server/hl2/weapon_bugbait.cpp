@@ -139,7 +139,7 @@ void CWeaponBugBait::Precache( void )
 
 	UTIL_PrecacheOther( "npc_grenade_bugbait" );
 
-	PrecacheScriptSound( "Weapon_Bugbait.Splat" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Bugbait.Splat" );
 
 }
 
@@ -241,7 +241,7 @@ void CWeaponBugBait::SecondaryAttack( void )
 	// Squeeze!
 	CPASAttenuationFilter filter( this );
 
-	EmitSound( filter, entindex(), "Weapon_Bugbait.Splat" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Weapon_Bugbait.Splat" );
 
 	if ( CGrenadeBugBait::ActivateBugbaitTargets( GetOwner(), GetAbsOrigin(), true ) == false )
 	{

@@ -409,7 +409,7 @@ void CCSBot::ResetStuckMonitor( void )
 		{
 			CBasePlayer *localPlayer = UTIL_GetListenServerHost();
 			CSingleUserRecipientFilter filter( localPlayer );
-			EmitSound( filter, localPlayer->entindex(), "Bot.StuckSound" );
+			g_pSoundEmitterSystem->EmitSound( filter, localPlayer->entindex(), "Bot.StuckSound" );
 		}
 	}
 
@@ -491,7 +491,7 @@ void CCSBot::StuckCheck( void )
 				{
 					CBasePlayer *localPlayer = UTIL_GetListenServerHost();
 					CSingleUserRecipientFilter filter( localPlayer );
-					EmitSound( filter, localPlayer->entindex(), "Bot.StuckStart" );
+					g_pSoundEmitterSystem->EmitSound( filter, localPlayer->entindex(), "Bot.StuckStart" );
 				}
 
 				m_isStuck = true;

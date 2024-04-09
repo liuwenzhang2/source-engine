@@ -577,9 +577,9 @@ void CNPC_MetroPolice::Precache( void )
 
 	UTIL_PrecacheOther( "npc_manhack" );
 
-	PrecacheScriptSound( "NPC_Metropolice.Shove" );
-	PrecacheScriptSound( "NPC_MetroPolice.WaterSpeech" );
-	PrecacheScriptSound( "NPC_MetroPolice.HidingSpeech" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Metropolice.Shove" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_MetroPolice.WaterSpeech" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_MetroPolice.HidingSpeech" );
 	enginesound->PrecacheSentenceGroup( "METROPOLICE" );
 
 	BaseClass::Precache();
@@ -2866,7 +2866,7 @@ void CNPC_MetroPolice::OnAnimEventShove( void )
 		}
 
 		// Play a random attack hit sound
-		EmitSound( "NPC_Metropolice.Shove" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Metropolice.Shove" );
 	}
 }
 
@@ -4564,11 +4564,11 @@ void CNPC_MetroPolice::StartTask( const Task_t *pTask )
 			{
 				if( GetEnemy() && GetEnemy()->GetWaterLevel() > 0 )
 				{
-					EmitSound( "NPC_MetroPolice.WaterSpeech" );
+					g_pSoundEmitterSystem->EmitSound(this, "NPC_MetroPolice.WaterSpeech" );
 				}
 				else
 				{
-					EmitSound( "NPC_MetroPolice.HidingSpeech" );
+					g_pSoundEmitterSystem->EmitSound(this, "NPC_MetroPolice.HidingSpeech" );
 				}
 			}
 

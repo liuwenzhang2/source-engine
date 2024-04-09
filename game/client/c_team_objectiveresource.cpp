@@ -414,7 +414,7 @@ void C_BaseTeamObjectiveResource::ClientThink()
 									// Prevent spam
 									if ( gpGlobals->curtime > ( m_flLastCapWarningTime[i] + 5 ) )
 									{
-										pPlayer->EmitSound( GetWarnSound( i ) );
+										g_pSoundEmitterSystem->EmitSound(pPlayer, GetWarnSound( i ) );//pPlayer->
 
 										m_bWarnedOnFinalCap[i] = true;
 										m_flLastCapWarningTime[i] = gpGlobals->curtime;

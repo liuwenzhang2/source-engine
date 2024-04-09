@@ -498,20 +498,20 @@ void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 		{
 			if ( reason == Bomb_Defused )
 			{
-				C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.BombDefused");
+				g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.BombDefused");//C_BaseEntity::
 			}
 			else
 			{
-				C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.CTWin");
+				g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.CTWin");//C_BaseEntity::
 			}
 		}
 		else if ( winningTeam == TEAM_TERRORIST )
 		{
-			C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.TERWin");
+			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.TERWin");//C_BaseEntity::
 		}
 		else
 		{
-			C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.RoundDraw");
+			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.RoundDraw");//C_BaseEntity::
 		}
 		
 		//=============================================================================
@@ -572,7 +572,7 @@ void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 		internalCenterPrint->Print( "#Cstrike_TitlesTXT_Bomb_Planted" );
 
 		// play sound
-		 C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.BombPlanted")  ;
+		g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.BombPlanted")  ;//C_BaseEntity::
 	}
 
 	else if ( Q_strcmp( "bomb_defused", eventname ) == 0 )
@@ -603,7 +603,7 @@ void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 		// play sound for spectators and CTs
 		if ( pLocalPlayer->IsObserver() || (pLocalPlayer->GetTeamNumber() == TEAM_CT) )
 		{
-			C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.HostageKilled")  ;
+			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "Event.HostageKilled");//C_BaseEntity::
 		}
 
 		// Show warning to killer

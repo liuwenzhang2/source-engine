@@ -132,9 +132,9 @@ void CWeapon_SLAM::Precache( void )
 	UTIL_PrecacheOther( "npc_satchel" );
 #endif
 
-	PrecacheScriptSound( "Weapon_SLAM.TripMineMode" );
-	PrecacheScriptSound( "Weapon_SLAM.SatchelDetonate" );
-	PrecacheScriptSound( "Weapon_SLAM.SatchelThrow" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_SLAM.TripMineMode" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_SLAM.SatchelDetonate" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_SLAM.SatchelThrow" );
 }
 
 //------------------------------------------------------------------------------
@@ -267,7 +267,7 @@ void CWeapon_SLAM::SatchelDetonate()
 	}
 #endif
 	// Play sound for pressing the detonator
-	EmitSound( "Weapon_SLAM.SatchelDetonate" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_SLAM.SatchelDetonate" );
 
 	m_bDetonatorArmed	= false;
 }
@@ -497,7 +497,7 @@ void CWeapon_SLAM::SatchelThrow( void )
 #endif
 
 	// Play throw sound
-	EmitSound( "Weapon_SLAM.SatchelThrow" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_SLAM.SatchelThrow" );
 }
 
 //-----------------------------------------------------------------------------

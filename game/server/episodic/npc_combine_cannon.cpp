@@ -552,7 +552,7 @@ void CNPC_Combine_Cannon::Precache( void )
 	
 	gHaloTexture = PrecacheModel("sprites/light_glow03.vmt");
 
-	PrecacheScriptSound( "NPC_Combine_Cannon.FireBullet" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Combine_Cannon.FireBullet" );
 
 	BaseClass::Precache();
 }
@@ -845,7 +845,7 @@ bool CNPC_Combine_Cannon::FireBullet( const Vector &vecTarget, bool bDirectShot 
 
 	FireBullets( info );
 
-	EmitSound( "NPC_Combine_Cannon.FireBullet" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Combine_Cannon.FireBullet" );
 
 	// Don't attack for a certain amount of time
 	SetNextAttack( gpGlobals->curtime + GetRefireTime() );

@@ -80,7 +80,7 @@ extern ConVar sv_unlockedchapters;
 
 void CPortalCredits::Precache( void )
 {
-	PrecacheScriptSound( "Portal.song_credits" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.song_credits" );
 
 	BaseClass::Precache();
 }

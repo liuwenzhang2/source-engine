@@ -830,7 +830,7 @@ void CNPC_BaseScanner::ScannerEmitSound( const char *pszSoundName )
 
 	m_bHasSpoken = true;
 
-	EmitSound( snd.Access() );
+	g_pSoundEmitterSystem->EmitSound(this, snd.Access() );
 }
 
 //------------------------------------------------------------------------------

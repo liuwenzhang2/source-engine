@@ -213,8 +213,8 @@ void CBasePlatTrain::Precache( void )
 #endif // HL1_DLL
 
 	//Precache them all
-	PrecacheScriptSound( (char *) STRING(m_NoiseMoving) );
-	PrecacheScriptSound( (char *) STRING(m_NoiseArrived) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( (char *) STRING(m_NoiseMoving) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( (char *) STRING(m_NoiseArrived) );
 
 }
 
@@ -531,7 +531,7 @@ void CFuncPlat::HitBottom( void )
 		ep.m_flVolume = m_volume;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 
 	ASSERT(m_toggle_state == TS_GOING_DOWN);
@@ -570,7 +570,7 @@ void CFuncPlat::HitTop( void )
 		ep.m_flVolume = m_volume;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 	
 	ASSERT(m_toggle_state == TS_GOING_UP);
@@ -597,7 +597,7 @@ void CFuncPlat::Blocked( CBaseEntity *pOther )
 
 	if (m_sNoise != NULL_STRING)
 	{
-		StopSound(entindex(), CHAN_STATIC, (char*)STRING(m_sNoise));
+		g_pSoundEmitterSystem->StopSound(entindex(), CHAN_STATIC, (char*)STRING(m_sNoise));
 	}
 	
 	// Send the platform back where it came from
@@ -832,7 +832,7 @@ void CFuncTrain::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 			ep.m_flVolume = m_volume;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 	}
 }
@@ -861,7 +861,7 @@ void CFuncTrain::Wait( void )
 			ep.m_flVolume = m_volume;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 		SetMoveDoneTime( -1 );
@@ -886,7 +886,7 @@ void CFuncTrain::Wait( void )
 			ep.m_flVolume = m_volume;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 		SetMoveDone( &CFuncTrain::Next );
@@ -924,7 +924,7 @@ void CFuncTrain::Next( void )
 			ep.m_flVolume = m_volume;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 		return;
@@ -1157,7 +1157,7 @@ void CFuncTrain::Stop( void )
 			ep.m_flVolume = m_volume;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 		//Do not teleport to our final move destination
@@ -1756,7 +1756,7 @@ void CFuncTrackTrain::SoundStop( void )
 	{
 		if ( m_iszSoundMove != NULL_STRING )
 		{
-			StopSound( entindex(), CHAN_STATIC, STRING( m_iszSoundMove ) );
+			g_pSoundEmitterSystem->StopSound( entindex(), CHAN_STATIC, STRING( m_iszSoundMove ) );
 		}
 
 		if ( m_iszSoundStop != NULL_STRING )
@@ -1769,7 +1769,7 @@ void CFuncTrackTrain::SoundStop( void )
 			ep.m_flVolume = m_flVolume;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 	}
 
@@ -1827,7 +1827,7 @@ void CFuncTrackTrain::SoundUpdate( void )
 			ep.m_SoundLevel = SNDLVL_NORM;
 			ep.m_pOrigin = &vecWorldSpaceCenter;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 		if ( m_iszSoundMove != NULL_STRING )
@@ -1840,7 +1840,7 @@ void CFuncTrackTrain::SoundUpdate( void )
 			ep.m_nPitch = (int)flpitch;
 			ep.m_pOrigin = &vecWorldSpaceCenter;
 
-			EmitSound( filterReliable, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filterReliable, entindex(), ep );
 		}
 
 		// We've just started moving. Delay the next move ping sound.
@@ -1865,17 +1865,17 @@ void CFuncTrackTrain::SoundUpdate( void )
 			// In multiplayer, don't make this reliable
 			if ( g_pGameRules->IsMultiplayer() )
 			{
-				EmitSound( filter, entindex(), ep );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 			}
 			else
 			{
-				EmitSound( filterReliable, entindex(), ep );
+				g_pSoundEmitterSystem->EmitSound( filterReliable, entindex(), ep );
 			}
 		}
 
 		if ( ( m_iszSoundMovePing != NULL_STRING ) && ( gpGlobals->curtime > m_flNextMoveSoundTime ) )
 		{
-			EmitSound(STRING(m_iszSoundMovePing));
+			g_pSoundEmitterSystem->EmitSound(this, STRING(m_iszSoundMovePing));
 			m_flNextMoveSoundTime = gpGlobals->curtime + RemapVal( flSpeedRatio, 0, 1, m_flMoveSoundMaxTime, m_flMoveSoundMinTime );
 		}
 	}
@@ -2727,22 +2727,22 @@ void CFuncTrackTrain::Precache( void )
 
 	if ( m_iszSoundMove != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING( m_iszSoundMove ) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszSoundMove ) );
 	}
 
 	if ( m_iszSoundMovePing != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING( m_iszSoundMovePing ) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszSoundMovePing ) );
 	}
 
 	if ( m_iszSoundStart != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING( m_iszSoundStart ) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszSoundStart ) );
 	}
 
 	if ( m_iszSoundStop != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING( m_iszSoundStop ) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszSoundStop ) );
 	}
 }
 
@@ -2950,7 +2950,7 @@ void CFuncTrackChange::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "FuncTrackChange.Blocking" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "FuncTrackChange.Blocking" );
 }
 
 
@@ -3181,7 +3181,7 @@ void CFuncTrackChange::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_T
 	if ( m_code == TRAIN_BLOCKING )
 	{
 		// Play alarm and return
-		EmitSound( "FuncTrackChange.Blocking" );
+		g_pSoundEmitterSystem->EmitSound(this, "FuncTrackChange.Blocking" );
 		return;
 	}
 

@@ -452,7 +452,7 @@ bool NextBotCombatCharacter::BecomeRagdoll( const CTakeDamageInfo &info, const V
 	}
 
 	// clear the deceased's sound channels.(may have been firing or reloading when killed)
-	EmitSound( "BaseCombatCharacter.StopWeaponSounds" );
+	g_pSoundEmitterSystem->EmitSound(this, "BaseCombatCharacter.StopWeaponSounds" );
 
 	return BaseClass::BecomeRagdoll( info, adjustedForceVector );
 }

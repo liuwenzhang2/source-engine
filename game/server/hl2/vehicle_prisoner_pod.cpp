@@ -228,8 +228,8 @@ void CPropVehiclePrisonerPod::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "d3_citadel.pod_open" );
-	PrecacheScriptSound( "d3_citadel.pod_close" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "d3_citadel.pod_open" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "d3_citadel.pod_close" );
 
 	m_ServerVehicle.Initialize( STRING(m_vehicleScript) );
 }
@@ -354,7 +354,7 @@ void CPropVehiclePrisonerPod::InputOpen( inputdata_t &inputdata )
 		m_flAnimTime = gpGlobals->curtime;
 		ResetSequence( nSequence );
 		ResetClientsideFrame();
-		EmitSound( "d3_citadel.pod_open" );
+		g_pSoundEmitterSystem->EmitSound(this, "d3_citadel.pod_open" );
 	}
 	else
 	{
@@ -383,7 +383,7 @@ void CPropVehiclePrisonerPod::InputClose( inputdata_t &inputdata )
 		m_flAnimTime = gpGlobals->curtime;
 		ResetSequence( nSequence );
 		ResetClientsideFrame();
-		EmitSound( "d3_citadel.pod_close" );
+		g_pSoundEmitterSystem->EmitSound(this, "d3_citadel.pod_close" );
 	}
 	else
 	{

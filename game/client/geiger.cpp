@@ -199,7 +199,7 @@ void CHudGeiger::Paint()
 
 		CSoundParameters params;
 
-		if ( C_BaseEntity::GetParametersForSound( sz, params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( sz, params, NULL ) )//C_BaseEntity::
 		{
 			CLocalPlayerFilter filter;
 
@@ -210,7 +210,7 @@ void CHudGeiger::Paint()
 			ep.m_SoundLevel = params.soundlevel;
 			ep.m_nPitch = params.pitch;
 
-			C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, ep ); 
+			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, ep ); //C_BaseEntity::
 		}
 	}
 }

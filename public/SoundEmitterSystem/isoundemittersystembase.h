@@ -16,6 +16,7 @@
 #include "soundflags.h"
 #include "mathlib/compressed_vector.h"
 #include "appframework/IAppSystem.h"
+#include "irecipientfilter.h"
 
 
 #define SOUNDEMITTERSYSTEM_INTERFACE_VERSION	"VSoundEmitter002"
@@ -268,5 +269,82 @@ public:
 	// Called by either client or server to force ModShutdown and ModInit
 	virtual void			Flush() = 0;
 };
+
+typedef short HSOUNDSCRIPTHANDLE;
+
+//-----------------------------------------------------------------------------
+// Purpose: Aggregates and sets default parameters for EmitSound function calls
+//-----------------------------------------------------------------------------
+struct EmitSound_t
+{
+	EmitSound_t() :
+		m_nChannel(0),
+		m_pSoundName(0),
+		m_flVolume(VOL_NORM),
+		m_SoundLevel(SNDLVL_NONE),
+		m_nFlags(0),
+		m_nPitch(PITCH_NORM),
+		m_nSpecialDSP(0),
+		m_pOrigin(0),
+		m_flSoundTime(0.0f),
+		m_pflSoundDuration(0),
+		m_bEmitCloseCaption(true),
+		m_bWarnOnMissingCloseCaption(false),
+		m_bWarnOnDirectWaveReference(false),
+		m_nSpeakerEntity(-1),
+		m_UtlVecSoundOrigin(),
+		m_hSoundScriptHandle(-1)
+	{
+	}
+
+	EmitSound_t(const CSoundParameters& src);
+
+	int							m_nChannel;
+	char const* m_pSoundName;
+	float						m_flVolume;
+	soundlevel_t				m_SoundLevel;
+	int							m_nFlags;
+	int							m_nPitch;
+	int							m_nSpecialDSP;
+	const Vector* m_pOrigin;
+	float						m_flSoundTime; ///< NOT DURATION, but rather, some absolute time in the future until which this sound should be delayed
+	float* m_pflSoundDuration;
+	bool						m_bEmitCloseCaption;
+	bool						m_bWarnOnMissingCloseCaption;
+	bool						m_bWarnOnDirectWaveReference;
+	int							m_nSpeakerEntity;
+	mutable CUtlVector< Vector >	m_UtlVecSoundOrigin;  ///< Actual sound origin(s) (can be multiple if sound routed through speaker entity(ies) )
+	mutable HSOUNDSCRIPTHANDLE		m_hSoundScriptHandle;
+};
+
+abstract_class ISoundEmitterSystem{
+public:
+	virtual HSOUNDSCRIPTHANDLE PrecacheScriptSound(const char* soundname) = 0;
+	virtual void PrefetchScriptSound(const char* soundname) = 0;
+	virtual bool PrecacheSound(const char* name) = 0;
+	virtual void PrefetchSound(const char* name) = 0;
+	virtual bool IsPrecacheAllowed() = 0;
+	virtual void SetAllowPrecache(bool allow) = 0;
+	virtual void EmitSound(CBaseEntity* pEntity, const char* soundname, float soundtime = 0.0f, float* duration = NULL) = 0;  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
+	virtual void EmitSound(CBaseEntity* pEntity, const char* soundname, HSOUNDSCRIPTHANDLE& handle, float soundtime = 0.0f, float* duration = NULL) = 0;  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
+	virtual void StopSound(CBaseEntity* pEntity, const char* soundname) = 0;
+	virtual void StopSound(CBaseEntity* pEntity, const char* soundname, HSOUNDSCRIPTHANDLE& handle) = 0;
+	virtual void GenderExpandString(CBaseEntity* pEntity, char const* in, char* out, int maxlen) = 0;
+	virtual float GetSoundDuration(const char* soundname, char const* actormodel) = 0;
+	virtual bool GetParametersForSound(const char* soundname, CSoundParameters& params, char const* actormodel) = 0;
+	virtual bool GetParametersForSound(const char* soundname, HSOUNDSCRIPTHANDLE& handle, CSoundParameters& params, char const* actormodel) = 0;
+	virtual void EmitSound(IRecipientFilter& filter, int iEntIndex, const char* soundname, const Vector* pOrigin = NULL, float soundtime = 0.0f, float* duration = NULL) = 0;
+	virtual void EmitSound(IRecipientFilter& filter, int iEntIndex, const char* soundname, HSOUNDSCRIPTHANDLE& handle, const Vector* pOrigin = NULL, float soundtime = 0.0f, float* duration = NULL) = 0;
+	virtual void StopSound(int iEntIndex, const char* soundname) = 0;
+	virtual soundlevel_t LookupSoundLevel(const char* soundname) = 0;
+	virtual soundlevel_t LookupSoundLevel(const char* soundname, HSOUNDSCRIPTHANDLE& handle) = 0;
+	virtual void EmitSound(IRecipientFilter& filter, int iEntIndex, const EmitSound_t& params) = 0;
+	virtual void EmitSound(IRecipientFilter& filter, int iEntIndex, const EmitSound_t& params, HSOUNDSCRIPTHANDLE& handle) = 0;
+	virtual void StopSound(int iEntIndex, int iChannel, const char* pSample) = 0;
+	virtual void TraceEmitSound(char const* fmt, ...) = 0;
+	virtual void EmitAmbientSound(int entindex, const Vector& origin, const char* soundname, float volume, soundlevel_t soundlevel, int flags = 0, int pitch = 0, float soundtime = 0.0f, float* duration = NULL) = 0;
+	virtual void EmitCloseCaption(IRecipientFilter& filter, int entindex, char const* token, CUtlVector< Vector >& soundorigins, float duration, bool warnifmissing = false) = 0;
+};
+
 
 #endif // ISOUNDEMITTERSYSTEMBASE_H

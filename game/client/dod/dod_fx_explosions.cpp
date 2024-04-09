@@ -55,7 +55,7 @@ void DODExplosionCallback( const Vector &vecOrigin, const Vector &vecNormal )
 	}
 
 	CLocalPlayerFilter filter;
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, pszSound, &vecOrigin );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, pszSound, &vecOrigin );//C_BaseEntity::
 
 	DispatchParticleEffect( pszEffect, vecOrigin, angExplosion );
 }

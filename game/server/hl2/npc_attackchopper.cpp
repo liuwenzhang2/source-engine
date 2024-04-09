@@ -958,28 +958,28 @@ void CNPC_AttackHelicopter::Precache( void )
 		PrecacheModel("models/combine_soldier.mdl");
 	}
 
-	PrecacheScriptSound("NPC_AttackHelicopter.ChargeGun");
+	g_pSoundEmitterSystem->PrecacheScriptSound("NPC_AttackHelicopter.ChargeGun");
 	if ( HasSpawnFlags( SF_HELICOPTER_LOUD_ROTOR_SOUND ) )
 	{
-		PrecacheScriptSound("NPC_AttackHelicopter.RotorsLoud");
+		g_pSoundEmitterSystem->PrecacheScriptSound("NPC_AttackHelicopter.RotorsLoud");
 	}
 	else
 	{
-		PrecacheScriptSound("NPC_AttackHelicopter.Rotors");
+		g_pSoundEmitterSystem->PrecacheScriptSound("NPC_AttackHelicopter.Rotors");
 	}
-	PrecacheScriptSound( "NPC_AttackHelicopter.DropMine" );
-	PrecacheScriptSound( "NPC_AttackHelicopter.BadlyDamagedAlert" );
-	PrecacheScriptSound( "NPC_AttackHelicopter.CrashingAlarm1" );
-	PrecacheScriptSound( "NPC_AttackHelicopter.MegabombAlert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopter.DropMine" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopter.BadlyDamagedAlert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopter.CrashingAlarm1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopter.MegabombAlert" );
 
-	PrecacheScriptSound( "NPC_AttackHelicopter.RotorBlast" );
-	PrecacheScriptSound( "NPC_AttackHelicopter.EngineFailure" );
-	PrecacheScriptSound( "NPC_AttackHelicopter.FireGun" );
-	PrecacheScriptSound( "NPC_AttackHelicopter.Crash" );
-	PrecacheScriptSound( "HelicopterBomb.HardImpact" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopter.RotorBlast" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopter.EngineFailure" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopter.FireGun" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopter.Crash" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HelicopterBomb.HardImpact" );
 
-	PrecacheScriptSound( "ReallyLoudSpark" );
-	PrecacheScriptSound( "NPC_AttackHelicopterGrenade.Ping" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "ReallyLoudSpark" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopterGrenade.Ping" );
 }
 
 int CNPC_AttackHelicopter::ObjectCaps() 
@@ -2255,7 +2255,7 @@ bool CNPC_AttackHelicopter::DoGunIdle( const Vector &vGunDir, const Vector &vTar
 	if ( ( m_nAttackMode == ATTACK_MODE_BULLRUSH_VEHICLE ) && 
 		( IsInSecondaryMode( BULLRUSH_MODE_SHOOT_GUN ) || IsInSecondaryMode(BULLRUSH_MODE_SHOOT_IDLE_PLAYER) ) )
 	{
-		EmitSound( "NPC_AttackHelicopter.ChargeGun" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.ChargeGun" );
 		m_flChargeTime = gpGlobals->curtime + CHOPPER_GUN_CHARGE_TIME;
 		m_nGunState = GUN_STATE_CHARGING;
 		m_flCircleOfDeathRadius = CHOPPER_MAX_CIRCLE_OF_DEATH_RADIUS;
@@ -2299,7 +2299,7 @@ bool CNPC_AttackHelicopter::DoGunIdle( const Vector &vGunDir, const Vector &vTar
 	}
 	else
 	{
-		EmitSound( "NPC_AttackHelicopter.ChargeGun" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.ChargeGun" );
 		float flChargeTime = CHOPPER_GUN_CHARGE_TIME;
 		float flVariance = flChargeTime * 0.1f;
 		m_flChargeTime = gpGlobals->curtime + random->RandomFloat(flChargeTime - flVariance, flChargeTime + flVariance);
@@ -2551,7 +2551,7 @@ void CNPC_AttackHelicopter::FireElectricityGun( )
 	if ( m_flNextAttack > gpGlobals->curtime )
 		return;
 
-	EmitSound( "ReallyLoudSpark" );
+	g_pSoundEmitterSystem->EmitSound(this, "ReallyLoudSpark" );
 
 	CBaseEntity *ppEnts[256];
 	Vector vecCenter = WorldSpaceCenter();
@@ -2838,7 +2838,7 @@ void CNPC_AttackHelicopter::CreateBomb( bool bCheckForFairness, Vector *pVecVelo
 	}
 
 	AddGesture( (Activity)ACT_HELICOPTER_DROP_BOMB );
-	EmitSound( "NPC_AttackHelicopter.DropMine" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.DropMine" );
 
 	// Make the bomb and send it off
 	CGrenadeHelicopter *pGrenade = SpawnBombEntity( vTipPos, vecActualVelocity );
@@ -3414,7 +3414,7 @@ void CNPC_AttackHelicopter::ExplodeAndThrowChunk( const Vector &vecExplosionPos 
 	data.m_vOrigin = vecExplosionPos;
 	DispatchEffect( "HelicopterMegaBomb", data );
 
-	EmitSound( "BaseExplosionEffect.Sound" );
+	g_pSoundEmitterSystem->EmitSound(this, "BaseExplosionEffect.Sound" );
 
 	UTIL_ScreenShake( vecExplosionPos, 25.0, 150.0, 1.0, 750.0f, SHAKE_START );
 
@@ -3583,7 +3583,7 @@ int CNPC_AttackHelicopter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		{
 			if (( nPrevHealth > m_flNextMegaBombHealth ) && (GetHealth() <= m_flNextMegaBombHealth) ) 
 			{
-				EmitSound( "NPC_AttackHelicopter.BadlyDamagedAlert" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.BadlyDamagedAlert" );
 			}
 		}
 
@@ -3750,7 +3750,7 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 
 	m_lifeState = LIFE_DEAD;
 
-	EmitSound( "NPC_CombineGunship.Explode" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.Explode" );
 
 	SetThink( &CNPC_AttackHelicopter::SUB_Remove );
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -4515,7 +4515,7 @@ void CNPC_AttackHelicopter::UpdateBullrushState( void )
 				m_flNextMegaBombHealth -= GetMaxHealth() * g_helicopter_bullrush_mega_bomb_health.GetFloat();
 				m_flNextBullrushBombTime = gpGlobals->curtime;
 				SetSecondaryMode( BULLRUSH_MODE_MEGA_BOMB );
-				EmitSound( "NPC_AttackHelicopter.MegabombAlert" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.MegabombAlert" );
 			}
 			else
 			{
@@ -4972,10 +4972,10 @@ void CGrenadeHelicopter::Precache( void )
 	BaseClass::Precache( );
 	PrecacheModel( GRENADE_HELICOPTER_MODEL );
 
-	PrecacheScriptSound( "ReallyLoudSpark" );
-	PrecacheScriptSound( "NPC_AttackHelicopterGrenade.Ping" );
-	PrecacheScriptSound( "NPC_AttackHelicopterGrenade.PingCaptured" );
-	PrecacheScriptSound( "NPC_AttackHelicopterGrenade.HardImpact" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "ReallyLoudSpark" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopterGrenade.Ping" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopterGrenade.PingCaptured" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopterGrenade.HardImpact" );
 }
 
 
@@ -5315,7 +5315,7 @@ void CGrenadeHelicopter::VPhysicsCollision( int index, gamevcollisionevent_t *pE
 		float flImpactSpeed = pEvent->preVelocity->Length();
 		if( flImpactSpeed > 400.0f && pEvent->pEntities[ 1 ]->IsWorld() )
 		{
-			EmitSound( "NPC_AttackHelicopterGrenade.HardImpact" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopterGrenade.HardImpact" );
 		}
 	}
 }
@@ -5965,7 +5965,7 @@ void CHelicopterChunk::FallThink( void )
 		data.m_vOrigin = GetAbsOrigin() + RandomVector( -64, 64 );
 		DispatchEffect( "HelicopterMegaBomb", data );
 
-		EmitSound( "BaseExplosionEffect.Sound" );
+		g_pSoundEmitterSystem->EmitSound(this, "BaseExplosionEffect.Sound" );
 	}
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -6034,7 +6034,7 @@ void CHelicopterChunk::CollisionCallback( CHelicopterChunk *pCaller )
 		}
 
 		// Make a loud noise
-		EmitSound( "NPC_AttackHelicopter.Crash" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.Crash" );
 
 		m_bLanded = true;
 	}

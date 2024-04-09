@@ -89,7 +89,7 @@ void TE_DODExplosion( IRecipientFilter &filter, float flDelay, const Vector &vec
 		if ( !te->CanPredict() )
 			return;
 				
-		CBaseEntity::EmitSound( filter, iPlayerIndex, shootsound, &vOrigin ); 
+		g_pSoundEmitterSystem->EmitSound( filter, iPlayerIndex, shootsound, &vOrigin ); //CBaseEntity::
 	}
 
 	class CGroupedSound
@@ -119,7 +119,7 @@ void TE_DODExplosion( IRecipientFilter &filter, float flDelay, const Vector &vec
 
 		// Ok, play the sound and add it to the list.
 		CLocalPlayerFilter filter;
-		C_BaseEntity::EmitSound( filter, NULL, pSoundName, &vEndPos );
+		g_pSoundEmitterSystem->EmitSound( filter, NULL, pSoundName, &vEndPos );//C_BaseEntity::
 
 		int tail = g_GroupedSounds.AddToTail();
 		g_GroupedSounds[tail].m_SoundName = pSoundName;

@@ -33,7 +33,7 @@ public:
 	{
 		PrecacheModel( BATTERY_MODEL );
 
-		PrecacheScriptSound( "Item.Pickup" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "Item.Pickup" );
 	}
 
 	bool MyTouch( CBasePlayer *pPlayer )
@@ -46,7 +46,7 @@ public:
 			pPlayer->IncrementArmorValue( sk_battery.GetFloat(), MAX_NORMAL_BATTERY );
 
 			CPASAttenuationFilter filter( pPlayer, "Item.Pickup" );
-			EmitSound( filter, pPlayer->entindex(), "Item.Pickup" );
+			g_pSoundEmitterSystem->EmitSound( filter, pPlayer->entindex(), "Item.Pickup" );
 
 			CSingleUserRecipientFilter user( pPlayer );
 			user.MakeReliable();

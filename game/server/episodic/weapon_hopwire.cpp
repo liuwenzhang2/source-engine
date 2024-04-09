@@ -101,8 +101,8 @@ void CWeaponHopwire::Precache( void )
 
 	UTIL_PrecacheOther( "npc_grenade_hopwire" );
 
-	PrecacheScriptSound( "WeaponFrag.Throw" );
-	PrecacheScriptSound( "WeaponFrag.Roll" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WeaponFrag.Throw" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WeaponFrag.Roll" );
 
 	m_bRedraw = false;
 }

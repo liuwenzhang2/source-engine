@@ -61,7 +61,7 @@ void CDODRifleGrenadeGER::Spawn()
 void CDODRifleGrenadeGER::Precache()
 {
 	PrecacheModel( GRENADE_MODEL );
-	PrecacheScriptSound( "HEGrenade.Bounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HEGrenade.Bounce" );
 	BaseClass::Precache();
 }
 

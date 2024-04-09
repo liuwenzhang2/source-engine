@@ -268,7 +268,7 @@ void CWeaponMG42::Precache()
 {
 	PrecacheMaterial( "sprites/effects/bazookapuff" );
 
-	PrecacheScriptSound( "Weapon_Mg42.OverHeat" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Mg42.OverHeat" );
 
 	BaseClass::Precache();
 }
@@ -328,7 +328,7 @@ void CWeaponMG42::PrimaryAttack( void )
 		m_bOverheated = true;
 		m_bInAttack = true;
 
-		EmitSound( "Weapon_Mg42.OverHeat" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_Mg42.OverHeat" );
 		return;
 	}
 

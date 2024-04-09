@@ -330,12 +330,12 @@ void CNPC_HGrunt::Precache()
 	else
 		m_voicePitch = 100;
 
-	PrecacheScriptSound( "HGrunt.Reload" );
-	PrecacheScriptSound( "HGrunt.GrenadeLaunch" );
-	PrecacheScriptSound( "HGrunt.9MM" );
-	PrecacheScriptSound( "HGrunt.Shotgun" );
-	PrecacheScriptSound( "HGrunt.Pain" );
-	PrecacheScriptSound( "HGrunt.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HGrunt.Reload" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HGrunt.GrenadeLaunch" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HGrunt.9MM" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HGrunt.Shotgun" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HGrunt.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HGrunt.Die" );
 
 	BaseClass::Precache();
 
@@ -1074,7 +1074,7 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 		case HGRUNT_AE_RELOAD:
 		{
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "HGrunt.Reload" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HGrunt.Reload" );
 
 			m_cAmmoLoaded = m_iClipSize;
 			ClearCondition( COND_NO_PRIMARY_AMMO);
@@ -1099,7 +1099,7 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 		case HGRUNT_AE_GREN_LAUNCH:
 		{
 			CPASAttenuationFilter filter2( this );
-			EmitSound( filter2, entindex(), "HGrunt.GrenadeLaunch" );
+			g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "HGrunt.GrenadeLaunch" );
 			
 			Vector vecSrc;
 			QAngle angAngles;
@@ -1145,14 +1145,14 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 
 				CPASAttenuationFilter filter3( this );
 				// the first round of the three round burst plays the sound and puts a sound in the world sound list.
-				EmitSound( filter3, entindex(), "HGrunt.9MM" );
+				g_pSoundEmitterSystem->EmitSound( filter3, entindex(), "HGrunt.9MM" );
 			}
 			else
 			{
 				Shotgun( );
 
 				CPASAttenuationFilter filter4( this );
-				EmitSound( filter4, entindex(), "HGrunt.Shotgun" );
+				g_pSoundEmitterSystem->EmitSound( filter4, entindex(), "HGrunt.Shotgun" );
 			}
 		
 			CSoundEnt::InsertSound ( SOUND_COMBAT, GetAbsOrigin(), 384, 0.3 );
@@ -1350,7 +1350,7 @@ void CNPC_HGrunt::PainSound( const CTakeDamageInfo &info )
 	if ( gpGlobals->curtime > m_flNextPainTime )
 	{
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "HGrunt.Pain" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HGrunt.Pain" );
 
 		m_flNextPainTime = gpGlobals->curtime + 1;
 	}
@@ -1362,7 +1362,7 @@ void CNPC_HGrunt::PainSound( const CTakeDamageInfo &info )
 void CNPC_HGrunt::DeathSound( const CTakeDamageInfo &info )
 {
 	CPASAttenuationFilter filter( this, ATTN_IDLE );
-	EmitSound( filter, entindex(), "HGrunt.Die" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HGrunt.Die" );
 }
 
 //=========================================================

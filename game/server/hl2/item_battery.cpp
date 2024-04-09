@@ -30,7 +30,7 @@ public:
 	{
 		PrecacheModel ("models/items/battery.mdl");
 
-		PrecacheScriptSound( "ItemBattery.Touch" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "ItemBattery.Touch" );
 
 	}
 	bool MyTouch( CBasePlayer *pPlayer )

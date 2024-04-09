@@ -55,7 +55,7 @@ void CHealthKit::Precache( void )
 {
 	PrecacheModel("models/items/healthkit.mdl");
 
-	PrecacheScriptSound( "HealthKit.Touch" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HealthKit.Touch" );
 }
 
 
@@ -76,7 +76,7 @@ bool CHealthKit::MyTouch( CBasePlayer *pPlayer )
 		MessageEnd();
 
 		CPASAttenuationFilter filter( pPlayer, "HealthKit.Touch" );
-		EmitSound( filter, pPlayer->entindex(), "HealthKit.Touch" );
+		g_pSoundEmitterSystem->EmitSound( filter, pPlayer->entindex(), "HealthKit.Touch" );
 
 		if ( g_pGameRules->ItemShouldRespawn( this ) )
 		{
@@ -114,7 +114,7 @@ public:
 	{
 		PrecacheModel("models/healthvial.mdl");
 
-		PrecacheScriptSound( "HealthVial.Touch" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "HealthVial.Touch" );
 	}
 
 	bool MyTouch( CBasePlayer *pPlayer )
@@ -129,7 +129,7 @@ public:
 			MessageEnd();
 
 			CPASAttenuationFilter filter( pPlayer, "HealthVial.Touch" );
-			EmitSound( filter, pPlayer->entindex(), "HealthVial.Touch" );
+			g_pSoundEmitterSystem->EmitSound( filter, pPlayer->entindex(), "HealthVial.Touch" );
 
 			if ( g_pGameRules->ItemShouldRespawn( this ) )
 			{
@@ -280,10 +280,10 @@ bool CWallHealth::CreateVPhysics(void)
 //-----------------------------------------------------------------------------
 void CWallHealth::Precache(void)
 {
-	PrecacheScriptSound( "WallHealth.Deny" );
-	PrecacheScriptSound( "WallHealth.Start" );
-	PrecacheScriptSound( "WallHealth.LoopingContinueCharge" );
-	PrecacheScriptSound( "WallHealth.Recharge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WallHealth.Deny" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WallHealth.Start" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WallHealth.LoopingContinueCharge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WallHealth.Recharge" );
 }
 
 
@@ -324,7 +324,7 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
 			m_flSoundTime = gpGlobals->curtime + 0.62;
-			EmitSound( "WallHealth.Deny" );
+			g_pSoundEmitterSystem->EmitSound(this, "WallHealth.Deny" );
 		}
 		return;
 	}
@@ -354,7 +354,7 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 	if (!m_iOn)
 	{
 		m_iOn++;
-		EmitSound( "WallHealth.Start" );
+		g_pSoundEmitterSystem->EmitSound(this, "WallHealth.Start" );
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 
 		m_OnPlayerUse.FireOutput( pActivator, this );
@@ -364,7 +364,7 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 		m_iOn++;
 		CPASAttenuationFilter filter( this, "WallHealth.LoopingContinueCharge" );
 		filter.MakeReliable();
-		EmitSound( filter, entindex(), "WallHealth.LoopingContinueCharge" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "WallHealth.LoopingContinueCharge" );
 	}
 
 	// charge the player
@@ -387,7 +387,7 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 //-----------------------------------------------------------------------------
 void CWallHealth::Recharge(void)
 {
-	EmitSound( "WallHealth.Recharge" );
+	g_pSoundEmitterSystem->EmitSound(this, "WallHealth.Recharge" );
 	m_iJuice = sk_healthcharger.GetFloat();
 	m_nState = 0;			
 	SetThink( NULL );
@@ -401,7 +401,7 @@ void CWallHealth::Off(void)
 {
 	// Stop looping sound.
 	if (m_iOn > 1)
-		StopSound( "WallHealth.LoopingContinueCharge" );
+		g_pSoundEmitterSystem->StopSound(this, "WallHealth.LoopingContinueCharge" );
 
 	m_iOn = 0;
 
@@ -562,10 +562,10 @@ void CNewWallHealth::Precache(void)
 {
 	PrecacheModel( HEALTH_CHARGER_MODEL_NAME );
 
-	PrecacheScriptSound( "WallHealth.Deny" );
-	PrecacheScriptSound( "WallHealth.Start" );
-	PrecacheScriptSound( "WallHealth.LoopingContinueCharge" );
-	PrecacheScriptSound( "WallHealth.Recharge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WallHealth.Deny" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WallHealth.Start" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WallHealth.LoopingContinueCharge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WallHealth.Recharge" );
 }
 
 void CNewWallHealth::StudioFrameAdvance( void )
@@ -634,7 +634,7 @@ void CNewWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
 			m_flSoundTime = gpGlobals->curtime + 0.62;
-			EmitSound( "WallHealth.Deny" );
+			g_pSoundEmitterSystem->EmitSound(this, "WallHealth.Deny" );
 		}
 		return;
 	}
@@ -649,7 +649,7 @@ void CNewWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 		// Make the user re-use me to get started drawing health.
 		m_iCaps = FCAP_IMPULSE_USE;
 		
-		EmitSound( "WallHealth.Deny" );
+		g_pSoundEmitterSystem->EmitSound(this, "WallHealth.Deny" );
 		return;
 	}
 
@@ -665,7 +665,7 @@ void CNewWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 	if (!m_iOn)
 	{
 		m_iOn++;
-		EmitSound( "WallHealth.Start" );
+		g_pSoundEmitterSystem->EmitSound(this, "WallHealth.Start" );
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 
 		m_OnPlayerUse.FireOutput( pActivator, this );
@@ -675,7 +675,7 @@ void CNewWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 		m_iOn++;
 		CPASAttenuationFilter filter( this, "WallHealth.LoopingContinueCharge" );
 		filter.MakeReliable();
-		EmitSound( filter, entindex(), "WallHealth.LoopingContinueCharge" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "WallHealth.LoopingContinueCharge" );
 	}
 
 	// charge the player
@@ -698,7 +698,7 @@ void CNewWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYP
 //-----------------------------------------------------------------------------
 void CNewWallHealth::Recharge(void)
 {
-	EmitSound( "WallHealth.Recharge" );
+	g_pSoundEmitterSystem->EmitSound(this, "WallHealth.Recharge" );
 	m_flJuice = m_iJuice = sk_healthcharger.GetFloat();
 	m_nState = 0;
 
@@ -718,7 +718,7 @@ void CNewWallHealth::Off(void)
 {
 	// Stop looping sound.
 	if (m_iOn > 1)
-		StopSound( "WallHealth.LoopingContinueCharge" );
+		g_pSoundEmitterSystem->StopSound(this, "WallHealth.LoopingContinueCharge" );
 
 	if ( m_nState == 1 )
 	{

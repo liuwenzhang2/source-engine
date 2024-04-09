@@ -230,7 +230,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 				m_fLiftingPrey = FALSE;
 
 				CPASAttenuationFilter filter( this );
-				EmitSound( filter, entindex(), "Barnacle.Bite");
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Barnacle.Bite");
 
 				// Take a while to kill the player
 				m_flKillVictimTime = gpGlobals->curtime + 10;
@@ -289,7 +289,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 			if ( pVictim && ( random->RandomInt( 0, 49 ) == 0 ) )
 			{
 				CPASAttenuationFilter filter( this );
-				EmitSound( filter, entindex(), "Barnacle.Chew" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Barnacle.Chew" );
 
 				if ( pVictim )
 				{
@@ -330,7 +330,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 			m_cGibs--;
 
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "Barnacle.Chew" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Barnacle.Chew" );
 		}
 
 		pTouchEnt = TongueTouchEnt( &flLength );
@@ -348,7 +348,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 			if ( pBCC && pBCC->DispatchInteraction( g_interactionBarnacleVictimGrab, &vecGrabPos, this ) )
 			{
 				CPASAttenuationFilter filter( this );
-				EmitSound( filter, entindex(), "Barnacle.Alert" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Barnacle.Alert" );
 
 				SetSequenceByName ( "attack1" );
 
@@ -412,7 +412,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 	CGib::SpawnRandomGibs( this, 4, GIB_HUMAN );
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Barnacle.Die" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Barnacle.Die" );
 
 	SetActivity ( ACT_DIESIMPLE );
 	SetBoneController( 0, 0 );
@@ -448,10 +448,10 @@ void CNPC_Barnacle::Precache()
 {
 	PrecacheModel("models/barnacle.mdl");
 
-	PrecacheScriptSound( "Barnacle.Bite" );
-	PrecacheScriptSound( "Barnacle.Chew" );
-	PrecacheScriptSound( "Barnacle.Alert" );
-	PrecacheScriptSound( "Barnacle.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Barnacle.Bite" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Barnacle.Chew" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Barnacle.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Barnacle.Die" );
 
 	BaseClass::Precache();
 }	

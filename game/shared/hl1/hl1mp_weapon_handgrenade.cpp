@@ -65,7 +65,7 @@ void CHandGrenade::Precache( void )
 {
 	BaseClass::Precache( );
 
-	PrecacheScriptSound( "Weapon_HandGrenade.GrenadeBounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_HandGrenade.GrenadeBounce" );
 
 	PrecacheModel( HANDGRENADE_MODEL );
 }
@@ -111,7 +111,7 @@ void CHandGrenade::ShootTimed( CBaseCombatCharacter *pOwner, Vector vecVelocity,
 
 void CHandGrenade ::BounceSound( void )
 {
-	EmitSound( "Weapon_HandGrenade.GrenadeBounce" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_HandGrenade.GrenadeBounce" );
 }
 
 

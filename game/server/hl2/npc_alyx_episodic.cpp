@@ -266,7 +266,7 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 	}
 	else if ( pEvent->event == COMBINE_AE_BEGIN_ALTFIRE )
 	{
-		EmitSound( "Weapon_CombineGuard.Special1" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_CombineGuard.Special1" );
 		return;
 	}
 	else if ( pEvent->event == COMBINE_AE_ALTFIRE )
@@ -363,18 +363,18 @@ void CNPC_Alyx::Spawn()
 void CNPC_Alyx::Precache()
 {
 	BaseClass::Precache();
-	PrecacheScriptSound( "npc_alyx.die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "npc_alyx.die" );
 	PrecacheModel( STRING( GetModelName() ) );
 	PrecacheModel( "models/alyx_emptool_prop.mdl" );
 
 	// For hacking
-	PrecacheScriptSound( "DoSpark" );
-	PrecacheScriptSound( "npc_alyx.starthacking" );
-	PrecacheScriptSound( "npc_alyx.donehacking" );
-	PrecacheScriptSound( "npc_alyx.readytohack" );
-	PrecacheScriptSound( "npc_alyx.interruptedhacking" );
-	PrecacheScriptSound( "ep_01.al_dark_breathing01" );
-	PrecacheScriptSound( "Weapon_CombineGuard.Special1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "DoSpark" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "npc_alyx.starthacking" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "npc_alyx.donehacking" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "npc_alyx.readytohack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "npc_alyx.interruptedhacking" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "ep_01.al_dark_breathing01" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_CombineGuard.Special1" );
 
 	UTIL_PrecacheOther( "env_alyxemp" );
 
@@ -2089,7 +2089,7 @@ void CNPC_Alyx::StartTask( const Task_t *pTask )
 					g_pEffects->Sparks( GetInteractTarget()->WorldSpaceCenter() );
 				}
 
-				GetInteractTarget()->EmitSound("DoSpark");
+				g_pSoundEmitterSystem->EmitSound(GetInteractTarget(), "DoSpark");//GetInteractTarget()->
 				Speak( CONCEPT_ALYX_INTERACTION_DONE );
 
 				SetInteractTarget(NULL);
@@ -2152,7 +2152,7 @@ void CNPC_Alyx::RunTask( const Task_t *pTask )
 		if( GetInteractTarget() && random->RandomInt(0, 3) == 0 )
 		{
 			g_pEffects->Sparks( GetInteractTarget()->WorldSpaceCenter() );
-			GetInteractTarget()->EmitSound("DoSpark");
+			g_pSoundEmitterSystem->EmitSound(GetInteractTarget(), "DoSpark");//GetInteractTarget()->
 		}
 
 		if ( IsWaitFinished() )
@@ -2442,7 +2442,7 @@ void CNPC_Alyx::DeathSound( const CTakeDamageInfo &info )
 
 	if ( !SpokeConcept( TLK_SELF_IN_BARNACLE ) )
 	{
-		EmitSound( "npc_alyx.die" );
+		g_pSoundEmitterSystem->EmitSound(this, "npc_alyx.die" );
 	}
 }
 

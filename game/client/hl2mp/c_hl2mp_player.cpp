@@ -572,13 +572,13 @@ void C_HL2MP_Player::StartSprinting( void )
 		// amount of suit power.
 		CPASAttenuationFilter filter( this );
 		filter.UsePredictionRules();
-		EmitSound( filter, entindex(), "HL2Player.SprintNoPower" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HL2Player.SprintNoPower" );
 		return;
 	}
 
 	CPASAttenuationFilter filter( this );
 	filter.UsePredictionRules();
-	EmitSound( filter, entindex(), "HL2Player.SprintStart" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HL2Player.SprintStart" );
 
 	SetMaxSpeed( HL2_SPRINT_SPEED );
 	m_fIsSprinting = true;

@@ -140,9 +140,9 @@ void CNPC_Barney::Precache()
 
 	PrecacheModel("models/barney.mdl");
 
-	PrecacheScriptSound( "Barney.FirePistol" );
-	PrecacheScriptSound( "Barney.Pain" );
-	PrecacheScriptSound( "Barney.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Barney.FirePistol" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Barney.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Barney.Die" );
 
 	// every new barney must call this, otherwise
 	// when a level is loaded, nobody will talk (time is reset to 0)
@@ -325,7 +325,7 @@ void CNPC_Barney::BarneyFirePistol ( void )
 	params.m_nChannel= CHAN_WEAPON;
 	params.m_SoundLevel = SNDLVL_NORM;
 	params.m_nPitch = 100 + pitchShift;
-	EmitSound( filter, entindex(), params );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), params );
 
 	CSoundEnt::InsertSound ( SOUND_COMBAT, GetAbsOrigin(), 384, 0.3 );
 
@@ -385,13 +385,13 @@ void CNPC_Barney::PainSound( const CTakeDamageInfo &info )
 	CPASAttenuationFilter filter( this );
 
 	CSoundParameters params;
-	if ( GetParametersForSound( "Barney.Pain", params, NULL ) )
+	if (g_pSoundEmitterSystem->GetParametersForSound( "Barney.Pain", params, NULL ) )
 	{
 		params.pitch = GetExpresser()->GetVoicePitch();
 
 		EmitSound_t ep( params );
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 }
 
@@ -403,13 +403,13 @@ void CNPC_Barney::DeathSound( const CTakeDamageInfo &info )
 	CPASAttenuationFilter filter( this );
 
 	CSoundParameters params;
-	if ( GetParametersForSound( "Barney.Die", params, NULL ) )
+	if (g_pSoundEmitterSystem->GetParametersForSound( "Barney.Die", params, NULL ) )
 	{
 		params.pitch = GetExpresser()->GetVoicePitch();
 
 		EmitSound_t ep( params );
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 }
 

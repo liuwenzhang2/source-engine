@@ -187,12 +187,12 @@ void CPropJeep::Precache( void )
 {
 	UTIL_PrecacheOther( "npc_seagull" );
 
-	PrecacheScriptSound( "PropJeep.AmmoClose" );
-	PrecacheScriptSound( "PropJeep.FireCannon" );
-	PrecacheScriptSound( "PropJeep.FireChargedCannon" );
-	PrecacheScriptSound( "PropJeep.AmmoOpen" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "PropJeep.AmmoClose" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "PropJeep.FireCannon" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "PropJeep.FireChargedCannon" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "PropJeep.AmmoOpen" );
 
-	PrecacheScriptSound( "Jeep.GaussCharge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Jeep.GaussCharge" );
 
 	PrecacheModel( GAUSS_BEAM_SPRITE );
 
@@ -839,7 +839,7 @@ void CPropJeep::Think( void )
 		ResetSequence( nSequence );
 
 		CPASAttenuationFilter sndFilter( this, "PropJeep.AmmoClose" );
-		EmitSound( sndFilter, entindex(), "PropJeep.AmmoClose" );
+		g_pSoundEmitterSystem->EmitSound( sndFilter, entindex(), "PropJeep.AmmoClose" );
 	}
 }
 
@@ -924,7 +924,7 @@ void CPropJeep::FireCannon( void )
 	}
 
 	CPASAttenuationFilter sndFilter( this, "PropJeep.FireCannon" );
-	EmitSound( sndFilter, entindex(), "PropJeep.FireCannon" );
+	g_pSoundEmitterSystem->EmitSound( sndFilter, entindex(), "PropJeep.FireCannon" );
 	
 	// make cylinders of gun spin a bit
 	m_nSpinPos += JEEP_GUN_SPIN_RATE;
@@ -944,7 +944,7 @@ void CPropJeep::FireChargedCannon( void )
 	StopChargeSound();
 
 	CPASAttenuationFilter sndFilter( this, "PropJeep.FireChargedCannon" );
-	EmitSound( sndFilter, entindex(), "PropJeep.FireChargedCannon" );
+	g_pSoundEmitterSystem->EmitSound( sndFilter, entindex(), "PropJeep.FireChargedCannon" );
 
 	if( m_hPlayer )
 	{
@@ -1164,7 +1164,7 @@ void CPropJeep::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 			ResetSequence( LookupSequence( "ammo_open" ) );
 			
 			CPASAttenuationFilter sndFilter( this, "PropJeep.AmmoOpen" );
-			EmitSound( sndFilter, entindex(), "PropJeep.AmmoOpen" );
+			g_pSoundEmitterSystem->EmitSound( sndFilter, entindex(), "PropJeep.AmmoOpen" );
 		}
 
 		m_flAmmoCrateCloseTime = gpGlobals->curtime + JEEP_AMMO_CRATE_CLOSE_DELAY;

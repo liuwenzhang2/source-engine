@@ -92,9 +92,9 @@ void CTriggerWeaponDissolve::Precache( void )
 
 	m_spriteTexture = PrecacheModel( "sprites/lgtning.vmt" );
 
-	PrecacheScriptSound( "WeaponDissolve.Dissolve" );
-	PrecacheScriptSound( "WeaponDissolve.Charge" );
-	PrecacheScriptSound( "WeaponDissolve.Beam" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WeaponDissolve.Dissolve" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WeaponDissolve.Charge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WeaponDissolve.Beam" );
 }
 
 static const char *s_pDissolveThinkContext = "DissolveThinkContext";
@@ -248,7 +248,7 @@ void CTriggerWeaponDissolve::DissolveThink( void )
 			PhysCannonBeginUpgrade( pWeapon );
 			m_OnChargingPhyscannon.FireOutput( this, this );
 
-			EmitSound( "WeaponDissolve.Beam" );
+			g_pSoundEmitterSystem->EmitSound(this, "WeaponDissolve.Beam" );
 
 			// We're done
 			m_pWeapons.Purge();
@@ -265,10 +265,10 @@ void CTriggerWeaponDissolve::DissolveThink( void )
 		m_OnDissolveWeapon.FireOutput( this, this );
 
 		CPASAttenuationFilter filter( pWeapon );
-		EmitSound( filter, pWeapon->entindex(), "WeaponDissolve.Dissolve" );
+		g_pSoundEmitterSystem->EmitSound( filter, pWeapon->entindex(), "WeaponDissolve.Dissolve" );
 		
 		// Beam looping sound
-		EmitSound( "WeaponDissolve.Beam" );
+		g_pSoundEmitterSystem->EmitSound(this, "WeaponDissolve.Beam" );
 
 		m_pWeapons.Remove( i );
 		SetContextThink( &CTriggerWeaponDissolve::DissolveThink, gpGlobals->curtime + random->RandomFloat( 0.5f, 1.5f ), s_pDissolveThinkContext );
@@ -284,8 +284,8 @@ void CTriggerWeaponDissolve::DissolveThink( void )
 //-----------------------------------------------------------------------------
 void CTriggerWeaponDissolve::InputStopSound( inputdata_t &inputdata )
 {
-	StopSound( "WeaponDissolve.Beam" );
-	StopSound( "WeaponDissolve.Charge" );
+	g_pSoundEmitterSystem->StopSound(this, "WeaponDissolve.Beam" );
+	g_pSoundEmitterSystem->StopSound(this, "WeaponDissolve.Charge" );
 }
 
 //-----------------------------------------------------------------------------
@@ -495,13 +495,13 @@ END_DATADESC()
 void CWateryDeathLeech::Precache( void )
 {
 	//Ugh this is temporary until Jakob finishes the animations and doesn't need the command anymore.
-	bool allowPrecache = CBaseEntity::IsPrecacheAllowed();
-	CBaseEntity::SetAllowPrecache( true );
+	bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
+	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
 
 	BaseClass::Precache();
 
 	PrecacheModel( "models/leech.mdl" );
-	CBaseEntity::SetAllowPrecache( allowPrecache );
+	g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
 }
 
 void CWateryDeathLeech::Spawn( void )
@@ -650,8 +650,8 @@ void CTriggerWateryDeath::Precache( void )
 	BaseClass::Precache();
 	PrecacheModel( "models/leech.mdl" );
 	
-	PrecacheScriptSound( "coast.leech_bites_loop" );
-	PrecacheScriptSound( "coast.leech_water_churn_loop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.leech_bites_loop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.leech_water_churn_loop" );
 }
 
 void CTriggerWateryDeath::SpawnLeeches( CBaseEntity *pOther )

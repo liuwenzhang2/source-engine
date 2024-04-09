@@ -204,7 +204,7 @@ void CNPC_Stalker::PrescheduleThink()
 {
 	if (gpGlobals->curtime > m_flNextBreatheSoundTime)
 	{
-		EmitSound( "NPC_Stalker.Ambient01" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Ambient01" );
 		m_flNextBreatheSoundTime = gpGlobals->curtime + 3.0 + random->RandomFloat( 0.0, 5.0 );
 	}
 }
@@ -319,15 +319,15 @@ void CNPC_Stalker::Precache( void )
 	PrecacheModel("sprites/orangeglow1.vmt");
 	PrecacheModel("sprites/yellowglow1.vmt");
 
-	PrecacheScriptSound( "NPC_Stalker.BurnFlesh" );
-	PrecacheScriptSound( "NPC_Stalker.BurnWall" );
-	PrecacheScriptSound( "NPC_Stalker.FootstepLeft" );
-	PrecacheScriptSound( "NPC_Stalker.FootstepRight" );
-	PrecacheScriptSound( "NPC_Stalker.Hit" );
-	PrecacheScriptSound( "NPC_Stalker.Ambient01" );
-	PrecacheScriptSound( "NPC_Stalker.Scream" );
-	PrecacheScriptSound( "NPC_Stalker.Pain" );
-	PrecacheScriptSound( "NPC_Stalker.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Stalker.BurnFlesh" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Stalker.BurnWall" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Stalker.FootstepLeft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Stalker.FootstepRight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Stalker.Hit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Stalker.Ambient01" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Stalker.Scream" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Stalker.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Stalker.Die" );
 
 	BaseClass::Precache();
 }
@@ -396,7 +396,7 @@ void CNPC_Stalker::Event_Killed( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_Stalker::DeathSound( const CTakeDamageInfo &info )
 { 
-	EmitSound( "NPC_Stalker.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Die" );
 };
 
 //-----------------------------------------------------------------------------
@@ -406,7 +406,7 @@ void CNPC_Stalker::DeathSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_Stalker::PainSound( const CTakeDamageInfo &info )
 { 
-	EmitSound( "NPC_Stalker.Pain" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Pain" );
 	m_flNextScrambleSoundTime	= gpGlobals->curtime + 1.5;
 	m_flNextBreatheSoundTime	= gpGlobals->curtime + 1.5;
 	m_flNextAttackSoundTime		= gpGlobals->curtime + 1.5;
@@ -498,7 +498,7 @@ void CNPC_Stalker::StartTask( const Task_t *pTask )
 	{
 		if( gpGlobals->curtime > m_flNextScreamTime )
 		{
-			EmitSound( "NPC_Stalker.Scream" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Scream" );
 			m_flNextScreamTime = gpGlobals->curtime + random->RandomFloat( 10.0, 15.0 );
 		}
 
@@ -517,7 +517,7 @@ void CNPC_Stalker::StartTask( const Task_t *pTask )
 				m_flLastAttackTime = gpGlobals->curtime;
 
 				// Always play this sound
-				EmitSound( "NPC_Stalker.Scream" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Scream" );
 				m_flNextScrambleSoundTime = gpGlobals->curtime + 2;
 				m_flNextBreatheSoundTime = gpGlobals->curtime + 2;
 
@@ -1052,12 +1052,12 @@ void CNPC_Stalker::DrawAttackBeam(void)
 				CPASAttenuationFilter filter( m_pBeam,"NPC_Stalker.BurnFlesh" );
 				filter.MakeReliable();
 
-				EmitSound( filter, m_pBeam->entindex(),"NPC_Stalker.BurnFlesh" );
+				g_pSoundEmitterSystem->EmitSound( filter, m_pBeam->entindex(),"NPC_Stalker.BurnFlesh" );
 				m_bPlayingHitFlesh = true;
 			}
 			if (m_bPlayingHitWall)
 			{
-				StopSound( m_pBeam->entindex(), "NPC_Stalker.BurnWall" );
+				g_pSoundEmitterSystem->StopSound( m_pBeam->entindex(), "NPC_Stalker.BurnWall" );
 				m_bPlayingHitWall = false;
 			}
 
@@ -1076,12 +1076,12 @@ void CNPC_Stalker::DrawAttackBeam(void)
 			CPASAttenuationFilter filter( m_pBeam, "NPC_Stalker.BurnWall" );
 			filter.MakeReliable();
 
-			EmitSound( filter, m_pBeam->entindex(), "NPC_Stalker.BurnWall" );
+			g_pSoundEmitterSystem->EmitSound( filter, m_pBeam->entindex(), "NPC_Stalker.BurnWall" );
 			m_bPlayingHitWall = true;
 		}
 		if (m_bPlayingHitFlesh)
 		{
-			StopSound(m_pBeam->entindex(), "NPC_Stalker.BurnFlesh" );
+			g_pSoundEmitterSystem->StopSound(m_pBeam->entindex(), "NPC_Stalker.BurnFlesh" );
 			m_bPlayingHitFlesh = false;
 		}
 
@@ -1117,8 +1117,8 @@ void CNPC_Stalker::KillAttackBeam(void)
 		return;
 
 	// Kill sound
-	StopSound(m_pBeam->entindex(), "NPC_Stalker.BurnWall" );
-	StopSound(m_pBeam->entindex(), "NPC_Stalker.BurnFlesh" );
+	g_pSoundEmitterSystem->StopSound(m_pBeam->entindex(), "NPC_Stalker.BurnWall" );
+	g_pSoundEmitterSystem->StopSound(m_pBeam->entindex(), "NPC_Stalker.BurnFlesh" );
 
 	UTIL_Remove( m_pLightGlow );
 	UTIL_Remove( m_pBeam);
@@ -1248,12 +1248,12 @@ void CNPC_Stalker::HandleAnimEvent( animevent_t *pEvent )
 	{
 		case NPC_EVENT_LEFTFOOT:
 			{
-				EmitSound( "NPC_Stalker.FootstepLeft", pEvent->eventtime );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.FootstepLeft", pEvent->eventtime );
 			}
 			break;
 		case NPC_EVENT_RIGHTFOOT:
 			{
-				EmitSound( "NPC_Stalker.FootstepRight", pEvent->eventtime );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.FootstepRight", pEvent->eventtime );
 			}
 			break;
 
@@ -1278,7 +1278,7 @@ void CNPC_Stalker::HandleAnimEvent( animevent_t *pEvent )
 				}
 
 				// Play a attack hit sound
-				EmitSound( "NPC_Stalker.Hit" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Hit" );
 			}
 			break;	
 		}

@@ -173,16 +173,16 @@ void C_VoteController::FireGameEvent( IGameEvent *event )
 				int vote_option = event->GetInt( "vote_option", TEAM_UNASSIGNED );
 				if( vote_option == VOTE_OPTION2 )
 				{
-					pLocalPlayer->EmitSound( "Vote.Cast.No" );
+					g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Cast.No" );//pLocalPlayer->
 				}
 				else if( vote_option == VOTE_OPTION1 )
 				{
-					pLocalPlayer->EmitSound( "Vote.Cast.Yes" );
+					g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Cast.Yes" );//pLocalPlayer->
 				}
 			}
 			else
 			{
-				pLocalPlayer->EmitSound( "Vote.Cast.Yes" );
+				g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Cast.Yes" );//pLocalPlayer->
 			}
 		}
 	}

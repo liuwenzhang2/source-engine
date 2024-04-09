@@ -578,7 +578,7 @@ void CHudWeaponSelection::CycleToNextWeapon( void )
 		// Play the "cycle to next weapon" sound
 		if ( m_bPlaySelectionSounds )
 		{
-			pPlayer->EmitSound( "Player.WeaponSelectionMoveSlot" );
+			g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 		}
 	}
 }
@@ -639,7 +639,7 @@ void CHudWeaponSelection::CycleToPrevWeapon( void )
 		// Play the "cycle to next weapon" sound
 		if( m_bPlaySelectionSounds )
 		{
-			pPlayer->EmitSound( "Player.WeaponSelectionMoveSlot" );
+			g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 		}
 	}
 }
@@ -735,7 +735,7 @@ void CHudWeaponSelection::SelectWeaponSlot( int iSlot )
 
 	if ( m_bPlaySelectionSounds )
 	{
-		pPlayer->EmitSound( "Player.WeaponSelectionMoveSlot" );
+		g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 	}
 }
 

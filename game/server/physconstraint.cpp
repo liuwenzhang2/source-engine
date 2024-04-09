@@ -304,7 +304,7 @@ void CPhysConstraint::OnBreak( void )
 		ep.m_SoundLevel = ATTN_TO_SNDLVL( ATTN_STATIC );
 		ep.m_pOrigin = &origin;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 	m_OnBreak.FireOutput( this, this );
 	// queue this up to be deleted at the end of physics 
@@ -428,7 +428,7 @@ void CPhysConstraint::Precache( void )
 {
 	if ( m_breakSound != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING(m_breakSound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_breakSound) );
 	}
 }
 
@@ -1778,11 +1778,11 @@ void ConstraintSoundInfo::ValidateInternals( CPhysConstraint *pOuter )
 
 void ConstraintSoundInfo::OnPrecache( CPhysConstraint *pOuter )
 {
-	pOuter->PrecacheScriptSound( m_iszTravelSoundFwd.ToCStr() ); 
-	pOuter->PrecacheScriptSound( m_iszTravelSoundBack.ToCStr() ); 
+	g_pSoundEmitterSystem->PrecacheScriptSound( m_iszTravelSoundFwd.ToCStr() );
+	g_pSoundEmitterSystem->PrecacheScriptSound( m_iszTravelSoundBack.ToCStr() );
 	for (int i = 0 ; i < SimpleConstraintSoundProfile::kREVERSAL_SOUND_ARRAY_SIZE; ++i )
 	{
-		pOuter->PrecacheScriptSound( m_iszReversalSounds[i].ToCStr() );
+		g_pSoundEmitterSystem->PrecacheScriptSound( m_iszReversalSounds[i].ToCStr() );
 	}
 }
 
@@ -1847,7 +1847,7 @@ void ConstraintSoundInfo::OnThink( CPhysConstraint *pOuter, const Vector &relati
 
 	if (m_bPlayReversalSound && (playReversal >= 0))
 	{
-		pChildEntity->EmitSound(m_iszReversalSounds[playReversal].ToCStr());
+		g_pSoundEmitterSystem->EmitSound(pChildEntity, m_iszReversalSounds[playReversal].ToCStr());//pChildEntity->
 	}
 
 	m_vSampler.AddSample( relativeVelocity );

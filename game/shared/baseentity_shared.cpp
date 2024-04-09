@@ -170,7 +170,7 @@ CEngineObjectSaveDataOps g_EngineObjectSaveDataOps;
 ISaveRestoreOps* engineObjectFuncs = &g_EngineObjectSaveDataOps;
 
 
-bool CBaseEntity::m_bAllowPrecache = false;
+//bool CBaseEntity::m_bAllowPrecache = false;
 
 // Set default max values for entities based on the existing constants from elsewhere
 float k_flMaxEntityPosCoord = MAX_COORD_FLOAT;
@@ -1635,23 +1635,7 @@ void CBaseEntity::InvalidatePhysicsRecursive( int nChangeFlags )
 	//#endif
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: static method
-// Output : Returns true on success, false on failure.
-//-----------------------------------------------------------------------------
-bool CBaseEntity::IsPrecacheAllowed()
-{
-	return m_bAllowPrecache;
-}
 
-//-----------------------------------------------------------------------------
-// Purpose: static method
-// Input  : allow - 
-//-----------------------------------------------------------------------------
-void CBaseEntity::SetAllowPrecache( bool allow )
-{
-	m_bAllowPrecache = allow;
-}
 
 /*
 ================

@@ -339,14 +339,14 @@ void CNPC_Tentacle::Precache( )
 {
 	PrecacheModel("models/tentacle2.mdl");
 
-	PrecacheScriptSound( "Tentacle.Flies" );
-	PrecacheScriptSound( "Tentacle.Squirm" );
-	PrecacheScriptSound( "Tentacle.Sing" );
-	PrecacheScriptSound( "Tentacle.HitDirt" );
-	PrecacheScriptSound( "Tentacle.Swing" );
-	PrecacheScriptSound( "Tentacle.Search" );
-	PrecacheScriptSound( "Tentacle.Roar" );
-	PrecacheScriptSound( "Tentacle.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Tentacle.Flies" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Tentacle.Squirm" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Tentacle.Sing" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Tentacle.HitDirt" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Tentacle.Swing" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Tentacle.Search" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Tentacle.Roar" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Tentacle.Alert" );
 
 	BaseClass::Precache();
 }
@@ -455,12 +455,12 @@ void CNPC_Tentacle::Start( void )
 
 	if ( !g_fFlySound )
 	{
-		EmitSound( filter, entindex(), "Tentacle.Flies" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Tentacle.Flies" );
 		g_fFlySound = TRUE;
 	}
 	else if ( !g_fSquirmSound )
 	{
-		EmitSound( filter, entindex(), "Tentacle.Squirm" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Tentacle.Squirm" );
 		g_fSquirmSound = TRUE;
 	}
 	
@@ -707,7 +707,7 @@ void CNPC_Tentacle::Cycle( void )
 				{
 					// play "I hear new something" sound
 					CPASAttenuationFilter filter( this );
-					EmitSound( filter, entindex(), "Tentacle.Sing" );
+					g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Tentacle.Sing" );
 
 					m_flNextSong = gpGlobals->curtime + random->RandomFloat( 10, 20 );
 				}

@@ -913,7 +913,7 @@ void EndRestoreEntities()
 
 	// HACKHACK: UNDONE: We need to redesign the main loop with respect to save/load/server activate
 	g_ServerGameDLL.ServerActivate( NULL, 0, 0 );
-	CBaseEntity::SetAllowPrecache( false );
+	g_pSoundEmitterSystem->SetAllowPrecache( false );//CBaseEntity::
 }
 
 void BeginRestoreEntities()
@@ -926,7 +926,7 @@ void BeginRestoreEntities()
 	g_RestoredEntities.Purge();
 	g_InRestore = true;
 
-	CBaseEntity::SetAllowPrecache( true );
+	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
 
 	// No calls to GetAbsOrigin until the entire hierarchy is restored!
 	//CBaseEntity::SetAbsQueriesValid( false );
@@ -1111,7 +1111,7 @@ void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, 
 
 	IGameSystem::LevelInitPostEntityAllSystems();
 	// No more precaching after PostEntityAllSystems!!!
-	CBaseEntity::SetAllowPrecache( false );
+	g_pSoundEmitterSystem->SetAllowPrecache( false );//CBaseEntity::
 
 	// only display the think limit when the game is run with "developer" mode set
 	if ( !g_pDeveloper->GetInt() )
@@ -1382,7 +1382,7 @@ void CServerGameDLL::LevelShutdown( void )
 	IGameSystem::LevelShutdownPostEntityAllSystems();
 
 	// In case we quit out during initial load
-	CBaseEntity::SetAllowPrecache( false );
+	g_pSoundEmitterSystem->SetAllowPrecache( false );//CBaseEntity::
 
 	g_nCurrentChapterIndex = -1;
 

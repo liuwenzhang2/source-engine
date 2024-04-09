@@ -397,8 +397,8 @@ void CC_NPC_Create( const CCommand &args )
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-	bool allowPrecache = CBaseEntity::IsPrecacheAllowed();
-	CBaseEntity::SetAllowPrecache( true );
+	bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
+	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
 
 	// Try to create entity
 	CAI_BaseNPC *baseNPC = dynamic_cast< CAI_BaseNPC * >(gEntList.CreateEntityByName(args[1]) );
@@ -452,7 +452,7 @@ void CC_NPC_Create( const CCommand &args )
 
 		baseNPC->Activate();
 	}
-	CBaseEntity::SetAllowPrecache( allowPrecache );
+	g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
 }
 static ConCommand npc_create("npc_create", CC_NPC_Create, "Creates an NPC of the given type where the player is looking (if the given NPC can actually stand at that location).  Note that this only works for npc classes that are already in the world.  You can not create an entity that doesn't have an instance in the level.\n\tArguments:	{npc_class_name}", FCVAR_CHEAT);
 
@@ -464,8 +464,8 @@ void CC_NPC_Create_Aimed( const CCommand &args )
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-	bool allowPrecache = CBaseEntity::IsPrecacheAllowed();
-	CBaseEntity::SetAllowPrecache( true );
+	bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
+	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
 
 	// Try to create entity
 	CAI_BaseNPC *baseNPC = dynamic_cast< CAI_BaseNPC * >(gEntList.CreateEntityByName(args[1]) );
@@ -523,7 +523,7 @@ void CC_NPC_Create_Aimed( const CCommand &args )
 
 		baseNPC->Activate();
 	}
-	CBaseEntity::SetAllowPrecache( allowPrecache );
+	g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
 }
 static ConCommand npc_create_aimed("npc_create_aimed", CC_NPC_Create_Aimed, "Creates an NPC aimed away from the player of the given type where the player is looking (if the given NPC can actually stand at that location).  Note that this only works for npc classes that are already in the world.  You can not create an entity that doesn't have an instance in the level.\n\tArguments:	{npc_class_name}", FCVAR_CHEAT);
 

@@ -601,22 +601,22 @@ void CCSPlayer::Precache()
 	PrecacheModel( SHIELD_VIEW_MODEL );
 #endif
 
-	PrecacheScriptSound( "Player.DeathHeadShot" );
-	PrecacheScriptSound( "Player.Death" );
-	PrecacheScriptSound( "Player.DamageHelmet" );
-	PrecacheScriptSound( "Player.DamageHeadShot" );
-	PrecacheScriptSound( "Flesh.BulletImpact" );
-	PrecacheScriptSound( "Player.DamageKevlar" );
-	PrecacheScriptSound( "Player.PickupWeapon" );
-	PrecacheScriptSound( "Player.NightVisionOff" );
-	PrecacheScriptSound( "Player.NightVisionOn" );
-	PrecacheScriptSound( "Player.FlashlightOn" );
-	PrecacheScriptSound( "Player.FlashlightOff" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.DeathHeadShot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.Death" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.DamageHelmet" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.DamageHeadShot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Flesh.BulletImpact" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.DamageKevlar" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.PickupWeapon" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.NightVisionOff" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.NightVisionOn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.FlashlightOn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.FlashlightOff" );
 
 	// CS Bot sounds
-	PrecacheScriptSound( "Bot.StuckSound" );
-	PrecacheScriptSound( "Bot.StuckStart" );
-	PrecacheScriptSound( "Bot.FellOff" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bot.StuckSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bot.StuckStart" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bot.FellOff" );
 
 	UTIL_PrecacheOther( "item_kevlar" );
 	UTIL_PrecacheOther( "item_assaultsuit" );
@@ -1333,11 +1333,11 @@ void CCSPlayer::DeathSound( const CTakeDamageInfo &info )
 {
 	if( m_LastHitGroup == HITGROUP_HEAD )
 	{
-		EmitSound( "Player.DeathHeadShot" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.DeathHeadShot" );
 	}
 	else
 	{
-		EmitSound( "Player.Death" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.Death" );
 	}
 }
 
@@ -1668,7 +1668,7 @@ void CCSPlayer::PostThink()
 
 	if ( IsPlayerUnderwater() && GetWaterLevel() < 3 )
 	{
-		StopSound( "Player.AmbientUnderWater" );
+		g_pSoundEmitterSystem->StopSound(this, "Player.AmbientUnderWater" );
 		SetPlayerUnderwater( false );
 	}
 
@@ -1778,21 +1778,21 @@ void CCSPlayer::Pain( bool bHasArmour )
 		case HITGROUP_HEAD:
 			if (m_bHasHelmet)  // He's wearing a helmet
 			{
-				EmitSound( "Player.DamageHelmet" );
+				g_pSoundEmitterSystem->EmitSound(this, "Player.DamageHelmet" );
 			}
 			else  // He's not wearing a helmet
 			{
-				EmitSound( "Player.DamageHeadShot" );
+				g_pSoundEmitterSystem->EmitSound(this, "Player.DamageHeadShot" );
 			}
 			break;
 		default:
 			if ( bHasArmour == false )
 			{
-				EmitSound( "Flesh.BulletImpact" );
+				g_pSoundEmitterSystem->EmitSound(this, "Flesh.BulletImpact" );
 			}
 			else
 			{
-				EmitSound( "Player.DamageKevlar" );
+				g_pSoundEmitterSystem->EmitSound(this, "Player.DamageKevlar" );
 			}
 			break;
 	}
@@ -3363,7 +3363,7 @@ BuyResult_e CCSPlayer::AttemptToBuyDefuser( void )
 			GiveDefuser();
 
 			CPASAttenuationFilter filter( this, "Player.PickupWeapon" );
-			EmitSound( filter, entindex(), "Player.PickupWeapon" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Player.PickupWeapon" );
 
 			AddAccount( -DEFUSEKIT_PRICE, true, true, "item_defuser" );
 			return BUY_BOUGHT;
@@ -4599,12 +4599,12 @@ bool CCSPlayer::ClientCommand( const CCommand &args )
 				if( m_bNightVisionOn )
 				{
 					CPASAttenuationFilter filter( this );
-					EmitSound( filter, entindex(), "Player.NightVisionOff" );
+					g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Player.NightVisionOff" );
 				}
 				else
 				{
 					CPASAttenuationFilter filter( this );
-					EmitSound( filter, entindex(), "Player.NightVisionOn" );
+					g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Player.NightVisionOn" );
 				}
 
 				m_bNightVisionOn = !m_bNightVisionOn;
@@ -5836,11 +5836,11 @@ CON_COMMAND( timeleft, "prints the time remaining in the match" )
 void CCSPlayer::EmitPrivateSound( const char *soundName )
 {
 	CSoundParameters params;
-	if (!GetParametersForSound( soundName, params, NULL ))
+	if (!g_pSoundEmitterSystem->GetParametersForSound( soundName, params, NULL ))
 		return;
 
 	CSingleUserRecipientFilter filter( this );
-	EmitSound( filter, entindex(), soundName );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), soundName );
 }
 
 
@@ -6754,7 +6754,7 @@ void CCSPlayer::FlashlightTurnOn( void )
 	if( flashlight.GetInt() > 0 && IsAlive() )
 	{
 		AddEffects( EF_DIMLIGHT );
-		EmitSound( "Player.FlashlightOn" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.FlashlightOn" );
 	}
 }
 
@@ -6767,7 +6767,7 @@ void CCSPlayer::FlashlightTurnOff( void )
 
 	if( IsAlive() )
 	{
-		EmitSound( "Player.FlashlightOff" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.FlashlightOff" );
 	}
 }
 

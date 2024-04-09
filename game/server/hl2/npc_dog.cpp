@@ -640,7 +640,7 @@ void CNPC_Dog::Precache( void )
 {
 	PrecacheModel( "models/dog.mdl" );
 	
-	PrecacheScriptSound( "Weapon_PhysCannon.Launch" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_PhysCannon.Launch" );
 
 	PrecacheModel( "sprites/orangelight1.vmt" );
 	PrecacheModel( "sprites/physcannon_bluelight2.vmt" );
@@ -886,7 +886,7 @@ void CNPC_Dog::ThrowObject( const char *pAttachmentName )
 			
 			if ( m_bBeamEffects == true )
 			{
-				EmitSound( "Weapon_PhysCannon.Launch" );
+				g_pSoundEmitterSystem->EmitSound(this, "Weapon_PhysCannon.Launch" );
 				
 				CBeam *pBeam = CBeam::BeamCreate(  "sprites/orangelight1.vmt", 1.8 );
 

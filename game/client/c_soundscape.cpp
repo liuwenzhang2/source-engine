@@ -1174,7 +1174,7 @@ int C_SoundscapeSystem::AddLoopingSound( const char *pSoundName, bool isAmbient,
 			ep.m_nPitch = pitch;
 			ep.m_pOrigin = &position;
 
-			C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, ep );
+			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );//C_BaseEntity::
 			m_loopingSounds[soundSlot].volumeCurrent = 0.05;
 		}
 	}
@@ -1205,7 +1205,7 @@ void C_SoundscapeSystem::StopLoopingSound( loopingsound_t &loopSound )
 	}
 	else
 	{
-		C_BaseEntity::StopSound( SOUND_FROM_WORLD, CHAN_STATIC, loopSound.pWaveName );
+		g_pSoundEmitterSystem->StopSound( SOUND_FROM_WORLD, CHAN_STATIC, loopSound.pWaveName );//C_BaseEntity::
 	}
 }
 
@@ -1229,7 +1229,7 @@ void C_SoundscapeSystem::UpdateLoopingSound( loopingsound_t &loopSound )
 		ep.m_nPitch = loopSound.pitch;
 		ep.m_pOrigin = &loopSound.position;
 
-		C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, ep );
+		g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );//C_BaseEntity::
 	}
 }
 
@@ -1282,7 +1282,7 @@ void C_SoundscapeSystem::PlayRandomSound( randomsound_t &sound )
 		}
 		ep.m_pOrigin = &sound.position;
 
-		C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, ep );
+		g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );//C_BaseEntity::
 	}
 }
 

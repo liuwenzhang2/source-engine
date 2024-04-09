@@ -459,7 +459,7 @@ void CAI_BehaviorAlyxInjured::GatherConditions( void )
 			{
 				if ( m_flNextWarnTime < gpGlobals->curtime )
 				{
-					pPlayer->EmitSound( "npc_alyx.injured_too_far" );
+					g_pSoundEmitterSystem->EmitSound(pPlayer, "npc_alyx.injured_too_far" );//pPlayer->
 					m_flNextWarnTime = gpGlobals->curtime + random->RandomFloat( 3.0f, 5.0f );
 				}
 			}

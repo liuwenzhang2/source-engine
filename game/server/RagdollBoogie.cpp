@@ -120,7 +120,7 @@ void CRagdollBoogie::ZapThink()
 	}
 
 #ifdef HL2_EPISODIC
-	EmitSound( "RagdollBoogie.Zap" );
+	g_pSoundEmitterSystem->EmitSound(this, "RagdollBoogie.Zap" );
 #endif
 
 	SetContextThink( &CRagdollBoogie::ZapThink, gpGlobals->curtime + random->RandomFloat( 0.1f, 0.3f ), s_pZapContext ); 

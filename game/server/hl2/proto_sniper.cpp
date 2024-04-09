@@ -911,12 +911,12 @@ void CProtoSniper::Precache( void )
 
 	UTIL_PrecacheOther( "sniperbullet" );
 
-	PrecacheScriptSound( "NPC_Sniper.Die" );
-	PrecacheScriptSound( "NPC_Sniper.TargetDestroyed" );
-	PrecacheScriptSound( "NPC_Sniper.HearDanger");
-	PrecacheScriptSound( "NPC_Sniper.FireBullet" );
-	PrecacheScriptSound( "NPC_Sniper.Reload" );
-	PrecacheScriptSound( "NPC_Sniper.SonicBoom" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Sniper.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Sniper.TargetDestroyed" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Sniper.HearDanger");
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Sniper.FireBullet" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Sniper.Reload" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Sniper.SonicBoom" );
 
 	BaseClass::Precache();
 }
@@ -1357,7 +1357,7 @@ void CProtoSniper::Event_Killed( const CTakeDamageInfo &info )
 
 	LaserOff();
 
-	EmitSound( "NPC_Sniper.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Sniper.Die" );
 
 	UTIL_Remove( this );
 }
@@ -1386,7 +1386,7 @@ int CProtoSniper::SelectSchedule ( void )
 {
 	if( HasCondition(COND_ENEMY_DEAD) && sniperspeak.GetBool() )
 	{
-		EmitSound( "NPC_Sniper.TargetDestroyed" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Sniper.TargetDestroyed" );
 	}
 
 	if( !m_fWeaponLoaded )
@@ -1422,7 +1422,7 @@ int CProtoSniper::SelectSchedule ( void )
 			// Also, don't play the sound effect if we're an ally.
 			if ( IsPlayerAllySniper() == false )
 			{
-				EmitSound( "NPC_Sniper.HearDanger" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_Sniper.HearDanger" );
 			}
 		}
 
@@ -1906,7 +1906,7 @@ bool CProtoSniper::FireBullet( const Vector &vecTarget, bool bDirectShot )
 	pBullet->SetOwnerEntity( this );
 
 	CPASAttenuationFilter filternoatten( this, ATTN_NONE );
-	EmitSound( filternoatten, entindex(), "NPC_Sniper.FireBullet" );
+	g_pSoundEmitterSystem->EmitSound( filternoatten, entindex(), "NPC_Sniper.FireBullet" );
 
 	CPVSFilter filter( vecBulletOrigin );
 	te->Sprite( filter, 0.0, &vecBulletOrigin, sFlashSprite, 0.3, 255 );
@@ -2117,7 +2117,7 @@ void CProtoSniper::StartTask( const Task_t *pTask )
 	case TASK_RELOAD:
 		{
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "NPC_Sniper.Reload" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Sniper.Reload" );
 			m_fWeaponLoaded = true;
 			TaskComplete();
 		}
@@ -3185,7 +3185,7 @@ void CSniperBullet::BulletThink( void )
 	{
 		// See if it's time to make the sonic boom.
 		CPASAttenuationFilter filter( this, ATTN_NONE );
-		EmitSound( filter, entindex(), "NPC_Sniper.SonicBoom" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Sniper.SonicBoom" );
 
 		if( GetOwnerEntity() )
 		{

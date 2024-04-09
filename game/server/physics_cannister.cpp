@@ -151,7 +151,7 @@ void CPhysicsCannister::Precache( void )
 	PropBreakablePrecacheAll( GetModelName() );
 	if ( m_gasSound != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING(m_gasSound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_gasSound) );
 	}
 	BaseClass::Precache();
 }
@@ -262,7 +262,7 @@ void CPhysicsCannister::CannisterActivate( CBaseEntity *pActivator, const Vector
 		ep.m_flVolume = 1.0f;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 }
 
@@ -344,7 +344,7 @@ void CPhysicsCannister::Deactivate(void)
 	}
 	if ( m_gasSound != NULL_STRING )
 	{
-		StopSound( entindex(), CHAN_ITEM, STRING(m_gasSound) );
+		g_pSoundEmitterSystem->StopSound( entindex(), CHAN_ITEM, STRING(m_gasSound) );
 	}
 }
 

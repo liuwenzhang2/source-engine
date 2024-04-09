@@ -857,7 +857,7 @@ int CNPC_BaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	{
 		if( bChopped )
 		{
-			EmitSound( "E3_Phystown.Slicer" );
+			g_pSoundEmitterSystem->EmitSound(this, "E3_Phystown.Slicer" );
 		}
 
 		DieChopped( info );
@@ -879,7 +879,7 @@ int CNPC_BaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 
 		case RELEASE_RAGDOLL_SLICED_OFF:
 			{
-				EmitSound( "E3_Phystown.Slicer" );
+			g_pSoundEmitterSystem->EmitSound(this, "E3_Phystown.Slicer" );
 				Vector vecForce = inputInfo.GetDamageForce() * 0.1;
 				vecForce += Vector( 0, 0, 2000.0 );
 				ReleaseHeadcrab( EyePosition(), vecForce, true, false, true );
@@ -1421,14 +1421,14 @@ void CNPC_BaseZombie::PoundSound()
 		const surfacedata_t *psurf = physprops->GetSurfaceData( tr.surface.surfaceProps );
 		if( psurf )
 		{
-			EmitSound( physprops->GetString(psurf->sounds.impactHard) );
+			g_pSoundEmitterSystem->EmitSound(this, physprops->GetString(psurf->sounds.impactHard) );
 			return;
 		}
 	}
 
 	// Otherwise fall through to the default sound.
 	CPASAttenuationFilter filter( this,"NPC_BaseZombie.PoundDoor" );
-	EmitSound( filter, entindex(),"NPC_BaseZombie.PoundDoor" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(),"NPC_BaseZombie.PoundDoor" );
 }
 
 //-----------------------------------------------------------------------------
@@ -1540,7 +1540,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 				return;
 			}
 
-			EmitSound( "NPC_BaseZombie.Swat" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_BaseZombie.Swat" );
 			PhysicsImpactSound( pEnemy, pPhysObj, CHAN_BODY, pPhysObj->GetMaterialIndex(), physprops->GetSurfaceIndex("flesh"), 0.5, 800 );
 
 			Vector physicsCenter = pPhysicsEntity->WorldSpaceCenter();
@@ -1715,9 +1715,9 @@ void CNPC_BaseZombie::Precache( void )
 {
 	UTIL_PrecacheOther( GetHeadcrabClassname() );
 
-	PrecacheScriptSound( "E3_Phystown.Slicer" );
-	PrecacheScriptSound( "NPC_BaseZombie.PoundDoor" );
-	PrecacheScriptSound( "NPC_BaseZombie.Swat" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "E3_Phystown.Slicer" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BaseZombie.PoundDoor" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BaseZombie.Swat" );
 
 	PrecacheModel( GetLegsModel() );
 	PrecacheModel( GetTorsoModel() );

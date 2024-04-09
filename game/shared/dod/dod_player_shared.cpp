@@ -927,7 +927,7 @@ void CDODPlayerShared::StartGoingProne( void )
 	// make the prone sound
 	CPASFilter filter( m_pOuter->GetAbsOrigin() );
 	filter.UsePredictionRules();
-	m_pOuter->EmitSound( filter, m_pOuter->entindex(), "Player.GoProne" );
+	g_pSoundEmitterSystem->EmitSound( filter, m_pOuter->entindex(), "Player.GoProne" );//m_pOuter->
 
 	// slow to prone speed
 	m_flGoProneTime = gpGlobals->curtime + TIME_TO_PRONE;
@@ -943,7 +943,7 @@ void CDODPlayerShared::StandUpFromProne( void )
 	// make the prone sound
 	CPASFilter filter( m_pOuter->GetAbsOrigin() );
 	filter.UsePredictionRules();
-	m_pOuter->EmitSound( filter, m_pOuter->entindex(), "Player.UnProne" );
+	g_pSoundEmitterSystem->EmitSound( filter, m_pOuter->entindex(), "Player.UnProne" );//m_pOuter->
 
 	// speed up to target speed
 	m_flUnProneTime = gpGlobals->curtime + TIME_TO_PRONE;
@@ -1156,14 +1156,14 @@ void CDODPlayer::CheckProneMoveSound( int groundspeed, bool onground )
 
 	if ( m_bPlayingProneMoveSound && !bShouldPlay )
 	{
-		StopSound( "Player.MoveProne" );
+		g_pSoundEmitterSystem->StopSound(this, "Player.MoveProne" );
 		m_bPlayingProneMoveSound= false;
 	}
 	else if ( !m_bPlayingProneMoveSound && bShouldPlay )
 	{
 		CRecipientFilter filter;
 		filter.AddRecipientsByPAS( WorldSpaceCenter() );
-		EmitSound( filter, entindex(), "Player.MoveProne" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Player.MoveProne" );
 
 		m_bPlayingProneMoveSound = true;
 	}
@@ -1206,7 +1206,7 @@ void CDODPlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, floa
 	if( GetTeamNumber() == TEAM_ALLIES )
 		pModelNameForGender = DOD_PLAYERMODEL_US_RIFLEMAN;
 
-	if ( !CBaseEntity::GetParametersForSound( pSoundName, params, pModelNameForGender ) )
+	if ( !g_pSoundEmitterSystem->GetParametersForSound( pSoundName, params, pModelNameForGender ) )//CBaseEntity::
 		return;	
 
 	CRecipientFilter filter;
@@ -1228,7 +1228,7 @@ void CDODPlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, floa
 	ep.m_nPitch = params.pitch;
 	ep.m_pOrigin = &vecOrigin;
 
-	EmitSound( filter, entindex(), ep );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 }
 
 Activity CDODPlayer::TranslateActivity( Activity baseAct, bool *pRequired /* = NULL */ )

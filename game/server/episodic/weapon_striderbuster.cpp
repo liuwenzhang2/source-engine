@@ -204,10 +204,10 @@ CWeaponStriderBuster::CWeaponStriderBuster( void ) :
 //-----------------------------------------------------------------------------
 void CWeaponStriderBuster::Precache( void )
 {
-	PrecacheScriptSound( "Weapon_StriderBuster.StickToEntity" );
-	PrecacheScriptSound( "Weapon_StriderBuster.Detonate" );
-	PrecacheScriptSound( "Weapon_StriderBuster.Dud_Detonate" );
-	PrecacheScriptSound( "Weapon_StriderBuster.Ping" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_StriderBuster.StickToEntity" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_StriderBuster.Detonate" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_StriderBuster.Dud_Detonate" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_StriderBuster.Ping" );
 
 	PrecacheModel("sprites/orangeflare1.vmt");
 
@@ -453,7 +453,7 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 				SetOwnerEntity( pFollowParent );
 
 				// Make a sound
-				EmitSound( "Weapon_StriderBuster.StickToEntity" );
+				g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.StickToEntity" );
 				
 				DispatchParticleEffect( "striderbuster_attach", GetAbsOrigin(), GetAbsAngles(), NULL );
 
@@ -664,12 +664,12 @@ void CWeaponStriderBuster::Detonate( void )
 	if ( !m_bDud )
 	{
 		CreateDestroyedEffect();
-		EmitSound( "Weapon_StriderBuster.Detonate" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.Detonate" );
 	}
 	else
 	{
 		DispatchParticleEffect( "striderbuster_explode_dummy_core", GetAbsOrigin(), GetAbsAngles() );
-		EmitSound( "Weapon_StriderBuster.Dud_Detonate" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.Dud_Detonate" );
 	}
 
 	// Go to bits!
@@ -748,7 +748,7 @@ int CWeaponStriderBuster::OnTakeDamage( const CTakeDamageInfo &info )
 				{
 					// Destroy the buster in place
 					// Make sure they know it blew up prematurely.
-					EmitSound( "Weapon_StriderBuster.Dud_Detonate" );
+					g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.Dud_Detonate" );
 					DispatchParticleEffect( "striderbuster_break_flechette", GetAbsOrigin(), GetAbsAngles() );
 					SetHealth( 0 );
 
@@ -1029,7 +1029,7 @@ void CWeaponStriderBuster::BusterDetachThink()
 	if( fabs(tr.startpos.z - tr.endpos.z) < 240.0f )
 	{
 		SetThink(NULL);
-		EmitSound( "Weapon_StriderBuster.Dud_Detonate" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.Dud_Detonate" );
 		DispatchParticleEffect( "striderbuster_break_flechette", GetAbsOrigin(), GetAbsAngles() );
 		SetHealth( 0 );
 		CTakeDamageInfo info;
@@ -1044,7 +1044,7 @@ void CWeaponStriderBuster::BusterDetachThink()
 //-----------------------------------------------------------------------------
 void CWeaponStriderBuster::BusterPingThink()
 {
-	EmitSound( "Weapon_StriderBuster.Ping" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.Ping" );
 
 	SetContextThink( &CWeaponStriderBuster::BusterPingThink, gpGlobals->curtime + BUSTER_PING_SOUND_FREQ, s_pBusterPingThinkContext );
 }

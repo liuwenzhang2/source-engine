@@ -269,7 +269,7 @@ void FX_TracerSound( const Vector &start, const Vector &end, int iTracerType )
 		return;
 
 	CSoundParameters params;
-	if( C_BaseEntity::GetParametersForSound( pszSoundName, params, NULL ) )
+	if(g_pSoundEmitterSystem->GetParametersForSound( pszSoundName, params, NULL ) )//C_BaseEntity::
 	{
 		// Get shot direction
 		Vector shotDir;

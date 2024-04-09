@@ -281,9 +281,9 @@ void CNPC_Combine::Precache()
 	PrecacheModel("models/Weapons/w_grenade.mdl");
 	UTIL_PrecacheOther( "npc_handgrenade" );
 
-	PrecacheScriptSound( "NPC_Combine.GrenadeLaunch" );
-	PrecacheScriptSound( "NPC_Combine.WeaponBash" );
-	PrecacheScriptSound( "Weapon_CombineGuard.Special1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Combine.GrenadeLaunch" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Combine.WeaponBash" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_CombineGuard.Special1" );
 
 	BaseClass::Precache();
 }
@@ -2322,15 +2322,15 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 		{
 			if( FClassnameIs( GetActiveWeapon(), "weapon_ar2" ) )
 			{
-				EmitSound( "Weapon_CombineGuard.Special1" );
+				g_pSoundEmitterSystem->EmitSound(this, "Weapon_CombineGuard.Special1" );
 			}
 			else if( FClassnameIs( GetActiveWeapon(), "weapon_smg1" ) )
 			{
-				EmitSound( "Weapon_SMG1.Double" );
+				g_pSoundEmitterSystem->EmitSound(this, "Weapon_SMG1.Double" );
 			}
 			else
 			{
-				EmitSound( "Weapon_CombineGuard.Special1" );
+				g_pSoundEmitterSystem->EmitSound(this, "Weapon_CombineGuard.Special1" );
 			}
 			handledEvent = true;
 		}
@@ -2423,7 +2423,7 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 
 		case COMBINE_AE_GREN_LAUNCH:
 			{
-				EmitSound( "NPC_Combine.GrenadeLaunch" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_Combine.GrenadeLaunch" );
 
 				CBaseEntity *pGrenade = CreateNoSpawn( "npc_contactgrenade", Weapon_ShootPosition(), vec3_angle, this );
 				pGrenade->KeyValue( "velocity", m_vecTossVelocity );
@@ -2470,7 +2470,7 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 						CalculateMeleeDamageForce( &info, forward, pBCC->GetAbsOrigin() );
 						pBCC->TakeDamage( info );
 
-						EmitSound( "NPC_Combine.WeaponBash" );
+						g_pSoundEmitterSystem->EmitSound(this, "NPC_Combine.WeaponBash" );
 					}
 				}			
 

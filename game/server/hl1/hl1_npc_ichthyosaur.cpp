@@ -175,12 +175,12 @@ void CNPC_Ichthyosaur::Precache()
 
 	PrecacheModel("sprites/lgtning.vmt");
 
-	PrecacheScriptSound( "Ichthyosaur.Bite" );
-	PrecacheScriptSound( "Ichthyosaur.Alert" );
-	PrecacheScriptSound( "Ichthyosaur.Pain" );
-	PrecacheScriptSound( "Ichthyosaur.Die" );
-	PrecacheScriptSound( "Ichthyosaur.Idle" );
-	PrecacheScriptSound( "Ichthyosaur.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Ichthyosaur.Bite" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Ichthyosaur.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Ichthyosaur.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Ichthyosaur.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Ichthyosaur.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Ichthyosaur.Attack" );
 
 	BaseClass::Precache();
 }
@@ -975,37 +975,37 @@ bool CNPC_Ichthyosaur::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntit
 void CNPC_Ichthyosaur::IdleSound( void )	
 { 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Ichthyosaur.Idle" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Ichthyosaur.Idle" );
 }
 
 void CNPC_Ichthyosaur::AlertSound( void ) 
 { 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Ichthyosaur.Alert" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Ichthyosaur.Alert" );
 }
 
 void CNPC_Ichthyosaur::AttackSound( void ) 
 { 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Ichthyosaur.Attack" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Ichthyosaur.Attack" );
 }
 
 void CNPC_Ichthyosaur::BiteSound( void ) 
 { 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Ichthyosaur.Bite" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Ichthyosaur.Bite" );
 }
 
 void CNPC_Ichthyosaur::DeathSound( const CTakeDamageInfo &info ) 
 { 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Ichthyosaur.Die" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Ichthyosaur.Die" );
 }
 
 void CNPC_Ichthyosaur::PainSound( const CTakeDamageInfo &info )	
 { 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Ichthyosaur.Pain" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Ichthyosaur.Pain" );
 }
 
 //-----------------------------------------------------------------------------

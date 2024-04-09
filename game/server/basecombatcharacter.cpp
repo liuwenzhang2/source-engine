@@ -791,9 +791,9 @@ void CBaseCombatCharacter::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "BaseCombatCharacter.CorpseGib" );
-	PrecacheScriptSound( "BaseCombatCharacter.StopWeaponSounds" );
-	PrecacheScriptSound( "BaseCombatCharacter.AmmoPickup" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseCombatCharacter.CorpseGib" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseCombatCharacter.StopWeaponSounds" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseCombatCharacter.AmmoPickup" );
 
 	for ( int i = m_Relationship.Count() - 1; i >= 0 ; i--) 
 	{
@@ -872,7 +872,7 @@ bool CBaseCombatCharacter::CorpseGib( const CTakeDamageInfo &info )
 	trace_t		tr;
 	bool		gibbed = false;
 
-	EmitSound( "BaseCombatCharacter.CorpseGib" );
+	g_pSoundEmitterSystem->EmitSound(this, "BaseCombatCharacter.CorpseGib" );
 
 	// only humans throw skulls !!!UNDONE - eventually NPCs will have their own sets of gibs
 	if ( HasHumanGibs() )
@@ -1618,7 +1618,7 @@ void CBaseCombatCharacter::Event_Killed( const CTakeDamageInfo &info )
 		CBaseEntity::Create( "item_healthvial", GetAbsOrigin(), GetAbsAngles() );
 	}
 	// clear the deceased's sound channels.(may have been firing or reloading when killed)
-	EmitSound( "BaseCombatCharacter.StopWeaponSounds" );
+	g_pSoundEmitterSystem->EmitSound(this, "BaseCombatCharacter.StopWeaponSounds" );
 
 	// Tell my killer that he got me!
 	if( info.GetAttacker() )
@@ -2990,7 +2990,7 @@ int CBaseCombatCharacter::GiveAmmo( int iCount, int iAmmoIndex, bool bSuppressSo
 	// Ammo pickup sound
 	if ( !bSuppressSound )
 	{
-		EmitSound( "BaseCombatCharacter.AmmoPickup" );
+		g_pSoundEmitterSystem->EmitSound(this, "BaseCombatCharacter.AmmoPickup" );
 	}
 
 	m_iAmmo.Set( iAmmoIndex, m_iAmmo[iAmmoIndex] + iAdd );

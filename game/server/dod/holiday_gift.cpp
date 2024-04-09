@@ -46,7 +46,7 @@ CHolidayGift* CHolidayGift::Create( const Vector &position, const QAngle &angles
 		pGift->UseClientSideAnimation();
 		pGift->ResetSequence( pGift->LookupSequence("idle") );
 
-		pGift->EmitSound( "Christmas.GiftDrop" );
+		g_pSoundEmitterSystem->EmitSound(pGift, "Christmas.GiftDrop" );//pGift->
 
 		pGift->ActivateWhenAtRest();
 	}
@@ -60,8 +60,8 @@ void CHolidayGift::Precache()
 	BaseClass::Precache();
 
 	PrecacheModel( CHRISTMAS_MODEL );
-	PrecacheScriptSound( "Christmas.GiftDrop" );
-	PrecacheScriptSound( "Christmas.GiftPickup" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Christmas.GiftDrop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Christmas.GiftPickup" );
 }
 
 //-----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ void CHolidayGift::Spawn( void )
 //-----------------------------------------------------------------------------
 void CHolidayGift::DropSoundThink( void )
 {
-	EmitSound( "Christmas.GiftDrop" );
+	g_pSoundEmitterSystem->EmitSound(this, "Christmas.GiftDrop" );
 }
 
 //-----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ bool CHolidayGift::MyTouch( CBasePlayer *pPlayer )
 		event->SetInt( "userid", pPlayer->GetUserID() );
 		gameeventmanager->FireEvent( event );
 	}
-	pPlayer->EmitSound( "Christmas.GiftPickup" );
+	g_pSoundEmitterSystem->EmitSound(pPlayer, "Christmas.GiftPickup" );//pPlayer->
 
 	return true;
 }

@@ -24,7 +24,7 @@ void DoSpark( CBaseEntity *ent, const Vector &location, int nMagnitude, int nTra
 
 	if ( bPlaySound )
 	{
-		ent->EmitSound( "DoSpark" );
+		g_pSoundEmitterSystem->EmitSound(ent, "DoSpark" );
 	}
 }
 
@@ -106,7 +106,7 @@ void CEnvSpark::Precache(void)
 {
 	m_nGlowSpriteIndex = PrecacheModel( "sprites/glow01.vmt" );
 
-	PrecacheScriptSound( "DoSpark" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "DoSpark" );
 }
 
 extern ConVar phys_pushscale;

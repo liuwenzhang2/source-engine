@@ -2229,7 +2229,7 @@ void C_BasePlayer::PlayPlayerJingle()
 	ep.m_flVolume = VOL_NORM;
 	ep.m_SoundLevel = SNDLVL_NORM;
 
-	C_BaseEntity::EmitSound( filter, GetSoundSourceIndex(), ep );
+	g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), ep );//C_BaseEntity::
 #endif
 }
 

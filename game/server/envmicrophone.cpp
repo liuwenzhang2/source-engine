@@ -216,7 +216,7 @@ void CEnvMicrophone::InputDisable( inputdata_t &inputdata )
 	m_bDisabled = true;
 	if ( m_hSpeaker )
 	{
-		CBaseEntity::StopSound( m_hSpeaker->entindex(), CHAN_STATIC, m_szLastSound );
+		g_pSoundEmitterSystem->StopSound( m_hSpeaker->entindex(), CHAN_STATIC, m_szLastSound );//CBaseEntity::
 		m_szLastSound[0] = 0;
 
 		// Remove ourselves from the list of active mics
@@ -490,7 +490,7 @@ MicrophoneResult_t CEnvMicrophone::SoundPlayed( int entindex, const char *soundn
 	ep.m_flSoundTime = soundtime;
 	ep.m_nSpeakerEntity = entindex;
 
-	CBaseEntity::EmitSound( filter, m_hSpeaker->entindex(), ep );
+	g_pSoundEmitterSystem->EmitSound( filter, m_hSpeaker->entindex(), ep );//CBaseEntity::
 
 	Q_strncpy( m_szLastSound, soundname, sizeof(m_szLastSound) );
 	m_OnRoutedSound.FireOutput( this, this, 0 );

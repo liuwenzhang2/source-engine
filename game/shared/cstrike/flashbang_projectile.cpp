@@ -280,8 +280,8 @@ void CFlashbangProjectile::Precache()
 {
 	PrecacheModel( GRENADE_MODEL );
 
-	PrecacheScriptSound( "Flashbang.Explode" );
-	PrecacheScriptSound( "Flashbang.Bounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Flashbang.Explode" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Flashbang.Bounce" );
 
 	BaseClass::Precache();
 }
@@ -289,7 +289,7 @@ void CFlashbangProjectile::Precache()
 void CFlashbangProjectile::Detonate()
 {
 	RadiusFlash ( GetAbsOrigin(), this, GetThrower(), 4, CLASS_NONE, DMG_BLAST );
-	EmitSound( "Flashbang.Explode" );	
+	g_pSoundEmitterSystem->EmitSound(this, "Flashbang.Explode" );
 
 	// tell the bots a flashbang grenade has exploded
 	CCSPlayer *player = ToCSPlayer(GetThrower());
@@ -312,5 +312,5 @@ void CFlashbangProjectile::Detonate()
 //TODO: Let physics handle the sound!
 void CFlashbangProjectile::BounceSound( void )
 {
-	EmitSound( "Flashbang.Bounce" );
+	g_pSoundEmitterSystem->EmitSound(this, "Flashbang.Bounce" );
 }

@@ -94,10 +94,10 @@ void CPropEnergyBall::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "EnergyBall.Explosion" );
-	PrecacheScriptSound( "EnergyBall.Launch" );
-	PrecacheScriptSound( "EnergyBall.Impact" );
-	PrecacheScriptSound( "EnergyBall.AmbientLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "EnergyBall.Explosion" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "EnergyBall.Launch" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "EnergyBall.Impact" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "EnergyBall.AmbientLoop" );
 	UTIL_PrecacheDecal( IMPACT_DECAL_NAME, false );
 
 }
@@ -241,7 +241,7 @@ void CPropEnergyBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEven
 			}
 		}
 
-		EmitSound( "EnergyBall.Impact" );
+		g_pSoundEmitterSystem->EmitSound(this, "EnergyBall.Impact" );
 	}
 	
 	// Record our direction so our fixed direction hacks know we have changed direction immediately
@@ -348,7 +348,7 @@ void CPropEnergyBall::ExplodeThink( )
 	CEffectData data;
 	data.m_vOrigin = GetAbsOrigin();
 	DispatchEffect( "ManhackSparks", data );
-	EmitSound( "EnergyBall.Explosion" );
+	g_pSoundEmitterSystem->EmitSound(this, "EnergyBall.Explosion" );
 
 	// Turn us off and wait because we need our trails to finish up properly
 	SetAbsVelocity( vec3_origin );
@@ -535,7 +535,7 @@ void CEnergyBallLauncher::SpawnBall()
 	// Think function, used to update time till death and avoid sleeping
 	pBall->SetNextThink ( gpGlobals->curtime + 0.1f );
 
-	EmitSound( "EnergyBall.Launch" );
+	g_pSoundEmitterSystem->EmitSound(this, "EnergyBall.Launch" );
 
 	m_OnPostSpawnBall.FireOutput( this, this );
 }

@@ -1107,7 +1107,7 @@ void C_SporeExplosion::RenderParticles( CParticleRenderIterator *pIterator )
 void RPGShotDownCallback( const CEffectData &data )
 {
 	CLocalPlayerFilter filter;
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, "Missile.ShotDown", &data.m_vOrigin );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, "Missile.ShotDown", &data.m_vOrigin );//C_BaseEntity::
 
 	if ( CExplosionOverlay *pOverlay = new CExplosionOverlay )
 	{

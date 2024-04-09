@@ -1244,7 +1244,7 @@ void C_CSPlayer::UpdateSoundEvents()
 		if ( gpGlobals->curtime >= pEvent->m_flEventTime )
 		{
 			CLocalPlayerFilter filter;
-			EmitSound( filter, GetSoundSourceIndex(), STRING( pEvent->m_SoundName ) );
+			g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), STRING( pEvent->m_SoundName ) );
 
 			m_SoundEvents.Remove( i );
 		}
@@ -1347,7 +1347,7 @@ void C_CSPlayer::ClientThink()
 				ep.m_SoundLevel = SNDLVL_NORM;
 				ep.m_bEmitCloseCaption = false;
 
-				EmitSound( filter, GetSoundSourceIndex(), ep );
+				g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), ep );
 			}
 		}
 		else

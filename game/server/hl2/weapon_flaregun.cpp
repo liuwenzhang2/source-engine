@@ -153,7 +153,7 @@ void CFlare::Precache( void )
 {
 	PrecacheModel("models/weapons/flare.mdl" );
 
-	PrecacheScriptSound( "Weapon_FlareGun.Burn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_FlareGun.Burn" );
 
   	// FIXME: needed to precache the fire model.  Shouldn't have to do this.
   	UTIL_PrecacheOther( "_firesmoke" );
@@ -465,7 +465,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 						}
 						
 						CPASAttenuationFilter filter2( this, "Flare.Touch" );
-						EmitSound( filter2, entindex(), "Flare.Touch" );
+						g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "Flare.Touch" );
 
 						return;
 					}

@@ -427,7 +427,7 @@ void CAmbientGeneric::Precache( void )
 	{
 		if (*szSoundFile != '!')
 		{
-			PrecacheScriptSound(szSoundFile);
+			g_pSoundEmitterSystem->PrecacheScriptSound(szSoundFile);
 		}
 	}
 
@@ -1395,7 +1395,7 @@ void UTIL_EmitSoundSuit(CBaseEntity *entity, const char *sample)
 		ep.m_SoundLevel = SNDLVL_NORM;
 		ep.m_nPitch = pitch;
 
-		CBaseEntity::EmitSound( filter, (entity)->entindex(), ep);
+		g_pSoundEmitterSystem->EmitSound( filter, (entity)->entindex(), ep);//CBaseEntity::
 	}
 }
 
@@ -1458,4 +1458,40 @@ char TEXTURETYPE_Find( trace_t *ptr )
 	const surfacedata_t *psurfaceData = physprops->GetSurfaceData( ptr->surface.surfaceProps );
 
 	return psurfaceData->game.material;
+}
+
+void UTIL_EmitAmbientSound(int entindex, const Vector& vecOrigin, const char* samp, float vol, soundlevel_t soundlevel, int fFlags, int pitch, float soundtime /*= 0.0f*/, float* duration /*=NULL*/)
+{
+#ifdef STAGING_ONLY
+	if (sv_snd_filter.GetString()[0] && !V_stristr(samp, sv_snd_filter.GetString()))
+	{
+		return;
+	}
+#endif // STAGING_ONLY
+
+	if (samp && *samp == '!')
+	{
+		int sentenceIndex = engine->SentenceIndexFromName(samp + 1);//SENTENCEG_Lookup(samp);
+		if (sentenceIndex >= 0)
+		{
+			char name[32];
+			Q_snprintf(name, sizeof(name), "!%d", sentenceIndex);
+#if !defined( CLIENT_DLL )
+			engine->EmitAmbientSound(entindex, vecOrigin, name, vol, soundlevel, fFlags, pitch, soundtime);
+#else
+			enginesound->EmitAmbientSound(name, vol, pitch, fFlags, soundtime);
+#endif
+			if (duration)
+			{
+				*duration = enginesound->GetSoundDuration(name);
+			}
+
+			g_pSoundEmitterSystem->TraceEmitSound("UTIL_EmitAmbientSound:  Sentence emitted '%s' (ent %i)\n",
+				name, entindex);
+		}
+	}
+	else
+	{
+		g_pSoundEmitterSystem->EmitAmbientSound(entindex, vecOrigin, samp, vol, soundlevel, fFlags, pitch, soundtime, duration);
+	}
 }

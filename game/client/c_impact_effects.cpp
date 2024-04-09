@@ -747,7 +747,7 @@ void FX_AntlionImpact( const Vector &pos, trace_t *trace )
 
 
 	CLocalPlayerFilter filter;
-	C_BaseEntity::EmitSound( filter, 0, "FX_AntlionImpact.ShellImpact", &trace->endpos );
+	g_pSoundEmitterSystem->EmitSound( filter, 0, "FX_AntlionImpact.ShellImpact", &trace->endpos );//C_BaseEntity::
 }
 
 //-----------------------------------------------------------------------------

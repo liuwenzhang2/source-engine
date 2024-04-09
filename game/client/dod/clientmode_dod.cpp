@@ -240,7 +240,7 @@ void ClientModeDODNormal::FireGameEvent( IGameEvent * event)
 				return;
 			}
 		}
-		C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, pszSoundName );
+		g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, pszSoundName );//C_BaseEntity::
 	}
 	else if ( Q_strcmp( "dod_bomb_planted", eventname ) == 0 )
 	{
@@ -500,7 +500,7 @@ void ClientModeDODNormal::RadioMessage( const char *pszSoundName, const char *ps
 		C_DODPlayer *pLocalPlayer = C_DODPlayer::GetLocalDODPlayer();
 		if ( pLocalPlayer )
 		{
-			pLocalPlayer->StopSound( m_szLastRadioSound );
+			g_pSoundEmitterSystem->StopSound(pLocalPlayer, m_szLastRadioSound );//pLocalPlayer->
 		}
 	}
 

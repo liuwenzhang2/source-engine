@@ -596,7 +596,7 @@ CFire::CFire( void )
 void CFire::UpdateOnRemove( void )
 {
 	//Stop any looping sounds that might be playing
-	StopSound( "Fire.Plasma" );
+	g_pSoundEmitterSystem->StopSound(this, "Fire.Plasma" );
 
 	DestroyEffect();
 
@@ -635,7 +635,7 @@ void CFire::Precache( void )
 		UTIL_PrecacheOther("_plasma");
 	}
 
-	PrecacheScriptSound( "Fire.Plasma" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Fire.Plasma" );
 }
 
 //------------------------------------------------------------------------------
@@ -801,7 +801,7 @@ void CFire::SpawnEffect( fireType_e type, float scale )
 			m_takedamage	= DAMAGE_YES;
 
 			// Start burn sound
-			EmitSound( "Fire.Plasma" );
+			g_pSoundEmitterSystem->EmitSound(this, "Fire.Plasma" );
 		}
 		break;
 	}

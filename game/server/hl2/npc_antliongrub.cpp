@@ -523,7 +523,7 @@ void CAntlionGrub::MakeIdleSounds( void )
 	{
 		if ( m_flNextSquealSoundTime < gpGlobals->curtime )
 		{
-			EmitSound( "NPC_Antlion_Grub.Stimulated" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion_Grub.Stimulated" );
 			m_flNextSquealSoundTime = gpGlobals->curtime + random->RandomFloat( 1.5f, 3.0f );
 			m_flNextIdleSoundTime = gpGlobals->curtime + random->RandomFloat( 4.0f, 8.0f );
 		}
@@ -532,7 +532,7 @@ void CAntlionGrub::MakeIdleSounds( void )
 	{
 		if ( m_flNextIdleSoundTime < gpGlobals->curtime )
 		{
-			EmitSound( "NPC_Antlion_Grub.Idle" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion_Grub.Idle" );
 			m_flNextIdleSoundTime = gpGlobals->curtime + random->RandomFloat( 8.0f, 12.0f );
 		}
 	}
@@ -674,11 +674,11 @@ void CAntlionGrub::Precache( void )
 
 	m_nGlowSpriteHandle = PrecacheModel("sprites/grubflare1.vmt");
 
-	PrecacheScriptSound( "NPC_Antlion_Grub.Idle" );
-	PrecacheScriptSound( "NPC_Antlion_Grub.Alert" );
-	PrecacheScriptSound( "NPC_Antlion_Grub.Stimulated" );
-	PrecacheScriptSound( "NPC_Antlion_Grub.Die" );
-	PrecacheScriptSound( "NPC_Antlion_Grub.Squish" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion_Grub.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion_Grub.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion_Grub.Stimulated" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion_Grub.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion_Grub.Squish" );
 
 	PrecacheParticleSystem( "GrubSquashBlood" );
 	PrecacheParticleSystem( "GrubBlood" );
@@ -762,8 +762,8 @@ void CAntlionGrub::Squash( CBaseEntity *pOther, bool bDealDamage, bool bSpawnBlo
 		m_hGlowSprite->GetEngineObject()->SetParent( NULL );
 	}
 
-	EmitSound( "NPC_Antlion_Grub.Die" );
-	EmitSound( "NPC_Antlion_Grub.Squish" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion_Grub.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion_Grub.Squish" );
 
 	// if vort stepped on me, maybe he wants to say something
 	if ( pOther && FClassnameIs( pOther, "npc_vortigaunt" ) )
@@ -876,8 +876,8 @@ void CGrubNugget::Precache( void )
 	PrecacheModel("models/grub_nugget_medium.mdl");
 	PrecacheModel("models/grub_nugget_large.mdl");
 
-	PrecacheScriptSound( "GrubNugget.Touch" );
-	PrecacheScriptSound( "NPC_Antlion_Grub.Explode" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "GrubNugget.Touch" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion_Grub.Explode" );
 
 	PrecacheParticleSystem( "antlion_spit_player" );
 }
@@ -923,7 +923,7 @@ bool CGrubNugget::MyTouch( CBasePlayer *pPlayer )
 	MessageEnd();
 
 	CPASAttenuationFilter filter( pPlayer, "GrubNugget.Touch" );
-	EmitSound( filter, pPlayer->entindex(), "GrubNugget.Touch" );
+	g_pSoundEmitterSystem->EmitSound( filter, pPlayer->entindex(), "GrubNugget.Touch" );
 
 	UTIL_Remove( this );	
 
@@ -973,7 +973,7 @@ void CGrubNugget::Event_Killed( const CTakeDamageInfo &info )
 {
 	AddEffects( EF_NODRAW );
 	DispatchParticleEffect( "antlion_spit_player", GetAbsOrigin(), QAngle( -90, 0, 0 ) );
-	EmitSound( "NPC_Antlion_Grub.Explode" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion_Grub.Explode" );
 
 	BaseClass::Event_Killed( info );
 }

@@ -391,36 +391,36 @@ void CFastZombie::Precache( void )
 	PrecacheModel("models/zombie/fast.mdl");
 #ifdef HL2_EPISODIC
 	PrecacheModel("models/zombie/Fast_torso.mdl");
-	PrecacheScriptSound( "NPC_FastZombie.CarEnter1" );
-	PrecacheScriptSound( "NPC_FastZombie.CarEnter2" );
-	PrecacheScriptSound( "NPC_FastZombie.CarEnter3" );
-	PrecacheScriptSound( "NPC_FastZombie.CarEnter4" );
-	PrecacheScriptSound( "NPC_FastZombie.CarScream" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.CarEnter1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.CarEnter2" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.CarEnter3" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.CarEnter4" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.CarScream" );
 #endif
 	PrecacheModel( "models/gibs/fast_zombie_torso.mdl" );
 	PrecacheModel( "models/gibs/fast_zombie_legs.mdl" );
 	
-	PrecacheScriptSound( "NPC_FastZombie.LeapAttack" );
-	PrecacheScriptSound( "NPC_FastZombie.FootstepRight" );
-	PrecacheScriptSound( "NPC_FastZombie.FootstepLeft" );
-	PrecacheScriptSound( "NPC_FastZombie.AttackHit" );
-	PrecacheScriptSound( "NPC_FastZombie.AttackMiss" );
-	PrecacheScriptSound( "NPC_FastZombie.LeapAttack" );
-	PrecacheScriptSound( "NPC_FastZombie.Attack" );
-	PrecacheScriptSound( "NPC_FastZombie.Idle" );
-	PrecacheScriptSound( "NPC_FastZombie.AlertFar" );
-	PrecacheScriptSound( "NPC_FastZombie.AlertNear" );
-	PrecacheScriptSound( "NPC_FastZombie.GallopLeft" );
-	PrecacheScriptSound( "NPC_FastZombie.GallopRight" );
-	PrecacheScriptSound( "NPC_FastZombie.Scream" );
-	PrecacheScriptSound( "NPC_FastZombie.RangeAttack" );
-	PrecacheScriptSound( "NPC_FastZombie.Frenzy" );
-	PrecacheScriptSound( "NPC_FastZombie.NoSound" );
-	PrecacheScriptSound( "NPC_FastZombie.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.LeapAttack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.FootstepRight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.FootstepLeft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.AttackHit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.AttackMiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.LeapAttack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.AlertFar" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.AlertNear" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.GallopLeft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.GallopRight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.Scream" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.RangeAttack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.Frenzy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.NoSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.Die" );
 
-	PrecacheScriptSound( "NPC_FastZombie.Gurgle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.Gurgle" );
 
-	PrecacheScriptSound( "NPC_FastZombie.Moan1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.Moan1" );
 
 	BaseClass::Precache();
 }
@@ -630,7 +630,7 @@ void CFastZombie::SetAngrySoundState( void )
 		return;
 	}
 
-	EmitSound( "NPC_FastZombie.LeapAttack" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.LeapAttack" );
 
 	// Main looping sound
 	ENVELOPE_CONTROLLER.SoundChangePitch( m_pMoanSound, FASTZOMBIE_MIN_PITCH, 0.5 );
@@ -845,11 +845,11 @@ void CFastZombie::FootstepSound( bool fRightFoot )
 {
 	if( fRightFoot )
 	{
-		EmitSound( "NPC_FastZombie.FootstepRight" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.FootstepRight" );
 	}
 	else
 	{
-		EmitSound( "NPC_FastZombie.FootstepLeft" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.FootstepLeft" );
 	}
 }
 
@@ -858,7 +858,7 @@ void CFastZombie::FootstepSound( bool fRightFoot )
 //-----------------------------------------------------------------------------
 void CFastZombie::AttackHitSound( void )
 {
-	EmitSound( "NPC_FastZombie.AttackHit" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.AttackHit" );
 }
 
 //-----------------------------------------------------------------------------
@@ -867,7 +867,7 @@ void CFastZombie::AttackHitSound( void )
 void CFastZombie::AttackMissSound( void )
 {
 	// Play a random attack miss sound
-	EmitSound( "NPC_FastZombie.AttackMiss" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.AttackMiss" );
 }
 
 //-----------------------------------------------------------------------------
@@ -875,7 +875,7 @@ void CFastZombie::AttackMissSound( void )
 //-----------------------------------------------------------------------------
 void CFastZombie::LeapAttackSound( void )
 {
-	EmitSound( "NPC_FastZombie.LeapAttack" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.LeapAttack" );
 }
 
 //-----------------------------------------------------------------------------
@@ -883,7 +883,7 @@ void CFastZombie::LeapAttackSound( void )
 //-----------------------------------------------------------------------------
 void CFastZombie::AttackSound( void )
 {
-	EmitSound( "NPC_FastZombie.Attack" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.Attack" );
 }
 
 //-----------------------------------------------------------------------------
@@ -891,7 +891,7 @@ void CFastZombie::AttackSound( void )
 //-----------------------------------------------------------------------------
 void CFastZombie::IdleSound( void )
 {
-	EmitSound( "NPC_FastZombie.Idle" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.Idle" );
 	MakeAISpookySound( 360.0f );
 }
 
@@ -910,7 +910,7 @@ void CFastZombie::PainSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CFastZombie::DeathSound( const CTakeDamageInfo &info ) 
 {
-	EmitSound( "NPC_FastZombie.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.Die" );
 }
 
 //-----------------------------------------------------------------------------
@@ -931,11 +931,11 @@ void CFastZombie::AlertSound( void )
 
 		if( flDist > 512 )
 		{
-			EmitSound( "NPC_FastZombie.AlertFar" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.AlertFar" );
 		}
 		else
 		{
-			EmitSound( "NPC_FastZombie.AlertNear" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.AlertNear" );
 		}
 	}
 
@@ -1067,13 +1067,13 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
 	
 	if ( pEvent->event == AE_FASTZOMBIE_GALLOP_LEFT )
 	{
-		EmitSound( "NPC_FastZombie.GallopLeft" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.GallopLeft" );
 		return;
 	}
 
 	if ( pEvent->event == AE_FASTZOMBIE_GALLOP_RIGHT )
 	{
-		EmitSound( "NPC_FastZombie.GallopRight" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.GallopRight" );
 		return;
 	}
 	
@@ -1403,12 +1403,12 @@ int CFastZombie::TranslateSchedule( int scheduleType )
 			if( !m_fHasScreamed )
 			{
 				// Only play that over-the-top attack scream once per combat state.
-				EmitSound( "NPC_FastZombie.Scream" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.Scream" );
 				m_fHasScreamed = true;
 			}
 			else
 			{
-				EmitSound( "NPC_FastZombie.RangeAttack" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.RangeAttack" );
 			}
 
 			return SCHED_FASTZOMBIE_RANGE_ATTACK1;
@@ -1642,7 +1642,7 @@ void CFastZombie::OnChangeActivity( Activity NewActivity )
 	if ( NewActivity == ACT_FASTZOMBIE_FRENZY )
 	{
 		// Scream!!!!
-		EmitSound( "NPC_FastZombie.Frenzy" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.Frenzy" );
 		SetPlaybackRate( random->RandomFloat( .9, 1.1 ) );	
 	}
 
@@ -1808,7 +1808,7 @@ void CFastZombie::Event_Killed( const CTakeDamageInfo &info )
 {
 	// Shut up my screaming sounds.
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "NPC_FastZombie.NoSound" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_FastZombie.NoSound" );
 
 	CTakeDamageInfo dInfo = info;
 

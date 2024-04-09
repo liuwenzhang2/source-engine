@@ -62,7 +62,7 @@ extern IMDLCache *mdlcache;
 extern IVideoServices *g_pVideo;
 extern IDmeMakefileUtils *g_pDmeMakefileUtils;
 extern IPhysicsCollision *g_pPhysicsCollision;
-extern ISoundEmitterSystemBase *g_pSoundEmitterSystem;
+extern ISoundEmitterSystemBase *g_pSoundEmitterSystemBase;
 extern IVTex *g_pVTex;
 
 

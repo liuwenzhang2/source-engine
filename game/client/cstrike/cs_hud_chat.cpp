@@ -141,7 +141,7 @@ void CHudChat::MsgFunc_RadioText( bf_read &msg )
 	ChatPrintf( client, CHAT_FILTER_TEAMCHANGE, "%s", ansiString );
 
 	CLocalPlayerFilter filter;
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );//C_BaseEntity::
 }
 
 //-----------------------------------------------------------------------------
@@ -197,7 +197,7 @@ void CHudChat::MsgFunc_SayText2( bf_read &msg )
 		if ( playChatSound )
 		{
 			CLocalPlayerFilter filter;
-			C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
+			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );//C_BaseEntity::
 		}
 	}
 	else
@@ -241,7 +241,7 @@ void CHudChat::MsgFunc_RawAudio( bf_read &msg )
 	ep.m_nPitch = pitch;
 
 	CLocalPlayerFilter filter;
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, ep );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, ep );//C_BaseEntity::
 
 	if ( feedbackDuration > 0.0f )
 	{

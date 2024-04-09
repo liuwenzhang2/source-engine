@@ -58,7 +58,7 @@ namespace physicssound
 				const char *pSound = physprops->GetString( soundName );
 
 				CSoundParameters params;
-				if ( !CBaseEntity::GetParametersForSound( pSound, params, NULL ) )
+				if ( !g_pSoundEmitterSystem->GetParametersForSound( pSound, params, NULL ) )//CBaseEntity::
 					break;
 
 				if ( sound.volume > 1 )
@@ -74,7 +74,7 @@ namespace physicssound
 				ep.m_nPitch = params.pitch;
 				ep.m_pOrigin = &sound.origin;
 
-				CBaseEntity::EmitSound( filter, 0 /*sound.entityIndex*/, ep );
+				g_pSoundEmitterSystem->EmitSound( filter, 0 /*sound.entityIndex*/, ep );//CBaseEntity::
 			}
 		}
 		list.RemoveAll();
@@ -155,7 +155,7 @@ namespace physicssound
 			const surfacedata_t *psurf = physprops->GetSurfaceData( sound.surfacePropsBreak );
 			const char *pSound = physprops->GetString( psurf->sounds.breakSound );
 			CSoundParameters params;
-			if ( !CBaseEntity::GetParametersForSound( pSound, params, NULL ) )
+			if ( !g_pSoundEmitterSystem->GetParametersForSound( pSound, params, NULL ) )//CBaseEntity::
 				return;
 
 			// Play from the world, because the entity is breaking, so it'll be destroyed soon
@@ -167,7 +167,7 @@ namespace physicssound
 			ep.m_SoundLevel = params.soundlevel;
 			ep.m_nPitch = params.pitch;
 			ep.m_pOrigin = &sound.origin;
-			CBaseEntity::EmitSound( filter, 0 /*sound.entityIndex*/, ep );
+			g_pSoundEmitterSystem->EmitSound( filter, 0 /*sound.entityIndex*/, ep );//CBaseEntity::
 		}
 		list.RemoveAll();
 	}

@@ -943,7 +943,7 @@ void CPointCommentaryNode::Precache()
 
 	if ( m_iszCommentaryFile.Get() != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING( m_iszCommentaryFile.Get() ) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszCommentaryFile.Get() ) );
 	}
 	else
 	{
@@ -952,7 +952,7 @@ void CPointCommentaryNode::Precache()
 
 	if ( m_iszCommentaryFileNoHDR.Get() != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING( m_iszCommentaryFileNoHDR.Get() ) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszCommentaryFileNoHDR.Get() ) );
 	}
 	
 	BaseClass::Precache();

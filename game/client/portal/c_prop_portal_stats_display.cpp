@@ -160,7 +160,7 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 		{
 			m_fEnabledCounter = 0.0f;
 
-			EmitSound( "Portal.stair_clack" );
+			g_pSoundEmitterSystem->EmitSound(this, "Portal.stair_clack" );
 			m_bGoalVisible = true;
 			++m_iCurrentDisplayStep;
 		}
@@ -180,9 +180,9 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 					m_fNumPlayerDisplay += 1.0f;
 
 					if ( static_cast<int>( m_fNumPlayerDisplay ) % 2 == 0 )
-						EmitSound( "Weapon_Portalgun.fire_blue" );
+						g_pSoundEmitterSystem->EmitSound(this, "Weapon_Portalgun.fire_blue" );
 					else
-						EmitSound( "Weapon_Portalgun.fire_red" );
+						g_pSoundEmitterSystem->EmitSound(this, "Weapon_Portalgun.fire_red" );
 				}
 				else
 					++m_iCurrentDisplayStep;
@@ -201,9 +201,9 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 
 					int iStepsMod10 = static_cast<int>( m_fNumPlayerDisplay ) % 10;
 					if ( iStepsMod10 == 0 )
-						EmitSound( "NPC_Citizen.RunFootstepLeft" );
+						g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.RunFootstepLeft" );
 					else if ( iStepsMod10 == 5 )
-						EmitSound( "NPC_Citizen.RunFootstepRight" );
+						g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.RunFootstepRight" );
 				}
 				else
 					++m_iCurrentDisplayStep;
@@ -217,7 +217,7 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 				{
 					m_fEnabledCounter = 0.0f;
 
-					EmitSound( "Portal.room1_Clock" );
+					g_pSoundEmitterSystem->EmitSound(this, "Portal.room1_Clock" );
 				}
 
 				m_fNumPlayerDisplay += gpGlobals->frametime * m_fNumSecondsTaken;
@@ -265,7 +265,7 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 				m_bMedalCompleted[ m_iGoalLevelDisplay ] = true;
 				m_iGoalSuccess = 1;
 
-				EmitSound( "Portal.button_down" );
+				g_pSoundEmitterSystem->EmitSound(this, "Portal.button_down" );
 
 				if ( m_iGoalLevelDisplay == 2 )
 					++m_iCurrentDisplayStep;	// skip the next step
@@ -274,7 +274,7 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 			{
 				m_iGoalSuccess = 0;
 
-				EmitSound( "Portal.button_up" );
+				g_pSoundEmitterSystem->EmitSound(this, "Portal.button_up" );
 				++m_iCurrentDisplayStep;	// skip the next step
 			}
 			
@@ -295,7 +295,7 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 
 			m_iGoalSuccess = -1;
 
-			EmitSound( "Portal.stair_clack" );
+			g_pSoundEmitterSystem->EmitSound(this, "Portal.stair_clack" );
 			--m_iCurrentDisplayStep;	// go back to success or failure step
 		}
 		break;
@@ -317,7 +317,7 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 
 void C_PropPortalStatsDisplay::ResetDisplayAnimation( void )
 {
-	EmitSound( "Portal.elevator_ding" );
+	g_pSoundEmitterSystem->EmitSound(this, "Portal.elevator_ding" );
 
 	m_fEnabledCounter = 0.0f;
 	m_iCurrentDisplayStep = 0;

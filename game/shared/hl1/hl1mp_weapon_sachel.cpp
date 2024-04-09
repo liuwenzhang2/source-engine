@@ -574,14 +574,14 @@ void CSatchelCharge::SatchelThink( void )
 void CSatchelCharge::Precache( void )
 {
 	PrecacheModel( SATCHEL_CHARGE_MODEL );
-	PrecacheScriptSound( "SatchelCharge.Bounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "SatchelCharge.Bounce" );
 }
 
 void CSatchelCharge::BounceSound( void )
 {
 	if ( gpGlobals->curtime > m_flNextBounceSoundTime )
 	{
-		EmitSound( "SatchelCharge.Bounce" );
+		g_pSoundEmitterSystem->EmitSound(this, "SatchelCharge.Bounce" );
 
 		m_flNextBounceSoundTime = gpGlobals->curtime + 0.1;
 	}

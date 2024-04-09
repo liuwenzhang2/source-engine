@@ -447,7 +447,7 @@ void CSoundscapeSystem::PrecacheSounds( int soundscapeIndex )
 		const char *pSound = m_soundscapeSounds[soundscapeIndex][i];
 		if ( Q_stristr( pSound, ".wav" ) )
 		{
-			CBaseEntity::PrecacheSound( pSound );
+			g_pSoundEmitterSystem->PrecacheSound( pSound );
 		}
 		else
 		{

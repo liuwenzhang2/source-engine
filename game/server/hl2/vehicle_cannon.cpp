@@ -223,9 +223,9 @@ void CPropCannon::Precache( void )
 
 	PrecacheModel( CANNON_PROJECTILE_MODEL );
 	
-	PrecacheScriptSound( "HeadcrabCanister.LaunchSound" );
-	PrecacheScriptSound( "HeadcrabCanister.Explosion" );
-	PrecacheScriptSound( "Weapon_Mortar.Incomming" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.LaunchSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.Explosion" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Mortar.Incomming" );
 }
 
 
@@ -556,7 +556,7 @@ void CPropCannon::Think( void )
 			ep.m_flVolume = 255;
 			ep.m_SoundLevel = SNDLVL_180dB;
 	
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 		if ( m_flFlyTime <= gpGlobals->curtime )
@@ -670,7 +670,7 @@ void CPropCannon::LaunchProjectile( void )
 
 	m_flNextAttackTime = gpGlobals->curtime + g_cannon_reloadtime.GetFloat();
 	
-	EmitSound( "HeadcrabCanister.LaunchSound" );
+	g_pSoundEmitterSystem->EmitSound(this, "HeadcrabCanister.LaunchSound" );
 
 	UTIL_ScreenShake( GetDriver()->GetAbsOrigin(), 50.0, 150.0, 1.0, 750, SHAKE_START, true );
 }

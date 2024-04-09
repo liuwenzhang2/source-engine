@@ -367,7 +367,7 @@ void CBreakable::MaterialSoundRandom( int entindex, Materials soundMaterial, flo
 		return;
 
 	CSoundParameters params;
-	if ( !GetParametersForSound( soundname, params, NULL ) )
+	if ( !g_pSoundEmitterSystem->GetParametersForSound( soundname, params, NULL ) )
 		return;
 
 	CPASAttenuationFilter filter( gEntList.GetBaseEntity( entindex ), params.soundlevel );
@@ -379,7 +379,7 @@ void CBreakable::MaterialSoundRandom( int entindex, Materials soundMaterial, flo
 	ep.m_flVolume = volume;
 	ep.m_SoundLevel = params.soundlevel;
 
-	EmitSound( filter, entindex, ep );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex, ep );
 }
 
 
@@ -479,18 +479,18 @@ void CBreakable::Precache( void )
 		}	
 	}
 
-	PrecacheScriptSound( "Breakable.MatGlass" );
-	PrecacheScriptSound( "Breakable.MatWood" );
-	PrecacheScriptSound( "Breakable.MatMetal" );
-	PrecacheScriptSound( "Breakable.MatFlesh" );
-	PrecacheScriptSound( "Breakable.MatConcrete" );
-	PrecacheScriptSound( "Breakable.Computer" );
-	PrecacheScriptSound( "Breakable.Crate" );
-	PrecacheScriptSound( "Breakable.Glass" );
-	PrecacheScriptSound( "Breakable.Metal" );
-	PrecacheScriptSound( "Breakable.Flesh" );
-	PrecacheScriptSound( "Breakable.Concrete" );
-	PrecacheScriptSound( "Breakable.Ceiling" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.MatGlass" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.MatWood" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.MatMetal" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.MatFlesh" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.MatConcrete" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.Computer" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.Crate" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.Glass" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.Metal" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.Flesh" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.Concrete" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Breakable.Ceiling" );
 }
 
 // play shard sound when func_breakable takes damage.
@@ -551,7 +551,7 @@ void CBreakable::DamageSound( void )
 	if ( soundname )
 	{
 		CSoundParameters params;
-		if ( GetParametersForSound( soundname, params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( soundname, params, NULL ) )
 		{
 			CPASAttenuationFilter filter( this );
 
@@ -562,7 +562,7 @@ void CBreakable::DamageSound( void )
 			ep.m_SoundLevel = params.soundlevel;
 			ep.m_nPitch = pitch;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 	}
 }
@@ -744,7 +744,7 @@ void CBreakable::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir,
 			{
 				g_pEffects->Sparks( ptr->endpos );
 
-				EmitSound( "Breakable.Computer" );
+				g_pSoundEmitterSystem->EmitSound(this, "Breakable.Computer" );
 			}
 			break;
 			
@@ -1001,7 +1001,7 @@ void CBreakable::Die( void )
 		}
 
 		CSoundParameters params;
-		if ( GetParametersForSound( soundname, params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( soundname, params, NULL ) )
 		{
 			CPASAttenuationFilter filter( this );
 
@@ -1012,7 +1012,7 @@ void CBreakable::Die( void )
 			ep.m_SoundLevel = params.soundlevel;
 			ep.m_nPitch = pitch;
 
-			EmitSound( filter, entindex(), ep );	
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 	}
 		

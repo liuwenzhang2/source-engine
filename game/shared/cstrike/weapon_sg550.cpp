@@ -113,7 +113,7 @@ void CWeaponSG550::SecondaryAttack()
 	//=============================================================================
 	if ( GetPlayerOwner() )
 	{
-		GetPlayerOwner()->EmitSound( "Default.Zoom" ); // zoom sound.
+		g_pSoundEmitterSystem->EmitSound(GetPlayerOwner(), "Default.Zoom" ); // zoom sound.//GetPlayerOwner()->
 	}
 	//=============================================================================
 	// HPE_END

@@ -116,7 +116,7 @@ void CSmokeGrenadeProjectile::Think_Detonate()
 	m_hSmokeEffect = pGren;
 	m_bDidSmokeEffect = true;
 
-	EmitSound( "BaseSmokeEffect.Sound" );
+	g_pSoundEmitterSystem->EmitSound(this, "BaseSmokeEffect.Sound" );
 
 	m_nRenderMode = kRenderTransColor;
 	SetNextThink( gpGlobals->curtime + 5 );
@@ -175,8 +175,8 @@ void CSmokeGrenadeProjectile::Spawn()
 void CSmokeGrenadeProjectile::Precache()
 {
 	PrecacheModel( GRENADE_MODEL );
-	PrecacheScriptSound( "BaseSmokeEffect.Sound" );
-	PrecacheScriptSound( "SmokeGrenade.Bounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseSmokeEffect.Sound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "SmokeGrenade.Bounce" );
 	BaseClass::Precache();
 }
 
@@ -184,6 +184,6 @@ void CSmokeGrenadeProjectile::BounceSound( void )
 {
 	if ( !m_bDidSmokeEffect )
 	{
-		EmitSound( "SmokeGrenade.Bounce" );
+		g_pSoundEmitterSystem->EmitSound(this, "SmokeGrenade.Bounce" );
 	}
 }

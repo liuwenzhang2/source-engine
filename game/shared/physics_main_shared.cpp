@@ -1596,7 +1596,7 @@ void CBaseEntity::PhysicsCheckWaterTransition( void )
 #endif // !CLIENT_DLL
 
 			// just crossed into water
-			EmitSound( "BaseEntity.EnterWater" );
+			g_pSoundEmitterSystem->EmitSound(this, "BaseEntity.EnterWater" );
 
 			if ( !IsEFlagSet( EFL_NO_WATER_VELOCITY_CHANGE ) )
 			{
@@ -1611,7 +1611,7 @@ void CBaseEntity::PhysicsCheckWaterTransition( void )
 		if ( oldcont != CONTENTS_EMPTY )
 		{	
 			// just crossed out of water
-			EmitSound( "BaseEntity.ExitWater" );
+			g_pSoundEmitterSystem->EmitSound(this, "BaseEntity.ExitWater" );
 		}		
 	}
 }

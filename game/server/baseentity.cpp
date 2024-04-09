@@ -4737,7 +4737,7 @@ void ModelSoundsCache_FinishModel( CStudioHdr *hdr )
 
 void ModelSoundsCache_PrecacheScriptSound( const char *soundname )
 {
-	CBaseEntity::PrecacheScriptSound( soundname );
+	g_pSoundEmitterSystem->PrecacheScriptSound( soundname );
 }
 
 static CUtlCachedFileData< CModelSoundsCache > g_ModelSoundsCache( "modelsounds.cache", MODELSOUNDSCACHE_VERSION, 0, UTL_CACHED_FILE_USE_FILESIZE, false );																  
@@ -4884,7 +4884,7 @@ void CBaseEntity::PrecacheSoundHelper( const char *pName )
 		g_ModelSoundsSymbolHelper.AddString( pName );
 
 		// very expensive, only call when required
-		PrecacheScriptSound( pName );
+		g_pSoundEmitterSystem->PrecacheScriptSound( pName );
 	}
 }
 
@@ -5071,7 +5071,7 @@ int CBaseEntity::PrecacheModel( const char *name, bool bPreload )
 	}
 
 	// Warn on out of order precache
-	if ( !CBaseEntity::IsPrecacheAllowed() )
+	if ( !g_pSoundEmitterSystem->IsPrecacheAllowed() )//CBaseEntity::
 	{
 		if ( !engine->IsModelPrecached( name ) )
 		{
@@ -7025,7 +7025,7 @@ void CBaseEntity::DispatchResponse( const char *conceptName )
 	{
 	case RESPONSE_SPEAK:
 		{
-			EmitSound( response );
+			g_pSoundEmitterSystem->EmitSound(this, response );
 		}
 		break;
 	case RESPONSE_SENTENCE:
@@ -7695,8 +7695,8 @@ void CC_Ent_Create( const CCommand& args )
 		}
 	}
 
-	bool allowPrecache = CBaseEntity::IsPrecacheAllowed();
-	CBaseEntity::SetAllowPrecache( true );
+	bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
+	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
 
 	// Try to create entity
 	CBaseEntity *entity = dynamic_cast< CBaseEntity * >(gEntList.CreateEntityByName(args[1]) );
@@ -7731,7 +7731,7 @@ void CC_Ent_Create( const CCommand& args )
 
 		entity->Activate();
 	}
-	CBaseEntity::SetAllowPrecache( allowPrecache );
+	g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
 }
 static ConCommand ent_create("ent_create", CC_Ent_Create, "Creates an entity of the given type where the player is looking.  Additional parameters can be passed in in the form: ent_create <entity name> <param 1 name> <param 1> <param 2 name> <param 2>...<param N name> <param N>", FCVAR_GAMEDLL | FCVAR_CHEAT);
 

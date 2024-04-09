@@ -20,6 +20,7 @@
 #include "ServerNetworkProperty.h"
 #include "shareddefs.h"
 #include "engine/ivmodelinfo.h"
+#include "SoundEmitterSystem/isoundemittersystembase.h"
 
 class CDamageModifier;
 class CDmgAccumulator;
@@ -325,6 +326,8 @@ extern void SpawnEntityByName( const char *className, CEntityMapData *mapData = 
 extern int DispatchSpawn( CBaseEntity *pEntity );
 
 extern ISaveRestoreOps* engineObjectFuncs;
+extern ISoundEmitterSystem* g_pSoundEmitterSystem;
+
 
 //inline CBaseEntity *GetContainingEntity( edict_t *pent );
 
@@ -1541,48 +1544,48 @@ public:
 	void					SetLocalTransform( const matrix3x4_t &localTransform );
 
 	// See CSoundEmitterSystem
-	void					EmitSound( const char *soundname, float soundtime = 0.0f, float *duration = NULL );  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
-	void					EmitSound( const char *soundname, HSOUNDSCRIPTHANDLE& handle, float soundtime = 0.0f, float *duration = NULL );  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
-	void					StopSound( const char *soundname );
-	void					StopSound( const char *soundname, HSOUNDSCRIPTHANDLE& handle );
-	void					GenderExpandString( char const *in, char *out, int maxlen );
+	//static void					EmitSound(CBaseEntity* pEntity, const char *soundname, float soundtime = 0.0f, float *duration = NULL );  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
+	//static void					EmitSound(CBaseEntity* pEntity, const char *soundname, HSOUNDSCRIPTHANDLE& handle, float soundtime = 0.0f, float *duration = NULL );  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
+	//static void					StopSound(CBaseEntity* pEntity, const char *soundname );
+	//static void					StopSound(CBaseEntity* pEntity, const char *soundname, HSOUNDSCRIPTHANDLE& handle );
+	//static void					GenderExpandString(CBaseEntity* pEntity, char const *in, char *out, int maxlen );
 
 	virtual void ModifyEmitSoundParams( EmitSound_t &params );
 
-	static float GetSoundDuration( const char *soundname, char const *actormodel );
+	//static float GetSoundDuration( const char *soundname, char const *actormodel );
 
-	static bool	GetParametersForSound( const char *soundname, CSoundParameters &params, char const *actormodel );
-	static bool	GetParametersForSound( const char *soundname, HSOUNDSCRIPTHANDLE& handle, CSoundParameters &params, char const *actormodel );
+	//static bool	GetParametersForSound( const char *soundname, CSoundParameters &params, char const *actormodel );
+	//static bool	GetParametersForSound( const char *soundname, HSOUNDSCRIPTHANDLE& handle, CSoundParameters &params, char const *actormodel );
 
-	static void EmitSound( IRecipientFilter& filter, int iEntIndex, const char *soundname, const Vector *pOrigin = NULL, float soundtime = 0.0f, float *duration = NULL );
-	static void EmitSound( IRecipientFilter& filter, int iEntIndex, const char *soundname, HSOUNDSCRIPTHANDLE& handle, const Vector *pOrigin = NULL, float soundtime = 0.0f, float *duration = NULL );
-	static void StopSound( int iEntIndex, const char *soundname );
-	static soundlevel_t LookupSoundLevel( const char *soundname );
-	static soundlevel_t LookupSoundLevel( const char *soundname, HSOUNDSCRIPTHANDLE& handle );
+	//static void EmitSound( IRecipientFilter& filter, int iEntIndex, const char *soundname, const Vector *pOrigin = NULL, float soundtime = 0.0f, float *duration = NULL );
+	//static void EmitSound( IRecipientFilter& filter, int iEntIndex, const char *soundname, HSOUNDSCRIPTHANDLE& handle, const Vector *pOrigin = NULL, float soundtime = 0.0f, float *duration = NULL );
+	//static void StopSound( int iEntIndex, const char *soundname );
+	//static soundlevel_t LookupSoundLevel( const char *soundname );
+	//static soundlevel_t LookupSoundLevel( const char *soundname, HSOUNDSCRIPTHANDLE& handle );
 
-	static void EmitSound( IRecipientFilter& filter, int iEntIndex, const EmitSound_t & params );
-	static void EmitSound( IRecipientFilter& filter, int iEntIndex, const EmitSound_t & params, HSOUNDSCRIPTHANDLE& handle );
+	//static void EmitSound( IRecipientFilter& filter, int iEntIndex, const EmitSound_t & params );
+	//static void EmitSound( IRecipientFilter& filter, int iEntIndex, const EmitSound_t & params, HSOUNDSCRIPTHANDLE& handle );
 
-	static void StopSound( int iEntIndex, int iChannel, const char *pSample );
+	//static void StopSound( int iEntIndex, int iChannel, const char *pSample );
 
-	static void EmitAmbientSound( int entindex, const Vector& origin, const char *soundname, int flags = 0, float soundtime = 0.0f, float *duration = NULL );
+	//static void EmitAmbientSound( int entindex, const Vector& origin, const char *soundname, int flags = 0, float soundtime = 0.0f, float *duration = NULL );
 
 	// These files need to be listed in scripts/game_sounds_manifest.txt
-	static HSOUNDSCRIPTHANDLE PrecacheScriptSound( const char *soundname );
-	static void PrefetchScriptSound( const char *soundname );
+	//static HSOUNDSCRIPTHANDLE PrecacheScriptSound( const char *soundname );
+	//static void PrefetchScriptSound( const char *soundname );
 
 	// For each client who appears to be a valid recipient, checks the client has disabled CC and if so, removes them from 
 	//  the recipient list.
 	static void RemoveRecipientsIfNotCloseCaptioning( CRecipientFilter& filter );
-	static void EmitCloseCaption( IRecipientFilter& filter, int entindex, char const *token, CUtlVector< Vector >& soundorigins, float duration, bool warnifmissing = false );
+	//static void EmitCloseCaption( IRecipientFilter& filter, int entindex, char const *token, CUtlVector< Vector >& soundorigins, float duration, bool warnifmissing = false );
 	static void	EmitSentenceByIndex( IRecipientFilter& filter, int iEntIndex, int iChannel, int iSentenceIndex, 
 		float flVolume, soundlevel_t iSoundlevel, int iFlags = 0, int iPitch = PITCH_NORM,
 		const Vector *pOrigin = NULL, const Vector *pDirection = NULL, bool bUpdatePositions = true, float soundtime = 0.0f );
 
-	static bool IsPrecacheAllowed();
-	static void SetAllowPrecache( bool allow );
+	//static bool IsPrecacheAllowed();
+	//static void SetAllowPrecache( bool allow );
 
-	static bool m_bAllowPrecache;
+	//static bool m_bAllowPrecache;
 
 	static bool IsSimulatingOnAlternateTicks();
 
@@ -1938,8 +1941,8 @@ public:
 public:
 	void							SetSize( const Vector &vecMin, const Vector &vecMax ); // UTIL_SetSize( this, mins, maxs );
 	static int						PrecacheModel( const char *name, bool bPreload = true ); 
-	static bool						PrecacheSound( const char *name );
-	static void						PrefetchSound( const char *name );
+	//static bool						PrecacheSound( const char *name );
+	//static void						PrefetchSound( const char *name );
 	void							Remove( ); // UTIL_Remove( this );
 
 private:

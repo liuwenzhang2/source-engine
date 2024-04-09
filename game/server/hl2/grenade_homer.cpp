@@ -97,10 +97,10 @@ void CGrenadeHomer::Precache( void )
 {
 	m_spriteTexture = PrecacheModel( "sprites/lgtning.vmt" );
 
-	PrecacheScriptSound( "GrenadeHomer.StopSounds" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeHomer.StopSounds" );
 	if ( NULL_STRING != m_sFlySound )
 	{
-		PrecacheScriptSound( STRING(m_sFlySound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_sFlySound) );
 	}
 
 }
@@ -378,7 +378,7 @@ void CGrenadeHomer::Detonate(void)
 {
 	StopRocketTrail();
 
-	StopSound(entindex(), CHAN_BODY, STRING(m_sFlySound));
+	g_pSoundEmitterSystem->StopSound(entindex(), CHAN_BODY, STRING(m_sFlySound));
 
 	m_takedamage	= DAMAGE_NO;	
 
@@ -458,7 +458,7 @@ void CGrenadeHomer::Detonate(void)
 
 	RadiusDamage ( CTakeDamageInfo( this, GetOwnerEntity(), m_flDamage, DMG_BLAST ), GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
 	CPASAttenuationFilter filter2( this, "GrenadeHomer.StopSounds" );
-	EmitSound( filter2, entindex(), "GrenadeHomer.StopSounds" );
+	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "GrenadeHomer.StopSounds" );
 	UTIL_Remove( this );
 }
 
@@ -480,7 +480,7 @@ void CGrenadeHomer::PlayFlySound(void)
 		ep.m_SoundLevel = SNDLVL_NORM;
 		ep.m_nPitch = 100;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 
 		m_flNextFlySoundTime	= gpGlobals->curtime + 1.0;
 	}

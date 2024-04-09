@@ -177,7 +177,7 @@ void ImpactCallback( const CEffectData &data )
 		if( random->RandomInt(1,10) <= 3 && (iDamageType == DMG_BULLET) )
 		{
 			CLocalPlayerFilter filter;
-			C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, "Bounce.Shrapnel", &vecOrigin );
+			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, "Bounce.Shrapnel", &vecOrigin );//C_BaseEntity::
 		}
 	}
 }

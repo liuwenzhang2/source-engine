@@ -50,7 +50,7 @@ void CItemDefuser::Precache( void )
 {
 	PrecacheModel( "models/weapons/w_defuser.mdl" );
 
-	PrecacheScriptSound( "BaseCombatCharacter.ItemPickup2" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseCombatCharacter.ItemPickup2" );
 }
 
 void CItemDefuser::ActivateThink( void )
@@ -95,7 +95,7 @@ void CItemDefuser::DefuserTouch( CBaseEntity *pOther )
 			if ( pPlayer->IsDead() == false )
 			{
 				CPASAttenuationFilter filter( pPlayer );
-				EmitSound( filter, entindex(), "BaseCombatCharacter.ItemPickup2" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BaseCombatCharacter.ItemPickup2" );
 			}
 
 			UTIL_Remove( this );

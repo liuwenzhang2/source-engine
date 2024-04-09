@@ -131,9 +131,9 @@ void CSquidSpit::Precache( void )
 {
 	m_nSquidSpitSprite = PrecacheModel("sprites/bigspit.vmt");// client side spittle.
 
-	PrecacheScriptSound( "NPC_BigMomma.SpitTouch1" );
-	PrecacheScriptSound( "NPC_BigMomma.SpitHit1" );
-	PrecacheScriptSound( "NPC_BigMomma.SpitHit2" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BigMomma.SpitTouch1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BigMomma.SpitHit1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BigMomma.SpitHit2" );
 }
 
 void CSquidSpit:: Spawn( void )
@@ -199,15 +199,15 @@ void CSquidSpit::Touch ( CBaseEntity *pOther )
 	// splat sound
 	iPitch = random->RandomFloat( 90, 110 );
 
-	EmitSound( "NPC_BigMomma.SpitTouch1" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_BigMomma.SpitTouch1" );
 
 	switch ( random->RandomInt( 0, 1 ) )
 	{
 	case 0:
-		EmitSound( "NPC_BigMomma.SpitHit1" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_BigMomma.SpitHit1" );
 		break;
 	case 1:
-		EmitSound( "NPC_BigMomma.SpitHit2" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_BigMomma.SpitHit2" );
 		break;
 	}
 
@@ -287,13 +287,13 @@ void CNPC_Bullsquid::Precache()
 	
 	PrecacheModel("sprites/bigspit.vmt");// spit projectile.
 
-	PrecacheScriptSound( "Bullsquid.Idle" );
-	PrecacheScriptSound( "Bullsquid.Pain" );
-	PrecacheScriptSound( "Bullsquid.Alert" );
-	PrecacheScriptSound( "Bullsquid.Die" );
-	PrecacheScriptSound( "Bullsquid.Attack" );
-	PrecacheScriptSound( "Bullsquid.Bite" );
-	PrecacheScriptSound( "Bullsquid.Growl" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullsquid.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullsquid.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullsquid.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullsquid.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullsquid.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullsquid.Bite" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullsquid.Growl" );
 }
 
 
@@ -325,7 +325,7 @@ Class_T	CNPC_Bullsquid::Classify( void )
 void CNPC_Bullsquid::IdleSound( void )
 {
 	CPASAttenuationFilter filter( this, SQUID_ATTN_IDLE );
-	EmitSound( filter, entindex(), "Bullsquid.Idle" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Bullsquid.Idle" );
 }
 
 //=========================================================
@@ -334,7 +334,7 @@ void CNPC_Bullsquid::IdleSound( void )
 void CNPC_Bullsquid::PainSound( const CTakeDamageInfo &info )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Bullsquid.Pain" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Bullsquid.Pain" );
 }
 
 //=========================================================
@@ -343,7 +343,7 @@ void CNPC_Bullsquid::PainSound( const CTakeDamageInfo &info )
 void CNPC_Bullsquid::AlertSound( void )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Bullsquid.Alert" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Bullsquid.Alert" );
 }
 
 //=========================================================
@@ -352,7 +352,7 @@ void CNPC_Bullsquid::AlertSound( void )
 void CNPC_Bullsquid::DeathSound( const CTakeDamageInfo &info )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Bullsquid.Die" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Bullsquid.Die" );
 }
 
 //=========================================================
@@ -361,7 +361,7 @@ void CNPC_Bullsquid::DeathSound( const CTakeDamageInfo &info )
 void CNPC_Bullsquid::AttackSound( void )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Bullsquid.Attack" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Bullsquid.Attack" );
 }
 
 //=========================================================
@@ -489,7 +489,7 @@ void CNPC_Bullsquid::HandleAnimEvent( animevent_t *pEvent )
 				{
 					// croonchy bite sound
 					CPASAttenuationFilter filter( this );
-					EmitSound( filter, entindex(), "Bullsquid.Bite" );	
+					g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Bullsquid.Bite" );
 
 					// screeshake transforms the viewmodel as well as the viewangle. No problems with seeing the ends of the viewmodels.
 					UTIL_ScreenShake( pHurt->GetAbsOrigin(), 25.0, 1.5, 0.7, 2, SHAKE_START );
@@ -908,7 +908,7 @@ void CNPC_Bullsquid::StartTask ( const Task_t *pTask )
 	case TASK_MELEE_ATTACK2:
 		{
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "Bullsquid.Growl" );		
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Bullsquid.Growl" );
 			BaseClass::StartTask ( pTask );
 			break;
 		}

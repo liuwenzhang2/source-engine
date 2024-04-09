@@ -422,15 +422,15 @@ void CDODPlayer::Precache()
 
 	UTIL_PrecacheOther( "dod_ammo_box" );
 
-	PrecacheScriptSound( "Player.FlashlightOn" );
-	PrecacheScriptSound( "Player.FlashlightOff" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.FlashlightOn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.FlashlightOff" );
 
-	PrecacheScriptSound( "Player.FreezeCam" );
-	PrecacheScriptSound( "Camera.SnapShot" );
-	PrecacheScriptSound( "Achievement.Earned" );
-	PrecacheScriptSound( "Game.Revenge" );
-	PrecacheScriptSound( "Game.Domination" );
-	PrecacheScriptSound( "Game.Nemesis" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.FreezeCam" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Camera.SnapShot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Achievement.Earned" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Game.Revenge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Game.Domination" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Game.Nemesis" );
 
 	PrecacheModel ( "sprites/glow01.vmt" );
 
@@ -524,7 +524,7 @@ void CDODPlayer::Spawn()
 	// update this counter, used to not interp players when they spawn
 	m_bSpawnInterpCounter = !m_bSpawnInterpCounter;
 
-	EmitSound( "Player.Spawn" );
+	g_pSoundEmitterSystem->EmitSound(this, "Player.Spawn" );
 
 	SetContextThink( &CDODPlayer::PushawayThink, gpGlobals->curtime + PUSHAWAY_THINK_INTERVAL, DOD_PUSHAWAY_THINK_CONTEXT );
 
@@ -778,7 +778,7 @@ void CDODPlayer::Event_Killed( const CTakeDamageInfo &info )
 
 	// stop any voice command or pain sounds that we may be making
 	CPASFilter filter( WorldSpaceCenter() );
-	EmitSound( filter, entindex(), "Voice.StopSounds" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Voice.StopSounds" );
 
 	ResetBleeding();
 
@@ -1034,7 +1034,7 @@ void CDODPlayer::FlashlightTurnOn( void )
 	if( flashlight.GetInt() > 0 && IsAlive() )
 	{
 		AddEffects( EF_DIMLIGHT );
-		EmitSound( "Player.FlashlightOn" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.FlashlightOn" );
 	}
 }
 
@@ -1048,7 +1048,7 @@ void CDODPlayer::FlashlightTurnOff( void )
 
 		if( m_iHealth > 0 )
 		{
-			EmitSound( "Player.FlashlightOff" );
+			g_pSoundEmitterSystem->EmitSound(this, "Player.FlashlightOff" );
 		}
 	}	
 }
@@ -1124,7 +1124,7 @@ void CDODPlayer::VoiceCommand( int iVoiceCommand )
 	char szSound[128];
 	Q_snprintf( szSound, sizeof(szSound), "Voice.%s_%s", pszCountry, g_VoiceCommands[iVoiceCommand].pszSoundName );
 
-	EmitSound( filter, entindex(), szSound );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), szSound );
 
 	// Don't show the subtitle to the other team
 	int oppositeTeam = ( GetTeamNumber() == TEAM_ALLIES ) ? TEAM_AXIS : TEAM_ALLIES;
@@ -1235,7 +1235,7 @@ void CDODPlayer::ReturnGenericAmmo( void )
 {
 	//play pickup sound
 	CPASFilter filter( WorldSpaceCenter() );
-	EmitSound( filter, entindex(), "BaseCombatCharacter.AmmoPickup" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BaseCombatCharacter.AmmoPickup" );
 
 	//allow them to drop generic ammo again
 	m_bHasGenericAmmo = true;
@@ -1260,7 +1260,7 @@ bool CDODPlayer::GiveGenericAmmo( void )
 
 			//play pickup sound
 			CPASFilter filter( WorldSpaceCenter() );
-			EmitSound( filter, entindex(), "BaseCombatCharacter.AmmoPickup" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BaseCombatCharacter.AmmoPickup" );
 
 			return true;
 		}
@@ -2637,7 +2637,7 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 				EmitSound_t params;
 				params.m_flSoundTime = 0;
 				params.m_pSoundName = "Player.FreezeCam";
-				EmitSound( filter, entindex(), params );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), params );
 
 				m_bPlayedFreezeCamSound = true;
 			}
@@ -3415,15 +3415,15 @@ void CDODPlayer::Pain( void )
 {
 	if ( m_LastDamageType & DMG_CLUB)
 	{
-		EmitSound( "Player.MajorPain" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.MajorPain" );
 	}
 	else if ( m_LastDamageType & DMG_BLAST )
 	{
-		EmitSound( "Player.MajorPain" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.MajorPain" );
 	}
 	else
 	{
-		EmitSound( "Player.MinorPain" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.MinorPain" );
 	}
 }
 
@@ -3431,19 +3431,19 @@ void CDODPlayer::DeathSound( const CTakeDamageInfo &info )
 {
 	if ( m_LastDamageType & DMG_CLUB )
 	{
-		EmitSound( "Player.MegaPain" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.MegaPain" );
 	}
 	else if ( m_LastDamageType & DMG_BLAST )
 	{
-		EmitSound( "Player.MegaPain" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.MegaPain" );
 	}
 	else if ( m_LastHitGroup == HITGROUP_HEAD )	
 	{
-		EmitSound( "Player.DeathHeadShot" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.DeathHeadShot" );
 	}
 	else
 	{
-		EmitSound( "Player.MinorPain" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.MinorPain" );
 	}
 }
 
@@ -4468,13 +4468,13 @@ void CDODPlayer::SetDefusing( CDODBombTarget *pTarget )
 	if ( bIsDefusing && !m_bIsDefusing )
 	{
 		// start defuse sound
-		EmitSound( "Weapon_C4.Disarm" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_C4.Disarm" );
 		m_Shared.SetDefusing( true );
 	}
 	else if ( !bIsDefusing && m_bIsDefusing )
 	{
 		// stop defuse sound
-		StopSound( "Weapon_C4.Disarm" );
+		g_pSoundEmitterSystem->StopSound(this, "Weapon_C4.Disarm" );
 		m_Shared.SetDefusing( false );
 	}
 
@@ -4490,13 +4490,13 @@ void CDODPlayer::SetPlanting( CDODBombTarget *pTarget )
 	if ( bIsPlanting && !m_bIsPlanting )
 	{
 		// start defuse sound
-		EmitSound( "Weapon_C4.Plant" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_C4.Plant" );
 		m_Shared.SetPlanting( true );
 	}
 	else if ( !bIsPlanting && m_bIsPlanting )
 	{
 		// stop defuse sound
-		StopSound( "Weapon_C4.Plant" );
+		g_pSoundEmitterSystem->StopSound(this, "Weapon_C4.Plant" );
 		m_Shared.SetPlanting( false );
 	}
 
@@ -4632,7 +4632,7 @@ void CDODPlayer::HandleComboWeaponKill( int iWeaponType )
 
 void CDODPlayer::PlayUseDenySound()
 {
-	EmitSound( "Player.UseDeny" );
+	g_pSoundEmitterSystem->EmitSound(this, "Player.UseDeny" );
 }
 
 //-----------------------------------------------------------------------------

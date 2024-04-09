@@ -702,7 +702,7 @@ void CBasePlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, flo
 		// Give child classes an opportunity to override.
 		pSoundName = GetOverrideStepSound( pSoundName );
 
-		if ( !CBaseEntity::GetParametersForSound( pSoundName, params, NULL ) )
+		if ( !g_pSoundEmitterSystem->GetParametersForSound( pSoundName, params, NULL ) )//CBaseEntity::
 			return;
 
 		// Only cache if there's one option.  Otherwise we'd never here any other sounds
@@ -744,7 +744,7 @@ void CBasePlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, flo
 	ep.m_nPitch = params.pitch;
 	ep.m_pOrigin = &vecOrigin;
 
-	EmitSound( filter, entindex(), ep );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 
 	// Kyle says: ugggh. This function may as well be called "PerformPileOfDesperateGameSpecificFootstepHacks".
 	OnEmitFootstepSound( params, vecOrigin, fvol );
@@ -1352,7 +1352,7 @@ void CBasePlayer::PlayerUse ( void )
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
 					m_iTrain = TrainSpeed(pTrain->m_flSpeed, ((CFuncTrackTrain*)pTrain)->GetMaxSpeed());
 					m_iTrain |= TRAIN_NEW;
-					EmitSound( "Player.UseTrain" );
+					g_pSoundEmitterSystem->EmitSound(this, "Player.UseTrain" );
 					return;
 				}
 			}
@@ -2003,7 +2003,7 @@ void CBasePlayer::UpdateUnderwaterState( void )
 #ifndef CLIENT_DLL
 			if ( m_iHealth > 0 && IsAlive() )
 			{
-				EmitSound( "Player.Wade" );
+				g_pSoundEmitterSystem->EmitSound(this, "Player.Wade" );
 			}
 #endif
 			RemoveFlag( FL_INWATER );
@@ -2015,7 +2015,7 @@ void CBasePlayer::UpdateUnderwaterState( void )
 		// player enter water sound
 		if (GetWaterType() == CONTENTS_WATER)
 		{
-			EmitSound( "Player.Wade" );
+			g_pSoundEmitterSystem->EmitSound(this, "Player.Wade" );
 		}
 #endif
 
@@ -2042,9 +2042,9 @@ void CBasePlayer::SetPlayerUnderwater( bool state )
 
 #ifdef CLIENT_DLL
 		if ( state )
-			EmitSound( "Player.AmbientUnderWater" );
+			g_pSoundEmitterSystem->EmitSound(this, "Player.AmbientUnderWater" );
 		else
-			StopSound( "Player.AmbientUnderWater" );		
+			g_pSoundEmitterSystem->StopSound(this, "Player.AmbientUnderWater" );
 #endif
 	}
 }

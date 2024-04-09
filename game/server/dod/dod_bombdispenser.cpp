@@ -98,7 +98,7 @@ void CDODBombDispenser::Touch( CBaseEntity *pOther )
 				pPlayer->GiveNamedItem( "weapon_basebomb" );
 
 				CPASFilter filter( pPlayer->WorldSpaceCenter() );
-				pPlayer->EmitSound( filter, pPlayer->entindex(), "Weapon_C4.PickUp" );
+				g_pSoundEmitterSystem->EmitSound( filter, pPlayer->entindex(), "Weapon_C4.PickUp" );//pPlayer->
 			}
 		}
 		break;

@@ -186,12 +186,12 @@ void CPropTelescopicArm::Precache( void )
 	BaseClass::Precache();
 
 	PrecacheModel( STRING( GetModelName() ) );
-	PrecacheScriptSound( "coast.thumper_hit" );
-	PrecacheScriptSound( "coast.thumper_ambient" );
-	PrecacheScriptSound( "coast.thumper_dust" );
-	PrecacheScriptSound( "coast.thumper_startup" );
-	PrecacheScriptSound( "coast.thumper_shutdown" );
-	PrecacheScriptSound( "coast.thumper_large_hit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_hit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_ambient" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_dust" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_startup" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_shutdown" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_large_hit" );
 }
 
 void CPropTelescopicArm::Activate( void )
@@ -434,7 +434,7 @@ void CPropTelescopicArm::InputDisable( inputdata_t &inputdata )
 	{
 		m_bEnabled = false;
 		
-		EmitSound( "coast.thumper_shutdown" );
+		g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_shutdown" );
 
 		CPoseController *pPoseController;
 
@@ -470,7 +470,7 @@ void CPropTelescopicArm::InputEnable( inputdata_t &inputdata )
 	{
 		m_bEnabled = true;
 
-		EmitSound( "coast.thumper_startup" );
+		g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_startup" );
 
 		CPoseController *pPoseController;
 		pPoseController = static_cast<CPoseController*>( m_hTelescopicPoseController.Get() );

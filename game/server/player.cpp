@@ -825,11 +825,11 @@ void CBasePlayer::DeathSound( const CTakeDamageInfo &info )
 	if ( m_bitsDamageType & DMG_FALL )
 	{
 		// They died in the fall. Play a splat sound.
-		EmitSound( "Player.FallGib" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.FallGib" );
 	}
 	else
 	{
-		EmitSound( "Player.Death" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.Death" );
 	}
 
 	// play one of the suit death alarms
@@ -997,16 +997,16 @@ void CBasePlayer::DamageEffect(float flDamage, int fDamageType)
 		//ViewPunch(QAngle(random->RandomInt(-0.1,0.1), random->RandomInt(-0.1,0.1), random->RandomInt(-0.1,0.1)));
 
 		// Burn sound 
-		EmitSound( "Player.PlasmaDamage" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.PlasmaDamage" );
 	}
 	else if (fDamageType & DMG_SONIC)
 	{
 		// Sonic damage sound 
-		EmitSound( "Player.SonicDamage" );
+		g_pSoundEmitterSystem->EmitSound(this, "Player.SonicDamage" );
 	}
 	else if ( fDamageType & DMG_BULLET )
 	{
-		EmitSound( "Flesh.BulletImpact" );
+		g_pSoundEmitterSystem->EmitSound(this, "Flesh.BulletImpact" );
 	}
 }
 
@@ -1949,7 +1949,7 @@ void CBasePlayer::WaterMove()
 		
 		if (m_AirFinished < gpGlobals->curtime)
 		{
-			EmitSound( "Player.DrownStart" );
+			g_pSoundEmitterSystem->EmitSound(this, "Player.DrownStart" );
 		}
 
 		m_AirFinished = gpGlobals->curtime + AIRTIME;
@@ -5070,14 +5070,14 @@ void CBasePlayer::Precache( void )
 	BaseClass::Precache();
 
 
-	PrecacheScriptSound( "Player.FallGib" );
-	PrecacheScriptSound( "Player.Death" );
-	PrecacheScriptSound( "Player.PlasmaDamage" );
-	PrecacheScriptSound( "Player.SonicDamage" );
-	PrecacheScriptSound( "Player.DrownStart" );
-	PrecacheScriptSound( "Player.DrownContinue" );
-	PrecacheScriptSound( "Player.Wade" );
-	PrecacheScriptSound( "Player.AmbientUnderWater" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.FallGib" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.Death" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.PlasmaDamage" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.SonicDamage" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.DrownStart" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.DrownContinue" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.Wade" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.AmbientUnderWater" );
 	enginesound->PrecacheSentenceGroup( "HEV" );
 
 	// These are always needed
@@ -5592,14 +5592,14 @@ void CSprayCan::Spawn ( CBasePlayer *pOwner )
 	SetLocalAngles( pOwner->EyeAngles() );
 	SetOwnerEntity( pOwner );
 	SetNextThink( gpGlobals->curtime );
-	EmitSound( "SprayCan.Paint" );
+	g_pSoundEmitterSystem->EmitSound(this, "SprayCan.Paint" );
 }
 
 void CSprayCan::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "SprayCan.Paint" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "SprayCan.Paint" );
 }
 
 void CSprayCan::Think( void )

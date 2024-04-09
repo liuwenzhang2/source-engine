@@ -148,12 +148,12 @@ void CPropThumper::Precache( void )
 	BaseClass::Precache();
 
 	PrecacheModel( STRING( GetModelName() ) );
-	PrecacheScriptSound( "coast.thumper_hit" );
-	PrecacheScriptSound( "coast.thumper_ambient" );
-	PrecacheScriptSound( "coast.thumper_dust" );
-	PrecacheScriptSound( "coast.thumper_startup" );
-	PrecacheScriptSound( "coast.thumper_shutdown" );
-	PrecacheScriptSound( "coast.thumper_large_hit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_hit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_ambient" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_dust" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_startup" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_shutdown" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_large_hit" );
 }
 
 void CPropThumper::InitMotorSound( void )
@@ -209,7 +209,7 @@ void CPropThumper::Thump ( void )
 		UTIL_ScreenShake( vOrigin, 10.0 * m_flPlaybackRate, m_flPlaybackRate, m_flPlaybackRate / 2, THUMPER_RADIUS * m_flPlaybackRate, SHAKE_START, false );
 	}
 
-	EmitSound( "coast.thumper_dust" );
+	g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_dust" );
 	CSoundEnt::InsertSound ( SOUND_THUMPER, GetAbsOrigin(), THUMPER_RADIUS * m_flPlaybackRate, THUMPER_SOUND_DURATION, this );
 
 	if ( thumper_show_radius.GetBool() )
@@ -222,9 +222,9 @@ void CPropThumper::Thump ( void )
 		 return;
 
 	if( m_iDustScale == THUMPER_MIN_SCALE )
-		 EmitSound( "coast.thumper_hit" );
+		g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_hit" );
 	else
-		 EmitSound( "coast.thumper_large_hit" );
+		g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_large_hit" );
 
 	// Signal that we've thumped
 	m_OnThumped.FireOutput( this, this );
@@ -260,7 +260,7 @@ void CPropThumper::InputDisable( inputdata_t &inputdata )
 {
 	m_bEnabled = false;
 	
-	EmitSound( "coast.thumper_shutdown" );
+	g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_shutdown" );
 	
 	if ( m_hRepellantEnt )
 	{
@@ -273,7 +273,7 @@ void CPropThumper::InputEnable( inputdata_t &inputdata )
 {
 	m_bEnabled = true;
 
-	EmitSound( "coast.thumper_startup" );
+	g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_startup" );
 
 	if ( m_hRepellantEnt )
 	{

@@ -808,7 +808,7 @@ void CBaseHudChat::MsgFunc_SayText( bf_read &msg )
 	}
 
 	CLocalPlayerFilter filter;
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );//C_BaseEntity::
 
 	Msg( "%s", szString );
 }
@@ -866,7 +866,7 @@ void CBaseHudChat::MsgFunc_SayText2( bf_read &msg )
 		Msg( "%s\n", RemoveColorMarkup(ansiString) );
 
 		CLocalPlayerFilter filter;
-		C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
+		g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );//C_BaseEntity::
 	}
 	else
 	{

@@ -819,7 +819,7 @@ void CSceneEntity::UpdateOnRemove( void )
 //-----------------------------------------------------------------------------
 CChoreoScene *CSceneEntity::GenerateSceneForSound( CBaseFlex *pFlexActor, const char *soundname )
 {
-	float duration = CBaseEntity::GetSoundDuration( soundname, pFlexActor ? STRING( pFlexActor->GetModelName() ) : NULL );
+	float duration = g_pSoundEmitterSystem->GetSoundDuration( soundname, pFlexActor ? STRING( pFlexActor->GetModelName() ) : NULL );//CBaseEntity::
 	if( duration <= 0.0f )
 	{
 		Warning( "CSceneEntity::GenerateSceneForSound:  Couldn't determine duration of %s\n", soundname );
@@ -941,7 +941,7 @@ void CSceneEntity::PrecacheScene( CChoreoScene *scene )
 				// Defined in SoundEmitterSystem.cpp
 				// NOTE:  The script entries associated with .vcds are forced to preload to avoid
 				//  loading hitches during triggering
-				PrecacheScriptSound( event->GetParameters() );
+				g_pSoundEmitterSystem->PrecacheScriptSound( event->GetParameters() );
 
 				if ( event->GetCloseCaptionType() == CChoreoEvent::CC_MASTER && 
 					 event->GetNumSlaves() > 0 )
@@ -949,7 +949,7 @@ void CSceneEntity::PrecacheScene( CChoreoScene *scene )
 					char tok[ CChoreoEvent::MAX_CCTOKEN_STRING ];
 					if ( event->GetPlaybackCloseCaptionToken( tok, sizeof( tok ) ) )
 					{
-						PrecacheScriptSound( tok );
+						g_pSoundEmitterSystem->PrecacheScriptSound( tok );
 					}
 				}
 			}
@@ -1779,7 +1779,7 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 				es.m_nFlags |= SND_CHANGE_PITCH;
 			}
 
-			EmitSound( filter2, actor->entindex(), es );
+			g_pSoundEmitterSystem->EmitSound( filter2, actor->entindex(), es );
 			actor->AddSceneEvent( scene, event );
 		}
 	
@@ -2581,7 +2581,7 @@ void CSceneEntity::PrefetchSpeakEventSounds( CUtlSymbolTable& table, CUtlRBTree<
 
 		// Warning( "Prefetch %s\n", soundname );
 
-		PrefetchScriptSound( soundname );  
+		g_pSoundEmitterSystem->PrefetchScriptSound( soundname );
 	}
 }
 
@@ -2753,7 +2753,7 @@ void CSceneEntity::PitchShiftPlayback( float fPitch )
 			params.m_pSoundName = szBuff;
 			params.m_nPitch = 100.0f * fPitch;
 			params.m_nFlags = SND_CHANGE_PITCH;
-			pTestActor->EmitSound( filter, pTestActor->entindex(), params );
+			g_pSoundEmitterSystem->EmitSound( filter, pTestActor->entindex(), params );//pTestActor->
 		}
 	}
 }
@@ -4491,7 +4491,7 @@ float InstancedScriptedScene( CBaseFlex *pActor, const char *pszScene, EHANDLE *
 	// This code expands any $gender tags into male or female tags based on the gender of the actor (based on his/her .mdl)
 	if ( pActor )
 	{
-		pActor->GenderExpandString( pszScene, pScene->m_szInstanceFilename, sizeof( pScene->m_szInstanceFilename ) );
+		g_pSoundEmitterSystem->GenderExpandString(pActor, pszScene, pScene->m_szInstanceFilename, sizeof( pScene->m_szInstanceFilename ) );//pActor->
 	}
 	else
 	{
@@ -4657,7 +4657,7 @@ void PrecacheInstancedScene( char const *pszScene )
 		for ( int i = 0; i < sceneData.numSounds; ++i )
 		{
 			short stringId = scenefilecache->GetSceneCachedSound( sceneData.sceneId, i );
-			CBaseEntity::PrecacheScriptSound( scenefilecache->GetSceneString( stringId ) );
+			g_pSoundEmitterSystem->PrecacheScriptSound( scenefilecache->GetSceneString( stringId ) );
 		}
 	}
 
@@ -4973,7 +4973,7 @@ void CSceneManager::OnClientActive( CBasePlayer *player )
 		es.m_SoundLevel = sound->soundlevel;
 		es.m_flSoundTime = gpGlobals->curtime - sound->time_in_past;
 
-		EmitSound( filter, sound->actor->entindex(), es );
+		g_pSoundEmitterSystem->EmitSound( filter, sound->actor->entindex(), es );
 	}
 
 	m_QueuedSceneSounds.RemoveAll();

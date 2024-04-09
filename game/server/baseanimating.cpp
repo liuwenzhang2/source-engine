@@ -1142,7 +1142,7 @@ void CBaseAnimating::HandleAnimEvent( animevent_t *pEvent )
 	{
 		if ( pEvent->event == AE_SV_PLAYSOUND )
 		{
-			EmitSound( pEvent->options );
+			g_pSoundEmitterSystem->EmitSound(this, pEvent->options );
 			return;
 		}
 		else if ( pEvent->event == AE_RAGDOLL )

@@ -71,11 +71,11 @@ void CNPC_GroundTurret::Precache( void )
 	PrecacheModel( GROUNDTURRET_BEAM_SPRITE );
 	PrecacheModel( "models/combine_turrets/ground_turret.mdl" );
 
-	PrecacheScriptSound( "NPC_CeilingTurret.Deploy" );
-	m_ShotSounds = PrecacheScriptSound( "NPC_FloorTurret.ShotSounds" );
-	PrecacheScriptSound( "NPC_FloorTurret.Die" );
-	PrecacheScriptSound( "NPC_FloorTurret.Ping" );
-	PrecacheScriptSound( "DoSpark" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CeilingTurret.Deploy" );
+	m_ShotSounds = g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FloorTurret.ShotSounds" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FloorTurret.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FloorTurret.Ping" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "DoSpark" );
 
 	BaseClass::Precache();
 }
@@ -277,7 +277,7 @@ void CNPC_GroundTurret::DeathEffects()
 	else
 	{
 		// Sparks
-		EmitSound( "DoSpark" );
+		g_pSoundEmitterSystem->EmitSound(this, "DoSpark" );
 		m_iDeathSparks--;
 
 		if( m_iDeathSparks == 0 )
@@ -294,7 +294,7 @@ void CNPC_GroundTurret::DeathEffects()
 //---------------------------------------------------------
 void CNPC_GroundTurret::DeathSound( const CTakeDamageInfo &info )
 {
-	EmitSound("NPC_FloorTurret.Die");
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Die");
 }
 
 //---------------------------------------------------------
@@ -553,7 +553,7 @@ void CNPC_GroundTurret::Shoot()
 	data.m_fFlags = MUZZLEFLASH_COMBINE;
 	DispatchEffect( "MuzzleFlash", data );
 
-	EmitSound( "NPC_FloorTurret.ShotSounds", m_ShotSounds );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.ShotSounds", m_ShotSounds );
 
 	if( IsX360() )
 	{
@@ -618,7 +618,7 @@ void CNPC_GroundTurret::Scan()
 
 	if( gpGlobals->curtime >= m_flTimeNextPing )
 	{
-		EmitSound( "NPC_FloorTurret.Ping" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Ping" );
 		m_flTimeNextPing = gpGlobals->curtime + 1.0f;
 	}
 

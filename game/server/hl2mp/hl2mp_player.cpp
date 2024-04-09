@@ -152,9 +152,9 @@ void CHL2MP_Player::Precache( void )
 
 	PrecacheFootStepSounds();
 
-	PrecacheScriptSound( "NPC_MetroPolice.Die" );
-	PrecacheScriptSound( "NPC_CombineS.Die" );
-	PrecacheScriptSound( "NPC_Citizen.die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_MetroPolice.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineS.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.die" );
 }
 
 void CHL2MP_Player::GiveAllItems( void )
@@ -1164,7 +1164,7 @@ void CHL2MP_Player::FlashlightTurnOn( void )
 	if( flashlight.GetInt() > 0 && IsAlive() )
 	{
 		AddEffects( EF_DIMLIGHT );
-		EmitSound( "HL2Player.FlashlightOn" );
+		g_pSoundEmitterSystem->EmitSound(this, "HL2Player.FlashlightOn" );
 	}
 }
 
@@ -1177,7 +1177,7 @@ void CHL2MP_Player::FlashlightTurnOff( void )
 	
 	if( IsAlive() )
 	{
-		EmitSound( "HL2Player.FlashlightOff" );
+		g_pSoundEmitterSystem->EmitSound(this, "HL2Player.FlashlightOff" );
 	}
 }
 
@@ -1216,7 +1216,7 @@ void CHL2MP_Player::DetonateTripmines( void )
 	}
 
 	// Play sound for pressing the detonator
-	EmitSound( "Weapon_SLAM.SatchelDetonate" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_SLAM.SatchelDetonate" );
 }
 
 void CHL2MP_Player::Event_Killed( const CTakeDamageInfo &info )
@@ -1290,7 +1290,7 @@ void CHL2MP_Player::DeathSound( const CTakeDamageInfo &info )
 	const char *pModelName = STRING( GetModelName() );
 
 	CSoundParameters params;
-	if ( GetParametersForSound( szStepSound, params, pModelName ) == false )
+	if (g_pSoundEmitterSystem->GetParametersForSound( szStepSound, params, pModelName ) == false )
 		return;
 
 	Vector vecOrigin = GetAbsOrigin();
@@ -1307,7 +1307,7 @@ void CHL2MP_Player::DeathSound( const CTakeDamageInfo &info )
 	ep.m_nPitch = params.pitch;
 	ep.m_pOrigin = &vecOrigin;
 
-	EmitSound( filter, entindex(), ep );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 }
 
 CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )

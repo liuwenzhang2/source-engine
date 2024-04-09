@@ -192,14 +192,14 @@ void CProp_Portal::UpdateOnRemove( void )
 
 void CProp_Portal::Precache( void )
 {
-	PrecacheScriptSound( "Portal.ambient_loop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.ambient_loop" );
 
-	PrecacheScriptSound( "Portal.open_blue" );
-	PrecacheScriptSound( "Portal.open_red" );
-	PrecacheScriptSound( "Portal.close_blue" );
-	PrecacheScriptSound( "Portal.close_red" );
-	PrecacheScriptSound( "Portal.fizzle_moved" );
-	PrecacheScriptSound( "Portal.fizzle_invalid_surface" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.open_blue" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.open_red" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.close_blue" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.close_red" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.fizzle_moved" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.fizzle_invalid_surface" );
 
 	PrecacheModel( "models/portals/portal1.mdl" );
 	PrecacheModel( "models/portals/portal2.mdl" );
@@ -611,7 +611,7 @@ void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
 			return;
 	}
 
-	EmitSound( filter, SOUND_FROM_WORLD, ep );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );
 }
 
 //-----------------------------------------------------------------------------
@@ -2126,11 +2126,11 @@ void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles )
 
 	if ( m_bIsPortal2 )
 	{
-		EmitSound( "Portal.open_red" );
+		g_pSoundEmitterSystem->EmitSound(this, "Portal.open_red" );
 	}
 	else
 	{
-		EmitSound( "Portal.open_blue" );
+		g_pSoundEmitterSystem->EmitSound(this, "Portal.open_blue" );
 	}
 }
 
@@ -2179,11 +2179,11 @@ void CProp_Portal::InputSetActivatedState( inputdata_t &inputdata )
 
 			if ( m_bIsPortal2 )
 			{
-				EmitSound( "Portal.open_red" );
+				g_pSoundEmitterSystem->EmitSound(this, "Portal.open_red" );
 			}
 			else
 			{
-				EmitSound( "Portal.open_blue" );
+				g_pSoundEmitterSystem->EmitSound(this, "Portal.open_blue" );
 			}
 		}
 	}

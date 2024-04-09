@@ -235,7 +235,7 @@ void CMissile::DumbFire( void )
 	SetModel("models/weapons/w_missile.mdl");
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
 
-	EmitSound( "Missile.Ignite" );
+	g_pSoundEmitterSystem->EmitSound(this, "Missile.Ignite" );
 
 	// Smoke trail.
 	CreateSmokeTrail();
@@ -259,7 +259,7 @@ void CMissile::AccelerateThink( void )
 	Vector vecForward;
 
 	// !!!UNDONE - make this work exactly the same as HL1 RPG, lest we have looping sound bugs again!
-	EmitSound( "Missile.Accelerate" );
+	g_pSoundEmitterSystem->EmitSound(this, "Missile.Accelerate" );
 
 	// SetEffects( EF_LIGHT );
 
@@ -379,7 +379,7 @@ void CMissile::Explode( void )
 		m_hOwner = NULL;
 	}
 
-	StopSound( "Missile.Ignite" );
+	g_pSoundEmitterSystem->StopSound(this, "Missile.Ignite" );
 	UTIL_Remove( this );
 }
 
@@ -444,7 +444,7 @@ void CMissile::IgniteThink( void )
 
 	Vector vecForward;
 
-	EmitSound( "Missile.Ignite" );
+	g_pSoundEmitterSystem->EmitSound(this, "Missile.Ignite" );
 
 	AngleVectors( GetLocalAngles(), &vecForward );
 	SetAbsVelocity( vecForward * RPG_SPEED );
@@ -1454,8 +1454,8 @@ void CWeaponRPG::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "Missile.Ignite" );
-	PrecacheScriptSound( "Missile.Accelerate" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Missile.Ignite" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Missile.Accelerate" );
 
 	// Laser dot...
 	PrecacheModel( "sprites/redglow1.vmt" );

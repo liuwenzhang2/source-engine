@@ -779,7 +779,7 @@ void C_DODPlayer::OnAchievementAchieved( int iAchievement )
 
 	if ( dod_playachievementsound.GetBool() )
 	{
-		EmitSound( "Achievement.Earned" );
+		g_pSoundEmitterSystem->EmitSound(this, "Achievement.Earned" );
 	}
 
 	BaseClass::OnAchievementAchieved( iAchievement );

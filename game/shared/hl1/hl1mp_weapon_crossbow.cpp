@@ -121,7 +121,7 @@ void CCrossbowBolt::Spawn( )
 void CCrossbowBolt::Precache( )
 {
 	PrecacheModel( BOLT_MODEL );
-	PrecacheScriptSound( "BaseGrenade.Explode" );    
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseGrenade.Explode" );
 }
 
 void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
@@ -165,7 +165,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		SetAbsVelocity( Vector( 0, 0, 0 ) );
 
 		// play body "thwack" sound
-		EmitSound( "Weapon_Crossbow.BoltHitBody" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_Crossbow.BoltHitBody" );
 
 		Vector vForward;
 
@@ -195,7 +195,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 	}
 	else
 	{
-		EmitSound( "Weapon_Crossbow.BoltHitWorld" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_Crossbow.BoltHitWorld" );
 
 		SetThink( &CCrossbowBolt::SUB_Remove );
 		SetNextThink( gpGlobals->curtime );// this will get changed below if the bolt is allowed to stick in what it hit.
@@ -252,7 +252,7 @@ void CCrossbowBolt::ExplodeThink( void )
                    'C' );                 /* materialType */
 
 	//CSoundEnt::InsertSound ( SOUND_COMBAT, GetAbsOrigin(), BASEGRENADE_EXPLOSION_VOLUME, 3.0 );
-	EmitSound( "BaseGrenade.Explode" );    
+	g_pSoundEmitterSystem->EmitSound(this, "BaseGrenade.Explode" );
 #endif
 
     
@@ -406,8 +406,8 @@ void CWeaponCrossbow::Precache( void )
 	UTIL_PrecacheOther( "crossbow_bolt" );
 #endif
 
-	PrecacheScriptSound( "Weapon_Crossbow.BoltHitBody" );
-	PrecacheScriptSound( "Weapon_Crossbow.BoltHitWorld" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Crossbow.BoltHitBody" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Crossbow.BoltHitWorld" );
 
 	BaseClass::Precache();
 }

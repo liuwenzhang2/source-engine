@@ -115,9 +115,9 @@ void CHL1_Player::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "Player.FlashlightOn" );
-	PrecacheScriptSound( "Player.FlashlightOff" );
-	PrecacheScriptSound( "Player.UseTrain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.FlashlightOn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.FlashlightOff" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.UseTrain" );
 }
 
 
@@ -1030,11 +1030,11 @@ int CHL1_Player::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	{
 		if( m_idrowndmg == m_idrownrestored )
 		{
-			EmitSound( "Player.DrownStart" );
+			g_pSoundEmitterSystem->EmitSound(this, "Player.DrownStart" );
 		}
 		else
 		{
-			EmitSound( "Player.DrownContinue" );
+			g_pSoundEmitterSystem->EmitSound(this, "Player.DrownContinue" );
 		}
 	}
 
@@ -1125,7 +1125,7 @@ void CHL1_Player::FlashlightTurnOn( void )
 	{
 		AddEffects( EF_DIMLIGHT );
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Player.FlashlightOn" );	
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Player.FlashlightOn" );
 
 		m_flFlashLightTime = FLASH_DRAIN_TIME + gpGlobals->curtime;
 	}
@@ -1138,7 +1138,7 @@ void CHL1_Player::FlashlightTurnOff( void )
 {
 	RemoveEffects( EF_DIMLIGHT );
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Player.FlashlightOff" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Player.FlashlightOff" );
 	m_flFlashLightTime = FLASH_CHARGE_TIME + gpGlobals->curtime;
 }
 

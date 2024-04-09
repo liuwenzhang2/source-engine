@@ -224,7 +224,7 @@ void CTeamControlPoint::Precache( void )
 
 		if ( m_TeamData[i].iszCapSound != NULL_STRING )
 		{
-			PrecacheScriptSound( STRING(m_TeamData[i].iszCapSound) );
+			g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_TeamData[i].iszCapSound) );
 		}
 
 		if ( m_TeamData[i].iszModel != NULL_STRING )
@@ -257,14 +257,14 @@ void CTeamControlPoint::Precache( void )
 		}
 	}
 
-	PrecacheScriptSound( STRING( m_iszCaptureStartSound ) );
-	PrecacheScriptSound( STRING( m_iszCaptureEndSound ) );
-	PrecacheScriptSound( STRING( m_iszCaptureInProgress ) );
-	PrecacheScriptSound( STRING( m_iszCaptureInterrupted ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszCaptureStartSound ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszCaptureEndSound ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszCaptureInProgress ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszCaptureInterrupted ) );
 
 	if ( m_iszWarnSound != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING( m_iszWarnSound ) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszWarnSound ) );
 	}
 
 #ifdef TF_DLL
@@ -316,7 +316,7 @@ void CTeamControlPoint::HandleScoring( int iTeam )
 #endif
 			{
 				CTeamRecipientFilter filter( iTeam );
-				EmitSound( filter, entindex(), "Hud.EndRoundScored" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Hud.EndRoundScored" );
 			}
 		}
 	}
@@ -508,7 +508,7 @@ void CTeamControlPoint::CaptureEnd( void )
 
 	if ( !FBitSet( m_spawnflags, SF_CAP_POINT_NO_CAP_SOUNDS ) )
 	{
-		EmitSound( STRING( m_iszCaptureEndSound ) );
+		g_pSoundEmitterSystem->EmitSound(this, STRING( m_iszCaptureEndSound ) );
 	}
 }
 
@@ -533,7 +533,7 @@ void CTeamControlPoint::CaptureInterrupted( bool bBlocked )
 	else
 	{
 		pSoundName = STRING( m_iszCaptureInProgress );
-		EmitSound( STRING( m_iszCaptureStartSound ) );
+		g_pSoundEmitterSystem->EmitSound(this, STRING( m_iszCaptureStartSound ) );
 	}
 
 	if ( m_pCaptureInProgressSound == NULL && pSoundName != NULL )
@@ -578,7 +578,7 @@ void CTeamControlPoint::InternalSetOwner( int iCapTeam, bool bMakeSound, int iNu
 	if ( bMakeSound )
 	{
 		CBroadcastRecipientFilter filter;
-		EmitSound( filter, entindex(), STRING( m_TeamData[m_iTeam].iszCapSound ) );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), STRING( m_TeamData[m_iTeam].iszCapSound ) );
 	}
 
 	// Update visuals

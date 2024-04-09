@@ -193,8 +193,8 @@ void CNPC_Launcher::Precache( void )
 	// This is a dummy model that is never used!
 	PrecacheModel("models/player.mdl");
 	PrecacheModel(STRING(m_sMissileModel));
-	PrecacheScriptSound( STRING(m_sLaunchSound));
-	PrecacheScriptSound( STRING(m_sFlySound));
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_sLaunchSound));
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_sFlySound));
 	
 	UTIL_PrecacheOther( "grenade_homer");
 	BaseClass::Precache();
@@ -301,7 +301,7 @@ void CNPC_Launcher::LaunchGrenade( CBaseEntity* pEnemy )
 	ep.m_pSoundName = STRING(m_sLaunchSound);
 	ep.m_SoundLevel = SNDLVL_NORM;
 
-	EmitSound( filter, entindex(), ep );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 
 	if (m_bSmokeLaunch)
 	{

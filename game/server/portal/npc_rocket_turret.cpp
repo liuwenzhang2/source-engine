@@ -347,10 +347,10 @@ void CNPC_RocketTurret::Precache( void )
 	PrecacheModel("effects/bluelaser1.vmt");
 	m_nSiteHalo = PrecacheModel("sprites/light_glow03.vmt");
 	
-	PrecacheScriptSound ( ROCKET_TURRET_SOUND_LOCKING );
-	PrecacheScriptSound ( ROCKET_TURRET_SOUND_LOCKED );
-	PrecacheScriptSound ( ROCKET_PROJECTILE_FIRE_SOUND );
-	PrecacheScriptSound ( ROCKET_PROJECTILE_LOOPING_SOUND );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( ROCKET_TURRET_SOUND_LOCKING );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( ROCKET_TURRET_SOUND_LOCKED );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( ROCKET_PROJECTILE_FIRE_SOUND );
+	g_pSoundEmitterSystem->PrecacheScriptSound ( ROCKET_PROJECTILE_LOOPING_SOUND );
 
 	UTIL_PrecacheDecal( ROCKET_TURRET_DECAL_NAME );
 	PrecacheModel( ROCKET_TURRET_MODEL_NAME );
@@ -667,9 +667,9 @@ void CNPC_RocketTurret::LockingThink( void )
     if ( m_flTimeLocking == 0.0f )
 	{
 		// Play lockon sound
-		EmitSound ( ROCKET_TURRET_SOUND_LOCKING );
-		EmitSound ( ROCKET_TURRET_SOUND_LOCKING, gpGlobals->curtime + ROCKET_TURRET_QUARTER_LOCKON_TIME );
-		EmitSound ( ROCKET_TURRET_SOUND_LOCKED, gpGlobals->curtime + ROCKET_TURRET_HALF_LOCKON_TIME );
+		g_pSoundEmitterSystem->EmitSound (this, ROCKET_TURRET_SOUND_LOCKING );
+		g_pSoundEmitterSystem->EmitSound (this, ROCKET_TURRET_SOUND_LOCKING, gpGlobals->curtime + ROCKET_TURRET_QUARTER_LOCKON_TIME );
+		g_pSoundEmitterSystem->EmitSound (this, ROCKET_TURRET_SOUND_LOCKED, gpGlobals->curtime + ROCKET_TURRET_HALF_LOCKON_TIME );
 
 		ResetSequence(LookupSequence("load"));
 
@@ -738,7 +738,7 @@ void CNPC_RocketTurret::FireRocket ( void )
 
 	m_flTimeLastFired = gpGlobals->curtime;
 
-	EmitSound ( ROCKET_PROJECTILE_FIRE_SOUND );
+	g_pSoundEmitterSystem->EmitSound (this, ROCKET_PROJECTILE_FIRE_SOUND );
 	ResetSequence(LookupSequence("fire"));
 
 	pRocket->SetThink( NULL );
@@ -1270,7 +1270,7 @@ void CRocket_Turret_Projectile::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( ROCKET_PROJECTILE_LOOPING_SOUND );
+	g_pSoundEmitterSystem->PrecacheScriptSound( ROCKET_PROJECTILE_LOOPING_SOUND );
 }
 
 void CRocket_Turret_Projectile::NotifyLauncherOnDeath( void )

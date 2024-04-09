@@ -141,15 +141,15 @@ void CNPC_Houndeye::Precache()
 
 	m_iSpriteTexture = PrecacheModel( "sprites/shockwave.vmt" );
 
-	PrecacheScriptSound( "HoundEye.Idle" );
-	PrecacheScriptSound( "HoundEye.Warn" );
-	PrecacheScriptSound( "HoundEye.Hunt" );
-	PrecacheScriptSound( "HoundEye.Alert" );
-	PrecacheScriptSound( "HoundEye.Die" );
-	PrecacheScriptSound( "HoundEye.Pain" );
-	PrecacheScriptSound( "HoundEye.Anger1" );
-	PrecacheScriptSound( "HoundEye.Anger2" );
-	PrecacheScriptSound( "HoundEye.Sonic" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HoundEye.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HoundEye.Warn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HoundEye.Hunt" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HoundEye.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HoundEye.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HoundEye.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HoundEye.Anger1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HoundEye.Anger2" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HoundEye.Sonic" );
 
 	BaseClass::Precache();
 }	
@@ -205,7 +205,7 @@ int CNPC_Houndeye::RangeAttack1Conditions ( float flDot, float flDist )
 void CNPC_Houndeye::IdleSound ( void )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "HoundEye.Idle" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HoundEye.Idle" );
 }
 
 //=========================================================
@@ -214,7 +214,7 @@ void CNPC_Houndeye::IdleSound ( void )
 void CNPC_Houndeye::WarmUpSound ( void )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(),"HoundEye.Warn" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(),"HoundEye.Warn" );
 }
 
 //=========================================================
@@ -223,7 +223,7 @@ void CNPC_Houndeye::WarmUpSound ( void )
 void CNPC_Houndeye::WarnSound ( void )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "HoundEye.Hunt" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HoundEye.Hunt" );
 }
 
 //=========================================================
@@ -236,7 +236,7 @@ void CNPC_Houndeye::AlertSound ( void )
 		 return; // only leader makes ALERT sound.
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "HoundEye.Alert" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HoundEye.Alert" );
 }
 
 //=========================================================
@@ -245,7 +245,7 @@ void CNPC_Houndeye::AlertSound ( void )
 void CNPC_Houndeye::DeathSound( const CTakeDamageInfo &info )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "HoundEye.Die" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HoundEye.Die" );
 }
 
 //=========================================================
@@ -254,7 +254,7 @@ void CNPC_Houndeye::DeathSound( const CTakeDamageInfo &info )
 void CNPC_Houndeye::PainSound ( const CTakeDamageInfo &info )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "HoundEye.Pain" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HoundEye.Pain" );
 }
 
 //=========================================================
@@ -339,14 +339,14 @@ void CNPC_Houndeye::HandleAnimEvent( animevent_t *pEvent )
 		case HOUND_AE_ANGERSOUND1:
 			{
 				CPASAttenuationFilter filter( this );
-				EmitSound( filter, entindex(), "HoundEye.Anger1" );	
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HoundEye.Anger1" );
 			}
 			break;
 
 		case HOUND_AE_ANGERSOUND2:
 			{
 				CPASAttenuationFilter filter2( this );
-				EmitSound( filter2, entindex(), "HoundEye.Anger2" );	
+				g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "HoundEye.Anger2" );
 			}
 			break;
 
@@ -372,7 +372,7 @@ void CNPC_Houndeye::SonicAttack ( void )
 	float		flDist;
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "HoundEye.Sonic");
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HoundEye.Sonic");
 
 	CBroadcastRecipientFilter filter2;
 	te->BeamRingPoint( filter2, 0.0, 

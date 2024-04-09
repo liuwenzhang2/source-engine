@@ -133,9 +133,9 @@ void CNPC_Roach::Precache()
 {
 	PrecacheModel("models/roach.mdl");
 
-	PrecacheScriptSound( "Roach.Walk" );
-	PrecacheScriptSound( "Roach.Die" );
-	PrecacheScriptSound( "Roach.Smash" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Roach.Walk" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Roach.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Roach.Smash" );
 }
 
 float CNPC_Roach::MaxYawSpeed( void )
@@ -316,7 +316,7 @@ void CNPC_Roach::PickNewDest ( int iCondition )
 	{
 		// every once in a while, a roach will play a skitter sound when they decide to run
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Roach.Walk" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Roach.Walk" );
 	}
 }
 
@@ -454,11 +454,11 @@ void CNPC_Roach::Event_Killed( const CTakeDamageInfo &info )
 	//random sound
 	if ( random->RandomInt( 0,4 ) == 1 )
 	{
-		EmitSound( filter, entindex(), "Roach.Die" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Roach.Die" );
 	}
 	else
 	{
-		EmitSound( filter, entindex(), "Roach.Smash" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Roach.Smash" );
 	}
 	
 	CSoundEnt::InsertSound ( SOUND_WORLD, GetAbsOrigin(), 128, 1 );

@@ -669,42 +669,42 @@ void CNPC_AntlionGuard::Precache( void )
 {
 	PrecacheModel( ANTLIONGUARD_MODEL );
 
-	PrecacheScriptSound( "NPC_AntlionGuard.Shove" );
-	PrecacheScriptSound( "NPC_AntlionGuard.HitHard" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Shove" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.HitHard" );
 
 	if ( HasSpawnFlags(SF_ANTLIONGUARD_INSIDE_FOOTSTEPS) )
 	{
-		PrecacheScriptSound( "NPC_AntlionGuard.Inside.StepLight" );
-		PrecacheScriptSound( "NPC_AntlionGuard.Inside.StepHeavy" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Inside.StepLight" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Inside.StepHeavy" );
 	}
 	else
 	{
-		PrecacheScriptSound( "NPC_AntlionGuard.StepLight" );
-		PrecacheScriptSound( "NPC_AntlionGuard.StepHeavy" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.StepLight" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.StepHeavy" );
 	}
 
 #if HL2_EPISODIC
-	PrecacheScriptSound( "NPC_AntlionGuard.NearStepLight" );
-	PrecacheScriptSound( "NPC_AntlionGuard.NearStepHeavy" );
-	PrecacheScriptSound( "NPC_AntlionGuard.FarStepLight" );
-	PrecacheScriptSound( "NPC_AntlionGuard.FarStepHeavy" );
-	PrecacheScriptSound( "NPC_AntlionGuard.BreatheLoop" );
-	PrecacheScriptSound( "NPC_AntlionGuard.ShellCrack" );
-	PrecacheScriptSound( "NPC_AntlionGuard.Pain_Roar" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.NearStepLight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.NearStepHeavy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.FarStepLight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.FarStepHeavy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.BreatheLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.ShellCrack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Pain_Roar" );
 	PrecacheModel( "sprites/grubflare1.vmt" );
 #endif // HL2_EPISODIC
 
-	PrecacheScriptSound( "NPC_AntlionGuard.Anger" );
-	PrecacheScriptSound( "NPC_AntlionGuard.Roar" );
-	PrecacheScriptSound( "NPC_AntlionGuard.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Anger" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Roar" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Die" );
 
-	PrecacheScriptSound( "NPC_AntlionGuard.GrowlHigh" );
-	PrecacheScriptSound( "NPC_AntlionGuard.GrowlIdle" );
-	PrecacheScriptSound( "NPC_AntlionGuard.BreathSound" );
-	PrecacheScriptSound( "NPC_AntlionGuard.Confused" );
-	PrecacheScriptSound( "NPC_AntlionGuard.Fallover" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.GrowlHigh" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.GrowlIdle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.BreathSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Confused" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Fallover" );
 
-	PrecacheScriptSound( "NPC_AntlionGuard.FrustratedRoar" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.FrustratedRoar" );
 
 	PrecacheParticleSystem( "blood_antlionguard_injured_light" );
 	PrecacheParticleSystem( "blood_antlionguard_injured_heavy" );
@@ -1462,7 +1462,7 @@ void CNPC_AntlionGuard::Shove( void )
 
 		m_hShoveTarget = NULL;
 
-		EmitSound( "NPC_AntlionGuard.Shove" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Shove" );
 
 		// If the player, throw him around
 		if ( pHurt->IsPlayer() )
@@ -1622,10 +1622,10 @@ void CNPC_AntlionGuard::Footstep( bool bHeavy )
 			soundParams.m_pSoundName = "NPC_AntlionGuard.NearStepHeavy";
 			soundParams.m_flVolume = flNearVolume;
 			soundParams.m_nFlags = SND_CHANGE_VOL;
-			EmitSound( filter, entindex(), soundParams );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), soundParams );
 		}
 
-		EmitSound( "NPC_AntlionGuard.FarStepHeavy" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.FarStepHeavy" );
 	}
 	else
 	{
@@ -1634,10 +1634,10 @@ void CNPC_AntlionGuard::Footstep( bool bHeavy )
 			soundParams.m_pSoundName = "NPC_AntlionGuard.NearStepLight";
 			soundParams.m_flVolume = flNearVolume;
 			soundParams.m_nFlags = SND_CHANGE_VOL;
-			EmitSound( filter, entindex(), soundParams );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), soundParams );
 		}
 
-		EmitSound( "NPC_AntlionGuard.FarStepLight" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.FarStepLight" );
 	}
 }
 
@@ -1818,7 +1818,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 		// If it's being held by the player, break that bond
 		Pickup_ForcePlayerToDropThisObject( m_hPhysicsTarget );
 
-		EmitSound( "NPC_AntlionGuard.HitHard" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.HitHard" );
 
 		//Clear the state information, we're done
 		ClearCondition( COND_ANTLIONGUARD_PHYSICS_TARGET );
@@ -1842,7 +1842,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ANTLIONGUARD_CHARGE_HIT )
 	{
 		UTIL_ScreenShake( GetAbsOrigin(), 32.0f, 4.0f, 1.0f, 512, SHAKE_START );
-		EmitSound( "NPC_AntlionGuard.HitHard" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.HitHard" );
 
 		Vector	startPos = GetAbsOrigin();
 		float	checkSize = ( CollisionProp()->BoundingRadius() + 8.0f );
@@ -1878,7 +1878,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLIONGUARD_SHOVE )
 	{
-		EmitSound("NPC_AntlionGuard.StepLight", pEvent->eventtime );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.StepLight", pEvent->eventtime );
 		Shove();
 		return;
 	}
@@ -1890,7 +1890,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 #if HL2_EPISODIC
 			Footstep( false );
 #else 
-			EmitSound("NPC_AntlionGuard.Inside.StepLight", pEvent->eventtime );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Inside.StepLight", pEvent->eventtime );
 #endif // HL2_EPISODIC
 		}
 		else
@@ -1898,7 +1898,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 #if HL2_EPISODIC
 			Footstep( false );
 #else 
-			EmitSound("NPC_AntlionGuard.StepLight", pEvent->eventtime );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.StepLight", pEvent->eventtime );
 #endif // HL2_EPISODIC
 		}
 		return;
@@ -1911,7 +1911,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 #if HL2_EPISODIC
 			Footstep( true );
 #else 
-			EmitSound( "NPC_AntlionGuard.Inside.StepHeavy", pEvent->eventtime );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Inside.StepHeavy", pEvent->eventtime );
 #endif // HL2_EPISODIC
 		}
 		else
@@ -1919,7 +1919,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 #if HL2_EPISODIC
 			Footstep( true );
 #else 
-			EmitSound( "NPC_AntlionGuard.StepHeavy", pEvent->eventtime );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.StepHeavy", pEvent->eventtime );
 #endif // HL2_EPISODIC
 		}
 		return;
@@ -1938,7 +1938,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 		else
 		{
 			duration = 1.0f;
-			EmitSound( "NPC_AntlionGuard.FrustratedRoar" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.FrustratedRoar" );
 			ENVELOPE_CONTROLLER.SoundFadeOut( m_pGrowlHighSound, 0.5f, false );
 		}
 		
@@ -1949,7 +1949,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 		m_flBreathTime = gpGlobals->curtime + duration - 0.2f;
 
-		EmitSound( "NPC_AntlionGuard.Anger" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Anger" );
 		return;
 	}
 		
@@ -1983,7 +1983,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 		m_flBreathTime = gpGlobals->curtime + duration - 0.2f;
 
-		EmitSound( "NPC_AntlionGuard.Roar" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Roar" );
 		return;
 	}
 
@@ -2014,7 +2014,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 		m_flBreathTime = gpGlobals->curtime + ( duration * 0.5f );
 
-		EmitSound( "NPC_AntlionGuard.Anger" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Anger" );
 		return;
 	}
 
@@ -2031,7 +2031,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 		m_flBreathTime = gpGlobals->curtime + duration;
 
-		EmitSound( "NPC_AntlionGuard.Anger" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Anger" );
 		return;
 	}
 		
@@ -2051,7 +2051,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLIONGUARD_BURROW_OUT )
 	{
-		EmitSound( "NPC_Antlion.BurrowOut" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.BurrowOut" );
 
 		//Shake the screen
 		UTIL_ScreenShake( GetAbsOrigin(), 0.5f, 80.0f, 1.0f, 256.0f, SHAKE_START );
@@ -2189,11 +2189,11 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		// Play a sound for a physics impact
 		if ( dInfo.GetDamageType() & DMG_CRUSH )
 		{
-			EmitSound("NPC_AntlionGuard.ShellCrack");
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.ShellCrack");
 		}
 
 		// Roar in pain
-		EmitSound( "NPC_AntlionGuard.Pain_Roar" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Pain_Roar" );
 
 		// TODO: This will require a more complete solution; for now let's shelve it!
 		/*
@@ -2260,7 +2260,7 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			SetHeavyDamageAnim( dInfo.GetDamagePosition() );
 
 			// Roar in pain
-			EmitSound( "NPC_AntlionGuard.Pain_Roar" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Pain_Roar" );
 
 			// Flinch!
 			SetCondition( COND_HEAVY_DAMAGE );
@@ -2731,7 +2731,7 @@ bool CNPC_AntlionGuard::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEnti
 	// Hit anything we don't like
 	if ( IRelationType( pEntity ) == D_HT && ( GetNextAttack() < gpGlobals->curtime ) )
 	{
-		EmitSound( "NPC_AntlionGuard.Shove" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Shove" );
 
 		if ( !IsPlayingGesture( ACT_ANTLIONGUARD_CHARGE_HIT ) )
 		{
@@ -3081,7 +3081,7 @@ void CNPC_AntlionGuard::RunTask( const Task_t *pTask )
 
 				if (pEntity && pEntity->IsPlayer())
 				{
-					EmitSound( "NPC_AntlionGuard.Shove" );
+					g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Shove" );
 
 					if ( !IsPlayingGesture( ACT_ANTLIONGUARD_CHARGE_HIT ) )
 					{
@@ -4309,7 +4309,7 @@ void CNPC_AntlionGuard::InputDisableBark( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_AntlionGuard::DeathSound( const CTakeDamageInfo &info )
 {
-	EmitSound( "NPC_AntlionGuard.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Die" );
 }
 
 //-----------------------------------------------------------------------------
@@ -4369,7 +4369,7 @@ bool CNPC_AntlionGuard::BecomeRagdollOnClient( const Vector &force )
 	if ( !CanBecomeRagdoll() ) 
 		return false;
 
-	EmitSound( "NPC_AntlionGuard.Fallover" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Fallover" );
 
 	// Become server-side ragdoll if we're flagged to do it
 	if ( m_spawnflags & SF_ANTLIONGUARD_SERVERSIDE_RAGDOLL )

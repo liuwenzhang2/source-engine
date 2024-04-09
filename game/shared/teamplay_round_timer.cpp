@@ -1180,20 +1180,20 @@ void CTeamRoundTimer::AddTimerSeconds( int iSecondsToAdd, int iTeamResponsible /
 					if ( iTeam == iTeamResponsible )
 					{
 						CTeamRecipientFilter filter( iTeam, true );
-						EmitSound( filter, entindex(), ROUND_TIMER_TIME_ADDED_WINNER );
+						g_pSoundEmitterSystem->EmitSound( filter, entindex(), ROUND_TIMER_TIME_ADDED_WINNER );
 						
 					}
 					else
 					{
 						CTeamRecipientFilter filter( iTeam, true );
-						EmitSound( filter, entindex(), ROUND_TIMER_TIME_ADDED_LOSER );
+						g_pSoundEmitterSystem->EmitSound( filter, entindex(), ROUND_TIMER_TIME_ADDED_LOSER );
 					}
 				}
 			}
 			else
 			{
 				CReliableBroadcastRecipientFilter filter;
-				EmitSound( filter, entindex(), ROUND_TIMER_TIME_ADDED );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), ROUND_TIMER_TIME_ADDED );
 			}
 		}
 

@@ -1645,15 +1645,15 @@ void CWeaponPhysCannon::Precache( void )
 	// Precache our alternate model
 	PrecacheModel( MEGACANNON_MODEL );
 
-	PrecacheScriptSound( "Weapon_PhysCannon.HoldSound" );
-	PrecacheScriptSound( "Weapon_Physgun.Off" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_PhysCannon.HoldSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Physgun.Off" );
 
-	PrecacheScriptSound( "Weapon_MegaPhysCannon.DryFire" );
-	PrecacheScriptSound( "Weapon_MegaPhysCannon.Launch" );
-	PrecacheScriptSound( "Weapon_MegaPhysCannon.Pickup");
-	PrecacheScriptSound( "Weapon_MegaPhysCannon.Drop");
-	PrecacheScriptSound( "Weapon_MegaPhysCannon.HoldSound");
-	PrecacheScriptSound( "Weapon_MegaPhysCannon.ChargeZap");
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_MegaPhysCannon.DryFire" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_MegaPhysCannon.Launch" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_MegaPhysCannon.Pickup");
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_MegaPhysCannon.Drop");
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_MegaPhysCannon.HoldSound");
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_MegaPhysCannon.ChargeZap");
 
 	BaseClass::Precache();
 }
@@ -3274,7 +3274,7 @@ void CWeaponPhysCannon::BeginUpgrade()
 
 	SetContextThink( &CWeaponPhysCannon::WaitForUpgradeThink, gpGlobals->curtime + 6.0f, s_pWaitForUpgradeContext );
 
-	EmitSound( "WeaponDissolve.Charge" );
+	g_pSoundEmitterSystem->EmitSound(this, "WeaponDissolve.Charge" );
 
 	// Bloat our bounds
 	CollisionProp()->UseTriggerBounds( true, 32.0f );
@@ -3319,7 +3319,7 @@ void CWeaponPhysCannon::WaitForUpgradeThink()
 		pEnt->AcceptInput( "Trigger", this, this, emptyVariant, 0 );
 	}
 
-	StopSound( "WeaponDissolve.Charge" );
+	g_pSoundEmitterSystem->StopSound(this, "WeaponDissolve.Charge" );
 
 	// Re-enable weapon pickup
 	AddSolidFlags( FSOLID_TRIGGER );
@@ -3353,7 +3353,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 		//This means we just switched to regular physcannon this frame.
 		if ( m_bPhyscannonState == false )
 		{
-			EmitSound( "Weapon_Physgun.Off" );
+			g_pSoundEmitterSystem->EmitSound(this, "Weapon_Physgun.Off" );
 
 #ifdef HL2_EPISODIC
 			ForceDrop();
@@ -3482,7 +3482,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 				// Turn on the sprite for awhile
 				m_hEndSprites[sprite]->TurnOn();
 				m_flEndSpritesOverride[sprite] = gpGlobals->curtime + lifetime;
-				EmitSound( "Weapon_MegaPhysCannon.ChargeZap" );
+				g_pSoundEmitterSystem->EmitSound(this, "Weapon_MegaPhysCannon.ChargeZap" );
 			}
 		}
 

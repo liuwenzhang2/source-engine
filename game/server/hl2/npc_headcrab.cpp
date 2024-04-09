@@ -659,7 +659,7 @@ void CBaseHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_HEADCRAB_BURROW_IN )
 	{
-		EmitSound( "NPC_Headcrab.BurrowIn" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Headcrab.BurrowIn" );
 		CreateDust();
 
 		return;
@@ -676,7 +676,7 @@ void CBaseHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 		Assert( m_bBurrowed );
 		if ( m_bBurrowed )
 		{
-			EmitSound( "NPC_Headcrab.BurrowOut" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Headcrab.BurrowOut" );
 			CreateDust();
 			SetBurrowed( false );
 
@@ -1652,7 +1652,7 @@ int CBaseHeadcrab::RangeAttack1Conditions( float flDot, float flDist )
 //------------------------------------------------------------------------------
 bool CBaseHeadcrab::CorpseGib( const CTakeDamageInfo &info )
 {
-	EmitSound( "NPC_HeadCrab.Gib" );	
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Gib" );
 
 	return BaseClass::CorpseGib( info );
 }
@@ -2406,15 +2406,15 @@ void CHeadcrab::Precache( void )
 {
 	PrecacheModel( "models/headcrabclassic.mdl" );
 
-	PrecacheScriptSound( "NPC_HeadCrab.Gib" );
-	PrecacheScriptSound( "NPC_HeadCrab.Idle" );
-	PrecacheScriptSound( "NPC_HeadCrab.Alert" );
-	PrecacheScriptSound( "NPC_HeadCrab.Pain" );
-	PrecacheScriptSound( "NPC_HeadCrab.Die" );
-	PrecacheScriptSound( "NPC_HeadCrab.Attack" );
-	PrecacheScriptSound( "NPC_HeadCrab.Bite" );
-	PrecacheScriptSound( "NPC_Headcrab.BurrowIn" );
-	PrecacheScriptSound( "NPC_Headcrab.BurrowOut" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_HeadCrab.Gib" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_HeadCrab.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_HeadCrab.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_HeadCrab.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_HeadCrab.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_HeadCrab.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_HeadCrab.Bite" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Headcrab.BurrowIn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Headcrab.BurrowOut" );
 
 	BaseClass::Precache();
 }
@@ -2457,7 +2457,7 @@ Activity CHeadcrab::NPC_TranslateActivity( Activity eNewActivity )
 //-----------------------------------------------------------------------------
 void CHeadcrab::IdleSound( void )
 {
-	EmitSound( "NPC_HeadCrab.Idle" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Idle" );
 }
 
 
@@ -2466,7 +2466,7 @@ void CHeadcrab::IdleSound( void )
 //-----------------------------------------------------------------------------
 void CHeadcrab::AlertSound( void )
 {
-	EmitSound( "NPC_HeadCrab.Alert" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Alert" );
 }
 
 
@@ -2481,7 +2481,7 @@ void CHeadcrab::PainSound( const CTakeDamageInfo &info )
 		return;
 	}
 
-	EmitSound( "NPC_HeadCrab.Pain" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Pain" );
 }
 
 
@@ -2490,7 +2490,7 @@ void CHeadcrab::PainSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CHeadcrab::DeathSound( const CTakeDamageInfo &info )
 {
-	EmitSound( "NPC_HeadCrab.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Die" );
 }
 
 
@@ -2500,7 +2500,7 @@ void CHeadcrab::DeathSound( const CTakeDamageInfo &info )
 void CHeadcrab::TelegraphSound( void )
 {
 	//FIXME: Need a real one
-	EmitSound( "NPC_HeadCrab.Alert" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Alert" );
 }
 
 
@@ -2509,7 +2509,7 @@ void CHeadcrab::TelegraphSound( void )
 //-----------------------------------------------------------------------------
 void CHeadcrab::AttackSound( void )
 {
-	EmitSound( "NPC_Headcrab.Attack" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Headcrab.Attack" );
 }
 
 
@@ -2518,7 +2518,7 @@ void CHeadcrab::AttackSound( void )
 //-----------------------------------------------------------------------------
 void CHeadcrab::BiteSound( void )
 {
-	EmitSound( "NPC_HeadCrab.Bite" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Bite" );
 }
 
 
@@ -2543,12 +2543,12 @@ void CFastHeadcrab::Precache( void )
 {
 	PrecacheModel( "models/headcrab.mdl" );
 
-	PrecacheScriptSound( "NPC_FastHeadcrab.Idle" );
-	PrecacheScriptSound( "NPC_FastHeadcrab.Alert" );
-	PrecacheScriptSound( "NPC_FastHeadcrab.Pain" );
-	PrecacheScriptSound( "NPC_FastHeadcrab.Die" );
-	PrecacheScriptSound( "NPC_FastHeadcrab.Bite" );
-	PrecacheScriptSound( "NPC_FastHeadcrab.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastHeadcrab.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastHeadcrab.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastHeadcrab.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastHeadcrab.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastHeadcrab.Bite" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastHeadcrab.Attack" );
 
 	BaseClass::Precache();
 }
@@ -2579,14 +2579,14 @@ void CFastHeadcrab::Spawn( void )
 //-----------------------------------------------------------------------------
 void CFastHeadcrab::IdleSound( void )
 {
-	EmitSound( "NPC_FastHeadcrab.Idle" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Idle" );
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CFastHeadcrab::AlertSound( void )
 {
-	EmitSound( "NPC_FastHeadcrab.Alert" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Alert" );
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2599,14 +2599,14 @@ void CFastHeadcrab::PainSound( const CTakeDamageInfo &info )
 		return;
 	}
 
-	EmitSound( "NPC_FastHeadcrab.Pain" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Pain" );
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CFastHeadcrab::DeathSound( const CTakeDamageInfo &info )
 {
-	EmitSound( "NPC_FastHeadcrab.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Die" );
 }
 
 
@@ -2880,12 +2880,12 @@ LINK_ENTITY_TO_CLASS( npc_headcrab_fast, CFastHeadcrab );
 //-----------------------------------------------------------------------------
 void CFastHeadcrab::BiteSound( void )
 {
-	EmitSound( "NPC_FastHeadcrab.Bite" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Bite" );
 }
 
 void CFastHeadcrab::AttackSound( void )
 {
-	EmitSound( "NPC_FastHeadcrab.Attack" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Attack" );
 }
 
 
@@ -3034,7 +3034,7 @@ LINK_ENTITY_TO_CLASS( npc_headcrab_poison, CBlackHeadcrab );
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::BiteSound( void )
 {
-	EmitSound( "NPC_BlackHeadcrab.Bite" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Bite" );
 }
 
 
@@ -3043,7 +3043,7 @@ void CBlackHeadcrab::BiteSound( void )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::AttackSound( void )
 {
-	EmitSound( "NPC_BlackHeadcrab.Attack" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Attack" );
 }
 
 //-----------------------------------------------------------------------------
@@ -3051,7 +3051,7 @@ void CBlackHeadcrab::AttackSound( void )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::TelegraphSound( void )
 {
-	EmitSound( "NPC_BlackHeadcrab.Telegraph" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Telegraph" );
 }
 
 //-----------------------------------------------------------------------------
@@ -3079,21 +3079,21 @@ void CBlackHeadcrab::Precache( void )
 {
 	PrecacheModel( "models/headcrabblack.mdl" );
 
-	PrecacheScriptSound( "NPC_BlackHeadcrab.Telegraph" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.Attack" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.Bite" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.Threat" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.Alert" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.Idle" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.Talk" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.AlertVoice" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.Pain" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.Die" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.Impact" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.ImpactAngry" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Telegraph" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Bite" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Threat" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Talk" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.AlertVoice" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Impact" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.ImpactAngry" );
 
-	PrecacheScriptSound( "NPC_BlackHeadcrab.FootstepWalk" );
-	PrecacheScriptSound( "NPC_BlackHeadcrab.Footstep" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.FootstepWalk" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Footstep" );
 
 	BaseClass::Precache();
 }
@@ -3426,11 +3426,11 @@ void CBlackHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 
 		if ( walk )
 		{
-			EmitSound( "NPC_BlackHeadcrab.FootstepWalk" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.FootstepWalk" );
 		}
 		else
 		{
-			EmitSound( "NPC_BlackHeadcrab.Footstep" );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Footstep" );
 		}
 
 		return;
@@ -3438,7 +3438,7 @@ void CBlackHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_HEADCRAB_JUMP_TELEGRAPH )
 	{
-		EmitSound( "NPC_BlackHeadcrab.Telegraph" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Telegraph" );
 
 		CBaseEntity *pEnemy = GetEnemy();
 
@@ -3455,8 +3455,8 @@ void CBlackHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_POISONHEADCRAB_THREAT_SOUND )
 	{
-		EmitSound( "NPC_BlackHeadcrab.Threat" );
-		EmitSound( "NPC_BlackHeadcrab.Alert" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Threat" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Alert" );
 
 		return;
 	}
@@ -3507,11 +3507,11 @@ void CBlackHeadcrab::IdleSound( void )
 	// TODO: hook up "Marco" / "Polo" talking with nearby buddies
 	if ( m_NPCState == NPC_STATE_IDLE )
 	{
-		EmitSound( "NPC_BlackHeadcrab.Idle" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Idle" );
 	}
 	else if ( m_NPCState == NPC_STATE_ALERT )
 	{
-		EmitSound( "NPC_BlackHeadcrab.Talk" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Talk" );
 	}
 }
 
@@ -3521,7 +3521,7 @@ void CBlackHeadcrab::IdleSound( void )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::AlertSound( void )
 {
-	EmitSound( "NPC_BlackHeadcrab.AlertVoice" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.AlertVoice" );
 }
 
 
@@ -3536,7 +3536,7 @@ void CBlackHeadcrab::PainSound( const CTakeDamageInfo &info )
 		return;
 	}
 
-	EmitSound( "NPC_BlackHeadcrab.Pain" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Pain" );
 }
 
 
@@ -3545,7 +3545,7 @@ void CBlackHeadcrab::PainSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::DeathSound( const CTakeDamageInfo &info )
 {
-	EmitSound( "NPC_BlackHeadcrab.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Die" );
 }
 
 
@@ -3554,12 +3554,12 @@ void CBlackHeadcrab::DeathSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::ImpactSound( void )
 {
-	EmitSound( "NPC_BlackHeadcrab.Impact" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Impact" );
 
 	if ( !( GetFlags() & FL_ONGROUND ) )
 	{
 		// Hit a wall - make a pissed off sound.
-		EmitSound( "NPC_BlackHeadcrab.ImpactAngry" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.ImpactAngry" );
 	}
 }
 

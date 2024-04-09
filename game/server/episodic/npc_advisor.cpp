@@ -1557,13 +1557,13 @@ void CNPC_Advisor::Precache()
 	PrecacheModel( "sprites/lgtning.vmt" );
 #endif
 
-	PrecacheScriptSound( "NPC_Advisor.Blast" );
-	PrecacheScriptSound( "NPC_Advisor.Gib" );
-	PrecacheScriptSound( "NPC_Advisor.Idle" );
-	PrecacheScriptSound( "NPC_Advisor.Alert" );
-	PrecacheScriptSound( "NPC_Advisor.Die" );
-	PrecacheScriptSound( "NPC_Advisor.Pain" );
-	PrecacheScriptSound( "NPC_Advisor.ObjectChargeUp" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Advisor.Blast" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Advisor.Gib" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Advisor.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Advisor.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Advisor.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Advisor.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Advisor.ObjectChargeUp" );
 	PrecacheParticleSystem( "Advisor_Psychic_Beam" );
 	PrecacheParticleSystem( "advisor_object_charge" );
 	PrecacheModel("sprites/greenglow1.vmt");
@@ -1574,25 +1574,25 @@ void CNPC_Advisor::Precache()
 //-----------------------------------------------------------------------------
 void CNPC_Advisor::IdleSound()
 {
-	EmitSound( "NPC_Advisor.Idle" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Advisor.Idle" );
 }
 
 
 void CNPC_Advisor::AlertSound()
 {
-	EmitSound( "NPC_Advisor.Alert" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Advisor.Alert" );
 }
 
 
 void CNPC_Advisor::PainSound( const CTakeDamageInfo &info )
 {
-	EmitSound( "NPC_Advisor.Pain" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Advisor.Pain" );
 }
 
 
 void CNPC_Advisor::DeathSound( const CTakeDamageInfo &info )
 {
-	EmitSound( "NPC_Advisor.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Advisor.Die" );
 }
 
 

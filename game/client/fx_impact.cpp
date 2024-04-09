@@ -400,7 +400,7 @@ void PlayImpactSound( CBaseEntity *pEntity, trace_t &tr, Vector &vecServerOrigin
 		else
 		{
 			CLocalPlayerFilter filter;
-			C_BaseEntity::EmitSound( filter, NULL, pbulletImpactSoundName, pdata->soundhandles.bulletImpact, &vecOrigin );
+			g_pSoundEmitterSystem->EmitSound( filter, NULL, pbulletImpactSoundName, pdata->soundhandles.bulletImpact, &vecOrigin );//C_BaseEntity::
 		}
 
 		return;

@@ -783,8 +783,8 @@ void CItem_AmmoCrate::Precache( void )
 	SetupCrate();
 	PrecacheModel( STRING( GetModelName() ) );
 
-	PrecacheScriptSound( "AmmoCrate.Open" );
-	PrecacheScriptSound( "AmmoCrate.Close" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AmmoCrate.Open" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AmmoCrate.Close" );
 }
 
 //-----------------------------------------------------------------------------
@@ -852,7 +852,7 @@ void CItem_AmmoCrate::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 
 		// Make sound
 		CPASAttenuationFilter sndFilter( this, "AmmoCrate.Open" );
-		EmitSound( sndFilter, entindex(), "AmmoCrate.Open" );
+		g_pSoundEmitterSystem->EmitSound( sndFilter, entindex(), "AmmoCrate.Open" );
 
 		// Start thinking to make it return
 		SetThink( &CItem_AmmoCrate::CrateThink );
@@ -877,7 +877,7 @@ int CItem_AmmoCrate::OnTakeDamage( const CTakeDamageInfo &info )
 		if (weapon && !stricmp(weapon->GetName(), "weapon_crowbar"))
 		{
 			// play the normal use sound
-			player->EmitSound( "HL2Player.Use" );
+			g_pSoundEmitterSystem->EmitSound(player, "HL2Player.Use" );//player->
 			// open the crate
 			Use(info.GetAttacker(), info.GetAttacker(), USE_TOGGLE, 0.0f);
 		}
@@ -962,7 +962,7 @@ void CItem_AmmoCrate::CrateThink( void )
 			// Stop thinking
 			SetThink( NULL );
 			CPASAttenuationFilter sndFilter( this, "AmmoCrate.Close" );
-			EmitSound( sndFilter, entindex(), "AmmoCrate.Close" );
+			g_pSoundEmitterSystem->EmitSound( sndFilter, entindex(), "AmmoCrate.Close" );
 
 			// FIXME: We're resetting the sequence here
 			// but setting Think to NULL will cause this to never have

@@ -47,7 +47,7 @@ public:
 	void	SetTimer( float detonateDelay, float warnDelay );
 	void	SetVelocity( const Vector &velocity, const AngularImpulse &angVelocity );
 	int		OnTakeDamage( const CTakeDamageInfo &inputInfo );
-	void	BlipSound() { EmitSound( "Grenade.Blip" ); }
+	void	BlipSound() { g_pSoundEmitterSystem->EmitSound(this, "Grenade.Blip" ); }
 	void	DelayThink();
 	void	VPhysicsUpdate( IPhysicsObject *pPhysics );
 	void	OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );
@@ -278,7 +278,7 @@ void CGrenadeFrag::Precache( void )
 {
 	PrecacheModel( GRENADE_MODEL );
 
-	PrecacheScriptSound( "Grenade.Blip" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Grenade.Blip" );
 
 	PrecacheModel( "sprites/redglow1.vmt" );
 	PrecacheModel( "sprites/bluelaser1.vmt" );

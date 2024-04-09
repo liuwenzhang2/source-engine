@@ -370,7 +370,7 @@ bool CBaseFlex::ClearSceneEvent( CSceneEventInfo *info, bool fastKill, bool canc
 			// Tracker 15420:  Issue stopsound if we need to cut this short...
 			if ( canceled )
 			{
-				StopSound( info->m_pEvent->GetParameters() );
+				g_pSoundEmitterSystem->StopSound(this, info->m_pEvent->GetParameters() );
 
 #ifdef HL2_EPISODIC
 				// If we were holding the semaphore because of this speech, release it

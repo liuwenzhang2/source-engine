@@ -742,7 +742,7 @@ void CPropCrane::RunCraneMovement( float flTime )
 				ep.m_flVolume = 1.0f;
 				ep.m_SoundLevel = SNDLVL_NORM;
 
-				CBaseEntity::EmitSound( filter, m_hCraneMagnet->entindex(), ep );
+				g_pSoundEmitterSystem->EmitSound( filter, m_hCraneMagnet->entindex(), ep );//CBaseEntity::
 			}
 			m_flNextCreakSound = gpGlobals->curtime + 5.0;
 		}

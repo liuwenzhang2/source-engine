@@ -675,7 +675,7 @@ void CFuncMortarField::Precache( void )
 {
 	PrecacheModel( "sprites/lgtning.vmt" );
 
-	PrecacheScriptSound( "MortarField.Trigger" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "MortarField.Trigger" );
 }
 
 void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
@@ -741,7 +741,7 @@ void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 	}
 
 	CPASAttenuationFilter filter( this, ATTN_NONE );
-	EmitSound( filter, entindex(), "MortarField.Trigger" );	
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "MortarField.Trigger" );
 
 	float t = 2.5;
 	for (int i = 0; i < m_iCount; i++)
@@ -1225,8 +1225,8 @@ void CXenTree::Precache( void )
 	PrecacheModel( "models/tree.mdl" );
 	PrecacheModel( XEN_PLANT_GLOW_SPRITE );
 
-	PrecacheScriptSound( "XenTree.AttackMiss" );
-	PrecacheScriptSound( "XenTree.AttackHit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "XenTree.AttackMiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "XenTree.AttackHit" );
 }
 
 
@@ -1247,7 +1247,7 @@ void CXenTree::Attack( void )
 		m_flPlaybackRate = random->RandomFloat( 1.0, 1.4 );
 
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "XenTree.AttackMiss" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "XenTree.AttackMiss" );
 	}
 }
 
@@ -1283,7 +1283,7 @@ void CXenTree::HandleAnimEvent( animevent_t *pEvent )
 			if ( sound )
 			{
 				CPASAttenuationFilter filter( this );
-				EmitSound( filter, entindex(), "XenTree.AttackHit" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "XenTree.AttackHit" );
 			}
 		}
 		return;

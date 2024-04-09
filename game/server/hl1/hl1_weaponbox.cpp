@@ -70,7 +70,7 @@ void CWeaponBox::Spawn( void )
 	SetModel( WEAPONBOX_MODEL );
 	BaseClass::Spawn();
 
-	PrecacheScriptSound( "Item.Pickup" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Item.Pickup" );
 
 	SetTouch( &CWeaponBox::BoxTouch );
 }
@@ -119,7 +119,7 @@ void CWeaponBox::BoxTouch( CBaseEntity *pOther )
 	}
 
 	CPASAttenuationFilter filter( pOther, "Item.Pickup" );
-	EmitSound( filter, pOther->entindex(), "Item.Pickup" );
+	g_pSoundEmitterSystem->EmitSound( filter, pOther->entindex(), "Item.Pickup" );
 
 	SetTouch(NULL);
 	if ( g_pGameRules->ItemShouldRespawn( this ) == GR_ITEM_RESPAWN_NO )

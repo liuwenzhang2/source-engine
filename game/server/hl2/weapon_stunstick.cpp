@@ -74,8 +74,8 @@ void CWeaponStunStick::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "Weapon_StunStick.Activate" );
-	PrecacheScriptSound( "Weapon_StunStick.Deactivate" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_StunStick.Activate" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_StunStick.Deactivate" );
 
 }
 
@@ -319,11 +319,11 @@ void CWeaponStunStick::SetStunState( bool state )
 
 		//FIXME: END - Move to client-side
 
-		EmitSound( "Weapon_StunStick.Activate" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_StunStick.Activate" );
 	}
 	else
 	{
-		EmitSound( "Weapon_StunStick.Deactivate" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_StunStick.Deactivate" );
 	}
 }
 

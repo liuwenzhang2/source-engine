@@ -971,7 +971,7 @@ void CHudVote::MsgFunc_CallVoteFailed( bf_read &msg )
 	if ( !pLocalPlayer )
 		return;
 
-	pLocalPlayer->EmitSound("Vote.Failed");
+	g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Failed");//pLocalPlayer->
 
 	m_pVoteActive->SetVisible( false );
 	m_pVoteFailed->SetVisible( false );
@@ -1111,7 +1111,7 @@ void CHudVote::MsgFunc_VoteFailed( bf_read &msg )
 	if ( !pLocalPlayer )
 		return;
 
-	pLocalPlayer->EmitSound("Vote.Failed");
+	g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Failed");//pLocalPlayer->
 }
 
 //-----------------------------------------------------------------------------
@@ -1403,7 +1403,7 @@ void CHudVote::MsgFunc_VotePass( bf_read &msg )
 	if ( !pLocalPlayer )
 		return;
 
-	pLocalPlayer->EmitSound( "Vote.Passed" );
+	g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Passed" );//pLocalPlayer->
 }
 
 //-----------------------------------------------------------------------------
@@ -1676,7 +1676,7 @@ void CHudVote::OnThink()
 			C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
 			if ( pLocalPlayer )
 			{
-				pLocalPlayer->EmitSound("Vote.Created");
+				g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Created");//pLocalPlayer->
 			}
 		}
 	}

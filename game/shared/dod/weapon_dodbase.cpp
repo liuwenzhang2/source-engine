@@ -174,7 +174,7 @@ bool CWeaponDODBase::PlayEmptySound()
 {
 	CPASAttenuationFilter filter( this );
 	filter.UsePredictionRules();
-	EmitSound( filter, entindex(), "Default.ClipEmpty_Rifle" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Default.ClipEmpty_Rifle" );
 
 	return false;
 }
@@ -353,7 +353,7 @@ void CWeaponDODBase::Precache( void )
 	// precache base first, it loads weapon scripts
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "Default.ClipEmpty_Rifle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Default.ClipEmpty_Rifle" );
 
 	PrecacheParticleSystem( "muzzle_pistols" );
 	PrecacheParticleSystem( "muzzle_fullyautomatic" );
@@ -843,14 +843,14 @@ bool CWeaponDODBase::DefaultReload( int iClipSize1, int iClipSize2, int iActivit
 
 		CSoundParameters params;
 
-		if ( !GetParametersForSound( shootsound, params, NULL ) )
+		if ( !g_pSoundEmitterSystem->GetParametersForSound( shootsound, params, NULL ) )
 			return;
 
 		// Play weapon sound from the owner
 		CPASAttenuationFilter filter( pPlayer, params.soundlevel );
 		filter.RemoveRecipient( pPlayer );	// no local player, that is done in the model
 
-		EmitSound( filter, pPlayer->entindex(), shootsound, NULL, 0.0 ); 
+		g_pSoundEmitterSystem->EmitSound( filter, pPlayer->entindex(), shootsound, NULL, 0.0 );
 	}
 #endif
 

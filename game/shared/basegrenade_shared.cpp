@@ -190,7 +190,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 
 	UTIL_DecalTrace( pTrace, "Scorch" );
 
-	EmitSound( "BaseGrenade.Explode" );
+	g_pSoundEmitterSystem->EmitSound(this, "BaseGrenade.Explode" );
 
 	SetThink( &CBaseGrenade::SUB_Remove );
 	SetTouch( NULL );
@@ -499,7 +499,7 @@ void CBaseGrenade::Precache( void )
 {
 	BaseClass::Precache( );
 
-	PrecacheScriptSound( "BaseGrenade.Explode" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseGrenade.Explode" );
 }
 
 //-----------------------------------------------------------------------------

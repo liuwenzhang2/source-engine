@@ -291,11 +291,11 @@ void CPortal_Player::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "PortalPlayer.EnterPortal" );
-	PrecacheScriptSound( "PortalPlayer.ExitPortal" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "PortalPlayer.EnterPortal" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "PortalPlayer.ExitPortal" );
 
-	PrecacheScriptSound( "PortalPlayer.Woosh" );
-	PrecacheScriptSound( "PortalPlayer.FallRecover" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "PortalPlayer.Woosh" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "PortalPlayer.FallRecover" );
 
 	PrecacheModel ( "sprites/glow01.vmt" );
 
@@ -303,7 +303,7 @@ void CPortal_Player::Precache( void )
 	PrecacheModel( g_pszPlayerModel );
 	PrecacheModel( g_pszChellModel );
 
-	PrecacheScriptSound( "NPC_Citizen.die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.die" );
 }
 
 void CPortal_Player::CreateSounds()
@@ -792,13 +792,13 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 
 					CPASAttenuationFilter filter( this );
 					CSoundParameters params;
-					if ( GetParametersForSound( "PortalPlayer.EnterPortal", params, NULL ) )
+					if (g_pSoundEmitterSystem->GetParametersForSound( "PortalPlayer.EnterPortal", params, NULL ) )
 					{
 						EmitSound_t ep( params );
 						ep.m_nPitch = 80.0f + vVelocity.Length() * 0.03f;
 						ep.m_flVolume = MIN( 0.3f + vVelocity.Length() * 0.00075f, 1.0f );
 
-						EmitSound( filter, entindex(), ep );
+						g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 					}
 				}
 			}
@@ -812,13 +812,13 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 
 					CPASAttenuationFilter filter( this );
 					CSoundParameters params;
-					if ( GetParametersForSound( "PortalPlayer.ExitPortal", params, NULL ) )
+					if (g_pSoundEmitterSystem->GetParametersForSound( "PortalPlayer.ExitPortal", params, NULL ) )
 					{
 						EmitSound_t ep( params );
 						ep.m_nPitch = 80.0f + vVelocity.Length() * 0.03f;
 						ep.m_flVolume = MIN( 0.3f + vVelocity.Length() * 0.00075f, 1.0f );
 
-						EmitSound( filter, entindex(), ep );
+						g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 					}
 				}
 			}
@@ -830,7 +830,7 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 
 		CPASAttenuationFilter filter( this );
 		CSoundParameters params;
-		if ( GetParametersForSound( "PortalPlayer.ExitPortal", params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( "PortalPlayer.ExitPortal", params, NULL ) )
 		{
 			EmitSound_t ep( params );
 			Vector vVelocity;
@@ -838,7 +838,7 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 			ep.m_nPitch = 80.0f + vVelocity.Length() * 0.03f;
 			ep.m_flVolume = MIN( 0.3f + vVelocity.Length() * 0.00075f, 1.0f );
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 	}
 }
@@ -1342,7 +1342,7 @@ bool CPortal_Player::UseFoundEntity( CBaseEntity *pUseEntity )
 		// Robin: Don't play sounds for NPCs, because NPCs will allow respond with speech.
 		if ( !pUseEntity->MyNPCPointer() )
 		{
-			EmitSound( "HL2Player.Use" );
+			g_pSoundEmitterSystem->EmitSound(this, "HL2Player.Use" );
 		}
 	}
 
@@ -1461,7 +1461,7 @@ void CPortal_Player::PlayerUse( void )
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
 					m_iTrain = TrainSpeed(pTrain->m_flSpeed, ((CFuncTrackTrain*)pTrain)->GetMaxSpeed());
 					m_iTrain |= TRAIN_NEW;
-					EmitSound( "HL2Player.TrainUse" );
+					g_pSoundEmitterSystem->EmitSound(this, "HL2Player.TrainUse" );
 					return;
 				}
 			}
@@ -1810,12 +1810,12 @@ int CPortal_Player::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 		if ( inputInfoCopy.GetDamage() >= 10.0f )
 		{
-			EmitSound( "PortalPlayer.BonkYelp" );
+			g_pSoundEmitterSystem->EmitSound(this, "PortalPlayer.BonkYelp" );
 		}
 	}
 	else if ( ( inputInfoCopy.GetDamageType() & DMG_SHOCK ) || ( inputInfoCopy.GetDamageType() & DMG_BURN ) )
 	{
-		EmitSound( "PortalPortal.PainYelp" );
+		g_pSoundEmitterSystem->EmitSound(this, "PortalPortal.PainYelp" );
 	}
 
 	int ret = BaseClass::OnTakeDamage( inputInfoCopy );

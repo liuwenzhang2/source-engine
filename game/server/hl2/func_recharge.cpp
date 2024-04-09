@@ -211,7 +211,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
 			m_flSoundTime = gpGlobals->curtime + 0.62;
-			EmitSound( "SuitRecharge.Deny" );
+			g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Deny" );
 		}
 		return;
 	}
@@ -229,7 +229,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
 			m_flSoundTime = gpGlobals->curtime + 0.62;
-			EmitSound( "SuitRecharge.Deny" );
+			g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Deny" );
 		}
 		return;
 	}
@@ -256,7 +256,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	if (!m_iOn)
 	{
 		m_iOn++;
-		EmitSound( "SuitRecharge.Start" );
+		g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Start" );
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 
 		m_OnPlayerUse.FireOutput( pActivator, this );
@@ -267,7 +267,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		m_iOn++;
 		CPASAttenuationFilter filter( this, "SuitRecharge.ChargingLoop" );
 		filter.MakeReliable();
-		EmitSound( filter, entindex(), "SuitRecharge.ChargingLoop" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "SuitRecharge.ChargingLoop" );
 	}
 
 	CBasePlayer *pl = (CBasePlayer *) m_hActivator.Get();
@@ -313,7 +313,7 @@ void CRecharge::Off(void)
 	// Stop looping sound.
 	if (m_iOn > 1)
 	{
-		StopSound( "SuitRecharge.ChargingLoop" );
+		g_pSoundEmitterSystem->StopSound(this, "SuitRecharge.ChargingLoop" );
 	}
 
 	m_iOn = 0;
@@ -438,9 +438,9 @@ void CNewRecharge::Precache( void )
 {
 	PrecacheModel( HEALTH_CHARGER_MODEL_NAME );
 
-	PrecacheScriptSound( "SuitRecharge.Deny" );
-	PrecacheScriptSound( "SuitRecharge.Start" );
-	PrecacheScriptSound( "SuitRecharge.ChargingLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "SuitRecharge.Deny" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "SuitRecharge.Start" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "SuitRecharge.ChargingLoop" );
 
 }
 
@@ -616,7 +616,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
 			m_flSoundTime = gpGlobals->curtime + 0.62;
-			EmitSound( "SuitRecharge.Deny" );
+			g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Deny" );
 		}
 		return;
 	}
@@ -636,7 +636,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 		if ( m_flSoundTime <= gpGlobals->curtime )
 		{
 			m_flSoundTime = gpGlobals->curtime + 0.62;
-			EmitSound( "SuitRecharge.Deny" );
+			g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Deny" );
 		}
 
 		return;
@@ -677,7 +677,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 			pPlayer->m_afButtonPressed &= ~IN_USE;
 			m_iCaps = FCAP_IMPULSE_USE;
 			
-			EmitSound( "SuitRecharge.Deny" );
+			g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Deny" );
 			return;
 		}
 	}
@@ -694,7 +694,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	if ( !m_iOn )
 	{
 		m_iOn++;
-		EmitSound( "SuitRecharge.Start" );
+		g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Start" );
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 
 		m_OnPlayerUse.FireOutput( pActivator, this );
@@ -705,7 +705,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 		m_iOn++;
 		CPASAttenuationFilter filter( this, "SuitRecharge.ChargingLoop" );
 		filter.MakeReliable();
-		EmitSound( filter, entindex(), "SuitRecharge.ChargingLoop" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "SuitRecharge.ChargingLoop" );
 	}
 
 	// Give armor if we need it
@@ -725,7 +725,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 
 void CNewRecharge::Recharge(void)
 {
-	EmitSound( "SuitRecharge.Start" );
+	g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Start" );
 	ResetSequence( LookupSequence( "idle" ) );
 
 	UpdateJuice( MaxJuice() );
@@ -743,7 +743,7 @@ void CNewRecharge::Off(void)
 	// Stop looping sound.
 	if (m_iOn > 1)
 	{
-		StopSound( "SuitRecharge.ChargingLoop" );
+		g_pSoundEmitterSystem->StopSound(this, "SuitRecharge.ChargingLoop" );
 	}
 	
 	if ( m_nState == 1 )

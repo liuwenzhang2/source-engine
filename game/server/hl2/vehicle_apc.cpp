@@ -129,9 +129,9 @@ void CPropAPC::Precache( void )
 		PrecacheModel( s_pGibModelName[i] );
 	}
 
-	PrecacheScriptSound( "Weapon_AR2.Single" );
-	PrecacheScriptSound( "PropAPC.FireRocket" );
-	PrecacheScriptSound( "combine.door_lock" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_AR2.Single" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "PropAPC.FireRocket" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "combine.door_lock" );
 }
 
 
@@ -729,7 +729,7 @@ void CPropAPC::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useT
 
 	if ( pActivator->IsPlayer() )
 	{
-		 EmitSound ( "combine.door_lock" );
+		g_pSoundEmitterSystem->EmitSound (this, "combine.door_lock" );
 	}
 }
 
@@ -846,7 +846,7 @@ void CPropAPC::FireMachineGun( void )
 	FireBullets( 1, vecMachineGunShootPos, vecMachineGunDir, VECTOR_CONE_8DEGREES, MAX_TRACE_LENGTH, bulletType, 1 );
 	DoMuzzleFlash();
 
-	EmitSound( "Weapon_AR2.Single" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_AR2.Single" );
 }
 
 
@@ -1021,7 +1021,7 @@ void CPropAPC::FireRocket( void )
 		pRocket->SetGuidanceHint( STRING( m_strMissileHint ) );
 	}
 
-	EmitSound( "PropAPC.FireRocket" );
+	g_pSoundEmitterSystem->EmitSound(this, "PropAPC.FireRocket" );
 	m_OnFiredMissile.FireOutput( this, this );
 }
 									 

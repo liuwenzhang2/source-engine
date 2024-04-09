@@ -62,7 +62,7 @@ void CEntityFlame::UpdateOnRemove()
 	// which kills me. Make sure to stop the burning sound.
 	if ( m_bPlayingSound )
 	{
-		EmitSound( "General.StopBurning" );
+		g_pSoundEmitterSystem->EmitSound(this, "General.StopBurning" );
 		m_bPlayingSound = false;
 	}
 
@@ -73,9 +73,9 @@ void CEntityFlame::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "General.StopBurning" );
-	PrecacheScriptSound( "General.BurningFlesh" );
-	PrecacheScriptSound( "General.BurningObject" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "General.StopBurning" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "General.BurningFlesh" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "General.BurningObject" );
 }
 
 //-----------------------------------------------------------------------------
@@ -160,11 +160,11 @@ void CEntityFlame::AttachToEntity( CBaseEntity *pTarget )
 
 	if( pTarget->IsNPC() )
 	{
-		EmitSound( "General.BurningFlesh" );
+		g_pSoundEmitterSystem->EmitSound(this, "General.BurningFlesh" );
 	}
 	else
 	{
-		EmitSound( "General.BurningObject" );
+		g_pSoundEmitterSystem->EmitSound(this, "General.BurningObject" );
 	}
 
 	m_bPlayingSound = true;
@@ -277,7 +277,7 @@ void CEntityFlame::FlameThink( void )
 	// See if we're done burning, or our attached ent has vanished
 	if ( m_flLifetime < gpGlobals->curtime || m_hEntAttached == NULL )
 	{
-		EmitSound( "General.StopBurning" );
+		g_pSoundEmitterSystem->EmitSound(this, "General.StopBurning" );
 		m_bPlayingSound = false;
 		SetThink( &CEntityFlame::SUB_Remove );
 		SetNextThink( gpGlobals->curtime + 0.5f );

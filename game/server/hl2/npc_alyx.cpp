@@ -138,7 +138,7 @@ void CNPC_Alyx::Spawn()
 void CNPC_Alyx::Precache()
 {
 	BaseClass::Precache();
-	PrecacheScriptSound( "npc_alyx.die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "npc_alyx.die" );
 	PrecacheModel( STRING( GetModelName() ) );
 	PrecacheModel( "models/alyx_emptool_prop.mdl" );
 }	
@@ -256,7 +256,7 @@ void CNPC_Alyx::DeathSound( const CTakeDamageInfo &info )
 	// Sentences don't play on dead NPCs
 	SentenceStop();
 
-	EmitSound( "npc_alyx.die" );
+	g_pSoundEmitterSystem->EmitSound(this, "npc_alyx.die" );
 }
 
 //=========================================================

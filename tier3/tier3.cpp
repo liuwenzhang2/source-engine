@@ -46,7 +46,7 @@ IMDLCache *mdlcache = 0;
 IVideoServices *g_pVideo = NULL;
 IDmeMakefileUtils *g_pDmeMakefileUtils = 0;
 IPhysicsCollision *g_pPhysicsCollision = 0;
-ISoundEmitterSystemBase *g_pSoundEmitterSystem = 0;
+ISoundEmitterSystemBase *g_pSoundEmitterSystemBase = 0;
 IVTex *g_pVTex = 0;
 
 
@@ -59,7 +59,7 @@ void ConnectTier3Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 	// Don't connect twice..
 	Assert( !g_pStudioRender && !studiorender && !g_pMatSystemSurface && !g_pVGui && !g_pVGuiPanel && !g_pVGuiInput &&
 		!g_pVGuiSurface && !g_pDataCache && !g_pMDLCache && !mdlcache && !g_pVideo &&
-		!g_pDmeMakefileUtils && !g_pPhysicsCollision && !g_pVGuiLocalize && !g_pSoundEmitterSystem &&
+		!g_pDmeMakefileUtils && !g_pPhysicsCollision && !g_pVGuiLocalize && !g_pSoundEmitterSystemBase &&
 		!g_pVGuiSchemeManager && !g_pVGuiSystem );
 
 	for ( int i = 0; i < nFactoryCount; ++i )
@@ -120,9 +120,9 @@ void ConnectTier3Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		{
 			g_pPhysicsCollision = ( IPhysicsCollision* )pFactoryList[i]( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
 		}
-		if ( !g_pSoundEmitterSystem )
+		if ( !g_pSoundEmitterSystemBase)
 		{
-			g_pSoundEmitterSystem = ( ISoundEmitterSystemBase* )pFactoryList[i]( SOUNDEMITTERSYSTEM_INTERFACE_VERSION, NULL );
+			g_pSoundEmitterSystemBase = ( ISoundEmitterSystemBase* )pFactoryList[i]( SOUNDEMITTERSYSTEM_INTERFACE_VERSION, NULL );
 		}
 		if ( !g_pVTex )
 		{
@@ -149,6 +149,6 @@ void DisconnectTier3Libraries()
 	g_pVideo = NULL;
 	g_pPhysicsCollision = 0;
 	g_pDmeMakefileUtils = NULL;
-	g_pSoundEmitterSystem = 0;
+	g_pSoundEmitterSystemBase = 0;
 	g_pVTex = NULL;
 }

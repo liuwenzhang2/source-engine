@@ -94,7 +94,7 @@ void CNPC_Scientist::Precache( void )
 {
 	PrecacheModel( "models/scientist.mdl" );
 
-	PrecacheScriptSound( "Scientist.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Scientist.Pain" );
 
 	TalkInit();
 	
@@ -539,12 +539,12 @@ void CNPC_Scientist::PainSound ( const CTakeDamageInfo &info )
 	CPASAttenuationFilter filter( this );
 
 	CSoundParameters params;
-	if ( GetParametersForSound( "Scientist.Pain", params, NULL ) )
+	if (g_pSoundEmitterSystem->GetParametersForSound( "Scientist.Pain", params, NULL ) )
 	{
 		EmitSound_t ep( params );
 		params.pitch = GetExpresser()->GetVoicePitch();
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 }
 

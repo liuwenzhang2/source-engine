@@ -77,8 +77,8 @@ void CWeaponSnark::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "WpnSnark.PrimaryAttack" );
-	PrecacheScriptSound( "WpnSnark.Deploy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WpnSnark.PrimaryAttack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WpnSnark.Deploy" );
 
 	UTIL_PrecacheOther("monster_snark");
 }
@@ -123,7 +123,7 @@ void CWeaponSnark::PrimaryAttack( void )
 
 	// play hunt sound
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "WpnSnark.PrimaryAttack" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "WpnSnark.PrimaryAttack" );
 
 	CSoundEnt::InsertSound( SOUND_DANGER, GetAbsOrigin(), 200, 0.2 );
 
@@ -178,7 +178,7 @@ void CWeaponSnark::WeaponIdle( void )
 bool CWeaponSnark::Deploy( void )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "WpnSnark.Deploy" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "WpnSnark.Deploy" );
 
 	return BaseClass::Deploy();
 }

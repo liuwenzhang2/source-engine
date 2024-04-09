@@ -59,14 +59,14 @@ void CDODHandGrenade::Precache()
 {
 	PrecacheModel( GRENADE_MODEL );
 
-	PrecacheScriptSound( "HEGrenade.Bounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HEGrenade.Bounce" );
 
 	BaseClass::Precache();
 }
 
 void CDODHandGrenade::BounceSound( void )
 {
-	EmitSound( "HEGrenade.Bounce" );
+	g_pSoundEmitterSystem->EmitSound(this, "HEGrenade.Bounce" );
 }
 
 //Pass the classname of the exploding version of this grenade.

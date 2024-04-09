@@ -372,7 +372,7 @@ void CDODGameMovement::CheckFalling( void )
 		{
 			CPASFilter filter( player->GetAbsOrigin() );
 			filter.UsePredictionRules();
-			player->EmitSound( filter, player->entindex(), "Player.JumpLanding" );
+			g_pSoundEmitterSystem->EmitSound( filter, player->entindex(), "Player.JumpLanding" );//player->
 		}
 
 		// turn off the jumping flag if we're on ground after a jump
@@ -741,7 +741,7 @@ bool CDODGameMovement::CheckJumpButton( void )
 	// make the jump sound
 	CPASFilter filter( m_pDODPlayer->GetAbsOrigin() );
 	filter.UsePredictionRules();
-	m_pDODPlayer->EmitSound( filter, m_pDODPlayer->entindex(), "Player.Jump" );
+	g_pSoundEmitterSystem->EmitSound( filter, m_pDODPlayer->entindex(), "Player.Jump" );//m_pDODPlayer->
 
 	float flGroundFactor = 1.0f;
 	if ( player->GetSurfaceData() )

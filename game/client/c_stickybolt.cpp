@@ -113,7 +113,7 @@ public:
 			ep.m_SoundLevel = SNDLVL_NORM;
 			ep.m_pOrigin = &pEnt->GetAbsOrigin();
 
-			C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, ep );
+			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );//C_BaseEntity::
 	
 			return ITERATION_STOP;
 		}

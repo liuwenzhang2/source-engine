@@ -343,25 +343,25 @@ void CPropAirboat::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "Airboat_engine_stop" );
-	PrecacheScriptSound( "Airboat_engine_start" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_engine_stop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_engine_start" );
 
-	PrecacheScriptSound( "Airboat.FireGunHeavy" );
-	PrecacheScriptSound( "Airboat.FireGunRevDown");
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat.FireGunHeavy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat.FireGunRevDown");
 
-	PrecacheScriptSound( "Airboat_engine_idle" );
-	PrecacheScriptSound( "Airboat_engine_fullthrottle" );
-	PrecacheScriptSound( "Airboat_fan_idle" );
-	PrecacheScriptSound( "Airboat_fan_fullthrottle" );
-	PrecacheScriptSound( "Airboat_water_stopped" );
-	PrecacheScriptSound( "Airboat_water_fast" );
-	PrecacheScriptSound( "Airboat_impact_splash" );
-	PrecacheScriptSound( "Airboat_impact_hard" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_engine_idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_engine_fullthrottle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_fan_idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_fan_fullthrottle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_water_stopped" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_water_fast" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_impact_splash" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_impact_hard" );
 
-	PrecacheScriptSound( "Airboat_headlight_on" );
-	PrecacheScriptSound( "Airboat_headlight_off" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_headlight_on" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat_headlight_off" );
 
-	PrecacheScriptSound( "Airboat.FireGunLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat.FireGunLoop" );
 
 	PrecacheMaterial( "effects/splashwake1" );
 	PrecacheMaterial( "effects/splashwake4" );
@@ -664,7 +664,7 @@ void CPropAirboat::EnterVehicle( CBaseCombatCharacter *pPlayer )
 
 	// Play the engine start sound.
 	float flDuration;
-	EmitSound( "Airboat_engine_start", 0.0, &flDuration );
+	g_pSoundEmitterSystem->EmitSound(this, "Airboat_engine_start", 0.0, &flDuration );
 	m_VehiclePhysics.TurnOn();
 
 	// Start playing the engine's idle sound as the startup sound finishes.
@@ -736,7 +736,7 @@ void CPropAirboat::ExitVehicle( int nRole )
 	ep.m_SoundLevel = SNDLVL_NORM;
 	ep.m_nPitch = controller.SoundGetPitch( m_pEngineSound );
 
-	EmitSound( filter, entindex(), ep );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	m_VehiclePhysics.TurnOff();
 
 	// Shut off the airboat sounds.
@@ -754,7 +754,7 @@ void CPropAirboat::ExitVehicle( int nRole )
 //-----------------------------------------------------------------------------
 void CPropAirboat::HeadlightTurnOn( void )
 {
-	EmitSound( "Airboat_headlight_on" );
+	g_pSoundEmitterSystem->EmitSound(this, "Airboat_headlight_on" );
 	m_bHeadlightIsOn = true;
 }
 
@@ -764,7 +764,7 @@ void CPropAirboat::HeadlightTurnOn( void )
 //-----------------------------------------------------------------------------
 void CPropAirboat::HeadlightTurnOff( void )
 {
-	EmitSound( "Airboat_headlight_off" );
+	g_pSoundEmitterSystem->EmitSound(this, "Airboat_headlight_off" );
 	m_bHeadlightIsOn = false;
 }
 
@@ -1447,12 +1447,12 @@ void CPropAirboat::UpdateWaterSound( CSoundEnvelopeController &controller, float
 			if ( ( fabs( vecVelocityWorld.x ) > 400 ) || ( fabs( vecVelocityWorld.y ) > 400 ) || ( fabs( vecVelocityWorld.z ) > 400 ) )
 			{
 				// Landed in the water. Play a splash sound.
-				EmitSound( "Airboat_impact_splash" );
+				g_pSoundEmitterSystem->EmitSound(this, "Airboat_impact_splash" );
 
 				if ( fabs( vecVelocityWorld.z ) > 200 )
 				{
 					// Landed hard in the water. Play a smack sound.
-					EmitSound( "Airboat_impact_hard" );
+					g_pSoundEmitterSystem->EmitSound(this, "Airboat_impact_hard" );
 				}
 			}
 		}
@@ -1731,7 +1731,7 @@ void CPropAirboat::UpdateGunState( CUserCmd *ucmd )
 
 			if ( m_nAmmoCount == 0 )
 			{
-				EmitSound( "Airboat.FireGunRevDown" );
+				g_pSoundEmitterSystem->EmitSound(this, "Airboat.FireGunRevDown" );
 				bStopRumble = true;
 //				RemoveAllGestures();
 			}
@@ -1743,7 +1743,7 @@ void CPropAirboat::UpdateGunState( CUserCmd *ucmd )
 		{
 			if ( m_nAmmoCount != 0 )
 			{
-				EmitSound( "Airboat.FireGunRevDown" );
+				g_pSoundEmitterSystem->EmitSound(this, "Airboat.FireGunRevDown" );
 				bStopRumble = true;
 //				RemoveAllGestures();
 			}

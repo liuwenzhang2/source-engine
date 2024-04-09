@@ -248,12 +248,12 @@ void CNPC_BaseTurret::Precache()
 {
 	m_iAmmoType = GetAmmoDef()->Index("12mmRound");	
 
-	PrecacheScriptSound( "Turret.Alert" );
-	PrecacheScriptSound( "Turret.Die" );
-	PrecacheScriptSound( "Turret.Deploy" );
-	PrecacheScriptSound( "Turret.Undeploy" );
-	PrecacheScriptSound( "Turret.Ping" );
-	PrecacheScriptSound( "Turret.Shoot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.Deploy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.Undeploy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.Ping" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.Shoot" );
 }
 
 Class_T CNPC_BaseTurret::Classify( void )
@@ -760,7 +760,7 @@ void CNPC_BaseTurret::AutoSearchThink(void)
 	{
 		SetThink(&CNPC_BaseTurret::Deploy);
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Turret.Alert" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.Alert" );
 	}
 
 	SetEnemy( pEnemy );
@@ -781,9 +781,9 @@ void CNPC_BaseTurret::TurretDeath(void)
 		m_lifeState = LIFE_DEAD;
 
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Turret.Die" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.Die" );
 	
-		StopSound( entindex(), "Turret.Spinup" );
+		g_pSoundEmitterSystem->StopSound( entindex(), "Turret.Spinup" );
 
 		if (m_iOrientation == TURRET_ORIENTATION_FLOOR)
 			m_vecGoalAngles.x = -14;
@@ -838,7 +838,7 @@ void CNPC_BaseTurret::Deploy(void)
 		m_iOn = 1;
 		SetTurretAnim(TURRET_ANIM_DEPLOY);
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Turret.Deploy" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.Deploy" );
 		m_OnActivate.FireOutput(this, this);
 	}
 
@@ -899,7 +899,7 @@ void CNPC_BaseTurret::Retire(void)
 		{
 			SetTurretAnim(TURRET_ANIM_RETIRE);
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "Turret.Undeploy" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.Undeploy" );
 			m_OnDeactivate.FireOutput(this, this);
 		}
 		//else if (IsSequenceFinished()) 
@@ -945,7 +945,7 @@ void CNPC_BaseTurret::Ping(void)
 	{
 		m_flPingTime = gpGlobals->curtime + 1;
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Turret.Ping" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.Ping" );
 
 		EyeOn( );
 	}
@@ -1221,11 +1221,11 @@ void CNPC_Turret::Precache()
 
 	PrecacheModel( "sprites/xspark4.vmt" );
 
-	PrecacheScriptSound( "Turret.Shoot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.Shoot" );
 
-	PrecacheScriptSound( "Turret.SpinUpCall" );
-	PrecacheScriptSound( "Turret.Spinup" );
-	PrecacheScriptSound( "Turret.SpinDownCall" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.SpinUpCall" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.Spinup" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.SpinDownCall" );
 	//precache sounds
 }
 
@@ -1235,7 +1235,7 @@ void CNPC_Turret::Shoot(Vector &vecSrc, Vector &vecDirToEnemy)
 
 	FireBullets( 1, vecSrc, vecDirToEnemy, TURRET_SPREAD, TURRET_RANGE, m_iAmmoType, 1 );
 
-	EmitSound( filter, entindex(), "Turret.Shoot" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.Shoot" );
 
 	DoMuzzleFlash();
 }
@@ -1254,7 +1254,7 @@ void CNPC_Turret::SpinUpCall(void)
 		{
 			SetNextThink( gpGlobals->curtime + 1.0 );	//spinup delay
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "Turret.SpinUpCall" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.SpinUpCall" );
 			m_iStartSpin = 1;
 			m_flPlaybackRate = 0.1;
 		}
@@ -1263,7 +1263,7 @@ void CNPC_Turret::SpinUpCall(void)
 		{
 			SetNextThink( gpGlobals->curtime + 0.1 );// retarget delay
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "Turret.Spinup" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.Spinup" );
 			SetThink(&CNPC_BaseTurret::ActiveThink);
 			m_iStartSpin = 0;
 			m_iSpin = 1;
@@ -1290,8 +1290,8 @@ void CNPC_Turret::SpinDownCall(void)
 
 		if ( m_flPlaybackRate == 1.0)
 		{
-			StopSound( entindex(), "Turret.Spinup" );
-			EmitSound( filter, entindex(), "Turret.SpinDownCall" );
+			g_pSoundEmitterSystem->StopSound( entindex(), "Turret.Spinup" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.SpinDownCall" );
 		}
 		m_flPlaybackRate -= 0.02;
 		if (m_flPlaybackRate <= 0)
@@ -1336,7 +1336,7 @@ void CNPC_MiniTurret::Precache()
 
 	m_iAmmoType = GetAmmoDef()->Index("9mmRound");
 
-	PrecacheScriptSound( "Turret.Shoot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.Shoot" );
 
 	PrecacheModel ("models/miniturret.mdl");	
 }
@@ -1347,7 +1347,7 @@ void CNPC_MiniTurret::Shoot(Vector &vecSrc, Vector &vecDirToEnemy)
 
 	CPASAttenuationFilter filter( this );
 
-	EmitSound( filter, entindex(), "Turret.Shoot" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.Shoot" );
 	
 	DoMuzzleFlash();
 }
@@ -1388,8 +1388,8 @@ void CNPC_Sentry::Precache()
 
 	m_iAmmoType = GetAmmoDef()->Index("9mmRound");
 
-	PrecacheScriptSound( "Sentry.Shoot" );
-	PrecacheScriptSound( "Sentry.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Sentry.Shoot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Sentry.Die" );
 
 	PrecacheModel ("models/sentry.mdl");
 }
@@ -1432,7 +1432,7 @@ void CNPC_Sentry::Shoot(Vector &vecSrc, Vector &vecDirToEnemy)
 	FireBullets( 1, vecSrc, vecDirToEnemy, TURRET_SPREAD, TURRET_RANGE, m_iAmmoType, 1 );
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Sentry.Shoot" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Sentry.Shoot" );
 	
 	DoMuzzleFlash();
 }
@@ -1472,9 +1472,9 @@ int CNPC_Sentry::OnTakeDamage_Alive(const CTakeDamageInfo &info)
 void CNPC_Sentry::Event_Killed( const CTakeDamageInfo &info )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Sentry.Die" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Sentry.Die" );
 
-	StopSound( entindex(), "Turret.Spinup" );
+	g_pSoundEmitterSystem->StopSound( entindex(), "Turret.Spinup" );
 
 	AddSolidFlags( FSOLID_NOT_STANDABLE );
 

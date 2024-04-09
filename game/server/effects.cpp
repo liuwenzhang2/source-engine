@@ -1412,7 +1412,7 @@ void CItemSoda::Precache ( void )
 {
 	PrecacheModel( "models/can.mdl" );
 
-	PrecacheScriptSound( "ItemSoda.Bounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "ItemSoda.Bounce" );
 }
 
 void CItemSoda::Spawn( void )
@@ -1430,7 +1430,7 @@ void CItemSoda::Spawn( void )
 
 void CItemSoda::CanThink ( void )
 {
-	EmitSound( "ItemSoda.Bounce" );
+	g_pSoundEmitterSystem->EmitSound(this, "ItemSoda.Bounce" );
 
 	SetSolid( SOLID_BBOX );
 	AddSolidFlags( FSOLID_TRIGGER );
@@ -2102,7 +2102,7 @@ LINK_ENTITY_TO_CLASS( env_gunfire, CEnvGunfire );
 //-----------------------------------------------------------------------------
 void CEnvGunfire::Precache()
 {
-	PrecacheScriptSound( STRING( m_iszShootSound ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_iszShootSound ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -2235,7 +2235,7 @@ void CEnvGunfire::ShootThink()
 		UTIL_Tracer( GetAbsOrigin(), vecEnd, 0, TRACER_DONT_USE_ATTACHMENT, 5000, true );
 	}
 
-	EmitSound( STRING(m_iszShootSound) );
+	g_pSoundEmitterSystem->EmitSound(this, STRING(m_iszShootSound) );
 
 	m_iShotsRemaining--;
 
@@ -2300,17 +2300,17 @@ CEnvQuadraticBeam *CreateQuadraticBeam( const char *pSpriteName, const Vector &s
 
 void EffectsPrecache( void *pUser )
 {
-	CBaseEntity::PrecacheScriptSound( "Underwater.BulletImpact" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Underwater.BulletImpact" );
 
-	CBaseEntity::PrecacheScriptSound( "FX_RicochetSound.Ricochet" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "FX_RicochetSound.Ricochet" );
 
-	CBaseEntity::PrecacheScriptSound( "Physics.WaterSplash" );
-	CBaseEntity::PrecacheScriptSound( "BaseExplosionEffect.Sound" );
-	CBaseEntity::PrecacheScriptSound( "Splash.SplashSound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Physics.WaterSplash" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseExplosionEffect.Sound" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Splash.SplashSound" );
 
 	if ( gpGlobals->maxClients > 1 )
 	{
-		CBaseEntity::PrecacheScriptSound( "HudChat.Message" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "HudChat.Message" );
 	}
 }
 

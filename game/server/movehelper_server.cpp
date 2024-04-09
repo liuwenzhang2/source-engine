@@ -270,7 +270,7 @@ void CMoveHelperServer::StartSound( const Vector& origin, const char *soundname 
 	CRecipientFilter filter;
 	filter.AddRecipientsByPAS( origin );
 
-	CBaseEntity::EmitSound( filter, m_pHostPlayer->entindex(), soundname );
+	g_pSoundEmitterSystem->EmitSound( filter, m_pHostPlayer->entindex(), soundname );//CBaseEntity::
 }
 
 //-----------------------------------------------------------------------------
@@ -296,7 +296,7 @@ void CMoveHelperServer::StartSound( const Vector& origin, int channel, char cons
 		ep.m_nPitch = pitch;
 		ep.m_pOrigin = &origin;
 
-		CBaseEntity::EmitSound( filter, m_pHostPlayer->entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, m_pHostPlayer->entindex(), ep );//CBaseEntity::
 	}
 	else
 	{
@@ -311,7 +311,7 @@ void CMoveHelperServer::StartSound( const Vector& origin, int channel, char cons
 		ep.m_nPitch = pitch;
 		ep.m_pOrigin = &origin;
 
-		CBaseEntity::EmitSound( filter, m_pHostPlayer->entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, m_pHostPlayer->entindex(), ep );//CBaseEntity::
 	}
 }
 

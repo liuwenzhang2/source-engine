@@ -42,10 +42,10 @@ void CHL2MP_Player::PrecacheFootStepSounds( void )
 		char szFootStepName[128];
 
 		Q_snprintf( szFootStepName, sizeof( szFootStepName ), "%s.RunFootstepLeft", g_ppszPlayerSoundPrefixNames[i] );
-		PrecacheScriptSound( szFootStepName );
+		g_pSoundEmitterSystem->PrecacheScriptSound( szFootStepName );
 
 		Q_snprintf( szFootStepName, sizeof( szFootStepName ), "%s.RunFootstepRight", g_ppszPlayerSoundPrefixNames[i] );
-		PrecacheScriptSound( szFootStepName );
+		g_pSoundEmitterSystem->PrecacheScriptSound( szFootStepName );
 	}
 }
 
@@ -96,7 +96,7 @@ void CHL2MP_Player::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, f
 	}
 
 	CSoundParameters params;
-	if ( GetParametersForSound( szStepSound, params, NULL ) == false )
+	if (g_pSoundEmitterSystem->GetParametersForSound( szStepSound, params, NULL ) == false )
 		return;
 
 	CRecipientFilter filter;
@@ -118,7 +118,7 @@ void CHL2MP_Player::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, f
 	ep.m_nPitch = params.pitch;
 	ep.m_pOrigin = &vecOrigin;
 
-	EmitSound( filter, entindex(), ep );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 }
 
 

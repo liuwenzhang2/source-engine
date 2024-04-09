@@ -920,7 +920,7 @@ void CEnvGlobal::Spawn( void )
 	// if we modify the state of the physics cannon, make sure we precache the ragdoll boogie zap sound
 	if ( ( m_globalstate != NULL_STRING ) && ( stricmp( STRING( m_globalstate ), "super_phys_gun" ) == 0 ) )
 	{
-		PrecacheScriptSound( "RagdollBoogie.Zap" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "RagdollBoogie.Zap" );
 	}
 #endif
 

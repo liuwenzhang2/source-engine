@@ -343,13 +343,13 @@ void CNPC_Nihilanth::Precache( void )
 	UTIL_PrecacheOther( "monster_alien_controller" );
 	UTIL_PrecacheOther( "monster_alien_slave" );
 
-	PrecacheScriptSound( "Nihilanth.PainLaugh" );
-	PrecacheScriptSound( "Nihilanth.Pain" );
-	PrecacheScriptSound( "Nihilanth.Die" );
-	PrecacheScriptSound( "Nihilanth.FriendBeam" );
-	PrecacheScriptSound( "Nihilanth.Attack" );
-	PrecacheScriptSound( "Nihilanth.BallAttack" );
-	PrecacheScriptSound( "Nihilanth.Recharge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Nihilanth.PainLaugh" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Nihilanth.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Nihilanth.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Nihilanth.FriendBeam" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Nihilanth.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Nihilanth.BallAttack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Nihilanth.Recharge" );
 
 }
 
@@ -363,19 +363,19 @@ void CNPC_Nihilanth::PainSound( const CTakeDamageInfo &info )
 	if ( m_iHealth > sk_nihilanth_health.GetFloat() / 2 )
 	{
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Nihilanth.PainLaugh" ); 
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Nihilanth.PainLaugh" );
 	}
 	else if (m_irritation >= 2)
 	{
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Nihilanth.Pain" ); 
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Nihilanth.Pain" );
 	}
 }	
 
 void CNPC_Nihilanth::DeathSound( const CTakeDamageInfo &info )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Nihilanth.Die" ); 
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Nihilanth.Die" );
 }
 
 int	CNPC_Nihilanth::OnTakeDamage_Alive( const CTakeDamageInfo &info )
@@ -894,7 +894,7 @@ void CNPC_Nihilanth::MakeFriend( Vector vecStart )
 			if (m_hFriend[i] != NULL)
 			{
 				CPASAttenuationFilter filter( this );
-				EmitSound( filter, m_hFriend[i]->entindex(), "Nihilanth.FriendBeam" ); 
+				g_pSoundEmitterSystem->EmitSound( filter, m_hFriend[i]->entindex(), "Nihilanth.FriendBeam" );
 			}
 
 			return;
@@ -1139,9 +1139,9 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 			CPASAttenuationFilter filter( this );
 		
 			if ( random->RandomInt(0,4) == 0)
-				EmitSound( filter, entindex(), "Nihilanth.Attack" ); 
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Nihilanth.Attack" );
 			
-			EmitSound( filter, entindex(), "Nihilanth.BallAttack" ); 
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Nihilanth.BallAttack" );
 
 			GetAttachment( 2, vOrigin, vAngle);
 			
@@ -1170,7 +1170,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 			if (pTrigger != NULL || pTouch != NULL)
 			{
 				CPASAttenuationFilter filter( this );
-				EmitSound( filter, entindex(), "Nihilanth.Attack" ); 
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Nihilanth.Attack" );
 
 				Vector vecSrc;
 				QAngle vecAngles;
@@ -1198,7 +1198,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 				m_iTeleport++; // unexpected failure
 
 				CPASAttenuationFilter filter( this );
-				EmitSound( filter, entindex(), "Nihilanth.BallAttack" ); 
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Nihilanth.BallAttack" );
 
 				Msg( "nihilanth can't target %s\n", szText );
 
@@ -1230,7 +1230,7 @@ void CNPC_Nihilanth::HandleAnimEvent( animevent_t *pEvent )
 	case 5:	// start up sphere machine
 		{
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "Nihilanth.Recharge" ); 
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Nihilanth.Recharge" );
 		}
 		break;
 	case 6:
@@ -1288,8 +1288,8 @@ void CNihilanthHVR::Precache( void )
 
 	PrecacheModel("sprites/laserbeam.vmt");
 
-	PrecacheScriptSound( "NihilanthHVR.Zap" );
-	PrecacheScriptSound( "NihilanthHVR.TeleAttack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NihilanthHVR.Zap" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NihilanthHVR.TeleAttack" );
 }
 
 void CNihilanthHVR::CircleInit( CBaseEntity *pTarget )
@@ -1457,7 +1457,7 @@ void CNihilanthHVR::ZapInit( CBaseEntity *pEnemy )
 	SetNextThink( gpGlobals->curtime + 0.1 );
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "NihilanthHVR.Zap" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NihilanthHVR.Zap" );
 }
 
 void CNihilanthHVR::ZapThink( void  )
@@ -1627,7 +1627,7 @@ void CNihilanthHVR::TeleportInit( CNPC_Nihilanth *pOwner, CBaseEntity *pEnemy, C
 	SetNextThink( gpGlobals->curtime + 0.1 );
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "NihilanthHVR.TeleAttack" ); 
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NihilanthHVR.TeleAttack" );
 }
 
 void CNihilanthHVR::MovetoTarget( Vector vecTarget )
@@ -1660,7 +1660,7 @@ void CNihilanthHVR::TeleportThink( void  )
 	// check world boundaries
 	if ( GetEnemy() == NULL || !GetEnemy()->IsAlive() || GetAbsOrigin().x < -4096 || GetAbsOrigin().x > 4096 || GetAbsOrigin().y < -4096 || GetAbsOrigin().y > 4096 || GetAbsOrigin().z < -4096 || GetAbsOrigin().z > 4096)
 	{
-		StopSound( entindex(), "NihilanthHVR.TeleAttack" );
+		g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
 		UTIL_Remove( this );
 		UTIL_Remove( GetSprite() );
 		return;
@@ -1668,7 +1668,7 @@ void CNihilanthHVR::TeleportThink( void  )
 
 	if (( GetEnemy()->WorldSpaceCenter() - GetAbsOrigin() ).Length() < 128)
 	{
-		StopSound( entindex(), "NihilanthHVR.TeleAttack" );
+		g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
 		UTIL_Remove( this );
 		UTIL_Remove( GetSprite() );
 
@@ -1714,7 +1714,7 @@ void CNihilanthHVR::TeleportTouch( CBaseEntity *pOther )
 	}
 
 	SetTouch( NULL );
-	StopSound( entindex(), "NihilanthHVR.TeleAttack" );
+	g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
 	UTIL_Remove( this );
 	UTIL_Remove( GetSprite() );
 }
@@ -1739,7 +1739,7 @@ void CNihilanthHVR::GreenBallInit( )
 
 void CNihilanthHVR::RemoveTouch( CBaseEntity *pOther )
 {
-	StopSound( entindex(), "NihilanthHVR.TeleAttack" );
+	g_pSoundEmitterSystem->StopSound( entindex(), "NihilanthHVR.TeleAttack" );
 	UTIL_Remove( this );
 	UTIL_Remove( GetSprite() );
 }

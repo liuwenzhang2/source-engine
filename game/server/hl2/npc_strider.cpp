@@ -445,21 +445,21 @@ void CNPC_Strider::Precache()
 
 	PropBreakablePrecacheAll( GetModelName() );
 
-	PrecacheScriptSound( "NPC_Strider.StriderBusterExplode" );
-	PrecacheScriptSound( "explode_5" );
-	PrecacheScriptSound( "NPC_Strider.Charge" );
-	PrecacheScriptSound( "NPC_Strider.RagdollDetach" );
-	PrecacheScriptSound( "NPC_Strider.Whoosh" );
-	PrecacheScriptSound( "NPC_Strider.Creak" );
-	PrecacheScriptSound( "NPC_Strider.Alert" );
-	PrecacheScriptSound( "NPC_Strider.Pain" );
-	PrecacheScriptSound( "NPC_Strider.Death" );
-	PrecacheScriptSound( "NPC_Strider.FireMinigun" );
-	PrecacheScriptSound( "NPC_Strider.Shoot" );
-	PrecacheScriptSound( "NPC_Strider.OpenHatch" );
-	PrecacheScriptSound( "NPC_Strider.Footstep" );
-	PrecacheScriptSound( "NPC_Strider.Skewer" );
-	PrecacheScriptSound( "NPC_Strider.Hunt" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.StriderBusterExplode" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "explode_5" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Charge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.RagdollDetach" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Whoosh" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Creak" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Death" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.FireMinigun" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Shoot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.OpenHatch" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Footstep" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Skewer" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Hunt" );
 	PrecacheMaterial( "effects/water_highlight" );
 	s_iImpactEffectTexture = PrecacheModel( "sprites/physbeam.vmt" );
 	PrecacheMaterial( "sprites/bluelaser1" );
@@ -1544,7 +1544,7 @@ void CNPC_Strider::StartTask( const Task_t *pTask )
 				WRITE_VEC3COORD( vecShootPos );
 			MessageEnd();
 			CPASAttenuationFilter filter2( this, "NPC_Strider.Charge" );
-			EmitSound( filter2, entindex(), "NPC_Strider.Charge" );
+			g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "NPC_Strider.Charge" );
 
 			//	CPVSFilter filter( vecShootPos );
 			//te->StreakSphere( filter, 0, 0, 150, 100, entindex(), gm_CannonAttachment );
@@ -1889,7 +1889,7 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 				WRITE_VEC3COORD( vecShootPos );
 			MessageEnd();
 			CPASAttenuationFilter filter2( this, "NPC_Strider.Charge" );
-			EmitSound( filter2, entindex(), "NPC_Strider.Charge" );
+			g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "NPC_Strider.Charge" );
 		}
 		break;
 	case STRIDER_AE_CANNONHIT:
@@ -1920,7 +1920,7 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 			if ( pRagdoll )
 			{
 				CPASAttenuationFilter filter( pRagdoll, "NPC_Strider.RagdollDetach" );
-				EmitSound( filter, pRagdoll->entindex(), "NPC_Strider.RagdollDetach" );
+				g_pSoundEmitterSystem->EmitSound( filter, pRagdoll->entindex(), "NPC_Strider.RagdollDetach" );
 				DetachAttachedRagdoll( pRagdoll );
 			}
 			m_hRagdoll = NULL;
@@ -1947,7 +1947,7 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 			GetAttachment( "left foot", footPosition );
 
 			CPASAttenuationFilter filter( this, "NPC_Strider.Whoosh" );
-			EmitSound( filter, 0, "NPC_Strider.Whoosh", &footPosition );
+			g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.Whoosh", &footPosition );
 		}
 		break;
 	case STRIDER_AE_WHOOSH_RIGHT:
@@ -1955,7 +1955,7 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 			GetAttachment( "right foot", footPosition );
 
 			CPASAttenuationFilter filter( this, "NPC_Strider.Whoosh" );
-			EmitSound( filter, 0, "NPC_Strider.Whoosh", &footPosition );
+			g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.Whoosh", &footPosition );
 		}
 		break;
 	case STRIDER_AE_WHOOSH_BACK:
@@ -1963,14 +1963,14 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 			GetAttachment( "back foot", footPosition );
 
 			CPASAttenuationFilter filter( this, "NPC_Strider.Whoosh" );
-			EmitSound( filter, 0, "NPC_Strider.Whoosh", &footPosition );
+			g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.Whoosh", &footPosition );
 		}
 		break;
 	case STRIDER_AE_CREAK_LEFT:
 	case STRIDER_AE_CREAK_BACK:
 	case STRIDER_AE_CREAK_RIGHT:
 		{
-			EmitSound( "NPC_Strider.Creak" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Creak" );
 		}
 		break;
 	default:
@@ -2428,7 +2428,7 @@ bool CNPC_Strider::UpdateEnemyMemory( CBaseEntity *pEnemy, const Vector &positio
 {
 	if( pInformer && FClassnameIs( pInformer, "npc_cscanner" ) )
 	{
-		EmitSound( "NPC_Strider.Alert" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Alert" );
 		// Move Strider's focus to this location and make strider mad at it
 		// (but less mad than at any other potential entities in the scene).
 #if 1
@@ -2953,7 +2953,7 @@ void CNPC_Strider::AlertSound()
 {
 	if( ( gpGlobals->curtime - m_flTimeLastAlertSound ) > 2.0f )
 	{
-		EmitSound( "NPC_Strider.Alert" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Alert" );
 		m_flTimeLastAlertSound = gpGlobals->curtime;
 	}
 }
@@ -2966,7 +2966,7 @@ void CNPC_Strider::PainSound( const CTakeDamageInfo &info )
 	if ( ShouldExplodeFromDamage( info ) )
 		return;
 
-	EmitSound( "NPC_Strider.Pain" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Pain" );
 }
 
 //---------------------------------------------------------
@@ -2976,12 +2976,12 @@ void CNPC_Strider::DeathSound( const CTakeDamageInfo &info )
 	// This means that we've exploded into pieces and have no way to whimper
 	if ( m_bExploding )
 	{
-		EmitSound( "NPC_Strider.StriderBusterExplode" );
-		EmitSound( "explode_5" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.StriderBusterExplode" );
+		g_pSoundEmitterSystem->EmitSound(this, "explode_5" );
 		return;
 	}
 
-	EmitSound( "NPC_Strider.Death" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Death" );
 }
 
 //---------------------------------------------------------
@@ -2990,7 +2990,7 @@ void CNPC_Strider::HuntSound()
 {
 	if( m_PlayerFreePass.HasPass() )
 	{
-		EmitSound( "NPC_Strider.Hunt" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Hunt" );
 		m_flTimeNextHuntSound = gpGlobals->curtime + random->RandomFloat( 8.0f, 12.0f );
 	}
 }
@@ -3824,7 +3824,7 @@ void CNPC_Strider::ShootMinigun( const Vector *pTarget, float aimError, const Ve
 		//g_pEffects->MuzzleFlash( muzzlePos, muzzleAng, random->RandomFloat( 2.0f, 4.0f ) , MUZZLEFLASH_TYPE_STRIDER );
 		DoMuzzleFlash();
 
-		EmitSound( "NPC_Strider.FireMinigun" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.FireMinigun" );
 	}
 }
 
@@ -4081,7 +4081,7 @@ void CNPC_Strider::FireCannon()
 	MessageEnd();
 
 	CPASAttenuationFilter filter2( this, "NPC_Strider.Shoot" );
-	EmitSound( filter2, entindex(), "NPC_Strider.Shoot");
+	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "NPC_Strider.Shoot");
 	SetContextThink( &CNPC_Strider::CannonHitThink, gpGlobals->curtime + 0.2f, "CANNON_HIT" );
 }
 
@@ -4222,12 +4222,12 @@ Vector CNPC_Strider::LeftFootHit( float eventtime )
 	if ( hl2_episodic.GetBool() )
 	{
 		CPASAttenuationFilter filter( this, "NPC_Strider.FootstepEverywhere" );
-		EmitSound( filter, 0, "NPC_Strider.FootstepEverywhere", &footPosition, eventtime );
+		g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.FootstepEverywhere", &footPosition, eventtime );
 	}
 	else
 	{
 		CPASAttenuationFilter filter( this, "NPC_Strider.Footstep" );
-		EmitSound( filter, 0, "NPC_Strider.Footstep", &footPosition, eventtime );
+		g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.Footstep", &footPosition, eventtime );
 	}
 
 	FootFX( footPosition );
@@ -4246,12 +4246,12 @@ Vector CNPC_Strider::RightFootHit( float eventtime )
 	if ( hl2_episodic.GetBool() )
 	{
 		CPASAttenuationFilter filter( this, "NPC_Strider.FootstepEverywhere" );
-		EmitSound( filter, 0, "NPC_Strider.FootstepEverywhere", &footPosition, eventtime );
+		g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.FootstepEverywhere", &footPosition, eventtime );
 	}
 	else
 	{
 		CPASAttenuationFilter filter( this, "NPC_Strider.Footstep" );
-		EmitSound( filter, 0, "NPC_Strider.Footstep", &footPosition, eventtime );
+		g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.Footstep", &footPosition, eventtime );
 	}
 
 	FootFX( footPosition );
@@ -4271,12 +4271,12 @@ Vector CNPC_Strider::BackFootHit( float eventtime )
 	if ( hl2_episodic.GetBool() )
 	{
 		CPASAttenuationFilter filter( this, "NPC_Strider.FootstepEverywhere" );
-		EmitSound( filter, 0, "NPC_Strider.FootstepEverywhere", &footPosition, eventtime );
+		g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.FootstepEverywhere", &footPosition, eventtime );
 	}
 	else
 	{
 		CPASAttenuationFilter filter( this, "NPC_Strider.Footstep" );
-		EmitSound( filter, 0, "NPC_Strider.Footstep", &footPosition, eventtime );
+		g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.Footstep", &footPosition, eventtime );
 	}
 
 	FootFX( footPosition );
@@ -4349,7 +4349,7 @@ void CNPC_Strider::StompHit( int followerBoneIndex )
 	GetAttachment( "left foot", footPosition );
 
 	CPASAttenuationFilter filter( this, "NPC_Strider.Skewer" );
-	EmitSound( filter, 0, "NPC_Strider.Skewer", &hitPosition );
+	g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.Skewer", &hitPosition );
 
 	CTakeDamageInfo damageInfo( this, this, 500, DMG_CRUSH );
 	Vector forward;
@@ -4463,12 +4463,12 @@ void AdjustStriderNodePosition( CAI_Network *pNetwork, CAI_Node *pNode )
 		bool bCreated = false;
 		if ( !pStrider )
 		{
-			bool allowPrecache = CBaseEntity::IsPrecacheAllowed();
-			CBaseEntity::SetAllowPrecache( true );
+			bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
+			g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
 			pStrider = (CNPC_Strider *)gEntList.CreateEntityByName( "npc_strider" );
 			pStrider->m_bDisableBoneFollowers = true; // don't create these since we're just going to destroy him
 			DispatchSpawn( pStrider );
-			CBaseEntity::SetAllowPrecache( allowPrecache );
+			g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
 			bCreated = true;
 		}
 
@@ -5369,14 +5369,14 @@ void CSparkTrail::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "DoSpark" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "DoSpark" );
 }
 
 void CSparkTrail::Spawn()
 {
 	Precache();
 
-	EmitSound( "DoSpark" );
+	g_pSoundEmitterSystem->EmitSound(this, "DoSpark" );
 
 	m_iHealth = 20 + random->RandomInt( 0, 5 );
 	UTIL_SetOrigin( this, GetOwnerEntity()->EyePosition() );

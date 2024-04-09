@@ -128,7 +128,7 @@ void CGrenadeBugBait::Precache( void )
 {
 	PrecacheModel( GRENADE_MODEL );
 
-	PrecacheScriptSound( "GrenadeBugBait.Splat" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeBugBait.Splat" );
 
 	BaseClass::Precache();
 }
@@ -188,7 +188,7 @@ void CGrenadeBugBait::BugBaitTouch( CBaseEntity *pOther )
 
 	//Make a splat sound
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "GrenadeBugBait.Splat" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "GrenadeBugBait.Splat" );
 
 	//Make sure we want to call antlions
 	if ( ActivateBugbaitTargets( GetThrower(), GetAbsOrigin(), false ) == false )

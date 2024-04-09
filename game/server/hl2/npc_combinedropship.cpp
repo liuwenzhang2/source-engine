@@ -1116,12 +1116,12 @@ void CNPC_CombineDropship::Precache( void )
 		break;
 	}
 
-	PrecacheScriptSound( "NPC_CombineDropship.RotorLoop" );
-	PrecacheScriptSound( "NPC_CombineDropship.FireLoop" );
-	PrecacheScriptSound( "NPC_CombineDropship.NearRotorLoop" );
-	PrecacheScriptSound( "NPC_CombineDropship.OnGroundRotorLoop" );
-	PrecacheScriptSound( "NPC_CombineDropship.DescendingWarningLoop" );
-	PrecacheScriptSound( "NPC_CombineDropship.NearRotorLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineDropship.RotorLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineDropship.FireLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineDropship.NearRotorLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineDropship.OnGroundRotorLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineDropship.DescendingWarningLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineDropship.NearRotorLoop" );
 
 	if ( m_sRollermineTemplate != NULL_STRING )
 	{

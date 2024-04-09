@@ -48,7 +48,7 @@ void CGrenadePathfollower::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "GrenadePathfollower.StopSounds" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadePathfollower.StopSounds" );
 }
 
 void CGrenadePathfollower::Spawn( void )
@@ -110,7 +110,7 @@ void CGrenadePathfollower::GrenadeTouch( CBaseEntity *pOther )
 //------------------------------------------------------------------------------
 void CGrenadePathfollower::Detonate(void)
 {
-	StopSound(entindex(), CHAN_BODY, STRING(m_sFlySound));
+	g_pSoundEmitterSystem->StopSound(entindex(), CHAN_BODY, STRING(m_sFlySound));
 
 	m_takedamage	= DAMAGE_NO;	
 
@@ -143,7 +143,7 @@ void CGrenadePathfollower::Detonate(void)
 
 	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetAbsOrigin(),  m_DmgRadius, CLASS_NONE, NULL );
 	CPASAttenuationFilter filter2( this, "GrenadePathfollower.StopSounds" );
-	EmitSound( filter2, entindex(), "GrenadePathfollower.StopSounds" );
+	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "GrenadePathfollower.StopSounds" );
 	UTIL_Remove( this );
 }
 
@@ -220,7 +220,7 @@ void CGrenadePathfollower::PlayFlySound(void)
 		ep.m_flVolume = 1.0f;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		m_flNextFlySoundTime	= gpGlobals->curtime + 1.0;
 	}
 }
@@ -300,7 +300,7 @@ CGrenadePathfollower::CGrenadePathfollower(void)
 //------------------------------------------------------------------------------
 CGrenadePathfollower::~CGrenadePathfollower(void)
 {
-	StopSound(entindex(), CHAN_BODY, STRING(m_sFlySound));
+	g_pSoundEmitterSystem->StopSound(entindex(), CHAN_BODY, STRING(m_sFlySound));
 }
 
 ///------------------------------------------------------------------------------

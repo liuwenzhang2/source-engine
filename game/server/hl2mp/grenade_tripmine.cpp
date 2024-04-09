@@ -79,7 +79,7 @@ void CTripmineGrenade::Spawn( void )
 
 	m_iHealth = 1;
 
-	EmitSound( "TripmineGrenade.Place" );
+	g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.Place" );
 	SetDamage( sk_plr_dmg_tripmine.GetFloat() );
 	SetDamageRadius( sk_tripmine_radius.GetFloat() );
 
@@ -98,8 +98,8 @@ void CTripmineGrenade::Precache( void )
 {
 	PrecacheModel("models/Weapons/w_slam.mdl"); 
 
-	PrecacheScriptSound( "TripmineGrenade.Place" );
-	PrecacheScriptSound( "TripmineGrenade.Activate" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "TripmineGrenade.Place" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "TripmineGrenade.Activate" );
 }
 
 
@@ -120,7 +120,7 @@ void CTripmineGrenade::PowerupThink( void  )
 		m_bIsLive			= true;
 
 		// play enabled sound
-		EmitSound( "TripmineGrenade.Activate" );
+		g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.Activate" );
 	}
 	SetNextThink( gpGlobals->curtime + 0.1f );
 }
@@ -255,7 +255,7 @@ void CTripmineGrenade::Event_Killed( const CTakeDamageInfo &info )
 	SetThink( &CTripmineGrenade::DelayDeathThink );
 	SetNextThink( gpGlobals->curtime + 0.25 );
 
-	EmitSound( "TripmineGrenade.StopSound" );
+	g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.StopSound" );
 }
 
 

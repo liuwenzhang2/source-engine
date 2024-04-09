@@ -68,9 +68,9 @@ public:
 		SelectModel( );
 		BaseClass::Precache();
 
-		PrecacheScriptSound( "NPC_Fisherman.FootstepLeft" );
-		PrecacheScriptSound( "NPC_Fisherman.FootstepRight" );
-		PrecacheScriptSound( "NPC_Fisherman.Die" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Fisherman.FootstepLeft" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Fisherman.FootstepRight" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Fisherman.Die" );
 
 		PrecacheInstancedScene( "scenes/Expressions/FishermanIdle.vcd" );
 		PrecacheInstancedScene( "scenes/Expressions/FishermanAlert.vcd" );
@@ -172,11 +172,11 @@ void CNPC_Fisherman::HandleAnimEvent( animevent_t *pEvent )
 {
 	if ( pEvent->event == NPC_EVENT_LEFTFOOT )
 	{
-		EmitSound( "NPC_Fisherman.FootstepLeft", pEvent->eventtime );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Fisherman.FootstepLeft", pEvent->eventtime );
 	}
 	else if ( pEvent->event == NPC_EVENT_RIGHTFOOT )
 	{
-		EmitSound( "NPC_Fisherman.FootstepRight", pEvent->eventtime );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Fisherman.FootstepRight", pEvent->eventtime );
 	}
 	else if ( pEvent->event == AE_FISHERMAN_HAT_UP )
 	{

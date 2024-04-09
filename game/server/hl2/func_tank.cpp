@@ -187,7 +187,7 @@ CFuncTank::~CFuncTank( void )
 {
 	if ( m_soundLoopRotate != NULL_STRING && ( m_spawnflags & SF_TANK_SOUNDON ) )
 	{
-		StopSound( entindex(), CHAN_STATIC, STRING(m_soundLoopRotate) );
+		g_pSoundEmitterSystem->StopSound( entindex(), CHAN_STATIC, STRING(m_soundLoopRotate) );
 	}
 }
 
@@ -953,18 +953,18 @@ void CFuncTank::Precache( void )
 		PrecacheModel( STRING(m_iszSpriteFlash) );
 
 	if ( m_soundStartRotate != NULL_STRING )
-		PrecacheScriptSound( STRING(m_soundStartRotate) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_soundStartRotate) );
 	if ( m_soundStopRotate != NULL_STRING )
-		PrecacheScriptSound( STRING(m_soundStopRotate) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_soundStopRotate) );
 	if ( m_soundLoopRotate != NULL_STRING )
-		PrecacheScriptSound( STRING(m_soundLoopRotate) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_soundLoopRotate) );
 
-	PrecacheScriptSound( "Func_Tank.BeginUse" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Func_Tank.BeginUse" );
 	
 	// Precache the combine cannon
 	if ( m_iEffectHandling == EH_COMBINE_CANNON )
 	{
-		PrecacheScriptSound( "NPC_Combine_Cannon.FireBullet" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Combine_Cannon.FireBullet" );
 	}
 }
 
@@ -1099,7 +1099,7 @@ bool CFuncTank::StartControl( CBaseCombatCharacter *pController )
 	// Set the controller's position to be the use position.
 	m_vecControllerUsePos = m_hController->GetLocalOrigin();
 
-	EmitSound( "Func_Tank.BeginUse" );
+	g_pSoundEmitterSystem->EmitSound(this, "Func_Tank.BeginUse" );
 	
 	SetNextThink( gpGlobals->curtime + 0.1f );
 	
@@ -2267,14 +2267,14 @@ void CFuncTank::Fire( int bulletCount, const Vector &barrelEnd, const Vector &fo
 		DoMuzzleFlash();
 
 		// Play the AR2 sound
-		EmitSound( "Weapon_functank.Single" );
+		g_pSoundEmitterSystem->EmitSound(this, "Weapon_functank.Single" );
 	}
 	else if ( m_iEffectHandling == EH_COMBINE_CANNON )
 	{
 		DoMuzzleFlash();
 
 		// Play the cannon sound
-		EmitSound( "NPC_Combine_Cannon.FireBullet" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Combine_Cannon.FireBullet" );
 	}
 	else
 	{
@@ -2354,7 +2354,7 @@ void CFuncTank::StartRotSound( void )
 		ep.m_flVolume = 0.85;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 	
 	if ( m_soundStartRotate != NULL_STRING )
@@ -2367,7 +2367,7 @@ void CFuncTank::StartRotSound( void )
 		ep.m_flVolume = 1.0f;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 }
 
@@ -2378,7 +2378,7 @@ void CFuncTank::StopRotSound( void )
 	{
 		if ( m_soundLoopRotate != NULL_STRING )
 		{
-			StopSound( entindex(), CHAN_STATIC, (char*)STRING(m_soundLoopRotate) );
+			g_pSoundEmitterSystem->StopSound( entindex(), CHAN_STATIC, (char*)STRING(m_soundLoopRotate) );
 		}
 		if ( m_soundStopRotate != NULL_STRING )
 		{
@@ -2390,7 +2390,7 @@ void CFuncTank::StopRotSound( void )
 			ep.m_flVolume = 1.0f;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 	}
 	m_spawnflags &= ~SF_TANK_SOUNDON;
@@ -2599,7 +2599,7 @@ void CFuncTankPulseLaser::Precache(void)
 
 	if ( m_sPulseFireSound != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING(m_sPulseFireSound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_sPulseFireSound) );
 	}
 	BaseClass::Precache();
 }
@@ -2644,7 +2644,7 @@ void CFuncTankPulseLaser::Fire( int bulletCount, const Vector &barrelEnd, const 
 			ep.m_flVolume = 1.0f;
 			ep.m_SoundLevel = SNDLVL_85dB;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 	}
@@ -2863,8 +2863,8 @@ LINK_ENTITY_TO_CLASS( func_tankairboatgun, CFuncTankAirboatGun );
 void CFuncTankAirboatGun::Precache( void )
 {
 	BaseClass::Precache();
-	PrecacheScriptSound( "Airboat.FireGunLoop" );
-	PrecacheScriptSound( "Airboat.FireGunRevDown");
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat.FireGunLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat.FireGunRevDown");
 	CreateSounds();
 }
 
@@ -2944,7 +2944,7 @@ void CFuncTankAirboatGun::StopFiring()
 		CSoundEnvelopeController *pController = &CSoundEnvelopeController::GetController();
 		float flVolume = pController->SoundGetVolume( m_pGunFiringSound );
 		pController->SoundChangeVolume( m_pGunFiringSound, 0.0f, 0.1f * flVolume );
-		EmitSound( "Airboat.FireGunRevDown" );
+		g_pSoundEmitterSystem->EmitSound(this, "Airboat.FireGunRevDown" );
 		m_bIsFiring = false;
 	}
 }
@@ -3132,7 +3132,7 @@ void CFuncTankAPCRocket::Precache( void )
 {
 	UTIL_PrecacheOther( "apc_missile" );
 
-	PrecacheScriptSound( "PropAPC.FireCannon" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "PropAPC.FireCannon" );
 
 	CFuncTank::Precache();
 }
@@ -3229,7 +3229,7 @@ void CFuncTankAPCRocket::Fire( int bulletCount, const Vector &barrelEnd, const V
 		// This will cause it to wait for a little while before shooting
 		m_fireLast += random->RandomFloat( 2.0f, 3.0f );
 	}
-	EmitSound( "PropAPC.FireCannon" );
+	g_pSoundEmitterSystem->EmitSound(this, "PropAPC.FireCannon" );
 }
 
 void CFuncTankAPCRocket::Think()
@@ -3479,12 +3479,12 @@ void CMortarShell::Precache()
 {
 	m_iSpriteTexture = PrecacheModel( "sprites/physbeam.vmt" );
 
-	PrecacheScriptSound( "Weapon_Mortar.Impact" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Mortar.Impact" );
 	PrecacheMaterial( "effects/ar2ground2" );
 
 	if ( NULL_STRING != m_warnSound )
 	{
-		PrecacheScriptSound( STRING( m_warnSound ) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_warnSound ) );
 	}
 }
 
@@ -3664,7 +3664,7 @@ void CMortarShell::Warn( void )
 		ep.m_flVolume = 1.0f;
 		ep.m_SoundLevel = SNDLVL_NONE;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 
 	m_bHasWarned = true;
@@ -3740,7 +3740,7 @@ void CMortarShell::Impact( void )
 
 	RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), MORTAR_BLAST_DAMAGE, (DMG_BLAST|DMG_DISSOLVE) ), GetAbsOrigin(), MORTAR_BLAST_RADIUS, CLASS_NONE, NULL );
 
-	EmitSound( "Weapon_Mortar.Impact" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_Mortar.Impact" );
 
 	UTIL_ScreenShake( GetAbsOrigin(), 10, 60, 1.0, 550, SHAKE_START, false );
 
@@ -3875,11 +3875,11 @@ void CFuncTankMortar::Spawn()
 void CFuncTankMortar::Precache( void )
 {
 	if ( m_fireStartSound != NULL_STRING )
-		PrecacheScriptSound( STRING(m_fireStartSound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_fireStartSound) );
 	//if ( m_fireEndSound != NULL_STRING )
 	//	PrecacheScriptSound( STRING(m_fireEndSound) );
 	if ( m_incomingSound != NULL_STRING )
-		PrecacheScriptSound( STRING(m_incomingSound) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_incomingSound) );
 	BaseClass::Precache();
 }
 
@@ -4014,7 +4014,7 @@ void CFuncTankMortar::Fire( int bulletCount, const Vector &barrelEnd, const Vect
 		ep.m_flVolume = 1.0f;
 		ep.m_SoundLevel = SNDLVL_NONE;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 
 	Vector vecFinalDir = tr.endpos - tr.startpos;

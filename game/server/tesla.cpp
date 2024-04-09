@@ -99,7 +99,7 @@ void CTesla::Precache()
 	PrecacheModel( STRING(m_iszSpriteName.Get()) );
 	BaseClass::Precache();
 
-	PrecacheScriptSound( STRING( m_SoundName.Get() ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_SoundName.Get() ) );
 }
 
 

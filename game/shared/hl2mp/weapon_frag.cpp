@@ -149,8 +149,8 @@ void CWeaponFrag::Precache( void )
 	UTIL_PrecacheOther( "npc_grenade_frag" );
 #endif
 
-	PrecacheScriptSound( "WeaponFrag.Throw" );
-	PrecacheScriptSound( "WeaponFrag.Roll" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WeaponFrag.Throw" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "WeaponFrag.Roll" );
 }
 
 #ifndef CLIENT_DLL

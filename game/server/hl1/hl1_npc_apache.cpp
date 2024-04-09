@@ -212,16 +212,16 @@ void CNPC_Apache::Precache( void )
 {
 	// Get to tha chopper!
 	PrecacheModel( "models/apache.mdl" );
-	PrecacheScriptSound( "Apache.Rotor" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Apache.Rotor" );
 	m_nDebrisModel = PrecacheModel(   "models/metalplategibs_green.mdl" );
 
 	// Gun
-	PrecacheScriptSound( "Apache.FireGun" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Apache.FireGun" );
 	m_iAmmoType = GetAmmoDef()->Index("9mmRound"); 
 
 	// Rockets
 	UTIL_PrecacheOther( "grenade_homer" );
-	PrecacheScriptSound( "Apache.RPG" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Apache.RPG" );
 	PrecacheModel( "models/weapons/w_missile.mdl" );
 
 	BaseClass::Precache();
@@ -519,7 +519,7 @@ bool CNPC_Apache::FireGun( )
 	{
 		CPASAttenuationFilter filter( this, 0.2f );
 
-		EmitSound( filter, entindex(), "Apache.FireGun" );//<<TEMP>>temp sound
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Apache.FireGun" );//<<TEMP>>temp sound
 
 		// gun is a bit dodgy, just fire at the target if we are close
 		FireBullets( 1, posGun, vecTarget, VECTOR_CONE_4DEGREES, 8192, m_iAmmoType, 2 );

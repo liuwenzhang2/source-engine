@@ -132,7 +132,7 @@ void CRpgRocket::Precache( void )
 	PrecacheModel( "models/rpgrocket.mdl" );
 	PrecacheModel( "sprites/animglow01.vmt" );
 
-	PrecacheScriptSound( "Weapon_RPG.RocketIgnite" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_RPG.RocketIgnite" );
 
 	m_iTrail = PrecacheModel("sprites/smoke.vmt");
 }
@@ -186,7 +186,7 @@ void CRpgRocket::RocketTouch( CBaseEntity *pOther )
 		m_hOwner->NotifyRocketDied();
 	}
 
-	StopSound( "Weapon_RPG.RocketIgnite" );
+	g_pSoundEmitterSystem->StopSound(this, "Weapon_RPG.RocketIgnite" );
 	ExplodeTouch( pOther );
 }
 
@@ -199,7 +199,7 @@ void CRpgRocket::IgniteThink( void )
 
 	AddEffects( EF_DIMLIGHT );
 
-	EmitSound( "Weapon_RPG.RocketIgnite" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_RPG.RocketIgnite" );
 
 	SetThink( &CRpgRocket::SeekThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -315,7 +315,7 @@ void CRpgRocket::SeekThink( void )
 
 void CRpgRocket::Detonate( void )
 {
-	StopSound( "Weapon_RPG.RocketIgnite" );
+	g_pSoundEmitterSystem->StopSound(this, "Weapon_RPG.RocketIgnite" );
 	BaseClass::Detonate();
 }
 

@@ -286,13 +286,13 @@ void CNPC_CombineCamera::Precache()
 	ADD_CUSTOM_ACTIVITY(CNPC_CombineCamera, ACT_COMBINE_CAMERA_OPEN_IDLE);
 	ADD_CUSTOM_ACTIVITY(CNPC_CombineCamera, ACT_COMBINE_CAMERA_FIRE);
 
-	PrecacheScriptSound( "NPC_CombineCamera.Move" );
-	PrecacheScriptSound( "NPC_CombineCamera.BecomeIdle" );
-	PrecacheScriptSound( "NPC_CombineCamera.Active" );
-	PrecacheScriptSound( "NPC_CombineCamera.Click" );
-	PrecacheScriptSound( "NPC_CombineCamera.Ping" );
-	PrecacheScriptSound( "NPC_CombineCamera.Angry" );
-	PrecacheScriptSound( "NPC_CombineCamera.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineCamera.Move" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineCamera.BecomeIdle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineCamera.Active" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineCamera.Click" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineCamera.Ping" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineCamera.Angry" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineCamera.Die" );
 
 	BaseClass::Precache();
 }
@@ -418,7 +418,7 @@ int CNPC_CombineCamera::OnTakeDamage(const CTakeDamageInfo &inputInfo)
 		ExplosionCreate(GetAbsOrigin(), GetLocalAngles(), this, 100, 100, false);
 		SetThink(&CNPC_CombineCamera::DeathThink);
 
-		StopSound("Alert");
+		g_pSoundEmitterSystem->StopSound(this, "Alert");
 
 		m_OnDamaged.FireOutput(info.GetInflictor(), this);
 
@@ -448,7 +448,7 @@ void CNPC_CombineCamera::Deploy()
 	m_flPlaybackRate = 0;
 	SetThink(&CNPC_CombineCamera::SearchThink);
 
-	EmitSound("NPC_CombineCamera.Move");
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Move");
 }
 
 
@@ -507,7 +507,7 @@ bool CNPC_CombineCamera::UpdateFacing()
 
 	if (bMoved && (m_flMoveSoundTime < gpGlobals->curtime))
 	{
-		EmitSound("NPC_CombineCamera.Move");
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Move");
 		m_flMoveSoundTime = gpGlobals->curtime + CAMERA_MOVE_INTERVAL;
 	}
 
@@ -624,7 +624,7 @@ void CNPC_CombineCamera::ActiveThink()
 	{
 		// Nobody suspicious. Go back to being idle.
 		m_hEnemyTarget = NULL;
-		EmitSound("NPC_CombineCamera.BecomeIdle");
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.BecomeIdle");
 		SetAngry(false);
 		SetThink(&CNPC_CombineCamera::SearchThink);
 		SetNextThink( gpGlobals->curtime );
@@ -651,7 +651,7 @@ void CNPC_CombineCamera::ActiveThink()
 				}
 				else
 				{
-					EmitSound("NPC_CombineCamera.Active");
+					g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Active");
 				}
 
 				m_OnFoundPlayer.Set(pTarget, pTarget, this);
@@ -750,7 +750,7 @@ void CNPC_CombineCamera::MaintainEye()
 			m_pEyeFlash->SetBrightness(255);
 			m_pEyeFlash->SetColor(255,255,255);
 
-			EmitSound("NPC_CombineCamera.Click");
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Click");
 
 			m_flTurnOffEyeFlashTime = gpGlobals->curtime + 0.1;
 			m_flClickTime = gpGlobals->curtime + CAMERA_CLICK_INTERVAL;
@@ -948,7 +948,7 @@ void CNPC_CombineCamera::Ping()
 		return;
 
 	// Ping!
-	EmitSound("NPC_CombineCamera.Ping");
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Ping");
 	m_flPingTime = gpGlobals->curtime + COMBINE_CAMERA_PING_TIME;
 }
 
@@ -1029,7 +1029,7 @@ void CNPC_CombineCamera::SetAngry(bool bAngry)
 		m_bAngry = true;
 		m_nClickCount = 0;
 		m_flClickTime = gpGlobals->curtime + 0.4;
-		EmitSound("NPC_CombineCamera.Angry");
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Angry");
 		SetEyeState(CAMERA_EYE_ANGRY);
 	}
 	else if ((!bAngry) && (m_bAngry))
@@ -1076,7 +1076,7 @@ void CNPC_CombineCamera::DeathThink()
 	{
 		m_lifeState = LIFE_DEAD;
 
-		EmitSound("NPC_CombineCamera.Die");
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Die");
 
 		// lots of smoke
 		Vector pos;

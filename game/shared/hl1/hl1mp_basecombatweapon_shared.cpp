@@ -128,7 +128,7 @@ void CBaseHL1MPCombatWeapon::WeaponSound( WeaponSound_t sound_type, float soundt
 	if ( !te->CanPredict() )
 		return;
 				
-	CBaseEntity::EmitSound( filter, GetPlayerOwner()->entindex(), shootsound, &GetPlayerOwner()->GetAbsOrigin() ); 
+	g_pSoundEmitterSystem->EmitSound( filter, GetPlayerOwner()->entindex(), shootsound, &GetPlayerOwner()->GetAbsOrigin() ); //CBaseEntity::
 #else
 	BaseClass::WeaponSound( sound_type, soundtime );
 #endif

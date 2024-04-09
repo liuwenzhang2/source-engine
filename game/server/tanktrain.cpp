@@ -251,9 +251,9 @@ CTankTrainAI::~CTankTrainAI( void )
 
 void CTankTrainAI::Precache( void )
 {
-	PrecacheScriptSound( STRING( m_startSoundName ) );
-	PrecacheScriptSound( STRING( m_engineSoundName ) );
-	PrecacheScriptSound( STRING( m_movementSoundName ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_startSoundName ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_engineSoundName ) );
+	g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_movementSoundName ) );
 }
 
 int CTankTrainAI::SoundEnginePitch( void )
@@ -285,7 +285,7 @@ void CTankTrainAI::SoundEngineStart( void )
 		ep.m_flVolume = 1.0f;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, pTrain->entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, pTrain->entindex(), ep );
 	}
 
 	// play the looping sounds using the envelope controller

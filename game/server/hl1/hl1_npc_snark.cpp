@@ -64,11 +64,11 @@ void CSnark::Precache( void )
 
 	PrecacheModel( "models/w_squeak2.mdl" );
 
-	PrecacheScriptSound( "Snark.Die" );
-	PrecacheScriptSound( "Snark.Gibbed" );
-	PrecacheScriptSound( "Snark.Squeak" );
-	PrecacheScriptSound( "Snark.Deploy" );
-	PrecacheScriptSound( "Snark.Bounce" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Snark.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Snark.Gibbed" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Snark.Squeak" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Snark.Deploy" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Snark.Bounce" );
 
 }
 
@@ -161,7 +161,7 @@ void CSnark::Event_Killed( const CTakeDamageInfo &inputInfo )
 
 	// play squeek blast
 	CPASAttenuationFilter filter( this, 0.5 );
-	EmitSound( filter, entindex(), "Snark.Die" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Snark.Die" );
 
 	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SNARK_EXPLOSION_VOLUME, 3.0 );
 
@@ -191,7 +191,7 @@ void CSnark::Event_Killed( const CTakeDamageInfo &inputInfo )
 bool CSnark::Event_Gibbed( const CTakeDamageInfo &info )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "Snark.Gibbed" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Snark.Gibbed" );
 
 	return BaseClass::Event_Gibbed( info );
 }
@@ -265,7 +265,7 @@ void CSnark::HuntThink( void )
 	if ( (m_flDie - gpGlobals->curtime <= 0.5) && (m_flDie - gpGlobals->curtime >= 0.3) )
 	{
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "Snark.Squeak" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Snark.Squeak" );
 		CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 256, 0.25 );
 	}
 
@@ -465,12 +465,12 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 				// make bite sound
 				CPASAttenuationFilter filter( this );
 				CSoundParameters params;
-				if ( GetParametersForSound( "Snark.Deploy", params, NULL ) )
+				if (g_pSoundEmitterSystem->GetParametersForSound( "Snark.Deploy", params, NULL ) )
 				{
 					EmitSound_t ep( params );
 					ep.m_nPitch = (int)flpitch;
 
-					EmitSound( filter, entindex(), ep );
+					g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 				}
 				m_flNextAttack = gpGlobals->curtime + 0.5;
 			}
@@ -500,12 +500,12 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 		CPASAttenuationFilter filter2( this );
 
 		CSoundParameters params;
-		if ( GetParametersForSound( "Snark.Bounce", params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( "Snark.Bounce", params, NULL ) )
 		{
 			EmitSound_t ep( params );
 			ep.m_nPitch = (int)flpitch;
 
-			EmitSound( filter2, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter2, entindex(), ep );
 		}
 
 		CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 256, 0.25 );

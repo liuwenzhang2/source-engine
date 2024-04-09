@@ -143,8 +143,8 @@ void CGrenadeSpit::Detonate(void)
 	// splat sound
 	iPitch = random->RandomFloat( 90, 110 );
 
-	EmitSound( "GrenadeSpit.Acid" );	
-	EmitSound( "GrenadeSpit.Hit" );	
+	g_pSoundEmitterSystem->EmitSound(this, "GrenadeSpit.Acid" );
+	g_pSoundEmitterSystem->EmitSound(this, "GrenadeSpit.Hit" );
 
 	UTIL_Remove( this );
 }
@@ -160,8 +160,8 @@ void CGrenadeSpit::Precache( void )
 	PrecacheModel("models/spitball_medium.mdl"); 
 	PrecacheModel("models/spitball_small.mdl"); 
 
-	PrecacheScriptSound( "GrenadeSpit.Acid" );	
-	PrecacheScriptSound( "GrenadeSpit.Hit" );	
+	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeSpit.Acid" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeSpit.Hit" );
 
 }
 

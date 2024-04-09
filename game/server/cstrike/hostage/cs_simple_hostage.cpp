@@ -226,9 +226,9 @@ void CHostage::Precache()
 		PrecacheModel( HostageModel[i] );
 	}
 
-	PrecacheScriptSound( "Hostage.StartFollowCT" );
-	PrecacheScriptSound( "Hostage.StopFollowCT" );
-	PrecacheScriptSound( "Hostage.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Hostage.StartFollowCT" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Hostage.StopFollowCT" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Hostage.Pain" );
 
 	BaseClass::Precache();
 }
@@ -239,7 +239,7 @@ int CHostage::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	float actualDamage = info.GetDamage();
 
 	// say something
-	EmitSound( "Hostage.Pain" );
+	g_pSoundEmitterSystem->EmitSound(this, "Hostage.Pain" );
 
 	CCSPlayer *player = ToCSPlayer( info.GetAttacker() );
 
@@ -1068,7 +1068,7 @@ void CHostage::HostageUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		Idle();
 
 		// say something
-		EmitSound( "Hostage.StopFollowCT" );
+		g_pSoundEmitterSystem->EmitSound(this, "Hostage.StopFollowCT" );
 	}
 	else
 	{
@@ -1082,7 +1082,7 @@ void CHostage::HostageUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		Follow( user );
 
 		// say something
-		EmitSound( "Hostage.StartFollowCT" );
+		g_pSoundEmitterSystem->EmitSound(this, "Hostage.StartFollowCT" );
 
 		// emit hostage_follows event
 		IGameEvent *event = gameeventmanager->CreateEvent( "hostage_follows" );

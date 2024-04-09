@@ -119,7 +119,7 @@ void CWeaponHL2MPBase::WeaponSound( WeaponSound_t sound_type, float soundtime /*
 		if ( !te->CanPredict() )
 			return;
 				
-		CBaseEntity::EmitSound( filter, GetPlayerOwner()->entindex(), shootsound, &GetPlayerOwner()->GetAbsOrigin() ); 
+		g_pSoundEmitterSystem->EmitSound( filter, GetPlayerOwner()->entindex(), shootsound, &GetPlayerOwner()->GetAbsOrigin() ); //CBaseEntity::
 #else
 		BaseClass::WeaponSound( sound_type, soundtime );
 #endif
@@ -171,7 +171,7 @@ void CWeaponHL2MPBase::Materialize( void )
 	if ( IsEffectActive( EF_NODRAW ) )
 	{
 		// changing from invisible state to visible.
-		EmitSound( "AlyxEmp.Charge" );
+		g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Charge" );
 		
 		RemoveEffects( EF_NODRAW );
 		DoMuzzleFlash();

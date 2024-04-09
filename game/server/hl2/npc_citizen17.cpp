@@ -395,9 +395,9 @@ void CNPC_Citizen::Precache()
 
 	PrecacheModel( INSIGNIA_MODEL );
 
-	PrecacheScriptSound( "NPC_Citizen.FootstepLeft" );
-	PrecacheScriptSound( "NPC_Citizen.FootstepRight" );
-	PrecacheScriptSound( "NPC_Citizen.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.FootstepLeft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.FootstepRight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.Die" );
 
 	PrecacheInstancedScene( "scenes/Expressions/CitizenIdle.vcd" );
 	PrecacheInstancedScene( "scenes/Expressions/CitizenAlert_loop.vcd" );
@@ -1902,13 +1902,13 @@ void CNPC_Citizen::HandleAnimEvent( animevent_t *pEvent )
 	{
 	case NPC_EVENT_LEFTFOOT:
 		{
-			EmitSound( "NPC_Citizen.FootstepLeft", pEvent->eventtime );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.FootstepLeft", pEvent->eventtime );
 		}
 		break;
 
 	case NPC_EVENT_RIGHTFOOT:
 		{
-			EmitSound( "NPC_Citizen.FootstepRight", pEvent->eventtime );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.FootstepRight", pEvent->eventtime );
 		}
 		break;
 
@@ -3622,7 +3622,7 @@ void CNPC_Citizen::Heal()
 			if ( pTarget->IsPlayer() && npc_citizen_medic_emit_sound.GetBool() )
 			{
 				CPASAttenuationFilter filter( pTarget, "HealthKit.Touch" );
-				EmitSound( filter, pTarget->entindex(), "HealthKit.Touch" );
+				g_pSoundEmitterSystem->EmitSound( filter, pTarget->entindex(), "HealthKit.Touch" );
 			}
 
 			pTarget->TakeHealth( healAmt, DMG_GENERIC );
@@ -3840,7 +3840,7 @@ void CNPC_Citizen::DeathSound( const CTakeDamageInfo &info )
 	// Sentences don't play on dead NPCs
 	SentenceStop();
 
-	EmitSound( "NPC_Citizen.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.Die" );
 }
 
 //------------------------------------------------------------------------------

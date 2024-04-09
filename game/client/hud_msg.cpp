@@ -54,5 +54,5 @@ void CHud::MsgFunc_SendAudio( bf_read &msg )
 	msg.ReadString( szString, sizeof(szString) );
 	
 	CLocalPlayerFilter filter;
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, szString );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, szString );//C_BaseEntity::
 }

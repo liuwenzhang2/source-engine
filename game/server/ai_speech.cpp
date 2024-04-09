@@ -425,7 +425,7 @@ bool CAI_Expresser::SpeakDispatchResponse( AIConcept_t concept, AI_Response *res
 			else
 			{
 				float speakTime = GetResponseDuration( result );
-				GetOuter()->EmitSound( response );
+				g_pSoundEmitterSystem->EmitSound(GetOuter(), response );
 
 				DevMsg( "SpeakDispatchResponse:  Entity ( %i/%s ) playing sound '%s'\n", GetOuter()->entindex(), STRING( GetOuter()->GetEntityName() ), response );
 				NoteSpeaking( speakTime, delay );
@@ -515,7 +515,7 @@ float CAI_Expresser::GetResponseDuration( AI_Response *result )
 		break;
 	case RESPONSE_SPEAK:
 		{
-			return GetOuter()->GetSoundDuration( response, STRING( GetOuter()->GetModelName() ) );
+			return g_pSoundEmitterSystem->GetSoundDuration( response, STRING( GetOuter()->GetModelName() ) );
 		}
 		break;
 	case RESPONSE_SENTENCE:
@@ -581,7 +581,7 @@ bool CAI_Expresser::SpeakRawScene( const char *pszScene, float delay, AI_Respons
 
 #if defined( HL2_EPISODIC ) || defined( TF_DLL )
 		char szInstanceFilename[256];
-		GetOuter()->GenderExpandString( pszScene, szInstanceFilename, sizeof( szInstanceFilename ) );
+		g_pSoundEmitterSystem->GenderExpandString(GetOuter(), pszScene, szInstanceFilename, sizeof( szInstanceFilename ) );//GetOuter()->
 		// Only mark ourselves as speaking if the scene has speech
 		if ( GetSceneSpeechCount(szInstanceFilename) > 0 )
 		{
@@ -852,7 +852,7 @@ bool CAI_Expresser::IsValidResponse( ResponseType_t type, const char *pszValue )
 	if ( type == RESPONSE_SCENE )
 	{
 		char szInstanceFilename[256];
-		GetOuter()->GenderExpandString( pszValue, szInstanceFilename, sizeof( szInstanceFilename ) );
+		g_pSoundEmitterSystem->GenderExpandString(GetOuter(), pszValue, szInstanceFilename, sizeof( szInstanceFilename ) );
 		return ( GetSceneDuration( szInstanceFilename ) > 0 );
 	}
 	return true;

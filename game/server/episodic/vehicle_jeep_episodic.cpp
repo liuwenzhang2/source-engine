@@ -425,8 +425,8 @@ void CPropJeepEpisodic::Precache( void )
 	PrecacheMaterial( RADAR_PANEL_MATERIAL );
 	PrecacheMaterial( RADAR_PANEL_WRITEZ );
 	PrecacheModel( s_szHazardSprite );
-	PrecacheScriptSound( "JNK_Radar_Ping_Friendly" );
-	PrecacheScriptSound( "Physics.WaterSplash" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "JNK_Radar_Ping_Friendly" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Physics.WaterSplash" );
 
 	PrecacheParticleSystem( "WheelDust" );
 	PrecacheParticleSystem( "WheelSplash" );
@@ -813,7 +813,7 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 				if ( m_flNextWaterSound < gpGlobals->curtime )
 				{
 					m_flNextWaterSound = gpGlobals->curtime + random->RandomFloat( 0.25f, 1.0f );
-					EmitSound( "Physics.WaterSplash" );
+					g_pSoundEmitterSystem->EmitSound(this, "Physics.WaterSplash" );
 				}
 			}
 			else
@@ -934,7 +934,7 @@ void CPropJeepEpisodic::UpdateRadar( bool forceUpdate )
 		// Play a bleepy sound
 		if( !bDetectedDog )
 		{
-			EmitSound( "JNK_Radar_Ping_Friendly" );
+			g_pSoundEmitterSystem->EmitSound(this, "JNK_Radar_Ping_Friendly" );
 		}
 
 		//Notify Alyx so she can talk about the radar contact

@@ -245,8 +245,8 @@ void CNPC_Monk::Precache()
 {
 	PrecacheModel( "models/Monk.mdl" );
 	
-	PrecacheScriptSound( "NPC_Citizen.FootstepLeft" );
-	PrecacheScriptSound( "NPC_Citizen.FootstepRight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.FootstepLeft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.FootstepRight" );
 
 	BaseClass::Precache();
 }
@@ -351,12 +351,12 @@ void CNPC_Monk::HandleAnimEvent( animevent_t *pEvent )
 	{
 		case NPC_EVENT_LEFTFOOT:
 			{
-				EmitSound( "NPC_Citizen.FootstepLeft", pEvent->eventtime );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.FootstepLeft", pEvent->eventtime );
 			}
 			break;
 		case NPC_EVENT_RIGHTFOOT:
 			{
-				EmitSound( "NPC_Citizen.FootstepRight", pEvent->eventtime );
+			g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.FootstepRight", pEvent->eventtime );
 			}
 			break;
 

@@ -468,7 +468,7 @@ END_PREDICTION_DATA()
 				Vector soundPosition = m_pBombDefuser->GetAbsOrigin() + Vector( 0, 0, 5 );
 				CPASAttenuationFilter filter( soundPosition );
 
-				EmitSound( filter, entindex(), "c4.disarmfinish" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "c4.disarmfinish" );
 								
 				// The bomb has just been disarmed.. Check to see if the round should end now
 				m_bBombTicking = false;
@@ -615,7 +615,7 @@ END_PREDICTION_DATA()
 
 		// Sound! for everyone
 		CBroadcastRecipientFilter filter;
-		EmitSound( filter, entindex(), "c4.explode" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "c4.explode" );
 
 
 		// Decal!
@@ -704,7 +704,7 @@ END_PREDICTION_DATA()
 			Vector soundPosition = player->GetAbsOrigin() + Vector( 0, 0, 5 );
 			CPASAttenuationFilter filter( soundPosition );
 
-			EmitSound( filter, entindex(), "c4.disarmstart" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "c4.disarmstart" );
 
 			m_flDefuseLength = player->HasDefuser() ? 5 : 10;
 
@@ -855,11 +855,11 @@ void CC4::ItemPostFrame()
 	{
 		PrecacheVGuiScreen( "c4_view_panel" );
 		
-		PrecacheScriptSound( "c4.disarmfinish" );
-		PrecacheScriptSound( "c4.explode" );
-		PrecacheScriptSound( "c4.disarmstart" );
-		PrecacheScriptSound( "c4.plant" );
-		PrecacheScriptSound( "C4.PlantSound" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "c4.disarmfinish" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "c4.explode" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "c4.disarmstart" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "c4.plant" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "C4.PlantSound" );
 
 		BaseClass::Precache();
 	}
@@ -1114,7 +1114,7 @@ void CC4::PrimaryAttack()
 			// Play the plant sound.
 			Vector plantPosition = pPlayer->GetAbsOrigin() + Vector( 0, 0, 5 );
 			CPASAttenuationFilter filter( plantPosition );
-			EmitSound( filter, entindex(), "c4.plant" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "c4.plant" );
 
 			// No more c4!
 			pPlayer->Weapon_Drop( this, NULL, NULL );
@@ -1243,7 +1243,7 @@ void CC4::PlayArmingBeeps( void )
 				}
 			}
 
-			EmitSound(filter, entindex(), "c4.click");
+			g_pSoundEmitterSystem->EmitSound(filter, entindex(), "c4.click");
 			
 			break;
 		}

@@ -230,16 +230,16 @@ void CNPC_AlienGrunt::Precache()
 
 	UTIL_PrecacheOther( "hornet" );
 
-	PrecacheScriptSound( "Weapon_Hornetgun.Single" );
-	PrecacheScriptSound( "AlienGrunt.LeftFoot" );
-	PrecacheScriptSound( "AlienGrunt.RightFoot" );
-	PrecacheScriptSound( "AlienGrunt.AttackHit" );
-	PrecacheScriptSound( "AlienGrunt.AttackMiss" );
-	PrecacheScriptSound( "AlienGrunt.Die" );
-	PrecacheScriptSound( "AlienGrunt.Alert" );
-	PrecacheScriptSound( "AlienGrunt.Attack" );
-	PrecacheScriptSound( "AlienGrunt.Pain" );
-	PrecacheScriptSound( "AlienGrunt.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Hornetgun.Single" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlienGrunt.LeftFoot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlienGrunt.RightFoot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlienGrunt.AttackHit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlienGrunt.AttackMiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlienGrunt.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlienGrunt.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlienGrunt.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlienGrunt.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "AlienGrunt.Idle" );
 }	
 
 float CNPC_AlienGrunt::MaxYawSpeed( void )
@@ -332,7 +332,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 			pHornet->SetAbsVelocity( vForward * 300 );
 			pHornet->SetOwnerEntity( this );
 			
-			EmitSound( "Weapon_Hornetgun.Single" );
+			g_pSoundEmitterSystem->EmitSound(this, "Weapon_Hornetgun.Single" );
 
 			CHL1BaseNPC *pHornetMonster = (CHL1BaseNPC *)pHornet->MyNPCPointer();
 
@@ -347,14 +347,14 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 		// left foot
 		{
 			CPASAttenuationFilter filter2( this );
-			EmitSound( filter2, entindex(), "AlienGrunt.LeftFoot" );
+			g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "AlienGrunt.LeftFoot" );
 		}
 		break;
 	case AGRUNT_AE_RIGHT_FOOT:
 		// right foot
 		{
 			CPASAttenuationFilter filter3( this );
-			EmitSound( filter3, entindex(), "AlienGrunt.RightFoot" );
+			g_pSoundEmitterSystem->EmitSound( filter3, entindex(), "AlienGrunt.RightFoot" );
 		}
 		break;
 
@@ -383,7 +383,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() + vRight * 250 );
 				}
 
-				EmitSound(filter4, entindex(), "AlienGrunt.AttackHit" );
+				g_pSoundEmitterSystem->EmitSound(filter4, entindex(), "AlienGrunt.AttackHit" );
 
 				Vector vecArmPos;
 				QAngle angArmAng;
@@ -393,7 +393,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 			else
 			{
 				// Play a random attack miss sound
-				EmitSound(filter4, entindex(), "AlienGrunt.AttackMiss" );
+				g_pSoundEmitterSystem->EmitSound(filter4, entindex(), "AlienGrunt.AttackMiss" );
 			}
 		}
 		break;
@@ -422,7 +422,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() + vRight * -250 );
 				}
 
-				EmitSound( filter5, entindex(), "AlienGrunt.AttackHit" );
+				g_pSoundEmitterSystem->EmitSound( filter5, entindex(), "AlienGrunt.AttackHit" );
 
 				Vector vecArmPos;
 				QAngle angArmAng;
@@ -432,7 +432,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 			else
 			{
 				// Play a random attack miss sound
-				EmitSound( filter5, entindex(), "AlienGrunt.AttackMiss" );
+				g_pSoundEmitterSystem->EmitSound( filter5, entindex(), "AlienGrunt.AttackMiss" );
 			}
 		}
 		break;
@@ -452,7 +452,7 @@ void CNPC_AlienGrunt::DeathSound( const CTakeDamageInfo &info )
 	StopTalking();
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "AlienGrunt.Die" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "AlienGrunt.Die" );
 }
 
 //=========================================================
@@ -463,7 +463,7 @@ void CNPC_AlienGrunt::AlertSound( void )
 	StopTalking();
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "AlienGrunt.Alert" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "AlienGrunt.Alert" );
 }
 
 //=========================================================
@@ -474,7 +474,7 @@ void CNPC_AlienGrunt::AttackSound( void )
 	StopTalking();
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "AlienGrunt.Attack" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "AlienGrunt.Attack" );
 }
 
 //=========================================================
@@ -492,7 +492,7 @@ void CNPC_AlienGrunt::PainSound( const CTakeDamageInfo &info )
 	StopTalking();
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(),"AlienGrunt.Pain" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(),"AlienGrunt.Pain" );
 }
 
 //=========================================================
@@ -535,7 +535,7 @@ void CNPC_AlienGrunt::PrescheduleThink ( void )
 		{
 			// play a new sound
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "AlienGrunt.Idle" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "AlienGrunt.Idle" );
 
 			// is this word our last?
 			if ( random->RandomInt( 1, 10 ) <= 1 )

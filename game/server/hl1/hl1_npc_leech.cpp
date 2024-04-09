@@ -296,8 +296,8 @@ void CNPC_Leech::Precache( void )
 {
 	PrecacheModel("models/leech.mdl");
 
-	PrecacheScriptSound( "Leech.Attack" );
-	PrecacheScriptSound( "Leech.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Leech.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Leech.Alert" );
 }
 
 
@@ -307,7 +307,7 @@ void CNPC_Leech::AttackSound( void )
 	{
 		CPASAttenuationFilter filter( this );
 
-		EmitSound(filter, entindex(), "Leech.Attack" );
+		g_pSoundEmitterSystem->EmitSound(filter, entindex(), "Leech.Attack" );
 		m_attackSoundTime = gpGlobals->curtime + 0.5;
 	}
 }
@@ -316,7 +316,7 @@ void CNPC_Leech::AttackSound( void )
 void CNPC_Leech::AlertSound( void )
 {
 	CPASAttenuationFilter filter( this );
-	EmitSound(filter, entindex(), "Leech.Alert" );
+	g_pSoundEmitterSystem->EmitSound(filter, entindex(), "Leech.Alert" );
 }
 
 void CNPC_Leech::SwitchLeechState( void )

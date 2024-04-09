@@ -81,7 +81,7 @@ void CMessage::Precache( void )
 {
 	if ( m_sNoise != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING(m_sNoise) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_sNoise) );
 	}
 }
 
@@ -124,7 +124,7 @@ void CMessage::InputShowMessage( inputdata_t &inputdata )
 		ep.m_flVolume = m_MessageVolume;
 		ep.m_SoundLevel = ATTN_TO_SNDLVL( m_Radius );
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 
 	if ( m_spawnflags & SF_MESSAGE_ONCE )

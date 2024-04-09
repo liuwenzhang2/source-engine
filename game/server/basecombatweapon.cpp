@@ -85,8 +85,8 @@ void W_Precache(void)
 	CBaseEntity::PrecacheModel("models/weapons/w_bullet.mdl");
 #endif
 
-	CBaseEntity::PrecacheScriptSound( "BaseCombatWeapon.WeaponDrop" );
-	CBaseEntity::PrecacheScriptSound( "BaseCombatWeapon.WeaponMaterialize" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseCombatWeapon.WeaponDrop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseCombatWeapon.WeaponMaterialize" );
 }
 
 //-----------------------------------------------------------------------------
@@ -550,7 +550,7 @@ void CBaseCombatWeapon::FallThink ( void )
 		// don't clatter if the gun is waiting to respawn (if it's waiting, it is invisible!)
 		if ( GetOwnerEntity() )
 		{
-			EmitSound( "BaseCombatWeapon.WeaponDrop" );
+			g_pSoundEmitterSystem->EmitSound(this, "BaseCombatWeapon.WeaponDrop" );
 		}
 		Materialize(); 
 	}
@@ -568,9 +568,9 @@ void CBaseCombatWeapon::Materialize( void )
 	{
 		// changing from invisible state to visible.
 #ifdef HL2MP
-		EmitSound( "AlyxEmp.Charge" );
+		g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Charge" );
 #else
-		EmitSound( "BaseCombatWeapon.WeaponMaterialize" );
+		g_pSoundEmitterSystem->EmitSound(this, "BaseCombatWeapon.WeaponMaterialize" );
 #endif
 		
 		RemoveEffects( EF_NODRAW );

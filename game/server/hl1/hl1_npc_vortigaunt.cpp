@@ -111,12 +111,12 @@ void CNPC_Vortigaunt::Precache()
 	PrecacheModel("models/islave.mdl");
 	PrecacheModel("sprites/lgtning.vmt");
 
-	PrecacheScriptSound( "Vortigaunt.Pain" );
-	PrecacheScriptSound( "Vortigaunt.Die" );
-	PrecacheScriptSound( "Vortigaunt.AttackHit" );
-	PrecacheScriptSound( "Vortigaunt.AttackMiss" );
-	PrecacheScriptSound( "Vortigaunt.ZapPowerup" );
-	PrecacheScriptSound( "Vortigaunt.ZapShoot" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Vortigaunt.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Vortigaunt.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Vortigaunt.AttackHit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Vortigaunt.AttackMiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Vortigaunt.ZapPowerup" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Vortigaunt.ZapShoot" );
 }
 
 Disposition_t CNPC_Vortigaunt::IRelationType ( CBaseEntity *pTarget )
@@ -195,12 +195,12 @@ void CNPC_Vortigaunt::PainSound( const CTakeDamageInfo &info )
 		CPASAttenuationFilter filter( this );
 
 		CSoundParameters params;
-		if ( GetParametersForSound( "Vortigaunt.Pain", params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.Pain", params, NULL ) )
 		{
 			EmitSound_t ep( params );
 			params.pitch = m_iVoicePitch;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 	}
 }
@@ -213,12 +213,12 @@ void CNPC_Vortigaunt::DeathSound( const CTakeDamageInfo &info )
 {
 	CPASAttenuationFilter filter( this );
 	CSoundParameters params;
-	if ( GetParametersForSound( "Vortigaunt.Die", params, NULL ) )
+	if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.Die", params, NULL ) )
 	{
 		EmitSound_t ep( params );
 		params.pitch = m_iVoicePitch;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 }
 
@@ -286,24 +286,24 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 			
 				// Play a random attack hit sound
 				CSoundParameters params;
-				if ( GetParametersForSound( "Vortigaunt.AttackHit", params, NULL ) )
+				if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.AttackHit", params, NULL ) )
 				{
 					EmitSound_t ep( params );
 					params.pitch = m_iVoicePitch;
 
-					EmitSound( filter, entindex(), ep );
+					g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 				}
 			}
 			else
 			{
 				// Play a random attack miss sound
 				CSoundParameters params;
-				if ( GetParametersForSound( "Vortigaunt.AttackMiss", params, NULL ) )
+				if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.AttackMiss", params, NULL ) )
 				{
 					EmitSound_t ep( params );
 					params.pitch = m_iVoicePitch;
 
-					EmitSound( filter, entindex(), ep );
+					g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 				}
 			}
 		}
@@ -319,23 +319,23 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 					 pHurt->ViewPunch( QAngle( 5, 0, 18 ) );
 
 				CSoundParameters params;
-				if ( GetParametersForSound( "Vortigaunt.AttackHit", params, NULL ) )
+				if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.AttackHit", params, NULL ) )
 				{
 					EmitSound_t ep( params );
 					params.pitch = m_iVoicePitch;
 
-					EmitSound( filter2, entindex(), ep );
+					g_pSoundEmitterSystem->EmitSound( filter2, entindex(), ep );
 				}
 			}
 			else
 			{
 				CSoundParameters params;
-				if ( GetParametersForSound( "Vortigaunt.AttackMiss", params, NULL ) )
+				if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.AttackMiss", params, NULL ) )
 				{
 					EmitSound_t ep( params );
 					params.pitch = m_iVoicePitch;
 
-					EmitSound( filter2, entindex(), ep );
+					g_pSoundEmitterSystem->EmitSound( filter2, entindex(), ep );
 				}
 			}
 		}
@@ -367,11 +367,11 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 
 			CPASAttenuationFilter filter3( this );
 			CSoundParameters params;
-			if ( GetParametersForSound( "Vortigaunt.ZapPowerup", params, NULL ) )
+			if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.ZapPowerup", params, NULL ) )
 			{
 				EmitSound_t ep( params );
 				ep.m_nPitch = 100 + m_iBeams * 10;
-				EmitSound( filter3, entindex(), ep );
+				g_pSoundEmitterSystem->EmitSound( filter3, entindex(), ep );
 			}
 
 // Huh?  Model doesn't have multiple texturegroups, commented this out.  -LH
@@ -407,7 +407,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 			ZapBeam( 1 );
 
 			CPASAttenuationFilter filter4( this );
-			EmitSound( filter4, entindex(), "Vortigaunt.ZapShoot" );
+			g_pSoundEmitterSystem->EmitSound( filter4, entindex(), "Vortigaunt.ZapShoot" );
 			ApplyMultiDamage();
 
 			m_flNextAttack = gpGlobals->curtime + random->RandomFloat( 0.5, 4.0 );

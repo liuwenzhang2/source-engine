@@ -200,7 +200,7 @@ void CGrenadeSpit::Detonate(void)
 {
 	m_takedamage = DAMAGE_NO;
 
-	EmitSound( "GrenadeSpit.Hit" );	
+	g_pSoundEmitterSystem->EmitSound(this, "GrenadeSpit.Hit" );
 
 	// Stop our hissing sound
 	if ( m_pHissSound != NULL )
@@ -277,7 +277,7 @@ void CGrenadeSpit::Precache( void )
 	PrecacheModel("models/spitball_medium.mdl"); 
 	PrecacheModel("models/spitball_small.mdl"); 
 
-	PrecacheScriptSound( "GrenadeSpit.Hit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeSpit.Hit" );
 
 	PrecacheParticleSystem( "antlion_spit_player" );
 	PrecacheParticleSystem( "antlion_spit" );

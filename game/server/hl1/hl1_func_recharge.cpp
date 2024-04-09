@@ -111,9 +111,9 @@ void CRecharge::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "SuitRecharge.Deny" );
-	PrecacheScriptSound( "SuitRecharge.Start" );
-	PrecacheScriptSound( "SuitRecharge.ChargingLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "SuitRecharge.Deny" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "SuitRecharge.Start" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "SuitRecharge.ChargingLoop" );
 }
 
 bool CRecharge::CreateVPhysics()
@@ -153,7 +153,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
 			m_flSoundTime = gpGlobals->curtime + 0.62;
-			EmitSound( "SuitRecharge.Deny" );
+			g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Deny" );
 		}
 		return;
 	}
@@ -165,7 +165,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		pPlayer->m_afButtonPressed &= ~IN_USE;
 		m_iCaps = FCAP_IMPULSE_USE;
 		
-		EmitSound( "SuitRecharge.Deny" );
+		g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Deny" );
 		return;
 	}
 
@@ -184,7 +184,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	if (!m_iOn)
 	{
 		m_iOn++;
-		EmitSound( "SuitRecharge.Start" );
+		g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Start" );
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 	}
 	if ((m_iOn == 1) && (m_flSoundTime <= gpGlobals->curtime))
@@ -192,7 +192,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		m_iOn++;
 		CPASAttenuationFilter filter( this, "SuitRecharge.ChargingLoop" );
 		filter.MakeReliable();
-		EmitSound( filter, entindex(), "SuitRecharge.ChargingLoop" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "SuitRecharge.ChargingLoop" );
 	}
 
 	CBasePlayer *pl = (CBasePlayer *) m_hActivator.Get();
@@ -224,7 +224,7 @@ void CRecharge::Off(void)
 	// Stop looping sound.
 	if (m_iOn > 1)
 	{
-		StopSound( "SuitRecharge.ChargingLoop" );
+		g_pSoundEmitterSystem->StopSound(this, "SuitRecharge.ChargingLoop" );
 	}
 
 	m_iOn = 0;

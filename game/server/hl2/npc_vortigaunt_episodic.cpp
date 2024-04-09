@@ -749,12 +749,12 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 		// Boom!
 		//EmitSound( "NPC_Vortigaunt.DispelImpact" );
 		CSoundParameters params;
-		if ( GetParametersForSound( "NPC_Vortigaunt.DispelImpact", params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( "NPC_Vortigaunt.DispelImpact", params, NULL ) )
 		{
 			CPASAttenuationFilter filter( this );
 			EmitSound_t ep( params );
 			ep.m_nChannel = CHAN_BODY;
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 		return;
 	}
@@ -818,13 +818,13 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 		CPASAttenuationFilter filter( this );
 		
 		CSoundParameters params;
-		if ( GetParametersForSound( "NPC_Vortigaunt.ZapPowerup", params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( "NPC_Vortigaunt.ZapPowerup", params, NULL ) )
 		{
 			EmitSound_t ep( params );
 			//ep.m_nPitch = 100 + m_iBeams * 10;
 			ep.m_nPitch = 150;
 	
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 
 			m_bStopLoopingSounds = true;
 		}
@@ -855,7 +855,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 
 		EndHandGlow();
 
-		EmitSound( "NPC_Vortigaunt.ClawBeam" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Vortigaunt.ClawBeam" );
 		m_bStopLoopingSounds = true;
 		ApplyMultiDamage();
 
@@ -945,13 +945,13 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 		CPASAttenuationFilter filter( this );
 
 		CSoundParameters params;
-		if ( GetParametersForSound( "NPC_Vortigaunt.StartHealLoop", params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( "NPC_Vortigaunt.StartHealLoop", params, NULL ) )
 		{
 			EmitSound_t ep( params );
 			//ep.m_nPitch = 100 + m_iBeams * 10;
 			ep.m_nPitch = 150;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 			m_bStopLoopingSounds = true;
 		}
 		return;
@@ -959,7 +959,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_VORTIGAUNT_SWING_SOUND )
 	{
-		EmitSound( "NPC_Vortigaunt.Swing" );	
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Vortigaunt.Swing" );
 		return;
 	}
 
@@ -970,13 +970,13 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 
 		CPASAttenuationFilter filter( this );
 		CSoundParameters params;
-		if ( GetParametersForSound( "NPC_Vortigaunt.StartShootLoop", params, NULL ) )
+		if (g_pSoundEmitterSystem->GetParametersForSound( "NPC_Vortigaunt.StartShootLoop", params, NULL ) )
 		{
 			EmitSound_t ep( params );
 			//ep.m_nPitch = 100 + m_iBeams * 10;
 			ep.m_nPitch = 150;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 			m_bStopLoopingSounds = true;
 		}
 		return;
@@ -984,13 +984,13 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_NPC_LEFTFOOT )
 	{
-		EmitSound( "NPC_Vortigaunt.FootstepLeft", pEvent->eventtime );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Vortigaunt.FootstepLeft", pEvent->eventtime );
 		return;
 	}
 
 	if ( pEvent->event == AE_NPC_RIGHTFOOT )
 	{
-		EmitSound( "NPC_Vortigaunt.FootstepRight", pEvent->eventtime );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Vortigaunt.FootstepRight", pEvent->eventtime );
 		return;
 	}
 	
@@ -1155,18 +1155,18 @@ void CNPC_Vortigaunt::Precache()
 		}
 	}
 
-	PrecacheScriptSound( "NPC_Vortigaunt.SuitOn" );
-	PrecacheScriptSound( "NPC_Vortigaunt.SuitCharge" );
-	PrecacheScriptSound( "NPC_Vortigaunt.ZapPowerup" );
-	PrecacheScriptSound( "NPC_Vortigaunt.ClawBeam" );
-	PrecacheScriptSound( "NPC_Vortigaunt.StartHealLoop" );
-	PrecacheScriptSound( "NPC_Vortigaunt.Swing" );
-	PrecacheScriptSound( "NPC_Vortigaunt.StartShootLoop" );
-	PrecacheScriptSound( "NPC_Vortigaunt.FootstepLeft" );
-	PrecacheScriptSound( "NPC_Vortigaunt.FootstepRight" );
-	PrecacheScriptSound( "NPC_Vortigaunt.DispelStart" );
-	PrecacheScriptSound( "NPC_Vortigaunt.DispelImpact" );
-	PrecacheScriptSound( "NPC_Vortigaunt.Explode" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.SuitOn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.SuitCharge" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.ZapPowerup" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.ClawBeam" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.StartHealLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.Swing" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.StartShootLoop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.FootstepLeft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.FootstepRight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.DispelStart" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.DispelImpact" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Vortigaunt.Explode" );
 
 	PrecacheParticleSystem( "vortigaunt_beam" );
 	PrecacheParticleSystem( "vortigaunt_beam_charge" );
@@ -2036,7 +2036,7 @@ void CNPC_Vortigaunt::CreateBeamBlast( const Vector &vecOrigin )
 		pBlastSprite->SetBrightness( 255 );
 		pBlastSprite->SetScale( random->RandomFloat( 1.0f, 1.5f ) );
 		pBlastSprite->AnimateAndDie( 45.0f );
-		pBlastSprite->EmitSound( "NPC_Vortigaunt.Explode" );
+		g_pSoundEmitterSystem->EmitSound(pBlastSprite, "NPC_Vortigaunt.Explode" );//pBlastSprite->
 	}
 
 	CPVSFilter filter( vecOrigin );
@@ -2188,10 +2188,10 @@ void CNPC_Vortigaunt::ClearBeams( void )
 	// Stop looping suit charge sound.
 	if ( m_bStopLoopingSounds )
 	{
-		StopSound( "NPC_Vortigaunt.StartHealLoop" );
-		StopSound( "NPC_Vortigaunt.StartShootLoop" );
-		StopSound( "NPC_Vortigaunt.SuitCharge" );
-		StopSound( "NPC_Vortigaunt.ZapPowerup" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_Vortigaunt.StartHealLoop" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_Vortigaunt.StartShootLoop" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_Vortigaunt.SuitCharge" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_Vortigaunt.ZapPowerup" );
 		m_bStopLoopingSounds = false;
 	}
 }
@@ -3248,7 +3248,7 @@ void CVortigauntChargeToken::SeekTouch( CBaseEntity	*pOther )
 		return;
 
 	// TODO: Play a special noise for this event!
-	EmitSound( "NPC_Vortigaunt.SuitOn" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Vortigaunt.SuitOn" );
 
 	// Charge the suit's armor
 	if ( pPlayer->ArmorValue() < sk_vortigaunt_armor_charge.GetInt() )

@@ -447,18 +447,18 @@ void CNPC_BigMomma::Precache()
 	gSpitSprite = PrecacheModel("sprites/mommaspout.vmt");// client side spittle.
 	gSpitDebrisSprite = PrecacheModel("sprites/mommablob.vmt" );
 
-	PrecacheScriptSound( "BigMomma.Pain" );
-	PrecacheScriptSound( "BigMomma.Attack" );
-	PrecacheScriptSound( "BigMomma.AttackHit" );
-	PrecacheScriptSound( "BigMomma.Alert" );
-	PrecacheScriptSound( "BigMomma.Birth" );
-	PrecacheScriptSound( "BigMomma.Sack" );
-	PrecacheScriptSound( "BigMomma.Die" );
-	PrecacheScriptSound( "BigMomma.FootstepLeft" );
-	PrecacheScriptSound( "BigMomma.FootstepRight" );
-	PrecacheScriptSound( "BigMomma.LayHeadcrab" );
-	PrecacheScriptSound( "BigMomma.ChildDie" );
-	PrecacheScriptSound( "BigMomma.LaunchMortar" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.AttackHit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.Birth" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.Sack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.FootstepLeft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.FootstepRight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.LayHeadcrab" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.ChildDie" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.LaunchMortar" );
 }
 
 //=========================================================
@@ -567,7 +567,7 @@ void CNPC_BigMomma::TraceAttack( const CTakeDamageInfo &info, const Vector &vecD
 		if ( gpGlobals->curtime > m_painSoundTime )
 		{
 			m_painSoundTime = gpGlobals->curtime + random->RandomInt(1, 3);
-			EmitSound( "BigMomma.Pain" );
+			g_pSoundEmitterSystem->EmitSound(this, "BigMomma.Pain" );
 		}
 	}
 
@@ -740,7 +740,7 @@ void CNPC_BigMomma::StartTask( const Task_t *pTask )
 		// Play an attack sound here
 
 			CPASAttenuationFilter filter( this );
-			EmitSound( filter, entindex(), "BigMomma.Attack" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.Attack" );
 
 			BaseClass::StartTask( pTask );
 		}
@@ -889,46 +889,46 @@ void CNPC_BigMomma::HandleAnimEvent( animevent_t *pEvent )
 				}
 
 				pHurt->SetGroundEntity( NULL );
-				EmitSound( filter, entindex(), "BigMomma.AttackHit" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.AttackHit" );
 			}
 		}
 		break;
 		
 		case BIG_AE_SCREAM:
-			EmitSound( filter, entindex(), "BigMomma.Alert" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.Alert" );
 			break;
 		
 		case BIG_AE_PAIN_SOUND:
-			EmitSound( filter, entindex(), "BigMomma.Pain" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.Pain" );
 			break;
 		
 		case BIG_AE_ATTACK_SOUND:
-			EmitSound( filter, entindex(), "BigMomma.Attack" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.Attack" );
 			break;
 
 		case BIG_AE_BIRTH_SOUND:
-			EmitSound( filter, entindex(), "BigMomma.Birth" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.Birth" );
 			break;
 
 		case BIG_AE_SACK:
 			if ( RandomInt(0,100) < 30 )
 			{
-				EmitSound( filter, entindex(), "BigMomma.Sack" );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.Sack" );
 			}
 			break;
 
 		case BIG_AE_DEATHSOUND:
-			EmitSound( filter, entindex(), "BigMomma.Die" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.Die" );
 			break;
 
 		case BIG_AE_STEP1:		// Footstep left
 		case BIG_AE_STEP3:		// Footstep back left
-			EmitSound( filter, entindex(), "BigMomma.FootstepLeft" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.FootstepLeft" );
 			break;
 
 		case BIG_AE_STEP4:		// Footstep back right
 		case BIG_AE_STEP2:		// Footstep right
-			EmitSound( filter, entindex(), "BigMomma.FootstepRight" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.FootstepRight" );
 			break;
 
 		case BIG_AE_MORTAR_ATTACK1:
@@ -990,7 +990,7 @@ void CNPC_BigMomma::LayHeadcrab( void )
 	UTIL_DecalTrace( &tr, "MommaBlob" );
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "BigMomma.LayHeadcrab" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.LayHeadcrab" );
 
 	m_crabCount++;
 }
@@ -1005,7 +1005,7 @@ void CNPC_BigMomma::DeathNotice( CBaseEntity *pevChild )
 	{
 		// Make the "my baby's dead" noise!
 		CPASAttenuationFilter filter( this );
-		EmitSound( filter, entindex(), "BigMomma.ChildDie" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.ChildDie" );
 	}
 }
 
@@ -1018,7 +1018,7 @@ void CNPC_BigMomma::LaunchMortar( void )
 	startPos.z += 180;
 
 	CPASAttenuationFilter filter( this );
-	EmitSound( filter, entindex(), "BigMomma.LaunchMortar" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.LaunchMortar" );
 
 	CBMortar *pBomb = CBMortar::Shoot( this, startPos, m_vTossDir );
 	pBomb->SetGravity( 1.0 );
@@ -1204,9 +1204,9 @@ void CBMortar::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "NPC_BigMomma.SpitTouch1" );
-	PrecacheScriptSound( "NPC_BigMomma.SpitHit1" );
-	PrecacheScriptSound( "NPC_BigMomma.SpitHit2" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BigMomma.SpitTouch1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BigMomma.SpitHit1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BigMomma.SpitHit2" );
 }
 
 void CBMortar::Touch( CBaseEntity *pOther )
@@ -1217,15 +1217,15 @@ void CBMortar::Touch( CBaseEntity *pOther )
 	// splat sound
 	iPitch = random->RandomFloat( 90, 110 );
 
-	EmitSound( "NPC_BigMomma.SpitTouch1" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_BigMomma.SpitTouch1" );
 
 	switch ( random->RandomInt( 0, 1 ) )
 	{
 	case 0:
-		EmitSound( "NPC_BigMomma.SpitHit1" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_BigMomma.SpitHit1" );
 		break;
 	case 1:
-		EmitSound( "NPC_BigMomma.SpitHit2" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_BigMomma.SpitHit2" );
 		break;
 	}
 

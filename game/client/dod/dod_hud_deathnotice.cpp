@@ -938,5 +938,5 @@ void CHudDeathNotice::PlayRivalrySounds( int iKillerIndex, int iVictimIndex, int
 	}
 
 	CLocalPlayerFilter filter;
-	C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, pszSoundName );
+	g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, pszSoundName );//C_BaseEntity::
 }

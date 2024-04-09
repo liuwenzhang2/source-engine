@@ -217,17 +217,17 @@ public:
 
 	void PainSound( const CTakeDamageInfo &info )
 	{
-		EmitSound( "NPC_Seagull.Pain" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Seagull.Pain" );
 	}
 
 	void DeathSound( const CTakeDamageInfo &info )
 	{
-		EmitSound( "NPC_Seagull.Pain" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Seagull.Pain" );
 	}
 
 	void IdleSound( void )
 	{
-		EmitSound( "NPC_Seagull.Idle" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Seagull.Idle" );
 	}
 };
 
@@ -249,7 +249,7 @@ public:
 
 	void IdleSound( void )
 	{
-		EmitSound( "NPC_Pigeon.Idle" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Pigeon.Idle" );
 	}
 };
 

@@ -150,6 +150,8 @@ public:
 	}
 };
 
+extern ISoundEmitterSystem* g_pSoundEmitterSystem;
+
 //-----------------------------------------------------------------------------
 // Purpose: Add players in PAS to list and if not in single player, use attenuation
 //  to remove those that are too far away from source origin
@@ -190,7 +192,7 @@ public:
 	CPASAttenuationFilter( CBaseEntity *entity, const char *lookupSound ) :
 		CPASFilter( static_cast<const Vector&>(entity->GetSoundEmissionOrigin()) )
 	{
-		soundlevel_t level = CBaseEntity::LookupSoundLevel( lookupSound );
+		soundlevel_t level = g_pSoundEmitterSystem->LookupSoundLevel( lookupSound );//CBaseEntity::
 		float attenuation = SNDLVL_TO_ATTN( level );
 		Filter( entity->GetSoundEmissionOrigin(), attenuation );
 	}
@@ -198,7 +200,7 @@ public:
 	CPASAttenuationFilter( const Vector& origin, const char *lookupSound ) :
 		CPASFilter( origin )
 	{
-		soundlevel_t level = CBaseEntity::LookupSoundLevel( lookupSound );
+		soundlevel_t level = g_pSoundEmitterSystem->LookupSoundLevel( lookupSound );//CBaseEntity::
 		float attenuation = SNDLVL_TO_ATTN( level );
 		Filter( origin, attenuation );
 	}
@@ -206,7 +208,7 @@ public:
 	CPASAttenuationFilter( CBaseEntity *entity, const char *lookupSound, HSOUNDSCRIPTHANDLE& handle ) :
 		CPASFilter( static_cast<const Vector&>(entity->GetSoundEmissionOrigin()) )
 	{
-		soundlevel_t level = CBaseEntity::LookupSoundLevel( lookupSound, handle );
+		soundlevel_t level = g_pSoundEmitterSystem->LookupSoundLevel( lookupSound, handle );//CBaseEntity::
 		float attenuation = SNDLVL_TO_ATTN( level );
 		Filter( entity->GetSoundEmissionOrigin(), attenuation );
 	}
@@ -214,7 +216,7 @@ public:
 	CPASAttenuationFilter( const Vector& origin, const char *lookupSound, HSOUNDSCRIPTHANDLE& handle ) :
 		CPASFilter( origin )
 	{
-		soundlevel_t level = CBaseEntity::LookupSoundLevel( lookupSound, handle );
+		soundlevel_t level = g_pSoundEmitterSystem->LookupSoundLevel( lookupSound, handle );//CBaseEntity::
 		float attenuation = SNDLVL_TO_ATTN( level );
 		Filter( origin, attenuation );
 	}

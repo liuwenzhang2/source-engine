@@ -426,15 +426,15 @@ void CHL2_Player::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheScriptSound( "HL2Player.SprintNoPower" );
-	PrecacheScriptSound( "HL2Player.SprintStart" );
-	PrecacheScriptSound( "HL2Player.UseDeny" );
-	PrecacheScriptSound( "HL2Player.FlashLightOn" );
-	PrecacheScriptSound( "HL2Player.FlashLightOff" );
-	PrecacheScriptSound( "HL2Player.PickupWeapon" );
-	PrecacheScriptSound( "HL2Player.TrainUse" );
-	PrecacheScriptSound( "HL2Player.Use" );
-	PrecacheScriptSound( "HL2Player.BurnPain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HL2Player.SprintNoPower" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HL2Player.SprintStart" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HL2Player.UseDeny" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HL2Player.FlashLightOn" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HL2Player.FlashLightOff" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HL2Player.PickupWeapon" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HL2Player.TrainUse" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HL2Player.Use" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "HL2Player.BurnPain" );
 }
 
 //-----------------------------------------------------------------------------
@@ -1203,7 +1203,7 @@ void CHL2_Player::StartSprinting( void )
 		{
 			CPASAttenuationFilter filter( this );
 			filter.UsePredictionRules();
-			EmitSound( filter, entindex(), "HL2Player.SprintNoPower" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HL2Player.SprintNoPower" );
 		}
 		return;
 	}
@@ -1213,7 +1213,7 @@ void CHL2_Player::StartSprinting( void )
 
 	CPASAttenuationFilter filter( this );
 	filter.UsePredictionRules();
-	EmitSound( filter, entindex(), "HL2Player.SprintStart" );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HL2Player.SprintStart" );
 
 	SetMaxSpeed( HL2_SPRINT_SPEED );
 	m_fIsSprinting = true;
@@ -1602,7 +1602,7 @@ void CHL2_Player::CommanderExecute( CommanderCommand_t command )
 
 	if ( !pPlayerSquadLeader )
 	{
-		EmitSound( "HL2Player.UseDeny" );
+		g_pSoundEmitterSystem->EmitSound(this, "HL2Player.UseDeny" );
 		return;
 	}
 
@@ -1636,7 +1636,7 @@ void CHL2_Player::CommanderExecute( CommanderCommand_t command )
 		// Find a goal for ourselves.
 		if( !CommanderFindGoal( &goal ) )
 		{
-			EmitSound( "HL2Player.UseDeny" );
+			g_pSoundEmitterSystem->EmitSound(this, "HL2Player.UseDeny" );
 			return; // just keep following
 		}
 	}
@@ -1987,7 +1987,7 @@ bool CHL2_Player::ApplyBattery( float powerMultiplier )
 		IncrementArmorValue( sk_battery.GetFloat() * powerMultiplier, MAX_NORMAL_BATTERY );
 
 		CPASAttenuationFilter filter( this, "ItemBattery.Touch" );
-		EmitSound( filter, entindex(), "ItemBattery.Touch" );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "ItemBattery.Touch" );
 
 		CSingleUserRecipientFilter user( this );
 		user.MakeReliable();
@@ -2039,7 +2039,7 @@ void CHL2_Player::FlashlightTurnOn( void )
 #endif
 
 	AddEffects( EF_DIMLIGHT );
-	EmitSound( "HL2Player.FlashLightOn" );
+	g_pSoundEmitterSystem->EmitSound(this, "HL2Player.FlashLightOn" );
 
 	variant_t flashlighton;
 	flashlighton.SetFloat( m_HL2Local.m_flSuitPower / 100.0f );
@@ -2058,7 +2058,7 @@ void CHL2_Player::FlashlightTurnOff( void )
 	}
 
 	RemoveEffects( EF_DIMLIGHT );
-	EmitSound( "HL2Player.FlashLightOff" );
+	g_pSoundEmitterSystem->EmitSound(this, "HL2Player.FlashLightOff" );
 
 	variant_t flashlightoff;
 	flashlightoff.SetFloat( m_HL2Local.m_flSuitPower / 100.0f );
@@ -2364,18 +2364,18 @@ int CHL2_Player::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	{
 		if( m_idrowndmg == m_idrownrestored )
 		{
-			EmitSound( "Player.DrownStart" );
+			g_pSoundEmitterSystem->EmitSound(this, "Player.DrownStart" );
 		}
 		else
 		{
-			EmitSound( "Player.DrownContinue" );
+			g_pSoundEmitterSystem->EmitSound(this, "Player.DrownContinue" );
 		}
 	}
 
 	// Burnt
 	if ( info.GetDamageType() & DMG_BURN )
 	{
-		EmitSound( "HL2Player.BurnPain" );
+		g_pSoundEmitterSystem->EmitSound(this, "HL2Player.BurnPain" );
 	}
 
 
@@ -2770,11 +2770,11 @@ bool CHL2_Player::ClientCommand( const CCommand &args )
 		CSingleUserRecipientFilter filter( this );
 		if ( args.ArgC() > 1 )
 		{
-			EmitSound( filter, entindex(), args[ 1 ] );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), args[ 1 ] );
 		}
 		else
 		{
-			EmitSound( filter, entindex(), "Test.Sound" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Test.Sound" );
 		}
 		return true;
 	}
@@ -2815,7 +2815,7 @@ void CHL2_Player::PlayerUse ( void )
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
 					m_iTrain = TrainSpeed(pTrain->m_flSpeed, ((CFuncTrackTrain*)pTrain)->GetMaxSpeed());
 					m_iTrain |= TRAIN_NEW;
-					EmitSound( "HL2Player.TrainUse" );
+					g_pSoundEmitterSystem->EmitSound(this, "HL2Player.TrainUse" );
 					return;
 				}
 			}
@@ -2851,7 +2851,7 @@ void CHL2_Player::PlayerUse ( void )
 			// Robin: Don't play sounds for NPCs, because NPCs will allow respond with speech.
 			if ( !pUseEntity->MyNPCPointer() )
 			{
-				EmitSound( "HL2Player.Use" );
+				g_pSoundEmitterSystem->EmitSound(this, "HL2Player.Use" );
 			}
 		}
 
@@ -3593,7 +3593,7 @@ void CHL2_Player::ItemPostFrame()
 	if ( m_bPlayUseDenySound )
 	{
 		m_bPlayUseDenySound = false;
-		EmitSound( "HL2Player.UseDeny" );
+		g_pSoundEmitterSystem->EmitSound(this, "HL2Player.UseDeny" );
 	}
 }
 

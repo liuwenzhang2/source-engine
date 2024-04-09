@@ -52,7 +52,7 @@ CDODBaseRocket::~CDODBaseRocket()
 //-----------------------------------------------------------------------------
 void CDODBaseRocket::Precache( void )
 {
-	PrecacheScriptSound( "Weapon_Bazooka.Shoot" );	
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Bazooka.Shoot" );
 	PrecacheParticleSystem( "rockettrail" );
 }
 
@@ -84,7 +84,7 @@ void CDODBaseRocket::Spawn( void )
 
 	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 
-	EmitSound( "Weapon_Bazooka.Shoot" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_Bazooka.Shoot" );
 
 	m_flCollideWithTeammatesTime = gpGlobals->curtime + 0.25;
 	m_bCollideWithTeammates = false;
@@ -122,7 +122,7 @@ void CDODBaseRocket::Fire( void )
 	SetModel("models/weapons/w_missile.mdl");
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
 
-	EmitSound( "Weapon_Bazooka.Shoot" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_Bazooka.Shoot" );
 }
 
 //-----------------------------------------------------------------------------
@@ -182,7 +182,7 @@ void CDODBaseRocket::Explode( void )
 	if ( newTrace->m_pEnt && !((CBaseEntity*)newTrace->m_pEnt)->IsPlayer() )
 		UTIL_DecalTrace( newTrace, "Scorch" );
 
-	StopSound( "Weapon_Bazooka.Shoot" );
+	g_pSoundEmitterSystem->StopSound(this, "Weapon_Bazooka.Shoot" );
 	UTIL_Remove( this );
 }
 

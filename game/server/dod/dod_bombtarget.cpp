@@ -243,7 +243,7 @@ void CDODBombTarget::State_Enter_ARMED( void )
 		pCP->BombPlanted( GetBombTimerLength(), m_pPlantingPlayer );
 	}	
 
-	EmitSound( "Weapon_C4.Fuse" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_C4.Fuse" );
 
 	static int iWickSeq = LookupSequence( "w_tnt_wick" );
 	ResetSequence( iWickSeq );
@@ -251,7 +251,7 @@ void CDODBombTarget::State_Enter_ARMED( void )
 
 void CDODBombTarget::State_Leave_Armed( void )
 {
-	StopSound( "Weapon_C4.Fuse" );
+	g_pSoundEmitterSystem->StopSound(this, "Weapon_C4.Fuse" );
 }
 
 void CDODBombTarget::ResetDefuse( int index )
@@ -290,7 +290,7 @@ extern short g_sModelIndexFireball;
 void CDODBombTarget::Explode( void )
 {
 	// output the explosion
-	EmitSound( "Weapon_C4.Explode" );
+	g_pSoundEmitterSystem->EmitSound(this, "Weapon_C4.Explode" );
 
 	Vector origin = GetAbsOrigin();
 

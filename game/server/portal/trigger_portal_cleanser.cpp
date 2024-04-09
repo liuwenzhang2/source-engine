@@ -205,7 +205,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 
 		if ( FClassnameIs( pBaseAnimating, "updateitem2" ) )
 		{
-			pBaseAnimating->EmitSound( "UpdateItem.Fizzle" );
+			g_pSoundEmitterSystem->EmitSound(pBaseAnimating, "UpdateItem.Fizzle" );//pBaseAnimating->
 		}
 
 		Vector vOldVel;

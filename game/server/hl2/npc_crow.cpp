@@ -204,7 +204,7 @@ void CNPC_Crow::StopLoopingSounds( void )
 	//
 	if ( m_bPlayedLoopingSound )
 	{
-		StopSound( "NPC_Crow.Flap" );
+		g_pSoundEmitterSystem->StopSound(this, "NPC_Crow.Flap" );
 	}
 	BaseClass::StopLoopingSounds();
 }
@@ -276,7 +276,7 @@ void CNPC_Crow::HandleAnimEvent( animevent_t *pEvent )
 		}
 
 		// Play a hop flap sound.
-		EmitSound( "NPC_Crow.Hop" );
+		g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Hop" );
 
 		SetAbsVelocity( vecJumpDir );
 		return;
@@ -1044,7 +1044,7 @@ void CNPC_Crow::RunTask( const Task_t *pTask )
 				m_flNextFlinchTime = gpGlobals->curtime + random->RandomFloat( 0.5f, 2.0f );
 				// dvs: TODO: squirm
 				// dvs: TODO: spawn feathers
-				EmitSound( "NPC_Crow.Squawk" );
+				g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Squawk" );
 			}
 			break;
 		}
@@ -1063,7 +1063,7 @@ void CNPC_Crow::RunTask( const Task_t *pTask )
 //-----------------------------------------------------------------------------
 bool CNPC_Crow::CorpseGib( const CTakeDamageInfo &info )
 {
-	EmitSound( "NPC_Crow.Gib" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Gib" );
 
 	// TODO: crow gibs?
 	//CGib::SpawnSpecificGibs( this, CROW_GIB_COUNT, 300, 400, "models/gibs/crow_gibs.mdl");
@@ -1262,21 +1262,21 @@ void CNPC_Crow::Precache( void )
 	PrecacheModel( "models/seagull.mdl" );
 
 	//Crow
-	PrecacheScriptSound( "NPC_Crow.Hop" );
-	PrecacheScriptSound( "NPC_Crow.Squawk" );
-	PrecacheScriptSound( "NPC_Crow.Gib" );
-	PrecacheScriptSound( "NPC_Crow.Idle" );
-	PrecacheScriptSound( "NPC_Crow.Alert" );
-	PrecacheScriptSound( "NPC_Crow.Die" );
-	PrecacheScriptSound( "NPC_Crow.Pain" );
-	PrecacheScriptSound( "NPC_Crow.Flap" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Crow.Hop" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Crow.Squawk" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Crow.Gib" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Crow.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Crow.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Crow.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Crow.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Crow.Flap" );
 
 	//Seagull
-	PrecacheScriptSound( "NPC_Seagull.Pain" );
-	PrecacheScriptSound( "NPC_Seagull.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Seagull.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Seagull.Idle" );
 
 	//Pigeon
-	PrecacheScriptSound( "NPC_Pigeon.Idle");
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Pigeon.Idle");
 }
 
 
@@ -1288,7 +1288,7 @@ void CNPC_Crow::IdleSound( void )
 	if ( m_iBirdType != BIRDTYPE_CROW )
 		 return;
 
-	EmitSound( "NPC_Crow.Idle" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Idle" );
 }
 
 
@@ -1297,7 +1297,7 @@ void CNPC_Crow::AlertSound( void )
 	if ( m_iBirdType != BIRDTYPE_CROW )
 		 return;
 
-	EmitSound( "NPC_Crow.Alert" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Alert" );
 }
 
 
@@ -1306,7 +1306,7 @@ void CNPC_Crow::PainSound( const CTakeDamageInfo &info )
 	if ( m_iBirdType != BIRDTYPE_CROW )
 		 return;
 
-	EmitSound( "NPC_Crow.Pain" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Pain" );
 }
 
 
@@ -1315,12 +1315,12 @@ void CNPC_Crow::DeathSound( const CTakeDamageInfo &info )
 	if ( m_iBirdType != BIRDTYPE_CROW )
 		 return;
 
-	EmitSound( "NPC_Crow.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Die" );
 }
 
 void CNPC_Crow::FlapSound( void )
 {
-	EmitSound( "NPC_Crow.Flap" );
+	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Flap" );
 	m_bPlayedLoopingSound = true;
 }
 

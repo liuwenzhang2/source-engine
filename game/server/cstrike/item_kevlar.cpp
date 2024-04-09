@@ -25,7 +25,7 @@ public:
 	
 	void Precache( void )
 	{
-		PrecacheScriptSound( "BaseCombatCharacter.ItemPickup2" );
+		g_pSoundEmitterSystem->PrecacheScriptSound( "BaseCombatCharacter.ItemPickup2" );
 	}
 	
 	bool MyTouch( CBasePlayer *pBasePlayer )
@@ -42,7 +42,7 @@ public:
 		if ( pPlayer->IsDead() == false )
 		{
 			CPASAttenuationFilter filter( pBasePlayer );
-			EmitSound( filter, entindex(), "BaseCombatCharacter.ItemPickup2" );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BaseCombatCharacter.ItemPickup2" );
 
 			CSingleUserRecipientFilter user( pPlayer );
 			UserMessageBegin( user, "ItemPickup" );

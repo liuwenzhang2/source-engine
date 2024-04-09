@@ -124,7 +124,7 @@ void ClientGamePrecache( void )
 
 	CBaseEntity::PrecacheModel( "models/gibs/agibs.mdl" );
 
-	CBaseEntity::PrecacheScriptSound( "Player.UseDeny" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.UseDeny" );
 }
 
 

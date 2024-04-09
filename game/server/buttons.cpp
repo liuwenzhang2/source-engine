@@ -86,13 +86,13 @@ void CBaseButton::Precache( void )
 	if (m_bLockedSound)
 	{
 		m_ls.sLockedSound = MakeButtonSound( (int)m_bLockedSound );
-		PrecacheScriptSound(m_ls.sLockedSound.ToCStr());
+		g_pSoundEmitterSystem->PrecacheScriptSound(m_ls.sLockedSound.ToCStr());
 	}
 
 	if (m_bUnlockedSound)
 	{
 		m_ls.sUnlockedSound = MakeButtonSound( (int)m_bUnlockedSound );
-		PrecacheScriptSound(m_ls.sUnlockedSound.ToCStr());
+		g_pSoundEmitterSystem->PrecacheScriptSound(m_ls.sUnlockedSound.ToCStr());
 	}
 
 	// get sentence group names, for doors which are directly 'touched' to open
@@ -128,7 +128,7 @@ void CBaseButton::Precache( void )
 
 	if ( m_sNoise != NULL_STRING )
 	{
-		PrecacheScriptSound( STRING( m_sNoise ) );
+		g_pSoundEmitterSystem->PrecacheScriptSound( STRING( m_sNoise ) );
 	}
 }
 
@@ -248,7 +248,7 @@ void CBaseButton::Press( CBaseEntity *pActivator, BUTTON_CODE eCode )
 			ep.m_flVolume = 1;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 		m_OnPressed.FireOutput(pActivator, this);
@@ -339,7 +339,7 @@ int CBaseButton::OnTakeDamage( const CTakeDamageInfo &info )
 			ep.m_flVolume = 1;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 		m_OnPressed.FireOutput(m_hActivator, this);
@@ -365,7 +365,7 @@ void CBaseButton::Spawn( )
 	if ( m_sounds )
 	{
 		m_sNoise = MakeButtonSound( m_sounds );
-		PrecacheScriptSound(m_sNoise.ToCStr());
+		g_pSoundEmitterSystem->PrecacheScriptSound(m_sNoise.ToCStr());
 	}
 	else
 	{
@@ -547,7 +547,7 @@ void CBaseButton::ButtonUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 				ep.m_flVolume = 1;
 				ep.m_SoundLevel = SNDLVL_NORM;
 
-				EmitSound( filter, entindex(), ep );
+				g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 			}
 
 			m_OnPressed.FireOutput(m_hActivator, this);
@@ -630,7 +630,7 @@ void CBaseButton::ButtonTouch( CBaseEntity *pOther )
 			ep.m_flVolume = 1;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
-			EmitSound( filter, entindex(), ep );
+			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 
 		m_OnPressed.FireOutput(m_hActivator, this);
@@ -661,7 +661,7 @@ void CBaseButton::ButtonActivate( void )
 		ep.m_flVolume = 1;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
-		EmitSound( filter, entindex(), ep );
+		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 	
 	if (!UTIL_IsMasterTriggered(m_sMaster, m_hActivator) || m_bLocked)
@@ -846,7 +846,7 @@ void CRotButton::Spawn( void )
 	if ( m_sounds )
 	{
 		m_sNoise = MakeButtonSound( m_sounds );
-		PrecacheScriptSound(m_sNoise.ToCStr());
+		g_pSoundEmitterSystem->PrecacheScriptSound(m_sNoise.ToCStr());
 	}
 	else
 	{
@@ -1030,7 +1030,7 @@ void CMomentaryRotButton::Spawn( void )
 		if ( m_sounds )
 		{
 			m_sNoise = MakeButtonSound( m_sounds );
-			PrecacheScriptSound(m_sNoise.ToCStr());
+			g_pSoundEmitterSystem->PrecacheScriptSound(m_sNoise.ToCStr());
 		}
 		else
 		{
@@ -1107,7 +1107,7 @@ void CMomentaryRotButton::PlaySound( void )
 	ep.m_flVolume = 1;
 	ep.m_SoundLevel = SNDLVL_NORM;
 
-	EmitSound( filter, entindex(), ep );
+	g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 }
 
 

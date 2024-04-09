@@ -238,23 +238,23 @@ void CZombie::Precache( void )
 	PrecacheModel( "models/zombie/classic_torso.mdl" );
 	PrecacheModel( "models/zombie/classic_legs.mdl" );
 
-	PrecacheScriptSound( "Zombie.FootstepRight" );
-	PrecacheScriptSound( "Zombie.FootstepLeft" );
-	PrecacheScriptSound( "Zombie.FootstepLeft" );
-	PrecacheScriptSound( "Zombie.ScuffRight" );
-	PrecacheScriptSound( "Zombie.ScuffLeft" );
-	PrecacheScriptSound( "Zombie.AttackHit" );
-	PrecacheScriptSound( "Zombie.AttackMiss" );
-	PrecacheScriptSound( "Zombie.Pain" );
-	PrecacheScriptSound( "Zombie.Die" );
-	PrecacheScriptSound( "Zombie.Alert" );
-	PrecacheScriptSound( "Zombie.Idle" );
-	PrecacheScriptSound( "Zombie.Attack" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.FootstepRight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.FootstepLeft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.FootstepLeft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.ScuffRight" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.ScuffLeft" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.AttackHit" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.AttackMiss" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.Pain" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.Die" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.Alert" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.Idle" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.Attack" );
 
-	PrecacheScriptSound( "NPC_BaseZombie.Moan1" );
-	PrecacheScriptSound( "NPC_BaseZombie.Moan2" );
-	PrecacheScriptSound( "NPC_BaseZombie.Moan3" );
-	PrecacheScriptSound( "NPC_BaseZombie.Moan4" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BaseZombie.Moan1" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BaseZombie.Moan2" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BaseZombie.Moan3" );
+	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BaseZombie.Moan4" );
 }
 
 //-----------------------------------------------------------------------------
@@ -334,11 +334,11 @@ void CZombie::FootstepSound( bool fRightFoot )
 {
 	if( fRightFoot )
 	{
-		EmitSound(  "Zombie.FootstepRight" );
+		g_pSoundEmitterSystem->EmitSound(this, "Zombie.FootstepRight" );
 	}
 	else
 	{
-		EmitSound( "Zombie.FootstepLeft" );
+		g_pSoundEmitterSystem->EmitSound(this, "Zombie.FootstepLeft" );
 	}
 }
 
@@ -349,11 +349,11 @@ void CZombie::FootscuffSound( bool fRightFoot )
 {
 	if( fRightFoot )
 	{
-		EmitSound( "Zombie.ScuffRight" );
+		g_pSoundEmitterSystem->EmitSound(this, "Zombie.ScuffRight" );
 	}
 	else
 	{
-		EmitSound( "Zombie.ScuffLeft" );
+		g_pSoundEmitterSystem->EmitSound(this, "Zombie.ScuffLeft" );
 	}
 }
 
@@ -362,7 +362,7 @@ void CZombie::FootscuffSound( bool fRightFoot )
 //-----------------------------------------------------------------------------
 void CZombie::AttackHitSound( void )
 {
-	EmitSound( "Zombie.AttackHit" );
+	g_pSoundEmitterSystem->EmitSound(this, "Zombie.AttackHit" );
 }
 
 //-----------------------------------------------------------------------------
@@ -371,7 +371,7 @@ void CZombie::AttackHitSound( void )
 void CZombie::AttackMissSound( void )
 {
 	// Play a random attack miss sound
-	EmitSound( "Zombie.AttackMiss" );
+	g_pSoundEmitterSystem->EmitSound(this, "Zombie.AttackMiss" );
 }
 
 //-----------------------------------------------------------------------------
@@ -385,14 +385,14 @@ void CZombie::PainSound( const CTakeDamageInfo &info )
 		return;
 	}
 
-	EmitSound( "Zombie.Pain" );
+	g_pSoundEmitterSystem->EmitSound(this, "Zombie.Pain" );
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CZombie::DeathSound( const CTakeDamageInfo &info ) 
 {
-	EmitSound( "Zombie.Die" );
+	g_pSoundEmitterSystem->EmitSound(this, "Zombie.Die" );
 }
 
 //-----------------------------------------------------------------------------
@@ -400,7 +400,7 @@ void CZombie::DeathSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CZombie::AlertSound( void )
 {
-	EmitSound( "Zombie.Alert" );
+	g_pSoundEmitterSystem->EmitSound(this, "Zombie.Alert" );
 
 	// Don't let a moan sound cut off the alert sound.
 	m_flNextMoanSound += random->RandomFloat( 2.0, 4.0 );
@@ -431,7 +431,7 @@ void CZombie::IdleSound( void )
 		return;
 	}
 
-	EmitSound( "Zombie.Idle" );
+	g_pSoundEmitterSystem->EmitSound(this, "Zombie.Idle" );
 	MakeAISpookySound( 360.0f );
 }
 
@@ -440,7 +440,7 @@ void CZombie::IdleSound( void )
 //-----------------------------------------------------------------------------
 void CZombie::AttackSound( void )
 {
-	EmitSound( "Zombie.Attack" );
+	g_pSoundEmitterSystem->EmitSound(this, "Zombie.Attack" );
 }
 
 //-----------------------------------------------------------------------------

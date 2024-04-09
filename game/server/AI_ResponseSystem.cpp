@@ -1884,7 +1884,7 @@ void CResponseSystem::Precache()
 				break;
 			case RESPONSE_SPEAK:
 				{
-					CBaseEntity::PrecacheScriptSound( response.value );
+					g_pSoundEmitterSystem->PrecacheScriptSound( response.value );
 				}
 				break;
 			}

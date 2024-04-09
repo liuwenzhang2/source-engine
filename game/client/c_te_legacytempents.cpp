@@ -2230,7 +2230,7 @@ void CTempEnts::PlaySound ( C_LocalTempEntity *pTemp, float damp )
 	}
 
 	CSoundParameters params;
-	if ( !C_BaseEntity::GetParametersForSound( soundname, params, NULL ) )
+	if ( !g_pSoundEmitterSystem->GetParametersForSound( soundname, params, NULL ) )//C_BaseEntity::
 		return;
 
 	fvol = params.volume;
@@ -2267,7 +2267,7 @@ void CTempEnts::PlaySound ( C_LocalTempEntity *pTemp, float damp )
 		ep.m_nPitch = pitch;
 		ep.m_pOrigin = &pTemp->GetAbsOrigin();
 
-		C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, ep );
+		g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );//C_BaseEntity::
 	}
 }
 					
