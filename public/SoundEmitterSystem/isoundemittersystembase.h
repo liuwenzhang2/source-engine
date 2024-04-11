@@ -303,7 +303,7 @@ struct EmitSound_t
 // Purpose: 
 // Input  : &src - 
 //-----------------------------------------------------------------------------
-	EmitSound_t::EmitSound_t(const CSoundParameters& src, float fCurTime )//gpGlobals->curtime
+	EmitSound_t(const CSoundParameters& src, float fCurTime )//gpGlobals->curtime
 	{
 		m_nChannel = src.channel;
 		m_pSoundName = src.soundname;
