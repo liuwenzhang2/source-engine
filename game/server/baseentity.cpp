@@ -5071,7 +5071,7 @@ int CBaseEntity::PrecacheModel( const char *name, bool bPreload )
 	}
 
 	// Warn on out of order precache
-	if ( !g_pSoundEmitterSystem->IsPrecacheAllowed() )//CBaseEntity::
+	if ( !engine->IsPrecacheAllowed() )//CBaseEntity::
 	{
 		if ( !engine->IsModelPrecached( name ) )
 		{
@@ -7660,8 +7660,8 @@ void CC_Ent_Create( const CCommand& args )
 		}
 	}
 
-	bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
-	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
+	bool allowPrecache = engine->IsPrecacheAllowed();//CBaseEntity::
+	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	// Try to create entity
 	CBaseEntity *entity = dynamic_cast< CBaseEntity * >(gEntList.CreateEntityByName(args[1]) );
@@ -7696,7 +7696,7 @@ void CC_Ent_Create( const CCommand& args )
 
 		entity->Activate();
 	}
-	g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
+	engine->SetAllowPrecache( allowPrecache );//CBaseEntity::
 }
 static ConCommand ent_create("ent_create", CC_Ent_Create, "Creates an entity of the given type where the player is looking.  Additional parameters can be passed in in the form: ent_create <entity name> <param 1 name> <param 1> <param 2 name> <param 2>...<param N name> <param N>", FCVAR_GAMEDLL | FCVAR_CHEAT);
 

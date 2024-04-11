@@ -89,7 +89,7 @@
 #include "tier3/tier3.h"
 #include "serverbenchmark_base.h"
 #include "querycache.h"
-
+#include "envmicrophone.h"
 
 #ifdef TF_DLL
 #include "gc_clientsystem.h"
@@ -610,7 +610,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 		return false;
 	if ( (datacache = (IDataCache*)appSystemFactory(DATACACHE_INTERFACE_VERSION, NULL )) == NULL )
 		return false;
-	if ( (soundemitterbase = (ISoundEmitterSystemBase *)appSystemFactory(SOUNDEMITTERSYSTEM_INTERFACE_VERSION, NULL)) == NULL )
+	if ( (soundemitterbase = (ISoundEmitterSystemBase *)appSystemFactory(SOUNDEMITTERSYSTEMBASE_INTERFACE_VERSION, NULL)) == NULL )
 		return false;
 #ifndef _XBOX
 	if ( (gamestatsuploader = (IUploadGameStats *)appSystemFactory( INTERFACEVERSION_UPLOADGAMESTATS, NULL )) == NULL )
@@ -917,7 +917,7 @@ void EndRestoreEntities()
 
 	// HACKHACK: UNDONE: We need to redesign the main loop with respect to save/load/server activate
 	g_ServerGameDLL.ServerActivate( NULL, 0, 0 );
-	g_pSoundEmitterSystem->SetAllowPrecache( false );//CBaseEntity::
+	engine->SetAllowPrecache( false );//CBaseEntity::
 }
 
 void BeginRestoreEntities()
@@ -930,7 +930,7 @@ void BeginRestoreEntities()
 	g_RestoredEntities.Purge();
 	g_InRestore = true;
 
-	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
+	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	// No calls to GetAbsOrigin until the entire hierarchy is restored!
 	//CBaseEntity::SetAbsQueriesValid( false );
@@ -1115,7 +1115,7 @@ void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, 
 
 	IGameSystem::LevelInitPostEntityAllSystems();
 	// No more precaching after PostEntityAllSystems!!!
-	g_pSoundEmitterSystem->SetAllowPrecache( false );//CBaseEntity::
+	engine->SetAllowPrecache( false );//CBaseEntity::
 
 	// only display the think limit when the game is run with "developer" mode set
 	if ( !g_pDeveloper->GetInt() )
@@ -1386,7 +1386,7 @@ void CServerGameDLL::LevelShutdown( void )
 	IGameSystem::LevelShutdownPostEntityAllSystems();
 
 	// In case we quit out during initial load
-	g_pSoundEmitterSystem->SetAllowPrecache( false );//CBaseEntity::
+	engine->SetAllowPrecache( false );//CBaseEntity::
 
 	g_nCurrentChapterIndex = -1;
 
@@ -2366,6 +2366,11 @@ void CServerGameDLL::EmitCloseCaption(IRecipientFilter& filter, int entindex, ch
 	}
 
 	InternalEmitCloseCaption(filter, entindex, fromplayer, token, soundorigin, duration, warnifmissing);
+}
+
+bool CServerGameDLL::OnEmitSound(int entindex, const char* soundname, soundlevel_t soundlevel,
+	float flVolume, int iFlags, int iPitch, const Vector* pOrigin, float soundtime, CUtlVector< Vector >& soundorigins) {
+	return CEnvMicrophone::OnSoundPlayed(entindex, soundname, soundlevel, flVolume, iFlags, iPitch, pOrigin, soundtime, soundorigins);
 }
 
 // keeps track of which chapters the user has unlocked
@@ -3718,7 +3723,7 @@ class CServerDLLSharedAppSystems : public IServerDLLSharedAppSystems
 public:
 	CServerDLLSharedAppSystems()
 	{
-		AddAppSystem( "soundemittersystem" DLL_EXT_STRING, SOUNDEMITTERSYSTEM_INTERFACE_VERSION );
+		AddAppSystem( "soundemittersystem" DLL_EXT_STRING, SOUNDEMITTERSYSTEMBASE_INTERFACE_VERSION);
 		AddAppSystem( "scenefilecache" DLL_EXT_STRING, SCENE_FILE_CACHE_INTERFACE_VERSION );
 	}
 

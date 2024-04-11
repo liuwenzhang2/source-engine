@@ -375,6 +375,24 @@ public:
 	//	return client->GetPrevPackInfo();		
 	//}
 	
+	//-----------------------------------------------------------------------------
+	// Purpose: static method
+	// Output : Returns true on success, false on failure.
+	//-----------------------------------------------------------------------------
+	virtual bool IsPrecacheAllowed()//CBaseEntity::
+	{
+		return m_bAllowPrecache;
+	}
+
+	//-----------------------------------------------------------------------------
+	// Purpose: static method
+	// Input  : allow - 
+	//-----------------------------------------------------------------------------
+	virtual void SetAllowPrecache(bool allow)//CBaseEntity::
+	{
+		m_bAllowPrecache = allow;
+	}
+
 	virtual int PrecacheDecal( const char *name, bool preload /*=false*/ )
 	{
 		PR_CheckEmptyString( name );
@@ -864,107 +882,30 @@ public:
 	
 	  =================
 	*/
-	virtual void EmitAmbientSound( int entindex, const Vector& pos, const char *samp, float vol, 
-		soundlevel_t soundlevel, int fFlags, int pitch, float soundtime /*=0.0f*/ )
-	{
-		SoundInfo_t sound; 
-		sound.SetDefault();
-		
-		sound.nEntityIndex = entindex;
-		sound.fVolume = vol;
-		sound.Soundlevel = soundlevel;
-		sound.nFlags = fFlags;
-		sound.nPitch = pitch;
-		sound.nChannel = CHAN_STATIC;
-		sound.vOrigin = pos;
-		sound.bIsAmbient = true;
-
-		ASSERT_COORD( sound.vOrigin );
-		
-		// set sound delay
-		
-		if ( soundtime != 0.0f )
-		{
-			sound.fDelay = soundtime - sv.GetTime();
-			sound.nFlags |= SND_DELAY;
-		}
-		
-		// if this is a sentence, get sentence number
-		if ( TestSoundChar(samp, CHAR_SENTENCE) )
-		{
-			sound.bIsSentence = true;
-			sound.nSoundNum = Q_atoi( PSkipSoundChars(samp) );
-			if ( sound.nSoundNum >= VOX_SentenceCount() )
-			{
-				ConMsg("EmitAmbientSound: invalid sentence number: %s", PSkipSoundChars(samp));
-				return;
-			}
-		}
-		else
-		{
-			// check to see if samp was properly precached
-			sound.bIsSentence = false;
-			sound.nSoundNum = SV_SoundIndex( samp );
-			if (sound.nSoundNum <= 0)
-			{
-				ConMsg ("EmitAmbientSound:  sound not precached: %s\n", samp);
-				return;
-			}
-		}
-
-		if ( (fFlags & SND_SPAWNING) && sv.allowsignonwrites )
-		{
-			SVC_Sounds	sndmsg;
-			char		buffer[32];
-
-			sndmsg.m_DataOut.StartWriting(buffer, sizeof(buffer) );
-			sndmsg.m_nNumSounds = 1;
-			sndmsg.m_bReliableSound = true;
-
-			SoundInfo_t	defaultSound; defaultSound.SetDefault();
-
-			sound.WriteDelta( &defaultSound, sndmsg.m_DataOut );
-			
-			 // write into signon buffer
-			if ( !sndmsg.WriteToBuffer( sv.m_Signon ) )
-			{
-				Sys_Error( "EmitAmbientSound: Init message would overflow signon buffer!\n" );
-				return;
-			}
-		}
-		else
-		{
-			if ( fFlags & SND_SPAWNING )
-			{
-				DevMsg("EmitAmbientSound: warning, broadcasting sound labled as SND_SPAWNING.\n" );
-			}
-
-			// send sound to all active players
-			CEngineRecipientFilter filter;
-			filter.AddAllPlayers();
-			filter.MakeReliable();
-			sv.BroadcastSound( sound, filter );
-		}
-	}
+	//virtual void EmitAmbientSound( int entindex, const Vector& pos, const char *pSample, float flVolume,
+	//	soundlevel_t soundlevel, int flags, int iPitch, float soundtime /*=0.0f*/ )
+	//{
+	//	//moved to CEngineSoundServer
+	//}
 	
 	
-	virtual void FadeClientVolume(int clientent,
-		float fadePercent, float fadeOutSeconds, float holdTime, float fadeInSeconds)
-	{
-		int entnum = clientent;
-		
-		if (entnum < 1 || entnum > sv.GetClientCount() )
-		{
-			ConMsg ("tried to DLL_FadeClientVolume a non-client\n");
-			return;
-		}
-		
-		IClient	*client = sv.Client(entnum-1);
+	//virtual void FadeClientVolume(int clientent,
+	//	float fadePercent, float fadeOutSeconds, float holdTime, float fadeInSeconds)
+	//{
+	//	int entnum = clientent;
+	//	
+	//	if (entnum < 1 || entnum > sv.GetClientCount() )
+	//	{
+	//		ConMsg ("tried to DLL_FadeClientVolume a non-client\n");
+	//		return;
+	//	}
+	//	
+	//	IClient	*client = sv.Client(entnum-1);
 
-		NET_StringCmd sndMsg( va("soundfade	%.1f %.1f %.1f %.1f", fadePercent, holdTime, fadeOutSeconds, fadeInSeconds ) );
-				
-		client->SendNetMsg( sndMsg );
-	}
+	//	NET_StringCmd sndMsg( va("soundfade	%.1f %.1f %.1f %.1f", fadePercent, holdTime, fadeOutSeconds, fadeInSeconds ) );
+	//			
+	//	client->SendNetMsg( sndMsg );
+	//}
 	
 	
 	//-----------------------------------------------------------------------------
@@ -1846,6 +1787,8 @@ private:
 
 	virtual ISpatialPartition *CreateSpatialPartition( const Vector& worldmin, const Vector& worldmax ) { return ::CreateSpatialPartition( worldmin, worldmax );	}
 	virtual void 		DestroySpatialPartition( ISpatialPartition *pPartition )						{ ::DestroySpatialPartition( pPartition );					}
+
+	bool m_bAllowPrecache = false;//CBaseEntity::
 };
 
 // Backwards-compat shim that inherits newest then provides overrides for the legacy behavior

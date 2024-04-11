@@ -62,8 +62,8 @@ public:
 	virtual void SetRoomType( IRecipientFilter& filter, int roomType );
 	virtual void SetPlayerDSP( IRecipientFilter& filter, int dspType, bool fastReset );
 
-	virtual void EmitAmbientSound( const char *pSample, float flVolume, 
-		int iPitch, int flags, float soundtime = 0.0f );
+	virtual void EmitAmbientSound( int entindex, const Vector& pos, const char *pSample, float flVolume,
+		soundlevel_t soundlevel, int flags, int iPitch, float soundtime = 0.0f );
 
 	virtual float GetDistGainFromSoundLevel( soundlevel_t soundlevel, float dist );
 
@@ -389,9 +389,10 @@ void CEngineSoundClient::SetPlayerDSP( IRecipientFilter& filter, int dspType, bo
 }
 
 
-void CEngineSoundClient::EmitAmbientSound( const char *pSample, float flVolume, 
-										  int iPitch, int flags, float soundtime /*= 0.0f*/ )
+void CEngineSoundClient::EmitAmbientSound( int entindex, const Vector& pos, const char *pSample, float flVolume,
+	soundlevel_t soundlevel, int flags, int iPitch, float soundtime /*= 0.0f*/ )
 {
+	//entindex pos soundlevel ignored
 	float delay = 0.0f;
 	if ( soundtime != 0.0f )
 	{

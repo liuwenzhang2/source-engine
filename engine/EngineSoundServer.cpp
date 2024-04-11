@@ -63,7 +63,8 @@ public:
 
 	// emit an "ambient" sound that isn't spatialized - specify left/right volume
 	// only available on the client, assert on server
-	virtual void EmitAmbientSound( const char *pSample, float flVolume, int iPitch, int flags, float soundtime = 0.0f );
+	virtual void EmitAmbientSound( int entindex, const Vector& pos, const char *pSample, float flVolume, 
+		soundlevel_t soundlevel, int flags, int iPitch, float soundtime = 0.0f );
 
 	virtual float GetDistGainFromSoundLevel( soundlevel_t soundlevel, float dist );
 
@@ -370,9 +371,88 @@ void CEngineSoundServer::StopAllSounds(bool bClearBuffers)
 	AssertMsg( 0, "Not supported" );
 }
 
-void CEngineSoundServer::EmitAmbientSound( const char *pSample, float flVolume, int iPitch, int flags, float soundtime /*= 0.0f*/ )
+void CEngineSoundServer::EmitAmbientSound(int entindex, const Vector& pos, const char *pSample, float flVolume, 
+	soundlevel_t soundlevel, int flags, int iPitch, float soundtime /*= 0.0f*/ )
 {
-	AssertMsg( 0, "Not supported" );
+	//AssertMsg( 0, "Not supported" );
+	SoundInfo_t sound;
+	sound.SetDefault();
+
+	sound.nEntityIndex = entindex;
+	sound.fVolume = flVolume;
+	sound.Soundlevel = soundlevel;
+	sound.nFlags = flags;
+	sound.nPitch = iPitch;
+	sound.nChannel = CHAN_STATIC;
+	sound.vOrigin = pos;
+	sound.bIsAmbient = true;
+
+	ASSERT_COORD(sound.vOrigin);
+
+	// set sound delay
+
+	if (soundtime != 0.0f)
+	{
+		sound.fDelay = soundtime - sv.GetTime();
+		sound.nFlags |= SND_DELAY;
+	}
+
+	// if this is a sentence, get sentence number
+	if (TestSoundChar(pSample, CHAR_SENTENCE))
+	{
+		sound.bIsSentence = true;
+		sound.nSoundNum = Q_atoi(PSkipSoundChars(pSample));
+		if (sound.nSoundNum >= VOX_SentenceCount())
+		{
+			ConMsg("EmitAmbientSound: invalid sentence number: %s", PSkipSoundChars(pSample));
+			return;
+		}
+	}
+	else
+	{
+		// check to see if samp was properly precached
+		sound.bIsSentence = false;
+		sound.nSoundNum = SV_SoundIndex(pSample);
+		if (sound.nSoundNum <= 0)
+		{
+			ConMsg("EmitAmbientSound:  sound not precached: %s\n", pSample);
+			return;
+		}
+	}
+
+	if ((flags & SND_SPAWNING) && sv.allowsignonwrites)
+	{
+		SVC_Sounds	sndmsg;
+		char		buffer[32];
+
+		sndmsg.m_DataOut.StartWriting(buffer, sizeof(buffer));
+		sndmsg.m_nNumSounds = 1;
+		sndmsg.m_bReliableSound = true;
+
+		SoundInfo_t	defaultSound; defaultSound.SetDefault();
+
+		sound.WriteDelta(&defaultSound, sndmsg.m_DataOut);
+
+		// write into signon buffer
+		if (!sndmsg.WriteToBuffer(sv.m_Signon))
+		{
+			Sys_Error("EmitAmbientSound: Init message would overflow signon buffer!\n");
+			return;
+		}
+	}
+	else
+	{
+		if (flags & SND_SPAWNING)
+		{
+			DevMsg("EmitAmbientSound: warning, broadcasting sound labled as SND_SPAWNING.\n");
+		}
+
+		// send sound to all active players
+		CEngineRecipientFilter filter;
+		filter.AddAllPlayers();
+		filter.MakeReliable();
+		sv.BroadcastSound(sound, filter);
+	}
 }
 
 //-----------------------------------------------------------------------------

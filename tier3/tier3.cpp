@@ -122,7 +122,7 @@ void ConnectTier3Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		}
 		if ( !g_pSoundEmitterSystemBase)
 		{
-			g_pSoundEmitterSystemBase = ( ISoundEmitterSystemBase* )pFactoryList[i]( SOUNDEMITTERSYSTEM_INTERFACE_VERSION, NULL );
+			g_pSoundEmitterSystemBase = ( ISoundEmitterSystemBase* )pFactoryList[i](SOUNDEMITTERSYSTEMBASE_INTERFACE_VERSION, NULL );
 		}
 		if ( !g_pVTex )
 		{

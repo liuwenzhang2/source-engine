@@ -26,7 +26,7 @@
 #include "haptics/haptic_utils.h"
 
 #ifndef CLIENT_DLL
-#include "envmicrophone.h"
+//#include "envmicrophone.h"
 #include "sceneentity.h"
 #include "gameinterface.h"
 #else
@@ -475,7 +475,8 @@ public:
 		}
 
 #if !defined( CLIENT_DLL )
-		bool bSwallowed = CEnvMicrophone::OnSoundPlayed( 
+		extern CServerGameDLL g_ServerGameDLL;
+		bool bSwallowed = g_ServerGameDLL.OnEmitSound(
 			entindex, 
 			params.soundname, 
 			params.soundlevel, 
@@ -581,7 +582,8 @@ public:
 			  ep.m_pSoundName[0] == '!' ) )
 		{
 #if !defined( CLIENT_DLL )
-			bool bSwallowed = CEnvMicrophone::OnSoundPlayed( 
+			extern CServerGameDLL g_ServerGameDLL;
+			bool bSwallowed = g_ServerGameDLL.OnEmitSound(
 				entindex, 
 				ep.m_pSoundName, 
 				ep.m_SoundLevel, 
@@ -843,11 +845,11 @@ public:
 			params.volume = flVolume;
 		}
 
-#if defined( CLIENT_DLL )
-		enginesound->EmitAmbientSound( params.soundname, params.volume, params.pitch, iFlags, soundtime );
-#else
-		engine->EmitAmbientSound(entindex, origin, params.soundname, params.volume, params.soundlevel, iFlags, params.pitch, soundtime );
-#endif
+//#if defined( CLIENT_DLL )
+//		enginesound->EmitAmbientSound( params.soundname, params.volume, params.pitch, iFlags, soundtime );
+//#else
+		enginesound->EmitAmbientSound(entindex, origin, params.soundname, params.volume, params.soundlevel, iFlags, params.pitch, soundtime );
+//#endif
 
 		bool needsCC = !( iFlags & ( SND_STOP | SND_CHANGE_VOL | SND_CHANGE_PITCH ) );
 
@@ -948,7 +950,7 @@ public:
 		}
 	}
 
-	void InternalEmitAmbientSound( int entindex, const Vector &origin, const char *pSample, float volume, soundlevel_t soundlevel, int flags, int pitch, float soundtime /*= 0.0f*/, float *duration /*=NULL*/ )
+	void EmitAmbientSound( int entindex, const Vector &origin, const char *pSample, float volume, soundlevel_t soundlevel, int flags, int pitch, float soundtime /*= 0.0f*/, float *duration /*=NULL*/ )
 	{
 #ifdef STAGING_ONLY
 		if ( sv_snd_filter.GetString()[ 0 ] && !V_stristr( pSample, sv_snd_filter.GetString() ))
@@ -962,7 +964,8 @@ public:
 
 		// Loop through all registered microphones and tell them the sound was just played
 		// NOTE: This means that pitch shifts/sound changes on the original ambient will not be reflected in the re-broadcasted sound
-		bool bSwallowed = CEnvMicrophone::OnSoundPlayed( 
+		extern CServerGameDLL g_ServerGameDLL;
+		bool bSwallowed = g_ServerGameDLL.OnEmitSound(
 							entindex, 
 							pSample, 
 							soundlevel, 
@@ -978,11 +981,11 @@ public:
 
 		if ( pSample && ( Q_stristr( pSample, ".wav" ) || Q_stristr( pSample, ".mp3" )) )
 		{
-#if defined( CLIENT_DLL )
-			enginesound->EmitAmbientSound( pSample, volume, pitch, flags, soundtime );
-#else
-			engine->EmitAmbientSound( entindex, origin, pSample, volume, soundlevel, flags, pitch, soundtime );
-#endif
+//#if defined( CLIENT_DLL )
+//			enginesound->EmitAmbientSound( pSample, volume, pitch, flags, soundtime );
+//#else
+			enginesound->EmitAmbientSound( entindex, origin, pSample, volume, soundlevel, flags, pitch, soundtime );
+//#endif
 
 			if ( duration )
 			{
@@ -1206,10 +1209,10 @@ public:
 	//			flags - 
 	//			*soundname - 
 	//-----------------------------------------------------------------------------
-	void EmitAmbientSound(int entindex, const Vector& origin, const char* soundname, float volume, soundlevel_t soundlevel, int flags, int pitch, float soundtime /*= 0.0f*/, float* duration /*=NULL*/)//CBaseEntity::
-	{
-		InternalEmitAmbientSound(entindex, origin, soundname, volume, soundlevel, flags, pitch, soundtime, duration);
-	}
+	//void EmitAmbientSound(int entindex, const Vector& origin, const char* soundname, float volume, soundlevel_t soundlevel, int flags, int pitch, float soundtime /*= 0.0f*/, float* duration /*=NULL*/)//CBaseEntity::
+	//{
+	//	InternalEmitAmbientSound(entindex, origin, soundname, volume, soundlevel, flags, pitch, soundtime, duration);
+	//}
 	
 	void GenderExpandString(CBaseEntity* pEntity, char const* in, char* out, int maxlen)//CBaseEntity::
 	{
@@ -1299,23 +1302,7 @@ public:
 //		InternalEmitCloseCaption(filter, entindex, fromplayer, token, soundorigin, duration, warnifmissing);
 //	}
 
-	//-----------------------------------------------------------------------------
-	// Purpose: static method
-	// Output : Returns true on success, false on failure.
-	//-----------------------------------------------------------------------------
-	bool IsPrecacheAllowed()//CBaseEntity::
-	{
-		return m_bAllowPrecache;
-	}
-
-	//-----------------------------------------------------------------------------
-	// Purpose: static method
-	// Input  : allow - 
-	//-----------------------------------------------------------------------------
-	void SetAllowPrecache(bool allow)//CBaseEntity::
-	{
-		m_bAllowPrecache = allow;
-	}
+	
 	//-----------------------------------------------------------------------------
 	// Purpose: 
 	// Input  : *name - 
@@ -1329,8 +1316,9 @@ public:
 			Warning("Direct precache of %s\n", name);
 		}
 
+#ifdef GAME_DLL
 		// If this is out of order, warn
-		if (!IsPrecacheAllowed())//CBaseEntity::
+		if (!engine->IsPrecacheAllowed())//CBaseEntity::
 		{
 			if (!enginesound->IsSoundPrecached(name))
 			{
@@ -1339,6 +1327,7 @@ public:
 				Warning("Late precache of %s\n", name);
 			}
 		}
+#endif // GAME_DLL
 
 		bool bret = enginesound->PrecacheSound(name, true);
 		return bret;
@@ -1355,11 +1344,13 @@ public:
 	
 private:
 	bool g_bPermitDirectSoundPrecache = false;
-	bool m_bAllowPrecache = false;//CBaseEntity::
+	
 };
 
 static CSoundEmitterSystem g_SoundEmitterSystem( "CSoundEmitterSystem" );
 ISoundEmitterSystem* g_pSoundEmitterSystem = &g_SoundEmitterSystem;
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CSoundEmitterSystem, ISoundEmitterSystem,
+	SOUNDEMITTERSYSTEM_INTERFACE_VERSION, g_SoundEmitterSystem);
 
 IGameSystem *SoundEmitterSystem()
 {

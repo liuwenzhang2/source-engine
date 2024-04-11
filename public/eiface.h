@@ -112,6 +112,8 @@ public:
 	// However, generic and decal are 0 based
 	// If preload is specified, the file is loaded into the server/client's cache memory before level startup, otherwise
 	//  it'll only load when actually used (which can cause a disk i/o hitch if it occurs during play of a level).
+	virtual bool		IsPrecacheAllowed() = 0;
+	virtual void		SetAllowPrecache(bool allow) = 0;
 	virtual int			PrecacheModel( const char *s, bool preload = false ) = 0;
 	virtual int			PrecacheSentenceFile( const char *s, bool preload = false ) = 0;
 	virtual int			PrecacheDecal( const char *name, bool preload = false ) = 0;
@@ -180,10 +182,10 @@ public:
 	virtual void		SaveFreeMemory( void *pSaveMem ) = 0;
 	
 	// Emit an ambient sound associated with the specified entity
-	virtual void		EmitAmbientSound( int entindex, const Vector &pos, const char *samp, float vol, soundlevel_t soundlevel, int fFlags, int pitch, float delay = 0.0f ) = 0;
+	//virtual void		EmitAmbientSound( int entindex, const Vector &pos, const char *samp, float vol, soundlevel_t soundlevel, int fFlags, int pitch, float soundtime = 0.0f ) = 0;
 
 	// Fade out the client's volume level toward silence (or fadePercent)
-	virtual void        FadeClientVolume( int pEdict, float fadePercent, float fadeOutSeconds, float holdTime, float fadeInSeconds ) = 0;
+	//virtual void        FadeClientVolume( int pEdict, float fadePercent, float fadeOutSeconds, float holdTime, float fadeInSeconds ) = 0;
 	
 	// Sentences / sentence groups
 	virtual int			SentenceGroupPick( int groupIndex, char *name, int nameBufLen ) = 0;
@@ -658,6 +660,9 @@ public:
 	virtual void InternalEmitCloseCaption(IRecipientFilter& filter, int entindex, bool fromplayer, char const* token, CUtlVector< Vector >& originlist, float duration, bool warnifmissing /*= false*/) = 0;
 
 	virtual void InternalEmitCloseCaption(IRecipientFilter& filter, int entindex, const CSoundParameters& params, const EmitSound_t& ep) = 0;
+
+	virtual bool OnEmitSound(int entindex, const char* soundname, soundlevel_t soundlevel,
+		float flVolume, int iFlags, int iPitch, const Vector* pOrigin, float soundtime, CUtlVector< Vector >& soundorigins) = 0;
 };
 
 typedef IServerGameDLL IServerGameDLL008;

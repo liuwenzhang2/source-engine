@@ -1934,7 +1934,7 @@ bool CModAppSystemGroup::AddLegacySystems()
 
 	AppSystemInfo_t appSystems[] = 
 	{
-		{ "soundemittersystem", SOUNDEMITTERSYSTEM_INTERFACE_VERSION },
+		{ "soundemittersystem", SOUNDEMITTERSYSTEMBASE_INTERFACE_VERSION },
 		{ "", "" }					// Required to terminate the list
 	};
 

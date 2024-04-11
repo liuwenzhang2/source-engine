@@ -136,6 +136,7 @@ int g_iServerGameClientsVersion = 0;	// This matches the number at the end of th
 IHLTVDirector	*serverGameDirector = NULL;
 
 IServerGameTags *serverGameTags = NULL;
+ISoundEmitterSystem* g_pSoundEmitterSystem = NULL;
 
 void Sys_InitArgv( char *lpCmdLine );
 void Sys_ShutdownArgv( void );
@@ -1203,6 +1204,13 @@ static bool LoadThisDll( char *szDllFilename, bool bIsServerOnly )
 		if ( !serverGameDirector )
 		{
 			ConMsg( "Could not get IHLTVDirector interface from library %s", szDllFilename );
+			// this is not a critical 
+		}
+
+		g_pSoundEmitterSystem = (ISoundEmitterSystem*)g_ServerFactory(SOUNDEMITTERSYSTEM_INTERFACE_VERSION, NULL);
+		if (!g_pSoundEmitterSystem)
+		{
+			ConMsg("Could not get ISoundEmitterSystem interface from library %s", szDllFilename);
 			// this is not a critical 
 		}
 

@@ -5889,8 +5889,8 @@ void CC_Prop_Dynamic_Create( const CCommand &args )
 	if ( h == MDLHANDLE_INVALID )
 		return;
 
-	bool bAllowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
-	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
+	bool bAllowPrecache = engine->IsPrecacheAllowed();//CBaseEntity::
+	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	vcollide_t *pVCollide = mdlcache->GetVCollide( h );
 
@@ -5933,7 +5933,7 @@ void CC_Prop_Dynamic_Create( const CCommand &args )
 		DispatchSpawn( pProp );
 		pProp->Activate();
 	}
-	g_pSoundEmitterSystem->SetAllowPrecache( bAllowPrecache );//CBaseEntity::
+	engine->SetAllowPrecache( bAllowPrecache );//CBaseEntity::
 }
 
 static ConCommand prop_dynamic_create("prop_dynamic_create", CC_Prop_Dynamic_Create, "Creates a dynamic prop with a specific .mdl aimed away from where the player is looking.\n\tArguments: {.mdl name}", FCVAR_CHEAT);
@@ -5994,8 +5994,8 @@ CPhysicsProp* CreatePhysicsProp( const char *pModelName, const Vector &vTraceSta
 		    
 	VectorMA( tr.endpos, 1.0f, tr.plane.normal, tr.endpos );
 
-	bool bAllowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
-	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
+	bool bAllowPrecache = engine->IsPrecacheAllowed();//CBaseEntity::
+	engine->SetAllowPrecache( true );//CBaseEntity::
 				  
 	// Try to create entity
 	CPhysicsProp *pProp = dynamic_cast< CPhysicsProp * >(gEntList.CreateEntityByName( pClassName ) );
@@ -6017,7 +6017,7 @@ CPhysicsProp* CreatePhysicsProp( const char *pModelName, const Vector &vTraceSta
 		DispatchSpawn( pProp );
 		pProp->Activate();
 	}
-	g_pSoundEmitterSystem->SetAllowPrecache( bAllowPrecache );//CBaseEntity::
+	engine->SetAllowPrecache( bAllowPrecache );//CBaseEntity::
 
 	return pProp;
 }

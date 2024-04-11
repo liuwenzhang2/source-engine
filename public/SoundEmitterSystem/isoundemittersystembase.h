@@ -19,7 +19,8 @@
 #include "irecipientfilter.h"
 
 
-#define SOUNDEMITTERSYSTEM_INTERFACE_VERSION	"VSoundEmitter002"
+#define SOUNDEMITTERSYSTEMBASE_INTERFACE_VERSION	"VSoundEmitterBase002"
+#define SOUNDEMITTERSYSTEM_INTERFACE_VERSION	"VSoundEmitter001"
 
 #define SOUNDGENDER_MACRO "$gender"
 #define SOUNDGENDER_MACRO_LENGTH 7		// Length of above including $
@@ -348,8 +349,6 @@ public:
 	virtual void PrefetchScriptSound(const char* soundname) = 0;
 	virtual bool PrecacheSound(const char* name) = 0;
 	virtual void PrefetchSound(const char* name) = 0;
-	virtual bool IsPrecacheAllowed() = 0;
-	virtual void SetAllowPrecache(bool allow) = 0;
 	//virtual void EmitSound(CBaseEntity* pEntity, const char* soundname, float soundtime = 0.0f, float* duration = NULL) = 0;  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
 	//virtual void EmitSound(CBaseEntity* pEntity, const char* soundname, HSOUNDSCRIPTHANDLE& handle, float soundtime = 0.0f, float* duration = NULL) = 0;  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
 	virtual void StopSound(CBaseEntity* pEntity, const char* soundname) = 0;

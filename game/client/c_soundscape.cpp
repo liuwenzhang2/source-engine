@@ -1158,7 +1158,7 @@ int C_SoundscapeSystem::AddLoopingSound( const char *pSoundName, bool isAmbient,
 		if ( isAmbient )
 		{
 			// start at 0 and fade in
-			enginesound->EmitAmbientSound( pSoundName, 0, pitch );
+			enginesound->EmitAmbientSound( 0, Vector(0,0,0), pSoundName, 0, SNDLVL_NORM, 0, pitch);
 			m_loopingSounds[soundSlot].volumeCurrent = 0.0;
 		}
 		else
@@ -1201,7 +1201,7 @@ void C_SoundscapeSystem::StopLoopingSound( loopingsound_t &loopSound )
 {
 	if ( loopSound.isAmbient )
 	{
-		enginesound->EmitAmbientSound( loopSound.pWaveName, 0, 0, SND_STOP );
+		enginesound->EmitAmbientSound( 0, Vector(0,0,0), loopSound.pWaveName, 0, SNDLVL_NORM, SND_STOP, 0);
 	}
 	else
 	{
@@ -1214,7 +1214,7 @@ void C_SoundscapeSystem::UpdateLoopingSound( loopingsound_t &loopSound )
 {
 	if ( loopSound.isAmbient )
 	{
-		enginesound->EmitAmbientSound( loopSound.pWaveName, loopSound.volumeCurrent, loopSound.pitch, SND_CHANGE_VOL );
+		enginesound->EmitAmbientSound( 0, Vector(0,0,0), loopSound.pWaveName, loopSound.volumeCurrent, SNDLVL_NORM, SND_CHANGE_VOL, loopSound.pitch  );
 	}
 	else
 	{
@@ -1264,7 +1264,7 @@ void C_SoundscapeSystem::PlayRandomSound( randomsound_t &sound )
 
 	if ( sound.isAmbient )
 	{
-		enginesound->EmitAmbientSound( pWaveName, sound.masterVolume * RandomInterval( sound.volume ), (int)RandomInterval( sound.pitch ) );
+		enginesound->EmitAmbientSound( 0, Vector(0,0,0), pWaveName, sound.masterVolume * RandomInterval( sound.volume ), SNDLVL_NORM, 0, (int)RandomInterval( sound.pitch ) );
 	}
 	else
 	{

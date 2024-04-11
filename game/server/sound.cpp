@@ -1477,7 +1477,7 @@ void UTIL_EmitAmbientSound(int entindex, const Vector& vecOrigin, const char* sa
 			char name[32];
 			Q_snprintf(name, sizeof(name), "!%d", sentenceIndex);
 #if !defined( CLIENT_DLL )
-			engine->EmitAmbientSound(entindex, vecOrigin, name, vol, soundlevel, fFlags, pitch, soundtime);
+			enginesound->EmitAmbientSound(entindex, vecOrigin, name, vol, soundlevel, fFlags, pitch, soundtime);
 #else
 			enginesound->EmitAmbientSound(name, vol, pitch, fFlags, soundtime);
 #endif

@@ -1662,4 +1662,4 @@ void CSoundEmitterSystemBase::ClearSoundOverrides()
 
 CSoundEmitterSystemBase g_SoundEmitterSystemBase;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CSoundEmitterSystemBase, ISoundEmitterSystemBase, 
-						SOUNDEMITTERSYSTEM_INTERFACE_VERSION, g_SoundEmitterSystemBase );
+						SOUNDEMITTERSYSTEMBASE_INTERFACE_VERSION, g_SoundEmitterSystemBase );

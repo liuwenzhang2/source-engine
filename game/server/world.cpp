@@ -600,7 +600,7 @@ void CWorld::Precache( void )
 	CSoundEnt::InitSoundEnt();
 
 	// Only allow precaching between LevelInitPreEntity and PostEntity
-	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
+	engine->SetAllowPrecache( true );//CBaseEntity::
 	IGameSystem::LevelInitPreEntityAllSystems( STRING( GetModelName() ) );
 
 	// Create the player resource
