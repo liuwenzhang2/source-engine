@@ -414,8 +414,8 @@ void CC_Hunter_Shoot_Flechette( const CCommand& args )
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-	bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
-	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
+	bool allowPrecache = engine->IsPrecacheAllowed();//CBaseEntity::
+	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	CBasePlayer *pPlayer = UTIL_GetCommandClient();
 
@@ -433,7 +433,7 @@ void CC_Hunter_Shoot_Flechette( const CCommand& args )
 		entity->Shoot( forward, false );
 	}
 
-	g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
+	engine->SetAllowPrecache( allowPrecache );//CBaseEntity::
 }
 
 static ConCommand ent_create("hunter_shoot_flechette", CC_Hunter_Shoot_Flechette, "Fires a hunter flechette where the player is looking.", FCVAR_GAMEDLL | FCVAR_CHEAT);

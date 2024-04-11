@@ -95,8 +95,8 @@ void CC_Create_PortalWeightBox( void )
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-	bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
-	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
+	bool allowPrecache = engine->IsPrecacheAllowed();//CBaseEntity::
+	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	// Try to create entity
 	CBaseEntity *entity = dynamic_cast< CBaseEntity * >(gEntList.CreateEntityByName("prop_physics") );
@@ -124,7 +124,7 @@ void CC_Create_PortalWeightBox( void )
 			UTIL_DropToFloor( entity, MASK_SOLID );
 		}
 	}
-	g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
+	engine->SetAllowPrecache( allowPrecache );//CBaseEntity::
 }
 static ConCommand ent_create_portal_weight_box("ent_create_portal_weight_box", CC_Create_PortalWeightBox, "Creates a weight box used in portal puzzles at the location the player is looking.", FCVAR_GAMEDLL | FCVAR_CHEAT);
 #endif // CLIENT_DLL
@@ -138,8 +138,8 @@ void CC_Create_PortalMetalSphere( void )
 {
 	MDLCACHE_CRITICAL_SECTION();
 
-	bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
-	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
+	bool allowPrecache = engine->IsPrecacheAllowed();//CBaseEntity::
+	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	// Try to create entity
 	CBaseEntity *entity = dynamic_cast< CBaseEntity * >(gEntList.CreateEntityByName("prop_physics") );
@@ -167,7 +167,7 @@ void CC_Create_PortalMetalSphere( void )
 			UTIL_DropToFloor( entity, MASK_SOLID );
 		}
 	}
-	g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
+	engine->SetAllowPrecache( allowPrecache );//CBaseEntity::
 }
 static ConCommand ent_create_portal_metal_sphere("ent_create_portal_metal_sphere", CC_Create_PortalMetalSphere, "Creates a reflective metal sphere where the player is looking.", FCVAR_GAMEDLL | FCVAR_CHEAT);
 #endif // CLIENT_DLL

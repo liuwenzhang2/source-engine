@@ -513,13 +513,13 @@ END_DATADESC()
 void CWateryDeathLeech::Precache( void )
 {
 	//Ugh this is temporary until Jakob finishes the animations and doesn't need the command anymore.
-	bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
-	g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
+	bool allowPrecache = engine->IsPrecacheAllowed();//CBaseEntity::
+	engine->SetAllowPrecache( true );//CBaseEntity::
 
 	BaseClass::Precache();
 
 	PrecacheModel( "models/leech.mdl" );
-	g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
+	engine->SetAllowPrecache( allowPrecache );//CBaseEntity::
 }
 
 void CWateryDeathLeech::Spawn( void )

@@ -4539,12 +4539,12 @@ void AdjustStriderNodePosition( CAI_Network *pNetwork, CAI_Node *pNode )
 		bool bCreated = false;
 		if ( !pStrider )
 		{
-			bool allowPrecache = g_pSoundEmitterSystem->IsPrecacheAllowed();//CBaseEntity::
-			g_pSoundEmitterSystem->SetAllowPrecache( true );//CBaseEntity::
+			bool allowPrecache = engine->IsPrecacheAllowed();//CBaseEntity::
+			engine->SetAllowPrecache( true );//CBaseEntity::
 			pStrider = (CNPC_Strider *)gEntList.CreateEntityByName( "npc_strider" );
 			pStrider->m_bDisableBoneFollowers = true; // don't create these since we're just going to destroy him
 			DispatchSpawn( pStrider );
-			g_pSoundEmitterSystem->SetAllowPrecache( allowPrecache );//CBaseEntity::
+			engine->SetAllowPrecache( allowPrecache );//CBaseEntity::
 			bCreated = true;
 		}
 
