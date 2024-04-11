@@ -8147,13 +8147,29 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 
 	case SCRIPT_EVENT_SOUND:			// Play a named wave file
 		{
-			g_pSoundEmitterSystem->EmitSound(this, pEvent->options );
+			const char* soundname = pEvent->options;
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		break;
 
 	case SCRIPT_EVENT_SOUND_VOICE:
 		{
-			g_pSoundEmitterSystem->EmitSound(this, pEvent->options );
+			const char* soundname = pEvent->options;
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		break;
 
@@ -8215,21 +8231,45 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 	case NPC_EVENT_BODYDROP_HEAVY:
 		if ( GetFlags() & FL_ONGROUND )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "AI_BaseNPC.BodyDrop_Heavy" );
+			const char* soundname = "AI_BaseNPC.BodyDrop_Heavy";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		break;
 
 	case NPC_EVENT_BODYDROP_LIGHT:
 		if ( GetFlags() & FL_ONGROUND )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "AI_BaseNPC.BodyDrop_Light" );
+			const char* soundname = "AI_BaseNPC.BodyDrop_Light";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		break;
 
 	case NPC_EVENT_SWISHSOUND:
 		{
+			const char* soundname = "AI_BaseNPC.SwishSound";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			// NO NPC may use this anim event unless that npc's precache precaches this sound!!!
-			g_pSoundEmitterSystem->EmitSound(this, "AI_BaseNPC.SwishSound" );
 			break;
 		}
 
@@ -8479,7 +8519,15 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			{
 				if ( GetFlags() & FL_ONGROUND )
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "AI_BaseNPC.BodyDrop_Heavy" );
+					const char* soundname = "AI_BaseNPC.BodyDrop_Heavy";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 				return;
 			}

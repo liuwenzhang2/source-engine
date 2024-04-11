@@ -801,7 +801,15 @@ void CFire::SpawnEffect( fireType_e type, float scale )
 			m_takedamage	= DAMAGE_YES;
 
 			// Start burn sound
-			g_pSoundEmitterSystem->EmitSound(this, "Fire.Plasma" );
+			const char* soundname = "Fire.Plasma";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		break;
 	}

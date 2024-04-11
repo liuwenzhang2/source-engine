@@ -24,7 +24,16 @@ void DoSpark( CBaseEntity *ent, const Vector &location, int nMagnitude, int nTra
 
 	if ( bPlaySound )
 	{
-		g_pSoundEmitterSystem->EmitSound(ent, "DoSpark" );
+		const char* soundname = "DoSpark";
+		CPASAttenuationFilter filter(ent, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, ent->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(ent, "DoSpark" );
 	}
 }
 

@@ -536,7 +536,16 @@ void CHL2MPRules::ManageObjectRelocation( void )
 						if ( shouldReset )
 						{
 							pEntity->Teleport( &vSpawOrigin, &vSpawnAngles, NULL );
-							g_pSoundEmitterSystem->EmitSound(pEntity, "AlyxEmp.Charge" );//pEntity->
+							const char* soundname = "AlyxEmp.Charge";
+							CPASAttenuationFilter filter(pEntity, soundname);
+
+							EmitSound_t params;
+							params.m_pSoundName = soundname;
+							params.m_flSoundTime = 0.0f;
+							params.m_pflSoundDuration = NULL;
+							params.m_bWarnOnDirectWaveReference = true;
+							g_pSoundEmitterSystem->EmitSound(filter, pEntity->entindex(), params);
+							//g_pSoundEmitterSystem->EmitSound(pEntity, "AlyxEmp.Charge" );//pEntity->
 
 							IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
 

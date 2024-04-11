@@ -630,7 +630,15 @@ void CFastZombie::SetAngrySoundState( void )
 		return;
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.LeapAttack" );
+	const char* soundname = "NPC_FastZombie.LeapAttack";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Main looping sound
 	ENVELOPE_CONTROLLER.SoundChangePitch( m_pMoanSound, FASTZOMBIE_MIN_PITCH, 0.5 );
@@ -845,11 +853,27 @@ void CFastZombie::FootstepSound( bool fRightFoot )
 {
 	if( fRightFoot )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.FootstepRight" );
+		const char* soundname = "NPC_FastZombie.FootstepRight";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.FootstepLeft" );
+		const char* soundname = "NPC_FastZombie.FootstepLeft";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -858,7 +882,15 @@ void CFastZombie::FootstepSound( bool fRightFoot )
 //-----------------------------------------------------------------------------
 void CFastZombie::AttackHitSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.AttackHit" );
+	const char* soundname = "NPC_FastZombie.AttackHit";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -867,7 +899,15 @@ void CFastZombie::AttackHitSound( void )
 void CFastZombie::AttackMissSound( void )
 {
 	// Play a random attack miss sound
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.AttackMiss" );
+	const char* soundname = "NPC_FastZombie.AttackMiss";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -875,7 +915,15 @@ void CFastZombie::AttackMissSound( void )
 //-----------------------------------------------------------------------------
 void CFastZombie::LeapAttackSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.LeapAttack" );
+	const char* soundname = "NPC_FastZombie.LeapAttack";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -883,7 +931,15 @@ void CFastZombie::LeapAttackSound( void )
 //-----------------------------------------------------------------------------
 void CFastZombie::AttackSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.Attack" );
+	const char* soundname = "NPC_FastZombie.Attack";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -891,7 +947,15 @@ void CFastZombie::AttackSound( void )
 //-----------------------------------------------------------------------------
 void CFastZombie::IdleSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.Idle" );
+	const char* soundname = "NPC_FastZombie.Idle";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	MakeAISpookySound( 360.0f );
 }
 
@@ -910,7 +974,15 @@ void CFastZombie::PainSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CFastZombie::DeathSound( const CTakeDamageInfo &info ) 
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.Die" );
+	const char* soundname = "NPC_FastZombie.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -931,11 +1003,27 @@ void CFastZombie::AlertSound( void )
 
 		if( flDist > 512 )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.AlertFar" );
+			const char* soundname = "NPC_FastZombie.AlertFar";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		else
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.AlertNear" );
+			const char* soundname = "NPC_FastZombie.AlertNear";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 	}
 
@@ -1067,13 +1155,29 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
 	
 	if ( pEvent->event == AE_FASTZOMBIE_GALLOP_LEFT )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.GallopLeft" );
+		const char* soundname = "NPC_FastZombie.GallopLeft";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 
 	if ( pEvent->event == AE_FASTZOMBIE_GALLOP_RIGHT )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.GallopRight" );
+		const char* soundname = "NPC_FastZombie.GallopRight";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 	
@@ -1403,12 +1507,28 @@ int CFastZombie::TranslateSchedule( int scheduleType )
 			if( !m_fHasScreamed )
 			{
 				// Only play that over-the-top attack scream once per combat state.
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.Scream" );
+				const char* soundname = "NPC_FastZombie.Scream";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				m_fHasScreamed = true;
 			}
 			else
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.RangeAttack" );
+				const char* soundname = "NPC_FastZombie.RangeAttack";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 
 			return SCHED_FASTZOMBIE_RANGE_ATTACK1;
@@ -1642,7 +1762,15 @@ void CFastZombie::OnChangeActivity( Activity NewActivity )
 	if ( NewActivity == ACT_FASTZOMBIE_FRENZY )
 	{
 		// Scream!!!!
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_FastZombie.Frenzy" );
+		const char* soundname = "NPC_FastZombie.Frenzy";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		SetPlaybackRate( random->RandomFloat( .9, 1.1 ) );	
 	}
 

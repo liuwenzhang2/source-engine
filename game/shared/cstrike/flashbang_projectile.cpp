@@ -289,7 +289,15 @@ void CFlashbangProjectile::Precache()
 void CFlashbangProjectile::Detonate()
 {
 	RadiusFlash ( GetAbsOrigin(), this, GetThrower(), 4, CLASS_NONE, DMG_BLAST );
-	g_pSoundEmitterSystem->EmitSound(this, "Flashbang.Explode" );
+	const char* soundname = "Flashbang.Explode";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// tell the bots a flashbang grenade has exploded
 	CCSPlayer *player = ToCSPlayer(GetThrower());
@@ -312,5 +320,13 @@ void CFlashbangProjectile::Detonate()
 //TODO: Let physics handle the sound!
 void CFlashbangProjectile::BounceSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Flashbang.Bounce" );
+	const char* soundname = "Flashbang.Bounce";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }

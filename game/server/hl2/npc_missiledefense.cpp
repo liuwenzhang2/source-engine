@@ -182,8 +182,15 @@ void CNPC_MissileDefense::FireCannons( void )
 		fSound = true;
 	}
 
+	const char* soundname = "NPC_MissileDefense.Attack";
+	CPASAttenuationFilter filter(this, soundname);
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_MissileDefense.Attack" );
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	Vector vecGun;
 	QAngle vecAng;
@@ -218,7 +225,15 @@ void CNPC_MissileDefense::FireCannons( void )
 	if( m_iAmmoLoaded < 1 )
 	{
 		// Incite a reload.
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_MissileDefense.Reload" );
+		const char* soundname = "NPC_MissileDefense.Reload";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flReloadedTime = gpGlobals->curtime + 0.3;
 		return;
 	}
@@ -476,7 +491,15 @@ void CNPC_MissileDefense::AimGun( void )
 
 	if (flOldX != m_vGunAng.x || flOldY != m_vGunAng.y)
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_MissileDefense.Turn" );
+		const char* soundname = "NPC_MissileDefense.Turn";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{

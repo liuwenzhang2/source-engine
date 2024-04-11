@@ -492,9 +492,25 @@ void CItem::Materialize( void )
 		// changing from invisible state to visible.
 
 #ifdef HL2MP
-		g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Charge" );
+		const char* soundname = "AlyxEmp.Charge";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 #else
-		g_pSoundEmitterSystem->EmitSound(this, "Item.Materialize" );
+		const char* soundname = "Item.Materialize";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 #endif
 		RemoveEffects( EF_NODRAW );
 		DoMuzzleFlash();

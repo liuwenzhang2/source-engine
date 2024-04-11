@@ -659,7 +659,15 @@ void CBaseHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_HEADCRAB_BURROW_IN )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Headcrab.BurrowIn" );
+		const char* soundname = "NPC_Headcrab.BurrowIn";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		CreateDust();
 
 		return;
@@ -676,7 +684,15 @@ void CBaseHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 		Assert( m_bBurrowed );
 		if ( m_bBurrowed )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Headcrab.BurrowOut" );
+			const char* soundname = "NPC_Headcrab.BurrowOut";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			CreateDust();
 			SetBurrowed( false );
 
@@ -1652,7 +1668,15 @@ int CBaseHeadcrab::RangeAttack1Conditions( float flDot, float flDist )
 //------------------------------------------------------------------------------
 bool CBaseHeadcrab::CorpseGib( const CTakeDamageInfo &info )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Gib" );
+	const char* soundname = "NPC_HeadCrab.Gib";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	return BaseClass::CorpseGib( info );
 }
@@ -2457,7 +2481,15 @@ Activity CHeadcrab::NPC_TranslateActivity( Activity eNewActivity )
 //-----------------------------------------------------------------------------
 void CHeadcrab::IdleSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Idle" );
+	const char* soundname = "NPC_HeadCrab.Idle";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -2466,7 +2498,15 @@ void CHeadcrab::IdleSound( void )
 //-----------------------------------------------------------------------------
 void CHeadcrab::AlertSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Alert" );
+	const char* soundname = "NPC_HeadCrab.Alert";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -2481,7 +2521,15 @@ void CHeadcrab::PainSound( const CTakeDamageInfo &info )
 		return;
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Pain" );
+	const char* soundname = "NPC_HeadCrab.Pain";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -2490,7 +2538,15 @@ void CHeadcrab::PainSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CHeadcrab::DeathSound( const CTakeDamageInfo &info )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Die" );
+	const char* soundname = "NPC_HeadCrab.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -2500,7 +2556,15 @@ void CHeadcrab::DeathSound( const CTakeDamageInfo &info )
 void CHeadcrab::TelegraphSound( void )
 {
 	//FIXME: Need a real one
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Alert" );
+	const char* soundname = "NPC_HeadCrab.Alert";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -2509,7 +2573,15 @@ void CHeadcrab::TelegraphSound( void )
 //-----------------------------------------------------------------------------
 void CHeadcrab::AttackSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Headcrab.Attack" );
+	const char* soundname = "NPC_Headcrab.Attack";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -2518,7 +2590,15 @@ void CHeadcrab::AttackSound( void )
 //-----------------------------------------------------------------------------
 void CHeadcrab::BiteSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_HeadCrab.Bite" );
+	const char* soundname = "NPC_HeadCrab.Bite";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -2579,14 +2659,30 @@ void CFastHeadcrab::Spawn( void )
 //-----------------------------------------------------------------------------
 void CFastHeadcrab::IdleSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Idle" );
+	const char* soundname = "NPC_FastHeadcrab.Idle";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CFastHeadcrab::AlertSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Alert" );
+	const char* soundname = "NPC_FastHeadcrab.Alert";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2599,14 +2695,30 @@ void CFastHeadcrab::PainSound( const CTakeDamageInfo &info )
 		return;
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Pain" );
+	const char* soundname = "NPC_FastHeadcrab.Pain";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CFastHeadcrab::DeathSound( const CTakeDamageInfo &info )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Die" );
+	const char* soundname = "NPC_FastHeadcrab.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -2880,12 +2992,28 @@ LINK_ENTITY_TO_CLASS( npc_headcrab_fast, CFastHeadcrab );
 //-----------------------------------------------------------------------------
 void CFastHeadcrab::BiteSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Bite" );
+	const char* soundname = "NPC_FastHeadcrab.Bite";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 void CFastHeadcrab::AttackSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FastHeadcrab.Attack" );
+	const char* soundname = "NPC_FastHeadcrab.Attack";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -3034,7 +3162,15 @@ LINK_ENTITY_TO_CLASS( npc_headcrab_poison, CBlackHeadcrab );
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::BiteSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Bite" );
+	const char* soundname = "NPC_BlackHeadcrab.Bite";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -3043,7 +3179,15 @@ void CBlackHeadcrab::BiteSound( void )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::AttackSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Attack" );
+	const char* soundname = "NPC_BlackHeadcrab.Attack";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -3051,7 +3195,15 @@ void CBlackHeadcrab::AttackSound( void )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::TelegraphSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Telegraph" );
+	const char* soundname = "NPC_BlackHeadcrab.Telegraph";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -3426,11 +3578,27 @@ void CBlackHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 
 		if ( walk )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.FootstepWalk" );
+			const char* soundname = "NPC_BlackHeadcrab.FootstepWalk";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		else
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Footstep" );
+			const char* soundname = "NPC_BlackHeadcrab.Footstep";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 
 		return;
@@ -3438,7 +3606,15 @@ void CBlackHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_HEADCRAB_JUMP_TELEGRAPH )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Telegraph" );
+		const char* soundname = "NPC_BlackHeadcrab.Telegraph";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		CBaseEntity *pEnemy = GetEnemy();
 
@@ -3455,8 +3631,28 @@ void CBlackHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_POISONHEADCRAB_THREAT_SOUND )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Threat" );
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Alert" );
+		{
+			const char* soundname = "NPC_BlackHeadcrab.Threat";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		}
+		{
+			const char* soundname = "NPC_BlackHeadcrab.Alert";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		}
 
 		return;
 	}
@@ -3507,11 +3703,27 @@ void CBlackHeadcrab::IdleSound( void )
 	// TODO: hook up "Marco" / "Polo" talking with nearby buddies
 	if ( m_NPCState == NPC_STATE_IDLE )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Idle" );
+		const char* soundname = "NPC_BlackHeadcrab.Idle";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else if ( m_NPCState == NPC_STATE_ALERT )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Talk" );
+		const char* soundname = "NPC_BlackHeadcrab.Talk";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -3521,7 +3733,15 @@ void CBlackHeadcrab::IdleSound( void )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::AlertSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.AlertVoice" );
+	const char* soundname = "NPC_BlackHeadcrab.AlertVoice";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -3536,7 +3756,15 @@ void CBlackHeadcrab::PainSound( const CTakeDamageInfo &info )
 		return;
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Pain" );
+	const char* soundname = "NPC_BlackHeadcrab.Pain";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -3545,7 +3773,15 @@ void CBlackHeadcrab::PainSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::DeathSound( const CTakeDamageInfo &info )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Die" );
+	const char* soundname = "NPC_BlackHeadcrab.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -3554,12 +3790,30 @@ void CBlackHeadcrab::DeathSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::ImpactSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.Impact" );
+	{
+		const char* soundname = "NPC_BlackHeadcrab.Impact";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
 
 	if ( !( GetFlags() & FL_ONGROUND ) )
 	{
 		// Hit a wall - make a pissed off sound.
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_BlackHeadcrab.ImpactAngry" );
+		const char* soundname = "NPC_BlackHeadcrab.ImpactAngry";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 

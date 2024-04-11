@@ -3274,7 +3274,15 @@ void CWeaponPhysCannon::BeginUpgrade()
 
 	SetContextThink( &CWeaponPhysCannon::WaitForUpgradeThink, gpGlobals->curtime + 6.0f, s_pWaitForUpgradeContext );
 
-	g_pSoundEmitterSystem->EmitSound(this, "WeaponDissolve.Charge" );
+	const char* soundname = "WeaponDissolve.Charge";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Bloat our bounds
 	CollisionProp()->UseTriggerBounds( true, 32.0f );
@@ -3353,7 +3361,15 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 		//This means we just switched to regular physcannon this frame.
 		if ( m_bPhyscannonState == false )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "Weapon_Physgun.Off" );
+			const char* soundname = "Weapon_Physgun.Off";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 #ifdef HL2_EPISODIC
 			ForceDrop();
@@ -3482,7 +3498,15 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 				// Turn on the sprite for awhile
 				m_hEndSprites[sprite]->TurnOn();
 				m_flEndSpritesOverride[sprite] = gpGlobals->curtime + lifetime;
-				g_pSoundEmitterSystem->EmitSound(this, "Weapon_MegaPhysCannon.ChargeZap" );
+				const char* soundname = "Weapon_MegaPhysCannon.ChargeZap";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 		}
 

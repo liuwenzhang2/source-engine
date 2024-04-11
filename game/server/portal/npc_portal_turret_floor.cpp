@@ -312,8 +312,17 @@ void CNPC_Portal_FloorTurret::Activate( void )
 
 void CNPC_Portal_FloorTurret::UpdateOnRemove( void )
 {
-	if ( IsDissolving() )
-		g_pSoundEmitterSystem->EmitSound(this, GetTurretTalkName( PORTAL_TURRET_DISSOLVED ) );
+	if (IsDissolving()) {
+		const char* soundname = GetTurretTalkName(PORTAL_TURRET_DISSOLVED);
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
 
 	LaserOff();
 	RopesOff();
@@ -330,7 +339,15 @@ int CNPC_Portal_FloorTurret::OnTakeDamage( const CTakeDamageInfo &info )
 	{
 		if ( gpGlobals->curtime > m_fNextTalk )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, GetTurretTalkName( PORTAL_TURRET_SHOTAT ) );
+			const char* soundname = GetTurretTalkName(PORTAL_TURRET_SHOTAT);
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_fNextTalk = gpGlobals->curtime + 3.0f;
 		}
 	}
@@ -408,16 +425,17 @@ bool CNPC_Portal_FloorTurret::PreThink( turretState_e state )
 		m_iLastState = (turretState_e)iNewState;
 
 		const char *pchScriptName = GetTurretTalkName( m_iLastState );
+		const char* soundname = pchScriptName;
 
 		switch ( iNewState )
 		{
 			case TURRET_SEARCHING:
-				g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
+				//g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
 				m_fNextTalk = gpGlobals->curtime + 1.75f;
 				break;
 
 			case TURRET_AUTO_SEARCHING:
-				g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
+				//g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
 				m_fNextTalk = gpGlobals->curtime + 1.75f;
 				break;
 
@@ -433,30 +451,39 @@ bool CNPC_Portal_FloorTurret::PreThink( turretState_e state )
 				break;*/
 
 			case TURRET_DEPLOYING:
-				g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
+				//g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
 				m_fNextTalk = gpGlobals->curtime + 1.75f;
 				break;
 
 			case TURRET_RETIRING:
-				g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
+				//g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
 				m_fNextTalk = gpGlobals->curtime + 3.5f;
 				break;
 
 			case TURRET_TIPPED:
-				g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
+				//g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
 				m_fNextTalk = gpGlobals->curtime + 1.15f;
 				break;
 
 			case PORTAL_TURRET_PICKUP:
-				g_pSoundEmitterSystem->EmitSound(this, GetTurretTalkName( PORTAL_TURRET_PICKUP ) );
+				soundname = GetTurretTalkName(PORTAL_TURRET_PICKUP);
 				m_fNextTalk = gpGlobals->curtime + 2.25f;
 				break;
 
 			case PORTAL_TURRET_DISSOLVED:
-				g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
+				//g_pSoundEmitterSystem->EmitSound(this, pchScriptName );
 				m_fNextTalk = gpGlobals->curtime + 10.0f;	// Never going to talk again
 				break;
 		}
+
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	// New states are not supported by old turret code
@@ -532,7 +559,15 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 	// Flip shooting from the top or bottom
 	m_bShootWithBottomBarrels = !m_bShootWithBottomBarrels;
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.ShotSounds" );
+	const char* soundname = "NPC_FloorTurret.ShotSounds";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	DoMuzzleFlash();
 
 	// Make ropes shake if they exist
@@ -559,7 +594,15 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 
 	if ( m_iLastState == TURRET_ACTIVE && gpGlobals->curtime > m_fNextTalk )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, GetTurretTalkName( m_iLastState ) );
+		const char* soundname = GetTurretTalkName(m_iLastState);
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_fNextTalk = gpGlobals->curtime + 2.5f;
 	}
 }
@@ -1023,7 +1066,15 @@ void CNPC_Portal_FloorTurret::SearchThink( void )
 
 		if ( gpGlobals->curtime > m_flNextActivateSoundTime )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Activate" );
+			const char* soundname = "NPC_FloorTurret.Activate";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_flNextActivateSoundTime = gpGlobals->curtime + 3.0;
 		}
 		return;
@@ -1130,12 +1181,42 @@ void CNPC_Portal_FloorTurret::TippedThink( void )
 			if ( UpdateFacing() == false )
 			{
 				//Make any last death noises and anims
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Die" );
-				g_pSoundEmitterSystem->EmitSound(this, GetTurretTalkName( PORTAL_TURRET_DISABLED ) );
+				{
+					const char* soundname = "NPC_FloorTurret.Die";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+				}
+				{
+					const char* soundname = GetTurretTalkName(PORTAL_TURRET_DISABLED);
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+				}
 				SpinDown();
 
 				SetActivity( (Activity) ACT_FLOOR_TURRET_CLOSE );
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Retract" );
+				{
+					const char* soundname = "NPC_FloorTurret.Retract";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+				}
 
 				CTakeDamageInfo	info;
 				info.SetDamage( 1 );
@@ -1386,7 +1467,16 @@ void CNPC_Portal_FloorTurret::StartTouch( CBaseEntity *pOther )
 				if ( vOtherVelocity.LengthSqr() > vTurretVelocity.LengthSqr() )
 				{
 					// Make the turret falling onto this one talk
-					g_pSoundEmitterSystem->EmitSound(pPortalFloor, GetTurretTalkName( PORTAL_TURRET_COLLIDE ) );//pPortalFloor->
+					const char* soundname = GetTurretTalkName(PORTAL_TURRET_COLLIDE);
+					CPASAttenuationFilter filter(pPortalFloor, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, pPortalFloor->entindex(), params);
+					//g_pSoundEmitterSystem->EmitSound(pPortalFloor, GetTurretTalkName( PORTAL_TURRET_COLLIDE ) );//pPortalFloor->
 					pPortalFloor->m_fNextTalk = gpGlobals->curtime + 1.2f;
 					pPortalFloor->m_bDelayTippedTalk = true;
 
@@ -1518,7 +1608,15 @@ void CNPC_Portal_FloorTurret::FireBullet( const char *pTargetName )
 		//Turn to face
 		UpdateFacing();
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Alert" );
+		const char* soundname = "NPC_FloorTurret.Alert";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		SetThink( &CNPC_FloorTurret::SuppressThink );
 	}
 }

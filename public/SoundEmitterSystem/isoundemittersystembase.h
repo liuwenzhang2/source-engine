@@ -297,7 +297,28 @@ struct EmitSound_t
 	{
 	}
 
-	EmitSound_t(const CSoundParameters& src);
+	//EmitSound_t(const CSoundParameters& src);
+	//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : &src - 
+//-----------------------------------------------------------------------------
+	EmitSound_t::EmitSound_t(const CSoundParameters& src, float fCurTime )//gpGlobals->curtime
+	{
+		m_nChannel = src.channel;
+		m_pSoundName = src.soundname;
+		m_flVolume = src.volume;
+		m_SoundLevel = src.soundlevel;
+		m_nFlags = 0;
+		m_nPitch = src.pitch;
+		m_nSpecialDSP = 0;
+		m_pOrigin = 0;
+		m_flSoundTime = (src.delay_msec == 0) ? 0.0f : fCurTime + ((float)src.delay_msec / 1000.0f);
+		m_pflSoundDuration = 0;
+		m_bEmitCloseCaption = true;
+		m_bWarnOnMissingCloseCaption = false;
+		m_bWarnOnDirectWaveReference = false;
+		m_nSpeakerEntity = -1;
+	}
 
 	int							m_nChannel;
 	char const* m_pSoundName;
@@ -319,14 +340,18 @@ struct EmitSound_t
 
 abstract_class ISoundEmitterSystem{
 public:
+	virtual bool Init() = 0;
+	virtual void Shutdown() = 0;
+	virtual void LevelInitPreEntity() = 0;
+	virtual void ReloadSoundEntriesInList(IFileList* pFilesToReload) = 0;
 	virtual HSOUNDSCRIPTHANDLE PrecacheScriptSound(const char* soundname) = 0;
 	virtual void PrefetchScriptSound(const char* soundname) = 0;
 	virtual bool PrecacheSound(const char* name) = 0;
 	virtual void PrefetchSound(const char* name) = 0;
 	virtual bool IsPrecacheAllowed() = 0;
 	virtual void SetAllowPrecache(bool allow) = 0;
-	virtual void EmitSound(CBaseEntity* pEntity, const char* soundname, float soundtime = 0.0f, float* duration = NULL) = 0;  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
-	virtual void EmitSound(CBaseEntity* pEntity, const char* soundname, HSOUNDSCRIPTHANDLE& handle, float soundtime = 0.0f, float* duration = NULL) = 0;  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
+	//virtual void EmitSound(CBaseEntity* pEntity, const char* soundname, float soundtime = 0.0f, float* duration = NULL) = 0;  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
+	//virtual void EmitSound(CBaseEntity* pEntity, const char* soundname, HSOUNDSCRIPTHANDLE& handle, float soundtime = 0.0f, float* duration = NULL) = 0;  // Override for doing the general case of CPASAttenuationFilter filter( this ), and EmitSound( filter, entindex(), etc. );
 	virtual void StopSound(CBaseEntity* pEntity, const char* soundname) = 0;
 	virtual void StopSound(CBaseEntity* pEntity, const char* soundname, HSOUNDSCRIPTHANDLE& handle) = 0;
 	virtual void GenderExpandString(CBaseEntity* pEntity, char const* in, char* out, int maxlen) = 0;
@@ -343,7 +368,7 @@ public:
 	virtual void StopSound(int iEntIndex, int iChannel, const char* pSample) = 0;
 	virtual void TraceEmitSound(char const* fmt, ...) = 0;
 	virtual void EmitAmbientSound(int entindex, const Vector& origin, const char* soundname, float volume, soundlevel_t soundlevel, int flags = 0, int pitch = 0, float soundtime = 0.0f, float* duration = NULL) = 0;
-	virtual void EmitCloseCaption(IRecipientFilter& filter, int entindex, char const* token, CUtlVector< Vector >& soundorigins, float duration, bool warnifmissing = false) = 0;
+	//virtual void EmitCloseCaption(IRecipientFilter& filter, int entindex, char const* token, CUtlVector< Vector >& soundorigins, float duration, bool warnifmissing = false) = 0;
 };
 
 

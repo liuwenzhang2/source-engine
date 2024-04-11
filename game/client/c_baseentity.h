@@ -835,7 +835,7 @@ public:
 	virtual const char				*GetIDString( void ) { return ""; };
 
 	// See CSoundEmitterSystem
-	virtual void ModifyEmitSoundParams( EmitSound_t &params );
+	//virtual void ModifyEmitSoundParams( EmitSound_t &params );
 
 	//static void	EmitSound(C_BaseEntity* pEntity, const char *soundname, float soundtime = 0.0f, float *duration = NULL );  // Override for doing the general case of CPASAttenuationFilter( this ), and EmitSound( filter, entindex(), etc. );
 	//static void	EmitSound(C_BaseEntity* pEntity, const char *soundname, HSOUNDSCRIPTHANDLE& handle, float soundtime = 0.0f, float *duration = NULL );  // Override for doing the general case of CPASAttenuationFilter( this ), and EmitSound( filter, entindex(), etc. );
@@ -867,7 +867,7 @@ public:
 
 	// For each client who appears to be a valid recipient, checks the client has disabled CC and if so, removes them from 
 	//  the recipient list.
-	static void RemoveRecipientsIfNotCloseCaptioning( C_RecipientFilter& filter );
+	//static void RemoveRecipientsIfNotCloseCaptioning( C_RecipientFilter& filter );
 	//static void EmitCloseCaption( IRecipientFilter& filter, int entindex, char const *token, CUtlVector< Vector >& soundorigins, float duration, bool warnifmissing = false );
 
 	// Moves all aiments into their correct position for the frame
@@ -1091,8 +1091,8 @@ public:
 	char const						*GetClassname( void );
 	char const						*GetDebugName( void );
 	static int						PrecacheModel( const char *name ); 
-	static bool						PrecacheSound( const char *name );
-	static void						PrefetchSound( const char *name );
+	//static bool						PrecacheSound( const char *name );
+	//static void						PrefetchSound( const char *name );
 	void							Remove( ); // UTIL_Remove( this );
 
 public:

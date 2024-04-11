@@ -1637,7 +1637,7 @@ void CAI_ActBusyBehavior::PlaySoundForActBusy( busyanimparts_t AnimPart )
 		if (g_pSoundEmitterSystem->GetParametersForSound( STRING(pBusyAnim->iszSounds[AnimPart]), params, STRING(GetOuter()->GetModelName()) ) )//GetOuter()->
 		{
 			CPASAttenuationFilter filter( GetOuter() );
-			g_pSoundEmitterSystem->EmitSound( filter, GetOuter()->entindex(), params );//GetOuter()->
+			g_pSoundEmitterSystem->EmitSound( filter, GetOuter()->entindex(), EmitSound_t(params, gpGlobals->curtime) );//GetOuter()->
 		}
 		else
 		{

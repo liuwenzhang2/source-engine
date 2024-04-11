@@ -578,7 +578,16 @@ void CHudWeaponSelection::CycleToNextWeapon( void )
 		// Play the "cycle to next weapon" sound
 		if ( m_bPlaySelectionSounds )
 		{
-			g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
+			const char* soundname = "Player.WeaponSelectionMoveSlot";
+			CPASAttenuationFilter filter(pPlayer, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 		}
 	}
 }
@@ -639,7 +648,16 @@ void CHudWeaponSelection::CycleToPrevWeapon( void )
 		// Play the "cycle to next weapon" sound
 		if( m_bPlaySelectionSounds )
 		{
-			g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
+			const char* soundname = "Player.WeaponSelectionMoveSlot";
+			CPASAttenuationFilter filter(pPlayer, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 		}
 	}
 }
@@ -735,7 +753,16 @@ void CHudWeaponSelection::SelectWeaponSlot( int iSlot )
 
 	if ( m_bPlaySelectionSounds )
 	{
-		g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
+		const char* soundname = "Player.WeaponSelectionMoveSlot";
+		CPASAttenuationFilter filter(pPlayer, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
 	}
 }
 

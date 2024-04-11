@@ -570,7 +570,17 @@ int	CDODFreezePanel::HudElementKeyInput( int down, ButtonCode_t keynum, const ch
 			{
 				//Do effects
 				g_flFreezeFlash = gpGlobals->curtime + 0.75f;
-				g_pSoundEmitterSystem->EmitSound(pPlayer, "Camera.SnapShot" );//pPlayer->
+
+				const char* soundname = "Camera.SnapShot";
+				CPASAttenuationFilter filter(pPlayer, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(pPlayer, "Camera.SnapShot" );//pPlayer->
 
 				//Extend Freezecam by a couple more seconds.
 				engine->ClientCmd( "extendfreeze" );

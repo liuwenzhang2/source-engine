@@ -206,7 +206,15 @@ void CWeaponGauss::SecondaryAttack( void )
 	{
 		if ( m_nAttackState != 0 )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "Weapon_Gauss.Zap1" );
+			const char* soundname = "Weapon_Gauss.Zap1";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			SendWeaponAnim( ACT_VM_IDLE );
 			m_nAttackState = 0;
 		}
@@ -315,8 +323,28 @@ void CWeaponGauss::SecondaryAttack( void )
 		if ( pPlayer->m_flStartCharge < gpGlobals->curtime - 10 )
 		{
 			// Player charged up too long. Zap him.
-			g_pSoundEmitterSystem->EmitSound(this, "Weapon_Gauss.Zap1" );
-			g_pSoundEmitterSystem->EmitSound(this, "Weapon_Gauss.Zap2" );
+			{
+				const char* soundname = "Weapon_Gauss.Zap1";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+			}
+			{
+				const char* soundname = "Weapon_Gauss.Zap2";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+			}
 			
 			m_nAttackState = 0;
 			SetWeaponIdleTime( gpGlobals->curtime + 1.0 );
@@ -626,7 +654,7 @@ void CWeaponGauss::Fire( Vector vecOrigSrc, Vector vecDir, float flDamage )
 	CSoundParameters params;
 	if (g_pSoundEmitterSystem->GetParametersForSound( "Weapon_Gauss.Fire", params, NULL ) )
 	{
-		EmitSound_t ep( params );
+		EmitSound_t ep( params, gpGlobals->curtime);
 		ep.m_flVolume = 0.5 + flDamage * (1.0 / 400.0);
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
@@ -643,7 +671,15 @@ void CWeaponGauss::WeaponIdle( void )
 	// play aftershock static discharge
 	if ( pPlayer->m_flPlayAftershock && pPlayer->m_flPlayAftershock < gpGlobals->curtime )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_Gauss.StaticDischarge" );
+		const char* soundname = "Weapon_Gauss.StaticDischarge";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		pPlayer->m_flPlayAftershock = 0.0;
 	}
 

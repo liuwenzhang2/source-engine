@@ -433,7 +433,15 @@ void CNPC_PoisonZombie::Event_Killed( const CTakeDamageInfo &info )
 {
 	if ( !( info.GetDamageType() & ( DMG_BLAST | DMG_ALWAYSGIB) ) ) 
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Die" );
+		const char* soundname = "NPC_PoisonZombie.Die";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	if ( !m_fIsTorso )
@@ -659,14 +667,30 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ZOMBIE_POISON_THROW_WARN_SOUND )
 	{
 		BreatheOffShort();
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.ThrowWarn" );
+		const char* soundname = "NPC_PoisonZombie.ThrowWarn";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 
 	if ( pEvent->event == AE_ZOMBIE_POISON_THROW_SOUND )
 	{
 		BreatheOffShort();
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Throw" );
+		const char* soundname = "NPC_PoisonZombie.Throw";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 
@@ -963,7 +987,15 @@ bool CNPC_PoisonZombie::ShouldPlayIdleSound( void )
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::AttackHitSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Zombie.AttackHit" );
+	const char* soundname = "Zombie.AttackHit";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -971,7 +1003,15 @@ void CNPC_PoisonZombie::AttackHitSound( void )
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::AttackMissSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Zombie.AttackMiss" );
+	const char* soundname = "Zombie.AttackMiss";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -979,7 +1019,15 @@ void CNPC_PoisonZombie::AttackMissSound( void )
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::AttackSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Attack" );
+	const char* soundname = "NPC_PoisonZombie.Attack";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -991,7 +1039,15 @@ void CNPC_PoisonZombie::IdleSound( void )
 	if ( m_NPCState != NPC_STATE_COMBAT )
 	{
 		BreatheOffShort();
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Idle" );
+		const char* soundname = "NPC_PoisonZombie.Idle";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		MakeAISpookySound( 360.0f );
 	}
 }
@@ -1005,7 +1061,15 @@ void CNPC_PoisonZombie::PainSound( const CTakeDamageInfo &info )
 	if ( m_flNextPainSoundTime <= gpGlobals->curtime )
 	{	
 		BreatheOffShort();
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Pain" );
+		const char* soundname = "NPC_PoisonZombie.Pain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flNextPainSoundTime = gpGlobals->curtime + random->RandomFloat( 4.0, 7.0 );
 	}
 }
@@ -1017,7 +1081,15 @@ void CNPC_PoisonZombie::AlertSound( void )
 {
 	BreatheOffShort();
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.Alert" );
+	const char* soundname = "NPC_PoisonZombie.Alert";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -1028,11 +1100,27 @@ void CNPC_PoisonZombie::FootstepSound( bool fRightFoot )
 {
 	if( fRightFoot )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.FootstepRight" );
+		const char* soundname = "NPC_PoisonZombie.FootstepRight";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_PoisonZombie.FootstepLeft" );
+		const char* soundname = "NPC_PoisonZombie.FootstepLeft";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	if( ShouldPlayFootstepMoan() )

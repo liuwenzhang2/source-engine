@@ -165,7 +165,15 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		SetAbsVelocity( Vector( 0, 0, 0 ) );
 
 		// play body "thwack" sound
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_Crossbow.BoltHitBody" );
+		const char* soundname = "Weapon_Crossbow.BoltHitBody";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		Vector vForward;
 
@@ -195,7 +203,15 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_Crossbow.BoltHitWorld" );
+		const char* soundname = "Weapon_Crossbow.BoltHitWorld";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		SetThink( &CCrossbowBolt::SUB_Remove );
 		SetNextThink( gpGlobals->curtime );// this will get changed below if the bolt is allowed to stick in what it hit.
@@ -237,22 +253,32 @@ void CCrossbowBolt::ExplodeThink( void )
     ::RadiusDamage( dmgInfo, GetAbsOrigin(), 128, CLASS_NONE, NULL );
 
 #if !defined( CLIENT_DLL )
-    CPASFilter filter( GetAbsOrigin() );
+	{
+		CPASFilter filter(GetAbsOrigin());
 
-    te->Explosion( filter,                /* filter */
-                   0.0,                   /* delay  */
-                   &GetAbsOrigin(),       /* pos    */
-                   g_sModelIndexFireball, /* modelindex */
-                   0.2,                   /* scale  */
-                   25,                    /* framerate */
-                   TE_EXPLFLAG_NONE,      /* flags */
-                   128,                   /* radius */
-                   64,                    /* magnitude */
-                   NULL,                  /* normal */
-                   'C' );                 /* materialType */
+		te->Explosion(filter,                /* filter */
+			0.0,                   /* delay  */
+			&GetAbsOrigin(),       /* pos    */
+			g_sModelIndexFireball, /* modelindex */
+			0.2,                   /* scale  */
+			25,                    /* framerate */
+			TE_EXPLFLAG_NONE,      /* flags */
+			128,                   /* radius */
+			64,                    /* magnitude */
+			NULL,                  /* normal */
+			'C');                 /* materialType */
+	}
 
 	//CSoundEnt::InsertSound ( SOUND_COMBAT, GetAbsOrigin(), BASEGRENADE_EXPLOSION_VOLUME, 3.0 );
-	g_pSoundEmitterSystem->EmitSound(this, "BaseGrenade.Explode" );
+	const char* soundname = "BaseGrenade.Explode";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 #endif
 
     

@@ -667,9 +667,41 @@ void CNPC_RocketTurret::LockingThink( void )
     if ( m_flTimeLocking == 0.0f )
 	{
 		// Play lockon sound
-		g_pSoundEmitterSystem->EmitSound (this, ROCKET_TURRET_SOUND_LOCKING );
-		g_pSoundEmitterSystem->EmitSound (this, ROCKET_TURRET_SOUND_LOCKING, gpGlobals->curtime + ROCKET_TURRET_QUARTER_LOCKON_TIME );
-		g_pSoundEmitterSystem->EmitSound (this, ROCKET_TURRET_SOUND_LOCKED, gpGlobals->curtime + ROCKET_TURRET_HALF_LOCKON_TIME );
+		{
+			const char* soundname = ROCKET_TURRET_SOUND_LOCKING;
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		}
+		{
+			const char* soundname = ROCKET_TURRET_SOUND_LOCKING;
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = gpGlobals->curtime + ROCKET_TURRET_QUARTER_LOCKON_TIME;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(this, ROCKET_TURRET_SOUND_LOCKING, gpGlobals->curtime + ROCKET_TURRET_QUARTER_LOCKON_TIME);
+		}
+		{
+			const char* soundname = ROCKET_TURRET_SOUND_LOCKED;
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = gpGlobals->curtime + ROCKET_TURRET_HALF_LOCKON_TIME;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(this, ROCKET_TURRET_SOUND_LOCKED, gpGlobals->curtime + ROCKET_TURRET_HALF_LOCKON_TIME);
+		}
 
 		ResetSequence(LookupSequence("load"));
 
@@ -738,7 +770,15 @@ void CNPC_RocketTurret::FireRocket ( void )
 
 	m_flTimeLastFired = gpGlobals->curtime;
 
-	g_pSoundEmitterSystem->EmitSound (this, ROCKET_PROJECTILE_FIRE_SOUND );
+	const char* soundname = ROCKET_PROJECTILE_FIRE_SOUND;
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	ResetSequence(LookupSequence("fire"));
 
 	pRocket->SetThink( NULL );

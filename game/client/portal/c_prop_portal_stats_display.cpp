@@ -160,7 +160,15 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 		{
 			m_fEnabledCounter = 0.0f;
 
-			g_pSoundEmitterSystem->EmitSound(this, "Portal.stair_clack" );
+			const char* soundname = "Portal.stair_clack";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_bGoalVisible = true;
 			++m_iCurrentDisplayStep;
 		}
@@ -179,10 +187,20 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 				{
 					m_fNumPlayerDisplay += 1.0f;
 
-					if ( static_cast<int>( m_fNumPlayerDisplay ) % 2 == 0 )
-						g_pSoundEmitterSystem->EmitSound(this, "Weapon_Portalgun.fire_blue" );
+					const char* soundname = "";
+					if (static_cast<int>(m_fNumPlayerDisplay) % 2 == 0)
+						soundname = "Weapon_Portalgun.fire_blue";
 					else
-						g_pSoundEmitterSystem->EmitSound(this, "Weapon_Portalgun.fire_red" );
+						soundname = "Weapon_Portalgun.fire_red";
+
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 				else
 					++m_iCurrentDisplayStep;
@@ -200,10 +218,20 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 					m_fNumPlayerDisplay += MIN( iNumStepsThisFrame, m_iNumStepsTaken - m_fNumPlayerDisplay );
 
 					int iStepsMod10 = static_cast<int>( m_fNumPlayerDisplay ) % 10;
-					if ( iStepsMod10 == 0 )
-						g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.RunFootstepLeft" );
-					else if ( iStepsMod10 == 5 )
-						g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.RunFootstepRight" );
+					const char* soundname = "";
+					if (iStepsMod10 == 0)
+						soundname = "NPC_Citizen.RunFootstepLeft";
+					else if (iStepsMod10 == 5)
+						soundname = "NPC_Citizen.RunFootstepRight";
+
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 				else
 					++m_iCurrentDisplayStep;
@@ -217,7 +245,15 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 				{
 					m_fEnabledCounter = 0.0f;
 
-					g_pSoundEmitterSystem->EmitSound(this, "Portal.room1_Clock" );
+					const char* soundname = "Portal.room1_Clock";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 
 				m_fNumPlayerDisplay += gpGlobals->frametime * m_fNumSecondsTaken;
@@ -265,7 +301,15 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 				m_bMedalCompleted[ m_iGoalLevelDisplay ] = true;
 				m_iGoalSuccess = 1;
 
-				g_pSoundEmitterSystem->EmitSound(this, "Portal.button_down" );
+				const char* soundname = "Portal.button_down";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 				if ( m_iGoalLevelDisplay == 2 )
 					++m_iCurrentDisplayStep;	// skip the next step
@@ -274,7 +318,15 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 			{
 				m_iGoalSuccess = 0;
 
-				g_pSoundEmitterSystem->EmitSound(this, "Portal.button_up" );
+				const char* soundname = "Portal.button_up";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				++m_iCurrentDisplayStep;	// skip the next step
 			}
 			
@@ -295,7 +347,15 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 
 			m_iGoalSuccess = -1;
 
-			g_pSoundEmitterSystem->EmitSound(this, "Portal.stair_clack" );
+			const char* soundname = "Portal.stair_clack";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			--m_iCurrentDisplayStep;	// go back to success or failure step
 		}
 		break;
@@ -317,7 +377,15 @@ void C_PropPortalStatsDisplay::ClientThink( void )
 
 void C_PropPortalStatsDisplay::ResetDisplayAnimation( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Portal.elevator_ding" );
+	const char* soundname = "Portal.elevator_ding";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_fEnabledCounter = 0.0f;
 	m_iCurrentDisplayStep = 0;

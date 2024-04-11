@@ -174,6 +174,7 @@ extern vgui::IInputInternal *g_InputInternal;
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#define CRecipientFilter C_RecipientFilter
 extern IClientMode *GetClientModeNormal();
 
 // IF YOU ADD AN INTERFACE, EXTERN IT IN THE HEADER FILE.
@@ -344,7 +345,7 @@ bool g_bTextMode = false;
 class IClientPurchaseInterfaceV2 *g_pClientPurchaseInterface = (class IClientPurchaseInterfaceV2 *)(&g_bTextMode + 156);
 
 static ConVar *g_pcv_ThreadMode = NULL;
-
+static ConVar* g_pClosecaption = NULL;
 //-----------------------------------------------------------------------------
 // Purpose: interface for gameui to modify voice bans
 //-----------------------------------------------------------------------------
@@ -672,6 +673,16 @@ public:
 	virtual void			EmitSentenceCloseCaption( char const *tokenstream );
 	virtual void			EmitCloseCaption( char const *captionname, float duration );
 
+	static void RemoveRecipientsIfNotCloseCaptioning(CRecipientFilter& filter);
+
+	void EmitCloseCaption(IRecipientFilter& filter, int entindex, char const* token, CUtlVector< Vector >& soundorigin, float duration, bool warnifmissing /*= false*/);// CBaseEntity::
+
+	void InternalEmitCloseCaption(IRecipientFilter& filter, int entindex, bool fromplayer, char const* token, CUtlVector< Vector >& originlist, float duration, bool warnifmissing /*= false*/);
+
+	void InternalEmitCloseCaption(IRecipientFilter& filter, int entindex, const CSoundParameters& params, const EmitSound_t& ep);
+
+	void ModifyEmitSoundParams(EmitSound_t& params);
+
 	virtual CStandardRecvProxies* GetStandardRecvProxies();
 
 	virtual bool			CanRecordDemo( char *errorMsg, int length ) const;
@@ -983,7 +994,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	ConVar_Register( FCVAR_CLIENTDLL );
 
 	g_pcv_ThreadMode = g_pCVar->FindVar( "host_thread_mode" );
-
+	g_pClosecaption = cvar->FindVar("closecaption");
+	Assert(g_pClosecaption);
 	//if (!Initializer::InitializeAllObjects())
 	//	return false;
 
@@ -2424,6 +2436,265 @@ void CHLClient::EmitCloseCaption( char const *captionname, float duration )
 	}
 }
 
+void Hack_FixEscapeChars(char* str)
+{
+	int len = Q_strlen(str) + 1;
+	char* i = str;
+	char* o = (char*)_alloca(len);
+	char* osave = o;
+	while (*i)
+	{
+		if (*i == '\\')
+		{
+			switch (*(i + 1))
+			{
+			case 'n':
+				*o = '\n';
+				++i;
+				break;
+			default:
+				*o = *i;
+				break;
+			}
+		}
+		else
+		{
+			*o = *i;
+		}
+
+		++i;
+		++o;
+	}
+	*o = 0;
+	Q_strncpy(str, osave, len);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: For each client (only can be local client in client .dll ) checks the client has disabled CC and if so, removes them from 
+//  the recipient list.
+// Input  : filter - 
+//-----------------------------------------------------------------------------
+void CHLClient::RemoveRecipientsIfNotCloseCaptioning(C_RecipientFilter& filter)
+{
+	extern ConVar closecaption;
+	if (!closecaption.GetBool())
+	{
+		filter.Reset();
+	}
+}
+
+void CHLClient::InternalEmitCloseCaption(IRecipientFilter& filter, int entindex, bool fromplayer, char const* token, CUtlVector< Vector >& originlist, float duration, bool warnifmissing /*= false*/)
+{
+	// No close captions in multiplayer...
+	if (gpGlobals->maxClients > 1 || (gpGlobals->maxClients == 1 && !g_pClosecaption->GetBool()))
+	{
+		return;
+	}
+
+	// A negative duration means fill it in from the wav file if possible
+	if (duration < 0.0f)
+	{
+		char const* wav = g_pSoundEmitterSystemBase->GetWavFileForSound(token, GENDER_NONE);
+		if (wav)
+		{
+			duration = enginesound->GetSoundDuration(wav);
+		}
+		else
+		{
+			duration = 2.0f;
+		}
+	}
+
+	char lowercase[256];
+	Q_strncpy(lowercase, token, sizeof(lowercase));
+	Q_strlower(lowercase);
+	if (Q_strstr(lowercase, "\\"))
+	{
+		Hack_FixEscapeChars(lowercase);
+	}
+
+	// NOTE:  We must make a copy or else if the filter is owned by a SoundPatch, we'll end up destructively removing
+	//  all players from it!!!!
+	CRecipientFilter filterCopy;
+	filterCopy.CopyFrom(&filter);
+
+	// Remove any players who don't want close captions
+	RemoveRecipientsIfNotCloseCaptioning(filterCopy);
+
+#if !defined( CLIENT_DLL )
+	{
+		// Defined in sceneentity.cpp
+		bool AttenuateCaption(const char* token, const Vector & listener, CUtlVector< Vector >&soundorigins);
+
+		if (filterCopy.GetRecipientCount() > 0)
+		{
+			int c = filterCopy.GetRecipientCount();
+			for (int i = c - 1; i >= 0; --i)
+			{
+				CBasePlayer* player = UTIL_PlayerByIndex(filterCopy.GetRecipientIndex(i));
+				if (!player)
+					continue;
+
+				Vector playerOrigin = player->GetAbsOrigin();
+
+				if (AttenuateCaption(lowercase, playerOrigin, originlist))
+				{
+					filterCopy.RemoveRecipient(player);
+				}
+			}
+		}
+	}
+#endif
+	// Anyone left?
+	if (filterCopy.GetRecipientCount() > 0)
+	{
+
+#if !defined( CLIENT_DLL )
+
+		byte byteflags = 0;
+		if (warnifmissing)
+		{
+			byteflags |= CLOSE_CAPTION_WARNIFMISSING;
+		}
+		if (fromplayer)
+		{
+			byteflags |= CLOSE_CAPTION_FROMPLAYER;
+		}
+
+		CBaseEntity* pActor = gEntList.GetBaseEntity(entindex);
+		if (pActor)
+		{
+			char const* pszActorModel = STRING(pActor->GetModelName());
+			gender_t gender = g_pSoundEmitterSystemBase->GetActorGender(pszActorModel);
+
+			if (gender == GENDER_MALE)
+			{
+				byteflags |= CLOSE_CAPTION_GENDER_MALE;
+			}
+			else if (gender == GENDER_FEMALE)
+			{
+				byteflags |= CLOSE_CAPTION_GENDER_FEMALE;
+			}
+		}
+
+		// Send caption and duration hint down to client
+		UserMessageBegin(filterCopy, "CloseCaption");
+		WRITE_STRING(lowercase);
+		WRITE_SHORT(MIN(255, (int)(duration * 10.0f))),
+			WRITE_BYTE(byteflags),
+			MessageEnd();
+#else
+		// Direct dispatch
+		CHudCloseCaption* cchud = GET_HUDELEMENT(CHudCloseCaption);
+		if (cchud)
+		{
+			cchud->ProcessCaption(lowercase, duration, fromplayer);
+		}
+#endif
+	}
+}
+
+void CHLClient::InternalEmitCloseCaption(IRecipientFilter& filter, int entindex, const CSoundParameters& params, const EmitSound_t& ep)
+{
+	// No close captions in multiplayer...
+	if (gpGlobals->maxClients > 1 || (gpGlobals->maxClients == 1 && !g_pClosecaption->GetBool()))
+	{
+		return;
+	}
+
+	if (!ep.m_bEmitCloseCaption)
+	{
+		return;
+	}
+
+	// NOTE:  We must make a copy or else if the filter is owned by a SoundPatch, we'll end up destructively removing
+	//  all players from it!!!!
+	CRecipientFilter filterCopy;
+	filterCopy.CopyFrom(&filter);
+
+	// Remove any players who don't want close captions
+	RemoveRecipientsIfNotCloseCaptioning(filterCopy);
+
+	// Anyone left?
+	if (filterCopy.GetRecipientCount() <= 0)
+	{
+		return;
+	}
+
+	float duration = 0.0f;
+	if (ep.m_pflSoundDuration)
+	{
+		duration = *ep.m_pflSoundDuration;
+	}
+	else
+	{
+		duration = enginesound->GetSoundDuration(params.soundname);
+	}
+
+	bool fromplayer = false;
+	CBaseEntity* ent = NULL;
+#ifdef GAME_DLL
+	ent = gEntList.GetBaseEntity(entindex);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+	ent = CBaseEntity::Instance(entindex);
+#endif // CLIENT_DLL
+	if (ent)
+	{
+		while (ent)
+		{
+			if (ent->IsPlayer())
+			{
+				fromplayer = true;
+				break;
+			}
+
+			ent = ent->GetOwnerEntity();
+		}
+	}
+	InternalEmitCloseCaption(filter, entindex, fromplayer, ep.m_pSoundName, ep.m_UtlVecSoundOrigin, duration, ep.m_bWarnOnMissingCloseCaption);
+}
+
+void CHLClient::ModifyEmitSoundParams(EmitSound_t& params)
+{
+#ifdef CLIENT_DLL
+	if (GameRules())
+	{
+		params.m_pSoundName = GameRules()->TranslateEffectForVisionFilter("sounds", params.m_pSoundName);
+	}
+#endif
+}
+
+//-----------------------------------------------------------------------------
+	// Purpose: 
+	// Input  : filter - 
+	//			*token - 
+	//			duration - 
+	//			warnifmissing - 
+	//-----------------------------------------------------------------------------
+void CHLClient::EmitCloseCaption(IRecipientFilter& filter, int entindex, char const* token, CUtlVector< Vector >& soundorigin, float duration, bool warnifmissing /*= false*/)// CBaseEntity::
+{
+	bool fromplayer = false;
+	CBaseEntity* ent = NULL;
+#ifdef GAME_DLL
+	ent = gEntList.GetBaseEntity(entindex);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+	ent = CBaseEntity::Instance(entindex);
+#endif // CLIENT_DLL
+	while (ent)
+	{
+		if (ent->IsPlayer())
+		{
+			fromplayer = true;
+			break;
+		}
+		ent = ent->GetOwnerEntity();
+	}
+
+	InternalEmitCloseCaption(filter, entindex, fromplayer, token, soundorigin, duration, warnifmissing);
+}
+
 CStandardRecvProxies* CHLClient::GetStandardRecvProxies()
 {
 	return &g_StandardRecvProxies;
@@ -2496,7 +2767,10 @@ void CHLClient::RenderView( const CViewSetup &setup, int nClearFlags, int whatTo
 	view->RenderView( setup, nClearFlags, whatToDraw );
 }
 
-void ReloadSoundEntriesInList( IFileList *pFilesToReload );
+void ReloadSoundEntriesInList(IFileList* pFilesToReload)
+{
+	g_pSoundEmitterSystem->ReloadSoundEntriesInList(pFilesToReload);
+}
 
 //-----------------------------------------------------------------------------
 // For sv_pure mode. The filesystem figures out which files the client needs to reload to be "pure" ala the server's preferences.

@@ -243,7 +243,15 @@ void CDODBombTarget::State_Enter_ARMED( void )
 		pCP->BombPlanted( GetBombTimerLength(), m_pPlantingPlayer );
 	}	
 
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_C4.Fuse" );
+	const char* soundname = "Weapon_C4.Fuse";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	static int iWickSeq = LookupSequence( "w_tnt_wick" );
 	ResetSequence( iWickSeq );
@@ -290,7 +298,17 @@ extern short g_sModelIndexFireball;
 void CDODBombTarget::Explode( void )
 {
 	// output the explosion
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_C4.Explode" );
+	{
+		const char* soundname = "Weapon_C4.Explode";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
 
 	Vector origin = GetAbsOrigin();
 

@@ -34,7 +34,7 @@ public:
 
 public:
 
-	void			CopyFrom( const CRecipientFilter& src );
+	void			CopyFrom( const IRecipientFilter* src );
 
 	void			Reset( void );
 

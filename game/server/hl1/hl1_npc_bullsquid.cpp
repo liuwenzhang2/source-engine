@@ -199,17 +199,37 @@ void CSquidSpit::Touch ( CBaseEntity *pOther )
 	// splat sound
 	iPitch = random->RandomFloat( 90, 110 );
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_BigMomma.SpitTouch1" );
+	{
+		const char* soundname = "NPC_BigMomma.SpitTouch1";
+		CPASAttenuationFilter filter(this, soundname);
 
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
+
+	const char* soundname = "";
 	switch ( random->RandomInt( 0, 1 ) )
 	{
 	case 0:
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_BigMomma.SpitHit1" );
+		soundname = "NPC_BigMomma.SpitHit1";
 		break;
 	case 1:
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_BigMomma.SpitHit2" );
+		soundname = "NPC_BigMomma.SpitHit2";
 		break;
 	}
+
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	if ( !pOther->m_takedamage )
 	{

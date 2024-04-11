@@ -794,7 +794,7 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 					CSoundParameters params;
 					if (g_pSoundEmitterSystem->GetParametersForSound( "PortalPlayer.EnterPortal", params, NULL ) )
 					{
-						EmitSound_t ep( params );
+						EmitSound_t ep( params, gpGlobals->curtime );
 						ep.m_nPitch = 80.0f + vVelocity.Length() * 0.03f;
 						ep.m_flVolume = MIN( 0.3f + vVelocity.Length() * 0.00075f, 1.0f );
 
@@ -814,7 +814,7 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 					CSoundParameters params;
 					if (g_pSoundEmitterSystem->GetParametersForSound( "PortalPlayer.ExitPortal", params, NULL ) )
 					{
-						EmitSound_t ep( params );
+						EmitSound_t ep( params, gpGlobals->curtime);
 						ep.m_nPitch = 80.0f + vVelocity.Length() * 0.03f;
 						ep.m_flVolume = MIN( 0.3f + vVelocity.Length() * 0.00075f, 1.0f );
 
@@ -832,7 +832,7 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 		CSoundParameters params;
 		if (g_pSoundEmitterSystem->GetParametersForSound( "PortalPlayer.ExitPortal", params, NULL ) )
 		{
-			EmitSound_t ep( params );
+			EmitSound_t ep( params, gpGlobals->curtime);
 			Vector vVelocity;
 			GetVelocity( &vVelocity, NULL );
 			ep.m_nPitch = 80.0f + vVelocity.Length() * 0.03f;
@@ -1342,7 +1342,15 @@ bool CPortal_Player::UseFoundEntity( CBaseEntity *pUseEntity )
 		// Robin: Don't play sounds for NPCs, because NPCs will allow respond with speech.
 		if ( !pUseEntity->MyNPCPointer() )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "HL2Player.Use" );
+			const char* soundname = "HL2Player.Use";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 	}
 
@@ -1461,7 +1469,15 @@ void CPortal_Player::PlayerUse( void )
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
 					m_iTrain = TrainSpeed(pTrain->m_flSpeed, ((CFuncTrackTrain*)pTrain)->GetMaxSpeed());
 					m_iTrain |= TRAIN_NEW;
-					g_pSoundEmitterSystem->EmitSound(this, "HL2Player.TrainUse" );
+					const char* soundname = "HL2Player.TrainUse";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 					return;
 				}
 			}
@@ -1810,12 +1826,28 @@ int CPortal_Player::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 		if ( inputInfoCopy.GetDamage() >= 10.0f )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "PortalPlayer.BonkYelp" );
+			const char* soundname = "PortalPlayer.BonkYelp";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 	}
 	else if ( ( inputInfoCopy.GetDamageType() & DMG_SHOCK ) || ( inputInfoCopy.GetDamageType() & DMG_BURN ) )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "PortalPortal.PainYelp" );
+		const char* soundname = "PortalPortal.PainYelp";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	int ret = BaseClass::OnTakeDamage( inputInfoCopy );

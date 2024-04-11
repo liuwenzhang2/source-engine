@@ -170,7 +170,15 @@ void CNPC_Portal_GroundTurret::Shoot()
 
 			TakeDamage( damageInfo );
 
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.DryFire" );
+			const char* soundname = "NPC_FloorTurret.DryFire";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 	}
 
@@ -182,7 +190,15 @@ void CNPC_Portal_GroundTurret::Shoot()
 	data.m_fFlags = MUZZLEFLASH_COMBINE;
 	DispatchEffect( "MuzzleFlash", data );
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.ShotSounds" );
+	const char* soundname = "NPC_FloorTurret.ShotSounds";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_flTimeNextShoot = gpGlobals->curtime + 0.09;
 }
@@ -214,7 +230,15 @@ void CNPC_Portal_GroundTurret::Scan( void )
 
 	if( gpGlobals->curtime >= m_flTimeNextPing )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Ping" );
+		const char* soundname = "NPC_FloorTurret.Ping";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flTimeNextPing = gpGlobals->curtime + 1.0f;
 	}
 

@@ -319,11 +319,27 @@ void CWeaponStunStick::SetStunState( bool state )
 
 		//FIXME: END - Move to client-side
 
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_StunStick.Activate" );
+		const char* soundname = "Weapon_StunStick.Activate";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_StunStick.Deactivate" );
+		const char* soundname = "Weapon_StunStick.Deactivate";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 

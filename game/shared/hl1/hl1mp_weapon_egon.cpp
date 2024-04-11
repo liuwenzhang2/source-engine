@@ -239,7 +239,15 @@ void CWeaponEgon::PrimaryAttack( void )
 
 			m_flAmmoUseTime = gpGlobals->curtime;// start using ammo ASAP.
 
-			g_pSoundEmitterSystem->EmitSound(this, "Weapon_Gluon.Start" );
+			const char* soundname = "Weapon_Gluon.Start";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			SendWeaponAnim( ACT_VM_PRIMARYATTACK );
 						
@@ -259,7 +267,15 @@ void CWeaponEgon::PrimaryAttack( void )
 		
 			if ( gpGlobals->curtime >= ( m_flStartFireTime + 2.0 ) )
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Weapon_Gluon.Run" );
+				const char* soundname = "Weapon_Gluon.Run";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 				m_fireState = FIRE_CHARGE;
 			}
@@ -481,7 +497,15 @@ void CWeaponEgon::EndAttack( void )
 	
 	if ( m_fireState != FIRE_OFF )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_Gluon.Off" );
+		const char* soundname = "Weapon_Gluon.Off";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	SetWeaponIdleTime( gpGlobals->curtime + 2.0 );

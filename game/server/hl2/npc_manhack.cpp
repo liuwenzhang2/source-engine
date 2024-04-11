@@ -764,7 +764,15 @@ int	CNPC_Manhack::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		m_vForceVelocity = vecBestDir * info.GetDamage() * 0.5f;
 		m_flBladeSpeed = 10.0;
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Bat" );
+		const char* soundname = "NPC_Manhack.Bat";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		// tdInfo.SetDamage( 1.0 );
 
@@ -1533,14 +1541,30 @@ void CNPC_Manhack::Slice( CBaseEntity *pHitEntity, float flInterval, trace_t &tr
 
 		DispatchEffect( "ManhackSparks", data );
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Grind" );
+		const char* soundname = "NPC_Manhack.Grind";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		//TODO: What we really want to do is get a material reference and emit the proper sprayage! - jdw
 	}
 	else
 	{
 		SpawnBlood(tr.endpos, g_vecAttackDir, pHitEntity->BloodColor(), 6 );
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Slice" );
+		const char* soundname = "NPC_Manhack.Slice";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	// Pop back a little bit after hitting the player
@@ -1632,7 +1656,15 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 			
 			if (!(m_spawnflags	& SF_NPC_GAG))
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Grind" );
+				const char* soundname = "NPC_Manhack.Grind";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 
 			// For decals and sparks we must trace a line in the direction of the surface norm
@@ -1850,7 +1882,15 @@ void CNPC_Manhack::PlayFlySound(void)
 	{
 		m_flNextEngineSoundTime	= gpGlobals->curtime + random->RandomFloat( 3.0, 10.0 );
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.EngineNoise" );
+		const char* soundname = "NPC_Manhack.EngineNoise";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -2614,7 +2654,15 @@ void CNPC_Manhack::StartTask( const Task_t *pTask )
 	case TASK_MANHACK_UNPACK:
 		{
 			// Just play a sound for now.
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Unpack" );
+			const char* soundname = "NPC_Manhack.Unpack";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			TaskComplete();
 		}
@@ -3141,11 +3189,27 @@ void CNPC_Manhack::ShowHostile( bool hostile /*= true*/)
 
 	if ( hostile )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.ChargeAnnounce" );
+		const char* soundname = "NPC_Manhack.ChargeAnnounce";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.ChargeEnd" );
+		const char* soundname = "NPC_Manhack.ChargeEnd";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -3217,7 +3281,15 @@ void CNPC_Manhack::SetEyeState( int state )
 				m_pLightGlow->m_nRenderFX = kRenderFxStrobeFast;
 			}
 
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Manhack.Stunned");
+			const char* soundname = "NPC_Manhack.Stunned";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			break;
 		}

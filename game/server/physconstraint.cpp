@@ -1847,7 +1847,16 @@ void ConstraintSoundInfo::OnThink( CPhysConstraint *pOuter, const Vector &relati
 
 	if (m_bPlayReversalSound && (playReversal >= 0))
 	{
-		g_pSoundEmitterSystem->EmitSound(pChildEntity, m_iszReversalSounds[playReversal].ToCStr());//pChildEntity->
+		const char* soundname = m_iszReversalSounds[playReversal].ToCStr();
+		CPASAttenuationFilter filter(pChildEntity, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, pChildEntity->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(pChildEntity, m_iszReversalSounds[playReversal].ToCStr());//pChildEntity->
 	}
 
 	m_vSampler.AddSample( relativeVelocity );

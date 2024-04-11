@@ -729,7 +729,15 @@ void CPropAPC::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useT
 
 	if ( pActivator->IsPlayer() )
 	{
-		g_pSoundEmitterSystem->EmitSound (this, "combine.door_lock" );
+		const char* soundname = "combine.door_lock";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -846,7 +854,15 @@ void CPropAPC::FireMachineGun( void )
 	FireBullets( 1, vecMachineGunShootPos, vecMachineGunDir, VECTOR_CONE_8DEGREES, MAX_TRACE_LENGTH, bulletType, 1 );
 	DoMuzzleFlash();
 
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_AR2.Single" );
+	const char* soundname = "Weapon_AR2.Single";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -1021,7 +1037,15 @@ void CPropAPC::FireRocket( void )
 		pRocket->SetGuidanceHint( STRING( m_strMissileHint ) );
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "PropAPC.FireRocket" );
+	const char* soundname = "PropAPC.FireRocket";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	m_OnFiredMissile.FireOutput( this, this );
 }
 									 

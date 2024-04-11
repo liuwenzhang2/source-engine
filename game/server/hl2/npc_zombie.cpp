@@ -334,11 +334,27 @@ void CZombie::FootstepSound( bool fRightFoot )
 {
 	if( fRightFoot )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Zombie.FootstepRight" );
+		const char* soundname = "Zombie.FootstepRight";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Zombie.FootstepLeft" );
+		const char* soundname = "Zombie.FootstepLeft";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -349,11 +365,27 @@ void CZombie::FootscuffSound( bool fRightFoot )
 {
 	if( fRightFoot )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Zombie.ScuffRight" );
+		const char* soundname = "Zombie.ScuffRight";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Zombie.ScuffLeft" );
+		const char* soundname = "Zombie.ScuffLeft";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -362,7 +394,15 @@ void CZombie::FootscuffSound( bool fRightFoot )
 //-----------------------------------------------------------------------------
 void CZombie::AttackHitSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Zombie.AttackHit" );
+	const char* soundname = "Zombie.AttackHit";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -371,7 +411,15 @@ void CZombie::AttackHitSound( void )
 void CZombie::AttackMissSound( void )
 {
 	// Play a random attack miss sound
-	g_pSoundEmitterSystem->EmitSound(this, "Zombie.AttackMiss" );
+	const char* soundname = "Zombie.AttackMiss";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -385,14 +433,30 @@ void CZombie::PainSound( const CTakeDamageInfo &info )
 		return;
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "Zombie.Pain" );
+	const char* soundname = "Zombie.Pain";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CZombie::DeathSound( const CTakeDamageInfo &info ) 
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Zombie.Die" );
+	const char* soundname = "Zombie.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -400,7 +464,15 @@ void CZombie::DeathSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CZombie::AlertSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Zombie.Alert" );
+	const char* soundname = "Zombie.Alert";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Don't let a moan sound cut off the alert sound.
 	m_flNextMoanSound += random->RandomFloat( 2.0, 4.0 );
@@ -431,7 +503,15 @@ void CZombie::IdleSound( void )
 		return;
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "Zombie.Idle" );
+	const char* soundname = "Zombie.Idle";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	MakeAISpookySound( 360.0f );
 }
 
@@ -440,7 +520,15 @@ void CZombie::IdleSound( void )
 //-----------------------------------------------------------------------------
 void CZombie::AttackSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Zombie.Attack" );
+	const char* soundname = "Zombie.Attack";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------

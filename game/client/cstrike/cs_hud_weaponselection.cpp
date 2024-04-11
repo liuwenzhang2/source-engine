@@ -568,8 +568,18 @@ void CHudWeaponSelection::CycleToNextWeapon( void )
 		}
 
 		// Play the "cycle to next weapon" sound
-		if( m_bPlaySelectionSounds )
-			g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
+		if (m_bPlaySelectionSounds) {
+			const char* soundname = "Player.WeaponSelectionMoveSlot";
+			CPASAttenuationFilter filter(pPlayer, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot");//pPlayer->
+		}
 	}
 }
 
@@ -626,8 +636,18 @@ void CHudWeaponSelection::CycleToPrevWeapon( void )
 		}
 
 		// Play the "cycle to next weapon" sound
-		if( m_bPlaySelectionSounds )
-			g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
+		if (m_bPlaySelectionSounds) {
+			const char* soundname = "Player.WeaponSelectionMoveSlot";
+			CPASAttenuationFilter filter(pPlayer, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot");//pPlayer->
+		}
 	}
 }
 
@@ -725,7 +745,16 @@ void CHudWeaponSelection::SelectWeapon( void )
 	// Don't allow selections of weapons that can't be selected (out of ammo, etc)
 	if ( !GetSelectedWeapon()->CanBeSelected() )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "Player.DenyWeaponSelection" );//player->
+		const char* soundname = "Player.DenyWeaponSelection";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "Player.DenyWeaponSelection" );//player->
 	}
 	else
 	{
@@ -734,7 +763,16 @@ void CHudWeaponSelection::SelectWeapon( void )
 		if (GetSelectedWeapon() != activeWeapon)
 		{
 			// Play the "weapon selected" sound
-			g_pSoundEmitterSystem->EmitSound(player, "Player.WeaponSelected" );//player->
+			const char* soundname = "Player.WeaponSelected";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "Player.WeaponSelected" );//player->
 		}
 
 		SetWeaponSelected();
@@ -840,6 +878,16 @@ void CHudWeaponSelection::SelectWeaponSlot( int iSlot )
 		}
 	}
 
-	if( m_bPlaySelectionSounds )
-		g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot" );//pPlayer->
+	if (m_bPlaySelectionSounds) {
+		const char* soundname = "Player.WeaponSelectionMoveSlot";
+		CPASAttenuationFilter filter(pPlayer, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.WeaponSelectionMoveSlot");//pPlayer->
+	}
 }

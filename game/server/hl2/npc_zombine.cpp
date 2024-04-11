@@ -562,7 +562,15 @@ void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 				pGrenade->SetDamage( 200.0f );
 				m_hGrenade = pGrenade;
 				
-				g_pSoundEmitterSystem->EmitSound(this, "Zombine.ReadyGrenade" );
+				const char* soundname = "Zombine.ReadyGrenade";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 				// Tell player allies nearby to regard me!
 				CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
@@ -681,7 +689,15 @@ void CNPC_Zombine::Sprint( bool bMadSprint )
 	//Don't sprint for this long after I'm done with this sprint run.
 	m_flSprintRestTime = m_flSprintTime + random->RandomFloat( 2.5f, 5.0f );
 
-	g_pSoundEmitterSystem->EmitSound(this, "Zombine.Charge" );
+	const char* soundname = "Zombine.Charge";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 void CNPC_Zombine::RunTask( const Task_t *pTask )
@@ -770,11 +786,27 @@ void CNPC_Zombine::FootstepSound( bool fRightFoot )
 {
 	if( fRightFoot )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Zombie.FootstepRight" );
+		const char* soundname = "Zombie.FootstepRight";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Zombie.FootstepLeft" );
+		const char* soundname = "Zombie.FootstepLeft";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -793,11 +825,27 @@ void CNPC_Zombine::FootscuffSound( bool fRightFoot )
 {
 	if( fRightFoot )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Zombine.ScuffRight" );
+		const char* soundname = "Zombine.ScuffRight";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Zombine.ScuffLeft" );
+		const char* soundname = "Zombine.ScuffLeft";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -806,7 +854,15 @@ void CNPC_Zombine::FootscuffSound( bool fRightFoot )
 //-----------------------------------------------------------------------------
 void CNPC_Zombine::AttackHitSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Zombie.AttackHit" );
+	const char* soundname = "Zombie.AttackHit";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -815,7 +871,15 @@ void CNPC_Zombine::AttackHitSound( void )
 void CNPC_Zombine::AttackMissSound( void )
 {
 	// Play a random attack miss sound
-	g_pSoundEmitterSystem->EmitSound(this, "Zombie.AttackMiss" );
+	const char* soundname = "Zombie.AttackMiss";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -829,14 +893,30 @@ void CNPC_Zombine::PainSound( const CTakeDamageInfo &info )
 		return;
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "Zombine.Pain" );
+	const char* soundname = "Zombine.Pain";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CNPC_Zombine::DeathSound( const CTakeDamageInfo &info ) 
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Zombine.Die" );
+	const char* soundname = "Zombine.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -844,7 +924,15 @@ void CNPC_Zombine::DeathSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_Zombine::AlertSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Zombine.Alert" );
+	const char* soundname = "Zombine.Alert";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Don't let a moan sound cut off the alert sound.
 	m_flNextMoanSound += random->RandomFloat( 2.0, 4.0 );
@@ -867,7 +955,15 @@ void CNPC_Zombine::IdleSound( void )
 		return;
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "Zombine.Idle" );
+	const char* soundname = "Zombine.Idle";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	MakeAISpookySound( 360.0f );
 }
 

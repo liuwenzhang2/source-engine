@@ -459,7 +459,16 @@ void CAI_BehaviorAlyxInjured::GatherConditions( void )
 			{
 				if ( m_flNextWarnTime < gpGlobals->curtime )
 				{
-					g_pSoundEmitterSystem->EmitSound(pPlayer, "npc_alyx.injured_too_far" );//pPlayer->
+					const char* soundname = "npc_alyx.injured_too_far";
+					CPASAttenuationFilter filter(pPlayer, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+					//g_pSoundEmitterSystem->EmitSound(pPlayer, "npc_alyx.injured_too_far" );//pPlayer->
 					m_flNextWarnTime = gpGlobals->curtime + random->RandomFloat( 3.0f, 5.0f );
 				}
 			}

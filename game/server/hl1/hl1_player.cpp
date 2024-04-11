@@ -1030,11 +1030,27 @@ int CHL1_Player::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	{
 		if( m_idrowndmg == m_idrownrestored )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "Player.DrownStart" );
+			const char* soundname = "Player.DrownStart";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		else
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "Player.DrownContinue" );
+			const char* soundname = "Player.DrownContinue";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 	}
 

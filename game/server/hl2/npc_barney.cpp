@@ -166,12 +166,30 @@ void CNPC_Barney::HandleAnimEvent( animevent_t *pEvent )
 	{
 	case NPC_EVENT_LEFTFOOT:
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Barney.FootstepLeft", pEvent->eventtime );
+			const char* soundname = "NPC_Barney.FootstepLeft";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = pEvent->eventtime;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(this, "NPC_Barney.FootstepLeft", pEvent->eventtime );
 		}
 		break;
 	case NPC_EVENT_RIGHTFOOT:
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Barney.FootstepRight", pEvent->eventtime );
+			const char* soundname = "NPC_Barney.FootstepRight";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = pEvent->eventtime;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(this, "NPC_Barney.FootstepRight", pEvent->eventtime );
 		}
 		break;
 
@@ -188,7 +206,15 @@ void CNPC_Barney::DeathSound( const CTakeDamageInfo &info )
 	// Sentences don't play on dead NPCs
 	SentenceStop();
 
-	g_pSoundEmitterSystem->EmitSound(this, "npc_barney.die" );
+	const char* soundname = "npc_barney.die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 }
 

@@ -1366,7 +1366,16 @@ void CTeamTrainWatcher::WatcherAlarmThink( void )
 	CTeamControlPoint *pPoint = m_CPLinks[m_iNumCPLinks-1].hCP.Get();
 	if ( pPoint )
 	{
-		g_pSoundEmitterSystem->EmitSound(pPoint, TEAM_TRAIN_ALARM_SINGLE );//pPoint->
+		const char* soundname = TEAM_TRAIN_ALARM_SINGLE;
+		CPASAttenuationFilter filter(pPoint, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, pPoint->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(pPoint, TEAM_TRAIN_ALARM_SINGLE );//pPoint->
 	}
 
 	SetContextThink( &CTeamTrainWatcher::WatcherAlarmThink, gpGlobals->curtime + TW_ALARM_THINK_INTERVAL, TW_ALARM_THINK );

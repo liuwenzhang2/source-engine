@@ -277,7 +277,15 @@ void CNPC_GroundTurret::DeathEffects()
 	else
 	{
 		// Sparks
-		g_pSoundEmitterSystem->EmitSound(this, "DoSpark" );
+		const char* soundname = "DoSpark";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_iDeathSparks--;
 
 		if( m_iDeathSparks == 0 )
@@ -294,7 +302,15 @@ void CNPC_GroundTurret::DeathEffects()
 //---------------------------------------------------------
 void CNPC_GroundTurret::DeathSound( const CTakeDamageInfo &info )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Die");
+	const char* soundname = "NPC_FloorTurret.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //---------------------------------------------------------
@@ -553,7 +569,16 @@ void CNPC_GroundTurret::Shoot()
 	data.m_fFlags = MUZZLEFLASH_COMBINE;
 	DispatchEffect( "MuzzleFlash", data );
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.ShotSounds", m_ShotSounds );
+	const char* soundname = "NPC_FloorTurret.ShotSounds";
+	CPASAttenuationFilter filter(this, soundname, m_ShotSounds);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params, m_ShotSounds);
+	//g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.ShotSounds", m_ShotSounds );
 
 	if( IsX360() )
 	{
@@ -618,7 +643,15 @@ void CNPC_GroundTurret::Scan()
 
 	if( gpGlobals->curtime >= m_flTimeNextPing )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Ping" );
+		const char* soundname = "NPC_FloorTurret.Ping";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flTimeNextPing = gpGlobals->curtime + 1.0f;
 	}
 

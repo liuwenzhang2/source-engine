@@ -266,7 +266,15 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 	}
 	else if ( pEvent->event == COMBINE_AE_BEGIN_ALTFIRE )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_CombineGuard.Special1" );
+		const char* soundname = "Weapon_CombineGuard.Special1";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 	else if ( pEvent->event == COMBINE_AE_ALTFIRE )
@@ -2089,7 +2097,16 @@ void CNPC_Alyx::StartTask( const Task_t *pTask )
 					g_pEffects->Sparks( GetInteractTarget()->WorldSpaceCenter() );
 				}
 
-				g_pSoundEmitterSystem->EmitSound(GetInteractTarget(), "DoSpark");//GetInteractTarget()->
+				const char* soundname = "DoSpark";
+				CPASAttenuationFilter filter(GetInteractTarget(), soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, GetInteractTarget()->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(GetInteractTarget(), "DoSpark");//GetInteractTarget()->
 				Speak( CONCEPT_ALYX_INTERACTION_DONE );
 
 				SetInteractTarget(NULL);
@@ -2152,7 +2169,16 @@ void CNPC_Alyx::RunTask( const Task_t *pTask )
 		if( GetInteractTarget() && random->RandomInt(0, 3) == 0 )
 		{
 			g_pEffects->Sparks( GetInteractTarget()->WorldSpaceCenter() );
-			g_pSoundEmitterSystem->EmitSound(GetInteractTarget(), "DoSpark");//GetInteractTarget()->
+			const char* soundname = "DoSpark";
+			CPASAttenuationFilter filter(GetInteractTarget(), soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, GetInteractTarget()->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(GetInteractTarget(), "DoSpark");//GetInteractTarget()->
 		}
 
 		if ( IsWaitFinished() )
@@ -2442,7 +2468,15 @@ void CNPC_Alyx::DeathSound( const CTakeDamageInfo &info )
 
 	if ( !SpokeConcept( TLK_SELF_IN_BARNACLE ) )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "npc_alyx.die" );
+		const char* soundname = "npc_alyx.die";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 

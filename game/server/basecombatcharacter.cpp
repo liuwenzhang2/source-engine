@@ -872,7 +872,15 @@ bool CBaseCombatCharacter::CorpseGib( const CTakeDamageInfo &info )
 	trace_t		tr;
 	bool		gibbed = false;
 
-	g_pSoundEmitterSystem->EmitSound(this, "BaseCombatCharacter.CorpseGib" );
+	const char* soundname = "BaseCombatCharacter.CorpseGib";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// only humans throw skulls !!!UNDONE - eventually NPCs will have their own sets of gibs
 	if ( HasHumanGibs() )
@@ -1618,7 +1626,15 @@ void CBaseCombatCharacter::Event_Killed( const CTakeDamageInfo &info )
 		CBaseEntity::Create( "item_healthvial", GetAbsOrigin(), GetAbsAngles() );
 	}
 	// clear the deceased's sound channels.(may have been firing or reloading when killed)
-	g_pSoundEmitterSystem->EmitSound(this, "BaseCombatCharacter.StopWeaponSounds" );
+	const char* soundname = "BaseCombatCharacter.StopWeaponSounds";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Tell my killer that he got me!
 	if( info.GetAttacker() )
@@ -2990,7 +3006,15 @@ int CBaseCombatCharacter::GiveAmmo( int iCount, int iAmmoIndex, bool bSuppressSo
 	// Ammo pickup sound
 	if ( !bSuppressSound )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "BaseCombatCharacter.AmmoPickup" );
+		const char* soundname = "BaseCombatCharacter.AmmoPickup";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	m_iAmmo.Set( iAmmoIndex, m_iAmmo[iAmmoIndex] + iAdd );

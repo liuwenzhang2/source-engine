@@ -62,7 +62,15 @@ void CEntityFlame::UpdateOnRemove()
 	// which kills me. Make sure to stop the burning sound.
 	if ( m_bPlayingSound )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "General.StopBurning" );
+		const char* soundname = "General.StopBurning";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_bPlayingSound = false;
 	}
 
@@ -160,11 +168,27 @@ void CEntityFlame::AttachToEntity( CBaseEntity *pTarget )
 
 	if( pTarget->IsNPC() )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "General.BurningFlesh" );
+		const char* soundname = "General.BurningFlesh";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "General.BurningObject" );
+		const char* soundname = "General.BurningObject";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	m_bPlayingSound = true;
@@ -277,7 +301,15 @@ void CEntityFlame::FlameThink( void )
 	// See if we're done burning, or our attached ent has vanished
 	if ( m_flLifetime < gpGlobals->curtime || m_hEntAttached == NULL )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "General.StopBurning" );
+		const char* soundname = "General.StopBurning";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_bPlayingSound = false;
 		SetThink( &CEntityFlame::SUB_Remove );
 		SetNextThink( gpGlobals->curtime + 0.5f );

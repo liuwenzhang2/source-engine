@@ -1164,7 +1164,15 @@ void CHL2MP_Player::FlashlightTurnOn( void )
 	if( flashlight.GetInt() > 0 && IsAlive() )
 	{
 		AddEffects( EF_DIMLIGHT );
-		g_pSoundEmitterSystem->EmitSound(this, "HL2Player.FlashlightOn" );
+		const char* soundname = "HL2Player.FlashlightOn";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -1177,7 +1185,15 @@ void CHL2MP_Player::FlashlightTurnOff( void )
 	
 	if( IsAlive() )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "HL2Player.FlashlightOff" );
+		const char* soundname = "HL2Player.FlashlightOff";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -1216,7 +1232,15 @@ void CHL2MP_Player::DetonateTripmines( void )
 	}
 
 	// Play sound for pressing the detonator
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_SLAM.SatchelDetonate" );
+	const char* soundname = "Weapon_SLAM.SatchelDetonate";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 void CHL2MP_Player::Event_Killed( const CTakeDamageInfo &info )

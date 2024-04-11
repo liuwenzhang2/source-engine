@@ -276,7 +276,15 @@ void CNPC_Crow::HandleAnimEvent( animevent_t *pEvent )
 		}
 
 		// Play a hop flap sound.
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Hop" );
+		const char* soundname = "NPC_Crow.Hop";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		SetAbsVelocity( vecJumpDir );
 		return;
@@ -1044,7 +1052,15 @@ void CNPC_Crow::RunTask( const Task_t *pTask )
 				m_flNextFlinchTime = gpGlobals->curtime + random->RandomFloat( 0.5f, 2.0f );
 				// dvs: TODO: squirm
 				// dvs: TODO: spawn feathers
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Squawk" );
+				const char* soundname = "NPC_Crow.Squawk";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			break;
 		}
@@ -1063,7 +1079,15 @@ void CNPC_Crow::RunTask( const Task_t *pTask )
 //-----------------------------------------------------------------------------
 bool CNPC_Crow::CorpseGib( const CTakeDamageInfo &info )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Gib" );
+	const char* soundname = "NPC_Crow.Gib";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// TODO: crow gibs?
 	//CGib::SpawnSpecificGibs( this, CROW_GIB_COUNT, 300, 400, "models/gibs/crow_gibs.mdl");
@@ -1288,7 +1312,15 @@ void CNPC_Crow::IdleSound( void )
 	if ( m_iBirdType != BIRDTYPE_CROW )
 		 return;
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Idle" );
+	const char* soundname = "NPC_Crow.Idle";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -1297,7 +1329,15 @@ void CNPC_Crow::AlertSound( void )
 	if ( m_iBirdType != BIRDTYPE_CROW )
 		 return;
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Alert" );
+	const char* soundname = "NPC_Crow.Alert";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -1306,7 +1346,15 @@ void CNPC_Crow::PainSound( const CTakeDamageInfo &info )
 	if ( m_iBirdType != BIRDTYPE_CROW )
 		 return;
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Pain" );
+	const char* soundname = "NPC_Crow.Pain";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -1315,12 +1363,28 @@ void CNPC_Crow::DeathSound( const CTakeDamageInfo &info )
 	if ( m_iBirdType != BIRDTYPE_CROW )
 		 return;
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Die" );
+	const char* soundname = "NPC_Crow.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 void CNPC_Crow::FlapSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Crow.Flap" );
+	const char* soundname = "NPC_Crow.Flap";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	m_bPlayedLoopingSound = true;
 }
 

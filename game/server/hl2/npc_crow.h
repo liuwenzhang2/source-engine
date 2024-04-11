@@ -217,17 +217,41 @@ public:
 
 	void PainSound( const CTakeDamageInfo &info )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Seagull.Pain" );
+		const char* soundname = "NPC_Seagull.Pain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	void DeathSound( const CTakeDamageInfo &info )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Seagull.Pain" );
+		const char* soundname = "NPC_Seagull.Pain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	void IdleSound( void )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Seagull.Idle" );
+		const char* soundname = "NPC_Seagull.Idle";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 };
 
@@ -249,7 +273,15 @@ public:
 
 	void IdleSound( void )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Pigeon.Idle" );
+		const char* soundname = "NPC_Pigeon.Idle";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 };
 

@@ -1333,11 +1333,27 @@ void CCSPlayer::DeathSound( const CTakeDamageInfo &info )
 {
 	if( m_LastHitGroup == HITGROUP_HEAD )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Player.DeathHeadShot" );
+		const char* soundname = "Player.DeathHeadShot";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Player.Death" );
+		const char* soundname = "Player.Death";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -1778,21 +1794,53 @@ void CCSPlayer::Pain( bool bHasArmour )
 		case HITGROUP_HEAD:
 			if (m_bHasHelmet)  // He's wearing a helmet
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Player.DamageHelmet" );
+				const char* soundname = "Player.DamageHelmet";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			else  // He's not wearing a helmet
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Player.DamageHeadShot" );
+				const char* soundname = "Player.DamageHeadShot";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			break;
 		default:
 			if ( bHasArmour == false )
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Flesh.BulletImpact" );
+				const char* soundname = "Flesh.BulletImpact";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			else
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Player.DamageKevlar" );
+				const char* soundname = "Player.DamageKevlar";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			break;
 	}
@@ -6754,7 +6802,15 @@ void CCSPlayer::FlashlightTurnOn( void )
 	if( flashlight.GetInt() > 0 && IsAlive() )
 	{
 		AddEffects( EF_DIMLIGHT );
-		g_pSoundEmitterSystem->EmitSound(this, "Player.FlashlightOn" );
+		const char* soundname = "Player.FlashlightOn";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -6767,7 +6823,15 @@ void CCSPlayer::FlashlightTurnOff( void )
 
 	if( IsAlive() )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Player.FlashlightOff" );
+		const char* soundname = "Player.FlashlightOff";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 

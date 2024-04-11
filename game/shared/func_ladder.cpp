@@ -393,7 +393,16 @@ void CFuncLadder::PlayerGotOn( CBasePlayer *pPlayer )
 {
 #if !defined( CLIENT_DLL )
 	m_OnPlayerGotOnLadder.FireOutput(this, pPlayer);
-	g_pSoundEmitterSystem->EmitSound(pPlayer, "Ladder.StepRight" );//pPlayer->
+	const char* soundname = "Ladder.StepRight";
+	CPASAttenuationFilter filter(pPlayer, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(pPlayer, "Ladder.StepRight" );//pPlayer->
 #endif
 }
 

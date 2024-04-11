@@ -1352,7 +1352,15 @@ void CBasePlayer::PlayerUse ( void )
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
 					m_iTrain = TrainSpeed(pTrain->m_flSpeed, ((CFuncTrackTrain*)pTrain)->GetMaxSpeed());
 					m_iTrain |= TRAIN_NEW;
-					g_pSoundEmitterSystem->EmitSound(this, "Player.UseTrain" );
+					const char* soundname = "Player.UseTrain";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 					return;
 				}
 			}
@@ -2003,7 +2011,15 @@ void CBasePlayer::UpdateUnderwaterState( void )
 #ifndef CLIENT_DLL
 			if ( m_iHealth > 0 && IsAlive() )
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Player.Wade" );
+				const char* soundname = "Player.Wade";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 #endif
 			RemoveFlag( FL_INWATER );
@@ -2015,7 +2031,15 @@ void CBasePlayer::UpdateUnderwaterState( void )
 		// player enter water sound
 		if (GetWaterType() == CONTENTS_WATER)
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "Player.Wade" );
+			const char* soundname = "Player.Wade";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 #endif
 
@@ -2041,8 +2065,17 @@ void CBasePlayer::SetPlayerUnderwater( bool state )
 		m_bPlayerUnderwater = state;
 
 #ifdef CLIENT_DLL
-		if ( state )
-			g_pSoundEmitterSystem->EmitSound(this, "Player.AmbientUnderWater" );
+		if (state) {
+			const char* soundname = "Player.AmbientUnderWater";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		}
 		else
 			g_pSoundEmitterSystem->StopSound(this, "Player.AmbientUnderWater" );
 #endif

@@ -204,7 +204,15 @@ void CNPC_Stalker::PrescheduleThink()
 {
 	if (gpGlobals->curtime > m_flNextBreatheSoundTime)
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Ambient01" );
+		const char* soundname = "NPC_Stalker.Ambient01";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flNextBreatheSoundTime = gpGlobals->curtime + 3.0 + random->RandomFloat( 0.0, 5.0 );
 	}
 }
@@ -396,7 +404,15 @@ void CNPC_Stalker::Event_Killed( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_Stalker::DeathSound( const CTakeDamageInfo &info )
 { 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Die" );
+	const char* soundname = "NPC_Stalker.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 };
 
 //-----------------------------------------------------------------------------
@@ -406,7 +422,15 @@ void CNPC_Stalker::DeathSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_Stalker::PainSound( const CTakeDamageInfo &info )
 { 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Pain" );
+	const char* soundname = "NPC_Stalker.Pain";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	m_flNextScrambleSoundTime	= gpGlobals->curtime + 1.5;
 	m_flNextBreatheSoundTime	= gpGlobals->curtime + 1.5;
 	m_flNextAttackSoundTime		= gpGlobals->curtime + 1.5;
@@ -498,7 +522,15 @@ void CNPC_Stalker::StartTask( const Task_t *pTask )
 	{
 		if( gpGlobals->curtime > m_flNextScreamTime )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Scream" );
+			const char* soundname = "NPC_Stalker.Scream";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_flNextScreamTime = gpGlobals->curtime + random->RandomFloat( 10.0, 15.0 );
 		}
 
@@ -517,7 +549,15 @@ void CNPC_Stalker::StartTask( const Task_t *pTask )
 				m_flLastAttackTime = gpGlobals->curtime;
 
 				// Always play this sound
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Scream" );
+				const char* soundname = "NPC_Stalker.Scream";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				m_flNextScrambleSoundTime = gpGlobals->curtime + 2;
 				m_flNextBreatheSoundTime = gpGlobals->curtime + 2;
 
@@ -1248,12 +1288,30 @@ void CNPC_Stalker::HandleAnimEvent( animevent_t *pEvent )
 	{
 		case NPC_EVENT_LEFTFOOT:
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.FootstepLeft", pEvent->eventtime );
+				const char* soundname = "NPC_Stalker.FootstepLeft";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = pEvent->eventtime;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.FootstepLeft", pEvent->eventtime );
 			}
 			break;
 		case NPC_EVENT_RIGHTFOOT:
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.FootstepRight", pEvent->eventtime );
+				const char* soundname = "NPC_Stalker.FootstepRight";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = pEvent->eventtime;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.FootstepRight", pEvent->eventtime );
 			}
 			break;
 
@@ -1278,7 +1336,15 @@ void CNPC_Stalker::HandleAnimEvent( animevent_t *pEvent )
 				}
 
 				// Play a attack hit sound
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_Stalker.Hit" );
+				const char* soundname = "NPC_Stalker.Hit";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			break;	
 		}

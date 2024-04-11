@@ -664,7 +664,15 @@ void CPropAirboat::EnterVehicle( CBaseCombatCharacter *pPlayer )
 
 	// Play the engine start sound.
 	float flDuration;
-	g_pSoundEmitterSystem->EmitSound(this, "Airboat_engine_start", 0.0, &flDuration );
+	const char* soundname = "Airboat_engine_start";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = &flDuration;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	m_VehiclePhysics.TurnOn();
 
 	// Start playing the engine's idle sound as the startup sound finishes.
@@ -754,7 +762,15 @@ void CPropAirboat::ExitVehicle( int nRole )
 //-----------------------------------------------------------------------------
 void CPropAirboat::HeadlightTurnOn( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Airboat_headlight_on" );
+	const char* soundname = "Airboat_headlight_on";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	m_bHeadlightIsOn = true;
 }
 
@@ -764,7 +780,15 @@ void CPropAirboat::HeadlightTurnOn( void )
 //-----------------------------------------------------------------------------
 void CPropAirboat::HeadlightTurnOff( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Airboat_headlight_off" );
+	const char* soundname = "Airboat_headlight_off";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	m_bHeadlightIsOn = false;
 }
 
@@ -1446,13 +1470,30 @@ void CPropAirboat::UpdateWaterSound( CSoundEnvelopeController &controller, float
 
 			if ( ( fabs( vecVelocityWorld.x ) > 400 ) || ( fabs( vecVelocityWorld.y ) > 400 ) || ( fabs( vecVelocityWorld.z ) > 400 ) )
 			{
-				// Landed in the water. Play a splash sound.
-				g_pSoundEmitterSystem->EmitSound(this, "Airboat_impact_splash" );
+				{
+					// Landed in the water. Play a splash sound.
+					const char* soundname = "Airboat_impact_splash";
+					CPASAttenuationFilter filter(this, soundname);
 
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+				}
 				if ( fabs( vecVelocityWorld.z ) > 200 )
 				{
 					// Landed hard in the water. Play a smack sound.
-					g_pSoundEmitterSystem->EmitSound(this, "Airboat_impact_hard" );
+					const char* soundname = "Airboat_impact_hard";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 			}
 		}
@@ -1731,7 +1772,15 @@ void CPropAirboat::UpdateGunState( CUserCmd *ucmd )
 
 			if ( m_nAmmoCount == 0 )
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Airboat.FireGunRevDown" );
+				const char* soundname = "Airboat.FireGunRevDown";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				bStopRumble = true;
 //				RemoveAllGestures();
 			}
@@ -1743,7 +1792,15 @@ void CPropAirboat::UpdateGunState( CUserCmd *ucmd )
 		{
 			if ( m_nAmmoCount != 0 )
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Airboat.FireGunRevDown" );
+				const char* soundname = "Airboat.FireGunRevDown";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				bStopRumble = true;
 //				RemoveAllGestures();
 			}

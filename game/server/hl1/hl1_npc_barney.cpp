@@ -389,7 +389,7 @@ void CNPC_Barney::PainSound( const CTakeDamageInfo &info )
 	{
 		params.pitch = GetExpresser()->GetVoicePitch();
 
-		EmitSound_t ep( params );
+		EmitSound_t ep( params, gpGlobals->curtime );
 
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
@@ -407,7 +407,7 @@ void CNPC_Barney::DeathSound( const CTakeDamageInfo &info )
 	{
 		params.pitch = GetExpresser()->GetVoicePitch();
 
-		EmitSound_t ep( params );
+		EmitSound_t ep( params, gpGlobals->curtime);
 
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}

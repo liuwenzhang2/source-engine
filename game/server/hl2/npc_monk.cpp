@@ -351,12 +351,30 @@ void CNPC_Monk::HandleAnimEvent( animevent_t *pEvent )
 	{
 		case NPC_EVENT_LEFTFOOT:
 			{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.FootstepLeft", pEvent->eventtime );
+				const char* soundname = "NPC_Citizen.FootstepLeft";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = pEvent->eventtime;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.FootstepLeft", pEvent->eventtime );
 			}
 			break;
 		case NPC_EVENT_RIGHTFOOT:
 			{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.FootstepRight", pEvent->eventtime );
+				const char* soundname = "NPC_Citizen.FootstepRight";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = pEvent->eventtime;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(this, "NPC_Citizen.FootstepRight", pEvent->eventtime );
 			}
 			break;
 

@@ -750,7 +750,15 @@ void CNPC_CombineGunship::Ping( void )
 	{
 		if( !HasCondition(COND_SEE_ENEMY) && gpGlobals->curtime > m_flTimeNextPing )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.SearchPing" );
+			const char* soundname = "NPC_CombineGunship.SearchPing";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_flTimeNextPing = gpGlobals->curtime + 3;
 		}
 	}
@@ -758,7 +766,15 @@ void CNPC_CombineGunship::Ping( void )
 	{
 		if( gpGlobals->curtime > m_flTimeNextPing )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.PatrolPing" );
+			const char* soundname = "NPC_CombineGunship.PatrolPing";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_flTimeNextPing = gpGlobals->curtime + 3;
 		}
 	}
@@ -1257,14 +1273,30 @@ void CNPC_CombineGunship::DoCombat( void )
 
 				if ( !HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.SeeEnemy" );
+					const char* soundname = "NPC_CombineGunship.SeeEnemy";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 			}
 
 			// If we're shooting at a missile, do it immediately!
 			if ( IsTargettingMissile() )
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.SeeMissile" );
+				const char* soundname = "NPC_CombineGunship.SeeMissile";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 				// Allow the gunship to attack again immediately
 				if ( ( m_flTimeNextAttack > gpGlobals->curtime ) && ( ( m_flTimeNextAttack - gpGlobals->curtime ) > GUNSHIP_MISSILE_MAX_RESPONSE_TIME ) )
@@ -1586,7 +1618,15 @@ bool CNPC_CombineGunship::FireGun( void )
 			m_bPreFire = true;
 			m_flTimeNextAttack = gpGlobals->curtime + 0.5f;
 			
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.CannonStartSound" );
+			const char* soundname = "NPC_CombineGunship.CannonStartSound";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			return false;
 		}
 
@@ -2438,13 +2478,30 @@ void CNPC_CombineGunship::SelfDestruct( void )
 	Vector vecOrigin;
 	if ( m_hRagdoll )
 	{
-		g_pSoundEmitterSystem->EmitSound(m_hRagdoll.Get(), "NPC_CombineGunship.Explode");//m_hRagdoll->
+		const char* soundname = "NPC_CombineGunship.Explode";
+		CPASAttenuationFilter filter(m_hRagdoll.Get(), soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, m_hRagdoll.Get()->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(m_hRagdoll.Get(), "NPC_CombineGunship.Explode");//m_hRagdoll->
 		vecOrigin = m_hRagdoll->GetAbsOrigin();
 		pBreakEnt = m_hRagdoll;
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.Explode" );
+		const char* soundname = "NPC_CombineGunship.Explode";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		vecOrigin = GetAbsOrigin();
 	}
 
@@ -2929,7 +2986,15 @@ int	CNPC_CombineGunship::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	// Make a pain sound
 	if ( !HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.Pain" );
+		const char* soundname = "NPC_CombineGunship.Pain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	Vector	damageDir = info.GetDamageForce();
@@ -3097,7 +3162,15 @@ void CNPC_CombineGunship::StopCannonBurst( void )
 		CSoundEnvelopeController::GetController().SoundChangeVolume( m_pCannonSound, 0.0, 0.05 );
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.CannonStopSound" );
+	const char* soundname = "NPC_CombineGunship.CannonStopSound";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 

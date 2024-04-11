@@ -1462,7 +1462,15 @@ void CNPC_AntlionGuard::Shove( void )
 
 		m_hShoveTarget = NULL;
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Shove" );
+		const char* soundname = "NPC_AntlionGuard.Shove";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		// If the player, throw him around
 		if ( pHurt->IsPlayer() )
@@ -1625,7 +1633,15 @@ void CNPC_AntlionGuard::Footstep( bool bHeavy )
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), soundParams );
 		}
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.FarStepHeavy" );
+		const char* soundname = "NPC_AntlionGuard.FarStepHeavy";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
@@ -1637,7 +1653,15 @@ void CNPC_AntlionGuard::Footstep( bool bHeavy )
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), soundParams );
 		}
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.FarStepLight" );
+		const char* soundname = "NPC_AntlionGuard.FarStepLight";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -1818,7 +1842,15 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 		// If it's being held by the player, break that bond
 		Pickup_ForcePlayerToDropThisObject( m_hPhysicsTarget );
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.HitHard" );
+		const char* soundname = "NPC_AntlionGuard.HitHard";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		//Clear the state information, we're done
 		ClearCondition( COND_ANTLIONGUARD_PHYSICS_TARGET );
@@ -1842,7 +1874,15 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ANTLIONGUARD_CHARGE_HIT )
 	{
 		UTIL_ScreenShake( GetAbsOrigin(), 32.0f, 4.0f, 1.0f, 512, SHAKE_START );
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.HitHard" );
+		const char* soundname = "NPC_AntlionGuard.HitHard";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		Vector	startPos = GetAbsOrigin();
 		float	checkSize = ( CollisionProp()->BoundingRadius() + 8.0f );
@@ -1878,7 +1918,16 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLIONGUARD_SHOVE )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.StepLight", pEvent->eventtime );
+		const char* soundname = "NPC_AntlionGuard.StepLight";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = pEvent->eventtime;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.StepLight", pEvent->eventtime );
 		Shove();
 		return;
 	}
@@ -1890,7 +1939,16 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 #if HL2_EPISODIC
 			Footstep( false );
 #else 
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Inside.StepLight", pEvent->eventtime );
+			const char* soundname = "NPC_AntlionGuard.Inside.StepLight";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = pEvent->eventtime;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Inside.StepLight", pEvent->eventtime );
 #endif // HL2_EPISODIC
 		}
 		else
@@ -1898,7 +1956,16 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 #if HL2_EPISODIC
 			Footstep( false );
 #else 
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.StepLight", pEvent->eventtime );
+			const char* soundname = "NPC_AntlionGuard.StepLight";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = pEvent->eventtime;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.StepLight", pEvent->eventtime );
 #endif // HL2_EPISODIC
 		}
 		return;
@@ -1911,7 +1978,16 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 #if HL2_EPISODIC
 			Footstep( true );
 #else 
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Inside.StepHeavy", pEvent->eventtime );
+			const char* soundname = "NPC_AntlionGuard.Inside.StepHeavy";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = pEvent->eventtime;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Inside.StepHeavy", pEvent->eventtime );
 #endif // HL2_EPISODIC
 		}
 		else
@@ -1919,7 +1995,16 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 #if HL2_EPISODIC
 			Footstep( true );
 #else 
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.StepHeavy", pEvent->eventtime );
+			const char* soundname = "NPC_AntlionGuard.StepHeavy";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = pEvent->eventtime;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.StepHeavy", pEvent->eventtime );
 #endif // HL2_EPISODIC
 		}
 		return;
@@ -1938,7 +2023,15 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 		else
 		{
 			duration = 1.0f;
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.FrustratedRoar" );
+			const char* soundname = "NPC_AntlionGuard.FrustratedRoar";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			ENVELOPE_CONTROLLER.SoundFadeOut( m_pGrowlHighSound, 0.5f, false );
 		}
 		
@@ -1949,7 +2042,15 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 		m_flBreathTime = gpGlobals->curtime + duration - 0.2f;
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Anger" );
+		const char* soundname = "NPC_AntlionGuard.Anger";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 		
@@ -1983,7 +2084,15 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 		m_flBreathTime = gpGlobals->curtime + duration - 0.2f;
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Roar" );
+		const char* soundname = "NPC_AntlionGuard.Roar";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 
@@ -2014,7 +2123,15 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 		m_flBreathTime = gpGlobals->curtime + ( duration * 0.5f );
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Anger" );
+		const char* soundname = "NPC_AntlionGuard.Anger";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 
@@ -2031,7 +2148,15 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 		m_flBreathTime = gpGlobals->curtime + duration;
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Anger" );
+		const char* soundname = "NPC_AntlionGuard.Anger";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 		
@@ -2051,7 +2176,15 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLIONGUARD_BURROW_OUT )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.BurrowOut" );
+		const char* soundname = "NPC_Antlion.BurrowOut";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		//Shake the screen
 		UTIL_ScreenShake( GetAbsOrigin(), 0.5f, 80.0f, 1.0f, 256.0f, SHAKE_START );
@@ -2189,11 +2322,27 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		// Play a sound for a physics impact
 		if ( dInfo.GetDamageType() & DMG_CRUSH )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.ShellCrack");
+			const char* soundname = "NPC_AntlionGuard.ShellCrack";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 
 		// Roar in pain
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Pain_Roar" );
+		const char* soundname = "NPC_AntlionGuard.Pain_Roar";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		// TODO: This will require a more complete solution; for now let's shelve it!
 		/*
@@ -2260,7 +2409,15 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			SetHeavyDamageAnim( dInfo.GetDamagePosition() );
 
 			// Roar in pain
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Pain_Roar" );
+			const char* soundname = "NPC_AntlionGuard.Pain_Roar";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			// Flinch!
 			SetCondition( COND_HEAVY_DAMAGE );
@@ -2731,7 +2888,15 @@ bool CNPC_AntlionGuard::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEnti
 	// Hit anything we don't like
 	if ( IRelationType( pEntity ) == D_HT && ( GetNextAttack() < gpGlobals->curtime ) )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Shove" );
+		const char* soundname = "NPC_AntlionGuard.Shove";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		if ( !IsPlayingGesture( ACT_ANTLIONGUARD_CHARGE_HIT ) )
 		{
@@ -3081,7 +3246,15 @@ void CNPC_AntlionGuard::RunTask( const Task_t *pTask )
 
 				if (pEntity && pEntity->IsPlayer())
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Shove" );
+					const char* soundname = "NPC_AntlionGuard.Shove";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 					if ( !IsPlayingGesture( ACT_ANTLIONGUARD_CHARGE_HIT ) )
 					{
@@ -4309,7 +4482,15 @@ void CNPC_AntlionGuard::InputDisableBark( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_AntlionGuard::DeathSound( const CTakeDamageInfo &info )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Die" );
+	const char* soundname = "NPC_AntlionGuard.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -4369,7 +4550,15 @@ bool CNPC_AntlionGuard::BecomeRagdollOnClient( const Vector &force )
 	if ( !CanBecomeRagdoll() ) 
 		return false;
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_AntlionGuard.Fallover" );
+	const char* soundname = "NPC_AntlionGuard.Fallover";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Become server-side ragdoll if we're flagged to do it
 	if ( m_spawnflags & SF_ANTLIONGUARD_SERVERSIDE_RAGDOLL )

@@ -25,6 +25,7 @@
 #include "tier1/KeyValues.h"
 #include "tier1/interface.h"
 #include "tier1/bitbuf.h"
+#include "SoundEmitterSystem\isoundemittersystembase.h"
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -651,6 +652,12 @@ public:
 
 	// Called to see if the game server is okay with a manual changelevel or map command
 	virtual bool			IsManualMapChangeOkay( const char **pszReason ) = 0;
+
+	virtual void EmitCloseCaption(IRecipientFilter& filter, int entindex, char const* token, CUtlVector< Vector >& soundorigin, float duration, bool warnifmissing /*= false*/) = 0;// CBaseEntity::
+
+	virtual void InternalEmitCloseCaption(IRecipientFilter& filter, int entindex, bool fromplayer, char const* token, CUtlVector< Vector >& originlist, float duration, bool warnifmissing /*= false*/) = 0;
+
+	virtual void InternalEmitCloseCaption(IRecipientFilter& filter, int entindex, const CSoundParameters& params, const EmitSound_t& ep) = 0;
 };
 
 typedef IServerGameDLL IServerGameDLL008;

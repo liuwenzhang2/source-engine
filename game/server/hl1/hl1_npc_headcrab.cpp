@@ -151,7 +151,7 @@ void CNPC_Headcrab::HeadCrabSound( const char *pchSound )
 	CSoundParameters params;
 	if (g_pSoundEmitterSystem->GetParametersForSound( pchSound, params, NULL ) )
 	{
-		EmitSound_t ep( params );
+		EmitSound_t ep( params, gpGlobals->curtime);
 
 		ep.m_flVolume = GetSoundVolume();
 		ep.m_nPitch = GetVoicePitch();

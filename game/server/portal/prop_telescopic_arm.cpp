@@ -434,7 +434,15 @@ void CPropTelescopicArm::InputDisable( inputdata_t &inputdata )
 	{
 		m_bEnabled = false;
 		
-		g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_shutdown" );
+		const char* soundname = "coast.thumper_shutdown";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		CPoseController *pPoseController;
 
@@ -470,7 +478,15 @@ void CPropTelescopicArm::InputEnable( inputdata_t &inputdata )
 	{
 		m_bEnabled = true;
 
-		g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_startup" );
+		const char* soundname = "coast.thumper_startup";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		CPoseController *pPoseController;
 		pPoseController = static_cast<CPoseController*>( m_hTelescopicPoseController.Get() );

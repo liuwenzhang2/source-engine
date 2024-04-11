@@ -267,7 +267,15 @@ void CWeapon_SLAM::SatchelDetonate()
 	}
 #endif
 	// Play sound for pressing the detonator
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_SLAM.SatchelDetonate" );
+	const char* soundname = "Weapon_SLAM.SatchelDetonate";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_bDetonatorArmed	= false;
 }
@@ -497,7 +505,15 @@ void CWeapon_SLAM::SatchelThrow( void )
 #endif
 
 	// Play throw sound
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_SLAM.SatchelThrow" );
+	const char* soundname = "Weapon_SLAM.SatchelThrow";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------

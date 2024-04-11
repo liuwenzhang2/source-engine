@@ -1008,7 +1008,16 @@ void CNavMesh::DrawEditMode( void )
 					if (m_selectedArea->GetPlace() != TheNavMesh->GetNavPlace())
 					{
 						m_selectedArea->SetPlace( TheNavMesh->GetNavPlace() );
-						g_pSoundEmitterSystem->EmitSound(player, "Bot.EditSwitchOn" );
+						const char* soundname = "Bot.EditSwitchOn";
+						CPASAttenuationFilter filter(player, soundname);
+
+						EmitSound_t params;
+						params.m_pSoundName = soundname;
+						params.m_flSoundTime = 0.0f;
+						params.m_pflSoundDuration = NULL;
+						params.m_bWarnOnDirectWaveReference = true;
+						g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+						//g_pSoundEmitterSystem->EmitSound(player, "Bot.EditSwitchOn" );
 					}
 				}
 			}
@@ -1156,21 +1165,48 @@ void CNavMesh::CommandNavDelete( void )
 
 		if( markedArea )
 		{
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+			const char* soundname = "EDIT_DELETE";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 			TheNavAreas.FindAndRemove( markedArea );
 			TheNavMesh->OnEditDestroyNotify( markedArea );
 			TheNavMesh->DestroyArea( markedArea );
 		}
 		else if( markedLadder )
 		{
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+			const char* soundname = "EDIT_DELETE";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 			m_ladders.FindAndRemove( markedLadder );
 			OnEditDestroyNotify( markedLadder );
 			delete markedLadder;
 		} 
 		else if ( m_selectedArea )
 		{
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+			const char* soundname = "EDIT_DELETE";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 			TheNavAreas.FindAndRemove( m_selectedArea );
 			CNavArea *deadArea = m_selectedArea;
 			OnEditDestroyNotify( deadArea );
@@ -1178,7 +1214,16 @@ void CNavMesh::CommandNavDelete( void )
 		}
 		else if ( m_selectedLadder )
 		{
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+			const char* soundname = "EDIT_DELETE";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 			m_ladders.FindAndRemove( m_selectedLadder );
 			CNavLadder *deadLadder = m_selectedLadder;
 			OnEditDestroyNotify( deadLadder );
@@ -1188,7 +1233,16 @@ void CNavMesh::CommandNavDelete( void )
 	else
 	{
 		// delete all areas in the selected set
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+		const char* soundname = "EDIT_DELETE";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 		
 		FOR_EACH_VEC( m_selectedSet, it )
 		{
@@ -1251,7 +1305,16 @@ void CNavMesh::CommandNavDeleteMarked( void )
 	CNavArea *markedArea = GetMarkedArea(); 
 	if( markedArea ) 
 	{ 
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+		const char* soundname = "EDIT_DELETE";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 		TheNavMesh->OnEditDestroyNotify( markedArea );
 		TheNavAreas.FindAndRemove( markedArea ); 
 		TheNavMesh->DestroyArea( markedArea ); 
@@ -1260,7 +1323,16 @@ void CNavMesh::CommandNavDeleteMarked( void )
 	CNavLadder *markedLadder = GetMarkedLadder(); 
 	if( markedLadder ) 
 	{ 
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+		const char* soundname = "EDIT_DELETE";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 		m_ladders.FindAndRemove( markedLadder );
 		delete markedLadder; 
 	} 
@@ -1298,7 +1370,16 @@ void CNavMesh::CommandNavFloodSelect( const CCommand &args )
 
 	if ( start )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+		const char* soundname = "EDIT_DELETE";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 
 		int connections = INCLUDE_BLOCKED_AREAS | INCLUDE_INCOMING_CONNECTIONS;
 		if ( args.ArgC() == 2 && FStrEq( "out", args[1] ) )
@@ -1334,7 +1415,16 @@ void CNavMesh::CommandNavToggleSelectedSet( void )
 	if ( !IsEditMode( NORMAL ) && !IsEditMode( PLACE_PAINTING ) )
 		return;
 
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+	const char* soundname = "EDIT_DELETE";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 
 	NavAreaVector notInSelectedSet;
 
@@ -1377,7 +1467,16 @@ void CNavMesh::CommandNavStoreSelectedSet( void )
 	if ( !IsEditMode( NORMAL ) && !IsEditMode( PLACE_PAINTING ) )
 		return;
 
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+	const char* soundname = "EDIT_DELETE";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 
 	m_storedSelectedSet.RemoveAll();
 	FOR_EACH_VEC( m_selectedSet, it )
@@ -1401,7 +1500,16 @@ void CNavMesh::CommandNavRecallSelectedSet( void )
 	if ( !IsEditMode( NORMAL ) && !IsEditMode( PLACE_PAINTING ) )
 		return;
 
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+	const char* soundname = "EDIT_DELETE";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 
 	ClearSelectedSet();
 
@@ -1436,7 +1544,16 @@ void CNavMesh::CommandNavAddToSelectedSet( void )
 	if ( m_selectedArea )
 	{
 		AddToSelectedSet( m_selectedArea );
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
+		const char* soundname = "EDIT_MARK.Enable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
 	}
 }
 
@@ -1458,7 +1575,16 @@ void CNavMesh::CommandNavAddToSelectedSetByID( const CCommand &args )
 	if ( area )
 	{
 		AddToSelectedSet( area );
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
+		const char* soundname = "EDIT_MARK.Enable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
 		Msg( "Added area %d.  ( to go there: setpos %f %f %f )\n", id, area->GetCenter().x, area->GetCenter().y, area->GetCenter().z + 5 );
 	}
 	else
@@ -1485,7 +1611,16 @@ void CNavMesh::CommandNavRemoveFromSelectedSet( void )
 	if ( m_selectedArea )
 	{
 		RemoveFromSelectedSet( m_selectedArea );
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+		const char* soundname = "EDIT_MARK.Disable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 	}
 }
 
@@ -1515,7 +1650,16 @@ void CNavMesh::CommandNavToggleInSelectedSet( void )
 		{
 			AddToSelectedSet( m_selectedArea );
 		}
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+		const char* soundname = "EDIT_MARK.Disable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 	}
 }
 
@@ -1534,7 +1678,16 @@ void CNavMesh::CommandNavClearSelectedSet( void )
 		return;
 
 	ClearSelectedSet();
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+	const char* soundname = "EDIT_MARK.Disable";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 }
 
 
@@ -1554,7 +1707,16 @@ void CNavMesh::CommandNavBeginSelecting( void )
 	m_isContinuouslySelecting = true;
 	m_isContinuouslyDeselecting = false;
 	
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.Creating" );
+	const char* soundname = "EDIT_BEGIN_AREA.Creating";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.Creating" );
 }
 
 
@@ -1574,7 +1736,16 @@ void CNavMesh::CommandNavEndSelecting( void )
 	m_isContinuouslySelecting = false;
 	m_isContinuouslyDeselecting = false;
 
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
+	const char* soundname = "EDIT_END_AREA.Creating";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
 }
 
 
@@ -1594,11 +1765,29 @@ void CNavMesh::CommandNavBeginDragSelecting( void )
 	{
 		ClearDragSelectionSet();
 		SetEditMode( NORMAL );
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
+		const char* soundname = "EDIT_BEGIN_AREA.NotCreating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
+		const char* soundname = "EDIT_BEGIN_AREA.NotCreating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
 		
 		SetEditMode( DRAG_SELECTING );
 
@@ -1631,7 +1820,16 @@ void CNavMesh::CommandNavEndDragSelecting( void )
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
+		const char* soundname = "EDIT_END_AREA.NotCreating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
 	}
 
 	ClearDragSelectionSet();
@@ -1655,11 +1853,29 @@ void CNavMesh::CommandNavBeginDragDeselecting( void )
 	{
 		ClearDragSelectionSet();
 		SetEditMode( NORMAL );
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
+		const char* soundname = "EDIT_BEGIN_AREA.NotCreating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
+		const char* soundname = "EDIT_BEGIN_AREA.NotCreating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
 		
 		SetEditMode( DRAG_SELECTING );
 		m_bIsDragDeselecting = true;
@@ -1693,7 +1909,16 @@ void CNavMesh::CommandNavEndDragDeselecting( void )
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
+		const char* soundname = "EDIT_END_AREA.NotCreating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
 	}
 
 	ClearDragSelectionSet();
@@ -1768,7 +1993,16 @@ void CNavMesh::CommandNavToggleSelecting( bool playSound )
 
 	if ( playSound )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
+		const char* soundname = "EDIT_END_AREA.Creating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
 	}
 }
 
@@ -1789,7 +2023,16 @@ void CNavMesh::CommandNavBeginDeselecting( void )
 	m_isContinuouslyDeselecting = true;
 	m_isContinuouslySelecting = false;
 	
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.Creating" );
+	const char* soundname = "EDIT_BEGIN_AREA.Creating";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.Creating" );
 }
 
 
@@ -1809,7 +2052,16 @@ void CNavMesh::CommandNavEndDeselecting( void )
 	m_isContinuouslyDeselecting = false;
 	m_isContinuouslySelecting = false;
 
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
+	const char* soundname = "EDIT_END_AREA.Creating";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
 }
 
 
@@ -1831,7 +2083,16 @@ void CNavMesh::CommandNavToggleDeselecting( bool playSound )
 
 	if ( playSound )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
+		const char* soundname = "EDIT_END_AREA.Creating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
 	}
 }
 
@@ -1953,7 +2214,16 @@ void CNavMesh::CommandNavSelectHalfSpace( const CCommand &args )
 		}
 	}
 
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+	const char* soundname = "EDIT_DELETE";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 }
 
 
@@ -1970,13 +2240,31 @@ void CNavMesh::CommandNavBeginShiftXY( void )
 	if (GetEditMode() == SHIFTING_XY)
 	{
 		SetEditMode( NORMAL );
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
+		const char* soundname = "EDIT_END_AREA.Creating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
 		return;
 	}
 	else
 	{
 		SetEditMode( SHIFTING_XY );
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.Creating" );
+		const char* soundname = "EDIT_BEGIN_AREA.Creating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.Creating" );
 	}
 	
 	// m_anchor starting corner
@@ -2052,7 +2340,16 @@ void CNavMesh::CommandNavEndShiftXY( void )
 	// update the position of all areas in the selected set
 	TheNavMesh->ForAllSelectedAreas( shift );
 
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
+	const char* soundname = "EDIT_END_AREA.Creating";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
 }
 
 
@@ -2089,7 +2386,16 @@ CON_COMMAND_F( nav_shift, "Shifts the selected areas by the specified amount", F
 	// update the position of all areas in the selected set
 	TheNavMesh->ForAllSelectedAreas( shift );
 
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
+	const char* soundname = "EDIT_END_AREA.Creating";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
 }
 
 
@@ -2147,7 +2453,16 @@ void CommandNavCenterInWorld( void )
 		area->Shift( shift );
 	}
 
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
+	const char* soundname = "EDIT_END_AREA.Creating";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
 
 	Msg( "Shifting mesh by %f,%f\n", shift.x, shift.y );
 }
@@ -2202,11 +2517,29 @@ void CNavMesh::CommandNavSelectInvalidAreas( void )
 
 	if ( m_selectedSet.Count() )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
+		const char* soundname = "EDIT_MARK.Enable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+		const char* soundname = "EDIT_MARK.Disable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 	}
 }
 
@@ -2240,11 +2573,29 @@ void CNavMesh::CommandNavSelectBlockedAreas( void )
 
 	if ( m_selectedSet.Count() )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
+		const char* soundname = "EDIT_MARK.Enable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+		const char* soundname = "EDIT_MARK.Disable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 	}
 }
 
@@ -2278,11 +2629,29 @@ void CNavMesh::CommandNavSelectObstructedAreas( void )
 
 	if ( m_selectedSet.Count() )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
+		const char* soundname = "EDIT_MARK.Enable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+		const char* soundname = "EDIT_MARK.Disable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 	}
 }
 
@@ -2316,11 +2685,29 @@ void CNavMesh::CommandNavSelectDamagingAreas( void )
 
 	if ( m_selectedSet.Count() )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
+		const char* soundname = "EDIT_MARK.Enable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+		const char* soundname = "EDIT_MARK.Disable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 	}
 }
 
@@ -2354,11 +2741,29 @@ void CNavMesh::CommandNavSelectStairs( void )
 
 	if ( m_selectedSet.Count() )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
+		const char* soundname = "EDIT_MARK.Enable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+		const char* soundname = "EDIT_MARK.Disable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 	}
 }
 
@@ -2384,7 +2789,16 @@ void CNavMesh::CommandNavSelectOrphans( void )
 
 	if ( start )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
+		const char* soundname = "EDIT_DELETE";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DELETE" );
 
 		int connections = INCLUDE_BLOCKED_AREAS | INCLUDE_INCOMING_CONNECTIONS;
 
@@ -2415,10 +2829,30 @@ void CNavMesh::CommandNavSplit( void )
 
 	if ( m_selectedArea )
 	{
-		if (m_selectedArea->SplitEdit( m_splitAlongX, m_splitEdge ))
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLIT.MarkedArea" );
-		else
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLIT.NoMarkedArea" );
+		if (m_selectedArea->SplitEdit(m_splitAlongX, m_splitEdge)) {
+			const char* soundname = "EDIT_SPLIT.MarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLIT.MarkedArea");
+		}
+		else {
+			const char* soundname = "EDIT_SPLIT.NoMarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLIT.NoMarkedArea");
+		}
 	}
 
 	StripNavigationAreas();
@@ -2494,16 +2928,43 @@ void CNavMesh::CommandNavMakeSniperSpots( void )
 		// recursively split the area
 		if ( MakeSniperSpots( m_selectedArea ) )
 		{
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLIT.MarkedArea" );
+			const char* soundname = "EDIT_SPLIT.MarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLIT.MarkedArea" );
 		}
 		else
 		{
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLIT.NoMarkedArea" );
+			const char* soundname = "EDIT_SPLIT.NoMarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLIT.NoMarkedArea" );
 		}
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLIT.NoMarkedArea" );
+		const char* soundname = "EDIT_SPLIT.NoMarkedArea";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLIT.NoMarkedArea" );
 	}
 
 	StripNavigationAreas();
@@ -2535,15 +2996,44 @@ void CNavMesh::CommandNavMerge( void )
 
 		if ( other && other != m_selectedArea )
 		{
-			if ( m_selectedArea->MergeEdit( other ) )
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_MERGE.Enable" );
-			else
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_MERGE.Disable" );
+			if (m_selectedArea->MergeEdit(other)) {
+				const char* soundname = "EDIT_MERGE.Enable";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MERGE.Enable");
+			}
+			else {
+				const char* soundname = "EDIT_MERGE.Disable";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MERGE.Disable");
+			}
 		}
 		else
 		{
 			Msg( "To merge, mark an area, highlight a second area, then invoke the merge command" );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_MERGE.Disable" );
+			const char* soundname = "EDIT_MERGE.Disable";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MERGE.Disable" );
 		}
 	}
 
@@ -2571,13 +3061,31 @@ void CNavMesh::CommandNavMark( const CCommand &args )
 		if (IsInSelectedSet( m_selectedArea ))
 		{
 			// remove from set
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+			const char* soundname = "EDIT_MARK.Disable";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 			RemoveFromSelectedSet( m_selectedArea );
 		}
 		else
 		{
 			// add to set
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
+			const char* soundname = "EDIT_MARK.Enable";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
 			AddToSelectedSet( m_selectedArea );
 		}
 		return;
@@ -2588,7 +3096,16 @@ void CNavMesh::CommandNavMark( const CCommand &args )
 	if ( m_markedArea || m_markedLadder )
 	{
 		// Unmark area or ladder
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
+		const char* soundname = "EDIT_MARK.Enable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
 		Msg("Area unmarked.\n");
 		SetMarkedArea( NULL );
 	}
@@ -2607,7 +3124,16 @@ void CNavMesh::CommandNavMark( const CCommand &args )
 						CNavLadder *ladder = TheNavMesh->GetLadderByID( ladderIDToMark );
 						if ( ladder )
 						{
-							g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+							const char* soundname = "EDIT_MARK.Disable";
+							CPASAttenuationFilter filter(player, soundname);
+
+							EmitSound_t params;
+							params.m_pSoundName = soundname;
+							params.m_flSoundTime = 0.0f;
+							params.m_pflSoundDuration = NULL;
+							params.m_bWarnOnDirectWaveReference = true;
+							g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+							//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 							SetMarkedLadder( ladder );
 
 							int connected = 0;
@@ -2642,7 +3168,16 @@ void CNavMesh::CommandNavMark( const CCommand &args )
 					}
 					if( areaToMark )
 					{
-						g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+						const char* soundname = "EDIT_MARK.Disable";
+						CPASAttenuationFilter filter(player, soundname);
+
+						EmitSound_t params;
+						params.m_pSoundName = soundname;
+						params.m_flSoundTime = 0.0f;
+						params.m_pflSoundDuration = NULL;
+						params.m_bWarnOnDirectWaveReference = true;
+						g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+						//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 						SetMarkedArea( areaToMark );
 
 						int connected = 0;
@@ -2660,7 +3195,16 @@ void CNavMesh::CommandNavMark( const CCommand &args )
 	else if ( m_selectedArea )
 	{
 		// Mark an area
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+		const char* soundname = "EDIT_MARK.Disable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 		SetMarkedArea( m_selectedArea );
 
 		int connected = 0;
@@ -2674,7 +3218,16 @@ void CNavMesh::CommandNavMark( const CCommand &args )
 	else if ( m_selectedLadder )
 	{
 		// Mark a ladder
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
+		const char* soundname = "EDIT_MARK.Disable";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Disable" );
 		SetMarkedLadder( m_selectedLadder );
 
 		int connected = 0;
@@ -2701,7 +3254,16 @@ void CNavMesh::CommandNavUnmark( void )
 	if ( !IsEditMode( NORMAL ) )
 		return;
 
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
+	const char* soundname = "EDIT_MARK.Enable";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK.Enable" );
 	SetMarkedArea( NULL );			// unmark the mark area
 	m_markedCorner = NUM_CORNERS;	// clear the corner selection
 }
@@ -2716,7 +3278,16 @@ void CNavMesh::CommandNavBeginArea( void )
 
 	if ( !(IsEditMode( CREATING_AREA ) || IsEditMode( CREATING_LADDER ) || IsEditMode( NORMAL )) )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
+		const char* soundname = "EDIT_END_AREA.NotCreating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
 		return;
 	}
 
@@ -2725,16 +3296,43 @@ void CNavMesh::CommandNavBeginArea( void )
 	if ( IsEditMode( CREATING_AREA ) )
 	{
 		SetEditMode( NORMAL );
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.Creating" );
+		const char* soundname = "EDIT_BEGIN_AREA.Creating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.Creating" );
 	}
 	else if ( IsEditMode( CREATING_LADDER ) )
 	{
 		SetEditMode( NORMAL );
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.Creating" );
+		const char* soundname = "EDIT_BEGIN_AREA.Creating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.Creating" );
 	}
 	else if ( m_climbableSurface )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
+		const char* soundname = "EDIT_BEGIN_AREA.NotCreating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
 		
 		SetEditMode( CREATING_LADDER );
 
@@ -2744,7 +3342,16 @@ void CNavMesh::CommandNavBeginArea( void )
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
+		const char* soundname = "EDIT_BEGIN_AREA.NotCreating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_BEGIN_AREA.NotCreating" );
 		
 		SetEditMode( CREATING_AREA );
 
@@ -2766,7 +3373,16 @@ void CNavMesh::CommandNavEndArea( void )
 
 	if ( !(IsEditMode( CREATING_AREA ) || IsEditMode( CREATING_LADDER ) || IsEditMode( NORMAL )) )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
+		const char* soundname = "EDIT_END_AREA.NotCreating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
 		return;
 	}
 
@@ -2801,7 +3417,16 @@ void CNavMesh::CommandNavEndArea( void )
 		if (newArea == NULL)
 		{
 			Warning( "NavEndArea: Out of memory\n" );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
+			const char* soundname = "EDIT_END_AREA.NotCreating";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
 			return;
 		}
 		
@@ -2814,7 +3439,16 @@ void CNavMesh::CommandNavEndArea( void )
 
 		TheNavAreas.AddToTail( newArea );
 		TheNavMesh->AddNavArea( newArea );
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
+		const char* soundname = "EDIT_END_AREA.Creating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
 
 		if ( nav_create_place_on_ground.GetBool() )
 		{
@@ -2858,7 +3492,16 @@ void CNavMesh::CommandNavEndArea( void )
 	{
 		SetEditMode( NORMAL );
 	
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
+		const char* soundname = "EDIT_END_AREA.Creating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.Creating" );
 
 		Vector corner1, corner2, corner3;
 		if ( m_climbableSurface && FindLadderCorners( &corner1, &corner2, &corner3 ) )
@@ -2880,12 +3523,30 @@ void CNavMesh::CommandNavEndArea( void )
 		}
 		else
 		{
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
+			const char* soundname = "EDIT_END_AREA.NotCreating";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
 		}
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
+		const char* soundname = "EDIT_END_AREA.NotCreating";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_END_AREA.NotCreating" );
 	}
 
 	m_markedCorner = NUM_CORNERS;	// clear the corner selection
@@ -2918,7 +3579,16 @@ void CNavMesh::CommandNavConnect( void )
 			NavDirType dir = second->ComputeLargestPortal( first, &center, &halfWidth );
 			if (dir == NUM_DIRECTIONS)
 			{
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
+				const char* soundname = "EDIT_CONNECT.AllDirections";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
 				bValid = false;
 				break;
 			}
@@ -2926,7 +3596,16 @@ void CNavMesh::CommandNavConnect( void )
 			dir = first->ComputeLargestPortal( second, &center, &halfWidth );
 			if (dir == NUM_DIRECTIONS)
 			{
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
+				const char* soundname = "EDIT_CONNECT.AllDirections";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
 				bValid = false;
 				break;
 			}
@@ -2944,7 +3623,16 @@ void CNavMesh::CommandNavConnect( void )
 
 				dir = first->ComputeLargestPortal( second, &center, &halfWidth );
 				first->ConnectTo( second, dir );
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.Added" );
+				const char* soundname = "EDIT_CONNECT.Added";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.Added" );
 			}
 		}
 	}
@@ -2953,19 +3641,46 @@ void CNavMesh::CommandNavConnect( void )
 		if ( m_markedLadder )
 		{
 			m_markedLadder->ConnectTo( m_selectedArea );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.Added" );
+			const char* soundname = "EDIT_CONNECT.Added";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.Added" );
 		}
 		else if ( m_markedArea )
 		{
 			NavDirType dir = GetMarkedArea()->ComputeLargestPortal( m_selectedArea, &center, &halfWidth );
 			if (dir == NUM_DIRECTIONS)
 			{
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
+				const char* soundname = "EDIT_CONNECT.AllDirections";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
 			}
 			else
 			{
 				m_markedArea->ConnectTo( m_selectedArea, dir );
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.Added" );
+				const char* soundname = "EDIT_CONNECT.Added";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.Added" );
 			}
 		}
 		else
@@ -2976,18 +3691,45 @@ void CNavMesh::CommandNavConnect( void )
 				NavDirType dir = area->ComputeLargestPortal( m_selectedArea, &center, &halfWidth );
 				if (dir == NUM_DIRECTIONS)
 				{
-					g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
+					const char* soundname = "EDIT_CONNECT.AllDirections";
+					CPASAttenuationFilter filter(player, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+					//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
 				}
 				else
 				{
 					area->ConnectTo( m_selectedArea, dir );
-					g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.Added" );
+					const char* soundname = "EDIT_CONNECT.Added";
+					CPASAttenuationFilter filter(player, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+					//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.Added" );
 				}
 			}
 			else
 			{
 				Msg( "To connect areas, mark an area, highlight a second area, then invoke the connect command. Make sure the cursor is directly north, south, east, or west of the marked area." );
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
+				const char* soundname = "EDIT_CONNECT.AllDirections";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
 			}
 		}
 	}
@@ -2996,12 +3738,30 @@ void CNavMesh::CommandNavConnect( void )
 		if ( m_markedArea )
 		{
 			m_markedArea->ConnectTo( m_selectedLadder );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.Added" );
+			const char* soundname = "EDIT_CONNECT.Added";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.Added" );
 		}
 		else
 		{
 			Msg( "To connect areas, mark an area, highlight a second area, then invoke the connect command. Make sure the cursor is directly north, south, east, or west of the marked area." );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
+			const char* soundname = "EDIT_CONNECT.AllDirections";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
 		}
 	}
 
@@ -3033,7 +3793,16 @@ void CNavMesh::CommandNavDisconnect( void )
 			CNavArea *second = m_selectedSet[i];
 			if ( !first->IsConnected( second, NUM_DIRECTIONS ) && !second->IsConnected( first, NUM_DIRECTIONS ) )
 			{
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
+				const char* soundname = "EDIT_CONNECT.AllDirections";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_CONNECT.AllDirections" );
 				bValid = false;
 				break;
 			}
@@ -3049,7 +3818,16 @@ void CNavMesh::CommandNavDisconnect( void )
 				first->Disconnect( second );
 				second->Disconnect( first );
 			}
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
+			const char* soundname = "EDIT_DISCONNECT.MarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
 		}
 	}
 	else if ( m_selectedArea )
@@ -3058,13 +3836,31 @@ void CNavMesh::CommandNavDisconnect( void )
 		{
 			m_markedArea->Disconnect( m_selectedArea );
 			m_selectedArea->Disconnect( m_markedArea );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
+			const char* soundname = "EDIT_DISCONNECT.MarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
 		}
 		else if ( m_selectedSet.Count() == 1 )
 		{
 			m_selectedSet[0]->Disconnect( m_selectedArea );
 			m_selectedArea->Disconnect( m_selectedSet[0] );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
+			const char* soundname = "EDIT_DISCONNECT.MarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
 		}
 		else
 		{
@@ -3072,12 +3868,30 @@ void CNavMesh::CommandNavDisconnect( void )
 			{
 				m_markedLadder->Disconnect( m_selectedArea );
 				m_selectedArea->Disconnect( m_markedLadder );
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
+				const char* soundname = "EDIT_DISCONNECT.MarkedArea";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
 			}
 			else
 			{
 				Msg( "To disconnect areas, mark an area, highlight a second area, then invoke the disconnect command. This will remove all connections between the two areas." );
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.NoMarkedArea" );
+				const char* soundname = "EDIT_DISCONNECT.NoMarkedArea";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.NoMarkedArea" );
 			}
 		}
 	}
@@ -3087,18 +3901,45 @@ void CNavMesh::CommandNavDisconnect( void )
 		{
 			m_markedArea->Disconnect( m_selectedLadder );
 			m_selectedLadder->Disconnect( m_markedArea );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
+			const char* soundname = "EDIT_DISCONNECT.MarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
 		}
 		if ( m_selectedSet.Count() == 1 )
 		{
 			m_selectedSet[0]->Disconnect( m_selectedLadder );
 			m_selectedLadder->Disconnect( m_selectedSet[0] );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
+			const char* soundname = "EDIT_DISCONNECT.MarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
 		}
 		else
 		{
 			Msg( "To disconnect areas, mark an area, highlight a second area, then invoke the disconnect command. This will remove all connections between the two areas." );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.NoMarkedArea" );
+			const char* soundname = "EDIT_DISCONNECT.NoMarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.NoMarkedArea" );
 		}
 	}
 
@@ -3149,7 +3990,16 @@ void CNavMesh::CommandNavDisconnectOutgoingOneWays( void )
 			}
 		}
 	}
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
+	const char* soundname = "EDIT_DISCONNECT.MarkedArea";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_DISCONNECT.MarkedArea" );
 
 	ClearSelectedSet();
 	SetMarkedArea( NULL );			// unmark the mark area
@@ -3173,15 +4023,44 @@ void CNavMesh::CommandNavSplice( void )
 	{
 		if (GetMarkedArea())
 		{
-			if (m_selectedArea->SpliceEdit( GetMarkedArea() ))
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLICE.MarkedArea" );
-			else
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLICE.NoMarkedArea" );
+			if (m_selectedArea->SpliceEdit(GetMarkedArea())) {
+				const char* soundname = "EDIT_SPLICE.MarkedArea";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLICE.MarkedArea");
+			}
+			else {
+				const char* soundname = "EDIT_SPLICE.NoMarkedArea";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLICE.NoMarkedArea");
+			}
 		}
 		else
 		{
 			Msg( "To splice, mark an area, highlight a second area, then invoke the splice command to create an area between them" );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLICE.NoMarkedArea" );
+			const char* soundname = "EDIT_SPLICE.NoMarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_SPLICE.NoMarkedArea" );
 		}
 	}
 
@@ -3231,14 +4110,32 @@ void CNavMesh::CommandNavToggleAttribute( NavAttributeType attribute )
 
 		if ( m_selectedArea )
 		{
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT.ToggleAttribute" );
+			const char* soundname = "EDIT.ToggleAttribute";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT.ToggleAttribute" );
 			DoToggleAttribute( m_selectedArea, attribute );			
 		}
 	}
 	else
 	{
 		// toggle the attribute in all areas in the selected set
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT.ToggleAttribute" );
+		const char* soundname = "EDIT.ToggleAttribute";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT.ToggleAttribute" );
 
 		FOR_EACH_VEC( m_selectedSet, it )
 		{
@@ -3273,7 +4170,16 @@ void CNavMesh::CommandNavTogglePlaceMode( void )
 		SetEditMode( PLACE_PAINTING );
 	}
 
-	g_pSoundEmitterSystem->EmitSound(player, "EDIT_TOGGLE_PLACE_MODE" );
+	const char* soundname = "EDIT_TOGGLE_PLACE_MODE";
+	CPASAttenuationFilter filter(player, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(player, "EDIT_TOGGLE_PLACE_MODE" );
 
 	SetMarkedArea( NULL );			// unmark the mark area
 	m_markedCorner = NUM_CORNERS;	// clear the corner selection
@@ -3338,7 +4244,16 @@ void CNavMesh::CommandNavPlacePick( void )
 
 	if ( m_selectedArea )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_PLACE_PICK" );
+		const char* soundname = "EDIT_PLACE_PICK";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_PLACE_PICK" );
 		TheNavMesh->SetNavPlace( m_selectedArea->GetPlace() );
 	}
 
@@ -3364,13 +4279,31 @@ void CNavMesh::CommandNavTogglePlacePainting( void )
 		if (m_isPlacePainting)
 		{
 			m_isPlacePainting = false;
-			g_pSoundEmitterSystem->EmitSound(player, "Bot.EditSwitchOff" );
+			const char* soundname = "Bot.EditSwitchOff";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "Bot.EditSwitchOff" );
 		}
 		else
 		{
 			m_isPlacePainting = true;
 
-			g_pSoundEmitterSystem->EmitSound(player, "Bot.EditSwitchOn" );
+			const char* soundname = "Bot.EditSwitchOn";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "Bot.EditSwitchOn" );
 
 			// paint the initial area
 			m_selectedArea->SetPlace( TheNavMesh->GetNavPlace() );
@@ -3398,7 +4331,16 @@ void CNavMesh::CommandNavMarkUnnamed( void )
 	{
 		if (GetMarkedArea())
 		{
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK_UNNAMED.Enable" );
+			const char* soundname = "EDIT_MARK_UNNAMED.Enable";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK_UNNAMED.Enable" );
 			SetMarkedArea( NULL );
 		}
 		else
@@ -3416,11 +4358,29 @@ void CNavMesh::CommandNavMarkUnnamed( void )
 			}
 			if ( !GetMarkedArea() )
 			{
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK_UNNAMED.NoMarkedArea" );
+				const char* soundname = "EDIT_MARK_UNNAMED.NoMarkedArea";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK_UNNAMED.NoMarkedArea" );
 			}
 			else
 			{
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK_UNNAMED.MarkedArea" );
+				const char* soundname = "EDIT_MARK_UNNAMED.MarkedArea";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MARK_UNNAMED.MarkedArea" );
 
 				int connected = 0;
 				connected += GetMarkedArea()->GetAdjacentCount( NORTH );
@@ -3465,11 +4425,29 @@ void CNavMesh::CommandNavCornerSelect( void )
 		{
 			int corner = (m_markedCorner + 1) % (NUM_CORNERS + 1);
 			m_markedCorner = (NavCornerType)corner;
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_SELECT_CORNER.MarkedArea" );
+			const char* soundname = "EDIT_SELECT_CORNER.MarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_SELECT_CORNER.MarkedArea" );
 		}
 		else
 		{
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_SELECT_CORNER.NoMarkedArea" );
+			const char* soundname = "EDIT_SELECT_CORNER.NoMarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_SELECT_CORNER.NoMarkedArea" );
 		}
 	}
 }
@@ -3501,18 +4479,45 @@ void CNavMesh::CommandNavCornerRaise( const CCommand &args )
 			if (GetMarkedArea())
 			{
 				GetMarkedArea()->RaiseCorner( m_markedCorner, amount );
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
+				const char* soundname = "EDIT_MOVE_CORNER.MarkedArea";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
 			}
 			else
 			{
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.NoMarkedArea" );
+				const char* soundname = "EDIT_MOVE_CORNER.NoMarkedArea";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.NoMarkedArea" );
 			}
 		}
 	}
 	else
 	{
 		// raise all areas in the selected set
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
+		const char* soundname = "EDIT_MOVE_CORNER.MarkedArea";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
 
 		FOR_EACH_VEC( m_selectedSet, it )
 		{
@@ -3552,18 +4557,45 @@ void CNavMesh::CommandNavCornerLower( const CCommand &args )
 			if (GetMarkedArea())
 			{
 				GetMarkedArea()->RaiseCorner( m_markedCorner, amount );
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
+				const char* soundname = "EDIT_MOVE_CORNER.MarkedArea";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
 			}
 			else
 			{
-				g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.NoMarkedArea" );
+				const char* soundname = "EDIT_MOVE_CORNER.NoMarkedArea";
+				CPASAttenuationFilter filter(player, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.NoMarkedArea" );
 			}
 		}
 	}
 	else
 	{
 		// raise all areas in the selected set
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
+		const char* soundname = "EDIT_MOVE_CORNER.MarkedArea";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
 
 		FOR_EACH_VEC( m_selectedSet, it )
 		{
@@ -3608,17 +4640,44 @@ void CNavMesh::CommandNavCornerPlaceOnGround( const CCommand &args )
 			{
 				m_selectedArea->PlaceOnGround( NUM_CORNERS, inset );
 			}
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
+			const char* soundname = "EDIT_MOVE_CORNER.MarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
 		}
 		else
 		{
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.NoMarkedArea" );
+			const char* soundname = "EDIT_MOVE_CORNER.NoMarkedArea";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.NoMarkedArea" );
 		}
 	}
 	else
 	{
 		// snap all areas in the selected set to the ground
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
+		const char* soundname = "EDIT_MOVE_CORNER.MarkedArea";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
 
 		FOR_EACH_VEC( m_selectedSet, it )
 		{
@@ -3656,12 +4715,30 @@ void CNavMesh::CommandNavWarpToMark( void )
 		if ( ( player->IsDead() || player->IsObserver() ) && player->GetObserverMode() == OBS_MODE_ROAMING )
 		{
 			UTIL_SetOrigin( player, origin );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_WARP_TO_MARK" );
+			const char* soundname = "EDIT_WARP_TO_MARK";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_WARP_TO_MARK" );
 		}
 		else
 		{
 			player->Teleport( &origin, &angles, &vec3_origin );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_WARP_TO_MARK" );
+			const char* soundname = "EDIT_WARP_TO_MARK";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_WARP_TO_MARK" );
 		}
 	}
 	else if ( GetMarkedLadder() )
@@ -3676,17 +4753,44 @@ void CNavMesh::CommandNavWarpToMark( void )
 		if ( ( player->IsDead() || player->IsObserver() ) && player->GetObserverMode() == OBS_MODE_ROAMING )
 		{
 			UTIL_SetOrigin( player, origin );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_WARP_TO_MARK" );
+			const char* soundname = "EDIT_WARP_TO_MARK";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_WARP_TO_MARK" );
 		}
 		else
 		{
 			player->Teleport( &origin, &angles, &vec3_origin );
-			g_pSoundEmitterSystem->EmitSound(player, "EDIT_WARP_TO_MARK" );
+			const char* soundname = "EDIT_WARP_TO_MARK";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "EDIT_WARP_TO_MARK" );
 		}
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_WARP_TO_MARK" );
+		const char* soundname = "EDIT_WARP_TO_MARK";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_WARP_TO_MARK" );
 	}
 }
 
@@ -3708,7 +4812,16 @@ void CNavMesh::CommandNavLadderFlip( void )
 		CNavArea *area;
 
 		// flip direction
-		g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
+		const char* soundname = "EDIT_MOVE_CORNER.MarkedArea";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "EDIT_MOVE_CORNER.MarkedArea" );
 		m_selectedLadder->SetDir( OppositeDirection( m_selectedLadder->GetDir() ) );
 
 		// and reverse ladder's area pointers

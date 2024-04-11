@@ -1071,8 +1071,30 @@ void CAntlionTemplateMaker::DoBlockedEffects( CBaseEntity *pBlocker, Vector vOri
 			pPhysObj->ApplyForceCenter( vecForce );
 
 			UTIL_CreateAntlionDust( vOrigin, vec3_angle, true );
-			g_pSoundEmitterSystem->EmitSound(pBlocker, "NPC_Antlion.MeleeAttackSingle_Muffled" );//pBlocker->
-			g_pSoundEmitterSystem->EmitSound(pBlocker, "NPC_Antlion.TrappedMetal" );//pBlocker->
+			{
+				const char* soundname = "NPC_Antlion.MeleeAttackSingle_Muffled";
+				CPASAttenuationFilter filter(pBlocker, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, pBlocker->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(pBlocker, "NPC_Antlion.MeleeAttackSingle_Muffled");//pBlocker->
+			}
+			{
+				const char* soundname = "NPC_Antlion.TrappedMetal";
+				CPASAttenuationFilter filter(pBlocker, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, pBlocker->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(pBlocker, "NPC_Antlion.TrappedMetal");//pBlocker->
+			}
 
 
 			m_flBlockedBumpTime = gpGlobals->curtime + random->RandomFloat( 1.75, 2.75 );

@@ -167,7 +167,15 @@ void CAlyxEmpEffect::InputStartCharge( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CAlyxEmpEffect::StartCharge( float flDuration )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Charge" );
+	const char* soundname = "AlyxEmp.Charge";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_nState = (int)ALYXEMP_STATE_CHARGING;
 	m_flDuration = flDuration;
@@ -190,7 +198,15 @@ void CAlyxEmpEffect::InputStartDischarge( inputdata_t &inputdata )
 
 void CAlyxEmpEffect::StartDischarge()
 {
-	g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Discharge" );
+	const char* soundname = "AlyxEmp.Discharge";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_nState = (int)ALYXEMP_STATE_DISCHARGING;
 	m_flStartTime = gpGlobals->curtime;
@@ -243,7 +259,15 @@ void CAlyxEmpEffect::InputStop( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CAlyxEmpEffect::Stop( float flDuration )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Stop" );
+	const char* soundname = "AlyxEmp.Stop";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_nState = (int)ALYXEMP_STATE_OFF;
 	m_flDuration = flDuration;

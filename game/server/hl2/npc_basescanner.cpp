@@ -830,7 +830,15 @@ void CNPC_BaseScanner::ScannerEmitSound( const char *pszSoundName )
 
 	m_bHasSpoken = true;
 
-	g_pSoundEmitterSystem->EmitSound(this, snd.Access() );
+	const char* soundname = snd.Access();
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //------------------------------------------------------------------------------

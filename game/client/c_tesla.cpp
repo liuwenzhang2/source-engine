@@ -45,7 +45,15 @@ void C_Tesla::ReceiveMessage( int classID, bf_read &msg )
 	teslaInfo.m_flTimeVisible = msg.ReadFloat();
 	teslaInfo.m_pszSpriteName = m_iszSpriteName;
 
-	g_pSoundEmitterSystem->EmitSound(this, m_SoundName );
+	const char* soundname = m_SoundName;
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_QueuedCommands.AddToTail( teslaInfo );
 	SetNextClientThink( CLIENT_THINK_ALWAYS );

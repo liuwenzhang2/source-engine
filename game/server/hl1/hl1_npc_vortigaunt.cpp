@@ -197,7 +197,7 @@ void CNPC_Vortigaunt::PainSound( const CTakeDamageInfo &info )
 		CSoundParameters params;
 		if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.Pain", params, NULL ) )
 		{
-			EmitSound_t ep( params );
+			EmitSound_t ep( params, gpGlobals->curtime);
 			params.pitch = m_iVoicePitch;
 
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
@@ -215,7 +215,7 @@ void CNPC_Vortigaunt::DeathSound( const CTakeDamageInfo &info )
 	CSoundParameters params;
 	if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.Die", params, NULL ) )
 	{
-		EmitSound_t ep( params );
+		EmitSound_t ep( params, gpGlobals->curtime);
 		params.pitch = m_iVoicePitch;
 
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
@@ -288,7 +288,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 				CSoundParameters params;
 				if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.AttackHit", params, NULL ) )
 				{
-					EmitSound_t ep( params );
+					EmitSound_t ep( params, gpGlobals->curtime);
 					params.pitch = m_iVoicePitch;
 
 					g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
@@ -300,7 +300,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 				CSoundParameters params;
 				if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.AttackMiss", params, NULL ) )
 				{
-					EmitSound_t ep( params );
+					EmitSound_t ep( params, gpGlobals->curtime);
 					params.pitch = m_iVoicePitch;
 
 					g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
@@ -321,7 +321,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 				CSoundParameters params;
 				if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.AttackHit", params, NULL ) )
 				{
-					EmitSound_t ep( params );
+					EmitSound_t ep( params, gpGlobals->curtime);
 					params.pitch = m_iVoicePitch;
 
 					g_pSoundEmitterSystem->EmitSound( filter2, entindex(), ep );
@@ -332,7 +332,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 				CSoundParameters params;
 				if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.AttackMiss", params, NULL ) )
 				{
-					EmitSound_t ep( params );
+					EmitSound_t ep( params, gpGlobals->curtime);
 					params.pitch = m_iVoicePitch;
 
 					g_pSoundEmitterSystem->EmitSound( filter2, entindex(), ep );
@@ -369,7 +369,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 			CSoundParameters params;
 			if (g_pSoundEmitterSystem->GetParametersForSound( "Vortigaunt.ZapPowerup", params, NULL ) )
 			{
-				EmitSound_t ep( params );
+				EmitSound_t ep( params, gpGlobals->curtime);
 				ep.m_nPitch = 100 + m_iBeams * 10;
 				g_pSoundEmitterSystem->EmitSound( filter3, entindex(), ep );
 			}

@@ -825,11 +825,27 @@ void CBasePlayer::DeathSound( const CTakeDamageInfo &info )
 	if ( m_bitsDamageType & DMG_FALL )
 	{
 		// They died in the fall. Play a splat sound.
-		g_pSoundEmitterSystem->EmitSound(this, "Player.FallGib" );
+		const char* soundname = "Player.FallGib";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Player.Death" );
+		const char* soundname = "Player.Death";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	// play one of the suit death alarms
@@ -997,16 +1013,40 @@ void CBasePlayer::DamageEffect(float flDamage, int fDamageType)
 		//ViewPunch(QAngle(random->RandomInt(-0.1,0.1), random->RandomInt(-0.1,0.1), random->RandomInt(-0.1,0.1)));
 
 		// Burn sound 
-		g_pSoundEmitterSystem->EmitSound(this, "Player.PlasmaDamage" );
+		const char* soundname = "Player.PlasmaDamage";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else if (fDamageType & DMG_SONIC)
 	{
 		// Sonic damage sound 
-		g_pSoundEmitterSystem->EmitSound(this, "Player.SonicDamage" );
+		const char* soundname = "Player.SonicDamage";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else if ( fDamageType & DMG_BULLET )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Flesh.BulletImpact" );
+		const char* soundname = "Flesh.BulletImpact";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -1949,7 +1989,15 @@ void CBasePlayer::WaterMove()
 		
 		if (m_AirFinished < gpGlobals->curtime)
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "Player.DrownStart" );
+			const char* soundname = "Player.DrownStart";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 
 		m_AirFinished = gpGlobals->curtime + AIRTIME;
@@ -5592,7 +5640,15 @@ void CSprayCan::Spawn ( CBasePlayer *pOwner )
 	SetLocalAngles( pOwner->EyeAngles() );
 	SetOwnerEntity( pOwner );
 	SetNextThink( gpGlobals->curtime );
-	g_pSoundEmitterSystem->EmitSound(this, "SprayCan.Paint" );
+	const char* soundname = "SprayCan.Paint";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 void CSprayCan::Precache()

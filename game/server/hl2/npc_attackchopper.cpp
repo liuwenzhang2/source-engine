@@ -2255,7 +2255,15 @@ bool CNPC_AttackHelicopter::DoGunIdle( const Vector &vGunDir, const Vector &vTar
 	if ( ( m_nAttackMode == ATTACK_MODE_BULLRUSH_VEHICLE ) && 
 		( IsInSecondaryMode( BULLRUSH_MODE_SHOOT_GUN ) || IsInSecondaryMode(BULLRUSH_MODE_SHOOT_IDLE_PLAYER) ) )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.ChargeGun" );
+		const char* soundname = "NPC_AttackHelicopter.ChargeGun";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flChargeTime = gpGlobals->curtime + CHOPPER_GUN_CHARGE_TIME;
 		m_nGunState = GUN_STATE_CHARGING;
 		m_flCircleOfDeathRadius = CHOPPER_MAX_CIRCLE_OF_DEATH_RADIUS;
@@ -2299,7 +2307,15 @@ bool CNPC_AttackHelicopter::DoGunIdle( const Vector &vGunDir, const Vector &vTar
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.ChargeGun" );
+		const char* soundname = "NPC_AttackHelicopter.ChargeGun";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		float flChargeTime = CHOPPER_GUN_CHARGE_TIME;
 		float flVariance = flChargeTime * 0.1f;
 		m_flChargeTime = gpGlobals->curtime + random->RandomFloat(flChargeTime - flVariance, flChargeTime + flVariance);
@@ -2551,7 +2567,15 @@ void CNPC_AttackHelicopter::FireElectricityGun( )
 	if ( m_flNextAttack > gpGlobals->curtime )
 		return;
 
-	g_pSoundEmitterSystem->EmitSound(this, "ReallyLoudSpark" );
+	const char* soundname = "ReallyLoudSpark";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	CBaseEntity *ppEnts[256];
 	Vector vecCenter = WorldSpaceCenter();
@@ -2838,7 +2862,15 @@ void CNPC_AttackHelicopter::CreateBomb( bool bCheckForFairness, Vector *pVecVelo
 	}
 
 	AddGesture( (Activity)ACT_HELICOPTER_DROP_BOMB );
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.DropMine" );
+	const char* soundname = "NPC_AttackHelicopter.DropMine";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Make the bomb and send it off
 	CGrenadeHelicopter *pGrenade = SpawnBombEntity( vTipPos, vecActualVelocity );
@@ -3414,7 +3446,15 @@ void CNPC_AttackHelicopter::ExplodeAndThrowChunk( const Vector &vecExplosionPos 
 	data.m_vOrigin = vecExplosionPos;
 	DispatchEffect( "HelicopterMegaBomb", data );
 
-	g_pSoundEmitterSystem->EmitSound(this, "BaseExplosionEffect.Sound" );
+	const char* soundname = "BaseExplosionEffect.Sound";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	UTIL_ScreenShake( vecExplosionPos, 25.0, 150.0, 1.0, 750.0f, SHAKE_START );
 
@@ -3583,7 +3623,15 @@ int CNPC_AttackHelicopter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		{
 			if (( nPrevHealth > m_flNextMegaBombHealth ) && (GetHealth() <= m_flNextMegaBombHealth) ) 
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.BadlyDamagedAlert" );
+				const char* soundname = "NPC_AttackHelicopter.BadlyDamagedAlert";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 		}
 
@@ -3750,7 +3798,15 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 
 	m_lifeState = LIFE_DEAD;
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineGunship.Explode" );
+	const char* soundname = "NPC_CombineGunship.Explode";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	SetThink( &CNPC_AttackHelicopter::SUB_Remove );
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -4515,7 +4571,15 @@ void CNPC_AttackHelicopter::UpdateBullrushState( void )
 				m_flNextMegaBombHealth -= GetMaxHealth() * g_helicopter_bullrush_mega_bomb_health.GetFloat();
 				m_flNextBullrushBombTime = gpGlobals->curtime;
 				SetSecondaryMode( BULLRUSH_MODE_MEGA_BOMB );
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.MegabombAlert" );
+				const char* soundname = "NPC_AttackHelicopter.MegabombAlert";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			else
 			{
@@ -5315,7 +5379,15 @@ void CGrenadeHelicopter::VPhysicsCollision( int index, gamevcollisionevent_t *pE
 		float flImpactSpeed = pEvent->preVelocity->Length();
 		if( flImpactSpeed > 400.0f && pEvent->pEntities[ 1 ]->IsWorld() )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopterGrenade.HardImpact" );
+			const char* soundname = "NPC_AttackHelicopterGrenade.HardImpact";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 	}
 }
@@ -5965,7 +6037,15 @@ void CHelicopterChunk::FallThink( void )
 		data.m_vOrigin = GetAbsOrigin() + RandomVector( -64, 64 );
 		DispatchEffect( "HelicopterMegaBomb", data );
 
-		g_pSoundEmitterSystem->EmitSound(this, "BaseExplosionEffect.Sound" );
+		const char* soundname = "BaseExplosionEffect.Sound";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -6034,7 +6114,15 @@ void CHelicopterChunk::CollisionCallback( CHelicopterChunk *pCaller )
 		}
 
 		// Make a loud noise
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_AttackHelicopter.Crash" );
+		const char* soundname = "NPC_AttackHelicopter.Crash";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		m_bLanded = true;
 	}

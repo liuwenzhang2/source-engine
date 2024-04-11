@@ -448,7 +448,15 @@ void CNPC_CombineCamera::Deploy()
 	m_flPlaybackRate = 0;
 	SetThink(&CNPC_CombineCamera::SearchThink);
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Move");
+	const char* soundname = "NPC_CombineCamera.Move";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -507,7 +515,15 @@ bool CNPC_CombineCamera::UpdateFacing()
 
 	if (bMoved && (m_flMoveSoundTime < gpGlobals->curtime))
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Move");
+		const char* soundname = "NPC_CombineCamera.Move";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flMoveSoundTime = gpGlobals->curtime + CAMERA_MOVE_INTERVAL;
 	}
 
@@ -624,7 +640,15 @@ void CNPC_CombineCamera::ActiveThink()
 	{
 		// Nobody suspicious. Go back to being idle.
 		m_hEnemyTarget = NULL;
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.BecomeIdle");
+		const char* soundname = "NPC_CombineCamera.BecomeIdle";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		SetAngry(false);
 		SetThink(&CNPC_CombineCamera::SearchThink);
 		SetNextThink( gpGlobals->curtime );
@@ -651,7 +675,15 @@ void CNPC_CombineCamera::ActiveThink()
 				}
 				else
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Active");
+					const char* soundname = "NPC_CombineCamera.Active";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 
 				m_OnFoundPlayer.Set(pTarget, pTarget, this);
@@ -750,7 +782,15 @@ void CNPC_CombineCamera::MaintainEye()
 			m_pEyeFlash->SetBrightness(255);
 			m_pEyeFlash->SetColor(255,255,255);
 
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Click");
+			const char* soundname = "NPC_CombineCamera.Click";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			m_flTurnOffEyeFlashTime = gpGlobals->curtime + 0.1;
 			m_flClickTime = gpGlobals->curtime + CAMERA_CLICK_INTERVAL;
@@ -948,7 +988,15 @@ void CNPC_CombineCamera::Ping()
 		return;
 
 	// Ping!
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Ping");
+	const char* soundname = "NPC_CombineCamera.Ping";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	m_flPingTime = gpGlobals->curtime + COMBINE_CAMERA_PING_TIME;
 }
 
@@ -1029,7 +1077,15 @@ void CNPC_CombineCamera::SetAngry(bool bAngry)
 		m_bAngry = true;
 		m_nClickCount = 0;
 		m_flClickTime = gpGlobals->curtime + 0.4;
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Angry");
+		const char* soundname = "NPC_CombineCamera.Angry";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		SetEyeState(CAMERA_EYE_ANGRY);
 	}
 	else if ((!bAngry) && (m_bAngry))
@@ -1076,7 +1132,17 @@ void CNPC_CombineCamera::DeathThink()
 	{
 		m_lifeState = LIFE_DEAD;
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineCamera.Die");
+		{
+			const char* soundname = "NPC_CombineCamera.Die";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		}
 
 		// lots of smoke
 		Vector pos;

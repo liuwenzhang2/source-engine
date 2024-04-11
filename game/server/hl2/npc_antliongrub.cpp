@@ -523,7 +523,15 @@ void CAntlionGrub::MakeIdleSounds( void )
 	{
 		if ( m_flNextSquealSoundTime < gpGlobals->curtime )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion_Grub.Stimulated" );
+			const char* soundname = "NPC_Antlion_Grub.Stimulated";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_flNextSquealSoundTime = gpGlobals->curtime + random->RandomFloat( 1.5f, 3.0f );
 			m_flNextIdleSoundTime = gpGlobals->curtime + random->RandomFloat( 4.0f, 8.0f );
 		}
@@ -532,7 +540,15 @@ void CAntlionGrub::MakeIdleSounds( void )
 	{
 		if ( m_flNextIdleSoundTime < gpGlobals->curtime )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion_Grub.Idle" );
+			const char* soundname = "NPC_Antlion_Grub.Idle";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_flNextIdleSoundTime = gpGlobals->curtime + random->RandomFloat( 8.0f, 12.0f );
 		}
 	}
@@ -761,9 +777,28 @@ void CAntlionGrub::Squash( CBaseEntity *pOther, bool bDealDamage, bool bSpawnBlo
 		FadeGlow();
 		m_hGlowSprite->GetEngineObject()->SetParent( NULL );
 	}
+	{
+		const char* soundname = "NPC_Antlion_Grub.Die";
+		CPASAttenuationFilter filter(this, soundname);
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion_Grub.Die" );
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion_Grub.Squish" );
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
+	{
+		const char* soundname = "NPC_Antlion_Grub.Squish";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
 
 	// if vort stepped on me, maybe he wants to say something
 	if ( pOther && FClassnameIs( pOther, "npc_vortigaunt" ) )
@@ -973,7 +1008,15 @@ void CGrubNugget::Event_Killed( const CTakeDamageInfo &info )
 {
 	AddEffects( EF_NODRAW );
 	DispatchParticleEffect( "antlion_spit_player", GetAbsOrigin(), QAngle( -90, 0, 0 ) );
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion_Grub.Explode" );
+	const char* soundname = "NPC_Antlion_Grub.Explode";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	BaseClass::Event_Killed( info );
 }

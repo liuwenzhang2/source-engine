@@ -248,7 +248,15 @@ void CTriggerWeaponDissolve::DissolveThink( void )
 			PhysCannonBeginUpgrade( pWeapon );
 			m_OnChargingPhyscannon.FireOutput( this, this );
 
-			g_pSoundEmitterSystem->EmitSound(this, "WeaponDissolve.Beam" );
+			const char* soundname = "WeaponDissolve.Beam";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			// We're done
 			m_pWeapons.Purge();
@@ -264,11 +272,21 @@ void CTriggerWeaponDissolve::DissolveThink( void )
 
 		m_OnDissolveWeapon.FireOutput( this, this );
 
-		CPASAttenuationFilter filter( pWeapon );
-		g_pSoundEmitterSystem->EmitSound( filter, pWeapon->entindex(), "WeaponDissolve.Dissolve" );
+		{
+			CPASAttenuationFilter filter(pWeapon);
+			g_pSoundEmitterSystem->EmitSound(filter, pWeapon->entindex(), "WeaponDissolve.Dissolve");
+		}
 		
 		// Beam looping sound
-		g_pSoundEmitterSystem->EmitSound(this, "WeaponDissolve.Beam" );
+		const char* soundname = "WeaponDissolve.Beam";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		m_pWeapons.Remove( i );
 		SetContextThink( &CTriggerWeaponDissolve::DissolveThink, gpGlobals->curtime + random->RandomFloat( 0.5f, 1.5f ), s_pDissolveThinkContext );

@@ -31,19 +31,22 @@ CRecipientFilter::~CRecipientFilter()
 // Purpose: 
 // Input  : src - 
 //-----------------------------------------------------------------------------
-void CRecipientFilter::CopyFrom( const CRecipientFilter& src )
+void CRecipientFilter::CopyFrom( const IRecipientFilter* src )
 {
-	m_bReliable = src.IsReliable();
-	m_bInitMessage = src.IsInitMessage();
-
-	m_bUsingPredictionRules = src.IsUsingPredictionRules();
-	m_bIgnorePredictionCull = src.IgnorePredictionCull();
-
-	int c = src.GetRecipientCount();
-	for ( int i = 0; i < c; ++i )
+	m_bReliable = src->IsReliable();
+	m_bInitMessage = src->IsInitMessage();
+	int c = src->GetRecipientCount();
+	for (int i = 0; i < c; ++i)
 	{
-		m_Recipients.AddToTail( src.GetRecipientIndex( i ) );
+		m_Recipients.AddToTail(src->GetRecipientIndex(i));
 	}
+
+	const CRecipientFilter* pSrc = dynamic_cast<const CRecipientFilter*>(src);
+	if (pSrc) {
+		m_bUsingPredictionRules = pSrc->IsUsingPredictionRules();
+		m_bIgnorePredictionCull = pSrc->IgnorePredictionCull();
+	}
+
 }
 
 //-----------------------------------------------------------------------------

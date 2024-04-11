@@ -108,7 +108,16 @@ void CWeaponScout::SecondaryAttack()
 	//=============================================================================
 	if ( GetPlayerOwner() )
 	{
-		g_pSoundEmitterSystem->EmitSound(GetPlayerOwner(), "Default.Zoom" ); // zoom sound//GetPlayerOwner()->
+		const char* soundname = "Default.Zoom";
+		CPASAttenuationFilter filter(GetPlayerOwner(), soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, GetPlayerOwner()->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(GetPlayerOwner(), "Default.Zoom" ); // zoom sound//GetPlayerOwner()->
 	}
 	//=============================================================================
 	// HPE_END

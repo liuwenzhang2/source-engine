@@ -320,7 +320,7 @@ a list of all CBaseEntitys is kept in gEntList
 //CBaseNetworkable *CreateNetworkableByName( const char *className );
 
 // creates an entity and calls all the necessary spawn functions
-extern void SpawnEntityByName( const char *className, CEntityMapData *mapData = NULL );
+//extern void SpawnEntityByName( const char *className, CEntityMapData *mapData = NULL );
 
 // calls the spawn functions for an entity
 extern int DispatchSpawn( CBaseEntity *pEntity );
@@ -1550,7 +1550,7 @@ public:
 	//static void					StopSound(CBaseEntity* pEntity, const char *soundname, HSOUNDSCRIPTHANDLE& handle );
 	//static void					GenderExpandString(CBaseEntity* pEntity, char const *in, char *out, int maxlen );
 
-	virtual void ModifyEmitSoundParams( EmitSound_t &params );
+	//virtual void ModifyEmitSoundParams( EmitSound_t &params );
 
 	//static float GetSoundDuration( const char *soundname, char const *actormodel );
 
@@ -1576,7 +1576,7 @@ public:
 
 	// For each client who appears to be a valid recipient, checks the client has disabled CC and if so, removes them from 
 	//  the recipient list.
-	static void RemoveRecipientsIfNotCloseCaptioning( CRecipientFilter& filter );
+	//static void RemoveRecipientsIfNotCloseCaptioning( CRecipientFilter& filter );
 	//static void EmitCloseCaption( IRecipientFilter& filter, int entindex, char const *token, CUtlVector< Vector >& soundorigins, float duration, bool warnifmissing = false );
 	static void	EmitSentenceByIndex( IRecipientFilter& filter, int iEntIndex, int iChannel, int iSentenceIndex, 
 		float flVolume, soundlevel_t iSoundlevel, int iFlags = 0, int iPitch = PITCH_NORM,

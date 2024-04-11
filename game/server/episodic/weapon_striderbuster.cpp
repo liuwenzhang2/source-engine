@@ -453,7 +453,15 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 				SetOwnerEntity( pFollowParent );
 
 				// Make a sound
-				g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.StickToEntity" );
+				const char* soundname = "Weapon_StriderBuster.StickToEntity";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				
 				DispatchParticleEffect( "striderbuster_attach", GetAbsOrigin(), GetAbsAngles(), NULL );
 
@@ -664,12 +672,28 @@ void CWeaponStriderBuster::Detonate( void )
 	if ( !m_bDud )
 	{
 		CreateDestroyedEffect();
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.Detonate" );
+		const char* soundname = "Weapon_StriderBuster.Detonate";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
 		DispatchParticleEffect( "striderbuster_explode_dummy_core", GetAbsOrigin(), GetAbsAngles() );
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.Dud_Detonate" );
+		const char* soundname = "Weapon_StriderBuster.Dud_Detonate";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	// Go to bits!
@@ -748,7 +772,15 @@ int CWeaponStriderBuster::OnTakeDamage( const CTakeDamageInfo &info )
 				{
 					// Destroy the buster in place
 					// Make sure they know it blew up prematurely.
-					g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.Dud_Detonate" );
+					const char* soundname = "Weapon_StriderBuster.Dud_Detonate";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 					DispatchParticleEffect( "striderbuster_break_flechette", GetAbsOrigin(), GetAbsAngles() );
 					SetHealth( 0 );
 
@@ -1029,7 +1061,15 @@ void CWeaponStriderBuster::BusterDetachThink()
 	if( fabs(tr.startpos.z - tr.endpos.z) < 240.0f )
 	{
 		SetThink(NULL);
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.Dud_Detonate" );
+		const char* soundname = "Weapon_StriderBuster.Dud_Detonate";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		DispatchParticleEffect( "striderbuster_break_flechette", GetAbsOrigin(), GetAbsAngles() );
 		SetHealth( 0 );
 		CTakeDamageInfo info;
@@ -1044,7 +1084,15 @@ void CWeaponStriderBuster::BusterDetachThink()
 //-----------------------------------------------------------------------------
 void CWeaponStriderBuster::BusterPingThink()
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_StriderBuster.Ping" );
+	const char* soundname = "Weapon_StriderBuster.Ping";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	SetContextThink( &CWeaponStriderBuster::BusterPingThink, gpGlobals->curtime + BUSTER_PING_SOUND_FREQ, s_pBusterPingThinkContext );
 }

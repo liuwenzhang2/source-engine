@@ -328,7 +328,15 @@ void CWeaponMG42::PrimaryAttack( void )
 		m_bOverheated = true;
 		m_bInAttack = true;
 
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_Mg42.OverHeat" );
+		const char* soundname = "Weapon_Mg42.OverHeat";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 

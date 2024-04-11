@@ -1766,7 +1766,16 @@ void CBaseServerVehicle::PlaySound( const char *pSound )
 	{
 		Msg("Playing non-looping vehicle sound: %s\n", pSound );
 	}
-	g_pSoundEmitterSystem->EmitSound(m_pVehicle, pSound );//m_pVehicle->
+	const char* soundname = pSound;
+	CPASAttenuationFilter filter(m_pVehicle, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, m_pVehicle->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(m_pVehicle, pSound );//m_pVehicle->
 }
 
 void CBaseServerVehicle::StopLoopingSound( float fadeTime )

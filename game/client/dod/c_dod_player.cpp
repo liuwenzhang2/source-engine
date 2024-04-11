@@ -779,7 +779,15 @@ void C_DODPlayer::OnAchievementAchieved( int iAchievement )
 
 	if ( dod_playachievementsound.GetBool() )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Achievement.Earned" );
+		const char* soundname = "Achievement.Earned";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	BaseClass::OnAchievementAchieved( iAchievement );

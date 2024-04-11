@@ -166,7 +166,15 @@ void CWeaponPortalgun::SetCanFirePortal1( bool bCanFire /*= true*/ )
 
 	pOwner->ViewPunch( QAngle( random->RandomFloat( -1, -0.5f ), random->RandomFloat( -1, 1 ), 0 ) );
 
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_Portalgun.powerup" );
+	const char* soundname = "Weapon_Portalgun.powerup";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 void CWeaponPortalgun::SetCanFirePortal2( bool bCanFire /*= true*/ )
@@ -196,7 +204,15 @@ void CWeaponPortalgun::SetCanFirePortal2( bool bCanFire /*= true*/ )
 
 	pOwner->ViewPunch( QAngle( random->RandomFloat( -1, -0.5f ), random->RandomFloat( -1, 1 ), 0 ) );
 
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_Portalgun.powerup" );
+	const char* soundname = "Weapon_Portalgun.powerup";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------

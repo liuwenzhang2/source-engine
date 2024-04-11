@@ -581,7 +581,15 @@ void CSatchelCharge::BounceSound( void )
 {
 	if ( gpGlobals->curtime > m_flNextBounceSoundTime )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "SatchelCharge.Bounce" );
+		const char* soundname = "SatchelCharge.Bounce";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		m_flNextBounceSoundTime = gpGlobals->curtime + 0.1;
 	}

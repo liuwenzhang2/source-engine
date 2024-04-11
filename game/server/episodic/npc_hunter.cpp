@@ -588,7 +588,15 @@ void CHunterFlechette::Precache()
 //-----------------------------------------------------------------------------
 void CHunterFlechette::StickTo( CBaseEntity *pOther, trace_t &tr )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechetteHitWorld" );
+	const char* soundname = "NPC_Hunter.FlechetteHitWorld";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	SetMoveType( MOVETYPE_NONE );
 	
@@ -699,7 +707,15 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 		SetAbsVelocity( Vector( 0, 0, 0 ) );
 
 		// play body "thwack" sound
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechetteHitBody" );
+		const char* soundname = "NPC_Hunter.FlechetteHitBody";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		StopParticleEffects( this );
 
@@ -824,7 +840,15 @@ void CHunterFlechette::DopplerThink()
 
 	if ( flPlayerDot <= flMyDot )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechetteNearMiss" );
+		const char* soundname = "NPC_Hunter.FlechetteNearMiss";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		
 		// We've played the near miss sound and we're not seeking. Stop thinking.
 		SetThink( NULL );
@@ -871,7 +895,15 @@ void CHunterFlechette::Shoot( Vector &vecVelocity, bool bBrightFX )
 //-----------------------------------------------------------------------------
 void CHunterFlechette::DangerSoundThink()
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechettePreExplode" );
+	const char* soundname = "NPC_Hunter.FlechettePreExplode";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	CSoundEnt::InsertSound( SOUND_DANGER|SOUND_CONTEXT_EXCLUDE_COMBINE, GetAbsOrigin(), 150.0f, 0.5, this );
 	SetThink( &CHunterFlechette::ExplodeThink );
@@ -896,7 +928,15 @@ void CHunterFlechette::Explode()
 	// Don't catch self in own explosion!
 	m_takedamage = DAMAGE_NO;
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechetteExplode" );
+	const char* soundname = "NPC_Hunter.FlechetteExplode";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	
 	// Move the explosion effect to the tip to reduce intersection with the world.
 	Vector vecFuse;
@@ -1900,11 +1940,27 @@ void CNPC_Hunter::IdleSound()
 {
 	if ( HasCondition( COND_LOST_ENEMY ) )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Scan" );
+		const char* soundname = "NPC_Hunter.Scan";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Idle" );
+		const char* soundname = "NPC_Hunter.Idle";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -2767,7 +2823,15 @@ int CNPC_Hunter::SelectCombatSchedule()
 	{
 		if ( gpGlobals->curtime - CAI_HunterEscortBehavior::gm_flLastDefendSound > 10.0 )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.DefendStrider" );
+			const char* soundname = "NPC_Hunter.DefendStrider";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			CAI_HunterEscortBehavior::gm_flLastDefendSound = gpGlobals->curtime;
 		}
 
@@ -3381,7 +3445,15 @@ void CNPC_Hunter::StartTask( const Task_t *pTask )
 
 		case TASK_HUNTER_ANNOUNCE_FLANK:
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlankAnnounce" );
+			const char* soundname = "NPC_Hunter.FlankAnnounce";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			TaskComplete();
 			break;
 		}
@@ -3821,7 +3893,15 @@ void CNPC_Hunter::RunTask( const Task_t *pTask )
 							// Shake the screen
 							if ( moveTrace.fStatus != AIMR_BLOCKED_NPC )
 							{
-								g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.ChargeHitWorld" );
+								const char* soundname = "NPC_Hunter.ChargeHitWorld";
+								CPASAttenuationFilter filter(this, soundname);
+
+								EmitSound_t params;
+								params.m_pSoundName = soundname;
+								params.m_flSoundTime = 0.0f;
+								params.m_pflSoundDuration = NULL;
+								params.m_bWarnOnDirectWaveReference = true;
+								g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 								UTIL_ScreenShake( GetAbsOrigin(), 16.0f, 4.0f, 1.0f, 400.0f, SHAKE_START );
 							}
 							SetIdealActivity( ACT_HUNTER_CHARGE_CRASH );
@@ -4091,7 +4171,15 @@ bool CNPC_Hunter::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEntity )
 	// Hit anything we don't like
 	if ( IRelationType( pEntity ) == D_HT && ( GetNextAttack() < gpGlobals->curtime ) )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.ChargeHitEnemy" );
+		const char* soundname = "NPC_Hunter.ChargeHitEnemy";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		// dvs: TODO:
 		//if ( !IsPlayingGesture( ACT_HUNTER_CHARGE_HIT ) )
@@ -4287,7 +4375,15 @@ void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_HUNTER_MELEE_ANNOUNCE )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.MeleeAnnounce" );
+		const char* soundname = "NPC_Hunter.MeleeAnnounce";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 		
@@ -5094,10 +5190,30 @@ CBaseEntity *CNPC_Hunter::MeleeAttack( float flDist, int iDamage, QAngle &qaView
 
 	CBaseEntity *pHurt = CheckTraceHullAttack( flDist, vecMins, vecMaxs, iDamage, DMG_SLASH );
 
-	if ( pHurt )
+	if (pHurt)
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.MeleeHit" );
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.TackleHit" );
+		{
+			const char* soundname = "NPC_Hunter.MeleeHit";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		}
+		{
+			const char* soundname = "NPC_Hunter.TackleHit";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		}
 
 		CBasePlayer *pPlayer = ToBasePlayer( pHurt );
 
@@ -5306,7 +5422,15 @@ bool CNPC_Hunter::IsInLargeOutdoorMap()
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::AlertSound()
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Alert" );
+	const char* soundname = "NPC_Hunter.Alert";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -5316,7 +5440,15 @@ void CNPC_Hunter::PainSound( const CTakeDamageInfo &info )
 {
 	if ( gpGlobals->curtime > m_flNextDamageTime )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Pain" );
+		const char* soundname = "NPC_Hunter.Pain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flNextDamageTime = gpGlobals->curtime + random->RandomFloat( 0.5, 1.2 ); 
 	}
 }
@@ -5326,7 +5458,15 @@ void CNPC_Hunter::PainSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::DeathSound( const CTakeDamageInfo &info )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Death" );
+	const char* soundname = "NPC_Hunter.Death";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 
@@ -5431,7 +5571,16 @@ void CNPC_Hunter::TeslaThink()
 	data.m_flMagnitude = 3;
 	data.m_flScale = 0.5f;
 	DispatchEffect( "TeslaHitboxes", data );
-	g_pSoundEmitterSystem->EmitSound(this, "RagdollBoogie.Zap" );
+
+	const char* soundname = "RagdollBoogie.Zap";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	if ( gpGlobals->curtime < m_flTeslaStopTime )
 	{
@@ -5685,7 +5834,15 @@ int CNPC_Hunter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				Vector vecVelDir = pInflictor->GetSmoothedVelocity();
 				if ( vecVelDir.Length() >= hunter_jostle_car_min_speed.GetFloat() )
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.HitByVehicle" );
+					const char* soundname = "NPC_Hunter.HitByVehicle";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 					m_hHitByVehicle = pInflictor;
 					SetContextThink( &CNPC_Hunter::JostleVehicleThink, gpGlobals->curtime, HUNTER_JOSTLE_VEHICLE_THINK );
 				}
@@ -6024,7 +6181,15 @@ void CNPC_Hunter::GetShootDir( Vector &vecDir, const Vector &vecSrc, CBaseEntity
 {
 	//RestartGesture( ACT_HUNTER_GESTURE_SHOOT );
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.FlechetteShoot" );
+	const char* soundname = "NPC_Hunter.FlechetteShoot";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	Vector vecBodyTarget;
 
@@ -6512,7 +6677,15 @@ void CNPC_Hunter::StriderBusterAttached( CBaseEntity *pAttached )
 	SetCondition( COND_HUNTER_HIT_BY_STICKYBOMB );
 	if (m_hAttachedBusters.Count() == 1)
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Hunter.Alert" );
+		const char* soundname = "NPC_Hunter.Alert";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 

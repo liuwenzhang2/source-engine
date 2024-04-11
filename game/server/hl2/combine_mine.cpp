@@ -389,7 +389,15 @@ void CBounceBomb::Flip( const Vector &vecForce, const AngularImpulse &torque )
 		return;
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.FlipOver" );
+	const char* soundname = "NPC_CombineMine.FlipOver";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	VPhysicsGetObject()->ApplyForceCenter( vecForce );
 	VPhysicsGetObject()->ApplyTorqueCenter( torque );
 	m_iFlipAttempts++;
@@ -512,7 +520,15 @@ void CBounceBomb::BounceThink()
 			pPhysicsObject->ApplyForceCenter( vecPredict * 10 );
 		}
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.Hop" );
+		const char* soundname = "NPC_CombineMine.Hop";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		SetThink( NULL );
 	}
 }
@@ -573,7 +589,15 @@ void CBounceBomb::CavernBounceThink()
 
 		pPhysicsObject->ApplyTorqueCenter( AngularImpulse( random->RandomFloat( 15, 40 ), random->RandomFloat( 15, 40 ), random->RandomFloat( 30, 60 ) ) );
 		
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.Hop" );
+		const char* soundname = "NPC_CombineMine.Hop";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		SetThink( &CBounceBomb::ExplodeThink );
 		SetNextThink( gpGlobals->curtime + 0.33f );
@@ -783,7 +807,15 @@ void CBounceBomb::Wake( bool bAwake )
 		// Turning on
 		if( m_bFoeNearest )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.TurnOn" );
+			const char* soundname = "NPC_CombineMine.TurnOn";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			controller.SoundChangeVolume( m_pWarnSound, 1.0, 0.1 );
 		}
 
@@ -806,7 +838,15 @@ void CBounceBomb::Wake( bool bAwake )
 		// Turning off
 		if( m_bFoeNearest )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.TurnOff" );
+			const char* soundname = "NPC_CombineMine.TurnOff";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 
 		SetNearestNPC( NULL );
@@ -1095,7 +1135,15 @@ void CBounceBomb::OpenHooks( bool bSilent )
 {
 	if( !bSilent )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.OpenHooks" );
+		const char* soundname = "NPC_CombineMine.OpenHooks";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	if( VPhysicsGetObject() )
@@ -1120,7 +1168,15 @@ void CBounceBomb::CloseHooks()
 {
 	if( !m_bLockSilently )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineMine.CloseHooks" );
+		const char* soundname = "NPC_CombineMine.CloseHooks";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	if( VPhysicsGetObject() )

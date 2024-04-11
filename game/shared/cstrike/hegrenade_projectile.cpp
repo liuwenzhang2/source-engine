@@ -70,7 +70,15 @@ void CHEGrenadeProjectile::Precache()
 
 void CHEGrenadeProjectile::BounceSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "HEGrenade.Bounce" );
+	const char* soundname = "HEGrenade.Bounce";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 void CHEGrenadeProjectile::Detonate()

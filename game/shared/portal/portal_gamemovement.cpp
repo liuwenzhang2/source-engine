@@ -384,7 +384,7 @@ void CPortalGameMovement::PlayerRoughLandingEffects( float fvol )
 		CSoundParameters params;
 		if (g_pSoundEmitterSystem->GetParametersForSound( "PortalPlayer.FallRecover", params, NULL ) )//CBaseEntity::
 		{
-			EmitSound_t ep( params );
+			EmitSound_t ep( params, gpGlobals->curtime);
 			ep.m_nPitch = 125.0f - player->m_Local.m_flFallVelocity * 0.03f;					// lower pitch the harder they land
 			ep.m_flVolume = MIN( player->m_Local.m_flFallVelocity * 0.00075f - 0.38, 1.0f );	// louder the harder they land
 

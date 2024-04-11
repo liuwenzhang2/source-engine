@@ -802,7 +802,15 @@ void CEnvHeadcrabCanister::OpenCanister( void )
 	int nOpenSequence = LookupSequence( "open" );
 	if ( nOpenSequence != ACT_INVALID )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "HeadcrabCanister.Open" );
+		const char* soundname = "HeadcrabCanister.Open";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		ResetSequence( nOpenSequence );
 		SetContextThink( &CEnvHeadcrabCanister::WaitForOpenSequenceThink, gpGlobals->curtime + 0.01f, s_pOpenThinkContext );
@@ -833,7 +841,15 @@ void CEnvHeadcrabCanister::SetLanded( void )
 //-----------------------------------------------------------------------------
 void CEnvHeadcrabCanister::Landed( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "HeadcrabCanister.AfterLanding" );
+	const char* soundname = "HeadcrabCanister.AfterLanding";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Lock us now that we've stopped
 	SetLanded();
@@ -897,7 +913,16 @@ void CEnvHeadcrabCanister::Detonate( )
 	if ( !HasSpawnFlags( SF_NO_IMPACT_SOUND ) )
 	{
 		g_pSoundEmitterSystem->StopSound(this, "HeadcrabCanister.IncomingSound" );
-		g_pSoundEmitterSystem->EmitSound(this, "HeadcrabCanister.Explosion" );
+
+		const char* soundname = "HeadcrabCanister.Explosion";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	// If we're supposed to be removed, do that now
@@ -974,7 +999,15 @@ void CEnvHeadcrabCanister::HeadcrabCanisterWorldThink( void )
 		if ( vecEndPosition.DistToSqr(m_vecImpactPosition) <= flDistSq )
 		{
 			// Figure out if we're close enough to play the incoming sound
-			g_pSoundEmitterSystem->EmitSound(this, "HeadcrabCanister.IncomingSound" );
+			const char* soundname = "HeadcrabCanister.IncomingSound";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_bIncomingSoundStarted = true;
 		}
 	}

@@ -320,9 +320,11 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 
 			vecArmPos = vecArmPos + vecDirToEnemy * 32;
 		
-			CPVSFilter filter( GetAbsOrigin() );
-			te->Sprite( filter, 0.0,
-				&vecArmPos, iAgruntMuzzleFlash, random->RandomFloat( 0.4, 0.8 ), 128 );
+			{
+				CPVSFilter filter(GetAbsOrigin());
+				te->Sprite(filter, 0.0,
+					&vecArmPos, iAgruntMuzzleFlash, random->RandomFloat(0.4, 0.8), 128);
+			}
 
 			CBaseEntity *pHornet = CBaseEntity::Create( "hornet", vecArmPos, QAngle( 0, 0, 0 ), this );
 
@@ -332,7 +334,15 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 			pHornet->SetAbsVelocity( vForward * 300 );
 			pHornet->SetOwnerEntity( this );
 			
-			g_pSoundEmitterSystem->EmitSound(this, "Weapon_Hornetgun.Single" );
+			const char* soundname = "Weapon_Hornetgun.Single";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			CHL1BaseNPC *pHornetMonster = (CHL1BaseNPC *)pHornet->MyNPCPointer();
 

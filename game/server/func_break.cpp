@@ -744,7 +744,15 @@ void CBreakable::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir,
 			{
 				g_pEffects->Sparks( ptr->endpos );
 
-				g_pSoundEmitterSystem->EmitSound(this, "Breakable.Computer" );
+				const char* soundname = "Breakable.Computer";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			break;
 			

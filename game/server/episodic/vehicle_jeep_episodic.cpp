@@ -813,7 +813,15 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 				if ( m_flNextWaterSound < gpGlobals->curtime )
 				{
 					m_flNextWaterSound = gpGlobals->curtime + random->RandomFloat( 0.25f, 1.0f );
-					g_pSoundEmitterSystem->EmitSound(this, "Physics.WaterSplash" );
+					const char* soundname = "Physics.WaterSplash";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 			}
 			else
@@ -934,7 +942,15 @@ void CPropJeepEpisodic::UpdateRadar( bool forceUpdate )
 		// Play a bleepy sound
 		if( !bDetectedDog )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "JNK_Radar_Ping_Friendly" );
+			const char* soundname = "JNK_Radar_Ping_Friendly";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 
 		//Notify Alyx so she can talk about the radar contact

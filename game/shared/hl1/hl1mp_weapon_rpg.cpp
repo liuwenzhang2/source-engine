@@ -199,7 +199,17 @@ void CRpgRocket::IgniteThink( void )
 
 	AddEffects( EF_DIMLIGHT );
 
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_RPG.RocketIgnite" );
+	{
+		const char* soundname = "Weapon_RPG.RocketIgnite";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
 
 	SetThink( &CRpgRocket::SeekThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );

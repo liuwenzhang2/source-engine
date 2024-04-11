@@ -209,7 +209,17 @@ void CPropThumper::Thump ( void )
 		UTIL_ScreenShake( vOrigin, 10.0 * m_flPlaybackRate, m_flPlaybackRate, m_flPlaybackRate / 2, THUMPER_RADIUS * m_flPlaybackRate, SHAKE_START, false );
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_dust" );
+	{
+		const char* soundname = "coast.thumper_dust";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
 	CSoundEnt::InsertSound ( SOUND_THUMPER, GetAbsOrigin(), THUMPER_RADIUS * m_flPlaybackRate, THUMPER_SOUND_DURATION, this );
 
 	if ( thumper_show_radius.GetBool() )
@@ -221,10 +231,20 @@ void CPropThumper::Thump ( void )
 	if ( m_flPlaybackRate < 0.7f )
 		 return;
 
-	if( m_iDustScale == THUMPER_MIN_SCALE )
-		g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_hit" );
+	const char* soundname = "";
+	if (m_iDustScale == THUMPER_MIN_SCALE)
+		soundname = "coast.thumper_hit";
 	else
-		g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_large_hit" );
+		soundname = "coast.thumper_large_hit";
+
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Signal that we've thumped
 	m_OnThumped.FireOutput( this, this );
@@ -260,7 +280,15 @@ void CPropThumper::InputDisable( inputdata_t &inputdata )
 {
 	m_bEnabled = false;
 	
-	g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_shutdown" );
+	const char* soundname = "coast.thumper_shutdown";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	
 	if ( m_hRepellantEnt )
 	{
@@ -273,7 +301,15 @@ void CPropThumper::InputEnable( inputdata_t &inputdata )
 {
 	m_bEnabled = true;
 
-	g_pSoundEmitterSystem->EmitSound(this, "coast.thumper_startup" );
+	const char* soundname = "coast.thumper_startup";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	if ( m_hRepellantEnt )
 	{

@@ -264,7 +264,15 @@ void CPropGladosCore::PanicThink ( void )
 	}
 
 	g_pSoundEmitterSystem->StopSound(this, m_speechEvents[m_iSpeechIter].ToCStr() );
-	g_pSoundEmitterSystem->EmitSound(this, m_iszPanicSoundScriptName.ToCStr() );
+	const char* soundname = m_iszPanicSoundScriptName.ToCStr();
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	float flCurDuration = g_pSoundEmitterSystem->GetSoundDuration(  m_iszPanicSoundScriptName.ToCStr(), GLADOS_CORE_MODEL_NAME );
 
 	SetThink( &CPropGladosCore::TalkingThink );
@@ -320,7 +328,15 @@ void CPropGladosCore::TalkingThink( void )
 
 	float flCurDuration = g_pSoundEmitterSystem->GetSoundDuration( m_speechEvents[m_iSpeechIter].ToCStr(), GLADOS_CORE_MODEL_NAME );
 
-	g_pSoundEmitterSystem->EmitSound(this, m_speechEvents[m_iSpeechIter].ToCStr() );
+	const char* soundname = m_speechEvents[m_iSpeechIter].ToCStr();
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	SetNextThink( gpGlobals->curtime + m_flBetweenVOPadding + flCurDuration );
 
 	// wrap if we hit the end of the list

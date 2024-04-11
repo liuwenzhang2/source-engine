@@ -80,7 +80,16 @@ CBaseEntity *CreateCombineBall( const Vector &origin, const Vector &velocity, fl
 	pBall->SetState( CPropCombineBall::STATE_THROWN );
 	pBall->SetSpeed( velocity.Length() );
 
-	g_pSoundEmitterSystem->EmitSound(pBall, "NPC_CombineBall.Launch" );//pBall->
+	const char* soundname = "NPC_CombineBall.Launch";
+	CPASAttenuationFilter filter(pBall, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, pBall->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(pBall, "NPC_CombineBall.Launch" );//pBall->
 
 	PhysSetGameFlags( pBall->VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
 
@@ -764,7 +773,15 @@ void CPropCombineBall::SetBallAsLaunched( void )
 	VPhysicsGetObject()->SetInertia( Vector( 1e30, 1e30, 1e30 ) );
 
 	StopLoopingSounds();
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall.Launch" );
+	const char* soundname = "NPC_CombineBall.Launch";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	
 	WhizSoundThink();
 }
@@ -1024,11 +1041,27 @@ void CPropCombineBall::DoExplosion( )
 	{
 		if ( hl2_episodic.GetBool() )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall_Episodic.Explosion" );
+			const char* soundname = "NPC_CombineBall_Episodic.Explosion";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		else
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall.Explosion" );
+			const char* soundname = "NPC_CombineBall.Explosion";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 
 		UTIL_ScreenShake( GetAbsOrigin(), 20.0f, 150.0, 1.0, 1250.0f, SHAKE_START );
@@ -1229,7 +1262,15 @@ void CPropCombineBall::OnHitEntity( CBaseEntity *pHitEntity, float flSpeed, int 
 				// damage. 
 				if( gpGlobals->curtime >= m_flNextDamageTime )
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall.KillImpact" );
+					const char* soundname = "NPC_CombineBall.KillImpact";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 					if ( pHitEntity->IsNPC() && pHitEntity->Classify() != CLASS_PLAYER_ALLY_VITAL && hl2_episodic.GetBool() == true )
 					{
@@ -1252,7 +1293,15 @@ void CPropCombineBall::OnHitEntity( CBaseEntity *pHitEntity, float flSpeed, int 
 			{
 				if ( (m_nState == STATE_THROWN) && (pHitEntity->IsNPC() || dynamic_cast<CRagdollProp*>(pHitEntity) ))
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall.KillImpact" );
+					const char* soundname = "NPC_CombineBall.KillImpact";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 				if ( (m_nState != STATE_HOLDING) )
 				{
@@ -1324,11 +1373,27 @@ void CPropCombineBall::DoImpactEffect( const Vector &preVelocity, int index, gam
 
 	if ( hl2_episodic.GetBool() )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall_Episodic.Impact" );
+		const char* soundname = "NPC_CombineBall_Episodic.Impact";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_CombineBall.Impact" );
+		const char* soundname = "NPC_CombineBall.Impact";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 

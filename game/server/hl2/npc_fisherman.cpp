@@ -172,11 +172,29 @@ void CNPC_Fisherman::HandleAnimEvent( animevent_t *pEvent )
 {
 	if ( pEvent->event == NPC_EVENT_LEFTFOOT )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Fisherman.FootstepLeft", pEvent->eventtime );
+		const char* soundname = "NPC_Fisherman.FootstepLeft";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = pEvent->eventtime;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(this, "NPC_Fisherman.FootstepLeft", pEvent->eventtime );
 	}
 	else if ( pEvent->event == NPC_EVENT_RIGHTFOOT )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Fisherman.FootstepRight", pEvent->eventtime );
+		const char* soundname = "NPC_Fisherman.FootstepRight";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = pEvent->eventtime;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(this, "NPC_Fisherman.FootstepRight", pEvent->eventtime );
 	}
 	else if ( pEvent->event == AE_FISHERMAN_HAT_UP )
 	{

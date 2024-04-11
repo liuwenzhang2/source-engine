@@ -47,7 +47,17 @@ public:
 	void	SetTimer( float detonateDelay, float warnDelay );
 	void	SetVelocity( const Vector &velocity, const AngularImpulse &angVelocity );
 	int		OnTakeDamage( const CTakeDamageInfo &inputInfo );
-	void	BlipSound() { g_pSoundEmitterSystem->EmitSound(this, "Grenade.Blip" ); }
+	void	BlipSound() { 
+		const char* soundname = "Grenade.Blip";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
 	void	DelayThink();
 	void	VPhysicsUpdate( IPhysicsObject *pPhysics );
 	void	OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason );

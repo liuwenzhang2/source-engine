@@ -205,7 +205,16 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 
 		if ( FClassnameIs( pBaseAnimating, "updateitem2" ) )
 		{
-			g_pSoundEmitterSystem->EmitSound(pBaseAnimating, "UpdateItem.Fizzle" );//pBaseAnimating->
+			const char* soundname = "UpdateItem.Fizzle";
+			CPASAttenuationFilter filter(pBaseAnimating, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, pBaseAnimating->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(pBaseAnimating, "UpdateItem.Fizzle" );//pBaseAnimating->
 		}
 
 		Vector vOldVel;

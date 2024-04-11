@@ -43,7 +43,15 @@ void CDODSmokeGrenade::Precache()
 
 void CDODSmokeGrenade::BounceSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "SmokeGrenade.Bounce" );
+	const char* soundname = "SmokeGrenade.Bounce";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 void CDODSmokeGrenade::Think_Emit( void )
@@ -63,7 +71,15 @@ void CDODSmokeGrenade::Think_Emit( void )
 		// Smoke Jet
 		DispatchParticleEffect( "smokegrenade_jet", PATTACH_POINT, this, "jet" );
 
-		g_pSoundEmitterSystem->EmitSound(this, "BaseSmokeEffect.Sound" );
+		const char* soundname = "BaseSmokeEffect.Sound";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		m_flRemoveTime = gpGlobals->curtime + 10;
 

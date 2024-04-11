@@ -153,7 +153,15 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
 			m_flSoundTime = gpGlobals->curtime + 0.62;
-			g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Deny" );
+			const char* soundname = "SuitRecharge.Deny";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		return;
 	}
@@ -165,7 +173,15 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		pPlayer->m_afButtonPressed &= ~IN_USE;
 		m_iCaps = FCAP_IMPULSE_USE;
 		
-		g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Deny" );
+		const char* soundname = "SuitRecharge.Deny";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 
@@ -184,7 +200,15 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	if (!m_iOn)
 	{
 		m_iOn++;
-		g_pSoundEmitterSystem->EmitSound(this, "SuitRecharge.Start" );
+		const char* soundname = "SuitRecharge.Start";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 	}
 	if ((m_iOn == 1) && (m_flSoundTime <= gpGlobals->curtime))

@@ -272,7 +272,15 @@ void CGrenadeBeam::GrenadeBeamTouch( CBaseEntity *pOther )
 		return;
 	}
 	
-	g_pSoundEmitterSystem->EmitSound(this, "GrenadeBeam.HitSound" );
+	const char* soundname = "GrenadeBeam.HitSound";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	trace_t tr;
 	Vector vDirection = GetAbsVelocity();

@@ -877,7 +877,16 @@ int CItem_AmmoCrate::OnTakeDamage( const CTakeDamageInfo &info )
 		if (weapon && !stricmp(weapon->GetName(), "weapon_crowbar"))
 		{
 			// play the normal use sound
-			g_pSoundEmitterSystem->EmitSound(player, "HL2Player.Use" );//player->
+			const char* soundname = "HL2Player.Use";
+			CPASAttenuationFilter filter(player, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(player, "HL2Player.Use" );//player->
 			// open the crate
 			Use(info.GetAttacker(), info.GetAttacker(), USE_TOGGLE, 0.0f);
 		}

@@ -241,7 +241,15 @@ void CPropEnergyBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEven
 			}
 		}
 
-		g_pSoundEmitterSystem->EmitSound(this, "EnergyBall.Impact" );
+		const char* soundname = "EnergyBall.Impact";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	
 	// Record our direction so our fixed direction hacks know we have changed direction immediately
@@ -348,7 +356,15 @@ void CPropEnergyBall::ExplodeThink( )
 	CEffectData data;
 	data.m_vOrigin = GetAbsOrigin();
 	DispatchEffect( "ManhackSparks", data );
-	g_pSoundEmitterSystem->EmitSound(this, "EnergyBall.Explosion" );
+	const char* soundname = "EnergyBall.Explosion";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Turn us off and wait because we need our trails to finish up properly
 	SetAbsVelocity( vec3_origin );
@@ -535,7 +551,15 @@ void CEnergyBallLauncher::SpawnBall()
 	// Think function, used to update time till death and avoid sleeping
 	pBall->SetNextThink ( gpGlobals->curtime + 0.1f );
 
-	g_pSoundEmitterSystem->EmitSound(this, "EnergyBall.Launch" );
+	const char* soundname = "EnergyBall.Launch";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_OnPostSpawnBall.FireOutput( this, this );
 }

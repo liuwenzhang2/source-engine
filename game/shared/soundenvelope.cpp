@@ -20,6 +20,10 @@
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "tier0/vprof.h"
 #include "gamerules.h"
+#ifdef GAME_DLL
+#include "gameinterface.h"
+#endif // GAME_DLL
+
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -587,7 +591,13 @@ void CSoundPatch::StartSound( float flStartTime )
 		}
 
 		g_pSoundEmitterSystem->EmitSound( m_Filter, EntIndex(), ep );//CBaseEntity::
-		g_pSoundEmitterSystem->EmitCloseCaption( m_Filter, EntIndex(), STRING( m_iszSoundScriptName ), ep.m_UtlVecSoundOrigin, m_flCloseCaptionDuration, true );//CBaseEntity::
+#ifdef GAME_DLL
+		extern CServerGameDLL g_ServerGameDLL;
+		g_ServerGameDLL.EmitCloseCaption(m_Filter, EntIndex(), STRING(m_iszSoundScriptName), ep.m_UtlVecSoundOrigin, m_flCloseCaptionDuration, true);//CBaseEntity::
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+		clientdll->EmitCloseCaption(m_Filter, EntIndex(), STRING(m_iszSoundScriptName), ep.m_UtlVecSoundOrigin, m_flCloseCaptionDuration, true);//CBaseEntity::
+#endif // CLIENT_DLL
 	}
 	m_isPlaying = true;
 }

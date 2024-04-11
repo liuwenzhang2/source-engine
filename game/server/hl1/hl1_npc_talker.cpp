@@ -367,7 +367,7 @@ bool CHL1NPCTalker::HandleInteraction(int interactionType, void *data, CBaseComb
 
 		if (g_pSoundEmitterSystem->GetParametersForSound( "Barney.Close", params, NULL ) )
 		{
-			EmitSound_t ep( params );
+			EmitSound_t ep( params, gpGlobals->curtime);
 			ep.m_nPitch = GetExpresser()->GetVoicePitch();
 
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );

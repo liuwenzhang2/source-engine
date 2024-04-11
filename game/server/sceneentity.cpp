@@ -33,6 +33,7 @@
 #include "SceneCache.h"
 #include "scripted.h"
 #include "env_debughistory.h"
+#include "gameinterface.h"
 
 #ifdef HL2_EPISODIC
 #include "npc_alyx_episodic.h"
@@ -1795,7 +1796,7 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 				Q_strlower( lowercase );
 
 				// Remove any players who don't want close captions
-				CBaseEntity::RemoveRecipientsIfNotCloseCaptioning( filter );
+				CServerGameDLL::RemoveRecipientsIfNotCloseCaptioning( filter );
 
 				// Certain events are marked "don't attenuate", (breencast), skip those here
 				if ( !event->IsSuppressingCaptionAttenuation() && 
@@ -4382,7 +4383,7 @@ void CSceneEntity::SetRecipientFilter( IRecipientFilter *filter )
 	if ( filter )
 	{
 		m_pRecipientFilter = new CRecipientFilter();
-		m_pRecipientFilter->CopyFrom( (CRecipientFilter &)( *filter ) );
+		m_pRecipientFilter->CopyFrom( filter );
 	}
 }
 

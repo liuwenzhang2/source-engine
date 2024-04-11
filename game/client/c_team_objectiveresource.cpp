@@ -414,7 +414,16 @@ void C_BaseTeamObjectiveResource::ClientThink()
 									// Prevent spam
 									if ( gpGlobals->curtime > ( m_flLastCapWarningTime[i] + 5 ) )
 									{
-										g_pSoundEmitterSystem->EmitSound(pPlayer, GetWarnSound( i ) );//pPlayer->
+										const char* soundname = GetWarnSound(i);
+										CPASAttenuationFilter filter(pPlayer, soundname);
+
+										EmitSound_t params;
+										params.m_pSoundName = soundname;
+										params.m_flSoundTime = 0.0f;
+										params.m_pflSoundDuration = NULL;
+										params.m_bWarnOnDirectWaveReference = true;
+										g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+										//g_pSoundEmitterSystem->EmitSound(pPlayer, GetWarnSound( i ) );//pPlayer->
 
 										m_bWarnedOnFinalCap[i] = true;
 										m_flLastCapWarningTime[i] = gpGlobals->curtime;

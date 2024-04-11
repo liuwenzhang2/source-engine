@@ -111,7 +111,15 @@ void CHandGrenade::ShootTimed( CBaseCombatCharacter *pOwner, Vector vecVelocity,
 
 void CHandGrenade ::BounceSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_HandGrenade.GrenadeBounce" );
+	const char* soundname = "Weapon_HandGrenade.GrenadeBounce";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 

@@ -411,7 +411,16 @@ enum
 
 		EmitGrenade( vecSrc, vec3_angle, vecThrow, AngularImpulse(600,random->RandomInt(-1200,1200),0), pPlayer, flTimeLeft );
 
-		g_pSoundEmitterSystem->EmitSound(pPlayer, "Weapon_Grenade.Throw" );//pPlayer->
+		const char* soundname = "Weapon_Grenade.Throw";
+		CPASAttenuationFilter filter(pPlayer, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(pPlayer, "Weapon_Grenade.Throw" );//pPlayer->
 
 #ifndef CLIENT_DLL
 		IGameEvent * event = gameeventmanager->CreateEvent( "dod_stats_weapon_attack" );

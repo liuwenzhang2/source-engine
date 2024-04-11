@@ -1018,7 +1018,15 @@ void CNPC_Ichthyosaur::HandleAnimEvent( animevent_t *pEvent )
 
 	case ICH_AE_BITE_START:
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Ichthyosaur.AttackGrowl" );
+			const char* soundname = "NPC_Ichthyosaur.AttackGrowl";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		break;
 	}
@@ -1094,7 +1102,15 @@ void CNPC_Ichthyosaur::Bite( void )
 		UTIL_Bubbles( pHurt->GetAbsOrigin()+Vector(-32.0f,-32.0f,-32.0f), pHurt->GetAbsOrigin()+Vector(32.0f,32.0f,0.0f), random->RandomInt( 16, 32 ) );
 		
 		// Play a random attack hit sound
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Ichthyosaur.Bite" );
+		const char* soundname = "NPC_Ichthyosaur.Bite";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		if ( GetActivity() == ACT_MELEE_ATTACK1 )
 		{
@@ -1111,7 +1127,15 @@ void CNPC_Ichthyosaur::Bite( void )
 	}
 
 	//Miss sound
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Ichthyosaur.BiteMiss" );
+	const char* soundname = "NPC_Ichthyosaur.BiteMiss";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------

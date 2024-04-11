@@ -333,8 +333,28 @@ void CTripmineGrenade::Spawn( void )
 	if ( GetOwnerEntity() != NULL )
 	{
 		// play deploy sound
-		g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.Deploy" );
-		g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.Charge" );
+		{
+			const char* soundname = "TripmineGrenade.Deploy";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		}
+		{
+			const char* soundname = "TripmineGrenade.Charge";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		}
 
 		m_hRealOwner = GetOwnerEntity();
 	}
@@ -437,7 +457,15 @@ void CTripmineGrenade::PowerupThink( void  )
 		m_bIsLive = true;
 
 		// play enabled sound
-		g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.Activate" );
+		const char* soundname = "TripmineGrenade.Activate";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	SetNextThink( gpGlobals->curtime + 0.1f );

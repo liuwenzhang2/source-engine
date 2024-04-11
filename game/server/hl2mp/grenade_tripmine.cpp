@@ -79,7 +79,15 @@ void CTripmineGrenade::Spawn( void )
 
 	m_iHealth = 1;
 
-	g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.Place" );
+	const char* soundname = "TripmineGrenade.Place";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	SetDamage( sk_plr_dmg_tripmine.GetFloat() );
 	SetDamageRadius( sk_tripmine_radius.GetFloat() );
 
@@ -120,7 +128,15 @@ void CTripmineGrenade::PowerupThink( void  )
 		m_bIsLive			= true;
 
 		// play enabled sound
-		g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.Activate" );
+		const char* soundname = "TripmineGrenade.Activate";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	SetNextThink( gpGlobals->curtime + 0.1f );
 }
@@ -255,7 +271,15 @@ void CTripmineGrenade::Event_Killed( const CTakeDamageInfo &info )
 	SetThink( &CTripmineGrenade::DelayDeathThink );
 	SetNextThink( gpGlobals->curtime + 0.25 );
 
-	g_pSoundEmitterSystem->EmitSound(this, "TripmineGrenade.StopSound" );
+	const char* soundname = "TripmineGrenade.StopSound";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 

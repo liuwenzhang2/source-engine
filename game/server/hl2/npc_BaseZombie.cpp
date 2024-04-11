@@ -857,7 +857,15 @@ int CNPC_BaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	{
 		if( bChopped )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "E3_Phystown.Slicer" );
+			const char* soundname = "E3_Phystown.Slicer";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 
 		DieChopped( info );
@@ -879,7 +887,15 @@ int CNPC_BaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 
 		case RELEASE_RAGDOLL_SLICED_OFF:
 			{
-			g_pSoundEmitterSystem->EmitSound(this, "E3_Phystown.Slicer" );
+				const char* soundname = "E3_Phystown.Slicer";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				Vector vecForce = inputInfo.GetDamageForce() * 0.1;
 				vecForce += Vector( 0, 0, 2000.0 );
 				ReleaseHeadcrab( EyePosition(), vecForce, true, false, true );
@@ -1421,7 +1437,15 @@ void CNPC_BaseZombie::PoundSound()
 		const surfacedata_t *psurf = physprops->GetSurfaceData( tr.surface.surfaceProps );
 		if( psurf )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, physprops->GetString(psurf->sounds.impactHard) );
+			const char* soundname = physprops->GetString(psurf->sounds.impactHard);
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			return;
 		}
 	}
@@ -1540,7 +1564,15 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 				return;
 			}
 
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_BaseZombie.Swat" );
+			const char* soundname = "NPC_BaseZombie.Swat";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			PhysicsImpactSound( pEnemy, pPhysObj, CHAN_BODY, pPhysObj->GetMaterialIndex(), physprops->GetSurfaceIndex("flesh"), 0.5, 800 );
 
 			Vector physicsCenter = pPhysicsEntity->WorldSpaceCenter();

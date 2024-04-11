@@ -845,7 +845,15 @@ bool CNPC_Combine_Cannon::FireBullet( const Vector &vecTarget, bool bDirectShot 
 
 	FireBullets( info );
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Combine_Cannon.FireBullet" );
+	const char* soundname = "NPC_Combine_Cannon.FireBullet";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Don't attack for a certain amount of time
 	SetNextAttack( gpGlobals->curtime + GetRefireTime() );

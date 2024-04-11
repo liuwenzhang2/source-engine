@@ -425,7 +425,17 @@ bool CAI_Expresser::SpeakDispatchResponse( AIConcept_t concept, AI_Response *res
 			else
 			{
 				float speakTime = GetResponseDuration( result );
-				g_pSoundEmitterSystem->EmitSound(GetOuter(), response );
+
+				const char* soundname = response;
+				CPASAttenuationFilter filter(GetOuter(), soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, GetOuter()->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(GetOuter(), response );
 
 				DevMsg( "SpeakDispatchResponse:  Entity ( %i/%s ) playing sound '%s'\n", GetOuter()->entindex(), STRING( GetOuter()->GetEntityName() ), response );
 				NoteSpeaking( speakTime, delay );

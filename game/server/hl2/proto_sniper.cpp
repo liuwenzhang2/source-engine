@@ -1357,7 +1357,15 @@ void CProtoSniper::Event_Killed( const CTakeDamageInfo &info )
 
 	LaserOff();
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Sniper.Die" );
+	const char* soundname = "NPC_Sniper.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	UTIL_Remove( this );
 }
@@ -1386,7 +1394,15 @@ int CProtoSniper::SelectSchedule ( void )
 {
 	if( HasCondition(COND_ENEMY_DEAD) && sniperspeak.GetBool() )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Sniper.TargetDestroyed" );
+		const char* soundname = "NPC_Sniper.TargetDestroyed";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	if( !m_fWeaponLoaded )
@@ -1422,7 +1438,15 @@ int CProtoSniper::SelectSchedule ( void )
 			// Also, don't play the sound effect if we're an ally.
 			if ( IsPlayerAllySniper() == false )
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_Sniper.HearDanger" );
+				const char* soundname = "NPC_Sniper.HearDanger";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 		}
 

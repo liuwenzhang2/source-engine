@@ -351,7 +351,15 @@ void CWeaponPortalBase::	Materialize( void )
 	if ( IsEffectActive( EF_NODRAW ) )
 	{
 		// changing from invisible state to visible.
-		g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Charge" );
+		const char* soundname = "AlyxEmp.Charge";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		
 		RemoveEffects( EF_NODRAW );
 		DoMuzzleFlash();

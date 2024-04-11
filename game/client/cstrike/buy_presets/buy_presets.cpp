@@ -124,7 +124,16 @@ CON_COMMAND_F( cl_buy_favorite_set, "Saves the current loadout as a favorite", F
 	C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 	if ( pPlayer )
 	{
-		g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.Updated" );//pPlayer->
+		const char* soundname = "BuyPreset.Updated";
+		CPASAttenuationFilter filter(pPlayer, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.Updated" );//pPlayer->
 	}
 }
 
@@ -413,7 +422,16 @@ void BuyPresetManager::PurchasePreset( int presetIndex )
 					C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 					if ( pPlayer )
 					{
-						g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.AlreadyBought" );//pPlayer->
+						const char* soundname = "BuyPreset.AlreadyBought";
+						CPASAttenuationFilter filter(pPlayer, soundname);
+
+						EmitSound_t params;
+						params.m_pSoundName = soundname;
+						params.m_flSoundTime = 0.0f;
+						params.m_pflSoundDuration = NULL;
+						params.m_bWarnOnDirectWaveReference = true;
+						g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+						//g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.AlreadyBought" );//pPlayer->
 					}
 
 					// We have everything already.  Let the player know.
@@ -433,7 +451,16 @@ void BuyPresetManager::PurchasePreset( int presetIndex )
 		C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 		if ( pPlayer )
 		{
-			g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
+			const char* soundname = "BuyPreset.CantBuy";
+			CPASAttenuationFilter filter(pPlayer, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
 		}
 
 		PRESET_DEBUG( "cl_buy_favorite: can't afford anything better from %ls.\n", preset->GetName() );
@@ -444,7 +471,16 @@ void BuyPresetManager::PurchasePreset( int presetIndex )
 	C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 	if ( pPlayer )
 	{
-		g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
+		const char* soundname = "BuyPreset.CantBuy";
+		CPASAttenuationFilter filter(pPlayer, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
 	}
 
 	PRESET_DEBUG( "cl_buy_favorite: preset %d doesn't exist.\n", presetIndex );

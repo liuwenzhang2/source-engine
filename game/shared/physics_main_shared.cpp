@@ -1596,7 +1596,15 @@ void CBaseEntity::PhysicsCheckWaterTransition( void )
 #endif // !CLIENT_DLL
 
 			// just crossed into water
-			g_pSoundEmitterSystem->EmitSound(this, "BaseEntity.EnterWater" );
+			const char* soundname = "BaseEntity.EnterWater";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			if ( !IsEFlagSet( EFL_NO_WATER_VELOCITY_CHANGE ) )
 			{
@@ -1611,7 +1619,15 @@ void CBaseEntity::PhysicsCheckWaterTransition( void )
 		if ( oldcont != CONTENTS_EMPTY )
 		{	
 			// just crossed out of water
-			g_pSoundEmitterSystem->EmitSound(this, "BaseEntity.ExitWater" );
+			const char* soundname = "BaseEntity.ExitWater";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}		
 	}
 }

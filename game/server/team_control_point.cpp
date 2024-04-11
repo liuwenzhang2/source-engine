@@ -508,7 +508,15 @@ void CTeamControlPoint::CaptureEnd( void )
 
 	if ( !FBitSet( m_spawnflags, SF_CAP_POINT_NO_CAP_SOUNDS ) )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, STRING( m_iszCaptureEndSound ) );
+		const char* soundname = STRING(m_iszCaptureEndSound);
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -533,7 +541,15 @@ void CTeamControlPoint::CaptureInterrupted( bool bBlocked )
 	else
 	{
 		pSoundName = STRING( m_iszCaptureInProgress );
-		g_pSoundEmitterSystem->EmitSound(this, STRING( m_iszCaptureStartSound ) );
+		const char* soundname = STRING(m_iszCaptureStartSound);
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	if ( m_pCaptureInProgressSound == NULL && pSoundName != NULL )

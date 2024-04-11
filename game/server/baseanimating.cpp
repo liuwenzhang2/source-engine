@@ -1142,7 +1142,15 @@ void CBaseAnimating::HandleAnimEvent( animevent_t *pEvent )
 	{
 		if ( pEvent->event == AE_SV_PLAYSOUND )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, pEvent->options );
+			const char* soundname = pEvent->options;
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			return;
 		}
 		else if ( pEvent->event == AE_RAGDOLL )

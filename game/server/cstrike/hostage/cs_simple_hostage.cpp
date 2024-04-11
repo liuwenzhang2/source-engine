@@ -239,7 +239,15 @@ int CHostage::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	float actualDamage = info.GetDamage();
 
 	// say something
-	g_pSoundEmitterSystem->EmitSound(this, "Hostage.Pain" );
+	const char* soundname = "Hostage.Pain";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	CCSPlayer *player = ToCSPlayer( info.GetAttacker() );
 
@@ -1068,7 +1076,15 @@ void CHostage::HostageUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		Idle();
 
 		// say something
-		g_pSoundEmitterSystem->EmitSound(this, "Hostage.StopFollowCT" );
+		const char* soundname = "Hostage.StopFollowCT";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
@@ -1082,7 +1098,15 @@ void CHostage::HostageUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		Follow( user );
 
 		// say something
-		g_pSoundEmitterSystem->EmitSound(this, "Hostage.StartFollowCT" );
+		const char* soundname = "Hostage.StartFollowCT";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		// emit hostage_follows event
 		IGameEvent *event = gameeventmanager->CreateEvent( "hostage_follows" );

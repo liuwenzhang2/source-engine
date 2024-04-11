@@ -237,7 +237,15 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		SetAbsVelocity( Vector( 0, 0, 0 ) );
 
 		// play body "thwack" sound
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_Crossbow.BoltHitBody" );
+		const char* soundname = "Weapon_Crossbow.BoltHitBody";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		Vector vForward;
 
@@ -276,7 +284,15 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		// See if we struck the world
 		if ( pOther->GetMoveType() == MOVETYPE_NONE && !( tr.surface.flags & SURF_SKY ) )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "Weapon_Crossbow.BoltHitWorld" );
+			const char* soundname = "Weapon_Crossbow.BoltHitWorld";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			// if what we hit is static architecture, can stay around for a while.
 			Vector vecDir = GetAbsVelocity();

@@ -670,7 +670,15 @@ void CPropCannon::LaunchProjectile( void )
 
 	m_flNextAttackTime = gpGlobals->curtime + g_cannon_reloadtime.GetFloat();
 	
-	g_pSoundEmitterSystem->EmitSound(this, "HeadcrabCanister.LaunchSound" );
+	const char* soundname = "HeadcrabCanister.LaunchSound";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	UTIL_ScreenShake( GetDriver()->GetAbsOrigin(), 50.0, 150.0, 1.0, 750, SHAKE_START, true );
 }

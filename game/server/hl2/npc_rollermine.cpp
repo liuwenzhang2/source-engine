@@ -1497,7 +1497,15 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			{
 				m_iSoundEventFlags |= ROLLERMINE_SE_TAUNT; // Don't repeat.
 
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Taunt" );
+				const char* soundname = "NPC_RollerMine.Taunt";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 
 			// Jump earlier when chasing a vehicle
@@ -1625,7 +1633,15 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			{
 				m_flNextHop = gpGlobals->curtime;
 				m_flPowerDownTime = gpGlobals->curtime + RandomFloat( 0.3, 0.9 );
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Hurt" );
+				const char* soundname = "NPC_RollerMine.Hurt";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 				CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), 400, 0.5f, this );
 
@@ -1671,7 +1687,15 @@ void CNPC_RollerMine::Open( void )
 		SetModel( "models/roller_spikes.mdl" );
         SetRollerSkin();
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.OpenSpikes" );
+		const char* soundname = "NPC_RollerMine.OpenSpikes";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		SetTouch( &CNPC_RollerMine::ShockTouch );
 		m_bIsOpen = true;
@@ -1952,7 +1976,15 @@ void CNPC_RollerMine::NotifyInteraction( CAI_BaseNPC *pUser )
 	GetEnemies()->SetFreeKnowledgeDuration( 30.0f );
 
 	// Play the hax0red sound
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Reprogram" );
+	const char* soundname = "NPC_RollerMine.Reprogram";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Force the rollermine open here. At very least, this ensures that the 
 	// correct, smaller bounding box is recomputed around it.
@@ -2007,7 +2039,15 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 	SetTouch( &CNPC_RollerMine::CloseTouch );
 	Vector vel;
 	pPhysics->SetVelocity( &impulse, NULL );
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Shock" );
+	const char* soundname = "NPC_RollerMine.Shock";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	// Do a shock effect
 	ShockTarget( pOther );
 
@@ -2211,7 +2251,15 @@ void CNPC_RollerMine::AnnounceArrivalToOthers( CBaseEntity *pOther )
 	if ( iRollers > 1 )
 	{
 		// Chirp to the others
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Chirp" );
+		const char* soundname = "NPC_RollerMine.Chirp";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		// Tell the others to respond (skip first slot, because that's me)
 		for ( int i = 1; i < iRollers; i++ )
@@ -2247,7 +2295,15 @@ void CNPC_RollerMine::InputConstraintBroken( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::InputRespondToChirp( inputdata_t &inputdata )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.ChirpRespond" );
+	const char* soundname = "NPC_RollerMine.ChirpRespond";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -2256,7 +2312,15 @@ void CNPC_RollerMine::InputRespondToChirp( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::InputRespondToExplodeChirp( inputdata_t &inputdata )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.ExplodeChirpRespond" );
+	const char* soundname = "NPC_RollerMine.ExplodeChirpRespond";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	Explode();
 }
@@ -2288,7 +2352,15 @@ void CNPC_RollerMine::InputJoltVehicle( inputdata_t &inputdata )
 	pVehiclePhysics->ApplyForceOffset( vecForce, GetAbsOrigin() );
 
 	// Play sounds & effects
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.JoltVehicle" );
+	const char* soundname = "NPC_RollerMine.JoltVehicle";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// UNDONE: Good Zap effects
 	/*
@@ -2403,7 +2475,15 @@ void CNPC_RollerMine::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_
 	m_OnPhysGunPickup.FireOutput( pPhysGunUser, this );
 	m_bHeld = true;
 	m_RollerController.Off();
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Held" );
+	const char* soundname = "NPC_RollerMine.Held";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -2426,7 +2506,15 @@ void CNPC_RollerMine::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Re
 			// enable world/prop touch too
 			VPhysicsGetObject()->SetCallbackFlags( VPhysicsGetObject()->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH|CALLBACK_GLOBAL_TOUCH_STATIC );
 		}
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Tossed" );
+		const char* soundname = "NPC_RollerMine.Tossed";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	m_OnPhysGunDrop.FireOutput( pPhysGunUser, this );
@@ -2504,7 +2592,15 @@ void CNPC_RollerMine::PreDetonate( void )
 	SetThink( &CNPC_RollerMine::Explode );
 	SetNextThink( gpGlobals->curtime + 0.5f );
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_RollerMine.Hurt" );
+	const char* soundname = "NPC_RollerMine.Hurt";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------

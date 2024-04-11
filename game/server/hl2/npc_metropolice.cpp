@@ -2866,7 +2866,15 @@ void CNPC_MetroPolice::OnAnimEventShove( void )
 		}
 
 		// Play a random attack hit sound
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Metropolice.Shove" );
+		const char* soundname = "NPC_Metropolice.Shove";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -4564,11 +4572,27 @@ void CNPC_MetroPolice::StartTask( const Task_t *pTask )
 			{
 				if( GetEnemy() && GetEnemy()->GetWaterLevel() > 0 )
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "NPC_MetroPolice.WaterSpeech" );
+					const char* soundname = "NPC_MetroPolice.WaterSpeech";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 				else
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "NPC_MetroPolice.HidingSpeech" );
+					const char* soundname = "NPC_MetroPolice.HidingSpeech";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 			}
 

@@ -19,6 +19,8 @@
 #include "tier1/bitbuf.h"
 #include "inputsystem/ButtonCode.h"
 #include "modes.h"
+#include "irecipientfilter.h"
+#include "SoundEmitterSystem\isoundemittersystembase.h"
 
 #if !defined( _X360 )
 #include "xbox/xboxstubs.h"
@@ -716,6 +718,14 @@ public:
 	virtual void			EmitSentenceCloseCaption( char const *tokenstream ) = 0;
 	// Emits a regular close caption by token name
 	virtual void			EmitCloseCaption( char const *captionname, float duration ) = 0;
+
+	virtual void EmitCloseCaption(IRecipientFilter& filter, int entindex, char const* token, CUtlVector< Vector >& soundorigin, float duration, bool warnifmissing /*= false*/) = 0;// CBaseEntity::
+
+	virtual void InternalEmitCloseCaption(IRecipientFilter& filter, int entindex, bool fromplayer, char const* token, CUtlVector< Vector >& originlist, float duration, bool warnifmissing /*= false*/) = 0;
+
+	virtual void InternalEmitCloseCaption(IRecipientFilter& filter, int entindex, const CSoundParameters& params, const EmitSound_t& ep) = 0;
+
+	virtual void ModifyEmitSoundParams(EmitSound_t& params) = 0;
 
 	// Returns true if the client can start recording a demo now.  If the client returns false,
 	// an error message of up to length bytes should be returned in errorMsg.

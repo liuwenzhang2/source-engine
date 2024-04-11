@@ -541,7 +541,7 @@ void CNPC_Scientist::PainSound ( const CTakeDamageInfo &info )
 	CSoundParameters params;
 	if (g_pSoundEmitterSystem->GetParametersForSound( "Scientist.Pain", params, NULL ) )
 	{
-		EmitSound_t ep( params );
+		EmitSound_t ep( params, gpGlobals->curtime);
 		params.pitch = GetExpresser()->GetVoicePitch();
 
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );

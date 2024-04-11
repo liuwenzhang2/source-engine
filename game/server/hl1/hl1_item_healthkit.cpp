@@ -294,7 +294,15 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 		if (m_flSoundTime <= gpGlobals->curtime)
 		{
 			m_flSoundTime = gpGlobals->curtime + 0.62;
-			g_pSoundEmitterSystem->EmitSound(this, "WallHealth.Deny" );
+			const char* soundname = "WallHealth.Deny";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		return;
 	}
@@ -311,7 +319,15 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 		// Make the user re-use me to get started drawing health.
 		m_iCaps = FCAP_IMPULSE_USE;
 
-		g_pSoundEmitterSystem->EmitSound(this, "WallHealth.Deny" );
+		const char* soundname = "WallHealth.Deny";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 
@@ -327,7 +343,15 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 	if (!m_iOn)
 	{
 		m_iOn++;
-		g_pSoundEmitterSystem->EmitSound(this, "WallHealth.Start" );
+		const char* soundname = "WallHealth.Start";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flSoundTime = 0.56 + gpGlobals->curtime;
 	}
 	if ((m_iOn == 1) && (m_flSoundTime <= gpGlobals->curtime))
@@ -355,7 +379,15 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 //-----------------------------------------------------------------------------
 void CWallHealth::Recharge(void)
 {
-	g_pSoundEmitterSystem->EmitSound(this, "WallHealth.Recharge" );
+	const char* soundname = "WallHealth.Recharge";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	m_iJuice = sk_healthcharger.GetFloat();
 	SetTextureFrameIndex( 0 );
 	SetThink( NULL );

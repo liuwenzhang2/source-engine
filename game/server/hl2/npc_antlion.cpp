@@ -688,7 +688,15 @@ void CNPC_Antlion::MeleeAttack( float distance, float damage, QAngle &viewPunch,
 		}
 
 		// Play a random attack hit sound
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.MeleeAttack" );
+		const char* soundname = "NPC_Antlion.MeleeAttack";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -1139,7 +1147,15 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 					DispatchParticleEffect( "blood_impact_yellow_01", vSpitPos + RandomVector( -12.0f, 12.0f ), RandomAngle( 0, 360 ) );
 				}
 
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.PoisonShoot" );
+				const char* soundname = "NPC_Antlion.PoisonShoot";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			return;
 		}
@@ -1155,7 +1171,16 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ANTLION_WALK_FOOTSTEP )
 	{
 		MakeAIFootstepSound( 240.0f );
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Footstep", m_hFootstep, pEvent->eventtime );
+		const char* soundname = "NPC_Antlion.Footstep";
+		CPASAttenuationFilter filter(this, soundname, m_hFootstep);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = pEvent->eventtime;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params, m_hFootstep);
+		//g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Footstep", m_hFootstep, pEvent->eventtime );
 		return;
 	}
 
@@ -1208,7 +1233,15 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ANTLION_BURROW_IN )
 	{
 		//Burrowing sound
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.BurrowIn" );
+		const char* soundname = "NPC_Antlion.BurrowIn";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		//Shake the screen
 		UTIL_ScreenShake( GetAbsOrigin(), 0.5f, 80.0f, 1.0f, 256.0f, SHAKE_START );
@@ -1226,7 +1259,15 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLION_BURROW_OUT )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.BurrowOut" );
+		const char* soundname = "NPC_Antlion.BurrowOut";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		//Shake the screen
 		UTIL_ScreenShake( GetAbsOrigin(), 0.5f, 80.0f, 1.0f, 256.0f, SHAKE_START );
@@ -1242,26 +1283,60 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLION_FOOTSTEP_SOFT )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.FootstepSoft", pEvent->eventtime );
+		const char* soundname = "NPC_Antlion.FootstepSoft";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = pEvent->eventtime;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.FootstepSoft", pEvent->eventtime );
 		return;
 	}
 
 	if ( pEvent->event == AE_ANTLION_FOOTSTEP_HEAVY )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.FootstepHeavy", pEvent->eventtime );
+		const char* soundname = "NPC_Antlion.FootstepHeavy";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = pEvent->eventtime;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.FootstepHeavy", pEvent->eventtime );
 		return;
 	}
 	
 	
 	if ( pEvent->event == AE_ANTLION_MELEE1_SOUND )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.MeleeAttackSingle" );
+		const char* soundname = "NPC_Antlion.MeleeAttackSingle";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 	
 	if ( pEvent->event == AE_ANTLION_MELEE2_SOUND )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.MeleeAttackDouble" );
+		const char* soundname = "NPC_Antlion.MeleeAttackDouble";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 
@@ -1277,11 +1352,27 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 	{
 		if ( GetWaterLevel() < 2 )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.PoisonBurstScream" );
+			const char* soundname = "NPC_Antlion.PoisonBurstScream";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		else
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.PoisonBurstScreamSubmerged" );
+			const char* soundname = "NPC_Antlion.PoisonBurstScreamSubmerged";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		return;
 	}
@@ -1450,7 +1541,15 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 
 	case TASK_ANNOUNCE_ATTACK:
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.MeleeAttackSingle" );
+			const char* soundname = "NPC_Antlion.MeleeAttackSingle";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			TaskComplete();
 			break;
 		}
@@ -2354,7 +2453,15 @@ int CNPC_Antlion::SelectSchedule( void )
 		//Play a special sound
 		if ( m_flNextAcknowledgeTime < gpGlobals->curtime )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Distracted" );
+			const char* soundname = "NPC_Antlion.Distracted";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_flNextAcknowledgeTime = gpGlobals->curtime + 1.0f;
 		}
 		
@@ -2455,7 +2562,15 @@ int CNPC_Antlion::SelectSchedule( void )
 				{
 					if ( OccupyStrategySlot( SQUAD_SLOT_ANTLION_WORKER_FIRE ) )
 					{
-						g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.PoisonBurstScream" );
+						const char* soundname = "NPC_Antlion.PoisonBurstScream";
+						CPASAttenuationFilter filter(this, soundname);
+
+						EmitSound_t params;
+						params.m_pSoundName = soundname;
+						params.m_flSoundTime = 0.0f;
+						params.m_pflSoundDuration = NULL;
+						params.m_bWarnOnDirectWaveReference = true;
+						g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 						SetNextAttack( gpGlobals->curtime + random->RandomFloat( 0.5f, 2.5f ) );
 						if ( GetEnemy() )
 						{
@@ -2742,7 +2857,15 @@ void CNPC_Antlion::StopLoopingSounds( void )
 //-----------------------------------------------------------------------------
 void CNPC_Antlion::IdleSound( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Idle" );
+	const char* soundname = "NPC_Antlion.Idle";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	m_flIdleDelay = gpGlobals->curtime + 4.0f;
 }
 
@@ -2751,7 +2874,15 @@ void CNPC_Antlion::IdleSound( void )
 //-----------------------------------------------------------------------------
 void CNPC_Antlion::PainSound( const CTakeDamageInfo &info )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Pain" );
+	const char* soundname = "NPC_Antlion.Pain";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -3345,7 +3476,15 @@ bool CNPC_Antlion::CheckLanding( void )
 			SetIdealActivity( (Activity) ACT_ANTLION_LAND );
 
 			CreateDust( false );
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Land" );
+			const char* soundname = "NPC_Antlion.Land";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			if ( GetEnemy() && GetEnemy()->IsPlayer()  )
 			{
@@ -4219,7 +4358,15 @@ void CNPC_Antlion::SetFollowTarget( CBaseEntity *pTarget )
 	// Play an acknowledgement noise
 	if ( m_flNextAcknowledgeTime < gpGlobals->curtime )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.Distracted" );
+		const char* soundname = "NPC_Antlion.Distracted";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flNextAcknowledgeTime = gpGlobals->curtime + 1.0f;
 	}
 }
@@ -4332,7 +4479,15 @@ void CNPC_Antlion::Flip( bool bZapped /*= false*/ )
 	{
 		m_flZapDuration = gpGlobals->curtime + SequenceDuration( SelectWeightedSequence( (Activity) ACT_ANTLION_ZAP_FLIP) ) + 0.1f;
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.ZappedFlip"  );
+		const char* soundname = "NPC_Antlion.ZappedFlip";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -4412,7 +4567,15 @@ void CNPC_Antlion::DoPoisonBurst()
 		DispatchEffect( "WaterSurfaceExplosion", data );
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Antlion.PoisonBurstExplode" );
+	const char* soundname = "NPC_Antlion.PoisonBurstExplode";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 #endif
 

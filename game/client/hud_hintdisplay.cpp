@@ -323,7 +323,16 @@ void CHudHintDisplay::LocalizeAndDisplay( const char *pszHudTxtMsg, const char *
 #ifndef HL2MP
 			if ( sv_hudhint_sound.GetBool() && cl_hudhint_sound.GetBool() )
 			{
-				g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Hud.Hint" );//pLocalPlayer->
+				const char* soundname = "Hud.Hint";
+				CPASAttenuationFilter filter(pLocalPlayer, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, pLocalPlayer->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Hud.Hint" );//pLocalPlayer->
 			}
 #endif // HL2MP
 

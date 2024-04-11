@@ -2322,15 +2322,39 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 		{
 			if( FClassnameIs( GetActiveWeapon(), "weapon_ar2" ) )
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Weapon_CombineGuard.Special1" );
+				const char* soundname = "Weapon_CombineGuard.Special1";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			else if( FClassnameIs( GetActiveWeapon(), "weapon_smg1" ) )
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Weapon_SMG1.Double" );
+				const char* soundname = "Weapon_SMG1.Double";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			else
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Weapon_CombineGuard.Special1" );
+				const char* soundname = "Weapon_CombineGuard.Special1";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			handledEvent = true;
 		}
@@ -2423,7 +2447,15 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 
 		case COMBINE_AE_GREN_LAUNCH:
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_Combine.GrenadeLaunch" );
+				const char* soundname = "NPC_Combine.GrenadeLaunch";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 				CBaseEntity *pGrenade = CreateNoSpawn( "npc_contactgrenade", Weapon_ShootPosition(), vec3_angle, this );
 				pGrenade->KeyValue( "velocity", m_vecTossVelocity );
@@ -2470,7 +2502,15 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 						CalculateMeleeDamageForce( &info, forward, pBCC->GetAbsOrigin() );
 						pBCC->TakeDamage( info );
 
-						g_pSoundEmitterSystem->EmitSound(this, "NPC_Combine.WeaponBash" );
+						const char* soundname = "NPC_Combine.WeaponBash";
+						CPASAttenuationFilter filter(this, soundname);
+
+						EmitSound_t params;
+						params.m_pSoundName = soundname;
+						params.m_flSoundTime = 0.0f;
+						params.m_pflSoundDuration = NULL;
+						params.m_bWarnOnDirectWaveReference = true;
+						g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 					}
 				}			
 

@@ -2126,11 +2126,27 @@ void CProp_Portal::NewLocation( const Vector &vOrigin, const QAngle &qAngles )
 
 	if ( m_bIsPortal2 )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Portal.open_red" );
+		const char* soundname = "Portal.open_red";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Portal.open_blue" );
+		const char* soundname = "Portal.open_blue";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -2179,11 +2195,27 @@ void CProp_Portal::InputSetActivatedState( inputdata_t &inputdata )
 
 			if ( m_bIsPortal2 )
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Portal.open_red" );
+				const char* soundname = "Portal.open_red";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 			else
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "Portal.open_blue" );
+				const char* soundname = "Portal.open_blue";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 		}
 	}

@@ -645,7 +645,15 @@ void CBreakableProp::StickAtPosition( const Vector &stickPosition, const Vector 
 	if ( !VPhysicsGetObject()->IsMotionEnabled() )
 		return;
 
-	g_pSoundEmitterSystem->EmitSound(this, "Metal.SawbladeStick");
+	const char* soundname = "Metal.SawbladeStick";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	Teleport( &stickPosition, NULL, NULL );
 	SetEnableMotionPosition( savePosition, saveAngles );  // this uses hierarchy, so it must be set after teleport
 
@@ -1572,7 +1580,15 @@ void CBreakableProp::PlayPuntSound()
 	if( m_iszPuntSound == NULL_STRING )
 		return;
 
-	g_pSoundEmitterSystem->EmitSound(this, STRING(m_iszPuntSound) );
+	const char* soundname = STRING(m_iszPuntSound);
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -1696,7 +1712,15 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 			ExplosionCreate( WorldSpaceCenter(), angles, pAttacker, m_explodeDamage, m_explodeRadius, 
 				SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE | SF_ENVEXPLOSION_SURFACEONLY | SF_ENVEXPLOSION_NOSOUND,
 				0.0f, this );
-			g_pSoundEmitterSystem->EmitSound(this, "PropaneTank.Burst");
+			const char* soundname = "PropaneTank.Burst";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		else
 		{
@@ -2128,7 +2152,15 @@ void CDynamicProp::HandleAnimEvent( animevent_t *pEvent )
 		
 		case SCRIPT_EVENT_SOUND:
 		{
-			g_pSoundEmitterSystem->EmitSound(this, pEvent->options );
+			const char* soundname = pEvent->options;
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			break;
 		}
 		
@@ -4092,7 +4124,15 @@ void CBasePropDoor::DoorOpen(CBaseEntity *pOpenAwayFrom)
 	// filter them out and leave a client stuck with looping door sounds!
 	if (!HasSpawnFlags(SF_DOOR_SILENT))
 	{
-		g_pSoundEmitterSystem->EmitSound(this, STRING( m_SoundMoving ) );
+		const char* soundname = STRING(m_SoundMoving);
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		if ( m_hActivator && m_hActivator->IsPlayer() && !HasSpawnFlags( SF_DOOR_SILENT_TO_NPCS ) )
 		{
@@ -4141,7 +4181,15 @@ void CBasePropDoor::DoorOpenMoveDone(void)
 
 	if (!HasSpawnFlags(SF_DOOR_SILENT))
 	{
-		g_pSoundEmitterSystem->EmitSound(this, STRING( m_SoundOpen ) );
+		const char* soundname = STRING(m_SoundOpen);
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	ASSERT(IsDoorOpening());
@@ -4214,7 +4262,15 @@ void CBasePropDoor::DoorClose(void)
 
 	if (!HasSpawnFlags(SF_DOOR_SILENT))
 	{
-		g_pSoundEmitterSystem->EmitSound(this, STRING( m_SoundMoving ) );
+		const char* soundname = STRING(m_SoundMoving);
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		if ( m_hActivator && m_hActivator->IsPlayer() )
 		{
@@ -4263,7 +4319,15 @@ void CBasePropDoor::DoorCloseMoveDone(void)
 	if (!HasSpawnFlags(SF_DOOR_SILENT))
 	{
 		g_pSoundEmitterSystem->StopSound(this, STRING( m_SoundMoving ) );
-		g_pSoundEmitterSystem->EmitSound(this, STRING( m_SoundClose ) );
+		const char* soundname = STRING(m_SoundClose);
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	ASSERT(IsDoorClosing());
@@ -4502,7 +4566,15 @@ void CBasePropDoor::EndBlocked( void )
 	// filter them out and leave a client stuck with looping door sounds!
 	if (!HasSpawnFlags(SF_DOOR_SILENT))
 	{
-		g_pSoundEmitterSystem->EmitSound(this, STRING( m_SoundMoving ) );
+		const char* soundname = STRING(m_SoundMoving);
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	//

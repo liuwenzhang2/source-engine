@@ -727,7 +727,16 @@ void CCSBuySubMenu::OnCommand( const char *command )
 			C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 			if ( pPlayer )
 			{
-				g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
+				const char* soundname = "BuyPreset.CantBuy";
+				CPASAttenuationFilter filter(pPlayer, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
 			}
 
 			if ( cl_buy_favorite_nowarn.GetBool() )
@@ -769,7 +778,16 @@ void CCSBuySubMenu::OnCommand( const char *command )
 		C_CSPlayer *pPlayer = C_CSPlayer::GetLocalCSPlayer();
 		if ( pPlayer )
 		{
-			g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
+			const char* soundname = "BuyPreset.CantBuy";
+			CPASAttenuationFilter filter(pPlayer, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(pPlayer, "BuyPreset.CantBuy" );//pPlayer->
 		}
 		BaseClass::OnCommand( "vguicancel" );
 		return;

@@ -149,8 +149,16 @@ void C_BaseCombatWeapon::OnDataChanged( DataUpdateType_t updateType )
 				{
 					pHudSelection->OnWeaponPickup( this );
 				}
+				const char* soundname = "Player.PickupWeapon";
+				CPASAttenuationFilter filter(pPlayer, soundname);
 
-				g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.PickupWeapon" );//pPlayer->
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(pPlayer, "Player.PickupWeapon" );//pPlayer->
 			}
 		}
 	}

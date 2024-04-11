@@ -354,7 +354,15 @@ void CPropVehiclePrisonerPod::InputOpen( inputdata_t &inputdata )
 		m_flAnimTime = gpGlobals->curtime;
 		ResetSequence( nSequence );
 		ResetClientsideFrame();
-		g_pSoundEmitterSystem->EmitSound(this, "d3_citadel.pod_open" );
+		const char* soundname = "d3_citadel.pod_open";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
@@ -383,7 +391,15 @@ void CPropVehiclePrisonerPod::InputClose( inputdata_t &inputdata )
 		m_flAnimTime = gpGlobals->curtime;
 		ResetSequence( nSequence );
 		ResetClientsideFrame();
-		g_pSoundEmitterSystem->EmitSound(this, "d3_citadel.pod_close" );
+		const char* soundname = "d3_citadel.pod_close";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{

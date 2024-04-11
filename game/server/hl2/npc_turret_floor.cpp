@@ -414,7 +414,15 @@ void CNPC_FloorTurret::Retire( void )
 		if ( UpdateFacing() == false )
 		{
 			SetActivity( (Activity) ACT_FLOOR_TURRET_CLOSE );
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Retire" );
+			const char* soundname = "NPC_FloorTurret.Retire";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			//Notify of the retraction
 			m_OnRetire.FireOutput( NULL, this );
@@ -462,7 +470,15 @@ void CNPC_FloorTurret::Deploy( void )
 	{
 		m_bActive = true;
 		SetActivity( (Activity) ACT_FLOOR_TURRET_OPEN );
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Deploy" );
+		const char* soundname = "NPC_FloorTurret.Deploy";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		//Notify we're deploying
 		m_OnDeploy.FireOutput( NULL, this );
@@ -478,7 +494,15 @@ void CNPC_FloorTurret::Deploy( void )
 		m_flPlaybackRate = 0;
 		SetThink( &CNPC_FloorTurret::SearchThink );
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Move" );
+		const char* soundname = "NPC_FloorTurret.Move";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	m_flLastSight = gpGlobals->curtime + FLOOR_TURRET_MAX_WAIT;	
@@ -609,7 +633,15 @@ bool CNPC_FloorTurret::HandleInteraction(int interactionType, void *data, CBaseC
 		CalculateMeleeDamageForce( &info, forward, GetAbsOrigin() );
 		TakeDamage( info );
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Combine.WeaponBash" );
+		const char* soundname = "NPC_Combine.WeaponBash";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return true;
 	}
 
@@ -698,8 +730,28 @@ bool CNPC_FloorTurret::UpdateFacing( void )
 
 void CNPC_FloorTurret::DryFire( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.DryFire");
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Activate" );
+	{
+		const char* soundname = "NPC_FloorTurret.DryFire";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
+	{
+		const char* soundname = "NPC_FloorTurret.Activate";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
 
  	if ( RandomFloat( 0, 1 ) > 0.5 )
 	{
@@ -1068,7 +1120,15 @@ void CNPC_FloorTurret::SearchThink( void )
  
 		if ( gpGlobals->curtime > m_flNextActivateSoundTime )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Activate" );
+			const char* soundname = "NPC_FloorTurret.Activate";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_flNextActivateSoundTime = gpGlobals->curtime + 3.0;
 		}
 		return;
@@ -1122,7 +1182,15 @@ void CNPC_FloorTurret::AutoSearchThink( void )
 		SetThink( &CNPC_FloorTurret::Deploy );
 		if ( !m_bNoAlarmSounds )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Alert" );
+			const char* soundname = "NPC_FloorTurret.Alert";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 	}
 }
@@ -1160,7 +1228,16 @@ void CNPC_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirToEnemy,
 	}
 
 	FireBullets( info );
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.ShotSounds", m_ShotSounds );
+	const char* soundname = "NPC_FloorTurret.ShotSounds";
+	CPASAttenuationFilter filter(this, soundname, m_ShotSounds);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params, m_ShotSounds);
+	//g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.ShotSounds", m_ShotSounds );
 	DoMuzzleFlash();
 }
 
@@ -1298,11 +1375,31 @@ void CNPC_FloorTurret::TippedThink( void )
 			if ( UpdateFacing() == false )
 			{
 				//Make any last death noises and anims
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Die" );
+				{
+					const char* soundname = "NPC_FloorTurret.Die";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+				}
 				SpinDown();
 
 				SetActivity( (Activity) ACT_FLOOR_TURRET_CLOSE );
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Retract" );
+				{
+					const char* soundname = "NPC_FloorTurret.Retract";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+				}
 
 				CTakeDamageInfo	info;
 				info.SetDamage( 1 );
@@ -1364,7 +1461,15 @@ void CNPC_FloorTurret::InactiveThink( void )
 			if ( m_bBlinkState == false )
 			{
 				// Ping when the light is going to come back on
-				g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.AlarmPing" );
+				const char* soundname = "NPC_FloorTurret.AlarmPing";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 
 			SetEyeState( TURRET_EYE_ALARM );
@@ -1497,7 +1602,15 @@ bool CNPC_FloorTurret::PreThink( turretState_e state )
 				SpinUp();
 				if ( !m_bNoAlarmSounds )
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Alarm" );
+					const char* soundname = "NPC_FloorTurret.Alarm";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 			}
 			else
@@ -1660,7 +1773,15 @@ void CNPC_FloorTurret::Ping( void )
 		return;
 
 	//Ping!
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Ping" );
+	const char* soundname = "NPC_FloorTurret.Ping";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	SetEyeState( TURRET_EYE_SEEKING_TARGET );
 
@@ -2038,7 +2159,17 @@ void CNPC_FloorTurret::BreakThink( void )
 	// K-boom
 	RadiusDamage( CTakeDamageInfo( this, this, 15.0f, DMG_BLAST ), vecOrigin, (10*12), CLASS_NONE, this );
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_FloorTurret.Destruct" );
+	{
+		const char* soundname = "NPC_FloorTurret.Destruct";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+	}
 
 	breakablepropparams_t params( GetAbsOrigin(), GetAbsAngles(), vec3_origin, RandomAngularImpulse( -800.0f, 800.0f ) );
 	params.impactEnergyScale = 1.0f;

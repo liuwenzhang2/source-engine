@@ -524,7 +524,15 @@ void CDODPlayer::Spawn()
 	// update this counter, used to not interp players when they spawn
 	m_bSpawnInterpCounter = !m_bSpawnInterpCounter;
 
-	g_pSoundEmitterSystem->EmitSound(this, "Player.Spawn" );
+	const char* soundname = "Player.Spawn";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	SetContextThink( &CDODPlayer::PushawayThink, gpGlobals->curtime + PUSHAWAY_THINK_INTERVAL, DOD_PUSHAWAY_THINK_CONTEXT );
 
@@ -1034,7 +1042,15 @@ void CDODPlayer::FlashlightTurnOn( void )
 	if( flashlight.GetInt() > 0 && IsAlive() )
 	{
 		AddEffects( EF_DIMLIGHT );
-		g_pSoundEmitterSystem->EmitSound(this, "Player.FlashlightOn" );
+		const char* soundname = "Player.FlashlightOn";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -1048,7 +1064,15 @@ void CDODPlayer::FlashlightTurnOff( void )
 
 		if( m_iHealth > 0 )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "Player.FlashlightOff" );
+			const char* soundname = "Player.FlashlightOff";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 	}	
 }
@@ -3415,15 +3439,39 @@ void CDODPlayer::Pain( void )
 {
 	if ( m_LastDamageType & DMG_CLUB)
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Player.MajorPain" );
+		const char* soundname = "Player.MajorPain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else if ( m_LastDamageType & DMG_BLAST )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Player.MajorPain" );
+		const char* soundname = "Player.MajorPain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Player.MinorPain" );
+		const char* soundname = "Player.MinorPain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -3431,19 +3479,51 @@ void CDODPlayer::DeathSound( const CTakeDamageInfo &info )
 {
 	if ( m_LastDamageType & DMG_CLUB )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Player.MegaPain" );
+		const char* soundname = "Player.MegaPain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else if ( m_LastDamageType & DMG_BLAST )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Player.MegaPain" );
+		const char* soundname = "Player.MegaPain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else if ( m_LastHitGroup == HITGROUP_HEAD )	
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Player.DeathHeadShot" );
+		const char* soundname = "Player.DeathHeadShot";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "Player.MinorPain" );
+		const char* soundname = "Player.MinorPain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -4468,7 +4548,15 @@ void CDODPlayer::SetDefusing( CDODBombTarget *pTarget )
 	if ( bIsDefusing && !m_bIsDefusing )
 	{
 		// start defuse sound
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_C4.Disarm" );
+		const char* soundname = "Weapon_C4.Disarm";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_Shared.SetDefusing( true );
 	}
 	else if ( !bIsDefusing && m_bIsDefusing )
@@ -4490,7 +4578,15 @@ void CDODPlayer::SetPlanting( CDODBombTarget *pTarget )
 	if ( bIsPlanting && !m_bIsPlanting )
 	{
 		// start defuse sound
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_C4.Plant" );
+		const char* soundname = "Weapon_C4.Plant";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_Shared.SetPlanting( true );
 	}
 	else if ( !bIsPlanting && m_bIsPlanting )
@@ -4632,7 +4728,15 @@ void CDODPlayer::HandleComboWeaponKill( int iWeaponType )
 
 void CDODPlayer::PlayUseDenySound()
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Player.UseDeny" );
+	const char* soundname = "Player.UseDeny";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------

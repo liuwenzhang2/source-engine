@@ -235,7 +235,15 @@ void CMissile::DumbFire( void )
 	SetModel("models/weapons/w_missile.mdl");
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
 
-	g_pSoundEmitterSystem->EmitSound(this, "Missile.Ignite" );
+	const char* soundname = "Missile.Ignite";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Smoke trail.
 	CreateSmokeTrail();
@@ -259,7 +267,15 @@ void CMissile::AccelerateThink( void )
 	Vector vecForward;
 
 	// !!!UNDONE - make this work exactly the same as HL1 RPG, lest we have looping sound bugs again!
-	g_pSoundEmitterSystem->EmitSound(this, "Missile.Accelerate" );
+	const char* soundname = "Missile.Accelerate";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// SetEffects( EF_LIGHT );
 
@@ -444,7 +460,15 @@ void CMissile::IgniteThink( void )
 
 	Vector vecForward;
 
-	g_pSoundEmitterSystem->EmitSound(this, "Missile.Ignite" );
+	const char* soundname = "Missile.Ignite";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	AngleVectors( GetLocalAngles(), &vecForward );
 	SetAbsVelocity( vecForward * RPG_SPEED );

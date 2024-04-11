@@ -116,7 +116,15 @@ void CSmokeGrenadeProjectile::Think_Detonate()
 	m_hSmokeEffect = pGren;
 	m_bDidSmokeEffect = true;
 
-	g_pSoundEmitterSystem->EmitSound(this, "BaseSmokeEffect.Sound" );
+	const char* soundname = "BaseSmokeEffect.Sound";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_nRenderMode = kRenderTransColor;
 	SetNextThink( gpGlobals->curtime + 5 );
@@ -184,6 +192,14 @@ void CSmokeGrenadeProjectile::BounceSound( void )
 {
 	if ( !m_bDidSmokeEffect )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "SmokeGrenade.Bounce" );
+		const char* soundname = "SmokeGrenade.Bounce";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }

@@ -971,7 +971,16 @@ void CHudVote::MsgFunc_CallVoteFailed( bf_read &msg )
 	if ( !pLocalPlayer )
 		return;
 
-	g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Failed");//pLocalPlayer->
+	const char* soundname = "Vote.Failed";
+	CPASAttenuationFilter filter(pLocalPlayer, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, pLocalPlayer->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Failed");//pLocalPlayer->
 
 	m_pVoteActive->SetVisible( false );
 	m_pVoteFailed->SetVisible( false );
@@ -1111,7 +1120,16 @@ void CHudVote::MsgFunc_VoteFailed( bf_read &msg )
 	if ( !pLocalPlayer )
 		return;
 
-	g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Failed");//pLocalPlayer->
+	const char* soundname = "Vote.Failed";
+	CPASAttenuationFilter filter(pLocalPlayer, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, pLocalPlayer->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Failed");//pLocalPlayer->
 }
 
 //-----------------------------------------------------------------------------
@@ -1403,7 +1421,16 @@ void CHudVote::MsgFunc_VotePass( bf_read &msg )
 	if ( !pLocalPlayer )
 		return;
 
-	g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Passed" );//pLocalPlayer->
+	const char* soundname = "Vote.Passed";
+	CPASAttenuationFilter filter(pLocalPlayer, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, pLocalPlayer->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Passed" );//pLocalPlayer->
 }
 
 //-----------------------------------------------------------------------------
@@ -1676,7 +1703,16 @@ void CHudVote::OnThink()
 			C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
 			if ( pLocalPlayer )
 			{
-				g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Created");//pLocalPlayer->
+				const char* soundname = "Vote.Created";
+				CPASAttenuationFilter filter(pLocalPlayer, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, pLocalPlayer->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Created");//pLocalPlayer->
 			}
 		}
 	}

@@ -1963,14 +1963,22 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 			GetAttachment( "back foot", footPosition );
 
 			CPASAttenuationFilter filter( this, "NPC_Strider.Whoosh" );
-			g_pSoundEmitterSystem->EmitSound( filter, 0, "NPC_Strider.Whoosh", &footPosition );
+			g_pSoundEmitterSystem->EmitSound( filter, this->entindex(), "NPC_Strider.Whoosh", &footPosition );
 		}
 		break;
 	case STRIDER_AE_CREAK_LEFT:
 	case STRIDER_AE_CREAK_BACK:
 	case STRIDER_AE_CREAK_RIGHT:
 		{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Creak" );
+			const char* soundname = "NPC_Strider.Creak";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		break;
 	default:
@@ -2428,7 +2436,15 @@ bool CNPC_Strider::UpdateEnemyMemory( CBaseEntity *pEnemy, const Vector &positio
 {
 	if( pInformer && FClassnameIs( pInformer, "npc_cscanner" ) )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Alert" );
+		const char* soundname = "NPC_Strider.Alert";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		// Move Strider's focus to this location and make strider mad at it
 		// (but less mad than at any other potential entities in the scene).
 #if 1
@@ -2953,7 +2969,15 @@ void CNPC_Strider::AlertSound()
 {
 	if( ( gpGlobals->curtime - m_flTimeLastAlertSound ) > 2.0f )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Alert" );
+		const char* soundname = "NPC_Strider.Alert";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flTimeLastAlertSound = gpGlobals->curtime;
 	}
 }
@@ -2966,7 +2990,15 @@ void CNPC_Strider::PainSound( const CTakeDamageInfo &info )
 	if ( ShouldExplodeFromDamage( info ) )
 		return;
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Pain" );
+	const char* soundname = "NPC_Strider.Pain";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //---------------------------------------------------------
@@ -2976,12 +3008,40 @@ void CNPC_Strider::DeathSound( const CTakeDamageInfo &info )
 	// This means that we've exploded into pieces and have no way to whimper
 	if ( m_bExploding )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.StriderBusterExplode" );
-		g_pSoundEmitterSystem->EmitSound(this, "explode_5" );
+		{
+			const char* soundname = "NPC_Strider.StriderBusterExplode";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		}
+		{
+			const char* soundname = "explode_5";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
+		}
 		return;
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Death" );
+	const char* soundname = "NPC_Strider.Death";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //---------------------------------------------------------
@@ -2990,7 +3050,15 @@ void CNPC_Strider::HuntSound()
 {
 	if( m_PlayerFreePass.HasPass() )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.Hunt" );
+		const char* soundname = "NPC_Strider.Hunt";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_flTimeNextHuntSound = gpGlobals->curtime + random->RandomFloat( 8.0f, 12.0f );
 	}
 }
@@ -3824,7 +3892,15 @@ void CNPC_Strider::ShootMinigun( const Vector *pTarget, float aimError, const Ve
 		//g_pEffects->MuzzleFlash( muzzlePos, muzzleAng, random->RandomFloat( 2.0f, 4.0f ) , MUZZLEFLASH_TYPE_STRIDER );
 		DoMuzzleFlash();
 
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Strider.FireMinigun" );
+		const char* soundname = "NPC_Strider.FireMinigun";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 
@@ -5376,7 +5452,15 @@ void CSparkTrail::Spawn()
 {
 	Precache();
 
-	g_pSoundEmitterSystem->EmitSound(this, "DoSpark" );
+	const char* soundname = "DoSpark";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_iHealth = 20 + random->RandomInt( 0, 5 );
 	UTIL_SetOrigin( this, GetOwnerEntity()->EyePosition() );

@@ -1602,7 +1602,15 @@ void CHL2_Player::CommanderExecute( CommanderCommand_t command )
 
 	if ( !pPlayerSquadLeader )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "HL2Player.UseDeny" );
+		const char* soundname = "HL2Player.UseDeny";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 
@@ -1636,7 +1644,15 @@ void CHL2_Player::CommanderExecute( CommanderCommand_t command )
 		// Find a goal for ourselves.
 		if( !CommanderFindGoal( &goal ) )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "HL2Player.UseDeny" );
+			const char* soundname = "HL2Player.UseDeny";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			return; // just keep following
 		}
 	}
@@ -2039,7 +2055,16 @@ void CHL2_Player::FlashlightTurnOn( void )
 #endif
 
 	AddEffects( EF_DIMLIGHT );
-	g_pSoundEmitterSystem->EmitSound(this, "HL2Player.FlashLightOn" );
+
+	const char* soundname = "HL2Player.FlashLightOn";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	variant_t flashlighton;
 	flashlighton.SetFloat( m_HL2Local.m_flSuitPower / 100.0f );
@@ -2058,7 +2083,16 @@ void CHL2_Player::FlashlightTurnOff( void )
 	}
 
 	RemoveEffects( EF_DIMLIGHT );
-	g_pSoundEmitterSystem->EmitSound(this, "HL2Player.FlashLightOff" );
+
+	const char* soundname = "HL2Player.FlashLightOff";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	variant_t flashlightoff;
 	flashlightoff.SetFloat( m_HL2Local.m_flSuitPower / 100.0f );
@@ -2364,18 +2398,42 @@ int CHL2_Player::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	{
 		if( m_idrowndmg == m_idrownrestored )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "Player.DrownStart" );
+			const char* soundname = "Player.DrownStart";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		else
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "Player.DrownContinue" );
+			const char* soundname = "Player.DrownContinue";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 	}
 
 	// Burnt
 	if ( info.GetDamageType() & DMG_BURN )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "HL2Player.BurnPain" );
+		const char* soundname = "HL2Player.BurnPain";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 
@@ -2815,7 +2873,16 @@ void CHL2_Player::PlayerUse ( void )
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
 					m_iTrain = TrainSpeed(pTrain->m_flSpeed, ((CFuncTrackTrain*)pTrain)->GetMaxSpeed());
 					m_iTrain |= TRAIN_NEW;
-					g_pSoundEmitterSystem->EmitSound(this, "HL2Player.TrainUse" );
+
+					const char* soundname = "HL2Player.TrainUse";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 					return;
 				}
 			}
@@ -2851,7 +2918,15 @@ void CHL2_Player::PlayerUse ( void )
 			// Robin: Don't play sounds for NPCs, because NPCs will allow respond with speech.
 			if ( !pUseEntity->MyNPCPointer() )
 			{
-				g_pSoundEmitterSystem->EmitSound(this, "HL2Player.Use" );
+				const char* soundname = "HL2Player.Use";
+				CPASAttenuationFilter filter(this, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 		}
 
@@ -3593,7 +3668,15 @@ void CHL2_Player::ItemPostFrame()
 	if ( m_bPlayUseDenySound )
 	{
 		m_bPlayUseDenySound = false;
-		g_pSoundEmitterSystem->EmitSound(this, "HL2Player.UseDeny" );
+		const char* soundname = "HL2Player.UseDeny";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 }
 

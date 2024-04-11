@@ -1875,7 +1875,15 @@ void CFuncTrackTrain::SoundUpdate( void )
 
 		if ( ( m_iszSoundMovePing != NULL_STRING ) && ( gpGlobals->curtime > m_flNextMoveSoundTime ) )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, STRING(m_iszSoundMovePing));
+			const char* soundname = STRING(m_iszSoundMovePing);
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			m_flNextMoveSoundTime = gpGlobals->curtime + RemapVal( flSpeedRatio, 0, 1, m_flMoveSoundMaxTime, m_flMoveSoundMinTime );
 		}
 	}
@@ -3181,7 +3189,15 @@ void CFuncTrackChange::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_T
 	if ( m_code == TRAIN_BLOCKING )
 	{
 		// Play alarm and return
-		g_pSoundEmitterSystem->EmitSound(this, "FuncTrackChange.Blocking" );
+		const char* soundname = "FuncTrackChange.Blocking";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		return;
 	}
 

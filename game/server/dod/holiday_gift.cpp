@@ -46,7 +46,16 @@ CHolidayGift* CHolidayGift::Create( const Vector &position, const QAngle &angles
 		pGift->UseClientSideAnimation();
 		pGift->ResetSequence( pGift->LookupSequence("idle") );
 
-		g_pSoundEmitterSystem->EmitSound(pGift, "Christmas.GiftDrop" );//pGift->
+		const char* soundname = "Christmas.GiftDrop";
+		CPASAttenuationFilter filter(pGift, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, pGift->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(pGift, "Christmas.GiftDrop" );//pGift->
 
 		pGift->ActivateWhenAtRest();
 	}
@@ -79,7 +88,15 @@ void CHolidayGift::Spawn( void )
 //-----------------------------------------------------------------------------
 void CHolidayGift::DropSoundThink( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "Christmas.GiftDrop" );
+	const char* soundname = "Christmas.GiftDrop";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------
@@ -104,7 +121,16 @@ bool CHolidayGift::MyTouch( CBasePlayer *pPlayer )
 		event->SetInt( "userid", pPlayer->GetUserID() );
 		gameeventmanager->FireEvent( event );
 	}
-	g_pSoundEmitterSystem->EmitSound(pPlayer, "Christmas.GiftPickup" );//pPlayer->
+	const char* soundname = "Christmas.GiftPickup";
+	CPASAttenuationFilter filter(pPlayer, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, pPlayer->entindex(), params);
+	//g_pSoundEmitterSystem->EmitSound(pPlayer, "Christmas.GiftPickup" );//pPlayer->
 
 	return true;
 }

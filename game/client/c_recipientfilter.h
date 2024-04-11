@@ -38,7 +38,7 @@ public:
 
 public:
 
-	void			CopyFrom( const C_RecipientFilter& src );
+	void			CopyFrom( const IRecipientFilter* src );
 
 	void			Reset( void );
 

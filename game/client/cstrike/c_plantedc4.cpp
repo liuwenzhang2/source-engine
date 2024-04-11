@@ -121,7 +121,7 @@ void C_PlantedC4::ClientThink( void )
 
 		if (g_pSoundEmitterSystem->GetParametersForSound( "C4.PlantSound", params, NULL ) )
 		{
-			EmitSound_t ep( params );
+			EmitSound_t ep( params, gpGlobals->curtime);
 			ep.m_SoundLevel = ATTN_TO_SNDLVL( attenuation );
 			ep.m_pOrigin = &GetAbsOrigin();
 

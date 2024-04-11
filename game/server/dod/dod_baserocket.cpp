@@ -84,7 +84,15 @@ void CDODBaseRocket::Spawn( void )
 
 	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_Bazooka.Shoot" );
+	const char* soundname = "Weapon_Bazooka.Shoot";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_flCollideWithTeammatesTime = gpGlobals->curtime + 0.25;
 	m_bCollideWithTeammates = false;
@@ -122,7 +130,15 @@ void CDODBaseRocket::Fire( void )
 	SetModel("models/weapons/w_missile.mdl");
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
 
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_Bazooka.Shoot" );
+	const char* soundname = "Weapon_Bazooka.Shoot";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 //-----------------------------------------------------------------------------

@@ -467,7 +467,7 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 				CSoundParameters params;
 				if (g_pSoundEmitterSystem->GetParametersForSound( "Snark.Deploy", params, NULL ) )
 				{
-					EmitSound_t ep( params );
+					EmitSound_t ep( params, gpGlobals->curtime);
 					ep.m_nPitch = (int)flpitch;
 
 					g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
@@ -502,7 +502,7 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 		CSoundParameters params;
 		if (g_pSoundEmitterSystem->GetParametersForSound( "Snark.Bounce", params, NULL ) )
 		{
-			EmitSound_t ep( params );
+			EmitSound_t ep( params, gpGlobals->curtime);
 			ep.m_nPitch = (int)flpitch;
 
 			g_pSoundEmitterSystem->EmitSound( filter2, entindex(), ep );

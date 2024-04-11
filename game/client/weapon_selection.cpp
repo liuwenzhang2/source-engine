@@ -523,7 +523,16 @@ void CBaseHudWeaponSelection::SelectWeapon( void )
 	// Don't allow selections of weapons that can't be selected (out of ammo, etc)
 	if ( !GetSelectedWeapon()->CanBeSelected() )
 	{
-		g_pSoundEmitterSystem->EmitSound(player, "Player.DenyWeaponSelection" );//player->
+		const char* soundname = "Player.DenyWeaponSelection";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "Player.DenyWeaponSelection" );//player->
 	}
 	else
 	{
@@ -534,7 +543,16 @@ void CBaseHudWeaponSelection::SelectWeapon( void )
 		engine->ClientCmd( "cancelselect\n" );
 
 		// Play the "weapon selected" sound
-		g_pSoundEmitterSystem->EmitSound(player, "Player.WeaponSelected" );//player->
+		const char* soundname = "Player.WeaponSelected";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "Player.WeaponSelected" );//player->
 	}
 }
 
@@ -557,7 +575,16 @@ void CBaseHudWeaponSelection::CancelWeaponSelection( void )
 		m_hSelectedWeapon = NULL;
 
 		// Play the "close weapon selection" sound
-		g_pSoundEmitterSystem->EmitSound(player, "Player.WeaponSelectionClose" );//player->
+		const char* soundname = "Player.WeaponSelectionClose";
+		CPASAttenuationFilter filter(player, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, player->entindex(), params);
+		//g_pSoundEmitterSystem->EmitSound(player, "Player.WeaponSelectionClose" );//player->
 	}
 	else
 	{

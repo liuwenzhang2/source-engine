@@ -1430,7 +1430,15 @@ void CItemSoda::Spawn( void )
 
 void CItemSoda::CanThink ( void )
 {
-	g_pSoundEmitterSystem->EmitSound(this, "ItemSoda.Bounce" );
+	const char* soundname = "ItemSoda.Bounce";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	SetSolid( SOLID_BBOX );
 	AddSolidFlags( FSOLID_TRIGGER );
@@ -2235,7 +2243,15 @@ void CEnvGunfire::ShootThink()
 		UTIL_Tracer( GetAbsOrigin(), vecEnd, 0, TRACER_DONT_USE_ATTACHMENT, 5000, true );
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, STRING(m_iszShootSound) );
+	const char* soundname = STRING(m_iszShootSound);
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_iShotsRemaining--;
 

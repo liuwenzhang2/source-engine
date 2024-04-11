@@ -482,7 +482,15 @@ void CNPC_Barnacle::BarnacleThink ( void )
 				// bite prey every once in a while
 				if ( random->RandomInt(0,25) == 0 )
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Digest" );
+					const char* soundname = "NPC_Barnacle.Digest";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 			}
 			else
@@ -527,7 +535,15 @@ void CNPC_Barnacle::BarnacleThink ( void )
 				// bite prey every once in a while
 				if ( random->RandomInt(0,25) == 0 )
 				{
-					g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Digest" );
+					const char* soundname = "NPC_Barnacle.Digest";
+					CPASAttenuationFilter filter(this, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				}
 			}
 			else
@@ -585,10 +601,18 @@ void CNPC_Barnacle::BarnacleThink ( void )
 		if ( m_cGibs && random->RandomInt(0,99) == 1 )
 		{
 			// cough up a gib.
-			CGib::SpawnSpecificGibs( this, 1, 50, 1, "models/gibs/hgibs_rib.mdl");
+			CGib::SpawnSpecificGibs( this, 1, 50, 1, "models/gibs/hgibs_rib.mdl");//need check
 			m_cGibs--;
 
-			g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Digest" );
+			const char* soundname = "NPC_Barnacle.Digest";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 
 		pTouchEnt = TongueTouchEnt( &flLength );
@@ -615,7 +639,15 @@ void CNPC_Barnacle::BarnacleThink ( void )
 					Vector vecGrabPos = pTouchEnt->EyePosition();
 					if( !pBCC || pBCC->DispatchInteraction( g_interactionBarnacleVictimGrab, &vecGrabPos, this ) )
 					{
-						g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.BreakNeck" );
+						const char* soundname = "NPC_Barnacle.BreakNeck";
+						CPASAttenuationFilter filter(this, soundname);
+
+						EmitSound_t params;
+						params.m_pSoundName = soundname;
+						params.m_flSoundTime = 0.0f;
+						params.m_pflSoundDuration = NULL;
+						params.m_bWarnOnDirectWaveReference = true;
+						g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 						AttachTongueToTarget( pTouchEnt, vecGrabPos );
 						
 						// Set the local timer to 60 seconds, which starts the lifting phase on
@@ -794,7 +826,15 @@ void CNPC_Barnacle::PlayLiftingScream( float flBiteZOffset )
 {
 	if ( !m_bPlayedPullSound && m_flAltitude < (flBiteZOffset + 100) )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Scream" );
+		const char* soundname = "NPC_Barnacle.Scream";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_bPlayedPullSound = true;
 	}
 }
@@ -1364,11 +1404,27 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 
 	if ( RandomFloat(0,1) > 0.5 )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.PullPant" );
+		const char* soundname = "NPC_Barnacle.PullPant";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.TongueStretch" );
+		const char* soundname = "NPC_Barnacle.TongueStretch";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	SetActivity( (Activity)ACT_BARNACLE_SLURP );
@@ -1615,7 +1671,15 @@ void CNPC_Barnacle::BitePrey( void )
 		return;
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.FinalBite" );
+	const char* soundname = "NPC_Barnacle.FinalBite";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_flVictimHeight = GetEnemy()->WorldAlignSize().z;
 
@@ -1660,7 +1724,16 @@ void CNPC_Barnacle::BitePrey( void )
 			m_hRagdoll->SetBodygroup( ZOMBIE_BODYGROUP_HEADCRAB, false );
 			DetachAttachedRagdoll( m_hRagdoll );
 			m_hLastSpitEnemy = m_hRagdoll.Get();
-			g_pSoundEmitterSystem->EmitSound(m_hRagdoll.Get(), "NPC_HeadCrab.Die");//m_hRagdoll->
+			const char* soundname = "NPC_HeadCrab.Die";
+			CPASAttenuationFilter filter(m_hRagdoll.Get(), soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, m_hRagdoll.Get()->entindex(), params);
+			//g_pSoundEmitterSystem->EmitSound(m_hRagdoll.Get(), "NPC_HeadCrab.Die");//m_hRagdoll->
 			m_hRagdoll = NULL;
 		}
 
@@ -1797,7 +1870,15 @@ void CNPC_Barnacle::SwallowPrey( void )
 	// bite prey every once in a while
 	if ( random->RandomInt(0,25) == 0 )
 	{
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Digest" );
+		const char* soundname = "NPC_Barnacle.Digest";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
 	// Fully swallowed it?
@@ -2082,7 +2163,15 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 #endif
 	}
 
-	g_pSoundEmitterSystem->EmitSound(this, "NPC_Barnacle.Die" );
+	const char* soundname = "NPC_Barnacle.Die";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	SetActivity( ACT_DIESIMPLE );
 

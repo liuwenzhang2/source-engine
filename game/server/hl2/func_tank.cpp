@@ -1099,7 +1099,15 @@ bool CFuncTank::StartControl( CBaseCombatCharacter *pController )
 	// Set the controller's position to be the use position.
 	m_vecControllerUsePos = m_hController->GetLocalOrigin();
 
-	g_pSoundEmitterSystem->EmitSound(this, "Func_Tank.BeginUse" );
+	const char* soundname = "Func_Tank.BeginUse";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	
 	SetNextThink( gpGlobals->curtime + 0.1f );
 	
@@ -2267,14 +2275,30 @@ void CFuncTank::Fire( int bulletCount, const Vector &barrelEnd, const Vector &fo
 		DoMuzzleFlash();
 
 		// Play the AR2 sound
-		g_pSoundEmitterSystem->EmitSound(this, "Weapon_functank.Single" );
+		const char* soundname = "Weapon_functank.Single";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else if ( m_iEffectHandling == EH_COMBINE_CANNON )
 	{
 		DoMuzzleFlash();
 
 		// Play the cannon sound
-		g_pSoundEmitterSystem->EmitSound(this, "NPC_Combine_Cannon.FireBullet" );
+		const char* soundname = "NPC_Combine_Cannon.FireBullet";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 	else
 	{
@@ -2944,7 +2968,15 @@ void CFuncTankAirboatGun::StopFiring()
 		CSoundEnvelopeController *pController = &CSoundEnvelopeController::GetController();
 		float flVolume = pController->SoundGetVolume( m_pGunFiringSound );
 		pController->SoundChangeVolume( m_pGunFiringSound, 0.0f, 0.1f * flVolume );
-		g_pSoundEmitterSystem->EmitSound(this, "Airboat.FireGunRevDown" );
+		const char* soundname = "Airboat.FireGunRevDown";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_bIsFiring = false;
 	}
 }
@@ -3229,7 +3261,16 @@ void CFuncTankAPCRocket::Fire( int bulletCount, const Vector &barrelEnd, const V
 		// This will cause it to wait for a little while before shooting
 		m_fireLast += random->RandomFloat( 2.0f, 3.0f );
 	}
-	g_pSoundEmitterSystem->EmitSound(this, "PropAPC.FireCannon" );
+
+	const char* soundname = "PropAPC.FireCannon";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 }
 
 void CFuncTankAPCRocket::Think()
@@ -3740,7 +3781,15 @@ void CMortarShell::Impact( void )
 
 	RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), MORTAR_BLAST_DAMAGE, (DMG_BLAST|DMG_DISSOLVE) ), GetAbsOrigin(), MORTAR_BLAST_RADIUS, CLASS_NONE, NULL );
 
-	g_pSoundEmitterSystem->EmitSound(this, "Weapon_Mortar.Impact" );
+	const char* soundname = "Weapon_Mortar.Impact";
+	CPASAttenuationFilter filter(this, soundname);
+
+	EmitSound_t params;
+	params.m_pSoundName = soundname;
+	params.m_flSoundTime = 0.0f;
+	params.m_pflSoundDuration = NULL;
+	params.m_bWarnOnDirectWaveReference = true;
+	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	UTIL_ScreenShake( GetAbsOrigin(), 10, 60, 1.0, 550, SHAKE_START, false );
 

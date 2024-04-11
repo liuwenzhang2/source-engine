@@ -550,7 +550,15 @@ void CBaseCombatWeapon::FallThink ( void )
 		// don't clatter if the gun is waiting to respawn (if it's waiting, it is invisible!)
 		if ( GetOwnerEntity() )
 		{
-			g_pSoundEmitterSystem->EmitSound(this, "BaseCombatWeapon.WeaponDrop" );
+			const char* soundname = "BaseCombatWeapon.WeaponDrop";
+			CPASAttenuationFilter filter(this, soundname);
+
+			EmitSound_t params;
+			params.m_pSoundName = soundname;
+			params.m_flSoundTime = 0.0f;
+			params.m_pflSoundDuration = NULL;
+			params.m_bWarnOnDirectWaveReference = true;
+			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 		Materialize(); 
 	}
@@ -568,9 +576,25 @@ void CBaseCombatWeapon::Materialize( void )
 	{
 		// changing from invisible state to visible.
 #ifdef HL2MP
-		g_pSoundEmitterSystem->EmitSound(this, "AlyxEmp.Charge" );
+		const char* soundname = "AlyxEmp.Charge";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 #else
-		g_pSoundEmitterSystem->EmitSound(this, "BaseCombatWeapon.WeaponMaterialize" );
+		const char* soundname = "BaseCombatWeapon.WeaponMaterialize";
+		CPASAttenuationFilter filter(this, soundname);
+
+		EmitSound_t params;
+		params.m_pSoundName = soundname;
+		params.m_flSoundTime = 0.0f;
+		params.m_pflSoundDuration = NULL;
+		params.m_bWarnOnDirectWaveReference = true;
+		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 #endif
 		
 		RemoveEffects( EF_NODRAW );

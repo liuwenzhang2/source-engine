@@ -173,16 +173,43 @@ void C_VoteController::FireGameEvent( IGameEvent *event )
 				int vote_option = event->GetInt( "vote_option", TEAM_UNASSIGNED );
 				if( vote_option == VOTE_OPTION2 )
 				{
-					g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Cast.No" );//pLocalPlayer->
+					const char* soundname = "Vote.Cast.No";
+					CPASAttenuationFilter filter(pLocalPlayer, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, pLocalPlayer->entindex(), params);
+					//g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Cast.No" );//pLocalPlayer->
 				}
 				else if( vote_option == VOTE_OPTION1 )
 				{
-					g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Cast.Yes" );//pLocalPlayer->
+					const char* soundname = "Vote.Cast.Yes";
+					CPASAttenuationFilter filter(pLocalPlayer, soundname);
+
+					EmitSound_t params;
+					params.m_pSoundName = soundname;
+					params.m_flSoundTime = 0.0f;
+					params.m_pflSoundDuration = NULL;
+					params.m_bWarnOnDirectWaveReference = true;
+					g_pSoundEmitterSystem->EmitSound(filter, pLocalPlayer->entindex(), params);
+					//g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Cast.Yes" );//pLocalPlayer->
 				}
 			}
 			else
 			{
-				g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Cast.Yes" );//pLocalPlayer->
+				const char* soundname = "Vote.Cast.Yes";
+				CPASAttenuationFilter filter(pLocalPlayer, soundname);
+
+				EmitSound_t params;
+				params.m_pSoundName = soundname;
+				params.m_flSoundTime = 0.0f;
+				params.m_pflSoundDuration = NULL;
+				params.m_bWarnOnDirectWaveReference = true;
+				g_pSoundEmitterSystem->EmitSound(filter, pLocalPlayer->entindex(), params);
+				//g_pSoundEmitterSystem->EmitSound(pLocalPlayer, "Vote.Cast.Yes" );//pLocalPlayer->
 			}
 		}
 	}
