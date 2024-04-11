@@ -25,7 +25,7 @@
 #include "tier1/KeyValues.h"
 #include "tier1/interface.h"
 #include "tier1/bitbuf.h"
-#include "SoundEmitterSystem\isoundemittersystembase.h"
+#include "SoundEmitterSystem/isoundemittersystembase.h"
 
 //-----------------------------------------------------------------------------
 // forward declarations

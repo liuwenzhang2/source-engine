@@ -20,7 +20,7 @@
 #include "inputsystem/ButtonCode.h"
 #include "modes.h"
 #include "irecipientfilter.h"
-#include "SoundEmitterSystem\isoundemittersystembase.h"
+#include "SoundEmitterSystem/isoundemittersystembase.h"
 
 #if !defined( _X360 )
 #include "xbox/xboxstubs.h"
