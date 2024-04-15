@@ -19,6 +19,7 @@
 #include "globals.h"
 #include "physics_impact_damage.h"
 #include "te_effect_dispatch.h"
+#include "gameinterface.h"
 
 //=============================================================================
 // HPE_BEGIN
@@ -211,36 +212,36 @@ void CBreakableSurface::Precache(void)
 	// Load the edge types and styles for the specific surface type
 	if (m_nSurfaceType == SHATTERSURFACE_TILE)
 	{
-		PrecacheMaterial( "models/brokentile/tilebroken_03a" );
-		PrecacheMaterial( "models/brokentile/tilebroken_03b" );
-		PrecacheMaterial( "models/brokentile/tilebroken_03c" );
-		PrecacheMaterial( "models/brokentile/tilebroken_03d" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_03a" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_03b" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_03c" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_03d" );
 
-		PrecacheMaterial( "models/brokentile/tilebroken_02a" );
-		PrecacheMaterial( "models/brokentile/tilebroken_02b" );
-		PrecacheMaterial( "models/brokentile/tilebroken_02c" );
-		PrecacheMaterial( "models/brokentile/tilebroken_02d" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_02a" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_02b" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_02c" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_02d" );
 
-		PrecacheMaterial( "models/brokentile/tilebroken_01a" );
-		PrecacheMaterial( "models/brokentile/tilebroken_01b" );
-		PrecacheMaterial( "models/brokentile/tilebroken_01c" );
-		PrecacheMaterial( "models/brokentile/tilebroken_01d" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_01a" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_01b" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_01c" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokentile/tilebroken_01d" );
 	}
 	else
 	{
-		PrecacheMaterial( "models/brokenglass/glassbroken_solid" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_01a" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_01b" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_01c" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_01d" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_02a" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_02b" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_02c" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_02d" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_03a" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_03b" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_03c" );
-		PrecacheMaterial( "models/brokenglass/glassbroken_03d" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_solid" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_01a" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_01b" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_01c" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_01d" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_02a" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_02b" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_02c" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_02d" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_03a" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_03b" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_03c" );
+		g_ServerGameDLL.PrecacheMaterial( "models/brokenglass/glassbroken_03d" );
 	}
 
 	BaseClass::Precache();
@@ -1220,7 +1221,7 @@ void CBreakableSurface::Spawn(void)
 	IMaterialVar* pCrackName = pMaterial->FindVar( "$crackmaterial", &foundVar, false );
 	if (foundVar)
 	{
-		PrecacheMaterial( pCrackName->GetStringValue() );
+		g_ServerGameDLL.PrecacheMaterial( pCrackName->GetStringValue() );
 	}
 
 	// Init the Panel bit vector to all true. ( no panes are broken )

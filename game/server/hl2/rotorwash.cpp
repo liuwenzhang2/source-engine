@@ -6,6 +6,7 @@
 
 #include "cbase.h"
 #include "rotorwash.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -54,7 +55,7 @@ void CRotorWashEmitter::Spawn( void )
 
 void CRotorWashEmitter::Precache( void )
 {
-	PrecacheMaterial( "effects/splashwake3" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/splashwake3" );
 }
 
 int CRotorWashEmitter::ShouldTransmit( const CCheckTransmitInfo *pInfo )

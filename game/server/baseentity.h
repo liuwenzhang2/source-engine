@@ -34,6 +34,7 @@ class CRecipientFilter;
 class CStudioHdr;
 template<class T>
 class CGlobalEntityList;
+class CServerGameDLL;
 
 // Matching the high level concept is significantly better than other criteria
 // FIXME:  Could do this in the script file by making it required and bumping up weighting there instead...
@@ -327,6 +328,7 @@ extern int DispatchSpawn( CBaseEntity *pEntity );
 
 extern ISaveRestoreOps* engineObjectFuncs;
 extern ISoundEmitterSystem* g_pSoundEmitterSystem;
+extern CServerGameDLL g_ServerGameDLL;
 
 
 //inline CBaseEntity *GetContainingEntity( edict_t *pent );

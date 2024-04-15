@@ -7,6 +7,7 @@
 #include "cbase.h"
 #include "EntityParticleTrail.h"
 #include "networkstringtable_gamedll.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -51,7 +52,7 @@ LINK_ENTITY_TO_CLASS( env_particle_trail, CEntityParticleTrail );
 //-----------------------------------------------------------------------------
 CEntityParticleTrail *CEntityParticleTrail::Create( CBaseEntity *pTarget, const EntityParticleTrailInfo_t &info, CBaseEntity *pConstraintEntity )
 {
-	int iMaterialName = GetMaterialIndex( STRING(info.m_strMaterialName) );
+	int iMaterialName = g_ServerGameDLL.GetMaterialIndex( STRING(info.m_strMaterialName) );
 
 	// Look for other particle trails on the entity + copy state to the new entity
 	CEntityParticleTrail *pTrail;
@@ -181,7 +182,7 @@ void CEntityParticleTrail::NotifySystemEvent( CBaseEntity *pNotify, notify_syste
 //-----------------------------------------------------------------------------
 void CEntityParticleTrail::Destroy( CBaseEntity *pTarget, const EntityParticleTrailInfo_t &info )
 {
-	int iMaterialName = GetMaterialIndex( STRING(info.m_strMaterialName) );
+	int iMaterialName = g_ServerGameDLL.GetMaterialIndex( STRING(info.m_strMaterialName) );
 
 	// Look for the particle trail attached to this entity + decrease refcount
 	CBaseEntity *pNext;

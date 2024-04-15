@@ -12,6 +12,7 @@
 #include "dod_team.h"
 #include "dod_objective_resource.h"
 #include "dod_control_point_master.h"
+#include "gameinterface.h"
 
 LINK_ENTITY_TO_CLASS( dod_control_point, CControlPoint );
 
@@ -469,28 +470,28 @@ void CControlPoint::Precache( void )
 	engine->PrecacheModel( STRING( m_iszAxisModel ) );
 	engine->PrecacheModel( STRING( m_iszResetModel ) );
 
-	PrecacheMaterial( STRING( m_iszAlliesIcon ) );
-	m_iAlliesIcon = GetMaterialIndex( STRING( m_iszAlliesIcon ) );
+	g_ServerGameDLL.PrecacheMaterial( STRING( m_iszAlliesIcon ) );
+	m_iAlliesIcon = g_ServerGameDLL.GetMaterialIndex( STRING( m_iszAlliesIcon ) );
 	Assert( m_iAlliesIcon != 0 );
 
-	PrecacheMaterial( STRING( m_iszAxisIcon ) );
-	m_iAxisIcon = GetMaterialIndex( STRING( m_iszAxisIcon ) );
+	g_ServerGameDLL.PrecacheMaterial( STRING( m_iszAxisIcon ) );
+	m_iAxisIcon = g_ServerGameDLL.GetMaterialIndex( STRING( m_iszAxisIcon ) );
 	Assert( m_iAxisIcon != 0 );
 
-	PrecacheMaterial( STRING( m_iszNeutralIcon ) );
-	m_iNeutralIcon = GetMaterialIndex( STRING( m_iszNeutralIcon ) );
+	g_ServerGameDLL.PrecacheMaterial( STRING( m_iszNeutralIcon ) );
+	m_iNeutralIcon = g_ServerGameDLL.GetMaterialIndex( STRING( m_iszNeutralIcon ) );
 	Assert( m_iNeutralIcon != 0 );
 
 	if ( strlen( STRING( m_iszTimerCapIcon ) ) > 0 )
 	{
-		PrecacheMaterial( STRING( m_iszTimerCapIcon ) );
-		m_iTimerCapIcon = GetMaterialIndex( STRING( m_iszTimerCapIcon ) );
+		g_ServerGameDLL.PrecacheMaterial( STRING( m_iszTimerCapIcon ) );
+		m_iTimerCapIcon = g_ServerGameDLL.GetMaterialIndex( STRING( m_iszTimerCapIcon ) );
 	}
 
 	if ( strlen( STRING( m_iszBombedIcon ) ) > 0 )
 	{
-		PrecacheMaterial( STRING( m_iszBombedIcon ) );
-		m_iBombedIcon = GetMaterialIndex( STRING( m_iszBombedIcon ) );
+		g_ServerGameDLL.PrecacheMaterial( STRING( m_iszBombedIcon ) );
+		m_iBombedIcon = g_ServerGameDLL.GetMaterialIndex( STRING( m_iszBombedIcon ) );
 	}
 
 	if( !m_iNeutralIcon || !m_iAxisIcon || !m_iAlliesIcon )

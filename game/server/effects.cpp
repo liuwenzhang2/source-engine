@@ -29,6 +29,7 @@
 #include "Sprite.h"
 #include "precipitation_shared.h"
 #include "shot_manipulator.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1517,10 +1518,10 @@ CPrecipitation::CPrecipitation()
 
 void CPrecipitation::Spawn( void )
 {
-	PrecacheMaterial( "effects/fleck_ash1" );
-	PrecacheMaterial( "effects/fleck_ash2" );
-	PrecacheMaterial( "effects/fleck_ash3" );
-	PrecacheMaterial( "effects/ember_swirling001" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/fleck_ash1" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/fleck_ash2" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/fleck_ash3" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/ember_swirling001" );
 
 	Precache();
 	SetSolid( SOLID_NONE );							// Remove model & collisions

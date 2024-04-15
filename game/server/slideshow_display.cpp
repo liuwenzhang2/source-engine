@@ -9,6 +9,7 @@
 #include "fmtstr.h"
 #include "vguiscreen.h"
 #include "filesystem.h"
+#include "gameinterface.h"
 
 
 #define SLIDESHOW_LIST_BUFFER_MAX 8192
@@ -517,7 +518,7 @@ void CSlideshowDisplay::BuildSlideShowImagesList( void )
 		Q_snprintf( szFileName, sizeof( szFileName ), "vgui/%s/%s", m_szSlideshowDirectory.Get(), szMatFileName );
 		szFileName[ Q_strlen( szFileName ) - 4 ] = '\0';
 
-		PrecacheMaterial( szFileName );	
+		g_ServerGameDLL.PrecacheMaterial( szFileName );
 
 		// Get material keywords
 		char szFullFileName[_MAX_PATH];

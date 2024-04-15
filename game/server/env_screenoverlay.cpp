@@ -6,6 +6,7 @@
 
 #include "cbase.h"
 #include "shareddefs.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -123,7 +124,7 @@ void CEnvScreenOverlay::Precache( void )
 		if ( m_iszOverlayNames[i] == NULL_STRING )
 			continue;
 
-		PrecacheMaterial( STRING( m_iszOverlayNames[i] ) );
+		g_ServerGameDLL.PrecacheMaterial( STRING( m_iszOverlayNames[i] ) );
 	}
 }
 
@@ -238,8 +239,8 @@ void CEnvScreenEffect::Spawn( void )
 
 void CEnvScreenEffect::Precache( void )
 {
-	PrecacheMaterial( "effects/stun" );
-	PrecacheMaterial( "effects/introblur" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/stun" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/introblur" );
 }
 
 //-----------------------------------------------------------------------------

@@ -8,6 +8,7 @@
 #include "cbase.h"
 #include "baseparticleentity.h"
 #include "sendproxy.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -69,7 +70,7 @@ void CEnvStarfield::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheMaterial( "effects/spark_noz" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/spark_noz" );
 }
 
 //-----------------------------------------------------------------------------

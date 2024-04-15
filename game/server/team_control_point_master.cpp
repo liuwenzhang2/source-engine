@@ -9,6 +9,7 @@
 #include "team_objectiveresource.h"
 #include "team_control_point_master.h"
 #include "teamplayroundbased_gamerules.h"
+#include "gameinterface.h"
 
 #if defined ( TF_DLL )
 #include "tf_gamerules.h"
@@ -141,8 +142,8 @@ void CTeamControlPointMaster::Precache( void )
 	{
 		if ( m_iszTeamBaseIcons[i] != NULL_STRING )
 		{
-			PrecacheMaterial( STRING( m_iszTeamBaseIcons[i] ) );
-			m_iTeamBaseIcons[i] = GetMaterialIndex( STRING( m_iszTeamBaseIcons[i] ) );
+			g_ServerGameDLL.PrecacheMaterial( STRING( m_iszTeamBaseIcons[i] ) );
+			m_iTeamBaseIcons[i] = g_ServerGameDLL.GetMaterialIndex( STRING( m_iszTeamBaseIcons[i] ) );
 			Assert( m_iTeamBaseIcons[i] != 0 );
 		}
 	}

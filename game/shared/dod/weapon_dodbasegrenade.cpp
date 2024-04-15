@@ -14,6 +14,7 @@
 	#include "c_dod_player.h"
 #else
 	#include "dod_player.h"
+	#include "gameinterface.h"
 #endif
 
 extern ConVar dod_bonusround;
@@ -103,12 +104,12 @@ bool CWeaponDODBaseGrenade::CanHolster( void )
 		g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Grenade.Throw" );
 
 		// Precache all the grenade minimap icons. 
-		PrecacheMaterial( "sprites/minimap_icons/minimap_riflegren_ger" );
-		PrecacheMaterial( "sprites/minimap_icons/minimap_riflegren_us" );
-		PrecacheMaterial( "sprites/minimap_icons/grenade_hltv" );
-		PrecacheMaterial( "sprites/minimap_icons/stick_hltv" );
-		PrecacheMaterial( "sprites/minimap_icons/minimap_smoke_us" );
-		PrecacheMaterial( "sprites/minimap_icons/minimap_smoke_ger" );
+		g_ServerGameDLL.PrecacheMaterial( "sprites/minimap_icons/minimap_riflegren_ger" );
+		g_ServerGameDLL.PrecacheMaterial( "sprites/minimap_icons/minimap_riflegren_us" );
+		g_ServerGameDLL.PrecacheMaterial( "sprites/minimap_icons/grenade_hltv" );
+		g_ServerGameDLL.PrecacheMaterial( "sprites/minimap_icons/stick_hltv" );
+		g_ServerGameDLL.PrecacheMaterial( "sprites/minimap_icons/minimap_smoke_us" );
+		g_ServerGameDLL.PrecacheMaterial( "sprites/minimap_icons/minimap_smoke_ger" );
 
 		BaseClass::Precache();
 	}

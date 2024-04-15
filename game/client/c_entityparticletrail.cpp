@@ -98,7 +98,7 @@ void C_EntityParticleTrail::Start( )
 	if( ParticleMgr()->AddEffect( &m_ParticleEffect, this ) == false )
 		return;
 
-	const char *pMaterialName = GetMaterialNameFromIndex( m_iMaterialName );
+	const char *pMaterialName = clientdll->GetMaterialNameFromIndex( m_iMaterialName );
 	if ( !pMaterialName )
 		return;
 

@@ -304,7 +304,7 @@ int CHudDeathNotice::DrawDefenseItem( DeathNoticeItem *pItem, int xRight, int y 
 	m_pIconDefended->DrawSelf( x, y, iconDefSize, iconDefSize, Color(255,255,255,255) );
 	x += iconDefSize + spacerX;
 
-	const char *szMatName = GetMaterialNameFromIndex( pItem->iMaterial );
+	const char *szMatName = clientdll->GetMaterialNameFromIndex( pItem->iMaterial );
 
 	vgui::surface()->DrawSetColor( Color(255,255,255,255) );
 	vgui::surface()->DrawSetTextureFile( m_iMaterialTexture, szMatName, true, false);
@@ -450,7 +450,7 @@ int CHudDeathNotice::DrawDeathNoticeItem( DeathNoticeItem *pItem, int xRight, in
 	// Draw death weapon or cap icon
 	if ( bCapMsg )
 	{
-		const char *szMatName = GetMaterialNameFromIndex( pItem->iMaterial );
+		const char *szMatName = clientdll->GetMaterialNameFromIndex( pItem->iMaterial );
 
 		vgui::surface()->DrawSetColor( Color(255,255,255,255) );
 		vgui::surface()->DrawSetTextureFile( m_iMaterialTexture, szMatName, true, false);

@@ -29,11 +29,11 @@
 
 #include "globalstate.h"
 #include "entitylist.h"
-
+#include "gameinterface.h"
 #else
 
 #include "gamestringpool.h"
-
+#include "cdll_client_int.h"
 #endif
 
 // HACKHACK: Builds a global list of entities that were restored from all levels
@@ -1296,7 +1296,13 @@ bool CSave::WriteGameField( const char *pname, void *pData, datamap_t *pRootMap,
 			{
 				int nMateralIndex = *(int*)pData;
 				string_t strMaterialName = NULL_STRING;
-				const char *pMaterialName = GetMaterialNameFromIndex( nMateralIndex );
+				const char* pMaterialName = NULL;
+#ifdef GAME_DLL
+				pMaterialName = g_ServerGameDLL.GetMaterialNameFromIndex(nMateralIndex);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+				pMaterialName = clientdll->GetMaterialNameFromIndex(nMateralIndex);
+#endif // CLIENT_DLL
 				if ( pMaterialName )
 				{
 					strMaterialName = MAKE_STRING( pMaterialName );
@@ -2091,12 +2097,17 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 					continue;
 				}
 
-				pMaterialIndex[i] = GetMaterialIndex( STRING( pMaterialName[i] ) );
+#ifdef GAME_DLL
+				pMaterialIndex[i] = g_ServerGameDLL.GetMaterialIndex(STRING(pMaterialName[i]));
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+				pMaterialIndex[i] = clientdll->GetMaterialIndex(STRING(pMaterialName[i]));
+#endif // CLIENT_DLL
 
 #if !defined( CLIENT_DLL )	
 				if ( m_precache )
 				{
-					PrecacheMaterial( STRING( pMaterialName[i] ) );
+					g_ServerGameDLL.PrecacheMaterial( STRING( pMaterialName[i] ) );
 				}
 #endif
 			}

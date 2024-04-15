@@ -2380,6 +2380,49 @@ void CServerGameDLL::OnModelPrecached(int nModelIndex) {
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Precaches a vgui screen overlay material
+//-----------------------------------------------------------------------------
+void CServerGameDLL::PrecacheMaterial(const char* pMaterialName)
+{
+	Assert(pMaterialName && pMaterialName[0]);
+	g_pStringTableMaterials->AddString(CBaseEntity::IsServer(), pMaterialName);
+}
+
+
+//-----------------------------------------------------------------------------
+// Converts a previously precached material into an index
+//-----------------------------------------------------------------------------
+int CServerGameDLL::GetMaterialIndex(const char* pMaterialName)
+{
+	if (pMaterialName)
+	{
+		int nIndex = g_pStringTableMaterials->FindStringIndex(pMaterialName);
+
+		if (nIndex != INVALID_STRING_INDEX)
+		{
+			return nIndex;
+		}
+		else
+		{
+			DevMsg("Warning! GetMaterialIndex: couldn't find material %s\n ", pMaterialName);
+			return 0;
+		}
+	}
+
+	// This is the invalid string index
+	return 0;
+}
+
+//-----------------------------------------------------------------------------
+// Converts a previously precached material index into a string
+//-----------------------------------------------------------------------------
+const char* CServerGameDLL::GetMaterialNameFromIndex(int nMaterialIndex)
+{
+	return g_pStringTableMaterials->GetString(nMaterialIndex);
+}
+
+
 // keeps track of which chapters the user has unlocked
 ConVar sv_unlockedchapters( "sv_unlockedchapters", "1", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX );
 
@@ -2569,49 +2612,6 @@ void UpdateRichPresence ( void )
 	}
 #endif
 }
-
-//-----------------------------------------------------------------------------
-// Precaches a vgui screen overlay material
-//-----------------------------------------------------------------------------
-void PrecacheMaterial( const char *pMaterialName )
-{
-	Assert( pMaterialName && pMaterialName[0] );
-	g_pStringTableMaterials->AddString( CBaseEntity::IsServer(), pMaterialName );
-}
-
-
-//-----------------------------------------------------------------------------
-// Converts a previously precached material into an index
-//-----------------------------------------------------------------------------
-int GetMaterialIndex( const char *pMaterialName )
-{
-	if (pMaterialName)
-	{
-		int nIndex = g_pStringTableMaterials->FindStringIndex( pMaterialName );
-		
-		if (nIndex != INVALID_STRING_INDEX )
-		{
-			return nIndex;
-		}
-		else
-		{
-			DevMsg("Warning! GetMaterialIndex: couldn't find material %s\n ", pMaterialName );
-			return 0;
-		}
-	}
-
-	// This is the invalid string index
-	return 0;
-}
-
-//-----------------------------------------------------------------------------
-// Converts a previously precached material index into a string
-//-----------------------------------------------------------------------------
-const char *GetMaterialNameFromIndex( int nMaterialIndex )
-{
-	return g_pStringTableMaterials->GetString( nMaterialIndex );
-}
-
 
 //-----------------------------------------------------------------------------
 // Precaches a vgui screen overlay material

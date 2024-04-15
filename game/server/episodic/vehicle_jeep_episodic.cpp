@@ -22,6 +22,7 @@
 #include "hl2_vehicle_radar.h"
 #include "props.h"
 #include "ai_dynamiclink.h"
+#include "gameinterface.h"
 
 extern ConVar phys_upimpactforcescale;
 
@@ -422,8 +423,8 @@ void CPropJeepEpisodic::UpdateOnRemove( void )
 //-----------------------------------------------------------------------------
 void CPropJeepEpisodic::Precache( void )
 {
-	PrecacheMaterial( RADAR_PANEL_MATERIAL );
-	PrecacheMaterial( RADAR_PANEL_WRITEZ );
+	g_ServerGameDLL.PrecacheMaterial( RADAR_PANEL_MATERIAL );
+	g_ServerGameDLL.PrecacheMaterial( RADAR_PANEL_WRITEZ );
 	engine->PrecacheModel( s_szHazardSprite );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "JNK_Radar_Ping_Friendly" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Physics.WaterSplash" );

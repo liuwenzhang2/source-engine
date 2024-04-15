@@ -19,6 +19,7 @@
 #else
 	
 	#include "dod_player.h"
+	#include "gameinterface.h"
 
 #endif
 
@@ -266,7 +267,13 @@ void CWeaponMG42::Spawn( void )
 
 void CWeaponMG42::Precache()
 {
-	PrecacheMaterial( "sprites/effects/bazookapuff" );
+#ifdef GAME_DLL
+	g_ServerGameDLL.PrecacheMaterial("sprites/effects/bazookapuff");
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+	clientdll->PrecacheMaterial("sprites/effects/bazookapuff");
+#endif // CLIENT_DLL
+
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Mg42.OverHeat" );
 

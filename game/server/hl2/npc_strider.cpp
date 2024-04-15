@@ -54,6 +54,7 @@
 #include "filters.h"
 #include "saverestore_utlvector.h"
 #include "eventqueue.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -460,14 +461,14 @@ void CNPC_Strider::Precache()
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Footstep" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Skewer" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Hunt" );
-	PrecacheMaterial( "effects/water_highlight" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/water_highlight" );
 	s_iImpactEffectTexture = engine->PrecacheModel( "sprites/physbeam.vmt" );
-	PrecacheMaterial( "sprites/bluelaser1" );
-	PrecacheMaterial( "effects/blueblacklargebeam" );
-	PrecacheMaterial( "effects/strider_pinch_dudv" );
-	PrecacheMaterial( "effects/blueblackflash" );
-	PrecacheMaterial( "effects/strider_bulge_dudv" );
-	PrecacheMaterial( "effects/strider_muzzle" );
+	g_ServerGameDLL.PrecacheMaterial( "sprites/bluelaser1" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/blueblacklargebeam" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/strider_pinch_dudv" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/blueblackflash" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/strider_bulge_dudv" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/strider_muzzle" );
 
 	engine->PrecacheModel( "models/chefhat.mdl" );
 

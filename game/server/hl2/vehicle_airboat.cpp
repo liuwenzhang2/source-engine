@@ -25,6 +25,7 @@
 #include "rumble_shared.h"
 // NVNT for airboat weapon fire
 #include "haptics/haptic_utils.h"
+#include "gameinterface.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -363,8 +364,8 @@ void CPropAirboat::Precache( void )
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Airboat.FireGunLoop" );
 
-	PrecacheMaterial( "effects/splashwake1" );
-	PrecacheMaterial( "effects/splashwake4" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/splashwake1" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/splashwake4" );
 }
 
 

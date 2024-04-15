@@ -446,7 +446,7 @@ void CHudObjectiveIcons::Paint()
 					iBlankIcon = g_pObjectiveResource->GetIconForTeam( index, TEAM_UNASSIGNED );
 				}
 
-				const char *szMatName = GetMaterialNameFromIndex( iBlankIcon );
+				const char *szMatName = clientdll->GetMaterialNameFromIndex( iBlankIcon );
 
 				vgui::surface()->DrawSetTextureFile( m_iCPTextures[index], szMatName, true, false );
 
@@ -523,7 +523,7 @@ void CHudObjectiveIcons::Paint()
 				quadrants[7].vecTrailing.Init( 1.0, 0.0 );
 				quadrants[7].vecLeading.Init( 0.5, 0.0 );
 
-				szMatName = GetMaterialNameFromIndex( iOwnerIcon );
+				szMatName = clientdll->GetMaterialNameFromIndex( iOwnerIcon );
 
 				vgui::surface()->DrawSetTextureFile( m_iCPTextures[index], szMatName, true, false );
 				vgui::surface()->DrawSetColor( Color(255,255,255,255) );	
@@ -621,7 +621,7 @@ void CHudObjectiveIcons::Paint()
 				// Draw the owner's icon
 				if( iOwnerIcon != 0 )
 				{
-					const char *szMatName = GetMaterialNameFromIndex( iOwnerIcon );
+					const char *szMatName = clientdll->GetMaterialNameFromIndex( iOwnerIcon );
 
 					vgui::surface()->DrawSetTextureFile( m_iCPTextures[index], szMatName, true, false );
 					
@@ -853,7 +853,7 @@ void CHudObjectiveIcons::Paint()
 					}
 
 					float width = ( flIconSize * flCapPercentage );
-					const char *szCappingMatName = GetMaterialNameFromIndex( iCapperIcon );
+					const char *szCappingMatName = clientdll->GetMaterialNameFromIndex( iCapperIcon );
 					
 					vgui::surface()->DrawSetTextureFile( m_iCPCappingTextures[index], szCappingMatName, true, false );
 

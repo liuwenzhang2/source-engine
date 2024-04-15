@@ -166,6 +166,20 @@ public:
 	
 	void OnModelPrecached( int nModelIndex );
 
+	//-----------------------------------------------------------------------------
+// Precaches a material
+//-----------------------------------------------------------------------------
+	void PrecacheMaterial(const char* pMaterialName);
+
+	//-----------------------------------------------------------------------------
+	// Converts a previously precached material into an index
+	//-----------------------------------------------------------------------------
+	int GetMaterialIndex(const char* pMaterialName);
+
+	//-----------------------------------------------------------------------------
+	// Converts a previously precached material index into a string
+	//-----------------------------------------------------------------------------
+	const char* GetMaterialNameFromIndex(int nMaterialIndex);
 private:
 
 	// This can just be a wrapper on MapEntity_ParseAllEntities, but CS does some tricks in here

@@ -156,7 +156,7 @@ void CDODMapOverview::UpdateCapturePoints()
 		if ( iOwningIcon <= 0 )
 			continue;	// baah
 
-		const char *textureName = GetMaterialNameFromIndex( iOwningIcon );
+		const char *textureName = clientdll->GetMaterialNameFromIndex( iOwningIcon );
 
 		int objID = m_CapturePoints[i];
 
@@ -598,7 +598,7 @@ bool CDODMapOverview::DrawCapturePoint( int iCP, MapObject_t *obj )
 
 			// 'white' icon
 			int iBlankIcon = g_pObjectiveResource->GetCPTimerCapIcon( iCP );
-			const char *textureName = GetMaterialNameFromIndex( iBlankIcon );
+			const char *textureName = clientdll->GetMaterialNameFromIndex( iBlankIcon );
 			DrawQuad( pos, scale, 0, AddIconTexture( textureName ), 255 );
 
 			// the circular swipe
@@ -622,7 +622,7 @@ bool CDODMapOverview::DrawCapturePoint( int iCP, MapObject_t *obj )
 		if ( iCappingTeam != TEAM_UNASSIGNED )
 		{
 			int iCapperIcon = g_pObjectiveResource->GetCPCappingIcon( iCP );
-			const char *textureName = GetMaterialNameFromIndex( iCapperIcon );
+			const char *textureName = clientdll->GetMaterialNameFromIndex( iCapperIcon );
 
 			float flCapPercent = g_pObjectiveResource->GetCPCapPercentage(iCP);
 			bool bSwipeLeft = ( iCappingTeam == TEAM_AXIS ) ? true : false;

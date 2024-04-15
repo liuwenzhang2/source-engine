@@ -728,6 +728,21 @@ public:
 
 	virtual void ModifyEmitSoundParams(EmitSound_t& params) = 0;
 
+	//-----------------------------------------------------------------------------
+// Precaches a material
+//-----------------------------------------------------------------------------
+	virtual void PrecacheMaterial(const char* pMaterialName) = 0;
+
+	//-----------------------------------------------------------------------------
+	// Converts a previously precached material into an index
+	//-----------------------------------------------------------------------------
+	virtual int GetMaterialIndex(const char* pMaterialName) = 0;
+
+	//-----------------------------------------------------------------------------
+	// Converts precached material indices into strings
+	//-----------------------------------------------------------------------------
+	virtual const char* GetMaterialNameFromIndex(int nIndex) = 0;
+
 	// Returns true if the client can start recording a demo now.  If the client returns false,
 	// an error message of up to length bytes should be returned in errorMsg.
 	virtual bool			CanRecordDemo( char *errorMsg, int length ) const = 0;

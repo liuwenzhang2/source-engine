@@ -6,6 +6,7 @@
 #include "cbase.h"
 #include "env_portal_path_track_shared.h"
 #include "beam_shared.h"
+#include "gameinterface.h"
 
 //**********( MODULE CONSTANTS )*************
 
@@ -81,7 +82,7 @@ CEnvPortalPathTrack::~CEnvPortalPathTrack()
 void CEnvPortalPathTrack::Precache()
 {
 	BaseClass::Precache();
-	PrecacheMaterial( "effects/combinemuzzle2_dark" ); 
+	g_ServerGameDLL.PrecacheMaterial( "effects/combinemuzzle2_dark" );
 }
 
 //-----------------------------------------------------------------------------

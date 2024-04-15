@@ -19,6 +19,7 @@
 #include "particle_parse.h"
 #include "particle_system.h"
 #include "ai_senses.h"
+#include "gameinterface.h"
 
 #include "npc_vortigaunt_episodic.h"
 
@@ -1184,7 +1185,7 @@ void CNPC_Vortigaunt::Precache()
 		{
 			if ( !Q_stricmp( modDir, "ep2" ) )
 			{
-				PrecacheMaterial( "effects/rollerglow" );
+				g_ServerGameDLL.PrecacheMaterial( "effects/rollerglow" );
 			}
 		}
 	}
@@ -1206,7 +1207,7 @@ void CNPC_Vortigaunt::Precache()
 	PrecacheParticleSystem( "vortigaunt_beam_charge" );
 	PrecacheParticleSystem( "vortigaunt_hand_glow" );
 
-	PrecacheMaterial( "sprites/light_glow02_add" );
+	g_ServerGameDLL.PrecacheMaterial( "sprites/light_glow02_add" );
 
 	BaseClass::Precache();
 }	

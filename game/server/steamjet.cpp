@@ -7,6 +7,7 @@
 
 #include "cbase.h"
 #include "steamjet.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -83,8 +84,8 @@ void CSteamJet::Spawn( void )
 
 void CSteamJet::Precache( void )
 {
-	PrecacheMaterial( "particle/particle_smokegrenade" );
-	PrecacheMaterial( "sprites/heatwave" );
+	g_ServerGameDLL.PrecacheMaterial( "particle/particle_smokegrenade" );
+	g_ServerGameDLL.PrecacheMaterial( "sprites/heatwave" );
 }
 
  void CSteamJet::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )

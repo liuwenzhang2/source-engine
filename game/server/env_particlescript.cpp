@@ -9,6 +9,7 @@
 #include "baseanimating.h"
 #include "SkyCamera.h"
 #include "studio.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -95,7 +96,7 @@ void CEnvParticleScript::PrecacheAnimationEventMaterials()
 					int nArgs = sscanf( event->pszOptions(), "%255s %255s", pAttachmentName, pSpriteName );
 					if ( nArgs == 2 )
 					{
-						PrecacheMaterial( pSpriteName );
+						g_ServerGameDLL.PrecacheMaterial( pSpriteName );
 					}
 				}
 			}

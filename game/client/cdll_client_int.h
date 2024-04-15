@@ -142,17 +142,17 @@ void ClearDataChangedEvent( int iStoredEvent );
 //-----------------------------------------------------------------------------
 // Precaches a material
 //-----------------------------------------------------------------------------
-void PrecacheMaterial( const char *pMaterialName );
+//void PrecacheMaterial( const char *pMaterialName );
 
 //-----------------------------------------------------------------------------
 // Converts a previously precached material into an index
 //-----------------------------------------------------------------------------
-int GetMaterialIndex( const char *pMaterialName );
+//int GetMaterialIndex( const char *pMaterialName );
 
 //-----------------------------------------------------------------------------
 // Converts precached material indices into strings
 //-----------------------------------------------------------------------------
-const char *GetMaterialNameFromIndex( int nIndex );
+//const char *GetMaterialNameFromIndex( int nIndex );
 
 //-----------------------------------------------------------------------------
 // Precache-related methods for particle systems

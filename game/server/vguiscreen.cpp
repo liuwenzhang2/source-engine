@@ -9,6 +9,7 @@
 #include "vguiscreen.h"
 #include "networkstringtable_gamedll.h"
 #include "saverestore_stringtable.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -114,7 +115,7 @@ void CVGuiScreen::Precache()
 	BaseClass::Precache();
 	if ( m_strOverlayMaterial != NULL_STRING )
 	{
-		PrecacheMaterial( STRING(m_strOverlayMaterial) );
+		g_ServerGameDLL.PrecacheMaterial( STRING(m_strOverlayMaterial) );
 	}
 }
 
@@ -165,7 +166,7 @@ void CVGuiScreen::SetAttachmentIndex( int nIndex )
 
 void CVGuiScreen::SetOverlayMaterial( const char *pMaterial )
 {
-	int iMaterial = GetMaterialIndex( pMaterial );
+	int iMaterial = g_ServerGameDLL.GetMaterialIndex( pMaterial );
 
 	if ( iMaterial == 0 )
 	{

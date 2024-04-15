@@ -144,7 +144,7 @@ void CSlideshowDisplayScreen::Update( C_SlideshowDisplay *pSlideshowDisplay )
 
 			if ( iMatIndex > 0 )
 			{
-				const char *pMaterialName = GetMaterialNameFromIndex( iMatIndex );
+				const char *pMaterialName = clientdll->GetMaterialNameFromIndex( iMatIndex );
 				if ( pMaterialName )
 				{
 					pMaterialName = Q_strnchr( pMaterialName, '/', Q_strlen( pMaterialName ) );

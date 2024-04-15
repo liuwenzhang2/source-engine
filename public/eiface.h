@@ -665,6 +665,21 @@ public:
 		float flVolume, int iFlags, int iPitch, const Vector* pOrigin, float soundtime, CUtlVector< Vector >& soundorigins) = 0;
 
 	virtual void OnModelPrecached(int nModelIndex) = 0;
+
+	//-----------------------------------------------------------------------------
+// Precaches a material
+//-----------------------------------------------------------------------------
+	virtual void PrecacheMaterial(const char* pMaterialName) = 0;
+
+	//-----------------------------------------------------------------------------
+	// Converts a previously precached material into an index
+	//-----------------------------------------------------------------------------
+	virtual int GetMaterialIndex(const char* pMaterialName) = 0;
+
+	//-----------------------------------------------------------------------------
+	// Converts a previously precached material index into a string
+	//-----------------------------------------------------------------------------
+	virtual const char* GetMaterialNameFromIndex(int nMaterialIndex) = 0;
 };
 
 typedef IServerGameDLL IServerGameDLL008;

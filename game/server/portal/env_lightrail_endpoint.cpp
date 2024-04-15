@@ -6,6 +6,7 @@
 
 #include "cbase.h"
 #include "env_lightrail_endpoint_shared.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -41,7 +42,7 @@ END_SEND_TABLE()
 void CEnv_Lightrail_Endpoint::Precache()
 {
 	BaseClass::Precache();
-	PrecacheMaterial( "effects/light_rail_endpoint" );		//Sprite used for the effects
+	g_ServerGameDLL.PrecacheMaterial( "effects/light_rail_endpoint" );		//Sprite used for the effects
 }
 
 

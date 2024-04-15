@@ -63,6 +63,7 @@
 #include "weapon_striderbuster.h"
 #include "monstermaker.h"
 #include "weapon_rpg.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1756,7 +1757,7 @@ void CNPC_Hunter::Precache()
 	PrecacheInstancedScene( "scenes/npc/hunter/hunter_eyedarts_top.vcd" );
 	PrecacheInstancedScene( "scenes/npc/hunter/hunter_eyedarts_bottom.vcd" );
 	
-	PrecacheMaterial( "effects/water_highlight" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/water_highlight" );
 
 	UTIL_PrecacheOther( "hunter_flechette" );
 	UTIL_PrecacheOther( "sparktrail" );

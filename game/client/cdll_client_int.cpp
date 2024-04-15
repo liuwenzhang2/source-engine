@@ -683,6 +683,21 @@ public:
 
 	void ModifyEmitSoundParams(EmitSound_t& params);
 
+	//-----------------------------------------------------------------------------
+// Precaches a material
+//-----------------------------------------------------------------------------
+	void PrecacheMaterial(const char* pMaterialName);
+
+	//-----------------------------------------------------------------------------
+	// Converts a previously precached material into an index
+	//-----------------------------------------------------------------------------
+	int GetMaterialIndex(const char* pMaterialName);
+
+	//-----------------------------------------------------------------------------
+	// Converts precached material indices into strings
+	//-----------------------------------------------------------------------------
+	const char* GetMaterialNameFromIndex(int nIndex);
+
 	virtual CStandardRecvProxies* GetStandardRecvProxies();
 
 	virtual bool			CanRecordDemo( char *errorMsg, int length ) const;
@@ -737,7 +752,7 @@ public:
 	// Returns true if the disconnect command has been handled by the client
 	virtual bool DisconnectAttempt( void );
 public:
-	void PrecacheMaterial( const char *pMaterialName );
+	//void PrecacheMaterial( const char *pMaterialName );
 
 	virtual bool IsConnectedUserInfoChangeAllowed( IConVar *pCvar );
 	virtual void IN_TouchEvent( int type, int fingerId, int x, int y );
@@ -759,15 +774,15 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CHLClient, IBaseClientDLL, CLIENT_DLL_INTERFA
 //-----------------------------------------------------------------------------
 // Precaches a material
 //-----------------------------------------------------------------------------
-void PrecacheMaterial( const char *pMaterialName )
-{
-	gHLClient.PrecacheMaterial( pMaterialName );
-}
+//void CHLClient::PrecacheMaterial( const char *pMaterialName )
+//{
+//	gHLClient.PrecacheMaterial( pMaterialName );
+//}
 
 //-----------------------------------------------------------------------------
 // Converts a previously precached material into an index
 //-----------------------------------------------------------------------------
-int GetMaterialIndex( const char *pMaterialName )
+int CHLClient::GetMaterialIndex( const char *pMaterialName )
 {
 	if (pMaterialName)
 	{
@@ -784,7 +799,7 @@ int GetMaterialIndex( const char *pMaterialName )
 //-----------------------------------------------------------------------------
 // Converts precached material indices into strings
 //-----------------------------------------------------------------------------
-const char *GetMaterialNameFromIndex( int nIndex )
+const char * CHLClient::GetMaterialNameFromIndex( int nIndex )
 {
 	if (nIndex != (g_pStringTableMaterials->GetMaxStrings() - 1))
 	{

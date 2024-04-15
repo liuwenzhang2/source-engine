@@ -1474,7 +1474,7 @@ void CDetailObjectSystem::LevelInitPreEntity()
 	if ( m_DetailObjects.Count() || m_DetailSpriteDict.Count() )
 	{
 		// There are detail objects in the level, so precache the material
-		PrecacheMaterial( DETAIL_SPRITE_MATERIAL );
+		clientdll->PrecacheMaterial( DETAIL_SPRITE_MATERIAL );
 		IMaterial *pMat = m_DetailSpriteMaterial;
 		// adjust for non-square textures (cropped)
 		float flRatio = (float)( pMat->GetMappingWidth() ) / pMat->GetMappingHeight();

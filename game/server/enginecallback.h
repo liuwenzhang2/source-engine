@@ -51,17 +51,17 @@ extern CSteamGameServerAPIContext *steamgameserverapicontext; //available on gam
 //-----------------------------------------------------------------------------
 // Precaches a material
 //-----------------------------------------------------------------------------
-void PrecacheMaterial( const char *pMaterialName );
+//void PrecacheMaterial( const char *pMaterialName );
 
 //-----------------------------------------------------------------------------
 // Converts a previously precached material into an index
 //-----------------------------------------------------------------------------
-int GetMaterialIndex( const char *pMaterialName );
+//int GetMaterialIndex( const char *pMaterialName );
 
 //-----------------------------------------------------------------------------
 // Converts a previously precached material index into a string
 //-----------------------------------------------------------------------------
-const char *GetMaterialNameFromIndex( int nMaterialIndex );
+//const char *GetMaterialNameFromIndex( int nMaterialIndex );
 
 
 //-----------------------------------------------------------------------------

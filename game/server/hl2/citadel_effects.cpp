@@ -6,6 +6,7 @@
 
 #include "cbase.h"
 #include "citadel_effects_shared.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -38,7 +39,7 @@ END_SEND_TABLE()
 void CCitadelEnergyCore::Precache()
 {
 	BaseClass::Precache();
-	PrecacheMaterial( "effects/combinemuzzle2_dark" ); 
+	g_ServerGameDLL.PrecacheMaterial( "effects/combinemuzzle2_dark" );
 }
 
 

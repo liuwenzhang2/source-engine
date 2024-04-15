@@ -8,6 +8,7 @@
 #include "cbase.h"
 #include "smoke_trail.h"
 #include "dt_send.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -469,13 +470,13 @@ LINK_ENTITY_TO_CLASS( env_fire_trail, CFireTrail );
 
 void CFireTrail::Precache( void )
 {
-	PrecacheMaterial( "sprites/flamelet1" );
-	PrecacheMaterial( "sprites/flamelet2" );
-	PrecacheMaterial( "sprites/flamelet3" );
-	PrecacheMaterial( "sprites/flamelet4" );
-	PrecacheMaterial( "sprites/flamelet5" );
-	PrecacheMaterial( "particle/particle_smokegrenade" );
-	PrecacheMaterial( "particle/particle_noisesphere" );
+	g_ServerGameDLL.PrecacheMaterial( "sprites/flamelet1" );
+	g_ServerGameDLL.PrecacheMaterial( "sprites/flamelet2" );
+	g_ServerGameDLL.PrecacheMaterial( "sprites/flamelet3" );
+	g_ServerGameDLL.PrecacheMaterial( "sprites/flamelet4" );
+	g_ServerGameDLL.PrecacheMaterial( "sprites/flamelet5" );
+	g_ServerGameDLL.PrecacheMaterial( "particle/particle_smokegrenade" );
+	g_ServerGameDLL.PrecacheMaterial( "particle/particle_noisesphere" );
 }
 
 //-----------------------------------------------------------------------------

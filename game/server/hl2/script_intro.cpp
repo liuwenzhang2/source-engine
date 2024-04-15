@@ -9,6 +9,7 @@
 #include "script_intro.h"
 #include "point_camera.h"
 #include "ai_utils.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -123,7 +124,7 @@ void CScriptIntro::Activate( void )
 
 void CScriptIntro::Precache()
 {
-	PrecacheMaterial( "scripted/intro_screenspaceeffect" );
+	g_ServerGameDLL.PrecacheMaterial( "scripted/intro_screenspaceeffect" );
 	BaseClass::Precache();
 }
 

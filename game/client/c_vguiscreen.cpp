@@ -134,7 +134,7 @@ void C_VGuiScreen::OnDataChanged( DataUpdateType_t type )
 	{
 		m_OverlayMaterial.Shutdown();
 
-		const char *pMaterialName = GetMaterialNameFromIndex(m_nOverlayMaterial);
+		const char *pMaterialName = clientdll->GetMaterialNameFromIndex(m_nOverlayMaterial);
 		if (pMaterialName)
 		{
 			m_OverlayMaterial.Init( pMaterialName, TEXTURE_GROUP_VGUI );

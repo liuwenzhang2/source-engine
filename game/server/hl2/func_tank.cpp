@@ -39,6 +39,7 @@
 #include "particle_parse.h"
 // NVNT turret recoil
 #include "haptics/haptic_utils.h"
+#include "gameinterface.h"
 
 #ifdef HL2_DLL
 #include "hl2_player.h"
@@ -3521,7 +3522,7 @@ void CMortarShell::Precache()
 	m_iSpriteTexture = engine->PrecacheModel( "sprites/physbeam.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Mortar.Impact" );
-	PrecacheMaterial( "effects/ar2ground2" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/ar2ground2" );
 
 	if ( NULL_STRING != m_warnSound )
 	{

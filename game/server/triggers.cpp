@@ -4526,7 +4526,7 @@ void CTriggerVPhysicsMotion::Precache()
 #ifndef _XBOX
 	if ( m_ParticleTrail.m_strMaterialName != NULL_STRING )
 	{
-		PrecacheMaterial( STRING(m_ParticleTrail.m_strMaterialName) ); 
+		g_ServerGameDLL.PrecacheMaterial( STRING(m_ParticleTrail.m_strMaterialName) );
 	}
 #endif //!_XBOX
 }

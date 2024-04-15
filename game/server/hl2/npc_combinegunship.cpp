@@ -47,6 +47,7 @@
 #include "eventqueue.h"
 #include "beam_flags.h"
 #include "ai_eventresponse.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -661,8 +662,8 @@ void CNPC_CombineGunship::Precache( void )
 
 	engine->PrecacheModel("sprites/lgtning.vmt");
 
-	PrecacheMaterial( "effects/ar2ground2" );
-	PrecacheMaterial( "effects/blueblackflash" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/ar2ground2" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/blueblackflash" );
 	
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.SearchPing" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineGunship.PatrolPing" );

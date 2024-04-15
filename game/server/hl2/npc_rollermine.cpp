@@ -38,6 +38,7 @@
 #include "mapentities.h"
 #include "RagdollBoogie.h"
 #include "physics_collisionevent.h"
+#include "gameinterface.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -517,7 +518,7 @@ void CNPC_RollerMine::Precache( void )
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Reprogram" );
 
-	PrecacheMaterial( "effects/rollerglow" );
+	g_ServerGameDLL.PrecacheMaterial( "effects/rollerglow" );
 
 	gm_iszDropshipClassname = AllocPooledString( "npc_combinedropship" ); // For fast string compares.
 #ifdef HL2_EPISODIC

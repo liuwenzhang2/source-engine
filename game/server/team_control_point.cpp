@@ -14,6 +14,7 @@
 #include "mp_shareddefs.h"
 #include "engine/IEngineSound.h"
 #include "soundenvelope.h"
+#include "gameinterface.h"
 
 #ifdef TF_DLL
 #include "tf_shareddefs.h"
@@ -234,8 +235,8 @@ void CTeamControlPoint::Precache( void )
 
 		if ( m_TeamData[i].iszIcon != NULL_STRING )
 		{
-			PrecacheMaterial( STRING( m_TeamData[i].iszIcon ) );
-			m_TeamData[i].iIcon = GetMaterialIndex( STRING( m_TeamData[i].iszIcon ) );
+			g_ServerGameDLL.PrecacheMaterial( STRING( m_TeamData[i].iszIcon ) );
+			m_TeamData[i].iIcon = g_ServerGameDLL.GetMaterialIndex( STRING( m_TeamData[i].iszIcon ) );
 			Assert( m_TeamData[i].iIcon != 0 );
 		}
 
@@ -246,8 +247,8 @@ void CTeamControlPoint::Precache( void )
 
 		if ( m_TeamData[i].iszOverlay != NULL_STRING )
 		{
-			PrecacheMaterial( STRING( m_TeamData[i].iszOverlay ) );
-			m_TeamData[i].iOverlay = GetMaterialIndex( STRING( m_TeamData[i].iszOverlay ) );
+			g_ServerGameDLL.PrecacheMaterial( STRING( m_TeamData[i].iszOverlay ) );
+			m_TeamData[i].iOverlay = g_ServerGameDLL.GetMaterialIndex( STRING( m_TeamData[i].iszOverlay ) );
 			Assert( m_TeamData[i].iOverlay != 0 );
 
 			if ( !m_TeamData[i].iOverlay )

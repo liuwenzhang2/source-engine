@@ -261,7 +261,7 @@ void C_SlideshowDisplay::BuildSlideShowImagesList( void )
 		Q_snprintf( szFileName, sizeof( szFileName ), "vgui/%s/%s", m_szSlideshowDirectory, szMatFileName );
 		szFileName[ Q_strlen( szFileName ) - 4 ] = '\0';
 
-		int iMatIndex = ::GetMaterialIndex( szFileName );
+		int iMatIndex = clientdll->GetMaterialIndex( szFileName );
 
 		// Get material keywords
 		char szFullFileName[_MAX_PATH];

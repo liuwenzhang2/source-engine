@@ -9,6 +9,7 @@
 #include "func_dust_shared.h"
 #include "te_particlesystem.h"
 #include "IEffects.h"
+#include "gameinterface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -171,7 +172,7 @@ void CFunc_Dust::Spawn()
 
 void CFunc_Dust::Precache()
 {
-	PrecacheMaterial( "particle/sparkles" );
+	g_ServerGameDLL.PrecacheMaterial( "particle/sparkles" );
 }
 
 void CFunc_Dust::Activate()
