@@ -119,7 +119,7 @@ void CNPC_Mossman::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Mossman::Precache()
 {
-	PrecacheModel( "models/mossman.mdl" );
+	engine->PrecacheModel( "models/mossman.mdl" );
 	
 	BaseClass::Precache();
 }	

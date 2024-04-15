@@ -97,8 +97,8 @@ void CWeaponTripMine::Precache( void )
 {
 	BaseClass::Precache();
 
-	m_iGroundIndex		= PrecacheModel( TRIPMINE_MODEL );
-	m_iPickedUpIndex	= PrecacheModel( GetWorldModel() );
+	m_iGroundIndex		= engine->PrecacheModel( TRIPMINE_MODEL );
+	m_iPickedUpIndex	= engine->PrecacheModel( GetWorldModel() );
 
 	UTIL_PrecacheOther( "monster_tripmine" );
 }
@@ -365,8 +365,8 @@ void CTripmineGrenade::Spawn( void )
 
 void CTripmineGrenade::Precache( void )
 {
-	PrecacheModel( TRIPMINE_MODEL ); 
-	m_iLaserModel = PrecacheModel( TRIPMINE_BEAM_SPRITE );
+	engine->PrecacheModel( TRIPMINE_MODEL );
+	m_iLaserModel = engine->PrecacheModel( TRIPMINE_BEAM_SPRITE );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "TripmineGrenade.Deploy" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "TripmineGrenade.Charge" );

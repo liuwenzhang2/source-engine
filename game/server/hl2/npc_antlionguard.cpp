@@ -667,7 +667,7 @@ void CNPC_AntlionGuard::UpdateOnRemove( void )
 //-----------------------------------------------------------------------------
 void CNPC_AntlionGuard::Precache( void )
 {
-	PrecacheModel( ANTLIONGUARD_MODEL );
+	engine->PrecacheModel( ANTLIONGUARD_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Shove" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.HitHard" );
@@ -691,7 +691,7 @@ void CNPC_AntlionGuard::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.BreatheLoop" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.ShellCrack" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Pain_Roar" );
-	PrecacheModel( "sprites/grubflare1.vmt" );
+	engine->PrecacheModel( "sprites/grubflare1.vmt" );
 #endif // HL2_EPISODIC
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Anger" );

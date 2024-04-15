@@ -64,7 +64,7 @@ void CNPC_Zombie::Spawn()
 //=========================================================
 void CNPC_Zombie::Precache()
 {
-	PrecacheModel( "models/zombie.mdl" );
+	engine->PrecacheModel( "models/zombie.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.AttackHit" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.AttackMiss" );

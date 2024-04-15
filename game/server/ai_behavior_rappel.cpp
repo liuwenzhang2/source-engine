@@ -125,7 +125,7 @@ bool CAI_RappelBehavior::KeyValue( const char *szKeyName, const char *szValue )
 
 void CAI_RappelBehavior::Precache()
 {
-	CBaseEntity::PrecacheModel( "cable/cable.vmt" );
+	engine->PrecacheModel( "cable/cable.vmt" );
 }
 
 //-----------------------------------------------------------------------------

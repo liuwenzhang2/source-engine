@@ -465,9 +465,9 @@ void CControlPoint::Precache( void )
 		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_iszResetSound) );
 	}
 
-	PrecacheModel( STRING( m_iszAlliesModel ) );
-	PrecacheModel( STRING( m_iszAxisModel ) );
-	PrecacheModel( STRING( m_iszResetModel ) );
+	engine->PrecacheModel( STRING( m_iszAlliesModel ) );
+	engine->PrecacheModel( STRING( m_iszAxisModel ) );
+	engine->PrecacheModel( STRING( m_iszResetModel ) );
 
 	PrecacheMaterial( STRING( m_iszAlliesIcon ) );
 	m_iAlliesIcon = GetMaterialIndex( STRING( m_iszAlliesIcon ) );

@@ -2070,7 +2070,7 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 #if !defined( CLIENT_DLL )	
 				if ( m_precache )
 				{
-					CBaseEntity::PrecacheModel( STRING( pModelName[i] ) );
+					engine->PrecacheModel( STRING( pModelName[i] ) );
 				}
 #endif
 			}
@@ -2128,7 +2128,7 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 #if !defined( CLIENT_DLL )	
 						if ( pField->fieldType == FIELD_MODELNAME )
 						{
-							CBaseEntity::PrecacheModel( STRING( pStringDest[i] ) );
+							engine->PrecacheModel( STRING( pStringDest[i] ) );
 						}
 						else if ( pField->fieldType == FIELD_SOUNDNAME )
 						{

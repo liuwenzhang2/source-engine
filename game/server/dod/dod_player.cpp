@@ -387,7 +387,7 @@ CDODPlayer *CDODPlayer::CreatePlayer( const char *className, int ed )
 
 void CDODPlayer::PrecachePlayerModel( const char *szPlayerModel )
 {
-	PrecacheModel( szPlayerModel );
+	engine->PrecacheModel( szPlayerModel );
 
 	// Strange numbers, but gotten from the actual max bounds of our
 	// player models
@@ -432,7 +432,7 @@ void CDODPlayer::Precache()
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Game.Domination" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Game.Nemesis" );
 
-	PrecacheModel ( "sprites/glow01.vmt" );
+	engine->PrecacheModel ( "sprites/glow01.vmt" );
 
 	BaseClass::Precache();
 }

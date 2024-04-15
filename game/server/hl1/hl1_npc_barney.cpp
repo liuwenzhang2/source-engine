@@ -138,7 +138,7 @@ void CNPC_Barney::Precache()
 {
 	m_iAmmoType = GetAmmoDef()->Index("9mmRound");
 
-	PrecacheModel("models/barney.mdl");
+	engine->PrecacheModel("models/barney.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Barney.FirePistol" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Barney.Pain" );
@@ -917,7 +917,7 @@ END_DATADESC()
 //=========================================================
 void CNPC_DeadBarney::Spawn( void )
 {
-	PrecacheModel("models/barney.mdl");
+	engine->PrecacheModel("models/barney.mdl");
 	SetModel( "models/barney.mdl");
 
 	ClearEffects();

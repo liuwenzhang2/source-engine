@@ -170,8 +170,8 @@ void CSun::Activate()
 		}
 	}
 
-	m_nMaterial = PrecacheModel( STRING( m_strMaterial ) );
-	m_nOverlayMaterial = PrecacheModel( STRING( m_strOverlayMaterial ) );
+	m_nMaterial = engine->PrecacheModel( STRING( m_strMaterial ) );
+	m_nOverlayMaterial = engine->PrecacheModel( STRING( m_strOverlayMaterial ) );
 }
 
 void CSun::InputTurnOn( inputdata_t &inputdata )

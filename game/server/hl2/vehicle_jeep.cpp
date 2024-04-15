@@ -194,7 +194,7 @@ void CPropJeep::Precache( void )
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Jeep.GaussCharge" );
 
-	PrecacheModel( GAUSS_BEAM_SPRITE );
+	engine->PrecacheModel( GAUSS_BEAM_SPRITE );
 
 	BaseClass::Precache();
 }

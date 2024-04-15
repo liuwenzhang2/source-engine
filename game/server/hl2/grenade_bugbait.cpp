@@ -126,7 +126,7 @@ void CGrenadeBugBait::Spawn( void )
 //-----------------------------------------------------------------------------
 void CGrenadeBugBait::Precache( void )
 {
-	PrecacheModel( GRENADE_MODEL );
+	engine->PrecacheModel( GRENADE_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeBugBait.Splat" );
 

@@ -224,9 +224,9 @@ void CNPC_AlienGrunt::Spawn()
 //=========================================================
 void CNPC_AlienGrunt::Precache()
 {
-	PrecacheModel("models/agrunt.mdl");
+	engine->PrecacheModel("models/agrunt.mdl");
 
-	iAgruntMuzzleFlash = PrecacheModel( "sprites/muz4.vmt" );
+	iAgruntMuzzleFlash = engine->PrecacheModel( "sprites/muz4.vmt" );
 
 	UTIL_PrecacheOther( "hornet" );
 

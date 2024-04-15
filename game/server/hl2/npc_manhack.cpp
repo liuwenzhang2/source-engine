@@ -2213,8 +2213,8 @@ void CNPC_Manhack::Precache(void)
 	//
 	// Model.
 	//
-	PrecacheModel("models/manhack.mdl");
-	PrecacheModel( MANHACK_GLOW_SPRITE );
+	engine->PrecacheModel("models/manhack.mdl");
+	engine->PrecacheModel( MANHACK_GLOW_SPRITE );
 	PropBreakablePrecacheAll( MAKE_STRING("models/manhack.mdl") );
 	
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Manhack.Die" );

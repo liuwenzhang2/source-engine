@@ -19,7 +19,7 @@ void CBazookaRocket::Spawn( void )
 
 void CBazookaRocket::Precache( void )
 {
-	PrecacheModel( BAZOOKA_ROCKET_MODEL );
+	engine->PrecacheModel( BAZOOKA_ROCKET_MODEL );
 
 	BaseClass::Precache();
 }

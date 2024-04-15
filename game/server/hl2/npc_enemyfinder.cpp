@@ -147,7 +147,7 @@ void CNPC_EnemyFinder::InputTurnOff( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_EnemyFinder::Precache( void )
 {
-	PrecacheModel( "models/player.mdl" );
+	engine->PrecacheModel( "models/player.mdl" );
 	BaseClass::Precache();
 }
 

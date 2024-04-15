@@ -638,13 +638,13 @@ void CNPC_Dog::PullObject( bool bMantain )
 //-----------------------------------------------------------------------------
 void CNPC_Dog::Precache( void )
 {
-	PrecacheModel( "models/dog.mdl" );
+	engine->PrecacheModel( "models/dog.mdl" );
 	
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_PhysCannon.Launch" );
 
-	PrecacheModel( "sprites/orangelight1.vmt" );
-	PrecacheModel( "sprites/physcannon_bluelight2.vmt" );
-	PrecacheModel( "sprites/glow04_noz.vmt" );
+	engine->PrecacheModel( "sprites/orangelight1.vmt" );
+	engine->PrecacheModel( "sprites/physcannon_bluelight2.vmt" );
+	engine->PrecacheModel( "sprites/glow04_noz.vmt" );
 
 	BaseClass::Precache();
 }

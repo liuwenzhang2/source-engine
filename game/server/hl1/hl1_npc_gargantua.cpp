@@ -176,7 +176,7 @@ void CStomp::Precache()
 	BaseClass::Precache();
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.Stomp" );
-	PrecacheModel( GARG_STOMP_SPRITE_NAME );
+	engine->PrecacheModel( GARG_STOMP_SPRITE_NAME );
 }
 
 
@@ -317,12 +317,12 @@ void CNPC_Gargantua::Spawn()
 //=========================================================
 void CNPC_Gargantua::Precache()
 {
-	PrecacheModel("models/garg.mdl");
-	PrecacheModel( GARG_EYE_SPRITE_NAME );
-	PrecacheModel( GARG_BEAM_SPRITE_NAME );
-	PrecacheModel( GARG_BEAM_SPRITE2 );
+	engine->PrecacheModel("models/garg.mdl");
+	engine->PrecacheModel( GARG_EYE_SPRITE_NAME );
+	engine->PrecacheModel( GARG_BEAM_SPRITE_NAME );
+	engine->PrecacheModel( GARG_BEAM_SPRITE2 );
 	//gStompSprite = PRECACHE_MODEL( GARG_STOMP_SPRITE_NAME );
-	gGargGibModel = PrecacheModel( GARG_GIB_MODEL );
+	gGargGibModel = engine->PrecacheModel( GARG_GIB_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.AttackHit" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Garg.AttackMiss" );

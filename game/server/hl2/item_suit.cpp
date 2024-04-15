@@ -37,7 +37,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/hevsuit.mdl");
+		engine->PrecacheModel ("models/items/hevsuit.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{

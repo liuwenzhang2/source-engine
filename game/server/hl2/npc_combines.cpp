@@ -110,7 +110,7 @@ void CNPC_CombineS::Precache()
 		SetModelName( MAKE_STRING( "models/combine_soldier.mdl" ) );
 	}
 
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 
 	UTIL_PrecacheOther( "item_healthvial" );
 	UTIL_PrecacheOther( "weapon_frag" );

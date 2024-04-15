@@ -67,7 +67,7 @@ void CHandGrenade::Precache( void )
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_HandGrenade.GrenadeBounce" );
 
-	PrecacheModel( HANDGRENADE_MODEL );
+	engine->PrecacheModel( HANDGRENADE_MODEL );
 }
 
 

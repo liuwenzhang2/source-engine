@@ -54,7 +54,7 @@ END_SEND_TABLE()
 void CNPC_Puppet::Precache( void )
 {
 	BaseClass::Precache();
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 }
 
 //-----------------------------------------------------------------------------

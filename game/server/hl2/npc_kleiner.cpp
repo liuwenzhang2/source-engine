@@ -115,7 +115,7 @@ void CNPC_Kleiner::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Kleiner::Precache()
 {
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 	
 	BaseClass::Precache();
 }	

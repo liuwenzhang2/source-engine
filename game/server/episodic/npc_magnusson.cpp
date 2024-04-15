@@ -117,7 +117,7 @@ void CNPC_Magnusson::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Magnusson::Precache()
 {
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 	
 	BaseClass::Precache();
 }	

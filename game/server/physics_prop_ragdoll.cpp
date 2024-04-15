@@ -283,7 +283,7 @@ CRagdollProp::~CRagdollProp( void )
 
 void CRagdollProp::Precache( void )
 {
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 	BaseClass::Precache();
 }
 

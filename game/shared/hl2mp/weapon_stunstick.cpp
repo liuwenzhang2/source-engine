@@ -200,10 +200,10 @@ void CWeaponStunStick::Precache()
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_StunStick.Activate" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_StunStick.Deactivate" );
 
-	PrecacheModel( STUNSTICK_BEAM_MATERIAL );
-	PrecacheModel( "sprites/light_glow02_add.vmt" );
-	PrecacheModel( "effects/blueflare1.vmt" );
-	PrecacheModel( "sprites/light_glow02_add_noz.vmt" );
+	engine->PrecacheModel( STUNSTICK_BEAM_MATERIAL );
+	engine->PrecacheModel( "sprites/light_glow02_add.vmt" );
+	engine->PrecacheModel( "effects/blueflare1.vmt" );
+	engine->PrecacheModel( "sprites/light_glow02_add_noz.vmt" );
 }
 
 //-----------------------------------------------------------------------------

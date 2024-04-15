@@ -1628,22 +1628,22 @@ CWeaponPhysCannon::CWeaponPhysCannon( void )
 //-----------------------------------------------------------------------------
 void CWeaponPhysCannon::Precache( void )
 {
-	PrecacheModel( PHYSCANNON_BEAM_SPRITE );
-	PrecacheModel( PHYSCANNON_GLOW_SPRITE );
-	PrecacheModel( PHYSCANNON_ENDCAP_SPRITE );
-	PrecacheModel( PHYSCANNON_CENTER_GLOW );
-	PrecacheModel( PHYSCANNON_BLAST_SPRITE );
+	engine->PrecacheModel( PHYSCANNON_BEAM_SPRITE );
+	engine->PrecacheModel( PHYSCANNON_GLOW_SPRITE );
+	engine->PrecacheModel( PHYSCANNON_ENDCAP_SPRITE );
+	engine->PrecacheModel( PHYSCANNON_CENTER_GLOW );
+	engine->PrecacheModel( PHYSCANNON_BLAST_SPRITE );
 
-	PrecacheModel( MEGACANNON_BEAM_SPRITE );
-	PrecacheModel( MEGACANNON_GLOW_SPRITE );
-	PrecacheModel( MEGACANNON_ENDCAP_SPRITE );
-	PrecacheModel( MEGACANNON_CENTER_GLOW );
-	PrecacheModel( MEGACANNON_BLAST_SPRITE );
+	engine->PrecacheModel( MEGACANNON_BEAM_SPRITE );
+	engine->PrecacheModel( MEGACANNON_GLOW_SPRITE );
+	engine->PrecacheModel( MEGACANNON_ENDCAP_SPRITE );
+	engine->PrecacheModel( MEGACANNON_CENTER_GLOW );
+	engine->PrecacheModel( MEGACANNON_BLAST_SPRITE );
 
-	PrecacheModel( MEGACANNON_RAGDOLL_BOOGIE_SPRITE );
+	engine->PrecacheModel( MEGACANNON_RAGDOLL_BOOGIE_SPRITE );
 
 	// Precache our alternate model
-	PrecacheModel( MEGACANNON_MODEL );
+	engine->PrecacheModel( MEGACANNON_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_PhysCannon.HoldSound" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Physgun.Off" );

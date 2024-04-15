@@ -204,7 +204,7 @@ int CEnvEffectsScript::UpdateTransmitState()
 void CEnvEffectsScript::Precache()
 {
 	BaseClass::Precache();
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 
 	if ( m_iszScriptName != NULL_STRING )
 		 ParseScriptFile();
@@ -464,7 +464,7 @@ void CEnvEffectsScript::ParseNewEffect( void )
 				{
 					ParseToken();
 					Q_strncpy( NewElement.m_szMaterial, token, sizeof( NewElement.m_szMaterial ) );
-					PrecacheModel( NewElement.m_szMaterial );
+					engine->PrecacheModel( NewElement.m_szMaterial );
 
 					continue;
 				}

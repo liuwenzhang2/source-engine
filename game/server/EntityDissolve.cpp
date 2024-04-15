@@ -100,11 +100,11 @@ void CEntityDissolve::Precache()
 {
 	if ( NULL_STRING == GetModelName() )
 	{
-		PrecacheModel( DISSOLVE_SPRITE_NAME );
+		engine->PrecacheModel( DISSOLVE_SPRITE_NAME );
 	}
 	else
 	{
-		PrecacheModel( STRING( GetModelName() ) );
+		engine->PrecacheModel( STRING( GetModelName() ) );
 	}
 }
 

@@ -446,7 +446,7 @@ void CNPC_Barnacle::WaitTillDead ( void )
 //=========================================================
 void CNPC_Barnacle::Precache()
 {
-	PrecacheModel("models/barnacle.mdl");
+	engine->PrecacheModel("models/barnacle.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Barnacle.Bite" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Barnacle.Chew" );

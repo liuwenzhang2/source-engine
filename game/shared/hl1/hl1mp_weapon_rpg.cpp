@@ -129,12 +129,12 @@ CRpgRocket::CRpgRocket()
 //-----------------------------------------------------------------------------
 void CRpgRocket::Precache( void )
 {
-	PrecacheModel( "models/rpgrocket.mdl" );
-	PrecacheModel( "sprites/animglow01.vmt" );
+	engine->PrecacheModel( "models/rpgrocket.mdl" );
+	engine->PrecacheModel( "sprites/animglow01.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_RPG.RocketIgnite" );
 
-	m_iTrail = PrecacheModel("sprites/smoke.vmt");
+	m_iTrail = engine->PrecacheModel("sprites/smoke.vmt");
 }
 
 //-----------------------------------------------------------------------------
@@ -755,7 +755,7 @@ void CWeaponRPG::Precache( void )
 #endif
 
 //	PrecacheModel( RPG_LASER_SPRITE );
-	PrecacheModel( "sprites/redglow_mp1.vmt" );
+	engine->PrecacheModel( "sprites/redglow_mp1.vmt" );
 
 	BaseClass::Precache();
 }

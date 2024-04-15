@@ -243,7 +243,7 @@ Activity CNPC_Monk::NPC_TranslateActivity( Activity eNewActivity )
 //-----------------------------------------------------------------------------
 void CNPC_Monk::Precache()
 {
-	PrecacheModel( "models/Monk.mdl" );
+	engine->PrecacheModel( "models/Monk.mdl" );
 	
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.FootstepLeft" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.FootstepRight" );

@@ -92,7 +92,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CNPC_Scientist::Precache( void )
 {
-	PrecacheModel( "models/scientist.mdl" );
+	engine->PrecacheModel( "models/scientist.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Scientist.Pain" );
 
@@ -911,7 +911,7 @@ LINK_ENTITY_TO_CLASS( monster_scientist_dead, CNPC_DeadScientist );
 //
 void CNPC_DeadScientist::Spawn( void )
 {
-	PrecacheModel("models/scientist.mdl");
+	engine->PrecacheModel("models/scientist.mdl");
 	SetModel( "models/scientist.mdl" );
 	
 	ClearEffects();
@@ -985,7 +985,7 @@ SITTING_ANIM_sitting3
 //
 void CNPC_SittingScientist::Spawn( )
 {
-	PrecacheModel("models/scientist.mdl");
+	engine->PrecacheModel("models/scientist.mdl");
 	SetModel("models/scientist.mdl");
 	Precache();
 

@@ -155,7 +155,7 @@ const char *GetBlobModelName()
 //---------------------------------------------------------
 void CBlobElement::Precache()
 {
-	PrecacheModel( GetBlobModelName() );
+	engine->PrecacheModel( GetBlobModelName() );
 
 	m_flRandomEightyPercent = random->RandomFloat( 0.8f, 1.0f );
 }
@@ -510,7 +510,7 @@ void CNPC_Blob::InitCustomSchedules(void)
 //-----------------------------------------------------------------------------
 void CNPC_Blob::Precache( void )
 {
-	PrecacheModel( NPC_BLOB_MODEL );
+	engine->PrecacheModel( NPC_BLOB_MODEL );
 	UTIL_PrecacheOther( "blob_element" );
 
 	BaseClass::Precache();

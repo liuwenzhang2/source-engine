@@ -131,7 +131,7 @@ void CNPC_Roach::Spawn()
 //=========================================================
 void CNPC_Roach::Precache()
 {
-	PrecacheModel("models/roach.mdl");
+	engine->PrecacheModel("models/roach.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Roach.Walk" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Roach.Die" );

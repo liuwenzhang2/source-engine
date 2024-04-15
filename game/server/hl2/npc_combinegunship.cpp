@@ -651,15 +651,15 @@ void CNPC_CombineGunship::Precache( void )
 {
 	if ( HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 	{
-		PrecacheModel( "models/combine_helicopter.mdl" );
+		engine->PrecacheModel( "models/combine_helicopter.mdl" );
 		Chopper_PrecacheChunks( this );
 	}
 	else
 	{
-		PrecacheModel("models/gunship.mdl");
+		engine->PrecacheModel("models/gunship.mdl");
 	}
 
-	PrecacheModel("sprites/lgtning.vmt");
+	engine->PrecacheModel("sprites/lgtning.vmt");
 
 	PrecacheMaterial( "effects/ar2ground2" );
 	PrecacheMaterial( "effects/blueblackflash" );
@@ -683,7 +683,7 @@ void CNPC_CombineGunship::Precache( void )
 	if ( hl2_episodic.GetBool() == true )
 	{
 		UTIL_PrecacheOther( "env_citadel_energy_core" );
-		g_iGunshipEffectIndex = PrecacheModel( "sprites/physbeam.vmt" );
+		g_iGunshipEffectIndex = engine->PrecacheModel( "sprites/physbeam.vmt" );
 	}
 
 	PropBreakablePrecacheAll( MAKE_STRING("models/gunship.mdl") );

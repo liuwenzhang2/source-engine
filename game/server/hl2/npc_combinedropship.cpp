@@ -421,7 +421,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CCombineDropshipContainer::Precache()
 {
-	PrecacheModel( DROPSHIP_CONTAINER_MODEL );
+	engine->PrecacheModel( DROPSHIP_CONTAINER_MODEL );
 
 	// Set this here to quiet base prop warnings
 	SetModel( DROPSHIP_CONTAINER_MODEL );
@@ -431,12 +431,12 @@ void CCombineDropshipContainer::Precache()
 	int i;
 	for ( i = 0; i < DROPSHIP_CONTAINER_MAX_CHUNKS; ++i )
 	{
-		PrecacheModel( s_pChunkModelName[i] );
+		engine->PrecacheModel( s_pChunkModelName[i] );
 	}
 
 	for ( i = 0; i < DROPSHIP_CONTAINER_MAX_GIBS; ++i )
 	{
-		PrecacheModel( s_pGibModelName[i] );
+		engine->PrecacheModel( s_pGibModelName[i] );
 	}
 
 	PropBreakablePrecacheAll( GetModelName() );
@@ -1060,7 +1060,7 @@ void CNPC_CombineDropship::Activate( void )
 void CNPC_CombineDropship::Precache( void )
 {
 	// Models
-	PrecacheModel("models/combine_dropship.mdl");
+	engine->PrecacheModel("models/combine_dropship.mdl");
 	switch ( m_iCrateType )
 	{
 	case CRATE_SOLDIER:
@@ -1109,7 +1109,7 @@ void CNPC_CombineDropship::Precache( void )
 		break;
 
 	case CRATE_JEEP:
-		PrecacheModel("models/buggy.mdl");
+		engine->PrecacheModel("models/buggy.mdl");
 		break;
 
 	default:

@@ -188,7 +188,7 @@ void CGenericNPC::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "GenericNPC.GunSound" );
 }	
@@ -296,7 +296,7 @@ void CNPC_Furniture::Spawn( )
 //-----------------------------------------------------------------------------
 void CNPC_Furniture::Precache( void )
 {
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 }
 
 //-----------------------------------------------------------------------------

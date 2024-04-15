@@ -129,7 +129,7 @@ END_DATADESC()
 
 void CSquidSpit::Precache( void )
 {
-	m_nSquidSpitSprite = PrecacheModel("sprites/bigspit.vmt");// client side spittle.
+	m_nSquidSpitSprite = engine->PrecacheModel("sprites/bigspit.vmt");// client side spittle.
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BigMomma.SpitTouch1" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BigMomma.SpitHit1" );
@@ -303,9 +303,9 @@ void CNPC_Bullsquid::Precache()
 {
 	BaseClass::Precache();
 	
-	PrecacheModel("models/bullsquid.mdl");
+	engine->PrecacheModel("models/bullsquid.mdl");
 	
-	PrecacheModel("sprites/bigspit.vmt");// spit projectile.
+	engine->PrecacheModel("sprites/bigspit.vmt");// spit projectile.
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullsquid.Idle" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Bullsquid.Pain" );

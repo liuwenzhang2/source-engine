@@ -213,7 +213,7 @@ public:
 
 	virtual void Precache( void )
 	{
-		PrecacheModel( "sprites/redglow1.vmt" );
+		engine->PrecacheModel( "sprites/redglow1.vmt" );
 	}
 };
 
@@ -939,7 +939,7 @@ void CPointCommentaryNode::Activate( void )
 //-----------------------------------------------------------------------------
 void CPointCommentaryNode::Precache()
 {
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 
 	if ( m_iszCommentaryFile.Get() != NULL_STRING )
 	{

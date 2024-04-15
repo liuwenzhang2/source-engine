@@ -53,7 +53,7 @@ void CHealthKit::Spawn( void )
 //-----------------------------------------------------------------------------
 void CHealthKit::Precache( void )
 {
-	PrecacheModel("models/items/healthkit.mdl");
+	engine->PrecacheModel("models/items/healthkit.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HealthKit.Touch" );
 }
@@ -112,7 +112,7 @@ public:
 
 	void Precache( void )
 	{
-		PrecacheModel("models/healthvial.mdl");
+		engine->PrecacheModel("models/healthvial.mdl");
 
 		g_pSoundEmitterSystem->PrecacheScriptSound( "HealthVial.Touch" );
 	}
@@ -584,7 +584,7 @@ bool CNewWallHealth::CreateVPhysics(void)
 //-----------------------------------------------------------------------------
 void CNewWallHealth::Precache(void)
 {
-	PrecacheModel( HEALTH_CHARGER_MODEL_NAME );
+	engine->PrecacheModel( HEALTH_CHARGER_MODEL_NAME );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "WallHealth.Deny" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "WallHealth.Start" );

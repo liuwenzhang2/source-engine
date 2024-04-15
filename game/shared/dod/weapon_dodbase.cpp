@@ -379,7 +379,7 @@ void CWeaponDODBase::Precache( void )
 #endif
 
 	if( iWpnNameLen > 0 )
-		m_iReloadModelIndex = CBaseEntity::PrecacheModel( info.m_szReloadModel );	
+		m_iReloadModelIndex = engine->PrecacheModel( info.m_szReloadModel );
 }
 
 bool CWeaponDODBase::DefaultDeploy( char *szViewModel, char *szWeaponModel, int iActivity, char *szAnimExt )

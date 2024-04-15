@@ -191,7 +191,7 @@ void CNPC_HAssassin::Precache()
 {
 	m_iAmmoType = GetAmmoDef()->Index("9mmRound");
 
-	PrecacheModel("models/hassassin.mdl");
+	engine->PrecacheModel("models/hassassin.mdl");
 
 	UTIL_PrecacheOther( "npc_handgrenade" );
 

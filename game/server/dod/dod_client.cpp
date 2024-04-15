@@ -126,12 +126,12 @@ int g_iHelmetModels[NUM_HELMETS];
 void ClientGamePrecache( void )
 {
 	// Materials used by the client effects
-	CBaseEntity::PrecacheModel( "sprites/white.vmt" );
-	CBaseEntity::PrecacheModel( "sprites/physbeam.vmt" );
+	engine->PrecacheModel( "sprites/white.vmt" );
+	engine->PrecacheModel( "sprites/physbeam.vmt" );
 
 	for( int i=0;i<NUM_HELMETS;i++ )
 	{
-		g_iHelmetModels[i] = CBaseEntity::PrecacheModel( m_pszHelmetModels[i] );
+		g_iHelmetModels[i] = engine->PrecacheModel( m_pszHelmetModels[i] );
 	}
 
 // Moved to pure_server_minimal.txt

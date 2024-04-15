@@ -72,7 +72,7 @@ void CCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax)
 
 void CCycler::Precache()
 {
-	PrecacheModel( (const char *)STRING( GetModelName() ) );
+	engine->PrecacheModel( (const char *)STRING( GetModelName() ) );
 }
 
 
@@ -256,7 +256,7 @@ void CWeaponCycler::Spawn( )
 	AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_NONE );
 
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 	SetModel( STRING( GetModelName() ) );
 	m_iszModel = GetModelName();
 	m_iModel = GetModelIndex();
@@ -364,7 +364,7 @@ void CWreckage::Spawn( void )
 
 	if (GetModelName() != NULL_STRING)
 	{
-		PrecacheModel( STRING( GetModelName() ) );
+		engine->PrecacheModel( STRING( GetModelName() ) );
 		SetModel( STRING( GetModelName() ) );
 	}
 
@@ -374,7 +374,7 @@ void CWreckage::Spawn( void )
 void CWreckage::Precache( )
 {
 	if ( GetModelName() != NULL_STRING )
-		PrecacheModel( STRING( GetModelName() ) );
+		engine->PrecacheModel( STRING( GetModelName() ) );
 }
 
 void CWreckage::Think( void )

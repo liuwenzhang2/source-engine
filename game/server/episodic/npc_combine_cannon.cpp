@@ -547,10 +547,10 @@ void CNPC_Combine_Cannon::OnScheduleChange( void )
 //-----------------------------------------------------------------------------
 void CNPC_Combine_Cannon::Precache( void )
 {
-	PrecacheModel("models/combine_soldier.mdl");
-	PrecacheModel("effects/bluelaser1.vmt");	
+	engine->PrecacheModel("models/combine_soldier.mdl");
+	engine->PrecacheModel("effects/bluelaser1.vmt");
 	
-	gHaloTexture = PrecacheModel("sprites/light_glow03.vmt");
+	gHaloTexture = engine->PrecacheModel("sprites/light_glow03.vmt");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Combine_Cannon.FireBullet" );
 

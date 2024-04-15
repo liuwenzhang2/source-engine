@@ -86,7 +86,7 @@ void CWindowPane::Spawn( void )
 
 void CWindowPane::Precache( void )
 {
-	PrecacheModel( "models/brokenglass_piece.mdl" );
+	engine->PrecacheModel( "models/brokenglass_piece.mdl" );
 }
 
 //-----------------------------------------------------------------------------

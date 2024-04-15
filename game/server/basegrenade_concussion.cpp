@@ -126,6 +126,6 @@ void CBaseGrenadeConcussion::Precache( void )
 {
 	BaseClass::Precache( );
 
-	PrecacheModel("models/weapons/w_grenade.mdl");
-	m_nTrailSprite = PrecacheModel("sprites/twinkle01.vmt");
+	engine->PrecacheModel("models/weapons/w_grenade.mdl");
+	m_nTrailSprite = engine->PrecacheModel("sprites/twinkle01.vmt");
 }

@@ -621,7 +621,7 @@ bool CFishPool::KeyValue( const char *szKeyName, const char *szValue )
 	}
 	else if (FStrEq( szKeyName, "model" ))
 	{
-		PrecacheModel( szValue );
+		engine->PrecacheModel( szValue );
 		SetModelName( AllocPooledString( szValue ) );
 	}
 

@@ -136,8 +136,8 @@ const char *GetGameDescription()
 void ClientGamePrecache( void )
 {
 	// Materials used by the client effects
-	CBaseEntity::PrecacheModel( "sprites/white.vmt" );
-	CBaseEntity::PrecacheModel( "sprites/physbeam.vmt" );
+	engine->PrecacheModel( "sprites/white.vmt" );
+	engine->PrecacheModel( "sprites/physbeam.vmt" );
 
 	// Legacy temp ents sounds
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Bounce.PistolShell" );

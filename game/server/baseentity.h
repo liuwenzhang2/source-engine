@@ -1797,6 +1797,7 @@ private:
 	// Changes shadow cast distance over time
 	void ShadowCastDistThink( );
 
+public:
 	// Precache model sounds + particles
 	static void PrecacheModelComponents( int nModelIndex );
 	static void PrecacheSoundHelper( const char *pName );
@@ -1940,7 +1941,7 @@ public:
 // Methods shared by client and server
 public:
 	void							SetSize( const Vector &vecMin, const Vector &vecMax ); // UTIL_SetSize( this, mins, maxs );
-	static int						PrecacheModel( const char *name, bool bPreload = true ); 
+	//static int						PrecacheModel( const char *name, bool bPreload = true ); 
 	//static bool						PrecacheSound( const char *name );
 	//static void						PrefetchSound( const char *name );
 	void							Remove( ); // UTIL_Remove( this );

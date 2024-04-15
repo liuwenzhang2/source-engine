@@ -98,10 +98,10 @@ void CWeaponElite::Precache()
 	m_inPrecache = true;
 	BaseClass::Precache();
 
-	PrecacheModel( "models/weapons/w_eq_eholster_elite.mdl" );
-	PrecacheModel( "models/weapons/w_eq_eholster.mdl" );
-	PrecacheModel( "models/weapons/w_pist_elite_single.mdl" );
-	m_droppedModelIndex = CBaseEntity::PrecacheModel( GetCSWpnData().m_szDroppedModel );
+	engine->PrecacheModel( "models/weapons/w_eq_eholster_elite.mdl" );
+	engine->PrecacheModel( "models/weapons/w_eq_eholster.mdl" );
+	engine->PrecacheModel( "models/weapons/w_pist_elite_single.mdl" );
+	m_droppedModelIndex = engine->PrecacheModel( GetCSWpnData().m_szDroppedModel );
 	m_inPrecache = false;
 }
 

@@ -82,5 +82,5 @@ void CNPC_Bloater::Spawn()
 //=========================================================
 void CNPC_Bloater::Precache()
 {
-	PrecacheModel("models/floater.mdl");
+	engine->PrecacheModel("models/floater.mdl");
 }	

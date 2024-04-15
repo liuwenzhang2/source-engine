@@ -230,17 +230,17 @@ void CNPC_Osprey::Precache( void )
 {
 	UTIL_PrecacheOther( "monster_human_grunt" );
 
-	PrecacheModel("models/osprey.mdl");
-	PrecacheModel("models/HVR.mdl");
+	engine->PrecacheModel("models/osprey.mdl");
+	engine->PrecacheModel("models/HVR.mdl");
 
-	m_iSpriteTexture = PrecacheModel( "sprites/rope.vmt" );
+	m_iSpriteTexture = engine->PrecacheModel( "sprites/rope.vmt" );
 
-	m_iExplode	= PrecacheModel( "sprites/fexplo.vmt" );
-	m_iTailGibs = PrecacheModel( "models/osprey_tailgibs.mdl" );
-	m_iBodyGibs = PrecacheModel( "models/osprey_bodygibs.mdl" );
-	m_iEngineGibs = PrecacheModel( "models/osprey_enginegibs.mdl" );
+	m_iExplode	= engine->PrecacheModel( "sprites/fexplo.vmt" );
+	m_iTailGibs = engine->PrecacheModel( "models/osprey_tailgibs.mdl" );
+	m_iBodyGibs = engine->PrecacheModel( "models/osprey_bodygibs.mdl" );
+	m_iEngineGibs = engine->PrecacheModel( "models/osprey_enginegibs.mdl" );
 
-	m_nDebrisModel = PrecacheModel( "models/mechgibs.mdl" );
+	m_nDebrisModel = engine->PrecacheModel( "models/mechgibs.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Apache.RotorSpinup" );
 

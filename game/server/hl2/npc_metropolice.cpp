@@ -573,7 +573,7 @@ void CNPC_MetroPolice::Precache( void )
 		SetModelName( AllocPooledString("models/police.mdl") );
 	}
 
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 
 	UTIL_PrecacheOther( "npc_manhack" );
 

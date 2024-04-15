@@ -431,10 +431,10 @@ void CGrenadeBeam::UpdateBeams(void)
 //------------------------------------------------------------------------------
 void CGrenadeBeam::Precache( void )
 {
-	PrecacheModel("sprites/laser.vmt");
+	engine->PrecacheModel("sprites/laser.vmt");
 
 	//UNDONE/HACK: this model is never used but one is needed
-	PrecacheModel("Models/weapons/flare.mdl");
+	engine->PrecacheModel("Models/weapons/flare.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeBeam.HitSound" );
 }

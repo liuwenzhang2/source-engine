@@ -673,7 +673,7 @@ void CFuncMortarField::Spawn( void )
 
 void CFuncMortarField::Precache( void )
 {
-	PrecacheModel( "sprites/lgtning.vmt" );
+	engine->PrecacheModel( "sprites/lgtning.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "MortarField.Trigger" );
 }
@@ -803,7 +803,7 @@ void CMortar::Spawn( )
 
 void CMortar::Precache( )
 {
-	m_spriteTexture = PrecacheModel( "sprites/lgtning.vmt" );
+	m_spriteTexture = engine->PrecacheModel( "sprites/lgtning.vmt" );
 }
 
 void CMortar::MortarExplode( void )
@@ -860,7 +860,7 @@ LINK_ENTITY_TO_CLASS( monster_hevsuit_dead, CNPC_DeadHEV );
 //=========================================================
 void CNPC_DeadHEV::Spawn( void )
 {
-	PrecacheModel("models/player.mdl");
+	engine->PrecacheModel("models/player.mdl");
 	SetModel( "models/player.mdl" );
 
 	ClearEffects();
@@ -1018,8 +1018,8 @@ void CXenPLight::Spawn( void )
 
 void CXenPLight::Precache( void )
 {
-	PrecacheModel( "models/light.mdl" );
-	PrecacheModel( XEN_PLANT_GLOW_SPRITE );
+	engine->PrecacheModel( "models/light.mdl" );
+	engine->PrecacheModel( XEN_PLANT_GLOW_SPRITE );
 }
 
 
@@ -1133,7 +1133,7 @@ void CXenHair::Think( void )
 
 void CXenHair::Precache( void )
 {
-	PrecacheModel( "models/hair.mdl" );
+	engine->PrecacheModel( "models/hair.mdl" );
 }
 
 class CXenTreeTrigger : public CBaseEntity
@@ -1222,8 +1222,8 @@ void CXenTree::Spawn( void )
 
 void CXenTree::Precache( void )
 {
-	PrecacheModel( "models/tree.mdl" );
-	PrecacheModel( XEN_PLANT_GLOW_SPRITE );
+	engine->PrecacheModel( "models/tree.mdl" );
+	engine->PrecacheModel( XEN_PLANT_GLOW_SPRITE );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "XenTree.AttackMiss" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "XenTree.AttackHit" );
@@ -1445,7 +1445,7 @@ const char *CXenSpore::pModelNames[] =
 
 void CXenSpore::Precache( void )
 {
-	PrecacheModel( (char *)pModelNames[m_nSkin] );
+	engine->PrecacheModel( (char *)pModelNames[m_nSkin] );
 }
 
 

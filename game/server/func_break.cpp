@@ -450,7 +450,7 @@ void CBreakable::Precache( void )
 		pGibName = STRING(m_iszGibModel);
 
 #ifdef HL1_DLL
-		PrecacheModel( pGibName );
+		engine->PrecacheModel( pGibName );
 #endif
 	}
 

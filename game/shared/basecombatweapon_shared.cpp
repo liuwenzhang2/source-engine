@@ -276,11 +276,11 @@ void CBaseCombatWeapon::Precache( void )
 		m_iWorldModelIndex = 0;
 		if ( GetViewModel() && GetViewModel()[0] )
 		{
-			m_iViewModelIndex = CBaseEntity::PrecacheModel( GetViewModel() );
+			m_iViewModelIndex = engine->PrecacheModel( GetViewModel() );
 		}
 		if ( GetWorldModel() && GetWorldModel()[0] )
 		{
-			m_iWorldModelIndex = CBaseEntity::PrecacheModel( GetWorldModel() );
+			m_iWorldModelIndex = engine->PrecacheModel( GetWorldModel() );
 		}
 
 		// Precache sounds, too

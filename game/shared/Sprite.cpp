@@ -304,9 +304,9 @@ void CSprite::SetModel( const char *szModelName )
 //-----------------------------------------------------------------------------
 void CSprite::Precache( void )
 {
-	if ( GetModelName() != NULL_STRING )
+	if (GetModelName() != NULL_STRING)
 	{
-		PrecacheModel( STRING( GetModelName() ) );
+		engine->PrecacheModel(STRING(GetModelName()));
 	}
 }
 

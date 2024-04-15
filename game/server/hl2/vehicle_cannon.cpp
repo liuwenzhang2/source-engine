@@ -221,7 +221,7 @@ void CPropCannon::Precache( void )
 	BaseClass::Precache();
 	m_ServerVehicle.Initialize( STRING( m_vehicleScript ) );
 
-	PrecacheModel( CANNON_PROJECTILE_MODEL );
+	engine->PrecacheModel( CANNON_PROJECTILE_MODEL );
 	
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.LaunchSound" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.Explosion" );

@@ -183,8 +183,8 @@ void CSatchelCharge::SatchelThink( void )
 
 void CSatchelCharge::Precache( void )
 {
-	PrecacheModel("models/Weapons/w_slam.mdl");
-	PrecacheModel(SLAM_SPRITE);
+	engine->PrecacheModel("models/Weapons/w_slam.mdl");
+	engine->PrecacheModel(SLAM_SPRITE);
 }
 
 void CSatchelCharge::BounceSound( void )

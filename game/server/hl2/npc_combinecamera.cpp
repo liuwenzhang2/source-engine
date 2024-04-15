@@ -275,9 +275,9 @@ CNPC_CombineCamera::~CNPC_CombineCamera()
 //-----------------------------------------------------------------------------
 void CNPC_CombineCamera::Precache()
 {
-	PrecacheModel(COMBINE_CAMERA_MODEL);
-	PrecacheModel(COMBINE_CAMERA_GLOW_SPRITE);
-	PrecacheModel(COMBINE_CAMERA_FLASH_SPRITE);
+	engine->PrecacheModel(COMBINE_CAMERA_MODEL);
+	engine->PrecacheModel(COMBINE_CAMERA_GLOW_SPRITE);
+	engine->PrecacheModel(COMBINE_CAMERA_FLASH_SPRITE);
 
 	//  Activities
 	ADD_CUSTOM_ACTIVITY(CNPC_CombineCamera, ACT_COMBINE_CAMERA_OPEN);

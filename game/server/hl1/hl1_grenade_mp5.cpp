@@ -154,7 +154,7 @@ void CGrenadeMP5::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheModel( "models/grenade.mdl" ); 
+	engine->PrecacheModel( "models/grenade.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeMP5.Detonate" );
 }

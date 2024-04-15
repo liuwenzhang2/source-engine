@@ -95,7 +95,7 @@ CGrenadeHomer* CGrenadeHomer::CreateGrenadeHomer( string_t sModelName, string_t 
 
 void CGrenadeHomer::Precache( void )
 {
-	m_spriteTexture = PrecacheModel( "sprites/lgtning.vmt" );
+	m_spriteTexture = engine->PrecacheModel( "sprites/lgtning.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeHomer.StopSounds" );
 	if ( NULL_STRING != m_sFlySound )

@@ -106,7 +106,7 @@ END_SEND_TABLE()
 
 void CPortal_Dinosaur::Precache()
 {
-	PrecacheModel( RADIO_MODEL_NAME );
+	engine->PrecacheModel( RADIO_MODEL_NAME );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.room1_radio" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "UpdateItem.Static" );

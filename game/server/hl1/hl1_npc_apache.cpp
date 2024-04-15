@@ -211,9 +211,9 @@ int CNPC_Apache::ObjectCaps( void )
 void CNPC_Apache::Precache( void )
 {
 	// Get to tha chopper!
-	PrecacheModel( "models/apache.mdl" );
+	engine->PrecacheModel( "models/apache.mdl" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Apache.Rotor" );
-	m_nDebrisModel = PrecacheModel(   "models/metalplategibs_green.mdl" );
+	m_nDebrisModel = engine->PrecacheModel(   "models/metalplategibs_green.mdl" );
 
 	// Gun
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Apache.FireGun" );
@@ -222,7 +222,7 @@ void CNPC_Apache::Precache( void )
 	// Rockets
 	UTIL_PrecacheOther( "grenade_homer" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Apache.RPG" );
-	PrecacheModel( "models/weapons/w_missile.mdl" );
+	engine->PrecacheModel( "models/weapons/w_missile.mdl" );
 
 	BaseClass::Precache();
 }

@@ -632,9 +632,9 @@ void CFuncTank::Precache( void )
 	m_iLargeAmmoType	= GetAmmoDef()->Index("12mmRound");
 
 	if ( m_iszSpriteSmoke != NULL_STRING )
-		PrecacheModel( STRING(m_iszSpriteSmoke) );
+		engine->PrecacheModel( STRING(m_iszSpriteSmoke) );
 	if ( m_iszSpriteFlash != NULL_STRING )
-		PrecacheModel( STRING(m_iszSpriteFlash) );
+		engine->PrecacheModel( STRING(m_iszSpriteFlash) );
 
 	if ( m_soundStartRotate != NULL_STRING )
 		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_soundStartRotate) );

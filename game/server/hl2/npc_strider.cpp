@@ -441,7 +441,7 @@ void CNPC_Strider::Precache()
 		SetModelName( MAKE_STRING( "models/combine_strider.mdl" ) );
 	}
 
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 
 	PropBreakablePrecacheAll( GetModelName() );
 
@@ -461,7 +461,7 @@ void CNPC_Strider::Precache()
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Skewer" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.Hunt" );
 	PrecacheMaterial( "effects/water_highlight" );
-	s_iImpactEffectTexture = PrecacheModel( "sprites/physbeam.vmt" );
+	s_iImpactEffectTexture = engine->PrecacheModel( "sprites/physbeam.vmt" );
 	PrecacheMaterial( "sprites/bluelaser1" );
 	PrecacheMaterial( "effects/blueblacklargebeam" );
 	PrecacheMaterial( "effects/strider_pinch_dudv" );
@@ -469,7 +469,7 @@ void CNPC_Strider::Precache()
 	PrecacheMaterial( "effects/strider_bulge_dudv" );
 	PrecacheMaterial( "effects/strider_muzzle" );
 
-	PrecacheModel( "models/chefhat.mdl" );
+	engine->PrecacheModel( "models/chefhat.mdl" );
 
 	UTIL_PrecacheOther( "sparktrail" );
 

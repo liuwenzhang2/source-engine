@@ -240,7 +240,7 @@ IMPLEMENT_CUSTOM_AI( npc_ichthyosaur, CNPC_Ichthyosaur );
 //-----------------------------------------------------------------------------
 void CNPC_Ichthyosaur::Precache( void )
 {
-	PrecacheModel( ICHTHYOSAUR_MODEL );
+	engine->PrecacheModel( ICHTHYOSAUR_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Ichthyosaur.Bite" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Ichthyosaur.BiteMiss" );

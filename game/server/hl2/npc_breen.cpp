@@ -114,7 +114,7 @@ void CNPC_Breen::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Breen::Precache()
 {
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 	BaseClass::Precache();
 }	
 

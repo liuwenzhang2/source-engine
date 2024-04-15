@@ -36,7 +36,7 @@ END_SEND_TABLE()
 //-----------------------------------------------------------------------------
 void CWaterBullet::Precache()
 {
-	PrecacheModel( "models/weapons/w_bullet.mdl" );
+	engine->PrecacheModel( "models/weapons/w_bullet.mdl" );
 }
 
 

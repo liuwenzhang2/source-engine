@@ -2373,6 +2373,13 @@ bool CServerGameDLL::OnEmitSound(int entindex, const char* soundname, soundlevel
 	return CEnvMicrophone::OnSoundPlayed(entindex, soundname, soundlevel, flVolume, iFlags, iPitch, pOrigin, soundtime, soundorigins);
 }
 
+void CServerGameDLL::OnModelPrecached(int nModelIndex) {
+	if (nModelIndex != -1)
+	{
+		CBaseEntity::PrecacheModelComponents(nModelIndex);
+	}
+}
+
 // keeps track of which chapters the user has unlocked
 ConVar sv_unlockedchapters( "sv_unlockedchapters", "1", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX );
 

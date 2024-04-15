@@ -337,7 +337,7 @@ void CNPC_Tentacle::UpdateOnRemove( void )
 
 void CNPC_Tentacle::Precache( )
 {
-	PrecacheModel("models/tentacle2.mdl");
+	engine->PrecacheModel("models/tentacle2.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Tentacle.Flies" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Tentacle.Squirm" );

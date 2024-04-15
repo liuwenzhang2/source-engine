@@ -242,7 +242,7 @@ void CPropData::ParsePropDataFile( void )
 				const char *pModel = pModelName->GetName();
 				string_t pooledName = AllocPooledString( pModel );
 				pBreakableChunk->iszChunkModels.AddToTail( pooledName );
-				CBaseEntity::PrecacheModel( STRING( pooledName ) );
+				engine->PrecacheModel( STRING( pooledName ) );
 
 				pModelName = pModelName->GetNextKey();
 			}
@@ -1245,7 +1245,7 @@ void PrecacheGibsForModel( int iModel )
 		{
 			breakmodel_t breakModel;
 			pParse->ParseCustom( &breakModel, &breakParser );
-			CBaseEntity::PrecacheModel( breakModel.modelName );
+			engine->PrecacheModel( breakModel.modelName );
 		}
 		else
 		{

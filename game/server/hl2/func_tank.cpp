@@ -948,9 +948,9 @@ bool CFuncTank::CreateVPhysics()
 void CFuncTank::Precache( void )
 {
 	if ( m_iszSpriteSmoke != NULL_STRING )
-		PrecacheModel( STRING(m_iszSpriteSmoke) );
+		engine->PrecacheModel( STRING(m_iszSpriteSmoke) );
 	if ( m_iszSpriteFlash != NULL_STRING )
-		PrecacheModel( STRING(m_iszSpriteFlash) );
+		engine->PrecacheModel( STRING(m_iszSpriteFlash) );
 
 	if ( m_soundStartRotate != NULL_STRING )
 		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_soundStartRotate) );
@@ -3518,7 +3518,7 @@ CMortarShell *CMortarShell::Create( const Vector &vecStart, const Vector &vecTar
 //---------------------------------------------------------
 void CMortarShell::Precache()
 {
-	m_iSpriteTexture = PrecacheModel( "sprites/physbeam.vmt" );
+	m_iSpriteTexture = engine->PrecacheModel( "sprites/physbeam.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Mortar.Impact" );
 	PrecacheMaterial( "effects/ar2ground2" );
@@ -4195,7 +4195,7 @@ void CFuncTankCombineCannon::Precache()
 {
 	m_originalFireRate = m_fireRate;
 
-	PrecacheModel(COMBINE_CANNON_BEAM);
+	engine->PrecacheModel(COMBINE_CANNON_BEAM);
 	PrecacheParticleSystem( "Weapon_Combine_Ion_Cannon" );
 	
 	BaseClass::Precache();

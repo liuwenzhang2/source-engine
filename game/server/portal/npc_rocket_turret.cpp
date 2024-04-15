@@ -344,8 +344,8 @@ CNPC_RocketTurret::~CNPC_RocketTurret( void )
 //-----------------------------------------------------------------------------
 void CNPC_RocketTurret::Precache( void )
 {
-	PrecacheModel("effects/bluelaser1.vmt");
-	m_nSiteHalo = PrecacheModel("sprites/light_glow03.vmt");
+	engine->PrecacheModel("effects/bluelaser1.vmt");
+	m_nSiteHalo = engine->PrecacheModel("sprites/light_glow03.vmt");
 	
 	g_pSoundEmitterSystem->PrecacheScriptSound ( ROCKET_TURRET_SOUND_LOCKING );
 	g_pSoundEmitterSystem->PrecacheScriptSound ( ROCKET_TURRET_SOUND_LOCKED );
@@ -353,8 +353,8 @@ void CNPC_RocketTurret::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound ( ROCKET_PROJECTILE_LOOPING_SOUND );
 
 	UTIL_PrecacheDecal( ROCKET_TURRET_DECAL_NAME );
-	PrecacheModel( ROCKET_TURRET_MODEL_NAME );
-	PrecacheModel ( ROCKET_TURRET_PROJECTILE_NAME );
+	engine->PrecacheModel( ROCKET_TURRET_MODEL_NAME );
+	engine->PrecacheModel ( ROCKET_TURRET_PROJECTILE_NAME );
 
 	BaseClass::Precache();
 }

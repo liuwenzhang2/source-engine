@@ -48,7 +48,7 @@ void CItemDefuser::Spawn( void )
 	
 void CItemDefuser::Precache( void )
 {
-	PrecacheModel( "models/weapons/w_defuser.mdl" );
+	engine->PrecacheModel( "models/weapons/w_defuser.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseCombatCharacter.ItemPickup2" );
 }

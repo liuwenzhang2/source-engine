@@ -2299,7 +2299,7 @@ void CFlexCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax
 		return;
 	}
 
-	PrecacheModel( szModel );
+	engine->PrecacheModel( szModel );
 	SetModel( szModel );
 
 	CFlexCycler::Spawn( );

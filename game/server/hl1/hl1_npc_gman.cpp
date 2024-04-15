@@ -141,7 +141,7 @@ void CNPC_GMan::Spawn()
 //=========================================================
 void CNPC_GMan::Precache()
 {
-	PrecacheModel( "models/gman.mdl" );
+	engine->PrecacheModel( "models/gman.mdl" );
 }	
 
 

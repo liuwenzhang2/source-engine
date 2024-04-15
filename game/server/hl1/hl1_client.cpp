@@ -106,23 +106,23 @@ void ClientGamePrecache( void )
     // Multiplayer uses different models, and more of them.
     if ( g_pGameRules->IsMultiplayer() )
     {
-        CBaseEntity::PrecacheModel("models/player/mp/barney/barney.mdl");
-        CBaseEntity::PrecacheModel("models/player/mp/gina/gina.mdl");
-        CBaseEntity::PrecacheModel("models/player/mp/gman/gman.mdl");
-        CBaseEntity::PrecacheModel("models/player/mp/gordon/gordon.mdl");
-        CBaseEntity::PrecacheModel("models/player/mp/helmet/helmet.mdl");
-        CBaseEntity::PrecacheModel("models/player/mp/hgrunt/hgrunt.mdl");
-        CBaseEntity::PrecacheModel("models/player/mp/robo/robo.mdl");
-        CBaseEntity::PrecacheModel("models/player/mp/scientist/scientist.mdl");
-        CBaseEntity::PrecacheModel("models/player/mp/zombie/zombie.mdl");
-        CBaseEntity::PrecacheModel("models/player.mdl" );                
+        engine->PrecacheModel("models/player/mp/barney/barney.mdl");
+        engine->PrecacheModel("models/player/mp/gina/gina.mdl");
+        engine->PrecacheModel("models/player/mp/gman/gman.mdl");
+        engine->PrecacheModel("models/player/mp/gordon/gordon.mdl");
+        engine->PrecacheModel("models/player/mp/helmet/helmet.mdl");
+        engine->PrecacheModel("models/player/mp/hgrunt/hgrunt.mdl");
+        engine->PrecacheModel("models/player/mp/robo/robo.mdl");
+        engine->PrecacheModel("models/player/mp/scientist/scientist.mdl");
+        engine->PrecacheModel("models/player/mp/zombie/zombie.mdl");
+        engine->PrecacheModel("models/player.mdl" );                
     }
     else
     {
-        CBaseEntity::PrecacheModel("models/player.mdl" );
+        engine->PrecacheModel("models/player.mdl" );
     }
 
-	CBaseEntity::PrecacheModel( "models/gibs/agibs.mdl" );
+	engine->PrecacheModel( "models/gibs/agibs.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Player.UseDeny" );
 }

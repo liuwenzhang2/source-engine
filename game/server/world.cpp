@@ -638,11 +638,11 @@ void CWorld::Precache( void )
 
 	if ( g_Language.GetInt() == LANGUAGE_GERMAN )
 	{
-		PrecacheModel( "models/germangibs.mdl" );
+		engine->PrecacheModel( "models/germangibs.mdl" );
 	}
 	else
 	{
-		PrecacheModel( "models/gibs/hgibs.mdl" );
+		engine->PrecacheModel( "models/gibs/hgibs.mdl" );
 	}
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseEntity.EnterWater" );

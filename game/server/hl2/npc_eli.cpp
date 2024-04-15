@@ -126,7 +126,7 @@ void CNPC_Eli::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Eli::Precache()
 {
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 	BaseClass::Precache();
 }	
 

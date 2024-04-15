@@ -105,9 +105,9 @@ const char *GetGameDescription()
 //-----------------------------------------------------------------------------
 void ClientGamePrecache( void )
 {
-	CBaseEntity::PrecacheModel("models/player.mdl");
-	CBaseEntity::PrecacheModel( "models/gibs/agibs.mdl" );
-	CBaseEntity::PrecacheModel ("models/weapons/v_hands.mdl");
+	engine->PrecacheModel("models/player.mdl");
+	engine->PrecacheModel( "models/gibs/agibs.mdl" );
+	engine->PrecacheModel ("models/weapons/v_hands.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HUDQuickInfo.LowAmmo" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HUDQuickInfo.LowHealth" );

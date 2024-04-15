@@ -92,7 +92,7 @@ END_DATADESC()
 void CItem_ItemCrate::Precache( void )
 {
 	// Set this here to quiet base prop warnings
-	PrecacheModel( pszItemCrateModelName[m_CrateAppearance] );
+	engine->PrecacheModel( pszItemCrateModelName[m_CrateAppearance] );
 	SetModel( pszItemCrateModelName[m_CrateAppearance] );
 
 	BaseClass::Precache();

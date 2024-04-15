@@ -137,8 +137,8 @@ CWeaponGauss::CWeaponGauss( void )
 //-----------------------------------------------------------------------------
 void CWeaponGauss::Precache( void )
 {
-	PrecacheModel( GAUSS_GLOW_SPRITE );
-	PrecacheModel( GAUSS_BEAM_SPRITE );
+	engine->PrecacheModel( GAUSS_GLOW_SPRITE );
+	engine->PrecacheModel( GAUSS_BEAM_SPRITE );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Gauss.Zap1" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Gauss.Zap2" );

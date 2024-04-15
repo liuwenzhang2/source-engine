@@ -108,8 +108,8 @@ void CNPC_Vortigaunt::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheModel("models/islave.mdl");
-	PrecacheModel("sprites/lgtning.vmt");
+	engine->PrecacheModel("models/islave.mdl");
+	engine->PrecacheModel("sprites/lgtning.vmt");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Vortigaunt.Pain" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Vortigaunt.Die" );

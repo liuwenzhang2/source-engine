@@ -94,10 +94,10 @@ void CWeaponDODBaseGun::Precache()
 	BaseClass::Precache();
 
 	// Precache all weapon ejections, since every weapon will appear in the game.
-	PrecacheModel( "models/shells/shell_small.mdl" );
-	PrecacheModel( "models/shells/shell_medium.mdl" );
-	PrecacheModel( "models/shells/shell_large.mdl" );
-	PrecacheModel( "models/shells/garand_clip.mdl" );
+	engine->PrecacheModel( "models/shells/shell_small.mdl" );
+	engine->PrecacheModel( "models/shells/shell_medium.mdl" );
+	engine->PrecacheModel( "models/shells/shell_large.mdl" );
+	engine->PrecacheModel( "models/shells/garand_clip.mdl" );
 }
 
 void CWeaponDODBaseGun::PrimaryAttack()

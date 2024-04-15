@@ -569,8 +569,8 @@ void CHunterFlechette::SetupGlobalModelData()
 //-----------------------------------------------------------------------------
 void CHunterFlechette::Precache()
 {
-	PrecacheModel( HUNTER_FLECHETTE_MODEL );
-	PrecacheModel( "sprites/light_glow02_noz.vmt" );
+	engine->PrecacheModel( HUNTER_FLECHETTE_MODEL );
+	engine->PrecacheModel( "sprites/light_glow02_noz.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FlechetteNearmiss" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.FlechetteHitBody" );
@@ -1715,7 +1715,7 @@ CNPC_Hunter::~CNPC_Hunter()
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::Precache()
 {
-	PrecacheModel( "models/hunter.mdl" );
+	engine->PrecacheModel( "models/hunter.mdl" );
 	PropBreakablePrecacheAll( MAKE_STRING("models/hunter.mdl") );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Hunter.Idle" );

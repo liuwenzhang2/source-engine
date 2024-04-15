@@ -67,5 +67,5 @@ void CBaseGrenadeContact::Precache( void )
 {
 	BaseClass::Precache( );
 
-	PrecacheModel("models/weapons/w_grenade.mdl");
+	engine->PrecacheModel("models/weapons/w_grenade.mdl");
 }

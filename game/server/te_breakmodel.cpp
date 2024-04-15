@@ -72,7 +72,7 @@ CTEBreakModel::~CTEBreakModel( void )
 //-----------------------------------------------------------------------------
 void CTEBreakModel::Precache( void )
 {
-	CBaseEntity::PrecacheModel( "models/gibs/hgibs.mdl" );
+	engine->PrecacheModel( "models/gibs/hgibs.mdl" );
 }
 
 //-----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ void CTEBreakModel::Precache( void )
 void CTEBreakModel::Test( const Vector& current_origin, const QAngle& current_angles )
 {
 	// Fill in data
-	m_nModelIndex = CBaseEntity::PrecacheModel( "models/gibs/hgibs.mdl" );
+	m_nModelIndex = engine->PrecacheModel( "models/gibs/hgibs.mdl" );
 	m_vecOrigin = current_origin;
 	m_angRotation = current_angles;
 	m_vecSize.Init( 16, 16, 16 );

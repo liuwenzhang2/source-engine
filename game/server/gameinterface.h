@@ -163,6 +163,9 @@ public:
 
 	bool OnEmitSound(int entindex, const char* soundname, soundlevel_t soundlevel,
 		float flVolume, int iFlags, int iPitch, const Vector* pOrigin, float soundtime, CUtlVector< Vector >& soundorigins);
+	
+	void OnModelPrecached( int nModelIndex );
+
 private:
 
 	// This can just be a wrapper on MapEntity_ParseAllEntities, but CS does some tricks in here

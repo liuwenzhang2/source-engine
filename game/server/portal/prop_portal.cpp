@@ -201,8 +201,8 @@ void CProp_Portal::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.fizzle_moved" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.fizzle_invalid_surface" );
 
-	PrecacheModel( "models/portals/portal1.mdl" );
-	PrecacheModel( "models/portals/portal2.mdl" );
+	engine->PrecacheModel( "models/portals/portal1.mdl" );
+	engine->PrecacheModel( "models/portals/portal2.mdl" );
 
 	PrecacheParticleSystem( "portal_1_particles" );
 	PrecacheParticleSystem( "portal_2_particles" );

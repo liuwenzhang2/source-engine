@@ -102,7 +102,7 @@ public:
 	//-----------------------------------------------------------------------------
 	void Precache( void )
 	{
-		m_spriteTexture = PrecacheModel( "sprites/lgtning.vmt" );
+		m_spriteTexture = engine->PrecacheModel( "sprites/lgtning.vmt" );
 
 		BaseClass::Precache();
 	}

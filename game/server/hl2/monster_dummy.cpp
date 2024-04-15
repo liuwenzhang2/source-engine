@@ -130,7 +130,7 @@ void CNewNPC::InitCustomSchedules(void)
 //-----------------------------------------------------------------------------
 void CNewNPC::Precache( void )
 {
-	PrecacheModel( "models/mymodel.mdl" );
+	engine->PrecacheModel( "models/mymodel.mdl" );
 
 	BaseClass::Precache();
 }

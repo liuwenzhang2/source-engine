@@ -3356,7 +3356,7 @@ int CBaseEntity::Restore( IRestore &restore )
 
 	if (IsNetworkable() && entindex()!=-1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
 	{
-		PrecacheModel( STRING( GetModelName() ) );
+		engine->PrecacheModel( STRING( GetModelName() ) );
 
 		//Adrian: We should only need to do this after we precache. No point in setting the model again.
 		SetModelIndex( modelinfo->GetModelIndex( STRING(GetModelName() ) ) );
@@ -4713,7 +4713,7 @@ void CBaseEntity::SetSize( const Vector &vecMin, const Vector &vecMax )
 CStudioHdr *ModelSoundsCache_LoadModel( const char *filename )
 {
 	// Load the file
-	int idx = engine->PrecacheModel( filename, true );
+	int idx = engine->PrecacheModel( filename, true ,false);
 	if ( idx != -1 )
 	{
 		model_t *mdl = (model_t *)modelinfo->GetModel( idx );
@@ -5062,42 +5062,42 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 // Input  : *name - model name
 // Output : int -- model index for model
 //-----------------------------------------------------------------------------
-int CBaseEntity::PrecacheModel( const char *name, bool bPreload )
-{
-	if ( !name || !*name )
-	{
-		Msg( "Attempting to precache model, but model name is NULL\n");
-		return -1;
-	}
-
-	// Warn on out of order precache
-	if ( !engine->IsPrecacheAllowed() )//CBaseEntity::
-	{
-		if ( !engine->IsModelPrecached( name ) )
-		{
-			Assert( !"CBaseEntity::PrecacheModel:  too late" );
-			Warning( "Late precache of %s\n", name );
-		}
-	}
-#if defined( WATCHACCESS )
-	else
-	{
-		g_bWatching = false;
-	}
-#endif
-
-	int idx = engine->PrecacheModel( name, bPreload );
-	if ( idx != -1 )
-	{
-		PrecacheModelComponents( idx );
-	}
-
-#if defined( WATCHACCESS )
-	g_bWatching = true;
-#endif
-
-	return idx;
-}
+//int CBaseEntity::PrecacheModel( const char *name, bool bPreload )
+//{
+//	if ( !name || !*name )
+//	{
+//		Msg( "Attempting to precache model, but model name is NULL\n");
+//		return -1;
+//	}
+//
+//	// Warn on out of order precache
+//	if ( !engine->IsPrecacheAllowed() )//CBaseEntity::
+//	{
+//		if ( !engine->IsModelPrecached( name ) )
+//		{
+//			Assert( !"CBaseEntity::PrecacheModel:  too late" );
+//			Warning( "Late precache of %s\n", name );
+//		}
+//	}
+//#if defined( WATCHACCESS )
+//	else
+//	{
+//		g_bWatching = false;
+//	}
+//#endif
+//
+//	int idx = engine->PrecacheModel( name, bPreload ,true);
+//	if ( idx != -1 )
+//	{
+//		PrecacheModelComponents( idx );
+//	}
+//
+//#if defined( WATCHACCESS )
+//	g_bWatching = true;
+//#endif
+//
+//	return idx;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

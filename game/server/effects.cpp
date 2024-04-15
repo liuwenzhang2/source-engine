@@ -125,7 +125,7 @@ void CBubbling::Spawn( void )
 
 void CBubbling::Precache( void )
 {
-	m_bubbleModel = PrecacheModel("sprites/bubble.vmt");			// Precache bubble sprite
+	m_bubbleModel = engine->PrecacheModel("sprites/bubble.vmt");			// Precache bubble sprite
 }
 
 
@@ -401,11 +401,11 @@ void CGibShooter::Precache ( void )
 {
 	if ( g_Language.GetInt() == LANGUAGE_GERMAN )
 	{
-		m_iGibModelIndex = PrecacheModel ("models/germanygibs.mdl");
+		m_iGibModelIndex = engine->PrecacheModel ("models/germanygibs.mdl");
 	}
 	else
 	{
-		m_iGibModelIndex = PrecacheModel ("models/gibs/hgibs.mdl");
+		m_iGibModelIndex = engine->PrecacheModel ("models/gibs/hgibs.mdl");
 	}
 }
 
@@ -727,7 +727,7 @@ bool CEnvShooter::KeyValue( const char *szKeyName, const char *szValue )
 
 void CEnvShooter::Precache ( void )
 {
-	m_iGibModelIndex = PrecacheModel( STRING( GetModelName() ) );
+	m_iGibModelIndex = engine->PrecacheModel( STRING( GetModelName() ) );
 }
 
 
@@ -946,7 +946,7 @@ void CTestEffect::Spawn( void )
 
 void CTestEffect::Precache( void )
 {
-	PrecacheModel( "sprites/lgtning.vmt" );
+	engine->PrecacheModel( "sprites/lgtning.vmt" );
 }
 
 void CTestEffect::Think( void )
@@ -1263,7 +1263,7 @@ END_DATADESC()
 
 void CEnvFunnel::Precache ( void )
 {
-	m_iSprite = PrecacheModel ( "sprites/flare6.vmt" );
+	m_iSprite = engine->PrecacheModel ( "sprites/flare6.vmt" );
 }
 
 void CEnvFunnel::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
@@ -1309,7 +1309,7 @@ public:
 
 void CEnvBeverage::Precache ( void )
 {
-	PrecacheModel( "models/can.mdl" );
+	engine->PrecacheModel( "models/can.mdl" );
 }
 
 BEGIN_DATADESC( CEnvBeverage )
@@ -1410,7 +1410,7 @@ LINK_ENTITY_TO_CLASS( item_sodacan, CItemSoda );
 
 void CItemSoda::Precache ( void )
 {
-	PrecacheModel( "models/can.mdl" );
+	engine->PrecacheModel( "models/can.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "ItemSoda.Bounce" );
 }

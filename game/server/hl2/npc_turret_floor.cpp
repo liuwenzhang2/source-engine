@@ -225,14 +225,14 @@ void CNPC_FloorTurret::Precache( void )
 {
 	const char *pModelName = STRING( GetModelName() );
 	pModelName = ( pModelName && pModelName[ 0 ] != '\0' ) ? pModelName : FLOOR_TURRET_MODEL;
-	PrecacheModel( pModelName );
-	PrecacheModel( FLOOR_TURRET_GLOW_SPRITE );
+	engine->PrecacheModel( pModelName );
+	engine->PrecacheModel( FLOOR_TURRET_GLOW_SPRITE );
 
 	PropBreakablePrecacheAll( MAKE_STRING( pModelName ) );
 
 	if ( IsCitizenTurret() )
 	{
-		PrecacheModel( LASER_BEAM_SPRITE );
+		engine->PrecacheModel( LASER_BEAM_SPRITE );
 		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FloorTurret.AlarmPing");
 	}
 

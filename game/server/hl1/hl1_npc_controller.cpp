@@ -271,9 +271,9 @@ void CNPC_Controller::Spawn()
 //=========================================================
 void CNPC_Controller::Precache()
 {
-	PrecacheModel("models/controller.mdl");
+	engine->PrecacheModel("models/controller.mdl");
 
-	PrecacheModel( "sprites/xspark4.vmt");
+	engine->PrecacheModel( "sprites/xspark4.vmt");
 
 	UTIL_PrecacheOther( "controller_energy_ball" );	
 	UTIL_PrecacheOther( "controller_head_ball" );
@@ -1092,7 +1092,7 @@ void CNPC_ControllerHeadBall::Spawn( void )
 
 void CNPC_ControllerHeadBall::Precache( void )
 {
-	PrecacheModel( "sprites/xspark4.vmt");
+	engine->PrecacheModel( "sprites/xspark4.vmt");
 }
 
 extern short		g_sModelIndexLaser;	
@@ -1253,7 +1253,7 @@ void CNPC_ControllerZapBall::Spawn( void )
 
 void CNPC_ControllerZapBall::Precache( void )
 {
-	PrecacheModel( "sprites/xspark4.vmt");
+	engine->PrecacheModel( "sprites/xspark4.vmt");
 }
 
 

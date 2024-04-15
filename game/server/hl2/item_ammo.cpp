@@ -51,7 +51,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/boxsrounds.mdl");
+		engine->PrecacheModel ("models/items/boxsrounds.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -86,7 +86,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/boxsrounds.mdl");
+		engine->PrecacheModel ("models/items/boxsrounds.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -120,7 +120,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/boxmrounds.mdl");
+		engine->PrecacheModel ("models/items/boxmrounds.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -154,7 +154,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/boxmrounds.mdl");
+		engine->PrecacheModel ("models/items/boxmrounds.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -188,7 +188,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/combine_rifle_cartridge01.mdl");
+		engine->PrecacheModel ("models/items/combine_rifle_cartridge01.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -222,7 +222,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/combine_rifle_cartridge01.mdl");
+		engine->PrecacheModel ("models/items/combine_rifle_cartridge01.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -251,7 +251,7 @@ public:
 
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/357ammo.mdl");
+		engine->PrecacheModel ("models/items/357ammo.mdl");
 	}
 	void Spawn( void )
 	{ 
@@ -286,7 +286,7 @@ public:
 
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/357ammobox.mdl");
+		engine->PrecacheModel ("models/items/357ammobox.mdl");
 	}
 	void Spawn( void )
 	{ 
@@ -321,7 +321,7 @@ public:
 
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/crossbowrounds.mdl");
+		engine->PrecacheModel ("models/items/crossbowrounds.mdl");
 	}
 
 	void Spawn( void )
@@ -363,7 +363,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/flare.mdl");
+		engine->PrecacheModel ("models/items/flare.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -398,7 +398,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/boxflares.mdl");
+		engine->PrecacheModel ("models/items/boxflares.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -431,7 +431,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/weapons/w_missile_closed.mdl");
+		engine->PrecacheModel ("models/weapons/w_missile_closed.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -465,7 +465,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/ar2_grenade.mdl");
+		engine->PrecacheModel ("models/items/ar2_grenade.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -501,7 +501,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/boxsniperrounds.mdl");
+		engine->PrecacheModel ("models/items/boxsniperrounds.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -535,7 +535,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/boxbuckshot.mdl");
+		engine->PrecacheModel ("models/items/boxbuckshot.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -563,7 +563,7 @@ public:
 	void Precache( void )
 	{
 		PrecacheParticleSystem( "combineball" );
-		PrecacheModel ("models/items/combine_rifle_ammo01.mdl");
+		engine->PrecacheModel ("models/items/combine_rifle_ammo01.mdl");
 	}
 
 	void Spawn( void )
@@ -781,7 +781,7 @@ bool CItem_AmmoCrate::CreateVPhysics( void )
 void CItem_AmmoCrate::Precache( void )
 {
 	SetupCrate();
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "AmmoCrate.Open" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "AmmoCrate.Close" );

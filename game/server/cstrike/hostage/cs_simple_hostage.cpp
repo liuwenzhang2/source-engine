@@ -223,7 +223,7 @@ void CHostage::Precache()
 {
 	for ( int i=0; i<NumHostageModels; ++i )
 	{
-		PrecacheModel( HostageModel[i] );
+		engine->PrecacheModel( HostageModel[i] );
 	}
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Hostage.StartFollowCT" );

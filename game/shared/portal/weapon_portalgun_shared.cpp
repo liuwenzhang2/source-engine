@@ -59,11 +59,11 @@ void CWeaponPortalgun::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheModel( PORTALGUN_BEAM_SPRITE );
-	PrecacheModel( PORTALGUN_BEAM_SPRITE_NOZ );
+	engine->PrecacheModel( PORTALGUN_BEAM_SPRITE );
+	engine->PrecacheModel( PORTALGUN_BEAM_SPRITE_NOZ );
 
-	PrecacheModel( "models/portals/portal1.mdl" );
-	PrecacheModel( "models/portals/portal2.mdl" );
+	engine->PrecacheModel( "models/portals/portal1.mdl" );
+	engine->PrecacheModel( "models/portals/portal2.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Portal.ambient_loop" );
 

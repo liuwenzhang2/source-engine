@@ -81,7 +81,7 @@ void CSimpleBot::Precache()
 	BaseClass::Precache();
 
 #ifndef DOTA_DLL
-	PrecacheModel( "models/humans/group01/female_01.mdl" );
+	engine->PrecacheModel( "models/humans/group01/female_01.mdl" );
 #endif
 }
 

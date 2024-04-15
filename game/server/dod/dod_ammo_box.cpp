@@ -32,8 +32,8 @@ void CAmmoBox::Spawn( void )
 
 void CAmmoBox::Precache( void )
 {
-	PrecacheModel( "models/ammo/ammo_axis.mdl" );
-	PrecacheModel( "models/ammo/ammo_us.mdl" );
+	engine->PrecacheModel( "models/ammo/ammo_axis.mdl" );
+	engine->PrecacheModel( "models/ammo/ammo_us.mdl" );
 }
 
 CAmmoBox *CAmmoBox::Create( const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner, int team )

@@ -105,7 +105,7 @@ void CNPC_Headcrab::Spawn( void )
 //-----------------------------------------------------------------------------
 void CNPC_Headcrab::Precache( void )
 {
-	PrecacheModel( "models/headcrab.mdl" );
+	engine->PrecacheModel( "models/headcrab.mdl" );
 //	PrecacheModel( "models/hc_squashed01.mdl" );
 //	PrecacheModel( "models/gibs/hc_gibs.mdl" );
 
@@ -673,7 +673,7 @@ void CNPC_BabyCrab::Spawn( void )
 
 void CNPC_BabyCrab::Precache( void )
 {
-	PrecacheModel( "models/baby_headcrab.mdl" );
+	engine->PrecacheModel( "models/baby_headcrab.mdl" );
 	CNPC_Headcrab::Precache();
 }
 

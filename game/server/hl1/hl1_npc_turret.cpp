@@ -1216,10 +1216,10 @@ void CNPC_Turret::Spawn()
 void CNPC_Turret::Precache()
 {
 	CNPC_BaseTurret::Precache( );
-	PrecacheModel ("models/turret.mdl");	
-	PrecacheModel (TURRET_GLOW_SPRITE);
+	engine->PrecacheModel ("models/turret.mdl");
+	engine->PrecacheModel (TURRET_GLOW_SPRITE);
 
-	PrecacheModel( "sprites/xspark4.vmt" );
+	engine->PrecacheModel( "sprites/xspark4.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.Shoot" );
 
@@ -1338,7 +1338,7 @@ void CNPC_MiniTurret::Precache()
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Turret.Shoot" );
 
-	PrecacheModel ("models/miniturret.mdl");	
+	engine->PrecacheModel ("models/miniturret.mdl");
 }
 
 void CNPC_MiniTurret::Shoot(Vector &vecSrc, Vector &vecDirToEnemy)
@@ -1391,7 +1391,7 @@ void CNPC_Sentry::Precache()
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Sentry.Shoot" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Sentry.Die" );
 
-	PrecacheModel ("models/sentry.mdl");
+	engine->PrecacheModel ("models/sentry.mdl");
 }
 
 void CNPC_Sentry::Spawn()

@@ -212,7 +212,7 @@ void CEnvBeam::Precache( void )
 
 	g_iszPhysicsPropClassname = AllocPooledString( "prop_physics" );
 
-	m_spriteTexture = PrecacheModel( STRING(m_iszSpriteName) );
+	m_spriteTexture = engine->PrecacheModel( STRING(m_iszSpriteName) );
 	BaseClass::Precache();
 }
 

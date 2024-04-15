@@ -140,10 +140,10 @@ bool CWeaponSatchel::CanDeploy( void )
 //-----------------------------------------------------------------------------
 void CWeaponSatchel::Precache( void )
 {
-	m_iSatchelViewIndex		= PrecacheModel( SATCHEL_VIEW_MODEL );
-	m_iSatchelWorldIndex	= PrecacheModel( SATCHEL_WORLD_MODEL );
-	m_iRadioViewIndex		= PrecacheModel( SATCHELRADIO_VIEW_MODEL );
-	m_iRadioWorldIndex		= PrecacheModel( SATCHELRADIO_WORLD_MODEL );
+	m_iSatchelViewIndex		= engine->PrecacheModel( SATCHEL_VIEW_MODEL );
+	m_iSatchelWorldIndex	= engine->PrecacheModel( SATCHEL_WORLD_MODEL );
+	m_iRadioViewIndex		= engine->PrecacheModel( SATCHELRADIO_VIEW_MODEL );
+	m_iRadioWorldIndex		= engine->PrecacheModel( SATCHELRADIO_WORLD_MODEL );
 
 #ifndef CLIENT_DLL
 	UTIL_PrecacheOther( "monster_satchel" );
@@ -573,7 +573,7 @@ void CSatchelCharge::SatchelThink( void )
 
 void CSatchelCharge::Precache( void )
 {
-	PrecacheModel( SATCHEL_CHARGE_MODEL );
+	engine->PrecacheModel( SATCHEL_CHARGE_MODEL );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "SatchelCharge.Bounce" );
 }
 

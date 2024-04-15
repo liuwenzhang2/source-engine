@@ -1171,10 +1171,10 @@ void CNPC_Vortigaunt::Precache()
 {
 	UTIL_PrecacheOther( "vort_charge_token" );
 
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 
-	m_nLightningSprite = PrecacheModel("sprites/lgtning.vmt");
-	PrecacheModel("sprites/vortring1.vmt");
+	m_nLightningSprite = engine->PrecacheModel("sprites/lgtning.vmt");
+	engine->PrecacheModel("sprites/vortring1.vmt");
 
 	// HACK: Only precache this for EP2 because reslists cannot be rebuilt - 08/22/07 - jdw
 	if ( hl2_episodic.GetBool() )

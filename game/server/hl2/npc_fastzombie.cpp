@@ -388,17 +388,17 @@ static const char *s_pLegsModel = "models/gibs/fast_zombie_legs.mdl";
 //-----------------------------------------------------------------------------
 void CFastZombie::Precache( void )
 {
-	PrecacheModel("models/zombie/fast.mdl");
+	engine->PrecacheModel("models/zombie/fast.mdl");
 #ifdef HL2_EPISODIC
-	PrecacheModel("models/zombie/Fast_torso.mdl");
+	engine->PrecacheModel("models/zombie/Fast_torso.mdl");
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.CarEnter1" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.CarEnter2" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.CarEnter3" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.CarEnter4" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.CarScream" );
 #endif
-	PrecacheModel( "models/gibs/fast_zombie_torso.mdl" );
-	PrecacheModel( "models/gibs/fast_zombie_legs.mdl" );
+	engine->PrecacheModel( "models/gibs/fast_zombie_torso.mdl" );
+	engine->PrecacheModel( "models/gibs/fast_zombie_legs.mdl" );
 	
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.LeapAttack" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastZombie.FootstepRight" );

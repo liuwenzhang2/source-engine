@@ -185,7 +185,7 @@ void CPropTelescopicArm::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_hit" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_ambient" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_dust" );

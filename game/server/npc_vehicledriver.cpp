@@ -141,7 +141,7 @@ void CNPC_VehicleDriver::Spawn( void )
 //-----------------------------------------------------------------------------
 void CNPC_VehicleDriver::Precache( void )
 {
-	PrecacheModel( "models/roller_vehicledriver.mdl" );
+	engine->PrecacheModel( "models/roller_vehicledriver.mdl" );
 }
 
 //-----------------------------------------------------------------------------

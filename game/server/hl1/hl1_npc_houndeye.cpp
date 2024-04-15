@@ -137,9 +137,9 @@ void CNPC_Houndeye::Spawn()
 //=========================================================
 void CNPC_Houndeye::Precache()
 {
-	PrecacheModel("models/houndeye.mdl");
+	engine->PrecacheModel("models/houndeye.mdl");
 
-	m_iSpriteTexture = PrecacheModel( "sprites/shockwave.vmt" );
+	m_iSpriteTexture = engine->PrecacheModel( "sprites/shockwave.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HoundEye.Idle" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HoundEye.Warn" );

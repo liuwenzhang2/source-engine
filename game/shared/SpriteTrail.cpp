@@ -163,7 +163,7 @@ void CSpriteTrail::Precache( void )
 
 	if ( m_iszSpriteName != NULL_STRING )
 	{
-		PrecacheModel( STRING(m_iszSpriteName) );
+		engine->PrecacheModel( STRING(m_iszSpriteName) );
 	}
 }
 

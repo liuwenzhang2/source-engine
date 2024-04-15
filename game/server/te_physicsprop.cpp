@@ -67,7 +67,7 @@ CTEPhysicsProp::~CTEPhysicsProp( void )
 //-----------------------------------------------------------------------------
 void CTEPhysicsProp::Precache( void )
 {
-	CBaseEntity::PrecacheModel( "models/gibs/hgibs.mdl" );
+	engine->PrecacheModel( "models/gibs/hgibs.mdl" );
 }
 
 //-----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ void CTEPhysicsProp::Precache( void )
 void CTEPhysicsProp::Test( const Vector& current_origin, const QAngle& current_angles )
 {
 	// Fill in data
-	m_nModelIndex = CBaseEntity::PrecacheModel( "models/gibs/hgibs.mdl" );
+	m_nModelIndex = engine->PrecacheModel( "models/gibs/hgibs.mdl" );
 	m_nSkin = 0;
 	m_vecOrigin = current_origin;
 	m_angRotation = current_angles;

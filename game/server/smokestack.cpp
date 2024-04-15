@@ -162,7 +162,7 @@ void CSmokeStack::Activate()
 
 	// Legacy support..
 	if ( m_iMaterialModel == -1 )
-		m_iMaterialModel = PrecacheModel( "particle/SmokeStack.vmt" );
+		m_iMaterialModel = engine->PrecacheModel( "particle/SmokeStack.vmt" );
 }
 
 
@@ -202,7 +202,7 @@ bool CSmokeStack::KeyValue( const char *szKeyName, const char *szValue )
 		const char *pName = STRING( m_strMaterialModel );
 		char szStrippedName[512];
 
-		m_iMaterialModel = PrecacheModel( pName );
+		m_iMaterialModel = engine->PrecacheModel( pName );
 		Q_StripExtension( pName, szStrippedName, Q_strlen(pName)+1 );
 
 		int iLength = Q_strlen( szStrippedName );
@@ -214,7 +214,7 @@ bool CSmokeStack::KeyValue( const char *szKeyName, const char *szValue )
 		
 		while ( filesystem->FileExists( UTIL_VarArgs( "materials/%s", str ) ) )
 		{
-			PrecacheModel( str );
+			engine->PrecacheModel( str );
 			iCount++;
 			
 			Q_snprintf( str, sizeof( str ), "%s%d.vmt", szStrippedName, iCount );
@@ -231,7 +231,7 @@ bool CSmokeStack::KeyValue( const char *szKeyName, const char *szValue )
 
 void CSmokeStack::Precache()
 {
-	m_iMaterialModel = PrecacheModel( STRING( m_strMaterialModel ) );
+	m_iMaterialModel = engine->PrecacheModel( STRING( m_strMaterialModel ) );
 	
 	BaseClass::Precache();
 }

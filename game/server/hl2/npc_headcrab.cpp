@@ -2428,7 +2428,7 @@ void CBaseHeadcrab::CreateDust( bool placeDecal )
 //-----------------------------------------------------------------------------
 void CHeadcrab::Precache( void )
 {
-	PrecacheModel( "models/headcrabclassic.mdl" );
+	engine->PrecacheModel( "models/headcrabclassic.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_HeadCrab.Gib" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_HeadCrab.Idle" );
@@ -2621,7 +2621,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CFastHeadcrab::Precache( void )
 {
-	PrecacheModel( "models/headcrab.mdl" );
+	engine->PrecacheModel( "models/headcrab.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastHeadcrab.Idle" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FastHeadcrab.Alert" );
@@ -3229,7 +3229,7 @@ void CBlackHeadcrab::Spawn( void )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::Precache( void )
 {
-	PrecacheModel( "models/headcrabblack.mdl" );
+	engine->PrecacheModel( "models/headcrabblack.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Telegraph" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BlackHeadcrab.Attack" );

@@ -104,7 +104,7 @@ void CTripmineGrenade::Spawn( void )
 
 void CTripmineGrenade::Precache( void )
 {
-	PrecacheModel("models/Weapons/w_slam.mdl"); 
+	engine->PrecacheModel("models/Weapons/w_slam.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "TripmineGrenade.Place" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "TripmineGrenade.Activate" );

@@ -48,6 +48,6 @@ void CDODSmokeGrenadeGER::Spawn()
 
 void CDODSmokeGrenadeGER::Precache()
 {
-	PrecacheModel( GRENADE_MODEL );
+	engine->PrecacheModel( GRENADE_MODEL );
 	BaseClass::Precache();
 }

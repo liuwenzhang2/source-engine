@@ -68,7 +68,7 @@ void CHolidayGift::Precache()
 {
 	BaseClass::Precache();
 
-	PrecacheModel( CHRISTMAS_MODEL );
+	engine->PrecacheModel( CHRISTMAS_MODEL );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Christmas.GiftDrop" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Christmas.GiftPickup" );
 }

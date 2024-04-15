@@ -294,7 +294,7 @@ void CNPC_Leech::HandleAnimEvent( animevent_t *pEvent )
 
 void CNPC_Leech::Precache( void )
 {
-	PrecacheModel("models/leech.mdl");
+	engine->PrecacheModel("models/leech.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Leech.Attack" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Leech.Alert" );

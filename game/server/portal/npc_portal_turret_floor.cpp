@@ -238,8 +238,8 @@ void CNPC_Portal_FloorTurret::Precache( void )
 
 	ADD_CUSTOM_ACTIVITY( CNPC_FloorTurret, ACT_FLOOR_TURRET_FIRE2 );
 
-	m_sLaserHaloSprite = PrecacheModel( "sprites/redlaserglow.vmt" );
-	PrecacheModel("effects/redlaser1.vmt");
+	m_sLaserHaloSprite = engine->PrecacheModel( "sprites/redlaserglow.vmt" );
+	engine->PrecacheModel("effects/redlaser1.vmt");
 
 	for ( int iTalkScript = 0; iTalkScript < PORTAL_TURRET_STATE_TOTAL; ++iTalkScript )
 	{

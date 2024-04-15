@@ -78,7 +78,7 @@ void CWeaponBox::Spawn( void )
 
 void CWeaponBox::Precache( void )
 {
-	PrecacheModel( WEAPONBOX_MODEL );
+	engine->PrecacheModel( WEAPONBOX_MODEL );
 }
 
 

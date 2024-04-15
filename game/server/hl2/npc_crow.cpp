@@ -1281,9 +1281,9 @@ void CNPC_Crow::Precache( void )
 {
 	BaseClass::Precache();
 	
-	PrecacheModel( "models/crow.mdl" );
-	PrecacheModel( "models/pigeon.mdl" );
-	PrecacheModel( "models/seagull.mdl" );
+	engine->PrecacheModel( "models/crow.mdl" );
+	engine->PrecacheModel( "models/pigeon.mdl" );
+	engine->PrecacheModel( "models/seagull.mdl" );
 
 	//Crow
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Crow.Hop" );

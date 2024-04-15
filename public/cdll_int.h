@@ -557,6 +557,7 @@ public:
 	virtual bool			StartDemoRecording( const char *pszFilename, const char *pszFolder = NULL ) = 0;
 	virtual void			StopDemoRecording( void ) = 0;
 	virtual void			TakeScreenshot( const char *pszFilename, const char *pszFolder = NULL ) = 0;
+	virtual int						PrecacheModel(const char* name) = 0;
 };
 
 abstract_class IVEngineClient : public IVEngineClient013

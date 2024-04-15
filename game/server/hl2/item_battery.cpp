@@ -28,7 +28,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/items/battery.mdl");
+		engine->PrecacheModel ("models/items/battery.mdl");
 
 		g_pSoundEmitterSystem->PrecacheScriptSound( "ItemBattery.Touch" );
 

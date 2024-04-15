@@ -65,7 +65,7 @@ CTESprite::~CTESprite( void )
 //-----------------------------------------------------------------------------
 void CTESprite::Precache( void )
 {
-	CBaseEntity::PrecacheModel("sprites/gunsmoke.vmt");
+	engine->PrecacheModel("sprites/gunsmoke.vmt");
 }
 
 //-----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ void CTESprite::Precache( void )
 void CTESprite::Test( const Vector& current_origin, const QAngle& current_angles )
 {
 	// Fill in data
-	m_nModelIndex = CBaseEntity::PrecacheModel("sprites/gunsmoke.vmt");
+	m_nModelIndex = engine->PrecacheModel("sprites/gunsmoke.vmt");
 	m_fScale = 0.8;
 	m_nBrightness = 200;
 	m_vecOrigin = current_origin;

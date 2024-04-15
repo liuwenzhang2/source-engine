@@ -1751,8 +1751,8 @@ void CNPC_BaseZombie::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BaseZombie.PoundDoor" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_BaseZombie.Swat" );
 
-	PrecacheModel( GetLegsModel() );
-	PrecacheModel( GetTorsoModel() );
+	engine->PrecacheModel( GetLegsModel() );
+	engine->PrecacheModel( GetTorsoModel() );
 
 	PrecacheParticleSystem( "blood_impact_zombie_01" );
 

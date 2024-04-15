@@ -90,7 +90,7 @@ void CTriggerWeaponDissolve::Precache( void )
 {
 	BaseClass::Precache();
 
-	m_spriteTexture = PrecacheModel( "sprites/lgtning.vmt" );
+	m_spriteTexture = engine->PrecacheModel( "sprites/lgtning.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "WeaponDissolve.Dissolve" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "WeaponDissolve.Charge" );
@@ -518,7 +518,7 @@ void CWateryDeathLeech::Precache( void )
 
 	BaseClass::Precache();
 
-	PrecacheModel( "models/leech.mdl" );
+	engine->PrecacheModel( "models/leech.mdl" );
 	engine->SetAllowPrecache( allowPrecache );//CBaseEntity::
 }
 
@@ -666,7 +666,7 @@ void CTriggerWateryDeath::Precache( void )
 {
 	//Ugh this is temporary until Jakob finishes the animations and doesn't need the command anymore.
 	BaseClass::Precache();
-	PrecacheModel( "models/leech.mdl" );
+	engine->PrecacheModel( "models/leech.mdl" );
 	
 	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.leech_bites_loop" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.leech_water_churn_loop" );

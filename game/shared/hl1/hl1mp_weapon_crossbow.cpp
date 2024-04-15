@@ -120,7 +120,7 @@ void CCrossbowBolt::Spawn( )
 
 void CCrossbowBolt::Precache( )
 {
-	PrecacheModel( BOLT_MODEL );
+	engine->PrecacheModel( BOLT_MODEL );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseGrenade.Explode" );
 }
 

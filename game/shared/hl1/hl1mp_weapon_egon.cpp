@@ -153,8 +153,8 @@ void CWeaponEgon::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Gluon.Run" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Gluon.Off" );
 
-	PrecacheModel( EGON_BEAM_SPRITE );
-	PrecacheModel( EGON_FLARE_SPRITE );
+	engine->PrecacheModel( EGON_BEAM_SPRITE );
+	engine->PrecacheModel( EGON_FLARE_SPRITE );
 
 	BaseClass::Precache();
 }

@@ -209,12 +209,12 @@ void CWeaponStriderBuster::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_StriderBuster.Dud_Detonate" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_StriderBuster.Ping" );
 
-	PrecacheModel("sprites/orangeflare1.vmt");
+	engine->PrecacheModel("sprites/orangeflare1.vmt");
 
 	UTIL_PrecacheOther( "env_citadel_energy_core" );
 	UTIL_PrecacheOther( "sparktrail" );
 
-	m_nRingTexture = PrecacheModel( "sprites/lgtning.vmt" );
+	m_nRingTexture = engine->PrecacheModel( "sprites/lgtning.vmt" );
 
 	PrecacheParticleSystem( "striderbuster_attach" );
 	PrecacheParticleSystem( "striderbuster_attached_pulse" );

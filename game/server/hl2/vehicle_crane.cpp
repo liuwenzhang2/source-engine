@@ -1051,7 +1051,7 @@ void CCraneTip::Spawn( void )
 //-----------------------------------------------------------------------------
 void CCraneTip::Precache( void )
 {
-	PrecacheModel( "models/props_junk/cardboard_box001a.mdl" );
+	engine->PrecacheModel( "models/props_junk/cardboard_box001a.mdl" );
 	BaseClass::Precache();
 }
 

@@ -233,7 +233,7 @@ void CNPC_Zombine::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheModel( "models/zombie/zombie_soldier.mdl" );
+	engine->PrecacheModel( "models/zombie/zombie_soldier.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.FootstepRight" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.FootstepLeft" );

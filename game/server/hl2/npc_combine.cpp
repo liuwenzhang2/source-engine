@@ -278,7 +278,7 @@ void CNPC_Combine::InputThrowGrenadeAtTarget( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Combine::Precache()
 {
-	PrecacheModel("models/Weapons/w_grenade.mdl");
+	engine->PrecacheModel("models/Weapons/w_grenade.mdl");
 	UTIL_PrecacheOther( "npc_handgrenade" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Combine.GrenadeLaunch" );

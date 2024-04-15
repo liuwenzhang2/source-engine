@@ -61,7 +61,7 @@ void CHEGrenadeProjectile::Spawn()
 
 void CHEGrenadeProjectile::Precache()
 {
-	PrecacheModel( GRENADE_MODEL );
+	engine->PrecacheModel( GRENADE_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HEGrenade.Bounce" );
 

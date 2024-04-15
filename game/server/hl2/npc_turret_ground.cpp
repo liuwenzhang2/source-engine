@@ -68,8 +68,8 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CNPC_GroundTurret::Precache( void )
 {
-	PrecacheModel( GROUNDTURRET_BEAM_SPRITE );
-	PrecacheModel( "models/combine_turrets/ground_turret.mdl" );
+	engine->PrecacheModel( GROUNDTURRET_BEAM_SPRITE );
+	engine->PrecacheModel( "models/combine_turrets/ground_turret.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CeilingTurret.Deploy" );
 	m_ShotSounds = g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_FloorTurret.ShotSounds" );

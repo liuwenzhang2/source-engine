@@ -109,7 +109,7 @@ void CEnvParticleScript::PrecacheAnimationEventMaterials()
 void CEnvParticleScript::Precache()
 {
 	BaseClass::Precache();
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 	
 	// We need a model for its animation sequences even though we don't render it
 	SetModel( STRING( GetModelName() ) );

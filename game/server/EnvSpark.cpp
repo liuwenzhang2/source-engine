@@ -113,7 +113,7 @@ void CEnvSpark::Spawn(void)
 //-----------------------------------------------------------------------------
 void CEnvSpark::Precache(void)
 {
-	m_nGlowSpriteIndex = PrecacheModel( "sprites/glow01.vmt" );
+	m_nGlowSpriteIndex = engine->PrecacheModel( "sprites/glow01.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "DoSpark" );
 }

@@ -161,9 +161,9 @@ CMissile::~CMissile()
 //-----------------------------------------------------------------------------
 void CMissile::Precache( void )
 {
-	PrecacheModel( "models/weapons/w_missile.mdl" );
-	PrecacheModel( "models/weapons/w_missile_launch.mdl" );
-	PrecacheModel( "models/weapons/w_missile_closed.mdl" );
+	engine->PrecacheModel( "models/weapons/w_missile.mdl" );
+	engine->PrecacheModel( "models/weapons/w_missile_launch.mdl" );
+	engine->PrecacheModel( "models/weapons/w_missile_closed.mdl" );
 }
 
 
@@ -1390,10 +1390,10 @@ void CWeaponRPG::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Missile.Accelerate" );
 
 	// Laser dot...
-	PrecacheModel( "sprites/redglow1.vmt" );
-	PrecacheModel( RPG_LASER_SPRITE );
-	PrecacheModel( RPG_BEAM_SPRITE );
-	PrecacheModel( RPG_BEAM_SPRITE_NOZ );
+	engine->PrecacheModel( "sprites/redglow1.vmt" );
+	engine->PrecacheModel( RPG_LASER_SPRITE );
+	engine->PrecacheModel( RPG_BEAM_SPRITE );
+	engine->PrecacheModel( RPG_BEAM_SPRITE_NOZ );
 
 #ifndef CLIENT_DLL
 	UTIL_PrecacheOther( "rpg_missile" );

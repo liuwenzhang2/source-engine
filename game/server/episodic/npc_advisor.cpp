@@ -1551,7 +1551,7 @@ void CNPC_Advisor::Precache()
 {
 	BaseClass::Precache();
 	
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 
 #if NPC_ADVISOR_HAS_BEHAVIOR
 	PrecacheModel( "sprites/lgtning.vmt" );
@@ -1566,7 +1566,7 @@ void CNPC_Advisor::Precache()
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Advisor.ObjectChargeUp" );
 	PrecacheParticleSystem( "Advisor_Psychic_Beam" );
 	PrecacheParticleSystem( "advisor_object_charge" );
-	PrecacheModel("sprites/greenglow1.vmt");
+	engine->PrecacheModel("sprites/greenglow1.vmt");
 }
 
 

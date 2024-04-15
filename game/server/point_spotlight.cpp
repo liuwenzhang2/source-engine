@@ -129,8 +129,8 @@ void CPointSpotlight::Precache(void)
 	BaseClass::Precache();
 
 	// Sprites.
-	m_nHaloSprite = PrecacheModel("sprites/light_glow03.vmt");
-	PrecacheModel( "sprites/glow_test02.vmt" );
+	m_nHaloSprite = engine->PrecacheModel("sprites/light_glow03.vmt");
+	engine->PrecacheModel( "sprites/glow_test02.vmt" );
 }
 
 

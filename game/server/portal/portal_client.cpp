@@ -100,9 +100,9 @@ CBaseEntity* FindEntity( int pEdict, char *classname)
 //-----------------------------------------------------------------------------
 void ClientGamePrecache( void )
 {
-	CBaseEntity::PrecacheModel("models/player.mdl");
-	CBaseEntity::PrecacheModel( "models/gibs/agibs.mdl" );
-	CBaseEntity::PrecacheModel("models/weapons/v_hands.mdl");
+	engine->PrecacheModel("models/player.mdl");
+	engine->PrecacheModel( "models/gibs/agibs.mdl" );
+	engine->PrecacheModel("models/weapons/v_hands.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HUDQuickInfo.LowAmmo" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HUDQuickInfo.LowHealth" );
@@ -115,8 +115,8 @@ void ClientGamePrecache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Geiger.BeepHigh" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Geiger.BeepLow" );
 
-	CBaseEntity::PrecacheModel( "models/portals/portal1.mdl" );
-	CBaseEntity::PrecacheModel( "models/portals/portal2.mdl" );
+	engine->PrecacheModel( "models/portals/portal1.mdl" );
+	engine->PrecacheModel( "models/portals/portal2.mdl" );
 }
 
 

@@ -177,7 +177,7 @@ void CNPC_FlockingFlyerFlock::Spawn( void )
 void CNPC_FlockingFlyerFlock::Precache( void )
 {
 	//PRECACHE_MODEL("models/aflock.mdl");		
-	PrecacheModel("models/boid.mdl");		
+	engine->PrecacheModel("models/boid.mdl");
 
 	PrecacheFlockSounds();
 }
@@ -272,7 +272,7 @@ void CNPC_FlockingFlyer::SpawnCommonCode( )
 void CNPC_FlockingFlyer::Precache( )
 {
 	//PRECACHE_MODEL("models/aflock.mdl");
-	PrecacheModel("models/boid.mdl");
+	engine->PrecacheModel("models/boid.mdl");
 	CNPC_FlockingFlyerFlock::PrecacheFlockSounds();
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "FlockingFlyer.Alert" );

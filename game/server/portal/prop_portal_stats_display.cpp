@@ -216,7 +216,7 @@ void CPropPortalStatsDisplay::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 
 	PrecacheVGuiScreen( "portal_stats_display_screen" );
 }

@@ -320,12 +320,12 @@ void CNPC_Stalker::Spawn( void )
 //-----------------------------------------------------------------------------
 void CNPC_Stalker::Precache( void )
 {
-	PrecacheModel("models/stalker.mdl");
-	PrecacheModel("sprites/laser.vmt");	
+	engine->PrecacheModel("models/stalker.mdl");
+	engine->PrecacheModel("sprites/laser.vmt");
 
-	PrecacheModel("sprites/redglow1.vmt");
-	PrecacheModel("sprites/orangeglow1.vmt");
-	PrecacheModel("sprites/yellowglow1.vmt");
+	engine->PrecacheModel("sprites/redglow1.vmt");
+	engine->PrecacheModel("sprites/orangeglow1.vmt");
+	engine->PrecacheModel("sprites/yellowglow1.vmt");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Stalker.BurnFlesh" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Stalker.BurnWall" );

@@ -1600,7 +1600,7 @@ void CPhysMagnet::Spawn( void )
 //-----------------------------------------------------------------------------
 void CPhysMagnet::Precache( void )
 {
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 	BaseClass::Precache();
 }
 

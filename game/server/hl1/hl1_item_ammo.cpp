@@ -31,7 +31,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel( AMMO_CROSSBOW_MODEL );
+		engine->PrecacheModel( AMMO_CROSSBOW_MODEL );
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -69,7 +69,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ( AMMO_EGON_MODEL );
+		engine->PrecacheModel ( AMMO_EGON_MODEL );
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -107,7 +107,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ( AMMO_GAUSS_MODEL );
+		engine->PrecacheModel ( AMMO_GAUSS_MODEL );
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -145,7 +145,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ( AMMO_GLOCK_MODEL );
+		engine->PrecacheModel ( AMMO_GLOCK_MODEL );
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -185,7 +185,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ( AMMO_MP5_MODEL );
+		engine->PrecacheModel ( AMMO_MP5_MODEL );
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -225,7 +225,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ( AMMO_MP5CHAIN_MODEL );
+		engine->PrecacheModel ( AMMO_MP5CHAIN_MODEL );
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -263,7 +263,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ( AMMO_MP5GRENADE_MODEL );
+		engine->PrecacheModel ( AMMO_MP5GRENADE_MODEL );
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -303,7 +303,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ( AMMO_357_MODEL );
+		engine->PrecacheModel ( AMMO_357_MODEL );
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -341,7 +341,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ( AMMO_RPG_MODEL );
+		engine->PrecacheModel ( AMMO_RPG_MODEL );
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{
@@ -391,7 +391,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ( AMMO_SHOTGUN_MODEL );
+		engine->PrecacheModel ( AMMO_SHOTGUN_MODEL );
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{

@@ -685,10 +685,10 @@ void CAntlionGrub::GrubTouch( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 void CAntlionGrub::Precache( void )
 {
-	PrecacheModel( ANTLIONGRUB_MODEL );
-	PrecacheModel( ANTLIONGRUB_SQUASHED_MODEL );
+	engine->PrecacheModel( ANTLIONGRUB_MODEL );
+	engine->PrecacheModel( ANTLIONGRUB_SQUASHED_MODEL );
 
-	m_nGlowSpriteHandle = PrecacheModel("sprites/grubflare1.vmt");
+	m_nGlowSpriteHandle = engine->PrecacheModel("sprites/grubflare1.vmt");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion_Grub.Idle" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion_Grub.Alert" );
@@ -907,9 +907,9 @@ void CGrubNugget::Spawn( void )
 //-----------------------------------------------------------------------------
 void CGrubNugget::Precache( void )
 {
-	PrecacheModel("models/grub_nugget_small.mdl");
-	PrecacheModel("models/grub_nugget_medium.mdl");
-	PrecacheModel("models/grub_nugget_large.mdl");
+	engine->PrecacheModel("models/grub_nugget_small.mdl");
+	engine->PrecacheModel("models/grub_nugget_medium.mdl");
+	engine->PrecacheModel("models/grub_nugget_large.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "GrubNugget.Touch" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion_Grub.Explode" );

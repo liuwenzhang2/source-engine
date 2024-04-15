@@ -31,7 +31,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel( BATTERY_MODEL );
+		engine->PrecacheModel( BATTERY_MODEL );
 
 		g_pSoundEmitterSystem->PrecacheScriptSound( "Item.Pickup" );
 	}

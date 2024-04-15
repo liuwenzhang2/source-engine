@@ -131,7 +131,7 @@ void CWeaponUSP::Precache()
 	m_inPrecache = true;
 	BaseClass::Precache();
 
-	m_silencedModelIndex = CBaseEntity::PrecacheModel( GetCSWpnData().m_szSilencerModel );
+	m_silencedModelIndex = engine->PrecacheModel( GetCSWpnData().m_szSilencerModel );
 	m_inPrecache = false;
 }
 

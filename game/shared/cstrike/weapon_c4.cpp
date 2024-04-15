@@ -127,8 +127,8 @@ END_PREDICTION_DATA()
 
 	void CPlantedC4::Precache()
 	{
-		g_sModelIndexC4Glow = PrecacheModel( "sprites/ledglow.vmt" );
-		PrecacheModel( PLANTED_C4_MODEL );
+		g_sModelIndexC4Glow = engine->PrecacheModel( "sprites/ledglow.vmt" );
+		engine->PrecacheModel( PLANTED_C4_MODEL );
 		PrecacheVGuiScreen( "c4_panel" );
 
 		engine->ForceModelBounds( PLANTED_C4_MODEL, Vector( -7, -13, -3 ), Vector( 9, 12, 11 ) );

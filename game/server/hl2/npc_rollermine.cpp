@@ -491,12 +491,12 @@ CNPC_RollerMine::~CNPC_RollerMine( void )
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::Precache( void )
 {
-	PrecacheModel( "models/roller.mdl" );
-	PrecacheModel( "models/roller_spikes.mdl" );
+	engine->PrecacheModel( "models/roller.mdl" );
+	engine->PrecacheModel( "models/roller_spikes.mdl" );
 
-	PrecacheModel( "sprites/bluelight1.vmt" );
-	PrecacheModel( "sprites/rollermine_shock.vmt" );
-	PrecacheModel( "sprites/rollermine_shock_yellow.vmt" );
+	engine->PrecacheModel( "sprites/bluelight1.vmt" );
+	engine->PrecacheModel( "sprites/rollermine_shock.vmt" );
+	engine->PrecacheModel( "sprites/rollermine_shock_yellow.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.Taunt" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_RollerMine.OpenSpikes" );

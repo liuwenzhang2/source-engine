@@ -114,7 +114,7 @@ public:
 	//  it'll only load when actually used (which can cause a disk i/o hitch if it occurs during play of a level).
 	virtual bool		IsPrecacheAllowed() = 0;
 	virtual void		SetAllowPrecache(bool allow) = 0;
-	virtual int			PrecacheModel( const char *s, bool preload = false ) = 0;
+	virtual int			PrecacheModel( const char *s, bool preload = false ,bool bCallback = true) = 0;
 	virtual int			PrecacheSentenceFile( const char *s, bool preload = false ) = 0;
 	virtual int			PrecacheDecal( const char *name, bool preload = false ) = 0;
 	virtual int			PrecacheGeneric( const char *s, bool preload = false ) = 0;
@@ -663,6 +663,8 @@ public:
 
 	virtual bool OnEmitSound(int entindex, const char* soundname, soundlevel_t soundlevel,
 		float flVolume, int iFlags, int iPitch, const Vector* pOrigin, float soundtime, CUtlVector< Vector >& soundorigins) = 0;
+
+	virtual void OnModelPrecached(int nModelIndex) = 0;
 };
 
 typedef IServerGameDLL IServerGameDLL008;

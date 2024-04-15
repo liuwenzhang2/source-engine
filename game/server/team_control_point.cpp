@@ -229,7 +229,7 @@ void CTeamControlPoint::Precache( void )
 
 		if ( m_TeamData[i].iszModel != NULL_STRING )
 		{
-			PrecacheModel( STRING(m_TeamData[i].iszModel) );
+			engine->PrecacheModel( STRING(m_TeamData[i].iszModel) );
 		}
 
 		if ( m_TeamData[i].iszIcon != NULL_STRING )

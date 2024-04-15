@@ -151,7 +151,7 @@ CFlare::~CFlare()
 //-----------------------------------------------------------------------------
 void CFlare::Precache( void )
 {
-	PrecacheModel("models/weapons/flare.mdl" );
+	engine->PrecacheModel("models/weapons/flare.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_FlareGun.Burn" );
 

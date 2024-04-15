@@ -1366,8 +1366,8 @@ CWeaponPhysCannon::CWeaponPhysCannon( void )
 //-----------------------------------------------------------------------------
 void CWeaponPhysCannon::Precache( void )
 {
-	PrecacheModel( PHYSCANNON_BEAM_SPRITE );
-	PrecacheModel( PHYSCANNON_BEAM_SPRITE_NOZ );
+	engine->PrecacheModel( PHYSCANNON_BEAM_SPRITE );
+	engine->PrecacheModel( PHYSCANNON_BEAM_SPRITE_NOZ );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_PhysCannon.HoldSound" );
 

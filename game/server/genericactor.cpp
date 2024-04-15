@@ -164,7 +164,7 @@ void CGenericActor::Spawn()
 //=========================================================
 void CGenericActor::Precache()
 {
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 }	
 
 //=========================================================

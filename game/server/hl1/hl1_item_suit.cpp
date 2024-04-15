@@ -37,7 +37,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel( SUIT_MODEL );
+		engine->PrecacheModel( SUIT_MODEL );
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{

@@ -343,7 +343,7 @@ void CRopeKeyframe::Activate()
 
 	// Legacy support..
 	if ( m_iRopeMaterialModelIndex == -1 )
-		m_iRopeMaterialModelIndex = PrecacheModel( "cable/cable.vmt" );
+		m_iRopeMaterialModelIndex = engine->PrecacheModel( "cable/cable.vmt" );
 
 	// Find the next entity in our chain.
 	CBaseEntity *pEnt = gEntList.FindEntityByName( NULL, m_iNextLinkName );
@@ -628,7 +628,7 @@ int CRopeKeyframe::OnTakeDamage( const CTakeDamageInfo &info )
 
 void CRopeKeyframe::Precache()
 {
-	m_iRopeMaterialModelIndex = PrecacheModel( STRING( m_strRopeMaterialModel ) );
+	m_iRopeMaterialModelIndex = engine->PrecacheModel( STRING( m_strRopeMaterialModel ) );
 	BaseClass::Precache();
 }
 
@@ -702,15 +702,15 @@ bool CRopeKeyframe::KeyValue( const char *szKeyName, const char *szValue )
 		int iShader = atoi( szValue );
 		if ( iShader == 0 )
 		{
-			m_iRopeMaterialModelIndex = PrecacheModel( "cable/cable.vmt" );
+			m_iRopeMaterialModelIndex = engine->PrecacheModel( "cable/cable.vmt" );
 		}
 		else if ( iShader == 1 )
 		{
-			m_iRopeMaterialModelIndex = PrecacheModel( "cable/rope.vmt" );
+			m_iRopeMaterialModelIndex = engine->PrecacheModel( "cable/rope.vmt" );
 		}
 		else
 		{
-			m_iRopeMaterialModelIndex = PrecacheModel( "cable/chain.vmt" );
+			m_iRopeMaterialModelIndex = engine->PrecacheModel( "cable/chain.vmt" );
 		}
 	}
 	else if ( stricmp( szKeyName, "RopeMaterial" ) == 0 )
@@ -751,7 +751,7 @@ void CRopeKeyframe::InputSetScrollSpeed( inputdata_t &inputdata )
 void CRopeKeyframe::SetMaterial( const char *pName )
 {
 	m_strRopeMaterialModel = AllocPooledString( pName );
-	m_iRopeMaterialModelIndex = PrecacheModel( STRING( m_strRopeMaterialModel ) );
+	m_iRopeMaterialModelIndex = engine->PrecacheModel( STRING( m_strRopeMaterialModel ) );
 }
 
 int CRopeKeyframe::UpdateTransmitState()

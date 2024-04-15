@@ -171,9 +171,9 @@ AI_END_CUSTOM_NPC()
 //=========================================================
 void CNPC_Ichthyosaur::Precache()
 {
-	PrecacheModel("models/icky.mdl");
+	engine->PrecacheModel("models/icky.mdl");
 
-	PrecacheModel("sprites/lgtning.vmt");
+	engine->PrecacheModel("sprites/lgtning.vmt");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Ichthyosaur.Bite" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Ichthyosaur.Alert" );

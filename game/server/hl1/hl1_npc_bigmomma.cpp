@@ -438,14 +438,14 @@ void CNPC_BigMomma::Spawn()
 //=========================================================
 void CNPC_BigMomma::Precache()
 {
-	PrecacheModel("models/big_mom.mdl");
+	engine->PrecacheModel("models/big_mom.mdl");
 
 	UTIL_PrecacheOther( BIG_CHILDCLASS );
 
 	// TEMP: Squid
-	PrecacheModel("sprites/mommaspit.vmt");// spit projectile.
-	gSpitSprite = PrecacheModel("sprites/mommaspout.vmt");// client side spittle.
-	gSpitDebrisSprite = PrecacheModel("sprites/mommablob.vmt" );
+	engine->PrecacheModel("sprites/mommaspit.vmt");// spit projectile.
+	gSpitSprite = engine->PrecacheModel("sprites/mommaspout.vmt");// client side spittle.
+	gSpitDebrisSprite = engine->PrecacheModel("sprites/mommablob.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.Pain" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "BigMomma.Attack" );

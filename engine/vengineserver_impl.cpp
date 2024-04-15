@@ -406,12 +406,23 @@ public:
 		return 0;
 	}
 	
-	virtual int PrecacheModel( const char *s, bool preload /*= false*/ )
+	virtual int PrecacheModel( const char *s, bool preload /*= false*/, bool bCallback /*= true*/)
 	{
+		if (!IsPrecacheAllowed())//CBaseEntity::
+		{
+			if (!IsModelPrecached(s))
+			{
+				Assert(!"CBaseEntity::PrecacheModel:  too late");
+				Warning("Late precache of %s\n", s);
+			}
+		}
 		PR_CheckEmptyString (s);
 		int i = SV_FindOrAddModel( s, preload );
 		if ( i >= 0 )
 		{
+			if (bCallback) {
+				serverGameDLL->OnModelPrecached(i);
+			}
 			return i;
 		}
 		

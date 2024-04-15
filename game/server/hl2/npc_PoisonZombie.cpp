@@ -256,7 +256,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CNPC_PoisonZombie::Precache( void )
 {
-	PrecacheModel("models/zombie/poison.mdl");
+	engine->PrecacheModel("models/zombie/poison.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.Die" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_PoisonZombie.ThrowWarn" );

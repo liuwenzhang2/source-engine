@@ -591,7 +591,7 @@ void CBeam::BeamInit( const char *pSpriteName, float width )
 	SetScrollRate( 0 );
 	SetModelName( MAKE_STRING( pSpriteName ) );
 	SetRenderMode( kRenderTransTexture );
-	SetTexture( PrecacheModel( pSpriteName ) );
+	SetTexture(engine->PrecacheModel( pSpriteName ) );
 	SetWidth( width );
 	SetEndWidth( width );
 	SetFadeLength( 0 );			// No fade

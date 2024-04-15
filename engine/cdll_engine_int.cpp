@@ -90,6 +90,7 @@
 #include "sourcevr/isourcevirtualreality.h"
 #include "cl_check_process.h"
 #include "enginethreads.h"
+#include "ModelInfo.h"
 
 #if defined( REPLAY_ENABLED )
 #include "replay_internal.h"
@@ -569,6 +570,7 @@ public:
 	virtual bool	StartDemoRecording( const char *pszFilename, const char *pszFolder = NULL );
 	virtual void	StopDemoRecording( void );
 	virtual void	TakeScreenshot( const char *pszFilename, const char *pszFolder = NULL );
+	int						PrecacheModel(const char* name);
 };
 
 
@@ -2210,4 +2212,9 @@ void CEngineClient::TakeScreenshot( const char *pszFilename, const char *pszFold
 	{
 		Shader_SwapBuffers();
 	}
+}
+
+int CEngineClient::PrecacheModel(const char* name)
+{
+	return modelinfoclient->GetModelIndex(name);
 }

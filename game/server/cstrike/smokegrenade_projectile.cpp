@@ -182,7 +182,7 @@ void CSmokeGrenadeProjectile::Spawn()
 
 void CSmokeGrenadeProjectile::Precache()
 {
-	PrecacheModel( GRENADE_MODEL );
+	engine->PrecacheModel( GRENADE_MODEL );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseSmokeEffect.Sound" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "SmokeGrenade.Bounce" );
 	BaseClass::Precache();

@@ -424,7 +424,7 @@ void CPropJeepEpisodic::Precache( void )
 {
 	PrecacheMaterial( RADAR_PANEL_MATERIAL );
 	PrecacheMaterial( RADAR_PANEL_WRITEZ );
-	PrecacheModel( s_szHazardSprite );
+	engine->PrecacheModel( s_szHazardSprite );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "JNK_Radar_Ping_Friendly" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Physics.WaterSplash" );
 

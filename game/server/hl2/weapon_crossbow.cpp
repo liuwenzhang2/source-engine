@@ -186,12 +186,12 @@ void CCrossbowBolt::Spawn( void )
 
 void CCrossbowBolt::Precache( void )
 {
-	PrecacheModel( BOLT_MODEL );
+	engine->PrecacheModel( BOLT_MODEL );
 
 	// This is used by C_TEStickyBolt, despte being different from above!!!
-	PrecacheModel( "models/crossbow_bolt.mdl" );
+	engine->PrecacheModel( "models/crossbow_bolt.mdl" );
 
-	PrecacheModel( "sprites/light_glow02_noz.vmt" );
+	engine->PrecacheModel( "sprites/light_glow02_noz.vmt" );
 }
 
 //-----------------------------------------------------------------------------
@@ -536,8 +536,8 @@ void CWeaponCrossbow::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Crossbow.BoltHitWorld" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_Crossbow.BoltSkewer" );
 
-	PrecacheModel( CROSSBOW_GLOW_SPRITE );
-	PrecacheModel( CROSSBOW_GLOW_SPRITE2 );
+	engine->PrecacheModel( CROSSBOW_GLOW_SPRITE );
+	engine->PrecacheModel( CROSSBOW_GLOW_SPRITE2 );
 
 	BaseClass::Precache();
 }

@@ -303,13 +303,13 @@ void Host_Say( CBaseEntity *pEdict, const CCommand &args, bool teamonly )
 void ClientPrecache( void )
 {
 	// Precache cable textures.
-	CBaseEntity::PrecacheModel( "cable/cable.vmt" );	
-	CBaseEntity::PrecacheModel( "cable/cable_lit.vmt" );	
-	CBaseEntity::PrecacheModel( "cable/chain.vmt" );	
-	CBaseEntity::PrecacheModel( "cable/rope.vmt" );	
-	CBaseEntity::PrecacheModel( "sprites/blueglow1.vmt" );	
-	CBaseEntity::PrecacheModel( "sprites/purpleglow1.vmt" );	
-	CBaseEntity::PrecacheModel( "sprites/purplelaser1.vmt" );	
+	engine->PrecacheModel( "cable/cable.vmt" );	
+	engine->PrecacheModel( "cable/cable_lit.vmt" );	
+	engine->PrecacheModel( "cable/chain.vmt" );	
+	engine->PrecacheModel( "cable/rope.vmt" );	
+	engine->PrecacheModel( "sprites/blueglow1.vmt" );	
+	engine->PrecacheModel( "sprites/purpleglow1.vmt" );	
+	engine->PrecacheModel( "sprites/purplelaser1.vmt" );	
 	
 #ifndef HL2MP
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Hud.Hint" );

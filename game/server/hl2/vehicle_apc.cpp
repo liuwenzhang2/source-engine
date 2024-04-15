@@ -121,12 +121,12 @@ void CPropAPC::Precache( void )
 	int i;
 	for ( i = 0; i < APC_MAX_CHUNKS; ++i )
 	{
-		PrecacheModel( s_pChunkModelName[i] );
+		engine->PrecacheModel( s_pChunkModelName[i] );
 	}
 
 	for ( i = 0; i < APC_MAX_GIBS; ++i )
 	{
-		PrecacheModel( s_pGibModelName[i] );
+		engine->PrecacheModel( s_pGibModelName[i] );
 	}
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Weapon_AR2.Single" );

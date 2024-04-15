@@ -191,8 +191,8 @@ void CNPC_Launcher::InputFireOnce( inputdata_t &inputdata )
 void CNPC_Launcher::Precache( void )
 {
 	// This is a dummy model that is never used!
-	PrecacheModel("models/player.mdl");
-	PrecacheModel(STRING(m_sMissileModel));
+	engine->PrecacheModel("models/player.mdl");
+	engine->PrecacheModel(STRING(m_sMissileModel));
 	g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_sLaunchSound));
 	g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_sFlySound));
 	

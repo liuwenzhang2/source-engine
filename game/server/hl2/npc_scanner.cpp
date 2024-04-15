@@ -533,14 +533,14 @@ void CNPC_CScanner::Precache(void)
 	// Model
 	if( m_bIsClawScanner )
 	{
-		PrecacheModel("models/shield_scanner.mdl");
+		engine->PrecacheModel("models/shield_scanner.mdl");
 
-		PrecacheModel("models/gibs/Shield_Scanner_Gib1.mdl");
-		PrecacheModel("models/gibs/Shield_Scanner_Gib2.mdl");
-		PrecacheModel("models/gibs/Shield_Scanner_Gib3.mdl");
-		PrecacheModel("models/gibs/Shield_Scanner_Gib4.mdl");
-		PrecacheModel("models/gibs/Shield_Scanner_Gib5.mdl");
-		PrecacheModel("models/gibs/Shield_Scanner_Gib6.mdl");
+		engine->PrecacheModel("models/gibs/Shield_Scanner_Gib1.mdl");
+		engine->PrecacheModel("models/gibs/Shield_Scanner_Gib2.mdl");
+		engine->PrecacheModel("models/gibs/Shield_Scanner_Gib3.mdl");
+		engine->PrecacheModel("models/gibs/Shield_Scanner_Gib4.mdl");
+		engine->PrecacheModel("models/gibs/Shield_Scanner_Gib5.mdl");
+		engine->PrecacheModel("models/gibs/Shield_Scanner_Gib6.mdl");
 
 		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.Shoot");
 		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_SScanner.Alert" );
@@ -559,13 +559,13 @@ void CNPC_CScanner::Precache(void)
 	}
 	else
 	{
-		PrecacheModel("models/combine_scanner.mdl");
+		engine->PrecacheModel("models/combine_scanner.mdl");
 
-		PrecacheModel("models/gibs/scanner_gib01.mdl" );
-		PrecacheModel("models/gibs/scanner_gib02.mdl" );	
-		PrecacheModel("models/gibs/scanner_gib02.mdl" );
-		PrecacheModel("models/gibs/scanner_gib04.mdl" );
-		PrecacheModel("models/gibs/scanner_gib05.mdl" );
+		engine->PrecacheModel("models/gibs/scanner_gib01.mdl" );
+		engine->PrecacheModel("models/gibs/scanner_gib02.mdl" );
+		engine->PrecacheModel("models/gibs/scanner_gib02.mdl" );
+		engine->PrecacheModel("models/gibs/scanner_gib04.mdl" );
+		engine->PrecacheModel("models/gibs/scanner_gib05.mdl" );
 
 		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.Shoot");
 		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CScanner.Alert" );
@@ -583,8 +583,8 @@ void CNPC_CScanner::Precache(void)
 	}
 
 	// Sprites
-	m_nHaloSprite = PrecacheModel("sprites/light_glow03.vmt");
-	PrecacheModel( "sprites/glow_test02.vmt" );
+	m_nHaloSprite = engine->PrecacheModel("sprites/light_glow03.vmt");
+	engine->PrecacheModel( "sprites/glow_test02.vmt" );
 
 	BaseClass::Precache();
 }

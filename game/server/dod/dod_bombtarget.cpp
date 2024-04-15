@@ -82,9 +82,9 @@ void CDODBombTarget::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheModel( DOD_BOMB_TARGET_MODEL_ARMED );
-	m_iTargetModel = PrecacheModel( DOD_BOMB_TARGET_MODEL_TARGET );
-	m_iUnavailableModel = PrecacheModel( DOD_BOMB_TARGET_MODEL_UNAVAILABLE );
+	engine->PrecacheModel( DOD_BOMB_TARGET_MODEL_ARMED );
+	m_iTargetModel = engine->PrecacheModel( DOD_BOMB_TARGET_MODEL_TARGET );
+	m_iUnavailableModel = engine->PrecacheModel( DOD_BOMB_TARGET_MODEL_UNAVAILABLE );
 }
 
 //-----------------------------------------------------------------------------

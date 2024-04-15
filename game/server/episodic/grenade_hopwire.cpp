@@ -382,10 +382,10 @@ void CGrenadeHopwire::Precache( void )
 	//PrecacheSound("NPC_Strider.Shoot");
 	//PrecacheSound("d3_citadel.weapon_zapper_beam_loop2");
 
-	PrecacheModel( GRENADE_MODEL_OPEN );
-	PrecacheModel( GRENADE_MODEL_CLOSED );
+	engine->PrecacheModel( GRENADE_MODEL_OPEN );
+	engine->PrecacheModel( GRENADE_MODEL_CLOSED );
 	
-	PrecacheModel( DENSE_BALL_MODEL );
+	engine->PrecacheModel( DENSE_BALL_MODEL );
 
 	BaseClass::Precache();
 }

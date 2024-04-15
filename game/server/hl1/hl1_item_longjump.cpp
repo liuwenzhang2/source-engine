@@ -28,7 +28,7 @@ public:
 	}
 	void Precache( void )
 	{
-		PrecacheModel ("models/w_longjump.mdl");
+		engine->PrecacheModel ("models/w_longjump.mdl");
 	}
 	bool MyTouch( CBasePlayer *pPlayer )
 	{

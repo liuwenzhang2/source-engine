@@ -85,9 +85,9 @@ void CEnvLaser::Spawn( void )
 //-----------------------------------------------------------------------------
 void CEnvLaser::Precache( void )
 {
-	SetModelIndex( PrecacheModel( STRING( GetModelName() ) ) );
+	SetModelIndex(engine->PrecacheModel( STRING( GetModelName() ) ) );
 	if ( m_iszSpriteName != NULL_STRING )
-		PrecacheModel( STRING(m_iszSpriteName) );
+		engine->PrecacheModel( STRING(m_iszSpriteName) );
 }
 
 

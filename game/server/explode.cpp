@@ -172,7 +172,7 @@ void CEnvExplosion::Precache( void )
 {
 	if ( m_iszFireballSprite != NULL_STRING )
 	{
-		m_sFireballSprite = PrecacheModel( STRING( m_iszFireballSprite ) );
+		m_sFireballSprite = engine->PrecacheModel( STRING( m_iszFireballSprite ) );
 	}
 }
 

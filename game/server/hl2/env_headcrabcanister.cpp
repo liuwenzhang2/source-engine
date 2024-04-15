@@ -234,10 +234,10 @@ CEnvHeadcrabCanister::CEnvHeadcrabCanister()
 void CEnvHeadcrabCanister::Precache( void )
 {
 	BaseClass::Precache();
-	PrecacheModel( ENV_HEADCRABCANISTER_MODEL );
-	PrecacheModel( ENV_HEADCRABCANISTER_BROKEN_MODEL );
-	PrecacheModel( ENV_HEADCRABCANISTER_SKYBOX_MODEL );
-	PrecacheModel("sprites/smoke.vmt");
+	engine->PrecacheModel( ENV_HEADCRABCANISTER_MODEL );
+	engine->PrecacheModel( ENV_HEADCRABCANISTER_BROKEN_MODEL );
+	engine->PrecacheModel( ENV_HEADCRABCANISTER_SKYBOX_MODEL );
+	engine->PrecacheModel("sprites/smoke.vmt");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.LaunchSound" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HeadcrabCanister.AfterLanding" );

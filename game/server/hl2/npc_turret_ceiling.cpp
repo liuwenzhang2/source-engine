@@ -247,8 +247,8 @@ CNPC_CeilingTurret::~CNPC_CeilingTurret( void )
 //-----------------------------------------------------------------------------
 void CNPC_CeilingTurret::Precache( void )
 {
-	PrecacheModel( CEILING_TURRET_MODEL );	
-	PrecacheModel( CEILING_TURRET_GLOW_SPRITE );
+	engine->PrecacheModel( CEILING_TURRET_MODEL );
+	engine->PrecacheModel( CEILING_TURRET_GLOW_SPRITE );
 
 	// Activities
 	ADD_CUSTOM_ACTIVITY( CNPC_CeilingTurret, ACT_CEILING_TURRET_OPEN );

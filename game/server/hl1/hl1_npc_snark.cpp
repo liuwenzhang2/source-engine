@@ -62,7 +62,7 @@ void CSnark::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheModel( "models/w_squeak2.mdl" );
+	engine->PrecacheModel( "models/w_squeak2.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Snark.Die" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Snark.Gibbed" );

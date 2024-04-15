@@ -2385,12 +2385,12 @@ const impactdamagetable_t &CNPC_Barnacle::GetPhysicsImpactDamageTable( void )
 //=========================================================
 void CNPC_Barnacle::Precache()
 {
-	PrecacheModel("models/barnacle.mdl");
+	engine->PrecacheModel("models/barnacle.mdl");
 
 	// Precache all gibs
 	for ( int i=0; i < ARRAYSIZE(m_szGibNames); i++ )
 	{
-		PrecacheModel( m_szGibNames[i] );
+		engine->PrecacheModel( m_szGibNames[i] );
 	}
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barnacle.Digest" );
@@ -2401,7 +2401,7 @@ void CNPC_Barnacle::Precache()
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barnacle.Die" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Barnacle.BreakNeck" );
 
-	PrecacheModel( "models/props_junk/rock001a.mdl" );
+	engine->PrecacheModel( "models/props_junk/rock001a.mdl" );
 
 	BaseClass::Precache();
 }	

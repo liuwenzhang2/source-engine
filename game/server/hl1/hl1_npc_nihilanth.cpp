@@ -337,8 +337,8 @@ void CNPC_Nihilanth::Spawn( void )
 
 void CNPC_Nihilanth::Precache( void )
 {
-	PrecacheModel("models/nihilanth.mdl");
-	PrecacheModel("sprites/lgtning.vmt");
+	engine->PrecacheModel("models/nihilanth.mdl");
+	engine->PrecacheModel("sprites/lgtning.vmt");
 	UTIL_PrecacheOther( "nihilanth_energy_ball" );
 	UTIL_PrecacheOther( "monster_alien_controller" );
 	UTIL_PrecacheOther( "monster_alien_slave" );
@@ -1278,15 +1278,15 @@ void CNihilanthHVR::Spawn( void )
 
 void CNihilanthHVR::Precache( void )
 {
-	PrecacheModel("sprites/flare6.vmt");
-	PrecacheModel("sprites/nhth1.vmt");
-	PrecacheModel("sprites/exit1.vmt");
-	PrecacheModel("sprites/tele1.vmt");
-	PrecacheModel("sprites/animglow01.vmt");
-	PrecacheModel("sprites/xspark4.vmt");
-	PrecacheModel("sprites/muzzleflash3.vmt");
+	engine->PrecacheModel("sprites/flare6.vmt");
+	engine->PrecacheModel("sprites/nhth1.vmt");
+	engine->PrecacheModel("sprites/exit1.vmt");
+	engine->PrecacheModel("sprites/tele1.vmt");
+	engine->PrecacheModel("sprites/animglow01.vmt");
+	engine->PrecacheModel("sprites/xspark4.vmt");
+	engine->PrecacheModel("sprites/muzzleflash3.vmt");
 
-	PrecacheModel("sprites/laserbeam.vmt");
+	engine->PrecacheModel("sprites/laserbeam.vmt");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NihilanthHVR.Zap" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NihilanthHVR.TeleAttack" );

@@ -281,9 +281,9 @@ void CGrenadeSpit::Precache( void )
 {
 	// m_nSquidSpitSprite = PrecacheModel("sprites/greenglow1.vmt");// client side spittle.
 
-	PrecacheModel( "models/spitball_large.mdl" ); 
-	PrecacheModel("models/spitball_medium.mdl"); 
-	PrecacheModel("models/spitball_small.mdl"); 
+	engine->PrecacheModel( "models/spitball_large.mdl" );
+	engine->PrecacheModel("models/spitball_medium.mdl");
+	engine->PrecacheModel("models/spitball_small.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "GrenadeSpit.Hit" );
 

@@ -922,12 +922,12 @@ void Chopper_PrecacheChunks( CBaseEntity *pChopper )
 {
 	for ( int i = 0; i < CHOPPER_MAX_CHUNKS; ++i )
 	{
-		pChopper->PrecacheModel( s_pChunkModelName[i] );
+		engine->PrecacheModel( s_pChunkModelName[i] );
 	}
 
-	pChopper->PrecacheModel( HELICOPTER_CHUNK_COCKPIT );
-	pChopper->PrecacheModel( HELICOPTER_CHUNK_TAIL );
-	pChopper->PrecacheModel( HELICOPTER_CHUNK_BODY );
+	engine->PrecacheModel( HELICOPTER_CHUNK_COCKPIT );
+	engine->PrecacheModel( HELICOPTER_CHUNK_TAIL );
+	engine->PrecacheModel( HELICOPTER_CHUNK_BODY );
 }
  
 //------------------------------------------------------------------------------
@@ -939,14 +939,14 @@ void CNPC_AttackHelicopter::Precache( void )
 
 	if ( !HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
 	{
-		PrecacheModel( CHOPPER_MODEL_NAME );
+		engine->PrecacheModel( CHOPPER_MODEL_NAME );
 	}
 	else
 	{
-		PrecacheModel( CHOPPER_DRONE_NAME );
+		engine->PrecacheModel( CHOPPER_DRONE_NAME );
 	}
 
-	PrecacheModel( CHOPPER_RED_LIGHT_SPRITE );
+	engine->PrecacheModel( CHOPPER_RED_LIGHT_SPRITE );
 	//PrecacheModel( CHOPPER_MODEL_CORPSE_NAME );
 	
 	// If we're never going to engage in combat, we don't need to load these assets!
@@ -955,7 +955,7 @@ void CNPC_AttackHelicopter::Precache( void )
 		UTIL_PrecacheOther( "grenade_helicopter" );
 		UTIL_PrecacheOther( "env_fire_trail" );
 		Chopper_PrecacheChunks( this );
-		PrecacheModel("models/combine_soldier.mdl");
+		engine->PrecacheModel("models/combine_soldier.mdl");
 	}
 
 	g_pSoundEmitterSystem->PrecacheScriptSound("NPC_AttackHelicopter.ChargeGun");
@@ -5034,7 +5034,7 @@ END_DATADESC()
 void CGrenadeHelicopter::Precache( void )
 {
 	BaseClass::Precache( );
-	PrecacheModel( GRENADE_HELICOPTER_MODEL );
+	engine->PrecacheModel( GRENADE_HELICOPTER_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "ReallyLoudSpark" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AttackHelicopterGrenade.Ping" );

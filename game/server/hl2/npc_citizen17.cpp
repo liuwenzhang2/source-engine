@@ -388,12 +388,12 @@ void CNPC_Citizen::Precache()
 	if ( !npc_citizen_dont_precache_all.GetBool() )
 		PrecacheAllOfType( m_Type );
 	else
-		PrecacheModel( STRING( GetModelName() ) );
+		engine->PrecacheModel( STRING( GetModelName() ) );
 
 	if ( NameMatches( "matt" ) )
-		PrecacheModel( "models/props_canal/mattpipe.mdl" );
+		engine->PrecacheModel( "models/props_canal/mattpipe.mdl" );
 
-	PrecacheModel( INSIGNIA_MODEL );
+	engine->PrecacheModel( INSIGNIA_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.FootstepLeft" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.FootstepRight" );
@@ -435,7 +435,7 @@ void CNPC_Citizen::PrecacheAllOfType( CitizenType_t type )
 	{
 		if ( !IsExcludedHead( type, false, i ) )
 		{
-			PrecacheModel( CFmtStr( "models/Humans/%s/%s", (const char *)(CFmtStr(g_ppszModelLocs[m_Type], "")), g_ppszRandomHeads[i] ) );
+			engine->PrecacheModel( CFmtStr( "models/Humans/%s/%s", (const char *)(CFmtStr(g_ppszModelLocs[m_Type], "")), g_ppszRandomHeads[i] ) );
 		}
 	}
 
@@ -445,7 +445,7 @@ void CNPC_Citizen::PrecacheAllOfType( CitizenType_t type )
 		{
 			if ( !IsExcludedHead( type, true, i ) )
 			{
-				PrecacheModel( CFmtStr( "models/Humans/%s/%s", (const char *)(CFmtStr(g_ppszModelLocs[m_Type], "m")), g_ppszRandomHeads[i] ) );
+				engine->PrecacheModel( CFmtStr( "models/Humans/%s/%s", (const char *)(CFmtStr(g_ppszModelLocs[m_Type], "m")), g_ppszRandomHeads[i] ) );
 			}
 		}
 	}

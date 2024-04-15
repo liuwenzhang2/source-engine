@@ -181,11 +181,11 @@ void CNPC_PlayerCompanion::Precache()
 	gm_iszShotgunClassname = AllocPooledString( "weapon_shotgun" );
 	gm_iszRollerMineClassname = AllocPooledString( "npc_rollermine" );
 
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 	
 #ifdef HL2_EPISODIC
 	// The flare we're able to pull out
-	PrecacheModel( "models/props_junk/flare.mdl" );
+	engine->PrecacheModel( "models/props_junk/flare.mdl" );
 #endif // HL2_EPISODIC
 
 	BaseClass::Precache();

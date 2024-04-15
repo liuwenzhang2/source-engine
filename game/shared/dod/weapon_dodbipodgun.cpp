@@ -78,19 +78,19 @@ void CDODBipodWeapon::Precache( void )
 	if( Q_strlen(info.m_szDeployedModel) > 0 )
 	{
 		Assert( info.m_iAltWpnCriteria & ALTWPN_CRITERIA_DEPLOYED );
-		m_iDeployedModelIndex = CBaseEntity::PrecacheModel( info.m_szDeployedModel );
+		m_iDeployedModelIndex = engine->PrecacheModel( info.m_szDeployedModel );
 	}
 
 	if( Q_strlen(info.m_szDeployedReloadModel) > 0 )
 	{
 		Assert( info.m_iAltWpnCriteria & ALTWPN_CRITERIA_DEPLOYED_RELOAD );
-		m_iDeployedReloadModelIndex = CBaseEntity::PrecacheModel( info.m_szDeployedReloadModel );
+		m_iDeployedReloadModelIndex = engine->PrecacheModel( info.m_szDeployedReloadModel );
 	}
 
 	if( Q_strlen(info.m_szProneDeployedReloadModel) > 0 )
 	{
 		Assert( info.m_iAltWpnCriteria & ALTWPN_CRITERIA_PRONE_DEPLOYED_RELOAD );
-		m_iProneDeployedReloadModelIndex = CBaseEntity::PrecacheModel( info.m_szProneDeployedReloadModel );
+		m_iProneDeployedReloadModelIndex = engine->PrecacheModel( info.m_szProneDeployedReloadModel );
 	}
 
 	m_iCurrentWorldModel = m_iWorldModelIndex;

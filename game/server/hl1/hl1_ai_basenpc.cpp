@@ -148,8 +148,8 @@ bool CHL1BaseNPC::HasAlienGibs( void )
 
 void CHL1BaseNPC::Precache( void )
 {
-	PrecacheModel( "models/gibs/agibs.mdl" );
-	PrecacheModel( "models/gibs/hgibs.mdl" );
+	engine->PrecacheModel( "models/gibs/agibs.mdl" );
+	engine->PrecacheModel( "models/gibs/hgibs.mdl" );
 
 	BaseClass::Precache();
 }

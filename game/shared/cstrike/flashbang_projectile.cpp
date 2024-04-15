@@ -278,7 +278,7 @@ void CFlashbangProjectile::Spawn()
 
 void CFlashbangProjectile::Precache()
 {
-	PrecacheModel( GRENADE_MODEL );
+	engine->PrecacheModel( GRENADE_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Flashbang.Explode" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Flashbang.Bounce" );

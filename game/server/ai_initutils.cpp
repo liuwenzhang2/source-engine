@@ -51,7 +51,7 @@ CAI_TestHull*	CAI_TestHull::pTestHull			= NULL;
 void CAI_TestHull::Precache()
 {
 	BaseClass::Precache();
-	PrecacheModel( PLAYER_MODEL );
+	engine->PrecacheModel( PLAYER_MODEL );
 }
 
 //=========================================================

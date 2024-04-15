@@ -234,9 +234,9 @@ void CZombie::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheModel( "models/zombie/classic.mdl" );
-	PrecacheModel( "models/zombie/classic_torso.mdl" );
-	PrecacheModel( "models/zombie/classic_legs.mdl" );
+	engine->PrecacheModel( "models/zombie/classic.mdl" );
+	engine->PrecacheModel( "models/zombie/classic_torso.mdl" );
+	engine->PrecacheModel( "models/zombie/classic_legs.mdl" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.FootstepRight" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Zombie.FootstepLeft" );

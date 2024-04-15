@@ -372,8 +372,8 @@ void CNPC_Alyx::Precache()
 {
 	BaseClass::Precache();
 	g_pSoundEmitterSystem->PrecacheScriptSound( "npc_alyx.die" );
-	PrecacheModel( STRING( GetModelName() ) );
-	PrecacheModel( "models/alyx_emptool_prop.mdl" );
+	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( "models/alyx_emptool_prop.mdl" );
 
 	// For hacking
 	g_pSoundEmitterSystem->PrecacheScriptSound( "DoSpark" );

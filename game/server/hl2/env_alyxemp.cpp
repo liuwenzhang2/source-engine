@@ -147,7 +147,7 @@ void CAlyxEmpEffect::AutomaticThink()
 //-----------------------------------------------------------------------------
 void CAlyxEmpEffect::Precache( void )
 {
-	PrecacheModel( EMP_BEAM_SPRITE );
+	engine->PrecacheModel( EMP_BEAM_SPRITE );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "AlyxEmp.Charge" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "AlyxEmp.Discharge" );

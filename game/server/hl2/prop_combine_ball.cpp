@@ -262,10 +262,10 @@ void CPropCombineBall::Precache( void )
 	//NOTENOTE: We don't call into the base class because it chains multiple 
 	//			precaches we don't need to incur
 
-	PrecacheModel( PROP_COMBINE_BALL_MODEL );
-	PrecacheModel( PROP_COMBINE_BALL_SPRITE_TRAIL );
+	engine->PrecacheModel( PROP_COMBINE_BALL_MODEL );
+	engine->PrecacheModel( PROP_COMBINE_BALL_SPRITE_TRAIL );
 
-	s_nExplosionTexture = PrecacheModel( "sprites/lgtning.vmt" );
+	s_nExplosionTexture = engine->PrecacheModel( "sprites/lgtning.vmt" );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineBall.Launch" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineBall.KillImpact" );

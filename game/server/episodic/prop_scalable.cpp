@@ -87,7 +87,7 @@ void CPropScalable::Spawn( void )
 	// Stomp our model name if we're the coreball (legacy)
 	if ( FClassnameIs( this, "prop_coreball" ) )
 	{
-		PrecacheModel( COREBALL_MODEL );
+		engine->PrecacheModel( COREBALL_MODEL );
 		SetModel( COREBALL_MODEL );
 	}
 	else
@@ -100,7 +100,7 @@ void CPropScalable::Spawn( void )
 			return;
 		}
 
-		PrecacheModel( szModel );
+		engine->PrecacheModel( szModel );
 		SetModel( szModel );
 	}
 

@@ -231,7 +231,7 @@ void CPropGladosCore::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_40" );
 	g_pSoundEmitterSystem->PrecacheScriptSound ( "Portal.Glados_core.Crazy_41" );
 
-	PrecacheModel( GLADOS_CORE_MODEL_NAME );
+	engine->PrecacheModel( GLADOS_CORE_MODEL_NAME );
 }
 
 //-----------------------------------------------------------------------------

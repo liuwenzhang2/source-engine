@@ -135,20 +135,20 @@ void CHL2MP_Player::Precache( void )
 {
 	BaseClass::Precache();
 
-	PrecacheModel ( "sprites/glow01.vmt" );
+	engine->PrecacheModel ( "sprites/glow01.vmt" );
 
 	//Precache Citizen models
 	int nHeads = ARRAYSIZE( g_ppszRandomCitizenModels );
 	int i;	
 
 	for ( i = 0; i < nHeads; ++i )
-	   	 PrecacheModel( g_ppszRandomCitizenModels[i] );
+		engine->PrecacheModel( g_ppszRandomCitizenModels[i] );
 
 	//Precache Combine Models
 	nHeads = ARRAYSIZE( g_ppszRandomCombineModels );
 
 	for ( i = 0; i < nHeads; ++i )
-	   	 PrecacheModel( g_ppszRandomCombineModels[i] );
+		engine->PrecacheModel( g_ppszRandomCombineModels[i] );
 
 	PrecacheFootStepSounds();
 

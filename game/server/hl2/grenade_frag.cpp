@@ -286,12 +286,12 @@ void CGrenadeFrag::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 void CGrenadeFrag::Precache( void )
 {
-	PrecacheModel( GRENADE_MODEL );
+	engine->PrecacheModel( GRENADE_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Grenade.Blip" );
 
-	PrecacheModel( "sprites/redglow1.vmt" );
-	PrecacheModel( "sprites/bluelaser1.vmt" );
+	engine->PrecacheModel( "sprites/redglow1.vmt" );
+	engine->PrecacheModel( "sprites/bluelaser1.vmt" );
 
 	BaseClass::Precache();
 }

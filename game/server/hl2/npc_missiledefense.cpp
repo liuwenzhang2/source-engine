@@ -83,8 +83,8 @@ END_DATADESC()
 //---------------------------------------------------------
 void CNPC_MissileDefense::Precache( void )
 {
-	PrecacheModel("models/missile_defense.mdl");
-	PrecacheModel(MD_GIB_MODEL);
+	engine->PrecacheModel("models/missile_defense.mdl");
+	engine->PrecacheModel(MD_GIB_MODEL);
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_MissileDefense.Attack" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_MissileDefense.Reload" );

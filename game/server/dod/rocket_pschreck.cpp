@@ -19,7 +19,7 @@ void CPschreckRocket::Spawn( void )
 
 void CPschreckRocket::Precache( void )
 {
-	PrecacheModel( PSCHRECK_ROCKET_MODEL );
+	engine->PrecacheModel( PSCHRECK_ROCKET_MODEL );
 
 	BaseClass::Precache();
 }

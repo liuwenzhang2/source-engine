@@ -65,9 +65,9 @@ CAI_Spotlight::~CAI_Spotlight()
 void CAI_Spotlight::Precache(void)
 {
 	// Sprites
-	m_nHaloSprite = GetOuter()->PrecacheModel("sprites/light_glow03.vmt");
+	m_nHaloSprite = engine->PrecacheModel("sprites/light_glow03.vmt");
 
-	GetOuter()->PrecacheModel( "sprites/glow_test02.vmt" );
+	engine->PrecacheModel( "sprites/glow_test02.vmt" );
 }
 
 

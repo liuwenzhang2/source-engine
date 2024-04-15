@@ -63,26 +63,26 @@ void W_Precache(void)
 
 
 #ifdef HL1_DLL
-	g_sModelIndexWExplosion = CBaseEntity::PrecacheModel ("sprites/WXplo1.vmt");// underwater fireball
-	g_sModelIndexBloodSpray = CBaseEntity::PrecacheModel ("sprites/bloodspray.vmt"); // initial blood
-	g_sModelIndexBloodDrop = CBaseEntity::PrecacheModel ("sprites/blood.vmt"); // splattered blood 
-	g_sModelIndexLaserDot = CBaseEntity::PrecacheModel("sprites/laserdot.vmt");
+	g_sModelIndexWExplosion = engine->PrecacheModel ("sprites/WXplo1.vmt");// underwater fireball
+	g_sModelIndexBloodSpray = engine->PrecacheModel ("sprites/bloodspray.vmt"); // initial blood
+	g_sModelIndexBloodDrop = engine->PrecacheModel ("sprites/blood.vmt"); // splattered blood 
+	g_sModelIndexLaserDot = engine->PrecacheModel("sprites/laserdot.vmt");
 #endif // HL1_DLL
 
 #ifndef TF_DLL
-	g_sModelIndexFireball = CBaseEntity::PrecacheModel ("sprites/zerogxplode.vmt");// fireball
+	g_sModelIndexFireball = engine->PrecacheModel ("sprites/zerogxplode.vmt");// fireball
 
-	g_sModelIndexSmoke = CBaseEntity::PrecacheModel ("sprites/steam1.vmt");// smoke
-	g_sModelIndexBubbles = CBaseEntity::PrecacheModel ("sprites/bubble.vmt");//bubbles
-	g_sModelIndexLaser = CBaseEntity::PrecacheModel( (char *)g_pModelNameLaser );
+	g_sModelIndexSmoke = engine->PrecacheModel ("sprites/steam1.vmt");// smoke
+	g_sModelIndexBubbles = engine->PrecacheModel ("sprites/bubble.vmt");//bubbles
+	g_sModelIndexLaser = engine->PrecacheModel( (char *)g_pModelNameLaser );
 
 	PrecacheParticleSystem( "blood_impact_red_01" );
 	PrecacheParticleSystem( "blood_impact_green_01" );
 	PrecacheParticleSystem( "blood_impact_yellow_01" );
 
-	CBaseEntity::PrecacheModel ("effects/bubble.vmt");//bubble trails
+	engine->PrecacheModel ("effects/bubble.vmt");//bubble trails
 
-	CBaseEntity::PrecacheModel("models/weapons/w_bullet.mdl");
+	engine->PrecacheModel("models/weapons/w_bullet.mdl");
 #endif
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "BaseCombatWeapon.WeaponDrop" );

@@ -456,7 +456,7 @@ void CONSOLE_ECHO( const char * pszMsg, ... )
 //------------------------------------------------------------------------------------------------------------
 void BotPrecache( void )
 {
-	s_iBeamSprite = CBaseEntity::PrecacheModel( "sprites/smoke.spr" );
+	s_iBeamSprite = engine->PrecacheModel( "sprites/smoke.spr" );
 }
 
 //------------------------------------------------------------------------------------------------------------

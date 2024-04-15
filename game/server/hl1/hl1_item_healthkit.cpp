@@ -51,7 +51,7 @@ void CHealthKit::Spawn( void )
 //-----------------------------------------------------------------------------
 void CHealthKit::Precache( void )
 {
-	PrecacheModel("models/w_medkit.mdl");
+	engine->PrecacheModel("models/w_medkit.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HealthKit.Touch" );
 }
@@ -110,7 +110,7 @@ public:
 
 	void Precache( void )
 	{
-		PrecacheModel("models/healthvial.mdl");
+		engine->PrecacheModel("models/healthvial.mdl");
 
 		g_pSoundEmitterSystem->PrecacheScriptSound( "HealthVial.Touch" );
 	}

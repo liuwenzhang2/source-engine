@@ -51,7 +51,7 @@ CTERadioIcon::~CTERadioIcon( void )
 
 void CTERadioIcon::Precache( void )
 {
-	CBaseEntity::PrecacheModel("sprites/radio.vmt");
+	engine->PrecacheModel("sprites/radio.vmt");
 }
 
 IMPLEMENT_SERVERCLASS_ST(CTERadioIcon, DT_TERadioIcon)

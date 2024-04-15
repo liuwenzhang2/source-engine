@@ -460,7 +460,7 @@ bool CNewRecharge::KeyValue( const char *szKeyName, const char *szValue )
 
 void CNewRecharge::Precache( void )
 {
-	PrecacheModel( HEALTH_CHARGER_MODEL_NAME );
+	engine->PrecacheModel( HEALTH_CHARGER_MODEL_NAME );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "SuitRecharge.Deny" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "SuitRecharge.Start" );

@@ -115,7 +115,7 @@ string_t CBounceBomb::gm_iszGroundTurretClassname;
 //---------------------------------------------------------
 void CBounceBomb::Precache()
 {
-	PrecacheModel("models/props_combine/combine_mine01.mdl");
+	engine->PrecacheModel("models/props_combine/combine_mine01.mdl");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineMine.Hop" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineMine.FlipOver" );
@@ -125,7 +125,7 @@ void CBounceBomb::Precache()
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineMine.CloseHooks" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_CombineMine.ActiveLoop" );
 
-	PrecacheModel( "sprites/glow01.vmt" );
+	engine->PrecacheModel( "sprites/glow01.vmt" );
 
 	gm_iszFloorTurretClassname = AllocPooledString( "npc_turret_floor" );
 	gm_iszGroundTurretClassname = AllocPooledString( "npc_turret_ground" );

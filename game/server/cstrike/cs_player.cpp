@@ -573,12 +573,12 @@ void CCSPlayer::Precache()
 	int i;
 	for ( i=0; i<CTPlayerModels.Count(); ++i )
 	{
-		PrecacheModel( CTPlayerModels[i] );
+		engine->PrecacheModel( CTPlayerModels[i] );
 		engine->ForceModelBounds( CTPlayerModels[i], mins, maxs );
 	}
 	for ( i=0; i<TerroristPlayerModels.Count(); ++i )
 	{
-		PrecacheModel( TerroristPlayerModels[i] );
+		engine->PrecacheModel( TerroristPlayerModels[i] );
 		engine->ForceModelBounds( TerroristPlayerModels[i], mins, maxs );
 	}
 
@@ -622,8 +622,8 @@ void CCSPlayer::Precache()
 	UTIL_PrecacheOther( "item_assaultsuit" );
 	UTIL_PrecacheOther( "item_defuser" );
 
-	PrecacheModel ( "sprites/glow01.vmt" );
-	PrecacheModel ( "models/items/cs_gift.mdl" );
+	engine->PrecacheModel ( "sprites/glow01.vmt" );
+	engine->PrecacheModel ( "models/items/cs_gift.mdl" );
 
 	BaseClass::Precache();
 }

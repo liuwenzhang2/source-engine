@@ -427,7 +427,7 @@ void CNPC_Antlion::Precache( void )
 #ifdef HL2_EPISODIC
 	if ( IsWorker() )
 	{
-		PrecacheModel( ANTLION_WORKER_MODEL );
+		engine->PrecacheModel( ANTLION_WORKER_MODEL );
 		PropBreakablePrecacheAll( MAKE_STRING( ANTLION_WORKER_MODEL ) );
 		UTIL_PrecacheOther( "grenade_spit" );
 		PrecacheParticleSystem( "blood_impact_antlion_worker_01" );
@@ -437,7 +437,7 @@ void CNPC_Antlion::Precache( void )
 	else
 #endif // HL2_EPISODIC
 	{
-		PrecacheModel( ANTLION_MODEL );
+		engine->PrecacheModel( ANTLION_MODEL );
 		PropBreakablePrecacheAll( MAKE_STRING( ANTLION_MODEL ) );
 		PrecacheParticleSystem( "blood_impact_antlion_01" );
 		PrecacheParticleSystem( "AntlionGib" );
@@ -445,15 +445,15 @@ void CNPC_Antlion::Precache( void )
 
 	for ( int i = 0; i < NUM_ANTLION_GIBS_UNIQUE; ++i )
 	{
-		PrecacheModel( pszAntlionGibs_Unique[ i ] );
+		engine->PrecacheModel( pszAntlionGibs_Unique[ i ] );
 	}
 	for ( int i = 0; i < NUM_ANTLION_GIBS_MEDIUM; ++i )
 	{
-		PrecacheModel( pszAntlionGibs_Medium[ i ] );
+		engine->PrecacheModel( pszAntlionGibs_Medium[ i ] );
 	}
 	for ( int i = 0; i < NUM_ANTLION_GIBS_SMALL; ++i )
 	{
-		PrecacheModel( pszAntlionGibs_Small[ i ] );
+		engine->PrecacheModel( pszAntlionGibs_Small[ i ] );
 	}
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Antlion.RunOverByVehicle" );

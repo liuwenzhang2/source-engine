@@ -185,7 +185,7 @@ void CBaseProp::Spawn( void )
 		return;
 	}
 
-	PrecacheModel( szModel );
+	engine->PrecacheModel( szModel );
 	Precache();
 	SetModel( szModel );
 
@@ -241,7 +241,7 @@ void CBaseProp::Precache( void )
 		SetModelName( AllocPooledString( "models/error.mdl" ) );
 	}
 
-	PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING( GetModelName() ) );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Metal.SawbladeStick" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "PropaneTank.Burst" );
@@ -2567,7 +2567,7 @@ void CPhysicsProp::Precache( void )
 	}
 	else
 	{
-		PrecacheModel( STRING( GetModelName() ) );
+		engine->PrecacheModel( STRING( GetModelName() ) );
 		BaseClass::Precache();
 	}
 }
@@ -3464,7 +3464,7 @@ int PropBreakablePrecacheAll( string_t modelName )
 		return iBreakables;
 	}
 
-	int modelIndex = CBaseEntity::PrecacheModel( STRING(modelName) );
+	int modelIndex = engine->PrecacheModel( STRING(modelName) );
 
 	CUtlVector<breakmodel_t> list;
 

@@ -297,11 +297,11 @@ void CPortal_Player::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "PortalPlayer.Woosh" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "PortalPlayer.FallRecover" );
 
-	PrecacheModel ( "sprites/glow01.vmt" );
+	engine->PrecacheModel ( "sprites/glow01.vmt" );
 
 	//Precache Citizen models
-	PrecacheModel( g_pszPlayerModel );
-	PrecacheModel( g_pszChellModel );
+	engine->PrecacheModel( g_pszPlayerModel );
+	engine->PrecacheModel( g_pszChellModel );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Citizen.die" );
 }

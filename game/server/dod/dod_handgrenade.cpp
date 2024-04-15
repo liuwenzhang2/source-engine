@@ -57,7 +57,7 @@ void CDODHandGrenade::Spawn()
 
 void CDODHandGrenade::Precache()
 {
-	PrecacheModel( GRENADE_MODEL );
+	engine->PrecacheModel( GRENADE_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "HEGrenade.Bounce" );
 

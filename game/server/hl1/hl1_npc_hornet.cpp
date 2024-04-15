@@ -115,10 +115,10 @@ void CNPC_Hornet::Spawn( void )
 
 void CNPC_Hornet::Precache()
 {
-	PrecacheModel("models/hornet.mdl");
+	engine->PrecacheModel("models/hornet.mdl");
 
-	iHornetPuff = PrecacheModel( "sprites/muz1.vmt" );
-	iHornetTrail = PrecacheModel("sprites/laserbeam.vmt");
+	iHornetPuff = engine->PrecacheModel( "sprites/muz1.vmt" );
+	iHornetTrail = engine->PrecacheModel("sprites/laserbeam.vmt");
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Hornet.Die" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Hornet.Buzz" );

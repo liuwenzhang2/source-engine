@@ -322,7 +322,7 @@ void CNPC_HGrunt::Precache()
 {
 	m_iAmmoType = GetAmmoDef()->Index("9mmRound");
 
-	PrecacheModel("models/hgrunt.mdl");
+	engine->PrecacheModel("models/hgrunt.mdl");
 
 	// get voice pitch
 	if ( random->RandomInt(0,1))
@@ -1889,7 +1889,7 @@ void CNPC_HGruntRepel::Spawn( void )
 void CNPC_HGruntRepel::Precache( void )
 {
 	UTIL_PrecacheOther( "monster_human_grunt" );
-	m_iSpriteTexture = PrecacheModel( "sprites/rope.vmt" );
+	m_iSpriteTexture = engine->PrecacheModel( "sprites/rope.vmt" );
 }
 
 void CNPC_HGruntRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
@@ -2594,7 +2594,7 @@ LINK_ENTITY_TO_CLASS( monster_hgrunt_dead, CNPC_DeadHGrunt );
 //=========================================================
 void CNPC_DeadHGrunt::Spawn( void )
 {
-	PrecacheModel("models/hgrunt.mdl");
+	engine->PrecacheModel("models/hgrunt.mdl");
 	SetModel( "models/hgrunt.mdl" );
 
 	ClearEffects();

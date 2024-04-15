@@ -260,7 +260,7 @@ CNPC_SecurityCamera::~CNPC_SecurityCamera( void )
 //-----------------------------------------------------------------------------
 void CNPC_SecurityCamera::Precache( void )
 {
-	PrecacheModel( SECURITY_CAMERA_MODEL );	
+	engine->PrecacheModel( SECURITY_CAMERA_MODEL );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Portalgun.pedestal_rotate_loop" );
 
