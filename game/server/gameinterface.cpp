@@ -1479,7 +1479,7 @@ CSaveRestoreData *CServerGameDLL::SaveInit( int size )
 //-----------------------------------------------------------------------------
 void CServerGameDLL::SaveWriteFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
 {
-	CSave saveHelper( pSaveData );
+	CSaveServer saveHelper( pSaveData );
 	saveHelper.WriteFields( pname, pBaseData, pMap, pFields, fieldCount );
 }
 
@@ -1497,7 +1497,7 @@ void CServerGameDLL::SaveWriteFields( CSaveRestoreData *pSaveData, const char *p
 
 void CServerGameDLL::SaveReadFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
 {
-	CRestore restoreHelper( pSaveData );
+	CRestoreServer restoreHelper( pSaveData );
 	restoreHelper.ReadFields( pname, pBaseData, pMap, pFields, fieldCount );
 }
 
@@ -1515,13 +1515,13 @@ void CServerGameDLL::RestoreGlobalState(CSaveRestoreData *s)
 
 void CServerGameDLL::Save( CSaveRestoreData *s )
 {
-	CSave saveHelper( s );
+	CSaveServer saveHelper( s );
 	g_pGameSaveRestoreBlockSet->Save( &saveHelper );
 }
 
 void CServerGameDLL::Restore( CSaveRestoreData *s, bool b)
 {
-	CRestore restore(s);
+	CRestoreServer restore(s);
 	g_pGameSaveRestoreBlockSet->Restore( &restore, b );
 	g_pGameSaveRestoreBlockSet->PostRestore();
 }
@@ -1551,7 +1551,7 @@ CStandardSendProxies* CServerGameDLL::GetStandardSendProxies()
 
 int	CServerGameDLL::CreateEntityTransitionList( CSaveRestoreData *s, int a)
 {
-	CRestore restoreHelper( s );
+	CRestoreServer restoreHelper( s );
 	// save off file base
 	int base = restoreHelper.GetReadPos();
 
@@ -1801,14 +1801,14 @@ void CServerGameDLL::GetSaveComment( char *text, int maxlength, float flMinutes,
 
 void CServerGameDLL::WriteSaveHeaders( CSaveRestoreData *s )
 {
-	CSave saveHelper( s );
+	CSaveServer saveHelper( s );
 	g_pGameSaveRestoreBlockSet->WriteSaveHeaders( &saveHelper );
 	g_pGameSaveRestoreBlockSet->PostSave();
 }
 
 void CServerGameDLL::ReadRestoreHeaders( CSaveRestoreData *s )
 {
-	CRestore restoreHelper( s );
+	CRestoreServer restoreHelper( s );
 	g_pGameSaveRestoreBlockSet->PreRestore();
 	g_pGameSaveRestoreBlockSet->ReadRestoreHeaders( &restoreHelper );
 }
@@ -2422,6 +2422,9 @@ const char* CServerGameDLL::GetMaterialNameFromIndex(int nMaterialIndex)
 	return g_pStringTableMaterials->GetString(nMaterialIndex);
 }
 
+string_t CServerGameDLL::AllocPooledString(const char* pszValue) {
+	return ::AllocPooledString(pszValue);
+}
 
 // keeps track of which chapters the user has unlocked
 ConVar sv_unlockedchapters( "sv_unlockedchapters", "1", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX );

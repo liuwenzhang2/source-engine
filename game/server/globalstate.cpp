@@ -289,14 +289,14 @@ void CGlobalState::Reset( void )
 
 void SaveGlobalState( CSaveRestoreData *pSaveData )
 {
-	CSave saveHelper( pSaveData );
+	CSaveServer saveHelper( pSaveData );
 	gGlobalState.Save( saveHelper );
 }
 
 
 void RestoreGlobalState( CSaveRestoreData *pSaveData )
 {
-	CRestore restoreHelper( pSaveData );
+	CRestoreServer restoreHelper( pSaveData );
 	gGlobalState.Restore( restoreHelper );
 }
 

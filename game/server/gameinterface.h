@@ -180,6 +180,8 @@ public:
 	// Converts a previously precached material index into a string
 	//-----------------------------------------------------------------------------
 	const char* GetMaterialNameFromIndex(int nMaterialIndex);
+
+	string_t AllocPooledString(const char* pszValue);
 private:
 
 	// This can just be a wrapper on MapEntity_ParseAllEntities, but CS does some tricks in here

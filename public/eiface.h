@@ -680,6 +680,8 @@ public:
 	// Converts a previously precached material index into a string
 	//-----------------------------------------------------------------------------
 	virtual const char* GetMaterialNameFromIndex(int nMaterialIndex) = 0;
+
+	virtual string_t AllocPooledString(const char* pszValue) = 0;
 };
 
 typedef IServerGameDLL IServerGameDLL008;

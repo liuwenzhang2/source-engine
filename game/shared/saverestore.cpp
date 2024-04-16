@@ -201,6 +201,23 @@ CSave::CSave( CSaveRestoreData *pdata )
 	m_hLogFile = NULL;
 }
 
+#ifdef GAME_DLL
+CSaveServer::CSaveServer(CSaveRestoreData* pdata) 
+:CSave(pdata)
+{
+
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+CSaveClient::CSaveClient(CSaveRestoreData* pdata)
+:CSave(pdata)
+{
+
+}
+#endif // CLIENT_DLL
+
+
 //-------------------------------------
 
 inline int CSave::DataEmpty( const char *pdata, int size )
@@ -1208,43 +1225,86 @@ void CSave::WriteEntityPtr( IHandleEntity **ppEntity, int count )
 
 //-------------------------------------
 
-void CSave::WriteEHandle( const char *pname, const CBaseHandle *pEHandle, int count )
+#ifdef GAME_DLL
+void CSaveServer::WriteEHandle( const char *pname, const CBaseHandle *pEHandle, int count )
 {
 	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
 	int entityArray[MAX_ENTITYARRAY];
 	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
 	{
-		IHandleEntity* pHandleEntity = NULL;
-#ifdef GAME_DLL
-		pHandleEntity = gEntList.GetServerEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-		pHandleEntity = cl_entitylist->GetClientEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
-#endif // CLIENT_DLL
+		IHandleEntity* pHandleEntity = gEntList.GetServerEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
 		entityArray[i] = EntityIndex(pHandleEntity);
 	}
 	WriteInt( pname, entityArray, count );
 }
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+void CSaveClient::WriteEHandle(const char* pname, const CBaseHandle* pEHandle, int count)
+{
+	AssertMsg(count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore");
+	int entityArray[MAX_ENTITYARRAY];
+	for (int i = 0; i < count && i < MAX_ENTITYARRAY; i++)
+	{
+		IHandleEntity* pHandleEntity = cl_entitylist->GetClientEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
+		entityArray[i] = EntityIndex(pHandleEntity);
+	}
+	WriteInt(pname, entityArray, count);
+}
+#endif // CLIENT_DLL
 
 //-------------------------------------
-
-void CSave::WriteEHandle( const CBaseHandle *pEHandle, int count )
+#ifdef GAME_DLL
+void CSaveServer::WriteEHandle( const CBaseHandle *pEHandle, int count )
 {
 	AssertMsg( count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore" );
 	int entityArray[MAX_ENTITYARRAY];
 	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
 	{
-		IHandleEntity* pHandleEntity = NULL;
-#ifdef GAME_DLL
-		pHandleEntity = gEntList.GetServerEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-		pHandleEntity = cl_entitylist->GetClientEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
-#endif // CLIENT_DLL
+		IHandleEntity* pHandleEntity = gEntList.GetServerEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
 		entityArray[i] = EntityIndex(pHandleEntity);
 	}
 	WriteInt( entityArray, count );
 }
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+void CSaveClient::WriteEHandle(const CBaseHandle* pEHandle, int count)
+{
+	AssertMsg(count <= MAX_ENTITYARRAY, "Array of entities or ehandles exceeds limit supported by save/restore");
+	int entityArray[MAX_ENTITYARRAY];
+	for (int i = 0; i < count && i < MAX_ENTITYARRAY; i++)
+	{
+		IHandleEntity* pHandleEntity = cl_entitylist->GetClientEntityFromHandle(const_cast<CBaseHandle*>(pEHandle)[i]);
+		entityArray[i] = EntityIndex(pHandleEntity);
+	}
+	WriteInt(entityArray, count);
+}
+#endif // CLIENT_DLL
+
+#ifdef GAME_DLL
+const char* CSaveServer::GetMaterialNameFromIndex(int nMateralIndex) {
+	return g_ServerGameDLL.GetMaterialNameFromIndex(nMateralIndex);
+}
+#endif
+
+#ifdef CLIENT_DLL
+const char* CSaveClient::GetMaterialNameFromIndex(int nMateralIndex) {
+	return clientdll->GetMaterialNameFromIndex(nMateralIndex);
+}
+#endif // CLIENT_DLL
+
+#ifdef GAME_DLL
+string_t CSaveServer::AllocPooledString(const char* pszValue) {
+	return g_ServerGameDLL.AllocPooledString(pszValue);
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+string_t CSaveClient::AllocPooledString(const char* pszValue) {
+	return clientdll->AllocPooledString(pszValue);
+}
+#endif // CLIENT_DLL
 
 //-------------------------------------
 // Purpose:	Writes all the fields that are not client neutral. In the event of 
@@ -1296,13 +1356,7 @@ bool CSave::WriteGameField( const char *pname, void *pData, datamap_t *pRootMap,
 			{
 				int nMateralIndex = *(int*)pData;
 				string_t strMaterialName = NULL_STRING;
-				const char* pMaterialName = NULL;
-#ifdef GAME_DLL
-				pMaterialName = g_ServerGameDLL.GetMaterialNameFromIndex(nMateralIndex);
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-				pMaterialName = clientdll->GetMaterialNameFromIndex(nMateralIndex);
-#endif // CLIENT_DLL
+				const char* pMaterialName = GetMaterialNameFromIndex(nMateralIndex);
 				if ( pMaterialName )
 				{
 					strMaterialName = MAKE_STRING( pMaterialName );
@@ -1363,6 +1417,22 @@ CRestore::CRestore( CSaveRestoreData *pdata )
 {
 	m_BlockEndStack.EnsureCapacity( 32 );
 }
+
+#ifdef GAME_DLL
+CRestoreServer::CRestoreServer(CSaveRestoreData* pdata)
+:CRestore(pdata)
+{
+
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+CRestoreClient::CRestoreClient(CSaveRestoreData* pdata)
+:CRestore(pdata)
+{
+
+}
+#endif // CLIENT_DLL
 
 //-------------------------------------
 
@@ -2025,6 +2095,83 @@ int CRestore::ReadEHandle( CBaseHandle *pEHandle, int count, int nBytesAvailable
 	return nRead;
 }
 	
+#ifdef GAME_DLL
+void CRestoreServer::PrecacheModel(const char* pModelName) {
+	engine->PrecacheModel(pModelName);
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+void CRestoreClient::PrecacheModel(const char* pModelName) {
+
+}
+#endif // CLIENT_DLL
+
+#ifdef GAME_DLL
+int CRestoreServer::GetMaterialIndex(const char* pMaterialName) {
+	return g_ServerGameDLL.GetMaterialIndex(pMaterialName);
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+int CRestoreClient::GetMaterialIndex(const char* pMaterialName) {
+	return clientdll->GetMaterialIndex(pMaterialName);
+}
+#endif // CLIENT_DLL
+
+#ifdef GAME_DLL
+void CRestoreServer::PrecacheMaterial(const char* pMaterialName) {
+	g_ServerGameDLL.PrecacheMaterial(pMaterialName);
+}
+#endif
+
+#ifdef CLIENT_DLL
+void CRestoreClient::PrecacheMaterial(const char* pMaterialName) {
+
+}
+#endif // CLIENT_DLL
+
+#ifdef GAME_DLL
+void CRestoreServer::PrecacheScriptSound(const char* pSoundName) {
+	g_pSoundEmitterSystem->PrecacheScriptSound(pSoundName);
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+void CRestoreClient::PrecacheScriptSound(const char* pMaterialName) {
+
+}
+#endif // CLIENT_DLL
+
+#ifdef GAME_DLL
+void CRestoreServer::RenameMapName(string_t* pStringDest) {
+	char buf[MAX_PATH];
+	Q_strncpy(buf, "maps/", sizeof(buf));
+	Q_strncat(buf, gpGlobals->mapname.ToCStr(), sizeof(buf));
+	Q_strncat(buf, ".bsp", sizeof(buf));
+	*pStringDest = AllocPooledString(buf);
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+void CRestoreClient::RenameMapName(string_t* pStringDest) {
+
+}
+#endif // CLIENT_DLL
+
+#ifdef GAME_DLL
+string_t CRestoreServer::AllocPooledString(const char* pszValue) {
+	return g_ServerGameDLL.AllocPooledString(pszValue);
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+string_t CRestoreClient::AllocPooledString(const char* pszValue) {
+	return clientdll->AllocPooledString(pszValue);
+}
+#endif // CLIENT_DLL
+
+
 //-------------------------------------
 // Purpose:	Reads all the fields that are not client neutral. In the event of 
 //			a librarization of save/restore, these would NOT reside in the library
@@ -2073,12 +2220,10 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 
 				pModelIndex[i] = modelinfo->GetModelIndex( STRING( pModelName[i] ) );
 
-#if !defined( CLIENT_DLL )	
 				if ( m_precache )
 				{
-					engine->PrecacheModel( STRING( pModelName[i] ) );
+					PrecacheModel( STRING( pModelName[i] ) );
 				}
-#endif
 			}
 			break;
 		}
@@ -2097,19 +2242,12 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 					continue;
 				}
 
-#ifdef GAME_DLL
-				pMaterialIndex[i] = g_ServerGameDLL.GetMaterialIndex(STRING(pMaterialName[i]));
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-				pMaterialIndex[i] = clientdll->GetMaterialIndex(STRING(pMaterialName[i]));
-#endif // CLIENT_DLL
+				pMaterialIndex[i] = GetMaterialIndex(STRING(pMaterialName[i]));
 
-#if !defined( CLIENT_DLL )	
 				if ( m_precache )
 				{
-					g_ServerGameDLL.PrecacheMaterial( STRING( pMaterialName[i] ) );
+					PrecacheMaterial( STRING( pMaterialName[i] ) );
 				}
-#endif
 			}
 			break;
 		}
@@ -2121,31 +2259,23 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 			int nRead = ReadString( pStringDest, pField->fieldSize, header.size );
 			if ( m_precache )
 			{
-#if !defined( CLIENT_DLL )
 				// HACKHACK: Rewrite the .bsp models to match the map name in case the bugreporter renamed it
-				if ( pField->fieldType == FIELD_MODELNAME && Q_stristr(pStringDest->ToCStr(), ".bsp") )
+				if ( pField->fieldType == FIELD_MODELNAME && Q_stristr( STRING( *pStringDest ), ".bsp") )
 				{
-					char buf[MAX_PATH];
-					Q_strncpy( buf, "maps/", sizeof(buf) );
-					Q_strncat( buf, gpGlobals->mapname.ToCStr(), sizeof(buf) );
-					Q_strncat( buf, ".bsp", sizeof(buf) );
-					*pStringDest = AllocPooledString( buf );
+					RenameMapName(pStringDest);
 				}
-#endif
 				for ( int i = 0; i < nRead; i++ )
 				{
 					if ( pStringDest[i] != NULL_STRING )
 					{
-#if !defined( CLIENT_DLL )	
 						if ( pField->fieldType == FIELD_MODELNAME )
 						{
-							engine->PrecacheModel( STRING( pStringDest[i] ) );
+							PrecacheModel( STRING( pStringDest[i] ) );
 						}
 						else if ( pField->fieldType == FIELD_SOUNDNAME )
 						{
-							g_pSoundEmitterSystem->PrecacheScriptSound( STRING( pStringDest[i] ) );
+							PrecacheScriptSound( STRING( pStringDest[i] ) );
 						}
-#endif
 					}
 				}
 			}
@@ -2982,7 +3112,7 @@ int CEntitySaveRestoreBlockHandler::RestoreGlobalEntity( CBaseEntity *pEntity, C
 	hEntitySafeHandle = pEntity;
 
 	oldOffset.Init();
-	CRestore restoreHelper( pSaveData );
+	CRestoreServer restoreHelper( pSaveData );
 	
 	string_t globalName = pEntInfo->globalname, className = pEntInfo->classname;
 
@@ -3430,7 +3560,7 @@ int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask )
 			else 
 			{
 				DevMsg( 2, "Transferring %s (%d)\n", STRING(pEntInfo->classname), pent->entindex());
-				CRestore restoreHelper( pSaveData );
+				CRestoreServer restoreHelper( pSaveData );
 				if ( g_EntitySaveRestoreBlockHandler.RestoreEntity( pent, &restoreHelper, pEntInfo ) < 0 )
 				{
 					UTIL_RemoveImmediate( pent );

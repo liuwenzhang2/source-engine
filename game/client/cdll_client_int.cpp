@@ -698,6 +698,8 @@ public:
 	//-----------------------------------------------------------------------------
 	const char* GetMaterialNameFromIndex(int nIndex);
 
+	string_t AllocPooledString(const char* pszValue);
+
 	virtual CStandardRecvProxies* GetStandardRecvProxies();
 
 	virtual bool			CanRecordDemo( char *errorMsg, int length ) const;
@@ -811,6 +813,9 @@ const char * CHLClient::GetMaterialNameFromIndex( int nIndex )
 	}
 }
 
+string_t CHLClient::AllocPooledString(const char* pszValue) {
+	return ::AllocPooledString(pszValue);
+}
 
 //-----------------------------------------------------------------------------
 // Precaches a particle system
@@ -2350,13 +2355,13 @@ CSaveRestoreData  *CHLClient::SaveInit( int size )
 
 void CHLClient::SaveWriteFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
 {
-	CSave saveHelper( pSaveData );
+	CSaveClient saveHelper( pSaveData );
 	saveHelper.WriteFields( pname, pBaseData, pMap, pFields, fieldCount );
 }
 
 void CHLClient::SaveReadFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
 {
-	CRestore restoreHelper( pSaveData );
+	CRestoreClient restoreHelper( pSaveData );
 	restoreHelper.ReadFields( pname, pBaseData, pMap, pFields, fieldCount );
 }
 
@@ -2367,27 +2372,27 @@ void CHLClient::PreSave( CSaveRestoreData *s )
 
 void CHLClient::Save( CSaveRestoreData *s )
 {
-	CSave saveHelper( s );
+	CSaveClient saveHelper( s );
 	g_pGameSaveRestoreBlockSet->Save( &saveHelper );
 }
 
 void CHLClient::WriteSaveHeaders( CSaveRestoreData *s )
 {
-	CSave saveHelper( s );
+	CSaveClient saveHelper( s );
 	g_pGameSaveRestoreBlockSet->WriteSaveHeaders( &saveHelper );
 	g_pGameSaveRestoreBlockSet->PostSave();
 }
 
 void CHLClient::ReadRestoreHeaders( CSaveRestoreData *s )
 {
-	CRestore restoreHelper( s );
+	CRestoreClient restoreHelper( s );
 	g_pGameSaveRestoreBlockSet->PreRestore();
 	g_pGameSaveRestoreBlockSet->ReadRestoreHeaders( &restoreHelper );
 }
 
 void CHLClient::Restore( CSaveRestoreData *s, bool b )
 {
-	CRestore restore(s);
+	CRestoreClient restore(s);
 	g_pGameSaveRestoreBlockSet->Restore( &restore, b );
 	g_pGameSaveRestoreBlockSet->PostRestore();
 }

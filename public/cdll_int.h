@@ -21,6 +21,7 @@
 #include "modes.h"
 #include "irecipientfilter.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
+#include "string_t.h"
 
 #if !defined( _X360 )
 #include "xbox/xboxstubs.h"
@@ -742,6 +743,8 @@ public:
 	// Converts precached material indices into strings
 	//-----------------------------------------------------------------------------
 	virtual const char* GetMaterialNameFromIndex(int nIndex) = 0;
+
+	virtual string_t AllocPooledString(const char* pszValue) = 0;
 
 	// Returns true if the client can start recording a demo now.  If the client returns false,
 	// an error message of up to length bytes should be returned in errorMsg.

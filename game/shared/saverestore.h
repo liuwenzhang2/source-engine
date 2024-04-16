@@ -112,7 +112,7 @@ public:
 
 	void			WriteEntityPtr( const char *pname, IHandleEntity **ppEntity, int count = 1 );
 	//void			WriteEdictPtr( const char *pname, edict_t **ppEdict, int count = 1 );
-	void			WriteEHandle( const char *pname, const CBaseHandle *pEHandle, int count = 1 );
+	virtual void	WriteEHandle( const char *pname, const CBaseHandle *pEHandle, int count = 1 ) = 0;
 
 	virtual void	WriteTime( const float *value, int count = 1 );	// Save a float (timevalue)
 	virtual void	WriteTick( const int *value, int count = 1 );	// Save a int (timevalue)
@@ -121,7 +121,7 @@ public:
 
 	virtual void	WriteEntityPtr( IHandleEntity **ppEntity, int count = 1 );
 	//virtual void	WriteEdictPtr( edict_t **ppEdict, int count = 1 );
-	virtual void	WriteEHandle( const CBaseHandle *pEHandle, int count = 1 );
+	virtual void	WriteEHandle( const CBaseHandle *pEHandle, int count = 1 ) = 0;
 	void			WriteVMatrixWorldspace( const char *pname, const VMatrix *value, int count = 1 );	       // Save a vmatrix array
 	void			WriteVMatrixWorldspace( const VMatrix *value, int count = 1 );	       // Save a vmatrix array
 	void			WriteMatrix3x4Worldspace( const matrix3x4_t *value, int count );
@@ -137,6 +137,9 @@ public:
 
 	CGameSaveRestoreInfo *GetGameSaveRestoreInfo()	{ return m_pGameInfo; }
 
+protected:
+	virtual const char* GetMaterialNameFromIndex(int nMateralIndex) = 0;
+	virtual string_t AllocPooledString(const char* pszValue) = 0;
 private:
 
 	//---------------------------------
@@ -180,6 +183,28 @@ private:
 	FileHandle_t		m_hLogFile;
 	bool				m_bAsync;
 };
+
+#ifdef GAME_DLL
+class CSaveServer : public CSave {
+public:
+	CSaveServer(CSaveRestoreData* pdata);
+	virtual void	WriteEHandle(const char* pname, const CBaseHandle* pEHandle, int count = 1);
+	virtual void	WriteEHandle(const CBaseHandle* pEHandle, int count = 1);
+	virtual const char* GetMaterialNameFromIndex(int nMateralIndex);
+	virtual string_t AllocPooledString(const char* pszValue);
+};
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+class CSaveClient : public CSave {
+public:
+	CSaveClient(CSaveRestoreData* pdata);
+	virtual void	WriteEHandle(const char* pname, const CBaseHandle* pEHandle, int count = 1);
+	virtual void	WriteEHandle(const CBaseHandle* pEHandle, int count = 1);
+	virtual const char* GetMaterialNameFromIndex(int nMateralIndex);
+	virtual string_t AllocPooledString(const char* pszValue);
+};
+#endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
 //
@@ -265,6 +290,13 @@ public:
 
 	CGameSaveRestoreInfo *GetGameSaveRestoreInfo()	{ return m_pGameInfo; }
 
+protected:
+	virtual void PrecacheModel(const char* pModelName) = 0;
+	virtual int GetMaterialIndex(const char* pMaterialName) = 0;
+	virtual void PrecacheMaterial(const char* pMaterialName) = 0;
+	virtual void PrecacheScriptSound(const char* pMaterialName) = 0;
+	virtual void RenameMapName(string_t* pStringDest) = 0;
+	virtual string_t AllocPooledString(const char* pszValue) = 0;
 private:
 	//---------------------------------
 	// Read primitives
@@ -326,6 +358,31 @@ private:
 	bool					m_precache;
 };
 
+#ifdef GAME_DLL
+class CRestoreServer : public CRestore {
+public:
+	CRestoreServer(CSaveRestoreData* pdata);
+	virtual void PrecacheModel(const char* pModelName);
+	virtual int GetMaterialIndex(const char* pMaterialName);
+	virtual void PrecacheMaterial(const char* pMaterialName);
+	virtual void PrecacheScriptSound(const char* pMaterialName);
+	virtual void RenameMapName(string_t* pStringDest);
+	virtual string_t AllocPooledString(const char* pszValue);
+};
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+class CRestoreClient : public CRestore {
+public:
+	CRestoreClient(CSaveRestoreData* pdata);
+	virtual void PrecacheModel(const char* pModelName);
+	virtual int GetMaterialIndex(const char* pMaterialName);
+	virtual void PrecacheMaterial(const char* pMaterialName);
+	virtual void PrecacheScriptSound(const char* pMaterialName);
+	virtual void RenameMapName(string_t* pStringDest);
+	virtual string_t AllocPooledString(const char* pszValue);
+};
+#endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
 // An interface passed into the OnSave method of all entities

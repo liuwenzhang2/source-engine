@@ -2096,7 +2096,7 @@ int CChangeLevel::ChangeList( levellist_t *pLevelList, int maxList )
 	if ( !gpGlobals->pSaveData || ( static_cast<CSaveRestoreData *>(gpGlobals->pSaveData)->NumEntities() == 0 ) )
 		return count;
 
-	CSave saveHelper( static_cast<CSaveRestoreData *>(gpGlobals->pSaveData) );
+	CSaveServer saveHelper( static_cast<CSaveRestoreData *>(gpGlobals->pSaveData) );
 
 	// For each level change, find nearby entities and save them
 	int	i;
