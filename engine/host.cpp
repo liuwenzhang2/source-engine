@@ -4415,7 +4415,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 #if !defined(SWDS)
 	CSaveRestoreData *pSaveData = NULL;
 #endif
-	bool bTransitionBySave = false;
+	//bool bTransitionBySave = false;
 
 	if ( !sv.IsActive() )
 	{
@@ -4512,7 +4512,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 	saverestore->SetMostRecentElapsedMinutes( iElapsedMinutes );
 	saverestore->SetMostRecentElapsedSeconds( ( iElapsedSeconds % 60 ) );
 
-	if ( bTransitionBySave )
+	if ( false )//bTransitionBySave
 	{
 		char comment[80];
 		// Pass in the total elapsed time so it gets added to the elapsed time for this map.
@@ -4541,7 +4541,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 #if !defined(SWDS)
 	if ( loadfromsavedgame )
 	{
-		if ( !bTransitionBySave )
+		if ( true )//!bTransitionBySave
 		{
 			// save the current level's state
 			saverestore->SaveGameState( true, &pSaveData );
@@ -4588,7 +4588,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 #ifndef SWDS
 	if ( loadfromsavedgame )
 	{
-		if ( !bTransitionBySave )
+		if ( true )//!bTransitionBySave
 		{
 			// Finish saving gamestate
 			saverestore->Finish( pSaveData );

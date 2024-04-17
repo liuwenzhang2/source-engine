@@ -1283,6 +1283,30 @@ void CSaveClient::WriteEHandle(const CBaseHandle* pEHandle, int count)
 #endif // CLIENT_DLL
 
 #ifdef GAME_DLL
+const model_t* CSaveServer::GetModel(int modelindex) {
+	return modelinfo->GetModel(modelindex);
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+const model_t* CSaveClient::GetModel(int modelindex) {
+	return modelinfo->GetModel(modelindex);
+}
+#endif // CLIENT_DLL
+
+#ifdef GAME_DLL
+const char* CSaveServer::GetModelName(const model_t* model) const {
+	return modelinfo->GetModelName(model);
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+const char* CSaveClient::GetModelName(const model_t* model) const {
+	return modelinfo->GetModelName(model);
+}
+#endif // CLIENT_DLL
+
+#ifdef GAME_DLL
 const char* CSaveServer::GetMaterialNameFromIndex(int nMateralIndex) {
 	return g_ServerGameDLL.GetMaterialNameFromIndex(nMateralIndex);
 }
@@ -1324,7 +1348,7 @@ bool CSave::WriteGameField( const char *pname, void *pData, datamap_t *pRootMap,
 			break;
 
 		case FIELD_EHANDLE:
-			WriteEHandle( pField->fieldName, (EHANDLE *)pData, pField->fieldSize );
+			WriteEHandle( pField->fieldName, (CBaseHandle*)pData, pField->fieldSize );
 			break;
 
 		case FIELD_POSITION_VECTOR:
@@ -1343,10 +1367,10 @@ bool CSave::WriteGameField( const char *pname, void *pData, datamap_t *pRootMap,
 			{
 				int nModelIndex = *(int*)pData;
 				string_t strModelName = NULL_STRING;
-				const model_t *pModel = modelinfo->GetModel( nModelIndex );
+				const model_t *pModel = GetModel( nModelIndex );
 				if ( pModel )
 				{
-					strModelName = AllocPooledString( modelinfo->GetModelName( pModel ) );
+					strModelName = AllocPooledString( GetModelName( pModel ) );
 				}
 				WriteString( pField->fieldName, (string_t *)&strModelName, pField->fieldSize );
 			}
@@ -2096,6 +2120,18 @@ int CRestore::ReadEHandle( CBaseHandle *pEHandle, int count, int nBytesAvailable
 }
 	
 #ifdef GAME_DLL
+int	CRestoreServer::GetModelIndex(const char* name) {
+	return modelinfo->GetModelIndex(name);
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+int	CRestoreClient::GetModelIndex(const char* name) {
+	return modelinfo->GetModelIndex(name);
+}
+#endif // CLIENT_DLL
+
+#ifdef GAME_DLL
 void CRestoreServer::PrecacheModel(const char* pModelName) {
 	engine->PrecacheModel(pModelName);
 }
@@ -2218,7 +2254,7 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 					continue;
 				}
 
-				pModelIndex[i] = modelinfo->GetModelIndex( STRING( pModelName[i] ) );
+				pModelIndex[i] = GetModelIndex( STRING( pModelName[i] ) );
 
 				if ( m_precache )
 				{
@@ -2287,15 +2323,11 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 			break;
 			
 		case FIELD_EDICT:
-#if !defined( CLIENT_DLL )
 			//ReadEdictPtr( (edict_t **)pDest, pField->fieldSize, header.size );
 			Error("ReadEdictPtr has been removed!");
-#else
-			Assert( !"FIELD_EDICT not valid for client .dll" );
-#endif
 			break;
 		case FIELD_EHANDLE:
-			ReadEHandle( (EHANDLE *)pDest, pField->fieldSize, header.size );
+			ReadEHandle( (CBaseHandle*)pDest, pField->fieldSize, header.size );
 			break;
 
 		case FIELD_VMATRIX:
