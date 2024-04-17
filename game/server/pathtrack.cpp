@@ -17,9 +17,9 @@
 //-----------------------------------------------------------------------------
 BEGIN_DATADESC( CPathTrack )
 
-	DEFINE_FIELD( m_pnext,			FIELD_CLASSPTR ),
-	DEFINE_FIELD( m_pprevious,		FIELD_CLASSPTR ),
-	DEFINE_FIELD( m_paltpath,		FIELD_CLASSPTR ),
+	DEFINE_FIELD( m_pnext,			FIELD_EHANDLE ),
+	DEFINE_FIELD( m_pprevious,		FIELD_EHANDLE ),
+	DEFINE_FIELD( m_paltpath,		FIELD_EHANDLE ),
 
 	DEFINE_KEYFIELD( m_flRadius,	FIELD_FLOAT, "radius" ),
 	DEFINE_FIELD( m_length,			FIELD_FLOAT ),

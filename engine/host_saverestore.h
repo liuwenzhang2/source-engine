@@ -16,6 +16,7 @@
 #include "saverestoretypes.h"
 
 class CSaveRestoreData;
+struct model_t;
 
 //-----------------------------------------------------------------------------
 //
@@ -126,6 +127,8 @@ public:
 	CGameSaveRestoreInfo* GetGameSaveRestoreInfo() { return m_pGameInfo; }
 
 protected:
+	virtual const model_t* GetModel(int modelindex) = 0;
+	virtual const char* GetModelName(const model_t* model) const = 0;
 	virtual const char* GetMaterialNameFromIndex(int nMateralIndex) = 0;
 	virtual string_t AllocPooledString(const char* pszValue) = 0;
 private:
@@ -177,6 +180,8 @@ public:
 	CSaveServer(CSaveRestoreData* pdata);
 	virtual void	WriteEHandle(const char* pname, const CBaseHandle* pEHandle, int count = 1);
 	virtual void	WriteEHandle(const CBaseHandle* pEHandle, int count = 1);
+	virtual const model_t* GetModel(int modelindex);
+	virtual const char* GetModelName(const model_t* model) const;
 	virtual const char* GetMaterialNameFromIndex(int nMateralIndex);
 	virtual string_t AllocPooledString(const char* pszValue);
 };
@@ -186,6 +191,8 @@ public:
 	CSaveClient(CSaveRestoreData* pdata);
 	virtual void	WriteEHandle(const char* pname, const CBaseHandle* pEHandle, int count = 1);
 	virtual void	WriteEHandle(const CBaseHandle* pEHandle, int count = 1);
+	virtual const model_t* GetModel(int modelindex);
+	virtual const char* GetModelName(const model_t* model) const;
 	virtual const char* GetMaterialNameFromIndex(int nMateralIndex);
 	virtual string_t AllocPooledString(const char* pszValue);
 };
@@ -275,13 +282,18 @@ public:
 	CGameSaveRestoreInfo* GetGameSaveRestoreInfo() { return m_pGameInfo; }
 
 protected:
+	virtual int	GetModelIndex(const char* name) = 0;
 	virtual void PrecacheModel(const char* pModelName) = 0;
 	virtual int GetMaterialIndex(const char* pMaterialName) = 0;
 	virtual void PrecacheMaterial(const char* pMaterialName) = 0;
 	virtual void PrecacheScriptSound(const char* pMaterialName) = 0;
 	virtual void RenameMapName(string_t* pStringDest) = 0;
 	virtual string_t AllocPooledString(const char* pszValue) = 0;
-private:
+	//---------------------------------
+	// Game info methods
+	//
+	virtual IHandleEntity* EntityFromIndex(int entityIndex) = 0;
+protected:
 	//---------------------------------
 	// Read primitives
 	//
@@ -323,10 +335,7 @@ private:
 	bool			ShouldReadField(typedescription_t* pField);
 	bool 			ShouldEmptyField(typedescription_t* pField);
 
-	//---------------------------------
-	// Game info methods
-	//
-	IHandleEntity* EntityFromIndex(int entityIndex);
+	
 	void 			ReadGameField(const SaveRestoreRecordHeader_t& header, void* pDest, datamap_t* pRootMap, typedescription_t* pField);
 
 	//---------------------------------
@@ -345,23 +354,27 @@ private:
 class CRestoreServer : public CRestore {
 public:
 	CRestoreServer(CSaveRestoreData* pdata);
+	virtual int	GetModelIndex(const char* name);
 	virtual void PrecacheModel(const char* pModelName);
 	virtual int GetMaterialIndex(const char* pMaterialName);
 	virtual void PrecacheMaterial(const char* pMaterialName);
 	virtual void PrecacheScriptSound(const char* pMaterialName);
 	virtual void RenameMapName(string_t* pStringDest);
 	virtual string_t AllocPooledString(const char* pszValue);
+	virtual IHandleEntity* EntityFromIndex(int entityIndex);
 };
 
 class CRestoreClient : public CRestore {
 public:
 	CRestoreClient(CSaveRestoreData* pdata);
+	virtual int	GetModelIndex(const char* name);
 	virtual void PrecacheModel(const char* pModelName);
 	virtual int GetMaterialIndex(const char* pMaterialName);
 	virtual void PrecacheMaterial(const char* pMaterialName);
 	virtual void PrecacheScriptSound(const char* pMaterialName);
 	virtual void RenameMapName(string_t* pStringDest);
 	virtual string_t AllocPooledString(const char* pszValue);
+	virtual IHandleEntity* EntityFromIndex(int entityIndex);
 };
 
 

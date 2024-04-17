@@ -2030,22 +2030,43 @@ int CRestore::ReadInterval( interval_t *interval, int count, int nBytesAvailable
 // Game centric restore methods
 //
 
-IHandleEntity *CRestore::EntityFromIndex( int entityIndex )
+#ifdef GAME_DLL
+IHandleEntity* CRestoreServer::EntityFromIndex(int entityIndex)
 {
-	if ( !m_pGameInfo || entityIndex < 0 )
+	if (!m_pGameInfo || entityIndex < 0)
 		return NULL;
 
 	int i;
-	entitytable_t *pTable;
+	entitytable_t* pTable;
 
-	for ( i = 0; i < m_pGameInfo->NumEntities(); i++ )
+	for (i = 0; i < m_pGameInfo->NumEntities(); i++)
 	{
-		pTable = m_pGameInfo->GetEntityInfo( i );
-		if ( pTable->id == entityIndex )
-			return pTable->hEnt;
+		pTable = m_pGameInfo->GetEntityInfo(i);
+		if (pTable->id == entityIndex)
+			return gEntList.GetServerEntityFromHandle(pTable->hEnt);
 	}
 	return NULL;
 }
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+IHandleEntity* CRestoreClient::EntityFromIndex(int entityIndex)
+{
+	if (!m_pGameInfo || entityIndex < 0)
+		return NULL;
+
+	int i;
+	entitytable_t* pTable;
+
+	for (i = 0; i < m_pGameInfo->NumEntities(); i++)
+	{
+		pTable = m_pGameInfo->GetEntityInfo(i);
+		if (pTable->id == entityIndex)
+			return ClientEntityList().GetClientEntityFromHandle(pTable->hEnt);
+	}
+	return NULL;
+}
+#endif // CLIENT_DLL
 
 //-------------------------------------
 
@@ -2657,6 +2678,16 @@ void CEntitySaveRestoreBlockHandler::PreSave( CSaveRestoreData *pSaveData )
 
 //---------------------------------
 
+CBaseEntity* EntityFromHandle(CBaseHandle& handle) {
+#ifdef GAME_DLL
+	return (CBaseEntity*)gEntList.GetServerEntityFromHandle(handle);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+	return (CBaseEntity*)ClientEntityList().GetClientEntityFromHandle(handle);
+#endif // CLIENT_DLL
+}
+
+
 void CEntitySaveRestoreBlockHandler::Save( ISave *pSave )
 {
 	CGameSaveRestoreInfo *pSaveData = pSave->GetGameSaveRestoreInfo();
@@ -2668,7 +2699,7 @@ void CEntitySaveRestoreBlockHandler::Save( ISave *pSave )
 		pEntInfo->location = pSave->GetWritePos();
 		pEntInfo->size = 0;
 
-		CBaseEntity *pEnt = pEntInfo->hEnt;
+		CBaseEntity *pEnt = EntityFromHandle(pEntInfo->hEnt);
 		if ( pEnt && !( pEnt->ObjectCaps() & FCAP_DONT_SAVE ) )
 		{
 			MDLCACHE_CRITICAL_SECTION();
@@ -2836,7 +2867,7 @@ void CEntitySaveRestoreBlockHandler::Restore( IRestore *pRestore, bool createPla
 		pEntInfo = pSaveData->GetEntityInfo( i );
 		if ( pEntInfo->edictindex != 0 )
 		{
-			pent = pEntInfo->hEnt;
+			pent = EntityFromHandle(pEntInfo->hEnt);
 			pRestore->SetReadPos( pEntInfo->location );
 			if ( pent )
 			{
@@ -2956,7 +2987,7 @@ void SaveEntityOnTable( CBaseEntity *pEntity, CSaveRestoreData *pSaveData, int &
 	pEntInfo->modelname = pEntity->GetModelName();
 	pEntInfo->restoreentityindex = -1;
 	pEntInfo->saveentityindex = pEntity && pEntity->IsNetworkable() ? pEntity->entindex() : -1;
-	pEntInfo->hEnt = pEntity;
+	pEntInfo->hEnt = pEntity->GetRefEHandle();
 	pEntInfo->flags = 0;
 	pEntInfo->location = 0;
 	pEntInfo->size = 0;
@@ -3021,7 +3052,7 @@ bool CEntitySaveRestoreBlockHandler::SaveInitEntities( CSaveRestoreData *pSaveDa
 	}
 #endif
 
-	pSaveData->BuildEntityHash();
+	//pSaveData->BuildEntityHash();
 
 	Assert( i == pSaveData->NumEntities() );
 	return ( i == pSaveData->NumEntities() );
@@ -3561,7 +3592,7 @@ int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask )
 	for ( i = 0; i < pSaveData->NumEntities(); i++ )
 	{
 		pEntInfo = pSaveData->GetEntityInfo( i );
-		pent = pEntInfo->hEnt;
+		pent = EntityFromHandle(pEntInfo->hEnt);
 //		pSaveData->currentIndex = i;
 		pSaveData->Seek( pEntInfo->location );
 		
@@ -3580,12 +3611,12 @@ int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask )
 				if ( g_EntitySaveRestoreBlockHandler.RestoreGlobalEntity( pent, pSaveData, pEntInfo ) > 0 )
 				{
 					movedCount++;
-					pEntInfo->restoreentityindex = pEntInfo->hEnt.Get()->entindex();
-					AddRestoredEntity( pEntInfo->hEnt.Get() );
+					pEntInfo->restoreentityindex = EntityFromHandle(pEntInfo->hEnt)->entindex();
+					AddRestoredEntity(EntityFromHandle(pEntInfo->hEnt) );
 				}
 				else
 				{
-					UTIL_RemoveImmediate( pEntInfo->hEnt.Get() );
+					UTIL_RemoveImmediate(EntityFromHandle(pEntInfo->hEnt) );
 				}
 				// -------------------------------------------------------------------------
 			}
@@ -3612,7 +3643,7 @@ int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask )
 	for ( i = checkList.Count()-1; i >= 0; --i )
 	{
 		pEntInfo = pSaveData->GetEntityInfo( checkList[i] );
-		pent = pEntInfo->hEnt;
+		pent = EntityFromHandle(pEntInfo->hEnt);
 
 		// NOTE: pent can be NULL because UTIL_RemoveImmediate (called below) removes all in hierarchy
 		if ( !pent )

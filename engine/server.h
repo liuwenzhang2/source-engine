@@ -186,6 +186,7 @@ extern int g_iServerGameClientsVersion;	// This matches the number at the end of
 extern IHLTVDirector *serverGameDirector;
 
 extern IServerGameTags *serverGameTags;
+extern ISoundEmitterSystem* g_pSoundEmitterSystem;
 
 // Master server address struct for use in building heartbeats
 extern	ConVar	skill;

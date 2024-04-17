@@ -304,7 +304,11 @@ protected:
 	virtual void PrecacheScriptSound(const char* pMaterialName) = 0;
 	virtual void RenameMapName(string_t* pStringDest) = 0;
 	virtual string_t AllocPooledString(const char* pszValue) = 0;
-private:
+	//---------------------------------
+// Game info methods
+//
+	virtual IHandleEntity* EntityFromIndex(int entityIndex) = 0;
+protected:
 	//---------------------------------
 	// Read primitives
 	//
@@ -346,10 +350,7 @@ private:
 	bool			ShouldReadField( typedescription_t *pField );
 	bool 			ShouldEmptyField( typedescription_t *pField );
 
-	//---------------------------------
-	// Game info methods
-	//
-	IHandleEntity *	EntityFromIndex( int entityIndex );
+
 	void 			ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDest, datamap_t *pRootMap, typedescription_t *pField );
 	
 	//---------------------------------
@@ -376,6 +377,7 @@ public:
 	virtual void PrecacheScriptSound(const char* pMaterialName);
 	virtual void RenameMapName(string_t* pStringDest);
 	virtual string_t AllocPooledString(const char* pszValue);
+	virtual IHandleEntity* EntityFromIndex(int entityIndex);
 };
 #endif // GAME_DLL
 
@@ -390,6 +392,7 @@ public:
 	virtual void PrecacheScriptSound(const char* pMaterialName);
 	virtual void RenameMapName(string_t* pStringDest);
 	virtual string_t AllocPooledString(const char* pszValue);
+	virtual IHandleEntity* EntityFromIndex(int entityIndex);
 };
 #endif // CLIENT_DLL
 

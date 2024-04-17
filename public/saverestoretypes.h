@@ -21,9 +21,9 @@
 //struct edict_t;
 
 
-#ifdef EHANDLE_H // not available to engine
+//#ifdef EHANDLE_H // not available to engine
 #define SR_ENTS_VISIBLE 1
-#endif
+//#endif
 
 
 //-----------------------------------------------------------------------------
@@ -131,7 +131,7 @@ struct entitytable_t
 	int			restoreentityindex; // the entity index given to this entity at restore time
 
 #ifdef SR_ENTS_VISIBLE
-	EHANDLE		hEnt;			// Pointer to the in-game entity
+	CBaseHandle		hEnt;			// Pointer to the in-game entity
 #else
 	EHandlePlaceholder_t hEnt;
 #endif
@@ -178,7 +178,7 @@ class CGameSaveRestoreInfo
 {
 public:
 	CGameSaveRestoreInfo()
-		: tableCount( 0 ), pTable( 0 ), m_pCurrentEntity( 0 ), m_EntityToIndex( 1024 )
+		: tableCount( 0 ), pTable( 0 ), m_pCurrentEntity( 0 )//, m_EntityToIndex( 1024 )
 	{
 		memset( &levelInfo, 0, sizeof( levelInfo ) );
 		modelSpaceOffset.Init( 0, 0, 0 );
@@ -211,40 +211,40 @@ public:
 	float GetBaseTime() const				{ return levelInfo.time; }
 	Vector GetLandmark() const				{ return ( levelInfo.fUseLandmark ) ? levelInfo.vecLandmarkOffset : vec3_origin; }
 
-	void BuildEntityHash()
-	{
-#ifdef GAME_DLL
-		int i;
-		entitytable_t *pTable;
-		int nEntities = NumEntities();
+//	void BuildEntityHash()
+//	{
+//#ifdef GAME_DLL
+//		int i;
+//		entitytable_t *pTable;
+//		int nEntities = NumEntities();
+//
+//		for ( i = 0; i < nEntities; i++ )
+//		{
+//			pTable = GetEntityInfo( i );
+//			m_EntityToIndex.Insert(  CHashElement( gEntList.GetServerEntityFromHandle(pTable->hEnt), i ) );
+//		}
+//#endif
+//	}
 
-		for ( i = 0; i < nEntities; i++ )
-		{
-			pTable = GetEntityInfo( i );
-			m_EntityToIndex.Insert(  CHashElement( pTable->hEnt.Get(), i ) );
-		}
-#endif
-	}
-
-	void PurgeEntityHash()
-	{
-		m_EntityToIndex.Purge();
-	}
+	//void PurgeEntityHash()
+	//{
+	//	m_EntityToIndex.Purge();
+	//}
 
 	int	GetEntityIndex( const IHandleEntity *pEntity )
 	{
 #ifdef SR_ENTS_VISIBLE
 		if ( pEntity )
 		{
-			if ( m_EntityToIndex.Count() )
-			{
-				UtlHashHandle_t hElement = m_EntityToIndex.Find( CHashElement( pEntity ) );
-				if ( hElement != m_EntityToIndex.InvalidHandle() )
-				{
-					return m_EntityToIndex.Element( hElement ).index;
-				}
-			}
-			else
+			//if ( m_EntityToIndex.Count() )
+			//{
+			//	UtlHashHandle_t hElement = m_EntityToIndex.Find( CHashElement( pEntity ) );
+			//	if ( hElement != m_EntityToIndex.InvalidHandle() )
+			//	{
+			//		return m_EntityToIndex.Element( hElement ).index;
+			//	}
+			//}
+			//else
 			{
 				int i;
 				entitytable_t *pEntTable;
@@ -253,9 +253,10 @@ public:
 				for ( i = 0; i < nEntities; i++ )
 				{
 					pEntTable = GetEntityInfo( i );
-					if ( pEntTable->hEnt == pEntity )
+					if ( pEntTable->hEnt == pEntity->GetRefEHandle() )
 						return pEntTable->id;
 				}
+				Error("can not happen");
 			}
 		}
 #endif
@@ -299,9 +300,9 @@ private:
 		}
 	};
 
-	typedef CUtlHash<CHashElement, CHashFuncs, CHashFuncs> CEntityToIndexHash;
+//	typedef CUtlHash<CHashElement, CHashFuncs, CHashFuncs> CEntityToIndexHash;
 
-	CEntityToIndexHash m_EntityToIndex;
+//	CEntityToIndexHash m_EntityToIndex;
 };
 
 //-----------------------------------------------------------------------------
