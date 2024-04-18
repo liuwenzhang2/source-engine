@@ -111,6 +111,7 @@ const char *Key_NameForBinding( const char *pBinding );
 void CL_GetBackgroundLevelName( char *pszBackgroundName, int bufSize, bool bMapName );
 CreateInterfaceFn g_ClientFactory = NULL;
 extern	CGlobalVars g_ServerGlobalVariables;
+extern ISaveRestoreBlockSet* g_pClientGameSaveRestoreBlockSet;
 
 //-----------------------------------------------------------------------------
 // globals
@@ -476,6 +477,9 @@ public:
 	virtual void ActivateOccluder( int nOccluderIndex, bool bActive );
 	virtual bool IsOccluded( const Vector &vecAbsMins, const Vector &vecAbsMaxs );
 	virtual void *SaveAllocMemory( size_t num, size_t size );
+	virtual void AddBlockHandler(ISaveRestoreBlockHandler* pHandler);
+	virtual void RemoveBlockHandler(ISaveRestoreBlockHandler* pHandler);
+	virtual void CallBlockHandlerRestore(ISaveRestoreBlockHandler* pHandler, int baseFilePos, IRestore* pRestore, bool fCreatePlayers);
 	virtual void SaveFreeMemory( void *pSaveMem );
 	virtual INetChannelInfo *GetNetChannelInfo( void );
 	virtual bool IsPlayingDemo( void );
@@ -1285,6 +1289,18 @@ void *CEngineClient::SaveAllocMemory( size_t num, size_t size )
 void CEngineClient::SaveFreeMemory( void *pSaveMem )
 {
 	::SaveFreeMemory( pSaveMem );
+}
+
+void CEngineClient::AddBlockHandler(ISaveRestoreBlockHandler* pHandler) {
+	g_pClientGameSaveRestoreBlockSet->AddBlockHandler(pHandler);
+}
+
+void CEngineClient::RemoveBlockHandler(ISaveRestoreBlockHandler* pHandler) {
+	g_pClientGameSaveRestoreBlockSet->RemoveBlockHandler(pHandler);
+}
+
+void CEngineClient::CallBlockHandlerRestore(ISaveRestoreBlockHandler* pHandler, int baseFilePos, IRestore* pRestore, bool fCreatePlayers) {
+	g_pClientGameSaveRestoreBlockSet->CallBlockHandlerRestore(pHandler, baseFilePos, pRestore, fCreatePlayers);
 }
 
 INetChannelInfo *CEngineClient::GetNetChannelInfo( void )

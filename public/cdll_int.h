@@ -62,6 +62,8 @@ class IFileList;
 class CRenamedRecvTableInfo;
 class CMouthInfo;
 class IConVar;
+class ISaveRestoreBlockHandler;
+class IRestore;
 
 //-----------------------------------------------------------------------------
 // Purpose: This data structure is filled in by the engine when the client .dll requests information about
@@ -403,6 +405,10 @@ public:
 	virtual void		*SaveAllocMemory( size_t num, size_t size ) = 0;
 	virtual void		SaveFreeMemory( void *pSaveMem ) = 0;
 
+	virtual void AddBlockHandler(ISaveRestoreBlockHandler* pHandler) = 0;
+	virtual void RemoveBlockHandler(ISaveRestoreBlockHandler* pHandler) = 0;
+	virtual void CallBlockHandlerRestore(ISaveRestoreBlockHandler* pHandler, int baseFilePos, IRestore* pRestore, bool fCreatePlayers) = 0;
+
 	// returns info interface for client netchannel
 	virtual INetChannelInfo	*GetNetChannelInfo( void ) = 0;
 
@@ -700,13 +706,13 @@ public:
 
 	// Save/restore system hooks
 	//virtual CSaveRestoreData  *SaveInit( int size ) = 0;
-	virtual void			SaveWriteFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
-	virtual void			SaveReadFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
-	virtual void			PreSave( CSaveRestoreData * ) = 0;
-	virtual void			Save( CSaveRestoreData * ) = 0;
-	virtual void			WriteSaveHeaders( CSaveRestoreData * ) = 0;
-	virtual void			ReadRestoreHeaders( CSaveRestoreData * ) = 0;
-	virtual void			Restore( CSaveRestoreData *, bool ) = 0;
+	//virtual void			SaveWriteFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
+	//virtual void			SaveReadFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
+	//virtual void			PreSave( CSaveRestoreData * ) = 0;
+	//virtual void			Save( CSaveRestoreData * ) = 0;
+	//virtual void			WriteSaveHeaders( CSaveRestoreData * ) = 0;
+	//virtual void			ReadRestoreHeaders( CSaveRestoreData * ) = 0;
+	//virtual void			Restore( CSaveRestoreData *, bool ) = 0;
 	virtual void			DispatchOnRestore() = 0;
 
 	// Hand over the StandardRecvProxies in the client DLL's module.

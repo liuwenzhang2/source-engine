@@ -64,6 +64,8 @@ class IReplayFactory;
 class IReplaySystem;
 class IServer;
 class CCommand;
+class ISaveRestoreBlockHandler;
+class IRestore;
 
 typedef struct player_info_s player_info_t;
 
@@ -181,6 +183,10 @@ public:
 	virtual void		*SaveAllocMemory( size_t num, size_t size ) = 0;
 	virtual void		SaveFreeMemory( void *pSaveMem ) = 0;
 	
+	virtual void AddBlockHandler(ISaveRestoreBlockHandler* pHandler) = 0;
+	virtual void RemoveBlockHandler(ISaveRestoreBlockHandler* pHandler) = 0;
+	virtual void CallBlockHandlerRestore(ISaveRestoreBlockHandler* pHandler, int baseFilePos, IRestore* pRestore, bool fCreatePlayers) = 0;
+
 	// Emit an ambient sound associated with the specified entity
 	//virtual void		EmitAmbientSound( int entindex, const Vector &pos, const char *samp, float vol, soundlevel_t soundlevel, int fFlags, int pitch, float soundtime = 0.0f ) = 0;
 
@@ -541,16 +547,16 @@ public:
 	
 	// Save/restore system hooks
 	//virtual CSaveRestoreData  *SaveInit( int size ) = 0;
-	virtual void			SaveWriteFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
-	virtual void			SaveReadFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
+	//virtual void			SaveWriteFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
+	//virtual void			SaveReadFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
 	virtual void			SaveGlobalState( CSaveRestoreData * ) = 0;
 	virtual void			RestoreGlobalState( CSaveRestoreData * ) = 0;
-	virtual void			PreSave( CSaveRestoreData * ) = 0;
-	virtual void			Save( CSaveRestoreData * ) = 0;
+	//virtual void			PreSave( CSaveRestoreData * ) = 0;
+	//virtual void			Save( CSaveRestoreData * ) = 0;
 	virtual void			GetSaveComment( char *comment, int maxlength, float flMinutes, float flSeconds, bool bNoTime = false ) = 0;
-	virtual void			WriteSaveHeaders( CSaveRestoreData * ) = 0;
-	virtual void			ReadRestoreHeaders( CSaveRestoreData * ) = 0;
-	virtual void			Restore( CSaveRestoreData *, bool ) = 0;
+	//virtual void			WriteSaveHeaders( CSaveRestoreData * ) = 0;
+	//virtual void			ReadRestoreHeaders( CSaveRestoreData * ) = 0;
+	//virtual void			Restore( CSaveRestoreData *, bool ) = 0;
 	virtual bool			IsRestoring() = 0;
 
 	// Returns the number of entities moved across the transition

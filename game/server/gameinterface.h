@@ -83,23 +83,23 @@ public:
 	
 	// Save/restore system hooks
 	//virtual CSaveRestoreData  *SaveInit( int size ) OVERRIDE;
-	virtual void			SaveWriteFields( CSaveRestoreData *, char const* , void *, datamap_t *, typedescription_t *, int ) OVERRIDE;
-	virtual void			SaveReadFields( CSaveRestoreData *, char const* , void *, datamap_t *, typedescription_t *, int ) OVERRIDE;
+	//virtual void			SaveWriteFields( CSaveRestoreData *, char const* , void *, datamap_t *, typedescription_t *, int ) OVERRIDE;
+	//virtual void			SaveReadFields( CSaveRestoreData *, char const* , void *, datamap_t *, typedescription_t *, int ) OVERRIDE;
 	virtual void			SaveGlobalState( CSaveRestoreData * ) OVERRIDE;
 	virtual void			RestoreGlobalState( CSaveRestoreData * ) OVERRIDE;
 	virtual int				CreateEntityTransitionList( CSaveRestoreData *, int ) OVERRIDE;
 	virtual void			BuildAdjacentMapList( void ) OVERRIDE;
 
-	virtual void			PreSave( CSaveRestoreData * ) OVERRIDE;
-	virtual void			Save( CSaveRestoreData * ) OVERRIDE;
+	//virtual void			PreSave( CSaveRestoreData * ) OVERRIDE;
+	//virtual void			Save( CSaveRestoreData * ) OVERRIDE;
 	virtual void			GetSaveComment( char *comment, int maxlength, float flMinutes, float flSeconds, bool bNoTime = false ) OVERRIDE;
 #ifdef _XBOX
 	virtual void			GetTitleName( const char *pMapName, char* pTitleBuff, int titleBuffSize ) OVERRIDE;
 #endif
-	virtual void			WriteSaveHeaders( CSaveRestoreData * ) OVERRIDE;
+	//virtual void			WriteSaveHeaders( CSaveRestoreData * ) OVERRIDE;
 
-	virtual void			ReadRestoreHeaders( CSaveRestoreData * ) OVERRIDE;
-	virtual void			Restore( CSaveRestoreData *, bool ) OVERRIDE;
+	//virtual void			ReadRestoreHeaders( CSaveRestoreData * ) OVERRIDE;
+	//virtual void			Restore( CSaveRestoreData *, bool ) OVERRIDE;
 	virtual bool			IsRestoring() OVERRIDE;
 
 	// Retrieve info needed for parsing the specified user message

@@ -65,6 +65,7 @@ CSaveRestoreData* SaveInit(int size, bool bServer);
 
 extern CNetworkStringTableContainer *networkStringTableContainerServer;
 extern ConVar g_debug_transitions;
+extern ISaveRestoreBlockSet* g_pServerGameSaveRestoreBlockSet;
 
 //CSharedEdictChangeInfo g_SharedEdictChangeInfo;
 //CSharedEdictChangeInfo *g_pSharedChangeInfo = &g_SharedEdictChangeInfo;
@@ -307,9 +308,11 @@ public:
 				//g_pGameSaveRestoreBlockSet->PreSave(pSaveData);
 				//pSaveData->levelInfo.connectionCount = BuildChangeList(pSaveData->levelInfo.levelList, MAX_LEVEL_CONNECTIONS);
 				//g_pGameSaveRestoreBlockSet->PostSave();
-				serverGameDLL->PreSave(pSaveData);
+				g_pServerGameSaveRestoreBlockSet->PreSave(pSaveData);
 				serverGameDLL->BuildAdjacentMapList();
-				serverGameDLL->WriteSaveHeaders(pSaveData);
+				CSaveServer saveHelper(pSaveData);
+				g_pServerGameSaveRestoreBlockSet->WriteSaveHeaders(&saveHelper);
+				g_pServerGameSaveRestoreBlockSet->PostSave();
 			}
 
 		}
@@ -911,6 +914,20 @@ public:
 		::SaveFreeMemory(pSaveMem);
 #endif
 	}
+
+
+	void AddBlockHandler(ISaveRestoreBlockHandler* pHandler) {
+		g_pServerGameSaveRestoreBlockSet->AddBlockHandler(pHandler);
+	}
+
+	void RemoveBlockHandler(ISaveRestoreBlockHandler* pHandler) {
+		g_pServerGameSaveRestoreBlockSet->RemoveBlockHandler(pHandler);
+	}
+
+	void CallBlockHandlerRestore(ISaveRestoreBlockHandler* pHandler, int baseFilePos, IRestore* pRestore, bool fCreatePlayers) {
+		g_pServerGameSaveRestoreBlockSet->CallBlockHandlerRestore(pHandler, baseFilePos, pRestore, fCreatePlayers);
+	}
+
 	
 	/*
 	=================

@@ -85,7 +85,7 @@ public:
 	virtual void CallBlockHandlerRestore( ISaveRestoreBlockHandler *pHandler, int baseFilePos, IRestore *pRestore, bool fCreatePlayers ) = 0;
 };
 
-extern ISaveRestoreBlockSet *g_pGameSaveRestoreBlockSet;
+//extern ISaveRestoreBlockSet *g_pGameSaveRestoreBlockSet;
 
 //-------------------------------------
 

@@ -121,6 +121,20 @@ IThreadPool *g_pSaveThread;
 
 static bool g_bSaveInProgress = false;
 
+BEGIN_SIMPLE_DATADESC(entitytable_t)
+	DEFINE_FIELD(id, FIELD_INTEGER),
+	DEFINE_FIELD(edictindex, FIELD_INTEGER),
+	DEFINE_FIELD(saveentityindex, FIELD_INTEGER),
+//	DEFINE_FIELD( restoreentityindex, FIELD_INTEGER ),
+	//				hEnt		(not saved, this is the fixup)
+	DEFINE_FIELD(location, FIELD_INTEGER),
+	DEFINE_FIELD(size, FIELD_INTEGER),
+	DEFINE_FIELD(flags, FIELD_INTEGER),
+	DEFINE_FIELD(classname, FIELD_STRING),
+	DEFINE_FIELD(globalname, FIELD_STRING),
+	DEFINE_FIELD(landmarkModelSpace, FIELD_VECTOR),
+	DEFINE_FIELD(modelname, FIELD_STRING),
+END_DATADESC()
 
 static int gSizes[FIELD_TYPECOUNT] =
 {
@@ -2218,7 +2232,7 @@ void CRestoreClient::PrecacheScriptSound(const char* pMaterialName) {
 void CRestoreServer::RenameMapName(string_t * pStringDest) {
 	char buf[MAX_PATH];
 	Q_strncpy(buf, "maps/", sizeof(buf));
-	Q_strncat(buf, g_ServerGlobalVariables.mapname.ToCStr(), sizeof(buf));
+	Q_strncat(buf, STRING( g_ServerGlobalVariables.mapname), sizeof(buf));
 	Q_strncat(buf, ".bsp", sizeof(buf));
 	*pStringDest = AllocPooledString(buf);
 }
@@ -2478,6 +2492,240 @@ int CRestore::ReadFunction(datamap_t * pMap, inputfunc_t * *pValue, int count, i
 	}
 	return 0;
 }
+
+//-----------------------------------------------------------------------------
+//
+// ISaveRestoreBlockSet
+//
+// Purpose:	Serves as holder for a group of sibling save sections. Takes
+//			care of iterating over them, making sure read points are
+//			queued up to the right spot (in case one section due to datadesc
+//			changes reads less than expected, or doesn't leave the
+//			read pointer at the right point), and ensuring the read pointer
+//			is at the end of the entire set when the set read is done.
+//-----------------------------------------------------------------------------
+
+struct SaveRestoreBlockHeader_t
+{
+	char szName[MAX_BLOCK_NAME_LEN + 1];
+	int locHeader;
+	int locBody;
+
+	DECLARE_SIMPLE_DATADESC();
+};
+
+
+//-------------------------------------
+
+class CSaveRestoreBlockSet : public ISaveRestoreBlockSet
+{
+public:
+	CSaveRestoreBlockSet(const char* pszName)
+	{
+		Q_strncpy(m_Name, pszName, sizeof(m_Name));
+	}
+
+	const char* GetBlockName()
+	{
+		return m_Name;
+	}
+
+	//---------------------------------
+
+	void PreSave(CSaveRestoreData* pData)
+	{
+		m_BlockHeaders.SetCount(m_Handlers.Count());
+		for (int i = 0; i < m_Handlers.Count(); i++)
+		{
+			Q_strncpy(m_BlockHeaders[i].szName, m_Handlers[i]->GetBlockName(), MAX_BLOCK_NAME_LEN + 1);
+			m_Handlers[i]->PreSave(pData);
+		}
+	}
+
+	void Save(ISave* pSave)
+	{
+		int base = pSave->GetWritePos();
+		for (int i = 0; i < m_Handlers.Count(); i++)
+		{
+			m_BlockHeaders[i].locBody = pSave->GetWritePos() - base;
+			m_Handlers[i]->Save(pSave);
+		}
+		m_SizeBodies = pSave->GetWritePos() - base;
+	}
+
+	void WriteSaveHeaders(ISave* pSave)
+	{
+		int base = pSave->GetWritePos();
+
+		//
+		// Reserve space for a fully populated header
+		//
+		int dummyInt = -1;
+		CUtlVector<SaveRestoreBlockHeader_t> dummyArr;
+
+		dummyArr.SetCount(m_BlockHeaders.Count());
+		memset(&dummyArr[0], 0xff, dummyArr.Count() * sizeof(SaveRestoreBlockHeader_t));
+
+		pSave->WriteInt(&dummyInt); // size all headers
+		pSave->WriteInt(&dummyInt); // size all bodies
+		SaveUtlVector(pSave, &dummyArr, FIELD_EMBEDDED);
+
+		//
+		// Write the data
+		//
+		for (int i = 0; i < m_Handlers.Count(); i++)
+		{
+			m_BlockHeaders[i].locHeader = pSave->GetWritePos() - base;
+			m_Handlers[i]->WriteSaveHeaders(pSave);
+		}
+
+		m_SizeHeaders = pSave->GetWritePos() - base;
+
+		//
+		// Write the actual header
+		//
+		int savedPos = pSave->GetWritePos();
+		pSave->SetWritePos(base);
+
+		pSave->WriteInt(&m_SizeHeaders);
+		pSave->WriteInt(&m_SizeBodies);
+		SaveUtlVector(pSave, &m_BlockHeaders, FIELD_EMBEDDED);
+
+		pSave->SetWritePos(savedPos);
+	}
+
+	void PostSave()
+	{
+		for (int i = 0; i < m_Handlers.Count(); i++)
+		{
+			m_Handlers[i]->PostSave();
+		}
+		m_BlockHeaders.Purge();
+	}
+
+	//---------------------------------
+
+	void PreRestore()
+	{
+		for (int i = 0; i < m_Handlers.Count(); i++)
+		{
+			m_Handlers[i]->PreRestore();
+		}
+	}
+
+	void ReadRestoreHeaders(IRestore* pRestore)
+	{
+		int base = pRestore->GetReadPos();
+
+		pRestore->ReadInt(&m_SizeHeaders);
+		pRestore->ReadInt(&m_SizeBodies);
+		RestoreUtlVector(pRestore, &m_BlockHeaders, FIELD_EMBEDDED);
+
+		for (int i = 0; i < m_Handlers.Count(); i++)
+		{
+			int location = GetBlockHeaderLoc(m_Handlers[i]->GetBlockName());
+			if (location != -1)
+			{
+				pRestore->SetReadPos(base + location);
+				m_Handlers[i]->ReadRestoreHeaders(pRestore);
+			}
+		}
+
+		pRestore->SetReadPos(base + m_SizeHeaders);
+	}
+
+	void CallBlockHandlerRestore(ISaveRestoreBlockHandler* pHandler, int baseFilePos, IRestore* pRestore, bool fCreatePlayers)
+	{
+		int location = GetBlockBodyLoc(pHandler->GetBlockName());
+		if (location != -1)
+		{
+			pRestore->SetReadPos(baseFilePos + location);
+			pHandler->Restore(pRestore, fCreatePlayers);
+		}
+	}
+
+	void Restore(IRestore* pRestore, bool fCreatePlayers)
+	{
+		int base = pRestore->GetReadPos();
+
+		for (int i = 0; i < m_Handlers.Count(); i++)
+		{
+			CallBlockHandlerRestore(m_Handlers[i], base, pRestore, fCreatePlayers);
+		}
+		pRestore->SetReadPos(base + m_SizeBodies);
+	}
+
+	void PostRestore()
+	{
+		for (int i = 0; i < m_Handlers.Count(); i++)
+		{
+			m_Handlers[i]->PostRestore();
+		}
+		m_BlockHeaders.Purge();
+	}
+
+	//---------------------------------
+
+	void AddBlockHandler(ISaveRestoreBlockHandler* pHandler)
+	{
+		// Grody, but... while this class is still isolated in saverestore.cpp, this seems like a fine time to assert:
+		AssertMsg(pHandler == &g_EntitySaveRestoreBlockHandler || (m_Handlers.Count() >= 1 && m_Handlers[0] == &g_EntitySaveRestoreBlockHandler), "Expected entity save load to always be first");
+
+		Assert(pHandler != this);
+		m_Handlers.AddToTail(pHandler);
+	}
+
+	void RemoveBlockHandler(ISaveRestoreBlockHandler* pHandler)
+	{
+		m_Handlers.FindAndRemove(pHandler);
+	}
+
+	//---------------------------------
+
+private:
+	int GetBlockBodyLoc(const char* pszName)
+	{
+		for (int i = 0; i < m_BlockHeaders.Count(); i++)
+		{
+			if (strcmp(m_BlockHeaders[i].szName, pszName) == 0)
+				return m_BlockHeaders[i].locBody;
+		}
+		return -1;
+	}
+
+	int GetBlockHeaderLoc(const char* pszName)
+	{
+		for (int i = 0; i < m_BlockHeaders.Count(); i++)
+		{
+			if (strcmp(m_BlockHeaders[i].szName, pszName) == 0)
+				return m_BlockHeaders[i].locHeader;
+		}
+		return -1;
+	}
+
+	char 								   m_Name[MAX_BLOCK_NAME_LEN + 1];
+	CUtlVector<ISaveRestoreBlockHandler*> m_Handlers;
+
+	int									   m_SizeHeaders;
+	int									   m_SizeBodies;
+	CUtlVector<SaveRestoreBlockHeader_t>   m_BlockHeaders;
+};
+
+//-------------------------------------
+
+BEGIN_SIMPLE_DATADESC(SaveRestoreBlockHeader_t)
+	DEFINE_ARRAY(szName, FIELD_CHARACTER, MAX_BLOCK_NAME_LEN + 1),
+	DEFINE_FIELD(locHeader, FIELD_INTEGER),
+	DEFINE_FIELD(locBody, FIELD_INTEGER),
+END_DATADESC()
+
+//-------------------------------------
+
+CSaveRestoreBlockSet g_ServerSaveRestoreBlockSet("Game");
+ISaveRestoreBlockSet* g_pServerGameSaveRestoreBlockSet = &g_ServerSaveRestoreBlockSet;
+
+CSaveRestoreBlockSet g_ClientSaveRestoreBlockSet("Game");
+ISaveRestoreBlockSet* g_pClientGameSaveRestoreBlockSet = &g_ClientSaveRestoreBlockSet;
 
 
 //-----------------------------------------------------------------------------
@@ -3201,7 +3449,8 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	}
 
 	gameHeader.mapCount = 0; // No longer used. The map packer will place the map count at the head of the compound files (toml 7/18/2007)
-	serverGameDLL->SaveWriteFields( pSaveData, "GameHeader", &gameHeader, NULL, GAME_HEADER::m_DataMap.dataDesc, GAME_HEADER::m_DataMap.dataNumFields );
+	CSaveServer saveHelper(pSaveData);
+	saveHelper.WriteFields( "GameHeader", &gameHeader, NULL, GAME_HEADER::m_DataMap.dataDesc, GAME_HEADER::m_DataMap.dataNumFields );
 	serverGameDLL->SaveGlobalState( pSaveData );
 
 	// Write entity string token table
@@ -3412,7 +3661,8 @@ int CSaveRestore::SaveReadHeader( FileHandle_t pFile, GAME_HEADER *pHeader, int 
 		return 0;
 	}
 	
-	serverGameDLL->SaveReadFields( pSaveData, "GameHeader", pHeader, NULL, GAME_HEADER::m_DataMap.dataDesc, GAME_HEADER::m_DataMap.dataNumFields );
+	CRestoreServer restoreHelper(pSaveData);
+	restoreHelper.ReadFields( "GameHeader", pHeader, NULL, GAME_HEADER::m_DataMap.dataDesc, GAME_HEADER::m_DataMap.dataNumFields );
 	if ( g_szMapLoadOverride[0] )
 	{
 		V_strncpy( pHeader->mapName, g_szMapLoadOverride, sizeof( pHeader->mapName ) );
@@ -3775,13 +4025,17 @@ void CSaveRestore::SaveGameStateGlobals( CSaveRestoreData *pSaveData )
 	}
 
 	pSaveData->levelInfo.time = 0; // prohibits rebase of header.time (why not just save time as a field_float and ditch this hack?)
-	serverGameDLL->SaveWriteFields( pSaveData, "Save Header", &header, NULL, SAVE_HEADER::m_DataMap.dataDesc, SAVE_HEADER::m_DataMap.dataNumFields );
+	{
+		CSaveServer saveHelper(pSaveData);
+		saveHelper.WriteFields("Save Header", &header, NULL, SAVE_HEADER::m_DataMap.dataDesc, SAVE_HEADER::m_DataMap.dataNumFields);
+	}
 	pSaveData->levelInfo.time = header.time__USE_VCR_MODE;
 
 	// Write adjacency list
-	for ( i = 0; i < pSaveData->levelInfo.connectionCount; i++ )
-		serverGameDLL->SaveWriteFields( pSaveData, "ADJACENCY", pSaveData->levelInfo.levelList + i, NULL, levellist_t::m_DataMap.dataDesc, levellist_t::m_DataMap.dataNumFields );
-
+	for (i = 0; i < pSaveData->levelInfo.connectionCount; i++) {
+		CSaveServer saveHelper(pSaveData);
+		saveHelper.WriteFields( "ADJACENCY", pSaveData->levelInfo.levelList + i, NULL, levellist_t::m_DataMap.dataDesc, levellist_t::m_DataMap.dataNumFields);
+	}
 	// Write the lightstyles
 	SAVELIGHTSTYLE	light;
 	for ( i = 0; i < MAX_LIGHTSTYLES; i++ )
@@ -3792,7 +4046,8 @@ void CSaveRestore::SaveGameStateGlobals( CSaveRestoreData *pSaveData )
 		{
 			light.index = i;
 			Q_strncpy( light.style, ligthStyle, sizeof( light.style ) );
-			serverGameDLL->SaveWriteFields( pSaveData, "LIGHTSTYLE", &light, NULL, SAVELIGHTSTYLE::m_DataMap.dataDesc, SAVELIGHTSTYLE::m_DataMap.dataNumFields );
+			CSaveServer saveHelper(pSaveData);
+			saveHelper.WriteFields( "LIGHTSTYLE", &light, NULL, SAVELIGHTSTYLE::m_DataMap.dataDesc, SAVELIGHTSTYLE::m_DataMap.dataNumFields );
 		}
 	}
 }
@@ -3842,7 +4097,7 @@ bool CSaveRestore::SaveGameState( bool bTransition, CSaveRestoreData **ppReturnS
 	//---------------------------------
 	// Pre-save
 
-	serverGameDLL->PreSave( pSaveData );
+	g_pServerGameSaveRestoreBlockSet->PreSave( pSaveData );
 	// Build the adjacent map list (after entity table build by game in presave)
 	if ( bTransition )
 	{
@@ -3859,7 +4114,10 @@ bool CSaveRestore::SaveGameState( bool bTransition, CSaveRestoreData **ppReturnS
 	SaveGameStateGlobals( pSaveData );
 
 	S_ExtraUpdate();
-	serverGameDLL->Save( pSaveData );
+	{
+		CSaveServer saveHelper(pSaveData);
+		g_pServerGameSaveRestoreBlockSet->Save(&saveHelper);
+	}
 	S_ExtraUpdate();
 	
 	sectionsInfo.nBytesData = pSaveData->AccessCurPos() - sections.pData;
@@ -3869,7 +4127,9 @@ bool CSaveRestore::SaveGameState( bool bTransition, CSaveRestoreData **ppReturnS
 	// Save necessary tables/dictionaries/directories
 	sections.pDataHeaders = pSaveData->AccessCurPos();
 	
-	serverGameDLL->WriteSaveHeaders( pSaveData );
+	CSaveServer saveHelper(pSaveData);
+	g_pServerGameSaveRestoreBlockSet->WriteSaveHeaders( &saveHelper);
+	g_pServerGameSaveRestoreBlockSet->PostSave();
 	
 	sectionsInfo.nBytesDataHeaders = pSaveData->AccessCurPos() - sections.pDataHeaders;
 
@@ -4294,7 +4554,9 @@ void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 
 	pSaveData->Init( (char *)(pszTokenList), size );	// The point pszTokenList was incremented to the end of the tokens
 
-	g_ClientDLL->ReadRestoreHeaders( pSaveData );
+	CRestoreClient restoreHelper(pSaveData);
+	g_pClientGameSaveRestoreBlockSet->PreRestore();
+	g_pClientGameSaveRestoreBlockSet->ReadRestoreHeaders(&restoreHelper);
 	
 	pSaveData->Rebase();
 
@@ -4345,14 +4607,19 @@ void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 		}
 	}
 
-	g_ClientDLL->Restore( pSaveData, false );
+	{
+		CRestoreClient restore(pSaveData);
+		g_pClientGameSaveRestoreBlockSet->Restore(&restore, false);
+		g_pClientGameSaveRestoreBlockSet->PostRestore();
+	}
 
 	if ( r_decals.GetInt() )
 	{
 		for ( int i = 0; i < sections.decalcount; i++ )
 		{
 			decallist_t entry;
-			g_ClientDLL->SaveReadFields( pSaveData, "DECALLIST", &entry, NULL, decallist_t::m_DataMap.dataDesc, decallist_t::m_DataMap.dataNumFields );
+			CRestoreClient restoreHelper(pSaveData);
+			restoreHelper.ReadFields( "DECALLIST", &entry, NULL, decallist_t::m_DataMap.dataDesc, decallist_t::m_DataMap.dataNumFields );
 
 			ReapplyDecal( adjacent, table, &entry );
 		}
@@ -4362,7 +4629,8 @@ void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 	{
 		musicsave_t song;
 
-		g_ClientDLL->SaveReadFields( pSaveData, "MUSICLIST", &song, NULL, musicsave_t::m_DataMap.dataDesc, musicsave_t::m_DataMap.dataNumFields );
+		CRestoreClient restoreHelper(pSaveData);
+		restoreHelper.ReadFields( "MUSICLIST", &song, NULL, musicsave_t::m_DataMap.dataDesc, musicsave_t::m_DataMap.dataNumFields );
 
 		// Tell sound system to restart the music
 		S_RestartSong( &song );
@@ -4408,14 +4676,21 @@ bool CSaveRestore::SaveClientState( const char *name )
 	sections.entitydata = pSaveData->AccessCurPos();
 
 	// Now write out the client .dll entities to the save file, too
-	g_ClientDLL->PreSave( pSaveData );
-	g_ClientDLL->Save( pSaveData );
+	g_pClientGameSaveRestoreBlockSet->PreSave( pSaveData );
+	{
+		CSaveClient saveHelper(pSaveData);
+		g_pClientGameSaveRestoreBlockSet->Save(&saveHelper);
+	}
 
 	sections.entitysize = pSaveData->AccessCurPos() - sections.entitydata;
 
 	sections.headerdata = pSaveData->AccessCurPos();
 
-	g_ClientDLL->WriteSaveHeaders( pSaveData );
+	{
+		CSaveClient saveHelper(pSaveData);
+		g_pClientGameSaveRestoreBlockSet->WriteSaveHeaders(&saveHelper);
+		g_pClientGameSaveRestoreBlockSet->PostSave();
+	}
 
 	sections.headersize = pSaveData->AccessCurPos() - sections.headerdata;
 
@@ -4427,8 +4702,8 @@ bool CSaveRestore::SaveClientState( const char *name )
 	for ( i = 0; i < sections.decalcount; i++ )
 	{
 		decallist_t *entry = &decalList[ i ];
-
-		g_ClientDLL->SaveWriteFields( pSaveData, "DECALLIST", entry, NULL, decallist_t::m_DataMap.dataDesc, decallist_t::m_DataMap.dataNumFields );
+		CSaveClient saveHelper(pSaveData);
+		saveHelper.WriteFields( "DECALLIST", entry, NULL, decallist_t::m_DataMap.dataDesc, decallist_t::m_DataMap.dataNumFields );
 	}
 
 	sections.decalsize = pSaveData->AccessCurPos() - sections.decaldata;
@@ -4445,8 +4720,8 @@ bool CSaveRestore::SaveClientState( const char *name )
 	for ( i = 0; i < sections.musiccount; ++i )
 	{
 		musicsave_t *song = &music[ i ];
-
-		g_ClientDLL->SaveWriteFields( pSaveData, "MUSICLIST", song, NULL, musicsave_t::m_DataMap.dataDesc, musicsave_t::m_DataMap.dataNumFields );
+		CSaveClient saveHelper(pSaveData);
+		saveHelper.WriteFields( "MUSICLIST", song, NULL, musicsave_t::m_DataMap.dataDesc, musicsave_t::m_DataMap.dataNumFields );
 	}
 
 	sections.musicsize = pSaveData->AccessCurPos() - sections.musicdata;
@@ -4765,8 +5040,11 @@ void CSaveRestore::ParseSaveTables( CSaveRestoreData *pSaveData, SAVE_HEADER *pH
 	// Re-base the savedata since we re-ordered the entity/table / restore fields
 	pSaveData->Rebase();
 	// Process SAVE_HEADER
-	serverGameDLL->SaveReadFields( pSaveData, "Save Header", pHeader, NULL, SAVE_HEADER::m_DataMap.dataDesc, SAVE_HEADER::m_DataMap.dataNumFields );
-//	header.version = ENGINE_VERSION;
+	{
+		CRestoreServer restoreHelper(pSaveData);
+		restoreHelper.ReadFields("Save Header", pHeader, NULL, SAVE_HEADER::m_DataMap.dataDesc, SAVE_HEADER::m_DataMap.dataNumFields);
+	}
+	//	header.version = ENGINE_VERSION;
 
 	pSaveData->levelInfo.mapVersion = pHeader->mapVersion;
 	pSaveData->levelInfo.connectionCount = pHeader->connectionCount;
@@ -4775,9 +5053,11 @@ void CSaveRestore::ParseSaveTables( CSaveRestoreData *pSaveData, SAVE_HEADER *pH
 	VectorCopy( vec3_origin, pSaveData->levelInfo.vecLandmarkOffset );
 
 	// Read adjacency list
-	for ( i = 0; i < pSaveData->levelInfo.connectionCount; i++ )
-		serverGameDLL->SaveReadFields( pSaveData, "ADJACENCY", pSaveData->levelInfo.levelList + i, NULL, levellist_t::m_DataMap.dataDesc, levellist_t::m_DataMap.dataNumFields );
-	
+	for (i = 0; i < pSaveData->levelInfo.connectionCount; i++) {
+		CRestoreServer restoreHelper(pSaveData);
+		restoreHelper.ReadFields( "ADJACENCY", pSaveData->levelInfo.levelList + i, NULL, levellist_t::m_DataMap.dataDesc, levellist_t::m_DataMap.dataNumFields);
+	}
+
 	if ( updateGlobals )
   	{
   		for ( i = 0; i < MAX_LIGHTSTYLES; i++ )
@@ -4787,7 +5067,8 @@ void CSaveRestore::ParseSaveTables( CSaveRestoreData *pSaveData, SAVE_HEADER *pH
 
 	for ( i = 0; i < pHeader->lightStyleCount; i++ )
 	{
-		serverGameDLL->SaveReadFields( pSaveData, "LIGHTSTYLE", &light, NULL, SAVELIGHTSTYLE::m_DataMap.dataDesc, SAVELIGHTSTYLE::m_DataMap.dataNumFields );
+		CRestoreServer restoreHelper(pSaveData);
+		restoreHelper.ReadFields( "LIGHTSTYLE", &light, NULL, SAVELIGHTSTYLE::m_DataMap.dataDesc, SAVELIGHTSTYLE::m_DataMap.dataNumFields );
 		if ( updateGlobals )
 		{
 			table->SetStringUserData( light.index, Q_strlen(light.style)+1, light.style );
@@ -4898,7 +5179,9 @@ int CSaveRestore::LoadGameState( char const *level, bool createPlayers )
 	if ( !pSaveData )		// Couldn't load the file
 		return 0;
 
-	serverGameDLL->ReadRestoreHeaders( pSaveData );
+	CRestoreServer restoreHelper(pSaveData);
+	g_pServerGameSaveRestoreBlockSet->PreRestore();
+	g_pServerGameSaveRestoreBlockSet->ReadRestoreHeaders( &restoreHelper);
 
 	ParseSaveTables( pSaveData, &header, 1 );
 	EntityPatchRead( pSaveData, level );
@@ -4916,7 +5199,9 @@ int CSaveRestore::LoadGameState( char const *level, bool createPlayers )
 	}
 	
 	// Create entity list
-	serverGameDLL->Restore( pSaveData, createPlayers );
+	CRestoreServer restore(pSaveData);
+	g_pServerGameSaveRestoreBlockSet->Restore( &restore, createPlayers );
+	g_pServerGameSaveRestoreBlockSet->PostRestore();
 
 	BuildRestoredIndexTranslationTable( level, pSaveData, false );
 
@@ -5064,7 +5349,9 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 
 		if ( pSaveData )
 		{
-			serverGameDLL->ReadRestoreHeaders( pSaveData );
+			CRestoreServer restoreHelper(pSaveData);
+			g_pServerGameSaveRestoreBlockSet->PreRestore();
+			g_pServerGameSaveRestoreBlockSet->ReadRestoreHeaders( &restoreHelper);
 
 			ParseSaveTables( pSaveData, &header, 0 );
 			EntityPatchRead( pSaveData, currentLevelData.levelInfo.levelList[i].mapName );

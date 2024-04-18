@@ -658,13 +658,13 @@ public:
 
 	// Save/restore system hooks
 	//virtual CSaveRestoreData  *SaveInit( int size );
-	virtual void			SaveWriteFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int );
-	virtual void			SaveReadFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int );
-	virtual void			PreSave( CSaveRestoreData * );
-	virtual void			Save( CSaveRestoreData * );
-	virtual void			WriteSaveHeaders( CSaveRestoreData * );
-	virtual void			ReadRestoreHeaders( CSaveRestoreData * );
-	virtual void			Restore( CSaveRestoreData *, bool );
+	//virtual void			SaveWriteFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int );
+	//virtual void			SaveReadFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int );
+	//virtual void			PreSave( CSaveRestoreData * );
+	//virtual void			Save( CSaveRestoreData * );
+	//virtual void			WriteSaveHeaders( CSaveRestoreData * );
+	//virtual void			ReadRestoreHeaders( CSaveRestoreData * );
+	//virtual void			Restore( CSaveRestoreData *, bool );
 	virtual void			DispatchOnRestore();
 	virtual void			WriteSaveGameScreenshot( const char *pFilename );
 
@@ -1105,9 +1105,9 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	if ( !PhysicsDLLInit( physicsFactory ) )
 		return false;
 
-	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetEntitySaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetPhysSaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetViewEffectsRestoreBlockHandler() );
+	engine->AddBlockHandler( GetEntitySaveRestoreBlockHandler() );
+	engine->AddBlockHandler( GetPhysSaveRestoreBlockHandler() );
+	engine->AddBlockHandler( GetViewEffectsRestoreBlockHandler() );
 
 	//ClientWorldFactoryInit();
 
@@ -1209,9 +1209,9 @@ void CHLClient::Shutdown( void )
 	C_BaseAnimating::ShutdownBoneSetupThreadPool();
 	//ClientWorldFactoryShutdown();
 
-	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetViewEffectsRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetPhysSaveRestoreBlockHandler() );
-	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetEntitySaveRestoreBlockHandler() );
+	engine->RemoveBlockHandler( GetViewEffectsRestoreBlockHandler() );
+	engine->RemoveBlockHandler( GetPhysSaveRestoreBlockHandler() );
+	engine->RemoveBlockHandler( GetEntitySaveRestoreBlockHandler() );
 
 	ClientVoiceMgr_Shutdown();
 
@@ -2353,49 +2353,49 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 //	return ::SaveInit(size);
 //}
 
-void CHLClient::SaveWriteFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
-{
-	CSaveClient saveHelper( pSaveData );
-	saveHelper.WriteFields( pname, pBaseData, pMap, pFields, fieldCount );
-}
+//void CHLClient::SaveWriteFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
+//{
+//	CSaveClient saveHelper( pSaveData );
+//	saveHelper.WriteFields( pname, pBaseData, pMap, pFields, fieldCount );
+//}
 
-void CHLClient::SaveReadFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
-{
-	CRestoreClient restoreHelper( pSaveData );
-	restoreHelper.ReadFields( pname, pBaseData, pMap, pFields, fieldCount );
-}
+//void CHLClient::SaveReadFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
+//{
+//	CRestoreClient restoreHelper( pSaveData );
+//	restoreHelper.ReadFields( pname, pBaseData, pMap, pFields, fieldCount );
+//}
 
-void CHLClient::PreSave( CSaveRestoreData *s )
-{
-	g_pGameSaveRestoreBlockSet->PreSave( s );
-}
+//void CHLClient::PreSave( CSaveRestoreData *s )
+//{
+//	g_pGameSaveRestoreBlockSet->PreSave( s );
+//}
 
-void CHLClient::Save( CSaveRestoreData *s )
-{
-	CSaveClient saveHelper( s );
-	g_pGameSaveRestoreBlockSet->Save( &saveHelper );
-}
+//void CHLClient::Save( CSaveRestoreData *s )
+//{
+//	CSaveClient saveHelper( s );
+//	g_pGameSaveRestoreBlockSet->Save( &saveHelper );
+//}
 
-void CHLClient::WriteSaveHeaders( CSaveRestoreData *s )
-{
-	CSaveClient saveHelper( s );
-	g_pGameSaveRestoreBlockSet->WriteSaveHeaders( &saveHelper );
-	g_pGameSaveRestoreBlockSet->PostSave();
-}
+//void CHLClient::WriteSaveHeaders( CSaveRestoreData *s )
+//{
+//	CSaveClient saveHelper( s );
+//	g_pGameSaveRestoreBlockSet->WriteSaveHeaders( &saveHelper );
+//	g_pGameSaveRestoreBlockSet->PostSave();
+//}
 
-void CHLClient::ReadRestoreHeaders( CSaveRestoreData *s )
-{
-	CRestoreClient restoreHelper( s );
-	g_pGameSaveRestoreBlockSet->PreRestore();
-	g_pGameSaveRestoreBlockSet->ReadRestoreHeaders( &restoreHelper );
-}
+//void CHLClient::ReadRestoreHeaders( CSaveRestoreData *s )
+//{
+//	CRestoreClient restoreHelper( s );
+//	g_pGameSaveRestoreBlockSet->PreRestore();
+//	g_pGameSaveRestoreBlockSet->ReadRestoreHeaders( &restoreHelper );
+//}
 
-void CHLClient::Restore( CSaveRestoreData *s, bool b )
-{
-	CRestoreClient restore(s);
-	g_pGameSaveRestoreBlockSet->Restore( &restore, b );
-	g_pGameSaveRestoreBlockSet->PostRestore();
-}
+//void CHLClient::Restore( CSaveRestoreData *s, bool b )
+//{
+//	CRestoreClient restore(s);
+//	g_pGameSaveRestoreBlockSet->Restore( &restore, b );
+//	g_pGameSaveRestoreBlockSet->PostRestore();
+//}
 
 static CUtlVector<EHANDLE> g_RestoredEntities;
 

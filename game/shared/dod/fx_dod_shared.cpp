@@ -112,7 +112,7 @@ void TE_DODExplosion( IRecipientFilter &filter, float flDelay, const Vector &vec
 
 			if ( vEndPos.DistToSqr( pSound->m_vPos ) < 300*300 )
 			{
-				if ( Q_stricmp( pSound->m_SoundName, pSoundName ) == 0 )
+				if ( Q_stricmp(STRING( pSound->m_SoundName), pSoundName ) == 0 )
 					return;
 			}
 		}
@@ -122,7 +122,7 @@ void TE_DODExplosion( IRecipientFilter &filter, float flDelay, const Vector &vec
 		g_pSoundEmitterSystem->EmitSound( filter, NULL, pSoundName, &vEndPos );//C_BaseEntity::
 
 		int tail = g_GroupedSounds.AddToTail();
-		g_GroupedSounds[tail].m_SoundName = pSoundName;
+		g_GroupedSounds[tail].m_SoundName = MAKE_STRING(pSoundName);
 		g_GroupedSounds[tail].m_vPos = vEndPos;
 	}
 

@@ -1393,7 +1393,7 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 		GetAttachment( iAttachment, vecHead, angHeadAngles );	//attachment 1 is the head attachment
 	}
 
-	pEntity->SetModelName( modelinfo->GetModelName(model) );
+	pEntity->SetModelName(MAKE_STRING(modelinfo->GetModelName(model)) );
 	pEntity->SetAbsOrigin( vecHead );
 	pEntity->SetAbsAngles( angHeadAngles );
 	pEntity->SetPhysicsMode( PHYSICS_MULTIPLAYER_CLIENTSIDE );
