@@ -94,6 +94,8 @@ ConVar save_noxsave( "save_noxsave", "0" );
 ConVar save_screenshot( "save_screenshot", "1", 0, "0 = none, 1 = non-autosave, 2 = always" );
 
 ConVar save_spew( "save_spew", "0" );
+ConVar g_debug_transitions("g_debug_transitions", "0", FCVAR_NONE, "Set to 1 and restart the map to be warned if the map has no trigger_transition volumes. Set to 2 to see a dump of all entities & associated results during a transition.");
+
 
 #define SaveMsg if ( !save_spew.GetBool() ) ; else Msg
 
@@ -2705,7 +2707,7 @@ private:
 
 	bool					CalcSaveGameName( const char *pName, char *output, int outputStringLength );
 
-	CSaveRestoreData *		SaveGameStateInit( void );
+	//CSaveRestoreData *		SaveGameStateInit( void );
 	void 					SaveGameStateGlobals( CSaveRestoreData *pSaveData );
 	int						SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) char *name, int nameSize, OUT_Z_CAP(commentSize) char *comment, int commentSize ) OVERRIDE;
 	void					BuildRestoredIndexTranslationTable( char const *mapname, CSaveRestoreData *pSaveData, bool verbose );
@@ -3008,6 +3010,76 @@ int CSaveRestore::IsValidSave( void )
 
 static ConVar save_asyncdelay( "save_asyncdelay", "0", 0, "For testing, adds this many milliseconds of delay to the save operation." );
 
+CSaveRestoreData* SaveInit(int size, bool bServer)
+{
+	CSaveRestoreData* pSaveData;
+
+#if ( defined( DISABLE_DEBUG_HISTORY ) )//defined( CLIENT_DLL ) || 
+	if (size <= 0)
+		size = 2 * 1024 * 1024;		// Reserve 2048K for now, UNDONE: Shrink this after compressing strings
+#else
+	if (bServer) {
+		if (size <= 0)
+			size = 3 * 1024 * 1024;		// Reserve 3096K for now, UNDONE: Shrink this after compressing strings
+	}
+	else {
+		if (size <= 0)
+			size = 2 * 1024 * 1024;		// Reserve 2048K for now, UNDONE: Shrink this after compressing strings
+	}
+#endif
+
+	int numentities;
+
+	if (bServer) {
+		numentities = serverEntitylist->NumberOfEntities();
+	}
+	else {
+		numentities = entitylist->NumberOfEntities(false);//need check default value
+	}
+
+	void* pSaveMemory = SaveAllocMemory(sizeof(CSaveRestoreData) + (sizeof(entitytable_t) * numentities) + size, sizeof(char));
+	if (!pSaveMemory)
+	{
+		return NULL;
+	}
+
+	pSaveData = MakeSaveRestoreData(pSaveMemory);
+	pSaveData->Init((char*)(pSaveData + 1), size);	// skip the save structure
+
+	const int nTokens = 0xfff; // Assume a maximum of 4K-1 symbol table entries(each of some length)
+	pSaveMemory = SaveAllocMemory(nTokens, sizeof(char*));
+	if (!pSaveMemory)
+	{
+		SaveFreeMemory(pSaveMemory);
+		return NULL;
+	}
+
+	pSaveData->InitSymbolTable((char**)pSaveMemory, nTokens);
+
+	//---------------------------------
+
+	if (bServer) {
+		pSaveData->levelInfo.time = g_ServerGlobalVariables.curtime;	// Use DLL time
+	}
+	else {
+		pSaveData->levelInfo.time = g_ClientGlobalVariables.curtime;	// Use DLL time
+	}
+	pSaveData->levelInfo.vecLandmarkOffset = vec3_origin;
+	pSaveData->levelInfo.fUseLandmark = false;
+	pSaveData->levelInfo.connectionCount = 0;
+
+	//---------------------------------
+
+	if (bServer) {
+		g_ServerGlobalVariables.pSaveData = pSaveData;
+	}
+	else {
+		g_ClientGlobalVariables.pSaveData = pSaveData;
+	}
+
+	return pSaveData;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: save a game with the given name/comment
 //			note: Added S_ExtraUpdate calls to fix audio pops in autosaves
@@ -3104,7 +3176,7 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 
 	//---------------------------------
 			
-	pSaveData = serverGameDLL->SaveInit( 0 );
+	pSaveData = SaveInit( 0, true);
 
 	if ( !pSaveData )
 	{
@@ -3725,12 +3797,12 @@ void CSaveRestore::SaveGameStateGlobals( CSaveRestoreData *pSaveData )
 	}
 }
 
-CSaveRestoreData *CSaveRestore::SaveGameStateInit( void )
-{
-	CSaveRestoreData *pSaveData = serverGameDLL->SaveInit( 0 );
-	
-	return pSaveData;
-}
+//CSaveRestoreData *CSaveRestore::SaveGameStateInit( void )
+//{
+//	CSaveRestoreData *pSaveData = serverGameDLL->SaveInit( 0 );
+//	
+//	return pSaveData;
+//}
 
 bool CSaveRestore::SaveGameState( bool bTransition, CSaveRestoreData **ppReturnSaveData, bool bOpenContainer, bool bIsAutosaveOrDangerous )
 {
@@ -3755,7 +3827,7 @@ bool CSaveRestore::SaveGameState( bool bTransition, CSaveRestoreData **ppReturnS
 	}
 
 	S_ExtraUpdate();
-	CSaveRestoreData *pSaveData = SaveGameStateInit();
+	CSaveRestoreData* pSaveData = SaveInit(0, true);
 	if ( !pSaveData )
 	{
 		return false;
@@ -4327,7 +4399,7 @@ bool CSaveRestore::SaveClientState( const char *name )
 
 	clientsections_t	sections;
 
-	CSaveRestoreData *pSaveData = g_ClientDLL->SaveInit( 0 );
+	CSaveRestoreData *pSaveData = SaveInit( 0, false );
 	if ( !pSaveData )
 	{
 		return false;

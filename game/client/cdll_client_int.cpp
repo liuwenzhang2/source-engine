@@ -657,7 +657,7 @@ public:
 	virtual bool					DispatchUserMessage( int msg_type, bf_read &msg_data );
 
 	// Save/restore system hooks
-	virtual CSaveRestoreData  *SaveInit( int size );
+	//virtual CSaveRestoreData  *SaveInit( int size );
 	virtual void			SaveWriteFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int );
 	virtual void			SaveReadFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int );
 	virtual void			PreSave( CSaveRestoreData * );
@@ -2345,13 +2345,13 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 	}
 }
 
-CSaveRestoreData *SaveInit( int size );
+//CSaveRestoreData *SaveInit( int size );
 
 // Save/restore system hooks
-CSaveRestoreData  *CHLClient::SaveInit( int size )
-{
-	return ::SaveInit(size);
-}
+//CSaveRestoreData  *CHLClient::SaveInit( int size )
+//{
+//	return ::SaveInit(size);
+//}
 
 void CHLClient::SaveWriteFields( CSaveRestoreData *pSaveData, const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount )
 {

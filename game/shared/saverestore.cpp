@@ -3237,58 +3237,7 @@ int CEntitySaveRestoreBlockHandler::RestoreGlobalEntity( CBaseEntity *pEntity, C
 
 //-----------------------------------------------------------------------------
 
-CSaveRestoreData *SaveInit( int size )
-{
-	CSaveRestoreData	*pSaveData;
 
-#if ( defined( CLIENT_DLL ) || defined( DISABLE_DEBUG_HISTORY ) )
-	if ( size <= 0 )
-		size = 2*1024*1024;		// Reserve 2048K for now, UNDONE: Shrink this after compressing strings
-#else
-	if ( size <= 0 )
-		size = 3*1024*1024;		// Reserve 3096K for now, UNDONE: Shrink this after compressing strings
-#endif
-
-	int numentities;
-
-#if !defined( CLIENT_DLL )
-	numentities = gEntList.NumberOfEntities();
-#else
-	numentities = ClientEntityList().NumberOfEntities();
-#endif
-
-	void *pSaveMemory = engine->SaveAllocMemory( sizeof(CSaveRestoreData) + (sizeof(entitytable_t) * numentities) + size, sizeof(char) );
-	if ( !pSaveMemory )
-	{
-		return NULL;
-	}
-
-	pSaveData = MakeSaveRestoreData( pSaveMemory );
-	pSaveData->Init( (char *)(pSaveData + 1), size );	// skip the save structure
-	
-	const int nTokens = 0xfff; // Assume a maximum of 4K-1 symbol table entries(each of some length)
-	pSaveMemory = engine->SaveAllocMemory( nTokens, sizeof( char * ) );
-	if ( !pSaveMemory )
-	{
-		engine->SaveFreeMemory( pSaveMemory );
-		return NULL;
-	}
-
-	pSaveData->InitSymbolTable( (char **)pSaveMemory, nTokens );
-
-	//---------------------------------
-	
-	pSaveData->levelInfo.time = gpGlobals->curtime;	// Use DLL time
-	pSaveData->levelInfo.vecLandmarkOffset = vec3_origin;
-	pSaveData->levelInfo.fUseLandmark = false;
-	pSaveData->levelInfo.connectionCount = 0;
-		
-	//---------------------------------
-	
-	gpGlobals->pSaveData = pSaveData;
-
-	return pSaveData;
-}
 
 
 

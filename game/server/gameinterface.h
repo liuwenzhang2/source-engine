@@ -82,7 +82,7 @@ public:
 	virtual void			CreateNetworkStringTables( void ) OVERRIDE;
 	
 	// Save/restore system hooks
-	virtual CSaveRestoreData  *SaveInit( int size ) OVERRIDE;
+	//virtual CSaveRestoreData  *SaveInit( int size ) OVERRIDE;
 	virtual void			SaveWriteFields( CSaveRestoreData *, char const* , void *, datamap_t *, typedescription_t *, int ) OVERRIDE;
 	virtual void			SaveReadFields( CSaveRestoreData *, char const* , void *, datamap_t *, typedescription_t *, int ) OVERRIDE;
 	virtual void			SaveGlobalState( CSaveRestoreData * ) OVERRIDE;

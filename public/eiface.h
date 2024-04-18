@@ -540,7 +540,7 @@ public:
 	virtual void			CreateNetworkStringTables( void ) = 0;
 	
 	// Save/restore system hooks
-	virtual CSaveRestoreData  *SaveInit( int size ) = 0;
+	//virtual CSaveRestoreData  *SaveInit( int size ) = 0;
 	virtual void			SaveWriteFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
 	virtual void			SaveReadFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
 	virtual void			SaveGlobalState( CSaveRestoreData * ) = 0;

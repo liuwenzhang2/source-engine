@@ -21,7 +21,7 @@ extern void SaveReadFields( CSaveRestoreData *pSaveData, const char *pname, void
 extern void SaveGlobalState( CSaveRestoreData *pSaveData );
 extern void RestoreGlobalState( CSaveRestoreData *pSaveData );
 extern void ResetGlobalState( void );
-extern CSaveRestoreData *SaveInit( int size  );
+//extern CSaveRestoreData *SaveInit( int size  );
 extern int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask );
 extern void ClearEntities( void );
 extern void FreeContainingEntity( int ed );

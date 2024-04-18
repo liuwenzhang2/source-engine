@@ -699,7 +699,7 @@ public:
 	virtual bool			DispatchUserMessage( int msg_type, bf_read &msg_data ) = 0;
 
 	// Save/restore system hooks
-	virtual CSaveRestoreData  *SaveInit( int size ) = 0;
+	//virtual CSaveRestoreData  *SaveInit( int size ) = 0;
 	virtual void			SaveWriteFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
 	virtual void			SaveReadFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
 	virtual void			PreSave( CSaveRestoreData * ) = 0;

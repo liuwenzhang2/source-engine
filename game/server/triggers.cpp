@@ -42,7 +42,6 @@
 #include "tier0/memdbgon.h"
 
 #define DEBUG_TRANSITIONS_VERBOSE	2
-ConVar g_debug_transitions( "g_debug_transitions", "0", FCVAR_NONE, "Set to 1 and restart the map to be warned if the map has no trigger_transition volumes. Set to 2 to see a dump of all entities & associated results during a transition." );
 
 // Global list of triggers that care about weapon fire
 // Doesn't need saving, the triggers re-add themselves on restore.
@@ -1424,6 +1423,7 @@ void CChangeLevel::Activate( void )
 					"This will break level transitions!\n", m_szMapName ); 
 		}
 
+		ConVarRef g_debug_transitions("g_debug_transitions");
 		if ( g_debug_transitions.GetInt() )
 		{
 			if ( !gEntList.FindEntityByClassname( NULL, "trigger_transition" ) )
@@ -1623,7 +1623,7 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 
 	NotifyEntitiesOutOfTransition();
 
-
+	ConVarRef g_debug_transitions("g_debug_transitions");
 ////	Msg( "Level touches %d levels\n", ChangeList( levels, 16 ) );
 	if ( g_debug_transitions.GetInt() )
 	{
@@ -1638,13 +1638,14 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 	else
 	{
 		// Build a change list so we can see what would be transitioning
-		CSaveRestoreData *pSaveData = SaveInit( 0 );
-		if ( pSaveData )
-		{
-			g_pGameSaveRestoreBlockSet->PreSave( pSaveData );
-			pSaveData->levelInfo.connectionCount = BuildChangeList( pSaveData->levelInfo.levelList, MAX_LEVEL_CONNECTIONS );
-			g_pGameSaveRestoreBlockSet->PostSave();
-		}
+		//CSaveRestoreData *pSaveData = SaveInit( 0 );
+		//if ( pSaveData )
+		//{
+		//	g_pGameSaveRestoreBlockSet->PreSave( pSaveData );
+		//	pSaveData->levelInfo.connectionCount = BuildChangeList( pSaveData->levelInfo.levelList, MAX_LEVEL_CONNECTIONS );
+		//	g_pGameSaveRestoreBlockSet->PostSave();
+		//}
+		engine->ChangeLevel(st_szNextMap, st_szNextSpot);
 
 		SetTouch( NULL );
 	}
@@ -1938,6 +1939,7 @@ int CChangeLevel::BuildEntityTransitionList( CBaseEntity *pLandmarkEntity, const
 {
 	int iEntity = 0;
 
+	ConVarRef g_debug_transitions("g_debug_transitions");
 	// Only show debug for the transition to the level we're going to
 	if ( g_debug_transitions.GetInt() && pLandmarkEntity->NameMatches(st_szNextSpot) )
 	{
@@ -2022,6 +2024,7 @@ int CChangeLevel::AddDependentEntities( int nCount, CBaseEntity **ppEntList, int
 
 	IEntitySaveUtils *pSaveUtils = GetEntitySaveUtils();
 
+	ConVarRef g_debug_transitions("g_debug_transitions");
 	// Iterate over entities whose dependencies we've not yet processed
 	// NOTE: nCount will change value during this loop in AddEntityToTransitionList
 	for ( i = 0; i < nCount; ++i )

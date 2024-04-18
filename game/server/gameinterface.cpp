@@ -1464,10 +1464,10 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 	g_VguiScreenStringOps.Init( g_pStringTableVguiScreen );
 }
 
-CSaveRestoreData *CServerGameDLL::SaveInit( int size )
-{
-	return ::SaveInit(size);
-}
+//CSaveRestoreData *CServerGameDLL::SaveInit( int size )
+//{
+//	return ::SaveInit(size);
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Saves data from a struct into a saverestore object, to be saved to disk

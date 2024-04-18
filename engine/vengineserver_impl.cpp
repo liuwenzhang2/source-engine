@@ -61,7 +61,10 @@ void SV_DetermineMulticastRecipients( bool usepas, const Vector& origin, CBitVec
 
 int MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose, int maxcount, int maxitemlength, char maplist[][ 64 ] );
 
+CSaveRestoreData* SaveInit(int size, bool bServer);
+
 extern CNetworkStringTableContainer *networkStringTableContainerServer;
+extern ConVar g_debug_transitions;
 
 //CSharedEdictChangeInfo g_SharedEdictChangeInfo;
 //CSharedEdictChangeInfo *g_pSharedChangeInfo = &g_SharedEdictChangeInfo;
@@ -290,6 +293,28 @@ public:
 
 	virtual void ChangeLevel( const char* s1, const char* s2)
 	{
+
+		if (g_debug_transitions.GetInt() == 0)
+		{
+			//normal
+		}
+		else
+		{
+			// Build a change list so we can see what would be transitioning
+			CSaveRestoreData* pSaveData = SaveInit(0 , true);
+			if (pSaveData)
+			{
+				//g_pGameSaveRestoreBlockSet->PreSave(pSaveData);
+				//pSaveData->levelInfo.connectionCount = BuildChangeList(pSaveData->levelInfo.levelList, MAX_LEVEL_CONNECTIONS);
+				//g_pGameSaveRestoreBlockSet->PostSave();
+				serverGameDLL->PreSave(pSaveData);
+				serverGameDLL->BuildAdjacentMapList();
+				serverGameDLL->WriteSaveHeaders(pSaveData);
+			}
+
+		}
+
+
 		if ( !s1 )
 		{
 			Sys_Error( "CVEngineServer::Changelevel with NULL s1\n" );

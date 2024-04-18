@@ -39,7 +39,7 @@ ConVar ai_new_aiming( "ai_new_aiming", "1" );
 
 #define GetReadinessUse()	ai_use_readiness.GetInt()
 
-extern ConVar g_debug_transitions;
+//extern ConVar g_debug_transitions;
 
 #define PLAYERCOMPANION_TRANSITION_SEARCH_DISTANCE		(100*12)
 
@@ -3125,6 +3125,8 @@ void CNPC_PlayerCompanion::InputOutsideTransition( inputdata_t &inputdata )
 
 	bool bMadeIt = false;
 	Vector teleportLocation;
+
+	ConVarRef g_debug_transitions("g_debug_transitions");
 
 	CAI_Hint *pHint = CAI_HintManager::FindHint( this, HINT_PLAYER_SQUAD_TRANSITON_POINT, bits_HINT_NODE_NEAREST, PLAYERCOMPANION_TRANSITION_SEARCH_DISTANCE, &playerPos );
 	while ( pHint )
