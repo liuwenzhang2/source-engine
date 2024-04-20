@@ -65,7 +65,9 @@ CSaveRestoreData* SaveInit(int size, bool bServer);
 
 extern CNetworkStringTableContainer *networkStringTableContainerServer;
 extern ConVar g_debug_transitions;
+#if !defined(SWDS)
 extern ISaveRestoreBlockSet* g_pServerGameSaveRestoreBlockSet;
+#endif
 
 //CSharedEdictChangeInfo g_SharedEdictChangeInfo;
 //CSharedEdictChangeInfo *g_pSharedChangeInfo = &g_SharedEdictChangeInfo;
@@ -294,7 +296,7 @@ public:
 
 	virtual void ChangeLevel( const char* s1, const char* s2)
 	{
-
+#if !defined(SWDS)
 		if (g_debug_transitions.GetInt() == 0)
 		{
 			//normal
@@ -319,6 +321,7 @@ public:
 			}
 
 		}
+#endif
 
 
 		if ( !s1 )
@@ -920,15 +923,21 @@ public:
 
 
 	void AddBlockHandler(ISaveRestoreBlockHandler* pHandler) {
+#if !defined(SWDS)
 		g_pServerGameSaveRestoreBlockSet->AddBlockHandler(pHandler);
+#endif
 	}
 
 	void RemoveBlockHandler(ISaveRestoreBlockHandler* pHandler) {
+#if !defined(SWDS)
 		g_pServerGameSaveRestoreBlockSet->RemoveBlockHandler(pHandler);
+#endif
 	}
 
 	void CallBlockHandlerRestore(ISaveRestoreBlockHandler* pHandler, int baseFilePos, IRestore* pRestore, bool fCreatePlayers) {
+#if !defined(SWDS)
 		g_pServerGameSaveRestoreBlockSet->CallBlockHandlerRestore(pHandler, baseFilePos, pRestore, fCreatePlayers);
+#endif
 	}
 
 	

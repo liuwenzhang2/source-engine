@@ -80,7 +80,9 @@
 
 extern CNetworkStringTableContainer *networkStringTableContainerServer;
 extern CNetworkStringTableContainer *networkStringTableContainerClient;
+#if !defined(SWDS)
 extern ISaveRestoreBlockSet* g_pServerGameSaveRestoreBlockSet;
+#endif
 static void OnHibernateWhenEmptyChanged( IConVar *var, const char *pOldValue, float flOldValue );
 ConVar sv_hibernate_when_empty( "sv_hibernate_when_empty", "1", 0, "Puts the server into extremely low CPU usage mode when no clients connected", OnHibernateWhenEmptyChanged );
 //ConVar sv_hibernate_ms( "sv_hibernate_ms", "20", 0, "# of milliseconds to sleep per frame while hibernating" );
@@ -911,7 +913,9 @@ void SV_InitGameDLL( void )
 
 	COM_TimestampedLog( "serverGameDLL->DLLInit" );
 
+#if !defined(SWDS)
 	g_pServerGameSaveRestoreBlockSet->AddBlockHandler(serverGameDLL);
+#endif
 	// Tell the game DLL to start up
 	if(!serverGameDLL->DLLInit(g_AppSystemFactory, g_AppSystemFactory, g_AppSystemFactory, &g_ServerGlobalVariables))
 	{
@@ -985,7 +989,9 @@ void SV_ShutdownGameDLL( void )
 	SV_TermSendTables( serverGameDLL->GetAllServerClasses() );
 	g_pServerPluginHandler->UnloadPlugins();
 	serverGameDLL->DLLShutdown();
+#if !defined(SWDS)
 	g_pServerGameSaveRestoreBlockSet->RemoveBlockHandler(serverGameDLL);
+#endif
 
 	UnloadEntityDLLs();
 
