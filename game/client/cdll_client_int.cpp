@@ -130,6 +130,7 @@
 #include "haptics/ihaptics.h"
 #include "haptics/haptic_utils.h"
 #include "haptics/haptic_msgs.h"
+#include "model_types.h"
 
 #if defined( TF_CLIENT_DLL )
 #include "abuse_report.h"
@@ -319,7 +320,7 @@ public:
 	int					*m_pStoredEvent;
 };
 
-ISaveRestoreBlockHandler *GetEntitySaveRestoreBlockHandler();
+//ISaveRestoreBlockHandler *GetEntitySaveRestoreBlockHandler();
 ISaveRestoreBlockHandler *GetViewEffectsRestoreBlockHandler();
 
 CUtlLinkedList<CDataChangedEvent, unsigned short> g_DataChangedEvents;
@@ -346,6 +347,17 @@ class IClientPurchaseInterfaceV2 *g_pClientPurchaseInterface = (class IClientPur
 
 static ConVar *g_pcv_ThreadMode = NULL;
 static ConVar* g_pClosecaption = NULL;
+
+static CUtlVector<EHANDLE> g_RestoredEntities;
+
+void AddRestoredEntity(C_BaseEntity* pEntity)
+{
+	if (!pEntity)
+		return;
+
+	g_RestoredEntities.AddToTail(EHANDLE(pEntity));
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: interface for gameui to modify voice bans
 //-----------------------------------------------------------------------------
@@ -599,6 +611,18 @@ class CHLClient : public IBaseClientDLL
 public:
 	CHLClient();
 
+	virtual const char*				GetBlockName();
+
+	virtual void					PreSave(CSaveRestoreData* pSaveData);
+	virtual void					Save(ISave* pSave);
+	virtual void					WriteSaveHeaders(ISave* pSave);
+	virtual void					PostSave();
+
+	virtual void					PreRestore();
+	virtual void					ReadRestoreHeaders(IRestore* pRestore);
+	virtual void					Restore(IRestore* pRestore, bool createPlayers);
+	virtual void					PostRestore();
+
 	virtual int						Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physicsFactory, CGlobalVarsBase *pGlobals );
 
 	virtual void					PostInit();
@@ -763,6 +787,11 @@ private:
 	void UncacheAllMaterials( );
 	void ResetStringTablePointers();
 
+	bool SaveInitEntities(CSaveRestoreData* pSaveData);
+	bool DoRestoreEntity(CBaseEntity* pEntity, IRestore* pRestore);
+	Vector ModelSpaceLandmark(int modelIndex);
+	int RestoreEntity(CBaseEntity* pEntity, IRestore* pRestore, entitytable_t* pEntInfo);
+
 	CUtlVector< IMaterial * > m_CachedMaterials;
 };
 
@@ -882,6 +911,416 @@ extern IGameSystem *ViewportClientSystem();
 
 //-----------------------------------------------------------------------------
 ISourceVirtualReality *g_pSourceVR = NULL;
+
+
+//-----------------------------------------------------------------------------
+// Implementation of the block handler for save/restore of entities
+//-----------------------------------------------------------------------------
+const char* CHLClient::GetBlockName()
+{
+	return "Entities";
+}
+
+//---------------------------------
+
+void CHLClient::PreSave(CSaveRestoreData* pSaveData)
+{
+	MDLCACHE_CRITICAL_SECTION();
+	IGameSystem::OnSaveAllSystems();
+
+	//m_EntitySaveUtils.PreSave();
+
+	// Allow the entities to do some work
+	CBaseEntity* pEnt = NULL;
+#if !defined( CLIENT_DLL )
+	while ((pEnt = gEntList.NextEnt(pEnt)) != NULL)
+	{
+		pEnt->OnSave(&m_EntitySaveUtils);
+	}
+#else
+	// Do this because it'll force entities to figure out their origins, and that requires
+	// SetupBones in the case of aiments.
+	{
+		C_BaseAnimating::AutoAllowBoneAccess boneaccess(true, true);
+
+		int last = ClientEntityList().GetHighestEntityIndex();
+		ClientEntityHandle_t iter = ClientEntityList().FirstHandle();
+
+		for (int e = 0; e <= last; e++)
+		{
+			pEnt = ClientEntityList().GetBaseEntity(e);
+
+			if (!pEnt)
+				continue;
+
+			pEnt->OnSave();
+		}
+
+		while (iter != ClientEntityList().InvalidHandle())
+		{
+			pEnt = ClientEntityList().GetBaseEntityFromHandle(iter);
+
+			if (pEnt && pEnt->ObjectCaps() & FCAP_SAVE_NON_NETWORKABLE)
+			{
+				pEnt->OnSave();
+			}
+
+			iter = ClientEntityList().NextHandle(iter);
+		}
+	}
+#endif
+	SaveInitEntities(pSaveData);
+}
+
+//---------------------------------
+
+CBaseEntity* EntityFromHandle(CBaseHandle& handle) {
+#ifdef GAME_DLL
+	return (CBaseEntity*)gEntList.GetServerEntityFromHandle(handle);
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+	return (CBaseEntity*)ClientEntityList().GetClientEntityFromHandle(handle);
+#endif // CLIENT_DLL
+}
+
+
+void CHLClient::Save(ISave* pSave)
+{
+	CGameSaveRestoreInfo* pSaveData = pSave->GetGameSaveRestoreInfo();
+
+	// write entity list that was previously built by SaveInitEntities()
+	for (int i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		entitytable_t* pEntInfo = pSaveData->GetEntityInfo(i);
+		pEntInfo->location = pSave->GetWritePos();
+		pEntInfo->size = 0;
+
+		CBaseEntity* pEnt = EntityFromHandle(pEntInfo->hEnt);
+		if (pEnt && !(pEnt->ObjectCaps() & FCAP_DONT_SAVE))
+		{
+			MDLCACHE_CRITICAL_SECTION();
+#if !defined( CLIENT_DLL )
+			AssertMsg(pEnt->entindex() == -1 || (pEnt->m_iClassname != NULL_STRING &&
+				(STRING(pEnt->m_iClassname)[0] != 0) &&
+				FStrEq(STRING(pEnt->m_iClassname), pEnt->GetClassname())),
+				"Saving entity with invalid classname");
+#endif
+
+			pSaveData->SetCurrentEntityContext(pEnt);
+			pEnt->Save(*pSave);
+			pSaveData->SetCurrentEntityContext(NULL);
+
+			pEntInfo->size = pSave->GetWritePos() - pEntInfo->location;	// Size of entity block is data size written to block
+
+			pEntInfo->classname = pEnt->m_iClassname;	// Remember entity class for respawn
+
+#if !defined( CLIENT_DLL )
+			pEntInfo->globalname = pEnt->m_iGlobalname; // remember global name
+			pEntInfo->landmarkModelSpace = ModelSpaceLandmark(pEnt->GetModelIndex());
+			int nEntIndex = pEnt->IsNetworkable() ? pEnt->entindex() : -1;
+			bool bIsPlayer = ((nEntIndex >= 1) && (nEntIndex <= gpGlobals->maxClients)) ? true : false;
+			if (bIsPlayer)
+			{
+				pEntInfo->flags |= FENTTABLE_PLAYER;
+			}
+#endif
+		}
+	}
+}
+
+//---------------------------------
+
+void CHLClient::WriteSaveHeaders(ISave* pSave)
+{
+	CGameSaveRestoreInfo* pSaveData = pSave->GetGameSaveRestoreInfo();
+
+	int nEntities = pSaveData->NumEntities();
+	pSave->WriteInt(&nEntities);
+
+	for (int i = 0; i < pSaveData->NumEntities(); i++)
+		pSave->WriteFields("ETABLE", pSaveData->GetEntityInfo(i), NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
+}
+
+//---------------------------------
+
+void CHLClient::PostSave()
+{
+	//m_EntitySaveUtils.PostSave();
+}
+
+//---------------------------------
+
+void CHLClient::PreRestore()
+{
+}
+
+//---------------------------------
+
+void CHLClient::ReadRestoreHeaders(IRestore* pRestore)
+{
+	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
+
+	int nEntities;
+	pRestore->ReadInt(&nEntities);
+
+	entitytable_t* pEntityTable = (entitytable_t*)engine->SaveAllocMemory((sizeof(entitytable_t) * nEntities), sizeof(char));
+	if (!pEntityTable)
+	{
+		return;
+	}
+
+	pSaveData->InitEntityTable(pEntityTable, nEntities);
+
+	for (int i = 0; i < pSaveData->NumEntities(); i++) {
+		if (i == 165) {
+			int aaa = 0;
+		}
+		entitytable_t* pEntityTable = pSaveData->GetEntityInfo(i);
+		pRestore->ReadFields("ETABLE", pEntityTable, NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
+		pEntityTable = pSaveData->GetEntityInfo(i);
+	}
+}
+
+//---------------------------------
+
+void CHLClient::Restore(IRestore* pRestore, bool createPlayers)
+{
+	entitytable_t* pEntInfo;
+	CBaseEntity* pent;
+
+	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
+
+	// Create entity list
+	int i;
+	bool restoredWorld = false;
+
+	for (i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		pEntInfo = pSaveData->GetEntityInfo(i);
+		pent = ClientEntityList().GetBaseEntity(pEntInfo->restoreentityindex);
+		pEntInfo->hEnt = pent;
+	}
+
+	// Blast saved data into entities
+	for (i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		pEntInfo = pSaveData->GetEntityInfo(i);
+
+		bool bRestoredCorrectly = false;
+		// FIXME, need to translate save spot to real index here using lookup table transmitted from server
+		//Assert( !"Need translation still" );
+		if (pEntInfo->restoreentityindex >= 0)
+		{
+			if (pEntInfo->restoreentityindex == 0)
+			{
+				Assert(!restoredWorld);
+				restoredWorld = true;
+			}
+
+			pent = ClientEntityList().GetBaseEntity(pEntInfo->restoreentityindex);
+			pRestore->SetReadPos(pEntInfo->location);
+			if (pent)
+			{
+				if (RestoreEntity(pent, pRestore, pEntInfo) >= 0)
+				{
+					// Call the OnRestore method
+					AddRestoredEntity(pent);
+					bRestoredCorrectly = true;
+				}
+			}
+		}
+		// BUGBUG: JAY: Disable ragdolls across transitions until PVS/solid check & client entity patch file are implemented
+		else if (!pSaveData->levelInfo.fUseLandmark)
+		{
+			if (pEntInfo->classname != NULL_STRING)
+			{
+				pent = cl_entitylist->CreateEntityByName(STRING(pEntInfo->classname));
+				pent->InitializeAsClientEntity(NULL, RENDER_GROUP_OPAQUE_ENTITY);
+
+				pRestore->SetReadPos(pEntInfo->location);
+
+				if (pent)
+				{
+					if (RestoreEntity(pent, pRestore, pEntInfo) >= 0)
+					{
+						pEntInfo->hEnt = pent;
+						AddRestoredEntity(pent);
+						bRestoredCorrectly = true;
+					}
+				}
+			}
+		}
+
+		if (!bRestoredCorrectly)
+		{
+			pEntInfo->hEnt = NULL;
+			pEntInfo->restoreentityindex = -1;
+		}
+	}
+
+	// Note, server does this after local player connects fully
+	IGameSystem::OnRestoreAllSystems();
+
+	// Tell hud elements to modify behavior based on game restoration, if applicable
+	gHUD.OnRestore();
+}
+
+void CHLClient::PostRestore()
+{
+}
+
+void SaveEntityOnTable(CBaseEntity* pEntity, CSaveRestoreData* pSaveData, int& iSlot)
+{
+	entitytable_t* pEntInfo = pSaveData->GetEntityInfo(iSlot);
+	pEntInfo->id = iSlot;
+#if !defined( CLIENT_DLL )
+	pEntInfo->edictindex = pEntity->RequiredEdictIndex();
+#else
+	pEntInfo->edictindex = -1;
+#endif
+	pEntInfo->modelname = pEntity->GetModelName();
+	pEntInfo->restoreentityindex = -1;
+	pEntInfo->saveentityindex = pEntity && pEntity->IsNetworkable() ? pEntity->entindex() : -1;
+	pEntInfo->hEnt = pEntity->GetRefEHandle();
+	pEntInfo->flags = 0;
+	pEntInfo->location = 0;
+	pEntInfo->size = 0;
+	pEntInfo->classname = NULL_STRING;
+
+	iSlot++;
+}
+
+
+//---------------------------------
+
+bool CHLClient::SaveInitEntities(CSaveRestoreData* pSaveData)
+{
+	int number_of_entities;
+
+	number_of_entities = ClientEntityList().NumberOfEntities(true);
+
+	entitytable_t* pEntityTable = (entitytable_t*)engine->SaveAllocMemory((sizeof(entitytable_t) * number_of_entities), sizeof(char));
+	if (!pEntityTable)
+		return false;
+
+	pSaveData->InitEntityTable(pEntityTable, number_of_entities);
+
+	// build the table of entities
+	// this is used to turn pointers into savable indices
+	// build up ID numbers for each entity, for use in pointer conversions
+	// if an entity requires a certain edict number upon restore, save that as well
+	CBaseEntity* pEnt = NULL;
+	int i = 0;
+
+	int last = ClientEntityList().GetHighestEntityIndex();
+
+	for (int e = 0; e <= last; e++)
+	{
+		pEnt = ClientEntityList().GetBaseEntity(e);
+		if (!pEnt)
+			continue;
+		SaveEntityOnTable(pEnt, pSaveData, i);
+	}
+
+#if defined( CLIENT_DLL )
+	ClientEntityHandle_t iter = ClientEntityList().FirstHandle();
+
+	while (iter != ClientEntityList().InvalidHandle())
+	{
+		pEnt = ClientEntityList().GetBaseEntityFromHandle(iter);
+
+		if (pEnt && pEnt->ObjectCaps() & FCAP_SAVE_NON_NETWORKABLE)
+		{
+			SaveEntityOnTable(pEnt, pSaveData, i);
+		}
+
+		iter = ClientEntityList().NextHandle(iter);
+	}
+#endif
+
+	//pSaveData->BuildEntityHash();
+
+	Assert(i == pSaveData->NumEntities());
+	return (i == pSaveData->NumEntities());
+	}
+
+//---------------------------------
+
+bool CHLClient::DoRestoreEntity(CBaseEntity * pEntity, IRestore * pRestore)
+{
+	MDLCACHE_CRITICAL_SECTION();
+
+	EHANDLE hEntity;
+
+	hEntity = pEntity;
+
+	pRestore->GetGameSaveRestoreInfo()->SetCurrentEntityContext(pEntity);
+	pEntity->Restore(*pRestore);
+	pRestore->GetGameSaveRestoreInfo()->SetCurrentEntityContext(NULL);
+
+#if !defined( CLIENT_DLL )
+	if (pEntity->ObjectCaps() & FCAP_MUST_SPAWN)
+	{
+		pEntity->Spawn();
+	}
+	else
+	{
+		pEntity->Precache();
+	}
+#endif
+
+	// Above calls may have resulted in self destruction
+	return (hEntity != NULL);
+}
+
+//---------------------------------
+// Get a reference position in model space to compute
+// changes in model space for global brush entities (designer models them in different coords!)
+Vector CHLClient::ModelSpaceLandmark(int modelIndex)
+{
+	const model_t* pModel = modelinfo->GetModel(modelIndex);
+	if (modelinfo->GetModelType(pModel) != mod_brush)
+		return vec3_origin;
+
+	Vector mins, maxs;
+	modelinfo->GetModelBounds(pModel, mins, maxs);
+	return mins;
+}
+
+
+int CHLClient::RestoreEntity(CBaseEntity * pEntity, IRestore * pRestore, entitytable_t * pEntInfo)
+{
+	if (!DoRestoreEntity(pEntity, pRestore))
+		return 0;
+
+#if !defined( CLIENT_DLL )		
+	if (pEntity->m_iGlobalname != NULL_STRING)
+	{
+		int globalIndex = GlobalEntity_GetIndex(pEntity->m_iGlobalname);
+		if (globalIndex >= 0)
+		{
+			// Already dead? delete
+			if (GlobalEntity_GetState(globalIndex) == GLOBAL_DEAD)
+				return -1;
+			else if (!FStrEq(STRING(gpGlobals->mapname), GlobalEntity_GetMap(globalIndex)))
+			{
+				pEntity->MakeDormant();	// Hasn't been moved to this level yet, wait but stay alive
+			}
+			// In this level & not dead, continue on as normal
+		}
+		else
+		{
+			Warning("Global Entity %s (%s) not in table!!!\n", STRING(pEntity->m_iGlobalname), STRING(pEntity->m_iClassname));
+			// Spawned entities default to 'On'
+			GlobalEntity_Add(pEntity->m_iGlobalname, gpGlobals->mapname, GLOBAL_ON);
+		}
+	}
+#endif
+
+	return 0;
+}
+
+
 
 // Purpose: Called when the DLL is first loaded.
 // Input  : engineFactory - 
@@ -1105,7 +1544,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	if ( !PhysicsDLLInit( physicsFactory ) )
 		return false;
 
-	engine->AddBlockHandler( GetEntitySaveRestoreBlockHandler() );
+	//engine->AddBlockHandler( GetEntitySaveRestoreBlockHandler() );
 	engine->AddBlockHandler( GetPhysSaveRestoreBlockHandler() );
 	engine->AddBlockHandler( GetViewEffectsRestoreBlockHandler() );
 
@@ -1211,7 +1650,7 @@ void CHLClient::Shutdown( void )
 
 	engine->RemoveBlockHandler( GetViewEffectsRestoreBlockHandler() );
 	engine->RemoveBlockHandler( GetPhysSaveRestoreBlockHandler() );
-	engine->RemoveBlockHandler( GetEntitySaveRestoreBlockHandler() );
+	//engine->RemoveBlockHandler( GetEntitySaveRestoreBlockHandler() );
 
 	ClientVoiceMgr_Shutdown();
 
@@ -2397,15 +2836,6 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 //	g_pGameSaveRestoreBlockSet->PostRestore();
 //}
 
-static CUtlVector<EHANDLE> g_RestoredEntities;
-
-void AddRestoredEntity( C_BaseEntity *pEntity )
-{
-	if ( !pEntity )
-		return;
-
-	g_RestoredEntities.AddToTail( EHANDLE(pEntity) );
-}
 
 void CHLClient::DispatchOnRestore()
 {

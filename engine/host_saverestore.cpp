@@ -2669,7 +2669,7 @@ public:
 	void AddBlockHandler(ISaveRestoreBlockHandler* pHandler)
 	{
 		// Grody, but... while this class is still isolated in saverestore.cpp, this seems like a fine time to assert:
-		AssertMsg(pHandler == &g_EntitySaveRestoreBlockHandler || (m_Handlers.Count() >= 1 && m_Handlers[0] == &g_EntitySaveRestoreBlockHandler), "Expected entity save load to always be first");
+		//AssertMsg(pHandler == &g_EntitySaveRestoreBlockHandler || (m_Handlers.Count() >= 1 && m_Handlers[0] == &g_EntitySaveRestoreBlockHandler), "Expected entity save load to always be first");
 
 		Assert(pHandler != this);
 		m_Handlers.AddToTail(pHandler);
@@ -2913,7 +2913,7 @@ public:
 	void					LoadAdjacentEnts( const char *pOldLevel, const char *pLandmarkName );
 	const char				*FindRecentSave( char *pNameBuf, int nameBufLen );
 	void					ForgetRecentSave( void );
-	int						SaveGameSlot( const char *pSaveName, const char *pSaveComment, bool onlyThisLevel, bool bSetMostRecent, const char *pszDestMap = NULL, const char *pszLandmark = NULL );
+	int						SaveGameSlot( const char *pSaveName, const char *pSaveComment, bool onlyThisLevel, bool bSetMostRecent);//, const char *pszDestMap = NULL, const char *pszLandmark = NULL 
 	bool					SaveGameState( bool bTransition, CSaveRestoreData ** = NULL, bool bOpenContainer = true, bool bIsAutosaveOrDangerous = false );
 	void					RestoreClientState( char const *fileName, bool adjacent );
 	void					RestoreAdjacenClientState( char const *map );
@@ -3332,7 +3332,7 @@ CSaveRestoreData* SaveInit(int size, bool bServer)
 // Purpose: save a game with the given name/comment
 //			note: Added S_ExtraUpdate calls to fix audio pops in autosaves
 //-----------------------------------------------------------------------------
-int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment, bool onlyThisLevel, bool bSetMostRecent, const char *pszDestMap, const char *pszLandmark )
+int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment, bool onlyThisLevel, bool bSetMostRecent)//, const char *pszDestMap, const char *pszLandmark 
 {
 	if ( save_disable.GetBool()  )
 	{
@@ -3415,7 +3415,7 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	}
 
 	S_ExtraUpdate();
-	if (!SaveGameState( (pszDestMap != NULL ), NULL, false, ( bIsAutosave || bIsAutosaveDangerous )  ) )
+	if (!SaveGameState( false, NULL, false, ( bIsAutosave || bIsAutosaveDangerous )  ) )
 	{
 		m_szSaveGameName[ 0 ] = 0;
 		return 0;	
@@ -3435,13 +3435,13 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	Q_FixSlashes( hlPath );
 	Q_strncpy( gameHeader.comment, pSaveComment, sizeof( gameHeader.comment ) );
 
-	if ( pszDestMap && pszLandmark && *pszDestMap && *pszLandmark )
-	{
-		Q_strncpy( gameHeader.mapName, pszDestMap, sizeof( gameHeader.mapName ) );
-		Q_strncpy( gameHeader.originMapName, sv.GetMapName(), sizeof( gameHeader.originMapName ) );
-		Q_strncpy( gameHeader.landmark, pszLandmark, sizeof( gameHeader.landmark ) );
-	}
-	else
+	//if ( pszDestMap && pszLandmark && *pszDestMap && *pszLandmark )
+	//{
+	//	Q_strncpy( gameHeader.mapName, pszDestMap, sizeof( gameHeader.mapName ) );
+	//	Q_strncpy( gameHeader.originMapName, sv.GetMapName(), sizeof( gameHeader.originMapName ) );
+	//	Q_strncpy( gameHeader.landmark, pszLandmark, sizeof( gameHeader.landmark ) );
+	//}
+	//else
 	{
 		Q_strncpy( gameHeader.mapName, sv.GetMapName(), sizeof( gameHeader.mapName ) );
 		gameHeader.originMapName[0] = 0;
@@ -3878,9 +3878,9 @@ bool CSaveRestore::LoadGame( const char *pName )
 		return false;	
 	}
 
-	bool bIsTransitionSave = ( gameHeader.originMapName[0] != 0 );
+	//bool bIsTransitionSave = ( gameHeader.originMapName[0] != 0 );
 
-	bool retval = Host_NewGame( gameHeader.mapName, true, false, ( bIsTransitionSave ) ? gameHeader.originMapName : NULL, ( bIsTransitionSave ) ? gameHeader.landmark : NULL, bOldSave );
+	bool retval = Host_NewGame( gameHeader.mapName, true, false, bOldSave );//( bIsTransitionSave ) ? gameHeader.originMapName : NULL, ( bIsTransitionSave ) ? gameHeader.landmark : NULL,
 
 	SetMostRecentElapsedMinutes( iElapsedMinutes );
 	SetMostRecentElapsedSeconds( iElapsedSeconds );

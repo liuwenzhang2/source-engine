@@ -1833,6 +1833,7 @@ void ClientDLL_Init( void )
 	{
 		COM_TimestampedLog( "g_ClientDLL->Init" );
 
+		g_pClientGameSaveRestoreBlockSet->AddBlockHandler(g_ClientDLL);
 		if ( !g_ClientDLL->Init(g_AppSystemFactory, g_AppSystemFactory, &g_ClientGlobalVariables ) )
 		{
 			Sys_Error("Client.dll Init() in library client failed.");
@@ -1981,6 +1982,7 @@ void ClientDLL_Shutdown( void )
 	centerprint = NULL;
 
 	g_ClientDLL->Shutdown();
+	g_pClientGameSaveRestoreBlockSet->RemoveBlockHandler(g_ClientDLL);
 }
 
 //-----------------------------------------------------------------------------

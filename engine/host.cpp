@@ -4512,28 +4512,28 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 	saverestore->SetMostRecentElapsedMinutes( iElapsedMinutes );
 	saverestore->SetMostRecentElapsedSeconds( ( iElapsedSeconds % 60 ) );
 
-	if ( false )//bTransitionBySave
-	{
-		char comment[80];
-		// Pass in the total elapsed time so it gets added to the elapsed time for this map.
-		serverGameDLL->GetSaveComment( 
-			comment, 
-			sizeof( comment ),
-			saverestore->GetMostRecentElapsedMinutes(),
-			saverestore->GetMostRecentElapsedSeconds() );
+	//if ( false )//bTransitionBySave
+	//{
+	//	char comment[80];
+	//	// Pass in the total elapsed time so it gets added to the elapsed time for this map.
+	//	serverGameDLL->GetSaveComment( 
+	//		comment, 
+	//		sizeof( comment ),
+	//		saverestore->GetMostRecentElapsedMinutes(),
+	//		saverestore->GetMostRecentElapsedSeconds() );
 
-		if ( !saverestore->SaveGameSlot( "_transition", comment, false, true, szMapName, startspot ) )
-		{
-			Warning( "Failed to save data for transition\n" );
-			SCR_EndLoadingPlaque();
-			return false;
-		}
+	//	if ( !saverestore->SaveGameSlot( "_transition", comment, false, true, szMapName, startspot ) )
+	//	{
+	//		Warning( "Failed to save data for transition\n" );
+	//		SCR_EndLoadingPlaque();
+	//		return false;
+	//	}
 
-		// Not going to load a save after the transition, so add this map's elapsed time to the total elapsed time
-		int totalSeconds = g_ServerGlobalVariables.curtime + saverestore->GetMostRecentElapsedSeconds();
-		saverestore->SetMostRecentElapsedMinutes( (int)( totalSeconds / 60.0f ) + saverestore->GetMostRecentElapsedMinutes() );
-		saverestore->SetMostRecentElapsedSeconds( (int)fmod( totalSeconds, 60.0f ) );
-	}
+	//	// Not going to load a save after the transition, so add this map's elapsed time to the total elapsed time
+	//	int totalSeconds = g_ServerGlobalVariables.curtime + saverestore->GetMostRecentElapsedSeconds();
+	//	saverestore->SetMostRecentElapsedMinutes( (int)( totalSeconds / 60.0f ) + saverestore->GetMostRecentElapsedMinutes() );
+	//	saverestore->SetMostRecentElapsedSeconds( (int)fmod( totalSeconds, 60.0f ) );
+	//}
 #endif
 
 	Q_strncpy( oldlevel, sv.GetMapName(), sizeof( oldlevel ) );
@@ -4637,7 +4637,7 @@ SERVER TRANSITIONS
 
 ===============================================================================
 */
-bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const char *pszOldMap, const char *pszLandmark, bool bOldSave )
+bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, bool bOldSave )//const char *pszOldMap, const char *pszLandmark, 
 {
 	VPROF( "Host_NewGame" );
 	COM_TimestampedLog( "Host_NewGame" );
@@ -4729,7 +4729,7 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 	audiosourcecache->LevelInit( szMapName );
 #endif
 
-	g_pServerPluginHandler->LevelInit( szMapName, CM_EntityString(), pszOldMap, pszLandmark, loadGame && !bOldSave, bBackgroundLevel );
+	g_pServerPluginHandler->LevelInit( szMapName, CM_EntityString(), NULL, NULL, loadGame && !bOldSave, bBackgroundLevel );
 
 	if ( loadGame && !bOldSave )
 	{

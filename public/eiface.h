@@ -26,6 +26,7 @@
 #include "tier1/interface.h"
 #include "tier1/bitbuf.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
+#include "isaverestore.h"
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -37,7 +38,6 @@ struct  Ray_t;
 class	CGameTrace;
 typedef	CGameTrace trace_t;
 class	typedescription_t;
-class	CSaveRestoreData;
 class	datamap_t;
 class	SendTable;
 class	ServerClass;
@@ -45,8 +45,6 @@ class	IMoveHelper;
 struct  Ray_t;
 struct	studiohdr_t;
 class	CBaseEntity;
-class	CRestore;
-class	CSave;
 class	variant_t;
 struct	vcollide_t;
 class	IRecipientFilter;
@@ -64,8 +62,6 @@ class IReplayFactory;
 class IReplaySystem;
 class IServer;
 class CCommand;
-class ISaveRestoreBlockHandler;
-class IRestore;
 
 typedef struct player_info_s player_info_t;
 
@@ -491,7 +487,7 @@ class IServerGCLobby;
 //-----------------------------------------------------------------------------
 // Purpose: These are the interfaces that the game .dll exposes to the engine
 //-----------------------------------------------------------------------------
-abstract_class IServerGameDLL
+abstract_class IServerGameDLL : public ISaveRestoreBlockHandler
 {
 public:
 	// Initialize the game (one-time call when the DLL is first loaded )
@@ -506,6 +502,18 @@ public:
 
 	// This is called when a new game is started. (restart, map)
 	virtual bool			GameInit( void ) = 0;
+
+	virtual const char* GetBlockName() = 0;
+
+	virtual void PreSave(CSaveRestoreData* pSaveData) = 0;
+	virtual void Save(ISave* pSave) = 0;
+	virtual void WriteSaveHeaders(ISave* pSave) = 0;
+	virtual void PostSave() = 0;
+
+	virtual void PreRestore() = 0;
+	virtual void ReadRestoreHeaders(IRestore* pRestore) = 0;
+	virtual void Restore(IRestore* pRestore, bool createPlayers) = 0;
+	virtual void PostRestore() = 0;
 
 	// Called any time a new level is started (after GameInit() also on level transitions within a game)
 	virtual bool			LevelInit( char const *pMapName, 

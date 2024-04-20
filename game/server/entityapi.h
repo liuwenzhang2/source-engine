@@ -26,8 +26,8 @@ extern int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMas
 extern void ClearEntities( void );
 extern void FreeContainingEntity( int ed );
 
-class ISaveRestoreBlockHandler;
-ISaveRestoreBlockHandler *GetEntitySaveRestoreBlockHandler();
+//class ISaveRestoreBlockHandler;
+//ISaveRestoreBlockHandler *GetEntitySaveRestoreBlockHandler();
 
 
 #endif			// ENTITYAPI_H

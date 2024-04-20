@@ -22,6 +22,7 @@
 #include "irecipientfilter.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "string_t.h"
+#include "isaverestore.h"
 
 #if !defined( _X360 )
 #include "xbox/xboxstubs.h"
@@ -591,7 +592,7 @@ public:
 //-----------------------------------------------------------------------------
 // Purpose: Interface exposed from the client .dll back to the engine
 //-----------------------------------------------------------------------------
-abstract_class IBaseClientDLL
+abstract_class IBaseClientDLL : public ISaveRestoreBlockHandler
 {
 public:
 	// Called once when the client DLL is loaded
@@ -604,6 +605,18 @@ public:
 	// Called once when the client DLL is being unloaded
 	virtual void			Shutdown( void ) = 0;
 	
+	virtual const char*		GetBlockName() = 0;
+
+	virtual void			PreSave(CSaveRestoreData* pSaveData) = 0;
+	virtual void			Save(ISave* pSave) = 0;
+	virtual void			WriteSaveHeaders(ISave* pSave) = 0;
+	virtual void			PostSave() = 0;
+
+	virtual void			PreRestore() = 0;
+	virtual void			ReadRestoreHeaders(IRestore* pRestore) = 0;
+	virtual void			Restore(IRestore* pRestore, bool createPlayers) = 0;
+	virtual void			PostRestore() = 0;
+
 	// Called once the client is initialized to setup client-side replay interface pointers
 	virtual bool			ReplayInit( CreateInterfaceFn replayFactory ) = 0;
 	virtual bool			ReplayPostInit() = 0;

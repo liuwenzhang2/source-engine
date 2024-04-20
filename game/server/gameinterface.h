@@ -13,6 +13,9 @@
 #endif
 
 #include "mapentities.h"
+#include "vphysics/object_hash.h"
+#include "saverestore.h"
+#include "saverestoretypes.h"
 
 class IReplayFactory;
 
@@ -59,10 +62,41 @@ public:
 	virtual void			ClientSpawned( int pPlayer ) OVERRIDE;
 };
 
+//-----------------------------------------------------------------------------
+// Utilities entities can use when saving
+//-----------------------------------------------------------------------------
+class CEntitySaveUtils : public IEntitySaveUtils
+{
+public:
+	// Call these in pre-save + post save
+	void PreSave();
+	void PostSave();
+
+	// Methods of IEntitySaveUtils
+	virtual void AddLevelTransitionSaveDependency(CBaseEntity* pEntity1, CBaseEntity* pEntity2);
+	virtual int GetEntityDependencyCount(CBaseEntity* pEntity);
+	virtual int GetEntityDependencies(CBaseEntity* pEntity, int nCount, CBaseEntity** ppEntList);
+
+private:
+	IPhysicsObjectPairHash* m_pLevelAdjacencyDependencyHash;
+};
 
 class CServerGameDLL : public IServerGameDLL
 {
 public:
+
+	virtual const char* GetBlockName();
+
+	virtual void PreSave(CSaveRestoreData* pSaveData);
+	virtual void Save(ISave* pSave);
+	virtual void WriteSaveHeaders(ISave* pSave);
+	virtual void PostSave();
+
+	virtual void PreRestore();
+	virtual void ReadRestoreHeaders(IRestore* pRestore);
+	virtual void Restore(IRestore* pRestore, bool createPlayers);
+	virtual void PostRestore();
+
 	virtual bool			DLLInit(CreateInterfaceFn engineFactory, CreateInterfaceFn physicsFactory, 
 										CreateInterfaceFn fileSystemFactory, CGlobalVars *pGlobals) OVERRIDE;
 	virtual void			DLLShutdown( void ) OVERRIDE;
@@ -182,6 +216,9 @@ public:
 	const char* GetMaterialNameFromIndex(int nMaterialIndex);
 
 	string_t AllocPooledString(const char* pszValue);
+
+	inline IEntitySaveUtils* GetEntitySaveUtils() { return &m_EntitySaveUtils; }
+
 private:
 
 	// This can just be a wrapper on MapEntity_ParseAllEntities, but CS does some tricks in here
@@ -189,6 +226,20 @@ private:
 	void LevelInit_ParseAllEntities( const char *pMapEntities );
 	void LoadMessageOfTheDay();
 	void LoadSpecificMOTDMsg( const ConVar &convar, const char *pszStringName );
+
+	friend int CreateEntityTransitionList(CSaveRestoreData* pSaveData, int levelMask);
+	bool SaveInitEntities(CSaveRestoreData* pSaveData);
+	bool DoRestoreEntity(CBaseEntity* pEntity, IRestore* pRestore);
+	Vector ModelSpaceLandmark(int modelIndex);
+	int RestoreEntity(CBaseEntity* pEntity, IRestore* pRestore, entitytable_t* pEntInfo);
+
+	// Find the matching global entity.  Spit out an error if the designer made entities of
+	// different classes with the same global name
+	CBaseEntity* FindGlobalEntity(string_t classname, string_t globalname);
+
+	int RestoreGlobalEntity(CBaseEntity* pEntity, CSaveRestoreData* pSaveData, entitytable_t* pEntInfo);
+
+	CEntitySaveUtils	m_EntitySaveUtils;
 };
 
 

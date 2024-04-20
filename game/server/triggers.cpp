@@ -2022,7 +2022,7 @@ int CChangeLevel::AddDependentEntities( int nCount, CBaseEntity **ppEntList, int
 		Set( pEntitiesSaved, nEntIndex );
 	}
 
-	IEntitySaveUtils *pSaveUtils = GetEntitySaveUtils();
+	IEntitySaveUtils *pSaveUtils = g_ServerGameDLL.GetEntitySaveUtils();
 
 	ConVarRef g_debug_transitions("g_debug_transitions");
 	// Iterate over entities whose dependencies we've not yet processed

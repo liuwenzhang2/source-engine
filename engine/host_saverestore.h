@@ -592,7 +592,7 @@ public:
 	virtual void					LoadAdjacentEnts( const char *pOldLevel, const char *pLandmarkName ) = 0;
 	virtual const char				*FindRecentSave( char *pNameBuf, int nameBufLen ) = 0;
 	virtual void					ForgetRecentSave() = 0;
-	virtual int						SaveGameSlot( const char *pSaveName, const char *pSaveComment, bool onlyThisLevel = false, bool bSetMostRecent = true, const char *pszDestMap = NULL, const char *pszLandmark = NULL ) = 0;
+	virtual int						SaveGameSlot( const char *pSaveName, const char *pSaveComment, bool onlyThisLevel = false, bool bSetMostRecent = true) = 0;//, const char *pszDestMap = NULL, const char *pszLandmark = NULL 
 	virtual bool					SaveGameState( bool bTransition, CSaveRestoreData ** = NULL, bool bOpenContainer = true, bool bIsAutosaveOrDangerous = false ) = 0;
 	virtual int						IsValidSave( void ) = 0;
 	virtual void					Finish( CSaveRestoreData *save ) = 0;

@@ -90,6 +90,8 @@
 #include "serverbenchmark_base.h"
 #include "querycache.h"
 #include "envmicrophone.h"
+#include "globalstate.h"
+#include "model_types.h"
 
 #ifdef TF_DLL
 #include "gc_clientsystem.h"
@@ -273,6 +275,66 @@ ConVar ai_post_frame_navigation( "ai_post_frame_navigation", "0" );
 class CPostFrameNavigationHook;
 extern CPostFrameNavigationHook *PostFrameNavigationSystem( void );
 static ConVar* g_pClosecaption = NULL;
+
+static CUtlVector<EHANDLE> g_RestoredEntities;
+// just for debugging, assert that this is the only time this function is called
+static bool g_InRestore = false;
+
+void AddRestoredEntity(CBaseEntity* pEntity)
+{
+	Assert(g_InRestore);
+	if (!pEntity)
+		return;
+
+	g_RestoredEntities.AddToTail(EHANDLE(pEntity));
+}
+
+void EndRestoreEntities()
+{
+	if (!g_InRestore)
+		return;
+
+	// The entire hierarchy is restored, so we can call GetAbsOrigin again.
+	//CBaseEntity::SetAbsQueriesValid( true );
+
+	// Call all entities' OnRestore handlers
+	for (int i = g_RestoredEntities.Count() - 1; i >= 0; --i)
+	{
+		CBaseEntity* pEntity = g_RestoredEntities[i].Get();
+		if (pEntity && !pEntity->IsDormant())
+		{
+			MDLCACHE_CRITICAL_SECTION();
+			pEntity->OnRestore();
+		}
+	}
+
+	g_RestoredEntities.Purge();
+
+	IGameSystem::OnRestoreAllSystems();
+
+	g_InRestore = false;
+	gEntList.CleanupDeleteList();
+
+	// HACKHACK: UNDONE: We need to redesign the main loop with respect to save/load/server activate
+	g_ServerGameDLL.ServerActivate(NULL, 0, 0);
+	engine->SetAllowPrecache(false);//CBaseEntity::
+}
+
+void BeginRestoreEntities()
+{
+	if (g_InRestore)
+	{
+		DevMsg("BeginRestoreEntities without previous EndRestoreEntities.\n");
+		gEntList.CleanupDeleteList();
+	}
+	g_RestoredEntities.Purge();
+	g_InRestore = true;
+
+	engine->SetAllowPrecache(true);//CBaseEntity::
+
+	// No calls to GetAbsOrigin until the entire hierarchy is restored!
+	//CBaseEntity::SetAbsQueriesValid( false );
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -566,6 +628,655 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameDLL, IServerGameDLL, INTERFACEVERSI
 // When bumping the version to this interface, check that our assumption is still valid and expose the older version in the same way
 COMPILE_TIME_ASSERT( INTERFACEVERSION_SERVERGAMEDLL_INT == 10 );
 
+//-----------------------------------------------------------------------------
+// Call these in pre-save + post save
+//-----------------------------------------------------------------------------
+void CEntitySaveUtils::PreSave()
+{
+	Assert(!m_pLevelAdjacencyDependencyHash);
+	MEM_ALLOC_CREDIT();
+	m_pLevelAdjacencyDependencyHash = physics->CreateObjectPairHash();
+}
+
+void CEntitySaveUtils::PostSave()
+{
+	physics->DestroyObjectPairHash(m_pLevelAdjacencyDependencyHash);
+	m_pLevelAdjacencyDependencyHash = NULL;
+}
+
+
+//-----------------------------------------------------------------------------
+// Gets the # of dependencies for a particular entity
+//-----------------------------------------------------------------------------
+int CEntitySaveUtils::GetEntityDependencyCount(CBaseEntity* pEntity)
+{
+	return m_pLevelAdjacencyDependencyHash->GetPairCountForObject(pEntity);
+}
+
+
+//-----------------------------------------------------------------------------
+// Gets all dependencies for a particular entity
+//-----------------------------------------------------------------------------
+int CEntitySaveUtils::GetEntityDependencies(CBaseEntity* pEntity, int nCount, CBaseEntity** ppEntList)
+{
+	return m_pLevelAdjacencyDependencyHash->GetPairListForObject(pEntity, nCount, (void**)ppEntList);
+}
+
+
+//-----------------------------------------------------------------------------
+// Methods of IEntitySaveUtils
+//-----------------------------------------------------------------------------
+void CEntitySaveUtils::AddLevelTransitionSaveDependency(CBaseEntity* pEntity1, CBaseEntity* pEntity2)
+{
+	if (pEntity1 != pEntity2)
+	{
+		m_pLevelAdjacencyDependencyHash->AddObjectPair(pEntity1, pEntity2);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Implementation of the block handler for save/restore of entities
+//-----------------------------------------------------------------------------
+const char* CServerGameDLL::GetBlockName()
+{
+	return "Entities";
+}
+
+void CServerGameDLL::PreSave(CSaveRestoreData* pSaveData)
+{
+	MDLCACHE_CRITICAL_SECTION();
+	IGameSystem::OnSaveAllSystems();
+
+	m_EntitySaveUtils.PreSave();
+
+	// Allow the entities to do some work
+	CBaseEntity* pEnt = NULL;
+	while ((pEnt = gEntList.NextEnt(pEnt)) != NULL)
+	{
+		pEnt->OnSave(&m_EntitySaveUtils);
+	}
+
+	SaveInitEntities(pSaveData);
+}
+
+//---------------------------------
+
+CBaseEntity* EntityFromHandle(CBaseHandle& handle) {
+	return (CBaseEntity*)gEntList.GetServerEntityFromHandle(handle);
+}
+
+
+void CServerGameDLL::Save(ISave* pSave)
+{
+	CGameSaveRestoreInfo* pSaveData = pSave->GetGameSaveRestoreInfo();
+
+	// write entity list that was previously built by SaveInitEntities()
+	for (int i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		entitytable_t* pEntInfo = pSaveData->GetEntityInfo(i);
+		pEntInfo->location = pSave->GetWritePos();
+		pEntInfo->size = 0;
+
+		CBaseEntity* pEnt = EntityFromHandle(pEntInfo->hEnt);
+		if (pEnt && !(pEnt->ObjectCaps() & FCAP_DONT_SAVE))
+		{
+			MDLCACHE_CRITICAL_SECTION();
+#if !defined( CLIENT_DLL )
+			AssertMsg(pEnt->entindex() == -1 || (pEnt->m_iClassname != NULL_STRING &&
+				(STRING(pEnt->m_iClassname)[0] != 0) &&
+				FStrEq(STRING(pEnt->m_iClassname), pEnt->GetClassname())),
+				"Saving entity with invalid classname");
+#endif
+
+			pSaveData->SetCurrentEntityContext(pEnt);
+			pEnt->Save(*pSave);
+			pSaveData->SetCurrentEntityContext(NULL);
+
+			pEntInfo->size = pSave->GetWritePos() - pEntInfo->location;	// Size of entity block is data size written to block
+
+			pEntInfo->classname = pEnt->m_iClassname;	// Remember entity class for respawn
+
+#if !defined( CLIENT_DLL )
+			pEntInfo->globalname = pEnt->m_iGlobalname; // remember global name
+			pEntInfo->landmarkModelSpace = ModelSpaceLandmark(pEnt->GetModelIndex());
+			int nEntIndex = pEnt->IsNetworkable() ? pEnt->entindex() : -1;
+			bool bIsPlayer = ((nEntIndex >= 1) && (nEntIndex <= gpGlobals->maxClients)) ? true : false;
+			if (bIsPlayer)
+			{
+				pEntInfo->flags |= FENTTABLE_PLAYER;
+			}
+#endif
+		}
+	}
+}
+
+//---------------------------------
+
+void CServerGameDLL::WriteSaveHeaders(ISave* pSave)
+{
+	CGameSaveRestoreInfo* pSaveData = pSave->GetGameSaveRestoreInfo();
+
+	int nEntities = pSaveData->NumEntities();
+	pSave->WriteInt(&nEntities);
+
+	for (int i = 0; i < pSaveData->NumEntities(); i++)
+		pSave->WriteFields("ETABLE", pSaveData->GetEntityInfo(i), NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
+}
+
+//---------------------------------
+
+void CServerGameDLL::PostSave()
+{
+	m_EntitySaveUtils.PostSave();
+}
+
+//---------------------------------
+
+void CServerGameDLL::PreRestore()
+{
+}
+
+//---------------------------------
+
+void CServerGameDLL::ReadRestoreHeaders(IRestore* pRestore)
+{
+	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
+
+	int nEntities;
+	pRestore->ReadInt(&nEntities);
+
+	entitytable_t* pEntityTable = (entitytable_t*)engine->SaveAllocMemory((sizeof(entitytable_t) * nEntities), sizeof(char));
+	if (!pEntityTable)
+	{
+		return;
+	}
+
+	pSaveData->InitEntityTable(pEntityTable, nEntities);
+
+	for (int i = 0; i < pSaveData->NumEntities(); i++) {
+		if (i == 165) {
+			int aaa = 0;
+		}
+		entitytable_t* pEntityTable = pSaveData->GetEntityInfo(i);
+		pRestore->ReadFields("ETABLE", pEntityTable, NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
+		pEntityTable = pSaveData->GetEntityInfo(i);
+	}
+}
+
+//---------------------------------
+
+void CServerGameDLL::Restore(IRestore* pRestore, bool createPlayers)
+{
+	entitytable_t* pEntInfo;
+	CBaseEntity* pent;
+
+	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
+
+	bool restoredWorld = false;
+
+	// Create entity list
+	int i;
+	for (i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		pEntInfo = pSaveData->GetEntityInfo(i);
+
+		if (pEntInfo->classname != NULL_STRING && pEntInfo->size && !(pEntInfo->flags & FENTTABLE_REMOVED))
+		{
+			if (pEntInfo->edictindex == 0)	// worldspawn
+			{
+				Assert(i == 0);
+				pent = gEntList.CreateEntityByName(STRING(pEntInfo->classname));
+				pRestore->SetReadPos(pEntInfo->location);
+				if (RestoreEntity(pent, pRestore, pEntInfo) < 0)
+				{
+					pEntInfo->hEnt = NULL;
+					pEntInfo->restoreentityindex = -1;
+					UTIL_RemoveImmediate(pent);
+				}
+				else
+				{
+					// force the entity to be relinked
+					AddRestoredEntity(pent);
+				}
+			}
+			else if ((pEntInfo->edictindex > 0) && (pEntInfo->edictindex <= gpGlobals->maxClients))
+			{
+				if (!(pEntInfo->flags & FENTTABLE_PLAYER))
+				{
+					Warning("ENTITY IS NOT A PLAYER: %d\n", i);
+					Assert(0);
+				}
+
+				if (createPlayers)//ed && 
+				{
+					// create the player
+					pent = CBasePlayer::CreatePlayer(STRING(pEntInfo->classname), pEntInfo->edictindex);
+				}
+				else
+					pent = NULL;
+			}
+			else
+			{
+				pent = gEntList.CreateEntityByName(STRING(pEntInfo->classname));
+			}
+			pEntInfo->hEnt = pent;
+			pEntInfo->restoreentityindex = pent && pent->IsNetworkable() ? pent->entindex() : -1;
+			if (pent && pEntInfo->restoreentityindex == 0)
+			{
+				if (!FClassnameIs(pent, "worldspawn"))
+				{
+					pEntInfo->restoreentityindex = -1;
+				}
+			}
+
+			if (pEntInfo->restoreentityindex == 0)
+			{
+				Assert(!restoredWorld);
+				restoredWorld = true;
+			}
+		}
+		else
+		{
+			pEntInfo->hEnt = NULL;
+			pEntInfo->restoreentityindex = -1;
+		}
+	}
+
+	// Now spawn entities
+	for (i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		pEntInfo = pSaveData->GetEntityInfo(i);
+		if (pEntInfo->edictindex != 0)
+		{
+			pent = EntityFromHandle(pEntInfo->hEnt);
+			pRestore->SetReadPos(pEntInfo->location);
+			if (pent)
+			{
+				if (RestoreEntity(pent, pRestore, pEntInfo) < 0)
+				{
+					pEntInfo->hEnt = NULL;
+					pEntInfo->restoreentityindex = -1;
+					UTIL_RemoveImmediate(pent);
+				}
+				else
+				{
+					AddRestoredEntity(pent);
+				}
+			}
+		}
+	}
+}
+
+void CServerGameDLL::PostRestore()
+{
+}
+
+void SaveEntityOnTable(CBaseEntity* pEntity, CSaveRestoreData* pSaveData, int& iSlot)
+{
+	entitytable_t* pEntInfo = pSaveData->GetEntityInfo(iSlot);
+	pEntInfo->id = iSlot;
+#if !defined( CLIENT_DLL )
+	pEntInfo->edictindex = pEntity->RequiredEdictIndex();
+#else
+	pEntInfo->edictindex = -1;
+#endif
+	pEntInfo->modelname = pEntity->GetModelName();
+	pEntInfo->restoreentityindex = -1;
+	pEntInfo->saveentityindex = pEntity && pEntity->IsNetworkable() ? pEntity->entindex() : -1;
+	pEntInfo->hEnt = pEntity->GetRefEHandle();
+	pEntInfo->flags = 0;
+	pEntInfo->location = 0;
+	pEntInfo->size = 0;
+	pEntInfo->classname = NULL_STRING;
+
+	iSlot++;
+}
+
+
+//---------------------------------
+
+bool CServerGameDLL::SaveInitEntities(CSaveRestoreData* pSaveData)
+{
+	int number_of_entities;
+
+	number_of_entities = gEntList.NumberOfEntities();
+
+	entitytable_t* pEntityTable = (entitytable_t*)engine->SaveAllocMemory((sizeof(entitytable_t) * number_of_entities), sizeof(char));
+	if (!pEntityTable)
+		return false;
+
+	pSaveData->InitEntityTable(pEntityTable, number_of_entities);
+
+	// build the table of entities
+	// this is used to turn pointers into savable indices
+	// build up ID numbers for each entity, for use in pointer conversions
+	// if an entity requires a certain edict number upon restore, save that as well
+	CBaseEntity* pEnt = NULL;
+	int i = 0;
+
+	while ((pEnt = gEntList.NextEnt(pEnt)) != NULL)
+	{
+		SaveEntityOnTable(pEnt, pSaveData, i);
+	}
+
+	//pSaveData->BuildEntityHash();
+
+	Assert(i == pSaveData->NumEntities());
+	return (i == pSaveData->NumEntities());
+}
+
+//---------------------------------
+
+// Find the matching global entity.  Spit out an error if the designer made entities of
+// different classes with the same global name
+CBaseEntity* CServerGameDLL::FindGlobalEntity(string_t classname, string_t globalname)
+{
+	CBaseEntity* pReturn = NULL;
+
+	while ((pReturn = gEntList.NextEnt(pReturn)) != NULL)
+	{
+		if (FStrEq(STRING(pReturn->m_iGlobalname), STRING(globalname)))
+			break;
+	}
+
+	if (pReturn)
+	{
+		if (!FClassnameIs(pReturn, STRING(classname)))
+		{
+			Warning("Global entity found %s, wrong class %s [expects class %s]\n", STRING(globalname), STRING(pReturn->m_iClassname), STRING(classname));
+			pReturn = NULL;
+		}
+	}
+
+	return pReturn;
+}
+//---------------------------------
+
+bool CServerGameDLL::DoRestoreEntity(CBaseEntity * pEntity, IRestore * pRestore)
+{
+	MDLCACHE_CRITICAL_SECTION();
+
+	EHANDLE hEntity;
+
+	hEntity = pEntity;
+
+	pRestore->GetGameSaveRestoreInfo()->SetCurrentEntityContext(pEntity);
+	pEntity->Restore(*pRestore);
+	pRestore->GetGameSaveRestoreInfo()->SetCurrentEntityContext(NULL);
+
+#if !defined( CLIENT_DLL )
+	if (pEntity->ObjectCaps() & FCAP_MUST_SPAWN)
+	{
+		pEntity->Spawn();
+	}
+	else
+	{
+		pEntity->Precache();
+	}
+#endif
+
+	// Above calls may have resulted in self destruction
+	return (hEntity != NULL);
+}
+
+//---------------------------------
+// Get a reference position in model space to compute
+// changes in model space for global brush entities (designer models them in different coords!)
+Vector CServerGameDLL::ModelSpaceLandmark(int modelIndex)
+{
+	const model_t* pModel = modelinfo->GetModel(modelIndex);
+	if (modelinfo->GetModelType(pModel) != mod_brush)
+		return vec3_origin;
+
+	Vector mins, maxs;
+	modelinfo->GetModelBounds(pModel, mins, maxs);
+	return mins;
+}
+
+
+int CServerGameDLL::RestoreEntity(CBaseEntity * pEntity, IRestore * pRestore, entitytable_t * pEntInfo)
+{
+	if (!DoRestoreEntity(pEntity, pRestore))
+		return 0;
+
+#if !defined( CLIENT_DLL )		
+	if (pEntity->m_iGlobalname != NULL_STRING)
+	{
+		int globalIndex = GlobalEntity_GetIndex(pEntity->m_iGlobalname);
+		if (globalIndex >= 0)
+		{
+			// Already dead? delete
+			if (GlobalEntity_GetState(globalIndex) == GLOBAL_DEAD)
+				return -1;
+			else if (!FStrEq(STRING(gpGlobals->mapname), GlobalEntity_GetMap(globalIndex)))
+			{
+				pEntity->MakeDormant();	// Hasn't been moved to this level yet, wait but stay alive
+			}
+			// In this level & not dead, continue on as normal
+		}
+		else
+		{
+			Warning("Global Entity %s (%s) not in table!!!\n", STRING(pEntity->m_iGlobalname), STRING(pEntity->m_iClassname));
+			// Spawned entities default to 'On'
+			GlobalEntity_Add(pEntity->m_iGlobalname, gpGlobals->mapname, GLOBAL_ON);
+		}
+	}
+#endif
+
+	return 0;
+}
+
+//---------------------------------
+int CServerGameDLL::RestoreGlobalEntity(CBaseEntity * pEntity, CSaveRestoreData * pSaveData, entitytable_t * pEntInfo)
+{
+	Vector oldOffset;
+	EHANDLE hEntitySafeHandle;
+	hEntitySafeHandle = pEntity;
+
+	oldOffset.Init();
+	CRestoreServer restoreHelper(pSaveData);
+
+	string_t globalName = pEntInfo->globalname, className = pEntInfo->classname;
+
+	// -------------------
+
+	int globalIndex = GlobalEntity_GetIndex(globalName);
+
+	// Don't overlay any instance of the global that isn't the latest
+	// pSaveData->szCurrentMapName is the level this entity is coming from
+	// pGlobal->levelName is the last level the global entity was active in.
+	// If they aren't the same, then this global update is out of date.
+	if (!FStrEq(pSaveData->levelInfo.szCurrentMapName, GlobalEntity_GetMap(globalIndex)))
+	{
+		return 0;
+	}
+
+	// Compute the new global offset
+	CBaseEntity* pNewEntity = FindGlobalEntity(className, globalName);
+	if (pNewEntity)
+	{
+		//				Msg( "Overlay %s with %s\n", pNewEntity->GetClassname(), STRING(tmpEnt->classname) );
+				// Tell the restore code we're overlaying a global entity from another level
+		restoreHelper.SetGlobalMode(1);	// Don't overwrite global fields
+
+		pSaveData->modelSpaceOffset = pEntInfo->landmarkModelSpace - ModelSpaceLandmark(pNewEntity->GetModelIndex());
+
+		UTIL_Remove(pEntity);
+		pEntity = pNewEntity;// we're going to restore this data OVER the old entity
+		pEntInfo->hEnt = pEntity;
+		// HACKHACK: Do we need system-wide support for removing non-global spawn allocated resources?
+		pEntity->VPhysicsDestroyObject();
+		Assert(pEntInfo->edictindex == -1);
+		// Update the global table to say that the global definition of this entity should come from this level
+		GlobalEntity_SetMap(globalIndex, gpGlobals->mapname);
+	}
+	else
+	{
+		// This entity will be freed automatically by the engine->  If we don't do a restore on a matching entity (below)
+		// or call EntityUpdate() to move it to this level, we haven't changed global state at all.
+		DevMsg("Warning: No match for global entity %s found in destination level\n", STRING(globalName));
+		return 0;
+	}
+
+	if (!DoRestoreEntity(pEntity, &restoreHelper))
+	{
+		pEntity = NULL;
+	}
+
+	// Is this an overriding global entity (coming over the transition)
+	pSaveData->modelSpaceOffset.Init();
+	if (pEntity)
+		return 1;
+	return 0;
+}
+
+//=============================================================================
+//------------------------------------------------------------------------------
+// Creates all entities that lie in the transition list
+//------------------------------------------------------------------------------
+void CreateEntitiesInTransitionList(CSaveRestoreData* pSaveData, int levelMask)
+{
+	CBaseEntity* pent;
+	int i;
+	for (i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		entitytable_t* pEntInfo = pSaveData->GetEntityInfo(i);
+		pEntInfo->hEnt = NULL;
+
+		if (pEntInfo->size == 0 || pEntInfo->edictindex == 0)
+			continue;
+
+		if (pEntInfo->classname == NULL_STRING)
+		{
+			Warning("Entity with data saved, but with no classname\n");
+			Assert(0);
+			continue;
+		}
+
+		bool active = (pEntInfo->flags & levelMask) ? 1 : 0;
+
+		// spawn players
+		pent = NULL;
+		if ((pEntInfo->edictindex > 0) && (pEntInfo->edictindex <= gpGlobals->maxClients))
+		{
+			if (active)//&& ed && !ed->IsFree()
+			{
+				if (!(pEntInfo->flags & FENTTABLE_PLAYER))
+				{
+					Warning("ENTITY IS NOT A PLAYER: %d\n", i);
+					Assert(0);
+				}
+
+				pent = CBasePlayer::CreatePlayer(STRING(pEntInfo->classname), pEntInfo->edictindex);
+			}
+		}
+		else if (active)
+		{
+			pent = gEntList.CreateEntityByName(STRING(pEntInfo->classname));
+		}
+
+		pEntInfo->hEnt = pent;
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+int CreateEntityTransitionList(CSaveRestoreData* pSaveData, int levelMask)
+{
+	CBaseEntity* pent;
+	entitytable_t* pEntInfo;
+
+	// Create entity list
+	CreateEntitiesInTransitionList(pSaveData, levelMask);
+
+	// Now spawn entities
+	CUtlVector<int> checkList;
+
+	int i;
+	int movedCount = 0;
+	for (i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		pEntInfo = pSaveData->GetEntityInfo(i);
+		pent = EntityFromHandle(pEntInfo->hEnt);
+		//		pSaveData->currentIndex = i;
+		pSaveData->Seek(pEntInfo->location);
+
+		// clear this out - it must be set on a per-entity basis
+		pSaveData->modelSpaceOffset.Init();
+
+		if (pent && (pEntInfo->flags & levelMask))		// Screen out the player if he's not to be spawned
+		{
+			if (pEntInfo->flags & FENTTABLE_GLOBAL)
+			{
+				DevMsg(2, "Merging changes for global: %s\n", STRING(pEntInfo->classname));
+
+				// -------------------------------------------------------------------------
+				// Pass the "global" flag to the DLL to indicate this entity should only override
+				// a matching entity, not be spawned
+				if (g_ServerGameDLL.RestoreGlobalEntity(pent, pSaveData, pEntInfo) > 0)
+				{
+					movedCount++;
+					pEntInfo->restoreentityindex = EntityFromHandle(pEntInfo->hEnt)->entindex();
+					AddRestoredEntity(EntityFromHandle(pEntInfo->hEnt));
+				}
+				else
+				{
+					UTIL_RemoveImmediate(EntityFromHandle(pEntInfo->hEnt));
+				}
+				// -------------------------------------------------------------------------
+			}
+			else
+			{
+				DevMsg(2, "Transferring %s (%d)\n", STRING(pEntInfo->classname), pent->entindex());
+				CRestoreServer restoreHelper(pSaveData);
+				if (g_ServerGameDLL.RestoreEntity(pent, &restoreHelper, pEntInfo) < 0)
+				{
+					UTIL_RemoveImmediate(pent);
+				}
+				else
+				{
+					// needs to be checked.  Do this in a separate pass so that pointers & hierarchy can be traversed
+					checkList.AddToTail(i);
+				}
+			}
+
+			// Remove any entities that were removed using UTIL_Remove() as a result of the above calls to UTIL_RemoveImmediate()
+			gEntList.CleanupDeleteList();
+		}
+	}
+
+	for (i = checkList.Count() - 1; i >= 0; --i)
+	{
+		pEntInfo = pSaveData->GetEntityInfo(checkList[i]);
+		pent = EntityFromHandle(pEntInfo->hEnt);
+
+		// NOTE: pent can be NULL because UTIL_RemoveImmediate (called below) removes all in hierarchy
+		if (!pent)
+			continue;
+
+		MDLCACHE_CRITICAL_SECTION();
+
+		if (!(pEntInfo->flags & FENTTABLE_PLAYER) && UTIL_EntityInSolid(pent))
+		{
+			// this can happen during normal processing - PVS is just a guess, some map areas won't exist in the new map
+			DevMsg(2, "Suppressing %s\n", STRING(pEntInfo->classname));
+			UTIL_RemoveImmediate(pent);
+			// Remove any entities that were removed using UTIL_Remove() as a result of the above calls to UTIL_RemoveImmediate()
+			gEntList.CleanupDeleteList();
+		}
+		else
+		{
+			movedCount++;
+			pEntInfo->flags = FENTTABLE_REMOVED;
+			pEntInfo->restoreentityindex = pent->entindex();
+			AddRestoredEntity(pent);
+		}
+	}
+
+	return movedCount;
+}
+
+
 bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory, 
 		CreateInterfaceFn physicsFactory, CreateInterfaceFn fileSystemFactory, 
 		CGlobalVars *pGlobals)
@@ -676,7 +1387,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 
 	sv_maxreplay = g_pCVar->FindVar( "sv_maxreplay" );
 
-	engine->AddBlockHandler( GetEntitySaveRestoreBlockHandler() );
+	//engine->AddBlockHandler( GetEntitySaveRestoreBlockHandler() );
 	engine->AddBlockHandler( GetPhysSaveRestoreBlockHandler() );
 	engine->AddBlockHandler( GetAISaveRestoreBlockHandler() );
 	engine->AddBlockHandler( GetTemplateSaveRestoreBlockHandler() );
@@ -769,7 +1480,7 @@ void CServerGameDLL::DLLShutdown( void )
 	engine->RemoveBlockHandler( GetTemplateSaveRestoreBlockHandler() );
 	engine->RemoveBlockHandler( GetAISaveRestoreBlockHandler() );
 	engine->RemoveBlockHandler( GetPhysSaveRestoreBlockHandler() );
-	engine->RemoveBlockHandler( GetEntitySaveRestoreBlockHandler() );
+	//engine->RemoveBlockHandler( GetEntitySaveRestoreBlockHandler() );
 
 	char *pFilename = g_TextStatsMgr.GetStatsFilename();
 	if ( !pFilename || !pFilename[0] )
@@ -876,65 +1587,7 @@ void Game_SetOneWayTransition( void )
 	g_OneWayTransition = true;
 }
 
-static CUtlVector<EHANDLE> g_RestoredEntities;
-// just for debugging, assert that this is the only time this function is called
-static bool g_InRestore = false;
 
-void AddRestoredEntity( CBaseEntity *pEntity )
-{
-	Assert(g_InRestore);
-	if ( !pEntity )
-		return;
-
-	g_RestoredEntities.AddToTail( EHANDLE(pEntity) );
-}
-
-void EndRestoreEntities()
-{
-	if ( !g_InRestore )
-		return;
-		
-	// The entire hierarchy is restored, so we can call GetAbsOrigin again.
-	//CBaseEntity::SetAbsQueriesValid( true );
-
-	// Call all entities' OnRestore handlers
-	for ( int i = g_RestoredEntities.Count()-1; i >=0; --i )
-	{
-		CBaseEntity *pEntity = g_RestoredEntities[i].Get();
-		if ( pEntity && !pEntity->IsDormant() )
-		{
-			MDLCACHE_CRITICAL_SECTION();
-			pEntity->OnRestore();
-		}
-	}
-
-	g_RestoredEntities.Purge();
-
-	IGameSystem::OnRestoreAllSystems();
-
-	g_InRestore = false;
-	gEntList.CleanupDeleteList();
-
-	// HACKHACK: UNDONE: We need to redesign the main loop with respect to save/load/server activate
-	g_ServerGameDLL.ServerActivate( NULL, 0, 0 );
-	engine->SetAllowPrecache( false );//CBaseEntity::
-}
-
-void BeginRestoreEntities()
-{
-	if ( g_InRestore )
-	{
-		DevMsg( "BeginRestoreEntities without previous EndRestoreEntities.\n" );
-		gEntList.CleanupDeleteList();
-	}
-	g_RestoredEntities.Purge();
-	g_InRestore = true;
-
-	engine->SetAllowPrecache( true );//CBaseEntity::
-
-	// No calls to GetAbsOrigin until the entire hierarchy is restored!
-	//CBaseEntity::SetAbsQueriesValid( false );
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: This prevents sv.tickcount/gpGlobals->tickcount from advancing during restore which
