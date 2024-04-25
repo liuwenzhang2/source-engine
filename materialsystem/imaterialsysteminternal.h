@@ -128,18 +128,18 @@ public:
 
 		//-------------------------------------
 
-	#define DEFINE_MATCALLQUEUE_CONST_MEMBER_QUEUE_CALL(N) \
-		template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-		void QueueCall(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) const FUNC_ARG_FORMAL_PARAMS_##N ) \
-		{ \
-			QueueFunctorInternal( m_FunctorFactory.CreateFunctor( pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N ) ); \
-		}
+	//#define DEFINE_MATCALLQUEUE_CONST_MEMBER_QUEUE_CALL(N) \
+	//	template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
+	//	void QueueCall(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) const FUNC_ARG_FORMAL_PARAMS_##N ) \
+	//	{ \
+	//		QueueFunctorInternal( m_FunctorFactory.CreateFunctor( pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N ) ); \
+	//	}
 
 		//-------------------------------------
 
 	FUNC_GENERATE_ALL( DEFINE_MATCALLQUEUE_NONMEMBER_QUEUE_CALL );
 	FUNC_GENERATE_ALL( DEFINE_MATCALLQUEUE_MEMBER_QUEUE_CALL );
-	FUNC_GENERATE_ALL( DEFINE_MATCALLQUEUE_CONST_MEMBER_QUEUE_CALL );
+	//FUNC_GENERATE_ALL( DEFINE_MATCALLQUEUE_CONST_MEMBER_QUEUE_CALL );
 
 private:
 	void QueueFunctorInternal( CFunctor *pFunctor )
