@@ -377,7 +377,7 @@ bool CPointTemplate::CreateInstance( const Vector &vecOrigin, const QAngle &vecA
 
 		pSpawnList[i].m_pEntity = pEntity;
 		pSpawnList[i].m_nDepth = 0;
-		pSpawnList[i].m_pDeferredParent = NULL;
+		//pSpawnList[i].m_pDeferredParent = NULL;
 	}
 
 	SpawnHierarchicalList( iTemplates, pSpawnList, true );

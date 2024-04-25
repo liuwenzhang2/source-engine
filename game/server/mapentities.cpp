@@ -212,10 +212,16 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 				const char *pAttachmentName = nexttoken(szToken, STRING(pEntity->m_iParent), ',');
 				pEntity->m_iParent = AllocPooledString(szToken);
 				CBaseEntity *pParent = gEntList.FindEntityByName( NULL, pEntity->m_iParent );
-
+				int iAttachment = -1;
+				CBaseAnimating* pAnim = pParent->GetBaseAnimating();
+				if (pAnim)
+				{
+					iAttachment = pAnim->LookupAttachment(pAttachmentName);
+				}
+				pEntity->GetEngineObject()->SetParent(pParent->GetEngineObject(), iAttachment);
 				// setparent in the spawn pass instead - so the model will have been set & loaded
-				pSpawnList[nEntity].m_pDeferredParent = pParent;
-				pSpawnList[nEntity].m_pDeferredParentAttachment = pAttachmentName;
+				//pSpawnList[nEntity].m_pDeferredParent = pParent;
+				//pSpawnList[nEntity].m_pDeferredParentAttachment = pAttachmentName;
 			}
 			else
 			{
@@ -253,19 +259,19 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 		VPROF( "MapEntity_ParseAllEntities_Spawn");
 		CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
 
-		if ( pSpawnList[nEntity].m_pDeferredParent )
-		{
-			// UNDONE: Promote this up to the root of this function?
-			MDLCACHE_CRITICAL_SECTION();
-			CBaseEntity *pParent = pSpawnList[nEntity].m_pDeferredParent;
-			int iAttachment = -1;
-			CBaseAnimating *pAnim = pParent->GetBaseAnimating();
-			if ( pAnim )
-			{
-				iAttachment = pAnim->LookupAttachment(pSpawnList[nEntity].m_pDeferredParentAttachment);
-			}
-			pEntity->GetEngineObject()->SetParent( pParent->GetEngineObject(), iAttachment);
-		}
+		//if ( pSpawnList[nEntity].m_pDeferredParent )
+		//{
+		//	// UNDONE: Promote this up to the root of this function?
+		//	MDLCACHE_CRITICAL_SECTION();
+		//	CBaseEntity *pParent = pSpawnList[nEntity].m_pDeferredParent;
+		//	int iAttachment = -1;
+		//	CBaseAnimating *pAnim = pParent->GetBaseAnimating();
+		//	if ( pAnim )
+		//	{
+		//		iAttachment = pAnim->LookupAttachment(pSpawnList[nEntity].m_pDeferredParentAttachment);
+		//	}
+		//	pEntity->GetEngineObject()->SetParent( pParent->GetEngineObject(), iAttachment);
+		//}
 		if ( pEntity )
 		{
 			if (DispatchSpawn(pEntity) < 0)
@@ -426,8 +432,8 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 			// Queue up this entity for spawning
 			pSpawnList[nEntities].m_pEntity = pEntity;
 			pSpawnList[nEntities].m_nDepth = 0;
-			pSpawnList[nEntities].m_pDeferredParentAttachment = NULL;
-			pSpawnList[nEntities].m_pDeferredParent = NULL;
+			//pSpawnList[nEntities].m_pDeferredParentAttachment = NULL;
+			//pSpawnList[nEntities].m_pDeferredParent = NULL;
 
 			pSpawnMapData[nEntities].m_pMapData = pCurMapData;
 			pSpawnMapData[nEntities].m_iMapDataLength = (pMapData - pCurMapData) + 2;

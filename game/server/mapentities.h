@@ -38,8 +38,8 @@ struct HierarchicalSpawn_t
 {
 	CBaseEntity *m_pEntity;
 	int			m_nDepth;
-	CBaseEntity	*m_pDeferredParent;			// attachment parents can't be set until the parents are spawned
-	const char	*m_pDeferredParentAttachment; // so defer setting them up until the second pass
+	//CBaseEntity	*m_pDeferredParent;			// attachment parents can't be set until the parents are spawned
+	//const char	*m_pDeferredParentAttachment; // so defer setting them up until the second pass
 };
 
 void SpawnHierarchicalList( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bActivateEntities );
