@@ -22,7 +22,7 @@
 // void QueueRefCall( <object>, <<function>, [args1, [arg2,]...]
 //-----------------------------------------------------
 
-#define DEFINE_CALLQUEUE_NONMEMBER_QUEUE_CALL(N) \
+#define DEFINE_NONMEMBER_QUEUE_CALL(N) \
 	template <typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
 	void QueueCall(FUNCTION_RETTYPE (*pfnProxied)( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
 		{ \
@@ -31,7 +31,7 @@
 
 //-------------------------------------
 
-#define DEFINE_CALLQUEUE_MEMBER_QUEUE_CALL(N) \
+#define DEFINE_MEMBER_QUEUE_CALL(N) \
 	template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
 	void QueueCall(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
 		{ \
@@ -66,9 +66,9 @@
 //		\
 //		}
 
-#define FUNC_GENERATE_QUEUE_METHODS() \
-	FUNC_GENERATE_ALL( DEFINE_CALLQUEUE_NONMEMBER_QUEUE_CALL ); \
-	FUNC_GENERATE_ALL( DEFINE_CALLQUEUE_MEMBER_QUEUE_CALL ); 
+//#define FUNC_GENERATE_QUEUE_METHODS() \
+//	FUNC_GENERATE_ALL( DEFINE_NONMEMBER_QUEUE_CALL ); \
+//	FUNC_GENERATE_ALL( DEFINE_MEMBER_QUEUE_CALL ); 
 
 	//FUNC_GENERATE_ALL( DEFINE_CALLQUEUE_CONST_MEMBER_QUEUE_CALL );
 	//FUNC_GENERATE_ALL( DEFINE_CALLQUEUE_REF_COUNTING_MEMBER_QUEUE_CALL ); \
@@ -154,7 +154,9 @@ public:
 		}
 	}
 
-	FUNC_GENERATE_QUEUE_METHODS();
+	//FUNC_GENERATE_QUEUE_METHODS();
+	FUNC_GENERATE_ALL(DEFINE_NONMEMBER_QUEUE_CALL);
+	FUNC_GENERATE_ALL(DEFINE_MEMBER_QUEUE_CALL);
 
 private:
 	void QueueFunctorInternal( CFunctor *pFunctor )
@@ -183,22 +185,6 @@ class CCallQueue : public CCallQueueT<>
 {
 };
 
-//-----------------------------------------------------
-// Optional interface that can be bound to concrete CCallQueue
-//-----------------------------------------------------
 
-class ICallQueue
-{
-public:
-	void QueueFunctor( CFunctor *pFunctor )
-	{
-		QueueFunctorInternal( RetAddRef( pFunctor ) );
-	}
-
-	FUNC_GENERATE_QUEUE_METHODS();
-
-private:
-	virtual void QueueFunctorInternal( CFunctor *pFunctor ) = 0;
-};
 
 #endif // CALLQUEUE_H

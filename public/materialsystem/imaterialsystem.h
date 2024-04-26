@@ -31,6 +31,7 @@
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "materialsystem/IColorCorrection.h"
 #include "tier1/memhelpers.h"
+#include "tier1/callqueue.h"
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -50,7 +51,7 @@ class IShader;
 class IVertexTexture;
 class IMorph;
 class IMatRenderContext;
-class ICallQueue;
+//class ICallQueue;
 struct MorphWeight_t;
 class IFileList;
 
@@ -1095,6 +1096,25 @@ public:
 	virtual bool				VerifyTextureCompositorTemplates( ) = 0;
 };
 
+//-----------------------------------------------------
+// Optional interface that can be bound to concrete CCallQueue
+//-----------------------------------------------------
+
+class ICallQueue
+{
+public:
+	void QueueFunctor(CFunctor* pFunctor)
+	{
+		QueueFunctorInternal(RetAddRef(pFunctor));
+	}
+
+	//FUNC_GENERATE_QUEUE_METHODS();
+	FUNC_GENERATE_ALL(DEFINE_NONMEMBER_QUEUE_CALL);
+	FUNC_GENERATE_ALL(DEFINE_MEMBER_QUEUE_CALL);
+
+private:
+	virtual void QueueFunctorInternal(CFunctor* pFunctor) = 0;
+};
 
 //-----------------------------------------------------------------------------
 // 
