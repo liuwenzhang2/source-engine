@@ -87,6 +87,10 @@ bool CFuncBrush::CreateVPhysics( void )
 	return true;
 }
 
+bool CFuncBrush::KeyValue(const char* szKeyName, const char* szValue) {
+	return BaseClass::KeyValue(szKeyName, szValue);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

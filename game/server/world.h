@@ -24,7 +24,7 @@ public:
 
 	static int RequiredEdictIndexStatic( void ) { return 0; }   // the world always needs to be in slot 0
 	virtual int RequiredEdictIndex(void) { return CWorld::RequiredEdictIndexStatic(); }
-	
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	static void RegisterSharedActivities( void );
 	static void RegisterSharedEvents( void );
 	virtual void Spawn( void );

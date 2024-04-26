@@ -96,6 +96,167 @@ public:
 extern bool g_fInCleanupDelete;
 extern void PhysOnCleanupDeleteList();
 
+
+class CEngineObjectInternal : public IEngineObject {
+public:
+	DECLARE_CLASS_NOBASE(CEngineObjectInternal);
+	//DECLARE_EMBEDDED_NETWORKVAR();
+
+	CEngineObjectInternal() {
+		SetIdentityMatrix(m_rgflCoordinateFrame);
+	}
+
+	~CEngineObjectInternal()
+	{
+		engine->CleanUpEntityClusterList(&m_PVSInfo);
+	}
+
+	void Init(CBaseEntity* pOuter) {
+		m_pOuter = pOuter;
+		m_PVSInfo.m_nClusterCount = 0;
+		m_bPVSInfoDirty = true;
+	}
+
+	CBaseEntity* GetOuter() {
+		return m_pOuter;
+	}
+
+	void					SetAbsVelocity(const Vector& vecVelocity);
+	Vector& GetAbsVelocity();
+	const Vector& GetAbsVelocity() const;
+	// NOTE: Setting the abs origin or angles will cause the local origin + angles to be set also
+	void					SetAbsOrigin(const Vector& origin);
+	Vector& GetAbsOrigin(void);
+	const Vector& GetAbsOrigin(void) const;
+
+	void					SetAbsAngles(const QAngle& angles);
+	QAngle& GetAbsAngles(void);
+	const QAngle& GetAbsAngles(void) const;
+
+	// Origin and angles in local space ( relative to parent )
+	// NOTE: Setting the local origin or angles will cause the abs origin + angles to be set also
+	void					SetLocalOrigin(const Vector& origin);
+	Vector& GetLocalOriginForWrite(void);
+	const Vector& GetLocalOrigin(void) const;
+
+	void					SetLocalAngles(const QAngle& angles);
+	const QAngle& GetLocalAngles(void) const;
+
+	void					SetLocalVelocity(const Vector& vecVelocity);
+	const Vector& GetLocalVelocity() const;
+
+	void					CalcAbsolutePosition();
+	void					CalcAbsoluteVelocity();
+
+	CEngineObjectInternal* GetMoveParent(void);
+	void SetMoveParent(EHANDLE hMoveParent);
+	CEngineObjectInternal* GetRootMoveParent();
+	CEngineObjectInternal* FirstMoveChild(void);
+	void SetFirstMoveChild(EHANDLE hMoveChild);
+	CEngineObjectInternal* NextMovePeer(void);
+	void SetNextMovePeer(EHANDLE hMovePeer);
+
+	void ResetRgflCoordinateFrame();
+	// Returns the entity-to-world transform
+	matrix3x4_t& EntityToWorldTransform();
+	const matrix3x4_t& EntityToWorldTransform() const;
+
+	// Some helper methods that transform a point from entity space to world space + back
+	void					EntityToWorldSpace(const Vector& in, Vector* pOut) const;
+	void					WorldToEntitySpace(const Vector& in, Vector* pOut) const;
+
+	// This function gets your parent's transform. If you're parented to an attachment,
+	// this calculates the attachment's transform and gives you that.
+	//
+	// You must pass in tempMatrix for scratch space - it may need to fill that in and return it instead of 
+	// pointing you right at a variable in your parent.
+	matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix);
+
+	// Computes the abs position of a point specified in local space
+	void					ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
+
+	// Computes the abs position of a direction specified in local space
+	void					ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection);
+
+	void	GetVectors(Vector* forward, Vector* right, Vector* up) const;
+
+	// Set the movement parent. Your local origin and angles will become relative to this parent.
+	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
+	// are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
+	// current m_iParentAttachment.
+	void	SetParent(IEngineObject* pNewParent, int iAttachment = -1);
+	// FIXME: Make hierarchy a member of CBaseEntity
+	// or a contained private class...
+	//static void UnlinkChild(CEngineObject* pParent, CEngineObject* pChild);
+	//static void LinkChild(CEngineObject* pParent, CEngineObject* pChild);
+	//static void ClearParent(CEngineObject* pEntity);
+	//static void UnlinkAllChildren(CEngineObject* pParent);
+	//static void UnlinkFromParent(CEngineObject* pRemove);
+	//static void TransferChildren(CEngineObject* pOldParent, CEngineObject* pNewParent);
+
+	virtual int				AreaNum() const;
+	virtual PVSInfo_t* GetPVSInfo();
+
+	// This version does a PVS check which also checks for connected areas
+	bool IsInPVS(const CCheckTransmitInfo* pInfo);
+
+	// This version doesn't do the area check
+	bool IsInPVS(const CBaseEntity* pRecipient, const void* pvs, int pvssize);
+
+	// Recomputes PVS information
+	void RecomputePVSInformation();
+	// Marks the PVS information dirty
+	void MarkPVSInformationDirty();
+private:
+
+	friend class CBaseEntity;
+	Vector			m_vecOrigin = Vector(0,0,0);
+	QAngle			m_angRotation = QAngle(0, 0, 0);
+	Vector			m_vecVelocity = Vector(0, 0, 0);
+	Vector			m_vecAbsOrigin = Vector(0, 0, 0);
+	QAngle			m_angAbsRotation = QAngle(0, 0, 0);
+	// Global velocity
+	Vector			m_vecAbsVelocity = Vector(0, 0, 0);
+	CBaseEntity* m_pOuter = NULL;
+
+	// Our immediate parent in the movement hierarchy.
+	// FIXME: clarify m_pParent vs. m_pMoveParent
+	EHANDLE m_hMoveParent = NULL;
+	// cached child list
+	EHANDLE m_hMoveChild = NULL;
+	// generated from m_pMoveParent
+	EHANDLE m_hMovePeer = NULL;
+	// local coordinate frame of entity
+	matrix3x4_t		m_rgflCoordinateFrame;
+
+	PVSInfo_t m_PVSInfo;
+	bool m_bPVSInfoDirty = false;
+
+};
+
+inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()
+{
+	return &m_PVSInfo;
+}
+
+inline int CEngineObjectInternal::AreaNum() const
+{
+	const_cast<CEngineObjectInternal*>(this)->RecomputePVSInformation();
+	return m_PVSInfo.m_nAreaNum;
+}
+
+//-----------------------------------------------------------------------------
+// Marks the PVS information dirty
+//-----------------------------------------------------------------------------
+inline void CEngineObjectInternal::MarkPVSInformationDirty()
+{
+	//if (m_entindex != -1)
+	//{
+	//GetTransmitState() |= FL_EDICT_DIRTY_PVS_INFORMATION;
+	//}
+	m_bPVSInfoDirty = true;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: a global list of all the entities in the game.  All iteration through
 //			entities is done through this object.
@@ -114,11 +275,13 @@ private:
 
 	bool m_bClearingEntities;
 	CUtlVector<T*> m_DeleteList;
+	CEngineObjectInternal* m_EngineObjectArray[NUM_ENT_ENTRIES];
 public:
 	void ReserveSlot(int index);
 	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
 	CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
 	void				DestroyEntity(IHandleEntity* pEntity);
+	IEngineObject*		GetEngineObject(int entnum);
 	IServerNetworkable* GetServerNetworkable( CBaseHandle hEnt ) const;
 	IServerNetworkable* GetServerNetworkable(int entnum) const;
 	IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const;
@@ -259,6 +422,11 @@ inline void	CGlobalEntityList<T>::DestroyEntity(IHandleEntity* pEntity) {
 //}
 
 template<class T>
+inline IEngineObject* CGlobalEntityList<T>::GetEngineObject(int entnum) {
+	return m_EngineObjectArray[entnum];
+}
+
+template<class T>
 inline IServerNetworkable* CGlobalEntityList<T>::GetServerNetworkable( CBaseHandle hEnt ) const
 {
 	T *pUnk = (BaseClass::LookupEntity( hEnt ));
@@ -331,6 +499,10 @@ CGlobalEntityList<T>::CGlobalEntityList()
 {
 	m_iHighestEnt = m_iNumEnts = m_iHighestEdicts = m_iNumEdicts = m_iNumReservedEdicts = 0;
 	m_bClearingEntities = false;
+	for (int i = 0; i < NUM_ENT_ENTRIES; i++)
+	{
+		m_EngineObjectArray[i] = NULL;
+	}
 }
 
 // mark an entity as deleted
@@ -1156,6 +1328,14 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 
 	// If it's a CBaseEntity, notify the listeners.
 	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
+	m_EngineObjectArray[i] = new CEngineObjectInternal();
+	m_EngineObjectArray[i]->Init(pBaseEnt);
+#ifdef _DEBUG
+	((Vector)m_EngineObjectArray[i]->GetLocalVelocity()).Init();
+	m_EngineObjectArray[i]->GetAbsVelocity().Init();
+#endif
+
+
 	if (pBaseEnt->IsNetworkable()) {
 		if (pBaseEnt->entindex() != -1)
 			m_iNumEdicts++;
@@ -1188,6 +1368,9 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 		}
 	}
 #endif
+	int i = handle.GetEntryIndex();
+	delete m_EngineObjectArray[i];
+	m_EngineObjectArray[i] = NULL;
 
 	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
 	if (pBaseEnt->IsNetworkable()) {

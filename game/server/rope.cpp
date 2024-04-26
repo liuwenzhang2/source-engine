@@ -124,9 +124,14 @@ CRopeKeyframe::~CRopeKeyframe()
 	// Release transmit state ownership.
 	SetStartPoint( NULL, 0 );
 	SetEndPoint( NULL, 0 );
-	GetEngineObject()->SetParent( NULL, 0 );
+	//GetEngineObject()->SetParent( NULL, 0 );
 }
 
+void CRopeKeyframe::UpdateOnRemove()
+{
+	BaseClass::UpdateOnRemove();
+	GetEngineObject()->SetParent(NULL, 0);
+}
 
 void CRopeKeyframe::SetAttachmentPoint( CBaseHandle &hOutEnt, short &iOutAttachment, CBaseEntity *pEnt, int iAttachment )
 {
@@ -164,7 +169,7 @@ void CRopeKeyframe::SetEndPoint( CBaseEntity *pEndPoint, int attachment )
 
 void CRopeKeyframe::BeforeUnlinkParent( CBaseEntity *pNewParent, int iAttachment )
 {
-	CEngineObject *pCurParent = GetEngineObject()->GetMoveParent();
+	IEngineObject *pCurParent = GetEngineObject()->GetMoveParent();
 	if ( pCurParent )
 	{
 		pCurParent->GetOuter()->DecrementTransmitStateOwnedCounter();

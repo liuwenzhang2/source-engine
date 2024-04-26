@@ -29,7 +29,7 @@ public:
 	bool CreateVPhysics( void );
 
 	virtual int	ObjectCaps( void ) { return HasSpawnFlags(SF_IGNORE_PLAYERUSE) ? BaseClass::ObjectCaps() : BaseClass::ObjectCaps() | FCAP_IMPULSE_USE; }
-
+	virtual bool KeyValue(const char* szKeyName, const char* szValue);
 	virtual int DrawDebugTextOverlays( void );
 
 	void TurnOff( void );

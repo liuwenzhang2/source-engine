@@ -885,16 +885,16 @@ public:
 		CEntityProxy* newEnt = new CEntityProxy(this, pEntityList, iForceEdictIndex, iSerialNum, pCallBack); // this is the only place 'new' should be used!
 		//CBaseHandle refHandle(iForceEdictIndex, iSerialNum);
 		//newEnt->SetRefEHandle(refHandle);
+		if (newEnt->GetEntityList()) {
+			int aaa = 0;
+		}
+		newEnt->m_pCallBack->AfterCreated(newEnt);
 #ifdef CLIENT_DLL
 		((IHandleEntity*)newEnt)->Init(iForceEdictIndex, iSerialNum);
 #endif
 #ifdef GAME_DLL
 		((CBaseEntity*)newEnt)->PostConstructor(m_pMapClassName, iForceEdictIndex);
 #endif // GAME_DLL
-		if (newEnt->GetEntityList()) {
-			int aaa = 0;
-		}
-		newEnt->m_pCallBack->AfterCreated(newEnt);
 		return newEnt;
 	}
 

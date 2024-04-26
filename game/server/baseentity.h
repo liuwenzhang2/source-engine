@@ -349,162 +349,100 @@ struct thinkfunc_t
 struct EmitSound_t;
 struct rotatingpushmove_t;
 
-class CEngineObject {
+class IEngineObject {
 public:
-	DECLARE_CLASS_NOBASE(CEngineObject);
-	//DECLARE_EMBEDDED_NETWORKVAR();
 
-	CEngineObject() {
-		SetIdentityMatrix(m_rgflCoordinateFrame);
-	}
+	virtual CBaseEntity* GetOuter() = 0;
 
-	~CEngineObject()
-	{
-		engine->CleanUpEntityClusterList(&m_PVSInfo);
-	}
-
-	void Init(CBaseEntity* pOuter) {
-		m_pOuter = pOuter;
-		m_PVSInfo.m_nClusterCount = 0;
-	}
-
-	CBaseEntity* GetOuter() {
-		return m_pOuter;
-	}
-
-	void					SetAbsVelocity(const Vector& vecVelocity);
-	Vector&					GetAbsVelocity();
-	const Vector&			GetAbsVelocity() const;
+	virtual void					SetAbsVelocity(const Vector& vecVelocity) = 0;
+	virtual Vector& GetAbsVelocity() = 0;
+	virtual const Vector& GetAbsVelocity() const = 0;
 	// NOTE: Setting the abs origin or angles will cause the local origin + angles to be set also
-	void					SetAbsOrigin(const Vector& origin);
-	Vector&					GetAbsOrigin(void);
-	const Vector&			GetAbsOrigin(void) const;
+	virtual void					SetAbsOrigin(const Vector& origin) = 0;
+	virtual Vector& GetAbsOrigin(void) = 0;
+	virtual const Vector& GetAbsOrigin(void) const = 0;
 
-	void					SetAbsAngles(const QAngle& angles);
-	QAngle&					GetAbsAngles(void);
-	const QAngle&			GetAbsAngles(void) const;
+	virtual void					SetAbsAngles(const QAngle& angles) = 0;
+	virtual QAngle& GetAbsAngles(void) = 0;
+	virtual const QAngle& GetAbsAngles(void) const = 0;
 
 	// Origin and angles in local space ( relative to parent )
 	// NOTE: Setting the local origin or angles will cause the abs origin + angles to be set also
-	void					SetLocalOrigin(const Vector& origin);
-	const Vector&			GetLocalOrigin(void) const;
+	virtual void					SetLocalOrigin(const Vector& origin) = 0;
+	virtual Vector& GetLocalOriginForWrite(void) = 0;
+	virtual const Vector& GetLocalOrigin(void) const = 0;
 
-	void					SetLocalAngles(const QAngle& angles);
-	const QAngle&			GetLocalAngles(void) const;
+	virtual void					SetLocalAngles(const QAngle& angles) = 0;
+	virtual const QAngle& GetLocalAngles(void) const = 0;
 
-	void					SetLocalVelocity(const Vector& vecVelocity);
-	const Vector&			GetLocalVelocity() const;
+	virtual void					SetLocalVelocity(const Vector& vecVelocity) = 0;
+	virtual const Vector& GetLocalVelocity() const = 0;
 
-	void					CalcAbsolutePosition();
-	void					CalcAbsoluteVelocity();
+	virtual void					CalcAbsolutePosition() = 0;
+	virtual void					CalcAbsoluteVelocity() = 0;
 
-	CEngineObject* GetMoveParent(void);
-	void SetMoveParent(EHANDLE hMoveParent);
-	CEngineObject* GetRootMoveParent();
-	CEngineObject* FirstMoveChild(void);
-	void SetFirstMoveChild(EHANDLE hMoveChild);
-	CEngineObject* NextMovePeer(void);
-	void SetNextMovePeer(EHANDLE hMovePeer);
+	virtual IEngineObject* GetMoveParent(void) = 0;
+	virtual void SetMoveParent(EHANDLE hMoveParent) = 0;
+	virtual IEngineObject* GetRootMoveParent() = 0;
+	virtual IEngineObject* FirstMoveChild(void) = 0;
+	virtual void SetFirstMoveChild(EHANDLE hMoveChild) = 0;
+	virtual IEngineObject* NextMovePeer(void) = 0;
+	virtual void SetNextMovePeer(EHANDLE hMovePeer) = 0;
 
+	virtual void ResetRgflCoordinateFrame() = 0;
 	// Returns the entity-to-world transform
-	matrix3x4_t& EntityToWorldTransform();
-	const matrix3x4_t& EntityToWorldTransform() const;
+	virtual matrix3x4_t& EntityToWorldTransform() = 0;
+	virtual const matrix3x4_t& EntityToWorldTransform() const = 0;
 
 	// Some helper methods that transform a point from entity space to world space + back
-	void					EntityToWorldSpace(const Vector& in, Vector* pOut) const;
-	void					WorldToEntitySpace(const Vector& in, Vector* pOut) const;
+	virtual void					EntityToWorldSpace(const Vector& in, Vector* pOut) const = 0;
+	virtual void					WorldToEntitySpace(const Vector& in, Vector* pOut) const = 0;
 
 	// This function gets your parent's transform. If you're parented to an attachment,
 	// this calculates the attachment's transform and gives you that.
 	//
 	// You must pass in tempMatrix for scratch space - it may need to fill that in and return it instead of 
 	// pointing you right at a variable in your parent.
-	matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix);
+	virtual matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix) = 0;
 
 	// Computes the abs position of a point specified in local space
-	void					ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
+	virtual void					ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition) = 0;
 
 	// Computes the abs position of a direction specified in local space
-	void					ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection);
+	virtual void					ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection) = 0;
 
-	void	GetVectors(Vector* forward, Vector* right, Vector* up) const;
+	virtual void	GetVectors(Vector* forward, Vector* right, Vector* up) const = 0;
 
 	// Set the movement parent. Your local origin and angles will become relative to this parent.
 	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
 	// are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
 	// current m_iParentAttachment.
-	void	SetParent(CEngineObject* pNewParent, int iAttachment = -1);
+	virtual void	SetParent(IEngineObject* pNewParent, int iAttachment = -1) = 0;
 	// FIXME: Make hierarchy a member of CBaseEntity
 	// or a contained private class...
-	static void UnlinkChild(CEngineObject* pParent, CEngineObject* pChild);
-	static void LinkChild(CEngineObject* pParent, CEngineObject* pChild);
-	static void ClearParent(CEngineObject* pEntity);
-	static void UnlinkAllChildren(CEngineObject* pParent);
-	static void UnlinkFromParent(CEngineObject* pRemove);
-	static void TransferChildren(CEngineObject* pOldParent, CEngineObject* pNewParent);
+	static void UnlinkChild(IEngineObject* pParent, IEngineObject* pChild);
+	static void LinkChild(IEngineObject* pParent, IEngineObject* pChild);
+	static void ClearParent(IEngineObject* pEntity);
+	static void UnlinkAllChildren(IEngineObject* pParent);
+	static void UnlinkFromParent(IEngineObject* pRemove);
+	static void TransferChildren(IEngineObject* pOldParent, IEngineObject* pNewParent);
 
-	virtual int				AreaNum() const;
-	virtual PVSInfo_t* GetPVSInfo();
+	virtual int				AreaNum() const = 0;
+	virtual PVSInfo_t* GetPVSInfo() = 0;
 
 	// This version does a PVS check which also checks for connected areas
-	bool IsInPVS(const CCheckTransmitInfo* pInfo);
+	virtual bool IsInPVS(const CCheckTransmitInfo* pInfo) = 0;
 
 	// This version doesn't do the area check
-	bool IsInPVS(const CBaseEntity* pRecipient, const void* pvs, int pvssize);
+	virtual bool IsInPVS(const CBaseEntity* pRecipient, const void* pvs, int pvssize) = 0;
 
 	// Recomputes PVS information
-	void RecomputePVSInformation();
+	virtual void RecomputePVSInformation() = 0;
 	// Marks the PVS information dirty
-	void MarkPVSInformationDirty();
-private:
-
-	friend class CBaseEntity;
-	Vector			m_vecOrigin;
-	QAngle			m_angRotation;
-	Vector			m_vecVelocity;
-	Vector			m_vecAbsOrigin;
-	QAngle			m_angAbsRotation;
-	// Global velocity
-	Vector			m_vecAbsVelocity;
-	CBaseEntity*	m_pOuter;
-
-	// Our immediate parent in the movement hierarchy.
-	// FIXME: clarify m_pParent vs. m_pMoveParent
-	EHANDLE m_hMoveParent;
-	// cached child list
-	EHANDLE m_hMoveChild;
-	// generated from m_pMoveParent
-	EHANDLE m_hMovePeer;
-	// local coordinate frame of entity
-	matrix3x4_t		m_rgflCoordinateFrame;
-
-	PVSInfo_t m_PVSInfo;
-	bool m_bPVSInfoDirty=false;
-
+	virtual void MarkPVSInformationDirty() = 0;
 };
 
-inline PVSInfo_t* CEngineObject::GetPVSInfo()
-{
-	return &m_PVSInfo;
-}
 
-inline int CEngineObject::AreaNum() const
-{
-	const_cast<CEngineObject*>(this)->RecomputePVSInformation();
-	return m_PVSInfo.m_nAreaNum;
-}
-
-//-----------------------------------------------------------------------------
-// Marks the PVS information dirty
-//-----------------------------------------------------------------------------
-inline void CEngineObject::MarkPVSInformationDirty()
-{
-	//if (m_entindex != -1)
-	//{
-	//GetTransmitState() |= FL_EDICT_DIRTY_PVS_INFORMATION;
-	//}
-	m_bPVSInfoDirty = true;
-}
 
 //#define CREATE_PREDICTED_ENTITY( className )	\
 //	CBaseEntity::CreatePredictedEntityByName( className, __FILE__, __LINE__ );
@@ -773,6 +711,7 @@ public:
 private:
 	bool		NameMatchesComplex( const char *pszNameOrWildcard );
 	bool		ClassMatchesComplex( const char *pszClassOrWildcard );
+public:
 	void		TransformStepData_WorldToParent( CBaseEntity *pParent );
 	void		TransformStepData_ParentToParent( CBaseEntity *pOldParent, CBaseEntity *pNewParent );
 	void		TransformStepData_ParentToWorld( CBaseEntity *pParent );
@@ -1413,14 +1352,9 @@ public:
 	virtual const Vector &GetViewOffset() const;
 	virtual void SetViewOffset( const Vector &v );
 
-	friend class CEngineObject;
-
-	CEngineObject* GetEngineObject() {
-		return &m_EngineObject;
-	}
-	const CEngineObject* GetEngineObject() const{
-		return &m_EngineObject;
-	}
+	//can not call this in constructor!
+	virtual IEngineObject* GetEngineObject();
+	virtual const IEngineObject* GetEngineObject() const;
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel
 	void			ApplyLocalVelocityImpulse( const Vector &vecImpulse );
@@ -1683,9 +1617,10 @@ public:
 
 	//void					SetPredictionEligible( bool canpredict );
 
-protected:
+public:
 	// Invalidates the abs state of all children
 	void					InvalidatePhysicsRecursive( int nChangeFlags );
+protected:
 
 	int						PhysicsClipVelocity (const Vector& in, const Vector& normal, Vector& out, float overbounce );
 	void					PhysicsRelinkChildren( float dt );
@@ -1827,10 +1762,6 @@ private:
 	CNetworkVar( unsigned char,  m_iParentAttachment ); // 0 if we're relative to the parent's absorigin and absangles.
 	CNetworkVar( unsigned char, m_MoveType );		// One of the MOVETYPE_ defines.
 	CNetworkVar( unsigned char, m_MoveCollide );
-
-	
-
-	CEngineObject m_EngineObject;
 
 	friend class CCollisionProperty;
 	friend class CServerNetworkProperty;

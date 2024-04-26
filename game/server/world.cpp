@@ -463,10 +463,16 @@ CWorld::CWorld( )
 	ActivityList_Init();
 	EventList_Init();
 	
-	SetSolid( SOLID_BSP );
+	//SetSolid( SOLID_BSP );
 	SetMoveType( MOVETYPE_NONE );
 
 	m_bColdWorld = false;
+}
+
+void CWorld::PostConstructor(const char* szClassname, int iForceEdictIndex)
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	SetSolid(SOLID_BSP);
 }
 
 CWorld::~CWorld( )

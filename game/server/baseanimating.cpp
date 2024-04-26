@@ -274,7 +274,7 @@ CBaseAnimating::CBaseAnimating()
 	m_pIk = NULL;
 	m_iIKCounter = 0;
 
-	InitStepHeightAdjust();
+	//InitStepHeightAdjust();
 
 	m_flModelScale = 1.0f;
 	// initialize anim clock
@@ -380,6 +380,7 @@ void CBaseAnimating::OnRestore()
 void CBaseAnimating::Spawn()
 {
 	BaseClass::Spawn();
+	InitStepHeightAdjust();
 }
 
 //-----------------------------------------------------------------------------

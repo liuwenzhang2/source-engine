@@ -18,14 +18,14 @@
 // Input  : pParent - 
 //			pChild - 
 //-----------------------------------------------------------------------------
-void CEngineObject::UnlinkChild( CEngineObject *pParent, CEngineObject *pChild )
+void IEngineObject::UnlinkChild( IEngineObject *pParent, IEngineObject *pChild )
 {
-	CEngineObject *pList = pParent->FirstMoveChild();
-	CEngineObject *pPrev = NULL;
+	IEngineObject *pList = pParent->FirstMoveChild();
+	IEngineObject *pPrev = NULL;
 	
 	while ( pList )
 	{
-		CEngineObject *pNext = pList->NextMovePeer();
+		IEngineObject *pNext = pList->NextMovePeer();
 		if ( pList == pChild )
 		{
 			// patch up the list
@@ -56,7 +56,7 @@ void CEngineObject::UnlinkChild( CEngineObject *pParent, CEngineObject *pChild )
 	Assert(0);
 }
 
-void CEngineObject::LinkChild( CEngineObject *pParent, CEngineObject *pChild )
+void IEngineObject::LinkChild( IEngineObject *pParent, IEngineObject *pChild )
 {
 	//EHANDLE hParent;
 	//hParent.Set( pParent->GetOuter() );
@@ -69,9 +69,9 @@ void CEngineObject::LinkChild( CEngineObject *pParent, CEngineObject *pChild )
 	pParent->GetOuter()->RecalcHasPlayerChildBit();
 }
 
-void CEngineObject::TransferChildren( CEngineObject *pOldParent, CEngineObject *pNewParent )
+void IEngineObject::TransferChildren( IEngineObject *pOldParent, IEngineObject *pNewParent )
 {
-	CEngineObject *pChild = pOldParent->FirstMoveChild();
+	IEngineObject *pChild = pOldParent->FirstMoveChild();
 	while ( pChild )
 	{
 		// NOTE: Have to do this before the unlink to ensure local coords are valid
@@ -98,7 +98,7 @@ void CEngineObject::TransferChildren( CEngineObject *pOldParent, CEngineObject *
 	}
 }
 
-void CEngineObject::UnlinkFromParent( CEngineObject *pRemove )
+void IEngineObject::UnlinkFromParent( IEngineObject *pRemove )
 {
 	if ( pRemove->GetMoveParent() )
 	{
@@ -122,12 +122,12 @@ void CEngineObject::UnlinkFromParent( CEngineObject *pRemove )
 //-----------------------------------------------------------------------------
 // Purpose: Clears the parent of all the children of the given object.
 //-----------------------------------------------------------------------------
-void CEngineObject::UnlinkAllChildren( CEngineObject *pParent )
+void IEngineObject::UnlinkAllChildren( IEngineObject *pParent )
 {
-	CEngineObject *pChild = pParent->FirstMoveChild();
+	IEngineObject *pChild = pParent->FirstMoveChild();
 	while ( pChild )
 	{
-		CEngineObject *pNext = pChild->NextMovePeer();
+		IEngineObject *pNext = pChild->NextMovePeer();
 		UnlinkFromParent( pChild );
 		pChild  = pNext;
 	}
