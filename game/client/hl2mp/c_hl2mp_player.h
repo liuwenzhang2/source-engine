@@ -30,6 +30,7 @@ public:
 	C_HL2MP_Player();
 	~C_HL2MP_Player( void );
 
+	bool Init(int entnum, int iSerialNum);
 	void ClientThink( void );
 
 	static C_HL2MP_Player* GetLocalHL2MPPlayer();

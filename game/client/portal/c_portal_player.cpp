@@ -322,12 +322,16 @@ C_Portal_Player::C_Portal_Player()
 
 	m_angEyeAngles.Init();
 
-	GetEngineObject()->AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
-
 	m_EntClientFlags |= ENTCLIENTFLAG_DONTUSEIK;
 	m_blinkTimer.Invalidate();
 
 	m_CCDeathHandle = INVALID_CLIENT_CCHANDLE;
+}
+
+bool C_Portal_Player::Init(int entnum, int iSerialNum) {
+	bool ret = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddVar(&m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR);
+	return ret;
 }
 
 C_Portal_Player::~C_Portal_Player( void )

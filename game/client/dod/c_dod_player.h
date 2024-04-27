@@ -38,6 +38,7 @@ public:
 	C_DODPlayer();
 	~C_DODPlayer();
 
+	bool Init(int entnum, int iSerialNum);
 	static C_DODPlayer* GetLocalDODPlayer();
 
 	virtual const QAngle& GetRenderAngles();

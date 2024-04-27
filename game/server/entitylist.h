@@ -102,6 +102,11 @@ public:
 	DECLARE_CLASS_NOBASE(CEngineObjectInternal);
 	//DECLARE_EMBEDDED_NETWORKVAR();
 
+	void* operator new(size_t stAllocateBlock);
+	void* operator new(size_t stAllocateBlock, int nBlockUse, const char* pFileName, int nLine);
+	void operator delete(void* pMem);
+	void operator delete(void* pMem, int nBlockUse, const char* pFileName, int nLine) { operator delete(pMem); }
+
 	CEngineObjectInternal() {
 		SetIdentityMatrix(m_rgflCoordinateFrame);
 	}

@@ -685,7 +685,7 @@ C_BaseAnimating::C_BaseAnimating() :
 		m_flEncodedController[ i ] = 0.0f;
 	}
 
-	AddBaseAnimatingInterpolatedVars();
+	//AddBaseAnimatingInterpolatedVars();
 
 	m_iMostRecentModelBoneCounter = 0xFFFFFFFF;
 	m_iMostRecentBoneSetupRequest = g_iPreviousBoneCounter - 1;
@@ -740,6 +740,17 @@ C_BaseAnimating::C_BaseAnimating() :
 	m_flOldCycle = 0;
 }
 
+bool C_BaseAnimating::Init(int entnum, int iSerialNum) {
+	bool ret = BaseClass::Init(entnum, iSerialNum);
+	AddBaseAnimatingInterpolatedVars();
+	return ret;
+}
+
+void C_BaseAnimating::UpdateOnRemove(void)
+{
+	BaseClass::UpdateOnRemove();
+	RemoveFromClientSideAnimationList();
+}
 //-----------------------------------------------------------------------------
 // Purpose: cleanup
 //-----------------------------------------------------------------------------
@@ -748,7 +759,6 @@ C_BaseAnimating::~C_BaseAnimating()
 	int i = g_PreviousBoneSetups.Find( this );
 	if ( i != -1 )
 		g_PreviousBoneSetups.FastRemove( i );
-	RemoveFromClientSideAnimationList();
 
 	TermRopes();
 	delete m_pRagdollInfo;
@@ -1860,7 +1870,7 @@ void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float curre
 	float		childPoseparam[MAXSTUDIOPOSEPARAM];
 
 	// go through all children
-	for ( C_EngineObject *pChild = GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
+	for ( IEngineObject *pChild = GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
 	{
 		C_BaseAnimating *pChildAnimating = pChild->GetOuter()->GetBaseAnimating();
 
@@ -5718,7 +5728,7 @@ float C_BaseAnimating::SetBoneController ( int iController, float flValue )
 
 void C_BaseAnimating::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles )
 {
-	C_EngineObject *pMoveParent;
+	IEngineObject *pMoveParent;
 	if ( IsEffectActive( EF_BONEMERGE ) && IsEffectActive( EF_BONEMERGE_FASTCULL ) && (pMoveParent = GetEngineObject()->GetMoveParent()) != NULL )
 	{
 		// Doing this saves a lot of CPU.

@@ -79,6 +79,8 @@ public:
 	C_BasePlayer();
 	virtual			~C_BasePlayer();
 
+	bool Init(int entnum, int iSerialNum);
+
 	virtual void	Spawn( void );
 	virtual void	SharedSpawn(); // Shared between client and server.
 	virtual bool	GetSteamID( CSteamID *pID );

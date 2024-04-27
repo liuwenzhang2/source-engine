@@ -560,9 +560,14 @@ CBaseGrenade::CBaseGrenade(void)
 	m_flDetonateTime	= 0;
 	m_bHasWarnedAI		= false;
 
-	SetSimulatedEveryTick( true );
 };
 
+#ifdef CLIENT_DLL
+bool CBaseGrenade::Init(int entnum, int iSerialNum) {
+	SetSimulatedEveryTick(true);
+	return BaseClass::Init(entnum, iSerialNum);
+}
+#endif // CLIENT_DLL
 
 
 

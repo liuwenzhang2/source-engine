@@ -682,8 +682,6 @@ C_DODPlayer::C_DODPlayer() :
 	m_iProgressBarDuration = 0;
 	m_flProgressBarStartTime = 0.0f;
 
-	GetEngineObject()->AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
-
 	m_flProneViewOffset = 0.0;
 	m_bProneSwayingRight = true;
 	m_iIDEntIndex = 0;
@@ -707,6 +705,11 @@ C_DODPlayer::C_DODPlayer() :
 	m_pHeadIconMaterial = NULL;
 }
 
+bool C_DODPlayer::Init(int entnum, int iSerialNum) {
+	bool ret = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddVar(&m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR);
+	return ret;
+}
 
 C_DODPlayer::~C_DODPlayer()
 {

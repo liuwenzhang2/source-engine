@@ -44,6 +44,7 @@ public:
 	C_CSPlayer();
 	~C_CSPlayer();
 
+	bool Init(int entnum, int iSerialNum);
 	virtual void Simulate();
 
 	bool HasDefuser() const;

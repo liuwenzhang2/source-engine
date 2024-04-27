@@ -24,6 +24,7 @@ public:
 	C_PropVehicleDriveable();
 	~C_PropVehicleDriveable();
 
+	bool Init(int entnum, int iSerialNum);
 // IVehicle overrides.
 public:
 

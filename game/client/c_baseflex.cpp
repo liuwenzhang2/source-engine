@@ -130,9 +130,6 @@ C_BaseFlex::C_BaseFlex() :
 	((Vector&)m_viewtarget).Init();
 #endif
 
-	GetEngineObject()->AddVar( &m_viewtarget, &m_iv_viewtarget, LATCH_ANIMATION_VAR | INTERPOLATE_LINEAR_ONLY );
-	GetEngineObject()->AddVar( m_flexWeight, &m_iv_flexWeight, LATCH_ANIMATION_VAR );
-
 	// Fill in phoneme class lookup
 	SetupMappings( "phonemes" );
 
@@ -141,12 +138,18 @@ C_BaseFlex::C_BaseFlex() :
 
 	/// Make sure size is correct
 	Assert( PHONEME_CLASS_STRONG + 1 == NUM_PHONEME_CLASSES );
+}
 
+bool C_BaseFlex::Init(int entnum, int iSerialNum) {
+	bool ret = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddVar(&m_viewtarget, &m_iv_viewtarget, LATCH_ANIMATION_VAR | INTERPOLATE_LINEAR_ONLY);
+	GetEngineObject()->AddVar(m_flexWeight, &m_iv_flexWeight, LATCH_ANIMATION_VAR);
 #ifdef HL2_CLIENT_DLL
 	// Get general lean vector
-	GetEngineObject()->AddVar( &m_vecLean, &m_iv_vecLean, LATCH_ANIMATION_VAR );
-	GetEngineObject()->AddVar( &m_vecShift, &m_iv_vecShift, LATCH_ANIMATION_VAR );
+	GetEngineObject()->AddVar(&m_vecLean, &m_iv_vecLean, LATCH_ANIMATION_VAR);
+	GetEngineObject()->AddVar(&m_vecShift, &m_iv_vecShift, LATCH_ANIMATION_VAR);
 #endif
+	return ret;
 }
 
 C_BaseFlex::~C_BaseFlex()

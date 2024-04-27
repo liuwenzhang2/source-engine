@@ -134,6 +134,8 @@ public:
 					C_BaseFlex();
 	virtual			~C_BaseFlex();
 
+	bool Init(int entnum, int iSerialNum);
+
 	virtual void Spawn();
 
 	virtual void InitPhonemeMappings();

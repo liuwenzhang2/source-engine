@@ -403,8 +403,6 @@ LINK_ENTITY_TO_CLASS( player, C_BasePlayer );
 // -------------------------------------------------------------------------------- //
 C_BasePlayer::C_BasePlayer() : m_iv_vecViewOffset( "C_BasePlayer::m_iv_vecViewOffset" )
 {
-	GetEngineObject()->AddVar( &m_vecViewOffset, &m_iv_vecViewOffset, LATCH_SIMULATION_VAR );
-	
 #ifdef _DEBUG																
 	m_vecLadderNormal.Init();
 	m_vecOldViewAngles.Init();
@@ -438,6 +436,12 @@ C_BasePlayer::C_BasePlayer() : m_iv_vecViewOffset( "C_BasePlayer::m_iv_vecViewOf
 	m_nForceVisionFilterFlags = 0;
 
 	ListenForGameEvent( "base_player_teleported" );
+}
+
+bool C_BasePlayer::Init(int entnum, int iSerialNum) {
+	bool ret = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddVar(&m_vecViewOffset, &m_iv_vecViewOffset, LATCH_SIMULATION_VAR);
+	return ret;
 }
 
 //-----------------------------------------------------------------------------
@@ -2275,7 +2279,7 @@ void C_BasePlayer::PhysicsSimulate( void )
 #if !defined( NO_ENTITY_PREDICTION )
 	VPROF( "C_BasePlayer::PhysicsSimulate" );
 	// If we've got a moveparent, we must simulate that first.
-	C_EngineObject *pMoveParent = GetEngineObject()->GetMoveParent();
+	IEngineObject *pMoveParent = GetEngineObject()->GetMoveParent();
 	if (pMoveParent)
 	{
 		pMoveParent->GetOuter()->PhysicsSimulate();

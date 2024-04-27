@@ -768,8 +768,8 @@ void C_LocalTempEntity::OnRemoveTempEntity()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CTempEnts::CTempEnts( void ) :
-	m_TempEntsPool( ( MAX_TEMP_ENTITIES / 20 ), CUtlMemoryPool::GROW_SLOW )
+CTempEnts::CTempEnts( void )
+//:m_TempEntsPool( ( MAX_TEMP_ENTITIES / 20 ), CUtlMemoryPool::GROW_SLOW )
 {
 }
 
@@ -778,7 +778,8 @@ CTempEnts::CTempEnts( void ) :
 //-----------------------------------------------------------------------------
 CTempEnts::~CTempEnts( void )
 {
-	m_TempEntsPool.Clear();
+	//m_TempEntsPool.Clear();
+	Clear();
 	m_TempEnts.RemoveAll();
 }
 
@@ -1935,7 +1936,8 @@ void CTempEnts::Clear( void )
 	{
 		C_LocalTempEntity *p = m_TempEnts[ i ];
 
-		m_TempEntsPool.Free( p );
+		//m_TempEntsPool.Free( p );
+		ClientEntityList().DestroyEntity(p);
 	}
 
 	m_TempEnts.RemoveAll();
@@ -2016,7 +2018,8 @@ C_LocalTempEntity *CTempEnts::TempEntAlloc()
 	if ( m_TempEnts.Count() >= MAX_TEMP_ENTITIES )
 		return NULL;
 
-	C_LocalTempEntity *pTemp = m_TempEntsPool.AllocZero();
+	//C_LocalTempEntity *pTemp = m_TempEntsPool.AllocZero();
+	C_LocalTempEntity* pTemp = (C_LocalTempEntity*)ClientEntityList().CreateEntityByName("C_LocalTempEntity");
 	return pTemp;
 }
 
@@ -2044,7 +2047,8 @@ void CTempEnts::TempEntFree( int index )
 
 		pTemp->OnRemoveTempEntity();
 	
-		m_TempEntsPool.Free( pTemp );
+		//m_TempEntsPool.Free( pTemp );
+		ClientEntityList().DestroyEntity(pTemp);
 	}
 }
 

@@ -54,6 +54,8 @@ public:
 					C_ParticleSmokeGrenade();
 					~C_ParticleSmokeGrenade();
 
+					bool Init(int entnum, int iSerialNum);
+					void UpdateOnRemove(void);
 private:
 	
 	class SmokeGrenadeParticle : public Particle
@@ -66,12 +68,10 @@ private:
 		unsigned char		m_Color[4];
 	};
 
-
 public:
 
 	// Optional call. It will use defaults if you don't call this.
-	void			SetParams(
-		);
+	void			SetParams();
 
 	// Call this to move the source..
 	void			SetPos(const Vector &pos);
@@ -206,7 +206,7 @@ private:
 	float				m_ExpandTimeCounter;	// How long since we started expanding.	
 	float				m_ExpandRadius;			// How large is our radius.
 
-	C_SmokeTrail		m_SmokeTrail;
+	C_SmokeTrail*		m_pSmokeTrail = NULL;
 };
 
 
@@ -315,6 +315,16 @@ C_ParticleSmokeGrenade::C_ParticleSmokeGrenade()
 	m_bStarted = false;
 }
 
+bool C_ParticleSmokeGrenade::Init(int entnum, int iSerialNum)
+{
+	m_pSmokeTrail = (C_SmokeTrail*)ClientEntityList().CreateEntityByName("C_SmokeTrail");
+	return BaseClass::Init(entnum, iSerialNum);
+}
+
+void C_ParticleSmokeGrenade::UpdateOnRemove(void) {
+	ClientEntityList().DestroyEntity(m_pSmokeTrail);
+	m_pSmokeTrail = NULL;
+}
 
 C_ParticleSmokeGrenade::~C_ParticleSmokeGrenade()
 {
@@ -344,17 +354,17 @@ void C_ParticleSmokeGrenade::Start(CParticleMgr *pParticleMgr, IPrototypeArgAcce
 	if(!pParticleMgr->AddEffect( &m_ParticleEffect, this ))
 		return;
 	
-	m_SmokeTrail.Start(pParticleMgr, pArgs);
+	m_pSmokeTrail->Start(pParticleMgr, pArgs);
 
-	m_SmokeTrail.m_ParticleLifetime = 0.5;
-	m_SmokeTrail.SetSpawnRate(40);
-	m_SmokeTrail.m_MinSpeed = 0;
-	m_SmokeTrail.m_MaxSpeed = 0;
-	m_SmokeTrail.m_StartSize = 3;
-	m_SmokeTrail.m_EndSize = 10;
-	m_SmokeTrail.m_SpawnRadius = 0;
+	m_pSmokeTrail->m_ParticleLifetime = 0.5;
+	m_pSmokeTrail->SetSpawnRate(40);
+	m_pSmokeTrail->m_MinSpeed = 0;
+	m_pSmokeTrail->m_MaxSpeed = 0;
+	m_pSmokeTrail->m_StartSize = 3;
+	m_pSmokeTrail->m_EndSize = 10;
+	m_pSmokeTrail->m_SpawnRadius = 0;
 
-	m_SmokeTrail.SetLocalOrigin( GetAbsOrigin() );
+	m_pSmokeTrail->SetLocalOrigin( GetAbsOrigin() );
 
 	for(int i=0; i < NUM_MATERIAL_HANDLES; i++)
 	{
@@ -429,16 +439,16 @@ void C_ParticleSmokeGrenade::UpdateSmokeTrail( float fTimeDelta )
 		// Update the smoke particle color.
 		if(m_CurrentStage == 0)
 		{
-			m_SmokeTrail.m_StartColor = EngineGetLightForPoint(GetAbsOrigin()) * 0.5f;
-			m_SmokeTrail.m_EndColor = m_SmokeTrail.m_StartColor;
+			m_pSmokeTrail->m_StartColor = EngineGetLightForPoint(GetAbsOrigin()) * 0.5f;
+			m_pSmokeTrail->m_EndColor = m_pSmokeTrail->m_StartColor;
 		}
 
 		// Spin the smoke trail.
 		AngleVectors(pAimEnt->GetAbsAngles(), &forward, &right, &up);
-		m_SmokeTrail.m_VelocityOffset = forward * 30 + GetAbsVelocity();
+		m_pSmokeTrail->m_VelocityOffset = forward * 30 + GetAbsVelocity();
 
-		m_SmokeTrail.SetLocalOrigin( GetAbsOrigin() );
-		m_SmokeTrail.Update(fTimeDelta);
+		m_pSmokeTrail->SetLocalOrigin( GetAbsOrigin() );
+		m_pSmokeTrail->Update(fTimeDelta);
 	}	
 }
 
@@ -810,7 +820,7 @@ void C_ParticleSmokeGrenade::FillVolume()
 {
 	m_CurrentStage = 1;
 	m_SmokeBasePos = GetPos();
-	m_SmokeTrail.SetEmit(false);
+	m_pSmokeTrail->SetEmit(false);
 	m_ExpandTimeCounter = m_ExpandRadius = 0;
 	m_bVolumeFilled = true;
 
@@ -926,7 +936,7 @@ void C_ParticleSmokeGrenade::CleanupToolRecordingState( KeyValues *msg )
 		return;
 
 	BaseClass::CleanupToolRecordingState( msg );
-	m_SmokeTrail.CleanupToolRecordingState( msg );
+	m_pSmokeTrail->CleanupToolRecordingState( msg );
 
 	// Generally, this is used to allow the entity to clean up
 	// allocated state it put into the message, but here we're going

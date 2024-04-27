@@ -42,6 +42,32 @@ CGlobalEntityList<CBaseEntity>* sv_entitylist = &gEntList;
 // Game-code CBaseHandle implementation.
 // -------------------------------------------------------------------------------------------------- //
 
+
+//-----------------------------------------------------------------------------
+// CBaseEntity new/delete
+// allocates and frees memory for itself from the engine->
+// All fields in the object are all initialized to 0.
+//-----------------------------------------------------------------------------
+void* CEngineObjectInternal::operator new(size_t stAllocateBlock)
+{
+	// call into engine to get memory
+	Assert(stAllocateBlock != 0);
+	return engine->PvAllocEntPrivateData(stAllocateBlock);
+};
+
+void* CEngineObjectInternal::operator new(size_t stAllocateBlock, int nBlockUse, const char* pFileName, int nLine)
+{
+	// call into engine to get memory
+	Assert(stAllocateBlock != 0);
+	return engine->PvAllocEntPrivateData(stAllocateBlock);
+}
+
+void CEngineObjectInternal::operator delete(void* pMem)
+{
+	// get the engine to free the memory
+	engine->FreeEntPrivateData(pMem);
+}
+
 //-----------------------------------------------------------------------------
 // PVS rules
 //-----------------------------------------------------------------------------

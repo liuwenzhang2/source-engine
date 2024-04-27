@@ -891,6 +891,7 @@ public:
 		newEnt->m_pCallBack->AfterCreated(newEnt);
 #ifdef CLIENT_DLL
 		((IHandleEntity*)newEnt)->Init(iForceEdictIndex, iSerialNum);
+		((IHandleEntity*)newEnt)->AfterInit();
 #endif
 #ifdef GAME_DLL
 		((CBaseEntity*)newEnt)->PostConstructor(m_pMapClassName, iForceEdictIndex);
@@ -905,14 +906,12 @@ public:
 		{
 			Error("not created by IEntityFactory!");
 		}
-		pEntityProxy->m_pCallBack->BeforeDestroy(pEntity);
 #ifdef CLIENT_DLL
 		((C_BaseEntity*)pEntityProxy)->Remove();
 #endif // CLIENT_DLL
-//#ifdef GAME_DLL
+		pEntityProxy->m_pCallBack->BeforeDestroy(pEntity);
 		pEntityProxy->m_bInDestruction = true;
 		delete pEntityProxy;
-//#endif // GAME_DLL
 	}
 
 	const char* GetMapClassName() {

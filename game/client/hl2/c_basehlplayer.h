@@ -25,6 +25,7 @@ public:
 
 						C_BaseHLPlayer();
 
+	bool Init(int entnum, int iSerialNum);
 	virtual void		OnDataChanged( DataUpdateType_t updateType );
 
 	void				Weapon_DropPrimary( void );

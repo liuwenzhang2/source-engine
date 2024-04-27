@@ -26,6 +26,7 @@ public:
 	virtual IEntityFactory* GetEntityFactory() { return NULL; }
 	virtual IEntityList* GetEntityList() { return NULL; }
 	virtual bool Init(int entnum, int iSerialNum) { return true; }
+	virtual void AfterInit() {};
 };
 
 abstract_class IEntityCallBack{

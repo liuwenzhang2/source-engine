@@ -33,6 +33,8 @@ public:
 	C_Portal_Player();
 	~C_Portal_Player( void );
 
+	bool Init(int entnum, int iSerialNum);
+
 	void ClientThink( void );
 	void FixTeleportationRoll( void );
 

@@ -82,7 +82,8 @@ bool C_World::Init( int entnum, int iSerialNum )
 void C_World::Release()
 {
 	ActivityList_Free();
-	Term();
+	//Term();
+	BaseClass::Release();
 }
 
 void C_World::PreDataUpdate( DataUpdateType_t updateType )

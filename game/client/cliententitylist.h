@@ -96,6 +96,311 @@ public:
 	unsigned char m_InPVSStatus;				// Combination of the INPVS_ flags.
 	unsigned short m_PVSNotifiersLink;			// Into m_PVSNotifyInfos.
 };
+
+class C_EngineObjectInternal : public IEngineObject {
+public:
+	DECLARE_CLASS_NOBASE(C_EngineObjectInternal);
+	DECLARE_PREDICTABLE();
+
+	// memory handling, uses calloc so members are zero'd out on instantiation
+	void* operator new(size_t stAllocateBlock);
+	void* operator new[](size_t stAllocateBlock);
+	void* operator new(size_t stAllocateBlock, int nBlockUse, const char* pFileName, int nLine);
+	void* operator new[](size_t stAllocateBlock, int nBlockUse, const char* pFileName, int nLine);
+	void operator delete(void* pMem);
+	void operator delete(void* pMem, int nBlockUse, const char* pFileName, int nLine) { operator delete(pMem); }
+
+	C_EngineObjectInternal() :
+		m_iv_vecOrigin("C_BaseEntity::m_iv_vecOrigin"),
+		m_iv_angRotation("C_BaseEntity::m_iv_angRotation"),
+		m_iv_vecVelocity("C_BaseEntity::m_iv_vecVelocity")
+	{
+		AddVar(&m_vecOrigin, &m_iv_vecOrigin, LATCH_SIMULATION_VAR);
+		AddVar(&m_angRotation, &m_iv_angRotation, LATCH_SIMULATION_VAR);
+		// Removing this until we figure out why velocity introduces view hitching.
+		// One possible fix is removing the player->ResetLatched() call in CGameMovement::FinishDuck(), 
+		// but that re-introduces a third-person hitching bug.  One possible cause is the abrupt change
+		// in player size/position that occurs when ducking, and how prediction tries to work through that.
+		//
+		// AddVar( &m_vecVelocity, &m_iv_vecVelocity, LATCH_SIMULATION_VAR );
+		for (int i = 0; i < MULTIPLAYER_BACKUP; i++) {
+			m_pIntermediateData[i] = NULL;
+			m_pOuterIntermediateData[i] = NULL;
+		}
+	}
+
+	void Init(C_BaseEntity* pOuter) {
+		m_pOuter = pOuter;
+	}
+
+	C_BaseEntity* GetOuter() {
+		return m_pOuter;
+	}
+
+	// NOTE: Setting the abs velocity in either space will cause a recomputation
+	// in the other space, so setting the abs velocity will also set the local vel
+	void				SetAbsVelocity(const Vector& vecVelocity);
+	Vector& GetAbsVelocity();
+	const Vector& GetAbsVelocity() const;
+
+	// Sets abs angles, but also sets local angles to be appropriate
+	void				SetAbsOrigin(const Vector& origin);
+	Vector& GetAbsOrigin(void);
+	const Vector& GetAbsOrigin(void) const;
+
+	void				SetAbsAngles(const QAngle& angles);
+	QAngle& GetAbsAngles(void);
+	const QAngle& GetAbsAngles(void) const;
+
+	void				SetLocalOrigin(const Vector& origin);
+	void				SetLocalOriginDim(int iDim, vec_t flValue);
+	const Vector& GetLocalOrigin(void) const;
+	vec_t				GetLocalOriginDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
+
+	void				SetLocalAngles(const QAngle& angles);
+	void				SetLocalAnglesDim(int iDim, vec_t flValue);
+	const QAngle& GetLocalAngles(void) const;
+	vec_t				GetLocalAnglesDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
+
+	void				SetLocalVelocity(const Vector& vecVelocity);
+	Vector& GetLocalVelocity();
+	const Vector& GetLocalVelocity() const;
+
+	const Vector& GetPrevLocalOrigin() const;
+	const QAngle& GetPrevLocalAngles() const;
+
+	CInterpolatedVar< QAngle >& GetRotationInterpolator();
+	CInterpolatedVar< Vector >& GetOriginInterpolator();
+
+	// Determine approximate velocity based on updates from server
+	void					EstimateAbsVelocity(Vector& vel);
+	// Computes absolute position based on hierarchy
+	void CalcAbsolutePosition();
+	void CalcAbsoluteVelocity();
+
+	// Unlinks from hierarchy
+	// Set the movement parent. Your local origin and angles will become relative to this parent.
+	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
+	// are relative to the attachment on this entity.
+	void SetParent(IEngineObject* pParentEntity, int iParentAttachment = 0);
+	void UnlinkChild(IEngineObject* pParent, IEngineObject* pChild);
+	void LinkChild(IEngineObject* pParent, IEngineObject* pChild);
+	void HierarchySetParent(IEngineObject* pNewParent);
+	void UnlinkFromHierarchy();
+
+	// Methods relating to traversing hierarchy
+	C_EngineObjectInternal* GetMoveParent(void) const;
+	void SetMoveParent(IEngineObject* pMoveParent);
+	C_EngineObjectInternal* GetRootMoveParent();
+	C_EngineObjectInternal* FirstMoveChild(void) const;
+	void SetFirstMoveChild(IEngineObject* pMoveChild);
+	C_EngineObjectInternal* NextMovePeer(void) const;
+	void SetNextMovePeer(IEngineObject* pMovePeer);
+	C_EngineObjectInternal* MovePrevPeer(void) const;
+	void SetMovePrevPeer(IEngineObject* pMovePrevPeer);
+
+	virtual void ResetRgflCoordinateFrame();
+	// Returns the entity-to-world transform
+	matrix3x4_t& EntityToWorldTransform();
+	const matrix3x4_t& EntityToWorldTransform() const;
+
+	// Some helper methods that transform a point from entity space to world space + back
+	void							EntityToWorldSpace(const Vector& in, Vector* pOut) const;
+	void							WorldToEntitySpace(const Vector& in, Vector* pOut) const;
+
+	void							GetVectors(Vector* forward, Vector* right, Vector* up) const;
+
+	// This function gets your parent's transform. If you're parented to an attachment,
+// this calculates the attachment's transform and gives you that.
+//
+// You must pass in tempMatrix for scratch space - it may need to fill that in and return it instead of 
+// pointing you right at a variable in your parent.
+	matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix);
+
+	// Computes the abs position of a point specified in local space
+	void				ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
+
+	// Computes the abs position of a direction specified in local space
+	void				ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection);
+
+public:
+
+	void AddVar(void* data, IInterpolatedVar* watcher, int type, bool bSetup = false);
+	void RemoveVar(void* data, bool bAssert = true);
+	VarMapping_t* GetVarMapping();
+
+	// Set appropriate flags and store off data when these fields are about to change
+	void							OnLatchInterpolatedVariables(int flags);
+	// For predictable entities, stores last networked value
+	void							OnStoreLastNetworkedValue();
+
+	void							Interp_SetupMappings(VarMapping_t* map);
+
+	// Returns 1 if there are no more changes (ie: we could call RemoveFromInterpolationList).
+	int								Interp_Interpolate(VarMapping_t* map, float currentTime);
+
+	void							Interp_RestoreToLastNetworked(VarMapping_t* map);
+	void							Interp_UpdateInterpolationAmounts(VarMapping_t* map);
+	void							Interp_Reset(VarMapping_t* map);
+	void							Interp_HierarchyUpdateInterpolationAmounts();
+
+
+
+	// Returns INTERPOLATE_STOP or INTERPOLATE_CONTINUE.
+	// bNoMoreChanges is set to 1 if you can call RemoveFromInterpolationList on the entity.
+	int BaseInterpolatePart1(float& currentTime, Vector& oldOrigin, QAngle& oldAngles, Vector& oldVel, int& bNoMoreChanges);
+	void BaseInterpolatePart2(Vector& oldOrigin, QAngle& oldAngles, Vector& oldVel, int nChangeFlags);
+
+	void							AllocateIntermediateData(void);
+	void							DestroyIntermediateData(void);
+	void							ShiftIntermediateDataForward(int slots_to_remove, int previous_last_slot);
+
+	void* GetPredictedFrame(int framenumber);
+	void* GetOuterPredictedFrame(int framenumber);
+	void* GetOriginalNetworkDataObject(void);
+	void* GetOuterOriginalNetworkDataObject(void);
+	bool							IsIntermediateDataAllocated(void) const;
+
+	void							PreEntityPacketReceived(int commands_acknowledged);
+	void							PostEntityPacketReceived(void);
+	bool							PostNetworkDataReceived(int commands_acknowledged);
+
+	int								SaveData(const char* context, int slot, int type);
+	int								RestoreData(const char* context, int slot, int type);
+
+#if !defined( NO_ENTITY_PREDICTION )
+	// For storing prediction results and pristine network state
+	byte* m_pIntermediateData[MULTIPLAYER_BACKUP];
+	byte* m_pOriginalData = NULL;
+	byte* m_pOuterIntermediateData[MULTIPLAYER_BACKUP];
+	byte* m_pOuterOriginalData = NULL;
+	int								m_nIntermediateDataCount = 0;
+
+	//bool							m_bIsPlayerSimulated;
+#endif
+
+	void					Clear(void) {
+		m_pOriginalData = NULL;
+		m_pOuterOriginalData = NULL;
+		for (int i = 0; i < MULTIPLAYER_BACKUP; i++) {
+			m_pIntermediateData[i] = NULL;
+			m_pOuterIntermediateData[i] = NULL;
+		}
+	}
+
+	VarMapping_t	m_VarMap;
+private:
+
+	friend class C_BaseEntity;
+	CThreadFastMutex m_CalcAbsolutePositionMutex;
+	CThreadFastMutex m_CalcAbsoluteVelocityMutex;
+	Vector							m_vecOrigin = Vector(0,0,0);
+	CInterpolatedVar< Vector >		m_iv_vecOrigin;
+	QAngle							m_angRotation = QAngle(0, 0, 0);
+	CInterpolatedVar< QAngle >		m_iv_angRotation;
+	// Object velocity
+	Vector							m_vecVelocity = Vector(0, 0, 0);
+	CInterpolatedVar< Vector >		m_iv_vecVelocity;
+	Vector							m_vecAbsOrigin = Vector(0, 0, 0);
+	// Object orientation
+	QAngle							m_angAbsRotation = QAngle(0, 0, 0);
+	Vector							m_vecAbsVelocity = Vector(0, 0, 0);
+	C_BaseEntity* m_pOuter = NULL;
+
+	// Hierarchy
+	C_EngineObjectInternal* m_pMoveParent = NULL;
+	C_EngineObjectInternal* m_pMoveChild = NULL;
+	C_EngineObjectInternal* m_pMovePeer = NULL;
+	C_EngineObjectInternal* m_pMovePrevPeer = NULL;
+
+	// Specifies the entity-to-world transform
+	matrix3x4_t						m_rgflCoordinateFrame;
+};
+
+//-----------------------------------------------------------------------------
+// Methods relating to traversing hierarchy
+//-----------------------------------------------------------------------------
+inline C_EngineObjectInternal* C_EngineObjectInternal::GetMoveParent(void) const
+{
+	return m_pMoveParent;
+}
+
+inline void C_EngineObjectInternal::SetMoveParent(IEngineObject* pMoveParent) {
+	m_pMoveParent = (C_EngineObjectInternal*)pMoveParent;
+}
+
+inline C_EngineObjectInternal* C_EngineObjectInternal::FirstMoveChild(void) const
+{
+	return m_pMoveChild;
+}
+
+inline void C_EngineObjectInternal::SetFirstMoveChild(IEngineObject* pMoveChild) {
+	m_pMoveChild = (C_EngineObjectInternal*)pMoveChild;
+}
+
+inline C_EngineObjectInternal* C_EngineObjectInternal::NextMovePeer(void) const
+{
+	return m_pMovePeer;
+}
+
+inline void C_EngineObjectInternal::SetNextMovePeer(IEngineObject* pMovePeer) {
+	m_pMovePeer = (C_EngineObjectInternal*)pMovePeer;
+}
+
+inline C_EngineObjectInternal* C_EngineObjectInternal::MovePrevPeer(void) const
+{
+	return m_pMovePrevPeer;
+}
+
+inline void C_EngineObjectInternal::SetMovePrevPeer(IEngineObject* pMovePrevPeer) {
+	m_pMovePrevPeer = (C_EngineObjectInternal*)pMovePrevPeer;
+}
+
+inline C_EngineObjectInternal* C_EngineObjectInternal::GetRootMoveParent()
+{
+	C_EngineObjectInternal* pEntity = this;
+	C_EngineObjectInternal* pParent = this->GetMoveParent();
+	while (pParent)
+	{
+		pEntity = pParent;
+		pParent = pEntity->GetMoveParent();
+	}
+
+	return pEntity;
+}
+
+inline VarMapping_t* C_EngineObjectInternal::GetVarMapping()
+{
+	return &m_VarMap;
+}
+
+//-----------------------------------------------------------------------------
+// Some helper methods that transform a point from entity space to world space + back
+//-----------------------------------------------------------------------------
+inline void C_EngineObjectInternal::EntityToWorldSpace(const Vector& in, Vector* pOut) const
+{
+	if (GetAbsAngles() == vec3_angle)
+	{
+		VectorAdd(in, GetAbsOrigin(), *pOut);
+	}
+	else
+	{
+		VectorTransform(in, EntityToWorldTransform(), *pOut);
+	}
+}
+
+inline void C_EngineObjectInternal::WorldToEntitySpace(const Vector& in, Vector* pOut) const
+{
+	if (GetAbsAngles() == vec3_angle)
+	{
+		VectorSubtract(in, GetAbsOrigin(), *pOut);
+	}
+	else
+	{
+		VectorITransform(in, EntityToWorldTransform(), *pOut);
+	}
+}
+
 //
 // This is the IClientEntityList implemenation. It serves two functions:
 //
@@ -127,6 +432,7 @@ public:
 	virtual C_BaseEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
 	virtual void				DestroyEntity(IHandleEntity* pEntity);
 
+	IEngineObject* GetEngineObject(int entnum);
 	virtual IClientNetworkable*	GetClientNetworkable( int entnum );
 	virtual IClientEntity*		GetClientEntity( int entnum );
 
@@ -221,7 +527,7 @@ private:
 
 	// For fast iteration.
 	CUtlLinkedList<C_BaseEntity*, unsigned short> m_BaseEntities;
-
+	C_EngineObjectInternal* m_EngineObjectArray[NUM_ENT_ENTRIES];
 
 private:
 
@@ -333,8 +639,11 @@ CClientEntityList<T>::CClientEntityList(void) :
 {
 	m_iMaxUsedServerIndex = -1;
 	m_iMaxServerEnts = 0;
+	for (int i = 0; i < NUM_ENT_ENTRIES; i++)
+	{
+		m_EngineObjectArray[i] = NULL;
+	}
 	Release();
-
 }
 
 //-----------------------------------------------------------------------------
@@ -380,6 +689,11 @@ void CClientEntityList<T>::Release(void)
 	m_iMaxServerEnts = 0;
 	m_iNumClientNonNetworkable = 0;
 	m_iMaxUsedServerIndex = -1;
+}
+
+template<class T>
+inline IEngineObject* CClientEntityList<T>::GetEngineObject(int entnum) {
+	return m_EngineObjectArray[entnum];
 }
 
 template<class T>
@@ -639,8 +953,18 @@ void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 
 	// Store it in a special list for fast iteration if it's a C_BaseEntity.
 	C_BaseEntity* pBaseEntity = pUnknown->GetBaseEntity();
-	if (pBaseEntity)
-	{
+	m_EngineObjectArray[entnum] = new C_EngineObjectInternal();
+	m_EngineObjectArray[entnum]->Init(pBaseEntity);
+#ifdef _DEBUG
+	m_EngineObjectArray[entnum]->SetAbsOrigin(vec3_origin);
+	m_EngineObjectArray[entnum]->SetAbsAngles(vec3_angle);
+	m_EngineObjectArray[entnum]->GetAbsOrigin().Init();
+	//	m_vecAbsAngVelocity.Init();
+	m_EngineObjectArray[entnum]->GetLocalVelocity().Init();
+	m_EngineObjectArray[entnum]->GetAbsVelocity().Init();
+#endif
+//	if (pBaseEntity)
+//	{
 		pCache->m_BaseEntitiesIndex = m_BaseEntities.AddToTail(pBaseEntity);
 
 		if (pBaseEntity->ObjectCaps() & FCAP_SAVE_NON_NETWORKABLE)
@@ -653,11 +977,11 @@ void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 		{
 			m_entityListeners[i]->OnEntityCreated(pBaseEntity);
 		}
-	}
-	else
-	{
-		pCache->m_BaseEntitiesIndex = m_BaseEntities.InvalidIndex();
-	}
+	//}
+	//else
+	//{
+	//	pCache->m_BaseEntitiesIndex = m_BaseEntities.InvalidIndex();
+	//}
 
 
 }
@@ -666,6 +990,10 @@ template<class T>
 void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 {
 	int entnum = handle.GetEntryIndex();
+
+	delete m_EngineObjectArray[entnum];
+	m_EngineObjectArray[entnum] = NULL;
+
 	EntityCacheInfo_t* pCache = &m_EntityCacheInfo[entnum];
 
 	if (entnum >= 0 && entnum < MAX_EDICTS)

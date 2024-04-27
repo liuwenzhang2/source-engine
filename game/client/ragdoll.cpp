@@ -379,6 +379,8 @@ public:
 
 	C_ServerRagdoll( void );
 
+	bool Init(int entnum, int iSerialNum);
+
 	virtual void PostDataUpdate( DataUpdateType_t updateType );
 
 	virtual int InternalDrawModel( int flags );
@@ -433,13 +435,17 @@ C_ServerRagdoll::C_ServerRagdoll( void ) :
 	m_elementCount = 0;
 	m_flLastBoneChangeTime = -FLT_MAX;
 
-	GetEngineObject()->AddVar( m_ragPos, &m_iv_ragPos, LATCH_SIMULATION_VAR  );
-	GetEngineObject()->AddVar( m_ragAngles, &m_iv_ragAngles, LATCH_SIMULATION_VAR );
-
 	m_flBlendWeight = 0.0f;
 	m_flBlendWeightCurrent = 0.0f;
 	m_nOverlaySequence = -1;
 	m_flFadeScale = 1;
+}
+
+bool C_ServerRagdoll::Init(int entnum, int iSerialNum) {
+	bool ret = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddVar(m_ragPos, &m_iv_ragPos, LATCH_SIMULATION_VAR);
+	GetEngineObject()->AddVar(m_ragAngles, &m_iv_ragAngles, LATCH_SIMULATION_VAR);
+	return ret;
 }
 
 void C_ServerRagdoll::PostDataUpdate( DataUpdateType_t updateType )

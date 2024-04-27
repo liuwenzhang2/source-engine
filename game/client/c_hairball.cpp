@@ -331,7 +331,7 @@ void CreateHairballCallback()
 {
 	for ( int i=0; i < 20; i++ )
 	{
-		C_Hairball *pHairball = new C_Hairball;
+		C_Hairball *pHairball = (C_Hairball*)ClientEntityList().CreateEntityByName( "C_Hairball");
 		pHairball->Init();
 		
 		// Put it a short distance in front of the player.

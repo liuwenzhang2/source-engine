@@ -140,7 +140,7 @@ public:
 
 private:
 	// Global temp entity pool
-	CClassMemoryPool< C_LocalTempEntity >	m_TempEntsPool;
+	//CClassMemoryPool< C_LocalTempEntity >	m_TempEntsPool;
 	CUtlLinkedList< C_LocalTempEntity *, unsigned short >	m_TempEnts;
 
 	// Muzzle flash sprites

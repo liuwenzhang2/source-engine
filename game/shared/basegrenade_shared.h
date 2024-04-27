@@ -45,6 +45,9 @@ public:
 	DECLARE_PREDICTABLE();
 	DECLARE_NETWORKCLASS();
 
+#ifdef CLIENT_DLL
+	bool Init(int entnum, int iSerialNum);
+#endif // CLIENT_DLL
 
 #if !defined( CLIENT_DLL )
 	DECLARE_DATADESC();

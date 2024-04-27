@@ -106,6 +106,9 @@ public:
 	C_BaseAnimating();
 	~C_BaseAnimating();
 
+	bool Init(int entnum, int iSerialNum);
+	void UpdateOnRemove(void);
+
 	virtual C_BaseAnimating*		GetBaseAnimating() { return this; }
 
 	bool UsesPowerOfTwoFrameBufferTexture( void );

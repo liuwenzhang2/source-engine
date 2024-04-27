@@ -86,7 +86,7 @@ public:
 	//------------------------------------------
 	//IClientRenderable - Trivial or redirection
 	//------------------------------------------
-	virtual IClientUnknown*			GetIClientUnknown() { return this; };
+	//virtual IClientUnknown*			GetIClientUnknown() { return this; };
 	virtual bool					IsTransparent( void );
 	virtual bool					UsesPowerOfTwoFrameBufferTexture();
 	//virtual ClientShadowHandle_t	GetShadowHandle() const { return m_hShadowHandle; };
@@ -119,12 +119,12 @@ public:
 	//virtual const					CBaseHandle& GetRefEHandle() const { return m_RefEHandle; };
 
 	//IClientUnknown
-	virtual ICollideable*			GetCollideable() { return NULL; };
-	virtual IClientNetworkable*		GetClientNetworkable() { return NULL; };
-	virtual IClientRenderable*		GetClientRenderable() { return this; };
-	virtual IClientEntity*			GetIClientEntity() { return NULL; };
-	virtual C_BaseEntity*			GetBaseEntity() { return NULL; };
-	virtual IClientThinkable*		GetClientThinkable() { return NULL; };
+	//virtual ICollideable*			GetCollideable() { return NULL; };
+	//virtual IClientNetworkable*		GetClientNetworkable() { return NULL; };
+	//virtual IClientRenderable*		GetClientRenderable() { return this; };
+	//virtual IClientEntity*			GetIClientEntity() { return NULL; };
+	//virtual C_BaseEntity*			GetBaseEntity() { return NULL; };
+	//virtual IClientThinkable*		GetClientThinkable() { return NULL; };
 };
 
 #endif //#ifndef C_PORTALGHOSTRENDERABLE_H

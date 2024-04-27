@@ -796,8 +796,6 @@ C_CSPlayer::C_CSPlayer() :
 
 	m_angEyeAngles.Init();
 
-	GetEngineObject()->AddVar( &m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR );
-
 	m_iLastAddonBits = m_iAddonBits = 0;
 	m_iLastPrimaryAddon = m_iLastSecondaryAddon = WEAPON_NONE;
 	m_iProgressBarDuration = 0;
@@ -822,6 +820,11 @@ C_CSPlayer::C_CSPlayer() :
     m_bPlayingFreezeCamSound = false;
 }
 
+bool C_CSPlayer::Init(int entnum, int iSerialNum) {
+	bool ret = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddVar(&m_angEyeAngles, &m_iv_angEyeAngles, LATCH_SIMULATION_VAR);
+	return ret;
+}
 
 C_CSPlayer::~C_CSPlayer()
 {

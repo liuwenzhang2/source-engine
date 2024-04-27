@@ -354,32 +354,32 @@ public:
 
 	virtual CBaseEntity* GetOuter() = 0;
 
-	virtual void					SetAbsVelocity(const Vector& vecVelocity) = 0;
+	virtual void SetAbsVelocity(const Vector& vecVelocity) = 0;
 	virtual Vector& GetAbsVelocity() = 0;
 	virtual const Vector& GetAbsVelocity() const = 0;
 	// NOTE: Setting the abs origin or angles will cause the local origin + angles to be set also
-	virtual void					SetAbsOrigin(const Vector& origin) = 0;
+	virtual void SetAbsOrigin(const Vector& origin) = 0;
 	virtual Vector& GetAbsOrigin(void) = 0;
 	virtual const Vector& GetAbsOrigin(void) const = 0;
 
-	virtual void					SetAbsAngles(const QAngle& angles) = 0;
+	virtual void SetAbsAngles(const QAngle& angles) = 0;
 	virtual QAngle& GetAbsAngles(void) = 0;
 	virtual const QAngle& GetAbsAngles(void) const = 0;
 
 	// Origin and angles in local space ( relative to parent )
 	// NOTE: Setting the local origin or angles will cause the abs origin + angles to be set also
-	virtual void					SetLocalOrigin(const Vector& origin) = 0;
+	virtual void SetLocalOrigin(const Vector& origin) = 0;
 	virtual Vector& GetLocalOriginForWrite(void) = 0;
 	virtual const Vector& GetLocalOrigin(void) const = 0;
 
-	virtual void					SetLocalAngles(const QAngle& angles) = 0;
+	virtual void SetLocalAngles(const QAngle& angles) = 0;
 	virtual const QAngle& GetLocalAngles(void) const = 0;
 
-	virtual void					SetLocalVelocity(const Vector& vecVelocity) = 0;
+	virtual void SetLocalVelocity(const Vector& vecVelocity) = 0;
 	virtual const Vector& GetLocalVelocity() const = 0;
 
-	virtual void					CalcAbsolutePosition() = 0;
-	virtual void					CalcAbsoluteVelocity() = 0;
+	virtual void CalcAbsolutePosition() = 0;
+	virtual void CalcAbsoluteVelocity() = 0;
 
 	virtual IEngineObject* GetMoveParent(void) = 0;
 	virtual void SetMoveParent(EHANDLE hMoveParent) = 0;
@@ -395,8 +395,8 @@ public:
 	virtual const matrix3x4_t& EntityToWorldTransform() const = 0;
 
 	// Some helper methods that transform a point from entity space to world space + back
-	virtual void					EntityToWorldSpace(const Vector& in, Vector* pOut) const = 0;
-	virtual void					WorldToEntitySpace(const Vector& in, Vector* pOut) const = 0;
+	virtual void EntityToWorldSpace(const Vector& in, Vector* pOut) const = 0;
+	virtual void WorldToEntitySpace(const Vector& in, Vector* pOut) const = 0;
 
 	// This function gets your parent's transform. If you're parented to an attachment,
 	// this calculates the attachment's transform and gives you that.
@@ -406,10 +406,10 @@ public:
 	virtual matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix) = 0;
 
 	// Computes the abs position of a point specified in local space
-	virtual void					ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition) = 0;
+	virtual void ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition) = 0;
 
 	// Computes the abs position of a direction specified in local space
-	virtual void					ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection) = 0;
+	virtual void ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection) = 0;
 
 	virtual void	GetVectors(Vector* forward, Vector* right, Vector* up) const = 0;
 
@@ -2274,15 +2274,6 @@ inline CBaseCombatCharacter *ToBaseCombatCharacter( CBaseEntity *pEntity )
 }
 
 
-
-
-
-
-
-
-
-
-
 //-----------------------------------------------------------------------------
 // Velocity
 //-----------------------------------------------------------------------------
@@ -2292,8 +2283,6 @@ inline Vector CBaseEntity::GetSmoothedVelocity( void )
 	GetVelocity( &vel, NULL );
 	return vel;
 }
-
-
 
 inline const QAngle &CBaseEntity::GetLocalAngularVelocity( ) const
 {
