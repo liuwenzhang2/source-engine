@@ -42,7 +42,7 @@ CGlobalEntityList<CBaseEntity>* sv_entitylist = &gEntList;
 // Game-code CBaseHandle implementation.
 // -------------------------------------------------------------------------------------------------- //
 
-
+#include "tier0/memdbgoff.h"
 //-----------------------------------------------------------------------------
 // CBaseEntity new/delete
 // allocates and frees memory for itself from the engine->
@@ -67,6 +67,8 @@ void CEngineObjectInternal::operator delete(void* pMem)
 	// get the engine to free the memory
 	engine->FreeEntPrivateData(pMem);
 }
+
+#include "tier0/memdbgon.h"
 
 //-----------------------------------------------------------------------------
 // PVS rules

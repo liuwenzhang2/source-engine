@@ -12,7 +12,7 @@
 //-----------------------------------------------------------------------------
 #include "cbase.h"
 #include "tier0/vprof.h"
-
+#include "cdll_bounded_cvars.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -65,6 +65,7 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_FIELD(m_angRotation, FIELD_VECTOR),
 END_PREDICTION_DATA()
 
+#include "tier0/memdbgoff.h"
 
 //-----------------------------------------------------------------------------
 // C_BaseEntity new/delete
@@ -113,6 +114,8 @@ void C_EngineObjectInternal::operator delete(void* pMem)
 	// get the engine to free the memory
 	MemAlloc_Free(pMem);
 }
+
+#include "tier0/memdbgon.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -310,7 +313,7 @@ void C_EngineObjectInternal::UnlinkChild(IEngineObject* pParent, IEngineObject* 
 	// remains in the PVS but the parent has not
 	if (pParent && (pParent->FirstMoveChild() == pChild))
 	{
-		Assert(!(pChild->m_pMovePrevPeer));
+		Assert(!(pChild->MovePrevPeer()));
 		pParent->SetFirstMoveChild(pChild->NextMovePeer());
 	}
 
