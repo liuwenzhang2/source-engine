@@ -20,6 +20,23 @@
 //-----------------------------------------------------------------------------
 // Globals
 //-----------------------------------------------------------------------------
+void cc_cl_interp_all_changed(IConVar* pConVar, const char* pOldString, float flOldValue)
+{
+	ConVarRef var(pConVar);
+	if (var.GetInt())
+	{
+		C_BaseEntityIterator iterator;
+		C_BaseEntity* pEnt;
+		while ((pEnt = iterator.Next()) != NULL)
+		{
+			if (pEnt->ShouldInterpolate())
+			{
+				pEnt->AddToInterpolationList();
+			}
+		}
+	}
+}
+
 static ConVar  cl_interp_all("cl_interp_all", "0", 0, "Disable interpolation list optimizations.", 0, 0, 0, 0, cc_cl_interp_all_changed);
 extern ConVar	cl_showerror;
 
