@@ -18,6 +18,7 @@
 #include "globalstate.h"
 #include "datacache/imdlcache.h"
 #include "positionwatcher.h"
+#include "mapentities_shared.h"
 
 #ifdef HL2_DLL
 #include "npc_playercompanion.h"
@@ -26,10 +27,13 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-void SceneManager_ClientActive( CBasePlayer *player );
+extern ConVar ent_debugkeys;
+//extern bool ParseKeyvalue(void* pObject, typedescription_t* pFields, int iNumFields, const char* szKeyName, const char* szValue);
+extern bool ExtractKeyvalue(void* pObject, typedescription_t* pFields, int iNumFields, const char* szKeyName, char* szValue, int iMaxLen);
+void SceneManager_ClientActive(CBasePlayer* player);
 
 CGlobalEntityList<CBaseEntity> gEntList;
-CBaseEntityList<CBaseEntity> *g_pEntityList = &gEntList;
+CBaseEntityList<CBaseEntity>* g_pEntityList = &gEntList;
 
 // Expose list to engine
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGlobalEntityList, IServerEntityList, VSERVERENTITYLIST_INTERFACE_VERSION, gEntList);
@@ -43,7 +47,15 @@ CGlobalEntityList<CBaseEntity>* sv_entitylist = &gEntList;
 // -------------------------------------------------------------------------------------------------- //
 
 BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
-	
+DEFINE_FIELD(m_vecOrigin, FIELD_VECTOR),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
+DEFINE_FIELD(m_angRotation, FIELD_VECTOR),
+DEFINE_KEYFIELD(m_vecVelocity, FIELD_VECTOR, "velocity"),
+DEFINE_FIELD(m_vecAbsOrigin, FIELD_POSITION_VECTOR),
+DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
+DEFINE_FIELD(m_vecAbsVelocity, FIELD_VECTOR),
+DEFINE_GLOBAL_FIELD(m_hMoveParent, FIELD_EHANDLE),
+DEFINE_GLOBAL_FIELD(m_hMoveChild, FIELD_EHANDLE),
+DEFINE_GLOBAL_FIELD(m_hMovePeer, FIELD_EHANDLE),
 END_DATADESC()
 
 #include "tier0/memdbgoff.h"
@@ -73,6 +85,428 @@ void CEngineObjectInternal::operator delete(void* pMem)
 }
 
 #include "tier0/memdbgon.h"
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Verifies that this entity's data description is valid in debug builds.
+//-----------------------------------------------------------------------------
+#ifdef _DEBUG
+typedef CUtlVector< const char* >	KeyValueNameList_t;
+
+static void AddDataMapFieldNamesToList(KeyValueNameList_t& list, datamap_t* pDataMap)
+{
+	while (pDataMap != NULL)
+	{
+		for (int i = 0; i < pDataMap->dataNumFields; i++)
+		{
+			typedescription_t* pField = &pDataMap->dataDesc[i];
+
+			if (pField->fieldType == FIELD_EMBEDDED)
+			{
+				AddDataMapFieldNamesToList(list, pField->td);
+				continue;
+			}
+
+			if (pField->flags & FTYPEDESC_KEY)
+			{
+				list.AddToTail(pField->externalName);
+			}
+		}
+
+		pDataMap = pDataMap->baseMap;
+	}
+}
+
+void CEngineObjectInternal::ValidateDataDescription(void)
+{
+	// Multiple key fields that have the same name are not allowed - it creates an
+	// ambiguity when trying to parse keyvalues and outputs.
+	datamap_t* pDataMap = GetDataDescMap();
+	if ((pDataMap == NULL) || pDataMap->bValidityChecked)
+		return;
+
+	pDataMap->bValidityChecked = true;
+
+	// Let's generate a list of all keyvalue strings in the entire hierarchy...
+	KeyValueNameList_t	names(128);
+	AddDataMapFieldNamesToList(names, pDataMap);
+
+	for (int i = names.Count(); --i > 0; )
+	{
+		for (int j = i - 1; --j >= 0; )
+		{
+			if (!Q_stricmp(names[i], names[j]))
+			{
+				DevMsg("%s has multiple data description entries for \"%s\"\n", STRING(m_iClassname), names[i]);
+				break;
+			}
+		}
+	}
+}
+#endif // _DEBUG
+
+//-----------------------------------------------------------------------------
+// Purpose: iterates through a typedescript data block, so it can insert key/value data into the block
+// Input  : *pObject - pointer to the struct or class the data is to be insterted into
+//			*pFields - description of the data
+//			iNumFields - number of fields contained in pFields
+//			char *szKeyName - name of the variable to look for
+//			char *szValue - value to set the variable to
+// Output : Returns true if the variable is found and set, false if the key is not found.
+//-----------------------------------------------------------------------------
+bool ParseKeyvalue(void* pObject, typedescription_t* pFields, int iNumFields, const char* szKeyName, const char* szValue)
+{
+	int i;
+	typedescription_t* pField;
+
+	for (i = 0; i < iNumFields; i++)
+	{
+		pField = &pFields[i];
+
+		int fieldOffset = pField->fieldOffset[TD_OFFSET_NORMAL];
+
+		// Check the nested classes, but only if they aren't in array form.
+		if ((pField->fieldType == FIELD_EMBEDDED) && (pField->fieldSize == 1))
+		{
+			for (datamap_t* dmap = pField->td; dmap != NULL; dmap = dmap->baseMap)
+			{
+				void* pEmbeddedObject = (void*)((char*)pObject + fieldOffset);
+				if (ParseKeyvalue(pEmbeddedObject, dmap->dataDesc, dmap->dataNumFields, szKeyName, szValue))
+					return true;
+			}
+		}
+
+		if ((pField->flags & FTYPEDESC_KEY) && !stricmp(pField->externalName, szKeyName))
+		{
+			switch (pField->fieldType)
+			{
+			case FIELD_MODELNAME:
+			case FIELD_SOUNDNAME:
+			case FIELD_STRING:
+				(*(string_t*)((char*)pObject + fieldOffset)) = AllocPooledString(szValue);
+				return true;
+
+			case FIELD_TIME:
+			case FIELD_FLOAT:
+				(*(float*)((char*)pObject + fieldOffset)) = atof(szValue);
+				return true;
+
+			case FIELD_BOOLEAN:
+				(*(bool*)((char*)pObject + fieldOffset)) = (bool)(atoi(szValue) != 0);
+				return true;
+
+			case FIELD_CHARACTER:
+				(*(char*)((char*)pObject + fieldOffset)) = (char)atoi(szValue);
+				return true;
+
+			case FIELD_SHORT:
+				(*(short*)((char*)pObject + fieldOffset)) = (short)atoi(szValue);
+				return true;
+
+			case FIELD_INTEGER:
+			case FIELD_TICK:
+				(*(int*)((char*)pObject + fieldOffset)) = atoi(szValue);
+				return true;
+
+			case FIELD_POSITION_VECTOR:
+			case FIELD_VECTOR:
+				UTIL_StringToVector((float*)((char*)pObject + fieldOffset), szValue);
+				return true;
+
+			case FIELD_VMATRIX:
+			case FIELD_VMATRIX_WORLDSPACE:
+				UTIL_StringToFloatArray((float*)((char*)pObject + fieldOffset), 16, szValue);
+				return true;
+
+			case FIELD_MATRIX3X4_WORLDSPACE:
+				UTIL_StringToFloatArray((float*)((char*)pObject + fieldOffset), 12, szValue);
+				return true;
+
+			case FIELD_COLOR32:
+				UTIL_StringToColor32((color32*)((char*)pObject + fieldOffset), szValue);
+				return true;
+
+			case FIELD_CUSTOM:
+			{
+				SaveRestoreFieldInfo_t fieldInfo =
+				{
+					(char*)pObject + fieldOffset,
+					pObject,
+					pField
+				};
+				pField->pSaveRestoreOps->Parse(fieldInfo, szValue);
+				return true;
+			}
+
+			default:
+			case FIELD_INTERVAL: // Fixme, could write this if needed
+			case FIELD_CLASSPTR:
+			case FIELD_MODELINDEX:
+			case FIELD_MATERIALINDEX:
+			case FIELD_EDICT:
+				Warning("Bad field in entity!!\n");
+				Assert(0);
+				break;
+			}
+		}
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Handles keys and outputs from the BSP.
+// Input  : mapData - Text block of keys and values from the BSP.
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::ParseMapData(CEntityMapData* mapData)
+{
+	char keyName[MAPKEY_MAXLENGTH];
+	char value[MAPKEY_MAXLENGTH];
+
+#ifdef _DEBUG
+	ValidateDataDescription();
+#endif // _DEBUG
+
+	// loop through all keys in the data block and pass the info back into the object
+	if (mapData->GetFirstKey(keyName, value))
+	{
+		do
+		{
+			if (!KeyValue(keyName, value)) {
+				if (!m_pOuter->KeyValue(keyName, value)) {
+					// loop through the data description, and try and place the keys in
+					if (!*ent_debugkeys.GetString())
+					{
+						for (datamap_t* dmap = m_pOuter->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap)
+						{
+							if (::ParseKeyvalue(m_pOuter, dmap->dataDesc, dmap->dataNumFields, keyName, value)) {
+								//return true;
+								break;
+							}
+						}
+					}
+					else
+					{
+						// debug version - can be used to see what keys have been parsed in
+						bool printKeyHits = false;
+						const char* debugName = "";
+
+						if (*ent_debugkeys.GetString() && !Q_stricmp(ent_debugkeys.GetString(), STRING(m_pOuter->m_iClassname)))
+						{
+							// Msg( "-- found entity of type %s\n", STRING(m_iClassname) );
+							printKeyHits = true;
+							debugName = STRING(m_pOuter->m_iClassname);
+						}
+
+						// loop through the data description, and try and place the keys in
+						for (datamap_t* dmap = m_pOuter->GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap)
+						{
+							if (!printKeyHits && *ent_debugkeys.GetString() && !Q_stricmp(dmap->dataClassName, ent_debugkeys.GetString()))
+							{
+								// Msg( "-- found class of type %s\n", dmap->dataClassName );
+								printKeyHits = true;
+								debugName = dmap->dataClassName;
+							}
+
+							if (::ParseKeyvalue(m_pOuter, dmap->dataDesc, dmap->dataNumFields, keyName, value))
+							{
+								if (printKeyHits)
+									Msg("(%s) key: %-16s value: %s\n", debugName, keyName, value);
+
+								//return true;
+								break;
+							}
+						}
+
+						if (printKeyHits)
+							Msg("!! (%s) key not handled: \"%s\" \"%s\"\n", STRING(m_pOuter->m_iClassname), keyName, value);
+					}
+				}
+			}
+		} while (mapData->GetNextKey(keyName, value));
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Parse data from a map file
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
+{
+	//!! temp hack, until worldcraft is fixed
+	// strip the # tokens from (duplicate) key names
+	char* s = (char*)strchr(szKeyName, '#');
+	if (s)
+	{
+		*s = '\0';
+	}
+
+	//if (FStrEq(szKeyName, "rendercolor") || FStrEq(szKeyName, "rendercolor32"))
+	//{
+	//	color32 tmp;
+	//	UTIL_StringToColor32(&tmp, szValue);
+	//	SetRenderColor(tmp.r, tmp.g, tmp.b);
+	//	// don't copy alpha, legacy support uses renderamt
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "renderamt"))
+	//{
+	//	SetRenderColorA(atoi(szValue));
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "disableshadows"))
+	//{
+	//	int val = atoi(szValue);
+	//	if (val)
+	//	{
+	//		AddEffects(EF_NOSHADOW);
+	//	}
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "mins"))
+	//{
+	//	Vector mins;
+	//	UTIL_StringToVector(mins.Base(), szValue);
+	//	CollisionProp()->SetCollisionBounds(mins, CollisionProp()->OBBMaxs());
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "maxs"))
+	//{
+	//	Vector maxs;
+	//	UTIL_StringToVector(maxs.Base(), szValue);
+	//	CollisionProp()->SetCollisionBounds(CollisionProp()->OBBMins(), maxs);
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "disablereceiveshadows"))
+	//{
+	//	int val = atoi(szValue);
+	//	if (val)
+	//	{
+	//		AddEffects(EF_NORECEIVESHADOW);
+	//	}
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "nodamageforces"))
+	//{
+	//	int val = atoi(szValue);
+	//	if (val)
+	//	{
+	//		AddEFlags(EFL_NO_DAMAGE_FORCES);
+	//	}
+	//	return true;
+	//}
+
+	// Fix up single angles
+	if (FStrEq(szKeyName, "angle"))
+	{
+		static char szBuf[64];
+
+		float y = atof(szValue);
+		if (y >= 0)
+		{
+			Q_snprintf(szBuf, sizeof(szBuf), "%f %f %f", GetLocalAngles()[0], y, GetLocalAngles()[2]);
+		}
+		else if ((int)y == -1)
+		{
+			Q_strncpy(szBuf, "-90 0 0", sizeof(szBuf));
+		}
+		else
+		{
+			Q_strncpy(szBuf, "90 0 0", sizeof(szBuf));
+		}
+
+		// Do this so inherited classes looking for 'angles' don't have to bother with 'angle'
+		return KeyValue("angles", szBuf);
+	}
+
+	// NOTE: Have to do these separate because they set two values instead of one
+	if (FStrEq(szKeyName, "angles"))
+	{
+		QAngle angles;
+		UTIL_StringToVector(angles.Base(), szValue);
+
+		// If you're hitting this assert, it's probably because you're
+		// calling SetLocalAngles from within a KeyValues method.. use SetAbsAngles instead!
+		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		SetAbsAngles(angles);
+		return true;
+	}
+
+	if (FStrEq(szKeyName, "origin"))
+	{
+		Vector vecOrigin;
+		UTIL_StringToVector(vecOrigin.Base(), szValue);
+
+		// If you're hitting this assert, it's probably because you're
+		// calling SetLocalOrigin from within a KeyValues method.. use SetAbsOrigin instead!
+		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		SetAbsOrigin(vecOrigin);
+		return true;
+	}
+
+#ifdef GAME_DLL	
+
+	//if (FStrEq(szKeyName, "targetname"))
+	//{
+	//	m_iName = AllocPooledString(szValue);
+	//	return true;
+	//}
+
+	// loop through the data description, and try and place the keys in
+	if (!*ent_debugkeys.GetString())
+	{
+		for (datamap_t* dmap = GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap)
+		{
+			if (::ParseKeyvalue(this, dmap->dataDesc, dmap->dataNumFields, szKeyName, szValue))
+				return true;
+		}
+	}
+	else
+	{
+		// debug version - can be used to see what keys have been parsed in
+		bool printKeyHits = false;
+		const char* debugName = "";
+
+		if (*ent_debugkeys.GetString() && !Q_stricmp(ent_debugkeys.GetString(), STRING(m_pOuter->m_iClassname)))
+		{
+			// Msg( "-- found entity of type %s\n", STRING(m_iClassname) );
+			printKeyHits = true;
+			debugName = STRING(m_pOuter->m_iClassname);
+		}
+
+		// loop through the data description, and try and place the keys in
+		for (datamap_t* dmap = GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap)
+		{
+			if (!printKeyHits && *ent_debugkeys.GetString() && !Q_stricmp(dmap->dataClassName, ent_debugkeys.GetString()))
+			{
+				// Msg( "-- found class of type %s\n", dmap->dataClassName );
+				printKeyHits = true;
+				debugName = dmap->dataClassName;
+			}
+
+			if (::ParseKeyvalue(this, dmap->dataDesc, dmap->dataNumFields, szKeyName, szValue))
+			{
+				if (printKeyHits)
+					Msg("(%s) key: %-16s value: %s\n", debugName, szKeyName, szValue);
+
+				return true;
+			}
+		}
+
+		if (printKeyHits)
+			Msg("!! (%s) key not handled: \"%s\" \"%s\"\n", STRING(m_pOuter->m_iClassname), szKeyName, szValue);
+	}
+
+#endif
+
+	// key hasn't been handled
+	return false;
+}
 
 //-----------------------------------------------------------------------------
 // PVS rules
@@ -837,68 +1271,68 @@ void CEngineObjectInternal::WorldToEntitySpace(const Vector& in, Vector* pOut) c
 
 // Called by CEntityListSystem
 void CAimTargetManager::LevelInitPreEntity()
-{ 
-	gEntList.AddListenerEntity( this );
-	Clear(); 
+{
+	gEntList.AddListenerEntity(this);
+	Clear();
 }
 void CAimTargetManager::LevelShutdownPostEntity()
 {
-	gEntList.RemoveListenerEntity( this );
+	gEntList.RemoveListenerEntity(this);
 	Clear();
 }
 
 void CAimTargetManager::Clear()
-{ 
-	m_targetList.Purge(); 
+{
+	m_targetList.Purge();
 }
 
 void CAimTargetManager::ForceRepopulateList()
 {
 	Clear();
 
-	CBaseEntity *pEnt = gEntList.FirstEnt();
+	CBaseEntity* pEnt = gEntList.FirstEnt();
 
-	while( pEnt )
+	while (pEnt)
 	{
-		if( ShouldAddEntity(pEnt) )
+		if (ShouldAddEntity(pEnt))
 			AddEntity(pEnt);
 
-		pEnt = gEntList.NextEnt( pEnt );
+		pEnt = gEntList.NextEnt(pEnt);
 	}
 }
-	
-bool CAimTargetManager::ShouldAddEntity( CBaseEntity *pEntity )
+
+bool CAimTargetManager::ShouldAddEntity(CBaseEntity* pEntity)
 {
 	return ((pEntity->GetFlags() & FL_AIMTARGET) != 0);
 }
 
 // IEntityListener
-void CAimTargetManager::OnEntityCreated( CBaseEntity *pEntity ) {}
-void CAimTargetManager::OnEntityDeleted( CBaseEntity *pEntity )
+void CAimTargetManager::OnEntityCreated(CBaseEntity* pEntity) {}
+void CAimTargetManager::OnEntityDeleted(CBaseEntity* pEntity)
 {
-	if ( !(pEntity->GetFlags() & FL_AIMTARGET) )
+	if (!(pEntity->GetFlags() & FL_AIMTARGET))
 		return;
 	RemoveEntity(pEntity);
 }
-void CAimTargetManager::AddEntity( CBaseEntity *pEntity )
+void CAimTargetManager::AddEntity(CBaseEntity* pEntity)
 {
-	if ( pEntity->IsMarkedForDeletion() )
+	if (pEntity->IsMarkedForDeletion())
 		return;
-	m_targetList.AddToTail( pEntity );
+	m_targetList.AddToTail(pEntity);
 }
-void CAimTargetManager::RemoveEntity( CBaseEntity *pEntity )
+void CAimTargetManager::RemoveEntity(CBaseEntity* pEntity)
 {
-	int index = m_targetList.Find( pEntity );
-	if ( m_targetList.IsValidIndex(index) )
+	int index = m_targetList.Find(pEntity);
+	if (m_targetList.IsValidIndex(index))
 	{
-		m_targetList.FastRemove( index );
+		m_targetList.FastRemove(index);
 	}
 }
 int CAimTargetManager::ListCount() { return m_targetList.Count(); }
-int CAimTargetManager::ListCopy( CBaseEntity *pList[], int listMax )
+int CAimTargetManager::ListCopy(CBaseEntity* pList[], int listMax)
 {
-	int count = MIN(listMax, ListCount() );
-	memcpy( pList, m_targetList.Base(), sizeof(CBaseEntity *) * count );
+	int count = MIN(listMax, ListCount());
+	memcpy(pList, m_targetList.Base(), sizeof(CBaseEntity*) * count);
 	return count;
 }
 
@@ -908,9 +1342,9 @@ int AimTarget_ListCount()
 {
 	return g_AimManager.ListCount();
 }
-int AimTarget_ListCopy( CBaseEntity *pList[], int listMax )
+int AimTarget_ListCopy(CBaseEntity* pList[], int listMax)
 {
-	return g_AimManager.ListCopy( pList, listMax );
+	return g_AimManager.ListCopy(pList, listMax);
 }
 void AimTarget_ForceRepopulateList()
 {
@@ -938,43 +1372,43 @@ public:
 	void Clear()
 	{
 		m_simThinkList.Purge();
-		for ( int i = 0; i < ARRAYSIZE(m_entinfoIndex); i++ )
+		for (int i = 0; i < ARRAYSIZE(m_entinfoIndex); i++)
 		{
 			m_entinfoIndex[i] = 0xFFFF;
 		}
 	}
 	void LevelInitPreEntity()
 	{
-		gEntList.AddListenerEntity( this );
+		gEntList.AddListenerEntity(this);
 	}
 
 	void LevelShutdownPostEntity()
 	{
-		gEntList.RemoveListenerEntity( this );
+		gEntList.RemoveListenerEntity(this);
 		Clear();
 	}
 
-	void OnEntityCreated( CBaseEntity *pEntity )
+	void OnEntityCreated(CBaseEntity* pEntity)
 	{
-		Assert( m_entinfoIndex[pEntity->GetRefEHandle().GetEntryIndex()] == 0xFFFF );
+		Assert(m_entinfoIndex[pEntity->GetRefEHandle().GetEntryIndex()] == 0xFFFF);
 	}
-	void OnEntityDeleted( CBaseEntity *pEntity )
+	void OnEntityDeleted(CBaseEntity* pEntity)
 	{
-		RemoveEntinfoIndex( pEntity->GetRefEHandle().GetEntryIndex() );
+		RemoveEntinfoIndex(pEntity->GetRefEHandle().GetEntryIndex());
 	}
 
-	void RemoveEntinfoIndex( int index )
+	void RemoveEntinfoIndex(int index)
 	{
 		int listHandle = m_entinfoIndex[index];
 		// If this guy is in the active list, remove him
-		if ( listHandle != 0xFFFF )
+		if (listHandle != 0xFFFF)
 		{
 			Assert(m_simThinkList[listHandle].entEntry == index);
-			m_simThinkList.FastRemove( listHandle );
+			m_simThinkList.FastRemove(listHandle);
 			m_entinfoIndex[index] = 0xFFFF;
-			
+
 			// fast remove shifted someone, update that someone
-			if ( listHandle < m_simThinkList.Count() )
+			if (listHandle < m_simThinkList.Count())
 			{
 				m_entinfoIndex[m_simThinkList[listHandle].entEntry] = listHandle;
 			}
@@ -985,21 +1419,21 @@ public:
 		return m_simThinkList.Count();
 	}
 
-	int ListCopy( CBaseEntity *pList[], int listMax )
+	int ListCopy(CBaseEntity* pList[], int listMax)
 	{
 		int count = MIN(listMax, ListCount());
 		int out = 0;
-		for ( int i = 0; i < count; i++ )
+		for (int i = 0; i < count; i++)
 		{
 			// only copy out entities that will simulate or think this frame
-			if ( m_simThinkList[i].nextThinkTick <= gpGlobals->tickcount )
+			if (m_simThinkList[i].nextThinkTick <= gpGlobals->tickcount)
 			{
-				Assert(m_simThinkList[i].nextThinkTick>=0);
+				Assert(m_simThinkList[i].nextThinkTick >= 0);
 				int entinfoIndex = m_simThinkList[i].entEntry;
-				const CEntInfo<CBaseEntity> *pInfo = gEntList.GetEntInfoPtrByIndex( entinfoIndex );
-				pList[out] = (CBaseEntity *)pInfo->m_pEntity;
-				Assert(m_simThinkList[i].nextThinkTick==0 || pList[out]->GetFirstThinkTick()==m_simThinkList[i].nextThinkTick);
-				Assert( gEntList.IsEntityPtr( pList[out] ) );
+				const CEntInfo<CBaseEntity>* pInfo = gEntList.GetEntInfoPtrByIndex(entinfoIndex);
+				pList[out] = (CBaseEntity*)pInfo->m_pEntity;
+				Assert(m_simThinkList[i].nextThinkTick == 0 || pList[out]->GetFirstThinkTick() == m_simThinkList[i].nextThinkTick);
+				Assert(gEntList.IsEntityPtr(pList[out]));
 				out++;
 			}
 		}
@@ -1007,43 +1441,43 @@ public:
 		return out;
 	}
 
-	void EntityChanged( CBaseEntity *pEntity )
+	void EntityChanged(CBaseEntity* pEntity)
 	{
 		// might change after deletion, don't put back into the list
-		if ( pEntity->IsMarkedForDeletion() )
+		if (pEntity->IsMarkedForDeletion())
 			return;
-		
-		const CBaseHandle &eh = pEntity->GetRefEHandle();
-		if ( !eh.IsValid() )
+
+		const CBaseHandle& eh = pEntity->GetRefEHandle();
+		if (!eh.IsValid())
 			return;
 
 		int index = eh.GetEntryIndex();
-		if ( pEntity->IsEFlagSet( EFL_NO_THINK_FUNCTION ) && pEntity->IsEFlagSet( EFL_NO_GAME_PHYSICS_SIMULATION ) )
+		if (pEntity->IsEFlagSet(EFL_NO_THINK_FUNCTION) && pEntity->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
 		{
-			RemoveEntinfoIndex( index );
+			RemoveEntinfoIndex(index);
 		}
 		else
 		{
 			// already in the list? (had think or sim last time, now has both - or had both last time, now just one)
-			if ( m_entinfoIndex[index] == 0xFFFF )
+			if (m_entinfoIndex[index] == 0xFFFF)
 			{
 				MEM_ALLOC_CREDIT();
 				m_entinfoIndex[index] = m_simThinkList.AddToTail();
 				m_simThinkList[m_entinfoIndex[index]].entEntry = (unsigned short)index;
 				m_simThinkList[m_entinfoIndex[index]].nextThinkTick = 0;
-				if ( pEntity->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION) )
+				if (pEntity->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
 				{
 					m_simThinkList[m_entinfoIndex[index]].nextThinkTick = pEntity->GetFirstThinkTick();
-					Assert(m_simThinkList[m_entinfoIndex[index]].nextThinkTick>=0);
+					Assert(m_simThinkList[m_entinfoIndex[index]].nextThinkTick >= 0);
 				}
 			}
 			else
 			{
 				// updating existing entry - if no sim, reset think time
-				if ( pEntity->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION) )
+				if (pEntity->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
 				{
 					m_simThinkList[m_entinfoIndex[index]].nextThinkTick = pEntity->GetFirstThinkTick();
-					Assert(m_simThinkList[m_entinfoIndex[index]].nextThinkTick>=0);
+					Assert(m_simThinkList[m_entinfoIndex[index]].nextThinkTick >= 0);
 				}
 				else
 				{
@@ -1065,17 +1499,17 @@ int SimThink_ListCount()
 	return g_SimThinkManager.ListCount();
 }
 
-int SimThink_ListCopy( CBaseEntity *pList[], int listMax )
+int SimThink_ListCopy(CBaseEntity* pList[], int listMax)
 {
-	return g_SimThinkManager.ListCopy( pList, listMax );
+	return g_SimThinkManager.ListCopy(pList, listMax);
 }
 
-void SimThink_EntityChanged( CBaseEntity *pEntity )
+void SimThink_EntityChanged(CBaseEntity* pEntity)
 {
-	g_SimThinkManager.EntityChanged( pEntity );
+	g_SimThinkManager.EntityChanged(pEntity);
 }
 
-static CBaseEntityClassList *s_pClassLists = NULL;
+static CBaseEntityClassList* s_pClassLists = NULL;
 CBaseEntityClassList::CBaseEntityClassList()
 {
 	m_pNextClassList = s_pClassLists;
@@ -1098,22 +1532,22 @@ bool g_fInCleanupDelete;
 //-----------------------------------------------------------------------------
 struct entitynotify_t
 {
-	CBaseEntity	*pNotify;
-	CBaseEntity	*pWatched;
+	CBaseEntity* pNotify;
+	CBaseEntity* pWatched;
 };
 class CNotifyList : public INotify, public IEntityListener<CBaseEntity>
 {
 public:
 	// INotify
-	void AddEntity( CBaseEntity *pNotify, CBaseEntity *pWatched );
-	void RemoveEntity( CBaseEntity *pNotify, CBaseEntity *pWatched );
-	void ReportNamedEvent( CBaseEntity *pEntity, const char *pEventName );
-	void ClearEntity( CBaseEntity *pNotify );
-	void ReportSystemEvent( CBaseEntity *pEntity, notify_system_event_t eventType, const notify_system_event_params_t &params );
+	void AddEntity(CBaseEntity* pNotify, CBaseEntity* pWatched);
+	void RemoveEntity(CBaseEntity* pNotify, CBaseEntity* pWatched);
+	void ReportNamedEvent(CBaseEntity* pEntity, const char* pEventName);
+	void ClearEntity(CBaseEntity* pNotify);
+	void ReportSystemEvent(CBaseEntity* pEntity, notify_system_event_t eventType, const notify_system_event_params_t& params);
 
 	// IEntityListener
-	virtual void OnEntityCreated( CBaseEntity *pEntity );
-	virtual void OnEntityDeleted( CBaseEntity *pEntity );
+	virtual void OnEntityCreated(CBaseEntity* pEntity);
+	virtual void OnEntityDeleted(CBaseEntity* pEntity);
 
 	// Called from CEntityListSystem
 	void LevelInitPreEntity();
@@ -1123,22 +1557,22 @@ private:
 	CUtlVector<entitynotify_t>	m_notifyList;
 };
 
-void CNotifyList::AddEntity( CBaseEntity *pNotify, CBaseEntity *pWatched )
+void CNotifyList::AddEntity(CBaseEntity* pNotify, CBaseEntity* pWatched)
 {
 	// OPTIMIZE: Also flag pNotify for faster "RemoveAllNotify" ?
-	pWatched->AddEFlags( EFL_NOTIFY );
+	pWatched->AddEFlags(EFL_NOTIFY);
 	int index = m_notifyList.AddToTail();
-	entitynotify_t &notify = m_notifyList[index];
+	entitynotify_t& notify = m_notifyList[index];
 	notify.pNotify = pNotify;
 	notify.pWatched = pWatched;
 }
 
 // Remove noitfication for an entity
-void CNotifyList::RemoveEntity( CBaseEntity *pNotify, CBaseEntity *pWatched )
+void CNotifyList::RemoveEntity(CBaseEntity* pNotify, CBaseEntity* pWatched)
 {
-	for ( int i = m_notifyList.Count(); --i >= 0; )
+	for (int i = m_notifyList.Count(); --i >= 0; )
 	{
-		if ( m_notifyList[i].pNotify == pNotify && m_notifyList[i].pWatched == pWatched)
+		if (m_notifyList[i].pNotify == pNotify && m_notifyList[i].pWatched == pWatched)
 		{
 			m_notifyList.FastRemove(i);
 		}
@@ -1146,86 +1580,86 @@ void CNotifyList::RemoveEntity( CBaseEntity *pNotify, CBaseEntity *pWatched )
 }
 
 
-void CNotifyList::ReportNamedEvent( CBaseEntity *pEntity, const char *pInputName )
+void CNotifyList::ReportNamedEvent(CBaseEntity* pEntity, const char* pInputName)
 {
 	variant_t emptyVariant;
 
-	if ( !pEntity->IsEFlagSet(EFL_NOTIFY) )
+	if (!pEntity->IsEFlagSet(EFL_NOTIFY))
 		return;
 
-	for ( int i = 0; i < m_notifyList.Count(); i++ )
+	for (int i = 0; i < m_notifyList.Count(); i++)
 	{
-		if ( m_notifyList[i].pWatched == pEntity )
+		if (m_notifyList[i].pWatched == pEntity)
 		{
-			m_notifyList[i].pNotify->AcceptInput( pInputName, pEntity, pEntity, emptyVariant, 0 );
+			m_notifyList[i].pNotify->AcceptInput(pInputName, pEntity, pEntity, emptyVariant, 0);
 		}
 	}
 }
 
 void CNotifyList::LevelInitPreEntity()
 {
-	gEntList.AddListenerEntity( this );
+	gEntList.AddListenerEntity(this);
 }
 
-void CNotifyList::LevelShutdownPreEntity( void )
+void CNotifyList::LevelShutdownPreEntity(void)
 {
-	gEntList.RemoveListenerEntity( this );
+	gEntList.RemoveListenerEntity(this);
 	m_notifyList.Purge();
 }
 
-void CNotifyList::OnEntityCreated( CBaseEntity *pEntity )
+void CNotifyList::OnEntityCreated(CBaseEntity* pEntity)
 {
 }
 
-void CNotifyList::OnEntityDeleted( CBaseEntity *pEntity )
+void CNotifyList::OnEntityDeleted(CBaseEntity* pEntity)
 {
-	ReportDestroyEvent( pEntity );
-	ClearEntity( pEntity );
+	ReportDestroyEvent(pEntity);
+	ClearEntity(pEntity);
 }
 
 
 // UNDONE: Slow linear search?
-void CNotifyList::ClearEntity( CBaseEntity *pNotify )
+void CNotifyList::ClearEntity(CBaseEntity* pNotify)
 {
-	for ( int i = m_notifyList.Count(); --i >= 0; )
+	for (int i = m_notifyList.Count(); --i >= 0; )
 	{
-		if ( m_notifyList[i].pNotify == pNotify || m_notifyList[i].pWatched == pNotify)
+		if (m_notifyList[i].pNotify == pNotify || m_notifyList[i].pWatched == pNotify)
 		{
 			m_notifyList.FastRemove(i);
 		}
 	}
 }
 
-void CNotifyList::ReportSystemEvent( CBaseEntity *pEntity, notify_system_event_t eventType, const notify_system_event_params_t &params )
+void CNotifyList::ReportSystemEvent(CBaseEntity* pEntity, notify_system_event_t eventType, const notify_system_event_params_t& params)
 {
-	if ( !pEntity->IsEFlagSet(EFL_NOTIFY) )
+	if (!pEntity->IsEFlagSet(EFL_NOTIFY))
 		return;
 
-	for ( int i = 0; i < m_notifyList.Count(); i++ )
+	for (int i = 0; i < m_notifyList.Count(); i++)
 	{
-		if ( m_notifyList[i].pWatched == pEntity )
+		if (m_notifyList[i].pWatched == pEntity)
 		{
-			m_notifyList[i].pNotify->NotifySystemEvent( pEntity, eventType, params );
+			m_notifyList[i].pNotify->NotifySystemEvent(pEntity, eventType, params);
 		}
 	}
 }
 
 static CNotifyList g_NotifyList;
-INotify *g_pNotify = &g_NotifyList;
+INotify* g_pNotify = &g_NotifyList;
 
 class CEntityTouchManager : public IEntityListener<CBaseEntity>
 {
 public:
 	// called by CEntityListSystem
-	void LevelInitPreEntity() 
-	{ 
-		gEntList.AddListenerEntity( this );
-		Clear(); 
+	void LevelInitPreEntity()
+	{
+		gEntList.AddListenerEntity(this);
+		Clear();
 	}
-	void LevelShutdownPostEntity() 
-	{ 
-		gEntList.RemoveListenerEntity( this );
-		Clear(); 
+	void LevelShutdownPostEntity()
+	{
+		gEntList.RemoveListenerEntity(this);
+		Clear();
 	}
 	void FrameUpdatePostEntityThink();
 
@@ -1233,77 +1667,77 @@ public:
 	{
 		m_updateList.Purge();
 	}
-	
+
 	// IEntityListener
-	virtual void OnEntityCreated( CBaseEntity *pEntity ) {}
-	virtual void OnEntityDeleted( CBaseEntity *pEntity )
+	virtual void OnEntityCreated(CBaseEntity* pEntity) {}
+	virtual void OnEntityDeleted(CBaseEntity* pEntity)
 	{
-		if ( !pEntity->GetCheckUntouch() )
+		if (!pEntity->GetCheckUntouch())
 			return;
-		int index = m_updateList.Find( pEntity );
-		if ( m_updateList.IsValidIndex(index) )
+		int index = m_updateList.Find(pEntity);
+		if (m_updateList.IsValidIndex(index))
 		{
-			m_updateList.FastRemove( index );
+			m_updateList.FastRemove(index);
 		}
 	}
-	void AddEntity( CBaseEntity *pEntity )
+	void AddEntity(CBaseEntity* pEntity)
 	{
-		if ( pEntity->IsMarkedForDeletion() )
+		if (pEntity->IsMarkedForDeletion())
 			return;
-		m_updateList.AddToTail( pEntity );
+		m_updateList.AddToTail(pEntity);
 	}
 
 private:
-	CUtlVector<CBaseEntity *>	m_updateList;
+	CUtlVector<CBaseEntity*>	m_updateList;
 };
 
 static CEntityTouchManager g_TouchManager;
 
-void EntityTouch_Add( CBaseEntity *pEntity )
+void EntityTouch_Add(CBaseEntity* pEntity)
 {
-	g_TouchManager.AddEntity( pEntity );
+	g_TouchManager.AddEntity(pEntity);
 }
 
 
 void CEntityTouchManager::FrameUpdatePostEntityThink()
 {
-	VPROF( "CEntityTouchManager::FrameUpdatePostEntityThink" );
+	VPROF("CEntityTouchManager::FrameUpdatePostEntityThink");
 	// Loop through all entities again, checking their untouch if flagged to do so
-	
+
 	int count = m_updateList.Count();
-	if ( count )
+	if (count)
 	{
 		// copy off the list
-		CBaseEntity **ents = (CBaseEntity **)stackalloc( sizeof(CBaseEntity *) * count );
-		memcpy( ents, m_updateList.Base(), sizeof(CBaseEntity *) * count );
+		CBaseEntity** ents = (CBaseEntity**)stackalloc(sizeof(CBaseEntity*) * count);
+		memcpy(ents, m_updateList.Base(), sizeof(CBaseEntity*) * count);
 		// clear it
 		m_updateList.RemoveAll();
-		
+
 		// now update those ents
-		for ( int i = 0; i < count; i++ )
+		for (int i = 0; i < count; i++)
 		{
 			//Assert( ents[i]->GetCheckUntouch() );
-			if ( ents[i]->GetCheckUntouch() )
+			if (ents[i]->GetCheckUntouch())
 			{
 				ents[i]->PhysicsCheckForEntityUntouch();
 			}
 		}
-		stackfree( ents );
+		stackfree(ents);
 	}
 }
 
 class CRespawnEntitiesFilter : public IMapEntityFilter
 {
 public:
-	virtual bool ShouldCreateEntity( const char *pClassname )
+	virtual bool ShouldCreateEntity(const char* pClassname)
 	{
 		// Create everything but the world
-		return Q_stricmp( pClassname, "worldspawn" ) != 0;
+		return Q_stricmp(pClassname, "worldspawn") != 0;
 	}
 
-	virtual CBaseEntity* CreateNextEntity( const char *pClassname )
+	virtual CBaseEntity* CreateNextEntity(const char* pClassname)
 	{
-		return gEntList.CreateEntityByName( pClassname );
+		return gEntList.CreateEntityByName(pClassname);
 	}
 };
 
@@ -1313,7 +1747,7 @@ public:
 class CEntityListSystem : public CAutoGameSystemPerFrame
 {
 public:
-	CEntityListSystem( char const *name ) : CAutoGameSystemPerFrame( name )
+	CEntityListSystem(char const* name) : CAutoGameSystemPerFrame(name)
 	{
 		m_bRespawnAllEntities = false;
 	}
@@ -1339,8 +1773,8 @@ public:
 #ifdef HL2_DLL
 		OverrideMoveCache_LevelShutdownPostEntity();
 #endif // HL2_DLL
-		CBaseEntityClassList *pClassList = s_pClassLists;
-		while ( pClassList )
+		CBaseEntityClassList* pClassList = s_pClassLists;
+		while (pClassList)
 		{
 			pClassList->LevelShutdownPostEntity();
 			pClassList = pClassList->m_pNextClassList;
@@ -1351,33 +1785,33 @@ public:
 	{
 		g_TouchManager.FrameUpdatePostEntityThink();
 
-		if ( m_bRespawnAllEntities )
+		if (m_bRespawnAllEntities)
 		{
 			m_bRespawnAllEntities = false;
 
 			// Don't change globalstate owing to deletion here
-			GlobalEntity_EnableStateUpdates( false );
+			GlobalEntity_EnableStateUpdates(false);
 
 			// Remove all entities
 			int nPlayerIndex = -1;
-			CBaseEntity *pEnt = gEntList.FirstEnt();
-			while ( pEnt )
+			CBaseEntity* pEnt = gEntList.FirstEnt();
+			while (pEnt)
 			{
-				CBaseEntity *pNextEnt = gEntList.NextEnt( pEnt );
-				if ( pEnt->IsPlayer() )
+				CBaseEntity* pNextEnt = gEntList.NextEnt(pEnt);
+				if (pEnt->IsPlayer())
 				{
 					nPlayerIndex = pEnt->entindex();
 				}
-				if ( !pEnt->IsEFlagSet( EFL_KEEP_ON_RECREATE_ENTITIES ) )
+				if (!pEnt->IsEFlagSet(EFL_KEEP_ON_RECREATE_ENTITIES))
 				{
-					UTIL_Remove( pEnt );
+					UTIL_Remove(pEnt);
 				}
 				pEnt = pNextEnt;
 			}
-			
+
 			gEntList.CleanupDeleteList();
 
-			GlobalEntity_EnableStateUpdates( true );
+			GlobalEntity_EnableStateUpdates(true);
 
 			// Allows us to immediately re-use the edict indices we just freed to avoid edict overflow
 			//engine->AllowImmediateEdictReuse();
@@ -1386,17 +1820,17 @@ public:
 			CNodeEnt::m_nNodeCount = 0;
 
 			CRespawnEntitiesFilter filter;
-			MapEntity_ParseAllEntities( engine->GetMapEntitiesString(), &filter, true );
+			MapEntity_ParseAllEntities(engine->GetMapEntitiesString(), &filter, true);
 
 			// Allocate a CBasePlayer for pev, and call spawn
-			if ( nPlayerIndex >= 0 )
+			if (nPlayerIndex >= 0)
 			{
-				CBaseEntity *pEdict = gEntList.GetBaseEntity( nPlayerIndex );
-				ClientPutInServer(nPlayerIndex, "unnamed" );
-				ClientActive(nPlayerIndex, false );
+				CBaseEntity* pEdict = gEntList.GetBaseEntity(nPlayerIndex);
+				ClientPutInServer(nPlayerIndex, "unnamed");
+				ClientActive(nPlayerIndex, false);
 
-				CBasePlayer *pPlayer = ( CBasePlayer * )pEdict;
-				SceneManager_ClientActive( pPlayer );
+				CBasePlayer* pPlayer = (CBasePlayer*)pEdict;
+				SceneManager_ClientActive(pPlayer);
 			}
 		}
 	}
@@ -1404,7 +1838,7 @@ public:
 	bool m_bRespawnAllEntities;
 };
 
-static CEntityListSystem g_EntityListSystem( "CEntityListSystem" );
+static CEntityListSystem g_EntityListSystem("CEntityListSystem");
 
 //-----------------------------------------------------------------------------
 // Respawns all entities in the level
@@ -1414,57 +1848,57 @@ void RespawnEntities()
 	g_EntityListSystem.m_bRespawnAllEntities = true;
 }
 
-static ConCommand restart_entities( "respawn_entities", RespawnEntities, "Respawn all the entities in the map.", FCVAR_CHEAT | FCVAR_SPONLY );
+static ConCommand restart_entities("respawn_entities", RespawnEntities, "Respawn all the entities in the map.", FCVAR_CHEAT | FCVAR_SPONLY);
 
 class CSortedEntityList
 {
 public:
 	CSortedEntityList() : m_sortedList(), m_emptyCount(0) {}
 
-	typedef CBaseEntity *ENTITYPTR;
+	typedef CBaseEntity* ENTITYPTR;
 	class CEntityReportLess
 	{
 	public:
-		bool Less( const ENTITYPTR &src1, const ENTITYPTR &src2, void *pCtx )
+		bool Less(const ENTITYPTR& src1, const ENTITYPTR& src2, void* pCtx)
 		{
-			if ( stricmp( src1->GetClassname(), src2->GetClassname() ) < 0 )
+			if (stricmp(src1->GetClassname(), src2->GetClassname()) < 0)
 				return true;
-	
+
 			return false;
 		}
 	};
 
-	void AddEntityToList( CBaseEntity *pEntity )
+	void AddEntityToList(CBaseEntity* pEntity)
 	{
-		if ( !pEntity )
+		if (!pEntity)
 		{
 			m_emptyCount++;
 		}
 		else
 		{
-			m_sortedList.Insert( pEntity );
+			m_sortedList.Insert(pEntity);
 		}
 	}
 	void ReportEntityList()
 	{
-		const char *pLastClass = "";
+		const char* pLastClass = "";
 		int count = 0;
 		int edicts = 0;
-		for ( int i = 0; i < m_sortedList.Count(); i++ )
+		for (int i = 0; i < m_sortedList.Count(); i++)
 		{
-			CBaseEntity *pEntity = m_sortedList[i];
-			if ( !pEntity )
+			CBaseEntity* pEntity = m_sortedList[i];
+			if (!pEntity)
 				continue;
 
-			if ( pEntity->entindex()!=-1 )
+			if (pEntity->entindex() != -1)
 				edicts++;
 
-			const char *pClassname = pEntity->GetClassname();
-			if ( !FStrEq( pClassname, pLastClass ) )
+			const char* pClassname = pEntity->GetClassname();
+			if (!FStrEq(pClassname, pLastClass))
 			{
-				if ( count )
+				if (count)
 				{
-					Msg("Class: %s (%d)\n", pLastClass, count );
+					Msg("Class: %s (%d)\n", pLastClass, count);
 				}
 
 				pLastClass = pClassname;
@@ -1473,17 +1907,17 @@ public:
 			else
 				count++;
 		}
-		if ( pLastClass[0] != 0 && count )
+		if (pLastClass[0] != 0 && count)
 		{
-			Msg("Class: %s (%d)\n", pLastClass, count );
+			Msg("Class: %s (%d)\n", pLastClass, count);
 		}
-		if ( m_sortedList.Count() )
+		if (m_sortedList.Count())
 		{
-			Msg("Total %d entities (%d empty, %d edicts)\n", m_sortedList.Count(), m_emptyCount, edicts );
+			Msg("Total %d entities (%d empty, %d edicts)\n", m_sortedList.Count(), m_emptyCount, edicts);
 		}
 	}
 private:
-	CUtlSortVector< CBaseEntity *, CEntityReportLess > m_sortedList;
+	CUtlSortVector< CBaseEntity*, CEntityReportLess > m_sortedList;
 	int		m_emptyCount;
 };
 
@@ -1491,15 +1925,15 @@ private:
 
 CON_COMMAND(report_entities, "Lists all entities")
 {
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+	if (!UTIL_IsCommandIssuedByServerAdmin())
 		return;
 
 	CSortedEntityList list;
-	CBaseEntity *pEntity = gEntList.FirstEnt();
-	while ( pEntity )
+	CBaseEntity* pEntity = gEntList.FirstEnt();
+	while (pEntity)
 	{
-		list.AddEntityToList( pEntity );
-		pEntity = gEntList.NextEnt( pEntity );
+		list.AddEntityToList(pEntity);
+		pEntity = gEntList.NextEnt(pEntity);
 	}
 	list.ReportEntityList();
 }
@@ -1507,51 +1941,51 @@ CON_COMMAND(report_entities, "Lists all entities")
 
 CON_COMMAND(report_touchlinks, "Lists all touchlinks")
 {
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+	if (!UTIL_IsCommandIssuedByServerAdmin())
 		return;
 
 	CSortedEntityList list;
-	CBaseEntity *pEntity = gEntList.FirstEnt();
-	const char *pClassname = NULL;
-	if ( args.ArgC() > 1 )
+	CBaseEntity* pEntity = gEntList.FirstEnt();
+	const char* pClassname = NULL;
+	if (args.ArgC() > 1)
 	{
 		pClassname = args.Arg(1);
 	}
-	while ( pEntity )
+	while (pEntity)
 	{
-		if ( !pClassname || FClassnameIs(pEntity, pClassname) )
+		if (!pClassname || FClassnameIs(pEntity, pClassname))
 		{
-			touchlink_t *root = ( touchlink_t * )pEntity->GetDataObject( TOUCHLINK );
-			if ( root )
+			touchlink_t* root = (touchlink_t*)pEntity->GetDataObject(TOUCHLINK);
+			if (root)
 			{
-				touchlink_t *link = root->nextLink;
-				while ( link != root )
+				touchlink_t* link = root->nextLink;
+				while (link != root)
 				{
-					list.AddEntityToList( link->entityTouched );
+					list.AddEntityToList(link->entityTouched);
 					link = link->nextLink;
 				}
 			}
 		}
-		pEntity = gEntList.NextEnt( pEntity );
+		pEntity = gEntList.NextEnt(pEntity);
 	}
 	list.ReportEntityList();
 }
 
 CON_COMMAND(report_simthinklist, "Lists all simulating/thinking entities")
 {
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+	if (!UTIL_IsCommandIssuedByServerAdmin())
 		return;
 
-	CBaseEntity *pTmp[NUM_ENT_ENTRIES];
-	int count = SimThink_ListCopy( pTmp, ARRAYSIZE(pTmp) );
+	CBaseEntity* pTmp[NUM_ENT_ENTRIES];
+	int count = SimThink_ListCopy(pTmp, ARRAYSIZE(pTmp));
 
 	CSortedEntityList list;
-	for ( int i = 0; i < count; i++ )
+	for (int i = 0; i < count; i++)
 	{
-		if ( !pTmp[i] )
+		if (!pTmp[i])
 			continue;
 
-		list.AddEntityToList( pTmp[i] );
+		list.AddEntityToList(pTmp[i]);
 	}
 	list.ReportEntityList();
 }

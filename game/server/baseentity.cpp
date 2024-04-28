@@ -562,65 +562,6 @@ void CBaseEntity::Release() {
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Verifies that this entity's data description is valid in debug builds.
-//-----------------------------------------------------------------------------
-#ifdef _DEBUG
-typedef CUtlVector< const char * >	KeyValueNameList_t;
-
-static void AddDataMapFieldNamesToList( KeyValueNameList_t &list, datamap_t *pDataMap )
-{
-	while (pDataMap != NULL)
-	{
-		for (int i = 0; i < pDataMap->dataNumFields; i++)
-		{
-			typedescription_t *pField = &pDataMap->dataDesc[i];
-
-			if (pField->fieldType == FIELD_EMBEDDED)
-			{
-				AddDataMapFieldNamesToList( list, pField->td );
-				continue;
-			}
-
-			if (pField->flags & FTYPEDESC_KEY)
-			{
-				list.AddToTail( pField->externalName );
-			}
-		}
-	
-		pDataMap = pDataMap->baseMap;
-	}
-}
-
-void CBaseEntity::ValidateDataDescription(void)
-{
-	// Multiple key fields that have the same name are not allowed - it creates an
-	// ambiguity when trying to parse keyvalues and outputs.
-	datamap_t *pDataMap = GetDataDescMap();
-	if ((pDataMap == NULL) || pDataMap->bValidityChecked)
-		return;
-
-	pDataMap->bValidityChecked = true;
-
-	// Let's generate a list of all keyvalue strings in the entire hierarchy...
-	KeyValueNameList_t	names(128);
-	AddDataMapFieldNamesToList( names, pDataMap );
-
-	for (int i = names.Count(); --i > 0; )
-	{
-		for (int j = i - 1; --j >= 0; )
-		{
-			if (!Q_stricmp(names[i], names[j]))
-			{
-				DevMsg( "%s has multiple data description entries for \"%s\"\n", STRING(m_iClassname), names[i]);
-				break;
-			}
-		}
-	}
-}
-#endif // _DEBUG
-
-
-//-----------------------------------------------------------------------------
 // Sets the collision bounds + the size
 //-----------------------------------------------------------------------------
 void CBaseEntity::SetCollisionBounds( const Vector& mins, const Vector &maxs )

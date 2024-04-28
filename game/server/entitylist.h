@@ -128,6 +128,12 @@ public:
 		return m_pOuter;
 	}
 
+	// Verifies that the data description is valid in debug builds.
+#ifdef _DEBUG
+	void ValidateDataDescription(void);
+#endif // _DEBUG
+	void ParseMapData(CEntityMapData* mapData);
+	bool KeyValue(const char* szKeyName, const char* szValue);
 	void					SetAbsVelocity(const Vector& vecVelocity);
 	Vector& GetAbsVelocity();
 	const Vector& GetAbsVelocity() const;

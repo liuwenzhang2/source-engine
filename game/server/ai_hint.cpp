@@ -596,7 +596,7 @@ CAI_Hint* CAI_HintManager::CreateHint( HintNodeData *pNodeData, const char *pMap
 		if ( pMapData )
 		{
 			CEntityMapData entData( (char*)pMapData );
-			pHint->ParseMapData( &entData );
+			pHint->GetEngineObject()->ParseMapData(&entData);
 
 			// Restore the desired classname (parsing the mapdata stomps it)
 			pHint->SetClassname( "ai_hint" );

@@ -631,7 +631,7 @@ const char *C_PhysPropClientside::ParseEntity( const char *pEntData )
 
 		if ( pEntity )
 		{	// Set up keyvalues.
-			pEntity->ParseMapData(&entData);
+			pEntity->GetEngineObject()->ParseMapData(&entData);
 			
 			if (!pEntity->Initialize())
 				DestroyEntity(pEntity);//->Release();
@@ -647,7 +647,7 @@ const char *C_PhysPropClientside::ParseEntity( const char *pEntData )
 		if ( pEntity )
 		{	
 			// Set up keyvalues.
-			pEntity->ParseMapData(&entData);
+			pEntity->GetEngineObject()->ParseMapData(&entData);
 
 			if (!pEntity->Initialize())
 				DestroyEntity(pEntity);// ->Release();

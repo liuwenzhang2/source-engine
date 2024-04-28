@@ -101,6 +101,8 @@ class C_EngineObjectInternal : public IEngineObject {
 public:
 	DECLARE_CLASS_NOBASE(C_EngineObjectInternal);
 	DECLARE_PREDICTABLE();
+	// data description
+	DECLARE_DATADESC();
 
 	// memory handling, uses calloc so members are zero'd out on instantiation
 	void* operator new(size_t stAllocateBlock);
@@ -137,6 +139,8 @@ public:
 		return m_pOuter;
 	}
 
+	void					ParseMapData(CEntityMapData* mapData);
+	bool KeyValue(const char* szKeyName, const char* szValue);
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel
 	void				SetAbsVelocity(const Vector& vecVelocity);

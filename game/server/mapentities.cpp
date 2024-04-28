@@ -540,7 +540,7 @@ void MapEntity_PrecacheEntity( const char *pEntData, int &nStringSize )
 	//
 	if ( pEntity != NULL )
 	{
-		pEntity->ParseMapData(&entData);
+		pEntity->GetEngineObject()->ParseMapData(&entData);
 		pEntity->Precache();
 		UTIL_RemoveImmediate( pEntity );
 	}
@@ -578,7 +578,7 @@ const char *MapEntity_ParseEntity(CBaseEntity *&pEntity, const char *pEntData, I
 		//
 		if (pEntity != NULL)
 		{
-			pEntity->ParseMapData(&entData);
+			pEntity->GetEngineObject()->ParseMapData(&entData);
 		}
 		else
 		{

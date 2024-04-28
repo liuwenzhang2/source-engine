@@ -354,6 +354,7 @@ public:
 
 	virtual CBaseEntity* GetOuter() = 0;
 
+	virtual void ParseMapData(CEntityMapData* mapData) = 0;
 	virtual void SetAbsVelocity(const Vector& vecVelocity) = 0;
 	virtual Vector& GetAbsVelocity() = 0;
 	virtual const Vector& GetAbsVelocity() const = 0;
@@ -673,7 +674,6 @@ protected:
 public:
 	virtual void PostConstructor( const char *szClassname, int iForceEdictIndex);
 	virtual void PostClientActive( void );
-	virtual void ParseMapData( CEntityMapData *mapData );
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
 	virtual bool KeyValue( const char *szKeyName, float flValue );
 	virtual bool KeyValue( const char *szKeyName, const Vector &vecValue );
@@ -742,11 +742,6 @@ public:
 
 	// capabilities
 	virtual int	ObjectCaps( void );
-
-	// Verifies that the data description is valid in debug builds.
-	#ifdef _DEBUG
-	void ValidateDataDescription(void);
-	#endif // _DEBUG
 
 	// handles an input (usually caused by outputs)
 	// returns true if the the value in the pass in should be set, false if the input is to be ignored

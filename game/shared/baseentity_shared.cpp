@@ -62,7 +62,7 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 
 #ifdef GAME_DLL
 	ConVar ent_debugkeys( "ent_debugkeys", "" );
-	extern bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, const char *szValue );
+	//extern bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, const char *szValue );
 	extern bool ExtractKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, char *szValue, int iMaxLen );
 #endif
 	extern ISoundEmitterSystemBase* soundemitterbase;
@@ -395,31 +395,7 @@ bool CBaseEntity::IsAIWalkable( void )
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: Handles keys and outputs from the BSP.
-// Input  : mapData - Text block of keys and values from the BSP.
-//-----------------------------------------------------------------------------
-void CBaseEntity::ParseMapData( CEntityMapData *mapData )
-{
-	char keyName[MAPKEY_MAXLENGTH];
-	char value[MAPKEY_MAXLENGTH];
 
-	#ifdef _DEBUG
-	#ifdef GAME_DLL
-	ValidateDataDescription();
-	#endif // GAME_DLL
-	#endif // _DEBUG
-
-	// loop through all keys in the data block and pass the info back into the object
-	if ( mapData->GetFirstKey(keyName, value) )
-	{
-		do 
-		{
-			KeyValue( keyName, value );
-		} 
-		while ( mapData->GetNextKey(keyName, value) );
-	}
-}
 
 //-----------------------------------------------------------------------------
 // Parse data from a map file
@@ -496,52 +472,52 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	}
 
 	// Fix up single angles
-	if( FStrEq( szKeyName, "angle" ) )
-	{
-		static char szBuf[64];
+	//if( FStrEq( szKeyName, "angle" ) )
+	//{
+	//	static char szBuf[64];
 
-		float y = atof( szValue );
-		if (y >= 0)
-		{
-			Q_snprintf( szBuf,sizeof(szBuf), "%f %f %f", GetLocalAngles()[0], y, GetLocalAngles()[2] );
-		}
-		else if ((int)y == -1)
-		{
-			Q_strncpy( szBuf, "-90 0 0", sizeof(szBuf) );
-		}
-		else
-		{
-			Q_strncpy( szBuf, "90 0 0", sizeof(szBuf) );
-		}
+	//	float y = atof( szValue );
+	//	if (y >= 0)
+	//	{
+	//		Q_snprintf( szBuf,sizeof(szBuf), "%f %f %f", GetLocalAngles()[0], y, GetLocalAngles()[2] );
+	//	}
+	//	else if ((int)y == -1)
+	//	{
+	//		Q_strncpy( szBuf, "-90 0 0", sizeof(szBuf) );
+	//	}
+	//	else
+	//	{
+	//		Q_strncpy( szBuf, "90 0 0", sizeof(szBuf) );
+	//	}
 
-		// Do this so inherited classes looking for 'angles' don't have to bother with 'angle'
-		return KeyValue( "angles", szBuf );
-	}
+	//	// Do this so inherited classes looking for 'angles' don't have to bother with 'angle'
+	//	return KeyValue( "angles", szBuf );
+	//}
 
 	// NOTE: Have to do these separate because they set two values instead of one
-	if( FStrEq( szKeyName, "angles" ) )
-	{
-		QAngle angles;
-		UTIL_StringToVector( angles.Base(), szValue );
+	//if( FStrEq( szKeyName, "angles" ) )
+	//{
+	//	QAngle angles;
+	//	UTIL_StringToVector( angles.Base(), szValue );
 
-		// If you're hitting this assert, it's probably because you're
-		// calling SetLocalAngles from within a KeyValues method.. use SetAbsAngles instead!
-		Assert( (GetEngineObject()->GetMoveParent() == NULL) && !IsEFlagSet( EFL_DIRTY_ABSTRANSFORM ) );
-		SetAbsAngles( angles );
-		return true;
-	}
+	//	// If you're hitting this assert, it's probably because you're
+	//	// calling SetLocalAngles from within a KeyValues method.. use SetAbsAngles instead!
+	//	Assert( (GetEngineObject()->GetMoveParent() == NULL) && !IsEFlagSet( EFL_DIRTY_ABSTRANSFORM ) );
+	//	SetAbsAngles( angles );
+	//	return true;
+	//}
 
-	if( FStrEq( szKeyName, "origin" ) )
-	{
-		Vector vecOrigin;
-		UTIL_StringToVector( vecOrigin.Base(), szValue );
+	//if( FStrEq( szKeyName, "origin" ) )
+	//{
+	//	Vector vecOrigin;
+	//	UTIL_StringToVector( vecOrigin.Base(), szValue );
 
-		// If you're hitting this assert, it's probably because you're
-		// calling SetLocalOrigin from within a KeyValues method.. use SetAbsOrigin instead!
-		Assert( (GetEngineObject()->GetMoveParent() == NULL) && !IsEFlagSet( EFL_DIRTY_ABSTRANSFORM ) );
-		SetAbsOrigin( vecOrigin );
-		return true;
-	}
+	//	// If you're hitting this assert, it's probably because you're
+	//	// calling SetLocalOrigin from within a KeyValues method.. use SetAbsOrigin instead!
+	//	Assert( (GetEngineObject()->GetMoveParent() == NULL) && !IsEFlagSet( EFL_DIRTY_ABSTRANSFORM ) );
+	//	SetAbsOrigin( vecOrigin );
+	//	return true;
+	//}
 
 #ifdef GAME_DLL	
 	
@@ -551,50 +527,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 		return true;
 	}
 
-	// loop through the data description, and try and place the keys in
-	if ( !*ent_debugkeys.GetString() )
-	{
-		for ( datamap_t *dmap = GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap )
-		{
-			if ( ::ParseKeyvalue(this, dmap->dataDesc, dmap->dataNumFields, szKeyName, szValue) )
-				return true;
-		}
-	}
-	else
-	{
-		// debug version - can be used to see what keys have been parsed in
-		bool printKeyHits = false;
-		const char *debugName = "";
 
-		if ( *ent_debugkeys.GetString() && !Q_stricmp(ent_debugkeys.GetString(), STRING(m_iClassname)) )
-		{
-			// Msg( "-- found entity of type %s\n", STRING(m_iClassname) );
-			printKeyHits = true;
-			debugName = STRING(m_iClassname);
-		}
-
-		// loop through the data description, and try and place the keys in
-		for ( datamap_t *dmap = GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap )
-		{
-			if ( !printKeyHits && *ent_debugkeys.GetString() && !Q_stricmp(dmap->dataClassName, ent_debugkeys.GetString()) )
-			{
-				// Msg( "-- found class of type %s\n", dmap->dataClassName );
-				printKeyHits = true;
-				debugName = dmap->dataClassName;
-			}
-
-			if ( ::ParseKeyvalue(this, dmap->dataDesc, dmap->dataNumFields, szKeyName, szValue) )
-			{
-				if ( printKeyHits )
-					Msg( "(%s) key: %-16s value: %s\n", debugName, szKeyName, szValue );
-				
-				return true;
-			}
-		}
-
-		if ( printKeyHits )
-			Msg( "!! (%s) key not handled: \"%s\" \"%s\"\n", STRING(m_iClassname), szKeyName, szValue );
-	}
 
 #endif
 

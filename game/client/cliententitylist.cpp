@@ -14,6 +14,7 @@
 #include "tier0/vprof.h"
 #include "cdll_bounded_cvars.h"
 #include "cliententitylist.h"
+#include "mapentities_shared.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -66,6 +67,11 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_FIELD(m_angRotation, FIELD_VECTOR),
 END_PREDICTION_DATA()
 
+BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
+	DEFINE_FIELD(m_vecAbsOrigin, FIELD_POSITION_VECTOR),
+	DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
+END_DATADESC()
+
 #include "tier0/memdbgoff.h"
 
 //-----------------------------------------------------------------------------
@@ -117,6 +123,159 @@ void C_EngineObjectInternal::operator delete(void* pMem)
 }
 
 #include "tier0/memdbgon.h"
+
+//-----------------------------------------------------------------------------
+// Purpose: Handles keys and outputs from the BSP.
+// Input  : mapData - Text block of keys and values from the BSP.
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::ParseMapData(CEntityMapData* mapData)
+{
+	char keyName[MAPKEY_MAXLENGTH];
+	char value[MAPKEY_MAXLENGTH];
+
+//#ifdef _DEBUG
+//#ifdef GAME_DLL
+//	ValidateDataDescription();
+//#endif // GAME_DLL
+//#endif // _DEBUG
+
+	// loop through all keys in the data block and pass the info back into the object
+	if (mapData->GetFirstKey(keyName, value))
+	{
+		do
+		{
+			if (!KeyValue(keyName, value)) {
+				m_pOuter->KeyValue(keyName, value);
+			}
+		} while (mapData->GetNextKey(keyName, value));
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Parse data from a map file
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
+{
+	//!! temp hack, until worldcraft is fixed
+	// strip the # tokens from (duplicate) key names
+	char* s = (char*)strchr(szKeyName, '#');
+	if (s)
+	{
+		*s = '\0';
+	}
+
+	//if (FStrEq(szKeyName, "rendercolor") || FStrEq(szKeyName, "rendercolor32"))
+	//{
+	//	color32 tmp;
+	//	UTIL_StringToColor32(&tmp, szValue);
+	//	SetRenderColor(tmp.r, tmp.g, tmp.b);
+	//	// don't copy alpha, legacy support uses renderamt
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "renderamt"))
+	//{
+	//	SetRenderColorA(atoi(szValue));
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "disableshadows"))
+	//{
+	//	int val = atoi(szValue);
+	//	if (val)
+	//	{
+	//		AddEffects(EF_NOSHADOW);
+	//	}
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "mins"))
+	//{
+	//	Vector mins;
+	//	UTIL_StringToVector(mins.Base(), szValue);
+	//	CollisionProp()->SetCollisionBounds(mins, CollisionProp()->OBBMaxs());
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "maxs"))
+	//{
+	//	Vector maxs;
+	//	UTIL_StringToVector(maxs.Base(), szValue);
+	//	CollisionProp()->SetCollisionBounds(CollisionProp()->OBBMins(), maxs);
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "disablereceiveshadows"))
+	//{
+	//	int val = atoi(szValue);
+	//	if (val)
+	//	{
+	//		AddEffects(EF_NORECEIVESHADOW);
+	//	}
+	//	return true;
+	//}
+
+	//if (FStrEq(szKeyName, "nodamageforces"))
+	//{
+	//	int val = atoi(szValue);
+	//	if (val)
+	//	{
+	//		AddEFlags(EFL_NO_DAMAGE_FORCES);
+	//	}
+	//	return true;
+	//}
+
+	// Fix up single angles
+	if (FStrEq(szKeyName, "angle"))
+	{
+		static char szBuf[64];
+
+		float y = atof(szValue);
+		if (y >= 0)
+		{
+			Q_snprintf(szBuf, sizeof(szBuf), "%f %f %f", GetLocalAngles()[0], y, GetLocalAngles()[2]);
+		}
+		else if ((int)y == -1)
+		{
+			Q_strncpy(szBuf, "-90 0 0", sizeof(szBuf));
+		}
+		else
+		{
+			Q_strncpy(szBuf, "90 0 0", sizeof(szBuf));
+		}
+
+		// Do this so inherited classes looking for 'angles' don't have to bother with 'angle'
+		return KeyValue("angles", szBuf);
+	}
+
+	// NOTE: Have to do these separate because they set two values instead of one
+	if (FStrEq(szKeyName, "angles"))
+	{
+		QAngle angles;
+		UTIL_StringToVector(angles.Base(), szValue);
+
+		// If you're hitting this assert, it's probably because you're
+		// calling SetLocalAngles from within a KeyValues method.. use SetAbsAngles instead!
+		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		SetAbsAngles(angles);
+		return true;
+	}
+
+	if (FStrEq(szKeyName, "origin"))
+	{
+		Vector vecOrigin;
+		UTIL_StringToVector(vecOrigin.Base(), szValue);
+
+		// If you're hitting this assert, it's probably because you're
+		// calling SetLocalOrigin from within a KeyValues method.. use SetAbsOrigin instead!
+		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		SetAbsOrigin(vecOrigin);
+		return true;
+	}
+
+	// key hasn't been handled
+	return false;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
