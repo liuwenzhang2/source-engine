@@ -256,7 +256,7 @@ bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalAngles from within a KeyValues method.. use SetAbsAngles instead!
-		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		Assert((GetMoveParent() == NULL) && !m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
 		SetAbsAngles(angles);
 		return true;
 	}
@@ -268,7 +268,7 @@ bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalOrigin from within a KeyValues method.. use SetAbsOrigin instead!
-		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		Assert((GetMoveParent() == NULL) && !m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
 		SetAbsOrigin(vecOrigin);
 		return true;
 	}
