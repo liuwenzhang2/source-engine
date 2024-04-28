@@ -13,7 +13,6 @@
 #endif
 
 #include "c_baseentity.h"
-#include "cliententitylist.h"
 #include "studio.h"
 #include "utlvector.h"
 #include "ragdoll.h"

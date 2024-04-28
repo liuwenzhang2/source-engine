@@ -489,6 +489,10 @@ float WaterDebrisEffect::UpdateAlpha( const SimpleParticle *pParticle )
 	return ( ((float)pParticle->m_uchStartAlpha/255.0f) * sin( M_PI * (pParticle->m_flLifetime / pParticle->m_flDieTime) ) );
 }
 
+CSplashParticle* CSplashParticle::Create(const char* pDebugName)
+{
+	return new CSplashParticle(pDebugName);
+}
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *pParticle - 

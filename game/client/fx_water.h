@@ -22,10 +22,7 @@ public:
 	CSplashParticle( const char *pDebugName ) : CSimpleEmitter( pDebugName ), m_bUseClipHeight( false ) {}
 	
 	// Create
-	static CSplashParticle *Create( const char *pDebugName )
-	{
-		return new CSplashParticle( pDebugName );
-	}
+	static CSplashParticle* Create(const char* pDebugName);
 
 	// Roll
 	virtual	float UpdateRoll( SimpleParticle *pParticle, float timeDelta );

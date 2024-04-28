@@ -167,6 +167,11 @@ CTrailParticles::CTrailParticles( const char *pDebugName ) : CSimpleEmitter( pDe
 	m_flVelocityDampen	= 0.0f;
 }
 
+CTrailParticles* CTrailParticles::Create(const char* pDebugName)
+{ 
+	return new CTrailParticles(pDebugName); 
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Test for surrounding collision surfaces for quick collision testing for the particle system
 // Input  : &origin - starting position

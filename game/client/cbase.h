@@ -36,7 +36,7 @@ struct studiohdr_t;
 
 #include <icvar.h>
 #include <baseentity_shared.h>
-
+#include "cliententitylist.h"
 
 // This is a precompiled header.  Include a bunch of common stuff.
 // This is kind of ugly in that it adds a bunch of dependency where it isn't needed.

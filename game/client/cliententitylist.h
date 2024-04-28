@@ -930,6 +930,11 @@ void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 	int entnum = handle.GetEntryIndex();
 	EntityCacheInfo_t* pCache = &m_EntityCacheInfo[entnum];
 
+	if (entnum < 0 || entnum >= NUM_ENT_ENTRIES) {
+		Error("entnum overflow!");
+		return;
+	}
+
 	if (entnum >= 0 && entnum < MAX_EDICTS)
 	{
 		// Update our counters.

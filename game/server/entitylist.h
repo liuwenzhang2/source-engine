@@ -101,6 +101,8 @@ class CEngineObjectInternal : public IEngineObject {
 public:
 	DECLARE_CLASS_NOBASE(CEngineObjectInternal);
 	//DECLARE_EMBEDDED_NETWORKVAR();
+	// data description
+	DECLARE_DATADESC();
 
 	void* operator new(size_t stAllocateBlock);
 	void* operator new(size_t stAllocateBlock, int nBlockUse, const char* pFileName, int nLine);

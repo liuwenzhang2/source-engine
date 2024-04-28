@@ -67,6 +67,11 @@ void CLitSmokeEmitter::SetLight( Vector position, Vector color, float intensity 
 	m_Renderer.SetAmbientLight( info );
 }
 
+CSmartPtr<CLitSmokeEmitter> CLitSmokeEmitter::Create(const char* pDebugName)
+{
+	return new CLitSmokeEmitter(pDebugName);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : flTimeDelta - 

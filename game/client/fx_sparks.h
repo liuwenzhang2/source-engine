@@ -76,7 +76,7 @@ class CTrailParticles : public CSimpleEmitter
 public:
 	CTrailParticles( const char *pDebugName );
 	
-	static CTrailParticles	*Create( const char *pDebugName )	{	return new CTrailParticles( pDebugName );	}
+	static CTrailParticles* Create(const char* pDebugName);
 
 	virtual void RenderParticles( CParticleRenderIterator *pIterator );
 	virtual void SimulateParticles( CParticleSimulateIterator *pIterator );
