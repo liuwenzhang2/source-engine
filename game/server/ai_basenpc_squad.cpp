@@ -267,7 +267,7 @@ int CAI_BaseNPC::NumWeaponsInSquad( const char *pszWeaponClassname )
 
 	if( !GetSquad() )
 	{
-		if( GetActiveWeapon() && GetActiveWeapon()->m_iClassname == iszWeaponClassname )
+		if( GetActiveWeapon() && GetActiveWeapon()->GetEngineObject()->GetClassname() == iszWeaponClassname)
 		{
 			// I'm alone in my squad, but I do have this weapon.
 			return 1;
@@ -281,7 +281,7 @@ int CAI_BaseNPC::NumWeaponsInSquad( const char *pszWeaponClassname )
 	CAI_BaseNPC *pSquadmate = m_pSquad->GetFirstMember( &iter );
 	while ( pSquadmate )
 	{
-		if( pSquadmate->GetActiveWeapon() && pSquadmate->GetActiveWeapon()->m_iClassname == iszWeaponClassname )
+		if( pSquadmate->GetActiveWeapon() && pSquadmate->GetActiveWeapon()->GetEngineObject()->GetClassname() == iszWeaponClassname)
 		{
 			count++;
 		}

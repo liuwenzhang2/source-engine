@@ -1252,7 +1252,7 @@ bool CNPC_FloorTurret::IsValidEnemy( CBaseEntity *pEnemy )
 		return false;
 
 	// Don't shoot at other turrets.
-	if ( pEnemy->m_iClassname == m_iClassname )
+	if ( pEnemy->GetEngineObject()->GetClassname() == GetEngineObject()->GetClassname())
 		return false;
 
 	// If our eye is stuck in something, don't shoot

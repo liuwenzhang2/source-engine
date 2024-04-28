@@ -261,7 +261,7 @@ void CC_CreateFlashlight( const CCommand &args )
 	CEnvProjectedTexture *pFlashlight = dynamic_cast< CEnvProjectedTexture * >(gEntList.CreateEntityByName("env_projectedtexture") );
 	if( args.ArgC() > 1 )
 	{
-		pFlashlight->SetName( AllocPooledString( args[1] ) );
+		pFlashlight->SetName( args[1] );
 	}
 
 	pFlashlight->Teleport( &origin, &angles, NULL );

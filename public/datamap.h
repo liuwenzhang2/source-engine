@@ -151,6 +151,7 @@ DECLARE_FIELD_SIZE( FIELD_MATERIALINDEX,	sizeof(int) )
 #define DEFINE_CUSTOM_FIELD_INVALID(name,datafuncs)	{ FIELD_CUSTOM, #name, { 0, 0 }, 1, FTYPEDESC_SAVE, NULL, datafuncs, NULL }
 #define DEFINE_CUSTOM_KEYFIELD_INVALID(name,datafuncs,mapname)	{ FIELD_CUSTOM, #name, { 0, 0 }, 1, FTYPEDESC_SAVE | FTYPEDESC_KEY, mapname, datafuncs, NULL }
 #define DEFINE_CUSTOM_GLOBAL_FIELD(name,datafuncs)	{ FIELD_CUSTOM, #name, { 0, 0 }, 1, FTYPEDESC_GLOBAL | FTYPEDESC_SAVE, NULL, datafuncs, NULL }
+#define DEFINE_CUSTOM_GLOBAL_KEYFIELD_INVALID(name,datafuncs, mapname)	{ FIELD_CUSTOM, #name, { 0, 0 }, 1, FTYPEDESC_GLOBAL | FTYPEDESC_KEY | FTYPEDESC_SAVE, mapname, datafuncs, NULL }
 #define DEFINE_AUTO_ARRAY2D(name,fieldtype)		_FIELD(name, fieldtype, ARRAYSIZE2D(((classNameTypedef *)0)->name), FTYPEDESC_SAVE, NULL, 0 )
 // Used by byteswap datadescs
 #define DEFINE_BITFIELD(name,fieldtype,bitcount)	DEFINE_ARRAY(name,fieldtype,((bitcount+FIELD_BITS(fieldtype)-1)&~(FIELD_BITS(fieldtype)-1)) / FIELD_BITS(fieldtype) )

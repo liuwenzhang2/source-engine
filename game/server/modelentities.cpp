@@ -54,7 +54,7 @@ void CFuncBrush::Spawn( void )
 		TurnOff();
 	
 	// If it can't move/go away, it's really part of the world
-	if ( !GetEntityName() || !m_iParent )
+	if ( !GetEntityName() || !GetEngineObject()->GetParentName() )
 		AddFlag( FL_WORLDBRUSH );
 
 	CreateVPhysics();
@@ -360,7 +360,7 @@ bool CTriggerBrush::PassesInputFilter( CBaseEntity *pOther, int filter )
 		return false;
 
 	// pushables
-	if ( (filter & TRIGGER_IGNOREPUSHABLES) && FStrEq(STRING(pOther->m_iClassname), "func_pushable") )
+	if ( (filter & TRIGGER_IGNOREPUSHABLES) && FStrEq(STRING(pOther->GetEngineObject()->GetClassname()), "func_pushable") )
 		return false;
 
 	return true;

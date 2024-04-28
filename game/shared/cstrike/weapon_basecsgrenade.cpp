@@ -239,7 +239,7 @@ void CBaseCSGrenade::ItemPostFrame()
 		IGameEvent * event = gameeventmanager->CreateEvent( "weapon_fire" );
 		if( event )
 		{
-			const char *weaponName = STRING( m_iClassname );
+			const char *weaponName = STRING(GetEngineObject()->GetClassname() );
 			if ( strncmp( weaponName, "weapon_", 7 ) == 0 )
 			{
 				weaponName += 7;

@@ -220,6 +220,52 @@ public:
 	void RecomputePVSInformation();
 	// Marks the PVS information dirty
 	void MarkPVSInformationDirty();
+
+	void SetClassname(const char* className)
+	{
+		m_iClassname = AllocPooledString(className);
+	}
+	const char* GetClassName() const
+	{
+		return STRING(m_iClassname);
+	}
+	const string_t& GetClassname() const
+	{
+		return m_iClassname;
+	}
+	void SetGlobalname(const char* iGlobalname) 
+	{
+		m_iGlobalname = AllocPooledString(iGlobalname);
+	}
+	const string_t& GetGlobalname() const
+	{
+		return m_iGlobalname;
+	}
+	void SetParentName(const char* parentName)
+	{
+		m_iParent = AllocPooledString(parentName);
+	}
+	string_t& GetParentName() 
+	{
+		return m_iParent;
+	}
+	void SetName(const char* newName)
+	{
+		m_iName = AllocPooledString(newName);
+	}
+	string_t& GetEntityName()
+	{
+		return m_iName;
+	}
+
+	bool		NameMatches(const char* pszNameOrWildcard);
+	bool		ClassMatches(const char* pszClassOrWildcard);
+	bool		NameMatches(string_t nameStr);
+	bool		ClassMatches(string_t nameStr);
+
+private:
+	bool		NameMatchesComplex(const char* pszNameOrWildcard);
+	bool		ClassMatchesComplex(const char* pszClassOrWildcard);
 private:
 
 	friend class CBaseEntity;
@@ -244,6 +290,12 @@ private:
 
 	PVSInfo_t m_PVSInfo;
 	bool m_bPVSInfoDirty = false;
+
+	// members
+	string_t m_iClassname;  // identifier for entity creation and save/restore
+	string_t m_iGlobalname; // identifier for carrying entity across level transitions
+	string_t m_iParent;	// the name of the entities parent; linked into m_pParent during Activate()
+	string_t m_iName;	// name used to identify this entity
 
 };
 
@@ -829,7 +881,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByName(CBaseEntity* pStartEntity, c
 			continue;
 		}
 
-		if (!ent->m_iName)
+		if (!ent->GetEngineObject()->GetEntityName())
 			continue;
 
 		if (ent->NameMatches(szName))
@@ -1309,7 +1361,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityNearestFacing(const Vector& origin,
 			continue;
 
 		// Ignore if worldspawn
-		if (!FStrEq(STRING(ent->m_iClassname), "worldspawn") && !FStrEq(STRING(ent->m_iClassname), "soundent"))
+		if (!FStrEq(STRING(ent->GetEngineObject()->GetClassname()), "worldspawn") && !FStrEq(STRING(ent->GetEngineObject()->GetClassname()), "soundent"))
 		{
 			bestDot = dot;
 			best_ent = ent;

@@ -881,7 +881,7 @@ void CPropJeepEpisodic::UpdateRadar( bool forceUpdate )
 	{
 		int type = RADAR_CONTACT_NONE;
 
-		if( pEnt->m_iClassname == iszRadarTarget )
+		if( pEnt->GetEngineObject()->GetClassname() == iszRadarTarget)
 		{
 			CRadarTarget *pTarget = dynamic_cast<CRadarTarget*>(pEnt);
 
@@ -906,7 +906,7 @@ void CPropJeepEpisodic::UpdateRadar( bool forceUpdate )
 		}
 		else if ( m_bRadarDetectsEnemies )
 		{
-			if ( pEnt->m_iClassname == iszStriderName )
+			if ( pEnt->GetEngineObject()->GetClassname() == iszStriderName)
 			{
 				CNPC_Strider *pStrider = dynamic_cast<CNPC_Strider*>(pEnt);
 
@@ -917,7 +917,7 @@ void CPropJeepEpisodic::UpdateRadar( bool forceUpdate )
 				}
 			}
 
-			if ( pEnt->m_iClassname == iszHunterName )
+			if ( pEnt->GetEngineObject()->GetClassname() == iszHunterName)
 			{
 				type = RADAR_CONTACT_ENEMY;
 			}

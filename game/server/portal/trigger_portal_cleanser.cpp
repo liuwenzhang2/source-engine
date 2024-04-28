@@ -241,7 +241,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 		if ( pDisolvingObj )
 		{
 			// Remove old prop, transfer name and children to the new simple prop
-			pDisolvingObj->SetName( pBaseAnimating->GetEntityName() );
+			pDisolvingObj->SetName( STRING(pBaseAnimating->GetEntityName()) );
 			UTIL_TransferPoseParameters( pBaseAnimating, pDisolvingObj );
 			IEngineObject::TransferChildren( pBaseAnimating->GetEngineObject(), pDisolvingObj->GetEngineObject());
 			pDisolvingObj->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );

@@ -387,7 +387,7 @@ void UTIL_Remove( CBaseEntity *oldObj )
 		Assert(g_bReceivedChainedUpdateOnRemove);
 
 		// clear oldObj targetname / other flags now
-		pBaseEnt->SetName(NULL_STRING);
+		pBaseEnt->SetName("");
 
 #ifdef PORTAL
 		if (bNetworkable && nEntIndex != -1) {
@@ -1808,10 +1808,10 @@ int DispatchSpawn( CBaseEntity *pEntity )
 		if ( pEntSafe == NULL || pEntity->IsMarkedForDeletion() )
 			return -1;
 
-		if ( pEntity->m_iGlobalname != NULL_STRING ) 
+		if ( pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING )
 		{
 			// Handle global stuff here
-			int globalIndex = GlobalEntity_GetIndex( pEntity->m_iGlobalname );
+			int globalIndex = GlobalEntity_GetIndex( pEntity->GetEngineObject()->GetGlobalname() );
 			if ( globalIndex >= 0 )
 			{
 				// Already dead? delete
@@ -1829,7 +1829,7 @@ int DispatchSpawn( CBaseEntity *pEntity )
 			else
 			{
 				// Spawned entities default to 'On'
-				GlobalEntity_Add( pEntity->m_iGlobalname, gpGlobals->mapname, GLOBAL_ON );
+				GlobalEntity_Add( pEntity->GetEngineObject()->GetGlobalname(), gpGlobals->mapname, GLOBAL_ON);
 //					Msg( "Added global entity %s (%s)\n", pEntity->GetClassname(), STRING(pEntity->m_iGlobalname) );
 			}
 		}

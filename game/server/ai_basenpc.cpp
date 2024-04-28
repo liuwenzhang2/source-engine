@@ -1948,7 +1948,7 @@ bool CAI_BaseNPC::QueryHearSound( CSound *pSound )
 	// Disregard footsteps from our own class type
 	if ( pSound->IsSoundType( SOUND_COMBAT ) && pSound->SoundChannel() == SOUNDENT_CHANNEL_NPC_FOOTSTEP )
 	{
-		if ( pSound->m_hOwner && pSound->m_hOwner->ClassMatches( m_iClassname ) )
+		if ( pSound->m_hOwner && pSound->m_hOwner->ClassMatches(GetEngineObject()->GetClassname() ) )
 				return false;
 	}
 
@@ -5150,7 +5150,7 @@ void CAI_BaseNPC::GiveWeapon( string_t iszWeaponName )
 	// If I have a name, make my weapon match it with "_weapon" appended
 	if ( GetEntityName() != NULL_STRING )
 	{
-		pWeapon->SetName( AllocPooledString(UTIL_VarArgs("%s_weapon", STRING(GetEntityName()) )) );
+		pWeapon->SetName( UTIL_VarArgs("%s_weapon", STRING(GetEntityName()) ));
 	}
 
 	Weapon_Equip( pWeapon );
@@ -6865,7 +6865,7 @@ void CAI_BaseNPC::NPCInit ( void )
 				// If I have a name, make my weapon match it with "_weapon" appended
 				if ( GetEntityName() != NULL_STRING )
 				{
-					pWeapon->SetName( AllocPooledString(UTIL_VarArgs("%s_weapon", STRING(GetEntityName()))) );
+					pWeapon->SetName( UTIL_VarArgs("%s_weapon", STRING(GetEntityName())) );
 				}
 
 				if ( GetEffects() & EF_NOSHADOW )
@@ -9010,7 +9010,7 @@ int CAI_BaseNPC::DrawDebugTextOverlays(void)
 			}
 			else
 			{
-				Q_strncat(tempstr,STRING(GetEnemy()->m_iClassname),sizeof(tempstr), COPY_ALL_CHARACTERS);
+				Q_strncat(tempstr,STRING(GetEnemy()->GetEngineObject()->GetClassname()),sizeof(tempstr), COPY_ALL_CHARACTERS);
 				Q_strncat(tempstr,"\n",sizeof(tempstr), COPY_ALL_CHARACTERS);
 			}
 		}
@@ -9278,7 +9278,7 @@ int CAI_BaseNPC::DrawDebugTextOverlays(void)
 			}
 			else
 			{
-				Q_strncat(tempstr,STRING(GetGoalEnt()->m_iClassname),sizeof(tempstr), COPY_ALL_CHARACTERS);
+				Q_strncat(tempstr,STRING(GetGoalEnt()->GetEngineObject()->GetClassname()),sizeof(tempstr), COPY_ALL_CHARACTERS);
 			}
 			EntityText(text_offset, tempstr, 0);
 			text_offset++;
@@ -12658,7 +12658,7 @@ bool CAI_BaseNPC::IsCoverPosition( const Vector &vecThreat, const Vector &vecPos
 
 	if( tr.fraction != 1.0 && hl2_episodic.GetBool() )
 	{
-		if(((CBaseEntity*)tr.m_pEnt)->m_iClassname == m_iClassname )
+		if(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetClassname() == GetEngineObject()->GetClassname())
 		{
 			// Don't hide behind buddies!
 			return false;
@@ -13275,7 +13275,7 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 	{
 		Q_snprintf( szSSName, sizeof(szSSName), "dss_%s%d", GetDebugName(), entindex() );
 	}
-  	string_t iszSSName = AllocPooledString(szSSName);
+  	//string_t iszSSName = AllocPooledString(szSSName);
 
 	// Setup next attempt
 	pInteraction->flNextAttemptTime = gpGlobals->curtime + pInteraction->flDelay + RandomFloat(-2,2);
@@ -13293,7 +13293,7 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 
 	pMySequence->SetAbsAngles( angDesired );
 	pMySequence->ForceSetTargetEntity( this, true );
-	pMySequence->SetName( iszSSName );
+	pMySequence->SetName( szSSName );
  	pMySequence->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
 	if ((pInteraction->iFlags & SCNPC_FLAG_DONT_TELEPORT_AT_END_ME) != 0)
 	{
@@ -13318,7 +13318,7 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 		pTheirSequence->SetAbsOrigin( vecOtherOrigin );
 		pTheirSequence->SetAbsAngles( angOtherAngles );
 		pTheirSequence->ForceSetTargetEntity( pOtherNPC, true );
-		pTheirSequence->SetName( iszSSName );
+		pTheirSequence->SetName( szSSName );
 		pTheirSequence->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
 		if ((pInteraction->iFlags & SCNPC_FLAG_DONT_TELEPORT_AT_END_THEM) != 0) 
 		{
@@ -13521,7 +13521,7 @@ void CAI_BaseNPC::CalculateValidEnemyInteractions( void )
 				continue;
 
 			// Check the specific weapon type
-			if ( pInteraction->iszMyWeapon != NULL_STRING && GetActiveWeapon()->m_iClassname != pInteraction->iszMyWeapon )
+			if ( pInteraction->iszMyWeapon != NULL_STRING && GetActiveWeapon()->GetEngineObject()->GetClassname() != pInteraction->iszMyWeapon )
 				continue;
 		}
 		if ( pInteraction->iFlags & SCNPC_FLAG_NEEDS_WEAPON_THEM )
@@ -13530,7 +13530,7 @@ void CAI_BaseNPC::CalculateValidEnemyInteractions( void )
 				continue;
 
 			// Check the specific weapon type
-			if ( pInteraction->iszTheirWeapon != NULL_STRING && pNPC->GetActiveWeapon()->m_iClassname != pInteraction->iszTheirWeapon )
+			if ( pInteraction->iszTheirWeapon != NULL_STRING && pNPC->GetActiveWeapon()->GetEngineObject()->GetClassname() != pInteraction->iszTheirWeapon )
 				continue;
 		}
 

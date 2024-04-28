@@ -1418,7 +1418,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 		// don't convert something that is already physics based
 		if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
-			Msg( "ERROR phys_convert %s ! Already MOVETYPE_VPHYSICS\n", STRING(pEntity->m_iClassname) );
+			Msg( "ERROR phys_convert %s ! Already MOVETYPE_VPHYSICS\n", STRING(pEntity->GetEngineObject()->GetClassname()) );
 			continue;
 		}
 
@@ -1445,7 +1445,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 				}
 			}
 
-			pPhys->SetName( pEntity->GetEntityName() );
+			pPhys->SetName( STRING(pEntity->GetEntityName()) );
 			UTIL_TransferPoseParameters( pEntity, pPhys );
 			IEngineObject::TransferChildren( pEntity->GetEngineObject(), pPhys->GetEngineObject());
 			pEntity->AddSolidFlags( FSOLID_NOT_SOLID );

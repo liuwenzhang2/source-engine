@@ -468,7 +468,7 @@ void NWCEdit::RememberEntityPosition( CBaseEntity *pEntity )
 	int index = pEntity->entindex();
 	g_EntityPositions[index] = pEntity->GetAbsOrigin();
 	g_EntityOrientations[index] = pEntity->GetAbsAngles();
-	g_EntityClassnames[index] = pEntity->m_iClassname;
+	g_EntityClassnames[index] = pEntity->GetEngineObject()->GetClassname();
 }
 
 //-----------------------------------------------------------------------------

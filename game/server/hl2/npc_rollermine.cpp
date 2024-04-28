@@ -640,7 +640,7 @@ void CNPC_RollerMine::Bury( trace_t *tr )
 //-----------------------------------------------------------------------------
 bool CNPC_RollerMine::WakeupMine( CAI_BaseNPC *pNPC )
 {
-	if ( pNPC && pNPC->m_iClassname == m_iClassname && pNPC != this )
+	if ( pNPC && pNPC->GetEngineObject()->GetClassname() == GetEngineObject()->GetClassname() && pNPC != this)
 	{
 		CNPC_RollerMine *pMine = dynamic_cast<CNPC_RollerMine *>(pNPC);
 		if ( pMine )
@@ -2198,7 +2198,7 @@ int CNPC_RollerMine::CountRollersOnMyVehicle( CUtlVector<CNPC_RollerMine*> *pRol
 	for ( int i = 0; i < boxCount; i++ )
 	{
 		CAI_BaseNPC *pNPC = entityList[i]->MyNPCPointer();
-		if ( pNPC && pNPC->m_iClassname == m_iClassname && pNPC != this )
+		if ( pNPC && pNPC->GetEngineObject()->GetClassname() == GetEngineObject()->GetClassname() && pNPC != this)
 		{
 			// Found another rollermine
 			CNPC_RollerMine *pMine = dynamic_cast<CNPC_RollerMine*>(pNPC);
@@ -2544,7 +2544,7 @@ int CNPC_RollerMine::OnTakeDamage( const CTakeDamageInfo &info )
 
 	if ( info.GetDamageType() & (DMG_BURN|DMG_BLAST) )
 	{
-		if ( info.GetAttacker() && info.GetAttacker()->m_iClassname != m_iClassname )
+		if ( info.GetAttacker() && info.GetAttacker()->GetEngineObject()->GetClassname() != GetEngineObject()->GetClassname() )
 		{
 			SetThink( &CNPC_RollerMine::PreDetonate );
 			SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1f, 0.5f ) );

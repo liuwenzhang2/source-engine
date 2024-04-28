@@ -2480,20 +2480,20 @@ public:
 
 		if ( pEntity )
 		{
-			if ( FStrEq( STRING( pEntity->m_iClassname ), "func_brush" ) )
+			if ( FStrEq( STRING( pEntity->GetEngineObject()->GetClassname() ), "func_brush" ) )
 			{
 				CFuncBrush *pFuncBrush = assert_cast<CFuncBrush *>(pEntity);
 
 				if ( pFuncBrush->m_bInvertExclusion )
 				{
-					if ( pFuncBrush->m_iszExcludedClass == m_pBarnacle->m_iClassname )
+					if ( pFuncBrush->m_iszExcludedClass == m_pBarnacle->GetEngineObject()->GetClassname() )
 						return true;
 					else
 						return false;
 				}
 				else
 				{
-					if ( pFuncBrush->m_iszExcludedClass != m_pBarnacle->m_iClassname )
+					if ( pFuncBrush->m_iszExcludedClass != m_pBarnacle->GetEngineObject()->GetClassname() )
 						return false;
 
 				}

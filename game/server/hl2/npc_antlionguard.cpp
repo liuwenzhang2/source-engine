@@ -3691,7 +3691,7 @@ void CNPC_AntlionGuard::UpdatePhysicsTarget( bool bPreferObjectsAlongTargetVecto
 //-----------------------------------------------------------------------------
 bool CNPC_AntlionGuard::ShouldProbeCollideAgainstEntity( CBaseEntity *pEntity )
 {
-	if ( m_iszPhysicsPropClass != pEntity->m_iClassname )
+	if ( m_iszPhysicsPropClass != pEntity->GetEngineObject()->GetClassname() )
 		return BaseClass::ShouldProbeCollideAgainstEntity( pEntity );
 
 	if ( m_hPhysicsTarget == pEntity )
@@ -4573,7 +4573,7 @@ bool CNPC_AntlionGuard::BecomeRagdollOnClient( const Vector &force )
 		CBaseEntity *pRagdoll = CreateServerRagdoll( this, 0, info, COLLISION_GROUP_NONE );
 
 		// Transfer our name to the new ragdoll
-		pRagdoll->SetName( GetEntityName() );
+		pRagdoll->SetName( STRING(GetEntityName()) );
 		pRagdoll->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		
 		// Get rid of our old body

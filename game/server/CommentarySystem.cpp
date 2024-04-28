@@ -592,7 +592,7 @@ public:
 
 		// Spawn the commentary semaphore entity
 		CBaseEntity *pSemaphore = gEntList.CreateEntityByName( "info_target" );
-		pSemaphore->SetName( MAKE_STRING(COMMENTARY_SPAWNED_SEMAPHORE) );
+		pSemaphore->SetName( COMMENTARY_SPAWNED_SEMAPHORE );
 
 		bool oldLock = engine->LockNetworkStringTables( false );
 

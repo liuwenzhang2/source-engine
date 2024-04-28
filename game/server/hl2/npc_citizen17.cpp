@@ -756,7 +756,7 @@ void CNPC_Citizen::FixupMattWeapon()
 		Weapon_Drop( pWeapon );
 		UTIL_Remove( pWeapon );
 		pWeapon = (CBaseCombatWeapon *)CREATE_UNSAVED_ENTITY( CMattsPipe, "weapon_crowbar" );
-		pWeapon->SetName( AllocPooledString( "matt_weapon" ) );
+		pWeapon->SetName( "matt_weapon" );
 		DispatchSpawn( pWeapon );
 
 #ifdef DEBUG
@@ -1868,7 +1868,7 @@ void CNPC_Citizen::HandleAnimEvent( animevent_t *pEvent )
 			// If I have a name, make my weapon match it with "_weapon" appended
 			if ( GetEntityName() != NULL_STRING )
 			{
-				pWeapon->SetName( AllocPooledString(UTIL_VarArgs("%s_weapon", STRING(GetEntityName()) )) );
+				pWeapon->SetName( UTIL_VarArgs("%s_weapon", STRING(GetEntityName()) ) );
 			}
 			Weapon_Equip( pWeapon );
 		}

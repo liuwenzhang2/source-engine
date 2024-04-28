@@ -588,7 +588,7 @@ void CWeaponCSBase::ItemPostFrame()
 			IGameEvent * event = gameeventmanager->CreateEvent( (HasAmmo()) ? "weapon_fire" : "weapon_fire_on_empty" );
 			if( event )
 			{
-				const char *weaponName = STRING( m_iClassname );
+				const char *weaponName = STRING(GetEngineObject()->GetClassname() );
 				if ( strncmp( weaponName, "weapon_", 7 ) == 0 )
 				{
 					weaponName += 7;
@@ -1813,7 +1813,7 @@ void CWeaponCSBase::OnPickedUp( CBaseCombatCharacter *pNewOwner )
 		// Robin: We don't want to delete weapons the player has picked up, so
 		// clear the name of the weapon. This prevents wildcards that are meant
 		// to find NPCs finding weapons dropped by the NPCs as well.
-		SetName( NULL_STRING );
+		SetName( "");
 	}
 
 	// Someone picked me up, so make it so that I can't be removed.

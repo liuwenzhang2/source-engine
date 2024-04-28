@@ -877,7 +877,7 @@ void CNPC_CombineDropship::Spawn( void )
 		m_hContainer = (CBaseAnimating*)gEntList.CreateEntityByName( "prop_dropship_container" );
 		if ( m_hContainer )
 		{
-			m_hContainer->SetName( AllocPooledString("dropship_container") );
+			m_hContainer->SetName( "dropship_container" );
 			m_hContainer->SetAbsOrigin( GetAbsOrigin() );
 			m_hContainer->SetAbsAngles( GetAbsAngles() );
 			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
@@ -958,7 +958,7 @@ void CNPC_CombineDropship::Spawn( void )
 		if ( m_hContainer )
 		{
 			m_hContainer->SetModel( "models/buggy.mdl" );
-			m_hContainer->SetName( AllocPooledString("dropship_jeep") );
+			m_hContainer->SetName( "dropship_jeep" );
 
 			m_hContainer->SetAbsOrigin( GetAbsOrigin() );//- Vector( 0, 0 , 25 ) );
 			QAngle angles = GetAbsAngles();

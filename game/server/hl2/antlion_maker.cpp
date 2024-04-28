@@ -327,7 +327,7 @@ void CAntlionTemplateMaker::ActivateSpore( const char* sporename, Vector vOrigin
 		if ( pSpore )
 		{
 			pSpore->SetAbsOrigin( vOrigin );
-			pSpore->SetName( AllocPooledString( szName ) );
+			pSpore->SetName( szName );
 			pSpore->m_flSpawnRate = ANTLION_MAKE_SPORE_SPAWNRATE;
 		}
 	}

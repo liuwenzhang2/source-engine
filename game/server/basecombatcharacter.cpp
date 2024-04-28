@@ -2897,7 +2897,7 @@ CBaseEntity *CBaseCombatCharacter::Weapon_FindUsable( const Vector &range )
 		if ( GetActiveWeapon() )
 		{
 			// Already armed. Would picking up this weapon improve my situation?
-			if( GetActiveWeapon()->m_iClassname == pWeapon->m_iClassname )
+			if( GetActiveWeapon()->GetEngineObject()->GetClassname() == pWeapon->GetEngineObject()->GetClassname())
 			{
 				// No, I'm already using this type of weapon.
 				continue;

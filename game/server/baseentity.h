@@ -441,6 +441,21 @@ public:
 	virtual void RecomputePVSInformation() = 0;
 	// Marks the PVS information dirty
 	virtual void MarkPVSInformationDirty() = 0;
+
+	virtual void SetClassname(const char* className) = 0;
+	virtual const char* GetClassName() const = 0;
+	virtual const string_t& GetClassname() const = 0;
+	virtual void SetGlobalname(const char* iGlobalname) = 0;
+	virtual const string_t& GetGlobalname() const = 0;
+	virtual void SetParentName(const char* parentName) = 0;
+	virtual string_t& GetParentName() = 0;
+	virtual void SetName(const char* newName) = 0;
+	virtual string_t& GetEntityName() = 0;
+	virtual bool NameMatches(const char* pszNameOrWildcard) = 0;
+	virtual bool ClassMatches(const char* pszClassOrWildcard) = 0;
+	virtual bool NameMatches(string_t nameStr) = 0;
+	virtual bool ClassMatches(string_t nameStr) = 0;
+
 };
 
 
@@ -691,7 +706,11 @@ public:
 	CBaseEntity *FirstMoveChild( void );
 	CBaseEntity *NextMovePeer( void );
 
-	void		SetName( string_t newTarget );
+	//void		SetName( string_t newTarget );
+	void CBaseEntity::SetName(const char* newName)
+	{
+		GetEngineObject()->SetName(newName);
+	}
 	void		SetParent( string_t newParent, CBaseEntity *pActivator, int iAttachment = -1 );
 	
 	
@@ -701,16 +720,30 @@ public:
 	//CBaseEntity* GetParent();
 	int			GetParentAttachment();
 
-	string_t	GetEntityName();
+	//string_t	GetEntityName();
+	//-----------------------------------------------------------------------------
+// Inline methods
+//-----------------------------------------------------------------------------
+	string_t CBaseEntity::GetEntityName()
+	{
+		return GetEngineObject()->GetEntityName();
+	}
+	
 
-	bool		NameMatches( const char *pszNameOrWildcard );
-	bool		ClassMatches( const char *pszClassOrWildcard );
-	bool		NameMatches( string_t nameStr );
-	bool		ClassMatches( string_t nameStr );
+	bool		NameMatches(const char* pszNameOrWildcard) {
+		return GetEngineObject()->NameMatches(pszNameOrWildcard);
+	}
+	bool		ClassMatches(const char* pszClassOrWildcard) {
+		return GetEngineObject()->ClassMatches(pszClassOrWildcard);
+	}
+	bool		NameMatches(string_t nameStr) {
+		return GetEngineObject()->NameMatches(nameStr);
+	}
+	bool		ClassMatches(string_t nameStr) {
+		return GetEngineObject()->ClassMatches(nameStr);
+	}
 
-private:
-	bool		NameMatchesComplex( const char *pszNameOrWildcard );
-	bool		ClassMatchesComplex( const char *pszClassOrWildcard );
+
 public:
 	void		TransformStepData_WorldToParent( CBaseEntity *pParent );
 	void		TransformStepData_ParentToParent( CBaseEntity *pOldParent, CBaseEntity *pNewParent );
@@ -785,11 +818,17 @@ public:
 	bool ReadKeyField( const char *varName, variant_t *var );
 
 	// classname access
-	void		SetClassname( const char *className );
-	const char* GetClassname() const;
+	void SetClassname(const char* className)
+	{
+		GetEngineObject()->SetClassname(className);
+	}
 	const char* GetClassName() const
 	{
-		return STRING(m_iClassname);
+		return GetEngineObject()->GetClassName();
+	}
+	const char* GetClassname() const
+	{
+		return STRING( GetEngineObject()->GetClassname());
 	}
 
 	// Debug Overlays
@@ -892,10 +931,6 @@ private:
 	CServerNetworkProperty m_Network;
 
 public:
-	// members
-	string_t m_iClassname;  // identifier for entity creation and save/restore
-	string_t m_iGlobalname; // identifier for carrying entity across level transitions
-	string_t m_iParent;	// the name of the entities parent; linked into m_pParent during Activate()
 
 	int		m_iHammerID; // Hammer unique edit id number
 
@@ -1746,8 +1781,6 @@ private:
 	// was pev->flags
 	CNetworkVarForDerived( int, m_fFlags );
 
-	string_t m_iName;	// name used to identify this entity
-
 	// Damage modifiers
 	friend class CDamageModifier;
 	CUtlLinkedList<CDamageModifier*,int>	m_DamageModifiers;
@@ -2101,53 +2134,6 @@ inline int CBaseEntity::GetParentAttachment()
 	return m_iParentAttachment;
 }
 
-//-----------------------------------------------------------------------------
-// Inline methods
-//-----------------------------------------------------------------------------
-inline string_t CBaseEntity::GetEntityName() 
-{ 
-	return m_iName; 
-}
-
-inline void CBaseEntity::SetName( string_t newName )
-{
-	m_iName = newName;
-}
-
-
-inline bool CBaseEntity::NameMatches( const char *pszNameOrWildcard )
-{
-	if ( IDENT_STRINGS(m_iName, pszNameOrWildcard) )
-		return true;
-	return NameMatchesComplex( pszNameOrWildcard );
-}
-
-inline bool CBaseEntity::NameMatches( string_t nameStr )
-{
-	if ( IDENT_STRINGS(m_iName, nameStr) )
-		return true;
-	return NameMatchesComplex( STRING(nameStr) );
-}
-
-inline bool CBaseEntity::ClassMatches( const char *pszClassOrWildcard )
-{
-	if ( IDENT_STRINGS(m_iClassname, pszClassOrWildcard ) )
-		return true;
-	return ClassMatchesComplex( pszClassOrWildcard );
-}
-
-inline const char* CBaseEntity::GetClassname() const
-{
-	return STRING(m_iClassname);
-}
-
-
-inline bool CBaseEntity::ClassMatches( string_t nameStr )
-{
-	if ( IDENT_STRINGS(m_iClassname, nameStr ) )
-		return true;
-	return ClassMatchesComplex( STRING(nameStr) );
-}
 
 inline int CBaseEntity::GetSpawnFlags( void ) const
 { 

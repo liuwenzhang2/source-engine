@@ -2048,7 +2048,7 @@ void CNPC_CombineGunship::BeginDestruct( void )
 		return;
 	}
 
-	m_hRagdoll->SetName( AllocPooledString( UTIL_VarArgs("%s_ragdoll", STRING(GetEntityName()) ) ) );
+	m_hRagdoll->SetName( UTIL_VarArgs("%s_ragdoll", STRING(GetEntityName()) ) );
 
 	// Tell the smoke trail to follow the ragdoll
 	CreateSmokeTrail();

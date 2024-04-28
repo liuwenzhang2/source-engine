@@ -1895,16 +1895,16 @@ void CProp_Portal::UpdatePortalLinkage( void )
 
 				if( !m_bIsPortal2 )
 				{
-					pSpeaker->SetName( MAKE_STRING( "PortalSpeaker1" ) );
-					pMicrophone->SetName( MAKE_STRING( "PortalMic1" ) );
+					pSpeaker->SetName( "PortalSpeaker1" );
+					pMicrophone->SetName( "PortalMic1" );
 					pMicrophone->Activate();
 					pMicrophone->SetSpeakerName( MAKE_STRING( "PortalSpeaker2" ) );
 					pMicrophone->SetSensitivity( 10.0f );
 				}
 				else
 				{
-					pSpeaker->SetName( MAKE_STRING( "PortalSpeaker2" ) );
-					pMicrophone->SetName( MAKE_STRING( "PortalMic2" ) );
+					pSpeaker->SetName( "PortalSpeaker2" );
+					pMicrophone->SetName( "PortalMic2" );
 					pMicrophone->Activate();
 					pMicrophone->SetSpeakerName( MAKE_STRING( "PortalSpeaker1" ) );
 					pMicrophone->SetSensitivity( 10.0f );
@@ -1926,16 +1926,16 @@ void CProp_Portal::UpdatePortalLinkage( void )
 
 				if ( !m_bIsPortal2 )
 				{
-					pLinkedSpeaker->SetName( MAKE_STRING( "PortalSpeaker2" ) );
-					pLinkedMicrophone->SetName( MAKE_STRING( "PortalMic2" ) );
+					pLinkedSpeaker->SetName( "PortalSpeaker2" );
+					pLinkedMicrophone->SetName( "PortalMic2" );
 					pLinkedMicrophone->Activate();
 					pLinkedMicrophone->SetSpeakerName( MAKE_STRING( "PortalSpeaker1" ) );
 					pLinkedMicrophone->SetSensitivity( 10.0f );
 				}
 				else
 				{
-					pLinkedSpeaker->SetName( MAKE_STRING( "PortalSpeaker1" ) );
-					pLinkedMicrophone->SetName( MAKE_STRING( "PortalMic1" ) );
+					pLinkedSpeaker->SetName( "PortalSpeaker1" );
+					pLinkedMicrophone->SetName( "PortalMic1" );
 					pLinkedMicrophone->Activate();
 					pLinkedMicrophone->SetSpeakerName( MAKE_STRING( "PortalSpeaker2" ) );
 					pLinkedMicrophone->SetSensitivity( 10.0f );

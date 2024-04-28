@@ -129,10 +129,10 @@ static int ComputeSpawnHierarchyDepth_r( CBaseEntity *pEntity )
 	if ( !pEntity )
 		return 1;
 
-	if (pEntity->m_iParent == NULL_STRING)
+	if (pEntity->GetEngineObject()->GetParentName() == NULL_STRING)
 		return 1;
 
-	CBaseEntity *pParent = gEntList.FindEntityByName( NULL, ExtractParentName(pEntity->m_iParent) );
+	CBaseEntity *pParent = gEntList.FindEntityByName( NULL, ExtractParentName(pEntity->GetEngineObject()->GetParentName()) );
 	if (!pParent)
 		return 1;
 	
@@ -206,12 +206,12 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 		CBaseEntity *pEntity = pSpawnList[nEntity].m_pEntity;
 		if ( pEntity )
 		{
-			if ( strchr(STRING(pEntity->m_iParent), ',') )
+			if ( strchr(STRING(pEntity->GetEngineObject()->GetParentName()), ',') )
 			{
 				char szToken[256];
-				const char *pAttachmentName = nexttoken(szToken, STRING(pEntity->m_iParent), ',');
-				pEntity->m_iParent = AllocPooledString(szToken);
-				CBaseEntity *pParent = gEntList.FindEntityByName( NULL, pEntity->m_iParent );
+				const char *pAttachmentName = nexttoken(szToken, STRING(pEntity->GetEngineObject()->GetParentName()), ',');
+				pEntity->GetEngineObject()->SetParentName( szToken);
+				CBaseEntity *pParent = gEntList.FindEntityByName( NULL, pEntity->GetEngineObject()->GetParentName() );
 				int iAttachment = -1;
 				CBaseAnimating* pAnim = pParent->GetBaseAnimating();
 				if (pAnim)
@@ -225,7 +225,7 @@ void SetupParentsForSpawnList( int nEntities, HierarchicalSpawn_t *pSpawnList )
 			}
 			else
 			{
-				CBaseEntity *pParent = gEntList.FindEntityByName( NULL, pEntity->m_iParent );
+				CBaseEntity *pParent = gEntList.FindEntityByName( NULL, pEntity->GetEngineObject()->GetParentName() );
 
 				if ((pParent != NULL) && (pParent->entindex() != -1))
 				{
@@ -380,7 +380,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 		{
 			VPROF( "MapEntity_ParseAllEntities_SpawnWorld");
 
-			pEntity->m_iParent = NULL_STRING;	// don't allow a parent on the first entity (worldspawn)
+			pEntity->GetEngineObject()->SetParentName( "");	// don't allow a parent on the first entity (worldspawn)
 
 			DispatchSpawn(pEntity);
 			continue;

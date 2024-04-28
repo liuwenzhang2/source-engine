@@ -734,10 +734,10 @@ void CServerGameDLL::Save(ISave* pSave)
 
 			pEntInfo->size = pSave->GetWritePos() - pEntInfo->location;	// Size of entity block is data size written to block
 
-			pEntInfo->classname = pEnt->m_iClassname;	// Remember entity class for respawn
+			pEntInfo->classname = pEnt->GetEngineObject()->GetClassname();	// Remember entity class for respawn
 
 #if !defined( CLIENT_DLL )
-			pEntInfo->globalname = pEnt->m_iGlobalname; // remember global name
+			pEntInfo->globalname = pEnt->GetEngineObject()->GetGlobalname(); // remember global name
 			pEntInfo->landmarkModelSpace = ModelSpaceLandmark(pEnt->GetModelIndex());
 			int nEntIndex = pEnt->IsNetworkable() ? pEnt->entindex() : -1;
 			bool bIsPlayer = ((nEntIndex >= 1) && (nEntIndex <= gpGlobals->maxClients)) ? true : false;
@@ -975,7 +975,7 @@ CBaseEntity* CServerGameDLL::FindGlobalEntity(string_t classname, string_t globa
 
 	while ((pReturn = gEntList.NextEnt(pReturn)) != NULL)
 	{
-		if (FStrEq(STRING(pReturn->m_iGlobalname), STRING(globalname)))
+		if (FStrEq(STRING(pReturn->GetEngineObject()->GetGlobalname()), STRING(globalname)))
 			break;
 	}
 
@@ -983,7 +983,7 @@ CBaseEntity* CServerGameDLL::FindGlobalEntity(string_t classname, string_t globa
 	{
 		if (!FClassnameIs(pReturn, STRING(classname)))
 		{
-			Warning("Global entity found %s, wrong class %s [expects class %s]\n", STRING(globalname), STRING(pReturn->m_iClassname), STRING(classname));
+			Warning("Global entity found %s, wrong class %s [expects class %s]\n", STRING(globalname), STRING(pReturn->GetEngineObject()->GetClassname()), STRING(classname));
 			pReturn = NULL;
 		}
 	}
@@ -1040,9 +1040,9 @@ int CServerGameDLL::RestoreEntity(CBaseEntity * pEntity, IRestore * pRestore, en
 		return 0;
 
 #if !defined( CLIENT_DLL )		
-	if (pEntity->m_iGlobalname != NULL_STRING)
+	if (pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING)
 	{
-		int globalIndex = GlobalEntity_GetIndex(pEntity->m_iGlobalname);
+		int globalIndex = GlobalEntity_GetIndex(pEntity->GetEngineObject()->GetGlobalname());
 		if (globalIndex >= 0)
 		{
 			// Already dead? delete
@@ -1056,9 +1056,9 @@ int CServerGameDLL::RestoreEntity(CBaseEntity * pEntity, IRestore * pRestore, en
 		}
 		else
 		{
-			Warning("Global Entity %s (%s) not in table!!!\n", STRING(pEntity->m_iGlobalname), STRING(pEntity->m_iClassname));
+			Warning("Global Entity %s (%s) not in table!!!\n", STRING(pEntity->GetEngineObject()->GetGlobalname()), STRING(pEntity->GetEngineObject()->GetClassname()));
 			// Spawned entities default to 'On'
-			GlobalEntity_Add(pEntity->m_iGlobalname, gpGlobals->mapname, GLOBAL_ON);
+			GlobalEntity_Add(pEntity->GetEngineObject()->GetGlobalname(), gpGlobals->mapname, GLOBAL_ON);
 		}
 	}
 #endif

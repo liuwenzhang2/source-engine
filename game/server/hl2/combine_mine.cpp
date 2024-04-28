@@ -429,7 +429,7 @@ bool CBounceBomb::IsValidLocation()
 		Vector vecMyPosition = GetAbsOrigin();
 		while( pEntity )
 		{
-			if( pEntity->m_iClassname == m_iClassname && pEntity != this )
+			if( pEntity->GetEngineObject()->GetClassname() == GetEngineObject()->GetClassname() && pEntity != this)
 			{
 				// Don't lock down if I'm near a mine that's already locked down.
 				if( vecMyPosition.DistToSqr(pEntity->GetAbsOrigin()) < MINE_MIN_PROXIMITY_SQR )
@@ -893,7 +893,7 @@ float CBounceBomb::FindNearestNPC()
 				continue;
 
 			// Disregard turrets
-			if( pNPC->m_iClassname == gm_iszFloorTurretClassname || pNPC->m_iClassname == gm_iszGroundTurretClassname )
+			if( pNPC->GetEngineObject()->GetClassname() == gm_iszFloorTurretClassname || pNPC->GetEngineObject()->GetClassname() == gm_iszGroundTurretClassname)
 				continue;
 
 

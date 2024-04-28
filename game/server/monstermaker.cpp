@@ -68,7 +68,7 @@ void CNPCSpawnDestination::OnSpawnedNPC( CAI_BaseNPC *pNPC )
 	// Rename the NPC
 	if( m_RenameNPC != NULL_STRING )
 	{
-		pNPC->SetName( m_RenameNPC );
+		pNPC->SetName( STRING(m_RenameNPC) );
 	}
 
 	m_OnSpawnNPC.FireOutput( pNPC, this );
@@ -462,7 +462,7 @@ void CNPCMaker::MakeNPC( void )
 	if ( m_ChildTargetName != NULL_STRING )
 	{
 		// if I have a netname (overloaded), give the child NPC that name as a targetname
-		pent->SetName( m_ChildTargetName );
+		pent->SetName( STRING(m_ChildTargetName) );
 	}
 
 	ChildPostSpawn( pent );

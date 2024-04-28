@@ -399,7 +399,7 @@ int CBoneFollower::ObjectCaps()
 	CBaseEntity *pOwner = GetOwnerEntity();
 	if ( pOwner )
 	{
-		if( pOwner->m_iGlobalname != NULL_STRING )
+		if( pOwner->GetEngineObject()->GetGlobalname() != NULL_STRING )
 		{
 			int caps = BaseClass::ObjectCaps() | pOwner->ObjectCaps();
 			caps &= ~FCAP_ACROSS_TRANSITION;

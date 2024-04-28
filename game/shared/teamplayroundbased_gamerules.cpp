@@ -892,7 +892,7 @@ void CTeamplayRoundBasedRules::CheckWaitingForPlayers( void )
 #ifndef CSTRIKE_DLL
 				variant_t sVariant;
 				m_hWaitingForPlayersTimer = (CTeamRoundTimer*)CBaseEntity::Create( "team_round_timer", vec3_origin, vec3_angle );
-				m_hWaitingForPlayersTimer->SetName( MAKE_STRING("zz_teamplay_waiting_timer") );
+				m_hWaitingForPlayersTimer->SetName( "zz_teamplay_waiting_timer" );
 				m_hWaitingForPlayersTimer->KeyValue( "show_in_hud", "1" );
 				sVariant.SetInt( m_flWaitingForPlayersTimeEnds - gpGlobals->curtime );
 				m_hWaitingForPlayersTimer->AcceptInput( "SetTime", NULL, NULL, sVariant, 0 );
@@ -2549,7 +2549,7 @@ void CTeamplayRoundBasedRules::CreateTimeLimitTimer( void )
 	if ( !m_hTimeLimitTimer )
 	{
 		m_hTimeLimitTimer = (CTeamRoundTimer*)CBaseEntity::Create( "team_round_timer", vec3_origin, vec3_angle );
-		m_hTimeLimitTimer->SetName( MAKE_STRING( "zz_teamplay_timelimit_timer" ) );
+		m_hTimeLimitTimer->SetName( "zz_teamplay_timelimit_timer" );
 	}
 
 	variant_t sVariant;

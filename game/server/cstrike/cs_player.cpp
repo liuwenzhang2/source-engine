@@ -1082,7 +1082,7 @@ int CCSPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				}
 				else
 				{
-					weaponName = STRING( pInflictor->m_iClassname );  // it's just that easy
+					weaponName = STRING( pInflictor->GetEngineObject()->GetClassname() );  // it's just that easy
 				}
 			}
 		}

@@ -657,7 +657,7 @@ void CDODPlayer::Event_Killed( const CTakeDamageInfo &info )
 	// distance from scorer to inflictor > 1200
 	if ( pScorer && GetTeamNumber() != pScorer->GetTeamNumber() && pInflictor != pScorer )
 	{
-		const char *killer_weapon_name = STRING( pInflictor->m_iClassname );
+		const char *killer_weapon_name = STRING( pInflictor->GetEngineObject()->GetClassname() );
 
 		if ( strncmp( killer_weapon_name, "rocket_", 7 ) == 0 )
 		{
@@ -826,7 +826,7 @@ void CDODPlayer::Event_Killed( const CTakeDamageInfo &info )
 		{
 			Assert( pInflictor );
 
-			const char *weaponName = STRING( pInflictor->m_iClassname );
+			const char *weaponName = STRING( pInflictor->GetEngineObject()->GetClassname() );
 
 			if ( Q_strncmp( weaponName, "rocket_", 7 ) == 0 )
 			{
@@ -3263,7 +3263,7 @@ int CDODPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				}
 				else
 				{
-					weaponName = STRING( pInflictor->m_iClassname );  // it's just that easy
+					weaponName = STRING( pInflictor->GetEngineObject()->GetClassname() );  // it's just that easy
 				}
 			}
 		}

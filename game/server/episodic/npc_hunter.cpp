@@ -264,8 +264,8 @@ bool IsStriderBuster( CBaseEntity *pEntity )
 	if ( !pEntity )
 		return false;
 
-	if( pEntity->m_iClassname == s_iszStriderBusterClassname || 
-		pEntity->m_iClassname == s_iszMagnadeClassname)
+	if( pEntity->GetEngineObject()->GetClassname() == s_iszStriderBusterClassname ||
+		pEntity->GetEngineObject()->GetClassname() == s_iszMagnadeClassname)
 		return true;
 
 	return false;
@@ -2512,7 +2512,7 @@ void CNPC_Hunter::ManageSiegeTargets()
 			// Create a bullseye that will live for 20 seconds. If we can't attack it within 20 seconds, it's probably
 			// out of reach anyone, so have it clean itself up after that long.
 			CBaseEntity *pSiegeTarget = CreateCustomTarget( pSiegeTargetLocation->GetAbsOrigin(), 20.0f );
-			pSiegeTarget->SetName( MAKE_STRING("siegetarget") );
+			pSiegeTarget->SetName( "siegetarget" );
 
 			m_hCurrentSiegeTarget.Set( pSiegeTarget );
 
@@ -4519,7 +4519,7 @@ int CNPC_Hunter::NumHuntersInMySquad()
 
 	while ( pSquadmate )
 	{
-		if( pSquadmate->m_iClassname == m_iClassname )
+		if( pSquadmate->GetEngineObject()->GetClassname() == GetEngineObject()->GetClassname())
 			count++;
 
 		pSquadmate = m_pSquad->GetNextMember( &iter );
@@ -5948,7 +5948,7 @@ void CNPC_Hunter::Event_Killed( const CTakeDamageInfo &info )
 
 	if ( m_EscortBehavior.GetFollowTarget() )
 	{
-		if ( AIGetNumFollowers( m_EscortBehavior.GetFollowTarget(), m_iClassname ) == 1 )
+		if ( AIGetNumFollowers( m_EscortBehavior.GetFollowTarget(), GetEngineObject()->GetClassname() ) == 1 )
 		{
 			m_EscortBehavior.GetEscortTarget()->AlertSound();
 			if ( info.GetAttacker() && info.GetAttacker()->IsPlayer() )
@@ -6091,7 +6091,7 @@ bool CNPC_Hunter::IsJumpLegal(const Vector &startPos, const Vector &apex, const 
 //-----------------------------------------------------------------------------
 bool CNPC_Hunter::ShouldProbeCollideAgainstEntity( CBaseEntity *pEntity )
 {
-	if ( s_iszPhysPropClassname != pEntity->m_iClassname )
+	if ( s_iszPhysPropClassname != pEntity->GetEngineObject()->GetClassname() )
 		return BaseClass::ShouldProbeCollideAgainstEntity( pEntity );
 
 	if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
@@ -7297,7 +7297,7 @@ public:
 		for ( i = 0; i < freeHunters.Count() && nNPCs; i++ )
 		{
 			freeHunters[i]->m_EscortBehavior.SetFollowTarget( this ); // this will make them not "free"
-			freeHunters[i]->SetName( m_iszTemplateName ); // this will force the hunter to get the FollowStrider input
+			freeHunters[i]->SetName( STRING(m_iszTemplateName) ); // this will force the hunter to get the FollowStrider input
 			nNPCs--;
 			nSummoned++;
 		}

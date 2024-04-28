@@ -1887,7 +1887,7 @@ int CChangeLevel::ComputeEntitySaveFlags( CBaseEntity *pEntity )
 	{
 		flags |= FENTTABLE_MOVEABLE;
 	}
-	if ( pEntity->m_iGlobalname != NULL_STRING && !pEntity->IsDormant() )
+	if ( pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING && !pEntity->IsDormant() )
 	{
 		flags |= FENTTABLE_GLOBAL;
 	}

@@ -1684,7 +1684,7 @@ void CWeaponRPG::PrimaryAttack( void )
 
 		for ( int i = 0; i < nAIs; i++ )
 		{
-			if( ppAIs[ i ]->m_iClassname == iszStriderClassname )
+			if( ppAIs[ i ]->GetEngineObject()->GetClassname() == iszStriderClassname)
 			{
 				ppAIs[ i ]->DispatchInteraction( g_interactionPlayerLaunchedRPG, NULL, m_hMissile );
 			}
@@ -2315,7 +2315,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 	//Create the graphic
 	pLaserDot->SpriteInit( "sprites/redglow1.vmt", origin );
 
-	pLaserDot->SetName( AllocPooledString("TEST") );
+	pLaserDot->SetName( "TEST" );
 
 	pLaserDot->SetTransparency( kRenderGlow, 255, 255, 255, 255, kRenderFxNoDissipation );
 	pLaserDot->SetScale( 0.5f );

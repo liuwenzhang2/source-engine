@@ -3221,7 +3221,7 @@ WeaponProficiency_t CNPC_Combine::CalcWeaponProficiency( CBaseCombatWeapon *pWea
 //-----------------------------------------------------------------------------
 bool CNPC_Combine::HasShotgun()
 {
-	if( GetActiveWeapon() && GetActiveWeapon()->m_iClassname == s_iszShotgunClassname )
+	if( GetActiveWeapon() && GetActiveWeapon()->GetEngineObject()->GetClassname() == s_iszShotgunClassname)
 	{
 		return true;
 	}

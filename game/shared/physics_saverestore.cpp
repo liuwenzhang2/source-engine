@@ -326,7 +326,7 @@ public:
 			{
 				CBaseEntity *pGlobalEntity = header.hEntity;
 #if !defined( CLIENT_DLL )
-				if ( NULL_STRING != pGlobalEntity->m_iGlobalname )
+				if ( NULL_STRING != pGlobalEntity->GetEngineObject()->GetGlobalname() )
 				{
 					modelIndex = pGlobalEntity->GetModelIndex();
 				}

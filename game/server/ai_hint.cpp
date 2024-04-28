@@ -602,7 +602,7 @@ CAI_Hint* CAI_HintManager::CreateHint( HintNodeData *pNodeData, const char *pMap
 			pHint->SetClassname( "ai_hint" );
 		}
 
-		pHint->SetName( pNodeData->strEntityName );
+		pHint->SetName( STRING( pNodeData->strEntityName) );
 		pHint->SetAbsOrigin( pNodeData->vecPosition );
 		memcpy( &(pHint->m_NodeData), pNodeData, sizeof(HintNodeData) );
 		DispatchSpawn( pHint );

@@ -104,6 +104,25 @@ class CEngineObjectSaveDataOps : public CDefSaveRestoreOps
 			EHANDLE Handle = pMovePeer ? pMovePeer->GetRefEHandle() : INVALID_EHANDLE_INDEX;
 			pSave->WriteEHandle(&Handle, fieldInfo.pTypeDesc->fieldSize);
 		}
+#ifdef GAME_DLL
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "classname")) {
+			string_t iClassname = pEntity->GetEngineObject()->GetClassname();
+			pSave->WriteString(&iClassname, fieldInfo.pTypeDesc->fieldSize);
+		}
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "globalname")) {
+			string_t iGlobalname = pEntity->GetEngineObject()->GetGlobalname();
+			pSave->WriteString(&iGlobalname, fieldInfo.pTypeDesc->fieldSize);
+		}
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "parentname")) {
+			string_t iParentName = pEntity->GetEngineObject()->GetParentName();
+			pSave->WriteString(&iParentName, fieldInfo.pTypeDesc->fieldSize);
+		}
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iName")) {
+			string_t iEntityName = pEntity->GetEngineObject()->GetEntityName();
+			pSave->WriteString(&iEntityName, fieldInfo.pTypeDesc->fieldSize);
+		}
+#endif // GAME_DLL
+
 	}
 
 	// restores a single instance of the variable
@@ -150,6 +169,26 @@ class CEngineObjectSaveDataOps : public CDefSaveRestoreOps
 			EHANDLE handle;
 			pRestore->ReadEHandle(&handle, fieldInfo.pTypeDesc->fieldSize, 0);
 			pEntity->GetEngineObject()->SetNextMovePeer(handle);
+		}
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "classname")) {
+			char iClassname[512];
+			pRestore->ReadString(iClassname, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->GetEngineObject()->SetClassname(iClassname);
+		}
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "globalname")) {
+			char iGlobalname[512];
+			pRestore->ReadString(iGlobalname, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->GetEngineObject()->SetGlobalname(iGlobalname);
+		}
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "parentname")) {
+			char iParentName[512];
+			pRestore->ReadString(iParentName, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->GetEngineObject()->SetParentName(iParentName);
+		}
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iName")) {
+			char iEntityName[512];
+			pRestore->ReadString(iEntityName, fieldInfo.pTypeDesc->fieldSize, 0);
+			pEntity->GetEngineObject()->SetName(iEntityName);
 		}
 #endif // GAME_DLL
 	}
@@ -519,17 +558,17 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	//	return true;
 	//}
 
-#ifdef GAME_DLL	
+//#ifdef GAME_DLL	
 	
-	if ( FStrEq( szKeyName, "targetname" ) )
-	{
-		m_iName = AllocPooledString( szValue );
-		return true;
-	}
+	//if ( FStrEq( szKeyName, "targetname" ) )
+	//{
+	//	m_iName = AllocPooledString( szValue );
+	//	return true;
+	//}
 
 
 
-#endif
+//#endif
 
 	// key hasn't been handled
 	return false;

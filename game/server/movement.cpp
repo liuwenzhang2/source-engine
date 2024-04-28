@@ -235,9 +235,9 @@ CPathKeyFrame *CPathKeyFrame::InsertNewKey( Vector newPos, QAngle newAngles )
 	newKey->m_Origin = newPos;
 	newKey->m_flSpeed = m_flSpeed;
 	newKey->SetEFlags( GetEFlags() );
-	if ( m_iParent != NULL_STRING )
+	if (GetEngineObject()->GetParentName() != NULL_STRING )
 	{
-		newKey->SetParent( m_iParent, NULL );
+		newKey->SetParent(GetEngineObject()->GetParentName(), NULL);
 	}
 
 	// link forward
@@ -568,7 +568,7 @@ void CBaseMoveBehavior::StopMoving( void )
 void CBaseMoveBehavior::MoveDone( void )
 {
 	// if we're just a base then keep playing the anim
-	if ( !stricmp(STRING(m_iClassname), "move_keyframed") )
+	if ( !stricmp(STRING(GetEngineObject()->GetClassname()), "move_keyframed") )
 	{
 		int direction = m_iDirection;
 		// start moving from the keyframe we've just reached

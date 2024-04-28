@@ -47,7 +47,7 @@ public:
 			user.MakeReliable();
 
 			UserMessageBegin( user, "ItemPickup" );
-				WRITE_STRING( STRING(m_iClassname) );
+				WRITE_STRING( STRING(GetEngineObject()->GetClassname()) );
 			MessageEnd();
 
 			UTIL_EmitSoundSuit( pHL1Player, "!HEV_A1" );	// Play the longjump sound UNDONE: Kelly? correct sound?

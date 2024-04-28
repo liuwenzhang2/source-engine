@@ -47,15 +47,19 @@ CGlobalEntityList<CBaseEntity>* sv_entitylist = &gEntList;
 // -------------------------------------------------------------------------------------------------- //
 
 BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
-DEFINE_FIELD(m_vecOrigin, FIELD_VECTOR),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
-DEFINE_FIELD(m_angRotation, FIELD_VECTOR),
-DEFINE_KEYFIELD(m_vecVelocity, FIELD_VECTOR, "velocity"),
-DEFINE_FIELD(m_vecAbsOrigin, FIELD_POSITION_VECTOR),
-DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
-DEFINE_FIELD(m_vecAbsVelocity, FIELD_VECTOR),
-DEFINE_GLOBAL_FIELD(m_hMoveParent, FIELD_EHANDLE),
-DEFINE_GLOBAL_FIELD(m_hMoveChild, FIELD_EHANDLE),
-DEFINE_GLOBAL_FIELD(m_hMovePeer, FIELD_EHANDLE),
+	DEFINE_FIELD(m_vecOrigin, FIELD_VECTOR),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
+	DEFINE_FIELD(m_angRotation, FIELD_VECTOR),
+	DEFINE_KEYFIELD(m_vecVelocity, FIELD_VECTOR, "velocity"),
+	DEFINE_FIELD(m_vecAbsOrigin, FIELD_POSITION_VECTOR),
+	DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
+	DEFINE_FIELD(m_vecAbsVelocity, FIELD_VECTOR),
+	DEFINE_GLOBAL_FIELD(m_hMoveParent, FIELD_EHANDLE),
+	DEFINE_GLOBAL_FIELD(m_hMoveChild, FIELD_EHANDLE),
+	DEFINE_GLOBAL_FIELD(m_hMovePeer, FIELD_EHANDLE),
+	DEFINE_KEYFIELD(m_iClassname, FIELD_STRING, "classname"),
+	DEFINE_GLOBAL_KEYFIELD(m_iGlobalname, FIELD_STRING, "globalname"),
+	DEFINE_KEYFIELD(m_iParent, FIELD_STRING, "parentname"),
+	DEFINE_FIELD(m_iName, FIELD_STRING),
 END_DATADESC()
 
 #include "tier0/memdbgoff.h"
@@ -86,6 +90,84 @@ void CEngineObjectInternal::operator delete(void* pMem)
 
 #include "tier0/memdbgon.h"
 
+FORCEINLINE bool NamesMatch(const char* pszQuery, string_t nameToMatch)
+{
+	if (nameToMatch == NULL_STRING)
+		return (!pszQuery || *pszQuery == 0 || *pszQuery == '*');
+
+	const char* pszNameToMatch = STRING(nameToMatch);
+
+	// If the pointers are identical, we're identical
+	if (pszNameToMatch == pszQuery)
+		return true;
+
+	while (*pszNameToMatch && *pszQuery)
+	{
+		unsigned char cName = *pszNameToMatch;
+		unsigned char cQuery = *pszQuery;
+		// simple ascii case conversion
+		if (cName == cQuery)
+			;
+		else if (cName - 'A' <= (unsigned char)'Z' - 'A' && cName - 'A' + 'a' == cQuery)
+			;
+		else if (cName - 'a' <= (unsigned char)'z' - 'a' && cName - 'a' + 'A' == cQuery)
+			;
+		else
+			break;
+		++pszNameToMatch;
+		++pszQuery;
+	}
+
+	if (*pszQuery == 0 && *pszNameToMatch == 0)
+		return true;
+
+	// @TODO (toml 03-18-03): Perhaps support real wildcards. Right now, only thing supported is trailing *
+	if (*pszQuery == '*')
+		return true;
+
+	return false;
+}
+
+bool CEngineObjectInternal::NameMatchesComplex(const char* pszNameOrWildcard)
+{
+	if (!Q_stricmp("!player", pszNameOrWildcard))
+		return m_pOuter->IsPlayer();
+
+	return NamesMatch(pszNameOrWildcard, m_iName);
+}
+
+bool CEngineObjectInternal::ClassMatchesComplex(const char* pszClassOrWildcard)
+{
+	return NamesMatch(pszClassOrWildcard, m_iClassname);
+}
+
+inline bool CEngineObjectInternal::NameMatches(const char* pszNameOrWildcard)
+{
+	if (IDENT_STRINGS(m_iName, pszNameOrWildcard))
+		return true;
+	return NameMatchesComplex(pszNameOrWildcard);
+}
+
+inline bool CEngineObjectInternal::NameMatches(string_t nameStr)
+{
+	if (IDENT_STRINGS(m_iName, nameStr))
+		return true;
+	return NameMatchesComplex(STRING(nameStr));
+}
+
+inline bool CEngineObjectInternal::ClassMatches(const char* pszClassOrWildcard)
+{
+	if (IDENT_STRINGS(m_iClassname, pszClassOrWildcard))
+		return true;
+	return ClassMatchesComplex(pszClassOrWildcard);
+}
+
+inline bool CEngineObjectInternal::ClassMatches(string_t nameStr)
+{
+	if (IDENT_STRINGS(m_iClassname, nameStr))
+		return true;
+	return ClassMatchesComplex(STRING(nameStr));
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Verifies that this entity's data description is valid in debug builds.
@@ -291,11 +373,11 @@ void CEngineObjectInternal::ParseMapData(CEntityMapData* mapData)
 						bool printKeyHits = false;
 						const char* debugName = "";
 
-						if (*ent_debugkeys.GetString() && !Q_stricmp(ent_debugkeys.GetString(), STRING(m_pOuter->m_iClassname)))
+						if (*ent_debugkeys.GetString() && !Q_stricmp(ent_debugkeys.GetString(), STRING(m_iClassname)))
 						{
 							// Msg( "-- found entity of type %s\n", STRING(m_iClassname) );
 							printKeyHits = true;
-							debugName = STRING(m_pOuter->m_iClassname);
+							debugName = STRING(m_iClassname);
 						}
 
 						// loop through the data description, and try and place the keys in
@@ -319,7 +401,7 @@ void CEngineObjectInternal::ParseMapData(CEntityMapData* mapData)
 						}
 
 						if (printKeyHits)
-							Msg("!! (%s) key not handled: \"%s\" \"%s\"\n", STRING(m_pOuter->m_iClassname), keyName, value);
+							Msg("!! (%s) key not handled: \"%s\" \"%s\"\n", STRING(m_iClassname), keyName, value);
 					}
 				}
 			}
@@ -451,11 +533,11 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 
 #ifdef GAME_DLL	
 
-	//if (FStrEq(szKeyName, "targetname"))
-	//{
-	//	m_iName = AllocPooledString(szValue);
-	//	return true;
-	//}
+	if (FStrEq(szKeyName, "targetname"))
+	{
+		m_iName = AllocPooledString(szValue);
+		return true;
+	}
 
 	// loop through the data description, and try and place the keys in
 	if (!*ent_debugkeys.GetString())
@@ -472,11 +554,11 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 		bool printKeyHits = false;
 		const char* debugName = "";
 
-		if (*ent_debugkeys.GetString() && !Q_stricmp(ent_debugkeys.GetString(), STRING(m_pOuter->m_iClassname)))
+		if (*ent_debugkeys.GetString() && !Q_stricmp(ent_debugkeys.GetString(), STRING(m_iClassname)))
 		{
 			// Msg( "-- found entity of type %s\n", STRING(m_iClassname) );
 			printKeyHits = true;
-			debugName = STRING(m_pOuter->m_iClassname);
+			debugName = STRING(m_iClassname);
 		}
 
 		// loop through the data description, and try and place the keys in
@@ -499,7 +581,7 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 		}
 
 		if (printKeyHits)
-			Msg("!! (%s) key not handled: \"%s\" \"%s\"\n", STRING(m_pOuter->m_iClassname), szKeyName, szValue);
+			Msg("!! (%s) key not handled: \"%s\" \"%s\"\n", STRING(m_iClassname), szKeyName, szValue);
 	}
 
 #endif
@@ -648,7 +730,7 @@ void CEngineObjectInternal::SetParent(IEngineObject* pParentEntity, int iAttachm
 
 	if (pParentEntity == NULL)
 	{
-		m_pOuter->m_iParent = NULL_STRING;
+		m_iParent = NULL_STRING;
 
 		// Transform step data from parent to worldspace
 		m_pOuter->TransformStepData_ParentToWorld(pOldParent ? pOldParent->m_pOuter : NULL);
@@ -656,7 +738,7 @@ void CEngineObjectInternal::SetParent(IEngineObject* pParentEntity, int iAttachm
 	}
 	// set the new name
 	//m_pParent = pParentEntity;
-	m_pOuter->m_iParent = pParentEntity->GetOuter()->m_iName;
+	m_iParent = pParentEntity->GetEntityName();
 
 	m_pOuter->RemoveSolidFlags(FSOLID_ROOT_PARENT_ALIGNED);
 	if (const_cast<IEngineObject*>(pParentEntity)->GetRootMoveParent()->GetOuter()->GetSolid() == SOLID_BSP)

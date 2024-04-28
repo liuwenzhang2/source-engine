@@ -597,11 +597,6 @@ CBaseEntity *CBaseEntity::GetFollowedEntity()
 	return GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 }
 
-void CBaseEntity::SetClassname( const char *className )
-{
-	m_iClassname = AllocPooledString( className );
-}
-
 void CBaseEntity::SetModelIndex( int index )
 {
 	if ( IsDynamicModelIndex( index ) && !(GetBaseAnimating() && m_bDynamicModelAllowed) )
@@ -991,9 +986,9 @@ int CBaseEntity::DrawDebugTextOverlays(void)
 		EntityText(offset,tempstr, 0);
 		offset++;
 
-		if( m_iGlobalname != NULL_STRING )
+		if( GetEngineObject()->GetGlobalname() != NULL_STRING )
 		{
-			Q_snprintf( tempstr, sizeof(tempstr), "GLOBALNAME: %s", STRING(m_iGlobalname) );
+			Q_snprintf( tempstr, sizeof(tempstr), "GLOBALNAME: %s", STRING(GetEngineObject()->GetGlobalname()) );
 			EntityText(offset,tempstr, 0);
 			offset++;
 		}
@@ -1035,14 +1030,14 @@ void CBaseEntity::SetParent( string_t newParent, CBaseEntity *pActivator, int iA
 	// debug check
 	if ( newParent != NULL_STRING && pParent == NULL )
 	{
-		Msg( "Entity %s(%s) has bad parent %s\n", STRING(m_iClassname), GetDebugName(), STRING(newParent) );
+		Msg( "Entity %s(%s) has bad parent %s\n", STRING(GetEngineObject()->GetClassname()), GetDebugName(), STRING(newParent) );
 	}
 	else
 	{
 		// make sure there isn't any ambiguity
 		if ( gEntList.FindEntityByName( pParent, newParent, NULL, pActivator ) )
 		{
-			Msg( "Entity %s(%s) has ambigious parent %s\n", STRING(m_iClassname), GetDebugName(), STRING(newParent) );
+			Msg( "Entity %s(%s) has ambigious parent %s\n", STRING(GetEngineObject()->GetClassname()), GetDebugName(), STRING(newParent) );
 		}
 		GetEngineObject()->SetParent( pParent->GetEngineObject(), iAttachment);
 	}
@@ -1642,9 +1637,9 @@ END_DATADESC()
 
 BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
-	DEFINE_KEYFIELD( m_iClassname, FIELD_STRING, "classname" ),
-	DEFINE_GLOBAL_KEYFIELD( m_iGlobalname, FIELD_STRING, "globalname" ),
-	DEFINE_KEYFIELD( m_iParent, FIELD_STRING, "parentname" ),
+	DEFINE_CUSTOM_KEYFIELD_INVALID( m_iClassname, engineObjectFuncs, "classname" ),
+	DEFINE_CUSTOM_GLOBAL_KEYFIELD_INVALID( m_iGlobalname, engineObjectFuncs, "globalname" ),
+	DEFINE_CUSTOM_KEYFIELD_INVALID( m_iParent, engineObjectFuncs, "parentname" ),
 
 	DEFINE_KEYFIELD( m_iHammerID, FIELD_INTEGER, "hammerid" ), // save ID numbers so that entities can be tracked between save/restore and vmf
 
@@ -1698,7 +1693,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	
 	DEFINE_FIELD( m_iEFlags, FIELD_INTEGER ),
 
-	DEFINE_FIELD( m_iName, FIELD_STRING ),
+	DEFINE_CUSTOM_FIELD_INVALID( m_iName, engineObjectFuncs),
 	DEFINE_EMBEDDED( m_Collision ),
 	DEFINE_EMBEDDED( m_Network ),
 
@@ -1893,12 +1888,12 @@ void CBaseEntity::UpdateOnRemove( void )
 		}
 	}
 
-	if ( m_iGlobalname != NULL_STRING )
+	if (GetEngineObject()->GetGlobalname() != NULL_STRING )
 	{
 		// NOTE: During level shutdown the global list will suppress this
 		// it assumes your changing levels or the game will end
 		// causing the whole list to be flushed
-		GlobalEntity_SetState( m_iGlobalname, GLOBAL_DEAD );
+		GlobalEntity_SetState(GetEngineObject()->GetGlobalname(), GLOBAL_DEAD);
 	}
 
 	VPhysicsDestroyObject();
@@ -2577,7 +2572,7 @@ void CBaseEntity::VPhysicsSwapObject( IPhysicsObject *pSwap )
 
 	if ( !m_pPhysicsObject )
 	{
-		Warning( "Bad vphysics swap for %s\n", STRING(m_iClassname) );
+		Warning( "Bad vphysics swap for %s\n", STRING(GetEngineObject()->GetClassname()) );
 	}
 	m_pPhysicsObject = pSwap;
 }
@@ -2850,56 +2845,9 @@ bool CBaseEntity::PassesDamageFilter( const CTakeDamageInfo &info )
 	return true;
 }
 
-FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
-{
-	if ( nameToMatch == NULL_STRING )
-		return (!pszQuery || *pszQuery == 0 || *pszQuery == '*');
 
-	const char *pszNameToMatch = STRING(nameToMatch);
 
-	// If the pointers are identical, we're identical
-	if ( pszNameToMatch == pszQuery )
-		return true;
 
-	while ( *pszNameToMatch && *pszQuery )
-	{
-		unsigned char cName = *pszNameToMatch;
-		unsigned char cQuery = *pszQuery;
-		// simple ascii case conversion
-		if ( cName == cQuery )
-			;
-		else if ( cName - 'A' <= (unsigned char)'Z' - 'A' && cName - 'A' + 'a' == cQuery )
-			;
-		else if ( cName - 'a' <= (unsigned char)'z' - 'a' && cName - 'a' + 'A' == cQuery )
-			;
-		else
-			break;
-		++pszNameToMatch;
-		++pszQuery;
-	}
-
-	if ( *pszQuery == 0 && *pszNameToMatch == 0 )
-		return true;
-
-	// @TODO (toml 03-18-03): Perhaps support real wildcards. Right now, only thing supported is trailing *
-	if ( *pszQuery == '*' )
-		return true;
-
-	return false;
-}
-
-bool CBaseEntity::NameMatchesComplex( const char *pszNameOrWildcard )
-{
-	if ( !Q_stricmp( "!player", pszNameOrWildcard) )
-		return IsPlayer();
-
-	return NamesMatch( pszNameOrWildcard, m_iName );
-}
-
-bool CBaseEntity::ClassMatchesComplex( const char *pszClassOrWildcard )
-{
-	return NamesMatch( pszClassOrWildcard, m_iClassname );
-}
 
 void CBaseEntity::MakeDormant( void )
 {
@@ -3610,13 +3558,13 @@ const char *CBaseEntity::GetDebugName(void)
 	if ( this == NULL )
 		return "<<null>>";
 
-	if ( m_iName != NULL_STRING ) 
+	if (GetEngineObject()->GetEntityName() != NULL_STRING )
 	{
-		return STRING(m_iName);
+		return STRING(GetEngineObject()->GetEntityName());
 	}
 	else
 	{
-		return STRING(m_iClassname);
+		return STRING(GetEngineObject()->GetClassname());
 	}
 }
 
@@ -3644,14 +3592,14 @@ void CBaseEntity::DrawInputOverlay(const char *szInputName, CBaseEntity *pCaller
 
 	if ( Value.FieldType() == FIELD_INTEGER )
 	{
-		DevMsg( 2, "input: (%s,%d) -> (%s,%s), from (%s)\n", szInputName, Value.Int(), STRING(m_iClassname), GetDebugName(), pCaller ? pCaller->GetDebugName() : NULL);
+		DevMsg( 2, "input: (%s,%d) -> (%s,%s), from (%s)\n", szInputName, Value.Int(), STRING(GetEngineObject()->GetClassname()), GetDebugName(), pCaller ? pCaller->GetDebugName() : NULL);
 	}
 	else if ( Value.FieldType() == FIELD_STRING )
 	{
-		DevMsg( 2, "input: (%s,%s) -> (%s,%s), from (%s)\n", szInputName, Value.String(), STRING(m_iClassname), GetDebugName(), pCaller ? pCaller->GetDebugName() : NULL);
+		DevMsg( 2, "input: (%s,%s) -> (%s,%s), from (%s)\n", szInputName, Value.String(), STRING(GetEngineObject()->GetClassname()), GetDebugName(), pCaller ? pCaller->GetDebugName() : NULL);
 	}
 	else
-		DevMsg( 2, "input: (%s) -> (%s,%s), from (%s)\n", szInputName, STRING(m_iClassname), GetDebugName(), pCaller ? pCaller->GetDebugName() : NULL);
+		DevMsg( 2, "input: (%s) -> (%s,%s), from (%s)\n", szInputName, STRING(GetEngineObject()->GetClassname()), GetDebugName(), pCaller ? pCaller->GetDebugName() : NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -3676,11 +3624,11 @@ void CBaseEntity::DrawOutputOverlay(CEventAction *ev)
 	// Now print to the console
 	if ( ev->m_flDelay )
 	{
-		DevMsg( 2, "output: (%s,%s) -> (%s,%s,%.1f)\n", STRING(m_iClassname), GetDebugName(), STRING(ev->m_iTarget), STRING(ev->m_iTargetInput), ev->m_flDelay );
+		DevMsg( 2, "output: (%s,%s) -> (%s,%s,%.1f)\n", STRING(GetEngineObject()->GetClassname()), GetDebugName(), STRING(ev->m_iTarget), STRING(ev->m_iTargetInput), ev->m_flDelay );
 	}
 	else
 	{
-		DevMsg( 2, "output: (%s,%s) -> (%s,%s)\n", STRING(m_iClassname), GetDebugName(), STRING(ev->m_iTarget), STRING(ev->m_iTargetInput) );
+		DevMsg( 2, "output: (%s,%s) -> (%s,%s)\n", STRING(GetEngineObject()->GetClassname()), GetDebugName(), STRING(ev->m_iTarget), STRING(ev->m_iTargetInput) );
 	}
 }
 
@@ -3793,7 +3741,7 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 					// mapper debug message
 					if (pCaller != NULL)
 					{
-						Q_snprintf( szBuffer, sizeof(szBuffer), "(%0.2f) input %s: %s.%s(%s)\n", gpGlobals->curtime, STRING(pCaller->m_iName), GetDebugName(), szInputName, Value.String() );
+						Q_snprintf( szBuffer, sizeof(szBuffer), "(%0.2f) input %s: %s.%s(%s)\n", gpGlobals->curtime, STRING(pCaller->GetEngineObject()->GetEntityName()), GetDebugName(), szInputName, Value.String() );
 					}
 					else
 					{
@@ -3816,9 +3764,9 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 							{
 								// bad conversion
 								Warning( "!! ERROR: bad input/output link:\n!! %s(%s,%s) doesn't match type from %s(%s)\n", 
-									STRING(m_iClassname), GetDebugName(), szInputName, 
-									( pCaller != NULL ) ? STRING(pCaller->m_iClassname) : "<null>",
-									( pCaller != NULL ) ? STRING(pCaller->m_iName) : "<null>" );
+									STRING(GetEngineObject()->GetClassname()), GetDebugName(), szInputName,
+									( pCaller != NULL ) ? STRING(pCaller->GetEngineObject()->GetClassname()) : "<null>",
+									( pCaller != NULL ) ? STRING(pCaller->GetEngineObject()->GetEntityName()) : "<null>" );
 								return false;
 							}
 						}
@@ -3859,7 +3807,7 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 		}
 	}
 
-	DevMsg( 2, "unhandled input: (%s) -> (%s,%s)\n", szInputName, STRING(m_iClassname), GetDebugName()/*,", from (%s,%s)" STRING(pCaller->m_iClassname), STRING(pCaller->m_iName)*/ );
+	DevMsg( 2, "unhandled input: (%s) -> (%s,%s)\n", szInputName, STRING(GetEngineObject()->GetClassname()), GetDebugName()/*,", from (%s,%s)" STRING(pCaller->m_iClassname), STRING(pCaller->m_iName)*/ );
 	return false;
 }
 
@@ -4951,7 +4899,7 @@ void CC_Ent_Remove( const CCommand& args )
 			while ( (ent = gEntList.NextEnt(ent)) != NULL )
 			{
 				if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
-					(ent->m_iClassname != NULL_STRING	&& FStrEq(args[1], STRING(ent->m_iClassname))) ||
+					(ent->GetEngineObject()->GetClassname() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEngineObject()->GetClassname()))) ||
 					(ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))
 				{
 					pEntity = ent;
@@ -4964,7 +4912,7 @@ void CC_Ent_Remove( const CCommand& args )
 	// Found one?
 	if ( pEntity )
 	{
-		Msg( "Removed %s(%s)\n", STRING(pEntity->m_iClassname), pEntity->GetDebugName() );
+		Msg( "Removed %s(%s)\n", STRING(pEntity->GetEngineObject()->GetClassname()), pEntity->GetDebugName() );
 		UTIL_Remove( pEntity );
 	}
 }
@@ -4986,7 +4934,7 @@ void CC_Ent_RemoveAll( const CCommand& args )
 		while ( (ent = gEntList.NextEnt(ent)) != NULL )
 		{
 			if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
-				  (ent->m_iClassname != NULL_STRING	&& FStrEq(args[1], STRING(ent->m_iClassname))) ||
+				  (ent->GetEngineObject()->GetClassname() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEngineObject()->GetClassname()))) ||
 				  (ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))
 			{
 				UTIL_Remove( ent );
@@ -5033,7 +4981,7 @@ void CC_Ent_SetName( const CCommand& args )
 			while ( (ent = gEntList.NextEnt(ent)) != NULL )
 			{
 				if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
-					  (ent->m_iClassname != NULL_STRING	&& FStrEq(args[1], STRING(ent->m_iClassname))) ||
+					  (ent->GetEngineObject()->GetClassname() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEngineObject()->GetClassname()))) ||
 					  (ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))
 				{
 					pEntity = ent;
@@ -5045,8 +4993,8 @@ void CC_Ent_SetName( const CCommand& args )
 		// Found one?
 		if ( pEntity )
 		{
-			Msg( "Set the name of %s to %s\n", STRING(pEntity->m_iClassname), args[1] );
-			pEntity->SetName( AllocPooledString( args[1] ) );
+			Msg( "Set the name of %s to %s\n", STRING(pEntity->GetEngineObject()->GetClassname()), args[1] );
+			pEntity->SetName( args[1] );
 		}
 	}
 }

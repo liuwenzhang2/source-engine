@@ -488,7 +488,7 @@ bool CFilterEnemy::PassesNameFilter( CBaseEntity *pEnemy )
 	}
 
 	// May be either a targetname or classname
-	bool bNameOrClassnameMatches = ( m_iszEnemyName == pEnemy->GetEntityName() || m_iszEnemyName == pEnemy->m_iClassname );
+	bool bNameOrClassnameMatches = ( m_iszEnemyName == pEnemy->GetEntityName() || m_iszEnemyName == pEnemy->GetEngineObject()->GetClassname() );
 
 	// We only leave this code block in a state meaning we've "succeeded" in any context
 	if ( m_bNegated )

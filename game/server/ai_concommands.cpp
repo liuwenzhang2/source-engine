@@ -409,7 +409,7 @@ void CC_NPC_Create( const CCommand &args )
 
 		if ( args.ArgC() == 3 )
 		{
-			baseNPC->SetName( AllocPooledString( args[2] ) );
+			baseNPC->SetName( args[2] );
 		}
 
 		DispatchSpawn(baseNPC);

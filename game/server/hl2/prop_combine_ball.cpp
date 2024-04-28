@@ -1419,7 +1419,7 @@ bool CPropCombineBall::IsAttractiveTarget( CBaseEntity *pEntity )
 			return false;
 
 		// Don't seek entities of the same class.
-		if ( pEntity->m_iClassname == GetOwnerEntity()->m_iClassname )
+		if ( pEntity->GetEngineObject()->GetClassname() == GetOwnerEntity()->GetEngineObject()->GetClassname())
 			return false;
 	}
 	else

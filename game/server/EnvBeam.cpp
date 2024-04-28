@@ -494,7 +494,7 @@ public:
 		CBaseEntity *pEntity = EntityFromEntityHandle( pServerEntity );
 		if ( pEntity )
 		{
-			if ( pEntity->IsPlayer() || pEntity->MyNPCPointer() || pEntity->m_iClassname == g_iszPhysicsPropClassname )
+			if ( pEntity->IsPlayer() || pEntity->MyNPCPointer() || pEntity->GetEngineObject()->GetClassname() == g_iszPhysicsPropClassname)
 				return true;
 		}
 
@@ -531,7 +531,7 @@ bool CEnvBeam::PassesTouchFilters(CBaseEntity *pOther)
 
 	if( m_TouchType == touch_player_or_npc_or_physicsprop )
 	{
-		if( pOther->m_iClassname == g_iszPhysicsPropClassname )
+		if( pOther->GetEngineObject()->GetClassname() == g_iszPhysicsPropClassname)
 		{
 			fPassedSoFar = true;
 		}

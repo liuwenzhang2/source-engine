@@ -89,15 +89,15 @@ AIMoveResult_t AIComputeBlockerMoveResult( CBaseEntity *pBlocker )
 //-----------------------------------------------------------------------------
 bool CAI_MoveProbe::ShouldBrushBeIgnored( CBaseEntity *pEntity )
 {
-	if ( pEntity->m_iClassname == g_iszFuncBrushClassname )
+	if ( pEntity->GetEngineObject()->GetClassname() == g_iszFuncBrushClassname)
 	{
 		CFuncBrush *pFuncBrush = assert_cast<CFuncBrush *>(pEntity);
 
 		// this is true if my class or entity name matches the exclusion name on the func brush
 #if HL2_EPISODIC
-		bool nameMatches = ( pFuncBrush->m_iszExcludedClass == GetOuter()->m_iClassname ) || GetOuter()->NameMatches(pFuncBrush->m_iszExcludedClass);
+		bool nameMatches = ( pFuncBrush->m_iszExcludedClass == GetOuter()->GetEngineObject()->GetClassname() ) || GetOuter()->NameMatches(pFuncBrush->m_iszExcludedClass);
 #else	// do not match against entity name in base HL2 (just in case there is some case somewhere that might be broken by this)
-		bool nameMatches = ( pFuncBrush->m_iszExcludedClass == GetOuter()->m_iClassname );
+		bool nameMatches = ( pFuncBrush->m_iszExcludedClass == GetOuter()->GetEngineObject()->GetClassname() );
 #endif
 
 		// return true (ignore brush) if the name matches, or, if exclusion is inverted, if the name does not match

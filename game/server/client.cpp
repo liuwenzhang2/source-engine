@@ -419,7 +419,7 @@ CBaseEntity *GetNextCommandEntity( CBasePlayer *pPlayer, const char *name, CBase
 	while ( (ent = gEntList.NextEnt(ent)) != NULL )
 	{
 		if (  (ent->GetEntityName() != NULL_STRING	&& ent->NameMatches(name))	|| 
-			  (ent->m_iClassname != NULL_STRING && ent->ClassMatches(name)) )
+			  (ent->GetEngineObject()->GetClassname() != NULL_STRING && ent->ClassMatches(name)) )
 		{
 			return ent;
 		}
@@ -473,7 +473,7 @@ void KillTargets( const char *pKillTargetName )
 	{
 		UTIL_Remove( pentKillTarget );
 
-		DevMsg( 2, "killing %s\n", STRING( pentKillTarget->m_iClassname ) );
+		DevMsg( 2, "killing %s\n", STRING( pentKillTarget->GetEngineObject()->GetClassname() ) );
 		pentKillTarget = gEntList.FindEntityByName( pentKillTarget, pKillTargetName );
 	}
 }

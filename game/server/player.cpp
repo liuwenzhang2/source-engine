@@ -6274,12 +6274,12 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 				Msg( " - Name: No Targetname\n" );
 			}
 
-			if ( pEntity->m_iParent != NULL_STRING )
-				Msg( "Parent: %s\n", STRING(pEntity->m_iParent) );
+			if ( pEntity->GetEngineObject()->GetParentName() != NULL_STRING )
+				Msg( "Parent: %s\n", STRING(pEntity->GetEngineObject()->GetParentName()) );
 
 			Msg( "Model: %s\n", STRING( pEntity->GetModelName() ) );
-			if ( pEntity->m_iGlobalname != NULL_STRING )
-				Msg( "Globalname: %s\n", STRING(pEntity->m_iGlobalname) );
+			if ( pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING )
+				Msg( "Globalname: %s\n", STRING(pEntity->GetEngineObject()->GetGlobalname()) );
 		}
 		break;
 

@@ -4835,7 +4835,7 @@ int CNPC_Strider::GetBoneFollowerIndex( CBoneFollower *pFollower )
 //-----------------------------------------------------------------------------
 bool CNPC_Strider::ShouldProbeCollideAgainstEntity( CBaseEntity *pEntity )
 {
-	if ( pEntity->m_iClassname == m_iszStriderBusterName )
+	if ( pEntity->GetEngineObject()->GetClassname() == m_iszStriderBusterName)
 		return false;
 
 	return BaseClass::ShouldProbeCollideAgainstEntity( pEntity );

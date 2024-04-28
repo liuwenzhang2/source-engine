@@ -2905,7 +2905,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 		while( ( pEntity = OverrideMoveCache_FindTargetsInRadius( pEntity, GetAbsOrigin(), AVOID_TEST_DIST ) ) != NULL )
 		{
 			// Handle each type
-			if ( pEntity->m_iClassname == iszEnvFire )
+			if ( pEntity->GetEngineObject()->GetClassname() == iszEnvFire)
 			{
 				Vector vMins, vMaxs;
 				if ( FireSystem_GetFireDamageDimensions( pEntity, &vMins, &vMaxs ) )
@@ -2918,7 +2918,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 				}
 			}
 #ifdef HL2_EPISODIC			
-			else if ( pEntity->m_iClassname == iszNPCTurretFloor )
+			else if ( pEntity->GetEngineObject()->GetClassname() == iszNPCTurretFloor)
 			{
 				UTIL_TraceLine( WorldSpaceCenter(), pEntity->WorldSpaceCenter(), MASK_BLOCKLOS, pEntity, COLLISION_GROUP_NONE, &tr );
 				if (tr.fraction == 1.0 && !tr.startsolid)
@@ -2927,7 +2927,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 					GetLocalNavigator()->AddObstacle( pEntity->WorldSpaceCenter(), radius, AIMST_AVOID_OBJECT );
 				}
 			}
-			else if( pEntity->m_iClassname == iszEntityFlame && pEntity->GetMoveParent() && !pEntity->GetMoveParent()->IsNPC() )
+			else if( pEntity->GetEngineObject()->GetClassname() == iszEntityFlame && pEntity->GetMoveParent() && !pEntity->GetMoveParent()->IsNPC())
 			{
 				float flDist = pEntity->WorldSpaceCenter().DistTo( WorldSpaceCenter() );
 
@@ -2943,7 +2943,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 				}
 			}
 #endif // HL2_EPISODIC
-			else if ( pEntity->m_iClassname == iszBounceBomb )
+			else if ( pEntity->GetEngineObject()->GetClassname() == iszBounceBomb)
 			{
 				CBounceBomb *pBomb = static_cast<CBounceBomb *>(pEntity);
 				if ( pBomb && !pBomb->IsPlayerPlaced() && pBomb->IsAwake() )
@@ -3881,7 +3881,7 @@ public:
 	{
 		for ( int i = 0; i < NUM_OVERRIDE_MOVE_CLASSNAMES; i++ )
 		{
-			if ( pEntity->m_iClassname == m_Classname[i] )
+			if ( pEntity->GetEngineObject()->GetClassname() == m_Classname[i])
 				return true;
 		}
 

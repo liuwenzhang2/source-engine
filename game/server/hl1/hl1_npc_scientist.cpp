@@ -862,7 +862,7 @@ float CNPC_Scientist::TargetDistance( void )
 
 bool CNPC_Scientist::IsValidEnemy( CBaseEntity *pEnemy )
 {
-	if( pEnemy->m_iClassname == s_iszBarnacleClassname )
+	if( pEnemy->GetEngineObject()->GetClassname() == s_iszBarnacleClassname)
 	{
 		// Scientists ignore barnacles rather than freak out.(sjb)
 		return false;

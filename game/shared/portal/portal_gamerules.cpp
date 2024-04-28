@@ -104,7 +104,7 @@ void CC_Create_PortalWeightBox( void )
 	{
 		engine->PrecacheModel( PORTAL_WEIGHT_BOX_MODEL_NAME );
 		entity->SetModel( PORTAL_WEIGHT_BOX_MODEL_NAME );
-		entity->SetName( MAKE_STRING("box") );
+		entity->SetName( "box" );
 		entity->AddSpawnFlags( SF_PHYSPROP_ENABLE_PICKUP_OUTPUT );
 		entity->Precache();
 		DispatchSpawn(entity);
@@ -147,7 +147,7 @@ void CC_Create_PortalMetalSphere( void )
 	{
 		engine->PrecacheModel( PORTAL_METAL_SPHERE_MODEL_NAME );
 		entity->SetModel( PORTAL_METAL_SPHERE_MODEL_NAME );
-		entity->SetName( MAKE_STRING("sphere") );
+		entity->SetName( "sphere" );
 		entity->AddSpawnFlags( SF_PHYSPROP_ENABLE_PICKUP_OUTPUT );
 		entity->Precache();
 		DispatchSpawn(entity);

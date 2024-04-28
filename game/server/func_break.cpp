@@ -1111,7 +1111,7 @@ void CBreakable::Die( void )
 	ResetOnGroundFlags();
 
 	// Don't fire something that could fire myself
-	SetName( NULL_STRING );
+	SetName( "");
 
 	AddSolidFlags( FSOLID_NOT_SOLID );
 	

@@ -843,13 +843,13 @@ ConVarRef suitcharger( "sk_suitcharger" );
 					}
 					else
 					{
-						killer_weapon_name = STRING( pInflictor->m_iClassname );  // it's just that easy
+						killer_weapon_name = STRING( pInflictor->GetEngineObject()->GetClassname() );  // it's just that easy
 					}
 				}
 			}
 			else
 			{
-				killer_weapon_name = STRING( pInflictor->m_iClassname );
+				killer_weapon_name = STRING( pInflictor->GetEngineObject()->GetClassname() );
 			}
 
 			// strip the NPC_* or weapon_* from the inflictor's classname

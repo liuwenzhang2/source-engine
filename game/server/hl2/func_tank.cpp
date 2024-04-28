@@ -870,7 +870,7 @@ void CFuncTank::Activate( void )
 {
 	BaseClass::Activate();
 	
-	CBaseEntity *pParent = gEntList.FindEntityByName( NULL, m_iParent );
+	CBaseEntity *pParent = gEntList.FindEntityByName( NULL, GetEngineObject()->GetParentName() );
 
 	if ((pParent != NULL) && (pParent->entindex() != -1))
 	{

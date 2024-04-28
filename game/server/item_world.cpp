@@ -77,7 +77,7 @@ void CWorldItem::Spawn( void )
 	else
 	{
 		pEntity->m_target = m_target;
-		pEntity->SetName( GetEntityName() );
+		pEntity->SetName( STRING(GetEntityName()) );
 		pEntity->ClearSpawnFlags();
 		pEntity->AddSpawnFlags( m_spawnflags );
 	}
