@@ -514,7 +514,7 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalAngles from within a KeyValues method.. use SetAbsAngles instead!
-		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		Assert((GetMoveParent() == NULL) && !m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
 		SetAbsAngles(angles);
 		return true;
 	}
@@ -526,12 +526,10 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalOrigin from within a KeyValues method.. use SetAbsOrigin instead!
-		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		Assert((GetMoveParent() == NULL) && !m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
 		SetAbsOrigin(vecOrigin);
 		return true;
 	}
-
-#ifdef GAME_DLL	
 
 	if (FStrEq(szKeyName, "targetname"))
 	{
@@ -583,8 +581,6 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 		if (printKeyHits)
 			Msg("!! (%s) key not handled: \"%s\" \"%s\"\n", STRING(m_iClassname), szKeyName, szValue);
 	}
-
-#endif
 
 	// key hasn't been handled
 	return false;

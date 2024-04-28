@@ -724,7 +724,7 @@ public:
 	//-----------------------------------------------------------------------------
 // Inline methods
 //-----------------------------------------------------------------------------
-	string_t CBaseEntity::GetEntityName()
+	string_t GetEntityName()
 	{
 		return GetEngineObject()->GetEntityName();
 	}
