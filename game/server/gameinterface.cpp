@@ -722,9 +722,9 @@ void CServerGameDLL::Save(ISave* pSave)
 		{
 			MDLCACHE_CRITICAL_SECTION();
 #if !defined( CLIENT_DLL )
-			AssertMsg(pEnt->entindex() == -1 || (pEnt->m_iClassname != NULL_STRING &&
-				(STRING(pEnt->m_iClassname)[0] != 0) &&
-				FStrEq(STRING(pEnt->m_iClassname), pEnt->GetClassname())),
+			AssertMsg(pEnt->entindex() == -1 || (pEnt->GetEngineObject()->GetClassname() != NULL_STRING &&
+				(STRING(pEnt->GetEngineObject()->GetClassname())[0] != 0) &&
+				FStrEq(STRING(pEnt->GetEngineObject()->GetClassname()), pEnt->GetClassname())),
 				"Saving entity with invalid classname");
 #endif
 

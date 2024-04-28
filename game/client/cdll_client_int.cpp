@@ -999,12 +999,6 @@ void CHLClient::Save(ISave* pSave)
 		if (pEnt && !(pEnt->ObjectCaps() & FCAP_DONT_SAVE))
 		{
 			MDLCACHE_CRITICAL_SECTION();
-#if !defined( CLIENT_DLL )
-			AssertMsg(pEnt->entindex() == -1 || (pEnt->m_iClassname != NULL_STRING &&
-				(STRING(pEnt->m_iClassname)[0] != 0) &&
-				FStrEq(STRING(pEnt->m_iClassname), pEnt->GetClassname())),
-				"Saving entity with invalid classname");
-#endif
 
 			pSaveData->SetCurrentEntityContext(pEnt);
 			pEnt->Save(*pSave);
@@ -1014,16 +1008,6 @@ void CHLClient::Save(ISave* pSave)
 
 			pEntInfo->classname = pEnt->m_iClassname;	// Remember entity class for respawn
 
-#if !defined( CLIENT_DLL )
-			pEntInfo->globalname = pEnt->m_iGlobalname; // remember global name
-			pEntInfo->landmarkModelSpace = ModelSpaceLandmark(pEnt->GetModelIndex());
-			int nEntIndex = pEnt->IsNetworkable() ? pEnt->entindex() : -1;
-			bool bIsPlayer = ((nEntIndex >= 1) && (nEntIndex <= gpGlobals->maxClients)) ? true : false;
-			if (bIsPlayer)
-			{
-				pEntInfo->flags |= FENTTABLE_PLAYER;
-			}
-#endif
 		}
 	}
 }
@@ -1292,30 +1276,6 @@ int CHLClient::RestoreEntity(CBaseEntity * pEntity, IRestore * pRestore, entityt
 {
 	if (!DoRestoreEntity(pEntity, pRestore))
 		return 0;
-
-#if !defined( CLIENT_DLL )		
-	if (pEntity->m_iGlobalname != NULL_STRING)
-	{
-		int globalIndex = GlobalEntity_GetIndex(pEntity->m_iGlobalname);
-		if (globalIndex >= 0)
-		{
-			// Already dead? delete
-			if (GlobalEntity_GetState(globalIndex) == GLOBAL_DEAD)
-				return -1;
-			else if (!FStrEq(STRING(gpGlobals->mapname), GlobalEntity_GetMap(globalIndex)))
-			{
-				pEntity->MakeDormant();	// Hasn't been moved to this level yet, wait but stay alive
-			}
-			// In this level & not dead, continue on as normal
-		}
-		else
-		{
-			Warning("Global Entity %s (%s) not in table!!!\n", STRING(pEntity->m_iGlobalname), STRING(pEntity->m_iClassname));
-			// Spawned entities default to 'On'
-			GlobalEntity_Add(pEntity->m_iGlobalname, gpGlobals->mapname, GLOBAL_ON);
-		}
-	}
-#endif
 
 	return 0;
 }

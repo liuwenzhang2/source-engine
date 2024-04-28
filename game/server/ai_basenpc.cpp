@@ -6796,7 +6796,7 @@ void CAI_BaseNPC::NPCInit ( void )
 		if ( !IsNavHullValid() )
 		{
 			Warning("NPC Entity %s (%d) has a bounding box which extends outside its nav box!\n",
-				STRING(m_iClassname), entindex() );
+				STRING(GetEngineObject()->GetClassname()), entindex() );
 		}
 	}
 #endif

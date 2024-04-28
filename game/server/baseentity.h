@@ -707,7 +707,7 @@ public:
 	CBaseEntity *NextMovePeer( void );
 
 	//void		SetName( string_t newTarget );
-	void CBaseEntity::SetName(const char* newName)
+	void SetName(const char* newName)
 	{
 		GetEngineObject()->SetName(newName);
 	}

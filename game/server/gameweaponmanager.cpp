@@ -213,7 +213,7 @@ void CGameWeaponManager::Think()
 			CBaseEntity *pEntity = m_ManagedNonWeapons[i];
 			if ( pEntity )
 			{
-				Assert( pEntity->m_iClassname == m_iszWeaponName );
+				Assert( pEntity->GetEngineObject()->GetClassname() == m_iszWeaponName);
 				if ( !pEntity->IsEffectActive( EF_NODRAW ) )
 				{
 					candidates.AddToTail( pEntity );

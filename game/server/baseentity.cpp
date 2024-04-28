@@ -490,7 +490,7 @@ void CBaseEntity::PostConstructor( const char *szClassname, int iForceEdictIndex
 		SetClassname(szClassname);
 	}
 
-	Assert( m_iClassname != NULL_STRING && STRING(m_iClassname) != NULL );
+	Assert(GetEngineObject()->GetClassname() != NULL_STRING && STRING(GetEngineObject()->GetClassname()) != NULL );
 
 	// Possibly get an edict, and add self to global list of entites.
 	//if ( !IsNetworkable() )
@@ -3198,7 +3198,7 @@ void CBaseEntity::FunctionCheck( void *pFunction, const char *name )
 	// class in your list of ancestors, which it must be.
 	if (pFunction && !UTIL_FunctionToName( GetDataDescMap(), *(inputfunc_t*)pFunction ) )
 	{
-		Warning( "FUNCTION NOT IN TABLE!: %s:%s (%08lx)\n", STRING(m_iClassname), name, (unsigned long)pFunction );
+		Warning( "FUNCTION NOT IN TABLE!: %s:%s (%08lx)\n", STRING(GetEngineObject()->GetClassname()), name, (unsigned long)pFunction );
 		Assert(0);
 	}
 #endif
