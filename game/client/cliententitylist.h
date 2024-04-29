@@ -23,6 +23,7 @@
 #include "entitylist_base.h"
 #include "utlmap.h"
 #include "c_baseentity.h"
+#include "gamestringpool.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
@@ -129,6 +130,7 @@ public:
 			m_pIntermediateData[i] = NULL;
 			m_pOuterIntermediateData[i] = NULL;
 		}
+		m_iClassname = NULL_STRING;
 	}
 
 	void Init(C_BaseEntity* pOuter) {
@@ -272,6 +274,14 @@ public:
 	int								SaveData(const char* context, int slot, int type);
 	int								RestoreData(const char* context, int slot, int type);
 
+	void SetClassname(const char* className)
+	{
+		m_iClassname = AllocPooledString(className);
+	}
+	const string_t& GetClassname() const {
+		return 	m_iClassname;
+	}
+
 #if !defined( NO_ENTITY_PREDICTION )
 	// For storing prediction results and pristine network state
 	byte* m_pIntermediateData[MULTIPLAYER_BACKUP];
@@ -319,6 +329,8 @@ private:
 
 	// Specifies the entity-to-world transform
 	matrix3x4_t						m_rgflCoordinateFrame;
+	string_t						m_iClassname;
+
 };
 
 //-----------------------------------------------------------------------------

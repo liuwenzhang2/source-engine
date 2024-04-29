@@ -818,7 +818,6 @@ C_BaseEntity::C_BaseEntity()
 	C_BaseEntity::Clear();
 
 	SetModelName( NULL_STRING );
-	m_iClassname = NULL_STRING;
 
 	m_InterpolationListEntry = 0xFFFF;
 	m_TeleportListEntry = 0xFFFF;
@@ -4608,12 +4607,6 @@ int C_BaseEntity::SaveDataDescBlock( ISave &save, datamap_t *dmap )
 	int nResult = save.WriteAll( this, dmap );
 	return nResult;
 }
-
-void C_BaseEntity::SetClassname( const char *className )
-{
-	m_iClassname = MAKE_STRING( className );
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Restores the current object from disk, by iterating through the objects

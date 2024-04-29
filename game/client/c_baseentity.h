@@ -337,6 +337,9 @@ public:
 	virtual int	RestoreData(const char* context, int slot, int type) = 0;
 	virtual void Clear(void) = 0;
 
+	virtual void SetClassname(const char* className) = 0;
+	virtual const string_t& GetClassname() const = 0;
+
 };
 
 
@@ -421,9 +424,6 @@ public:
 	// This just picks one of the routes to IClientUnknown.
 	IClientUnknown*					GetIClientUnknown()	{ return this; }
 	virtual C_BaseAnimating*		GetBaseAnimating() { return NULL; }
-	virtual void					SetClassname( const char *className );
-
-	string_t						m_iClassname;
 
 // IClientUnknown overrides.
 public:

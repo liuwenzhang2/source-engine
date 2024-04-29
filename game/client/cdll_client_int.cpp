@@ -1006,7 +1006,7 @@ void CHLClient::Save(ISave* pSave)
 
 			pEntInfo->size = pSave->GetWritePos() - pEntInfo->location;	// Size of entity block is data size written to block
 
-			pEntInfo->classname = pEnt->m_iClassname;	// Remember entity class for respawn
+			pEntInfo->classname = pEnt->GetEngineObject()->GetClassname();	// Remember entity class for respawn
 
 		}
 	}

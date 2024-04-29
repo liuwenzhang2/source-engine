@@ -288,7 +288,7 @@ C_ClientRagdoll::C_ClientRagdoll( )//bool bRestoring
 	m_bImportant = false;
 	m_bNoModelParticles = false;
 
-	SetClassname("client_ragdoll");
+	GetEngineObject()->SetClassname("client_ragdoll");
 
 	//if ( bRestoring == true )
 	//{
