@@ -656,6 +656,8 @@ public:
 	DECLARE_CLASS( C_ClientRagdoll, C_BaseAnimating );
 	DECLARE_DATADESC();
 
+	bool Init(int entnum, int iSerialNum);
+
 	// inherited from IPVSNotify
 	virtual void OnPVSStatusChanged( bool bInPVS );
 

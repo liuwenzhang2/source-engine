@@ -288,12 +288,15 @@ C_ClientRagdoll::C_ClientRagdoll( )//bool bRestoring
 	m_bImportant = false;
 	m_bNoModelParticles = false;
 
-	GetEngineObject()->SetClassname("client_ragdoll");
-
 	//if ( bRestoring == true )
 	//{
 	//	m_pRagdoll = new CRagdoll;
 	//}
+}
+
+bool C_ClientRagdoll::Init(int entnum, int iSerialNum) {
+	GetEngineObject()->SetClassname("client_ragdoll");
+	return true;
 }
 
 void C_ClientRagdoll::OnSave( void )
