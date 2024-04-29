@@ -105,15 +105,15 @@ class CEngineObjectSaveDataOps : public CDefSaveRestoreOps
 			pSave->WriteEHandle(&Handle, fieldInfo.pTypeDesc->fieldSize);
 		}
 #ifdef GAME_DLL
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "classname")) {
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iClassname")) {
 			string_t iClassname = pEntity->GetEngineObject()->GetClassname();
 			pSave->WriteString(&iClassname, fieldInfo.pTypeDesc->fieldSize);
 		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "globalname")) {
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iGlobalname")) {
 			string_t iGlobalname = pEntity->GetEngineObject()->GetGlobalname();
 			pSave->WriteString(&iGlobalname, fieldInfo.pTypeDesc->fieldSize);
 		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "parentname")) {
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iParent")) {
 			string_t iParentName = pEntity->GetEngineObject()->GetParentName();
 			pSave->WriteString(&iParentName, fieldInfo.pTypeDesc->fieldSize);
 		}
@@ -170,24 +170,28 @@ class CEngineObjectSaveDataOps : public CDefSaveRestoreOps
 			pRestore->ReadEHandle(&handle, fieldInfo.pTypeDesc->fieldSize, 0);
 			pEntity->GetEngineObject()->SetNextMovePeer(handle);
 		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "classname")) {
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iClassname")) {
 			char iClassname[512];
-			pRestore->ReadString(iClassname, fieldInfo.pTypeDesc->fieldSize, 0);
+			iClassname[0] = 0;
+			pRestore->ReadString(iClassname, sizeof(iClassname), 0);
 			pEntity->GetEngineObject()->SetClassname(iClassname);
 		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "globalname")) {
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iGlobalname")) {
 			char iGlobalname[512];
-			pRestore->ReadString(iGlobalname, fieldInfo.pTypeDesc->fieldSize, 0);
+			iGlobalname[0] = 0;
+			pRestore->ReadString(iGlobalname, sizeof(iGlobalname), 0);
 			pEntity->GetEngineObject()->SetGlobalname(iGlobalname);
 		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "parentname")) {
+		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iParent")) {
 			char iParentName[512];
-			pRestore->ReadString(iParentName, fieldInfo.pTypeDesc->fieldSize, 0);
+			iParentName[0] = 0;
+			pRestore->ReadString(iParentName, sizeof(iParentName), 0);
 			pEntity->GetEngineObject()->SetParentName(iParentName);
 		}
 		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iName")) {
 			char iEntityName[512];
-			pRestore->ReadString(iEntityName, fieldInfo.pTypeDesc->fieldSize, 0);
+			iEntityName[0] = 0;
+			pRestore->ReadString(iEntityName, sizeof(iEntityName), 0);
 			pEntity->GetEngineObject()->SetName(iEntityName);
 		}
 #endif // GAME_DLL
