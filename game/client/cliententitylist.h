@@ -521,12 +521,12 @@ public:
 private:
 
 	// Cached info for networked entities.
-	struct EntityCacheInfo_t
-	{
-		// Cached off because GetClientNetworkable is called a *lot*
-		IClientNetworkable *m_pNetworkable;
-		unsigned short m_BaseEntitiesIndex;	// Index into m_BaseEntities (or m_BaseEntities.InvalidIndex() if none).
-	};
+	//struct EntityCacheInfo_t
+	//{
+	//	// Cached off because GetClientNetworkable is called a *lot*
+	//	IClientNetworkable *m_pNetworkable;
+	//	unsigned short m_BaseEntitiesIndex;	// Index into m_BaseEntities (or m_BaseEntities.InvalidIndex() if none).
+	//};
 
 	// Current count
 	int					m_iNumServerEnts;
@@ -539,10 +539,10 @@ private:
 	int					m_iMaxUsedServerIndex;
 
 	// This holds fast lookups for special edicts.
-	EntityCacheInfo_t	m_EntityCacheInfo[NUM_ENT_ENTRIES];
+	//EntityCacheInfo_t	m_EntityCacheInfo[NUM_ENT_ENTRIES];
 
 	// For fast iteration.
-	CUtlLinkedList<C_BaseEntity*, unsigned short> m_BaseEntities;
+	//CUtlLinkedList<C_BaseEntity*, unsigned short> m_BaseEntities;
 	C_EngineObjectInternal* m_EngineObjectArray[NUM_ENT_ENTRIES];
 
 private:
@@ -580,7 +580,8 @@ public:
 	C_BaseEntity* Next();	// keep calling this until it returns null.
 
 private:
-	unsigned short m_CurBaseEntity;
+	bool start = false;
+	CBaseHandle m_CurBaseEntity;
 };
 
 
@@ -717,7 +718,8 @@ IClientNetworkable* CClientEntityList<T>::GetClientNetworkable(int entnum)
 {
 	Assert(entnum >= 0);
 	Assert(entnum < MAX_EDICTS);
-	return m_EntityCacheInfo[entnum].m_pNetworkable;
+	T* pEnt = GetListedEntity(entnum);
+	return pEnt ? pEnt->GetClientNetworkable() : 0;
 }
 
 template<class T>
@@ -944,7 +946,7 @@ template<class T>
 void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 {
 	int entnum = handle.GetEntryIndex();
-	EntityCacheInfo_t* pCache = &m_EntityCacheInfo[entnum];
+	//EntityCacheInfo_t* pCache = &m_EntityCacheInfo[entnum];
 
 	if (entnum < 0 || entnum >= NUM_ENT_ENTRIES) {
 		Error("entnum overflow!");
@@ -964,7 +966,7 @@ void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 		// Cache its networkable pointer.
 		Assert(dynamic_cast<IClientUnknown*>(pEnt));
 		Assert(((IClientUnknown*)pEnt)->GetClientNetworkable()); // Server entities should all be networkable.
-		pCache->m_pNetworkable = (pEnt)->GetClientNetworkable();//(IClientUnknown*)
+		//pCache->m_pNetworkable = (pEnt)->GetClientNetworkable();//(IClientUnknown*)
 	}
 
 	IClientUnknown* pUnknown = pEnt;//(IClientUnknown*)
@@ -986,7 +988,7 @@ void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 #endif
 //	if (pBaseEntity)
 //	{
-		pCache->m_BaseEntitiesIndex = m_BaseEntities.AddToTail(pBaseEntity);
+		//pCache->m_BaseEntitiesIndex = m_BaseEntities.AddToTail(pBaseEntity);
 
 		if (pBaseEntity->ObjectCaps() & FCAP_SAVE_NON_NETWORKABLE)
 		{
@@ -1015,12 +1017,12 @@ void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	delete m_EngineObjectArray[entnum];
 	m_EngineObjectArray[entnum] = NULL;
 
-	EntityCacheInfo_t* pCache = &m_EntityCacheInfo[entnum];
+	//EntityCacheInfo_t* pCache = &m_EntityCacheInfo[entnum];
 
 	if (entnum >= 0 && entnum < MAX_EDICTS)
 	{
 		// This is a networkable ent. Clear out our cache info for it.
-		pCache->m_pNetworkable = NULL;
+		//pCache->m_pNetworkable = NULL;
 		m_iNumServerEnts--;
 
 		if (entnum >= m_iMaxUsedServerIndex)
@@ -1051,10 +1053,10 @@ void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 		}
 	}
 
-	if (pCache->m_BaseEntitiesIndex != m_BaseEntities.InvalidIndex())
-		m_BaseEntities.Remove(pCache->m_BaseEntitiesIndex);
+	//if (pCache->m_BaseEntitiesIndex != m_BaseEntities.InvalidIndex())
+	//	m_BaseEntities.Remove(pCache->m_BaseEntitiesIndex);
 
-	pCache->m_BaseEntitiesIndex = m_BaseEntities.InvalidIndex();
+	//pCache->m_BaseEntitiesIndex = m_BaseEntities.InvalidIndex();
 }
 
 

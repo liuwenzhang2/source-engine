@@ -1798,17 +1798,24 @@ C_BaseEntityIterator::C_BaseEntityIterator()
 
 void C_BaseEntityIterator::Restart()
 {
-	m_CurBaseEntity = ClientEntityList().m_BaseEntities.Head();
+	start = false;
+	m_CurBaseEntity.Term();
 }
 
 C_BaseEntity* C_BaseEntityIterator::Next()
 {
-	// Skip dormant entities
-	while ( m_CurBaseEntity != ClientEntityList().m_BaseEntities.InvalidIndex() )
-	{
-		C_BaseEntity *pRet = ClientEntityList().m_BaseEntities[m_CurBaseEntity];
-		m_CurBaseEntity = ClientEntityList().m_BaseEntities.Next( m_CurBaseEntity );
-
+	while (!start || m_CurBaseEntity.IsValid()) {
+		if (!start) {
+			start = true;
+			m_CurBaseEntity = ClientEntityList().FirstHandle();
+		}
+		else {
+			m_CurBaseEntity = ClientEntityList().NextHandle(m_CurBaseEntity);
+		}
+		if (!m_CurBaseEntity.IsValid()) {
+			break;
+		}
+		C_BaseEntity* pRet = ClientEntityList().GetBaseEntityFromHandle(m_CurBaseEntity);
 		if (!pRet->IsDormant())
 			return pRet;
 	}
