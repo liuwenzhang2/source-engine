@@ -46,8 +46,10 @@ public:
 	// Datamap based writing
 	//
 
+	int				WriteEntity(IHandleEntity* pHandleEntity);
 	int				WriteAll(const void* pLeafObject, datamap_t* pLeafMap) { return DoWriteAll(pLeafObject, pLeafMap, pLeafMap); }
 
+	int				WriteRootFields(const char* pname, IHandleEntity* pHandleEntity, datamap_t* pMap, typedescription_t* pFields, int fieldCount);
 	int				WriteFields(const char* pname, const void* pBaseData, datamap_t* pMap, typedescription_t* pFields, int fieldCount);
 
 	//---------------------------------
@@ -131,6 +133,7 @@ protected:
 	virtual const char* GetModelName(const model_t* model) const = 0;
 	virtual const char* GetMaterialNameFromIndex(int nMateralIndex) = 0;
 	virtual string_t AllocPooledString(const char* pszValue) = 0;
+	virtual IEngineObject* GetEngineObject(int entnum) = 0;
 private:
 
 	//---------------------------------
@@ -184,6 +187,7 @@ public:
 	virtual const char* GetModelName(const model_t* model) const;
 	virtual const char* GetMaterialNameFromIndex(int nMateralIndex);
 	virtual string_t AllocPooledString(const char* pszValue);
+	virtual IEngineObject* GetEngineObject(int entnum);
 };
 
 class CSaveClient : public CSave {
@@ -195,6 +199,7 @@ public:
 	virtual const char* GetModelName(const model_t* model) const;
 	virtual const char* GetMaterialNameFromIndex(int nMateralIndex);
 	virtual string_t AllocPooledString(const char* pszValue);
+	virtual IEngineObject* GetEngineObject(int entnum);
 };
 
 //-----------------------------------------------------------------------------
@@ -215,8 +220,10 @@ public:
 	// Datamap based reading
 	//
 
+	int				ReadEntity(IHandleEntity* pHandleEntity);
 	int				ReadAll(void* pLeafObject, datamap_t* pLeafMap) { return DoReadAll(pLeafObject, pLeafMap, pLeafMap); }
 
+	int				ReadRootFields(const char* pname, IHandleEntity* pHandleEntity, datamap_t* pMap, typedescription_t* pFields, int fieldCount);
 	int				ReadFields(const char* pname, void* pBaseData, datamap_t* pMap, typedescription_t* pFields, int fieldCount);
 	void 			EmptyFields(void* pBaseData, typedescription_t* pFields, int fieldCount);
 
@@ -293,6 +300,7 @@ protected:
 	// Game info methods
 	//
 	virtual IHandleEntity* EntityFromIndex(int entityIndex) = 0;
+	virtual IEngineObject* GetEngineObject(int entnum) = 0;
 protected:
 	//---------------------------------
 	// Read primitives
@@ -362,6 +370,7 @@ public:
 	virtual void RenameMapName(string_t* pStringDest);
 	virtual string_t AllocPooledString(const char* pszValue);
 	virtual IHandleEntity* EntityFromIndex(int entityIndex);
+	virtual IEngineObject* GetEngineObject(int entnum);
 };
 
 class CRestoreClient : public CRestore {
@@ -375,6 +384,7 @@ public:
 	virtual void RenameMapName(string_t* pStringDest);
 	virtual string_t AllocPooledString(const char* pszValue);
 	virtual IHandleEntity* EntityFromIndex(int entityIndex);
+	virtual IEngineObject* GetEngineObject(int entnum);
 };
 
 template <int FIELD_TYPE>

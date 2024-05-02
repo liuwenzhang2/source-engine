@@ -703,7 +703,7 @@ void CEngineObjectInternal::RecomputePVSInformation()
 //			from the parent entity and will then follow the parent entity.
 // Input  : pParentEntity - This entity's new parent in the movement hierarchy.
 //-----------------------------------------------------------------------------
-void CEngineObjectInternal::SetParent(IEngineObject* pParentEntity, int iAttachment)
+void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iAttachment)
 {
 	if (pParentEntity == this)
 	{
@@ -722,7 +722,7 @@ void CEngineObjectInternal::SetParent(IEngineObject* pParentEntity, int iAttachm
 
 	this->m_pOuter->BeforeUnlinkParent(pParentEntity ? pParentEntity->GetOuter() : NULL);
 	// notify the old parent of the loss
-	IEngineObject::UnlinkFromParent(this);
+	IEngineObjectServer::UnlinkFromParent(this);
 
 	if (pParentEntity == NULL)
 	{
@@ -737,7 +737,7 @@ void CEngineObjectInternal::SetParent(IEngineObject* pParentEntity, int iAttachm
 	m_iParent = pParentEntity->GetEntityName();
 
 	m_pOuter->RemoveSolidFlags(FSOLID_ROOT_PARENT_ALIGNED);
-	if (const_cast<IEngineObject*>(pParentEntity)->GetRootMoveParent()->GetOuter()->GetSolid() == SOLID_BSP)
+	if (const_cast<IEngineObjectServer*>(pParentEntity)->GetRootMoveParent()->GetOuter()->GetSolid() == SOLID_BSP)
 	{
 		m_pOuter->AddSolidFlags(FSOLID_ROOT_PARENT_ALIGNED);
 	}
@@ -753,7 +753,7 @@ void CEngineObjectInternal::SetParent(IEngineObject* pParentEntity, int iAttachm
 	// set the move parent if we have one
 
 	// add ourselves to the list
-	IEngineObject::LinkChild(pParentEntity, this);
+	IEngineObjectServer::LinkChild(pParentEntity, this);
 	this->m_pOuter->AfterLinkParent(pOldParent ? pOldParent->m_pOuter : NULL);
 
 	m_pOuter->m_iParentAttachment = (char)iAttachment;

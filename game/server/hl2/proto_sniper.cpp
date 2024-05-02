@@ -471,7 +471,7 @@ BEGIN_DATADESC( CSniperBullet )
 	DEFINE_FIELD( m_PenetratedAmmoType, FIELD_INTEGER ),
 	DEFINE_FIELD( m_fActive, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_iImpacts, FIELD_INTEGER ),
-	DEFINE_CUSTOM_FIELD_INVALID(m_vecOrigin, engineObjectFuncs),
+	//DEFINE_CUSTOM_FIELD_INVALID(m_vecOrigin, engineObjectFuncs),
 	DEFINE_FIELD( m_vecDir, FIELD_VECTOR ),
 	DEFINE_FIELD( m_flLastThink, FIELD_TIME ),
 	DEFINE_FIELD( m_Speed, FIELD_FLOAT ),

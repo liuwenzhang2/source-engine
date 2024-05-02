@@ -98,7 +98,7 @@ public:
 	unsigned short m_PVSNotifiersLink;			// Into m_PVSNotifyInfos.
 };
 
-class C_EngineObjectInternal : public IEngineObject {
+class C_EngineObjectInternal : public IEngineObjectClient {
 public:
 	DECLARE_CLASS_NOBASE(C_EngineObjectInternal);
 	DECLARE_PREDICTABLE();
@@ -188,22 +188,22 @@ public:
 	// Set the movement parent. Your local origin and angles will become relative to this parent.
 	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
 	// are relative to the attachment on this entity.
-	void SetParent(IEngineObject* pParentEntity, int iParentAttachment = 0);
-	void UnlinkChild(IEngineObject* pParent, IEngineObject* pChild);
-	void LinkChild(IEngineObject* pParent, IEngineObject* pChild);
-	void HierarchySetParent(IEngineObject* pNewParent);
+	void SetParent(IEngineObjectClient* pParentEntity, int iParentAttachment = 0);
+	void UnlinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild);
+	void LinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild);
+	void HierarchySetParent(IEngineObjectClient* pNewParent);
 	void UnlinkFromHierarchy();
 
 	// Methods relating to traversing hierarchy
 	C_EngineObjectInternal* GetMoveParent(void) const;
-	void SetMoveParent(IEngineObject* pMoveParent);
+	void SetMoveParent(IEngineObjectClient* pMoveParent);
 	C_EngineObjectInternal* GetRootMoveParent();
 	C_EngineObjectInternal* FirstMoveChild(void) const;
-	void SetFirstMoveChild(IEngineObject* pMoveChild);
+	void SetFirstMoveChild(IEngineObjectClient* pMoveChild);
 	C_EngineObjectInternal* NextMovePeer(void) const;
-	void SetNextMovePeer(IEngineObject* pMovePeer);
+	void SetNextMovePeer(IEngineObjectClient* pMovePeer);
 	C_EngineObjectInternal* MovePrevPeer(void) const;
-	void SetMovePrevPeer(IEngineObject* pMovePrevPeer);
+	void SetMovePrevPeer(IEngineObjectClient* pMovePrevPeer);
 
 	virtual void ResetRgflCoordinateFrame();
 	// Returns the entity-to-world transform
@@ -341,7 +341,7 @@ inline C_EngineObjectInternal* C_EngineObjectInternal::GetMoveParent(void) const
 	return m_pMoveParent;
 }
 
-inline void C_EngineObjectInternal::SetMoveParent(IEngineObject* pMoveParent) {
+inline void C_EngineObjectInternal::SetMoveParent(IEngineObjectClient* pMoveParent) {
 	m_pMoveParent = (C_EngineObjectInternal*)pMoveParent;
 }
 
@@ -350,7 +350,7 @@ inline C_EngineObjectInternal* C_EngineObjectInternal::FirstMoveChild(void) cons
 	return m_pMoveChild;
 }
 
-inline void C_EngineObjectInternal::SetFirstMoveChild(IEngineObject* pMoveChild) {
+inline void C_EngineObjectInternal::SetFirstMoveChild(IEngineObjectClient* pMoveChild) {
 	m_pMoveChild = (C_EngineObjectInternal*)pMoveChild;
 }
 
@@ -359,7 +359,7 @@ inline C_EngineObjectInternal* C_EngineObjectInternal::NextMovePeer(void) const
 	return m_pMovePeer;
 }
 
-inline void C_EngineObjectInternal::SetNextMovePeer(IEngineObject* pMovePeer) {
+inline void C_EngineObjectInternal::SetNextMovePeer(IEngineObjectClient* pMovePeer) {
 	m_pMovePeer = (C_EngineObjectInternal*)pMovePeer;
 }
 
@@ -368,7 +368,7 @@ inline C_EngineObjectInternal* C_EngineObjectInternal::MovePrevPeer(void) const
 	return m_pMovePrevPeer;
 }
 
-inline void C_EngineObjectInternal::SetMovePrevPeer(IEngineObject* pMovePrevPeer) {
+inline void C_EngineObjectInternal::SetMovePrevPeer(IEngineObjectClient* pMovePrevPeer) {
 	m_pMovePrevPeer = (C_EngineObjectInternal*)pMovePrevPeer;
 }
 
@@ -448,7 +448,7 @@ public:
 	virtual C_BaseEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
 	virtual void				DestroyEntity(IHandleEntity* pEntity);
 
-	IEngineObject* GetEngineObject(int entnum);
+	IEngineObjectClient* GetEngineObject(int entnum);
 	virtual IClientNetworkable*	GetClientNetworkable( int entnum );
 	virtual IClientEntity*		GetClientEntity( int entnum );
 
@@ -709,7 +709,7 @@ void CClientEntityList<T>::Release(void)
 }
 
 template<class T>
-inline IEngineObject* CClientEntityList<T>::GetEngineObject(int entnum) {
+inline IEngineObjectClient* CClientEntityList<T>::GetEngineObject(int entnum) {
 	return m_EngineObjectArray[entnum];
 }
 

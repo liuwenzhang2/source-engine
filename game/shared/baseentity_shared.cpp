@@ -67,151 +67,151 @@ ConVar hl2_episodic( "hl2_episodic", "0", FCVAR_REPLICATED );
 #endif
 	extern ISoundEmitterSystemBase* soundemitterbase;
 
-class CEngineObjectSaveDataOps : public CDefSaveRestoreOps
-{
-	// saves the entire array of variables
-	virtual void Save(const SaveRestoreFieldInfo_t& fieldInfo, ISave* pSave)
-	{
-		CBaseEntity* pEntity = (CBaseEntity*)pSave->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
-		if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecOrigin")) {
-			Vector verOrigin = pEntity->GetLocalOrigin();
-			pSave->WriteVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angRotation")) {
-			QAngle angel = pEntity->GetLocalAngles();
-			pSave->WriteVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecVelocity")) {
-			Vector verOrigin = pEntity->GetLocalVelocity();
-			pSave->WriteVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsOrigin")) {
-			Vector verOrigin = pEntity->GetAbsOrigin();
-			pSave->WritePositionVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angAbsRotation")) {
-			QAngle angel = pEntity->GetAbsAngles();
-			pSave->WriteVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsVelocity")) {
-			Vector verOrigin = pEntity->GetAbsVelocity();
-			pSave->WritePositionVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveParent")) {
-			CBaseEntity* pMoveParent = pEntity->GetEngineObject()->GetMoveParent()? pEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
-			EHANDLE Handle = pMoveParent ? pMoveParent->GetRefEHandle() : INVALID_EHANDLE_INDEX;
-			pSave->WriteEHandle(&Handle, fieldInfo.pTypeDesc->fieldSize);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveChild")) {
-			CBaseEntity* pMoveChild = pEntity->GetEngineObject()->FirstMoveChild() ? pEntity->GetEngineObject()->FirstMoveChild()->GetOuter() : NULL;
-			EHANDLE Handle = pMoveChild ? pMoveChild->GetRefEHandle() : INVALID_EHANDLE_INDEX;
-			pSave->WriteEHandle(&Handle, fieldInfo.pTypeDesc->fieldSize);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMovePeer")) {
-			CBaseEntity* pMovePeer = pEntity->GetEngineObject()->NextMovePeer() ? pEntity->GetEngineObject()->NextMovePeer()->GetOuter() : NULL;
-			EHANDLE Handle = pMovePeer ? pMovePeer->GetRefEHandle() : INVALID_EHANDLE_INDEX;
-			pSave->WriteEHandle(&Handle, fieldInfo.pTypeDesc->fieldSize);
-		}
-#ifdef GAME_DLL
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iClassname")) {
-			string_t iClassname = pEntity->GetEngineObject()->GetClassname();
-			pSave->WriteString(&iClassname, fieldInfo.pTypeDesc->fieldSize);
-		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iGlobalname")) {
-			string_t iGlobalname = pEntity->GetEngineObject()->GetGlobalname();
-			pSave->WriteString(&iGlobalname, fieldInfo.pTypeDesc->fieldSize);
-		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iParent")) {
-			string_t iParentName = pEntity->GetEngineObject()->GetParentName();
-			pSave->WriteString(&iParentName, fieldInfo.pTypeDesc->fieldSize);
-		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iName")) {
-			string_t iEntityName = pEntity->GetEngineObject()->GetEntityName();
-			pSave->WriteString(&iEntityName, fieldInfo.pTypeDesc->fieldSize);
-		}
-#endif // GAME_DLL
+//class CEngineObjectSaveDataOps : public CDefSaveRestoreOps
+//{
+//	// saves the entire array of variables
+//	virtual void Save(const SaveRestoreFieldInfo_t& fieldInfo, ISave* pSave)
+//	{
+//		CBaseEntity* pEntity = (CBaseEntity*)pSave->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
+//		if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecOrigin")) {
+//			Vector verOrigin = pEntity->GetLocalOrigin();
+//			pSave->WriteVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angRotation")) {
+//			QAngle angel = pEntity->GetLocalAngles();
+//			pSave->WriteVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecVelocity")) {
+//			Vector verOrigin = pEntity->GetLocalVelocity();
+//			pSave->WriteVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsOrigin")) {
+//			Vector verOrigin = pEntity->GetAbsOrigin();
+//			pSave->WritePositionVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angAbsRotation")) {
+//			QAngle angel = pEntity->GetAbsAngles();
+//			pSave->WriteVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsVelocity")) {
+//			Vector verOrigin = pEntity->GetAbsVelocity();
+//			pSave->WritePositionVector(&verOrigin, fieldInfo.pTypeDesc->fieldSize);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveParent")) {
+//			CBaseEntity* pMoveParent = pEntity->GetEngineObject()->GetMoveParent()? pEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+//			EHANDLE Handle = pMoveParent ? pMoveParent->GetRefEHandle() : INVALID_EHANDLE_INDEX;
+//			pSave->WriteEHandle(&Handle, fieldInfo.pTypeDesc->fieldSize);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveChild")) {
+//			CBaseEntity* pMoveChild = pEntity->GetEngineObject()->FirstMoveChild() ? pEntity->GetEngineObject()->FirstMoveChild()->GetOuter() : NULL;
+//			EHANDLE Handle = pMoveChild ? pMoveChild->GetRefEHandle() : INVALID_EHANDLE_INDEX;
+//			pSave->WriteEHandle(&Handle, fieldInfo.pTypeDesc->fieldSize);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMovePeer")) {
+//			CBaseEntity* pMovePeer = pEntity->GetEngineObject()->NextMovePeer() ? pEntity->GetEngineObject()->NextMovePeer()->GetOuter() : NULL;
+//			EHANDLE Handle = pMovePeer ? pMovePeer->GetRefEHandle() : INVALID_EHANDLE_INDEX;
+//			pSave->WriteEHandle(&Handle, fieldInfo.pTypeDesc->fieldSize);
+//		}
+//#ifdef GAME_DLL
+//		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iClassname")) {
+//			string_t iClassname = pEntity->GetEngineObject()->GetClassname();
+//			pSave->WriteString(&iClassname, fieldInfo.pTypeDesc->fieldSize);
+//		}
+//		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iGlobalname")) {
+//			string_t iGlobalname = pEntity->GetEngineObject()->GetGlobalname();
+//			pSave->WriteString(&iGlobalname, fieldInfo.pTypeDesc->fieldSize);
+//		}
+//		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iParent")) {
+//			string_t iParentName = pEntity->GetEngineObject()->GetParentName();
+//			pSave->WriteString(&iParentName, fieldInfo.pTypeDesc->fieldSize);
+//		}
+//		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iName")) {
+//			string_t iEntityName = pEntity->GetEngineObject()->GetEntityName();
+//			pSave->WriteString(&iEntityName, fieldInfo.pTypeDesc->fieldSize);
+//		}
+//#endif // GAME_DLL
+//
+//	}
+//
+//	// restores a single instance of the variable
+//	virtual void Restore(const SaveRestoreFieldInfo_t& fieldInfo, IRestore* pRestore)
+//	{
+//		CBaseEntity* pEntity = (CBaseEntity*)pRestore->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
+//		if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecOrigin")) {
+//			Vector vecOrigin;
+//			pRestore->ReadVector(&vecOrigin, fieldInfo.pTypeDesc->fieldSize, 0);
+//			pEntity->SetLocalOrigin(vecOrigin);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angRotation")) {
+//			QAngle angel;
+//			pRestore->ReadVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize, 0);
+//			pEntity->SetLocalAngles(angel);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecVelocity")) {
+//			Vector vecVelocity;
+//			pRestore->ReadVector(&vecVelocity, fieldInfo.pTypeDesc->fieldSize, 0);
+//			pEntity->SetLocalVelocity(vecVelocity);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsOrigin")) {
+//			Vector vecOrigin;
+//			pRestore->ReadPositionVector(&vecOrigin, fieldInfo.pTypeDesc->fieldSize, 0);
+//			pEntity->SetAbsOrigin(vecOrigin);
+//		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angAbsRotation")) {
+//			QAngle angel;
+//			pRestore->ReadVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize, 0);
+//			pEntity->SetAbsAngles(angel);
+//		} else if(!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsVelocity")) {
+//			Vector vecVelocity;
+//			pRestore->ReadVector(&vecVelocity, fieldInfo.pTypeDesc->fieldSize, 0);
+//			pEntity->SetAbsVelocity(vecVelocity);
+//		} 
+//#ifdef GAME_DLL
+//		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveParent")) {
+//			EHANDLE handle;
+//			pRestore->ReadEHandle(&handle, fieldInfo.pTypeDesc->fieldSize, 0);
+//			pEntity->GetEngineObject()->SetMoveParent(handle);
+//		}
+//		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveChild")) {
+//			EHANDLE handle;
+//			pRestore->ReadEHandle(&handle, fieldInfo.pTypeDesc->fieldSize, 0);
+//			pEntity->GetEngineObject()->SetFirstMoveChild(handle);
+//		}
+//		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMovePeer")) {
+//			EHANDLE handle;
+//			pRestore->ReadEHandle(&handle, fieldInfo.pTypeDesc->fieldSize, 0);
+//			pEntity->GetEngineObject()->SetNextMovePeer(handle);
+//		}
+//		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iClassname")) {
+//			char iClassname[512];
+//			iClassname[0] = 0;
+//			pRestore->ReadString(iClassname, sizeof(iClassname), 0);
+//			pEntity->GetEngineObject()->SetClassname(iClassname);
+//		}
+//		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iGlobalname")) {
+//			char iGlobalname[512];
+//			iGlobalname[0] = 0;
+//			pRestore->ReadString(iGlobalname, sizeof(iGlobalname), 0);
+//			pEntity->GetEngineObject()->SetGlobalname(iGlobalname);
+//		}
+//		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iParent")) {
+//			char iParentName[512];
+//			iParentName[0] = 0;
+//			pRestore->ReadString(iParentName, sizeof(iParentName), 0);
+//			pEntity->GetEngineObject()->SetParentName(iParentName);
+//		}
+//		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iName")) {
+//			char iEntityName[512];
+//			iEntityName[0] = 0;
+//			pRestore->ReadString(iEntityName, sizeof(iEntityName), 0);
+//			pEntity->GetEngineObject()->SetName(iEntityName);
+//		}
+//#endif // GAME_DLL
+//	}
+//
+//
+//	virtual bool IsEmpty(const SaveRestoreFieldInfo_t& fieldInfo)
+//	{
+//		return false;
+//	}
+//
+//	virtual void MakeEmpty(const SaveRestoreFieldInfo_t& fieldInfo)
+//	{
+//		// Don't no how to. This is okay, since objects of this type
+//		// are always born clean before restore, and not reused
+//	}
+//};
 
-	}
-
-	// restores a single instance of the variable
-	virtual void Restore(const SaveRestoreFieldInfo_t& fieldInfo, IRestore* pRestore)
-	{
-		CBaseEntity* pEntity = (CBaseEntity*)pRestore->GetGameSaveRestoreInfo()->GetCurrentEntityContext();
-		if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecOrigin")) {
-			Vector vecOrigin;
-			pRestore->ReadVector(&vecOrigin, fieldInfo.pTypeDesc->fieldSize, 0);
-			pEntity->SetLocalOrigin(vecOrigin);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angRotation")) {
-			QAngle angel;
-			pRestore->ReadVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize, 0);
-			pEntity->SetLocalAngles(angel);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecVelocity")) {
-			Vector vecVelocity;
-			pRestore->ReadVector(&vecVelocity, fieldInfo.pTypeDesc->fieldSize, 0);
-			pEntity->SetLocalVelocity(vecVelocity);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsOrigin")) {
-			Vector vecOrigin;
-			pRestore->ReadPositionVector(&vecOrigin, fieldInfo.pTypeDesc->fieldSize, 0);
-			pEntity->SetAbsOrigin(vecOrigin);
-		} else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_angAbsRotation")) {
-			QAngle angel;
-			pRestore->ReadVector((Vector*)&angel, fieldInfo.pTypeDesc->fieldSize, 0);
-			pEntity->SetAbsAngles(angel);
-		} else if(!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_vecAbsVelocity")) {
-			Vector vecVelocity;
-			pRestore->ReadVector(&vecVelocity, fieldInfo.pTypeDesc->fieldSize, 0);
-			pEntity->SetAbsVelocity(vecVelocity);
-		} 
-#ifdef GAME_DLL
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveParent")) {
-			EHANDLE handle;
-			pRestore->ReadEHandle(&handle, fieldInfo.pTypeDesc->fieldSize, 0);
-			pEntity->GetEngineObject()->SetMoveParent(handle);
-		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMoveChild")) {
-			EHANDLE handle;
-			pRestore->ReadEHandle(&handle, fieldInfo.pTypeDesc->fieldSize, 0);
-			pEntity->GetEngineObject()->SetFirstMoveChild(handle);
-		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_hMovePeer")) {
-			EHANDLE handle;
-			pRestore->ReadEHandle(&handle, fieldInfo.pTypeDesc->fieldSize, 0);
-			pEntity->GetEngineObject()->SetNextMovePeer(handle);
-		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iClassname")) {
-			char iClassname[512];
-			iClassname[0] = 0;
-			pRestore->ReadString(iClassname, sizeof(iClassname), 0);
-			pEntity->GetEngineObject()->SetClassname(iClassname);
-		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iGlobalname")) {
-			char iGlobalname[512];
-			iGlobalname[0] = 0;
-			pRestore->ReadString(iGlobalname, sizeof(iGlobalname), 0);
-			pEntity->GetEngineObject()->SetGlobalname(iGlobalname);
-		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iParent")) {
-			char iParentName[512];
-			iParentName[0] = 0;
-			pRestore->ReadString(iParentName, sizeof(iParentName), 0);
-			pEntity->GetEngineObject()->SetParentName(iParentName);
-		}
-		else if (!V_strcmp(fieldInfo.pTypeDesc->fieldName, "m_iName")) {
-			char iEntityName[512];
-			iEntityName[0] = 0;
-			pRestore->ReadString(iEntityName, sizeof(iEntityName), 0);
-			pEntity->GetEngineObject()->SetName(iEntityName);
-		}
-#endif // GAME_DLL
-	}
-
-
-	virtual bool IsEmpty(const SaveRestoreFieldInfo_t& fieldInfo)
-	{
-		return false;
-	}
-
-	virtual void MakeEmpty(const SaveRestoreFieldInfo_t& fieldInfo)
-	{
-		// Don't no how to. This is okay, since objects of this type
-		// are always born clean before restore, and not reused
-	}
-};
-
-CEngineObjectSaveDataOps g_EngineObjectSaveDataOps;
-ISaveRestoreOps* engineObjectFuncs = &g_EngineObjectSaveDataOps;
+//CEngineObjectSaveDataOps g_EngineObjectSaveDataOps;
+//ISaveRestoreOps* engineObjectFuncs = &g_EngineObjectSaveDataOps;
 
 
 //bool CBaseEntity::m_bAllowPrecache = false;

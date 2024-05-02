@@ -833,6 +833,63 @@ bool CSave::WriteField( const char *pname, void *pData, datamap_t *pRootMap, typ
 }
 
 //-------------------------------------
+int	CSave::WriteRootFields(const char* pname, IHandleEntity* pHandleEntity, datamap_t* pRootMap, typedescription_t* pFields, int fieldCount) {
+	typedescription_t* pTest;
+	int iHeaderPos = m_pData->GetCurPos();
+	int count = -1;
+	WriteInt(pname, &count, 1);
+
+	count = 0;
+
+#ifdef _X360
+	__dcbt(0, pBaseData);
+	__dcbt(128, pBaseData);
+	__dcbt(256, pBaseData);
+	__dcbt(512, pBaseData);
+	void* pDest = m_pData->AccessCurPos();
+	__dcbt(0, pDest);
+	__dcbt(128, pDest);
+	__dcbt(256, pDest);
+	__dcbt(512, pDest);
+#endif
+
+	IEngineObject* pEngineObject = GetEngineObject(pHandleEntity->GetRefEHandle().GetEntryIndex());
+	datamap_t* pEngineObjectDataMap = pEngineObject->GetDataDescMap();
+	for (int i = 0; i < pEngineObjectDataMap->dataNumFields; i++) {
+		pTest = &pEngineObjectDataMap->dataDesc[i];
+		void* pOutputData = ((char*)pEngineObject + pTest->fieldOffset[TD_OFFSET_NORMAL]);
+
+		if (!ShouldSaveField(pOutputData, pTest))
+			continue;
+
+		if (!WriteField(pname, pOutputData, pEngineObjectDataMap, pTest))
+			break;
+		count++;
+	}
+
+
+	for (int i = 0; i < fieldCount; i++)
+	{
+		pTest = &pFields[i];
+		void* pOutputData = ((char*)pHandleEntity + pTest->fieldOffset[TD_OFFSET_NORMAL]);
+
+		if (!ShouldSaveField(pOutputData, pTest))
+			continue;
+
+		if (!WriteField(pname, pOutputData, pRootMap, pTest))
+			break;
+		count++;
+	}
+
+	int iCurPos = m_pData->GetCurPos();
+	int iRewind = iCurPos - iHeaderPos;
+	m_pData->Rewind(iRewind);
+	WriteInt(pname, &count, 1);
+	iCurPos = m_pData->GetCurPos();
+	m_pData->MoveCurPos(iRewind - (iCurPos - iHeaderPos));
+
+	return 1;
+}
 
 int CSave::WriteFields( const char *pname, const void *pBaseData, datamap_t *pRootMap, typedescription_t *pFields, int fieldCount )
 {
@@ -874,6 +931,33 @@ int CSave::WriteFields( const char *pname, const void *pBaseData, datamap_t *pRo
 	WriteInt( pname, &count, 1 );
 	iCurPos = m_pData->GetCurPos();
 	m_pData->MoveCurPos( iRewind - ( iCurPos - iHeaderPos ) );
+
+	return 1;
+}
+
+int	CSave::WriteEntity(IHandleEntity* pHandleEntity) {
+
+	datamap_t* pDataMaps[100];
+	int nDataMapCount = 0;
+	datamap_t* pDataMap = pHandleEntity->GetDataDescMap();
+	while (pDataMap) {
+		pDataMaps[nDataMapCount] = pDataMap;
+		if (nDataMapCount++ >= 100) {
+			Error("too much level");
+		}
+		pDataMap = pDataMap->baseMap;
+	}
+	if (nDataMapCount > 0) {
+		for (int i = nDataMapCount - 1; i >= 0; i--) {
+			datamap_t* pCurMap = pDataMaps[i];
+			if (i == nDataMapCount - 1) {
+				WriteRootFields(pCurMap->dataClassName, pHandleEntity, pHandleEntity->GetDataDescMap(), pCurMap->dataDesc, pCurMap->dataNumFields);
+			}
+			else {
+				WriteFields(pCurMap->dataClassName, pHandleEntity, pHandleEntity->GetDataDescMap(), pCurMap->dataDesc, pCurMap->dataNumFields);
+			}
+		}
+	}
 
 	return 1;
 }
@@ -1330,6 +1414,19 @@ string_t CSaveClient::AllocPooledString(const char* pszValue) {
 }
 #endif // CLIENT_DLL
 
+#ifdef GAME_DLL
+IEngineObject* CSaveServer::GetEngineObject(int entnum) {
+	return gEntList.GetEngineObject(entnum);
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+IEngineObject* CSaveClient::GetEngineObject(int entnum) {
+	return ClientEntityList().GetEngineObject(entnum);
+}
+#endif // CLIENT_DLL
+
+
 //-------------------------------------
 // Purpose:	Writes all the fields that are not client neutral. In the event of 
 //			a librarization of save/restore, these would not reside in the library
@@ -1621,6 +1718,9 @@ bool CRestore::ShouldReadField( typedescription_t *pField )
 typedescription_t *CRestore::FindField( const char *pszFieldName, typedescription_t *pFields, int fieldCount, int *pCookie )
 {
 	int &fieldNumber = *pCookie;
+	if (fieldNumber >= fieldCount) {
+		fieldNumber = 0;
+	}
 	if ( pszFieldName )
 	{
 		typedescription_t *pTest;
@@ -1630,7 +1730,7 @@ typedescription_t *CRestore::FindField( const char *pszFieldName, typedescriptio
 			pTest = &pFields[fieldNumber];
 			
 			++fieldNumber;
-			if ( fieldNumber == fieldCount )
+			if ( fieldNumber >= fieldCount )
 				fieldNumber = 0;
 			
 			if ( stricmp( pTest->fieldName, pszFieldName ) == 0 )
@@ -1748,6 +1848,69 @@ void CRestore::EndBlock()
 	
 //-------------------------------------
 
+int CRestore::ReadRootFields(const char* pname, IHandleEntity* pHandleEntity, datamap_t* pRootMap, typedescription_t* pFields, int fieldCount)
+{
+	static int lastName = -1;
+	Verify(ReadShort() == sizeof(int));			// First entry should be an int
+	int symName = m_pData->FindCreateSymbol(pname);
+
+	// Check the struct name
+	int curSym = ReadShort();
+	if (curSym != symName)			// Field Set marker
+	{
+		const char* pLastName = m_pData->StringFromSymbol(lastName);
+		const char* pCurName = m_pData->StringFromSymbol(curSym);
+		Msg("Expected %s found %s ( raw '%s' )! (prev: %s)\n", pname, pCurName, BufferPointer(), pLastName);
+		Msg("Field type name may have changed or inheritance graph changed, save file is suspect\n");
+		m_pData->Rewind(2 * sizeof(short));
+		return 0;
+	}
+	lastName = symName;
+
+	IEngineObject* pEngineObject = GetEngineObject(pHandleEntity->GetRefEHandle().GetEntryIndex());
+	datamap_t* pEngineObjectDataMap = pEngineObject->GetDataDescMap();
+
+	// Clear out base data
+	EmptyFields(pEngineObject, pEngineObjectDataMap->dataDesc, pEngineObjectDataMap->dataNumFields);
+	EmptyFields(pHandleEntity, pFields, fieldCount);
+
+	// Skip over the struct name
+	int i;
+	int nFieldsSaved = ReadInt();						// Read field count
+	int searchCookie = 0;								// Make searches faster, most data is read/written in the same order
+	SaveRestoreRecordHeader_t header;
+
+	for (i = 0; i < nFieldsSaved; i++)
+	{
+		ReadHeader(&header);
+
+		const char* pFieldName = m_pData->StringFromSymbol(header.symbol);
+		typedescription_t* pField = NULL;
+		pField = FindField(pFieldName, pEngineObjectDataMap->dataDesc, pEngineObjectDataMap->dataNumFields, &searchCookie);
+		if (pField) {
+			if ( ShouldReadField(pField)) {
+				ReadField(header, ((char*)pEngineObject + pField->fieldOffset[TD_OFFSET_NORMAL]), pEngineObjectDataMap, pField);
+			}
+			else {
+				BufferSkipBytes(header.size);			// Advance to next field
+			}
+		}
+		else {
+			pField = FindField(pFieldName, pFields, fieldCount, &searchCookie);
+			if (pField && ShouldReadField(pField))
+			{
+				ReadField(header, ((char*)pHandleEntity + pField->fieldOffset[TD_OFFSET_NORMAL]), pRootMap, pField);
+			}
+			else
+			{
+				BufferSkipBytes(header.size);			// Advance to next field
+			}
+		}
+	}
+
+	return 1;
+}
+
 int CRestore::ReadFields( const char *pname, void *pBaseData, datamap_t *pRootMap, typedescription_t *pFields, int fieldCount )
 {
 	static int lastName = -1;
@@ -1830,6 +1993,32 @@ int	CRestore::ReadInt( void )
 	BufferReadBytes( (char *)&tmp, sizeof(int) );
 
 	return tmp;
+}
+
+int CRestore::ReadEntity(IHandleEntity* pHandleEntity) {
+	datamap_t* pDataMaps[100];
+	int nDataMapCount = 0;
+	datamap_t* pDataMap = pHandleEntity->GetDataDescMap();
+	while (pDataMap) {
+		pDataMaps[nDataMapCount] = pDataMap;
+		if (nDataMapCount++ >= 100) {
+			Error("too much level");
+		}
+		pDataMap = pDataMap->baseMap;
+	}
+	if (nDataMapCount > 0) {
+		for (int i = nDataMapCount - 1; i >= 0; i--) {
+			datamap_t* pCurMap = pDataMaps[i];
+			if (i == nDataMapCount - 1) {
+				ReadRootFields(pCurMap->dataClassName, pHandleEntity, pHandleEntity->GetDataDescMap(), pCurMap->dataDesc, pCurMap->dataNumFields);
+			}
+			else {
+				ReadFields(pCurMap->dataClassName, pHandleEntity, pHandleEntity->GetDataDescMap(), pCurMap->dataDesc, pCurMap->dataNumFields);
+			}
+		}
+	}
+
+	return 1;
 }
 
 //-------------------------------------
@@ -2068,6 +2257,17 @@ IHandleEntity* CRestoreClient::EntityFromIndex(int entityIndex)
 }
 #endif // CLIENT_DLL
 
+#ifdef GAME_DLL
+IEngineObject* CRestoreServer::GetEngineObject(int entnum) {
+	return gEntList.GetEngineObject(entnum);
+}
+#endif // GAME_DLL
+
+#ifdef CLIENT_DLL
+IEngineObject* CRestoreClient::GetEngineObject(int entnum) {
+	return ClientEntityList().GetEngineObject(entnum);
+}
+#endif // CLIENT_DLL
 //-------------------------------------
 
 int CRestore::ReadEntityPtr( IHandleEntity **ppEntity, int count, int nBytesAvailable )

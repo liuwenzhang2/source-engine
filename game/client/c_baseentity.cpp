@@ -850,10 +850,10 @@ C_BaseEntity::~C_BaseEntity()
 	
 }
 
-IEngineObject* C_BaseEntity::GetEngineObject() {
+IEngineObjectClient* C_BaseEntity::GetEngineObject() {
 	return ClientEntityList().GetEngineObject(entindex());
 }
-const IEngineObject* C_BaseEntity::GetEngineObject() const {
+const IEngineObjectClient* C_BaseEntity::GetEngineObject() const {
 	return ClientEntityList().GetEngineObject(entindex());
 }
 
@@ -1435,19 +1435,19 @@ void C_BaseEntity::MarkShadowDirty( bool bDirty )
 
 IClientRenderable *C_BaseEntity::GetShadowParent()
 {
-	IEngineObject *pParent = GetEngineObject()->GetMoveParent();
+	IEngineObjectClient *pParent = GetEngineObject()->GetMoveParent();
 	return pParent ? pParent->GetOuter()->GetClientRenderable() : NULL;
 }
 
 IClientRenderable *C_BaseEntity::FirstShadowChild()
 {
-	IEngineObject *pChild = GetEngineObject()->FirstMoveChild();
+	IEngineObjectClient *pChild = GetEngineObject()->FirstMoveChild();
 	return pChild ? pChild->GetOuter()->GetClientRenderable() : NULL;
 }
 
 IClientRenderable *C_BaseEntity::NextShadowPeer()
 {
-	IEngineObject *pPeer = GetEngineObject()->NextMovePeer();
+	IEngineObjectClient *pPeer = GetEngineObject()->NextMovePeer();
 	return pPeer ? pPeer->GetOuter()->GetClientRenderable() : NULL;
 }
 
@@ -2509,7 +2509,7 @@ bool C_BaseEntity::ShouldInterpolate()
 		return true;
 
 	// if any movement child needs interpolation, we have to interpolate too
-	IEngineObject *pChild = GetEngineObject()->FirstMoveChild();
+	IEngineObjectClient *pChild = GetEngineObject()->FirstMoveChild();
 	while( pChild )
 	{
 		if ( pChild->GetOuter()->ShouldInterpolate() )	
@@ -4544,8 +4544,8 @@ bool C_BaseEntity::IsFloating()
 
 BEGIN_DATADESC_NO_BASE( C_BaseEntity )
 	DEFINE_FIELD( m_ModelName, FIELD_STRING ),
-	DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsOrigin, engineObjectFuncs),
-	DEFINE_CUSTOM_FIELD_INVALID( m_angAbsRotation, engineObjectFuncs),
+	//DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsOrigin, engineObjectFuncs),
+	//DEFINE_CUSTOM_FIELD_INVALID( m_angAbsRotation, engineObjectFuncs),
 	//DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
 	DEFINE_FIELD( m_fFlags, FIELD_INTEGER ),
 END_DATADESC()
@@ -4593,7 +4593,7 @@ void C_BaseEntity::OnRestore()
 int C_BaseEntity::Save( ISave &save )
 {
 	// loop through the data description list, saving each data desc block
-	int status = SaveDataDescBlock( save, GetDataDescMap() );
+	int status = save.WriteEntity(this);
 
 	return status;
 }
@@ -4602,11 +4602,11 @@ int C_BaseEntity::Save( ISave &save )
 // Purpose: Recursively saves all the classes in an object, in reverse order (top down)
 // Output : int 0 on failure, 1 on success
 //-----------------------------------------------------------------------------
-int C_BaseEntity::SaveDataDescBlock( ISave &save, datamap_t *dmap )
-{
-	int nResult = save.WriteAll( this, dmap );
-	return nResult;
-}
+//int C_BaseEntity::SaveDataDescBlock( ISave &save, datamap_t *dmap )
+//{
+//	int nResult = save.WriteAll( this, dmap );
+//	return nResult;
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Restores the current object from disk, by iterating through the objects
@@ -4617,7 +4617,7 @@ int C_BaseEntity::SaveDataDescBlock( ISave &save, datamap_t *dmap )
 int C_BaseEntity::Restore( IRestore &restore )
 {
 	// loops through the data description list, restoring each data desc block in order
-	int status = RestoreDataDescBlock( restore, GetDataDescMap() );
+	int status = restore.ReadEntity(this);
 
 	// NOTE: Do *not* use GetAbsOrigin() here because it will
 	// try to recompute m_rgflCoordinateFrame!
@@ -4637,10 +4637,10 @@ int C_BaseEntity::Restore( IRestore &restore )
 // Purpose: Recursively restores all the classes in an object, in reverse order (top down)
 // Output : int 0 on failure, 1 on success
 //-----------------------------------------------------------------------------
-int C_BaseEntity::RestoreDataDescBlock( IRestore &restore, datamap_t *dmap )
-{
-	return restore.ReadAll( this, dmap );
-}
+//int C_BaseEntity::RestoreDataDescBlock( IRestore &restore, datamap_t *dmap )
+//{
+//	return restore.ReadAll( this, dmap );
+//}
 
 //-----------------------------------------------------------------------------
 // capabilities
@@ -4727,7 +4727,7 @@ void C_BaseEntity::GetToolRecordingState( KeyValues *msg )
 	{
 		state.m_nEffects |= EF_NOINTERP;
 	}
-	IEngineObject *pParent = GetEngineObject()->GetMoveParent();
+	IEngineObjectClient *pParent = GetEngineObject()->GetMoveParent();
 	while ( pParent )
 	{
 		if ( pParent->GetOuter()->IsNoInterpolationFrame() )

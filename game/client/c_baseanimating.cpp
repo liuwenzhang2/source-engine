@@ -1873,7 +1873,7 @@ void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float curre
 	float		childPoseparam[MAXSTUDIOPOSEPARAM];
 
 	// go through all children
-	for ( IEngineObject *pChild = GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
+	for ( IEngineObjectClient *pChild = GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
 	{
 		C_BaseAnimating *pChildAnimating = pChild->GetOuter()->GetBaseAnimating();
 
@@ -5731,7 +5731,7 @@ float C_BaseAnimating::SetBoneController ( int iController, float flValue )
 
 void C_BaseAnimating::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles )
 {
-	IEngineObject *pMoveParent;
+	IEngineObjectClient *pMoveParent;
 	if ( IsEffectActive( EF_BONEMERGE ) && IsEffectActive( EF_BONEMERGE_FASTCULL ) && (pMoveParent = GetEngineObject()->GetMoveParent()) != NULL )
 	{
 		// Doing this saves a lot of CPU.

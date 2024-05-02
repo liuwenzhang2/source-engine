@@ -461,7 +461,7 @@ const QAngle& C_EngineObjectInternal::GetAbsAngles(void) const
 }
 
 
-void C_EngineObjectInternal::UnlinkChild(IEngineObject* pParent, IEngineObject* pChild)
+void C_EngineObjectInternal::UnlinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild)
 {
 	Assert(pChild);
 	Assert(pParent != pChild);
@@ -495,7 +495,7 @@ void C_EngineObjectInternal::UnlinkChild(IEngineObject* pParent, IEngineObject* 
 	Interp_HierarchyUpdateInterpolationAmounts();
 }
 
-void C_EngineObjectInternal::LinkChild(IEngineObject* pParent, IEngineObject* pChild)
+void C_EngineObjectInternal::LinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild)
 {
 	Assert(!pChild->NextMovePeer());
 	Assert(!pChild->MovePrevPeer());
@@ -504,7 +504,7 @@ void C_EngineObjectInternal::LinkChild(IEngineObject* pParent, IEngineObject* pC
 
 #ifdef _DEBUG
 	// Make sure the child isn't already in this list
-	IEngineObject* pExistingChild;
+	IEngineObjectClient* pExistingChild;
 	for (pExistingChild = pParent->FirstMoveChild(); pExistingChild; pExistingChild = pExistingChild->NextMovePeer())
 	{
 		Assert(pChild != pExistingChild);
@@ -528,7 +528,7 @@ void C_EngineObjectInternal::LinkChild(IEngineObject* pParent, IEngineObject* pC
 //-----------------------------------------------------------------------------
 // Connects us up to hierarchy
 //-----------------------------------------------------------------------------
-void C_EngineObjectInternal::HierarchySetParent(IEngineObject* pNewParent)
+void C_EngineObjectInternal::HierarchySetParent(IEngineObjectClient* pNewParent)
 {
 	// NOTE: When this is called, we expect to have a valid
 	// local origin, etc. that we received from network daa
@@ -557,7 +557,7 @@ void C_EngineObjectInternal::HierarchySetParent(IEngineObject* pNewParent)
 //-----------------------------------------------------------------------------
 // Unlinks from hierarchy
 //-----------------------------------------------------------------------------
-void C_EngineObjectInternal::SetParent(IEngineObject* pParentEntity, int iParentAttachment)
+void C_EngineObjectInternal::SetParent(IEngineObjectClient* pParentEntity, int iParentAttachment)
 {
 	// NOTE: This version is meant to be called *outside* of PostDataUpdate
 	// as it assumes the moveparent has a valid handle

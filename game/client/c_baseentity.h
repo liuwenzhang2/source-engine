@@ -68,7 +68,7 @@ typedef unsigned int			AimEntsListHandle_t;
 
 extern void RecvProxy_IntToColor32( const CRecvProxyData *pData, void *pStruct, void *pOut );
 extern void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *pOut );
-extern ISaveRestoreOps* engineObjectFuncs;
+//extern ISaveRestoreOps* engineObjectFuncs;
 extern ISoundEmitterSystem* g_pSoundEmitterSystem;
 //extern HSOUNDSCRIPTHANDLE PrecacheScriptSound(const char* soundname);
 //extern void PrefetchScriptSound(const char* soundname);
@@ -196,7 +196,7 @@ enum
 };
 
 
-class IEngineObject {
+class IEngineObjectClient : public IEngineObject {
 public:
 
 	virtual C_BaseEntity* GetOuter() = 0;
@@ -247,22 +247,22 @@ public:
 	// Set the movement parent. Your local origin and angles will become relative to this parent.
 	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
 	// are relative to the attachment on this entity.
-	virtual void SetParent(IEngineObject* pParentEntity, int iParentAttachment = 0) = 0;
-	virtual void UnlinkChild(IEngineObject* pParent, IEngineObject* pChild) = 0;
-	virtual void LinkChild(IEngineObject* pParent, IEngineObject* pChild) = 0;
-	virtual void HierarchySetParent(IEngineObject* pNewParent) = 0;
+	virtual void SetParent(IEngineObjectClient* pParentEntity, int iParentAttachment = 0) = 0;
+	virtual void UnlinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild) = 0;
+	virtual void LinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild) = 0;
+	virtual void HierarchySetParent(IEngineObjectClient* pNewParent) = 0;
 	virtual void UnlinkFromHierarchy() = 0;
 
 	// Methods relating to traversing hierarchy
-	virtual IEngineObject* GetMoveParent(void) const = 0;
-	virtual void SetMoveParent(IEngineObject* pMoveParent) = 0;
-	virtual IEngineObject* GetRootMoveParent() = 0;
-	virtual IEngineObject* FirstMoveChild(void) const = 0;
-	virtual void SetFirstMoveChild(IEngineObject* pMoveChild) = 0;
-	virtual IEngineObject* NextMovePeer(void) const = 0;
-	virtual void SetNextMovePeer(IEngineObject* pMovePeer) = 0;
-	virtual IEngineObject* MovePrevPeer(void) const = 0;
-	virtual void SetMovePrevPeer(IEngineObject* pMovePrevPeer) = 0;
+	virtual IEngineObjectClient* GetMoveParent(void) const = 0;
+	virtual void SetMoveParent(IEngineObjectClient* pMoveParent) = 0;
+	virtual IEngineObjectClient* GetRootMoveParent() = 0;
+	virtual IEngineObjectClient* FirstMoveChild(void) const = 0;
+	virtual void SetFirstMoveChild(IEngineObjectClient* pMoveChild) = 0;
+	virtual IEngineObjectClient* NextMovePeer(void) const = 0;
+	virtual void SetNextMovePeer(IEngineObjectClient* pMovePeer) = 0;
+	virtual IEngineObjectClient* MovePrevPeer(void) const = 0;
+	virtual void SetMovePrevPeer(IEngineObjectClient* pMovePrevPeer) = 0;
 
 	virtual void ResetRgflCoordinateFrame() = 0;
 	// Returns the entity-to-world transform
@@ -570,8 +570,8 @@ public:
 
 private:
 
-	int SaveDataDescBlock( ISave &save, datamap_t *dmap );
-	int RestoreDataDescBlock( IRestore &restore, datamap_t *dmap );
+	//int SaveDataDescBlock( ISave &save, datamap_t *dmap );
+	//int RestoreDataDescBlock( IRestore &restore, datamap_t *dmap );
 
 public:
 	// Called after restoring data into prediction slots. This function is used in place of proxies
@@ -1154,8 +1154,8 @@ public:
 
 	//friend class C_EngineObject;
 
-	virtual IEngineObject* GetEngineObject();
-	virtual const IEngineObject* GetEngineObject() const;
+	virtual IEngineObjectClient* GetEngineObject();
+	virtual const IEngineObjectClient* GetEngineObject() const;
 
 	void				ApplyLocalVelocityImpulse( const Vector &vecImpulse );
 	void				ApplyAbsVelocityImpulse( const Vector &vecImpulse );
@@ -1652,7 +1652,7 @@ private:
 
 	string_t						m_ModelName;
 
-	//IEngineObject* m_EngineObject;
+	//IEngineObjectClient* m_EngineObject;
 
 	CNetworkVarEmbedded( CCollisionProperty, m_Collision );
 	CNetworkVarEmbedded( CParticleProperty, m_Particles );

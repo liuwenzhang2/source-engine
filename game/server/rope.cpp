@@ -169,7 +169,7 @@ void CRopeKeyframe::SetEndPoint( CBaseEntity *pEndPoint, int attachment )
 
 void CRopeKeyframe::BeforeUnlinkParent( CBaseEntity *pNewParent, int iAttachment )
 {
-	IEngineObject *pCurParent = GetEngineObject()->GetMoveParent();
+	IEngineObjectServer *pCurParent = GetEngineObject()->GetMoveParent();
 	if ( pCurParent )
 	{
 		pCurParent->GetOuter()->DecrementTransmitStateOwnedCounter();

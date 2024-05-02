@@ -548,10 +548,10 @@ void CBaseEntity::PostClientActive( void )
 {
 }
 
-IEngineObject* CBaseEntity::GetEngineObject() {
+IEngineObjectServer* CBaseEntity::GetEngineObject() {
 	return gEntList.GetEngineObject(entindex());
 }
-const IEngineObject* CBaseEntity::GetEngineObject() const {
+const IEngineObjectServer* CBaseEntity::GetEngineObject() const {
 	return gEntList.GetEngineObject(entindex());
 }
 
@@ -1637,9 +1637,9 @@ END_DATADESC()
 
 BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
-	DEFINE_CUSTOM_KEYFIELD_INVALID( m_iClassname, engineObjectFuncs, "classname" ),
-	DEFINE_CUSTOM_GLOBAL_KEYFIELD_INVALID( m_iGlobalname, engineObjectFuncs, "globalname" ),
-	DEFINE_CUSTOM_KEYFIELD_INVALID( m_iParent, engineObjectFuncs, "parentname" ),
+	//DEFINE_CUSTOM_KEYFIELD_INVALID( m_iClassname, engineObjectFuncs, "classname" ),
+	//DEFINE_CUSTOM_GLOBAL_KEYFIELD_INVALID( m_iGlobalname, engineObjectFuncs, "globalname" ),
+	//DEFINE_CUSTOM_KEYFIELD_INVALID( m_iParent, engineObjectFuncs, "parentname" ),
 
 	DEFINE_KEYFIELD( m_iHammerID, FIELD_INTEGER, "hammerid" ), // save ID numbers so that entities can be tracked between save/restore and vmf
 
@@ -1687,13 +1687,13 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 	//DEFINE_GLOBAL_FIELD( m_pParent, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_iParentAttachment, FIELD_CHARACTER ),
-	DEFINE_CUSTOM_GLOBAL_FIELD( m_hMoveParent, engineObjectFuncs),
-	DEFINE_CUSTOM_GLOBAL_FIELD( m_hMoveChild, engineObjectFuncs),
-	DEFINE_CUSTOM_GLOBAL_FIELD( m_hMovePeer, engineObjectFuncs),
+	//DEFINE_CUSTOM_GLOBAL_FIELD( m_hMoveParent, engineObjectFuncs),
+	//DEFINE_CUSTOM_GLOBAL_FIELD( m_hMoveChild, engineObjectFuncs),
+	//DEFINE_CUSTOM_GLOBAL_FIELD( m_hMovePeer, engineObjectFuncs),
 	
 	DEFINE_FIELD( m_iEFlags, FIELD_INTEGER ),
 
-	DEFINE_CUSTOM_FIELD_INVALID( m_iName, engineObjectFuncs),
+	//DEFINE_CUSTOM_FIELD_INVALID( m_iName, engineObjectFuncs),
 	DEFINE_EMBEDDED( m_Collision ),
 	DEFINE_EMBEDDED( m_Network ),
 
@@ -1716,7 +1716,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_GLOBAL_KEYFIELD( m_ModelName, FIELD_MODELNAME, "model" ),
 	
 	DEFINE_KEYFIELD( m_vecBaseVelocity, FIELD_VECTOR, "basevelocity" ),
-	DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsVelocity, engineObjectFuncs),
+	//DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsVelocity, engineObjectFuncs),
 	DEFINE_KEYFIELD( m_vecAngVelocity, FIELD_VECTOR, "avelocity" ),
 //	DEFINE_FIELD( m_vecAbsAngVelocity, FIELD_VECTOR ),
 	//DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
@@ -1736,17 +1736,17 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 //	DEFINE_FIELD( m_nPushEnumCount, FIELD_INTEGER ),
 
-	DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsOrigin, engineObjectFuncs),
-	DEFINE_CUSTOM_KEYFIELD_INVALID( m_vecVelocity, engineObjectFuncs, "velocity" ),
+	//DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsOrigin, engineObjectFuncs),
+	//DEFINE_CUSTOM_KEYFIELD_INVALID( m_vecVelocity, engineObjectFuncs, "velocity" ),
 	DEFINE_KEYFIELD( m_iTextureFrameIndex, FIELD_CHARACTER, "texframeindex" ),
 	DEFINE_FIELD( m_bSimulatedEveryTick, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bAnimatedEveryTick, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bAlternateSorting, FIELD_BOOLEAN ),
 	DEFINE_KEYFIELD( m_spawnflags, FIELD_INTEGER, "spawnflags" ),
 	DEFINE_FIELD( m_nTransmitStateOwnedCounter, FIELD_CHARACTER ),
-	DEFINE_CUSTOM_FIELD_INVALID( m_angAbsRotation, engineObjectFuncs),
-	DEFINE_CUSTOM_FIELD_INVALID( m_vecOrigin, engineObjectFuncs),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
-	DEFINE_CUSTOM_FIELD_INVALID( m_angRotation, engineObjectFuncs),
+	//DEFINE_CUSTOM_FIELD_INVALID( m_angAbsRotation, engineObjectFuncs),
+	//DEFINE_CUSTOM_FIELD_INVALID( m_vecOrigin, engineObjectFuncs),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
+	//DEFINE_CUSTOM_FIELD_INVALID( m_angRotation, engineObjectFuncs),
 
 	DEFINE_KEYFIELD( m_vecViewOffset, FIELD_VECTOR, "view_ofs" ),
 
@@ -1905,7 +1905,7 @@ void CBaseEntity::UpdateOnRemove( void )
 
 	// If we have a parent, unlink from it.
 	this->BeforeUnlinkParent(NULL);
-	IEngineObject::UnlinkFromParent( this->GetEngineObject());
+	IEngineObjectServer::UnlinkFromParent( this->GetEngineObject());
 
 	// Any children still connected are orphans, mark all for delete
 	CUtlVector<CBaseEntity *> childrenList;
@@ -2440,7 +2440,7 @@ void CBaseEntity::SetMoveDoneTime( float flDelay )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsRelinkChildren( float dt )
 {
-	IEngineObject *child;
+	IEngineObjectServer *child;
 
 	// iterate through all children
 	for ( child = GetEngineObject()->FirstMoveChild(); child != NULL; child = child->NextMovePeer() )
@@ -2982,7 +2982,7 @@ Vector CBaseEntity::GetSoundEmissionOrigin() const
 int CBaseEntity::Save( ISave &save )
 {
 	// loop through the data description list, saving each data desc block
-	int status = SaveDataDescBlock( save, GetDataDescMap() );
+	int status = save.WriteEntity(this);
 
 	return status;
 }
@@ -2991,10 +2991,10 @@ int CBaseEntity::Save( ISave &save )
 // Purpose: Recursively saves all the classes in an object, in reverse order (top down)
 // Output : int 0 on failure, 1 on success
 //-----------------------------------------------------------------------------
-int CBaseEntity::SaveDataDescBlock( ISave &save, datamap_t *dmap )
-{
-	return save.WriteAll( this, dmap );
-}
+//int CBaseEntity::SaveDataDescBlock( ISave &save, datamap_t *dmap )
+//{
+//	return save.WriteAll( this, dmap );
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: Restores the current object from disk, by iterating through the objects
@@ -3008,7 +3008,7 @@ int CBaseEntity::Restore( IRestore &restore )
 	CollisionProp()->DestroyPartitionHandle();
 
 	// loops through the data description list, restoring each data desc block in order
-	int status = RestoreDataDescBlock( restore, GetDataDescMap() );
+	int status = restore.ReadEntity(this);;
 
 	// ---------------------------------------------------------------
 	// HACKHACK: We don't know the space of these vectors until now
@@ -3131,7 +3131,7 @@ void CBaseEntity::OnRestore()
 			Warning("Fixing up parent on %s\n", GetClassname() );
 #endif
 			// We only need to be back in the parent's list because we're already in the right place and with the right data
-			IEngineObject::LinkChild(GetMoveParent()->GetEngineObject(), this->GetEngineObject());
+			IEngineObjectServer::LinkChild(GetMoveParent()->GetEngineObject(), this->GetEngineObject());
 			this->AfterLinkParent(NULL);
 		}
 	}
@@ -3145,10 +3145,10 @@ void CBaseEntity::OnRestore()
 // Purpose: Recursively restores all the classes in an object, in reverse order (top down)
 // Output : int 0 on failure, 1 on success
 //-----------------------------------------------------------------------------
-int CBaseEntity::RestoreDataDescBlock( IRestore &restore, datamap_t *dmap )
-{
-	return restore.ReadAll( this, dmap );
-}
+//int CBaseEntity::RestoreDataDescBlock( IRestore &restore, datamap_t *dmap )
+//{
+//	return restore.ReadAll( this, dmap );
+//}
 
 //-----------------------------------------------------------------------------
 
@@ -3966,7 +3966,7 @@ void CBaseEntity::InputKill( inputdata_t &inputdata )
 
 void CBaseEntity::InputKillHierarchy( inputdata_t &inputdata )
 {
-	IEngineObject *pChild, *pNext;
+	IEngineObjectServer *pChild, *pNext;
 	for ( pChild = GetEngineObject()->FirstMoveChild(); pChild; pChild = pNext )
 	{
 		pNext = pChild->NextMovePeer();
@@ -4338,7 +4338,7 @@ static void BuildTeleportList_r( CBaseEntity *pTeleport, CUtlVector<TeleportList
 
 	teleportList.AddToTail( entry );
 
-	IEngineObject *pList = pTeleport->GetEngineObject()->FirstMoveChild();
+	IEngineObjectServer *pList = pTeleport->GetEngineObject()->FirstMoveChild();
 	while ( pList )
 	{
 		BuildTeleportList_r( pList->GetOuter(), teleportList);
@@ -6714,12 +6714,12 @@ void CBaseEntity::SUB_FadeOut( void  )
 }
 
 
-inline bool AnyPlayersInHierarchy_R( IEngineObject *pEnt )
+inline bool AnyPlayersInHierarchy_R( IEngineObjectServer *pEnt )
 {
 	if ( pEnt->GetOuter()->IsPlayer())
 		return true;
 
-	for ( IEngineObject *pCur = pEnt->FirstMoveChild(); pCur; pCur = pCur->NextMovePeer())
+	for ( IEngineObjectServer *pCur = pEnt->FirstMoveChild(); pCur; pCur = pCur->NextMovePeer())
 	{
 		if ( AnyPlayersInHierarchy_R( pCur ) )
 			return true;

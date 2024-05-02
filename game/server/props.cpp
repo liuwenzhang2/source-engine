@@ -422,7 +422,7 @@ void CBreakableProp::ClearEnableMotionPosition()
 	CBaseEntity *pFixup = FindEnableMotionFixup();
 	if ( pFixup )
 	{
-		IEngineObject::UnlinkFromParent( pFixup->GetEngineObject());
+		IEngineObjectServer::UnlinkFromParent( pFixup->GetEngineObject());
 		UTIL_Remove( pFixup );
 	}
 }

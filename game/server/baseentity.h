@@ -326,7 +326,7 @@ a list of all CBaseEntitys is kept in gEntList
 // calls the spawn functions for an entity
 extern int DispatchSpawn( CBaseEntity *pEntity );
 
-extern ISaveRestoreOps* engineObjectFuncs;
+//extern ISaveRestoreOps* engineObjectFuncs;
 extern ISoundEmitterSystem* g_pSoundEmitterSystem;
 extern CServerGameDLL g_ServerGameDLL;
 
@@ -349,7 +349,7 @@ struct thinkfunc_t
 struct EmitSound_t;
 struct rotatingpushmove_t;
 
-class IEngineObject {
+class IEngineObjectServer : public IEngineObject {
 public:
 
 	virtual CBaseEntity* GetOuter() = 0;
@@ -382,12 +382,12 @@ public:
 	virtual void CalcAbsolutePosition() = 0;
 	virtual void CalcAbsoluteVelocity() = 0;
 
-	virtual IEngineObject* GetMoveParent(void) = 0;
+	virtual IEngineObjectServer* GetMoveParent(void) = 0;
 	virtual void SetMoveParent(EHANDLE hMoveParent) = 0;
-	virtual IEngineObject* GetRootMoveParent() = 0;
-	virtual IEngineObject* FirstMoveChild(void) = 0;
+	virtual IEngineObjectServer* GetRootMoveParent() = 0;
+	virtual IEngineObjectServer* FirstMoveChild(void) = 0;
 	virtual void SetFirstMoveChild(EHANDLE hMoveChild) = 0;
-	virtual IEngineObject* NextMovePeer(void) = 0;
+	virtual IEngineObjectServer* NextMovePeer(void) = 0;
 	virtual void SetNextMovePeer(EHANDLE hMovePeer) = 0;
 
 	virtual void ResetRgflCoordinateFrame() = 0;
@@ -418,15 +418,15 @@ public:
 	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
 	// are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
 	// current m_iParentAttachment.
-	virtual void	SetParent(IEngineObject* pNewParent, int iAttachment = -1) = 0;
+	virtual void	SetParent(IEngineObjectServer* pNewParent, int iAttachment = -1) = 0;
 	// FIXME: Make hierarchy a member of CBaseEntity
 	// or a contained private class...
-	static void UnlinkChild(IEngineObject* pParent, IEngineObject* pChild);
-	static void LinkChild(IEngineObject* pParent, IEngineObject* pChild);
-	static void ClearParent(IEngineObject* pEntity);
-	static void UnlinkAllChildren(IEngineObject* pParent);
-	static void UnlinkFromParent(IEngineObject* pRemove);
-	static void TransferChildren(IEngineObject* pOldParent, IEngineObject* pNewParent);
+	static void UnlinkChild(IEngineObjectServer* pParent, IEngineObjectServer* pChild);
+	static void LinkChild(IEngineObjectServer* pParent, IEngineObjectServer* pChild);
+	static void ClearParent(IEngineObjectServer* pEntity);
+	static void UnlinkAllChildren(IEngineObjectServer* pParent);
+	static void UnlinkFromParent(IEngineObjectServer* pRemove);
+	static void TransferChildren(IEngineObjectServer* pOldParent, IEngineObjectServer* pNewParent);
 
 	virtual int				AreaNum() const = 0;
 	virtual PVSInfo_t* GetPVSInfo() = 0;
@@ -876,8 +876,8 @@ public:
 	void		 SetAIWalkable( bool bBlocksLOS );
 	bool		 IsAIWalkable( void );
 private:
-	int SaveDataDescBlock( ISave &save, datamap_t *dmap );
-	int RestoreDataDescBlock( IRestore &restore, datamap_t *dmap );
+	//int SaveDataDescBlock( ISave &save, datamap_t *dmap );
+	//int RestoreDataDescBlock( IRestore &restore, datamap_t *dmap );
 
 public:
 	// Networking related methods
@@ -1383,8 +1383,8 @@ public:
 	virtual void SetViewOffset( const Vector &v );
 
 	//can not call this in constructor!
-	virtual IEngineObject* GetEngineObject();
-	virtual const IEngineObject* GetEngineObject() const;
+	virtual IEngineObjectServer* GetEngineObject();
+	virtual const IEngineObjectServer* GetEngineObject() const;
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel
 	void			ApplyLocalVelocityImpulse( const Vector &vecImpulse );

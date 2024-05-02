@@ -131,6 +131,7 @@ public:
 	// Datamap based writing
 	//
 	
+	virtual int		WriteEntity(IHandleEntity* pHandleEntity) = 0;
 	virtual int		WriteAll( const void *pLeafObject, datamap_t *pLeafMap ) = 0;
 	virtual int		WriteFields( const char *pname, const void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldCount ) = 0;
 
@@ -232,6 +233,7 @@ public:
 	// Datamap based reading
 	//
 	
+	virtual int		ReadEntity(IHandleEntity* pHandleEntity) = 0;
 	virtual int		ReadAll( void *pLeafObject, datamap_t *pLeafMap ) = 0;
 	
 	virtual int		ReadFields( const char *pname, void *pBaseData, datamap_t *pMap, typedescription_t *pFields, int fieldcount = 1 ) = 0;

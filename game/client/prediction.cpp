@@ -618,7 +618,7 @@ void CPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *
 	move->m_nImpulseCommand = ucmd->impulse;	
 	move->m_nButtons		= ucmd->buttons;
 
-	IEngineObject *pMoveParent = player->GetEngineObject()->GetMoveParent();
+	IEngineObjectClient *pMoveParent = player->GetEngineObject()->GetMoveParent();
 	if (!pMoveParent)
 	{
 		move->m_vecAbsViewAngles = move->m_vecViewAngles;
@@ -1117,7 +1117,7 @@ void CPrediction::RestoreOriginalEntityState( void )
 
 		if ( ent->GetPredictable() )
 		{
-			ent->GetEngineObject()->RestoreData( "RestoreOriginalEntityState", IEngineObject::SLOT_ORIGINALDATA, PC_EVERYTHING );
+			ent->GetEngineObject()->RestoreData( "RestoreOriginalEntityState", IEngineObjectClient::SLOT_ORIGINALDATA, PC_EVERYTHING );
 		}
 	}
 #endif
@@ -1252,7 +1252,7 @@ void InvalidateEFlagsRecursive( C_BaseEntity *pEnt, int nDirtyFlags, int nChildF
 {
 	pEnt->AddEFlags( nDirtyFlags );
 	nDirtyFlags |= nChildFlags;
-	for (IEngineObject *pChild = pEnt->GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer())
+	for (IEngineObjectClient *pChild = pEnt->GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer())
 	{
 		InvalidateEFlagsRecursive( pChild->GetOuter(), nDirtyFlags);
 	}

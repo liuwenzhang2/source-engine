@@ -97,7 +97,7 @@ extern bool g_fInCleanupDelete;
 extern void PhysOnCleanupDeleteList();
 
 
-class CEngineObjectInternal : public IEngineObject {
+class CEngineObjectInternal : public IEngineObjectServer {
 public:
 	DECLARE_CLASS_NOBASE(CEngineObjectInternal);
 	//DECLARE_EMBEDDED_NETWORKVAR();
@@ -197,7 +197,7 @@ public:
 	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
 	// are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
 	// current m_iParentAttachment.
-	void	SetParent(IEngineObject* pNewParent, int iAttachment = -1);
+	void	SetParent(IEngineObjectServer* pNewParent, int iAttachment = -1);
 	// FIXME: Make hierarchy a member of CBaseEntity
 	// or a contained private class...
 	//static void UnlinkChild(CEngineObject* pParent, CEngineObject* pChild);
@@ -346,7 +346,7 @@ public:
 	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
 	CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
 	void				DestroyEntity(IHandleEntity* pEntity);
-	IEngineObject*		GetEngineObject(int entnum);
+	IEngineObjectServer*		GetEngineObject(int entnum);
 	IServerNetworkable* GetServerNetworkable( CBaseHandle hEnt ) const;
 	IServerNetworkable* GetServerNetworkable(int entnum) const;
 	IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const;
@@ -487,7 +487,7 @@ inline void	CGlobalEntityList<T>::DestroyEntity(IHandleEntity* pEntity) {
 //}
 
 template<class T>
-inline IEngineObject* CGlobalEntityList<T>::GetEngineObject(int entnum) {
+inline IEngineObjectServer* CGlobalEntityList<T>::GetEngineObject(int entnum) {
 	return m_EngineObjectArray[entnum];
 }
 

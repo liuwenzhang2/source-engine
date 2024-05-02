@@ -18,14 +18,14 @@
 // Input  : pParent - 
 //			pChild - 
 //-----------------------------------------------------------------------------
-void IEngineObject::UnlinkChild( IEngineObject *pParent, IEngineObject *pChild )
+void IEngineObjectServer::UnlinkChild( IEngineObjectServer *pParent, IEngineObjectServer *pChild )
 {
-	IEngineObject *pList = pParent->FirstMoveChild();
-	IEngineObject *pPrev = NULL;
+	IEngineObjectServer *pList = pParent->FirstMoveChild();
+	IEngineObjectServer *pPrev = NULL;
 	
 	while ( pList )
 	{
-		IEngineObject *pNext = pList->NextMovePeer();
+		IEngineObjectServer *pNext = pList->NextMovePeer();
 		if ( pList == pChild )
 		{
 			// patch up the list
@@ -56,7 +56,7 @@ void IEngineObject::UnlinkChild( IEngineObject *pParent, IEngineObject *pChild )
 	Assert(0);
 }
 
-void IEngineObject::LinkChild( IEngineObject *pParent, IEngineObject *pChild )
+void IEngineObjectServer::LinkChild( IEngineObjectServer *pParent, IEngineObjectServer *pChild )
 {
 	//EHANDLE hParent;
 	//hParent.Set( pParent->GetOuter() );
@@ -69,9 +69,9 @@ void IEngineObject::LinkChild( IEngineObject *pParent, IEngineObject *pChild )
 	pParent->GetOuter()->RecalcHasPlayerChildBit();
 }
 
-void IEngineObject::TransferChildren( IEngineObject *pOldParent, IEngineObject *pNewParent )
+void IEngineObjectServer::TransferChildren( IEngineObjectServer *pOldParent, IEngineObjectServer *pNewParent )
 {
-	IEngineObject *pChild = pOldParent->FirstMoveChild();
+	IEngineObjectServer *pChild = pOldParent->FirstMoveChild();
 	while ( pChild )
 	{
 		// NOTE: Have to do this before the unlink to ensure local coords are valid
@@ -98,7 +98,7 @@ void IEngineObject::TransferChildren( IEngineObject *pOldParent, IEngineObject *
 	}
 }
 
-void IEngineObject::UnlinkFromParent( IEngineObject *pRemove )
+void IEngineObjectServer::UnlinkFromParent( IEngineObjectServer *pRemove )
 {
 	if ( pRemove->GetMoveParent() )
 	{
@@ -122,12 +122,12 @@ void IEngineObject::UnlinkFromParent( IEngineObject *pRemove )
 //-----------------------------------------------------------------------------
 // Purpose: Clears the parent of all the children of the given object.
 //-----------------------------------------------------------------------------
-void IEngineObject::UnlinkAllChildren( IEngineObject *pParent )
+void IEngineObjectServer::UnlinkAllChildren( IEngineObjectServer *pParent )
 {
-	IEngineObject *pChild = pParent->FirstMoveChild();
+	IEngineObjectServer *pChild = pParent->FirstMoveChild();
 	while ( pChild )
 	{
-		IEngineObject *pNext = pChild->NextMovePeer();
+		IEngineObjectServer *pNext = pChild->NextMovePeer();
 		UnlinkFromParent( pChild );
 		pChild  = pNext;
 	}

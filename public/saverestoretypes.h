@@ -472,7 +472,7 @@ inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToke
 	}
 #endif
 
-	for ( int i=0; i<tokenCount; i++ )
+	for ( int i= hash; i< hash + tokenCount; i++ )
 	{
 #if _DEBUG
 		static bool beentheredonethat = false;
@@ -483,9 +483,9 @@ inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToke
 		}
 #endif
 
-		int	index = hash + i;
-		if ( index >= tokenCount )
-			index -= tokenCount;
+		int	index = i % tokenCount;
+		//if ( index >= tokenCount )
+		//	index -= tokenCount;
 
 		if ( !pTokens[index] || strcmp( pszToken, pTokens[index] ) == 0 )
 		{
