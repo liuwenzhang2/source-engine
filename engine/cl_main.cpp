@@ -2283,12 +2283,12 @@ CON_COMMAND_F( cl_showents, "Dump entity list to console.", FCVAR_CHEAT )
 	for ( int i = 0; i < entitylist->GetMaxEntities(); i++ )
 	{
 		char entStr[256], classStr[256];
-		IClientNetworkable *pEnt;
+		IClientEntity *pClientEntity;
 
-		if((pEnt = entitylist->GetClientNetworkable(i)) != NULL)
+		if((pClientEntity = entitylist->GetClientEntity(i)) != NULL)
 		{
 			entStr[0] = 0;
-			Q_snprintf(classStr, sizeof( classStr ), "'%s'", pEnt->GetClientClass()->m_pNetworkName);
+			Q_snprintf(classStr, sizeof( classStr ), "'%s'", pClientEntity->GetClientClass()->m_pNetworkName);
 		}
 		else
 		{
@@ -2296,7 +2296,7 @@ CON_COMMAND_F( cl_showents, "Dump entity list to console.", FCVAR_CHEAT )
 			Q_snprintf(classStr, sizeof( classStr ), "(missing)");
 		}
 
-		if ( pEnt )
+		if (pClientEntity)
 			ConMsg("Ent %3d: %s class %s\n", i, entStr, classStr);
 	}
 }

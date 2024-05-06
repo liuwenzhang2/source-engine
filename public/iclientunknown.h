@@ -22,7 +22,7 @@ class IClientRenderable;
 class ICollideable;
 class IClientEntity;
 class IClientThinkable;
-
+class ClientClass;
 
 
 // This is the client's version of IUnknown. We may want to use a QueryInterface-like
@@ -48,6 +48,7 @@ public:
 	virtual IClientEntity*		GetIClientEntity() = 0;
 	virtual C_BaseEntity*		GetBaseEntity() = 0;
 	virtual IClientThinkable*	GetClientThinkable() = 0;
+	virtual ClientClass*		GetClientClass() = 0;
 private:
 	CBaseHandle m_RefEHandle;
 };

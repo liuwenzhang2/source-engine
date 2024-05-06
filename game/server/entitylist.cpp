@@ -42,10 +42,6 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGlobalEntityList, IServerEntityList, VSERVERE
 //  (CClientEntityList instead of IClientEntityList )
 CGlobalEntityList<CBaseEntity>* sv_entitylist = &gEntList;
 
-// -------------------------------------------------------------------------------------------------- //
-// Game-code CBaseHandle implementation.
-// -------------------------------------------------------------------------------------------------- //
-
 BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_vecOrigin, FIELD_VECTOR),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
 	DEFINE_FIELD(m_angRotation, FIELD_VECTOR),
@@ -61,6 +57,19 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_KEYFIELD(m_iParent, FIELD_STRING, "parentname"),
 	DEFINE_FIELD(m_iName, FIELD_STRING),
 END_DATADESC()
+
+BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
+
+END_SEND_TABLE()
+
+void CEngineObjectNetworkProperty::Init(CEngineObjectInternal* pEntity) {
+	CServerNetworkProperty::Init();
+	m_pOuter = pEntity;
+}
+
+SendTable* CEngineObjectNetworkProperty::GetSendTable() {
+	return &DT_EngineObject::g_SendTable;
+}
 
 #include "tier0/memdbgoff.h"
 //-----------------------------------------------------------------------------

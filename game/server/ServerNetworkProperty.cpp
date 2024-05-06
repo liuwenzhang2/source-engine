@@ -35,7 +35,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 CServerNetworkProperty::CServerNetworkProperty()
 {
-	Init( NULL );
+	Init();
 }
 
 
@@ -57,7 +57,7 @@ CServerNetworkProperty::~CServerNetworkProperty()
 //-----------------------------------------------------------------------------
 // Initialization
 //-----------------------------------------------------------------------------
-void CServerNetworkProperty::Init( CBaseEntity *pEntity )
+void CServerNetworkProperty::Init()
 {
 	//m_pPev = NULL;
 	//m_pOuter = pEntity;
@@ -203,6 +203,4 @@ void CServerNetworkProperty::FireEvent()
 		m_bPendingStateChange = false;
 	}
 }
-
-
 

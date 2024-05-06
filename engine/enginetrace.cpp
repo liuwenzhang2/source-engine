@@ -1313,12 +1313,12 @@ void CEngineTraceClient::HandleEntityToCollideable( IHandleEntity *pHandleEntity
 	
 	*ppCollide = pUnk->GetCollideable();
 	*ppDebugName = "client entity";
-	IClientNetworkable *pNetwork = pUnk->GetClientNetworkable();
-	if (pNetwork)
+	IClientEntity *pClientEntity = pUnk->GetIClientEntity();
+	if (pClientEntity)
 	{
-		if (pNetwork->GetClientClass())
+		if (pClientEntity->GetClientClass())
 		{
-			*ppDebugName = pNetwork->GetClientClass()->m_pNetworkName;
+			*ppDebugName = pClientEntity->GetClientClass()->m_pNetworkName;
 		}
 	}
 }

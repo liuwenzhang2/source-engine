@@ -93,7 +93,7 @@ public:
 
 	// Tell the engine which class this object is.
 	//virtual ServerClass*	GetServerClass() = 0;
-
+	virtual SendTable*		GetSendTable() = 0;
 	//virtual edict_t			*GetEdict() const = 0;
 	virtual bool			HasStateChanged() const = 0;
 	virtual void			ClearStateChanged() = 0;

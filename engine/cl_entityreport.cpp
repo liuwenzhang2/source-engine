@@ -391,7 +391,7 @@ void CEntityReportPanel::ApplyEffect( ENTITYBITS *entry, int& r, int& g, int& b 
 //-----------------------------------------------------------------------------
 bool CEntityReportPanel::DrawEntry( int row, int col, int rowheight, int colwidth, int entityIdx )
 {
-	IClientNetworkable *pNet;
+	IClientEntity		*pClientEntity;
 	ClientClass			*pClientClass;
 	bool				inpvs;
 	int					r, g, b, a;
@@ -401,15 +401,15 @@ bool CEntityReportPanel::DrawEntry( int row, int col, int rowheight, int colwidt
 	int top = 5;
 	int left = 5;
 
-	pNet	= entitylist->GetClientNetworkable( entityIdx );
+	pClientEntity = entitylist->GetClientEntity( entityIdx );
 	
 	entry = &s_EntityBits[ entityIdx ];
 
 	effectactive = ( realtime <= entry->effectfinishtime ) ? true : false;
 
-	if ( pNet && ((pClientClass = pNet->GetClientClass())) != NULL )
+	if (pClientEntity && ((pClientClass = pClientEntity->GetClientClass())) != NULL )
 	{
-		inpvs = !pNet->IsDormant();
+		inpvs = !pClientEntity->IsDormant();
 		if ( inpvs )
 		{
 			if ( entry->average >= 5 )
@@ -523,7 +523,7 @@ void CEntityReportPanel::Paint()
 	int colwidth = 160;
 	int rowheight = vgui::surface()->GetFontTall( m_hFont );
 
-	IClientNetworkable *pNet;
+	IClientEntity		*pClientEntity;
 	bool				effectactive;
 	ENTITYBITS			*entry;
 
@@ -531,13 +531,13 @@ void CEntityReportPanel::Paint()
 
 	while ( lastused > 0 )
 	{
-		pNet	= entitylist->GetClientNetworkable( lastused );
+		pClientEntity = entitylist->GetClientEntity( lastused );
 
 		entry = &s_EntityBits[ lastused ];
 
 		effectactive = ( realtime <= entry->effectfinishtime ) ? true : false;
 
-		if ( pNet && pNet->GetClientClass() )
+		if (pClientEntity && pClientEntity->GetClientClass() )
 		{
 			break;
 		}

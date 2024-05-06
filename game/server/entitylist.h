@@ -96,6 +96,17 @@ public:
 extern bool g_fInCleanupDelete;
 extern void PhysOnCleanupDeleteList();
 
+class CEngineObjectInternal;
+
+class CEngineObjectNetworkProperty : public CServerNetworkProperty {
+public:
+	void Init(CEngineObjectInternal* pEntity);
+
+	SendTable* GetSendTable();
+
+private:
+	CEngineObjectInternal* m_pOuter = NULL;;
+};
 
 class CEngineObjectInternal : public IEngineObjectServer {
 public:
@@ -263,6 +274,10 @@ public:
 	bool		NameMatches(string_t nameStr);
 	bool		ClassMatches(string_t nameStr);
 
+	CEngineObjectNetworkProperty* NetworkProp();
+	const CEngineObjectNetworkProperty* NetworkProp() const;
+	IServerNetworkable* GetNetworkable();
+
 private:
 	bool		NameMatchesComplex(const char* pszNameOrWildcard);
 	bool		ClassMatchesComplex(const char* pszClassOrWildcard);
@@ -297,6 +312,7 @@ private:
 	string_t m_iParent;	// the name of the entities parent; linked into m_pParent during Activate()
 	string_t m_iName;	// name used to identify this entity
 
+	CEngineObjectNetworkProperty m_Network;
 };
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()
@@ -322,6 +338,20 @@ inline void CEngineObjectInternal::MarkPVSInformationDirty()
 	m_bPVSInfoDirty = true;
 }
 
+inline CEngineObjectNetworkProperty* CEngineObjectInternal::NetworkProp()
+{
+	return &m_Network;
+}
+
+inline const CEngineObjectNetworkProperty* CEngineObjectInternal::NetworkProp() const
+{
+	return &m_Network;
+}
+
+inline IServerNetworkable* CEngineObjectInternal::GetNetworkable()
+{
+	return &m_Network;
+}
 //-----------------------------------------------------------------------------
 // Purpose: a global list of all the entities in the game.  All iteration through
 //			entities is done through this object.

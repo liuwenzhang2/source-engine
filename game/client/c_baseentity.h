@@ -339,7 +339,7 @@ public:
 
 	virtual void SetClassname(const char* className) = 0;
 	virtual const string_t& GetClassname() const = 0;
-
+	virtual IClientNetworkable* GetClientNetworkable() = 0;
 };
 
 

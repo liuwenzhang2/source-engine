@@ -38,11 +38,12 @@ public:
 	//virtual ServerClass*	GetServerClass();
 	//virtual const char*		GetClassName() const;
 	//virtual void			Release();
+	virtual SendTable*		GetSendTable() = 0;
 	virtual int&			GetTransmitState();
 	virtual void			ClearTransmitState();
 public:
 	// Other public methods
-	void Init(CBaseEntity* pEntity);
+	void Init();
 	//void SetEntIndex(int entindex);
 	//void AttachEdict(int pRequiredEdict = -1);
 
@@ -317,9 +318,6 @@ inline const unsigned short	CServerNetworkProperty::GetNumStateChangedOffsets() 
 //{
 //	m_entindex = pEdict->m_EdictIndex;
 //}
-
-
-
 
 
 #endif // SERVERNETWORKPROPERTY_H

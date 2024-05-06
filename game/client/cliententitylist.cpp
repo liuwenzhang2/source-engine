@@ -72,6 +72,14 @@ BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
 	DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
 END_DATADESC()
 
+BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
+
+END_RECV_TABLE()
+
+RecvTable* C_EngineObjectInternal::GetRecvTable() {
+	return &DT_EngineObject::g_RecvTable;
+}
+
 #include "tier0/memdbgoff.h"
 
 //-----------------------------------------------------------------------------

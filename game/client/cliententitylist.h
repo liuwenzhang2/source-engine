@@ -98,12 +98,23 @@ public:
 	unsigned short m_PVSNotifiersLink;			// Into m_PVSNotifyInfos.
 };
 
-class C_EngineObjectInternal : public IEngineObjectClient {
+class C_EngineObjectInternal : public IEngineObjectClient, public IClientNetworkable {
 public:
 	DECLARE_CLASS_NOBASE(C_EngineObjectInternal);
 	DECLARE_PREDICTABLE();
 	// data description
 	DECLARE_DATADESC();
+
+	RecvTable* GetRecvTable();
+	void NotifyShouldTransmit(ShouldTransmitState_t state) {}
+	void OnPreDataChanged(DataUpdateType_t updateType) {}
+	void OnDataChanged(DataUpdateType_t updateType) {}
+	void PreDataUpdate(DataUpdateType_t updateType) {}
+	void PostDataUpdate(DataUpdateType_t updateType) {}
+	bool IsDormant(void) { return false; }
+	void ReceiveMessage(int classID, bf_read& msg) {}
+	void* GetDataTableBasePtr() { return this; }
+	void SetDestroyedOnRecreateEntities(void) {}
 
 	// memory handling, uses calloc so members are zero'd out on instantiation
 	void* operator new(size_t stAllocateBlock);
@@ -282,6 +293,9 @@ public:
 		return 	m_iClassname;
 	}
 
+	IClientNetworkable* GetClientNetworkable() {
+		return this;
+	}
 #if !defined( NO_ENTITY_PREDICTION )
 	// For storing prediction results and pristine network state
 	byte* m_pIntermediateData[MULTIPLAYER_BACKUP];

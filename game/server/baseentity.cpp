@@ -98,6 +98,15 @@ bool CBaseEntity::s_bAbsQueriesValid = true;
 
 ConVar sv_netvisdist( "sv_netvisdist", "10000", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Test networking visibility distance" );
 
+void CEntityNetworkProperty::Init(CBaseEntity* pEntity) {
+	CServerNetworkProperty::Init();
+	m_pOuter = pEntity;
+}
+
+SendTable* CEntityNetworkProperty::GetSendTable() {
+	return m_pOuter->GetServerClass()->m_pTable;
+}
+
 // This table encodes edict data.
 void SendProxy_AnimTime( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID )
 {

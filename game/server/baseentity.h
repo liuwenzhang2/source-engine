@@ -455,10 +455,18 @@ public:
 	virtual bool ClassMatches(const char* pszClassOrWildcard) = 0;
 	virtual bool NameMatches(string_t nameStr) = 0;
 	virtual bool ClassMatches(string_t nameStr) = 0;
-
+	virtual IServerNetworkable* GetNetworkable() = 0;
 };
 
+class CEntityNetworkProperty : public CServerNetworkProperty {
+public:
+	void Init(CBaseEntity* pEntity);
 
+	SendTable* GetSendTable();
+
+private:
+	CBaseEntity* m_pOuter = NULL;;
+};
 
 //#define CREATE_PREDICTED_ENTITY( className )	\
 //	CBaseEntity::CreatePredictedEntityByName( className, __FILE__, __LINE__ );
@@ -545,8 +553,8 @@ public:
 	// An inline version the game code can use
 	CCollisionProperty		*CollisionProp();
 	const CCollisionProperty*CollisionProp() const;
-	CServerNetworkProperty *NetworkProp();
-	const CServerNetworkProperty *NetworkProp() const;
+	CEntityNetworkProperty *NetworkProp();
+	const CEntityNetworkProperty *NetworkProp() const;
 
 	PVSInfo_t* GetPVSInfo() {
 		return GetEngineObject()->GetPVSInfo();
@@ -928,7 +936,7 @@ public:
 
 private:
 	// NOTE: Keep this near vtable so it's in cache with vtable.
-	CServerNetworkProperty m_Network;
+	CEntityNetworkProperty m_Network;
 
 public:
 
@@ -2427,12 +2435,12 @@ inline const CCollisionProperty *CBaseEntity::CollisionProp() const
 	return &m_Collision;
 }
 
-inline CServerNetworkProperty *CBaseEntity::NetworkProp()
+inline CEntityNetworkProperty *CBaseEntity::NetworkProp()
 {
 	return &m_Network;
 }
 
-inline const CServerNetworkProperty *CBaseEntity::NetworkProp() const
+inline const CEntityNetworkProperty *CBaseEntity::NetworkProp() const
 {
 	return &m_Network;
 }

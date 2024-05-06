@@ -18,6 +18,7 @@
 
 class IClientEntity;
 class ClientClass;
+class RecvTable;
 
 
 enum ShouldTransmitState_t
@@ -51,7 +52,8 @@ public:
 	//virtual void			Release() = 0;
 
 	// Supplied automatically by the IMPLEMENT_CLIENTCLASS macros.
-	virtual ClientClass*	GetClientClass() = 0;
+	//virtual ClientClass*	GetClientClass() = 0;
+	virtual RecvTable*		GetRecvTable() = 0;
 
 	// This tells the entity what the server says for ShouldTransmit on this entity.
 	// Note: This used to be EntityEnteredPVS/EntityRemainedInPVS/EntityLeftPVS.
