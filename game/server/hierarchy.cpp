@@ -30,9 +30,9 @@ void IEngineObjectServer::UnlinkChild( IEngineObjectServer *pParent, IEngineObje
 		{
 			// patch up the list
 			if (!pPrev) {
-				pParent->SetFirstMoveChild(pNext?pNext->GetOuter():NULL);
+				pParent->SetFirstMoveChild(pNext);
 			}else{
-				pPrev->SetNextMovePeer(pNext?pNext->GetOuter():NULL);
+				pPrev->SetNextMovePeer(pNext);
 			}
 
 			// Clear hierarchy bits for this guy
@@ -60,9 +60,9 @@ void IEngineObjectServer::LinkChild( IEngineObjectServer *pParent, IEngineObject
 {
 	//EHANDLE hParent;
 	//hParent.Set( pParent->GetOuter() );
-	pChild->SetNextMovePeer( pParent->GetOuter()->FirstMoveChild());
-	pParent->SetFirstMoveChild( pChild->GetOuter() );
-	pChild->SetMoveParent(pParent->GetOuter());
+	pChild->SetNextMovePeer( pParent->FirstMoveChild());
+	pParent->SetFirstMoveChild( pChild );
+	pChild->SetMoveParent(pParent);
 	//pChild->GetOuter()->NetworkProp()->SetNetworkParent(pParent->GetOuter());
 	pChild->GetOuter()->DispatchUpdateTransmitState();
 	pChild->GetOuter()->OnEntityEvent( ENTITY_EVENT_PARENT_CHANGED, NULL );

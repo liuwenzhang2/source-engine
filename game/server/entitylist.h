@@ -173,12 +173,12 @@ public:
 	void					CalcAbsoluteVelocity();
 
 	CEngineObjectInternal* GetMoveParent(void);
-	void SetMoveParent(EHANDLE hMoveParent);
+	void SetMoveParent(IEngineObjectServer* hMoveParent);
 	CEngineObjectInternal* GetRootMoveParent();
 	CEngineObjectInternal* FirstMoveChild(void);
-	void SetFirstMoveChild(EHANDLE hMoveChild);
+	void SetFirstMoveChild(IEngineObjectServer* hMoveChild);
 	CEngineObjectInternal* NextMovePeer(void);
-	void SetNextMovePeer(EHANDLE hMovePeer);
+	void SetNextMovePeer(IEngineObjectServer* hMovePeer);
 
 	void ResetRgflCoordinateFrame();
 	// Returns the entity-to-world transform
@@ -295,11 +295,11 @@ private:
 
 	// Our immediate parent in the movement hierarchy.
 	// FIXME: clarify m_pParent vs. m_pMoveParent
-	EHANDLE m_hMoveParent = NULL;
+	CBaseHandle m_hMoveParent = NULL;
 	// cached child list
-	EHANDLE m_hMoveChild = NULL;
+	CBaseHandle m_hMoveChild = NULL;
 	// generated from m_pMoveParent
-	EHANDLE m_hMovePeer = NULL;
+	CBaseHandle m_hMovePeer = NULL;
 	// local coordinate frame of entity
 	matrix3x4_t		m_rgflCoordinateFrame;
 

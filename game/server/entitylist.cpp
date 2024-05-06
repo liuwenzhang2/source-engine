@@ -1259,30 +1259,30 @@ const QAngle& CEngineObjectInternal::GetAbsAngles(void) const
 //-----------------------------------------------------------------------------
 CEngineObjectInternal* CEngineObjectInternal::GetMoveParent(void)
 {
-	return m_hMoveParent.Get() ? (CEngineObjectInternal*)m_hMoveParent.Get()->GetEngineObject() : NULL;
+	return gEntList.GetBaseEntity(m_hMoveParent) ? (CEngineObjectInternal*)gEntList.GetBaseEntity(m_hMoveParent)->GetEngineObject() : NULL;
 }
 
-void CEngineObjectInternal::SetMoveParent(EHANDLE hMoveParent) {
-	m_hMoveParent = hMoveParent;
+void CEngineObjectInternal::SetMoveParent(IEngineObjectServer* hMoveParent) {
+	m_hMoveParent = hMoveParent? hMoveParent->GetOuter():NULL;
 	m_pOuter->NetworkStateChanged();
 }
 
 CEngineObjectInternal* CEngineObjectInternal::FirstMoveChild(void)
 {
-	return m_hMoveChild.Get() ? (CEngineObjectInternal*)m_hMoveChild.Get()->GetEngineObject() : NULL;
+	return gEntList.GetBaseEntity(m_hMoveChild) ? (CEngineObjectInternal*)gEntList.GetBaseEntity(m_hMoveChild)->GetEngineObject() : NULL;
 }
 
-void CEngineObjectInternal::SetFirstMoveChild(EHANDLE hMoveChild) {
-	m_hMoveChild = hMoveChild;
+void CEngineObjectInternal::SetFirstMoveChild(IEngineObjectServer* hMoveChild) {
+	m_hMoveChild = hMoveChild? hMoveChild->GetOuter():NULL;
 }
 
 CEngineObjectInternal* CEngineObjectInternal::NextMovePeer(void)
 {
-	return m_hMovePeer.Get() ? (CEngineObjectInternal*)m_hMovePeer.Get()->GetEngineObject() : NULL;
+	return gEntList.GetBaseEntity(m_hMovePeer) ? (CEngineObjectInternal*)gEntList.GetBaseEntity(m_hMovePeer)->GetEngineObject() : NULL;
 }
 
-void CEngineObjectInternal::SetNextMovePeer(EHANDLE hMovePeer) {
-	m_hMovePeer = hMovePeer;
+void CEngineObjectInternal::SetNextMovePeer(IEngineObjectServer* hMovePeer) {
+	m_hMovePeer = hMovePeer? hMovePeer->GetOuter():NULL;
 }
 
 CEngineObjectInternal* CEngineObjectInternal::GetRootMoveParent()
