@@ -234,8 +234,8 @@ public:
 	virtual const Vector& GetPrevLocalOrigin() const = 0;
 	virtual const QAngle& GetPrevLocalAngles() const = 0;
 
-	virtual CInterpolatedVar< QAngle >& GetRotationInterpolator() = 0;
-	virtual CInterpolatedVar< Vector >& GetOriginInterpolator() = 0;
+	virtual ITypedInterpolatedVar< QAngle >& GetRotationInterpolator() = 0;
+	virtual ITypedInterpolatedVar< Vector >& GetOriginInterpolator() = 0;
 
 	// Determine approximate velocity based on updates from server
 	virtual void EstimateAbsVelocity(Vector& vel) = 0;

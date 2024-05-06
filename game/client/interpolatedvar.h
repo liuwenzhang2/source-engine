@@ -414,7 +414,7 @@ private:
 // -------------------------------------------------------------------------------------------------------------- //
 
 template< typename Type, bool IS_ARRAY>
-class CInterpolatedVarArrayBase : public IInterpolatedVar
+class CInterpolatedVarArrayBase : public ITypedInterpolatedVar<Type>
 {
 public:
 	friend class CInterpolatedVarPrivate;

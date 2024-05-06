@@ -186,8 +186,8 @@ public:
 	const Vector& GetPrevLocalOrigin() const;
 	const QAngle& GetPrevLocalAngles() const;
 
-	CInterpolatedVar< QAngle >& GetRotationInterpolator();
-	CInterpolatedVar< Vector >& GetOriginInterpolator();
+	ITypedInterpolatedVar< QAngle >& GetRotationInterpolator();
+	ITypedInterpolatedVar< Vector >& GetOriginInterpolator();
 
 	// Determine approximate velocity based on updates from server
 	void					EstimateAbsVelocity(Vector& vel);

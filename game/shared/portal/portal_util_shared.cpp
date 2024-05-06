@@ -1689,7 +1689,7 @@ bool UTIL_Portal_EntityIsInPortalHole( const CProp_Portal *pPortal, CBaseEntity 
 
 
 #ifdef CLIENT_DLL
-void UTIL_TransformInterpolatedAngle( CInterpolatedVar< QAngle > &qInterped, matrix3x4_t matTransform, bool bSkipNewest )
+void UTIL_TransformInterpolatedAngle(ITypedInterpolatedVar< QAngle > &qInterped, matrix3x4_t matTransform, bool bSkipNewest )
 {
 	int iHead = qInterped.GetHead();
 	if( !qInterped.IsValidIndex( iHead ) )
@@ -1724,7 +1724,7 @@ void UTIL_TransformInterpolatedAngle( CInterpolatedVar< QAngle > &qInterped, mat
 	qInterped.Interpolate( gpGlobals->curtime );
 }
 
-void UTIL_TransformInterpolatedPosition( CInterpolatedVar< Vector > &vInterped, VMatrix matTransform, bool bSkipNewest )
+void UTIL_TransformInterpolatedPosition(ITypedInterpolatedVar< Vector > &vInterped, VMatrix matTransform, bool bSkipNewest )
 {
 	int iHead = vInterped.GetHead();
 	if( !vInterped.IsValidIndex( iHead ) )

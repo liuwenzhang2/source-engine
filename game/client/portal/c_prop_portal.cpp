@@ -114,8 +114,8 @@ void __MsgFunc_EntityPortalled(bf_read &msg)
 	VMatrix matTransform = pPortal->MatrixThisToLinked();
 	//VMatrix matInvTransform = pPortal->m_hLinkedPortal->MatrixThisToLinked();
 
-	CInterpolatedVar< QAngle > &rotInterp = pEntity->GetEngineObject()->GetRotationInterpolator();
-	CInterpolatedVar< Vector > &posInterp = pEntity->GetEngineObject()->GetOriginInterpolator();
+	ITypedInterpolatedVar< QAngle > &rotInterp = pEntity->GetEngineObject()->GetRotationInterpolator();
+	ITypedInterpolatedVar< Vector > &posInterp = pEntity->GetEngineObject()->GetOriginInterpolator();
 
 	Vector ptCurrentPosition = posInterp.GetCurrent();
 	Vector ptInvCurrentPosition = matTransform * ptCurrentPosition;

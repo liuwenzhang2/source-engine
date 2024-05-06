@@ -550,7 +550,7 @@ bool CWeaponDODBase::Deploy()
 			// add an interpolation history so the movement is smoother
 
 			// Now stick our initial velocity into the interpolation history 
-			CInterpolatedVar< Vector > &interpolator = GetEngineObject()->GetOriginInterpolator();
+			ITypedInterpolatedVar< Vector > &interpolator = GetEngineObject()->GetOriginInterpolator();
 
 			interpolator.ClearHistory();
 			float changeTime = GetLastChangeTime( LATCH_SIMULATION_VAR );

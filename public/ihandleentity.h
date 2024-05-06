@@ -118,4 +118,18 @@ public:
 	virtual void SetDebug(bool bDebug) = 0;
 };
 
+template< typename Type>
+class ITypedInterpolatedVar : public IInterpolatedVar {
+public:
+	virtual void ClearHistory() = 0;
+	virtual void AddToHead(float changeTime, const Type* values, bool bFlushNewer) = 0;
+	virtual const Type& GetCurrent(int iArrayIndex = 0) const = 0;
+	virtual int		GetHead() = 0;
+	virtual bool	IsValidIndex(int i) = 0;
+	virtual int		GetNext(int i) = 0;
+	virtual Type*	GetHistoryValue(int index, float& changetime, int iArrayIndex = 0) = 0;
+	virtual int GetMaxCount() const = 0;
+
+};
+
 #endif // IHANDLEENTITY_H

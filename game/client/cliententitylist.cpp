@@ -414,12 +414,12 @@ void C_EngineObjectInternal::GetVectors(Vector* pForward, Vector* pRight, Vector
 	}
 }
 
-CInterpolatedVar< QAngle >& C_EngineObjectInternal::GetRotationInterpolator()
+ITypedInterpolatedVar< QAngle >& C_EngineObjectInternal::GetRotationInterpolator()
 {
 	return m_iv_angRotation;
 }
 
-CInterpolatedVar< Vector >& C_EngineObjectInternal::GetOriginInterpolator()
+ITypedInterpolatedVar< Vector >& C_EngineObjectInternal::GetOriginInterpolator()
 {
 	return m_iv_vecOrigin;
 }

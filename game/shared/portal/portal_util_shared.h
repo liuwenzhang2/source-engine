@@ -93,8 +93,8 @@ void UTIL_Portal_NDebugOverlay( const CProp_Portal *pPortal, int r, int g, int b
 bool FindClosestPassableSpace( CBaseEntity *pEntity, const Vector &vIndecisivePush, unsigned int fMask = MASK_SOLID ); //assumes the object is already in a mostly passable space
 
 #ifdef CLIENT_DLL
-void UTIL_TransformInterpolatedAngle( CInterpolatedVar< QAngle > &qInterped, matrix3x4_t matTransform, bool bSkipNewest );
-void UTIL_TransformInterpolatedPosition( CInterpolatedVar< Vector > &vInterped, VMatrix matTransform, bool bSkipNewest );
+void UTIL_TransformInterpolatedAngle(ITypedInterpolatedVar< QAngle > &qInterped, matrix3x4_t matTransform, bool bSkipNewest );
+void UTIL_TransformInterpolatedPosition(ITypedInterpolatedVar< Vector > &vInterped, VMatrix matTransform, bool bSkipNewest );
 #endif
 
 bool UTIL_Portal_EntityIsInPortalHole( const CProp_Portal *pPortal, CBaseEntity *pEntity );
