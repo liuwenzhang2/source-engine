@@ -18,7 +18,7 @@
 //			that is used to initialise entities.  The data
 //			string contains a set of key/value pairs.
 //-----------------------------------------------------------------------------
-class CEntityMapData
+class CEntityMapData : public IEntityMapData
 {
 private:
 	char	*m_pEntData;

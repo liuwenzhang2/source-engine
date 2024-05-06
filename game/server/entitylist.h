@@ -143,7 +143,7 @@ public:
 #ifdef _DEBUG
 	void ValidateDataDescription(void);
 #endif // _DEBUG
-	void ParseMapData(CEntityMapData* mapData);
+	void ParseMapData(IEntityMapData* mapData);
 	bool KeyValue(const char* szKeyName, const char* szValue);
 	void					SetAbsVelocity(const Vector& vecVelocity);
 	Vector& GetAbsVelocity();

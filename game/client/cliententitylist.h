@@ -152,7 +152,7 @@ public:
 		return m_pOuter;
 	}
 
-	void					ParseMapData(CEntityMapData* mapData);
+	void					ParseMapData(IEntityMapData* mapData);
 	bool KeyValue(const char* szKeyName, const char* szValue);
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel

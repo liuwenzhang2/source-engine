@@ -136,7 +136,7 @@ void C_EngineObjectInternal::operator delete(void* pMem)
 // Purpose: Handles keys and outputs from the BSP.
 // Input  : mapData - Text block of keys and values from the BSP.
 //-----------------------------------------------------------------------------
-void C_EngineObjectInternal::ParseMapData(CEntityMapData* mapData)
+void C_EngineObjectInternal::ParseMapData(IEntityMapData* mapData)
 {
 	char keyName[MAPKEY_MAXLENGTH];
 	char value[MAPKEY_MAXLENGTH];

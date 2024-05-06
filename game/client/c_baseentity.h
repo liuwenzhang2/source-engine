@@ -201,7 +201,7 @@ public:
 
 	virtual C_BaseEntity* GetOuter() = 0;
 
-	virtual void ParseMapData(CEntityMapData* mapData) = 0;
+	virtual void ParseMapData(IEntityMapData* mapData) = 0;
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 // in the other space, so setting the abs velocity will also set the local vel
 	virtual void SetAbsVelocity(const Vector& vecVelocity) = 0;

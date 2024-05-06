@@ -80,4 +80,42 @@ public:
 	virtual void DestroyEntity(IHandleEntity* pEntity) = 0;
 };
 
+abstract_class IEntityMapData
+{
+public:
+	virtual bool ExtractValue(const char* keyName, char* Value) = 0;
+	// find the nth keyName in the endata and change its value to specified one
+	// where n == nKeyInstance
+	virtual bool SetValue(const char* keyName, char* NewValue, int nKeyInstance = 0) = 0;
+	virtual bool GetFirstKey(char* keyName, char* Value) = 0;
+	virtual bool GetNextKey(char* keyName, char* Value) = 0;
+	virtual const char* CurrentBufferPosition(void) = 0;
+};
+
+abstract_class IInterpolatedVar
+{
+public:
+	virtual		 ~IInterpolatedVar() {}
+
+	virtual void Setup(void* pValue, int type) = 0;
+	virtual void SetInterpolationAmount(float seconds) = 0;
+
+	// Returns true if the new value is different from the prior most recent value.
+	virtual void NoteLastNetworkedValue() = 0;
+	virtual bool NoteChanged(float changetime, bool bUpdateLastNetworkedValue) = 0;
+	virtual void Reset() = 0;
+
+	// Returns 1 if the value will always be the same if currentTime is always increasing.
+	virtual int Interpolate(float currentTime) = 0;
+
+	virtual int	 GetType() const = 0;
+	virtual void RestoreToLastNetworked() = 0;
+	virtual void Copy(IInterpolatedVar* pSrc) = 0;
+
+	virtual const char* GetDebugName() = 0;
+	virtual void SetDebugName(const char* pName) = 0;
+
+	virtual void SetDebug(bool bDebug) = 0;
+};
+
 #endif // IHANDLEENTITY_H

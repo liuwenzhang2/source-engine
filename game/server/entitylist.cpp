@@ -349,7 +349,7 @@ bool ParseKeyvalue(void* pObject, typedescription_t* pFields, int iNumFields, co
 // Purpose: Handles keys and outputs from the BSP.
 // Input  : mapData - Text block of keys and values from the BSP.
 //-----------------------------------------------------------------------------
-void CEngineObjectInternal::ParseMapData(CEntityMapData* mapData)
+void CEngineObjectInternal::ParseMapData(IEntityMapData* mapData)
 {
 	char keyName[MAPKEY_MAXLENGTH];
 	char value[MAPKEY_MAXLENGTH];
