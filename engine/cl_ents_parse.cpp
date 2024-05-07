@@ -197,9 +197,13 @@ void PackedEntityDecoder::CopyEntityBaseline(int iFrom, int iTo)
 	}
 }
 
-void PackedEntityDecoder::ReadEnterPvsFromBuffer(CEntityReadInfo& u, IClientEntity* pClientEntity) {
+void PackedEntityDecoder::ReadEnterPvsFromBuffer(CEntityReadInfo& u, IClientNetworkable* pClientNetworkable) {
 	
-	ClientClass* pClientClass = pClientEntity->GetClientClass();
+	ClientClass* pClientClass = pClientNetworkable->GetClientClass();
+	RecvTable* pRecvTable = pClientNetworkable->GetRecvTable();
+	if (!pRecvTable)
+		Host_Error("CL_ParseDelta: invalid recv table for ent %d.\n", u.m_nNewEntity);
+
 	// Get either the static or instance baseline.
 	const void* pFromData;
 	int nFromBits;
@@ -225,11 +229,6 @@ void PackedEntityDecoder::ReadEnterPvsFromBuffer(CEntityReadInfo& u, IClientEnti
 	// Delta from baseline and merge to new baseline
 	bf_read fromBuf("CL_CopyNewEntity->fromBuf", pFromData, Bits2Bytes(nFromBits), nFromBits);
 
-	RecvTable* pRecvTable = pClientClass->m_pRecvTable;
-
-	if (!pRecvTable)
-		Host_Error("CL_ParseDelta: invalid recv table for ent %d.\n", u.m_nNewEntity);
-
 	if (u.m_bUpdateBaselines)
 	{
 		// store this baseline in u.m_pUpdateBaselines
@@ -243,30 +242,29 @@ void PackedEntityDecoder::ReadEnterPvsFromBuffer(CEntityReadInfo& u, IClientEnti
 
 		fromBuf.StartReading(packedData, writeBuf.GetNumBytesWritten());
 
-		RecvTable_Decode(pRecvTable, pClientEntity->GetDataTableBasePtr(), &fromBuf, u.m_nNewEntity, false);
+		RecvTable_Decode(pRecvTable, pClientNetworkable->GetDataTableBasePtr(), &fromBuf, u.m_nNewEntity, false);
 
 	}
 	else
 	{
 		// write data from baseline into entity
-		RecvTable_Decode(pRecvTable, pClientEntity->GetDataTableBasePtr(), &fromBuf, u.m_nNewEntity, false);
+		RecvTable_Decode(pRecvTable, pClientNetworkable->GetDataTableBasePtr(), &fromBuf, u.m_nNewEntity, false);
 
 		// Now parse in the contents of the network stream.
-		RecvTable_Decode(pRecvTable, pClientEntity->GetDataTableBasePtr(), u.m_pBuf, u.m_nNewEntity, true);
+		RecvTable_Decode(pRecvTable, pClientNetworkable->GetDataTableBasePtr(), u.m_pBuf, u.m_nNewEntity, true);
 	}
 }
 
-void PackedEntityDecoder::ReadDeltaEntFromBuffer(CEntityReadInfo& u, IClientEntity* pClientEntity) {
-	ClientClass* pClientClass = pClientEntity->GetClientClass();
-	RecvTable* pRecvTable = pClientClass->m_pRecvTable;
-
+void PackedEntityDecoder::ReadDeltaEntFromBuffer(CEntityReadInfo& u, IClientNetworkable* pClientNetworkable) {
+	ClientClass* pClientClass = pClientNetworkable->GetClientClass();
+	RecvTable* pRecvTable = pClientNetworkable->GetRecvTable();
 	if (!pRecvTable)
 	{
 		Host_Error("CL_ParseDelta: invalid recv table for ent %d.\n", u.m_nNewEntity);
 		return;
 	}
 
-	RecvTable_Decode(pRecvTable, pClientEntity->GetDataTableBasePtr(), u.m_pBuf, u.m_nNewEntity);
+	RecvTable_Decode(pRecvTable, pClientNetworkable->GetDataTableBasePtr(), u.m_pBuf, u.m_nNewEntity);
 }
 
 void	SpewBitStream( unsigned char* pMem, int bit, int lastbit )
@@ -441,18 +439,17 @@ void DeltaEntitiesDecoder::CopyNewEntity(
 		return;
 	}
 
-	// If it's new, make sure we have a slot for it.
-	IClientEntity *pClientEntity = entitylist->GetClientEntity( u.m_nNewEntity );
-
-	if( iClass >= cl.m_nServerClasses )
+	if (iClass >= cl.m_nServerClasses)
 	{
 		Host_Error("CL_CopyNewEntity: invalid class index (%d).\n", iClass);
 		return;
 	}
 
+	//ClientClass* pClientClass = cl.m_pServerClasses[iClass].m_pClientClass;
+
 	// Delete the entity.
-	ClientClass *pClass = cl.m_pServerClasses[iClass].m_pClientClass;
-	bool bNew = false;
+	// If it's new, make sure we have a slot for it.
+	IClientEntity* pClientEntity = entitylist->GetClientEntity(u.m_nNewEntity);
 	if (pClientEntity)
 	{
 		// if serial number is different, destory old entity
@@ -463,6 +460,7 @@ void DeltaEntitiesDecoder::CopyNewEntity(
 		}
 	}
 
+	bool bNew = false;
 	if ( !pClientEntity)
 	{	
 		// Ok, it doesn't exist yet, therefore this is not an "entered PVS" message.
@@ -479,10 +477,12 @@ void DeltaEntitiesDecoder::CopyNewEntity(
 
 	int start_bit = u.m_pBuf->GetNumBitsRead();
 
-	DataUpdateType_t updateType = bNew ? DATA_UPDATE_CREATED : DATA_UPDATE_DATATABLE_CHANGED;
-	pClientEntity->PreDataUpdate( updateType );
+	IClientNetworkable* pClientNetworkable = pClientEntity->GetClientNetworkable();
 
-	m_PackedEntityDecoder.ReadEnterPvsFromBuffer(u, pClientEntity);
+	DataUpdateType_t updateType = bNew ? DATA_UPDATE_CREATED : DATA_UPDATE_DATATABLE_CHANGED;
+	pClientNetworkable->PreDataUpdate( updateType );
+
+	m_PackedEntityDecoder.ReadEnterPvsFromBuffer(u, pClientNetworkable);
 
 	AddPostDataUpdateCall( u, u.m_nNewEntity, updateType );
 
@@ -684,8 +684,8 @@ void DeltaEntitiesDecoder::CopyExistingEntity(CEntityReadInfo& u)
 {
 	int start_bit = u.m_pBuf->GetNumBitsRead();
 
-	IClientEntity* pClientEntity = entitylist->GetClientEntity(u.m_nNewEntity);
-	if (!pClientEntity)
+	IClientNetworkable* pClientNetworkable = entitylist->GetClientNetworkable(u.m_nNewEntity);
+	if (!pClientNetworkable)
 	{
 		Host_Error("CL_CopyExistingEntity: missing client entity %d.\n", u.m_nNewEntity);
 		return;
@@ -694,9 +694,9 @@ void DeltaEntitiesDecoder::CopyExistingEntity(CEntityReadInfo& u)
 	Assert(u.m_pFrom->transmit_entity.Get(u.m_nNewEntity));
 
 	// Read raw data from the network stream
-	pClientEntity->PreDataUpdate(DATA_UPDATE_DATATABLE_CHANGED);
+	pClientNetworkable->PreDataUpdate(DATA_UPDATE_DATATABLE_CHANGED);
 
-	m_PackedEntityDecoder.ReadDeltaEntFromBuffer(u, pClientEntity);
+	m_PackedEntityDecoder.ReadDeltaEntFromBuffer(u, pClientNetworkable);
 
 	AddPostDataUpdateCall(u, u.m_nNewEntity, DATA_UPDATE_DATATABLE_CHANGED);
 
@@ -731,8 +731,8 @@ void DeltaEntitiesDecoder::ReadDeltaEnt(CEntityReadInfo& u)
 
 void DeltaEntitiesDecoder::PreserveExistingEntity(int nOldEntity)
 {
-	IClientNetworkable* pEnt = entitylist->GetClientNetworkable(nOldEntity);
-	if (!pEnt)
+	IClientNetworkable* pClientNetworkable = entitylist->GetClientNetworkable(nOldEntity);
+	if (!pClientNetworkable)
 	{
 		// If you hit this, this is because there's a networked client entity that got released
 		// by some method other than a server update.  This can happen if client code calls
@@ -879,24 +879,24 @@ void DeltaEntitiesDecoder::MarkEntitiesOutOfPVS(CBitVec<MAX_EDICTS>* pvs_flags)
 	// Note that we go up to and including the highest_index
 	for (int i = 0; i <= highest_index; i++)
 	{
-		IClientNetworkable* ent = entitylist->GetClientNetworkable(i);
-		if (!ent)
+		IClientNetworkable* pClientNetworkable = entitylist->GetClientNetworkable(i);
+		if (!pClientNetworkable)
 			continue;
 
 		// FIXME: We can remove IClientEntity here if we keep track of the
 		// last frame's entity_in_pvs
-		bool curstate = !ent->IsDormant();
+		bool curstate = !pClientNetworkable->IsDormant();
 		bool newstate = pvs_flags->Get(i) ? true : false;
 
 		if (!curstate && newstate)
 		{
 			// Inform the client entity list that the entity entered the PVS
-			ent->NotifyShouldTransmit(SHOULDTRANSMIT_START);
+			pClientNetworkable->NotifyShouldTransmit(SHOULDTRANSMIT_START);
 		}
 		else if (curstate && !newstate)
 		{
 			// Inform the client entity list that the entity left the PVS
-			ent->NotifyShouldTransmit(SHOULDTRANSMIT_END);
+			pClientNetworkable->NotifyShouldTransmit(SHOULDTRANSMIT_END);
 #ifndef _XBOX
 			CL_RecordLeavePVS(i);
 #endif
@@ -911,11 +911,11 @@ void DeltaEntitiesDecoder::CallPostDataUpdates(CEntityReadInfo& u)
 		MDLCACHE_CRITICAL_SECTION_(g_pMDLCache);
 		CPostDataUpdateCall* pCall = &u.m_PostDataUpdateCalls[i];
 
-		IClientNetworkable* pEnt = entitylist->GetClientNetworkable(pCall->m_iEnt);
-		ErrorIfNot(pEnt,
+		IClientNetworkable* pClientNetworkable = entitylist->GetClientNetworkable(pCall->m_iEnt);
+		ErrorIfNot(pClientNetworkable,
 			("CL_CallPostDataUpdates: missing ent %d", pCall->m_iEnt));
 
-		pEnt->PostDataUpdate(pCall->m_UpdateType);
+		pClientNetworkable->PostDataUpdate(pCall->m_UpdateType);
 	}
 }
 //-----------------------------------------------------------------------------

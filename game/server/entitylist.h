@@ -118,6 +118,8 @@ public:
 	// data description
 	DECLARE_DATADESC();
 
+	DECLARE_SERVERCLASS();
+
 	void* operator new(size_t stAllocateBlock);
 	void* operator new(size_t stAllocateBlock, int nBlockUse, const char* pFileName, int nLine);
 	void operator delete(void* pMem);

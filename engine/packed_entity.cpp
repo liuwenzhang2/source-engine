@@ -443,10 +443,10 @@ bool PackedEntityManager::ShouldForceRepack(CFrameSnapshot* pSnapshot, int entit
 	return false;
 }
 
-bool PackedEntityManager::UsePreviouslySentPacket(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity)
+bool PackedEntityManager::UsePreviouslySentPacket(CFrameSnapshot* pSnapshot, IServerNetworkable* pServerNetworkable)
 {
-	int edictIdx = pServerEntity->entindex();
-	ServerClass* pServerClass = pServerEntity->GetServerClass();
+	int edictIdx = pServerNetworkable->entindex();
+	ServerClass* pServerClass = pServerNetworkable->GetServerClass();
 	int iSerialNum = serverEntitylist->GetNetworkSerialNumber(edictIdx);
 
 	PackedEntity* pPackedEntity = m_pPackedData[edictIdx];
@@ -841,29 +841,29 @@ void PackedEntityManager::InitPackedEntity(CFrameSnapshot* pSnapshot, int edictI
 // Pack the entity....
 //-----------------------------------------------------------------------------
 
-void PackedEntityManager::DoPackEntity(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity)
+void PackedEntityManager::DoPackEntity(CFrameSnapshot* pSnapshot, IServerNetworkable* pServerNetworkable)
 {
-	int edictIdx = pServerEntity->entindex();
+	int edictIdx = pServerNetworkable->entindex();
 	Assert(edictIdx < pSnapshot->m_nNumEntities);
 	tmZoneFiltered(TELEMETRY_LEVEL0, 50, TMZF_NONE, "PackEntities_Normal%s", __FUNCTION__);
-	ServerClass* pServerClass = pServerEntity->GetServerClass();
-	SendTable* pSendTable = pServerClass->m_pTable;
+	ServerClass* pServerClass = pServerNetworkable->GetServerClass();
+	SendTable* pSendTable = pServerNetworkable->GetSendTable();
 	int iSerialNum = serverEntitylist->GetNetworkSerialNumber(edictIdx);
 
 	// Check to see if this entity specifies its changes.
 	// If so, then try to early out making the fullpack
 	bool bUsedPrev = false;
 
-	if (!pServerEntity->GetNetworkable()->HasStateChanged())
+	if (!pServerNetworkable->HasStateChanged())
 	{
 		// Now this may not work if we didn't previously send a packet;
 		// if not, then we gotta compute it
-		bUsedPrev = UsePreviouslySentPacket(pSnapshot, pServerEntity);
+		bUsedPrev = UsePreviouslySentPacket(pSnapshot, pServerNetworkable);
 	}
 
 	if (bUsedPrev && !sv_debugmanualmode.GetInt())
 	{
-		pServerEntity->GetNetworkable()->ClearStateChanged();
+		pServerNetworkable->ClearStateChanged();
 		return;
 	}
 
@@ -875,7 +875,7 @@ void PackedEntityManager::DoPackEntity(CFrameSnapshot* pSnapshot, IServerEntity*
 	unsigned char tempData[sizeof(CSendProxyRecipients) * MAX_DATATABLE_PROXIES];
 	CUtlMemory< CSendProxyRecipients > recip((CSendProxyRecipients*)tempData, pSendTable->m_pPrecalc->GetNumDataTableProxies());
 
-	if (!SendTable_Encode(pSendTable, pServerEntity, &writeBuf, edictIdx, &recip, false))
+	if (!SendTable_Encode(pSendTable, pServerNetworkable->GetDataTableBasePtr(), &writeBuf, edictIdx, &recip, false))
 	{
 		Host_Error("SV_PackEntity: SendTable_Encode returned false (ent %d).\n", edictIdx);
 	}
@@ -928,16 +928,16 @@ void PackedEntityManager::DoPackEntity(CFrameSnapshot* pSnapshot, IServerEntity*
 		{
 			if (pPrevFrame->CompareRecipients(recip))
 			{
-				if (UsePreviouslySentPacket(pSnapshot, pServerEntity))
+				if (UsePreviouslySentPacket(pSnapshot, pServerNetworkable))
 				{
-					pServerEntity->GetNetworkable()->ClearStateChanged();
+					pServerNetworkable->ClearStateChanged();
 					return;
 				}
 			}
 		}
 		else
 		{
-			if (!pServerEntity->GetNetworkable()->HasStateChanged())
+			if (!pServerNetworkable->HasStateChanged())
 			{
 				for (int iDeltaProp = 0; iDeltaProp < nChanges; iDeltaProp++)
 				{
@@ -952,7 +952,7 @@ void PackedEntityManager::DoPackEntity(CFrameSnapshot* pSnapshot, IServerEntity*
 
 					Msg("Entity %d (class '%s') reported ENTITY_CHANGE_NONE but '%s' changed.\n",
 						edictIdx,
-						pServerEntity->GetClassName(),
+						pServerNetworkable->GetSendTable()->GetName(),
 						pProp->GetName());
 
 				}
@@ -1003,5 +1003,5 @@ void PackedEntityManager::DoPackEntity(CFrameSnapshot* pSnapshot, IServerEntity*
 		pPackedEntity->SetRecipients(recip);
 	}
 
-	pServerEntity->GetNetworkable()->ClearStateChanged();
+	pServerNetworkable->ClearStateChanged();
 }

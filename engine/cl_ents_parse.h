@@ -27,9 +27,9 @@ public:
 
 	}
 
-	void ReadEnterPvsFromBuffer(CEntityReadInfo& u, IClientEntity* pClientEntity);
+	void ReadEnterPvsFromBuffer(CEntityReadInfo& u, IClientNetworkable* pClientNetworkable);
 
-	void ReadDeltaEntFromBuffer(CEntityReadInfo& u, IClientEntity* pClientEntity);
+	void ReadDeltaEntFromBuffer(CEntityReadInfo& u, IClientNetworkable* pClientNetworkable);
 
 	void FreeEntityBaselines();
 

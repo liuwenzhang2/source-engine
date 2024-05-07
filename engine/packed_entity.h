@@ -267,13 +267,13 @@ public:
 
 	void	InitPackedEntity(CFrameSnapshot* pSnapshot, int edictIdx, ServerClass* pServerClass, int iSerialNum);
 
-	void	DoPackEntity(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity);
+	void	DoPackEntity(CFrameSnapshot* pSnapshot, IServerNetworkable* pServerNetworkable);
 
 	// Returns the pack data for a particular entity for a particular snapshot
 	PackedEntity* GetPackedEntity(CFrameSnapshot* pSnapshot, int entity);
 
 	// Uses a previously sent packet
-	bool			UsePreviouslySentPacket(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity);
+	bool			UsePreviouslySentPacket(CFrameSnapshot* pSnapshot, IServerNetworkable* pServerNetworkable);
 
 	bool			ShouldForceRepack(CFrameSnapshot* pSnapshot, int entity, PackedEntity* handle);
 

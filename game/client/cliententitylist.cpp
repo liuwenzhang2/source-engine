@@ -76,6 +76,8 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 
 END_RECV_TABLE()
 
+IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
+
 int	C_EngineObjectInternal::entindex() const {
 	return m_pOuter->entindex();
 }

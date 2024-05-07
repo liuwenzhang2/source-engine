@@ -62,6 +62,8 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 
 END_SEND_TABLE()
 
+IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
+
 void CEngineObjectNetworkProperty::Init(CEngineObjectInternal* pEntity) {
 	CServerNetworkProperty::Init();
 	m_pOuter = pEntity;
@@ -76,7 +78,7 @@ SendTable* CEngineObjectNetworkProperty::GetSendTable() {
 }
 
 ServerClass* CEngineObjectNetworkProperty::GetServerClass() {
-	return NULL;
+	return m_pOuter->GetServerClass();
 }
 
 void* CEngineObjectNetworkProperty::GetDataTableBasePtr() {

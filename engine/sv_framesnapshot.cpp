@@ -376,7 +376,7 @@ struct PackWork_t
 
 	static void Process(PackWork_t& item)
 	{
-		g_pPackedEntityManager->DoPackEntity(item.pSnapshot,item.pEdict);//item.pSnapshot->m_pEntities item.nIdx, g_pPackedEntityManager->GetSnapshotEntry(item.pSnapshot, item.nIdx)->m_pClass,
+		g_pPackedEntityManager->DoPackEntity(item.pSnapshot,item.pEdict->GetNetworkable());//item.pSnapshot->m_pEntities item.nIdx, g_pPackedEntityManager->GetSnapshotEntry(item.pSnapshot, item.nIdx)->m_pClass,
 	}
 };
 
@@ -441,7 +441,7 @@ void CFrameSnapshotManager::PackEntities_Normal(
 		for (int i = 0; i < c; ++i)
 		{
 			PackWork_t& w = workItems[i];
-			g_pPackedEntityManager->DoPackEntity(w.pSnapshot, w.pEdict);//w.pSnapshot->m_pEntities g_pPackedEntityManager->GetSnapshotEntry(w.pSnapshot, w.nIdx)->m_pClass, 
+			g_pPackedEntityManager->DoPackEntity(w.pSnapshot, w.pEdict->GetNetworkable());//w.pSnapshot->m_pEntities g_pPackedEntityManager->GetSnapshotEntry(w.pSnapshot, w.nIdx)->m_pClass, 
 		}
 	}
 

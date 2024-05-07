@@ -105,7 +105,7 @@ public:
 
 // Implement a client class and provide a factory so you can allocate and delete it yourself
 // (or make it a singleton).
-#define IMPLEMENT_CLIENTCLASS_FACTORY(clientClassName, dataTable, serverClassName, factory) \
+#define IMPLEMENT_CLIENTCLASS_NO_FACTORY(clientClassName, dataTable, serverClassName) \
 	INTERNAL_IMPLEMENT_CLIENTCLASS_PROLOGUE(clientClassName, dataTable, serverClassName) \
 	ClientClass __g_##clientClassName##ClientClass(#clientClassName,\
 													#serverClassName, \
@@ -142,26 +142,26 @@ public:
 // Register a client event singleton but specify a pointer to give to the engine rather than
 // have a global instance. This is useful if you're using Initializers and your object's constructor
 // uses some other global object (so you must use Initializers so you're constructed afterwards).
-#define IMPLEMENT_CLIENTCLASS_EVENT_POINTER(clientClassName, dataTable, serverClassName, ptr)\
-	INTERNAL_IMPLEMENT_CLIENTCLASS_PROLOGUE(clientClassName, dataTable, serverClassName)\
-	static IClientNetworkable* _##clientClassName##_CreateObject() {return ptr;}\
-	ClientClass __g_##clientClassName##ClientClass(#clientClassName,\
-													#serverClassName, \
-													_##clientClassName##_CreateObject, \
-													&dataTable::g_RecvTable);
+//#define IMPLEMENT_CLIENTCLASS_EVENT_POINTER(clientClassName, dataTable, serverClassName, ptr)\
+//	INTERNAL_IMPLEMENT_CLIENTCLASS_PROLOGUE(clientClassName, dataTable, serverClassName)\
+//	static IClientNetworkable* _##clientClassName##_CreateObject() {return ptr;}\
+//	ClientClass __g_##clientClassName##ClientClass(#clientClassName,\
+//													#serverClassName, \
+//													_##clientClassName##_CreateObject, \
+//													&dataTable::g_RecvTable);
 
-#define IMPLEMENT_CLIENTCLASS_EVENT_NONSINGLETON(clientClassName, dataTable, serverClassName)\
-	static IClientNetworkable* _##clientClassName##_CreateObject() \
-	{ \
-		clientClassName *p = new clientClassName; \
-		if ( p ) \
-			p->Init( -1, 0 ); \
-		return p; \
-	} \
-	ClientClass __g_##clientClassName##ClientClass(#clientClassName,\
-													#serverClassName, \
-													_##clientClassName##_CreateObject, \
-													&dataTable::g_RecvTable);
+//#define IMPLEMENT_CLIENTCLASS_EVENT_NONSINGLETON(clientClassName, dataTable, serverClassName)\
+//	static IClientNetworkable* _##clientClassName##_CreateObject() \
+//	{ \
+//		clientClassName *p = new clientClassName; \
+//		if ( p ) \
+//			p->Init( -1, 0 ); \
+//		return p; \
+//	} \
+//	ClientClass __g_##clientClassName##ClientClass(#clientClassName,\
+//													#serverClassName, \
+//													_##clientClassName##_CreateObject, \
+//													&dataTable::g_RecvTable);
 
 
 // Used internally..

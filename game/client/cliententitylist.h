@@ -104,10 +104,11 @@ public:
 	DECLARE_PREDICTABLE();
 	// data description
 	DECLARE_DATADESC();
+	DECLARE_CLIENTCLASS();
 
 	int	entindex() const;
 	RecvTable* GetRecvTable();
-	ClientClass* GetClientClass() { return NULL; }
+	//ClientClass* GetClientClass() { return NULL; }
 	void* GetDataTableBasePtr() { return this; }
 	void NotifyShouldTransmit(ShouldTransmitState_t state) {}
 	void OnPreDataChanged(DataUpdateType_t updateType) {}
