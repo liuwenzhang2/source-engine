@@ -59,7 +59,7 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 END_DATADESC()
 
 BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
-
+	SendPropInt(SENDINFO(testNetwork), 32, SPROP_UNSIGNED),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)

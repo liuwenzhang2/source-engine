@@ -348,6 +348,7 @@ private:
 	matrix3x4_t						m_rgflCoordinateFrame;
 	string_t						m_iClassname;
 
+	unsigned int testNetwork;
 };
 
 //-----------------------------------------------------------------------------

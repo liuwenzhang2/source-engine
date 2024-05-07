@@ -289,7 +289,7 @@ public:
 
 	bool	IsSamePackedEntity(CEntityWriteInfo& u);
 
-	void	GetChangedProps(CEntityWriteInfo& u);
+	void	GetChangedProps(CEntityWriteInfo& u, int& nCheckProps, int* checkProps, int nMaxCheckProps);
 
 	void	WriteDeltaEnt(CBaseClient* pClient, CEntityWriteInfo& u, const int* pCheckProps, const int nCheckProps);
 
@@ -330,6 +330,7 @@ private:
 };
 
 extern PackedEntityManager* g_pPackedEntityManager;
+extern PackedEntityManager* g_pEnginePackedEntityManager;
 
 #include "memdbgoff.h"
 

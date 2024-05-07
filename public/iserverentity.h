@@ -171,7 +171,7 @@ public:
 	virtual int NumberOfReservedEdicts(void) = 0;
 	virtual int IndexOfHighestEdict(void) = 0;
 
-	virtual IEngineObject* GetEngineObject(int entnum) = 0;
+	virtual IEngineObjectServer* GetEngineObject(int entnum) = 0;
 	// Get IServerNetworkable interface for specified entity
 	virtual IServerNetworkable* GetServerNetworkable(int entnum) const = 0;
 	virtual IServerNetworkable* GetServerNetworkableFromHandle(CBaseHandle hEnt) const = 0;

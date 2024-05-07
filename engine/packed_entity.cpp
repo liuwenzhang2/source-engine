@@ -137,6 +137,8 @@ void PackedEntity::SetServerAndClientClass( ServerClass *pServerClass, ClientCla
 
 static PackedEntityManager s_PackedEntityManager;
 PackedEntityManager* g_pPackedEntityManager = &s_PackedEntityManager;
+static PackedEntityManager s_EnginePackedEntityManager;
+PackedEntityManager* g_pEnginePackedEntityManager = &s_EnginePackedEntityManager;
 
 PackedEntityManager::PackedEntityManager() : m_PackedEntitiesPool(MAX_EDICTS / 16, CUtlMemoryPool::GROW_SLOW)
 {
@@ -579,14 +581,14 @@ bool PackedEntityManager::IsSamePackedEntity(CEntityWriteInfo& u) {
 	return oldFrameSnapshotEntry == toFrameSnapshotEntry;
 }
 
-void PackedEntityManager::GetChangedProps(CEntityWriteInfo& u) {
+void PackedEntityManager::GetChangedProps(CEntityWriteInfo& u, int& nCheckProps, int* checkProps, int nMaxCheckProps) {
 	
 	PackedEntity* pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pToSnapshot, u.m_nNewEntity) : NULL;
 	PackedEntity* pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pFromSnapshot, u.m_nOldEntity) : NULL;
 	
-	u.nCheckProps = pNewPack->GetPropsChangedAfterTick(u.m_pFromSnapshot->m_nTickCount, u.checkProps, ARRAYSIZE(u.checkProps));
+	nCheckProps = pNewPack->GetPropsChangedAfterTick(u.m_pFromSnapshot->m_nTickCount, checkProps, nMaxCheckProps);
 
-	if (u.nCheckProps == -1)
+	if (nCheckProps == -1)
 	{
 		// check failed, we have to recalc delta props based on from & to snapshot
 		// that should happen only in HLTV/Replay demo playback mode, this code is really expensive
@@ -614,14 +616,14 @@ void PackedEntityManager::GetChangedProps(CEntityWriteInfo& u) {
 			nNewBits = pNewPack->GetNumBits();
 		}
 
-		u.nCheckProps = SendTable_CalcDelta(
+		nCheckProps = SendTable_CalcDelta(
 			pOldPack->m_pServerClass->m_pTable,
 			pOldData,
 			nOldBits,
 			pNewData,
 			nNewBits,
-			u.checkProps,
-			ARRAYSIZE(u.checkProps),
+			checkProps,
+			nMaxCheckProps,
 			u.m_nNewEntity
 		);
 	}
@@ -629,7 +631,7 @@ void PackedEntityManager::GetChangedProps(CEntityWriteInfo& u) {
 #ifndef NO_VCR
 	if (vcr_verbose.GetInt())
 	{
-		VCRGenericValueVerify("checkProps", u.checkProps, sizeof(u.checkProps[0]) * u.nCheckProps);
+		VCRGenericValueVerify("checkProps", checkProps, sizeof(checkProps[0]) * nCheckProps);
 	}
 #endif
 }
@@ -732,35 +734,6 @@ void PackedEntityManager::WriteEnterPVS(CBaseClient* pClient, CEntityWriteInfo& 
 	PackedEntity* pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pToSnapshot, u.m_nNewEntity) : NULL;
 	PackedEntity* pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? GetPackedEntity(u.m_pFromSnapshot, u.m_nOldEntity) : NULL;
 
-	CFrameSnapshotEntry* entry = GetSnapshotEntry(u.m_pToSnapshot, u.m_nNewEntity);//u.m_pToSnapshot->m_pEntities
-
-	ServerClass* pClass = entry->m_pClass;
-
-	if (!pClass)
-	{
-		Host_Error("SV_CreatePacketEntities: GetEntServerClass failed for ent %d.\n", u.m_nNewEntity);
-		return;
-	}
-
-	TRACE_PACKET(("  SV Enter Class %s\n", pClass->m_pNetworkName));
-
-	if (pClass->m_ClassID >= sv.serverclasses)
-	{
-		ConMsg("pClass->m_ClassID(%i) >= %i\n", pClass->m_ClassID, sv.serverclasses);
-		Assert(0);
-	}
-
-	u.m_pBuf->WriteUBitLong(pClass->m_ClassID, sv.serverclassbits);
-
-	// Write some of the serial number's bits. 
-	u.m_pBuf->WriteUBitLong(entry->m_nSerialNumber, NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS);
-
-	if (u.from_baseline)
-	{
-		// remember that we sent this entity as full update from entity baseline
-		u.from_baseline->Set(u.m_nNewEntity);
-	}
-
 	CClientBaselineInfo* pClientBaselineInfo = &m_ClientBaselineInfo.Element(pClient->m_nClientSlot);
 	PackedEntity* hBaselinePackedEntity = pClientBaselineInfo->m_pPackedEntities[u.m_nNewEntity];
 
@@ -780,13 +753,13 @@ void PackedEntityManager::WriteEnterPVS(CBaseClient* pClient, CEntityWriteInfo& 
 	{
 		// Since the ent is in the fullpack, then it must have either a static or an instance baseline.
 		int nFromBytes;
-		if (!sv.GetClassBaseline(pClass, &pFromData, &nFromBytes))
+		if (!sv.GetClassBaseline(pNewPack->m_pServerClass, &pFromData, &nFromBytes))
 		{
-			Error("SV_WriteEnterPVS: missing instance baseline for '%s'.", pClass->m_pNetworkName);
+			Error("SV_WriteEnterPVS: missing instance baseline for '%s'.", pNewPack->m_pServerClass->m_pNetworkName);
 		}
 
 		ErrorIfNot(pFromData,
-			("SV_WriteEnterPVS: missing pFromData for '%s'.", pClass->m_pNetworkName)
+			("SV_WriteEnterPVS: missing pFromData for '%s'.", pNewPack->m_pServerClass->m_pNetworkName)
 		);
 
 		nFromBits = nFromBytes * 8;	// NOTE: this isn't the EXACT number of bits but that's ok since it's
@@ -810,7 +783,7 @@ void PackedEntityManager::WriteEnterPVS(CBaseClient* pClient, CEntityWriteInfo& 
 	/*if ( server->IsHLTV() || server->IsReplay() )
 	{*/
 	// send all changed properties when entering PVS (no SendProxy culling since we may use it as baseline
-	u.m_nFullProps += SendTable_WriteAllDeltaProps(pClass->m_pTable, pFromData, nFromBits,
+	u.m_nFullProps += SendTable_WriteAllDeltaProps(pNewPack->m_pServerClass->m_pTable, pFromData, nFromBits,
 		pToData, nToBits, pNewPack->m_nEntityIndex, u.m_pBuf);
 	/*}
 	else

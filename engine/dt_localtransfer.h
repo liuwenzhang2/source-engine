@@ -34,11 +34,11 @@ void LocalTransfer_InitFastCopy(
 
 // Transfer the data from pSrcEnt to pDestEnt using the specified SendTable and RecvTable.
 void LocalTransfer_TransferEntity( 
-	IServerEntity * pServerEntity,
+	IServerNetworkable * pServerNetworkable,
 	//const SendTable *pSendTable, 
 	//const void *pSrcEnt, 
 	//RecvTable *pRecvTable, 
-	IClientEntity *pDestEnt,
+	IClientNetworkable *pClientNetworkable,
 	bool bNewlyCreated,
 	bool bJustEnteredPVS,
 	int objectID );

@@ -127,6 +127,8 @@ public:
 
 	CEngineObjectInternal() {
 		SetIdentityMatrix(m_rgflCoordinateFrame);
+		m_Network.Init(this);
+		testNetwork = 9999;
 	}
 
 	~CEngineObjectInternal()
@@ -283,6 +285,11 @@ public:
 	const CEngineObjectNetworkProperty* NetworkProp() const;
 	IServerNetworkable* GetNetworkable();
 
+public:
+	// Networking related methods
+	void	NetworkStateChanged();
+	void	NetworkStateChanged(void* pVar);
+	void	NetworkStateChanged(unsigned short varOffset);
 private:
 	bool		NameMatchesComplex(const char* pszNameOrWildcard);
 	bool		ClassMatchesComplex(const char* pszClassOrWildcard);
@@ -318,6 +325,9 @@ private:
 	string_t m_iName;	// name used to identify this entity
 
 	CEngineObjectNetworkProperty m_Network;
+
+	CNetworkVar(unsigned int, testNetwork);
+
 };
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()
@@ -357,6 +367,38 @@ inline IServerNetworkable* CEngineObjectInternal::GetNetworkable()
 {
 	return &m_Network;
 }
+
+//-----------------------------------------------------------------------------
+// Methods relating to networking
+//-----------------------------------------------------------------------------
+inline void	CEngineObjectInternal::NetworkStateChanged()
+{
+	NetworkProp()->NetworkStateChanged();
+}
+
+
+inline void	CEngineObjectInternal::NetworkStateChanged(void* pVar)
+{
+	// Make sure it's a semi-reasonable pointer.
+	Assert((char*)pVar > (char*)this);
+	Assert((char*)pVar - (char*)this < 32768);
+
+	// Good, they passed an offset so we can track this variable's change
+	// and avoid sending the whole entity.
+	NetworkProp()->NetworkStateChanged((char*)pVar - (char*)this);
+}
+
+inline void	CEngineObjectInternal::NetworkStateChanged(unsigned short varOffset)
+{
+	// Make sure it's a semi-reasonable pointer.
+	//Assert((char*)pVar > (char*)this);
+	//Assert((char*)pVar - (char*)this < 32768);
+
+	// Good, they passed an offset so we can track this variable's change
+	// and avoid sending the whole entity.
+	NetworkProp()->NetworkStateChanged(varOffset);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: a global list of all the entities in the game.  All iteration through
 //			entities is done through this object.

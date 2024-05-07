@@ -79,6 +79,7 @@ private:
 	void AddPostDataUpdateCall(CEntityReadInfo& u, int iEnt, DataUpdateType_t updateType);
 	void CallPostDataUpdates(CEntityReadInfo& u);
 
+	PackedEntityDecoder m_EnginePackedEntityDecoder;
 	PackedEntityDecoder m_PackedEntityDecoder;
 };
 

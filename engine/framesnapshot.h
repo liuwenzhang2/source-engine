@@ -179,8 +179,10 @@ public:
 	int				m_nTotalGap;
 	int				m_nTotalGapCount; */
 
-	int checkProps[MAX_DATATABLE_PROPS];
-	int nCheckProps = 0;
+	int checkEntityProps[MAX_DATATABLE_PROPS];
+	int nCheckEntityProps = 0;
+	int checkEngineProps[MAX_DATATABLE_PROPS];
+	int nCheckEngineProps = 0;
 };
 
 //-----------------------------------------------------------------------------

@@ -228,6 +228,7 @@ void CFrameSnapshotManager::LevelChanged()
 
 	// Release the most recent snapshot...
 	g_pPackedEntityManager->OnLevelChanged();
+	g_pEnginePackedEntityManager->OnLevelChanged();
 	COMPILE_TIME_ASSERT( INVALID_PACKED_ENTITY_HANDLE == 0 );
 }
 
@@ -263,6 +264,7 @@ CFrameSnapshot*	CFrameSnapshotManager::CreateEmptySnapshot( int tickcount, int m
 	}
 
 	g_pPackedEntityManager->OnCreateSnapshot(snap);
+	g_pEnginePackedEntityManager->OnCreateSnapshot(snap);
 
 	return snap;
 }
@@ -376,6 +378,7 @@ struct PackWork_t
 
 	static void Process(PackWork_t& item)
 	{
+		g_pEnginePackedEntityManager->DoPackEntity(item.pSnapshot, serverEntitylist->GetEngineObject(item.pEdict->entindex())->GetNetworkable());
 		g_pPackedEntityManager->DoPackEntity(item.pSnapshot,item.pEdict->GetNetworkable());//item.pSnapshot->m_pEntities item.nIdx, g_pPackedEntityManager->GetSnapshotEntry(item.pSnapshot, item.nIdx)->m_pClass,
 	}
 };
@@ -441,6 +444,7 @@ void CFrameSnapshotManager::PackEntities_Normal(
 		for (int i = 0; i < c; ++i)
 		{
 			PackWork_t& w = workItems[i];
+			g_pEnginePackedEntityManager->DoPackEntity(w.pSnapshot, serverEntitylist->GetEngineObject(w.pEdict->entindex())->GetNetworkable());
 			g_pPackedEntityManager->DoPackEntity(w.pSnapshot, w.pEdict->GetNetworkable());//w.pSnapshot->m_pEntities g_pPackedEntityManager->GetSnapshotEntry(w.pSnapshot, w.nIdx)->m_pClass, 
 		}
 	}
@@ -484,14 +488,18 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot(int clientCount, CGameCl
 			if ( !sv.GetClient(i-1)->IsActive() )
 				continue;
 		}
+
+		IEngineObjectServer* pEngineObjectServer = serverEntitylist->GetEngineObject(i);
 		
 		// entity exists and is not marked as 'free'
 		ServerClass* pServerClass = pServerEntity->GetServerClass();
 		int iSerialNum = serverEntitylist->GetNetworkSerialNumber(i);
+		ServerClass* pEngineServerClass = pEngineObjectServer->GetNetworkable()->GetServerClass();
 		Assert( iSerialNum != -1 );
 		Assert( serverEntitylist->GetServerNetworkable(i));
 		Assert( pServerClass );
 		g_pPackedEntityManager->InitPackedEntity(snap, i, pServerClass, iSerialNum);
+		g_pEnginePackedEntityManager->InitPackedEntity(snap, i, pEngineServerClass, iSerialNum);
 
 		nValidEntities[snap->m_nValidEntities++] = i;
 	}
@@ -597,6 +605,7 @@ void CFrameSnapshotManager::DeleteFrameSnapshot( CFrameSnapshot* pSnapshot )
 	}
 	
 	g_pPackedEntityManager->OnDeleteSnapshot(pSnapshot);
+	g_pEnginePackedEntityManager->OnDeleteSnapshot(pSnapshot);
 
 	m_FrameSnapshots.Remove( pSnapshot->m_ListIndex );
 	delete pSnapshot;
@@ -629,11 +638,13 @@ void CFrameSnapshotManager::FreeClientBaselines(CBaseClient* pClient)
 	pClientSnapshotInfo->m_nBaselineUsed = 0;
 	pClientSnapshotInfo->m_BaselinesSent.ClearAll();
 	g_pPackedEntityManager->FreeClientBaselines(pClient);
+	g_pEnginePackedEntityManager->FreeClientBaselines(pClient);
 }
 
 void CFrameSnapshotManager::AllocClientBaselines(CBaseClient* pClient) {
 	CheckClientSnapshotArray(pClient->m_nClientSlot);
 	g_pPackedEntityManager->AllocClientBaselines(pClient);
+	g_pEnginePackedEntityManager->AllocClientBaselines(pClient);
 }
 
 void CFrameSnapshotManager::OnClientConnected(CBaseClient* pClient) {
@@ -645,6 +656,7 @@ void CFrameSnapshotManager::OnClientConnected(CBaseClient* pClient) {
 	pClientSnapshotInfo->m_BaselinesSent.ClearAll();
 	pClientSnapshotInfo->DeleteClientFrames(-1);
 	g_pPackedEntityManager->OnClientConnected(pClient);
+	g_pEnginePackedEntityManager->OnClientConnected(pClient);
 }
 
 void CFrameSnapshotManager::OnClientInactivate(CBaseClient* pClient) {
@@ -768,7 +780,9 @@ void CFrameSnapshotManager::WriteDeltaHeader(CEntityWriteInfo& u, int entnum, in
 
 void CFrameSnapshotManager::DetermineUpdateType(CEntityWriteInfo& u)
 {
-	u.nCheckProps = 0;
+	u.nCheckEntityProps = 0;
+	u.nCheckEngineProps = 0;
+
 	// Figure out how we want to update the entity.
 	if (u.m_nNewEntity < u.m_nOldEntity)
 	{
@@ -804,7 +818,7 @@ void CFrameSnapshotManager::DetermineUpdateType(CEntityWriteInfo& u)
 	//Assert(u.m_pOldPack->m_pServerClass == u.m_pNewPack->m_pServerClass);
 
 	// We can early out with the delta bits if we are using the same pack handles...
-	if (g_pPackedEntityManager->IsSamePackedEntity(u))//u.m_pOldPack == u.m_pNewPack
+	if (g_pPackedEntityManager->IsSamePackedEntity(u) && g_pEnginePackedEntityManager->IsSamePackedEntity(u))//u.m_pOldPack == u.m_pNewPack
 	{
 		//Assert(u.m_pOldPack != NULL);
 		u.m_UpdateType = PreserveEnt;
@@ -846,9 +860,10 @@ void CFrameSnapshotManager::DetermineUpdateType(CEntityWriteInfo& u)
 	}
 #endif
 
-	g_pPackedEntityManager->GetChangedProps(u);
+	g_pPackedEntityManager->GetChangedProps(u, u.nCheckEntityProps, u.checkEntityProps, ARRAYSIZE(u.checkEntityProps));
+	g_pEnginePackedEntityManager->GetChangedProps(u, u.nCheckEngineProps, u.checkEngineProps, ARRAYSIZE(u.checkEngineProps));
 
-	if (u.nCheckProps > 0)
+	if (u.nCheckEntityProps > 0 || u.nCheckEngineProps > 0)
 	{
 		// Write a header.
 //		WriteDeltaHeader(u, u.m_nNewEntity, FHDR_ZERO);
@@ -947,6 +962,34 @@ void CFrameSnapshotManager::WriteEntityUpdate(CBaseClient* pClient, CEntityWrite
 
 		WriteDeltaHeader(u, u.m_nNewEntity, FHDR_ENTERPVS);
 		//SV_WriteEnterPVS(u);
+		CFrameSnapshotEntry* entry = g_pPackedEntityManager->GetSnapshotEntry(u.m_pToSnapshot, u.m_nNewEntity);//u.m_pToSnapshot->m_pEntities
+		ServerClass* pClass = entry->m_pClass;
+		if (!pClass)
+		{
+			Host_Error("SV_CreatePacketEntities: GetEntServerClass failed for ent %d.\n", u.m_nNewEntity);
+			return;
+		}
+
+		TRACE_PACKET(("  SV Enter Class %s\n", pClass->m_pNetworkName));
+
+		if (pClass->m_ClassID >= sv.serverclasses)
+		{
+			ConMsg("pClass->m_ClassID(%i) >= %i\n", pClass->m_ClassID, sv.serverclasses);
+			Assert(0);
+		}
+
+		u.m_pBuf->WriteUBitLong(pClass->m_ClassID, sv.serverclassbits);
+
+		// Write some of the serial number's bits. 
+		u.m_pBuf->WriteUBitLong(entry->m_nSerialNumber, NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS);
+
+		if (u.from_baseline)
+		{
+			// remember that we sent this entity as full update from entity baseline
+			u.from_baseline->Set(u.m_nNewEntity);
+		}
+
+		g_pEnginePackedEntityManager->WriteEnterPVS(pClient, u);
 		g_pPackedEntityManager->WriteEnterPVS(pClient, u);
 	}
 	break;
@@ -986,14 +1029,15 @@ void CFrameSnapshotManager::WriteEntityUpdate(CBaseClient* pClient, CEntityWrite
 
 		// NOTE: it was already written in DetermineUpdateType. By doing it this way, we avoid an expensive
 		// (non-byte-aligned) copy of the data.
-		if (u.nCheckProps > 0)
+		if (u.nCheckEntityProps > 0|| u.nCheckEngineProps > 0)
 		{
 			// Write a header.
 			WriteDeltaHeader(u, u.m_nNewEntity, FHDR_ZERO);
 #if defined( DEBUG_NETWORKING )
 			int startBit = u.m_pBuf->GetNumBitsWritten();
 #endif
-			g_pPackedEntityManager->WriteDeltaEnt(pClient, u, u.checkProps, u.nCheckProps);
+			g_pEnginePackedEntityManager->WriteDeltaEnt(pClient, u, u.checkEngineProps, u.nCheckEngineProps);
+			g_pPackedEntityManager->WriteDeltaEnt(pClient, u, u.checkEntityProps, u.nCheckEntityProps);
 #if defined( DEBUG_NETWORKING )
 			int endBit = u.m_pBuf->GetNumBitsWritten();
 			TRACE_PACKET(("    Delta Bits (%d) = %d (%d bytes)\n", u.m_nNewEntity, (endBit - startBit), ((endBit - startBit) + 7) / 8));
@@ -1497,6 +1541,7 @@ bool	CFrameSnapshotManager::ProcessBaselineAck(CBaseClient* pClient, int nBaseli
 	}
 
 	g_pPackedEntityManager->ProcessBaselineAck(pClient, pSnapshot);
+	g_pEnginePackedEntityManager->ProcessBaselineAck(pClient, pSnapshot);
 
 	//m_pBaseline->m_nTickCount = m_nBaselineUpdateTick;
 

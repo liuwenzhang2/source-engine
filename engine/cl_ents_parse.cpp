@@ -482,6 +482,7 @@ void DeltaEntitiesDecoder::CopyNewEntity(
 	DataUpdateType_t updateType = bNew ? DATA_UPDATE_CREATED : DATA_UPDATE_DATATABLE_CHANGED;
 	pClientNetworkable->PreDataUpdate( updateType );
 
+	m_EnginePackedEntityDecoder.ReadEnterPvsFromBuffer(u, entitylist->GetEngineObject(u.m_nNewEntity)->GetClientNetworkable());
 	m_PackedEntityDecoder.ReadEnterPvsFromBuffer(u, pClientNetworkable);
 
 	AddPostDataUpdateCall( u, u.m_nNewEntity, updateType );
@@ -696,6 +697,7 @@ void DeltaEntitiesDecoder::CopyExistingEntity(CEntityReadInfo& u)
 	// Read raw data from the network stream
 	pClientNetworkable->PreDataUpdate(DATA_UPDATE_DATATABLE_CHANGED);
 
+	m_EnginePackedEntityDecoder.ReadDeltaEntFromBuffer(u, entitylist->GetEngineObject(u.m_nNewEntity)->GetClientNetworkable());
 	m_PackedEntityDecoder.ReadDeltaEntFromBuffer(u, pClientNetworkable);
 
 	AddPostDataUpdateCall(u, u.m_nNewEntity, DATA_UPDATE_DATATABLE_CHANGED);
@@ -868,6 +870,7 @@ void DeltaEntitiesDecoder::ReadPacketEntities(CEntityReadInfo& u)
 
 void DeltaEntitiesDecoder::FreeEntityBaselines() {
 	m_PackedEntityDecoder.FreeEntityBaselines();
+	m_EnginePackedEntityDecoder.FreeEntityBaselines();
 }
 
 //-----------------------------------------------------------------------------
@@ -1005,6 +1008,7 @@ bool DeltaEntitiesDecoder::ProcessPacketEntities ( SVC_PacketEntities *entmsg )
 		// server requested to use this snapshot as baseline update
 		int nUpdateBaseline = (entmsg->m_nBaseline == 0) ? 1 : 0;
 		m_PackedEntityDecoder.CopyEntityBaseline( entmsg->m_nBaseline, nUpdateBaseline );
+		m_EnginePackedEntityDecoder.CopyEntityBaseline(entmsg->m_nBaseline, nUpdateBaseline);
 
 		// send new baseline acknowledgement(as reliable)
 		cl.m_NetChannel->SendNetMsg( CLC_BaselineAck( cl.GetServerTickCount(), entmsg->m_nBaseline ), true );

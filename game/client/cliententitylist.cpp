@@ -73,7 +73,7 @@ BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
 END_DATADESC()
 
 BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
-
+	RecvPropInt(RECVINFO(testNetwork)),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);

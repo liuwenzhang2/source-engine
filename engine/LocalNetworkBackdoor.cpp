@@ -356,12 +356,21 @@ void CLocalNetworkBackdoor::EntState(
 
 		Assert( pCached->m_pClientEntity == pClientEntity->GetClientNetworkable()->GetDataTableBasePtr());
 
-		LocalTransfer_TransferEntity( 
-			pServerEntity,
+		LocalTransfer_TransferEntity(
+			serverEntitylist->GetEngineObject(iEnt)->GetNetworkable(),
 			//pSendTable, 
 			//pSourceEnt, 
 			//pClientClass->m_pRecvTable, 
-			pClientEntity,
+			entitylist->GetEngineObject(iEnt)->GetClientNetworkable(),
+			bCreated,
+			bExistedAndWasDormant,
+			iEnt);
+		LocalTransfer_TransferEntity( 
+			pServerEntity->GetNetworkable(),
+			//pSendTable, 
+			//pSourceEnt, 
+			//pClientClass->m_pRecvTable, 
+			pClientEntity->GetClientNetworkable(),
 			bCreated, 
 			bExistedAndWasDormant,
 			iEnt );
