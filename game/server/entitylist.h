@@ -102,7 +102,10 @@ class CEngineObjectNetworkProperty : public CServerNetworkProperty {
 public:
 	void Init(CEngineObjectInternal* pEntity);
 
+	int			entindex() const;
 	SendTable* GetSendTable();
+	ServerClass* GetServerClass();
+	void* GetDataTableBasePtr();
 
 private:
 	CEngineObjectInternal* m_pOuter = NULL;;

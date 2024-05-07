@@ -67,8 +67,20 @@ void CEngineObjectNetworkProperty::Init(CEngineObjectInternal* pEntity) {
 	m_pOuter = pEntity;
 }
 
+int CEngineObjectNetworkProperty::entindex() const {
+	return m_pOuter->GetOuter()->entindex();
+}
+
 SendTable* CEngineObjectNetworkProperty::GetSendTable() {
 	return &DT_EngineObject::g_SendTable;
+}
+
+ServerClass* CEngineObjectNetworkProperty::GetServerClass() {
+	return NULL;
+}
+
+void* CEngineObjectNetworkProperty::GetDataTableBasePtr() {
+	return m_pOuter;
 }
 
 #include "tier0/memdbgoff.h"

@@ -364,7 +364,7 @@ public:
 	// Server to client message received
 	virtual void					ReceiveMessage( int classID, bf_read &msg );
 
-	virtual void*					GetDataTableBasePtr();
+	//virtual void*					GetDataTableBasePtr();
 
 // IClientThinkable.
 public:

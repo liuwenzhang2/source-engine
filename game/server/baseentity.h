@@ -353,7 +353,10 @@ class CEntityNetworkProperty : public CServerNetworkProperty {
 public:
 	void Init(CBaseEntity* pEntity);
 
+	int			entindex() const;
 	SendTable* GetSendTable();
+	ServerClass* GetServerClass();
+	void* GetDataTableBasePtr();
 
 private:
 	CBaseEntity* m_pOuter = NULL;;

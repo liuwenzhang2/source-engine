@@ -48,9 +48,11 @@ public:
 	virtual IClientEntity*		GetIClientEntity()		{ return 0; }
 	virtual C_BaseEntity*		GetBaseEntity()			{ return 0; }
 	virtual IClientThinkable*	GetClientThinkable()	{ return 0; }
+	virtual int					entindex() const { return IClientUnknown::entindex(); }
 	virtual RecvTable* GetRecvTable() {
 		return GetClientClass()->m_pRecvTable;
 	}
+	virtual void*				GetDataTableBasePtr() { return this; }
 
 // IClientNetworkable overrides.
 public:
@@ -63,9 +65,9 @@ public:
 	virtual void					OnDataChanged( DataUpdateType_t updateType );
 	virtual void					SetDormant( bool bDormant );
 	virtual bool					IsDormant( void );
-	virtual int						entindex( void ) const;
+	//virtual int						entindex( void ) const;
 	virtual void					ReceiveMessage( int classID, bf_read &msg );
-	virtual void*					GetDataTableBasePtr();
+	//virtual void*					GetDataTableBasePtr();
 	virtual void					SetDestroyedOnRecreateEntities( void );
 
 public:

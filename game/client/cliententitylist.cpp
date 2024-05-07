@@ -76,6 +76,10 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 
 END_RECV_TABLE()
 
+int	C_EngineObjectInternal::entindex() const {
+	return m_pOuter->entindex();
+}
+
 RecvTable* C_EngineObjectInternal::GetRecvTable() {
 	return &DT_EngineObject::g_RecvTable;
 }

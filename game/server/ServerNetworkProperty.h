@@ -38,7 +38,10 @@ public:
 	//virtual ServerClass*	GetServerClass();
 	//virtual const char*		GetClassName() const;
 	//virtual void			Release();
+	virtual int				entindex() const = 0;
 	virtual SendTable*		GetSendTable() = 0;
+	virtual ServerClass*	GetServerClass() = 0;
+	virtual void*			GetDataTableBasePtr() = 0;
 	virtual int&			GetTransmitState();
 	virtual void			ClearTransmitState();
 public:
@@ -48,7 +51,6 @@ public:
 	//void AttachEdict(int pRequiredEdict = -1);
 
 	// Methods to get the entindex + edict
-	//int	entindex() const;
 	//edict_t *edict();
 	//const edict_t *edict() const;
 	bool HasStateChanged() const;

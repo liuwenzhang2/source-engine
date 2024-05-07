@@ -103,8 +103,20 @@ void CEntityNetworkProperty::Init(CBaseEntity* pEntity) {
 	m_pOuter = pEntity;
 }
 
+int CEntityNetworkProperty::entindex() const {
+	return m_pOuter->entindex();
+}
+
 SendTable* CEntityNetworkProperty::GetSendTable() {
 	return m_pOuter->GetServerClass()->m_pTable;
+}
+
+ServerClass* CEntityNetworkProperty::GetServerClass() {
+	return m_pOuter->GetServerClass();
+}
+
+void* CEntityNetworkProperty::GetDataTableBasePtr() {
+	return m_pOuter;
 }
 
 // This table encodes edict data.

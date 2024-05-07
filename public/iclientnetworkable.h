@@ -52,14 +52,16 @@ public:
 	//virtual void			Release() = 0;
 
 	// Supplied automatically by the IMPLEMENT_CLIENTCLASS macros.
-	//virtual ClientClass*	GetClientClass() = 0;
+	virtual int				entindex() const = 0;
 	virtual RecvTable*		GetRecvTable() = 0;
+	virtual ClientClass*	GetClientClass() = 0;
+	// Get the base pointer to the networked data that GetClientClass->m_pRecvTable starts at.
+	// (This is usually just the "this" pointer).
+	virtual void*			GetDataTableBasePtr() = 0;
 
 	// This tells the entity what the server says for ShouldTransmit on this entity.
 	// Note: This used to be EntityEnteredPVS/EntityRemainedInPVS/EntityLeftPVS.
 	virtual void			NotifyShouldTransmit( ShouldTransmitState_t state ) = 0;
-
-
 
 	//
 	// NOTE FOR ENTITY WRITERS: 
@@ -93,10 +95,6 @@ public:
 
 	// Server to client entity message received
 	virtual void			ReceiveMessage( int classID, bf_read &msg ) = 0;
-
-	// Get the base pointer to the networked data that GetClientClass->m_pRecvTable starts at.
-	// (This is usually just the "this" pointer).
-	virtual void*			GetDataTableBasePtr() = 0;
 
 	// Tells the entity that it's about to be destroyed due to the client receiving
 	// an uncompressed update that's caused it to destroy all entities & recreate them.

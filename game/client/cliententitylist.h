@@ -105,7 +105,10 @@ public:
 	// data description
 	DECLARE_DATADESC();
 
+	int	entindex() const;
 	RecvTable* GetRecvTable();
+	ClientClass* GetClientClass() { return NULL; }
+	void* GetDataTableBasePtr() { return this; }
 	void NotifyShouldTransmit(ShouldTransmitState_t state) {}
 	void OnPreDataChanged(DataUpdateType_t updateType) {}
 	void OnDataChanged(DataUpdateType_t updateType) {}
@@ -113,7 +116,6 @@ public:
 	void PostDataUpdate(DataUpdateType_t updateType) {}
 	bool IsDormant(void) { return false; }
 	void ReceiveMessage(int classID, bf_read& msg) {}
-	void* GetDataTableBasePtr() { return this; }
 	void SetDestroyedOnRecreateEntities(void) {}
 
 	// memory handling, uses calloc so members are zero'd out on instantiation

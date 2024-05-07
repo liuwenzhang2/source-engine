@@ -213,9 +213,12 @@ public:
 	// Retrieve sound spatialization info for the specified sound on this entity
 	// Return false to indicate sound is not audible
 	virtual bool			GetSoundSpatialization( SpatializationInfo_t& info ) = 0;
+	virtual int				entindex() const { return IClientUnknown::entindex(); }
 	virtual RecvTable* GetRecvTable() {
 		return GetClientClass()->m_pRecvTable;
 	}
+	virtual ClientClass* GetClientClass() = 0;
+	virtual void* GetDataTableBasePtr() { return this; }
 };
 
 

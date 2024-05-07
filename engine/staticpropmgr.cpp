@@ -135,7 +135,6 @@ public:
 	virtual IClientEntity*		GetIClientEntity()		{ return NULL; }
 	virtual C_BaseEntity*		GetBaseEntity()			{ return NULL; }
 	virtual IClientThinkable*	GetClientThinkable()	{ return NULL; }
-	virtual ClientClass* GetClientClass() { return NULL; }
 public:
 	// These methods return a box defined in the space of the entity
 	virtual const Vector&	OBBMinsPreScaled() const { return OBBMins(); }

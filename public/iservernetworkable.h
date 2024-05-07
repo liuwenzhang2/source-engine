@@ -92,8 +92,10 @@ public:
 	//virtual IHandleEntity	*GetEntityHandle() = 0;
 
 	// Tell the engine which class this object is.
-	//virtual ServerClass*	GetServerClass() = 0;
+	virtual int				entindex() const = 0;
 	virtual SendTable*		GetSendTable() = 0;
+	virtual ServerClass*	GetServerClass() = 0;
+	virtual void*			GetDataTableBasePtr() = 0;
 	//virtual edict_t			*GetEdict() const = 0;
 	virtual bool			HasStateChanged() const = 0;
 	virtual void			ClearStateChanged() = 0;
@@ -106,7 +108,6 @@ public:
 
 	//virtual const char*		GetClassName() const = 0;
 	//virtual void			Release() = 0;
-	//virtual int				entindex() const = 0;
 
 	// In place of a generic QueryInterface.
 	//virtual CBaseNetworkable* GetBaseNetworkable() = 0;

@@ -1321,10 +1321,10 @@ void C_BaseEntity::ReceiveMessage( int classID, bf_read &msg )
 }
 
 
-void* C_BaseEntity::GetDataTableBasePtr()
-{
-	return this;
-}
+//void* C_BaseEntity::GetDataTableBasePtr()
+//{
+//	return this;
+//}
 
 
 //-----------------------------------------------------------------------------
