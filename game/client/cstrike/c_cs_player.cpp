@@ -239,7 +239,7 @@ private:
 
 
 IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_CSRagdoll, DT_CSRagdoll, CCSRagdoll )
-	RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+	//RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 	RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
 	RecvPropEHandle( RECVINFO( m_hPlayer ) ),
 	RecvPropInt( RECVINFO( m_nModelIndex ) ),
@@ -382,7 +382,7 @@ void C_CSRagdoll::CreateLowViolenceRagdoll( void )
 		return;
 	}
 
-	SetNetworkOrigin( m_vecRagdollOrigin );
+	GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 	SetAbsOrigin( m_vecRagdollOrigin );
 	SetAbsVelocity( m_vecRagdollVelocity );
 
@@ -396,7 +396,7 @@ void C_CSRagdoll::CreateLowViolenceRagdoll( void )
 		}
 
 		SetAbsAngles( pPlayer->GetRenderAngles() );
-		SetNetworkAngles( pPlayer->GetRenderAngles() );
+		GetEngineObject()->SetNetworkAngles( pPlayer->GetRenderAngles() );
 	}
 
 	int iDeathAnim = RandomInt( iMinDeathAnim, iMaxDeathAnim );
@@ -471,7 +471,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 	{
 		// overwrite network origin so later interpolation will
 		// use this position
-		SetNetworkOrigin( m_vecRagdollOrigin );
+		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
 		SetAbsOrigin( m_vecRagdollOrigin );
 		SetAbsVelocity( m_vecRagdollVelocity );
@@ -711,7 +711,7 @@ BEGIN_RECV_TABLE_NOBASE( C_CSPlayer, DT_CSLocalPlayerExclusive )
 	RecvPropInt( RECVINFO( m_iShotsFired ) ),
 	RecvPropFloat( RECVINFO( m_flVelocityModifier ) ),
 
-	RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+	//RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 
     //=============================================================================
     // HPE_BEGIN:
@@ -729,7 +729,7 @@ END_RECV_TABLE()
 
 
 BEGIN_RECV_TABLE_NOBASE( C_CSPlayer, DT_CSNonLocalPlayerExclusive )
-	RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+	//RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 END_RECV_TABLE()
 
 
@@ -1396,8 +1396,8 @@ void C_CSPlayer::PostDataUpdate( DataUpdateType_t updateType )
 {
 	// C_BaseEntity assumes we're networking the entity's angles, so pretend that it
 	// networked the same value we already have.
-	SetNetworkAngles( GetLocalAngles() );
-
+	GetEngineObject()->SetNetworkAngles( GetLocalAngles() );
+	
 	BaseClass::PostDataUpdate( updateType );
 }
 
@@ -1413,7 +1413,7 @@ bool C_CSPlayer::Interpolate( float currentTime )
 	if ( CSGameRules()->IsFreezePeriod() )
 	{
 		// don't interpolate players position during freeze period
-		SetAbsOrigin( GetNetworkOrigin() );
+		SetAbsOrigin(GetEngineObject()->GetNetworkOrigin() );
 	}
 
 	return true;

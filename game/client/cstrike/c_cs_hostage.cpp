@@ -116,7 +116,7 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 
 	if ( pHostage && !pHostage->IsDormant() )
 	{
-		SetNetworkOrigin( pHostage->GetAbsOrigin() );
+		GetEngineObject()->SetNetworkOrigin( pHostage->GetAbsOrigin() );
 		SetAbsOrigin( pHostage->GetAbsOrigin() );
 		SetAbsVelocity( pHostage->GetAbsVelocity() );
 
@@ -124,7 +124,7 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 		pHostage->SnatchModelInstance( this );
 
 		SetAbsAngles( pHostage->GetRenderAngles() );
-		SetNetworkAngles( pHostage->GetRenderAngles() );
+		GetEngineObject()->SetNetworkAngles( pHostage->GetRenderAngles() );
 
 		CStudioHdr *pStudioHdr = GetModelPtr();
 

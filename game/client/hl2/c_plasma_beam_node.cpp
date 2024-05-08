@@ -274,6 +274,6 @@ void C_PlasmaBeamNode::ClientThink(void)
 }
 
 IMPLEMENT_CLIENTCLASS_DT(C_PlasmaBeamNode, DT_PlasmaBeamNode, CPlasmaBeamNode )
-	RecvPropVector	(RECVINFO_INVALID(m_vecVelocity), 0, RecvProxy_LocalVelocity),
+	//RecvPropVector	(RECVINFO_INVALID(m_vecVelocity), 0, RecvProxy_LocalVelocity),
 	RecvPropInt		(RECVINFO(m_bSprayOn)),
 END_RECV_TABLE()

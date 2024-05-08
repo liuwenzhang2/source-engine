@@ -299,6 +299,15 @@ public:
 	IClientNetworkable* GetClientNetworkable() {
 		return this;
 	}
+
+	const Vector& GetNetworkOrigin() const;
+	const QAngle& GetNetworkAngles() const;
+	IEngineObjectClient* GetNetworkMoveParent();
+
+	void SetNetworkOrigin(const Vector& org);
+	void SetNetworkAngles(const QAngle& ang);
+	void SetNetworkMoveParent(IEngineObjectClient* pMoveParent);
+
 #if !defined( NO_ENTITY_PREDICTION )
 	// For storing prediction results and pristine network state
 	byte* m_pIntermediateData[MULTIPLAYER_BACKUP];
@@ -349,6 +358,12 @@ private:
 	string_t						m_iClassname;
 
 	unsigned int testNetwork;
+
+	// Last values to come over the wire. Used for interpolation.
+	Vector							m_vecNetworkOrigin = Vector(0, 0, 0);
+	QAngle							m_angNetworkAngles = QAngle(0, 0, 0);
+	// The moveparent received from networking data
+	CHandle<C_BaseEntity>			m_hNetworkMoveParent = NULL;
 };
 
 //-----------------------------------------------------------------------------
@@ -433,6 +448,20 @@ inline void C_EngineObjectInternal::WorldToEntitySpace(const Vector& in, Vector*
 	{
 		VectorITransform(in, EntityToWorldTransform(), *pOut);
 	}
+}
+
+inline const Vector& C_EngineObjectInternal::GetNetworkOrigin() const
+{
+	return m_vecNetworkOrigin;
+}
+
+inline const QAngle& C_EngineObjectInternal::GetNetworkAngles() const
+{
+	return m_angNetworkAngles;
+}
+
+inline IEngineObjectClient* C_EngineObjectInternal::GetNetworkMoveParent() {
+	return m_hNetworkMoveParent.Get()? m_hNetworkMoveParent.Get()->GetEngineObject():NULL;
 }
 
 //

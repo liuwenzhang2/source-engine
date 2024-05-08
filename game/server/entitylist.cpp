@@ -58,8 +58,81 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_iName, FIELD_STRING),
 END_DATADESC()
 
+void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
+{
+	CEngineObjectInternal* entity = (CEngineObjectInternal*)pStruct;
+	Assert(entity);
+
+	const Vector* v;
+	if (entity->GetOuter()->entindex() == 1) {
+		int aaa = 0;
+	}
+	if (!entity->GetOuter()->UseStepSimulationNetworkOrigin(&v))
+	{
+		v = &entity->GetLocalOrigin();
+	}
+
+	pOut->m_Vector[0] = v->x;
+	pOut->m_Vector[1] = v->y;
+	pOut->m_Vector[2] = v->z;
+}
+
+void SendProxy_Angles(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
+{
+	CEngineObjectInternal* entity = (CEngineObjectInternal*)pStruct;
+	Assert(entity);
+
+	const QAngle* a;
+
+	if (!entity->GetOuter()->UseStepSimulationNetworkAngles(&a))
+	{
+		a = &entity->GetLocalAngles();
+	}
+
+	pOut->m_Vector[0] = anglemod(a->x);
+	pOut->m_Vector[1] = anglemod(a->y);
+	pOut->m_Vector[2] = anglemod(a->z);
+}
+
+void SendProxy_LocalVelocity(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
+{
+	CEngineObjectInternal* entity = (CEngineObjectInternal*)pStruct;
+	Assert(entity);
+
+	const Vector* a = &entity->GetLocalVelocity();;
+
+	pOut->m_Vector[0] = a->x;
+	pOut->m_Vector[1] = a->y;
+	pOut->m_Vector[2] = a->z;
+}
+
+void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
+{
+	CEngineObjectInternal* entity = (CEngineObjectInternal*)pStruct;
+	Assert(entity);
+
+	CBaseEntity* pMoveParent = entity->GetMoveParent() ? entity->GetMoveParent()->GetOuter() : NULL;
+	if (pMoveParent&& pMoveParent->entindex()==1) {
+		int aaa = 0;
+	}
+	CBaseHandle pHandle = pMoveParent ? pMoveParent->GetRefEHandle() : NULL;;
+	SendProxy_EHandleToInt(pProp, pStruct, &pHandle, pOut, iElement, objectID);
+}
+
 BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropInt(SENDINFO(testNetwork), 32, SPROP_UNSIGNED),
+#if PREDICTION_ERROR_CHECK_LEVEL > 1 
+	SendPropVector(SENDINFO(m_vecOrigin), -1, SPROP_NOSCALE | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin),
+#else
+	SendPropVector(SENDINFO(m_vecOrigin), -1, SPROP_COORD | SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin),
+#endif
+#if PREDICTION_ERROR_CHECK_LEVEL > 1 
+	SendPropVector(SENDINFO(m_angRotation), -1, SPROP_NOSCALE | SPROP_CHANGES_OFTEN, 0, HIGH_DEFAULT, SendProxy_Angles),
+#else
+	SendPropQAngles(SENDINFO(m_angRotation), 13, SPROP_CHANGES_OFTEN, SendProxy_Angles),
+#endif
+	SendPropVector(SENDINFO(m_vecVelocity), 0, SPROP_NOSCALE, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocity),
+	SendPropEHandle(SENDINFO_NAME(m_hMoveParent, moveparent), 0, SendProxy_MoveParentToInt),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -995,7 +1068,7 @@ void CEngineObjectInternal::SetAbsOrigin(const Vector& absOrigin)
 
 	if (m_vecOrigin != vecNewOrigin)
 	{
-		m_pOuter->NetworkStateChanged(55554);
+		//m_pOuter->NetworkStateChanged(55554);
 		m_vecOrigin = vecNewOrigin;
 		m_pOuter->SetSimulationTime(gpGlobals->curtime);
 	}
@@ -1046,7 +1119,7 @@ void CEngineObjectInternal::SetAbsAngles(const QAngle& absAngles)
 
 	if (m_angRotation != angNewRotation)
 	{
-		m_pOuter->NetworkStateChanged(55555);
+		//m_pOuter->NetworkStateChanged(55555);
 		m_angRotation = angNewRotation;
 		m_pOuter->SetSimulationTime(gpGlobals->curtime);
 	}
@@ -1056,7 +1129,7 @@ void CEngineObjectInternal::SetAbsVelocity(const Vector& vecAbsVelocity)
 {
 	if (m_vecAbsVelocity == vecAbsVelocity)
 		return;
-	m_pOuter->NetworkStateChanged(55556);
+	//m_pOuter->NetworkStateChanged(55556);
 	//m_pOuter->NetworkStateChanged(55553);
 	// The abs velocity won't be dirty since we're setting it here
 	// All children are invalid, but we are not
@@ -1116,7 +1189,7 @@ void CEngineObjectInternal::SetLocalOrigin(const Vector& origin)
 		Assert(origin.y >= -largeVal && origin.y <= largeVal);
 		Assert(origin.z >= -largeVal && origin.z <= largeVal);
 #endif
-		m_pOuter->NetworkStateChanged(55554);
+		//m_pOuter->NetworkStateChanged(55554);
 		m_pOuter->InvalidatePhysicsRecursive(POSITION_CHANGED);
 		m_vecOrigin = origin;
 		m_pOuter->SetSimulationTime(gpGlobals->curtime);
@@ -1146,7 +1219,7 @@ void CEngineObjectInternal::SetLocalAngles(const QAngle& angles)
 
 	if (m_angRotation != angles)
 	{
-		m_pOuter->NetworkStateChanged(55555);
+		//m_pOuter->NetworkStateChanged(55555);
 		m_pOuter->InvalidatePhysicsRecursive(ANGLES_CHANGED);
 		m_angRotation = angles;
 		m_pOuter->SetSimulationTime(gpGlobals->curtime);
@@ -1174,7 +1247,7 @@ void CEngineObjectInternal::SetLocalVelocity(const Vector& inVecVelocity)
 
 	if (m_vecVelocity != vecVelocity)
 	{
-		m_pOuter->NetworkStateChanged(55556);
+		//m_pOuter->NetworkStateChanged(55556);
 		m_pOuter->InvalidatePhysicsRecursive(VELOCITY_CHANGED);
 		m_vecVelocity = vecVelocity;
 	}
@@ -1210,9 +1283,6 @@ const Vector& CEngineObjectInternal::GetAbsVelocity() const
 //-----------------------------------------------------------------------------
 // Physics state accessor methods
 //-----------------------------------------------------------------------------
-Vector& CEngineObjectInternal::GetLocalOriginForWrite(void) {
-	return m_vecOrigin;
-}
 
 const Vector& CEngineObjectInternal::GetLocalOrigin(void) const
 {
@@ -1273,12 +1343,12 @@ const QAngle& CEngineObjectInternal::GetAbsAngles(void) const
 //-----------------------------------------------------------------------------
 CEngineObjectInternal* CEngineObjectInternal::GetMoveParent(void)
 {
-	return gEntList.GetBaseEntity(m_hMoveParent) ? (CEngineObjectInternal*)gEntList.GetBaseEntity(m_hMoveParent)->GetEngineObject() : NULL;
+	return m_hMoveParent.Get() ? (CEngineObjectInternal*)(m_hMoveParent.Get()->GetEngineObject()) : NULL;
 }
 
 void CEngineObjectInternal::SetMoveParent(IEngineObjectServer* hMoveParent) {
 	m_hMoveParent = hMoveParent? hMoveParent->GetOuter():NULL;
-	m_pOuter->NetworkStateChanged();
+	//this->NetworkStateChanged();
 }
 
 CEngineObjectInternal* CEngineObjectInternal::FirstMoveChild(void)

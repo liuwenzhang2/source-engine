@@ -206,22 +206,7 @@ END_SEND_TABLE()
 //REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_SendPredictableId );
 //#endif
 
-void SendProxy_Origin( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
-{
-	CBaseEntity *entity = (CBaseEntity*)pStruct;
-	Assert( entity );
 
-	const Vector *v;
-
-	if ( !entity->UseStepSimulationNetworkOrigin( &v ) )
-	{
-		v = &entity->GetEngineObject()->GetLocalOrigin();
-	}
-
-	pOut->m_Vector[ 0 ] = v->x;
-	pOut->m_Vector[ 1 ] = v->y;
-	pOut->m_Vector[ 2 ] = v->z;
-}
 
 //--------------------------------------------------------------------------------------------------------
 // Used when breaking up origin, note we still have to deal with StepSimulation
@@ -261,43 +246,12 @@ void SendProxy_OriginZ( const SendProp *pProp, const void *pStruct, const void *
 }
 
 
-void SendProxy_Angles( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
-{
-	CBaseEntity *entity = (CBaseEntity*)pStruct;
-	Assert( entity );
 
-	const QAngle *a;
-
-	if ( !entity->UseStepSimulationNetworkAngles( &a ) )
-	{
-		a = &entity->GetEngineObject()->GetLocalAngles();
-	}
-
-	pOut->m_Vector[ 0 ] = anglemod( a->x );
-	pOut->m_Vector[ 1 ] = anglemod( a->y );
-	pOut->m_Vector[ 2 ] = anglemod( a->z );
-}
-
-void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
-{
-	CBaseEntity* entity = (CBaseEntity*)pStruct;
-	Assert(entity);
-
-	CBaseEntity* pMoveParent = entity->GetEngineObject()->GetMoveParent()? entity->GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
-	CBaseHandle pHandle = pMoveParent ? pMoveParent->GetRefEHandle() : NULL;;
-	SendProxy_EHandleToInt(pProp, pStruct, &pHandle, pOut, iElement, objectID);
-}
 
 // This table encodes the CBaseEntity data.
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropDataTable( "AnimTimeMustBeFirst", 0, &REFERENCE_SEND_TABLE(DT_AnimTimeMustBeFirst), SendProxy_ClientSideAnimation ),
 	SendPropInt			(SENDINFO(m_flSimulationTime),	SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_SimulationTime),
-
-#if PREDICTION_ERROR_CHECK_LEVEL > 1 
-	SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
-#else
-	SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
-#endif
 
 	SendPropInt		(SENDINFO( m_ubInterpolationFrame ), NOINTERP_PARITY_MAX_BITS, SPROP_UNSIGNED ),
 	SendPropModelIndex(SENDINFO(m_nModelIndex)),
@@ -312,16 +266,10 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropFloat	(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED ),
 	SendPropEHandle (SENDINFO(m_hOwnerEntity)),
 	SendPropEHandle (SENDINFO(m_hEffectEntity)),
-	SendPropEHandle (SENDINFO_MOVEPARENT(/*m_hMoveParent,*/ moveparent), 0, SendProxy_MoveParentToInt),
 	SendPropInt		(SENDINFO(m_iParentAttachment), NUM_PARENTATTACHMENT_BITS, SPROP_UNSIGNED),
 
 	SendPropInt		(SENDINFO_NAME( m_MoveType, movetype ), MOVETYPE_MAX_BITS, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO_NAME( m_MoveCollide, movecollide ), MOVECOLLIDE_MAX_BITS, SPROP_UNSIGNED ),
-#if PREDICTION_ERROR_CHECK_LEVEL > 1 
-	SendPropVector	(SENDINFO_ANGELS(m_angRotation), -1, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0, HIGH_DEFAULT, SendProxy_Angles ),
-#else
-	SendPropQAngles	(SENDINFO_ANGELS(m_angRotation), 13, SPROP_CHANGES_OFTEN, SendProxy_Angles ),
-#endif
 
 	SendPropInt		( SENDINFO( m_iTextureFrameIndex ),		8, SPROP_UNSIGNED ),
 
@@ -3050,7 +2998,7 @@ int CBaseEntity::Restore( IRestore &restore )
 		//MatrixSetColumn(GetEngineObject()->m_vecAbsOrigin, 3, GetEngineObject()->m_rgflCoordinateFrame );
 		GetEngineObject()->ResetRgflCoordinateFrame();
 
-		GetEngineObject()->GetLocalOriginForWrite() += parentSpaceOffset;
+		GetEngineObject()->SetLocalOrigin( GetEngineObject()->GetLocalOrigin() + parentSpaceOffset);
 	}
 
 	// Gotta do this after the coordframe is set up as it depends on it.

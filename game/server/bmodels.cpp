@@ -495,25 +495,25 @@ BEGIN_DATADESC( CFuncRotating )
 
 END_DATADESC()
 
-extern void SendProxy_Origin( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
-void SendProxy_FuncRotatingOrigin( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
-{
-#ifdef TF_DLL
-	CFuncRotating *entity = (CFuncRotating*)pStruct;
-	Assert( entity );
-
-	if ( entity->HasSpawnFlags(SF_BRUSH_ROTATE_CLIENTSIDE) )
-	{
-		const Vector *v = &entity->m_vecClientOrigin;
-		pOut->m_Vector[ 0 ] = v->x;
-		pOut->m_Vector[ 1 ] = v->y;
-		pOut->m_Vector[ 2 ] = v->z;
-		return;
-	}
-#endif
-
-	SendProxy_Origin( pProp, pStruct, pData, pOut, iElement, objectID );
-}
+//extern void SendProxy_Origin( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
+//void SendProxy_FuncRotatingOrigin( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
+//{
+//#ifdef TF_DLL
+//	CFuncRotating *entity = (CFuncRotating*)pStruct;
+//	Assert( entity );
+//
+//	if ( entity->HasSpawnFlags(SF_BRUSH_ROTATE_CLIENTSIDE) )
+//	{
+//		const Vector *v = &entity->m_vecClientOrigin;
+//		pOut->m_Vector[ 0 ] = v->x;
+//		pOut->m_Vector[ 1 ] = v->y;
+//		pOut->m_Vector[ 2 ] = v->z;
+//		return;
+//	}
+//#endif
+//
+//	SendProxy_Origin( pProp, pStruct, pData, pOut, iElement, objectID );
+//}
 
 /*
 extern void SendProxy_Angles( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
@@ -633,14 +633,14 @@ void SendProxy_FuncRotatingSimulationTime( const SendProp *pProp, const void *pS
 }
 
 IMPLEMENT_SERVERCLASS_ST(CFuncRotating, DT_FuncRotating)
-	SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
-	SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
+	//SendPropExclude( "DT_BaseEntity", "m_angRotation" ),
+	//SendPropExclude( "DT_BaseEntity", "m_vecOrigin" ),
 	SendPropExclude( "DT_BaseEntity", "m_flSimulationTime" ),
 
-	SendPropVector(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_FuncRotatingOrigin ),
-	SendPropAngle(SENDINFO_ANGELS(m_angRotation[0]), 13, SPROP_CHANGES_OFTEN, SendProxy_FuncRotatingAngleX ),
-	SendPropAngle(SENDINFO_ANGELS(m_angRotation[1]), 13, SPROP_CHANGES_OFTEN, SendProxy_FuncRotatingAngleY ),
-	SendPropAngle(SENDINFO_ANGELS(m_angRotation[2]), 13, SPROP_CHANGES_OFTEN, SendProxy_FuncRotatingAngleZ ),
+	//SendPropVector(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_FuncRotatingOrigin ),
+	//SendPropAngle(SENDINFO_ANGELS(m_angRotation[0]), 13, SPROP_CHANGES_OFTEN, SendProxy_FuncRotatingAngleX ),
+	//SendPropAngle(SENDINFO_ANGELS(m_angRotation[1]), 13, SPROP_CHANGES_OFTEN, SendProxy_FuncRotatingAngleY ),
+	//SendPropAngle(SENDINFO_ANGELS(m_angRotation[2]), 13, SPROP_CHANGES_OFTEN, SendProxy_FuncRotatingAngleZ ),
 
 	SendPropInt(SENDINFO(m_flSimulationTime), SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_FuncRotatingSimulationTime),
 END_SEND_TABLE()

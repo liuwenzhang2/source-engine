@@ -45,9 +45,9 @@ public:
 	CNetworkVar( float, m_flHDRColorScale );
 };
 
-extern void SendProxy_Angles( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
+//extern void SendProxy_Angles( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
 
-extern void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID);
+//extern void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID);
 
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CLightGlow, DT_LightGlow )
 	SendPropInt( SENDINFO(m_clrRender), 32, SPROP_UNSIGNED, SendProxy_Color32ToInt ),
@@ -57,9 +57,9 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CLightGlow, DT_LightGlow )
 	SendPropInt( SENDINFO(m_nMaxDist), LIGHTGLOW_MAXDIST_BITS, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO(m_nOuterMaxDist), LIGHTGLOW_OUTERMAXDIST_BITS, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO(m_spawnflags), 8, SPROP_UNSIGNED ),
-	SendPropVector(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD, 0.0f, HIGH_DEFAULT, SendProxy_Origin),
-	SendPropQAngles	(SENDINFO_ANGELS(m_angRotation), 13, 0, SendProxy_Angles ),
-	SendPropEHandle (SENDINFO_MOVEPARENT(moveparent), 0, SendProxy_MoveParentToInt),
+	//SendPropVector(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD, 0.0f, HIGH_DEFAULT, SendProxy_Origin),
+	//SendPropQAngles	(SENDINFO_ANGELS(m_angRotation), 13, 0, SendProxy_Angles ),
+	//SendPropEHandle (SENDINFO_MOVEPARENT(moveparent), 0, SendProxy_MoveParentToInt),
 	SendPropFloat( SENDINFO(m_flGlowProxySize ), 6,	SPROP_ROUNDUP,	0.0f,	64.0f ),
 	SendPropFloat( SENDINFO_NAME( m_flHDRColorScale, HDRColorScale ), 0,	SPROP_NOSCALE,	0.0f,	100.0f ),
 END_SEND_TABLE()

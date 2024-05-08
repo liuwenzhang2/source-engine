@@ -325,10 +325,10 @@ void C_Fish::ClientThink()
 	// euler integration
 	m_pos += m_vel * deltaT;
 
-	SetNetworkOrigin( m_pos );
+	GetEngineObject()->SetNetworkOrigin( m_pos );
 	SetAbsOrigin( m_pos );
 
-	SetNetworkAngles( m_angles );
+	GetEngineObject()->SetNetworkAngles( m_angles );
 	SetAbsAngles( m_angles );
 }
 

@@ -52,6 +52,7 @@ struct VarMapping_t
 class IEngineObjectClient : public IEngineObject {
 public:
 
+	virtual datamap_t* GetPredDescMap(void) = 0;
 	virtual C_BaseEntity* GetOuter() = 0;
 
 	virtual void ParseMapData(IEntityMapData* mapData) = 0;
@@ -193,6 +194,14 @@ public:
 	virtual void SetClassname(const char* className) = 0;
 	virtual const string_t& GetClassname() const = 0;
 	virtual IClientNetworkable* GetClientNetworkable() = 0;
+
+	virtual const Vector& GetNetworkOrigin() const = 0;
+	virtual const QAngle& GetNetworkAngles() const = 0;
+	virtual IEngineObjectClient* GetNetworkMoveParent() = 0;
+	virtual void SetNetworkOrigin(const Vector& org) = 0;
+	virtual void SetNetworkAngles(const QAngle& ang) = 0;
+	virtual void SetNetworkMoveParent(IEngineObjectClient* pMoveParent) = 0;
+
 };
 
 //-----------------------------------------------------------------------------

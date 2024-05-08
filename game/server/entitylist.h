@@ -129,6 +129,10 @@ public:
 		SetIdentityMatrix(m_rgflCoordinateFrame);
 		m_Network.Init(this);
 		testNetwork = 9999;
+		m_vecOrigin = Vector(0, 0, 0);
+		m_angRotation = QAngle(0, 0, 0);
+		m_vecVelocity = Vector(0, 0, 0);
+		m_hMoveParent = NULL;
 	}
 
 	~CEngineObjectInternal()
@@ -167,7 +171,6 @@ public:
 	// Origin and angles in local space ( relative to parent )
 	// NOTE: Setting the local origin or angles will cause the abs origin + angles to be set also
 	void					SetLocalOrigin(const Vector& origin);
-	Vector& GetLocalOriginForWrite(void);
 	const Vector& GetLocalOrigin(void) const;
 
 	void					SetLocalAngles(const QAngle& angles);
@@ -296,9 +299,9 @@ private:
 private:
 
 	friend class CBaseEntity;
-	Vector			m_vecOrigin = Vector(0,0,0);
-	QAngle			m_angRotation = QAngle(0, 0, 0);
-	Vector			m_vecVelocity = Vector(0, 0, 0);
+	CNetworkVector(m_vecOrigin);
+	CNetworkQAngle(m_angRotation);
+	CNetworkVector(m_vecVelocity);
 	Vector			m_vecAbsOrigin = Vector(0, 0, 0);
 	QAngle			m_angAbsRotation = QAngle(0, 0, 0);
 	// Global velocity
@@ -307,7 +310,7 @@ private:
 
 	// Our immediate parent in the movement hierarchy.
 	// FIXME: clarify m_pParent vs. m_pMoveParent
-	CBaseHandle m_hMoveParent = NULL;
+	CNetworkHandle(CBaseEntity, m_hMoveParent);
 	// cached child list
 	CBaseHandle m_hMoveChild = NULL;
 	// generated from m_pMoveParent

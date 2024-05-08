@@ -7971,35 +7971,35 @@ void SendProxy_CropFlagsToPlayerFlagBitsLength( const SendProp *pProp, const voi
 // SendTable for CPlayerState.
 // -------------------------------------------------------------------------------- //
 
-void SendProxy_LocalVelocityX(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
-{
-	CBaseEntity* entity = (CBaseEntity*)pStruct;
-	Assert(entity);
+//void SendProxy_LocalVelocityX(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
+//{
+//	CBaseEntity* entity = (CBaseEntity*)pStruct;
+//	Assert(entity);
+//
+//	const Vector* a = &entity->GetLocalVelocity();;
+//
+//	pOut->m_Float = a->x;
+//}
 
-	const Vector* a = &entity->GetLocalVelocity();;
+//void SendProxy_LocalVelocityY(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
+//{
+//	CBaseEntity* entity = (CBaseEntity*)pStruct;
+//	Assert(entity);
+//
+//	const Vector* a = &entity->GetLocalVelocity();;
+//
+//	pOut->m_Float = a->y;
+//}
 
-	pOut->m_Float = a->x;
-}
-
-void SendProxy_LocalVelocityY(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
-{
-	CBaseEntity* entity = (CBaseEntity*)pStruct;
-	Assert(entity);
-
-	const Vector* a = &entity->GetLocalVelocity();;
-
-	pOut->m_Float = a->y;
-}
-
-void SendProxy_LocalVelocityZ(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
-{
-	CBaseEntity* entity = (CBaseEntity*)pStruct;
-	Assert(entity);
-
-	const Vector* a = &entity->GetLocalVelocity();;
-
-	pOut->m_Float = a->z;
-}
+//void SendProxy_LocalVelocityZ(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
+//{
+//	CBaseEntity* entity = (CBaseEntity*)pStruct;
+//	Assert(entity);
+//
+//	const Vector* a = &entity->GetLocalVelocity();;
+//
+//	pOut->m_Float = a->z;
+//}
 
 	BEGIN_SEND_TABLE_NOBASE(CPlayerState, DT_PlayerState)
 		SendPropInt		(SENDINFO(deadflag),	1, SPROP_UNSIGNED ),
@@ -8032,9 +8032,9 @@ void SendProxy_LocalVelocityZ(const SendProp* pProp, const void* pStruct, const 
 		SendPropEHandle		( SENDINFO( m_hLastWeapon ) ),
 		SendPropEHandle		( SENDINFO( m_hGroundEntity ), SPROP_CHANGES_OFTEN ),
 
-		SendPropFloat		( SENDINFO_VELOCITY(m_vecVelocity[0]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityX),
-		SendPropFloat		( SENDINFO_VELOCITY(m_vecVelocity[1]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityY),
-		SendPropFloat		( SENDINFO_VELOCITY(m_vecVelocity[2]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityZ),
+		//SendPropFloat		( SENDINFO_VELOCITY(m_vecVelocity[0]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityX),
+		//SendPropFloat		( SENDINFO_VELOCITY(m_vecVelocity[1]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityY),
+		//SendPropFloat		( SENDINFO_VELOCITY(m_vecVelocity[2]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityZ),
 
 #if PREDICTION_ERROR_CHECK_LEVEL > 1 
 		SendPropVector		( SENDINFO( m_vecBaseVelocity ), -1, SPROP_COORD ),

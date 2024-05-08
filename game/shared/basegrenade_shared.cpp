@@ -56,17 +56,7 @@ END_DATADESC()
 
 void SendProxy_CropFlagsToPlayerFlagBitsLength( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID);
 
-void SendProxy_LocalVelocity(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
-{
-	CBaseEntity* entity = (CBaseEntity*)pStruct;
-	Assert(entity);
 
-	const Vector* a = &entity->GetLocalVelocity();;
-
-	pOut->m_Vector[0] = a->x;
-	pOut->m_Vector[1] = a->y;
-	pOut->m_Vector[2] = a->z;
-}
 
 #endif
 
@@ -80,7 +70,6 @@ BEGIN_NETWORK_TABLE( CBaseGrenade, DT_BaseGrenade )
 //	SendPropTime( SENDINFO( m_flDetonateTime ) ),
 	SendPropEHandle( SENDINFO( m_hThrower ) ),
 
-	SendPropVector( SENDINFO_VELOCITY( m_vecVelocity ), 0, SPROP_NOSCALE, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocity),
 	// HACK: Use same flag bits as player for now
 	SendPropInt			( SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED, SendProxy_CropFlagsToPlayerFlagBitsLength ),
 #else
@@ -91,7 +80,7 @@ BEGIN_NETWORK_TABLE( CBaseGrenade, DT_BaseGrenade )
 	RecvPropEHandle( RECVINFO( m_hThrower ) ),
 
 	// Need velocity from grenades to make animation system work correctly when running
-	RecvPropVector( RECVINFO_INVALID(m_vecVelocity), 0, RecvProxy_LocalVelocity ),
+	//RecvPropVector( RECVINFO_INVALID(m_vecVelocity), 0, RecvProxy_LocalVelocity ),
 
 	RecvPropInt( RECVINFO( m_fFlags ) ),
 #endif

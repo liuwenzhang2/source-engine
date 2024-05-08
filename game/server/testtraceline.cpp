@@ -59,16 +59,16 @@ void SendProxy_AnglesZ(const SendProp* pProp, const void* pStruct, const void* p
 	pOut->m_Float = a->z;
 }
 
-extern void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID);
+//extern void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID);
 
 // This table encodes the CBaseEntity data.
 IMPLEMENT_SERVERCLASS_ST_NOBASE(CTestTraceline, DT_TestTraceline)
 	SendPropInt		(SENDINFO(m_clrRender),	32, SPROP_UNSIGNED ),
-	SendPropVector (SENDINFO_ORIGIN(m_vecOrigin), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_Origin),
-	SendPropFloat	(SENDINFO_ANGELS(m_angRotation[0]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesX),
-	SendPropFloat	(SENDINFO_ANGELS(m_angRotation[1]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesY),
-	SendPropFloat	(SENDINFO_ANGELS(m_angRotation[2]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesZ),
-	SendPropEHandle (SENDINFO_MOVEPARENT(moveparent), 0, SendProxy_MoveParentToInt),
+	//SendPropVector (SENDINFO_ORIGIN(m_vecOrigin), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_Origin),
+	//SendPropFloat	(SENDINFO_ANGELS(m_angRotation[0]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesX),
+	//SendPropFloat	(SENDINFO_ANGELS(m_angRotation[1]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesY),
+	//SendPropFloat	(SENDINFO_ANGELS(m_angRotation[2]), 19, 0,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_AnglesZ),
+	//SendPropEHandle (SENDINFO_MOVEPARENT(moveparent), 0, SendProxy_MoveParentToInt),
 END_SEND_TABLE()
 
 LINK_ENTITY_TO_CLASS( test_traceline, CTestTraceline );

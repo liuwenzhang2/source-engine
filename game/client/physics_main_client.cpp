@@ -93,8 +93,8 @@ void C_BaseEntity::PhysicsPushEntity( const Vector& push, trace_t *pTrace )
 	}
 
 	// CLIENT DLL HACKS
-	m_vecNetworkOrigin = GetLocalOrigin();
-	m_angNetworkAngles = GetLocalAngles();
+	GetEngineObject()->SetNetworkOrigin(GetLocalOrigin());
+	GetEngineObject()->SetNetworkAngles(GetLocalAngles());
 
 //	InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED );
 

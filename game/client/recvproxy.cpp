@@ -114,16 +114,6 @@ RecvProp RecvPropBool(
 }
 
 
-//-----------------------------------------------------------------------------
-// Moveparent receive proxies
-//-----------------------------------------------------------------------------
-void RecvProxy_IntToMoveParent( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	CHandle<C_BaseEntity> *pHandle = (CHandle<C_BaseEntity>*)pOut;
-	RecvProxy_IntToEHandle( pData, pStruct, (CBaseHandle*)pHandle );
-}
-
-
 void RecvProxy_InterpolationAmountChanged( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
 	// m_bSimulatedEveryTick & m_bAnimatedEveryTick are boolean

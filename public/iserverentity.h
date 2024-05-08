@@ -49,7 +49,6 @@ public:
 	// Origin and angles in local space ( relative to parent )
 	// NOTE: Setting the local origin or angles will cause the abs origin + angles to be set also
 	virtual void SetLocalOrigin(const Vector& origin) = 0;
-	virtual Vector& GetLocalOriginForWrite(void) = 0;
 	virtual const Vector& GetLocalOrigin(void) const = 0;
 
 	virtual void SetLocalAngles(const QAngle& angles) = 0;

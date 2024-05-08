@@ -15,6 +15,7 @@
 #include "cdll_bounded_cvars.h"
 #include "cliententitylist.h"
 #include "mapentities_shared.h"
+#include "coordsize.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -57,6 +58,7 @@ CClientEntityList<C_BaseEntity> *cl_entitylist = &s_EntityList;
 // Game-code CBaseHandle implementation.
 // -------------------------------------------------------------------------------------------------- //
 int addVarCount = 0;
+const float coordTolerance = 2.0f / (float)(1 << COORD_FRACTIONAL_BITS);
 
 BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_FIELD(m_vecAbsVelocity, FIELD_VECTOR),
@@ -65,6 +67,9 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
 	DEFINE_FIELD(m_vecOrigin, FIELD_VECTOR),
 	DEFINE_FIELD(m_angRotation, FIELD_VECTOR),
+	DEFINE_PRED_FIELD_TOL(m_vecNetworkOrigin, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, coordTolerance),
+	DEFINE_PRED_FIELD(m_angNetworkAngles, FIELD_VECTOR, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK),
+	DEFINE_PRED_FIELD(m_hNetworkMoveParent, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE),
 END_PREDICTION_DATA()
 
 BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
@@ -72,8 +77,46 @@ BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
 	DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
 END_DATADESC()
 
+//-----------------------------------------------------------------------------
+// Moveparent receive proxies
+//-----------------------------------------------------------------------------
+void RecvProxy_IntToMoveParent(const CRecvProxyData* pData, void* pStruct, void* pOut)
+{
+	CHandle<C_BaseEntity>* pHandle = (CHandle<C_BaseEntity>*)pOut;
+	RecvProxy_IntToEHandle(pData, pStruct, (CBaseHandle*)pHandle);
+	C_EngineObjectInternal* pEntity = (C_EngineObjectInternal*)pStruct;
+	C_BaseEntity* pMoveParent = pHandle->Get();
+	if (pMoveParent&& pMoveParent->entindex()==1) {
+		int aaa = 0;
+	}
+	if (pMoveParent) {
+		if (pEntity->GetNetworkMoveParent()) {
+			int aaa = 0;
+		}
+		else {
+			Error("cannot happen");
+		}
+	}
+	else {
+		if (pEntity->GetNetworkMoveParent()) {
+			Error("cannot happen");
+		}
+		else {
+			int aaa = 0;
+		}
+	}
+}
+
 BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO(testNetwork)),
+	RecvPropVector(RECVINFO_NAME(m_vecNetworkOrigin, m_vecOrigin)),
+#if PREDICTION_ERROR_CHECK_LEVEL > 1 
+	RecvPropVector(RECVINFO_NAME(m_angNetworkAngles, m_angRotation)),
+#else
+	RecvPropQAngles(RECVINFO_NAME(m_angNetworkAngles, m_angRotation)),
+#endif
+	RecvPropVector(RECVINFO(m_vecVelocity)),//, 0, RecvProxy_LocalVelocity
+	RecvPropInt(RECVINFO_NAME(m_hNetworkMoveParent, moveparent), 0, RecvProxy_IntToMoveParent),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -137,6 +180,28 @@ void C_EngineObjectInternal::operator delete(void* pMem)
 }
 
 #include "tier0/memdbgon.h"
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : org - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetNetworkOrigin(const Vector& org)
+{
+	m_vecNetworkOrigin = org;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : ang - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetNetworkAngles(const QAngle& ang)
+{
+	m_angNetworkAngles = ang;
+}
+
+void C_EngineObjectInternal::SetNetworkMoveParent(IEngineObjectClient* pMoveParent) {
+	m_hNetworkMoveParent = pMoveParent? pMoveParent->GetOuter():NULL;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Handles keys and outputs from the BSP.
@@ -598,7 +663,7 @@ void C_EngineObjectInternal::SetParent(IEngineObjectClient* pParentEntity, int i
 
 	if (!m_pOuter->IsServerEntity())
 	{
-		m_pOuter->SetNetworkMoveParent( pParentEntity ? pParentEntity->GetOuter() : NULL);
+		SetNetworkMoveParent( pParentEntity);
 	}
 
 	m_pOuter->SetParentAttachment( iParentAttachment);

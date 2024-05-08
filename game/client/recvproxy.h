@@ -17,7 +17,7 @@ class CRecvProxyData;
 // This converts the int stored in pData to an EHANDLE in pOut.
 void RecvProxy_IntToEHandle( const CRecvProxyData *pData, void *pStruct, void *pOut );
 
-void RecvProxy_IntToMoveParent( const CRecvProxyData *pData, void *pStruct, void *pOut );
+//void RecvProxy_IntToMoveParent( const CRecvProxyData *pData, void *pStruct, void *pOut );
 void RecvProxy_IntToColor32( const CRecvProxyData *pData, void *pStruct, void *pOut );
 void RecvProxy_IntSubOne( const CRecvProxyData *pData, void *pStruct, void *pOut );
 void RecvProxy_ShortSubOne( const CRecvProxyData *pData, void *pStruct, void *pOut );

@@ -347,19 +347,19 @@ void RecvProxy_SimulationTime( const CRecvProxyData *pData, void *pStruct, void 
 	pEntity->m_flSimulationTime = ( t * TICK_INTERVAL );
 }
 
-void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	CBaseEntity *pEnt = (CBaseEntity *)pStruct;
-
-	Vector vecVelocity;
-	
-	vecVelocity.x = pData->m_Value.m_Vector[0];
-	vecVelocity.y = pData->m_Value.m_Vector[1];
-	vecVelocity.z = pData->m_Value.m_Vector[2];
-
-	// SetLocalVelocity checks to see if the value has changed
-	pEnt->GetEngineObject()->SetLocalVelocity( vecVelocity );
-}
+//void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *pOut )
+//{
+//	CBaseEntity *pEnt = (CBaseEntity *)pStruct;
+//
+//	Vector vecVelocity;
+//	
+//	vecVelocity.x = pData->m_Value.m_Vector[0];
+//	vecVelocity.y = pData->m_Value.m_Vector[1];
+//	vecVelocity.z = pData->m_Value.m_Vector[2];
+//
+//	// SetLocalVelocity checks to see if the value has changed
+//	pEnt->GetEngineObject()->SetLocalVelocity( vecVelocity );
+//}
 void RecvProxy_ToolRecording( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
 	if ( !ToolsEnabled() )
@@ -416,13 +416,6 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 	RecvPropInt( RECVINFO(m_flSimulationTime), 0, RecvProxy_SimulationTime ),
 	RecvPropInt( RECVINFO( m_ubInterpolationFrame ) ),
 
-	RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
-#if PREDICTION_ERROR_CHECK_LEVEL > 1 
-	RecvPropVector( RECVINFO_NAME( m_angNetworkAngles, m_angRotation ) ),
-#else
-	RecvPropQAngles( RECVINFO_NAME( m_angNetworkAngles, m_angRotation ) ),
-#endif
-
 #ifdef DEMO_BACKWARDCOMPATABILITY
 	RecvPropInt( RECVINFO(m_nModelIndex), 0, RecvProxy_IntToModelIndex16_BackCompatible ),
 #else
@@ -439,7 +432,6 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 	RecvPropFloat(RECVINFO(m_flShadowCastDistance)),
 	RecvPropEHandle( RECVINFO(m_hOwnerEntity) ),
 	RecvPropEHandle( RECVINFO(m_hEffectEntity) ),
-	RecvPropInt( RECVINFO_NAME(m_hNetworkMoveParent, moveparent), 0, RecvProxy_IntToMoveParent ),
 	RecvPropInt( RECVINFO( m_iParentAttachment ) ),
 
 	RecvPropInt( "movetype", 0, SIZEOF_IGNORE, 0, RecvProxy_MoveType ),
@@ -460,9 +452,6 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 #endif
 
 END_RECV_TABLE()
-
-const float coordTolerance = 2.0f / (float)( 1 << COORD_FRACTIONAL_BITS );
-
 
 
 BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
@@ -489,14 +478,12 @@ BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 
 //	DEFINE_FIELD( m_nSimulationTick, FIELD_INTEGER ),
 
-	DEFINE_PRED_FIELD( m_hNetworkMoveParent, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE ),
 //	DEFINE_PRED_FIELD( m_pMoveParent, FIELD_EHANDLE ),
 //	DEFINE_PRED_FIELD( m_pMoveChild, FIELD_EHANDLE ),
 //	DEFINE_PRED_FIELD( m_pMovePeer, FIELD_EHANDLE ),
 //	DEFINE_PRED_FIELD( m_pMovePrevPeer, FIELD_EHANDLE ),
 
-	DEFINE_PRED_FIELD_TOL( m_vecNetworkOrigin, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, coordTolerance ),
-	DEFINE_PRED_FIELD( m_angNetworkAngles, FIELD_VECTOR, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK ),
+
 	//DEFINE_FIELD( m_vecAbsOrigin, FIELD_VECTOR ),
 	//DEFINE_FIELD( m_angAbsRotation, FIELD_VECTOR ),
 	//DEFINE_FIELD( m_vecOrigin, FIELD_VECTOR ),
@@ -1549,23 +1536,6 @@ void C_BaseEntity::GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType
 	m_EntClientFlags &= ~ENTCLIENTFLAG_GETTINGSHADOWRENDERBOUNDS;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : org - 
-//-----------------------------------------------------------------------------
-void C_BaseEntity::SetNetworkOrigin( const Vector& org )
-{
-	m_vecNetworkOrigin = org;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : ang - 
-//-----------------------------------------------------------------------------
-void C_BaseEntity::SetNetworkAngles( const QAngle& ang )
-{
-	m_angNetworkAngles = ang;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1981,8 +1951,8 @@ void C_BaseEntity::PreDataUpdate( DataUpdateType_t updateType )
 	}
 #endif
 
-	m_vecOldOrigin = GetNetworkOrigin();
-	m_vecOldAngRotation = GetNetworkAngles();
+	m_vecOldOrigin = GetEngineObject()->GetNetworkOrigin();
+	m_vecOldAngRotation = GetEngineObject()->GetNetworkAngles();
 
 	m_flOldAnimTime = m_flAnimTime;
 	m_flOldSimulationTime = m_flSimulationTime;
@@ -2109,10 +2079,10 @@ void C_BaseEntity::RemoveFromAimEntsList()
 //-----------------------------------------------------------------------------
 void C_BaseEntity::HierarchyUpdateMoveParent()
 {
-	if (m_hNetworkMoveParent.Get() && m_hNetworkMoveParent.Get()->GetEngineObject() == GetEngineObject()->GetMoveParent())
+	if (GetEngineObject()->GetNetworkMoveParent() && GetEngineObject()->GetNetworkMoveParent() == GetEngineObject()->GetMoveParent())
 		return;
 
-	GetEngineObject()->HierarchySetParent(m_hNetworkMoveParent.Get()?m_hNetworkMoveParent.Get()->GetEngineObject():NULL);
+	GetEngineObject()->HierarchySetParent(GetEngineObject()->GetNetworkMoveParent());
 }
 
 
@@ -2232,8 +2202,11 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 	// Deal with hierarchy. Have to do it here (instead of in a proxy)
 	// because this is the only point at which all entities are loaded
 	// If this condition isn't met, then a child was sent without its parent
-	Assert( m_hNetworkMoveParent.Get() || !m_hNetworkMoveParent.IsValid() );
-	GetEngineObject()->HierarchySetParent(m_hNetworkMoveParent.Get()?m_hNetworkMoveParent.Get()->GetEngineObject():NULL);
+	//Assert( m_hNetworkMoveParent.Get() || !m_hNetworkMoveParent.IsValid() );
+	if (GetEngineObject()->GetNetworkMoveParent()&& GetEngineObject()->GetNetworkMoveParent()->GetOuter()->entindex()==1) {
+		int aaa = 0;
+	}
+	GetEngineObject()->HierarchySetParent(GetEngineObject()->GetNetworkMoveParent());
 
 	MarkMessageReceived();
 
@@ -2276,7 +2249,7 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 //	}
 
 	// if we changed parents, recalculate visibility
-	if ( m_hOldMoveParent != m_hNetworkMoveParent )
+	if ( m_hOldMoveParent != GetEngineObject()->GetNetworkMoveParent())
 	{
 		UpdateVisibility();
 	}
@@ -2432,7 +2405,7 @@ void C_BaseEntity::OnNewParticleEffect( const char *pszParticleName, CNewParticl
 bool C_BaseEntity::Teleported( void )
 {
 	// Disable interpolation when hierarchy changes
-	if (m_hOldMoveParent != m_hNetworkMoveParent || m_iOldParentAttachment != m_iParentAttachment)
+	if (m_hOldMoveParent != GetEngineObject()->GetNetworkMoveParent() || m_iOldParentAttachment != m_iParentAttachment)
 	{
 		return true;
 	}
@@ -2491,8 +2464,8 @@ void C_BaseEntity::MoveToLastReceivedPosition( bool force )
 {
 	if ( force || ( m_nRenderFX != kRenderFxRagdoll ) )
 	{
-		GetEngineObject()->SetLocalOrigin( GetNetworkOrigin() );
-		GetEngineObject()->SetLocalAngles( GetNetworkAngles() );
+		GetEngineObject()->SetLocalOrigin( GetEngineObject()->GetNetworkOrigin() );
+		GetEngineObject()->SetLocalAngles(GetEngineObject()->GetNetworkAngles() );
 	}
 }
 
@@ -2537,7 +2510,7 @@ void C_BaseEntity::ProcessTeleportList()
 		if ( teleport || ef_nointerp )
 		{
 			// Undo the teleport flag..
-			pCur->m_hOldMoveParent = pCur->m_hNetworkMoveParent;			
+			pCur->m_hOldMoveParent = pCur->GetEngineObject()->GetNetworkMoveParent();
 			pCur->m_iOldParentAttachment = pCur->m_iParentAttachment;
 			// Zero out all but last update.
 			pCur->MoveToLastReceivedPosition( true );
@@ -2772,7 +2745,7 @@ void C_BaseEntity::InterpolateServerEntities()
 //-----------------------------------------------------------------------------
 void C_BaseEntity::OnPreDataChanged( DataUpdateType_t type )
 {
-	m_hOldMoveParent = m_hNetworkMoveParent;
+	m_hOldMoveParent = GetEngineObject()->GetNetworkMoveParent();
 	m_iOldParentAttachment = m_iParentAttachment;
 }
 

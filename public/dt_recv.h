@@ -298,7 +298,7 @@ inline bool RecvTable::IsInMainList() const
 #define RECVINFO_DT(varName)					RECVINFO_NOSIZE(varName)
 #define RECVINFO_DTNAME(varName,remoteVarName)	#remoteVarName, _hacky_dtrecv_offsetof(currentRecvDTClass, varName)
 
-#define RECVINFO_INVALID(varName)				#varName, 55550, -1
+//#define RECVINFO_INVALID(varName)				#varName, 55550, -1
 
 void RecvProxy_FloatToFloat  ( const CRecvProxyData *pData, void *pStruct, void *pOut );
 void RecvProxy_VectorToVector( const CRecvProxyData *pData, void *pStruct, void *pOut );

@@ -122,9 +122,9 @@ ConVar demo_fov_override( "demo_fov_override", "0", FCVAR_CLIENTDLL | FCVAR_DONT
 ConVar cl_meathook_neck_pivot_ingame_up( "cl_meathook_neck_pivot_ingame_up", "7.0" );
 ConVar cl_meathook_neck_pivot_ingame_fwd( "cl_meathook_neck_pivot_ingame_fwd", "3.0" );
 
-void RecvProxy_LocalVelocityX( const CRecvProxyData *pData, void *pStruct, void *pOut );
-void RecvProxy_LocalVelocityY( const CRecvProxyData *pData, void *pStruct, void *pOut );
-void RecvProxy_LocalVelocityZ( const CRecvProxyData *pData, void *pStruct, void *pOut );
+//void RecvProxy_LocalVelocityX( const CRecvProxyData *pData, void *pStruct, void *pOut );
+//void RecvProxy_LocalVelocityY( const CRecvProxyData *pData, void *pStruct, void *pOut );
+//void RecvProxy_LocalVelocityZ( const CRecvProxyData *pData, void *pStruct, void *pOut );
 
 void RecvProxy_ObserverTarget( const CRecvProxyData *pData, void *pStruct, void *pOut );
 void RecvProxy_ObserverMode  ( const CRecvProxyData *pData, void *pStruct, void *pOut );
@@ -228,9 +228,9 @@ END_RECV_TABLE()
 		RecvPropEHandle		( RECVINFO( m_hLastWeapon ) ),
 		RecvPropEHandle		( RECVINFO( m_hGroundEntity ) ),
 
- 		RecvPropFloat		(RECVINFO_INVALID(m_vecVelocity[0]), 0, RecvProxy_LocalVelocityX ),
- 		RecvPropFloat		(RECVINFO_INVALID(m_vecVelocity[1]), 0, RecvProxy_LocalVelocityY ),
- 		RecvPropFloat		(RECVINFO_INVALID(m_vecVelocity[2]), 0, RecvProxy_LocalVelocityZ ),
+ 		//RecvPropFloat		(RECVINFO_INVALID(m_vecVelocity[0]), 0, RecvProxy_LocalVelocityX ),
+ 		//RecvPropFloat		(RECVINFO_INVALID(m_vecVelocity[1]), 0, RecvProxy_LocalVelocityY ),
+ 		//RecvPropFloat		(RECVINFO_INVALID(m_vecVelocity[2]), 0, RecvProxy_LocalVelocityZ ),
 
 		RecvPropVector		( RECVINFO( m_vecBaseVelocity ) ),
 
@@ -681,7 +681,7 @@ void C_BasePlayer::SetLocalViewAngles( const QAngle &viewAngles )
 void C_BasePlayer::SetViewAngles( const QAngle& ang )
 {
 	SetLocalAngles( ang );
-	SetNetworkAngles( ang );
+	GetEngineObject()->SetNetworkAngles( ang );
 }
 
 
@@ -826,7 +826,7 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 		float flTimeDelta = m_flSimulationTime - m_flOldSimulationTime;
 		if ( flTimeDelta > 0  &&  !( IsNoInterpolationFrame() || bForceEFNoInterp ) )
 		{
-			Vector newVelo = (GetNetworkOrigin() - GetOldOrigin()  ) / flTimeDelta;
+			Vector newVelo = (GetEngineObject()->GetNetworkOrigin() - GetOldOrigin()  ) / flTimeDelta;
 			SetAbsVelocity( newVelo);
 		}
 	}
@@ -2439,56 +2439,56 @@ float C_BasePlayer::GetFOV( void )
 	return fFOV;
 }
 
-void RecvProxy_LocalVelocityX( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	C_BasePlayer *pPlayer = (C_BasePlayer *) pStruct;
+//void RecvProxy_LocalVelocityX( const CRecvProxyData *pData, void *pStruct, void *pOut )
+//{
+//	C_BasePlayer *pPlayer = (C_BasePlayer *) pStruct;
+//
+//	Assert( pPlayer );
+//
+//	float flNewVel_x = pData->m_Value.m_Float;
+//
+//	Vector vecVelocity = pPlayer->GetLocalVelocity();
+//
+//	if( vecVelocity.x != flNewVel_x )	// Should this use an epsilon check?
+//	{
+//		vecVelocity.x = flNewVel_x;
+//		pPlayer->SetLocalVelocity( vecVelocity );
+//	}
+//}
 
-	Assert( pPlayer );
+//void RecvProxy_LocalVelocityY( const CRecvProxyData *pData, void *pStruct, void *pOut )
+//{
+//	C_BasePlayer *pPlayer = (C_BasePlayer *) pStruct;
+//
+//	Assert( pPlayer );
+//
+//	float flNewVel_y = pData->m_Value.m_Float;
+//
+//	Vector vecVelocity = pPlayer->GetLocalVelocity();
+//
+//	if( vecVelocity.y != flNewVel_y )
+//	{
+//		vecVelocity.y = flNewVel_y;
+//		pPlayer->SetLocalVelocity( vecVelocity );
+//	}
+//}
 
-	float flNewVel_x = pData->m_Value.m_Float;
-
-	Vector vecVelocity = pPlayer->GetLocalVelocity();
-
-	if( vecVelocity.x != flNewVel_x )	// Should this use an epsilon check?
-	{
-		vecVelocity.x = flNewVel_x;
-		pPlayer->SetLocalVelocity( vecVelocity );
-	}
-}
-
-void RecvProxy_LocalVelocityY( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	C_BasePlayer *pPlayer = (C_BasePlayer *) pStruct;
-
-	Assert( pPlayer );
-
-	float flNewVel_y = pData->m_Value.m_Float;
-
-	Vector vecVelocity = pPlayer->GetLocalVelocity();
-
-	if( vecVelocity.y != flNewVel_y )
-	{
-		vecVelocity.y = flNewVel_y;
-		pPlayer->SetLocalVelocity( vecVelocity );
-	}
-}
-
-void RecvProxy_LocalVelocityZ( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	C_BasePlayer *pPlayer = (C_BasePlayer *) pStruct;
-	
-	Assert( pPlayer );
-
-	float flNewVel_z = pData->m_Value.m_Float;
-
-	Vector vecVelocity = pPlayer->GetLocalVelocity();
-
-	if( vecVelocity.z != flNewVel_z )
-	{
-		vecVelocity.z = flNewVel_z;
-		pPlayer->SetLocalVelocity( vecVelocity );
-	}
-}
+//void RecvProxy_LocalVelocityZ( const CRecvProxyData *pData, void *pStruct, void *pOut )
+//{
+//	C_BasePlayer *pPlayer = (C_BasePlayer *) pStruct;
+//	
+//	Assert( pPlayer );
+//
+//	float flNewVel_z = pData->m_Value.m_Float;
+//
+//	Vector vecVelocity = pPlayer->GetLocalVelocity();
+//
+//	if( vecVelocity.z != flNewVel_z )
+//	{
+//		vecVelocity.z = flNewVel_z;
+//		pPlayer->SetLocalVelocity( vecVelocity );
+//	}
+//}
 
 void RecvProxy_ObserverTarget( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {

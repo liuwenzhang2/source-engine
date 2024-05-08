@@ -268,7 +268,7 @@ inline void	CBeam::SetFireTime( float flFireTime )
 inline void CBeam::SetStartPos( const Vector &pos ) 
 { 
 #if defined( CLIENT_DLL )
-	SetNetworkOrigin( pos );
+	GetEngineObject()->SetNetworkOrigin( pos );
 #endif
 	SetLocalOrigin( pos );
 }

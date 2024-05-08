@@ -67,7 +67,7 @@ typedef unsigned int			AimEntsListHandle_t;
 #define		INVALID_AIMENTS_LIST_HANDLE		(AimEntsListHandle_t)~0
 
 extern void RecvProxy_IntToColor32( const CRecvProxyData *pData, void *pStruct, void *pOut );
-extern void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *pOut );
+//extern void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *pOut );
 //extern ISaveRestoreOps* engineObjectFuncs;
 extern ISoundEmitterSystem* g_pSoundEmitterSystem;
 //extern HSOUNDSCRIPTHANDLE PrecacheScriptSound(const char* soundname);
@@ -453,11 +453,7 @@ public:
 
 	
 
-	const Vector&					GetNetworkOrigin() const;
-	const QAngle&					GetNetworkAngles() const;
 
-	void SetNetworkOrigin( const Vector& org );
-	void SetNetworkAngles( const QAngle& ang );
 
 	void							SetLocalTransform( const matrix3x4_t &localTransform );
 
@@ -1347,10 +1343,6 @@ public:
 	// a render handle, and is put into the spatial partition.
 	bool InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t renderGroup );
 
-	void SetNetworkMoveParent(CHandle<C_BaseEntity> hMoveParent) {
-		m_hNetworkMoveParent = hMoveParent;
-	}
-
 	unsigned char GetParentAttachment() {
 		return m_iParentAttachment;
 	}
@@ -1474,12 +1466,7 @@ private:
 	// Prediction system
 	bool							m_bPredictable;
 
-
-
-
-	// The moveparent received from networking data
-	CHandle<C_BaseEntity>			m_hNetworkMoveParent;
-	CHandle<C_BaseEntity>			m_hOldMoveParent;
+	IEngineObjectClient* m_hOldMoveParent = NULL;
 
 	string_t						m_ModelName;
 
@@ -1511,9 +1498,7 @@ private:
 
 	
 
-	// Last values to come over the wire. Used for interpolation.
-	Vector							m_vecNetworkOrigin;
-	QAngle							m_angNetworkAngles;
+
 
 	// Behavior flags
 	int								m_fFlags;
@@ -1717,17 +1702,6 @@ inline bool C_BaseEntity::IsServerEntity( void )
 	return entindex() != -1;
 }
 
-
-
-inline const Vector& C_BaseEntity::GetNetworkOrigin() const
-{
-	return m_vecNetworkOrigin;
-}
-
-inline const QAngle& C_BaseEntity::GetNetworkAngles() const
-{
-	return m_angNetworkAngles;
-}
 
 inline const model_t *C_BaseEntity::GetModel( void ) const
 {

@@ -146,14 +146,14 @@ void CPrediction::CheckError( int commands_acknowledged )
 	if ( !player->GetEngineObject()->IsIntermediateDataAllocated() )
 		return;
 
-	origin = player->GetNetworkOrigin();
+	origin = player->GetEngineObject()->GetNetworkOrigin();
 		
-	const void *slot = player->GetEngineObject()->GetOuterPredictedFrame( commands_acknowledged - 1 );
+	const void *slot = player->GetEngineObject()->GetPredictedFrame( commands_acknowledged - 1 );
 	if ( !slot )
 		return;
 
 	// Find the origin field in the database
-	typedescription_t *td = FindFieldByName( "m_vecNetworkOrigin", player->GetPredDescMap() );
+	typedescription_t *td = FindFieldByName( "m_vecNetworkOrigin", player->GetEngineObject()->GetPredDescMap());
 	Assert( td );
 	if ( !td )
 		return;
@@ -608,7 +608,7 @@ void CPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *
 	
 	move->m_nPlayerHandle = player;// ->GetClientHandle();
 	move->m_vecVelocity		= player->GetAbsVelocity();
-	move->SetAbsOrigin( player->GetNetworkOrigin() );
+	move->SetAbsOrigin(player->GetEngineObject()->GetNetworkOrigin());
 	move->m_vecOldAngles	= move->m_vecAngles;
 	move->m_nOldButtons		= player->m_Local.m_nOldButtons;
 	move->m_flClientMaxSpeed = player->m_flMaxspeed;
@@ -689,7 +689,7 @@ void CPrediction::FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *m
 
 	player->SetLocalVelocity(move->m_vecVelocity);
 
-	player->m_vecNetworkOrigin = move->GetAbsOrigin();
+	player->GetEngineObject()->SetNetworkOrigin(move->GetAbsOrigin());
 	
 	player->m_Local.m_nOldButtons = move->m_nButtons;
 
@@ -1743,7 +1743,7 @@ void CPrediction::SetViewOrigin( Vector& org )
 		return;
 
 	player->SetLocalOrigin( org );
-	player->m_vecNetworkOrigin = org;
+	player->GetEngineObject()->SetNetworkOrigin(org);
 
 	player->GetEngineObject()->GetOriginInterpolator().Reset();//m_iv_vecOrigin
 }
