@@ -1442,6 +1442,8 @@ void CEngineObjectInternal::WorldToEntitySpace(const Vector& in, Vector* pOut) c
 	}
 }
 
+void EntityTouch_Add(CBaseEntity* pEntity);
+
 void CEngineObjectInternal::SetCheckUntouch(bool check)
 {
 	// Invalidate touchstamp

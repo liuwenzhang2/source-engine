@@ -1997,7 +1997,7 @@ CCheckClient g_CheckClient( "CCheckClient" );
 static int UTIL_GetNewCheckClient( int check )
 {
 	int		i;
-	CBaseEntity	*ent;
+	CBaseEntity	*ent = NULL;
 	Vector	org;
 
 // cycle to the next one
@@ -2019,13 +2019,13 @@ static int UTIL_GetNewCheckClient( int check )
 			i = 1;
 		}
 
+		// Looped but didn't find anything else
+		if (i == check)
+			break;
+
 		ent = gEntList.GetBaseEntity( i );
 		if ( !ent )
 			continue;
-
-		// Looped but didn't find anything else
-		if ( i == check )
-			break;	
 
 		//if ( !ent->GetUnknown() )
 		//	continue;

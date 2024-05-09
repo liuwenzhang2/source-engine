@@ -1762,7 +1762,6 @@ public:
 // singleton
 extern INotify *g_pNotify;
 
-void EntityTouch_Add( CBaseEntity *pEntity );
 int AimTarget_ListCount();
 int AimTarget_ListCopy( CBaseEntity *pList[], int listMax );
 void AimTarget_ForceRepopulateList();
