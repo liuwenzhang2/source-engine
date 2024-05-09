@@ -55,6 +55,11 @@ BEGIN_DATADESC( CBaseViewModel )
 
 END_DATADESC()
 
+void CBaseViewModel::OnRestore() {
+	BaseClass::OnRestore();
+	//RemoveEffects(EF_BONEMERGE);
+}
+
 int CBaseViewModel::UpdateTransmitState()
 {
 	if ( IsEffectActive( EF_NODRAW ) )

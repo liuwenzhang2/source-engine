@@ -215,7 +215,7 @@ END_RECV_TABLE()
 
 // specific to the local player
 BEGIN_RECV_TABLE_NOBASE( C_DODPlayer, DT_DODLocalPlayerExclusive )
-	RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+	//RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 	RecvPropFloat( RECVINFO( m_flStunDuration ), 0, RecvProxy_StunTime ),
 	RecvPropFloat( RECVINFO( m_flStunMaxAlpha)),
 	RecvPropInt( RECVINFO( m_iProgressBarDuration ) ),
@@ -224,7 +224,7 @@ END_RECV_TABLE()
 
 // all players except the local player
 BEGIN_RECV_TABLE_NOBASE( C_DODPlayer, DT_DODNonLocalPlayerExclusive )
-	RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
+	//RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 END_RECV_TABLE()
 
 // main table
@@ -421,7 +421,7 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 		SetSequence( LookupSequence( str ) );
 		ForceClientSideAnimationOn();
 
-		SetNetworkOrigin( m_vecRagdollOrigin );
+		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 		SetAbsOrigin( m_vecRagdollOrigin );
 		SetAbsVelocity( m_vecRagdollVelocity );
 
@@ -432,7 +432,7 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 			pPlayer->SnatchModelInstance( this );
 
 			SetAbsAngles( pPlayer->GetRenderAngles() );
-			SetNetworkAngles( pPlayer->GetRenderAngles() );
+			GetEngineObject()->SetNetworkAngles( pPlayer->GetRenderAngles() );
 		}
 	
 		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
@@ -498,7 +498,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 	{
 		// overwrite network origin so later interpolation will
 		// use this position
-		SetNetworkOrigin( m_vecRagdollOrigin );
+		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
 		SetAbsOrigin( m_vecRagdollOrigin );
 		SetAbsVelocity( m_vecRagdollVelocity );
@@ -1318,7 +1318,7 @@ void C_DODPlayer::PostDataUpdate( DataUpdateType_t updateType )
 {
 	// C_BaseEntity assumes we're networking the entity's angles, so pretend that it
 	// networked the same value we already have.
-	SetNetworkAngles( GetLocalAngles() );
+	GetEngineObject()->SetNetworkAngles( GetLocalAngles() );
 
 	BaseClass::PostDataUpdate( updateType );
 

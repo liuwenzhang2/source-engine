@@ -98,6 +98,7 @@ public:
 #endif
 
 #if !defined( CLIENT_DLL )
+	virtual void			OnRestore();
 	virtual int				UpdateTransmitState( void );
 	virtual int				ShouldTransmit( const CCheckTransmitInfo *pInfo );
 	virtual void			SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways );

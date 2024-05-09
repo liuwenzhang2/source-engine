@@ -285,7 +285,7 @@ void C_Prop_Portal::Simulate()
 	C_BaseViewModel *pLocalPlayerViewModel = pLocalPlayer->GetViewModel();
 
 	CBaseEntity *pEntsNearPortal[1024];
-	int iEntsNearPortal = UTIL_EntitiesInSphere( pEntsNearPortal, 1024, GetNetworkOrigin(), PORTAL_HALF_HEIGHT, 0, PARTITION_CLIENT_NON_STATIC_EDICTS );
+	int iEntsNearPortal = UTIL_EntitiesInSphere( pEntsNearPortal, 1024, GetEngineObject()->GetNetworkOrigin(), PORTAL_HALF_HEIGHT, 0, PARTITION_CLIENT_NON_STATIC_EDICTS );
 
 	if( iEntsNearPortal != 0 )
 	{
@@ -534,8 +534,8 @@ void C_Prop_Portal::OnPreDataChanged( DataUpdateType_t updateType )
 	//PreDataChanged.m_matrixThisToLinked = m_matrixThisToLinked;
 	PreDataChanged.m_bIsPortal2 = m_bIsPortal2;
 	PreDataChanged.m_bActivated = m_bActivated;
-	PreDataChanged.m_vOrigin = GetNetworkOrigin();
-	PreDataChanged.m_qAngles = GetNetworkAngles();
+	PreDataChanged.m_vOrigin = GetEngineObject()->GetNetworkOrigin();
+	PreDataChanged.m_qAngles = GetEngineObject()->GetNetworkAngles();
 	PreDataChanged.m_hLinkedTo = m_hLinkedPortal.Get();
 
 	BaseClass::OnPreDataChanged( updateType );
@@ -550,10 +550,10 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 	C_Prop_Portal *pRemote = m_hLinkedPortal;
 	m_pLinkedPortal = pRemote;
 	GetEngineObject()->GetVectors( &m_vForward, &m_vRight, &m_vUp );
-	m_ptOrigin = GetNetworkOrigin();
+	m_ptOrigin = GetEngineObject()->GetNetworkOrigin();
 
 	bool bPortalMoved = ( (PreDataChanged.m_vOrigin != m_ptOrigin ) ||
-						(PreDataChanged.m_qAngles != GetNetworkAngles()) || 
+						(PreDataChanged.m_qAngles != GetEngineObject()->GetNetworkAngles()) ||
 						(PreDataChanged.m_bActivated == false) ||
 						(PreDataChanged.m_bIsPortal2 != m_bIsPortal2) );
 
@@ -568,7 +568,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 		if( pRemote )
 		{
 			pRemote->GetEngineObject()->GetVectors( &vRemoteForward, &vRemoteRight, &vRemoteUp );
-			ptRemoteOrigin = pRemote->GetNetworkOrigin();
+			ptRemoteOrigin = pRemote->GetEngineObject()->GetNetworkOrigin();
 		}
 		g_pPortalRender->AddPortal( this ); //will know if we're already added and avoid adding twice
 		 
@@ -578,7 +578,7 @@ void C_Prop_Portal::OnDataChanged( DataUpdateType_t updateType )
 			Vector vScaledRight = m_vRight * (PORTAL_HALF_WIDTH * 0.95f);
 			Vector vScaledUp = m_vUp * (PORTAL_HALF_HEIGHT  * 0.95f);
 
-			m_PortalSimulator.MoveTo( GetNetworkOrigin(), GetNetworkAngles() );
+			m_PortalSimulator.MoveTo(GetEngineObject()->GetNetworkOrigin(), GetEngineObject()->GetNetworkAngles() );
 
 			//update our associated portal environment
 			//CPortal_PhysicsEnvironmentMgr::CreateEnvironment( this );

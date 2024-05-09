@@ -238,7 +238,7 @@ extern void SendProxy_Origin( const SendProp *pProp, const void *pStruct, const 
 // specific to the local player
 BEGIN_SEND_TABLE_NOBASE( CDODPlayer, DT_DODLocalPlayerExclusive )
 	// send a hi-res origin to the local player for use in prediction
-	SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+	//SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 	SendPropFloat( SENDINFO(m_flStunDuration), 0, SPROP_NOSCALE ),
 	SendPropFloat( SENDINFO(m_flStunMaxAlpha), 0, SPROP_NOSCALE ),
 	SendPropInt( SENDINFO( m_iProgressBarDuration ), 4, SPROP_UNSIGNED ),
@@ -248,7 +248,7 @@ END_SEND_TABLE()
 // all players except the local player
 BEGIN_SEND_TABLE_NOBASE( CDODPlayer, DT_DODNonLocalPlayerExclusive )
 	// send a lo-res origin to other players
-	SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
+	//SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 END_SEND_TABLE()
 		
 // main table

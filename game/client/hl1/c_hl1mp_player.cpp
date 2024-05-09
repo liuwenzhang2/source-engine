@@ -248,7 +248,7 @@ void C_HL1MP_Player::PostDataUpdate( DataUpdateType_t updateType )
 {
 	// C_BaseEntity assumes we're networking the entity's angles, so pretend that it
 	// networked the same value we already have.
-	SetNetworkAngles( GetLocalAngles() );
+	GetEngineObject()->SetNetworkAngles( GetLocalAngles() );
 	
 	BaseClass::PostDataUpdate( updateType );
 }
@@ -460,7 +460,7 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 	{
 		// overwrite network origin so later interpolation will
 		// use this position
-		SetNetworkOrigin( m_vecRagdollOrigin );
+		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
 		SetAbsOrigin( m_vecRagdollOrigin );
 		SetAbsVelocity( m_vecRagdollVelocity );

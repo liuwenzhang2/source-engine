@@ -457,6 +457,7 @@ void C_BaseViewModel::OnDataChanged( DataUpdateType_t updateType )
 void C_BaseViewModel::PostDataUpdate( DataUpdateType_t updateType )
 {
 	BaseClass::PostDataUpdate(updateType);
+	GetEngineObject()->HierarchySetParent(NULL);
 	GetEngineObject()->OnLatchInterpolatedVariables( LATCH_ANIMATION_VAR );
 }
 

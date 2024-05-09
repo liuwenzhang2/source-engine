@@ -892,7 +892,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 	{
 		// overwrite network origin so later interpolation will
 		// use this position
-		SetNetworkOrigin( m_vecRagdollOrigin );
+		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
 		SetAbsOrigin( m_vecRagdollOrigin );
 		SetAbsVelocity( m_vecRagdollVelocity );

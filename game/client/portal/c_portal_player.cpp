@@ -1109,7 +1109,7 @@ bool C_Portal_Player::DetectAndHandlePortalTeleportation( void )
 		//Assert( pOldPortal );
 		//if( pOldPortal )
 		{
-			Vector ptNewPosition = GetNetworkOrigin();
+			Vector ptNewPosition = GetEngineObject()->GetNetworkOrigin();
 
 			UTIL_Portal_PointTransform( m_PendingPortalMatrix, PortalEyeInterpolation.m_vEyePosition_Interpolated, PortalEyeInterpolation.m_vEyePosition_Interpolated );
 			UTIL_Portal_PointTransform( m_PendingPortalMatrix, PortalEyeInterpolation.m_vEyePosition_Uninterpolated, PortalEyeInterpolation.m_vEyePosition_Uninterpolated );
@@ -1135,7 +1135,7 @@ bool C_Portal_Player::DetectAndHandlePortalTeleportation( void )
 				SetLocalAngles( m_angEyeAngles );
 			}
 
-			m_PlayerAnimState->Teleport ( &ptNewPosition, &GetNetworkAngles(), this );
+			m_PlayerAnimState->Teleport ( &ptNewPosition, &GetEngineObject()->GetNetworkAngles(), this );
 
 			// Reorient last facing direction to fix pops in view model lag
 			for ( int i = 0; i < MAX_VIEWMODELS; i++ )
@@ -1166,7 +1166,7 @@ void C_Portal_Player::PostDataUpdate( DataUpdateType_t updateType )
 {
 	// C_BaseEntity assumes we're networking the entity's angles, so pretend that it
 	// networked the same value we already have.
-	SetNetworkAngles( GetLocalAngles() );
+	GetEngineObject()->SetNetworkAngles( GetLocalAngles() );
 
 	if ( m_iSpawnInterpCounter != m_iSpawnInterpCounterCache )
 	{
@@ -1533,7 +1533,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 	Vector ptPortalCenter;
 	Vector vPortalForward;
 
-	ptPortalCenter = pPortal->GetNetworkOrigin();
+	ptPortalCenter = pPortal->GetEngineObject()->GetNetworkOrigin();
 	pPortal->GetEngineObject()->GetVectors( &vPortalForward, NULL, NULL );
 	float fPortalPlaneDist = vPortalForward.Dot( ptPortalCenter );
 
