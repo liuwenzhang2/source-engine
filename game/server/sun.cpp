@@ -23,6 +23,8 @@ public:
 
 	CSun();
 
+	void			PostConstructor(const char* szClassname, int iForceEdictIndex);
+
 	virtual void	Activate();
 
 	// Input handlers
@@ -103,11 +105,15 @@ CSun::CSun()
 	m_nSize = 16;
 
 	m_bOn = true;
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	m_strMaterial = NULL_STRING;
 	m_strOverlayMaterial = NULL_STRING;
 	m_nOverlaySize = -1;
+}
+
+void CSun::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	GetEngineObject()->AddEFlags(EFL_FORCE_CHECK_TRANSMIT);
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
 }
 
 void CSun::Activate()

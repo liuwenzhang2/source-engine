@@ -3185,7 +3185,7 @@ void CVortigauntChargeToken::Spawn( void )
 	SetGravity( 0.0f );
 
 	// No model but we still need to force this!
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	SetNextThink( gpGlobals->curtime + 0.05f );
 
@@ -3386,7 +3386,7 @@ void CVortigauntEffectDispel::Spawn( void )
 	SetSolidFlags( FSOLID_NOT_SOLID );
 
 	// No model but we still need to force this!
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	BaseClass::Spawn();
 }
@@ -3422,7 +3422,7 @@ public:
 	{
 		BaseClass::Spawn();
 
-		AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+		GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 	}
 
 private:

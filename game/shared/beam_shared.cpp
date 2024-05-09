@@ -51,7 +51,7 @@ void CInfoTarget::Spawn( void )
 
 	if ( HasSpawnFlags(0x01) )
 	{
-		SetEFlags( EFL_FORCE_CHECK_TRANSMIT );
+		GetEngineObject()->SetEFlags( EFL_FORCE_CHECK_TRANSMIT );
 	}
 }
 
@@ -425,7 +425,7 @@ void CBeam::SetStartEntity( CBaseEntity *pEntity )
 	m_hAttachEntity.Set( 0, pEntity );
 	SetOwnerEntity( pEntity );
 	RelinkBeam();
-	pEntity->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	pEntity->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 }
 
 void CBeam::SetEndEntity( CBaseEntity *pEntity ) 
@@ -434,7 +434,7 @@ void CBeam::SetEndEntity( CBaseEntity *pEntity )
 	m_hAttachEntity.Set( m_nNumBeamEnts-1, pEntity );
 	m_hEndEntity = pEntity;
 	RelinkBeam();
-	pEntity->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	pEntity->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 }
 
 

@@ -180,7 +180,7 @@ void C_VGuiScreen::CreateVguiScreen( const char *pTypeName )
 	// Clear out any old screens.
 	DestroyVguiScreen();
 
-	AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+	GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 
 	// Create the new screen...
 	VGuiScreenInitData_t initData( this );

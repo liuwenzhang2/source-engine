@@ -2184,7 +2184,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 
 	pLaserDot->SetOwnerEntity( pOwner );
 
-	pLaserDot->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	pLaserDot->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	if ( !bVisibleDot )
 	{

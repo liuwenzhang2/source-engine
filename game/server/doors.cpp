@@ -301,7 +301,7 @@ void CBaseDoor::Spawn()
 		if ( HasSpawnFlags(SF_DOOR_PASSABLE) )
 		{
 			//normal door
-			AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+			GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 			AddSolidFlags( FSOLID_NOT_SOLID );
 		}
 

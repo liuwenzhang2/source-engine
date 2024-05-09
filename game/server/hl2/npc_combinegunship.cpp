@@ -544,7 +544,7 @@ void CNPC_CombineGunship::Spawn( void )
 	BaseClass::Spawn();
 
 	InitPathingData( GUNSHIP_ARRIVE_DIST, GUNSHIP_MIN_CHASE_DIST_DIFF, sk_gunship_burst_min.GetFloat() );
-	AddEFlags( EFL_NO_DISSOLVE | EFL_NO_MEGAPHYSCANNON_RAGDOLL | EFL_NO_PHYSCANNON_INTERACTION );
+	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE | EFL_NO_MEGAPHYSCANNON_RAGDOLL | EFL_NO_PHYSCANNON_INTERACTION );
 
 	m_takedamage = DAMAGE_YES;
 
@@ -611,7 +611,7 @@ void CNPC_CombineGunship::Spawn( void )
 	m_iBurstHits = 0;
 
 	// Do not dissolve
-	AddEFlags( EFL_NO_DISSOLVE );
+	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
 	for ( int i = 0; i < GUNSHIP_NUM_DAMAGE_OUTPUTS; i++ )
 	{
@@ -1089,7 +1089,7 @@ void CNPC_CombineGunship::DoBellyBlastDamage( trace_t &tr, Vector vMins, Vector 
 		// If the creature was killed, then dissolve it
 		if ( pEntity->GetHealth() <= 0.0f )
 		{
-			if ( pEntity->GetBaseAnimating() != NULL && !pEntity->IsEFlagSet( EFL_NO_DISSOLVE ) )
+			if ( pEntity->GetBaseAnimating() != NULL && !pEntity->GetEngineObject()->IsEFlagSet( EFL_NO_DISSOLVE ) )
 			{
 				pEntity->GetBaseAnimating()->Dissolve( NULL, gpGlobals->curtime );
 			}

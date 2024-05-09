@@ -417,7 +417,7 @@ void UTIL_EnableRemoveImmediate()
 void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 {
 	// valid pointer or already removed?
-	if ( !oldObj || oldObj->IsEFlagSet(EFL_KILLME) )
+	if ( !oldObj || oldObj->GetEngineObject()->IsEFlagSet(EFL_KILLME) )
 		return;
 
 	if ( s_RemoveImmediateSemaphore )
@@ -434,7 +434,7 @@ void UTIL_RemoveImmediate( CBaseEntity *oldObj )
 	}
 #endif
 
-	oldObj->AddEFlags( EFL_KILLME );	// Make sure to ignore further calls into here or UTIL_Remove.
+	oldObj->GetEngineObject()->AddEFlags( EFL_KILLME );	// Make sure to ignore further calls into here or UTIL_Remove.
 
 	g_bReceivedChainedUpdateOnRemove = false;
 	oldObj->UpdateOnRemove();

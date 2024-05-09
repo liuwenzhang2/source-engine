@@ -149,7 +149,7 @@ CEntityFlame *CEntityFlame::Create( CBaseEntity *pTarget, bool useHitboxes )
 	pFlame->SetLifetime( 2.0f );
 
 	//Send to the client even though we don't have a model
-	pFlame->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	pFlame->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	pFlame->SetUseHitboxes( useHitboxes );
 

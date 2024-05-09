@@ -253,7 +253,7 @@ CEntityDissolve *CEntityDissolve::Create( CBaseEntity *pTarget, const char *pMat
 	pDissolve->Spawn();
 
 	// Send to the client even though we don't have a model
-	pDissolve->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	pDissolve->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	// Play any appropriate noises when we start to dissolve
 	if ( (nDissolveType == ENTITY_DISSOLVE_ELECTRICAL) || (nDissolveType == ENTITY_DISSOLVE_ELECTRICAL_LIGHT) )

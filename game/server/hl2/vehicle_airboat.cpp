@@ -616,7 +616,7 @@ void CPropAirboat::InputEnableGun( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPropAirboat::InputStartRotorWashForces( inputdata_t &inputdata )
 {
-	RemoveEFlags( EFL_NO_ROTORWASH_PUSH );
+	GetEngineObject()->RemoveEFlags( EFL_NO_ROTORWASH_PUSH );
 }
 
 
@@ -625,7 +625,7 @@ void CPropAirboat::InputStartRotorWashForces( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPropAirboat::InputStopRotorWashForces( inputdata_t &inputdata )
 {
-	AddEFlags( EFL_NO_ROTORWASH_PUSH );
+	GetEngineObject()->AddEFlags( EFL_NO_ROTORWASH_PUSH );
 }
 
 

@@ -345,8 +345,7 @@ CBaseEntity::CBaseEntity()
 	CollisionProp()->Init( this );
 	NetworkProp()->Init( this );
 
-	// NOTE: THIS MUST APPEAR BEFORE ANY SetMoveType() or SetNextThink() calls
-	AddEFlags( EFL_NO_THINK_FUNCTION | EFL_NO_GAME_PHYSICS_SIMULATION | EFL_USE_PARTITION_WHEN_NOT_SOLID );
+
 
 	// clear debug overlays
 	m_debugOverlays  = 0;
@@ -368,19 +367,16 @@ CBaseEntity::CBaseEntity()
 	ClearSolidFlags();
 
 	m_nModelIndex = 0;
+	m_ModelName = NULL_STRING;
 	m_bDynamicModelAllowed = false;
 	m_bDynamicModelPending = false;
 	m_bDynamicModelSetBounds = false;
 
 	SetMoveType( MOVETYPE_NONE );
 	SetOwnerEntity( NULL );
-	SetCheckUntouch( false );
-	SetModelIndex( 0 );
-	SetModelName( NULL_STRING );
 	m_nTransmitStateOwnedCounter = 0;
-
+	m_fFlags = 0;
 	SetCollisionBounds( vec3_origin, vec3_origin );
-	ClearFlags();
 
 	SetFriction( 1.0f );
 
@@ -390,73 +386,17 @@ CBaseEntity::CBaseEntity()
 	//}
 	//GetEngineObject()->MarkPVSInformationDirty();
 
-#ifndef _XBOX
-	AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
-#endif
+
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Scale up our physics hull and test against the new one
-// Input  : *pNewCollide - New collision hull
-//-----------------------------------------------------------------------------
-void CBaseEntity::SetScaledPhysics( IPhysicsObject *pNewObject )
+void CBaseEntity::PostConstructor(const char* szClassname, int iForceEdictIndex)
 {
-	if ( pNewObject )
-	{
-		AddSolidFlags( FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
-	}
-	else
-	{
-		RemoveSolidFlags( FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
-	}
-}
-
-extern bool g_bDisableEhandleAccess;
-
-//-----------------------------------------------------------------------------
-// Purpose: See note below
-//-----------------------------------------------------------------------------
-CBaseEntity::~CBaseEntity( )
-{
-	// FIXME: This can't be called from UpdateOnRemove! There's at least one
-	// case where friction sounds are added between the call to UpdateOnRemove + ~CBaseEntity
-	PhysCleanupFrictionSounds( this );
-
-	Assert( !IsDynamicModelIndex( m_nModelIndex ) );
-	Verify( !sg_DynamicLoadHandlers.Remove( this ) );
-
-	// In debug make sure that we don't call delete on an entity without setting
-	//  the disable flag first!
-	// EHANDLE accessors will check, in debug, for access to entities during destruction of
-	//  another entity.
-	// That kind of operation should only occur in UpdateOnRemove calls
-	// Deletion should only occur via UTIL_Remove(Immediate) calls, not via naked delete calls
-	Assert( g_bDisableEhandleAccess );
-
-	VPhysicsDestroyObject();
-
-	// Need to remove references to this entity before EHANDLES go null
-	{
-		g_bDisableEhandleAccess = false;
-		CBaseEntity::PhysicsRemoveTouchedList( this );
-		CBaseEntity::PhysicsRemoveGroundList( this );
-		SetGroundEntity( NULL ); // remove us from the ground entity if we are on it
-		DestroyAllDataObjects();
-		g_bDisableEhandleAccess = true;
-
-		// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
-		//gEntList.RemoveEntity( this );
-	}
-}
-
-void CBaseEntity::PostConstructor( const char *szClassname, int iForceEdictIndex)
-{
-	if ( szClassname )
+	if (szClassname)
 	{
 		SetClassname(szClassname);
 	}
 
-	Assert(GetEngineObject()->GetClassname() != NULL_STRING && STRING(GetEngineObject()->GetClassname()) != NULL );
+	Assert(GetEngineObject()->GetClassname() != NULL_STRING && STRING(GetEngineObject()->GetClassname()) != NULL);
 
 	// Possibly get an edict, and add self to global list of entites.
 	//if ( !IsNetworkable() )
@@ -503,9 +443,169 @@ void CBaseEntity::PostConstructor( const char *szClassname, int iForceEdictIndex
 	//	//}
 	//}
 
-	CheckHasThinkFunction( false );
+	CheckHasThinkFunction(false);
 	CheckHasGamePhysicsSimulation();
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: Scale up our physics hull and test against the new one
+// Input  : *pNewCollide - New collision hull
+//-----------------------------------------------------------------------------
+void CBaseEntity::SetScaledPhysics( IPhysicsObject *pNewObject )
+{
+	if ( pNewObject )
+	{
+		AddSolidFlags( FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
+	}
+	else
+	{
+		RemoveSolidFlags( FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
+	}
+}
+
+extern bool g_bDisableEhandleAccess;
+
+// For code error checking
+extern bool g_bReceivedChainedUpdateOnRemove;
+
+//-----------------------------------------------------------------------------
+// Purpose: Called just prior to object destruction
+//  Entities that need to unlink themselves from other entities should do the unlinking
+//  here rather than in their destructor.  The reason why is that when the global entity list
+//  is told to Clear(), it first takes a pass through all active entities and calls UTIL_Remove
+//  on each such entity.  Then it calls the delete function on each deleted entity in the list.
+// In the old code, the objects were simply destroyed in order and there was no guarantee that the
+//  destructor of one object would not try to access another object that might already have been
+//  destructed (especially since the entity list order is more or less random!).
+// NOTE:  You should never call delete directly on an entity (there's an assert now), see note
+//  at CBaseEntity::~CBaseEntity for more information.
+// 
+// NOTE:  You should chain to BaseClass::UpdateOnRemove after doing your own cleanup code, e.g.:
+// 
+// void CDerived::UpdateOnRemove( void )
+// {
+//		... cleanup code
+//		...
+//
+//		BaseClass::UpdateOnRemove();
+// }
+//
+// In general, this function updates global tables that need to know about entities being removed
+//-----------------------------------------------------------------------------
+void CBaseEntity::UpdateOnRemove(void)
+{
+	g_bReceivedChainedUpdateOnRemove = true;
+
+	// Virtual call to shut down any looping sounds.
+	StopLoopingSounds();
+
+	// Notifies entity listeners, etc
+	gEntList.NotifyRemoveEntity(this);
+
+	if (!IsNetworkable() || entindex() != -1)
+	{
+		AddFlag(FL_KILLME);
+		if (GetFlags() & FL_GRAPHED)
+		{
+			/*	<<TODO>>
+			// this entity was a LinkEnt in the world node graph, so we must remove it from
+			// the graph since we are removing it from the world.
+			for ( int i = 0 ; i < WorldGraph.m_cLinks ; i++ )
+			{
+				if ( WorldGraph.m_pLinkPool [ i ].m_pLinkEnt == pev )
+				{
+					// if this link has a link ent which is the same ent that is removing itself, remove it!
+					WorldGraph.m_pLinkPool [ i ].m_pLinkEnt = NULL;
+				}
+			}
+			*/
+		}
+	}
+
+	if (GetEngineObject()->GetGlobalname() != NULL_STRING)
+	{
+		// NOTE: During level shutdown the global list will suppress this
+		// it assumes your changing levels or the game will end
+		// causing the whole list to be flushed
+		GlobalEntity_SetState(GetEngineObject()->GetGlobalname(), GLOBAL_DEAD);
+	}
+
+	VPhysicsDestroyObject();
+
+	// This is only here to allow the MOVETYPE_NONE to be set without the
+	// assertion triggering. Why do we bother setting the MOVETYPE to none here?
+	RemoveEffects(EF_BONEMERGE);
+	SetMoveType(MOVETYPE_NONE);
+
+	// If we have a parent, unlink from it.
+	this->BeforeUnlinkParent(NULL);
+	IEngineObjectServer::UnlinkFromParent(this->GetEngineObject());
+
+	// Any children still connected are orphans, mark all for delete
+	CUtlVector<CBaseEntity*> childrenList;
+	GetAllChildren(this, childrenList);
+	if (childrenList.Count())
+	{
+		DevMsg(2, "Warning: Deleting orphaned children of %s\n", GetClassname());
+		for (int i = childrenList.Count() - 1; i >= 0; --i)
+		{
+			UTIL_Remove(childrenList[i]);
+		}
+	}
+
+	SetGroundEntity(NULL);
+
+	if (m_bDynamicModelPending)
+	{
+		sg_DynamicLoadHandlers.Remove(this);
+	}
+
+	if (IsDynamicModelIndex(m_nModelIndex))
+	{
+		modelinfo->ReleaseDynamicModel(m_nModelIndex); // no-op if not dynamic
+		m_nModelIndex = -1;
+	}
+
+	// Need to remove references to this entity before EHANDLES go null
+	{
+		g_bDisableEhandleAccess = false;
+		CBaseEntity::PhysicsRemoveTouchedList(this);
+		CBaseEntity::PhysicsRemoveGroundList(this);
+		SetGroundEntity(NULL); // remove us from the ground entity if we are on it
+		DestroyAllDataObjects();
+		g_bDisableEhandleAccess = true;
+
+		// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
+		//gEntList.RemoveEntity( this );
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: See note below
+//-----------------------------------------------------------------------------
+CBaseEntity::~CBaseEntity( )
+{
+	// FIXME: This can't be called from UpdateOnRemove! There's at least one
+	// case where friction sounds are added between the call to UpdateOnRemove + ~CBaseEntity
+	PhysCleanupFrictionSounds( this );
+
+	Assert( !IsDynamicModelIndex( m_nModelIndex ) );
+	Verify( !sg_DynamicLoadHandlers.Remove( this ) );
+
+	// In debug make sure that we don't call delete on an entity without setting
+	//  the disable flag first!
+	// EHANDLE accessors will check, in debug, for access to entities during destruction of
+	//  another entity.
+	// That kind of operation should only occur in UpdateOnRemove calls
+	// Deletion should only occur via UTIL_Remove(Immediate) calls, not via naked delete calls
+	Assert( g_bDisableEhandleAccess );
+
+	VPhysicsDestroyObject();
+
+
+}
+
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Called after player becomes active in the game
@@ -1237,7 +1337,7 @@ int CBaseEntity::OnTakeDamage( const CTakeDamageInfo &info )
 	// figure momentum add (don't let hurt brushes or other triggers move player)
 
 	// physics objects have their own calcs for this: (don't let fire move things around!)
-	if ( !IsEFlagSet( EFL_NO_DAMAGE_FORCES ) )
+	if ( !GetEngineObject()->IsEFlagSet( EFL_NO_DAMAGE_FORCES ) )
 	{
 		if ( ( GetMoveType() == MOVETYPE_VPHYSICS ) )
 		{
@@ -1626,7 +1726,6 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 //#if !defined( NO_ENTITY_PREDICTION )
 //	DEFINE_FIELD( m_PredictableID, CPredictableId ),
 //#endif
-	DEFINE_FIELD( touchStamp, FIELD_INTEGER ),
 	DEFINE_CUSTOM_FIELD( m_aThinkFunctions, thinkcontextFuncs ),
 	//								m_iCurrentThinkContext (not saved, debug field only, and think transient to boot)
 
@@ -1657,7 +1756,6 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	//DEFINE_CUSTOM_GLOBAL_FIELD( m_hMoveChild, engineObjectFuncs),
 	//DEFINE_CUSTOM_GLOBAL_FIELD( m_hMovePeer, engineObjectFuncs),
 	
-	DEFINE_FIELD( m_iEFlags, FIELD_INTEGER ),
 
 	//DEFINE_CUSTOM_FIELD_INVALID( m_iName, engineObjectFuncs),
 	DEFINE_EMBEDDED( m_Collision ),
@@ -1797,107 +1895,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 END_DATADESC()
 
-// For code error checking
-extern bool g_bReceivedChainedUpdateOnRemove;
 
-//-----------------------------------------------------------------------------
-// Purpose: Called just prior to object destruction
-//  Entities that need to unlink themselves from other entities should do the unlinking
-//  here rather than in their destructor.  The reason why is that when the global entity list
-//  is told to Clear(), it first takes a pass through all active entities and calls UTIL_Remove
-//  on each such entity.  Then it calls the delete function on each deleted entity in the list.
-// In the old code, the objects were simply destroyed in order and there was no guarantee that the
-//  destructor of one object would not try to access another object that might already have been
-//  destructed (especially since the entity list order is more or less random!).
-// NOTE:  You should never call delete directly on an entity (there's an assert now), see note
-//  at CBaseEntity::~CBaseEntity for more information.
-// 
-// NOTE:  You should chain to BaseClass::UpdateOnRemove after doing your own cleanup code, e.g.:
-// 
-// void CDerived::UpdateOnRemove( void )
-// {
-//		... cleanup code
-//		...
-//
-//		BaseClass::UpdateOnRemove();
-// }
-//
-// In general, this function updates global tables that need to know about entities being removed
-//-----------------------------------------------------------------------------
-void CBaseEntity::UpdateOnRemove( void )
-{
-	g_bReceivedChainedUpdateOnRemove = true;
-
-	// Virtual call to shut down any looping sounds.
-	StopLoopingSounds();
-
-	// Notifies entity listeners, etc
-	gEntList.NotifyRemoveEntity( this );
-
-	if (!IsNetworkable() || entindex()!=-1 )
-	{
-		AddFlag( FL_KILLME );
-		if ( GetFlags() & FL_GRAPHED )
-		{
-			/*	<<TODO>>
-			// this entity was a LinkEnt in the world node graph, so we must remove it from
-			// the graph since we are removing it from the world.
-			for ( int i = 0 ; i < WorldGraph.m_cLinks ; i++ )
-			{
-				if ( WorldGraph.m_pLinkPool [ i ].m_pLinkEnt == pev )
-				{
-					// if this link has a link ent which is the same ent that is removing itself, remove it!
-					WorldGraph.m_pLinkPool [ i ].m_pLinkEnt = NULL;
-				}
-			}
-			*/
-		}
-	}
-
-	if (GetEngineObject()->GetGlobalname() != NULL_STRING )
-	{
-		// NOTE: During level shutdown the global list will suppress this
-		// it assumes your changing levels or the game will end
-		// causing the whole list to be flushed
-		GlobalEntity_SetState(GetEngineObject()->GetGlobalname(), GLOBAL_DEAD);
-	}
-
-	VPhysicsDestroyObject();
-
-	// This is only here to allow the MOVETYPE_NONE to be set without the
-	// assertion triggering. Why do we bother setting the MOVETYPE to none here?
-	RemoveEffects( EF_BONEMERGE );
-	SetMoveType(MOVETYPE_NONE);
-
-	// If we have a parent, unlink from it.
-	this->BeforeUnlinkParent(NULL);
-	IEngineObjectServer::UnlinkFromParent( this->GetEngineObject());
-
-	// Any children still connected are orphans, mark all for delete
-	CUtlVector<CBaseEntity *> childrenList;
-	GetAllChildren( this, childrenList );
-	if ( childrenList.Count() )
-	{
-		DevMsg( 2, "Warning: Deleting orphaned children of %s\n", GetClassname() );
-		for ( int i = childrenList.Count()-1; i >= 0; --i )
-		{
-			UTIL_Remove( childrenList[i] );
-		}
-	}
-
-	SetGroundEntity( NULL );
-
-	if ( m_bDynamicModelPending )
-	{
-		sg_DynamicLoadHandlers.Remove( this );
-	}
-	
-	if ( IsDynamicModelIndex( m_nModelIndex ) )
-	{
-		modelinfo->ReleaseDynamicModel( m_nModelIndex ); // no-op if not dynamic
-		m_nModelIndex = -1;
-	}
-}
 
 //-----------------------------------------------------------------------------
 // capabilities
@@ -2458,7 +2456,7 @@ void CBaseEntity::PhysicsTouchTriggers( const Vector *pPrevAbsOrigin )
 			}
 		}
 
-		SetCheckUntouch( true );
+		GetEngineObject()->SetCheckUntouch( true );
 		if ( isSolidCheckTriggers )
 		{
 			engine->SolidMoved( this, CollisionProp(), pPrevAbsOrigin, sm_bAccurateTriggerBboxChecks );
@@ -2817,7 +2815,7 @@ bool CBaseEntity::PassesDamageFilter( const CTakeDamageInfo &info )
 
 void CBaseEntity::MakeDormant( void )
 {
-	AddEFlags( EFL_DORMANT );
+	GetEngineObject()->AddEFlags( EFL_DORMANT );
 
 	// disable thinking for dormant entities
 	SetThink( NULL );
@@ -2825,7 +2823,7 @@ void CBaseEntity::MakeDormant( void )
 	if ( entindex()==-1 )
 		return;
 
-	SETBITS( m_iEFlags, EFL_DORMANT );
+	//SETBITS( m_iEFlags, EFL_DORMANT );
 	
 	// Don't touch
 	AddSolidFlags( FSOLID_NOT_SOLID );
@@ -2839,7 +2837,7 @@ void CBaseEntity::MakeDormant( void )
 
 int CBaseEntity::IsDormant( void )
 {
-	return IsEFlagSet( EFL_DORMANT );
+	return GetEngineObject()->IsEFlagSet( EFL_DORMANT );
 }
 
 
@@ -3003,7 +3001,7 @@ int CBaseEntity::Restore( IRestore &restore )
 	// By definition, the surrounding bounds are dirty
 	// Also, twiddling with the flags here ensures it gets added to the KD tree dirty list
 	// (We don't want to use the saved version of this flag)
-	RemoveEFlags( EFL_DIRTY_SPATIAL_PARTITION );
+	GetEngineObject()->RemoveEFlags( EFL_DIRTY_SPATIAL_PARTITION );
 	CollisionProp()->MarkSurroundingBoundsDirty();
 
 	if (IsNetworkable() && entindex()!=-1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
@@ -3056,10 +3054,10 @@ void CBaseEntity::OnRestore()
 	SimThink_EntityChanged( this );
 
 	// touchlinks get recomputed
-	if ( IsEFlagSet( EFL_CHECK_UNTOUCH ) )
+	if (GetEngineObject()->IsEFlagSet( EFL_CHECK_UNTOUCH ) )
 	{
-		RemoveEFlags( EFL_CHECK_UNTOUCH );
-		SetCheckUntouch( true );
+		GetEngineObject()->RemoveEFlags( EFL_CHECK_UNTOUCH );
+		GetEngineObject()->SetCheckUntouch( true );
 	}
 
 	// disable touch functions while we recreate the touch links between entities
@@ -3335,7 +3333,7 @@ int CBaseEntity::UpdateTransmitState()
 		return SetTransmitState( FL_EDICT_DONTSEND );
 	}
 
-	if ( !IsEFlagSet( EFL_FORCE_CHECK_TRANSMIT ) )
+	if ( !GetEngineObject()->IsEFlagSet( EFL_FORCE_CHECK_TRANSMIT ) )
 	{
 		if ( !GetModelIndex() || !GetModelName() )
 		{
@@ -3349,7 +3347,7 @@ int CBaseEntity::UpdateTransmitState()
 		return SetTransmitState( FL_EDICT_ALWAYS );
 	}
 
-	if ( IsEFlagSet( EFL_IN_SKYBOX ) )
+	if (GetEngineObject()->IsEFlagSet( EFL_IN_SKYBOX ) )
 	{
 		return SetTransmitState( FL_EDICT_ALWAYS );
 	}
@@ -3494,11 +3492,11 @@ bool CBaseEntity::DetectInSkybox()
 {
 	if ( GetEntitySkybox() != NULL )
 	{
-		AddEFlags( EFL_IN_SKYBOX );
+		GetEngineObject()->AddEFlags( EFL_IN_SKYBOX );
 		return true;
 	}
 
-	RemoveEFlags( EFL_IN_SKYBOX );
+	GetEngineObject()->RemoveEFlags( EFL_IN_SKYBOX );
 	return false;
 }
 
@@ -3856,12 +3854,12 @@ bool CBaseEntity::ReadKeyField( const char *varName, variant_t *var )
 //-----------------------------------------------------------------------------
 void CBaseEntity::InputEnableDamageForces( inputdata_t &inputdata )
 {
-	RemoveEFlags( EFL_NO_DAMAGE_FORCES );
+	GetEngineObject()->RemoveEFlags( EFL_NO_DAMAGE_FORCES );
 }
 
 void CBaseEntity::InputDisableDamageForces( inputdata_t &inputdata )
 {
-	AddEFlags( EFL_NO_DAMAGE_FORCES );
+	GetEngineObject()->AddEFlags( EFL_NO_DAMAGE_FORCES );
 }
 
 	
@@ -5506,23 +5504,7 @@ void CC_Ent_Step( const CCommand& args )
 }
 static ConCommand ent_step("ent_step", CC_Ent_Step, "When 'ent_pause' is set this will step through one waiting input / output message at a time.", FCVAR_CHEAT);
 
-void CBaseEntity::SetCheckUntouch( bool check )
-{
-	// Invalidate touchstamp
-	if ( check )
-	{
-		touchStamp++;
-		if ( !IsEFlagSet( EFL_CHECK_UNTOUCH ) )
-		{
-			AddEFlags( EFL_CHECK_UNTOUCH );
-			EntityTouch_Add( this );
-		}
-	}
-	else
-	{
-		RemoveEFlags( EFL_CHECK_UNTOUCH );
-	}
-}
+
 
 model_t *CBaseEntity::GetModel( void )
 {
@@ -5653,7 +5635,7 @@ void CBaseEntity::SetLocalTransform( const matrix3x4_t &localTransform )
 //-----------------------------------------------------------------------------
 bool CBaseEntity::IsFloating()
 {
-	if ( !IsEFlagSet(EFL_TOUCHING_FLUID) )
+	if ( !GetEngineObject()->IsEFlagSet(EFL_TOUCHING_FLUID) )
 		return false;
 
 	IPhysicsObject *pObject = VPhysicsGetObject();
@@ -6641,7 +6623,7 @@ bool CBaseEntity::SUB_AllowedToFade( void )
 {
 	if( VPhysicsGetObject() )
 	{
-		if( VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD || GetEFlags() & EFL_IS_BEING_LIFTED_BY_BARNACLE )
+		if( VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD || GetEngineObject()->GetEFlags() & EFL_IS_BEING_LIFTED_BY_BARNACLE )
 			return false;
 	}
 
@@ -6699,15 +6681,15 @@ inline bool AnyPlayersInHierarchy_R( IEngineObjectServer *pEnt )
 void CBaseEntity::RecalcHasPlayerChildBit()
 {
 	if ( AnyPlayersInHierarchy_R( this->GetEngineObject() ) )
-		AddEFlags( EFL_HAS_PLAYER_CHILD );
+		GetEngineObject()->AddEFlags( EFL_HAS_PLAYER_CHILD );
 	else
-		RemoveEFlags( EFL_HAS_PLAYER_CHILD );
+		GetEngineObject()->RemoveEFlags( EFL_HAS_PLAYER_CHILD );
 }
 
 
 bool CBaseEntity::DoesHavePlayerChild()
 {
-	return IsEFlagSet( EFL_HAS_PLAYER_CHILD );
+	return GetEngineObject()->IsEFlagSet( EFL_HAS_PLAYER_CHILD );
 }
 
 

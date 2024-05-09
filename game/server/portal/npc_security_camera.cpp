@@ -321,7 +321,7 @@ void CNPC_SecurityCamera::Spawn( void )
 	SetCollisionBounds( Vector( -16.0f, -16.0f, -16.0f ), Vector( 16.0f, 16.0f, 16.0f ) );
 
 	RemoveFlag( FL_AIMTARGET );
-	AddEFlags( EFL_NO_DISSOLVE );
+	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
 	SetPoseParameter( SECURITY_CAMERA_BC_YAW, 0 );
 	SetPoseParameter( SECURITY_CAMERA_BC_PITCH, 0 );

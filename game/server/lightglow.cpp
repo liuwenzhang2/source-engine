@@ -100,7 +100,7 @@ void CLightGlow::Spawn( void )
 	BaseClass::Spawn();
 
 	// No model but we still need to force this!
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 }
 
 //-----------------------------------------------------------------------------

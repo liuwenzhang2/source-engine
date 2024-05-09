@@ -1141,7 +1141,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 	if ( IsLocalPlayer() )
 	{
 		pEnt->SetSolid( SOLID_NONE );
-		pEnt->RemoveEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+		pEnt->GetEngineObject()->RemoveEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 	}
 }
 

@@ -84,6 +84,7 @@ public:
 
 	CFire( void );
 	
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	virtual void UpdateOnRemove( void );
 
 	void	Precache( void );
@@ -586,8 +587,12 @@ CFire::CFire( void )
 	m_flHeatAbsorb = 8.0f;
 	m_flHeatLevel = 0;
 
+}
+
+void CFire::PostConstructor(const char* szClassname, int iForceEdictIndex) {
 	// Must be in the constructor!
-	AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+	GetEngineObject()->AddEFlags(EFL_USE_PARTITION_WHEN_NOT_SOLID);
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
 }
 
 //-----------------------------------------------------------------------------

@@ -436,7 +436,7 @@ bool CBaseHelicopter::DoWashPush( washentity_t *pWash, const Vector &vecWashOrig
 	CBaseEntity *pEntity = pWash->hEntity;
 
 	// This can happen because we can dynamically turn this flag on and off
-	if ( pEntity->IsEFlagSet( EFL_NO_ROTORWASH_PUSH ))
+	if ( pEntity->GetEngineObject()->IsEFlagSet( EFL_NO_ROTORWASH_PUSH ))
 		return false;
 
 	Vector vecSpot = pEntity->BodyTarget( vecWashOrigin );
@@ -562,7 +562,7 @@ void CBaseHelicopter::DoRotorPhysicsPush( const Vector &vecRotorOrigin, float fl
 	{
 		IRotorWashShooter *pShooter = GetRotorWashShooter( pEntity );
 
-		if ( pEntity->IsEFlagSet( EFL_NO_ROTORWASH_PUSH ))
+		if ( pEntity->GetEngineObject()->IsEFlagSet( EFL_NO_ROTORWASH_PUSH ))
 			continue;
 
 		if ( pShooter || pEntity->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() && !pEntity->IsPlayer()) ) 

@@ -181,7 +181,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 	void InitBodyQue(void)
 	{
 		CCorpse *pEntity = ( CCorpse * )gEntList.CreateEntityByName( "bodyque" );
-		pEntity->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
+		pEntity->GetEngineObject()->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
 		g_pBodyQueueHead = pEntity;
 		CCorpse *p = g_pBodyQueueHead;
 		
@@ -189,7 +189,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 		for ( int i = 0; i < 3; i++ )
 		{
 			CCorpse *next = ( CCorpse * )gEntList.CreateEntityByName( "bodyque" );
-			next->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
+			next->GetEngineObject()->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
 			p->SetOwnerEntity( next );
 			p = next;
 		}

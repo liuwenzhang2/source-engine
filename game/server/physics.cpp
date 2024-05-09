@@ -1067,7 +1067,7 @@ void CCollisionEvent::FluidStartTouch( IPhysicsObject *pObject, IPhysicsFluidCon
 	if ( !pEntity )
 		return;
 
-	pEntity->AddEFlags( EFL_TOUCHING_FLUID );
+	pEntity->GetEngineObject()->AddEFlags( EFL_TOUCHING_FLUID );
 	pEntity->OnEntityEvent( ENTITY_EVENT_WATER_TOUCH, (void*)(intp)pFluid->GetContents() );
 
 	float timeSinceLastCollision = DeltaTimeSinceLastFluid( pEntity );
@@ -1123,7 +1123,7 @@ void CCollisionEvent::FluidEndTouch( IPhysicsObject *pObject, IPhysicsFluidContr
 		PhysicsSplash( pFluid, pObject, pEntity );
 	}
 
-	pEntity->RemoveEFlags( EFL_TOUCHING_FLUID );
+	pEntity->GetEngineObject()->RemoveEFlags( EFL_TOUCHING_FLUID );
 	pEntity->OnEntityEvent( ENTITY_EVENT_WATER_UNTOUCH, (void*)(intp)pFluid->GetContents() );
 }
 

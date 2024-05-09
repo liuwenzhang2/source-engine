@@ -1418,7 +1418,7 @@ bool CAI_PlayerAlly::IsOkToSpeak( ConceptCategory_t category, bool fRespondingTo
 		return false;
 
 	// Don't speak if being eaten by a barnacle
-	if ( IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
+	if (GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 		return false;
 
 	if ( IsInAScript() && !m_bCanSpeakWhileScripting )

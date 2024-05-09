@@ -56,7 +56,7 @@ int CBaseParticleEntity::UpdateTransmitState( void )
 	if ( IsEffectActive( EF_NODRAW ) )
 		return SetTransmitState( FL_EDICT_DONTSEND );
 
-	if ( IsEFlagSet( EFL_IN_SKYBOX ) )
+	if (GetEngineObject()->IsEFlagSet( EFL_IN_SKYBOX ) )
 		return SetTransmitState( FL_EDICT_ALWAYS );
 
 	// cull against PVS

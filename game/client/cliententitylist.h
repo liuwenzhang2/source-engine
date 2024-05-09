@@ -146,6 +146,8 @@ public:
 		}
 		m_iClassname = NULL_STRING;
 		m_iParentAttachment = 0;
+		m_iEFlags = 0;
+		SetCheckUntouch(false);
 	}
 
 	void Init(C_BaseEntity* pOuter) {
@@ -319,6 +321,17 @@ public:
 		m_iParentAttachment = iParentAttachment;
 	}
 
+	int						GetEFlags() const;
+	void					SetEFlags(int iEFlags);
+	void					AddEFlags(int nEFlagMask);
+	void					RemoveEFlags(int nEFlagMask);
+	bool					IsEFlagSet(int nEFlagMask) const;
+
+	void					SetCheckUntouch(bool check);
+	bool					GetCheckUntouch() const;
+	int						GetTouchStamp();
+	void					ClearTouchStamp();
+
 #if !defined( NO_ENTITY_PREDICTION )
 	// For storing prediction results and pristine network state
 	byte* m_pIntermediateData[MULTIPLAYER_BACKUP];
@@ -376,6 +389,10 @@ private:
 	// The moveparent received from networking data
 	CHandle<C_BaseEntity>			m_hNetworkMoveParent = NULL;
 	unsigned char					m_iParentAttachment; // 0 if we're relative to the parent's absorigin and absangles.
+
+	int								m_iEFlags;	// entity flags EFL_*
+	// used so we know when things are no longer touching
+	int								touchStamp;
 
 };
 
@@ -480,6 +497,44 @@ inline IEngineObjectClient* C_EngineObjectInternal::GetNetworkMoveParent() {
 inline unsigned char C_EngineObjectInternal::GetParentAttachment() const
 {
 	return m_iParentAttachment;
+}
+
+//-----------------------------------------------------------------------------
+// EFlags.. 
+//-----------------------------------------------------------------------------
+inline int C_EngineObjectInternal::GetEFlags() const
+{
+	return m_iEFlags;
+}
+
+inline void C_EngineObjectInternal::SetEFlags(int iEFlags)
+{
+	m_iEFlags = iEFlags;
+}
+
+inline void C_EngineObjectInternal::AddEFlags(int nEFlagMask)
+{
+	m_iEFlags |= nEFlagMask;
+}
+
+inline void C_EngineObjectInternal::RemoveEFlags(int nEFlagMask)
+{
+	m_iEFlags &= ~nEFlagMask;
+}
+
+inline bool C_EngineObjectInternal::IsEFlagSet(int nEFlagMask) const
+{
+	return (m_iEFlags & nEFlagMask) != 0;
+}
+
+inline int	C_EngineObjectInternal::GetTouchStamp()
+{
+	return touchStamp;
+}
+
+inline void C_EngineObjectInternal::ClearTouchStamp()
+{
+	touchStamp = 0;
 }
 
 //

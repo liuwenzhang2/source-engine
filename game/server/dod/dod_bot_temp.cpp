@@ -88,7 +88,7 @@ CBasePlayer *BotPutInServer( bool bFrozen, int iTeam, int iClass )
 	pPlayer->AddFlag( FL_CLIENT | FL_FAKECLIENT );
 
 	if ( bFrozen )
-		pPlayer->AddEFlags( EFL_BOT_FROZEN );
+		pPlayer->GetEngineObject()->AddEFlags( EFL_BOT_FROZEN );
 
 	BotNumber++;
 
@@ -233,7 +233,7 @@ void Bot_Think( CDODPlayer *pBot )
 		trace_t trace;
 
 		// Stop when shot
-		if ( !pBot->IsEFlagSet(EFL_BOT_FROZEN) )
+		if ( !pBot->GetEngineObject()->IsEFlagSet(EFL_BOT_FROZEN) )
 		{
 			if ( pBot->m_iHealth == 100 )
 			{
@@ -250,7 +250,7 @@ void Bot_Think( CDODPlayer *pBot )
 		}
 
 		// Only turn if I haven't been hurt
-		if ( !pBot->IsEFlagSet(EFL_BOT_FROZEN) && pBot->m_iHealth == 100 )
+		if ( !pBot->GetEngineObject()->IsEFlagSet(EFL_BOT_FROZEN) && pBot->m_iHealth == 100 )
 		{
 			Vector vecEnd;
 			Vector forward;

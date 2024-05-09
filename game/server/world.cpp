@@ -458,7 +458,6 @@ CWorld* GetWorldEntity()
 
 CWorld::CWorld( )
 {
-	AddEFlags( EFL_NO_AUTO_EDICT_ATTACH | EFL_KEEP_ON_RECREATE_ENTITIES );
 	//NetworkProp()->AttachEdict( RequiredEdictIndex() );
 	ActivityList_Init();
 	EventList_Init();
@@ -471,6 +470,7 @@ CWorld::CWorld( )
 
 void CWorld::PostConstructor(const char* szClassname, int iForceEdictIndex)
 {
+	GetEngineObject()->AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES);
 	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
 	SetSolid(SOLID_BSP);
 }

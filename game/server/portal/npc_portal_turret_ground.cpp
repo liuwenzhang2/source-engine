@@ -62,7 +62,7 @@ void CNPC_Portal_GroundTurret::Spawn( void )
 
 	CapabilitiesClear();
 
-	AddEFlags( EFL_NO_DISSOLVE );
+	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
 	NPCInit();
 

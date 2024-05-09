@@ -407,34 +407,34 @@ void CBaseEntity::SetBlocksLOS( bool bBlocksLOS )
 {
 	if ( bBlocksLOS )
 	{
-		RemoveEFlags( EFL_DONTBLOCKLOS );
+		GetEngineObject()->RemoveEFlags( EFL_DONTBLOCKLOS );
 	}
 	else
 	{
-		AddEFlags( EFL_DONTBLOCKLOS );
+		GetEngineObject()->AddEFlags( EFL_DONTBLOCKLOS );
 	}
 }
 
 bool CBaseEntity::BlocksLOS( void ) 
 { 
-	return !IsEFlagSet(EFL_DONTBLOCKLOS); 
+	return !GetEngineObject()->IsEFlagSet(EFL_DONTBLOCKLOS);
 }
 
 void CBaseEntity::SetAIWalkable( bool bBlocksLOS )
 {
 	if ( bBlocksLOS )
 	{
-		RemoveEFlags( EFL_DONTWALKON );
+		GetEngineObject()->RemoveEFlags( EFL_DONTWALKON );
 	}
 	else
 	{
-		AddEFlags( EFL_DONTWALKON );
+		GetEngineObject()->AddEFlags( EFL_DONTWALKON );
 	}
 }
 
 bool CBaseEntity::IsAIWalkable( void ) 
 { 
-	return !IsEFlagSet(EFL_DONTWALKON);
+	return !GetEngineObject()->IsEFlagSet(EFL_DONTWALKON);
 }
 
 
@@ -509,7 +509,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 		int val = atoi( szValue );
 		if (val)
 		{
-			AddEFlags( EFL_NO_DAMAGE_FORCES );
+			GetEngineObject()->AddEFlags( EFL_NO_DAMAGE_FORCES );
 		}
 		return true;
 	}
@@ -1092,13 +1092,13 @@ int CBaseEntity::GetFirstThinkTick()
 // NOTE: pass in the isThinking hint so we have to search the think functions less
 void CBaseEntity::CheckHasThinkFunction( bool isThinking )
 {
-	if ( IsEFlagSet( EFL_NO_THINK_FUNCTION ) && isThinking )
+	if (GetEngineObject()->IsEFlagSet( EFL_NO_THINK_FUNCTION ) && isThinking )
 	{
-		RemoveEFlags( EFL_NO_THINK_FUNCTION );
+		GetEngineObject()->RemoveEFlags( EFL_NO_THINK_FUNCTION );
 	}
-	else if ( !isThinking && !IsEFlagSet( EFL_NO_THINK_FUNCTION ) && !WillThink() )
+	else if ( !isThinking && !GetEngineObject()->IsEFlagSet( EFL_NO_THINK_FUNCTION ) && !WillThink() )
 	{
-		AddEFlags( EFL_NO_THINK_FUNCTION );
+		GetEngineObject()->AddEFlags( EFL_NO_THINK_FUNCTION );
 	}
 #if !defined( CLIENT_DLL )
 	SimThink_EntityChanged( this );
@@ -1128,15 +1128,15 @@ bool CBaseEntity::WillSimulateGamePhysics()
 void CBaseEntity::CheckHasGamePhysicsSimulation()
 {
 	bool isSimulating = WillSimulateGamePhysics();
-	if ( isSimulating != IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION) )
+	if ( isSimulating != GetEngineObject()->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION) )
 		return;
 	if ( isSimulating )
 	{
-		RemoveEFlags( EFL_NO_GAME_PHYSICS_SIMULATION );
+		GetEngineObject()->RemoveEFlags( EFL_NO_GAME_PHYSICS_SIMULATION );
 	}
 	else
 	{
-		AddEFlags( EFL_NO_GAME_PHYSICS_SIMULATION );
+		GetEngineObject()->AddEFlags( EFL_NO_GAME_PHYSICS_SIMULATION );
 	}
 #if !defined( CLIENT_DLL )
 	SimThink_EntityChanged( this );
@@ -1554,7 +1554,7 @@ void CBaseEntity::InvalidatePhysicsRecursive( int nChangeFlags )
 		nChangeFlags |= POSITION_CHANGED | VELOCITY_CHANGED;
 	}
 
-	AddEFlags( nDirtyFlags );
+	GetEngineObject()->AddEFlags( nDirtyFlags );
 
 	// Set flags for children
 	bool bOnlyDueToAttachment = false;

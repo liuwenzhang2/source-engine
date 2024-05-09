@@ -647,7 +647,7 @@ float CGrabController::ComputeError()
 		}
 	}
 	
-	if ( pAttached->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
+	if ( pAttached->GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 	{
 		m_error *= 3.0f;
 	}
@@ -2161,7 +2161,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	UTIL_PhyscannonTraceHull( start, end, -Vector(8,8,8), Vector(8,8,8), pOwner, &tr );
 	bool bValid = true;
 	CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
-	if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
+	if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
 	{
 		bValid = false;
 	}
@@ -2174,7 +2174,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	if ( !bValid )
 	{
 		UTIL_PhyscannonTraceLine( start, end, pOwner, &tr );
-		if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
+		if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
 		{
 			if( hl2_episodic.GetBool() )
 			{
@@ -2186,7 +2186,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 					// Trace to the object.
 					UTIL_PhyscannonTraceLine( start, pObject->WorldSpaceCenter(), pOwner, &tr );
 
-					if( tr.m_pEnt && tr.m_pEnt == pObject && !(pObject->IsEFlagSet(EFL_NO_PHYSCANNON_INTERACTION)) )
+					if( tr.m_pEnt && tr.m_pEnt == pObject && !(pObject->GetEngineObject()->IsEFlagSet(EFL_NO_PHYSCANNON_INTERACTION)) )
 					{
 						bValid = true;
 						pEntity = pObject;
@@ -2228,7 +2228,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 
 		if ( IsMegaPhysCannon() )
 		{
-			if ( pEntity->IsNPC() && !pEntity->IsEFlagSet( EFL_NO_MEGAPHYSCANNON_RAGDOLL ) && pEntity->MyNPCPointer()->CanBecomeRagdoll() )
+			if ( pEntity->IsNPC() && !pEntity->GetEngineObject()->IsEFlagSet( EFL_NO_MEGAPHYSCANNON_RAGDOLL ) && pEntity->MyNPCPointer()->CanBecomeRagdoll() )
 			{
 				CTakeDamageInfo info( pOwner, pOwner, 1.0f, DMG_GENERIC );
 				CBaseEntity *pRagdoll = CreateServerRagdoll( pEntity->MyNPCPointer(), 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
@@ -2373,7 +2373,7 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 	bool bIsMegaPhysCannon = IsMegaPhysCannon();
 	if ( bIsMegaPhysCannon )
 	{
-		if ( pObject->IsNPC() && !pObject->IsEFlagSet( EFL_NO_MEGAPHYSCANNON_RAGDOLL ) )
+		if ( pObject->IsNPC() && !pObject->GetEngineObject()->IsEFlagSet( EFL_NO_MEGAPHYSCANNON_RAGDOLL ) )
 		{
 			Assert( pObject->MyNPCPointer()->CanBecomeRagdoll() );
 			CTakeDamageInfo info( GetOwner(), GetOwner(), 1.0f, DMG_GENERIC );
@@ -3476,7 +3476,7 @@ bool CWeaponPhysCannon::CanPickupObject( CBaseEntity *pTarget )
 			return true;
 	}
 
-	if ( pTarget->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
+	if ( pTarget->GetEngineObject()->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
 		return false;
 
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );

@@ -134,6 +134,12 @@ public:
 		m_vecVelocity = Vector(0, 0, 0);
 		m_hMoveParent = NULL;
 		m_iParentAttachment = 0;
+		// NOTE: THIS MUST APPEAR BEFORE ANY SetMoveType() or SetNextThink() calls
+		AddEFlags(EFL_NO_THINK_FUNCTION | EFL_NO_GAME_PHYSICS_SIMULATION | EFL_USE_PARTITION_WHEN_NOT_SOLID);
+#ifndef _XBOX
+		AddEFlags(EFL_USE_PARTITION_WHEN_NOT_SOLID);
+#endif
+		SetCheckUntouch(false);
 	}
 
 	~CEngineObjectInternal()
@@ -292,6 +298,16 @@ public:
 	int			GetParentAttachment();
 	void		ClearParentAttachment();
 
+	int						GetEFlags() const;
+	void					SetEFlags(int iEFlags);
+	void					AddEFlags(int nEFlagMask);
+	void					RemoveEFlags(int nEFlagMask);
+	bool					IsEFlagSet(int nEFlagMask) const;
+	void					SetCheckUntouch(bool check);
+	bool					GetCheckUntouch() const;
+	int						GetTouchStamp();
+	void					ClearTouchStamp();
+
 public:
 	// Networking related methods
 	void	NetworkStateChanged();
@@ -335,6 +351,10 @@ private:
 
 	CNetworkVar(unsigned int, testNetwork);
 	CNetworkVar(unsigned char, m_iParentAttachment); // 0 if we're relative to the parent's absorigin and absangles.
+
+	int		m_iEFlags;	// entity flags EFL_*
+	// used so we know when things are no longer touching
+	int			touchStamp;
 
 };
 
@@ -414,6 +434,62 @@ inline int CEngineObjectInternal::GetParentAttachment()
 
 inline void	CEngineObjectInternal::ClearParentAttachment() {
 	m_iParentAttachment = 0;
+}
+
+//-----------------------------------------------------------------------------
+// EFlags
+//-----------------------------------------------------------------------------
+inline int CEngineObjectInternal::GetEFlags() const
+{
+	return m_iEFlags;
+}
+
+inline void CEngineObjectInternal::SetEFlags(int iEFlags)
+{
+	m_iEFlags = iEFlags;
+
+	if (iEFlags & (EFL_FORCE_CHECK_TRANSMIT | EFL_IN_SKYBOX))
+	{
+		m_pOuter->DispatchUpdateTransmitState();
+	}
+}
+
+inline void CEngineObjectInternal::AddEFlags(int nEFlagMask)
+{
+	m_iEFlags |= nEFlagMask;
+
+	if (nEFlagMask & (EFL_FORCE_CHECK_TRANSMIT | EFL_IN_SKYBOX))
+	{
+		m_pOuter->DispatchUpdateTransmitState();
+	}
+}
+
+inline void CEngineObjectInternal::RemoveEFlags(int nEFlagMask)
+{
+	m_iEFlags &= ~nEFlagMask;
+
+	if (nEFlagMask & (EFL_FORCE_CHECK_TRANSMIT | EFL_IN_SKYBOX))
+		m_pOuter->DispatchUpdateTransmitState();
+}
+
+inline bool CEngineObjectInternal::IsEFlagSet(int nEFlagMask) const
+{
+	return (m_iEFlags & nEFlagMask) != 0;
+}
+
+inline bool CEngineObjectInternal::GetCheckUntouch() const
+{
+	return IsEFlagSet(EFL_CHECK_UNTOUCH);
+}
+
+inline int	CEngineObjectInternal::GetTouchStamp()
+{
+	return touchStamp;
+}
+
+inline void CEngineObjectInternal::ClearTouchStamp()
+{
+	touchStamp = 0;
 }
 
 //-----------------------------------------------------------------------------

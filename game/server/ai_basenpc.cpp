@@ -628,7 +628,7 @@ void CAI_BaseNPC::Event_Killed( const CTakeDamageInfo &info )
 	// i.e. The barnacle does this because it's already got a ragdoll for us.
 	if ( info.GetDamageType() & DMG_REMOVENORAGDOLL )
 	{
-		if ( !IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
+		if ( !GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 		{
 			// Go away
 			RemoveDeferred();

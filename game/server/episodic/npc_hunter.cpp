@@ -1809,7 +1809,7 @@ void CNPC_Hunter::Spawn()
 
 	if ( !hunter_allow_dissolve.GetBool() )
 	{
-		AddEFlags( EFL_NO_DISSOLVE );
+		GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 	}
 
 	if( hunter_allow_nav_jump.GetBool() )

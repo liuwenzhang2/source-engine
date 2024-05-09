@@ -469,7 +469,7 @@ void CAmbientGeneric::Activate( void )
 		{
 			if ( !FBitSet( m_spawnflags, SF_AMBIENT_SOUND_EVERYWHERE ) )
 			{
-				AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+				GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 			}
 		}
 	}

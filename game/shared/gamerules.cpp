@@ -621,7 +621,7 @@ float CGameRules::WeaponTraceEntity( CBaseEntity *pEntity, const Vector &vecStar
 void CGameRules::CreateStandardEntities()
 {
 	g_pPlayerResource = (CPlayerResource*)CBaseEntity::Create( "player_manager", vec3_origin, vec3_angle );
-	g_pPlayerResource->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
+	g_pPlayerResource->GetEngineObject()->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
 }
 
 //-----------------------------------------------------------------------------

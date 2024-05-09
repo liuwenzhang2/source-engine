@@ -161,7 +161,7 @@ void CNPC_Bullseye::Spawn( void )
 	}
 
 	AddFlag( FL_NPC );
-	AddEFlags( EFL_NO_DISSOLVE );
+	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
 	SetThink( &CNPC_Bullseye::BullseyeThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );

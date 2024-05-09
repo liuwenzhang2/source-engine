@@ -106,7 +106,7 @@ void CInfoLightingRelative::Activate()
 		else
 		{
 			// Set a force transmit because we do not have a model.
-			m_hLightingLandmark->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+			m_hLightingLandmark->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 		}
 	}
 }
@@ -1798,9 +1798,9 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		return;
 	}
 
-	Assert( !IsEFlagSet( EFL_SETTING_UP_BONES ) );
+	Assert( !GetEngineObject()->IsEFlagSet( EFL_SETTING_UP_BONES ) );
 
-	AddEFlags( EFL_SETTING_UP_BONES );
+	GetEngineObject()->AddEFlags( EFL_SETTING_UP_BONES );
 
 	Vector pos[MAXSTUDIOBONES];
 	Quaternion q[MAXSTUDIOBONES];
@@ -1852,7 +1852,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 				pParent, 
 				pParentCache );
 			
-			RemoveEFlags( EFL_SETTING_UP_BONES );
+			GetEngineObject()->RemoveEFlags( EFL_SETTING_UP_BONES );
 			if (ai_setupbones_debug.GetBool())
 			{
 				DrawRawSkeleton( pBoneToWorld, boneMask, true, 0.11 );
@@ -1877,7 +1877,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		// Msg("%s:%s:%s (%x)\n", GetClassname(), GetDebugName(), STRING(GetModelName()), boneMask );
 		DrawRawSkeleton( pBoneToWorld, boneMask, true, 0.11 );
 	}
-	RemoveEFlags( EFL_SETTING_UP_BONES );
+	GetEngineObject()->RemoveEFlags( EFL_SETTING_UP_BONES );
 }
 
 //=========================================================

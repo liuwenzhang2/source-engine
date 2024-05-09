@@ -966,12 +966,12 @@ void CBreakableProp::CopyFadeFrom( CBreakableProp *pSource )
 //-----------------------------------------------------------------------------
 void CBreakableProp::InputEnablePhyscannonPickup( inputdata_t &inputdata )
 {
-	RemoveEFlags( EFL_NO_PHYSCANNON_INTERACTION );
+	GetEngineObject()->RemoveEFlags( EFL_NO_PHYSCANNON_INTERACTION );
 }
 
 void CBreakableProp::InputDisablePhyscannonPickup( inputdata_t &inputdata )
 {
-	AddEFlags( EFL_NO_PHYSCANNON_INTERACTION );
+	GetEngineObject()->AddEFlags( EFL_NO_PHYSCANNON_INTERACTION );
 }
 
 //-----------------------------------------------------------------------------
@@ -2536,7 +2536,7 @@ void CPhysicsProp::Spawn( )
 
 	if ( HasSpawnFlags( SF_PHYSPROP_NO_ROTORWASH_PUSH ) )
 	{
-		AddEFlags( EFL_NO_ROTORWASH_PUSH );
+		GetEngineObject()->AddEFlags( EFL_NO_ROTORWASH_PUSH );
 	}
 
 	CreateVPhysics();

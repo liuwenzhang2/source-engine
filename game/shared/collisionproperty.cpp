@@ -212,7 +212,7 @@ void CDirtySpatialPartitionEntityList::OnPreQuery( SpatialPartitionListMask_t li
 					// If an entity is in the middle of bone setup, don't call UpdatePartition
 					//  which can cause it to redo bone setup on the same frame causing a recursive
 					//  call to bone setup.
-					if ( !pEntity->IsEFlagSet( EFL_SETTING_UP_BONES ) )
+					if ( !pEntity->GetEngineObject()->IsEFlagSet( EFL_SETTING_UP_BONES ) )
 					{
 						pEntity->CollisionProp()->UpdatePartition();
 					}
@@ -519,7 +519,7 @@ void CCollisionProperty::CheckForUntouch()
 		{
 			// mark ent so that at the end of frame it will check to 
 			// see if it's no longer touching ents
-			m_pOuter->SetCheckUntouch( true );
+			m_pOuter->GetEngineObject()->SetCheckUntouch( true );
 		}
 	}
 #endif
@@ -1223,7 +1223,7 @@ void CCollisionProperty::SetSurroundingBoundsType( SurroundingBoundsType_t type,
 //-----------------------------------------------------------------------------
 void CCollisionProperty::MarkSurroundingBoundsDirty()
 {
-	GetOuter()->AddEFlags( EFL_DIRTY_SURROUNDING_COLLISION_BOUNDS );
+	GetOuter()->GetEngineObject()->AddEFlags( EFL_DIRTY_SURROUNDING_COLLISION_BOUNDS );
 	MarkPartitionHandleDirty();
 
 #ifdef CLIENT_DLL
@@ -1270,9 +1270,9 @@ bool CCollisionProperty::DoesVPhysicsInvalidateSurroundingBox( ) const
 void CCollisionProperty::WorldSpaceSurroundingBounds( Vector *pVecMins, Vector *pVecMaxs )
 {
 	const Vector &vecAbsOrigin = GetCollisionOrigin();
-	if ( GetOuter()->IsEFlagSet( EFL_DIRTY_SURROUNDING_COLLISION_BOUNDS ))
+	if ( GetOuter()->GetEngineObject()->IsEFlagSet( EFL_DIRTY_SURROUNDING_COLLISION_BOUNDS ))
 	{
-		GetOuter()->RemoveEFlags( EFL_DIRTY_SURROUNDING_COLLISION_BOUNDS );
+		GetOuter()->GetEngineObject()->RemoveEFlags( EFL_DIRTY_SURROUNDING_COLLISION_BOUNDS );
 		ComputeSurroundingBox( pVecMins, pVecMaxs );
 		VectorSubtract( *pVecMins, vecAbsOrigin, m_vecSurroundingMins );
 		VectorSubtract( *pVecMaxs, vecAbsOrigin, m_vecSurroundingMaxs );
@@ -1332,7 +1332,7 @@ void CCollisionProperty::UpdateServerPartitionMask( )
 
 	// Make sure it's in the list of all entities
 	bool bIsSolid = IsSolid() || IsSolidFlagSet(FSOLID_TRIGGER);
-	if ( bIsSolid || m_pOuter->IsEFlagSet(EFL_USE_PARTITION_WHEN_NOT_SOLID) )
+	if ( bIsSolid || m_pOuter->GetEngineObject()->IsEFlagSet(EFL_USE_PARTITION_WHEN_NOT_SOLID) )
 	{
 		partition->Insert( PARTITION_ENGINE_NON_STATIC_EDICTS, handle );
 	}
@@ -1366,9 +1366,9 @@ void CCollisionProperty::MarkPartitionHandleDirty()
 	if (!m_pOuter->IsNetworkable() || m_pOuter->entindex() == 0 )
 		return;
 	
-	if ( !m_pOuter->IsEFlagSet( EFL_DIRTY_SPATIAL_PARTITION ) )
+	if ( !m_pOuter->GetEngineObject()->IsEFlagSet( EFL_DIRTY_SPATIAL_PARTITION ) )
 	{
-		m_pOuter->AddEFlags( EFL_DIRTY_SPATIAL_PARTITION );
+		m_pOuter->GetEngineObject()->AddEFlags( EFL_DIRTY_SPATIAL_PARTITION );
 		s_DirtyKDTree.AddEntity( m_pOuter );
 	}
 
@@ -1384,9 +1384,9 @@ void CCollisionProperty::MarkPartitionHandleDirty()
 //-----------------------------------------------------------------------------
 void CCollisionProperty::UpdatePartition( )
 {
-	if ( m_pOuter->IsEFlagSet( EFL_DIRTY_SPATIAL_PARTITION ) )
+	if ( m_pOuter->GetEngineObject()->IsEFlagSet( EFL_DIRTY_SPATIAL_PARTITION ) )
 	{
-		m_pOuter->RemoveEFlags( EFL_DIRTY_SPATIAL_PARTITION );
+		m_pOuter->GetEngineObject()->RemoveEFlags( EFL_DIRTY_SPATIAL_PARTITION );
 
 #ifndef CLIENT_DLL
 		Assert( m_pOuter->entindex() != 0 );
@@ -1406,7 +1406,7 @@ void CCollisionProperty::UpdatePartition( )
 #endif
 
 		// We don't need to bother if it's not a trigger or solid
-		if ( IsSolid() || IsSolidFlagSet( FSOLID_TRIGGER ) || m_pOuter->IsEFlagSet( EFL_USE_PARTITION_WHEN_NOT_SOLID ) )
+		if ( IsSolid() || IsSolidFlagSet( FSOLID_TRIGGER ) || m_pOuter->GetEngineObject()->IsEFlagSet( EFL_USE_PARTITION_WHEN_NOT_SOLID ) )
 		{
 			// Bloat a little bit...
 			if ( BoundingRadius() != 0.0f )

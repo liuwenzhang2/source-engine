@@ -62,7 +62,7 @@ void CFuncLadder::Spawn()
 	// Make entity invisible
 	AddEffects( EF_NODRAW );
 	// No model but should still network
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	Vector playerMins = VEC_HULL_MIN;
 	Vector playerMaxs = VEC_HULL_MAX;

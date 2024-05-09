@@ -660,7 +660,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 						bGrabbedTarget = true;
 
 						// Set our touch flag so no one else tries to grab us this frame
-						pTouchEnt->AddEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
+						pTouchEnt->GetEngineObject()->AddEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
 					}
 				}
 			}
@@ -1039,7 +1039,7 @@ void CNPC_Barnacle::LiftPlayer( float flBiteZOffset )
 void CNPC_Barnacle::LiftNPC( float flBiteZOffset )
 {
 	// Necessary to make the NPCs not do things like talk
-	GetEnemy()->AddEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
+	GetEnemy()->GetEngineObject()->AddEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
 
 	// Play a scream when we're almost within bite range
 	PlayLiftingScream( flBiteZOffset );
@@ -1074,7 +1074,7 @@ void CNPC_Barnacle::LiftNPC( float flBiteZOffset )
 void CNPC_Barnacle::LiftRagdoll( float flBiteZOffset )
 {
 	// Necessary to make the NPCs not do things like talk
-	GetEnemy()->AddEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
+	GetEnemy()->GetEngineObject()->AddEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
 
 	// Play a scream when we're almost within bite range
 	PlayLiftingScream( flBiteZOffset );
@@ -1180,7 +1180,7 @@ void CNPC_Barnacle::LiftPhysicsObject( float flBiteZOffset )
 			return;
 
 		// Necessary for good +use interactions
-		pVictim->RemoveEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
+		pVictim->GetEngineObject()->RemoveEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
 
 		// If we got a physics prop, wait until the thing has settled down
 		m_bLiftingPrey = false;
@@ -1226,7 +1226,7 @@ void CNPC_Barnacle::LiftPhysicsObject( float flBiteZOffset )
 	else
 	{
 		// Necessary for good +use interactions
-		pVictim->AddEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
+		pVictim->GetEngineObject()->AddEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
 
 		// Pull the victim towards the mouth
 		PullEnemyTorwardsMouth( false );
@@ -1973,7 +1973,7 @@ void CNPC_Barnacle::LostPrey( bool bRemoveRagdoll )
 		if ( pVictim )
 		{
 			pVictim->DispatchInteraction( g_interactionBarnacleVictimReleased, NULL, this );
-			pVictim->RemoveEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
+			pVictim->GetEngineObject()->RemoveEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
 
 			if ( m_hRagdoll )
 			{
@@ -1990,7 +1990,7 @@ void CNPC_Barnacle::LostPrey( bool bRemoveRagdoll )
 		else if ( IsEnemyAPhysicsObject() )
 		{
 			// If we're a physics object, then we need to clear this flag
-			pEnemy->RemoveEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
+			pEnemy->GetEngineObject()->RemoveEFlags( EFL_IS_BEING_LIFTED_BY_BARNACLE );
 		}
 	}
 
@@ -2559,7 +2559,7 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 
 		// Can't lift something that's in the process of being lifted...
 		// Necessary for good +use interactions
-		if ( pTest->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
+		if ( pTest->GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 			continue;
 
 		// Vehicles can drive so fast that players can warp through the barnacle tongue.

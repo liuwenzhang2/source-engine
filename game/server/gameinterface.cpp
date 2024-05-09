@@ -1752,17 +1752,17 @@ void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, 
 		Msg( "%s", "ERROR: Entity delete queue not empty on level start!\n" );
 	}
 
-	for ( CBaseEntity *pClass = gEntList.FirstEnt(); pClass != NULL; pClass = gEntList.NextEnt(pClass) )
+	for ( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt(pEntity) )
 	{
-		if ( pClass && !pClass->IsDormant() )
+		if (pEntity && !pEntity->IsDormant() )
 		{
 			MDLCACHE_CRITICAL_SECTION();
 
 			BeginCheckChainedActivate();
-			pClass->Activate();
+			pEntity->Activate();
 			
 			// We don't care if it finished activating if it decided to remove itself.
-			EndCheckChainedActivate( !( pClass->GetEFlags() & EFL_KILLME ) ); 
+			EndCheckChainedActivate( !(pEntity->GetEngineObject()->GetEFlags() & EFL_KILLME ) );
 		}
 	}
 

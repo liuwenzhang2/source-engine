@@ -504,7 +504,6 @@ BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 //	DEFINE_FIELD( current_position, FIELD_INTEGER ),
 //	DEFINE_FIELD( m_flLastMessageTime, FIELD_FLOAT ),
 	DEFINE_FIELD( m_vecBaseVelocity, FIELD_VECTOR ),
-	DEFINE_FIELD( m_iEFlags, FIELD_INTEGER ),
 	DEFINE_FIELD( m_flGravity, FIELD_FLOAT ),
 //	DEFINE_FIELD( m_ModelInstance, FIELD_SHORT ),
 	DEFINE_FIELD( m_flProxyRandomValue, FIELD_FLOAT ),
@@ -877,14 +876,12 @@ void C_BaseEntity::Clear( void )
 	SetMoveType( MOVETYPE_NONE );
 
 	ClearEffects();
-	m_iEFlags = 0;
 	m_nRenderMode = 0;
 	m_nOldRenderMode = 0;
 	SetRenderColor( 255, 255, 255, 255 );
 	m_nRenderFX = 0;
 	m_flFriction = 0.0f;       
 	m_flGravity = 0.0f;
-	SetCheckUntouch( false );
 	m_ShadowDirUseOtherEntity = NULL;
 
 	m_nLastThinkTick = gpGlobals->tickcount;
@@ -1127,9 +1124,9 @@ void C_BaseEntity::DestroyModelInstance()
 void C_BaseEntity::SetRemovalFlag( bool bRemove ) 
 { 
 	if (bRemove) 
-		m_iEFlags |= EFL_KILLME; 
+		GetEngineObject()->AddEFlags(EFL_KILLME);
 	else 
-		m_iEFlags &= ~EFL_KILLME; 
+		GetEngineObject()->RemoveEFlags(EFL_KILLME);
 }
 
 
@@ -1403,18 +1400,18 @@ bool C_BaseEntity::ShouldReceiveProjectedTextures( int flags )
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::IsShadowDirty( )
 {
-	return IsEFlagSet( EFL_DIRTY_SHADOWUPDATE );
+	return GetEngineObject()->IsEFlagSet( EFL_DIRTY_SHADOWUPDATE );
 }
 
 void C_BaseEntity::MarkShadowDirty( bool bDirty )
 {
 	if ( bDirty )
 	{
-		AddEFlags( EFL_DIRTY_SHADOWUPDATE );
+		GetEngineObject()->AddEFlags( EFL_DIRTY_SHADOWUPDATE );
 	}
 	else
 	{
-		RemoveEFlags( EFL_DIRTY_SHADOWUPDATE );
+		GetEngineObject()->RemoveEFlags( EFL_DIRTY_SHADOWUPDATE );
 	}
 }
 
@@ -2005,7 +2002,7 @@ void C_BaseEntity::MarkAimEntsDirty()
 		Assert( pEnt && pEnt->GetEngineObject()->GetMoveParent() );
 		if ( pEnt->IsEffectActive(EF_BONEMERGE | EF_PARENT_ANIMATES) )
 		{
-			pEnt->AddEFlags( EFL_DIRTY_ABSTRANSFORM );
+			pEnt->GetEngineObject()->AddEFlags( EFL_DIRTY_ABSTRANSFORM );
 		}
 	}
 }
@@ -2298,20 +2295,6 @@ void C_BaseEntity::CheckInitPredictable( const char *context )
 bool C_BaseEntity::IsSelfAnimating()
 {
 	return true;
-}
-
-
-//-----------------------------------------------------------------------------
-// EFlags.. 
-//-----------------------------------------------------------------------------
-int C_BaseEntity::GetEFlags() const
-{
-	return m_iEFlags;
-}
-
-void C_BaseEntity::SetEFlags( int iEFlags )
-{
-	m_iEFlags = iEFlags;
 }
 
 
@@ -3722,7 +3705,7 @@ void C_BaseEntity::Remove( )
 		AddSolidFlags( FSOLID_NOT_SOLID );
 		SetMoveType( MOVETYPE_NONE );
 
-		AddEFlags( EFL_KILLME );	// Make sure to ignore further calls into here or UTIL_Remove.
+		GetEngineObject()->AddEFlags( EFL_KILLME );	// Make sure to ignore further calls into here or UTIL_Remove.
 	}
 
 	Release();

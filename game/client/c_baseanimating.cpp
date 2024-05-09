@@ -1142,7 +1142,7 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 	// objects with attachment points need to be queryable even if they're not solid
 	if ( hdr->GetNumAttachments() != 0 )
 	{
-		AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+		GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 	}
 
 

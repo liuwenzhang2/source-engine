@@ -109,7 +109,7 @@ void __MsgFunc_EntityPortalled(bf_read &msg)
 		qaOldInterpolatedRot = pEntity->GetEngineObject()->GetRotationInterpolator().GetCurrent();
 	}
 
-	pEntity->AddEFlags( EFL_DIRTY_ABSTRANSFORM );
+	pEntity->GetEngineObject()->AddEFlags( EFL_DIRTY_ABSTRANSFORM );
 
 	VMatrix matTransform = pPortal->MatrixThisToLinked();
 	//VMatrix matInvTransform = pPortal->m_hLinkedPortal->MatrixThisToLinked();

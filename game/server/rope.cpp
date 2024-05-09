@@ -98,7 +98,6 @@ END_DATADESC()
 
 CRopeKeyframe::CRopeKeyframe()
 {
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 	
 	m_takedamage = DAMAGE_YES;
 
@@ -118,6 +117,10 @@ CRopeKeyframe::CRopeKeyframe()
 	m_bCreatedFromMapFile = true;
 }
 
+void CRopeKeyframe::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	GetEngineObject()->AddEFlags(EFL_FORCE_CHECK_TRANSMIT);
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+}
 
 CRopeKeyframe::~CRopeKeyframe()
 {

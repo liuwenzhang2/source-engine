@@ -452,7 +452,7 @@ void CPhysBox::Spawn( void )
 
 	if ( HasSpawnFlags( SF_PHYSBOX_NO_ROTORWASH_PUSH ) )
 	{
-		AddEFlags( EFL_NO_ROTORWASH_PUSH );
+		GetEngineObject()->AddEFlags( EFL_NO_ROTORWASH_PUSH );
 	}
 
 	if ( m_bNotSolidToWorld )

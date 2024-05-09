@@ -411,7 +411,7 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 
 		m_Shared.InitInSkybox( gpGlobals->curtime, m_vecImpactPosition, GetAbsAngles(), vecForward, 
 			m_vecImpactPosition, pCamera->m_skyboxData.origin, pCamera->m_skyboxData.scale );
-		AddEFlags( EFL_IN_SKYBOX );
+		GetEngineObject()->AddEFlags( EFL_IN_SKYBOX );
 		SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterSkyboxOnlyThink );
 		SetNextThink( gpGlobals->curtime + m_Shared.GetEnterWorldTime() + TICK_INTERVAL );
 	}
@@ -432,7 +432,7 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 			{
 				SetModel( ENV_HEADCRABCANISTER_SKYBOX_MODEL );
 				SetSolid( SOLID_NONE );
-				AddEFlags( EFL_IN_SKYBOX );
+				GetEngineObject()->AddEFlags( EFL_IN_SKYBOX );
 				SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterSkyboxThink );
 				SetNextThink( gpGlobals->curtime + m_Shared.GetEnterWorldTime() );
 			}
@@ -1063,7 +1063,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSkyboxThink( void )
 	m_Shared.GetPositionAtTime( gpGlobals->curtime, vecEndPosition, vecEndAngles );
 	UTIL_SetOrigin( this, vecEndPosition );
 	SetAbsAngles( vecEndAngles );
-	RemoveEFlags( EFL_IN_SKYBOX );
+	GetEngineObject()->RemoveEFlags( EFL_IN_SKYBOX );
 
 	// Switch to the actual-scale model
 	SetupWorldModel();

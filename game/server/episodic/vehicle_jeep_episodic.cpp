@@ -1686,14 +1686,14 @@ void CPropJeepEpisodic::InputOutsideTransition( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CPropJeepEpisodic::InputDisablePhysGun( inputdata_t &data )
 {
-	AddEFlags( EFL_NO_PHYSCANNON_INTERACTION );
+	GetEngineObject()->AddEFlags( EFL_NO_PHYSCANNON_INTERACTION );
 }
 //-----------------------------------------------------------------------------
 // Purpose: Return to normal
 //-----------------------------------------------------------------------------
 void CPropJeepEpisodic::InputEnablePhysGun( inputdata_t &data )
 {
-	RemoveEFlags( EFL_NO_PHYSCANNON_INTERACTION );
+	GetEngineObject()->RemoveEFlags( EFL_NO_PHYSCANNON_INTERACTION );
 }
 
 //-----------------------------------------------------------------------------

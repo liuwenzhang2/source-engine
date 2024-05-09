@@ -128,7 +128,7 @@ void CVGuiScreen::Spawn()
 	Precache();
 
 	// This has no model, but we want it to transmit if it's in the PVS anyways
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 	m_nAttachmentIndex = 0;
 	SetSolid( SOLID_OBB );
 	AddSolidFlags( FSOLID_NOT_SOLID );

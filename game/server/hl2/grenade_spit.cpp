@@ -70,7 +70,7 @@ void CGrenadeSpit::Spawn( void )
 
 	SetCollisionGroup( HL2COLLISION_GROUP_SPIT );
 
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	// We're self-illuminating, so we don't take or give shadows
 	AddEffects( EF_NOSHADOW|EF_NORECEIVESHADOW );

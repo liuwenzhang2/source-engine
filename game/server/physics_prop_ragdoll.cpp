@@ -187,7 +187,7 @@ void CRagdollProp::Spawn( void )
 	// Unless specified, do not allow this to be dissolved
 	if ( HasSpawnFlags( SF_RAGDOLLPROP_ALLOW_DISSOLVE ) == false )
 	{
-		AddEFlags( EFL_NO_DISSOLVE );
+		GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 	}
 
 	if ( HasSpawnFlags(SF_RAGDOLLPROP_MOTIONDISABLED) )
@@ -1308,9 +1308,9 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	float dt = 0.1f;
 
 	// Copy over dissolve state...
-	if ( pAnimating->IsEFlagSet( EFL_NO_DISSOLVE ) )
+	if ( pAnimating->GetEngineObject()->IsEFlagSet( EFL_NO_DISSOLVE ) )
 	{
-		pRagdoll->AddEFlags( EFL_NO_DISSOLVE );
+		pRagdoll->GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 	}
 
 	// NOTE: This currently is only necessary to prevent manhacks from

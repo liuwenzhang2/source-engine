@@ -428,7 +428,7 @@ float CGrabController::ComputeError()
 		}
 	}
 	
-	if ( pAttached->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
+	if ( pAttached->GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 	{
 		m_error *= 3.0f;
 	}
@@ -1879,7 +1879,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	UTIL_TraceHull( start, end, -Vector(8,8,8), Vector(8,8,8), MASK_SHOT|CONTENTS_GRATE, &filter, &tr );
 	bool bValid = true;
 	CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
-	if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
+	if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
 	{
 		bValid = false;
 	}
@@ -1892,7 +1892,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	if ( !bValid )
 	{
 		UTIL_TraceLine( start, end, MASK_SHOT|CONTENTS_GRATE, &filter, &tr );
-		if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
+		if ( tr.fraction == 1 || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
 		{
 			// Play dry-fire sequence
 			DryFire();
@@ -2803,7 +2803,7 @@ bool CWeaponPhysCannon::CanPickupObject( CBaseEntity *pTarget )
 	if ( pTarget->GetBaseAnimating() && pTarget->GetBaseAnimating()->IsDissolving() )
 		return false;
 
-	if ( pTarget->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
+	if ( pTarget->GetEngineObject()->IsEFlagSet( EFL_NO_PHYSCANNON_INTERACTION ) )
 		return false;
 
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );

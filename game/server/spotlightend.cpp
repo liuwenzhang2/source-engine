@@ -48,5 +48,5 @@ void CSpotlightEnd::Spawn( void )
 	SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_FLY );
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 }

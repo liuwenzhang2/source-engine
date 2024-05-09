@@ -1651,7 +1651,7 @@ void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
 #if PORTAL_HIDE_PLAYER_RAGDOLL
 	AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW | EF_NOSHADOW );
-	AddEFlags( EFL_NO_DISSOLVE );
+	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 #endif // PORTAL_HIDE_PLAYER_RAGDOLL
 	CBaseEntity *pRagdoll = CreateServerRagdoll( this, m_nForceBone, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
 	pRagdoll->m_takedamage = DAMAGE_NO;
@@ -1764,7 +1764,7 @@ void CPortal_Player::Event_Killed( const CTakeDamageInfo &info )
 	}
 #endif // PORTAL_HIDE_PLAYER_RAGDOLL
 
-	if ( (info.GetDamageType() & DMG_DISSOLVE) && !(m_hRagdoll.Get()->GetEFlags() & EFL_NO_DISSOLVE) )
+	if ( (info.GetDamageType() & DMG_DISSOLVE) && !(m_hRagdoll.Get()->GetEngineObject()->GetEFlags() & EFL_NO_DISSOLVE) )
 	{
 		if ( m_hRagdoll )
 		{

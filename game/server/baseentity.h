@@ -463,11 +463,7 @@ public:
 	SolidType_t				GetSolid() const;
 	int			 			GetSolidFlags( void ) const;
 
-	int						GetEFlags() const;
-	void					SetEFlags( int iEFlags );
-	void					AddEFlags( int nEFlagMask );
-	void					RemoveEFlags( int nEFlagMask );
-	bool					IsEFlagSet( int nEFlagMask ) const;
+
 	// Marks for deletion
 	void					MarkForDeletion();
 	bool					IsMarkedForDeletion() const;
@@ -875,8 +871,7 @@ public:
 //	CNetworkVar( CPredictableId, m_PredictableID );
 //#endif
 
-	// used so we know when things are no longer touching
-	int			touchStamp;			
+
 
 protected:
 
@@ -1330,8 +1325,7 @@ public:
 	// Use CDamageModifier to hook in damage modifiers on a guy.
 	virtual float			GetReceivedDamageScale( CBaseEntity *pAttacker );
 
- 	void					SetCheckUntouch( bool check );
-	bool					GetCheckUntouch() const;
+ 
 
 	void					SetGroundEntity( CBaseEntity *ground );
 	CBaseEntity				*GetGroundEntity( void );
@@ -1679,7 +1673,6 @@ protected:
 	CNetworkVar( int, m_spawnflags );
 
 private:
-	int		m_iEFlags;	// entity flags EFL_*
 	// was pev->flags
 	CNetworkVarForDerived( int, m_fFlags );
 
@@ -2060,48 +2053,7 @@ inline bool CBaseEntity::HasSpawnFlags( int nFlags ) const
 //-----------------------------------------------------------------------------
 inline bool CBaseEntity::IsMarkedForDeletion( void ) 
 { 
-	return (m_iEFlags & EFL_KILLME); 
-}
-
-//-----------------------------------------------------------------------------
-// EFlags
-//-----------------------------------------------------------------------------
-inline int CBaseEntity::GetEFlags() const
-{
-	return m_iEFlags;
-}
-
-inline void CBaseEntity::SetEFlags( int iEFlags )
-{
-	m_iEFlags = iEFlags;
-
-	if ( iEFlags & ( EFL_FORCE_CHECK_TRANSMIT | EFL_IN_SKYBOX ) )
-	{
-		DispatchUpdateTransmitState();
-	}
-}
-
-inline void CBaseEntity::AddEFlags( int nEFlagMask )
-{
-	m_iEFlags |= nEFlagMask;
-
-	if ( nEFlagMask & ( EFL_FORCE_CHECK_TRANSMIT | EFL_IN_SKYBOX ) )
-	{
-		DispatchUpdateTransmitState();
-	}
-}
-
-inline void CBaseEntity::RemoveEFlags( int nEFlagMask )
-{
-	m_iEFlags &= ~nEFlagMask;
-	
-	if ( nEFlagMask & ( EFL_FORCE_CHECK_TRANSMIT | EFL_IN_SKYBOX ) )
-		DispatchUpdateTransmitState();
-}
-
-inline bool CBaseEntity::IsEFlagSet( int nEFlagMask ) const
-{
-	return (m_iEFlags & nEFlagMask) != 0;
+	return (GetEngineObject()->GetEFlags() & EFL_KILLME);
 }
 
 //-----------------------------------------------------------------------------
@@ -2109,12 +2061,12 @@ inline bool CBaseEntity::IsEFlagSet( int nEFlagMask ) const
 //-----------------------------------------------------------------------------
 inline void CBaseEntity::MarkForDeletion()
 {
-	AddEFlags(EFL_KILLME);
+	GetEngineObject()->AddEFlags(EFL_KILLME);
 }
 
 inline bool CBaseEntity::IsMarkedForDeletion() const
 {
-	return (GetEFlags() & EFL_KILLME) != 0;
+	return (GetEngineObject()->GetEFlags() & EFL_KILLME) != 0;
 }
 
 inline void	CBaseEntity::SetNavIgnore( float duration )
@@ -2134,10 +2086,7 @@ inline bool	CBaseEntity::IsNavIgnored() const
 	return ( gpGlobals->curtime <= m_flNavIgnoreUntilTime );
 }
 
-inline bool CBaseEntity::GetCheckUntouch() const
-{
-	return IsEFlagSet( EFL_CHECK_UNTOUCH );
-}
+
 
 //-----------------------------------------------------------------------------
 // Network state optimization

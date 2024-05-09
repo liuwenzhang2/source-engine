@@ -158,7 +158,7 @@ void CItem::Spawn( void )
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 	SetSolid( SOLID_BBOX );
 	SetBlocksLOS( false );
-	AddEFlags( EFL_NO_ROTORWASH_PUSH );
+	GetEngineObject()->AddEFlags( EFL_NO_ROTORWASH_PUSH );
 	
 	if( IsX360() )
 	{

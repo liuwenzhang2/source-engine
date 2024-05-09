@@ -205,7 +205,7 @@ bool CSoundEnt::InitSoundEnt()
 		Warning( "**COULD NOT CREATE SOUNDENT**\n" );
 		return false;
 	}
-	g_pSoundEnt->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
+	g_pSoundEnt->GetEngineObject()->AddEFlags( EFL_KEEP_ON_RECREATE_ENTITIES );
 	return true;
 }
 

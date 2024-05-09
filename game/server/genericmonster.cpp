@@ -275,7 +275,7 @@ void CNPC_Furniture::Spawn( )
 
 	CapabilitiesAdd( bits_CAP_MOVE_FLY | bits_CAP_TURN_HEAD | bits_CAP_ANIMATEDFACE );
 
-	AddEFlags( EFL_NO_MEGAPHYSCANNON_RAGDOLL );
+	GetEngineObject()->AddEFlags( EFL_NO_MEGAPHYSCANNON_RAGDOLL );
 
 //	pev->nextthink += 1.0;
 //	SetThink (WalkMonsterDelay);

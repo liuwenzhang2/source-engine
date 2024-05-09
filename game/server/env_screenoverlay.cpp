@@ -202,9 +202,13 @@ public:
 	DECLARE_SERVERCLASS();
 
 	// We always want to be sent to the client
-	CEnvScreenEffect( void ) { 	AddEFlags( EFL_FORCE_CHECK_TRANSMIT ); }
+	CEnvScreenEffect( void ) {  }
+	void			PostConstructor(const char* szClassname, int iForceEdictIndex) {
+		GetEngineObject()->AddEFlags(EFL_FORCE_CHECK_TRANSMIT);
+		BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	}
 	virtual int UpdateTransmitState( void )	{ return SetTransmitState( FL_EDICT_ALWAYS ); }
-	virtual void Spawn( void );
+	virtual void Spawn(void);
 	virtual void Precache( void );
 
 private:

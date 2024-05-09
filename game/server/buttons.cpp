@@ -871,7 +871,7 @@ void CRotButton::Spawn( void )
 #endif
 	if ( HasSpawnFlags( SF_ROTBUTTON_NOTSOLID ) )
 	{
-		AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+		GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
@@ -1048,7 +1048,7 @@ void CMomentaryRotButton::Spawn( void )
 #endif
 	if (HasSpawnFlags(SF_ROTBUTTON_NOTSOLID))
 	{
-		AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+		GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 

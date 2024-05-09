@@ -1195,7 +1195,7 @@ void CPropCombineBall::CollisionEventToTrace( int index, gamevcollisionevent_t *
 //-----------------------------------------------------------------------------
 bool CPropCombineBall::DissolveEntity( CBaseEntity *pEntity )
 {
-	if( pEntity->IsEFlagSet( EFL_NO_DISSOLVE ) )
+	if( pEntity->GetEngineObject()->IsEFlagSet( EFL_NO_DISSOLVE ) )
 		return false;
 
 #ifdef HL2MP

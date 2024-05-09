@@ -346,11 +346,7 @@ public:
 	// an uncompressed update that's caused it to destroy all entities & recreate them.
 	virtual void					SetDestroyedOnRecreateEntities( void );
 
-	virtual int				GetEFlags() const;
-	virtual void			SetEFlags( int iEFlags );
-	void					AddEFlags( int nEFlagMask );
-	void					RemoveEFlags( int nEFlagMask );
-	bool					IsEFlagSet( int nEFlagMask ) const;
+
 
 	// checks to see if the entity is marked for deletion
 	bool							IsMarkedForDeletion( void );
@@ -825,8 +821,7 @@ public:
 	virtual bool			CanBePoweredUp( void ) { return false; }
 	virtual bool			AttemptToPowerup( int iPowerup, float flTime, float flAmount = 0, C_BaseEntity *pAttacker = NULL, CDamageModifier *pDamageModifier = NULL ) { return false; }
 
-	void					SetCheckUntouch( bool check );
-	bool					GetCheckUntouch() const;
+
 
 	virtual bool			IsCurrentlyTouching( void ) const;
 
@@ -1255,8 +1250,7 @@ public:
 //	PredictionContext				*m_pPredictionContext;
 //#endif
 
-	// used so we know when things are no longer touching
-	int								touchStamp;	
+
 
 	// Called after predicted entity has been acknowledged so that no longer needed entity can
 	//  be deleted
@@ -1441,8 +1435,7 @@ private:
 
 	ClientThinkHandle_t				m_hThink;
 
-public:
-	int								m_iEFlags;	// entity flags EFL_*
+
 private:
 
 	// Object movetype
@@ -1911,24 +1904,8 @@ inline RenderMode_t CBaseEntity::GetRenderMode() const
 //-----------------------------------------------------------------------------
 inline bool C_BaseEntity::IsMarkedForDeletion( void ) 
 { 
-	return (m_iEFlags & EFL_KILLME); 
+	return (GetEngineObject()->GetEFlags() & EFL_KILLME);
 }
-
-inline void C_BaseEntity::AddEFlags( int nEFlagMask )
-{
-	m_iEFlags |= nEFlagMask;
-}
-
-inline void C_BaseEntity::RemoveEFlags( int nEFlagMask )
-{
-	m_iEFlags &= ~nEFlagMask;
-}
-
-inline bool CBaseEntity::IsEFlagSet( int nEFlagMask ) const
-{
-	return (m_iEFlags & nEFlagMask) != 0;
-}
-
 
 
 inline ClientRenderHandle_t CBaseEntity::GetRenderHandle() const 

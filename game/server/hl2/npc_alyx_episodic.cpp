@@ -340,7 +340,7 @@ void CNPC_Alyx::Spawn()
 		CreateEmpTool( );
 	}
 
-	AddEFlags( EFL_NO_DISSOLVE | EFL_NO_MEGAPHYSCANNON_RAGDOLL | EFL_NO_PHYSCANNON_INTERACTION );
+	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE | EFL_NO_MEGAPHYSCANNON_RAGDOLL | EFL_NO_PHYSCANNON_INTERACTION );
 
 	m_iHealth			= 80;
 	m_bloodColor		= DONT_BLEED;
@@ -2487,7 +2487,7 @@ void CNPC_Alyx::OnSeeEntity( CBaseEntity *pEntity )
 {
 	BaseClass::OnSeeEntity(pEntity);
 
-	if( pEntity->IsPlayer() &&  pEntity->IsEFlagSet(EFL_IS_BEING_LIFTED_BY_BARNACLE) )
+	if( pEntity->IsPlayer() &&  pEntity->GetEngineObject()->IsEFlagSet(EFL_IS_BEING_LIFTED_BY_BARNACLE) )
 	{
 		SpeakIfAllowed( TLK_ALLY_IN_BARNACLE );
 	}
@@ -3187,7 +3187,7 @@ bool CNPC_Alyx::PlayerInSpread( const Vector &sourcePos, const Vector &targetPos
 		{
 			//If the player is being lifted by a barnacle then go ahead and ignore the player and shoot.
 #ifdef HL2_EPISODIC
-			if ( pPlayer->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
+			if ( pPlayer->GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 				return false;
 #endif
 

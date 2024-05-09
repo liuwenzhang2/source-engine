@@ -1066,7 +1066,7 @@ void EnableNoClip( CBasePlayer *pPlayer )
 	pPlayer->GetEngineObject()->SetParent( NULL );
 	pPlayer->SetMoveType( MOVETYPE_NOCLIP );
 	ClientPrint( pPlayer, HUD_PRINTCONSOLE, "noclip ON\n");
-	pPlayer->AddEFlags( EFL_NOCLIP_ACTIVE );
+	pPlayer->GetEngineObject()->AddEFlags( EFL_NOCLIP_ACTIVE );
 }
 
 void CC_Player_NoClip( void )
@@ -1087,7 +1087,7 @@ void CC_Player_NoClip( void )
 		return;
 	}
 
-	pPlayer->RemoveEFlags( EFL_NOCLIP_ACTIVE );
+	pPlayer->GetEngineObject()->RemoveEFlags( EFL_NOCLIP_ACTIVE );
 	pPlayer->SetMoveType( MOVETYPE_WALK );
 
 	Vector oldorigin = pPlayer->GetAbsOrigin();

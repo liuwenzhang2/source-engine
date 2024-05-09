@@ -371,7 +371,7 @@ void CNPC_RocketTurret::Spawn( void )
 
 	SetViewOffset( vec3_origin );
 
-	AddEFlags( EFL_NO_DISSOLVE );
+	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
 	SetModel( ROCKET_TURRET_MODEL_NAME );
 	SetSolid( SOLID_VPHYSICS );

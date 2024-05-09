@@ -5079,7 +5079,7 @@ void CGrenadeHelicopter::Spawn( void )
 
 	// We're always being dropped beneath the helicopter; need to not
 	// be affected by the rotor wash
-	AddEFlags( EFL_NO_ROTORWASH_PUSH );
+	GetEngineObject()->AddEFlags( EFL_NO_ROTORWASH_PUSH );
 
 	// contact grenades arc lower
 	QAngle angles;

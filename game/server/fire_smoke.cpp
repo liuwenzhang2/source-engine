@@ -122,8 +122,12 @@ CFireSmoke::CFireSmoke( void )
 	m_flScaleTime		= 0.0f;
 	m_nFlags			= bitsFIRE_NONE;
 
+}
+
+void CFireSmoke::PostConstructor(const char* szClassname, int iForceEdictIndex) {
 	//Server-side
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags(EFL_FORCE_CHECK_TRANSMIT);
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
 }
 
 //-----------------------------------------------------------------------------

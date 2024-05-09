@@ -480,7 +480,7 @@ void CGrenadeHopwire::EndThink( void )
 void CGrenadeHopwire::CombatThink( void )
 {
 	// Stop the grenade from moving
-	AddEFlags( EF_NODRAW );
+	GetEngineObject()->AddEFlags( EF_NODRAW );
 	AddFlag( FSOLID_NOT_SOLID );
 	VPhysicsDestroyObject();
 	SetAbsVelocity( vec3_origin );

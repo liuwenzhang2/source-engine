@@ -45,6 +45,7 @@ class CBaseTrigger : public CBaseToggle
 public:
 	CBaseTrigger();
 	
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	void Activate( void );
 	virtual void PostClientActive( void );
 	void InitTrigger( void );

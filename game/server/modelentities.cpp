@@ -41,7 +41,7 @@ void CFuncBrush::Spawn( void )
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 
 	SetSolid( SOLID_VPHYSICS );
-	AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+	GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 
 	if ( m_iSolidity == BRUSHSOLID_NEVER )
 	{

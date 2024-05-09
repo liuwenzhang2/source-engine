@@ -362,7 +362,7 @@ void CEnvSoundscape::Spawn( )
 	Precache();
 	// Because the soundscape has no model, need to make sure it doesn't get culled from the PVS for this reason and therefore
 	//  never exist on the client, etc.
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 }
 

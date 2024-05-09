@@ -52,7 +52,7 @@ void CAlyxEmpEffect::Spawn( void )
 	Precache();
 
 	// No model but we still need to force this!
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	// No shadows
 	AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );

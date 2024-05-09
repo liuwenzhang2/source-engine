@@ -398,7 +398,7 @@ void CNPC_Advisor::Spawn()
 
 	SetGoalEnt( NULL );
 
-	AddEFlags( EFL_NO_DISSOLVE );
+	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 }
 
 

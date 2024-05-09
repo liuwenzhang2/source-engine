@@ -140,7 +140,7 @@ void CColorCorrectionVolume::Spawn( void )
 {
 	BaseClass::Spawn();
 
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT | EFL_DIRTY_ABSTRANSFORM );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT | EFL_DIRTY_ABSTRANSFORM );
 	Precache();
 
 	SetSolid( SOLID_BSP );

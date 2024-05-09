@@ -261,32 +261,7 @@ void C_BaseEntity::EndTouch( C_BaseEntity *pOther )
 //	}
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : check - 
-//-----------------------------------------------------------------------------
-void C_BaseEntity::SetCheckUntouch( bool check )
-{
-	// Invalidate touchstamp
-	if ( check )
-	{
-		touchStamp++;
-		AddEFlags( EFL_CHECK_UNTOUCH );
-	}
-	else
-	{
-		RemoveEFlags( EFL_CHECK_UNTOUCH );
-	}
-}
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : Returns true on success, false on failure.
-//-----------------------------------------------------------------------------
-bool C_BaseEntity::GetCheckUntouch() const
-{
-	return IsEFlagSet( EFL_CHECK_UNTOUCH );
-}
 
 extern ConVar think_limit;
 

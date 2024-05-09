@@ -149,7 +149,7 @@ int CColorCorrection::UpdateTransmitState()
 //------------------------------------------------------------------------------
 void CColorCorrection::Spawn( void )
 {
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT | EFL_DIRTY_ABSTRANSFORM );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT | EFL_DIRTY_ABSTRANSFORM );
 	Precache();
 	SetSolid( SOLID_NONE );
 

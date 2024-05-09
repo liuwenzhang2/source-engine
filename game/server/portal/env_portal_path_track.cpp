@@ -96,7 +96,7 @@ void CEnvPortalPathTrack::Spawn( void )
 	UTIL_SetSize( this, Vector( -8, -8, -8 ), Vector( 8, 8, 8 ) );
 
 	// No model but we still need to force this!
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 }
 
 void CEnvPortalPathTrack::Activate( void )

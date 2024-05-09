@@ -1578,7 +1578,7 @@ float CGrabController::ComputeError()
 		}
 	}
 	
-	if ( pAttached->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
+	if ( pAttached->GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 	{
 		m_error *= 3.0f;
 	}

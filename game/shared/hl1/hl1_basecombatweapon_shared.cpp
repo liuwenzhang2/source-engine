@@ -28,7 +28,7 @@ void CBaseHL1CombatWeapon::Spawn( void )
 	m_flNextEmptySoundTime = 0.0f;
 
 	// Weapons won't show up in trace calls if they are being carried...
-	RemoveEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+	GetEngineObject()->RemoveEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 
 	m_iState = WEAPON_NOT_CARRIED;
 	// Assume 

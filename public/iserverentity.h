@@ -136,6 +136,15 @@ public:
 	virtual IServerNetworkable* GetNetworkable() = 0;
 	virtual int			GetParentAttachment() = 0;
 	virtual void		ClearParentAttachment() = 0;
+	virtual int			GetEFlags() const = 0;
+	virtual void		SetEFlags(int iEFlags) = 0;
+	virtual void		AddEFlags(int nEFlagMask) = 0;
+	virtual void		RemoveEFlags(int nEFlagMask) = 0;
+	virtual bool		IsEFlagSet(int nEFlagMask) const = 0;
+	virtual void		SetCheckUntouch(bool check) = 0;
+	virtual bool		GetCheckUntouch() const = 0;
+	virtual int					GetTouchStamp() = 0;
+	virtual void				ClearTouchStamp() = 0;
 
 };
 

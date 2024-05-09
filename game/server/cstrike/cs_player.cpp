@@ -5611,7 +5611,7 @@ void CCSPlayer::State_PreThink_ACTIVE()
 	// We only allow noclip here only because noclip is useful for debugging.
 	// It would be nice if the noclip command set some flag so we could tell that they
 	// did it intentionally.
-	if ( IsEFlagSet( EFL_NOCLIP_ACTIVE ) )
+	if (GetEngineObject()->IsEFlagSet( EFL_NOCLIP_ACTIVE ) )
 	{
 //		Assert( GetMoveType() == MOVETYPE_NOCLIP );
 	}

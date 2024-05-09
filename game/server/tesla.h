@@ -23,6 +23,7 @@ public:
 
 	CTesla();
 
+	void		PostConstructor(const char* szClassname, int iForceEdictIndex);
 	virtual void Spawn();
 	virtual void Activate();
 	virtual void Precache();

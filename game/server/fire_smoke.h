@@ -57,6 +57,8 @@ public:
 	CFireSmoke( void );
 	virtual	~CFireSmoke( void );
 
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
+
 	void	Spawn();
 	void	Precache();
 	void	EnableSmoke( int state = true );

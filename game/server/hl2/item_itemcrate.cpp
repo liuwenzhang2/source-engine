@@ -129,7 +129,7 @@ void CItem_ItemCrate::Spawn( void )
 
 	Precache( );
 	SetModel( pszItemCrateModelName[m_CrateAppearance] );
-	AddEFlags( EFL_NO_ROTORWASH_PUSH );
+	GetEngineObject()->AddEFlags( EFL_NO_ROTORWASH_PUSH );
 	BaseClass::Spawn( );
 }
 

@@ -57,6 +57,8 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_KEYFIELD(m_iParent, FIELD_STRING, "parentname"),
 	DEFINE_FIELD(m_iName, FIELD_STRING),
 	DEFINE_FIELD(m_iParentAttachment, FIELD_CHARACTER),
+	DEFINE_FIELD(m_iEFlags, FIELD_INTEGER),
+	DEFINE_FIELD(touchStamp, FIELD_INTEGER),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -612,7 +614,7 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalAngles from within a KeyValues method.. use SetAbsAngles instead!
-		Assert((GetMoveParent() == NULL) && !m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
 		SetAbsAngles(angles);
 		return true;
 	}
@@ -624,7 +626,7 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalOrigin from within a KeyValues method.. use SetAbsOrigin instead!
-		Assert((GetMoveParent() == NULL) && !m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
 		SetAbsOrigin(vecOrigin);
 		return true;
 	}
@@ -905,10 +907,10 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 //-----------------------------------------------------------------------------
 void CEngineObjectInternal::CalcAbsolutePosition(void)
 {
-	if (!m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	if (!IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 		return;
 
-	m_pOuter->RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
+	RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
 
 	// Plop the entity->parent matrix into m_rgflCoordinateFrame
 	AngleMatrix(m_angRotation, m_vecOrigin, m_rgflCoordinateFrame);
@@ -952,10 +954,10 @@ void CEngineObjectInternal::CalcAbsolutePosition(void)
 
 void CEngineObjectInternal::CalcAbsoluteVelocity()
 {
-	if (!m_pOuter->IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
+	if (!IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
 		return;
 
-	m_pOuter->RemoveEFlags(EFL_DIRTY_ABSVELOCITY);
+	RemoveEFlags(EFL_DIRTY_ABSVELOCITY);
 
 	CEngineObjectInternal* pMoveParent = GetMoveParent();
 	if (!pMoveParent)
@@ -1047,7 +1049,7 @@ void CEngineObjectInternal::SetAbsOrigin(const Vector& absOrigin)
 
 	// All children are invalid, but we are not
 	m_pOuter->InvalidatePhysicsRecursive(POSITION_CHANGED);
-	m_pOuter->RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
+	RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
 
 	m_vecAbsOrigin = absOrigin;
 
@@ -1091,7 +1093,7 @@ void CEngineObjectInternal::SetAbsAngles(const QAngle& absAngles)
 
 	// All children are invalid, but we are not
 	m_pOuter->InvalidatePhysicsRecursive(ANGLES_CHANGED);
-	m_pOuter->RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
+	RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
 
 	m_angAbsRotation = absAngles;
 	AngleMatrix(absAngles, m_rgflCoordinateFrame);
@@ -1136,7 +1138,7 @@ void CEngineObjectInternal::SetAbsVelocity(const Vector& vecAbsVelocity)
 	// The abs velocity won't be dirty since we're setting it here
 	// All children are invalid, but we are not
 	m_pOuter->InvalidatePhysicsRecursive(VELOCITY_CHANGED);
-	m_pOuter->RemoveEFlags(EFL_DIRTY_ABSVELOCITY);
+	RemoveEFlags(EFL_DIRTY_ABSVELOCITY);
 
 	m_vecAbsVelocity = vecAbsVelocity;
 
@@ -1264,7 +1266,7 @@ Vector& CEngineObjectInternal::GetAbsVelocity()
 {
 	Assert(CBaseEntity::IsAbsQueriesValid());
 
-	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
+	if (IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
 	{
 		const_cast<CEngineObjectInternal*>(this)->CalcAbsoluteVelocity();
 	}
@@ -1275,7 +1277,7 @@ const Vector& CEngineObjectInternal::GetAbsVelocity() const
 {
 	Assert(CBaseEntity::IsAbsQueriesValid());
 
-	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
+	if (IsEFlagSet(EFL_DIRTY_ABSVELOCITY))
 	{
 		const_cast<CEngineObjectInternal*>(this)->CalcAbsoluteVelocity();
 	}
@@ -1300,7 +1302,7 @@ Vector& CEngineObjectInternal::GetAbsOrigin(void)
 {
 	Assert(CBaseEntity::IsAbsQueriesValid());
 
-	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
 		const_cast<CEngineObjectInternal*>(this)->CalcAbsolutePosition();
 	}
@@ -1311,7 +1313,7 @@ const Vector& CEngineObjectInternal::GetAbsOrigin(void) const
 {
 	Assert(CBaseEntity::IsAbsQueriesValid());
 
-	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
 		const_cast<CEngineObjectInternal*>(this)->CalcAbsolutePosition();
 	}
@@ -1322,7 +1324,7 @@ QAngle& CEngineObjectInternal::GetAbsAngles(void)
 {
 	Assert(CBaseEntity::IsAbsQueriesValid());
 
-	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
 		const_cast<CEngineObjectInternal*>(this)->CalcAbsolutePosition();
 	}
@@ -1333,7 +1335,7 @@ const QAngle& CEngineObjectInternal::GetAbsAngles(void) const
 {
 	Assert(CBaseEntity::IsAbsQueriesValid());
 
-	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
 		const_cast<CEngineObjectInternal*>(this)->CalcAbsolutePosition();
 	}
@@ -1395,7 +1397,7 @@ matrix3x4_t& CEngineObjectInternal::EntityToWorldTransform()
 {
 	Assert(CBaseEntity::IsAbsQueriesValid());
 
-	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
 		CalcAbsolutePosition();
 	}
@@ -1406,7 +1408,7 @@ const matrix3x4_t& CEngineObjectInternal::EntityToWorldTransform() const
 {
 	Assert(CBaseEntity::IsAbsQueriesValid());
 
-	if (m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
+	if (IsEFlagSet(EFL_DIRTY_ABSTRANSFORM))
 	{
 		const_cast<CEngineObjectInternal*>(this)->CalcAbsolutePosition();
 	}
@@ -1437,6 +1439,24 @@ void CEngineObjectInternal::WorldToEntitySpace(const Vector& in, Vector* pOut) c
 	else
 	{
 		VectorITransform(in, EntityToWorldTransform(), *pOut);
+	}
+}
+
+void CEngineObjectInternal::SetCheckUntouch(bool check)
+{
+	// Invalidate touchstamp
+	if (check)
+	{
+		touchStamp++;
+		if (!IsEFlagSet(EFL_CHECK_UNTOUCH))
+		{
+			AddEFlags(EFL_CHECK_UNTOUCH);
+			EntityTouch_Add(this->GetOuter());
+		}
+	}
+	else
+	{
+		RemoveEFlags(EFL_CHECK_UNTOUCH);
 	}
 }
 
@@ -1625,7 +1645,7 @@ public:
 			return;
 
 		int index = eh.GetEntryIndex();
-		if (pEntity->IsEFlagSet(EFL_NO_THINK_FUNCTION) && pEntity->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
+		if (pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_THINK_FUNCTION) && pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
 		{
 			RemoveEntinfoIndex(index);
 		}
@@ -1638,7 +1658,7 @@ public:
 				m_entinfoIndex[index] = m_simThinkList.AddToTail();
 				m_simThinkList[m_entinfoIndex[index]].entEntry = (unsigned short)index;
 				m_simThinkList[m_entinfoIndex[index]].nextThinkTick = 0;
-				if (pEntity->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
+				if (pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
 				{
 					m_simThinkList[m_entinfoIndex[index]].nextThinkTick = pEntity->GetFirstThinkTick();
 					Assert(m_simThinkList[m_entinfoIndex[index]].nextThinkTick >= 0);
@@ -1647,7 +1667,7 @@ public:
 			else
 			{
 				// updating existing entry - if no sim, reset think time
-				if (pEntity->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
+				if (pEntity->GetEngineObject()->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
 				{
 					m_simThinkList[m_entinfoIndex[index]].nextThinkTick = pEntity->GetFirstThinkTick();
 					Assert(m_simThinkList[m_entinfoIndex[index]].nextThinkTick >= 0);
@@ -1733,7 +1753,7 @@ private:
 void CNotifyList::AddEntity(CBaseEntity* pNotify, CBaseEntity* pWatched)
 {
 	// OPTIMIZE: Also flag pNotify for faster "RemoveAllNotify" ?
-	pWatched->AddEFlags(EFL_NOTIFY);
+	pWatched->GetEngineObject()->AddEFlags(EFL_NOTIFY);
 	int index = m_notifyList.AddToTail();
 	entitynotify_t& notify = m_notifyList[index];
 	notify.pNotify = pNotify;
@@ -1757,7 +1777,7 @@ void CNotifyList::ReportNamedEvent(CBaseEntity* pEntity, const char* pInputName)
 {
 	variant_t emptyVariant;
 
-	if (!pEntity->IsEFlagSet(EFL_NOTIFY))
+	if (!pEntity->GetEngineObject()->IsEFlagSet(EFL_NOTIFY))
 		return;
 
 	for (int i = 0; i < m_notifyList.Count(); i++)
@@ -1805,7 +1825,7 @@ void CNotifyList::ClearEntity(CBaseEntity* pNotify)
 
 void CNotifyList::ReportSystemEvent(CBaseEntity* pEntity, notify_system_event_t eventType, const notify_system_event_params_t& params)
 {
-	if (!pEntity->IsEFlagSet(EFL_NOTIFY))
+	if (!pEntity->GetEngineObject()->IsEFlagSet(EFL_NOTIFY))
 		return;
 
 	for (int i = 0; i < m_notifyList.Count(); i++)
@@ -1845,7 +1865,7 @@ public:
 	virtual void OnEntityCreated(CBaseEntity* pEntity) {}
 	virtual void OnEntityDeleted(CBaseEntity* pEntity)
 	{
-		if (!pEntity->GetCheckUntouch())
+		if (!pEntity->GetEngineObject()->GetCheckUntouch())
 			return;
 		int index = m_updateList.Find(pEntity);
 		if (m_updateList.IsValidIndex(index))
@@ -1890,7 +1910,7 @@ void CEntityTouchManager::FrameUpdatePostEntityThink()
 		for (int i = 0; i < count; i++)
 		{
 			//Assert( ents[i]->GetCheckUntouch() );
-			if (ents[i]->GetCheckUntouch())
+			if (ents[i]->GetEngineObject()->GetCheckUntouch())
 			{
 				ents[i]->PhysicsCheckForEntityUntouch();
 			}
@@ -1975,7 +1995,7 @@ public:
 				{
 					nPlayerIndex = pEnt->entindex();
 				}
-				if (!pEnt->IsEFlagSet(EFL_KEEP_ON_RECREATE_ENTITIES))
+				if (!pEnt->GetEngineObject()->IsEFlagSet(EFL_KEEP_ON_RECREATE_ENTITIES))
 				{
 					UTIL_Remove(pEnt);
 				}

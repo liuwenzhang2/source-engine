@@ -75,6 +75,7 @@ END_PREDICTION_DATA()
 BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
 	DEFINE_FIELD(m_vecAbsOrigin, FIELD_POSITION_VECTOR),
 	DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
+	DEFINE_FIELD(m_iEFlags, FIELD_INTEGER),
 END_DATADESC()
 
 //-----------------------------------------------------------------------------
@@ -336,7 +337,7 @@ bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalAngles from within a KeyValues method.. use SetAbsAngles instead!
-		Assert((GetMoveParent() == NULL) && !m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
 		SetAbsAngles(angles);
 		return true;
 	}
@@ -348,7 +349,7 @@ bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalOrigin from within a KeyValues method.. use SetAbsOrigin instead!
-		Assert((GetMoveParent() == NULL) && !m_pOuter->IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
+		Assert((GetMoveParent() == NULL) && !IsEFlagSet(EFL_DIRTY_ABSTRANSFORM));
 		SetAbsOrigin(vecOrigin);
 		return true;
 	}
@@ -874,7 +875,7 @@ void C_EngineObjectInternal::SetAbsOrigin(const Vector& absOrigin)
 
 	// All children are invalid, but we are not
 	m_pOuter->InvalidatePhysicsRecursive(POSITION_CHANGED);
-	m_pOuter->RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
+	RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
 
 	m_vecAbsOrigin = absOrigin;
 	MatrixSetColumn(absOrigin, 3, m_rgflCoordinateFrame);
@@ -904,7 +905,7 @@ void C_EngineObjectInternal::SetAbsAngles(const QAngle& absAngles)
 		return;
 
 	m_pOuter->InvalidatePhysicsRecursive(ANGLES_CHANGED);
-	m_pOuter->RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
+	RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
 
 	m_angAbsRotation = absAngles;
 	AngleMatrix(absAngles, m_rgflCoordinateFrame);
@@ -940,7 +941,7 @@ void C_EngineObjectInternal::SetAbsVelocity(const Vector& vecAbsVelocity)
 
 	// The abs velocity won't be dirty since we're setting it here
 	m_pOuter->InvalidatePhysicsRecursive(VELOCITY_CHANGED);
-	m_pOuter->m_iEFlags &= ~EFL_DIRTY_ABSVELOCITY;
+	m_iEFlags &= ~EFL_DIRTY_ABSVELOCITY;
 
 	m_vecAbsVelocity = vecAbsVelocity;
 
@@ -1134,7 +1135,7 @@ void C_EngineObjectInternal::CalcAbsolutePosition()
 		return;
 
 	// FIXME: Recompute absbox!!!
-	if ((m_pOuter->m_iEFlags & EFL_DIRTY_ABSTRANSFORM) == 0)
+	if ((m_iEFlags & EFL_DIRTY_ABSTRANSFORM) == 0)
 	{
 		// quick check to make sure we really don't need an update
 		// Assert( m_pMoveParent || m_vecAbsOrigin == GetLocalOrigin() );
@@ -1143,12 +1144,12 @@ void C_EngineObjectInternal::CalcAbsolutePosition()
 
 	AUTO_LOCK(m_CalcAbsolutePositionMutex);
 
-	if ((m_pOuter->m_iEFlags & EFL_DIRTY_ABSTRANSFORM) == 0) // need second check in event another thread grabbed mutex and did the calculation
+	if ((m_iEFlags & EFL_DIRTY_ABSTRANSFORM) == 0) // need second check in event another thread grabbed mutex and did the calculation
 	{
 		return;
 	}
 
-	m_pOuter->RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
+	RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
 
 	if (!m_pMoveParent)
 	{
@@ -1197,25 +1198,25 @@ void C_EngineObjectInternal::CalcAbsolutePosition()
 	//
 	// So here, we keep our absorigin invalidated. It means we're returning an origin that is a frame old to CalculateIKLocks,
 	// but we'll still render with the right origin.
-	if (GetParentAttachment() != 0 && (m_pMoveParent->GetOuter()->GetEFlags() & EFL_SETTING_UP_BONES))
+	if (GetParentAttachment() != 0 && (m_pMoveParent->GetEFlags() & EFL_SETTING_UP_BONES))
 	{
-		m_pOuter->m_iEFlags |= EFL_DIRTY_ABSTRANSFORM;
+		m_iEFlags |= EFL_DIRTY_ABSTRANSFORM;
 	}
 }
 
 void C_EngineObjectInternal::CalcAbsoluteVelocity()
 {
-	if ((m_pOuter->m_iEFlags & EFL_DIRTY_ABSVELOCITY) == 0)
+	if ((m_iEFlags & EFL_DIRTY_ABSVELOCITY) == 0)
 		return;
 
 	AUTO_LOCK(m_CalcAbsoluteVelocityMutex);
 
-	if ((m_pOuter->m_iEFlags & EFL_DIRTY_ABSVELOCITY) == 0) // need second check in event another thread grabbed mutex and did the calculation
+	if ((m_iEFlags & EFL_DIRTY_ABSVELOCITY) == 0) // need second check in event another thread grabbed mutex and did the calculation
 	{
 		return;
 	}
 
-	m_pOuter->m_iEFlags &= ~EFL_DIRTY_ABSVELOCITY;
+	m_iEFlags &= ~EFL_DIRTY_ABSVELOCITY;
 
 	C_EngineObjectInternal* pMoveParent = GetMoveParent();
 	if (!pMoveParent)
@@ -1688,7 +1689,7 @@ int C_EngineObjectInternal::RestoreData(const char* context, int slot, int type)
 
 	// some flags shouldn't be predicted - as we find them, add them to the savedEFlagsMask
 	const int savedEFlagsMask = EFL_DIRTY_SHADOWUPDATE;
-	int savedEFlags = m_pOuter->GetEFlags() & savedEFlagsMask;
+	int savedEFlags = GetEFlags() & savedEFlagsMask;
 
 	// model index needs to be set manually for dynamic model refcounting purposes
 	int oldModelIndex = m_pOuter->m_nModelIndex;
@@ -1699,8 +1700,8 @@ int C_EngineObjectInternal::RestoreData(const char* context, int slot, int type)
 	int outerError_count = outerCopyHelper.TransferData(sz, m_pOuter->entindex(), m_pOuter->GetPredDescMap());
 
 	// set non-predicting flags back to their prior state
-	m_pOuter->RemoveEFlags(savedEFlagsMask);
-	m_pOuter->AddEFlags(savedEFlags);
+	RemoveEFlags(savedEFlagsMask);
+	AddEFlags(savedEFlags);
 
 	// restore original model index and change via SetModelIndex
 	int newModelIndex = m_pOuter->m_nModelIndex;
@@ -1835,6 +1836,32 @@ void C_EngineObjectInternal::RemoveVar(void* data, bool bAssert)
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : check - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetCheckUntouch(bool check)
+{
+	// Invalidate touchstamp
+	if (check)
+	{
+		touchStamp++;
+		AddEFlags(EFL_CHECK_UNTOUCH);
+	}
+	else
+	{
+		RemoveEFlags(EFL_CHECK_UNTOUCH);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::GetCheckUntouch() const
+{
+	return IsEFlagSet(EFL_CHECK_UNTOUCH);
+}
 
 
 bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b )

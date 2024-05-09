@@ -68,10 +68,12 @@ CTesla::CTesla()
 	m_flTimeVisible[0] = 0.3;
 	m_flTimeVisible[1] = 0.55;
 	m_flArcInterval[0] = m_flArcInterval[1] = 0.5;
-	
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 }
 
+void CTesla::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	GetEngineObject()->AddEFlags(EFL_FORCE_CHECK_TRANSMIT);
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+}
 
 void CTesla::Spawn()
 {

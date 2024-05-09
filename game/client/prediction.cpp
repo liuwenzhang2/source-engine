@@ -1236,7 +1236,7 @@ void CPrediction::Untouch( void )
 		if ( !entity )
 			continue;
 
-		if ( !entity->GetCheckUntouch() )
+		if ( !entity->GetEngineObject()->GetCheckUntouch() )
 			continue;
 
 		entity->PhysicsCheckForEntityUntouch();
@@ -1250,7 +1250,7 @@ void CPrediction::Untouch( void )
 //-----------------------------------------------------------------------------
 void InvalidateEFlagsRecursive( C_BaseEntity *pEnt, int nDirtyFlags, int nChildFlags = 0 )
 {
-	pEnt->AddEFlags( nDirtyFlags );
+	pEnt->GetEngineObject()->AddEFlags( nDirtyFlags );
 	nDirtyFlags |= nChildFlags;
 	for (IEngineObjectClient *pChild = pEnt->GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer())
 	{

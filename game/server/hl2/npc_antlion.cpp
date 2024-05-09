@@ -606,7 +606,7 @@ void CNPC_Antlion::Event_Killed( const CTakeDamageInfo &info )
 
 	if ( IsCurSchedule(SCHED_ANTLION_BURROW_IN) || IsCurSchedule(SCHED_ANTLION_BURROW_OUT) )
 	{
-		AddEFlags( EF_NOSHADOW );
+		GetEngineObject()->AddEFlags( EF_NOSHADOW );
 	}
 
 	if ( info.GetDamageType() & DMG_CRUSH )
@@ -2694,7 +2694,7 @@ int CNPC_Antlion::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	}
 
 	// If we're being hoisted by a barnacle, we only take damage from that barnacle (otherwise we can die too early!)
-	if ( IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
+	if (GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 	{
 		if ( info.GetAttacker() && info.GetAttacker()->Classify() != CLASS_BARNACLE )
 			return 0;
@@ -4099,7 +4099,7 @@ void CNPC_Antlion::GatherEnemyConditions( CBaseEntity *pEnemy )
 bool CNPC_Antlion::ShouldGib( const CTakeDamageInfo &info )
 {
 	// If we're being hoisted, we only want to gib when the barnacle hurts us with his bite!
-	if ( IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
+	if (GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 	{
 		if ( info.GetAttacker() && info.GetAttacker()->Classify() != CLASS_BARNACLE )
 			return false;

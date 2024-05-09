@@ -124,7 +124,7 @@ void CRagdoll::Init(
 	m_flLastOriginChangeTime = gpGlobals->curtime;
 
 	// So traces hit it.
-	ent->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+	ent->GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 
 	if ( !m_ragdoll.listCount )
 		return;

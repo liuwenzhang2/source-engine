@@ -747,7 +747,7 @@ void CFuncTank::Spawn( void )
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	SetSolid( SOLID_VPHYSICS );
 	SetModel( STRING( GetModelName() ) );
-	AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+	GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 
 	if ( HasSpawnFlags(SF_TANK_NOTSOLID) )
 	{
@@ -3561,7 +3561,7 @@ void CMortarShell::Spawn()
 	SetNextThink( gpGlobals->curtime );
 
 	// No model but we still need to force this!
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 }
 
 //-----------------------------------------------------------------------------

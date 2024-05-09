@@ -754,7 +754,7 @@ void CAI_ScriptedSequence::StartScript( void )
 		pTarget->SetIdealState(NPC_STATE_SCRIPT);
 
 		// FIXME: not sure why this is happening, or what to do about truely dormant NPCs
-		if ( pTarget->IsEFlagSet( EFL_NO_THINK_FUNCTION ) && pTarget->GetNextThink() != TICK_NEVER_THINK )
+		if ( pTarget->GetEngineObject()->IsEFlagSet( EFL_NO_THINK_FUNCTION ) && pTarget->GetNextThink() != TICK_NEVER_THINK )
 		{
 			DevWarning( "scripted_sequence %d:%s - restarting dormant entity %d:%s : %.1f:%.1f\n", entindex(), GetDebugName(), pTarget->entindex(), pTarget->GetDebugName(), gpGlobals->curtime, pTarget->GetNextThink() );
 			pTarget->SetNextThink( gpGlobals->curtime );

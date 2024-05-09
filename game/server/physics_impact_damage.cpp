@@ -271,7 +271,7 @@ float CalculatePhysicsImpactDamage( int index, gamevcollisionevent_t *pEvent, co
 
 	// Dissolving impact damage results in death always.
 	if ( ( pEvent->pObjects[otherIndex]->GetGameFlags() & FVPHYSICS_DMG_DISSOLVE ) && 
-			!pEvent->pEntities[index]->IsEFlagSet(EFL_NO_DISSOLVE) )
+			!pEvent->pEntities[index]->GetEngineObject()->IsEFlagSet(EFL_NO_DISSOLVE) )
 	{
 		damageType |= DMG_DISSOLVE;
 		return 1000;

@@ -126,7 +126,11 @@ LINK_ENTITY_TO_CLASS( trigger, CBaseTrigger );
 
 CBaseTrigger::CBaseTrigger()
 {
-	AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
+}
+
+void CBaseTrigger::PostConstructor(const char* szClassname, int iForceEdictIndex) {
+	GetEngineObject()->AddEFlags(EFL_USE_PARTITION_WHEN_NOT_SOLID);
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
 }
 
 //------------------------------------------------------------------------------

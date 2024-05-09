@@ -79,7 +79,7 @@ void CPoseController::Spawn( void )
 	BaseClass::Spawn();
 
 	// Talk to the client class when data changes
-	AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
+	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	// Think to refresh the list of models
 	SetThink( &CPoseController::Think );

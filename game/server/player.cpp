@@ -548,7 +548,7 @@ CBasePlayer *CBasePlayer::CreatePlayer( const char *className, int ed )
 //-----------------------------------------------------------------------------
 CBasePlayer::CBasePlayer( )
 {
-	AddEFlags( EFL_NO_AUTO_EDICT_ATTACH );
+	//AddEFlags( EFL_NO_AUTO_EDICT_ATTACH );
 
 #ifdef _DEBUG
 	m_vecAutoAim.Init();
@@ -5446,7 +5446,7 @@ bool CBasePlayer::CanEnterVehicle( IServerVehicle *pVehicle, int nRole )
 		return false;
 
 	// Can't be pulled by a barnacle
-	if ( IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
+	if (GetEngineObject()->IsEFlagSet( EFL_IS_BEING_LIFTED_BY_BARNACLE ) )
 		return false;
 
 	return true;
@@ -9294,7 +9294,7 @@ bool CPlayerInfo::IsEFlagSet( int nEFlagMask )
 	Assert( m_pParent );
 	if ( m_pParent->IsBot() )
 	{
-		return m_pParent->IsEFlagSet(nEFlagMask); 
+		return m_pParent->GetEngineObject()->IsEFlagSet(nEFlagMask);
 	}
 	return false;
 }

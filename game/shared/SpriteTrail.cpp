@@ -224,11 +224,11 @@ void CSpriteTrail::SetSkybox( const Vector &vecSkyboxOrigin, float flSkyboxScale
 
 	if ( IsInSkybox() )
 	{
-		AddEFlags( EFL_IN_SKYBOX ); 
+		GetEngineObject()->AddEFlags( EFL_IN_SKYBOX );
 	}
 	else
 	{
-		RemoveEFlags( EFL_IN_SKYBOX ); 
+		GetEngineObject()->RemoveEFlags( EFL_IN_SKYBOX );
 	}
 }
 

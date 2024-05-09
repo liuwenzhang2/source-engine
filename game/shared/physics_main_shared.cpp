@@ -646,7 +646,7 @@ void CBaseEntity::PhysicsCheckForEntityUntouch( void )
 			else
 			{    
 				// check to see if the touch stamp is up to date
-				if ( link->touchStamp != touchStamp )
+				if ( link->touchStamp != GetEngineObject()->GetTouchStamp() )
 				{
 					// stamp is out of data, so entities are no longer touching
 					// remove self from other entities touch list
@@ -672,7 +672,7 @@ void CBaseEntity::PhysicsCheckForEntityUntouch( void )
 
 	g_pNextLink = NULL;
 
-	SetCheckUntouch( false );
+	GetEngineObject()->SetCheckUntouch( false );
 }
 
 //-----------------------------------------------------------------------------
@@ -768,7 +768,7 @@ void CBaseEntity::PhysicsRemoveTouchedList( CBaseEntity *ent )
 		ent->DestroyDataObject( TOUCHLINK );
 	}
 
-	ent->touchStamp = 0;
+	ent->GetEngineObject()->ClearTouchStamp();
 }
 
 //-----------------------------------------------------------------------------
@@ -1008,7 +1008,7 @@ touchlink_t *CBaseEntity::PhysicsMarkEntityAsTouched( CBaseEntity *other )
 			if ( link->entityTouched == other )
 			{
 				// update stamp
-				link->touchStamp = touchStamp;
+				link->touchStamp = GetEngineObject()->GetTouchStamp();
 				
 				if ( !CBaseEntity::sm_bDisableTouchFuncs )
 				{
@@ -1037,7 +1037,7 @@ touchlink_t *CBaseEntity::PhysicsMarkEntityAsTouched( CBaseEntity *other )
 	if ( !link )
 		return NULL;
 
-	link->touchStamp = touchStamp;
+	link->touchStamp = GetEngineObject()->GetTouchStamp();
 	link->entityTouched = other;
 	link->flags = 0;
 	// add it to the list
@@ -1606,7 +1606,7 @@ void CBaseEntity::PhysicsCheckWaterTransition( void )
 			params.m_bWarnOnDirectWaveReference = true;
 			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-			if ( !IsEFlagSet( EFL_NO_WATER_VELOCITY_CHANGE ) )
+			if ( !GetEngineObject()->IsEFlagSet( EFL_NO_WATER_VELOCITY_CHANGE ) )
 			{
 				Vector vecAbsVelocity = GetAbsVelocity();
 				vecAbsVelocity[2] *= 0.5;
@@ -1919,7 +1919,7 @@ void CBaseEntity::PhysicsSimulate( void )
 //-----------------------------------------------------------------------------
 bool CBaseEntity::PhysicsRunThink( thinkmethods_t thinkMethod )
 {
-	if ( IsEFlagSet( EFL_NO_THINK_FUNCTION ) )
+	if (GetEngineObject()->IsEFlagSet( EFL_NO_THINK_FUNCTION ) )
 		return true;
 	
 	bool bAlive = true;

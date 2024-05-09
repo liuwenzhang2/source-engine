@@ -770,7 +770,7 @@ inline void CBot< PlayerType >::UpdatePlayer( void )
 		SETBITS( m_buttonFlags, IN_SPEED );
 	}
 
-	if ( this->IsEFlagSet(EFL_BOT_FROZEN) )
+	if ( this->GetEngineObject()->IsEFlagSet(EFL_BOT_FROZEN) )
 	{
 		m_buttonFlags = 0; // Freeze.
 		m_forwardSpeed = 0;
