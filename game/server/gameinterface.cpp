@@ -1732,7 +1732,7 @@ bool g_bCheckForChainedActivate;
 	{ \
 		if ( bCheck ) \
 		{ \
-			AssertMsg( g_bReceivedChainedActivate, "Entity (%i/%s/%s) failed to call base class Activate()\n", pClass->entindex(), pClass->GetClassname(), STRING( pClass->GetEntityName() ) );	\
+			AssertMsg( g_bReceivedChainedActivate, "Entity (%i/%s/%s) failed to call base class Activate()\n", pEntity->entindex(), pEntity->GetClassname(), STRING( pEntity->GetEntityName() ) );	\
 		} \
 		g_bCheckForChainedActivate = false; \
 	}
