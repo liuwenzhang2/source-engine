@@ -133,6 +133,7 @@ public:
 		m_angRotation = QAngle(0, 0, 0);
 		m_vecVelocity = Vector(0, 0, 0);
 		m_hMoveParent = NULL;
+		m_iParentAttachment = 0;
 	}
 
 	~CEngineObjectInternal()
@@ -288,6 +289,9 @@ public:
 	const CEngineObjectNetworkProperty* NetworkProp() const;
 	IServerNetworkable* GetNetworkable();
 
+	int			GetParentAttachment();
+	void		ClearParentAttachment();
+
 public:
 	// Networking related methods
 	void	NetworkStateChanged();
@@ -330,6 +334,7 @@ private:
 	CEngineObjectNetworkProperty m_Network;
 
 	CNetworkVar(unsigned int, testNetwork);
+	CNetworkVar(unsigned char, m_iParentAttachment); // 0 if we're relative to the parent's absorigin and absangles.
 
 };
 
@@ -400,6 +405,15 @@ inline void	CEngineObjectInternal::NetworkStateChanged(unsigned short varOffset)
 	// Good, they passed an offset so we can track this variable's change
 	// and avoid sending the whole entity.
 	NetworkProp()->NetworkStateChanged(varOffset);
+}
+
+inline int CEngineObjectInternal::GetParentAttachment()
+{
+	return m_iParentAttachment;
+}
+
+inline void	CEngineObjectInternal::ClearParentAttachment() {
+	m_iParentAttachment = 0;
 }
 
 //-----------------------------------------------------------------------------

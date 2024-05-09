@@ -52,7 +52,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CRopeKeyframe, DT_RopeKeyframe )
 	//SendPropVector(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD, 0.0f, HIGH_DEFAULT, SendProxy_Origin),
 	//SendPropEHandle(SENDINFO_MOVEPARENT(moveparent), 0, SendProxy_MoveParentToInt),
 
-	SendPropInt		(SENDINFO(m_iParentAttachment), NUM_PARENTATTACHMENT_BITS, SPROP_UNSIGNED),
+	//SendPropInt		(SENDINFO(m_iParentAttachment), NUM_PARENTATTACHMENT_BITS, SPROP_UNSIGNED),
 END_SEND_TABLE()
 
 
@@ -375,7 +375,7 @@ void CRopeKeyframe::Activate()
 
 	// If we don't do this here, then when we save/load, we won't "own" the transmit 
 	// state of our parent, so the client might get our entity without our parent entity.
-	GetEngineObject()->SetParent(GetEngineObject()->GetMoveParent(), GetParentAttachment());
+	GetEngineObject()->SetParent(GetEngineObject()->GetMoveParent(), GetEngineObject()->GetParentAttachment());
 
 	EndpointsChanged();
 

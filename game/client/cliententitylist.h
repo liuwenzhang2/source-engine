@@ -145,6 +145,7 @@ public:
 			m_pOuterIntermediateData[i] = NULL;
 		}
 		m_iClassname = NULL_STRING;
+		m_iParentAttachment = 0;
 	}
 
 	void Init(C_BaseEntity* pOuter) {
@@ -308,6 +309,16 @@ public:
 	void SetNetworkAngles(const QAngle& ang);
 	void SetNetworkMoveParent(IEngineObjectClient* pMoveParent);
 
+	// Returns the attachment point index on our parent that our transform is relative to.
+	// 0 if we're relative to the parent's absorigin and absangles.
+	unsigned char			GetParentAttachment() const;
+	unsigned char GetParentAttachment() {
+		return m_iParentAttachment;
+	}
+	void SetParentAttachment(unsigned char iParentAttachment) {
+		m_iParentAttachment = iParentAttachment;
+	}
+
 #if !defined( NO_ENTITY_PREDICTION )
 	// For storing prediction results and pristine network state
 	byte* m_pIntermediateData[MULTIPLAYER_BACKUP];
@@ -364,6 +375,8 @@ private:
 	QAngle							m_angNetworkAngles = QAngle(0, 0, 0);
 	// The moveparent received from networking data
 	CHandle<C_BaseEntity>			m_hNetworkMoveParent = NULL;
+	unsigned char					m_iParentAttachment; // 0 if we're relative to the parent's absorigin and absangles.
+
 };
 
 //-----------------------------------------------------------------------------
@@ -462,6 +475,11 @@ inline const QAngle& C_EngineObjectInternal::GetNetworkAngles() const
 
 inline IEngineObjectClient* C_EngineObjectInternal::GetNetworkMoveParent() {
 	return m_hNetworkMoveParent.Get()? m_hNetworkMoveParent.Get()->GetEngineObject():NULL;
+}
+
+inline unsigned char C_EngineObjectInternal::GetParentAttachment() const
+{
+	return m_iParentAttachment;
 }
 
 //

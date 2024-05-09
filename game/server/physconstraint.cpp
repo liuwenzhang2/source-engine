@@ -64,7 +64,7 @@ public:
 		constraint_anchor_t *pAnchor = &m_list[index];
 
 		pAnchor->hEntity = pEntity->GetMoveParent();
-		pAnchor->parentAttachment = pEntity->GetParentAttachment();
+		pAnchor->parentAttachment = pEntity->GetEngineObject()->GetParentAttachment();
 		pAnchor->name = pEntity->GetEntityName();
 		pAnchor->localOrigin = pEntity->GetLocalOrigin();
 		pAnchor->massScale = massScale;

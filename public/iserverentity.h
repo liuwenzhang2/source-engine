@@ -134,6 +134,9 @@ public:
 	virtual bool NameMatches(string_t nameStr) = 0;
 	virtual bool ClassMatches(string_t nameStr) = 0;
 	virtual IServerNetworkable* GetNetworkable() = 0;
+	virtual int			GetParentAttachment() = 0;
+	virtual void		ClearParentAttachment() = 0;
+
 };
 
 // This class is how the engine talks to entities in the game DLL.

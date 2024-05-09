@@ -266,8 +266,6 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropFloat	(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED ),
 	SendPropEHandle (SENDINFO(m_hOwnerEntity)),
 	SendPropEHandle (SENDINFO(m_hEffectEntity)),
-	SendPropInt		(SENDINFO(m_iParentAttachment), NUM_PARENTATTACHMENT_BITS, SPROP_UNSIGNED),
-
 	SendPropInt		(SENDINFO_NAME( m_MoveType, movetype ), MOVETYPE_MAX_BITS, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO_NAME( m_MoveCollide, movecollide ), MOVECOLLIDE_MAX_BITS, SPROP_UNSIGNED ),
 
@@ -339,7 +337,6 @@ CBaseEntity::CBaseEntity()
 
 	m_bAlternateSorting = false;
 	m_CollisionGroup = COLLISION_GROUP_NONE;
-	m_iParentAttachment = 0;
 //	GetEngineObject()->Init(this);
 //#ifdef _DEBUG
 //	((Vector)GetEngineObject()->GetLocalVelocity()).Init();
@@ -1655,7 +1652,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_FIELD( m_debugOverlays, FIELD_INTEGER ),
 
 	//DEFINE_GLOBAL_FIELD( m_pParent, FIELD_EHANDLE ),
-	DEFINE_FIELD( m_iParentAttachment, FIELD_CHARACTER ),
+	//DEFINE_FIELD( m_iParentAttachment, FIELD_CHARACTER ),
 	//DEFINE_CUSTOM_GLOBAL_FIELD( m_hMoveParent, engineObjectFuncs),
 	//DEFINE_CUSTOM_GLOBAL_FIELD( m_hMoveChild, engineObjectFuncs),
 	//DEFINE_CUSTOM_GLOBAL_FIELD( m_hMovePeer, engineObjectFuncs),
@@ -3959,11 +3956,12 @@ void CBaseEntity::InputKillHierarchy( inputdata_t &inputdata )
 void CBaseEntity::InputSetParent( inputdata_t &inputdata )
 {
 	// If we had a parent attachment, clear it, because it's no longer valid.
-	if ( m_iParentAttachment )
-	{
-		m_iParentAttachment = 0;
-	}
+	//if ( m_iParentAttachment )
+	//{
+	//	m_iParentAttachment = 0;
+	//}
 
+	GetEngineObject()->ClearParentAttachment();
 	SetParent( inputdata.value.StringID(), inputdata.pActivator );
 }
 
@@ -3995,8 +3993,8 @@ void CBaseEntity::SetParentAttachment( const char *szInputName, const char *szAt
 		return;
 	}
 
-	m_iParentAttachment = iAttachment;
-	GetEngineObject()->SetParent(GetEngineObject()->GetMoveParent(), m_iParentAttachment );
+	//m_iParentAttachment = iAttachment;
+	GetEngineObject()->SetParent(GetEngineObject()->GetMoveParent(), iAttachment);
 
 	// Now move myself directly onto the attachment point
 	SetMoveType( MOVETYPE_NONE );

@@ -432,7 +432,6 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 	RecvPropFloat(RECVINFO(m_flShadowCastDistance)),
 	RecvPropEHandle( RECVINFO(m_hOwnerEntity) ),
 	RecvPropEHandle( RECVINFO(m_hEffectEntity) ),
-	RecvPropInt( RECVINFO( m_iParentAttachment ) ),
 
 	RecvPropInt( "movetype", 0, SIZEOF_IGNORE, 0, RecvProxy_MoveType ),
 	RecvPropInt( "movecollide", 0, SIZEOF_IGNORE, 0, RecvProxy_MoveCollide ),
@@ -765,7 +764,6 @@ C_BaseEntity::C_BaseEntity()
 	m_EntClientFlags = 0;
 	m_bEnableRenderingClipPlane = false;
 
-	m_iParentAttachment = 0;
 	m_nRenderFXBlend = 255;
 
 	//SetPredictionEligible( false );
@@ -2203,9 +2201,6 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 	// because this is the only point at which all entities are loaded
 	// If this condition isn't met, then a child was sent without its parent
 	//Assert( m_hNetworkMoveParent.Get() || !m_hNetworkMoveParent.IsValid() );
-	if (GetEngineObject()->GetNetworkMoveParent()&& GetEngineObject()->GetNetworkMoveParent()->GetOuter()->entindex()==1) {
-		int aaa = 0;
-	}
 	GetEngineObject()->HierarchySetParent(GetEngineObject()->GetNetworkMoveParent());
 
 	MarkMessageReceived();
@@ -2405,7 +2400,7 @@ void C_BaseEntity::OnNewParticleEffect( const char *pszParticleName, CNewParticl
 bool C_BaseEntity::Teleported( void )
 {
 	// Disable interpolation when hierarchy changes
-	if (m_hOldMoveParent != GetEngineObject()->GetNetworkMoveParent() || m_iOldParentAttachment != m_iParentAttachment)
+	if (m_hOldMoveParent != GetEngineObject()->GetNetworkMoveParent() || m_iOldParentAttachment != GetEngineObject()->GetParentAttachment())
 	{
 		return true;
 	}
@@ -2511,7 +2506,7 @@ void C_BaseEntity::ProcessTeleportList()
 		{
 			// Undo the teleport flag..
 			pCur->m_hOldMoveParent = pCur->GetEngineObject()->GetNetworkMoveParent();
-			pCur->m_iOldParentAttachment = pCur->m_iParentAttachment;
+			pCur->m_iOldParentAttachment = pCur->GetEngineObject()->GetParentAttachment();
 			// Zero out all but last update.
 			pCur->MoveToLastReceivedPosition( true );
 			pCur->ResetLatched();
@@ -2746,7 +2741,7 @@ void C_BaseEntity::InterpolateServerEntities()
 void C_BaseEntity::OnPreDataChanged( DataUpdateType_t type )
 {
 	m_hOldMoveParent = GetEngineObject()->GetNetworkMoveParent();
-	m_iOldParentAttachment = m_iParentAttachment;
+	m_iOldParentAttachment = GetEngineObject()->GetParentAttachment();
 }
 
 void C_BaseEntity::OnDataChanged( DataUpdateType_t type )

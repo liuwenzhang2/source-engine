@@ -51,7 +51,7 @@ BEGIN_RECV_TABLE_NOBASE( C_ParticleSystem, DT_ParticleSystem )
 	//RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 	RecvPropEHandle( RECVINFO(m_hOwnerEntity) ),
 	//RecvPropInt( RECVINFO_NAME(m_hNetworkMoveParent, moveparent), 0, RecvProxy_IntToMoveParent ),
-	RecvPropInt( RECVINFO( m_iParentAttachment ) ),
+	//RecvPropInt( RECVINFO( m_iParentAttachment ) ),
 	//RecvPropQAngles( RECVINFO_NAME( m_angNetworkAngles, m_angRotation ) ),
 
 	RecvPropInt( RECVINFO( m_iEffectIndex ) ),

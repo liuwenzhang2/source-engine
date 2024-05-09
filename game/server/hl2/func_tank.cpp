@@ -984,7 +984,7 @@ void CFuncTank::UpdateOnRemove( void )
 //-----------------------------------------------------------------------------
 void CFuncTank::UpdateMatrix( void )
 {
-	m_parentMatrix.InitFromEntity(GetMoveParent(), GetParentAttachment() );
+	m_parentMatrix.InitFromEntity(GetMoveParent(), GetEngineObject()->GetParentAttachment() );
 }
 
 	

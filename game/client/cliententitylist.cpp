@@ -117,6 +117,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 #endif
 	RecvPropVector(RECVINFO(m_vecVelocity)),//, 0, RecvProxy_LocalVelocity
 	RecvPropInt(RECVINFO_NAME(m_hNetworkMoveParent, moveparent), 0, RecvProxy_IntToMoveParent),
+	RecvPropInt(RECVINFO(m_iParentAttachment)),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -666,7 +667,7 @@ void C_EngineObjectInternal::SetParent(IEngineObjectClient* pParentEntity, int i
 		SetNetworkMoveParent( pParentEntity);
 	}
 
-	m_pOuter->SetParentAttachment( iParentAttachment);
+	SetParentAttachment( iParentAttachment);
 
 	GetAbsOrigin().Init(FLT_MAX, FLT_MAX, FLT_MAX);
 	GetAbsAngles().Init(FLT_MAX, FLT_MAX, FLT_MAX);
@@ -1103,11 +1104,11 @@ matrix3x4_t& C_EngineObjectInternal::GetParentToWorldTransform(matrix3x4_t& temp
 		return tempMatrix;
 	}
 
-	if (m_pOuter->GetParentAttachment() != 0)
+	if (GetParentAttachment() != 0)
 	{
 		Vector vOrigin;
 		QAngle vAngles;
-		if (pMoveParent->m_pOuter->GetAttachment(m_pOuter->GetParentAttachment(), vOrigin, vAngles))
+		if (pMoveParent->m_pOuter->GetAttachment(GetParentAttachment(), vOrigin, vAngles))
 		{
 			AngleMatrix(vAngles, vOrigin, tempMatrix);
 			return tempMatrix;
@@ -1180,7 +1181,7 @@ void C_EngineObjectInternal::CalcAbsolutePosition()
 	MatrixGetColumn(m_rgflCoordinateFrame, 3, m_vecAbsOrigin);
 
 	// if we have any angles, we have to extract our absolute angles from our matrix
-	if (m_angRotation == vec3_angle && m_pOuter->GetParentAttachment() == 0)
+	if (m_angRotation == vec3_angle && GetParentAttachment() == 0)
 	{
 		// just copy our parent's absolute angles
 		VectorCopy(m_pMoveParent->GetAbsAngles(), m_angAbsRotation);
@@ -1196,7 +1197,7 @@ void C_EngineObjectInternal::CalcAbsolutePosition()
 	//
 	// So here, we keep our absorigin invalidated. It means we're returning an origin that is a frame old to CalculateIKLocks,
 	// but we'll still render with the right origin.
-	if (m_pOuter->GetParentAttachment() != 0 && (m_pMoveParent->GetOuter()->GetEFlags() & EFL_SETTING_UP_BONES))
+	if (GetParentAttachment() != 0 && (m_pMoveParent->GetOuter()->GetEFlags() & EFL_SETTING_UP_BONES))
 	{
 		m_pOuter->m_iEFlags |= EFL_DIRTY_ABSTRANSFORM;
 	}
@@ -1227,11 +1228,11 @@ void C_EngineObjectInternal::CalcAbsoluteVelocity()
 
 
 	// Add in the attachments velocity if it exists
-	if (m_pOuter->GetParentAttachment() != 0)
+	if (GetParentAttachment() != 0)
 	{
 		Vector vOriginVel;
 		Quaternion vAngleVel;
-		if (pMoveParent->GetOuter()->GetAttachmentVelocity(m_pOuter->GetParentAttachment(), vOriginVel, vAngleVel))
+		if (pMoveParent->GetOuter()->GetAttachmentVelocity(GetParentAttachment(), vOriginVel, vAngleVel))
 		{
 			m_vecAbsVelocity += vOriginVel;
 			return;

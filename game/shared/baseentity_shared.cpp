@@ -1581,10 +1581,10 @@ void CBaseEntity::InvalidatePhysicsRecursive( int nChangeFlags )
 		if ( bOnlyDueToAttachment )
 		{
 #ifdef CLIENT_DLL
-			if ( (pChild->GetParentAttachment() == 0) && !pChild->IsFollowingEntity() )
+			if ( (pChild->GetEngineObject()->GetParentAttachment() == 0) && !pChild->IsFollowingEntity() )
 				continue;
 #else
-			if ( pChild->GetParentAttachment() == 0 )
+			if ( pChild->GetEngineObject()->GetParentAttachment() == 0 )
 				continue;
 #endif
 		}

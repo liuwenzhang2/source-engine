@@ -201,6 +201,7 @@ public:
 	virtual void SetNetworkOrigin(const Vector& org) = 0;
 	virtual void SetNetworkAngles(const QAngle& ang) = 0;
 	virtual void SetNetworkMoveParent(IEngineObjectClient* pMoveParent) = 0;
+	virtual unsigned char			GetParentAttachment() const = 0;
 
 };
 

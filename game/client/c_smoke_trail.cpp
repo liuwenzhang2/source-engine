@@ -1934,7 +1934,7 @@ void C_DustTrail::CleanupToolRecordingState( KeyValues *msg )
 		// FIXME: Until we can interpolate ent logs during emission, this can't work
 		KeyValues *pPosition = pInitializers->FindKey( "DmePositionPointToEntityInitializer", true );
 		pPosition->SetPtr( "entindex", (void*)(intp)pEnt->entindex() );
-		pPosition->SetInt( "attachmentIndex", GetParentAttachment() );
+		pPosition->SetInt( "attachmentIndex", GetEngineObject()->GetParentAttachment() );
 		pPosition->SetFloat( "randomDist", m_SpawnRadius );
 		pPosition->SetFloat( "startx", pEnt->GetAbsOrigin().x );
 		pPosition->SetFloat( "starty", pEnt->GetAbsOrigin().y );

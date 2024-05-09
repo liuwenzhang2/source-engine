@@ -799,9 +799,7 @@ public:
 
 public:
 
-	// Returns the attachment point index on our parent that our transform is relative to.
-	// 0 if we're relative to the parent's absorigin and absangles.
-	unsigned char			GetParentAttachment() const;
+	
 
 	// Externalized data objects ( see sharreddefs.h for DataObjectType_t )
 	bool					HasDataObjectType( int type ) const;
@@ -1343,12 +1341,7 @@ public:
 	// a render handle, and is put into the spatial partition.
 	bool InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t renderGroup );
 
-	unsigned char GetParentAttachment() {
-		return m_iParentAttachment;
-	}
-	void SetParentAttachment(unsigned char iParentAttachment) {
-		m_iParentAttachment = iParentAttachment;
-	}
+
 private:
 	friend void OnRenderStart();
 
@@ -1455,7 +1448,6 @@ private:
 	// Object movetype
 	unsigned char					m_MoveType;
 	unsigned char					m_MoveCollide;
-	unsigned char					m_iParentAttachment; // 0 if we're relative to the parent's absorigin and absangles.
 	unsigned char					m_iOldParentAttachment;
 
 	unsigned char					m_nWaterLevel;
@@ -1937,10 +1929,7 @@ inline bool CBaseEntity::IsEFlagSet( int nEFlagMask ) const
 	return (m_iEFlags & nEFlagMask) != 0;
 }
 
-inline unsigned char CBaseEntity::GetParentAttachment() const
-{
-	return m_iParentAttachment;
-}
+
 
 inline ClientRenderHandle_t CBaseEntity::GetRenderHandle() const 
 { 

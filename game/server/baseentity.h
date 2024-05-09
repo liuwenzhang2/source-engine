@@ -620,7 +620,7 @@ public:
 	virtual void	AfterLinkParent(CBaseEntity* pOldParent, int iAttachment = -1) {}
 
 	//CBaseEntity* GetParent();
-	int			GetParentAttachment();
+	//int			GetParentAttachment();
 
 	//string_t	GetEntityName();
 	//-----------------------------------------------------------------------------
@@ -1689,7 +1689,6 @@ private:
 
 	//EHANDLE m_pParent;  // for movement hierarchy
 	byte	m_nTransmitStateOwnedCounter;
-	CNetworkVar( unsigned char,  m_iParentAttachment ); // 0 if we're relative to the parent's absorigin and absangles.
 	CNetworkVar( unsigned char, m_MoveType );		// One of the MOVETYPE_ defines.
 	CNetworkVar( unsigned char, m_MoveCollide );
 
@@ -2030,11 +2029,6 @@ inline CBaseEntity* CBaseEntity::GetRootMoveParent()
 //{
 //	return m_hMoveParent.Get();
 //}
-
-inline int CBaseEntity::GetParentAttachment()
-{
-	return m_iParentAttachment;
-}
 
 
 inline int CBaseEntity::GetSpawnFlags( void ) const

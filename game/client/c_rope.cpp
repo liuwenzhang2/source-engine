@@ -59,7 +59,7 @@ IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_RopeKeyframe, DT_RopeKeyframe, CRopeKeyframe 
 	//RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 	//RecvPropInt( RECVINFO_NAME(m_hNetworkMoveParent, moveparent), 0, RecvProxy_IntToMoveParent ),
 	
-	RecvPropInt( RECVINFO( m_iParentAttachment ) ),
+	//RecvPropInt( RECVINFO( m_iParentAttachment ) ),
 END_RECV_TABLE()
 
 #define ROPE_IMPULSE_SCALE	20

@@ -56,6 +56,7 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_GLOBAL_KEYFIELD(m_iGlobalname, FIELD_STRING, "globalname"),
 	DEFINE_KEYFIELD(m_iParent, FIELD_STRING, "parentname"),
 	DEFINE_FIELD(m_iName, FIELD_STRING),
+	DEFINE_FIELD(m_iParentAttachment, FIELD_CHARACTER),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -133,6 +134,7 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 #endif
 	SendPropVector(SENDINFO(m_vecVelocity), 0, SPROP_NOSCALE, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocity),
 	SendPropEHandle(SENDINFO_NAME(m_hMoveParent, moveparent), 0, SendProxy_MoveParentToInt),
+	SendPropInt(SENDINFO(m_iParentAttachment), NUM_PARENTATTACHMENT_BITS, SPROP_UNSIGNED),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -810,7 +812,7 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 	// If they didn't specify an attachment, use our current
 	if (iAttachment == -1)
 	{
-		iAttachment = m_pOuter->m_iParentAttachment;
+		iAttachment = m_iParentAttachment;
 	}
 
 	bool bWasNotParented = (GetMoveParent() == NULL);
@@ -852,10 +854,10 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 	IEngineObjectServer::LinkChild(pParentEntity, this);
 	this->m_pOuter->AfterLinkParent(pOldParent ? pOldParent->m_pOuter : NULL);
 
-	m_pOuter->m_iParentAttachment = (char)iAttachment;
+	m_iParentAttachment = (char)iAttachment;
 
 	EntityMatrix matrix, childMatrix;
-	matrix.InitFromEntity(const_cast<CBaseEntity*>(pParentEntity->GetOuter()), m_pOuter->m_iParentAttachment); // parent->world
+	matrix.InitFromEntity(const_cast<CBaseEntity*>(pParentEntity->GetOuter()), m_iParentAttachment); // parent->world
 	childMatrix.InitFromEntityLocal(this->m_pOuter); // child->world
 	Vector localOrigin = matrix.WorldToLocal(this->GetLocalOrigin());
 
@@ -933,7 +935,7 @@ void CEngineObjectInternal::CalcAbsolutePosition(void)
 	MatrixGetColumn(m_rgflCoordinateFrame, 3, m_vecAbsOrigin);
 
 	// if we have any angles, we have to extract our absolute angles from our matrix
-	if ((m_angRotation == vec3_angle) && (m_pOuter->m_iParentAttachment == 0))
+	if ((m_angRotation == vec3_angle) && (m_iParentAttachment == 0))
 	{
 		// just copy our parent's absolute angles
 		VectorCopy(pMoveParent->GetAbsAngles(), m_angAbsRotation);
@@ -1013,12 +1015,12 @@ matrix3x4_t& CEngineObjectInternal::GetParentToWorldTransform(matrix3x4_t& tempM
 		return tempMatrix;
 	}
 
-	if (m_pOuter->m_iParentAttachment != 0)
+	if (m_iParentAttachment != 0)
 	{
 		MDLCACHE_CRITICAL_SECTION();
 
 		CBaseAnimating* pAnimating = pMoveParent->m_pOuter->GetBaseAnimating();
-		if (pAnimating && pAnimating->GetAttachment(m_pOuter->m_iParentAttachment, tempMatrix))
+		if (pAnimating && pAnimating->GetAttachment(m_iParentAttachment, tempMatrix))
 		{
 			return tempMatrix;
 		}
