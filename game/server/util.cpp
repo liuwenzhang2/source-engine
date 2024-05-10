@@ -2020,8 +2020,10 @@ static int UTIL_GetNewCheckClient( int check )
 		}
 
 		// Looped but didn't find anything else
-		if (i == check)
+		if (i == check) {
+			ent = gEntList.GetBaseEntity(i);
 			break;
+		}
 
 		ent = gEntList.GetBaseEntity( i );
 		if ( !ent )
