@@ -37,25 +37,7 @@ struct watcher_t
 };
 
 static CUtlMultiList<watcher_t, unsigned short>	g_WatcherList;
-class CWatcherList
-{
-public:
-	//CWatcherList(); NOTE: Dataobj doesn't support constructors - it zeros the memory
-	~CWatcherList();	// frees the positionwatcher_t's to the pool
-	void Init();
 
-	void NotifyPositionChanged( CBaseEntity *pEntity );
-	void NotifyVPhysicsStateChanged( IPhysicsObject *pPhysics, CBaseEntity *pEntity, bool bAwake );
-
-	void AddToList( CBaseEntity *pWatcher );
-	void RemoveWatcher( CBaseEntity *pWatcher );
-
-private:
-	int GetCallbackObjects( IWatcherCallback **pList, int listMax );
-
-	unsigned short Find( CBaseEntity *pEntity );
-	unsigned short m_list;
-};
 
 int linksallocated = 0;
 int groundlinksallocated = 0;
@@ -113,161 +95,6 @@ CPortalTouchScope::~CPortalTouchScope()
 	}
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: System for hanging objects off of CBaseEntity, etc.
-//  Externalized data objects ( see sharreddefs.h for enum )
-//-----------------------------------------------------------------------------
-class CDataObjectAccessSystem : public CAutoGameSystem
-{
-public:
-
-	enum
-	{
-		MAX_ACCESSORS = 32,
-	};
-
-	CDataObjectAccessSystem()
-	{
-		// Cast to int to make it clear that we know we are comparing different enum types.
-		COMPILE_TIME_ASSERT( (int)NUM_DATAOBJECT_TYPES <= (int)MAX_ACCESSORS );
-
-		Q_memset( m_Accessors, 0, sizeof( m_Accessors ) );
-	}
-
-	virtual bool Init()
-	{
-		AddDataAccessor( TOUCHLINK, new CEntityDataInstantiator< touchlink_t > );
-		AddDataAccessor( GROUNDLINK, new CEntityDataInstantiator< groundlink_t > );
-		AddDataAccessor( STEPSIMULATION, new CEntityDataInstantiator< StepSimulationData > );
-		AddDataAccessor( MODELSCALE, new CEntityDataInstantiator< ModelScale > );
-		AddDataAccessor( POSITIONWATCHER, new CEntityDataInstantiator< CWatcherList > );
-		AddDataAccessor( PHYSICSPUSHLIST, new CEntityDataInstantiator< physicspushlist_t > );
-		AddDataAccessor( VPHYSICSUPDATEAI, new CEntityDataInstantiator< vphysicsupdateai_t > );
-		AddDataAccessor( VPHYSICSWATCHER, new CEntityDataInstantiator< CWatcherList > );
-		
-		return true;
-	}
-
-	virtual void Shutdown()
-	{
-		for ( int i = 0; i < MAX_ACCESSORS; i++ )
-		{
-			delete m_Accessors[ i ];
-			m_Accessors[ i ]  = 0;
-		}
-	}
-
-	void *GetDataObject( int type, const CBaseEntity *instance )
-	{
-		if ( !IsValidType( type ) )
-		{
-			Assert( !"Bogus type" );
-			return NULL;
-		}
-		return m_Accessors[ type ]->GetDataObject( instance );
-	}
-
-	void *CreateDataObject( int type, CBaseEntity *instance )
-	{
-		if ( !IsValidType( type ) )
-		{
-			Assert( !"Bogus type" );
-			return NULL;
-		}
-
-		return m_Accessors[ type ]->CreateDataObject( instance );
-	}
-
-	void DestroyDataObject( int type, CBaseEntity *instance )
-	{
-		if ( !IsValidType( type ) )
-		{
-			Assert( !"Bogus type" );
-			return;
-		}
-
-		m_Accessors[ type ]->DestroyDataObject( instance );
-	}
-
-private:
-
-	bool IsValidType( int type ) const
-	{
-		if ( type < 0 || type >= MAX_ACCESSORS )
-			return false;
-
-		if ( m_Accessors[ type ] == NULL )
-			return false;
-		return true;
-	}
-
-	void AddDataAccessor( int type, IEntityDataInstantiator *instantiator )
-	{
-		if ( type < 0 || type >= MAX_ACCESSORS )
-		{
-			Assert( !"AddDataAccessor with out of range type!!!\n" );
-			return;
-		}
-
-		Assert( instantiator );
-
-		if ( m_Accessors[ type ] != NULL )
-		{
-			Assert( !"AddDataAccessor, duplicate adds!!!\n" );
-			return;
-		}
-
-		m_Accessors[ type ] = instantiator;
-	}
-
-	IEntityDataInstantiator *m_Accessors[ MAX_ACCESSORS ];
-};
-
-static CDataObjectAccessSystem g_DataObjectAccessSystem;
-
-bool CBaseEntity::HasDataObjectType( int type ) const
-{
-	Assert( type >= 0 && type < NUM_DATAOBJECT_TYPES );
-	return ( m_fDataObjectTypes	& (1<<type) ) ? true : false;
-}
-
-void CBaseEntity::AddDataObjectType( int type )
-{
-	Assert( type >= 0 && type < NUM_DATAOBJECT_TYPES );
-	m_fDataObjectTypes |= (1<<type);
-}
-
-void CBaseEntity::RemoveDataObjectType( int type )
-{
-	Assert( type >= 0 && type < NUM_DATAOBJECT_TYPES );
-	m_fDataObjectTypes &= ~(1<<type);
-}
-
-void *CBaseEntity::GetDataObject( int type )
-{
-	Assert( type >= 0 && type < NUM_DATAOBJECT_TYPES );
-	if ( !HasDataObjectType( type ) )
-		return NULL;
-	return g_DataObjectAccessSystem.GetDataObject( type, this );
-}
-
-void *CBaseEntity::CreateDataObject( int type )
-{
-	Assert( type >= 0 && type < NUM_DATAOBJECT_TYPES );
-	AddDataObjectType( type );
-	return g_DataObjectAccessSystem.CreateDataObject( type, this );
-}
-
-void CBaseEntity::DestroyDataObject( int type )
-{
-	Assert( type >= 0 && type < NUM_DATAOBJECT_TYPES );
-	if ( !HasDataObjectType( type ) )
-		return;
-	g_DataObjectAccessSystem.DestroyDataObject( type, this );
-	RemoveDataObjectType( type );
-}
-
 void CWatcherList::Init()
 {
 	m_list = g_WatcherList.CreateList();
@@ -302,34 +129,6 @@ int CWatcherList::GetCallbackObjects( IWatcherCallback **pList, int listMax )
 		}
 	}
 	return index;
-}
-
-void CWatcherList::NotifyPositionChanged( CBaseEntity *pEntity )
-{
-	IWatcherCallback *pCallbacks[1024]; // HACKHACK: Assumes this list is big enough
-	int count = GetCallbackObjects( pCallbacks, ARRAYSIZE(pCallbacks) );
-	for ( int i = 0; i < count; i++ )
-	{
-		IPositionWatcher *pWatcher = assert_cast<IPositionWatcher *>(pCallbacks[i]);
-		if ( pWatcher )
-		{
-			pWatcher->NotifyPositionChanged(pEntity);
-		}
-	}
-}
-
-void CWatcherList::NotifyVPhysicsStateChanged( IPhysicsObject *pPhysics, CBaseEntity *pEntity, bool bAwake )
-{
-	IWatcherCallback *pCallbacks[1024];	// HACKHACK: Assumes this list is big enough!
-	int count = GetCallbackObjects( pCallbacks, ARRAYSIZE(pCallbacks) );
-	for ( int i = 0; i < count; i++ )
-	{
-		IVPhysicsWatcher *pWatcher = assert_cast<IVPhysicsWatcher *>(pCallbacks[i]);
-		if ( pWatcher )
-		{
-			pWatcher->NotifyVPhysicsStateChanged(pPhysics, pEntity, bAwake);
-		}
-	}
 }
 
 unsigned short CWatcherList::Find( CBaseEntity *pEntity )
@@ -374,79 +173,94 @@ void CWatcherList::AddToList( CBaseEntity *pWatcher )
 	}
 }
 
-static void AddWatcherToEntity( CBaseEntity *pWatcher, CBaseEntity *pEntity, int watcherType )
+void CBaseEntity::AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType)
 {
-	CWatcherList *pList = (CWatcherList *)pEntity->GetDataObject(watcherType);
-	if ( !pList )
+	CWatcherList* pList = (CWatcherList*)GetEngineObject()->GetDataObject(watcherType);
+	if (!pList)
 	{
-		pList = ( CWatcherList * )pEntity->CreateDataObject( watcherType );
+		pList = (CWatcherList*)GetEngineObject()->CreateDataObject(watcherType);
 		pList->Init();
 	}
 
-	pList->AddToList( pWatcher );
+	pList->AddToList(pWatcher);
 }
 
-static void RemoveWatcherFromEntity( CBaseEntity *pWatcher, CBaseEntity *pEntity, int watcherType )
+void CBaseEntity::RemoveWatcherFromEntity(CBaseEntity* pWatcher, int watcherType)
 {
-	CWatcherList *pList = (CWatcherList *)pEntity->GetDataObject(watcherType);
-	if ( pList )
+	CWatcherList* pList = (CWatcherList*)GetEngineObject()->GetDataObject(watcherType);
+	if (pList)
 	{
-		pList->RemoveWatcher( pWatcher );
+		pList->RemoveWatcher(pWatcher);
 	}
 }
 
-void WatchPositionChanges( CBaseEntity *pWatcher, CBaseEntity *pMovingEntity )
+void CBaseEntity::NotifyPositionChanged()
 {
-	AddWatcherToEntity( pWatcher, pMovingEntity, POSITIONWATCHER );
-}
-
-void RemovePositionWatcher( CBaseEntity *pWatcher, CBaseEntity *pMovingEntity )
-{
-	RemoveWatcherFromEntity( pWatcher, pMovingEntity, POSITIONWATCHER );
-}
-
-void ReportPositionChanged( CBaseEntity *pMovedEntity )
-{
-	CWatcherList *pList = (CWatcherList *)pMovedEntity->GetDataObject(POSITIONWATCHER);
-	if ( pList )
+	CWatcherList* pList = (CWatcherList*)GetEngineObject()->GetDataObject(POSITIONWATCHER);
+	IWatcherCallback* pCallbacks[1024]; // HACKHACK: Assumes this list is big enough
+	int count = pList->GetCallbackObjects(pCallbacks, ARRAYSIZE(pCallbacks));
+	for (int i = 0; i < count; i++)
 	{
-		pList->NotifyPositionChanged( pMovedEntity );
-	}
-}
-
-void WatchVPhysicsStateChanges( CBaseEntity *pWatcher, CBaseEntity *pPhysicsEntity )
-{
-	AddWatcherToEntity( pWatcher, pPhysicsEntity, VPHYSICSWATCHER );
-}
-
-void RemoveVPhysicsStateWatcher( CBaseEntity *pWatcher, CBaseEntity *pPhysicsEntity )
-{
-	AddWatcherToEntity( pWatcher, pPhysicsEntity, VPHYSICSWATCHER );
-}
-
-void ReportVPhysicsStateChanged( IPhysicsObject *pPhysics, CBaseEntity *pEntity, bool bAwake )
-{
-	CWatcherList *pList = (CWatcherList *)pEntity->GetDataObject(VPHYSICSWATCHER);
-	if ( pList )
-	{
-		pList->NotifyVPhysicsStateChanged( pPhysics, pEntity, bAwake );
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CBaseEntity::DestroyAllDataObjects( void )
-{
-	int i;
-	for ( i = 0; i < NUM_DATAOBJECT_TYPES; i++ )
-	{
-		if ( HasDataObjectType( i ) )
+		IPositionWatcher* pWatcher = assert_cast<IPositionWatcher*>(pCallbacks[i]);
+		if (pWatcher)
 		{
-			DestroyDataObject( i );
+			pWatcher->NotifyPositionChanged(this);
 		}
 	}
 }
+
+void CBaseEntity::NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwake)
+{
+	CWatcherList* pList = (CWatcherList*)GetEngineObject()->GetDataObject(VPHYSICSWATCHER);
+	IWatcherCallback* pCallbacks[1024];	// HACKHACK: Assumes this list is big enough!
+	int count = pList->GetCallbackObjects(pCallbacks, ARRAYSIZE(pCallbacks));
+	for (int i = 0; i < count; i++)
+	{
+		IVPhysicsWatcher* pWatcher = assert_cast<IVPhysicsWatcher*>(pCallbacks[i]);
+		if (pWatcher)
+		{
+			pWatcher->NotifyVPhysicsStateChanged(pPhysics, this, bAwake);
+		}
+	}
+}
+
+//void WatchPositionChanges( CBaseEntity *pWatcher, CBaseEntity *pMovingEntity )
+//{
+//	pMovingEntity->AddWatcherToEntity( pWatcher, POSITIONWATCHER );
+//}
+
+//void RemovePositionWatcher( CBaseEntity *pWatcher, CBaseEntity *pMovingEntity )
+//{
+//	pMovingEntity->RemoveWatcherFromEntity( pWatcher, POSITIONWATCHER );
+//}
+
+//void ReportPositionChanged( CBaseEntity *pMovedEntity )
+//{
+//	if (pMovedEntity)
+//	{
+//		pMovedEntity->NotifyPositionChanged();
+//	}
+//}
+
+//void WatchVPhysicsStateChanges( CBaseEntity *pWatcher, CBaseEntity *pPhysicsEntity )
+//{
+//	pPhysicsEntity->AddWatcherToEntity( pWatcher, VPHYSICSWATCHER );
+//}
+
+//void RemoveVPhysicsStateWatcher( CBaseEntity *pWatcher, CBaseEntity *pPhysicsEntity )
+//{
+//	pPhysicsEntity->RemoveWatcherFromEntity( pWatcher, VPHYSICSWATCHER );
+//}
+
+//void ReportVPhysicsStateChanged( IPhysicsObject *pPhysics, CBaseEntity *pEntity, bool bAwake )
+//{
+//	if (pEntity)
+//	{
+//		pEntity->NotifyVPhysicsStateChanged( pPhysics, bAwake );
+//	}
+//}
+
+
 
 //-----------------------------------------------------------------------------
 // For debugging
@@ -461,7 +275,7 @@ void SpewLinks()
 	{
 		if ( pClass /*&& !pClass->IsDormant()*/ )
 		{
-			touchlink_t *root = ( touchlink_t * )pClass->GetDataObject( TOUCHLINK );
+			touchlink_t *root = ( touchlink_t * )pClass->GetEngineObject()->GetDataObject( TOUCHLINK );
 			if ( root )
 			{
 
@@ -514,7 +328,7 @@ inline touchlink_t *AllocTouchLink( void )
 	return link;
 }
 
-static touchlink_t *g_pNextLink = NULL;
+//static touchlink_t *g_pNextLink = NULL;
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -525,10 +339,10 @@ inline void FreeTouchLink( touchlink_t *link )
 {
 	if ( link )
 	{
-		if ( link == g_pNextLink )
-		{
-			g_pNextLink = link->nextLink;
-		}
+		//if ( link == g_pNextLink )
+		//{
+		//	g_pNextLink = link->nextLink;
+		//}
 		--linksallocated;
 		link->prevLink = link->nextLink = NULL;
 	}
@@ -601,7 +415,7 @@ inline void FreeGroundLink( groundlink_t *link )
 //-----------------------------------------------------------------------------
 bool CBaseEntity::IsCurrentlyTouching( void ) const
 {
-	if ( HasDataObjectType( TOUCHLINK ) )
+	if (GetEngineObject()->HasDataObjectType( TOUCHLINK ) )
 	{
 		return true;
 	}
@@ -609,7 +423,7 @@ bool CBaseEntity::IsCurrentlyTouching( void ) const
 	return false;
 }
 
-static bool g_bCleanupDatObject = true;
+//static bool g_bCleanupDatObject = true;
 
 //-----------------------------------------------------------------------------
 // Purpose: Checks to see if any entities that have been touching this one
@@ -618,23 +432,23 @@ static bool g_bCleanupDatObject = true;
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsCheckForEntityUntouch( void )
 {
-	Assert( g_pNextLink == NULL );
+	//Assert( g_pNextLink == NULL );
 
-	touchlink_t *link;
+	touchlink_t* link, *nextLink;
 
-	touchlink_t *root = ( touchlink_t * )GetDataObject( TOUCHLINK );
+	touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
 	{
 #ifdef PORTAL
 		CPortalTouchScope scope;
 #endif
-		bool saveCleanup = g_bCleanupDatObject;
-		g_bCleanupDatObject = false;
+		//bool saveCleanup = g_bCleanupDatObject;
+		//g_bCleanupDatObject = false;
 
 		link = root->nextLink;
-		while ( link != root )
+		while (link && link != root)
 		{
-			g_pNextLink = link->nextLink;
+			nextLink = link->nextLink;
 
 			// these touchlinks are not polled.  The ents are touching due to an outside
 			// system that will add/delete them as necessary (vphysics in this case)
@@ -657,20 +471,20 @@ void CBaseEntity::PhysicsCheckForEntityUntouch( void )
 				}
 			}
 
-			link = g_pNextLink;
+			link = nextLink;
 		}
 
-		g_bCleanupDatObject = saveCleanup;
+		//g_bCleanupDatObject = saveCleanup;
 
 		// Nothing left in list, destroy root
 		if ( root->nextLink == root &&
 			 root->prevLink == root )
 		{
-			DestroyDataObject( TOUCHLINK );
+			GetEngineObject()->DestroyDataObject( TOUCHLINK );
 		}
 	}
 
-	g_pNextLink = NULL;
+	//g_pNextLink = NULL;
 
 	GetEngineObject()->SetCheckUntouch( false );
 }
@@ -686,22 +500,22 @@ void CBaseEntity::PhysicsNotifyOtherOfUntouch( CBaseEntity *ent, CBaseEntity *ot
 
 	// loop through ed's touch list, looking for the notifier
 	// remove and call untouch if found
-	touchlink_t *root = ( touchlink_t * )other->GetDataObject( TOUCHLINK );
+	touchlink_t *root = ( touchlink_t * )other->GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
 	{
 		touchlink_t *link = root->nextLink;
-		while ( link != root )
+		while (link && link != root )
 		{
 			if ( link->entityTouched == ent )
 			{
 				PhysicsRemoveToucher( other, link );
 
 				// Check for complete removal
-				if ( g_bCleanupDatObject &&
+				if ( //g_bCleanupDatObject &&
 					 root->nextLink == root && 
 					 root->prevLink == root )
 				{
-					other->DestroyDataObject( TOUCHLINK );
+					other->GetEngineObject()->DestroyDataObject( TOUCHLINK );
 				}
 				return;
 			}
@@ -742,14 +556,14 @@ void CBaseEntity::PhysicsRemoveTouchedList( CBaseEntity *ent )
 	CPortalTouchScope scope;
 #endif
 
-	touchlink_t *link, *nextLink;
+	touchlink_t* link, *nextLink;
 
-	touchlink_t *root = ( touchlink_t * )ent->GetDataObject( TOUCHLINK );
+	touchlink_t *root = ( touchlink_t * )ent->GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
 	{
 		link = root->nextLink;
-		bool saveCleanup = g_bCleanupDatObject;
-		g_bCleanupDatObject = false;
+		//bool saveCleanup = g_bCleanupDatObject;
+		//g_bCleanupDatObject = false;
 		while ( link && link != root )
 		{
 			nextLink = link->nextLink;
@@ -764,8 +578,8 @@ void CBaseEntity::PhysicsRemoveTouchedList( CBaseEntity *ent )
 			link = nextLink;
 		}
 
-		g_bCleanupDatObject = saveCleanup;
-		ent->DestroyDataObject( TOUCHLINK );
+		//g_bCleanupDatObject = saveCleanup;
+		ent->GetEngineObject()->DestroyDataObject( TOUCHLINK );
 	}
 
 	ent->GetEngineObject()->ClearTouchStamp();
@@ -784,7 +598,7 @@ groundlink_t *CBaseEntity::AddEntityToGroundList( CBaseEntity *other )
 		return NULL;
 
 	// check if the edict is already in the list
-	groundlink_t *root = ( groundlink_t * )GetDataObject( GROUNDLINK );
+	groundlink_t *root = ( groundlink_t * )GetEngineObject()->GetDataObject( GROUNDLINK );
 	if ( root )
 	{
 		for ( link = root->nextLink; link != root; link = link->nextLink )
@@ -798,7 +612,7 @@ groundlink_t *CBaseEntity::AddEntityToGroundList( CBaseEntity *other )
 	}
 	else
 	{
-		root = ( groundlink_t * )CreateDataObject( GROUNDLINK );
+		root = ( groundlink_t * )GetEngineObject()->CreateDataObject( GROUNDLINK );
 		root->prevLink = root->nextLink = root;
 	}
 
@@ -848,7 +662,7 @@ void CBaseEntity::PhysicsNotifyOtherOfGroundRemoval( CBaseEntity *ent, CBaseEnti
 
 	// loop through ed's touch list, looking for the notifier
 	// remove and call untouch if found
-	groundlink_t *root = ( groundlink_t * )other->GetDataObject( GROUNDLINK );
+	groundlink_t *root = ( groundlink_t * )other->GetEngineObject()->GetDataObject( GROUNDLINK );
 	if ( root )
 	{
 		groundlink_t *link = root->nextLink;
@@ -861,7 +675,7 @@ void CBaseEntity::PhysicsNotifyOtherOfGroundRemoval( CBaseEntity *ent, CBaseEnti
 				if ( root->nextLink == root && 
 					 root->prevLink == root )
 				{
-					other->DestroyDataObject( GROUNDLINK );
+					other->GetEngineObject()->DestroyDataObject( GROUNDLINK );
 				}
 				return;
 			}
@@ -901,7 +715,7 @@ void CBaseEntity::PhysicsRemoveGroundList( CBaseEntity *ent )
 {
 	groundlink_t *link, *nextLink;
 
-	groundlink_t *root = ( groundlink_t * )ent->GetDataObject( GROUNDLINK );
+	groundlink_t *root = ( groundlink_t * )ent->GetEngineObject()->GetDataObject( GROUNDLINK );
 	if ( root )
 	{
 		link = root->nextLink;
@@ -918,7 +732,7 @@ void CBaseEntity::PhysicsRemoveGroundList( CBaseEntity *ent )
 			link = nextLink;
 		}
 
-		ent->DestroyDataObject( GROUNDLINK );
+		ent->GetEngineObject()->DestroyDataObject( GROUNDLINK );
 	}
 }
 
@@ -1000,7 +814,7 @@ touchlink_t *CBaseEntity::PhysicsMarkEntityAsTouched( CBaseEntity *other )
 #endif
 
 	// check if the edict is already in the list
-	touchlink_t *root = ( touchlink_t * )GetDataObject( TOUCHLINK );
+	touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
 	{
 		for ( link = root->nextLink; link != root; link = link->nextLink )
@@ -1023,7 +837,7 @@ touchlink_t *CBaseEntity::PhysicsMarkEntityAsTouched( CBaseEntity *other )
 	else
 	{
 		// Allocate the root object
-		root = ( touchlink_t * )CreateDataObject( TOUCHLINK );
+		root = ( touchlink_t * )GetEngineObject()->CreateDataObject( TOUCHLINK );
 		root->nextLink = root->prevLink = root;
 	}
 
@@ -2240,7 +2054,7 @@ void CBaseEntity::WakeRestingObjects()
 bool CBaseEntity::HasNPCsOnIt( void )
 {
 	groundlink_t *link;
-	groundlink_t *root = ( groundlink_t * )GetDataObject( GROUNDLINK );
+	groundlink_t *root = ( groundlink_t * )GetEngineObject()->GetDataObject( GROUNDLINK );
 	if ( root )
 	{
 		for ( link = root->nextLink; link != root; link = link->nextLink )

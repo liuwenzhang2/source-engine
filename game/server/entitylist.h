@@ -133,13 +133,20 @@ public:
 		m_angRotation = QAngle(0, 0, 0);
 		m_vecVelocity = Vector(0, 0, 0);
 		m_hMoveParent = NULL;
+		m_iClassname = NULL_STRING;
+		m_iGlobalname = NULL_STRING;
+		m_iParent = NULL_STRING;
+		m_iName = NULL_STRING;
 		m_iParentAttachment = 0;
+		m_iEFlags = 0;
 		// NOTE: THIS MUST APPEAR BEFORE ANY SetMoveType() or SetNextThink() calls
 		AddEFlags(EFL_NO_THINK_FUNCTION | EFL_NO_GAME_PHYSICS_SIMULATION | EFL_USE_PARTITION_WHEN_NOT_SOLID);
 #ifndef _XBOX
 		AddEFlags(EFL_USE_PARTITION_WHEN_NOT_SOLID);
 #endif
+		touchStamp = 0;
 		SetCheckUntouch(false);
+		m_fDataObjectTypes = 0;
 	}
 
 	~CEngineObjectInternal()
@@ -308,6 +315,16 @@ public:
 	int						GetTouchStamp();
 	void					ClearTouchStamp();
 
+	// Externalized data objects ( see sharreddefs.h for DataObjectType_t )
+	bool					HasDataObjectType(int type) const;
+	void					AddDataObjectType(int type);
+	void					RemoveDataObjectType(int type);
+
+	void*					GetDataObject(int type);
+	void*					CreateDataObject(int type);
+	void					DestroyDataObject(int type);
+	void					DestroyAllDataObjects(void);
+
 public:
 	// Networking related methods
 	void	NetworkStateChanged();
@@ -354,7 +371,9 @@ private:
 
 	int		m_iEFlags;	// entity flags EFL_*
 	// used so we know when things are no longer touching
-	int			touchStamp;
+	int		touchStamp;
+	int		m_fDataObjectTypes;
+
 
 };
 
@@ -597,6 +616,11 @@ public:
 	
 	CGlobalEntityList();
 
+	void AddDataAccessor(int type, IEntityDataInstantiator<T>* instantiator);
+	void RemoveDataAccessor(int type);
+	void* GetDataObject(int type, const T* instance);
+	void* CreateDataObject(int type, T* instance);
+	void DestroyDataObject(int type, T* instance);
 // CBaseEntityList overrides.
 protected:
 	virtual void AfterCreated(IHandleEntity* pEntity);
@@ -1617,6 +1641,31 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	}
 
 	m_iNumEnts--;
+}
+
+template<class T>
+void CGlobalEntityList<T>::AddDataAccessor(int type, IEntityDataInstantiator<T>* instantiator) {
+	BaseClass::AddDataAccessor(type, instantiator);
+}
+
+template<class T>
+void CGlobalEntityList<T>::RemoveDataAccessor(int type) {
+	BaseClass::RemoveDataAccessor(type);
+}
+
+template<class T>
+void* CGlobalEntityList<T>::GetDataObject(int type, const T* instance) {
+	return BaseClass::GetDataObject(type, instance);
+}
+
+template<class T>
+void* CGlobalEntityList<T>::CreateDataObject(int type, T* instance) {
+	return BaseClass::CreateDataObject(type, instance);
+}
+
+template<class T>
+void CGlobalEntityList<T>::DestroyDataObject(int type, T* instance) {
+	BaseClass::DestroyDataObject(type, instance);
 }
 
 

@@ -1354,7 +1354,7 @@ static bool IsInGroundList( CBaseEntity *ent, CBaseEntity *ground )
 	if ( !ground || !ent )
 		return false;
 
-	groundlink_t *root = ( groundlink_t * )ground->GetDataObject( GROUNDLINK );
+	groundlink_t *root = ( groundlink_t * )ground->GetEngineObject()->GetDataObject( GROUNDLINK );
 	if ( root )
 	{
 		groundlink_t *link = root->nextLink;
@@ -1381,7 +1381,7 @@ static int DescribeGroundList( CBaseEntity *ent )
 	Msg( "%i : %s (ground %i %s)\n", ent->entindex(), ent->GetClassname(), 
 		ent->GetGroundEntity() ? ent->GetGroundEntity()->entindex() : -1,
 		ent->GetGroundEntity() ? ent->GetGroundEntity()->GetClassname() : "NULL" );
-	groundlink_t *root = ( groundlink_t * )ent->GetDataObject( GROUNDLINK );
+	groundlink_t *root = ( groundlink_t * )ent->GetEngineObject()->GetDataObject( GROUNDLINK );
 	if ( root )
 	{
 		groundlink_t *link = root->nextLink;

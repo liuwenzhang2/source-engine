@@ -392,7 +392,8 @@ void CRopeKeyframe::EndpointsChanged()
 	{
 		if ( (pStartEnt != this) || GetEngineObject()->GetMoveParent() )
 		{
-			WatchPositionChanges( this, pStartEnt );
+			//WatchPositionChanges( this, pStartEnt );
+			pStartEnt->AddWatcherToEntity(this, POSITIONWATCHER);
 		}
 	}
 	CBaseEntity *pEndEnt = m_hEndPoint.Get();
@@ -400,7 +401,8 @@ void CRopeKeyframe::EndpointsChanged()
 	{
 		if ( (pEndEnt != this) || GetEngineObject()->GetMoveParent() )
 		{
-			WatchPositionChanges( this, pEndEnt );
+			//WatchPositionChanges( this, pEndEnt );
+			pEndEnt->AddWatcherToEntity(this, POSITIONWATCHER);
 		}
 	}
 }

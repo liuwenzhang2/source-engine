@@ -811,7 +811,7 @@ int CTriggerHurt::HurtAllTouchers( float dt )
 
 	m_hurtEntities.RemoveAll();
 
-	touchlink_t *root = ( touchlink_t * )GetDataObject( TOUCHLINK );
+	touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
 	{
 		for ( touchlink_t *link = root->nextLink; link != root; link = link->nextLink )
@@ -3632,11 +3632,11 @@ void CTriggerProximity::MeasureThink( void )
 	float fMinDistance = m_fRadius + 100;
 	CBaseEntity *pNearestEntity = NULL;
 
-	touchlink_t *root = ( touchlink_t * )GetDataObject( TOUCHLINK );
+	touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
 	{
 		touchlink_t *pLink = root->nextLink;
-		while ( pLink != root )
+		while (pLink && pLink != root)
 		{
 			CBaseEntity *pEntity = pLink->entityTouched;
 

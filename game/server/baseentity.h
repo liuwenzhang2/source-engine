@@ -455,10 +455,7 @@ public:
 	}
 	int				AreaNum() const {
 		return GetEngineObject()->AreaNum();
-	}
-
-	bool					IsCurrentlyTouching( void ) const;
-	
+	}	
 
 	SolidType_t				GetSolid() const;
 	int			 			GetSolidFlags( void ) const;
@@ -488,20 +485,6 @@ public:
 	MoveCollide_t			GetMoveCollide() const;
 	void					SetMoveType( MoveType_t val, MoveCollide_t moveCollide = MOVECOLLIDE_DEFAULT );
 	void					SetMoveCollide( MoveCollide_t val );
-
-
-
-
-
-	// Externalized data objects ( see sharreddefs.h for DataObjectType_t )
-	bool					HasDataObjectType( int type ) const;
-	void					AddDataObjectType( int type );
-	void					RemoveDataObjectType( int type );
-
-	void					*GetDataObject( int type );
-	void					*CreateDataObject( int type );
-	void					DestroyDataObject( int type );
-	void					DestroyAllDataObjects( void );
 
 public:
 	void SetScaledPhysics( IPhysicsObject *pNewObject );
@@ -1060,11 +1043,16 @@ public:
 
 	// FIXME: Should be private, but I can't make em private just yet
 	void					PhysicsImpact( CBaseEntity *other, trace_t &trace );
- 	void					PhysicsMarkEntitiesAsTouching( CBaseEntity *other, trace_t &trace );
+	void					PhysicsTouchTriggers(const Vector* pPrevAbsOrigin = NULL);
+	void					PhysicsMarkEntitiesAsTouching( CBaseEntity *other, trace_t &trace );
 	void					PhysicsMarkEntitiesAsTouchingEventDriven( CBaseEntity *other, trace_t &trace );
-	void					PhysicsTouchTriggers( const Vector *pPrevAbsOrigin = NULL );
+	touchlink_t*			PhysicsMarkEntityAsTouched(CBaseEntity* other);
+	void					PhysicsTouch(CBaseEntity* pentOther);
+	void					PhysicsStartTouch(CBaseEntity* pentOther);
+	bool					IsCurrentlyTouching(void) const;
 
 	// Physics helper
+	void					PhysicsCheckForEntityUntouch(void);
 	static void				PhysicsRemoveTouchedList( CBaseEntity *ent );
 	static void				PhysicsNotifyOtherOfUntouch( CBaseEntity *ent, CBaseEntity *other );
 	static void				PhysicsRemoveToucher( CBaseEntity *other, touchlink_t *link );
@@ -1517,7 +1505,6 @@ public:
 //	CBasePlayer				*GetSimulatingPlayer( void );
 //#endif
 	// FIXME: Make these private!
-	void					PhysicsCheckForEntityUntouch( void );
  	bool					PhysicsRunThink( thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS );
 	bool					PhysicsRunSpecificThink( int nContextIndex, BASEPTR thinkFunc );
 	bool					PhysicsTestEntityPosition( CBaseEntity **ppEntity = NULL );
@@ -1546,6 +1533,10 @@ public:
 public:
 	// Invalidates the abs state of all children
 	void					InvalidatePhysicsRecursive( int nChangeFlags );
+	void					AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType);
+	void					RemoveWatcherFromEntity(CBaseEntity* pWatcher, int watcherType);
+	void					NotifyPositionChanged();
+	void					NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwake);
 protected:
 
 	int						PhysicsClipVelocity (const Vector& in, const Vector& normal, Vector& out, float overbounce );
@@ -1579,9 +1570,7 @@ private:
 
 	void					PhysicsDispatchThink( BASEPTR thinkFunc );
 
-	touchlink_t				*PhysicsMarkEntityAsTouched( CBaseEntity *other );
-	void					PhysicsTouch( CBaseEntity *pentOther );
-	void					PhysicsStartTouch( CBaseEntity *pentOther );
+
 
 	CBaseEntity				*PhysicsPushMove( float movetime );
 	CBaseEntity				*PhysicsPushRotate( float movetime );
@@ -1788,7 +1777,6 @@ public:
 //	CHandle< CBasePlayer >			m_hPlayerSimulationOwner;
 //#endif
 
-	int								m_fDataObjectTypes;
 
 	// So it can get at the physics methods
 	friend class CCollisionEvent;

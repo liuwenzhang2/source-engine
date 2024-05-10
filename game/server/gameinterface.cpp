@@ -92,6 +92,8 @@
 #include "envmicrophone.h"
 #include "globalstate.h"
 #include "model_types.h"
+#include "movetype_push.h"
+#include "vphysicsupdateai.h"
 
 #ifdef TF_DLL
 #include "gc_clientsystem.h"
@@ -1459,6 +1461,15 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	g_pClosecaption = cvar->FindVar("closecaption");
 	Assert(g_pClosecaption);
 
+	gEntList.AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<CBaseEntity, touchlink_t >);
+	gEntList.AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<CBaseEntity, groundlink_t >);
+	gEntList.AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<CBaseEntity, StepSimulationData >);
+	gEntList.AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<CBaseEntity, ModelScale >);
+	gEntList.AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<CBaseEntity, CWatcherList >);
+	gEntList.AddDataAccessor(PHYSICSPUSHLIST, new CEntityDataInstantiator<CBaseEntity, physicspushlist_t >);
+	gEntList.AddDataAccessor(VPHYSICSUPDATEAI, new CEntityDataInstantiator<CBaseEntity, vphysicsupdateai_t >);
+	gEntList.AddDataAccessor(VPHYSICSWATCHER, new CEntityDataInstantiator<CBaseEntity, CWatcherList >);
+
 	return true;
 }
 
@@ -1469,6 +1480,14 @@ void CServerGameDLL::PostInit()
 
 void CServerGameDLL::DLLShutdown( void )
 {
+	gEntList.RemoveDataAccessor(TOUCHLINK);
+	gEntList.RemoveDataAccessor(GROUNDLINK);
+	gEntList.RemoveDataAccessor(STEPSIMULATION);
+	gEntList.RemoveDataAccessor(MODELSCALE);
+	gEntList.RemoveDataAccessor(POSITIONWATCHER);
+	gEntList.RemoveDataAccessor(PHYSICSPUSHLIST);
+	gEntList.RemoveDataAccessor(VPHYSICSUPDATEAI);
+	gEntList.RemoveDataAccessor(VPHYSICSWATCHER);
 
 	// Due to dependencies, these are not autogamesystems
 	ModelSoundsCacheShutdown();

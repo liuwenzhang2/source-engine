@@ -737,18 +737,20 @@ bool CCollisionEvent::ShouldFreezeContacts( IPhysicsObject **pObjectList, int ob
 void CCollisionEvent::ObjectWake( IPhysicsObject *pObject )
 {
 	CBaseEntity *pEntity = static_cast<CBaseEntity *>(pObject->GetGameData());
-	if ( pEntity && pEntity->HasDataObjectType( VPHYSICSWATCHER ) )
+	if ( pEntity && pEntity->GetEngineObject()->HasDataObjectType( VPHYSICSWATCHER ) )
 	{
-		ReportVPhysicsStateChanged( pObject, pEntity, true );
+		//ReportVPhysicsStateChanged( pObject, pEntity, true );
+		pEntity->NotifyVPhysicsStateChanged(pObject, true);
 	}
 }
 // called when an object goes to sleep (no longer simulating)
 void CCollisionEvent::ObjectSleep( IPhysicsObject *pObject )
 {
 	CBaseEntity *pEntity = static_cast<CBaseEntity *>(pObject->GetGameData());
-	if ( pEntity && pEntity->HasDataObjectType( VPHYSICSWATCHER ) )
+	if ( pEntity && pEntity->GetEngineObject()->HasDataObjectType( VPHYSICSWATCHER ) )
 	{
-		ReportVPhysicsStateChanged( pObject, pEntity, false );
+		//ReportVPhysicsStateChanged( pObject, pEntity, false );
+		pEntity->NotifyVPhysicsStateChanged(pObject, false);
 	}
 }
 
@@ -2111,8 +2113,8 @@ void CCollisionEvent::DispatchStartTouch( CBaseEntity *pEntity0, CBaseEntity *pE
 void CCollisionEvent::DispatchEndTouch( CBaseEntity *pEntity0, CBaseEntity *pEntity1 )
 {
 	// frees the event-driven touchlinks
-	pEntity0->PhysicsNotifyOtherOfUntouch( pEntity0, pEntity1 );
-	pEntity1->PhysicsNotifyOtherOfUntouch( pEntity1, pEntity0 );
+	CBaseEntity::PhysicsNotifyOtherOfUntouch( pEntity0, pEntity1 );
+	CBaseEntity::PhysicsNotifyOtherOfUntouch( pEntity1, pEntity0 );
 }
 
 void CCollisionEvent::UpdateTouchEvents( void )

@@ -1417,7 +1417,7 @@ void CBaseEntity::PerformPush( float movetime )
 			// UNDONE: Any reason to want to call this twice before physics runs?
 			// If so, maybe just append to the list?
 			Assert( !GetDataObject( PHYSICSPUSHLIST ) );
-			physicspushlist_t *pList = (physicspushlist_t *)CreateDataObject( PHYSICSPUSHLIST );
+			physicspushlist_t *pList = (physicspushlist_t *)GetEngineObject()->CreateDataObject( PHYSICSPUSHLIST );
 			if ( pList )
 			{
 				g_pPushedEntities->StoreMovedEntities( *pList );
@@ -1570,20 +1570,20 @@ void CBaseEntity::CheckStepSimulationChanged()
 		SetSimulatedEveryTick( g_bTestMoveTypeStepSimulation );
 	}
 
-	bool hadobject = HasDataObjectType( STEPSIMULATION );
+	bool hadobject = GetEngineObject()->HasDataObjectType( STEPSIMULATION );
 
 	if ( g_bTestMoveTypeStepSimulation )
 	{
 		if ( !hadobject )
 		{
-			CreateDataObject( STEPSIMULATION );
+			GetEngineObject()->CreateDataObject( STEPSIMULATION );
 		}
 	}
 	else
 	{
 		if ( hadobject )
 		{
-			DestroyDataObject( STEPSIMULATION );
+			GetEngineObject()->DestroyDataObject( STEPSIMULATION );
 		}
 	}
 }
@@ -1599,7 +1599,7 @@ void CBaseEntity::StepSimulationThink( float dt )
 	// See if we need to allocate, deallocate step simulation object
 	CheckStepSimulationChanged();
 
-	StepSimulationData *step = ( StepSimulationData * )GetDataObject( STEPSIMULATION );
+	StepSimulationData *step = ( StepSimulationData * )GetEngineObject()->GetDataObject( STEPSIMULATION );
 	if ( !step )
 	{
 		PhysicsStepRunTimestep( dt );
@@ -1722,9 +1722,9 @@ void CBaseEntity::PhysicsStep()
 
 	// Feed the position delta back from vphysics if enabled
 	bool updateFromVPhysics = npc_vphysics.GetBool();
-	if ( HasDataObjectType(VPHYSICSUPDATEAI) )
+	if (GetEngineObject()->HasDataObjectType(VPHYSICSUPDATEAI) )
 	{
-		vphysicsupdateai_t *pUpdate = static_cast<vphysicsupdateai_t *>(GetDataObject( VPHYSICSUPDATEAI ));
+		vphysicsupdateai_t *pUpdate = static_cast<vphysicsupdateai_t *>(GetEngineObject()->GetDataObject( VPHYSICSUPDATEAI ));
 		if ( pUpdate->stopUpdateTime > gpGlobals->curtime )
 		{
 			updateFromVPhysics = true;
@@ -1734,7 +1734,7 @@ void CBaseEntity::PhysicsStep()
 			float maxAngular;
 			VPhysicsGetObject()->GetShadowController()->GetMaxSpeed( NULL, &maxAngular );
 			VPhysicsGetObject()->GetShadowController()->MaxSpeed( pUpdate->savedShadowControllerMaxSpeed, maxAngular );
-			DestroyDataObject(VPHYSICSUPDATEAI);
+			GetEngineObject()->DestroyDataObject(VPHYSICSUPDATEAI);
 		}
 	}
 

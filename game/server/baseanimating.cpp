@@ -3308,7 +3308,7 @@ void CBaseAnimating::SetModelScale( float scale, float change_duration /*= 0.0f*
 {
 	if ( change_duration > 0.0f )
 	{
-		ModelScale *mvs = ( ModelScale * )CreateDataObject( MODELSCALE );
+		ModelScale *mvs = ( ModelScale * )GetEngineObject()->CreateDataObject( MODELSCALE );
 		mvs->m_flModelScaleStart = m_flModelScale;
 		mvs->m_flModelScaleGoal = scale;
 		mvs->m_flModelScaleStartTime = gpGlobals->curtime;
@@ -3319,16 +3319,16 @@ void CBaseAnimating::SetModelScale( float scale, float change_duration /*= 0.0f*
 		m_flModelScale = scale;
 		RefreshCollisionBounds();
 
-		if ( HasDataObjectType( MODELSCALE ) )
+		if (GetEngineObject()->HasDataObjectType( MODELSCALE ) )
 		{
-			DestroyDataObject( MODELSCALE );
+			GetEngineObject()->DestroyDataObject( MODELSCALE );
 		}
 	}
 }
 
 void CBaseAnimating::UpdateModelScale()
 {
-	ModelScale *mvs = ( ModelScale * )GetDataObject( MODELSCALE );
+	ModelScale *mvs = ( ModelScale * )GetEngineObject()->GetDataObject( MODELSCALE );
 	if ( !mvs )
 	{
 		return;
@@ -3343,7 +3343,7 @@ void CBaseAnimating::UpdateModelScale()
 	if ( gpGlobals->curtime >= mvs->m_flModelScaleFinishTime )
 	{
 		m_flModelScale = mvs->m_flModelScaleGoal;
-		DestroyDataObject( MODELSCALE );
+		GetEngineObject()->DestroyDataObject( MODELSCALE );
 	}
 	else
 	{

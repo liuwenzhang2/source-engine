@@ -201,6 +201,253 @@ public:
 	virtual void OnEntityDeleted(T* pEntity) {};
 };
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+template <class T>
+abstract_class IEntityDataInstantiator
+{
+public:
+	virtual ~IEntityDataInstantiator() {};
+
+	virtual void* GetDataObject(const T* instance) = 0;
+	virtual void* CreateDataObject(const T* instance) = 0;
+	virtual void DestroyDataObject(const T* instance) = 0;
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+template <class T, class V>
+class CEntityDataInstantiator : public IEntityDataInstantiator<T>
+{
+public:
+	CEntityDataInstantiator() :
+		m_HashTable(64, 0, 0, CompareFunc, KeyFunc)
+	{
+	}
+
+	virtual void* GetDataObject(const T* instance)
+	{
+		UtlHashHandle_t handle;
+		HashEntry entry;
+		entry.key = instance;
+		handle = m_HashTable.Find(entry);
+
+		if (handle != m_HashTable.InvalidHandle())
+		{
+			return (void*)m_HashTable[handle].data;
+		}
+
+		return NULL;
+	}
+
+	virtual void* CreateDataObject(const T* instance)
+	{
+		UtlHashHandle_t handle;
+		HashEntry entry;
+		entry.key = instance;
+		handle = m_HashTable.Find(entry);
+
+		// Create it if not already present
+		if (handle == m_HashTable.InvalidHandle())
+		{
+			handle = m_HashTable.Insert(entry);
+			Assert(handle != m_HashTable.InvalidHandle());
+			m_HashTable[handle].data = AllocDataObject(instance);
+
+			// FIXME: We'll have to remove this if any objects we instance have vtables!!!
+			Q_memset(m_HashTable[handle].data, 0, sizeof(V));
+		}
+
+		return (void*)m_HashTable[handle].data;
+	}
+
+	virtual void DestroyDataObject(const T* instance)
+	{
+		UtlHashHandle_t handle;
+		HashEntry entry;
+		entry.key = instance;
+		handle = m_HashTable.Find(entry);
+
+		if (handle != m_HashTable.InvalidHandle())
+		{
+			FreeDataObject(instance, m_HashTable[handle].data);
+			m_HashTable.Remove(handle);
+		}
+	}
+
+protected:
+
+	virtual V* AllocDataObject(const T* instance) {
+		return new V;
+	}
+
+	virtual void FreeDataObject(const T* instance, V* pDataObject) {
+		delete pDataObject;
+	}
+
+private:
+
+	struct HashEntry
+	{
+		HashEntry()
+		{
+			key = NULL;
+			data = NULL;
+		}
+
+		const T* key;
+		V* data;
+	};
+
+	static bool CompareFunc(const HashEntry& src1, const HashEntry& src2)
+	{
+		return (src1.key == src2.key);
+	}
+
+
+	static unsigned int KeyFunc(const HashEntry& src)
+	{
+		// Shift right to get rid of alignment bits and border the struct on a 16 byte boundary
+		return (unsigned int)(uintp)src.key;
+	}
+
+	CUtlHash< HashEntry >	m_HashTable;
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: System for hanging objects off of CBaseEntity, etc.
+//  Externalized data objects ( see sharreddefs.h for enum )
+//-----------------------------------------------------------------------------
+template<class T>
+class CDataObjectAccessSystem
+{
+public:
+
+	enum
+	{
+		MAX_ACCESSORS = 32,
+	};
+
+	CDataObjectAccessSystem()
+	{
+		// Cast to int to make it clear that we know we are comparing different enum types.
+		COMPILE_TIME_ASSERT((int)NUM_DATAOBJECT_TYPES <= (int)MAX_ACCESSORS);
+
+		Q_memset(m_Accessors, 0, sizeof(m_Accessors));
+	}
+
+	~CDataObjectAccessSystem()
+	{
+		for (int i = 0; i < MAX_ACCESSORS; i++)
+		{
+			delete m_Accessors[i];
+			m_Accessors[i] = 0;
+		}
+	}
+
+	//virtual bool Init()
+	//{
+	//	AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator< touchlink_t >);
+	//	AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator< groundlink_t >);
+	//	AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator< StepSimulationData >);
+	//	AddDataAccessor(MODELSCALE, new CEntityDataInstantiator< ModelScale >);
+	//	AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator< CWatcherList >);
+	//	AddDataAccessor(PHYSICSPUSHLIST, new CEntityDataInstantiator< physicspushlist_t >);
+	//	AddDataAccessor(VPHYSICSUPDATEAI, new CEntityDataInstantiator< vphysicsupdateai_t >);
+	//	AddDataAccessor(VPHYSICSWATCHER, new CEntityDataInstantiator< CWatcherList >);
+
+	//	return true;
+	//}
+
+	void* GetDataObject(int type, const T* instance)
+	{
+		if (!IsValidType(type))
+		{
+			Assert(!"Bogus type");
+			return NULL;
+		}
+		return m_Accessors[type]->GetDataObject(instance);
+	}
+
+	void* CreateDataObject(int type, T* instance)
+	{
+		if (!IsValidType(type))
+		{
+			Assert(!"Bogus type");
+			return NULL;
+		}
+
+		return m_Accessors[type]->CreateDataObject(instance);
+	}
+
+	void DestroyDataObject(int type, T* instance)
+	{
+		if (!IsValidType(type))
+		{
+			Assert(!"Bogus type");
+			return;
+		}
+
+		m_Accessors[type]->DestroyDataObject(instance);
+	}
+
+	void AddDataAccessor(int type, IEntityDataInstantiator<T>* instantiator)
+	{
+		if (type < 0 || type >= MAX_ACCESSORS)
+		{
+			Assert(!"AddDataAccessor with out of range type!!!\n");
+			return;
+		}
+
+		Assert(instantiator);
+
+		if (m_Accessors[type] != NULL)
+		{
+			Assert(!"AddDataAccessor, duplicate adds!!!\n");
+			return;
+		}
+
+		m_Accessors[type] = instantiator;
+	}
+
+	void RemoveDataAccessor(int type) {
+		if (type < 0 || type >= MAX_ACCESSORS)
+		{
+			Assert(!"AddDataAccessor with out of range type!!!\n");
+			return;
+		}
+
+		Assert(m_Accessors[type]);
+
+		if (m_Accessors[type] == NULL)
+		{
+			Assert(!"AddDataAccessor, duplicate remove!!!\n");
+			return;
+		}
+
+		delete m_Accessors[type];
+		m_Accessors[type] = NULL;
+	}
+
+private:
+
+	bool IsValidType(int type) const
+	{
+		if (type < 0 || type >= MAX_ACCESSORS)
+			return false;
+
+		if (m_Accessors[type] == NULL)
+			return false;
+		return true;
+	}
+
+
+
+	IEntityDataInstantiator<T>* m_Accessors[MAX_ACCESSORS];
+};
+
 template<class T>// = IHandleEntity
 class CBaseEntityList
 {
@@ -257,6 +504,12 @@ protected:
 
 	virtual void Clear(void);
 
+	void AddDataAccessor(int type, IEntityDataInstantiator<T>* instantiator);
+	void RemoveDataAccessor(int type);
+	void* GetDataObject(int type, const T* instance);
+	void* CreateDataObject(int type, T* instance);
+	void DestroyDataObject(int type, T* instance);
+
 private:
 	//CBaseHandle AddEntityAtSlot( T *pEnt, int iSlot, int iForcedSerialNum );
 	//void RemoveEntityAtSlot( int iSlot );
@@ -269,6 +522,7 @@ private:
 	CEntInfoList<T>	m_ReservedNetworkableList;
 	CEntInfoList<T>	m_freeNonNetworkableList;
 	CUtlVector<IEntityListener<T>*>	m_entityListeners;
+	CDataObjectAccessSystem<T> m_DataObjectAccessSystem;
 };
 
 template<class T>
@@ -764,6 +1018,31 @@ void CBaseEntityList<T>::Clear(void) {
 		m_freeNetworkableList.AddToTail(pList);
 		pList = pNext;
 	}
+}
+
+template<class T>
+void CBaseEntityList<T>::AddDataAccessor(int type, IEntityDataInstantiator<T>* instantiator) {
+	m_DataObjectAccessSystem.AddDataAccessor(type, instantiator);
+}
+
+template<class T>
+void CBaseEntityList<T>::RemoveDataAccessor(int type) {
+	m_DataObjectAccessSystem.RemoveDataAccessor(type);
+}
+
+template<class T>
+void* CBaseEntityList<T>::GetDataObject(int type, const T* instance) {
+	return m_DataObjectAccessSystem.GetDataObject(type, instance);
+}
+
+template<class T>
+void* CBaseEntityList<T>::CreateDataObject(int type, T* instance) {
+	return m_DataObjectAccessSystem.CreateDataObject(type, instance);
+}
+
+template<class T>
+void CBaseEntityList<T>::DestroyDataObject(int type, T* instance) {
+	m_DataObjectAccessSystem.DestroyDataObject(type, instance);
 }
 
 #ifdef CLIENT_DLL

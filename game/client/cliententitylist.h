@@ -147,7 +147,9 @@ public:
 		m_iClassname = NULL_STRING;
 		m_iParentAttachment = 0;
 		m_iEFlags = 0;
+		touchStamp = 0;
 		SetCheckUntouch(false);
+		m_fDataObjectTypes = 0;
 	}
 
 	void Init(C_BaseEntity* pOuter) {
@@ -332,16 +334,15 @@ public:
 	int						GetTouchStamp();
 	void					ClearTouchStamp();
 
-#if !defined( NO_ENTITY_PREDICTION )
-	// For storing prediction results and pristine network state
-	byte* m_pIntermediateData[MULTIPLAYER_BACKUP];
-	byte* m_pOriginalData = NULL;
-	byte* m_pOuterIntermediateData[MULTIPLAYER_BACKUP];
-	byte* m_pOuterOriginalData = NULL;
-	int								m_nIntermediateDataCount = 0;
+	// Externalized data objects ( see sharreddefs.h for DataObjectType_t )
+	bool					HasDataObjectType(int type) const;
+	void					AddDataObjectType(int type);
+	void					RemoveDataObjectType(int type);
 
-	//bool							m_bIsPlayerSimulated;
-#endif
+	void*					GetDataObject(int type);
+	void*					CreateDataObject(int type);
+	void					DestroyDataObject(int type);
+	void					DestroyAllDataObjects(void);
 
 	void					Clear(void) {
 		m_pOriginalData = NULL;
@@ -352,7 +353,6 @@ public:
 		}
 	}
 
-	VarMapping_t	m_VarMap;
 private:
 
 	friend class C_BaseEntity;
@@ -381,6 +381,18 @@ private:
 	matrix3x4_t						m_rgflCoordinateFrame;
 	string_t						m_iClassname;
 
+#if !defined( NO_ENTITY_PREDICTION )
+	// For storing prediction results and pristine network state
+	byte* m_pIntermediateData[MULTIPLAYER_BACKUP];
+	byte* m_pOriginalData = NULL;
+	byte* m_pOuterIntermediateData[MULTIPLAYER_BACKUP];
+	byte* m_pOuterOriginalData = NULL;
+	int								m_nIntermediateDataCount = 0;
+
+	//bool							m_bIsPlayerSimulated;
+#endif
+	VarMapping_t	m_VarMap;
+
 	unsigned int testNetwork;
 
 	// Last values to come over the wire. Used for interpolation.
@@ -393,7 +405,7 @@ private:
 	int								m_iEFlags;	// entity flags EFL_*
 	// used so we know when things are no longer touching
 	int								touchStamp;
-
+	int								m_fDataObjectTypes;
 };
 
 //-----------------------------------------------------------------------------
@@ -638,6 +650,11 @@ public:
 	void NotifyCreateEntity( C_BaseEntity *pEnt );
 	void NotifyRemoveEntity( C_BaseEntity *pEnt );
 
+	void AddDataAccessor(int type, IEntityDataInstantiator<T>* instantiator);
+	void RemoveDataAccessor(int type);
+	void* GetDataObject(int type, const T* instance);
+	void* CreateDataObject(int type, T* instance);
+	void DestroyDataObject(int type, T* instance);
 private:
 
 	// Cached info for networked entities.
@@ -1227,6 +1244,31 @@ C_BaseEntity* CClientEntityList<T>::NextBaseEntity(C_BaseEntity* pEnt) const
 	}
 
 	return NULL;
+}
+
+template<class T>
+void CClientEntityList<T>::AddDataAccessor(int type, IEntityDataInstantiator<T>* instantiator) {
+	BaseClass::AddDataAccessor(type, instantiator);
+}
+
+template<class T>
+void CClientEntityList<T>::RemoveDataAccessor(int type) {
+	BaseClass::RemoveDataAccessor(type);
+}
+
+template<class T>
+void* CClientEntityList<T>::GetDataObject(int type, const T* instance) {
+	return BaseClass::GetDataObject(type, instance);
+}
+
+template<class T>
+void* CClientEntityList<T>::CreateDataObject(int type, T* instance) {
+	return BaseClass::CreateDataObject(type, instance);
+}
+
+template<class T>
+void CClientEntityList<T>::DestroyDataObject(int type, T* instance) {
+	BaseClass::DestroyDataObject(type, instance);
 }
 
 //-----------------------------------------------------------------------------

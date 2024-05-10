@@ -1015,7 +1015,7 @@ void C_BaseEntity::Term()
 {
 	C_BaseEntity::PhysicsRemoveTouchedList( this );
 	C_BaseEntity::PhysicsRemoveGroundList( this );
-	DestroyAllDataObjects();
+	GetEngineObject()->DestroyAllDataObjects();
 
 #if !defined( NO_ENTITY_PREDICTION )
 	// Remove from the predictables list

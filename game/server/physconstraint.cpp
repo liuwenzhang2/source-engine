@@ -835,12 +835,14 @@ public:
 		CBaseEntity *pEntity0 = info.pObjects[0] ? static_cast<CBaseEntity *>(info.pObjects[0]->GetGameData()) : NULL;
 		if ( pEntity0 && !info.pObjects[0]->IsStatic()  )
 		{
-			WatchVPhysicsStateChanges( this, pEntity0 );
+			//WatchVPhysicsStateChanges( this, pEntity0 );
+			pEntity0->AddWatcherToEntity(this, VPHYSICSWATCHER);
 		}
 		CBaseEntity *pEntity1 = info.pObjects[1] ? static_cast<CBaseEntity *>(info.pObjects[1]->GetGameData()) : NULL;
 		if ( pEntity1 && !info.pObjects[1]->IsStatic()  )
 		{
-			WatchVPhysicsStateChanges( this, pEntity1 );
+			//WatchVPhysicsStateChanges( this, pEntity1 );
+			pEntity1->AddWatcherToEntity(this, VPHYSICSWATCHER);
 		}
 		BaseClass::OnConstraintSetup(info);
 	}
@@ -1140,12 +1142,14 @@ public:
 		CBaseEntity *pEntity0 = info.pObjects[0] ? static_cast<CBaseEntity *>(info.pObjects[0]->GetGameData()) : NULL;
 		if ( pEntity0 && !info.pObjects[0]->IsStatic()  )
 		{
-			WatchVPhysicsStateChanges( this, pEntity0 );
+			//WatchVPhysicsStateChanges( this, pEntity0 );
+			pEntity0->AddWatcherToEntity(this, VPHYSICSWATCHER);
 		}
 		CBaseEntity *pEntity1 = info.pObjects[1] ? static_cast<CBaseEntity *>(info.pObjects[1]->GetGameData()) : NULL;
 		if ( pEntity1 && !info.pObjects[1]->IsStatic()  )
 		{
-			WatchVPhysicsStateChanges( this, pEntity1 );
+			//WatchVPhysicsStateChanges( this, pEntity1 );
+			pEntity1->AddWatcherToEntity(this, VPHYSICSWATCHER);
 		}
 		BaseClass::OnConstraintSetup(info);
 	}

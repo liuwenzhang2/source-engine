@@ -26,9 +26,9 @@ public:
 };
 
 // NOTE: The table of watchers is NOT saved/loaded!  Recreate these links on restore
-void ReportPositionChanged( CBaseEntity *pMovedEntity );
-void WatchPositionChanges( CBaseEntity *pWatcher, CBaseEntity *pMovingEntity );
-void RemovePositionWatcher( CBaseEntity *pWatcher, CBaseEntity *pMovingEntity );
+//void ReportPositionChanged( CBaseEntity *pMovedEntity );
+//void WatchPositionChanges( CBaseEntity *pWatcher, CBaseEntity *pMovingEntity );
+//void RemovePositionWatcher( CBaseEntity *pWatcher, CBaseEntity *pMovingEntity );
 
 
 // inherit from this interface to be able to call WatchPositionChanges
@@ -39,9 +39,9 @@ public:
 };
 
 // NOTE: The table of watchers is NOT saved/loaded!  Recreate these links on restore
-void ReportVPhysicsStateChanged( IPhysicsObject *pPhysics, CBaseEntity *pEntity, bool bAwake );
-void WatchVPhysicsStateChanges( CBaseEntity *pWatcher, CBaseEntity *pPhysicsEntity );
-void RemoveVPhysicsStateWatcher( CBaseEntity *pWatcher, CBaseEntity *pPhysicsEntity );
+//void ReportVPhysicsStateChanged( IPhysicsObject *pPhysics, CBaseEntity *pEntity, bool bAwake );
+//void WatchVPhysicsStateChanges( CBaseEntity *pWatcher, CBaseEntity *pPhysicsEntity );
+//void RemoveVPhysicsStateWatcher( CBaseEntity *pWatcher, CBaseEntity *pPhysicsEntity );
 
 
 #endif // POSITIONWATCHER_H

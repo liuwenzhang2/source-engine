@@ -1863,6 +1863,63 @@ bool C_EngineObjectInternal::GetCheckUntouch() const
 	return IsEFlagSet(EFL_CHECK_UNTOUCH);
 }
 
+bool C_EngineObjectInternal::HasDataObjectType(int type) const
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	return (m_fDataObjectTypes & (1 << type)) ? true : false;
+}
+
+void C_EngineObjectInternal::AddDataObjectType(int type)
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	m_fDataObjectTypes |= (1 << type);
+}
+
+void C_EngineObjectInternal::RemoveDataObjectType(int type)
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	m_fDataObjectTypes &= ~(1 << type);
+}
+
+void* C_EngineObjectInternal::GetDataObject(int type)
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	if (!HasDataObjectType(type))
+		return NULL;
+	return ClientEntityList().GetDataObject(type, m_pOuter);
+}
+
+void* C_EngineObjectInternal::CreateDataObject(int type)
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	AddDataObjectType(type);
+	return ClientEntityList().CreateDataObject(type, m_pOuter);
+}
+
+void C_EngineObjectInternal::DestroyDataObject(int type)
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	if (!HasDataObjectType(type))
+		return;
+	ClientEntityList().DestroyDataObject(type, m_pOuter);
+	RemoveDataObjectType(type);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::DestroyAllDataObjects(void)
+{
+	int i;
+	for (i = 0; i < NUM_DATAOBJECT_TYPES; i++)
+	{
+		if (HasDataObjectType(i))
+		{
+			DestroyDataObject(i);
+		}
+	}
+}
+
 
 bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b )
 {

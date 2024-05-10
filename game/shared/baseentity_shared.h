@@ -67,6 +67,7 @@ enum InvalidatePhysicsBits_t
 #endif // HL2_EPISODIC
 
 #endif
+#include "positionwatcher.h"
 
 //#if !defined( NO_ENTITY_PREDICTION )
 //// CBaseEntity inlines
@@ -306,5 +307,23 @@ inline bool IsEntityQAngleVelReasonable( const QAngle &q )
 }
 
 extern bool CheckEmitReasonablePhysicsSpew();
+
+class CWatcherList
+{
+public:
+	//CWatcherList(); NOTE: Dataobj doesn't support constructors - it zeros the memory
+	~CWatcherList();	// frees the positionwatcher_t's to the pool
+	void Init();
+
+	void AddToList(CBaseEntity* pWatcher);
+	void RemoveWatcher(CBaseEntity* pWatcher);
+
+	friend class CBaseEntity;
+private:
+	int GetCallbackObjects(IWatcherCallback** pList, int listMax);
+
+	unsigned short Find(CBaseEntity* pEntity);
+	unsigned short m_list;
+};
 
 #endif // BASEENTITY_SHARED_H

@@ -143,8 +143,13 @@ public:
 	virtual bool		IsEFlagSet(int nEFlagMask) const = 0;
 	virtual void		SetCheckUntouch(bool check) = 0;
 	virtual bool		GetCheckUntouch() const = 0;
-	virtual int					GetTouchStamp() = 0;
-	virtual void				ClearTouchStamp() = 0;
+	virtual int			GetTouchStamp() = 0;
+	virtual void		ClearTouchStamp() = 0;
+	virtual bool		HasDataObjectType(int type) const = 0;
+	virtual void*		GetDataObject(int type) = 0;
+	virtual void*		CreateDataObject(int type) = 0;
+	virtual void		DestroyDataObject(int type) = 0;
+	virtual void		DestroyAllDataObjects(void) = 0;
 
 };
 

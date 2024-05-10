@@ -817,7 +817,7 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 		iAttachment = m_iParentAttachment;
 	}
 
-	bool bWasNotParented = (GetMoveParent() == NULL);
+	//bool bWasNotParented = (GetMoveParent() == NULL);
 	CEngineObjectInternal* pOldParent = GetMoveParent();
 
 	this->m_pOuter->BeforeUnlinkParent(pParentEntity ? pParentEntity->GetOuter() : NULL);
@@ -872,10 +872,11 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 	QAngle angles;
 	MatrixToAngles(matrix, angles);
 	this->SetLocalAngles(angles);
-	UTIL_SetOrigin(this->m_pOuter, localOrigin);
+	//UTIL_SetOrigin(this->m_pOuter, localOrigin);
+	this->SetLocalOrigin(localOrigin);
 
 	// Move our step data into the correct space
-	if (bWasNotParented)
+	if (pOldParent == NULL)
 	{
 		// Transform step data from world to parent-space
 		m_pOuter->TransformStepData_WorldToParent(this->m_pOuter);
@@ -921,9 +922,10 @@ void CEngineObjectInternal::CalcAbsolutePosition(void)
 		// no move parent, so just copy existing values
 		m_vecAbsOrigin = m_vecOrigin;
 		m_angAbsRotation = m_angRotation;
-		if (m_pOuter->HasDataObjectType(POSITIONWATCHER))
+		if (HasDataObjectType(POSITIONWATCHER))
 		{
-			ReportPositionChanged(this->m_pOuter);
+			//ReportPositionChanged(this->m_pOuter);
+			this->m_pOuter->NotifyPositionChanged();
 		}
 		return;
 	}
@@ -946,9 +948,10 @@ void CEngineObjectInternal::CalcAbsolutePosition(void)
 	{
 		MatrixAngles(m_rgflCoordinateFrame, m_angAbsRotation);
 	}
-	if (m_pOuter->HasDataObjectType(POSITIONWATCHER))
+	if (HasDataObjectType(POSITIONWATCHER))
 	{
-		ReportPositionChanged(this->m_pOuter);
+		//ReportPositionChanged(this->m_pOuter);
+		this->m_pOuter->NotifyPositionChanged();
 	}
 }
 
@@ -1462,6 +1465,62 @@ void CEngineObjectInternal::SetCheckUntouch(bool check)
 	}
 }
 
+bool CEngineObjectInternal::HasDataObjectType(int type) const
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	return (m_fDataObjectTypes & (1 << type)) ? true : false;
+}
+
+void CEngineObjectInternal::AddDataObjectType(int type)
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	m_fDataObjectTypes |= (1 << type);
+}
+
+void CEngineObjectInternal::RemoveDataObjectType(int type)
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	m_fDataObjectTypes &= ~(1 << type);
+}
+
+void* CEngineObjectInternal::GetDataObject(int type)
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	if (!HasDataObjectType(type))
+		return NULL;
+	return gEntList.GetDataObject(type, m_pOuter);
+}
+
+void* CEngineObjectInternal::CreateDataObject(int type)
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	AddDataObjectType(type);
+	return gEntList.CreateDataObject(type, m_pOuter);
+}
+
+void CEngineObjectInternal::DestroyDataObject(int type)
+{
+	Assert(type >= 0 && type < NUM_DATAOBJECT_TYPES);
+	if (!HasDataObjectType(type))
+		return;
+	gEntList.DestroyDataObject(type, m_pOuter);
+	RemoveDataObjectType(type);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::DestroyAllDataObjects(void)
+{
+	int i;
+	for (i = 0; i < NUM_DATAOBJECT_TYPES; i++)
+	{
+		if (HasDataObjectType(i))
+		{
+			DestroyDataObject(i);
+		}
+	}
+}
 
 
 // Called by CEntityListSystem
@@ -2150,11 +2209,11 @@ CON_COMMAND(report_touchlinks, "Lists all touchlinks")
 	{
 		if (!pClassname || FClassnameIs(pEntity, pClassname))
 		{
-			touchlink_t* root = (touchlink_t*)pEntity->GetDataObject(TOUCHLINK);
+			touchlink_t* root = (touchlink_t*)pEntity->GetEngineObject()->GetDataObject(TOUCHLINK);
 			if (root)
 			{
 				touchlink_t* link = root->nextLink;
-				while (link != root)
+				while (link && link != root)
 				{
 					list.AddEntityToList(link->entityTouched);
 					link = link->nextLink;

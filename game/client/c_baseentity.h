@@ -797,15 +797,7 @@ public:
 
 	
 
-	// Externalized data objects ( see sharreddefs.h for DataObjectType_t )
-	bool					HasDataObjectType( int type ) const;
-	void					AddDataObjectType( int type );
-	void					RemoveDataObjectType( int type );
 
-	void					*GetDataObject( int type );
-	void					*CreateDataObject( int type );
-	void					DestroyDataObject( int type );
-	void					DestroyAllDataObjects( void );
 
 	
 
@@ -837,10 +829,6 @@ protected:
 	static bool				sm_bDisableTouchFuncs;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 
 public:
-	touchlink_t				*PhysicsMarkEntityAsTouched( C_BaseEntity *other );
-	void					PhysicsTouch( C_BaseEntity *pentOther );
-	void					PhysicsStartTouch( C_BaseEntity *pentOther );
-
 	// HACKHACK:Get the trace_t from the last physics touch call (replaces the even-hackier global trace vars)
 	static const trace_t	&GetTouchTrace( void );
 
@@ -848,6 +836,9 @@ public:
 	void					PhysicsImpact( C_BaseEntity *other, trace_t &trace );
  	void					PhysicsMarkEntitiesAsTouching( C_BaseEntity *other, trace_t &trace );
 	void					PhysicsMarkEntitiesAsTouchingEventDriven( C_BaseEntity *other, trace_t &trace );
+	touchlink_t*			PhysicsMarkEntityAsTouched(C_BaseEntity* other);
+	void					PhysicsTouch(C_BaseEntity* pentOther);
+	void					PhysicsStartTouch(C_BaseEntity* pentOther);
 
 	// Physics helper
 	static void				PhysicsRemoveTouchedList( C_BaseEntity *ent );
@@ -883,6 +874,8 @@ public:
 
 	void					PhysicsPushEntity( const Vector& push, trace_t *pTrace );
 	void					PhysicsCheckWaterTransition( void );
+
+
 
 	// Performs the collision resolution for fliers.
 	void					PerformFlyCollisionResolution( trace_t &trace, Vector &move );
@@ -1005,6 +998,10 @@ public:
 
 	// Invalidates the abs state of all children
 	void InvalidatePhysicsRecursive( int nChangeFlags );
+	void					AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType);
+	void					RemoveWatcherFromEntity(CBaseEntity* pWatcher, int watcherType);
+	void					NotifyPositionChanged();
+	void					NotifyVPhysicsStateChanged(IPhysicsObject* pPhysics, bool bAwake);
 
 	ClientRenderHandle_t	GetRenderHandle() const;
 
@@ -1526,7 +1523,6 @@ private:
 
 	static bool						s_bInterpolate;
 	
-	int								m_fDataObjectTypes;
 
 	AimEntsListHandle_t				m_AimEntsListHandle;
 	int								m_nCreationTick;

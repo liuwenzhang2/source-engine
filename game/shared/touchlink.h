@@ -22,14 +22,14 @@ enum touchlink_flags_t
 struct touchlink_t
 {
 #if defined( CLIENT_DLL )
-	C_BaseEntity		*entityTouched;
+	C_BaseEntity		*entityTouched = NULL;
 #else
-	EHANDLE				entityTouched;
+	EHANDLE				entityTouched = NULL;
 #endif
-	int					touchStamp;
-	touchlink_t			*nextLink;
-	touchlink_t			*prevLink;
-	int					flags;
+	int					touchStamp = 0;
+	touchlink_t			*nextLink = NULL;
+	touchlink_t			*prevLink = NULL;
+	int					flags = 0;
 };
 
 // means this touchlink is managed external to the main physics system

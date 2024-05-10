@@ -1997,7 +1997,8 @@ void CDynamicProp::BoneFollowerHierarchyChanged()
 	// If we have bone followers and we're parented to something, we need to constantly update our bone followers
 	if ( m_BoneFollowerManager.GetNumBoneFollowers() && GetMoveParent() )
 	{
-		WatchPositionChanges(this, this);
+		//WatchPositionChanges(this, this);
+		this->AddWatcherToEntity(this, POSITIONWATCHER);
 	}
 }
 
@@ -5824,7 +5825,7 @@ void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 
 	CBaseEntity::PhysicsRemoveTouchedList( this );
 	CBaseEntity::PhysicsRemoveGroundList( this );
-	DestroyAllDataObjects();
+	GetEngineObject()->DestroyAllDataObjects();
 
 	AddEffects( EF_NODRAW );
 

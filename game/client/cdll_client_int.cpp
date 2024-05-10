@@ -131,6 +131,8 @@
 #include "haptics/haptic_utils.h"
 #include "haptics/haptic_msgs.h"
 #include "model_types.h"
+#include "movetype_push.h"
+#include "vphysicsupdateai.h"
 
 #if defined( TF_CLIENT_DLL )
 #include "abuse_report.h"
@@ -1520,6 +1522,15 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	HookHapticMessages(); // Always hook the messages
 #endif
 
+	ClientEntityList().AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<C_BaseEntity, touchlink_t >);
+	ClientEntityList().AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<C_BaseEntity, groundlink_t >);
+	ClientEntityList().AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<C_BaseEntity, StepSimulationData >);
+	ClientEntityList().AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<C_BaseEntity, ModelScale >);
+	ClientEntityList().AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<C_BaseEntity, CWatcherList >);
+	ClientEntityList().AddDataAccessor(PHYSICSPUSHLIST, new CEntityDataInstantiator<C_BaseEntity, physicspushlist_t >);
+	ClientEntityList().AddDataAccessor(VPHYSICSUPDATEAI, new CEntityDataInstantiator<C_BaseEntity, vphysicsupdateai_t >);
+	ClientEntityList().AddDataAccessor(VPHYSICSWATCHER, new CEntityDataInstantiator<C_BaseEntity, CWatcherList >);
+
 	return true;
 }
 
@@ -1594,6 +1605,15 @@ void CHLClient::PostInit()
 //-----------------------------------------------------------------------------
 void CHLClient::Shutdown( void )
 {
+	ClientEntityList().RemoveDataAccessor(TOUCHLINK);
+	ClientEntityList().RemoveDataAccessor(GROUNDLINK);
+	ClientEntityList().RemoveDataAccessor(STEPSIMULATION);
+	ClientEntityList().RemoveDataAccessor(MODELSCALE);
+	ClientEntityList().RemoveDataAccessor(POSITIONWATCHER);
+	ClientEntityList().RemoveDataAccessor(PHYSICSPUSHLIST);
+	ClientEntityList().RemoveDataAccessor(VPHYSICSUPDATEAI);
+	ClientEntityList().RemoveDataAccessor(VPHYSICSWATCHER);
+
     if (g_pAchievementsAndStatsInterface)
     {
         g_pAchievementsAndStatsInterface->ReleasePanel();

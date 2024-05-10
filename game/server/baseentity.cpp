@@ -572,7 +572,7 @@ void CBaseEntity::UpdateOnRemove(void)
 		CBaseEntity::PhysicsRemoveTouchedList(this);
 		CBaseEntity::PhysicsRemoveGroundList(this);
 		SetGroundEntity(NULL); // remove us from the ground entity if we are on it
-		DestroyAllDataObjects();
+		GetEngineObject()->DestroyAllDataObjects();
 		g_bDisableEhandleAccess = true;
 
 		// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
@@ -1116,7 +1116,7 @@ void CBaseEntity::SetParent( string_t newParent, CBaseEntity *pActivator, int iA
 void CBaseEntity::TransformStepData_ParentToWorld( CBaseEntity *pParent )
 {
 	// Fix up our step simulation points to be in the proper local space
-	StepSimulationData *step = (StepSimulationData *) GetDataObject( STEPSIMULATION );
+	StepSimulationData *step = (StepSimulationData *)GetEngineObject()->GetDataObject( STEPSIMULATION );
 	if ( step != NULL )
 	{
 		// Convert our positions
@@ -1133,7 +1133,7 @@ void CBaseEntity::TransformStepData_ParentToWorld( CBaseEntity *pParent )
 void CBaseEntity::TransformStepData_ParentToParent( CBaseEntity *pOldParent, CBaseEntity *pNewParent )
 {
 	// Fix up our step simulation points to be in the proper local space
-	StepSimulationData *step = (StepSimulationData *) GetDataObject( STEPSIMULATION );
+	StepSimulationData *step = (StepSimulationData *)GetEngineObject()->GetDataObject( STEPSIMULATION );
 	if ( step != NULL )
 	{
 		// Convert our positions
@@ -1153,7 +1153,7 @@ void CBaseEntity::TransformStepData_ParentToParent( CBaseEntity *pOldParent, CBa
 void CBaseEntity::TransformStepData_WorldToParent( CBaseEntity *pParent )
 {
 	// Fix up our step simulation points to be in the proper local space
-	StepSimulationData *step = (StepSimulationData *) GetDataObject( STEPSIMULATION );
+	StepSimulationData *step = (StepSimulationData *)GetEngineObject()->GetDataObject( STEPSIMULATION );
 	if ( step != NULL )
 	{
 		// Convert our positions
@@ -2284,9 +2284,9 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 		//NDebugOverlay::BoxAngles( origin, CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), angles, 255,0,0,0, gpGlobals->frametime);
 
 		physicspushlist_t *pList = NULL;
-		if ( HasDataObjectType(PHYSICSPUSHLIST) )
+		if (GetEngineObject()->HasDataObjectType(PHYSICSPUSHLIST) )
 		{
-			pList = (physicspushlist_t *)GetDataObject( PHYSICSPUSHLIST );
+			pList = (physicspushlist_t *)GetEngineObject()->GetDataObject( PHYSICSPUSHLIST );
 			Assert(pList);
 		}
 		bool checkrot = (GetLocalAngularVelocity() != vec3_angle) ? true : false;
@@ -2372,9 +2372,9 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 	}
 
 	// this data is no longer useful, free the memory
-	if ( HasDataObjectType(PHYSICSPUSHLIST) )
+	if (GetEngineObject()->HasDataObjectType(PHYSICSPUSHLIST) )
 	{
-		DestroyDataObject( PHYSICSPUSHLIST );
+		GetEngineObject()->DestroyDataObject( PHYSICSPUSHLIST );
 	}
 
 	m_flVPhysicsUpdateLocalTime = m_flLocalTime;
@@ -4348,7 +4348,7 @@ void CBaseEntity::Teleport( const Vector *newPosition, const QAngle *newAngles, 
 	g_TeleportStack.FastRemove( index );
 
 	// FIXME: add an initializer function to StepSimulationData
-	StepSimulationData *step = ( StepSimulationData * )GetDataObject( STEPSIMULATION );
+	StepSimulationData *step = ( StepSimulationData * )GetEngineObject()->GetDataObject( STEPSIMULATION );
 	if (step)
 	{
 		Q_memset( step, 0, sizeof( *step ) );
@@ -6385,9 +6385,9 @@ bool CBaseEntity::UseStepSimulationNetworkOrigin( const Vector **out_v )
 
 	if ( g_bTestMoveTypeStepSimulation &&
 		GetMoveType() == MOVETYPE_STEP &&
-		HasDataObjectType( STEPSIMULATION ) )
+		GetEngineObject()->HasDataObjectType( STEPSIMULATION ) )
 	{
-		StepSimulationData *step = ( StepSimulationData * )GetDataObject( STEPSIMULATION );
+		StepSimulationData *step = ( StepSimulationData * )GetEngineObject()->GetDataObject( STEPSIMULATION );
 		ComputeStepSimulationNetwork( step );
 		*out_v = &step->m_vecNetworkOrigin;
 
@@ -6404,9 +6404,9 @@ bool CBaseEntity::UseStepSimulationNetworkAngles( const QAngle **out_a )
 
 	if ( g_bTestMoveTypeStepSimulation &&
 		GetMoveType() == MOVETYPE_STEP &&
-		HasDataObjectType( STEPSIMULATION ) )
+		GetEngineObject()->HasDataObjectType( STEPSIMULATION ) )
 	{
-		StepSimulationData *step = ( StepSimulationData * )GetDataObject( STEPSIMULATION );
+		StepSimulationData *step = ( StepSimulationData * )GetEngineObject()->GetDataObject( STEPSIMULATION );
 		ComputeStepSimulationNetwork( step );
 		*out_a = &step->m_angNetworkAngles;
 		return step->m_bAnglesActive;
@@ -6420,12 +6420,12 @@ bool CBaseEntity::UseStepSimulationNetworkAngles( const QAngle **out_a )
 
 bool CBaseEntity::AddStepDiscontinuity( float flTime, const Vector &vecOrigin, const QAngle &vecAngles )
 {
-	if ((GetMoveType() != MOVETYPE_STEP ) || !HasDataObjectType( STEPSIMULATION ) )
+	if ((GetMoveType() != MOVETYPE_STEP ) || !GetEngineObject()->HasDataObjectType( STEPSIMULATION ) )
 	{
 		return false;
 	}
 
-	StepSimulationData *step = ( StepSimulationData * )GetDataObject( STEPSIMULATION );
+	StepSimulationData *step = ( StepSimulationData * )GetEngineObject()->GetDataObject( STEPSIMULATION );
 
 	if (!step)
 	{
