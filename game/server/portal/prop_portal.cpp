@@ -762,7 +762,7 @@ void CProp_Portal::Activate( void )
 		m_PortalSimulator.MoveTo( ptCenter, qAngles );
 
 		//resimulate everything we're touching
-		touchlink_t *root = ( touchlink_t * )GetDataObject( TOUCHLINK );
+		touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
 		if( root )
 		{
 			for( touchlink_t *link = root->nextLink; link != root; link = link->nextLink )

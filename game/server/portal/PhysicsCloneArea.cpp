@@ -106,7 +106,7 @@ void CPhysicsCloneArea::UpdatePosition( void )
 	Assert( m_pAttachedPortal );
 
 	//untouch everything we're touching
-	touchlink_t *root = ( touchlink_t * )GetDataObject( TOUCHLINK );
+	touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
 	if( root )
 	{
 		//don't want to risk list corruption while untouching
@@ -220,7 +220,7 @@ void CPhysicsCloneArea::CloneTouchingEntities( void )
 {
 	if( m_pAttachedPortal && m_pAttachedPortal->m_bActivated )
 	{
-		touchlink_t *root = ( touchlink_t * )GetDataObject( TOUCHLINK );
+		touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
 		if( root )
 		{
 			for( touchlink_t *link = root->nextLink; link != root; link = link->nextLink )

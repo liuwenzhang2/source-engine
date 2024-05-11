@@ -1271,9 +1271,9 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 				vphysicsupdateai_t *pUpdate = NULL;
 				if ( pNPC->VPhysicsGetObject() && pNPC->VPhysicsGetObject()->GetShadowController() && pNPC->GetMoveType() == MOVETYPE_STEP )
 				{
-					if ( pNPC->HasDataObjectType(VPHYSICSUPDATEAI) )
+					if ( pNPC->GetEngineObject()->HasDataObjectType(VPHYSICSUPDATEAI) )
 					{
-						pUpdate = static_cast<vphysicsupdateai_t *>(pNPC->GetDataObject(VPHYSICSUPDATEAI));
+						pUpdate = static_cast<vphysicsupdateai_t *>(pNPC->GetEngineObject()->GetDataObject(VPHYSICSUPDATEAI));
 						// kill this guy if I've been pushing him for more than half a second and I'm 
 						// still pushing in his direction
 						if ( (gpGlobals->curtime - pUpdate->startUpdateTime) > 0.5f && DotProduct(velocity,normal) > 0)
@@ -1287,7 +1287,7 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 					}
 					else
 					{
-						pUpdate = static_cast<vphysicsupdateai_t *>(pNPC->CreateDataObject( VPHYSICSUPDATEAI ));
+						pUpdate = static_cast<vphysicsupdateai_t *>(pNPC->GetEngineObject()->CreateDataObject( VPHYSICSUPDATEAI ));
 						pUpdate->startUpdateTime = gpGlobals->curtime;
 					}
 					// update based on vphysics for the next second
