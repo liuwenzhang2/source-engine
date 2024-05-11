@@ -191,7 +191,7 @@ void C_BaseEntity::PhysicsStep()
 {
 	// Run all but the base think function
 	PhysicsRunThink( THINK_FIRE_ALL_BUT_BASE );
-PhysicsRunThink( THINK_FIRE_BASE_ONLY );
+	PhysicsRunThink( THINK_FIRE_BASE_ONLY );
 }
 //-----------------------------------------------------------------------------
 // Purpose: 

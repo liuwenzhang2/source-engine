@@ -226,7 +226,7 @@ public:
 
 	int Save( CSave &save )	const						{ return 0; }
 	int Restore( CRestore &restore ) const	{ return 0; }
-	virtual void Think( void ) { }
+	//virtual void Think( void ) { }
 
 	const BotProfile *GetProfile( void ) const		{ return m_profile; }	///< return our personality profile
 
