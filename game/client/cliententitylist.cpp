@@ -668,7 +668,7 @@ void C_EngineObjectInternal::SetParent(IEngineObjectClient* pParentEntity, int i
 		SetNetworkMoveParent( pParentEntity);
 	}
 
-	SetParentAttachment( iParentAttachment);
+	m_iParentAttachment = iParentAttachment;
 
 	GetAbsOrigin().Init(FLT_MAX, FLT_MAX, FLT_MAX);
 	GetAbsAngles().Init(FLT_MAX, FLT_MAX, FLT_MAX);

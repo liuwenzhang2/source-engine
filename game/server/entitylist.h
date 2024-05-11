@@ -164,6 +164,10 @@ public:
 		return m_pOuter;
 	}
 
+	int	entindex() const {
+		return m_Network.entindex();
+	}
+
 	// Verifies that the data description is valid in debug builds.
 #ifdef _DEBUG
 	void ValidateDataDescription(void);

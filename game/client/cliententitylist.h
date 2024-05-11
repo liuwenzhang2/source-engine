@@ -315,12 +315,9 @@ public:
 
 	// Returns the attachment point index on our parent that our transform is relative to.
 	// 0 if we're relative to the parent's absorigin and absangles.
-	unsigned char			GetParentAttachment() const;
+	unsigned char GetParentAttachment() const;
 	unsigned char GetParentAttachment() {
 		return m_iParentAttachment;
-	}
-	void SetParentAttachment(unsigned char iParentAttachment) {
-		m_iParentAttachment = iParentAttachment;
 	}
 
 	int						GetEFlags() const;

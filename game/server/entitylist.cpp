@@ -764,7 +764,7 @@ bool CEngineObjectInternal::IsInPVS(const CCheckTransmitInfo* pInfo)
 	// negative leaf count is a node number
 	// If no pvs, add any entity
 
-	Assert(m_pOuter->entindex() != pInfo->m_pClientEnt);
+	Assert(entindex() != pInfo->m_pClientEnt);
 
 	unsigned char* pPVS = (unsigned char*)pInfo->m_PVS;
 
@@ -819,22 +819,19 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 
 	//bool bWasNotParented = (GetMoveParent() == NULL);
 	CEngineObjectInternal* pOldParent = GetMoveParent();
+	unsigned char iOldParentAttachment = m_iParentAttachment;
 
-	this->m_pOuter->BeforeUnlinkParent(pParentEntity ? pParentEntity->GetOuter() : NULL);
+	this->m_pOuter->BeforeParentChanged(pParentEntity ? pParentEntity->GetOuter() : NULL, iAttachment);
 	// notify the old parent of the loss
 	IEngineObjectServer::UnlinkFromParent(this);
+	m_iParent = NULL_STRING;
+	m_iParentAttachment = 0;
 
 	if (pParentEntity == NULL)
 	{
-		m_iParent = NULL_STRING;
-
-		// Transform step data from parent to worldspace
-		m_pOuter->TransformStepData_ParentToWorld(pOldParent ? pOldParent->m_pOuter : NULL);
+		this->m_pOuter->AfterParentChanged(pOldParent ? pOldParent->m_pOuter : NULL, iOldParentAttachment);
 		return;
 	}
-	// set the new name
-	//m_pParent = pParentEntity;
-	m_iParent = pParentEntity->GetEntityName();
 
 	m_pOuter->RemoveSolidFlags(FSOLID_ROOT_PARENT_ALIGNED);
 	if (const_cast<IEngineObjectServer*>(pParentEntity)->GetRootMoveParent()->GetOuter()->GetSolid() == SOLID_BSP)
@@ -854,12 +851,14 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 
 	// add ourselves to the list
 	IEngineObjectServer::LinkChild(pParentEntity, this);
-	this->m_pOuter->AfterLinkParent(pOldParent ? pOldParent->m_pOuter : NULL);
-
+	// set the new name
+//m_pParent = pParentEntity;
+	m_iParent = pParentEntity->GetEntityName();
 	m_iParentAttachment = (char)iAttachment;
+	this->m_pOuter->AfterParentChanged(pOldParent ? pOldParent->m_pOuter : NULL, iOldParentAttachment);
 
 	EntityMatrix matrix, childMatrix;
-	matrix.InitFromEntity(const_cast<CBaseEntity*>(pParentEntity->GetOuter()), m_iParentAttachment); // parent->world
+	matrix.InitFromEntity(pParentEntity->GetOuter(), m_iParentAttachment); // parent->world
 	childMatrix.InitFromEntityLocal(this->m_pOuter); // child->world
 	Vector localOrigin = matrix.WorldToLocal(this->GetLocalOrigin());
 
@@ -874,18 +873,6 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 	this->SetLocalAngles(angles);
 	//UTIL_SetOrigin(this->m_pOuter, localOrigin);
 	this->SetLocalOrigin(localOrigin);
-
-	// Move our step data into the correct space
-	if (pOldParent == NULL)
-	{
-		// Transform step data from world to parent-space
-		m_pOuter->TransformStepData_WorldToParent(this->m_pOuter);
-	}
-	else
-	{
-		// Transform step data between parent-spaces
-		m_pOuter->TransformStepData_ParentToParent(pOldParent->m_pOuter, this->m_pOuter);
-	}
 
 	if (m_pOuter->VPhysicsGetObject())
 	{

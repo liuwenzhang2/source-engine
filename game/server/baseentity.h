@@ -595,8 +595,26 @@ public:
 	void		SetParent( string_t newParent, CBaseEntity *pActivator, int iAttachment = -1 );
 	
 	
-	virtual void	BeforeUnlinkParent(CBaseEntity* pNewParent, int iAttachment = -1) {}
-	virtual void	AfterLinkParent(CBaseEntity* pOldParent, int iAttachment = -1) {}
+	virtual void	BeforeParentChanged(CBaseEntity* pNewParent, int inewAttachment = -1) {}
+	virtual void	AfterParentChanged(CBaseEntity* pOldParent, int iOldAttachment = -1) {
+		if (GetEngineObject()->GetMoveParent()) {
+			// Move our step data into the correct space
+			if (pOldParent == NULL)
+			{
+				// Transform step data from world to parent-space
+				TransformStepData_WorldToParent(this);
+			}
+			else
+			{
+				// Transform step data between parent-spaces
+				TransformStepData_ParentToParent(pOldParent, this);
+			}
+		}
+		else {
+			// Transform step data from parent to worldspace
+			TransformStepData_ParentToWorld(pOldParent);
+		}
+	}
 
 	//CBaseEntity* GetParent();
 	//int			GetParentAttachment();

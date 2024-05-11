@@ -538,7 +538,7 @@ void CBaseEntity::UpdateOnRemove(void)
 	SetMoveType(MOVETYPE_NONE);
 
 	// If we have a parent, unlink from it.
-	this->BeforeUnlinkParent(NULL);
+	this->BeforeParentChanged(NULL);
 	IEngineObjectServer::UnlinkFromParent(this->GetEngineObject());
 
 	// Any children still connected are orphans, mark all for delete
@@ -3096,7 +3096,7 @@ void CBaseEntity::OnRestore()
 #endif
 			// We only need to be back in the parent's list because we're already in the right place and with the right data
 			IEngineObjectServer::LinkChild(GetMoveParent()->GetEngineObject(), this->GetEngineObject());
-			this->AfterLinkParent(NULL);
+			this->AfterParentChanged(NULL);
 		}
 	}
 

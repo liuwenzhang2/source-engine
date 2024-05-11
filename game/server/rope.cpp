@@ -170,8 +170,9 @@ void CRopeKeyframe::SetEndPoint( CBaseEntity *pEndPoint, int attachment )
 	SetAttachmentPoint( m_hEndPoint.GetForModify(), m_iEndAttachment.GetForModify(), pEndPoint, attachment );
 }
 
-void CRopeKeyframe::BeforeUnlinkParent( CBaseEntity *pNewParent, int iAttachment )
+void CRopeKeyframe::BeforeParentChanged( CBaseEntity *pNewParent, int iNewAttachment )
 {
+	BaseClass::BeforeParentChanged(pNewParent, iNewAttachment);
 	IEngineObjectServer *pCurParent = GetEngineObject()->GetMoveParent();
 	if ( pCurParent )
 	{

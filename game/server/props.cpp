@@ -1985,8 +1985,9 @@ void CDynamicProp::OnRestore( void )
 	BoneFollowerHierarchyChanged();
 }
 
-void CDynamicProp::AfterLinkParent( CBaseEntity *pOldParent, int iAttachment )
+void CDynamicProp::AfterParentChanged( CBaseEntity *pOldParent, int iOldAttachment )
 {
+	BaseClass::AfterParentChanged(pOldParent, iOldAttachment);
 	//BaseClass::SetParent(pNewParent, iAttachment);
 	BoneFollowerHierarchyChanged();
 }

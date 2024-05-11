@@ -79,10 +79,10 @@ void IEngineObjectServer::TransferChildren( IEngineObjectServer *pOldParent, IEn
 		QAngle angAbsRotation = pChild->GetAbsAngles();
 		Vector vecAbsVelocity = pChild->GetAbsVelocity();
 //		QAngle vecAbsAngVelocity = pChild->GetAbsAngularVelocity();
-		pChild->GetOuter()->BeforeUnlinkParent(pOldParent->GetOuter());
+		pChild->GetOuter()->BeforeParentChanged(pOldParent->GetOuter());
 		UnlinkChild( pOldParent, pChild );
 		LinkChild( pNewParent, pChild );
-		pChild->GetOuter()->AfterLinkParent(pNewParent->GetOuter());
+		pChild->GetOuter()->AfterParentChanged(pNewParent->GetOuter());
 
 		// FIXME: This is a hack to guarantee update of the local origin, angles, etc.
 		pChild->GetAbsOrigin().Init(FLT_MAX, FLT_MAX, FLT_MAX);

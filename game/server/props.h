@@ -277,7 +277,7 @@ public:
 	void	HandleAnimEvent( animevent_t *pEvent );
 
 	// baseentity - watch dynamic hierarchy updates
-	virtual void	AfterLinkParent( CBaseEntity* pOldParent, int iAttachment = -1 );
+	virtual void	AfterParentChanged( CBaseEntity* pOldParent, int iOldAttachment = -1 );
 	bool			TestCollision( const Ray_t &ray, unsigned int mask, trace_t& trace );
 
 	// breakable prop
