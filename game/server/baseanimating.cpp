@@ -448,7 +448,7 @@ void CBaseAnimating::StudioFrameAdvanceInternal( CStudioHdr *pStudioHdr, float f
 	m_flGroundSpeed = GetSequenceGroundSpeed( pStudioHdr, GetSequence() ) * GetModelScale();
 
 	// Msg("%s : %s : %5.1f\n", GetClassname(), GetSequenceName( GetSequence() ), GetCycle() );
-	InvalidatePhysicsRecursive( ANIMATION_CHANGED );
+	GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
 
 	InvalidateBoneCacheIfOlderThan( 0 );
 }

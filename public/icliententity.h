@@ -201,21 +201,22 @@ public:
 	virtual void SetNetworkOrigin(const Vector& org) = 0;
 	virtual void SetNetworkAngles(const QAngle& ang) = 0;
 	virtual void SetNetworkMoveParent(IEngineObjectClient* pMoveParent) = 0;
-	virtual unsigned char		GetParentAttachment() const = 0;
-	virtual int					GetEFlags() const = 0;
-	virtual void				SetEFlags(int iEFlags) = 0;
-	virtual void				AddEFlags(int nEFlagMask) = 0;
-	virtual void				RemoveEFlags(int nEFlagMask) = 0;
-	virtual bool				IsEFlagSet(int nEFlagMask) const = 0;
-	virtual void				SetCheckUntouch(bool check) = 0;
-	virtual bool				GetCheckUntouch() const = 0;
-	virtual int					GetTouchStamp() = 0;
-	virtual void				ClearTouchStamp() = 0;
-	virtual bool				HasDataObjectType(int type) const = 0;
-	virtual void*				GetDataObject(int type) = 0;
-	virtual void*				CreateDataObject(int type) = 0;
-	virtual void				DestroyDataObject(int type) = 0;
-	virtual void				DestroyAllDataObjects(void) = 0;
+	virtual unsigned char GetParentAttachment() const = 0;
+	virtual int	GetEFlags() const = 0;
+	virtual void SetEFlags(int iEFlags) = 0;
+	virtual void AddEFlags(int nEFlagMask) = 0;
+	virtual void RemoveEFlags(int nEFlagMask) = 0;
+	virtual bool IsEFlagSet(int nEFlagMask) const = 0;
+	virtual void SetCheckUntouch(bool check) = 0;
+	virtual bool GetCheckUntouch() const = 0;
+	virtual int GetTouchStamp() = 0;
+	virtual void ClearTouchStamp() = 0;
+	virtual bool HasDataObjectType(int type) const = 0;
+	virtual void* GetDataObject(int type) = 0;
+	virtual void* CreateDataObject(int type) = 0;
+	virtual void DestroyDataObject(int type) = 0;
+	virtual void DestroyAllDataObjects(void) = 0;
+	virtual void InvalidatePhysicsRecursive(int nChangeFlags) = 0;
 
 };
 

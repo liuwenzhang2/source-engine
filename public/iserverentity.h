@@ -106,7 +106,7 @@ public:
 	static void UnlinkFromParent(IEngineObjectServer* pRemove);
 	static void TransferChildren(IEngineObjectServer* pOldParent, IEngineObjectServer* pNewParent);
 
-	virtual int				AreaNum() const = 0;
+	virtual int	AreaNum() const = 0;
 	virtual PVSInfo_t* GetPVSInfo() = 0;
 
 	// This version does a PVS check which also checks for connected areas
@@ -134,22 +134,23 @@ public:
 	virtual bool NameMatches(string_t nameStr) = 0;
 	virtual bool ClassMatches(string_t nameStr) = 0;
 	virtual IServerNetworkable* GetNetworkable() = 0;
-	virtual int			GetParentAttachment() = 0;
-	virtual void		ClearParentAttachment() = 0;
-	virtual int			GetEFlags() const = 0;
-	virtual void		SetEFlags(int iEFlags) = 0;
-	virtual void		AddEFlags(int nEFlagMask) = 0;
-	virtual void		RemoveEFlags(int nEFlagMask) = 0;
-	virtual bool		IsEFlagSet(int nEFlagMask) const = 0;
-	virtual void		SetCheckUntouch(bool check) = 0;
-	virtual bool		GetCheckUntouch() const = 0;
-	virtual int			GetTouchStamp() = 0;
-	virtual void		ClearTouchStamp() = 0;
-	virtual bool		HasDataObjectType(int type) const = 0;
-	virtual void*		GetDataObject(int type) = 0;
-	virtual void*		CreateDataObject(int type) = 0;
-	virtual void		DestroyDataObject(int type) = 0;
-	virtual void		DestroyAllDataObjects(void) = 0;
+	virtual int GetParentAttachment() = 0;
+	virtual void ClearParentAttachment() = 0;
+	virtual int GetEFlags() const = 0;
+	virtual void SetEFlags(int iEFlags) = 0;
+	virtual void AddEFlags(int nEFlagMask) = 0;
+	virtual void RemoveEFlags(int nEFlagMask) = 0;
+	virtual bool IsEFlagSet(int nEFlagMask) const = 0;
+	virtual void SetCheckUntouch(bool check) = 0;
+	virtual bool GetCheckUntouch() const = 0;
+	virtual int GetTouchStamp() = 0;
+	virtual void ClearTouchStamp() = 0;
+	virtual bool HasDataObjectType(int type) const = 0;
+	virtual void* GetDataObject(int type) = 0;
+	virtual void* CreateDataObject(int type) = 0;
+	virtual void DestroyDataObject(int type) = 0;
+	virtual void DestroyAllDataObjects(void) = 0;
+	virtual void InvalidatePhysicsRecursive(int nChangeFlags) = 0;
 
 };
 

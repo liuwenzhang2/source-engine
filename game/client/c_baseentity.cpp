@@ -4345,7 +4345,7 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 void C_BaseEntity::OnPostRestoreData()
 {
 	// HACK Force recomputation of origin
-	InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED );
+	GetEngineObject()->InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED );
 
 	if (GetEngineObject()->GetMoveParent() )
 	{
@@ -4527,7 +4527,7 @@ void C_BaseEntity::OnSave()
 //-----------------------------------------------------------------------------
 void C_BaseEntity::OnRestore()
 {
-	InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED );
+	GetEngineObject()->InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED );
 	
 	UpdatePartitionListEntry();
 	CollisionProp()->UpdatePartition();

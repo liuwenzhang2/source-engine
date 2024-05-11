@@ -325,6 +325,8 @@ public:
 	void					DestroyDataObject(int type);
 	void					DestroyAllDataObjects(void);
 
+	// Invalidates the abs state of all children
+	void					InvalidatePhysicsRecursive(int nChangeFlags);
 public:
 	// Networking related methods
 	void	NetworkStateChanged();

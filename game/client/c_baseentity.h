@@ -996,8 +996,9 @@ public:
 	void				SetEyeAngleOffset( const QAngle & qa );
 #endif
 
-	// Invalidates the abs state of all children
-	void InvalidatePhysicsRecursive( int nChangeFlags );
+	void					OnPositionChenged();
+	void					OnAnglesChanged();
+	void					OnAnimationChanged();
 	void					AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType);
 	void					RemoveWatcherFromEntity(CBaseEntity* pWatcher, int watcherType);
 	void					NotifyPositionChanged();

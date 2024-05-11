@@ -1531,8 +1531,9 @@ public:
 	//void					SetPredictionEligible( bool canpredict );
 
 public:
-	// Invalidates the abs state of all children
-	void					InvalidatePhysicsRecursive( int nChangeFlags );
+	void					OnPositionChenged();
+	void					OnAnglesChanged();
+	void					OnAnimationChanged();
 	void					AddWatcherToEntity(CBaseEntity* pWatcher, int watcherType);
 	void					RemoveWatcherFromEntity(CBaseEntity* pWatcher, int watcherType);
 	void					NotifyPositionChanged();
@@ -1886,8 +1887,6 @@ public:
 		return GetEngineObject()->GetLocalVelocity();
 	}
 
-	void					CalcAbsolutePosition();
-	void					CalcAbsoluteVelocity();
 };
 
 // Send tables exposed in this module.

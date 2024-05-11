@@ -1492,126 +1492,33 @@ bool CBaseEntity::IsBSPModel() const
 }
 
 
-//-----------------------------------------------------------------------------
-// Invalidates the abs state of all children
-//-----------------------------------------------------------------------------
-void CBaseEntity::InvalidatePhysicsRecursive( int nChangeFlags )
-{
-	// Main entry point for dirty flag setting for the 90% case
-	// 1) If the origin changes, then we have to update abstransform, Shadow projection, PVS, KD-tree, 
-	//    client-leaf system.
-	// 2) If the angles change, then we have to update abstransform, Shadow projection,
-	//    shadow render-to-texture, client-leaf system, and surrounding bounds. 
-	//	  Children have to additionally update absvelocity, KD-tree, and PVS.
-	//	  If the surrounding bounds actually update, when we also need to update the KD-tree and the PVS.
-	// 3) If it's due to attachment, then all children who are attached to an attachment point
-	//    are assumed to have dirty origin + angles.
-
-	// Other stuff:
-	// 1) Marking the surrounding bounds dirty will automatically mark KD tree + PVS dirty.
-	
-	int nDirtyFlags = 0;
-
-	if ( nChangeFlags & VELOCITY_CHANGED )
-	{
-		nDirtyFlags |= EFL_DIRTY_ABSVELOCITY;
-	}
-
-	if ( nChangeFlags & POSITION_CHANGED )
-	{
-		nDirtyFlags |= EFL_DIRTY_ABSTRANSFORM;
-
-#ifndef CLIENT_DLL
-		GetEngineObject()->MarkPVSInformationDirty();
-#endif
-
-		// NOTE: This will also mark shadow projection + client leaf dirty
-		CollisionProp()->MarkPartitionHandleDirty();
-	}
-
-	// NOTE: This has to be done after velocity + position are changed
-	// because we change the nChangeFlags for the child entities
-	if ( nChangeFlags & ANGLES_CHANGED )
-	{
-		nDirtyFlags |= EFL_DIRTY_ABSTRANSFORM;
-		if ( CollisionProp()->DoesRotationInvalidateSurroundingBox() )
-		{
-			// NOTE: This will handle the KD-tree, surrounding bounds, PVS
-			// render-to-texture shadow, shadow projection, and client leaf dirty
-			CollisionProp()->MarkSurroundingBoundsDirty();
-		}
-		else
-		{
-#ifdef CLIENT_DLL
-			MarkRenderHandleDirty();
-			g_pClientShadowMgr->AddToDirtyShadowList( this );
-			g_pClientShadowMgr->MarkRenderToTextureShadowDirty( GetShadowHandle() );
-#endif
-		}
-
-		// This is going to be used for all children: children
-		// have position + velocity changed
-		nChangeFlags |= POSITION_CHANGED | VELOCITY_CHANGED;
-	}
-
-	GetEngineObject()->AddEFlags( nDirtyFlags );
-
-	// Set flags for children
-	bool bOnlyDueToAttachment = false;
-	if ( nChangeFlags & ANIMATION_CHANGED )
-	{
-#ifdef CLIENT_DLL
-		g_pClientShadowMgr->MarkRenderToTextureShadowDirty( GetShadowHandle() );
-#endif
-
-		// Only set this flag if the only thing that changed us was the animation.
-		// If position or something else changed us, then we must tell all children.
-		if ( !( nChangeFlags & (POSITION_CHANGED | VELOCITY_CHANGED | ANGLES_CHANGED) ) )
-		{
-			bOnlyDueToAttachment = true;
-		}
-
-		nChangeFlags = POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED;
-	}
-
-	for (CBaseEntity *pChild = (GetEngineObject()->FirstMoveChild()? GetEngineObject()->FirstMoveChild()->GetOuter():NULL); pChild; pChild = (pChild->GetEngineObject()->NextMovePeer()? pChild->GetEngineObject()->NextMovePeer()->GetOuter():NULL))
-	{
-		// If this is due to the parent animating, only invalidate children that are parented to an attachment
-		// Entities that are following also access attachments points on parents and must be invalidated.
-		if ( bOnlyDueToAttachment )
-		{
-#ifdef CLIENT_DLL
-			if ( (pChild->GetEngineObject()->GetParentAttachment() == 0) && !pChild->IsFollowingEntity() )
-				continue;
-#else
-			if ( pChild->GetEngineObject()->GetParentAttachment() == 0 )
-				continue;
-#endif
-		}
-		pChild->InvalidatePhysicsRecursive( nChangeFlags );
-	}
-
-	//
-	// This code should really be in here, or the bone cache should not be in world space.
-	// Since the bone transforms are in world space, if we move or rotate the entity, its
-	// bones should be marked invalid.
-	//
-	// As it is, we're near ship, and don't have time to setup a good A/B test of how much
-	// overhead this fix would add. We've also only got one known case where the lack of
-	// this fix is screwing us, and I just fixed it, so I'm leaving this commented out for now.
-	//
-	// Hopefully, we'll put the bone cache in entity space and remove the need for this fix.
-	//
-	//#ifdef CLIENT_DLL
-	//	if ( nChangeFlags & (POSITION_CHANGED | ANGLES_CHANGED | ANIMATION_CHANGED) )
-	//	{
-	//		C_BaseAnimating *pAnim = GetBaseAnimating();
-	//		if ( pAnim )
-	//			pAnim->InvalidateBoneCache();		
-	//	}
-	//#endif
+void CBaseEntity::OnPositionChenged() {
+	// NOTE: This will also mark shadow projection + client leaf dirty
+	CollisionProp()->MarkPartitionHandleDirty();
 }
 
+void CBaseEntity::OnAnglesChanged() {
+	if (CollisionProp()->DoesRotationInvalidateSurroundingBox())
+	{
+		// NOTE: This will handle the KD-tree, surrounding bounds, PVS
+		// render-to-texture shadow, shadow projection, and client leaf dirty
+		CollisionProp()->MarkSurroundingBoundsDirty();
+	}
+	else
+	{
+#ifdef CLIENT_DLL
+		MarkRenderHandleDirty();
+		g_pClientShadowMgr->AddToDirtyShadowList(this);
+		g_pClientShadowMgr->MarkRenderToTextureShadowDirty(GetShadowHandle());
+#endif
+	}
+}
+
+void CBaseEntity::OnAnimationChanged() {
+#ifdef CLIENT_DLL
+	g_pClientShadowMgr->MarkRenderToTextureShadowDirty(GetShadowHandle());
+#endif
+}
 
 
 /*
@@ -2459,7 +2366,7 @@ void CBaseEntity::ApplyLocalVelocityImpulse( const Vector &inVecImpulse )
 		}
 		else
 		{
-			InvalidatePhysicsRecursive( VELOCITY_CHANGED );
+			GetEngineObject()->InvalidatePhysicsRecursive( VELOCITY_CHANGED );
 #ifdef GAME_DLL
 			GetEngineObject()->SetLocalVelocity(GetEngineObject()->GetLocalVelocity() + vecImpulse);
 #endif // GAME_DLL

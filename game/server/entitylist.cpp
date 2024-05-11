@@ -1051,7 +1051,7 @@ void CEngineObjectInternal::SetAbsOrigin(const Vector& absOrigin)
 	//m_pOuter->NetworkStateChanged(55551);
 
 	// All children are invalid, but we are not
-	m_pOuter->InvalidatePhysicsRecursive(POSITION_CHANGED);
+	InvalidatePhysicsRecursive(POSITION_CHANGED);
 	RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
 
 	m_vecAbsOrigin = absOrigin;
@@ -1095,7 +1095,7 @@ void CEngineObjectInternal::SetAbsAngles(const QAngle& absAngles)
 	//m_pOuter->NetworkStateChanged(55552);
 
 	// All children are invalid, but we are not
-	m_pOuter->InvalidatePhysicsRecursive(ANGLES_CHANGED);
+	InvalidatePhysicsRecursive(ANGLES_CHANGED);
 	RemoveEFlags(EFL_DIRTY_ABSTRANSFORM);
 
 	m_angAbsRotation = absAngles;
@@ -1140,7 +1140,7 @@ void CEngineObjectInternal::SetAbsVelocity(const Vector& vecAbsVelocity)
 	//m_pOuter->NetworkStateChanged(55553);
 	// The abs velocity won't be dirty since we're setting it here
 	// All children are invalid, but we are not
-	m_pOuter->InvalidatePhysicsRecursive(VELOCITY_CHANGED);
+	InvalidatePhysicsRecursive(VELOCITY_CHANGED);
 	RemoveEFlags(EFL_DIRTY_ABSVELOCITY);
 
 	m_vecAbsVelocity = vecAbsVelocity;
@@ -1197,7 +1197,7 @@ void CEngineObjectInternal::SetLocalOrigin(const Vector& origin)
 		Assert(origin.z >= -largeVal && origin.z <= largeVal);
 #endif
 		//m_pOuter->NetworkStateChanged(55554);
-		m_pOuter->InvalidatePhysicsRecursive(POSITION_CHANGED);
+		InvalidatePhysicsRecursive(POSITION_CHANGED);
 		m_vecOrigin = origin;
 		m_pOuter->SetSimulationTime(gpGlobals->curtime);
 	}
@@ -1227,7 +1227,7 @@ void CEngineObjectInternal::SetLocalAngles(const QAngle& angles)
 	if (m_angRotation != angles)
 	{
 		//m_pOuter->NetworkStateChanged(55555);
-		m_pOuter->InvalidatePhysicsRecursive(ANGLES_CHANGED);
+		InvalidatePhysicsRecursive(ANGLES_CHANGED);
 		m_angRotation = angles;
 		m_pOuter->SetSimulationTime(gpGlobals->curtime);
 	}
@@ -1255,7 +1255,7 @@ void CEngineObjectInternal::SetLocalVelocity(const Vector& inVecVelocity)
 	if (m_vecVelocity != vecVelocity)
 	{
 		//m_pOuter->NetworkStateChanged(55556);
-		m_pOuter->InvalidatePhysicsRecursive(VELOCITY_CHANGED);
+		InvalidatePhysicsRecursive(VELOCITY_CHANGED);
 		m_vecVelocity = vecVelocity;
 	}
 }
@@ -1520,6 +1520,104 @@ void CEngineObjectInternal::DestroyAllDataObjects(void)
 			DestroyDataObject(i);
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Invalidates the abs state of all children
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
+{
+	// Main entry point for dirty flag setting for the 90% case
+	// 1) If the origin changes, then we have to update abstransform, Shadow projection, PVS, KD-tree, 
+	//    client-leaf system.
+	// 2) If the angles change, then we have to update abstransform, Shadow projection,
+	//    shadow render-to-texture, client-leaf system, and surrounding bounds. 
+	//	  Children have to additionally update absvelocity, KD-tree, and PVS.
+	//	  If the surrounding bounds actually update, when we also need to update the KD-tree and the PVS.
+	// 3) If it's due to attachment, then all children who are attached to an attachment point
+	//    are assumed to have dirty origin + angles.
+
+	// Other stuff:
+	// 1) Marking the surrounding bounds dirty will automatically mark KD tree + PVS dirty.
+
+	int nDirtyFlags = 0;
+
+	if (nChangeFlags & VELOCITY_CHANGED)
+	{
+		nDirtyFlags |= EFL_DIRTY_ABSVELOCITY;
+	}
+
+	if (nChangeFlags & POSITION_CHANGED)
+	{
+		nDirtyFlags |= EFL_DIRTY_ABSTRANSFORM;
+
+//#ifndef CLIENT_DLL
+		MarkPVSInformationDirty();
+//#endif
+		m_pOuter->OnPositionChenged();
+	}
+
+	// NOTE: This has to be done after velocity + position are changed
+	// because we change the nChangeFlags for the child entities
+	if (nChangeFlags & ANGLES_CHANGED)
+	{
+		nDirtyFlags |= EFL_DIRTY_ABSTRANSFORM;
+		m_pOuter->OnAnglesChanged();
+
+		// This is going to be used for all children: children
+		// have position + velocity changed
+		nChangeFlags |= POSITION_CHANGED | VELOCITY_CHANGED;
+	}
+
+	AddEFlags(nDirtyFlags);
+
+	// Set flags for children
+	bool bOnlyDueToAttachment = false;
+	if (nChangeFlags & ANIMATION_CHANGED)
+	{
+		m_pOuter->OnAnimationChanged();
+
+		// Only set this flag if the only thing that changed us was the animation.
+		// If position or something else changed us, then we must tell all children.
+		if (!(nChangeFlags & (POSITION_CHANGED | VELOCITY_CHANGED | ANGLES_CHANGED)))
+		{
+			bOnlyDueToAttachment = true;
+		}
+
+		nChangeFlags = POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED;
+	}
+
+	for (CEngineObjectInternal* pChild = FirstMoveChild(); pChild; pChild = pChild->NextMovePeer())
+	{
+		// If this is due to the parent animating, only invalidate children that are parented to an attachment
+		// Entities that are following also access attachments points on parents and must be invalidated.
+		if (bOnlyDueToAttachment)
+		{
+			if (pChild->GetParentAttachment() == 0)
+				continue;
+		}
+		pChild->InvalidatePhysicsRecursive(nChangeFlags);
+	}
+
+	//
+	// This code should really be in here, or the bone cache should not be in world space.
+	// Since the bone transforms are in world space, if we move or rotate the entity, its
+	// bones should be marked invalid.
+	//
+	// As it is, we're near ship, and don't have time to setup a good A/B test of how much
+	// overhead this fix would add. We've also only got one known case where the lack of
+	// this fix is screwing us, and I just fixed it, so I'm leaving this commented out for now.
+	//
+	// Hopefully, we'll put the bone cache in entity space and remove the need for this fix.
+	//
+	//#ifdef CLIENT_DLL
+	//	if ( nChangeFlags & (POSITION_CHANGED | ANGLES_CHANGED | ANIMATION_CHANGED) )
+	//	{
+	//		C_BaseAnimating *pAnim = GetBaseAnimating();
+	//		if ( pAnim )
+	//			pAnim->InvalidateBoneCache();		
+	//	}
+	//#endif
 }
 
 

@@ -353,6 +353,9 @@ public:
 		}
 	}
 
+	// Invalidates the abs state of all children
+	void InvalidatePhysicsRecursive(int nChangeFlags);
+
 private:
 
 	friend class C_BaseEntity;

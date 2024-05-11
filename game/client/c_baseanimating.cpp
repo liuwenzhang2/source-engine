@@ -4407,7 +4407,7 @@ void C_BaseAnimating::RagdollMoved( void )
 	SetCollisionBounds( mins, maxs );
 
 	// If the ragdoll moves, its render-to-texture shadow is dirty
-	InvalidatePhysicsRecursive( ANIMATION_CHANGED ); 
+	GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
 }
 
 
@@ -4517,7 +4517,7 @@ void C_BaseAnimating::PostDataUpdate( DataUpdateType_t updateType )
 	bool bScaleChanged = ( m_flOldModelScale != GetModelScale() );
 	if ( bAnimationChanged || bSequenceChanged || bScaleChanged )
 	{
-		InvalidatePhysicsRecursive( ANIMATION_CHANGED );
+		GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
 	}
 
 	if ( bAnimationChanged || bSequenceChanged )
@@ -4782,7 +4782,7 @@ void C_BaseAnimating::OnDataChanged( DataUpdateType_t updateType )
 	// If there's a significant change, make sure the shadow updates
 	if ( modelchanged || (GetSequence() != m_nPrevSequence))
 	{
-		InvalidatePhysicsRecursive( ANIMATION_CHANGED ); 
+		GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
 		m_nPrevSequence = GetSequence();
 	}
 
@@ -5048,7 +5048,7 @@ void C_BaseAnimating::SetCycle( float flCycle )
 	if ( m_flCycle != flCycle )
 	{
 		m_flCycle = flCycle;
-		InvalidatePhysicsRecursive( ANIMATION_CHANGED );
+		GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
 	}
 }
 
@@ -5069,7 +5069,7 @@ void C_BaseAnimating::SetSequence( int nSequence )
 		*/
 
 		m_nSequence = nSequence; 
-		InvalidatePhysicsRecursive( ANIMATION_CHANGED );
+		GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
 		if ( m_bClientSideAnimation )
 		{
 			ClientSideAnimationChanged();
@@ -5144,7 +5144,7 @@ void C_BaseAnimating::StudioFrameAdvance()
 	// I didn't have a test case for this, but it seems like the right thing to do.  Check multi-player!
 
 	// Msg("%s : %s : %5.1f\n", GetClassname(), GetSequenceName( GetSequence() ), GetCycle() );
-	InvalidatePhysicsRecursive( ANIMATION_CHANGED );
+	GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
 #endif
 
 	if ( watch )
