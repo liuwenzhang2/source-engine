@@ -915,6 +915,7 @@ void SV_InitGameDLL( void )
 
 #if !defined(SWDS)
 	g_pServerGameSaveRestoreBlockSet->AddBlockHandler(serverGameDLL);
+	g_pServerGameSaveRestoreBlockSet->AddBlockHandler(serverEntitylist);
 #endif
 	// Tell the game DLL to start up
 	if(!serverGameDLL->DLLInit(g_AppSystemFactory, g_AppSystemFactory, g_AppSystemFactory, &g_ServerGlobalVariables))
@@ -990,6 +991,7 @@ void SV_ShutdownGameDLL( void )
 	g_pServerPluginHandler->UnloadPlugins();
 	serverGameDLL->DLLShutdown();
 #if !defined(SWDS)
+	g_pServerGameSaveRestoreBlockSet->RemoveBlockHandler(serverEntitylist);
 	g_pServerGameSaveRestoreBlockSet->RemoveBlockHandler(serverGameDLL);
 #endif
 

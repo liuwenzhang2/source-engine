@@ -15,7 +15,7 @@
 #include "iserverunknown.h"
 #include "string_t.h"
 #include "platform.h"
-
+#include "isaverestore.h"
 
 
 struct Ray_t;
@@ -176,7 +176,7 @@ public:
 //-----------------------------------------------------------------------------
 // Purpose: Exposes IClientEntity's to engine
 //-----------------------------------------------------------------------------
-abstract_class IServerEntityList : public IEntityList
+abstract_class IServerEntityList : public IEntityList, public ISaveRestoreBlockHandler
 {
 public:
 	virtual void ReserveSlot(int index) = 0;
@@ -209,6 +209,18 @@ public:
 	// Sizes entity list to specified size
 	//virtual void				SetMaxEntities(int maxents) = 0;
 	//virtual int					GetMaxEntities() = 0;
+
+	virtual const char* GetBlockName() = 0;
+
+	virtual void PreSave(CSaveRestoreData* pSaveData) = 0;
+	virtual void Save(ISave* pSave) = 0;
+	virtual void WriteSaveHeaders(ISave* pSave) = 0;
+	virtual void PostSave() = 0;
+
+	virtual void PreRestore() = 0;
+	virtual void ReadRestoreHeaders(IRestore* pRestore) = 0;
+	virtual void Restore(IRestore* pRestore, bool createPlayers) = 0;
+	virtual void PostRestore() = 0;
 };
 
 extern IServerEntityList* serverEntitylist;

@@ -62,25 +62,6 @@ public:
 	virtual void			ClientSpawned( int pPlayer ) OVERRIDE;
 };
 
-//-----------------------------------------------------------------------------
-// Utilities entities can use when saving
-//-----------------------------------------------------------------------------
-class CEntitySaveUtils : public IEntitySaveUtils
-{
-public:
-	// Call these in pre-save + post save
-	void PreSave();
-	void PostSave();
-
-	// Methods of IEntitySaveUtils
-	virtual void AddLevelTransitionSaveDependency(CBaseEntity* pEntity1, CBaseEntity* pEntity2);
-	virtual int GetEntityDependencyCount(CBaseEntity* pEntity);
-	virtual int GetEntityDependencies(CBaseEntity* pEntity, int nCount, CBaseEntity** ppEntList);
-
-private:
-	IPhysicsObjectPairHash* m_pLevelAdjacencyDependencyHash;
-};
-
 class CServerGameDLL : public IServerGameDLL
 {
 public:
@@ -217,8 +198,7 @@ public:
 
 	string_t AllocPooledString(const char* pszValue);
 
-	inline IEntitySaveUtils* GetEntitySaveUtils() { return &m_EntitySaveUtils; }
-
+	Vector ModelSpaceLandmark(int modelIndex);
 private:
 
 	// This can just be a wrapper on MapEntity_ParseAllEntities, but CS does some tricks in here
@@ -227,19 +207,7 @@ private:
 	void LoadMessageOfTheDay();
 	void LoadSpecificMOTDMsg( const ConVar &convar, const char *pszStringName );
 
-	friend int CreateEntityTransitionList(CSaveRestoreData* pSaveData, int levelMask);
-	bool SaveInitEntities(CSaveRestoreData* pSaveData);
-	bool DoRestoreEntity(CBaseEntity* pEntity, IRestore* pRestore);
-	Vector ModelSpaceLandmark(int modelIndex);
-	int RestoreEntity(CBaseEntity* pEntity, IRestore* pRestore, entitytable_t* pEntInfo);
 
-	// Find the matching global entity.  Spit out an error if the designer made entities of
-	// different classes with the same global name
-	CBaseEntity* FindGlobalEntity(string_t classname, string_t globalname);
-
-	int RestoreGlobalEntity(CBaseEntity* pEntity, CSaveRestoreData* pSaveData, entitytable_t* pEntInfo);
-
-	CEntitySaveUtils	m_EntitySaveUtils;
 };
 
 
@@ -262,37 +230,7 @@ public:
 
 extern CUtlLinkedList<CMapEntityRef, unsigned short> g_MapEntityRefs;
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-class CMapLoadEntityFilter : public IMapEntityFilter
-{
-public:
-	virtual bool ShouldCreateEntity( const char *pClassname )
-	{
-		// During map load, create all the entities.
-		return true;
-	}
 
-	virtual CBaseEntity* CreateNextEntity( const char *pClassname )
-	{
-		CBaseEntity *pRet = gEntList.CreateEntityByName( pClassname );
-
-		CMapEntityRef ref;
-		ref.m_iEdict = -1;
-		ref.m_iSerialNumber = -1;
-
-		if ( pRet && pRet->IsNetworkable())
-		{
-			ref.m_iEdict = pRet->entindex();
-			if ( pRet->entindex()!=-1 )
-				ref.m_iSerialNumber = gEntList.GetNetworkSerialNumber(pRet->entindex());
-		}
-
-		g_MapEntityRefs.AddToTail( ref );
-		return pRet;
-	}
-};
 
 bool IsEngineThreaded();
 
