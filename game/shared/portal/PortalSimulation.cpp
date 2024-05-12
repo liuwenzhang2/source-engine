@@ -1026,7 +1026,7 @@ void CPortalSimulator::ReleasePhysicsOwnership( CBaseEntity *pEntity, bool bCont
 
 						m_pLinkedPortal->m_InternalData.Simulation.Dynamic.EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
 						m_pLinkedPortal->MarkAsReleased( pClone );
-						pClone->Free();
+						CPhysicsShadowClone::ReleaseShadowClone(pClone);
 						m_pLinkedPortal->m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.FastRemove(i);
 
 						if( pHeldEntity )
@@ -1515,7 +1515,7 @@ void CPortalSimulator::ClearLocalPhysics( void )
 			m_InternalData.Simulation.Dynamic.EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
 			MarkAsReleased( pClone );
 			Assert( GetSimulatorThatOwnsEntity( pClone ) == NULL );
-			pClone->Free();
+			CPhysicsShadowClone::ReleaseShadowClone(pClone);
 		}
 
 		m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.RemoveAll();		
@@ -1585,7 +1585,7 @@ void CPortalSimulator::ClearLinkedPhysics( void )
 			CPhysicsShadowClone *pClone = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal[i];
 			m_InternalData.Simulation.Dynamic.EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
 			MarkAsReleased( pClone );
-			pClone->Free();
+			CPhysicsShadowClone::ReleaseShadowClone(pClone);
 		}
 
 		m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.RemoveAll();
@@ -1626,7 +1626,7 @@ void CPortalSimulator::ClearLinkedEntities( void )
 			CPhysicsShadowClone *pClone = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal[i];
 			m_InternalData.Simulation.Dynamic.EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
 			MarkAsReleased( pClone );
-			pClone->Free();
+			CPhysicsShadowClone::ReleaseShadowClone(pClone);
 		}
 
 		m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.RemoveAll();

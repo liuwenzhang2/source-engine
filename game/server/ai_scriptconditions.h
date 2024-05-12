@@ -115,6 +115,7 @@ public:
 #endif
 	}
 
+	void UpdateOnRemove(void);
 private:
 	void Spawn();
 	void Activate();
@@ -154,7 +155,6 @@ private:
 	int AddNewElement( CBaseEntity *pActor );
 
 	bool ActorInList( CBaseEntity *pActor );
-	void UpdateOnRemove( void );
 
 	// Input handlers
 	void InputEnable( inputdata_t &inputdata );

@@ -44,6 +44,7 @@ public:
 	};
 	virtual const char*			GetClassName() const = 0;
 	virtual ServerClass*		GetServerClass() = 0;
+	virtual void				UpdateOnRemove(void) {};
 private:
 	CBaseHandle m_RefEHandle;
 };

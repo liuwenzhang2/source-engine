@@ -5689,7 +5689,7 @@ void CSaveRestore::RequestClearSaveDir( void )
 
 void CSaveRestore::OnFinishedClientRestore()
 {
-	g_ClientDLL->DispatchOnRestore();
+	//g_ClientDLL->DispatchOnRestore();
 
 	ClearRestoredIndexTranslationTables();
 

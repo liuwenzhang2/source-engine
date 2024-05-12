@@ -305,10 +305,10 @@ public:
 	bool				HintMatchesCriteria( CAI_BaseNPC *pNPC, const CHintCriteria &hintCriteria, const Vector &position, float *flNearestDistance, bool bIgnoreLock = false, bool bIgnoreHintType = false );
 	bool				IsInNodeFOV( CBaseEntity *pOther );
 
+	virtual void		UpdateOnRemove(void);
 private:
 	void				Spawn( void );
 	virtual void		Activate();
-	virtual void		UpdateOnRemove( void );
 	int					DrawDebugTextOverlays(void);
 	virtual int			ObjectCaps( void ) { return (BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION); }
 	virtual void		OnRestore();

@@ -64,7 +64,7 @@ public:
 	virtual void	Spawn( void );
 
 	//crush, kill, DESTROY!!!!!
-	void			Free( void );
+	//void			Free( void );
 
 	//syncs to the source entity in every way possible, assumed sync does some rudimentary tests to see if the object is in sync, and if so, skips the update
 	void			FullSync( bool bAllowAssumedSync = false );
@@ -112,6 +112,7 @@ public:
 
 
 	static CPhysicsShadowClone *CreateShadowClone( IPhysicsEnvironment *pInPhysicsEnvironment, EHANDLE hEntToClone, const char *szDebugMarker, const matrix3x4_t *pTransformationMatrix = NULL );
+	static void ReleaseShadowClone(CPhysicsShadowClone* pShadowClone);
 
 	//given a physics object that is part of this clone, tells you which physics object in the source
 	IPhysicsObject *TranslatePhysicsToClonedEnt( const IPhysicsObject *pPhysics );

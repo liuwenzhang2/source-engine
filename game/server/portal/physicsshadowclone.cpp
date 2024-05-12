@@ -998,11 +998,9 @@ CPhysicsShadowClone *CPhysicsShadowClone::CreateShadowClone( IPhysicsEnvironment
 	return pClone;
 }
 
-void CPhysicsShadowClone::Free( void )
+void CPhysicsShadowClone::ReleaseShadowClone(CPhysicsShadowClone* pShadowClone)
 {
-	VPhysicsDestroyObject();
-
-	UTIL_Remove( this );
+	gEntList.DestroyEntity(pShadowClone);
 
 	//Too many shadow clones breaks the game (too many entities)
 	--g_iShadowCloneCount;

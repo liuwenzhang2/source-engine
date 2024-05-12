@@ -41,14 +41,24 @@ called each time a player is spawned into the game
 */
 void ClientPutInServer( int pEdict, const char *playername )
 {
-	CHL1_Player *pPlayer = NULL;
-
-	// Allocate a CBasePlayer for pev, and call spawn
-    if ( g_pGameRules->IsMultiplayer() )
-		pPlayer = CHL1_Player::CreatePlayer( "player_mp", pEdict );
-	else
-		pPlayer = CHL1_Player::CreatePlayer( "player", pEdict );
-
+	CHL1_Player *pPlayer = (CHL1_Player*)gEntList.GetBaseEntity(pEdict);
+	if (pPlayer == NULL) {
+		// Allocate a CBasePlayer for pev, and call spawn
+		if (g_pGameRules->IsMultiplayer())
+			pPlayer = CHL1_Player::CreatePlayer("player_mp", pEdict);
+		else
+			pPlayer = CHL1_Player::CreatePlayer("player", pEdict);
+	}
+	else {
+		if (pPlayer->m_hViewEntity)
+		{
+			engine->SetView(pEdict, pPlayer->m_hViewEntity);
+		}
+		else
+		{
+			engine->SetView(pEdict, pPlayer);
+		}
+	}
 	pPlayer->SetPlayerName( playername );
 }
 

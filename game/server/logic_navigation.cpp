@@ -24,12 +24,13 @@ class CLogicNavigation : public CLogicalEntity,
 						 public IEntityListener<CBaseEntity>
 {
 	DECLARE_CLASS( CLogicNavigation, CLogicalEntity );
+public:
 
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	void Activate( void );
 
-private:
 	void UpdateOnRemove();
+private:
 
 	void OnEntitySpawned( CBaseEntity *pEntity );
 

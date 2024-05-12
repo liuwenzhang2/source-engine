@@ -655,10 +655,6 @@ public:
 	void* GetDataObject(int type, const T* instance);
 	void* CreateDataObject(int type, T* instance);
 	void DestroyDataObject(int type, T* instance);
-	void BeginRestoreEntities();
-	void AddRestoredEntity(T* pEntity);
-	void EndRestoreEntities();
-	bool IsRestoring();
 	IEntitySaveUtils* GetEntitySaveUtils() { return &m_EntitySaveUtils; }
 
 protected:
@@ -670,6 +666,7 @@ protected:
 	void SaveEntityOnTable(T* pEntity, CSaveRestoreData* pSaveData, int& iSlot);
 
 	friend int CreateEntityTransitionList(CSaveRestoreData* pSaveData, int levelMask);
+	void AddRestoredEntity(T* pEntity);
 	bool DoRestoreEntity(T* pEntity, IRestore* pRestore);
 	int RestoreEntity(T* pEntity, IRestore* pRestore, entitytable_t* pEntInfo);
 
@@ -691,9 +688,8 @@ private:
 	CEngineObjectInternal* m_EngineObjectArray[NUM_ENT_ENTRIES];
 
 	CEntitySaveUtils	m_EntitySaveUtils;
-	CUtlVector<EHANDLE> g_RestoredEntities;
-	// just for debugging, assert that this is the only time this function is called
-	bool g_InRestore = false;
+	CUtlVector<EHANDLE> m_RestoredEntities;
+
 };
 
 extern CGlobalEntityList<CBaseEntity> gEntList;
@@ -838,6 +834,8 @@ void CGlobalEntityList<T>::PostSave()
 template<class T>
 void CGlobalEntityList<T>::PreRestore()
 {
+	CleanupDeleteList();
+	m_RestoredEntities.Purge();
 }
 
 template<class T>
@@ -864,6 +862,16 @@ void CGlobalEntityList<T>::ReadRestoreHeaders(IRestore* pRestore)
 		pRestore->ReadFields("ETABLE", pEntityTable, NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
 		pEntityTable = pSaveData->GetEntityInfo(i);
 	}
+}
+
+template<class T>
+void CGlobalEntityList<T>::AddRestoredEntity(T* pEntity)
+{
+	//Assert(m_InRestore);
+	if (!pEntity)
+		return;
+
+	m_RestoredEntities.AddToTail(EHANDLE(pEntity));
 }
 
 template<class T>
@@ -969,12 +977,6 @@ void CGlobalEntityList<T>::Restore(IRestore* pRestore, bool createPlayers)
 	}
 }
 
-template<class T>
-void CGlobalEntityList<T>::PostRestore()
-{
-}
-
-
 // Find the matching global entity.  Spit out an error if the designer made entities of
 // different classes with the same global name
 template<class T>
@@ -982,7 +984,7 @@ T* CGlobalEntityList<T>::FindGlobalEntity(string_t classname, string_t globalnam
 {
 	CBaseEntity* pReturn = NULL;
 
-	while ((pReturn = gEntList.NextEnt(pReturn)) != NULL)
+	while ((pReturn = NextEnt(pReturn)) != NULL)
 	{
 		if (FStrEq(STRING(pReturn->GetEngineObject()->GetGlobalname()), STRING(globalname)))
 			break;
@@ -1128,40 +1130,15 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, CSaveRestoreData* pSav
 }
 
 template<class T>
-void CGlobalEntityList<T>::BeginRestoreEntities()
+void CGlobalEntityList<T>::PostRestore()
 {
-	if (g_InRestore)
-	{
-		DevMsg("BeginRestoreEntities without previous EndRestoreEntities.\n");
-		CleanupDeleteList();
-	}
-	g_RestoredEntities.Purge();
-	g_InRestore = true;
-}
-
-template<class T>
-void CGlobalEntityList<T>::AddRestoredEntity(T* pEntity)
-{
-	Assert(g_InRestore);
-	if (!pEntity)
-		return;
-
-	g_RestoredEntities.AddToTail(EHANDLE(pEntity));
-}
-
-template<class T>
-void CGlobalEntityList<T>::EndRestoreEntities()
-{
-	if (!g_InRestore)
-		return;
-
 	// The entire hierarchy is restored, so we can call GetAbsOrigin again.
-	//CBaseEntity::SetAbsQueriesValid( true );
+//CBaseEntity::SetAbsQueriesValid( true );
 
-	// Call all entities' OnRestore handlers
-	for (int i = g_RestoredEntities.Count() - 1; i >= 0; --i)
+// Call all entities' OnRestore handlers
+	for (int i = m_RestoredEntities.Count() - 1; i >= 0; --i)
 	{
-		CBaseEntity* pEntity = g_RestoredEntities[i].Get();
+		CBaseEntity* pEntity = m_RestoredEntities[i].Get();
 		if (pEntity && !pEntity->IsDormant())
 		{
 			MDLCACHE_CRITICAL_SECTION();
@@ -1169,17 +1146,10 @@ void CGlobalEntityList<T>::EndRestoreEntities()
 		}
 	}
 
-	g_RestoredEntities.Purge();
-
-	g_InRestore = false;
+	m_RestoredEntities.Purge();
 	CleanupDeleteList();
 }
 
-template<class T>
-bool CGlobalEntityList<T>::IsRestoring()
-{
-	return g_InRestore;
-}
 //-----------------------------------------------------------------------------
 // Inlines.
 //-----------------------------------------------------------------------------
@@ -1760,7 +1730,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByNameNearest(const char* szName, c
 	}
 
 	CBaseEntity* pSearch = NULL;
-	while ((pSearch = gEntList.FindEntityByName(pSearch, szName, pSearchingEntity, pActivator, pCaller)) != NULL)
+	while ((pSearch = FindEntityByName(pSearch, szName, pSearchingEntity, pActivator, pCaller)) != NULL)
 	{
 		if (pSearch->entindex()==-1)
 			continue;
@@ -1800,10 +1770,10 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByNameWithin(CBaseEntity* pStartEnt
 	float flMaxDist2 = flRadius * flRadius;
 	if (flMaxDist2 == 0)
 	{
-		return gEntList.FindEntityByName(pEntity, szName, pSearchingEntity, pActivator, pCaller);
+		return FindEntityByName(pEntity, szName, pSearchingEntity, pActivator, pCaller);
 	}
 
-	while ((pEntity = gEntList.FindEntityByName(pEntity, szName, pSearchingEntity, pActivator, pCaller)) != NULL)
+	while ((pEntity = FindEntityByName(pEntity, szName, pSearchingEntity, pActivator, pCaller)) != NULL)
 	{
 		if (pEntity->entindex()==-1)
 			continue;
@@ -1843,7 +1813,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameNearest(const char* szNa
 	}
 
 	CBaseEntity* pSearch = NULL;
-	while ((pSearch = gEntList.FindEntityByClassname(pSearch, szName)) != NULL)
+	while ((pSearch = FindEntityByClassname(pSearch, szName)) != NULL)
 	{
 		if (pSearch->entindex()==-1)
 			continue;
@@ -1880,10 +1850,10 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pSta
 	float flMaxDist2 = flRadius * flRadius;
 	if (flMaxDist2 == 0)
 	{
-		return gEntList.FindEntityByClassname(pEntity, szName);
+		return FindEntityByClassname(pEntity, szName);
 	}
 
-	while ((pEntity = gEntList.FindEntityByClassname(pEntity, szName)) != NULL)
+	while ((pEntity = FindEntityByClassname(pEntity, szName)) != NULL)
 	{
 		if (pEntity->entindex()==-1)
 			continue;
@@ -1916,7 +1886,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pSta
 	//
 	CBaseEntity* pEntity = pStartEntity;
 
-	while ((pEntity = gEntList.FindEntityByClassname(pEntity, szName)) != NULL)
+	while ((pEntity = FindEntityByClassname(pEntity, szName)) != NULL)
 	{
 		if (pEntity->IsNetworkable() && pEntity->entindex()==-1)
 			continue;
@@ -1951,10 +1921,10 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityGeneric(CBaseEntity* pStartEntity, 
 {
 	CBaseEntity* pEntity = NULL;
 
-	pEntity = gEntList.FindEntityByName(pStartEntity, szName, pSearchingEntity, pActivator, pCaller);
+	pEntity = FindEntityByName(pStartEntity, szName, pSearchingEntity, pActivator, pCaller);
 	if (!pEntity)
 	{
-		pEntity = gEntList.FindEntityByClassname(pStartEntity, szName);
+		pEntity = FindEntityByClassname(pStartEntity, szName);
 	}
 
 	return pEntity;
@@ -1978,10 +1948,10 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityGenericWithin(CBaseEntity* pStartEn
 {
 	CBaseEntity* pEntity = NULL;
 
-	pEntity = gEntList.FindEntityByNameWithin(pStartEntity, szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller);
+	pEntity = FindEntityByNameWithin(pStartEntity, szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller);
 	if (!pEntity)
 	{
-		pEntity = gEntList.FindEntityByClassnameWithin(pStartEntity, szName, vecSrc, flRadius);
+		pEntity = FindEntityByClassnameWithin(pStartEntity, szName, vecSrc, flRadius);
 	}
 
 	return pEntity;
@@ -2004,10 +1974,10 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityGenericNearest(const char* szName, 
 {
 	CBaseEntity* pEntity = NULL;
 
-	pEntity = gEntList.FindEntityByNameNearest(szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller);
+	pEntity = FindEntityByNameNearest(szName, vecSrc, flRadius, pSearchingEntity, pActivator, pCaller);
 	if (!pEntity)
 	{
-		pEntity = gEntList.FindEntityByClassnameNearest(szName, vecSrc, flRadius);
+		pEntity = FindEntityByClassnameNearest(szName, vecSrc, flRadius);
 	}
 
 	return pEntity;

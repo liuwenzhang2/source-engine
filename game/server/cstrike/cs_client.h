@@ -9,7 +9,8 @@
 #ifdef _WIN32
 #pragma once
 #endif
-
+class CBaseEntity;
+class CCSPlayer;
 
 void respawn( CBaseEntity *pEdict, bool fCopyCorpse );
 

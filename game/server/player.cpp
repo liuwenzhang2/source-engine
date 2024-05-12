@@ -5280,8 +5280,7 @@ void CBasePlayer::OnRestore( void )
 {
 	BaseClass::OnRestore();
 
-
-	SetViewEntity( m_hViewEntity );
+	//SetViewEntity( m_hViewEntity );
 	SetDefaultFOV(m_iDefaultFOV);		// force this to reset if zero
 
 	// Calculate this immediately

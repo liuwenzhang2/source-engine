@@ -24,11 +24,14 @@
 #include "utlmap.h"
 #include "c_baseentity.h"
 #include "gamestringpool.h"
+#include "saverestoretypes.h"
+#include "saverestore.h"
 
 //class C_Beam;
 //class C_BaseViewModel;
 //class C_BaseEntity;
 
+extern IVEngineClient* engine;
 
 #define INPVS_YES			0x0001		// The entity thinks it's in the PVS.
 #define INPVS_THISFRAME		0x0002		// Accumulated as different views are rendered during the frame and used to notify the entity if
@@ -549,6 +552,33 @@ inline void C_EngineObjectInternal::ClearTouchStamp()
 	touchStamp = 0;
 }
 
+
+// Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.
+//class C_AllBaseEntityIterator
+//{
+//public:
+//	C_AllBaseEntityIterator();
+//
+//	void Restart();
+//	C_BaseEntity* Next();	// keep calling this until it returns null.
+//
+//private:
+//	unsigned short m_CurBaseEntity;
+//};
+
+class C_BaseEntityIterator
+{
+public:
+	C_BaseEntityIterator();
+
+	void Restart();
+	C_BaseEntity* Next();	// keep calling this until it returns null.
+
+private:
+	bool start = false;
+	CBaseHandle m_CurBaseEntity;
+};
+
 //
 // This is the IClientEntityList implemenation. It serves two functions:
 //
@@ -573,7 +603,17 @@ public:
 
 	void						Release();		// clears everything and releases entities
 
+	virtual const char*			GetBlockName();
 
+	virtual void				PreSave(CSaveRestoreData* pSaveData);
+	virtual void				Save(ISave* pSave);
+	virtual void				WriteSaveHeaders(ISave* pSave);
+	virtual void				PostSave();
+
+	virtual void				PreRestore();
+	virtual void				ReadRestoreHeaders(IRestore* pRestore);
+	virtual void				Restore(IRestore* pRestore, bool createPlayers);
+	virtual void				PostRestore();
 // Implement IClientEntityList
 public:
 
@@ -603,7 +643,10 @@ protected:
 	virtual void BeforeDestroy(IHandleEntity* pEntity);
 	virtual void OnAddEntity( T *pEnt, CBaseHandle handle );
 	virtual void OnRemoveEntity( T *pEnt, CBaseHandle handle );
-
+	bool SaveInitEntities(CSaveRestoreData* pSaveData);
+	bool DoRestoreEntity(T* pEntity, IRestore* pRestore);
+	int RestoreEntity(T* pEntity, IRestore* pRestore, entitytable_t* pEntInfo);
+	void SaveEntityOnTable(T* pEntity, CSaveRestoreData* pSaveData, int& iSlot);
 // Internal to client DLL.
 public:
 
@@ -631,17 +674,12 @@ public:
 
 	void					RecomputeHighestEntityUsed( void );
 
-
 	// Use this to iterate over all the C_BaseEntities.
-	C_BaseEntity* FirstBaseEntity() const;
-	C_BaseEntity* NextBaseEntity( C_BaseEntity *pEnt ) const;
-
-	
+	C_BaseEntity*			FirstBaseEntity() const;
+	C_BaseEntity*			NextBaseEntity( C_BaseEntity *pEnt ) const;
 
 	// Get the list of all PVS notifiers.
 	CUtlLinkedList<CPVSNotifyInfo,unsigned short>& GetPVSNotifiers();
-
-	CUtlVector<IClientEntityListener *>	m_entityListeners;
 
 	// add a class that gets notified of entity events
 	void AddListenerEntity( IClientEntityListener *pListener );
@@ -655,15 +693,21 @@ public:
 	void* GetDataObject(int type, const T* instance);
 	void* CreateDataObject(int type, T* instance);
 	void DestroyDataObject(int type, T* instance);
+
+private:
+	void AddPVSNotifier(IClientUnknown* pUnknown);
+	void RemovePVSNotifier(IClientUnknown* pUnknown);
+	void AddRestoredEntity(T* pEntity);
 private:
 
 	// Cached info for networked entities.
-	//struct EntityCacheInfo_t
-	//{
-	//	// Cached off because GetClientNetworkable is called a *lot*
-	//	IClientNetworkable *m_pNetworkable;
-	//	unsigned short m_BaseEntitiesIndex;	// Index into m_BaseEntities (or m_BaseEntities.InvalidIndex() if none).
-	//};
+//struct EntityCacheInfo_t
+//{
+//	// Cached off because GetClientNetworkable is called a *lot*
+//	IClientNetworkable *m_pNetworkable;
+//	unsigned short m_BaseEntitiesIndex;	// Index into m_BaseEntities (or m_BaseEntities.InvalidIndex() if none).
+//};
+	CUtlVector<IClientEntityListener*>	m_entityListeners;
 
 	// Current count
 	int					m_iNumServerEnts;
@@ -681,46 +725,352 @@ private:
 	// For fast iteration.
 	//CUtlLinkedList<C_BaseEntity*, unsigned short> m_BaseEntities;
 	C_EngineObjectInternal* m_EngineObjectArray[NUM_ENT_ENTRIES];
-
-private:
-
-	void AddPVSNotifier( IClientUnknown *pUnknown );
-	void RemovePVSNotifier( IClientUnknown *pUnknown );
-	
 	// These entities want to know when they enter and leave the PVS (server entities
 	// already can get the equivalent notification with NotifyShouldTransmit, but client
 	// entities have to get it this way).
 	CUtlLinkedList<CPVSNotifyInfo,unsigned short> m_PVSNotifyInfos;
 	CUtlMap<IClientUnknown*,unsigned short,unsigned short> m_PVSNotifierMap;	// Maps IClientUnknowns to indices into m_PVSNotifyInfos.
+	CUtlVector<EHANDLE> m_RestoredEntities;
+
 };
 
-
-// Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.
-//class C_AllBaseEntityIterator
-//{
-//public:
-//	C_AllBaseEntityIterator();
-//
-//	void Restart();
-//	C_BaseEntity* Next();	// keep calling this until it returns null.
-//
-//private:
-//	unsigned short m_CurBaseEntity;
-//};
-
-class C_BaseEntityIterator
+template<class T>
+const char* CClientEntityList<T>::GetBlockName()
 {
-public:
-	C_BaseEntityIterator();
+	return "Entities";
+}
 
-	void Restart();
-	C_BaseEntity* Next();	// keep calling this until it returns null.
+template<class T>
+void CClientEntityList<T>::PreSave(CSaveRestoreData* pSaveData)
+{
+	//m_EntitySaveUtils.PreSave();
 
-private:
-	bool start = false;
-	CBaseHandle m_CurBaseEntity;
-};
+	// Allow the entities to do some work
+	T* pEnt = NULL;
 
+	// Do this because it'll force entities to figure out their origins, and that requires
+	// SetupBones in the case of aiments.
+	{
+		C_BaseAnimating::AutoAllowBoneAccess boneaccess(true, true);
+
+		int last = GetHighestEntityIndex();
+		ClientEntityHandle_t iter = FirstHandle();
+
+		for (int e = 0; e <= last; e++)
+		{
+			pEnt = GetBaseEntity(e);
+
+			if (!pEnt)
+				continue;
+
+			pEnt->OnSave();
+		}
+
+		while (iter != InvalidHandle())
+		{
+			pEnt = GetBaseEntityFromHandle(iter);
+
+			if (pEnt && pEnt->ObjectCaps() & FCAP_SAVE_NON_NETWORKABLE)
+			{
+				pEnt->OnSave();
+			}
+
+			iter = NextHandle(iter);
+		}
+	}
+	SaveInitEntities(pSaveData);
+}
+
+template<class T>
+void CClientEntityList<T>::SaveEntityOnTable(T* pEntity, CSaveRestoreData* pSaveData, int& iSlot)
+{
+	entitytable_t* pEntInfo = pSaveData->GetEntityInfo(iSlot);
+	pEntInfo->id = iSlot;
+#if !defined( CLIENT_DLL )
+	pEntInfo->edictindex = pEntity->RequiredEdictIndex();
+#else
+	pEntInfo->edictindex = -1;
+#endif
+	pEntInfo->modelname = pEntity->GetModelName();
+	pEntInfo->restoreentityindex = -1;
+	pEntInfo->saveentityindex = pEntity && pEntity->IsNetworkable() ? pEntity->entindex() : -1;
+	pEntInfo->hEnt = pEntity->GetRefEHandle();
+	pEntInfo->flags = 0;
+	pEntInfo->location = 0;
+	pEntInfo->size = 0;
+	pEntInfo->classname = NULL_STRING;
+
+	iSlot++;
+}
+
+template<class T>
+bool CClientEntityList<T>::SaveInitEntities(CSaveRestoreData* pSaveData)
+{
+	int number_of_entities;
+
+	number_of_entities = NumberOfEntities(true);
+
+	entitytable_t* pEntityTable = (entitytable_t*)engine->SaveAllocMemory((sizeof(entitytable_t) * number_of_entities), sizeof(char));
+	if (!pEntityTable)
+		return false;
+
+	pSaveData->InitEntityTable(pEntityTable, number_of_entities);
+
+	// build the table of entities
+	// this is used to turn pointers into savable indices
+	// build up ID numbers for each entity, for use in pointer conversions
+	// if an entity requires a certain edict number upon restore, save that as well
+	T* pEnt = NULL;
+	int i = 0;
+
+	int last = GetHighestEntityIndex();
+
+	for (int e = 0; e <= last; e++)
+	{
+		pEnt = GetBaseEntity(e);
+		if (!pEnt)
+			continue;
+		SaveEntityOnTable(pEnt, pSaveData, i);
+	}
+
+#if defined( CLIENT_DLL )
+	ClientEntityHandle_t iter = FirstHandle();
+
+	while (iter != InvalidHandle())
+	{
+		pEnt = GetBaseEntityFromHandle(iter);
+
+		if (pEnt && pEnt->ObjectCaps() & FCAP_SAVE_NON_NETWORKABLE)
+		{
+			SaveEntityOnTable(pEnt, pSaveData, i);
+		}
+
+		iter = NextHandle(iter);
+	}
+#endif
+
+	//pSaveData->BuildEntityHash();
+
+	Assert(i == pSaveData->NumEntities());
+	return (i == pSaveData->NumEntities());
+}
+
+template<class T>
+void CClientEntityList<T>::Save(ISave* pSave)
+{
+	CGameSaveRestoreInfo* pSaveData = pSave->GetGameSaveRestoreInfo();
+
+	// write entity list that was previously built by SaveInitEntities()
+	for (int i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		entitytable_t* pEntInfo = pSaveData->GetEntityInfo(i);
+		pEntInfo->location = pSave->GetWritePos();
+		pEntInfo->size = 0;
+
+		T* pEnt = (T*)GetClientEntityFromHandle(pEntInfo->hEnt);
+		if (pEnt && !(pEnt->ObjectCaps() & FCAP_DONT_SAVE))
+		{
+			MDLCACHE_CRITICAL_SECTION();
+
+			pSaveData->SetCurrentEntityContext(pEnt);
+			pEnt->Save(*pSave);
+			pSaveData->SetCurrentEntityContext(NULL);
+
+			pEntInfo->size = pSave->GetWritePos() - pEntInfo->location;	// Size of entity block is data size written to block
+
+			pEntInfo->classname = pEnt->GetEngineObject()->GetClassname();	// Remember entity class for respawn
+
+		}
+	}
+}
+
+template<class T>
+void CClientEntityList<T>::WriteSaveHeaders(ISave* pSave)
+{
+	CGameSaveRestoreInfo* pSaveData = pSave->GetGameSaveRestoreInfo();
+
+	int nEntities = pSaveData->NumEntities();
+	pSave->WriteInt(&nEntities);
+
+	for (int i = 0; i < pSaveData->NumEntities(); i++)
+		pSave->WriteFields("ETABLE", pSaveData->GetEntityInfo(i), NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
+}
+
+template<class T>
+void CClientEntityList<T>::PostSave()
+{
+	//m_EntitySaveUtils.PostSave();
+}
+
+template<class T>
+bool CClientEntityList<T>::DoRestoreEntity(T* pEntity, IRestore* pRestore)
+{
+	MDLCACHE_CRITICAL_SECTION();
+
+	EHANDLE hEntity;
+
+	hEntity = pEntity;
+
+	pRestore->GetGameSaveRestoreInfo()->SetCurrentEntityContext(pEntity);
+	pEntity->Restore(*pRestore);
+	pRestore->GetGameSaveRestoreInfo()->SetCurrentEntityContext(NULL);
+
+#if !defined( CLIENT_DLL )
+	if (pEntity->ObjectCaps() & FCAP_MUST_SPAWN)
+	{
+		pEntity->Spawn();
+	}
+	else
+	{
+		pEntity->Precache();
+	}
+#endif
+
+	// Above calls may have resulted in self destruction
+	return (hEntity != NULL);
+}
+
+template<class T>
+int CClientEntityList<T>::RestoreEntity(T* pEntity, IRestore* pRestore, entitytable_t* pEntInfo)
+{
+	if (!DoRestoreEntity(pEntity, pRestore))
+		return 0;
+
+	return 0;
+}
+
+template<class T>
+void CClientEntityList<T>::PreRestore()
+{
+
+}
+
+template<class T>
+void CClientEntityList<T>::ReadRestoreHeaders(IRestore* pRestore)
+{
+	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
+
+	int nEntities;
+	pRestore->ReadInt(&nEntities);
+
+	entitytable_t* pEntityTable = (entitytable_t*)engine->SaveAllocMemory((sizeof(entitytable_t) * nEntities), sizeof(char));
+	if (!pEntityTable)
+	{
+		return;
+	}
+
+	pSaveData->InitEntityTable(pEntityTable, nEntities);
+
+	for (int i = 0; i < pSaveData->NumEntities(); i++) {
+		if (i == 165) {
+			int aaa = 0;
+		}
+		entitytable_t* pEntityTable = pSaveData->GetEntityInfo(i);
+		pRestore->ReadFields("ETABLE", pEntityTable, NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
+		pEntityTable = pSaveData->GetEntityInfo(i);
+	}
+}
+
+template<class T>
+void CClientEntityList<T>::AddRestoredEntity(T* pEntity)
+{
+	if (!pEntity)
+		return;
+
+	m_RestoredEntities.AddToTail(EHANDLE(pEntity));
+}
+
+template<class T>
+void CClientEntityList<T>::Restore(IRestore* pRestore, bool createPlayers)
+{
+	entitytable_t* pEntInfo;
+	CBaseEntity* pent;
+
+	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
+
+	// Create entity list
+	int i;
+	bool restoredWorld = false;
+
+	for (i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		pEntInfo = pSaveData->GetEntityInfo(i);
+		pent = GetBaseEntity(pEntInfo->restoreentityindex);
+		pEntInfo->hEnt = pent;
+	}
+
+	// Blast saved data into entities
+	for (i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		pEntInfo = pSaveData->GetEntityInfo(i);
+
+		bool bRestoredCorrectly = false;
+		// FIXME, need to translate save spot to real index here using lookup table transmitted from server
+		//Assert( !"Need translation still" );
+		if (pEntInfo->restoreentityindex >= 0)
+		{
+			if (pEntInfo->restoreentityindex == 0)
+			{
+				Assert(!restoredWorld);
+				restoredWorld = true;
+			}
+
+			pent = GetBaseEntity(pEntInfo->restoreentityindex);
+			pRestore->SetReadPos(pEntInfo->location);
+			if (pent)
+			{
+				if (RestoreEntity(pent, pRestore, pEntInfo) >= 0)
+				{
+					// Call the OnRestore method
+					AddRestoredEntity(pent);
+					bRestoredCorrectly = true;
+				}
+			}
+		}
+		// BUGBUG: JAY: Disable ragdolls across transitions until PVS/solid check & client entity patch file are implemented
+		else if (!pSaveData->levelInfo.fUseLandmark)
+		{
+			if (pEntInfo->classname != NULL_STRING)
+			{
+				pent = CreateEntityByName(STRING(pEntInfo->classname));
+				pent->InitializeAsClientEntity(NULL, RENDER_GROUP_OPAQUE_ENTITY);
+
+				pRestore->SetReadPos(pEntInfo->location);
+
+				if (pent)
+				{
+					if (RestoreEntity(pent, pRestore, pEntInfo) >= 0)
+					{
+						pEntInfo->hEnt = pent;
+						AddRestoredEntity(pent);
+						bRestoredCorrectly = true;
+					}
+				}
+			}
+		}
+
+		if (!bRestoredCorrectly)
+		{
+			pEntInfo->hEnt = NULL;
+			pEntInfo->restoreentityindex = -1;
+		}
+	}
+
+}
+
+template<class T>
+void CClientEntityList<T>::PostRestore()
+{
+	for (int i = 0; i < m_RestoredEntities.Count(); i++)
+	{
+		if (m_RestoredEntities[i] != NULL)
+		{
+			MDLCACHE_CRITICAL_SECTION();
+			m_RestoredEntities[i]->OnRestore();
+		}
+	}
+	m_RestoredEntities.RemoveAll();
+}
 
 template<class T>
 inline C_BaseEntity* CClientEntityList<T>::CreateEntityByName(const char* className, int iForceEdictIndex, int iSerialNum) {

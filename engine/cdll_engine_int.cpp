@@ -1856,6 +1856,7 @@ void ClientDLL_Init( void )
 			{
 				Sys_Error( "Could not get client entity list interface from library client" );
 			}
+			g_pClientGameSaveRestoreBlockSet->AddBlockHandler(entitylist);
 
 			centerprint = ( ICenterPrint * )g_ClientFactory( VCENTERPRINT_INTERFACE_VERSION, NULL );
 			if ( !centerprint )
@@ -1976,6 +1977,7 @@ void ClientDLL_Shutdown( void )
 
 	g_pClientSidePrediction->Shutdown();
 
+	g_pClientGameSaveRestoreBlockSet->RemoveBlockHandler(entitylist);
 	entitylist = NULL;
 	g_pClientSidePrediction = NULL;
 	g_ClientFactory = NULL;

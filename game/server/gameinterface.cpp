@@ -277,10 +277,16 @@ ConVar ai_post_frame_navigation( "ai_post_frame_navigation", "0" );
 class CPostFrameNavigationHook;
 extern CPostFrameNavigationHook *PostFrameNavigationSystem( void );
 static ConVar* g_pClosecaption = NULL;
+// just for debugging, assert that this is the only time this function is called
+static bool g_InRestore = false;
 
 void BeginRestoreEntities()
 {
-	gEntList.BeginRestoreEntities();
+	if (g_InRestore)
+	{
+		DevMsg("BeginRestoreEntities without previous EndRestoreEntities.\n");
+	}
+	g_InRestore = true;
 	engine->SetAllowPrecache(true);//CBaseEntity::
 
 	// No calls to GetAbsOrigin until the entire hierarchy is restored!
@@ -289,7 +295,9 @@ void BeginRestoreEntities()
 
 void EndRestoreEntities()
 {
-	gEntList.EndRestoreEntities();
+	if (!g_InRestore)
+		return;
+	g_InRestore = false;
 	IGameSystem::OnRestoreAllSystems();
 
 	// HACKHACK: UNDONE: We need to redesign the main loop with respect to save/load/server activate
@@ -1201,7 +1209,7 @@ void Game_SetOneWayTransition( void )
 //-----------------------------------------------------------------------------
 bool CServerGameDLL::IsRestoring()
 {
-	return gEntList.IsRestoring();
+	return g_InRestore;
 }
 
 //-----------------------------------------------------------------------------
@@ -1381,7 +1389,7 @@ bool g_bCheckForChainedActivate;
 void CServerGameDLL::ServerActivate( IServerEntity *pEdictList, int edictCount, int clientMax )
 {
 	// HACKHACK: UNDONE: We need to redesign the main loop with respect to save/load/server activate
-	if (gEntList.IsRestoring())
+	if (IsRestoring())
 		return;
 
 	if ( gEntList.ResetDeleteList() != 0 )
@@ -1477,7 +1485,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 	VPROF( "CServerGameDLL::GameFrame" );
 
 	// Don't run frames until fully restored
-	if (gEntList.IsRestoring())
+	if (IsRestoring())
 		return;
 
 	if ( CBaseEntity::IsSimulatingOnAlternateTicks() )

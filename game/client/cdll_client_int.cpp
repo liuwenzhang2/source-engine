@@ -350,15 +350,8 @@ class IClientPurchaseInterfaceV2 *g_pClientPurchaseInterface = (class IClientPur
 static ConVar *g_pcv_ThreadMode = NULL;
 static ConVar* g_pClosecaption = NULL;
 
-static CUtlVector<EHANDLE> g_RestoredEntities;
 
-void AddRestoredEntity(C_BaseEntity* pEntity)
-{
-	if (!pEntity)
-		return;
 
-	g_RestoredEntities.AddToTail(EHANDLE(pEntity));
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: interface for gameui to modify voice bans
@@ -691,7 +684,7 @@ public:
 	//virtual void			WriteSaveHeaders( CSaveRestoreData * );
 	//virtual void			ReadRestoreHeaders( CSaveRestoreData * );
 	//virtual void			Restore( CSaveRestoreData *, bool );
-	virtual void			DispatchOnRestore();
+	//virtual void			DispatchOnRestore();
 	virtual void			WriteSaveGameScreenshot( const char *pFilename );
 
 	// Given a list of "S(wavname) S(wavname2)" tokens, look up the localized text and emit
@@ -789,10 +782,8 @@ private:
 	void UncacheAllMaterials( );
 	void ResetStringTablePointers();
 
-	bool SaveInitEntities(CSaveRestoreData* pSaveData);
-	bool DoRestoreEntity(CBaseEntity* pEntity, IRestore* pRestore);
-	Vector ModelSpaceLandmark(int modelIndex);
-	int RestoreEntity(CBaseEntity* pEntity, IRestore* pRestore, entitytable_t* pEntInfo);
+	
+	//Vector ModelSpaceLandmark(int modelIndex);
 
 	CUtlVector< IMaterial * > m_CachedMaterials;
 };
@@ -920,7 +911,7 @@ ISourceVirtualReality *g_pSourceVR = NULL;
 //-----------------------------------------------------------------------------
 const char* CHLClient::GetBlockName()
 {
-	return "Entities";
+	return "ClientDLL";
 }
 
 //---------------------------------
@@ -929,102 +920,28 @@ void CHLClient::PreSave(CSaveRestoreData* pSaveData)
 {
 	MDLCACHE_CRITICAL_SECTION();
 	IGameSystem::OnSaveAllSystems();
-
-	//m_EntitySaveUtils.PreSave();
-
-	// Allow the entities to do some work
-	CBaseEntity* pEnt = NULL;
-#if !defined( CLIENT_DLL )
-	while ((pEnt = gEntList.NextEnt(pEnt)) != NULL)
-	{
-		pEnt->OnSave(&m_EntitySaveUtils);
-	}
-#else
-	// Do this because it'll force entities to figure out their origins, and that requires
-	// SetupBones in the case of aiments.
-	{
-		C_BaseAnimating::AutoAllowBoneAccess boneaccess(true, true);
-
-		int last = ClientEntityList().GetHighestEntityIndex();
-		ClientEntityHandle_t iter = ClientEntityList().FirstHandle();
-
-		for (int e = 0; e <= last; e++)
-		{
-			pEnt = ClientEntityList().GetBaseEntity(e);
-
-			if (!pEnt)
-				continue;
-
-			pEnt->OnSave();
-		}
-
-		while (iter != ClientEntityList().InvalidHandle())
-		{
-			pEnt = ClientEntityList().GetBaseEntityFromHandle(iter);
-
-			if (pEnt && pEnt->ObjectCaps() & FCAP_SAVE_NON_NETWORKABLE)
-			{
-				pEnt->OnSave();
-			}
-
-			iter = ClientEntityList().NextHandle(iter);
-		}
-	}
-#endif
-	SaveInitEntities(pSaveData);
 }
 
 //---------------------------------
-
-CBaseEntity* EntityFromHandle(CBaseHandle& handle) {
-#ifdef GAME_DLL
-	return (CBaseEntity*)gEntList.GetServerEntityFromHandle(handle);
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-	return (CBaseEntity*)ClientEntityList().GetClientEntityFromHandle(handle);
-#endif // CLIENT_DLL
-}
-
+//CBaseEntity* EntityFromHandle(CBaseHandle& handle) {
+//#ifdef GAME_DLL
+//	return (CBaseEntity*)gEntList.GetServerEntityFromHandle(handle);
+//#endif // GAME_DLL
+//#ifdef CLIENT_DLL
+//	return (CBaseEntity*)ClientEntityList().GetClientEntityFromHandle(handle);
+//#endif // CLIENT_DLL
+//}
 
 void CHLClient::Save(ISave* pSave)
 {
-	CGameSaveRestoreInfo* pSaveData = pSave->GetGameSaveRestoreInfo();
 
-	// write entity list that was previously built by SaveInitEntities()
-	for (int i = 0; i < pSaveData->NumEntities(); i++)
-	{
-		entitytable_t* pEntInfo = pSaveData->GetEntityInfo(i);
-		pEntInfo->location = pSave->GetWritePos();
-		pEntInfo->size = 0;
-
-		CBaseEntity* pEnt = EntityFromHandle(pEntInfo->hEnt);
-		if (pEnt && !(pEnt->ObjectCaps() & FCAP_DONT_SAVE))
-		{
-			MDLCACHE_CRITICAL_SECTION();
-
-			pSaveData->SetCurrentEntityContext(pEnt);
-			pEnt->Save(*pSave);
-			pSaveData->SetCurrentEntityContext(NULL);
-
-			pEntInfo->size = pSave->GetWritePos() - pEntInfo->location;	// Size of entity block is data size written to block
-
-			pEntInfo->classname = pEnt->GetEngineObject()->GetClassname();	// Remember entity class for respawn
-
-		}
-	}
 }
 
 //---------------------------------
 
 void CHLClient::WriteSaveHeaders(ISave* pSave)
 {
-	CGameSaveRestoreInfo* pSaveData = pSave->GetGameSaveRestoreInfo();
 
-	int nEntities = pSaveData->NumEntities();
-	pSave->WriteInt(&nEntities);
-
-	for (int i = 0; i < pSaveData->NumEntities(); i++)
-		pSave->WriteFields("ETABLE", pSaveData->GetEntityInfo(i), NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
 }
 
 //---------------------------------
@@ -1038,112 +955,25 @@ void CHLClient::PostSave()
 
 void CHLClient::PreRestore()
 {
+
 }
 
 //---------------------------------
 
 void CHLClient::ReadRestoreHeaders(IRestore* pRestore)
 {
-	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
 
-	int nEntities;
-	pRestore->ReadInt(&nEntities);
-
-	entitytable_t* pEntityTable = (entitytable_t*)engine->SaveAllocMemory((sizeof(entitytable_t) * nEntities), sizeof(char));
-	if (!pEntityTable)
-	{
-		return;
-	}
-
-	pSaveData->InitEntityTable(pEntityTable, nEntities);
-
-	for (int i = 0; i < pSaveData->NumEntities(); i++) {
-		if (i == 165) {
-			int aaa = 0;
-		}
-		entitytable_t* pEntityTable = pSaveData->GetEntityInfo(i);
-		pRestore->ReadFields("ETABLE", pEntityTable, NULL, entitytable_t::m_DataMap.dataDesc, entitytable_t::m_DataMap.dataNumFields);
-		pEntityTable = pSaveData->GetEntityInfo(i);
-	}
 }
 
 //---------------------------------
 
 void CHLClient::Restore(IRestore* pRestore, bool createPlayers)
 {
-	entitytable_t* pEntInfo;
-	CBaseEntity* pent;
 
-	CGameSaveRestoreInfo* pSaveData = pRestore->GetGameSaveRestoreInfo();
+}
 
-	// Create entity list
-	int i;
-	bool restoredWorld = false;
-
-	for (i = 0; i < pSaveData->NumEntities(); i++)
-	{
-		pEntInfo = pSaveData->GetEntityInfo(i);
-		pent = ClientEntityList().GetBaseEntity(pEntInfo->restoreentityindex);
-		pEntInfo->hEnt = pent;
-	}
-
-	// Blast saved data into entities
-	for (i = 0; i < pSaveData->NumEntities(); i++)
-	{
-		pEntInfo = pSaveData->GetEntityInfo(i);
-
-		bool bRestoredCorrectly = false;
-		// FIXME, need to translate save spot to real index here using lookup table transmitted from server
-		//Assert( !"Need translation still" );
-		if (pEntInfo->restoreentityindex >= 0)
-		{
-			if (pEntInfo->restoreentityindex == 0)
-			{
-				Assert(!restoredWorld);
-				restoredWorld = true;
-			}
-
-			pent = ClientEntityList().GetBaseEntity(pEntInfo->restoreentityindex);
-			pRestore->SetReadPos(pEntInfo->location);
-			if (pent)
-			{
-				if (RestoreEntity(pent, pRestore, pEntInfo) >= 0)
-				{
-					// Call the OnRestore method
-					AddRestoredEntity(pent);
-					bRestoredCorrectly = true;
-				}
-			}
-		}
-		// BUGBUG: JAY: Disable ragdolls across transitions until PVS/solid check & client entity patch file are implemented
-		else if (!pSaveData->levelInfo.fUseLandmark)
-		{
-			if (pEntInfo->classname != NULL_STRING)
-			{
-				pent = cl_entitylist->CreateEntityByName(STRING(pEntInfo->classname));
-				pent->InitializeAsClientEntity(NULL, RENDER_GROUP_OPAQUE_ENTITY);
-
-				pRestore->SetReadPos(pEntInfo->location);
-
-				if (pent)
-				{
-					if (RestoreEntity(pent, pRestore, pEntInfo) >= 0)
-					{
-						pEntInfo->hEnt = pent;
-						AddRestoredEntity(pent);
-						bRestoredCorrectly = true;
-					}
-				}
-			}
-		}
-
-		if (!bRestoredCorrectly)
-		{
-			pEntInfo->hEnt = NULL;
-			pEntInfo->restoreentityindex = -1;
-		}
-	}
-
+void CHLClient::PostRestore()
+{
 	// Note, server does this after local player connects fully
 	IGameSystem::OnRestoreAllSystems();
 
@@ -1151,138 +981,19 @@ void CHLClient::Restore(IRestore* pRestore, bool createPlayers)
 	gHUD.OnRestore();
 }
 
-void CHLClient::PostRestore()
-{
-}
-
-void SaveEntityOnTable(CBaseEntity* pEntity, CSaveRestoreData* pSaveData, int& iSlot)
-{
-	entitytable_t* pEntInfo = pSaveData->GetEntityInfo(iSlot);
-	pEntInfo->id = iSlot;
-#if !defined( CLIENT_DLL )
-	pEntInfo->edictindex = pEntity->RequiredEdictIndex();
-#else
-	pEntInfo->edictindex = -1;
-#endif
-	pEntInfo->modelname = pEntity->GetModelName();
-	pEntInfo->restoreentityindex = -1;
-	pEntInfo->saveentityindex = pEntity && pEntity->IsNetworkable() ? pEntity->entindex() : -1;
-	pEntInfo->hEnt = pEntity->GetRefEHandle();
-	pEntInfo->flags = 0;
-	pEntInfo->location = 0;
-	pEntInfo->size = 0;
-	pEntInfo->classname = NULL_STRING;
-
-	iSlot++;
-}
-
-
-//---------------------------------
-
-bool CHLClient::SaveInitEntities(CSaveRestoreData* pSaveData)
-{
-	int number_of_entities;
-
-	number_of_entities = ClientEntityList().NumberOfEntities(true);
-
-	entitytable_t* pEntityTable = (entitytable_t*)engine->SaveAllocMemory((sizeof(entitytable_t) * number_of_entities), sizeof(char));
-	if (!pEntityTable)
-		return false;
-
-	pSaveData->InitEntityTable(pEntityTable, number_of_entities);
-
-	// build the table of entities
-	// this is used to turn pointers into savable indices
-	// build up ID numbers for each entity, for use in pointer conversions
-	// if an entity requires a certain edict number upon restore, save that as well
-	CBaseEntity* pEnt = NULL;
-	int i = 0;
-
-	int last = ClientEntityList().GetHighestEntityIndex();
-
-	for (int e = 0; e <= last; e++)
-	{
-		pEnt = ClientEntityList().GetBaseEntity(e);
-		if (!pEnt)
-			continue;
-		SaveEntityOnTable(pEnt, pSaveData, i);
-	}
-
-#if defined( CLIENT_DLL )
-	ClientEntityHandle_t iter = ClientEntityList().FirstHandle();
-
-	while (iter != ClientEntityList().InvalidHandle())
-	{
-		pEnt = ClientEntityList().GetBaseEntityFromHandle(iter);
-
-		if (pEnt && pEnt->ObjectCaps() & FCAP_SAVE_NON_NETWORKABLE)
-		{
-			SaveEntityOnTable(pEnt, pSaveData, i);
-		}
-
-		iter = ClientEntityList().NextHandle(iter);
-	}
-#endif
-
-	//pSaveData->BuildEntityHash();
-
-	Assert(i == pSaveData->NumEntities());
-	return (i == pSaveData->NumEntities());
-	}
-
-//---------------------------------
-
-bool CHLClient::DoRestoreEntity(CBaseEntity * pEntity, IRestore * pRestore)
-{
-	MDLCACHE_CRITICAL_SECTION();
-
-	EHANDLE hEntity;
-
-	hEntity = pEntity;
-
-	pRestore->GetGameSaveRestoreInfo()->SetCurrentEntityContext(pEntity);
-	pEntity->Restore(*pRestore);
-	pRestore->GetGameSaveRestoreInfo()->SetCurrentEntityContext(NULL);
-
-#if !defined( CLIENT_DLL )
-	if (pEntity->ObjectCaps() & FCAP_MUST_SPAWN)
-	{
-		pEntity->Spawn();
-	}
-	else
-	{
-		pEntity->Precache();
-	}
-#endif
-
-	// Above calls may have resulted in self destruction
-	return (hEntity != NULL);
-}
-
 //---------------------------------
 // Get a reference position in model space to compute
 // changes in model space for global brush entities (designer models them in different coords!)
-Vector CHLClient::ModelSpaceLandmark(int modelIndex)
-{
-	const model_t* pModel = modelinfo->GetModel(modelIndex);
-	if (modelinfo->GetModelType(pModel) != mod_brush)
-		return vec3_origin;
-
-	Vector mins, maxs;
-	modelinfo->GetModelBounds(pModel, mins, maxs);
-	return mins;
-}
-
-
-int CHLClient::RestoreEntity(CBaseEntity * pEntity, IRestore * pRestore, entitytable_t * pEntInfo)
-{
-	if (!DoRestoreEntity(pEntity, pRestore))
-		return 0;
-
-	return 0;
-}
-
-
+//Vector CHLClient::ModelSpaceLandmark(int modelIndex)
+//{
+//	const model_t* pModel = modelinfo->GetModel(modelIndex);
+//	if (modelinfo->GetModelType(pModel) != mod_brush)
+//		return vec3_origin;
+//
+//	Vector mins, maxs;
+//	modelinfo->GetModelBounds(pModel, mins, maxs);
+//	return mins;
+//}
 
 // Purpose: Called when the DLL is first loaded.
 // Input  : engineFactory - 
@@ -2817,18 +2528,10 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 //}
 
 
-void CHLClient::DispatchOnRestore()
-{
-	for ( int i = 0; i < g_RestoredEntities.Count(); i++ )
-	{
-		if ( g_RestoredEntities[i] != NULL )
-		{
-			MDLCACHE_CRITICAL_SECTION();
-			g_RestoredEntities[i]->OnRestore();
-		}
-	}
-	g_RestoredEntities.RemoveAll();
-}
+//void CHLClient::DispatchOnRestore()
+//{
+//	ClientEntityList().DispatchOnRestore();
+//}
 
 void CHLClient::WriteSaveGameScreenshot( const char *pFilename )
 {

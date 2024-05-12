@@ -87,8 +87,20 @@ called each time a player is spawned into the game
 void ClientPutInServer( int pEdict, const char *playername )
 {
 	// Allocate a CBaseTFPlayer for pev, and call spawn
-	CDODPlayer *pPlayer = CDODPlayer::CreatePlayer( "player", pEdict );
-
+	CDODPlayer *pPlayer = (CDODPlayer*)gEntList.GetBaseEntity(pEdict);
+	if (pPlayer == NULL) {
+		pPlayer = CDODPlayer::CreatePlayer("player", pEdict);
+	}
+	else {
+		if (pPlayer->m_hViewEntity)
+		{
+			engine->SetView(pEdict, pPlayer->m_hViewEntity);
+		}
+		else
+		{
+			engine->SetView(pEdict, pPlayer);
+		}
+	}
 	pPlayer->SetPlayerName( playername );
 }
 

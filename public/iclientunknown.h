@@ -49,6 +49,7 @@ public:
 	virtual C_BaseEntity*		GetBaseEntity() = 0;
 	virtual IClientThinkable*	GetClientThinkable() = 0;
 	//virtual ClientClass*		GetClientClass() = 0;
+	virtual void				UpdateOnRemove(void) {};
 private:
 	CBaseHandle m_RefEHandle;
 };

@@ -822,6 +822,13 @@ void CGameClient::ActivatePlayer( void )
 
 		g_pServerPluginHandler->ClientPutInServer( m_nEntityIndex, m_Name );
 	}
+	else {
+		g_ServerGlobalVariables.curtime = sv.GetTime();
+
+		COM_TimestampedLog("g_pServerPluginHandler->ClientPutInServer");
+
+		g_pServerPluginHandler->ClientPutInServer(m_nEntityIndex, m_Name);
+	}
 
     COM_TimestampedLog( "g_pServerPluginHandler->ClientActive" );
 

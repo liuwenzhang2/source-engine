@@ -44,7 +44,20 @@ called each time a player is spawned into the game
 void ClientPutInServer( int pEdict, const char *playername )
 {
 	// Allocate a CBasePlayer for pev, and call spawn
-	CPortal_Player *pPlayer = CPortal_Player::CreatePlayer( "player", pEdict );
+	CPortal_Player *pPlayer = (CPortal_Player*)gEntList.GetBaseEntity(pEdict);
+	if (pPlayer == NULL) {
+		pPlayer = CPortal_Player::CreatePlayer("player", pEdict);
+	}
+	else {
+		if (pPlayer->m_hViewEntity)
+		{
+			engine->SetView(pEdict, pPlayer->m_hViewEntity);
+		}
+		else
+		{
+			engine->SetView(pEdict, pPlayer);
+		}
+	}
 	pPlayer->PlayerData()->netname = AllocPooledString( playername );
 }
 

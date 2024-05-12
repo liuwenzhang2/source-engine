@@ -15,6 +15,8 @@
 
 #include "interface.h"
 #include "icliententity.h"
+#include "isaverestore.h"
+#include "saverestoretypes.h"
 
 //class IClientEntity;
 class ClientClass;
@@ -26,9 +28,21 @@ class IClientUnknown;
 //-----------------------------------------------------------------------------
 // Purpose: Exposes IClientEntity's to engine
 //-----------------------------------------------------------------------------
-abstract_class IClientEntityList : public IEntityList
+abstract_class IClientEntityList : public IEntityList, public ISaveRestoreBlockHandler
 {
 public:
+
+	virtual const char* GetBlockName() = 0;
+
+	virtual void			PreSave(CSaveRestoreData* pSaveData) = 0;
+	virtual void			Save(ISave* pSave) = 0;
+	virtual void			WriteSaveHeaders(ISave* pSave) = 0;
+	virtual void			PostSave() = 0;
+
+	virtual void			PreRestore() = 0;
+	virtual void			ReadRestoreHeaders(IRestore* pRestore) = 0;
+	virtual void			Restore(IRestore* pRestore, bool createPlayers) = 0;
+	virtual void			PostRestore() = 0;
 
 	virtual IClientEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
 	virtual void				DestroyEntity(IHandleEntity* pEntity) = 0;

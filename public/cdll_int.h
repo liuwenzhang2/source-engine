@@ -726,7 +726,7 @@ public:
 	//virtual void			WriteSaveHeaders( CSaveRestoreData * ) = 0;
 	//virtual void			ReadRestoreHeaders( CSaveRestoreData * ) = 0;
 	//virtual void			Restore( CSaveRestoreData *, bool ) = 0;
-	virtual void			DispatchOnRestore() = 0;
+	//virtual void			DispatchOnRestore() = 0;
 
 	// Hand over the StandardRecvProxies in the client DLL's module.
 	virtual CStandardRecvProxies* GetStandardRecvProxies() = 0;

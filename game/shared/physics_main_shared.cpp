@@ -423,7 +423,7 @@ bool CBaseEntity::IsCurrentlyTouching( void ) const
 	return false;
 }
 
-//static bool g_bCleanupDatObject = true;
+static bool g_bCleanupDatObject = true;
 
 //-----------------------------------------------------------------------------
 // Purpose: Checks to see if any entities that have been touching this one
@@ -442,8 +442,8 @@ void CBaseEntity::PhysicsCheckForEntityUntouch( void )
 #ifdef PORTAL
 		CPortalTouchScope scope;
 #endif
-		//bool saveCleanup = g_bCleanupDatObject;
-		//g_bCleanupDatObject = false;
+		bool saveCleanup = g_bCleanupDatObject;
+		g_bCleanupDatObject = false;
 
 		link = root->nextLink;
 		while (link && link != root)
@@ -474,7 +474,7 @@ void CBaseEntity::PhysicsCheckForEntityUntouch( void )
 			link = nextLink;
 		}
 
-		//g_bCleanupDatObject = saveCleanup;
+		g_bCleanupDatObject = saveCleanup;
 
 		// Nothing left in list, destroy root
 		if ( root->nextLink == root &&
@@ -511,7 +511,7 @@ void CBaseEntity::PhysicsNotifyOtherOfUntouch( CBaseEntity *ent, CBaseEntity *ot
 				PhysicsRemoveToucher( other, link );
 
 				// Check for complete removal
-				if ( //g_bCleanupDatObject &&
+				if ( g_bCleanupDatObject &&
 					 root->nextLink == root && 
 					 root->prevLink == root )
 				{
@@ -562,8 +562,8 @@ void CBaseEntity::PhysicsRemoveTouchedList( CBaseEntity *ent )
 	if ( root )
 	{
 		link = root->nextLink;
-		//bool saveCleanup = g_bCleanupDatObject;
-		//g_bCleanupDatObject = false;
+		bool saveCleanup = g_bCleanupDatObject;
+		g_bCleanupDatObject = false;
 		while ( link && link != root )
 		{
 			nextLink = link->nextLink;
@@ -578,7 +578,7 @@ void CBaseEntity::PhysicsRemoveTouchedList( CBaseEntity *ent )
 			link = nextLink;
 		}
 
-		//g_bCleanupDatObject = saveCleanup;
+		g_bCleanupDatObject = saveCleanup;
 		ent->GetEngineObject()->DestroyDataObject( TOUCHLINK );
 	}
 

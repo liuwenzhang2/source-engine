@@ -502,9 +502,10 @@ void CBaseEntity::UpdateOnRemove(void)
 	// Notifies entity listeners, etc
 	gEntList.NotifyRemoveEntity(this);
 
+	GetEngineObject()->AddEFlags(EFL_KILLME);
+	AddFlag(FL_KILLME);
 	if (!IsNetworkable() || entindex() != -1)
 	{
-		AddFlag(FL_KILLME);
 		if (GetFlags() & FL_GRAPHED)
 		{
 			/*	<<TODO>>

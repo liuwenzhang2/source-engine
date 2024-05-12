@@ -1138,12 +1138,21 @@ class CEntityFactory : public IEntityFactory
 			return m_RefEHandle;
 		}
 
+		void UpdateOnRemove() {
+			if (bUpdateOnRemoved) {
+				Error("recursive UpdateOnRemove hit");
+			}
+			T::UpdateOnRemove();
+			bUpdateOnRemoved = true;
+		}
+
 	private:
 		CEntityFactory<T>* const m_pEntityFactory;
 		bool m_bInDestruction = false;
 		IEntityList* const m_pEntityList;
 		const CBaseHandle m_RefEHandle;
 		IEntityCallBack* const m_pCallBack;
+		bool bUpdateOnRemoved = false;
 		template <class U>
 		friend class CEntityFactory;
 	};
@@ -1188,6 +1197,9 @@ public:
 #ifdef CLIENT_DLL
 		((C_BaseEntity*)pEntityProxy)->Remove();
 #endif // CLIENT_DLL
+		if (!pEntityProxy->bUpdateOnRemoved) {
+			pEntityProxy->UpdateOnRemove();
+		}
 		pEntityProxy->m_pCallBack->BeforeDestroy(pEntity);
 		pEntityProxy->m_bInDestruction = true;
 		delete pEntityProxy;

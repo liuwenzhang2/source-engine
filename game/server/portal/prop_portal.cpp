@@ -1159,8 +1159,8 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 	//untouch the portal(s), will force a touch on destination after the teleport
 	{
 		m_PortalSimulator.ReleaseOwnershipOfEntity( pOther, true );
-		this->PhysicsNotifyOtherOfUntouch( this, pOther );
-		pOther->PhysicsNotifyOtherOfUntouch( pOther, this );
+		//this->PhysicsNotifyOtherOfUntouch( this, pOther );
+		//pOther->PhysicsNotifyOtherOfUntouch( pOther, this );
 
 		m_hLinkedPortal->m_PortalSimulator.TakeOwnershipOfEntity( pOther );
 
@@ -1261,7 +1261,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		//UTIL_TraceEntity( pOther, ptNewOrigin, ptNewOrigin, MASK_SOLID, pOther, COLLISION_GROUP_NONE, &Trace ); //fires off some asserts, and we just need a dummy anyways
 
 		pOther->PhysicsMarkEntitiesAsTouching( m_hLinkedPortal.Get(), Trace );
-		m_hLinkedPortal.Get()->PhysicsMarkEntitiesAsTouching( pOther, Trace );
+		//m_hLinkedPortal.Get()->PhysicsMarkEntitiesAsTouching( pOther, Trace );
 	}
 
 	// Notify the entity that it's being teleported
