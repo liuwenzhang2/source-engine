@@ -1784,7 +1784,6 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	//DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsVelocity, engineObjectFuncs),
 	DEFINE_KEYFIELD( m_vecAngVelocity, FIELD_VECTOR, "avelocity" ),
 //	DEFINE_FIELD( m_vecAbsAngVelocity, FIELD_VECTOR ),
-	//DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
 
 	DEFINE_KEYFIELD( m_nWaterLevel, FIELD_CHARACTER, "waterlevel" ),
 	DEFINE_FIELD( m_nWaterType, FIELD_CHARACTER ),

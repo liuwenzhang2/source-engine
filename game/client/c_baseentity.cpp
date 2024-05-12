@@ -4497,7 +4497,6 @@ BEGIN_DATADESC_NO_BASE( C_BaseEntity )
 	DEFINE_FIELD( m_ModelName, FIELD_STRING ),
 	//DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsOrigin, engineObjectFuncs),
 	//DEFINE_CUSTOM_FIELD_INVALID( m_angAbsRotation, engineObjectFuncs),
-	//DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
 	DEFINE_FIELD( m_fFlags, FIELD_INTEGER ),
 END_DATADESC()
 
