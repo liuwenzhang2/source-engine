@@ -754,7 +754,7 @@ void CClientEntityList<T>::PreSave(CSaveRestoreData* pSaveData)
 		C_BaseAnimating::AutoAllowBoneAccess boneaccess(true, true);
 
 		int last = GetHighestEntityIndex();
-		ClientEntityHandle_t iter = FirstHandle();
+		ClientEntityHandle_t iter = BaseClass::FirstHandle();
 
 		for (int e = 0; e <= last; e++)
 		{
@@ -766,7 +766,7 @@ void CClientEntityList<T>::PreSave(CSaveRestoreData* pSaveData)
 			pEnt->OnSave();
 		}
 
-		while (iter != InvalidHandle())
+		while (iter != BaseClass::InvalidHandle())
 		{
 			pEnt = GetBaseEntityFromHandle(iter);
 
@@ -775,7 +775,7 @@ void CClientEntityList<T>::PreSave(CSaveRestoreData* pSaveData)
 				pEnt->OnSave();
 			}
 
-			iter = NextHandle(iter);
+			iter = BaseClass::NextHandle(iter);
 		}
 	}
 	SaveInitEntities(pSaveData);
@@ -834,9 +834,9 @@ bool CClientEntityList<T>::SaveInitEntities(CSaveRestoreData* pSaveData)
 	}
 
 #if defined( CLIENT_DLL )
-	ClientEntityHandle_t iter = FirstHandle();
+	ClientEntityHandle_t iter = BaseClass::FirstHandle();
 
-	while (iter != InvalidHandle())
+	while (iter != BaseClass::InvalidHandle())
 	{
 		pEnt = GetBaseEntityFromHandle(iter);
 
@@ -845,7 +845,7 @@ bool CClientEntityList<T>::SaveInitEntities(CSaveRestoreData* pSaveData)
 			SaveEntityOnTable(pEnt, pSaveData, i);
 		}
 
-		iter = NextHandle(iter);
+		iter = BaseClass::NextHandle(iter);
 	}
 #endif
 
