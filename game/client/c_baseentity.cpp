@@ -347,19 +347,6 @@ void RecvProxy_SimulationTime( const CRecvProxyData *pData, void *pStruct, void 
 	pEntity->m_flSimulationTime = ( t * TICK_INTERVAL );
 }
 
-//void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *pOut )
-//{
-//	CBaseEntity *pEnt = (CBaseEntity *)pStruct;
-//
-//	Vector vecVelocity;
-//	
-//	vecVelocity.x = pData->m_Value.m_Vector[0];
-//	vecVelocity.y = pData->m_Value.m_Vector[1];
-//	vecVelocity.z = pData->m_Value.m_Vector[2];
-//
-//	// SetLocalVelocity checks to see if the value has changed
-//	pEnt->GetEngineObject()->SetLocalVelocity( vecVelocity );
-//}
 void RecvProxy_ToolRecording( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
 	if ( !ToolsEnabled() )

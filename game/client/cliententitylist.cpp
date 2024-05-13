@@ -109,6 +109,20 @@ void RecvProxy_IntToMoveParent(const CRecvProxyData* pData, void* pStruct, void*
 	}
 }
 
+void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *pOut )
+{
+	C_EngineObjectInternal *pEnt = (C_EngineObjectInternal*)pStruct;
+
+	Vector vecVelocity;
+	
+	vecVelocity.x = pData->m_Value.m_Vector[0];
+	vecVelocity.y = pData->m_Value.m_Vector[1];
+	vecVelocity.z = pData->m_Value.m_Vector[2];
+
+	// SetLocalVelocity checks to see if the value has changed
+	pEnt->SetLocalVelocity( vecVelocity );
+}
+
 BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO(testNetwork)),
 	RecvPropVector(RECVINFO_NAME(m_vecNetworkOrigin, m_vecOrigin)),
@@ -117,7 +131,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 #else
 	RecvPropQAngles(RECVINFO_NAME(m_angNetworkAngles, m_angRotation)),
 #endif
-	RecvPropVector(RECVINFO(m_vecVelocity)),//, 0, RecvProxy_LocalVelocity
+	RecvPropVector(RECVINFO(m_vecVelocity), 0, RecvProxy_LocalVelocity),
 	RecvPropInt(RECVINFO_NAME(m_hNetworkMoveParent, moveparent), 0, RecvProxy_IntToMoveParent),
 	RecvPropInt(RECVINFO(m_iParentAttachment)),
 END_RECV_TABLE()
