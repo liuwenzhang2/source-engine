@@ -20,7 +20,13 @@
 #include "tier0/memdbgon.h"
 
 // SINGLE_INHERITANCE restricts the size of CBaseEntity pointers-to-member-functions to 4 bytes
+#ifdef CBaseEntity
+#undef CBaseEntity
 class SINGLE_INHERITANCE CBaseEntity;
+#define CBaseEntity	C_BaseEntity
+#else
+class SINGLE_INHERITANCE CBaseEntity;
+#endif
 struct inputdata_t;
 
 #define INVALID_TIME (FLT_MAX * -1.0) // Special value not rebased on save/load
@@ -248,7 +254,13 @@ class ISaveRestoreOps;
 //
 // Function prototype for all input handlers.
 //
+#ifdef CBaseEntity
+#undef CBaseEntity
 typedef void (CBaseEntity::*inputfunc_t)(inputdata_t &data);
+#define CBaseEntity	C_BaseEntity
+#else
+typedef void (CBaseEntity::* inputfunc_t)(inputdata_t& data);
+#endif
 
 class datamap_t;
 class typedescription_t;
@@ -649,6 +661,85 @@ private:
 };
 
 //-----------------------------------------------------------------------------
+
+#ifndef GAME_DLL
+#ifndef NO_ENTITY_PREDICTION
+#define DECLARE_PREDICTABLE()											\
+	public:																\
+		static typedescription_t m_PredDesc[];							\
+		static datamap_t m_PredMap;										\
+		virtual datamap_t *GetPredDescMap( void );						\
+		template <typename T> friend datamap_t *PredMapInit(T *)
+#else
+#define DECLARE_PREDICTABLE()	template <typename T> friend datamap_t *PredMapInit(T *)
+#endif
+
+#ifndef NO_ENTITY_PREDICTION
+#define BEGIN_PREDICTION_DATA( className ) \
+	datamap_t className::m_PredMap = { 0, 0, #className, &BaseClass::m_PredMap }; \
+	datamap_t *className::GetPredDescMap( void ) { return &m_PredMap; } \
+	BEGIN_PREDICTION_DATA_GUTS( className )
+
+#define BEGIN_PREDICTION_DATA_NO_BASE( className ) \
+	datamap_t className::m_PredMap = { 0, 0, #className, NULL }; \
+	datamap_t *className::GetPredDescMap( void ) { return &m_PredMap; } \
+	BEGIN_PREDICTION_DATA_GUTS( className )
+
+#define BEGIN_PREDICTION_DATA_GUTS( className ) \
+	template <typename T> datamap_t *PredMapInit(T *); \
+	template <> datamap_t *PredMapInit<className>( className * ); \
+	namespace className##_PredDataDescInit \
+	{ \
+		datamap_t *g_PredMapHolder = PredMapInit( (className *)NULL ); /* This can/will be used for some clean up duties later */ \
+	} \
+	\
+	template <> datamap_t *PredMapInit<className>( className * ) \
+	{ \
+		typedef className classNameTypedef; \
+		static typedescription_t predDesc[] = \
+		{ \
+		{ FIELD_VOID,0, {0,0},0,0,0,0,0,0}, /* so you can define "empty" tables */
+
+#define END_PREDICTION_DATA() \
+		}; \
+		\
+		if ( sizeof( predDesc ) > sizeof( predDesc[0] ) ) \
+		{ \
+			classNameTypedef::m_PredMap.dataNumFields = ARRAYSIZE( predDesc ) - 1; \
+			classNameTypedef::m_PredMap.dataDesc 	  = &predDesc[1]; \
+		} \
+		else \
+		{ \
+			classNameTypedef::m_PredMap.dataNumFields = 1; \
+			classNameTypedef::m_PredMap.dataDesc 	  = predDesc; \
+		} \
+		return &classNameTypedef::m_PredMap; \
+	}
+#else
+#define BEGIN_PREDICTION_DATA( className ) \
+	template <> inline datamap_t *PredMapInit<className>( className * ) \
+	{ \
+		if ( 0 ) \
+		{ \
+			typedef className classNameTypedef; \
+			typedescription_t predDesc[] = \
+			{ \
+				{ FIELD_VOID,0, {0,0},0,0,0,0,0,0},
+
+#define BEGIN_PREDICTION_DATA_NO_BASE( className ) BEGIN_PREDICTION_DATA( className )
+
+#define END_PREDICTION_DATA() \
+			}; \
+			predDesc[0].flags = 0; /* avoid compiler warning of unused data */ \
+		} \
+	}
+#endif
+#else
+// nothing, only client and engine has a prediction system
+#define DECLARE_PREDICTABLE()	
+#define BEGIN_PREDICTION_DATA( className ) 
+#define END_PREDICTION_DATA() 
+#endif // !GAME_DLL
 
 #include "tier0/memdbgoff.h"
 

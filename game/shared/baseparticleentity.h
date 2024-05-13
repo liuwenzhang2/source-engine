@@ -12,7 +12,7 @@
 #ifndef PARTICLE_BASEEFFECT_H
 #define PARTICLE_BASEEFFECT_H
 
-#include "predictable_entity.h"
+//#include "predictable_entity.h"
 #include "baseentity_shared.h"
 
 #if defined( CLIENT_DLL )

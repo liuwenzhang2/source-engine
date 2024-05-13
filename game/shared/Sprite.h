@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include "predictable_entity.h"
+//#include "predictable_entity.h"
 #include "baseentity_shared.h"
 
 #define SF_SPRITE_STARTON		0x0001

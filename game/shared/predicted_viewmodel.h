@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include "predictable_entity.h"
+//#include "predictable_entity.h"
 #include "utlvector.h"
 #include "baseplayer_shared.h"
 #include "shared_classnames.h"

@@ -40,6 +40,7 @@
 #include "cdll_bounded_cvars.h"
 #include "inetchannelinfo.h"
 #include "proto_version.h"
+#include "predictioncopy.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -77,138 +78,7 @@ static unsigned short g_iAbsRecomputationStackPos = 0;
 static CUtlLinkedList<C_BaseEntity*, unsigned short> g_InterpolationList;
 static CUtlLinkedList<C_BaseEntity*, unsigned short> g_TeleportList;
 
-#if !defined( NO_ENTITY_PREDICTION )
-//-----------------------------------------------------------------------------
-// Purpose: Maintains a list of predicted or client created entities
-//-----------------------------------------------------------------------------
-class CPredictableList : public IPredictableList
-{
-public:
-	virtual C_BaseEntity *GetPredictable( int slot );
-	virtual int GetPredictableCount( void );
 
-protected:
-	void	AddToPredictableList( ClientEntityHandle_t add );
-	void	RemoveFromPredictablesList( ClientEntityHandle_t remove );
-
-private:
-	CUtlVector< ClientEntityHandle_t >	m_Predictables;
-
-	friend class C_BaseEntity;
-};
-
-// Create singleton
-static CPredictableList g_Predictables;
-IPredictableList *predictables = &g_Predictables;
-
-//-----------------------------------------------------------------------------
-// Purpose: Add entity to list
-// Input  : add - 
-// Output : int
-//-----------------------------------------------------------------------------
-void CPredictableList::AddToPredictableList( ClientEntityHandle_t add )
-{
-	// This is a hack to remap slot to index
-	if ( m_Predictables.Find( add ) != m_Predictables.InvalidIndex() )
-	{
-		return;
-	}
-
-	// Add to general list
-	m_Predictables.AddToTail( add );
-
-	// Maintain sort order by entindex
-	int count = m_Predictables.Size();
-	if ( count < 2 )
-		return;
-
-	int i, j;
-	for ( i = 0; i < count; i++ )
-	{
-		for ( j = i + 1; j < count; j++ )
-		{
-			ClientEntityHandle_t h1 = m_Predictables[ i ];
-			ClientEntityHandle_t h2 = m_Predictables[ j ];
-
-			C_BaseEntity *p1 = cl_entitylist->GetBaseEntityFromHandle( h1 );
-			C_BaseEntity *p2 = cl_entitylist->GetBaseEntityFromHandle( h2 );
-
-			if ( !p1 || !p2 )
-			{
-				Assert( 0 );
-				continue;
-			}
-
-			if ( p1->entindex() != -1 && 
-				 p2->entindex() != -1 )
-			{
-				if ( p1->entindex() < p2->entindex() )
-					continue;
-			}
-
-			if ( p2->entindex() == -1 )
-				continue;
-
-			m_Predictables[ i ] = h2;
-			m_Predictables[ j ] = h1;
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : remove - 
-//-----------------------------------------------------------------------------
-void CPredictableList::RemoveFromPredictablesList( ClientEntityHandle_t remove )
-{
-	m_Predictables.FindAndRemove( remove );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : slot - 
-// Output : C_BaseEntity
-//-----------------------------------------------------------------------------
-C_BaseEntity *CPredictableList::GetPredictable( int slot )
-{
-	return cl_entitylist->GetBaseEntityFromHandle( m_Predictables[ slot ] );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : int
-//-----------------------------------------------------------------------------
-int CPredictableList::GetPredictableCount( void )
-{
-	return m_Predictables.Count();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Searc predictables for previously created entity (by testId)
-// Input  : testId - 
-// Output : static C_BaseEntity
-//-----------------------------------------------------------------------------
-//static C_BaseEntity *FindPreviouslyCreatedEntity( CPredictableId& testId )
-//{
-//	int c = predictables->GetPredictableCount();
-//
-//	int i;
-//	for ( i = 0; i < c; i++ )
-//	{
-//		C_BaseEntity *e = predictables->GetPredictable( i );
-//		if ( !e || !e->IsClientCreated() )
-//			continue;
-//
-//		// Found it, note use of operator ==
-//		if ( testId == e->m_PredictableID )
-//		{
-//			return e;
-//		}
-//	}
-//
-//	return NULL;
-//}
-#endif
 
 abstract_class IRecordingList
 {
@@ -1008,7 +878,7 @@ void C_BaseEntity::Term()
 	// Remove from the predictables list
 	if ( GetPredictable() /*|| IsClientCreated()*/)
 	{
-		g_Predictables.RemoveFromPredictablesList( GetClientHandle() );
+		predictables->RemoveFromPredictablesList( GetClientHandle() );
 	}
 
 	// If it's play simulated, remove from simulation list if the player still exists...
@@ -3605,7 +3475,7 @@ void C_BaseEntity::ShutdownPredictable( void )
 #if !defined( NO_ENTITY_PREDICTION )
 	Assert( GetPredictable() );
 
-	g_Predictables.RemoveFromPredictablesList( GetClientHandle() );
+	predictables->RemoveFromPredictablesList( GetClientHandle() );
 	GetEngineObject()->DestroyIntermediateData();
 	SetPredictable( false );
 #endif
@@ -3624,7 +3494,7 @@ void C_BaseEntity::InitPredictable( void )
 	// Allocate buffers into which we copy data
 	GetEngineObject()->AllocateIntermediateData();
 	// Add to list of predictables
-	g_Predictables.AddToPredictableList( GetClientHandle() );
+	predictables->AddToPredictableList( GetClientHandle() );
 	// Copy everything from "this" into the original_state_data
 	//  object.  Don't care about client local stuff, so pull from slot 0 which
 

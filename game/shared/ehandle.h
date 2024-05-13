@@ -24,6 +24,14 @@
 
 
 //class IHandleEntity;
+#ifdef CLIENT_DLL
+class C_BaseEntity;
+typedef CHandle<C_BaseEntity> EHANDLE;
+#endif // CLIENT_DLL
+#ifdef GAME_DLL
+class CBaseEntity;
+typedef CHandle<CBaseEntity> EHANDLE;
+#endif // GAME_DLL
 
 
 

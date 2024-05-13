@@ -67,8 +67,10 @@
 
 #include "datamap.h"
 #include "util.h"
-#include "predictable_entity.h"
+//#include "predictable_entity.h"
 //#include "predictableid.h"
+#include "ehandle.h"
+#include "sendproxy.h"
 #include "variant_t.h"
 #include "takedamageinfo.h"
 #include "utllinkedlist.h"

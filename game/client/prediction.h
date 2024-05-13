@@ -20,6 +20,30 @@
 class CMoveData;
 class CUserCmd;
 
+#if !defined( NO_ENTITY_PREDICTION )
+//-----------------------------------------------------------------------------
+// Purpose: Maintains a list of predicted or client created entities
+//-----------------------------------------------------------------------------
+class CPredictableList : public IPredictableList
+{
+public:
+	virtual C_BaseEntity* GetPredictable(int slot);
+	virtual int GetPredictableCount(void);
+
+protected:
+	void	AddToPredictableList(CBaseHandle add);
+	void	RemoveFromPredictablesList(CBaseHandle remove);
+
+private:
+	CUtlVector<CBaseHandle>	m_Predictables;
+
+	friend class C_BaseEntity;
+};
+
+// Expose interface to rest of .dll
+extern IPredictableList* predictables;
+#endif
+
 //-----------------------------------------------------------------------------
 // Purpose: Implements prediction in the client .dll
 //-----------------------------------------------------------------------------

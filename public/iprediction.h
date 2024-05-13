@@ -19,6 +19,7 @@
 
 #include "interface.h"
 #include "mathlib/vector.h" // Solely to get at define for QAngle
+#include "basehandle.h"
 
 
 class IMoveHelper;
@@ -63,5 +64,17 @@ public:
 extern IPrediction *g_pClientSidePrediction;
 
 #define VCLIENT_PREDICTION_INTERFACE_VERSION	"VClientPrediction001"
+
+// Interface used by client and server to track predictable entities
+abstract_class IPredictableList
+{
+public:
+	// Get predictables by index
+	virtual CBaseEntity * GetPredictable(int slot) = 0;
+	// Get count of predictables
+	virtual int		GetPredictableCount(void) = 0;
+	virtual void	AddToPredictableList(CBaseHandle add) = 0;
+	virtual void	RemoveFromPredictablesList(CBaseHandle remove) = 0;
+};
 
 #endif // IPREDICTION_H

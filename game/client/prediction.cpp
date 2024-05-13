@@ -20,6 +20,7 @@
 #include "con_nprint.h"
 #include "hud_pdump.h"
 #include "datacache/imdlcache.h"
+#include "predictioncopy.h"
 
 #ifdef HL2_CLIENT_DLL
 #include "c_basehlplayer.h"
@@ -79,8 +80,119 @@ static C_BaseEntity *FindPredictableByGameClass( const char *classname )
 
 	return NULL;
 }
-#endif
 
+// Create singleton
+static CPredictableList g_Predictables;
+IPredictableList* predictables = &g_Predictables;
+
+//-----------------------------------------------------------------------------
+// Purpose: Add entity to list
+// Input  : add - 
+// Output : int
+//-----------------------------------------------------------------------------
+void CPredictableList::AddToPredictableList(CBaseHandle add)
+{
+	// This is a hack to remap slot to index
+	if (m_Predictables.Find(add) != m_Predictables.InvalidIndex())
+	{
+		return;
+	}
+
+	// Add to general list
+	m_Predictables.AddToTail(add);
+
+	// Maintain sort order by entindex
+	int count = m_Predictables.Size();
+	if (count < 2)
+		return;
+
+	int i, j;
+	for (i = 0; i < count; i++)
+	{
+		for (j = i + 1; j < count; j++)
+		{
+			ClientEntityHandle_t h1 = m_Predictables[i];
+			ClientEntityHandle_t h2 = m_Predictables[j];
+
+			C_BaseEntity* p1 = cl_entitylist->GetBaseEntityFromHandle(h1);
+			C_BaseEntity* p2 = cl_entitylist->GetBaseEntityFromHandle(h2);
+
+			if (!p1 || !p2)
+			{
+				Assert(0);
+				continue;
+			}
+
+			if (p1->entindex() != -1 &&
+				p2->entindex() != -1)
+			{
+				if (p1->entindex() < p2->entindex())
+					continue;
+			}
+
+			if (p2->entindex() == -1)
+				continue;
+
+			m_Predictables[i] = h2;
+			m_Predictables[j] = h1;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : remove - 
+//-----------------------------------------------------------------------------
+void CPredictableList::RemoveFromPredictablesList(CBaseHandle remove)
+{
+	m_Predictables.FindAndRemove(remove);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : slot - 
+// Output : C_BaseEntity
+//-----------------------------------------------------------------------------
+C_BaseEntity* CPredictableList::GetPredictable(int slot)
+{
+	return cl_entitylist->GetBaseEntityFromHandle(m_Predictables[slot]);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : int
+//-----------------------------------------------------------------------------
+int CPredictableList::GetPredictableCount(void)
+{
+	return m_Predictables.Count();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Searc predictables for previously created entity (by testId)
+// Input  : testId - 
+// Output : static C_BaseEntity
+//-----------------------------------------------------------------------------
+//static C_BaseEntity *FindPreviouslyCreatedEntity( CPredictableId& testId )
+//{
+//	int c = predictables->GetPredictableCount();
+//
+//	int i;
+//	for ( i = 0; i < c; i++ )
+//	{
+//		C_BaseEntity *e = predictables->GetPredictable( i );
+//		if ( !e || !e->IsClientCreated() )
+//			continue;
+//
+//		// Found it, note use of operator ==
+//		if ( testId == e->m_PredictableID )
+//		{
+//			return e;
+//		}
+//	}
+//
+//	return NULL;
+//}
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 

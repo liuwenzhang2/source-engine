@@ -14,9 +14,9 @@
 #include "edict.h"
 #include "networkvar.h"
 // Only care about this stuff in game/client .dlls
-#if defined( CLIENT_DLL )
-#include "predictable_entity.h"
-#endif
+//#if defined( CLIENT_DLL )
+//#include "predictable_entity.h"
+//#endif
 
 class CPlayerState
 {

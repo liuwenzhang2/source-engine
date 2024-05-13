@@ -812,5 +812,24 @@ SendProp SendPropExclude(
 	const char *pPropName		// Name of the property to exclude.
 	);
 
+#ifdef GAME_DLL
+#define DECLARE_NETWORKCLASS()											\
+		DECLARE_SERVERCLASS()
+
+#define DECLARE_NETWORKCLASS_NOBASE()									\
+		DECLARE_SERVERCLASS_NOBASE()	
+
+#define BEGIN_NETWORK_TABLE( className, tableName ) BEGIN_SEND_TABLE( className, tableName )
+#define BEGIN_NETWORK_TABLE_NOBASE( className, tableName ) BEGIN_SEND_TABLE_NOBASE( className, tableName )
+
+#define END_NETWORK_TABLE	END_SEND_TABLE
+
+#define IMPLEMENT_NETWORKCLASS_ALIASED(className, dataTable)			\
+	IMPLEMENT_SERVERCLASS( C##className, dataTable )
+#define IMPLEMENT_NETWORKCLASS(className, dataTable)			\
+	IMPLEMENT_SERVERCLASS(className, dataTable)
+#define IMPLEMENT_NETWORKCLASS_DT(className, dataTable)			\
+	IMPLEMENT_SERVERCLASS_ST(className, dataTable)
+#endif // GAME_DLL
 
 #endif // DATATABLE_SEND_H

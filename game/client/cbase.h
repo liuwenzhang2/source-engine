@@ -29,8 +29,10 @@ struct studiohdr_t;
 
 // These two have to be included very early
 //#include <predictableid.h>
-#include <predictable_entity.h>
-
+//#include <predictable_entity.h>
+#include "ehandle.h"
+#include "recvproxy.h"
+#include "shared_classnames.h"
 #include "cdll_util.h"
 #include <util_shared.h>
 

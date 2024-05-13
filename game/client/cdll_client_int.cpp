@@ -133,6 +133,7 @@
 #include "model_types.h"
 #include "movetype_push.h"
 #include "vphysicsupdateai.h"
+#include "predictioncopy.h"
 
 #if defined( TF_CLIENT_DLL )
 #include "abuse_report.h"

@@ -12,7 +12,7 @@
 
 #include "sharedInterface.h"
 #include "vphysics_interface.h"
-#include "predictable_entity.h"
+//#include "predictable_entity.h"
 #include "soundflags.h"
 #include "weapon_parse.h"
 #include "baseviewmodel_shared.h"

@@ -26,7 +26,7 @@
 #include "hierarchy.h"
 #endif
 
-#include "predictable_entity.h"
+//#include "predictable_entity.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

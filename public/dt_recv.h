@@ -574,4 +574,24 @@ inline void	RecvProp::SetParentArrayPropName( const char *pArrayPropName )
 	m_pParentArrayPropName = pArrayPropName;
 }
 
+#ifdef CLIENT_DLL
+#define DECLARE_NETWORKCLASS()											\
+		DECLARE_CLIENTCLASS()
+
+#define DECLARE_NETWORKCLASS_NOBASE()									\
+		DECLARE_CLIENTCLASS_NOBASE()							
+
+#define BEGIN_NETWORK_TABLE( className, tableName ) BEGIN_RECV_TABLE( className, tableName )
+#define BEGIN_NETWORK_TABLE_NOBASE( className, tableName ) BEGIN_RECV_TABLE_NOBASE( className, tableName )
+
+#define END_NETWORK_TABLE	END_RECV_TABLE
+
+#define IMPLEMENT_NETWORKCLASS_ALIASED(className, dataTable)			\
+	IMPLEMENT_CLIENTCLASS( C_##className, dataTable, C##className )
+#define IMPLEMENT_NETWORKCLASS(className, dataTable)			\
+	IMPLEMENT_CLIENTCLASS(className, dataTable, className)
+#define IMPLEMENT_NETWORKCLASS_DT(className, dataTable)			\
+	IMPLEMENT_CLIENTCLASS_DT(className, dataTable, className)
+#endif // CLIENT_DLL
+
 #endif // DATATABLE_RECV_H
