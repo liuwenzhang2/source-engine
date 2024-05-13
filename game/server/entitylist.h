@@ -1040,13 +1040,13 @@ int CGlobalEntityList<T>::RestoreEntity(T* pEntity, IRestore* pRestore, entityta
 #if !defined( CLIENT_DLL )		
 	if (pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING)
 	{
-		int globalIndex = GlobalEntity_GetIndex(pEntity->GetEngineObject()->GetGlobalname());
+		int globalIndex = engine->GlobalEntity_GetIndex(pEntity->GetEngineObject()->GetGlobalname());
 		if (globalIndex >= 0)
 		{
 			// Already dead? delete
-			if (GlobalEntity_GetState(globalIndex) == GLOBAL_DEAD)
+			if (engine->GlobalEntity_GetState(globalIndex) == GLOBAL_DEAD)
 				return -1;
-			else if (!FStrEq(STRING(gpGlobals->mapname), GlobalEntity_GetMap(globalIndex)))
+			else if (!FStrEq(STRING(gpGlobals->mapname), engine->GlobalEntity_GetMap(globalIndex)))
 			{
 				pEntity->MakeDormant();	// Hasn't been moved to this level yet, wait but stay alive
 			}
@@ -1056,7 +1056,7 @@ int CGlobalEntityList<T>::RestoreEntity(T* pEntity, IRestore* pRestore, entityta
 		{
 			Warning("Global Entity %s (%s) not in table!!!\n", STRING(pEntity->GetEngineObject()->GetGlobalname()), STRING(pEntity->GetEngineObject()->GetClassname()));
 			// Spawned entities default to 'On'
-			GlobalEntity_Add(pEntity->GetEngineObject()->GetGlobalname(), gpGlobals->mapname, GLOBAL_ON);
+			engine->GlobalEntity_Add(pEntity->GetEngineObject()->GetGlobalname(), gpGlobals->mapname, GLOBAL_ON);
 		}
 	}
 #endif
@@ -1079,13 +1079,13 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, CSaveRestoreData* pSav
 
 	// -------------------
 
-	int globalIndex = GlobalEntity_GetIndex(globalName);
+	int globalIndex = engine->GlobalEntity_GetIndex(globalName);
 
 	// Don't overlay any instance of the global that isn't the latest
 	// pSaveData->szCurrentMapName is the level this entity is coming from
 	// pGlobal->levelName is the last level the global entity was active in.
 	// If they aren't the same, then this global update is out of date.
-	if (!FStrEq(pSaveData->levelInfo.szCurrentMapName, GlobalEntity_GetMap(globalIndex)))
+	if (!FStrEq(pSaveData->levelInfo.szCurrentMapName, engine->GlobalEntity_GetMap(globalIndex)))
 	{
 		return 0;
 	}
@@ -1107,7 +1107,7 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, CSaveRestoreData* pSav
 		pEntity->VPhysicsDestroyObject();
 		Assert(pEntInfo->edictindex == -1);
 		// Update the global table to say that the global definition of this entity should come from this level
-		GlobalEntity_SetMap(globalIndex, gpGlobals->mapname);
+		engine->GlobalEntity_SetMap(globalIndex, gpGlobals->mapname);
 	}
 	else
 	{

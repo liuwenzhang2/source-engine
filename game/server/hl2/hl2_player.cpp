@@ -1170,7 +1170,7 @@ bool CHL2_Player::CanSprint()
 			!IsWalking() &&												// Not if we're walking
 			!( m_Local.m_bDucked && !m_Local.m_bDucking ) &&			// Nor if we're ducking
 			(GetWaterLevel() != 3) &&									// Certainly not underwater
-			(GlobalEntity_GetState("suit_no_sprint") != GLOBAL_ON) );	// Out of the question without the sprint module
+			(engine->GlobalEntity_GetState("suit_no_sprint") != GLOBAL_ON) );	// Out of the question without the sprint module
 }
 
 //-----------------------------------------------------------------------------
@@ -2321,7 +2321,7 @@ ConVar test_massive_dmg("test_massive_dmg", "30" );
 ConVar test_massive_dmg_clip("test_massive_dmg_clip", "0.5" );
 int	CHL2_Player::OnTakeDamage( const CTakeDamageInfo &info )
 {
-	if ( GlobalEntity_GetState( "gordon_invulnerable" ) == GLOBAL_ON )
+	if (engine->GlobalEntity_GetState( "gordon_invulnerable" ) == GLOBAL_ON )
 		return 0;
 
 	// ignore fall damage if instructed to do so by input
@@ -2369,7 +2369,7 @@ int	CHL2_Player::OnTakeDamage( const CTakeDamageInfo &info )
 		bAdjustForSkillLevel = false;
 	}
 
-	if ( GetVehicleEntity() != NULL && GlobalEntity_GetState("gordon_protect_driver") == GLOBAL_ON )
+	if ( GetVehicleEntity() != NULL && engine->GlobalEntity_GetState("gordon_protect_driver") == GLOBAL_ON )
 	{
 		if( playerDamage.GetDamage() > test_massive_dmg.GetFloat() && playerDamage.GetInflictor() == GetVehicleEntity() && (playerDamage.GetDamageType() & DMG_CRUSH) )
 		{
@@ -3774,7 +3774,7 @@ void CHL2_Player::ModifyOrAppendPlayerCriteria( AI_CriteriaSet& set )
 {
 	BaseClass::ModifyOrAppendPlayerCriteria( set );
 
-	if ( GlobalEntity_GetIndex( "gordon_precriminal" ) == -1 )
+	if (engine->GlobalEntity_GetIndex( "gordon_precriminal" ) == -1 )
 	{
 		set.AppendCriteria( "gordon_precriminal", "0" );
 	}

@@ -3306,13 +3306,13 @@ void CWeaponPhysCannon::WaitForUpgradeThink()
 		return;
 	}
 
-	if ( !GlobalEntity_IsInTable( "super_phys_gun" ) )
+	if ( !engine->GlobalEntity_IsInTable( "super_phys_gun" ) )
 	{
-		GlobalEntity_Add( MAKE_STRING("super_phys_gun"), gpGlobals->mapname, GLOBAL_ON );
+		engine->GlobalEntity_Add( MAKE_STRING("super_phys_gun"), gpGlobals->mapname, GLOBAL_ON );
 	}
 	else
 	{
-		GlobalEntity_SetState( MAKE_STRING("super_phys_gun"), GLOBAL_ON );
+		engine->GlobalEntity_SetState( MAKE_STRING("super_phys_gun"), GLOBAL_ON );
 	}
 	m_bIsCurrentlyUpgrading = false;
 

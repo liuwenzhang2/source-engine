@@ -385,7 +385,7 @@ void CPortal_Player::GiveAllItems( void )
 void CPortal_Player::GiveDefaultItems( void )
 {
 	castable_string_t st( "suit_no_sprint" );
-	GlobalEntity_SetState( st, GLOBAL_OFF );
+	engine->GlobalEntity_SetState( st, GLOBAL_OFF );
 	inputdata_t in;
 	InputDisableFlashlight( in );
 }

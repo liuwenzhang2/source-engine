@@ -2037,10 +2037,10 @@ void CNPC_Hunter::Activate()
 	s_iszHuntersToRunOver = AllocPooledString( "hunters_to_run_over" );
 	
 	// If no one has initialized the hunters to run over counter, just zero it out.
-	if ( !GlobalEntity_IsInTable( s_iszHuntersToRunOver ) )
+	if ( !engine->GlobalEntity_IsInTable( s_iszHuntersToRunOver ) )
 	{
-		GlobalEntity_Add( s_iszHuntersToRunOver, gpGlobals->mapname, GLOBAL_ON );
-		GlobalEntity_SetCounter( s_iszHuntersToRunOver, 0 );
+		engine->GlobalEntity_Add( s_iszHuntersToRunOver, gpGlobals->mapname, GLOBAL_ON );
+		engine->GlobalEntity_SetCounter( s_iszHuntersToRunOver, 0 );
 	}
 
 	CMissile::AddCustomDetonator( this, ( GetHullMaxs().AsVector2D() - GetHullMins().AsVector2D() ).Length() * 0.5, GetHullHeight() );
@@ -2319,7 +2319,7 @@ void CNPC_Hunter::GatherConditions()
 	if ( m_IgnoreVehicleTimer.Expired() && GetEnemy() && HasCondition( COND_SEE_ENEMY ) )
 	{
 		CBaseEntity *pVehicle = GetEnemyVehicle();
-		if ( ( pVehicle ) && ( GlobalEntity_GetCounter( s_iszHuntersToRunOver ) <= 0 ) )
+		if ( ( pVehicle ) && (engine->GlobalEntity_GetCounter( s_iszHuntersToRunOver ) <= 0 ) )
 		{
 			static float timeDrawnArrow;
 
@@ -5977,9 +5977,9 @@ void CNPC_Hunter::Event_Killed( const CTakeDamageInfo &info )
 
 		// Death by vehicle! Decrement the hunters to run over counter.
 		// When the counter reaches zero hunters will start dodging.
-		if ( GlobalEntity_GetCounter( s_iszHuntersToRunOver ) > 0 )
+		if (engine->GlobalEntity_GetCounter( s_iszHuntersToRunOver ) > 0 )
 		{
-			GlobalEntity_AddToCounter( s_iszHuntersToRunOver, -1 );
+			engine->GlobalEntity_AddToCounter( s_iszHuntersToRunOver, -1 );
 		}
 	}
 

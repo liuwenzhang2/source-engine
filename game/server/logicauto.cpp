@@ -84,7 +84,7 @@ void CLogicAuto::Activate(void)
 //-----------------------------------------------------------------------------
 void CLogicAuto::Think(void)
 {
-	if (!m_globalstate || GlobalEntity_GetState(m_globalstate) == GLOBAL_ON)
+	if (!m_globalstate || engine->GlobalEntity_GetState(m_globalstate) == GLOBAL_ON)
 	{
 		if (gpGlobals->eLoadType == MapLoad_Transition)
 		{

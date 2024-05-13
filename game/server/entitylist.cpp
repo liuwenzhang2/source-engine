@@ -2130,7 +2130,7 @@ public:
 			m_bRespawnAllEntities = false;
 
 			// Don't change globalstate owing to deletion here
-			GlobalEntity_EnableStateUpdates(false);
+			engine->GlobalEntity_EnableStateUpdates(false);
 
 			// Remove all entities
 			int nPlayerIndex = -1;
@@ -2151,7 +2151,7 @@ public:
 
 			gEntList.CleanupDeleteList();
 
-			GlobalEntity_EnableStateUpdates(true);
+			engine->GlobalEntity_EnableStateUpdates(true);
 
 			// Allows us to immediately re-use the edict indices we just freed to avoid edict overflow
 			//engine->AllowImmediateEdictReuse();

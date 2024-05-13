@@ -528,7 +528,7 @@ void CBaseEntity::UpdateOnRemove(void)
 		// NOTE: During level shutdown the global list will suppress this
 		// it assumes your changing levels or the game will end
 		// causing the whole list to be flushed
-		GlobalEntity_SetState(GetEngineObject()->GetGlobalname(), GLOBAL_DEAD);
+		engine->GlobalEntity_SetState(GetEngineObject()->GetGlobalname(), GLOBAL_DEAD);
 	}
 
 	VPhysicsDestroyObject();
@@ -5782,10 +5782,10 @@ void CBaseEntity::ModifyOrAppendCriteria( AI_CriteriaSet& set )
 
 	// Go through all the global states and append them
 
-	for ( int i = 0; i < GlobalEntity_GetNumGlobals(); i++ ) 
+	for ( int i = 0; i < engine->GlobalEntity_GetNumGlobals(); i++ )
 	{
-		const char *szGlobalName = GlobalEntity_GetName(i);
-		int iGlobalState = (int)GlobalEntity_GetStateByIndex(i);
+		const char *szGlobalName = engine->GlobalEntity_GetName(i);
+		int iGlobalState = (int)engine->GlobalEntity_GetStateByIndex(i);
 		set.AppendCriteria( szGlobalName, UTIL_VarArgs( "%i", iGlobalState ) );
 	}
 

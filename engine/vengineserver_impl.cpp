@@ -287,6 +287,217 @@ static bool ValidCmd( const char *pCmd )
 	return false;
 }
 
+
+struct globalentity_t
+{
+	DECLARE_SIMPLE_DATADESC();
+
+	CUtlSymbol	name;
+	CUtlSymbol	levelName;
+	GLOBALESTATE	state;
+	int				counter;
+};
+
+class CGlobalState// : public CAutoGameSystem
+{
+public:
+	CGlobalState(char const* name) : m_disableStateUpdates(false)//CAutoGameSystem(name), 
+	{
+	}
+
+	// IGameSystem
+	virtual void LevelShutdownPreEntity()
+	{
+		// don't allow state updates during shutdowns
+		Assert(!m_disableStateUpdates);
+		m_disableStateUpdates = true;
+	}
+
+	virtual void LevelShutdownPostEntity()
+	{
+		Assert(m_disableStateUpdates);
+		m_disableStateUpdates = false;
+	}
+
+	void EnableStateUpdates(bool bEnable)
+	{
+		m_disableStateUpdates = !bEnable;
+	}
+
+	void SetState(int globalIndex, GLOBALESTATE state)
+	{
+		if (m_disableStateUpdates || !m_list.IsValidIndex(globalIndex))
+			return;
+		m_list[globalIndex].state = state;
+	}
+
+	GLOBALESTATE GetState(int globalIndex)
+	{
+		if (!m_list.IsValidIndex(globalIndex))
+			return GLOBAL_OFF;
+		return m_list[globalIndex].state;
+	}
+
+	void SetCounter(int globalIndex, int counter)
+	{
+		if (m_disableStateUpdates || !m_list.IsValidIndex(globalIndex))
+			return;
+		m_list[globalIndex].counter = counter;
+	}
+
+	int AddToCounter(int globalIndex, int delta)
+	{
+		if (m_disableStateUpdates || !m_list.IsValidIndex(globalIndex))
+			return 0;
+		return (m_list[globalIndex].counter += delta);
+	}
+
+	int GetCounter(int globalIndex)
+	{
+		if (!m_list.IsValidIndex(globalIndex))
+			return 0;
+		return m_list[globalIndex].counter;
+	}
+
+	void SetMap(int globalIndex, string_t mapname)
+	{
+		if (!m_list.IsValidIndex(globalIndex))
+			return;
+		m_list[globalIndex].levelName = m_nameList.AddString(STRING(mapname));
+	}
+
+	const char* GetMap(int globalIndex)
+	{
+		if (!m_list.IsValidIndex(globalIndex))
+			return NULL;
+		return m_nameList.String(m_list[globalIndex].levelName);
+	}
+
+	const char* GetName(int globalIndex)
+	{
+		if (!m_list.IsValidIndex(globalIndex))
+			return NULL;
+		return m_nameList.String(m_list[globalIndex].name);
+	}
+
+	int GetIndex(const char* pGlobalname)
+	{
+		CUtlSymbol symName = m_nameList.Find(pGlobalname);
+
+		if (symName.IsValid())
+		{
+			for (int i = m_list.Count() - 1; i >= 0; --i)
+			{
+				if (m_list[i].name == symName)
+					return i;
+			}
+		}
+
+		return -1;
+	}
+
+	int AddEntity(const char* pGlobalname, const char* pMapName, GLOBALESTATE state)
+	{
+		globalentity_t entity;
+		entity.name = m_nameList.AddString(pGlobalname);
+		entity.levelName = m_nameList.AddString(pMapName);
+		entity.state = state;
+
+		int index = GetIndex(m_nameList.String(entity.name));
+		if (index >= 0)
+			return index;
+		return m_list.AddToTail(entity);
+	}
+
+	int GetNumGlobals(void)
+	{
+		return m_list.Count();
+	}
+
+	void			Reset(void);
+	int				Save(ISave& save);
+	int				Restore(IRestore& restore);
+	DECLARE_SIMPLE_DATADESC();
+
+	//#ifdef _DEBUG
+	void			DumpGlobals(void);
+	//#endif
+
+public:
+	CUtlSymbolTable	m_nameList;
+private:
+	bool			m_disableStateUpdates;
+	CUtlVector<globalentity_t> m_list;
+};
+
+int CGlobalState::Save(ISave& save)
+{
+	if (!save.WriteFields("GLOBAL", this, NULL, m_DataMap.dataDesc, m_DataMap.dataNumFields))
+		return 0;
+
+	return 1;
+}
+
+int CGlobalState::Restore(IRestore& restore)
+{
+	Reset();
+	if (!restore.ReadFields("GLOBAL", this, NULL, m_DataMap.dataDesc, m_DataMap.dataNumFields))
+		return 0;
+
+	return 1;
+}
+
+void CGlobalState::Reset(void)
+{
+	m_list.Purge();
+	m_nameList.RemoveAll();
+}
+
+// This is available all the time now on impulse 104, remove later
+//#ifdef _DEBUG
+void CGlobalState::DumpGlobals(void)
+{
+	static const char* estates[] = { "Off", "On", "Dead" };
+
+	Msg("-- Globals --\n");
+	for (int i = 0; i < m_list.Count(); i++)
+	{
+		Msg("%s: %s (%s) = %d\n", m_nameList.String(m_list[i].name), m_nameList.String(m_list[i].levelName), estates[m_list[i].state], m_list[i].counter);
+	}
+}
+//#endif
+
+static CGlobalState gGlobalState("CGlobalState");
+static CUtlSymbolDataOps g_GlobalSymbolDataOps(gGlobalState.m_nameList);
+
+// Global state Savedata 
+BEGIN_SIMPLE_DATADESC(CGlobalState)
+	DEFINE_UTLVECTOR(m_list, FIELD_EMBEDDED),
+	// DEFINE_FIELD( m_nameList, CUtlSymbolTable ),
+	// DEFINE_FIELD( m_disableStateUpdates, FIELD_BOOLEAN ),
+END_DATADESC()
+
+BEGIN_SIMPLE_DATADESC(globalentity_t)
+	DEFINE_CUSTOM_FIELD(name, &g_GlobalSymbolDataOps),
+	DEFINE_CUSTOM_FIELD(levelName, &g_GlobalSymbolDataOps),
+	DEFINE_FIELD(state, FIELD_INTEGER),
+	DEFINE_FIELD(counter, FIELD_INTEGER),
+END_DATADESC()
+
+
+void SaveGlobalState(CSaveRestoreData* pSaveData)
+{
+	CSaveServer saveHelper(pSaveData);
+	gGlobalState.Save(saveHelper);
+}
+
+void RestoreGlobalState(CSaveRestoreData* pSaveData)
+{
+	CRestoreServer restoreHelper(pSaveData);
+	gGlobalState.Restore(restoreHelper);
+}
+
+
 // ---------------------------------------------------------------------- //
 // CVEngineServer
 // ---------------------------------------------------------------------- //
@@ -1824,6 +2035,156 @@ public:
 	virtual void SetPausedForced( bool bPaused, float flDuration /*= -1.f*/ ) OVERRIDE
 	{
 		sv.SetPausedForced( bPaused, flDuration );
+	}
+
+	void GlobalEntity_SetState(int globalIndex, GLOBALESTATE state)
+	{
+		gGlobalState.SetState(globalIndex, state);
+	}
+
+	void GlobalEntity_SetState(string_t globalname, GLOBALESTATE state)
+	{
+		GlobalEntity_SetState(GlobalEntity_GetIndex(globalname), state);
+	}
+
+	void GlobalEntity_SetCounter(int globalIndex, int counter)
+	{
+		gGlobalState.SetCounter(globalIndex, counter);
+	}
+
+	void GlobalEntity_SetCounter(string_t globalname, int counter)
+	{
+		GlobalEntity_SetCounter(GlobalEntity_GetIndex(globalname), counter);
+	}
+
+	void GlobalEntity_SetCounter(const char* pGlobalName, int counter)
+	{
+		GlobalEntity_SetCounter(GlobalEntity_GetIndex(pGlobalName), counter);
+	}
+
+	int GlobalEntity_AddToCounter(int globalIndex, int delta)
+	{
+		return gGlobalState.AddToCounter(globalIndex, delta);
+	}
+
+	int GlobalEntity_AddToCounter(string_t globalname, int delta)
+	{
+		return GlobalEntity_AddToCounter(GlobalEntity_GetIndex(globalname), delta);
+	}
+
+	int GlobalEntity_AddToCounter(const char* pGlobalName, int delta)
+	{
+		return GlobalEntity_AddToCounter(GlobalEntity_GetIndex(pGlobalName), delta);
+	}
+
+	void GlobalEntity_EnableStateUpdates(bool bEnable)
+	{
+		gGlobalState.EnableStateUpdates(bEnable);
+	}
+
+
+	void GlobalEntity_SetMap(int globalIndex, string_t mapname)
+	{
+		gGlobalState.SetMap(globalIndex, mapname);
+	}
+
+	void GlobalEntity_SetMap(string_t globalname, string_t mapname)
+	{
+		GlobalEntity_SetMap(GlobalEntity_GetIndex(globalname), mapname);
+	}
+
+	int GlobalEntity_Add(const char* pGlobalname, const char* pMapName, GLOBALESTATE state)
+	{
+		return gGlobalState.AddEntity(pGlobalname, pMapName, state);
+	}
+
+	int GlobalEntity_Add(string_t globalname, string_t mapName, GLOBALESTATE state)
+	{
+		return GlobalEntity_Add(STRING(globalname), STRING(mapName), state);
+	}
+
+	int GlobalEntity_GetIndex(const char* pGlobalname)
+	{
+		return gGlobalState.GetIndex(pGlobalname);
+	}
+
+	int GlobalEntity_GetIndex(string_t globalname)
+	{
+		return GlobalEntity_GetIndex(STRING(globalname));
+	}
+
+	GLOBALESTATE GlobalEntity_GetState(int globalIndex)
+	{
+		return gGlobalState.GetState(globalIndex);
+	}
+
+	GLOBALESTATE GlobalEntity_GetState(string_t globalname)
+	{
+		return GlobalEntity_GetState(GlobalEntity_GetIndex(globalname));
+	}
+
+	GLOBALESTATE GlobalEntity_GetState(const char* pGlobalName)
+	{
+		return GlobalEntity_GetState(GlobalEntity_GetIndex(pGlobalName));
+	}
+
+	int GlobalEntity_GetCounter(int globalIndex)
+	{
+		return gGlobalState.GetCounter(globalIndex);
+	}
+
+	int GlobalEntity_GetCounter(string_t globalname)
+	{
+		return GlobalEntity_GetCounter(GlobalEntity_GetIndex(globalname));
+	}
+
+	int GlobalEntity_GetCounter(const char* pGlobalName)
+	{
+		return GlobalEntity_GetCounter(GlobalEntity_GetIndex(pGlobalName));
+	}
+
+	const char* GlobalEntity_GetMap(int globalIndex)
+	{
+		return gGlobalState.GetMap(globalIndex);
+	}
+
+	const char* GlobalEntity_GetName(int globalIndex)
+	{
+		return gGlobalState.GetName(globalIndex);
+	}
+
+	int GlobalEntity_GetNumGlobals(void)
+	{
+		return gGlobalState.GetNumGlobals();
+	}
+
+	int GlobalEntity_IsInTable(string_t globalname)
+	{
+		return GlobalEntity_GetIndex(STRING(globalname)) >= 0 ? true : false;
+	}
+
+	int GlobalEntity_IsInTable(const char* pGlobalname)
+	{
+		return GlobalEntity_GetIndex(pGlobalname) >= 0 ? true : false;
+	}
+
+	GLOBALESTATE GlobalEntity_GetStateByIndex(int iIndex)
+	{
+		return GlobalEntity_GetState(iIndex);
+	}
+
+	//-----------------------------------------------------------------------------
+// Purpose: This gets called when a level is shut down
+//-----------------------------------------------------------------------------
+
+	void ResetGlobalState(void)
+	{
+		gGlobalState.Reset();
+	}
+
+	void DumpGlobals(void)
+	{
+		gGlobalState.DumpGlobals();
 	}
 
 private:

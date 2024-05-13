@@ -1334,7 +1334,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 		else
 		{
 			// FIXME: Is there a better place for this?
-			m_bMegaPhysgun = ( GlobalEntity_GetState("super_phys_gun") == GLOBAL_ON );
+			m_bMegaPhysgun = (engine->GlobalEntity_GetState("super_phys_gun") == GLOBAL_ON );
 		}
 	}
 
@@ -1748,7 +1748,7 @@ bool CHalfLife2::IsAlyxInDarknessMode()
 	if ( alyx_darkness_force.GetBool() )
 		return true;
 
-	return ( GlobalEntity_GetState( "ep_alyx_darknessmode" ) == GLOBAL_ON );
+	return ( engine->GlobalEntity_GetState( "ep_alyx_darknessmode" ) == GLOBAL_ON );
 #else
 	return false;
 #endif // HL2_EPISODIC

@@ -86,6 +86,8 @@ struct bbox_t
 	Vector maxs;
 };
 
+typedef enum { GLOBAL_OFF = 0, GLOBAL_ON = 1, GLOBAL_DEAD = 2 } GLOBALESTATE;
+
 //-----------------------------------------------------------------------------
 // Purpose: Interface the engine exposes to the game DLL
 //-----------------------------------------------------------------------------
@@ -470,6 +472,41 @@ public:
 	virtual eFindMapResult FindMap( /* in/out */ char *pMapName, int nMapNameMax ) = 0;
 	
 	virtual void SetPausedForced( bool bPaused, float flDuration = -1.f ) = 0;
+
+	virtual void		GlobalEntity_SetState(int globalIndex, GLOBALESTATE state) = 0;
+	virtual void		GlobalEntity_SetState(string_t globalname, GLOBALESTATE state) = 0;
+	virtual void		GlobalEntity_SetMap(int globalIndex, string_t mapname) = 0;
+	virtual void		GlobalEntity_SetMap(string_t globalname, string_t mapname) = 0;
+	virtual int			GlobalEntity_Add(const char* pGlobalname, const char* pMapName, GLOBALESTATE state) = 0;
+	virtual int			GlobalEntity_Add(string_t globalname, string_t mapName, GLOBALESTATE state) = 0;
+
+	virtual int			GlobalEntity_GetIndex(const char* pGlobalname) = 0;
+	virtual int			GlobalEntity_GetIndex(string_t globalname) = 0;
+	virtual GLOBALESTATE GlobalEntity_GetState(int globalIndex) = 0;
+	virtual GLOBALESTATE GlobalEntity_GetState(string_t globalname) = 0;
+	virtual GLOBALESTATE GlobalEntity_GetState(const char* pGlobalName) = 0;
+	virtual const char* GlobalEntity_GetMap(int globalIndex) = 0;
+	virtual const char* GlobalEntity_GetName(int globalIndex) = 0;
+
+	virtual int GlobalEntity_GetCounter(int globalIndex) = 0;
+	virtual int GlobalEntity_GetCounter(string_t globalname) = 0;
+	virtual int GlobalEntity_GetCounter(const char* pGlobalName) = 0;
+	virtual void GlobalEntity_SetCounter(int globalIndex, int counter) = 0;
+	virtual void GlobalEntity_SetCounter(string_t globalname, int counter) = 0;
+	virtual void GlobalEntity_SetCounter(const char* pGlobalName, int counter) = 0;
+	virtual int GlobalEntity_AddToCounter(int globalIndex, int delta) = 0;
+	virtual int GlobalEntity_AddToCounter(string_t globalname, int delta) = 0;
+	virtual int GlobalEntity_AddToCounter(const char* pGlobalName, int delta) = 0;
+
+	virtual int			GlobalEntity_GetNumGlobals(void) = 0;
+	virtual void		GlobalEntity_EnableStateUpdates(bool bEnable) = 0;
+
+	virtual int			GlobalEntity_IsInTable(string_t globalname) = 0;
+	virtual int			GlobalEntity_IsInTable(const char* pGlobalname) = 0;
+	virtual GLOBALESTATE GlobalEntity_GetStateByIndex(int iIndex) = 0;
+
+	virtual void ResetGlobalState(void) = 0;
+	virtual void DumpGlobals(void) = 0;
 };
 
 // These only differ in new items added to the end
@@ -557,8 +594,8 @@ public:
 	//virtual CSaveRestoreData  *SaveInit( int size ) = 0;
 	//virtual void			SaveWriteFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
 	//virtual void			SaveReadFields( CSaveRestoreData *, const char *, void *, datamap_t *, typedescription_t *, int ) = 0;
-	virtual void			SaveGlobalState( CSaveRestoreData * ) = 0;
-	virtual void			RestoreGlobalState( CSaveRestoreData * ) = 0;
+	//virtual void			SaveGlobalState( CSaveRestoreData * ) = 0;
+	//virtual void			RestoreGlobalState( CSaveRestoreData * ) = 0;
 	//virtual void			PreSave( CSaveRestoreData * ) = 0;
 	//virtual void			Save( CSaveRestoreData * ) = 0;
 	virtual void			GetSaveComment( char *comment, int maxlength, float flMinutes, float flSeconds, bool bNoTime = false ) = 0;

@@ -257,10 +257,10 @@ void CGameRules::RefreshSkillData ( bool forceUpdate )
 #ifndef CLIENT_DLL
 	if ( !forceUpdate )
 	{
-		if ( GlobalEntity_IsInTable( "skill.cfg" ) )
+		if (engine->GlobalEntity_IsInTable( "skill.cfg" ) )
 			return;
 	}
-	GlobalEntity_Add( "skill.cfg", STRING(gpGlobals->mapname), GLOBAL_ON );
+	engine->GlobalEntity_Add( "skill.cfg", STRING(gpGlobals->mapname), GLOBAL_ON );
 
 #if !defined( TF_DLL ) && !defined( DOD_DLL )
 	char	szExec[256];

@@ -3952,7 +3952,7 @@ bool CNPC_Antlion::IsLightDamage( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 bool CNPC_Antlion::IsAllied( void )
 {
-	return ( GlobalEntity_GetState( "antlion_allied" ) == GLOBAL_ON );
+	return (engine->GlobalEntity_GetState( "antlion_allied" ) == GLOBAL_ON );
 }
 
 //-----------------------------------------------------------------------------

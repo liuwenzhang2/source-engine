@@ -170,7 +170,7 @@ bool CBaseHL2MPCombatWeapon::WeaponShouldBeLowered( void )
 	
 #if !defined( CLIENT_DLL )
 
-	if ( GlobalEntity_GetState( "friendly_encounter" ) == GLOBAL_ON )
+	if (engine->GlobalEntity_GetState( "friendly_encounter" ) == GLOBAL_ON )
 		return true;
 
 #endif

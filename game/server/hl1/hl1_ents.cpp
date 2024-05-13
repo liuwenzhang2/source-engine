@@ -78,7 +78,7 @@ void CAutoTrigger::Precache( void )
 //-----------------------------------------------------------------------------
 void CAutoTrigger::Think( void )
 {
-	if ( !m_globalstate || GlobalEntity_GetState( m_globalstate ) == GLOBAL_ON )
+	if ( !m_globalstate || engine->GlobalEntity_GetState( m_globalstate ) == GLOBAL_ON )
 	{
 		m_OnTrigger.FireOutput(NULL, this);
 

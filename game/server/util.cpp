@@ -1811,16 +1811,16 @@ int DispatchSpawn( CBaseEntity *pEntity )
 		if ( pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING )
 		{
 			// Handle global stuff here
-			int globalIndex = GlobalEntity_GetIndex( pEntity->GetEngineObject()->GetGlobalname() );
+			int globalIndex = engine->GlobalEntity_GetIndex( pEntity->GetEngineObject()->GetGlobalname() );
 			if ( globalIndex >= 0 )
 			{
 				// Already dead? delete
-				if ( GlobalEntity_GetState(globalIndex) == GLOBAL_DEAD )
+				if (engine->GlobalEntity_GetState(globalIndex) == GLOBAL_DEAD )
 				{
 					pEntity->Remove();
 					return -1;
 				}
-				else if ( !FStrEq(STRING(gpGlobals->mapname), GlobalEntity_GetMap(globalIndex)) )
+				else if ( !FStrEq(STRING(gpGlobals->mapname), engine->GlobalEntity_GetMap(globalIndex)) )
 				{
 					pEntity->MakeDormant();	// Hasn't been moved to this level yet, wait but stay alive
 				}
@@ -1829,7 +1829,7 @@ int DispatchSpawn( CBaseEntity *pEntity )
 			else
 			{
 				// Spawned entities default to 'On'
-				GlobalEntity_Add( pEntity->GetEngineObject()->GetGlobalname(), gpGlobals->mapname, GLOBAL_ON);
+				engine->GlobalEntity_Add( pEntity->GetEngineObject()->GetGlobalname(), gpGlobals->mapname, GLOBAL_ON);
 //					Msg( "Added global entity %s (%s)\n", pEntity->GetClassname(), STRING(pEntity->m_iGlobalname) );
 			}
 		}

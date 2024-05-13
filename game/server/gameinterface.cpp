@@ -1173,7 +1173,7 @@ float CServerGameDLL::GetTickInterval( void ) const
 // This is called when a new game is started. (restart, map)
 bool CServerGameDLL::GameInit( void )
 {
-	ResetGlobalState();
+	engine->ResetGlobalState();
 	engine->ServerCommand( "exec game.cfg\n" );
 	engine->ServerExecute( );
 	CBaseEntity::sm_bAccurateTriggerBboxChecks = true;
@@ -1191,7 +1191,7 @@ bool CServerGameDLL::GameInit( void )
 // NOT on level transitions within a game
 void CServerGameDLL::GameShutdown( void )
 {
-	ResetGlobalState();
+	engine->ResetGlobalState();
 }
 
 static bool g_OneWayTransition = false;
@@ -1672,6 +1672,7 @@ void CServerGameDLL::LevelShutdown( void )
 
 	MDLCACHE_CRITICAL_SECTION();
 	IGameSystem::LevelShutdownPreEntityAllSystems();
+	engine->GlobalEntity_EnableStateUpdates(false);
 
 	// YWB:
 	// This entity pointer is going away now and is corrupting memory on level transitions/restarts
@@ -1682,6 +1683,7 @@ void CServerGameDLL::LevelShutdown( void )
 	InvalidateQueryCache();
 
 	IGameSystem::LevelShutdownPostEntityAllSystems();
+	engine->GlobalEntity_EnableStateUpdates(true);
 
 	// In case we quit out during initial load
 	engine->SetAllowPrecache( false );//CBaseEntity::
@@ -1801,15 +1803,15 @@ void CServerGameDLL::CreateNetworkStringTables( void )
 
 //-----------------------------------------------------------------------------
 
-void CServerGameDLL::SaveGlobalState( CSaveRestoreData *s )
-{
-	::SaveGlobalState(s);
-}
+//void CServerGameDLL::SaveGlobalState( CSaveRestoreData *s )
+//{
+//	::SaveGlobalState(s);
+//}
 
-void CServerGameDLL::RestoreGlobalState(CSaveRestoreData *s)
-{
-	::RestoreGlobalState(s);
-}
+//void CServerGameDLL::RestoreGlobalState(CSaveRestoreData *s)
+//{
+//	::RestoreGlobalState(s);
+//}
 
 //void CServerGameDLL::Save( CSaveRestoreData *s )
 //{

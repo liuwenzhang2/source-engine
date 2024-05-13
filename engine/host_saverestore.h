@@ -587,6 +587,54 @@ public:
 #define RestoreUtlVector( pRestore, pUtlVector, fieldtype) \
 	CUtlVectorDataopsInstantiator<fieldtype>::GetDataOps( pUtlVector )->Restore( pUtlVector, pRestore );
 
+//-------------------------------------
+
+#define DEFINE_UTLVECTOR(name,fieldtype) \
+	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE, NULL, CUtlVectorDataopsInstantiator<fieldtype>::GetDataOps(&(((classNameTypedef *)0)->name)), NULL }
+
+#define DEFINE_GLOBAL_UTLVECTOR(name,fieldtype) \
+	{ FIELD_CUSTOM, #name, { offsetof(classNameTypedef,name), 0 }, 1, FTYPEDESC_SAVE|FTYPEDESC_GLOBAL, NULL, CUtlVectorDataopsInstantiator<fieldtype>::GetDataOps(&(((classNameTypedef *)0)->name)), NULL }
+
+
+class CUtlSymbolDataOps : public CDefSaveRestoreOps
+{
+public:
+	CUtlSymbolDataOps(CUtlSymbolTable& masterTable) : m_symbolTable(masterTable) {}
+
+	virtual void Save(const SaveRestoreFieldInfo_t& fieldInfo, ISave* pSave)
+	{
+		CUtlSymbol* sym = ((CUtlSymbol*)fieldInfo.pField);
+
+		pSave->WriteString(m_symbolTable.String(*sym));
+	}
+
+	virtual void Restore(const SaveRestoreFieldInfo_t& fieldInfo, IRestore* pRestore)
+	{
+		CUtlSymbol* sym = ((CUtlSymbol*)fieldInfo.pField);
+
+		char tmp[1024];
+		pRestore->ReadString(tmp, sizeof(tmp), 0);
+		*sym = m_symbolTable.AddString(tmp);
+	}
+
+	virtual void MakeEmpty(const SaveRestoreFieldInfo_t& fieldInfo)
+	{
+		CUtlSymbol* sym = ((CUtlSymbol*)fieldInfo.pField);
+		*sym = UTL_INVAL_SYMBOL;
+	}
+
+	virtual bool IsEmpty(const SaveRestoreFieldInfo_t& fieldInfo)
+	{
+		CUtlSymbol* sym = ((CUtlSymbol*)fieldInfo.pField);
+		return (*sym).IsValid() ? false : true;
+	}
+
+private:
+	CUtlSymbolTable& m_symbolTable;
+
+};
+
+
 abstract_class ISaveRestore
 {
 public:

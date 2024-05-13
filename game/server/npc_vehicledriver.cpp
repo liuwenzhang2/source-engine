@@ -543,7 +543,7 @@ Disposition_t CNPC_VehicleDriver::IRelationType(CBaseEntity *pTarget)
 	// If it's the player and they are a criminal, we hate them.
 	if ( pTarget && pTarget->Classify() == CLASS_PLAYER)
 	{
-		if (GlobalEntity_GetState("gordon_precriminal") == GLOBAL_ON)
+		if (engine->GlobalEntity_GetState("gordon_precriminal") == GLOBAL_ON)
 		{
 			return(D_NU);
 		}

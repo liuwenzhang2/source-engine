@@ -338,7 +338,7 @@ public:
 					if ( info.GetDamage() )
 					{
 						// If gordon's a criminal, do damage now
-						if ( !pEntity->IsPlayer() || GlobalEntity_GetState( "gordon_precriminal" ) == GLOBAL_OFF )
+						if ( !pEntity->IsPlayer() || engine->GlobalEntity_GetState( "gordon_precriminal" ) == GLOBAL_OFF )
 						{
 							if ( pEntity->IsPlayer() && ((CBasePlayer *)pEntity)->IsSuitEquipped() )
 							{
@@ -2718,7 +2718,7 @@ bool CNPC_MetroPolice::PlayerIsCriminal( void )
 	if ( m_PolicingBehavior.IsEnabled() && m_PolicingBehavior.TargetIsHostile() )
 		return true;
 
-	if ( GlobalEntity_GetState( "gordon_precriminal" ) == GLOBAL_ON )
+	if (engine->GlobalEntity_GetState( "gordon_precriminal" ) == GLOBAL_ON )
 		return false;
 
 	return true;
@@ -4029,7 +4029,7 @@ int CNPC_MetroPolice::SelectSchedule( void )
 			m_nNumWarnings = METROPOLICE_MAX_WARNINGS;
 			AdministerJustice();
 		}
-		else if ( GlobalEntity_GetState( "gordon_precriminal" ) == GLOBAL_ON )
+		else if (engine->GlobalEntity_GetState( "gordon_precriminal" ) == GLOBAL_ON )
 		{
 			// We're not allowed to respond, but warn them
 			m_Sentences.Speak( "METROPOLICE_IDLE_HARASS_PLAYER", SENTENCE_PRIORITY_INVALID, SENTENCE_CRITERIA_ALWAYS );

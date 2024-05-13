@@ -83,6 +83,8 @@ extern ConVar	save_in_memory;
 extern CGlobalVars g_ServerGlobalVariables;
 
 extern CNetworkStringTableContainer *networkStringTableContainerServer;
+extern void SaveGlobalState( CSaveRestoreData *pSaveData );
+extern void RestoreGlobalState( CSaveRestoreData *pSaveData );
 
 // Keep the last 1 autosave / quick saves
 ConVar save_history_count("save_history_count", "1", 0, "Keep this many old copies in history of autosaves and quicksaves." );
@@ -3640,7 +3642,7 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	gameHeader.mapCount = 0; // No longer used. The map packer will place the map count at the head of the compound files (toml 7/18/2007)
 	CSaveServer saveHelper(pSaveData);
 	saveHelper.WriteFields( "GameHeader", &gameHeader, NULL, GAME_HEADER::m_DataMap.dataDesc, GAME_HEADER::m_DataMap.dataNumFields );
-	serverGameDLL->SaveGlobalState( pSaveData );
+	SaveGlobalState( pSaveData );
 
 	// Write entity string token table
 	pTokenData = pSaveData->AccessCurPos();
@@ -3863,7 +3865,7 @@ int CSaveRestore::SaveReadHeader( FileHandle_t pFile, GAME_HEADER *pHeader, int 
 
 	if ( readGlobalState && pHeader->mapCount == 0 ) // Alfred: Only load save games from the OB era engine where mapCount is forced to zero
 	{
-		serverGameDLL->RestoreGlobalState( pSaveData );
+		RestoreGlobalState( pSaveData );
 	}
 
 	Finish( pSaveData );

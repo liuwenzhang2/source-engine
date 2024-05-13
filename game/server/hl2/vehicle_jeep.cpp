@@ -1483,7 +1483,7 @@ void CPropJeep::ExitVehicle( int nRole )
 	m_flPlayerExitedTime = gpGlobals->curtime;
 	m_flLastSawPlayerAt = gpGlobals->curtime;
 
-	if ( GlobalEntity_GetState( "no_seagulls_on_jeep" ) == GLOBAL_OFF )
+	if (engine->GlobalEntity_GetState( "no_seagulls_on_jeep" ) == GLOBAL_OFF )
 	{
 		// Look for fly nodes
 		CHintCriteria hintCriteria;

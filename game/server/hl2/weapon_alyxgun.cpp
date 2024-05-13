@@ -292,7 +292,7 @@ bool IsAlyxInInjuredMode( void )
 	if ( hl2_episodic.GetBool() == false )
 		return false;
 
-	return ( GlobalEntity_GetState("ep2_alyx_injured") == GLOBAL_ON );
+	return (engine->GlobalEntity_GetState("ep2_alyx_injured") == GLOBAL_ON );
 }
 
 //-----------------------------------------------------------------------------

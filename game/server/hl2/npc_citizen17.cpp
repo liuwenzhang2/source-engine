@@ -818,10 +818,10 @@ string_t CNPC_Citizen::GetModelName() const
 //-----------------------------------------------------------------------------
 Class_T	CNPC_Citizen::Classify()
 {
-	if (GlobalEntity_GetState("gordon_precriminal") == GLOBAL_ON)
+	if (engine->GlobalEntity_GetState("gordon_precriminal") == GLOBAL_ON)
 		return CLASS_CITIZEN_PASSIVE;
 
-	if (GlobalEntity_GetState("citizens_passive") == GLOBAL_ON)
+	if (engine->GlobalEntity_GetState("citizens_passive") == GLOBAL_ON)
 		return CLASS_CITIZEN_PASSIVE;
 
 	return CLASS_PLAYER_ALLY;
@@ -2195,7 +2195,7 @@ bool CNPC_Citizen::ShouldLookForBetterWeapon()
 		if ( GetActiveWeapon() && IsMoving() )
 			return false;
 
-		if ( GlobalEntity_GetState("gordon_precriminal") == GLOBAL_ON )
+		if (engine->GlobalEntity_GetState("gordon_precriminal") == GLOBAL_ON )
 		{
 			// This stops the NPC looking altogether.
 			m_flNextWeaponSearchTime = FLT_MAX;
@@ -2323,7 +2323,7 @@ bool CNPC_Citizen::IsCommandable()
 //-----------------------------------------------------------------------------
 bool CNPC_Citizen::IsPlayerAlly( CBasePlayer *pPlayer )											
 { 
-	if ( Classify() == CLASS_CITIZEN_PASSIVE && GlobalEntity_GetState("gordon_precriminal") == GLOBAL_ON )
+	if ( Classify() == CLASS_CITIZEN_PASSIVE && engine->GlobalEntity_GetState("gordon_precriminal") == GLOBAL_ON )
 	{
 		// Robin: Citizens use friendly speech semaphore in trainstation
 		return true;
