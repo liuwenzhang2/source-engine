@@ -1010,6 +1010,10 @@ public:
 
 	// UNDONE: Make this data instead of procedural?
 	virtual bool	IsViewable( void );					// is this something that would be looked at (model, sprite, etc.)?
+	
+	virtual bool	IsChangeLevelTrigger() { return false; };
+	virtual const char* GetNewLandmarkName() { return ""; };
+	virtual const char* GetNewMapName() { return ""; };
 
 	// Team Handling
 	CTeam			*GetTeam( void ) const;				// Get the Team this entity is on

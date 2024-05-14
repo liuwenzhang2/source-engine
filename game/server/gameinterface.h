@@ -102,8 +102,8 @@ public:
 	//virtual void			SaveReadFields( CSaveRestoreData *, char const* , void *, datamap_t *, typedescription_t *, int ) OVERRIDE;
 	//virtual void			SaveGlobalState( CSaveRestoreData * ) OVERRIDE;
 	//virtual void			RestoreGlobalState( CSaveRestoreData * ) OVERRIDE;
-	virtual int				CreateEntityTransitionList( CSaveRestoreData *, int ) OVERRIDE;
-	virtual void			BuildAdjacentMapList( void ) OVERRIDE;
+	//virtual int				CreateEntityTransitionList( CSaveRestoreData *, int ) OVERRIDE;
+	//virtual void			BuildAdjacentMapList( void ) OVERRIDE;
 
 	//virtual void			PreSave( CSaveRestoreData * ) OVERRIDE;
 	//virtual void			Save( CSaveRestoreData * ) OVERRIDE;

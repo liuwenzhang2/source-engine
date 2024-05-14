@@ -605,9 +605,9 @@ public:
 	virtual bool			IsRestoring() = 0;
 
 	// Returns the number of entities moved across the transition
-	virtual int				CreateEntityTransitionList( CSaveRestoreData *, int ) = 0;
+	//virtual int				CreateEntityTransitionList( CSaveRestoreData *, int ) = 0;
 	// Build the list of maps adjacent to the current map
-	virtual void			BuildAdjacentMapList( void ) = 0;
+	//virtual void			BuildAdjacentMapList( void ) = 0;
 
 	// Retrieve info needed for parsing the specified user message
 	virtual bool			GetUserMessageInfo( int msg_type, char *name, int maxnamelength, int& size ) = 0;

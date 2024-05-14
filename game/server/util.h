@@ -409,7 +409,7 @@ float UTIL_DotPoints ( const Vector &vecSrc, const Vector &vecCheck, const Vecto
 void UTIL_StripToken( const char *pKey, char *pDest );// for redundant keynames
 
 // Misc functions
-int BuildChangeList( levellist_t *pLevelList, int maxList );
+//int BuildChangeList( levellist_t *pLevelList, int maxList );
 
 // computes gravity scale for an absolute gravity.  Pass the result into CBaseEntity::SetGravity()
 float UTIL_ScaleForGravity( float desiredGravity );

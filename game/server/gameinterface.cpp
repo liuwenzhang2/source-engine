@@ -659,9 +659,9 @@ void CServerGameDLL::PreSave(CSaveRestoreData* pSaveData)
 
 //---------------------------------
 
-CBaseEntity* EntityFromHandle(CBaseHandle& handle) {
-	return (CBaseEntity*)gEntList.GetServerEntityFromHandle(handle);
-}
+//CBaseEntity* EntityFromHandle(CBaseHandle& handle) {
+//	return (CBaseEntity*)gEntList.GetServerEntityFromHandle(handle);
+//}
 
 void CServerGameDLL::Save(ISave* pSave)
 {
@@ -722,156 +722,6 @@ Vector CServerGameDLL::ModelSpaceLandmark(int modelIndex)
 	modelinfo->GetModelBounds(pModel, mins, maxs);
 	return mins;
 }
-
-
-
-
-//=============================================================================
-//------------------------------------------------------------------------------
-// Creates all entities that lie in the transition list
-//------------------------------------------------------------------------------
-void CreateEntitiesInTransitionList(CSaveRestoreData* pSaveData, int levelMask)
-{
-	CBaseEntity* pent;
-	int i;
-	for (i = 0; i < pSaveData->NumEntities(); i++)
-	{
-		entitytable_t* pEntInfo = pSaveData->GetEntityInfo(i);
-		pEntInfo->hEnt = NULL;
-
-		if (pEntInfo->size == 0 || pEntInfo->edictindex == 0)
-			continue;
-
-		if (pEntInfo->classname == NULL_STRING)
-		{
-			Warning("Entity with data saved, but with no classname\n");
-			Assert(0);
-			continue;
-		}
-
-		bool active = (pEntInfo->flags & levelMask) ? 1 : 0;
-
-		// spawn players
-		pent = NULL;
-		if ((pEntInfo->edictindex > 0) && (pEntInfo->edictindex <= gpGlobals->maxClients))
-		{
-			if (active)//&& ed && !ed->IsFree()
-			{
-				if (!(pEntInfo->flags & FENTTABLE_PLAYER))
-				{
-					Warning("ENTITY IS NOT A PLAYER: %d\n", i);
-					Assert(0);
-				}
-
-				pent = CBasePlayer::CreatePlayer(STRING(pEntInfo->classname), pEntInfo->edictindex);
-			}
-		}
-		else if (active)
-		{
-			pent = gEntList.CreateEntityByName(STRING(pEntInfo->classname));
-		}
-
-		pEntInfo->hEnt = pent;
-	}
-}
-
-
-//-----------------------------------------------------------------------------
-int CreateEntityTransitionList(CSaveRestoreData* pSaveData, int levelMask)
-{
-	CBaseEntity* pent;
-	entitytable_t* pEntInfo;
-
-	// Create entity list
-	CreateEntitiesInTransitionList(pSaveData, levelMask);
-
-	// Now spawn entities
-	CUtlVector<int> checkList;
-
-	int i;
-	int movedCount = 0;
-	for (i = 0; i < pSaveData->NumEntities(); i++)
-	{
-		pEntInfo = pSaveData->GetEntityInfo(i);
-		pent = EntityFromHandle(pEntInfo->hEnt);
-		//		pSaveData->currentIndex = i;
-		pSaveData->Seek(pEntInfo->location);
-
-		// clear this out - it must be set on a per-entity basis
-		pSaveData->modelSpaceOffset.Init();
-
-		if (pent && (pEntInfo->flags & levelMask))		// Screen out the player if he's not to be spawned
-		{
-			if (pEntInfo->flags & FENTTABLE_GLOBAL)
-			{
-				DevMsg(2, "Merging changes for global: %s\n", STRING(pEntInfo->classname));
-
-				// -------------------------------------------------------------------------
-				// Pass the "global" flag to the DLL to indicate this entity should only override
-				// a matching entity, not be spawned
-				if (gEntList.RestoreGlobalEntity(pent, pSaveData, pEntInfo) > 0)
-				{
-					movedCount++;
-					pEntInfo->restoreentityindex = EntityFromHandle(pEntInfo->hEnt)->entindex();
-					gEntList.AddRestoredEntity(EntityFromHandle(pEntInfo->hEnt));
-				}
-				else
-				{
-					UTIL_RemoveImmediate(EntityFromHandle(pEntInfo->hEnt));
-				}
-				// -------------------------------------------------------------------------
-			}
-			else
-			{
-				DevMsg(2, "Transferring %s (%d)\n", STRING(pEntInfo->classname), pent->entindex());
-				CRestoreServer restoreHelper(pSaveData);
-				if (gEntList.RestoreEntity(pent, &restoreHelper, pEntInfo) < 0)
-				{
-					UTIL_RemoveImmediate(pent);
-				}
-				else
-				{
-					// needs to be checked.  Do this in a separate pass so that pointers & hierarchy can be traversed
-					checkList.AddToTail(i);
-				}
-			}
-
-			// Remove any entities that were removed using UTIL_Remove() as a result of the above calls to UTIL_RemoveImmediate()
-			gEntList.CleanupDeleteList();
-		}
-	}
-
-	for (i = checkList.Count() - 1; i >= 0; --i)
-	{
-		pEntInfo = pSaveData->GetEntityInfo(checkList[i]);
-		pent = EntityFromHandle(pEntInfo->hEnt);
-
-		// NOTE: pent can be NULL because UTIL_RemoveImmediate (called below) removes all in hierarchy
-		if (!pent)
-			continue;
-
-		MDLCACHE_CRITICAL_SECTION();
-
-		if (!(pEntInfo->flags & FENTTABLE_PLAYER) && UTIL_EntityInSolid(pent))
-		{
-			// this can happen during normal processing - PVS is just a guess, some map areas won't exist in the new map
-			DevMsg(2, "Suppressing %s\n", STRING(pEntInfo->classname));
-			UTIL_RemoveImmediate(pent);
-			// Remove any entities that were removed using UTIL_Remove() as a result of the above calls to UTIL_RemoveImmediate()
-			gEntList.CleanupDeleteList();
-		}
-		else
-		{
-			movedCount++;
-			pEntInfo->flags = FENTTABLE_REMOVED;
-			pEntInfo->restoreentityindex = pent->entindex();
-			gEntList.AddRestoredEntity(pent);
-		}
-	}
-
-	return movedCount;
-}
-
 
 bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory, 
 		CreateInterfaceFn physicsFactory, CreateInterfaceFn fileSystemFactory, 
@@ -1849,24 +1699,7 @@ CStandardSendProxies* CServerGameDLL::GetStandardSendProxies()
 	return &g_StandardSendProxies;
 }
 
-int	CServerGameDLL::CreateEntityTransitionList( CSaveRestoreData *s, int a)
-{
-	CRestoreServer restoreHelper( s );
-	// save off file base
-	int base = restoreHelper.GetReadPos();
 
-	int movedCount = ::CreateEntityTransitionList(s, a);
-	if ( movedCount )
-	{
-		engine->CallBlockHandlerRestore( GetPhysSaveRestoreBlockHandler(), base, &restoreHelper, false );
-		engine->CallBlockHandlerRestore( GetAISaveRestoreBlockHandler(), base, &restoreHelper, false );
-	}
-
-	GetPhysSaveRestoreBlockHandler()->PostRestore();
-	GetAISaveRestoreBlockHandler()->PostRestore();
-
-	return movedCount;
-}
 
 //void CServerGameDLL::PreSave( CSaveRestoreData *s )
 //{
@@ -2280,18 +2113,6 @@ bool CServerGameDLL::IsManualMapChangeOkay( const char **pszReason )
 	}
 */
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Called during a transition, to build a map adjacency list
-//-----------------------------------------------------------------------------
-void CServerGameDLL::BuildAdjacentMapList( void )
-{
-	// retrieve the pointer to the save data
-	CSaveRestoreData *pSaveData = gpGlobals->pSaveData;
-
-	if ( pSaveData )
-		pSaveData->levelInfo.connectionCount = BuildChangeList( pSaveData->levelInfo.levelList, MAX_LEVEL_CONNECTIONS );
 }
 
 //-----------------------------------------------------------------------------

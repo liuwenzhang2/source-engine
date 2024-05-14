@@ -1745,5 +1745,8 @@
     <ClInclude Include="..\..\..\public\server_class.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\game\server\cbase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

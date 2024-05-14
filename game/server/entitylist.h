@@ -25,12 +25,19 @@
 #include "globalstate.h"
 
 //class CBaseEntity;
+// We can only ever move 512 entities across a transition
+#define MAX_ENTITY 512
+#define MAX_ENTITY_BYTE_COUNT	(NUM_ENT_ENTRIES >> 3)
+#define DEBUG_TRANSITIONS_VERBOSE	2
 
 extern IVEngineServer* engine;
 //extern CUtlVector<IServerNetworkable*> g_DeleteList;
 extern bool g_fInCleanupDelete;
 extern void PhysOnCleanupDeleteList();
 extern CServerGameDLL g_ServerGameDLL;
+extern bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* pEntity);
+extern ISaveRestoreBlockHandler* GetPhysSaveRestoreBlockHandler();
+extern ISaveRestoreBlockHandler* GetAISaveRestoreBlockHandler();
 
 abstract_class CBaseEntityClassList
 {
@@ -565,6 +572,9 @@ public:
 	virtual void Restore(IRestore* pRestore, bool createPlayers);
 	virtual void PostRestore();
 
+	virtual int	CreateEntityTransitionList(CSaveRestoreData*, int) OVERRIDE;
+	virtual void BuildAdjacentMapList(void) OVERRIDE;
+
 	void ReserveSlot(int index);
 	int AllocateFreeSlot(bool bNetworkable = true, int index = -1);
 	CBaseEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
@@ -656,7 +666,10 @@ public:
 	void* CreateDataObject(int type, T* instance);
 	void DestroyDataObject(int type, T* instance);
 	IEntitySaveUtils* GetEntitySaveUtils() { return &m_EntitySaveUtils; }
-
+	T* FindLandmark(const char* pLandmarkName);
+	int InTransitionVolume(T* pEntity, const char* pVolumeName);
+	bool IsEntityInTransition(T* pEntity,const char* pLandmarkName);
+	void OnChangeLevel(const char* pNewMapName, const char* pNewLandmarkName);
 protected:
 	virtual void AfterCreated(IHandleEntity* pEntity);
 	virtual void BeforeDestroy(IHandleEntity* pEntity);
@@ -665,7 +678,7 @@ protected:
 	bool SaveInitEntities(CSaveRestoreData* pSaveData);
 	void SaveEntityOnTable(T* pEntity, CSaveRestoreData* pSaveData, int& iSlot);
 
-	friend int CreateEntityTransitionList(CSaveRestoreData* pSaveData, int levelMask);
+	//friend int CreateEntityTransitionList(CSaveRestoreData* pSaveData, int levelMask);
 	void AddRestoredEntity(T* pEntity);
 	bool DoRestoreEntity(T* pEntity, IRestore* pRestore);
 	int RestoreEntity(T* pEntity, IRestore* pRestore, entitytable_t* pEntInfo);
@@ -675,7 +688,24 @@ protected:
 	T* FindGlobalEntity(string_t classname, string_t globalname);
 
 	int RestoreGlobalEntity(T* pEntity, CSaveRestoreData* pSaveData, entitytable_t* pEntInfo);
+	void CreateEntitiesInTransitionList(CSaveRestoreData* pSaveData, int levelMask);
+	int CreateEntityTransitionListInternal(CSaveRestoreData* pSaveData, int levelMask);
 
+	int AddLandmarkToList(levellist_t* pLevelList, int listCount, const char* pMapName, const char* pLandmarkName, T* pentLandmark);
+	// Builds the list of entities to save when moving across a transition
+	int BuildLandmarkList(levellist_t* pLevelList, int maxList);
+
+	// Builds the list of entities to bring across a particular transition
+	int BuildEntityTransitionList(T* pLandmarkEntity, const char* pLandmarkName, T** ppEntList, int* pEntityFlags, int nMaxList);
+
+	// Adds a single entity to the transition list, if appropriate. Returns the new count
+	int AddEntityToTransitionList(T* pEntity, int flags, int nCount, T** ppEntList, int* pEntityFlags);
+
+	// Adds in all entities depended on by entities near the transition
+	int AddDependentEntities(int nCount, T** ppEntList, int* pEntityFlags, int nMaxList);
+
+	// Figures out save flags for the entity
+	int ComputeEntitySaveFlags(T* pEntity);
 private:
 	int m_iHighestEnt; // the topmost used array index
 	int m_iNumEnts;
@@ -690,6 +720,11 @@ private:
 	CEntitySaveUtils	m_EntitySaveUtils;
 	CUtlVector<EHANDLE> m_RestoredEntities;
 
+	char st_szNextMap[cchMapNameMost];
+	char st_szNextSpot[cchMapNameMost];
+
+	// Used to show debug for only the transition volume we're currently in
+	int g_iDebuggingTransition = 0;
 };
 
 extern CGlobalEntityList<CBaseEntity> gEntList;
@@ -982,7 +1017,7 @@ void CGlobalEntityList<T>::Restore(IRestore* pRestore, bool createPlayers)
 template<class T>
 T* CGlobalEntityList<T>::FindGlobalEntity(string_t classname, string_t globalname)
 {
-	CBaseEntity* pReturn = NULL;
+	T* pReturn = NULL;
 
 	while ((pReturn = NextEnt(pReturn)) != NULL)
 	{
@@ -1091,7 +1126,7 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, CSaveRestoreData* pSav
 	}
 
 	// Compute the new global offset
-	CBaseEntity* pNewEntity = FindGlobalEntity(className, globalName);
+	T* pNewEntity = FindGlobalEntity(className, globalName);
 	if (pNewEntity)
 	{
 		//				Msg( "Overlay %s with %s\n", pNewEntity->GetClassname(), STRING(tmpEnt->classname) );
@@ -1138,7 +1173,7 @@ void CGlobalEntityList<T>::PostRestore()
 // Call all entities' OnRestore handlers
 	for (int i = m_RestoredEntities.Count() - 1; i >= 0; --i)
 	{
-		CBaseEntity* pEntity = m_RestoredEntities[i].Get();
+		T* pEntity = m_RestoredEntities[i].Get();
 		if (pEntity && !pEntity->IsDormant())
 		{
 			MDLCACHE_CRITICAL_SECTION();
@@ -1148,6 +1183,598 @@ void CGlobalEntityList<T>::PostRestore()
 
 	m_RestoredEntities.Purge();
 	CleanupDeleteList();
+}
+
+//=============================================================================
+//------------------------------------------------------------------------------
+// Creates all entities that lie in the transition list
+//------------------------------------------------------------------------------
+template<class T>
+void CGlobalEntityList<T>::CreateEntitiesInTransitionList(CSaveRestoreData* pSaveData, int levelMask)
+{
+	T* pent;
+	int i;
+	for (i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		entitytable_t* pEntInfo = pSaveData->GetEntityInfo(i);
+		pEntInfo->hEnt = NULL;
+
+		if (pEntInfo->size == 0 || pEntInfo->edictindex == 0)
+			continue;
+
+		if (pEntInfo->classname == NULL_STRING)
+		{
+			Warning("Entity with data saved, but with no classname\n");
+			Assert(0);
+			continue;
+		}
+
+		bool active = (pEntInfo->flags & levelMask) ? 1 : 0;
+
+		// spawn players
+		pent = NULL;
+		if ((pEntInfo->edictindex > 0) && (pEntInfo->edictindex <= gpGlobals->maxClients))
+		{
+			if (active)//&& ed && !ed->IsFree()
+			{
+				if (!(pEntInfo->flags & FENTTABLE_PLAYER))
+				{
+					Warning("ENTITY IS NOT A PLAYER: %d\n", i);
+					Assert(0);
+				}
+
+				pent = CBasePlayer::CreatePlayer(STRING(pEntInfo->classname), pEntInfo->edictindex);
+			}
+		}
+		else if (active)
+		{
+			pent = CreateEntityByName(STRING(pEntInfo->classname));
+		}
+
+		pEntInfo->hEnt = pent;
+	}
+}
+
+//-----------------------------------------------------------------------------
+template<class T>
+int CGlobalEntityList<T>::CreateEntityTransitionListInternal(CSaveRestoreData* pSaveData, int levelMask)
+{
+	T* pent;
+	entitytable_t* pEntInfo;
+
+	// Create entity list
+	CreateEntitiesInTransitionList(pSaveData, levelMask);
+
+	// Now spawn entities
+	CUtlVector<int> checkList;
+
+	int i;
+	int movedCount = 0;
+	for (i = 0; i < pSaveData->NumEntities(); i++)
+	{
+		pEntInfo = pSaveData->GetEntityInfo(i);
+		pent = (T*)GetServerEntityFromHandle(pEntInfo->hEnt);
+		//		pSaveData->currentIndex = i;
+		pSaveData->Seek(pEntInfo->location);
+
+		// clear this out - it must be set on a per-entity basis
+		pSaveData->modelSpaceOffset.Init();
+
+		if (pent && (pEntInfo->flags & levelMask))		// Screen out the player if he's not to be spawned
+		{
+			if (pEntInfo->flags & FENTTABLE_GLOBAL)
+			{
+				DevMsg(2, "Merging changes for global: %s\n", STRING(pEntInfo->classname));
+
+				// -------------------------------------------------------------------------
+				// Pass the "global" flag to the DLL to indicate this entity should only override
+				// a matching entity, not be spawned
+				if (RestoreGlobalEntity(pent, pSaveData, pEntInfo) > 0)
+				{
+					movedCount++;
+					pEntInfo->restoreentityindex = ((T*)GetServerEntityFromHandle(pEntInfo->hEnt))->entindex();
+					AddRestoredEntity((T*)GetServerEntityFromHandle(pEntInfo->hEnt));
+				}
+				else
+				{
+					UTIL_RemoveImmediate((T*)GetServerEntityFromHandle(pEntInfo->hEnt));
+				}
+				// -------------------------------------------------------------------------
+			}
+			else
+			{
+				DevMsg(2, "Transferring %s (%d)\n", STRING(pEntInfo->classname), pent->entindex());
+				CRestoreServer restoreHelper(pSaveData);
+				if (RestoreEntity(pent, &restoreHelper, pEntInfo) < 0)
+				{
+					UTIL_RemoveImmediate(pent);
+				}
+				else
+				{
+					// needs to be checked.  Do this in a separate pass so that pointers & hierarchy can be traversed
+					checkList.AddToTail(i);
+				}
+			}
+
+			// Remove any entities that were removed using UTIL_Remove() as a result of the above calls to UTIL_RemoveImmediate()
+			CleanupDeleteList();
+		}
+	}
+
+	for (i = checkList.Count() - 1; i >= 0; --i)
+	{
+		pEntInfo = pSaveData->GetEntityInfo(checkList[i]);
+		pent = (T*)GetServerEntityFromHandle(pEntInfo->hEnt);
+
+		// NOTE: pent can be NULL because UTIL_RemoveImmediate (called below) removes all in hierarchy
+		if (!pent)
+			continue;
+
+		MDLCACHE_CRITICAL_SECTION();
+
+		if (!(pEntInfo->flags & FENTTABLE_PLAYER) && UTIL_EntityInSolid(pent))
+		{
+			// this can happen during normal processing - PVS is just a guess, some map areas won't exist in the new map
+			DevMsg(2, "Suppressing %s\n", STRING(pEntInfo->classname));
+			UTIL_RemoveImmediate(pent);
+			// Remove any entities that were removed using UTIL_Remove() as a result of the above calls to UTIL_RemoveImmediate()
+			CleanupDeleteList();
+		}
+		else
+		{
+			movedCount++;
+			pEntInfo->flags = FENTTABLE_REMOVED;
+			pEntInfo->restoreentityindex = pent->entindex();
+			AddRestoredEntity(pent);
+		}
+	}
+
+	return movedCount;
+}
+
+template<class T>
+int	CGlobalEntityList<T>::CreateEntityTransitionList(CSaveRestoreData* s, int a)
+{
+	CRestoreServer restoreHelper(s);
+	// save off file base
+	int base = restoreHelper.GetReadPos();
+
+	int movedCount = CreateEntityTransitionListInternal(s, a);
+	if (movedCount)
+	{
+		engine->CallBlockHandlerRestore(GetPhysSaveRestoreBlockHandler(), base, &restoreHelper, false);
+		engine->CallBlockHandlerRestore(GetAISaveRestoreBlockHandler(), base, &restoreHelper, false);
+	}
+
+	GetPhysSaveRestoreBlockHandler()->PostRestore();
+	GetAISaveRestoreBlockHandler()->PostRestore();
+
+	return movedCount;
+}
+
+template<class T>
+T* CGlobalEntityList<T>::FindLandmark(const char* pLandmarkName)
+{
+	T* pentLandmark;
+
+	pentLandmark = FindEntityByName(NULL, pLandmarkName);
+	while (pentLandmark)
+	{
+		// Found the landmark
+		if (FClassnameIs(pentLandmark, "info_landmark"))
+			return pentLandmark;
+		else
+			pentLandmark = FindEntityByName(pentLandmark, pLandmarkName);
+	}
+	Warning("Can't find landmark %s\n", pLandmarkName);
+	return NULL;
+}
+
+
+// Add a transition to the list, but ignore duplicates 
+// (a designer may have placed multiple trigger_changelevels with the same landmark)
+template<class T>
+int CGlobalEntityList<T>::AddLandmarkToList(levellist_t* pLevelList, int listCount, const char* pMapName, const char* pLandmarkName, T* pentLandmark)
+{
+	int i;
+
+	if (!pLevelList || !pMapName || !pLandmarkName || !pentLandmark)
+		return 0;
+
+	// Ignore changelevels to the level we're ready in. Mapmakers love to do this!
+	if (stricmp(pMapName, STRING(gpGlobals->mapname)) == 0)
+		return 0;
+
+	for (i = 0; i < listCount; i++)
+	{
+		if (pLevelList[i].pentLandmark == pentLandmark && stricmp(pLevelList[i].mapName, pMapName) == 0)
+			return 0;
+	}
+	Q_strncpy(pLevelList[listCount].mapName, pMapName, sizeof(pLevelList[listCount].mapName));
+	Q_strncpy(pLevelList[listCount].landmarkName, pLandmarkName, sizeof(pLevelList[listCount].landmarkName));
+	pLevelList[listCount].pentLandmark = pentLandmark;
+
+	T* ent = (pentLandmark);
+	Assert(ent);
+
+	pLevelList[listCount].vecLandmarkOrigin = ent->GetAbsOrigin();
+
+	return 1;
+}
+
+enum
+{
+	TRANSITION_VOLUME_SCREENED_OUT = 0,
+	TRANSITION_VOLUME_NOT_FOUND = 1,
+	TRANSITION_VOLUME_PASSED = 2,
+};
+
+
+template<class T>
+int CGlobalEntityList<T>::InTransitionVolume(T* pEntity, const char* pVolumeName)
+{
+	T* pVolume;
+
+	if (pEntity->ObjectCaps() & FCAP_FORCE_TRANSITION)
+		return TRANSITION_VOLUME_PASSED;
+
+	// If you're following another entity, follow it through the transition (weapons follow the player)
+	pEntity = pEntity->GetRootMoveParent();
+
+	int inVolume = TRANSITION_VOLUME_NOT_FOUND;	// Unless we find a trigger_transition, everything is in the volume
+
+	pVolume = FindEntityByName(NULL, pVolumeName);
+	while (pVolume)
+	{
+		if (pVolume && FClassnameIs(pVolume, "trigger_transition"))
+		{
+			if (TestEntityTriggerIntersection_Accurate(pVolume, pEntity))	// It touches one, it's in the volume
+				return TRANSITION_VOLUME_PASSED;
+
+			inVolume = TRANSITION_VOLUME_SCREENED_OUT;	// Found a trigger_transition, but I don't intersect it -- if I don't find another, don't go!
+		}
+		pVolume = FindEntityByName(pVolume, pVolumeName);
+	}
+	return inVolume;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Performs the level change and fires targets.
+// Input  : pActivator - 
+//-----------------------------------------------------------------------------
+template<class T>
+bool CGlobalEntityList<T>::IsEntityInTransition(T* pEntity, const char* pLandmarkName)
+{
+	int transitionState = InTransitionVolume(pEntity, pLandmarkName);
+	if (transitionState == TRANSITION_VOLUME_SCREENED_OUT)
+	{
+		return false;
+	}
+
+	// look for a landmark entity		
+	T* pLandmark = FindLandmark(pLandmarkName);
+
+	if (!pLandmark)
+		return false;
+
+	// Check to make sure it's also in the PVS of landmark
+	byte pvs[MAX_MAP_CLUSTERS / 8];
+	int clusterIndex = engine->GetClusterForOrigin(pLandmark->GetAbsOrigin());
+	engine->GetPVSForCluster(clusterIndex, sizeof(pvs), pvs);
+	Vector vecSurroundMins, vecSurroundMaxs;
+	pEntity->CollisionProp()->WorldSpaceSurroundingBounds(&vecSurroundMins, &vecSurroundMaxs);
+
+	return engine->CheckBoxInPVS(vecSurroundMins, vecSurroundMaxs, pvs, sizeof(pvs));
+}
+
+//------------------------------------------------------------------------------
+// Adds a single entity to the transition list, if appropriate. Returns the new count
+//------------------------------------------------------------------------------
+template<class T>
+int CGlobalEntityList<T>::ComputeEntitySaveFlags(T* pEntity)
+{
+	if (g_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
+	{
+		Msg("Trying %s (%s): ", pEntity->GetClassname(), pEntity->GetDebugName());
+	}
+
+	int caps = pEntity->ObjectCaps();
+	if (caps & FCAP_DONT_SAVE)
+	{
+		if (g_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
+		{
+			Msg("IGNORED due to being marked \"Don't save\".\n");
+		}
+		return 0;
+	}
+
+	// If this entity can be moved or is global, mark it
+	int flags = 0;
+	if (caps & FCAP_ACROSS_TRANSITION)
+	{
+		flags |= FENTTABLE_MOVEABLE;
+	}
+	if (pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING && !pEntity->IsDormant())
+	{
+		flags |= FENTTABLE_GLOBAL;
+	}
+
+	if (g_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE && !flags)
+	{
+		Msg("IGNORED, no across_transition flag & no globalname\n");
+	}
+
+	return flags;
+}
+
+//------------------------------------------------------------------------------
+// Adds a single entity to the transition list, if appropriate. Returns the new count
+//------------------------------------------------------------------------------
+template<class T>
+int CGlobalEntityList<T>::AddEntityToTransitionList(T* pEntity, int flags, int nCount, T** ppEntList, int* pEntityFlags)
+{
+	ppEntList[nCount] = pEntity;
+	pEntityFlags[nCount] = flags;
+	++nCount;
+
+	// If we're debugging, make it visible
+	if (g_iDebuggingTransition)
+	{
+		if (g_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
+		{
+			// In verbose mode we've already printed out what the entity is
+			Msg("ADDED.\n");
+		}
+		else
+		{
+			// In non-verbose mode, we just print this line
+			Msg("ADDED %s (%s) to transition.\n", pEntity->GetClassname(), pEntity->GetDebugName());
+		}
+
+		pEntity->m_debugOverlays |= (OVERLAY_BBOX_BIT | OVERLAY_NAME_BIT);
+	}
+
+	return nCount;
+}
+
+
+//------------------------------------------------------------------------------
+// Builds the list of entities to bring across a particular transition
+//------------------------------------------------------------------------------
+template<class T>
+int CGlobalEntityList<T>::BuildEntityTransitionList(T* pLandmarkEntity, const char* pLandmarkName,
+	T** ppEntList, int* pEntityFlags, int nMaxList)
+{
+	int iEntity = 0;
+
+	ConVarRef g_debug_transitions("g_debug_transitions");
+	// Only show debug for the transition to the level we're going to
+	if (g_debug_transitions.GetInt() && pLandmarkEntity->NameMatches(st_szNextSpot))
+	{
+		g_iDebuggingTransition = g_debug_transitions.GetInt();
+
+		// Show us where the landmark entity is
+		pLandmarkEntity->m_debugOverlays |= (OVERLAY_PIVOT_BIT | OVERLAY_BBOX_BIT | OVERLAY_NAME_BIT);
+	}
+	else
+	{
+		g_iDebuggingTransition = 0;
+	}
+
+	// Follow the linked list of entities in the PVS of the transition landmark
+	T* pEntity = NULL;
+	while ((pEntity = UTIL_EntitiesInPVS(pLandmarkEntity, pEntity)) != NULL)
+	{
+		int flags = ComputeEntitySaveFlags(pEntity);
+		if (!flags)
+			continue;
+
+		// Check to make sure the entity isn't screened out by a trigger_transition
+		if (!InTransitionVolume(pEntity, pLandmarkName))
+		{
+			if (g_iDebuggingTransition == DEBUG_TRANSITIONS_VERBOSE)
+			{
+				Msg("IGNORED, outside transition volume.\n");
+			}
+			continue;
+		}
+
+		if (iEntity >= nMaxList)
+		{
+			Warning("Too many entities across a transition!\n");
+			Assert(0);
+			return iEntity;
+		}
+
+		iEntity = AddEntityToTransitionList(pEntity, flags, iEntity, ppEntList, pEntityFlags);
+	}
+
+	return iEntity;
+}
+
+//------------------------------------------------------------------------------
+// Builds the list of entities to save when moving across a transition
+//------------------------------------------------------------------------------
+template<class T>
+int CGlobalEntityList<T>::BuildLandmarkList(levellist_t* pLevelList, int maxList)
+{
+	int nCount = 0;
+
+	T* pentChangelevel = FindEntityByClassname(NULL, "trigger_changelevel");
+	while (pentChangelevel)
+	{
+		//CChangeLevel* pTrigger = dynamic_cast<CChangeLevel*>(pentChangelevel);
+		if (pentChangelevel->IsChangeLevelTrigger())
+		{
+			// Find the corresponding landmark
+			T* pentLandmark = FindLandmark(pentChangelevel->GetNewLandmarkName());
+			if (pentLandmark)
+			{
+				// Build a list of unique transitions
+				if (AddLandmarkToList(pLevelList, nCount, pentChangelevel->GetNewMapName(), pentChangelevel->GetNewLandmarkName(), pentLandmark))
+				{
+					++nCount;
+					if (nCount >= maxList)		// FULL!!
+						break;
+				}
+			}
+		}
+		pentChangelevel = FindEntityByClassname(pentChangelevel, "trigger_changelevel");
+	}
+
+	return nCount;
+}
+
+template<class T>
+void CGlobalEntityList<T>::OnChangeLevel(const char* pNewMapName, const char* pNewLandmarkName) 
+{
+	g_iDebuggingTransition = 0;
+	st_szNextSpot[0] = 0;	// Init landmark to NULL
+	Q_strncpy(st_szNextSpot, pNewLandmarkName, sizeof(st_szNextSpot));
+	// This object will get removed in the call to engine->ChangeLevel, copy the params into "safe" memory
+	Q_strncpy(st_szNextMap, pNewMapName, sizeof(st_szNextMap));
+}
+
+//------------------------------------------------------------------------------
+// Tests bits in a bitfield
+//------------------------------------------------------------------------------
+inline bool IsBitSet(char* pBuf, int nBit)
+{
+	return (pBuf[nBit >> 3] & (1 << (nBit & 0x7))) != 0;
+}
+
+inline void Set(char* pBuf, int nBit)
+{
+	pBuf[nBit >> 3] |= 1 << (nBit & 0x7);
+}
+
+//------------------------------------------------------------------------------
+// Adds in all entities depended on by entities near the transition
+//------------------------------------------------------------------------------
+template<class T>
+int CGlobalEntityList<T>::AddDependentEntities(int nCount, T** ppEntList, int* pEntityFlags, int nMaxList)
+{
+	char pEntitiesSaved[MAX_ENTITY_BYTE_COUNT];
+	memset(pEntitiesSaved, 0, MAX_ENTITY_BYTE_COUNT * sizeof(char));
+
+	// Populate the initial bitfield
+	int i;
+	for (i = 0; i < nCount; ++i)
+	{
+		// NOTE: Must use GetEntryIndex because we're saving non-networked entities
+		int nEntIndex = ppEntList[i]->GetRefEHandle().GetEntryIndex();
+
+		// We shouldn't already have this entity in the list!
+		Assert(!IsBitSet(pEntitiesSaved, nEntIndex));
+
+		// Mark the entity as being in the list
+		Set(pEntitiesSaved, nEntIndex);
+	}
+
+	IEntitySaveUtils* pSaveUtils = GetEntitySaveUtils();
+
+	ConVarRef g_debug_transitions("g_debug_transitions");
+	// Iterate over entities whose dependencies we've not yet processed
+	// NOTE: nCount will change value during this loop in AddEntityToTransitionList
+	for (i = 0; i < nCount; ++i)
+	{
+		T* pEntity = ppEntList[i];
+
+		// Find dependencies in the hash.
+		int nDepCount = pSaveUtils->GetEntityDependencyCount(pEntity);
+		if (!nDepCount)
+			continue;
+
+		T** ppDependentEntities = (T**)stackalloc(nDepCount * sizeof(T*));
+		pSaveUtils->GetEntityDependencies(pEntity, nDepCount, ppDependentEntities);
+		for (int j = 0; j < nDepCount; ++j)
+		{
+			T* pDependent = ppDependentEntities[j];
+			if (!pDependent)
+				continue;
+
+			// NOTE: Must use GetEntryIndex because we're saving non-networked entities
+			int nEntIndex = pDependent->GetRefEHandle().GetEntryIndex();
+
+			// Don't re-add it if it's already in the list
+			if (IsBitSet(pEntitiesSaved, nEntIndex))
+				continue;
+
+			// Mark the entity as being in the list
+			Set(pEntitiesSaved, nEntIndex);
+
+			int flags = ComputeEntitySaveFlags(pEntity);
+			if (flags)
+			{
+				if (nCount >= nMaxList)
+				{
+					Warning("Too many entities across a transition!\n");
+					Assert(0);
+					return false;
+				}
+
+				if (g_debug_transitions.GetInt())
+				{
+					Msg("ADDED DEPENDANCY: %s (%s)\n", pEntity->GetClassname(), pEntity->GetDebugName());
+				}
+
+				nCount = AddEntityToTransitionList(pEntity, flags, nCount, ppEntList, pEntityFlags);
+			}
+			else
+			{
+				Warning("Warning!! Save dependency is linked to an entity that doesn't want to be saved!\n");
+			}
+		}
+	}
+
+	return nCount;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Called during a transition, to build a map adjacency list
+//-----------------------------------------------------------------------------
+template<class T>
+void CGlobalEntityList<T>::BuildAdjacentMapList(void)
+{
+	// retrieve the pointer to the save data
+	CSaveRestoreData* pSaveData = gpGlobals->pSaveData;
+	if (!pSaveData) {
+		return;
+	}
+
+	// Find all of the possible level changes on this BSP
+	pSaveData->levelInfo.connectionCount = BuildLandmarkList(pSaveData->levelInfo.levelList, MAX_LEVEL_CONNECTIONS);
+
+	if (pSaveData->NumEntities() == 0) {
+		return;
+	}
+
+	CSaveServer saveHelper(pSaveData);
+
+	// For each level change, find nearby entities and save them
+	int	i;
+	for (i = 0; i < pSaveData->levelInfo.connectionCount; i++)
+	{
+		T* pEntList[MAX_ENTITY];
+		int			 entityFlags[MAX_ENTITY];
+
+		// First, figure out which entities are near the transition
+		T* pLandmarkEntity = (T*)(pSaveData->levelInfo.levelList[i].pentLandmark);
+		int iEntityCount = BuildEntityTransitionList(pLandmarkEntity, pSaveData->levelInfo.levelList[i].landmarkName, pEntList, entityFlags, MAX_ENTITY);
+
+		// FIXME: Activate if we have a dependency problem on level transition
+		// Next, add in all entities depended on by entities near the transition
+//		iEntity = AddDependentEntities( iEntity, pEntList, entityFlags, MAX_ENTITY );
+
+		int j;
+		for (j = 0; j < iEntityCount; j++)
+		{
+			// Mark entity table with 1<<i
+			int index = saveHelper.EntityIndex(pEntList[j]);
+			// Flag it with the level number
+			saveHelper.EntityFlagsSet(index, entityFlags[j] | (1 << i));
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1331,7 +1958,7 @@ void CGlobalEntityList<T>::Clear(void)
 	CBaseHandle hCur = BaseClass::FirstHandle();
 	while (hCur != BaseClass::InvalidHandle())
 	{
-		CBaseEntity* ent = GetBaseEntity(hCur);
+		T* ent = GetBaseEntity(hCur);
 		if (ent)
 		{
 			MDLCACHE_CRITICAL_SECTION();

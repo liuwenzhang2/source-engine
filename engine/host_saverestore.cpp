@@ -4292,7 +4292,7 @@ bool CSaveRestore::SaveGameState( bool bTransition, CSaveRestoreData **ppReturnS
 	// Build the adjacent map list (after entity table build by game in presave)
 	if ( bTransition )
 	{
-		serverGameDLL->BuildAdjacentMapList();
+		serverEntitylist->BuildAdjacentMapList();
 	}
 	else
 	{
@@ -5513,7 +5513,7 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 	memset( &currentLevelData, 0, sizeof(CSaveRestoreData) );
 	g_ServerGlobalVariables.pSaveData = &currentLevelData;
 	// Build the adjacent map list
-	serverGameDLL->BuildAdjacentMapList();
+	serverEntitylist->BuildAdjacentMapList();
 	bool foundprevious = false;
 
 	for ( i = 0; i < currentLevelData.levelInfo.connectionCount; i++ )
@@ -5565,7 +5565,7 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 			}
 			
 			if ( flags )
-				movedCount = serverGameDLL->CreateEntityTransitionList( pSaveData, flags );
+				movedCount = serverEntitylist->CreateEntityTransitionList( pSaveData, flags );
 
 			// If ents were moved, rewrite entity table to save file
 			if ( movedCount )

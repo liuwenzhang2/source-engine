@@ -1608,6 +1608,87 @@ void CEngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
 	//#endif
 }
 
+struct collidelist_t
+{
+	const CPhysCollide* pCollide;
+	Vector			origin;
+	QAngle			angles;
+};
+
+// NOTE: This routine is relatively slow.  If you need to use it for per-frame work, consider that fact.
+// UNDONE: Expand this to the full matrix of solid types on each side and move into enginetrace
+bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* pEntity)
+{
+	Assert(pTrigger->GetSolid() == SOLID_BSP);
+
+	if (pTrigger->Intersects(pEntity))	// It touches one, it's in the volume
+	{
+		switch (pEntity->GetSolid())
+		{
+		case SOLID_BBOX:
+		{
+			ICollideable* pCollide = pTrigger->CollisionProp();
+			Ray_t ray;
+			trace_t tr;
+			ray.Init(pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin(), pEntity->WorldAlignMins(), pEntity->WorldAlignMaxs());
+			enginetrace->ClipRayToCollideable(ray, MASK_ALL, pCollide, &tr);
+
+			if (tr.startsolid)
+				return true;
+		}
+		break;
+		case SOLID_BSP:
+		case SOLID_VPHYSICS:
+		{
+			CPhysCollide* pTriggerCollide = modelinfo->GetVCollide(pTrigger->GetModelIndex())->solids[0];
+			Assert(pTriggerCollide);
+
+			CUtlVector<collidelist_t> collideList;
+			IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+			int physicsCount = pEntity->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+			if (physicsCount)
+			{
+				for (int i = 0; i < physicsCount; i++)
+				{
+					const CPhysCollide* pCollide = pList[i]->GetCollide();
+					if (pCollide)
+					{
+						collidelist_t element;
+						element.pCollide = pCollide;
+						pList[i]->GetPosition(&element.origin, &element.angles);
+						collideList.AddToTail(element);
+					}
+				}
+			}
+			else
+			{
+				vcollide_t* pVCollide = modelinfo->GetVCollide(pEntity->GetModelIndex());
+				if (pVCollide && pVCollide->solidCount)
+				{
+					collidelist_t element;
+					element.pCollide = pVCollide->solids[0];
+					element.origin = pEntity->GetAbsOrigin();
+					element.angles = pEntity->GetAbsAngles();
+					collideList.AddToTail(element);
+				}
+			}
+			for (int i = collideList.Count() - 1; i >= 0; --i)
+			{
+				const collidelist_t& element = collideList[i];
+				trace_t tr;
+				physcollision->TraceCollide(element.origin, element.origin, element.pCollide, element.angles, pTriggerCollide, pTrigger->GetAbsOrigin(), pTrigger->GetAbsAngles(), &tr);
+				if (tr.startsolid)
+					return true;
+			}
+		}
+		break;
+
+		default:
+			return true;
+		}
+	}
+	return false;
+}
 
 // Called by CEntityListSystem
 void CAimTargetManager::LevelInitPreEntity()

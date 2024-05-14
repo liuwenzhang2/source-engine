@@ -602,6 +602,7 @@
     <ClCompile Include="..\..\..\public\vgui_controls\vgui_controls.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\game\client\cbase.h" />
     <ClInclude Include="..\..\..\public\client_class.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

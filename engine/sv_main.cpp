@@ -1770,7 +1770,7 @@ void CGameServer::FinishRestore()
 
 	g_ServerGlobalVariables.pSaveData = &currentLevelData;
 	// Build the adjacent map list
-	serverGameDLL->BuildAdjacentMapList();
+	serverEntitylist->BuildAdjacentMapList();
 
 	if ( !saverestore->IsXSave() )
 	{

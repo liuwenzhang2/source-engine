@@ -526,7 +526,7 @@ public:
 				//pSaveData->levelInfo.connectionCount = BuildChangeList(pSaveData->levelInfo.levelList, MAX_LEVEL_CONNECTIONS);
 				//g_pGameSaveRestoreBlockSet->PostSave();
 				g_pServerGameSaveRestoreBlockSet->PreSave(pSaveData);
-				serverGameDLL->BuildAdjacentMapList();
+				serverEntitylist->BuildAdjacentMapList();
 				CSaveServer saveHelper(pSaveData);
 				g_pServerGameSaveRestoreBlockSet->WriteSaveHeaders(&saveHelper);
 				g_pServerGameSaveRestoreBlockSet->PostSave();

@@ -443,5 +443,7 @@ class CThreadNullMutex;
 typedef CThreadNullMutex CSourceMutex;
 #endif
 
+#define cchMapNameMost 32
+
 #endif
 

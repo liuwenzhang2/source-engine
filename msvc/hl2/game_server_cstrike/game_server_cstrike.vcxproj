@@ -584,6 +584,7 @@
     <ClCompile Include="..\..\..\public\tier0\memoverride.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\game\server\cbase.h" />
     <ClInclude Include="..\..\..\public\server_class.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
