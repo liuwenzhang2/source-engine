@@ -487,14 +487,18 @@ END_DATADESC()
 
 void SaveGlobalState(CSaveRestoreData* pSaveData)
 {
+#if !defined(SWDS)
 	CSaveServer saveHelper(pSaveData);
 	gGlobalState.Save(saveHelper);
+#endif
 }
 
 void RestoreGlobalState(CSaveRestoreData* pSaveData)
 {
+#if !defined(SWDS)
 	CRestoreServer restoreHelper(pSaveData);
 	gGlobalState.Restore(restoreHelper);
+#endif
 }
 
 
