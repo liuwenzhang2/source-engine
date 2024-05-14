@@ -4201,9 +4201,6 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 
 void C_BaseEntity::OnPostRestoreData()
 {
-	// HACK Force recomputation of origin
-	GetEngineObject()->InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED );
-
 	if (GetEngineObject()->GetMoveParent() )
 	{
 		AddToAimEntsList();
@@ -4371,10 +4368,7 @@ bool C_BaseEntity::ShouldSavePhysics()
 //-----------------------------------------------------------------------------
 void C_BaseEntity::OnSave()
 {
-	// Here, we must force recomputation of all abs data so it gets saved correctly
-	// We can't leave the dirty bits set because the loader can't cope with it.
-	GetEngineObject()->CalcAbsolutePosition();
-	GetEngineObject()->CalcAbsoluteVelocity();
+
 }
 
 
@@ -4382,9 +4376,7 @@ void C_BaseEntity::OnSave()
 // handler to do stuff after you are restored
 //-----------------------------------------------------------------------------
 void C_BaseEntity::OnRestore()
-{
-	GetEngineObject()->InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED );
-	
+{	
 	UpdatePartitionListEntry();
 	CollisionProp()->UpdatePartition();
 

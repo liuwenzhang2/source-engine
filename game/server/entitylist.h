@@ -188,31 +188,36 @@ public:
 #endif // _DEBUG
 	void ParseMapData(IEntityMapData* mapData);
 	bool KeyValue(const char* szKeyName, const char* szValue);
-	void					SetAbsVelocity(const Vector& vecVelocity);
+	// handler to reset stuff before you are restored
+	// NOTE: Always chain to base class when implementing this!
+	void OnSave(IEntitySaveUtils* pSaveUtils);
+	void OnRestore();
+
+	void SetAbsVelocity(const Vector& vecVelocity);
 	Vector& GetAbsVelocity();
 	const Vector& GetAbsVelocity() const;
 	// NOTE: Setting the abs origin or angles will cause the local origin + angles to be set also
-	void					SetAbsOrigin(const Vector& origin);
+	void SetAbsOrigin(const Vector& origin);
 	Vector& GetAbsOrigin(void);
 	const Vector& GetAbsOrigin(void) const;
 
-	void					SetAbsAngles(const QAngle& angles);
+	void SetAbsAngles(const QAngle& angles);
 	QAngle& GetAbsAngles(void);
 	const QAngle& GetAbsAngles(void) const;
 
 	// Origin and angles in local space ( relative to parent )
 	// NOTE: Setting the local origin or angles will cause the abs origin + angles to be set also
-	void					SetLocalOrigin(const Vector& origin);
+	void SetLocalOrigin(const Vector& origin);
 	const Vector& GetLocalOrigin(void) const;
 
-	void					SetLocalAngles(const QAngle& angles);
+	void SetLocalAngles(const QAngle& angles);
 	const QAngle& GetLocalAngles(void) const;
 
-	void					SetLocalVelocity(const Vector& vecVelocity);
+	void SetLocalVelocity(const Vector& vecVelocity);
 	const Vector& GetLocalVelocity() const;
 
-	void					CalcAbsolutePosition();
-	void					CalcAbsoluteVelocity();
+	void CalcAbsolutePosition();
+	void CalcAbsoluteVelocity();
 
 	CEngineObjectInternal* GetMoveParent(void);
 	void SetMoveParent(IEngineObjectServer* hMoveParent);
@@ -228,8 +233,8 @@ public:
 	const matrix3x4_t& EntityToWorldTransform() const;
 
 	// Some helper methods that transform a point from entity space to world space + back
-	void					EntityToWorldSpace(const Vector& in, Vector* pOut) const;
-	void					WorldToEntitySpace(const Vector& in, Vector* pOut) const;
+	void EntityToWorldSpace(const Vector& in, Vector* pOut) const;
+	void WorldToEntitySpace(const Vector& in, Vector* pOut) const;
 
 	// This function gets your parent's transform. If you're parented to an attachment,
 	// this calculates the attachment's transform and gives you that.
@@ -239,18 +244,18 @@ public:
 	matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix);
 
 	// Computes the abs position of a point specified in local space
-	void					ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
+	void ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
 
 	// Computes the abs position of a direction specified in local space
-	void					ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection);
+	void ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection);
 
-	void	GetVectors(Vector* forward, Vector* right, Vector* up) const;
+	void GetVectors(Vector* forward, Vector* right, Vector* up) const;
 
 	// Set the movement parent. Your local origin and angles will become relative to this parent.
 	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
 	// are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
 	// current m_iParentAttachment.
-	void	SetParent(IEngineObjectServer* pNewParent, int iAttachment = -1);
+	void SetParent(IEngineObjectServer* pNewParent, int iAttachment = -1);
 	// FIXME: Make hierarchy a member of CBaseEntity
 	// or a contained private class...
 	//static void UnlinkChild(CEngineObject* pParent, CEngineObject* pChild);
@@ -260,7 +265,7 @@ public:
 	//static void UnlinkFromParent(CEngineObject* pRemove);
 	//static void TransferChildren(CEngineObject* pOldParent, CEngineObject* pNewParent);
 
-	virtual int				AreaNum() const;
+	virtual int AreaNum() const;
 	virtual PVSInfo_t* GetPVSInfo();
 
 	// This version does a PVS check which also checks for connected areas
@@ -311,48 +316,48 @@ public:
 		return m_iName;
 	}
 
-	bool		NameMatches(const char* pszNameOrWildcard);
-	bool		ClassMatches(const char* pszClassOrWildcard);
-	bool		NameMatches(string_t nameStr);
-	bool		ClassMatches(string_t nameStr);
+	bool NameMatches(const char* pszNameOrWildcard);
+	bool ClassMatches(const char* pszClassOrWildcard);
+	bool NameMatches(string_t nameStr);
+	bool ClassMatches(string_t nameStr);
 
 	CEngineObjectNetworkProperty* NetworkProp();
 	const CEngineObjectNetworkProperty* NetworkProp() const;
 	IServerNetworkable* GetNetworkable();
 
-	int			GetParentAttachment();
-	void		ClearParentAttachment();
+	int	 GetParentAttachment();
+	void ClearParentAttachment();
 
-	int						GetEFlags() const;
-	void					SetEFlags(int iEFlags);
-	void					AddEFlags(int nEFlagMask);
-	void					RemoveEFlags(int nEFlagMask);
-	bool					IsEFlagSet(int nEFlagMask) const;
-	void					SetCheckUntouch(bool check);
-	bool					GetCheckUntouch() const;
-	int						GetTouchStamp();
-	void					ClearTouchStamp();
+	int GetEFlags() const;
+	void SetEFlags(int iEFlags);
+	void AddEFlags(int nEFlagMask);
+	void RemoveEFlags(int nEFlagMask);
+	bool IsEFlagSet(int nEFlagMask) const;
+	void SetCheckUntouch(bool check);
+	bool GetCheckUntouch() const;
+	int GetTouchStamp();
+	void ClearTouchStamp();
 
 	// Externalized data objects ( see sharreddefs.h for DataObjectType_t )
-	bool					HasDataObjectType(int type) const;
-	void					AddDataObjectType(int type);
-	void					RemoveDataObjectType(int type);
+	bool HasDataObjectType(int type) const;
+	void AddDataObjectType(int type);
+	void RemoveDataObjectType(int type);
 
-	void*					GetDataObject(int type);
-	void*					CreateDataObject(int type);
-	void					DestroyDataObject(int type);
-	void					DestroyAllDataObjects(void);
+	void* GetDataObject(int type);
+	void* CreateDataObject(int type);
+	void DestroyDataObject(int type);
+	void DestroyAllDataObjects(void);
 
 	// Invalidates the abs state of all children
-	void					InvalidatePhysicsRecursive(int nChangeFlags);
+	void InvalidatePhysicsRecursive(int nChangeFlags);
 public:
 	// Networking related methods
-	void	NetworkStateChanged();
-	void	NetworkStateChanged(void* pVar);
-	void	NetworkStateChanged(unsigned short varOffset);
+	void NetworkStateChanged();
+	void NetworkStateChanged(void* pVar);
+	void NetworkStateChanged(unsigned short varOffset);
 private:
-	bool		NameMatchesComplex(const char* pszNameOrWildcard);
-	bool		ClassMatchesComplex(const char* pszClassOrWildcard);
+	bool NameMatchesComplex(const char* pszNameOrWildcard);
+	bool ClassMatchesComplex(const char* pszClassOrWildcard);
 private:
 
 	friend class CBaseEntity;
@@ -718,7 +723,7 @@ private:
 	CEngineObjectInternal* m_EngineObjectArray[NUM_ENT_ENTRIES];
 
 	CEntitySaveUtils	m_EntitySaveUtils;
-	CUtlVector<EHANDLE> m_RestoredEntities;
+	CUtlVector<CBaseHandle> m_RestoredEntities;
 
 	char st_szNextMap[cchMapNameMost];
 	char st_szNextSpot[cchMapNameMost];
@@ -744,7 +749,7 @@ inline void CGlobalEntityList<T>::PreSave(CSaveRestoreData* pSaveData)
 	T* pEnt = NULL;
 	while ((pEnt = NextEnt(pEnt)) != NULL)
 	{
-		pEnt->OnSave(&m_EntitySaveUtils);
+		m_EngineObjectArray[pEnt->entindex()]->OnSave(&m_EntitySaveUtils);
 	}
 
 	SaveInitEntities(pSaveData);
@@ -906,7 +911,7 @@ void CGlobalEntityList<T>::AddRestoredEntity(T* pEntity)
 	if (!pEntity)
 		return;
 
-	m_RestoredEntities.AddToTail(EHANDLE(pEntity));
+	m_RestoredEntities.AddToTail(pEntity->GetRefEHandle());
 }
 
 template<class T>
@@ -1173,11 +1178,11 @@ void CGlobalEntityList<T>::PostRestore()
 // Call all entities' OnRestore handlers
 	for (int i = m_RestoredEntities.Count() - 1; i >= 0; --i)
 	{
-		T* pEntity = m_RestoredEntities[i].Get();
+		T* pEntity = (T*)GetServerEntityFromHandle(m_RestoredEntities[i]);
 		if (pEntity && !pEntity->IsDormant())
 		{
 			MDLCACHE_CRITICAL_SECTION();
-			pEntity->OnRestore();
+			m_EngineObjectArray[pEntity->entindex()]->OnRestore();
 		}
 	}
 

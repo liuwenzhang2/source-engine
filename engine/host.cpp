@@ -4541,8 +4541,8 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 #if !defined(SWDS)
 	if ( loadfromsavedgame )
 	{
-		if ( true )//!bTransitionBySave
-		{
+		//if ( true )//!bTransitionBySave
+		//{
 			// save the current level's state
 			saverestore->SaveGameState( true, &pSaveData );
 
@@ -4552,7 +4552,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 				SCR_EndLoadingPlaque();
 				return false;
 			}
-		}
+		//}
 
 		// ensure resources in the transition volume stay
 		AddTransitionResources( pSaveData, szMapName, startspot );

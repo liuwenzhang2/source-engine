@@ -3027,10 +3027,7 @@ int CBaseEntity::Restore( IRestore &restore )
 //-----------------------------------------------------------------------------
 void CBaseEntity::OnSave( IEntitySaveUtils *pUtils )
 {
-	// Here, we must force recomputation of all abs data so it gets saved correctly
-	// We can't leave the dirty bits set because the loader can't cope with it.
-	GetEngineObject()->CalcAbsolutePosition();
-	GetEngineObject()->CalcAbsoluteVelocity();
+	
 }
 
 //-----------------------------------------------------------------------------
@@ -3051,15 +3048,6 @@ void CBaseEntity::OnRestore()
 	}
 #endif
 
-	SimThink_EntityChanged( this );
-
-	// touchlinks get recomputed
-	if (GetEngineObject()->IsEFlagSet( EFL_CHECK_UNTOUCH ) )
-	{
-		GetEngineObject()->RemoveEFlags( EFL_CHECK_UNTOUCH );
-		GetEngineObject()->SetCheckUntouch( true );
-	}
-
 	// disable touch functions while we recreate the touch links between entities
 	// NOTE: We don't do this on transitions, because we'd miss the OnStartTouch call!
 #if !defined(HL2_DLL) || ( defined(HL2_DLL) && defined(HL2_EPISODIC) )
@@ -3077,31 +3065,6 @@ void CBaseEntity::OnRestore()
 		RemoveFlag( FL_DISSOLVING | FL_ONFIRE );
 	}
 
-	if (GetMoveParent())
-	{
-		CBaseEntity *pChild = GetMoveParent()->FirstMoveChild();
-		while ( pChild )
-		{
-			if ( pChild == this )
-				break;
-			pChild = pChild->NextMovePeer();
-		}
-		if ( pChild != this )
-		{
-#if _DEBUG
-			// generally this means you've got something marked FCAP_DONT_SAVE
-			// in a hierarchy.  That's probably ok given this fixup, but the hierarhcy
-			// linked list is just saved/loaded in-place
-			Warning("Fixing up parent on %s\n", GetClassname() );
-#endif
-			// We only need to be back in the parent's list because we're already in the right place and with the right data
-			IEngineObjectServer::LinkChild(GetMoveParent()->GetEngineObject(), this->GetEngineObject());
-			this->AfterParentChanged(NULL);
-		}
-	}
-
-	// We're not save/loading the PVS dirty state. Assume everything is dirty after a restore
-	GetEngineObject()->MarkPVSInformationDirty();
 }
 
 

@@ -375,6 +375,28 @@ bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue
 }
 
 //-----------------------------------------------------------------------------
+// handler to do stuff before you are saved
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::OnSave()
+{
+	// Here, we must force recomputation of all abs data so it gets saved correctly
+	// We can't leave the dirty bits set because the loader can't cope with it.
+	CalcAbsolutePosition();
+	CalcAbsoluteVelocity();
+	m_pOuter->OnSave();
+}
+
+//-----------------------------------------------------------------------------
+// handler to do stuff after you are restored
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::OnRestore()
+{
+	InvalidatePhysicsRecursive(POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED);
+
+	m_pOuter->OnRestore();
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *map - 
 //-----------------------------------------------------------------------------
@@ -1731,7 +1753,8 @@ int C_EngineObjectInternal::RestoreData(const char* context, int slot, int type)
 		m_pOuter->SetModelIndex(newModelIndex);
 	}
 
-
+	// HACK Force recomputation of origin
+	InvalidatePhysicsRecursive(POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED);
 	m_pOuter->OnPostRestoreData();
 
 	return error_count + outerError_count;

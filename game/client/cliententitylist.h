@@ -163,34 +163,37 @@ public:
 		return m_pOuter;
 	}
 
-	void					ParseMapData(IEntityMapData* mapData);
+	void ParseMapData(IEntityMapData* mapData);
 	bool KeyValue(const char* szKeyName, const char* szValue);
+	void OnSave();
+	void OnRestore();
+
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel
-	void				SetAbsVelocity(const Vector& vecVelocity);
+	void SetAbsVelocity(const Vector& vecVelocity);
 	Vector& GetAbsVelocity();
 	const Vector& GetAbsVelocity() const;
 
 	// Sets abs angles, but also sets local angles to be appropriate
-	void				SetAbsOrigin(const Vector& origin);
+	void SetAbsOrigin(const Vector& origin);
 	Vector& GetAbsOrigin(void);
 	const Vector& GetAbsOrigin(void) const;
 
-	void				SetAbsAngles(const QAngle& angles);
+	void SetAbsAngles(const QAngle& angles);
 	QAngle& GetAbsAngles(void);
 	const QAngle& GetAbsAngles(void) const;
 
-	void				SetLocalOrigin(const Vector& origin);
-	void				SetLocalOriginDim(int iDim, vec_t flValue);
+	void SetLocalOrigin(const Vector& origin);
+	void SetLocalOriginDim(int iDim, vec_t flValue);
 	const Vector& GetLocalOrigin(void) const;
-	vec_t				GetLocalOriginDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
+	vec_t GetLocalOriginDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
 
-	void				SetLocalAngles(const QAngle& angles);
-	void				SetLocalAnglesDim(int iDim, vec_t flValue);
+	void SetLocalAngles(const QAngle& angles);
+	void SetLocalAnglesDim(int iDim, vec_t flValue);
 	const QAngle& GetLocalAngles(void) const;
-	vec_t				GetLocalAnglesDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
+	vec_t GetLocalAnglesDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
 
-	void				SetLocalVelocity(const Vector& vecVelocity);
+	void SetLocalVelocity(const Vector& vecVelocity);
 	Vector& GetLocalVelocity();
 	const Vector& GetLocalVelocity() const;
 
@@ -201,7 +204,7 @@ public:
 	ITypedInterpolatedVar< Vector >& GetOriginInterpolator();
 
 	// Determine approximate velocity based on updates from server
-	void					EstimateAbsVelocity(Vector& vel);
+	void EstimateAbsVelocity(Vector& vel);
 	// Computes absolute position based on hierarchy
 	void CalcAbsolutePosition();
 	void CalcAbsoluteVelocity();
@@ -233,10 +236,10 @@ public:
 	const matrix3x4_t& EntityToWorldTransform() const;
 
 	// Some helper methods that transform a point from entity space to world space + back
-	void							EntityToWorldSpace(const Vector& in, Vector* pOut) const;
-	void							WorldToEntitySpace(const Vector& in, Vector* pOut) const;
+	void EntityToWorldSpace(const Vector& in, Vector* pOut) const;
+	void WorldToEntitySpace(const Vector& in, Vector* pOut) const;
 
-	void							GetVectors(Vector* forward, Vector* right, Vector* up) const;
+	void GetVectors(Vector* forward, Vector* right, Vector* up) const;
 
 	// This function gets your parent's transform. If you're parented to an attachment,
 // this calculates the attachment's transform and gives you that.
@@ -246,10 +249,10 @@ public:
 	matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix);
 
 	// Computes the abs position of a point specified in local space
-	void				ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
+	void ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
 
 	// Computes the abs position of a direction specified in local space
-	void				ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection);
+	void ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection);
 
 public:
 
@@ -258,19 +261,19 @@ public:
 	VarMapping_t* GetVarMapping();
 
 	// Set appropriate flags and store off data when these fields are about to change
-	void							OnLatchInterpolatedVariables(int flags);
+	void OnLatchInterpolatedVariables(int flags);
 	// For predictable entities, stores last networked value
-	void							OnStoreLastNetworkedValue();
+	void OnStoreLastNetworkedValue();
 
-	void							Interp_SetupMappings(VarMapping_t* map);
+	void Interp_SetupMappings(VarMapping_t* map);
 
 	// Returns 1 if there are no more changes (ie: we could call RemoveFromInterpolationList).
-	int								Interp_Interpolate(VarMapping_t* map, float currentTime);
+	int Interp_Interpolate(VarMapping_t* map, float currentTime);
 
-	void							Interp_RestoreToLastNetworked(VarMapping_t* map);
-	void							Interp_UpdateInterpolationAmounts(VarMapping_t* map);
-	void							Interp_Reset(VarMapping_t* map);
-	void							Interp_HierarchyUpdateInterpolationAmounts();
+	void Interp_RestoreToLastNetworked(VarMapping_t* map);
+	void Interp_UpdateInterpolationAmounts(VarMapping_t* map);
+	void Interp_Reset(VarMapping_t* map);
+	void Interp_HierarchyUpdateInterpolationAmounts();
 
 
 
@@ -279,22 +282,22 @@ public:
 	int BaseInterpolatePart1(float& currentTime, Vector& oldOrigin, QAngle& oldAngles, Vector& oldVel, int& bNoMoreChanges);
 	void BaseInterpolatePart2(Vector& oldOrigin, QAngle& oldAngles, Vector& oldVel, int nChangeFlags);
 
-	void							AllocateIntermediateData(void);
-	void							DestroyIntermediateData(void);
-	void							ShiftIntermediateDataForward(int slots_to_remove, int previous_last_slot);
+	void AllocateIntermediateData(void);
+	void DestroyIntermediateData(void);
+	void ShiftIntermediateDataForward(int slots_to_remove, int previous_last_slot);
 
 	void* GetPredictedFrame(int framenumber);
 	void* GetOuterPredictedFrame(int framenumber);
 	void* GetOriginalNetworkDataObject(void);
 	void* GetOuterOriginalNetworkDataObject(void);
-	bool							IsIntermediateDataAllocated(void) const;
+	bool IsIntermediateDataAllocated(void) const;
 
-	void							PreEntityPacketReceived(int commands_acknowledged);
-	void							PostEntityPacketReceived(void);
-	bool							PostNetworkDataReceived(int commands_acknowledged);
+	void PreEntityPacketReceived(int commands_acknowledged);
+	void PostEntityPacketReceived(void);
+	bool PostNetworkDataReceived(int commands_acknowledged);
 
-	int								SaveData(const char* context, int slot, int type);
-	int								RestoreData(const char* context, int slot, int type);
+	int SaveData(const char* context, int slot, int type);
+	int RestoreData(const char* context, int slot, int type);
 
 	void SetClassname(const char* className)
 	{
@@ -323,28 +326,28 @@ public:
 		return m_iParentAttachment;
 	}
 
-	int						GetEFlags() const;
-	void					SetEFlags(int iEFlags);
-	void					AddEFlags(int nEFlagMask);
-	void					RemoveEFlags(int nEFlagMask);
-	bool					IsEFlagSet(int nEFlagMask) const;
+	int GetEFlags() const;
+	void SetEFlags(int iEFlags);
+	void AddEFlags(int nEFlagMask);
+	void RemoveEFlags(int nEFlagMask);
+	bool IsEFlagSet(int nEFlagMask) const;
 
-	void					SetCheckUntouch(bool check);
-	bool					GetCheckUntouch() const;
-	int						GetTouchStamp();
-	void					ClearTouchStamp();
+	void SetCheckUntouch(bool check);
+	bool GetCheckUntouch() const;
+	int GetTouchStamp();
+	void ClearTouchStamp();
 
 	// Externalized data objects ( see sharreddefs.h for DataObjectType_t )
-	bool					HasDataObjectType(int type) const;
-	void					AddDataObjectType(int type);
-	void					RemoveDataObjectType(int type);
+	bool HasDataObjectType(int type) const;
+	void AddDataObjectType(int type);
+	void RemoveDataObjectType(int type);
 
-	void*					GetDataObject(int type);
-	void*					CreateDataObject(int type);
-	void					DestroyDataObject(int type);
-	void					DestroyAllDataObjects(void);
+	void* GetDataObject(int type);
+	void* CreateDataObject(int type);
+	void DestroyDataObject(int type);
+	void DestroyAllDataObjects(void);
 
-	void					Clear(void) {
+	void Clear(void) {
 		m_pOriginalData = NULL;
 		m_pOuterOriginalData = NULL;
 		for (int i = 0; i < MULTIPLAYER_BACKUP; i++) {
@@ -730,7 +733,7 @@ private:
 	// entities have to get it this way).
 	CUtlLinkedList<CPVSNotifyInfo,unsigned short> m_PVSNotifyInfos;
 	CUtlMap<IClientUnknown*,unsigned short,unsigned short> m_PVSNotifierMap;	// Maps IClientUnknowns to indices into m_PVSNotifyInfos.
-	CUtlVector<EHANDLE> m_RestoredEntities;
+	CUtlVector<CBaseHandle> m_RestoredEntities;
 
 };
 
@@ -763,7 +766,7 @@ void CClientEntityList<T>::PreSave(CSaveRestoreData* pSaveData)
 			if (!pEnt)
 				continue;
 
-			pEnt->OnSave();
+			m_EngineObjectArray[pEnt->entindex()]->OnSave();
 		}
 
 		while (iter != BaseClass::InvalidHandle())
@@ -772,7 +775,7 @@ void CClientEntityList<T>::PreSave(CSaveRestoreData* pSaveData)
 
 			if (pEnt && pEnt->ObjectCaps() & FCAP_SAVE_NON_NETWORKABLE)
 			{
-				pEnt->OnSave();
+				m_EngineObjectArray[pEnt->entindex()]->OnSave();
 			}
 
 			iter = BaseClass::NextHandle(iter);
@@ -977,7 +980,7 @@ void CClientEntityList<T>::AddRestoredEntity(T* pEntity)
 	if (!pEntity)
 		return;
 
-	m_RestoredEntities.AddToTail(EHANDLE(pEntity));
+	m_RestoredEntities.AddToTail(pEntity->GetRefEHandle());
 }
 
 template<class T>
@@ -1063,10 +1066,11 @@ void CClientEntityList<T>::PostRestore()
 {
 	for (int i = 0; i < m_RestoredEntities.Count(); i++)
 	{
-		if (m_RestoredEntities[i] != NULL)
+		T* pEntity = (T*)GetClientEntityFromHandle(m_RestoredEntities[i]);
+		if (pEntity)
 		{
 			MDLCACHE_CRITICAL_SECTION();
-			m_RestoredEntities[i]->OnRestore();
+			m_EngineObjectArray[pEntity->entindex()]->OnRestore();
 		}
 	}
 	m_RestoredEntities.RemoveAll();
