@@ -971,8 +971,8 @@ void CEngineObjectInternal::UnlinkChild(IEngineObjectServer* pChild)
 			}
 
 			// Clear hierarchy bits for this guy
-			pChild->SetMoveParent(NULL);
-			pChild->SetNextMovePeer(NULL);
+			((CEngineObjectInternal*)pChild)->SetMoveParent(NULL);
+			((CEngineObjectInternal*)pChild)->SetNextMovePeer(NULL);
 			//pList->GetOuter()->NetworkProp()->SetNetworkParent( CBaseHandle() );
 			pChild->GetOuter()->DispatchUpdateTransmitState();
 			pChild->GetOuter()->OnEntityEvent(ENTITY_EVENT_PARENT_CHANGED, NULL);
@@ -995,9 +995,9 @@ void CEngineObjectInternal::LinkChild(IEngineObjectServer* pChild)
 {
 	//EHANDLE hParent;
 	//hParent.Set( pParent->GetOuter() );
-	pChild->SetNextMovePeer(this->FirstMoveChild());
+	((CEngineObjectInternal*)pChild)->SetNextMovePeer(this->FirstMoveChild());
 	this->SetFirstMoveChild(pChild);
-	pChild->SetMoveParent(this);
+	((CEngineObjectInternal*)pChild)->SetMoveParent(this);
 	//pChild->GetOuter()->NetworkProp()->SetNetworkParent(pParent->GetOuter());
 	pChild->GetOuter()->DispatchUpdateTransmitState();
 	pChild->GetOuter()->OnEntityEvent(ENTITY_EVENT_PARENT_CHANGED, NULL);
@@ -1176,7 +1176,7 @@ void CEngineObjectInternal::GetVectors(Vector* forward, Vector* right, Vector* u
 	m_pOuter->GetVectors(forward, right, up);
 }
 
-matrix3x4_t& CEngineObjectInternal::GetParentToWorldTransform(matrix3x4_t& tempMatrix)
+const matrix3x4_t& CEngineObjectInternal::GetParentToWorldTransform(matrix3x4_t& tempMatrix)
 {
 	CEngineObjectInternal* pMoveParent = GetMoveParent();
 	if (!pMoveParent)
@@ -1233,7 +1233,7 @@ void CEngineObjectInternal::SetAbsOrigin(const Vector& absOrigin)
 	else
 	{
 		matrix3x4_t tempMat;
-		matrix3x4_t& parentTransform = GetParentToWorldTransform(tempMat);
+		const matrix3x4_t& parentTransform = GetParentToWorldTransform(tempMat);
 
 		// Moveparent case: transform the abs position into local space
 		VectorITransform(absOrigin, parentTransform, vecNewOrigin);

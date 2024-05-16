@@ -76,12 +76,12 @@ public:
 	virtual void TransferChildren(IEngineObjectServer* pNewParent) = 0;
 
 	virtual IEngineObjectServer* GetMoveParent(void) = 0;
-	virtual void SetMoveParent(IEngineObjectServer* hMoveParent) = 0;
+	//virtual void SetMoveParent(IEngineObjectServer* hMoveParent) = 0;
 	virtual IEngineObjectServer* GetRootMoveParent() = 0;
 	virtual IEngineObjectServer* FirstMoveChild(void) = 0;
-	virtual void SetFirstMoveChild(IEngineObjectServer* hMoveChild) = 0;
+	//virtual void SetFirstMoveChild(IEngineObjectServer* hMoveChild) = 0;
 	virtual IEngineObjectServer* NextMovePeer(void) = 0;
-	virtual void SetNextMovePeer(IEngineObjectServer* hMovePeer) = 0;
+	//virtual void SetNextMovePeer(IEngineObjectServer* hMovePeer) = 0;
 
 	virtual void ResetRgflCoordinateFrame() = 0;
 	// Returns the entity-to-world transform
@@ -97,7 +97,7 @@ public:
 	//
 	// You must pass in tempMatrix for scratch space - it may need to fill that in and return it instead of 
 	// pointing you right at a variable in your parent.
-	virtual matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix) = 0;
+	virtual const matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix) = 0;
 
 	// Computes the abs position of a point specified in local space
 	virtual void ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition) = 0;

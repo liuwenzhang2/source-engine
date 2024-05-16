@@ -137,6 +137,17 @@ public:
 	{
 		AddVar(&m_vecOrigin, &m_iv_vecOrigin, LATCH_SIMULATION_VAR);
 		AddVar(&m_angRotation, &m_iv_angRotation, LATCH_SIMULATION_VAR);
+
+#ifdef _DEBUG
+		m_vecAbsOrigin = vec3_origin;
+		m_angAbsRotation = vec3_angle;
+		m_vecNetworkOrigin.Init();
+		m_angNetworkAngles.Init();
+		m_vecAbsOrigin.Init();
+		//	m_vecAbsAngVelocity.Init();
+		m_vecVelocity.Init();
+		m_vecAbsVelocity.Init();
+#endif
 		// Removing this until we figure out why velocity introduces view hitching.
 		// One possible fix is removing the player->ResetLatched() call in CGameMovement::FinishDuck(), 
 		// but that re-introduces a third-person hitching bug.  One possible cause is the abrupt change
@@ -246,7 +257,7 @@ public:
 //
 // You must pass in tempMatrix for scratch space - it may need to fill that in and return it instead of 
 // pointing you right at a variable in your parent.
-	matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix);
+	const matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix);
 
 	// Computes the abs position of a point specified in local space
 	void ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
@@ -1473,14 +1484,7 @@ void CClientEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 	C_BaseEntity* pBaseEntity = pUnknown->GetBaseEntity();
 	m_EngineObjectArray[entnum] = new C_EngineObjectInternal();
 	m_EngineObjectArray[entnum]->Init(pBaseEntity);
-#ifdef _DEBUG
-	m_EngineObjectArray[entnum]->SetAbsOrigin(vec3_origin);
-	m_EngineObjectArray[entnum]->SetAbsAngles(vec3_angle);
-	m_EngineObjectArray[entnum]->GetAbsOrigin().Init();
-	//	m_vecAbsAngVelocity.Init();
-	m_EngineObjectArray[entnum]->GetLocalVelocity().Init();
-	m_EngineObjectArray[entnum]->GetAbsVelocity().Init();
-#endif
+
 //	if (pBaseEntity)
 //	{
 		//pCache->m_BaseEntitiesIndex = m_BaseEntities.AddToTail(pBaseEntity);

@@ -599,16 +599,16 @@ void C_EngineObjectInternal::UnlinkChild(IEngineObjectClient* pChild)
 	// Unlink from siblings...
 	if (pChild->MovePrevPeer())
 	{
-		pChild->MovePrevPeer()->SetNextMovePeer(pChild->NextMovePeer());
+		((C_EngineObjectInternal*)pChild->MovePrevPeer())->SetNextMovePeer(pChild->NextMovePeer());
 	}
 	if (pChild->NextMovePeer())
 	{
-		pChild->NextMovePeer()->SetMovePrevPeer(pChild->MovePrevPeer());
+		((C_EngineObjectInternal*)pChild->NextMovePeer())->SetMovePrevPeer(pChild->MovePrevPeer());
 	}
 
-	pChild->SetNextMovePeer( NULL);
-	pChild->SetMovePrevPeer( NULL);
-	pChild->SetMoveParent( NULL);
+	((C_EngineObjectInternal*)pChild)->SetNextMovePeer( NULL);
+	((C_EngineObjectInternal*)pChild)->SetMovePrevPeer( NULL);
+	((C_EngineObjectInternal*)pChild)->SetMoveParent( NULL);
 	pChild->GetOuter()->RemoveFromAimEntsList();
 
 	Interp_HierarchyUpdateInterpolationAmounts();
@@ -624,20 +624,20 @@ void C_EngineObjectInternal::LinkChild(IEngineObjectClient* pChild)
 #ifdef _DEBUG
 	// Make sure the child isn't already in this list
 	IEngineObjectClient* pExistingChild;
-	for (pExistingChild = pParent->FirstMoveChild(); pExistingChild; pExistingChild = pExistingChild->NextMovePeer())
+	for (pExistingChild = this->FirstMoveChild(); pExistingChild; pExistingChild = pExistingChild->NextMovePeer())
 	{
 		Assert(pChild != pExistingChild);
 	}
 #endif
 
-	pChild->SetMovePrevPeer( NULL);
-	pChild->SetNextMovePeer( this->FirstMoveChild());
+	((C_EngineObjectInternal*)pChild)->SetMovePrevPeer( NULL);
+	((C_EngineObjectInternal*)pChild)->SetNextMovePeer( this->FirstMoveChild());
 	if (pChild->NextMovePeer())
 	{
-		pChild->NextMovePeer()->SetMovePrevPeer( pChild);
+		((C_EngineObjectInternal*)pChild->NextMovePeer())->SetMovePrevPeer( pChild);
 	}
 	this->SetFirstMoveChild( pChild);
-	pChild->SetMoveParent( this);
+	((C_EngineObjectInternal*)pChild)->SetMoveParent( this);
 	pChild->GetOuter()->AddToAimEntsList();
 
 	Interp_HierarchyUpdateInterpolationAmounts();
@@ -1133,7 +1133,7 @@ const matrix3x4_t& C_EngineObjectInternal::EntityToWorldTransform() const
 }
 
 
-matrix3x4_t& C_EngineObjectInternal::GetParentToWorldTransform(matrix3x4_t& tempMatrix)
+const matrix3x4_t& C_EngineObjectInternal::GetParentToWorldTransform(matrix3x4_t& tempMatrix)
 {
 	C_EngineObjectInternal* pMoveParent = GetMoveParent();
 	if (!pMoveParent)

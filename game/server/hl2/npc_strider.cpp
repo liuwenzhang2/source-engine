@@ -831,7 +831,7 @@ const Vector &CNPC_Strider::GetViewOffset()
 	vOffset.y = 0;
 	vOffset.z = ( GetHeight() - GetMaxHeightModel() ) + gm_zMinigunDist;
 
-	Assert( VectorsAreEqual( GetAbsOrigin() + vOffset, EyePosition(), 0.1 ));
+	Assert( VectorsAreEqual( GetEngineObject()->GetAbsOrigin() + vOffset, EyePosition(), 0.1 ));
 
 	SetViewOffset( vOffset );
 

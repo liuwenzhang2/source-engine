@@ -6375,11 +6375,11 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 			if ( pSmoke )
 			{
 				Vector vForward;
-				AngleVectors( GetLocalAngles(), &vForward );
+				AngleVectors( GetEngineObject()->GetLocalAngles(), &vForward );
 				vForward.z = 0;
 				VectorNormalize( vForward );
 
-				pSmoke->SetLocalOrigin( GetLocalOrigin() + vForward * 100 );
+				pSmoke->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() + vForward * 100 );
 				pSmoke->SetFadeTime(25, 30);	// Fade out between 25 seconds and 30 seconds.
 				pSmoke->Activate();
 				pSmoke->SetLifetime(30);

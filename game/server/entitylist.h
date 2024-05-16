@@ -172,6 +172,10 @@ public:
 		m_pOuter = pOuter;
 		m_PVSInfo.m_nClusterCount = 0;
 		m_bPVSInfoDirty = true;
+#ifdef _DEBUG
+		m_vecVelocity.Init();
+		m_vecAbsVelocity.Init();
+#endif
 	}
 
 	CBaseEntity* GetOuter() {
@@ -241,7 +245,7 @@ public:
 	//
 	// You must pass in tempMatrix for scratch space - it may need to fill that in and return it instead of 
 	// pointing you right at a variable in your parent.
-	matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix);
+	const matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix);
 
 	// Computes the abs position of a point specified in local space
 	void ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition);
@@ -2739,11 +2743,6 @@ void CGlobalEntityList<T>::OnAddEntity(T* pEnt, CBaseHandle handle)
 	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
 	m_EngineObjectArray[i] = new CEngineObjectInternal();
 	m_EngineObjectArray[i]->Init(pBaseEnt);
-#ifdef _DEBUG
-	((Vector)m_EngineObjectArray[i]->GetLocalVelocity()).Init();
-	m_EngineObjectArray[i]->GetAbsVelocity().Init();
-#endif
-
 
 	if (pBaseEnt->IsNetworkable()) {
 		if (pBaseEnt->entindex() != -1)

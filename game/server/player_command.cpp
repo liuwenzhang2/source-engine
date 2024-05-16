@@ -230,7 +230,7 @@ void CPlayerMove::FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *mo
 
 	// The class had better not have changed during the move!!
 	if ( player->m_hConstraintEntity )
-		Assert( move->m_vecConstraintCenter == player->m_hConstraintEntity.Get()->GetAbsOrigin() );
+		Assert( move->m_vecConstraintCenter == player->m_hConstraintEntity.Get()->GetEngineObject()->GetAbsOrigin() );
 	else
 		Assert( move->m_vecConstraintCenter == player->m_vecConstraintCenter );
 	Assert( move->m_flConstraintRadius == player->m_flConstraintRadius );

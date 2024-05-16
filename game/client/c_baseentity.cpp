@@ -630,14 +630,6 @@ C_BaseEntity::C_BaseEntity()
 	m_pPhysicsObject = NULL;
 	//GetEngineObject()->Init(this);
 #ifdef _DEBUG
-	//GetEngineObject()->SetAbsOrigin(vec3_origin);
-	//GetEngineObject()->SetAbsAngles(vec3_angle);
-	//m_vecNetworkOrigin.Init();
-	//m_angNetworkAngles.Init();
-	//GetEngineObject()->GetAbsOrigin().Init();
-//	m_vecAbsAngVelocity.Init();
-	//GetEngineObject()->GetLocalVelocity().Init();
-	//GetEngineObject()->GetAbsVelocity().Init();
 	m_vecViewOffset.Init();
 	m_vecBaseVelocity.Init();
 

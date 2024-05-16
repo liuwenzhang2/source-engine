@@ -821,7 +821,7 @@ void CPrediction::FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *m
 
 	// Sanity checks
 	if ( player->m_hConstraintEntity )
-		Assert( move->m_vecConstraintCenter == player->m_hConstraintEntity->GetAbsOrigin() );
+		Assert( move->m_vecConstraintCenter == player->m_hConstraintEntity->GetEngineObject()->GetAbsOrigin() );
 	else
 		Assert( move->m_vecConstraintCenter == player->m_vecConstraintCenter );
 	Assert( move->m_flConstraintRadius == player->m_flConstraintRadius );

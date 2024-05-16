@@ -109,14 +109,14 @@ public:
 
 	// Methods relating to traversing hierarchy
 	virtual IEngineObjectClient* GetMoveParent(void) const = 0;
-	virtual void SetMoveParent(IEngineObjectClient* pMoveParent) = 0;
+	//virtual void SetMoveParent(IEngineObjectClient* pMoveParent) = 0;
 	virtual IEngineObjectClient* GetRootMoveParent() = 0;
 	virtual IEngineObjectClient* FirstMoveChild(void) const = 0;
-	virtual void SetFirstMoveChild(IEngineObjectClient* pMoveChild) = 0;
+	//virtual void SetFirstMoveChild(IEngineObjectClient* pMoveChild) = 0;
 	virtual IEngineObjectClient* NextMovePeer(void) const = 0;
-	virtual void SetNextMovePeer(IEngineObjectClient* pMovePeer) = 0;
+	//virtual void SetNextMovePeer(IEngineObjectClient* pMovePeer) = 0;
 	virtual IEngineObjectClient* MovePrevPeer(void) const = 0;
-	virtual void SetMovePrevPeer(IEngineObjectClient* pMovePrevPeer) = 0;
+	//virtual void SetMovePrevPeer(IEngineObjectClient* pMovePrevPeer) = 0;
 
 	virtual void ResetRgflCoordinateFrame() = 0;
 	// Returns the entity-to-world transform
@@ -134,7 +134,7 @@ public:
 //
 // You must pass in tempMatrix for scratch space - it may need to fill that in and return it instead of 
 // pointing you right at a variable in your parent.
-	virtual matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix) = 0;
+	virtual const matrix3x4_t& GetParentToWorldTransform(matrix3x4_t& tempMatrix) = 0;
 
 	// Computes the abs position of a point specified in local space
 	virtual void ComputeAbsPosition(const Vector& vecLocalPosition, Vector* pAbsPosition) = 0;
