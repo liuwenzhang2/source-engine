@@ -100,7 +100,7 @@ public:
 	{
 		m_player = player;
 
-		Vector playerVel = player->GetAbsVelocity();
+		Vector playerVel = player->GetEngineObject()->GetAbsVelocity();
 		m_forward.x = playerVel.x;
 		m_forward.y = playerVel.y;
 		float speed = m_forward.NormalizeInPlace();
@@ -199,7 +199,7 @@ void FollowState::OnUpdate( CCSBot *me )
 		m_idleTimer.Start( RandomFloat( 2.0f, 5.0f ) );
 
 	// compute the leader's speed
-	Vector leaderVel = m_leader->GetAbsVelocity();
+	Vector leaderVel = m_leader->GetEngineObject()->GetAbsVelocity();
 	float leaderSpeed = Vector2D( leaderVel.x, leaderVel.y ).Length();
 
 	// determine our leader's movement state

@@ -460,9 +460,9 @@ void C_VGuiScreen::ClientThink( void )
 //-----------------------------------------------------------------------------
 void C_VGuiScreen::ComputeEdges( Vector *pUpperLeft, Vector *pUpperRight, Vector *pLowerLeft )
 {
-	Vector vecOrigin = GetAbsOrigin();
+	Vector vecOrigin = GetEngineObject()->GetAbsOrigin();
 	Vector xaxis, yaxis;
-	AngleVectors( GetAbsAngles(), &xaxis, &yaxis, NULL );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &xaxis, &yaxis, NULL );
 
 	// NOTE: Have to multiply by -1 here because yaxis goes out the -y axis in AngleVectors actually...
 	yaxis *= -1.0f;
@@ -493,7 +493,7 @@ bool C_VGuiScreen::IsBackfacing( const Vector &viewOrigin )
 {
 	// Compute a ray from camera to center of the screen..
 	Vector cameraToScreen;
-	VectorSubtract( GetAbsOrigin(), viewOrigin, cameraToScreen );
+	VectorSubtract(GetEngineObject()->GetAbsOrigin(), viewOrigin, cameraToScreen );
 
 	// Figure out the face normal
 	Vector zaxis;
@@ -512,7 +512,7 @@ void C_VGuiScreen::ComputePanelToWorld()
 	// The origin is at the upper-left corner of the screen
 	Vector vecOrigin, vecUR, vecLL;
 	ComputeEdges( &vecOrigin, &vecUR, &vecLL );
-	m_PanelToWorld.SetupMatrixOrgAngles( vecOrigin, GetAbsAngles() );
+	m_PanelToWorld.SetupMatrixOrgAngles( vecOrigin, GetEngineObject()->GetAbsAngles() );
 }
 
 
@@ -743,7 +743,7 @@ C_BaseEntity *FindNearbyVguiScreen( const Vector &viewPosition, const QAngle &vi
 
 		// Test perpendicular distance from the screen...
 		pScreen->GetEngineObject()->GetVectors( NULL, NULL, &vecOut );
-		VectorSubtract( viewPosition, pScreen->GetAbsOrigin(), vecViewDelta );
+		VectorSubtract( viewPosition, pScreen->GetEngineObject()->GetAbsOrigin(), vecViewDelta );
 		float flPerpDist = DotProduct(vecViewDelta, vecOut);
 		if ( (flPerpDist < 0) || (flPerpDist > VGUI_SCREEN_MODE_RADIUS) )
 			continue;

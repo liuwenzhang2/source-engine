@@ -87,7 +87,7 @@ bool C_EnvPortalPathTrack::SetupEmitters( void )
 	// Setup the attractor emitter
 	if ( m_pAttractorEmitter.IsValid() == false )
 	{
-		m_pAttractorEmitter = CParticleAttractor::Create( GetAbsOrigin(), "portaltracktrainendpointattractor" );
+		m_pAttractorEmitter = CParticleAttractor::Create(GetEngineObject()->GetAbsOrigin(), "portaltracktrainendpointattractor" );
 
 		if ( m_pAttractorEmitter.IsValid() == false )
 			return false;
@@ -130,15 +130,15 @@ void C_EnvPortalPathTrack::UpdateParticles_Active ( void )
 		return;
 
 	// Reset our sort origin
-	m_pSimpleEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pSimpleEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	SimpleParticle *sParticle;
 
 	// Do the charging particles
-	m_pAttractorEmitter->SetAttractorOrigin( GetAbsOrigin() );
+	m_pAttractorEmitter->SetAttractorOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	Vector forward, right, up;
-	AngleVectors( GetAbsAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
 
 	Vector	offset;
 	float	dist;
@@ -155,7 +155,7 @@ void C_EnvPortalPathTrack::UpdateParticles_Active ( void )
 		offset += right * random->RandomFloat( -4.0f * dist, 4.0f * dist );
 		offset += up * random->RandomFloat( -4.0f * dist, 4.0f * dist );
 
-		offset += GetAbsOrigin();
+		offset += GetEngineObject()->GetAbsOrigin();
 
 		sParticle = (SimpleParticle *) m_pAttractorEmitter->AddParticle( sizeof(SimpleParticle), m_pAttractorEmitter->GetPMaterial( "effects/strider_muzzle" ), offset );
 

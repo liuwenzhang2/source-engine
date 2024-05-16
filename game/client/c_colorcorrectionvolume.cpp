@@ -101,7 +101,7 @@ bool C_ColorCorrectionVolume::ShouldDraw()
 
 void C_ColorCorrectionVolume::ClientThink()
 {
-	Vector entityPosition = GetAbsOrigin();
+	Vector entityPosition = GetEngineObject()->GetAbsOrigin();
 	g_pColorCorrectionMgr->SetColorCorrectionWeight( m_CCHandle, m_Weight );
 }
 

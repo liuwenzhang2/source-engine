@@ -87,7 +87,7 @@ void CPointPlayerMoveConstraint::InputTurnOn( inputdata_t &inputdata )
 		flRadius = MAX_COORD_RANGE;
 	}
 	CBaseEntity *pEntity = NULL;
-	while ( (pEntity = gEntList.FindEntityByClassnameWithin( pEntity, "player", GetLocalOrigin(), flRadius)) != NULL )
+	while ( (pEntity = gEntList.FindEntityByClassnameWithin( pEntity, "player", GetEngineObject()->GetLocalOrigin(), flRadius)) != NULL )
 	{
 		CBasePlayer *pPlayer = ToBasePlayer( pEntity );
 		Assert( pPlayer );
@@ -97,7 +97,7 @@ void CPointPlayerMoveConstraint::InputTurnOn( inputdata_t &inputdata )
 		{
 			m_hConstrainedPlayers.AddToTail( pPlayer );
 
-			pPlayer->ActivateMovementConstraint( this, GetAbsOrigin(), m_flRadius, m_flConstraintWidth, m_flSpeedFactor );
+			pPlayer->ActivateMovementConstraint( this, GetEngineObject()->GetAbsOrigin(), m_flRadius, m_flConstraintWidth, m_flSpeedFactor );
 		}
 	}
 
@@ -140,7 +140,7 @@ void CPointPlayerMoveConstraint::ConstraintThink( void )
 		CBasePlayer *pPlayer = ToBasePlayer( m_hConstrainedPlayers[i] );
 		if ( pPlayer )
 		{
-			float flDistanceSqr = (pPlayer->GetAbsOrigin() - GetAbsOrigin()).LengthSqr();
+			float flDistanceSqr = (pPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).LengthSqr();
 			if ( flDistanceSqr > m_flRadiusSquared )
 			{
 				// Break the constraint to this player

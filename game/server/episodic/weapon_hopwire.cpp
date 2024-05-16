@@ -497,7 +497,7 @@ void CWeaponHopwire::RollGrenade( CBasePlayer *pPlayer )
 	pPlayer->GetVelocity( &vecThrow, NULL );
 	vecThrow += vecFacing * 700;
 	// put it on its side
-	QAngle orientation(0,pPlayer->GetLocalAngles().y,-90);
+	QAngle orientation(0,pPlayer->GetEngineObject()->GetLocalAngles().y,-90);
 	// roll it
 	AngularImpulse rotSpeed(0,0,720);
 	m_hActiveHopWire = static_cast<CGrenadeHopwire *> (HopWire_Create( vecSrc, orientation, vecThrow, rotSpeed, pPlayer, GRENADE_TIMER ));

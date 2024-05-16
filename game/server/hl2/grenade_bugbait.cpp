@@ -155,14 +155,14 @@ void CGrenadeBugBait::BugBaitTouch( CBaseEntity *pOther )
 
 	if ( pSporeExplosion )
 	{
-		Vector	dir = -GetAbsVelocity();
+		Vector	dir = -GetEngineObject()->GetAbsVelocity();
 		VectorNormalize( dir );
 
 		QAngle	angles;
 		VectorAngles( dir, angles );
 
-		pSporeExplosion->SetLocalAngles( angles );
-		pSporeExplosion->SetLocalOrigin( GetAbsOrigin() );
+		pSporeExplosion->GetEngineObject()->SetLocalAngles( angles );
+		pSporeExplosion->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetAbsOrigin() );
 		pSporeExplosion->m_flSpawnRate			= 8.0f;
 		pSporeExplosion->m_flParticleLifetime	= 2.0f;
 		pSporeExplosion->SetRenderColor( 0.0f, 0.5f, 0.25f, 0.15f );
@@ -175,11 +175,11 @@ void CGrenadeBugBait::BugBaitTouch( CBaseEntity *pOther )
 	}
 
 	trace_t	tr;
-	Vector traceDir = GetAbsVelocity();
+	Vector traceDir = GetEngineObject()->GetAbsVelocity();
 
 	VectorNormalize( traceDir );
 
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + traceDir * 64, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + traceDir * 64, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
 	if ( tr.fraction < 1.0f )
 	{
@@ -191,14 +191,14 @@ void CGrenadeBugBait::BugBaitTouch( CBaseEntity *pOther )
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "GrenadeBugBait.Splat" );
 
 	//Make sure we want to call antlions
-	if ( ActivateBugbaitTargets( GetThrower(), GetAbsOrigin(), false ) == false )
+	if ( ActivateBugbaitTargets( GetThrower(), GetEngineObject()->GetAbsOrigin(), false ) == false )
 	{
 		//Alert any antlions around
-		CSoundEnt::InsertSound( SOUND_BUGBAIT, GetAbsOrigin(), bugbait_hear_radius.GetInt(), bugbait_distract_time.GetFloat(), GetThrower() );
+		CSoundEnt::InsertSound( SOUND_BUGBAIT, GetEngineObject()->GetAbsOrigin(), bugbait_hear_radius.GetInt(), bugbait_distract_time.GetFloat(), GetThrower() );
 	}
 
 	// Tell all spawners to now fight to this position
-	g_AntlionMakerManager.BroadcastFightGoal( GetAbsOrigin() );
+	g_AntlionMakerManager.BroadcastFightGoal(GetEngineObject()->GetAbsOrigin() );
 
 	//Go away
 	UTIL_Remove( this );
@@ -262,7 +262,7 @@ bool CGrenadeBugBait::ActivateBugbaitTargets( CBaseEntity *pOwner, Vector vecOri
 			continue;
 
 		//Make sure we're within range of the sensor
-		if ( pSensor->GetRadius() > ( pSensor->GetAbsOrigin() - vecOrigin ).Length() )
+		if ( pSensor->GetRadius() > ( pSensor->GetEngineObject()->GetAbsOrigin() - vecOrigin ).Length() )
 		{
 			//Tell the sensor it's been hit
 			if ( pSensor->Baited( pOwner ) )
@@ -317,7 +317,7 @@ CGrenadeBugBait *BugBaitGrenade_Create( const Vector &position, const QAngle &an
 	if ( pGrenade != NULL )
 	{
 		pGrenade->SetLocalAngularVelocity( angVelocity );
-		pGrenade->SetAbsVelocity( velocity );
+		pGrenade->GetEngineObject()->SetAbsVelocity( velocity );
 		pGrenade->SetThrower( ToBaseCombatCharacter( owner ) );
 	}
 

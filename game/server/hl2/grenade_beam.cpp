@@ -53,7 +53,7 @@ void CGrenadeBeamChaser::ChaserThink( void )
 {
 	Vector vTargetPos;
 	m_pTarget->GetChaserTargetPos(&vTargetPos);
-	Vector vTargetDir = (vTargetPos - GetLocalOrigin());
+	Vector vTargetDir = (vTargetPos - GetEngineObject()->GetLocalOrigin());
 
 	// -------------------------------------------------
 	// Check to see if we'll pass our target this frame
@@ -63,7 +63,7 @@ void CGrenadeBeamChaser::ChaserThink( void )
 	if ((gpGlobals->frametime * m_pTarget->m_flBeamSpeed) > flTargetDist)
 	{
 		m_pTarget->GetNextTargetPos(&vTargetPos);
-		vTargetDir = (vTargetPos - GetLocalOrigin());
+		vTargetDir = (vTargetPos - GetEngineObject()->GetLocalOrigin());
 		flTargetDist = vTargetDir.Length();
 	}
 
@@ -73,7 +73,7 @@ void CGrenadeBeamChaser::ChaserThink( void )
 		// Set our velocity to chase the target
 		//--------------------------------------
 		VectorNormalize(vTargetDir);
-		SetAbsVelocity( vTargetDir * m_pTarget->m_flBeamSpeed );
+		GetEngineObject()->SetAbsVelocity( vTargetDir * m_pTarget->m_flBeamSpeed );
 	}
 	SetNextThink( gpGlobals->curtime );
 }
@@ -86,7 +86,7 @@ void CGrenadeBeamChaser::ChaserThink( void )
 CGrenadeBeamChaser* CGrenadeBeamChaser::ChaserCreate( CGrenadeBeam *pTarget )
 {
 	CGrenadeBeamChaser *pChaser = (CGrenadeBeamChaser *)gEntList.CreateEntityByName( "grenade_beam_chaser" );
-	pChaser->SetLocalOrigin( pTarget->GetLocalOrigin() );
+	pChaser->GetEngineObject()->SetLocalOrigin( pTarget->GetEngineObject()->GetLocalOrigin() );
 	pChaser->m_pTarget		= pTarget;
 	pChaser->Spawn();
 	return pChaser;
@@ -182,11 +182,11 @@ void CGrenadeBeam::Shoot(Vector vDirection, float flSpeed, float flLifetime, flo
 	SetNextThink( gpGlobals->curtime + flLifetime );
 	m_hBeamChaser		= CGrenadeBeamChaser::ChaserCreate(this);
 	m_flBeamSpeed		= flSpeed;
-	SetAbsVelocity( vDirection * flSpeed );
+	GetEngineObject()->SetAbsVelocity( vDirection * flSpeed );
 	m_flBeamLag			= flLag;
 	m_flDamage			= flDamage;
 	m_flLaunchTime		= gpGlobals->curtime;
-	m_vLaunchPos		= GetAbsOrigin();
+	m_vLaunchPos		= GetEngineObject()->GetAbsOrigin();
 	m_flLastTouchTime  = 0;
 	CreateBeams();
 	UpdateBeams();
@@ -235,31 +235,31 @@ void CGrenadeBeam::GrenadeBeamTouch( CBaseEntity *pOther )
 	// ---------------------------------------
 	if (m_nNumHits < GRENADEBEAM_MAXHITS)
 	{
-		m_pHitLocation[m_nNumHits] = GetLocalOrigin();
+		m_pHitLocation[m_nNumHits] = GetEngineObject()->GetLocalOrigin();
 		m_nNumHits++;
 	}
 	// Otherwise copy over old hit, and force chaser into last hit position
 	else
 	{
-		m_hBeamChaser->SetLocalOrigin( m_pHitLocation[0] );
+		m_hBeamChaser->GetEngineObject()->SetLocalOrigin( m_pHitLocation[0] );
 		for (int i=0;i<m_nNumHits-1;i++)
 		{
 			m_pHitLocation[i] = m_pHitLocation[i+1];
 		}
-		m_pHitLocation[m_nNumHits-1]=GetLocalOrigin();
+		m_pHitLocation[m_nNumHits-1]= GetEngineObject()->GetLocalOrigin();
 	}
 	UpdateBeams();
 
 	// --------------------------------------
 	//  Smoke or bubbles effect
 	// --------------------------------------
-	if (UTIL_PointContents ( GetAbsOrigin() ) & MASK_WATER)
+	if (UTIL_PointContents (GetEngineObject()->GetAbsOrigin() ) & MASK_WATER)
 	{
-		UTIL_Bubbles(GetAbsOrigin()-Vector(3,3,3),GetAbsOrigin()+Vector(3,3,3),10);
+		UTIL_Bubbles(GetEngineObject()->GetAbsOrigin()-Vector(3,3,3), GetEngineObject()->GetAbsOrigin()+Vector(3,3,3),10);
 	}
 	else 
 	{
-		UTIL_Smoke(GetAbsOrigin(), random->RandomInt(5, 10), 10);
+		UTIL_Smoke(GetEngineObject()->GetAbsOrigin(), random->RandomInt(5, 10), 10);
 	}
 
 	// --------------------------------------------
@@ -283,9 +283,9 @@ void CGrenadeBeam::GrenadeBeamTouch( CBaseEntity *pOther )
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	trace_t tr;
-	Vector vDirection = GetAbsVelocity();
+	Vector vDirection = GetEngineObject()->GetAbsVelocity();
 	VectorNormalize(vDirection);
-	UTIL_TraceLine( GetAbsOrigin()-vDirection, GetAbsOrigin()+vDirection, MASK_SOLID, NULL, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin()-vDirection, GetEngineObject()->GetAbsOrigin()+vDirection, MASK_SOLID, NULL, COLLISION_GROUP_NONE, &tr );
 	UTIL_DecalTrace( &tr, "RedGlowFade" );
 	UTIL_ImpactTrace( &tr, DMG_ENERGYBEAM );
 }
@@ -334,7 +334,7 @@ void CGrenadeBeam::GetChaserTargetPos(Vector *vPosition)
 	}
 	else
 	{
-		*vPosition = GetLocalOrigin();
+		*vPosition = GetEngineObject()->GetLocalOrigin();
 	}
 }
 

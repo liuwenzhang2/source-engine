@@ -68,7 +68,7 @@ float CAK47::GetInaccuracy() const
 
 		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 			return 0.04f + 0.4f * m_flAccuracy;
-		else if (pPlayer->GetAbsVelocity().Length2D() > 140)
+		else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 140)
 			return 0.04f + 0.07f * m_flAccuracy;
 		else
 			return 0.0275f * m_flAccuracy;
@@ -92,7 +92,7 @@ void CAK47::PrimaryAttack()
 	if ( !pPlayer )
 		return;
 
-	if (pPlayer->GetAbsVelocity().Length2D() > 5 )
+	if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5 )
 		pPlayer->KickBack ( 1.5, 0.45, 0.225, 0.05, 6.5, 2.5, 7 );
 	else if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 		pPlayer->KickBack ( 2, 1.0, 0.5, 0.35, 9, 6, 5 );

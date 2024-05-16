@@ -175,7 +175,7 @@ void CBlobElement::Spawn()
 
 	QAngle angles(0,0,0);
 	angles.y = random->RandomFloat( 0, 180 );
-	SetAbsAngles( angles );
+	GetEngineObject()->SetAbsAngles( angles );
 
 	AddEffects( EF_NOSHADOW );
 
@@ -207,7 +207,7 @@ int CBlobElement::DrawDebugTextOverlays(void)
 //---------------------------------------------------------
 void CBlobElement::SetElementVelocity( Vector vecVelocity, bool bPlanarOnly )
 {
-	SetAbsVelocity( vecVelocity );
+	GetEngineObject()->SetAbsVelocity( vecVelocity );
 }
 
 //---------------------------------------------------------
@@ -216,8 +216,8 @@ void CBlobElement::SetElementVelocity( Vector vecVelocity, bool bPlanarOnly )
 //---------------------------------------------------------
 void CBlobElement::AddElementVelocity( Vector vecVelocityAdd, bool bPlanarOnly )
 {
-	Vector vecSum = GetAbsVelocity() + vecVelocityAdd;
-	SetAbsVelocity( vecSum );
+	Vector vecSum = GetEngineObject()->GetAbsVelocity() + vecVelocityAdd;
+	GetEngineObject()->SetAbsVelocity( vecSum );
 }
 
 //---------------------------------------------------------
@@ -228,10 +228,10 @@ void CBlobElement::AddElementVelocity( Vector vecVelocityAdd, bool bPlanarOnly )
 void CBlobElement::ModifyVelocityForSurface( float flInterval, float flSpeed )
 {
 	trace_t tr;
-	Vector vecStart = GetAbsOrigin();
+	Vector vecStart = GetEngineObject()->GetAbsOrigin();
 	Vector up = Vector( 0, 0, BLOB_TRACE_HEIGHT );
 
-	Vector vecWishedGoal = vecStart + (GetAbsVelocity() * flInterval);
+	Vector vecWishedGoal = vecStart + (GetEngineObject()->GetAbsVelocity() * flInterval);
 
 	UTIL_TraceLine( vecStart + up, vecWishedGoal + up, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
@@ -295,7 +295,7 @@ void CBlobElement::MoveTowardsTargetEntity( float speed )
 			pTarget = pTargetEnemy;
 		}
 
-		Vector vecDir = pTarget->WorldSpaceCenter() - GetAbsOrigin();
+		Vector vecDir = pTarget->WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin();
 		vecDir.NormalizeInPlace();
 		SetElementVelocity( vecDir * speed, true );
 	}
@@ -313,7 +313,7 @@ void CBlobElement::MoveTowardsTargetEntity( float speed )
 //---------------------------------------------------------
 void CBlobElement::MoveTowardsTargetLocation( float speed )
 {
-	Vector vecDir = m_vecTargetLocation - GetAbsOrigin();
+	Vector vecDir = m_vecTargetLocation - GetEngineObject()->GetAbsOrigin();
 	float dist = VectorNormalize( vecDir );
 
 	//!!!HACKHACK - how about a real way to tell if we've reached our goal?
@@ -344,7 +344,7 @@ void CBlobElement::ReconfigureRandomParams()
 //---------------------------------------------------------
 void CBlobElement::EnforceSpeedLimits( float flMinSpeed, float flMaxSpeed )
 {
-	Vector vecVelocity = GetAbsVelocity();
+	Vector vecVelocity = GetEngineObject()->GetAbsVelocity();
 	float flSpeed = VectorNormalize( vecVelocity );
 
 	if( flSpeed > flMaxSpeed )
@@ -624,7 +624,7 @@ void CNPC_Blob::RunAI()
 
 	if( GetEnemy() != NULL )
 	{
-		float flEnemyDistSqr = m_vecCentroid.DistToSqr( GetEnemy()->GetAbsOrigin() );
+		float flEnemyDistSqr = m_vecCentroid.DistToSqr( GetEnemy()->GetEngineObject()->GetAbsOrigin() );
 
 		if( flEnemyDistSqr <= Square( 32.0f ) )
 		{
@@ -700,7 +700,7 @@ void CNPC_Blob::ComputeCentroid()
 
 	for( int i = 0 ; i < m_Elements.Count() ; i++ )
 	{
-		m_vecCentroid += m_Elements[ i ]->GetAbsOrigin();
+		m_vecCentroid += m_Elements[ i ]->GetEngineObject()->GetAbsOrigin();
 	}
 
 	m_vecCentroid /= m_Elements.Count();
@@ -744,7 +744,7 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 	{
 		// If I have an enemy, the right-hand vector is perpendicular to a straight line 
 		// from the group's centroid to the enemy's origin.
-		vecForward = GetEnemy()->GetAbsOrigin() - m_vecCentroid;
+		vecForward = GetEnemy()->GetEngineObject()->GetAbsOrigin() - m_vecCentroid;
 		VectorNormalize( vecForward );
 		vecRight.x = vecForward.y;
 		vecRight.y = -vecForward.x;
@@ -752,7 +752,7 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 	else
 	{
 		// If there is no enemy, wobble along the axis from the centroid to me.
-		vecForward = GetAbsOrigin() - m_vecCentroid;
+		vecForward = GetEngineObject()->GetAbsOrigin() - m_vecCentroid;
 		VectorNormalize( vecForward );
 		vecRight.x = vecForward.y;
 		vecRight.y = -vecForward.x;
@@ -786,7 +786,7 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 				pThisElement->SetElementVelocity( vec3_origin, true );
 
 				trace_t tr;
-				Vector vecOrigin = pThisElement->GetAbsOrigin();
+				Vector vecOrigin = pThisElement->GetEngineObject()->GetAbsOrigin();
 
 				UTIL_TraceLine( vecOrigin, vecOrigin - Vector( 0, 0, 16), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
@@ -801,7 +801,7 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 					angles.x = -angles.y;
 					angles.y = flSwap;
 
-					pThisElement->SetAbsAngles( angles );
+					pThisElement->GetEngineObject()->SetAbsAngles( angles );
 				}
 			}
 			continue;
@@ -809,7 +809,7 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 
 		case BLOB_MOVE_TO_TARGET_LOCATION:
 			{
-				Vector vecDiff = pThisElement->GetAbsOrigin() - pThisElement->m_vecTargetLocation;
+				Vector vecDiff = pThisElement->GetEngineObject()->GetAbsOrigin() - pThisElement->m_vecTargetLocation;
 
 				if( vecDiff.Length2DSqr() <= Square(80.0f) )
 				{
@@ -827,7 +827,7 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 			{
 				if( !IsMoving() && GetEnemy() == NULL )
 				{
-					if( pThisElement->GetAbsOrigin().DistToSqr( GetAbsOrigin() ) <= flBlobRadiusSqr )
+					if( pThisElement->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin() ) <= flBlobRadiusSqr )
 					{
 						flSpeed = (flSpeed * flIdleSpeedFactor) * pThisElement->m_flRandomEightyPercent;
 					}
@@ -852,7 +852,7 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 		// direction will cause overspeed. Conflicting attempts to repel an element in opposite
 		// directions will cause underspeed.
 		Vector vecDir = Vector( 0, 0, 0 );
-		Vector vecThisElementOrigin = pThisElement->GetAbsOrigin();
+		Vector vecThisElementOrigin = pThisElement->GetEngineObject()->GetAbsOrigin();
 
 		if( bEnforceRelativePositions )
 		{
@@ -869,7 +869,7 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 				CBlobElement *pThatElement = m_Elements[ j ];
 				if( i != j )
 				{
-					Vector vecThatElementOrigin = pThatElement->GetAbsOrigin();
+					Vector vecThatElementOrigin = pThatElement->GetEngineObject()->GetAbsOrigin();
 					float distSqr = vecThisElementOrigin.DistToSqr( vecThatElementOrigin );
 
 					if( distSqr < minDistSqr )
@@ -904,7 +904,7 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 		// Avoidance
 		for( int a = 0 ; a < m_iNumAvoidOrigins ; a++ )
 		{
-			Vector vecAvoidDir = pThisElement->GetAbsOrigin() - m_vecAvoidOrigin[ a ];
+			Vector vecAvoidDir = pThisElement->GetEngineObject()->GetAbsOrigin() - m_vecAvoidOrigin[ a ];
 
 			if( vecAvoidDir.LengthSqr() <= (m_flAvoidRadiusSqr * pThisElement->m_flRandomEightyPercent) )
 			{
@@ -928,7 +928,7 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 		pThisElement->ModifyVelocityForSurface( flInterval, flSpeed );
 
 		// For identifying stuck elements.
-		pThisElement->m_vecPrevOrigin = pThisElement->GetAbsOrigin(); 
+		pThisElement->m_vecPrevOrigin = pThisElement->GetEngineObject()->GetAbsOrigin();
 
 		pThisElement->m_flDistFromCentroidSqr = pThisElement->m_vecPrevOrigin.DistToSqr( m_vecCentroid );
 
@@ -936,8 +936,8 @@ void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 		if( bDoOrientation )
 		{
 			QAngle angles;
-			VectorAngles( pThisElement->GetAbsVelocity(), angles );
-			pThisElement->SetAbsAngles( angles );
+			VectorAngles( pThisElement->GetEngineObject()->GetAbsVelocity(), angles );
+			pThisElement->GetEngineObject()->SetAbsAngles( angles );
 		}
 
 /*
@@ -1023,7 +1023,7 @@ void CNPC_Blob::AddNewElements( int iNumElements )
 			// of the group easier on the eye, since this element will spawn inside of some
 			// other element, and then be pushed out by the blob's repel rules.
 			int iCopyElement = random->RandomInt( 0, iInitialElements - 1 );
-			pElement->SetAbsOrigin( m_Elements[iCopyElement]->GetAbsOrigin() );
+			pElement->GetEngineObject()->SetAbsOrigin( m_Elements[iCopyElement]->GetEngineObject()->GetAbsOrigin() );
 		}
 	}
 }
@@ -1055,7 +1055,7 @@ void CNPC_Blob::FormShapeFromPath( string_t iszPathName )
 			for( int j = 0 ; j < i ; j++ )
 			{
 				// Stop if we reach a vertex that's already in the array (closed path)
-				if( vertex[ j ] == pEntity->GetAbsOrigin() )
+				if( vertex[ j ] == pEntity->GetEngineObject()->GetAbsOrigin() )
 				{
 					//Msg("Closed path!\n");
 					bClosedPath = true;
@@ -1063,7 +1063,7 @@ void CNPC_Blob::FormShapeFromPath( string_t iszPathName )
 				}
 			}
 
-			vertex[ i ] = pEntity->GetAbsOrigin();
+			vertex[ i ] = pEntity->GetEngineObject()->GetAbsOrigin();
 			iszPathName = pEntity->m_target;
 			iNumVerts++;
 
@@ -1173,7 +1173,7 @@ void CNPC_Blob::InputIsolateElement( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Blob::InputFormHemisphere( inputdata_t &inputdata )
 {
-	Vector center = GetAbsOrigin();
+	Vector center = GetEngineObject()->GetAbsOrigin();
 	const float flRadius = 240.0f;
 
 	Vector vecDir;
@@ -1198,9 +1198,9 @@ void CNPC_Blob::InputFormHemisphere( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Blob::InputFormTwoSpheres( inputdata_t &inputdata )
 {
-	Vector center = GetAbsOrigin();
-	Vector sphere1 = GetAbsOrigin() + Vector( 120.0f, 0, 120.0f );
-	Vector sphere2 = GetAbsOrigin() + Vector( -120.0f, 0, 120.0f );
+	Vector center = GetEngineObject()->GetAbsOrigin();
+	Vector sphere1 = GetEngineObject()->GetAbsOrigin() + Vector( 120.0f, 0, 120.0f );
+	Vector sphere2 = GetEngineObject()->GetAbsOrigin() + Vector( -120.0f, 0, 120.0f );
 	const float flRadius = 100.0f;
 
 	Vector vecDir;
@@ -1332,7 +1332,7 @@ void CNPC_Blob::InitializeElements()
 		trace_t tr;
 		UTIL_TraceLine( vecDest, vecDest + Vector (0, 0, MIN_COORD_FLOAT), MASK_SHOT, pElement, COLLISION_GROUP_NONE, &tr );
 
-		pElement->SetAbsOrigin( tr.endpos + Vector( 0, 0, 1 ) );
+		pElement->GetEngineObject()->SetAbsOrigin( tr.endpos + Vector( 0, 0, 1 ) );
 
 		angDistributor.y += step;
 	}
@@ -1344,7 +1344,7 @@ void CNPC_Blob::InitializeElements()
 		{
 			if( pEntity->NameMatches("avoid") )
 			{
-				m_vecAvoidOrigin[ i ] = pEntity->GetAbsOrigin();
+				m_vecAvoidOrigin[ i ] = pEntity->GetEngineObject()->GetAbsOrigin();
 				m_flAvoidRadiusSqr = Square( 120.0f );
 				m_iNumAvoidOrigins++;
 			}

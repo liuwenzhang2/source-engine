@@ -625,7 +625,7 @@ void CPropJeepEpisodic::InputAddBusterToCargo( inputdata_t &data )
 	if ( pNewBomb )
 	{
 		DispatchSpawn( pNewBomb );
-		pNewBomb->Teleport( &m_hCargoTrigger->GetAbsOrigin(), NULL, NULL );
+		pNewBomb->Teleport( &m_hCargoTrigger->GetEngineObject()->GetAbsOrigin(), NULL, NULL );
 		m_hCargoTrigger->AddCargo( pNewBomb );
 	}
 }
@@ -761,7 +761,7 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 			m_hWheelDust[i]->KeyValue( "start_active", "0" );
 			m_hWheelDust[i]->KeyValue( "effect_name", "WheelDust" );
 			m_hWheelDust[i]->GetEngineObject()->SetParent( this->GetEngineObject() );
-			m_hWheelDust[i]->SetLocalOrigin( vec3_origin );
+			m_hWheelDust[i]->GetEngineObject()->SetLocalOrigin( vec3_origin );
 			DispatchSpawn( m_hWheelDust[i] );
 			if ( gpGlobals->curtime > 0.5f )
 				m_hWheelDust[i]->Activate();
@@ -779,7 +779,7 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 			m_hWheelWater[i]->KeyValue( "start_active", "0" );
 			m_hWheelWater[i]->KeyValue( "effect_name", "WheelSplash" );
 			m_hWheelWater[i]->GetEngineObject()->SetParent( this->GetEngineObject() );
-			m_hWheelWater[i]->SetLocalOrigin( vec3_origin );
+			m_hWheelWater[i]->GetEngineObject()->SetLocalOrigin( vec3_origin );
 			DispatchSpawn( m_hWheelWater[i] );
 			if ( gpGlobals->curtime > 0.5f )
 				m_hWheelWater[i]->Activate();
@@ -808,8 +808,8 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 
 				// Set us up in the right position
 				m_hWheelWater[i]->StartParticleSystem();
-				m_hWheelWater[i]->SetAbsAngles( vecAngles );
-				m_hWheelWater[i]->SetAbsOrigin( vecPos + Vector( 0, 0, 8 ) );
+				m_hWheelWater[i]->GetEngineObject()->SetAbsAngles( vecAngles );
+				m_hWheelWater[i]->GetEngineObject()->SetAbsOrigin( vecPos + Vector( 0, 0, 8 ) );
 
 				if ( m_flNextWaterSound < gpGlobals->curtime )
 				{
@@ -831,8 +831,8 @@ void CPropJeepEpisodic::UpdateWheelDust( void )
 
 				// Set us up in the right position
 				m_hWheelDust[i]->StartParticleSystem();
-				m_hWheelDust[i]->SetAbsAngles( vecAngles );
-				m_hWheelDust[i]->SetAbsOrigin( vecPos + Vector( 0, 0, 8 ) );
+				m_hWheelDust[i]->GetEngineObject()->SetAbsAngles( vecAngles );
+				m_hWheelDust[i]->GetEngineObject()->SetAbsOrigin( vecPos + Vector( 0, 0, 8 ) );
 			}
 		}
 		else
@@ -887,7 +887,7 @@ void CPropJeepEpisodic::UpdateRadar( bool forceUpdate )
 
 			if( pTarget != NULL && !pTarget->IsDisabled() )
 			{
-				if( pTarget->m_flRadius < 0 || vecJalopyOrigin.DistToSqr(pTarget->GetAbsOrigin()) <= Square(pTarget->m_flRadius) )
+				if( pTarget->m_flRadius < 0 || vecJalopyOrigin.DistToSqr(pTarget->GetEngineObject()->GetAbsOrigin()) <= Square(pTarget->m_flRadius) )
 				{
 					// This item has been detected.
 					type = pTarget->GetType();
@@ -1011,7 +1011,7 @@ void CPropJeepEpisodic::UpdateCargoEntry( void )
 	// Find where we are in the blend and bias it for a fast entry and slow ease-out
 	float flPerc = (jalopy_cargo_anim_time.GetFloat()) ? (( gpGlobals->curtime - m_flCargoStartTime ) / jalopy_cargo_anim_time.GetFloat()) : 1.0f;
 	flPerc = Bias( flPerc, 0.75f );
-	VectorLerp( m_hCargoProp->GetLocalOrigin(), vecTarget, flPerc, vecOut );
+	VectorLerp( m_hCargoProp->GetEngineObject()->GetLocalOrigin(), vecTarget, flPerc, vecOut );
 
 	// Get our target orientation
 	CPhysicsProp *pProp = dynamic_cast<CPhysicsProp *>(m_hCargoProp.Get());
@@ -1024,7 +1024,7 @@ void CPropJeepEpisodic::UpdateCargoEntry( void )
 	qa += pProp->PreferredCarryAngles();
 	AngleQuaternion( qa, qtTarget );	// FIXME: Find the real offset to make this sit properly
 	Quaternion	qtCurrent;
-	AngleQuaternion( pProp->GetLocalAngles(), qtCurrent );
+	AngleQuaternion( pProp->GetEngineObject()->GetLocalAngles(), qtCurrent );
 
 	Quaternion qtOut;
 	QuaternionSlerp( qtCurrent, qtTarget, flPerc, qtOut );
@@ -1033,8 +1033,8 @@ void CPropJeepEpisodic::UpdateCargoEntry( void )
 	QuaternionAngles( qtOut, vecAngles );
 
 	// Finally, take these new position
-	m_hCargoProp->SetLocalOrigin( vecOut );
-	m_hCargoProp->SetLocalAngles( vecAngles );
+	m_hCargoProp->GetEngineObject()->SetLocalOrigin( vecOut );
+	m_hCargoProp->GetEngineObject()->SetLocalAngles( vecAngles );
 
 	// Push the closing out into the future to make sure we don't try and close at the same time
 	m_flAmmoCrateCloseTime += gpGlobals->frametime;
@@ -1384,7 +1384,7 @@ void CPropJeepEpisodic::CreateHazardLights( void )
 	{
 		if ( m_hHazardLights[i] == NULL )
 		{
-			m_hHazardLights[i] = CSprite::SpriteCreate( s_szHazardSprite, GetLocalOrigin(), false );
+			m_hHazardLights[i] = CSprite::SpriteCreate( s_szHazardSprite, GetEngineObject()->GetLocalOrigin(), false );
 			if ( m_hHazardLights[i] )
 			{
 				m_hHazardLights[i]->SetTransparency( kRenderWorldGlow, 255, 220, 40, 255, kRenderFxNoDissipation );
@@ -1631,11 +1631,11 @@ void CPropJeepEpisodic::InputOutsideTransition( inputdata_t &inputdata )
 			continue;
 
 		// Must be within range
-		if ( ( pEntity->GetAbsOrigin() - pPlayer->GetAbsOrigin() ).LengthSqr() > Square( TRANSITION_SEARCH_RADIUS ) )
+		if ( ( pEntity->GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin() ).LengthSqr() > Square( TRANSITION_SEARCH_RADIUS ) )
 			continue;
 
-		vecTeleportPos = pEntity->GetAbsOrigin();
-		vecTeleportAngles = pEntity->GetAbsAngles() + QAngle( 0, -90, 0 );	// Vehicle is always off by 90 degrees
+		vecTeleportPos = pEntity->GetEngineObject()->GetAbsOrigin();
+		vecTeleportAngles = pEntity->GetEngineObject()->GetAbsAngles() + QAngle( 0, -90, 0 );	// Vehicle is always off by 90 degrees
 
 		// Rotate to face the destination angles
 		Vector vecMins;
@@ -1721,7 +1721,7 @@ void CPropJeepEpisodic::InputCreateLinkController( inputdata_t &data )
 	{
 		pLinkController->m_flRadius = flRadius;
 		pLinkController->Spawn();
-		pLinkController->SetAbsOrigin( vecFront );
+		pLinkController->GetEngineObject()->SetAbsOrigin( vecFront );
 		pLinkController->SetOwnerEntity( this );
 		pLinkController->GetEngineObject()->SetParent( this->GetEngineObject() );
 		pLinkController->Activate();
@@ -1735,7 +1735,7 @@ void CPropJeepEpisodic::InputCreateLinkController( inputdata_t &data )
 	{
 		pLinkController->m_flRadius = flRadius;
 		pLinkController->Spawn();
-		pLinkController->SetAbsOrigin( vecRear );
+		pLinkController->GetEngineObject()->SetAbsOrigin( vecRear );
 		pLinkController->SetOwnerEntity( this );
 		pLinkController->GetEngineObject()->SetParent( this->GetEngineObject() );
 		pLinkController->Activate();

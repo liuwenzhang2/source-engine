@@ -390,7 +390,7 @@ Class_T	CNPC_Headcrab::Classify( void )
 //-----------------------------------------------------------------------------
 Vector CNPC_Headcrab::Center( void )
 {
-	return Vector( GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z + 6 );
+	return Vector(GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z + 6 );
 }
 
 
@@ -477,7 +477,7 @@ void CNPC_Headcrab::BiteSound( void )
 void CNPC_Headcrab::TouchDamage( CBaseEntity *pOther )
 {
 	CTakeDamageInfo info( this, this, GetDamageAmount(), DMG_SLASH );
-	CalculateMeleeDamageForce( &info, GetAbsVelocity(), GetAbsOrigin() );
+	CalculateMeleeDamageForce( &info, GetEngineObject()->GetAbsVelocity(), GetEngineObject()->GetAbsOrigin() );
 	pOther->TakeDamage( info );
 }
 
@@ -498,7 +498,7 @@ void CNPC_Headcrab::HandleAnimEvent( animevent_t *pEvent )
 			//
 			// Take him off ground so engine doesn't instantly reset FL_ONGROUND.
 			//
-			UTIL_SetOrigin( this, GetAbsOrigin() + Vector( 0 , 0 , 1 ));
+			UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() + Vector( 0 , 0 , 1 ));
 
 			Vector vecJumpDir;
 			CBaseEntity *pEnemy = GetEnemy();
@@ -515,7 +515,7 @@ void CNPC_Headcrab::HandleAnimEvent( animevent_t *pEvent )
 				//
 				// How fast does the headcrab need to travel to reach my enemy's eyes given gravity?
 				//
-				float height = ( vecEnemyEyePos.z - GetAbsOrigin().z );
+				float height = ( vecEnemyEyePos.z - GetEngineObject()->GetAbsOrigin().z );
 				if ( height < 16 )
 				{
 					height = 16;
@@ -530,7 +530,7 @@ void CNPC_Headcrab::HandleAnimEvent( animevent_t *pEvent )
 				//
 				// Scale the sideways velocity to get there at the right time
 				//
-				vecJumpDir = vecEnemyEyePos - GetAbsOrigin();
+				vecJumpDir = vecEnemyEyePos - GetEngineObject()->GetAbsOrigin();
 				vecJumpDir = vecJumpDir / time;
 
 				//
@@ -553,7 +553,7 @@ void CNPC_Headcrab::HandleAnimEvent( animevent_t *pEvent )
 				// Jump hop, don't care where.
 				//
 				Vector forward, up;
-				AngleVectors( GetAbsAngles(), &forward, NULL, &up );
+				AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, NULL, &up );
 				vecJumpDir = Vector( forward.x, forward.y, up.z ) * 350;
 			}
 
@@ -563,7 +563,7 @@ void CNPC_Headcrab::HandleAnimEvent( animevent_t *pEvent )
 				AttackSound();
 			}
 
-			SetAbsVelocity( vecJumpDir );
+			GetEngineObject()->SetAbsVelocity( vecJumpDir );
 			m_flNextAttack = gpGlobals->curtime + 2;
 			break;
 		}

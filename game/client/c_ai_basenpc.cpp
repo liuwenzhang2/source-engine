@@ -126,10 +126,10 @@ void C_AI_BaseNPC::ClientThink( void )
 			}
 
 			GetRenderBounds( vMins, vMaxs );
-			AngleVectors (pPlayer->GetAbsAngles(), NULL, &vRight, &vUp );
-			Vector p1 = GetAbsOrigin() + vRight * vMins.x + vUp * vMins.z;
-			Vector p2 = GetAbsOrigin() + vRight * vMaxs.x + vUp * vMins.z;
-			Vector p3 = GetAbsOrigin() + vUp * vMaxs.z;
+			AngleVectors (pPlayer->GetEngineObject()->GetAbsAngles(), NULL, &vRight, &vUp );
+			Vector p1 = GetEngineObject()->GetAbsOrigin() + vRight * vMins.x + vUp * vMins.z;
+			Vector p2 = GetEngineObject()->GetAbsOrigin() + vRight * vMaxs.x + vUp * vMins.z;
+			Vector p3 = GetEngineObject()->GetAbsOrigin() + vUp * vMaxs.z;
 
 			int r = 0 * fFade;
 			int g = 255 * fFade;

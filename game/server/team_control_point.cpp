@@ -555,7 +555,7 @@ void CTeamControlPoint::CaptureInterrupted( bool bBlocked )
 
 	if ( m_pCaptureInProgressSound == NULL && pSoundName != NULL )
 	{
-		CPASFilter filter( GetAbsOrigin() );
+		CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 
 		CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
 		m_pCaptureInProgressSound = controller.SoundCreate( filter, entindex(), pSoundName );

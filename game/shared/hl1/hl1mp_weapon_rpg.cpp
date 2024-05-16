@@ -160,10 +160,10 @@ void CRpgRocket::Spawn( void )
 	QAngle angAngs;
 	Vector vecFwd;
 
-	angAngs = GetAbsAngles();
+	angAngs = GetEngineObject()->GetAbsAngles();
 	angAngs.x -= 30;
 	AngleVectors( angAngs, &vecFwd );
-	SetAbsVelocity( vecFwd * 250 );
+	GetEngineObject()->SetAbsVelocity( vecFwd * 250 );
 
 	SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for rockets
 
@@ -245,7 +245,7 @@ void CRpgRocket::SeekThink( void )
 	float flDist, flMax, flDot;
 	trace_t tr;
 
-	AngleVectors( GetAbsAngles(), &vecFwd );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vecFwd );
 
 	vecTarget = vecFwd;
 	flMax = 4096;
@@ -258,10 +258,10 @@ void CRpgRocket::SeekThink( void )
 //		if ( pDot->IsActive() )
 		if ( pDot->IsOn() )
 		{
-			UTIL_TraceLine( GetAbsOrigin(), pDot->GetAbsOrigin(), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
+			UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), pDot->GetEngineObject()->GetAbsOrigin(), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 			if ( tr.fraction >= 0.90 )
 			{
-				vecDir = pDot->GetAbsOrigin() - GetAbsOrigin();
+				vecDir = pDot->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 				flDist = VectorLength( vecDir );
 				VectorNormalize( vecDir );
 				flDot = DotProduct( vecFwd, vecDir );
@@ -276,32 +276,32 @@ void CRpgRocket::SeekThink( void )
 
 	QAngle vecAng;
 	VectorAngles( vecTarget, vecAng );
-	SetAbsAngles( vecAng );
+	GetEngineObject()->SetAbsAngles( vecAng );
 
 	// this acceleration and turning math is totally wrong, but it seems to respond well so don't change it.
-	float flSpeed = GetAbsVelocity().Length();
+	float flSpeed = GetEngineObject()->GetAbsVelocity().Length();
 	if ( gpGlobals->curtime - m_flIgniteTime < 1.0 )
 	{
-		SetAbsVelocity( GetAbsVelocity() * 0.2 + vecTarget * (flSpeed * 0.8 + 400) );
+		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.2 + vecTarget * (flSpeed * 0.8 + 400) );
 		if ( GetWaterLevel() == 3 )
 		{
 			// go slow underwater
-			if ( GetAbsVelocity().Length() > 300 )
+			if (GetEngineObject()->GetAbsVelocity().Length() > 300 )
 			{
-				Vector vecVel = GetAbsVelocity();
+				Vector vecVel = GetEngineObject()->GetAbsVelocity();
 				VectorNormalize( vecVel );
-				SetAbsVelocity( vecVel * 300 );
+				GetEngineObject()->SetAbsVelocity( vecVel * 300 );
 			}
 
-			UTIL_BubbleTrail( GetAbsOrigin() - GetAbsVelocity() * 0.1, GetAbsOrigin(), 4 );
+			UTIL_BubbleTrail(GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsVelocity() * 0.1, GetEngineObject()->GetAbsOrigin(), 4 );
 		} 
 		else 
 		{
-			if ( GetAbsVelocity().Length() > 2000 )
+			if (GetEngineObject()->GetAbsVelocity().Length() > 2000 )
 			{
-				Vector vecVel = GetAbsVelocity();
+				Vector vecVel = GetEngineObject()->GetAbsVelocity();
 				VectorNormalize( vecVel );
-				SetAbsVelocity( vecVel * 2000 );
+				GetEngineObject()->SetAbsVelocity( vecVel * 2000 );
 			}
 		}
 	}
@@ -312,9 +312,9 @@ void CRpgRocket::SeekThink( void )
 			ClearEffects();
 		}
 
-		SetAbsVelocity( GetAbsVelocity() * 0.2 + vecTarget * flSpeed * 0.798 );
+		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.2 + vecTarget * flSpeed * 0.798 );
 
-		if ( GetWaterLevel() == 0 && GetAbsVelocity().Length() < 1500 )
+		if ( GetWaterLevel() == 0 && GetEngineObject()->GetAbsVelocity().Length() < 1500 )
 		{
 			Detonate();
 		}
@@ -342,7 +342,7 @@ CRpgRocket *CRpgRocket::Create( const Vector &vecOrigin, const QAngle &angAngles
 {
 	CRpgRocket *pRocket = (CRpgRocket *)gEntList.CreateEntityByName( "rpg_rocket" );
 	UTIL_SetOrigin( pRocket, vecOrigin );
-	pRocket->SetAbsAngles( angAngles );
+	pRocket->GetEngineObject()->SetAbsAngles( angAngles );
 	pRocket->Spawn();
 	pRocket->SetOwnerEntity( pentOwner );
 
@@ -469,13 +469,13 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 
 void CLaserDot::SetLaserPosition( const Vector &origin, const Vector &normal )
 {
-	SetAbsOrigin( origin );
+	GetEngineObject()->SetAbsOrigin( origin );
 	m_vecSurfaceNormal = normal;
 }
 
 Vector CLaserDot::GetChasePosition()
 {
-	return GetAbsOrigin() - m_vecSurfaceNormal * 10;
+	return GetEngineObject()->GetAbsOrigin() - m_vecSurfaceNormal * 10;
 }
 
 //-----------------------------------------------------------------------------
@@ -557,7 +557,7 @@ int CLaserDot::DrawModel( int flags )
 	else
 	{
 		// Just use our position if we can't predict it otherwise
-		endPos = GetAbsOrigin();
+		endPos = GetEngineObject()->GetAbsOrigin();
 	}
 
 	// Randomly flutter
@@ -819,7 +819,7 @@ void CWeaponRPG::PrimaryAttack( void )
 	SendWeaponAnim( ACT_VM_PRIMARYATTACK );
 	WeaponSound( SINGLE );
 #ifndef CLIENT_DLL
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 400, 0.2 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 400, 0.2 );
 #endif
 	pOwner->DoMuzzleFlash();
 
@@ -840,7 +840,7 @@ void CWeaponRPG::PrimaryAttack( void )
 
 	CRpgRocket * pMissile = CRpgRocket::Create( muzzlePoint, vecAngles, pOwner );
 	pMissile->m_hOwner = this;
-	pMissile->SetAbsVelocity( pMissile->GetAbsVelocity() + vForward * DotProduct( pOwner->GetAbsVelocity(), vForward ) );
+	pMissile->GetEngineObject()->SetAbsVelocity( pMissile->GetEngineObject()->GetAbsVelocity() + vForward * DotProduct( pOwner->GetEngineObject()->GetAbsVelocity(), vForward ) );
 
 	m_hMissile = pMissile;
 #endif
@@ -1045,7 +1045,7 @@ void CWeaponRPG::CreateLaserPointer( void )
 	if ( m_hLaserDot != NULL )
 		return;
 
-	m_hLaserDot = CLaserDot::Create( GetAbsOrigin(), GetOwner() );
+	m_hLaserDot = CLaserDot::Create(GetEngineObject()->GetAbsOrigin(), GetOwner() );
 	if ( !IsGuiding() )
 	{
 		if ( m_hLaserDot )

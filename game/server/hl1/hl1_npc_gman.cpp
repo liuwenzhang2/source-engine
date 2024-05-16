@@ -173,7 +173,7 @@ void CNPC_GMan::RunTask( const Task_t *pTask )
 		// look at who I'm talking to
 		if (m_flTalkTime > gpGlobals->curtime && m_hTalkTarget != NULL)
 		{
-			AddLookTarget( m_hTalkTarget->GetAbsOrigin(), 1.0, 2.0 );
+			AddLookTarget( m_hTalkTarget->GetEngineObject()->GetAbsOrigin(), 1.0, 2.0 );
 		}
 		// look at player, but only if playing a "safe" idle animation
 		else if (m_hPlayer != NULL && (GetSequence() == 0 || IsInC5A1()) )
@@ -186,7 +186,7 @@ void CNPC_GMan::RunTask( const Task_t *pTask )
 			Vector forward;
 			GetVectors( &forward, NULL, NULL );
 
-			AddLookTarget( GetAbsOrigin() + forward * 12.0f, 1.0, 1.0 );
+			AddLookTarget(GetEngineObject()->GetAbsOrigin() + forward * 12.0f, 1.0, 1.0 );
 			SetBoneController( 0, 0 );
 		}
 		BaseClass::RunTask( pTask );

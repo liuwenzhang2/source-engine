@@ -61,7 +61,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 		return false;
 	}
 
-	SetAbsOrigin( vecOrigin );
+	GetEngineObject()->SetAbsOrigin( vecOrigin );
 	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	solid_t tmpSolid;
@@ -74,7 +74,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 		float flForce = m_pPhysicsObject->GetMass();
 		vecForceDir *= flForce;	
 
-		m_pPhysicsObject->ApplyForceOffset( vecForceDir, GetAbsOrigin() );
+		m_pPhysicsObject->ApplyForceOffset( vecForceDir, GetEngineObject()->GetAbsOrigin() );
 		m_pPhysicsObject->SetCallbackFlags( m_pPhysicsObject->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH | CALLBACK_GLOBAL_TOUCH_STATIC );
 	}
 	else

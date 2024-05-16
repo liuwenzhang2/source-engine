@@ -408,7 +408,7 @@ int CAI_Senses::LookForHighPriorityEntities( int iDistance )
 
 			if ( pPlayer )
 			{
-				if ( origin.DistToSqr(pPlayer->GetAbsOrigin()) < distSq && Look( pPlayer ) )
+				if ( origin.DistToSqr(pPlayer->GetEngineObject()->GetAbsOrigin()) < distSq && Look( pPlayer ) )
 				{
 					nSeen++;
 				}
@@ -416,7 +416,7 @@ int CAI_Senses::LookForHighPriorityEntities( int iDistance )
 				else
 				{
 					CProp_Portal *pPortal = GetOuter()->FInViewConeThroughPortal( pPlayer );
-					if ( pPortal && UTIL_Portal_DistanceThroughPortalSqr( pPortal, origin, pPlayer->GetAbsOrigin() ) < distSq && LookThroughPortal( pPortal, pPlayer ) )
+					if ( pPortal && UTIL_Portal_DistanceThroughPortalSqr( pPortal, origin, pPlayer->GetEngineObject()->GetAbsOrigin() ) < distSq && LookThroughPortal( pPortal, pPlayer ) )
 					{
 						nSeen++;
 					}
@@ -465,7 +465,7 @@ int CAI_Senses::LookForNPCs( int iDistance )
 			
 			for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
 			{
-				if ( ppAIs[i] != GetOuter() && ( ppAIs[i]->ShouldNotDistanceCull() || origin.DistToSqr(ppAIs[i]->GetAbsOrigin()) < distSq ) )
+				if ( ppAIs[i] != GetOuter() && ( ppAIs[i]->ShouldNotDistanceCull() || origin.DistToSqr(ppAIs[i]->GetEngineObject()->GetAbsOrigin()) < distSq ) )
 				{
 					if ( Look( ppAIs[i] ) )
 					{
@@ -492,7 +492,7 @@ int CAI_Senses::LookForNPCs( int iDistance )
 		else if ( bRemoveStaleFromCache )
 		{
 			if ( ( !((CAI_BaseNPC *)m_SeenNPCs[i].Get())->ShouldNotDistanceCull() && 
-				   origin.DistToSqr(m_SeenNPCs[i]->GetAbsOrigin()) > distSq ) ||
+				   origin.DistToSqr(m_SeenNPCs[i]->GetEngineObject()->GetAbsOrigin()) > distSq ) ||
 				 !Look( m_SeenNPCs[i] ) )
 			{
 	    		m_SeenNPCs.FastRemove( i );
@@ -525,7 +525,7 @@ int CAI_Senses::LookForObjects( int iDistance )
 		{
 			if ( pEnt->GetFlags() & BOX_QUERY_MASK )
 			{
-				if ( origin.DistToSqr(pEnt->GetAbsOrigin()) < distSq && Look( pEnt) )
+				if ( origin.DistToSqr(pEnt->GetEngineObject()->GetAbsOrigin()) < distSq && Look( pEnt) )
 				{
 					nSeen++;
 				}

@@ -83,7 +83,7 @@ END_SEND_TABLE()
 void cc_CreatePredictionError_f()
 {
 	CBaseEntity *pEnt = CBaseEntity::Instance( 1 );
-	pEnt->SetAbsOrigin( pEnt->GetAbsOrigin() + Vector( 63, 0, 0 ) );
+	pEnt->GetEngineObject()->SetAbsOrigin( pEnt->GetEngineObject()->GetAbsOrigin() + Vector( 63, 0, 0 ) );
 }
 
 ConCommand cc_CreatePredictionError( "CreatePredictionError", cc_CreatePredictionError_f, "Create a prediction error", FCVAR_CHEAT );
@@ -118,9 +118,9 @@ void CHL1MP_Player::PostThink( void )
 {
     BaseClass::PostThink();
 
-	QAngle angles = GetLocalAngles();
+	QAngle angles = GetEngineObject()->GetLocalAngles();
 	angles[PITCH] = 0;
-	SetLocalAngles( angles );
+	GetEngineObject()->SetLocalAngles( angles );
 	
 	// Store the eye angles pitch so the client can compute its animation state correctly.
 	m_angEyeAngles = EyeAngles();
@@ -229,7 +229,7 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 
 	float speed;
 
-	speed = GetAbsVelocity().Length2D();
+	speed = GetEngineObject()->GetAbsVelocity().Length2D();
 
 	if (GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
 	{
@@ -617,12 +617,12 @@ void CHL1MP_Player::CreateRagdollEntity( void )
     if ( pRagdoll )
     {
 		pRagdoll->m_hPlayer = this;
-		pRagdoll->m_vecRagdollOrigin = GetAbsOrigin();
-		pRagdoll->m_vecRagdollVelocity = GetAbsVelocity();
+		pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
+		pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
 		pRagdoll->m_nModelIndex = m_nModelIndex;
 		pRagdoll->m_nForceBone = m_nForceBone;
 		//pRagdoll->m_vecForce = m_vecTotalBulletForce;
-		pRagdoll->SetAbsOrigin( GetAbsOrigin() );
+		pRagdoll->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
         
     }
 

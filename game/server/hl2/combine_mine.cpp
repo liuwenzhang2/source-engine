@@ -311,7 +311,7 @@ void CBounceBomb::SetMineState( int iState )
 			}
 
 			// Scare NPC's
-			CSoundEnt::InsertSound( SOUND_DANGER, GetAbsOrigin(), 300, 1.0f, this );
+			CSoundEnt::InsertSound( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), 300, 1.0f, this );
 
 			CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
 			controller.SoundChangeVolume( m_pWarnSound, 0.0, 0.2 );
@@ -414,8 +414,8 @@ bool CBounceBomb::IsValidLocation()
 	CHintCriteria criteria;
 	criteria.SetHintType( HINT_WORLD_INHIBIT_COMBINE_MINES );
 	criteria.SetFlag( bits_HINT_NODE_NEAREST );
-	criteria.AddIncludePosition( GetAbsOrigin(), 12.0f * 15.0f );
-	pHint = CAI_HintManager::FindHint( GetAbsOrigin(), criteria );
+	criteria.AddIncludePosition(GetEngineObject()->GetAbsOrigin(), 12.0f * 15.0f );
+	pHint = CAI_HintManager::FindHint(GetEngineObject()->GetAbsOrigin(), criteria );
 
 	if( pHint )
 	{
@@ -426,13 +426,13 @@ bool CBounceBomb::IsValidLocation()
 	{
 		// Look for other mines that are too close to me.
 		CBaseEntity *pEntity = gEntList.FirstEnt();
-		Vector vecMyPosition = GetAbsOrigin();
+		Vector vecMyPosition = GetEngineObject()->GetAbsOrigin();
 		while( pEntity )
 		{
 			if( pEntity->GetEngineObject()->GetClassname() == GetEngineObject()->GetClassname() && pEntity != this)
 			{
 				// Don't lock down if I'm near a mine that's already locked down.
-				if( vecMyPosition.DistToSqr(pEntity->GetAbsOrigin()) < MINE_MIN_PROXIMITY_SQR )
+				if( vecMyPosition.DistToSqr(pEntity->GetEngineObject()->GetAbsOrigin()) < MINE_MIN_PROXIMITY_SQR )
 				{
 					pAvoidObject = pEntity;
 					flAvoidForce = 60.0f;
@@ -451,7 +451,7 @@ bool CBounceBomb::IsValidLocation()
 		Vector vecForce = Vector( 0, 0, VPhysicsGetObject()->GetMass() * 200.0f );
 
 		// Now add some force in the direction that takes us away from the inhibitor.
-		Vector vecDir = GetAbsOrigin() - pAvoidObject->GetAbsOrigin();
+		Vector vecDir = GetEngineObject()->GetAbsOrigin() - pAvoidObject->GetEngineObject()->GetAbsOrigin();
 		vecDir.z = 0.0f;
 		VectorNormalize( vecDir );
 		vecForce += vecDir * VPhysicsGetObject()->GetMass() * flAvoidForce;
@@ -481,7 +481,7 @@ void CBounceBomb::BounceThink()
 
 		// Figure out how much headroom the mine has, and hop to within a few inches of that.
 		trace_t tr;
-		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, MINE_MAX_JUMP_HEIGHT ), MASK_SHOT, this, COLLISION_GROUP_INTERACTIVE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, MINE_MAX_JUMP_HEIGHT ), MASK_SHOT, this, COLLISION_GROUP_INTERACTIVE, &tr );
 
 		float height;
 
@@ -492,7 +492,7 @@ void CBounceBomb::BounceThink()
 		}
 		else
 		{
-			height = tr.endpos.z - GetAbsOrigin().z;
+			height = tr.endpos.z - GetEngineObject()->GetAbsOrigin().z;
 			height -= BOUNCEBOMB_RADIUS;
 			if ( height < 0.1 )
 				height = 0.1;
@@ -551,7 +551,7 @@ void CBounceBomb::CavernBounceThink()
 
 		// Figure out how much headroom the mine has, and hop to within a few inches of that.
 		trace_t tr;
-		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, MINE_MAX_JUMP_HEIGHT ), MASK_SHOT, this, COLLISION_GROUP_INTERACTIVE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, MINE_MAX_JUMP_HEIGHT ), MASK_SHOT, this, COLLISION_GROUP_INTERACTIVE, &tr );
 
 		float height;
 
@@ -562,7 +562,7 @@ void CBounceBomb::CavernBounceThink()
 		}
 		else
 		{
-			height = tr.endpos.z - GetAbsOrigin().z;
+			height = tr.endpos.z - GetEngineObject()->GetAbsOrigin().z;
 			height -= BOUNCEBOMB_RADIUS;
 			if ( height < 0.1 )
 				height = 0.1;
@@ -653,7 +653,7 @@ void CBounceBomb::SettleThink()
 		{
 			// If i'm not resting on the world, jump randomly.
 			trace_t tr;
-			UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector( 0, 0, 1024 ), MASK_SHOT|CONTENTS_GRATE, this, COLLISION_GROUP_NONE, &tr );
+			UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 1024 ), MASK_SHOT|CONTENTS_GRATE, this, COLLISION_GROUP_NONE, &tr );
 
 			bool bHop = false;
 			if( tr.m_pEnt )
@@ -708,7 +708,7 @@ void CBounceBomb::SettleThink()
 			ballsocket.constraint.Defaults();
 			ballsocket.constraint.forceLimit = lbs2kg(1000);
 			ballsocket.constraint.torqueLimit = lbs2kg(1000);
-			ballsocket.InitWithCurrentObjectState( g_PhysWorldObject, VPhysicsGetObject(), GetAbsOrigin() );
+			ballsocket.InitWithCurrentObjectState( g_PhysWorldObject, VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
 			m_pConstraint = physenv->CreateBallsocketConstraint( g_PhysWorldObject, VPhysicsGetObject(), NULL, ballsocket );
 			CloseHooks();
 
@@ -751,7 +751,7 @@ void CBounceBomb::UpdateLight( bool bTurnOn, unsigned int r, unsigned int g, uns
 			GetVectors( NULL, NULL, &up );
 
 			// Light isn't on.
-			m_hSprite = CSprite::SpriteCreate( "sprites/glow01.vmt", GetAbsOrigin() + up * 10.0f, false );
+			m_hSprite = CSprite::SpriteCreate( "sprites/glow01.vmt", GetEngineObject()->GetAbsOrigin() + up * 10.0f, false );
 			CSprite *pSprite = (CSprite *)m_hSprite.Get();
 
 			if( m_hSprite )
@@ -881,7 +881,7 @@ float CBounceBomb::FindNearestNPC()
 				continue;
 
 			// Don't bother with NPC's that are below me.
-			if( pNPC->EyePosition().z < GetAbsOrigin().z )
+			if( pNPC->EyePosition().z < GetEngineObject()->GetAbsOrigin().z )
 				continue;
 
 			// Disregard things that want to be disregarded
@@ -897,7 +897,7 @@ float CBounceBomb::FindNearestNPC()
 				continue;
 
 
-			float flDist = (GetAbsOrigin() - pNPC->GetAbsOrigin()).LengthSqr();
+			float flDist = (GetEngineObject()->GetAbsOrigin() - pNPC->GetEngineObject()->GetAbsOrigin()).LengthSqr();
 
 			if( flDist < flNearest )
 			{
@@ -916,7 +916,7 @@ float CBounceBomb::FindNearestNPC()
 
 	if( pPlayer && !(pPlayer->GetFlags() & FL_NOTARGET) )
 	{
-		float flDist = (pPlayer->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
+		float flDist = (pPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 
 		if( flDist < flNearest && FVisible( pPlayer, MASK_SOLID_BRUSHONLY ) )
 		{
@@ -1119,12 +1119,12 @@ void CBounceBomb::ExplodeThink()
 
 	if (m_iModification == MINE_MODIFICATION_CAVERN)
 	{
-		ExplosionCreate( GetAbsOrigin(), GetAbsAngles(), (pThrower) ? pThrower : this, BOUNCEBOMB_EXPLODE_DAMAGE, BOUNCEBOMB_EXPLODE_RADIUS, true,
+		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), (pThrower) ? pThrower : this, BOUNCEBOMB_EXPLODE_DAMAGE, BOUNCEBOMB_EXPLODE_RADIUS, true,
 			NULL, CLASS_PLAYER_ALLY );
 	}
 	else
 	{
-		ExplosionCreate( GetAbsOrigin(), GetAbsAngles(), (pThrower) ? pThrower : this, BOUNCEBOMB_EXPLODE_DAMAGE, BOUNCEBOMB_EXPLODE_RADIUS, true);
+		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), (pThrower) ? pThrower : this, BOUNCEBOMB_EXPLODE_DAMAGE, BOUNCEBOMB_EXPLODE_RADIUS, true);
 	}
 	UTIL_Remove( this );
 }
@@ -1284,7 +1284,7 @@ void CBounceBomb::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t re
 
 			// Try to scatter NPCs without panicking them. Make a move away sound up around their 
 			// ear level.
-			CSoundEnt::InsertSound( SOUND_MOVE_AWAY, GetAbsOrigin() + Vector( 0, 0, 60), 32.0f, 0.2f );
+			CSoundEnt::InsertSound( SOUND_MOVE_AWAY, GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 60), 32.0f, 0.2f );
 			return;
 		}
 		else

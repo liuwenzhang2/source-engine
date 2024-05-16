@@ -260,7 +260,7 @@ const Vector *FindRandomHidingSpot( CBaseEntity *me, Place place, bool isSniper 
 	// collect set of nearby hiding spots
 	if (isSniper)
 	{
-		CollectHidingSpotsFunctor collector( me, me->GetAbsOrigin(), -1.0f, HidingSpot::IDEAL_SNIPER_SPOT, place );
+		CollectHidingSpotsFunctor collector( me, me->GetEngineObject()->GetAbsOrigin(), -1.0f, HidingSpot::IDEAL_SNIPER_SPOT, place );
 		TheNavMesh->ForAllAreas( collector );
 
 		if (collector.m_count)
@@ -271,7 +271,7 @@ const Vector *FindRandomHidingSpot( CBaseEntity *me, Place place, bool isSniper 
 		else
 		{
 			// no ideal sniping spots, look for "good" sniping spots
-			CollectHidingSpotsFunctor collector( me, me->GetAbsOrigin(), -1.0f, HidingSpot::GOOD_SNIPER_SPOT, place );
+			CollectHidingSpotsFunctor collector( me, me->GetEngineObject()->GetAbsOrigin(), -1.0f, HidingSpot::GOOD_SNIPER_SPOT, place );
 			TheNavMesh->ForAllAreas( collector );
 
 			if (collector.m_count)
@@ -285,7 +285,7 @@ const Vector *FindRandomHidingSpot( CBaseEntity *me, Place place, bool isSniper 
 	}
 
 	// collect hiding spots with decent "cover"
-	CollectHidingSpotsFunctor collector( me, me->GetAbsOrigin(), -1.0f, HidingSpot::IN_COVER, place );
+	CollectHidingSpotsFunctor collector( me, me->GetEngineObject()->GetAbsOrigin(), -1.0f, HidingSpot::IN_COVER, place );
 	TheNavMesh->ForAllAreas( collector );
 
 	if (collector.m_count == 0)

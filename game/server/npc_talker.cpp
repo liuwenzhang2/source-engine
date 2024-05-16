@@ -100,7 +100,7 @@ bool CNPCSimpleTalker::ShouldSuspendMonolog( void )
 {
 	float flDist;
 
-	flDist = ((assert_cast<CNPCSimpleTalkerExpresser *>(GetExpresser()))->GetMonologueTarget()->GetAbsOrigin() - GetAbsOrigin()).Length();
+	flDist = ((assert_cast<CNPCSimpleTalkerExpresser *>(GetExpresser()))->GetMonologueTarget()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
 	
 	if( flDist >= 384 )
 	{
@@ -116,7 +116,7 @@ bool CNPCSimpleTalker::ShouldResumeMonolog( void )
 
 	if( HasCondition( COND_SEE_PLAYER ) )
 	{
-		flDist = ((assert_cast<CNPCSimpleTalkerExpresser *>(GetExpresser()))->GetMonologueTarget()->GetAbsOrigin() - GetAbsOrigin()).Length();
+		flDist = ((assert_cast<CNPCSimpleTalkerExpresser *>(GetExpresser()))->GetMonologueTarget()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
 		
 		if( flDist <= 256 )
 		{
@@ -190,7 +190,7 @@ void CNPCSimpleTalker::StartTask( const Task_t *pTask )
 	case TASK_TALKER_IDEALYAW:
 		if (GetSpeechTarget() != NULL)
 		{
-			GetMotor()->SetIdealYawToTarget( GetSpeechTarget()->GetAbsOrigin() );
+			GetMotor()->SetIdealYawToTarget( GetSpeechTarget()->GetEngineObject()->GetAbsOrigin() );
 		}
 		TaskComplete();
 		break;
@@ -235,15 +235,15 @@ void CNPCSimpleTalker::RunTask( const Task_t *pTask )
 			Assert( pPlayer );
 
 			// fail out if the player looks away or moves away.
-			if ( ( pPlayer->GetAbsOrigin() - GetAbsOrigin() ).Length2D() > TALKER_STARE_DIST )
+			if ( ( pPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length2D() > TALKER_STARE_DIST )
 			{
 				// player moved away.
 				TaskFail("Player moved away");
 			}
 
 			Vector forward;
-			AngleVectors( pPlayer->GetLocalAngles(), &forward );
-			if ( UTIL_DotPoints( pPlayer->GetAbsOrigin(), GetAbsOrigin(), forward ) < m_flFieldOfView )
+			AngleVectors( pPlayer->GetEngineObject()->GetLocalAngles(), &forward );
+			if ( UTIL_DotPoints( pPlayer->GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), forward ) < m_flFieldOfView )
 			{
 				// player looked away
 				TaskFail("Player looked away");
@@ -327,7 +327,7 @@ CBaseEntity	*CNPCSimpleTalker::EnumFriends( CBaseEntity *pPrevious, int listNumb
 		{
 			Vector vecCheck;
 			pFriend->CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &vecCheck );
-			UTIL_TraceLine( GetAbsOrigin(), vecCheck, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
+			UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), vecCheck, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 		}
 		else
 		{
@@ -831,9 +831,9 @@ int CNPCSimpleTalker::SelectNonCombatSpeechSchedule()
 		{
 			// watch the client.
 			Vector forward;
-			AngleVectors( pPlayer->GetLocalAngles(), &forward );
-			if ( ( pPlayer->GetAbsOrigin() - GetAbsOrigin() ).Length2D() < TALKER_STARE_DIST	&& 
-				 UTIL_DotPoints( pPlayer->GetAbsOrigin(), GetAbsOrigin(), forward ) >= m_flFieldOfView )
+			AngleVectors( pPlayer->GetEngineObject()->GetLocalAngles(), &forward );
+			if ( ( pPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length2D() < TALKER_STARE_DIST	&&
+				 UTIL_DotPoints( pPlayer->GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), forward ) >= m_flFieldOfView )
 			{
 				// go into the special STARE schedule if the player is close, and looking at me too.
 				return SCHED_TALKER_IDLE_WATCH_CLIENT_STARE;

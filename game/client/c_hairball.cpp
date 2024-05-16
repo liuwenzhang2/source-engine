@@ -187,12 +187,12 @@ void C_Hairball::ClientThink()
 	{
 		float div = m_flCurSpinTime / m_flSpinDuration;
 
-		QAngle angles = GetLocalAngles();
+		QAngle angles = GetEngineObject()->GetLocalAngles();
 
 		angles.x += m_flSpinRateX * SmoothCurve( div );
 		angles.y += m_flSpinRateY * SmoothCurve( div );
 
-		SetLocalAngles( angles );
+		GetEngineObject()->SetLocalAngles( angles );
 	}
 	else
 	{
@@ -232,7 +232,7 @@ void C_Hairball::ClientThink()
 				VectorNormalize( vDir );
 
 				trace_t trace;
-				UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + vDir * 10000, MASK_SOLID, NULL, COLLISION_GROUP_NONE, &trace );
+				UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vDir * 10000, MASK_SOLID, NULL, COLLISION_GROUP_NONE, &trace );
 
 				if ( trace.fraction != 1.0 )
 				{
@@ -251,10 +251,10 @@ void C_Hairball::ClientThink()
 	else
 	{
 		// Move in the specified direction.
-		Vector vEnd = GetAbsOrigin() + m_vMoveDir * gpGlobals->frametime;
+		Vector vEnd = GetEngineObject()->GetAbsOrigin() + m_vMoveDir * gpGlobals->frametime;
 
 		trace_t trace;
-		UTIL_TraceLine( GetAbsOrigin(), vEnd, MASK_SOLID, NULL, COLLISION_GROUP_NONE, &trace );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), vEnd, MASK_SOLID, NULL, COLLISION_GROUP_NONE, &trace );
 
 		if ( trace.fraction < 1 )
 		{
@@ -263,14 +263,14 @@ void C_Hairball::ClientThink()
 		}
 		else
 		{
-			SetLocalOrigin( GetLocalOrigin() + m_vMoveDir * gpGlobals->frametime );
+			GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() + m_vMoveDir * gpGlobals->frametime );
 		}
 	}
 
 	
 	// Transform the base hair positions so we can lock them down.
 	VMatrix mTransform;
-	mTransform.SetupMatrixOrgAngles( GetLocalOrigin(), GetLocalAngles() );
+	mTransform.SetupMatrixOrgAngles(GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles() );
 
 	for ( int i=0; i < m_HairPositions.Count(); i++ )
 	{
@@ -341,8 +341,8 @@ void CreateHairballCallback()
 			return;
 
 		Vector vForward;
-		AngleVectors( pPlayer->GetAbsAngles(), &vForward );
-		pHairball->SetLocalOrigin( pPlayer->GetAbsOrigin() + vForward * 300 + RandomVector( 0, 100 ) );
+		AngleVectors( pPlayer->GetEngineObject()->GetAbsAngles(), &vForward );
+		pHairball->GetEngineObject()->SetLocalOrigin( pPlayer->GetEngineObject()->GetAbsOrigin() + vForward * 300 + RandomVector( 0, 100 ) );
 	}
 }
 

@@ -637,7 +637,7 @@ void CParticleProperty::UpdateControlPoint( ParticleEffectList_t *pEffect, int i
 		case PATTACH_ABSORIGIN_FOLLOW:
 		default:
 			{
-				vecOrigin = pPoint->hEntity->GetAbsOrigin() + pPoint->vecOriginOffset;
+				vecOrigin = pPoint->hEntity->GetEngineObject()->GetAbsOrigin() + pPoint->vecOriginOffset;
 				pPoint->hEntity->GetEngineObject()->GetVectors( &vecForward, &vecRight, &vecUp );
 			}
 			break;

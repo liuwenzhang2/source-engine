@@ -389,9 +389,9 @@ void BuyState::OnUpdate( CCSBot *me )
 		m_doneBuying = true;
 		CONSOLE_ECHO( "%s bot spawned outside of a buy zone (%d, %d, %d)\n",
 						(me->GetTeamNumber() == TEAM_CT) ? "CT" : "Terrorist",
-						(int)me->GetAbsOrigin().x,
-						(int)me->GetAbsOrigin().y,
-						(int)me->GetAbsOrigin().z );
+						(int)me->GetEngineObject()->GetAbsOrigin().x,
+						(int)me->GetEngineObject()->GetAbsOrigin().y,
+						(int)me->GetEngineObject()->GetAbsOrigin().z );
 		return;
 	}
 

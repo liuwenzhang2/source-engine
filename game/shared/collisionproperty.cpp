@@ -627,14 +627,14 @@ void CCollisionProperty::SetSolidFlags( int flags )
 //-----------------------------------------------------------------------------
 const Vector& CCollisionProperty::GetCollisionOrigin() const
 {
-	return m_pOuter->GetAbsOrigin();
+	return m_pOuter->GetEngineObject()->GetAbsOrigin();
 }
 
 const QAngle& CCollisionProperty::GetCollisionAngles() const
 {
 	if ( IsBoundsDefinedInEntitySpace() )
 	{
-		return m_pOuter->GetAbsAngles();
+		return m_pOuter->GetEngineObject()->GetAbsAngles();
 	}
 
 	return vec3_angle;

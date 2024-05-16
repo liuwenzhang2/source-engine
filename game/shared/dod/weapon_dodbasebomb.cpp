@@ -124,7 +124,7 @@ void CDODBaseBombWeapon::PrimaryAttack()
 			// if the target is not active anymore, cancel ( someone planted there already? )
 			CancelPlanting();
 		}
-		else if ( ( pTarget->GetAbsOrigin() - pPlayer->WorldSpaceCenter() ).Length() > DOD_BOMB_PLANT_RADIUS )
+		else if ( ( pTarget->GetEngineObject()->GetAbsOrigin() - pPlayer->WorldSpaceCenter() ).Length() > DOD_BOMB_PLANT_RADIUS )
 		{
 			// if we're too far away, cancel
 			CancelPlanting();			
@@ -167,7 +167,7 @@ void CDODBaseBombWeapon::PrimaryAttack()
 
 		Vector pos = pPlayer->WorldSpaceCenter();
 
-		float flDist = ( pos - pTarget->GetAbsOrigin() ).Length();
+		float flDist = ( pos - pTarget->GetEngineObject()->GetAbsOrigin() ).Length();
 
 		// if we are looking directly at a bomb target and it is within our radius, that automatically wins
 		if ( flDist < flBestDist &&
@@ -287,7 +287,7 @@ bool CDODBaseBombWeapon::IsLookingAtBombTarget( CBasePlayer *pPlayer, CDODBombTa
 	Vector forward;
 	AngleVectors( pPlayer->EyeAngles(), &forward );
 
-	Vector toBomb = pTarget->GetAbsOrigin() - pPlayer->EyePosition();
+	Vector toBomb = pTarget->GetEngineObject()->GetAbsOrigin() - pPlayer->EyePosition();
 	toBomb.NormalizeInPlace();
 
 	return ( DotProduct( forward, toBomb ) >= 0.8 );

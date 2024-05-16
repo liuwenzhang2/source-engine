@@ -471,11 +471,11 @@ void CFuncTank::TraceAttack( CBaseEntity *pAttacker, float flDamage, const Vecto
 		// Only adjust yaw for now
 		if (pAttacker)
 		{
-			Vector vFromAttacker = (pAttacker->EyePosition()-GetAbsOrigin());
+			Vector vFromAttacker = (pAttacker->EyePosition()- GetEngineObject()->GetAbsOrigin());
 			vFromAttacker.z = 0;
 			VectorNormalize(vFromAttacker);
 
-			Vector vFromAttacker2 = (ptr->endpos-GetAbsOrigin());
+			Vector vFromAttacker2 = (ptr->endpos- GetEngineObject()->GetAbsOrigin());
 			vFromAttacker2.z = 0;
 			VectorNormalize(vFromAttacker2);
 
@@ -484,7 +484,7 @@ void CFuncTank::TraceAttack( CBaseEntity *pAttacker, float flDamage, const Vecto
 			CrossProduct(vFromAttacker,vFromAttacker2, vCrossProduct);
 			Msg( "%f\n",vCrossProduct.z);
 			QAngle angles;
-			angles = GetLocalAngles();
+			angles = GetEngineObject()->GetLocalAngles();
 			if (vCrossProduct.z > 0)
 			{
 				angles.y		+= 10;
@@ -504,7 +504,7 @@ void CFuncTank::TraceAttack( CBaseEntity *pAttacker, float flDamage, const Vecto
 				angles.y = (m_yawCenter - m_yawRange);
 			}
 
-			SetLocalAngles( angles );
+			GetEngineObject()->SetLocalAngles( angles );
 		}
 	}
 }
@@ -517,7 +517,7 @@ void CFuncTank::TraceAttack( CBaseEntity *pAttacker, float flDamage, const Vecto
 //-----------------------------------------------------------------------------
 CBaseEntity *CFuncTank::FindTarget( string_t targetName, CBaseEntity *pActivator ) 
 {
-	return gEntList.FindEntityGenericNearest( STRING( targetName ), GetAbsOrigin(), 0, this, pActivator );
+	return gEntList.FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
 }
 
 
@@ -567,8 +567,8 @@ void CFuncTank::Spawn( void )
 	SetSolid( SOLID_VPHYSICS );
 	SetModel( STRING( GetModelName() ) );
 
-	m_yawCenter			= GetLocalAngles().y;
-	m_pitchCenter		= GetLocalAngles().x;
+	m_yawCenter			= GetEngineObject()->GetLocalAngles().y;
+	m_pitchCenter		= GetEngineObject()->GetLocalAngles().x;
 	m_vTargetPosition	= vec3_origin;
 
 	if ( IsActive() )
@@ -653,9 +653,9 @@ bool CFuncTank::OnControls( CBaseEntity *pTest )
 	if ( !(m_spawnflags & SF_TANK_CANCONTROL) )
 		return FALSE;
 
-	Vector offset = pTest->GetLocalOrigin() - GetLocalOrigin();
+	Vector offset = pTest->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin();
 
-	if ( (m_vecControllerUsePos - pTest->GetLocalOrigin()).Length() < 30 )
+	if ( (m_vecControllerUsePos - pTest->GetEngineObject()->GetLocalOrigin()).Length() < 30 )
 		return TRUE;
 
 	return FALSE;
@@ -681,7 +681,7 @@ bool CFuncTank::StartControl( CBasePlayer *pController )
 	}
 
 	m_pController->m_Local.m_iHideHUD |= HIDEHUD_WEAPONSELECTION;
-	m_vecControllerUsePos = m_pController->GetLocalOrigin();
+	m_vecControllerUsePos = m_pController->GetEngineObject()->GetLocalOrigin();
 	
 	SetNextThink( gpGlobals->curtime + 0.1f );
 	
@@ -714,7 +714,7 @@ void CFuncTank::ControllerPostFrame( void )
 		return;
 
 	Vector forward;
-	AngleVectors( GetAbsAngles(), &forward );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
 	if ( m_pController->m_nButtons & IN_ATTACK )
 	{
 		m_fireLast = gpGlobals->curtime - (1/m_fireRate) - 0.01;  // to make sure the gun doesn't fire too many bullets
@@ -809,14 +809,14 @@ void CFuncTank::Think( void )
 //-----------------------------------------------------------------------------
 QAngle CFuncTank::AimBarrelAt( const Vector &parentTarget )
 {
-	Vector target = parentTarget - GetLocalOrigin();
+	Vector target = parentTarget - GetEngineObject()->GetLocalOrigin();
 	float quadTarget = target.LengthSqr();
 	float quadTargetXY = target.x*target.x + target.y*target.y;
 
 	// Target is too close!  Can't aim at it
 	if ( quadTarget <= m_barrelPos.LengthSqr() )
 	{
-		return GetLocalAngles();
+		return GetEngineObject()->GetLocalAngles();
 	}
 	else
 	{
@@ -946,7 +946,7 @@ void CFuncTank::TrackTarget( void )
 					updateTime = TRUE;
 
 					// Sight position is BodyTarget with no noise (so gun doesn't bob up and down)
-					m_sightOrigin = pInstance->BodyTarget( GetLocalOrigin(), false );
+					m_sightOrigin = pInstance->BodyTarget(GetEngineObject()->GetLocalOrigin(), false );
 				}
 			}
 		}
@@ -971,7 +971,7 @@ void CFuncTank::TrackTarget( void )
 	bool bOutsideYawRange = ( fabs( offsetY ) > m_yawRange + m_yawTolerance );
 	bool bOutsidePitchRange = ( fabs( offsetX ) > m_pitchRange + m_pitchTolerance );
 
-	Vector vecToTarget = m_sightOrigin - GetLocalOrigin();
+	Vector vecToTarget = m_sightOrigin - GetEngineObject()->GetLocalOrigin();
 
 	// if target is outside yaw range
 	if ( bOutsideYawRange )
@@ -986,7 +986,7 @@ void CFuncTank::TrackTarget( void )
 		}
 	}
 
-	if ( bOutsidePitchRange || bOutsideYawRange || ( vecToTarget.Length() < ( barrelEnd - GetAbsOrigin() ).Length() ) )
+	if ( bOutsidePitchRange || bOutsideYawRange || ( vecToTarget.Length() < ( barrelEnd - GetEngineObject()->GetAbsOrigin() ).Length() ) )
 	{
 		// Don't update if you saw the player, but out of range
 		updateTime = false;
@@ -999,7 +999,7 @@ void CFuncTank::TrackTarget( void )
 	}
 
 	// Move toward target at rate or less
-	float distY = UTIL_AngleDistance( angles.y, GetLocalAngles().y );
+	float distY = UTIL_AngleDistance( angles.y, GetEngineObject()->GetLocalAngles().y );
 
 	QAngle vecAngVel = GetLocalAngularVelocity();
 	vecAngVel.y = distY * 10;
@@ -1009,7 +1009,7 @@ void CFuncTank::TrackTarget( void )
 	angles.x = clamp( angles.x, m_pitchCenter - m_pitchRange, m_pitchCenter + m_pitchRange );
 
 	// Move toward target at rate or less
-	float distX = UTIL_AngleDistance( angles.x, GetLocalAngles().x );
+	float distX = UTIL_AngleDistance( angles.x, GetEngineObject()->GetLocalAngles().x );
 	vecAngVel.x = distX  * 10;
 	vecAngVel.x = clamp( vecAngVel.x, -m_pitchRate, m_pitchRate );
 	SetLocalAngularVelocity( vecAngVel );
@@ -1022,7 +1022,7 @@ void CFuncTank::TrackTarget( void )
 	{
 		bool fire = FALSE;
 		Vector forward;
-		AngleVectors( GetLocalAngles(), &forward );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), &forward );
 		forward = m_parentMatrix.ApplyRotation( forward );
 
 
@@ -1106,7 +1106,7 @@ void CFuncTank::Fire( int bulletCount, const Vector &barrelEnd, const Vector &fo
 		pSprite->SetTransparency( kRenderTransAlpha, m_clrRender->r, m_clrRender->g, m_clrRender->b, 255, kRenderFxNone );
 
 		Vector vecVelocity( 0, 0, random->RandomFloat(40, 80) ); 
-		pSprite->SetAbsVelocity( vecVelocity );
+		pSprite->GetEngineObject()->SetAbsVelocity( vecVelocity );
 		pSprite->SetScale( m_spriteScale );
 	}
 	if ( m_iszSpriteFlash != NULL_STRING )
@@ -1125,7 +1125,7 @@ void CFuncTank::TankTrace( const Vector &vecStart, const Vector &vecForward, con
 {
 	Vector forward, right, up;
 
-	AngleVectors( GetAbsAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
 	// get circular gaussian spread
 	float x, y, z;
 	do {
@@ -1435,7 +1435,7 @@ void CFuncTankLaser::Fire( int bulletCount, const Vector &barrelEnd, const Vecto
 	{
 		for ( i = 0; i < bulletCount; i++ )
 		{
-			m_pLaser->SetLocalOrigin( barrelEnd );
+			m_pLaser->GetEngineObject()->SetLocalOrigin( barrelEnd );
 			TankTrace( barrelEnd, forward, gTankSpread[m_spread], tr );
 			
 			m_laserTime = gpGlobals->curtime;
@@ -1472,8 +1472,8 @@ void CFuncTankRocket::Fire( int bulletCount, const Vector &barrelEnd, const Vect
 
 	for ( i = 0; i < bulletCount; i++ )
 	{
-		CBaseEntity *pRocket = CBaseEntity::Create( "rpg_rocket", barrelEnd, GetAbsAngles(), this );
-		pRocket->SetAbsAngles( GetAbsAngles() );
+		CBaseEntity *pRocket = CBaseEntity::Create( "rpg_rocket", barrelEnd, GetEngineObject()->GetAbsAngles(), this );
+		pRocket->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 	}
 	CFuncTank::Fire( bulletCount, barrelEnd, forward, this );
 }
@@ -1546,7 +1546,7 @@ void CFuncTankMortar::InputShootGun( inputdata_t &inputdata )
 void CFuncTankMortar::ShootGun( void )
 {
 	Vector forward;
-	AngleVectors( GetLocalAngles(), &forward );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &forward );
 	UpdateMatrix();
 	forward = m_parentMatrix.ApplyRotation( forward );
 
@@ -1621,7 +1621,7 @@ void CFuncTankMortar::Fire( int bulletCount, const Vector &barrelEnd, const Vect
 		te->SetSuppressHost( NULL );
 	}
 
-	ExplosionCreate( tr.endpos, GetAbsAngles(), this, m_Magnitude, 0, true );
+	ExplosionCreate( tr.endpos, GetEngineObject()->GetAbsAngles(), this, m_Magnitude, 0, true );
 
 	if ( g_pGameRules->IsMultiplayer() )
 	{

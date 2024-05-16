@@ -49,13 +49,13 @@ void CBaseAnimatingProjectile::Spawn(	char *pszModel,
 	SetMoveType( iMovetype, nMoveCollide );
 
 	UTIL_SetOrigin( this, vecOrigin );
-	SetAbsVelocity( vecVelocity );
+	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 	SetOwnerEntity( pOwner );
 
 	QAngle qAngles;
 	VectorAngles( vecVelocity, qAngles );
-	SetAbsAngles( qAngles );
+	GetEngineObject()->SetAbsAngles( qAngles );
 }
 
 

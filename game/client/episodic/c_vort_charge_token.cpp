@@ -294,7 +294,7 @@ void C_VortigauntChargeToken::ClientThink( void )
 
 	if ( m_pDLight != NULL )
 	{
-		m_pDLight->origin = GetAbsOrigin();
+		m_pDLight->origin = GetEngineObject()->GetAbsOrigin();
 		m_pDLight->radius = DLIGHT_RADIUS;
 	}
 }
@@ -406,7 +406,7 @@ bool C_VortigauntEffectDispel::SetupEmitters( void )
 
 #ifndef _X360
 	m_pDLight = effects->CL_AllocDlight (entindex());
-	m_pDLight->origin = GetAbsOrigin();
+	m_pDLight->origin = GetEngineObject()->GetAbsOrigin();
 	m_pDLight->color.r = 64;
 	m_pDLight->color.g = 255;
 	m_pDLight->color.b = 64;
@@ -425,7 +425,7 @@ void C_VortigauntEffectDispel::ClientThink( void )
 {
 	if ( m_pDLight != NULL )
 	{
-		m_pDLight->origin = GetAbsOrigin();
+		m_pDLight->origin = GetEngineObject()->GetAbsOrigin();
 		m_pDLight->radius = DLIGHT_RADIUS;
 	}
 }

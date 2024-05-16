@@ -871,7 +871,7 @@ void CNavArea::ComputeEarliestOccupyTimes( void )
 		 spot;
 		 spot = gEntList.FindEntityByClassname( spot, "info_player_terrorist" ) )
 	{
-		float travelDistance = NavAreaTravelDistance( spot->GetAbsOrigin(), m_center, cost );
+		float travelDistance = NavAreaTravelDistance( spot->GetEngineObject()->GetAbsOrigin(), m_center, cost );
 		if (travelDistance < 0.0f)
 			continue;
 
@@ -889,7 +889,7 @@ void CNavArea::ComputeEarliestOccupyTimes( void )
 		 spot;
 		 spot = gEntList.FindEntityByClassname( spot, "info_player_counterterrorist" ) )
 	{
-		float travelDistance = NavAreaTravelDistance( spot->GetAbsOrigin(), m_center, cost );
+		float travelDistance = NavAreaTravelDistance( spot->GetEngineObject()->GetAbsOrigin(), m_center, cost );
 		if (travelDistance < 0.0f)
 			continue;
 

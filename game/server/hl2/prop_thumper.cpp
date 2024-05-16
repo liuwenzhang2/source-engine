@@ -127,7 +127,7 @@ void CPropThumper::Spawn( void )
 	if ( pRepellant )
 	{
 		pRepellant->Spawn();
-		pRepellant->SetAbsOrigin( GetAbsOrigin() );
+		pRepellant->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		pRepellant->SetRadius( THUMPER_RADIUS );
 
 		m_hRepellantEnt = pRepellant;
@@ -220,11 +220,11 @@ void CPropThumper::Thump ( void )
 		params.m_bWarnOnDirectWaveReference = true;
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
-	CSoundEnt::InsertSound ( SOUND_THUMPER, GetAbsOrigin(), THUMPER_RADIUS * m_flPlaybackRate, THUMPER_SOUND_DURATION, this );
+	CSoundEnt::InsertSound ( SOUND_THUMPER, GetEngineObject()->GetAbsOrigin(), THUMPER_RADIUS * m_flPlaybackRate, THUMPER_SOUND_DURATION, this );
 
 	if ( thumper_show_radius.GetBool() )
 	{
-		NDebugOverlay::Box( GetAbsOrigin(), Vector(-THUMPER_RADIUS, -THUMPER_RADIUS, -THUMPER_RADIUS), Vector(THUMPER_RADIUS, THUMPER_RADIUS, THUMPER_RADIUS), 
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), Vector(-THUMPER_RADIUS, -THUMPER_RADIUS, -THUMPER_RADIUS), Vector(THUMPER_RADIUS, THUMPER_RADIUS, THUMPER_RADIUS),
 			255, 64, 64, 255, THUMPER_SOUND_DURATION );
 	}
 

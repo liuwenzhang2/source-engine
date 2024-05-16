@@ -97,8 +97,8 @@ void CNPC_APCDriver::Activate( void )
 		return;
 	}
 	GetEngineObject()->SetParent( m_hAPC->GetEngineObject() );
-	SetAbsOrigin( m_hAPC->WorldSpaceCenter() );
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetAbsOrigin( m_hAPC->WorldSpaceCenter() );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 
 	m_flDistTooFar = m_hAPC->MaxAttackRange();
 	SetDistLook( m_hAPC->MaxAttackRange() );
@@ -174,7 +174,7 @@ bool CNPC_APCDriver::FVisible( CBaseEntity *pTarget, int traceMask, CBaseEntity 
 	if ( IsBeingCarried() || m_bFiringDisabled )
 		return false;
 
-	float flTargetDist = GetAbsOrigin().DistTo( pTarget->GetAbsOrigin() );
+	float flTargetDist = GetEngineObject()->GetAbsOrigin().DistTo( pTarget->GetEngineObject()->GetAbsOrigin() );
 	if (flTargetDist > m_hAPC->MaxAttackRange())
 		return false;
 
@@ -277,7 +277,7 @@ void CNPC_APCDriver::PrescheduleThink( )
 	{
 		if ( GetEnemy() )
 		{
-			m_hAPC->AimPrimaryWeapon( GetEnemy()->BodyTarget( GetAbsOrigin(), false ) );
+			m_hAPC->AimPrimaryWeapon( GetEnemy()->BodyTarget(GetEngineObject()->GetAbsOrigin(), false ) );
 		}
 		m_hAPC->AimSecondaryWeaponAt( GetEnemy() );
 	}

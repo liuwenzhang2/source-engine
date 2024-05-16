@@ -159,7 +159,7 @@ bool INextBot::SetPosition( const Vector &pos )
 	}
 	
 	// fall back to setting raw entity position
-	GetEntity()->SetAbsOrigin( pos );
+	GetEntity()->GetEngineObject()->SetAbsOrigin( pos );
 	return true;
 }
 
@@ -167,7 +167,7 @@ bool INextBot::SetPosition( const Vector &pos )
 //----------------------------------------------------------------------------------------------------------------
 const Vector &INextBot::GetPosition( void ) const
 {
-	return const_cast< INextBot * >( this )->GetEntity()->GetAbsOrigin();
+	return const_cast< INextBot * >( this )->GetEntity()->GetEngineObject()->GetAbsOrigin();
 }
 
 
@@ -518,10 +518,10 @@ void INextBot::UpdateImmobileStatus( void )
 		m_immobileCheckTimer.Start( 1.0f );
 
 		// if we haven't moved farther than this in 1 second, we're immobile
-		if ( ( GetEntity()->GetAbsOrigin() - m_immobileAnchor ).IsLengthGreaterThan( GetImmobileSpeedThreshold() ) )
+		if ( ( GetEntity()->GetEngineObject()->GetAbsOrigin() - m_immobileAnchor ).IsLengthGreaterThan( GetImmobileSpeedThreshold() ) )
 		{
 			// moved far enough, not immobile
-			m_immobileAnchor = GetEntity()->GetAbsOrigin();
+			m_immobileAnchor = GetEntity()->GetEngineObject()->GetAbsOrigin();
 			m_immobileTimer.Invalidate();
 		}
 		else

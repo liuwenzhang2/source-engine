@@ -141,7 +141,7 @@ void CAI_Spotlight::CreateSpotlightEntities( void )
 	Vector vecStartPoint;
 	if ( m_nSpotlightAttachment == 0 ) 
 	{
-		vecStartPoint = GetOuter()->GetAbsOrigin();
+		vecStartPoint = GetOuter()->GetEngineObject()->GetAbsOrigin();
 	}
 	else
 	{
@@ -153,7 +153,7 @@ void CAI_Spotlight::CreateSpotlightEntities( void )
 
 	m_hSpotlightTarget = (CSpotlightEnd*)gEntList.CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
-	m_hSpotlightTarget->SetAbsOrigin( vecEndPoint );
+	m_hSpotlightTarget->GetEngineObject()->SetAbsOrigin( vecEndPoint );
 	m_hSpotlightTarget->SetOwnerEntity( GetOuter() );
 	m_hSpotlightTarget->SetRenderColor( 255, 255, 255 );
 	m_hSpotlightTarget->m_Radius = m_flSpotlightMaxLength;
@@ -230,7 +230,7 @@ bool CAI_Spotlight::ConstrainToCone( Vector *pDirection )
 	if ( m_nSpotlightAttachment == 0 ) 
 	{
 		QAngle vecAngles;
-		vecAngles = GetOuter()->GetAbsAngles();
+		vecAngles = GetOuter()->GetEngineObject()->GetAbsAngles();
 		AngleVectors( vecAngles, &vecForward );
 	}
 	else
@@ -349,8 +349,8 @@ void CAI_Spotlight::UpdateSpotlightEndpoint( void )
 	VectorSubtract( vecEndPoint, vecStartPoint, vecSpotDir );
 	float flBeamLength = VectorNormalize(vecSpotDir);
 	
-	m_hSpotlightTarget->SetAbsOrigin( vecEndPoint );
-	m_hSpotlightTarget->SetAbsVelocity( vec3_origin );
+	m_hSpotlightTarget->GetEngineObject()->SetAbsOrigin( vecEndPoint );
+	m_hSpotlightTarget->GetEngineObject()->SetAbsVelocity( vec3_origin );
 	m_hSpotlightTarget->m_vSpotlightOrg = vecStartPoint;
 	m_hSpotlightTarget->m_vSpotlightDir = vecSpotDir;
 

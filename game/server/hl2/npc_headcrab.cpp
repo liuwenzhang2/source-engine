@@ -379,7 +379,7 @@ Class_T	CBaseHeadcrab::Classify( void )
 Vector CBaseHeadcrab::BodyTarget( const Vector &posSrc, bool bNoisy ) 
 { 
 	Vector vecResult;
-	vecResult = GetAbsOrigin();
+	vecResult = GetEngineObject()->GetAbsOrigin();
 	vecResult.z += 6;
 	return vecResult;
 }
@@ -421,7 +421,7 @@ bool CBaseHeadcrab::IsFirmlyOnGround()
 		return false;
 
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector( 0, 0, HEADCRAB_MAX_LEDGE_HEIGHT ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, HEADCRAB_MAX_LEDGE_HEIGHT ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 	return tr.fraction != 1.0;
 }
 
@@ -429,7 +429,7 @@ bool CBaseHeadcrab::IsFirmlyOnGround()
 //-----------------------------------------------------------------------------
 void CBaseHeadcrab::MoveOrigin( const Vector &vecDelta )
 {
-	UTIL_SetOrigin( this, GetLocalOrigin() + vecDelta );
+	UTIL_SetOrigin( this, GetEngineObject()->GetLocalOrigin() + vecDelta );
 }
 
 //-----------------------------------------------------------------------------
@@ -448,7 +448,7 @@ void CBaseHeadcrab::ThrowAt( const Vector &vecPos )
 //-----------------------------------------------------------------------------
 void CBaseHeadcrab::JumpToBurrowHint( CAI_Hint *pHint )
 {
-	Vector vecVel = VecCheckToss( this, GetAbsOrigin(), pHint->GetAbsOrigin(), 0.5f, 1.0f, false, NULL, NULL );
+	Vector vecVel = VecCheckToss( this, GetEngineObject()->GetAbsOrigin(), pHint->GetEngineObject()->GetAbsOrigin(), 0.5f, 1.0f, false, NULL, NULL );
 
 	// Undershoot by a little because it looks bad if we overshoot and turn around to burrow.
 	vecVel *= 0.9f;
@@ -476,7 +476,7 @@ void CBaseHeadcrab::Leap( const Vector &vecVel )
 		MoveOrigin( Vector( 0, 0, 1 ) );
 	}
 
-	SetAbsVelocity( vecVel );
+	GetEngineObject()->SetAbsVelocity( vecVel );
 
 	// Think every frame so the player sees the headcrab where he actually is...
 	m_bMidJump = true;
@@ -525,7 +525,7 @@ void CBaseHeadcrab::JumpAttack( bool bRandomJump, const Vector &vecPos, bool bTh
 		}
 
 		// How fast does the headcrab need to travel to reach the position given gravity?
-		float flActualHeight = vecPos.z - GetAbsOrigin().z;
+		float flActualHeight = vecPos.z - GetEngineObject()->GetAbsOrigin().z;
 		float height = flActualHeight;
 		if ( height < 16 )
 		{
@@ -563,7 +563,7 @@ void CBaseHeadcrab::JumpAttack( bool bRandomJump, const Vector &vecPos, bool bTh
 		time += sqrt( (2 * additionalHeight) / gravity );
 
 		// Scale the sideways velocity to get there at the right time
-		VectorSubtract( vecPos, GetAbsOrigin(), vecJumpVel );
+		VectorSubtract( vecPos, GetEngineObject()->GetAbsOrigin(), vecJumpVel );
 		vecJumpVel /= time;
 
 		// Speed to offset gravity at the desired height.
@@ -583,7 +583,7 @@ void CBaseHeadcrab::JumpAttack( bool bRandomJump, const Vector &vecPos, bool bTh
 		// Jump hop, don't care where.
 		//
 		Vector forward, up;
-		AngleVectors( GetLocalAngles(), &forward, NULL, &up );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, NULL, &up );
 		vecJumpVel = Vector( forward.x, forward.y, up.z ) * 350;
 	}
 
@@ -637,7 +637,7 @@ void CBaseHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 		RemoveFlag( FL_ONGROUND );
 		RemoveFlag( FL_FLY );
 
-		SetAbsVelocity( Vector ( 0, 0, -128 ) );
+		GetEngineObject()->SetAbsVelocity( Vector ( 0, 0, -128 ) );
 		return;
 	}
 	if ( pEvent->event == AE_HEADCRAB_JUMP_TELEGRAPH )
@@ -780,7 +780,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 			else
 			{
 				// Face the direction I've been forced to jump.
-				GetMotor()->SetIdealYawToTargetAndUpdate( GetAbsOrigin() + GetAbsVelocity() );
+				GetMotor()->SetIdealYawToTargetAndUpdate(GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() );
 			}
 			break;
 
@@ -822,7 +822,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 				return;
 
 			// See if we can pop up
-			if ( ValidBurrowPoint( GetAbsOrigin() ) )
+			if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 			{
 				m_spawnflags &= ~SF_NPC_GAG;
 				RemoveSolidFlags( FSOLID_NOT_SOLID );
@@ -881,7 +881,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 				trace_t tr;
 
 				//Figure out where the headcrab is going to be in quarter of a second.
-				vecPrPos = GetAbsOrigin() + ( GetAbsVelocity() * 0.25f );
+				vecPrPos = GetEngineObject()->GetAbsOrigin() + (GetEngineObject()->GetAbsVelocity() * 0.25f );
 				UTIL_TraceHull( vecPrPos, vecPrPos, GetHullMins(), GetHullMaxs(), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 				
 				if ( tr.startsolid == true || GetFlags() & FL_ONGROUND )
@@ -918,7 +918,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 bool CBaseHeadcrab::HasHeadroom()
 {
 	trace_t tr;
-	UTIL_TraceEntity( this, GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, 1 ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 1 ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 
 #if 0
 	if( tr.fraction == 1.0f )
@@ -1002,7 +1002,7 @@ void CBaseHeadcrab::LeapTouch( CBaseEntity *pOther )
 int CBaseHeadcrab::CalcDamageInfo( CTakeDamageInfo *pInfo )
 {
 	pInfo->Set( this, this, sk_headcrab_melee_dmg.GetFloat(), DMG_SLASH );
-	CalculateMeleeDamageForce( pInfo, GetAbsVelocity(), GetAbsOrigin() );
+	CalculateMeleeDamageForce( pInfo, GetEngineObject()->GetAbsVelocity(), GetEngineObject()->GetAbsOrigin() );
 	return pInfo->GetDamage();
 }
 
@@ -1026,7 +1026,7 @@ void CBaseHeadcrab::GatherConditions( void )
 	{
 		// See if there's enough room for our hull to fit here. If so, unhide.
 		trace_t tr;
-		AI_TraceHull( GetAbsOrigin(), GetAbsOrigin(),GetHullMins(), GetHullMaxs(), MASK_SHOT, this, GetCollisionGroup(), &tr );
+		AI_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),GetHullMins(), GetHullMaxs(), MASK_SHOT, this, GetCollisionGroup(), &tr );
 		if ( tr.fraction == 1.0 )
 		{
 			SetCondition( COND_PROVOKED );
@@ -1034,12 +1034,12 @@ void CBaseHeadcrab::GatherConditions( void )
 
 			if ( g_debug_headcrab.GetInt() == HEADCRAB_DEBUG_HIDING )
 			{
-				NDebugOverlay::Box( GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 0,255,0, true, 1.0 );
+				NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 0,255,0, true, 1.0 );
 			}
 		}
 		else if ( g_debug_headcrab.GetInt() == HEADCRAB_DEBUG_HIDING )
 		{
-			NDebugOverlay::Box( GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 255,0,0, true, 0.1 );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 255,0,0, true, 0.1 );
 		}
 
 		// Prevent baseclass thinking, so we don't respond to enemy fire, etc.
@@ -1129,7 +1129,7 @@ void CBaseHeadcrab::PrescheduleThink( void )
 //-----------------------------------------------------------------------------
 void CBaseHeadcrab::EliminateRollAndPitch()
 {
-	QAngle angles = GetAbsAngles();
+	QAngle angles = GetEngineObject()->GetAbsAngles();
 	angles.x = AngleNormalize( angles.x );
 	angles.z = AngleNormalize( angles.z );
 	if ( ( angles.x == 0.0f ) && ( angles.z == 0.0f ) )
@@ -1159,7 +1159,7 @@ void CBaseHeadcrab::EliminateRollAndPitch()
 		angles.z += flRollDelta;
 	}
 
-	SetAbsAngles( angles );
+	GetEngineObject()->SetAbsAngles( angles );
 
 	SetContextThink( &CBaseHeadcrab::EliminateRollAndPitch, gpGlobals->curtime + TICK_INTERVAL, s_pPitchContext );
 }
@@ -1173,12 +1173,12 @@ void CBaseHeadcrab::BeginClimbFromCanister()
 	Assert( GetMoveParent() );
 	// Compute a desired position or hint
 	Vector vecForward, vecActualForward;
-	AngleVectors( GetMoveParent()->GetAbsAngles(), &vecActualForward );
+	AngleVectors( GetMoveParent()->GetEngineObject()->GetAbsAngles(), &vecActualForward );
 	vecForward = vecActualForward;
 	vecForward.z = 0.0f;
 	VectorNormalize( vecForward );
 
-	Vector vecSearchCenter = GetAbsOrigin();
+	Vector vecSearchCenter = GetEngineObject()->GetAbsOrigin();
 	CAI_Hint *pHint = CAI_HintManager::FindHint( this, HINT_HEADCRAB_BURROW_POINT, 0, HEADCRAB_BURROW_POINT_SEARCH_RADIUS, &vecSearchCenter );
 
 	if( !pHint && hl2_episodic.GetBool() )
@@ -1194,7 +1194,7 @@ void CBaseHeadcrab::BeginClimbFromCanister()
 
 		// Compute relative yaw..
 		Vector vecDelta;
-		VectorSubtract( pHint->GetAbsOrigin(), vecSearchCenter, vecDelta );
+		VectorSubtract( pHint->GetEngineObject()->GetAbsOrigin(), vecSearchCenter, vecDelta );
 		vecDelta.z = 0.0f;
 		VectorNormalize( vecDelta );
 
@@ -1250,7 +1250,7 @@ void CBaseHeadcrab::JumpFromCanister()
 	Assert( GetMoveParent() );
 
 	Vector vecForward, vecActualForward, vecActualRight;
-	AngleVectors( GetMoveParent()->GetAbsAngles(), &vecActualForward, &vecActualRight, NULL );
+	AngleVectors( GetMoveParent()->GetEngineObject()->GetAbsAngles(), &vecActualForward, &vecActualRight, NULL );
 
 	switch( m_nJumpFromCanisterDir )
 	{
@@ -1287,7 +1287,7 @@ void CBaseHeadcrab::JumpFromCanister()
 	if ( pEnemy )
 	{
 		Vector vecDirToEnemy;
-		VectorSubtract( pEnemy->GetAbsOrigin(), GetAbsOrigin(), vecDirToEnemy );
+		VectorSubtract( pEnemy->GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), vecDirToEnemy );
 		vecDirToEnemy.z = 0.0f;
 		float flDist = VectorNormalize( vecDirToEnemy );
 		if ( ( flDist < HEADCRAB_ATTACK_PLAYER_FROM_CANISTER_DIST ) && 
@@ -1308,7 +1308,7 @@ void CBaseHeadcrab::JumpFromCanister()
 		else
 		{
 			vecForward *= 100.0f;
-			vecForward += GetAbsOrigin();
+			vecForward += GetEngineObject()->GetAbsOrigin();
 			JumpAttack( false, vecForward, false );
 		}
 	}
@@ -1342,7 +1342,7 @@ void CBaseHeadcrab::DropFromCeiling( void )
 					if ( pPlayer )
 					{
 						SetEnemy( pPlayer ); //Is this a bad thing to do?
-						UpdateEnemyMemory( pPlayer, pPlayer->GetAbsOrigin());
+						UpdateEnemyMemory( pPlayer, pPlayer->GetEngineObject()->GetAbsOrigin());
 					}
 				}
 			}
@@ -1397,7 +1397,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 	case TASK_HEADCRAB_CEILING_POSITION:
 		{
 			trace_t tr;
-			UTIL_TraceHull( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, 512 ), NAI_Hull::Mins( GetHullType() ), NAI_Hull::Maxs( GetHullType() ), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+			UTIL_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 512 ), NAI_Hull::Mins( GetHullType() ), NAI_Hull::Maxs( GetHullType() ), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 			// SetMoveType( MOVETYPE_NONE );
 			AddFlag(FL_FLY);
@@ -1406,7 +1406,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 			//Don't need this anymore
 			RemoveSpawnFlags( SF_HEADCRAB_START_HANGING );
 
-			SetAbsOrigin( tr.endpos );
+			GetEngineObject()->SetAbsOrigin( tr.endpos );
 
 			TaskComplete();
 		}
@@ -1443,7 +1443,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 
 				GetVectors( &forward, NULL, &up );
 
-				m_vecCommittedJumpPos = GetAbsOrigin();
+				m_vecCommittedJumpPos = GetEngineObject()->GetAbsOrigin();
 				m_vecCommittedJumpPos += up * random->RandomFloat( 80, 150 );
 				m_vecCommittedJumpPos += forward * random->RandomFloat( 32, 80 );
 
@@ -1500,7 +1500,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 					MoveOrigin( Vector( 0, 0, 1 ) );
 				}
 				
-				SetAbsVelocity( vecJumpDir * 200 + Vector( 0, 0, 200 ) );
+				GetEngineObject()->SetAbsVelocity( vecJumpDir * 200 + Vector( 0, 0, 200 ) );
 			}
 			else
 			{
@@ -1540,7 +1540,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 
 		case TASK_HEADCRAB_CHECK_FOR_UNBURROW:
 		{
-			if ( ValidBurrowPoint( GetAbsOrigin() ) )
+			if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 			{
 				m_spawnflags &= ~SF_NPC_GAG;
 				RemoveSolidFlags( FSOLID_NOT_SOLID );
@@ -1551,7 +1551,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 
 		case TASK_HEADCRAB_FIND_BURROW_IN_POINT:
 		{	
-			if ( FindBurrow( GetAbsOrigin(), pTask->flTaskData, true ) == false )
+			if ( FindBurrow(GetEngineObject()->GetAbsOrigin(), pTask->flTaskData, true ) == false )
 			{
 				TaskFail( "TASK_HEADCRAB_FIND_BURROW_IN_POINT: Unable to find burrow in position\n" );
 			}
@@ -1636,18 +1636,18 @@ int CBaseHeadcrab::RangeAttack1Conditions( float flDot, float flDist )
 				return COND_NONE;
 		}
 
-		if( GetEnemy()->EyePosition().z - 36.0f > GetAbsOrigin().z )
+		if( GetEnemy()->EyePosition().z - 36.0f > GetEngineObject()->GetAbsOrigin().z )
 		{
 			// Only run this test if trying to jump at a player who is higher up than me, else this 
 			// code will always prevent a headcrab from jumping down at an enemy, and sometimes prevent it
 			// jumping just slightly up at an enemy.
-			Vector vStartHullTrace = GetAbsOrigin();
+			Vector vStartHullTrace = GetEngineObject()->GetAbsOrigin();
 			vStartHullTrace.z += 1.0;
 
-			Vector vEndHullTrace = GetEnemy()->EyePosition() - GetAbsOrigin();
+			Vector vEndHullTrace = GetEnemy()->EyePosition() - GetEngineObject()->GetAbsOrigin();
 			vEndHullTrace.NormalizeInPlace();
 			vEndHullTrace *= 8.0;
-			vEndHullTrace += GetAbsOrigin();
+			vEndHullTrace += GetEngineObject()->GetAbsOrigin();
 
 			AI_TraceHull( vStartHullTrace, vEndHullTrace,GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 
@@ -1690,12 +1690,12 @@ void CBaseHeadcrab::Touch( CBaseEntity *pOther )
 	// If someone has smacked me into a wall then gib!
 	if (m_NPCState == NPC_STATE_DEAD) 
 	{
-		if (GetAbsVelocity().Length() > 250)
+		if (GetEngineObject()->GetAbsVelocity().Length() > 250)
 		{
 			trace_t tr;
-			Vector vecDir = GetAbsVelocity();
+			Vector vecDir = GetEngineObject()->GetAbsVelocity();
 			VectorNormalize(vecDir);
-			AI_TraceLine(GetAbsOrigin(), GetAbsOrigin() + vecDir * 100, 
+			AI_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecDir * 100,
 				MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr); 
 			float dotPr = DotProduct(vecDir,tr.plane.normal);
 			if ((tr.fraction						!= 1.0) && 
@@ -1809,7 +1809,7 @@ void CBaseHeadcrab::Event_Killed( const CTakeDamageInfo &info )
 	if ( info.GetDamageType() & (DMG_GENERIC | DMG_PREVENT_PHYSICS_FORCE) )
 	{
 		trace_t	tr;
-		AI_TraceLine( GetAbsOrigin()+Vector(0,0,1), GetAbsOrigin()-Vector(0,0,64), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+		AI_TraceLine(GetEngineObject()->GetAbsOrigin()+Vector(0,0,1), GetEngineObject()->GetAbsOrigin()-Vector(0,0,64), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 		UTIL_DecalTrace( &tr, "YellowBlood" );
 	}
@@ -1851,14 +1851,14 @@ int CBaseHeadcrab::TranslateSchedule( int scheduleType )
 					break;
 
 				float flZDiff;
-				flZDiff = GetEnemy()->GetAbsOrigin().z - GetAbsOrigin().z;
+				flZDiff = GetEnemy()->GetEngineObject()->GetAbsOrigin().z - GetEngineObject()->GetAbsOrigin().z;
 
 				// Make sure the enemy isn't so high above me that this would look silly.
 				if( flZDiff < 128.0f || flZDiff > 512.0f )
 					return SCHED_COMBAT_PATROL;
 
 				float flDist;
-				flDist = ( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() ).Length2D();
+				flDist = ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length2D();
 
 				// Maybe a patrol will bring me closer.
 				if( flDist > 384.0f )
@@ -1986,7 +1986,7 @@ int CBaseHeadcrab::SelectSchedule( void )
 	if ( GetHintNode() && GetHintNode()->HintType() == HINT_HEADCRAB_BURROW_POINT )
 	{
 		// Only burrow if we're not within leap attack distance of our enemy.
-		if ( ( GetEnemy() == NULL ) || ( ( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() ).Length() > HEADCRAB_MAX_JUMP_DIST ) )
+		if ( ( GetEnemy() == NULL ) || ( ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length() > HEADCRAB_MAX_JUMP_DIST ) )
 		{
 			return SCHED_HEADCRAB_RUN_TO_SPECIFIC_BURROW;
 		}
@@ -2135,8 +2135,8 @@ bool CBaseHeadcrab::HandleInteraction(int interactionType, void *data, CBaseComb
 		// Create dead headcrab in its place
 		CBaseHeadcrab *pEntity = (CBaseHeadcrab*)gEntList.CreateEntityByName( "npc_headcrab" );
 		pEntity->Spawn();
-		pEntity->SetLocalOrigin( GetLocalOrigin() );
-		pEntity->SetLocalAngles( GetLocalAngles() );
+		pEntity->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
+		pEntity->GetEngineObject()->SetLocalAngles(GetEngineObject()->GetLocalAngles() );
 		pEntity->m_NPCState = NPC_STATE_DEAD;
 		return true;
 	}
@@ -2151,11 +2151,11 @@ bool CBaseHeadcrab::HandleInteraction(int interactionType, void *data, CBaseComb
 			MoveOrigin( Vector( 0, 0, 1 ) );
 		}
 
-		Vector vHitDir = GetLocalOrigin() - sourceEnt->GetLocalOrigin();
+		Vector vHitDir = GetEngineObject()->GetLocalOrigin() - sourceEnt->GetEngineObject()->GetLocalOrigin();
 		VectorNormalize(vHitDir);
 
 		CTakeDamageInfo info( sourceEnt, sourceEnt, m_iHealth+1, DMG_CLUB );
-		CalculateMeleeDamageForce( &info, vHitDir, GetAbsOrigin() );
+		CalculateMeleeDamageForce( &info, vHitDir, GetEngineObject()->GetAbsOrigin() );
 
 		TakeDamage( info );
 
@@ -2320,14 +2320,14 @@ void CBaseHeadcrab::Unburrow( void )
 	// If we have an enemy, come out facing them
 	if ( GetEnemy() )
 	{
-		Vector dir = GetEnemy()->GetAbsOrigin() - GetAbsOrigin();
+		Vector dir = GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 		VectorNormalize(dir);
 
 		GetMotor()->SetIdealYaw( dir );
 
-		QAngle angles = GetLocalAngles();
+		QAngle angles = GetEngineObject()->GetLocalAngles();
 		angles[YAW] = UTIL_VecToYaw( dir );
-		SetLocalAngles( angles );
+		GetEngineObject()->SetLocalAngles( angles );
 	}
 }
 
@@ -2399,7 +2399,7 @@ void CBaseHeadcrab::InputDropFromCeiling( inputdata_t &inputdata )
 void CBaseHeadcrab::CreateDust( bool placeDecal )
 {
 	trace_t	tr;
-	AI_TraceLine( GetAbsOrigin()+Vector(0,0,1), GetAbsOrigin()-Vector(0,0,64), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+	AI_TraceLine(GetEngineObject()->GetAbsOrigin()+Vector(0,0,1), GetEngineObject()->GetAbsOrigin()-Vector(0,0,64), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 	if ( tr.fraction < 1.0f )
 	{
@@ -2407,7 +2407,7 @@ void CBaseHeadcrab::CreateDust( bool placeDecal )
 
 		if ( ( (char) pdata->game.material == CHAR_TEX_CONCRETE ) || ( (char) pdata->game.material == CHAR_TEX_DIRT ) )
 		{
-			UTIL_CreateAntlionDust( tr.endpos + Vector(0, 0, 24), GetLocalAngles() );
+			UTIL_CreateAntlionDust( tr.endpos + Vector(0, 0, 24), GetEngineObject()->GetLocalAngles() );
 
 			//CEffectData data;
 			//data.m_vOrigin = GetAbsOrigin();
@@ -2870,7 +2870,7 @@ void CFastHeadcrab::RunTask( const Task_t *pTask )
 		
 		if ( GetEnemy() )
 			// Fast headcrab faces the target in flight.
-			GetMotor()->SetIdealYawAndUpdate( GetEnemy()->GetAbsOrigin() - GetAbsOrigin(), AI_KEEP_YAW_SPEED );
+			GetMotor()->SetIdealYawAndUpdate( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin(), AI_KEEP_YAW_SPEED );
 		
 		// Call back up into base headcrab for collision.
 		BaseClass::RunTask( pTask );
@@ -2878,14 +2878,14 @@ void CFastHeadcrab::RunTask( const Task_t *pTask )
 
 	case TASK_HEADCRAB_HOP_ASIDE:
 		if ( GetEnemy() )
-			GetMotor()->SetIdealYawAndUpdate( GetEnemy()->GetAbsOrigin() - GetAbsOrigin(), AI_KEEP_YAW_SPEED );
+			GetMotor()->SetIdealYawAndUpdate( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin(), AI_KEEP_YAW_SPEED );
 
 		if( GetFlags() & FL_ONGROUND )
 		{
 			SetGravity(1.0);
 			SetMoveType( MOVETYPE_STEP );
 
-			if( GetEnemy() && ( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() ).Length() > HEADCRAB_MAX_JUMP_DIST )
+			if( GetEnemy() && ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length() > HEADCRAB_MAX_JUMP_DIST )
 			{
 				TaskFail( "");
 			}
@@ -2930,21 +2930,21 @@ void CFastHeadcrab::StartTask( const Task_t *pTask )
 
 			// This could be a problem. Since I'm adjusting the headcrab's gravity for flight, this check actually
 			// checks farther ahead than the crab will actually jump. (sjb)
-			AI_TraceHull( GetAbsOrigin(), GetAbsOrigin() + vecDir,GetHullMins(), GetHullMaxs(), MASK_SHOT, this, GetCollisionGroup(), &tr );
+			AI_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecDir,GetHullMins(), GetHullMaxs(), MASK_SHOT, this, GetCollisionGroup(), &tr );
 
 			//NDebugOverlay::Line( tr.startpos, tr.endpos, 0, 255, 0, false, 1.0 );
 
 			if( tr.fraction == 1.0 )
 			{
 				AIMoveTrace_t moveTrace;
-				GetMoveProbe()->MoveLimit( NAV_JUMP, GetAbsOrigin(), tr.endpos, MASK_NPCSOLID, GetEnemy(), &moveTrace );
+				GetMoveProbe()->MoveLimit( NAV_JUMP, GetEngineObject()->GetAbsOrigin(), tr.endpos, MASK_NPCSOLID, GetEnemy(), &moveTrace );
 
 				// FIXME: Where should this happen?
 				m_vecJumpVel = moveTrace.vJumpVelocity;
 
 				if( !IsMoveBlocked( moveTrace ) )
 				{
-					SetAbsVelocity( m_vecJumpVel );// + 0.5f * Vector(0,0,GetCurrentGravity()) * flInterval;
+					GetEngineObject()->SetAbsVelocity( m_vecJumpVel );// + 0.5f * Vector(0,0,GetCurrentGravity()) * flInterval;
 					SetGravity( UTIL_ScaleForGravity( 1600 ) );
 					SetGroundEntity( NULL );
 					SetNavType( NAV_JUMP );
@@ -3125,7 +3125,7 @@ bool CFastHeadcrab::QuerySeeEntity(CBaseEntity *pSightEnt, bool bOnlyHateOrFearI
 
 	if( m_NPCState != NPC_STATE_COMBAT )
 	{
-		if( fabs( pSightEnt->GetAbsOrigin().z - GetAbsOrigin().z ) >= 150 )
+		if( fabs( pSightEnt->GetEngineObject()->GetAbsOrigin().z - GetEngineObject()->GetAbsOrigin().z ) >= 150 )
 		{
 			// Don't see things much higher or lower than me unless
 			// I'm already pissed.
@@ -3463,7 +3463,7 @@ void CBlackHeadcrab::Eject( const QAngle &vecAngles, float flVelocityScale, CBas
 	if ( pEnemy )
 	{
 		SetEnemy( pEnemy );
-		UpdateEnemyMemory(pEnemy, pEnemy->GetAbsOrigin());
+		UpdateEnemyMemory(pEnemy, pEnemy->GetEngineObject()->GetAbsOrigin());
 	}
 
 	SetActivity( ACT_RANGE_ATTACK1 );
@@ -3473,7 +3473,7 @@ void CBlackHeadcrab::Eject( const QAngle &vecAngles, float flVelocityScale, CBas
 
 	GetMotor()->SetIdealYaw( vecAngles.y );
 
-	SetAbsVelocity( flVelocityScale * random->RandomInt( 20, 50 ) * 
+	GetEngineObject()->SetAbsVelocity( flVelocityScale * random->RandomInt( 20, 50 ) *
 		Vector( random->RandomFloat( -1.0, 1.0 ), random->RandomFloat( -1.0, 1.0 ), random->RandomFloat( 0.5, 1.0 ) ) );
 
 	m_bMidJump = false;
@@ -3518,7 +3518,7 @@ void CBlackHeadcrab::Panic( float flDuration )
 bool CBlackHeadcrab::FInViewCone( CBaseEntity *pEntity )
 {
 	if(  IsCurSchedule( SCHED_HEADCRAB_AMBUSH ) &&
-		 (( pEntity->IsNPC() || pEntity->IsPlayer() ) && pEntity->GetAbsOrigin().DistToSqr(GetAbsOrigin()) <= CRAB_360_VIEW_DIST_SQR ) )
+		 (( pEntity->IsNPC() || pEntity->IsPlayer() ) && pEntity->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin()) <= CRAB_360_VIEW_DIST_SQR ) )
 	{
 		// Only see players and NPC's with 360 cone
 		// For instance, DON'T tell the eyeball/head tracking code that you can see an object that is behind you!
@@ -3552,15 +3552,15 @@ void CBlackHeadcrab::JumpFlinch( const Vector *pvecDir )
 	// Jump in a random direction.
 	//
 	Vector up;
-	AngleVectors( GetLocalAngles(), NULL, NULL, &up );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), NULL, NULL, &up );
 
 	if (pvecDir)
 	{
-		SetAbsVelocity( Vector( pvecDir->x * 4, pvecDir->y * 4, up.z ) * random->RandomFloat( 40, 80 ) );
+		GetEngineObject()->SetAbsVelocity( Vector( pvecDir->x * 4, pvecDir->y * 4, up.z ) * random->RandomFloat( 40, 80 ) );
 	}
 	else
 	{
-		SetAbsVelocity( Vector( random->RandomFloat( -4, 4 ), random->RandomFloat( -4, 4 ), up.z ) * random->RandomFloat( 40, 80 ) );
+		GetEngineObject()->SetAbsVelocity( Vector( random->RandomFloat( -4, 4 ), random->RandomFloat( -4, 4 ), up.z ) * random->RandomFloat( 40, 80 ) );
 	}
 }
 
@@ -3666,7 +3666,7 @@ void CBlackHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 		if (m_bPanicState)
 		{
 			Vector vecForward;
-			AngleVectors( GetLocalAngles(), &vecForward );
+			AngleVectors(GetEngineObject()->GetLocalAngles(), &vecForward );
 			JumpFlinch( &vecForward );
 		}
 		else

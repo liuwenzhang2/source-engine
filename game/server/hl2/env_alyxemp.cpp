@@ -107,7 +107,7 @@ void CAlyxEmpEffect::ActivateAutomatic( CBaseEntity *pAlyx, CBaseEntity *pTarget
 	Assert( pAlyx->GetBaseAnimating() != NULL );
 
 	GetEngineObject()->SetParent( pAlyx->GetEngineObject(), pAlyx->GetBaseAnimating()->LookupAttachment("LeftHand"));
-	SetLocalOrigin( vec3_origin );
+	GetEngineObject()->SetLocalOrigin( vec3_origin );
 
 	m_iState = ALYXEMP_STATE_OFF;
 	SetTargetEntity( pTarget );
@@ -219,7 +219,7 @@ void CAlyxEmpEffect::StartDischarge()
 
 		if ( m_hBeam != NULL )
 		{
-			m_hBeam->PointEntInit( m_hTargetEnt->GetAbsOrigin(), this );
+			m_hBeam->PointEntInit( m_hTargetEnt->GetEngineObject()->GetAbsOrigin(), this );
 			m_hBeam->SetStartEntity( m_hTargetEnt );
 			m_hBeam->SetWidth( 4 );
 			m_hBeam->SetEndWidth( 8 );
@@ -231,11 +231,11 @@ void CAlyxEmpEffect::StartDischarge()
 		}
 
 		// End hit
-		Vector shotDir = ( GetAbsOrigin() - m_hTargetEnt->GetAbsOrigin() );
+		Vector shotDir = (GetEngineObject()->GetAbsOrigin() - m_hTargetEnt->GetEngineObject()->GetAbsOrigin() );
 		VectorNormalize( shotDir );
 
-		CPVSFilter filter( m_hTargetEnt->GetAbsOrigin() );
-		te->GaussExplosion( filter, 0.0f, m_hTargetEnt->GetAbsOrigin() - ( shotDir * 4.0f ), RandomVector(-1.0f, 1.0f), 0 );
+		CPVSFilter filter( m_hTargetEnt->GetEngineObject()->GetAbsOrigin() );
+		te->GaussExplosion( filter, 0.0f, m_hTargetEnt->GetEngineObject()->GetAbsOrigin() - ( shotDir * 4.0f ), RandomVector(-1.0f, 1.0f), 0 );
 	}
 
 	if( m_bAutomated )

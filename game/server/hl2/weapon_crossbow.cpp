@@ -99,7 +99,7 @@ CCrossbowBolt *CCrossbowBolt::BoltCreate( const Vector &vecOrigin, const QAngle 
 	// Create a new entity with CCrossbowBolt private data
 	CCrossbowBolt *pBolt = (CCrossbowBolt *)gEntList.CreateEntityByName( "crossbow_bolt" );
 	UTIL_SetOrigin( pBolt, vecOrigin );
-	pBolt->SetAbsAngles( angAngles );
+	pBolt->GetEngineObject()->SetAbsAngles( angAngles );
 	pBolt->Spawn();
 	pBolt->SetOwnerEntity( pentOwner );
 
@@ -143,7 +143,7 @@ unsigned int CCrossbowBolt::PhysicsSolidMaskForEntity() const
 bool CCrossbowBolt::CreateSprites( void )
 {
 	// Start up the eye glow
-	m_pGlowSprite = CSprite::SpriteCreate( "sprites/light_glow02_noz.vmt", GetLocalOrigin(), false );
+	m_pGlowSprite = CSprite::SpriteCreate( "sprites/light_glow02_noz.vmt", GetEngineObject()->GetLocalOrigin(), false );
 
 	if ( m_pGlowSprite != NULL )
 	{
@@ -209,7 +209,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 	{
 		trace_t	tr, tr2;
 		tr = BaseClass::GetTouchTrace();
-		Vector	vecNormalizedVel = GetAbsVelocity();
+		Vector	vecNormalizedVel = GetEngineObject()->GetAbsVelocity();
 
 		ClearMultiDamage();
 		VectorNormalize( vecNormalizedVel );
@@ -265,7 +265,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 			}
 		}
 
-		SetAbsVelocity( Vector( 0, 0, 0 ) );
+		GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 0 ) );
 
 		// play body "thwack" sound
 		const char* soundname = "Weapon_Crossbow.BoltHitBody";
@@ -280,10 +280,10 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 
 		Vector vForward;
 
-		AngleVectors( GetAbsAngles(), &vForward );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
 		VectorNormalize ( vForward );
 
-		UTIL_TraceLine( GetAbsOrigin(),	GetAbsOrigin() + vForward * 128, MASK_BLOCKLOS, pOther, COLLISION_GROUP_NONE, &tr2 );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vForward * 128, MASK_BLOCKLOS, pOther, COLLISION_GROUP_NONE, &tr2 );
 
 		if ( tr2.fraction != 1.0f )
 		{
@@ -329,7 +329,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 			// if what we hit is static architecture, can stay around for a while.
-			Vector vecDir = GetAbsVelocity();
+			Vector vecDir = GetEngineObject()->GetAbsVelocity();
 			float speed = VectorNormalize( vecDir );
 
 			// See if we should reflect off this surface
@@ -343,9 +343,9 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 
 				VectorAngles( vReflection, reflectAngles );
 
-				SetLocalAngles( reflectAngles );
+				GetEngineObject()->SetLocalAngles( reflectAngles );
 
-				SetAbsVelocity( vReflection * speed * 0.75f );
+				GetEngineObject()->SetAbsVelocity( vReflection * speed * 0.75f );
 
 				// Start to sink faster
 				SetGravity( 1.0f );
@@ -360,7 +360,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 			
 				Vector vForward;
 
-				AngleVectors( GetAbsAngles(), &vForward );
+				AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
 				VectorNormalize ( vForward );
 
 				CEffectData	data;
@@ -386,9 +386,9 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 			}
 			
 			// Shoot some sparks
-			if ( UTIL_PointContents( GetAbsOrigin() ) != CONTENTS_WATER)
+			if ( UTIL_PointContents(GetEngineObject()->GetAbsOrigin() ) != CONTENTS_WATER)
 			{
-				g_pEffects->Sparks( GetAbsOrigin() );
+				g_pEffects->Sparks(GetEngineObject()->GetAbsOrigin() );
 			}
 		}
 		else
@@ -417,18 +417,18 @@ void CCrossbowBolt::BubbleThink( void )
 {
 	QAngle angNewAngles;
 
-	VectorAngles( GetAbsVelocity(), angNewAngles );
-	SetAbsAngles( angNewAngles );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angNewAngles );
+	GetEngineObject()->SetAbsAngles( angNewAngles );
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Make danger sounds out in front of me, to scare snipers back into their hole
-	CSoundEnt::InsertSound( SOUND_DANGER_SNIPERONLY, GetAbsOrigin() + GetAbsVelocity() * 0.2, 120.0f, 0.5f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
+	CSoundEnt::InsertSound( SOUND_DANGER_SNIPERONLY, GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 0.2, 120.0f, 0.5f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
 
 	if ( GetWaterLevel()  == 0 )
 		return;
 
-	UTIL_BubbleTrail( GetAbsOrigin() - GetAbsVelocity() * 0.1f, GetAbsOrigin(), 5 );
+	UTIL_BubbleTrail(GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsVelocity() * 0.1f, GetEngineObject()->GetAbsOrigin(), 5 );
 }
 
 
@@ -685,11 +685,11 @@ void CWeaponCrossbow::FireBolt( void )
 
 	if ( pOwner->GetWaterLevel() == 3 )
 	{
-		pBolt->SetAbsVelocity( vecAiming * BOLT_WATER_VELOCITY );
+		pBolt->GetEngineObject()->SetAbsVelocity( vecAiming * BOLT_WATER_VELOCITY );
 	}
 	else
 	{
-		pBolt->SetAbsVelocity( vecAiming * BOLT_AIR_VELOCITY );
+		pBolt->GetEngineObject()->SetAbsVelocity( vecAiming * BOLT_AIR_VELOCITY );
 	}
 
 	m_iClip1--;
@@ -699,7 +699,7 @@ void CWeaponCrossbow::FireBolt( void )
 	WeaponSound( SINGLE );
 	WeaponSound( SPECIAL2 );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 200, 0.2 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 200, 0.2 );
 
 	SendWeaponAnim( ACT_VM_PRIMARYATTACK );
 
@@ -780,7 +780,7 @@ void CWeaponCrossbow::CreateChargerEffects( void )
 	if ( m_hChargerSprite != NULL )
 		return;
 
-	m_hChargerSprite = CSprite::SpriteCreate( CROSSBOW_GLOW_SPRITE, GetAbsOrigin(), false );
+	m_hChargerSprite = CSprite::SpriteCreate( CROSSBOW_GLOW_SPRITE, GetEngineObject()->GetAbsOrigin(), false );
 
 	if ( m_hChargerSprite )
 	{
@@ -835,7 +835,7 @@ void CWeaponCrossbow::DoLoadEffect( void )
 
 	DispatchEffect( "CrossbowLoad", data );
 
-	CSprite *pBlast = CSprite::SpriteCreate( CROSSBOW_GLOW_SPRITE2, GetAbsOrigin(), false );
+	CSprite *pBlast = CSprite::SpriteCreate( CROSSBOW_GLOW_SPRITE2, GetEngineObject()->GetAbsOrigin(), false );
 
 	if ( pBlast )
 	{

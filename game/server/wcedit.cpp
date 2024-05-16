@@ -162,7 +162,7 @@ void NWCEdit::CreateAINode( CBasePlayer *pPlayer )
 		UTIL_SetSize(testHull, NAI_Hull::Mins(hullType), NAI_Hull::Maxs(hullType));
 
 		// Set origin of test hull
-		testHull->SetLocalOrigin( vNewNodePos );
+		testHull->GetEngineObject()->SetLocalOrigin( vNewNodePos );
 
 		// -----------------------------------------------------------------------
 		// If a ground node, drop to floor and make sure can stand at test postion
@@ -170,7 +170,7 @@ void NWCEdit::CreateAINode( CBasePlayer *pPlayer )
 		if (!g_pAINetworkManager->GetEditOps()->m_bAirEditMode)
 		{
 			UTIL_DropToFloor( testHull, MASK_NPCSOLID );
-			vNewNodePos = testHull->GetAbsOrigin();
+			vNewNodePos = testHull->GetEngineObject()->GetAbsOrigin();
 			CTraceFilterSimple traceFilter( testHull, COLLISION_GROUP_NONE );
 			if (!UTIL_CheckBottom(testHull, &traceFilter, sv_stepsize.GetFloat()))
 			{
@@ -183,10 +183,10 @@ void NWCEdit::CreateAINode( CBasePlayer *pPlayer )
 		// -----------------------------------------------------------------------
 		// Make sure hull fits at location by seeing if it can move up a fraction
 		// -----------------------------------------------------------------------
-		Vector vUpBit = testHull->GetAbsOrigin();
+		Vector vUpBit = testHull->GetEngineObject()->GetAbsOrigin();
 		vUpBit.z += 1;
 		trace_t tr;
-		UTIL_TraceHull( testHull->GetAbsOrigin(), vUpBit, NAI_Hull::Mins(hullType), 
+		UTIL_TraceHull( testHull->GetEngineObject()->GetAbsOrigin(), vUpBit, NAI_Hull::Mins(hullType),
 			NAI_Hull::Maxs(hullType), MASK_NPCSOLID, testHull, COLLISION_GROUP_NONE, &tr );
 		if (tr.startsolid || tr.fraction != 1.0)
 		{
@@ -196,8 +196,8 @@ void NWCEdit::CreateAINode( CBasePlayer *pPlayer )
 		}
 
 		// <<TEMP>> Round position till DS fixed WC bug
-		testHull->SetLocalOrigin( Vector( floor(testHull->GetAbsOrigin().x),
-			floor(testHull->GetAbsOrigin().y ), floor(testHull->GetAbsOrigin().z) ) );
+		testHull->GetEngineObject()->SetLocalOrigin( Vector( floor(testHull->GetEngineObject()->GetAbsOrigin().x),
+			floor(testHull->GetEngineObject()->GetAbsOrigin().y ), floor(testHull->GetEngineObject()->GetAbsOrigin().z) ) );
 
 		// ---------------------------------------
 		//  Send new node to WC
@@ -205,15 +205,15 @@ void NWCEdit::CreateAINode( CBasePlayer *pPlayer )
 		int status;
 		if (g_pAINetworkManager->GetEditOps()->m_bAirEditMode)
 		{
-			status = Editor_CreateNode("info_node_air", g_pAINetworkManager->GetEditOps()->m_nNextWCIndex, testHull->GetLocalOrigin().x, testHull->GetLocalOrigin().y, testHull->GetLocalOrigin().z, false);
+			status = Editor_CreateNode("info_node_air", g_pAINetworkManager->GetEditOps()->m_nNextWCIndex, testHull->GetEngineObject()->GetLocalOrigin().x, testHull->GetEngineObject()->GetLocalOrigin().y, testHull->GetEngineObject()->GetLocalOrigin().z, false);
 		}
 		else
 		{
 			// Create slightly higher in WC so it can be dropped when its loaded again
-			Vector origin = testHull->GetLocalOrigin();
+			Vector origin = testHull->GetEngineObject()->GetLocalOrigin();
 			origin.z += 24.0;
-			testHull->SetLocalOrigin( origin );
-			status = Editor_CreateNode("info_node", g_pAINetworkManager->GetEditOps()->m_nNextWCIndex, testHull->GetLocalOrigin().x, testHull->GetLocalOrigin().y, testHull->GetLocalOrigin().z, false);
+			testHull->GetEngineObject()->SetLocalOrigin( origin );
+			status = Editor_CreateNode("info_node", g_pAINetworkManager->GetEditOps()->m_nNextWCIndex, testHull->GetEngineObject()->GetLocalOrigin().x, testHull->GetEngineObject()->GetLocalOrigin().y, testHull->GetEngineObject()->GetLocalOrigin().z, false);
 		}
 		if (status == Editor_BadCommand)
 		{
@@ -236,7 +236,7 @@ void NWCEdit::CreateAINode( CBasePlayer *pPlayer )
 			}
 
 			// Note this is a new entity being created as part of wc editing
-			pNodeEnt->SetLocalOrigin( testHull->GetLocalOrigin() );
+			pNodeEnt->GetEngineObject()->SetLocalOrigin( testHull->GetEngineObject()->GetLocalOrigin() );
 			CAI_TestHull::ReturnTestHull();
 
 			pNodeEnt->m_NodeData.nWCNodeID =	g_pAINetworkManager->GetEditOps()->m_nNextWCIndex;
@@ -466,8 +466,8 @@ void NWCEdit::RememberEntityPosition( CBaseEntity *pEntity )
 		g_EntityClassnames = new string_t[NUM_ENT_ENTRIES];
 	}
 	int index = pEntity->entindex();
-	g_EntityPositions[index] = pEntity->GetAbsOrigin();
-	g_EntityOrientations[index] = pEntity->GetAbsAngles();
+	g_EntityPositions[index] = pEntity->GetEngineObject()->GetAbsOrigin();
+	g_EntityOrientations[index] = pEntity->GetEngineObject()->GetAbsAngles();
 	g_EntityClassnames[index] = pEntity->GetEngineObject()->GetClassname();
 }
 
@@ -476,8 +476,8 @@ void NWCEdit::RememberEntityPosition( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 void NWCEdit::UpdateEntityPosition( CBaseEntity *pEntity )
 {
-	const Vector &newPos = pEntity->GetAbsOrigin();
-	const QAngle &newAng = pEntity->GetAbsAngles();
+	const Vector &newPos = pEntity->GetEngineObject()->GetAbsOrigin();
+	const QAngle &newAng = pEntity->GetEngineObject()->GetAbsAngles();
 
 	DevMsg( 1, "%s\n   origin %f %f %f\n   angles %f %f %f\n", pEntity->GetClassname(), newPos.x, newPos.y, newPos.z, newAng.x, newAng.y, newAng.z );
 	if ( Ragdoll_IsPropRagdoll(pEntity) )

@@ -272,8 +272,8 @@ void CHLTVDirector::BuildCameraList( void )
 		{
 			// look at target if any given
 			QAngle angles;
-			VectorAngles( pTarget->GetAbsOrigin() - pCamera->GetAbsOrigin(), angles );
-			pCamera->SetAbsAngles( angles );
+			VectorAngles( pTarget->GetEngineObject()->GetAbsOrigin() - pCamera->GetEngineObject()->GetAbsOrigin(), angles );
+			pCamera->GetEngineObject()->SetAbsAngles( angles );
 		}
 
 		m_pFixedCameras[m_nNumFixedCameras] = pCamera;
@@ -413,8 +413,8 @@ void CHLTVDirector::StartFixedCameraShot(int iCamera, int iTarget)
 	CBaseEntity *pCamera = m_pFixedCameras[iCamera];
 	
 
-	Vector vCamPos = pCamera->GetAbsOrigin();
-	QAngle aViewAngle = pCamera->GetAbsAngles();
+	Vector vCamPos = pCamera->GetEngineObject()->GetAbsOrigin();
+	QAngle aViewAngle = pCamera->GetEngineObject()->GetAbsAngles();
 
 	m_iPVSEntity = 0;	// don't use camera entity, since it may not been transmitted
 	m_vPVSOrigin = vCamPos;
@@ -1011,13 +1011,13 @@ void CHLTVDirector::AnalyzeCameras()
 		int		nCount = 0; // Number of visible targets
 		Vector	vDistribution; vDistribution.Init(); // distribution of targets
 
-		Vector vCamPos = pCamera->GetAbsOrigin();
+		Vector vCamPos = pCamera->GetEngineObject()->GetAbsOrigin();
 
 		for ( int j=0; j<m_nNumActivePlayers; j++ )
 		{
 			CBasePlayer *pPlayer = m_pActivePlayers[j];
 
-			Vector vPlayerPos = pPlayer->GetAbsOrigin();
+			Vector vPlayerPos = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 			float dist = VectorLength( vPlayerPos - vCamPos );
 
@@ -1026,7 +1026,7 @@ void CHLTVDirector::AnalyzeCameras()
 
 			// check visibility
 			trace_t tr;
-			UTIL_TraceLine( vCamPos, pPlayer->GetAbsOrigin(), MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &tr  );
+			UTIL_TraceLine( vCamPos, pPlayer->GetEngineObject()->GetAbsOrigin(), MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &tr  );
 
 			if ( tr.fraction < 1.0 )
 				continue;	// not visible for camera
@@ -1118,7 +1118,7 @@ void CHLTVDirector::AnalyzePlayers()
 		int		nCount = 0; // Number of visible targets
 		Vector	vDistribution; vDistribution.Init(); // distribution of targets
 		
-		Vector vCamPos = pPlayer->GetAbsOrigin();
+		Vector vCamPos = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 		Vector v1; AngleVectors( pPlayer->EyeAngles(), &v1 );
 
@@ -1131,7 +1131,7 @@ void CHLTVDirector::AnalyzePlayers()
 			
 			CBasePlayer *pOtherPlayer = m_pActivePlayers[j];
 
-			Vector vPlayerPos = pOtherPlayer->GetAbsOrigin();
+			Vector vPlayerPos = pOtherPlayer->GetEngineObject()->GetAbsOrigin();
 
 			float dist = VectorLength( vPlayerPos - vCamPos );
 
@@ -1140,7 +1140,7 @@ void CHLTVDirector::AnalyzePlayers()
 
 			// check visibility
 			trace_t tr;
-			UTIL_TraceLine( vCamPos, pOtherPlayer->GetAbsOrigin(), MASK_SOLID, pOtherPlayer, COLLISION_GROUP_NONE, &tr  );
+			UTIL_TraceLine( vCamPos, pOtherPlayer->GetEngineObject()->GetAbsOrigin(), MASK_SOLID, pOtherPlayer, COLLISION_GROUP_NONE, &tr  );
 
 			if ( tr.fraction < 1.0 )
 				continue;	// not visible for camera

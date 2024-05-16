@@ -555,7 +555,7 @@ void CFastZombie::PrescheduleThink( void )
 	}
 
 	// Crudely detect the apex of our jump
-	if( IsNavJumping() && !m_fHitApex && GetAbsVelocity().z <= 0.0 )
+	if( IsNavJumping() && !m_fHitApex && GetEngineObject()->GetAbsVelocity().z <= 0.0 )
 	{
 		OnNavJumpHitApex();
 	}
@@ -999,7 +999,7 @@ void CFastZombie::AlertSound( void )
 		// one that hears the sound.
 		float flDist;
 
-		flDist = ( GetAbsOrigin() - pPlayer->GetAbsOrigin() ).Length();
+		flDist = (GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin() ).Length();
 
 		if( flDist > 512 )
 		{
@@ -1065,7 +1065,7 @@ int CFastZombie::RangeAttack1Conditions( float flDot, float flDist )
 
 	// make sure the enemy isn't on a roof and I'm in the streets (Ravenholm)
 	float flZDist;
-	flZDist = fabs( GetEnemy()->GetLocalOrigin().z - GetLocalOrigin().z );
+	flZDist = fabs( GetEnemy()->GetEngineObject()->GetLocalOrigin().z - GetEngineObject()->GetLocalOrigin().z );
 	if( flZDist > FASTZOMBIE_MAXLEAP_Z )
 	{
 		return COND_TOO_FAR_TO_ATTACK;
@@ -1184,7 +1184,7 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ZOMBIE_ATTACK_RIGHT )
 	{
 		Vector right;
-		AngleVectors( GetLocalAngles(), NULL, &right, NULL );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), NULL, &right, NULL );
 		right = right * -50;
 
 		QAngle angle( -3, -5, -3  );
@@ -1195,7 +1195,7 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ZOMBIE_ATTACK_LEFT )
 	{
 		Vector right;
-		AngleVectors( GetLocalAngles(), NULL, &right, NULL );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), NULL, &right, NULL );
 		right = right * 50;
 		QAngle angle( -3, 5, -3 );
 		ClawAttack( GetClawAttackRange(), 3, angle, right, ZOMBIE_BLOOD_LEFT_HAND );
@@ -1264,7 +1264,7 @@ void CFastZombie::LeapAttack( void )
 	//
 	// Take him off ground so engine doesn't instantly reset FL_ONGROUND.
 	//
-	UTIL_SetOrigin( this, GetLocalOrigin() + Vector( 0 , 0 , 1 ));
+	UTIL_SetOrigin( this, GetEngineObject()->GetLocalOrigin() + Vector( 0 , 0 , 1 ));
 
 	Vector vecJumpDir;
 	CBaseEntity *pEnemy = GetEnemy();
@@ -1282,7 +1282,7 @@ void CFastZombie::LeapAttack( void )
 		//
 		// How fast does the zombie need to travel to reach my enemy's eyes given gravity?
 		//
-		float height = ( vecEnemyPos.z - GetAbsOrigin().z );
+		float height = ( vecEnemyPos.z - GetEngineObject()->GetAbsOrigin().z );
 
 		if ( height < 16 )
 		{
@@ -1298,7 +1298,7 @@ void CFastZombie::LeapAttack( void )
 		//
 		// Scale the sideways velocity to get there at the right time
 		//
-		vecJumpDir = vecEnemyPos - GetAbsOrigin();
+		vecJumpDir = vecEnemyPos - GetEngineObject()->GetAbsOrigin();
 		vecJumpDir = vecJumpDir / time;
 
 		//
@@ -1317,7 +1317,7 @@ void CFastZombie::LeapAttack( void )
 		}
 
 		// try speeding up a bit.
-		SetAbsVelocity( vecJumpDir );
+		GetEngineObject()->SetAbsVelocity( vecJumpDir );
 		m_flNextAttack = gpGlobals->curtime + 2;
 	}
 }
@@ -1350,12 +1350,12 @@ void CFastZombie::StartTask( const Task_t *pTask )
 			BeginAttackJump();
 
 			Vector forward;
-			AngleVectors( GetLocalAngles(), &forward );
+			AngleVectors(GetEngineObject()->GetLocalAngles(), &forward );
 
 			//
 			// Take him off ground so engine doesn't instantly reset FL_ONGROUND.
 			//
-			UTIL_SetOrigin( this, GetLocalOrigin() + Vector( 0 , 0 , 1 ));
+			UTIL_SetOrigin( this, GetEngineObject()->GetLocalOrigin() + Vector( 0 , 0 , 1 ));
 
 			ApplyAbsVelocityImpulse( forward * -200 + Vector( 0, 0, 200 ) );
 		}
@@ -1373,7 +1373,7 @@ void CFastZombie::StartTask( const Task_t *pTask )
 			//
 			// Take him off ground so engine doesn't instantly reset FL_ONGROUND.
 			//
-			UTIL_SetOrigin( this, GetLocalOrigin() + Vector( 0 , 0 , 1 ));
+			UTIL_SetOrigin( this, GetEngineObject()->GetLocalOrigin() + Vector( 0 , 0 , 1 ));
 
 			CBaseEntity *pEnemy = GetEnemy();
 			Vector vecJumpDir;
@@ -1389,7 +1389,7 @@ void CFastZombie::StartTask( const Task_t *pTask )
 			}
 			else if( pEnemy )
 			{
-				vecJumpDir = pEnemy->GetLocalOrigin() - GetLocalOrigin();
+				vecJumpDir = pEnemy->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin();
 				VectorNormalize( vecJumpDir );
 				vecJumpDir.z = 0;
 
@@ -1558,7 +1558,7 @@ int CFastZombie::TranslateSchedule( int scheduleType )
 		break;
 	case SCHED_MOVE_TO_WEAPON_RANGE:
 		{
-			float flZDist = fabs( GetEnemy()->GetLocalOrigin().z - GetLocalOrigin().z );
+			float flZDist = fabs( GetEnemy()->GetEngineObject()->GetLocalOrigin().z - GetEngineObject()->GetLocalOrigin().z );
 			if ( flZDist > FASTZOMBIE_MAXLEAP_Z )
 				return SCHED_CHASE_ENEMY;
 			else // fall through to default
@@ -1592,11 +1592,11 @@ void CFastZombie::LeapAttackTouch( CBaseEntity *pOther )
 	}
 
 	// Stop the zombie and knock the player back
-	Vector vecNewVelocity( 0, 0, GetAbsVelocity().z );
-	SetAbsVelocity( vecNewVelocity );
+	Vector vecNewVelocity( 0, 0, GetEngineObject()->GetAbsVelocity().z );
+	GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
 	Vector forward;
-	AngleVectors( GetLocalAngles(), &forward );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &forward );
 	forward *= 500;
 	QAngle qaPunch( 15, random->RandomInt(-5,5), random->RandomInt(-5,5) );
 	
@@ -1631,7 +1631,7 @@ void CFastZombie::ClimbTouch( CBaseEntity *pOther )
 		if ( GetActivity() != ACT_CLIMB_DISMOUNT || 
 			 ( pOther->GetGroundEntity() == NULL &&
 			   GetNavigator()->IsGoalActive() &&
-			   pOther->GetAbsOrigin().z - GetNavigator()->GetCurWaypointPos().z < -1.0 ) )
+			   pOther->GetEngineObject()->GetAbsOrigin().z - GetNavigator()->GetCurWaypointPos().z < -1.0 ) )
 		{
 			SetCondition( COND_FASTZOMBIE_CLIMB_TOUCH );
 		}
@@ -1730,7 +1730,7 @@ bool CFastZombie::ShouldFailNav( bool bMovementFailed )
 {
 	if ( !BaseClass::ShouldFailNav( bMovementFailed ) )
 	{
-		DevMsg( 2, "Fast zombie in scripted sequence probably hit bad node configuration at %s\n", VecToString( GetAbsOrigin() ) );
+		DevMsg( 2, "Fast zombie in scripted sequence probably hit bad node configuration at %s\n", VecToString(GetEngineObject()->GetAbsOrigin() ) );
 		
 		if ( GetNavigator()->GetPath()->CurWaypointNavType() == NAV_JUMP && GetNavigator()->RefindPathToGoal( false ) )
 		{
@@ -1869,7 +1869,7 @@ void CFastZombie::BeginAttackJump( void )
 	// to someplace that's not pathing friendly, and so must jump again to get out.
 	m_fJustJumped = true;
 
-	m_flJumpStartAltitude = GetLocalOrigin().z;
+	m_flJumpStartAltitude = GetEngineObject()->GetLocalOrigin().z;
 }
 
 //=========================================================
@@ -2076,16 +2076,16 @@ void CFastZombie::VehicleLeapAttack( void )
 	LeapAttackSound();
 
 	// Take him off ground so engine doesn't instantly reset FL_ONGROUND.
-	UTIL_SetOrigin( this, GetLocalOrigin() + Vector( 0 , 0 , 1 ));
+	UTIL_SetOrigin( this, GetEngineObject()->GetLocalOrigin() + Vector( 0 , 0 , 1 ));
 
 	// FIXME: This should be the exact position we'll enter at, but this approximates it generally
 	//vecEnemyPos[2] += 16;
 
 	Vector vecMins = GetHullMins();
 	Vector vecMaxs = GetHullMaxs();
-	Vector vecJumpDir = VecCheckToss( this, GetAbsOrigin(), vecEnemyPos, 0.1f, 1.0f, false, &vecMins, &vecMaxs );
+	Vector vecJumpDir = VecCheckToss( this, GetEngineObject()->GetAbsOrigin(), vecEnemyPos, 0.1f, 1.0f, false, &vecMins, &vecMaxs );
 
-	SetAbsVelocity( vecJumpDir );
+	GetEngineObject()->SetAbsVelocity( vecJumpDir );
 	m_flNextAttack = gpGlobals->curtime + 2.0f;
 	SetTouch( &CFastZombie::VehicleLeapAttackTouch );
 }
@@ -2113,7 +2113,7 @@ void CFastZombie::VehicleLeapAttackTouch( CBaseEntity *pOther )
 		m_PassengerBehavior.AttachToVehicle();
 
 		// HACK: Stop us cold
-		SetLocalVelocity( vec3_origin );
+		GetEngineObject()->SetLocalVelocity( vec3_origin );
 	}
 }
 

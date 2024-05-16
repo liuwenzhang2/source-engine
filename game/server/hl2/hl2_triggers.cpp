@@ -205,11 +205,11 @@ Vector CTriggerWeaponDissolve::GetConduitPoint( CBaseEntity *pTarget )
 	// Find the nearest conduit to the target
 	for ( int i = 0; i < m_pConduitPoints.Count(); i++ )
 	{
-		testDist = ( m_pConduitPoints[i]->GetAbsOrigin() - pTarget->GetAbsOrigin() ).LengthSqr();
+		testDist = ( m_pConduitPoints[i]->GetEngineObject()->GetAbsOrigin() - pTarget->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 
 		if ( testDist < nearDist )
 		{
-			bestPoint = m_pConduitPoints[i]->GetAbsOrigin();
+			bestPoint = m_pConduitPoints[i]->GetEngineObject()->GetAbsOrigin();
 			nearDist = testDist;
 		}
 	}
@@ -242,7 +242,7 @@ void CTriggerWeaponDissolve::DissolveThink( void )
 			// All conduits send power to the weapon
 			for ( int i = 0; i < m_pConduitPoints.Count(); i++ )
 			{
-				CreateBeam( m_pConduitPoints[i]->GetAbsOrigin(), pWeapon, 4.0f );
+				CreateBeam( m_pConduitPoints[i]->GetEngineObject()->GetAbsOrigin(), pWeapon, 4.0f );
 			}
 
 			PhysCannonBeginUpgrade( pWeapon );
@@ -542,7 +542,7 @@ void CWateryDeathLeech::Spawn( void )
 
 	QAngle vAngle;
 	vAngle[YAW] = random->RandomFloat( 0, 360 );
-	SetAbsAngles( vAngle );
+	GetEngineObject()->SetAbsAngles( vAngle );
 
 	m_iFadeState = 1;
 	SetRenderColorA( 1 );
@@ -597,7 +597,7 @@ void CWateryDeathLeech::LeechThink( void )
 			RemoveEffects( EF_NODRAW );
 		}
 
-		SetAbsOrigin( GetOwnerEntity()->GetAbsOrigin() + GetOwnerEntity()->GetViewOffset() );
+		GetEngineObject()->SetAbsOrigin( GetOwnerEntity()->GetEngineObject()->GetAbsOrigin() + GetOwnerEntity()->GetViewOffset() );
 	}
 }
 
@@ -691,7 +691,7 @@ void CTriggerWateryDeath::SpawnLeeches( CBaseEntity *pOther )
 			m_hLeeches.AddToTail( pLeech );
 
 			pLeech->Spawn();
-			pLeech->SetAbsOrigin( pOther->GetAbsOrigin() );
+			pLeech->GetEngineObject()->SetAbsOrigin( pOther->GetEngineObject()->GetAbsOrigin() );
 			pLeech->SetOwnerEntity( pOther );
 
 			if ( i <= 8 )
@@ -738,7 +738,7 @@ void CTriggerWateryDeath::Touch( CBaseEntity *pOther )
 		// This ensures that if the target is the player, the damage isn't modified by skill
 		CTakeDamageInfo info = CTakeDamageInfo( pOther, pOther, m_flPainValue, DMG_GENERIC );
 
-		GuessDamageForce( &info, (pOther->GetAbsOrigin() - GetAbsOrigin()), pOther->GetAbsOrigin() );
+		GuessDamageForce( &info, (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), pOther->GetEngineObject()->GetAbsOrigin() );
 		pOther->TakeDamage( info );
 
 		m_flEntityKillTimes[iIndex] = gpGlobals->curtime + WD_KILLTIME_NEXT_BITE;

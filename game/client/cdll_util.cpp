@@ -412,7 +412,7 @@ void UTIL_Smoke( const Vector &origin, const float scale, const float framerate 
 
 void UTIL_SetOrigin( C_BaseEntity *entity, const Vector &vecOrigin )
 {
-	entity->SetLocalOrigin( vecOrigin );
+	entity->GetEngineObject()->SetLocalOrigin( vecOrigin );
 }
 
 //#define PRECACHE_OTHER_ONCE

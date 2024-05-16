@@ -103,10 +103,10 @@ void CGrenadeMP5::Detonate(void)
 	m_bIsLive		= false;
 	m_takedamage	= DAMAGE_NO;	
 
-	CPASFilter filter( GetAbsOrigin() );
+	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 
 	te->Explosion( filter, 0.0,
-		&GetAbsOrigin(), 
+		&GetEngineObject()->GetAbsOrigin(),
 		GetWaterLevel() == 0 ? g_sModelIndexFireball : g_sModelIndexWExplosion,
 		(m_flDamage - 50) * .60, 
 		15,
@@ -127,9 +127,9 @@ void CGrenadeMP5::Detonate(void)
 		UTIL_DecalTrace( &tr, "Scorch" );
 	}
 
-	CSoundEnt::InsertSound ( SOUND_COMBAT, GetAbsOrigin(), BASEGRENADE_EXPLOSION_VOLUME, 3.0 );
+	CSoundEnt::InsertSound ( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), BASEGRENADE_EXPLOSION_VOLUME, 3.0 );
 
-	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetAbsOrigin(), m_flDamage * 2.5, CLASS_NONE, NULL );
+	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(), m_flDamage * 2.5, CLASS_NONE, NULL );
 
 	CPASAttenuationFilter filter2( this );
 	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "GrenadeMP5.Detonate" );
@@ -141,7 +141,7 @@ void CGrenadeMP5::Detonate(void)
 		VectorAngles( tr.plane.normal, angles );
 
 		for ( int i = 0; i < sparkCount; i++ )
-			Create( "spark_shower", GetAbsOrigin(), angles, NULL );
+			Create( "spark_shower", GetEngineObject()->GetAbsOrigin(), angles, NULL );
 	}
 
 	UTIL_Remove( this );

@@ -1082,7 +1082,7 @@ void CPointCommentaryNode::TeleportTo( CBasePlayer *pPlayer )
 	Vector vecTarget = m_vecTeleportOrigin;
 	if ( m_vecTeleportOrigin == vec3_origin )
 	{
-		vecTarget = GetAbsOrigin();
+		vecTarget = GetEngineObject()->GetAbsOrigin();
 	}
 
 	trace_t trace;
@@ -1090,7 +1090,7 @@ void CPointCommentaryNode::TeleportTo( CBasePlayer *pPlayer )
 
 	pPlayer->Teleport( &trace.endpos, NULL, &vec3_origin );
 
-	Vector vecToNode = GetAbsOrigin() - pPlayer->EyePosition();
+	Vector vecToNode = GetEngineObject()->GetAbsOrigin() - pPlayer->EyePosition();
 	VectorNormalize( vecToNode );
 	QAngle vecAngle;
 	VectorAngles( vecToNode, Vector(0,0,1), vecAngle );
@@ -1170,8 +1170,8 @@ void CPointCommentaryNode::UpdateViewThink( void )
 		{
 			// Make an invisible entity to attach view angles to
 			m_hViewTargetAngles = gEntList.CreateEntityByName( "point_commentary_viewpoint" );
-			m_hViewTargetAngles->SetAbsOrigin( pPlayer->EyePosition() );
-			m_hViewTargetAngles->SetAbsAngles( pPlayer->EyeAngles() );
+			m_hViewTargetAngles->GetEngineObject()->SetAbsOrigin( pPlayer->EyePosition() );
+			m_hViewTargetAngles->GetEngineObject()->SetAbsAngles( pPlayer->EyeAngles() );
 			pPlayer->SetViewEntity( m_hViewTargetAngles );
 
 			if ( pPlayer->GetActiveWeapon() )
@@ -1184,14 +1184,14 @@ void CPointCommentaryNode::UpdateViewThink( void )
  		QAngle angCurrent;
 		if ( m_hViewPositionMover )
 		{
-			angCurrent = m_hViewPositionMover->GetAbsAngles();
-			VectorAngles( m_hViewTarget->WorldSpaceCenter() - m_hViewPositionMover->GetAbsOrigin(), angGoal );
+			angCurrent = m_hViewPositionMover->GetEngineObject()->GetAbsAngles();
+			VectorAngles( m_hViewTarget->WorldSpaceCenter() - m_hViewPositionMover->GetEngineObject()->GetAbsOrigin(), angGoal );
 		}
 		else if ( m_hViewTargetAngles )
 		{
-			angCurrent = m_hViewTargetAngles->GetAbsAngles();
-			m_hViewTargetAngles->SetAbsOrigin( pPlayer->EyePosition() );
-			VectorAngles( m_hViewTarget->WorldSpaceCenter() - m_hViewTargetAngles->GetAbsOrigin(), angGoal );
+			angCurrent = m_hViewTargetAngles->GetEngineObject()->GetAbsAngles();
+			m_hViewTargetAngles->GetEngineObject()->SetAbsOrigin( pPlayer->EyePosition() );
+			VectorAngles( m_hViewTarget->WorldSpaceCenter() - m_hViewTargetAngles->GetEngineObject()->GetAbsOrigin(), angGoal );
 		}
 		else
 		{
@@ -1211,11 +1211,11 @@ void CPointCommentaryNode::UpdateViewThink( void )
 
 		if ( m_hViewPositionMover )
 		{
-			m_hViewPositionMover->SetAbsAngles( angCurrent );
+			m_hViewPositionMover->GetEngineObject()->SetAbsAngles( angCurrent );
 		}
 		else if ( m_hViewTargetAngles )
 		{
-			m_hViewTargetAngles->SetAbsAngles( angCurrent );
+			m_hViewTargetAngles->GetEngineObject()->SetAbsAngles( angCurrent );
 			pPlayer->SnapEyeAngles( angCurrent );
 		}
 		else
@@ -1238,7 +1238,7 @@ void CPointCommentaryNode::UpdateViewThink( void )
 			// Make an invisible info target entity for us to attach the view to, 
 			// and move it to the desired view position.
 			m_hViewPositionMover = gEntList.CreateEntityByName( "point_commentary_viewpoint" );
-			m_hViewPositionMover->SetAbsAngles( pPlayer->EyeAngles() );
+			m_hViewPositionMover->GetEngineObject()->SetAbsAngles( pPlayer->EyeAngles() );
 			pPlayer->SetViewEntity( m_hViewPositionMover );
 		}
 
@@ -1248,8 +1248,8 @@ void CPointCommentaryNode::UpdateViewThink( void )
 
 		// Figure out the current view position
 		Vector vecCurEye;
-		VectorLerp( pPlayer->EyePosition(), m_hViewPosition.Get()->GetAbsOrigin(), flBlendPerc, vecCurEye );
-		m_hViewPositionMover->SetAbsOrigin( vecCurEye ); 
+		VectorLerp( pPlayer->EyePosition(), m_hViewPosition.Get()->GetEngineObject()->GetAbsOrigin(), flBlendPerc, vecCurEye );
+		m_hViewPositionMover->GetEngineObject()->SetAbsOrigin( vecCurEye );
 
 		SetNextThink( gpGlobals->curtime, s_pCommentaryUpdateViewThink );
 	}
@@ -1280,7 +1280,7 @@ void CPointCommentaryNode::UpdateViewPostThink( void )
 			Vector vecPlayerPos = pPlayer->EyePosition();
 			Vector vecToPosition = (m_vecFinishOrigin - vecPlayerPos); 
 			Vector vecCurEye = pPlayer->EyePosition() + (vecToPosition * flBlendPerc);
-			m_hViewPositionMover->SetAbsOrigin( vecCurEye ); 
+			m_hViewPositionMover->GetEngineObject()->SetAbsOrigin( vecCurEye );
 
 			if ( m_hViewTarget )
 			{
@@ -1292,14 +1292,14 @@ void CPointCommentaryNode::UpdateViewPostThink( void )
 				QuaternionSlerp( quatFinish, quatOriginal, 1.0 - flBlendPerc, quatCurrent );
 				QAngle angCurrent;
 				QuaternionAngles( quatCurrent, angCurrent );
-				m_hViewPositionMover->SetAbsAngles( angCurrent );
+				m_hViewPositionMover->GetEngineObject()->SetAbsAngles( angCurrent );
 			}
 
 			SetNextThink( gpGlobals->curtime, s_pCommentaryUpdateViewThink );
 			return;
 		}
 
-		pPlayer->SnapEyeAngles( m_hViewPositionMover->GetAbsAngles() );
+		pPlayer->SnapEyeAngles( m_hViewPositionMover->GetEngineObject()->GetAbsAngles() );
 	}
 
 	// We're done
@@ -1332,8 +1332,8 @@ void CPointCommentaryNode::FinishCommentary( bool bBlendOut )
 	{
  		m_bActive = false;
 		m_flPlaybackRate = 1.0;
-		m_vecFinishOrigin = m_hViewPositionMover->GetAbsOrigin();
-		m_vecFinishAngles = m_hViewPositionMover->GetAbsAngles();
+		m_vecFinishOrigin = m_hViewPositionMover->GetEngineObject()->GetAbsOrigin();
+		m_vecFinishAngles = m_hViewPositionMover->GetEngineObject()->GetAbsAngles();
 
 		m_bPreventChangesWhileMoving = true;
 

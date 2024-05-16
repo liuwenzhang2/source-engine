@@ -98,9 +98,9 @@ bool CDynamicLight::KeyValue( const char *szKeyName, const char *szValue )
 		float angle = atof(szValue);
 		if ( angle )
 		{
-			QAngle angles = GetAbsAngles();
+			QAngle angles = GetEngineObject()->GetAbsAngles();
 			angles[PITCH] = -angle;
-			SetAbsAngles( angles );
+			GetEngineObject()->SetAbsAngles( angles );
 		}
 	}
 	else if ( FStrEq( szKeyName, "spawnflags" ) )
@@ -173,7 +173,7 @@ void CDynamicLight::Spawn( void )
 	if ( m_Exponent != clampedExponent )
 	{
 		Warning( "light_dynamic at [%d %d %d] has invalid exponent value (%d must be between %d and %d).\n",
-			(int)GetAbsOrigin().x, (int)GetAbsOrigin().x, (int)GetAbsOrigin().x, 
+			(int)GetEngineObject()->GetAbsOrigin().x, (int)GetEngineObject()->GetAbsOrigin().x, (int)GetEngineObject()->GetAbsOrigin().x,
 			m_Exponent.Get(),
 			MIN_DL_EXPONENT_VALUE,
 			MAX_DL_EXPONENT_VALUE );
@@ -193,10 +193,10 @@ void CDynamicLight::DynamicLightThink( void )
 	CBaseEntity *pEntity = GetNextTarget();
 	if ( pEntity )
 	{
-		Vector vecToTarget = (pEntity->GetAbsOrigin() - GetAbsOrigin());
+		Vector vecToTarget = (pEntity->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin());
 		QAngle vecAngles;
 		VectorAngles( vecToTarget, vecAngles );
-		SetAbsAngles( vecAngles );
+		GetEngineObject()->SetAbsAngles( vecAngles );
 	}
 	
 	SetNextThink( gpGlobals->curtime + 0.1 );

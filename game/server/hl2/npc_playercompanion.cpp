@@ -304,7 +304,7 @@ Disposition_t CNPC_PlayerCompanion::IRelationType( CBaseEntity *pTarget )
 			// is active... that is, not classifying itself as CLASS_NONE
 			if( pTarget->Classify() != CLASS_NONE )
 			{
-				if( !hl2_episodic.GetBool() && IsSafeFromFloorTurret(GetAbsOrigin(), pTarget) )
+				if( !hl2_episodic.GetBool() && IsSafeFromFloorTurret(GetEngineObject()->GetAbsOrigin(), pTarget) )
 				{
 					return D_NU;
 				}
@@ -318,10 +318,10 @@ Disposition_t CNPC_PlayerCompanion::IRelationType( CBaseEntity *pTarget )
 				  ((CAI_BaseNPC *)pTarget)->GetActiveWeapon()->ClassMatches( gm_iszShotgunClassname ) &&
 				  ( !GetActiveWeapon() || !GetActiveWeapon()->ClassMatches( gm_iszShotgunClassname ) ) )
 		{
-			if ( (pTarget->GetAbsOrigin() - GetAbsOrigin()).LengthSqr() < Square( 25 * 12 ) )
+			if ( (pTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).LengthSqr() < Square( 25 * 12 ) )
 			{
 				// Ignore enemies on the floor above us
-				if ( fabs(pTarget->GetAbsOrigin().z - GetAbsOrigin().z) < 100 )
+				if ( fabs(pTarget->GetEngineObject()->GetAbsOrigin().z - GetEngineObject()->GetAbsOrigin().z) < 100 )
 					return D_FR;
 			}
 		}
@@ -357,14 +357,14 @@ void CNPC_PlayerCompanion::GatherConditions()
 			bool bInPlayerSquad = ( m_pSquad && MAKE_STRING(m_pSquad->GetName()) == GetPlayerSquadName() );
 			if ( bInPlayerSquad )
 			{
-				if ( GetState() == NPC_STATE_SCRIPT || ( !HasCondition( COND_SEE_PLAYER ) && (GetAbsOrigin() - pPlayer->GetAbsOrigin()).LengthSqr() > Square(50 * 12) ) )
+				if ( GetState() == NPC_STATE_SCRIPT || ( !HasCondition( COND_SEE_PLAYER ) && (GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin()).LengthSqr() > Square(50 * 12) ) )
 				{
 					RemoveFromSquad();
 				}
 			}
 			else if ( GetState() != NPC_STATE_SCRIPT )
 			{
-				if ( HasCondition( COND_SEE_PLAYER ) && (GetAbsOrigin() - pPlayer->GetAbsOrigin()).LengthSqr() < Square(25 * 12) )
+				if ( HasCondition( COND_SEE_PLAYER ) && (GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin()).LengthSqr() < Square(25 * 12) )
 				{
 					if ( hl2_episodic.GetBool() )
 					{
@@ -397,7 +397,7 @@ void CNPC_PlayerCompanion::GatherConditions()
 			 GetFollowBehavior().GetGoalRange() > 0.1 &&
 			 BaseClass::GetIdealSpeed() > 0.1 )
 		{
-			Vector vPlayerToFollower = GetAbsOrigin() - pPlayer->GetAbsOrigin();
+			Vector vPlayerToFollower = GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin();
 			float dist = vPlayerToFollower.NormalizeInPlace();
 
 			bool bDoSpeedBoost = false;
@@ -483,7 +483,7 @@ void CNPC_PlayerCompanion::GatherConditions()
 
 		if ( pSound && (pSound->SoundType() & SOUND_CONTEXT_MORTAR) )
 		{
-			float flDistSq = (pSound->GetSoundOrigin() - GetAbsOrigin() ).LengthSqr();
+			float flDistSq = (pSound->GetSoundOrigin() - GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 			if ( flDistSq > Square( MORTAR_BLAST_RADIUS + GetHullWidth() * 2 ) )
 				SetCondition( COND_PC_SAFE_FROM_MORTAR );
 		}
@@ -698,10 +698,10 @@ int CNPC_PlayerCompanion::SelectSchedule()
 	if ( m_ActBusyBehavior.IsRunning() && m_ActBusyBehavior.NeedsToPlayExitAnim() )
 	{
 		trace_t tr;
-		Vector	vUp = GetAbsOrigin();
+		Vector	vUp = GetEngineObject()->GetAbsOrigin();
 		vUp.z += .25;
 
-		AI_TraceHull( GetAbsOrigin(), vUp, GetHullMins(),
+		AI_TraceHull(GetEngineObject()->GetAbsOrigin(), vUp, GetHullMins(),
 			GetHullMaxs(), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 
 		if ( tr.startsolid )
@@ -899,7 +899,7 @@ bool CNPC_PlayerCompanion::ShouldDeferToFollowBehavior()
 	if ( !GetFollowBehavior().CanSelectSchedule() || !GetFollowBehavior().FarFromFollowTarget() )
 		return false;
 		
-	if ( m_StandoffBehavior.CanSelectSchedule() && !m_StandoffBehavior.IsBehindBattleLines( GetFollowBehavior().GetFollowTarget()->GetAbsOrigin() ) )
+	if ( m_StandoffBehavior.CanSelectSchedule() && !m_StandoffBehavior.IsBehindBattleLines( GetFollowBehavior().GetFollowTarget()->GetEngineObject()->GetAbsOrigin() ) )
 		return false;
 
 	if ( HasCondition(COND_BETTER_WEAPON_AVAILABLE) && !GetActiveWeapon() )
@@ -943,7 +943,7 @@ bool CNPC_PlayerCompanion::IsValidReasonableFacing( const Vector &vecSightDir, f
 
 	if( ai_new_aiming.GetBool() )
 	{
-		Vector vecEyePositionCentered = GetAbsOrigin();
+		Vector vecEyePositionCentered = GetEngineObject()->GetAbsOrigin();
 		vecEyePositionCentered.z = EyePosition().z;
 
 		if( IsSquadmateInSpread(vecEyePositionCentered, vecEyePositionCentered + vecSightDir * 240.0f, VECTOR_CONE_15DEGREES.x, 12.0f * 3.0f) )
@@ -1428,7 +1428,7 @@ void CNPC_PlayerCompanion::HandleAnimEvent( animevent_t *pEvent )
 
 		// Construct a toss velocity
 		Vector vecToss;
-		AngleVectors( GetAbsAngles(), &vecToss );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &vecToss );
 		VectorNormalize( vecToss );
 		vecToss *= random->RandomFloat( 64.0f, 72.0f );
 		vecToss[2] += 64.0f;
@@ -1910,7 +1910,7 @@ bool CNPC_PlayerCompanion::PickTacticalLookTarget( AILookTargetArgs_t *pArgs )
 	hintCriteria.AddHintType( HINT_WORLD_VISUALLY_INTERESTING_DONT_AIM );
 	hintCriteria.AddHintType( HINT_WORLD_VISUALLY_INTERESTING_STEALTH );
 	hintCriteria.SetFlag( bits_HINT_NODE_VISIBLE | bits_HINT_NODE_IN_VIEWCONE | bits_HINT_NPC_IN_NODE_FOV );
-	hintCriteria.AddIncludePosition( GetAbsOrigin(), COMPANION_MAX_TACTICAL_TARGET_DIST );
+	hintCriteria.AddIncludePosition(GetEngineObject()->GetAbsOrigin(), COMPANION_MAX_TACTICAL_TARGET_DIST );
 
 	{
 		AI_PROFILE_SCOPE( CNPC_PlayerCompanion_FindHint_PickTacticalLookTarget );
@@ -1957,12 +1957,12 @@ bool CNPC_PlayerCompanion::FindNewAimTarget()
 
 	hintCriteria.SetHintType( HINT_WORLD_VISUALLY_INTERESTING );
 	hintCriteria.SetFlag( bits_HINT_NODE_VISIBLE | bits_HINT_NODE_IN_VIEWCONE | bits_HINT_NPC_IN_NODE_FOV );
-	hintCriteria.AddIncludePosition( GetAbsOrigin(), COMPANION_MAX_TACTICAL_TARGET_DIST );
+	hintCriteria.AddIncludePosition(GetEngineObject()->GetAbsOrigin(), COMPANION_MAX_TACTICAL_TARGET_DIST );
 	pHint = CAI_HintManager::FindHint( this, hintCriteria );
 
 	if( pHint )
 	{
-		if( (pHint->GetAbsOrigin() - GetAbsOrigin()).Length2D() < COMPANION_AIMTARGET_NEAREST )
+		if( (pHint->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length2D() < COMPANION_AIMTARGET_NEAREST )
 		{
 			// Too close!
 			return false;
@@ -2000,8 +2000,8 @@ void CNPC_PlayerCompanion::OnNewLookTarget()
 			if( pHint )
 			{
 				if( pHint->HintType() == HINT_WORLD_VISUALLY_INTERESTING &&
-					(pHint->GetAbsOrigin() - GetAbsOrigin()).Length2D() > COMPANION_AIMTARGET_NEAREST  &&
-					FInAimCone(pHint->GetAbsOrigin())	&&
+					(pHint->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length2D() > COMPANION_AIMTARGET_NEAREST  &&
+					FInAimCone(pHint->GetEngineObject()->GetAbsOrigin())	&&
 					HasAimLOS(pHint) )
 				{
 					SetAimTarget( pHint );
@@ -2024,7 +2024,7 @@ void CNPC_PlayerCompanion::OnNewLookTarget()
 				return;
 			}
 
-			if( (GetLooktarget()->GetAbsOrigin() - GetAbsOrigin()).Length2D() < COMPANION_AIMTARGET_NEAREST )
+			if( (GetLooktarget()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length2D() < COMPANION_AIMTARGET_NEAREST )
 			{
 				// Too close!
 				return;
@@ -2127,7 +2127,7 @@ void CNPC_PlayerCompanion::AimGun()
 			float flDist; 
 			Vector vecAimTargetLoc = GetAimTarget()->WorldSpaceCenter();
 
-			flDist = (vecAimTargetLoc - GetAbsOrigin()).Length2DSqr();
+			flDist = (vecAimTargetLoc - GetEngineObject()->GetAbsOrigin()).Length2DSqr();
 
 			// Throw away a looktarget if it gets too close. We don't want guys turning around as
 			// they walk through doorways which contain a looktarget.
@@ -2263,7 +2263,7 @@ void CNPC_PlayerCompanion::OnUpdateShotRegulator()
 
 	if( GetEnemy() && HasCondition(COND_CAN_RANGE_ATTACK1) )
 	{
-		if( GetAbsOrigin().DistTo( GetEnemy()->GetAbsOrigin() ) <= PC_LARGER_BURST_RANGE )
+		if(GetEngineObject()->GetAbsOrigin().DistTo( GetEnemy()->GetEngineObject()->GetAbsOrigin() ) <= PC_LARGER_BURST_RANGE )
 		{
 			if( hl2_episodic.GetBool() )
 			{
@@ -2439,8 +2439,8 @@ int __cdecl MultiCoverCompare( AI_EnemyInfo_t * const *ppLeft, AI_EnemyInfo_t * 
 	if ( leftRelevantTime > rightRelevantTime )
 		return 1;
 
-	float leftDistSq = g_pMultiCoverSearcher->GetAbsOrigin().DistToSqr( pLeft->hEnemy->GetAbsOrigin() );
-	float rightDistSq = g_pMultiCoverSearcher->GetAbsOrigin().DistToSqr( pRight->hEnemy->GetAbsOrigin() );
+	float leftDistSq = g_pMultiCoverSearcher->GetEngineObject()->GetAbsOrigin().DistToSqr( pLeft->hEnemy->GetEngineObject()->GetAbsOrigin() );
+	float rightDistSq = g_pMultiCoverSearcher->GetEngineObject()->GetAbsOrigin().DistToSqr( pRight->hEnemy->GetEngineObject()->GetAbsOrigin() );
 
 	if ( leftDistSq < rightDistSq )
 		return -1;
@@ -2664,8 +2664,8 @@ bool CNPC_PlayerCompanion::IsCoverPosition( const Vector &vecThreat, const Vecto
 		if( pSound  )
 		{
 			// Don't get closer to the shell
-			Vector vecToSound = vecThreat - GetAbsOrigin();
-			Vector vecToPosition = vecPosition - GetAbsOrigin();
+			Vector vecToSound = vecThreat - GetEngineObject()->GetAbsOrigin();
+			Vector vecToPosition = vecPosition - GetEngineObject()->GetAbsOrigin();
 			VectorNormalize( vecToPosition );
 			VectorNormalize( vecToSound );
 
@@ -2732,7 +2732,7 @@ int CNPC_PlayerCompanion::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		bool bIsEnvFire;
 		if( ( bIsEnvFire = FClassnameIs( info.GetAttacker(), "env_fire" ) ) != false || FClassnameIs( info.GetAttacker(), "entityflame" ) || FClassnameIs( info.GetAttacker(), "env_entity_igniter" ) )
 		{
-			GetMotor()->SetIdealYawToTarget( info.GetAttacker()->GetAbsOrigin() );
+			GetMotor()->SetIdealYawToTarget( info.GetAttacker()->GetEngineObject()->GetAbsOrigin() );
 			SetCondition( COND_PC_HURTBYFIRE );
 		}
 
@@ -2746,7 +2746,7 @@ int CNPC_PlayerCompanion::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		//						  npc clipped, this latter case should be rare.
 		if ( bIsEnvFire )
 		{
-			if ( ( GetAbsOrigin() - info.GetAttacker()->GetAbsOrigin() ).Length2DSqr() > Square(12 + GetHullWidth() * .5 ) )
+			if ( (GetEngineObject()->GetAbsOrigin() - info.GetAttacker()->GetEngineObject()->GetAbsOrigin() ).Length2DSqr() > Square(12 + GetHullWidth() * .5 ) )
 			{
 				return 0;
 			}
@@ -2772,7 +2772,7 @@ void CNPC_PlayerCompanion::OnFriendDamaged( CBaseCombatCharacter *pSquadmate, CB
 						   GetSenses()->DidSeeEntity( pSquadmate ) ) ) );
 		if ( bDirect )
 		{
-			UpdateEnemyMemory( pAttacker, pAttacker->GetAbsOrigin(), pSquadmate );
+			UpdateEnemyMemory( pAttacker, pAttacker->GetEngineObject()->GetAbsOrigin(), pSquadmate );
 		}
 		else
 		{
@@ -2780,12 +2780,12 @@ void CNPC_PlayerCompanion::OnFriendDamaged( CBaseCombatCharacter *pSquadmate, CB
 			{
 				AI_EnemyInfo_t *pInfo = GetEnemies()->Find( pAttacker );
 				if ( !pInfo || ( gpGlobals->curtime - pInfo->timeLastSeen ) > 15.0 )
-					UpdateEnemyMemory( pAttacker, pSquadmate->GetAbsOrigin(), pSquadmate );
+					UpdateEnemyMemory( pAttacker, pSquadmate->GetEngineObject()->GetAbsOrigin(), pSquadmate );
 			}
 		}
 
 		CBasePlayer *pPlayer = AI_GetSinglePlayer();
-		if ( pPlayer && IsInPlayerSquad() && ( pPlayer->GetAbsOrigin().AsVector2D() - GetAbsOrigin().AsVector2D() ).LengthSqr() < Square( 25*12 ) && IsAllowedToSpeak( TLK_WATCHOUT ) )
+		if ( pPlayer && IsInPlayerSquad() && ( pPlayer->GetEngineObject()->GetAbsOrigin().AsVector2D() - GetEngineObject()->GetAbsOrigin().AsVector2D() ).LengthSqr() < Square( 25*12 ) && IsAllowedToSpeak( TLK_WATCHOUT ) )
 		{
 			if ( !pPlayer->FInViewCone( pAttacker ) )
 			{
@@ -2795,14 +2795,14 @@ void CNPC_PlayerCompanion::OnFriendDamaged( CBaseCombatCharacter *pSquadmate, CB
 				float dot = vPlayerDir.Dot( vEnemyDir );
 				if ( dot < 0 )
 					Speak( TLK_WATCHOUT, "dangerloc:behind" );
-				else if ( ( pPlayer->GetAbsOrigin().AsVector2D() - pAttacker->GetAbsOrigin().AsVector2D() ).LengthSqr() > Square( 40*12 ) )
+				else if ( ( pPlayer->GetEngineObject()->GetAbsOrigin().AsVector2D() - pAttacker->GetEngineObject()->GetAbsOrigin().AsVector2D() ).LengthSqr() > Square( 40*12 ) )
 					Speak( TLK_WATCHOUT, "dangerloc:far" );
 			}
-			else if ( pAttacker->GetAbsOrigin().z - pPlayer->GetAbsOrigin().z > 128 )
+			else if ( pAttacker->GetEngineObject()->GetAbsOrigin().z - pPlayer->GetEngineObject()->GetAbsOrigin().z > 128 )
 			{
 				Speak( TLK_WATCHOUT, "dangerloc:above" );
 			}
-			else if ( pAttacker->GetHullType() <= HULL_TINY && ( pPlayer->GetAbsOrigin().AsVector2D() - pAttacker->GetAbsOrigin().AsVector2D() ).LengthSqr() > Square( 100*12 ) )
+			else if ( pAttacker->GetHullType() <= HULL_TINY && ( pPlayer->GetEngineObject()->GetAbsOrigin().AsVector2D() - pAttacker->GetEngineObject()->GetAbsOrigin().AsVector2D() ).LengthSqr() > Square( 100*12 ) )
 			{
 				Speak( TLK_WATCHOUT, "dangerloc:far" );
 			}
@@ -2894,7 +2894,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 			if( pSound && pSound->SoundContext() == SOUND_CONTEXT_MORTAR )
 			{
 				// Try not to get any closer to the center
-				GetLocalNavigator()->AddObstacle( pSound->GetSoundOrigin(), (pSound->GetSoundOrigin() - GetAbsOrigin()).Length2D() * 0.5, AIMST_AVOID_DANGER );
+				GetLocalNavigator()->AddObstacle( pSound->GetSoundOrigin(), (pSound->GetSoundOrigin() - GetEngineObject()->GetAbsOrigin()).Length2D() * 0.5, AIMST_AVOID_DANGER );
 			}
 		}
 
@@ -2902,7 +2902,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 		trace_t tr;
 		
 		// For each possible entity, compare our known interesting classnames to its classname, via ID
-		while( ( pEntity = OverrideMoveCache_FindTargetsInRadius( pEntity, GetAbsOrigin(), AVOID_TEST_DIST ) ) != NULL )
+		while( ( pEntity = OverrideMoveCache_FindTargetsInRadius( pEntity, GetEngineObject()->GetAbsOrigin(), AVOID_TEST_DIST ) ) != NULL )
 		{
 			// Handle each type
 			if ( pEntity->GetEngineObject()->GetClassname() == iszEnvFire)
@@ -2913,7 +2913,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 					UTIL_TraceLine( WorldSpaceCenter(), pEntity->WorldSpaceCenter(), MASK_FIRE_SOLID, pEntity, COLLISION_GROUP_NONE, &tr );
 					if (tr.fraction == 1.0 && !tr.startsolid)
 					{
-						GetLocalNavigator()->AddObstacle( pEntity->GetAbsOrigin(), ( ( vMaxs.x - vMins.x ) * 1.414 * 0.5 ) + 6.0, AIMST_AVOID_DANGER );
+						GetLocalNavigator()->AddObstacle( pEntity->GetEngineObject()->GetAbsOrigin(), ( ( vMaxs.x - vMins.x ) * 1.414 * 0.5 ) + 6.0, AIMST_AVOID_DANGER );
 					}
 				}
 			}
@@ -2951,7 +2951,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 					UTIL_TraceLine( WorldSpaceCenter(), pEntity->WorldSpaceCenter(), MASK_BLOCKLOS, pEntity, COLLISION_GROUP_NONE, &tr );
 					if (tr.fraction == 1.0 && !tr.startsolid)
 					{
-						GetLocalNavigator()->AddObstacle( pEntity->GetAbsOrigin(), BOUNCEBOMB_DETONATE_RADIUS * .8, AIMST_AVOID_DANGER );
+						GetLocalNavigator()->AddObstacle( pEntity->GetEngineObject()->GetAbsOrigin(), BOUNCEBOMB_DETONATE_RADIUS * .8, AIMST_AVOID_DANGER );
 					}
 				}
 			}
@@ -2975,8 +2975,8 @@ bool CNPC_PlayerCompanion::MovementCost( int moveType, const Vector &vecStart, c
 			CSound *pSound = GetBestSound( SOUND_DANGER );
 			if( pSound && (pSound->SoundContext() & (SOUND_CONTEXT_MORTAR|SOUND_CONTEXT_FROM_SNIPER)) )
 			{
-				Vector vecToSound = pSound->GetSoundReactOrigin() - GetAbsOrigin();
-				Vector vecToPosition = vecEnd - GetAbsOrigin();
+				Vector vecToSound = pSound->GetSoundReactOrigin() - GetEngineObject()->GetAbsOrigin();
+				Vector vecToPosition = vecEnd - GetEngineObject()->GetAbsOrigin();
 				VectorNormalize( vecToPosition );
 				VectorNormalize( vecToSound );
 
@@ -3019,7 +3019,7 @@ float CNPC_PlayerCompanion::GetIdealAccel() const
 	float multiplier = 1.0;
 	if ( AI_IsSinglePlayer() )
 	{
-		if ( m_bMovingAwayFromPlayer && (UTIL_PlayerByIndex(1)->GetAbsOrigin() - GetAbsOrigin()).Length2DSqr() < Square(3.0*12.0) )
+		if ( m_bMovingAwayFromPlayer && (UTIL_PlayerByIndex(1)->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length2DSqr() < Square(3.0*12.0) )
 			multiplier = 2.0;
 	}
 	return BaseClass::GetIdealAccel() * multiplier;
@@ -3096,7 +3096,7 @@ void CNPC_PlayerCompanion::InputOutsideTransition( inputdata_t &inputdata )
 		return;
 
 	CBaseEntity *pPlayer = UTIL_GetLocalPlayer();
-	const Vector &playerPos = pPlayer->GetAbsOrigin();
+	const Vector &playerPos = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	// Mark us as already having succeeded if we're vital or always meant to come with the player
 	bool bAlwaysTransition = ( ( Classify() == CLASS_PLAYER_ALLY_VITAL ) || m_bAlwaysTransition );
@@ -3104,7 +3104,7 @@ void CNPC_PlayerCompanion::InputOutsideTransition( inputdata_t &inputdata )
 
 	if ( bAlwaysTransition == false )
 	{
-		AI_Waypoint_t *pPathToPlayer = GetPathfinder()->BuildRoute( GetAbsOrigin(), playerPos, pPlayer, 0 );
+		AI_Waypoint_t *pPathToPlayer = GetPathfinder()->BuildRoute(GetEngineObject()->GetAbsOrigin(), playerPos, pPlayer, 0 );
 
 		if ( pPathToPlayer )
 		{
@@ -3138,9 +3138,9 @@ void CNPC_PlayerCompanion::InputOutsideTransition( inputdata_t &inputdata )
 		if ( GetNavigator()->CanFitAtPosition( teleportLocation, MASK_NPCSOLID ) )
 		{
 			bMadeIt = true;
-			if ( !bPathToPlayer && ( playerPos - GetAbsOrigin() ).LengthSqr() > Square(40*12) )
+			if ( !bPathToPlayer && ( playerPos - GetEngineObject()->GetAbsOrigin() ).LengthSqr() > Square(40*12) )
 			{
-				AI_Waypoint_t *pPathToTeleport = GetPathfinder()->BuildRoute( GetAbsOrigin(), teleportLocation, pPlayer, 0 );
+				AI_Waypoint_t *pPathToTeleport = GetPathfinder()->BuildRoute(GetEngineObject()->GetAbsOrigin(), teleportLocation, pPlayer, 0 );
 
 				if ( !pPathToTeleport )
 				{
@@ -3175,9 +3175,9 @@ void CNPC_PlayerCompanion::InputOutsideTransition( inputdata_t &inputdata )
 		// Force us if we didn't find a normal route
 		if ( bAlwaysTransition )
 		{
-			bMadeIt = FindSpotForNPCInRadius( &teleportLocation, pPlayer->GetAbsOrigin(), this, 32.0*1.414, true );
+			bMadeIt = FindSpotForNPCInRadius( &teleportLocation, pPlayer->GetEngineObject()->GetAbsOrigin(), this, 32.0*1.414, true );
 			if ( !bMadeIt )
-				bMadeIt = FindSpotForNPCInRadius( &teleportLocation, pPlayer->GetAbsOrigin(), this, 32.0*1.414, false );
+				bMadeIt = FindSpotForNPCInRadius( &teleportLocation, pPlayer->GetEngineObject()->GetAbsOrigin(), this, 32.0*1.414, false );
 		}
 	}
 
@@ -3934,7 +3934,7 @@ public:
 		while ( nIndex != m_Cache.InvalidIndex() )
 		{
 			pTarget = m_Cache[nIndex];
-			if ( pTarget && ( pTarget->GetAbsOrigin() - vecOrigin ).LengthSqr() < flRadiusSqr )
+			if ( pTarget && ( pTarget->GetEngineObject()->GetAbsOrigin() - vecOrigin ).LengthSqr() < flRadiusSqr )
 				return pTarget;
 
 			nIndex = m_Cache.Next( nIndex );

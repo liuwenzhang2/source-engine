@@ -117,7 +117,7 @@ float CDEagle::GetInaccuracy() const
 		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 			return 1.5f * (1 - m_flAccuracy);
 
-		else if (pPlayer->GetAbsVelocity().Length2D() > 5)
+		else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 			return 0.25f * (1 - m_flAccuracy);
 
 		else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )

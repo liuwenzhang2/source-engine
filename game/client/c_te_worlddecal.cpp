@@ -121,7 +121,7 @@ void C_TEWorldDecal::PostDataUpdate( DataUpdateType_t updateType )
 
 			if ( !( bNoBlood && bIsBlood ) )
 			{
-				effects->DecalShoot( m_nIndex, 0, ent->GetModel(), ent->GetAbsOrigin(), ent->GetAbsAngles(), m_vecOrigin, 0, 0 );
+				effects->DecalShoot( m_nIndex, 0, ent->GetModel(), ent->GetEngineObject()->GetAbsOrigin(), ent->GetEngineObject()->GetAbsAngles(), m_vecOrigin, 0, 0 );
 			}
 		}
 	}
@@ -139,7 +139,7 @@ void TE_WorldDecal( IRecipientFilter& filter, float delay, const Vector* pos, in
 		C_BaseEntity *ent = cl_entitylist->GetEnt( 0 );
 		if ( ent )
 		{
-			effects->DecalShoot( index, 0, ent->GetModel(), ent->GetAbsOrigin(), ent->GetAbsAngles(), *pos, 0, 0 );
+			effects->DecalShoot( index, 0, ent->GetModel(), ent->GetEngineObject()->GetAbsOrigin(), ent->GetEngineObject()->GetAbsAngles(), *pos, 0, 0 );
 		}
 	}
 	RecordWorldDecal( pos, index );

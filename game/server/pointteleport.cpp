@@ -73,8 +73,8 @@ bool CPointTeleport::EntityMayTeleport( CBaseEntity *pTarget )
 void CPointTeleport::Activate( void )
 {
 	// Start with our origin point
-	m_vSaveOrigin = GetAbsOrigin();
-	m_vSaveAngles = GetAbsAngles();
+	m_vSaveOrigin = GetEngineObject()->GetAbsOrigin();
+	m_vSaveAngles = GetEngineObject()->GetAbsAngles();
 
 	// Save off the spawn position of the target if instructed to do so
 	if ( m_spawnflags & SF_TELEPORT_TO_SPAWN_POS )
@@ -86,8 +86,8 @@ void CPointTeleport::Activate( void )
 			if ( EntityMayTeleport( pTarget ) )
 			{
 				// Save the points
-				m_vSaveOrigin = pTarget->GetAbsOrigin();
-				m_vSaveAngles = pTarget->GetAbsAngles();
+				m_vSaveOrigin = pTarget->GetEngineObject()->GetAbsOrigin();
+				m_vSaveAngles = pTarget->GetEngineObject()->GetAbsAngles();
 			}
 			else
 			{

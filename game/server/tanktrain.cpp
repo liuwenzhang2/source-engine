@@ -407,13 +407,13 @@ int PathFindDirection( CPathTrack *pStart, const Vector &startPosition, const Ve
 	CPathTrack *pPath = pStart->m_pnext;
 	CPathTrack *pNearest = pStart;
 
-	float nearestDist = (pNearest->GetLocalOrigin() - destination).LengthSqr();
+	float nearestDist = (pNearest->GetEngineObject()->GetLocalOrigin() - destination).LengthSqr();
 	float length = 0;
 	float nearestForward = 0, nearestReverse = 0;
 
 	do
 	{
-		float dist = (pPath->GetLocalOrigin() - destination).LengthSqr();
+		float dist = (pPath->GetEngineObject()->GetLocalOrigin() - destination).LengthSqr();
 		
 		// This is closer than our current estimate
 		if ( dist < nearestDist )
@@ -427,7 +427,7 @@ int PathFindDirection( CPathTrack *pStart, const Vector &startPosition, const Ve
 		if ( pNext )
 		{
 			// UNDONE: Cache delta in path?
-			float delta = (pNext->GetLocalOrigin() - pPath->GetLocalOrigin()).LengthSqr();
+			float delta = (pNext->GetEngineObject()->GetLocalOrigin() - pPath->GetEngineObject()->GetLocalOrigin()).LengthSqr();
 			length += delta;
 			// add to current reverse estimate
 			nearestReverse += delta;
@@ -456,7 +456,7 @@ int PathFindDirection( CPathTrack *pStart, const Vector &startPosition, const Ve
 
 	// UNDONE: Fix this fudge factor
 	// if you are already at the path, or <100 units away, don't move
-	if ( pNearest == pStart || (pNearest->GetLocalOrigin() - startPosition).LengthSqr() < 100 )
+	if ( pNearest == pStart || (pNearest->GetEngineObject()->GetLocalOrigin() - startPosition).LengthSqr() < 100 )
 		return 0;
 
 	if ( nearestForward <= nearestReverse )
@@ -486,7 +486,7 @@ void CTankTrainAI::Think( void )
 	CBaseEntity *pTarget = m_hTargetEntity;
 	if ( pTarget )
 	{
-		desired = PathFindDirection( pTrain->m_ppath, pTrain->GetLocalOrigin(), pTarget->GetLocalOrigin() );
+		desired = PathFindDirection( pTrain->m_ppath, pTrain->GetEngineObject()->GetLocalOrigin(), pTarget->GetEngineObject()->GetLocalOrigin() );
 	}
 
 	// If the train wants to stop, figure out throttle

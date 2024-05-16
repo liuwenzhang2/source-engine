@@ -512,9 +512,9 @@ void CHL2MP_Player::ResetAnimation( void )
 		SetSequence ( -1 );
 		SetActivity( ACT_INVALID );
 
-		if (!GetAbsVelocity().x && !GetAbsVelocity().y)
+		if (!GetEngineObject()->GetAbsVelocity().x && !GetEngineObject()->GetAbsVelocity().y)
 			SetAnimation( PLAYER_IDLE );
-		else if ((GetAbsVelocity().x || GetAbsVelocity().y) && ( GetFlags() & FL_ONGROUND ))
+		else if ((GetEngineObject()->GetAbsVelocity().x || GetEngineObject()->GetAbsVelocity().y) && ( GetFlags() & FL_ONGROUND ))
 			SetAnimation( PLAYER_WALK );
 		else if (GetWaterLevel() > 1)
 			SetAnimation( PLAYER_WALK );
@@ -536,8 +536,8 @@ bool CHL2MP_Player::Weapon_Switch( CBaseCombatWeapon *pWeapon, int viewmodelinde
 
 void CHL2MP_Player::PreThink( void )
 {
-	QAngle vOldAngles = GetLocalAngles();
-	QAngle vTempAngles = GetLocalAngles();
+	QAngle vOldAngles = GetEngineObject()->GetLocalAngles();
+	QAngle vTempAngles = GetEngineObject()->GetLocalAngles();
 
 	vTempAngles = EyeAngles();
 
@@ -546,14 +546,14 @@ void CHL2MP_Player::PreThink( void )
 		vTempAngles[PITCH] -= 360.0f;
 	}
 
-	SetLocalAngles( vTempAngles );
+	GetEngineObject()->SetLocalAngles( vTempAngles );
 
 	BaseClass::PreThink();
 	State_PreThink();
 
 	//Reset bullet force accumulator, only lasts one frame
 	m_vecTotalBulletForce = vec3_origin;
-	SetLocalAngles( vOldAngles );
+	GetEngineObject()->SetLocalAngles( vOldAngles );
 }
 
 void CHL2MP_Player::PostThink( void )
@@ -570,9 +570,9 @@ void CHL2MP_Player::PostThink( void )
 	// Store the eye angles pitch so the client can compute its animation state correctly.
 	m_angEyeAngles = EyeAngles();
 
-	QAngle angles = GetLocalAngles();
+	QAngle angles = GetEngineObject()->GetLocalAngles();
 	angles[PITCH] = 0;
-	SetLocalAngles( angles );
+	GetEngineObject()->SetLocalAngles( angles );
 }
 
 void CHL2MP_Player::PlayerDeathThink()
@@ -627,8 +627,8 @@ bool CHL2MP_Player::WantsLagCompensationOnEntity( const CBasePlayer *pPlayer, co
 	if ( pEntityTransmitBits && !pEntityTransmitBits->Get( pPlayer->entindex() ) )
 		return false;
 
-	const Vector &vMyOrigin = GetAbsOrigin();
-	const Vector &vHisOrigin = pPlayer->GetAbsOrigin();
+	const Vector &vMyOrigin = GetEngineObject()->GetAbsOrigin();
+	const Vector &vHisOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	// get max distance player could have moved within max lag compensation time, 
 	// multiply by 1.5 to to avoid "dead zones"  (sqrt(2) would be the exact value)
@@ -678,7 +678,7 @@ void CHL2MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 
 	float speed;
 
-	speed = GetAbsVelocity().Length2D();
+	speed = GetEngineObject()->GetAbsVelocity().Length2D();
 
 	
 	// bool bRunning = true;
@@ -1065,7 +1065,7 @@ void CHL2MP_Player::CreateViewModel( int index /*=0*/ )
 	CPredictedViewModel *vm = ( CPredictedViewModel * )gEntList.CreateEntityByName( "predicted_viewmodel" );
 	if ( vm )
 	{
-		vm->SetAbsOrigin( GetAbsOrigin() );
+		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		vm->SetOwner( this );
 		vm->SetIndex( index );
 		DispatchSpawn( vm );
@@ -1136,12 +1136,12 @@ void CHL2MP_Player::CreateRagdollEntity( void )
 	if ( pRagdoll )
 	{
 		pRagdoll->m_hPlayer = this;
-		pRagdoll->m_vecRagdollOrigin = GetAbsOrigin();
-		pRagdoll->m_vecRagdollVelocity = GetAbsVelocity();
+		pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
+		pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
 		pRagdoll->m_nModelIndex = m_nModelIndex;
 		pRagdoll->m_nForceBone = m_nForceBone;
 		pRagdoll->m_vecForce = m_vecTotalBulletForce;
-		pRagdoll->SetAbsOrigin( GetAbsOrigin() );
+		pRagdoll->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 	}
 
 	// ragdolls will be removed on round restart automatically
@@ -1317,7 +1317,7 @@ void CHL2MP_Player::DeathSound( const CTakeDamageInfo &info )
 	if (g_pSoundEmitterSystem->GetParametersForSound( szStepSound, params, pModelName ) == false )
 		return;
 
-	Vector vecOrigin = GetAbsOrigin();
+	Vector vecOrigin = GetEngineObject()->GetAbsOrigin();
 	
 	CRecipientFilter filter;
 	filter.AddRecipientsByPAS( vecOrigin );
@@ -1377,7 +1377,7 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 			// check if pSpot is valid
 			if ( g_pGameRules->IsSpawnPointValid( pSpot, this ) )
 			{
-				if ( pSpot->GetLocalOrigin() == vec3_origin )
+				if ( pSpot->GetEngineObject()->GetLocalOrigin() == vec3_origin )
 				{
 					pSpot = gEntList.FindEntityByClassname( pSpot, pSpawnpointName );
 					continue;
@@ -1395,7 +1395,7 @@ CBaseEntity* CHL2MP_Player::EntSelectSpawnPoint( void )
 	if ( pSpot )
 	{
 		CBaseEntity *ent = NULL;
-		for ( CEntitySphereQuery sphere( pSpot->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
+		for ( CEntitySphereQuery sphere( pSpot->GetEngineObject()->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 		{
 			// if ent is a client, kill em (unless they are ourselves)
 			if ( ent->IsPlayer() && !(ent->entindex() == entindex()) )

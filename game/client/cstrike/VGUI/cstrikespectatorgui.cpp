@@ -958,7 +958,7 @@ void CCSMapOverview::UpdateBomb()
 
 		if( pC4->IsBombActive() )
 		{
-			m_bomb.position = pC4->GetAbsOrigin();
+			m_bomb.position = pC4->GetEngineObject()->GetAbsOrigin();
 			m_bomb.state = CSMapBomb_t::BOMB_PLANTED;
 			m_bomb.ringTravelTime = 3.0f;
 			smallestRadius = m_flIconSize;
@@ -1005,7 +1005,7 @@ void CCSMapOverview::UpdateBomb()
 				else
 				{
 					// Update players is about to put this Real Data in the player sturct, and we don't want the bomb pos lagged one update behind
-					m_bomb.position = pPlayer->GetAbsOrigin();
+					m_bomb.position = pPlayer->GetEngineObject()->GetAbsOrigin();
 				}
 
 				m_bomb.state = CSMapBomb_t::BOMB_CARRIED;
@@ -1473,9 +1473,9 @@ void CCSMapOverview::DrawMapPlayers()
 			if( localPlayer )
 			{	
 				if( (localPlayer->GetObserverMode() != OBS_MODE_NONE) && localPlayer->GetObserverTarget() )
-					zDifference = player->position.z - localPlayer->GetObserverTarget()->GetAbsOrigin().z;
+					zDifference = player->position.z - localPlayer->GetObserverTarget()->GetEngineObject()->GetAbsOrigin().z;
 				else
-					zDifference = player->position.z - localPlayer->GetAbsOrigin().z;
+					zDifference = player->position.z - localPlayer->GetEngineObject()->GetAbsOrigin().z;
 			}
 
 			float sizeForRing = m_flIconSize * 1.4f;
@@ -1588,9 +1588,9 @@ void CCSMapOverview::DrawHostages()
 			if( localPlayer )
 			{	
 				if( (localPlayer->GetObserverMode() != OBS_MODE_NONE) && localPlayer->GetObserverTarget() )
-					zDifference = hostage->position.z - localPlayer->GetObserverTarget()->GetAbsOrigin().z;
+					zDifference = hostage->position.z - localPlayer->GetObserverTarget()->GetEngineObject()->GetAbsOrigin().z;
 				else
-					zDifference = hostage->position.z - localPlayer->GetAbsOrigin().z;
+					zDifference = hostage->position.z - localPlayer->GetEngineObject()->GetAbsOrigin().z;
 			}
 
 			float sizeForHostage = m_flIconSize;
@@ -1819,7 +1819,7 @@ void CCSMapOverview::DrawCamera()
 	{
 		// Instead of the programmer-art red dot, we'll draw an icon for when our camera is roaming.
 		int alpha = 255;
-		DrawIconCS(m_cameraIconFree, m_cameraIconFree, localPlayer->GetAbsOrigin(), m_flIconSize * 3.0f, localPlayer->EyeAngles()[YAW], alpha);
+		DrawIconCS(m_cameraIconFree, m_cameraIconFree, localPlayer->GetEngineObject()->GetAbsOrigin(), m_flIconSize * 3.0f, localPlayer->EyeAngles()[YAW], alpha);
 	}
 	else if( localPlayer->GetObserverMode() == OBS_MODE_IN_EYE )
 	{
@@ -1827,7 +1827,7 @@ void CCSMapOverview::DrawCamera()
 		{
 			// Fade it if it is on top of a player dot.  And don't rotate it.
 			int alpha = 255 * 0.5f;
-			DrawIconCS(m_cameraIconFirst, m_cameraIconFirst, localPlayer->GetObserverTarget()->GetAbsOrigin(), m_flIconSize * 1.5f, GetViewAngle(), alpha);
+			DrawIconCS(m_cameraIconFirst, m_cameraIconFirst, localPlayer->GetObserverTarget()->GetEngineObject()->GetAbsOrigin(), m_flIconSize * 1.5f, GetViewAngle(), alpha);
 		}
 	}
 	else if( localPlayer->GetObserverMode() == OBS_MODE_CHASE )
@@ -1836,7 +1836,7 @@ void CCSMapOverview::DrawCamera()
 		{
 			// Or Draw the third-camera a little bigger. (Needs room to be off the dot being followed)
 			int alpha = 255;
-			DrawIconCS(m_cameraIconThird, m_cameraIconThird, localPlayer->GetObserverTarget()->GetAbsOrigin(), m_flIconSize * 3.0f, localPlayer->EyeAngles()[YAW], alpha);
+			DrawIconCS(m_cameraIconThird, m_cameraIconThird, localPlayer->GetObserverTarget()->GetEngineObject()->GetAbsOrigin(), m_flIconSize * 3.0f, localPlayer->EyeAngles()[YAW], alpha);
 		}
 	}
 }

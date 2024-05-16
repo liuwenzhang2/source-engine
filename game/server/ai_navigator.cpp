@@ -1479,7 +1479,7 @@ AIMoveResult_t CAI_Navigator::MoveClimb()
 			else if ( pOther->GetNavType() == NAV_CLIMB && climbDir.z <= 0.01 )
 			{
 				const Vector &otherClimbDest = pOther->GetNavigator()->GetPath()->CurWaypointPos();
-				Vector otherClimbDir = otherClimbDest - pOther->GetLocalOrigin();
+				Vector otherClimbDir = otherClimbDest - pOther->GetEngineObject()->GetLocalOrigin();
 				VectorNormalize( otherClimbDir );
 
 				if ( otherClimbDir.Dot( climbDir ) < 0 )
@@ -1744,7 +1744,7 @@ bool CAI_Navigator::OnObstructionPreSteer( AILocalMoveGoal_t *pMoveGoal, float d
 	if ( ai_vehicle_avoidance.GetBool() && pMoveGoal->directTrace.pObstruction != NULL && pMoveGoal->directTrace.pObstruction->GetServerVehicle() != NULL )
 	{
 		//FIXME: This should change into a flag which forces an OBB route to be formed around the entity in question!
-		AI_Waypoint_t *pOBB = GetPathfinder()->BuildOBBAvoidanceRoute( GetOuter()->GetAbsOrigin(),
+		AI_Waypoint_t *pOBB = GetPathfinder()->BuildOBBAvoidanceRoute( GetOuter()->GetEngineObject()->GetAbsOrigin(),
 																	   GetGoalPos(),
 																	   pMoveGoal->directTrace.pObstruction,
 																	   GetNavTargetEntity(), 
@@ -2033,8 +2033,8 @@ bool CAI_Navigator::DelayNavigationFailure( const AIMoveTrace_t &trace )
 				if ( pBlocker->GetGroundEntity() == GetOuter() )
 				{
 					trace_t bumpTrace;
-					pBlocker->GetMoveProbe()->TraceHull( pBlocker->GetAbsOrigin(), 
-														 pBlocker->GetAbsOrigin() + Vector(0,0,2.0), 
+					pBlocker->GetMoveProbe()->TraceHull( pBlocker->GetEngineObject()->GetAbsOrigin(),
+														 pBlocker->GetEngineObject()->GetAbsOrigin() + Vector(0,0,2.0),
 														 MASK_NPCSOLID, 
 														 &bumpTrace );
 					if ( bumpTrace.fraction == 1.0  )
@@ -3645,13 +3645,13 @@ bool CAI_Navigator::DoFindPathToPathcorner( CBaseEntity *pPathCorner )
 
 			GetPath()->ClearWaypoints();
 
-			AI_Waypoint_t *pRoute = new AI_Waypoint_t( pPathCorner->GetLocalOrigin(), 0, GetNavType(), bits_WP_TO_PATHCORNER, NO_NODE );
+			AI_Waypoint_t *pRoute = new AI_Waypoint_t( pPathCorner->GetEngineObject()->GetLocalOrigin(), 0, GetNavType(), bits_WP_TO_PATHCORNER, NO_NODE );
 			pRoute->hPathCorner = pPathCorner;
 			AI_Waypoint_t *pLast = pRoute;
 			pPathCorner = GetNextPathcorner(pPathCorner);
 			if ( pPathCorner )
 			{
-				pLast = new AI_Waypoint_t( pPathCorner->GetLocalOrigin(), 0, GetNavType(), bits_WP_TO_PATHCORNER, NO_NODE );
+				pLast = new AI_Waypoint_t( pPathCorner->GetEngineObject()->GetLocalOrigin(), 0, GetNavType(), bits_WP_TO_PATHCORNER, NO_NODE );
 				pLast->hPathCorner = pPathCorner;
 				pRoute->SetNext(pLast);
 			}
@@ -3661,7 +3661,7 @@ bool CAI_Navigator::DoFindPathToPathcorner( CBaseEntity *pPathCorner )
 		}
 		else
 		{
-			Vector initPos = pPathCorner->GetLocalOrigin();
+			Vector initPos = pPathCorner->GetEngineObject()->GetLocalOrigin();
 
 			TranslateNavGoal( pPathCorner, initPos );
 
@@ -3697,7 +3697,7 @@ bool CAI_Navigator::DoFindPathToPathcorner( CBaseEntity *pPathCorner )
 					lastWaypoint->ModifyFlags( bits_WP_TO_GOAL, false );
 					// BRJ 10/4/02
 					// FIXME: I'm not certain about the navtype here
-					AI_Waypoint_t *curWaypoint = new AI_Waypoint_t( pPathCorner->GetLocalOrigin(), 0, GetNavType(), (bits_WP_TO_PATHCORNER | bits_WP_TO_GOAL), NO_NODE );
+					AI_Waypoint_t *curWaypoint = new AI_Waypoint_t( pPathCorner->GetEngineObject()->GetLocalOrigin(), 0, GetNavType(), (bits_WP_TO_PATHCORNER | bits_WP_TO_GOAL), NO_NODE );
 					Vector waypointPos = curWaypoint->GetPos();
 					TranslateNavGoal( pPathCorner, waypointPos );
 					curWaypoint->SetPos( waypointPos );
@@ -3813,7 +3813,7 @@ bool CAI_Navigator::DoFindPath( void )
 				// NOTE: Calling reset here because this can get called
 				// any time we have to update our goal position
 				
-				Vector	initPos = pTarget->GetAbsOrigin();
+				Vector	initPos = pTarget->GetEngineObject()->GetAbsOrigin();
 				TranslateNavGoal( pTarget, initPos );
 
 				GetPath()->ResetGoalPosition( initPos );
@@ -4152,7 +4152,7 @@ void CAI_Navigator::DrawDebugRouteOverlay(void)
 	if ( GetPath()->GoalType() != GOALTYPE_NONE )
 	{
 		Vector vecGoalPos = GetPath()->ActualGoalPosition();
-		Vector vecGoalDir = GetPath()->GetGoalDirection( GetOuter()->GetAbsOrigin() );
+		Vector vecGoalDir = GetPath()->GetGoalDirection( GetOuter()->GetEngineObject()->GetAbsOrigin() );
 		NDebugOverlay::Line( vecGoalPos, vecGoalPos + vecGoalDir * 32, 0,0,255, true, 2.0 );
 
 		float flYaw = UTIL_VecToYaw( vecGoalDir );

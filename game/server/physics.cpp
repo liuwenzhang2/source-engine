@@ -1639,7 +1639,7 @@ CON_COMMAND( physics_budget, "Times the cost of each active object" )
 		for ( i = 0; i < ents.Count(); i++ )
 		{
 			float fraction = times[i] / totalTime;
-			Msg( "%s (%s): %.3fms (%.3f%%) @ %s\n", ents[i]->GetClassname(), ents[i]->GetDebugName(), fraction * totalTime * 1000.0f, fraction * 100.0f, VecToString(ents[i]->GetAbsOrigin()) );
+			Msg( "%s (%s): %.3fms (%.3f%%) @ %s\n", ents[i]->GetClassname(), ents[i]->GetDebugName(), fraction * totalTime * 1000.0f, fraction * 100.0f, VecToString(ents[i]->GetEngineObject()->GetAbsOrigin()) );
 		}
 		g_Collisions.BufferTouchEvents( false );
 	}
@@ -2828,7 +2828,7 @@ IPhysicsObject *FindPhysicsObjectByName( const char *pName, CBaseEntity *pErrorE
 			if ( pBestObject )
 			{
 				const char *pErrorName = pErrorEntity ? pErrorEntity->GetClassname() : "Unknown";
-				Vector origin = pErrorEntity ? pErrorEntity->GetAbsOrigin() : vec3_origin;
+				Vector origin = pErrorEntity ? pErrorEntity->GetEngineObject()->GetAbsOrigin() : vec3_origin;
 				DevWarning("entity %s at %s has physics attachment to more than one entity with the name %s!!!\n", pErrorName, VecToString(origin), pName );
 				while ( ( pEntity = gEntList.FindEntityByName( pEntity, pName ) ) != NULL )
 				{

@@ -1863,56 +1863,9 @@ public:
 		return s_bAbsQueriesValid;
 	}
 
-
-public:
-	void					SetAbsVelocity(const Vector& vecVelocity) {
-		GetEngineObject()->SetAbsVelocity(vecVelocity);
-	}
-	const Vector& GetAbsVelocity() const {
-		return GetEngineObject()->GetAbsVelocity();
-	}
-	// NOTE: Setting the abs origin or angles will cause the local origin + angles to be set also
-	void					SetAbsOrigin(const Vector& origin) {
-		GetEngineObject()->SetAbsOrigin(origin);
-	}
-	const Vector& GetAbsOrigin(void) const {
-		return GetEngineObject()->GetAbsOrigin();
-	}
-
-	void					SetAbsAngles(const QAngle& angles) {
-		GetEngineObject()->SetAbsAngles(angles);
-	}
-	const QAngle& GetAbsAngles(void) const {
-		return GetEngineObject()->GetAbsAngles();
-	}
-
-	// Origin and angles in local space ( relative to parent )
-	// NOTE: Setting the local origin or angles will cause the abs origin + angles to be set also
-	void					SetLocalOrigin(const Vector& origin) {
-		GetEngineObject()->SetLocalOrigin(origin);
-	}
-	const Vector& GetLocalOrigin(void) const {
-		return GetEngineObject()->GetLocalOrigin();
-	}
-
-	void					SetLocalAngles(const QAngle& angles) {
-		GetEngineObject()->SetLocalAngles(angles);
-	}
-	const QAngle& GetLocalAngles(void) const {
-		return GetEngineObject()->GetLocalAngles();
-	}
-
-	void					SetLocalVelocity(const Vector& vecVelocity) {
-		GetEngineObject()->SetLocalVelocity(vecVelocity);
-	}
-	const Vector& GetLocalVelocity() const {
-		return GetEngineObject()->GetLocalVelocity();
-	}
-
 };
 
 // Send tables exposed in this module.
-EXTERN_SEND_TABLE(DT_Edict);
 EXTERN_SEND_TABLE(DT_BaseEntity);
 
 

@@ -4564,6 +4564,7 @@ void CSaveRestore::ReapplyDecal( bool adjacent, RestoreLookupTable *table, decal
 						IClientEntity *clientEntity = entitylist->GetClientEntity( entityToHit );
 						if ( !clientEntity )
 							return;
+						IEngineObjectClient* pEngineObject = entitylist->GetEngineObject(entityToHit);
 						
 						bool found = false;
 						int decalIndex = Draw_DecalIndexFromName( entry->name, &found );
@@ -4580,8 +4581,8 @@ void CSaveRestore::ReapplyDecal( bool adjacent, RestoreLookupTable *table, decal
 							decalIndex, 
 							entityToHit, 
 							clientEntity->GetModel(), 
-							clientEntity->GetAbsOrigin(), 
-							clientEntity->GetAbsAngles(),
+							pEngineObject->GetAbsOrigin(),
+							pEngineObject->GetAbsAngles(),
 							entry->position, 0, flags );
 					}
 				}

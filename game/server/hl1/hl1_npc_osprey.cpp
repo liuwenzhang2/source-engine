@@ -187,7 +187,7 @@ void CNPC_Osprey::Spawn( void )
 	Vector mins, maxs;
 	ExtractBbox( 0, mins, maxs );
 	UTIL_SetSize( this, mins, maxs ); 
-	UTIL_SetOrigin( this, GetAbsOrigin() );
+	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() );
 
 	AddFlag( FL_NPC );
 	m_takedamage		= DAMAGE_YES;
@@ -353,7 +353,7 @@ void CNPC_Osprey::FindAllThink( void )
 		if (pEntity->IsAlive())
 		{
 			m_hGrunt[m_iUnits]		= pEntity;
-			m_vecOrigin[m_iUnits]	= pEntity->GetAbsOrigin();
+			m_vecOrigin[m_iUnits]	= pEntity->GetEngineObject()->GetAbsOrigin();
 			m_iUnits++;
 		}
 	}
@@ -376,24 +376,24 @@ void CNPC_Osprey::DeployThink( void )
 	Vector vecSrc;
 
 	SetLocalAngularVelocity( QAngle ( 0, 0, 0 ) );
-	SetAbsVelocity( Vector ( 0, 0, 0 ) );
+	GetEngineObject()->SetAbsVelocity( Vector ( 0, 0, 0 ) );
 
-	AngleVectors( GetAbsAngles(), &vecForward, &vecRight, &vecUp );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vecForward, &vecRight, &vecUp );
 
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, -4096.0), MASK_SOLID_BRUSHONLY, this,COLLISION_GROUP_NONE, &tr);
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, -4096.0), MASK_SOLID_BRUSHONLY, this,COLLISION_GROUP_NONE, &tr);
 	CSoundEnt::InsertSound ( SOUND_DANGER, tr.endpos, 400, 0.3 );
 
-	vecSrc = GetAbsOrigin() + vecForward *  32 + vecRight *  100 + vecUp * -96;
+	vecSrc = GetEngineObject()->GetAbsOrigin() + vecForward *  32 + vecRight *  100 + vecUp * -96;
 	m_hRepel[0] = MakeGrunt( vecSrc );
 
-	vecSrc = GetAbsOrigin() + vecForward * -64 + vecRight *  100 + vecUp * -96;
+	vecSrc = GetEngineObject()->GetAbsOrigin() + vecForward * -64 + vecRight *  100 + vecUp * -96;
 	m_hRepel[1] = MakeGrunt( vecSrc );
 
-	vecSrc = GetAbsOrigin() + vecForward *  32 + vecRight * -100 + vecUp * -96;
+	vecSrc = GetEngineObject()->GetAbsOrigin() + vecForward *  32 + vecRight * -100 + vecUp * -96;
 	m_hRepel[2] = MakeGrunt( vecSrc );
 
-	vecSrc = GetAbsOrigin() + vecForward * -64 + vecRight * -100 + vecUp * -96;
+	vecSrc = GetEngineObject()->GetAbsOrigin() + vecForward * -64 + vecRight * -100 + vecUp * -96;
 	m_hRepel[3] = MakeGrunt( vecSrc );
 
 	m_iRepelState = GRUNTS_DEPLOYED;
@@ -411,7 +411,7 @@ bool CNPC_Osprey::HasDead( )
 		}
 		else
 		{
-			m_vecOrigin[i] = m_hGrunt[i]->GetAbsOrigin();  // send them to where they died
+			m_vecOrigin[i] = m_hGrunt[i]->GetEngineObject()->GetAbsOrigin();  // send them to where they died
 		}
 	}
 	return FALSE;
@@ -459,13 +459,13 @@ CAI_BaseNPC *CNPC_Osprey::MakeGrunt( Vector vecSrc )
 			{
 				m_hGrunt[i]->SUB_StartFadeOut( );
 			}
-			pEntity = Create( "monster_human_grunt", vecSrc, GetAbsAngles() );
+			pEntity = Create( "monster_human_grunt", vecSrc, GetEngineObject()->GetAbsAngles() );
 			pGrunt = pEntity->MyNPCPointer( );
 			pGrunt->SetMoveType( MOVETYPE_FLYGRAVITY );
 			pGrunt->SetGravity( 0.0001 );
 
 			Vector spd = Vector( 0, 0, random->RandomFloat( -196, -128 ) );
-			pGrunt->SetLocalVelocity( spd );
+			pGrunt->GetEngineObject()->SetLocalVelocity( spd );
 			pGrunt->SetActivity( ACT_GLIDE );
 			pGrunt->SetGroundEntity( NULL );
 
@@ -477,7 +477,7 @@ CAI_BaseNPC *CNPC_Osprey::MakeGrunt( Vector vecSrc )
 			pBeam->SetBeamFlags( FBEAM_SOLID );
 			pBeam->SetColor( 255, 255, 255 );
 			pBeam->SetThink( &CBaseEntity::SUB_Remove );
-			pBeam->SetNextThink( gpGlobals->curtime + -4096.0 * tr.fraction / pGrunt->GetAbsVelocity().z + 0.5 );
+			pBeam->SetNextThink( gpGlobals->curtime + -4096.0 * tr.fraction / pGrunt->GetEngineObject()->GetAbsVelocity().z + 0.5 );
 			
 
 			// ALERT( at_console, "%d at %.0f %.0f %.0f\n", i, m_vecOrigin[i].x, m_vecOrigin[i].y, m_vecOrigin[i].z );  
@@ -551,7 +551,7 @@ void CNPC_Osprey::DyingThink( void )
 
 	if( gpGlobals->curtime > m_flNextCrashExplosion )
 	{
-		CPASFilter filter( GetAbsOrigin() );
+		CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 		Vector pos;
 		QAngle dummy;
 
@@ -564,7 +564,7 @@ void CNPC_Osprey::DyingThink( void )
 		}
 		else
 		{
-			pos = GetAbsOrigin();
+			pos = GetEngineObject()->GetAbsOrigin();
 			pos.x += random->RandomFloat( -150, 150 );
 			pos.y += random->RandomFloat( -150, 150 );
 			pos.z += random->RandomFloat( -150, -50 );
@@ -579,25 +579,25 @@ void CNPC_Osprey::DyingThink( void )
 		{
 		case 0:
 			{
-				te->BreakModel( filter, 0.0, GetAbsOrigin(), vec3_angle, 
+				te->BreakModel( filter, 0.0, GetEngineObject()->GetAbsOrigin(), vec3_angle,
 					vecSize, vec3_origin, m_iTailGibs, 100, 0, 2.5, BREAK_METAL );
 				break;
 			}
 		case 1:
 			{
-				te->BreakModel( filter, 0.0, GetAbsOrigin(), vec3_angle, 
+				te->BreakModel( filter, 0.0, GetEngineObject()->GetAbsOrigin(), vec3_angle,
 					vecSize, vec3_origin, m_iBodyGibs, 100, 0, 2.5, BREAK_METAL );
 				break;
 			}
 		case 2:
 			{
-				te->BreakModel( filter, 0.0, GetAbsOrigin(), vec3_angle, 
+				te->BreakModel( filter, 0.0, GetEngineObject()->GetAbsOrigin(), vec3_angle,
 					vecSize, vec3_origin, m_iEngineGibs, 100, 0, 2.5, BREAK_METAL );
 				break;
 			}
 		case 3:
 			{
-				te->BreakModel( filter, 0.0, GetAbsOrigin(), vec3_angle, 
+				te->BreakModel( filter, 0.0, GetEngineObject()->GetAbsOrigin(), vec3_angle,
 					vecSize, vec3_origin, m_nDebrisModel, 100, 0, 2.5, BREAK_METAL );
 				break;
 			}
@@ -623,9 +623,9 @@ void CNPC_Osprey::DyingThink( void )
 void CNPC_Osprey::CrashTouch( CBaseEntity *pOther )
 {
 	Vector vecSize = Vector( 120, 120, 30 );
-	CPVSFilter filter( GetAbsOrigin() );
+	CPVSFilter filter(GetEngineObject()->GetAbsOrigin() );
 
-	te->BreakModel( filter, 0.0, GetAbsOrigin(), vec3_angle, 
+	te->BreakModel( filter, 0.0, GetEngineObject()->GetAbsOrigin(), vec3_angle,
 		vecSize, vec3_origin, m_iTailGibs, 100, 0, 2.5, BREAK_METAL );
 
 	if( m_hLeftSmoke )
@@ -779,7 +779,7 @@ void CBaseHelicopter::HelicopterThink( void )
 	// -----------------------------------------------
 	if (CAI_BaseNPC::m_nDebugBits & bits_debugDisableAI)
 	{
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		SetLocalAngularVelocity( vec3_angle );
 		SetNextThink( gpGlobals->curtime + HELICOPTER_THINK_INTERVAL );
 		return;
@@ -843,8 +843,8 @@ void CBaseHelicopter::Hunt( void )
 
 	if ( 1 )
 	{
-		Vector targetDir = m_vecTargetPosition - GetAbsOrigin();
-		Vector desiredDir = m_vecDesiredPosition - GetAbsOrigin();
+		Vector targetDir = m_vecTargetPosition - GetEngineObject()->GetAbsOrigin();
+		Vector desiredDir = m_vecDesiredPosition - GetEngineObject()->GetAbsOrigin();
 
 		VectorNormalize( targetDir ); 
 		VectorNormalize( desiredDir ); 
@@ -916,10 +916,10 @@ void CBaseHelicopter::FlyPathCorners( void )
 		SetGoalEnt( gEntList.FindEntityByName( NULL, m_target ) );
 		if (GetGoalEnt())
 		{
-			m_vecDesiredPosition = GetGoalEnt()->GetLocalOrigin();
+			m_vecDesiredPosition = GetGoalEnt()->GetEngineObject()->GetLocalOrigin();
 
 			// FIXME: orienation removed from path_corners!
-			AngleVectors( GetGoalEnt()->GetLocalAngles(), &m_vecGoalOrientation );
+			AngleVectors( GetGoalEnt()->GetEngineObject()->GetLocalAngles(), &m_vecGoalOrientation );
 		}
 	}
 
@@ -941,10 +941,10 @@ void CBaseHelicopter::FlyPathCorners( void )
 
 			if (GetGoalEnt())
 			{
-				m_vecDesiredPosition = GetGoalEnt()->GetAbsOrigin();
+				m_vecDesiredPosition = GetGoalEnt()->GetEngineObject()->GetAbsOrigin();
 			
 				// FIXME: orienation removed from path_corners!
-				AngleVectors( GetGoalEnt()->GetLocalAngles(), &m_vecGoalOrientation );
+				AngleVectors( GetGoalEnt()->GetEngineObject()->GetLocalAngles(), &m_vecGoalOrientation );
 
 				// NDebugOverlay::Box( m_vecDesiredPosition, Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0,255,0, false, 30.0);
 			}
@@ -953,7 +953,7 @@ void CBaseHelicopter::FlyPathCorners( void )
 	else
 	{
 		// If we can't find a new target, just stay where we are.
-		m_vecDesiredPosition = GetAbsOrigin();
+		m_vecDesiredPosition = GetEngineObject()->GetAbsOrigin();
 	}
 
 }
@@ -983,11 +983,11 @@ void CBaseHelicopter::UpdatePlayerDopplerShift( )
 		pPlayer = gEntList.FindEntityByName( NULL, "!player" );
 		if (pPlayer)
 		{
-			Vector dir = pPlayer->GetLocalOrigin() - GetLocalOrigin();
+			Vector dir = pPlayer->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin();
 			VectorNormalize(dir);
 
-			float velReceiver = -DotProduct( pPlayer->GetAbsVelocity(), dir );
-			float velTransmitter = -DotProduct( GetAbsVelocity(), dir );
+			float velReceiver = -DotProduct( pPlayer->GetEngineObject()->GetAbsVelocity(), dir );
+			float velTransmitter = -DotProduct(GetEngineObject()->GetAbsVelocity(), dir );
 			// speed of sound == 13049in/s
 			int iPitch = 100 * ((1 - velReceiver / 13049) / (1 + velTransmitter / 13049));
 
@@ -1030,7 +1030,7 @@ void CBaseHelicopter::Flight( void )
 
 	// estimate where I'll be facing in one seconds
 	Vector forward, right, up;
-	AngleVectors( GetLocalAngles() + GetLocalAngularVelocity() * 2, &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetLocalAngles() + GetLocalAngularVelocity() * 2, &forward, &right, &up );
 
 	QAngle angVel = GetLocalAngularVelocity();
 	float flSide = DotProduct( m_vecDesiredFaceDir, right );
@@ -1060,11 +1060,11 @@ void CBaseHelicopter::Flight( void )
 	angVel.y *= ( 0.98 ); // why?! (sjb)
 
 	// estimate where I'll be in two seconds
-	AngleVectors( GetLocalAngles() + angVel, NULL, NULL, &up );
-	Vector vecEst = GetAbsOrigin() + GetAbsVelocity() * 2.0 + up * m_flForce * 20 - Vector( 0, 0, 384 * 2 );
+	AngleVectors(GetEngineObject()->GetLocalAngles() + angVel, NULL, NULL, &up );
+	Vector vecEst = GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 2.0 + up * m_flForce * 20 - Vector( 0, 0, 384 * 2 );
 
 	// add immediate force
-	AngleVectors( GetLocalAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, &right, &up );
 	
 	Vector vecImpulse( 0, 0, 0 );
 	vecImpulse.x += up.x * m_flForce;
@@ -1075,8 +1075,8 @@ void CBaseHelicopter::Flight( void )
 	vecImpulse.z -= 38.4; // 32ft/sec
 	ApplyAbsVelocityImpulse( vecImpulse );
 
-	float flSpeed = GetAbsVelocity().Length();
-	float flDir = DotProduct( Vector( forward.x, forward.y, 0 ), Vector( GetAbsVelocity().x, GetAbsVelocity().y, 0 ) );
+	float flSpeed = GetEngineObject()->GetAbsVelocity().Length();
+	float flDir = DotProduct( Vector( forward.x, forward.y, 0 ), Vector(GetEngineObject()->GetAbsVelocity().x, GetEngineObject()->GetAbsVelocity().y, 0 ) );
 	if (flDir < 0)
 	{
 		flSpeed = -flSpeed;
@@ -1092,14 +1092,14 @@ void CBaseHelicopter::Flight( void )
 	// fly sideways
 	if (flSlip > 0)
 	{
-		if (GetLocalAngles().z > -30 && angVel.z > -15)
+		if (GetEngineObject()->GetLocalAngles().z > -30 && angVel.z > -15)
 			angVel.z -= 4;
 		else
 			angVel.z += 2;
 	}
 	else
 	{
-		if (GetLocalAngles().z < 30 && angVel.z < 15)
+		if (GetEngineObject()->GetLocalAngles().z < 30 && angVel.z < 15)
 			angVel.z += 4;
 		else
 			angVel.z -= 2;
@@ -1157,7 +1157,7 @@ void CBaseHelicopter::Flight( void )
 		angVel.x -= 2.0;
 	}
 #else
-	m_angleVelocity = GetLocalAngles().x + angVel.x;
+	m_angleVelocity = GetEngineObject()->GetLocalAngles().x + angVel.x;
 	float angleX = angVel.x;
 
 //	Msg("AngVel %f, %f\n", m_angleVelocity, flDist);
@@ -1258,7 +1258,7 @@ void CBaseHelicopter::FlyTouch( CBaseEntity *pOther )
 		const trace_t &tr = CBaseEntity::GetTouchTrace( );
 
 		// UNDONE, do a real bounce
-		ApplyAbsVelocityImpulse( tr.plane.normal * (GetAbsVelocity().Length() + 200) );
+		ApplyAbsVelocityImpulse( tr.plane.normal * (GetEngineObject()->GetAbsVelocity().Length() + 200) );
 	}
 }
 
@@ -1276,10 +1276,10 @@ void CBaseHelicopter::CrashTouch( CBaseEntity *pOther )
 		SetTouch( NULL );
 		SetNextThink( gpGlobals->curtime );
 
-		CPASFilter filter( GetAbsOrigin() );
+		CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 		for (int i = 0; i < 5; i++)
 		{
-			Vector pos = GetAbsOrigin();
+			Vector pos = GetEngineObject()->GetAbsOrigin();
 
 			pos.x += random->RandomFloat( -150, 150 );
 			pos.y += random->RandomFloat( -150, 150 );
@@ -1345,7 +1345,7 @@ void CBaseHelicopter::DrawDebugGeometryOverlays(void)
 		// ------------------------------
 		if (m_debugOverlays & OVERLAY_NPC_ROUTE_BIT)
 		{
-			NDebugOverlay::Line(GetAbsOrigin(), m_vecDesiredPosition, 0,0,255, true, 0);
+			NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), m_vecDesiredPosition, 0,0,255, true, 0);
 		}
 	}
 	BaseClass::DrawDebugGeometryOverlays();
@@ -1468,8 +1468,8 @@ void CBaseHelicopter::ChangePathCorner( const char *pszName )
 		// I don't think we need to do this. The FLIGHT() code will do it for us (sjb)
 		if (GetGoalEnt())
 		{
-			m_vecDesiredPosition = GetGoalEnt()->GetLocalOrigin();
-			AngleVectors( GetGoalEnt()->GetLocalAngles(), &m_vecGoalOrientation );
+			m_vecDesiredPosition = GetGoalEnt()->GetEngineObject()->GetLocalOrigin();
+			AngleVectors( GetGoalEnt()->GetEngineObject()->GetLocalAngles(), &m_vecGoalOrientation );
 		}
 	}
 }
@@ -1510,11 +1510,11 @@ void CBaseHelicopter::InputActivate( inputdata_t &inputdata )
 
 void CBaseHelicopter::ApplySidewaysDrag( const Vector &vecRight )
 {
-	Vector vecNewVelocity = GetAbsVelocity();
+	Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 	vecNewVelocity.x *= 1.0 - fabs( vecRight.x ) * 0.05;
 	vecNewVelocity.y *= 1.0 - fabs( vecRight.y ) * 0.05;
 	vecNewVelocity.z *= 1.0 - fabs( vecRight.z ) * 0.05;
-	SetAbsVelocity( vecNewVelocity );
+	GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 }
 
 
@@ -1525,9 +1525,9 @@ void CBaseHelicopter::ApplySidewaysDrag( const Vector &vecRight )
 //-----------------------------------------------------------------------------
 void CBaseHelicopter::ApplyGeneralDrag( void )
 {
-	Vector vecNewVelocity = GetAbsVelocity();
+	Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 	vecNewVelocity *= 0.995;
-	SetAbsVelocity( vecNewVelocity );
+	GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 }
 	
 

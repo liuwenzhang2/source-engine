@@ -111,7 +111,7 @@ public:
 			ep.m_pSoundName =  "Weapon_Crossbow.BoltSkewer";
 			ep.m_flVolume = 1.0f;
 			ep.m_SoundLevel = SNDLVL_NORM;
-			ep.m_pOrigin = &pEnt->GetAbsOrigin();
+			ep.m_pOrigin = &pEnt->GetEngineObject()->GetAbsOrigin();
 
 			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );//C_BaseEntity::
 	

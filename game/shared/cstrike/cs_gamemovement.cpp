@@ -379,7 +379,7 @@ void CCSGameMovement::PlayerMove()
 		vHullMin.z = 0.0f;
 		Vector vHullMax = GetPlayerMaxs( player->m_Local.m_bDucked ); 
 
-		Vector start = player->GetAbsOrigin();
+		Vector start = player->GetEngineObject()->GetAbsOrigin();
 		start.z += vHullMax.z;
 		Vector end = start;
 		end.z += eyeClearance - vHullMax.z; 
@@ -398,7 +398,7 @@ void CCSGameMovement::PlayerMove()
 
 		if ( trace.fraction < 1.0f )
 		{
-			float est = start.z + trace.fraction * (end.z - start.z) - player->GetAbsOrigin().z - eyeClearance;
+			float est = start.z + trace.fraction * (end.z - start.z) - player->GetEngineObject()->GetAbsOrigin().z - eyeClearance;
 			if ( ( player->GetFlags() & FL_DUCKING ) == 0 && !player->m_Local.m_bDucking && !player->m_Local.m_bDucked )
 			{
 				offset.z = est;

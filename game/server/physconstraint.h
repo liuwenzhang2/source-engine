@@ -120,7 +120,7 @@ public:
 				Vector pos, posWorld;
 				MatrixPosition( xformRef, pos );
 				pObj->LocalToWorld(&posWorld, pos);
-				SetAbsOrigin(posWorld);
+				GetEngineObject()->SetAbsOrigin(posWorld);
 			}
 		}
 	}

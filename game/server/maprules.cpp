@@ -484,7 +484,7 @@ void CGamePlayerZone::InputCountPlayersInZone( inputdata_t &inputdata )
 				hullType = HULL_SMALL_CENTERED;
 			}
 
-			UTIL_TraceModel( pPlayer->GetAbsOrigin(), pPlayer->GetAbsOrigin(), NAI_Hull::Mins(hullType), 
+			UTIL_TraceModel( pPlayer->GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsOrigin(), NAI_Hull::Mins(hullType),
 				NAI_Hull::Maxs(hullType), this, COLLISION_GROUP_NONE, &trace );
 
 			if ( trace.startsolid )

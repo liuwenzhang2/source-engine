@@ -211,12 +211,12 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 		pHead->CopyAnimationDataFrom( pCorpse );
 
 		pHead->SetMoveType( MOVETYPE_FLYGRAVITY );
-		pHead->SetAbsVelocity( pCorpse->GetAbsVelocity() );
+		pHead->GetEngineObject()->SetAbsVelocity( pCorpse->GetEngineObject()->GetAbsVelocity() );
 		pHead->ClearFlags();
 		pHead->m_nReferencePlayer	= ( pCorpse )->entindex();
 
-		pHead->SetLocalAngles( pCorpse->GetAbsAngles() );
-		UTIL_SetOrigin(pHead, pCorpse->GetAbsOrigin());
+		pHead->GetEngineObject()->SetLocalAngles( pCorpse->GetEngineObject()->GetAbsAngles() );
+		UTIL_SetOrigin(pHead, pCorpse->GetEngineObject()->GetAbsOrigin());
 
 		UTIL_SetSize(pHead, pCorpse->WorldAlignMins(), pCorpse->WorldAlignMaxs());
 		g_pBodyQueueHead = (CCorpse *)pHead->GetOwnerEntity();

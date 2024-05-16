@@ -39,11 +39,11 @@ void C_DODBaseGrenade::PostDataUpdate( DataUpdateType_t type )
 		float changeTime = GetLastChangeTime( LATCH_SIMULATION_VAR );
 
 		// Add a sample 1 second back.
-		Vector vCurOrigin = GetLocalOrigin() - m_vInitialVelocity;
+		Vector vCurOrigin = GetEngineObject()->GetLocalOrigin() - m_vInitialVelocity;
 		interpolator.AddToHead( changeTime - 1.0, &vCurOrigin, false );
 
 		// Add the current sample.
-		vCurOrigin = GetLocalOrigin();
+		vCurOrigin = GetEngineObject()->GetLocalOrigin();
 		interpolator.AddToHead( changeTime, &vCurOrigin, false );
 
 		// BUG ? this may call multiple times
@@ -64,9 +64,9 @@ int C_DODBaseGrenade::DrawModel( int flags )
 
 	C_DODPlayer *pPlayer = C_DODPlayer::GetLocalDODPlayer();
 
-	if ( pPlayer && GetAbsVelocity().Length() < 30 )
+	if ( pPlayer && GetEngineObject()->GetAbsVelocity().Length() < 30 )
 	{
-		pPlayer->CheckGrenadeHint( GetAbsOrigin() );
+		pPlayer->CheckGrenadeHint(GetEngineObject()->GetAbsOrigin() );
 	}
 
 	return BaseClass::DrawModel( flags );

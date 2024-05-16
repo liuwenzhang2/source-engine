@@ -186,7 +186,7 @@ bool CPointAngleSensor::IsFacingWithinTolerance(CBaseEntity *pEntity, CBaseEntit
 	}
 	else
 	{
-		dir = pTarget->GetAbsOrigin() - pEntity->GetAbsOrigin();
+		dir = pTarget->GetEngineObject()->GetAbsOrigin() - pEntity->GetEngineObject()->GetAbsOrigin();
 		VectorNormalize(dir);
 	}
 		
@@ -543,7 +543,7 @@ void CPointProximitySensor::Think( void )
 {
 	if ( m_hTargetEntity != NULL )
 	{
-		Vector vecTestDir = ( m_hTargetEntity->GetAbsOrigin() - GetAbsOrigin() );
+		Vector vecTestDir = ( m_hTargetEntity->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 		float flDist = VectorNormalize( vecTestDir );
 
 		// If we're only interested in the distance along a vector, modify the length the accomodate that

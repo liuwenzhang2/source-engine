@@ -115,7 +115,7 @@ void CEnvPortalPathTrack::InitTrackFX()
 
 	if ( m_pnext )
 	{
-		m_pBeam->PointEntInit( GetAbsOrigin(), m_pnext );							//Set up the beam to draw from its center to it's next track.
+		m_pBeam->PointEntInit(GetEngineObject()->GetAbsOrigin(), m_pnext );							//Set up the beam to draw from its center to it's next track.
 	}
 	
 	ActivateTrackFX();																//Set prettiness

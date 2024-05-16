@@ -119,7 +119,7 @@ void C_MovieExplosion::Start(CParticleMgr *pParticleMgr, IPrototypeArgAccess *pA
 		MovieExplosionEmitter *pEmitter = &m_Emitters[iEmitter];
 		pEmitter->m_Velocity = RandomVector(-1, 1) * 200;
 
-		pEmitter->m_Pos = GetAbsOrigin();
+		pEmitter->m_Pos = GetEngineObject()->GetAbsOrigin();
 			
 		pEmitter->m_Lifetime = 0;
 		pEmitter->m_ParticleSpawn.Init(15);

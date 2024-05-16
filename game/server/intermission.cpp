@@ -28,7 +28,7 @@ void CInfoIntermission::Spawn( void )
 {
 	SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 	SetNextThink( gpGlobals->curtime + 2 );// let targets spawn !
 }
 
@@ -41,11 +41,11 @@ void CInfoIntermission::Think ( void )
 
 	if ( pTarget )
 	{
-		Vector dir = pTarget->GetLocalOrigin() - GetLocalOrigin();
+		Vector dir = pTarget->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin();
 		VectorNormalize( dir );
 		QAngle angles;
 		VectorAngles( dir, angles );
-		SetLocalAngles( angles );
+		GetEngineObject()->SetLocalAngles( angles );
 	}
 }
 

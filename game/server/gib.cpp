@@ -49,7 +49,7 @@ END_DATADESC()
 // HACKHACK -- The gib velocity equations don't work
 void CGib::LimitVelocity( void )
 {
-	Vector vecNewVelocity = GetAbsVelocity();
+	Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 	float length = VectorNormalize( vecNewVelocity );
 
 	// ceiling at 1500.  The gib velocity equation is not bounded properly.  Rather than tune it
@@ -57,7 +57,7 @@ void CGib::LimitVelocity( void )
 	if ( length > 1500.0 )
 	{
 		vecNewVelocity *= 1500;		// This should really be sv_maxvelocity * 0.75 or something
-		SetAbsVelocity( vecNewVelocity );
+		GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 	}
 }
 
@@ -81,7 +81,7 @@ void CGib::SpawnStickyGibs( CBaseEntity *pVictim, Vector vecOrigin, int cGibs )
 
 		if ( pVictim )
 		{
-			pGib->SetLocalOrigin(
+			pGib->GetEngineObject()->SetLocalOrigin(
 				Vector( vecOrigin.x + random->RandomFloat( -3, 3 ),
 						vecOrigin.y + random->RandomFloat( -3, 3 ),
 						vecOrigin.z + random->RandomFloat( -3, 3 ) ) );
@@ -103,7 +103,7 @@ void CGib::SpawnStickyGibs( CBaseEntity *pVictim, Vector vecOrigin, int cGibs )
 			pGib->SetBloodColor( pVictim->BloodColor() );
 		
 			pGib->AdjustVelocityBasedOnHealth( pVictim->m_iHealth, vecNewVelocity );
-			pGib->SetAbsVelocity( vecNewVelocity );
+			pGib->GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 			
 			pGib->SetMoveType( MOVETYPE_FLYGRAVITY );
 			pGib->RemoveSolidFlags( FSOLID_NOT_SOLID );
@@ -132,9 +132,9 @@ void CGib::SpawnHeadGib( CBaseEntity *pVictim )
 
 	if ( pVictim )
 	{
-		Vector vecNewVelocity = pGib->GetAbsVelocity();
+		Vector vecNewVelocity = pGib->GetEngineObject()->GetAbsVelocity();
 
-		pGib->SetLocalOrigin( pVictim->EyePosition() );
+		pGib->GetEngineObject()->SetLocalOrigin( pVictim->EyePosition() );
 		
 		CBaseEntity *pentPlayer = UTIL_FindClientInPVS( pGib );
 		
@@ -144,7 +144,7 @@ void CGib::SpawnHeadGib( CBaseEntity *pVictim )
 			CBasePlayer *player = (CBasePlayer *)pentPlayer;
 			if ( player )
 			{
-				vecNewVelocity = ( player->EyePosition() ) - pGib->GetAbsOrigin();
+				vecNewVelocity = ( player->EyePosition() ) - pGib->GetEngineObject()->GetAbsOrigin();
 				VectorNormalize(vecNewVelocity);
 				vecNewVelocity *= 300;
 				vecNewVelocity.z += 100;
@@ -163,7 +163,7 @@ void CGib::SpawnHeadGib( CBaseEntity *pVictim )
 		// copy owner's blood color
 		pGib->SetBloodColor( pVictim->BloodColor() );
 		pGib->AdjustVelocityBasedOnHealth( pVictim->m_iHealth, vecNewVelocity );
-		pGib->SetAbsVelocity( vecNewVelocity );
+		pGib->GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 	}
 	pGib->LimitVelocity();
 }
@@ -214,7 +214,7 @@ void CGib::InitGib( CBaseEntity *pVictim, float fMinVelocity, float fMaxVelocity
 		Vector vecOrigin;
 		pVictim->CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &vecOrigin );
 		vecOrigin.z += 1.0f;
-		SetAbsOrigin( vecOrigin );	
+		GetEngineObject()->SetAbsOrigin( vecOrigin );
 
 		// make the gib fly away from the attack vector
 		Vector vecNewVelocity =	 g_vecAttackDir * -1;
@@ -251,7 +251,7 @@ void CGib::InitGib( CBaseEntity *pVictim, float fMinVelocity, float fMaxVelocity
 		{
 			SetSolid( SOLID_BBOX );
 			SetCollisionBounds( vec3_origin, vec3_origin );
-			SetAbsVelocity( vecNewVelocity );
+			GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 		}
 	
 		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
@@ -340,7 +340,7 @@ void CGib::WaitTillLand ( void )
 		return;
 	}
 
-	if ( GetAbsVelocity() == vec3_origin )
+	if (GetEngineObject()->GetAbsVelocity() == vec3_origin )
 	{
 		SetRenderColorA( 255 );
 		m_nRenderMode = kRenderTransTexture;
@@ -512,11 +512,11 @@ void CGib::BounceGibTouch ( CBaseEntity *pOther )
 	//	return;// don't bleed everytime
 	if (GetFlags() & FL_ONGROUND)
 	{
-		SetAbsVelocity( GetAbsVelocity() * 0.9 );
-		QAngle angles = GetLocalAngles();
+		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.9 );
+		QAngle angles = GetEngineObject()->GetLocalAngles();
 		angles.x = 0;
 		angles.z = 0;
-		SetLocalAngles( angles );
+		GetEngineObject()->SetLocalAngles( angles );
 
 		QAngle angVel = GetLocalAngularVelocity();
 		angVel.x = 0;
@@ -527,7 +527,7 @@ void CGib::BounceGibTouch ( CBaseEntity *pOther )
 	{
 		if ( g_Language.GetInt() != LANGUAGE_GERMAN && m_cBloodDecals > 0 && m_bloodColor != DONT_BLEED )
 		{
-			vecSpot = GetAbsOrigin() + Vector ( 0 , 0 , 8 );//move up a bit, and trace down.
+			vecSpot = GetEngineObject()->GetAbsOrigin() + Vector ( 0 , 0 , 8 );//move up a bit, and trace down.
 			UTIL_TraceLine ( vecSpot, vecSpot + Vector ( 0, 0, -24 ),  MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 
 			UTIL_BloodDecalTrace( &tr, m_bloodColor );
@@ -538,7 +538,7 @@ void CGib::BounceGibTouch ( CBaseEntity *pOther )
 		if ( m_material != matNone && random->RandomInt(0,2) == 0 )
 		{
 			float volume;
-			float zvel = fabs(GetAbsVelocity().z);
+			float zvel = fabs(GetEngineObject()->GetAbsVelocity().z);
 		
 			volume = 0.8f * MIN(1.0, ((float)zvel) / 450.0f);
 
@@ -564,15 +564,15 @@ void CGib::StickyGibTouch ( CBaseEntity *pOther )
 		return;
 	}
 
-	UTIL_TraceLine ( GetAbsOrigin(), GetAbsOrigin() + GetAbsVelocity() * 32,  MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
+	UTIL_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 32,  MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 
 	UTIL_BloodDecalTrace( &tr, m_bloodColor );
 
 	Vector vecForward = tr.plane.normal * -1;
 	QAngle angles;
 	VectorAngles( vecForward, angles );
-	SetLocalAngles( angles );
-	SetAbsVelocity( vec3_origin ); 
+	GetEngineObject()->SetLocalAngles( angles );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetLocalAngularVelocity( vec3_angle );
 	SetMoveType( MOVETYPE_NONE );
 }
@@ -636,7 +636,7 @@ CBaseEntity *CreateRagGib( const char *szModel, const Vector &vecOrigin, const Q
 
 	pGib = (CRagGib*)gEntList.CreateEntityByName( "raggib" );
 
-	pGib->SetLocalAngles( vecAngles );
+	pGib->GetEngineObject()->SetLocalAngles( vecAngles );
 
 	if ( !pGib )
 	{

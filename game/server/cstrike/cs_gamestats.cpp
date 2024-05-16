@@ -992,9 +992,9 @@ void CCSGameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity 
 
 			if ( pC4->IsBombActive() )
 			{
-				Vector bombPos = pC4->GetAbsOrigin();
-				Vector victimToBomb = pPlayerVictim->GetAbsOrigin() - bombPos;
-				Vector attackerToBomb = pPlayerAttacker->GetAbsOrigin() - bombPos;
+				Vector bombPos = pC4->GetEngineObject()->GetAbsOrigin();
+				Vector victimToBomb = pPlayerVictim->GetEngineObject()->GetAbsOrigin() - bombPos;
+				Vector attackerToBomb = pPlayerAttacker->GetEngineObject()->GetAbsOrigin() - bombPos;
 				if (victimToBomb.LengthSqr() < bombCheckDistSq || attackerToBomb.LengthSqr() < bombCheckDistSq)
 				{
 					IncrementStat(pPlayerAttacker, CSSTAT_KILLS_WHILE_DEFENDING_BOMB, 1);
@@ -1048,7 +1048,7 @@ void CCSGameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity 
 		if ( bUsingSniper && pPlayerAttacker->GetFOV() != pPlayerAttacker->GetDefaultFOV() )
 		{
 			// Get our position
-			 Vector position = pPlayerAttacker->GetAbsOrigin();
+			 Vector position = pPlayerAttacker->GetEngineObject()->GetAbsOrigin();
 			 int userid = pPlayerAttacker->GetUserID();
 
 			 bool bFoundPlayerEntry = false;

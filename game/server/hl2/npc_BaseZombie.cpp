@@ -278,7 +278,7 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 		return false;
 	}
 
-	vecDirToEnemy = GetEnemy()->GetAbsOrigin() - GetAbsOrigin();
+	vecDirToEnemy = GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	float dist = VectorNormalize(vecDirToEnemy);
 	vecDirToEnemy.z = 0;
 
@@ -321,7 +321,7 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 
 	CZombieSwatEntitiesEnum swatEnum( pList, ZOMBIE_PHYSICS_SEARCH_DEPTH, iMaxMass );
 
-	int count = UTIL_EntitiesInBox( GetAbsOrigin() - vecDelta, GetAbsOrigin() + vecDelta, &swatEnum );
+	int count = UTIL_EntitiesInBox(GetEngineObject()->GetAbsOrigin() - vecDelta, GetEngineObject()->GetAbsOrigin() + vecDelta, &swatEnum );
 
 	// magically know where they are
 	Vector vecZombieKnees;
@@ -334,20 +334,20 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 		Assert( !( !pPhysObj || pPhysObj->GetMass() > iMaxMass || !pPhysObj->IsAsleep() ) );
 
 		Vector center = pList[ i ]->WorldSpaceCenter();
-		flDist = UTIL_DistApprox2D( GetAbsOrigin(), center );
+		flDist = UTIL_DistApprox2D(GetEngineObject()->GetAbsOrigin(), center );
 
 		if( flDist >= flNearestDist )
 			continue;
 
 		// This object is closer... but is it between the player and the zombie?
-		vecDirToObject = pList[ i ]->WorldSpaceCenter() - GetAbsOrigin();
+		vecDirToObject = pList[ i ]->WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin();
 		VectorNormalize(vecDirToObject);
 		vecDirToObject.z = 0;
 
 		if( DotProduct( vecDirToEnemy, vecDirToObject ) < 0.8 )
 			continue;
 
-		if( flDist >= UTIL_DistApprox2D( center, GetEnemy()->GetAbsOrigin() ) )
+		if( flDist >= UTIL_DistApprox2D( center, GetEnemy()->GetEngineObject()->GetAbsOrigin() ) )
 			continue;
 
 		// don't swat things where the highest point is under my knees
@@ -362,7 +362,7 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 		vcollide_t *pCollide = modelinfo->GetVCollide( pList[i]->GetModelIndex() );
 		
 		Vector objMins, objMaxs;
-		physcollision->CollideGetAABB( &objMins, &objMaxs, pCollide->solids[0], pList[i]->GetAbsOrigin(), pList[i]->GetAbsAngles() );
+		physcollision->CollideGetAABB( &objMins, &objMaxs, pCollide->solids[0], pList[i]->GetEngineObject()->GetAbsOrigin(), pList[i]->GetEngineObject()->GetAbsAngles() );
 
 		if ( objMaxs.z < vecZombieKnees.z )
 			continue;
@@ -514,7 +514,7 @@ bool CNPC_BaseZombie::OverrideMoveFacing( const AILocalMoveGoal_t &move, float f
 
 	// find movement direction to compensate for not being turned far enough
 	float fSequenceMoveYaw = GetSequenceMoveYaw( GetSequence() );
-	float flDiff = UTIL_AngleDiff( flMoveYaw, GetLocalAngles().y + fSequenceMoveYaw );
+	float flDiff = UTIL_AngleDiff( flMoveYaw, GetEngineObject()->GetLocalAngles().y + fSequenceMoveYaw );
 	SetPoseParameter( m_poseMove_Yaw, GetPoseParameter( m_poseMove_Yaw ) + flDiff );
 
 	return true;
@@ -663,7 +663,7 @@ float CNPC_BaseZombie::GetHitgroupDamageMultiplier( int iHitGroup, const CTakeDa
 
 				if( info.GetAttacker() )
 				{
-					flDist = ( GetAbsOrigin() - info.GetAttacker()->GetAbsOrigin() ).Length();
+					flDist = (GetEngineObject()->GetAbsOrigin() - info.GetAttacker()->GetEngineObject()->GetAbsOrigin() ).Length();
 				}
 
 				if( flDist <= ZOMBIE_BUCKSHOT_TRIPLE_DAMAGE_DIST )
@@ -1119,7 +1119,7 @@ void CNPC_BaseZombie::DieChopped( const CTakeDamageInfo &info )
 		vecLegsForce.z *= -10;
 	}
 
-	CBaseEntity *pLegGib = CreateRagGib( GetLegsModel(), GetAbsOrigin(), GetAbsAngles(), vecLegsForce, flFadeTime, ShouldIgniteZombieGib() );
+	CBaseEntity *pLegGib = CreateRagGib( GetLegsModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), vecLegsForce, flFadeTime, ShouldIgniteZombieGib() );
 	if ( pLegGib )
 	{
 		CopyRenderColorTo( pLegGib );
@@ -1136,9 +1136,9 @@ void CNPC_BaseZombie::DieChopped( const CTakeDamageInfo &info )
 
 	// Why do I have to fix this up?! (sjb)
 	QAngle TorsoAngles;
-	TorsoAngles = GetAbsAngles();
+	TorsoAngles = GetEngineObject()->GetAbsAngles();
 	TorsoAngles.x -= 90.0f;
-	CBaseEntity *pTorsoGib = CreateRagGib( GetTorsoModel(), GetAbsOrigin() + Vector( 0, 0, 64 ), TorsoAngles, forceVector, flFadeTime, ShouldIgniteZombieGib() );
+	CBaseEntity *pTorsoGib = CreateRagGib( GetTorsoModel(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 64 ), TorsoAngles, forceVector, flFadeTime, ShouldIgniteZombieGib() );
 	if ( pTorsoGib )
 	{
 		CBaseAnimating *pAnimating = dynamic_cast<CBaseAnimating*>(pTorsoGib);
@@ -1327,7 +1327,7 @@ CBaseEntity *CNPC_BaseZombie::ClawAttack( float flDist, int iDamage, QAngle &qaV
 	{ 
 		// We always hit bullseyes we're targeting
 		pHurt = GetEnemy();
-		CTakeDamageInfo info( this, this, vec3_origin, GetAbsOrigin(), iDamage, DMG_SLASH );
+		CTakeDamageInfo info( this, this, vec3_origin, GetEngineObject()->GetAbsOrigin(), iDamage, DMG_SLASH );
 		pHurt->TakeDamage( info );
 	}
 	else 
@@ -1350,7 +1350,7 @@ CBaseEntity *CNPC_BaseZombie::ClawAttack( float flDist, int iDamage, QAngle &qaV
 
 		vForce *= 5 * 24;
 
-		CTakeDamageInfo info( this, this, vForce, GetAbsOrigin(), iDamage, DMG_SLASH );
+		CTakeDamageInfo info( this, this, vForce, GetEngineObject()->GetAbsOrigin(), iDamage, DMG_SLASH );
 		pHurt->TakeDamage( info );
 
 		pHurt = m_hPhysicsEnt;
@@ -1606,7 +1606,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ZOMBIE_ATTACK_RIGHT )
 	{
 		Vector right, forward;
-		AngleVectors( GetLocalAngles(), &forward, &right, NULL );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, &right, NULL );
 		
 		right = right * 100;
 		forward = forward * 200;
@@ -1620,7 +1620,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ZOMBIE_ATTACK_LEFT )
 	{
 		Vector right, forward;
-		AngleVectors( GetLocalAngles(), &forward, &right, NULL );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, &right, NULL );
 
 		right = right * -100;
 		forward = forward * 200;
@@ -1635,7 +1635,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 	{
 		Vector forward;
 		QAngle qaPunch( 45, random->RandomInt(-5,5), random->RandomInt(-5,5) );
-		AngleVectors( GetLocalAngles(), &forward );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), &forward );
 		forward = forward * 200;
 		ClawAttack( GetClawAttackRange(), sk_zombie_dmg_one_slash.GetFloat(), qaPunch, forward, ZOMBIE_BLOOD_BOTH_HANDS );
 		return;
@@ -1915,7 +1915,7 @@ int CNPC_BaseZombie::SelectSchedule ( void )
 		{
 			float flDist;
 
-			flDist = ( GetLocalOrigin() - GetEnemy()->GetLocalOrigin() ).Length();
+			flDist = (GetEngineObject()->GetLocalOrigin() - GetEnemy()->GetEngineObject()->GetLocalOrigin() ).Length();
 
 			// If this is a new enemy that's far away, ambush!!
 			if (flDist >= zombie_ambushdist.GetFloat() && MustCloseToAttack() )
@@ -2001,9 +2001,9 @@ int CNPC_BaseZombie::GetSwatActivity( void )
 	float		flDot;
 	Vector		vecRight, vecDirToObj;
 
-	AngleVectors( GetLocalAngles(), NULL, &vecRight, NULL );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), NULL, &vecRight, NULL );
 	
-	vecDirToObj = m_hPhysicsEnt->GetLocalOrigin() - GetLocalOrigin();
+	vecDirToObj = m_hPhysicsEnt->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin();
 	VectorNormalize(vecDirToObj);
 
 	// compare in 2D.
@@ -2122,7 +2122,7 @@ void CNPC_BaseZombie::StartTask( const Task_t *pTask )
 			Vector vecGoalPos;
 			Vector vecDir;
 
-			vecDir = GetLocalOrigin() - m_hPhysicsEnt->GetLocalOrigin();
+			vecDir = GetEngineObject()->GetLocalOrigin() - m_hPhysicsEnt->GetEngineObject()->GetLocalOrigin();
 			VectorNormalize(vecDir);
 			vecDir.z = 0;
 
@@ -2167,7 +2167,7 @@ void CNPC_BaseZombie::StartTask( const Task_t *pTask )
 			Vector vecForward;
 			Vector vecVelocity;
 
-			AngleVectors( GetAbsAngles(), &vecForward );
+			AngleVectors(GetEngineObject()->GetAbsAngles(), &vecForward );
 			
 			vecVelocity = vecForward * 30;
 			vecVelocity.z += 100;
@@ -2268,9 +2268,9 @@ void CNPC_BaseZombie::BecomeTorso( const Vector &vecTorsoForce, const Vector &ve
 
 		// Put the torso up where the torso was when the zombie
 		// was whole.
-		Vector origin = GetAbsOrigin();
+		Vector origin = GetEngineObject()->GetAbsOrigin();
 		origin.z += 40;
-		SetAbsOrigin( origin );
+		GetEngineObject()->SetAbsOrigin( origin );
 
 		SetGroundEntity( NULL );
 		// assume zombie mass ~ 100 kg
@@ -2287,7 +2287,7 @@ void CNPC_BaseZombie::BecomeTorso( const Vector &vecTorsoForce, const Vector &ve
 	if ( m_fIsTorso == true )
 	{
 		// -40 on Z to make up for the +40 on Z that we did above. This stops legs spawning above the head.
-		CBaseEntity *pGib = CreateRagGib( GetLegsModel(), GetAbsOrigin() - Vector(0, 0, 40), GetAbsAngles(), vecLegsForce, flFadeTime );
+		CBaseEntity *pGib = CreateRagGib( GetLegsModel(), GetEngineObject()->GetAbsOrigin() - Vector(0, 0, 40), GetEngineObject()->GetAbsAngles(), vecLegsForce, flFadeTime );
 
 		// don't collide with this thing ever
 		if ( pGib )
@@ -2371,7 +2371,7 @@ bool CNPC_BaseZombie::ShouldPlayFootstepMoan( void )
 //-----------------------------------------------------------------------------
 bool CNPC_BaseZombie::HeadcrabFits( CBaseAnimating *pCrab )
 {
-	Vector vecSpawnLoc = pCrab->GetAbsOrigin();
+	Vector vecSpawnLoc = pCrab->GetEngineObject()->GetAbsOrigin();
 
 	CTraceFilterSimpleList traceFilter( COLLISION_GROUP_NONE );
 	traceFilter.AddEntityToIgnore( pCrab );
@@ -2423,7 +2423,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 	if( fRagdollCrab )
 	{
 		//Vector vecForce = Vector( 0, 0, random->RandomFloat( 700, 1100 ) );
-		CBaseEntity *pGib = CreateRagGib( GetHeadcrabModel(), vecOrigin, GetLocalAngles(), vecVelocity, 15, ShouldIgniteZombieGib() );
+		CBaseEntity *pGib = CreateRagGib( GetHeadcrabModel(), vecOrigin, GetEngineObject()->GetLocalAngles(), vecVelocity, 15, ShouldIgniteZombieGib() );
 
 		if ( pGib )
 		{
@@ -2485,11 +2485,11 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 		// make me the crab's owner to avoid collision issues
 		pCrab->SetOwnerEntity( this );
 
-		pCrab->SetAbsOrigin( vecSpot );
-		pCrab->SetAbsAngles( GetAbsAngles() );
+		pCrab->GetEngineObject()->SetAbsOrigin( vecSpot );
+		pCrab->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 		DispatchSpawn( pCrab );
 
-		pCrab->GetMotor()->SetIdealYaw( GetAbsAngles().y );
+		pCrab->GetMotor()->SetIdealYaw(GetEngineObject()->GetAbsAngles().y );
 
 		// FIXME: npc's with multiple headcrabs will need some way to query different attachments.
 		// NOTE: this has till after spawn is called so that the model is set up
@@ -2497,12 +2497,12 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 		if (iCrabAttachment > 0)
 		{
 			SetHeadcrabSpawnLocation( iCrabAttachment, pCrab );
-			pCrab->GetMotor()->SetIdealYaw( pCrab->GetAbsAngles().y );
+			pCrab->GetMotor()->SetIdealYaw( pCrab->GetEngineObject()->GetAbsAngles().y );
 			
 			// Take out any pitch
-			QAngle angles = pCrab->GetAbsAngles();
+			QAngle angles = pCrab->GetEngineObject()->GetAbsAngles();
 			angles.x = 0.0;
-			pCrab->SetAbsAngles( angles );
+			pCrab->GetEngineObject()->SetAbsAngles( angles );
 		}
 
 		if( !HeadcrabFits(pCrab) )
@@ -2514,7 +2514,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 		pCrab->SetActivity( ACT_IDLE );
 		pCrab->SetNextThink( gpGlobals->curtime );
 		pCrab->PhysicsSimulate();
-		pCrab->SetAbsVelocity( vecVelocity );
+		pCrab->GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 		// if I have an enemy, stuff that to the headcrab.
 		CBaseEntity *pEnemy;
@@ -2558,8 +2558,8 @@ void CNPC_BaseZombie::SetHeadcrabSpawnLocation( int iCrabAttachment, CBaseAnimat
 	GetAttachment( iCrabAttachment, attachmentToWorld );
 
 	// find offset of root bone from origin 
-	pCrab->SetAbsOrigin( Vector( 0, 0, 0 ) );
-	pCrab->SetAbsAngles( QAngle( 0, 0, 0 ) );
+	pCrab->GetEngineObject()->SetAbsOrigin( Vector( 0, 0, 0 ) );
+	pCrab->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 	pCrab->InvalidateBoneCache();
 	matrix3x4_t rootLocal;
 	pCrab->GetBoneTransform( 0, rootLocal );
@@ -2576,12 +2576,12 @@ void CNPC_BaseZombie::SetHeadcrabSpawnLocation( int iCrabAttachment, CBaseAnimat
 	Vector vecOrigin;
 	QAngle vecAngles;
 	MatrixAngles( spawnOrigin, vecAngles, vecOrigin );
-	pCrab->SetAbsOrigin( vecOrigin );
+	pCrab->GetEngineObject()->SetAbsOrigin( vecOrigin );
 	
 	// FIXME: head crabs don't like pitch or roll!
 	vecAngles.z = 0;
 
-	pCrab->SetAbsAngles( vecAngles );
+	pCrab->GetEngineObject()->SetAbsAngles( vecAngles );
 	pCrab->InvalidateBoneCache();
 }
 
@@ -2597,7 +2597,7 @@ float CNPC_BaseZombie::DistToPhysicsEnt( void )
 {
 	//return ( GetLocalOrigin() - m_hPhysicsEnt->GetLocalOrigin() ).Length();
 	if ( m_hPhysicsEnt != NULL )
-		return UTIL_DistApprox2D( GetAbsOrigin(), m_hPhysicsEnt->WorldSpaceCenter() );
+		return UTIL_DistApprox2D(GetEngineObject()->GetAbsOrigin(), m_hPhysicsEnt->WorldSpaceCenter() );
 	return ZOMBIE_PHYSOBJ_SWATDIST + 1;
 }
 
@@ -2670,7 +2670,7 @@ Vector CNPC_BaseZombie::BodyTarget( const Vector &posSrc, bool bNoisy )
 		// This zombie is assumed to be standing up. 
 		// Return a position that's centered over the absorigin,
 		// halfway between the origin and the head. 
-		Vector vecTarget = GetAbsOrigin();
+		Vector vecTarget = GetEngineObject()->GetAbsOrigin();
 		Vector vecHead = HeadTarget( posSrc );
 		vecTarget.z = ((vecTarget.z + vecHead.z) * 0.5f);
 		return vecTarget;

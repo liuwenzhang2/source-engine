@@ -281,7 +281,7 @@ public:
 		if ( pOwner == NULL )
 			return NULL;
 
-		CTurretTipController *pController = (CTurretTipController *) Create( "floorturret_tipcontroller", pOwner->GetAbsOrigin(), pOwner->GetAbsAngles() );
+		CTurretTipController *pController = (CTurretTipController *) Create( "floorturret_tipcontroller", pOwner->GetEngineObject()->GetAbsOrigin(), pOwner->GetEngineObject()->GetAbsAngles() );
 
 		if ( pController != NULL )
 		{

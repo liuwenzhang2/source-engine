@@ -87,7 +87,7 @@ bool C_AlyxEmpEffect::SetupEmitters( void )
 	// Setup the attractor emitter
 	if ( m_pAttractorEmitter.IsValid() == false )
 	{
-		m_pAttractorEmitter = CParticleAttractor::Create( GetAbsOrigin(), "energyattractor" );
+		m_pAttractorEmitter = CParticleAttractor::Create(GetEngineObject()->GetAbsOrigin(), "energyattractor" );
 
 		if ( m_pAttractorEmitter.IsValid() == false )
 			return false;
@@ -191,7 +191,7 @@ void C_AlyxEmpEffect::UpdateCharging( float percentage )
 		return;
 
 	// Reset our sort origin
-	m_pSimpleEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pSimpleEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	float flScale = 4.0f * EMP_SCALE * percentage;
 
@@ -202,7 +202,7 @@ void C_AlyxEmpEffect::UpdateCharging( float percentage )
 	while ( m_tParticleSpawn.NextEvent( dTime ) )
 	{
 		// Do the core effects
-		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( EMP_PARTICLES ), GetAbsOrigin() );
+		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( EMP_PARTICLES ), GetEngineObject()->GetAbsOrigin() );
 
 		if ( sParticle == NULL )
 			return;
@@ -290,12 +290,12 @@ void C_AlyxEmpEffect::UpdateDischarging( void )
 		return;
 
 	// Reset our sort origin
-	m_pSimpleEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pSimpleEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	float flScale = EMP_SCALE * 8.0f;
 
 	Vector forward, right, up;
-	AngleVectors( GetAbsAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
 
 	SimpleParticle *sParticle;
 
@@ -304,7 +304,7 @@ void C_AlyxEmpEffect::UpdateDischarging( void )
 	while ( m_tParticleSpawn.NextEvent( dTime ) )
 	{
 		// Base of the core effect
-		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( EMP_PARTICLES ), GetAbsOrigin() );
+		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( EMP_PARTICLES ), GetEngineObject()->GetAbsOrigin() );
 
 		if ( sParticle == NULL )
 			return;
@@ -328,7 +328,7 @@ void C_AlyxEmpEffect::UpdateDischarging( void )
 		sParticle->m_uchEndSize		= 0.0f;
 
 		// Base of the core effect
-		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( EMP_PARTICLES ), GetAbsOrigin() );
+		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( EMP_PARTICLES ), GetEngineObject()->GetAbsOrigin() );
 
 		if ( sParticle == NULL )
 			return;
@@ -355,7 +355,7 @@ void C_AlyxEmpEffect::UpdateDischarging( void )
 		m_pSimpleEmitter->SetParticleCullRadius( sParticle->m_uchEndSize );
 
 		// Do the core effects
-		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( EMP_PARTICLES ), GetAbsOrigin() );
+		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( EMP_PARTICLES ), GetEngineObject()->GetAbsOrigin() );
 
 		if ( sParticle == NULL )
 			return;

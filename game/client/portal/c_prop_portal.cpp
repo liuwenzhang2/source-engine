@@ -509,7 +509,7 @@ void C_Prop_Portal::OnNewParticleEffect( const char *pszParticleName, CNewPartic
 				CProp_Portal *pTempPortal = pPortals[i];
 				if ( pTempPortal != this && pTempPortal->m_bActivated )
 				{
-					Vector vPosition = pTempPortal->GetAbsOrigin();
+					Vector vPosition = pTempPortal->GetEngineObject()->GetAbsOrigin();
 
 					float fDistanceSqr = pNewParticleEffect->GetRenderOrigin().DistToSqr( vPosition );
 
@@ -899,7 +899,7 @@ void C_Prop_Portal::UpdateOriginPlane( void )
 {
 	//setup our origin plane
 	GetEngineObject()->GetVectors( &m_plane_Origin.normal, NULL, NULL );
-	m_plane_Origin.dist = m_plane_Origin.normal.Dot( GetAbsOrigin() );
+	m_plane_Origin.dist = m_plane_Origin.normal.Dot(GetEngineObject()->GetAbsOrigin() );
 	m_plane_Origin.signbits = SignbitsForPlane( &m_plane_Origin );
 
 	Vector vAbsNormal;

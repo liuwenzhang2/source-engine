@@ -2339,7 +2339,7 @@ void CServerGameDLL::InternalEmitCloseCaption(IRecipientFilter& filter, int enti
 				if (!player)
 					continue;
 
-				Vector playerOrigin = player->GetAbsOrigin();
+				Vector playerOrigin = player->GetEngineObject()->GetAbsOrigin();
 
 				if (AttenuateCaption(lowercase, playerOrigin, originlist))
 				{
@@ -2818,7 +2818,7 @@ void CServerGameEnts::MarkEntitiesAsTouching( IServerEntity *e1, IServerEntity *
 		// HACKHACK: UNDONE: Pass in the trace here??!?!?
 		trace_t tr;
 		UTIL_ClearTrace( tr );
-		tr.endpos = (entity->GetAbsOrigin() + entityTouched->GetAbsOrigin()) * 0.5;
+		tr.endpos = (entity->GetEngineObject()->GetAbsOrigin() + entityTouched->GetEngineObject()->GetAbsOrigin()) * 0.5;
 		entity->PhysicsMarkEntitiesAsTouching( entityTouched, tr );
 	}
 }
@@ -3329,7 +3329,7 @@ int TestAreaPortalVisibilityThroughPortals ( CFuncAreaPortalBase* pAreaPortal, I
 			{
 				bool bIsOpenOnClient = true;
 				float fovDistanceAdjustFactor = 1.0f;
-				Vector portalOrg = pLocalPortal->GetAbsOrigin();
+				Vector portalOrg = pLocalPortal->GetEngineObject()->GetAbsOrigin();
 				int iPortalNeedsThisPortalOpen = pAreaPortal->UpdateVisibility( portalOrg, fovDistanceAdjustFactor, bIsOpenOnClient );
 
 				// Stop checking on success, this portal needs to be open

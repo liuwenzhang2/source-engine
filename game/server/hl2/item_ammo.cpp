@@ -834,11 +834,11 @@ void CItem_AmmoCrate::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 
 		CollisionProp()->WorldSpaceAABB( &mins, &maxs );
 
-		Vector vOrigin = GetAbsOrigin();
+		Vector vOrigin = GetEngineObject()->GetAbsOrigin();
 		vOrigin.z += ( maxs.z - mins.z );
-		mins = (mins - GetAbsOrigin()) * 0.2f;
-		maxs = (maxs - GetAbsOrigin()) * 0.2f;
-		mins.z = ( GetAbsOrigin().z - vOrigin.z );  
+		mins = (mins - GetEngineObject()->GetAbsOrigin()) * 0.2f;
+		maxs = (maxs - GetEngineObject()->GetAbsOrigin()) * 0.2f;
+		mins.z = (GetEngineObject()->GetAbsOrigin().z - vOrigin.z );
 		
 		UTIL_TraceHull( vOrigin, vOrigin, mins, maxs, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 
@@ -914,7 +914,7 @@ void CItem_AmmoCrate::HandleAnimEvent( animevent_t *pEvent )
 				CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>(pEntity);
 				if ( pWeapon )
 				{
-					pWeapon->SetAbsOrigin( m_hActivator->GetAbsOrigin() );
+					pWeapon->GetEngineObject()->SetAbsOrigin( m_hActivator->GetEngineObject()->GetAbsOrigin() );
 					pWeapon->m_iPrimaryAmmoType = 0;
 					pWeapon->m_iSecondaryAmmoType = 0;
 					pWeapon->Spawn();

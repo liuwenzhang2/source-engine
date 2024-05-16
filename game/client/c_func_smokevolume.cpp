@@ -323,8 +323,8 @@ void C_FuncSmokeVolume::Update( float fTimeDelta )
 	// Update our world space bbox if we've moved at all.
 	// We do this manually because sometimes people make HUGE bboxes, and if they're constantly changing because their
 	// particles wander outside the current bounds sometimes, it'll be linking them into all the leaves repeatedly.
-	const Vector &curOrigin = GetAbsOrigin();
-	const QAngle &curAngles = GetAbsAngles();
+	const Vector &curOrigin = GetEngineObject()->GetAbsOrigin();
+	const QAngle &curAngles = GetEngineObject()->GetAbsAngles();
 	if ( !VectorsAreEqual( curOrigin, m_vLastOrigin, 0.1 ) || 
 		fabs( curAngles.x - m_vLastAngles.x ) > 0.1 || 
 		fabs( curAngles.y - m_vLastAngles.y ) > 0.1 || 

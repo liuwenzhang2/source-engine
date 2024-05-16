@@ -181,7 +181,7 @@ void CNPC_VehicleDriver::Activate( void )
 	}
 
 	// We've found our vehicle. Move to it and start following it.
-	SetAbsOrigin( m_hVehicleEntity->WorldSpaceCenter() );
+	GetEngineObject()->SetAbsOrigin( m_hVehicleEntity->WorldSpaceCenter() );
 	m_pVehicleInterface->NPC_SetDriver( this );
 
 	RecalculateSpeeds();
@@ -227,8 +227,8 @@ void CNPC_VehicleDriver::PrescheduleThink( void )
 	}
 
 	// Keep up with my vehicle
-	SetAbsOrigin( m_hVehicleEntity->WorldSpaceCenter() );
-	SetAbsAngles( m_hVehicleEntity->GetAbsAngles() );
+	GetEngineObject()->SetAbsOrigin( m_hVehicleEntity->WorldSpaceCenter() );
+	GetEngineObject()->SetAbsAngles( m_hVehicleEntity->GetEngineObject()->GetAbsAngles() );
 
 	BaseClass::PrescheduleThink();
 
@@ -321,7 +321,7 @@ int	CNPC_VehicleDriver::RangeAttack1Conditions( float flDot, float flDist )
 
 	// Don't shoot backwards
 	Vector vecForward;
-	Vector vecToTarget = (GetEnemy()->GetAbsOrigin() - GetAbsOrigin());
+	Vector vecToTarget = (GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin());
 	VectorNormalize(vecToTarget);
 	m_hVehicleEntity->GetVectors( &vecForward, NULL, NULL );
 	float flForwardDot = DotProduct( vecForward, vecToTarget );
@@ -416,10 +416,10 @@ void CNPC_VehicleDriver::StartTask( const Task_t *pTask )
 
 			if ( g_debug_vehicledriver.GetInt() & DRIVER_DEBUG_PATH )
 			{
-				NDebugOverlay::Box( GetGoalEnt()->GetAbsOrigin(), -Vector(50,50,50), Vector(50,50,50), 255,255,255, true, 5);
+				NDebugOverlay::Box( GetGoalEnt()->GetEngineObject()->GetAbsOrigin(), -Vector(50,50,50), Vector(50,50,50), 255,255,255, true, 5);
 			}
 
-	  		AI_NavGoal_t goal( GOALTYPE_PATHCORNER, GetGoalEnt()->GetLocalOrigin(), ACT_WALK, AIN_DEF_TOLERANCE, AIN_YAW_TO_DEST);
+	  		AI_NavGoal_t goal( GOALTYPE_PATHCORNER, GetGoalEnt()->GetEngineObject()->GetLocalOrigin(), ACT_WALK, AIN_DEF_TOLERANCE, AIN_YAW_TO_DEST);
   			if ( !GetNavigator()->SetGoal( goal ) )
    			{
 				TaskFail( FAIL_NO_ROUTE );
@@ -469,7 +469,7 @@ void CNPC_VehicleDriver::RunTask( const Task_t *pTask )
 			if ( pEnemy )
 			{
 				// TODO: Get a bodytarget from the firing point of the gun in the vehicle
-				Vector vecTarget = GetEnemy()->BodyTarget( GetAbsOrigin(), false );
+				Vector vecTarget = GetEnemy()->BodyTarget(GetEngineObject()->GetAbsOrigin(), false );
 				m_pVehicleInterface->NPC_AimPrimaryWeapon( vecTarget );
 				m_pVehicleInterface->NPC_PrimaryFire();
 				TaskComplete();
@@ -489,7 +489,7 @@ void CNPC_VehicleDriver::RunTask( const Task_t *pTask )
 			if ( pEnemy )
 			{
 				// TODO: Get a bodytarget from the firing point of the gun in the vehicle
-				Vector vecTarget = GetEnemy()->BodyTarget( GetAbsOrigin(), false );
+				Vector vecTarget = GetEnemy()->BodyTarget(GetEngineObject()->GetAbsOrigin(), false );
 				m_pVehicleInterface->NPC_AimSecondaryWeapon( vecTarget );
 				m_pVehicleInterface->NPC_SecondaryFire();
 				TaskComplete();
@@ -630,7 +630,7 @@ bool CNPC_VehicleDriver::WaypointReached( void )
 {
 	// We reached our current waypoint.
 	m_vecPrevPrevPoint = m_vecPrevPoint;
-	m_vecPrevPoint = GetAbsOrigin();
+	m_vecPrevPoint = GetEngineObject()->GetAbsOrigin();
 
 	// If we've got to our goal, we're done here.
 	if ( GetNavigator()->CurWaypointIsGoal() )
@@ -705,8 +705,8 @@ bool CNPC_VehicleDriver::OverridePathMove( float flInterval )
 	// Setup our initial path data if we've just started running a path
 	if ( !m_pCurrentWaypoint )
 	{
-		m_vecPrevPoint = GetAbsOrigin();
-		m_vecPrevPrevPoint = GetAbsOrigin();
+		m_vecPrevPoint = GetEngineObject()->GetAbsOrigin();
+		m_vecPrevPrevPoint = GetEngineObject()->GetAbsOrigin();
 		m_vecDesiredPosition = GetNavigator()->GetCurWaypointPos();	
 		CalculatePostPoints();
 	
@@ -775,7 +775,7 @@ bool CNPC_VehicleDriver::OverridePathMove( float flInterval )
 
 	// Now that we've got the target spline point & tangent, use it to decide what our desired velocity is.
 	// If we're close to the tangent, just use the tangent. Otherwise, Lerp towards it.
-	Vector vecToDesired = (vSplinePoint - GetAbsOrigin());
+	Vector vecToDesired = (vSplinePoint - GetEngineObject()->GetAbsOrigin());
 	float flDistToDesired = VectorNormalize( vecToDesired );
 	float flTangentLength = VectorNormalize( vSplineTangent );
 
@@ -871,7 +871,7 @@ void CNPC_VehicleDriver::DriveVehicle( void )
 	if ( g_debug_vehicledriver.GetInt() & DRIVER_DEBUG_PATH )
 	{
 		NDebugOverlay::Box(m_vecDesiredPosition, -Vector(20,20,20), Vector(20,20,20), 0,255,0, true, 0.1);
-		NDebugOverlay::Line(GetAbsOrigin(), GetAbsOrigin() + m_vecDesiredVelocity, 0,255,0, true, 0.1);
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + m_vecDesiredVelocity, 0,255,0, true, 0.1);
 	}
 
 	m_flGoalSpeed = VectorNormalize(m_vecDesiredVelocity);
@@ -957,15 +957,15 @@ void CNPC_VehicleDriver::CheckForTeleport( void )
 		Vector vecMins, vecMaxs;
 		vecMins = m_hVehicleEntity->CollisionProp()->OBBMins();
 		vecMaxs = m_hVehicleEntity->CollisionProp()->OBBMaxs();
-		Vector vecTarget = pTrack->GetAbsOrigin() - (vecMins + vecMaxs) * 0.5;
+		Vector vecTarget = pTrack->GetEngineObject()->GetAbsOrigin() - (vecMins + vecMaxs) * 0.5;
 		vecTarget.z += ((vecMaxs.z - vecMins.z) * 0.5) + 8;	// Safety buffer
 
 		// Orient it to face the next point
-		QAngle vecAngles = pTrack->GetAbsAngles();
+		QAngle vecAngles = pTrack->GetEngineObject()->GetAbsAngles();
 		Vector vecToTarget = vec3_origin;
 		if ( pTrack->GetNext() )
 		{
-			vecToTarget = (pTrack->GetNext()->GetAbsOrigin() - pTrack->GetAbsOrigin());
+			vecToTarget = (pTrack->GetNext()->GetEngineObject()->GetAbsOrigin() - pTrack->GetEngineObject()->GetAbsOrigin());
 			VectorNormalize( vecToTarget );
 
 			// Vehicles are rotated 90 degrees
@@ -975,10 +975,10 @@ void CNPC_VehicleDriver::CheckForTeleport( void )
 		m_hVehicleEntity->Teleport( &vecTarget, &vecAngles, &vec3_origin );
 
 		// Teleport the driver
-		SetAbsOrigin( m_hVehicleEntity->WorldSpaceCenter() );
-		SetAbsAngles( m_hVehicleEntity->GetAbsAngles() );
+		GetEngineObject()->SetAbsOrigin( m_hVehicleEntity->WorldSpaceCenter() );
+		GetEngineObject()->SetAbsAngles( m_hVehicleEntity->GetEngineObject()->GetAbsAngles() );
 
-		m_vecPrevPoint = pTrack->GetAbsOrigin();
+		m_vecPrevPoint = pTrack->GetEngineObject()->GetAbsOrigin();
 
 		// Move to the next waypoint, we've reached this one
 		if ( GetNavigator()->GetPath() )

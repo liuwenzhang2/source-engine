@@ -437,16 +437,16 @@ void CC_NPC_Create( const CCommand &args )
 			}
 
 			// Now check that this is a valid location for the new npc to be
-			Vector	vUpBit = baseNPC->GetAbsOrigin();
+			Vector	vUpBit = baseNPC->GetEngineObject()->GetAbsOrigin();
 			vUpBit.z += 1;
 
-			AI_TraceHull( baseNPC->GetAbsOrigin(), vUpBit, baseNPC->GetHullMins(), baseNPC->GetHullMaxs(), 
+			AI_TraceHull( baseNPC->GetEngineObject()->GetAbsOrigin(), vUpBit, baseNPC->GetHullMins(), baseNPC->GetHullMaxs(),
 				MASK_NPCSOLID, baseNPC, COLLISION_GROUP_NONE, &tr );
 			if ( tr.startsolid || (tr.fraction < 1.0) )
 			{
 				baseNPC->SUB_Remove();
 				DevMsg("Can't create %s.  Bad Position!\n",args[1]);
-				NDebugOverlay::Box(baseNPC->GetAbsOrigin(), baseNPC->GetHullMins(), baseNPC->GetHullMaxs(), 255, 0, 0, 0, 0);
+				NDebugOverlay::Box(baseNPC->GetEngineObject()->GetAbsOrigin(), baseNPC->GetHullMins(), baseNPC->GetHullMaxs(), 255, 0, 0, 0, 0);
 			}
 		}
 
@@ -504,16 +504,16 @@ void CC_NPC_Create_Aimed( const CCommand &args )
 			}
 
 			// Now check that this is a valid location for the new npc to be
-			Vector	vUpBit = baseNPC->GetAbsOrigin();
+			Vector	vUpBit = baseNPC->GetEngineObject()->GetAbsOrigin();
 			vUpBit.z += 1;
 
-			AI_TraceHull( baseNPC->GetAbsOrigin(), vUpBit, baseNPC->GetHullMins(), baseNPC->GetHullMaxs(), 
+			AI_TraceHull( baseNPC->GetEngineObject()->GetAbsOrigin(), vUpBit, baseNPC->GetHullMins(), baseNPC->GetHullMaxs(),
 				MASK_NPCSOLID, baseNPC, COLLISION_GROUP_NONE, &tr );
 			if ( tr.startsolid || (tr.fraction < 1.0) )
 			{
 				baseNPC->SUB_Remove();
 				DevMsg("Can't create %s.  Bad Position!\n",args[1]);
-				NDebugOverlay::Box(baseNPC->GetAbsOrigin(), baseNPC->GetHullMins(), baseNPC->GetHullMaxs(), 255, 0, 0, 0, 0);
+				NDebugOverlay::Box(baseNPC->GetEngineObject()->GetAbsOrigin(), baseNPC->GetHullMins(), baseNPC->GetHullMaxs(), 255, 0, 0, 0, 0);
 			}
 		}
 		else

@@ -262,7 +262,7 @@ void CBaseDoor::Spawn()
 	AngleVectors( angMoveDir, &m_vecMoveDir );
 
 	SetModel( STRING( GetModelName() ) );
-	m_vecPosition1	= GetLocalOrigin();
+	m_vecPosition1	= GetEngineObject()->GetLocalOrigin();
 
 	// Subtract 2 from size because the engine expands bboxes by 1 in all directions making the size too big
 	Vector vecOBB = CollisionProp()->OBBSize();
@@ -472,11 +472,11 @@ void CBaseDoor::Activate( void )
 			bool error = false;
 			if ( pDoorList[i]->IsRotatingDoor() )
 			{
-				error = ( pDoorList[i]->GetLocalAngles() != GetLocalAngles() ) ? true : false;
+				error = ( pDoorList[i]->GetEngineObject()->GetLocalAngles() != GetEngineObject()->GetLocalAngles() ) ? true : false;
 			}
 			else 
 			{
-				error = ( pDoorList[i]->GetLocalOrigin() != GetLocalOrigin() ) ? true : false;
+				error = ( pDoorList[i]->GetEngineObject()->GetLocalOrigin() != GetEngineObject()->GetLocalOrigin() ) ? true : false;
 			}
 			if ( error )
 			{
@@ -975,11 +975,11 @@ void CBaseDoor::DoorGoUp( void )
 				//					So you can't look at the door's facing to determine which way to open.
 
 				Vector nearestPoint;
-				CollisionProp()->CalcNearestPoint( m_hActivator->GetAbsOrigin(), &nearestPoint );
-				Vector activatorToNearestPoint = nearestPoint - m_hActivator->GetAbsOrigin();
+				CollisionProp()->CalcNearestPoint( m_hActivator->GetEngineObject()->GetAbsOrigin(), &nearestPoint );
+				Vector activatorToNearestPoint = nearestPoint - m_hActivator->GetEngineObject()->GetAbsOrigin();
 				activatorToNearestPoint.z = 0;
 
-				Vector activatorToOrigin = GetAbsOrigin() - m_hActivator->GetAbsOrigin();
+				Vector activatorToOrigin = GetEngineObject()->GetAbsOrigin() - m_hActivator->GetEngineObject()->GetAbsOrigin();
 				activatorToOrigin.z = 0;
 
 				// Point right hand at door hinge, curl hand towards closest spot on door, if thumb
@@ -1242,20 +1242,20 @@ void CBaseDoor::Blocked( CBaseEntity *pOther )
 
 			if ( pDoor->m_flWait >= 0)
 			{
-				if (m_bDoorGroup && pDoor->m_vecMoveDir == m_vecMoveDir && pDoor->GetAbsVelocity() == GetAbsVelocity() && pDoor->GetLocalAngularVelocity() == GetLocalAngularVelocity())
+				if (m_bDoorGroup && pDoor->m_vecMoveDir == m_vecMoveDir && pDoor->GetEngineObject()->GetAbsVelocity() == GetEngineObject()->GetAbsVelocity() && pDoor->GetLocalAngularVelocity() == GetLocalAngularVelocity())
 				{
 					pDoor->m_nSimulationTick = m_nSimulationTick;	// don't run simulation this frame if you haven't run yet
 
 					// this is the most hacked, evil, bastardized thing I've ever seen. kjb
 					if ( !pDoor->IsRotatingDoor() )
 					{// set origin to realign normal doors
-						pDoor->SetLocalOrigin( GetLocalOrigin() );
-						pDoor->SetAbsVelocity( vec3_origin );// stop!
+						pDoor->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
+						pDoor->GetEngineObject()->SetAbsVelocity( vec3_origin );// stop!
 
 					}
 					else
 					{// set angles to realign rotating doors
-						pDoor->SetLocalAngles( GetLocalAngles() );
+						pDoor->GetEngineObject()->SetLocalAngles(GetEngineObject()->GetLocalAngles() );
 						pDoor->SetLocalAngularVelocity( vec3_angle );
 					}
 				}
@@ -1360,8 +1360,8 @@ void CRotDoor::Spawn( void )
 		m_vecMoveAng = m_vecMoveAng * -1;
 	
 	//m_flWait			= 2; who the hell did this? (sjb)
-	m_vecAngle1	= GetLocalAngles();
-	m_vecAngle2	= GetLocalAngles() + m_vecMoveAng * m_flMoveDistance;
+	m_vecAngle1	= GetEngineObject()->GetLocalAngles();
+	m_vecAngle2	= GetEngineObject()->GetLocalAngles() + m_vecMoveAng * m_flMoveDistance;
 
 	ASSERTSZ(m_vecAngle1 != m_vecAngle2, "rotating door start/end positions are equal\n");
 
@@ -1427,7 +1427,7 @@ bool CRotDoor::CreateVPhysics()
 void CRotDoor::SetToggleState( int state )
 {
 	if ( state == TS_AT_TOP )
-		SetLocalAngles( m_vecAngle2 );
+		GetEngineObject()->SetLocalAngles( m_vecAngle2 );
 	else
-		SetLocalAngles( m_vecAngle1 );
+		GetEngineObject()->SetLocalAngles( m_vecAngle1 );
 }

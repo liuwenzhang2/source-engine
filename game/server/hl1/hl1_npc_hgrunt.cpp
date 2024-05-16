@@ -492,7 +492,7 @@ int CNPC_HGrunt::SquadRecruit( int searchRadius, int maxMembers )
 
 		m_SquadName = AllocPooledString( szSquadName );
 
-		while ( ( pEntity = gEntList.FindEntityInSphere( pEntity, GetAbsOrigin(), searchRadius ) ) != NULL )
+		while ( ( pEntity = gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), searchRadius ) ) != NULL )
 		{
 			if ( !FClassnameIs ( pEntity, "monster_human_grunt" ) )
 				  continue;
@@ -507,7 +507,7 @@ int CNPC_HGrunt::SquadRecruit( int searchRadius, int maxMembers )
 					!pRecruit->m_SquadName )
 				{
 					trace_t tr;
-					UTIL_TraceLine( GetAbsOrigin() + GetViewOffset(), pRecruit->GetAbsOrigin() + GetViewOffset(), MASK_NPCSOLID_BRUSHONLY, pRecruit, COLLISION_GROUP_NONE, &tr );// try to hit recruit with a traceline.
+					UTIL_TraceLine(GetEngineObject()->GetAbsOrigin() + GetViewOffset(), pRecruit->GetEngineObject()->GetAbsOrigin() + GetViewOffset(), MASK_NPCSOLID_BRUSHONLY, pRecruit, COLLISION_GROUP_NONE, &tr );// try to hit recruit with a traceline.
 
 					if ( tr.fraction == 1.0 )
 					{
@@ -632,7 +632,7 @@ int CNPC_HGrunt::RangeAttack1Conditions ( float flDot, float flDist )
 
 		//NDebugOverlay::Line( GetAbsOrigin() + GetViewOffset(), GetEnemy()->BodyTarget(GetAbsOrigin() + GetViewOffset()), 255, 0, 0, false, 0.1 );
 		// verify that a bullet fired from the gun will hit the enemy before the world.
-		UTIL_TraceLine( GetAbsOrigin() + GetViewOffset(), GetEnemy()->BodyTarget(GetAbsOrigin() + GetViewOffset()), MASK_SHOT, this/*pentIgnore*/, COLLISION_GROUP_NONE, &tr);
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin() + GetViewOffset(), GetEnemy()->BodyTarget(GetEngineObject()->GetAbsOrigin() + GetViewOffset()), MASK_SHOT, this/*pentIgnore*/, COLLISION_GROUP_NONE, &tr);
 
 		if ( tr.fraction == 1.0 || tr.m_pEnt == GetEnemy() )
 		{
@@ -674,7 +674,7 @@ int CNPC_HGrunt::GetGrenadeConditions( float flDot, float flDist  )
 		return COND_NONE;
 	
 	Vector flEnemyLKP = GetEnemyLKP();
-	if ( !(pEnemy->GetFlags() & FL_ONGROUND) && pEnemy->GetWaterLevel() == 0 && flEnemyLKP.z > (GetAbsOrigin().z + WorldAlignMaxs().z)  )
+	if ( !(pEnemy->GetFlags() & FL_ONGROUND) && pEnemy->GetWaterLevel() == 0 && flEnemyLKP.z > (GetEngineObject()->GetAbsOrigin().z + WorldAlignMaxs().z)  )
 	{
 		//!!!BUGBUG - we should make this check movetype and make sure it isn't FLY? Players who jump a lot are unlikely to 
 		// be grenaded.
@@ -702,11 +702,11 @@ int CNPC_HGrunt::GetGrenadeConditions( float flDot, float flDist  )
 	{
 		// find target
 		// vecTarget = GetEnemy()->BodyTarget( GetAbsOrigin() );
-		vecTarget = GetEnemy()->GetAbsOrigin() + (GetEnemy()->BodyTarget( GetAbsOrigin() ) - GetEnemy()->GetAbsOrigin());
+		vecTarget = GetEnemy()->GetEngineObject()->GetAbsOrigin() + (GetEnemy()->BodyTarget(GetEngineObject()->GetAbsOrigin() ) - GetEnemy()->GetEngineObject()->GetAbsOrigin());
 		// estimate position
 		if ( HasCondition( COND_SEE_ENEMY))
 		{
-			vecTarget = vecTarget + ((vecTarget - GetAbsOrigin()).Length() / sk_hgrunt_gspeed.GetFloat()) * GetEnemy()->GetAbsVelocity();
+			vecTarget = vecTarget + ((vecTarget - GetEngineObject()->GetAbsOrigin()).Length() / sk_hgrunt_gspeed.GetFloat()) * GetEnemy()->GetEngineObject()->GetAbsVelocity();
 		}
 	}
 
@@ -721,7 +721,7 @@ int CNPC_HGrunt::GetGrenadeConditions( float flDot, float flDist  )
 		}
 	}
 	
-	if ( ( vecTarget - GetAbsOrigin() ).Length2D() <= 256 )
+	if ( ( vecTarget - GetEngineObject()->GetAbsOrigin() ).Length2D() <= 256 )
 	{
 		// crap, I don't want to blow myself up
 		m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.
@@ -956,7 +956,7 @@ bool CNPC_HGrunt::HandleInteraction(int interactionType, void *data, CBaseCombat
 	{
 		SetState ( NPC_STATE_IDLE );
 		m_bInBarnacleMouth	= false;
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		SetMoveType( MOVETYPE_STEP );
 		return true;
 	}
@@ -1002,8 +1002,8 @@ CBaseEntity *CNPC_HGrunt::Kick( void )
 	trace_t tr;
 
 	Vector forward;
-	AngleVectors( GetAbsAngles(), &forward );
-	Vector vecStart = GetAbsOrigin();
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
+	Vector vecStart = GetEngineObject()->GetAbsOrigin();
 	vecStart.z += WorldAlignSize().z * 0.5;
 	Vector vecEnd = vecStart + (forward * 70);
 
@@ -1021,9 +1021,9 @@ CBaseEntity *CNPC_HGrunt::Kick( void )
 Vector CNPC_HGrunt::Weapon_ShootPosition( void )
 {
 	if ( m_fStanding )
-		return GetAbsOrigin() + Vector( 0, 0, 60 );
+		return GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 60 );
 	else
-		return GetAbsOrigin() + Vector( 0, 0, 48 );
+		return GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 48 );
 }
 
 void CNPC_HGrunt::Event_Killed( const CTakeDamageInfo &info )
@@ -1039,7 +1039,7 @@ void CNPC_HGrunt::Event_Killed( const CTakeDamageInfo &info )
 	// If the gun would drop into a wall, spawn it at our origin
 	if( UTIL_PointContents( vecGunPos ) & CONTENTS_SOLID )
 	{
-		vecGunPos = GetAbsOrigin();
+		vecGunPos = GetEngineObject()->GetAbsOrigin();
 	}
 
 	// now spawn a gun.
@@ -1054,7 +1054,7 @@ void CNPC_HGrunt::Event_Killed( const CTakeDamageInfo &info )
 
 	if (FBitSet( m_iWeapons, HGRUNT_GRENADELAUNCHER ))
 	{
-		DropItem( "ammo_ARgrenades", BodyTarget( GetAbsOrigin() ), vecGunAngles );
+		DropItem( "ammo_ARgrenades", BodyTarget(GetEngineObject()->GetAbsOrigin() ), vecGunAngles );
 	}
 
 	BaseClass::Event_Killed( info );
@@ -1083,7 +1083,7 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 
 		case HGRUNT_AE_GREN_TOSS:
 		{
-			CHandGrenade *pGrenade = (CHandGrenade*)Create( "grenade_hand", GetAbsOrigin() + Vector(0,0,60), vec3_angle );
+			CHandGrenade *pGrenade = (CHandGrenade*)Create( "grenade_hand", GetEngineObject()->GetAbsOrigin() + Vector(0,0,60), vec3_angle );
 			if ( pGrenade )
 			{
 				pGrenade->ShootTimed( this, m_vecTossVelocity, 3.5 );
@@ -1107,7 +1107,7 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 			GetAttachment( "0", vecSrc, angAngles );
 		
 			CGrenadeMP5 * m_pMyGrenade = (CGrenadeMP5*)Create( "grenade_mp5", vecSrc, angAngles, this );
-			m_pMyGrenade->SetAbsVelocity( m_vecTossVelocity );
+			m_pMyGrenade->GetEngineObject()->SetAbsVelocity( m_vecTossVelocity );
 			m_pMyGrenade->SetLocalAngularVelocity( QAngle( random->RandomFloat( -100, -500 ), 0, 0 ) );
 			m_pMyGrenade->SetMoveType( MOVETYPE_FLYGRAVITY ); 
 			m_pMyGrenade->SetThrower( this );
@@ -1155,7 +1155,7 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 				g_pSoundEmitterSystem->EmitSound( filter4, entindex(), "HGrunt.Shotgun" );
 			}
 		
-			CSoundEnt::InsertSound ( SOUND_COMBAT, GetAbsOrigin(), 384, 0.3 );
+			CSoundEnt::InsertSound ( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 384, 0.3 );
 		}
 		break;
 
@@ -1172,7 +1172,7 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 			{
 				// SOUND HERE!
 				Vector forward, up;
-				AngleVectors( GetAbsAngles(), &forward, NULL, &up );
+				AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, NULL, &up );
 
 				if ( pHurt->GetFlags() & ( FL_NPC | FL_CLIENT ) )
 					 pHurt->ViewPunch( QAngle( 15, 0, 0) );
@@ -1183,7 +1183,7 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 					pHurt->ApplyAbsVelocityImpulse( forward * 100 + up * 50 );
 
 					CTakeDamageInfo info( this, this, sk_hgrunt_kick.GetFloat(), DMG_CLUB );
-					CalculateMeleeDamageForce( &info, forward, pHurt->GetAbsOrigin() );
+					CalculateMeleeDamageForce( &info, forward, pHurt->GetEngineObject()->GetAbsOrigin() );
 					pHurt->TakeDamage( info );
 				}			
 			}
@@ -1229,10 +1229,10 @@ void CNPC_HGrunt::Shoot ( void )
 	Vector vecShootDir = GetShootEnemyDir( vecShootOrigin );
 
 	Vector forward, right, up;
-	AngleVectors( GetAbsAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
 
 	Vector	vecShellVelocity = right * random->RandomFloat(40,90) + up * random->RandomFloat( 75,200 ) + forward * random->RandomFloat( -40, 40 );
-	EjectShell( vecShootOrigin - vecShootDir * 24, vecShellVelocity, GetAbsAngles().y, 0 );
+	EjectShell( vecShootOrigin - vecShootDir * 24, vecShellVelocity, GetEngineObject()->GetAbsAngles().y, 0 );
 	FireBullets(1, vecShootOrigin, vecShootDir, VECTOR_CONE_10DEGREES, 2048, m_iAmmoType ); // shoot +-5 degrees
 	
 	DoMuzzleFlash();
@@ -1254,10 +1254,10 @@ void CNPC_HGrunt::Shotgun ( void )
 	Vector vecShootDir = GetShootEnemyDir( vecShootOrigin );
 
 	Vector forward, right, up;
-	AngleVectors( GetAbsAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
 
 	Vector	vecShellVelocity = right * random->RandomFloat(40,90) + up * random->RandomFloat( 75,200 ) + forward * random->RandomFloat( -40, 40 );
-	EjectShell( vecShootOrigin - vecShootDir * 24, vecShellVelocity, GetAbsAngles().y, 1 );
+	EjectShell( vecShootOrigin - vecShootDir * 24, vecShellVelocity, GetEngineObject()->GetAbsAngles().y, 1 );
 	FireBullets( sk_hgrunt_pellets.GetFloat(), vecShootOrigin, vecShootDir, VECTOR_CONE_15DEGREES, 2048, m_iAmmoType, 0 ); // shoot +-7.5 degrees
 
 	DoMuzzleFlash();
@@ -1326,7 +1326,7 @@ void CNPC_HGrunt::RunTask( const Task_t *pTask )
 	case TASK_GRUNT_FACE_TOSS_DIR:
 		{
 			// project a point along the toss vector and turn to face that point.
-			GetMotor()->SetIdealYawToTargetAndUpdate( GetAbsOrigin() + m_vecTossVelocity * 64, AI_KEEP_YAW_SPEED );
+			GetMotor()->SetIdealYawToTargetAndUpdate(GetEngineObject()->GetAbsOrigin() + m_vecTossVelocity * 64, AI_KEEP_YAW_SPEED );
 
 			if ( FacingIdeal() )
 			{
@@ -1822,22 +1822,22 @@ int CNPC_HGrunt::TranslateSchedule( int scheduleType )
 		}
 	case SCHED_GRUNT_REPEL:
 		{
-			Vector vecVel = GetAbsVelocity();
+			Vector vecVel = GetEngineObject()->GetAbsVelocity();
 			if ( vecVel.z > -128 )
 			{
 				vecVel.z -= 32;
-				SetAbsVelocity( vecVel );
+				GetEngineObject()->SetAbsVelocity( vecVel );
 			}
 
 			return SCHED_GRUNT_REPEL;
 		}
 	case SCHED_GRUNT_REPEL_ATTACK:
 		{
-			Vector vecVel = GetAbsVelocity();
+			Vector vecVel = GetEngineObject()->GetAbsVelocity();
 			if ( vecVel.z > -128 )
 			{
 				vecVel.z -= 32;
-				SetAbsVelocity( vecVel );
+				GetEngineObject()->SetAbsVelocity( vecVel );
 			}
 
 			return SCHED_GRUNT_REPEL_ATTACK;
@@ -1895,23 +1895,23 @@ void CNPC_HGruntRepel::Precache( void )
 void CNPC_HGruntRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, -4096.0), MASK_NPCSOLID, this,COLLISION_GROUP_NONE, &tr);
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, -4096.0), MASK_NPCSOLID, this,COLLISION_GROUP_NONE, &tr);
 	
-	CBaseEntity *pEntity = Create( "monster_human_grunt", GetAbsOrigin(), GetAbsAngles() );
+	CBaseEntity *pEntity = Create( "monster_human_grunt", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 	CAI_BaseNPC *pGrunt = pEntity->MyNPCPointer( );
 	pGrunt->SetMoveType( MOVETYPE_FLYGRAVITY );
 	pGrunt->SetGravity( 0.001 );
-	pGrunt->SetAbsVelocity( Vector( 0, 0, random->RandomFloat( -196, -128 ) ) );
+	pGrunt->GetEngineObject()->SetAbsVelocity( Vector( 0, 0, random->RandomFloat( -196, -128 ) ) );
 	pGrunt->SetActivity( ACT_GLIDE );
 	// UNDONE: position?
 	pGrunt->m_vecLastPosition = tr.endpos;
 
 	CBeam *pBeam = CBeam::BeamCreate( "sprites/rope.vmt", 10 );
-	pBeam->PointEntInit( GetAbsOrigin() + Vector(0,0,112), pGrunt );
+	pBeam->PointEntInit(GetEngineObject()->GetAbsOrigin() + Vector(0,0,112), pGrunt );
 	pBeam->SetBeamFlags( FBEAM_SOLID );
 	pBeam->SetColor( 255, 255, 255 );
 	pBeam->SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + -4096.0 * tr.fraction / pGrunt->GetAbsVelocity().z + 0.5 );
+	SetNextThink( gpGlobals->curtime + -4096.0 * tr.fraction / pGrunt->GetEngineObject()->GetAbsVelocity().z + 0.5 );
 
 	UTIL_Remove( this );
 }

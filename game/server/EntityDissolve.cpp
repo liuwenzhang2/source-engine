@@ -181,7 +181,7 @@ void CEntityDissolve::InputDissolve( inputdata_t &inputdata )
 		CBaseAnimating *pBaseAnim = pTarget->GetBaseAnimating();
 		if (pBaseAnim)
 		{
-			pBaseAnim->Dissolve( NULL, gpGlobals->curtime, false, m_nDissolveType, GetAbsOrigin(), m_nMagnitude );
+			pBaseAnim->Dissolve( NULL, gpGlobals->curtime, false, m_nDissolveType, GetEngineObject()->GetAbsOrigin(), m_nMagnitude );
 		}
 	}
 }
@@ -295,8 +295,8 @@ void CEntityDissolve::AttachToEntity( CBaseEntity *pTarget )
 {
 	// So our dissolver follows the entity around on the server.
 	GetEngineObject()->SetParent( pTarget?pTarget->GetEngineObject():NULL );
-	SetLocalOrigin( vec3_origin );
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetLocalOrigin( vec3_origin );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 }
 
 

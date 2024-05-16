@@ -229,7 +229,7 @@ void CDODBipodWeapon::DeployBipod( float flHeight, CBaseEntity *pDeployedOn, flo
 	m_hDeployedOnEnt = pDeployedOn;
 
 	if ( pDeployedOn )
-        m_DeployedEntOrigin = pDeployedOn->GetAbsOrigin();
+        m_DeployedEntOrigin = pDeployedOn->GetEngineObject()->GetAbsOrigin();
 	else
 		m_DeployedEntOrigin = vec3_origin;	// world ent 
 
@@ -323,7 +323,7 @@ bool CDODBipodWeapon::CheckDeployEnt( void )
 	// of it will be different. If so, recalc our yaw limits.
 	if ( pDeployedOn )
 	{
-		if ( m_DeployedEntOrigin != pDeployedOn->GetAbsOrigin() )
+		if ( m_DeployedEntOrigin != pDeployedOn->GetEngineObject()->GetAbsOrigin() )
 		{
 			float flYawLimitLeft = 0, flYawLimitRight = 0;
 			TestDeploy( &flDeployedHeight, &pDeployedOn, &flYawLimitLeft, &flYawLimitRight );
@@ -333,7 +333,7 @@ bool CDODBipodWeapon::CheckDeployEnt( void )
 			if ( pPlayer )
 				pPlayer->m_Shared.SetDeployedYawLimits( flYawLimitLeft, flYawLimitRight );
 
-			m_DeployedEntOrigin = pDeployedOn->GetAbsOrigin();
+			m_DeployedEntOrigin = pDeployedOn->GetEngineObject()->GetAbsOrigin();
 		}
 	}
 	
@@ -492,7 +492,7 @@ bool CDODBipodWeapon::TestDeployAngle( CDODPlayer *pPlayer, float *flDeployedHei
 	AngleVectors( angles, &forward, &right, &up );
 
 	// start at top of player bbox
-	Vector vecStart = pPlayer->GetAbsOrigin();
+	Vector vecStart = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	float flForwardTraceDist = 32;
 
@@ -649,7 +649,7 @@ bool CDODBipodWeapon::TestDeployAngle( CDODPlayer *pPlayer, float *flDeployedHei
 		return false;
 
 	*pDeployedOn = pBestDeployEnt;
-	*flDeployedHeight = flHighestTraceEnd - vecDeployTraceBoxSize[0] + DEPLOY_DOWNTRACE_OFFSET - pPlayer->GetAbsOrigin().z;
+	*flDeployedHeight = flHighestTraceEnd - vecDeployTraceBoxSize[0] + DEPLOY_DOWNTRACE_OFFSET - pPlayer->GetEngineObject()->GetAbsOrigin().z;
 	return true;
 }
 

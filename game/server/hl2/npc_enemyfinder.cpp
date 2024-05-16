@@ -231,7 +231,7 @@ void CNPC_EnemyFinder::Wake( bool bFireOutput )
 //------------------------------------------------------------------------------
 bool CNPC_EnemyFinder::FVisible( CBaseEntity *pTarget, int traceMask, CBaseEntity **ppBlocker )
 {
-	float flTargetDist = GetAbsOrigin().DistTo( pTarget->GetAbsOrigin() );
+	float flTargetDist = GetEngineObject()->GetAbsOrigin().DistTo( pTarget->GetEngineObject()->GetAbsOrigin() );
 	if ( flTargetDist < m_flMinSearchDist)
 		return false;
 
@@ -256,7 +256,7 @@ bool CNPC_EnemyFinder::FVisible( CBaseEntity *pTarget, int traceMask, CBaseEntit
 
 	// Trace from launch position to target position.  
 	// Use position above actual barral based on vertical launch speed
-	Vector vStartPos = GetAbsOrigin();
+	Vector vStartPos = GetEngineObject()->GetAbsOrigin();
 	Vector vEndPos	 = pTarget->EyePosition();
 
 	CBaseEntity *pVehicle = NULL;
@@ -294,7 +294,7 @@ bool CNPC_EnemyFinder::ShouldChooseNewEnemy()
 //------------------------------------------------------------------------------
 bool CNPC_EnemyFinder::IsValidEnemy( CBaseEntity *pTarget )
 {
-	float flTargetDist = GetAbsOrigin().DistTo( pTarget->GetAbsOrigin() );
+	float flTargetDist = GetEngineObject()->GetAbsOrigin().DistTo( pTarget->GetEngineObject()->GetAbsOrigin() );
 	if (flTargetDist < m_flMinSearchDist)
 		return false;
 
@@ -309,7 +309,7 @@ bool CNPC_EnemyFinder::IsValidEnemy( CBaseEntity *pTarget )
 
 	// Trace from launch position to target position.  
 	// Use position above actual barral based on vertical launch speed
-	Vector vStartPos = GetAbsOrigin();
+	Vector vStartPos = GetEngineObject()->GetAbsOrigin();
 	Vector vEndPos	 = pTarget->EyePosition();
 
 	// Test our line of sight to the target
@@ -419,7 +419,7 @@ bool CNPC_EnemyFinder::ShouldAlwaysThink()
 	CBasePlayer *pPlayer = AI_GetSinglePlayer();
 	if ( pPlayer && IRelationType( pPlayer ) == D_HT )
 	{
-		float playerDistSqr = GetAbsOrigin().DistToSqr( pPlayer->GetAbsOrigin() );
+		float playerDistSqr = GetEngineObject()->GetAbsOrigin().DistToSqr( pPlayer->GetEngineObject()->GetAbsOrigin() );
 
 		if ( !m_flMaxSearchDist || playerDistSqr <= Square(m_flMaxSearchDist) )
 		{

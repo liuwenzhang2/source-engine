@@ -58,7 +58,7 @@ public:
 	{
 		if ( pEntity )
 		{
-			m_vMark = pEntity->GetAbsOrigin();
+			m_vMark = pEntity->GetEngineObject()->GetAbsOrigin();
 			m_flMarkTolerance = tolerance;
 		}
 	}
@@ -77,7 +77,7 @@ public:
 	{
 		if ( IsMarkSet() && pEntity != NULL )
 		{
-			float distance = ( m_vMark - pEntity->GetAbsOrigin() ).Length();
+			float distance = ( m_vMark - pEntity->GetEngineObject()->GetAbsOrigin() ).Length();
 			if ( distance > m_flMarkTolerance )
 				return true;
 		}
@@ -88,7 +88,7 @@ public:
 	{
 		if ( IsMarkSet() && pEntity != NULL )
 		{
-			float distance = ( m_vMark.AsVector2D() - pEntity->GetAbsOrigin().AsVector2D() ).Length();
+			float distance = ( m_vMark.AsVector2D() - pEntity->GetEngineObject()->GetAbsOrigin().AsVector2D() ).Length();
 			if ( distance > m_flMarkTolerance )
 				return true;
 		}

@@ -38,7 +38,7 @@ CSmokeGrenadeProjectile* CSmokeGrenadeProjectile::Create(
 	// Set the timer for 1 second less than requested. We're going to issue a SOUND_DANGER
 	// one second before detonation.
 	pGrenade->SetTimer( 1.5 );
-	pGrenade->SetAbsVelocity( velocity );
+	pGrenade->GetEngineObject()->SetAbsVelocity( velocity );
 	pGrenade->SetupInitialTransmittedGrenadeVelocity( velocity );
 	pGrenade->SetThrower( pOwner );
 	pGrenade->SetGravity( 0.55 );
@@ -69,7 +69,7 @@ void CSmokeGrenadeProjectile::SetTimer( float timer )
 
 void CSmokeGrenadeProjectile::Think_Detonate()
 {
-	if ( GetAbsVelocity().Length() > 0.1 )
+	if (GetEngineObject()->GetAbsVelocity().Length() > 0.1 )
 	{
 		// Still moving. Don't detonate yet.
 		SetNextThink( gpGlobals->curtime + 0.2 );
@@ -79,21 +79,21 @@ void CSmokeGrenadeProjectile::Think_Detonate()
 	TheBots->SetGrenadeRadius( this, SmokeGrenadeRadius );
 
 	// Ok, we've stopped rolling or whatever. Now detonate.
-	ParticleSmokeGrenade *pGren = (ParticleSmokeGrenade*)CBaseEntity::Create( PARTICLESMOKEGRENADE_ENTITYNAME, GetAbsOrigin(), QAngle(0,0,0), NULL );
+	ParticleSmokeGrenade *pGren = (ParticleSmokeGrenade*)CBaseEntity::Create( PARTICLESMOKEGRENADE_ENTITYNAME, GetEngineObject()->GetAbsOrigin(), QAngle(0,0,0), NULL );
 	if ( pGren )
 	{
 		pGren->FillVolume();
 		pGren->SetFadeTime( 15, 20 );
-		pGren->SetAbsOrigin( GetAbsOrigin() );
+		pGren->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 
 		//tell the hostages about the smoke!
 		CBaseEntity *pEntity = NULL;
 		variant_t var;	//send the location of the smoke?
-		var.SetVector3D( GetAbsOrigin() );
+		var.SetVector3D(GetEngineObject()->GetAbsOrigin() );
 		while ( ( pEntity = gEntList.FindEntityByClassname( pEntity, "hostage_entity" ) ) != NULL)
 		{
 			//send to hostages that have a resonable chance of being in it while its still smoking
-			if( (GetAbsOrigin() - pEntity->GetAbsOrigin()).Length() < 1000 )
+			if( (GetEngineObject()->GetAbsOrigin() - pEntity->GetEngineObject()->GetAbsOrigin()).Length() < 1000 )
 				pEntity->AcceptInput( "smokegrenade", this, this, var, 0 );
 		}
 
@@ -105,9 +105,9 @@ void CSmokeGrenadeProjectile::Think_Detonate()
 			if ( event )
 			{
 				event->SetInt( "userid", player->GetUserID() );
-				event->SetFloat( "x", GetAbsOrigin().x );
-				event->SetFloat( "y", GetAbsOrigin().y );
-				event->SetFloat( "z", GetAbsOrigin().z );
+				event->SetFloat( "x", GetEngineObject()->GetAbsOrigin().x );
+				event->SetFloat( "y", GetEngineObject()->GetAbsOrigin().y );
+				event->SetFloat( "z", GetEngineObject()->GetAbsOrigin().z );
 				gameeventmanager->FireEvent( event );
 			}
 		}

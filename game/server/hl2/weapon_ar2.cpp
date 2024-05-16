@@ -241,7 +241,7 @@ void CWeaponAR2::DelayedAttack( void )
 	UTIL_ScreenFade( pOwner, white, 0.1, 0, FFADE_IN  );
 	
 	//Disorient the player
-	QAngle angles = pOwner->GetLocalAngles();
+	QAngle angles = pOwner->GetEngineObject()->GetLocalAngles();
 
 	angles.x += random->RandomInt( -4, 4 );
 	angles.y += random->RandomInt( -4, 4 );
@@ -342,7 +342,7 @@ void CWeaponAR2::FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, bool bUs
 
 	WeaponSoundRealtime( SINGLE_NPC );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
+	CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetEngineObject()->GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
 
 	pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED, MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2 );
 

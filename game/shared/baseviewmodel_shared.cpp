@@ -426,8 +426,8 @@ void CBaseViewModel::CalcViewModelView( CBasePlayer *owner, const Vector& eyePos
 		g_ClientVirtualReality.OverrideViewModelTransform( vmorigin, vmangles, pWeapon && pWeapon->ShouldUseLargeViewModelVROverride() );
 	}
 
-	SetLocalOrigin( vmorigin );//SetLocalOrigin( vmorigin );
-	SetLocalAngles( vmangles );//SetLocalAngles( vmangles );
+	GetEngineObject()->SetLocalOrigin( vmorigin );//SetLocalOrigin( vmorigin );
+	GetEngineObject()->SetLocalAngles( vmangles );//SetLocalAngles( vmangles );
 
 #ifdef SIXENSE
 	if( g_pSixenseInput->IsEnabled() && (owner->GetObserverMode()==OBS_MODE_NONE) && !UseVR() )

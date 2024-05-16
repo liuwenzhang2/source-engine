@@ -56,11 +56,11 @@ void CWaterBullet::Spawn( const Vector &vecOrigin, const Vector &vecDir )
 	SetGravity( 0.0 );
 
 	QAngle angles;
-	SetAbsOrigin( vecOrigin );
+	GetEngineObject()->SetAbsOrigin( vecOrigin );
 	
-	SetAbsVelocity( vecDir * 1500.0f );
-	VectorAngles( GetAbsVelocity(), angles );
-	SetAbsAngles( angles );
+	GetEngineObject()->SetAbsVelocity( vecDir * 1500.0f );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
+	GetEngineObject()->SetAbsAngles( angles );
 
 	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	SetTouch( &CWaterBullet::Touch );
@@ -84,8 +84,8 @@ void CWaterBullet::BulletThink()
 */
 
 	Vector forward;
-	AngleVectors( GetAbsAngles(), &forward );
-	SetAbsVelocity( forward * 1500.0f );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
+	GetEngineObject()->SetAbsVelocity( forward * 1500.0f );
 }
 
 //-----------------------------------------------------------------------------
@@ -93,11 +93,11 @@ void CWaterBullet::BulletThink()
 //-----------------------------------------------------------------------------
 void CWaterBullet::Touch( CBaseEntity *pOther )
 {
-	Vector	vecDir = GetAbsVelocity();
+	Vector	vecDir = GetEngineObject()->GetAbsVelocity();
 	float speed = VectorNormalize( vecDir );
 
-	Vector	vecStart = GetAbsOrigin() - ( vecDir * 8 );
-	Vector	vecEnd = GetAbsOrigin() + ( vecDir * speed );
+	Vector	vecStart = GetEngineObject()->GetAbsOrigin() - ( vecDir * 8 );
+	Vector	vecEnd = GetEngineObject()->GetAbsOrigin() + ( vecDir * speed );
 
 	trace_t	tr;
 	UTIL_TraceLine( vecStart, vecEnd, MASK_SHOT, NULL, &tr );

@@ -293,7 +293,7 @@ void CEnvTracer::Activate( void )
 	CBaseEntity *pEnd = gEntList.FindEntityByName( NULL, m_target );
 	if (pEnd != NULL)
 	{
-		m_vecEnd = pEnd->GetLocalOrigin();
+		m_vecEnd = pEnd->GetEngineObject()->GetLocalOrigin();
 		SetThink( &CEnvTracer::TracerThink );
 		SetNextThink( gpGlobals->curtime + m_flDelay );
 	}
@@ -306,7 +306,7 @@ void CEnvTracer::Activate( void )
 // Think
 void CEnvTracer::TracerThink( void )
 {
-	UTIL_Tracer( GetAbsOrigin(), m_vecEnd );
+	UTIL_Tracer(GetEngineObject()->GetAbsOrigin(), m_vecEnd );
 
 	SetNextThink( gpGlobals->curtime + m_flDelay );
 }
@@ -481,8 +481,8 @@ void CGibShooter::InitPointGib( CGib *pGib, const Vector &vecShootDir, float flS
 {
 	if ( pGib )
 	{
-		pGib->SetLocalOrigin( GetAbsOrigin() );
-		pGib->SetAbsVelocity( vecShootDir * flSpeed );
+		pGib->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetAbsOrigin() );
+		pGib->GetEngineObject()->SetAbsVelocity( vecShootDir * flSpeed );
 
 		QAngle angVel( random->RandomFloat ( 100, 200 ), random->RandomFloat ( 100, 300 ), 0 );
 		pGib->SetLocalAngularVelocity( angVel );
@@ -508,7 +508,7 @@ void CGibShooter::InitPointGib( CGib *pGib, const Vector &vecShootDir, float flS
 
 		if ( m_bIsSprite == true )
 		{
-			pGib->SetSprite( CSprite::SpriteCreate( STRING( GetModelName() ), pGib->GetAbsOrigin(), false ) );
+			pGib->SetSprite( CSprite::SpriteCreate( STRING( GetModelName() ), pGib->GetEngineObject()->GetAbsOrigin(), false ) );
 
 			CSprite *pSprite = (CSprite*)pGib->GetSprite();
 
@@ -537,7 +537,7 @@ CBaseEntity *CGibShooter::SpawnGib( const Vector &vecShootDir, float flSpeed )
 		{
 			// UNDONE: Assume a mass of 200 for now
 			Vector force = vecShootDir * flSpeed * 200;
-			return CreateRagGib( STRING( GetModelName() ), GetAbsOrigin(), GetAbsAngles(), force, m_flGibLife );
+			return CreateRagGib( STRING( GetModelName() ), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), force, m_flGibLife );
 		}
 
 		case GIB_SIMULATE_PHYSICS:
@@ -546,8 +546,8 @@ CBaseEntity *CGibShooter::SpawnGib( const Vector &vecShootDir, float flSpeed )
 
 			if ( pGib )
 			{
-				pGib->SetAbsOrigin( GetAbsOrigin() );
-				pGib->SetAbsAngles( m_angGibRotation );
+				pGib->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
+				pGib->GetEngineObject()->SetAbsAngles( m_angGibRotation );
 
 				pGib->m_lifeTime = (m_flGibLife * random->RandomFloat( 0.95, 1.05 ));	// +/- 5%
 
@@ -593,7 +593,7 @@ CBaseEntity *CGibShooter::SpawnGib( const Vector &vecShootDir, float flSpeed )
 
 			if ( pGib )
 			{
-				pGib->SetAbsAngles( m_angGibRotation );
+				pGib->GetEngineObject()->SetAbsAngles( m_angGibRotation );
 
 				InitPointGib( pGib, vecShootDir, flSpeed );
 				return pGib;
@@ -613,7 +613,7 @@ void CGibShooter::ShootThink ( void )
 	SetNextThink( gpGlobals->curtime + m_flDelay );
 
 	Vector vecShootDir, vForward,vRight,vUp;
-	AngleVectors( GetAbsAngles(), &vForward, &vRight, &vUp );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward, &vRight, &vUp );
 	vecShootDir = vForward;
 	vecShootDir = vecShootDir + vRight * random->RandomFloat( -1, 1) * m_flVariance;
 	vecShootDir = vecShootDir + vForward * random->RandomFloat( -1, 1) * m_flVariance;
@@ -961,7 +961,7 @@ void CTestEffect::Think( void )
 
 		trace_t	tr;
 
-		Vector vecSrc = GetAbsOrigin();
+		Vector vecSrc = GetEngineObject()->GetAbsOrigin();
 		Vector vecDir = Vector( random->RandomFloat( -1.0, 1.0 ), random->RandomFloat( -1.0, 1.0 ),random->RandomFloat( -1.0, 1.0 ) );
 		VectorNormalize( vecDir );
 		UTIL_TraceLine( vecSrc, vecSrc + vecDir * 128, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
@@ -1140,7 +1140,7 @@ Vector CBlood::BloodPosition( CBaseEntity *pActivator )
 		}
 	}
 
-	return GetLocalOrigin();
+	return GetEngineObject()->GetLocalOrigin();
 }
 
 
@@ -1211,7 +1211,7 @@ void CBlood::InputEmitBlood( inputdata_t &inputdata )
 			nFlags |= FX_BLOODSPRAY_GORE;
 		}
 
-		UTIL_BloodSpray(GetAbsOrigin(), Direction(), Color(), BloodAmount(), nFlags);
+		UTIL_BloodSpray(GetEngineObject()->GetAbsOrigin(), Direction(), Color(), BloodAmount(), nFlags);
 	}
 }
 
@@ -1271,7 +1271,7 @@ void CEnvFunnel::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 {
 	CBroadcastRecipientFilter filter;
 	te->LargeFunnel( filter, 0.0,
-		&GetAbsOrigin(), m_iSprite, HasSpawnFlags( SF_FUNNEL_REVERSE ) ? 1 : 0 );
+		&GetEngineObject()->GetAbsOrigin(), m_iSprite, HasSpawnFlags( SF_FUNNEL_REVERSE ) ? 1 : 0 );
 
 	SetThink( &CEnvFunnel::SUB_Remove );
 	SetNextThink( gpGlobals->curtime );
@@ -1345,7 +1345,7 @@ void CEnvBeverage::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 		return;
 	}
 
-	CBaseAnimating *pCan = (CBaseAnimating *)CBaseEntity::Create( "item_sodacan", GetLocalOrigin(), GetLocalAngles(), this );
+	CBaseAnimating *pCan = (CBaseAnimating *)CBaseEntity::Create( "item_sodacan", GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles(), this );
 
 	if ( m_nBeverageType == 6 )
 	{
@@ -1629,7 +1629,7 @@ void CEnvWind::Spawn( void )
 	SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 
-	m_EnvWindShared.Init( entindex(), 0, gpGlobals->frametime, GetLocalAngles().y, 0 );
+	m_EnvWindShared.Init( entindex(), 0, gpGlobals->frametime, GetEngineObject()->GetLocalAngles().y, 0 );
 
 	SetThink( &CEnvWind::WindThink );
 	SetNextThink( gpGlobals->curtime );
@@ -1914,8 +1914,8 @@ void CEnvMuzzleFlash::Spawn()
 		if ( nParentAttachment > 0 )
 		{
 			GetEngineObject()->SetParent(GetMoveParent()->GetEngineObject(), nParentAttachment);
-			SetLocalOrigin( vec3_origin );
-			SetLocalAngles( vec3_angle );
+			GetEngineObject()->SetLocalOrigin( vec3_origin );
+			GetEngineObject()->SetLocalAngles( vec3_angle );
 		}
 	}
 }
@@ -1927,7 +1927,7 @@ void CEnvMuzzleFlash::Spawn()
 //-----------------------------------------------------------------------------
 void CEnvMuzzleFlash::InputFire( inputdata_t &inputdata )
 {
-	g_pEffects->MuzzleFlash( GetAbsOrigin(), GetAbsAngles(), m_flScale, MUZZLEFLASH_TYPE_DEFAULT );
+	g_pEffects->MuzzleFlash(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), m_flScale, MUZZLEFLASH_TYPE_DEFAULT );
 }
 
 
@@ -1974,7 +1974,7 @@ void CEnvSplash::InputSplash( inputdata_t &inputdata )
 
 	if( HasSpawnFlags( SF_ENVSPLASH_FINDWATERSURFACE ) )
 	{
-		if( UTIL_PointContents(GetAbsOrigin()) & MASK_WATER )
+		if( UTIL_PointContents(GetEngineObject()->GetAbsOrigin()) & MASK_WATER )
 		{
 			// No splash if I'm supposed to find the surface of the water, but I'm underwater.
 			return;
@@ -1983,7 +1983,7 @@ void CEnvSplash::InputSplash( inputdata_t &inputdata )
 		// Trace down and find the water's surface. This is designed for making
 		// splashes on the surface of water that can change water level.
 		trace_t tr;
-		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector( 0, 0, 4096 ), (MASK_WATER|MASK_SOLID_BRUSHONLY), this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 4096 ), (MASK_WATER|MASK_SOLID_BRUSHONLY), this, COLLISION_GROUP_NONE, &tr );
 		data.m_vOrigin = tr.endpos;
 
 		if ( tr.contents & CONTENTS_SLIME )
@@ -1993,7 +1993,7 @@ void CEnvSplash::InputSplash( inputdata_t &inputdata )
 	}
 	else
 	{
-		data.m_vOrigin = GetAbsOrigin();
+		data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 	}
 
 	if( HasSpawnFlags( SF_ENVSPLASH_DIMINISH ) )
@@ -2183,7 +2183,7 @@ void CEnvGunfire::UpdateTarget()
 			// Target has moved.
 			// Locate my target and cache the position and distance.
 			m_vecTargetPosition = m_hTarget->WorldSpaceCenter();
-			m_flTargetDist = (GetAbsOrigin() - m_vecTargetPosition).Length();
+			m_flTargetDist = (GetEngineObject()->GetAbsOrigin() - m_vecTargetPosition).Length();
 		}
 	}
 }
@@ -2208,7 +2208,7 @@ void CEnvGunfire::ShootThink()
 
 	UpdateTarget();
 
-	Vector vecDir = m_vecTargetPosition - GetAbsOrigin();
+	Vector vecDir = m_vecTargetPosition - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( vecDir );
 
 	CShotManipulator manipulator( vecDir );
@@ -2221,7 +2221,7 @@ void CEnvGunfire::ShootThink()
 	{
 		trace_t tr;
 
-		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + vecDir * 8192, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecDir * 8192, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
 		if( tr.fraction != 1.0 )
 		{
@@ -2232,16 +2232,16 @@ void CEnvGunfire::ShootThink()
 	}
 	else
 	{
-		vecEnd = GetAbsOrigin() + vecDir * m_flTargetDist;
+		vecEnd = GetEngineObject()->GetAbsOrigin() + vecDir * m_flTargetDist;
 	}
 
 	if( m_iszTracerType != NULL_STRING )
 	{
-		UTIL_Tracer( GetAbsOrigin(), vecEnd, 0, TRACER_DONT_USE_ATTACHMENT, 5000, true, STRING(m_iszTracerType) );
+		UTIL_Tracer(GetEngineObject()->GetAbsOrigin(), vecEnd, 0, TRACER_DONT_USE_ATTACHMENT, 5000, true, STRING(m_iszTracerType) );
 	}
 	else
 	{
-		UTIL_Tracer( GetAbsOrigin(), vecEnd, 0, TRACER_DONT_USE_ATTACHMENT, 5000, true );
+		UTIL_Tracer(GetEngineObject()->GetAbsOrigin(), vecEnd, 0, TRACER_DONT_USE_ATTACHMENT, 5000, true );
 	}
 
 	const char* soundname = STRING(m_iszShootSound);
@@ -2389,7 +2389,7 @@ void CEnvViewPunch::Spawn( void )
 void CEnvViewPunch::DoViewPunch()
 {
 	bool bAir = (GetSpawnFlags() & SF_PUNCH_IN_AIR) ? true : false;
-	UTIL_ViewPunch( GetAbsOrigin(), m_angViewPunch, m_flRadius, bAir );
+	UTIL_ViewPunch(GetEngineObject()->GetAbsOrigin(), m_angViewPunch, m_flRadius, bAir );
 }
 
 

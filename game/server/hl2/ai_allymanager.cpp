@@ -130,7 +130,7 @@ void CAI_AllyManager::CountAllies( int *pTotal, int *pMedics )
 		return;
 	}
 
-	const Vector &	vPlayerPos = UTIL_GetLocalPlayer()->GetAbsOrigin();
+	const Vector &	vPlayerPos = UTIL_GetLocalPlayer()->GetEngineObject()->GetAbsOrigin();
 	CAI_BaseNPC **	ppAIs 	= g_AI_Manager.AccessAIs();
 	int 			nAIs 	= g_AI_Manager.NumAIs();
 
@@ -153,8 +153,8 @@ void CAI_AllyManager::CountAllies( int *pTotal, int *pMedics )
 			// Skip distant NPCs
 			if ( !ppAIs[i]->IsInPlayerSquad() && 
 				!UTIL_FindClientInPVS( ppAIs[i] ) &&
-				( ( ppAIs[i]->GetAbsOrigin() - vPlayerPos ).LengthSqr() > 150*12 ||
-				  fabsf( ppAIs[i]->GetAbsOrigin().z - vPlayerPos.z ) > 192 ) )
+				( ( ppAIs[i]->GetEngineObject()->GetAbsOrigin() - vPlayerPos ).LengthSqr() > 150*12 ||
+				  fabsf( ppAIs[i]->GetEngineObject()->GetAbsOrigin().z - vPlayerPos.z ) > 192 ) )
 				continue;
 
 			if( FClassnameIs( ppAIs[i], "npc_citizen" ) ) 

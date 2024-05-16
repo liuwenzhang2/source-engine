@@ -293,7 +293,7 @@ void CAI_FollowBehavior::DrawDebugGeometryOverlays()
 	if ( GetFollowTarget() )
 	{
 		Vector vecFollowPos = GetGoalPosition();
-		NDebugOverlay::HorzArrow( GetOuter()->GetAbsOrigin(), vecFollowPos, 16.0f, 0, 255, 0, 0, true, 0 );
+		NDebugOverlay::HorzArrow( GetOuter()->GetEngineObject()->GetAbsOrigin(), vecFollowPos, 16.0f, 0, 255, 0, 0, true, 0 );
 	}
 }
 
@@ -918,7 +918,7 @@ const Vector &CAI_FollowBehavior::GetFollowPoint()
 {
 	static Vector invalid = vec3_invalid;
 	if ( GetHintNode() && GetHintNode()->HintType() == HINT_FOLLOW_WAIT_POINT )
-		return GetHintNode()->GetAbsOrigin();
+		return GetHintNode()->GetEngineObject()->GetAbsOrigin();
 	return invalid;
 }
 
@@ -946,7 +946,7 @@ bool CAI_FollowBehavior::IsFollowPointInRange()
 {
 	return ( GetHintNode() && 
 			 GetHintNode()->HintType() == HINT_FOLLOW_WAIT_POINT && 
-			 (GetHintNode()->GetAbsOrigin() - GetFollowTarget()->GetAbsOrigin()).LengthSqr() < Square(MAX(m_FollowNavGoal.followPointTolerance, GetGoalRange())) );
+			 (GetHintNode()->GetEngineObject()->GetAbsOrigin() - GetFollowTarget()->GetEngineObject()->GetAbsOrigin()).LengthSqr() < Square(MAX(m_FollowNavGoal.followPointTolerance, GetGoalRange())) );
 }
 
 
@@ -999,7 +999,7 @@ int CAI_FollowBehavior::SelectScheduleFollowPoints()
 
 	if ( bHasFollowPoint )
 	{
-		distSqToPoint = (GetHintNode()->GetAbsOrigin() - GetAbsOrigin()).LengthSqr();
+		distSqToPoint = (GetHintNode()->GetEngineObject()->GetAbsOrigin() - GetAbsOrigin()).LengthSqr();
 		if ( !bShouldUseFollowPoints || 
 			distSqToPoint > Square(2.0 * GetHullWidth()) ||
 			HasCondition( COND_FOLLOW_WAIT_POINT_INVALID ) )
@@ -1026,7 +1026,7 @@ int CAI_FollowBehavior::SelectScheduleFollowPoints()
 			SetFollowPoint( ( m_pInterruptWaitPoint ) ? m_pInterruptWaitPoint : FindFollowPoint() );
 			
 			if ( GetHintNode() )
-				distSqToPoint = (GetHintNode()->GetAbsOrigin() - GetAbsOrigin()).LengthSqr();
+				distSqToPoint = (GetHintNode()->GetEngineObject()->GetAbsOrigin() - GetAbsOrigin()).LengthSqr();
 		}
 		
 		if ( GetHintNode() )
@@ -1212,7 +1212,7 @@ int CAI_FollowBehavior::TranslateSchedule( int scheduleType )
 				// Make sure I don't get too far from the player
 				if ( GetFollowTarget() )
 				{
-					float fDist = (GetLocalOrigin() - GetFollowTarget()->GetAbsOrigin()).Length();
+					float fDist = (GetLocalOrigin() - GetFollowTarget()->GetEngineObject()->GetAbsOrigin()).Length();
 					if (fDist > 500)
 					{
 						return SCHED_FOLLOW;
@@ -1282,7 +1282,7 @@ void CAI_FollowBehavior::GetFollowTargetViewLoc( Vector *pResult )
 		*pResult = tr.endpos;		
 	}
 	else
-		*pResult = m_hFollowTarget->GetAbsOrigin();
+		*pResult = m_hFollowTarget->GetEngineObject()->GetAbsOrigin();
 }
 
 //-------------------------------------
@@ -1293,7 +1293,7 @@ bool CAI_FollowBehavior::ValidateFaceTarget( Vector *pFaceTarget )
 	{
 		if ( m_hFollowTarget != NULL )
 		{
-			*pFaceTarget = m_hFollowTarget->GetAbsOrigin();
+			*pFaceTarget = m_hFollowTarget->GetEngineObject()->GetAbsOrigin();
 		}
 		return false;
 	}
@@ -1309,7 +1309,7 @@ bool CAI_FollowBehavior::ValidateFaceTarget( Vector *pFaceTarget )
 
 	if ( tr.fraction < 1.0 )
 	{
-		*pFaceTarget = m_hFollowTarget->GetAbsOrigin();
+		*pFaceTarget = m_hFollowTarget->GetEngineObject()->GetAbsOrigin();
 		return false;
 	}
 	return true;
@@ -1384,7 +1384,7 @@ void CAI_FollowBehavior::StartTask( const Task_t *pTask )
 			{
 				if ( m_bFirstFacing && m_hFollowTarget->IsPlayer() )
 				{
-					faceTarget = m_hFollowTarget->GetAbsOrigin();
+					faceTarget = m_hFollowTarget->GetEngineObject()->GetAbsOrigin();
 				}
 				else if ( m_TimeNextSpreadFacing.Expired() )
 				{
@@ -1400,7 +1400,7 @@ void CAI_FollowBehavior::StartTask( const Task_t *pTask )
 
 					if( bIsEpisodicVitalAlly )
 					{
-						faceTarget = m_hFollowTarget->GetAbsOrigin();
+						faceTarget = m_hFollowTarget->GetEngineObject()->GetAbsOrigin();
 					}
 					else
 					{
@@ -1411,7 +1411,7 @@ void CAI_FollowBehavior::StartTask( const Task_t *pTask )
 						}
 						else if ( roll == 2 )
 						{
-							faceTarget = m_hFollowTarget->GetAbsOrigin();
+							faceTarget = m_hFollowTarget->GetEngineObject()->GetAbsOrigin();
 						}
 						else
 						{
@@ -1426,7 +1426,7 @@ void CAI_FollowBehavior::StartTask( const Task_t *pTask )
 								// Add one to slots so then are 1 to N instead of 0 to N - 1.
 								int slot = random->RandomInt( 0, count );
 
-								QAngle angle = m_hFollowTarget->GetAbsAngles();
+								QAngle angle = m_hFollowTarget->GetEngineObject()->GetAbsAngles();
 
 								// split up the remaining angles among followers in my group.
 								angle.y = UTIL_AngleMod( angle.y + ( flSlice * slot ) );
@@ -1434,7 +1434,7 @@ void CAI_FollowBehavior::StartTask( const Task_t *pTask )
 								Vector vecDir;
 								AngleVectors( angle, &vecDir );
 
-								faceTarget = GetOuter()->GetAbsOrigin() + vecDir * 128;
+								faceTarget = GetOuter()->GetEngineObject()->GetAbsOrigin() + vecDir * 128;
 							}
 						}
 					}
@@ -1473,7 +1473,7 @@ void CAI_FollowBehavior::StartTask( const Task_t *pTask )
 			{
 				TaskFail(FAIL_NO_TARGET);
 			}
-			else if ( (m_hFollowTarget->GetAbsOrigin() - GetAbsOrigin()).Length() < 1 )
+			else if ( (m_hFollowTarget->GetEngineObject()->GetAbsOrigin() - GetAbsOrigin()).Length() < 1 )
 			{
 				TaskComplete();
 			}
@@ -1555,7 +1555,7 @@ void CAI_FollowBehavior::StartTask( const Task_t *pTask )
 		{
 			if ( GetHintNode() && !ShouldIgnoreFollowPointFacing() )
 			{
-				float distSqToPoint = (GetHintNode()->GetAbsOrigin() - GetAbsOrigin()).LengthSqr();
+				float distSqToPoint = (GetHintNode()->GetEngineObject()->GetAbsOrigin() - GetAbsOrigin()).LengthSqr();
 				if ( distSqToPoint < WAIT_HINT_MIN_DIST )
 				{
 					GetOuter()->SetSchedule( SCHED_FOLLOWER_STAND_AT_WAIT_POINT );
@@ -2066,7 +2066,7 @@ bool CAI_FollowBehavior::FValidateHintType( CAI_Hint *pHint )
 {
 	if ( pHint->HintType() == HINT_FOLLOW_WAIT_POINT )
 	{
-		if ( GetFollowTarget() && GetFollowTarget()->FVisible( pHint->GetAbsOrigin() + Vector( 0, 0, 0.1 ) )  )
+		if ( GetFollowTarget() && GetFollowTarget()->FVisible( pHint->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 0.1 ) )  )
 			return true;
 		else
 			return false;
@@ -2594,7 +2594,7 @@ bool CAI_FollowManager::CalcFollowPosition( AI_FollowManagerInfoHandle_t& hInfo,
 		AI_Follower_t *iterNode = &pGroup->followers[hInfo.m_hFollower];
 		if ( iterNode->navInfo.position != vec3_origin )
 		{
-			QAngle angles = pTarget->GetLocalAngles();
+			QAngle angles = pTarget->GetEngineObject()->GetLocalAngles();
 			angles.x = angles.z = 0;
 				
 			matrix3x4_t fRotateMatrix;
@@ -2633,7 +2633,7 @@ bool CAI_FollowManager::RedistributeSlots( AI_FollowGroup_t *pGroup )
 	CUtlRBTree<CBaseEntity *> movedFollowers;
 	SetDefLessFunc( movedFollowers );
 
-	const Vector &originFollowed = pGroup->hFollowTarget->GetAbsOrigin();
+	const Vector &originFollowed = pGroup->hFollowTarget->GetEngineObject()->GetAbsOrigin();
 	int 		  bestSlot;
 
 	while ( ( bestSlot = FindBestSlot( pGroup ) ) != -1 && ((int)movedFollowers.Count() < pGroup->followers.Count()) )
@@ -2651,7 +2651,7 @@ bool CAI_FollowManager::RedistributeSlots( AI_FollowGroup_t *pGroup )
 			if ( movedFollowers.Find( p->hFollower ) == movedFollowers.InvalidIndex() && 
 				 ( p->slot == -1 || pSlot->priority > pGroup->pFormation->pSlots[p->slot].priority ) )
 			{
-				float distSqCur = ( p->hFollower->GetAbsOrigin() - slotPos ).LengthSqr();
+				float distSqCur = ( p->hFollower->GetEngineObject()->GetAbsOrigin() - slotPos ).LengthSqr();
 				if ( distSqCur < distSqBest )
 				{
 					hBest = h;

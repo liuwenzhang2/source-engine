@@ -199,8 +199,8 @@ void CLogicMeasureMovement::MeasureThink( )
 		Vector vecNewOrigin;
 		QAngle vecNewAngles;
 		MatrixAngles( matNewTargetToWorld, vecNewAngles, vecNewOrigin );
-		m_hTarget->SetAbsOrigin( vecNewOrigin );
-		m_hTarget->SetAbsAngles( vecNewAngles );
+		m_hTarget->GetEngineObject()->SetAbsOrigin( vecNewOrigin );
+		m_hTarget->GetEngineObject()->SetAbsAngles( vecNewAngles );
 	}
 
 	SetNextThink( gpGlobals->curtime + TICK_INTERVAL );

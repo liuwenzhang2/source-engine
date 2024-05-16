@@ -85,8 +85,8 @@ CGrenadeHomer* CGrenadeHomer::CreateGrenadeHomer( string_t sModelName, string_t 
 	{
 		pGrenade->m_sFlySound	= sFlySound;
 		pGrenade->SetOwnerEntity( pentOwner );
-		pGrenade->SetLocalOrigin( vecOrigin );
-		pGrenade->SetLocalAngles( vecAngles );
+		pGrenade->GetEngineObject()->SetLocalOrigin( vecOrigin );
+		pGrenade->GetEngineObject()->SetLocalAngles( vecAngles );
 		pGrenade->SetModel( STRING(sModelName) );
 	}
 	return pGrenade;
@@ -301,7 +301,7 @@ void CGrenadeHomer::Launch( CBaseEntity*		pOwner,
 {
 	SetOwnerEntity( pOwner );
 	m_hTarget					= pTarget;
-	SetAbsVelocity( vInitVelocity );
+	GetEngineObject()->SetAbsVelocity( vInitVelocity );
 	m_flHomingSpeed				= flHomingSpeed;
 	SetGravity( flGravity );
 	m_nRocketTrailType			= nRocketTrailType;
@@ -330,9 +330,9 @@ void CGrenadeHomer::Launch( CBaseEntity*		pOwner,
 	{
 		// Figure out how long it'll take for me to reach the target.
 		float flDist = ( pTarget->WorldSpaceCenter() - WorldSpaceCenter() ).Length();
-		float flTime = MAX( 0.5, flDist / GetAbsVelocity().Length() );
+		float flTime = MAX( 0.5, flDist / GetEngineObject()->GetAbsVelocity().Length() );
 
-		CSoundEnt::InsertSound ( SOUND_DANGER, m_hTarget->GetAbsOrigin(), 300, flTime, pOwner );
+		CSoundEnt::InsertSound ( SOUND_DANGER, m_hTarget->GetEngineObject()->GetAbsOrigin(), 300, flTime, pOwner );
 	}
 }
 
@@ -360,7 +360,7 @@ void CGrenadeHomer::GrenadeHomerTouch( CBaseEntity *pOther )
 	// If I hit the sky, don't explode
 	// ----------------------------------
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + GetAbsVelocity(),  MASK_SOLID_BRUSHONLY, 
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity(),  MASK_SOLID_BRUSHONLY,
 		this, COLLISION_GROUP_NONE, &tr);
 
 	if (tr.surface.flags & SURF_SKY)
@@ -382,10 +382,10 @@ void CGrenadeHomer::Detonate(void)
 
 	m_takedamage	= DAMAGE_NO;	
 
-	CPASFilter filter( GetAbsOrigin() );
+	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 
 	te->Explosion( filter, 0.0,
-		&GetAbsOrigin(), 
+		&GetEngineObject()->GetAbsOrigin(),
 		g_sModelIndexFireball,
 		2.0, 
 		15,
@@ -402,7 +402,7 @@ void CGrenadeHomer::Detonate(void)
 		// Add a shockring
 		CBroadcastRecipientFilter filter3;
 		te->BeamRingPoint( filter3, 0, 
-			GetAbsOrigin(),	//origin
+			GetEngineObject()->GetAbsOrigin(),	//origin
 			16,			//start radius
 			1000,		//end radius
 			m_spriteTexture, //texture
@@ -424,7 +424,7 @@ void CGrenadeHomer::Detonate(void)
 		// Add a shockring
 		CBroadcastRecipientFilter filter4;
 		te->BeamRingPoint( filter4, 0, 
-			GetAbsOrigin(),	//origin
+			GetEngineObject()->GetAbsOrigin(),	//origin
 			16,			//start radius
 			500,		//end radius
 			m_spriteTexture, //texture
@@ -447,16 +447,16 @@ void CGrenadeHomer::Detonate(void)
 	}
 
 
-	Vector vecForward = GetAbsVelocity();
+	Vector vecForward = GetEngineObject()->GetAbsVelocity();
 	VectorNormalize(vecForward);
 	trace_t		tr;
-	UTIL_TraceLine ( GetAbsOrigin(), GetAbsOrigin() + 60*vecForward,  MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, & tr);
+	UTIL_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + 60*vecForward,  MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, & tr);
 
 	UTIL_DecalTrace( &tr, "Scorch" );
 
-	UTIL_ScreenShake( GetAbsOrigin(), 25.0, 150.0, 1.0, 750, SHAKE_START );
+	UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 25.0, 150.0, 1.0, 750, SHAKE_START );
 
-	RadiusDamage ( CTakeDamageInfo( this, GetOwnerEntity(), m_flDamage, DMG_BLAST ), GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
+	RadiusDamage ( CTakeDamageInfo( this, GetOwnerEntity(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
 	CPASAttenuationFilter filter2( this, "GrenadeHomer.StopSounds" );
 	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "GrenadeHomer.StopSounds" );
 	UTIL_Remove( this );
@@ -514,21 +514,21 @@ void CGrenadeHomer::AimThink( void )
 	if (m_hTarget != NULL)
 	{
 		vTargetPos		= m_hTarget->EyePosition();
-		vTargetDir		= vTargetPos - GetAbsOrigin();
+		vTargetDir		= vTargetPos - GetEngineObject()->GetAbsOrigin();
 		VectorNormalize(vTargetDir);
 
 		// --------------------------------------------------
 		//  If my target is far away do some primitive
 		//  obstacle avoidance
 		// --------------------------------------------------
-		if ((vTargetPos - GetAbsOrigin()).Length() > 200)
+		if ((vTargetPos - GetEngineObject()->GetAbsOrigin()).Length() > 200)
 		{
-			Vector  vTravelDir	= GetAbsVelocity();
+			Vector  vTravelDir	= GetEngineObject()->GetAbsVelocity();
 			VectorNormalize(vTravelDir);
 			vTravelDir *= 50;
 
 			trace_t tr;
-			UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + vTravelDir, MASK_SHOT, m_hTarget, COLLISION_GROUP_NONE, &tr );
+			UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vTravelDir, MASK_SHOT, m_hTarget, COLLISION_GROUP_NONE, &tr );
 			if (tr.fraction != 1.0)
 			{
 				// Head off in normal 
@@ -545,7 +545,7 @@ void CGrenadeHomer::AimThink( void )
 			}
 		}
 
-		float	flTargetSpeed					= GetAbsVelocity().Length();
+		float	flTargetSpeed					= GetEngineObject()->GetAbsVelocity().Length();
 		float	flHomingRampUpStartTime			= m_flHomingLaunchTime		+ m_flHomingDelay;
 		float	flHomingSustainStartTime		= flHomingRampUpStartTime	+ m_flHomingRampUp;
 		float	flHomingRampDownStartTime		= flHomingSustainStartTime	+ m_flHomingDuration;
@@ -598,12 +598,12 @@ void CGrenadeHomer::AimThink( void )
 			}
 
 			// Extract speed and direction
-			Vector	vCurDir		= GetAbsVelocity();
+			Vector	vCurDir		= GetEngineObject()->GetAbsVelocity();
 			float flCurSpeed = VectorNormalize(vCurDir);
 			flTargetSpeed = MAX(flTargetSpeed, flCurSpeed);
 
 			// Add in homing direction
-			Vector vecNewVelocity = GetAbsVelocity();
+			Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 			float flTimeToUse = gpGlobals->frametime;
 			while (flTimeToUse > 0)
 			{
@@ -612,7 +612,7 @@ void CGrenadeHomer::AimThink( void )
 			}
 			VectorNormalize(vecNewVelocity);
 			vecNewVelocity *= flTargetSpeed;
-			SetAbsVelocity( vecNewVelocity );
+			GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 		}
 	}
 	
@@ -632,8 +632,8 @@ void CGrenadeHomer::AimThink( void )
 	ApplyAbsVelocityImpulse( vecImpulse );
 
 	QAngle angles;
-	VectorAngles( GetAbsVelocity(), angles );
-	SetLocalAngles( angles );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
+	GetEngineObject()->SetLocalAngles( angles );
 
 #if 0 // BUBBLE
 	if( gpGlobals->curtime > m_flNextWarnTime )

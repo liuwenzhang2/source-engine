@@ -165,7 +165,7 @@ void CWeaponMG42::Spawn( void )
 	// ( except if we are holstered )
 	void CWeaponMG42::ClientThink( void )
 	{
-		m_pEmitter->SetSortOrigin( GetAbsOrigin() );
+		m_pEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
 		float flEmitRate = 0.0;	//particles per second
 

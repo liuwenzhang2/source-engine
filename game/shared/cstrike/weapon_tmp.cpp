@@ -92,7 +92,7 @@ void CWeaponTMP::PrimaryAttack( void )
 
 	if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 		pPlayer->KickBack (1.1, 0.5, 0.35, 0.045, 4.5, 3.5, 6);
-	else if (pPlayer->GetAbsVelocity().Length2D() > 5)
+	else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 		pPlayer->KickBack (0.8, 0.4, 0.2, 0.03, 3, 2.5, 7);
 	else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
 		pPlayer->KickBack (0.7, 0.35, 0.125, 0.025, 2.5, 2, 10);

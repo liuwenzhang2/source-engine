@@ -312,11 +312,11 @@ bool CRopeKeyframe::SetupHangDistance( float flHangDist )
 		return false;
 
 	// Calculate starting conditions so we can force it to hang down N inches.
-	Vector v1 = pEnt1->GetAbsOrigin();
+	Vector v1 = pEnt1->GetEngineObject()->GetAbsOrigin();
 	if ( pEnt1->GetBaseAnimating() )
 		pEnt1->GetBaseAnimating()->GetAttachment( m_iStartAttachment, v1 );
 		
-	Vector v2 = pEnt2->GetAbsOrigin();
+	Vector v2 = pEnt2->GetEngineObject()->GetAbsOrigin();
 	if ( pEnt2->GetBaseAnimating() )
 		pEnt2->GetBaseAnimating()->GetAttachment( m_iEndAttachment, v2 );
 
@@ -331,7 +331,7 @@ bool CRopeKeyframe::SetupHangDistance( float flHangDist )
 
 void CRopeKeyframe::Init()
 {
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 	RecalculateLength();
 
 	m_nSegments = clamp( (int) m_nSegments, 2, ROPE_MAX_SEGMENTS );
@@ -420,7 +420,7 @@ void CRopeKeyframe::RecalculateLength( void )
 		CBaseEntity *pEndEnt = m_hEndPoint.Get();
 
 		// Set the length
-		m_RopeLength = (int)( pStartEnt->GetAbsOrigin() - pEndEnt->GetAbsOrigin() ).Length();
+		m_RopeLength = (int)( pStartEnt->GetEngineObject()->GetAbsOrigin() - pEndEnt->GetEngineObject()->GetAbsOrigin() ).Length();
 	}
 	else
 	{
@@ -478,7 +478,7 @@ bool CRopeKeyframe::GetEndPointPos2( CBaseEntity *pAttached, int iAttachment, Ve
 	}
 	else
 	{
-		vPos = pAttached->GetAbsOrigin();
+		vPos = pAttached->GetEngineObject()->GetAbsOrigin();
 	}
 
 	return true;
@@ -506,12 +506,12 @@ void CRopeKeyframe::UpdateBBox( bool bForceRelink )
 			VectorMax( v1, v2, vMax );
 
 			// Set our bounds to enclose both endpoints and relink.
-			vMin -= GetAbsOrigin();
-			vMax -= GetAbsOrigin();
+			vMin -= GetEngineObject()->GetAbsOrigin();
+			vMax -= GetEngineObject()->GetAbsOrigin();
 		}
 		else
 		{
-			vMin = vMax = v1 - GetAbsOrigin();
+			vMin = vMax = v1 - GetEngineObject()->GetAbsOrigin();
 		}
 	}
 	else
@@ -604,7 +604,7 @@ void CRopeKeyframe::NotifyPositionChanged( CBaseEntity *pEntity )
 	CBaseEntity *ents[2] = { m_hStartPoint.Get(), m_hEndPoint.Get() };
 	if ( (m_RopeFlags & ROPE_RESIZE) && ents[0] && ents[0]->entindex()!=-1 && ents[1] && ents[1]->entindex()!=-1 )
 	{
-		int len = (int)( ents[0]->GetAbsOrigin() - ents[1]->GetAbsOrigin() ).Length() + m_Slack;
+		int len = (int)( ents[0]->GetEngineObject()->GetAbsOrigin() - ents[1]->GetEngineObject()->GetAbsOrigin() ).Length() + m_Slack;
 		if ( len != m_RopeLength )
 		{
 			m_RopeLength = len;

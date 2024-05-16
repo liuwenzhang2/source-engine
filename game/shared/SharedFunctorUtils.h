@@ -53,7 +53,7 @@ public:
 			Vector testPos;
 			CalcClosestPointOnLineSegment( them->WorldSpaceCenter(), start, end, testPos );
 
-			start = them->GetAbsOrigin();
+			start = them->GetEngineObject()->GetAbsOrigin();
 			end = start;
 			end.z += them->CollisionProp()->OBBMaxs().z;
 			CalcClosestPointOnLineSegment( testPos, start, end, closestPos );

@@ -360,7 +360,7 @@ bool CNPC_Ichthyosaur::OverrideMove( float flInterval )
 	}
 	else
 	{
-		DoMovement( flInterval, GetLocalOrigin(), ICH_MOVETYPE_ARRIVE );
+		DoMovement( flInterval, GetEngineObject()->GetLocalOrigin(), ICH_MOVETYPE_ARRIVE );
 	}
 	return true;
 }
@@ -455,10 +455,10 @@ void CNPC_Ichthyosaur::DragVictim( float moveDist )
 	Vector	forward, up;
 	GetVectors( &forward, NULL, &up );
 
-	Vector	newPos = GetAbsOrigin() + ( (forward+(up*0.25f)) * ( moveDist + width + DRAG_OFFSET ) );
+	Vector	newPos = GetEngineObject()->GetAbsOrigin() + ( (forward+(up*0.25f)) * ( moveDist + width + DRAG_OFFSET ) );
 
 	trace_t	tr;
-	AI_TraceEntity( this, m_pVictim->GetAbsOrigin(), newPos, MASK_NPCSOLID, &tr );
+	AI_TraceEntity( this, m_pVictim->GetEngineObject()->GetAbsOrigin(), newPos, MASK_NPCSOLID, &tr );
 
 	if ( ( tr.fraction == 1.0f ) && ( tr.m_pEnt != this ) )
 	{
@@ -557,22 +557,22 @@ void CNPC_Ichthyosaur::SetPoses( Vector moveRel, float speed )
 	}
 
 	//Face our current velocity
-	GetMotor()->SetIdealYawAndUpdate( UTIL_AngleMod( CalcIdealYaw( GetAbsOrigin() + GetAbsVelocity() ) ), AI_KEEP_YAW_SPEED );
+	GetMotor()->SetIdealYawAndUpdate( UTIL_AngleMod( CalcIdealYaw(GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() ) ), AI_KEEP_YAW_SPEED );
 
 	float	pitch = 0.0f;
 
 	if ( speed != 0.0f )
 	{
-		pitch = -RAD2DEG( asin( GetAbsVelocity().z / speed ) );
+		pitch = -RAD2DEG( asin(GetEngineObject()->GetAbsVelocity().z / speed ) );
 	}
 
 	//FIXME: Framerate dependant
-	QAngle angles = GetLocalAngles();
+	QAngle angles = GetEngineObject()->GetLocalAngles();
 
 	angles.x = (angles.x * 0.8f) + (pitch * 0.2f);
 	angles.z = (angles.z * 0.9f) + (tailPosition[ROLL] * 0.1f);
 
-	SetLocalAngles( angles );
+	GetEngineObject()->SetLocalAngles( angles );
 }
 
 #define	LATERAL_NOISE_MAX	2.0f
@@ -618,7 +618,7 @@ void CNPC_Ichthyosaur::DoMovement( float flInterval, const Vector &MoveTarget, i
 
 	if ( ( GetActivity() == ACT_MELEE_ATTACK1 ) && ( GetEnemy() != NULL ) )
 	{
-		SteerSeek( Steer, GetEnemy()->GetAbsOrigin() );
+		SteerSeek( Steer, GetEnemy()->GetEngineObject()->GetAbsOrigin() );
 	}
 	else
 	{
@@ -674,7 +674,7 @@ void CNPC_Ichthyosaur::DoMovement( float flInterval, const Vector &MoveTarget, i
 #else
 
 	//See if we need to avoid any obstacles.
-	if ( SteerAvoidObstacles( SteerAvoid, GetAbsVelocity(), forward, right, up ) )
+	if ( SteerAvoidObstacles( SteerAvoid, GetEngineObject()->GetAbsVelocity(), forward, right, up ) )
 	{
 		//Take the avoidance vector
 		Steer = SteerAvoid;
@@ -687,7 +687,7 @@ void CNPC_Ichthyosaur::DoMovement( float flInterval, const Vector &MoveTarget, i
 	
 #endif
 
-	Vector vecNewVelocity = GetAbsVelocity();
+	Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 	float flLength = vecNewVelocity.Length();
 
 	//Clamp our final speed
@@ -727,7 +727,7 @@ void CNPC_Ichthyosaur::DoMovement( float flInterval, const Vector &MoveTarget, i
 		}
 	}
 
-	SetAbsVelocity( vecNewVelocity );
+	GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
 }
 
@@ -739,7 +739,7 @@ void CNPC_Ichthyosaur::DoMovement( float flInterval, const Vector &MoveTarget, i
 //-----------------------------------------------------------------------------
 void CNPC_Ichthyosaur::SteerArrive(Vector &Steer, const Vector &Target)
 {
-	Vector Offset = Target - GetLocalOrigin();
+	Vector Offset = Target - GetEngineObject()->GetLocalOrigin();
 	float fTargetDistance = Offset.Length();
 
 	float fIdealSpeed = m_flGroundSpeed * (fTargetDistance / ICH_WAYPOINT_DISTANCE);
@@ -752,7 +752,7 @@ void CNPC_Ichthyosaur::SteerArrive(Vector &Steer, const Vector &Target)
 		DesiredVelocity = (fClippedSpeed / fTargetDistance) * Offset;
 	}
 
-	Steer = DesiredVelocity - GetAbsVelocity();
+	Steer = DesiredVelocity - GetEngineObject()->GetAbsVelocity();
 }
 
 
@@ -764,13 +764,13 @@ void CNPC_Ichthyosaur::SteerArrive(Vector &Steer, const Vector &Target)
 //-----------------------------------------------------------------------------
 void CNPC_Ichthyosaur::SteerSeek( Vector &Steer, const Vector &Target )
 {
-	Vector offset = Target - GetLocalOrigin();
+	Vector offset = Target - GetEngineObject()->GetLocalOrigin();
 	
 	VectorNormalize( offset );
 	
 	Vector DesiredVelocity = m_flGroundSpeed * offset;
 	
-	Steer = DesiredVelocity - GetAbsVelocity();
+	Steer = DesiredVelocity - GetEngineObject()->GetAbsVelocity();
 }
 
 //-----------------------------------------------------------------------------
@@ -787,7 +787,7 @@ bool CNPC_Ichthyosaur::SteerAvoidObstacles(Vector &Steer, const Vector &Velocity
 	float	speed = VectorNormalize( dir );
 
 	//Look ahead one second and avoid whatever is in our way.
-	AI_TraceHull( GetAbsOrigin(), GetAbsOrigin() + (dir*speed), GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
+	AI_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + (dir*speed), GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
 
 	Vector	forward;
 
@@ -805,7 +805,7 @@ bool CNPC_Ichthyosaur::SteerAvoidObstacles(Vector &Steer, const Vector &Velocity
 		{
 			DevMsg( 2, "Avoiding an NPC\n" );
 
-			Vector HitOffset = tr.endpos - GetAbsOrigin();
+			Vector HitOffset = tr.endpos - GetEngineObject()->GetAbsOrigin();
 
 			Vector SteerUp = CrossProduct( HitOffset, Velocity );
 			Steer = CrossProduct(  SteerUp, Velocity  );
@@ -853,7 +853,7 @@ bool CNPC_Ichthyosaur::SteerAvoidObstacles(Vector &Steer, const Vector &Velocity
 	}
 
 	//Try to remain 8 feet above the ground.
-	AI_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector(0, 0, -ICH_HEIGHT_PREFERENCE), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+	AI_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector(0, 0, -ICH_HEIGHT_PREFERENCE), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 	if ( tr.fraction < 1.0f )
 	{
@@ -864,7 +864,7 @@ bool CNPC_Ichthyosaur::SteerAvoidObstacles(Vector &Steer, const Vector &Velocity
 	//Stay under the surface
 	if ( m_bIgnoreSurface == false )
 	{
-		float waterLevel = ( UTIL_WaterLevel( GetAbsOrigin(), GetAbsOrigin().z, GetAbsOrigin().z+ICH_DEPTH_PREFERENCE ) - GetAbsOrigin().z ) / ICH_DEPTH_PREFERENCE;
+		float waterLevel = ( UTIL_WaterLevel(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin().z, GetEngineObject()->GetAbsOrigin().z+ICH_DEPTH_PREFERENCE ) - GetEngineObject()->GetAbsOrigin().z ) / ICH_DEPTH_PREFERENCE;
 
 		if ( waterLevel < 1.0f )
 		{
@@ -947,9 +947,9 @@ void CNPC_Ichthyosaur::MoveFlyExecute( CBaseEntity *pTargetEnt, const Vector &ve
 	if ( ( GetEnemy() != NULL ) && ( GetNavigator()->GetGoalTarget() == (CBaseEntity *) GetEnemy() ) )
 	{
 		trace_t	tr;
-		Vector	goalPos = GetEnemy()->GetAbsOrigin() + ( GetEnemy()->GetSmoothedVelocity() * 0.5f );
+		Vector	goalPos = GetEnemy()->GetEngineObject()->GetAbsOrigin() + ( GetEnemy()->GetSmoothedVelocity() * 0.5f );
 
-		AI_TraceHull( GetAbsOrigin(), goalPos, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, GetEnemy(), COLLISION_GROUP_NONE, &tr );
+		AI_TraceHull(GetEngineObject()->GetAbsOrigin(), goalPos, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, GetEnemy(), COLLISION_GROUP_NONE, &tr );
 
 		if ( tr.fraction == 1.0f )
 		{
@@ -987,7 +987,7 @@ bool CNPC_Ichthyosaur::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntit
 //-----------------------------------------------------------------------------
 int CNPC_Ichthyosaur::MeleeAttack1Conditions( float flDot, float flDist )
 {
-	Vector	predictedDir	= ( (GetEnemy()->GetAbsOrigin()+(GetEnemy()->GetSmoothedVelocity())) - GetAbsOrigin() );	
+	Vector	predictedDir	= ( (GetEnemy()->GetEngineObject()->GetAbsOrigin()+(GetEnemy()->GetSmoothedVelocity())) - GetEngineObject()->GetAbsOrigin() );
 	float	flPredictedDist = VectorNormalize( predictedDir );
 	
 	Vector	vBodyDir;
@@ -998,7 +998,7 @@ int CNPC_Ichthyosaur::MeleeAttack1Conditions( float flDot, float flDist )
 	if ( flPredictedDot < 0.8f )
 		return COND_NOT_FACING_ATTACK;
 
-	if ( ( flPredictedDist > ( GetAbsVelocity().Length() * 0.5f) ) && ( flDist > 128.0f ) )
+	if ( ( flPredictedDist > (GetEngineObject()->GetAbsVelocity().Length() * 0.5f) ) && ( flDist > 128.0f ) )
 		return COND_TOO_FAR_TO_ATTACK;
 
 	return COND_CAN_MELEE_ATTACK1;
@@ -1072,34 +1072,34 @@ void CNPC_Ichthyosaur::Bite( void )
 				{
 					info.SetDamage( sk_ichthyosaur_melee_dmg.GetInt() * 3 );
 				}
-				CalculateMeleeDamageForce( &info, GetAbsVelocity(), pHurt->GetAbsOrigin() );
+				CalculateMeleeDamageForce( &info, GetEngineObject()->GetAbsVelocity(), pHurt->GetEngineObject()->GetAbsOrigin() );
 				pHurt->TakeDamage( info );
 
 				color32 red = {64, 0, 0, 255};
 				UTIL_ScreenFade( pPlayer, red, 0.5, 0, FFADE_IN  );
 
 				//Disorient the player
-				QAngle angles = pPlayer->GetLocalAngles();
+				QAngle angles = pPlayer->GetEngineObject()->GetLocalAngles();
 
 				angles.x += random->RandomInt( 60, 25 );
 				angles.y += random->RandomInt( 60, 25 );
 				angles.z = 0.0f;
 
-				pPlayer->SetLocalAngles( angles );
+				pPlayer->GetEngineObject()->SetLocalAngles( angles );
 
 				pPlayer->SnapEyeAngles( angles );
 			}
 		}
 		else
 		{
-			CalculateMeleeDamageForce( &info, GetAbsVelocity(), pHurt->GetAbsOrigin() );
+			CalculateMeleeDamageForce( &info, GetEngineObject()->GetAbsVelocity(), pHurt->GetEngineObject()->GetAbsOrigin() );
 			pHurt->TakeDamage( info );
 		}
 
 		m_flNextBiteTime = gpGlobals->curtime + random->RandomFloat( 2.0f, 4.0f );
 
 		//Bubbles!
-		UTIL_Bubbles( pHurt->GetAbsOrigin()+Vector(-32.0f,-32.0f,-32.0f), pHurt->GetAbsOrigin()+Vector(32.0f,32.0f,0.0f), random->RandomInt( 16, 32 ) );
+		UTIL_Bubbles( pHurt->GetEngineObject()->GetAbsOrigin()+Vector(-32.0f,-32.0f,-32.0f), pHurt->GetEngineObject()->GetAbsOrigin()+Vector(32.0f,32.0f,0.0f), random->RandomInt( 16, 32 ) );
 		
 		// Play a random attack hit sound
 		const char* soundname = "NPC_Ichthyosaur.Bite";
@@ -1147,9 +1147,9 @@ bool CNPC_Ichthyosaur::Beached( void )
 	trace_t	tr;
 	Vector	testPos;
 
-	testPos = GetAbsOrigin() - Vector( 0, 0, ICH_DEPTH_PREFERENCE );
+	testPos = GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, ICH_DEPTH_PREFERENCE );
 	
-	AI_TraceHull( GetAbsOrigin(), testPos, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
+	AI_TraceHull(GetEngineObject()->GetAbsOrigin(), testPos, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
 
 	return ( tr.fraction < 1.0f );
 }
@@ -1191,7 +1191,7 @@ void CNPC_Ichthyosaur::PrescheduleThink( void )
 	//Randomly emit bubbles
 	if ( random->RandomInt( 0, 10 ) == 0 )
 	{
-		UTIL_Bubbles( GetAbsOrigin()+(GetHullMins()*0.5f), GetAbsOrigin()+(GetHullMaxs()*0.5f), 1 );
+		UTIL_Bubbles(GetEngineObject()->GetAbsOrigin()+(GetHullMins()*0.5f), GetEngineObject()->GetAbsOrigin()+(GetHullMaxs()*0.5f), 1 );
 	}
 
 	//Check our water level
@@ -1205,9 +1205,9 @@ void CNPC_Ichthyosaur::PrescheduleThink( void )
 			{
 				SetSchedule( SCHED_ICH_THRASH );
 
-				Vector vecNewVelocity = GetAbsVelocity();
+				Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 				vecNewVelocity[2] = 8.0f;
-				SetAbsVelocity( vecNewVelocity );
+				GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 			}
 		}
 		else
@@ -1348,7 +1348,7 @@ void CNPC_Ichthyosaur::StartTask( const Task_t *pTask )
 
 	case TASK_ICH_GET_PATH_TO_RANDOM_NODE:
 		{
-			if ( GetEnemy() == NULL || !GetNavigator()->SetRandomGoal( GetEnemy()->GetLocalOrigin(), pTask->flTaskData ) )
+			if ( GetEnemy() == NULL || !GetNavigator()->SetRandomGoal( GetEnemy()->GetEngineObject()->GetLocalOrigin(), pTask->flTaskData ) )
 			{
 				if (!GetNavigator()->SetRandomGoal( pTask->flTaskData ) )
 				{
@@ -1363,7 +1363,7 @@ void CNPC_Ichthyosaur::StartTask( const Task_t *pTask )
 
 	case TASK_ICH_GET_PATH_TO_DROWN_NODE:
 		{
-			Vector	drownPos = GetLocalOrigin() - Vector( 0, 0, pTask->flTaskData );
+			Vector	drownPos = GetEngineObject()->GetLocalOrigin() - Vector( 0, 0, pTask->flTaskData );
 
 			if ( GetNavigator()->SetGoal( drownPos, AIN_CLEAR_TARGET ) == false )
 			{
@@ -1421,7 +1421,7 @@ float CNPC_Ichthyosaur::MaxYawSpeed( void )
 		return 16.0f;
 
 	//Ramp up the yaw speed as we increase our speed
-	return ICH_MIN_TURN_SPEED + ( (ICH_MAX_TURN_SPEED-ICH_MIN_TURN_SPEED) * ( fabs(GetAbsVelocity().Length()) / ICH_SWIM_SPEED_RUN ) );
+	return ICH_MIN_TURN_SPEED + ( (ICH_MAX_TURN_SPEED-ICH_MIN_TURN_SPEED) * ( fabs(GetEngineObject()->GetAbsVelocity().Length()) / ICH_SWIM_SPEED_RUN ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1432,7 +1432,7 @@ float CNPC_Ichthyosaur::MaxYawSpeed( void )
 //-----------------------------------------------------------------------------
 void CNPC_Ichthyosaur::TranslateNavGoal( CBaseEntity *pEnemy, Vector &chasePosition )
 {
-	Vector offset = pEnemy->EyePosition() - pEnemy->GetAbsOrigin();
+	Vector offset = pEnemy->EyePosition() - pEnemy->GetEngineObject()->GetAbsOrigin();
 	chasePosition += offset;
 }
 

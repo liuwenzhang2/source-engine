@@ -197,7 +197,7 @@ void CAPCController::DeactivateRocketGuidance(void)
 //-----------------------------------------------------------------------------
 CBaseEntity *CAPCController::FindTarget( string_t targetName, CBaseEntity *pActivator ) 
 {
-	return gEntList.FindEntityGenericNearest( STRING( targetName ), GetAbsOrigin(), 0, this, pActivator );
+	return gEntList.FindEntityGenericNearest( STRING( targetName ), GetEngineObject()->GetAbsOrigin(), 0, this, pActivator );
 }
 
 //-----------------------------------------------------------------------------
@@ -233,8 +233,8 @@ void CAPCController::Spawn( void )
 {
 	Precache();
 
-	m_yawCenter			= GetLocalAngles().y;
-	m_pitchCenter		= GetLocalAngles().x;
+	m_yawCenter			= GetEngineObject()->GetLocalAngles().y;
+	m_pitchCenter		= GetEngineObject()->GetLocalAngles().x;
 
 	if ( IsActive() )
 	{
@@ -298,7 +298,7 @@ void CAPCController::Think( void )
 //-----------------------------------------------------------------------------
 QAngle CAPCController::AimBarrelAt( const Vector &parentTarget )
 {
-	Vector target = parentTarget - GetLocalOrigin();
+	Vector target = parentTarget - GetEngineObject()->GetLocalOrigin();
 	float quadTarget = target.LengthSqr();
 	float quadTargetXY = target.x*target.x + target.y*target.y;
 
@@ -382,7 +382,7 @@ void CAPCController::TrackTarget( void )
 			updateTime = TRUE;
 
 			// Sight position is BodyTarget with no noise (so gun doesn't bob up and down)
-			m_sightOrigin = pInstance->BodyTarget( GetLocalOrigin(), false );
+			m_sightOrigin = pInstance->BodyTarget(GetEngineObject()->GetLocalOrigin(), false );
 		}
 	}
 
@@ -397,14 +397,14 @@ void CAPCController::TrackTarget( void )
 	angles.x = m_pitchCenter + offsetX;
 
 	// Move toward target at rate or less
-	float distY = UTIL_AngleDistance( angles.y, GetLocalAngles().y );
+	float distY = UTIL_AngleDistance( angles.y, GetEngineObject()->GetLocalAngles().y );
 
 	QAngle vecAngVel = GetLocalAngularVelocity();
 	vecAngVel.y = distY * 10;
 	vecAngVel.y = clamp( vecAngVel.y, -m_yawRate, m_yawRate );
 
 	// Move toward target at rate or less
-	float distX = UTIL_AngleDistance( angles.x, GetLocalAngles().x );
+	float distX = UTIL_AngleDistance( angles.x, GetEngineObject()->GetLocalAngles().x );
 	vecAngVel.x = distX  * 10;
 	vecAngVel.x = clamp( vecAngVel.x, -m_pitchRate, m_pitchRate );
 	SetLocalAngularVelocity( vecAngVel );
@@ -412,7 +412,7 @@ void CAPCController::TrackTarget( void )
 	SetMoveDoneTime( 0.1 );
 
 	Vector forward;
-	AngleVectors( GetLocalAngles(), &forward );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &forward );
 	forward = m_parentMatrix.ApplyRotation( forward );
 
 	AngleVectors(angles, &forward);

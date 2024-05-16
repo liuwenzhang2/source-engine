@@ -233,10 +233,10 @@ void CNPC_Ichthyosaur::Spawn( void )
 	m_flLastAttackSound = gpGlobals->curtime;
 
 	Vector vforward;
-	AngleVectors(GetAbsAngles(), &vforward );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vforward );
 	VectorNormalize ( vforward );
-	SetAbsVelocity( m_flFlyingSpeed * vforward );
-	m_SaveVelocity = GetAbsVelocity();
+	GetEngineObject()->SetAbsVelocity( m_flFlyingSpeed * vforward );
+	m_SaveVelocity = GetEngineObject()->GetAbsVelocity();
 
 	CapabilitiesClear();
 	CapabilitiesAdd( bits_CAP_MOVE_FLY | bits_CAP_INNATE_MELEE_ATTACK1 | bits_CAP_INNATE_RANGE_ATTACK1 );
@@ -339,12 +339,12 @@ bool CNPC_Ichthyosaur::OverrideMove( float flInterval )
 //-----------------------------------------------------------------------------
 void CNPC_Ichthyosaur::MoveExecute_Alive(float flInterval)
 {
-	Vector vStart = GetAbsOrigin();
+	Vector vStart = GetEngineObject()->GetAbsOrigin();
 	Vector vForward, vRight, vUp;
 
 	if (GetNavigator()->IsGoalActive())
 	{
-		Vector vecDir =  ( GetNavigator()->GetPath()->CurWaypointPos() - GetAbsOrigin());	
+		Vector vecDir =  ( GetNavigator()->GetPath()->CurWaypointPos() - GetEngineObject()->GetAbsOrigin());
 		VectorNormalize( vecDir );
 
 		m_SaveVelocity = vecDir * m_flFlyingSpeed;
@@ -397,7 +397,7 @@ void CNPC_Ichthyosaur::MoveExecute_Alive(float flInterval)
 	m_SaveVelocity += SteeringVector/32;
 	VectorNormalize( m_SaveVelocity );
 
-	angSaveAngles = GetAbsAngles();
+	angSaveAngles = GetEngineObject()->GetAbsAngles();
 
 	AngleVectors( angSaveAngles, &vForward, &vRight, &vUp );
 
@@ -409,7 +409,7 @@ void CNPC_Ichthyosaur::MoveExecute_Alive(float flInterval)
 	else
 		m_SaveVelocity = m_SaveVelocity * 80;
 
-	SetAbsVelocity( m_SaveVelocity );
+	GetEngineObject()->SetAbsVelocity( m_SaveVelocity );
 	
 	VectorAngles( m_SaveVelocity, angSaveAngles );
 	
@@ -419,7 +419,7 @@ void CNPC_Ichthyosaur::MoveExecute_Alive(float flInterval)
 	if (angSaveAngles.x > 180)
 		angSaveAngles.x = angSaveAngles.x - 360;
 	
-	QAngle angAbsAngles = GetAbsAngles();
+	QAngle angAbsAngles = GetEngineObject()->GetAbsAngles();
 
 	angAbsAngles.x = clamp( UTIL_Approach(angSaveAngles.x, angAbsAngles.x, 10 ), -60, 60 );
 
@@ -500,7 +500,7 @@ void CNPC_Ichthyosaur::MoveExecute_Alive(float flInterval)
 
 	angAbsAngles.z = clamp( UTIL_Approach(flTempRoll, angAbsAngles.z, 5 ), -20, 20 );
 
-	SetAbsAngles( angAbsAngles );
+	GetEngineObject()->SetAbsAngles( angAbsAngles );
 
 	//Move along the current velocity vector
 	if ( WalkMove( m_SaveVelocity * flInterval, MASK_NPCSOLID ) == false )
@@ -519,7 +519,7 @@ void CNPC_Ichthyosaur::MoveExecute_Alive(float flInterval)
 		}
 	}
 
-	SetAbsVelocity( m_SaveVelocity );
+	GetEngineObject()->SetAbsVelocity( m_SaveVelocity );
 }
 
 void CNPC_Ichthyosaur::InputStartCombat( inputdata_t &input )
@@ -571,7 +571,7 @@ void CNPC_Ichthyosaur::StartTask(const Task_t *pTask)
 
 void CNPC_Ichthyosaur::RunTask(const Task_t *pTask )
 {
-	QAngle angles = GetAbsAngles();
+	QAngle angles = GetEngineObject()->GetAbsAngles();
 
 	switch ( pTask->iTask )
 	{
@@ -585,7 +585,7 @@ void CNPC_Ichthyosaur::RunTask(const Task_t *pTask )
 		{
 			Vector vecFrom = GetEnemy()->EyePosition( );
 
-			Vector vecDelta = GetAbsOrigin() - vecFrom;
+			Vector vecDelta = GetEngineObject()->GetAbsOrigin() - vecFrom;
 			VectorNormalize( vecDelta );
 			Vector vecSwim = CrossProduct( vecDelta, Vector( 0, 0, 1 ) );
 			VectorNormalize( vecSwim );
@@ -607,7 +607,7 @@ void CNPC_Ichthyosaur::RunTask(const Task_t *pTask )
 				vecPos = tr.endpos;
 			}
 
-			Vector vecNorm = vecPos - GetAbsOrigin();
+			Vector vecNorm = vecPos - GetEngineObject()->GetAbsOrigin();
 			VectorNormalize( vecNorm );
 			m_SaveVelocity = m_SaveVelocity * 0.8 + 0.2 * vecNorm * m_flFlyingSpeed;
 
@@ -676,7 +676,7 @@ void CNPC_Ichthyosaur::RunTask(const Task_t *pTask )
 
 	case TASK_ICHTHYOSAUR_FLOAT:
 		angles.x = UTIL_ApproachAngle( 0, angles.x, 20 );
-		SetAbsAngles( angles );
+		GetEngineObject()->SetAbsAngles( angles );
 
 //		SetAbsVelocity( GetAbsVelocity() * 0.8 );
 //		if (pev->waterlevel > 1 && GetAbsVelocity().z < 64)
@@ -708,7 +708,7 @@ int CNPC_Ichthyosaur::MeleeAttack1Conditions( float flDot, float flDist )
 	if ( GetEnemy() && GetEnemy()->GetWaterLevel() != GetWaterLevel() )
 		return COND_NONE;
 
-	Vector	predictedDir	= ( (GetEnemy()->GetAbsOrigin()+(GetEnemy()->GetSmoothedVelocity())) - GetAbsOrigin() );	
+	Vector	predictedDir	= ( (GetEnemy()->GetEngineObject()->GetAbsOrigin()+(GetEnemy()->GetSmoothedVelocity())) - GetEngineObject()->GetAbsOrigin() );
 	float	flPredictedDist = VectorNormalize( predictedDir );
 	
 	Vector	vBodyDir;
@@ -719,7 +719,7 @@ int CNPC_Ichthyosaur::MeleeAttack1Conditions( float flDot, float flDist )
 	if ( flPredictedDot < 0.8f )
 		return COND_NOT_FACING_ATTACK;
 
-	if ( ( flPredictedDist > ( GetAbsVelocity().Length() * 0.5f) ) && ( flDist > 128.0f ) )
+	if ( ( flPredictedDist > (GetEngineObject()->GetAbsVelocity().Length() * 0.5f) ) && ( flDist > 128.0f ) )
 		return COND_TOO_FAR_TO_ATTACK;
 
 	return COND_CAN_MELEE_ATTACK1;
@@ -766,7 +766,7 @@ void CNPC_Ichthyosaur::HandleAnimEvent( animevent_t *pEvent )
 {
 	int bDidAttack = FALSE;
 	Vector vForward, vRight;
-	QAngle angles = GetAbsAngles();
+	QAngle angles = GetEngineObject()->GetAbsAngles();
 	AngleVectors( angles, &vForward, &vRight, NULL );
 
 	switch( pEvent->event )
@@ -780,7 +780,7 @@ void CNPC_Ichthyosaur::HandleAnimEvent( animevent_t *pEvent )
 			{
 				CBaseEntity *pHurt = GetEnemy();
 
-				if ( m_flEnemyTouched > gpGlobals->curtime && (pHurt->BodyTarget( GetAbsOrigin() ) - GetAbsOrigin()).Length() > (32+16+32) )
+				if ( m_flEnemyTouched > gpGlobals->curtime && (pHurt->BodyTarget(GetEngineObject()->GetAbsOrigin() ) - GetEngineObject()->GetAbsOrigin()).Length() > (32+16+32) )
 					break;
 
 				Vector vecShootOrigin = Weapon_ShootPosition();
@@ -788,9 +788,9 @@ void CNPC_Ichthyosaur::HandleAnimEvent( animevent_t *pEvent )
 
 				if (DotProduct( vecShootDir, vForward ) > 0.707)
 				{
-					angles = pHurt->GetAbsAngles();
+					angles = pHurt->GetEngineObject()->GetAbsAngles();
 					m_bOnAttack = true;
-					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() - vRight * 300 );
+					pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() - vRight * 300 );
 					if (pHurt->IsPlayer())
 					{
 						angles.x += RandomFloat( -35, 35 );
@@ -800,7 +800,7 @@ void CNPC_Ichthyosaur::HandleAnimEvent( animevent_t *pEvent )
 					}
 
 					CTakeDamageInfo info( this, this, sk_ichthyosaur_shake.GetInt(), DMG_SLASH );
-					CalculateMeleeDamageForce( &info, vForward, pHurt->GetAbsOrigin() );
+					CalculateMeleeDamageForce( &info, vForward, pHurt->GetEngineObject()->GetAbsOrigin() );
 					pHurt->TakeDamage( info );
 				}
 			}
@@ -818,7 +818,7 @@ void CNPC_Ichthyosaur::HandleAnimEvent( animevent_t *pEvent )
 	// make bubbles when he attacks
 	if (bDidAttack)
 	{
-		Vector vecSrc = GetAbsOrigin() + vForward * 32;
+		Vector vecSrc = GetEngineObject()->GetAbsOrigin() + vForward * 32;
 		UTIL_Bubbles( vecSrc - Vector( 8, 8, 8 ), vecSrc + Vector( 8, 8, 8 ), 16 );
 	}
 }
@@ -870,7 +870,7 @@ Vector CNPC_Ichthyosaur::DoProbe( const Vector &Probe )
 	bool bBumpedSomething = false;	// = ProbeZ(GetAbsOrigin(), Probe, &frac);
 
 	trace_t tr;
-	UTIL_TraceEntity( this, GetAbsOrigin(), Probe, MASK_NPCSOLID, &tr );
+	UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), Probe, MASK_NPCSOLID, &tr );
 	if ( tr.allsolid || tr.fraction < 0.99 )
 	{
 		if (tr.fraction < 0.0) tr.fraction = 0.0;
@@ -888,7 +888,7 @@ Vector CNPC_Ichthyosaur::DoProbe( const Vector &Probe )
 
 	if (bBumpedSomething && (GetEnemy() == NULL || !tr.m_pEnt || ((CBaseEntity*)tr.m_pEnt)->entindex() != GetEnemy()->entindex()))
 	{
-		Vector ProbeDir = Probe - GetAbsOrigin();
+		Vector ProbeDir = Probe - GetEngineObject()->GetAbsOrigin();
 
 		Vector NormalToProbeAndWallNormal = CrossProduct(ProbeDir, WallNormal);
 		Vector SteeringVector = CrossProduct( NormalToProbeAndWallNormal, ProbeDir);

@@ -253,7 +253,7 @@ void CAmbientGeneric::Spawn( void )
 	char *szSoundFile = (char *)STRING( m_iszSound );
 	if ( !m_iszSound || strlen( szSoundFile ) < 1 )
 	{
-		Warning( "Empty %s (%s) at %.2f, %.2f, %.2f\n", GetClassname(), GetDebugName(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		Warning( "Empty %s (%s) at %.2f, %.2f, %.2f\n", GetClassname(), GetDebugName(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 		UTIL_Remove(this);
 		return;
 	}
@@ -539,7 +539,7 @@ void CAmbientGeneric::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 		return;
 
 	// Send the sound source if he's close enough
-	if ( ( m_flMaxRadius < 0 ) || ( pClient->GetAbsOrigin().DistToSqr( m_hSoundSource->GetAbsOrigin() ) <= m_flMaxRadius * m_flMaxRadius ) )
+	if ( ( m_flMaxRadius < 0 ) || ( pClient->GetEngineObject()->GetAbsOrigin().DistToSqr( m_hSoundSource->GetEngineObject()->GetAbsOrigin() ) <= m_flMaxRadius * m_flMaxRadius ) )
 	{
 		m_hSoundSource->SetTransmit( pInfo, false );
 	}
@@ -756,7 +756,7 @@ void CAmbientGeneric::RampThink( void )
 		CBaseEntity* pSoundSource = m_hSoundSource;
 		if (pSoundSource)
 		{
-			UTIL_EmitAmbientSound(pSoundSource->GetSoundSourceIndex(), pSoundSource->GetAbsOrigin(), 
+			UTIL_EmitAmbientSound(pSoundSource->GetSoundSourceIndex(), pSoundSource->GetEngineObject()->GetAbsOrigin(),
 				STRING( m_iszSound ), (vol * 0.01), m_iSoundLevel, flags, pitch);
 		}
 	}
@@ -883,12 +883,12 @@ void CAmbientGeneric::SendSound( SoundFlags_t flags)
 	{
 		if ( flags == SND_STOP )
 		{
-			UTIL_EmitAmbientSound(pSoundSource->GetSoundSourceIndex(), pSoundSource->GetAbsOrigin(), szSoundFile, 
+			UTIL_EmitAmbientSound(pSoundSource->GetSoundSourceIndex(), pSoundSource->GetEngineObject()->GetAbsOrigin(), szSoundFile,
 						0, SNDLVL_NONE, flags, 0);
 		}
 		else
 		{
-			UTIL_EmitAmbientSound(pSoundSource->GetSoundSourceIndex(), pSoundSource->GetAbsOrigin(), szSoundFile, 
+			UTIL_EmitAmbientSound(pSoundSource->GetSoundSourceIndex(), pSoundSource->GetEngineObject()->GetAbsOrigin(), szSoundFile,
 				(m_dpv.vol * 0.01), m_iSoundLevel, flags, m_dpv.pitch);
 		}
 	}	
@@ -897,7 +897,7 @@ void CAmbientGeneric::SendSound( SoundFlags_t flags)
 		if ( ( flags == SND_STOP ) && 
 			( m_nSoundSourceEntIndex != -1 ) )
 		{
-			UTIL_EmitAmbientSound(m_nSoundSourceEntIndex, GetAbsOrigin(), szSoundFile, 
+			UTIL_EmitAmbientSound(m_nSoundSourceEntIndex, GetEngineObject()->GetAbsOrigin(), szSoundFile,
 					0, SNDLVL_NONE, flags, 0);
 		}
 	}

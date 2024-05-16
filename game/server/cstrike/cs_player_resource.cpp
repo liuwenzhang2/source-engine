@@ -170,7 +170,7 @@ void CCSPlayerResource::UpdatePlayerData( void )
 		if ( g_C4s.Count() > 0 )
 		{
 			c4 = g_C4s[0];
-			m_vecC4 = c4->GetAbsOrigin();
+			m_vecC4 = c4->GetEngineObject()->GetAbsOrigin();
 		}
 		else
 		{
@@ -196,9 +196,9 @@ void CCSPlayerResource::UpdatePlayerData( void )
 
 		if ( pHostage->IsValid() )
 		{
-			m_iHostageX.Set( i, (int) pHostage->GetAbsOrigin().x );	
-			m_iHostageY.Set( i, (int) pHostage->GetAbsOrigin().y );	
-			m_iHostageZ.Set( i, (int) pHostage->GetAbsOrigin().z );	
+			m_iHostageX.Set( i, (int) pHostage->GetEngineObject()->GetAbsOrigin().x );
+			m_iHostageY.Set( i, (int) pHostage->GetEngineObject()->GetAbsOrigin().y );
+			m_iHostageZ.Set( i, (int) pHostage->GetEngineObject()->GetAbsOrigin().z );
 			m_iHostageEntityIDs.Set( i, pHostage->entindex() );
 			m_isHostageFollowingSomeone.Set( i, pHostage->IsFollowingSomeone() );
 //			engine->Con_NPrintf( i, "ID:%d Pos:(%.0f,%.0f,%.0f)", pHostage->entindex(), pHostage->GetAbsOrigin().x, pHostage->GetAbsOrigin().y, pHostage->GetAbsOrigin().z );

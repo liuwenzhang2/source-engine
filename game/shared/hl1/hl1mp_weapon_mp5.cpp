@@ -134,7 +134,7 @@ void CWeaponMP5::PrimaryAttack( void )
 
 #ifdef CLIENT_DLL
 #else
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 600, 0.2 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 600, 0.2 );
 #endif
 
 	if ( !m_iClip1 && pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
@@ -176,7 +176,7 @@ void CWeaponMP5::SecondaryAttack( void )
 #ifdef CLIENT_DLL
 #else
 	CGrenadeMP5 * m_pMyGrenade = (CGrenadeMP5*)Create( "grenade_mp5", vecSrc, angGrenAngle, GetOwner() );
-	m_pMyGrenade->SetAbsVelocity( vecThrow );
+	m_pMyGrenade->GetEngineObject()->SetAbsVelocity( vecThrow );
 	m_pMyGrenade->SetLocalAngularVelocity( QAngle( random->RandomFloat( -100, -500 ), 0, 0 ) );
 	m_pMyGrenade->SetMoveType( MOVETYPE_FLYGRAVITY ); 
 	m_pMyGrenade->SetThrower( GetOwner() );
@@ -195,7 +195,7 @@ void CWeaponMP5::SecondaryAttack( void )
 
 #ifdef CLIENT_DLL
 #else
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 600, 0.2 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 600, 0.2 );
 #endif
 
 	// Decrease ammo

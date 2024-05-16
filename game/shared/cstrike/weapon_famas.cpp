@@ -128,7 +128,7 @@ float CWeaponFamas::GetInaccuracy() const
 		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )	// if player is in air
 			return 0.03f + 0.3f * m_flAccuracy + fAutoPenalty;
 	
-		else if ( pPlayer->GetAbsVelocity().Length2D() > 140 )	// if player is moving
+		else if ( pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 140 )	// if player is moving
 			return 0.03f + 0.07f * m_flAccuracy + fAutoPenalty;
 		/* new code */
 		else
@@ -227,7 +227,7 @@ void CWeaponFamas::PrimaryAttack()
 	if ( !CSBaseGunFire( flCycleTime, m_weaponMode ) )
 		return;
 	
-	if ( pPlayer->GetAbsVelocity().Length2D() > 5 )
+	if ( pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5 )
 		pPlayer->KickBack ( 1, 0.45, 0.275, 0.05, 4, 2.5, 7 );
 	
 	else if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )

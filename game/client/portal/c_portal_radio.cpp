@@ -179,7 +179,7 @@ void C_Portal_Dinosaur::ScanForSounds()
 	// How much of the real signal to blend in
 	// 1.0 at > outerrad, 0.0 at < inner rad, blend when in between the two.
 	float flRadiusDelta = fabs( m_hDinosaur_Signal.Get()->m_flOuterRadius - m_hDinosaur_Signal.Get()->m_flInnerRadius );
-	float flDist = m_hDinosaur_Signal.Get()->GetAbsOrigin().DistTo( GetAbsOrigin() );
+	float flDist = m_hDinosaur_Signal.Get()->GetEngineObject()->GetAbsOrigin().DistTo(GetEngineObject()->GetAbsOrigin() );
 
 	float flOuterBlend = RemapValClamped( flDist, m_hDinosaur_Signal.Get()->m_flOuterRadius, m_hDinosaur_Signal.Get()->m_flOuterRadius-(flRadiusDelta*0.5f), 1.0f, 0.0f );
 	float flInnerBlend = RemapValClamped( flDist, m_hDinosaur_Signal.Get()->m_flOuterRadius-(flRadiusDelta*0.5f), m_hDinosaur_Signal.Get()->m_flInnerRadius, 0.0f, 1.0f );
@@ -249,7 +249,7 @@ int C_Portal_Dinosaur::DrawModel( int flags )
 
 	Vector vForward, vRight, vUp;
 	GetEngineObject()->GetVectors( &vForward, &vRight, &vUp );
-	Vector vOffset = GetAbsOrigin() + ( vForward * 4.0f ) + ( vUp * 1.85f );
+	Vector vOffset = GetEngineObject()->GetAbsOrigin() + ( vForward * 4.0f ) + ( vUp * 1.85f );
 	DrawSprite( vOffset, 6.0f, 6.0f, color );
 
 	return nRet;

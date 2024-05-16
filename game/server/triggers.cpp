@@ -1126,7 +1126,7 @@ void CTriggerLook::Touch(CBaseEntity *pOther)
 		Vector vLookDir;
 		if ( HasSpawnFlags( SF_TRIGGERLOOK_USEVELOCITY ) )
 		{
-			vLookDir = pOther->GetAbsVelocity();
+			vLookDir = pOther->GetEngineObject()->GetAbsVelocity();
 			if ( vLookDir == vec3_origin )
 			{
 				// See if they're in a vehicle
@@ -1143,7 +1143,7 @@ void CTriggerLook::Touch(CBaseEntity *pOther)
 			vLookDir = ((CBaseCombatCharacter*)pOther)->EyeDirection3D( );
 		}
 
-		Vector vTargetDir = m_hLookTarget->GetAbsOrigin() - pOther->EyePosition();
+		Vector vTargetDir = m_hLookTarget->GetEngineObject()->GetAbsOrigin() - pOther->EyePosition();
 		VectorNormalize(vTargetDir);
 
 		float fDotPr = DotProduct(vLookDir,vTargetDir);
@@ -1391,7 +1391,7 @@ void CChangeLevel::Activate( void )
 	CBaseEntity *pLandmark = gEntList.FindLandmark( m_szLandmarkName );
 	if ( pLandmark )
 	{
-		int clusterIndex = engine->GetClusterForOrigin( pLandmark->GetAbsOrigin() );
+		int clusterIndex = engine->GetClusterForOrigin( pLandmark->GetEngineObject()->GetAbsOrigin() );
 		if ( clusterIndex < 0 )
 		{
 			Warning( "trigger_changelevel to map %s has a landmark embedded in solid!\n"
@@ -1511,7 +1511,7 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 	if ( transitionState == TRANSITION_VOLUME_NOT_FOUND )
 	{
 		byte pvs[MAX_MAP_CLUSTERS/8];
-		int clusterIndex = engine->GetClusterForOrigin( pLandmark->GetAbsOrigin() );
+		int clusterIndex = engine->GetClusterForOrigin( pLandmark->GetEngineObject()->GetAbsOrigin() );
 		engine->GetPVSForCluster( clusterIndex, sizeof(pvs), pvs );
 		if ( pPlayer )
 		{
@@ -1582,10 +1582,10 @@ void CChangeLevel::TouchChangeLevel( CBaseEntity *pOther )
 	{
 		// Some semblance of deceleration, but allow player to fall normally.
 		// Also, disable controls.
-		Vector vecVelocity = pPlayer->GetAbsVelocity();
+		Vector vecVelocity = pPlayer->GetEngineObject()->GetAbsVelocity();
 		vecVelocity.x *= 0.5f;
 		vecVelocity.y *= 0.5f;
-		pPlayer->SetAbsVelocity( vecVelocity );
+		pPlayer->GetEngineObject()->SetAbsVelocity( vecVelocity );
 		pPlayer->AddFlag( FL_FROZEN );
 		return;
 	}
@@ -1753,9 +1753,9 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 			if ( vecPush.z > 0 && (pOther->GetFlags() & FL_ONGROUND) )
 			{
 				pOther->SetGroundEntity( NULL );
-				Vector origin = pOther->GetAbsOrigin();
+				Vector origin = pOther->GetEngineObject()->GetAbsOrigin();
 				origin.z += 1.0f;
-				pOther->SetAbsOrigin( origin );
+				pOther->GetEngineObject()->SetAbsOrigin( origin );
 			}
 
 #ifdef HL1_DLL
@@ -1848,13 +1848,13 @@ void CTriggerTeleport::Touch( CBaseEntity *pOther )
 		pentLandmark = gEntList.FindEntityByName(pentLandmark, m_iLandmark, NULL, pOther, pOther );
 		if (pentLandmark)
 		{
-			vecLandmarkOffset = pOther->GetAbsOrigin() - pentLandmark->GetAbsOrigin();
+			vecLandmarkOffset = pOther->GetEngineObject()->GetAbsOrigin() - pentLandmark->GetEngineObject()->GetAbsOrigin();
 		}
 	}
 
 	pOther->SetGroundEntity( NULL );
 	
-	Vector tmp = pentTarget->GetAbsOrigin();
+	Vector tmp = pentTarget->GetEngineObject()->GetAbsOrigin();
 
 	if (!pentLandmark && pOther->IsPlayer())
 	{
@@ -1874,7 +1874,7 @@ void CTriggerTeleport::Touch( CBaseEntity *pOther )
 
 	if (!pentLandmark && !HasSpawnFlags(SF_TELEPORT_PRESERVE_ANGLES) )
 	{
-		pAngles = &pentTarget->GetAbsAngles();
+		pAngles = &pentTarget->GetEngineObject()->GetAbsAngles();
 
 #ifdef HL1_DLL
 		pVelocity = &vecZero;
@@ -2191,19 +2191,19 @@ CAI_BaseNPC *CAI_ChangeHintGroup::FindQualifiedNPC( CAI_BaseNPC *pPrev, CBaseEnt
 		{
 			case 0:
 			{
-				pEntity = gEntList.FindEntityByNameWithin( pEntity, pszSearchName, GetLocalOrigin(), m_flRadius, NULL, pActivator, pCaller );
+				pEntity = gEntList.FindEntityByNameWithin( pEntity, pszSearchName, GetEngineObject()->GetLocalOrigin(), m_flRadius, NULL, pActivator, pCaller );
 				break;
 			}
 			
 			case 1:
 			{
-				pEntity = gEntList.FindEntityByClassnameWithin( pEntity, pszSearchName, GetLocalOrigin(), m_flRadius );
+				pEntity = gEntList.FindEntityByClassnameWithin( pEntity, pszSearchName, GetEngineObject()->GetLocalOrigin(), m_flRadius );
 				break;
 			}
 
 			case 2:
 			{
-				pEntity = gEntList.FindEntityInSphere( pEntity, GetLocalOrigin(), ( m_flRadius != 0.0 ) ? m_flRadius : FLT_MAX );
+				pEntity = gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetLocalOrigin(), ( m_flRadius != 0.0 ) ? m_flRadius : FLT_MAX );
 				break;
 			}
 		}
@@ -2574,24 +2574,24 @@ void CTriggerCamera::Enable( void )
 	{
 		// initialize the values we'll spline between
 		m_vStartPos = m_hPlayer->EyePosition();
-		m_vEndPos = GetAbsOrigin();
+		m_vEndPos = GetEngineObject()->GetAbsOrigin();
 		m_flInterpStartTime = gpGlobals->curtime;
 		UTIL_SetOrigin( this, m_hPlayer->EyePosition() );
-		SetLocalAngles( QAngle( m_hPlayer->GetLocalAngles().x, m_hPlayer->GetLocalAngles().y, 0 ) );
+		GetEngineObject()->SetLocalAngles( QAngle( m_hPlayer->GetEngineObject()->GetLocalAngles().x, m_hPlayer->GetEngineObject()->GetLocalAngles().y, 0 ) );
 
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 	}
 	else
 #endif
 	if (HasSpawnFlags(SF_CAMERA_PLAYER_POSITION ) )
 	{
 		UTIL_SetOrigin( this, m_hPlayer->EyePosition() );
-		SetLocalAngles( QAngle( m_hPlayer->GetLocalAngles().x, m_hPlayer->GetLocalAngles().y, 0 ) );
-		SetAbsVelocity( m_hPlayer->GetAbsVelocity() );
+		GetEngineObject()->SetLocalAngles( QAngle( m_hPlayer->GetEngineObject()->GetLocalAngles().x, m_hPlayer->GetEngineObject()->GetLocalAngles().y, 0 ) );
+		GetEngineObject()->SetAbsVelocity( m_hPlayer->GetEngineObject()->GetAbsVelocity() );
 	}
 	else
 	{
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 	}
 
 
@@ -2696,31 +2696,31 @@ void CTriggerCamera::FollowTarget( )
 	{
 		Vector vecOrigin;
 		m_hTarget->GetBaseAnimating()->GetAttachment( m_iAttachmentIndex, vecOrigin );
-		VectorAngles( vecOrigin - GetAbsOrigin(), vecGoal );
+		VectorAngles( vecOrigin - GetEngineObject()->GetAbsOrigin(), vecGoal );
 	}
 	else
 	{
 		if ( m_hTarget )
 		{
-			VectorAngles( m_hTarget->GetAbsOrigin() - GetAbsOrigin(), vecGoal );
+			VectorAngles( m_hTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin(), vecGoal );
 		}
 		else
 		{
 			// Use the viewcontroller's angles
-			vecGoal = GetAbsAngles();
+			vecGoal = GetEngineObject()->GetAbsAngles();
 		}
 	}
 
 	// Should we just snap to the goal angles?
 	if ( m_bSnapToGoal ) 
 	{
-		SetAbsAngles( vecGoal );
+		GetEngineObject()->SetAbsAngles( vecGoal );
 		m_bSnapToGoal = false;
 	}
 	else
 	{
 		// UNDONE: Can't we just use UTIL_AngleDiff here?
-		QAngle angles = GetLocalAngles();
+		QAngle angles = GetEngineObject()->GetLocalAngles();
 
 		if (angles.y > 360)
 			angles.y -= 360;
@@ -2728,10 +2728,10 @@ void CTriggerCamera::FollowTarget( )
 		if (angles.y < 0)
 			angles.y += 360;
 
-		SetLocalAngles( angles );
+		GetEngineObject()->SetLocalAngles( angles );
 
-		float dx = vecGoal.x - GetLocalAngles().x;
-		float dy = vecGoal.y - GetLocalAngles().y;
+		float dx = vecGoal.x - GetEngineObject()->GetLocalAngles().x;
+		float dy = vecGoal.y - GetEngineObject()->GetLocalAngles().y;
 
 		if (dx < -180) 
 			dx += 360;
@@ -2750,10 +2750,10 @@ void CTriggerCamera::FollowTarget( )
 
 	if (!HasSpawnFlags(SF_CAMERA_PLAYER_TAKECONTROL))	
 	{
-		SetAbsVelocity( GetAbsVelocity() * 0.8 );
-		if (GetAbsVelocity().Length( ) < 10.0)
+		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.8 );
+		if (GetEngineObject()->GetAbsVelocity().Length( ) < 10.0)
 		{
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 		}
 	}
 
@@ -2809,14 +2809,14 @@ void CTriggerCamera::Move()
 			// Set up next corner
 			if ( !m_pPath )
 			{
-				SetAbsVelocity( vec3_origin );
+				GetEngineObject()->SetAbsVelocity( vec3_origin );
 			}
 			else 
 			{
 				if ( m_pPath->m_flSpeed != 0 )
 					m_targetSpeed = m_pPath->m_flSpeed;
 
-				m_vecMoveDir = m_pPath->GetLocalOrigin() - GetLocalOrigin();
+				m_vecMoveDir = m_pPath->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin();
 				m_moveDistance = VectorNormalize( m_vecMoveDir );
 				m_flStopTime = gpGlobals->curtime + m_pPath->GetDelay();
 			}
@@ -2828,7 +2828,7 @@ void CTriggerCamera::Move()
 			m_flSpeed = UTIL_Approach( m_targetSpeed, m_flSpeed, m_acceleration * gpGlobals->frametime );
 
 		float fraction = 2 * gpGlobals->frametime;
-		SetAbsVelocity( ((m_vecMoveDir * m_flSpeed) * fraction) + (GetAbsVelocity() * (1-fraction)) );
+		GetEngineObject()->SetAbsVelocity( ((m_vecMoveDir * m_flSpeed) * fraction) + (GetEngineObject()->GetAbsVelocity() * (1-fraction)) );
 	}
 #if HL2_EPISODIC
 	else if (m_bInterpolatePosition)
@@ -2839,7 +2839,7 @@ void CTriggerCamera::Move()
 		{
 			// we're there, we're done
 			UTIL_SetOrigin( this, m_vEndPos );
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 			m_bInterpolatePosition = false;
 		}
@@ -2849,8 +2849,8 @@ void CTriggerCamera::Move()
 
 			Vector nextPos = ( (m_vEndPos - m_vStartPos) * SimpleSpline(tt) ) + m_vStartPos;
 			// rather than stomping origin, set the velocity so that we get there in the proper time
-			Vector desiredVel = (nextPos - GetAbsOrigin()) * (1.0f / gpGlobals->frametime);
-			SetAbsVelocity( desiredVel );
+			Vector desiredVel = (nextPos - GetEngineObject()->GetAbsOrigin()) * (1.0f / gpGlobals->frametime);
+			GetEngineObject()->SetAbsVelocity( desiredVel );
 		}
 	}
 #endif
@@ -3113,7 +3113,7 @@ void CTriggerProximity::MeasureThink( void )
 			// If this is an entity that we care about, check its distance.
 			if ( ( pEntity != NULL ) && PassesTriggerFilters( pEntity ) )
 			{
-				float flDistance = (pEntity->GetLocalOrigin() - m_hMeasureTarget->GetLocalOrigin()).Length();
+				float flDistance = (pEntity->GetEngineObject()->GetLocalOrigin() - m_hMeasureTarget->GetEngineObject()->GetLocalOrigin()).Length();
 				if (flDistance < fMinDistance)
 				{
 					fMinDistance = flDistance;
@@ -3274,7 +3274,7 @@ END_DATADESC()
 void CTriggerWind::Spawn( void )
 {
 	m_bSwitch = true;
-	m_nDirBase = GetLocalAngles().y;
+	m_nDirBase = GetEngineObject()->GetLocalAngles().y;
 
 	BaseClass::Spawn();
 
@@ -3556,7 +3556,7 @@ void CTriggerImpact::InputImpact( inputdata_t &inputdata )
 {
 	// Output the force vector in case anyone else wants to use it
 	Vector vDir;
-	AngleVectors( GetLocalAngles(),&vDir );
+	AngleVectors(GetEngineObject()->GetLocalAngles(),&vDir );
 	m_pOutputForce.Set( m_flMagnitude * vDir, inputdata.pActivator, inputdata.pCaller);
 
 	// Enable long enough to throw objects inside me
@@ -3575,7 +3575,7 @@ void CTriggerImpact::StartTouch(CBaseEntity *pOther)
 	if ( ( pOther != NULL  ) && ( pOther->VPhysicsGetObject() != NULL ) )
 	{
 		Vector vDir;
-		AngleVectors( GetLocalAngles(),&vDir );
+		AngleVectors(GetEngineObject()->GetLocalAngles(),&vDir );
 		vDir += RandomVector(-m_flNoise,m_flNoise);
 		pOther->VPhysicsGetObject()->ApplyForceCenter( m_flMagnitude * vDir );
 	}
@@ -3584,7 +3584,7 @@ void CTriggerImpact::StartTouch(CBaseEntity *pOther)
 	if (pOther->IsPlayer() && fabs(m_flMagnitude)>0 )
 	{
 		Vector vDir;
-		AngleVectors( GetLocalAngles(),&vDir );
+		AngleVectors(GetEngineObject()->GetLocalAngles(),&vDir );
 
 		float flPunch = -m_flViewkick*m_flMagnitude*TRIGGERIMPACT_VIEWKICK_SCALE;
 		pOther->ViewPunch( QAngle( vDir.y * flPunch, 0, vDir.x * flPunch ) );

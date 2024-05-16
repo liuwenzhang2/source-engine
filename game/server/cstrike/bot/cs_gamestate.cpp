@@ -127,7 +127,7 @@ void CSGameState::OnBombPlanted( IGameEvent *event )
 	// Terrorists always know where the bomb is
 	if (m_owner->GetTeamNumber() == TEAM_TERRORIST && plantingPlayer)
 	{
-		UpdatePlantedBomb( plantingPlayer->GetAbsOrigin() );
+		UpdatePlantedBomb( plantingPlayer->GetEngineObject()->GetAbsOrigin() );
 	}
 }
 
@@ -389,7 +389,7 @@ void CSGameState::InitializeHostageInfo( void )
 	for( int i=0; i<g_Hostages.Count(); ++i )
 	{
 		m_hostage[ m_hostageCount ].hostage = g_Hostages[i];
-		m_hostage[ m_hostageCount ].knownPos = g_Hostages[i]->GetAbsOrigin();
+		m_hostage[ m_hostageCount ].knownPos = g_Hostages[i]->GetEngineObject()->GetAbsOrigin();
 		m_hostage[ m_hostageCount ].isValid = true;
 		m_hostage[ m_hostageCount ].isAlive = true;
 		m_hostage[ m_hostageCount ].isFree = true;
@@ -433,7 +433,7 @@ CHostage *CSGameState::GetNearestFreeHostage( Vector *knowPos ) const
 			if (m_hostage[i].hostage->IsFollowingSomeone())
 				continue;
 
-			hostagePos = m_hostage[i].hostage->GetAbsOrigin();
+			hostagePos = m_hostage[i].hostage->GetEngineObject()->GetAbsOrigin();
 		}
 		else
 		{
@@ -492,7 +492,7 @@ const Vector *CSGameState::GetRandomFreeHostagePosition( void ) const
 			if (info->hostage->IsFollowingSomeone())
 				continue;
 
-			freePos[ freeCount++ ] = info->hostage->GetAbsOrigin();
+			freePos[ freeCount++ ] = info->hostage->GetEngineObject()->GetAbsOrigin();
 		}
 		else
 		{
@@ -545,7 +545,7 @@ unsigned char CSGameState::ValidateHostagePositions( void )
 			continue;
 
 		// if we can see a hostage, update our knowledge of it
-		Vector pos = info->hostage->GetAbsOrigin() + Vector( 0, 0, HalfHumanHeight );
+		Vector pos = info->hostage->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, HalfHumanHeight );
 		if (m_owner->IsVisible( pos, CHECK_FOV ))
 		{
 			if (info->hostage->IsAlive())
@@ -559,7 +559,7 @@ unsigned char CSGameState::ValidateHostagePositions( void )
 				}
 				else
 				{
-					info->knownPos = info->hostage->GetAbsOrigin();
+					info->knownPos = info->hostage->GetEngineObject()->GetAbsOrigin();
 					info->isValid = true;
 				}
 			}
@@ -608,7 +608,7 @@ unsigned char CSGameState::ValidateHostagePositions( void )
 			}
 
 			const float tolerance = 50.0f;
-			if ((info->hostage->GetAbsOrigin() - info->knownPos).IsLengthGreaterThan( tolerance ))
+			if ((info->hostage->GetEngineObject()->GetAbsOrigin() - info->knownPos).IsLengthGreaterThan( tolerance ))
 			{
 				// discovered that hostage has been moved
 				status |= HOSTAGE_GONE;
@@ -664,7 +664,7 @@ CHostage *CSGameState::GetNearestVisibleFreeHostage( void ) const
 			continue;
 
 		/// @todo Use travel distance here
-		pos = info->hostage->GetAbsOrigin();
+		pos = info->hostage->GetEngineObject()->GetAbsOrigin();
 		rangeSq = (pos - myOrigin).LengthSqr();
 
 		if (rangeSq < closeRangeSq)

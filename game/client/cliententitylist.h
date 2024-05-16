@@ -171,27 +171,27 @@ public:
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 	// in the other space, so setting the abs velocity will also set the local vel
 	void SetAbsVelocity(const Vector& vecVelocity);
-	Vector& GetAbsVelocity();
+	const Vector& GetAbsVelocity();
 	const Vector& GetAbsVelocity() const;
 
 	// Sets abs angles, but also sets local angles to be appropriate
 	void SetAbsOrigin(const Vector& origin);
-	Vector& GetAbsOrigin(void);
+	const Vector& GetAbsOrigin(void);
 	const Vector& GetAbsOrigin(void) const;
 
 	void SetAbsAngles(const QAngle& angles);
-	QAngle& GetAbsAngles(void);
+	const QAngle& GetAbsAngles(void);
 	const QAngle& GetAbsAngles(void) const;
 
 	void SetLocalOrigin(const Vector& origin);
 	void SetLocalOriginDim(int iDim, vec_t flValue);
 	const Vector& GetLocalOrigin(void) const;
-	vec_t GetLocalOriginDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
+	const vec_t GetLocalOriginDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
 
 	void SetLocalAngles(const QAngle& angles);
 	void SetLocalAnglesDim(int iDim, vec_t flValue);
 	const QAngle& GetLocalAngles(void) const;
-	vec_t GetLocalAnglesDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
+	const vec_t GetLocalAnglesDim(int iDim) const;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
 
 	void SetLocalVelocity(const Vector& vecVelocity);
 	Vector& GetLocalVelocity();
@@ -214,8 +214,8 @@ public:
 	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
 	// are relative to the attachment on this entity.
 	void SetParent(IEngineObjectClient* pParentEntity, int iParentAttachment = 0);
-	void UnlinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild);
-	void LinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild);
+	void UnlinkChild(IEngineObjectClient* pChild);
+	void LinkChild(IEngineObjectClient* pChild);
 	void HierarchySetParent(IEngineObjectClient* pNewParent);
 	void UnlinkFromHierarchy();
 
@@ -348,6 +348,10 @@ public:
 	void DestroyAllDataObjects(void);
 
 	void Clear(void) {
+		m_vecAbsOrigin.Init();
+		m_angAbsRotation.Init();
+		m_vecVelocity.Init();
+		m_vecAbsVelocity.Init();//GetLocalVelocity ???
 		m_pOriginalData = NULL;
 		m_pOuterOriginalData = NULL;
 		for (int i = 0; i < MULTIPLAYER_BACKUP; i++) {

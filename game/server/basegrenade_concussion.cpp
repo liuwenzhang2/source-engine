@@ -47,18 +47,18 @@ void CBaseGrenadeConcussion::FallThink(void)
 		Remove( );
 		return;
 	}
-	CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin() + GetAbsVelocity() * 0.5, GetAbsVelocity().Length( ), 0.2 );
+	CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 0.5, GetEngineObject()->GetAbsVelocity().Length( ), 0.2 );
 
 	SetNextThink( gpGlobals->curtime + random->RandomFloat(0.05, 0.1) );
 
 	if (GetWaterLevel() != 0)
 	{
-		SetAbsVelocity( GetAbsVelocity() * 0.5 );
+		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.5 );
 	}
 
-	Vector 	pos = GetAbsOrigin() + Vector(random->RandomFloat(-4, 4), random->RandomFloat(-4, 4), random->RandomFloat(-4, 4));
+	Vector 	pos = GetEngineObject()->GetAbsOrigin() + Vector(random->RandomFloat(-4, 4), random->RandomFloat(-4, 4), random->RandomFloat(-4, 4));
 
-	CPVSFilter filter( GetAbsOrigin() );
+	CPVSFilter filter(GetEngineObject()->GetAbsOrigin() );
 
 	te->Sprite( filter, 0.0,
 		&pos,
@@ -76,9 +76,9 @@ void CBaseGrenadeConcussion::ExplodeConcussion( CBaseEntity *pOther )
 	trace_t		tr;
 	Vector		vecSpot;// trace starts here!
 
-	Vector velDir = GetAbsVelocity();
+	Vector velDir = GetEngineObject()->GetAbsVelocity();
 	VectorNormalize( velDir );
-	vecSpot = GetAbsOrigin() - velDir * 32;
+	vecSpot = GetEngineObject()->GetAbsOrigin() - velDir * 32;
 	UTIL_TraceLine( vecSpot, vecSpot + velDir * 64, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 	Explode( &tr, DMG_BLAST );
@@ -98,8 +98,8 @@ void CBaseGrenadeConcussion::Spawn( void )
 	// contact grenades arc lower
 	SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for grenades to make them easier to see
 	QAngle angles;
-	VectorAngles(GetAbsVelocity(), angles );
-	SetLocalAngles( angles );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
+	GetEngineObject()->SetLocalAngles( angles );
 
 	m_nRenderFX = kRenderFxGlowShell;
 	SetRenderColor( 200, 200, 20, 255 );

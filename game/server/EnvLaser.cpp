@@ -50,13 +50,13 @@ void CEnvLaser::Spawn( void )
 
 	SetEndWidth( GetWidth() );				// Note: EndWidth is not scaled
 
-	PointsInit( GetLocalOrigin(), GetLocalOrigin() );
+	PointsInit(GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalOrigin() );
 
 	Precache( );
 
 	if ( !m_pSprite && m_iszSpriteName != NULL_STRING )
 	{
-		m_pSprite = CSprite::SpriteCreate( STRING(m_iszSpriteName), GetAbsOrigin(), TRUE );
+		m_pSprite = CSprite::SpriteCreate( STRING(m_iszSpriteName), GetEngineObject()->GetAbsOrigin(), TRUE );
 	}
 	else
 	{
@@ -237,12 +237,12 @@ void CEnvLaser::StrikeThink( void )
 	Vector vecFireAt = GetAbsEndPos();
 	if ( pEnd )
 	{
-		vecFireAt = pEnd->GetAbsOrigin();
+		vecFireAt = pEnd->GetEngineObject()->GetAbsOrigin();
 	}
 
 	trace_t tr;
 
-	UTIL_TraceLine( GetAbsOrigin(), vecFireAt, MASK_SOLID, NULL, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), vecFireAt, MASK_SOLID, NULL, COLLISION_GROUP_NONE, &tr );
 	FireAtPoint( tr );
 	SetNextThink( gpGlobals->curtime );
 }

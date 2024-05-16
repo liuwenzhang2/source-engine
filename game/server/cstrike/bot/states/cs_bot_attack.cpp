@@ -166,7 +166,7 @@ void AttackState::Dodge( CCSBot *me )
 			return;
 		}
 
-		Vector toEnemy = enemy->GetAbsOrigin() - me->GetAbsOrigin();
+		Vector toEnemy = enemy->GetEngineObject()->GetAbsOrigin() - me->GetEngineObject()->GetAbsOrigin();
 		float range = toEnemy.Length();
 
 		const float hysterisRange = 125.0f;		// (+/-) m_combatRange
@@ -250,11 +250,11 @@ void AttackState::Dodge( CCSBot *me )
 			case SLIDE_LEFT:
 			{
 				// don't move left if we will fall
-				Vector pos = me->GetAbsOrigin() - (lookAheadRange * right);
+				Vector pos = me->GetEngineObject()->GetAbsOrigin() - (lookAheadRange * right);
 
 				if (me->GetSimpleGroundHeightWithFloor( pos, &ground ))
 				{
-					if (me->GetAbsOrigin().z - ground < StepHeight)
+					if (me->GetEngineObject()->GetAbsOrigin().z - ground < StepHeight)
 					{
 						me->StrafeLeft();
 					}
@@ -265,11 +265,11 @@ void AttackState::Dodge( CCSBot *me )
 			case SLIDE_RIGHT:
 			{
 				// don't move left if we will fall
-				Vector pos = me->GetAbsOrigin() + (lookAheadRange * right);
+				Vector pos = me->GetEngineObject()->GetAbsOrigin() + (lookAheadRange * right);
 
 				if (me->GetSimpleGroundHeightWithFloor( pos, &ground ))
 				{
-					if (me->GetAbsOrigin().z - ground < StepHeight)
+					if (me->GetEngineObject()->GetAbsOrigin().z - ground < StepHeight)
 					{
 						me->StrafeRight();
 					}
@@ -405,7 +405,7 @@ void AttackState::OnUpdate( CCSBot *me )
 
 		// if toe to toe with our enemy, don't dodge, just slash
 		const float slashRange = 70.0f;
-		if ((enemy->GetAbsOrigin() - me->GetAbsOrigin()).IsLengthGreaterThan( slashRange ))
+		if ((enemy->GetEngineObject()->GetAbsOrigin() - me->GetEngineObject()->GetAbsOrigin()).IsLengthGreaterThan( slashRange ))
 		{
 			const float repathInterval = 0.5f;
 
@@ -414,7 +414,7 @@ void AttackState::OnUpdate( CCSBot *me )
 			if (me->HasPath())
 			{
 				const float repathRange = 100.0f;		// 50
-				if ((me->GetPathEndpoint() - enemy->GetAbsOrigin()).IsLengthGreaterThan( repathRange ))
+				if ((me->GetPathEndpoint() - enemy->GetEngineObject()->GetAbsOrigin()).IsLengthGreaterThan( repathRange ))
 				{
 					repath = true;
 				}
@@ -426,7 +426,7 @@ void AttackState::OnUpdate( CCSBot *me )
 
 			if (repath && m_repathTimer.IsElapsed())
 			{
-				Vector enemyPos = enemy->GetAbsOrigin() + Vector( 0, 0, HalfHumanHeight );
+				Vector enemyPos = enemy->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, HalfHumanHeight );
 				me->ComputePath( enemyPos, FASTEST_ROUTE );
 				m_repathTimer.Start( repathInterval );
 			}

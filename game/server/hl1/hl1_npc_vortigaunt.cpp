@@ -151,7 +151,7 @@ void CNPC_Vortigaunt::CallForHelp( char *szClassname, float flDist, CBaseEntity 
 	AISquadIter_t iter;
 	for (CAI_BaseNPC *pSquadMember = m_pSquad->GetFirstMember( &iter ); pSquadMember; pSquadMember = m_pSquad->GetNextMember( &iter ) )
 	{
-		float d = ( GetAbsOrigin() - pSquadMember->GetAbsOrigin() ).Length();
+		float d = (GetEngineObject()->GetAbsOrigin() - pSquadMember->GetEngineObject()->GetAbsOrigin() ).Length();
 
 		if ( d < flDist )
 		{
@@ -171,7 +171,7 @@ void CNPC_Vortigaunt::AlertSound( void )
 	{
 		SENTENCEG_PlayRndSz( this, "SLV_ALERT", 0.85, SNDLVL_NORM, 0, m_iVoicePitch );
 
-		Vector vecTmp = GetEnemy()->GetAbsOrigin();
+		Vector vecTmp = GetEnemy()->GetEngineObject()->GetAbsOrigin();
 		CallForHelp( "monster_alien_slave", 512, GetEnemy(), vecTmp );
 	}
 }
@@ -351,7 +351,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 			GetVectors( &v_forward, NULL, NULL );
 
 			CBroadcastRecipientFilter filter;
-			te->DynamicLight( filter, 0.0, &GetAbsOrigin(), 125, 200, 100, 2, 120, 0.2 / m_flPlaybackRate, 0 );
+			te->DynamicLight( filter, 0.0, &GetEngineObject()->GetAbsOrigin(), 125, 200, 100, 2, 120, 0.2 / m_flPlaybackRate, 0 );
 
 			if ( m_hDead != NULL )
 			{
@@ -385,13 +385,13 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 
 			if ( m_hDead != NULL )
 			{
-				Vector vecDest = m_hDead->GetAbsOrigin() + Vector( 0, 0, 38 );
+				Vector vecDest = m_hDead->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 38 );
 				trace_t trace;
 				UTIL_TraceHull( vecDest, vecDest, GetHullMins(), GetHullMaxs(),MASK_SOLID, m_hDead, COLLISION_GROUP_NONE, &trace );
 
 				if ( !trace.startsolid )
 				{
-					CBaseEntity *pNew = Create( "monster_alien_slave", m_hDead->GetAbsOrigin(), m_hDead->GetAbsAngles() );
+					CBaseEntity *pNew = Create( "monster_alien_slave", m_hDead->GetEngineObject()->GetAbsOrigin(), m_hDead->GetEngineObject()->GetAbsAngles() );
 					
 					pNew->AddSpawnFlags( 1 );
 					WackBeam( -1, pNew );
@@ -560,8 +560,8 @@ void CNPC_Vortigaunt::ArmBeam( int side )
 
 	Vector forward, right, up;
 	Vector vecAim;
-	AngleVectors( GetAbsAngles(), &forward, &right, &up );
-	Vector vecSrc = GetAbsOrigin() + up * 36 + right * side * 16 + forward * 32;
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
+	Vector vecSrc = GetEngineObject()->GetAbsOrigin() + up * 36 + right * side * 16 + forward * 32;
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -665,9 +665,9 @@ void CNPC_Vortigaunt::ZapBeam( int side )
 		 return;
 
 	Vector forward, right, up;
-	AngleVectors( GetAbsAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
 
-	vecSrc = GetAbsOrigin() + up * 36;
+	vecSrc = GetEngineObject()->GetAbsOrigin() + up * 36;
 	vecAim = GetShootEnemyDir( vecSrc );
 	float deflection = 0.01;
 	vecAim = vecAim + side * right * random->RandomFloat( 0, deflection ) + up * random->RandomFloat( -deflection, deflection );

@@ -163,17 +163,17 @@ void CSnark::Event_Killed( const CTakeDamageInfo &inputInfo )
 	CPASAttenuationFilter filter( this, 0.5 );
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Snark.Die" );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), SNARK_EXPLOSION_VOLUME, 3.0 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), SNARK_EXPLOSION_VOLUME, 3.0 );
 
 	UTIL_BloodDrips( WorldSpaceCenter(), Vector( 0, 0, 0 ), BLOOD_COLOR_YELLOW, 80 );
 
 	if ( m_hOwner != NULL )
 	{
-		RadiusDamage( CTakeDamageInfo( this, m_hOwner, GetDamage(), DMG_BLAST ), GetAbsOrigin(), GetDamage() * 2.5, CLASS_NONE, NULL );
+		RadiusDamage( CTakeDamageInfo( this, m_hOwner, GetDamage(), DMG_BLAST ), GetEngineObject()->GetAbsOrigin(), GetDamage() * 2.5, CLASS_NONE, NULL );
 	}
 	else
 	{
-		RadiusDamage( CTakeDamageInfo( this, this, GetDamage(), DMG_BLAST ), GetAbsOrigin(), GetDamage() * 2.5, CLASS_NONE, NULL );
+		RadiusDamage( CTakeDamageInfo( this, this, GetDamage(), DMG_BLAST ), GetEngineObject()->GetAbsOrigin(), GetDamage() * 2.5, CLASS_NONE, NULL );
 	}
 
 	// reset owner so death message happens
@@ -218,7 +218,7 @@ void CSnark::HuntThink( void )
 	// explode when ready
 	if ( gpGlobals->curtime >= m_flDie )
 	{
-		g_vecAttackDir = GetAbsVelocity();
+		g_vecAttackDir = GetEngineObject()->GetAbsVelocity();
 		VectorNormalize( g_vecAttackDir );
 		m_iHealth = -1;
 		CTakeDamageInfo	info( this, this, 1, DMG_GENERIC );
@@ -234,10 +234,10 @@ void CSnark::HuntThink( void )
 			SetMoveType( MOVETYPE_FLY, MOVECOLLIDE_FLY_CUSTOM );
 		}
 
-		Vector vecVel = GetAbsVelocity();
+		Vector vecVel = GetEngineObject()->GetAbsVelocity();
 		vecVel *= 0.9;
 		vecVel.z += 8.0;
-		SetAbsVelocity( vecVel );
+		GetEngineObject()->SetAbsVelocity( vecVel );
 	}
 	else if ( GetMoveType() == MOVETYPE_FLY )
 	{
@@ -250,7 +250,7 @@ void CSnark::HuntThink( void )
 
 	m_flNextHunt = gpGlobals->curtime + 2.0;
 	
-	Vector vecFlat = GetAbsVelocity();
+	Vector vecFlat = GetEngineObject()->GetAbsVelocity();
 	vecFlat.z = 0;
 	VectorNormalize( vecFlat );
 
@@ -266,7 +266,7 @@ void CSnark::HuntThink( void )
 	{
 		CPASAttenuationFilter filter( this );
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Snark.Squeak" );
-		CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 256, 0.25 );
+		CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 256, 0.25 );
 	}
 
 	// higher pitch as squeeker gets closer to detonation time
@@ -278,11 +278,11 @@ void CSnark::HuntThink( void )
 	{
 		if ( FVisible( GetEnemy() ) )
 		{
-			m_vecTarget = GetEnemy()->EyePosition() - GetAbsOrigin();
+			m_vecTarget = GetEnemy()->EyePosition() - GetEngineObject()->GetAbsOrigin();
 			VectorNormalize( m_vecTarget );
 		}
 
-		float flVel = GetAbsVelocity().Length();
+		float flVel = GetEngineObject()->GetAbsVelocity().Length();
 		float flAdj = 50.0 / ( flVel + 10.0 );
 
 		if ( flAdj > 1.2 )
@@ -292,7 +292,7 @@ void CSnark::HuntThink( void )
 
 		// ALERT( at_console, "%.0f %.2f %.2f %.2f\n", flVel, m_vecTarget.x, m_vecTarget.y, m_vecTarget.z );
 
-		SetAbsVelocity( GetAbsVelocity() * flAdj + (m_vecTarget * 300) );
+		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * flAdj + (m_vecTarget * 300) );
 	}
 
 	if ( GetFlags() & FL_ONGROUND )
@@ -310,21 +310,21 @@ void CSnark::HuntThink( void )
 		}
 	}
 
-	if ( ( GetAbsOrigin() - m_posPrev ).Length() < 1.0 )
+	if ( (GetEngineObject()->GetAbsOrigin() - m_posPrev ).Length() < 1.0 )
 	{
-		Vector vecVel = GetAbsVelocity();
+		Vector vecVel = GetEngineObject()->GetAbsVelocity();
 		vecVel.x = random->RandomFloat( -100, 100 );
 		vecVel.y = random->RandomFloat( -100, 100 );
-		SetAbsVelocity( vecVel );
+		GetEngineObject()->SetAbsVelocity( vecVel );
 	}
 
-	m_posPrev = GetAbsOrigin();
+	m_posPrev = GetEngineObject()->GetAbsOrigin();
 
 	QAngle angles;
-	VectorAngles( GetAbsVelocity(), angles );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
 	angles.z = 0;
 	angles.x = 0;
-	SetAbsAngles( angles );
+	GetEngineObject()->SetAbsAngles( angles );
 }
 
 unsigned int CSnark::PhysicsSolidMaskForEntity( void ) const
@@ -345,7 +345,7 @@ void CSnark::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity )
 	float flSurfaceFriction;
 	physprops->GetPhysicsProperties( trace.surface.surfaceProps, NULL, NULL, &flSurfaceFriction, NULL );
 
-	Vector vecAbsVelocity = GetAbsVelocity();
+	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 
 	// If we hit a wall
 	if ( trace.plane.normal.z <= 0.7 )			// Floor
@@ -360,7 +360,7 @@ void CSnark::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity )
 			
 		Vector vReflection = 2.0f * trace.plane.normal * hitDot + vecDir;
 		
-		SetAbsVelocity( vReflection * speed * 0.6f );
+		GetEngineObject()->SetAbsVelocity( vReflection * speed * 0.6f );
 
 		return;
 	}
@@ -382,7 +382,7 @@ void CSnark::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity )
 		VectorAdd( vecAbsVelocity, GetBaseVelocity(), vecVelocity );
 		flSpeedSqr = DotProduct( vecVelocity, vecVelocity );
 	}
-	SetAbsVelocity( vecAbsVelocity );
+	GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 
 	if ( flSpeedSqr < ( 30 * 30 ) )
 	{
@@ -392,7 +392,7 @@ void CSnark::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity )
 		}
 
 		// Reset velocities.
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		SetLocalAngularVelocity( vec3_angle );
 	}
 	else
@@ -416,10 +416,10 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 	// at least until we've bounced once
 	SetOwnerEntity( NULL );
 
-	QAngle angles = GetAbsAngles();
+	QAngle angles = GetEngineObject()->GetAbsAngles();
 	angles.x = 0;
 	angles.z = 0;
-	SetAbsAngles( angles );
+	GetEngineObject()->SetAbsAngles( angles );
 
 	// avoid bouncing too much
 	if ( m_flNextHit > gpGlobals->curtime) 
@@ -442,7 +442,7 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 				ClearMultiDamage();
 
 				Vector vecForward;
-				AngleVectors( GetAbsAngles(), &vecForward );
+				AngleVectors(GetEngineObject()->GetAbsAngles(), &vecForward );
 
 				if ( m_hOwner != NULL )
 				{
@@ -508,12 +508,12 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 			g_pSoundEmitterSystem->EmitSound( filter2, entindex(), ep );
 		}
 
-		CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 256, 0.25 );
+		CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 256, 0.25 );
 	}
 	else
 	{
 		// skittering sound
-		CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 100, 0.1 );
+		CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 100, 0.1 );
 	}
 
 	m_flNextBounceSoundTime = gpGlobals->curtime + 0.5;// half second.

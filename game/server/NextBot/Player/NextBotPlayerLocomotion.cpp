@@ -397,7 +397,7 @@ void PlayerLocomotion::Update( void )
 				Jump();
 			}
 
-			Vector vel = GetBot()->GetEntity()->GetAbsVelocity();
+			Vector vel = GetBot()->GetEntity()->GetEngineObject()->GetAbsVelocity();
 
 			if ( m_isJumpingAcrossGap )
 			{
@@ -407,7 +407,7 @@ void PlayerLocomotion::Update( void )
 				// leave vel.z unchanged
 			}
 
-			GetBot()->GetEntity()->SetAbsVelocity( vel );
+			GetBot()->GetEntity()->GetEngineObject()->SetAbsVelocity( vel );
 
 			if ( !IsOnGround() )
 			{
@@ -541,7 +541,7 @@ void PlayerLocomotion::Approach( const Vector &pos, float goalWeight )
 
 			if ( GetBot()->IsDebugging( NEXTBOT_LOCOMOTION ) )
 			{
-				NDebugOverlay::HorzArrow( m_player->GetAbsOrigin(), m_player->GetAbsOrigin() + 50.0f * Vector( forward.x, forward.y, 0.0f ), 15.0f, 0, 255, 0, 255, true, 0.1f );
+				NDebugOverlay::HorzArrow( m_player->GetEngineObject()->GetAbsOrigin(), m_player->GetEngineObject()->GetAbsOrigin() + 50.0f * Vector( forward.x, forward.y, 0.0f ), 15.0f, 0, 255, 0, 255, true, 0.1f );
 			}
 		}
 		else if ( ahead < -epsilon )
@@ -550,7 +550,7 @@ void PlayerLocomotion::Approach( const Vector &pos, float goalWeight )
 
 			if ( GetBot()->IsDebugging( NEXTBOT_LOCOMOTION ) )
 			{
-				NDebugOverlay::HorzArrow( m_player->GetAbsOrigin(), m_player->GetAbsOrigin() - 50.0f * Vector( forward.x, forward.y, 0.0f ), 15.0f, 255, 0, 0, 255, true, 0.1f );
+				NDebugOverlay::HorzArrow( m_player->GetEngineObject()->GetAbsOrigin(), m_player->GetEngineObject()->GetAbsOrigin() - 50.0f * Vector( forward.x, forward.y, 0.0f ), 15.0f, 255, 0, 0, 255, true, 0.1f );
 			}
 		}
 
@@ -560,7 +560,7 @@ void PlayerLocomotion::Approach( const Vector &pos, float goalWeight )
 
 			if ( GetBot()->IsDebugging( NEXTBOT_LOCOMOTION ) )
 			{
-				NDebugOverlay::HorzArrow( m_player->GetAbsOrigin(), m_player->GetAbsOrigin() - 50.0f * Vector( right.x, right.y, 0.0f ), 15.0f, 255, 0, 255, 255, true, 0.1f );
+				NDebugOverlay::HorzArrow( m_player->GetEngineObject()->GetAbsOrigin(), m_player->GetEngineObject()->GetAbsOrigin() - 50.0f * Vector( right.x, right.y, 0.0f ), 15.0f, 255, 0, 255, 255, true, 0.1f );
 			}
 		}
 		else if ( side >= epsilon )
@@ -569,7 +569,7 @@ void PlayerLocomotion::Approach( const Vector &pos, float goalWeight )
 
 			if ( GetBot()->IsDebugging( NEXTBOT_LOCOMOTION ) )
 			{
-				NDebugOverlay::HorzArrow( m_player->GetAbsOrigin(), m_player->GetAbsOrigin() + 50.0f * Vector( right.x, right.y, 0.0f ), 15.0f, 0, 255, 255, 255, true, 0.1f );
+				NDebugOverlay::HorzArrow( m_player->GetEngineObject()->GetAbsOrigin(), m_player->GetEngineObject()->GetAbsOrigin() + 50.0f * Vector( right.x, right.y, 0.0f ), 15.0f, 0, 255, 255, 255, true, 0.1f );
 			}
 		}
 	}
@@ -797,7 +797,7 @@ void PlayerLocomotion::FaceTowards( const Vector &target )
 */
 const Vector &PlayerLocomotion::GetFeet( void ) const
 {
-	return m_player->GetAbsOrigin();
+	return m_player->GetEngineObject()->GetAbsOrigin();
 }
 
 
@@ -807,7 +807,7 @@ const Vector &PlayerLocomotion::GetFeet( void ) const
  */
 const Vector &PlayerLocomotion::GetVelocity( void ) const
 {
-	return m_player->GetAbsVelocity();
+	return m_player->GetEngineObject()->GetAbsVelocity();
 }
 
 

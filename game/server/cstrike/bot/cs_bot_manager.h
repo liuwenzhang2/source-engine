@@ -392,7 +392,7 @@ inline const CCSBotManager::Zone *CCSBotManager::GetClosestZone( const CBaseEnti
 	if (entity == NULL)
 		return NULL;
 
-	Vector centroid = entity->GetAbsOrigin();
+	Vector centroid = entity->GetEngineObject()->GetAbsOrigin();
 	centroid.z += HalfHumanHeight;
 	return GetClosestZone( centroid );
 }

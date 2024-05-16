@@ -101,8 +101,8 @@ void TracePortals( const CProp_Portal *pIgnorePortal, const Vector &vForward, co
 			CProp_Portal *pTempPortal = pPortals[i];
 			if( pTempPortal != pIgnorePortal && pTempPortal->m_bActivated )
 			{
-				Vector vOtherOrigin = pTempPortal->GetAbsOrigin();
-				QAngle qOtherAngles = pTempPortal->GetAbsAngles();
+				Vector vOtherOrigin = pTempPortal->GetEngineObject()->GetAbsOrigin();
+				QAngle qOtherAngles = pTempPortal->GetEngineObject()->GetAbsAngles();
 
 				Vector vLinkedForward;
 				AngleVectors( qOtherAngles, &vLinkedForward, NULL, NULL );
@@ -936,8 +936,8 @@ void FitPortalAroundOtherPortals( const CProp_Portal *pIgnorePortal, Vector &vOr
 			CProp_Portal *pTempPortal = pPortals[i];
 			if( pTempPortal != pIgnorePortal && pTempPortal->m_bActivated )
 			{
-				Vector vOtherOrigin = pTempPortal->GetAbsOrigin();
-				QAngle qOtherAngles = pTempPortal->GetAbsAngles();
+				Vector vOtherOrigin = pTempPortal->GetEngineObject()->GetAbsOrigin();
+				QAngle qOtherAngles = pTempPortal->GetEngineObject()->GetAbsAngles();
 
 				Vector vLinkedForward;
 				AngleVectors( qOtherAngles, &vLinkedForward, NULL, NULL );
@@ -946,7 +946,7 @@ void FitPortalAroundOtherPortals( const CProp_Portal *pIgnorePortal, Vector &vOr
 				if ( vForward.Dot( vLinkedForward ) < 0.95f )
 					continue;
 
-				Vector vDiff = vOrigin - pTempPortal->GetLocalOrigin();
+				Vector vDiff = vOrigin - pTempPortal->GetEngineObject()->GetLocalOrigin();
 
 				Vector vDiffProjRight = vDiff.Dot( vRight ) * vRight;
 				Vector vDiffProjUp = vDiff.Dot( vUp ) * vUp;
@@ -1028,8 +1028,8 @@ bool IsPortalOverlappingOtherPortals( const CProp_Portal *pIgnorePortal, const V
 			CProp_Portal *pTempPortal = pPortals[i];
 			if( pTempPortal != pIgnorePortal && pTempPortal->m_bActivated )
 			{
-				Vector vOtherOrigin = pTempPortal->GetAbsOrigin();
-				QAngle qOtherAngles = pTempPortal->GetAbsAngles();
+				Vector vOtherOrigin = pTempPortal->GetEngineObject()->GetAbsOrigin();
+				QAngle qOtherAngles = pTempPortal->GetEngineObject()->GetAbsAngles();
 
 				Vector vLinkedForward;
 				AngleVectors( qOtherAngles, &vLinkedForward, NULL, NULL );

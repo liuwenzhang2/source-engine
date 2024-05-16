@@ -212,7 +212,7 @@ void C_HL1MP_Player::PreThink( void )
 	BaseClass::PreThink();
 	return;
 
-	QAngle vTempAngles = GetLocalAngles();
+	QAngle vTempAngles = GetEngineObject()->GetLocalAngles();
 
 	if ( GetLocalPlayer() == this )
 	{
@@ -228,7 +228,7 @@ void C_HL1MP_Player::PreThink( void )
 		vTempAngles[YAW] += 360.0f;
 	}
 
-	SetLocalAngles( vTempAngles );
+	GetEngineObject()->SetLocalAngles( vTempAngles );
 
 	BaseClass::PreThink();
 #if 0
@@ -248,7 +248,7 @@ void C_HL1MP_Player::PostDataUpdate( DataUpdateType_t updateType )
 {
 	// C_BaseEntity assumes we're networking the entity's angles, so pretend that it
 	// networked the same value we already have.
-	GetEngineObject()->SetNetworkAngles( GetLocalAngles() );
+	GetEngineObject()->SetNetworkAngles(GetEngineObject()->GetLocalAngles() );
 	
 	BaseClass::PostDataUpdate( updateType );
 }
@@ -426,7 +426,7 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 		{
 			Interp_Copy( pPlayer );
 
-			SetAbsAngles( pPlayer->GetRenderAngles() );
+			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 			GetEngineObject()->GetRotationInterpolator().Reset();
 
 			m_flAnimTime = pPlayer->m_flAnimTime;
@@ -437,11 +437,11 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 		{
 			// This is the local player, so set them in a default
 			// pose and slam their velocity, angles and origin
-			SetAbsOrigin( m_vecRagdollOrigin );
+			GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 			
-			SetAbsAngles( pPlayer->GetRenderAngles() );
+			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 
-			SetAbsVelocity( m_vecRagdollVelocity );
+			GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 			int iSeq = pPlayer->GetSequence();
 			if ( iSeq == -1 )
@@ -462,8 +462,8 @@ void C_HL1MPRagdoll::CreateHL1MPRagdoll( void )
 		// use this position
 		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
-		SetAbsOrigin( m_vecRagdollOrigin );
-		SetAbsVelocity( m_vecRagdollVelocity );
+		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
 		

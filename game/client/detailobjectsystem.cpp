@@ -1330,7 +1330,7 @@ void CDetailModel::UpdatePlayerAvoid( void )
 		else
 			pEnt = avoid.GetObject( i );
 		
-		vecAvoid = m_Origin - pEnt->GetAbsOrigin();
+		vecAvoid = m_Origin - pEnt->GetEngineObject()->GetAbsOrigin();
 		vecAvoid.z = 0;
 
 		float flDist = vecAvoid.Length2D();

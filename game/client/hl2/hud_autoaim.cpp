@@ -223,7 +223,7 @@ void CHUDAutoAim::OnThink()
 					Vector vecLook;
 					pLocalPlayer->EyeVectors( &vecLook, NULL, NULL );
 
-					Vector vecMove = pLocalPlayer->GetAbsVelocity();
+					Vector vecMove = pLocalPlayer->GetEngineObject()->GetAbsVelocity();
 					float flSpeed = VectorNormalize( vecMove );
 					float flDot = DotProduct( vecLook, vecMove );
 

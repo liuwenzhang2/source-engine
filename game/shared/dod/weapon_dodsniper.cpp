@@ -216,7 +216,7 @@ void CDODSniperWeapon::ItemPostFrame( void )
 	{
 		// if the player is sprinting and moving at all, cancel the rezoom
 		if ( ( pPlayer->m_nButtons & IN_SPEED ) > 0 &&
-			pPlayer->GetAbsVelocity().Length2D() > 20 )
+			pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 20 )
 		{
 			m_flRezoomTime = -1;
 		}

@@ -355,7 +355,7 @@ void CAI_StandoffBehavior::PrescheduleThink()
 
 				pLine->GetVectors( &normal, NULL, NULL );
 
-				NDebugOverlay::Line( pLine->GetAbsOrigin() - Vector( 0, 0, 64 ), pLine->GetAbsOrigin() + Vector(0,0,64), 0,255,0, false, 0.1 );
+				NDebugOverlay::Line( pLine->GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 64 ), pLine->GetEngineObject()->GetAbsOrigin() + Vector(0,0,64), 0,255,0, false, 0.1 );
 			}
 		}
 	}
@@ -451,11 +451,11 @@ void CAI_StandoffBehavior::GatherConditions()
 		{
 			if ( IsBehindBattleLines( GetAbsOrigin() ) )
 			{
-				NDebugOverlay::Box( GetOuter()->GetAbsOrigin(), -Vector(48,48,4), Vector(48,48,4), 255,0,0,8, 0.1 );
+				NDebugOverlay::Box( GetOuter()->GetEngineObject()->GetAbsOrigin(), -Vector(48,48,4), Vector(48,48,4), 255,0,0,8, 0.1 );
 			}
 			else
 			{
-				NDebugOverlay::Box( GetOuter()->GetAbsOrigin(), -Vector(48,48,4), Vector(48,48,4), 0,255,0,8, 0.1 );
+				NDebugOverlay::Box( GetOuter()->GetEngineObject()->GetAbsOrigin(), -Vector(48,48,4), Vector(48,48,4), 0,255,0,8, 0.1 );
 			}
 		}
 	}
@@ -716,7 +716,7 @@ Vector CAI_StandoffBehavior::GetStandoffGoalPosition()
 	}
 	else if( PlayerIsLeading() )
 	{
-		return UTIL_GetLocalPlayer()->GetAbsOrigin();
+		return UTIL_GetLocalPlayer()->GetEngineObject()->GetAbsOrigin();
 	}
 	else
 	{
@@ -731,7 +731,7 @@ Vector CAI_StandoffBehavior::GetStandoffGoalPosition()
 			if ( pBattleLine->m_fActive && pBattleLine->Affects( GetOuter() ) )
 			{
 				StandoffMsg1( "Using battleline %s as goal\n", STRING( pBattleLine->GetEntityName() ) );
-				return pBattleLine->GetAbsOrigin();
+				return pBattleLine->GetEngineObject()->GetAbsOrigin();
 			}
 		}
 	}
@@ -774,7 +774,7 @@ void CAI_StandoffBehavior::UpdateBattleLines()
 
 				if ( GetDirectionOfStandoff( &playerLine.normal ) )
 				{
-					playerLine.point = pPlayer->GetAbsOrigin() + playerLine.normal * DIST_PLAYER_PLANE;
+					playerLine.point = pPlayer->GetEngineObject()->GetAbsOrigin() + playerLine.normal * DIST_PLAYER_PLANE;
 					m_BattleLines.AddToTail( playerLine );
 				}
 			}
@@ -792,8 +792,8 @@ void CAI_StandoffBehavior::UpdateBattleLines()
 			{
 				BattleLine_t battleLine;
 				
-				battleLine.point = pBattleLine->GetAbsOrigin();
-				battleLine.normal = UTIL_YawToVector( pBattleLine->GetAbsAngles().y );
+				battleLine.point = pBattleLine->GetEngineObject()->GetAbsOrigin();
+				battleLine.normal = UTIL_YawToVector( pBattleLine->GetEngineObject()->GetAbsAngles().y );
 
 				m_BattleLines.AddToTail( battleLine );
 			}
@@ -821,7 +821,7 @@ bool CAI_StandoffBehavior::IsBehindBattleLines( const Vector &point )
 			if( DrawBattleLines.GetInt() != 0 )
 			{
 				NDebugOverlay::Box( point, -Vector(48,48,4), Vector(48,48,4), 0,255,0,8, 1 );
-				NDebugOverlay::Line( point, GetOuter()->GetAbsOrigin(), 0,255,0,true, 1 );
+				NDebugOverlay::Line( point, GetOuter()->GetEngineObject()->GetAbsOrigin(), 0,255,0,true, 1 );
 			}
 			return false;
 		}
@@ -830,7 +830,7 @@ bool CAI_StandoffBehavior::IsBehindBattleLines( const Vector &point )
 	if( DrawBattleLines.GetInt() != 0 )
 	{
 		NDebugOverlay::Box( point, -Vector(48,48,4), Vector(48,48,4), 255,0,0,8, 1 );
-		NDebugOverlay::Line( point, GetOuter()->GetAbsOrigin(), 255,0,0,true, 1 );
+		NDebugOverlay::Line( point, GetOuter()->GetEngineObject()->GetAbsOrigin(), 255,0,0,true, 1 );
 	}
 
 	return true;
@@ -900,7 +900,7 @@ void CAI_StandoffBehavior::StartTask( const Task_t *pTask )
 
 				Vector					coverPos			= vec3_origin;
 				CAI_TacticalServices *	pTacticalServices	= GetTacticalServices();
-				const Vector &			enemyPos			= pEntity->GetAbsOrigin();
+				const Vector &			enemyPos			= pEntity->GetEngineObject()->GetAbsOrigin();
 				Vector					enemyEyePos			= pEntity->EyePosition();
 				float					coverRadius			= GetOuter()->CoverRadius();
 				const Vector &			goalPos				= GetStandoffGoalPosition();
@@ -1019,7 +1019,7 @@ bool CAI_StandoffBehavior::GetDirectionOfStandoff( Vector *pDir )
 {
 	if ( GetEnemy() )
 	{
-		*pDir = GetEnemy()->GetAbsOrigin() - GetAbsOrigin();
+		*pDir = GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetAbsOrigin();
 		VectorNormalize( *pDir );
 		pDir->z = 0;
 		return true;

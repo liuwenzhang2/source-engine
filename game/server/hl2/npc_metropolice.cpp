@@ -246,8 +246,8 @@ CBaseEntity *CNPC_MetroPolice::CheckTraceHullAttack( float flDist, const Vector 
 {
 	// If only a length is given assume we want to trace in our facing direction
 	Vector forward;
-	AngleVectors( GetAbsAngles(), &forward );
-	Vector vStart = GetAbsOrigin();
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
+	Vector vStart = GetEngineObject()->GetAbsOrigin();
 
 	// The ideal place to start the trace is in the center of the attacker's bounding box.
 	// however, we need to make sure there's enough clearance. Some of the smaller monsters aren't 
@@ -412,7 +412,7 @@ CBaseEntity *CNPC_MetroPolice::CheckTraceHullAttack( const Vector &vStart, const
 		Vector vecMins, vecMaxs;
 
 		// Do a tracehull from the top center of my bounding box.
-		vecTopCenter = GetAbsOrigin();
+		vecTopCenter = GetEngineObject()->GetAbsOrigin();
 		CollisionProp()->WorldSpaceAABB( &vecMins, &vecMaxs );
 		vecTopCenter.z = vecMaxs.z + 1.0f;
 		vecEnd = vecTopCenter;
@@ -1275,7 +1275,7 @@ bool CNPC_MetroPolice::ShouldAttemptToStitch()
 	if ( HasSpawnFlags( SF_METROPOLICE_ALWAYS_STITCH ) )
 	{
 		// Don't stitch if the player is at the same level or higher
-		if ( GetEnemy()->GetAbsOrigin().z - GetAbsOrigin().z > -36 )
+		if ( GetEnemy()->GetEngineObject()->GetAbsOrigin().z - GetEngineObject()->GetAbsOrigin().z > -36 )
 			return false;
 
 		return true;
@@ -1345,7 +1345,7 @@ void CNPC_MetroPolice::AimBurstRandomly( int nMinCount, int nMaxCount, float flM
 
 	int nShotCount = GetShotRegulator()->GetBurstShotsRemaining();
 
-	Vector vecDelta = StitchAimTarget( GetAbsOrigin(), true ) - Weapon_ShootPosition();
+	Vector vecDelta = StitchAimTarget(GetEngineObject()->GetAbsOrigin(), true ) - Weapon_ShootPosition();
 	VectorNormalize( vecDelta );
 
 	// Choose a random direction vector perpendicular to the delta position
@@ -1404,7 +1404,7 @@ void CNPC_MetroPolice::RandomDirectionBetweenVectors( const Vector &vecStart, co
 void CNPC_MetroPolice::PredictShootTargetPosition( float flDeltaTime, float flMinLeadDist, float flAddVelocity, Vector *pVecTarget, Vector *pVecTargetVelocity )
 {
 	CBaseEntity *pShootTarget = GetShootTarget();
-	*pVecTarget = StitchAimTarget( GetAbsOrigin(), true );
+	*pVecTarget = StitchAimTarget(GetEngineObject()->GetAbsOrigin(), true );
 
 	Vector vecSmoothedVel = pShootTarget->GetSmoothedVelocity();
 
@@ -1876,7 +1876,7 @@ void CNPC_MetroPolice::AimBurstInFrontOfEnemy( float flReactionTime )
 	float flStitchLength = AIM_IN_FRONT_OF_DEFAULT_STITCH_LENGTH;
 
 	Vector vecEndPoint1, vecEndPoint2;
-	VectorSubtract( Weapon_ShootPosition(), StitchAimTarget( GetAbsOrigin(), false ), vecTargetToGun );
+	VectorSubtract( Weapon_ShootPosition(), StitchAimTarget(GetEngineObject()->GetAbsOrigin(), false ), vecTargetToGun );
 	float flSign = ( DotProduct( vecAcross, vecTargetToGun ) >= 0.0f ) ? 1.0f : -1.0f;
 	VectorMA( vecShootAt, flSign * flStitchLength * AIM_IN_FRONT_REACTION_FRACTION, vecAcross, vecEndPoint1 );
 	VectorMA( vecShootAt, -flSign * flStitchLength * (1.0f - AIM_IN_FRONT_REACTION_FRACTION), vecAcross, vecEndPoint2 );
@@ -2089,7 +2089,7 @@ void CNPC_MetroPolice::SteerBurstWithinLineOfDeath( )
 {
 	// Account for velocity + position changes, but only within a constrained cylinder
 	Vector vecShootAt;
-	vecShootAt = StitchAimTarget( GetAbsOrigin(), false );
+	vecShootAt = StitchAimTarget(GetEngineObject()->GetAbsOrigin(), false );
 
 	// If the target close to the current point the shot is on,
 	// move the shot toward the point
@@ -2782,8 +2782,8 @@ void CNPC_MetroPolice::OnAnimEventStartDeployManhack( void )
 	int handAttachment = LookupAttachment( "LHand" );
 	GetAttachment( handAttachment, vecOrigin, vecAngles );
 
-	pManhack->SetLocalOrigin( vecOrigin );
-	pManhack->SetLocalAngles( vecAngles );
+	pManhack->GetEngineObject()->SetLocalOrigin( vecOrigin );
+	pManhack->GetEngineObject()->SetLocalAngles( vecAngles );
 	pManhack->AddSpawnFlags( (SF_MANHACK_PACKED_UP|SF_MANHACK_CARRIED|SF_NPC_WAIT_FOR_SCRIPT) );
 	
 	// Also fade if our parent is marked to do it
@@ -2846,7 +2846,7 @@ void CNPC_MetroPolice::OnAnimEventShove( void )
 			//Kick the player angles
 			pPlayer->ViewPunch( QAngle( 8, 14, 0 ) );
 
-			Vector	dir = pHurt->GetAbsOrigin() - GetAbsOrigin();
+			Vector	dir = pHurt->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 			VectorNormalize(dir);
 
 			QAngle angles;
@@ -3075,7 +3075,7 @@ void CNPC_MetroPolice::ReleaseManhack( void )
 		m_hManhack->SetEnemy( GetEnemy() );
 		m_hManhack->SetState( NPC_STATE_COMBAT );
 
-		m_hManhack->UpdateEnemyMemory( GetEnemy(), GetEnemy()->GetAbsOrigin() );
+		m_hManhack->UpdateEnemyMemory( GetEnemy(), GetEnemy()->GetEngineObject()->GetAbsOrigin() );
 	}
 
 	// Place him into our squad so we can communicate
@@ -3628,7 +3628,7 @@ int CNPC_MetroPolice::SelectStitchSchedule()
 	// If the boat is very close to us, we're going to stitch at it
 	// even if the squad slot is full..
 	Vector vecTargetToGun;
-	Vector vecTarget = StitchAimTarget( GetAbsOrigin(), false );
+	Vector vecTarget = StitchAimTarget(GetEngineObject()->GetAbsOrigin(), false );
 	VectorSubtract( Weapon_ShootPosition(), vecTarget, vecTargetToGun );
 
 	Vector2D vecTargetToGun2D = vecTargetToGun.AsVector2D();
@@ -3709,7 +3709,7 @@ int CNPC_MetroPolice::SelectMoveToLedgeSchedule()
 
 	// If the NPC is above the airboat (say, on a bridge), make sure he
 	// goes to the closest ledge. (may need a spawnflag for this)
-	if ( (GetAbsOrigin().z - GetShootTarget()->GetAbsOrigin().z) >= 150.0f )
+	if ( (GetEngineObject()->GetAbsOrigin().z - GetShootTarget()->GetEngineObject()->GetAbsOrigin().z) >= 150.0f )
 	{
 		m_flNextLedgeCheckTime = gpGlobals->curtime + 3.0f;
 
@@ -3727,7 +3727,7 @@ int CNPC_MetroPolice::SelectMoveToLedgeSchedule()
 		CTraceFilterWorldOnly traceFilter;
 		UTIL_TraceLine( Weapon_ShootPosition(), Weapon_ShootPosition() + vecDelta, MASK_SOLID, &traceFilter, &tr );
 
-		if (tr.endpos.z >= GetAbsOrigin().z - 25.0f )
+		if (tr.endpos.z >= GetEngineObject()->GetAbsOrigin().z - 25.0f )
 			return SCHED_METROPOLICE_ESTABLISH_STITCH_LINE_OF_FIRE;
 	}
 	
@@ -3959,8 +3959,8 @@ void CNPC_MetroPolice::AdministerJustice( void )
 	{
 		if ( m_vecPreChaseOrigin == vec3_origin )
 		{
-			m_vecPreChaseOrigin = GetAbsOrigin();
-			m_flPreChaseYaw = GetAbsAngles().y;
+			m_vecPreChaseOrigin = GetEngineObject()->GetAbsOrigin();
+			m_flPreChaseYaw = GetEngineObject()->GetAbsAngles().y;
 		}
 		m_flChasePlayerTime = gpGlobals->curtime + RandomFloat( 3, 7 );
 
@@ -3968,7 +3968,7 @@ void CNPC_MetroPolice::AdministerJustice( void )
 		CBasePlayer *pPlayer = UTIL_PlayerByIndex(1);
 		SetEnemy( pPlayer );
 		SetState( NPC_STATE_COMBAT );
-		UpdateEnemyMemory( pPlayer, pPlayer->GetAbsOrigin() );
+		UpdateEnemyMemory( pPlayer, pPlayer->GetEngineObject()->GetAbsOrigin() );
 	}
 	else
 	{
@@ -4294,7 +4294,7 @@ int CNPC_MetroPolice::TranslateSchedule( int scheduleType )
 		{	
 			if ( Weapon_OwnsThisType( "weapon_pistol" ) )
 			{
-				if (  GetEnemy() && GetEnemy()->GetAbsOrigin().DistToSqr( GetAbsOrigin() ) > 300*300 )
+				if (  GetEnemy() && GetEnemy()->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin() ) > 300*300 )
 				{
 					if ( OccupyStrategySlot( SQUAD_SLOT_POLICE_CHARGE_ENEMY ) )
 					{
@@ -4476,7 +4476,7 @@ void CNPC_MetroPolice::StartTask( const Task_t *pTask )
 			Vector vecTarget, vecTargetVel;
 			PredictShootTargetPosition( 0.5f, 0.0f, 0.0f, &vecTarget, &vecTargetVel );
 
-			vecTarget -= GetAbsOrigin();
+			vecTarget -= GetEngineObject()->GetAbsOrigin();
 			vecTarget.z = 0.0f;
 			float flDist = VectorNormalize( vecTarget );
 			if ( GetNavigator()->SetVectorGoal( vecTarget, flDist ) )
@@ -4770,7 +4770,7 @@ void CNPC_MetroPolice::RunTask( const Task_t *pTask )
 
 				// Do a distance check of the enemy from his initial position.
 				// Shoot if he gets too far.
-				if ( m_vSavePosition.DistToSqr( GetEnemy()->GetAbsOrigin() ) > FLEEING_DISTANCE_SQR )
+				if ( m_vSavePosition.DistToSqr( GetEnemy()->GetEngineObject()->GetAbsOrigin() ) > FLEEING_DISTANCE_SQR )
 				{
 					SpeakSentence( METROPOLICE_SENTENCE_HES_RUNNING );
 					EnemyResistingArrest();
@@ -5000,7 +5000,7 @@ void CNPC_MetroPolice::GatherConditions( void )
 	if ( !pPlayer )
 		return;
 
-	float distToPlayerSqr = ( pPlayer->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
+	float distToPlayerSqr = ( pPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 	
 	// See if we're too close
 	if ( pPlayer->GetGroundEntity() == this )

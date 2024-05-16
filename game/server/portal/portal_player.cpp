@@ -588,8 +588,8 @@ void CPortal_Player::ClearExpression( void )
 
 void CPortal_Player::PreThink( void )
 {
-	QAngle vOldAngles = GetLocalAngles();
-	QAngle vTempAngles = GetLocalAngles();
+	QAngle vOldAngles = GetEngineObject()->GetLocalAngles();
+	QAngle vTempAngles = GetEngineObject()->GetLocalAngles();
 
 	vTempAngles = EyeAngles();
 
@@ -598,7 +598,7 @@ void CPortal_Player::PreThink( void )
 		vTempAngles[PITCH] -= 360.0f;
 	}
 
-	SetLocalAngles( vTempAngles );
+	GetEngineObject()->SetLocalAngles( vTempAngles );
 
 	BaseClass::PreThink();
 
@@ -610,7 +610,7 @@ void CPortal_Player::PreThink( void )
 	//Reset bullet force accumulator, only lasts one frame
 	m_vecTotalBulletForce = vec3_origin;
 
-	SetLocalAngles( vOldAngles );
+	GetEngineObject()->SetLocalAngles( vOldAngles );
 }
 
 void CPortal_Player::PostThink( void )
@@ -620,9 +620,9 @@ void CPortal_Player::PostThink( void )
 	// Store the eye angles pitch so the client can compute its animation state correctly.
 	m_angEyeAngles = EyeAngles();
 
-	QAngle angles = GetLocalAngles();
+	QAngle angles = GetEngineObject()->GetLocalAngles();
 	angles[PITCH] = 0;
-	SetLocalAngles( angles );
+	GetEngineObject()->SetLocalAngles( angles );
 
 	// Regenerate heath after 3 seconds
 	if ( IsAlive() && GetHealth() < GetMaxHealth() )
@@ -667,7 +667,7 @@ void CPortal_Player::PostThink( void )
 	if ( m_bStuckOnPortalCollisionObject )
 	{
 		Vector vForward = ((CProp_Portal*)m_hPortalEnvironment.Get())->m_vPrevForward;
-		Vector vNewPos = GetAbsOrigin() + vForward * gpGlobals->frametime * -1000.0f;
+		Vector vNewPos = GetEngineObject()->GetAbsOrigin() + vForward * gpGlobals->frametime * -1000.0f;
 		Teleport( &vNewPos, NULL, &vForward );
 		m_bStuckOnPortalCollisionObject = false;
 	}
@@ -681,17 +681,17 @@ void CPortal_Player::PlayerDeathThink(void)
 
 	if (GetFlags() & FL_ONGROUND)
 	{
-		flForward = GetAbsVelocity().Length() - 20;
+		flForward = GetEngineObject()->GetAbsVelocity().Length() - 20;
 		if (flForward <= 0)
 		{
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 		}
 		else
 		{
-			Vector vecNewVelocity = GetAbsVelocity();
+			Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 			VectorNormalize( vecNewVelocity );
 			vecNewVelocity *= flForward;
-			SetAbsVelocity( vecNewVelocity );
+			GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 		}
 	}
 
@@ -849,7 +849,7 @@ void CPortal_Player::UpdateWooshSounds( void )
 	{
 		CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
 
-		float fWooshVolume = GetAbsVelocity().Length() - MIN_FLING_SPEED;
+		float fWooshVolume = GetEngineObject()->GetAbsVelocity().Length() - MIN_FLING_SPEED;
 
 		if ( fWooshVolume < 0.0f )
 		{
@@ -895,8 +895,8 @@ bool CPortal_Player::WantsLagCompensationOnEntity( const CBasePlayer *pPlayer, c
 	if ( pEntityTransmitBits && !pEntityTransmitBits->Get( pPlayer->entindex() ) )
 		return false;
 
-	const Vector &vMyOrigin = GetAbsOrigin();
-	const Vector &vHisOrigin = pPlayer->GetAbsOrigin();
+	const Vector &vMyOrigin = GetEngineObject()->GetAbsOrigin();
+	const Vector &vHisOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	// get max distance player could have moved within max lag compensation time, 
 	// multiply by 1.5 to to avoid "dead zones"  (sqrt(2) would be the exact value)
@@ -946,14 +946,14 @@ void CPortal_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	Quaternion q[MAXSTUDIOBONES];
 
 	// Adjust hit boxes based on IK driven offset.
-	Vector adjOrigin = GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
+	Vector adjOrigin = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
 
 	// FIXME: pass this into Studio_BuildMatrices to skip transforms
 	CBoneBitList boneComputed;
 	if ( m_pIk )
 	{
 		m_iIKCounter++;
-		m_pIk->Init( pStudioHdr, GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask );
+		m_pIk->Init( pStudioHdr, GetEngineObject()->GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask );
 		GetSkeleton( pStudioHdr, pos, q, boneMask );
 
 		m_pIk->UpdateTargets( pos, q, pBoneToWorld, boneComputed );
@@ -1119,15 +1119,15 @@ void CPortal_Player::ShutdownUseEntity( void )
 
 const Vector& CPortal_Player::WorldSpaceCenter( ) const
 {
-	m_vWorldSpaceCenterHolder = GetAbsOrigin();
+	m_vWorldSpaceCenterHolder = GetEngineObject()->GetAbsOrigin();
 	m_vWorldSpaceCenterHolder.z += ( (IsDucked()) ? (VEC_DUCK_HULL_MAX_SCALED( this ).z) : (VEC_HULL_MAX_SCALED( this ).z) ) * 0.5f;
 	return m_vWorldSpaceCenterHolder;
 }
 
 void CPortal_Player::Teleport( const Vector *newPosition, const QAngle *newAngles, const Vector *newVelocity )
 {
-	Vector oldOrigin = GetLocalOrigin();
-	QAngle oldAngles = GetLocalAngles();
+	Vector oldOrigin = GetEngineObject()->GetLocalOrigin();
+	QAngle oldAngles = GetEngineObject()->GetLocalAngles();
 	BaseClass::Teleport( newPosition, newAngles, newVelocity );
 	m_angEyeAngles = pl.v_angle;
 
@@ -1178,7 +1178,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 	if ( GetMoveType() == MOVETYPE_NOCLIP )
 	{
-		m_oldOrigin = GetAbsOrigin();
+		m_oldOrigin = GetEngineObject()->GetAbsOrigin();
 		return;
 	}
 
@@ -1198,14 +1198,14 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 
 
-	Vector tmp = GetAbsOrigin() - newPosition;
+	Vector tmp = GetEngineObject()->GetAbsOrigin() - newPosition;
 	if ( !m_touchedPhysObject && !(GetFlags() & FL_ONGROUND) )
 	{
 		tmp.z *= 0.5f;	// don't care about z delta as much
 	}
 
 	float dist = tmp.LengthSqr();
-	float deltaV = (newVelocity - GetAbsVelocity()).LengthSqr();
+	float deltaV = (newVelocity - GetEngineObject()->GetAbsVelocity()).LengthSqr();
 
 	float maxDistErrorSqr = VPHYS_MAX_DISTSQR;
 	float maxVelErrorSqr = VPHYS_MAX_VELSQR;
@@ -1222,7 +1222,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			// BUGBUG: Rewrite this code using fixed timestep
 			if ( deltaV >= maxVelErrorSqr )
 			{
-				Vector dir = GetAbsVelocity();
+				Vector dir = GetEngineObject()->GetAbsVelocity();
 				float len = VectorNormalize(dir);
 				float dot = DotProduct( newVelocity, dir );
 				if ( dot > len )
@@ -1256,7 +1256,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			UTIL_TraceEntity( this, newPosition, newPosition, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 			if ( !trace.allsolid && !trace.startsolid )
 			{
-				SetAbsOrigin( newPosition );
+				GetEngineObject()->SetAbsOrigin( newPosition );
 			}
 		}
 		else
@@ -1264,7 +1264,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			trace_t trace;
 
 			Ray_t ray;
-			ray.Init( GetAbsOrigin(), GetAbsOrigin(), WorldAlignMins(), WorldAlignMaxs() );
+			ray.Init(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), WorldAlignMins(), WorldAlignMaxs() );
 
 			CTraceFilterSimple OriginalTraceFilter( this, COLLISION_GROUP_PLAYER_MOVEMENT );
 			CTraceFilterTranslateClones traceFilter( &OriginalTraceFilter );
@@ -1279,16 +1279,16 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 				if( trace.startsolid == false )
 				{
-					SetAbsOrigin( newPosition );
+					GetEngineObject()->SetAbsOrigin( newPosition );
 				}
 				else
 				{
-					if( !FindClosestPassableSpace( this, newPosition - GetAbsOrigin(), MASK_PLAYERSOLID ) )
+					if( !FindClosestPassableSpace( this, newPosition - GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID ) )
 					{
 						// Try moving the player closer to the center of the portal
 						CProp_Portal *pPortal = m_hPortalEnvironment.Get();
-						newPosition += ( pPortal->GetAbsOrigin() - WorldSpaceCenter() ) * 0.1f;
-						SetAbsOrigin( newPosition );
+						newPosition += ( pPortal->GetEngineObject()->GetAbsOrigin() - WorldSpaceCenter() ) * 0.1f;
+						GetEngineObject()->SetAbsOrigin( newPosition );
 
 						DevMsg( "Hurting the player for FindClosestPassableSpaceFailure!" );
 
@@ -1307,7 +1307,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			// check my position (physics object could have simulated into my position
 			// physics is not very far away, check my position
 			trace_t trace;
-			UTIL_TraceEntity( this, GetAbsOrigin(), GetAbsOrigin(),
+			UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),
 				MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 
 			// is current position ok?
@@ -1315,18 +1315,18 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			{
 				// stuck????!?!?
 				//Msg("Stuck on %s\n", trace.m_pEnt->GetClassname());
-				SetAbsOrigin( newPosition );
-				UTIL_TraceEntity( this, GetAbsOrigin(), GetAbsOrigin(),
+				GetEngineObject()->SetAbsOrigin( newPosition );
+				UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),
 					MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 				if ( trace.allsolid || trace.startsolid )
 				{
 					//Msg("Double Stuck\n");
-					SetAbsOrigin( m_oldOrigin );
+					GetEngineObject()->SetAbsOrigin( m_oldOrigin );
 				}
 			}
 		}
 	}
-	m_oldOrigin = GetAbsOrigin();
+	m_oldOrigin = GetEngineObject()->GetAbsOrigin();
 }
 
 bool CPortal_Player::UseFoundEntity( CBaseEntity *pUseEntity )
@@ -1626,7 +1626,7 @@ void CPortal_Player::CreateViewModel( int index /*=0*/ )
 	CPredictedViewModel *vm = ( CPredictedViewModel * )gEntList.CreateEntityByName( "predicted_viewmodel" );
 	if ( vm )
 	{
-		vm->SetAbsOrigin( GetAbsOrigin() );
+		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		vm->SetOwner( this );
 		vm->SetIndex( index );
 		DispatchSpawn( vm );
@@ -1721,7 +1721,7 @@ void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
 
 void CPortal_Player::Jump( void )
 {
-	g_PortalGameStats.Event_PlayerJump( GetAbsOrigin(), GetAbsVelocity() );
+	g_PortalGameStats.Event_PlayerJump(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity() );
 	BaseClass::Jump();
 }
 
@@ -1814,7 +1814,7 @@ int CPortal_Player::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		vLateralForce.z = 0.0f;
 
 		// Push if the player is moving against the force direction
-		if ( GetAbsVelocity().Dot( vLateralForce ) < 0.0f )
+		if (GetEngineObject()->GetAbsVelocity().Dot( vLateralForce ) < 0.0f )
 			ApplyAbsVelocityImpulse( vLateralForce );
 	}
 	else if ( ( inputInfoCopy.GetDamageType() & DMG_CRUSH ) )
@@ -1920,7 +1920,7 @@ int CPortal_Player::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	// Insert a combat sound so that nearby NPCs hear battle
 	if ( attacker->IsNPC() )
 	{
-		CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 512, 0.5, this );//<<TODO>>//magic number
+		CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 512, 0.5, this );//<<TODO>>//magic number
 	}
 
 	return 1;
@@ -1935,7 +1935,7 @@ void CPortal_Player::ForceDuckThisFrame( void )
 		m_Local.m_bDucked = true;
 		ForceButtons( IN_DUCK );
 		AddFlag( FL_DUCKING );
-		SetVCollisionState( GetAbsOrigin(), GetAbsVelocity(), VPHYS_CROUCH );
+		SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_CROUCH );
 	}
 }
 
@@ -1946,7 +1946,7 @@ void CPortal_Player::UnDuck( void )
 		m_Local.m_bDucked = false;
 		UnforceButtons( IN_DUCK );
 		RemoveFlag( FL_DUCKING );
-		SetVCollisionState( GetAbsOrigin(), GetAbsVelocity(), VPHYS_WALK );
+		SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_WALK );
 	}
 }
 
@@ -2067,7 +2067,7 @@ void CPortal_Player::UpdatePortalViewAreaBits( unsigned char *pvs, int pvssize )
 			if ( pRemotePortal && pRemotePortal->m_bActivated && pRemotePortal->NetworkProp() && 
 				pRemotePortal->GetEngineObject()->IsInPVS( this, pvs, pvssize ) )
 			{
-				portalArea[ i ] = engine->GetArea( pPortals[ i ]->GetAbsOrigin() );
+				portalArea[ i ] = engine->GetArea( pPortals[ i ]->GetEngineObject()->GetAbsOrigin() );
 
 				if ( portalArea [ i ] >= 0 )
 				{
@@ -2110,7 +2110,7 @@ void AddPortalCornersToEnginePVS( CProp_Portal* pPortal )
 	pPortal->GetVectors( &vForward, &vRight, &vUp );
 
 	// Center of the remote portal
-	Vector ptOrigin			= pPortal->GetAbsOrigin();
+	Vector ptOrigin			= pPortal->GetEngineObject()->GetAbsOrigin();
 
 	// Distance offsets to the different edges of the portal... Used in the placement checks
 	Vector vToTopEdge = vUp * ( PORTAL_HALF_HEIGHT - PORTAL_BUMP_FORGIVENESS );
@@ -2174,7 +2174,7 @@ void CPortal_Player::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *p
 
 		if ( pPortal && pRemotePortal && pPortal->m_bActivated && pRemotePortal->m_bActivated )
 		{		
-			Vector ptPortalCenter = pPortal->GetAbsOrigin();
+			Vector ptPortalCenter = pPortal->GetEngineObject()->GetAbsOrigin();
 			Vector vPortalForward;
 			pPortal->GetVectors( &vPortalForward, NULL, NULL );
 

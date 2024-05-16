@@ -354,7 +354,7 @@ void CPhysThruster::OnActivate( void )
 		{
 			QAngle angles;
 			MatrixAngles( thrusterToAttached, angles );
-			SetLocalAngles( angles );
+			GetEngineObject()->SetLocalAngles( angles );
 		}
 		// maintain the local relationship with this entity
 		// it may move before the thruster is activated
@@ -379,7 +379,7 @@ void CalculateVelocityOffsetLocal( IPhysicsObject *pPhys, const Vector &forceLoc
 void CPhysThruster::SetupForces( IPhysicsObject *pPhys, Vector &linear, AngularImpulse &angular )
 {
 	Vector thrustVector;
-	AngleVectors( GetLocalAngles(), &thrustVector );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &thrustVector );
 	thrustVector *= m_force;
 
 	// multiply the force by mass (it's actually just an acceleration)
@@ -440,7 +440,7 @@ void CPhysTorque::Spawn( void )
 	m_spawnflags |= SF_THRUST_TORQUE | SF_THRUST_MASS_INDEPENDENT;
 	m_spawnflags &= ~SF_THRUST_FORCE;
 
-	m_axis -= GetAbsOrigin();
+	m_axis -= GetEngineObject()->GetAbsOrigin();
 	VectorNormalize(m_axis);
 	UTIL_SnapDirectionToAxis( m_axis );
 	BaseClass::Spawn();
@@ -707,7 +707,7 @@ CPhysMotor::~CPhysMotor()
 
 void CPhysMotor::Spawn( void )
 {
-	m_motor.m_axis -= GetLocalOrigin();
+	m_motor.m_axis -= GetEngineObject()->GetLocalOrigin();
 	float axisLength = VectorNormalize(m_motor.m_axis);
 	// double check that the axis is at least a unit long. If not, warn and self-destruct.
 	if ( axisLength > 1.0f )
@@ -780,7 +780,7 @@ void CPhysMotor::Activate( void )
 				constraint_hingeparams_t hingeParams;
 				hingeParams.Defaults();
 				hingeParams.worldAxisDirection = m_motor.m_axis;
-				hingeParams.worldPosition = GetLocalOrigin();
+				hingeParams.worldPosition = GetEngineObject()->GetLocalOrigin();
 
 				m_pHinge = physenv->CreateHingeConstraint( g_PhysWorldObject, pPhys, NULL, hingeParams );
 				m_pHinge->SetGameData( (void *)this );

@@ -375,9 +375,9 @@ void CPhysicsShadowClone::SyncEntity( bool bPullChanges )
 	Vector ptOrigin, vVelocity;
 	QAngle qAngles;
 
-	ptOrigin = pSource->GetAbsOrigin();
-	qAngles = pSource->GetAbsAngles();
-	vVelocity = pSource->GetAbsVelocity();
+	ptOrigin = pSource->GetEngineObject()->GetAbsOrigin();
+	qAngles = pSource->GetEngineObject()->GetAbsAngles();
+	vVelocity = pSource->GetEngineObject()->GetAbsVelocity();
 
 	if( !m_bShadowTransformIsIdentity )
 	{
@@ -390,15 +390,15 @@ void CPhysicsShadowClone::SyncEntity( bool bPullChanges )
 	//	pDest->SetGroundEntity( pSource->GetGroundEntity() );
 	//}
 
-	if( (ptOrigin != pDest->GetAbsOrigin()) || (qAngles != pDest->GetAbsAngles()) )
+	if( (ptOrigin != pDest->GetEngineObject()->GetAbsOrigin()) || (qAngles != pDest->GetEngineObject()->GetAbsAngles()) )
 	{
 		pDest->Teleport( &ptOrigin, &qAngles, NULL );
 	}
 	
-	if( vVelocity != pDest->GetAbsVelocity() )
+	if( vVelocity != pDest->GetEngineObject()->GetAbsVelocity() )
 	{
 		//pDest->IncrementInterpolationFrame();
-		pDest->SetAbsVelocity( vec3_origin ); //the two step process helps, I don't know why, but it does
+		pDest->GetEngineObject()->SetAbsVelocity( vec3_origin ); //the two step process helps, I don't know why, but it does
 		pDest->ApplyAbsVelocityImpulse( vVelocity );
 	}
 }

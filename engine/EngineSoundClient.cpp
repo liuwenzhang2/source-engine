@@ -243,7 +243,7 @@ void CEngineSoundClient::EmitSoundInternal( IRecipientFilter& filter, int iEntIn
 
 		if (!pDirection)
 		{
-			IClientEntity *pEnt = entitylist->GetClientEntity( iEntIndex );
+			IEngineObjectClient *pEnt = entitylist->GetEngineObject( iEntIndex );
 			if (pEnt && !(iFlags & SND_STOP))
 			{
 				QAngle angles;

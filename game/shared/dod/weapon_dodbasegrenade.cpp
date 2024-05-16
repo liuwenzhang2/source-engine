@@ -364,7 +364,7 @@ enum
 
 		AngleVectors( angThrow, &vForward, &vRight, &vUp );
 		
-		Vector eyes = pPlayer->GetAbsOrigin() + pPlayer->GetViewOffset();
+		Vector eyes = pPlayer->GetEngineObject()->GetAbsOrigin() + pPlayer->GetViewOffset();
 		Vector vecSrc = eyes + vForward * 16; 	
 
 		// Start with the player's velocity as the grenade vel
@@ -372,7 +372,7 @@ enum
 		pPlayer->GetVelocity( &vecPlayerVel, NULL );
 
 		// Get player angles, not eye angles!
-		QAngle angPlayerAngles = pPlayer->GetAbsAngles();
+		QAngle angPlayerAngles = pPlayer->GetEngineObject()->GetAbsAngles();
 		Vector vecPlayerForward;
 		AngleVectors( angPlayerAngles, &vecPlayerForward );
 		Vector vecThrow = DotProduct( vecPlayerVel, vecPlayerForward ) * vecPlayerForward;

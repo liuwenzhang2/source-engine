@@ -35,15 +35,16 @@ public:
 
 	virtual void ParseMapData(IEntityMapData* mapData) = 0;
 	virtual void SetAbsVelocity(const Vector& vecVelocity) = 0;
-	virtual Vector& GetAbsVelocity() = 0;
+	//virtual const Vector& GetAbsVelocity() = 0;
 	virtual const Vector& GetAbsVelocity() const = 0;
+
 	// NOTE: Setting the abs origin or angles will cause the local origin + angles to be set also
 	virtual void SetAbsOrigin(const Vector& origin) = 0;
-	virtual Vector& GetAbsOrigin(void) = 0;
+	//virtual const Vector& GetAbsOrigin(void) = 0;
 	virtual const Vector& GetAbsOrigin(void) const = 0;
 
 	virtual void SetAbsAngles(const QAngle& angles) = 0;
-	virtual QAngle& GetAbsAngles(void) = 0;
+	//virtual const QAngle& GetAbsAngles(void) = 0;
 	virtual const QAngle& GetAbsAngles(void) const = 0;
 
 	// Origin and angles in local space ( relative to parent )
@@ -60,6 +61,20 @@ public:
 	virtual void CalcAbsolutePosition() = 0;
 	virtual void CalcAbsoluteVelocity() = 0;
 
+	// Set the movement parent. Your local origin and angles will become relative to this parent.
+// If iAttachment is a valid attachment on the parent, then your local origin and angles 
+// are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
+// current m_iParentAttachment.
+	virtual void	SetParent(IEngineObjectServer* pNewParent, int iAttachment = -1) = 0;
+	// FIXME: Make hierarchy a member of CBaseEntity
+	// or a contained private class...
+	virtual void UnlinkChild(IEngineObjectServer* pChild) = 0;
+	virtual void LinkChild(IEngineObjectServer* pChild) = 0;
+	//virtual void ClearParent(IEngineObjectServer* pEntity) = 0;
+	virtual void UnlinkAllChildren() = 0;
+	virtual void UnlinkFromParent() = 0;
+	virtual void TransferChildren(IEngineObjectServer* pNewParent) = 0;
+
 	virtual IEngineObjectServer* GetMoveParent(void) = 0;
 	virtual void SetMoveParent(IEngineObjectServer* hMoveParent) = 0;
 	virtual IEngineObjectServer* GetRootMoveParent() = 0;
@@ -70,7 +85,7 @@ public:
 
 	virtual void ResetRgflCoordinateFrame() = 0;
 	// Returns the entity-to-world transform
-	virtual matrix3x4_t& EntityToWorldTransform() = 0;
+	//virtual matrix3x4_t& EntityToWorldTransform() = 0;
 	virtual const matrix3x4_t& EntityToWorldTransform() const = 0;
 
 	// Some helper methods that transform a point from entity space to world space + back
@@ -91,20 +106,6 @@ public:
 	virtual void ComputeAbsDirection(const Vector& vecLocalDirection, Vector* pAbsDirection) = 0;
 
 	virtual void	GetVectors(Vector* forward, Vector* right, Vector* up) const = 0;
-
-	// Set the movement parent. Your local origin and angles will become relative to this parent.
-	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
-	// are relative to the attachment on this entity. If iAttachment == -1, it'll preserve the
-	// current m_iParentAttachment.
-	virtual void	SetParent(IEngineObjectServer* pNewParent, int iAttachment = -1) = 0;
-	// FIXME: Make hierarchy a member of CBaseEntity
-	// or a contained private class...
-	static void UnlinkChild(IEngineObjectServer* pParent, IEngineObjectServer* pChild);
-	static void LinkChild(IEngineObjectServer* pParent, IEngineObjectServer* pChild);
-	static void ClearParent(IEngineObjectServer* pEntity);
-	static void UnlinkAllChildren(IEngineObjectServer* pParent);
-	static void UnlinkFromParent(IEngineObjectServer* pRemove);
-	static void TransferChildren(IEngineObjectServer* pOldParent, IEngineObjectServer* pNewParent);
 
 	virtual int	AreaNum() const = 0;
 	virtual PVSInfo_t* GetPVSInfo() = 0;

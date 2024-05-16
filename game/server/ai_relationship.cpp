@@ -330,7 +330,7 @@ void CAI_Relationship::DiscloseNPCLocation( CBaseCombatCharacter *pSubject, CBas
 	CAI_BaseNPC *pNPC = pSubject->MyNPCPointer();
 	if ( pNPC != NULL )
 	{
-		pNPC->UpdateEnemyMemory( pTarget, pTarget->GetAbsOrigin() );
+		pNPC->UpdateEnemyMemory( pTarget, pTarget->GetEngineObject()->GetAbsOrigin() );
 	}
 }
 
@@ -383,7 +383,7 @@ void CAI_Relationship::ChangeRelationships( int disposition, int iReverting, CBa
 		{
 			if( IsASubject( pPlayer ) )
 			{
-				if ( m_flRadius == 0.0 || GetAbsOrigin().DistToSqr( pPlayer->GetAbsOrigin() ) <= radiusSq )
+				if ( m_flRadius == 0.0 || GetEngineObject()->GetAbsOrigin().DistToSqr( pPlayer->GetEngineObject()->GetAbsOrigin() ) <= radiusSq )
 					subjectList.AddToTail( pPlayer );
 			}
 			else if( IsATarget( pPlayer ) )
@@ -407,7 +407,7 @@ void CAI_Relationship::ChangeRelationships( int disposition, int iReverting, CBa
 		{
 			if( IsASubject( pNPC ) )
 			{
-				if ( m_flRadius == 0.0 || GetAbsOrigin().DistToSqr( pNPC->GetAbsOrigin() ) <= radiusSq )
+				if ( m_flRadius == 0.0 || GetEngineObject()->GetAbsOrigin().DistToSqr( pNPC->GetEngineObject()->GetAbsOrigin() ) <= radiusSq )
 					subjectList.AddToTail( pNPC );
 			}
 			else if( IsATarget( pNPC ) )

@@ -169,9 +169,9 @@ void C_EnvParticleScript::CreateParticle( const char *pAttachmentName, const cha
 
 	if ( m_flSequenceScale != 1.0f )
 	{
-		pParticle->m_Pos -= GetAbsOrigin();
+		pParticle->m_Pos -= GetEngineObject()->GetAbsOrigin();
 		pParticle->m_Pos *= m_flSequenceScale;
-		pParticle->m_Pos += GetAbsOrigin();
+		pParticle->m_Pos += GetEngineObject()->GetAbsOrigin();
 	}
 }
 
@@ -288,9 +288,9 @@ void C_EnvParticleScript::SimulateParticles( CParticleSimulateIterator *pIterato
 
 			if ( m_flSequenceScale != 1.0f )
 			{
-				pParticle->m_Pos -= GetAbsOrigin();
+				pParticle->m_Pos -= GetEngineObject()->GetAbsOrigin();
 				pParticle->m_Pos *= m_flSequenceScale;
-				pParticle->m_Pos += GetAbsOrigin();
+				pParticle->m_Pos += GetEngineObject()->GetAbsOrigin();
 			}
 		}
 		
@@ -300,5 +300,5 @@ void C_EnvParticleScript::SimulateParticles( CParticleSimulateIterator *pIterato
 
 const Vector &C_EnvParticleScript::GetSortOrigin()
 {
-	return GetAbsOrigin();
+	return GetEngineObject()->GetAbsOrigin();
 }

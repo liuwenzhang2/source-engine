@@ -370,7 +370,7 @@ void CBaseAnimating::OnRestore()
 	if ( m_nSequence != -1 && GetModelPtr() && !IsValidSequence( m_nSequence ) )
 		m_nSequence = 0;
 
-	m_flEstIkFloor = GetLocalOrigin().z;
+	m_flEstIkFloor = GetEngineObject()->GetLocalOrigin().z;
 	PopulatePoseParameters();
 }
 
@@ -1186,7 +1186,7 @@ void CBaseAnimating::HandleAnimEvent( animevent_t *pEvent )
 					hDustTrail->SetLifetime(flDuration);  // Lifetime of the spawner, in seconds
 					hDustTrail->m_StopEmitTime = gpGlobals->curtime + flDuration;
 					hDustTrail->GetEngineObject()->SetParent( this->GetEngineObject(), LookupAttachment( szAttachment ) );
-					hDustTrail->SetLocalOrigin( vec3_origin );
+					hDustTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
 				}
 			}
 			else
@@ -1517,7 +1517,7 @@ void CBaseAnimating::InitStepHeightAdjust( void )
 	m_flIKGroundMaxHeight = 0;
 
 	// FIXME: not safe to call GetAbsOrigin here. Hierarchy might not be set up!
-	m_flEstIkFloor = GetAbsOrigin().z;
+	m_flEstIkFloor = GetEngineObject()->GetAbsOrigin().z;
 	m_flEstIkOffset = 0;
 }
 
@@ -1533,7 +1533,7 @@ void CBaseAnimating::UpdateStepOrigin()
 	if (!npc_height_adjust.GetBool())
 	{
 		m_flEstIkOffset = 0;
-		m_flEstIkFloor = GetLocalOrigin().z;
+		m_flEstIkFloor = GetEngineObject()->GetLocalOrigin().z;
 		return;
 	}
 
@@ -1548,7 +1548,7 @@ void CBaseAnimating::UpdateStepOrigin()
 	{
 		if ((GetFlags() & (FL_FLY | FL_SWIM)) == 0 && GetMoveParent() == NULL && GetGroundEntity() != NULL && !GetGroundEntity()->IsMoving())
 		{
-			Vector toAbs = GetAbsOrigin() - GetLocalOrigin();
+			Vector toAbs = GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetLocalOrigin();
 			if (toAbs.z == 0.0)
 			{
 				CAI_BaseNPC *pNPC = MyNPCPointer();
@@ -1565,7 +1565,7 @@ void CBaseAnimating::UpdateStepOrigin()
 				// don't let heigth difference between min and max exceed step height
 				float bias = clamp( (m_flIKGroundMaxHeight - m_flIKGroundMinHeight) - height, 0.f, height );
 				// save off reasonable offset
-				m_flEstIkOffset = clamp( m_flEstIkFloor - GetAbsOrigin().z, -height + bias, 0.0f );
+				m_flEstIkOffset = clamp( m_flEstIkFloor - GetEngineObject()->GetAbsOrigin().z, -height + bias, 0.0f );
 				return;
 			}
 		}
@@ -1573,7 +1573,7 @@ void CBaseAnimating::UpdateStepOrigin()
 
 	// don't use floor offset, decay the value
 	m_flEstIkOffset *= 0.5;
-	m_flEstIkFloor = GetLocalOrigin().z;
+	m_flEstIkFloor = GetEngineObject()->GetLocalOrigin().z;
 }
 
 
@@ -1583,7 +1583,7 @@ void CBaseAnimating::UpdateStepOrigin()
 
 Vector CBaseAnimating::GetStepOrigin( void ) const 
 { 
-	Vector tmp = GetLocalOrigin();
+	Vector tmp = GetEngineObject()->GetLocalOrigin();
 	tmp.z += m_flEstIkOffset;
 	return tmp;
 }
@@ -1595,7 +1595,7 @@ Vector CBaseAnimating::GetStepOrigin( void ) const
 QAngle CBaseAnimating::GetStepAngles( void ) const
 {
 	// TODO: Add in body lean
-	return GetLocalAngles();
+	return GetEngineObject()->GetLocalAngles();
 }
 
 //-----------------------------------------------------------------------------
@@ -1626,9 +1626,9 @@ void CBaseAnimating::CalculateIKLocks( float currentTime )
 			case IK_GROUND:
 				{
 					Vector estGround;
-					estGround = (pTarget->est.pos - GetAbsOrigin());
+					estGround = (pTarget->est.pos - GetEngineObject()->GetAbsOrigin());
 					estGround = estGround - (estGround * up) * up;
-					estGround = GetAbsOrigin() + estGround + pTarget->est.floor * up;
+					estGround = GetEngineObject()->GetAbsOrigin() + estGround + pTarget->est.floor * up;
 
 					Vector p1, p2;
 					VectorMA( estGround, pTarget->est.height, up, p1 );
@@ -1669,7 +1669,7 @@ void CBaseAnimating::CalculateIKLocks( float currentTime )
 						else
 						{
 							pTarget->SetPos( trace.endpos );
-							pTarget->SetAngles( GetAbsAngles() );
+							pTarget->SetAngles(GetEngineObject()->GetAbsAngles() );
 						}
 
 					}
@@ -1806,7 +1806,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	Quaternion q[MAXSTUDIOBONES];
 
 	// adjust hit boxes based on IK driven offset
-	Vector adjOrigin = GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
+	Vector adjOrigin = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
 
 	if ( CanSkipAnimation() )
 	{
@@ -1821,7 +1821,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 			// FIXME: pass this into Studio_BuildMatrices to skip transforms
 			CBoneBitList boneComputed;
 			m_iIKCounter++;
-			m_pIk->Init( pStudioHdr, GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask );
+			m_pIk->Init( pStudioHdr, GetEngineObject()->GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask );
 			GetSkeleton( pStudioHdr, pos, q, boneMask );
 
 			m_pIk->UpdateTargets( pos, q, pBoneToWorld, boneComputed );
@@ -1844,7 +1844,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		{
 			BuildMatricesWithBoneMerge( 
 				pStudioHdr, 
-				GetAbsAngles(), 
+				GetEngineObject()->GetAbsAngles(),
 				adjOrigin, 
 				pos, 
 				q, 
@@ -1863,7 +1863,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 
 	Studio_BuildMatrices( 
 		pStudioHdr, 
-		GetAbsAngles(), 
+		GetEngineObject()->GetAbsAngles(),
 		adjOrigin, 
 		pos, 
 		q, 
@@ -2199,7 +2199,7 @@ void CBaseAnimating::SetSequenceBox( void )
 	{
 		// expand box for rotation
 		// find min / max for rotations
-		float yaw = GetLocalAngles().y * (M_PI / 180.0);
+		float yaw = GetEngineObject()->GetLocalAngles().y * (M_PI / 180.0);
 		
 		Vector xvector, yvector;
 		xvector.x = cos(yaw);
@@ -2334,7 +2334,7 @@ Vector CBaseAnimating::GetGroundSpeedVelocity( void )
 	vecAngles.x = 0;
 	vecAngles.z = 0;
 
-	vecAngles.y += GetLocalAngles().y;
+	vecAngles.y += GetEngineObject()->GetLocalAngles().y;
 
 	AngleVectors( vecAngles, &vecVelocity );
 
@@ -2424,16 +2424,16 @@ bool CBaseAnimating::GetIntervalMovement( float flIntervalUsed, bool &bMoveSeqFi
 
 	if (Studio_SeqMovement( pstudiohdr, GetSequence(), GetCycle(), flNextCycle, GetPoseParameterArray(), deltaPos, deltaAngles ))
 	{
-		VectorYawRotate( deltaPos, GetLocalAngles().y, deltaPos );
-		newPosition = GetLocalOrigin() + deltaPos;
+		VectorYawRotate( deltaPos, GetEngineObject()->GetLocalAngles().y, deltaPos );
+		newPosition = GetEngineObject()->GetLocalOrigin() + deltaPos;
 		newAngles.Init();
-		newAngles.y = GetLocalAngles().y + deltaAngles.y;
+		newAngles.y = GetEngineObject()->GetLocalAngles().y + deltaAngles.y;
 		return true;
 	}
 	else
 	{
-		newPosition = GetLocalOrigin();
-		newAngles = GetLocalAngles();
+		newPosition = GetEngineObject()->GetLocalOrigin();
+		newAngles = GetEngineObject()->GetLocalAngles();
 		return false;
 	}
 }
@@ -2695,7 +2695,7 @@ bool CBaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask,
 	matrix3x4_t *hitboxbones[MAXSTUDIOBONES];
 	pcache->ReadCachedBonePointers( hitboxbones, pStudioHdr->numbones() );
 
-	if ( TraceToStudio( physprops, ray, pStudioHdr, set, hitboxbones, fContentsMask, GetAbsOrigin(), GetModelScale(), tr ) )
+	if ( TraceToStudio( physprops, ray, pStudioHdr, set, hitboxbones, fContentsMask, GetEngineObject()->GetAbsOrigin(), GetModelScale(), tr ) )
 	{
 		mstudiobbox_t *pbox = set->pHitbox( tr.hitbox );
 		mstudiobone_t *pBone = pStudioHdr->pBone(pbox->bone);
@@ -2795,7 +2795,7 @@ void CBaseAnimating::GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity
 
 			// Build a rotation matrix from NPC orientation
 			matrix3x4_t fRotateMatrix;
-			AngleMatrix(GetLocalAngles(), fRotateMatrix);
+			AngleMatrix(GetEngineObject()->GetLocalAngles(), fRotateMatrix);
 			VectorRotate( vRawVel, fRotateMatrix, *vVelocity);
 		}
 		if (vAngVelocity != NULL)
@@ -2826,7 +2826,7 @@ void CBaseAnimating::GetSkeleton( CStudioHdr *pStudioHdr, Vector pos[], Quaterni
 	if ( m_pIk )
 	{
 		CIKContext auto_ik;
-		auto_ik.Init( pStudioHdr, GetAbsAngles(), GetAbsOrigin(), gpGlobals->curtime, 0, boneMask );
+		auto_ik.Init( pStudioHdr, GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), gpGlobals->curtime, 0, boneMask );
 		boneSetup.CalcAutoplaySequences( pos, q, gpGlobals->curtime, &auto_ik );
 	}
 	else

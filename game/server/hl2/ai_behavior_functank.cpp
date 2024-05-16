@@ -244,7 +244,7 @@ void CAI_FuncTankBehavior::StartTask( const Task_t *pTask )
 			goal.pTarget = m_hFuncTank;
 			if ( GetNavigator()->SetGoal( goal ) )
 			{
-				GetNavigator()->SetArrivalDirection( m_hFuncTank->GetAbsAngles() );
+				GetNavigator()->SetArrivalDirection( m_hFuncTank->GetEngineObject()->GetAbsAngles() );
 				TaskComplete();
 			}
 			else
@@ -277,7 +277,7 @@ void CAI_FuncTankBehavior::StartTask( const Task_t *pTask )
 				return;
 			}
 
-			GetMotor()->SetIdealYawToTarget( m_hFuncTank->GetAbsOrigin() );
+			GetMotor()->SetIdealYawToTarget( m_hFuncTank->GetEngineObject()->GetAbsOrigin() );
 			GetOuter()->SetTurnActivity(); 
 			break;
 		}
@@ -327,7 +327,7 @@ void CAI_FuncTankBehavior::StartTask( const Task_t *pTask )
 				return;
 			}
 
-			GetMotor()->SetIdealYawToTarget( m_hFuncTank->GetAbsOrigin() );
+			GetMotor()->SetIdealYawToTarget( m_hFuncTank->GetEngineObject()->GetAbsOrigin() );
 
 			float flCenterYaw = m_hFuncTank->YawCenterWorld();
 			float flYawRange = m_hFuncTank->YawRange();
@@ -358,7 +358,7 @@ void CAI_FuncTankBehavior::StartTask( const Task_t *pTask )
 				return;
 			}
 
-			GetMotor()->SetIdealYawToTarget( m_hFuncTank->GetAbsOrigin() );
+			GetMotor()->SetIdealYawToTarget( m_hFuncTank->GetEngineObject()->GetAbsOrigin() );
 
 			float flCenterYaw = m_hFuncTank->YawCenterWorld();
 			float flYawRange = m_hFuncTank->YawRange();
@@ -546,7 +546,7 @@ void CAI_FuncTankBehavior::AimGun( void )
 	if ( m_bMounted && m_hFuncTank)
 	{
 		Vector vecForward;
-		AngleVectors( m_hFuncTank->GetAbsAngles(), &vecForward );
+		AngleVectors( m_hFuncTank->GetEngineObject()->GetAbsAngles(), &vecForward );
 		GetOuter()->SetAim( vecForward );
 		return;
 	}
@@ -645,7 +645,7 @@ CBaseEntity *CAI_FuncTankBehavior::BestEnemy( void )
 		{
 			bBestSeen = ( pNPC->GetSenses()->DidSeeEntity( pEnemy ) || pNPC->FVisible( pEnemy ) ); // @TODO (toml 04-02-03): Need to optimize CanSeeEntity() so multiple calls in frame do not recalculate, rather cache
 			iBestPriority = pNPC->IRelationPriority( pEnemy );
-			iBestDistSq = (pEnemy->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
+			iBestDistSq = (pEnemy->GetEngineObject()->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
 			pBestEnemy = pEnemy;
 			bBestUnreachable = bUnreachable;
 		}
@@ -656,7 +656,7 @@ CBaseEntity *CAI_FuncTankBehavior::BestEnemy( void )
 			// currently think is the best visible enemy. No need to do
 			// a distance check, just get mad at this one for now.
 			iBestPriority = pNPC->IRelationPriority ( pEnemy );
-			iBestDistSq = ( pEnemy->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
+			iBestDistSq = ( pEnemy->GetEngineObject()->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
 			pBestEnemy = pEnemy;
 			bBestUnreachable = bUnreachable;
 		}
@@ -665,7 +665,7 @@ CBaseEntity *CAI_FuncTankBehavior::BestEnemy( void )
 			// this entity is disliked just as much as the entity that
 			// we currently think is the best visible enemy, so we only
 			// get mad at it if it is closer.
-			iDistSq = ( pEnemy->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
+			iDistSq = ( pEnemy->GetEngineObject()->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
 
 			bool bCloser = ( iDistSq < iBestDistSq ) ;
 

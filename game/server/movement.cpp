@@ -108,8 +108,8 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CPathKeyFrame::Spawn( void )
 {
-	m_Origin = GetLocalOrigin();
-	m_Angles = GetLocalAngles();
+	m_Origin = GetEngineObject()->GetLocalOrigin();
+	m_Angles = GetEngineObject()->GetLocalAngles();
 
 	SetKeyAngles( m_Angles );
 }
@@ -332,8 +332,8 @@ void CBaseMoveBehavior::Spawn( void )
 	SetMoveType( MOVETYPE_PUSH );
 
 	// a move behavior is also it's first keyframe
-	m_Origin = GetLocalOrigin();
-	m_Angles = GetLocalAngles();
+	m_Origin = GetEngineObject()->GetLocalOrigin();
+	m_Angles = GetEngineObject()->GetLocalAngles();
 
 	BaseClass::Spawn();
 }
@@ -557,7 +557,7 @@ void CBaseMoveBehavior::StopMoving( void )
 	m_flAnimStartTime = 0;
 	m_flAnimEndTime = 0;
 	m_pTargetKeyFrame = NULL;
-	SetAbsVelocity(vec3_origin);
+	GetEngineObject()->SetAbsVelocity(vec3_origin);
 	SetLocalAngularVelocity( vec3_angle );
 }
 
@@ -650,8 +650,8 @@ float CBaseMoveBehavior::SetObjectPhysicsVelocity( float moveTime )
 
 	// find our velocity vector (newPos - currentPos) and scale velocity vector according to the movetime
 	float oneOnMoveTime = 1 / moveTime;
-	SetAbsVelocity( (newPos - GetLocalOrigin()) * oneOnMoveTime );
-	SetLocalAngularVelocity( (newAngles - GetLocalAngles()) * oneOnMoveTime );
+	GetEngineObject()->SetAbsVelocity( (newPos - GetEngineObject()->GetLocalOrigin()) * oneOnMoveTime );
+	SetLocalAngularVelocity( (newAngles - GetEngineObject()->GetLocalAngles()) * oneOnMoveTime );
 
 	return moveTime;
 }

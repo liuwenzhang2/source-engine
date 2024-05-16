@@ -74,7 +74,7 @@ IterationRetval_t CPlayerAndObjectEnumerator::EnumElement( IHandleEntity *pHandl
 		return ITERATION_CONTINUE;
 #endif
 
-	Vector	deltaPos = pEnt->GetAbsOrigin() - m_pLocal->GetAbsOrigin();
+	Vector	deltaPos = pEnt->GetEngineObject()->GetAbsOrigin() - m_pLocal->GetEngineObject()->GetAbsOrigin();
 	if ( deltaPos.LengthSqr() > m_flRadiusSquared )
 		return ITERATION_CONTINUE;
 

@@ -222,7 +222,7 @@ void CWeaponSMG1::SecondaryAttack( void )
 #ifndef CLIENT_DLL
 	//Create the grenade
 	CGrenadeAR2 *pGrenade = (CGrenadeAR2*)Create( "grenade_ar2", vecSrc, vec3_angle, pPlayer );
-	pGrenade->SetAbsVelocity( vecThrow );
+	pGrenade->GetEngineObject()->SetAbsVelocity( vecThrow );
 
 	pGrenade->SetLocalAngularVelocity( RandomAngle( -400, 400 ) );
 	pGrenade->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE ); 

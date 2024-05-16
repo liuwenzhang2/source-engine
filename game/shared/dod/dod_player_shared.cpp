@@ -462,7 +462,7 @@ void CDODPlayer::SetSprinting( bool bIsSprinting )
 
 bool CDODPlayer::IsSprinting( void )
 {
-	float flVelSqr = GetAbsVelocity().LengthSqr();
+	float flVelSqr = GetEngineObject()->GetAbsVelocity().LengthSqr();
 
 	return m_Shared.m_bIsSprinting && ( flVelSqr > 0.5f );
 }
@@ -482,7 +482,7 @@ bool CDODPlayer::CanAttack( void )
 		return false;
 
 	// cannot attack while prone moving. except if you have a bazooka
-	if ( m_Shared.IsProne() && GetAbsVelocity().LengthSqr() > 1 )
+	if ( m_Shared.IsProne() && GetEngineObject()->GetAbsVelocity().LengthSqr() > 1 )
 	{
 		return false;
 	}
@@ -925,7 +925,7 @@ void CDODPlayerShared::SetSlowedTime( float t )
 void CDODPlayerShared::StartGoingProne( void )
 {
 	// make the prone sound
-	CPASFilter filter( m_pOuter->GetAbsOrigin() );
+	CPASFilter filter( m_pOuter->GetEngineObject()->GetAbsOrigin() );
 	filter.UsePredictionRules();
 	g_pSoundEmitterSystem->EmitSound( filter, m_pOuter->entindex(), "Player.GoProne" );//m_pOuter->
 
@@ -941,7 +941,7 @@ void CDODPlayerShared::StartGoingProne( void )
 void CDODPlayerShared::StandUpFromProne( void )
 {	
 	// make the prone sound
-	CPASFilter filter( m_pOuter->GetAbsOrigin() );
+	CPASFilter filter( m_pOuter->GetEngineObject()->GetAbsOrigin() );
 	filter.UsePredictionRules();
 	g_pSoundEmitterSystem->EmitSound( filter, m_pOuter->entindex(), "Player.UnProne" );//m_pOuter->
 
@@ -1324,7 +1324,7 @@ void CDODPlayerShared::ViewAnimThink( void )
 
 void CDODPlayerShared::ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs )
 {
-	Vector org = m_pOuter->GetAbsOrigin();
+	Vector org = m_pOuter->GetEngineObject()->GetAbsOrigin();
 
 	if ( IsProne() )
 	{

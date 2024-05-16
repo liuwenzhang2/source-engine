@@ -281,7 +281,7 @@ void C_SteamJet::Update(float fTimeDelta)
 		if ( nToEmit > 0 )
 		{
 			Vector forward, right, up;
-			AngleVectors(GetAbsAngles(), &forward, &right, &up);			
+			AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up);
 
 			// Legacy env_steamjet entities faced left instead of forward.
 			if (m_bFaceLeft)
@@ -293,10 +293,10 @@ void C_SteamJet::Update(float fTimeDelta)
 
 			// EVIL: Ideally, we could tell the renderer our OBB, and let it build a big box that encloses
 			// the entity with its parent so it doesn't have to setup its parent's bones here.
-			Vector vEndPoint = GetAbsOrigin() + forward * m_Speed;
+			Vector vEndPoint = GetEngineObject()->GetAbsOrigin() + forward * m_Speed;
 			Vector vMin, vMax;
-			VectorMin( GetAbsOrigin(), vEndPoint, vMin );
-			VectorMax( GetAbsOrigin(), vEndPoint, vMax );
+			VectorMin(GetEngineObject()->GetAbsOrigin(), vEndPoint, vMin );
+			VectorMax(GetEngineObject()->GetAbsOrigin(), vEndPoint, vMax );
 			m_ParticleEffect.SetBBox( vMin, vMax );
 
 			if ( m_ParticleEffect.WasDrawnPrevFrame() )
@@ -306,7 +306,7 @@ void C_SteamJet::Update(float fTimeDelta)
 					// Make a new particle.
 					if( SteamJetParticle *pParticle = (SteamJetParticle*) m_ParticleEffect.AddParticle( sizeof(SteamJetParticle), m_MaterialHandle ) )
 					{
-						pParticle->m_Pos = GetAbsOrigin();
+						pParticle->m_Pos = GetEngineObject()->GetAbsOrigin();
 						
 						pParticle->m_Velocity = 
 							FRand(-m_SpreadSpeed,m_SpreadSpeed) * right +
@@ -464,18 +464,18 @@ void C_SteamJet::SimulateParticles( CParticleSimulateIterator *pIterator )
 
 void C_SteamJet::UpdateLightingRamp()
 {
-	if( VectorsAreEqual( m_vLastRampUpdatePos, GetAbsOrigin(), 0.1 ) && 
-		QAnglesAreEqual( m_vLastRampUpdateAngles, GetAbsAngles(), 0.1 ) )
+	if( VectorsAreEqual( m_vLastRampUpdatePos, GetEngineObject()->GetAbsOrigin(), 0.1 ) &&
+		QAnglesAreEqual( m_vLastRampUpdateAngles, GetEngineObject()->GetAbsAngles(), 0.1 ) )
 	{
 		return;
 	}
 
-	m_vLastRampUpdatePos = GetAbsOrigin();
-	m_vLastRampUpdateAngles = GetAbsAngles();
+	m_vLastRampUpdatePos = GetEngineObject()->GetAbsOrigin();
+	m_vLastRampUpdateAngles = GetEngineObject()->GetAbsAngles();
 
 	// Sample the world lighting where we think the particles will be.
 	Vector forward, right, up;
-	AngleVectors(GetAbsAngles(), &forward, &right, &up);
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up);
 
 	// Legacy env_steamjet entities faced left instead of forward.
 	if (m_bFaceLeft)
@@ -485,8 +485,8 @@ void C_SteamJet::UpdateLightingRamp()
 		right = temp;
 	}
 
-	Vector startPos = GetAbsOrigin();
-	Vector endPos = GetAbsOrigin() + forward * (m_Speed * m_Lifetime);
+	Vector startPos = GetEngineObject()->GetAbsOrigin();
+	Vector endPos = GetEngineObject()->GetAbsOrigin() + forward * (m_Speed * m_Lifetime);
 
 	for(int iRamp=0; iRamp < STEAMJET_NUMRAMPS; iRamp++)
 	{

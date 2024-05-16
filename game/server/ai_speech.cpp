@@ -950,7 +950,7 @@ void CAI_ExpresserHost_NPC_DoModifyOrAppendCriteria( CAI_BaseNPC *pSpeaker, AI_C
 	CBasePlayer *pPlayer = AI_GetSinglePlayer();
 	if ( pPlayer )
 	{
-		Vector distance = pPlayer->GetAbsOrigin() - pSpeaker->GetAbsOrigin();
+		Vector distance = pPlayer->GetEngineObject()->GetAbsOrigin() - pSpeaker->GetEngineObject()->GetAbsOrigin();
 
 		set.AppendCriteria( "distancetoplayer", UTIL_VarArgs( "%f", distance.Length() ) );
 

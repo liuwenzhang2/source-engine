@@ -285,11 +285,11 @@ void CNPC_Zombine::PrescheduleThink( void )
 
 	if ( HasGrenade () )
 	{
-		CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin() + GetSmoothedVelocity() * 0.5f , 256, 0.1, this, SOUNDENT_CHANNEL_ZOMBINE_GRENADE );
+		CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin() + GetSmoothedVelocity() * 0.5f , 256, 0.1, this, SOUNDENT_CHANNEL_ZOMBINE_GRENADE );
 
 		if( IsSprinting() && GetEnemy() && GetEnemy()->Classify() == CLASS_PLAYER_ALLY_VITAL && HasCondition( COND_SEE_ENEMY ) )
 		{
-			if( GetAbsOrigin().DistToSqr(GetEnemy()->GetAbsOrigin()) < Square( 144 ) )
+			if(GetEngineObject()->GetAbsOrigin().DistToSqr(GetEnemy()->GetEngineObject()->GetAbsOrigin()) < Square( 144 ) )
 			{
 				StopSprint();
 			}
@@ -415,12 +415,12 @@ void CNPC_Zombine::GatherGrenadeConditions( void )
 
 	if ( pPlayer && pPlayer->FVisible( this ) )
 	{
-		float flLengthToPlayer = (pPlayer->GetAbsOrigin() - GetAbsOrigin()).Length();
+		float flLengthToPlayer = (pPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
 		float flLengthToEnemy = flLengthToPlayer;
 
 		if ( pPlayer != GetEnemy() )
 		{
-			flLengthToEnemy = ( GetEnemy()->GetAbsOrigin() - GetAbsOrigin()).Length();
+			flLengthToEnemy = ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
 		}
 
 		if ( flLengthToPlayer <= GRENADE_PULL_MAX_DISTANCE && flLengthToEnemy <= GRENADE_PULL_MAX_DISTANCE )
@@ -554,8 +554,8 @@ void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 				pGrenade->SetSolid( SOLID_NONE );
 				pGrenade->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
-				pGrenade->SetAbsOrigin( vecStart );
-				pGrenade->SetAbsAngles( angles );
+				pGrenade->GetEngineObject()->SetAbsOrigin( vecStart );
+				pGrenade->GetEngineObject()->SetAbsAngles( angles );
 
 				pGrenade->GetEngineObject()->SetParent( this->GetEngineObject(), iAttachment);
 
@@ -1021,7 +1021,7 @@ void CNPC_Zombine::ReleaseGrenade( Vector vPhysgunPos )
 	if ( HasGrenade() == false )
 		return;
 
-	Vector vDir = vPhysgunPos - m_hGrenade->GetAbsOrigin();
+	Vector vDir = vPhysgunPos - m_hGrenade->GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( vDir );
 
 	Activity aActivity;

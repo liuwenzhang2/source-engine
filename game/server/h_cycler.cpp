@@ -53,7 +53,7 @@ void CCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax)
 {
 	if (!szModel || !*szModel)
 	{
-		Warning( "cycler at %.0f %.0f %0.f missing modelname\n", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		Warning( "cycler at %.0f %.0f %0.f missing modelname\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 		UTIL_Remove( this );
 		return;
 	}
@@ -93,7 +93,7 @@ void CCycler::Spawn( )
 	SetMoveType( MOVETYPE_NONE );
 	m_takedamage		= DAMAGE_YES;
 	m_iHealth			= 80000;// no cycler should die
-	GetMotor()->SetIdealYaw( GetLocalAngles().y );
+	GetMotor()->SetIdealYaw(GetEngineObject()->GetLocalAngles().y );
 	GetMotor()->SnapYaw();
 	
 	m_flPlaybackRate	= 1.0;

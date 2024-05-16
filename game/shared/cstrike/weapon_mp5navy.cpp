@@ -120,7 +120,7 @@ void CWeaponMP5Navy::PrimaryAttack( void )
 	// Kick the gun based on the state of the player.
 	if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 		pPlayer->KickBack (0.9, 0.475, 0.35, 0.0425, 5, 3, 6);	
-	else if (pPlayer->GetAbsVelocity().Length2D() > 5)
+	else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 		pPlayer->KickBack (0.5, 0.275, 0.2, 0.03, 3, 2, 10);
 	else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
 		pPlayer->KickBack (0.225, 0.15, 0.1, 0.015, 2, 1, 10);

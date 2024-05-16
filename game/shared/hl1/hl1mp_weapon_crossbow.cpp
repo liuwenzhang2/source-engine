@@ -91,7 +91,7 @@ CCrossbowBolt *CCrossbowBolt::BoltCreate( const Vector &vecOrigin, const QAngle 
 	// Create a new entity with CCrossbowBolt private data
 	CCrossbowBolt *pBolt = (CCrossbowBolt *)gEntList.CreateEntityByName( "crossbow_bolt" );
 	UTIL_SetOrigin( pBolt, vecOrigin );
-	pBolt->SetAbsAngles( angAngles );
+	pBolt->GetEngineObject()->SetAbsAngles( angAngles );
 	pBolt->Spawn();
 	pBolt->SetOwnerEntity( pentOwner );
 
@@ -136,7 +136,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 	{
 		trace_t tr, tr2;
 		tr = BaseClass::GetTouchTrace( );
-		Vector	vecNormalizedVel = GetAbsVelocity();
+		Vector	vecNormalizedVel = GetEngineObject()->GetAbsVelocity();
 
 		ClearMultiDamage( );
 		VectorNormalize( vecNormalizedVel );
@@ -162,7 +162,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 
 		ApplyMultiDamage();
 
-		SetAbsVelocity( Vector( 0, 0, 0 ) );
+		GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 0 ) );
 
 		// play body "thwack" sound
 		const char* soundname = "Weapon_Crossbow.BoltHitBody";
@@ -177,10 +177,10 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 
 		Vector vForward;
 
-		AngleVectors( GetAbsAngles(), &vForward );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
 		VectorNormalize ( vForward );
 		
-		UTIL_TraceLine( GetAbsOrigin(),	GetAbsOrigin() + vForward * 128, MASK_OPAQUE, pOther, COLLISION_GROUP_NONE, &tr2 );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vForward * 128, MASK_OPAQUE, pOther, COLLISION_GROUP_NONE, &tr2 );
 
 		if ( tr2.fraction != 1.0f )
 		{
@@ -219,21 +219,21 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		if ( m_bExplode == false )
 		{
 			Vector vForward;
-			AngleVectors( GetAbsAngles(), &vForward );
+			AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
 			VectorNormalize ( vForward );
 
 			CEffectData	data;
 
-			data.m_vOrigin = GetAbsOrigin();
+			data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 			data.m_vNormal = vForward;
 			data.m_nEntIndex = 0;
 
 			DispatchEffect( "BoltImpact", data );
 		}
 
-		if (  UTIL_PointContents( GetAbsOrigin() ) != CONTENTS_WATER)
+		if (  UTIL_PointContents(GetEngineObject()->GetAbsOrigin() ) != CONTENTS_WATER)
 		{
-			g_pEffects->Sparks( GetAbsOrigin() );
+			g_pEffects->Sparks(GetEngineObject()->GetAbsOrigin() );
 		}
 	}
 
@@ -250,15 +250,15 @@ void CCrossbowBolt::ExplodeThink( void )
     //    int iContents = UTIL_PointContents( pev->origin );
     CTakeDamageInfo	dmgInfo( this, GetOwnerEntity(), sk_plr_dmg_xbow_bolt_npc.GetFloat() * g_pGameRules->GetDamageMultiplier(), DMG_BLAST );
 
-    ::RadiusDamage( dmgInfo, GetAbsOrigin(), 128, CLASS_NONE, NULL );
+    ::RadiusDamage( dmgInfo, GetEngineObject()->GetAbsOrigin(), 128, CLASS_NONE, NULL );
 
 #if !defined( CLIENT_DLL )
 	{
-		CPASFilter filter(GetAbsOrigin());
+		CPASFilter filter(GetEngineObject()->GetAbsOrigin());
 
 		te->Explosion(filter,                /* filter */
 			0.0,                   /* delay  */
-			&GetAbsOrigin(),       /* pos    */
+			&GetEngineObject()->GetAbsOrigin(),       /* pos    */
 			g_sModelIndexFireball, /* modelindex */
 			0.2,                   /* scale  */
 			25,                    /* framerate */
@@ -292,15 +292,15 @@ void CCrossbowBolt::BubbleThink( void )
 {
 	QAngle angNewAngles;
 
-	VectorAngles( GetAbsVelocity(), angNewAngles );
-	SetAbsAngles( angNewAngles );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angNewAngles );
+	GetEngineObject()->SetAbsAngles( angNewAngles );
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if ( GetWaterLevel()  == 0 )
 		return;
 
-	UTIL_BubbleTrail( GetAbsOrigin() - GetAbsVelocity() * 0.1, GetAbsOrigin(), 1 );
+	UTIL_BubbleTrail(GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsVelocity() * 0.1, GetEngineObject()->GetAbsOrigin(), 1 );
 }
 
 
@@ -502,7 +502,7 @@ void CWeaponCrossbow::FireBolt( void )
         
         trace_t trace;
         UTIL_TraceLine( vecSrc, vecEnd, MASK_SHOT, GetOwner(), COLLISION_GROUP_NONE, &trace );
-        pBolt->SetAbsOrigin( trace.endpos );
+        pBolt->GetEngineObject()->SetAbsOrigin( trace.endpos );
 
         // We hit someone
         if ( trace.m_pEnt && ((CBaseEntity*)trace.m_pEnt)->m_takedamage )
@@ -516,11 +516,11 @@ void CWeaponCrossbow::FireBolt( void )
     {
         if ( pOwner->GetWaterLevel() == 3 )
         {
-            pBolt->SetAbsVelocity( vecAiming * BOLT_WATER_VELOCITY );
+            pBolt->GetEngineObject()->SetAbsVelocity( vecAiming * BOLT_WATER_VELOCITY );
         }
         else
         {
-            pBolt->SetAbsVelocity( vecAiming * BOLT_AIR_VELOCITY );
+            pBolt->GetEngineObject()->SetAbsVelocity( vecAiming * BOLT_AIR_VELOCITY );
         }
     }
 
@@ -542,7 +542,7 @@ void CWeaponCrossbow::FireBolt( void )
 
 #ifdef CLIENT_DLL
 #else
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 200, 0.2 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 200, 0.2 );
 #endif
 
 	if ( m_iClip1 > 0 )

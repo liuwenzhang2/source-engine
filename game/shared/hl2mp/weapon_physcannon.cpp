@@ -235,7 +235,7 @@ static void ComputePlayerMatrix( CBasePlayer *pPlayer, matrix3x4_t &out )
 	//angles.x = clamp( angles.x, -PLAYER_LOOK_PITCH_RANGE, PLAYER_LOOK_PITCH_RANGE );
 	angles.x = 0;
 
-	float feet = pPlayer->GetAbsOrigin().z + pPlayer->WorldAlignMins().z;
+	float feet = pPlayer->GetEngineObject()->GetAbsOrigin().z + pPlayer->WorldAlignMins().z;
 	float eyes = origin.z;
 	float zoffset = 0;
 	// moving up (negative pitch is up)
@@ -916,7 +916,7 @@ void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	if ( pObject->VPhysicsGetObject() == NULL )
 		 return;
 
-	CPlayerPickupController *pController = (CPlayerPickupController *)CBaseEntity::Create( "player_pickup", pObject->GetAbsOrigin(), vec3_angle, pPlayer );
+	CPlayerPickupController *pController = (CPlayerPickupController *)CBaseEntity::Create( "player_pickup", pObject->GetEngineObject()->GetAbsOrigin(), vec3_angle, pPlayer );
 	
 	if ( !pController )
 		return;
@@ -2280,7 +2280,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	AngleVectors( playerAngles, &forward, &right, &up );
 
 	// Now clamp a sphere of object radius at end to the player's bbox
-	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetAbsAngles(), -forward );
+	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -forward );
 	Vector player2d = pPlayer->CollisionProp()->OBBMaxs();
 	float playerRadius = player2d.Length2D();
 	float flDot = DotProduct( forward, radial );

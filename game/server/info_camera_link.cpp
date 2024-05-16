@@ -174,7 +174,7 @@ void PointCameraSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *
 			CPointCamera *pCameraEnt = g_InfoCameraLinkList[i]->m_hCamera;
 			if ( pCameraEnt )
 			{
-				engine->AddOriginToPVS( pCameraEnt->GetAbsOrigin() );
+				engine->AddOriginToPVS( pCameraEnt->GetEngineObject()->GetAbsOrigin() );
 				pCameraEnt->SetActive( true );
 			}
 		}

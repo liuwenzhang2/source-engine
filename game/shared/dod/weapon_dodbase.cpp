@@ -556,11 +556,11 @@ bool CWeaponDODBase::Deploy()
 			float changeTime = GetLastChangeTime( LATCH_SIMULATION_VAR );
 
 			// Add a sample 1 second back.
-			Vector vCurOrigin = GetLocalOrigin() - m_vInitialDropVelocity;
+			Vector vCurOrigin = GetEngineObject()->GetLocalOrigin() - m_vInitialDropVelocity;
 			interpolator.AddToHead( changeTime - 1.0, &vCurOrigin, false );
 
 			// Add the current sample.
-			vCurOrigin = GetLocalOrigin();
+			vCurOrigin = GetEngineObject()->GetLocalOrigin();
 			interpolator.AddToHead( changeTime, &vCurOrigin, false );
 
 			Vector estVel;
@@ -706,7 +706,7 @@ bool CWeaponDODBase::Deploy()
 	{
 		// make a copy of this weapon that is invisible and inaccessible to players (no touch function). The weapon spawn/respawn code
 		// will decide when to make the weapon visible and touchable.
-		CBaseEntity *pNewWeapon = CBaseEntity::Create( GetClassname(), g_pGameRules->VecWeaponRespawnSpot( this ), GetAbsAngles(), GetOwner() );
+		CBaseEntity *pNewWeapon = CBaseEntity::Create( GetClassname(), g_pGameRules->VecWeaponRespawnSpot( this ), GetEngineObject()->GetAbsAngles(), GetOwner() );
 
 		if ( pNewWeapon )
 		{
@@ -1114,7 +1114,7 @@ void CWeaponDODBase::Smack()
 	effectfilter.RemoveRecipient( GetPlayerOwner() );
 #endif
 
-	data.m_vAngles = GetPlayerOwner()->GetAbsAngles();
+	data.m_vAngles = GetPlayerOwner()->GetEngineObject()->GetAbsAngles();
 	data.m_fFlags = 0x1;	//IMPACT_NODECAL;
 	data.m_nDamageType = iDamageType;
 
@@ -1177,7 +1177,7 @@ void CWeaponDODBase::Smack()
 		}
 
 		//Find the speed of the player
-		float speed = player->GetLocalVelocity().Length2D();
+		float speed = player->GetEngineObject()->GetLocalVelocity().Length2D();
 		float flmaxSpeedDelta = MAX( 0, (gpGlobals->curtime - lastbobtime) * 320.0f );
 
 		// don't allow too big speed changes
@@ -1332,7 +1332,7 @@ void CWeaponDODBase::Smack()
 		float flMaxDistSqr = 250;
 		flMaxDistSqr *= flMaxDistSqr;
 
-		float flDistSqr = pLocalPlayer->EyePosition().DistToSqr( GetAbsOrigin() );
+		float flDistSqr = pLocalPlayer->EyePosition().DistToSqr(GetEngineObject()->GetAbsOrigin() );
 		return ( flDistSqr < flMaxDistSqr );
 	}
 

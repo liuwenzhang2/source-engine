@@ -67,7 +67,7 @@ void C_CrossbowBolt::OnDataChanged( DataUpdateType_t updateType )
 	if ( updateType == DATA_UPDATE_CREATED )
 	{
 		m_bUpdated = false;
-		m_vecLastOrigin = GetAbsOrigin();
+		m_vecLastOrigin = GetEngineObject()->GetAbsOrigin();
 		SetNextClientThink( CLIENT_THINK_ALWAYS );
 	}
 }
@@ -85,7 +85,7 @@ int C_CrossbowBolt::DrawModel( int flags )
 		float		color[3];
 		IMaterial	*pBlurMaterial = materials->FindMaterial( "effects/muzzleflash1", NULL, false );
 
-		Vector	vecDir = GetAbsOrigin() - m_vecLastOrigin;
+		Vector	vecDir = GetEngineObject()->GetAbsOrigin() - m_vecLastOrigin;
 		float	speed = VectorNormalize( vecDir );
 		
 		speed = clamp( speed, 0, 32 );
@@ -94,7 +94,7 @@ int C_CrossbowBolt::DrawModel( int flags )
 		{
 			float	stepSize = MIN( ( speed * 0.5f ), 4.0f );
 
-			Vector	spawnPos = GetAbsOrigin() + ( vecDir * 24.0f );
+			Vector	spawnPos = GetEngineObject()->GetAbsOrigin() + ( vecDir * 24.0f );
 			Vector	spawnStep = -vecDir * stepSize;
 
 			CMatRenderContextPtr pRenderContext( materials );
@@ -118,7 +118,7 @@ int C_CrossbowBolt::DrawModel( int flags )
 		if ( gpGlobals->frametime > 0.0f && !m_bUpdated)
 		{
 			m_bUpdated = true;
-			m_vecLastOrigin = GetAbsOrigin();
+			m_vecLastOrigin = GetEngineObject()->GetAbsOrigin();
 		}
 
 		return 1;

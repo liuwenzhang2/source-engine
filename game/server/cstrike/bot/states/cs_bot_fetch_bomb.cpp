@@ -43,7 +43,7 @@ void FetchBombState::OnUpdate( CCSBot *me )
 		if (!me->HasPath())
 		{
 			// build a path to the bomb
-			if (me->ComputePath( bomb->GetAbsOrigin() ) == false)
+			if (me->ComputePath( bomb->GetEngineObject()->GetAbsOrigin() ) == false)
 			{
 				me->PrintIfWatched( "Fetch bomb pathfind failed\n" );
 

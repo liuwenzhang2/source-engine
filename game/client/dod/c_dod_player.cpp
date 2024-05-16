@@ -422,8 +422,8 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 		ForceClientSideAnimationOn();
 
 		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
-		SetAbsOrigin( m_vecRagdollOrigin );
-		SetAbsVelocity( m_vecRagdollVelocity );
+		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		C_DODPlayer *pPlayer = dynamic_cast< C_DODPlayer* >( m_hPlayer.Get() );
 		if ( pPlayer && !pPlayer->IsDormant() )
@@ -431,7 +431,7 @@ void C_DODRagdoll::CreateLowViolenceRagdoll()
 			// move my current model instance to the ragdoll's so decals are preserved.
 			pPlayer->SnatchModelInstance( this );
 
-			SetAbsAngles( pPlayer->GetRenderAngles() );
+			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 			GetEngineObject()->SetNetworkAngles( pPlayer->GetRenderAngles() );
 		}
 	
@@ -462,7 +462,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 		{
 			Interp_Copy( pPlayer );
 
-			SetAbsAngles( pPlayer->GetRenderAngles() );
+			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 			GetEngineObject()->GetRotationInterpolator().Reset();
 
 			m_flAnimTime = pPlayer->m_flAnimTime;
@@ -473,11 +473,11 @@ void C_DODRagdoll::CreateDODRagdoll()
 		{
 			// This is the local player, so set them in a default
 			// pose and slam their velocity, angles and origin
-			SetAbsOrigin( m_vecRagdollOrigin );
+			GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 			
-			SetAbsAngles( pPlayer->GetRenderAngles() );
+			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 
-			SetAbsVelocity( m_vecRagdollVelocity );
+			GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 			int iSeq = LookupSequence( "RagdollSpawn" );	// hax, find a neutral standing pose
 			if ( iSeq == -1 )
@@ -500,8 +500,8 @@ void C_DODRagdoll::CreateDODRagdoll()
 		// use this position
 		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
-		SetAbsOrigin( m_vecRagdollOrigin );
-		SetAbsVelocity( m_vecRagdollVelocity );
+		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
 		
@@ -576,7 +576,7 @@ bool C_DODRagdoll::IsRagdollVisible()
 	Vector vMins = Vector(-1,-1,-1);	//WorldAlignMins();
 	Vector vMaxs = Vector(1,1,1);	//WorldAlignMaxs();
 		
-	Vector origin = GetAbsOrigin();
+	Vector origin = GetEngineObject()->GetAbsOrigin();
 	
 	if( !engine->IsBoxInViewCluster( vMins + origin, vMaxs + origin) )
 	{
@@ -632,8 +632,8 @@ void C_DODRagdoll::ClientThink( void )
 		if ( pEnt->m_Shared.IsProne() == false )
 			continue;
 
-		Vector vTargetOrigin = pEnt->GetAbsOrigin();
-		Vector vMyOrigin =  GetAbsOrigin();
+		Vector vTargetOrigin = pEnt->GetEngineObject()->GetAbsOrigin();
+		Vector vMyOrigin = GetEngineObject()->GetAbsOrigin();
 
 		Vector vDir = vTargetOrigin - vMyOrigin;
 
@@ -904,7 +904,7 @@ bool C_DODPlayer::CreateMove( float flInputSampleTime, CUserCmd *pCmd )
 	//if we're prone and moving, do some sway
 	if( m_Shared.IsProne() && IsAlive() )
 	{
-		float flSpeed = GetAbsVelocity().Length();
+		float flSpeed = GetEngineObject()->GetAbsVelocity().Length();
 
 		float flSwayAmount = PRONE_SWAY_AMOUNT * gpGlobals->frametime;
 
@@ -1164,7 +1164,7 @@ void C_DODPlayer::ClientThink()
 			else									//standing
 				scale = ZOOM_SWAY_STANDING; 
 
-			if( GetAbsVelocity().Length() > 10 )
+			if(GetEngineObject()->GetAbsVelocity().Length() > 10 )
 				scale += ZOOM_SWAY_MOVING_PENALTY;
 
 			viewangles[PITCH] += y * scale;
@@ -1318,7 +1318,7 @@ void C_DODPlayer::PostDataUpdate( DataUpdateType_t updateType )
 {
 	// C_BaseEntity assumes we're networking the entity's angles, so pretend that it
 	// networked the same value we already have.
-	GetEngineObject()->SetNetworkAngles( GetLocalAngles() );
+	GetEngineObject()->SetNetworkAngles(GetEngineObject()->GetLocalAngles() );
 
 	BaseClass::PostDataUpdate( updateType );
 
@@ -1397,8 +1397,8 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 	}
 
 	pEntity->SetModelName(MAKE_STRING(modelinfo->GetModelName(model)) );
-	pEntity->SetAbsOrigin( vecHead );
-	pEntity->SetAbsAngles( angHeadAngles );
+	pEntity->GetEngineObject()->SetAbsOrigin( vecHead );
+	pEntity->GetEngineObject()->SetAbsAngles( angHeadAngles );
 	pEntity->SetPhysicsMode( PHYSICS_MULTIPLAYER_CLIENTSIDE );
 
 	if ( !pEntity->Initialize() )
@@ -1419,7 +1419,7 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 #endif
 
 		Vector vecForce = vecDir;		
-		Vector vecOffset = vecForceOrigin - pEntity->GetAbsOrigin();
+		Vector vecOffset = vecForceOrigin - pEntity->GetEngineObject()->GetAbsOrigin();
 		pPhysicsObject->ApplyForceOffset( vecForce, vecOffset );
 	}
 	else
@@ -1527,7 +1527,7 @@ void C_DODPlayer::CheckGrenadeHint( Vector vecGrenadeOrigin )
 	if ( m_Hints.HasPlayedHint( HINT_PICK_UP_GRENADE ) == false )
 	{
 		// if its within 500 units
-		float flDist = ( vecGrenadeOrigin - GetAbsOrigin() ).Length2D();
+		float flDist = ( vecGrenadeOrigin - GetEngineObject()->GetAbsOrigin() ).Length2D();
 
 		if ( flDist < 500 )
 		{
@@ -1576,7 +1576,7 @@ bool C_DODPlayer::IsWeaponLowered( void )
 	if ( GetWaterLevel() > 2 && pWeapon->GetDODWpnData().m_WeaponType != WPN_TYPE_MELEE )
 		return true;
 
-	if ( m_Shared.IsProne() && GetAbsVelocity().LengthSqr() > 1 )
+	if ( m_Shared.IsProne() && GetEngineObject()->GetAbsVelocity().LengthSqr() > 1 )
 		return true;
 
 	if ( m_Shared.IsGoingProne() || m_Shared.IsGettingUpFromProne() )
@@ -1600,7 +1600,7 @@ bool C_DODPlayer::IsWeaponLowered( void )
 	if ( m_Shared.IsBazookaDeployed() )
 		return false;
 
-	Vector vel = GetAbsVelocity();
+	Vector vel = GetEngineObject()->GetAbsVelocity();
 	if ( vel.Length2D() < 50 )
 		return false;
 
@@ -1982,7 +1982,7 @@ void C_DODPlayer::CalcDODDeathCamView(Vector& eyeOrigin, QAngle& eyeAngles, floa
 
 	if ( killer && (killer != this) ) 
 	{
-		Vector vecKiller = killer->GetAbsOrigin();
+		Vector vecKiller = killer->GetEngineObject()->GetAbsOrigin();
 		
 		C_DODPlayer *player = ToDODPlayer( killer );
 		if ( player && player->IsAlive() )
@@ -2312,7 +2312,7 @@ void C_DODPlayer::UpdateColdBreath( void )
 		return;
 
 	// Check player speed, do emit cold breath when moving quickly.
-	float flSpeed = GetAbsVelocity().Length();
+	float flSpeed = GetEngineObject()->GetAbsVelocity().Length();
 	if ( flSpeed > 60.0f )
 		return;
 
@@ -2520,7 +2520,7 @@ void C_DODPlayer::AvoidPlayers( CUserCmd *pCmd )
 	// Up vector.
 	static Vector vecUp( 0.0f, 0.0f, 1.0f );
 
-	Vector vecDODPlayerCenter = GetAbsOrigin();
+	Vector vecDODPlayerCenter = GetEngineObject()->GetAbsOrigin();
 	Vector vecDODPlayerMin = GetPlayerMins();
 	Vector vecDODPlayerMax = GetPlayerMaxs();
 	float flZHeight = vecDODPlayerMax.z - vecDODPlayerMin.z;
@@ -2559,7 +2559,7 @@ void C_DODPlayer::AvoidPlayers( CUserCmd *pCmd )
 
 		Vector t1, t2;
 
-		vecAvoidCenter = pAvoidPlayer->GetAbsOrigin();
+		vecAvoidCenter = pAvoidPlayer->GetEngineObject()->GetAbsOrigin();
 		vecAvoidMin = pAvoidPlayer->GetPlayerMins();
 		vecAvoidMax = pAvoidPlayer->GetPlayerMaxs();
 		flZHeight = vecAvoidMax.z - vecAvoidMin.z;
@@ -2607,9 +2607,9 @@ void C_DODPlayer::AvoidPlayers( CUserCmd *pCmd )
 		return;
 
 	Vector vecPush;
-	if ( GetAbsVelocity().Length2DSqr() > 0.1f )
+	if (GetEngineObject()->GetAbsVelocity().Length2DSqr() > 0.1f )
 	{
-		Vector vecVelocity = GetAbsVelocity();
+		Vector vecVelocity = GetEngineObject()->GetAbsVelocity();
 		vecVelocity.z = 0.0f;
 		CrossProduct( vecUp, vecVelocity, vecPush );
 		VectorNormalize( vecPush );

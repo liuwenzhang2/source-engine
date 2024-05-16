@@ -142,8 +142,8 @@ int CWeaponStunStick::WeaponMeleeAttack1Condition( float flDot, float flDist )
 		//float flSpeed = VectorNormalize( vecDir );
 
 		// If player will be in front of me in one-half second, clock his arse.
-		Vector vecProjectEnemy = pEnemy->GetAbsOrigin() + (pEnemy->GetAbsVelocity() * 0.35);
-		Vector vecProjectMe = GetAbsOrigin();
+		Vector vecProjectEnemy = pEnemy->GetEngineObject()->GetAbsOrigin() + (pEnemy->GetEngineObject()->GetAbsVelocity() * 0.35);
+		Vector vecProjectMe = GetEngineObject()->GetAbsOrigin();
 
 		if( (vecProjectMe - vecProjectEnemy).Length2D() <= 48.0f )
 		{
@@ -190,7 +190,7 @@ void CWeaponStunStick::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseComba
 			// Trace up or down based on where the enemy is...
 			// But only if we're basically facing that direction
 			Vector vecDirection;
-			AngleVectors( GetAbsAngles(), &vecDirection );
+			AngleVectors(GetEngineObject()->GetAbsAngles(), &vecDirection );
 
 			CBaseEntity *pEnemy = pOperator->MyNPCPointer() ? pOperator->MyNPCPointer()->GetEnemy() : NULL;
 			if ( pEnemy )
@@ -257,7 +257,7 @@ void CWeaponStunStick::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseComba
 					//Kick the player angles
 					pPlayer->ViewPunch( QAngle( -16, yawKick, 2 ) );
 
-					Vector	dir = pHurt->GetAbsOrigin() - GetAbsOrigin();
+					Vector	dir = pHurt->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 
 					// If the player's on my head, don't knock him up
 					if ( pPlayer->GetGroundEntity() == pOperator )

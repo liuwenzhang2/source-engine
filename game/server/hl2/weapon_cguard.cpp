@@ -115,12 +115,12 @@ public:
 	void Explode( float magnitude )
 	{
 		//Create a concussive explosion
-		CPASFilter filter( GetAbsOrigin() );
+		CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 
 		Vector vecForward;
-		AngleVectors( GetAbsAngles(), &vecForward );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &vecForward );
 		TE_ConcussiveExplosion( filter, 0.0,
-			&GetAbsOrigin(),//position
+			&GetEngineObject()->GetAbsOrigin(),//position
 			1.0f,	//scale
 			256*magnitude,	//radius
 			175*magnitude,	//magnitude
@@ -131,7 +131,7 @@ public:
 		//Shockring
 		CBroadcastRecipientFilter filter2;
 		te->BeamRingPoint( filter2, 0, 
-			GetAbsOrigin(),	//origin
+			GetEngineObject()->GetAbsOrigin(),	//origin
 			16,			//start radius
 			300*magnitude,		//end radius
 			m_spriteTexture, //texture
@@ -150,7 +150,7 @@ public:
 			);
 
 		//Do the radius damage
-		RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), 200, DMG_BLAST|DMG_DISSOLVE ), GetAbsOrigin(), 256, CLASS_NONE, NULL );
+		RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), 200, DMG_BLAST|DMG_DISSOLVE ), GetEngineObject()->GetAbsOrigin(), 256, CLASS_NONE, NULL );
 
 		UTIL_Remove( this );
 	}

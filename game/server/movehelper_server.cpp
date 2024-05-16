@@ -221,7 +221,7 @@ void CMoveHelperServer::ProcessImpacts( void )
 		return;
 
 	// Save off the velocity, cause we need to temporarily reset it
-	Vector vel = m_pHostPlayer->GetAbsVelocity();
+	Vector vel = m_pHostPlayer->GetEngineObject()->GetAbsVelocity();
 
 	// Touch other objects that were intersected during the movement.
 	for (int i = 0 ; i < m_TouchList.Size(); i++)
@@ -245,13 +245,13 @@ void CMoveHelperServer::ProcessImpacts( void )
 		m_TouchList[i].trace.m_pEnt = entity;
 
 		// Use the velocity we had when we collided, so boxes will move, etc.
-		m_pHostPlayer->SetAbsVelocity( m_TouchList[i].deltavelocity );
+		m_pHostPlayer->GetEngineObject()->SetAbsVelocity( m_TouchList[i].deltavelocity );
 		
 		entity->PhysicsImpact( m_pHostPlayer, m_TouchList[i].trace );
 	}
 
 	// Restore the velocity
-	m_pHostPlayer->SetAbsVelocity( vel );
+	m_pHostPlayer->GetEngineObject()->SetAbsVelocity( vel );
 
 	// So no stuff is ever left over, sigh...
 	ResetTouchList();
@@ -358,7 +358,7 @@ bool CMoveHelperServer::PlayerFallingDamage( void )
 	if ( flFallDamage > 0 )
 	{
 		m_pHostPlayer->TakeDamage( CTakeDamageInfo( gEntList.GetBaseEntity(0), gEntList.GetBaseEntity(0), flFallDamage, DMG_FALL ) ); 
-		StartSound( m_pHostPlayer->GetAbsOrigin(), "Player.FallDamage" );
+		StartSound( m_pHostPlayer->GetEngineObject()->GetAbsOrigin(), "Player.FallDamage" );
 
         //=============================================================================
         // HPE_BEGIN:

@@ -761,14 +761,14 @@ bool CClient_Precipitation::ComputeEmissionArea( Vector& origin, Vector2D& size 
 		return false;
 
 	// Determine how much time it'll take a falling particle to hit the player
-	float emissionHeight = MIN( vMaxs[2], pPlayer->GetAbsOrigin()[2] + 512 );
-	float distToFall = emissionHeight - pPlayer->GetAbsOrigin()[2];
+	float emissionHeight = MIN( vMaxs[2], pPlayer->GetEngineObject()->GetAbsOrigin()[2] + 512 );
+	float distToFall = emissionHeight - pPlayer->GetEngineObject()->GetAbsOrigin()[2];
 	float fallTime = distToFall / GetSpeed();
 	
 	// Based on the windspeed, figure out the center point of the emission
 	Vector2D center;
-	center[0] = pPlayer->GetAbsOrigin()[0] - fallTime * s_WindVector[0];
-	center[1] = pPlayer->GetAbsOrigin()[1] - fallTime * s_WindVector[1];
+	center[0] = pPlayer->GetEngineObject()->GetAbsOrigin()[0] - fallTime * s_WindVector[0];
+	center[1] = pPlayer->GetEngineObject()->GetAbsOrigin()[1] - fallTime * s_WindVector[1];
 
 	Vector2D lobound, hibound;
 	lobound[0] = center[0] - emissionSize * 0.5f;
@@ -908,7 +908,7 @@ void CClient_Precipitation::CreateAshParticle( void )
 	if ( m_bActiveAshEmitter == false )
 		 return;
 
-		Vector vecVelocity = pPlayer->GetAbsVelocity();
+		Vector vecVelocity = pPlayer->GetEngineObject()->GetAbsVelocity();
 
 
 		float flVelocity = VectorNormalize( vecVelocity );
@@ -1371,7 +1371,7 @@ void C_Embers::OnDataChanged( DataUpdateType_t updateType )
 
 	if ( updateType == DATA_UPDATE_CREATED )
 	{
-		m_pEmitter->SetSortOrigin( GetAbsOrigin() );
+		m_pEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
 		Start();
 	}
@@ -1452,7 +1452,7 @@ void C_Embers::SpawnEmber( void )
 	//Set the velocity
 	Vector	velocity;
 
-	AngleVectors( GetAbsAngles(), &velocity );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &velocity );
 
 	sParticle->m_vecVelocity = velocity * m_nSpeed;
 
@@ -1909,7 +1909,7 @@ void CSnowFallManager::CreateSnowFall( void )
 	Vector vecForward;
 	pPlayer->GetEngineObject()->GetVectors( &vecForward, NULL, NULL );
 	vecForward.z = 0.0f;
-	Vector vecVelocity = pPlayer->GetAbsVelocity();
+	Vector vecVelocity = pPlayer->GetEngineObject()->GetAbsVelocity();
 	float flSpeed = VectorNormalize( vecVelocity );
 	m_vecSnowFallEmitOrigin += ( vecForward * ( 64.0f + ( flSpeed * 0.4f * r_SnowPosScale.GetFloat() ) ) );
 	m_vecSnowFallEmitOrigin += ( vecVelocity * ( flSpeed * 1.25f * r_SnowSpeedScale.GetFloat() ) );

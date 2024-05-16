@@ -241,7 +241,7 @@ void CNPC_Apache::Flight( void )
 {
 	StudioFrameAdvance( );
 
-	float flDistToDesiredPosition = (GetAbsOrigin() - m_vecDesiredPosition).Length();
+	float flDistToDesiredPosition = (GetEngineObject()->GetAbsOrigin() - m_vecDesiredPosition).Length();
 	// NDebugOverlay::Line(GetAbsOrigin(), m_vecDesiredPosition, 0,0,255, true, 0.1);
 
 	if (m_flGoalSpeed < 800 )
@@ -251,25 +251,25 @@ void CNPC_Apache::Flight( void )
 //	Vector vecGoalOrientation;
 	if (flDistToDesiredPosition > 250) // 500
 	{
-		Vector v1 = (m_vecTargetPosition - GetAbsOrigin());
-		Vector v2 = (m_vecDesiredPosition - GetAbsOrigin());
+		Vector v1 = (m_vecTargetPosition - GetEngineObject()->GetAbsOrigin());
+		Vector v2 = (m_vecDesiredPosition - GetEngineObject()->GetAbsOrigin());
 
 		VectorNormalize( v1 );
 		VectorNormalize( v2 );
 
 		if (m_flLastSeen + 90 > gpGlobals->curtime && DotProduct( v1, v2 ) > 0.25)
 		{
-			m_vecGoalOrientation = ( m_vecTargetPosition - GetAbsOrigin());
+			m_vecGoalOrientation = ( m_vecTargetPosition - GetEngineObject()->GetAbsOrigin());
 		}
 		else
 		{
-			m_vecGoalOrientation = (m_vecDesiredPosition - GetAbsOrigin());
+			m_vecGoalOrientation = (m_vecDesiredPosition - GetEngineObject()->GetAbsOrigin());
 		}
 		VectorNormalize( m_vecGoalOrientation );
 	}
 	else
 	{
-		AngleVectors( GetGoalEnt()->GetAbsAngles(), &m_vecGoalOrientation );
+		AngleVectors( GetGoalEnt()->GetEngineObject()->GetAbsAngles(), &m_vecGoalOrientation );
 	}
 //	SetGoalOrientation( vecGoalOrientation );
 	
@@ -291,21 +291,21 @@ void CNPC_Apache::Flight( void )
 
 			if (GetGoalEnt())
 			{
-				m_vecDesiredPosition = GetGoalEnt()->GetAbsOrigin();
+				m_vecDesiredPosition = GetGoalEnt()->GetEngineObject()->GetAbsOrigin();
 				
 //				Vector vecGoalOrientation;
-				AngleVectors( GetGoalEnt()->GetAbsAngles(), &m_vecGoalOrientation );
+				AngleVectors( GetGoalEnt()->GetEngineObject()->GetAbsAngles(), &m_vecGoalOrientation );
 
 //				SetGoalOrientation( vecGoalOrientation );
 
-				flDistToDesiredPosition = (GetAbsOrigin() - m_vecDesiredPosition).Length();
+				flDistToDesiredPosition = (GetEngineObject()->GetAbsOrigin() - m_vecDesiredPosition).Length();
 			}
 		}
 	}
 	else
 	{
 		// If we can't find a new target, just stay where we are.
-		m_vecDesiredPosition = GetAbsOrigin();
+		m_vecDesiredPosition = GetEngineObject()->GetAbsOrigin();
 	}
 
 	// tilt model 5 degrees
@@ -313,7 +313,7 @@ void CNPC_Apache::Flight( void )
 
 	// estimate where I'll be facing in one seconds
 	Vector forward, right, up;
-	AngleVectors( GetAbsAngles() + GetLocalAngularVelocity() * 2 + angAdj, &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles() + GetLocalAngularVelocity() * 2 + angAdj, &forward, &right, &up );
 	// Vector vecEst1 = GetAbsOrigin() + pev->velocity + gpGlobals->v_up * m_flForce - Vector( 0, 0, 384 );
 	// float flSide = DotProduct( m_posDesired - vecEst1, gpGlobals->v_right );
 	
@@ -338,14 +338,14 @@ void CNPC_Apache::Flight( void )
 	angVel.y *= 0.98;
 	SetLocalAngularVelocity( angVel );
 
-	Vector vecVel = GetAbsVelocity();
+	Vector vecVel = GetEngineObject()->GetAbsVelocity();
 
 	// estimate where I'll be in two seconds
-	AngleVectors( GetAbsAngles() + GetLocalAngularVelocity() * 1 + angAdj, &forward, &right, &up );
-	Vector vecEst = GetAbsOrigin() + vecVel * 2.0 + up * m_flForce * 20 - Vector( 0, 0, 384 * 2 );
+	AngleVectors(GetEngineObject()->GetAbsAngles() + GetLocalAngularVelocity() * 1 + angAdj, &forward, &right, &up );
+	Vector vecEst = GetEngineObject()->GetAbsOrigin() + vecVel * 2.0 + up * m_flForce * 20 - Vector( 0, 0, 384 * 2 );
 
 	// add immediate force
-	AngleVectors( GetAbsAngles() + angAdj, &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles() + angAdj, &forward, &right, &up );
 
 	vecVel.x += up.x * m_flForce;
 	vecVel.y += up.y * m_flForce;
@@ -367,7 +367,7 @@ void CNPC_Apache::Flight( void )
 	// fly sideways
 	if (flSlip > 0)
 	{
-		if (GetAbsAngles().z > -30 && angVel.z > -15)
+		if (GetEngineObject()->GetAbsAngles().z > -30 && angVel.z > -15)
 			angVel.z -= 4;
 		else
 			angVel.z += 2;
@@ -375,7 +375,7 @@ void CNPC_Apache::Flight( void )
 	else
 	{
 
-		if (GetAbsAngles().z < 30 && angVel.z < 15)
+		if (GetEngineObject()->GetAbsAngles().z < 30 && angVel.z < 15)
 			angVel.z += 4;
 		else
 			angVel.z -= 2;
@@ -391,7 +391,7 @@ void CNPC_Apache::Flight( void )
 	vecVel = vecVel * 0.995;
 
 	// Set final computed velocity
-	SetAbsVelocity( vecVel );
+	GetEngineObject()->SetAbsVelocity( vecVel );
 	
 	// apply power to stay correct height
 	if (m_flForce < 80 && vecEst.z < m_vecDesiredPosition.z) 
@@ -407,24 +407,24 @@ void CNPC_Apache::Flight( void )
 
 	angVel = GetLocalAngularVelocity();
 	// pitch forward or back to get to target
-	if (flDist > 0 && flSpeed < m_flGoalSpeed && GetAbsAngles().x + angVel.x < 40)
+	if (flDist > 0 && flSpeed < m_flGoalSpeed && GetEngineObject()->GetAbsAngles().x + angVel.x < 40)
 	{
 		// ALERT( at_console, "F " );
 		// lean forward
 		angVel.x += 12.0;
 	}
-	else if (flDist < 0 && flSpeed > -50 && GetAbsAngles().x + angVel.x  > -20)
+	else if (flDist < 0 && flSpeed > -50 && GetEngineObject()->GetAbsAngles().x + angVel.x  > -20)
 	{
 		// ALERT( at_console, "B " );
 		// lean backward
 		angVel.x -= 12.0;
 	}
-	else if (GetAbsAngles().x + angVel.x < 0)
+	else if (GetEngineObject()->GetAbsAngles().x + angVel.x < 0)
 	{
 		// ALERT( at_console, "f " );
 		angVel.x += 4.0;
 	}
-	else if (GetAbsAngles().x + angVel.x > 0)
+	else if (GetEngineObject()->GetAbsAngles().x + angVel.x > 0)
 	{
 		// ALERT( at_console, "b " );
 		angVel.x -= 4.0;
@@ -457,7 +457,7 @@ bool CNPC_Apache::FireGun( )
 
 	Vector vForward, vRight, vUp;
 
-	AngleVectors( GetAbsAngles(), &vForward, &vUp, &vRight );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward, &vUp, &vRight );
 		
 	Vector posGun;
 	QAngle angGun;
@@ -504,7 +504,7 @@ bool CNPC_Apache::FireGun( )
 	Vector forward;
 	AngleVectors( angBarrel + m_angGun, &forward );
 
-	Vector2D vec2LOS = ( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() ).AsVector2D();
+	Vector2D vec2LOS = ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).AsVector2D();
 	vec2LOS.NormalizeInPlace();
 
 	float flDot = vec2LOS.Dot( forward.AsVector2D() );
@@ -537,8 +537,8 @@ void CNPC_Apache::FireRocket( void )
 	Vector vForward, vRight, vUp;
 
 
-	AngleVectors( GetAbsAngles(), &vForward, &vRight, &vUp );
-	Vector vecSrc = GetAbsOrigin() + 1.5 * ( vForward * 21 + vRight * 70 * side + vUp * -79 );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward, &vRight, &vUp );
+	Vector vecSrc = GetEngineObject()->GetAbsOrigin() + 1.5 * ( vForward * 21 + vRight * 70 * side + vUp * -79 );
 
 	// pick firing pod to launch from
 	switch( m_iRockets % 5)
@@ -550,7 +550,7 @@ void CNPC_Apache::FireRocket( void )
 	case 4: break;
 	}
 
-	Vector vTargetDir = m_vecTargetPosition - GetAbsOrigin();
+	Vector vTargetDir = m_vecTargetPosition - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize ( vTargetDir );
 	LaunchRocket( vTargetDir, 100, 150, vecSrc);
 
@@ -565,19 +565,19 @@ void CNPC_Apache::AimRocketGun( void )
 	if (m_iRockets <= 0)
 		return;
 	
-	Vector vTargetDir = m_vecTargetPosition - GetAbsOrigin();
+	Vector vTargetDir = m_vecTargetPosition - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize ( vTargetDir );
 
-	AngleVectors( GetAbsAngles(), &vForward, &vRight, &vUp );
-	Vector vecEst = ( vForward * 800 + GetAbsVelocity());
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward, &vRight, &vUp );
+	Vector vecEst = ( vForward * 800 + GetEngineObject()->GetAbsVelocity());
 	VectorNormalize ( vecEst );
 
 	trace_t tr1;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + vecEst * 4096, MASK_ALL, this, COLLISION_GROUP_NONE, &tr1);
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecEst * 4096, MASK_ALL, this, COLLISION_GROUP_NONE, &tr1);
 
 //	NDebugOverlay::Line(GetAbsOrigin(), tr1.endpos, 255,255,0, false, 0.1);
 
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + vTargetDir * 4096, MASK_ALL, this, COLLISION_GROUP_NONE, &tr1);
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vTargetDir * 4096, MASK_ALL, this, COLLISION_GROUP_NONE, &tr1);
 
 //	NDebugOverlay::Line(GetAbsOrigin(), tr1.endpos, 0,255,0, false, 0.1);
 
@@ -593,7 +593,7 @@ void CNPC_Apache::AimRocketGun( void )
 			m_iRockets = 10;
 		}
 	}
-	else if (DotProduct( GetAbsVelocity(), vForward ) > -100 && m_flNextRocket < gpGlobals->curtime)
+	else if (DotProduct(GetEngineObject()->GetAbsVelocity(), vForward ) > -100 && m_flNextRocket < gpGlobals->curtime)
 	{
 		if (m_flLastSeen + 60 > gpGlobals->curtime)
 		{
@@ -604,7 +604,7 @@ void CNPC_Apache::AimRocketGun( void )
 				{
 					trace_t tr;
 					
-					UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + vecEst * 4096, MASK_ALL, this, COLLISION_GROUP_NONE, &tr);
+					UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecEst * 4096, MASK_ALL, this, COLLISION_GROUP_NONE, &tr);
 
 			//		NDebugOverlay::Line(GetAbsOrigin(), tr.endpos, 255,0,255, false, 5);
 
@@ -617,7 +617,7 @@ void CNPC_Apache::AimRocketGun( void )
 			{
 				trace_t tr;
 				
-				UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + vecEst * 4096, MASK_ALL, this, COLLISION_GROUP_NONE, &tr);
+				UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecEst * 4096, MASK_ALL, this, COLLISION_GROUP_NONE, &tr);
 				// just fire when close
 				if ((tr.endpos - m_vecTargetPosition).Length() < 512)
 					FireRocket( );
@@ -661,10 +661,10 @@ void CNPC_Apache::DyingThink( void )
 
 	if( gpGlobals->curtime > m_flNextCrashExplosion )
 	{
-		CPASFilter pasFilter( GetAbsOrigin() );
+		CPASFilter pasFilter(GetEngineObject()->GetAbsOrigin() );
 		Vector pos;
 
-		pos = GetAbsOrigin();
+		pos = GetEngineObject()->GetAbsOrigin();
 		pos.x += random->RandomFloat( -150, 150 );
 		pos.y += random->RandomFloat( -150, 150 );
 		pos.z += random->RandomFloat( -150, -50 );
@@ -672,9 +672,9 @@ void CNPC_Apache::DyingThink( void )
 		te->Explosion( pasFilter, 0.0,	&pos, g_sModelIndexFireball, 10, 15, TE_EXPLFLAG_NONE, 100, 0 );
 		
 		Vector vecSize = Vector( 500, 500, 60 );
-		CPVSFilter pvsFilter( GetAbsOrigin() );
+		CPVSFilter pvsFilter(GetEngineObject()->GetAbsOrigin() );
 
-		te->BreakModel( pvsFilter, 0.0, GetAbsOrigin(), vec3_angle, vecSize, vec3_origin, 
+		te->BreakModel( pvsFilter, 0.0, GetEngineObject()->GetAbsOrigin(), vec3_angle, vecSize, vec3_origin,
 			m_nDebrisModel, 100, 0, 2.5, BREAK_METAL );
 
 		m_flNextCrashExplosion = gpGlobals->curtime + random->RandomFloat( 0.3, 0.5 );

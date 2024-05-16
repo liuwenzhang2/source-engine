@@ -32,15 +32,15 @@ CON_COMMAND_F( simple_bot_add, "Add a simple bot.", FCVAR_CHEAT )
 	CSimpleBot *bot = static_cast< CSimpleBot * >(gEntList.CreateEntityByName( "simple_bot" ) );
 	if ( bot )
 	{
-		Vector forward = player->GetAbsOrigin() - result.endpos;
+		Vector forward = player->GetEngineObject()->GetAbsOrigin() - result.endpos;
 		forward.z = 0.0f;
 		forward.NormalizeInPlace();
 
 		QAngle angles;
 		VectorAngles( forward, angles );
 
-		bot->SetAbsAngles( angles );
-		bot->SetAbsOrigin( result.endpos + Vector( 0, 0, 10.0f ) );
+		bot->GetEngineObject()->SetAbsAngles( angles );
+		bot->GetEngineObject()->SetAbsOrigin( result.endpos + Vector( 0, 0, 10.0f ) );
 
 		DispatchSpawn( bot );
 	}

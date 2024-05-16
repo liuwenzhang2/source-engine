@@ -199,7 +199,7 @@ void CNodeEnt::Spawn( void )
 int CNodeEnt::Spawn( const char *pMapData )
 {
 	m_NodeData.strEntityName = GetEntityName();
-	m_NodeData.vecPosition = GetAbsOrigin();
+	m_NodeData.vecPosition = GetEngineObject()->GetAbsOrigin();
 	m_NodeData.nNodeID = NO_NODE;
 	if ( m_NodeData.minState == NPC_STATE_NONE )
 		m_NodeData.minState = NPC_STATE_IDLE;
@@ -268,7 +268,7 @@ int CNodeEnt::Spawn( const char *pMapData )
 	//	Add a new node to the network
 	// ---------------------------------------------------------------------------------
 	// For now just using one big AI network
-	CAI_Node *new_node = g_pBigAINet->AddNode( GetAbsOrigin(), GetAbsAngles().y );
+	CAI_Node *new_node = g_pBigAINet->AddNode(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles().y );
 	new_node->SetHint( pHint );
 
 	// -------------------------------------------------------------------------

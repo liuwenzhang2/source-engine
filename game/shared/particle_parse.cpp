@@ -295,7 +295,7 @@ void DispatchParticleEffect( const char *pszParticleName, ParticleAttachment_t i
 		data.m_nEntIndex = pEntity->entindex();
 #endif
 		data.m_fFlags |= PARTICLE_DISPATCH_FROM_ENTITY;
-		data.m_vOrigin = pEntity->GetAbsOrigin();
+		data.m_vOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
 	}
 	data.m_nDamageType = iAttachType;
 	data.m_nAttachmentIndex = iAttachmentPoint;
@@ -348,7 +348,7 @@ void DispatchParticleEffect( const char *pszParticleName, ParticleAttachment_t i
 		data.m_nEntIndex = pEntity->entindex();
 #endif
 		data.m_fFlags |= PARTICLE_DISPATCH_FROM_ENTITY;
-		data.m_vOrigin = pEntity->GetAbsOrigin();
+		data.m_vOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
 	}
 	data.m_nDamageType = iAttachType;
 	data.m_nAttachmentIndex = iAttachment;

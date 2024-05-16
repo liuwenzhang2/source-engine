@@ -511,7 +511,7 @@ void C_BaseAnimatingOverlay::DoAnimationEvents( CStudioHdr *pStudioHdr )
 				}
 					
 					
-				FireEvent( GetAbsOrigin(), GetAbsAngles(), pevent[ i ].event, pevent[ i ].pszOptions() );
+				FireEvent(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), pevent[ i ].event, pevent[ i ].pszOptions() );
 			}
 
 			// Necessary to get the next loop working
@@ -542,7 +542,7 @@ void C_BaseAnimatingOverlay::DoAnimationEvents( CStudioHdr *pStudioHdr )
 						gpGlobals->curtime );
 				}
 
-				FireEvent( GetAbsOrigin(), GetAbsAngles(), pevent[ i ].event, pevent[ i ].pszOptions() );
+				FireEvent(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), pevent[ i ].event, pevent[ i ].pszOptions() );
 			}
 		}
 

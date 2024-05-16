@@ -116,6 +116,6 @@ void CNPC_Puppet::InputSetAnimationTarget( inputdata_t &inputdata )
 
 	// Stuff us at the owner's core for visibility reasons
 	GetEngineObject()->SetParent( pTarget->GetEngineObject() );
-	SetLocalOrigin( vec3_origin );
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetLocalOrigin( vec3_origin );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 }

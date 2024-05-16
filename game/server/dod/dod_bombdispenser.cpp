@@ -65,7 +65,7 @@ void CDODBombDispenser::Spawn( void )
 #ifdef DBGFLAG_ASSERT
     CBaseEntity *pIcon = 
 #endif
-		CBaseEntity::Create( "dod_bomb_dispenser_icon", WorldSpaceCenter(), GetAbsAngles(), this );
+		CBaseEntity::Create( "dod_bomb_dispenser_icon", WorldSpaceCenter(), GetEngineObject()->GetAbsAngles(), this );
 
 	Assert( pIcon );
 }

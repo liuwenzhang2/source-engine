@@ -111,8 +111,8 @@ void CFuncLadder::Spawn()
 		}
 	}
 
-	m_vecPlayerMountPositionTop -= GetAbsOrigin();
-	m_vecPlayerMountPositionBottom -= GetAbsOrigin();
+	m_vecPlayerMountPositionTop -= GetEngineObject()->GetAbsOrigin();
+	m_vecPlayerMountPositionBottom -= GetEngineObject()->GetAbsOrigin();
 
 	// Compute mins, maxs of points
 	// 
@@ -274,7 +274,7 @@ void CFuncLadder::DrawDebugGeometryOverlays()
 		if ( !pt )
 			continue;
 
-		NDebugOverlay::Box(pt->GetAbsOrigin(),Vector( -16, -16, 0 ), Vector( 16, 16, 8 ), 150,0,0, 63, 0);
+		NDebugOverlay::Box(pt->GetEngineObject()->GetAbsOrigin(),Vector( -16, -16, 0 ), Vector( 16, 16, 8 ), 150,0,0, 63, 0);
 	}
 #endif
 }
@@ -285,7 +285,7 @@ void CFuncLadder::DrawDebugGeometryOverlays()
 //-----------------------------------------------------------------------------
 void CFuncLadder::GetTopPosition( Vector& org )
 {
-	GetEngineObject()->ComputeAbsPosition( m_vecPlayerMountPositionTop + GetLocalOrigin(), &org );
+	GetEngineObject()->ComputeAbsPosition( m_vecPlayerMountPositionTop + GetEngineObject()->GetLocalOrigin(), &org );
 }
 
 //-----------------------------------------------------------------------------
@@ -294,7 +294,7 @@ void CFuncLadder::GetTopPosition( Vector& org )
 //-----------------------------------------------------------------------------
 void CFuncLadder::GetBottomPosition( Vector& org )
 {
-	GetEngineObject()->ComputeAbsPosition( m_vecPlayerMountPositionBottom + GetLocalOrigin(), &org );
+	GetEngineObject()->ComputeAbsPosition( m_vecPlayerMountPositionBottom + GetEngineObject()->GetLocalOrigin(), &org );
 }
 
 //-----------------------------------------------------------------------------
@@ -488,7 +488,7 @@ void CInfoLadderDismount::DrawDebugGeometryOverlays()
 
 	if ( developer.GetBool() )
 	{
-		NDebugOverlay::Box( GetAbsOrigin(), Vector( -16, -16, 0 ), Vector( 16, 16, 8 ), 127, 127, 127, 127, 0 );
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), Vector( -16, -16, 0 ), Vector( 16, 16, 8 ), 127, 127, 127, 127, 0 );
 	}
 #endif
 }

@@ -237,15 +237,15 @@ int UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgn
 
 #if !defined(HL2MP) && !defined(HL1_DLL)
 	// HACK: is this really the only sure way to detect crossing a terrain boundry?
-	UTIL_TraceEntity( pEntity, pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin(), mask, pIgnore, pEntity->GetCollisionGroup(), &trace );
+	UTIL_TraceEntity( pEntity, pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsOrigin(), mask, pIgnore, pEntity->GetCollisionGroup(), &trace );
 	if (trace.fraction == 0.0)
 		return -1;
 #endif // HL2MP
 
-	UTIL_TraceEntity( pEntity, pEntity->GetAbsOrigin() + Vector(0,0,1), pEntity->GetAbsOrigin() - Vector(0,0,256), mask, pIgnore, pEntity->GetCollisionGroup(), &trace );
+	UTIL_TraceEntity( pEntity, pEntity->GetEngineObject()->GetAbsOrigin() + Vector(0,0,1), pEntity->GetEngineObject()->GetAbsOrigin() - Vector(0,0,256), mask, pIgnore, pEntity->GetCollisionGroup(), &trace );
 
 #ifdef HL1_DLL
-	if( fabs(pEntity->GetAbsOrigin().z - trace.endpos.z) <= 2.f )
+	if( fabs(pEntity->GetEngineObject()->GetAbsOrigin().z - trace.endpos.z) <= 2.f )
 		return -1;
 #endif
 
@@ -255,7 +255,7 @@ int UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgn
 	if (trace.fraction == 1)
 		return 0;
 
-	pEntity->SetAbsOrigin( trace.endpos );
+	pEntity->GetEngineObject()->SetAbsOrigin( trace.endpos );
 	pEntity->SetGroundEntity( (CBaseEntity*)trace.m_pEnt );
 
 	return 1;
@@ -282,8 +282,8 @@ bool UTIL_CheckBottom( CBaseEntity *pEntity, ITraceFilter *pTraceFilter, float f
 
 	unsigned int mask = pEntity->PhysicsSolidMaskForEntity();
 
-	VectorAdd (pEntity->GetAbsOrigin(), pEntity->WorldAlignMins(), mins);
-	VectorAdd (pEntity->GetAbsOrigin(), pEntity->WorldAlignMaxs(), maxs);
+	VectorAdd (pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->WorldAlignMins(), mins);
+	VectorAdd (pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->WorldAlignMaxs(), maxs);
 
 	// if all of the points under the corners are solid world, don't bother
 	// with the tougher checks
@@ -838,7 +838,7 @@ void UTIL_ViewPunch( const Vector &center, QAngle angPunch, float radius, bool b
 
 		if ( radius > 0 )
 		{
-			Vector delta = center - pPlayer->GetAbsOrigin();
+			Vector delta = center - pPlayer->GetEngineObject()->GetAbsOrigin();
 			float distance = delta.Length();
 
 			if ( distance <= radius )
@@ -1200,7 +1200,7 @@ void UTIL_SetModel( CBaseEntity *pEntity, const char *pModelName )
 	
 void UTIL_SetOrigin( CBaseEntity *entity, const Vector &vecOrigin, bool bFireTriggers )
 {
-	entity->SetLocalOrigin( vecOrigin );
+	entity->GetEngineObject()->SetLocalOrigin( vecOrigin );
 	if ( bFireTriggers )
 	{
 		entity->PhysicsTouchTriggers();
@@ -1889,7 +1889,7 @@ void EntityMatrix::InitFromEntity( CBaseEntity *pEntity, int iAttachment )
 		}
 	}
 
-	((VMatrix *)this)->SetupMatrixOrgAngles( pEntity->GetAbsOrigin(), pEntity->GetAbsAngles() );
+	((VMatrix *)this)->SetupMatrixOrgAngles( pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles() );
 }
 
 
@@ -1900,7 +1900,7 @@ void EntityMatrix::InitFromEntityLocal( CBaseEntity *entity )
 		Identity();
 		return;
 	}
-	((VMatrix *)this)->SetupMatrixOrgAngles( entity->GetLocalOrigin(), entity->GetLocalAngles() );
+	((VMatrix *)this)->SetupMatrixOrgAngles( entity->GetEngineObject()->GetLocalOrigin(), entity->GetEngineObject()->GetLocalAngles() );
 }
 
 //==================================================
@@ -2340,7 +2340,7 @@ void UTIL_PredictedPosition( CBaseEntity *pTarget, float flTimeDelta, Vector *ve
 	}
 
 	//Get the result
-	(*vecPredictedPosition) = pTarget->GetAbsOrigin() + ( vecPredictedVel * flTimeDelta );
+	(*vecPredictedPosition) = pTarget->GetEngineObject()->GetAbsOrigin() + ( vecPredictedVel * flTimeDelta );
 }
 
 //-----------------------------------------------------------------------------
@@ -2355,15 +2355,15 @@ bool UTIL_PointAtEntity( CBaseEntity *pDest, CBaseEntity *pTarget )
 		return false;
 	}
 
-	Vector dir = (pTarget->GetAbsOrigin() - pDest->GetAbsOrigin());
+	Vector dir = (pTarget->GetEngineObject()->GetAbsOrigin() - pDest->GetEngineObject()->GetAbsOrigin());
 
 	VectorNormalize( dir );
 
 	//Store off as angles
 	QAngle angles;
 	VectorAngles( dir, angles );
-	pDest->SetLocalAngles( angles );
-	pDest->SetAbsAngles( angles );
+	pDest->GetEngineObject()->SetLocalAngles( angles );
+	pDest->GetEngineObject()->SetAbsAngles( angles );
 	return true;
 }
 
@@ -2507,7 +2507,7 @@ bool UTIL_IsFacingWithinTolerance( CBaseEntity *pViewer, const Vector &vecPositi
 	Vector forward;
 	pViewer->GetVectors( &forward, NULL, NULL );
 
-	Vector dir = vecPosition - pViewer->GetAbsOrigin();
+	Vector dir = vecPosition - pViewer->GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( dir );
 
 	// Larger dot product corresponds to a smaller angle
@@ -2539,7 +2539,7 @@ bool UTIL_IsFacingWithinTolerance( CBaseEntity *pViewer, CBaseEntity *pTarget, f
 	if ( pViewer == NULL || pTarget == NULL )
 		return false;
 
-	return UTIL_IsFacingWithinTolerance( pViewer, pTarget->GetAbsOrigin(), flDotTolerance, pflDot );
+	return UTIL_IsFacingWithinTolerance( pViewer, pTarget->GetEngineObject()->GetAbsOrigin(), flDotTolerance, pflDot );
 }
 
 //-----------------------------------------------------------------------------
@@ -2794,7 +2794,7 @@ void CC_KDTreeTest( const CCommand &args )
 //	Vector vecStart = pSpot->GetAbsOrigin();
 
 	CBasePlayer *pPlayer = static_cast<CBasePlayer*>( UTIL_GetLocalPlayer() );
-	Vector vecStart = pPlayer->GetAbsOrigin();
+	Vector vecStart = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	static Vector *vecTargets = NULL;
 	static bool bFirst = true;
@@ -2968,7 +2968,7 @@ void CC_VoxelTreePlayerView( void )
 	Msg( "VoxelTreePlayerView\n" );
 
 	CBasePlayer *pPlayer = static_cast<CBasePlayer*>( UTIL_GetLocalPlayer() );
-	Vector vecStart = pPlayer->GetAbsOrigin();
+	Vector vecStart = pPlayer->GetEngineObject()->GetAbsOrigin();
 	partition->RenderObjectsInPlayerLeafs( vecStart - VEC_HULL_MIN_SCALED( pPlayer ), vecStart + VEC_HULL_MAX_SCALED( pPlayer ), 3.0f  );
 }
 
@@ -3091,7 +3091,7 @@ void CC_CollisionTest( const CCommand &args )
 	partition->ReportStats( "" );
 	int i;
 	CBaseEntity *pSpot = gEntList.FindEntityByClassname( NULL, "info_player_start");
-	Vector start = pSpot->GetAbsOrigin();
+	Vector start = pSpot->GetEngineObject()->GetAbsOrigin();
 	static Vector *targets = NULL;
 	static bool first = true;
 	static float test[2] = {1,1};

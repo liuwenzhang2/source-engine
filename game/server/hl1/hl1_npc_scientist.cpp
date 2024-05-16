@@ -401,7 +401,7 @@ void CNPC_Scientist::StartTask( const Task_t *pTask )
 			{
 				TaskFail(FAIL_NO_TARGET);
 			}
-			else if ( (GetTarget()->GetAbsOrigin() - GetAbsOrigin()).Length() < 1 )
+			else if ( (GetTarget()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length() < 1 )
 			{
 				TaskComplete();
 			}
@@ -435,12 +435,12 @@ void CNPC_Scientist::RunTask( const Task_t *pTask )
 			}
 			else
 			{
-				distance = ( GetNavigator()->GetPath()->ActualGoalPosition() - GetAbsOrigin() ).Length2D();
+				distance = ( GetNavigator()->GetPath()->ActualGoalPosition() - GetEngineObject()->GetAbsOrigin() ).Length2D();
 				// Re-evaluate when you think your finished, or the target has moved too far
-				if ( (distance < pTask->flTaskData) || (GetNavigator()->GetPath()->ActualGoalPosition() - GetTarget()->GetAbsOrigin()).Length() > pTask->flTaskData * 0.5 )
+				if ( (distance < pTask->flTaskData) || (GetNavigator()->GetPath()->ActualGoalPosition() - GetTarget()->GetEngineObject()->GetAbsOrigin()).Length() > pTask->flTaskData * 0.5 )
 				{
-					GetNavigator()->GetPath()->ResetGoalPosition(GetTarget()->GetAbsOrigin());
-					distance = ( GetNavigator()->GetPath()->ActualGoalPosition() - GetAbsOrigin() ).Length2D();
+					GetNavigator()->GetPath()->ResetGoalPosition(GetTarget()->GetEngineObject()->GetAbsOrigin());
+					distance = ( GetNavigator()->GetPath()->ActualGoalPosition() - GetEngineObject()->GetAbsOrigin() ).Length2D();
 //					GetNavigator()->GetPath()->Find();
 					GetNavigator()->SetGoal( GOALTYPE_TARGETENT );
 				}
@@ -475,7 +475,7 @@ void CNPC_Scientist::RunTask( const Task_t *pTask )
 				TaskComplete();
 
 			if ( GetTarget() )
-				 GetMotor()->SetIdealYaw( UTIL_VecToYaw( GetTarget()->GetAbsOrigin() - GetAbsOrigin() ) );
+				 GetMotor()->SetIdealYaw( UTIL_VecToYaw( GetTarget()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ) );
 
 			//GetMotor()->SetYawSpeed( m_YawSpeed );
 		}
@@ -562,7 +562,7 @@ void CNPC_Scientist::Heal( void )
 	if ( !CanHeal() )
 		  return;
 
-	Vector target = GetFollowTarget()->GetAbsOrigin() - GetAbsOrigin();
+	Vector target = GetFollowTarget()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	if ( target.Length() > 100 )
 		return;
 
@@ -1061,7 +1061,7 @@ void CNPC_SittingScientist::SittingThink( void )
 		pent = FindNearestFriend(true);
 		if (pent)
 		{
-			float yaw = VecToYaw(pent->GetAbsOrigin() - GetAbsOrigin()) - GetAbsAngles().y;
+			float yaw = VecToYaw(pent->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()) - GetEngineObject()->GetAbsAngles().y;
 
 			if (yaw > 180) yaw -= 360;
 			if (yaw < -180) yaw += 360;
@@ -1110,7 +1110,7 @@ void CNPC_SittingScientist::SittingThink( void )
 			else
 			{
 				// only turn head if we spoke
-				float yaw = VecToYaw(pent->GetAbsOrigin() - GetAbsOrigin()) - GetAbsAngles().y;
+				float yaw = VecToYaw(pent->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()) - GetEngineObject()->GetAbsAngles().y;
 
 				if (yaw > 180) yaw -= 360;
 				if (yaw < -180) yaw += 360;

@@ -83,7 +83,7 @@ void CGrenadeSpit::Spawn( void )
 		m_hSpitEffect->KeyValue( "start_active", "1" );
 		m_hSpitEffect->KeyValue( "effect_name", "antlion_spit_trail" );
 		m_hSpitEffect->GetEngineObject()->SetParent( this->GetEngineObject() );
-		m_hSpitEffect->SetLocalOrigin( vec3_origin );
+		m_hSpitEffect->GetEngineObject()->SetLocalOrigin( vec3_origin );
 		DispatchSpawn( m_hSpitEffect );
 		if ( gpGlobals->curtime > 0.5f )
 			m_hSpitEffect->Activate();
@@ -178,7 +178,7 @@ void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
 		pTraceEnt->TakeDamage( CTakeDamageInfo( this, GetThrower(), m_flDamage * poisonratio, DMG_POISON ) );
 	}
 
-	CSoundEnt::InsertSound( SOUND_DANGER, GetAbsOrigin(), m_DmgRadius * 2.0f, 0.5f, GetThrower() );
+	CSoundEnt::InsertSound( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), m_DmgRadius * 2.0f, 0.5f, GetThrower() );
 
 	QAngle vecAngles;
 	VectorAngles( tracePlaneNormal, vecAngles );
@@ -186,11 +186,11 @@ void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
 	if ( pOther->IsPlayer() || bHitWater )
 	{
 		// Do a lighter-weight effect if we just hit a player
-		DispatchParticleEffect( "antlion_spit_player", GetAbsOrigin(), vecAngles );
+		DispatchParticleEffect( "antlion_spit_player", GetEngineObject()->GetAbsOrigin(), vecAngles );
 	}
 	else
 	{
-		DispatchParticleEffect( "antlion_spit", GetAbsOrigin(), vecAngles );
+		DispatchParticleEffect( "antlion_spit", GetEngineObject()->GetAbsOrigin(), vecAngles );
 	}
 
 	Detonate();
@@ -250,11 +250,11 @@ void CGrenadeSpit::Think( void )
 	if ( pPlayer != NULL )
 	{
 		Vector dir;
-		VectorSubtract( pPlayer->GetAbsOrigin(), GetAbsOrigin(), dir );
+		VectorSubtract( pPlayer->GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), dir );
 		VectorNormalize(dir);
 
-		float velReceiver = DotProduct( pPlayer->GetAbsVelocity(), dir );
-		float velTransmitter = -DotProduct( GetAbsVelocity(), dir );
+		float velReceiver = DotProduct( pPlayer->GetEngineObject()->GetAbsVelocity(), dir );
+		float velTransmitter = -DotProduct(GetEngineObject()->GetAbsVelocity(), dir );
 		
 		// speed of sound == 13049in/s
 		int iPitch = 100 * ((1 - velReceiver / 13049) / (1 + velTransmitter / 13049));

@@ -122,7 +122,7 @@ void CFogController::Activate( )
 
 	if ( m_bUseAngles )
 	{
-		AngleVectors( GetAbsAngles(), &m_fog.dirPrimary.GetForModify() );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &m_fog.dirPrimary.GetForModify() );
 		m_fog.dirPrimary.GetForModify() *= -1.0f; 
 	}	    
 }
@@ -217,9 +217,9 @@ void CFogController::InputSetAngles( inputdata_t &inputdata )
 
 	Vector vTemp;
 	AngleVectors( angles, &vTemp );
-	SetAbsAngles( angles );
+	GetEngineObject()->SetAbsAngles( angles );
 
-	AngleVectors( GetAbsAngles(), &m_fog.dirPrimary.GetForModify() );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &m_fog.dirPrimary.GetForModify() );
 	m_fog.dirPrimary.GetForModify() *= -1.0f;
 }
 

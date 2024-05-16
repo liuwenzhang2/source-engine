@@ -194,12 +194,12 @@ void CHostage::Spawn( void )
 	m_lastKnownArea = NULL;
 
 	// Need to make sure the hostages are on the ground when they spawn
-	Vector GroundPos = DropToGround( this, GetAbsOrigin(), HOSTAGE_BBOX_VEC_MIN, HOSTAGE_BBOX_VEC_MAX );
-	SetAbsOrigin( GroundPos );
+	Vector GroundPos = DropToGround( this, GetEngineObject()->GetAbsOrigin(), HOSTAGE_BBOX_VEC_MIN, HOSTAGE_BBOX_VEC_MAX );
+	GetEngineObject()->SetAbsOrigin( GroundPos );
 
 	if (TheNavMesh)
 	{
-		Vector pos = GetAbsOrigin();
+		Vector pos = GetEngineObject()->GetAbsOrigin();
 		m_lastKnownArea = TheNavMesh->GetNearestNavArea( pos );
 	}
 
@@ -559,7 +559,7 @@ void CHostage::Touch( CBaseEntity *other )
 	if ( ( other->IsPlayer() && other->GetTeamNumber() == TEAM_CT ) || FClassnameIs( other, "hostage_entity" ) )
 	{
 		// only push in 2D
-		Vector to = GetAbsOrigin() - other->GetAbsOrigin();
+		Vector to = GetEngineObject()->GetAbsOrigin() - other->GetEngineObject()->GetAbsOrigin();
 		to.z = 0.0f;
 		to.NormalizeInPlace();
 		
@@ -588,7 +588,7 @@ void CHostage::Wiggle( void )
 	}
 
 	Vector dir, lat;
-	AngleVectors( GetAbsAngles(), &dir, &lat, NULL );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &dir, &lat, NULL );
 
 	const float speed = 500.0f;
 
@@ -654,7 +654,7 @@ void CHostage::UpdateFollowing( float deltaT )
 		// if leader has moved, repath
 		if (m_path.IsValid())
 		{
-			Vector pathError = leader->GetAbsOrigin() - m_path.GetEndpoint();
+			Vector pathError = leader->GetEngineObject()->GetAbsOrigin() - m_path.GetEndpoint();
 			
 			const float repathRange = 100.0f;
 			if (pathError.IsLengthGreaterThan( repathRange ))
@@ -670,8 +670,8 @@ void CHostage::UpdateFollowing( float deltaT )
 			const float repathInterval = 0.5f;
 			m_repathTimer.Start( repathInterval );
 
-			Vector from = GetAbsOrigin();
-			Vector to = leader->GetAbsOrigin();
+			Vector from = GetEngineObject()->GetAbsOrigin();
+			Vector to = leader->GetEngineObject()->GetAbsOrigin();
 			HostagePathCost pathCost;
 
 			m_path.Compute( from, to, pathCost );
@@ -682,7 +682,7 @@ void CHostage::UpdateFollowing( float deltaT )
 		// if our rescuer is too far away, give up
 		const float giveUpRange = 2000.0f;
 		const float maxPathLength = 4000.0f;
-		Vector toLeader = leader->GetAbsOrigin() - GetAbsOrigin();
+		Vector toLeader = leader->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 		if (toLeader.IsLengthGreaterThan( giveUpRange ) || (m_path.IsValid() && m_path.GetLength() > maxPathLength))
 		{
 			if ( hostage_debug.GetInt() < 2 )
@@ -791,7 +791,7 @@ void CHostage::AvoidPhysicsProps( void )
 	if ( !m_accel.IsZero() )
 	{
 		trace_t trace;
-		Vector start = GetAbsOrigin();
+		Vector start = GetEngineObject()->GetAbsOrigin();
 		Vector forward = m_accel;
 		forward.NormalizeInPlace();
 		UTIL_TraceEntity( this, start, start + forward, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER, &trace );
@@ -802,7 +802,7 @@ void CHostage::AvoidPhysicsProps( void )
 			UTIL_TraceEntity( this, start, start + forward, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER, &trace );
 			if ( !trace.startsolid && trace.fraction > groundFraction )
 			{
-				SetAbsOrigin( start );
+				GetEngineObject()->SetAbsOrigin( start );
 			}
 		}
 	}
@@ -829,7 +829,7 @@ void CHostage::PhysicsSimulate( void )
 {
 	BaseClass::PhysicsSimulate();
 
-	SetAbsVelocity( m_vel );
+	GetEngineObject()->SetAbsVelocity( m_vel );
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -850,7 +850,7 @@ void CHostage::HostageThink( void )
 	SetNextThink( gpGlobals->curtime + deltaT );
 
 	// keep track of which Navigation Area we are in (or were in, if we're "off the mesh" right now)
-	CNavArea *area = TheNavMesh->GetNavArea( GetAbsOrigin() );
+	CNavArea *area = TheNavMesh->GetNavArea(GetEngineObject()->GetAbsOrigin() );
 	if (area != NULL && area != m_lastKnownArea)
 	{
 		// entered a new nav area
@@ -867,7 +867,7 @@ void CHostage::HostageThink( void )
 	m_vel += deltaT * (m_accel - damping * m_vel);
 
 	// leave Z component untouched
-	m_vel.z = GetAbsVelocity().z;
+	m_vel.z = GetEngineObject()->GetAbsVelocity().z;
 
 	if ( m_accel.IsZero() && m_vel.AsVector2D().IsZero( 1.0f ) )
 	{
@@ -886,7 +886,7 @@ void CHostage::HostageThink( void )
 		SetSequence( sequence );
 	}
 
-	m_PlayerAnimState->Update( GetAbsAngles()[YAW], GetAbsAngles()[PITCH] );
+	m_PlayerAnimState->Update(GetEngineObject()->GetAbsAngles()[YAW], GetEngineObject()->GetAbsAngles()[PITCH] );
 
 
 	if ( m_disappearTime && m_disappearTime < gpGlobals->curtime )
@@ -1014,7 +1014,7 @@ CCSPlayer *CHostage::GetLeader( void ) const
  */
 void CHostage::HostageUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-	Vector to = pActivator->GetAbsOrigin() - GetAbsOrigin();
+	Vector to = pActivator->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 
 	// limit use range
 	float useRange = 1000.0f;
@@ -1141,12 +1141,12 @@ void CHostage::FaceTowards( const Vector &target, float deltaT )
 	QAngle desiredAngles;
 	VectorAngles( to, desiredAngles );
 
-	QAngle angles = GetAbsAngles();
+	QAngle angles = GetEngineObject()->GetAbsAngles();
 
 	const float turnSpeed = 250.0f;	
 	angles.y = ApproachAngle( desiredAngles.y, angles.y, turnSpeed * deltaT );
 
-	SetAbsAngles( angles );
+	GetEngineObject()->SetAbsAngles( angles );
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -1170,7 +1170,7 @@ const Vector &CHostage::GetFeet( void ) const
 {
 	static Vector feet;
 	
-	feet = GetAbsOrigin();
+	feet = GetEngineObject()->GetAbsOrigin();
 
 	return feet;
 }
@@ -1191,7 +1191,7 @@ const Vector &CHostage::GetEyes( void ) const
  */
 float CHostage::GetMoveAngle( void ) const
 {
-	return GetAbsAngles().y;
+	return GetEngineObject()->GetAbsAngles().y;
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -1252,9 +1252,9 @@ void CHostage::Jump( void )
 		const float minJumpInterval = 0.5f;
 		m_jumpTimer.Start( minJumpInterval );
 
-		Vector vel = GetAbsVelocity();
+		Vector vel = GetEngineObject()->GetAbsVelocity();
 		vel.z += 200.0f;
-		SetAbsVelocity( vel );
+		GetEngineObject()->SetAbsVelocity( vel );
 	}
 }
 
@@ -1321,7 +1321,7 @@ bool CHostage::IsUsingLadder( void ) const
 void CHostage::TrackPath( const Vector &pathGoal, float deltaT )
 {
 	// face in the direction of our motion
-	FaceTowards( GetAbsOrigin() + 10.0f * m_vel, deltaT );
+	FaceTowards(GetEngineObject()->GetAbsOrigin() + 10.0f * m_vel, deltaT );
 
 	if (GetFlags() & FL_ONGROUND)
 	{
@@ -1337,7 +1337,7 @@ void CHostage::TrackPath( const Vector &pathGoal, float deltaT )
 	{
 		// in the air - continue forward motion
 		Vector to;
-		QAngle angles = GetAbsAngles();
+		QAngle angles = GetEngineObject()->GetAbsAngles();
 		AngleVectors( angles, &to );
 
 		const float airSpeed = 350.0f;

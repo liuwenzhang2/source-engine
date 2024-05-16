@@ -136,7 +136,7 @@ void CPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *p
 	// Allow sound, etc. to be created by movement code
 	move->m_bFirstRunOfFunctions = true;
 	move->m_bGameCodeMovedPlayer = false;
-	if ( player->GetPreviouslyPredictedOrigin() != player->GetAbsOrigin() )
+	if ( player->GetPreviouslyPredictedOrigin() != player->GetEngineObject()->GetAbsOrigin() )
 	{
 		move->m_bGameCodeMovedPlayer = true;
 	}
@@ -179,15 +179,15 @@ void CPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *p
 	move->m_nOldButtons			= player->m_Local.m_nOldButtons;
 	move->m_vecAngles			= player->pl.v_angle;
 
-	move->m_vecVelocity			= player->GetAbsVelocity();
+	move->m_vecVelocity			= player->GetEngineObject()->GetAbsVelocity();
 
 	move->m_nPlayerHandle		= player;
 
-	move->SetAbsOrigin( player->GetAbsOrigin() );
+	move->SetAbsOrigin( player->GetEngineObject()->GetAbsOrigin() );
 
 	// Copy constraint information
 	if ( player->m_hConstraintEntity.Get() )
-		move->m_vecConstraintCenter = player->m_hConstraintEntity.Get()->GetAbsOrigin();
+		move->m_vecConstraintCenter = player->m_hConstraintEntity.Get()->GetEngineObject()->GetAbsOrigin();
 	else
 		move->m_vecConstraintCenter = player->m_vecConstraintCenter;
 	move->m_flConstraintRadius = player->m_flConstraintRadius;
@@ -208,8 +208,8 @@ void CPlayerMove::FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *mo
 
 	// NOTE: Don't copy this.  the movement code modifies its local copy but is not expecting to be authoritative
 	//player->m_flMaxspeed			= move->m_flClientMaxSpeed;
-	player->SetAbsOrigin( move->GetAbsOrigin() );
-	player->SetAbsVelocity( move->m_vecVelocity );
+	player->GetEngineObject()->SetAbsOrigin( move->GetAbsOrigin() );
+	player->GetEngineObject()->SetAbsVelocity( move->m_vecVelocity );
 	player->SetPreviouslyPredictedOrigin( move->GetAbsOrigin() );
 
 	player->m_Local.m_nOldButtons			= move->m_nButtons;
@@ -226,7 +226,7 @@ void CPlayerMove::FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *mo
 
 	player->SetBodyPitch( pitch );
 
-	player->SetLocalAngles( move->m_vecAngles );
+	player->GetEngineObject()->SetLocalAngles( move->m_vecAngles );
 
 	// The class had better not have changed during the move!!
 	if ( player->m_hConstraintEntity )

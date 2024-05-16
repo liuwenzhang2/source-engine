@@ -116,7 +116,7 @@ void C_DODSmokeGrenade::ClientThink( void )
 	{
 		float flExpandRadius = CalcSmokeCloudRadius();
 
-		Vector vecSmokePos = GetAbsOrigin();
+		Vector vecSmokePos = GetEngineObject()->GetAbsOrigin();
 		vecSmokePos.z += 32;
 
 		float testDist = (MainViewOrigin() - vecSmokePos).Length();

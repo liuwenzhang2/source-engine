@@ -314,7 +314,7 @@ void CBaseHL2MPBludgeonWeapon::Swing( int bIsSecondary )
 		UTIL_TraceHull( swingStart, swingEnd, g_bludgeonMins, g_bludgeonMaxs, MASK_SHOT_HULL, pOwner, COLLISION_GROUP_NONE, &traceHit );
 		if ( traceHit.fraction < 1.0 && traceHit.m_pEnt )
 		{
-			Vector vecToTarget = ((CBaseEntity*)traceHit.m_pEnt)->GetAbsOrigin() - swingStart;
+			Vector vecToTarget = ((CBaseEntity*)traceHit.m_pEnt)->GetEngineObject()->GetAbsOrigin() - swingStart;
 			VectorNormalize( vecToTarget );
 
 			float dot = vecToTarget.Dot( forward );

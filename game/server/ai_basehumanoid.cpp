@@ -191,7 +191,7 @@ void CAI_BaseHumanoid::TraceAttack( const CTakeDamageInfo &info, const Vector &v
 
 			float flDist;
 
-			flDist = (info.GetAttacker()->GetAbsOrigin() - GetAbsOrigin()).Length();
+			flDist = (info.GetAttacker()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
 
 			if( flDist > SNEAK_ATTACK_DIST )
 			{

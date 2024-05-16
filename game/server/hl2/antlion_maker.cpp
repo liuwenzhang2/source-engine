@@ -326,7 +326,7 @@ void CAntlionTemplateMaker::ActivateSpore( const char* sporename, Vector vOrigin
 		
 		if ( pSpore )
 		{
-			pSpore->SetAbsOrigin( vOrigin );
+			pSpore->GetEngineObject()->SetAbsOrigin( vOrigin );
 			pSpore->SetName( szName );
 			pSpore->m_flSpawnRate = ANTLION_MAKE_SPORE_SPAWNRATE;
 		}
@@ -376,7 +376,7 @@ void CAntlionTemplateMaker::ActivateAllSpores( void )
 			bool bBlank;
 			if ( !AllHintsFromClusterBlocked( pTestHint, bBlank ) )
 			{
-				ActivateSpore( STRING( pTestHint->GetEntityName() ), pTestHint->GetAbsOrigin() );
+				ActivateSpore( STRING( pTestHint->GetEntityName() ), pTestHint->GetEngineObject()->GetAbsOrigin() );
 			}
 		}
 	}
@@ -555,7 +555,7 @@ void CAntlionTemplateMaker::CreateProxyTarget( const Vector &position )
 	// Update if we do
 	if ( m_hProxyTarget != NULL )
 	{
-		m_hProxyTarget->SetAbsOrigin( position );
+		m_hProxyTarget->GetEngineObject()->SetAbsOrigin( position );
 	}
 }
 
@@ -660,8 +660,8 @@ void CAntlionTemplateMaker::MakeNPC( void )
 		return;
 
 	// Set our defaults
-	Vector	targetOrigin = GetAbsOrigin();
-	QAngle	targetAngles = GetAbsAngles();
+	Vector	targetOrigin = GetEngineObject()->GetAbsOrigin();
+	QAngle	targetAngles = GetEngineObject()->GetAbsAngles();
 
 	// Look for our target entity
 	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_strSpawnTarget, this );
@@ -695,7 +695,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 	// Point at the current position of the enemy
 	if ( pTarget != NULL )
 	{
-		targetOrigin = pTarget->GetAbsOrigin();
+		targetOrigin = pTarget->GetEngineObject()->GetAbsOrigin();
 	}	
  	
 	// Create the entity via a template
@@ -731,7 +731,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 	ChildPreSpawn( pent );
 
 	// Put us at the desired location
-	pent->SetLocalOrigin( spawnOrigin );
+	pent->GetEngineObject()->SetLocalOrigin( spawnOrigin );
 
 	QAngle	spawnAngles;
 
@@ -750,7 +750,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 		spawnAngles = QAngle( 0, pNode->Yaw(), 0 );
 	}
 
-	pent->SetLocalAngles( spawnAngles );	
+	pent->GetEngineObject()->SetLocalAngles( spawnAngles );
 	DispatchSpawn( pent );
 	
 	pent->Activate();
@@ -800,7 +800,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 bool CAntlionTemplateMaker::FindPositionOnFoot( Vector &origin, float radius, CBaseEntity *pTarget )
 {
 	int iMaxTries = 10;
-	Vector vSpawnOrigin = pTarget->GetAbsOrigin();
+	Vector vSpawnOrigin = pTarget->GetEngineObject()->GetAbsOrigin();
 
 	while ( iMaxTries > 0 )
 	{
@@ -824,7 +824,7 @@ bool CAntlionTemplateMaker::FindPositionOnFoot( Vector &origin, float radius, CB
 bool CAntlionTemplateMaker::FindPositionOnVehicle( Vector &origin, float radius, CBaseEntity *pTarget )
 {
 	int iMaxTries = 10;
-	Vector vSpawnOrigin = pTarget->GetAbsOrigin();
+	Vector vSpawnOrigin = pTarget->GetEngineObject()->GetAbsOrigin();
 	vSpawnOrigin.z += 96;
 
 	if ( pTarget == NULL )
@@ -908,7 +908,7 @@ bool CAntlionTemplateMaker::ValidateSpawnPosition( Vector &vOrigin, CBaseEntity 
 
 					trace_t trVerify;
 					
-					Vector vVerifyOrigin = pPlayer->GetAbsOrigin() + pPlayer->GetViewOffset();
+					Vector vVerifyOrigin = pPlayer->GetEngineObject()->GetAbsOrigin() + pPlayer->GetViewOffset();
 					float flZOffset = NAI_Hull::Maxs( HULL_MEDIUM ).z;
 					UTIL_TraceLine( vVerifyOrigin, tr.endpos + Vector( 0, 0, flZOffset ), MASK_BLOCKLOS | CONTENTS_WATER, &traceFilter, &trVerify );
 
@@ -1205,7 +1205,7 @@ void CAntlionTemplateMaker::FindNodesCloseToPlayer( void )
 
 	hintCriteria.SetGroup( m_strSpawnGroup );
 	hintCriteria.SetHintType( HINT_ANTLION_BURROW_POINT );
-	hintCriteria.AddIncludePosition( pPlayer->GetAbsOrigin(), ANTLION_MAKER_PLAYER_DETECT_RADIUS );
+	hintCriteria.AddIncludePosition( pPlayer->GetEngineObject()->GetAbsOrigin(), ANTLION_MAKER_PLAYER_DETECT_RADIUS );
 
 	CUtlVector<CAI_Hint *> hintList;
 
@@ -1222,7 +1222,7 @@ void CAntlionTemplateMaker::FindNodesCloseToPlayer( void )
 	{
 		CAI_Hint *pNode = hintList[i];
 
-		if ( pNode && pNode->HintMatchesCriteria( NULL, hintCriteria, pPlayer->GetAbsOrigin(), &flRadius ) )
+		if ( pNode && pNode->HintMatchesCriteria( NULL, hintCriteria, pPlayer->GetEngineObject()->GetAbsOrigin(), &flRadius ) )
 		{
 			bool bClusterAlreadyBlocked = false;
 
@@ -1251,7 +1251,7 @@ void CAntlionTemplateMaker::FindNodesCloseToPlayer( void )
 			}
 			else
 			{
-				ActivateSpore( STRING( pNode->GetEntityName() ), pNode->GetAbsOrigin() );
+				ActivateSpore( STRING( pNode->GetEntityName() ), pNode->GetEngineObject()->GetAbsOrigin() );
 			}
 		}
 	}
@@ -1709,7 +1709,7 @@ void CAntlionTemplateMaker::DrawDebugGeometryOverlays( void )
 		}
 
 		// Draw ourself
-		NDebugOverlay::Box( GetAbsOrigin(), -Vector(8,8,8), Vector(8,8,8), r, g, b, true, 0.05f );
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), -Vector(8,8,8), Vector(8,8,8), r, g, b, true, 0.05f );
 
 		// Draw lines to our spawngroup hints
 		if ( m_strSpawnGroup != NULL_STRING )
@@ -1727,12 +1727,12 @@ void CAntlionTemplateMaker::DrawDebugGeometryOverlays( void )
 				}
 
 				// Draw an arrow to the spot
-				NDebugOverlay::VertArrow( GetAbsOrigin(), pHint->GetAbsOrigin() + Vector( 0, 0, 32 ), 8.0f, r, g, b, 0, true, 0.05f );
+				NDebugOverlay::VertArrow(GetEngineObject()->GetAbsOrigin(), pHint->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 32 ), 8.0f, r, g, b, 0, true, 0.05f );
 				
 				// Draw a box to represent where it's sitting
 				Vector vecForward;
-				AngleVectors( pHint->GetAbsAngles(), &vecForward );
-				NDebugOverlay::BoxDirection( pHint->GetAbsOrigin(), -Vector(32,32,0), Vector(32,32,16), vecForward, r, g, b, true, 0.05f );
+				AngleVectors( pHint->GetEngineObject()->GetAbsAngles(), &vecForward );
+				NDebugOverlay::BoxDirection( pHint->GetEngineObject()->GetAbsOrigin(), -Vector(32,32,0), Vector(32,32,16), vecForward, r, g, b, true, 0.05f );
 				
 				// Move to the next
 				pHint = CAI_HintManager::GetNextHint( &iter );
@@ -1746,7 +1746,7 @@ void CAntlionTemplateMaker::DrawDebugGeometryOverlays( void )
 			CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_strSpawnTarget );
 			if ( pTarget != NULL )
 			{
-				NDebugOverlay::VertArrow( GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 255, 255, 0, true, 0.05f );
+				NDebugOverlay::VertArrow(GetEngineObject()->GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 255, 255, 0, true, 0.05f );
 			}
 		}
 
@@ -1757,7 +1757,7 @@ void CAntlionTemplateMaker::DrawDebugGeometryOverlays( void )
 			CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_strFollowTarget );
 			if ( pTarget != NULL )
 			{
-				NDebugOverlay::VertArrow( GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 255, 0, 0, true, 0.05f );
+				NDebugOverlay::VertArrow(GetEngineObject()->GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 255, 0, 0, true, 0.05f );
 			}
 		}
 
@@ -1768,7 +1768,7 @@ void CAntlionTemplateMaker::DrawDebugGeometryOverlays( void )
 			CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_strFightTarget );
 			if ( pTarget != NULL )
 			{
-				NDebugOverlay::VertArrow( GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 0, 0, 0, true, 0.05f );
+				NDebugOverlay::VertArrow(GetEngineObject()->GetAbsOrigin(), pTarget->WorldSpaceCenter(), 4.0f, 255, 0, 0, 0, true, 0.05f );
 			}
 		}
 	}

@@ -144,7 +144,7 @@ public:
 				Vector mins, maxs;
 				if ( GetFireDimensions( &mins, &maxs ) )
 				{
-					NDebugOverlay::Box(GetAbsOrigin(), mins, maxs, 128, 0, 0, 10, 0);
+					NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), mins, maxs, 128, 0, 0, 10, 0);
 				}
 			}
 
@@ -252,7 +252,7 @@ IterationRetval_t CFireSphere::EnumElement( IHandleEntity *pHandleEntity )
 		{
 			if ( !m_onlyActiveFires || pFire->IsBurning() )
 			{
-				if ( (m_origin - pFire->GetAbsOrigin()).LengthSqr() < m_radiusSqr )
+				if ( (m_origin - pFire->GetEngineObject()->GetAbsOrigin()).LengthSqr() < m_radiusSqr )
 				{
 					if ( !AddToList( pFire ) )
 						return ITERATION_STOP;
@@ -440,7 +440,7 @@ bool FireSystem_StartFire( CBaseAnimating *pEntity, float fireHeight, float atta
 {
 	VPROF_FIRE( "FireSystem_StartFire2" );
 
-	Vector position = pEntity->GetAbsOrigin();
+	Vector position = pEntity->GetEngineObject()->GetAbsOrigin();
 	Vector testPos = position;
 
 	// Make sure its a valid position for fire (not in a wall, etc)
@@ -705,11 +705,11 @@ void CFire::StartFire( void )
 	trace_t tr;
 	if ( m_spawnflags & SF_FIRE_DONT_DROP )
 	{
-		vFirePos = GetAbsOrigin();
+		vFirePos = GetEngineObject()->GetAbsOrigin();
 	}
 	else
 	{
-		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector( 0, 0, 1024 ), MASK_FIRE_SOLID, this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 1024 ), MASK_FIRE_SOLID, this, COLLISION_GROUP_NONE, &tr );
 		vFirePos = tr.endpos;
 	}
 
@@ -738,7 +738,7 @@ void CFire::Spawn( void )
 	// set up the ignition point
 	m_flHeatAbsorb = m_flHeatLevel * 0.05;
 	m_flHeatLevel = 0;
-	Init( GetAbsOrigin(), m_flFireSize, m_flAttackTime, m_flFuel, m_spawnflags, m_nFireType );
+	Init(GetEngineObject()->GetAbsOrigin(), m_flFireSize, m_flAttackTime, m_flFuel, m_spawnflags, m_nFireType );
 	
 	if( m_bStartDisabled )
 	{
@@ -819,7 +819,7 @@ void CFire::SpawnEffect( fireType_e type, float scale )
 		break;
 	}
 
-	UTIL_SetOrigin( pEffect, GetAbsOrigin() );
+	UTIL_SetOrigin( pEffect, GetEngineObject()->GetAbsOrigin() );
 	pEffect->Spawn();
 	pEffect->GetEngineObject()->SetParent( this->GetEngineObject() );
 	pEffect->Scale( m_flFireSize, m_flFireSize, 0 );
@@ -972,13 +972,13 @@ void CFire::Update( float simTime )
 	}
 
 	//NDebugOverlay::Box( GetAbsOrigin(), fireMins, fireMaxs, 255, 255, 255, 0, fire_dmginterval.GetFloat() );
-	fireMins += GetAbsOrigin();
-	fireMaxs += GetAbsOrigin();
+	fireMins += GetEngineObject()->GetAbsOrigin();
+	fireMaxs += GetEngineObject()->GetAbsOrigin();
 
 	if ( FIRE_SPREAD_DAMAGE_MULTIPLIER != 1.0 )
 	{
-		fireEntityDamageMins += GetAbsOrigin();
-		fireEntityDamageMaxs += GetAbsOrigin();
+		fireEntityDamageMins += GetEngineObject()->GetAbsOrigin();
+		fireEntityDamageMaxs += GetEngineObject()->GetAbsOrigin();
 	}
 
 	CBaseEntity *pNearby[256];
@@ -1282,7 +1282,7 @@ void CEnvFireSource::Think()
 	SetNextThink( gpGlobals->curtime + FIRESOURCE_THINK_TIME );
 
 	CFire *pFires[128];
-	int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), false, GetAbsOrigin(), m_radius );
+	int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), false, GetEngineObject()->GetAbsOrigin(), m_radius );
 
 	for ( int i = 0; i < fireCount; i++ )
 	{
@@ -1392,7 +1392,7 @@ void CEnvFireSensor::Think()
 
 	float heat = 0;
 	CFire *pFires[128];
-	int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), true, GetAbsOrigin(), m_radius );
+	int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), true, GetEngineObject()->GetAbsOrigin(), m_radius );
 	for ( int i = 0; i < fireCount; i++ )
 	{
 		heat += pFires[i]->GetHeatLevel();

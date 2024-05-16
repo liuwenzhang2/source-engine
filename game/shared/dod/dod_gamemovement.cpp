@@ -357,7 +357,7 @@ void CDODGameMovement::CheckParameters( void )
 
 	if ( cl_show_speed.GetBool() )
 	{
-		Vector vel = m_pDODPlayer->GetAbsVelocity();
+		Vector vel = m_pDODPlayer->GetEngineObject()->GetAbsVelocity();
 		float actual_speed = sqrt( vel.x * vel.x + vel.y * vel.y );
 		Msg( "player speed %.1f\n",actual_speed );
 	}
@@ -370,7 +370,7 @@ void CDODGameMovement::CheckFalling( void )
 	{
 		if ( player->m_Local.m_flFallVelocity >= 300 )
 		{
-			CPASFilter filter( player->GetAbsOrigin() );
+			CPASFilter filter( player->GetEngineObject()->GetAbsOrigin() );
 			filter.UsePredictionRules();
 			g_pSoundEmitterSystem->EmitSound( filter, player->entindex(), "Player.JumpLanding" );//player->
 		}
@@ -444,7 +444,7 @@ void CDODGameMovement::PlayerMove()
 
 void CDODGameMovement::WalkMove( void )
 {
-	float flSpeed = m_pDODPlayer->GetAbsVelocity().Length2D();
+	float flSpeed = m_pDODPlayer->GetEngineObject()->GetAbsVelocity().Length2D();
 
 	bool bSprintButtonPressed = ( mv->m_nButtons & IN_SPEED ) > 0;
 
@@ -606,7 +606,7 @@ bool CDODGameMovement::ResolveStanding( void )
 //-----------------------------------------------------------------------------
 void CDODGameMovement::ReduceTimers( void )
 {
-	Vector vecPlayerVelocity = m_pDODPlayer->GetAbsVelocity();
+	Vector vecPlayerVelocity = m_pDODPlayer->GetEngineObject()->GetAbsVelocity();
 	float flStamina = m_pDODPlayer->m_Shared.GetStamina();
 	float fl2DVelocitySquared = vecPlayerVelocity.x * vecPlayerVelocity.x + 
 								vecPlayerVelocity.y * vecPlayerVelocity.y;	
@@ -620,7 +620,7 @@ void CDODGameMovement::ReduceTimers( void )
 	bool bSprinting = ( (mv->m_nButtons & IN_SPEED) && ( mv->m_nButtons & IN_FORWARD ) );
 
 	// If we're holding the sprint key and also actually moving, remove some stamina
-	Vector vel = m_pDODPlayer->GetAbsVelocity();
+	Vector vel = m_pDODPlayer->GetEngineObject()->GetAbsVelocity();
 	if ( bSprinting && fl2DVelocitySquared > 10000 ) //speed > 100
 	{
 		//flStamina -= 30 * gpGlobals->frametime;	//reduction for sprinting
@@ -739,7 +739,7 @@ bool CDODGameMovement::CheckJumpButton( void )
 	m_pDODPlayer->DoAnimationEvent( PLAYERANIMEVENT_JUMP );
 
 	// make the jump sound
-	CPASFilter filter( m_pDODPlayer->GetAbsOrigin() );
+	CPASFilter filter( m_pDODPlayer->GetEngineObject()->GetAbsOrigin() );
 	filter.UsePredictionRules();
 	g_pSoundEmitterSystem->EmitSound( filter, m_pDODPlayer->entindex(), "Player.Jump" );//m_pDODPlayer->
 

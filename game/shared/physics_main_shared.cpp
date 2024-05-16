@@ -1052,8 +1052,8 @@ bool CBaseEntity::PhysicsCheckWater( void )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsCheckVelocity( void )
 {
-	Vector origin = GetAbsOrigin();
-	Vector vecAbsVelocity = GetAbsVelocity();
+	Vector origin = GetEngineObject()->GetAbsOrigin();
+	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 
 	bool bReset = false;
 	for ( int i=0 ; i<3 ; i++ )
@@ -1091,8 +1091,8 @@ void CBaseEntity::PhysicsCheckVelocity( void )
 
 	if (bReset)
 	{
-		SetAbsOrigin( origin );
-		SetAbsVelocity( vecAbsVelocity );
+		GetEngineObject()->SetAbsOrigin( origin );
+		GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 	}
 }
 
@@ -1102,7 +1102,7 @@ void CBaseEntity::PhysicsCheckVelocity( void )
 //-----------------------------------------------------------------------------
 void CBaseEntity::PhysicsAddGravityMove( Vector &move )
 {
-	Vector vecAbsVelocity = GetAbsVelocity();
+	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 
 	move.x = (vecAbsVelocity.x + GetBaseVelocity().x ) * gpGlobals->frametime;
 	move.y = (vecAbsVelocity.y + GetBaseVelocity().y ) * gpGlobals->frametime;
@@ -1123,7 +1123,7 @@ void CBaseEntity::PhysicsAddGravityMove( Vector &move )
 	SetBaseVelocity( vecBaseVelocity );
 	
 	vecAbsVelocity.z = newZVelocity;
-	SetAbsVelocity( vecAbsVelocity );
+	GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 
 	// Bound velocity
 	PhysicsCheckVelocity();
@@ -1196,7 +1196,7 @@ void CBaseEntity::ResolveFlyCollisionBounce( trace_t &trace, Vector &vecVelocity
 
 	// NOTE: A backoff of 2.0f is a reflection
 	Vector vecAbsVelocity;
-	PhysicsClipVelocity( GetAbsVelocity(), trace.plane.normal, vecAbsVelocity, 2.0f );
+	PhysicsClipVelocity(GetEngineObject()->GetAbsVelocity(), trace.plane.normal, vecAbsVelocity, 2.0f );
 	vecAbsVelocity *= flTotalElasticity;
 
 	// Get the total velocity (player + conveyors, etc.)
@@ -1220,7 +1220,7 @@ void CBaseEntity::ResolveFlyCollisionBounce( trace_t &trace, Vector &vecVelocity
 			flSpeedSqr = DotProduct( vecVelocity, vecVelocity );
 		}
 
-		SetAbsVelocity( vecAbsVelocity );
+		GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 
 		if ( flSpeedSqr < ( 30 * 30 ) )
 		{
@@ -1230,7 +1230,7 @@ void CBaseEntity::ResolveFlyCollisionBounce( trace_t &trace, Vector &vecVelocity
 			}
 
 			// Reset velocities.
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 			SetLocalAngularVelocity( vec3_angle );
 		}
 		else
@@ -1252,12 +1252,12 @@ void CBaseEntity::ResolveFlyCollisionBounce( trace_t &trace, Vector &vecVelocity
 		if ( flSpeedSqr < ( 30 * 30 ) )
 		{
 			// Reset velocities.
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 			SetLocalAngularVelocity( vec3_angle );
 		}
 		else
 		{
-			SetAbsVelocity( vecAbsVelocity );
+			GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 		}
 	}
 }
@@ -1274,11 +1274,11 @@ void CBaseEntity::ResolveFlyCollisionSlide( trace_t &trace, Vector &vecVelocity 
 	// A backoff of 1.0 is a slide.
 	float flBackOff = 1.0f;	
 	Vector vecAbsVelocity;
-	PhysicsClipVelocity( GetAbsVelocity(), trace.plane.normal, vecAbsVelocity, flBackOff );
+	PhysicsClipVelocity(GetEngineObject()->GetAbsVelocity(), trace.plane.normal, vecAbsVelocity, flBackOff );
 
 	if ( trace.plane.normal.z <= 0.7 )			// Floor
 	{
-		SetAbsVelocity( vecAbsVelocity );
+		GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 		return;
 	}
 
@@ -1300,7 +1300,7 @@ void CBaseEntity::ResolveFlyCollisionSlide( trace_t &trace, Vector &vecVelocity 
 		VectorAdd( vecAbsVelocity, GetBaseVelocity(), vecVelocity );
 		flSpeedSqr = DotProduct( vecVelocity, vecVelocity );
 	}
-	SetAbsVelocity( vecAbsVelocity );
+	GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 
 	if ( flSpeedSqr < ( 30 * 30 ) )
 	{
@@ -1310,7 +1310,7 @@ void CBaseEntity::ResolveFlyCollisionSlide( trace_t &trace, Vector &vecVelocity 
 		}
 
 		// Reset velocities.
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		SetLocalAngularVelocity( vec3_angle );
 	}
 	else
@@ -1331,7 +1331,7 @@ void CBaseEntity::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity
 	if ( trace.plane.normal.z > 0.7 )			// Floor
 	{
 		// Get the total velocity (player + conveyors, etc.)
-		VectorAdd( GetAbsVelocity(), GetBaseVelocity(), vecVelocity );
+		VectorAdd(GetEngineObject()->GetAbsVelocity(), GetBaseVelocity(), vecVelocity );
 
 		// Verify that we have an entity.
 		CBaseEntity *pEntity = (CBaseEntity*)trace.m_pEnt;
@@ -1340,9 +1340,9 @@ void CBaseEntity::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity
 		// Are we on the ground?
 		if ( vecVelocity.z < ( GetActualGravity( this ) * gpGlobals->frametime ) )
 		{
-			Vector vecAbsVelocity = GetAbsVelocity();
+			Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 			vecAbsVelocity.z = 0.0f;
-			SetAbsVelocity( vecAbsVelocity );
+			GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 		}
 
 		if ( pEntity->IsStandable() )
@@ -1422,9 +1422,9 @@ void CBaseEntity::PhysicsCheckWaterTransition( void )
 
 			if ( !GetEngineObject()->IsEFlagSet( EFL_NO_WATER_VELOCITY_CHANGE ) )
 			{
-				Vector vecAbsVelocity = GetAbsVelocity();
+				Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 				vecAbsVelocity[2] *= 0.5;
-				SetAbsVelocity( vecAbsVelocity );
+				GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 			}
 		}
 	}
@@ -1453,8 +1453,8 @@ void CBaseEntity::SimulateAngles( float flFrameTime )
 {
 	// move angles
 	QAngle angles;
-	VectorMA ( GetLocalAngles(), flFrameTime, GetLocalAngularVelocity(), angles );
-	SetLocalAngles( angles );
+	VectorMA (GetEngineObject()->GetLocalAngles(), flFrameTime, GetLocalAngularVelocity(), angles );
+	GetEngineObject()->SetLocalAngles( angles );
 }
 
 
@@ -1473,7 +1473,7 @@ void CBaseEntity::PhysicsToss( void )
 		return;
 
 	// Moving upward, off the ground, or  resting on a client/monster, remove FL_ONGROUND
-	if ( GetAbsVelocity()[2] > 0 || !GetGroundEntity() || !GetGroundEntity()->IsStandable() )
+	if (GetEngineObject()->GetAbsVelocity()[2] > 0 || !GetGroundEntity() || !GetGroundEntity()->IsStandable() )
 	{
 		SetGroundEntity( NULL );
 	}
@@ -1481,7 +1481,7 @@ void CBaseEntity::PhysicsToss( void )
 	// Check to see if entity is on the ground at rest
 	if ( GetFlags() & FL_ONGROUND )
 	{
-		if ( VectorCompare( GetAbsVelocity(), vec3_origin ) )
+		if ( VectorCompare(GetEngineObject()->GetAbsVelocity(), vec3_origin ) )
 		{
 			// Clear rotation if not moving (even if on a conveyor)
 			SetLocalAngularVelocity( vec3_angle );
@@ -1501,7 +1501,7 @@ void CBaseEntity::PhysicsToss( void )
 	{
 		// Base velocity is not properly accounted for since this entity will move again after the bounce without
 		// taking it into account
-		Vector vecAbsVelocity = GetAbsVelocity();
+		Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 		vecAbsVelocity += GetBaseVelocity();
 		VectorScale(vecAbsVelocity, gpGlobals->frametime, move);
 		PhysicsCheckVelocity( );
@@ -1516,7 +1516,7 @@ void CBaseEntity::PhysicsToss( void )
 #if !defined( CLIENT_DLL )
 	if ( VPhysicsGetObject() )
 	{
-		VPhysicsGetObject()->UpdateShadow( GetAbsOrigin(), vec3_angle, true, gpGlobals->frametime );
+		VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), vec3_angle, true, gpGlobals->frametime );
 	}
 #endif
 
@@ -1526,7 +1526,7 @@ void CBaseEntity::PhysicsToss( void )
 	{	
 		// entity is trapped in another solid
 		// UNDONE: does this entity needs to be removed?
-		SetAbsVelocity(vec3_origin);
+		GetEngineObject()->SetAbsVelocity(vec3_origin);
 		SetLocalAngularVelocity(vec3_angle);
 		return;
 	}
@@ -1556,7 +1556,7 @@ void CBaseEntity::PhysicsRigidChild( void )
 	// Collision impulses will be handled either not at all, or by
 	// forwarding the information to the highest move parent
 
-	Vector vecPrevOrigin = GetAbsOrigin();
+	Vector vecPrevOrigin = GetEngineObject()->GetAbsOrigin();
 
 	// regular thinking
 	if ( !PhysicsRunThink() )
@@ -1573,7 +1573,7 @@ void CBaseEntity::PhysicsRigidChild( void )
 	{
 		int solidType = GetSolid();
 		bool bAxisAligned = ( solidType == SOLID_BBOX || solidType == SOLID_NONE ) ? true : false;
-		VPhysicsGetObject()->UpdateShadow( GetAbsOrigin(), bAxisAligned ? vec3_angle : GetAbsAngles(), true, gpGlobals->frametime );
+		VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), bAxisAligned ? vec3_angle : GetEngineObject()->GetAbsAngles(), true, gpGlobals->frametime );
 	}
 #endif
 
@@ -1658,8 +1658,8 @@ void CBaseEntity::PhysicsSimulate( void )
 			// Apply momentum (add in half of the previous frame of velocity first)
 			// BUGBUG: This will break with PhysicsStep() because of the timestep difference
 			Vector vecAbsVelocity;
-			VectorMA( GetAbsVelocity(), 1.0 + (gpGlobals->frametime*0.5), GetBaseVelocity(), vecAbsVelocity );
-			SetAbsVelocity( vecAbsVelocity );
+			VectorMA(GetEngineObject()->GetAbsVelocity(), 1.0 + (gpGlobals->frametime*0.5), GetBaseVelocity(), vecAbsVelocity );
+			GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 			SetBaseVelocity( vec3_origin );
 		}
 		RemoveFlag( FL_BASEVELOCITY );

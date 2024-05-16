@@ -115,7 +115,7 @@ public:
 
 	Vector			EyePosition();
 	const Vector &	GetViewOffset();
-	Vector			EyePositionCrouched() { return GetAbsOrigin() - Vector( 0, 0, 330 ); }
+	Vector			EyePositionCrouched() { return GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 330 ); }
 
 	//---------------------------------
 	// CBaseAnimating
@@ -240,7 +240,7 @@ public:
 	void 			SetIdealHeight( float h );
 	void 			SetAbsIdealHeight( float z );
 	float			GetIdealHeight()			{ return m_idealHeight; }
-	Vector			GetAdjustedOrigin()			{ Vector result = GetAbsOrigin(); result.z -= GetMaxHeightModel() - GetHeight(); return result; }
+	Vector			GetAdjustedOrigin()			{ Vector result = GetEngineObject()->GetAbsOrigin(); result.z -= GetMaxHeightModel() - GetHeight(); return result; }
 
 	bool			IsInCrouchedPosture() { return GetIdealHeight() < GetMaxHeight() * .5; }
 	bool			IsInStandingPosture() { return !IsInCrouchedPosture(); }

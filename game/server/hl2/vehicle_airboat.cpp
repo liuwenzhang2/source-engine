@@ -498,12 +498,12 @@ void CPropAirboat::CreatePlayerBlocker()
 	Assert( m_hPlayerBlocker == NULL );
 	DestroyPlayerBlocker();
 	
-	m_hPlayerBlocker = CEntityBlocker::Create( GetAbsOrigin(), Vector( -84, -32, 0 ), Vector( 54, 32, 84 ), this, false );
+	m_hPlayerBlocker = CEntityBlocker::Create(GetEngineObject()->GetAbsOrigin(), Vector( -84, -32, 0 ), Vector( 54, 32, 84 ), this, false );
 	if ( m_hPlayerBlocker != NULL )
 	{
 		m_hPlayerBlocker->GetEngineObject()->SetParent( this->GetEngineObject() );
-		m_hPlayerBlocker->SetLocalOrigin( vec3_origin );
-		m_hPlayerBlocker->SetLocalAngles( vec3_angle );
+		m_hPlayerBlocker->GetEngineObject()->SetLocalOrigin( vec3_origin );
+		m_hPlayerBlocker->GetEngineObject()->SetLocalAngles( vec3_angle );
 		m_hPlayerBlocker->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 		m_hPlayerBlocker->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
@@ -1725,7 +1725,7 @@ void CPropAirboat::FireGun( )
 		CalculateBulletDamageForce( &info, ammoType, vecRay, pEnt->WorldSpaceCenter() );
 		pEnt->TakeDamage( info );
 
-		Vector vecVelocity = pEnt->GetAbsVelocity();
+		Vector vecVelocity = pEnt->GetEngineObject()->GetAbsVelocity();
 
 		// Pick a vector perpendicular to the vecRay which will push it away from the airboat
 		Vector vecPerp;
@@ -1742,7 +1742,7 @@ void CPropAirboat::FireGun( )
 
 			vecPerp *= random->RandomFloat( 15, 25 );
 			vecVelocity += vecPerp;
-			pEnt->SetAbsVelocity( vecVelocity );
+			pEnt->GetEngineObject()->SetAbsVelocity( vecVelocity );
 //			pEnt->DisableGuiding();
 		}
 	}
@@ -1877,14 +1877,14 @@ void CPropAirboat::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData )
 		// Play a sound around us to make NPCs pay attention to us
 		if ( m_VehiclePhysics.GetThrottle() > 0 )
 		{
-			CSoundEnt::InsertSound( SOUND_PLAYER_VEHICLE, pPlayer->GetAbsOrigin(), 3500, 0.1f, pPlayer, SOUNDENT_CHANNEL_REPEATED_PHYSICS_DANGER );
+			CSoundEnt::InsertSound( SOUND_PLAYER_VEHICLE, pPlayer->GetEngineObject()->GetAbsOrigin(), 3500, 0.1f, pPlayer, SOUNDENT_CHANNEL_REPEATED_PHYSICS_DANGER );
 		}
 	}
 
 	Vector vecVelocityWorld;
 	GetVelocity( &vecVelocityWorld, NULL );
 	Vector vecVelocityLocal;
-	GetEngineObject()->WorldToEntitySpace( GetAbsOrigin() + vecVelocityWorld, &vecVelocityLocal );
+	GetEngineObject()->WorldToEntitySpace(GetEngineObject()->GetAbsOrigin() + vecVelocityWorld, &vecVelocityLocal );
 	
 	m_vecPhysVelocity = vecVelocityLocal;
 }
@@ -1895,8 +1895,8 @@ void CPropAirboat::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData )
 //-----------------------------------------------------------------------------
 void CPropAirboat::CreateDangerSounds( void )
 {
-	QAngle vehicleAngles = GetLocalAngles();
-	Vector vecStart = GetAbsOrigin();
+	QAngle vehicleAngles = GetEngineObject()->GetLocalAngles();
+	Vector vecStart = GetEngineObject()->GetAbsOrigin();
 	Vector vecDir, vecRight;
 
 	GetVectors( &vecDir, &vecRight, NULL );
@@ -2152,7 +2152,7 @@ void CPropAirboat::ApplyStressDamage( IPhysicsObject *pPhysics )
 	{
 		CTakeDamageInfo dmgInfo( GetWorldEntity(), GetWorldEntity(), vec3_origin, vec3_origin, damage, DMG_CRUSH );
 		dmgInfo.SetDamageForce( Vector( 0, 0, -stressOut.receivedStress * GetCurrentGravity() * gpGlobals->frametime ) );
-		dmgInfo.SetDamagePosition( GetAbsOrigin() );
+		dmgInfo.SetDamagePosition(GetEngineObject()->GetAbsOrigin() );
 		m_hPlayer->TakeDamage( dmgInfo );
 	}
 }

@@ -238,7 +238,7 @@ public:
 						if ( pProp )
 						{
 							m_PhysicsObjects.AddToTail( pProp );
-							pProp->SetAbsVelocity( Vector( this->RandomFloat(-500,500), this->RandomFloat(-500,500), this->RandomFloat(-500,500) ) );
+							pProp->GetEngineObject()->SetAbsVelocity( Vector( this->RandomFloat(-500,500), this->RandomFloat(-500,500), this->RandomFloat(-500,500) ) );
 							break;
 						}
 					}
@@ -348,8 +348,8 @@ public:
 			if ( pPlayer && (pPlayer->GetFlags() & FL_FAKECLIENT) )
 			{
 				crc += pPlayer->GetTeamNumber();
-				crc += (int)pPlayer->GetAbsOrigin().x; 
-				crc += (int)pPlayer->GetAbsOrigin().y; 
+				crc += (int)pPlayer->GetEngineObject()->GetAbsOrigin().x;
+				crc += (int)pPlayer->GetEngineObject()->GetAbsOrigin().y;
 			}
 		}
 

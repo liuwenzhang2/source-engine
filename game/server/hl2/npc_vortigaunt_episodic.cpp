@@ -446,12 +446,12 @@ void CNPC_Vortigaunt::RunTask( const Task_t *pTask )
 		CBasePlayer *pPlayer = AI_GetSinglePlayer();
 		if ( pPlayer != NULL )
 		{
-			GetMotor()->SetIdealYawToTargetAndUpdate( pPlayer->GetAbsOrigin(), AI_KEEP_YAW_SPEED );
+			GetMotor()->SetIdealYawToTargetAndUpdate( pPlayer->GetEngineObject()->GetAbsOrigin(), AI_KEEP_YAW_SPEED );
 			SetTurnActivity();
 			if ( GetMotor()->DeltaIdealYaw() < 10 )
 			{
 				// Wait for the player to get close enough
-				if ( ( GetAbsOrigin() - pPlayer->GetAbsOrigin() ).LengthSqr() < Square(32*12) )
+				if ( (GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin() ).LengthSqr() < Square(32*12) )
 				{
 					TaskComplete();
 				}
@@ -537,7 +537,7 @@ Vector  CNPC_Vortigaunt::FacingPosition( void )
 
 Vector CNPC_Vortigaunt::BodyTarget( const Vector &posSrc, bool bNoisy ) 
 { 
-	Vector low = WorldSpaceCenter() - ( WorldSpaceCenter() - GetAbsOrigin() ) * .25;
+	Vector low = WorldSpaceCenter() - ( WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin() ) * .25;
 
 	Vector high;
 	int iBone = LookupBone( "ValveBiped.neck1" );
@@ -582,7 +582,7 @@ bool CNPC_Vortigaunt::InnateWeaponLOSCondition( const Vector &ownerPos, const Ve
 	UTIL_PredictedPosition( this, flTimeDelta, &vecNewOwnerPos );
 	UTIL_PredictedPosition( GetEnemy(), flTimeDelta, &vecNewTargetPos );
 
-	Vector vecDelta = vecNewTargetPos - GetEnemy()->GetAbsOrigin();
+	Vector vecDelta = vecNewTargetPos - GetEnemy()->GetEngineObject()->GetAbsOrigin();
 	Vector vecFinalTargetPos = GetEnemy()->BodyTarget( vecNewOwnerPos ) + vecDelta;
 
 	// Debug data
@@ -638,11 +638,11 @@ int CNPC_Vortigaunt::RangeAttack1Conditions( float flDot, float flDist )
 	if ( IsAntlionWorker( GetEnemy() ) )
 	{
 		// See if it's too close to me
-		if ( ( GetAbsOrigin() - GetEnemy()->GetAbsOrigin() ).LengthSqr() < Square( AntlionWorkerBurstRadius() ) )
+		if ( (GetEngineObject()->GetAbsOrigin() - GetEnemy()->GetEngineObject()->GetAbsOrigin() ).LengthSqr() < Square( AntlionWorkerBurstRadius() ) )
 			return COND_TOO_CLOSE_TO_ATTACK;
 
 		CBasePlayer *pPlayer = AI_GetSinglePlayer();
-		if ( pPlayer && ( pPlayer->GetAbsOrigin() - GetEnemy()->GetAbsOrigin() ).LengthSqr() < Square( AntlionWorkerBurstRadius() ) )
+		if ( pPlayer && ( pPlayer->GetEngineObject()->GetAbsOrigin() - GetEnemy()->GetEngineObject()->GetAbsOrigin() ).LengthSqr() < Square( AntlionWorkerBurstRadius() ) )
 		{
 			// Warn the player to get away!
 			CFmtStrN<128> modifiers( "antlion_worker:true" );
@@ -687,7 +687,7 @@ int CNPC_Vortigaunt::NumAntlionsInRadius( float flRadius )
 {
 	CBaseEntity *sEnemySearch[16];
 	int nNumAntlions = 0;
-	int nNumEnemies = UTIL_EntitiesInBox( sEnemySearch, ARRAYSIZE(sEnemySearch), GetAbsOrigin()-Vector(flRadius,flRadius,flRadius), GetAbsOrigin()+Vector(flRadius,flRadius,flRadius), FL_NPC );
+	int nNumEnemies = UTIL_EntitiesInBox( sEnemySearch, ARRAYSIZE(sEnemySearch), GetEngineObject()->GetAbsOrigin()-Vector(flRadius,flRadius,flRadius), GetEngineObject()->GetAbsOrigin()+Vector(flRadius,flRadius,flRadius), FL_NPC );
 	for ( int i = 0; i < nNumEnemies; i++ )
 	{
 		// We only care about antlions
@@ -769,7 +769,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 	// Kaboom!
 	if ( pEvent->event == AE_VORTIGAUNT_DISPEL )
 	{
-		DispelAntlions( GetAbsOrigin(), 400.0f );
+		DispelAntlions(GetEngineObject()->GetAbsOrigin(), 400.0f );
 		return;
 	}
 
@@ -915,7 +915,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 
 				//NDebugOverlay::Box( vecSpawnOrigin, -Vector(20,20,20), Vector(20,20,20), 0,255,0, 64, 100 );
 
-				pWeapon->SetAbsOrigin( vecSpawnOrigin );
+				pWeapon->GetEngineObject()->SetAbsOrigin( vecSpawnOrigin );
 				pWeapon->Drop( Vector(0,0,1) );
 			}
 
@@ -1393,7 +1393,7 @@ CBaseEntity *CNPC_Vortigaunt::FindHealTarget( void )
 	//	return false;
 
 	// Find a likely target in range
-	CBaseEntity *pEntity = PlayerInRange( GetAbsOrigin(), HEAL_SEARCH_RANGE );
+	CBaseEntity *pEntity = PlayerInRange(GetEngineObject()->GetAbsOrigin(), HEAL_SEARCH_RANGE );
 
 	// Make sure we can heal that target
 	if ( ShouldHealTarget( pEntity ) == false )
@@ -1659,7 +1659,7 @@ bool CNPC_Vortigaunt::CanBeUsedAsAFriend( void )
 bool CNPC_Vortigaunt::FInViewCone( CBaseEntity *pEntity )
 {
 	// Vort can see 360 degrees but only at limited distance
-	if( ( pEntity->IsNPC() || pEntity->IsPlayer() ) && pEntity->GetAbsOrigin().DistToSqr(GetAbsOrigin()) <= VORT_360_VIEW_DIST_SQR )
+	if( ( pEntity->IsNPC() || pEntity->IsPlayer() ) && pEntity->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin()) <= VORT_360_VIEW_DIST_SQR )
 		return true;
 
 	return BaseClass::FInViewCone( pEntity );
@@ -1931,8 +1931,8 @@ void CNPC_Vortigaunt::ArmBeam( int beamType, int nHand )
 	int side = ( nHand == HAND_LEFT ) ? -1 : 1;
 
 	Vector forward, right, up;
-	AngleVectors( GetLocalAngles(), &forward, &right, &up );
-	Vector vecSrc = GetLocalOrigin() + up * 36 + right * side * 16 + forward * 32;
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, &right, &up );
+	Vector vecSrc = GetEngineObject()->GetLocalOrigin() + up * 36 + right * side * 16 + forward * 32;
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -1991,7 +1991,7 @@ void CNPC_Vortigaunt::StartHandGlow( int beamType, int nHand )
 			if ( m_hHandEffect[nHand] == NULL )
 			{
 				// Create the token if it doesn't already exist
-				m_hHandEffect[nHand] = CVortigauntEffectDispel::CreateEffectDispel( GetAbsOrigin(), this, NULL );
+				m_hHandEffect[nHand] = CVortigauntEffectDispel::CreateEffectDispel(GetEngineObject()->GetAbsOrigin(), this, NULL );
 				if ( m_hHandEffect[nHand] == NULL )
 					return;
 			}
@@ -1999,7 +1999,7 @@ void CNPC_Vortigaunt::StartHandGlow( int beamType, int nHand )
 			// Stomp our settings
 			m_hHandEffect[nHand]->GetEngineObject()->SetParent( this->GetEngineObject(), (nHand == HAND_LEFT) ? m_iLeftHandAttachment : m_iRightHandAttachment);
 			m_hHandEffect[nHand]->SetMoveType( MOVETYPE_NONE );
-			m_hHandEffect[nHand]->SetLocalOrigin( Vector( 8.0f, 4.0f, 0.0f ) );
+			m_hHandEffect[nHand]->GetEngineObject()->SetLocalOrigin( Vector( 8.0f, 4.0f, 0.0f ) );
 		}
 		break;
 
@@ -2099,7 +2099,7 @@ void CNPC_Vortigaunt::ZapBeam( int nHand )
 	Vector forward;
 	GetVectors( &forward, NULL, NULL );
 
-	Vector vecSrc = GetAbsOrigin() + GetViewOffset();
+	Vector vecSrc = GetEngineObject()->GetAbsOrigin() + GetViewOffset();
 	Vector vecAim = GetShootEnemyDir( vecSrc, false );	// We want a clear shot to their core
 
 	if ( GetEnemy() )
@@ -2339,13 +2339,13 @@ int CNPC_Vortigaunt::IRelationPriority( CBaseEntity *pTarget )
 	if ( pEnemy != NULL && pEnemy != pTarget )
 	{
 		// I have an enemy that is not this thing. If that enemy is near, I shouldn't become distracted.
-		if ( GetAbsOrigin().DistToSqr( pEnemy->GetAbsOrigin()) < Square(15*12) )
+		if (GetEngineObject()->GetAbsOrigin().DistToSqr( pEnemy->GetEngineObject()->GetAbsOrigin()) < Square(15*12) )
 			return priority;
 	}
 
 	// Targets near our follow target have a higher priority to us
 	if ( m_FollowBehavior.GetFollowTarget() && 
-		m_FollowBehavior.GetFollowTarget()->GetAbsOrigin().DistToSqr( pTarget->GetAbsOrigin() ) < Square(25*12) )
+		m_FollowBehavior.GetFollowTarget()->GetEngineObject()->GetAbsOrigin().DistToSqr( pTarget->GetEngineObject()->GetAbsOrigin() ) < Square(25*12) )
 	{
 		priority++;
 	}
@@ -2370,7 +2370,7 @@ Disposition_t CNPC_Vortigaunt::IRelationType( CBaseEntity *pTarget )
 
 	if ( pTarget->Classify() == CLASS_ZOMBIE && disposition == D_HT )
 	{
-		if( GetAbsOrigin().DistToSqr(pTarget->GetAbsOrigin()) < VORTIGAUNT_FEAR_ZOMBIE_DIST_SQR )
+		if(GetEngineObject()->GetAbsOrigin().DistToSqr(pTarget->GetEngineObject()->GetAbsOrigin()) < VORTIGAUNT_FEAR_ZOMBIE_DIST_SQR )
 		{
 			// Be afraid of a zombie that's near if I'm not allowed to dodge. This will make Alyx back away.
 			return D_FR;
@@ -2574,7 +2574,7 @@ void CNPC_Vortigaunt::DispelAntlions( const Vector &vecOrigin, float flRadius, b
 			if ( tr.fraction < 1.0f && tr.m_pEnt != pAntlion )
 				continue;
 
-			Vector vecDir = ( pAntlion->GetAbsOrigin() - vecOrigin );
+			Vector vecDir = ( pAntlion->GetEngineObject()->GetAbsOrigin() - vecOrigin );
 			vecDir[2] = 0.0f;
 			float flDist = VectorNormalize( vecDir );
 
@@ -2590,7 +2590,7 @@ void CNPC_Vortigaunt::DispelAntlions( const Vector &vecOrigin, float flRadius, b
 			{
 				// splat!
 				vecDir[2] += 400.0f * flFalloff;
-				CTakeDamageInfo dmgInfo( this, this, vecDir, pAntlion->GetAbsOrigin() , 100, DMG_SHOCK );
+				CTakeDamageInfo dmgInfo( this, this, vecDir, pAntlion->GetEngineObject()->GetAbsOrigin() , 100, DMG_SHOCK );
 				pAntlion->TakeDamage( dmgInfo );
 			}
 			else
@@ -3148,7 +3148,7 @@ CVortigauntChargeToken *CVortigauntChargeToken::CreateChargeToken( const Vector 
 	}
 
 	// Start out at that speed
-	pToken->SetAbsVelocity( vecInitialVelocity );
+	pToken->GetEngineObject()->SetAbsVelocity( vecInitialVelocity );
 
 	return pToken;
 }
@@ -3205,7 +3205,7 @@ Vector CVortigauntChargeToken::GetSteerVector( const Vector &vecForward )
 
 	// Use two probes fanned out a head of us
 	Vector vecProbe;
-	float flSpeed = GetAbsVelocity().Length();
+	float flSpeed = GetEngineObject()->GetAbsVelocity().Length();
 
 	// Try right 
 	vecProbe = vecForward + vecRight;	
@@ -3218,14 +3218,14 @@ Vector CVortigauntChargeToken::GetSteerVector( const Vector &vecForward )
 	filterSkip.AddEntityToIgnore( m_hTarget );
 
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + vecProbe, MASK_SHOT, &filterSkip, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecProbe, MASK_SHOT, &filterSkip, &tr );
 	vecSteer -= vecRight * 100.0f * ( 1.0f - tr.fraction );
 
 	// Try left
 	vecProbe = vecForward - vecRight;
 	vecProbe *= flSpeed;
 
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + vecProbe, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecProbe, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 	vecSteer += vecRight * 100.0f * ( 1.0f - tr.fraction );
 
 	return vecSteer;
@@ -3248,10 +3248,10 @@ void CVortigauntChargeToken::SeekThink( void )
 	}
 
 	// Find the direction towards our goal and start to go there
-	Vector vecDir = ( m_hTarget->WorldSpaceCenter() - GetAbsOrigin() );
+	Vector vecDir = ( m_hTarget->WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin() );
 	VectorNormalize( vecDir );
 
-	float flSpeed = GetAbsVelocity().Length();
+	float flSpeed = GetEngineObject()->GetAbsVelocity().Length();
 	float flDelta = gpGlobals->curtime - GetLastThink();
 
 	if ( flSpeed < VTOKEN_MAX_SPEED )
@@ -3273,7 +3273,7 @@ void CVortigauntChargeToken::SeekThink( void )
 	
 	vecOffset += GetSteerVector( vecDir );
 
-	SetAbsVelocity( ( vecDir * flSpeed ) + vecOffset );
+	GetEngineObject()->SetAbsVelocity( ( vecDir * flSpeed ) + vecOffset );
 	SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
@@ -3325,7 +3325,7 @@ void CVortigauntChargeToken::FadeAndDie( void )
 {
 	SetTouch( NULL );
 
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 	m_bFadeOut = true;
 	SetThink( &CBaseEntity::SUB_Remove );

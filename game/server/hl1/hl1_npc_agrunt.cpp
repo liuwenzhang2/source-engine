@@ -291,15 +291,15 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 
 			if (HasCondition( COND_SEE_ENEMY) && GetEnemy())
 			{
-				Vector vecEnemyLKP = GetEnemy()->GetAbsOrigin();
+				Vector vecEnemyLKP = GetEnemy()->GetEngineObject()->GetAbsOrigin();
 
-				vecDirToEnemy = ( ( vecEnemyLKP ) - GetAbsOrigin() );
+				vecDirToEnemy = ( ( vecEnemyLKP ) -GetEngineObject()->GetAbsOrigin() );
 				VectorAngles( vecDirToEnemy, angDir );
 				VectorNormalize( vecDirToEnemy );
 			}
 			else
 			{
-				angDir = GetAbsAngles();
+				angDir = GetEngineObject()->GetAbsAngles();
 				angDir.x = -angDir.x;
 
 				Vector vForward;
@@ -321,7 +321,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 			vecArmPos = vecArmPos + vecDirToEnemy * 32;
 		
 			{
-				CPVSFilter filter(GetAbsOrigin());
+				CPVSFilter filter(GetEngineObject()->GetAbsOrigin());
 				te->Sprite(filter, 0.0,
 					&vecArmPos, iAgruntMuzzleFlash, random->RandomFloat(0.4, 0.8), 128);
 			}
@@ -331,7 +331,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 			Vector vForward;
 			AngleVectors( angDir, &vForward );
 	
-			pHornet->SetAbsVelocity( vForward * 300 );
+			pHornet->GetEngineObject()->SetAbsVelocity( vForward * 300 );
 			pHornet->SetOwnerEntity( this );
 			
 			const char* soundname = "Weapon_Hornetgun.Single";
@@ -384,13 +384,13 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 					 pHurt->ViewPunch( QAngle( -25, 8, 0) );
 
 				Vector vRight;
-				AngleVectors( GetAbsAngles(), NULL, &vRight, NULL );
+				AngleVectors(GetEngineObject()->GetAbsAngles(), NULL, &vRight, NULL );
 
 				// OK to use gpGlobals without calling MakeVectors, cause CheckTraceHullAttack called it above.
 				if ( pHurt->IsPlayer() )
 				{
 					// this is a player. Knock him around.
-					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() + vRight * 250 );
+					pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() + vRight * 250 );
 				}
 
 				g_pSoundEmitterSystem->EmitSound(filter4, entindex(), "AlienGrunt.AttackHit" );
@@ -428,8 +428,8 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 				{
 					// this is a player. Knock him around.
 					Vector vRight;
-					AngleVectors( GetAbsAngles(), NULL, &vRight, NULL );
-					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() + vRight * -250 );
+					AngleVectors(GetEngineObject()->GetAbsAngles(), NULL, &vRight, NULL );
+					pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() + vRight * -250 );
 				}
 
 				g_pSoundEmitterSystem->EmitSound( filter5, entindex(), "AlienGrunt.AttackHit" );
@@ -675,7 +675,7 @@ void CNPC_AlienGrunt::StartTask ( const Task_t *pTask )
 	case TASK_AGRUNT_GET_PATH_TO_ENEMY_CORPSE:
 		{
 			Vector forward;
-			AngleVectors( GetAbsAngles(), &forward );
+			AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
 			Vector flEnemyLKP = GetEnemyLKP();
 
 			GetNavigator()->SetGoal( flEnemyLKP - forward * 64, AIN_CLEAR_TARGET);
@@ -712,14 +712,14 @@ void CNPC_AlienGrunt::StartTask ( const Task_t *pTask )
 			vecCenter = WorldSpaceCenter();
 			vecEnemyLKP = GetEnemyLKP();
 
-			VectorAngles( vecEnemyLKP - GetAbsOrigin(), angTmp );
-			SetAbsAngles( angTmp );
-			AngleVectors( GetAbsAngles(), &vForward, &vRight, NULL );
+			VectorAngles( vecEnemyLKP - GetEngineObject()->GetAbsOrigin(), angTmp );
+			GetEngineObject()->SetAbsAngles( angTmp );
+			AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward, &vRight, NULL );
 
 			UTIL_TraceLine( WorldSpaceCenter() + vForward * 128, vecEnemyLKP, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 			if ( tr.fraction == 1.0 )
 			{
-				GetMotor()->SetIdealYawToTargetAndUpdate ( GetAbsOrigin() + vRight * 128 );
+				GetMotor()->SetIdealYawToTargetAndUpdate (GetEngineObject()->GetAbsOrigin() + vRight * 128 );
 				fSkip = TRUE;
 				TaskComplete();
 			}
@@ -729,7 +729,7 @@ void CNPC_AlienGrunt::StartTask ( const Task_t *pTask )
 				UTIL_TraceLine( WorldSpaceCenter() - vForward * 128, vecEnemyLKP, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 				if ( tr.fraction == 1.0 )
 				{
-					GetMotor()->SetIdealYawToTargetAndUpdate ( GetAbsOrigin() - vRight * 128 );
+					GetMotor()->SetIdealYawToTargetAndUpdate (GetEngineObject()->GetAbsOrigin() - vRight * 128 );
 					fSkip = TRUE;
 					TaskComplete();
 				}
@@ -740,7 +740,7 @@ void CNPC_AlienGrunt::StartTask ( const Task_t *pTask )
 				UTIL_TraceLine( WorldSpaceCenter() + vForward * 256, vecEnemyLKP, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 				if ( tr.fraction == 1.0 )
 				{
-					GetMotor()->SetIdealYawToTargetAndUpdate ( GetAbsOrigin() + vRight * 256 );
+					GetMotor()->SetIdealYawToTargetAndUpdate (GetEngineObject()->GetAbsOrigin() + vRight * 256 );
 					fSkip = TRUE;
 					TaskComplete();
 				}
@@ -751,7 +751,7 @@ void CNPC_AlienGrunt::StartTask ( const Task_t *pTask )
 				UTIL_TraceLine( WorldSpaceCenter() - vForward * 256, vecEnemyLKP, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 				if ( tr.fraction == 1.0 )
 				{
-					GetMotor()->SetIdealYawToTargetAndUpdate ( GetAbsOrigin() - vRight * 256 );
+					GetMotor()->SetIdealYawToTargetAndUpdate (GetEngineObject()->GetAbsOrigin() - vRight * 256 );
 					fSkip = TRUE;
 					TaskComplete();
 				}

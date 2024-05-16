@@ -61,11 +61,11 @@ END_NETWORK_TABLE()
 			float changeTime = GetLastChangeTime( LATCH_SIMULATION_VAR );
 
 			// Add a sample 1 second back.
-			Vector vCurOrigin = GetLocalOrigin() - m_vInitialVelocity;
+			Vector vCurOrigin = GetEngineObject()->GetLocalOrigin() - m_vInitialVelocity;
 			interpolator.AddToHead( changeTime - 1.0, &vCurOrigin, false );
 
 			// Add the current sample.
-			vCurOrigin = GetLocalOrigin();
+			vCurOrigin = GetEngineObject()->GetLocalOrigin();
 			interpolator.AddToHead( changeTime, &vCurOrigin, false );
 		}
 	}
@@ -135,13 +135,13 @@ END_NETWORK_TABLE()
 			return;
 		}
 
-		CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin() + GetAbsVelocity() * 0.5, GetAbsVelocity().Length( ), 0.2 );
+		CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 0.5, GetEngineObject()->GetAbsVelocity().Length( ), 0.2 );
 
 		SetNextThink( gpGlobals->curtime + 0.2 );
 
 		if (GetWaterLevel() != 0)
 		{
-			SetAbsVelocity( GetAbsVelocity() * 0.5 );
+			GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.5 );
 		}
 	}
 
@@ -180,18 +180,18 @@ END_NETWORK_TABLE()
 		if (breakthrough)
 		{
 			CTakeDamageInfo info( this, this, 10, DMG_CLUB );
-			((CBaseEntity*)trace.m_pEnt)->DispatchTraceAttack( info, GetAbsVelocity(), &trace );
+			((CBaseEntity*)trace.m_pEnt)->DispatchTraceAttack( info, GetEngineObject()->GetAbsVelocity(), &trace );
 
 			ApplyMultiDamage();
 
 			if(((CBaseEntity*)trace.m_pEnt)->m_iHealth <= 0 )
 			{
 				// slow our flight a little bit
-				Vector vel = GetAbsVelocity();
+				Vector vel = GetEngineObject()->GetAbsVelocity();
 
 				vel *= 0.4;
 
-				SetAbsVelocity( vel );
+				GetEngineObject()->SetAbsVelocity( vel );
 				return;
 			}
 		}
@@ -201,7 +201,7 @@ END_NETWORK_TABLE()
 
 		// NOTE: A backoff of 2.0f is a reflection
 		Vector vecAbsVelocity;
-		PhysicsClipVelocity( GetAbsVelocity(), trace.plane.normal, vecAbsVelocity, 2.0f );
+		PhysicsClipVelocity(GetEngineObject()->GetAbsVelocity(), trace.plane.normal, vecAbsVelocity, 2.0f );
 		vecAbsVelocity *= flTotalElasticity;
 
 		// Get the total velocity (player + conveyors, etc.)
@@ -215,7 +215,7 @@ END_NETWORK_TABLE()
 			CBaseEntity *pEntity = (CBaseEntity*)trace.m_pEnt;
 			Assert( pEntity );
 
-			SetAbsVelocity( vecAbsVelocity );
+			GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 
 			if ( flSpeedSqr < ( 30 * 30 ) )
 			{
@@ -225,7 +225,7 @@ END_NETWORK_TABLE()
 				}
 
 				// Reset velocities.
-				SetAbsVelocity( vec3_origin );
+				GetEngineObject()->SetAbsVelocity( vec3_origin );
 				SetLocalAngularVelocity( vec3_angle );
 
 				//align to the ground so we're not standing on end
@@ -237,7 +237,7 @@ END_NETWORK_TABLE()
 
 				// TODO: rotate around trace.plane.normal
 				
-				SetAbsAngles( angle );			
+				GetEngineObject()->SetAbsAngles( angle );
 			}
 			else
 			{
@@ -258,12 +258,12 @@ END_NETWORK_TABLE()
 			if ( flSpeedSqr < ( 30 * 30 ) )
 			{
 				// Reset velocities.
-				SetAbsVelocity( vec3_origin );
+				GetEngineObject()->SetAbsVelocity( vec3_origin );
 				SetLocalAngularVelocity( vec3_angle );
 			}
 			else
 			{
-				SetAbsVelocity( vecAbsVelocity );
+				GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 			}
 		}
 		
@@ -277,9 +277,9 @@ END_NETWORK_TABLE()
 			if ( event )
 			{
 				event->SetInt( "userid", player->GetUserID() );
-				event->SetFloat( "x", GetAbsOrigin().x );
-				event->SetFloat( "y", GetAbsOrigin().y );
-				event->SetFloat( "z", GetAbsOrigin().z );
+				event->SetFloat( "x", GetEngineObject()->GetAbsOrigin().x );
+				event->SetFloat( "y", GetEngineObject()->GetAbsOrigin().y );
+				event->SetFloat( "z", GetEngineObject()->GetAbsOrigin().z );
 				gameeventmanager->FireEvent( event );
 			}
 		}
@@ -294,7 +294,7 @@ END_NETWORK_TABLE()
 
 	void CBaseCSGrenadeProjectile::Splash()
 	{
-		Vector centerPoint = GetAbsOrigin();
+		Vector centerPoint = GetEngineObject()->GetAbsOrigin();
 		Vector normal( 0, 0, 1 );
 
 		// Find our water surface by tracing up till we're out of the water

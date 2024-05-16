@@ -94,7 +94,7 @@ void CWeaponPschreck::FireRocket( void )
 #ifdef DBGFLAG_ASSERT
 	CPschreckRocket *pRocket = 
 #endif //DEBUG		
-		CPschreckRocket::Create( pPlayer->Weapon_ShootPosition(), pPlayer->GetAbsAngles(), pPlayer );
+		CPschreckRocket::Create( pPlayer->Weapon_ShootPosition(), pPlayer->GetEngineObject()->GetAbsAngles(), pPlayer );
 
 	Assert( pRocket );
 

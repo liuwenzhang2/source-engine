@@ -110,12 +110,12 @@ void CWindowPane::PaneTouch( CBaseEntity *pOther )
 //------------------------------------------------------------------------------
 void CWindowPane::Die( void )
 {
-	Vector flForce = -1 * GetAbsVelocity();
+	Vector flForce = -1 * GetEngineObject()->GetAbsVelocity();
 
-	CPASFilter filter( GetAbsOrigin() );
+	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 	te->ShatterSurface( filter, 0.0,
-					 &GetAbsOrigin(), &GetAbsAngles(), 
-					 &GetAbsVelocity(), &GetAbsOrigin(),
+					 &GetEngineObject()->GetAbsOrigin(), &GetEngineObject()->GetAbsAngles(),
+					 &GetEngineObject()->GetAbsVelocity(), &GetEngineObject()->GetAbsOrigin(),
 					 WINDOW_PANEL_SIZE, WINDOW_PANEL_SIZE,WINDOW_SMALL_SHARD_SIZE,SHATTERSURFACE_GLASS,
 					 255,255,255,255,255,255);
 
@@ -138,8 +138,8 @@ CWindowPane* CWindowPane::CreateWindowPane( const Vector &vecOrigin, const QAngl
 
 	if ( pGlass->entindex()!=-1 )
 	{
-		pGlass->SetLocalOrigin( vecOrigin );
-		pGlass->SetLocalAngles( vecAngles );
+		pGlass->GetEngineObject()->SetLocalOrigin( vecOrigin );
+		pGlass->GetEngineObject()->SetLocalAngles( vecAngles );
 		pGlass->Spawn();
 		pGlass->SetTouch(&CWindowPane::PaneTouch);
 		pGlass->SetLocalAngularVelocity( RandomAngle(-50,50) );
@@ -308,16 +308,16 @@ void CBreakableSurface::SurfaceTouch( CBaseEntity *pOther )
 		// Randomly break the one before so it doesn't look square
 		if (random->RandomInt(0,1))
 		{
-			ShatterPane(nMinWidth-1, height,vHitVel,pOther->GetLocalOrigin());
+			ShatterPane(nMinWidth-1, height,vHitVel,pOther->GetEngineObject()->GetLocalOrigin());
 		}
 		for (int width=nMinWidth;width<nMaxWidth;width++)
 		{
-			ShatterPane(width, height,vHitVel,pOther->GetLocalOrigin());
+			ShatterPane(width, height,vHitVel,pOther->GetEngineObject()->GetLocalOrigin());
 		}
 		// Randomly break the one after so it doesn't look square
 		if (random->RandomInt(0,1))
 		{
-			ShatterPane(nMaxWidth+1, height,vHitVel,pOther->GetLocalOrigin());
+			ShatterPane(nMaxWidth+1, height,vHitVel,pOther->GetEngineObject()->GetLocalOrigin());
 		}
 	}
 }
@@ -338,7 +338,7 @@ int CBreakableSurface::OnTakeDamage( const CTakeDamageInfo &info )
 
 	if ( m_nSurfaceType == SHATTERSURFACE_GLASS && info.GetDamageType() & DMG_BLAST )
 	{
-		Vector vecDir = info.GetInflictor()->GetAbsOrigin() - WorldSpaceCenter();
+		Vector vecDir = info.GetInflictor()->GetEngineObject()->GetAbsOrigin() - WorldSpaceCenter();
 		VectorNormalize( vecDir );
 		Die( info.GetAttacker(), vecDir );
 		return 0;
@@ -469,7 +469,7 @@ void CBreakableSurface::TraceAttack( const CTakeDamageInfo &info, const Vector &
 			float flWidth,flHeight;
 			if (info.GetAttacker())
 			{
-				PanePos(info.GetAttacker()->GetAbsOrigin(),&flWidth,&flHeight);
+				PanePos(info.GetAttacker()->GetEngineObject()->GetAbsOrigin(),&flWidth,&flHeight);
 			}
 			else
 			{
@@ -612,7 +612,7 @@ void CBreakableSurface::Die( CBaseEntity *pBreaker, const Vector &vAttackDir )
 		return;
 
 	// Play a break sound
-	PhysBreakSound( this, VPhysicsGetObject(), GetAbsOrigin() );
+	PhysBreakSound( this, VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
 
 	m_bIsBroken = true;
 	m_iHealth = 0.0f;

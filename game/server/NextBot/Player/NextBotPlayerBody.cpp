@@ -218,7 +218,7 @@ void PlayerBody::Upkeep( void )
 				desiredLookAtPos = subject->WorldSpaceCenter();
 			}
 
-			desiredLookAtPos += GetHeadAimSubjectLeadTime() * subject->GetAbsVelocity();
+			desiredLookAtPos += GetHeadAimSubjectLeadTime() * subject->GetEngineObject()->GetAbsVelocity();
 
 			Vector errorVector = desiredLookAtPos - m_lookAtPos;
 			float error = errorVector.NormalizeInPlace();
@@ -231,7 +231,7 @@ void PlayerBody::Upkeep( void )
 
 			float errorVel = error / trackingInterval;
 
-			m_lookAtVelocity = ( errorVel * errorVector ) + subject->GetAbsVelocity();
+			m_lookAtVelocity = ( errorVel * errorVector ) + subject->GetEngineObject()->GetAbsVelocity();
 
 			m_lookAtTrackingTimer.Start( RandomFloat( 0.8f, 1.2f ) * trackingInterval );
 		}
@@ -328,7 +328,7 @@ void PlayerBody::Upkeep( void )
 //-----------------------------------------------------------------------------------------------
 bool PlayerBody::SetPosition( const Vector &pos )
 {
-	m_player->SetAbsOrigin( pos );	
+	m_player->GetEngineObject()->SetAbsOrigin( pos );
 	return true;
 }
 

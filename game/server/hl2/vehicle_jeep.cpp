@@ -390,7 +390,7 @@ void CPropJeep::AimGunAt( Vector *endPos, float flInterval )
 
 		// Make the gun go limp and look "down"
 		Vector	v_forward, v_up;
-		AngleVectors( GetLocalAngles(), NULL, &v_forward, &v_up );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), NULL, &v_forward, &v_up );
 		aimPos = WorldSpaceCenter() + ( v_forward * -32.0f ) - Vector( 0, 0, 128.0f );
 	}
 
@@ -1394,8 +1394,8 @@ void CPropJeep::CreateDangerSounds( void )
 	if ( m_flDangerSoundTime > gpGlobals->curtime )
 		return;
 
-	QAngle vehicleAngles = GetLocalAngles();
-	Vector vecStart = GetAbsOrigin();
+	QAngle vehicleAngles = GetEngineObject()->GetLocalAngles();
+	Vector vecStart = GetEngineObject()->GetAbsOrigin();
 	Vector vecDir, vecRight;
 
 	GetVectors( &vecDir, &vecRight, NULL );
@@ -1444,7 +1444,7 @@ void CPropJeep::CreateDangerSounds( void )
 	}
 
 	// Make engine sounds even when we're not going fast.
-	CSoundEnt::InsertSound( SOUND_PLAYER | SOUND_CONTEXT_PLAYER_VEHICLE, GetAbsOrigin(), 800, soundDuration, this, 0 );
+	CSoundEnt::InsertSound( SOUND_PLAYER | SOUND_CONTEXT_PLAYER_VEHICLE, GetEngineObject()->GetAbsOrigin(), 800, soundDuration, this, 0 );
 
 	m_flDangerSoundTime = gpGlobals->curtime + 0.1;
 }
@@ -1488,8 +1488,8 @@ void CPropJeep::ExitVehicle( int nRole )
 		// Look for fly nodes
 		CHintCriteria hintCriteria;
 		hintCriteria.SetHintType( HINT_CROW_FLYTO_POINT );
-		hintCriteria.AddIncludePosition( GetAbsOrigin(), 4500 );
-		CAI_Hint *pHint = CAI_HintManager::FindHint( GetAbsOrigin(), hintCriteria );
+		hintCriteria.AddIncludePosition(GetEngineObject()->GetAbsOrigin(), 4500 );
+		CAI_Hint *pHint = CAI_HintManager::FindHint(GetEngineObject()->GetAbsOrigin(), hintCriteria );
 		if ( pHint )
 		{
 			// Start looking for seagulls to perch on me
@@ -1521,7 +1521,7 @@ void CPropJeep::JeepSeagullThink( void )
 				// Make the existing seagull spawn more poop over time
 				if ( pSeagull->IsAlive() )
 				{
-					AddSeagullPoop( pSeagull->GetAbsOrigin() );
+					AddSeagullPoop( pSeagull->GetEngineObject()->GetAbsOrigin() );
 				}
 
 				SetContextThink( &CPropJeep::JeepSeagullThink, gpGlobals->curtime + JEEP_SEAGULL_POOP_INTERVAL, g_pJeepThinkContext );

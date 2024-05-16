@@ -138,7 +138,7 @@ public:
 
 	Vector	EyePosition( void )
 	{
-		return GetAbsOrigin() + EyeOffset(GetActivity());
+		return GetEngineObject()->GetAbsOrigin() + EyeOffset(GetActivity());
 	}
 
 	Vector	GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity *pTarget ) 
@@ -304,7 +304,7 @@ void CNPC_CeilingTurret::Spawn( void )
 	m_iAmmoType = GetAmmoDef()->Index( "AR2" );
 
 	//Create our eye sprite
-	m_pEyeGlow = CSprite::SpriteCreate( CEILING_TURRET_GLOW_SPRITE, GetLocalOrigin(), false );
+	m_pEyeGlow = CSprite::SpriteCreate( CEILING_TURRET_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin(), false );
 	m_pEyeGlow->SetTransparency( kRenderTransAdd, 255, 0, 0, 128, kRenderFxNoDissipation );
 	m_pEyeGlow->SetAttachment( this, 2 );
 
@@ -358,7 +358,7 @@ int CNPC_CeilingTurret::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 		//FIXME: This needs to throw a ragdoll gib or something other than animating the retraction -- jdw
 
-		ExplosionCreate( GetAbsOrigin(), GetLocalAngles(), this, 100, 100, false );
+		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetLocalAngles(), this, 100, 100, false );
 		SetThink( &CNPC_CeilingTurret::DeathThink );
 
 		g_pSoundEmitterSystem->StopSound(this, "NPC_CeilingTurret.Alert" );
@@ -382,7 +382,7 @@ void CNPC_CeilingTurret::Retire( void )
 		return;
 
 	//Level out the turret
-	m_vecGoalAngles = GetAbsAngles();
+	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 	SetNextThink( gpGlobals->curtime );
 
 	//Set ourselves to close
@@ -443,7 +443,7 @@ void CNPC_CeilingTurret::Deploy( void )
 	if ( PreThink( TURRET_DEPLOYING ) )
 		return;
 
-	m_vecGoalAngles = GetAbsAngles();
+	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
 	SetNextThink( gpGlobals->curtime );
 
@@ -623,13 +623,13 @@ void CNPC_CeilingTurret::ActiveThink( void )
 		SetEnemy( NULL );
 		SetLastSightTime();
 		SetThink( &CNPC_CeilingTurret::SearchThink );
-		m_vecGoalAngles = GetAbsAngles();
+		m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 		return;
 	}
 	
 	//Get our shot positions
 	Vector vecMid = EyePosition();
-	Vector vecMidEnemy = GetEnemy()->GetAbsOrigin();
+	Vector vecMidEnemy = GetEnemy()->GetEngineObject()->GetAbsOrigin();
 
 	//Store off our last seen location
 	UpdateEnemyMemory( GetEnemy(), vecMidEnemy );
@@ -674,7 +674,7 @@ void CNPC_CeilingTurret::ActiveThink( void )
 			SetEnemy( NULL );
 			SetLastSightTime();
 			SetThink( &CNPC_CeilingTurret::SearchThink );
-			m_vecGoalAngles = GetAbsAngles();
+			m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 			
 			SpinDown();
 
@@ -795,7 +795,7 @@ void CNPC_CeilingTurret::SearchThink( void )
 	
 	//Display that we're scanning
 	m_vecGoalAngles.x = 15.0f;
-	m_vecGoalAngles.y = GetAbsAngles().y + ( sin( gpGlobals->curtime * 2.0f ) * 45.0f );
+	m_vecGoalAngles.y = GetEngineObject()->GetAbsAngles().y + ( sin( gpGlobals->curtime * 2.0f ) * 45.0f );
 
 	//Turn and ping
 	UpdateFacing();
@@ -1124,7 +1124,7 @@ void CNPC_CeilingTurret::DeathThink( void )
 		return;
 
 	//Level out our angles
-	m_vecGoalAngles = GetAbsAngles();
+	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 	SetNextThink( gpGlobals->curtime );
 
 	if ( m_lifeState != LIFE_DEAD )
@@ -1170,7 +1170,7 @@ void CNPC_CeilingTurret::DeathThink( void )
 void CNPC_CeilingTurret::SetHeight( float height )
 {
 	Vector forward, right, up;
-	AngleVectors( GetLocalAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, &right, &up );
 
 	Vector mins = ( forward * -16.0f ) + ( right * -16.0f );
 	Vector maxs = ( forward *  16.0f ) + ( right *  16.0f ) + ( up * -height );

@@ -88,7 +88,7 @@ void CGrenadePathfollower::GrenadeTouch( CBaseEntity *pOther )
 	// If I hit the sky, don't explode
 	// ----------------------------------
 	trace_t tr;
-	UTIL_TraceLine ( GetAbsOrigin(), GetAbsOrigin() + GetAbsVelocity(),  MASK_SOLID_BRUSHONLY, 
+	UTIL_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity(),  MASK_SOLID_BRUSHONLY,
 		this, COLLISION_GROUP_NONE, &tr);
 
 	if (tr.surface.flags & SURF_SKY)
@@ -120,10 +120,10 @@ void CGrenadePathfollower::Detonate(void)
 		m_hRocketTrail = NULL;
 	}
 
-	CPASFilter filter( GetAbsOrigin() );
+	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 
 	te->Explosion( filter, 0.0,
-		&GetAbsOrigin(), 
+		&GetEngineObject()->GetAbsOrigin(),
 		g_sModelIndexFireball,
 		0.5, 
 		15,
@@ -131,17 +131,17 @@ void CGrenadePathfollower::Detonate(void)
 		m_DmgRadius,
 		m_flDamage );
 
-	Vector vecForward = GetAbsVelocity();
+	Vector vecForward = GetEngineObject()->GetAbsVelocity();
 	VectorNormalize(vecForward);
 	trace_t		tr;
-	UTIL_TraceLine ( GetAbsOrigin(), GetAbsOrigin() + 60*vecForward,  MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, & tr);
+	UTIL_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + 60*vecForward,  MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, & tr);
 
 	UTIL_DecalTrace( &tr, "Scorch" );
 
-	UTIL_ScreenShake( GetAbsOrigin(), 25.0, 150.0, 1.0, 750, SHAKE_START );
-	CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), 400, 0.2 );
+	UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 25.0, 150.0, 1.0, 750, SHAKE_START );
+	CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), 400, 0.2 );
 
-	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetAbsOrigin(),  m_DmgRadius, CLASS_NONE, NULL );
+	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(),  m_DmgRadius, CLASS_NONE, NULL );
 	CPASAttenuationFilter filter2( this, "GrenadePathfollower.StopSounds" );
 	g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "GrenadePathfollower.StopSounds" );
 	UTIL_Remove( this );
@@ -158,12 +158,12 @@ void CGrenadePathfollower::Launch( float flLaunchSpeed, string_t sPathCornerName
 	if (m_pPathTarget)
 	{
 		m_flFlySpeed = flLaunchSpeed;
-		Vector vTargetDir = (m_pPathTarget->GetAbsOrigin() - GetAbsOrigin());
+		Vector vTargetDir = (m_pPathTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin());
 		VectorNormalize(vTargetDir);
-		SetAbsVelocity( m_flFlySpeed * vTargetDir );
+		GetEngineObject()->SetAbsVelocity( m_flFlySpeed * vTargetDir );
 		QAngle angles;
-		VectorAngles( GetAbsVelocity(), angles );
-		SetLocalAngles( angles );
+		VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
+		GetEngineObject()->SetLocalAngles( angles );
 	}
 	else
 	{
@@ -239,7 +239,7 @@ void CGrenadePathfollower::AimThink( void )
 	// ---------------------------------------------------
 	if (m_pPathTarget)
 	{
-		float flLength = (GetAbsOrigin() - m_pPathTarget->GetAbsOrigin()).Length();
+		float flLength = (GetEngineObject()->GetAbsOrigin() - m_pPathTarget->GetEngineObject()->GetAbsOrigin()).Length();
 		if (flLength < GRENADE_PF_TOLERANCE)
 		{
 			m_pPathTarget = gEntList.FindEntityByName( NULL, m_pPathTarget->m_target );
@@ -255,10 +255,10 @@ void CGrenadePathfollower::AimThink( void )
 	// --------------------------------------------------
 	if (m_pPathTarget)
 	{	
-		Vector vTargetDir = (m_pPathTarget->GetAbsOrigin() - GetAbsOrigin());
+		Vector vTargetDir = (m_pPathTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin());
 		VectorNormalize(vTargetDir);
 
-		Vector vecNewVelocity = GetAbsVelocity();
+		Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 		VectorNormalize(vecNewVelocity);
 
 		float flTimeToUse = gpGlobals->frametime;
@@ -268,12 +268,12 @@ void CGrenadePathfollower::AimThink( void )
 			flTimeToUse = -0.1;
 		}
 		vecNewVelocity *= m_flFlySpeed;
-		SetAbsVelocity( vecNewVelocity );
+		GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 	}
 
 	QAngle angles;
-	VectorAngles( GetAbsVelocity(), angles );
-	SetLocalAngles( angles );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
+	GetEngineObject()->SetLocalAngles( angles );
 	SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
@@ -321,8 +321,8 @@ CGrenadePathfollower* CGrenadePathfollower::CreateGrenadePathfollower( string_t 
 	{
 		pGrenade->m_sFlySound	= sFlySound;
 		pGrenade->SetOwnerEntity( pentOwner );
-		pGrenade->SetLocalOrigin( vecOrigin );
-		pGrenade->SetLocalAngles( vecAngles );
+		pGrenade->GetEngineObject()->SetLocalOrigin( vecOrigin );
+		pGrenade->GetEngineObject()->SetLocalAngles( vecAngles );
 		pGrenade->SetModel( STRING(sModelName) );
 		pGrenade->Spawn();
 	}

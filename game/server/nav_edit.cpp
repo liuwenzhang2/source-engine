@@ -1113,7 +1113,7 @@ void CNavMesh::DrawEditMode( void )
 				{
 					CNavArea *area = m_selectedSet[ it ];
 
-					float range = (player->GetAbsOrigin() - area->GetCenter()).LengthSqr();
+					float range = (player->GetEngineObject()->GetAbsOrigin() - area->GetCenter()).LengthSqr();
 					if (range < nearRange)
 					{
 						nearRange = range;
@@ -4710,7 +4710,7 @@ void CNavMesh::CommandNavWarpToMark( void )
 	if ( targetArea )
 	{
 		Vector origin = targetArea->GetCenter() + Vector( 0, 0, 0.75f * HumanHeight );
-		QAngle angles = player->GetAbsAngles();
+		QAngle angles = player->GetEngineObject()->GetAbsAngles();
 
 		if ( ( player->IsDead() || player->IsObserver() ) && player->GetObserverMode() == OBS_MODE_ROAMING )
 		{
@@ -4745,7 +4745,7 @@ void CNavMesh::CommandNavWarpToMark( void )
 	{
 		CNavLadder *ladder = GetMarkedLadder();
 
-		QAngle angles = player->GetAbsAngles();
+		QAngle angles = player->GetEngineObject()->GetAbsAngles();
 		Vector origin = (ladder->m_top + ladder->m_bottom)/2;
 		origin.x += ladder->GetNormal().x * GenerationStepSize;
 		origin.y += ladder->GetNormal().y * GenerationStepSize;
@@ -4894,7 +4894,7 @@ CON_COMMAND_F( nav_select_radius, "Adds all areas in a radius to the selection s
 	if ( !host )
 		return;
 
-	RadiusSelect select( host->GetAbsOrigin(), radius );
+	RadiusSelect select( host->GetEngineObject()->GetAbsOrigin(), radius );
 	TheNavMesh->ForAllAreas( select );
 
 	Msg( "%d areas added to selection\n", select.GetNumSelected() );

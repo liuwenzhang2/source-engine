@@ -406,7 +406,7 @@ void CBaseButton::Spawn( )
 	}
 
 	m_toggle_state = TS_AT_BOTTOM;
-	m_vecPosition1 = GetLocalOrigin();
+	m_vecPosition1 = GetEngineObject()->GetLocalOrigin();
 
 	// Subtract 2 from size because the engine expands bboxes by 1 in all directions making the size too big
 	Vector vecButtonOBB = CollisionProp()->OBBSize();
@@ -889,8 +889,8 @@ void CRotButton::Spawn( void )
 	}
 
 	m_toggle_state = TS_AT_BOTTOM;
-	m_vecAngle1	= GetLocalAngles();
-	m_vecAngle2	= GetLocalAngles() + m_vecMoveAng * m_flMoveDistance;
+	m_vecAngle1	= GetEngineObject()->GetLocalAngles();
+	m_vecAngle2	= GetEngineObject()->GetLocalAngles() + m_vecMoveAng * m_flMoveDistance;
 	ASSERTSZ(m_vecAngle1 != m_vecAngle2, "rotating button start/end positions are equal\n");
 
 	m_fStayPushed = (m_flWait == -1 ? TRUE : FALSE);
@@ -1005,8 +1005,8 @@ void CMomentaryRotButton::Spawn( void )
 		m_flMoveDistance = -m_flMoveDistance;
 	}
 
-	m_start = GetLocalAngles() - m_vecMoveAng * m_flMoveDistance * m_flStartPosition;
-	m_end	= GetLocalAngles() + m_vecMoveAng * m_flMoveDistance * (1-m_flStartPosition);
+	m_start = GetEngineObject()->GetLocalAngles() - m_vecMoveAng * m_flMoveDistance * m_flStartPosition;
+	m_end	= GetEngineObject()->GetLocalAngles() + m_vecMoveAng * m_flMoveDistance * (1-m_flStartPosition);
 
 	m_IdealYaw			= m_flStartPosition;
 
@@ -1136,7 +1136,7 @@ void CMomentaryRotButton::InputSetPosition( inputdata_t &inputdata )
 {
 	m_IdealYaw = clamp( inputdata.value.Float(), 0.f, 1.f );
 
-	float flCurPos = GetPos( GetLocalAngles() );
+	float flCurPos = GetPos(GetEngineObject()->GetLocalAngles() );
 	if ( flCurPos < m_IdealYaw )
 	{
 		// Moving forward (from start to end).
@@ -1167,7 +1167,7 @@ void CMomentaryRotButton::InputSetPosition( inputdata_t &inputdata )
 	// are told to change position in very small increments.
 	//
 	QAngle vecNewAngles = m_start + m_vecMoveAng * ( m_IdealYaw * m_flMoveDistance );
-	float flAngleDelta = fabs( AxisDelta( m_spawnflags, vecNewAngles, GetLocalAngles() ));
+	float flAngleDelta = fabs( AxisDelta( m_spawnflags, vecNewAngles, GetEngineObject()->GetLocalAngles() ));
 	float dt = flAngleDelta / m_flSpeed;
 	if ( dt < TICK_INTERVAL )
 	{
@@ -1188,7 +1188,7 @@ void CMomentaryRotButton::InputSetPosition( inputdata_t &inputdata )
 void CMomentaryRotButton::InputSetPositionImmediately( inputdata_t &inputdata )
 {
 	m_IdealYaw = clamp( inputdata.value.Float(), 0.f, 1.f );
-	SetLocalAngles( m_start + m_vecMoveAng * ( m_IdealYaw * m_flMoveDistance ) );
+	GetEngineObject()->SetLocalAngles( m_start + m_vecMoveAng * ( m_IdealYaw * m_flMoveDistance ) );
 }
 
 
@@ -1266,7 +1266,7 @@ void CMomentaryRotButton::OutputMovementComplete( void )
 //------------------------------------------------------------------------------
 void CMomentaryRotButton::SetPositionMoveDone(void)
 {
-	float flCurPos = GetPos( GetLocalAngles() );
+	float flCurPos = GetPos(GetEngineObject()->GetLocalAngles() );
 
 	if ((( flCurPos >= m_IdealYaw ) && ( m_direction == 1 )) ||
 		(( flCurPos <= m_IdealYaw ) && ( m_direction == -1 )))
@@ -1276,7 +1276,7 @@ void CMomentaryRotButton::SetPositionMoveDone(void)
 		//
 		SetLocalAngularVelocity( vec3_angle );
 		// BUGBUG: Won't this get the player stuck?
-		SetLocalAngles( m_start + m_vecMoveAng * ( m_IdealYaw * m_flMoveDistance ) );
+		GetEngineObject()->SetLocalAngles( m_start + m_vecMoveAng * ( m_IdealYaw * m_flMoveDistance ) );
 		SetNextThink( TICK_NEVER_THINK );
 		SetMoveDoneTime( -1 );
 		UpdateTarget( m_IdealYaw, this );
@@ -1286,7 +1286,7 @@ void CMomentaryRotButton::SetPositionMoveDone(void)
 
 	// TODO: change this to use a Think function like ReturnThink.
 	QAngle vecNewAngles = m_start + m_vecMoveAng * ( m_IdealYaw * m_flMoveDistance );
-	float flAngleDelta = fabs( AxisDelta( m_spawnflags, vecNewAngles, GetLocalAngles() ));
+	float flAngleDelta = fabs( AxisDelta( m_spawnflags, vecNewAngles, GetEngineObject()->GetLocalAngles() ));
 	float dt = flAngleDelta / m_flSpeed;
 	if ( dt < TICK_INTERVAL )
 	{
@@ -1359,7 +1359,7 @@ void CMomentaryRotButton::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 
 	m_lastUsed = 1;
 
-	float flPos = GetPos( GetLocalAngles() );
+	float flPos = GetPos(GetEngineObject()->GetLocalAngles() );
 	UpdateSelf( flPos, bPlaySound );
 
 	//
@@ -1396,7 +1396,7 @@ void CMomentaryRotButton::UpdateSelf( float value, bool bPlaySound )
 	if ( m_direction > 0 && value >= 1.0 )
 	{
 		SetLocalAngularVelocity( vec3_angle );
-		SetLocalAngles( m_end );
+		GetEngineObject()->SetLocalAngles( m_end );
 
 		m_OnFullyClosed.FireOutput(this, this);
 		return;
@@ -1407,7 +1407,7 @@ void CMomentaryRotButton::UpdateSelf( float value, bool bPlaySound )
 	else if ( m_direction < 0 && value <= 0 )
 	{
 		SetLocalAngularVelocity( vec3_angle );
-		SetLocalAngles( m_start );
+		GetEngineObject()->SetLocalAngles( m_start );
 
 		m_OnFullyOpen.FireOutput(this, this);
 		return;
@@ -1447,7 +1447,7 @@ void CMomentaryRotButton::UseMoveDone( void )
 	SetLocalAngularVelocity( vec3_angle );
 
 	// Make sure our targets stop where we stopped.
-	float flPos = GetPos( GetLocalAngles() );
+	float flPos = GetPos(GetEngineObject()->GetLocalAngles() );
 	UpdateTarget( flPos, this );
 
 	// Alert that we've been unpressed
@@ -1476,14 +1476,14 @@ void CMomentaryRotButton::UseMoveDone( void )
 //-----------------------------------------------------------------------------
 void CMomentaryRotButton::ReturnMoveDone( void )
 {
-	float value = GetPos( GetLocalAngles() );
+	float value = GetPos(GetEngineObject()->GetLocalAngles() );
 	if ( value <= 0 )
 	{
 		//
 		// Got back to the start, stop spinning.
 		//
 		SetLocalAngularVelocity( vec3_angle );
-		SetLocalAngles( m_start );
+		GetEngineObject()->SetLocalAngles( m_start );
 
 		UpdateTarget( 0, NULL );
 
@@ -1509,7 +1509,7 @@ void CMomentaryRotButton::ReturnMoveDone( void )
 //-----------------------------------------------------------------------------
 void CMomentaryRotButton::UpdateThink( void )
 {
-	float value = GetPos( GetLocalAngles() );
+	float value = GetPos(GetEngineObject()->GetLocalAngles() );
 	UpdateTarget( value, NULL );
 	SetNextThink( gpGlobals->curtime );
 }
@@ -1527,7 +1527,7 @@ int CMomentaryRotButton::DrawDebugTextOverlays(void)
 	{
 		char tempstr[255];
 		
-		Q_snprintf(tempstr,sizeof(tempstr),"QAngle: %.2f %.2f %.2f", GetLocalAngles()[0], GetLocalAngles()[1], GetLocalAngles()[2]);
+		Q_snprintf(tempstr,sizeof(tempstr),"QAngle: %.2f %.2f %.2f", GetEngineObject()->GetLocalAngles()[0], GetEngineObject()->GetLocalAngles()[1], GetEngineObject()->GetLocalAngles()[2]);
 		EntityText(text_offset,tempstr,0);
 		text_offset++;
 
@@ -1539,7 +1539,7 @@ int CMomentaryRotButton::DrawDebugTextOverlays(void)
 		EntityText(text_offset,tempstr,0);
 		text_offset++;
 
-		float flCurPos = GetPos(GetLocalAngles());
+		float flCurPos = GetPos(GetEngineObject()->GetLocalAngles());
 		Q_snprintf(tempstr,sizeof(tempstr),"Current Pos:   %3.3f",flCurPos);
 		EntityText(text_offset,tempstr,0);
 		text_offset++;

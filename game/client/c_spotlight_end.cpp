@@ -117,7 +117,7 @@ void C_SpotlightEnd::ClientThink(void)
 
 	//m_pDynamicLight->flags = DLIGHT_NO_MODEL_ILLUMINATION;
 	m_pDynamicLight->radius		= m_flLightScale*3.0f;
-	m_pDynamicLight->origin		= GetAbsOrigin() + Vector(0,0,5);
+	m_pDynamicLight->origin		= GetEngineObject()->GetAbsOrigin() + Vector(0,0,5);
 	m_pDynamicLight->die		= gpGlobals->curtime + 0.05f;
 	m_pDynamicLight->color		= color;
 

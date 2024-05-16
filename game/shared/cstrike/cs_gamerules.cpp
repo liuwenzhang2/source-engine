@@ -466,8 +466,8 @@ ConVar cl_autohelp(
 			 
 		Vector mins, maxs;
 		pMainEnt->CollisionProp()->WorldSpaceAABB( &mins, &maxs );
-		mins -= pMainEnt->GetAbsOrigin();
-		maxs -= pMainEnt->GetAbsOrigin();
+		mins -= pMainEnt->GetEngineObject()->GetAbsOrigin();
+		maxs -= pMainEnt->GetEngineObject()->GetAbsOrigin();
 
 		// Put some padding on their bbox.
 		float flPadSize = 5;
@@ -964,26 +964,26 @@ ConVar cl_autohelp(
 		float armDistanceFromChest = HalfHumanWidth;
 
 		// calculate positions of various points on the target player's body
-		Vector vecFeet = player->GetAbsOrigin();
+		Vector vecFeet = player->GetEngineObject()->GetAbsOrigin();
 
 		Vector vecChest = player->BodyTarget(vecSrc, false);
 		chestHeightFromFeet = vecChest.z - vecFeet.z;  // compute the distance from the chest to the feet. (this accounts for ducking and the like)
 
-		Vector vecHead = player->GetAbsOrigin();
+		Vector vecHead = player->GetEngineObject()->GetAbsOrigin();
 		vecHead.z += HumanHeight;
 
 		Vector vecRightFacing;
-		AngleVectors(player->GetAbsAngles(), NULL, &vecRightFacing, NULL);
+		AngleVectors(player->GetEngineObject()->GetAbsAngles(), NULL, &vecRightFacing, NULL);
 
 		vecRightFacing.NormalizeInPlace();
 		vecRightFacing = vecRightFacing * armDistanceFromChest;
 
-		Vector vecLeftSide = player->GetAbsOrigin();
+		Vector vecLeftSide = player->GetEngineObject()->GetAbsOrigin();
 		vecLeftSide.x -= vecRightFacing.x;
 		vecLeftSide.y -= vecRightFacing.y;
 		vecLeftSide.z += chestHeightFromFeet;
 
-		Vector vecRightSide = player->GetAbsOrigin();
+		Vector vecRightSide = player->GetEngineObject()->GetAbsOrigin();
 		vecRightSide.x += vecRightFacing.x;
 		vecRightSide.y += vecRightFacing.y;
 		vecRightSide.z += chestHeightFromFeet;
@@ -3589,7 +3589,7 @@ ConVar cl_autohelp(
 				else
 				{
 					Warning("Invalid terrorist spawnpoint at (%.1f,%.1f,%.1f)\n",
-						ent->GetAbsOrigin()[0],ent->GetAbsOrigin()[2],ent->GetAbsOrigin()[2] );
+						ent->GetEngineObject()->GetAbsOrigin()[0],ent->GetEngineObject()->GetAbsOrigin()[2],ent->GetEngineObject()->GetAbsOrigin()[2] );
 				}
 			}
 
@@ -3602,7 +3602,7 @@ ConVar cl_autohelp(
 				else
 				{
 					Warning("Invalid counterterrorist spawnpoint at (%.1f,%.1f,%.1f)\n",
-						ent->GetAbsOrigin()[0],ent->GetAbsOrigin()[2],ent->GetAbsOrigin()[2] );
+						ent->GetEngineObject()->GetAbsOrigin()[0],ent->GetEngineObject()->GetAbsOrigin()[2],ent->GetEngineObject()->GetAbsOrigin()[2] );
 				}
 			}
 
@@ -3622,11 +3622,11 @@ ConVar cl_autohelp(
 		{
 			if ( IsSpawnPointValid( ent, NULL ) )
 			{
-				NDebugOverlay::Box( ent->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 0, 255, 0, 200, 600 );
+				NDebugOverlay::Box( ent->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 0, 255, 0, 200, 600 );
 			}
 			else
 			{
-				NDebugOverlay::Box( ent->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 255, 0, 0, 200, 600);
+				NDebugOverlay::Box( ent->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 255, 0, 0, 200, 600);
 			}
 		}
 
@@ -3634,11 +3634,11 @@ ConVar cl_autohelp(
 		{
 			if ( IsSpawnPointValid( ent, NULL ) ) 
 			{
-				NDebugOverlay::Box( ent->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 0, 255, 0, 200, 600 );
+				NDebugOverlay::Box( ent->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 0, 255, 0, 200, 600 );
 			}
 			else
 			{
-				NDebugOverlay::Box( ent->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 255, 0, 0, 200, 600 );
+				NDebugOverlay::Box( ent->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 255, 0, 0, 200, 600 );
 			}
 		}
 	}
@@ -4696,10 +4696,10 @@ ConVar cl_autohelp(
 		CBaseEntity *pSpawnSpot = pPlayer->EntSelectSpawnPoint();
 
 		// drop down to ground
-		Vector GroundPos = DropToGround( pPlayer, pSpawnSpot->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX );
+		Vector GroundPos = DropToGround( pPlayer, pSpawnSpot->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX );
 
 		// Move the player to the place it said.
-		pPlayer->Teleport( &pSpawnSpot->GetAbsOrigin(), &pSpawnSpot->GetLocalAngles(), &vec3_origin );
+		pPlayer->Teleport( &pSpawnSpot->GetEngineObject()->GetAbsOrigin(), &pSpawnSpot->GetEngineObject()->GetLocalAngles(), &vec3_origin );
 		pPlayer->m_Local.m_vecPunchAngle = vec3_angle;
 		
 		return pSpawnSpot;
@@ -4716,8 +4716,8 @@ ConVar cl_autohelp(
 		Vector mins = GetViewVectors()->m_vHullMin;
 		Vector maxs = GetViewVectors()->m_vHullMax;
 
-		Vector vTestMins = pSpot->GetAbsOrigin() + mins;
-		Vector vTestMaxs = pSpot->GetAbsOrigin() + maxs;
+		Vector vTestMins = pSpot->GetEngineObject()->GetAbsOrigin() + mins;
+		Vector vTestMaxs = pSpot->GetEngineObject()->GetAbsOrigin() + maxs;
 		
 		// First test the starting origin.
 		return UTIL_IsSpaceEmpty( pPlayer, vTestMins, vTestMaxs );

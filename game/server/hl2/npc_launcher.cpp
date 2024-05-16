@@ -274,7 +274,7 @@ void CNPC_Launcher::LaunchGrenade( CBaseEntity* pEnemy )
 	// If a path following missile, create a path following missile
 	if (m_sPathCornerName != NULL_STRING)
 	{
-		CGrenadePathfollower *pGrenade = CGrenadePathfollower::CreateGrenadePathfollower( m_sMissileModel, m_sFlySound,  GetAbsOrigin(), vec3_angle, this );
+		CGrenadePathfollower *pGrenade = CGrenadePathfollower::CreateGrenadePathfollower( m_sMissileModel, m_sFlySound, GetEngineObject()->GetAbsOrigin(), vec3_angle, this );
 		pGrenade->SetDamage(m_flDamage);
 		pGrenade->SetDamageRadius(m_flDamageRadius);
 		pGrenade->Launch(m_flLaunchSpeed,m_sPathCornerName);
@@ -282,10 +282,10 @@ void CNPC_Launcher::LaunchGrenade( CBaseEntity* pEnemy )
 	else
 	{
 		Vector vUp;
-		AngleVectors( GetAbsAngles(), NULL, NULL, &vUp );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), NULL, NULL, &vUp );
 		Vector vLaunchVelocity = (vUp * m_flLaunchSpeed);
 
-		CGrenadeHomer *pGrenade = CGrenadeHomer::CreateGrenadeHomer( m_sMissileModel, m_sFlySound,  GetAbsOrigin(), vec3_angle, this );
+		CGrenadeHomer *pGrenade = CGrenadeHomer::CreateGrenadeHomer( m_sMissileModel, m_sFlySound, GetEngineObject()->GetAbsOrigin(), vec3_angle, this );
 		pGrenade->Spawn( );
 		pGrenade->SetSpin(m_flSpinMagnitude,m_flSpinSpeed);
 		pGrenade->SetHoming((0.01*m_nHomingStrength),m_flHomingDelay,m_flHomingRampUp,m_flHomingDuration,m_flHomingRampDown);
@@ -305,7 +305,7 @@ void CNPC_Launcher::LaunchGrenade( CBaseEntity* pEnemy )
 
 	if (m_bSmokeLaunch)
 	{
-		UTIL_Smoke(GetAbsOrigin(), random->RandomInt(20,30), random->RandomInt(10,15));
+		UTIL_Smoke(GetEngineObject()->GetAbsOrigin(), random->RandomInt(20,30), random->RandomInt(10,15));
 	}
 	m_flNextAttack = gpGlobals->curtime + LAUNCHER_REST_TIME;
 
@@ -327,7 +327,7 @@ bool CNPC_Launcher::IsValidEnemy( CBaseEntity *pTarget )
 	// ---------------------------------
 	//  Check range
 	// ---------------------------------
-	float flTargetDist = (GetAbsOrigin() - pTarget->GetAbsOrigin()).Length();
+	float flTargetDist = (GetEngineObject()->GetAbsOrigin() - pTarget->GetEngineObject()->GetAbsOrigin()).Length();
 	if (flTargetDist < m_flMinAttackDist)
 	{
 		return false;
@@ -348,8 +348,8 @@ bool CNPC_Launcher::IsValidEnemy( CBaseEntity *pTarget )
 
 	// Trace from launch position to target position.  
 	// Use position above actual barral based on vertical launch speed
-	Vector vStartPos = GetAbsOrigin() + Vector(0,0,0.2*m_flLaunchSpeed);
-	Vector vEndPos	 = pTarget->GetAbsOrigin();
+	Vector vStartPos = GetEngineObject()->GetAbsOrigin() + Vector(0,0,0.2*m_flLaunchSpeed);
+	Vector vEndPos	 = pTarget->GetEngineObject()->GetAbsOrigin();
 	AI_TraceLine( vStartPos, vEndPos, MASK_SHOT, pTarget, COLLISION_GROUP_NONE, &tr );
 
 	if (tr.fraction == 1.0)

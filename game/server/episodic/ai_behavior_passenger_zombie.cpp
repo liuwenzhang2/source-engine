@@ -253,7 +253,7 @@ bool CAI_PassengerBehaviorZombie::CanJumpToAttachToVehicle( void )
 	Vector	vecPredictedPosition;
 	UTIL_PredictedPosition( pEnemy, 1.0f, &vecPredictedPosition );
 
-	float flDist = UTIL_DistApprox( vecPredictedPosition, GetOuter()->GetAbsOrigin() );
+	float flDist = UTIL_DistApprox( vecPredictedPosition, GetOuter()->GetEngineObject()->GetAbsOrigin() );
 
 	// If we're facing them enough, allow the jump
 	if ( ( flDist < JUMP_ATTACH_DIST_THRESHOLD ) && UTIL_IsFacingWithinTolerance( GetOuter(), pEnemy, JUMP_ATTACH_FACING_THRESHOLD ) )
@@ -307,7 +307,7 @@ void CAI_PassengerBehaviorZombie::GatherConditions( void )
 		{
 			// Can't be visible to the player and must be close enough
 			bool bNotVisibleToPlayer = ( pPlayer->FInViewCone( GetOuter() ) == false );
-			float flDistSqr = ( pPlayer->GetAbsOrigin() - GetOuter()->GetAbsOrigin() ).LengthSqr();
+			float flDistSqr = ( pPlayer->GetEngineObject()->GetAbsOrigin() - GetOuter()->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 			bool bInRange = ( flDistSqr < Square(250.0f) );
 			if ( bNotVisibleToPlayer && bInRange )
 			{
@@ -371,8 +371,8 @@ void CAI_PassengerBehaviorZombie::GetAttachmentPoint( Vector *vecPoint )
 {
 	Vector vecEntryOffset, vecFinalOffset;
 	GetEntryTarget( &vecEntryOffset, NULL );
-	VectorRotate( vecEntryOffset, m_hVehicle->GetAbsAngles(), vecFinalOffset );
-	*vecPoint = ( m_hVehicle->GetAbsOrigin() + vecFinalOffset );
+	VectorRotate( vecEntryOffset, m_hVehicle->GetEngineObject()->GetAbsAngles(), vecFinalOffset );
+	*vecPoint = ( m_hVehicle->GetEngineObject()->GetAbsOrigin() + vecFinalOffset );
 }
 
 //-----------------------------------------------------------------------------
@@ -425,7 +425,7 @@ void CAI_PassengerBehaviorZombie::StartDismount( void )
 
 	QAngle vecAngles = GetAbsAngles();
 	vecAngles.z = 0.0f;
-	GetOuter()->SetAbsAngles( vecAngles );
+	GetOuter()->GetEngineObject()->SetAbsAngles( vecAngles );
 
 	// HACK: Will this work?
 	IPhysicsObject *pPhysObj = GetOuter()->VPhysicsGetObject();
@@ -445,7 +445,7 @@ void CAI_PassengerBehaviorZombie::StartDismount( void )
 	// Move back and up
 	vecJumpDir *= random->RandomFloat( -400.0f, -500.0f );
 	vecJumpDir += vecUp * 150.0f;
-	GetOuter()->SetAbsVelocity( vecJumpDir );
+	GetOuter()->GetEngineObject()->SetAbsVelocity( vecJumpDir );
 }
 
 //-----------------------------------------------------------------------------

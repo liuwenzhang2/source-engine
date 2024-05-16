@@ -146,7 +146,7 @@ void CHudDODCrosshair::Paint()
 			if ( !pWeapon )
 				return;
 
-			float accuracy = pWeapon->GetWeaponAccuracy( pPlayer->GetAbsVelocity().Length2D() );
+			float accuracy = pWeapon->GetWeaponAccuracy( pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() );
 
 			float flMin = 0.02;
 

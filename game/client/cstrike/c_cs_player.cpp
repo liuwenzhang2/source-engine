@@ -383,8 +383,8 @@ void C_CSRagdoll::CreateLowViolenceRagdoll( void )
 	}
 
 	GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
-	SetAbsOrigin( m_vecRagdollOrigin );
-	SetAbsVelocity( m_vecRagdollVelocity );
+	GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+	GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 	C_CSPlayer *pPlayer = dynamic_cast< C_CSPlayer* >( m_hPlayer.Get() );
 	if ( pPlayer )
@@ -395,7 +395,7 @@ void C_CSRagdoll::CreateLowViolenceRagdoll( void )
 			pPlayer->SnatchModelInstance( this );
 		}
 
-		SetAbsAngles( pPlayer->GetRenderAngles() );
+		GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 		GetEngineObject()->SetNetworkAngles( pPlayer->GetRenderAngles() );
 	}
 
@@ -432,7 +432,7 @@ void C_CSRagdoll::CreateCSRagdoll()
 		{
 			Interp_Copy( pPlayer );
 
-			SetAbsAngles( pPlayer->GetRenderAngles() );
+			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 			GetEngineObject()->GetRotationInterpolator().Reset();
 
 			m_flAnimTime = pPlayer->m_flAnimTime;
@@ -443,11 +443,11 @@ void C_CSRagdoll::CreateCSRagdoll()
 		{
 			// This is the local player, so set them in a default
 			// pose and slam their velocity, angles and origin
-			SetAbsOrigin( m_vecRagdollOrigin );
+			GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 
-			SetAbsAngles( pPlayer->GetRenderAngles() );
+			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 
-			SetAbsVelocity( m_vecRagdollVelocity );
+			GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 			int iSeq = LookupSequence( "walk_lower" );
 			if ( iSeq == -1 )
@@ -473,8 +473,8 @@ void C_CSRagdoll::CreateCSRagdoll()
 		// use this position
 		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
-		SetAbsOrigin( m_vecRagdollOrigin );
-		SetAbsVelocity( m_vecRagdollVelocity );
+		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
 	}
@@ -1136,8 +1136,8 @@ void C_CSPlayer::CreateAddonModel( int i )
 	pAddon->m_iAddon = i;
 	pAddon->m_iAttachmentPoint = iAttachment;
 	pEnt->GetEngineObject()->SetParent( this->GetEngineObject(), pAddon->m_iAttachmentPoint );
-	pEnt->SetLocalOrigin( Vector( 0, 0, 0 ) );
-	pEnt->SetLocalAngles( QAngle( 0, 0, 0 ) );
+	pEnt->GetEngineObject()->SetLocalOrigin( Vector( 0, 0, 0 ) );
+	pEnt->GetEngineObject()->SetLocalAngles( QAngle( 0, 0, 0 ) );
 	if ( IsLocalPlayer() )
 	{
 		pEnt->SetSolid( SOLID_NONE );
@@ -1396,7 +1396,7 @@ void C_CSPlayer::PostDataUpdate( DataUpdateType_t updateType )
 {
 	// C_BaseEntity assumes we're networking the entity's angles, so pretend that it
 	// networked the same value we already have.
-	GetEngineObject()->SetNetworkAngles( GetLocalAngles() );
+	GetEngineObject()->SetNetworkAngles(GetEngineObject()->GetLocalAngles() );
 	
 	BaseClass::PostDataUpdate( updateType );
 }
@@ -1413,7 +1413,7 @@ bool C_CSPlayer::Interpolate( float currentTime )
 	if ( CSGameRules()->IsFreezePeriod() )
 	{
 		// don't interpolate players position during freeze period
-		SetAbsOrigin(GetEngineObject()->GetNetworkOrigin() );
+		GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetNetworkOrigin() );
 	}
 
 	return true;
@@ -1518,7 +1518,7 @@ void C_CSPlayer::UpdateIDTarget()
 
 					float flRadius = ( SMOKEGRENADE_PARTICLERADIUS * NUM_PARTICLES_PER_DIMENSION + 1 ) * 0.5f;
 
-					Vector vPos = pSmokeGrenade->GetAbsOrigin();
+					Vector vPos = pSmokeGrenade->GetEngineObject()->GetAbsOrigin();
 
 					/*debugoverlay->AddBoxOverlay( pSmokeGrenade->GetAbsOrigin(), Vector( flRadius, flRadius, flRadius ),
 					 Vector( -flRadius, -flRadius, -flRadius ), QAngle( 0, 0, 0 ), 255, 0, 0, 255, 0.2 );*/

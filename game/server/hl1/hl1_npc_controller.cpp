@@ -424,7 +424,7 @@ void CNPC_Controller::HandleAnimEvent( animevent_t *pEvent )
 
 			CAI_BaseNPC *pBall = (CAI_BaseNPC*)Create( "controller_head_ball", vecStart, angleGun );
 
-			pBall->SetAbsVelocity( Vector(0,0,32) );
+			pBall->GetEngineObject()->SetAbsVelocity( Vector(0,0,32) );
 			pBall->SetEnemy( GetEnemy() );
 
 //			DevMsg( 1, "controller shooting head ball\n" );
@@ -604,7 +604,7 @@ int CNPC_Controller::LookupFloat( )
 	}
 
 	Vector vecForward, vecRight, vecUp;
-	AngleVectors( GetAbsAngles(), &vecForward, &vecRight, &vecUp );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vecForward, &vecRight, &vecUp );
 
 	float x = DotProduct( vecForward, m_velocity );
 	float y = DotProduct( vecRight, m_velocity );
@@ -648,27 +648,27 @@ void CNPC_Controller::RunTask ( const Task_t *pTask )
 	
 		while (m_flShootTime < m_flShootEnd && m_flShootTime < gpGlobals->curtime)
 		{
-			Vector vecSrc = vecHand + GetAbsVelocity() * (m_flShootTime - gpGlobals->curtime);
+			Vector vecSrc = vecHand + GetEngineObject()->GetAbsVelocity() * (m_flShootTime - gpGlobals->curtime);
 			Vector vecDir;
 			
 			if (GetEnemy() != NULL)
 			{
 				if (HasCondition( COND_SEE_ENEMY ))
 				{
-					m_vecEstVelocity = m_vecEstVelocity * 0.5 + GetEnemy()->GetAbsVelocity() * 0.5;
+					m_vecEstVelocity = m_vecEstVelocity * 0.5 + GetEnemy()->GetEngineObject()->GetAbsVelocity() * 0.5;
 				}
 				else
 				{
 					m_vecEstVelocity = m_vecEstVelocity * 0.8;
 				}
-				vecDir = Intersect( vecSrc, GetEnemy()->BodyTarget( GetAbsOrigin() ), m_vecEstVelocity, sk_controller_speedball.GetFloat() );
+				vecDir = Intersect( vecSrc, GetEnemy()->BodyTarget(GetEngineObject()->GetAbsOrigin() ), m_vecEstVelocity, sk_controller_speedball.GetFloat() );
 			
 				float delta = 0.03490; // +-2 degree
 				vecDir = vecDir + Vector( random->RandomFloat( -delta, delta ), random->RandomFloat( -delta, delta ), random->RandomFloat( -delta, delta ) ) * sk_controller_speedball.GetFloat();
 
 				vecSrc = vecSrc + vecDir * (gpGlobals->curtime - m_flShootTime);
-				CAI_BaseNPC *pBall = (CAI_BaseNPC*)Create( "controller_energy_ball", vecSrc, GetAbsAngles(), this );
-				pBall->SetAbsVelocity( vecDir );
+				CAI_BaseNPC *pBall = (CAI_BaseNPC*)Create( "controller_energy_ball", vecSrc, GetEngineObject()->GetAbsAngles(), this );
+				pBall->GetEngineObject()->SetAbsVelocity( vecDir );
 
 //				DevMsg( 2, "controller shooting energy ball\n" );
 			}
@@ -695,7 +695,7 @@ void CNPC_Controller::RunTask ( const Task_t *pTask )
 		{
 			if( GetEnemy() )
 			{
-				float idealYaw = UTIL_VecToYaw( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() );
+				float idealYaw = UTIL_VecToYaw( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 				GetMotor()->SetIdealYawAndUpdate( idealYaw );
 			}
 
@@ -861,7 +861,7 @@ void CNPC_Controller::RunAI( void )
 	{
 		if (m_pBall[i] == NULL)
 		{
-			m_pBall[i] = CSprite::SpriteCreate( "sprites/xspark4.vmt", GetAbsOrigin(), TRUE );
+			m_pBall[i] = CSprite::SpriteCreate( "sprites/xspark4.vmt", GetEngineObject()->GetAbsOrigin(), TRUE );
 			m_pBall[i]->SetTransparency( kRenderGlow, 255, 255, 255, 255, kRenderFxNoDissipation );
 			m_pBall[i]->SetAttachment( this, (i + 3) );
 			m_pBall[i]->SetScale( 1.0 );
@@ -878,7 +878,7 @@ void CNPC_Controller::RunAI( void )
 		m_pBall[i]->SetBrightness( m_iBallCurrent[i] );
 
 		GetAttachment( i + 2, vecStart, angleGun );
-		m_pBall[i]->SetAbsOrigin( vecStart );
+		m_pBall[i]->GetEngineObject()->SetAbsOrigin( vecStart );
 
 		CBroadcastRecipientFilter filter;
 		GetAttachment( i + 3, vecStart, angleGun );
@@ -901,7 +901,7 @@ void CNPC_Controller::Stop( void )
 bool CNPC_Controller::OverridePathMove( float flInterval )
 {
 	CBaseEntity *pMoveTarget = (GetTarget()) ? GetTarget() : GetEnemy();
-	Vector waypointDir = GetNavigator()->GetCurWaypointPos() - GetLocalOrigin();
+	Vector waypointDir = GetNavigator()->GetCurWaypointPos() - GetEngineObject()->GetLocalOrigin();
 
 	float flWaypointDist = waypointDir.Length2D();
 	VectorNormalize(waypointDir);
@@ -919,15 +919,15 @@ bool CNPC_Controller::OverridePathMove( float flInterval )
 	}
 
 	m_velocity = m_velocity * 0.8 + m_flGroundSpeed * waypointDir * 0.5;
-	SetAbsVelocity( m_velocity );
+	GetEngineObject()->SetAbsVelocity( m_velocity );
 
 	// -----------------------------------------------------------------
 	// Check route is blocked
 	// ------------------------------------------------------------------
-	Vector checkPos = GetLocalOrigin() + (waypointDir * (m_flGroundSpeed * flInterval));
+	Vector checkPos = GetEngineObject()->GetLocalOrigin() + (waypointDir * (m_flGroundSpeed * flInterval));
 
 	AIMoveTrace_t moveTrace;
-	GetMoveProbe()->MoveLimit( NAV_FLY, GetLocalOrigin(), checkPos, MASK_NPCSOLID|CONTENTS_WATER,
+	GetMoveProbe()->MoveLimit( NAV_FLY, GetEngineObject()->GetLocalOrigin(), checkPos, MASK_NPCSOLID|CONTENTS_WATER,
 		pMoveTarget, &moveTrace);
 	if (IsMoveBlocked( moveTrace ))
 	{
@@ -938,7 +938,7 @@ bool CNPC_Controller::OverridePathMove( float flInterval )
 
 	// ----------------------------------------------
 	
-	Vector lastPatrolDir = GetNavigator()->GetCurWaypointPos() - GetLocalOrigin();
+	Vector lastPatrolDir = GetNavigator()->GetCurWaypointPos() - GetEngineObject()->GetLocalOrigin();
 	
 	if ( ProgressFlyPath( flInterval, pMoveTarget, MASK_NPCSOLID, false, 64 ) == AINPP_COMPLETE )
 	{
@@ -977,11 +977,11 @@ bool CNPC_Controller::OverrideMove( float flInterval )
 	Vector vMoveTargetPos(0,0,0);
 	if (GetTarget())
 	{
-		vMoveTargetPos = GetTarget()->GetAbsOrigin();
+		vMoveTargetPos = GetTarget()->GetEngineObject()->GetAbsOrigin();
 	}
 	else if (GetEnemy() != NULL)
 	{
-		vMoveTargetPos = GetEnemy()->GetAbsOrigin();
+		vMoveTargetPos = GetEnemy()->GetEngineObject()->GetAbsOrigin();
 	}
 
 	// -----------------------------------------
@@ -993,12 +993,12 @@ bool CNPC_Controller::OverrideMove( float flInterval )
 
 		if (pMoveTarget)
 		{
-			UTIL_TraceEntity( this, GetAbsOrigin(), vMoveTargetPos, 
+			UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vMoveTargetPos,
 				MASK_NPCSOLID_BRUSHONLY, pMoveTarget, GetCollisionGroup(), &tr);
 		}
 		else
 		{
-			UTIL_TraceEntity( this, GetAbsOrigin(), vMoveTargetPos, MASK_NPCSOLID_BRUSHONLY, &tr);
+			UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vMoveTargetPos, MASK_NPCSOLID_BRUSHONLY, &tr);
 		}
 /*
 		float fTargetDist = (1-tr.fraction)*(GetAbsOrigin() - vMoveTargetPos).Length();
@@ -1069,13 +1069,13 @@ void CNPC_ControllerHeadBall::Spawn( void )
 	SetSolid( SOLID_BBOX );
 	SetSize( vec3_origin, vec3_origin );
 
-	m_pSprite = CSprite::SpriteCreate( "sprites/xspark4.vmt", GetAbsOrigin(), FALSE );
+	m_pSprite = CSprite::SpriteCreate( "sprites/xspark4.vmt", GetEngineObject()->GetAbsOrigin(), FALSE );
 	m_pSprite->SetTransparency( kRenderTransAdd, 255, 255, 255, 255, kRenderFxNoDissipation );
 	m_pSprite->SetAttachment( this, 0 );
 	m_pSprite->SetScale( 2.0 );
 
 	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0) );
-	UTIL_SetOrigin( this, GetAbsOrigin() );
+	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() );
 
 	SetThink( &CNPC_ControllerHeadBall::HuntThink );
 	SetTouch( &CNPC_ControllerHeadBall::BounceTouch );
@@ -1110,7 +1110,7 @@ void CNPC_ControllerHeadBall::HuntThink( void  )
 	m_pSprite->SetBrightness( m_pSprite->GetBrightness() - 5, 0.1f );
 
 	CBroadcastRecipientFilter filter;
-	te->DynamicLight( filter, 0.0, &GetAbsOrigin(), 255, 255, 255, 0, m_pSprite->GetBrightness() / 16, 0.2, 0 );
+	te->DynamicLight( filter, 0.0, &GetEngineObject()->GetAbsOrigin(), 255, 255, 255, 0, m_pSprite->GetBrightness() / 16, 0.2, 0 );
 
 	// check world boundaries
 	if (gpGlobals->curtime - m_flSpawnTime > 5 || m_pSprite->GetBrightness() < 64 /*|| GetEnemy() == NULL || m_hOwner == NULL*/ || !IsInWorld() )
@@ -1124,19 +1124,19 @@ void CNPC_ControllerHeadBall::HuntThink( void  )
 	if( !GetEnemy() )
 		return;
 
-	MovetoTarget( GetEnemy()->GetAbsOrigin() );
+	MovetoTarget( GetEnemy()->GetEngineObject()->GetAbsOrigin() );
 
-	if ((GetEnemy()->WorldSpaceCenter() - GetAbsOrigin()).Length() < 64)
+	if ((GetEnemy()->WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin()).Length() < 64)
 	{
 		trace_t tr;
 
-		UTIL_TraceLine( GetAbsOrigin(), GetEnemy()->WorldSpaceCenter(), MASK_ALL, this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEnemy()->WorldSpaceCenter(), MASK_ALL, this, COLLISION_GROUP_NONE, &tr );
 
 		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
 		if (pEntity != NULL && pEntity->m_takedamage == DAMAGE_YES)
 		{
 			ClearMultiDamage( );
-			Vector dir = GetAbsVelocity();
+			Vector dir = GetEngineObject()->GetAbsVelocity();
 			VectorNormalize( dir );
 			CTakeDamageInfo info( this, this, sk_controller_dmgball.GetFloat(), DMG_SHOCK );
 			CalculateMeleeDamageForce( &info, dir, tr.endpos );
@@ -1147,13 +1147,13 @@ void CNPC_ControllerHeadBall::HuntThink( void  )
 			int fadelength = 0;
 			int amplitude = 0;
 			const Vector vecEnd = tr.endpos;
-			te->BeamEntPoint( filter, 0.0, entindex(), NULL, 0, &(((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin()),
+			te->BeamEntPoint( filter, 0.0, entindex(), NULL, 0, &(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin()),
 				g_sModelIndexLaser, haloindex /* no halo */, 0, 10, 3, 20, 20, fadelength, 
 				amplitude, 255, 255, 255, 255, 10 );
 
 		}
 
-		UTIL_EmitAmbientSound( GetSoundSourceIndex(), GetAbsOrigin(), "Controller.ElectroSound", 0.5, SNDLVL_NORM, 0, 100 );
+		UTIL_EmitAmbientSound( GetSoundSourceIndex(), GetEngineObject()->GetAbsOrigin(), "Controller.ElectroSound", 0.5, SNDLVL_NORM, 0, 100 );
 
 		SetNextAttack( gpGlobals->curtime + 3.0 );
 
@@ -1168,7 +1168,7 @@ void CNPC_ControllerHeadBall::MovetoTarget( Vector vecTarget )
 	float flSpeed = m_vecIdeal.Length();
 	if (flSpeed == 0)
 	{
-		m_vecIdeal = GetAbsVelocity();
+		m_vecIdeal = GetEngineObject()->GetAbsVelocity();
 		flSpeed = m_vecIdeal.Length();
 	}
 
@@ -1178,10 +1178,10 @@ void CNPC_ControllerHeadBall::MovetoTarget( Vector vecTarget )
 		m_vecIdeal = m_vecIdeal * 400;
 	}
 
-	Vector t = vecTarget - GetAbsOrigin();
+	Vector t = vecTarget - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize(t);
 	m_vecIdeal = m_vecIdeal + t * 100;
-	SetAbsVelocity(m_vecIdeal);
+	GetEngineObject()->SetAbsVelocity(m_vecIdeal);
 }
 
 void CNPC_ControllerHeadBall::BounceTouch( CBaseEntity *pOther )
@@ -1233,13 +1233,13 @@ void CNPC_ControllerZapBall::Spawn( void )
 	SetSolid( SOLID_BBOX );
 	SetSize( vec3_origin, vec3_origin );
 
-	m_pSprite = CSprite::SpriteCreate( "sprites/xspark4.vmt", GetAbsOrigin(), FALSE );
+	m_pSprite = CSprite::SpriteCreate( "sprites/xspark4.vmt", GetEngineObject()->GetAbsOrigin(), FALSE );
 	m_pSprite->SetTransparency( kRenderTransAdd, 255, 255, 255, 255, kRenderFxNoDissipation );
 	m_pSprite->SetAttachment( this, 0 );
 	m_pSprite->SetScale( 0.5 );
 
 	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0) );
-	UTIL_SetOrigin( this, GetAbsOrigin() );
+	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() );
 
 	SetThink( &CNPC_ControllerZapBall::AnimateThink );
 	SetTouch( &CNPC_ControllerZapBall::ExplodeTouch );
@@ -1263,7 +1263,7 @@ void CNPC_ControllerZapBall::AnimateThink( void  )
 	
 	SetCycle( ((int)GetCycle() + 1) % 11 );
 
-	if (gpGlobals->curtime - m_flSpawnTime > 5 || GetAbsVelocity().Length() < 10)
+	if (gpGlobals->curtime - m_flSpawnTime > 5 || GetEngineObject()->GetAbsVelocity().Length() < 10)
 	{
 		SetTouch( NULL );
 		Kill();
@@ -1280,7 +1280,7 @@ void CNPC_ControllerZapBall::ExplodeTouch( CBaseEntity *pOther )
 
 		ClearMultiDamage( );
 
-		Vector vecAttackDir = GetAbsVelocity();
+		Vector vecAttackDir = GetEngineObject()->GetAbsVelocity();
 		VectorNormalize( vecAttackDir );
 
 		if (m_hOwner != NULL)

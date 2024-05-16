@@ -102,9 +102,9 @@ void CNPC_MissileDefense::GetGunAim( Vector *vecAim )
 
 	GetAttachment( MD_AP_LGUN, vecPos, vecAng );
 
-	vecAng.x = GetLocalAngles().x + GetBoneController( MD_BC_PITCH );
+	vecAng.x = GetEngineObject()->GetLocalAngles().x + GetBoneController( MD_BC_PITCH );
 	vecAng.z = 0;
-	vecAng.y = GetLocalAngles().y + GetBoneController( MD_BC_YAW );
+	vecAng.y = GetEngineObject()->GetLocalAngles().y + GetBoneController( MD_BC_YAW );
 
 	Vector vecForward;
 	AngleVectors( vecAng, &vecForward );
@@ -145,7 +145,7 @@ void CNPC_MissileDefense::FireCannons( void )
 	Vector vTargetPos;
 	EnemyShootPosition(GetEnemy(),&vTargetPos);
 
-	Vector vTargetDir = vTargetPos - GetAbsOrigin();
+	Vector vTargetDir = vTargetPos - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( vTargetDir );
 
 	float fDotPr = DotProduct( vGunDir, vTargetDir );
@@ -158,7 +158,7 @@ void CNPC_MissileDefense::FireCannons( void )
 	// Check line of sight
 	// ----------------------------------------------
 	trace_t tr;
-	AI_TraceLine( GetEnemy()->EyePosition(), GetAbsOrigin(), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
+	AI_TraceLine( GetEnemy()->EyePosition(), GetEngineObject()->GetAbsOrigin(), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 	if (tr.fraction < 1.0)
 	{
 		return;
@@ -167,7 +167,7 @@ void CNPC_MissileDefense::FireCannons( void )
 	Vector vecRight;
 	Vector vecDir;
 	Vector vecCenter;
-	AngleVectors( GetLocalAngles(), NULL, &vecRight, NULL );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), NULL, &vecRight, NULL );
 
 	vecCenter = WorldSpaceCenter();
 
@@ -241,7 +241,7 @@ void CNPC_MissileDefense::FireCannons( void )
 	// Do damage to the missile based on distance.
 	// if < 1, make damage 0.
 
-	float flDist = (GetEnemy()->GetLocalOrigin() - vecGun).Length();
+	float flDist = (GetEnemy()->GetEngineObject()->GetLocalOrigin() - vecGun).Length();
 	float flDamage;
 
 	flDamage = 4000 - flDist;
@@ -256,7 +256,7 @@ void CNPC_MissileDefense::FireCannons( void )
 		}
 
 		CTakeDamageInfo info( this, this, flDamage, DMG_MISSILEDEFENSE );
-		CalculateBulletDamageForce( &info, GetAmmoDef()->Index("SMG1"), vecDir, GetEnemy()->GetAbsOrigin() );
+		CalculateBulletDamageForce( &info, GetAmmoDef()->Index("SMG1"), vecDir, GetEnemy()->GetEngineObject()->GetAbsOrigin() );
 		GetEnemy()->TakeDamage( info );
 	}
 }
@@ -342,20 +342,20 @@ void CNPC_MissileDefense::Gib(void)
 	// Sparks
 	for (int i = 0; i < 4; i++)
 	{
-		Vector sparkPos = GetAbsOrigin();
+		Vector sparkPos = GetEngineObject()->GetAbsOrigin();
 		sparkPos.x += random->RandomFloat(-12,12);
 		sparkPos.y += random->RandomFloat(-12,12);
 		sparkPos.z += random->RandomFloat(-12,12);
 		g_pEffects->Sparks(sparkPos);
 	}
 	// Smoke
-	UTIL_Smoke(GetAbsOrigin(), random->RandomInt(10, 15), 10);
+	UTIL_Smoke(GetEngineObject()->GetAbsOrigin(), random->RandomInt(10, 15), 10);
 
 	// Light
 	CBroadcastRecipientFilter filter;
 
 	te->DynamicLight( filter, 0.0,
-			&GetAbsOrigin(), 255, 180, 100, 0, 100, 0.1, 0 );
+			&GetEngineObject()->GetAbsOrigin(), 255, 180, 100, 0, 100, 0.1, 0 );
 
 	// Remove top parts
 	SetBodygroup( 1, 0 );
@@ -419,10 +419,10 @@ void CNPC_MissileDefense::EnemyShootPosition(CBaseEntity* pEnemy, Vector *vPosit
 		return;
 	}
 
-	*vPosition = pEnemy->GetAbsOrigin();
+	*vPosition = pEnemy->GetEngineObject()->GetAbsOrigin();
 	
 	// Add prediction but prevents us from flipping around as enemy approaches us
-	float	flDist		= (pEnemy->GetAbsOrigin() - GetAbsOrigin()).Length();
+	float	flDist		= (pEnemy->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
 	Vector	vPredVel	= pEnemy->GetSmoothedVelocity() * 0.5;
 	if ( flDist > vPredVel.Length())
 	{
@@ -444,7 +444,7 @@ void CNPC_MissileDefense::AimGun( void )
 	}
 
 	Vector forward, right, up;
-	AngleVectors( GetLocalAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, &right, &up );
 		
 	// Get gun attachment points
 	Vector vBasePos;

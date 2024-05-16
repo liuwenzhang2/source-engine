@@ -259,7 +259,7 @@ void C_SmokeTrail::Start( CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArgs
 		return;
 	}
 
-	m_pSmokeEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pSmokeEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 	m_pSmokeEmitter->SetNearClip( 64.0f, 128.0f );
 
 	m_MaterialHandle[0] = g_Mat_DustPuff[0];
@@ -293,7 +293,7 @@ void C_SmokeTrail::Update( float fTimeDelta )
 	Vector			offset;
 
 	Vector vecOrigin;
-	VectorMA( GetAbsOrigin(), -fTimeDelta, GetAbsVelocity(), vecOrigin );
+	VectorMA(GetEngineObject()->GetAbsOrigin(), -fTimeDelta, GetEngineObject()->GetAbsVelocity(), vecOrigin );
 
 	Vector vecForward;
 	GetEngineObject()->GetVectors( &vecForward, NULL, NULL );
@@ -304,7 +304,7 @@ void C_SmokeTrail::Update( float fTimeDelta )
 
 		offset.Random( -m_SpawnRadius, m_SpawnRadius );
 		offset += vecOrigin;
-		VectorMA( offset, fldt, GetAbsVelocity(), offset );
+		VectorMA( offset, fldt, GetEngineObject()->GetAbsVelocity(), offset );
 
 		pParticle = (SimpleParticle *) m_pSmokeEmitter->AddParticle( sizeof( SimpleParticle ), m_MaterialHandle[random->RandomInt(0,1)], offset );
 
@@ -317,7 +317,7 @@ void C_SmokeTrail::Update( float fTimeDelta )
 		pParticle->m_vecVelocity.Random( -1.0f, 1.0f );
 		pParticle->m_vecVelocity *= random->RandomFloat( m_MinSpeed, m_MaxSpeed );
 
-		pParticle->m_vecVelocity = pParticle->m_vecVelocity + GetAbsVelocity();
+		pParticle->m_vecVelocity = pParticle->m_vecVelocity + GetEngineObject()->GetAbsVelocity();
 		
 		float flDirectedVel = random->RandomFloat( m_MinDirectedSpeed, m_MaxDirectedSpeed );
 		VectorMA( pParticle->m_vecVelocity, flDirectedVel, vecForward, pParticle->m_vecVelocity );
@@ -421,9 +421,9 @@ void C_SmokeTrail::CleanupToolRecordingState( KeyValues *msg )
 		pPosition->SetPtr( "entindex", (void*)(intp)pEnt->entindex() );
 		pPosition->SetInt( "attachmentIndex", m_nAttachment );
 		pPosition->SetFloat( "randomDist", m_SpawnRadius );
-		pPosition->SetFloat( "startx", pEnt->GetAbsOrigin().x );
-		pPosition->SetFloat( "starty", pEnt->GetAbsOrigin().y );
-		pPosition->SetFloat( "startz", pEnt->GetAbsOrigin().z );
+		pPosition->SetFloat( "startx", pEnt->GetEngineObject()->GetAbsOrigin().x );
+		pPosition->SetFloat( "starty", pEnt->GetEngineObject()->GetAbsOrigin().y );
+		pPosition->SetFloat( "startz", pEnt->GetEngineObject()->GetAbsOrigin().z );
 
 		KeyValues *pLifetime = pInitializers->FindKey( "DmeRandomLifetimeInitializer", true );
 		pLifetime->SetFloat( "minLifetime", m_ParticleLifetime );
@@ -637,7 +637,7 @@ void C_RocketTrail::Start( CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArg
 		return;
 	}
 
-	m_pRocketEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pRocketEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 	m_pRocketEmitter->SetNearClip( 64.0f, 128.0f );
 
 	m_MaterialHandle[0] = g_Mat_DustPuff[0];
@@ -645,7 +645,7 @@ void C_RocketTrail::Start( CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArg
 	
 	m_ParticleSpawn.Init( m_SpawnRate );
 
-	m_vecLastPosition = GetAbsOrigin();
+	m_vecLastPosition = GetEngineObject()->GetAbsOrigin();
 }
 
 
@@ -662,12 +662,12 @@ void C_RocketTrail::Update( float fTimeDelta )
 		return;
 
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "MuzzleFlash" );
-	pSimple->SetSortOrigin( GetAbsOrigin() );
+	pSimple->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 	
 	SimpleParticle *pParticle;
 	Vector			forward, offset;
 
-	AngleVectors( GetAbsAngles(), &forward );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
 	
 	forward.Negate();
 
@@ -681,7 +681,7 @@ void C_RocketTrail::Update( float fTimeDelta )
 
 	for ( i = 1; i < 9; i++ )
 	{
-		offset = GetAbsOrigin() + (forward * (i*2.0f*m_flFlareScale));
+		offset = GetEngineObject()->GetAbsOrigin() + (forward * (i*2.0f*m_flFlareScale));
 
 		pParticle = (SimpleParticle *) pSimple->AddParticle( sizeof( SimpleParticle ), pSimple->GetPMaterial( VarArgs( "effects/muzzleflash%d", random->RandomInt(1,4) ) ), offset );
 			
@@ -709,7 +709,7 @@ void C_RocketTrail::Update( float fTimeDelta )
 	// Add new particles (undamaged version)
 	if ( m_bEmit )
 	{
-		Vector	moveDiff	= GetAbsOrigin() - m_vecLastPosition;
+		Vector	moveDiff	= GetEngineObject()->GetAbsOrigin() - m_vecLastPosition;
 		float	moveLength	= VectorNormalize( moveDiff );
 
 		int	numPuffs = moveLength / ( m_StartSize / 2.0f );
@@ -777,14 +777,14 @@ void C_RocketTrail::Update( float fTimeDelta )
 
 		CSmartPtr<CEmberEffect>	pEmitter = CEmberEffect::Create("C_RocketTrail::damaged");
 
-		pEmitter->SetSortOrigin( GetAbsOrigin() );
+		pEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
 		PMaterialHandle flameMaterial = m_pRocketEmitter->GetPMaterial( VarArgs( "sprites/flamelet%d", random->RandomInt( 1, 4 ) ) );
 		
 		// Flames from the rocket
 		for ( i = 0; i < 8; i++ )
 		{
-			offset = RandomVector( -8, 8 ) + GetAbsOrigin();
+			offset = RandomVector( -8, 8 ) + GetEngineObject()->GetAbsOrigin();
 
 			pParticle = (SimpleParticle *) pEmitter->AddParticle( sizeof( SimpleParticle ), flameMaterial, offset );
 
@@ -818,7 +818,7 @@ void C_RocketTrail::Update( float fTimeDelta )
 		}
 	}
 
-	m_vecLastPosition = GetAbsOrigin();
+	m_vecLastPosition = GetEngineObject()->GetAbsOrigin();
 }
 
 void C_RocketTrail::RenderParticles( CParticleRenderIterator *pIterator )
@@ -972,7 +972,7 @@ void C_SporeExplosion::Start( CParticleMgr *pParticleMgr, IPrototypeArgAccess *p
 
 	m_hMaterial	= m_pSporeEffect->GetPMaterial( "particle/fire" );
 
-	m_pSporeEffect->SetSortOrigin( GetAbsOrigin() );
+	m_pSporeEffect->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 	m_pSporeEffect->SetNearClip( 64, 128 );
 }
 
@@ -986,7 +986,7 @@ void C_SporeExplosion::AddParticles( void )
 	Vector	dir;
 
 	//Get our direction
-	AngleVectors( GetAbsAngles(), &dir );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &dir );
 
 	SimpleParticle	*sParticle;
 
@@ -994,7 +994,7 @@ void C_SporeExplosion::AddParticles( void )
 	{
 		//Add small particle to the effect's origin
 		offset.Random( -m_flSpawnRadius, m_flSpawnRadius );
-		sParticle = (SimpleParticle *) m_pSporeEffect->AddParticle( sizeof(SimpleParticle), m_hMaterial, GetAbsOrigin()+offset );
+		sParticle = (SimpleParticle *) m_pSporeEffect->AddParticle( sizeof(SimpleParticle), m_hMaterial, GetEngineObject()->GetAbsOrigin()+offset );
 
 		if ( sParticle == NULL )
 			return;
@@ -1018,7 +1018,7 @@ void C_SporeExplosion::AddParticles( void )
 
 	//Add smokey bits
 	offset.Random( -(m_flSpawnRadius * 0.5), (m_flSpawnRadius * 0.5) );
-	sParticle = (SimpleParticle *) m_pSporeEffect->AddParticle( sizeof(SimpleParticle), g_Mat_DustPuff[1], GetAbsOrigin()+offset );
+	sParticle = (SimpleParticle *) m_pSporeEffect->AddParticle( sizeof(SimpleParticle), g_Mat_DustPuff[1], GetEngineObject()->GetAbsOrigin()+offset );
 
 	if ( sParticle == NULL )
 		return;
@@ -1052,7 +1052,7 @@ void C_SporeExplosion::Update( float fTimeDelta )
 	{
 		float tempDelta = fTimeDelta;
 
-		float flDist = (MainViewOrigin() - GetAbsOrigin()).Length();
+		float flDist = (MainViewOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
 
 		//Lower the spawnrate by half if we're far away from it.
 		if ( cl_sporeclipdistance.GetFloat() <= flDist )
@@ -1445,7 +1445,7 @@ void C_FireTrail::Start( CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArgs 
 		return;
 	}
 
-	m_pTrailEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pTrailEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	// Setup our materials
 	m_hMaterial[FTRAIL_SMOKE1] = g_Mat_DustPuff[0];
@@ -1460,7 +1460,7 @@ void C_FireTrail::Start( CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArgs 
 	// Setup our smoke emitter
 	m_pSmokeEmitter = CSmokeParticle::Create( "FireTrail_Smoke" );
 	
-	m_pSmokeEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pSmokeEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 	m_pSmokeEmitter->SetNearClip( 64.0f, 128.0f );
 
 	if ( !m_pSmokeEmitter )
@@ -1470,7 +1470,7 @@ void C_FireTrail::Start( CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArgs 
 	}
 
 	// Seed our first position as the last known one
-	m_vecLastPosition = GetAbsOrigin();
+	m_vecLastPosition = GetEngineObject()->GetAbsOrigin();
 }
 
 
@@ -1487,7 +1487,7 @@ void C_FireTrail::Update( float fTimeDelta )
 		return;
 
 	CSmartPtr<CSimpleEmitter> pSimple = CSimpleEmitter::Create( "FireTrail" );
-	pSimple->SetSortOrigin( GetAbsOrigin() );
+	pSimple->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 	
 	Vector			offset;
 
@@ -1500,7 +1500,7 @@ void C_FireTrail::Update( float fTimeDelta )
 	// Add new particles
 	//if ( ShouldEmit() )
 	{
-		Vector	moveDiff	= GetAbsOrigin() - m_vecLastPosition;
+		Vector	moveDiff	= GetEngineObject()->GetAbsOrigin() - m_vecLastPosition;
 		float	moveLength	= VectorNormalize( moveDiff );
 
 		int	numPuffs = moveLength / ( STARTSIZE / 2.0f );
@@ -1550,7 +1550,7 @@ void C_FireTrail::Update( float fTimeDelta )
 		// Smoke
 		//
 
-		offset = RandomVector( -STARTSIZE*0.5f, STARTSIZE*0.5f ) + GetAbsOrigin();
+		offset = RandomVector( -STARTSIZE*0.5f, STARTSIZE*0.5f ) + GetEngineObject()->GetAbsOrigin();
 
 		pParticle = (SimpleParticle *) m_pSmokeEmitter->AddParticle( sizeof( SimpleParticle ), m_hMaterial[random->RandomInt( FTRAIL_SMOKE1, FTRAIL_SMOKE2 )], offset );
 
@@ -1579,7 +1579,7 @@ void C_FireTrail::Update( float fTimeDelta )
 	}
 
 	// Save off this position
-	m_vecLastPosition = GetAbsOrigin();
+	m_vecLastPosition = GetEngineObject()->GetAbsOrigin();
 }
 
 //-----------------------------------------------------------------------------
@@ -1769,7 +1769,7 @@ void C_DustTrail::Start( CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArgs 
 		return;
 	}
 
-	m_pDustEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pDustEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 	m_pDustEmitter->SetNearClip( 64.0f, 128.0f );
 
 	for (int i = 0; i < DUSTTRAIL_MATERIALS; i++)
@@ -1807,7 +1807,7 @@ void C_DustTrail::Update( float fTimeDelta )
 	Vector			offset;
 
 	Vector vecOrigin;
-	VectorMA( GetAbsOrigin(), -fTimeDelta, GetAbsVelocity(), vecOrigin );
+	VectorMA(GetEngineObject()->GetAbsOrigin(), -fTimeDelta, GetEngineObject()->GetAbsVelocity(), vecOrigin );
 
 	Vector vecForward;
 	GetEngineObject()->GetVectors( &vecForward, NULL, NULL );
@@ -1818,7 +1818,7 @@ void C_DustTrail::Update( float fTimeDelta )
 
 		offset.Random( -m_SpawnRadius, m_SpawnRadius );
 		offset += vecOrigin;
-		VectorMA( offset, fldt, GetAbsVelocity(), offset );
+		VectorMA( offset, fldt, GetEngineObject()->GetAbsVelocity(), offset );
 
 		//if ( random->RandomFloat( 0.f, 5.0f ) > GetAbsVelocity().Length())
 		//	continue;
@@ -1834,7 +1834,7 @@ void C_DustTrail::Update( float fTimeDelta )
 		pParticle->m_vecVelocity.Random( -1.0f, 1.0f );
 		pParticle->m_vecVelocity *= random->RandomFloat( m_MinSpeed, m_MaxSpeed );
 
-		pParticle->m_vecVelocity = pParticle->m_vecVelocity + GetAbsVelocity();
+		pParticle->m_vecVelocity = pParticle->m_vecVelocity + GetEngineObject()->GetAbsVelocity();
 		
 		float flDirectedVel = random->RandomFloat( m_MinDirectedSpeed, m_MaxDirectedSpeed );
 		VectorMA( pParticle->m_vecVelocity, flDirectedVel, vecForward, pParticle->m_vecVelocity );
@@ -1936,14 +1936,14 @@ void C_DustTrail::CleanupToolRecordingState( KeyValues *msg )
 		pPosition->SetPtr( "entindex", (void*)(intp)pEnt->entindex() );
 		pPosition->SetInt( "attachmentIndex", GetEngineObject()->GetParentAttachment() );
 		pPosition->SetFloat( "randomDist", m_SpawnRadius );
-		pPosition->SetFloat( "startx", pEnt->GetAbsOrigin().x );
-		pPosition->SetFloat( "starty", pEnt->GetAbsOrigin().y );
-		pPosition->SetFloat( "startz", pEnt->GetAbsOrigin().z );
+		pPosition->SetFloat( "startx", pEnt->GetEngineObject()->GetAbsOrigin().x );
+		pPosition->SetFloat( "starty", pEnt->GetEngineObject()->GetAbsOrigin().y );
+		pPosition->SetFloat( "startz", pEnt->GetEngineObject()->GetAbsOrigin().z );
 
 		KeyValues *pVelocity = pInitializers->FindKey( "DmeDecayVelocityInitializer", true );
-		pVelocity->SetFloat( "velocityX", pEnt->GetAbsVelocity().x );
-		pVelocity->SetFloat( "velocityY", pEnt->GetAbsVelocity().y );
-		pVelocity->SetFloat( "velocityZ", pEnt->GetAbsVelocity().z );
+		pVelocity->SetFloat( "velocityX", pEnt->GetEngineObject()->GetAbsVelocity().x );
+		pVelocity->SetFloat( "velocityY", pEnt->GetEngineObject()->GetAbsVelocity().y );
+		pVelocity->SetFloat( "velocityZ", pEnt->GetEngineObject()->GetAbsVelocity().z );
 		pVelocity->SetFloat( "decayto", 0.5 );
 		pVelocity->SetFloat( "decaytime", 0.3 );
 

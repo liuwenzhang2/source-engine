@@ -82,7 +82,7 @@ public:
 	void NearestPath( void );
 	void DeadEnd( void );
 
-	void SetTrack( CPathTrack *track ) { m_ppath = track->Nearest(GetLocalOrigin()); }
+	void SetTrack( CPathTrack *track ) { m_ppath = track->Nearest(GetEngineObject()->GetLocalOrigin()); }
 	void SetControls( CBaseEntity *pControls );
 	bool OnControls( CBaseEntity *pControls );
 

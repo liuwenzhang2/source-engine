@@ -31,7 +31,7 @@ CHEGrenadeProjectile* CHEGrenadeProjectile::Create(
 	// one second before detonation.
 
 	pGrenade->SetDetonateTimerLength( 1.5 );
-	pGrenade->SetAbsVelocity( velocity );
+	pGrenade->GetEngineObject()->SetAbsVelocity( velocity );
 	pGrenade->SetupInitialTransmittedGrenadeVelocity( velocity );
 	pGrenade->SetThrower( pOwner ); 
 
@@ -93,9 +93,9 @@ void CHEGrenadeProjectile::Detonate()
 		if ( event )
 		{
 			event->SetInt( "userid", player->GetUserID() );
-			event->SetFloat( "x", GetAbsOrigin().x );
-			event->SetFloat( "y", GetAbsOrigin().y );
-			event->SetFloat( "z", GetAbsOrigin().z );
+			event->SetFloat( "x", GetEngineObject()->GetAbsOrigin().x );
+			event->SetFloat( "y", GetEngineObject()->GetAbsOrigin().y );
+			event->SetFloat( "z", GetEngineObject()->GetAbsOrigin().z );
 			gameeventmanager->FireEvent( event );
 		}
 	}

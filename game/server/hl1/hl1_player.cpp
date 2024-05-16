@@ -133,7 +133,7 @@ void CHL1_Player::PreThink(void)
 		UTIL_PredictedPosition( this, player_showpredictedposition_timestep.GetFloat(), &predPos );
 
 		NDebugOverlay::Box( predPos, NAI_Hull::Mins( GetHullType() ), NAI_Hull::Maxs( GetHullType() ), 0, 255, 0, 0, 0.01f );
-		NDebugOverlay::Line( GetAbsOrigin(), predPos, 0, 255, 0, 0, 0.01f );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), predPos, 0, 255, 0, 0, 0.01f );
 	}
 
 	int buttonsChanged;
@@ -211,7 +211,7 @@ void CHL1_Player::PreThink(void)
 			{
 				trace_t trainTrace;
 				// Maybe this is on the other side of a level transition
-				UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector(0,0,-38), 
+				UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector(0,0,-38),
 					MASK_PLAYERSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trainTrace );
 
 				if ( trainTrace.fraction != 1.0 && trainTrace.m_pEnt )
@@ -235,7 +235,7 @@ void CHL1_Player::PreThink(void)
 			return;
 		}
 
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		vel = 0;
 		if ( m_afButtonPressed & IN_FORWARD )
 		{
@@ -287,12 +287,12 @@ void CHL1_Player::PreThink(void)
 	//
 	if ( !( GetFlags() & FL_ONGROUND ) )
 	{
-		m_Local.m_flFallVelocity = -GetAbsVelocity().z;
+		m_Local.m_flFallVelocity = -GetEngineObject()->GetAbsVelocity().z;
 	}
 
 	if ( m_afPhysicsFlags & PFLAG_ONBARNACLE )
 	{
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 	}
 	// StudioFrameAdvance( );//!!!HACKHACK!!! Can't be hit by traceline when not animating?
 
@@ -420,7 +420,7 @@ CBaseEntity	*CHL1_Player::GiveNamedItem( const char *pszName, int iSubType )
 		return NULL;
 	}
 
-	pent->SetLocalOrigin( GetLocalOrigin() );
+	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
 	pent->AddSpawnFlags( SF_NORESPAWN );
 
 	if ( iSubType )
@@ -836,7 +836,7 @@ int	CHL1_Player::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		// message at the end of the frame
 		// todo: remove after combining shotgun blasts?
 		if ( info.GetInflictor() && info.GetInflictor()->entindex()!=-1 )
-			m_DmgOrigin = info.GetInflictor()->GetAbsOrigin();
+			m_DmgOrigin = info.GetInflictor()->GetEngineObject()->GetAbsOrigin();
 
 		m_DmgTake += (int)info.GetDamage();
 	}
@@ -1086,7 +1086,7 @@ void CHL1_Player::FindMissTargets( void )
 	CBaseEntity *pEnts[256];
 	Vector		radius( 80, 80, 80);
 
-	int numEnts = UTIL_EntitiesInBox( pEnts, 256, GetAbsOrigin()-radius, GetAbsOrigin()+radius, 0 );
+	int numEnts = UTIL_EntitiesInBox( pEnts, 256, GetEngineObject()->GetAbsOrigin()-radius, GetEngineObject()->GetAbsOrigin()+radius, 0 );
 
 	for ( int i = 0; i < numEnts; i++ )
 	{
@@ -1164,7 +1164,7 @@ void CHL1_Player::UpdateClientData( void )
 	if (m_DmgTake || m_DmgSave || m_bitsHUDDamage != m_bitsDamageType)
 	{
 		// Comes from inside me if not set
-		Vector damageOrigin = GetLocalOrigin();
+		Vector damageOrigin = GetEngineObject()->GetLocalOrigin();
 		// send "damage" message
 		// causes screen to flash, and pain compass to show direction of damage
 		damageOrigin = m_DmgOrigin;
@@ -1243,7 +1243,7 @@ void CHL1_Player::CreateViewModel( int index /*=0*/ )
 	CPredictedViewModel *vm = ( CPredictedViewModel * )gEntList.CreateEntityByName( "predicted_viewmodel" );
 	if ( vm )
 	{
-		vm->SetAbsOrigin( GetAbsOrigin() );
+		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		vm->SetOwner( this );
 		vm->SetIndex( index );
 		DispatchSpawn( vm );
@@ -1389,7 +1389,7 @@ static void ComputePlayerMatrix( CBasePlayer *pPlayer, matrix3x4_t &out )
 	//angles.x = clamp( angles.x, -PLAYER_LOOK_PITCH_RANGE, PLAYER_LOOK_PITCH_RANGE );
 	angles.x = 0;
 
-	float feet = pPlayer->GetAbsOrigin().z + pPlayer->WorldAlignMins().z;
+	float feet = pPlayer->GetEngineObject()->GetAbsOrigin().z + pPlayer->WorldAlignMins().z;
 	float eyes = origin.z;
 	float zoffset = 0;
 	// moving up (negative pitch is up)
@@ -1863,7 +1863,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	AngleVectors( playerAngles, &forward, &right, &up );
 	
 	// Now clamp a sphere of object radius at end to the player's bbox
-	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetAbsAngles(), -forward );
+	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -forward );
 	Vector player2d = pPlayer->CollisionProp()->OBBMaxs();
 	float playerRadius = player2d.Length2D();
 	float radius = playerRadius + fabs(DotProduct( forward, radial ));

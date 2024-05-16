@@ -179,7 +179,7 @@ void CWeaponSMG1::FireNPCPrimaryAttack( CBaseCombatCharacter *pOperator, Vector 
 	// FIXME: use the returned number of bullets to account for >10hz firerate
 	WeaponSoundRealtime( SINGLE_NPC );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
+	CSoundEnt::InsertSound( SOUND_COMBAT|SOUND_CONTEXT_GUNFIRE, pOperator->GetEngineObject()->GetAbsOrigin(), SOUNDENT_VOLUME_MACHINEGUN, 0.2, pOperator, SOUNDENT_CHANNEL_WEAPON, pOperator->GetEnemy() );
 	pOperator->FireBullets( 1, vecShootOrigin, vecShootDir, VECTOR_CONE_PRECALCULATED,
 		MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 2, entindex(), 0 );
 
@@ -250,7 +250,7 @@ void CWeaponSMG1::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChar
 			}
 
 			CGrenadeAR2 *pGrenade = (CGrenadeAR2*)Create("grenade_ar2", vecShootOrigin, vec3_angle, npc);
-			pGrenade->SetAbsVelocity( vecThrow );
+			pGrenade->GetEngineObject()->SetAbsVelocity( vecThrow );
 			pGrenade->SetLocalAngularVelocity(RandomAngle(-400, 400)); //tumble in air
 			pGrenade->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
@@ -374,7 +374,7 @@ void CWeaponSMG1::SecondaryAttack( void )
 	QAngle angles;
 	VectorAngles( vecThrow, angles );
 	CGrenadeAR2 *pGrenade = (CGrenadeAR2*)Create( "grenade_ar2", vecSrc, angles, pPlayer );
-	pGrenade->SetAbsVelocity( vecThrow );
+	pGrenade->GetEngineObject()->SetAbsVelocity( vecThrow );
 
 	pGrenade->SetLocalAngularVelocity( RandomAngle( -400, 400 ) );
 	pGrenade->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE ); 
@@ -383,7 +383,7 @@ void CWeaponSMG1::SecondaryAttack( void )
 
 	SendWeaponAnim( ACT_VM_SECONDARYATTACK );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 1000, 0.2, GetOwner(), SOUNDENT_CHANNEL_WEAPON );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 1000, 0.2, GetOwner(), SOUNDENT_CHANNEL_WEAPON );
 
 	// player "shoot" animation
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
@@ -438,7 +438,7 @@ int CWeaponSMG1::WeaponRangeAttack2Condition(/* float flDot, float flDist */)
 		return COND_NONE;
 
 	Vector vecEnemyLKP = npcOwner->GetEnemyLKP();
-	if ( !( pEnemy->GetFlags() & FL_ONGROUND ) && pEnemy->GetWaterLevel() == 0 && vecEnemyLKP.z > (GetAbsOrigin().z + WorldAlignMaxs().z) )
+	if ( !( pEnemy->GetFlags() & FL_ONGROUND ) && pEnemy->GetWaterLevel() == 0 && vecEnemyLKP.z > (GetEngineObject()->GetAbsOrigin().z + WorldAlignMaxs().z) )
 	{
 		//!!!BUGBUG - we should make this check movetype and make sure it isn't FLY? Players who jump a lot are unlikely to 
 		// be grenaded.
@@ -465,7 +465,7 @@ int CWeaponSMG1::WeaponRangeAttack2Condition(/* float flDot, float flDist */)
 	// vecTarget = vecTarget + pEnemy->m_vecVelocity * 2;
 
 
-	if ( ( vecTarget - npcOwner->GetLocalOrigin() ).Length2D() <= COMBINE_MIN_GRENADE_CLEAR_DIST )
+	if ( ( vecTarget - npcOwner->GetEngineObject()->GetLocalOrigin() ).Length2D() <= COMBINE_MIN_GRENADE_CLEAR_DIST )
 	{
 		// crap, I don't want to blow myself up
 		m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.
@@ -493,7 +493,7 @@ int CWeaponSMG1::WeaponRangeAttack2Condition(/* float flDot, float flDist */)
 	// ---------------------------------------------------------------------
 	// FIXME: speed is based on difficulty...
 
-	Vector vecToss = VecCheckThrow( this, npcOwner->GetLocalOrigin() + Vector(0,0,60), vecTarget, 600.0, 0.5 );
+	Vector vecToss = VecCheckThrow( this, npcOwner->GetEngineObject()->GetLocalOrigin() + Vector(0,0,60), vecTarget, 600.0, 0.5 );
 	if ( vecToss != vec3_origin )
 	{
 		m_vecTossVelocity = vecToss;

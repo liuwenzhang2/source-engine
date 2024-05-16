@@ -593,7 +593,7 @@ void CBasePlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
 	{
 #ifndef CLIENT_DLL
 		//Adrian: Make the model's angle match the legs so the hitboxes match on both sides.
-		GetOuter()->SetLocalAngles( QAngle( 0, m_flCurrentFeetYaw, 0 ) );
+		GetOuter()->GetEngineObject()->SetLocalAngles( QAngle( 0, m_flCurrentFeetYaw, 0 ) );
 #endif
 	}
 
@@ -637,7 +637,7 @@ void CBasePlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
 	{
 #ifndef CLIENT_DLL
 		//Adrian: Make the model's angle match the legs so the hitboxes match on both sides.
-		GetOuter()->SetLocalAngles( QAngle( 0, m_flCurrentFeetYaw, 0 ) );
+		GetOuter()->GetEngineObject()->SetLocalAngles( QAngle( 0, m_flCurrentFeetYaw, 0 ) );
 #endif
 
 		int iMoveX = GetOuter()->LookupPoseParameter( pStudioHdr, "move_x" );
@@ -921,7 +921,7 @@ void CBasePlayerAnimState::GetOuterAbsVelocity( Vector& vel ) const
 #if defined( CLIENT_DLL )
 	GetOuter()->GetEngineObject()->EstimateAbsVelocity( vel );
 #else
-	vel = GetOuter()->GetAbsVelocity();
+	vel = GetOuter()->GetEngineObject()->GetAbsVelocity();
 #endif
 }
 
@@ -1047,7 +1047,7 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 	// Draw a red triangle on the ground for the eye yaw.
 	float flBaseSize = 10;
 	float flHeight = 80;
-	Vector vBasePos = GetOuter()->GetAbsOrigin() + Vector( 0, 0, 3 );
+	Vector vBasePos = GetOuter()->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 3 );
 	QAngle angles( 0, 0, 0 );
 	angles[YAW] = m_flEyeYaw;
 	Vector vForward, vRight, vUp;

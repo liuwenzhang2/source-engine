@@ -345,7 +345,7 @@ void CItem_DynamicResupply::SpawnFullItem( CItem_DynamicResupply *pMaster, CBase
 		// If we're supposed to fallback to just a health vial, do that and finish.
 		if ( pMaster->HasSpawnFlags(SF_DYNAMICRESUPPLY_FALLBACK_TO_VIAL) )
 		{
-			CBaseEntity::Create( "item_healthvial", GetAbsOrigin(), GetAbsAngles(), this );
+			CBaseEntity::Create( "item_healthvial", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), this );
 
 			if ( iDebug )
 			{
@@ -364,7 +364,7 @@ void CItem_DynamicResupply::SpawnFullItem( CItem_DynamicResupply *pMaster, CBase
 	{
 		if ( flChoice <= flRatio[i] )
 		{
-			CBaseEntity::Create( g_DynamicResupplyAmmoItems[i].sEntityName, GetAbsOrigin(), GetAbsAngles(), this );
+			CBaseEntity::Create( g_DynamicResupplyAmmoItems[i].sEntityName, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), this );
 
 			if ( iDebug )
 			{
@@ -542,8 +542,8 @@ bool CItem_DynamicResupply::SpawnItemFromRatio( int nCount, DynamicResupplyItems
 		Msg("Chosen item: %s (had farthest delta, %.2f)\n", pItems[iSelectedIndex].sEntityName, pSpawnInfo[iSelectedIndex].m_flDelta );
 	}
 
-	CBaseEntity *pEnt = CBaseEntity::Create( pItems[iSelectedIndex].sEntityName, *pVecSpawnOrigin, GetAbsAngles(), this );
-	pEnt->SetAbsVelocity( GetAbsVelocity() );
+	CBaseEntity *pEnt = CBaseEntity::Create( pItems[iSelectedIndex].sEntityName, *pVecSpawnOrigin, GetEngineObject()->GetAbsAngles(), this );
+	pEnt->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() );
 	pEnt->SetLocalAngularVelocity( GetLocalAngularVelocity() );
 
 	// Move the entity up so that it doesn't go below the spawn origin
@@ -554,7 +554,7 @@ bool CItem_DynamicResupply::SpawnItemFromRatio( int nCount, DynamicResupplyItems
 		float dz = pVecSpawnOrigin->z - vecWorldMins.z;
 		pVecSpawnOrigin->z += dz;
 		vecWorldMaxs.z += dz;
-		pEnt->SetAbsOrigin( *pVecSpawnOrigin ); 
+		pEnt->GetEngineObject()->SetAbsOrigin( *pVecSpawnOrigin );
 	}
 
 	// Update the spawn position to spawn them on top of each other
@@ -602,7 +602,7 @@ void CItem_DynamicResupply::SpawnDynamicItem( CBasePlayer *pPlayer )
 	ComputeHealthRatios( pMaster, pPlayer, iDebug, pHealthInfo );
 	ComputeAmmoRatios( pMaster, pPlayer, iDebug, pAmmoInfo );
 
-	Vector vecSpawnOrigin = GetAbsOrigin();
+	Vector vecSpawnOrigin = GetEngineObject()->GetAbsOrigin();
 	bool bHealthSpawned = SpawnItemFromRatio( NUM_HEALTH_ITEMS, g_DynamicResupplyHealthItems, iDebug, pHealthInfo, &vecSpawnOrigin );
 	bool bAmmoSpawned = SpawnItemFromRatio( NUM_AMMO_ITEMS, g_DynamicResupplyAmmoItems, iDebug, pAmmoInfo, &vecSpawnOrigin );
 	if ( !bHealthSpawned && !bAmmoSpawned )

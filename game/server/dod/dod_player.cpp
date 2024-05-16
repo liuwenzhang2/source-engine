@@ -292,7 +292,7 @@ END_DATADESC()
 void cc_CreatePredictionError_f()
 {
 	CBaseEntity *pEnt = CBaseEntity::Instance( 1 );
-	pEnt->SetAbsOrigin( pEnt->GetAbsOrigin() + Vector( 63, 0, 0 ) );
+	pEnt->GetEngineObject()->SetAbsOrigin( pEnt->GetEngineObject()->GetAbsOrigin() + Vector( 63, 0, 0 ) );
 }
 
 ConCommand cc_CreatePredictionError( "CreatePredictionError", cc_CreatePredictionError_f, "Create a prediction error", FCVAR_CHEAT );
@@ -613,8 +613,8 @@ void CDODPlayer::CreateRagdollEntity()
 	if ( pRagdoll )
 	{
 		pRagdoll->m_hPlayer = this;
-		pRagdoll->m_vecRagdollOrigin = GetAbsOrigin();
-		pRagdoll->m_vecRagdollVelocity = GetAbsVelocity();
+		pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
+		pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
 		pRagdoll->m_nModelIndex = m_nModelIndex;
 		pRagdoll->m_nForceBone = m_nForceBone;
 		pRagdoll->m_vecForce = m_vecTotalBulletForce;
@@ -661,7 +661,7 @@ void CDODPlayer::Event_Killed( const CTakeDamageInfo &info )
 
 		if ( strncmp( killer_weapon_name, "rocket_", 7 ) == 0 )
 		{
-			float flDist = ( pScorer->GetAbsOrigin() - pInflictor->GetAbsOrigin() ).Length();
+			float flDist = ( pScorer->GetEngineObject()->GetAbsOrigin() - pInflictor->GetEngineObject()->GetAbsOrigin() ).Length();
 
 			if ( flDist > ACHIEVEMENT_LONG_RANGE_ROCKET_DIST && DODGameRules()->State_Get() == STATE_RND_RUNNING )
 			{
@@ -690,7 +690,7 @@ void CDODPlayer::Event_Killed( const CTakeDamageInfo &info )
 		Vector vForward, vRight, vUp;
 		AngleVectors( EyeAngles(), &vForward, &vRight, &vUp );	
 
-		CHolidayGift::Create( WorldSpaceCenter(), GetAbsAngles(), EyeAngles(), GetAbsVelocity(), this );
+		CHolidayGift::Create( WorldSpaceCenter(), GetEngineObject()->GetAbsAngles(), EyeAngles(), GetEngineObject()->GetAbsVelocity(), this );
 	}
 
 	FlashlightTurnOff();
@@ -881,7 +881,7 @@ bool CDODPlayer::ShouldInstantRespawn( void )
 		return false;
 
 	const float flMaxDistSqr = ( 500*500 );
-	Vector vecOrigin = GetAbsOrigin();
+	Vector vecOrigin = GetEngineObject()->GetAbsOrigin();
 	int i;
 	int count = pSpawnPoints->Count();
 	for ( i=0;i<count;i++ )
@@ -893,7 +893,7 @@ bool CDODPlayer::ShouldInstantRespawn( void )
 			if ( point && !point->IsDisabled() )
 			{
 				// range
-				Vector vecDist = point->GetAbsOrigin() - vecOrigin;
+				Vector vecDist = point->GetEngineObject()->GetAbsOrigin() - vecOrigin;
 				if ( vecDist.LengthSqr() > flMaxDistSqr )
 				{
 					continue;
@@ -1004,7 +1004,7 @@ CBaseEntity	*CDODPlayer::GiveNamedItem( const char *pszName, int iSubType )
 		return NULL;
 	}
 
-	pent->SetLocalOrigin( GetLocalOrigin() );
+	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
 	pent->AddSpawnFlags( SF_NORESPAWN );
 
 	if ( iSubType )
@@ -1092,9 +1092,9 @@ void CDODPlayer::PostThink()
 		m_fHandleSignalsTime = gpGlobals->curtime + 0.1;
 		HandleSignals();
 	}
-	QAngle angles = GetLocalAngles();
+	QAngle angles = GetEngineObject()->GetLocalAngles();
 	angles[PITCH] = 0;
-	SetLocalAngles( angles );
+	GetEngineObject()->SetLocalAngles( angles );
 	
 	// Store the eye angles pitch so the client can compute its animation state correctly.
 	m_angEyeAngles = EyeAngles();
@@ -1157,7 +1157,7 @@ void CDODPlayer::VoiceCommand( int iVoiceCommand )
 	// further reduce the voice command subtitle radius
 	float flDist;
 	float flMaxDist = 1900;
-	Vector vecEmitOrigin = GetAbsOrigin();
+	Vector vecEmitOrigin = GetEngineObject()->GetAbsOrigin();
 
 	int i;
 	for ( i=1; i<= MAX_PLAYERS; i++ )
@@ -1167,7 +1167,7 @@ void CDODPlayer::VoiceCommand( int iVoiceCommand )
 		if ( !pPlayer )
 			continue;
 
-		flDist = ( pPlayer->GetAbsOrigin() - vecEmitOrigin ).Length2D();
+		flDist = ( pPlayer->GetEngineObject()->GetAbsOrigin() - vecEmitOrigin ).Length2D();
 
 		if ( flDist > flMaxDist )
 			filter.RemoveRecipient( pPlayer );
@@ -1645,8 +1645,8 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 			// find offset of root bone from origin in local space
 			// Make sure we're detached from hierarchy before doing this!!!
 			pWeapon->StopFollowingEntity();
-			pWeapon->SetAbsOrigin( Vector( 0, 0, 0 ) );
-			pWeapon->SetAbsAngles( QAngle( 0, 0, 0 ) );
+			pWeapon->GetEngineObject()->SetAbsOrigin( Vector( 0, 0, 0 ) );
+			pWeapon->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 			pWeapon->InvalidateBoneCache();
 			matrix3x4_t rootLocal;
 			pWeapon->GetBoneTransform( iWeaponBoneIndex, rootLocal );
@@ -1685,7 +1685,7 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 				pWeaponPhys->SetPosition( vPos, angles, true );
 
 				AngularImpulse	angImp(0,0,0);
-				Vector vecAdd = GetAbsVelocity();
+				Vector vecAdd = GetEngineObject()->GetAbsVelocity();
 				pWeaponPhys->AddVelocity( &vecAdd, &angImp );
 			}
 
@@ -1735,7 +1735,7 @@ void CDODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin )
 	SetBodygroup( BODYGROUP_HELMET, pClassInfo.m_iHairGroup );
 
 	// Add the velocity of the player
-	vecDir += GetAbsVelocity();
+	vecDir += GetEngineObject()->GetAbsVelocity();
 
 	//CDisablePredictionFiltering disabler;
 
@@ -2006,7 +2006,7 @@ int CDODPlayer::GetNearestLocationAsString( char *pDest, int iDestSize )
 
 	while( pEnt )
 	{
-		Vector vecDelta = GetAbsOrigin() - pEnt->GetAbsOrigin();
+		Vector vecDelta = GetEngineObject()->GetAbsOrigin() - pEnt->GetEngineObject()->GetAbsOrigin();
 		flDist = vecDelta.Length();
 
 		if( flDist < flMinDist )
@@ -2023,7 +2023,7 @@ int CDODPlayer::GetNearestLocationAsString( char *pDest, int iDestSize )
 
 	while( pEnt )
 	{
-		Vector vecDelta = GetAbsOrigin() - pEnt->GetAbsOrigin();
+		Vector vecDelta = GetEngineObject()->GetAbsOrigin() - pEnt->GetEngineObject()->GetAbsOrigin();
 		flDist = vecDelta.Length();
 
 		if( flDist < flMinDist )
@@ -2629,17 +2629,17 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 	// either respawn the guy or put him into observer mode).
 	if ( GetFlags() & FL_ONGROUND )
 	{
-		float flForward = GetAbsVelocity().Length() - 20;
+		float flForward = GetEngineObject()->GetAbsVelocity().Length() - 20;
 		if (flForward <= 0)
 		{
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 		}
 		else
 		{
-			Vector vAbsVel = GetAbsVelocity();
+			Vector vAbsVel = GetEngineObject()->GetAbsVelocity();
 			VectorNormalize( vAbsVel );
 			vAbsVel *= flForward;
-			SetAbsVelocity( vAbsVel );
+			GetEngineObject()->SetAbsVelocity( vAbsVel );
 		}
 	}
 
@@ -2766,7 +2766,7 @@ void CDODPlayer::State_Enter_OBSERVER_MODE()
 	CTeam *pTeam = GetGlobalTeam( TEAM_ALLIES );
 
 	CBasePlayer *pPlayer;
-	Vector localOrigin = GetAbsOrigin();
+	Vector localOrigin = GetEngineObject()->GetAbsOrigin();
 	Vector targetOrigin;
 	float flMinDist = FLT_MAX;
 	float flDist;
@@ -2781,7 +2781,7 @@ void CDODPlayer::State_Enter_OBSERVER_MODE()
 		if ( !IsValidObserverTarget(pPlayer) )
 			continue;
 
-		targetOrigin = pPlayer->GetAbsOrigin();
+		targetOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 		flDist = ( targetOrigin - localOrigin ).Length();
 
@@ -2879,19 +2879,19 @@ void CDODPlayer::MoveToNextIntroCamera()
 	if( !m_pIntroCamera  ) //if there are no cameras find a spawn point and black out the screen
 	{
 		DODGameRules()->GetPlayerSpawnSpot( this );
-		SetAbsAngles( QAngle( 0, 0, 0 ) );
+		GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 		m_pIntroCamera = NULL;  // never update again
 	}
 	else
 	{
-		Vector vIntroCamera = m_pIntroCamera->GetAbsOrigin();
+		Vector vIntroCamera = m_pIntroCamera->GetEngineObject()->GetAbsOrigin();
 			
-		QAngle CamAngles = m_pIntroCamera->GetAbsAngles();
+		QAngle CamAngles = m_pIntroCamera->GetEngineObject()->GetAbsAngles();
 
 		UTIL_SetSize( this, vec3_origin, vec3_origin );
 	
-		SetAbsOrigin( vIntroCamera );
-		SetAbsAngles( CamAngles );
+		GetEngineObject()->SetAbsOrigin( vIntroCamera );
+		GetEngineObject()->SetAbsAngles( CamAngles );
 		SnapEyeAngles( CamAngles );
 		SetViewOffset( vec3_origin );
 		m_fIntroCamTime = gpGlobals->curtime + 6;
@@ -2922,7 +2922,7 @@ CBaseEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int
 
 		if( g_pGameRules->IsSpawnPointValid( pSpot, this ) )
 		{
-			if ( pSpot->GetAbsOrigin() == Vector( 0, 0, 0 ) )
+			if ( pSpot->GetEngineObject()->GetAbsOrigin() == Vector( 0, 0, 0 ) )
 			{
 				continue;
 			}
@@ -2965,11 +2965,11 @@ CBaseEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int
 
 		// if we find a clear spot, create a new spawn point there, copied from pSpot
 
-		AngleVectors( pSpot->GetAbsAngles(), &vecForward, &vecRight, &vecUp );
+		AngleVectors( pSpot->GetEngineObject()->GetAbsAngles(), &vecForward, &vecRight, &vecUp );
 
 		for( int i=0;i<4;i++ )
 		{
-			Vector origin = pSpot->GetAbsOrigin();
+			Vector origin = pSpot->GetEngineObject()->GetAbsOrigin();
 
 			switch( i )
 			{
@@ -2984,12 +2984,12 @@ CBaseEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int
 
 			if ( UTIL_IsSpaceEmpty( this, vTestMins, vTestMaxs ) )
 			{
-				QAngle spotAngles = pSpot->GetAbsAngles();
+				QAngle spotAngles = pSpot->GetEngineObject()->GetAbsAngles();
 
 				// make a new spawnpoint so we don't have to do this a bunch of times
 				pSpot = gEntList.CreateEntityByName( pSpot->GetClassname() );
-				pSpot->SetAbsOrigin( origin );
-				pSpot->SetAbsAngles( spotAngles );
+				pSpot->GetEngineObject()->SetAbsOrigin( origin );
+				pSpot->GetEngineObject()->SetAbsAngles( spotAngles );
 
 				// delete it in a while so we don't accumulate entities
 				pSpot->SetThink( &CBaseEntity::SUB_Remove );
@@ -3323,7 +3323,7 @@ int CDODPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				stats_event->SetInt( "damage_given", MIN( iDamage, iInitialHealth ) );
 
 				CBaseEntity *pInflictor = info.GetInflictor();
-				float flDist = ( pInflictor->GetAbsOrigin() - GetAbsOrigin() ).Length();
+				float flDist = ( pInflictor->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length();
 				stats_event->SetFloat( "distance", flDist );
 
 				stats_event->SetInt("hitgroup", m_LastHitGroup );
@@ -3736,7 +3736,7 @@ void CDODPlayer::CreateViewModel( int index /*=0*/ )
 	CDODViewModel *vm = ( CDODViewModel * )gEntList.CreateEntityByName( "dod_viewmodel" );
 	if ( vm )
 	{
-		vm->SetAbsOrigin( GetAbsOrigin() );
+		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		vm->SetOwner( this );
 		vm->SetIndex( index );
 		DispatchSpawn( vm );
@@ -3972,14 +3972,14 @@ void CDODPlayer::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	Quaternion q[MAXSTUDIOBONES];
 
 	// Adjust hit boxes based on IK driven offset.
-	Vector adjOrigin = GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
+	Vector adjOrigin = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
 
 	// FIXME: pass this into Studio_BuildMatrices to skip transforms
 	CBoneBitList boneComputed;
 	if ( m_pIk )
 	{
 		m_iIKCounter++;
-		m_pIk->Init( pStudioHdr, GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask );
+		m_pIk->Init( pStudioHdr, GetEngineObject()->GetAbsAngles(), adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask );
 		GetSkeleton( pStudioHdr, pos, q, boneMask );
 
 		m_pIk->UpdateTargets( pos, q, pBoneToWorld, boneComputed );
@@ -4203,9 +4203,9 @@ CBaseEntity *CDODPlayer::FindUseEntity()
 
 			Vector pos = WorldSpaceCenter();
 
-			float flDist = ( pos - pTarget->GetAbsOrigin() ).Length();
+			float flDist = ( pos - pTarget->GetEngineObject()->GetAbsOrigin() ).Length();
 
-			Vector toBomb = pTarget->GetAbsOrigin() - EyePosition();
+			Vector toBomb = pTarget->GetEngineObject()->GetAbsOrigin() - EyePosition();
 			toBomb.NormalizeInPlace();
 
 			if ( DotProduct( forward, toBomb ) < 0.8 )

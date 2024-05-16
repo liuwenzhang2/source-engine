@@ -119,14 +119,14 @@ void CDecal::TriggerDecal ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_T
 	trace_t		trace;
 	int			entityIndex;
 
-	UTIL_TraceLine( GetAbsOrigin() - Vector(5,5,5), GetAbsOrigin() + Vector(5,5,5), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trace );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin() - Vector(5,5,5), GetEngineObject()->GetAbsOrigin() + Vector(5,5,5), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trace );
 
 	entityIndex = trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->entindex() : 0;
 
 	CBroadcastRecipientFilter filter;
 
 	te->BSPDecal( filter, 0.0, 
-		&GetAbsOrigin(), entityIndex, m_nTexture );
+		&GetEngineObject()->GetAbsOrigin(), entityIndex, m_nTexture );
 
 	SetThink( &CDecal::SUB_Remove );
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -183,7 +183,7 @@ void CDecal::StaticDecal( void )
 	CTraceFilterValidForDecal traceFilter( this, COLLISION_GROUP_NONE );
 	int entityIndex, modelIndex = 0;
 
-	Vector position = GetAbsOrigin();
+	Vector position = GetEngineObject()->GetAbsOrigin();
 	UTIL_TraceLine( position - Vector(5,5,5), position + Vector(5,5,5),  MASK_SOLID, &traceFilter, &trace );
 
 	bool canDraw = true;
@@ -195,7 +195,7 @@ void CDecal::StaticDecal( void )
 		if ( ent )
 		{
 			modelIndex = ent->GetModelIndex();
-			VectorITransform( GetAbsOrigin(), ent->GetEngineObject()->EntityToWorldTransform(), position );
+			VectorITransform(GetEngineObject()->GetAbsOrigin(), ent->GetEngineObject()->EntityToWorldTransform(), position );
 
 			canDraw = ( modelIndex != 0 );
 			if ( !canDraw )
@@ -319,7 +319,7 @@ void CProjectedDecal::InputActivate( inputdata_t &inputdata )
 void CProjectedDecal::ProjectDecal( CRecipientFilter& filter )
 {
 	te->ProjectDecal( filter, 0.0, 
-		&GetAbsOrigin(), &GetAbsAngles(), m_flDistance, m_nTexture );
+		&GetEngineObject()->GetAbsOrigin(), &GetEngineObject()->GetAbsAngles(), m_flDistance, m_nTexture );
 }
 
 void CProjectedDecal::TriggerDecal ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
@@ -524,8 +524,8 @@ void CWorld::RegisterSharedEvents( void )
 
 void CWorld::Spawn( void )
 {
-	SetLocalOrigin( vec3_origin );
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetLocalOrigin( vec3_origin );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 	// NOTE:  SHOULD NEVER BE ANYTHING OTHER THAN 1!!!
 	SetModelIndex( 1 );
 	// world model

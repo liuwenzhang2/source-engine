@@ -185,7 +185,7 @@ void CFleshInteriorMaterialProxy::OnBind( C_BaseEntity *pEnt )
 			if ( g_FleshProxyTargets[i]->IsAbsQueriesValid() == false )
 				continue;
 
-			Vector vecAbsOrigin = g_FleshProxyTargets[i]->GetAbsOrigin();
+			Vector vecAbsOrigin = g_FleshProxyTargets[i]->GetEngineObject()->GetAbsOrigin();
 			vEffectCenterRadius[0] = vecAbsOrigin.x;
 			vEffectCenterRadius[1] = vecAbsOrigin.y;
 			vEffectCenterRadius[2] = vecAbsOrigin.z;

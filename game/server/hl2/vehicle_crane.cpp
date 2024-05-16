@@ -210,7 +210,7 @@ void CPropCrane::Activate( void )
 		m_hRope->m_nSegments = ROPE_MAX_SEGMENTS / 2;
 		m_hRope->EnableWind( false );
 		m_hRope->SetupHangDistance( 0 );
-		m_hRope->m_RopeLength = (m_hCraneMagnet->GetAbsOrigin() - m_hCraneTip->GetAbsOrigin()).Length() * 1.1;
+		m_hRope->m_RopeLength = (m_hCraneMagnet->GetEngineObject()->GetAbsOrigin() - m_hCraneTip->GetEngineObject()->GetAbsOrigin()).Length() * 1.1;
 	}
 
 	// Start with the magnet off
@@ -406,14 +406,14 @@ void CPropCrane::DrawDebugGeometryOverlays(void)
 	// Draw if BBOX is on
 	if ( m_debugOverlays & OVERLAY_BBOX_BIT )
 	{
-		Vector vecPoint = m_hCraneMagnet->GetAbsOrigin();
+		Vector vecPoint = m_hCraneMagnet->GetEngineObject()->GetAbsOrigin();
 		int iIndex = m_hCraneMagnet->LookupAttachment("magnetcable_a");
 		if ( iIndex >= 0 )
 		{
 			m_hCraneMagnet->GetAttachment( iIndex, vecPoint );
 		}
 
-		NDebugOverlay::Line( m_hCraneTip->GetAbsOrigin(), vecPoint, 255,255,255, true, 0.1 );
+		NDebugOverlay::Line( m_hCraneTip->GetEngineObject()->GetAbsOrigin(), vecPoint, 255,255,255, true, 0.1 );
 	}
 
 	BaseClass::DrawDebugGeometryOverlays();
@@ -646,7 +646,7 @@ void CPropCrane::RecalculateCraneTip( void )
 	Vector vecOrigin;
 	QAngle vecAngles;
 	GetCraneTipPosition( &vecOrigin, &vecAngles );
-	m_hCraneTip->SetAbsOrigin( vecOrigin );
+	m_hCraneTip->GetEngineObject()->SetAbsOrigin( vecOrigin );
 
 	// NOTE: We need to do this because we're not using Physics...
 	if ( m_hCraneTip->VPhysicsGetObject() )
@@ -784,7 +784,7 @@ void CPropCrane::TurnMagnetOff( void )
 //-----------------------------------------------------------------------------
 const Vector &CPropCrane::GetCraneTipPosition( void )
 {
-	return m_hCraneTip->GetAbsOrigin();
+	return m_hCraneTip->GetEngineObject()->GetAbsOrigin();
 }
 
 //-----------------------------------------------------------------------------
@@ -990,23 +990,23 @@ void CCraneServerVehicle::NPC_DriveVehicle( void )
 			GetCrane()->GetVectors( &vecForward, &vecRight, NULL );
 			if ( m_nNPCButtons & IN_FORWARD )
 			{
-				NDebugOverlay::Line( GetCrane()->GetAbsOrigin(), GetCrane()->GetAbsOrigin() + vecForward * 200, 0,255,0, true, 0.1 );
+				NDebugOverlay::Line( GetCrane()->GetEngineObject()->GetAbsOrigin(), GetCrane()->GetEngineObject()->GetAbsOrigin() + vecForward * 200, 0,255,0, true, 0.1 );
 			}
 			if ( m_nNPCButtons & IN_BACK )
 			{
-				NDebugOverlay::Line( GetCrane()->GetAbsOrigin(), GetCrane()->GetAbsOrigin() - vecForward * 200, 0,255,0, true, 0.1 );
+				NDebugOverlay::Line( GetCrane()->GetEngineObject()->GetAbsOrigin(), GetCrane()->GetEngineObject()->GetAbsOrigin() - vecForward * 200, 0,255,0, true, 0.1 );
 			}
 			if ( m_nNPCButtons & IN_MOVELEFT )
 			{
-				NDebugOverlay::Line( GetCrane()->GetAbsOrigin(), GetCrane()->GetAbsOrigin() - vecRight * 200, 0,255,0, true, 0.1 );
+				NDebugOverlay::Line( GetCrane()->GetEngineObject()->GetAbsOrigin(), GetCrane()->GetEngineObject()->GetAbsOrigin() - vecRight * 200, 0,255,0, true, 0.1 );
 			}
 			if ( m_nNPCButtons & IN_MOVERIGHT )
 			{
-				NDebugOverlay::Line( GetCrane()->GetAbsOrigin(), GetCrane()->GetAbsOrigin() + vecRight * 200, 0,255,0, true, 0.1 );
+				NDebugOverlay::Line( GetCrane()->GetEngineObject()->GetAbsOrigin(), GetCrane()->GetEngineObject()->GetAbsOrigin() + vecRight * 200, 0,255,0, true, 0.1 );
 			}
 			if ( m_nNPCButtons & IN_JUMP )
 			{
-				NDebugOverlay::Box( GetCrane()->GetAbsOrigin(), -Vector(20,20,20), Vector(20,20,20), 0,255,0, true, 0.1 );
+				NDebugOverlay::Box( GetCrane()->GetEngineObject()->GetAbsOrigin(), -Vector(20,20,20), Vector(20,20,20), 0,255,0, true, 0.1 );
 			}
 		}
 	}
@@ -1070,7 +1070,7 @@ bool CCraneTip::CreateConstraint( CBaseAnimating *pCraneMagnet, IPhysicsConstrai
 	Assert( pPhysObject );
 
 	// Check to see if it's got an attachment point to connect to
-	Vector vecPoint = pCraneMagnet->GetAbsOrigin();
+	Vector vecPoint = pCraneMagnet->GetEngineObject()->GetAbsOrigin();
 	int iIndex = pCraneMagnet->LookupAttachment("magnetcable_a");
 	if ( iIndex >= 0 )
 	{
@@ -1089,9 +1089,9 @@ bool CCraneTip::CreateConstraint( CBaseAnimating *pCraneMagnet, IPhysicsConstrai
 	springparams_t spring;
 	spring.constant = CRANE_SPRING_CONSTANT_HANGING;
 	spring.damping = CRANE_SPRING_DAMPING;
-	spring.naturalLength = (GetAbsOrigin() - vecPoint).Length();
+	spring.naturalLength = (GetEngineObject()->GetAbsOrigin() - vecPoint).Length();
 	spring.relativeDamping = CRANE_SPRING_RELATIVE_DAMPING;
-	spring.startPosition = GetAbsOrigin();
+	spring.startPosition = GetEngineObject()->GetAbsOrigin();
 	spring.endPosition = vecPoint;
 	spring.useLocalPositions = false;
 	spring.onlyStretch = true;

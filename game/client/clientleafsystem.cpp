@@ -357,7 +357,7 @@ void DefaultRenderBoundsWorldspace( IClientRenderable *pRenderable, Vector &absM
 			Vector vAddMins, vAddMaxs;
 			pEnt->GetRenderBounds( vAddMins, vAddMaxs );
 			// if our origin is actually farther away than that, expand again
-			float radius = pEnt->GetLocalOrigin().Length();
+			float radius = pEnt->GetEngineObject()->GetLocalOrigin().Length();
 
 			float flBloatSize = MAX( vAddMins.Length(), vAddMaxs.Length() );
 			flBloatSize = MAX(flBloatSize, radius);
@@ -417,7 +417,7 @@ void CalcRenderableWorldSpaceAABB_Fast( IClientRenderable *pRenderable, Vector &
 		Vector vAddMins, vAddMaxs;
 		pEnt->GetRenderBounds( vAddMins, vAddMaxs );
 		// if our origin is actually farther away than that, expand again
-		float radius = pEnt->GetLocalOrigin().Length();
+		float radius = pEnt->GetEngineObject()->GetLocalOrigin().Length();
 
 		float flBloatSize = MAX( vAddMins.Length(), vAddMaxs.Length() );
 		flBloatSize = MAX(flBloatSize, radius);

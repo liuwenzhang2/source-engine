@@ -2153,9 +2153,9 @@ void CGameMovement::FullObserverMove( void )
 
 		if ( target != NULL )
 		{
-			mv->SetAbsOrigin( target->GetAbsOrigin() );
-			mv->m_vecViewAngles = target->GetAbsAngles();
-			mv->m_vecVelocity = target->GetAbsVelocity();
+			mv->SetAbsOrigin( target->GetEngineObject()->GetAbsOrigin() );
+			mv->m_vecViewAngles = target->GetEngineObject()->GetAbsAngles();
+			mv->m_vecVelocity = target->GetEngineObject()->GetAbsVelocity();
 		}
 
 		return;
@@ -3598,14 +3598,14 @@ void CGameMovement::SetGroundEntity( trace_t *pm )
 	if ( !oldGround && newGround )
 	{
 		// Subtract ground velocity at instant we hit ground jumping
-		vecBaseVelocity -= newGround->GetAbsVelocity(); 
-		vecBaseVelocity.z = newGround->GetAbsVelocity().z;
+		vecBaseVelocity -= newGround->GetEngineObject()->GetAbsVelocity();
+		vecBaseVelocity.z = newGround->GetEngineObject()->GetAbsVelocity().z;
 	}
 	else if ( oldGround && !newGround )
 	{
 		// Add in ground velocity at instant we started jumping
- 		vecBaseVelocity += oldGround->GetAbsVelocity();
-		vecBaseVelocity.z = oldGround->GetAbsVelocity().z;
+ 		vecBaseVelocity += oldGround->GetEngineObject()->GetAbsVelocity();
+		vecBaseVelocity.z = oldGround->GetEngineObject()->GetAbsVelocity().z;
 	}
 
 	player->SetBaseVelocity( vecBaseVelocity );
@@ -3824,7 +3824,7 @@ void CGameMovement::CategorizePosition( void )
 		CBaseEntity *ground = player->GetGroundEntity();
 		if ( ground )
 		{
-			flGroundEntityVelZ = ground->GetAbsVelocity().z;
+			flGroundEntityVelZ = ground->GetEngineObject()->GetAbsVelocity().z;
 			bMovingUpRapidly = ( zvel - flGroundEntityVelZ ) > NON_JUMP_VELOCITY;
 		}
 	}
@@ -3922,10 +3922,10 @@ void CGameMovement::CheckFalling( void )
 			//
 			// They hit the ground.
 			//
-			if( player->GetGroundEntity()->GetAbsVelocity().z < 0.0f )
+			if( player->GetGroundEntity()->GetEngineObject()->GetAbsVelocity().z < 0.0f )
 			{
 				// Player landed on a descending object. Subtract the velocity of the ground entity.
-				player->m_Local.m_flFallVelocity += player->GetGroundEntity()->GetAbsVelocity().z;
+				player->m_Local.m_flFallVelocity += player->GetGroundEntity()->GetEngineObject()->GetAbsVelocity().z;
 				player->m_Local.m_flFallVelocity = MAX( 0.1f, player->m_Local.m_flFallVelocity );
 			}
 

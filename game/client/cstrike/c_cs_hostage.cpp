@@ -116,14 +116,14 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 
 	if ( pHostage && !pHostage->IsDormant() )
 	{
-		GetEngineObject()->SetNetworkOrigin( pHostage->GetAbsOrigin() );
-		SetAbsOrigin( pHostage->GetAbsOrigin() );
-		SetAbsVelocity( pHostage->GetAbsVelocity() );
+		GetEngineObject()->SetNetworkOrigin( pHostage->GetEngineObject()->GetAbsOrigin() );
+		GetEngineObject()->SetAbsOrigin( pHostage->GetEngineObject()->GetAbsOrigin() );
+		GetEngineObject()->SetAbsVelocity( pHostage->GetEngineObject()->GetAbsVelocity() );
 
 		// move my current model instance to the ragdoll's so decals are preserved.
 		pHostage->SnatchModelInstance( this );
 
-		SetAbsAngles( pHostage->GetRenderAngles() );
+		GetEngineObject()->SetAbsAngles( pHostage->GetRenderAngles() );
 		GetEngineObject()->SetNetworkAngles( pHostage->GetRenderAngles() );
 
 		CStudioHdr *pStudioHdr = GetModelPtr();
@@ -313,7 +313,7 @@ void C_CHostage::Initialize( )
 	}
 	else
 	{
-		m_vecViewOffset = pos - GetAbsOrigin();
+		m_vecViewOffset = pos - GetEngineObject()->GetAbsOrigin();
 	}
 
 
@@ -424,7 +424,7 @@ void C_CHostage::LookAround( void )
 		m_lookAroundTimer.Start( RandomFloat( 3.0f, 15.0f ) );
 
 		Vector forward;
-		QAngle angles = GetAbsAngles();
+		QAngle angles = GetEngineObject()->GetAbsAngles();
 		angles[ YAW ] += RandomFloat( m_headYawMin, m_headYawMax );
 		angles[ PITCH ] += RandomFloat( m_headPitchMin, m_headPitchMax );
 		AngleVectors( angles, &forward );
@@ -440,7 +440,7 @@ void C_CHostage::UpdateClientSideAnimation()
 		return;
 	}
 
-	m_PlayerAnimState->Update( GetAbsAngles()[YAW], GetAbsAngles()[PITCH] );
+	m_PlayerAnimState->Update(GetEngineObject()->GetAbsAngles()[YAW], GetEngineObject()->GetAbsAngles()[PITCH] );
 
 	// initialize pose parameters
 	char *setToZero[] =

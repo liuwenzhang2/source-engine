@@ -166,7 +166,7 @@ int CNPC_Houndeye::RangeAttack1Conditions ( float flDot, float flDist )
 	// I'm not allowed to attack if standing in another hound eye 
 	// (note houndeyes allowed to interpenetrate)
 	trace_t tr;
-	UTIL_TraceHull( GetAbsOrigin(), GetAbsOrigin() + Vector(0,0,0.1), 
+	UTIL_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector(0,0,0.1),
 					GetHullMins(), GetHullMaxs(),
 					MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
 	if (tr.startsolid)
@@ -326,7 +326,7 @@ void CNPC_Houndeye::HandleAnimEvent( animevent_t *pEvent )
 
 				Vector vecVel = v_forward * -200;
 				vecVel.z += ( 0.6 * flGravity ) * 0.5;
-				SetAbsVelocity( vecVel );
+				GetEngineObject()->SetAbsVelocity( vecVel );
 
 				break;
 			}
@@ -376,7 +376,7 @@ void CNPC_Houndeye::SonicAttack ( void )
 
 	CBroadcastRecipientFilter filter2;
 	te->BeamRingPoint( filter2, 0.0, 
-		GetAbsOrigin(),							//origin
+		GetEngineObject()->GetAbsOrigin(),							//origin
 		16,										//start radius
 		HOUNDEYE_MAX_ATTACK_RADIUS,//end radius
 		m_iSpriteTexture,						//texture
@@ -396,7 +396,7 @@ void CNPC_Houndeye::SonicAttack ( void )
 
 	CBroadcastRecipientFilter filter3;
 	te->BeamRingPoint( filter3, 0.0, 
-		GetAbsOrigin(),									//origin
+		GetEngineObject()->GetAbsOrigin(),									//origin
 		16,												//start radius
 		HOUNDEYE_MAX_ATTACK_RADIUS / 2,											//end radius
 		m_iSpriteTexture,								//texture
@@ -416,7 +416,7 @@ void CNPC_Houndeye::SonicAttack ( void )
 	
 	CBaseEntity *pEntity = NULL;
 	// iterate on all entities in the vicinity.
-	while ((pEntity = gEntList.FindEntityInSphere( pEntity, GetAbsOrigin(), HOUNDEYE_MAX_ATTACK_RADIUS )) != NULL)
+	while ((pEntity = gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), HOUNDEYE_MAX_ATTACK_RADIUS )) != NULL)
 	{
 		if ( pEntity->m_takedamage  != DAMAGE_NO )
 		{
@@ -438,7 +438,7 @@ void CNPC_Houndeye::SonicAttack ( void )
 					flAdjustedDamage =sk_houndeye_dmg_blast.GetFloat();
 				}
 
-				flDist = (pEntity->WorldSpaceCenter() - GetAbsOrigin()).Length();
+				flDist = (pEntity->WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin()).Length();
 
 				flAdjustedDamage -= ( flDist / HOUNDEYE_MAX_ATTACK_RADIUS ) * flAdjustedDamage;
 
@@ -463,11 +463,11 @@ void CNPC_Houndeye::SonicAttack ( void )
 				if (flAdjustedDamage > 0 )
 				{
 					CTakeDamageInfo info( this, this, flAdjustedDamage, DMG_SONIC | DMG_ALWAYSGIB );
-					CalculateExplosiveDamageForce( &info, (pEntity->GetAbsOrigin() - GetAbsOrigin()), pEntity->GetAbsOrigin() );
+					CalculateExplosiveDamageForce( &info, (pEntity->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), pEntity->GetEngineObject()->GetAbsOrigin() );
 
 					pEntity->TakeDamage( info );
 
-					if ( (pEntity->GetAbsOrigin() - GetAbsOrigin()).Length2D() <= HOUNDEYE_MAX_ATTACK_RADIUS )
+					if ( (pEntity->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length2D() <= HOUNDEYE_MAX_ATTACK_RADIUS )
 					{
 						if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() && !pEntity->IsPlayer()) ) 
 						{
@@ -693,7 +693,7 @@ void CNPC_Houndeye::RunTask ( const Task_t *pTask )
 			if ( GetEnemy() )
 			{
 				float idealYaw;
-				idealYaw = UTIL_VecToYaw( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() );
+				idealYaw = UTIL_VecToYaw( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 				GetMotor()->SetIdealYawAndUpdate( idealYaw );
 			}
 
@@ -794,7 +794,7 @@ void CNPC_Houndeye::PrescheduleThink ( void )
 		for (CAI_BaseNPC *pSquadMember = m_pSquad->GetFirstMember( &iter ); pSquadMember; pSquadMember = m_pSquad->GetNextMember( &iter ) )
 		{
 			iSquadCount++;
-			m_vecPackCenter = m_vecPackCenter + pSquadMember->GetAbsOrigin();
+			m_vecPackCenter = m_vecPackCenter + pSquadMember->GetEngineObject()->GetAbsOrigin();
 		}
 
 		m_vecPackCenter = m_vecPackCenter / iSquadCount;
@@ -909,7 +909,7 @@ int CNPC_Houndeye::SelectSchedule( void )
 					trace_t trace;
 					Vector v_forward;
 					GetVectors( &v_forward, NULL, NULL );
-					UTIL_TraceEntity( this, GetAbsOrigin(), GetAbsOrigin() + v_forward * -128, MASK_SOLID, &trace );
+					UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + v_forward * -128, MASK_SOLID, &trace );
 					
 					if ( trace.fraction == 1.0 )
 					{
@@ -943,7 +943,7 @@ int CNPC_Houndeye::SelectSchedule( void )
 //=========================================================
 float CNPC_Houndeye::FLSoundVolume( CSound *pSound )
 {
-	return ( pSound->Volume() - ( ( pSound->GetSoundOrigin() - GetAbsOrigin() ).Length() ) );
+	return ( pSound->Volume() - ( ( pSound->GetSoundOrigin() - GetEngineObject()->GetAbsOrigin() ).Length() ) );
 }
 
 
@@ -1000,7 +1000,7 @@ int CNPC_Houndeye::SquadRecruit( int searchRadius, int maxMembers )
 
 		m_SquadName = AllocPooledString( szSquadName );
 
-		while ( ( pEntity = gEntList.FindEntityInSphere( pEntity, GetAbsOrigin(), searchRadius ) ) != NULL && squadCount < maxMembers )
+		while ( ( pEntity = gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), searchRadius ) ) != NULL && squadCount < maxMembers )
 		{
 			if ( !FClassnameIs ( pEntity, "monster_houndeye" ) )
 				continue;
@@ -1015,7 +1015,7 @@ int CNPC_Houndeye::SquadRecruit( int searchRadius, int maxMembers )
 					!pRecruit->m_SquadName )
 				{
 					trace_t tr;
-					UTIL_TraceLine( GetAbsOrigin() + GetViewOffset(), pRecruit->GetAbsOrigin() + GetViewOffset(), MASK_NPCSOLID_BRUSHONLY, pRecruit, COLLISION_GROUP_NONE, &tr );// try to hit recruit with a traceline.
+					UTIL_TraceLine(GetEngineObject()->GetAbsOrigin() + GetViewOffset(), pRecruit->GetEngineObject()->GetAbsOrigin() + GetViewOffset(), MASK_NPCSOLID_BRUSHONLY, pRecruit, COLLISION_GROUP_NONE, &tr );// try to hit recruit with a traceline.
 
 					if ( tr.fraction == 1.0 )
 					{

@@ -360,7 +360,7 @@ void CWeapon_SLAM::TripmineAttach( void )
 	// Take the eye position and direction
 	vecSrc = pOwner->EyePosition();
 	
-	QAngle angles = pOwner->GetLocalAngles();
+	QAngle angles = pOwner->GetEngineObject()->GetLocalAngles();
 
 	AngleVectors( angles, &vecAiming );
 
@@ -411,7 +411,7 @@ void CWeapon_SLAM::StartTripmineAttach( void )
 	// Take the eye position and direction
 	vecSrc = pPlayer->EyePosition();
 	
-	QAngle angles = pPlayer->GetLocalAngles();
+	QAngle angles = pPlayer->GetEngineObject()->GetLocalAngles();
 
 	AngleVectors( angles, &vecAiming );
 
@@ -726,7 +726,7 @@ bool CWeapon_SLAM::CanAttachSLAM( void )
 	// Take the eye position and direction
 	vecSrc = pOwner->EyePosition();
 	
-	QAngle angles = pOwner->GetLocalAngles();
+	QAngle angles = pOwner->GetEngineObject()->GetLocalAngles();
 
 	AngleVectors( angles, &vecAiming );
 

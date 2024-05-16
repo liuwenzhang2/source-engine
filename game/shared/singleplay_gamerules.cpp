@@ -382,7 +382,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	//=========================================================
 	Vector CSingleplayRules::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
 	{
-		return pWeapon->GetAbsOrigin();
+		return pWeapon->GetEngineObject()->GetAbsOrigin();
 	}
 
 	//=========================================================
@@ -429,7 +429,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	//=========================================================
 	Vector CSingleplayRules::VecItemRespawnSpot( CItem *pItem )
 	{
-		return pItem->GetAbsOrigin();
+		return pItem->GetEngineObject()->GetAbsOrigin();
 	}
 
 	//=========================================================
@@ -437,7 +437,7 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 	//=========================================================
 	QAngle CSingleplayRules::VecItemRespawnAngles( CItem *pItem )
 	{
-		return pItem->GetAbsAngles();
+		return pItem->GetEngineObject()->GetAbsAngles();
 	}
 
 	//=========================================================

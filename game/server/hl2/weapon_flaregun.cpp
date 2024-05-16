@@ -268,7 +268,7 @@ CFlare *CFlare::Create( Vector vecOrigin, QAngle vecAngles, CBaseEntity *pOwner,
 
 	UTIL_SetOrigin( pFlare, vecOrigin );
 
-	pFlare->SetLocalAngles( vecAngles );
+	pFlare->GetEngineObject()->SetLocalAngles( vecAngles );
 	pFlare->Spawn();
 	pFlare->SetTouch( &CFlare::FlareTouch );
 	pFlare->SetThink( &CFlare::FlareThink );
@@ -340,7 +340,7 @@ void CFlare::FlareThink( void )
 	//Act differently underwater
 	if ( GetWaterLevel() > 1 )
 	{
-		UTIL_Bubbles( GetAbsOrigin() + Vector( -2, -2, -2 ), GetAbsOrigin() + Vector( 2, 2, 2 ), 1 );
+		UTIL_Bubbles(GetEngineObject()->GetAbsOrigin() + Vector( -2, -2, -2 ), GetEngineObject()->GetAbsOrigin() + Vector( 2, 2, 2 ), 1 );
 		m_bSmoke = false;
 	}
 	else
@@ -348,7 +348,7 @@ void CFlare::FlareThink( void )
 		//Shoot sparks
 		if ( random->RandomInt( 0, 8 ) == 1 )
 		{
-			g_pEffects->Sparks( GetAbsOrigin() );
+			g_pEffects->Sparks(GetEngineObject()->GetAbsOrigin() );
 		}
 	}
 
@@ -382,7 +382,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 	if ( ( m_nBounces < 10 ) && ( GetWaterLevel() < 1 ) )
 	{
 		// Throw some real chunks here
-		g_pEffects->Sparks( GetAbsOrigin() );
+		g_pEffects->Sparks(GetEngineObject()->GetAbsOrigin() );
 	}
 
 	//If the flare hit a person or NPC, do damage here.
@@ -413,9 +413,9 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 			pAnim->Ignite( 30.0f );
 		}
 
-		Vector vecNewVelocity = GetAbsVelocity();
+		Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 		vecNewVelocity	*= 0.1f;
-		SetAbsVelocity( vecNewVelocity );
+		GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
 		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 		SetGravity(1.0f);
@@ -452,7 +452,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 						RemoveSolidFlags( FSOLID_NOT_SOLID );
 						AddSolidFlags( FSOLID_TRIGGER );
 						UTIL_SetOrigin( this, tr.endpos + ( tr.plane.normal * 2.0f ) );
-						SetAbsVelocity( vec3_origin );
+						GetEngineObject()->SetAbsVelocity( vec3_origin );
 						SetMoveType( MOVETYPE_NONE );
 						
 						SetTouch( &CFlare::FlareBurnTouch );
@@ -474,7 +474,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 		}
 
 		//Scorch decal
-		if ( GetAbsVelocity().LengthSqr() > (250*250) )
+		if (GetEngineObject()->GetAbsVelocity().LengthSqr() > (250*250) )
 		{
 			int index = decalsystem->GetDecalIndexForName( "FadingScorch" );
 			if ( index >= 0 )
@@ -494,15 +494,15 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 		SetOwnerEntity( this );	
 
 		// Slow down
-		Vector vecNewVelocity = GetAbsVelocity();
+		Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 		vecNewVelocity.x *= 0.8f;
 		vecNewVelocity.y *= 0.8f;
-		SetAbsVelocity( vecNewVelocity );
+		GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
 		//Stopped?
-		if ( GetAbsVelocity().Length() < 64.0f )
+		if (GetEngineObject()->GetAbsVelocity().Length() < 64.0f )
 		{
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 			SetMoveType( MOVETYPE_NONE );
 			RemoveSolidFlags( FSOLID_NOT_SOLID );
 			AddSolidFlags( FSOLID_TRIGGER );
@@ -569,7 +569,7 @@ void CFlare::Launch( const Vector &direction, float speed )
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
 	// Punch our velocity towards our facing
-	SetAbsVelocity( direction * speed );
+	GetEngineObject()->SetAbsVelocity( direction * speed );
 
 	SetGravity( 1.0f );
 }
@@ -599,7 +599,7 @@ void CFlare::InputDie( inputdata_t &inputdata )
 void CFlare::InputLaunch( inputdata_t &inputdata )
 {
 	Vector	direction;
-	AngleVectors( GetAbsAngles(), &direction );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &direction );
 
 	float	speed = inputdata.value.Float();
 

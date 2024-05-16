@@ -211,9 +211,9 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 
 		// This is the local player, so set them in a default
 		// pose and slam their velocity, angles and origin
-		SetAbsOrigin( /* m_vecRagdollOrigin : */ pPlayer->GetRenderOrigin() );			
-		SetAbsAngles( pPlayer->GetRenderAngles() );
-		SetAbsVelocity( m_vecRagdollVelocity );
+		GetEngineObject()->SetAbsOrigin( /* m_vecRagdollOrigin : */ pPlayer->GetRenderOrigin() );
+		GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
+		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		// Hack! Find a neutral standing pose or use the idle.
 		int iSeq = LookupSequence( "ragdoll" );
@@ -390,7 +390,7 @@ void C_Portal_Player::TraceAttack( const CTakeDamageInfo &info, const Vector &ve
 
 	if ( info.GetAttacker() )
 	{
-		flDistance = (ptr->endpos - info.GetAttacker()->GetAbsOrigin()).Length();
+		flDistance = (ptr->endpos - info.GetAttacker()->GetEngineObject()->GetAbsOrigin()).Length();
 	}
 
 	if ( m_takedamage )
@@ -518,7 +518,7 @@ void C_Portal_Player::UpdateLookAt( void )
 
 	// Figure out where our body is facing in world space.
 	QAngle bodyAngles( 0, 0, 0 );
-	bodyAngles[YAW] = GetLocalAngles()[YAW];
+	bodyAngles[YAW] = GetEngineObject()->GetLocalAngles()[YAW];
 
 	m_flLastBodyYaw = bodyAngles[YAW];
 
@@ -554,7 +554,7 @@ void C_Portal_Player::ClientThink( void )
 	//PortalEyeInterpolation.m_bNeedToUpdateEyePosition = true;
 
 	Vector vForward;
-	AngleVectors( GetLocalAngles(), &vForward );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &vForward );
 
 	// Allow sprinting
 	HandleSpeedChanges();
@@ -880,7 +880,7 @@ void C_Portal_Player::DoImpactEffect( trace_t &tr, int nDamageType )
 
 void C_Portal_Player::PreThink( void )
 {
-	QAngle vTempAngles = GetLocalAngles();
+	QAngle vTempAngles = GetEngineObject()->GetLocalAngles();
 
 	if ( IsLocalPlayer() )
 	{
@@ -896,7 +896,7 @@ void C_Portal_Player::PreThink( void )
 		vTempAngles[YAW] += 360.0f;
 	}
 
-	SetLocalAngles( vTempAngles );
+	GetEngineObject()->SetLocalAngles( vTempAngles );
 
 	BaseClass::PreThink();
 
@@ -911,13 +911,13 @@ void C_Portal_Player::AddEntity( void )
 {
 	BaseClass::AddEntity();
 
-	QAngle vTempAngles = GetLocalAngles();
+	QAngle vTempAngles = GetEngineObject()->GetLocalAngles();
 	vTempAngles[PITCH] = m_angEyeAngles[PITCH];
 
-	SetLocalAngles( vTempAngles );
+	GetEngineObject()->SetLocalAngles( vTempAngles );
 
 	// Zero out model pitch, blending takes care of all of it.
-	SetLocalAnglesDim( X_INDEX, 0 );
+	GetEngineObject()->SetLocalAnglesDim( X_INDEX, 0 );
 
 	if( this != C_BasePlayer::GetLocalPlayer() )
 	{
@@ -1132,7 +1132,7 @@ bool C_Portal_Player::DetectAndHandlePortalTeleportation( void )
 			if( IsLocalPlayer() ) 
 			{
 				//DevMsg( "FPT: %.2f %.2f %.2f\n", m_angEyeAngles.x, m_angEyeAngles.y, m_angEyeAngles.z );
-				SetLocalAngles( m_angEyeAngles );
+				GetEngineObject()->SetLocalAngles( m_angEyeAngles );
 			}
 
 			m_PlayerAnimState->Teleport ( &ptNewPosition, &GetEngineObject()->GetNetworkAngles(), this );
@@ -1166,7 +1166,7 @@ void C_Portal_Player::PostDataUpdate( DataUpdateType_t updateType )
 {
 	// C_BaseEntity assumes we're networking the entity's angles, so pretend that it
 	// networked the same value we already have.
-	GetEngineObject()->SetNetworkAngles( GetLocalAngles() );
+	GetEngineObject()->SetNetworkAngles(GetEngineObject()->GetLocalAngles() );
 
 	if ( m_iSpawnInterpCounter != m_iSpawnInterpCounterCache )
 	{
@@ -1424,7 +1424,7 @@ void C_Portal_Player::CalcView( Vector &eyeOrigin, QAngle &eyeAngles, float &zNe
 
 		if ( pRagdoll )
 		{
-			origin = pRagdoll->GetAbsOrigin();
+			origin = pRagdoll->GetEngineObject()->GetAbsOrigin();
 #if !PORTAL_HIDE_PLAYER_RAGDOLL
 			origin.z += VEC_DEAD_VIEWHEIGHT_SCALED( this ).z; // look over ragdoll, not through
 #endif //PORTAL_HIDE_PLAYER_RAGDOLL
@@ -1549,7 +1549,7 @@ void C_Portal_Player::CalcPortalView( Vector &eyeOrigin, QAngle &eyeAngles )
 		}
 		else if( vPortalForward.z < -0.01f ) //there's a weird case where the player is ducking below a ceiling portal. As they unduck their eye moves beyond the portal before the code detects that they're in the portal hole.
 		{
-			Vector ptPlayerOrigin = GetAbsOrigin();
+			Vector ptPlayerOrigin = GetEngineObject()->GetAbsOrigin();
 			float fOriginDist = vPortalForward.Dot( ptPlayerOrigin ) - fPortalPlaneDist;
 
 			if( fOriginDist > 0.0f )

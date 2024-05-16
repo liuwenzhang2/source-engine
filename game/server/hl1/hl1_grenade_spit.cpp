@@ -108,7 +108,7 @@ void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
 
 		// make a splat on the wall
 		trace_t tr;
-		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + GetAbsVelocity() * 10, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 10, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 		UTIL_DecalTrace(&tr, "BeerSplash" );
 
 		// make some flecks
@@ -118,7 +118,7 @@ void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
 	}
 	else
 	{
-		RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
+		RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
 	}
 
 	Detonate();

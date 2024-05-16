@@ -51,7 +51,7 @@ void CBaseSpriteProjectile::Spawn(	char *pszModel,
 	SetMoveType( iMovetype, nMoveCollide );
 
 	UTIL_SetOrigin( this, vecOrigin );
-	SetAbsVelocity( vecVelocity );
+	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 	SetOwnerEntity( pOwner );
 

@@ -693,7 +693,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 	}
 	else
 	{
-		SetAbsVelocity( vecVelocity );
+		GetEngineObject()->SetAbsVelocity( vecVelocity );
 	}
 
 	CBaseEntity *pOwner = GetOwnerEntity();
@@ -966,7 +966,7 @@ void CBaseCombatWeapon::SetPickupTouch( void )
 void CBaseCombatWeapon::Equip( CBaseCombatCharacter *pOwner )
 {
 	// Attach the weapon to an owner
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	RemoveSolidFlags( FSOLID_TRIGGER );
 	FollowEntity( pOwner );
 	SetOwner( pOwner );
@@ -1897,7 +1897,7 @@ void CBaseCombatWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /
 #if !defined( CLIENT_DLL )
 			if( sound_type == EMPTY )
 			{
-				CSoundEnt::InsertSound( SOUND_COMBAT, GetOwner()->GetAbsOrigin(), SOUNDENT_VOLUME_EMPTY, 0.2, GetOwner() );
+				CSoundEnt::InsertSound( SOUND_COMBAT, GetOwner()->GetEngineObject()->GetAbsOrigin(), SOUNDENT_VOLUME_EMPTY, 0.2, GetOwner() );
 			}
 #endif
 		}

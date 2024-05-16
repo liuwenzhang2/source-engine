@@ -182,12 +182,12 @@ void CEnvShake::ApplyShake( ShakeCommand_t command )
 	if ( !HasSpawnFlags( SF_SHAKE_NO_VIEW ) || !HasSpawnFlags( SF_SHAKE_NO_RUMBLE ) )
 	{
 		bool air = (GetSpawnFlags() & SF_SHAKE_INAIR) ? true : false;
-		UTIL_ScreenShake( GetAbsOrigin(), Amplitude(), Frequency(), Duration(), Radius(), command, air );
+		UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), Amplitude(), Frequency(), Duration(), Radius(), command, air );
 	}
 		
 	if ( GetSpawnFlags() & SF_SHAKE_ROPES )
 	{
-		CRopeKeyframe::ShakeRopes( GetAbsOrigin(), Radius(false), Frequency() );
+		CRopeKeyframe::ShakeRopes(GetEngineObject()->GetAbsOrigin(), Radius(false), Frequency() );
 	}
 
 	if ( GetSpawnFlags() & SF_SHAKE_PHYSICS )
@@ -218,8 +218,8 @@ void CEnvShake::ApplyShake( ShakeCommand_t command )
 				}
 				Vector extents = Vector(radius, radius, radius);
 				extents.z = MAX(extents.z, 100);
-				Vector mins = GetAbsOrigin() - extents;
-				Vector maxs = GetAbsOrigin() + extents;
+				Vector mins = GetEngineObject()->GetAbsOrigin() - extents;
+				Vector maxs = GetEngineObject()->GetAbsOrigin() + extents;
 				int count = UTIL_EntitiesInBox( list, 1024, mins, maxs, 0 );
 
 				for ( int i = 0; i < count; i++ )

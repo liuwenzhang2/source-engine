@@ -144,7 +144,7 @@ float CWeaponScout::GetInaccuracy() const
 	
 		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 			fSpread = 0.2f;
-		else if (pPlayer->GetAbsVelocity().Length2D() > 170)
+		else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 170)
 			fSpread = 0.075f;
 		else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
 			fSpread = 0.0f;

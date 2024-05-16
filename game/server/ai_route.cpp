@@ -192,7 +192,7 @@ void CAI_Path::SetGoalDirection( CBaseEntity *pTarget )
 		AI_Waypoint_t *pLast = m_Waypoints.GetLast();
 		if ( pLast )
 		{
-			m_goalDirection = pTarget->GetAbsOrigin() - pLast->vecLocation;
+			m_goalDirection = pTarget->GetEngineObject()->GetAbsOrigin() - pLast->vecLocation;
 			VectorNormalize( m_goalDirection );
 			/*
 			NDebugOverlay::Box( pLast->vecLocation, Vector( -2, -2, -2 ), Vector( 2, 2, 2 ), 0,0,255, 0, 2.0 );
@@ -214,13 +214,13 @@ Vector CAI_Path::GetGoalDirection( const Vector &startPos )
 			AI_Waypoint_t *pPrev = pLast->GetPrev();
 			if (pPrev)
 			{
-				Vector goalDirection = m_goalDirectionTarget->GetAbsOrigin() - pPrev->vecLocation;
+				Vector goalDirection = m_goalDirectionTarget->GetEngineObject()->GetAbsOrigin() - pPrev->vecLocation;
 				VectorNormalize( goalDirection );
 				return goalDirection;
 			}
 			else
 			{
-				Vector goalDirection = m_goalDirectionTarget->GetAbsOrigin() - startPos;
+				Vector goalDirection = m_goalDirectionTarget->GetEngineObject()->GetAbsOrigin() - startPos;
 				VectorNormalize( goalDirection );
 				return goalDirection;
 			}

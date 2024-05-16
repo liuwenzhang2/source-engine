@@ -423,7 +423,7 @@ void CNPC_Barnacle::InitTonguePosition( void )
 
 	GetAttachment( "TongueEnd", origin );
 
-	float flTongueAdj = origin.z - GetAbsOrigin().z;
+	float flTongueAdj = origin.z - GetEngineObject()->GetAbsOrigin().z;
 	m_vecRoot = origin - Vector(0,0,flTongueAdj);
 	m_vecTip.Set( m_vecRoot.Get() - Vector(0,0,(float)m_flAltitude) );
 	CollisionProp()->MarkSurroundingBoundsDirty();
@@ -654,7 +654,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 						// the upshot of the sine wave which right away makes it more obvious
 						// that the player is being lifted.
 						m_flLocalTimer = 60.0f;
-						m_vLastEnemyPos = pTouchEnt->GetAbsOrigin();
+						m_vLastEnemyPos = pTouchEnt->GetEngineObject()->GetAbsOrigin();
 						m_flLastPull = 0;
 						m_StuckTimer.Set(3.0);
 						bGrabbedTarget = true;
@@ -724,7 +724,7 @@ bool CNPC_Barnacle::CanPickup( CBaseCombatCharacter *pBCC )
 //-----------------------------------------------------------------------------
 bool CNPC_Barnacle::WaitForRagdollToSettle( float flBiteZOffset )
 {
-	Vector vecVictimPos = GetEnemy()->GetAbsOrigin();
+	Vector vecVictimPos = GetEnemy()->GetEngineObject()->GetAbsOrigin();
 
 	Vector vecCheckPos;
 	QAngle vecBoneAngles;
@@ -738,7 +738,7 @@ bool CNPC_Barnacle::WaitForRagdollToSettle( float flBiteZOffset )
 	float flDelta = 4.0;
 
 	// Only bite if the target bone is in the right position.
-	Vector vecBitePoint = GetAbsOrigin();
+	Vector vecBitePoint = GetEngineObject()->GetAbsOrigin();
 	vecBitePoint.z -= flBiteZOffset;
 
    	//NDebugOverlay::Box( vecBitePoint, -Vector(10,10,10), Vector(10,10,10), 0,255,0, 0, 0.1 );
@@ -869,7 +869,7 @@ void CNPC_Barnacle::PullEnemyTorwardsMouth( bool bAdjustEnemyOrigin )
 	{
 		if ( m_flLastPull > 1.0 )
 		{
-			if ( (pEnemy->GetAbsOrigin() - m_vLastEnemyPos).LengthSqr() < Square( m_flLastPull - 1.0 ) )
+			if ( (pEnemy->GetEngineObject()->GetAbsOrigin() - m_vLastEnemyPos).LengthSqr() < Square( m_flLastPull - 1.0 ) )
 			{
 				if ( m_StuckTimer.Expired() )
 				{
@@ -885,7 +885,7 @@ void CNPC_Barnacle::PullEnemyTorwardsMouth( bool bAdjustEnemyOrigin )
 		else
 			m_StuckTimer.Delay(dt);
 
-		m_vLastEnemyPos = pEnemy->GetAbsOrigin();
+		m_vLastEnemyPos = pEnemy->GetEngineObject()->GetAbsOrigin();
 		m_flLastPull = flPull;
 
 		Vector vecNewPos = m_vLastEnemyPos;
@@ -1019,7 +1019,7 @@ void CNPC_Barnacle::LiftPlayer( float flBiteZOffset )
 
 	// Figure out when the prey has reached our bite range use eye position to avoid
 	// clipping into the barnacle body
-	if ( GetAbsOrigin().z - GetEnemy()->EyePosition().z < flBiteZOffset)
+	if (GetEngineObject()->GetAbsOrigin().z - GetEnemy()->EyePosition().z < flBiteZOffset)
 	{
 		m_bLiftingPrey = false;
 
@@ -1045,7 +1045,7 @@ void CNPC_Barnacle::LiftNPC( float flBiteZOffset )
 	PlayLiftingScream( flBiteZOffset );
 
 	// Figure out when the prey has reached our bite range
-	if ( GetAbsOrigin().z - m_vecTip.Get().z < flBiteZOffset )
+	if (GetEngineObject()->GetAbsOrigin().z - m_vecTip.Get().z < flBiteZOffset )
 	{
 		m_bLiftingPrey = false;
 
@@ -1080,7 +1080,7 @@ void CNPC_Barnacle::LiftRagdoll( float flBiteZOffset )
 	PlayLiftingScream( flBiteZOffset );
 
 	// Figure out when the prey has reached our bite range
-	if ( GetAbsOrigin().z - m_vecTip.Get().z < flBiteZOffset )
+	if (GetEngineObject()->GetAbsOrigin().z - m_vecTip.Get().z < flBiteZOffset )
 	{
 		// If we've got a ragdoll, wait until the bone is down below the mouth.
  		if ( !WaitForRagdollToSettle( flBiteZOffset ) )
@@ -1168,7 +1168,7 @@ void CNPC_Barnacle::LiftPhysicsObject( float flBiteZOffset )
 	PlayLiftingScream( flBiteZOffset );
 
 	// Figure out when the prey has reached our bite range
-	if ( GetAbsOrigin().z - m_vecTip.Get().z < flBiteZOffset ) // then yes, let's chomp
+	if (GetEngineObject()->GetAbsOrigin().z - m_vecTip.Get().z < flBiteZOffset ) // then yes, let's chomp
 	{
 		if ( m_hTongueTip )
 		{
@@ -1279,12 +1279,12 @@ void CNPC_Barnacle::LiftPrey( void )
 
 	if ( m_hRagdoll )
 	{
-		QAngle newAngles( 0, m_hRagdoll->GetAbsAngles()[YAW], 0 );
+		QAngle newAngles( 0, m_hRagdoll->GetEngineObject()->GetAbsAngles()[YAW], 0 );
 
 		Vector centerDelta = m_hRagdoll->WorldSpaceCenter() - GetEnemy()->WorldSpaceCenter();
-		Vector newOrigin = GetEnemy()->GetAbsOrigin() + centerDelta;
-		GetEnemy()->SetAbsOrigin( newOrigin );
-		GetEnemy()->SetAbsAngles( newAngles );
+		Vector newOrigin = GetEnemy()->GetEngineObject()->GetAbsOrigin() + centerDelta;
+		GetEnemy()->GetEngineObject()->SetAbsOrigin( newOrigin );
+		GetEnemy()->GetEngineObject()->SetAbsAngles( newAngles );
 	}
 }
 
@@ -1299,7 +1299,7 @@ CRagdollProp *CNPC_Barnacle::AttachRagdollToTongue( CBaseAnimating *pAnimating )
 	
 	if ( m_hTongueTip )
 	{
-		vecNeckOffset = (pAnimating->EyePosition() - m_hTongueTip->GetAbsOrigin());
+		vecNeckOffset = (pAnimating->EyePosition() - m_hTongueTip->GetEngineObject()->GetAbsOrigin());
 	}
 
 	CStudioHdr *pHdr = pAnimating->GetModelPtr();
@@ -1435,20 +1435,20 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 		CBasePlayer *pPlayer = static_cast<CBasePlayer*>(pTouchEnt);
 		if ( pPlayer->IsInAVehicle() )
 		{
-			pPlayer->LeaveVehicle( pPlayer->GetAbsOrigin(), pPlayer->GetAbsAngles() );
+			pPlayer->LeaveVehicle( pPlayer->GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsAngles() );
 
 			// The player could have warped through the tongue while on a high-speed vehicle.
 			// Move him back under the barnacle.
 			Vector vecDelta;
-			VectorSubtract( pPlayer->GetAbsOrigin(), GetAbsOrigin(), vecDelta );
+			VectorSubtract( pPlayer->GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), vecDelta );
 			vecDelta.z = 0.0f;
 			float flDist = VectorNormalize( vecDelta );
 			if ( flDist > 20 )
 			{
 				Vector vecNewPos;
-				VectorMA( GetAbsOrigin(), 20, vecDelta, vecNewPos );
-				vecNewPos.z = pPlayer->GetAbsOrigin().z;
-				pPlayer->SetAbsOrigin( vecNewPos );
+				VectorMA(GetEngineObject()->GetAbsOrigin(), 20, vecDelta, vecNewPos );
+				vecNewPos.z = pPlayer->GetEngineObject()->GetAbsOrigin().z;
+				pPlayer->GetEngineObject()->SetAbsOrigin( vecNewPos );
 			}
 		}
 
@@ -1464,8 +1464,8 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 	// teleporting the player in this way is illegitimate -- try it in third person to see the problem
 	if ( /* pTouchEnt->IsPlayer() || */ pTouchEnt->MyNPCPointer() )
 	{
-		Vector origin = GetAbsOrigin();
-		origin.z = pTouchEnt->GetAbsOrigin().z;
+		Vector origin = GetEngineObject()->GetAbsOrigin();
+		origin.z = pTouchEnt->GetEngineObject()->GetAbsOrigin().z;
 
 		CTraceFilterSkipTwoEntities traceFilter( this, pTouchEnt, COLLISION_GROUP_NONE );
 		trace_t placementTrace;
@@ -1475,20 +1475,20 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 			UTIL_TraceHull( origin + Vector(0, 0, 24), origin, pTouchEnt->WorldAlignMins(), pTouchEnt->WorldAlignMaxs(), MASK_NPCSOLID, &traceFilter, &placementTrace );
 			if ( !placementTrace.startsolid )
 			{
-				pTouchEnt->SetAbsOrigin( placementTrace.endpos );
+				pTouchEnt->GetEngineObject()->SetAbsOrigin( placementTrace.endpos );
 				// pTouchEnt->Teleport( &placementTrace.endpos, NULL, NULL );
 			}
 		}
 		else
 		{
-			pTouchEnt->SetAbsOrigin( origin );
+			pTouchEnt->GetEngineObject()->SetAbsOrigin( origin );
 			// pTouchEnt->Teleport( &origin, NULL, NULL );
 		}
 	}
 
 	m_nShakeCount = 6;
 	m_bLiftingPrey = true;// indicate that we should be lifting prey.
-	SetAltitude( (GetAbsOrigin().z - vecGrabPos.z) );
+	SetAltitude( (GetEngineObject()->GetAbsOrigin().z - vecGrabPos.z) );
 	m_bPlayedPullSound  = false;
 
 	CBaseAnimating *pAnimating = dynamic_cast<CBaseAnimating*>(pTouchEnt);
@@ -1511,9 +1511,9 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 		}
 		else
 		{
-			VectorSubtract( m_vecTip, pTouchEnt->GetAbsOrigin(), vecGrabPos	);
+			VectorSubtract( m_vecTip, pTouchEnt->GetEngineObject()->GetAbsOrigin(), vecGrabPos	);
 			VectorNormalize( vecGrabPos );
-			vecGrabPos = physcollision->CollideGetExtent( pPlayerPhys->GetCollide(), pTouchEnt->GetAbsOrigin(), pTouchEnt->GetAbsAngles(), vecGrabPos );
+			vecGrabPos = physcollision->CollideGetExtent( pPlayerPhys->GetCollide(), pTouchEnt->GetEngineObject()->GetAbsOrigin(), pTouchEnt->GetEngineObject()->GetAbsAngles(), vecGrabPos );
 #if BARNACLE_USE_TONGUE_OFFSET
 			m_vecTipDrawOffset.GetForModify().Zero();
 #endif
@@ -1521,7 +1521,7 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 
 		m_hTongueTip->Teleport( &vecGrabPos, NULL, NULL );
 
-		float flDist = (vecGrabPos - GetAbsOrigin() ).Length();
+		float flDist = (vecGrabPos - GetEngineObject()->GetAbsOrigin() ).Length();
 		float flTime = flDist / m_flBarnaclePullSpeed;
 
 		// If this object would be pulled in too quickly, change the pull speed.
@@ -1652,12 +1652,12 @@ void CNPC_Barnacle::BitePrey( void )
 
 				// Switch the tongue tip to shadow and drag it up
 				pTonguePhys->SetShadow( 1e4, 1e4, false, false );
-				pTonguePhys->UpdateShadow( m_hTongueTip->GetAbsOrigin(), m_hTongueTip->GetAbsAngles(), false, 0 );
+				pTonguePhys->UpdateShadow( m_hTongueTip->GetEngineObject()->GetAbsOrigin(), m_hTongueTip->GetEngineObject()->GetAbsAngles(), false, 0 );
 				m_hTongueTip->SetMoveType( MOVETYPE_NOCLIP );
-				m_hTongueTip->SetAbsVelocity( Vector(0,0,32) );
+				m_hTongueTip->GetEngineObject()->SetAbsVelocity( Vector(0,0,32) );
 				
 
-				SetAltitude( (GetAbsOrigin().z - m_hTongueTip->GetAbsOrigin().z) );
+				SetAltitude( (GetEngineObject()->GetAbsOrigin().z - m_hTongueTip->GetEngineObject()->GetAbsOrigin().z) );
 			}
 		}
 		
@@ -1796,11 +1796,11 @@ void CNPC_Barnacle::BitePrey( void )
 
 	// Switch the tongue tip to shadow and drag it up
 	pTonguePhys->SetShadow( 1e4, 1e4, false, false );
-	pTonguePhys->UpdateShadow( m_hTongueTip->GetAbsOrigin(), m_hTongueTip->GetAbsAngles(), false, 0 );
+	pTonguePhys->UpdateShadow( m_hTongueTip->GetEngineObject()->GetAbsOrigin(), m_hTongueTip->GetEngineObject()->GetAbsAngles(), false, 0 );
 	m_hTongueTip->SetMoveType( MOVETYPE_NOCLIP );
-	m_hTongueTip->SetAbsVelocity( Vector(0,0,32) );
+	m_hTongueTip->GetEngineObject()->SetAbsVelocity( Vector(0,0,32) );
 
-	SetAltitude( (GetAbsOrigin().z - m_hTongueTip->GetAbsOrigin().z) );
+	SetAltitude( (GetEngineObject()->GetAbsOrigin().z - m_hTongueTip->GetEngineObject()->GetAbsOrigin().z) );
 
 	if ( !npc_barnacle_swallow.GetBool() )
 		return;
@@ -1863,7 +1863,7 @@ void CNPC_Barnacle::SwallowPrey( void )
 	}
 
 	// Move the body up slowly
-	Vector vecSwallowPos = m_hTongueTip->GetAbsOrigin();
+	Vector vecSwallowPos = m_hTongueTip->GetEngineObject()->GetAbsOrigin();
 	vecSwallowPos.z -= m_flVictimHeight;
 	//NDebugOverlay::Box( vecSwallowPos, -Vector(5,5,5), Vector(5,5,5), 255,255,255, 0, 0.1 );
 
@@ -1882,12 +1882,12 @@ void CNPC_Barnacle::SwallowPrey( void )
 	}
 
 	// Fully swallowed it?
-	float flDistanceToGo = GetAbsOrigin().z - vecSwallowPos.z;
+	float flDistanceToGo = GetEngineObject()->GetAbsOrigin().z - vecSwallowPos.z;
 	if ( flDistanceToGo <= 0 )
 	{
 		// He's dead jim
 		m_bSwallowingPrey = false;
-		m_hTongueTip->SetAbsVelocity( vec3_origin );
+		m_hTongueTip->GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 #if HL2_EPISODIC
 		// digest poisonous things for just a moment before being killed by them (it looks wierd if it's instant)
@@ -1977,13 +1977,13 @@ void CNPC_Barnacle::LostPrey( bool bRemoveRagdoll )
 
 			if ( m_hRagdoll )
 			{
-				QAngle newAngles( 0, m_hRagdoll->GetAbsAngles()[ YAW ], 0 );
+				QAngle newAngles( 0, m_hRagdoll->GetEngineObject()->GetAbsAngles()[ YAW ], 0 );
 
 				Vector centerDelta = m_hRagdoll->WorldSpaceCenter() - pEnemy->WorldSpaceCenter();
-				Vector newOrigin = pEnemy->GetAbsOrigin() + centerDelta;
-				pEnemy->SetAbsOrigin( newOrigin );
+				Vector newOrigin = pEnemy->GetEngineObject()->GetAbsOrigin() + centerDelta;
+				pEnemy->GetEngineObject()->SetAbsOrigin( newOrigin );
 
-				pVictim->SetAbsAngles( newAngles );
+				pVictim->GetEngineObject()->SetAbsAngles( newAngles );
 			}
 			pVictim->SetGroundEntity( NULL );
 		}
@@ -2035,7 +2035,7 @@ void CNPC_Barnacle::LostPrey( bool bRemoveRagdoll )
 void CNPC_Barnacle::OnTongueTipUpdated()
 {
 	// Update the tip's position
-	const Vector &vecNewTip = m_hTongueTip->GetAbsOrigin();
+	const Vector &vecNewTip = m_hTongueTip->GetEngineObject()->GetAbsOrigin();
 	if ( vecNewTip != m_vecTip )
 	{
 		m_vecTip = vecNewTip;
@@ -2110,11 +2110,11 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 	else if ( m_bSwallowingPrey && m_hRagdoll )
 	{
 		// We're swallowing a body. Make it stick inside us.
-		m_hTongueTip->SetAbsVelocity( vec3_origin );
+		m_hTongueTip->GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 		m_hRagdoll->StopFollowingEntity();
 		m_hRagdoll->SetMoveType( MOVETYPE_VPHYSICS );
-		m_hRagdoll->SetAbsOrigin( m_hTongueTip->GetAbsOrigin() );
+		m_hRagdoll->GetEngineObject()->SetAbsOrigin( m_hTongueTip->GetEngineObject()->GetAbsOrigin() );
 		m_hRagdoll->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_hRagdoll->SetCollisionGroup( COLLISION_GROUP_DEBRIS ); 
 		m_hRagdoll->RecheckCollisionFilter();
@@ -2147,12 +2147,12 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 #ifdef _XBOX
 	UTIL_BloodSpray( GetAbsOrigin(), Vector(0,0,-1), BLOOD_COLOR_YELLOW, 8, FX_BLOODSPRAY_ALL );
 #else
-	UTIL_BloodSpray( GetAbsOrigin(), Vector(0,0,-1), BLOOD_COLOR_RED, 8, FX_BLOODSPRAY_ALL );
+	UTIL_BloodSpray(GetEngineObject()->GetAbsOrigin(), Vector(0,0,-1), BLOOD_COLOR_RED, 8, FX_BLOODSPRAY_ALL );
 #endif
 
 	// Put blood on the ground if near enough
 	trace_t bloodTrace;
-	AI_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector( 0, 0, 256 ), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &bloodTrace);
+	AI_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 256 ), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &bloodTrace);
 	
 	if ( bloodTrace.fraction < 1.0f )
 	{
@@ -2529,10 +2529,10 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 
 	// trace once to hit architecture and see if the tongue needs to change position.
 	CBarnacleTongueFilter tongueFilter( m_hLastSpitEnemy, this, COLLISION_GROUP_NONE );
-	AI_TraceLine ( GetAbsOrigin(), GetAbsOrigin() - Vector ( 0 , 0 , 2048 ), 
+	AI_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector ( 0 , 0 , 2048 ),
 		iMask, &tongueFilter, &tr );
 	
-	length = fabs( GetAbsOrigin().z - tr.endpos.z );
+	length = fabs(GetEngineObject()->GetAbsOrigin().z - tr.endpos.z );
 	// Pull it up a tad
 	length = MAX(8, length - m_flRestUnitsAboveGround);
 	if ( pflLength )
@@ -2541,9 +2541,9 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 	}
 
 	Vector delta = Vector( BARNACLE_CHECK_SPACING, BARNACLE_CHECK_SPACING, 0 );
-	Vector mins = GetAbsOrigin() - delta;
-	Vector maxs = GetAbsOrigin() + delta;
-	maxs.z = GetAbsOrigin().z;
+	Vector mins = GetEngineObject()->GetAbsOrigin() - delta;
+	Vector maxs = GetEngineObject()->GetAbsOrigin() + delta;
+	maxs.z = GetEngineObject()->GetAbsOrigin().z;
 	mins.z -= length;
 
 	CBaseEntity *pList[10];
@@ -2571,10 +2571,10 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 			{
 				Vector vecPrevDriverPos;
 				pTest->GetVelocity( &vecPrevDriverPos );
-				VectorMA( pDriver->GetAbsOrigin(), -0.1f, vecPrevDriverPos, vecPrevDriverPos );
+				VectorMA( pDriver->GetEngineObject()->GetAbsOrigin(), -0.1f, vecPrevDriverPos, vecPrevDriverPos );
 
 				Ray_t sweptDriver;
-				sweptDriver.Init( vecPrevDriverPos, pDriver->GetAbsOrigin(), pDriver->WorldAlignMins(), pDriver->WorldAlignMaxs() );
+				sweptDriver.Init( vecPrevDriverPos, pDriver->GetEngineObject()->GetAbsOrigin(), pDriver->WorldAlignMins(), pDriver->WorldAlignMaxs() );
 				if ( IsBoxIntersectingRay( mins, maxs, sweptDriver ) )
 				{
 					pTest = pDriver;
@@ -2600,7 +2600,7 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 
 				// Allow the barnacles to grab stuff while their tongue is lowering
 #ifdef HL2_EPISODIC
-				length = fabs( GetAbsOrigin().z - pTest->WorldSpaceCenter().z );
+				length = fabs(GetEngineObject()->GetAbsOrigin().z - pTest->WorldSpaceCenter().z );
 				// Pull it up a tad
 				length = MAX(8, length - m_flRestUnitsAboveGround);
 				if ( pflLength )
@@ -2628,7 +2628,7 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 
 			// Allow the barnacles to grab stuff while their tongue is lowering
 #ifdef HL2_EPISODIC
-			length = fabs( GetAbsOrigin().z - pTest->WorldSpaceCenter().z );
+			length = fabs(GetEngineObject()->GetAbsOrigin().z - pTest->WorldSpaceCenter().z );
 			// Pull it up a tad
 			length = MAX(8, length - m_flRestUnitsAboveGround);
 			if ( pflLength )
@@ -2735,10 +2735,10 @@ bool CBarnacleTongueTip::CreateSpring( CBaseAnimating *pTongueRoot )
 	springparams_t spring;
 	spring.constant = BARNACLE_TONGUE_SPRING_CONSTANT_HANGING;
 	spring.damping = BARNACLE_TONGUE_SPRING_DAMPING;
-	spring.naturalLength = (GetAbsOrigin() - pTongueRoot->GetAbsOrigin()).Length();
+	spring.naturalLength = (GetEngineObject()->GetAbsOrigin() - pTongueRoot->GetEngineObject()->GetAbsOrigin()).Length();
 	spring.relativeDamping = 10;
-	spring.startPosition = GetAbsOrigin();
-	spring.endPosition = pTongueRoot->GetAbsOrigin();
+	spring.startPosition = GetEngineObject()->GetAbsOrigin();
+	spring.endPosition = pTongueRoot->GetEngineObject()->GetAbsOrigin();
 	spring.useLocalPositions = false;
 	m_pSpring = physenv->CreateSpring( pPhysObject, pRootPhysObject, &spring );
 

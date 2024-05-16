@@ -129,7 +129,7 @@ void C_DynamicLight::Release()
 void C_DynamicLight::ClientThink(void)
 {
 	Vector forward;
-	AngleVectors( GetAbsAngles(), &forward );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
 
 	if ( (m_Flags & DLIGHT_NO_MODEL_ILLUMINATION) == 0 )
 	{
@@ -156,7 +156,7 @@ void C_DynamicLight::ClientThink(void)
 		m_pDynamicLight->color.g = m_clrRender->g;
 		m_pDynamicLight->color.b = m_clrRender->b;
 		m_pDynamicLight->color.exponent	= m_Exponent;	// this makes it match the world
-		m_pDynamicLight->origin		= GetAbsOrigin();
+		m_pDynamicLight->origin		= GetEngineObject()->GetAbsOrigin();
 		m_pDynamicLight->m_InnerAngle = m_InnerAngle;
 		m_pDynamicLight->m_OuterAngle = m_OuterAngle;
 		m_pDynamicLight->die = gpGlobals->curtime + 1e6;
@@ -188,11 +188,11 @@ void C_DynamicLight::ClientThink(void)
 				  
 		// Trace a line outward, don't use hitboxes (too slow)
 		Vector end;
-		VectorMA( GetAbsOrigin(), m_Radius, forward, end );
+		VectorMA(GetEngineObject()->GetAbsOrigin(), m_Radius, forward, end );
 
 		trace_t		pm;
 		C_BaseEntity::PushEnableAbsRecomputations( false );	 // HACK don't recompute positions while doing RayTrace
-		UTIL_TraceLine( GetAbsOrigin(), end, MASK_NPCWORLDSTATIC, NULL, COLLISION_GROUP_NONE, &pm );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), end, MASK_NPCWORLDSTATIC, NULL, COLLISION_GROUP_NONE, &pm );
 		C_BaseEntity::PopEnableAbsRecomputations();
 		VectorCopy( pm.endpos, m_pSpotlightEnd->origin );
 		

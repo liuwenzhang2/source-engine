@@ -326,7 +326,7 @@ void C_SmokeStack::Update(float fTimeDelta)
 	{
 		// Add new particles.																	
 		Vector forward, right, up;
-		AngleVectors(GetAbsAngles(), &forward, &right, &up);			
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up);
 
 		float tempDelta = fTimeDelta;
 		while(m_ParticleSpawn.NextEvent(tempDelta))
@@ -342,7 +342,7 @@ void C_SmokeStack::Update(float fTimeDelta)
 			{
 				float angle = FRand( 0, 2.0f*M_PI_F );
 				
-				pParticle->m_Pos = GetAbsOrigin() +
+				pParticle->m_Pos = GetEngineObject()->GetAbsOrigin() +
 					right * (cos( angle ) * m_flBaseSpread) +
 					forward * (sin( angle ) * m_flBaseSpread);
 
@@ -467,12 +467,12 @@ void C_SmokeStack::SimulateParticles( CParticleSimulateIterator *pIterator )
 			if( m_bTwist )
 			{
 				Vector vTwist(
-					pParticle->m_Pos.x - GetAbsOrigin().x,
-					pParticle->m_Pos.y - GetAbsOrigin().y,
+					pParticle->m_Pos.x - GetEngineObject()->GetAbsOrigin().x,
+					pParticle->m_Pos.y - GetEngineObject()->GetAbsOrigin().y,
 					0);
 
-				pParticle->m_Pos.x = vTwist.x * m_TwistMat[0][0] + vTwist.y * m_TwistMat[0][1] + GetAbsOrigin().x;
-				pParticle->m_Pos.y = vTwist.x * m_TwistMat[1][0] + vTwist.y * m_TwistMat[1][1] + GetAbsOrigin().y;
+				pParticle->m_Pos.x = vTwist.x * m_TwistMat[0][0] + vTwist.y * m_TwistMat[0][1] + GetEngineObject()->GetAbsOrigin().x;
+				pParticle->m_Pos.y = vTwist.x * m_TwistMat[1][0] + vTwist.y * m_TwistMat[1][1] + GetEngineObject()->GetAbsOrigin().y;
 			}
 
 #ifndef HL2_EPISODIC

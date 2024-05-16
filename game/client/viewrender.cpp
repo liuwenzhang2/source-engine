@@ -3062,8 +3062,8 @@ bool CViewRender::DrawOneMonitor( ITexture *pRenderTarget, int cameraNum, C_Poin
 	monitorView.height = height;
 	monitorView.x = x;
 	monitorView.y = y;
-	monitorView.origin = pCameraEnt->GetAbsOrigin();
-	monitorView.angles = pCameraEnt->GetAbsAngles();
+	monitorView.origin = pCameraEnt->GetEngineObject()->GetAbsOrigin();
+	monitorView.angles = pCameraEnt->GetEngineObject()->GetAbsAngles();
 	monitorView.fov = pCameraEnt->GetFOV();
 	monitorView.m_bOrtho = false;
 	monitorView.m_flAspectRatio = pCameraEnt->UseScreenAspectRatio() ? 0.0f : 1.0f;

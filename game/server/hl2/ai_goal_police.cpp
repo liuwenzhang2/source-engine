@@ -93,11 +93,11 @@ bool CAI_PoliceGoal::ShouldKnockOutTarget( const Vector &targetPos, bool bTarget
 	if ( !bTargetVisible )
 		return false;
 
-	Vector targetDir = targetPos - GetAbsOrigin();
+	Vector targetDir = targetPos - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( targetDir );
 
 	Vector	facingDir;
-	AngleVectors( GetAbsAngles(), &facingDir );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &facingDir );
 
 	// See if it's behind us
 	if ( DotProduct( facingDir, targetDir ) < 0 )

@@ -124,10 +124,10 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	// Pull out of the wall a bit
 	if ( pTrace->fraction != 1.0 )
 	{
-		SetAbsOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6) );
+		GetEngineObject()->SetAbsOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6) );
 	}
 
-	Vector vecAbsOrigin = GetAbsOrigin();
+	Vector vecAbsOrigin = GetEngineObject()->GetAbsOrigin();
 	int contents = UTIL_PointContents ( vecAbsOrigin );
 
 #if defined( TF_DLL )
@@ -167,15 +167,15 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	}
 
 #if !defined( CLIENT_DLL )
-	CSoundEnt::InsertSound ( SOUND_COMBAT, GetAbsOrigin(), BASEGRENADE_EXPLOSION_VOLUME, 3.0 );
+	CSoundEnt::InsertSound ( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), BASEGRENADE_EXPLOSION_VOLUME, 3.0 );
 #endif
 
 	// Use the thrower's position as the reported position
-	Vector vecReported = m_hThrower ? m_hThrower->GetAbsOrigin() : vec3_origin;
+	Vector vecReported = m_hThrower ? m_hThrower->GetEngineObject()->GetAbsOrigin() : vec3_origin;
 	
-	CTakeDamageInfo info( this, m_hThrower, GetBlastForce(), GetAbsOrigin(), m_flDamage, bitsDamageType, 0, &vecReported );
+	CTakeDamageInfo info( this, m_hThrower, GetBlastForce(), GetEngineObject()->GetAbsOrigin(), m_flDamage, bitsDamageType, 0, &vecReported );
 
-	RadiusDamage( info, GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
+	RadiusDamage( info, GetEngineObject()->GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
 
 	UTIL_DecalTrace( pTrace, "Scorch" );
 
@@ -194,7 +194,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	SetSolid( SOLID_NONE );
 	
 	AddEffects( EF_NODRAW );
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 #if HL2_EPISODIC
 	// Because the grenade is zipped out of the world instantly, the EXPLOSION sound that it makes for
@@ -222,7 +222,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 
 void CBaseGrenade::Smoke( void )
 {
-	Vector vecAbsOrigin = GetAbsOrigin();
+	Vector vecAbsOrigin = GetEngineObject()->GetAbsOrigin();
 	if ( UTIL_PointContents ( vecAbsOrigin ) & MASK_WATER )
 	{
 		UTIL_Bubbles( vecAbsOrigin - Vector( 64, 64, 64 ), vecAbsOrigin + Vector( 64, 64, 64 ), 100 );
@@ -281,7 +281,7 @@ void CBaseGrenade::DetonateUse( CBaseEntity *pActivator, CBaseEntity *pCaller, U
 void CBaseGrenade::PreDetonate( void )
 {
 #if !defined( CLIENT_DLL )
-	CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), 400, 1.5, this );
+	CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), 400, 1.5, this );
 #endif
 
 	SetThink( &CBaseGrenade::Detonate );
@@ -296,7 +296,7 @@ void CBaseGrenade::Detonate( void )
 
 	SetThink( NULL );
 
-	vecSpot = GetAbsOrigin() + Vector ( 0 , 0 , 8 );
+	vecSpot = GetEngineObject()->GetAbsOrigin() + Vector ( 0 , 0 , 8 );
 	UTIL_TraceLine ( vecSpot, vecSpot + Vector ( 0, 0, -32 ), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, & tr);
 
 	if( tr.startsolid )
@@ -304,14 +304,14 @@ void CBaseGrenade::Detonate( void )
 		// Since we blindly moved the explosion origin vertically, we may have inadvertently moved the explosion into a solid,
 		// in which case nothing is going to be harmed by the grenade's explosion because all subsequent traces will startsolid.
 		// If this is the case, we do the downward trace again from the actual origin of the grenade. (sjb) 3/8/2007  (for ep2_outland_09)
-		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, -32), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, -32), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr );
 	}
 
 	Explode( &tr, DMG_BLAST );
 
 	if ( GetShakeAmplitude() )
 	{
-		UTIL_ScreenShake( GetAbsOrigin(), GetShakeAmplitude(), 150.0, 1.0, GetShakeRadius(), SHAKE_START );
+		UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), GetShakeAmplitude(), 150.0, 1.0, GetShakeRadius(), SHAKE_START );
 	}
 }
 
@@ -328,9 +328,9 @@ void CBaseGrenade::ExplodeTouch( CBaseEntity *pOther )
 	if ( !pOther->IsSolid() )
 		return;
 
-	Vector velDir = GetAbsVelocity();
+	Vector velDir = GetEngineObject()->GetAbsVelocity();
 	VectorNormalize( velDir );
-	vecSpot = GetAbsOrigin() - velDir * 32;
+	vecSpot = GetEngineObject()->GetAbsOrigin() - velDir * 32;
 	UTIL_TraceLine( vecSpot, vecSpot + velDir * 64, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 	Explode( &tr, DMG_BLAST );
@@ -346,14 +346,14 @@ void CBaseGrenade::DangerSoundThink( void )
 	}
 
 #if !defined( CLIENT_DLL )
-	CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin() + GetAbsVelocity() * 0.5, GetAbsVelocity().Length( ), 0.2, this );
+	CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 0.5, GetEngineObject()->GetAbsVelocity().Length( ), 0.2, this );
 #endif
 
 	SetNextThink( gpGlobals->curtime + 0.2 );
 
 	if (GetWaterLevel() != 0)
 	{
-		SetAbsVelocity( GetAbsVelocity() * 0.5 );
+		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.5 );
 	}
 }
 
@@ -368,7 +368,7 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 		return;
 
 	// only do damage if we're moving fairly fast
-	if ( (pOther->m_takedamage != DAMAGE_NO) && (m_flNextAttack < gpGlobals->curtime && GetAbsVelocity().Length() > 100))
+	if ( (pOther->m_takedamage != DAMAGE_NO) && (m_flNextAttack < gpGlobals->curtime && GetEngineObject()->GetAbsVelocity().Length() > 100))
 	{
 		if (m_hThrower)
 		{
@@ -377,9 +377,9 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 			tr = CBaseEntity::GetTouchTrace( );
 			ClearMultiDamage( );
 			Vector forward;
-			AngleVectors( GetLocalAngles(), &forward, NULL, NULL );
+			AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, NULL, NULL );
 			CTakeDamageInfo info( this, m_hThrower, 1, DMG_CLUB );
-			CalculateMeleeDamageForce( &info, GetAbsVelocity(), GetAbsOrigin() );
+			CalculateMeleeDamageForce( &info, GetEngineObject()->GetAbsVelocity(), GetEngineObject()->GetAbsOrigin() );
 			pOther->DispatchTraceAttack( info, forward, &tr ); 
 			ApplyMultiDamage();
 #endif
@@ -393,7 +393,7 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 	// this is my heuristic for modulating the grenade velocity because grenades dropped purely vertical
 	// or thrown very far tend to slow down too quickly for me to always catch just by testing velocity. 
 	// trimming the Z velocity a bit seems to help quite a bit.
-	vecTestVelocity = GetAbsVelocity(); 
+	vecTestVelocity = GetEngineObject()->GetAbsVelocity();
 	vecTestVelocity.z *= 0.45;
 
 	if ( !m_bHasWarnedAI && vecTestVelocity.Length() <= 60 )
@@ -403,7 +403,7 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 		
 		// register a radius louder than the explosion, so we make sure everyone gets out of the way
 #if !defined( CLIENT_DLL )
-		CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), m_flDamage / 0.4, 0.3, this );
+		CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), m_flDamage / 0.4, 0.3, this );
 #endif
 		m_bHasWarnedAI = true;
 	}
@@ -420,7 +420,7 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 		// play bounce sound
 		BounceSound();
 	}
-	m_flPlaybackRate = GetAbsVelocity().Length() / 200.0;
+	m_flPlaybackRate = GetEngineObject()->GetAbsVelocity().Length() / 200.0;
 	if (m_flPlaybackRate > 1.0)
 		m_flPlaybackRate = 1;
 	else if (m_flPlaybackRate < 0.5)
@@ -443,7 +443,7 @@ void CBaseGrenade::SlideTouch( CBaseEntity *pOther )
 		// add a bit of static friction
 //		SetAbsVelocity( GetAbsVelocity() * 0.95 );  
 
-		if (GetAbsVelocity().x != 0 || GetAbsVelocity().y != 0)
+		if (GetEngineObject()->GetAbsVelocity().x != 0 || GetEngineObject()->GetAbsVelocity().y != 0)
 		{
 			// maintain sliding sound
 		}
@@ -476,7 +476,7 @@ void CBaseGrenade ::TumbleThink( void )
 	if (m_flDetonateTime - 1 < gpGlobals->curtime)
 	{
 #if !defined( CLIENT_DLL )
-		CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin() + GetAbsVelocity() * (m_flDetonateTime - gpGlobals->curtime), 400, 0.1, this );
+		CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * (m_flDetonateTime - gpGlobals->curtime), 400, 0.1, this );
 #endif
 	}
 
@@ -487,7 +487,7 @@ void CBaseGrenade ::TumbleThink( void )
 
 	if (GetWaterLevel() != 0)
 	{
-		SetAbsVelocity( GetAbsVelocity() * 0.5 );
+		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.5 );
 		m_flPlaybackRate = 0.2;
 	}
 }

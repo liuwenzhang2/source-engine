@@ -56,14 +56,14 @@ protected:
 				if ( m_bIsFlinging )
 				{
 					// Add up how far we traveled since the last teleport
-					m_fAccumulatedDistance += m_fZPortalPosition - pInPortal->GetAbsOrigin().z;
+					m_fAccumulatedDistance += m_fZPortalPosition - pInPortal->GetEngineObject()->GetAbsOrigin().z;
 
 					if ( m_fAccumulatedDistance > 30000.0f * 12 )
 						IncrementCount();
 				}
 
 				// Remember the Z position to get the distance when the teleport again or land
-				m_fZPortalPosition = pOutPortal->GetAbsOrigin().z;
+				m_fZPortalPosition = pOutPortal->GetEngineObject()->GetAbsOrigin().z;
 				m_bIsFlinging = true;
 			}
 		}
@@ -75,7 +75,7 @@ protected:
 
 				if ( pLocalPlayer )
 				{
-					m_fAccumulatedDistance += m_fZPortalPosition - pLocalPlayer->GetAbsOrigin().z;
+					m_fAccumulatedDistance += m_fZPortalPosition - pLocalPlayer->GetEngineObject()->GetAbsOrigin().z;
 
 					if ( m_fAccumulatedDistance > 30000.0f * 12 )
 						IncrementCount();
@@ -135,7 +135,7 @@ protected:
 				if ( m_bIsFlinging )
 				{
 					// Add up how far we traveled since the last teleport
-					float flDist = pInPortal->GetAbsOrigin().AsVector2D().DistTo( m_vec2DPortalPosition );
+					float flDist = pInPortal->GetEngineObject()->GetAbsOrigin().AsVector2D().DistTo( m_vec2DPortalPosition );
 				
 					// Ignore small distances that can be caused by microadjustments in infinite falls
 					if ( flDist > 63.0f )
@@ -148,7 +148,7 @@ protected:
 				}
 
 				// Remember the 2D position to get the distance when the teleport again or land
-				m_vec2DPortalPosition = pOutPortal->GetAbsOrigin().AsVector2D();
+				m_vec2DPortalPosition = pOutPortal->GetEngineObject()->GetAbsOrigin().AsVector2D();
 				m_bIsFlinging = true;
 			}
 		}
@@ -160,7 +160,7 @@ protected:
 
 				if ( pLocalPlayer )
 				{
-					float flDist = pLocalPlayer->GetAbsOrigin().AsVector2D().DistTo( m_vec2DPortalPosition );
+					float flDist = pLocalPlayer->GetEngineObject()->GetAbsOrigin().AsVector2D().DistTo( m_vec2DPortalPosition );
 
 					// Ignore small distances that can be caused by microadjustments in infinite falls
 					if ( flDist > 63.0f )

@@ -151,11 +151,11 @@ void CPointAngularVelocitySensor::DrawDebugLines( void )
 	if ( m_hTargetEntity )
 	{
 		Vector vForward, vRight, vUp;
-		AngleVectors( m_hTargetEntity->GetAbsAngles(), &vForward, &vRight, &vUp );
+		AngleVectors( m_hTargetEntity->GetEngineObject()->GetAbsAngles(), &vForward, &vRight, &vUp );
 
-		NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + vForward * 64, 255, 0, 0, false, 0 );
-		NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + vRight * 64, 0, 255, 0, false, 0 );
-		NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + vUp * 64, 0, 0, 255, false, 0 );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vForward * 64, 255, 0, 0, false, 0 );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vRight * 64, 0, 255, 0, false, 0 );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vUp * 64, 0, 0, 255, false, 0 );
 	}
 
 	if ( m_bUseHelper == true )
@@ -163,16 +163,16 @@ void CPointAngularVelocitySensor::DrawDebugLines( void )
 		QAngle Angles;
 		Vector vAxisForward, vAxisRight, vAxisUp;
 
-		Vector vLine = m_vecAxis - GetAbsOrigin();
+		Vector vLine = m_vecAxis - GetEngineObject()->GetAbsOrigin();
 
 		VectorNormalize( vLine );
 
 		VectorAngles( vLine, Angles );
 		AngleVectors( Angles, &vAxisForward, &vAxisRight, &vAxisUp );
 
-		NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + vAxisForward * 64, 255, 0, 0, false, 0 );
-		NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + vAxisRight * 64, 0, 255, 0, false, 0 );
-		NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + vAxisUp * 64, 0, 0, 255, false, 0 );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vAxisForward * 64, 255, 0, 0, false, 0 );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vAxisRight * 64, 0, 255, 0, false, 0 );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vAxisUp * 64, 0, 0, 255, false, 0 );
 	}
 }
 
@@ -213,7 +213,7 @@ float CPointAngularVelocitySensor::SampleAngularVelocity(CBaseEntity *pEntity)
 			}
 			else
 			{
-				Vector vLine = m_vecAxis - GetAbsOrigin();
+				Vector vLine = m_vecAxis - GetEngineObject()->GetAbsOrigin();
 				VectorNormalize( vLine );
 
 				Vector vecWorldAngVelocity;
@@ -432,7 +432,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CPointVelocitySensor::Spawn()
 {
-	Vector vLine = m_vecAxis - GetAbsOrigin();
+	Vector vLine = m_vecAxis - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( vLine );
 	m_vecAxis = vLine;
 }
@@ -510,7 +510,7 @@ void CPointVelocitySensor::SampleVelocity( void )
 	}
 	else
 	{
-		vecVelocity = m_hTargetEntity->GetAbsVelocity();
+		vecVelocity = m_hTargetEntity->GetEngineObject()->GetAbsVelocity();
 	}
 
 	/*

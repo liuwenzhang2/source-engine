@@ -70,7 +70,7 @@ void CScriptedTarget::InputDisable( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CScriptedTarget::TurnOn( void )
 {
-	m_vLastPosition = GetAbsOrigin();
+	m_vLastPosition = GetEngineObject()->GetAbsOrigin();
 	SetThink( &CScriptedTarget::ScriptThink );
 	m_iDisabled		= false;
 	SetNextThink( gpGlobals->curtime );
@@ -106,7 +106,7 @@ void CScriptedTarget::Spawn( void )
 
 	SetSolid( SOLID_NONE );
 
-	m_vLastPosition = GetAbsOrigin();
+	m_vLastPosition = GetEngineObject()->GetAbsOrigin();
 
 	if (!m_iDisabled )
 	{
@@ -163,7 +163,7 @@ CScriptedTarget* CScriptedTarget::NextScriptedTarget(void)
 			//  Make sure there is a LOS between these two targets
 			// ----------------------------------------------------
 			trace_t tr;
-			UTIL_TraceLine(GetAbsOrigin(), pNextTarget->GetAbsOrigin(), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr);	
+			UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), pNextTarget->GetEngineObject()->GetAbsOrigin(), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr);
 			if (tr.fraction != 1.0)
 			{
 				Warning( "WARNING: Scripted Target from (%s) to (%s) is occluded!\n",GetDebugName(),pNextTarget->GetDebugName() );
@@ -215,13 +215,13 @@ CBaseEntity* CScriptedTarget::FindEntity( void )
 	CBaseEntity*	pNearestEnt		= NULL;
 	CBaseEntity*	pTestEnt		= NULL;
 
-	for ( CEntitySphereQuery sphere( GetAbsOrigin(), m_flRadius ); ( pTestEnt = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
+	for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), m_flRadius ); ( pTestEnt = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 	{
 		if (pTestEnt->GetFlags() & FL_NPC)
 		{
 			if (FClassnameIs( pTestEnt, STRING(m_iszEntity)))
 			{
-				float flTestDist = (pTestEnt->GetAbsOrigin() - GetAbsOrigin()).Length();
+				float flTestDist = (pTestEnt->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
 				if (flTestDist < flNearestDist)
 				{
 					flNearestDist	= flTestDist;
@@ -337,23 +337,23 @@ void CScriptedTarget::DrawDebugGeometryOverlays(void)
 	{
 		if (m_iDisabled)
 		{
-			NDebugOverlay::Box(GetAbsOrigin(), Vector(-5,-5,-5), Vector(5,5,5), 200,100,100, 0 ,0);
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), Vector(-5,-5,-5), Vector(5,5,5), 200,100,100, 0 ,0);
 		}
 		else
 		{
 			NDebugOverlay::Cross3D(m_vLastPosition,	Vector(-8,-8,-8),Vector(8,8,8),255,0,0,true,0.1);
-			NDebugOverlay::Box(GetAbsOrigin(), Vector(-5,-5,-5), Vector(5,5,5), 255,0,0, 0 ,0);
-			NDebugOverlay::Line(GetAbsOrigin(),m_vLastPosition,255,0,0,true,0.0);
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), Vector(-5,-5,-5), Vector(5,5,5), 255,0,0, 0 ,0);
+			NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(),m_vLastPosition,255,0,0,true,0.0);
 		}
 
 		CBaseEntity *pTarget = GetNextTarget();
 		if (pTarget)
 		{
-			NDebugOverlay::Line(GetAbsOrigin(),pTarget->GetAbsOrigin(),200,100,100,true,0.0);
+			NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(),pTarget->GetEngineObject()->GetAbsOrigin(),200,100,100,true,0.0);
 		}
 		if (GetTarget() != NULL)
 		{
-			NDebugOverlay::Line(GetAbsOrigin(),GetTarget()->EyePosition(),0,255,0,true,0.0);
+			NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(),GetTarget()->EyePosition(),0,255,0,true,0.0);
 		}
 
 	}

@@ -359,7 +359,7 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 			// make sure we're still able to play this command
 			if (!info->m_bStarted)
 			{
-				info->m_flInitialYaw = GetLocalAngles().y;
+				info->m_flInitialYaw = GetEngineObject()->GetLocalAngles().y;
 				info->m_flTargetYaw = info->m_flInitialYaw;
 				info->m_flFacingYaw = info->m_flInitialYaw;
 				if (IsMoving())
@@ -380,7 +380,7 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 
 			if (!bInScene || info->m_bIsMoving != IsMoving())
 			{
-				info->m_flInitialYaw = GetLocalAngles().y;
+				info->m_flInitialYaw = GetEngineObject()->GetLocalAngles().y;
 			}
 			info->m_bIsMoving = IsMoving();
 
@@ -395,7 +395,7 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 
 			if (bInScene && info->m_bIsMoving)
 			{
-				info->m_flInitialYaw = GetLocalAngles().y;
+				info->m_flInitialYaw = GetEngineObject()->GetLocalAngles().y;
 			}
 
 			if (!event->IsLockBodyFacing())
@@ -412,7 +412,7 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 			float flBodyYaw;
 			
 			// move upper body to account for missing body yaw
-			diff = UTIL_AngleDiff( info->m_flTargetYaw, GetLocalAngles().y );
+			diff = UTIL_AngleDiff( info->m_flTargetYaw, GetEngineObject()->GetLocalAngles().y );
 			if (diff < 0)
 			{
 				diff = -diff;
@@ -436,7 +436,7 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 
 			CAI_BaseNPC *pGoalNpc = info->m_hTarget->MyNPCPointer();
 
-			float goalYaw = GetLocalAngles().y;
+			float goalYaw = GetEngineObject()->GetLocalAngles().y;
 			
 			if ( pGoalNpc )
 			{
@@ -449,7 +449,7 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 
 			if (developer.GetInt() > 0 && scene_showfaceto.GetBool())
 			{
-				NDebugOverlay::YawArrow( GetAbsOrigin() + Vector( 0, 0, 1 ), goalYaw, 8 + 32 * intensity, 8, 255, 255, 255, 0, true, 0.12 );
+				NDebugOverlay::YawArrow(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 1 ), goalYaw, 8 + 32 * intensity, 8, 255, 255, 255, 0, true, 0.12 );
 			}
 
 			diff = UTIL_AngleDiff( goalYaw, info->m_flInitialYaw ) * intensity;
@@ -707,7 +707,7 @@ void CAI_BaseActor::UpdateLatchedValues( )
 		if (!HasCondition( COND_IN_PVS ) || !GetAttachment( "eyes", m_latchedEyeOrigin, &m_latchedHeadDirection ))
 		{
 			m_latchedEyeOrigin = BaseClass::EyePosition( );
-			AngleVectors( GetLocalAngles(), &m_latchedHeadDirection );
+			AngleVectors(GetEngineObject()->GetLocalAngles(), &m_latchedHeadDirection );
 		}
 		// clear out eye latch
 		m_fLatchedPositions &= ~(HUMANOID_LATCHED_EYE);
@@ -855,7 +855,7 @@ float CAI_BaseActor::ClampWithBias( PoseParameter_t index, float value, float ba
 
 void CAI_BaseActor::AccumulateIdealYaw( float flYaw, float flIntensity )
 {
-	float diff = AngleDiff( flYaw, GetLocalAngles().y );
+	float diff = AngleDiff( flYaw, GetEngineObject()->GetLocalAngles().y );
 	m_flAccumYawDelta += diff * flIntensity;
 	m_flAccumYawScale += flIntensity;
 }
@@ -870,7 +870,7 @@ bool CAI_BaseActor::SetAccumulatedYawAndUpdate( void )
 	if (m_flAccumYawScale > 0.0)
 	{
 		float diff = m_flAccumYawDelta / m_flAccumYawScale;
-		float facing = GetLocalAngles().y + diff;
+		float facing = GetEngineObject()->GetLocalAngles().y + diff;
 
 		m_flAccumYawDelta = 0.0;
 		m_flAccumYawScale = 0.0;
@@ -1231,7 +1231,7 @@ bool CAI_BaseActor::PickRandomLookTarget( AILookTargetArgs_t *pArgs )
 	{
 		Vector navLookPoint;
 		Vector delta;
-		if ( GetNavigator()->GetPointAlongPath( &navLookPoint, 12 * 12 ) && (delta = navLookPoint - GetAbsOrigin()).Length() > 8.0 * 12.0 )
+		if ( GetNavigator()->GetPointAlongPath( &navLookPoint, 12 * 12 ) && (delta = navLookPoint - GetEngineObject()->GetAbsOrigin()).Length() > 8.0 * 12.0 )
 		{
 			if ( random->RandomInt(1, 10) <= 5 )
 			{
@@ -1259,7 +1259,7 @@ bool CAI_BaseActor::PickRandomLookTarget( AILookTargetArgs_t *pArgs )
 	CBaseEntity *pEntity = NULL;
 	int iHighestImportance = 0;
 	int iConsidered = 0;
-	for ( CEntitySphereQuery sphere( GetAbsOrigin(), 30 * 12, 0 ); (pEntity = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
+	for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), 30 * 12, 0 ); (pEntity = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 	{
 		if (pEntity == this)
 		{
@@ -1672,11 +1672,11 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 
 	if ( m_hLookTarget != NULL )
 	{
-		Vector absVel = m_hLookTarget->GetAbsVelocity();
+		Vector absVel = m_hLookTarget->GetEngineObject()->GetAbsVelocity();
 		CBaseEntity *ground = m_hLookTarget->GetGroundEntity();
 		if ( ground && ground->GetMoveType() == MOVETYPE_PUSH)
 		{
-			absVel = absVel + ground->GetAbsVelocity();
+			absVel = absVel + ground->GetEngineObject()->GetAbsVelocity();
 		}
 
 #ifdef HL2_EPISODIC

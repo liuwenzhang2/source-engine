@@ -450,7 +450,7 @@ void CNPC_BaseTurret::Initialize(void)
 	if (m_iBaseTurnRate == 0) m_iBaseTurnRate = TURRET_TURNRATE;
 	if (m_flMaxWait == 0) m_flMaxWait = TURRET_MAXWAIT;
 
-	QAngle angles = GetAbsAngles();
+	QAngle angles = GetEngineObject()->GetAbsAngles();
 	m_flStartYaw = angles.y;
 	if (m_iOrientation == TURRET_ORIENTATION_CEILING)
 	{
@@ -458,7 +458,7 @@ void CNPC_BaseTurret::Initialize(void)
 		angles.y += 180;
 		if( angles.y > 360 )
 			angles.y -= 360;
-		SetAbsAngles( angles );
+		GetEngineObject()->SetAbsAngles( angles );
 
 //		pev->idealpitch = 180;			//not used?
 
@@ -564,7 +564,7 @@ void CNPC_BaseTurret::ActiveThink(void)
 	Vector forward;
 	AngleVectors( m_vecCurAngles, &forward );
 
-	Vector2D vec2LOS = ( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() ).AsVector2D();
+	Vector2D vec2LOS = ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).AsVector2D();
 	vec2LOS.NormalizeInPlace();
 
 	float flDot = vec2LOS.Dot( forward.AsVector2D() );
@@ -855,7 +855,7 @@ void CNPC_BaseTurret::Deploy(void)
 
 		m_vecCurAngles.x = 0;
 
-		QAngle angles = GetAbsAngles();
+		QAngle angles = GetEngineObject()->GetAbsAngles();
 
 		if (m_iOrientation == TURRET_ORIENTATION_CEILING)
 		{
@@ -1025,7 +1025,7 @@ int CNPC_BaseTurret::MoveTurret(void)
 		if (flDist < (0.05 * m_iBaseTurnRate))
 			m_vecCurAngles.y = m_vecGoalAngles.y;
 
-		QAngle angles = GetAbsAngles();
+		QAngle angles = GetEngineObject()->GetAbsAngles();
 
 		//ALERT(at_console, "%.2f -> %.2f\n", m_vecCurAngles.y, y);
 
@@ -1204,7 +1204,7 @@ void CNPC_Turret::Spawn()
 	
 	SetThink(&CNPC_BaseTurret::Initialize);	
 
-	m_pEyeGlow = CSprite::SpriteCreate( TURRET_GLOW_SPRITE, GetAbsOrigin(), FALSE );
+	m_pEyeGlow = CSprite::SpriteCreate( TURRET_GLOW_SPRITE, GetEngineObject()->GetAbsOrigin(), FALSE );
 	m_pEyeGlow->SetTransparency( kRenderGlow, 255, 0, 0, 0, kRenderFxNoDissipation );
 	m_pEyeGlow->SetAttachment( this, 2 );
 

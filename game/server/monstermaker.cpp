@@ -177,9 +177,9 @@ bool CBaseNPCMaker::CanMakeNPC( bool bIgnoreSolidEntities )
 		m_hIgnoreEntity = gEntList.FindEntityByName( NULL, m_iszIngoreEnt );
 	}
 
-	Vector mins = GetAbsOrigin() - Vector( 34, 34, 0 );
-	Vector maxs = GetAbsOrigin() + Vector( 34, 34, 0 );
-	maxs.z = GetAbsOrigin().z;
+	Vector mins = GetEngineObject()->GetAbsOrigin() - Vector( 34, 34, 0 );
+	Vector maxs = GetEngineObject()->GetAbsOrigin() + Vector( 34, 34, 0 );
+	maxs.z = GetEngineObject()->GetAbsOrigin().z;
 	
 	// If we care about not hitting solid entities, look for 'em
 	if ( !bIgnoreSolidEntities )
@@ -202,8 +202,8 @@ bool CBaseNPCMaker::CanMakeNPC( bool bIgnoreSolidEntities )
 					// Since the outer method doesn't work well around striders on account of their huge bounding box.
 					// Find the ground under me and see if a human hull would fit there.
 					trace_t tr;
-					UTIL_TraceHull( GetAbsOrigin() + Vector( 0, 0, 2 ),
-									GetAbsOrigin() - Vector( 0, 0, 8192 ),
+					UTIL_TraceHull(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 2 ),
+									GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 8192 ),
 									NAI_Hull::Mins(HULL_HUMAN),
 									NAI_Hull::Maxs(HULL_HUMAN),
 									MASK_NPCSOLID,
@@ -229,7 +229,7 @@ bool CBaseNPCMaker::CanMakeNPC( bool bIgnoreSolidEntities )
 			if ( pPlayer )
 			{
 				// Only spawn if the player's looking away from me
-				if( pPlayer->FInViewCone( GetAbsOrigin() ) && pPlayer->FVisible( GetAbsOrigin() ) )
+				if( pPlayer->FInViewCone(GetEngineObject()->GetAbsOrigin() ) && pPlayer->FVisible(GetEngineObject()->GetAbsOrigin() ) )
 				{
 					if ( !(pPlayer->GetFlags() & FL_NOTARGET) )
 						return false;
@@ -434,13 +434,13 @@ void CNPCMaker::MakeNPC( void )
 
 	m_OnSpawnNPC.Set( pent, pent, this );
 
-	pent->SetAbsOrigin( GetAbsOrigin() );
+	pent->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	// Strip pitch and roll from the spawner's angles. Pass only yaw to the spawned NPC.
-	QAngle angles = GetAbsAngles();
+	QAngle angles = GetEngineObject()->GetAbsAngles();
 	angles.x = 0.0;
 	angles.z = 0.0;
-	pent->SetAbsAngles( angles );
+	pent->GetEngineObject()->SetAbsAngles( angles );
 
 	pent->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 
@@ -495,7 +495,7 @@ void CBaseNPCMaker::ChildPostSpawn( CAI_BaseNPC *pChild )
 	while ( bFound )
 	{
 		trace_t tr;
-		UTIL_TraceHull( pChild->GetAbsOrigin(), pChild->GetAbsOrigin(), pChild->WorldAlignMins(), pChild->WorldAlignMaxs(), MASK_NPCSOLID, pChild, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceHull( pChild->GetEngineObject()->GetAbsOrigin(), pChild->GetEngineObject()->GetAbsOrigin(), pChild->WorldAlignMins(), pChild->WorldAlignMaxs(), MASK_NPCSOLID, pChild, COLLISION_GROUP_NONE, &tr );
 		//NDebugOverlay::Box( pChild->GetAbsOrigin(), pChild->WorldAlignMins(), pChild->WorldAlignMaxs(), 0, 255, 0, 32, 5.0 );
 		if ( tr.fraction != 1.0 && tr.m_pEnt )
 		{
@@ -663,7 +663,7 @@ CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 		if( pDestination && pDestination->IsAvailable() )
 		{
 			bool fValid = true;
-			Vector vecTest = pDestination->GetAbsOrigin();
+			Vector vecTest = pDestination->GetEngineObject()->GetAbsOrigin();
 
 			if( m_CriterionVisibility != TS_YN_DONT_CARE )
 			{
@@ -713,7 +713,7 @@ CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 		{
 			CNPCSpawnDestination *pRandomDest = pDestinations[ rand() % count ];
 
-			if( HumanHullFits( pRandomDest->GetAbsOrigin() ) )
+			if( HumanHullFits( pRandomDest->GetEngineObject()->GetAbsOrigin() ) )
 			{
 				return pRandomDest;
 			}
@@ -730,8 +730,8 @@ CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 
 			for( int i = 0 ; i < count ; i++ )
 			{
-				Vector vecTest = pDestinations[ i ]->GetAbsOrigin();
-				float flDist = ( vecTest - pPlayer->GetAbsOrigin() ).Length();
+				Vector vecTest = pDestinations[ i ]->GetEngineObject()->GetAbsOrigin();
+				float flDist = ( vecTest - pPlayer->GetEngineObject()->GetAbsOrigin() ).Length();
 
 				if ( m_iMinSpawnDistance != 0 && m_iMinSpawnDistance > flDist )
 					continue;
@@ -752,8 +752,8 @@ CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 
 			for( int i = 0 ; i < count ; i++ )
 			{
-				Vector vecTest = pDestinations[ i ]->GetAbsOrigin();
-				float flDist = ( vecTest - pPlayer->GetAbsOrigin() ).Length();
+				Vector vecTest = pDestinations[ i ]->GetEngineObject()->GetAbsOrigin();
+				float flDist = ( vecTest - pPlayer->GetEngineObject()->GetAbsOrigin() ).Length();
 
 				if ( m_iMinSpawnDistance != 0 && m_iMinSpawnDistance > flDist )
 					continue;
@@ -814,25 +814,25 @@ void CTemplateNPCMaker::MakeNPC( void )
 	
 	if ( pDestination )
 	{
-		pent->SetAbsOrigin( pDestination->GetAbsOrigin() );
+		pent->GetEngineObject()->SetAbsOrigin( pDestination->GetEngineObject()->GetAbsOrigin() );
 
 		// Strip pitch and roll from the spawner's angles. Pass only yaw to the spawned NPC.
-		QAngle angles = pDestination->GetAbsAngles();
+		QAngle angles = pDestination->GetEngineObject()->GetAbsAngles();
 		angles.x = 0.0;
 		angles.z = 0.0;
-		pent->SetAbsAngles( angles );
+		pent->GetEngineObject()->SetAbsAngles( angles );
 
 		pDestination->OnSpawnedNPC( pent );
 	}
 	else
 	{
-		pent->SetAbsOrigin( GetAbsOrigin() );
+		pent->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 
 		// Strip pitch and roll from the spawner's angles. Pass only yaw to the spawned NPC.
-		QAngle angles = GetAbsAngles();
+		QAngle angles = GetEngineObject()->GetAbsAngles();
 		angles.x = 0.0;
 		angles.z = 0.0;
-		pent->SetAbsAngles( angles );
+		pent->GetEngineObject()->SetAbsAngles( angles );
 	}
 
 	m_OnSpawnNPC.Set( pEntity, pEntity, this );
@@ -939,7 +939,7 @@ bool CTemplateNPCMaker::PlaceNPCInLine( CAI_BaseNPC *pNPC )
 	vecLine *= -1;
 
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector( 0, 0, 8192 ), MASK_SHOT, pNPC, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 8192 ), MASK_SHOT, pNPC, COLLISION_GROUP_NONE, &tr );
 	vecPlace = tr.endpos;
 	float flStepSize = pNPC->GetHullWidth();
 
@@ -957,7 +957,7 @@ bool CTemplateNPCMaker::PlaceNPCInLine( CAI_BaseNPC *pNPC )
 
 		if( tr.fraction == 1.0 )
 		{
-			pNPC->SetAbsOrigin( tr.endpos );
+			pNPC->GetEngineObject()->SetAbsOrigin( tr.endpos );
 			return true;
 		}
 
@@ -1037,9 +1037,9 @@ bool CTemplateNPCMaker::PlaceNPCInRadius( CAI_BaseNPC *pNPC )
 {
 	Vector vPos;
 
-	if ( CAI_BaseNPC::FindSpotForNPCInRadius( &vPos, GetAbsOrigin(), pNPC, m_flRadius ) )
+	if ( CAI_BaseNPC::FindSpotForNPCInRadius( &vPos, GetEngineObject()->GetAbsOrigin(), pNPC, m_flRadius ) )
 	{
-		pNPC->SetAbsOrigin( vPos );
+		pNPC->GetEngineObject()->SetAbsOrigin( vPos );
 		return true;
 	}
 

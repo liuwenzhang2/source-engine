@@ -101,8 +101,8 @@ int C_FuncAreaPortalWindow::DrawModel( int flags )
 	render->DrawBrushModelEx( 
 		this, 
 		(model_t *)GetModel(), 
-		GetAbsOrigin(), 
-		GetAbsAngles(), 
+		GetEngineObject()->GetAbsOrigin(),
+		GetEngineObject()->GetAbsAngles(),
 		mode );
 
 	// Draw the optional foreground model next.
@@ -116,8 +116,8 @@ int C_FuncAreaPortalWindow::DrawModel( int flags )
 			render->DrawBrushModelEx( 
 				this, 
 				pBackground, 
-				GetAbsOrigin(), 
-				GetAbsAngles(), 
+				GetEngineObject()->GetAbsOrigin(),
+				GetEngineObject()->GetAbsAngles(),
 				mode );
 		}
 	}

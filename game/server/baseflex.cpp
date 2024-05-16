@@ -937,7 +937,7 @@ void CBaseFlex::ProcessSceneEvents( void )
 			Vector p1 = myNpc->GetHullMaxs();
 			p0.z = p1.z + 2;
 			p1.z = p1.z + 2;
-			NDebugOverlay::Box( myNpc->GetAbsOrigin(), p0, p1, 255, 0, 0, 0, 0.12 );
+			NDebugOverlay::Box( myNpc->GetEngineObject()->GetAbsOrigin(), p0, p1, 255, 0, 0, 0, 0.12 );
 		}
 	}
 
@@ -1266,7 +1266,7 @@ bool CBaseFlex::ProcessFacingSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 
 	if (!info->m_bStarted)
 	{
-		info->m_flInitialYaw = GetLocalAngles().y;
+		info->m_flInitialYaw = GetEngineObject()->GetLocalAngles().y;
 	}
 
 	// lock in place if aiming at self
@@ -1280,7 +1280,7 @@ bool CBaseFlex::ProcessFacingSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 	{
 		if (info->m_bIsMoving != IsMoving())
 		{
-			info->m_flInitialYaw = GetLocalAngles().y;
+			info->m_flInitialYaw = GetEngineObject()->GetLocalAngles().y;
 		}
 		info->m_bIsMoving = IsMoving();
 
@@ -1410,7 +1410,7 @@ bool CBaseFlex::ProcessMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 
 			AI_NavGoal_t goal( GOALTYPE_TARGETENT, moveActivity, flDistTolerance, AIN_UPDATE_TARGET_POS );
 
-			float flDist = (info->m_hTarget->EyePosition() - GetAbsOrigin()).Length2D();
+			float flDist = (info->m_hTarget->EyePosition() - GetEngineObject()->GetAbsOrigin()).Length2D();
 
 			if (flDist > MAX( MAX( flDistTolerance, 0.1 ), event->GetDistanceToTarget()))
 			{
@@ -1442,7 +1442,7 @@ bool CBaseFlex::ProcessMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 					{
 						Vector vTestPoint;
 						myNpc->GetMoveProbe()->FloorPoint( info->m_hTarget->EyePosition(), MASK_NPCSOLID, 0, -64, &vTestPoint );
-						NDebugOverlay::HorzArrow( GetAbsOrigin() + Vector( 0, 0, 1 ), vTestPoint + Vector( 0, 0, 1 ), 4, 255, 0, 255, 0, false, 0.12 );
+						NDebugOverlay::HorzArrow(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 1 ), vTestPoint + Vector( 0, 0, 1 ), 4, 255, 0, 255, 0, false, 0.12 );
 						NDebugOverlay::Box( vTestPoint, myNpc->GetHullMins(), myNpc->GetHullMaxs(), 255, 0, 255, 0, 0.12 );
 					}
 				}
@@ -1456,7 +1456,7 @@ bool CBaseFlex::ProcessMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 	else if (IsMoving())
 	{
 		// float flDist = (myNpc->GetNavigator()->GetGoalPos() - GetAbsOrigin()).Length2D();
-		float flDist = (info->m_hTarget->EyePosition() - GetAbsOrigin()).Length2D();
+		float flDist = (info->m_hTarget->EyePosition() - GetEngineObject()->GetAbsOrigin()).Length2D();
 
 		if (flDist <= event->GetDistanceToTarget())
 		{
@@ -1502,7 +1502,7 @@ bool CBaseFlex::ProcessMoveToSceneEvent( CSceneEventInfo *info, CChoreoScene *sc
 			r = 255;
 		}
 
-		NDebugOverlay::HorzArrow( GetAbsOrigin() + Vector( 0, 0, 1 ), vTestPoint + Vector( 0, 0, 1 ), 4, r, g, b, 0, false, 0.12 );
+		NDebugOverlay::HorzArrow(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 1 ), vTestPoint + Vector( 0, 0, 1 ), 4, r, g, b, 0, false, 0.12 );
 		NDebugOverlay::Box( vTestPoint, myNpc->GetHullMins(), myNpc->GetHullMaxs(), r, g, b, 0, 0.12 );
 	}
 
@@ -2118,7 +2118,7 @@ void CBaseFlex::DoBodyLean( void )
 	{
 		Vector vecDelta;
 		Vector vecPos;
-		Vector vecOrigin = GetAbsOrigin();
+		Vector vecOrigin = GetEngineObject()->GetAbsOrigin();
 
 		if (m_vecPrevOrigin == vec3_origin)
 		{
@@ -2294,7 +2294,7 @@ void CFlexCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax
 {
 	if (!szModel || !*szModel)
 	{
-		Warning( "cycler at %.0f %.0f %0.f missing modelname\n", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		Warning( "cycler at %.0f %.0f %0.f missing modelname\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 		UTIL_Remove( this );
 		return;
 	}

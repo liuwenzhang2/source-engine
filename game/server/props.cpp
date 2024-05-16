@@ -180,7 +180,7 @@ void CBaseProp::Spawn( void )
 	char *szModel = (char *)STRING( GetModelName() );
 	if (!szModel || !*szModel)
 	{
-		Warning( "prop at %.0f %.0f %0.f missing modelname\n", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		Warning( "prop at %.0f %.0f %0.f missing modelname\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 		UTIL_Remove( this );
 		return;
 	}
@@ -195,7 +195,7 @@ void CBaseProp::Spawn( void )
 	{
 		if ( iResult == PARSE_FAILED_BAD_DATA )
 		{
-			DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has an invalid prop_data type. DELETED.\n", GetClassname(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z, szModel );
+			DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has an invalid prop_data type. DELETED.\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z, szModel );
 			UTIL_Remove( this );
 			return;
 		}
@@ -204,7 +204,7 @@ void CBaseProp::Spawn( void )
 			// If we don't have data, but we're a prop_physics, fail
 			if ( FClassnameIs( this, "prop_physics" ) )
 			{
-				DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has no propdata which means it must be used on a prop_static. DELETED.\n", GetClassname(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z, szModel );
+				DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has no propdata which means it must be used on a prop_static. DELETED.\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z, szModel );
 				UTIL_Remove( this );
 				return;
 			}
@@ -214,7 +214,7 @@ void CBaseProp::Spawn( void )
 			// If we have data, and we're not a physics prop, fail
 			if ( !dynamic_cast<CPhysicsProp*>(this) )
 			{
-				DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has propdata which means that it be used on a prop_physics. DELETED.\n", GetClassname(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z, szModel );
+				DevWarning( "%s at %.0f %.0f %0.f uses model %s, which has propdata which means that it be used on a prop_physics. DELETED.\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z, szModel );
 				UTIL_Remove( this );
 				return;
 			}
@@ -237,7 +237,7 @@ void CBaseProp::Precache( void )
 {
 	if ( GetModelName() == NULL_STRING )
 	{
-		Msg( "%s at (%.3f, %.3f, %.3f) has no model name!\n", GetClassname(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		Msg( "%s at (%.3f, %.3f, %.3f) has no model name!\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 		SetModelName( AllocPooledString( "models/error.mdl" ) );
 	}
 
@@ -412,8 +412,8 @@ bool CBreakableProp::GetEnableMotionPosition( Vector *pPosition, QAngle *pAngles
 	CBaseEntity *pFixup = FindEnableMotionFixup();
 	if ( !pFixup )
 		return false;
-	*pPosition = pFixup->GetAbsOrigin();
-	*pAngles = pFixup->GetAbsAngles();
+	*pPosition = pFixup->GetEngineObject()->GetAbsOrigin();
+	*pAngles = pFixup->GetEngineObject()->GetAbsAngles();
 	return true;
 }
 
@@ -422,7 +422,7 @@ void CBreakableProp::ClearEnableMotionPosition()
 	CBaseEntity *pFixup = FindEnableMotionFixup();
 	if ( pFixup )
 	{
-		IEngineObjectServer::UnlinkFromParent( pFixup->GetEngineObject());
+		pFixup->GetEngineObject()->UnlinkFromParent();
 		UTIL_Remove( pFixup );
 	}
 }
@@ -446,7 +446,7 @@ void CBreakableProp::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize,
 	}
 
 	// Frighten AIs, just in case this is an exploding thing.
-	CSoundEnt::InsertSound( SOUND_DANGER, GetAbsOrigin(), 128.0f, 1.0f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
+	CSoundEnt::InsertSound( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), 128.0f, 1.0f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
 }
 
 //-----------------------------------------------------------------------------
@@ -993,7 +993,7 @@ void CBreakableProp::BreakablePropTouch( CBaseEntity *pOther )
 
 			// do a little damage to player if we broke glass or computer
 			CTakeDamageInfo info( pOther, pOther, flDamage/4, DMG_SLASH );
-			CalculateMeleeDamageForce( &info, (pOther->GetAbsOrigin() - GetAbsOrigin()), GetAbsOrigin() );
+			CalculateMeleeDamageForce( &info, (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), GetEngineObject()->GetAbsOrigin() );
 			pOther->TakeDamage( info );
 		}
 	}
@@ -1487,7 +1487,7 @@ void CBreakableProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t
 void CBreakableProp::CreateFlare( float flLifetime )
 {
 	// Create the flare
-	CBaseEntity *pFlare = ::CreateFlare( GetAbsOrigin(), GetAbsAngles(), this, flLifetime );
+	CBaseEntity *pFlare = ::CreateFlare(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), this, flLifetime );
 	if ( pFlare )
 	{
 		int iAttachment = LookupAttachment( "fuse" );
@@ -1499,7 +1499,7 @@ void CBreakableProp::CreateFlare( float flLifetime )
 		pFlare->SetSolid( SOLID_NONE );
 		pFlare->SetRenderMode( kRenderTransAlpha );
 		pFlare->SetRenderColorA( 1 );
-		pFlare->SetLocalOrigin( vOrigin );
+		pFlare->GetEngineObject()->SetLocalOrigin( vOrigin );
 		pFlare->GetEngineObject()->SetParent( this->GetEngineObject(), iAttachment );
 		RemoveInteraction( PROPINTER_PHYSGUN_CREATE_FLARE );
 		m_hFlareEnt = pFlare;
@@ -1676,13 +1676,13 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 	}
 	else
 	{
-		velocity = GetAbsVelocity();
+		velocity = GetEngineObject()->GetAbsVelocity();
 		QAngleToAngularImpulse( GetLocalAngularVelocity(), angVelocity );
-		origin = GetAbsOrigin();
-		angles = GetAbsAngles();
+		origin = GetEngineObject()->GetAbsOrigin();
+		angles = GetEngineObject()->GetAbsAngles();
 	}
 
-	PhysBreakSound( this, VPhysicsGetObject(), GetAbsOrigin() );
+	PhysBreakSound( this, VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin() );
 
 	bool bExploded = false;
 
@@ -1749,11 +1749,11 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 
 	if ( m_iszBreakModelMessage != NULL_STRING )
 	{
-		CPVSFilter filter( GetAbsOrigin() );
+		CPVSFilter filter(GetEngineObject()->GetAbsOrigin() );
 		UserMessageBegin( filter, STRING( m_iszBreakModelMessage ) );
 		WRITE_SHORT( GetModelIndex() );
-		WRITE_VEC3COORD( GetAbsOrigin() );
-		WRITE_ANGLES( GetAbsAngles() );
+		WRITE_VEC3COORD(GetEngineObject()->GetAbsOrigin() );
+		WRITE_ANGLES(GetEngineObject()->GetAbsAngles() );
 		MessageEnd();
 
 #ifndef HL2MP
@@ -1776,7 +1776,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		{
 		case MULTIPLAYER_BREAK_DEFAULT:		// default is to break client-side
 		case MULTIPLAYER_BREAK_CLIENTSIDE:
-			te->PhysicsProp( filter, -1, GetModelIndex(), m_nSkin, GetAbsOrigin(), GetAbsAngles(), velocity, true, GetEffects() );
+			te->PhysicsProp( filter, -1, GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEffects() );
 			break;
 		case MULTIPLAYER_BREAK_SERVERSIDE:	// server-side break
 			if ( m_PerformanceMode != PM_NO_GIBS || breakable_disable_gib_limit.GetBool() )
@@ -1785,7 +1785,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 			}
 			break;
 		case MULTIPLAYER_BREAK_BOTH:	// pieces break from both dlls
-			te->PhysicsProp( filter, -1, GetModelIndex(), m_nSkin, GetAbsOrigin(), GetAbsAngles(), velocity, true, GetEffects() );
+			te->PhysicsProp( filter, -1, GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEffects() );
 			if ( m_PerformanceMode != PM_NO_GIBS || breakable_disable_gib_limit.GetBool() )
 			{
 				PropBreakableCreateAll( GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ), false );
@@ -2565,7 +2565,7 @@ void CPhysicsProp::Precache( void )
 {
 	if ( GetModelName() == NULL_STRING )
 	{
-		Msg( "%s at (%.3f, %.3f, %.3f) has no model name!\n", GetClassname(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		Msg( "%s at (%.3f, %.3f, %.3f) has no model name!\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 	}
 	else
 	{
@@ -3653,7 +3653,7 @@ void CBasePropDoor::Spawn()
 	if ((m_nHardwareType == 0) && (!HasSpawnFlags(SF_DOOR_LOCKED)))
 	{
 		// Doors with no hardware must always be locked.
-		DevWarning(1, "Unlocked prop_door '%s' at (%.0f %.0f %.0f) has no hardware. All openable doors must have hardware!\n", GetDebugName(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z);
+		DevWarning(1, "Unlocked prop_door '%s' at (%.0f %.0f %.0f) has no hardware. All openable doors must have hardware!\n", GetDebugName(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z);
 	}
 
 	if ( !PropDataOverrodeBlockLOS() )
@@ -3771,7 +3771,7 @@ void CBasePropDoor::HandleAnimEvent(animevent_t *pEvent)
 //-----------------------------------------------------------------------------
 void CBasePropDoor::CalcDoorSounds()
 {
-	ErrorIfNot( GetModel() != NULL, ( "prop_door with no model at %.2f %.2f %.2f\n", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z ) );
+	ErrorIfNot( GetModel() != NULL, ( "prop_door with no model at %.2f %.2f %.2f\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z ) );
 
 	string_t strSoundOpen = NULL_STRING;
 	string_t strSoundClose = NULL_STRING;
@@ -4085,7 +4085,7 @@ void CBasePropDoor::Unlock(void)
 	if (!m_nHardwareType)
 	{
 		// Doors with no hardware must always be locked.
-		DevWarning(1, "Unlocking prop_door '%s' at (%.0f %.0f %.0f) with no hardware. All openable doors must have hardware!\n", GetDebugName(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z);
+		DevWarning(1, "Unlocking prop_door '%s' at (%.0f %.0f %.0f) with no hardware. All openable doors must have hardware!\n", GetDebugName(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z);
 	}
 
 	m_bLocked = false;
@@ -4138,7 +4138,7 @@ void CBasePropDoor::DoorOpen(CBaseEntity *pOpenAwayFrom)
 
 		if ( m_hActivator && m_hActivator->IsPlayer() && !HasSpawnFlags( SF_DOOR_SILENT_TO_NPCS ) )
 		{
-			CSoundEnt::InsertSound( SOUND_PLAYER, GetAbsOrigin(), 512, 0.5, this );//<<TODO>>//magic number
+			CSoundEnt::InsertSound( SOUND_PLAYER, GetEngineObject()->GetAbsOrigin(), 512, 0.5, this );//<<TODO>>//magic number
 		}
 	}
 
@@ -4276,7 +4276,7 @@ void CBasePropDoor::DoorClose(void)
 
 		if ( m_hActivator && m_hActivator->IsPlayer() )
 		{
-			CSoundEnt::InsertSound( SOUND_PLAYER, GetAbsOrigin(), 512, 0.5, this );//<<TODO>>//magic number
+			CSoundEnt::InsertSound( SOUND_PLAYER, GetEngineObject()->GetAbsOrigin(), 512, 0.5, this );//<<TODO>>//magic number
 		}
 	}
 	
@@ -4636,7 +4636,7 @@ bool CBasePropDoor::TestCollision( const Ray_t &ray, unsigned int mask, trace_t&
 	if ( !( pStudioHdr->contents() & mask ) )
 		return false;
 
-	physcollision->TraceBox( ray, VPhysicsGetObject()->GetCollide(), GetAbsOrigin(), GetAbsAngles(), &trace );
+	physcollision->TraceBox( ray, VPhysicsGetObject()->GetCollide(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
 
 	if ( trace.DidHit() )
 	{
@@ -4882,7 +4882,7 @@ void UTIL_ComputeAABBForBounds( const Vector &mins1, const Vector &maxs1, const 
 void CPropDoorRotating::Spawn()
 {
 	// Doors are built closed, so save the current angles as the closed angles.
-	m_angRotationClosed = GetLocalAngles();
+	m_angRotationClosed = GetEngineObject()->GetLocalAngles();
 
 	// The axis of rotation must be along the z axis for now.
 	// NOTE: If you change this, be sure to change IsHingeOnLeft to account for it!
@@ -4901,8 +4901,8 @@ void CPropDoorRotating::Spawn()
 	}
 
 	// Figure out our volumes of movement as this door opens
-	CalculateDoorVolume( GetLocalAngles(), m_angRotationOpenForward, &m_vecForwardBoundsMin, &m_vecForwardBoundsMax );
-	CalculateDoorVolume( GetLocalAngles(), m_angRotationOpenBack, &m_vecBackBoundsMin, &m_vecBackBoundsMax );
+	CalculateDoorVolume(GetEngineObject()->GetLocalAngles(), m_angRotationOpenForward, &m_vecForwardBoundsMin, &m_vecForwardBoundsMax );
+	CalculateDoorVolume(GetEngineObject()->GetLocalAngles(), m_angRotationOpenBack, &m_vecBackBoundsMin, &m_vecBackBoundsMax );
 }
 
 //-----------------------------------------------------------------------------
@@ -4947,8 +4947,8 @@ bool CPropDoorRotating::IsHingeOnLeft()
 	Vector vecMaxs;
 	CollisionProp()->WorldSpaceAABB( &vecMins, &vecMaxs );
 
-	vecMins -= GetAbsOrigin();
-	vecMaxs -= GetAbsOrigin();
+	vecMins -= GetEngineObject()->GetAbsOrigin();
+	vecMaxs -= GetEngineObject()->GetAbsOrigin();
 
 	// Throw out z -- we only care about 2D distance.
 	// NOTE: if we allow for arbitrary hinge axes, this needs to change
@@ -4997,7 +4997,7 @@ void CPropDoorRotating::OnDoorOpened( void )
 
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box( GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 0, 255, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 0, 255, 0, true, 1.0f );
 		}
 	}
 }
@@ -5014,7 +5014,7 @@ void CPropDoorRotating::OnDoorClosed( void )
 		
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box( GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 0, 255, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 0, 255, 0, true, 1.0f );
 		}
 	}
 }
@@ -5065,28 +5065,28 @@ bool CPropDoorRotating::DoorCanClose( bool bAutoClose )
 void CPropDoorRotating::CalculateDoorVolume( QAngle closedAngles, QAngle openAngles, Vector *destMins, Vector *destMaxs )
 {
 	// Save our current angles and move to our start angles
-	QAngle	saveAngles = GetLocalAngles();
-	SetLocalAngles( closedAngles );
+	QAngle	saveAngles = GetEngineObject()->GetLocalAngles();
+	GetEngineObject()->SetLocalAngles( closedAngles );
 
 	// Find our AABB at the closed state
 	Vector	closedMins, closedMaxs;
 	CollisionProp()->WorldSpaceAABB( &closedMins, &closedMaxs );
 	
-	SetLocalAngles( openAngles );
+	GetEngineObject()->SetLocalAngles( openAngles );
 
 	// Find our AABB at the open state
 	Vector	openMins, openMaxs;
 	CollisionProp()->WorldSpaceAABB( &openMins, &openMaxs );
 
 	// Reset our angles to our starting angles
-	SetLocalAngles( saveAngles );
+	GetEngineObject()->SetLocalAngles( saveAngles );
 
 	// Find the minimum extents
 	UTIL_ComputeAABBForBounds( closedMins, closedMaxs, openMins, openMaxs, destMins, destMaxs );
 	
 	// Move this back into local space
-	*destMins -= GetAbsOrigin();
-	*destMaxs -= GetAbsOrigin();
+	*destMins -= GetEngineObject()->GetAbsOrigin();
+	*destMaxs -= GetEngineObject()->GetAbsOrigin();
 }
 
 //-----------------------------------------------------------------------------
@@ -5097,8 +5097,8 @@ void CPropDoorRotating::OnRestore( void )
 	BaseClass::OnRestore();
 
 	// Figure out our volumes of movement as this door opens
-	CalculateDoorVolume( GetLocalAngles(), m_angRotationOpenForward, &m_vecForwardBoundsMin, &m_vecForwardBoundsMax );
-	CalculateDoorVolume( GetLocalAngles(), m_angRotationOpenBack, &m_vecBackBoundsMin, &m_vecBackBoundsMax );
+	CalculateDoorVolume(GetEngineObject()->GetLocalAngles(), m_angRotationOpenForward, &m_vecForwardBoundsMin, &m_vecForwardBoundsMax );
+	CalculateDoorVolume(GetEngineObject()->GetLocalAngles(), m_angRotationOpenBack, &m_vecBackBoundsMin, &m_vecBackBoundsMax );
 }
 
 //-----------------------------------------------------------------------------
@@ -5132,16 +5132,16 @@ bool CPropDoorRotating::CheckDoorClear( doorCheck_e state )
 
 	// Look for blocking entities, ignoring ourselves and the entity that opened us.
 	trace_t	tr;
-	TraceHull_Door( this, GetAbsOrigin(), GetAbsOrigin(), moveMins, moveMaxs, MASK_SOLID, GetActivator(), COLLISION_GROUP_NONE, &tr );
+	TraceHull_Door( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), moveMins, moveMaxs, MASK_SOLID, GetActivator(), COLLISION_GROUP_NONE, &tr );
 	if ( tr.allsolid || tr.startsolid )
 	{
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box( GetAbsOrigin(), moveMins, moveMaxs, 255, 0, 0, true, 10.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), moveMins, moveMaxs, 255, 0, 0, true, 10.0f );
 
 			if ( tr.m_pEnt )
 			{
-				NDebugOverlay::Box(((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin(), ((CBaseEntity*)tr.m_pEnt)->CollisionProp()->OBBMins(), ((CBaseEntity*)tr.m_pEnt)->CollisionProp()->OBBMaxs(), 220, 220, 0, true, 10.0f );
+				NDebugOverlay::Box(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin(), ((CBaseEntity*)tr.m_pEnt)->CollisionProp()->OBBMins(), ((CBaseEntity*)tr.m_pEnt)->CollisionProp()->OBBMaxs(), 220, 220, 0, true, 10.0f );
 			}
 		}
 
@@ -5150,7 +5150,7 @@ bool CPropDoorRotating::CheckDoorClear( doorCheck_e state )
 
 	if ( g_debug_doors.GetBool() )
 	{
-		NDebugOverlay::Box( GetAbsOrigin(), moveMins, moveMaxs, 0, 255, 0, true, 10.0f );
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), moveMins, moveMaxs, 0, 255, 0, true, 10.0f );
 	}
 
 	return true;
@@ -5193,7 +5193,7 @@ void CPropDoorRotating::DoorTeleportToSpawnPosition()
 		SetDoorState( DOOR_STATE_CLOSED );
 	}
 
-	SetLocalAngles( angSpawn );
+	GetEngineObject()->SetLocalAngles( angSpawn );
 
 	// Doesn't relink; that's done in Spawn.
 }
@@ -5204,7 +5204,7 @@ void CPropDoorRotating::DoorTeleportToSpawnPosition()
 //-----------------------------------------------------------------------------
 void CPropDoorRotating::MoveDone()
 {
-	SetLocalAngles(m_angGoal);
+	GetEngineObject()->SetLocalAngles(m_angGoal);
 	SetLocalAngularVelocity(vec3_angle);
 	SetMoveDoneTime(-1);
 	BaseClass::MoveDone();
@@ -5224,14 +5224,14 @@ void CPropDoorRotating::AngularMove(const QAngle &vecDestAngle, float flSpeed)
 	m_angGoal = vecDestAngle;
 
 	// Already there?
-	if (vecDestAngle == GetLocalAngles())
+	if (vecDestAngle == GetEngineObject()->GetLocalAngles())
 	{
 		MoveDone();
 		return;
 	}
 	
 	// Set destdelta to the vector needed to move.
-	QAngle vecDestDelta = vecDestAngle - GetLocalAngles();
+	QAngle vecDestDelta = vecDestAngle - GetEngineObject()->GetLocalAngles();
 	
 	// Divide by speed to get time to reach dest
 	float flTravelTime = vecDestDelta.Length() / flSpeed;
@@ -5270,7 +5270,7 @@ void CPropDoorRotating::BeginOpening(CBaseEntity *pOpenAwayFrom)
 			Vector vecForwardDoor;
 			GetVectors(&vecForwardDoor, NULL, NULL);
 
-			if (vecForwardDoor.Dot(pOpenAwayFrom->GetAbsOrigin()) > vecForwardDoor.Dot(GetAbsOrigin()))
+			if (vecForwardDoor.Dot(pOpenAwayFrom->GetEngineObject()->GetAbsOrigin()) > vecForwardDoor.Dot(GetEngineObject()->GetAbsOrigin()))
 			{
 				angOpen = m_angRotationOpenBack;
 				eDirCheck = DOOR_CHECK_BACKWARD;
@@ -5313,9 +5313,9 @@ void CPropDoorRotating::BeginOpening(CBaseEntity *pOpenAwayFrom)
 	}
 
 	// Create a blocking entity to keep random entities out of our movement path
-	m_hDoorBlocker = CEntityBlocker::Create( GetAbsOrigin(), mins, maxs, pOpenAwayFrom, false );
+	m_hDoorBlocker = CEntityBlocker::Create(GetEngineObject()->GetAbsOrigin(), mins, maxs, pOpenAwayFrom, false );
 	
-	Vector	volumeCenter = ((mins+maxs) * 0.5f) + GetAbsOrigin();
+	Vector	volumeCenter = ((mins+maxs) * 0.5f) + GetEngineObject()->GetAbsOrigin();
 
 	// Ignoring the Z
 	float volumeRadius = MAX( fabs(mins.x), maxs.x );
@@ -5347,7 +5347,7 @@ void CPropDoorRotating::BeginOpening(CBaseEntity *pOpenAwayFrom)
 
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box( GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 255, 0, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 255, 0, 0, true, 1.0f );
 		}
 	}
 
@@ -5370,7 +5370,7 @@ void CPropDoorRotating::BeginClosing( void )
 		
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box( GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 255, 0, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 255, 0, 0, true, 1.0f );
 		}
 	}
 
@@ -5405,18 +5405,18 @@ void CPropDoorRotating::GetNPCOpenData(CAI_BaseNPC *pNPC, opendata_t &opendata)
 	// dvs: TODO: finalize open position, direction, activity
 	Vector vecForward;
 	Vector vecRight;
-	AngleVectors(GetAbsAngles(), &vecForward, &vecRight, NULL);
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vecForward, &vecRight, NULL);
 
 	//
 	// Figure out where the NPC should stand to open this door,
 	// and what direction they should face.
 	//
-	opendata.vecStandPos = GetAbsOrigin() - (vecRight * 24);
+	opendata.vecStandPos = GetEngineObject()->GetAbsOrigin() - (vecRight * 24);
 	opendata.vecStandPos.z -= 54;
 
-	Vector vecNPCOrigin = pNPC->GetAbsOrigin();
+	Vector vecNPCOrigin = pNPC->GetEngineObject()->GetAbsOrigin();
 
-	if (pNPC->GetAbsOrigin().Dot(vecForward) > GetAbsOrigin().Dot(vecForward))
+	if (pNPC->GetEngineObject()->GetAbsOrigin().Dot(vecForward) > GetEngineObject()->GetAbsOrigin().Dot(vecForward))
 	{
 		// In front of the door relative to the door's forward vector.
 		opendata.vecStandPos += vecForward * 64;
@@ -5439,7 +5439,7 @@ void CPropDoorRotating::GetNPCOpenData(CAI_BaseNPC *pNPC, opendata_t &opendata)
 float CPropDoorRotating::GetOpenInterval()
 {
 	// set destdelta to the vector needed to move
-	QAngle vecDestDelta = m_angRotationOpenForward - GetLocalAngles();
+	QAngle vecDestDelta = m_angRotationOpenForward - GetEngineObject()->GetLocalAngles();
 	
 	// divide by speed to get time to reach dest
 	return vecDestDelta.Length() / m_flSpeed;
@@ -5497,8 +5497,8 @@ void CPropDoorRotating::InputSetRotationDistance( inputdata_t &inputdata )
 	
 	// Recalculate our open volume
 	CalcOpenAngles();
-	CalculateDoorVolume( GetLocalAngles(), m_angRotationOpenForward, &m_vecForwardBoundsMin, &m_vecForwardBoundsMax );
-	CalculateDoorVolume( GetLocalAngles(), m_angRotationOpenBack, &m_vecBackBoundsMin, &m_vecBackBoundsMax );
+	CalculateDoorVolume(GetEngineObject()->GetLocalAngles(), m_angRotationOpenForward, &m_vecForwardBoundsMin, &m_vecForwardBoundsMax );
+	CalculateDoorVolume(GetEngineObject()->GetLocalAngles(), m_angRotationOpenBack, &m_vecBackBoundsMin, &m_vecBackBoundsMax );
 }
 
 // Debug sphere
@@ -5513,7 +5513,7 @@ public:
 		SetCollisionBounds( -Vector(12,12,12), Vector(12,12,12) );
 		objectparams_t params = g_PhysDefaultObjectParams;
 		params.pGameData = static_cast<void *>(this);
-		IPhysicsObject *pPhysicsObject = physenv->CreateSphereObject( 12, 0, GetAbsOrigin(), GetAbsAngles(), &params, false );
+		IPhysicsObject *pPhysicsObject = physenv->CreateSphereObject( 12, 0, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &params, false );
 		if ( pPhysicsObject )
 		{
 			VPhysicsSetObject( pPhysicsObject );
@@ -5795,8 +5795,8 @@ void CPhysicsPropRespawnable::Spawn( void )
 {
 	BaseClass::Spawn();
 
-	m_vOriginalSpawnOrigin = GetAbsOrigin();
-	m_vOriginalSpawnAngles = GetAbsAngles();
+	m_vOriginalSpawnOrigin = GetEngineObject()->GetAbsOrigin();
+	m_vOriginalSpawnAngles = GetEngineObject()->GetAbsAngles();
 
 	m_vOriginalMins = CollisionProp()->OBBMins();
 	m_vOriginalMaxs = CollisionProp()->OBBMaxs();
@@ -6134,11 +6134,11 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	IPhysicsObject *pNewObject = NULL;
 	if ( bWasStatic )
 	{
-		pNewObject = physenv->CreatePolyObjectStatic( pNewCollide, surfaceProp, pInstance->GetAbsOrigin(), pInstance->GetAbsAngles(), &tmpSolid.params );
+		pNewObject = physenv->CreatePolyObjectStatic( pNewCollide, surfaceProp, pInstance->GetEngineObject()->GetAbsOrigin(), pInstance->GetEngineObject()->GetAbsAngles(), &tmpSolid.params );
 	}
 	else
 	{
-		pNewObject = physenv->CreatePolyObject( pNewCollide, surfaceProp, pInstance->GetAbsOrigin(), pInstance->GetAbsAngles(), &tmpSolid.params );
+		pNewObject = physenv->CreatePolyObject( pNewCollide, surfaceProp, pInstance->GetEngineObject()->GetAbsOrigin(), pInstance->GetEngineObject()->GetAbsAngles(), &tmpSolid.params );
 	}
 	Assert( pNewObject );
 
@@ -6160,7 +6160,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	if ( pInstance->GetMoveParent() )
 	{
 		pNewObject->SetShadow( 1e4, 1e4, false, false );
-		pNewObject->UpdateShadow( pInstance->GetAbsOrigin(), pInstance->GetAbsAngles(), false, 0 );
+		pNewObject->UpdateShadow( pInstance->GetEngineObject()->GetAbsOrigin(), pInstance->GetEngineObject()->GetAbsAngles(), false, 0 );
 	}
 
 	if ( bWasMotionDisabled )
@@ -6190,7 +6190,7 @@ void CC_Ent_Rotate( const CCommand &args )
 	if ( !pEntity )
 		return;
 
-	QAngle angles = pEntity->GetLocalAngles();
+	QAngle angles = pEntity->GetEngineObject()->GetLocalAngles();
 	float flAngle = (args.ArgC() == 2) ? atof( args[1] ) : 7.5f;
 	   
 	VMatrix entToWorld, rot, newEntToWorld;
@@ -6198,7 +6198,7 @@ void CC_Ent_Rotate( const CCommand &args )
 	MatrixFromAngles( angles, entToWorld );
 	MatrixMultiply( entToWorld, rot, newEntToWorld );
 	MatrixToAngles( newEntToWorld, angles );
-	pEntity->SetLocalAngles( angles );
+	pEntity->GetEngineObject()->SetLocalAngles( angles );
 }
 
 static ConCommand ent_rotate("ent_rotate", CC_Ent_Rotate, "Rotates an entity by a specified # of degrees", FCVAR_CHEAT);

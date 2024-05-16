@@ -521,10 +521,10 @@ CAI_BaseNPC *CAI_ScriptedSequence::FindScriptEntity( )
 	{
 		interrupt = SS_INTERRUPT_BY_NAME;
 		
-		pEntity = gEntList.FindEntityByNameWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetAbsOrigin(), m_flRadius );
+		pEntity = gEntList.FindEntityByNameWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
 		if (!pEntity)
 		{
-			pEntity = gEntList.FindEntityByClassnameWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetAbsOrigin(), m_flRadius );
+			pEntity = gEntList.FindEntityByClassnameWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
 			interrupt = SS_INTERRUPT_BY_CLASS;
 		}
 	}
@@ -566,9 +566,9 @@ CAI_BaseNPC *CAI_ScriptedSequence::FindScriptEntity( )
 		else
 		{		
 			if ( interrupt == SS_INTERRUPT_BY_NAME )
-				pEntity = gEntList.FindEntityByNameWithin( pEntity, STRING( m_iszEntity ), GetAbsOrigin(), m_flRadius );
+				pEntity = gEntList.FindEntityByNameWithin( pEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
 			else
-				pEntity = gEntList.FindEntityByClassnameWithin( pEntity, STRING( m_iszEntity ), GetAbsOrigin(), m_flRadius );
+				pEntity = gEntList.FindEntityByClassnameWithin( pEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius );
 		}
 	}
 
@@ -724,14 +724,14 @@ void CAI_ScriptedSequence::StartScript( void )
 
 		case CINE_MOVETO_TELEPORT: 
 			m_bIsTeleportingDueToMoveTo = true;
-			pTarget->Teleport( &GetAbsOrigin(), NULL, &vec3_origin );
+			pTarget->Teleport( &GetEngineObject()->GetAbsOrigin(), NULL, &vec3_origin );
 			m_bIsTeleportingDueToMoveTo = false;
-			pTarget->GetMotor()->SetIdealYaw( GetLocalAngles().y );
+			pTarget->GetMotor()->SetIdealYaw(GetEngineObject()->GetLocalAngles().y );
 			pTarget->SetLocalAngularVelocity( vec3_angle );
 			pTarget->IncrementInterpolationFrame();
-			QAngle angles = pTarget->GetLocalAngles();
-			angles.y = GetLocalAngles().y;
-			pTarget->SetLocalAngles( angles );
+			QAngle angles = pTarget->GetEngineObject()->GetLocalAngles();
+			angles.y = GetEngineObject()->GetLocalAngles().y;
+			pTarget->GetEngineObject()->SetLocalAngles( angles );
 			pTarget->m_scriptState = CAI_BaseNPC::SCRIPT_WAIT;
 
 			if ( m_bIgnoreGravity )
@@ -1262,8 +1262,8 @@ void CAI_ScriptedSequence::ModifyScriptedAutoMovement( Vector *vecNewPos )
    		if ( m_iszEntry != NULL_STRING && !m_bIsPlayingEntry )
 			return;
 
-		Vector vecRelativeOrigin = m_hInteractionRelativeEntity->GetAbsOrigin();
-		QAngle angRelativeAngles = m_hInteractionRelativeEntity->GetAbsAngles();
+		Vector vecRelativeOrigin = m_hInteractionRelativeEntity->GetEngineObject()->GetAbsOrigin();
+		QAngle angRelativeAngles = m_hInteractionRelativeEntity->GetEngineObject()->GetAbsAngles();
 
 		CAI_BaseNPC *pNPC = m_hInteractionRelativeEntity->MyNPCPointer();
 		if ( pNPC )
@@ -1274,7 +1274,7 @@ void CAI_ScriptedSequence::ModifyScriptedAutoMovement( Vector *vecNewPos )
 		bool bDebug = ai_debug_dyninteractions.GetInt() == 2;
 		if ( bDebug )
 		{
-			Msg("--\n%s current org: %f %f\n", m_hTargetEnt->GetDebugName(), m_hTargetEnt->GetAbsOrigin().x, m_hTargetEnt->GetAbsOrigin().y );
+			Msg("--\n%s current org: %f %f\n", m_hTargetEnt->GetDebugName(), m_hTargetEnt->GetEngineObject()->GetAbsOrigin().x, m_hTargetEnt->GetEngineObject()->GetAbsOrigin().y );
 			Msg("%s current org: %f %f", m_hInteractionRelativeEntity->GetDebugName(), vecRelativeOrigin.x, vecRelativeOrigin.y );
 		}
 
@@ -1284,7 +1284,7 @@ void CAI_ScriptedSequence::ModifyScriptedAutoMovement( Vector *vecNewPos )
 			Vector vecDeltaPos;
 			QAngle vecDeltaAngles;
  			pAnimating->GetSequenceMovement( pAnimating->GetSequence(), 0.0f, pAnimating->GetCycle(), vecDeltaPos, vecDeltaAngles );
- 			VectorYawRotate( vecDeltaPos, pAnimating->GetLocalAngles().y, vecDeltaPos );
+ 			VectorYawRotate( vecDeltaPos, pAnimating->GetEngineObject()->GetLocalAngles().y, vecDeltaPos );
 
 			if ( bDebug )
 			{
@@ -1455,7 +1455,7 @@ void CAI_ScriptedSequence::DrawDebugGeometryOverlays( void )
 	{
 		if ( GetTarget() )
 		{
-			NDebugOverlay::HorzArrow( GetAbsOrigin(), GetTarget()->GetAbsOrigin(), 16, 0, 255, 0, 64, true, 0.0f );
+			NDebugOverlay::HorzArrow(GetEngineObject()->GetAbsOrigin(), GetTarget()->GetEngineObject()->GetAbsOrigin(), 16, 0, 255, 0, 64, true, 0.0f );
 		}
 	}
 }
@@ -1694,7 +1694,7 @@ void CAI_ScriptedSchedule::ScriptThink( void )
 //-----------------------------------------------------------------------------
 CAI_BaseNPC *CAI_ScriptedSchedule::FindScriptEntity( bool bCyclic )
 {
-	CBaseEntity *pEntity = gEntList.FindEntityGenericWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetAbsOrigin(), m_flRadius, this, m_hActivator );
+	CBaseEntity *pEntity = gEntList.FindEntityGenericWithin( m_hLastFoundEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius, this, m_hActivator );
 
 	while ( pEntity != NULL )
 	{
@@ -1710,7 +1710,7 @@ CAI_BaseNPC *CAI_ScriptedSchedule::FindScriptEntity( bool bCyclic )
 			return pNPC;
 		}
 
-		pEntity = gEntList.FindEntityGenericWithin( pEntity, STRING( m_iszEntity ), GetAbsOrigin(), m_flRadius, this, NULL );
+		pEntity = gEntList.FindEntityGenericWithin( pEntity, STRING( m_iszEntity ), GetEngineObject()->GetAbsOrigin(), m_flRadius, this, NULL );
 	}
 
 	m_hLastFoundEntity = NULL;
@@ -1735,8 +1735,8 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 		CHintCriteria hintCriteria;
 		hintCriteria.SetGroup( m_sGoalEnt );
 		hintCriteria.SetHintType( HINT_ANY );
-		hintCriteria.AddIncludePosition( pTarget->GetAbsOrigin(), FLT_MAX );
-		CAI_Hint *pHint = CAI_HintManager::FindHint( pTarget->GetAbsOrigin(), hintCriteria );
+		hintCriteria.AddIncludePosition( pTarget->GetEngineObject()->GetAbsOrigin(), FLT_MAX );
+		CAI_Hint *pHint = CAI_HintManager::FindHint( pTarget->GetEngineObject()->GetAbsOrigin(), hintCriteria );
 		if ( !pHint )
 		{
 			DevMsg( 1, "Can't find goal entity %s\nCan't execute script %s\n", STRING(m_sGoalEnt), GetDebugName() );
@@ -1776,7 +1776,7 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 		if ( pGoalEnt && pGoalEnt->MyCombatCharacterPointer() )
 		{
 			pTarget->SetEnemy( pGoalEnt );
-			pTarget->UpdateEnemyMemory( pGoalEnt, pGoalEnt->GetAbsOrigin() );
+			pTarget->UpdateEnemyMemory( pGoalEnt, pGoalEnt->GetEngineObject()->GetAbsOrigin() );
 			pTarget->SetCondition( COND_SCHEDULE_DONE );
 		}
 		else
@@ -2166,7 +2166,7 @@ CAI_BaseNPC *CAI_ScriptedSentence::FindEntity( void )
 	}
 	
 	CBaseEntity *pEntity = NULL;
-	for ( CEntitySphereQuery sphere( GetAbsOrigin(), m_flRadius, FL_NPC ); ( pEntity = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
+	for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), m_flRadius, FL_NPC ); ( pEntity = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 	{
 		if (FClassnameIs( pEntity, STRING(m_iszEntity)))
 		{
@@ -2210,7 +2210,7 @@ int CAI_ScriptedSentence::StartSentence( CAI_BaseNPC *pTarget )
 		if ( FStrEq( STRING(m_iszListener ), "!player" ) )
 			radius = MAX_TRACE_LENGTH;	// Always find the player
 
-		pListener = gEntList.FindEntityGenericNearest( STRING( m_iszListener ), pTarget->GetAbsOrigin(), radius, this, NULL );
+		pListener = gEntList.FindEntityGenericNearest( STRING( m_iszListener ), pTarget->GetEngineObject()->GetAbsOrigin(), radius, this, NULL );
 	}
 
 	int sentenceIndex = pTarget->PlayScriptedSentence( STRING(m_iszSentence), m_flDelay,  m_flVolume, m_iSoundLevel, bConcurrent, pListener );

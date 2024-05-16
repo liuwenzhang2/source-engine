@@ -162,7 +162,7 @@ void CThirdPersonManager::PositionCamera( CBasePlayer *pPlayer, QAngle angles )
 		Vector camForward, camRight, camUp;
 
 		// find our player's origin, and from there, the eye position
-		Vector origin = pPlayer->GetLocalOrigin();
+		Vector origin = pPlayer->GetEngineObject()->GetLocalOrigin();
 		origin += pPlayer->GetViewOffset();
 
 		AngleVectors( angles, &camForward, &camRight, &camUp );

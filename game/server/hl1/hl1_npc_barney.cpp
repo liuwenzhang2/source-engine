@@ -79,12 +79,12 @@ LINK_ENTITY_TO_CLASS( monster_barney, CNPC_Barney );
 
 static BOOL IsFacing( CBaseEntity *pevTest, const Vector &reference )
 {
-	Vector vecDir = (reference - pevTest->GetAbsOrigin());
+	Vector vecDir = (reference - pevTest->GetEngineObject()->GetAbsOrigin());
 	vecDir.z = 0;
 	VectorNormalize( vecDir );
 	Vector forward;
 	QAngle angle;
-	angle = pevTest->GetAbsAngles();
+	angle = pevTest->GetEngineObject()->GetAbsAngles();
 	angle.x = 0;
 	AngleVectors( angle, &forward );
 	// He's facing me, he meant it
@@ -245,9 +245,9 @@ bool CNPC_Barney::CheckRangeAttack1 ( float flDot, float flDist )
 	{
 		trace_t tr;
 		
-		Vector shootOrigin = GetAbsOrigin() + Vector( 0, 0, 55 );
+		Vector shootOrigin = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 55 );
 		CBaseEntity *pEnemy = GetEnemy();
-		Vector shootTarget = ( (pEnemy->BodyTarget( shootOrigin ) - pEnemy->GetAbsOrigin()) + GetEnemyLKP() );
+		Vector shootTarget = ( (pEnemy->BodyTarget( shootOrigin ) - pEnemy->GetEngineObject()->GetAbsOrigin()) + GetEnemyLKP() );
 		
 		UTIL_TraceLine ( shootOrigin, shootTarget, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
 		m_flCheckAttackTime = gpGlobals->curtime + 1;
@@ -298,7 +298,7 @@ void CNPC_Barney::BarneyFirePistol ( void )
 {
 	Vector vecShootOrigin;
 	
-	vecShootOrigin = GetAbsOrigin() + Vector( 0, 0, 55 );
+	vecShootOrigin = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 55 );
 	Vector vecShootDir = GetShootEnemyDir( vecShootOrigin );
 
 	QAngle angDir;
@@ -327,7 +327,7 @@ void CNPC_Barney::BarneyFirePistol ( void )
 	params.m_nPitch = 100 + pitchShift;
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), params );
 
-	CSoundEnt::InsertSound ( SOUND_COMBAT, GetAbsOrigin(), 384, 0.3 );
+	CSoundEnt::InsertSound ( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 384, 0.3 );
 
 	// UNDONE: Reload?
 	m_cAmmoLoaded--;// take away a bullet!
@@ -348,7 +348,7 @@ int CNPC_Barney::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 		if ( GetEnemy() == NULL )
 		{
 			// If the player was facing directly at me, or I'm already suspicious, get mad
-			if ( HasMemory( bits_MEMORY_SUSPICIOUS ) || IsFacing( inputInfo.GetAttacker(), GetAbsOrigin() ) )
+			if ( HasMemory( bits_MEMORY_SUSPICIOUS ) || IsFacing( inputInfo.GetAttacker(), GetEngineObject()->GetAbsOrigin() ) )
 			{
 				// Alright, now I'm pissed!
 				Speak( BA_MAD );

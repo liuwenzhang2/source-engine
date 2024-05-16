@@ -320,15 +320,15 @@ void CAI_PolicingBehavior::StartTask( const Task_t *pTask )
 			Vector	harassPos = GetAbsOrigin() + ( harassDir * ( flDist - pTask->flTaskData ) );
 
 			// Find a point on our policing radius to stand on
-			if ( IntersectInfiniteRayWithSphere( GetAbsOrigin(), harassDir, m_hPoliceGoal->GetAbsOrigin(), m_hPoliceGoal->GetRadius(), &flInter1, &flInter2 ) )
+			if ( IntersectInfiniteRayWithSphere( GetAbsOrigin(), harassDir, m_hPoliceGoal->GetEngineObject()->GetAbsOrigin(), m_hPoliceGoal->GetRadius(), &flInter1, &flInter2 ) )
 			{
-				Vector vPos = m_hPoliceGoal->GetAbsOrigin() + harassDir * ( MAX( flInter1, flInter2 ) );
+				Vector vPos = m_hPoliceGoal->GetEngineObject()->GetAbsOrigin() + harassDir * ( MAX( flInter1, flInter2 ) );
 
 				// See how far away the default one is
-				float testDist = UTIL_DistApprox2D( m_hPoliceGoal->GetAbsOrigin(), harassPos );
+				float testDist = UTIL_DistApprox2D( m_hPoliceGoal->GetEngineObject()->GetAbsOrigin(), harassPos );
 				
 				// If our other goal is closer, choose it
-				if ( testDist > UTIL_DistApprox2D( m_hPoliceGoal->GetAbsOrigin(), vPos ) )
+				if ( testDist > UTIL_DistApprox2D( m_hPoliceGoal->GetEngineObject()->GetAbsOrigin(), vPos ) )
 				{
 					harassPos = vPos;
 				}
@@ -349,9 +349,9 @@ void CAI_PolicingBehavior::StartTask( const Task_t *pTask )
 	
 	case TASK_POLICE_GET_PATH_TO_POLICE_GOAL:
 		{
-			if ( GetNavigator()->SetGoal( m_hPoliceGoal->GetAbsOrigin(), pTask->flTaskData ) )
+			if ( GetNavigator()->SetGoal( m_hPoliceGoal->GetEngineObject()->GetAbsOrigin(), pTask->flTaskData ) )
 			{
-				GetNavigator()->SetArrivalDirection( m_hPoliceGoal->GetAbsAngles() );
+				GetNavigator()->SetArrivalDirection( m_hPoliceGoal->GetEngineObject()->GetAbsAngles() );
 				TaskComplete();
 			}
 			else
@@ -379,7 +379,7 @@ void CAI_PolicingBehavior::StartTask( const Task_t *pTask )
 			// We may have lost our police goal in the 2 seconds we wait before this task
 			if ( m_hPoliceGoal )
 			{
-				GetMotor()->SetIdealYaw( m_hPoliceGoal->GetAbsAngles().y );
+				GetMotor()->SetIdealYaw( m_hPoliceGoal->GetEngineObject()->GetAbsAngles().y );
 				GetOuter()->SetTurnActivity(); 
 			}
 		}
@@ -421,7 +421,7 @@ void CAI_PolicingBehavior::RunTask( const Task_t *pTask )
 bool CAI_PolicingBehavior::MaintainGoalPosition( void )
 {
 	Vector vecOrg = GetAbsOrigin();
-	Vector vecTarget = m_hPoliceGoal->GetAbsOrigin();
+	Vector vecTarget = m_hPoliceGoal->GetEngineObject()->GetAbsOrigin();
 
 	// Allow some slop on Z
 	if ( fabs(vecOrg.z - vecTarget.z) > 64 )
@@ -485,7 +485,7 @@ int CAI_PolicingBehavior::SelectSuppressSchedule( void )
 		// Attack the target
 		GetOuter()->SetEnemy( pTarget );
 		GetOuter()->SetState( NPC_STATE_COMBAT );
-		GetOuter()->UpdateEnemyMemory( pTarget, pTarget->GetAbsOrigin() );
+		GetOuter()->UpdateEnemyMemory( pTarget, pTarget->GetEngineObject()->GetAbsOrigin() );
 
 		HostSetBatonState( true );
 		
@@ -567,7 +567,7 @@ int CAI_PolicingBehavior::SelectHarassSchedule( void )
 
 				GetOuter()->SetEnemy( pTarget );
 				GetOuter()->SetState( NPC_STATE_COMBAT );
-				GetOuter()->UpdateEnemyMemory( pTarget, pTarget->GetAbsOrigin() );
+				GetOuter()->UpdateEnemyMemory( pTarget, pTarget->GetEngineObject()->GetAbsOrigin() );
 				HostSetBatonState( true );
 				
 				m_hPoliceGoal->FireWarningLevelOutput( 4 );
@@ -665,7 +665,7 @@ int CAI_PolicingBehavior::SelectSchedule( void )
 		return SCHED_POLICE_TRACK_TARGET;
 
 	// Re-align myself to the goal angles if I've strayed
-	if ( fabs(UTIL_AngleDiff( GetAbsAngles().y, m_hPoliceGoal->GetAbsAngles().y )) > 15 )
+	if ( fabs(UTIL_AngleDiff( GetAbsAngles().y, m_hPoliceGoal->GetEngineObject()->GetAbsAngles().y )) > 15 )
 		return SCHED_POLICE_FACE_ALONG_GOAL;
 
 	return SCHED_IDLE_STAND;

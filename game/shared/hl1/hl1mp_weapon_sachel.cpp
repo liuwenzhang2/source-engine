@@ -246,13 +246,13 @@ void CWeaponSatchel::Throw( void )
 		pPlayer->EyeVectors( &vecForward );
 
 		Vector vecSrc	= pPlayer->WorldSpaceCenter();
-		Vector vecThrow	= vecForward * 274 + pPlayer->GetAbsVelocity();
+		Vector vecThrow	= vecForward * 274 + pPlayer->GetEngineObject()->GetAbsVelocity();
 
 #ifndef CLIENT_DLL
 		CBaseEntity *pSatchel = Create( "monster_satchel", vecSrc, QAngle( 0, 0, 90 ), pPlayer );
 		if ( pSatchel )
 		{
-			pSatchel->SetAbsVelocity( vecThrow );
+			pSatchel->GetEngineObject()->SetAbsVelocity( vecThrow );
 			QAngle angVel = pSatchel->GetLocalAngularVelocity();
 			angVel.y = 400;
 			pSatchel->SetLocalAngularVelocity( angVel );
@@ -521,7 +521,7 @@ void CSatchelCharge::SatchelTouch( CBaseEntity *pOther )
 	}
 
 	// add a bit of static friction
-	SetAbsVelocity( GetAbsVelocity() * GetFriction() );
+	GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * GetFriction() );
 	SetLocalAngularVelocity( GetLocalAngularVelocity() * GetFriction() );
 }
 
@@ -529,7 +529,7 @@ void CSatchelCharge::UpdateSlideSound( void )
 {	
 	// HACKHACK - On ground isn't always set, so look for ground underneath
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector(0,0,10), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector(0,0,10), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 	if ( !(tr.fraction < 1.0) )
 	{
@@ -550,7 +550,7 @@ void CSatchelCharge::SatchelThink( void )
 		return;
 	}
 
-	Vector vecNewVel = GetAbsVelocity();
+	Vector vecNewVel = GetEngineObject()->GetAbsVelocity();
 	
 	if ( GetWaterLevel() > 0 )
 	{
@@ -568,7 +568,7 @@ void CSatchelCharge::SatchelThink( void )
 		SetGravity( 1.0 );
 	}
 
-	SetAbsVelocity( vecNewVel );	
+	GetEngineObject()->SetAbsVelocity( vecNewVel );
 }
 
 void CSatchelCharge::Precache( void )

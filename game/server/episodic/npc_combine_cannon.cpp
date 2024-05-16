@@ -614,7 +614,7 @@ void CNPC_Combine_Cannon::Spawn( void )
 	// Point the cursor straight ahead so that the sniper's
 	// first sweep of the laser doesn't look weird.
 	Vector vecForward;
-	AngleVectors( GetLocalAngles(), &vecForward );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &vecForward );
 	m_vecPaintCursor = GetBulletOrigin() + vecForward * 1024;
 
 	// none!
@@ -641,7 +641,7 @@ Class_T	CNPC_Combine_Cannon::Classify( void )
 //-----------------------------------------------------------------------------
 Vector CNPC_Combine_Cannon::GetBulletOrigin( void )
 {
-	return GetAbsOrigin();
+	return GetEngineObject()->GetAbsOrigin();
 }
 
 
@@ -790,7 +790,7 @@ void CNPC_Combine_Cannon::ScopeGlint( void )
 {
 	CEffectData data;
 
-	data.m_vOrigin = GetAbsOrigin();
+	data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 	data.m_vNormal = vec3_origin;
 	data.m_vAngles = vec3_angle;
 	data.m_nColor = COMMAND_POINT_BLUE;
@@ -807,7 +807,7 @@ void CNPC_Combine_Cannon::AdjustShotPosition( CBaseEntity *pTarget, Vector *vecI
 	if ( pTarget == NULL || vecIn == NULL )
 		return;
 
-	Vector low = pTarget->WorldSpaceCenter() - ( pTarget->WorldSpaceCenter() - pTarget->GetAbsOrigin() ) * .25;
+	Vector low = pTarget->WorldSpaceCenter() - ( pTarget->WorldSpaceCenter() - pTarget->GetEngineObject()->GetAbsOrigin() ) * .25;
 	Vector high = pTarget->EyePosition();
 	Vector delta = high - low;
 	Vector result = low + delta * 0.5; 
@@ -907,7 +907,7 @@ void CNPC_Combine_Cannon::StartTask( const Task_t *pTask )
 
 			// Try to start the laser where the player can't miss seeing it!
 			Vector vecCursor;
-			AngleVectors( GetEnemy()->GetLocalAngles(), &vecCursor );
+			AngleVectors( GetEnemy()->GetEngineObject()->GetLocalAngles(), &vecCursor );
 			vecCursor *= 300;
 			vecCursor += GetEnemy()->EyePosition();				
 			LaserOn( vecCursor, Vector( 16, 16, 16 ) );
@@ -1043,7 +1043,7 @@ void CNPC_Combine_Cannon::PrescheduleThink( void )
 //---------------------------------------------------------
 Vector CNPC_Combine_Cannon::EyePosition( void )
 {
-	return GetAbsOrigin();
+	return GetEngineObject()->GetAbsOrigin();
 }
 
 //---------------------------------------------------------
@@ -1069,7 +1069,7 @@ Vector CNPC_Combine_Cannon::DesiredBodyTarget( CBaseEntity *pTarget )
 		if( pTarget->Classify() == CLASS_HEADCRAB )
 		{
 			// Headcrabs are tiny inside their boxes.
-			vecTarget = pTarget->GetAbsOrigin();
+			vecTarget = pTarget->GetEngineObject()->GetAbsOrigin();
 			vecTarget.z += 4.0;
 		}
 		else if( pTarget->Classify() == CLASS_ZOMBIE )
@@ -1088,7 +1088,7 @@ Vector CNPC_Combine_Cannon::DesiredBodyTarget( CBaseEntity *pTarget )
 		{
 			// Shoot about a few inches above the origin. This makes it easy to hit antlions
 			// even if they are on their backs.
-			vecTarget = pTarget->GetAbsOrigin();
+			vecTarget = pTarget->GetEngineObject()->GetAbsOrigin();
 			vecTarget.z += 18.0f;
 		}
 		else if( pTarget->Classify() == CLASS_EARTH_FAUNA )
@@ -1165,7 +1165,7 @@ bool CNPC_Combine_Cannon::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEn
 	Vector	vecEye;
 	trace_t	tr;
 
-	if( fabs( GetAbsOrigin().z - pEntity->WorldSpaceCenter().z ) <= 120.f )
+	if( fabs(GetEngineObject()->GetAbsOrigin().z - pEntity->WorldSpaceCenter().z ) <= 120.f )
 	{
 		// If the player is around the same elevation, look straight at his eyes. 
 		// At the same elevation, the vertical peeking allowance makes it too easy
@@ -1179,7 +1179,7 @@ bool CNPC_Combine_Cannon::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEn
 		vecVerticalOffset = CANNON_TARGET_VERTICAL_OFFSET;
 	}
 
-	AngleVectors( pEntity->GetLocalAngles(), NULL, &vecRight, NULL );
+	AngleVectors( pEntity->GetEngineObject()->GetLocalAngles(), NULL, &vecRight, NULL );
 
 	vecEye = vecRight * CANNON_EYE_DIST - vecVerticalOffset;
 	UTIL_TraceLine( EyePosition(), pEntity->EyePosition() + vecEye, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );

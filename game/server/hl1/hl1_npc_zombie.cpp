@@ -114,7 +114,7 @@ void CNPC_Zombie::HandleAnimEvent( animevent_t *pEvent )
 					
 					GetVectors( &v_forward, &v_right, NULL );
 
-					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() - v_right * 100 );
+					pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() - v_right * 100 );
 				}
 				// Play a random attack hit sound
 				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Zombie.AttackHit" );
@@ -147,7 +147,7 @@ void CNPC_Zombie::HandleAnimEvent( animevent_t *pEvent )
 					
 					GetVectors( &v_forward, &v_right, NULL );
 
-					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() - v_right * 100 );
+					pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() - v_right * 100 );
 				}
 				g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "Zombie.AttackHit" );
 			}
@@ -180,7 +180,7 @@ void CNPC_Zombie::HandleAnimEvent( animevent_t *pEvent )
 					pHurt->ViewPunch( QAngle ( 5, 0, 0 ) );
 					
 					GetVectors( &v_forward, &v_right, NULL );
-					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() - v_right * 100 );
+					pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() - v_right * 100 );
 				}
 				g_pSoundEmitterSystem->EmitSound( filter3, entindex(), "Zombie.AttackHit" );
 			}
@@ -227,10 +227,10 @@ int CNPC_Zombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	// Take 30% damage from bullets
 	if ( info.GetDamageType() == DMG_BULLET )
 	{
-		Vector vecDir = GetAbsOrigin() - info.GetInflictor()->WorldSpaceCenter();
+		Vector vecDir = GetEngineObject()->GetAbsOrigin() - info.GetInflictor()->WorldSpaceCenter();
 		VectorNormalize( vecDir );
 		float flForce = DamageForce( WorldAlignSize(), info.GetDamage() );
-		SetAbsVelocity( GetAbsVelocity() + vecDir * flForce );
+		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() + vecDir * flForce );
 		info.ScaleDamage( 0.3f );
 	}
 

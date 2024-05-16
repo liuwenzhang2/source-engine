@@ -515,6 +515,6 @@ void ILocomotion::StuckMonitor( void )
 //--------------------------------------------------------------------------------------------------------------
 const Vector &ILocomotion::GetFeet( void ) const
 {
-	return GetBot()->GetEntity()->GetAbsOrigin();
+	return GetBot()->GetEntity()->GetEngineObject()->GetAbsOrigin();
 }
 

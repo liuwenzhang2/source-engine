@@ -82,7 +82,7 @@ void CFuncAreaPortalWindow::Activate()
 	if( pTarget )
 	{
 		SetModel( STRING(pTarget->GetModelName()) );
-		SetAbsOrigin( pTarget->GetAbsOrigin() );
+		GetEngineObject()->SetAbsOrigin( pTarget->GetEngineObject()->GetAbsOrigin() );
 		pTarget->AddEffects( EF_NODRAW ); // we will draw for it.
 	}
 }

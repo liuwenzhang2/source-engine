@@ -94,8 +94,8 @@ CBaseEntity* ConvertToSimpleProp ( CBaseEntity* pEnt )
 	}
 
 	pRetVal->KeyValue( "model", STRING(pEnt->GetModelName()) );
-	pRetVal->SetAbsOrigin( pEnt->GetAbsOrigin() );
-	pRetVal->SetAbsAngles( pEnt->GetAbsAngles() );
+	pRetVal->GetEngineObject()->SetAbsOrigin( pEnt->GetEngineObject()->GetAbsOrigin() );
+	pRetVal->GetEngineObject()->SetAbsAngles( pEnt->GetEngineObject()->GetAbsAngles() );
 	pRetVal->Spawn();
 	pRetVal->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false );
 	
@@ -231,8 +231,8 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 				// Modify the velocity for held objects so it gets away from the player
 				pPlayer->ForceDropOfCarriedPhysObjects( pBaseAnimating );
 
-				pPlayer->GetAbsVelocity();
-				vOldVel = pPlayer->GetAbsVelocity() + Vector( pPlayer->EyeDirection2D().x * 4.0f, pPlayer->EyeDirection2D().y * 4.0f, -32.0f );
+				pPlayer->GetEngineObject()->GetAbsVelocity();
+				vOldVel = pPlayer->GetEngineObject()->GetAbsVelocity() + Vector( pPlayer->EyeDirection2D().x * 4.0f, pPlayer->EyeDirection2D().y * 4.0f, -32.0f );
 			}
 		}
 
@@ -243,7 +243,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 			// Remove old prop, transfer name and children to the new simple prop
 			pDisolvingObj->SetName( STRING(pBaseAnimating->GetEntityName()) );
 			UTIL_TransferPoseParameters( pBaseAnimating, pDisolvingObj );
-			IEngineObjectServer::TransferChildren( pBaseAnimating->GetEngineObject(), pDisolvingObj->GetEngineObject());
+			pBaseAnimating->GetEngineObject()->TransferChildren(pDisolvingObj->GetEngineObject());
 			pDisolvingObj->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
 			pBaseAnimating->AddSolidFlags( FSOLID_NOT_SOLID );
 			pBaseAnimating->AddEffects( EF_NODRAW );

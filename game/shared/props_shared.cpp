@@ -1161,7 +1161,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 				VectorNormalize( vecBurstDir );
 				Vector vecVelocity = vecBurstDir * params.defBurstScale;
 
-				QAngle vecAngles = pEntity->GetAbsAngles();
+				QAngle vecAngles = pEntity->GetEngineObject()->GetAbsAngles();
 				int iSkin = pBreakableInterface->GetBreakableSkin();
 
 				CBaseEntity *pBreakable = NULL;
@@ -1200,7 +1200,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 						pBreakable->VPhysicsGetObject()->SetPosition( pos, vecAngles, true );
 					}
 
-					pBreakable->SetAbsAngles( vecAngles );
+					pBreakable->GetEngineObject()->SetAbsAngles( vecAngles );
 
 					if ( pOwnerEntity->IsEffectActive( EF_NOSHADOW ) )
 					{
@@ -1573,7 +1573,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 				VectorNormalize( vecBurstDir );
 				Vector vecVelocity = vecBurstDir * params.defBurstScale;
 
-				QAngle vecAngles = pEntity->GetAbsAngles();
+				QAngle vecAngles = pEntity->GetEngineObject()->GetAbsAngles();
 				int iSkin = pBreakableInterface->GetBreakableSkin();
 
 				CBaseEntity *pBreakable = NULL;
@@ -1608,7 +1608,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 						pBreakable->VPhysicsGetObject()->SetPosition( pos, vecAngles, true );
 					}
 
-					pBreakable->SetAbsAngles( vecAngles );
+					pBreakable->GetEngineObject()->SetAbsAngles( vecAngles );
 
 					if ( pOwnerEntity->IsEffectActive( EF_NOSHADOW ) )
 					{

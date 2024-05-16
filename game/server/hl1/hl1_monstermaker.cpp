@@ -86,13 +86,13 @@ bool CNPCMaker::CanMakeNPC( void )
 		// set altitude. Now that I'm activated, any breakables, etc should be out from under me. 
 		trace_t tr;
 
-		UTIL_TraceLine ( GetAbsOrigin(), GetAbsOrigin() - Vector ( 0, 0, 2048 ), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector ( 0, 0, 2048 ), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 		m_flGround = tr.endpos.z;
 	}
 
-	Vector mins = GetAbsOrigin() - Vector( 34, 34, 0 );
-	Vector maxs = GetAbsOrigin() + Vector( 34, 34, 0 );
-	maxs.z = GetAbsOrigin().z;
+	Vector mins = GetEngineObject()->GetAbsOrigin() - Vector( 34, 34, 0 );
+	Vector maxs = GetEngineObject()->GetAbsOrigin() + Vector( 34, 34, 0 );
+	maxs.z = GetEngineObject()->GetAbsOrigin().z;
 	
 	//Only adjust for the ground if we want it
 	if ( ( m_spawnflags & SF_NPCMAKER_NO_DROP ) == false )
@@ -242,8 +242,8 @@ void CNPCMaker::MakeNPC( void )
 	
 	m_OnSpawnNPC.FireOutput( this, this );
 
-	pent->SetLocalOrigin( GetAbsOrigin() );
-	pent->SetLocalAngles( GetAbsAngles() );
+	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetAbsOrigin() );
+	pent->GetEngineObject()->SetLocalAngles(GetEngineObject()->GetAbsAngles() );
 
 	pent->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 

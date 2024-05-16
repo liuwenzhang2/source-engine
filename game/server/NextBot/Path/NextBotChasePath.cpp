@@ -21,7 +21,7 @@ Vector ChasePath::PredictSubjectPosition( INextBot *bot, CBaseEntity *subject ) 
 {
 	ILocomotion *mover = bot->GetLocomotionInterface();
 
-	const Vector &subjectPos = subject->GetAbsOrigin();
+	const Vector &subjectPos = subject->GetEngineObject()->GetAbsOrigin();
 
 	Vector to = subjectPos - bot->GetPosition();
 	to.z = 0.0f;
@@ -41,7 +41,7 @@ Vector ChasePath::PredictSubjectPosition( INextBot *bot, CBaseEntity *subject ) 
 	float leadTime = 0.5f + ( range / ( mover->GetRunSpeed() + 0.0001f ) );
 	
 	// estimate amount to lead the subject	
-	Vector lead = leadTime * subject->GetAbsVelocity();
+	Vector lead = leadTime * subject->GetEngineObject()->GetAbsVelocity();
 	lead.z = 0.0f;
 
 	if ( DotProduct( to, lead ) < 0.0f )

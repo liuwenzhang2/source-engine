@@ -399,7 +399,7 @@ void CNPC_FloorTurret::Retire( void )
 		return;
 
 	//Level out the turret
-	m_vecGoalAngles = GetAbsAngles();
+	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 	SetNextThink( gpGlobals->curtime + 0.05f );
 
 	//Set ourselves to close
@@ -458,7 +458,7 @@ void CNPC_FloorTurret::Deploy( void )
 	if ( PreThink( TURRET_DEPLOYING ) )
 		return;
 
-	m_vecGoalAngles = GetAbsAngles();
+	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
 	SetNextThink( gpGlobals->curtime + 0.05f );
 
@@ -525,7 +525,7 @@ void CNPC_FloorTurret::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup
 		m_OnPhysGunPickup.FireOutput( this, this );
 
 		// We want to use preferred carry angles if we're not nicely upright
-		Vector vecToTurret = pPhysGunUser->GetAbsOrigin() - GetAbsOrigin();
+		Vector vecToTurret = pPhysGunUser->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 		vecToTurret.z = 0;
 		VectorNormalize( vecToTurret );
 
@@ -596,7 +596,7 @@ bool CNPC_FloorTurret::OnAttemptPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGu
 	{
 		Vector vecForward;
 		GetVectors( &vecForward, NULL, NULL );
-		Vector vecForce = (pPhysGunUser->GetAbsOrigin() - GetAbsOrigin());
+		Vector vecForce = (pPhysGunUser->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin());
 		float flDistance = VectorNormalize( vecForce );
 
 		// If it's over the physcannon tracelength, we're pulling it
@@ -627,10 +627,10 @@ bool CNPC_FloorTurret::HandleInteraction(int interactionType, void *data, CBaseC
 
 		// Get knocked away
 		Vector forward, up;
-		AngleVectors( sourceEnt->GetLocalAngles(), &forward, NULL, &up );
+		AngleVectors( sourceEnt->GetEngineObject()->GetLocalAngles(), &forward, NULL, &up );
 		ApplyAbsVelocityImpulse( forward * 100 + up * 50 );
 		CTakeDamageInfo info( sourceEnt, sourceEnt, 30, DMG_CLUB );
-		CalculateMeleeDamageForce( &info, forward, GetAbsOrigin() );
+		CalculateMeleeDamageForce( &info, forward, GetEngineObject()->GetAbsOrigin() );
 		TakeDamage( info );
 
 		const char* soundname = "NPC_Combine.WeaponBash";
@@ -792,7 +792,7 @@ void CNPC_FloorTurret::SuppressThink( void )
 		ClearEnemyMemory();
 		SetEnemy( NULL );
 		SetThink( &CNPC_FloorTurret::SearchThink );
-		m_vecGoalAngles = GetAbsAngles();
+		m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 		
 		SpinDown();
 
@@ -890,7 +890,7 @@ void CNPC_FloorTurret::ActiveThink( void )
 		SetEnemy( NULL );
 		m_flLastSight = gpGlobals->curtime + FLOOR_TURRET_MAX_WAIT;
 		SetThink( &CNPC_FloorTurret::SearchThink );
-		m_vecGoalAngles = GetAbsAngles();
+		m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 		return;
 	}
 	
@@ -956,7 +956,7 @@ void CNPC_FloorTurret::ActiveThink( void )
 		}
 
 		SetThink( &CNPC_FloorTurret::SearchThink );
-		m_vecGoalAngles = GetAbsAngles();
+		m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 		
 		SpinDown();
 
@@ -986,7 +986,7 @@ void CNPC_FloorTurret::ActiveThink( void )
 		// Visualize vertical firing ranges
 		for ( int i = 0; i < 4; i++ )
 		{
-			QAngle angMaxDownPitch = GetAbsAngles();
+			QAngle angMaxDownPitch = GetEngineObject()->GetAbsAngles();
 
 			switch( i )
 			{
@@ -1144,8 +1144,8 @@ void CNPC_FloorTurret::SearchThink( void )
 	}
 	
 	//Display that we're scanning
-	m_vecGoalAngles.x = GetAbsAngles().x + ( sin( gpGlobals->curtime * 1.0f ) * 15.0f );
-	m_vecGoalAngles.y = GetAbsAngles().y + ( sin( gpGlobals->curtime * 2.0f ) * 60.0f );
+	m_vecGoalAngles.x = GetEngineObject()->GetAbsAngles().x + ( sin( gpGlobals->curtime * 1.0f ) * 15.0f );
+	m_vecGoalAngles.y = GetEngineObject()->GetAbsAngles().y + ( sin( gpGlobals->curtime * 2.0f ) * 60.0f );
 
 	//Turn and ping
 	UpdateFacing();
@@ -1280,7 +1280,7 @@ bool CNPC_FloorTurret::IsValidEnemy( CBaseEntity *pEnemy )
 
 	QAngle angleToTarget;
 	VectorAngles( los, angleToTarget );
-	float flZDiff = fabs( AngleNormalize( angleToTarget.x - GetAbsAngles().x) );
+	float flZDiff = fabs( AngleNormalize( angleToTarget.x - GetEngineObject()->GetAbsAngles().x) );
 	if ( flZDiff > 28.0f && los.LengthSqr() > 4096.0f )
 		return false;
 
@@ -1356,15 +1356,15 @@ void CNPC_FloorTurret::TippedThink( void )
 			m_flShotTime = gpGlobals->curtime + 0.05f;
 		}
 
-		m_vecGoalAngles.x = GetAbsAngles().x + random->RandomFloat( -60, 60 );
-		m_vecGoalAngles.y = GetAbsAngles().y + random->RandomFloat( -60, 60 );
+		m_vecGoalAngles.x = GetEngineObject()->GetAbsAngles().x + random->RandomFloat( -60, 60 );
+		m_vecGoalAngles.y = GetEngineObject()->GetAbsAngles().y + random->RandomFloat( -60, 60 );
 
 		UpdateFacing();
 	}
 	else
 	{
 		//Face forward
-		m_vecGoalAngles = GetAbsAngles();
+		m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
 		//Set ourselves to close
 		if ( GetActivity() != ACT_FLOOR_TURRET_CLOSE )
@@ -1583,9 +1583,9 @@ bool CNPC_FloorTurret::PreThink( turretState_e state )
 				Vector	up;
 				GetVectors( NULL, NULL, &up );
 
-				NDebugOverlay::Line( GetAbsOrigin()+(up*32), GetAbsOrigin()+(up*128), 0, 255, 0, false, 2.0f );
-				NDebugOverlay::Cross3D( GetAbsOrigin()+(up*32), -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 2.0f );
-				NDebugOverlay::Cross3D( GetAbsOrigin()+(up*128), -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 2.0f );
+				NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin()+(up*32), GetEngineObject()->GetAbsOrigin()+(up*128), 0, 255, 0, false, 2.0f );
+				NDebugOverlay::Cross3D(GetEngineObject()->GetAbsOrigin()+(up*32), -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 2.0f );
+				NDebugOverlay::Cross3D(GetEngineObject()->GetAbsOrigin()+(up*128), -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 2.0f );
 			}
 		}
 		else
@@ -1637,9 +1637,9 @@ bool CNPC_FloorTurret::PreThink( turretState_e state )
 				Vector	up;
 				GetVectors( NULL, NULL, &up );
 
-				NDebugOverlay::Line( GetAbsOrigin()+(up*32), GetAbsOrigin()+(up*128), 255, 0, 0, false, 2.0f );
-				NDebugOverlay::Cross3D( GetAbsOrigin()+(up*32), -Vector(2,2,2), Vector(2,2,2), 255, 0, 0, false, 2.0f );
-				NDebugOverlay::Cross3D( GetAbsOrigin()+(up*128), -Vector(2,2,2), Vector(2,2,2), 255, 0, 0, false, 2.0f );
+				NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin()+(up*32), GetEngineObject()->GetAbsOrigin()+(up*128), 255, 0, 0, false, 2.0f );
+				NDebugOverlay::Cross3D(GetEngineObject()->GetAbsOrigin()+(up*32), -Vector(2,2,2), Vector(2,2,2), 255, 0, 0, false, 2.0f );
+				NDebugOverlay::Cross3D(GetEngineObject()->GetAbsOrigin()+(up*128), -Vector(2,2,2), Vector(2,2,2), 255, 0, 0, false, 2.0f );
 			}
 
 			//Interrupt current think function
@@ -1661,7 +1661,7 @@ void CNPC_FloorTurret::SetEyeState( eyeState_t state )
 	if ( !m_hEyeGlow )
 	{
 		// Create our eye sprite
-		m_hEyeGlow = CSprite::SpriteCreate( FLOOR_TURRET_GLOW_SPRITE, GetLocalOrigin(), false );
+		m_hEyeGlow = CSprite::SpriteCreate( FLOOR_TURRET_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin(), false );
 		if ( !m_hEyeGlow )
 			return;
 
@@ -2153,7 +2153,7 @@ void CNPC_FloorTurret::BreakThink( void )
 
 	// Our effect
 #ifdef HL2_EPISODIC
-	DispatchParticleEffect( "explosion_turret_break", vecOrigin, GetAbsAngles() );
+	DispatchParticleEffect( "explosion_turret_break", vecOrigin, GetEngineObject()->GetAbsAngles() );
 #endif // HL2_EPISODIC
 
 	// K-boom
@@ -2171,7 +2171,7 @@ void CNPC_FloorTurret::BreakThink( void )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
-	breakablepropparams_t params( GetAbsOrigin(), GetAbsAngles(), vec3_origin, RandomAngularImpulse( -800.0f, 800.0f ) );
+	breakablepropparams_t params(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), vec3_origin, RandomAngularImpulse( -800.0f, 800.0f ) );
 	params.impactEnergyScale = 1.0f;
 	params.defCollisionGroup = COLLISION_GROUP_INTERACTIVE;
 
@@ -2185,7 +2185,7 @@ void CNPC_FloorTurret::BreakThink( void )
 	{
 		Vector gibVelocity = RandomVector(-100,100);
 		int iModelIndex = modelinfo->GetModelIndex( g_PropDataSystem.GetRandomChunkModel( "MetalChunks" ) );	
-		te->BreakModel( filter, 0.0, vecOrigin, GetAbsAngles(), Vector(40,40,40), gibVelocity, iModelIndex, 150, 4, 2.5, BREAK_METAL );
+		te->BreakModel( filter, 0.0, vecOrigin, GetEngineObject()->GetAbsAngles(), Vector(40,40,40), gibVelocity, iModelIndex, 150, 4, 2.5, BREAK_METAL );
 	}
 
 	// We're done!
@@ -2239,8 +2239,8 @@ void CNPC_FloorTurret::SelfDestructThink( void )
 		m_flPingTime = gpGlobals->curtime;
 		
 		// Randomly twitch
-		m_vecGoalAngles.x = GetAbsAngles().x + random->RandomFloat( -60*flDestructPerc, 60*flDestructPerc );
-		m_vecGoalAngles.y = GetAbsAngles().y + random->RandomFloat( -60*flDestructPerc, 60*flDestructPerc );
+		m_vecGoalAngles.x = GetEngineObject()->GetAbsAngles().x + random->RandomFloat( -60*flDestructPerc, 60*flDestructPerc );
+		m_vecGoalAngles.y = GetEngineObject()->GetAbsAngles().y + random->RandomFloat( -60*flDestructPerc, 60*flDestructPerc );
 	}
 	
 	UpdateFacing();
@@ -2273,7 +2273,7 @@ void CNPC_FloorTurret::InputSelfDestruct( inputdata_t &inputdata )
 		m_hFizzleEffect->KeyValue( "start_active", "1" );
 		m_hFizzleEffect->KeyValue( "effect_name", "explosion_turret_fizzle" );
 		m_hFizzleEffect->GetEngineObject()->SetParent( this->GetEngineObject() );
-		m_hFizzleEffect->SetAbsOrigin( WorldSpaceCenter() + ( vecUp * 12.0f ) );
+		m_hFizzleEffect->GetEngineObject()->SetAbsOrigin( WorldSpaceCenter() + ( vecUp * 12.0f ) );
 		DispatchSpawn( m_hFizzleEffect );
 		m_hFizzleEffect->Activate();
 	}

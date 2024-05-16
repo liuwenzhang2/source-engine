@@ -34,7 +34,7 @@ void SendProxy_AnglesX(const SendProp* pProp, const void* pStruct, const void* p
 	CBaseEntity* entity = (CBaseEntity*)pStruct;
 	Assert(entity);
 
-	const QAngle* a = & entity->GetLocalAngles();;
+	const QAngle* a = & entity->GetEngineObject()->GetLocalAngles();;
 
 	pOut->m_Float = a->x;
 }
@@ -44,7 +44,7 @@ void SendProxy_AnglesY(const SendProp* pProp, const void* pStruct, const void* p
 	CBaseEntity* entity = (CBaseEntity*)pStruct;
 	Assert(entity);
 
-	const QAngle* a = &entity->GetLocalAngles();;
+	const QAngle* a = &entity->GetEngineObject()->GetLocalAngles();;
 
 	pOut->m_Float = a->y;
 }
@@ -54,7 +54,7 @@ void SendProxy_AnglesZ(const SendProp* pProp, const void* pStruct, const void* p
 	CBaseEntity* entity = (CBaseEntity*)pStruct;
 	Assert(entity);
 
-	const QAngle* a = &entity->GetLocalAngles();;
+	const QAngle* a = &entity->GetEngineObject()->GetLocalAngles();;
 
 	pOut->m_Float = a->z;
 }
@@ -96,12 +96,12 @@ void	CTestTraceline::Spin( void )
 	if (traceline_spin.GetInt())
 	{
 		float s = sin( gpGlobals->curtime );
-		QAngle angles = GetLocalAngles();
+		QAngle angles = GetEngineObject()->GetLocalAngles();
 
 		angles[0] = 180.0 * 0.5 * (s * s * s + 1.0f) + 90;
 		angles[1] = gpGlobals->curtime * 10;
 		   
-		SetLocalAngles( angles );
+		GetEngineObject()->SetLocalAngles( angles );
 
 	}
 	SetNextThink( gpGlobals->curtime );

@@ -114,7 +114,7 @@ const Vector C_CS_PlayerResource::GetC4Postion()
 
 		if ( pPlayer )
 		{
-			return pPlayer->GetAbsOrigin();
+			return pPlayer->GetEngineObject()->GetAbsOrigin();
 		}
 	}
 

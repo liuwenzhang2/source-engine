@@ -201,7 +201,7 @@ void CAI_MoveAndShootOverlay::RunShootWhileMove()
 		if ( pOuter->GetAlternateMoveShootTarget() )
 		{
 			// Aim at this other thing if I can't aim at my enemy.
-			pOuter->AddFacingTarget( pOuter->GetAlternateMoveShootTarget(), pOuter->GetAlternateMoveShootTarget()->GetAbsOrigin(), 1.0, 0.2 );
+			pOuter->AddFacingTarget( pOuter->GetAlternateMoveShootTarget(), pOuter->GetAlternateMoveShootTarget()->GetEngineObject()->GetAbsOrigin(), 1.0, 0.2 );
 		}
 
 		return;

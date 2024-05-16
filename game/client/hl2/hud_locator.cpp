@@ -264,7 +264,7 @@ void CHudLocator::Paint()
 	// feature later and want to iterate some kind of list. 
 	Vector vecLocation = pPlayer->m_HL2Local.m_vecLocatorOrigin;
 
-	Vector vecToLocation = vecLocation - pPlayer->GetAbsOrigin();
+	Vector vecToLocation = vecLocation - pPlayer->GetEngineObject()->GetAbsOrigin();
 	QAngle locationAngles;
 
 	VectorAngles( vecToLocation, locationAngles );

@@ -1710,7 +1710,7 @@ public:
 	virtual void		OnGivenWeapon( CBaseCombatWeapon *pNewWeapon ) { }
 	bool				IsMovingToPickupWeapon();
 	virtual bool		WeaponLOSCondition(const Vector &ownerPos, const Vector &targetPos, bool bSetConditions);
-	virtual bool		CurrentWeaponLOSCondition(const Vector &targetPos, bool bSetConditions) { return WeaponLOSCondition( GetAbsOrigin(), targetPos, bSetConditions ); }
+	virtual bool		CurrentWeaponLOSCondition(const Vector &targetPos, bool bSetConditions) { return WeaponLOSCondition(GetEngineObject()->GetAbsOrigin(), targetPos, bSetConditions ); }
 	virtual bool		IsWaitingToRappel( void ) { return false; }
 	virtual void		BeginRappel() {}
 
@@ -2703,28 +2703,28 @@ public:
 
 inline const Vector &CAI_Component::GetLocalOrigin() const
 {
-	return GetOuter()->GetLocalOrigin();
+	return GetOuter()->GetEngineObject()->GetLocalOrigin();
 }
 
 //-----------------------------------------------------------------------------
 
 inline void CAI_Component::SetLocalOrigin(const Vector &origin)
 {
-	GetOuter()->SetLocalOrigin(origin);
+	GetOuter()->GetEngineObject()->SetLocalOrigin(origin);
 }
 
 //-----------------------------------------------------------------------------
 
 inline const Vector &CAI_Component::GetAbsOrigin() const
 {
-	return GetOuter()->GetAbsOrigin();
+	return GetOuter()->GetEngineObject()->GetAbsOrigin();
 }
 
 //-----------------------------------------------------------------------------
 
 inline const QAngle &CAI_Component::GetAbsAngles() const
 {
-	return GetOuter()->GetAbsAngles();
+	return GetOuter()->GetEngineObject()->GetAbsAngles();
 }
 
 //-----------------------------------------------------------------------------
@@ -3018,14 +3018,14 @@ inline int CAI_Component::CapabilitiesGet()
 
 inline void CAI_Component::SetLocalAngles( const QAngle& angles )
 {
-	GetOuter()->SetLocalAngles( angles );
+	GetOuter()->GetEngineObject()->SetLocalAngles( angles );
 }
 
 //-----------------------------------------------------------------------------
 
 inline const QAngle &CAI_Component::GetLocalAngles( void ) const
 {
-	return GetOuter()->GetLocalAngles();
+	return GetOuter()->GetEngineObject()->GetLocalAngles();
 }
 
 //-----------------------------------------------------------------------------

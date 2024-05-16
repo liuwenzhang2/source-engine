@@ -1917,7 +1917,7 @@ void BotChatterInterface::ReportingIn( void )
 			if (TheCSBots()->GetLooseBomb())
 			{
 				say->AppendPhrase( TheBotPhrases->GetPhrase( "GuardingLooseBomb" ) );
-				say->AttachMeme( new BotBombStatusMeme( CSGameState::LOOSE, TheCSBots()->GetLooseBomb()->GetAbsOrigin() ) );
+				say->AttachMeme( new BotBombStatusMeme( CSGameState::LOOSE, TheCSBots()->GetLooseBomb()->GetEngineObject()->GetAbsOrigin() ) );
 			}
 			break;
 		}
@@ -2245,7 +2245,7 @@ void BotChatterInterface::SpottedLooseBomb( CBaseEntity *bomb )
 		return;
 
 	// update our gamestate
-	m_me->GetGameState()->UpdateLooseBomb( bomb->GetAbsOrigin() );
+	m_me->GetGameState()->UpdateLooseBomb( bomb->GetEngineObject()->GetAbsOrigin() );
 
 	if (m_spottedLooseBombTimer.IsElapsed())
 	{
@@ -2256,13 +2256,13 @@ void BotChatterInterface::SpottedLooseBomb( CBaseEntity *bomb )
 		BotStatement *say = new BotStatement( this, REPORT_INFORMATION, 10.0f );
 
 		// where is the bomb
-		Place place = TheNavMesh->GetPlace( bomb->GetAbsOrigin() );
+		Place place = TheNavMesh->GetPlace( bomb->GetEngineObject()->GetAbsOrigin() );
 		SayWhere( say, place );
 
 		say->AppendPhrase( TheBotPhrases->GetPhrase( "SpottedLooseBomb" ) );
 
 		if (TheCSBots()->GetLooseBomb())
-			say->AttachMeme( new BotBombStatusMeme( CSGameState::LOOSE, bomb->GetAbsOrigin() ) );
+			say->AttachMeme( new BotBombStatusMeme( CSGameState::LOOSE, bomb->GetEngineObject()->GetAbsOrigin() ) );
 
 		AddStatement( say );
 	}
@@ -2285,19 +2285,19 @@ void BotChatterInterface::GuardingLooseBomb( CBaseEntity *bomb )
 	m_planInterval.Reset();
 
 	// update our gamestate
-	m_me->GetGameState()->UpdateLooseBomb( bomb->GetAbsOrigin() );
+	m_me->GetGameState()->UpdateLooseBomb( bomb->GetEngineObject()->GetAbsOrigin() );
 
 	// tell our teammates
 	BotStatement *say = new BotStatement( this, REPORT_INFORMATION, 10.0f );
 
 	// where is the bomb
-	Place place = TheNavMesh->GetPlace( bomb->GetAbsOrigin() );
+	Place place = TheNavMesh->GetPlace( bomb->GetEngineObject()->GetAbsOrigin() );
 	SayWhere( say, place );
 
 	say->AppendPhrase( TheBotPhrases->GetPhrase( "GuardingLooseBomb" ) );
 
 	if (TheCSBots()->GetLooseBomb())
-		say->AttachMeme( new BotBombStatusMeme( CSGameState::LOOSE, bomb->GetAbsOrigin() ) );
+		say->AttachMeme( new BotBombStatusMeme( CSGameState::LOOSE, bomb->GetEngineObject()->GetAbsOrigin() ) );
 
 	AddStatement( say );
 }

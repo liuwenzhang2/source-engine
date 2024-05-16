@@ -1435,7 +1435,7 @@ void CBugUIPanel::Activate()
 		QAngle ang;
 		VectorAngles( MainViewForward(), ang );
 
-		IClientEntity *localPlayer = entitylist->GetClientEntity( cl.m_nPlayerSlot + 1 );
+		IEngineObjectClient *localPlayer = entitylist->GetEngineObject( cl.m_nPlayerSlot + 1 );
 		if ( localPlayer )
 		{
 			org = localPlayer->GetAbsOrigin();

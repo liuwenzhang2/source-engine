@@ -855,7 +855,7 @@ int C_PropAirboat::DrawWake( void )
 	
 	TrailPoint_t currentPoint;
 	currentPoint.m_flDieTime = gpGlobals->curtime + 0.5f;
-	currentPoint.m_vecScreenPos = GetAbsOrigin();
+	currentPoint.m_vecScreenPos = GetEngineObject()->GetAbsOrigin();
 	currentPoint.m_vecScreenPos[2] = m_nExactWaterLevel + 16;
 	currentPoint.m_flTexCoord = pLast->m_flTexCoord + currentPoint.m_vecScreenPos.DistTo(pLast->m_vecScreenPos);
 	currentPoint.m_flTexCoord = fmod( currentPoint.m_flTexCoord, 1 );

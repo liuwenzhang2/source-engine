@@ -81,7 +81,7 @@ void CBaseParticleEntity::Think()
 void CBaseParticleEntity::FollowEntity(CBaseEntity *pEntity)
 {
 	BaseClass::FollowEntity( pEntity );
-	SetLocalOrigin( vec3_origin );
+	GetEngineObject()->SetLocalOrigin( vec3_origin );
 }
 
 

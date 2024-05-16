@@ -207,14 +207,14 @@ void CNPC_FlockingFlyerFlock::SpawnFlock( void )
 		vecSpot.x = random->RandomFloat( -R, R );
 		vecSpot.y = random->RandomFloat( -R, R );
 		vecSpot.z = random->RandomFloat( 0, 16 );
-		vecSpot = GetAbsOrigin() + vecSpot;
+		vecSpot = GetEngineObject()->GetAbsOrigin() + vecSpot;
 
 		UTIL_SetOrigin( pBoid, vecSpot);
 		pBoid->SetMoveType( MOVETYPE_FLY );
 		pBoid->SpawnCommonCode();
 		pBoid->SetGroundEntity( NULL );
-		pBoid->SetAbsVelocity( Vector ( 0, 0, 0 ) );
-		pBoid->SetAbsAngles( GetAbsAngles() );
+		pBoid->GetEngineObject()->SetAbsVelocity( Vector ( 0, 0, 0 ) );
+		pBoid->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 		
 		pBoid->SetCycle( 0 );
 		pBoid->SetThink( &CNPC_FlockingFlyer::IdleThink );
@@ -457,10 +457,10 @@ void CNPC_FlockingFlyer::BoidAdvanceFrame ( void )
 	QAngle angVel = GetLocalAngularVelocity();
 
 	// lean
-	angVel.x = - GetAbsAngles().x + flapspeed * 5;
+	angVel.x = -GetEngineObject()->GetAbsAngles().x + flapspeed * 5;
 
 	// bank
-	angVel.z = - GetAbsAngles().z + angVel.y;
+	angVel.z = -GetEngineObject()->GetAbsAngles().z + angVel.y;
 
 	SetLocalAngularVelocity( angVel );
 
@@ -483,7 +483,7 @@ void CNPC_FlockingFlyer::FlockLeaderThink( void )
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
 	
-	AngleVectors ( GetAbsAngles(), &vForward, &vRight, &vUp );
+	AngleVectors (GetEngineObject()->GetAbsAngles(), &vForward, &vRight, &vUp );
 
 	// is the way ahead clear?
 	if ( !FPathBlocked () )
@@ -503,7 +503,7 @@ void CNPC_FlockingFlyer::FlockLeaderThink( void )
 		if ( m_flSpeed <= AFLOCK_FLY_SPEED )
 			 m_flSpeed += 5;
 
-		SetAbsVelocity( vForward * m_flSpeed );
+		GetEngineObject()->SetAbsVelocity( vForward * m_flSpeed );
 
 		BoidAdvanceFrame( );
 
@@ -516,12 +516,12 @@ void CNPC_FlockingFlyer::FlockLeaderThink( void )
 	if ( !m_fTurning)// something in the way and boid is not already turning to avoid
 	{
 		// measure clearance on left and right to pick the best dir to turn
-		UTIL_TraceLine(GetAbsOrigin(), GetAbsOrigin() + vRight * AFLOCK_CHECK_DIST, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
-		vecDist = (tr.endpos - GetAbsOrigin());
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vRight * AFLOCK_CHECK_DIST, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
+		vecDist = (tr.endpos - GetEngineObject()->GetAbsOrigin());
 		flRightSide = vecDist.Length();
 
-		UTIL_TraceLine(GetAbsOrigin(), GetAbsOrigin() - vRight * AFLOCK_CHECK_DIST, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
-		vecDist = (tr.endpos - GetAbsOrigin());
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - vRight * AFLOCK_CHECK_DIST, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
+		vecDist = (tr.endpos - GetEngineObject()->GetAbsOrigin());
 		flLeftSide = vecDist.Length();
 
 		// turn right if more clearance on right side
@@ -564,24 +564,24 @@ void CNPC_FlockingFlyer::FlockLeaderThink( void )
 
 	SpreadFlock( );
 
-	SetAbsVelocity( vForward * m_flSpeed );
+	GetEngineObject()->SetAbsVelocity( vForward * m_flSpeed );
 	
 	// check and make sure we aren't about to plow into the ground, don't let it happen
-	UTIL_TraceLine(GetAbsOrigin(), GetAbsOrigin() - vUp * 16, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
-	if (tr.fraction != 1.0 && GetAbsVelocity().z < 0 )
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - vUp * 16, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
+	if (tr.fraction != 1.0 && GetEngineObject()->GetAbsVelocity().z < 0 )
 	{
-		Vector vecVel = GetAbsVelocity();
+		Vector vecVel = GetEngineObject()->GetAbsVelocity();
 		vecVel.z = 0;
-		SetAbsVelocity( vecVel );
+		GetEngineObject()->SetAbsVelocity( vecVel );
 	}
 
 	// maybe it did, though.
 	if ( GetFlags() & FL_ONGROUND )
 	{
-		UTIL_SetOrigin( this, GetAbsOrigin() + Vector ( 0 , 0 , 1 ) );
-		Vector vecVel = GetAbsVelocity();
+		UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() + Vector ( 0 , 0 , 1 ) );
+		Vector vecVel = GetEngineObject()->GetAbsVelocity();
 		vecVel.z = 0;
-		SetAbsVelocity( vecVel );
+		GetEngineObject()->SetAbsVelocity( vecVel );
 	}
 
 	if ( m_flFlockNextSoundTime < gpGlobals->curtime )
@@ -614,12 +614,12 @@ bool CNPC_FlockingFlyer::FPathBlocked( void )
 
 	// use VELOCITY, not angles, not all boids point the direction they are flying
 	//vecDir = UTIL_VecToAngles( pevBoid->velocity );
-	AngleVectors ( GetAbsAngles(), &vForward, &vRight, &vUp );
+	AngleVectors (GetEngineObject()->GetAbsAngles(), &vForward, &vRight, &vUp );
 
 	fBlocked = FALSE;// assume the way ahead is clear
 
 	// check for obstacle ahead
-	UTIL_TraceLine(GetAbsOrigin(), GetAbsOrigin() + vForward * AFLOCK_CHECK_DIST, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vForward * AFLOCK_CHECK_DIST, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 	
 	if (tr.fraction != 1.0)
 	{
@@ -628,7 +628,7 @@ bool CNPC_FlockingFlyer::FPathBlocked( void )
 	}
 
 	// extra wide checks
-	UTIL_TraceLine(GetAbsOrigin() + vRight * 12, GetAbsOrigin() + vRight * 12 + vForward * AFLOCK_CHECK_DIST, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin() + vRight * 12, GetEngineObject()->GetAbsOrigin() + vRight * 12 + vForward * AFLOCK_CHECK_DIST, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 	
 	if (tr.fraction != 1.0)
 	{
@@ -636,7 +636,7 @@ bool CNPC_FlockingFlyer::FPathBlocked( void )
 		fBlocked = TRUE;
 	}
 
-	UTIL_TraceLine(GetAbsOrigin() - vRight * 12, GetAbsOrigin() - vRight * 12 + vForward * AFLOCK_CHECK_DIST, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin() - vRight * 12, GetEngineObject()->GetAbsOrigin() - vRight * 12 + vForward * AFLOCK_CHECK_DIST, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 	
 	if (tr.fraction != 1.0)
 	{
@@ -664,19 +664,19 @@ void CNPC_FlockingFlyer::SpreadFlock( )
 	CNPC_FlockingFlyer *pList = m_pSquadLeader;
 	while ( pList )
 	{
-		if ( pList != this && ( GetAbsOrigin() - pList->GetAbsOrigin() ).Length() <= AFLOCK_TOO_CLOSE )
+		if ( pList != this && (GetEngineObject()->GetAbsOrigin() - pList->GetEngineObject()->GetAbsOrigin() ).Length() <= AFLOCK_TOO_CLOSE )
 		{
 			// push the other away
-			vecDir = ( pList->GetAbsOrigin() - GetAbsOrigin() );
+			vecDir = ( pList->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 			VectorNormalize( vecDir );
 
 			// store the magnitude of the other boid's velocity, and normalize it so we
 			// can average in a course that points away from the leader.
-			flSpeed = pList->GetAbsVelocity().Length();
+			flSpeed = pList->GetEngineObject()->GetAbsVelocity().Length();
 
-			Vector vecVel = pList->GetAbsVelocity();
+			Vector vecVel = pList->GetEngineObject()->GetAbsVelocity();
 			VectorNormalize( vecVel );
-			pList->SetAbsVelocity( ( vecVel + vecDir ) * 0.5 * flSpeed );
+			pList->GetEngineObject()->SetAbsVelocity( ( vecVel + vecDir ) * 0.5 * flSpeed );
 		}
 
 		pList = pList->m_pSquadNext;
@@ -696,12 +696,12 @@ void CNPC_FlockingFlyer::SpreadFlock2 ( )
 
 	while ( pList )
 	{
-		if ( pList != this && ( GetAbsOrigin() - pList->GetAbsOrigin() ).Length() <= AFLOCK_TOO_CLOSE )
+		if ( pList != this && (GetEngineObject()->GetAbsOrigin() - pList->GetEngineObject()->GetAbsOrigin() ).Length() <= AFLOCK_TOO_CLOSE )
 		{
-			vecDir = ( GetAbsOrigin() - pList->GetAbsOrigin() );
+			vecDir = (GetEngineObject()->GetAbsOrigin() - pList->GetEngineObject()->GetAbsOrigin() );
 			VectorNormalize( vecDir );
 
-			SetAbsVelocity( ( GetAbsVelocity() + vecDir ) );
+			GetEngineObject()->SetAbsVelocity( (GetEngineObject()->GetAbsVelocity() + vecDir ) );
 		}
 
 		pList = pList->m_pSquadNext;
@@ -746,11 +746,11 @@ void CNPC_FlockingFlyer::FlockFollowerThink( void )
 		return;
 	}
 
-	vecDirToLeader = ( m_pSquadLeader->GetAbsOrigin() - GetAbsOrigin() );
+	vecDirToLeader = ( m_pSquadLeader->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 	flDistToLeader = vecDirToLeader.Length();
 	
 	// match heading with leader
-	SetAbsAngles( m_pSquadLeader->GetAbsAngles() );
+	GetEngineObject()->SetAbsAngles( m_pSquadLeader->GetEngineObject()->GetAbsAngles() );
 
 	//
 	// We can see the leader, so try to catch up to it
@@ -760,24 +760,24 @@ void CNPC_FlockingFlyer::FlockFollowerThink( void )
 		// if we're too far away, speed up
 		if ( flDistToLeader > AFLOCK_TOO_FAR )
 		{
-			m_flGoalSpeed = m_pSquadLeader->GetAbsVelocity().Length() * 1.5;
+			m_flGoalSpeed = m_pSquadLeader->GetEngineObject()->GetAbsVelocity().Length() * 1.5;
 		}
 
 		// if we're too close, slow down
 		else if ( flDistToLeader < AFLOCK_TOO_CLOSE )
 		{
-			m_flGoalSpeed = m_pSquadLeader->GetAbsVelocity().Length() * 0.5;
+			m_flGoalSpeed = m_pSquadLeader->GetEngineObject()->GetAbsVelocity().Length() * 0.5;
 		}
 	}
 	else
 	{
 		// wait up! the leader isn't out in front, so we slow down to let him pass
-		m_flGoalSpeed = m_pSquadLeader->GetAbsVelocity().Length() * 0.5;
+		m_flGoalSpeed = m_pSquadLeader->GetEngineObject()->GetAbsVelocity().Length() * 0.5;
 	}
 
 	SpreadFlock2();
 
-	Vector vecVel = GetAbsVelocity();
+	Vector vecVel = GetEngineObject()->GetAbsVelocity();
 	m_flSpeed = vecVel.Length();
 	VectorNormalize( vecVel );
 
@@ -803,7 +803,7 @@ void CNPC_FlockingFlyer::FlockFollowerThink( void )
 		m_flSpeed -= AFLOCK_ACCELERATE;
 	}
 
-	SetAbsVelocity( vecVel * m_flSpeed );
+	GetEngineObject()->SetAbsVelocity( vecVel * m_flSpeed );
 
 	BoidAdvanceFrame( );
 }
@@ -852,7 +852,7 @@ void CNPC_FlockingFlyer::FallHack( void )
 		}
 		else
 		{
-			SetAbsVelocity( Vector( 0, 0, 0 ) );
+			GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 0 ) );
 			SetThink( NULL );
 		}
 	}

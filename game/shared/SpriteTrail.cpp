@@ -537,7 +537,7 @@ int CSpriteTrail::DrawModel( int flags )
 const Vector &CSpriteTrail::GetRenderOrigin( void )
 {
 	static Vector vOrigin;
-	vOrigin = GetAbsOrigin();
+	vOrigin = GetEngineObject()->GetAbsOrigin();
 
 	if ( m_hAttachedToEntity )
 	{

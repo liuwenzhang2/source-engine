@@ -37,7 +37,7 @@ public:
 	}
 	virtual void OnBind( C_BaseEntity *pC_BaseEntity )
 	{
-		const Vector &origin = pC_BaseEntity->GetAbsOrigin();
+		const Vector &origin = pC_BaseEntity->GetEngineObject()->GetAbsOrigin();
 		m_pOriginVar->SetVecValue( origin.x, origin.y, origin.z );
 	}
 
@@ -81,7 +81,7 @@ public:
 	}
 	virtual void OnBind( C_BaseEntity *pC_BaseEntity )
 	{
-		const Vector &origin = pC_BaseEntity->GetAbsOrigin();
+		const Vector &origin = pC_BaseEntity->GetEngineObject()->GetAbsOrigin();
 		m_pOriginVar->SetVecValue( origin.x - 15.0f, origin.y, origin.z );
 	}
 

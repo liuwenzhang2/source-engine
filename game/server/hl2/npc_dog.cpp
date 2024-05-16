@@ -347,8 +347,8 @@ void CNPC_Dog::SetPlayerAvoidState( void )
 			vWorldMins = WorldAlignMins();
 			vWorldMaxs = WorldAlignMaxs();
 
-			vPlayerMins = pLocalPlayer->GetAbsOrigin() + pLocalPlayer->WorldAlignMins();
-			vPlayerMaxs = pLocalPlayer->GetAbsOrigin() + pLocalPlayer->WorldAlignMaxs();
+			vPlayerMins = pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->WorldAlignMins();
+			vPlayerMaxs = pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->WorldAlignMaxs();
 
 			// check if the player intersects the bounds of any of the bone followers
 			for ( i = 0; i < m_BoneFollowerManager.GetNumBoneFollowers(); i++ )
@@ -365,13 +365,13 @@ void CNPC_Dog::SetPlayerAvoidState( void )
 				}
 			}
 
-			bIntersectingNPCBox = IsBoxIntersectingBox( GetAbsOrigin() + vWorldMins, GetAbsOrigin() + vWorldMaxs, vPlayerMins, vPlayerMaxs );
+			bIntersectingNPCBox = IsBoxIntersectingBox(GetEngineObject()->GetAbsOrigin() + vWorldMins, GetEngineObject()->GetAbsOrigin() + vWorldMaxs, vPlayerMins, vPlayerMaxs );
 
 			if ( ai_debug_avoidancebounds.GetBool() )
 			{
 				int iRed = ( bIntersectingNPCBox == true ) ? 255 : 0;
 
-				NDebugOverlay::Box( GetAbsOrigin(), vWorldMins, vWorldMaxs, iRed, 0, 255, 64, 0.1 );
+				NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), vWorldMins, vWorldMaxs, iRed, 0, 255, 64, 0.1 );
 
 				// draw the bounds of the bone followers
 				for ( i = 0; i < m_BoneFollowerManager.GetNumBoneFollowers(); i++ )
@@ -825,7 +825,7 @@ void CNPC_Dog::ThrowObject( const char *pAttachmentName )
 				m_hPhysicsEnt->SetOwnerEntity( this );
 
 				pPhysObj->RemoveShadowController();
-				pPhysObj->SetPosition( m_hPhysicsEnt->GetLocalOrigin(), m_hPhysicsEnt->GetLocalAngles(), true );
+				pPhysObj->SetPosition( m_hPhysicsEnt->GetEngineObject()->GetLocalOrigin(), m_hPhysicsEnt->GetEngineObject()->GetLocalAngles(), true );
 
 				pPhysObj->RecheckCollisionFilter();
 				pPhysObj->RecheckContactPoints();
@@ -838,7 +838,7 @@ void CNPC_Dog::ThrowObject( const char *pAttachmentName )
 
 			if ( m_hThrowTarget )
 			{
-				Vector vThrowOrigin = m_hThrowTarget->GetAbsOrigin();
+				Vector vThrowOrigin = m_hThrowTarget->GetEngineObject()->GetAbsOrigin();
 				
 				if ( m_hThrowTarget->IsPlayer() )
 					 vThrowOrigin = vThrowOrigin + Vector( random->RandomFloat( -128, 128 ), random->RandomFloat( -128, 128 ), 0 );
@@ -939,7 +939,7 @@ void CNPC_Dog::PickupOrCatchObject( const char *pAttachmentName )
 		if ( pPhysicsObject )
 		{
 			pPhysicsObject->SetShadow( 1e4, 1e4, false, false );
-			pPhysicsObject->UpdateShadow( GetAbsOrigin(), GetAbsAngles(), false, 0 );
+			pPhysicsObject->UpdateShadow(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), false, 0 );
 		}
 		
 		m_iContainerMoveType = m_hPhysicsEnt->GetMoveType();
@@ -947,8 +947,8 @@ void CNPC_Dog::PickupOrCatchObject( const char *pAttachmentName )
 		
 		m_hPhysicsEnt->GetEngineObject()->SetParent( this->GetEngineObject(), iAttachment);
 	
-		m_hPhysicsEnt->SetLocalOrigin( vec3_origin );
-		m_hPhysicsEnt->SetLocalAngles( vec3_angle );
+		m_hPhysicsEnt->GetEngineObject()->SetLocalOrigin( vec3_origin );
+		m_hPhysicsEnt->GetEngineObject()->SetLocalAngles( vec3_angle );
 
 		m_hPhysicsEnt->SetGroundEntity( NULL );
 		
@@ -1036,7 +1036,7 @@ void CNPC_Dog::CreateSprites( void )
 			"index",
 		};
 
-		m_hGlowSprites[i] = CSprite::SpriteCreate( "sprites/glow04_noz.vmt", GetAbsOrigin(), false );
+		m_hGlowSprites[i] = CSprite::SpriteCreate( "sprites/glow04_noz.vmt", GetEngineObject()->GetAbsOrigin(), false );
 
 		m_hGlowSprites[i]->SetAttachment( this, LookupAttachment( attachNames[i] ) );
 		m_hGlowSprites[i]->SetTransparency( kRenderGlow, 255, 128, 0, 64, kRenderFxNoDissipation );
@@ -1118,7 +1118,7 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 			 continue;
 		
 		Vector center = pEnt->WorldSpaceCenter();
-		flDist = UTIL_DistApprox2D( GetAbsOrigin(), center );
+		flDist = UTIL_DistApprox2D(GetEngineObject()->GetAbsOrigin(), center );
 
 		vcollide_t *pCollide = modelinfo->GetVCollide( pEnt->GetModelIndex() );
 
@@ -1231,7 +1231,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 			Vector vecGoalPos;
 			Vector vecDir;
 
-			vecDir = GetLocalOrigin() - m_hPhysicsEnt->WorldSpaceCenter();
+			vecDir = GetEngineObject()->GetLocalOrigin() - m_hPhysicsEnt->WorldSpaceCenter();
 			VectorNormalize(vecDir);
 			vecDir.z = 0;
 		
@@ -1248,7 +1248,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 			//If I'm near my goal, then just walk to it.
 			Activity aActivity = ACT_RUN;
 
-			if ( ( vecGoalPos - GetLocalOrigin() ).Length() <= 128 )
+			if ( ( vecGoalPos - GetEngineObject()->GetLocalOrigin() ).Length() <= 128 )
 				 aActivity = ACT_WALK;
 
 			bBuiltRoute = GetNavigator()->SetGoal( AI_NavGoal_t( vecGoalPos, aActivity ), AIN_NO_PATH_TASK_FAIL );
@@ -1282,7 +1282,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 		{
 			if ( m_bHasObject == false )
 			{
-				GetMotor()->SetIdealYawToTarget( m_hPhysicsEnt->GetAbsOrigin() );
+				GetMotor()->SetIdealYawToTarget( m_hPhysicsEnt->GetEngineObject()->GetAbsOrigin() );
 				GetMotor()->UpdateYaw();
 			}
 		}
@@ -1336,7 +1336,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 					Vector vecGoalPos;
 					Vector vecDir;
 				
-					vecDir = GetLocalOrigin() - m_hPhysicsEnt->WorldSpaceCenter();
+					vecDir = GetEngineObject()->GetLocalOrigin() - m_hPhysicsEnt->WorldSpaceCenter();
 					VectorNormalize(vecDir);
 					vecDir.z = 0;
 									
@@ -1344,12 +1344,12 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 
 					GetNavigator()->ClearGoal();
 
-					float flDistance = (vecGoalPos - GetLocalOrigin()).Length();
+					float flDistance = (vecGoalPos - GetEngineObject()->GetLocalOrigin()).Length();
 
 					//If I'm near my goal, then just walk to it.
 					Activity aActivity = ACT_RUN;
 
-					if ( ( vecGoalPos - GetLocalOrigin() ).Length() <= 128 )
+					if ( ( vecGoalPos - GetEngineObject()->GetLocalOrigin() ).Length() <= 128 )
 						 aActivity = ACT_WALK;
 
 				    GetNavigator()->SetGoal( AI_NavGoal_t( vecGoalPos, aActivity ), AIN_NO_PATH_TASK_FAIL );
@@ -1382,7 +1382,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 				m_hPhysicsEnt->SetOwnerEntity( this );
 
 				Vector vForward;
-				AngleVectors( GetAbsAngles(), &vForward );
+				AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
 
 
 				Vector vGunPos;
@@ -1393,7 +1393,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 
 				VectorNormalize( vToObject );
 
-				SetAim( m_hPhysicsEnt->WorldSpaceCenter() - GetAbsOrigin() );
+				SetAim( m_hPhysicsEnt->WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin() );
 
 				CBasePlayer *pPlayer = AI_GetSinglePlayer();
 
@@ -1401,7 +1401,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 
 				if ( pPlayer )
 				{
-					flDistanceToPlayer = (pPlayer->GetAbsOrigin() - m_hPhysicsEnt->WorldSpaceCenter()).Length();
+					flDistanceToPlayer = (pPlayer->GetEngineObject()->GetAbsOrigin() - m_hPhysicsEnt->WorldSpaceCenter()).Length();
 				}
 			
 				IPhysicsObject *pPhysObj = m_hPhysicsEnt->VPhysicsGetObject();
@@ -1451,7 +1451,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 								Vector vecGoalPos;
 								Vector vecDir;
 
-								vecDir = GetLocalOrigin() - m_hPhysicsEnt->WorldSpaceCenter();
+								vecDir = GetEngineObject()->GetLocalOrigin() - m_hPhysicsEnt->WorldSpaceCenter();
 								VectorNormalize(vecDir);
 								vecDir.z = 0;
 												
@@ -1462,7 +1462,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 								//If I'm near my goal, then just walk to it.
 								Activity aActivity = ACT_RUN;
 
-								if ( ( vecGoalPos - GetLocalOrigin() ).Length() <= 128 )
+								if ( ( vecGoalPos - GetEngineObject()->GetLocalOrigin() ).Length() <= 128 )
 									 aActivity = ACT_WALK;
 									 
 								GetNavigator()->SetGoal( AI_NavGoal_t( vecGoalPos, aActivity ),  AIN_NO_PATH_TASK_FAIL );
@@ -1476,7 +1476,7 @@ void CNPC_Dog::RunTask( const Task_t *pTask )
 
 				if ( flDirDot < 0.2 )
 				{
-					GetMotor()->SetIdealYawToTarget( m_hPhysicsEnt->GetAbsOrigin() );
+					GetMotor()->SetIdealYawToTarget( m_hPhysicsEnt->GetEngineObject()->GetAbsOrigin() );
 					GetMotor()->UpdateYaw();
 				}
 
@@ -1563,7 +1563,7 @@ void CNPC_Dog::StartTask( const Task_t *pTask )
 			Vector vecGoalPos;
 			Vector vecDir;
 
-			vecDir = GetLocalOrigin() - m_hPhysicsEnt->WorldSpaceCenter();
+			vecDir = GetEngineObject()->GetLocalOrigin() - m_hPhysicsEnt->WorldSpaceCenter();
 			VectorNormalize(vecDir);
 			vecDir.z = 0;
 		
@@ -1578,7 +1578,7 @@ void CNPC_Dog::StartTask( const Task_t *pTask )
 			//If I'm near my goal, then just walk to it.
 			Activity aActivity = ACT_RUN;
 
-			if ( ( vecGoalPos - GetLocalOrigin() ).Length() <= 128 )
+			if ( ( vecGoalPos - GetEngineObject()->GetLocalOrigin() ).Length() <= 128 )
 				 aActivity = ACT_WALK;
 
 			if ( GetNavigator()->SetGoal( AI_NavGoal_t( vecGoalPos, aActivity ), AIN_NO_PATH_TASK_FAIL ) == false )
@@ -1613,7 +1613,7 @@ void CNPC_Dog::StartTask( const Task_t *pTask )
 
 			Vector vecDir;
 
-			vecDir = m_hPhysicsEnt->WorldSpaceCenter() - GetLocalOrigin();
+			vecDir = m_hPhysicsEnt->WorldSpaceCenter() - GetEngineObject()->GetLocalOrigin();
 			VectorNormalize(vecDir);
 
 			GetMotor()->SetIdealYaw( UTIL_VecToYaw( vecDir ) );

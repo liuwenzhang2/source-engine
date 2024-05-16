@@ -263,7 +263,7 @@ void CDODMapOverview::DrawCamera()
 		memset( &obj, 0, sizeof(MapObject_t) );
 
 		obj.icon = iTexture;
-		obj.position = localPlayer->GetAbsOrigin();
+		obj.position = localPlayer->GetEngineObject()->GetAbsOrigin();
 		obj.size = m_flIconSize * 1.5;
 		obj.angle = localPlayer->EyeAngles();
 		obj.status = -1;

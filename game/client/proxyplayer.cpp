@@ -150,7 +150,7 @@ void CPlayerViewProxy::OnBind( void *pC_BaseEntity )
 	VectorNormalize( delta );
 
 	Vector forward;
-	AngleVectors( pPlayer->GetAbsAngles(), &forward );
+	AngleVectors( pPlayer->GetEngineObject()->GetAbsAngles(), &forward );
 
 	Assert( m_pResult );
 	SetFloatResult( DotProduct( forward, delta ) * m_Factor );
@@ -194,7 +194,7 @@ void CPlayerSpeedProxy::OnBind( void *pC_BaseEntity )
 		return;
 
 	Assert( m_pResult );
-	SetFloatResult( pPlayer->GetLocalVelocity().Length() * m_Factor );
+	SetFloatResult( pPlayer->GetEngineObject()->GetLocalVelocity().Length() * m_Factor );
 
 	if ( ToolsEnabled() )
 	{
@@ -268,7 +268,7 @@ void CEntitySpeedProxy::OnBind( void *pC_BaseEntity )
 	C_BaseEntity *pEntity = BindArgToEntity( pC_BaseEntity );
 
 	Assert( m_pResult );
-	m_pResult->SetFloatValue( pEntity->GetLocalVelocity().Length() );
+	m_pResult->SetFloatValue( pEntity->GetEngineObject()->GetLocalVelocity().Length() );
 
 	if ( ToolsEnabled() )
 	{

@@ -126,7 +126,7 @@ void C_ColorCorrection::ClientThink()
 	if( !pPlayer )
 		return;
 
-	Vector playerOrigin = pPlayer->GetAbsOrigin();
+	Vector playerOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	float weight = 0;
 	if ( ( m_minFalloff != -1 ) && ( m_maxFalloff != -1 ) && m_minFalloff != m_maxFalloff )

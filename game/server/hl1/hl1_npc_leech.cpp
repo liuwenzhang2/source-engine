@@ -205,20 +205,20 @@ void CNPC_Leech::DeadThink( void )
 	SetNextThink( gpGlobals->curtime + 0.1 );
 
 	// Apply damage velocity, but keep out of the walls
-	if ( GetAbsVelocity().x != 0 || GetAbsVelocity().y != 0 )
+	if (GetEngineObject()->GetAbsVelocity().x != 0 || GetEngineObject()->GetAbsVelocity().y != 0 )
 	{
 		trace_t tr;
 
 		// Look 0.5 seconds ahead
-		UTIL_TraceLine( GetLocalOrigin(), GetLocalOrigin() + GetAbsVelocity() * 0.5, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
+		UTIL_TraceLine(GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalOrigin() + GetEngineObject()->GetAbsVelocity() * 0.5, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
 		if (tr.fraction != 1.0)
 		{
-			Vector vVelocity = GetAbsVelocity();
+			Vector vVelocity = GetEngineObject()->GetAbsVelocity();
 
 			vVelocity.x = 0;
 			vVelocity.y = 0;
 
-			SetAbsVelocity( vVelocity );
+			GetEngineObject()->SetAbsVelocity( vVelocity );
 		}
 	}
 }
@@ -239,10 +239,10 @@ void CNPC_Leech::Touch( CBaseEntity *pOther )
 
 	if ( pOther == GetTouchTrace().m_pEnt )
 	{
-		if ( pOther->GetAbsVelocity() == vec3_origin )
+		if ( pOther->GetEngineObject()->GetAbsVelocity() == vec3_origin )
 			 return;
 
-		SetBaseVelocity( pOther->GetAbsVelocity() );
+		SetBaseVelocity( pOther->GetEngineObject()->GetAbsVelocity() );
 		AddFlag( FL_BASEVELOCITY );
 	}
 }
@@ -264,10 +264,10 @@ void CNPC_Leech::HandleAnimEvent( animevent_t *pEvent )
 		{
 			Vector dir, face;
 	
-			AngleVectors( GetAbsAngles(), &face );
+			AngleVectors(GetEngineObject()->GetAbsAngles(), &face );
 			
 			face.z = 0;
-			dir = (pEnemy->GetLocalOrigin() - GetLocalOrigin() );
+			dir = (pEnemy->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin() );
 			dir.z = 0;
 			
 			VectorNormalize( dir );
@@ -276,7 +276,7 @@ void CNPC_Leech::HandleAnimEvent( animevent_t *pEvent )
 			if ( DotProduct(dir, face) > 0.9 )		// Only take damage if the leech is facing the prey
 			{
 				CTakeDamageInfo info( this, this, sk_leech_dmg_bite.GetInt(), DMG_SLASH );
-				CalculateMeleeDamageForce( &info, dir, pEnemy->GetAbsOrigin() );
+				CalculateMeleeDamageForce( &info, dir, pEnemy->GetEngineObject()->GetAbsOrigin() );
 				pEnemy->TakeDamage( info );
 			}
 		}
@@ -346,18 +346,18 @@ void CNPC_Leech::SwitchLeechState( void )
 void CNPC_Leech::RecalculateWaterlevel( void )
 {
 	// Calculate boundaries
-	Vector vecTest = GetLocalOrigin() - Vector(0,0,400);
+	Vector vecTest = GetEngineObject()->GetLocalOrigin() - Vector(0,0,400);
 
 	trace_t tr;
 
-	UTIL_TraceLine( GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
+	UTIL_TraceLine(GetEngineObject()->GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
 	
 	if ( tr.fraction != 1.0 )
 		m_bottom = tr.endpos.z + 1;
 	else
 		m_bottom = vecTest.z;
 
-	m_top = UTIL_WaterLevel( GetLocalOrigin(), GetLocalOrigin().z, GetLocalOrigin().z + 400 ) - 1;
+	m_top = UTIL_WaterLevel(GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalOrigin().z, GetEngineObject()->GetLocalOrigin().z + 400 ) - 1;
 
 #if DEBUG_BEAMS
 	NDebugOverlay::Line( GetLocalOrigin(), GetLocalOrigin() + Vector( 0, 0, m_bottom ), 0, 255, 0, false, 0.1f );
@@ -409,22 +409,22 @@ void CNPC_Leech::SwimThink( void )
 		else
 		{
 			// Chase the enemy's eyes
-			m_height = pTarget->GetLocalOrigin().z + pTarget->GetViewOffset().z - 5;
+			m_height = pTarget->GetEngineObject()->GetLocalOrigin().z + pTarget->GetViewOffset().z - 5;
 			// Clip to viable water area
 			if ( m_height < m_bottom )
 				m_height = m_bottom;
 			else if ( m_height > m_top )
 				m_height = m_top;
-			Vector location = pTarget->GetLocalOrigin() - GetLocalOrigin();
+			Vector location = pTarget->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin();
 			location.z += (pTarget->GetViewOffset().z);
 			if ( location.Length() < 80 )
 				SetCondition( COND_CAN_MELEE_ATTACK1 );
 			// Turn towards target ent
 			targetYaw = UTIL_VecToYaw( location );
 
-			QAngle vTestAngle = GetAbsAngles();
+			QAngle vTestAngle = GetEngineObject()->GetAbsAngles();
 			
-			targetYaw = UTIL_AngleDiff( targetYaw, UTIL_AngleMod( GetAbsAngles().y ) );
+			targetYaw = UTIL_AngleDiff( targetYaw, UTIL_AngleMod(GetEngineObject()->GetAbsAngles().y ) );
 
 			if ( targetYaw < (-LEECH_TURN_RATE) )
 				targetYaw = (-LEECH_TURN_RATE);
@@ -447,7 +447,7 @@ void CNPC_Leech::SwimThink( void )
 			targetYaw = random->RandomInt( -30, 30 );
 		pTarget = NULL;
 		// oldorigin test
-		if ( ( GetLocalOrigin() - m_oldOrigin ).Length() < 1 )
+		if ( (GetEngineObject()->GetLocalOrigin() - m_oldOrigin ).Length() < 1 )
 		{
 			// If leech didn't move, there must be something blocking it, so try to turn
 			m_sideTime = 0;
@@ -457,13 +457,13 @@ void CNPC_Leech::SwimThink( void )
 	}
 
 	m_obstacle = ObstacleDistance( pTarget );
-	m_oldOrigin = GetLocalOrigin();
+	m_oldOrigin = GetEngineObject()->GetLocalOrigin();
 	if ( m_obstacle < 0.1 )
 		m_obstacle = 0.1;
 
 	Vector vForward, vRight;
 
-	AngleVectors( GetAbsAngles(), &vForward, &vRight, NULL );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward, &vRight, NULL );
 
 	// is the way ahead clear?
 	if ( m_obstacle == 1.0 )
@@ -476,7 +476,7 @@ void CNPC_Leech::SwimThink( void )
 
 		m_fPathBlocked = FALSE;
 		m_flSpeed = UTIL_Approach( targetSpeed, m_flSpeed, LEECH_SWIM_ACCEL * LEECH_FRAMETIME );
-		SetAbsVelocity( vForward * m_flSpeed );
+		GetEngineObject()->SetAbsVelocity( vForward * m_flSpeed );
 
 	}
 	else
@@ -489,12 +489,12 @@ void CNPC_Leech::SwimThink( void )
 		{
 			Vector vecTest;
 			// measure clearance on left and right to pick the best dir to turn
-			vecTest = GetLocalOrigin() + ( vRight * LEECH_SIZEX) + ( vForward * LEECH_CHECK_DIST);
-			UTIL_TraceLine( GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
+			vecTest = GetEngineObject()->GetLocalOrigin() + ( vRight * LEECH_SIZEX) + ( vForward * LEECH_CHECK_DIST);
+			UTIL_TraceLine(GetEngineObject()->GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
 			flRightSide = tr.fraction;
 
-			vecTest = GetLocalOrigin() + ( vRight * -LEECH_SIZEX) + ( vForward * LEECH_CHECK_DIST);
-			UTIL_TraceLine( GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
+			vecTest = GetEngineObject()->GetLocalOrigin() + ( vRight * -LEECH_SIZEX) + ( vForward * LEECH_CHECK_DIST);
+			UTIL_TraceLine(GetEngineObject()->GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
 			
 			flLeftSide = tr.fraction;
 
@@ -507,7 +507,7 @@ void CNPC_Leech::SwimThink( void )
 		}
 
 		m_flSpeed = UTIL_Approach( -(LEECH_SWIM_SPEED*0.5), m_flSpeed, LEECH_SWIM_DECEL * LEECH_FRAMETIME * m_obstacle );
-		SetAbsVelocity( vForward * m_flSpeed );
+		GetEngineObject()->SetAbsVelocity( vForward * m_flSpeed );
 	}
 	
 	GetMotor()->SetIdealYaw( m_flTurning + targetYaw );
@@ -525,13 +525,13 @@ float CNPC_Leech::ObstacleDistance( CBaseEntity *pTarget )
 
 	// use VELOCITY, not angles, not all boids point the direction they are flying
 	//Vector vecDir = UTIL_VecToAngles( pev->velocity );
-	QAngle tmp = GetAbsAngles();
+	QAngle tmp = GetEngineObject()->GetAbsAngles();
 	tmp.x = -tmp.x;
 	AngleVectors ( tmp, &vForward, &vRight, NULL );
 
 	// check for obstacle ahead
-	vecTest = GetLocalOrigin() + vForward * LEECH_CHECK_DIST;
-	UTIL_TraceLine( GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
+	vecTest = GetEngineObject()->GetLocalOrigin() + vForward * LEECH_CHECK_DIST;
+	UTIL_TraceLine(GetEngineObject()->GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
 
 	if ( tr.startsolid )
 	{
@@ -546,7 +546,7 @@ float CNPC_Leech::ObstacleDistance( CBaseEntity *pTarget )
 		}
 		else
 		{
-			if ( fabs( m_height - GetLocalOrigin().z ) > 10 )
+			if ( fabs( m_height - GetEngineObject()->GetLocalOrigin().z ) > 10 )
 				return tr.fraction;
 		}
 	}
@@ -554,14 +554,14 @@ float CNPC_Leech::ObstacleDistance( CBaseEntity *pTarget )
 	if ( m_sideTime < gpGlobals->curtime )
 	{
 		// extra wide checks
-		vecTest = GetLocalOrigin() + vRight * LEECH_SIZEX * 2 + vForward * LEECH_CHECK_DIST;
-		UTIL_TraceLine( GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
+		vecTest = GetEngineObject()->GetLocalOrigin() + vRight * LEECH_SIZEX * 2 + vForward * LEECH_CHECK_DIST;
+		UTIL_TraceLine(GetEngineObject()->GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
 
 		if (tr.fraction != 1.0)
 			return tr.fraction;
 
-		vecTest = GetLocalOrigin() - vRight * LEECH_SIZEX * 2 + vForward * LEECH_CHECK_DIST;
-		UTIL_TraceLine( GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
+		vecTest = GetEngineObject()->GetLocalOrigin() - vRight * LEECH_SIZEX * 2 + vForward * LEECH_CHECK_DIST;
+		UTIL_TraceLine(GetEngineObject()->GetLocalOrigin(), vecTest, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
 		if (tr.fraction != 1.0)
 			return tr.fraction;
 
@@ -588,7 +588,7 @@ void CNPC_Leech::UpdateMotion( void )
 	m_flPlaybackRate = flapspeed;
 
 	QAngle vAngularVelocity = GetLocalAngularVelocity();
-	QAngle vAngles = GetLocalAngles();
+	QAngle vAngles = GetEngineObject()->GetLocalAngles();
 
 	if ( !m_fPathBlocked )
 		vAngularVelocity.y = GetMotor()->GetIdealYaw();
@@ -604,7 +604,7 @@ void CNPC_Leech::UpdateMotion( void )
 
 	// lean
 	float targetPitch, delta;
-	delta = m_height - GetLocalOrigin().z;
+	delta = m_height - GetEngineObject()->GetLocalOrigin().z;
 
 /*	if ( delta < -10 )
 		targetPitch = -30;
@@ -626,7 +626,7 @@ void CNPC_Leech::UpdateMotion( void )
 	{
 		SetMoveType( MOVETYPE_FLYGRAVITY );
 		SetIdealActivity( ACT_HOP );
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 		// Animation will intersect the floor if either of these is non-zero
 		vAngles.z = 0;
@@ -652,7 +652,7 @@ void CNPC_Leech::UpdateMotion( void )
 	
 	DispatchAnimEvents ( this );
 
-	SetLocalAngles( vAngles );
+	GetEngineObject()->SetLocalAngles( vAngles );
 	SetLocalAngularVelocity( vAngularVelocity );
 
 	Vector vForward, vRight;
@@ -691,23 +691,23 @@ void CNPC_Leech::Event_Killed( const CTakeDamageInfo &info )
 	// When we hit the ground, play the "death_end" activity
 	if ( GetWaterLevel() )
 	{
-		QAngle qAngles = GetAbsAngles();
+		QAngle qAngles = GetEngineObject()->GetAbsAngles();
 		QAngle qAngularVel = GetLocalAngularVelocity();
-		Vector  vOrigin = GetLocalOrigin();
+		Vector  vOrigin = GetEngineObject()->GetLocalOrigin();
 
 		qAngles.z = 0;
 		qAngles.x = 0;
 
 		vOrigin.z += 1;
 
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 		if ( random->RandomInt( 0, 99 ) < 70 )
 			 qAngularVel.y = random->RandomInt( -720, 720 );
 
-		SetAbsAngles( qAngles );
+		GetEngineObject()->SetAbsAngles( qAngles );
 		SetLocalAngularVelocity( qAngularVel );
-		SetAbsOrigin( vOrigin );
+		GetEngineObject()->SetAbsOrigin( vOrigin );
 
 		
 		SetGravity ( 0.02 );

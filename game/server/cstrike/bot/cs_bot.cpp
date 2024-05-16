@@ -171,7 +171,7 @@ void CCSBot::Event_Killed( const CTakeDamageInfo &info )
 	// increase the danger where we died
 	const float deathDanger = 1.0f;
 	const float deathDangerRadius = 500.0f;
-	TheNavMesh->IncreaseDangerNearby( GetTeamNumber(), deathDanger, m_lastKnownArea, GetAbsOrigin(), deathDangerRadius );
+	TheNavMesh->IncreaseDangerNearby( GetTeamNumber(), deathDanger, m_lastKnownArea, GetEngineObject()->GetAbsOrigin(), deathDangerRadius );
 
 	// end voice feedback
 	m_voiceEndTimestamp = 0.0f;
@@ -458,7 +458,7 @@ bool CCSBot::CanSeeLooseBomb( void ) const
 
 	if (bomb)
 	{
-		if (IsVisible( bomb->GetAbsOrigin(), CHECK_FOV ))
+		if (IsVisible( bomb->GetEngineObject()->GetAbsOrigin(), CHECK_FOV ))
 			return true;
 	}
 
@@ -663,7 +663,7 @@ CCSPlayer *CCSBot::GetImportantEnemy( bool checkVisibility ) const
 			continue;
 
 		// is it closest?
-		Vector d = GetAbsOrigin() - player->GetAbsOrigin();
+		Vector d = GetEngineObject()->GetAbsOrigin() - player->GetEngineObject()->GetAbsOrigin();
 		float distSq = d.x*d.x + d.y*d.y + d.z*d.z;
 		if (distSq < nearDist)
 		{
@@ -982,7 +982,7 @@ public:
 	{
 		if (hostage->IsFollowing( m_me ))
 		{
-			float range = (hostage->GetAbsOrigin() - m_me->GetAbsOrigin()).Length();
+			float range = (hostage->GetEngineObject()->GetAbsOrigin() - m_me->GetEngineObject()->GetAbsOrigin()).Length();
 			if (range > m_farRange)
 			{
 				m_farRange = range;

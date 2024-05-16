@@ -38,7 +38,7 @@ public:
 
 	bool FarFromFollowTarget( void )
 	{ 
-		return ( GetFollowTarget() && (GetAbsOrigin() - GetFollowTarget()->GetAbsOrigin()).LengthSqr() > ANTLION_FOLLOW_DISTANCE_SQR ); 
+		return ( GetFollowTarget() && (GetAbsOrigin() - GetFollowTarget()->GetEngineObject()->GetAbsOrigin()).LengthSqr() > ANTLION_FOLLOW_DISTANCE_SQR );
 	}
 
 	bool ShouldFollow( void )

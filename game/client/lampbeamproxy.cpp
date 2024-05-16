@@ -72,7 +72,7 @@ void CLampBeamProxy::OnBind( C_BaseEntity *pEnt )
 	if ( !m_pFadeValue )
 		return;
 
-	Vector vecLocal = pEnt->GetAbsOrigin() - CurrentViewOrigin();
+	Vector vecLocal = pEnt->GetEngineObject()->GetAbsOrigin() - CurrentViewOrigin();
 	VectorNormalize( vecLocal );
 
 	float fade = 1.0 - fabs( vecLocal.z );

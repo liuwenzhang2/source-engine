@@ -118,14 +118,14 @@ void CWeaponSnark::PrimaryAttack( void )
 	CSnark *pSnark = (CSnark*)Create( "monster_snark", tr.endpos, pPlayer->EyeAngles(), GetOwner() );
 	if ( pSnark )
 	{
-		pSnark->SetAbsVelocity( vecForward * 200 + pPlayer->GetAbsVelocity() );
+		pSnark->GetEngineObject()->SetAbsVelocity( vecForward * 200 + pPlayer->GetEngineObject()->GetAbsVelocity() );
 	}
 
 	// play hunt sound
 	CPASAttenuationFilter filter( this );
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "WpnSnark.PrimaryAttack" );
 
-	CSoundEnt::InsertSound( SOUND_DANGER, GetAbsOrigin(), 200, 0.2 );
+	CSoundEnt::InsertSound( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), 200, 0.2 );
 
 	pPlayer->RemoveAmmo( 1, m_iPrimaryAmmoType );
 

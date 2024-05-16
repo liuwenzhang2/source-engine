@@ -115,14 +115,14 @@ inline void ChasePath::Update( INextBot *bot, CBaseEntity *subject, const IPathC
 inline bool ChasePath::IsRepathNeeded( INextBot *bot, CBaseEntity *subject ) const
 {
 	// the closer we get, the more accurate our path needs to be
-	Vector to = subject->GetAbsOrigin() - bot->GetPosition();
+	Vector to = subject->GetEngineObject()->GetAbsOrigin() - bot->GetPosition();
 
 	const float minTolerance = 0.0f; // 25.0f;
 	const float toleranceRate = 0.33f; // 1.0f; // 0.15f;
 
 	float tolerance = minTolerance + toleranceRate * to.Length();
 
-	return ( subject->GetAbsOrigin() - GetEndPosition() ).IsLengthGreaterThan( tolerance );
+	return ( subject->GetEngineObject()->GetAbsOrigin() - GetEndPosition() ).IsLengthGreaterThan( tolerance );
 }
 
 
@@ -202,7 +202,7 @@ inline void ChasePath::RefreshPath( INextBot *bot, CBaseEntity *subject, const I
 	{
 		// the situation has changed - try a new path
 		bool isPath;
-		Vector pathTarget = subject->GetAbsOrigin();
+		Vector pathTarget = subject->GetEngineObject()->GetAbsOrigin();
 
 		if ( m_chaseHow == LEAD_SUBJECT )
 		{

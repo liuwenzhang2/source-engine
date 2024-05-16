@@ -124,8 +124,8 @@ void CPhysicsCloneArea::UpdatePosition( void )
 		}
 	}
 
-	SetAbsOrigin( m_pAttachedPortal->GetAbsOrigin() );
-	SetAbsAngles( m_pAttachedPortal->GetAbsAngles() );
+	GetEngineObject()->SetAbsOrigin( m_pAttachedPortal->GetEngineObject()->GetAbsOrigin() );
+	GetEngineObject()->SetAbsAngles( m_pAttachedPortal->GetEngineObject()->GetAbsAngles() );
 	m_bActive = m_pAttachedPortal->m_bActivated;
 
 	//NDebugOverlay::EntityBounds( this, 0, 0, 255, 25, 5.0f );
@@ -141,8 +141,8 @@ void CPhysicsCloneArea::CloneNearbyEntities( void )
 	Vector vForward, vUp, vRight;
 	GetVectors( &vForward, &vRight, &vUp );
 
-	Vector ptOrigin = GetAbsOrigin();
-	QAngle qAngles = GetAbsAngles();
+	Vector ptOrigin = GetEngineObject()->GetAbsOrigin();
+	QAngle qAngles = GetEngineObject()->GetAbsAngles();
 
 	Vector ptOBBStart = ptOrigin;
 	ptOBBStart += vForward * vLocalMins.x;

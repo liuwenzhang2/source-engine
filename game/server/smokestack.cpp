@@ -151,7 +151,7 @@ void CSmokeStack::Activate()
 
 		pInfo->m_flIntensity = pLight->m_flIntensity;
 		pInfo->m_vColor = pLight->m_vColor;
-		pInfo->m_vPos = pLight->GetAbsOrigin();
+		pInfo->m_vPos = pLight->GetEngineObject()->GetAbsOrigin();
 	}
 
 	// Put our light colors in 0-1 space.

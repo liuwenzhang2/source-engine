@@ -242,8 +242,8 @@ bool CBoneFollower::Init( CBaseEntity *pOwner, const char *pModelName, solid_t &
 
 	m_modelIndex = modelinfo->GetModelIndex( pModelName );
 	m_solidIndex = solid.index;
-	SetAbsOrigin( position );
-	SetAbsAngles( orientation );
+	GetEngineObject()->SetAbsOrigin( position );
+	GetEngineObject()->SetAbsAngles( orientation );
 	SetMoveType( MOVETYPE_PUSH );
 	SetSolid( SOLID_VPHYSICS );
 	SetCollisionGroup( pOwner->GetCollisionGroup() );
@@ -285,8 +285,8 @@ void CBoneFollower::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 	pPhysics->GetPosition( &origin, &angles );
 
-	SetAbsOrigin( origin );
-	SetAbsAngles( angles );
+	GetEngineObject()->SetAbsOrigin( origin );
+	GetEngineObject()->SetAbsAngles( angles );
 }
 
 // a little helper class to temporarily change the physics object
@@ -357,7 +357,7 @@ bool CBoneFollower::TestCollision( const Ray_t &ray, unsigned int mask, trace_t&
 
 	UTIL_ClearTrace( trace );
 
-	physcollision->TraceBox( ray, pCollide->solids[m_solidIndex], GetAbsOrigin(), GetAbsAngles(), &trace );
+	physcollision->TraceBox( ray, pCollide->solids[m_solidIndex], GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
 
 	if ( trace.fraction >= 1 )
 		return false;

@@ -127,7 +127,7 @@ bool CNeurotoxinCountdown::KeyValue( const char *szKeyName, const char *szValue 
 		MatrixBuildRotateZ( rotation, 90 );
 		MatrixMultiply( tmp, rotation, mat );
 		MatrixToAngles( mat, angles );
-		SetAbsAngles( angles );
+		GetEngineObject()->SetAbsAngles( angles );
 
 		return true;
 	}

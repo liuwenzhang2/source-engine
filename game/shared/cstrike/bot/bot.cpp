@@ -31,7 +31,7 @@ int g_botInitTeam = 0;
 ActiveGrenade::ActiveGrenade( CBaseGrenade *grenadeEntity )
 {
 	m_entity = grenadeEntity;
-	m_detonationPosition = grenadeEntity->GetAbsOrigin();
+	m_detonationPosition = grenadeEntity->GetEngineObject()->GetAbsOrigin();
 	m_dieTimestamp = 0.0f;
 	m_radius = HEGrenadeRadius;
 
@@ -69,7 +69,7 @@ void ActiveGrenade::Update( void )
 {
 	if (m_entity != NULL)
 	{
-		m_detonationPosition = m_entity->GetAbsOrigin();
+		m_detonationPosition = m_entity->GetEngineObject()->GetAbsOrigin();
 	}
 }
 
@@ -104,6 +104,6 @@ const Vector &ActiveGrenade::GetPosition( void ) const
 	if (m_entity == NULL)
 		return GetDetonationPosition();
 
-	return m_entity->GetAbsOrigin();
+	return m_entity->GetEngineObject()->GetAbsOrigin();
 }
 

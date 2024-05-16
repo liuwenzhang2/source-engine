@@ -95,17 +95,17 @@ void CNPC_Portal_GroundTurret::Spawn( void )
 	m_flTimeNextShoot = gpGlobals->curtime;
 	m_flTimeNextPing = gpGlobals->curtime;
 
-	m_vecClosedPos = GetAbsOrigin();
+	m_vecClosedPos = GetEngineObject()->GetAbsOrigin();
 
 	StudioFrameAdvance();
 
 	Vector vecPos;
 
 	GetAttachment( "eyes", vecPos );
-	SetViewOffset( vecPos - GetAbsOrigin() );
+	SetViewOffset( vecPos - GetEngineObject()->GetAbsOrigin() );
 
 	GetAttachment( "light", vecPos );
-	m_vecLightOffset = vecPos - GetAbsOrigin();
+	m_vecLightOffset = vecPos - GetEngineObject()->GetAbsOrigin();
 }
 
 float CNPC_Portal_GroundTurret::GetAttackDamageScale( CBaseEntity *pVictim )
@@ -244,21 +244,21 @@ void CNPC_Portal_GroundTurret::Scan( void )
 
 	QAngle	scanAngle;
 	Vector	forward;
-	Vector	vecEye = GetAbsOrigin() + m_vecLightOffset;
+	Vector	vecEye = GetEngineObject()->GetAbsOrigin() + m_vecLightOffset;
 
 	// Draw the outer extents
-	scanAngle = GetAbsAngles();
+	scanAngle = GetEngineObject()->GetAbsAngles();
 	scanAngle.y += (m_fViewconeDegrees / 2.0f);
 	AngleVectors( scanAngle, &forward, NULL, NULL );
 	ProjectBeam( vecEye, forward, 1, 30, 0.1 );
 
-	scanAngle = GetAbsAngles();
+	scanAngle = GetEngineObject()->GetAbsAngles();
 	scanAngle.y -= (m_fViewconeDegrees / 2.0f);
 	AngleVectors( scanAngle, &forward, NULL, NULL );
 	ProjectBeam( vecEye, forward, 1, 30, 0.1 );
 
 	// Draw a sweeping beam
-	scanAngle = GetAbsAngles();
+	scanAngle = GetEngineObject()->GetAbsAngles();
 	scanAngle.y += (m_fViewconeDegrees / 2.0f) * sin( gpGlobals->curtime * 6.0f );
 	AngleVectors( scanAngle, &forward, NULL, NULL );
 	ProjectBeam( vecEye, forward, 1, 30, 0.3 );

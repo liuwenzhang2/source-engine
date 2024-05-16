@@ -774,14 +774,14 @@ bool ShouldRemoveThisRagdoll( CBaseAnimating *pRagdoll )
 	if( !UTIL_FindClientInPVS( pRagdoll ) )
 	{
 		if ( g_debug_ragdoll_removal.GetBool() )
-			 NDebugOverlay::Line( pRagdoll->GetAbsOrigin(), pRagdoll->GetAbsOrigin() + Vector( 0, 0, 64 ), 0, 255, 0, true, 5 );
+			 NDebugOverlay::Line( pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 64 ), 0, 255, 0, true, 5 );
 
 		return true;
 	}
 	else if( !pPlayer->FInViewCone( pRagdoll ) )
 	{
 		if ( g_debug_ragdoll_removal.GetBool() )
-			 NDebugOverlay::Line( pRagdoll->GetAbsOrigin(), pRagdoll->GetAbsOrigin() + Vector( 0, 0, 64 ), 0, 0, 255, true, 5 );
+			 NDebugOverlay::Line( pRagdoll->GetEngineObject()->GetAbsOrigin(), pRagdoll->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 64 ), 0, 0, 255, true, 5 );
 		
 		return true;
 	}
@@ -872,7 +872,7 @@ void CRagdollLRURetirement::Update( float frametime ) // EPISODIC VERSION
 
 	if (pPlayer && m_LRU.Count() > iMaxRagdollCount) // find the furthest one algorithm
 	{
-		Vector PlayerOrigin = pPlayer->GetAbsOrigin();
+		Vector PlayerOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
 		// const CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 	
 		for ( i = m_LRU.Head(); i < m_LRU.InvalidIndex(); i = next )
@@ -887,7 +887,7 @@ void CRagdollLRURetirement::Update( float frametime ) // EPISODIC VERSION
 			if ( pRagdoll )
 			{
 				// float distToPlayer = (pPlayer->GetAbsOrigin() - pRagdoll->GetAbsOrigin()).LengthSqr();
-				float distToPlayer = (PlayerOrigin - pRagdoll->GetAbsOrigin()).LengthSqr();
+				float distToPlayer = (PlayerOrigin - pRagdoll->GetEngineObject()->GetAbsOrigin()).LengthSqr();
 
 				if (distToPlayer > furthestDistSq)
 				{
@@ -1098,7 +1098,7 @@ C_EntityDissolve *DissolveEffect( C_BaseEntity *pTarget, float flTime )
 		pTarget->AddFlag( FL_DISSOLVING );
 		pDissolve->GetEngineObject()->SetParent( pTarget->GetEngineObject());
 		pDissolve->OnDataChanged( DATA_UPDATE_CREATED );
-		pDissolve->SetAbsOrigin( pTarget->GetAbsOrigin() );
+		pDissolve->GetEngineObject()->SetAbsOrigin( pTarget->GetEngineObject()->GetAbsOrigin() );
 
 		pDissolve->m_flStartTime = flTime;
 		pDissolve->m_flFadeOutStart = DEFAULT_FADE_START;
@@ -1139,7 +1139,7 @@ C_EntityFlame *FireEffect( C_BaseAnimating *pTarget, C_BaseEntity *pServerFire, 
 		pFire->m_hEntAttached = (C_BaseEntity *) pTarget;
 
 		pFire->OnDataChanged( DATA_UPDATE_CREATED );
-		pFire->SetAbsOrigin( pTarget->GetAbsOrigin() );
+		pFire->GetEngineObject()->SetAbsOrigin( pTarget->GetEngineObject()->GetAbsOrigin() );
 
 #ifdef HL2_EPISODIC
 		if ( pServerFire )

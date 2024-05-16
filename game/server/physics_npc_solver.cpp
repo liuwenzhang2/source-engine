@@ -186,7 +186,7 @@ bool CPhysicsNPCSolver::IsIntersecting()
 		Vector mins = pNPC->WorldAlignMins() - Vector(1,1,1);
 		Vector maxs = pNPC->WorldAlignMaxs() + Vector(1,1,1);
 
-		ray.Init( pNPC->GetAbsOrigin(), pNPC->GetAbsOrigin(), mins, maxs );
+		ray.Init( pNPC->GetEngineObject()->GetAbsOrigin(), pNPC->GetEngineObject()->GetAbsOrigin(), mins, maxs );
 		trace_t tr;
 		enginetrace->ClipRayToEntity( ray, pNPC->PhysicsSolidMaskForEntity(), pPhysics, &tr );
 		if ( tr.startsolid )
@@ -197,7 +197,7 @@ bool CPhysicsNPCSolver::IsIntersecting()
 
 bool CPhysicsNPCSolver::IsContactOnNPCHead( IPhysicsFrictionSnapshot *pSnapshot, IPhysicsObject *pPhysics, CAI_BaseNPC *pNPC )
 {
-	float heightCheck = pNPC->GetAbsOrigin().z + pNPC->GetHullMaxs().z;
+	float heightCheck = pNPC->GetEngineObject()->GetAbsOrigin().z + pNPC->GetHullMaxs().z;
 	Vector vel, point;
 	pPhysics->GetVelocity( &vel, NULL );
 	pSnapshot->GetContactPoint( point );
@@ -318,7 +318,7 @@ IMotionEvent::simresult_e CPhysicsNPCSolver::Simulate( IPhysicsMotionController 
 		Vector origin, vel;
 		pObject->GetPosition( &origin, NULL );
 		pObject->GetVelocity( &vel, NULL );
-		Vector dir = origin - m_hNPC->GetAbsOrigin();
+		Vector dir = origin - m_hNPC->GetEngineObject()->GetAbsOrigin();
 		dir.z = dir.z > 0 ? 0.1f : -0.1f;
 		VectorNormalize(dir);
 		AngularImpulse angVel;

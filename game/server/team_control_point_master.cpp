@@ -273,7 +273,7 @@ bool CTeamControlPointMaster::FindControlPoints( void )
 
 		ObjectiveResource()->SetOwningTeam( iPointIndex, pPoint->GetOwner() );
 		ObjectiveResource()->SetCPVisible( iPointIndex, pPoint->PointIsVisible() );
-		ObjectiveResource()->SetCPPosition( iPointIndex, pPoint->GetAbsOrigin() );
+		ObjectiveResource()->SetCPPosition( iPointIndex, pPoint->GetEngineObject()->GetAbsOrigin() );
 		ObjectiveResource()->SetWarnOnCap( iPointIndex, pPoint->GetWarnOnCap() );
 		ObjectiveResource()->SetWarnSound( iPointIndex, pPoint->GetWarnSound() );
 		ObjectiveResource()->SetCPGroup( iPointIndex, pPoint->GetCPGroup() );

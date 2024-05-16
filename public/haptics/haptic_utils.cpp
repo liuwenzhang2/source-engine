@@ -227,7 +227,7 @@ void UpdateAvatarEffect(void)
 	if(!pPlayer)
 		return;
 
-	eye = pPlayer->GetAbsAngles();
+	eye = pPlayer->GetEngineObject()->GetAbsAngles();
 
 	if(pPlayer->IsInAVehicle() && pPlayer->GetVehicle())
 	{
@@ -244,10 +244,10 @@ void UpdateAvatarEffect(void)
 	}
 	else
 	{
-		vel = pPlayer->GetAbsVelocity();
+		vel = pPlayer->GetEngineObject()->GetAbsVelocity();
 	}
 
-	Vector PlayerVel = pPlayer->GetAbsVelocity();
+	Vector PlayerVel = pPlayer->GetEngineObject()->GetAbsVelocity();
 
 	//Choreo vehicles use player avatar and don't produce their own velocity
 	if(!pPlayer->GetVehicle() || abs(vvel.Length()) == 0 )
@@ -292,8 +292,8 @@ void HapticsDamage(CBasePlayer* pPlayer, const CTakeDamageInfo &info)
 		return;
 	}
 	// Player Data
-	Vector playerPosition = pPlayer->GetLocalOrigin();
-	Vector inflictorPosition = eInflictor->GetLocalOrigin();
+	Vector playerPosition = pPlayer->GetEngineObject()->GetLocalOrigin();
+	Vector inflictorPosition = eInflictor->GetEngineObject()->GetLocalOrigin();
 
 	Vector posWithDir = playerPosition + (playerPosition - inflictorPosition);
 	pPlayer->GetEngineObject()->WorldToEntitySpace(posWithDir, &DamageDirection);

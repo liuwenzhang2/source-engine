@@ -83,7 +83,7 @@ void C_NextBotCombatCharacter::UpdateShadowLOD( void )
 		{
 			if ( C_BasePlayer::GetLocalPlayer() )
 			{
-				Vector delta = GetAbsOrigin() - C_BasePlayer::GetLocalPlayer()->GetAbsOrigin();
+				Vector delta = GetEngineObject()->GetAbsOrigin() - C_BasePlayer::GetLocalPlayer()->GetEngineObject()->GetAbsOrigin();
 #endif
 				if ( delta.IsLengthLessThan( NextBotShadowDist.GetFloat() ) )
 				{

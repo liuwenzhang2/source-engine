@@ -190,7 +190,7 @@ void C_GrenadeTrail::Start( CParticleMgr *pParticleMgr, IPrototypeArgAccess *pAr
 		return;
 	}
 
-	m_pSmokeEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pSmokeEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 	m_pSmokeEmitter->SetNearClip( 64.0f, 128.0f );
 
 	m_MaterialHandle[0] = g_Mat_DustPuff[0];
@@ -227,7 +227,7 @@ void C_GrenadeTrail::Update( float fTimeDelta )
 	Vector			offset;
 
 	Vector vecOrigin;
-	VectorMA( GetAbsOrigin(), -fTimeDelta, GetAbsVelocity(), vecOrigin );
+	VectorMA(GetEngineObject()->GetAbsOrigin(), -fTimeDelta, GetEngineObject()->GetAbsVelocity(), vecOrigin );
 
 	Vector vecForward;
 	GetEngineObject()->GetVectors( &vecForward, NULL, NULL );
@@ -238,7 +238,7 @@ void C_GrenadeTrail::Update( float fTimeDelta )
 
 		offset.Random( -m_SpawnRadius, m_SpawnRadius );
 		offset += vecOrigin;
-		VectorMA( offset, fldt, GetAbsVelocity(), offset );
+		VectorMA( offset, fldt, GetEngineObject()->GetAbsVelocity(), offset );
 
 		pParticle = (SimpleParticle *) m_pSmokeEmitter->AddParticle( sizeof( SimpleParticle ), m_MaterialHandle[random->RandomInt(0,1)], offset );
 

@@ -244,7 +244,7 @@ void CEnvEffectsScript::TrailEffectEvent( CEffectScriptElement *pEffect )
 		//Only one type of this effect active at a time.
 		if ( pEffect->m_pTrail == NULL )
 		{
-			pEffect->m_pTrail = CSpriteTrail::SpriteTrailCreate( pEffect->m_szMaterial, GetAbsOrigin(), true );
+			pEffect->m_pTrail = CSpriteTrail::SpriteTrailCreate( pEffect->m_szMaterial, GetEngineObject()->GetAbsOrigin(), true );
 			pEffect->m_pTrail->FollowEntity( this );
 			pEffect->m_pTrail->SetTransparency( pEffect->m_iRenderType, pEffect->m_iR, pEffect->m_iG, pEffect->m_iB, pEffect->m_iA, kRenderFxNone );
 			pEffect->m_pTrail->SetStartWidth( pEffect->m_flScale );
@@ -272,7 +272,7 @@ void CEnvEffectsScript::SpriteEffectEvent( CEffectScriptElement *pEffect )
 		//Only one type of this effect active at a time.
 		if ( pEffect->m_pSprite == NULL )
 		{
-			pEffect->m_pSprite = CSprite::SpriteCreate( pEffect->m_szMaterial, GetAbsOrigin(), true );
+			pEffect->m_pSprite = CSprite::SpriteCreate( pEffect->m_szMaterial, GetEngineObject()->GetAbsOrigin(), true );
 			pEffect->m_pSprite->FollowEntity( this );
 			pEffect->m_pSprite->SetTransparency( pEffect->m_iRenderType, pEffect->m_iR, pEffect->m_iG, pEffect->m_iB, pEffect->m_iA, kRenderFxNone );
 			pEffect->m_pSprite->SetScale( pEffect->m_flScale );
@@ -321,7 +321,7 @@ void CEnvEffectsScript::HandleAnimEvent ( animevent_t *pEvent )
 					pCurrent->m_pTrail->m_hAttachedToEntity = NULL;
 					pCurrent->m_pTrail->m_nAttachment = 0;
 
-					pCurrent->m_pTrail->SetAbsOrigin( vOrigin);
+					pCurrent->m_pTrail->GetEngineObject()->SetAbsOrigin( vOrigin);
 				}
 
 				pCurrent->m_pTrail->FadeAndDie( pCurrent->m_flFadeTime );
@@ -340,7 +340,7 @@ void CEnvEffectsScript::HandleAnimEvent ( animevent_t *pEvent )
 					pCurrent->m_pSprite->m_hAttachedToEntity = NULL;
 					pCurrent->m_pSprite->m_nAttachment = 0;
 
-					pCurrent->m_pSprite->SetAbsOrigin( vOrigin);
+					pCurrent->m_pSprite->GetEngineObject()->SetAbsOrigin( vOrigin);
 				}
 
 				pCurrent->m_pSprite->FadeAndDie( pCurrent->m_flFadeTime );

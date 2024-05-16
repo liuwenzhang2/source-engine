@@ -162,8 +162,8 @@ void CWeaponBugBait::Drop( const Vector &vecVelocity )
 		QAngle	angles;
 		VectorAngles( Vector(0,0,1), angles );
 
-		pSporeExplosion->SetAbsAngles( angles );
-		pSporeExplosion->SetAbsOrigin( GetAbsOrigin() );
+		pSporeExplosion->GetEngineObject()->SetAbsAngles( angles );
+		pSporeExplosion->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		pSporeExplosion->GetEngineObject()->SetParent( this->GetEngineObject() );
 
 		pSporeExplosion->m_flSpawnRate			= 16.0f;
@@ -243,7 +243,7 @@ void CWeaponBugBait::SecondaryAttack( void )
 
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Weapon_Bugbait.Splat" );
 
-	if ( CGrenadeBugBait::ActivateBugbaitTargets( GetOwner(), GetAbsOrigin(), true ) == false )
+	if ( CGrenadeBugBait::ActivateBugbaitTargets( GetOwner(), GetEngineObject()->GetAbsOrigin(), true ) == false )
 	{
 		g_AntlionMakerManager.BroadcastFollowGoal( GetOwner() );
 	}

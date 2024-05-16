@@ -214,7 +214,7 @@ void Bot_Think( CDODPlayer *pBot )
 	byte  impulse = 0;
 	float frametime = gpGlobals->frametime;
 
-	vecViewAngles = pBot->GetLocalAngles();
+	vecViewAngles = pBot->GetEngineObject()->GetLocalAngles();
 
 
 	// Create some random values
@@ -265,14 +265,14 @@ void Bot_Think( CDODPlayer *pBot )
 				angledelta = -angledelta;
 			}
 
-			angle = pBot->GetLocalAngles();
+			angle = pBot->GetEngineObject()->GetLocalAngles();
 
 			Vector vecSrc;
 			while ( --maxtries >= 0 )
 			{
 				AngleVectors( angle, &forward );
 
-				vecSrc = pBot->GetLocalOrigin() + Vector( 0, 0, 36 );
+				vecSrc = pBot->GetEngineObject()->GetLocalOrigin() + Vector( 0, 0, 36 );
 
 				vecEnd = vecSrc + forward * 10;
 
@@ -327,7 +327,7 @@ void Bot_Think( CDODPlayer *pBot )
 				}
 			}
 
-			pBot->SetLocalAngles( angle );
+			pBot->GetEngineObject()->SetLocalAngles( angle );
 			vecViewAngles = angle;
 		}
 
@@ -444,10 +444,10 @@ void Bot_Think( CDODPlayer *pBot )
 			buttons |= IN_WALK;
 		}
 
-		pBot->SetLocalAngles( botdata->lastAngles );
+		pBot->GetEngineObject()->SetLocalAngles( botdata->lastAngles );
 	}
 
-	RunPlayerMove( pBot, pBot->GetLocalAngles(), forwardmove, sidemove, upmove, buttons, impulse, frametime );
+	RunPlayerMove( pBot, pBot->GetEngineObject()->GetLocalAngles(), forwardmove, sidemove, upmove, buttons, impulse, frametime );
 }
 
 

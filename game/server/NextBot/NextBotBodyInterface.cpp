@@ -27,7 +27,7 @@ void IBody::AimHeadTowards( CBaseEntity *subject, LookAtPriorityType priority, f
 
 bool IBody::SetPosition( const Vector &pos )
 {
-	GetBot()->GetEntity()->SetAbsOrigin( pos );
+	GetBot()->GetEntity()->GetEngineObject()->SetAbsOrigin( pos );
 	return true;
 }
 

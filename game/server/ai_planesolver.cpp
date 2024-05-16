@@ -80,7 +80,7 @@ inline CAI_Motor *CAI_PlaneSolver::GetMotor()
 
 inline const Vector &CAI_PlaneSolver::GetLocalOrigin()
 {
-	return m_pNpc->GetLocalOrigin();
+	return m_pNpc->GetEngineObject()->GetLocalOrigin();
 }
 
 //-----------------------------------------------------------------------------
@@ -257,7 +257,7 @@ void CAI_PlaneSolver::GenerateSuggestionFromTrace( const AILocalMoveGoal_t &goal
 	
 	if ( moveTrace.fStatus == AIMR_BLOCKED_NPC )
 	{
-		Vector vecToOther = moveTrace.pObstruction->GetLocalOrigin() - GetLocalOrigin();
+		Vector vecToOther = moveTrace.pObstruction->GetEngineObject()->GetLocalOrigin() - GetLocalOrigin();
 		
 		CrossProduct(vecToEnd, vecToOther, crossProduct);
 
@@ -342,7 +342,7 @@ void CAI_PlaneSolver::GenerateObstacleNpcs( const AILocalMoveGoal_t &goal, float
 				if ( mins.z < maxsSelf.z + 12.0 && maxs.z > minsSelf.z - 12.0 )
 				{
 					float radius = (mins.AsVector2D() - maxs.AsVector2D()).Length() * 0.5;
-					float distance = ( pAI->GetAbsOrigin().AsVector2D() - m_pNpc->GetAbsOrigin().AsVector2D() ).Length();
+					float distance = ( pAI->GetEngineObject()->GetAbsOrigin().AsVector2D() - m_pNpc->GetEngineObject()->GetAbsOrigin().AsVector2D() ).Length();
 					if ( distance - radius < radiusSelf + probeDist )
 					{
 						AddObstacle( pAI->WorldSpaceCenter(), radius, pAI, AIMST_AVOID_NPC );
@@ -360,7 +360,7 @@ void CAI_PlaneSolver::GenerateObstacleNpcs( const AILocalMoveGoal_t &goal, float
 			if ( mins.z < maxsSelf.z + 12.0 && maxs.z > minsSelf.z - 12.0 )
 			{
 				float radius = (mins.AsVector2D() - maxs.AsVector2D()).Length();
-				float distance = ( pPlayer->GetAbsOrigin().AsVector2D() - m_pNpc->GetAbsOrigin().AsVector2D() ).Length();
+				float distance = ( pPlayer->GetEngineObject()->GetAbsOrigin().AsVector2D() - m_pNpc->GetEngineObject()->GetAbsOrigin().AsVector2D() ).Length();
 				if ( distance - radius < radiusSelf + probeDist )
 				{
 					AddObstacle( pPlayer->WorldSpaceCenter(), radius, pPlayer, AIMST_AVOID_NPC );

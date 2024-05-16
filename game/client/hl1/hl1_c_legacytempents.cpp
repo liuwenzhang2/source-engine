@@ -83,7 +83,7 @@ void CHL1TempEnts::MuzzleFlash( const Vector& pos1, const QAngle& angles, int ty
 	pTemp->m_nRenderFX = 0;
 	pTemp->SetRenderColor( 255, 255, 255, 255 );
 	pTemp->m_flSpriteScale = scale;
-	pTemp->SetAbsOrigin( pos1 );
+	pTemp->GetEngineObject()->SetAbsOrigin( pos1 );
 	pTemp->die = gpGlobals->curtime + 0.01;
 	pTemp->m_flFrame = random->RandomInt( 0, frameCount-1 );
 	pTemp->m_flFrameMax = frameCount - 1;
@@ -97,5 +97,5 @@ void CHL1TempEnts::MuzzleFlash( const Vector& pos1, const QAngle& angles, int ty
 	{
 		ang.z = random->RandomInt( 0, 359 );
 	}
-	pTemp->SetAbsAngles( ang );
+	pTemp->GetEngineObject()->SetAbsAngles( ang );
 }

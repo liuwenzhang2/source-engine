@@ -696,7 +696,7 @@ Vector CClientTools::GetAbsOrigin( HTOOLHANDLE handle )
 	HToolEntry_t &entry = m_Handles[ idx ];
 	if ( entry.m_hEntity )
 	{
-		return entry.m_hEntity->GetAbsOrigin();
+		return entry.m_hEntity->GetEngineObject()->GetAbsOrigin();
 	}
 	Assert( 0 );
 	return vec3_origin;
@@ -711,7 +711,7 @@ QAngle CClientTools::GetAbsAngles( HTOOLHANDLE handle )
 	HToolEntry_t &entry = m_Handles[ idx ];
 	if ( entry.m_hEntity )
 	{
-		return entry.m_hEntity->GetAbsAngles();
+		return entry.m_hEntity->GetEngineObject()->GetAbsAngles();
 	}
 	Assert( 0 );
 	return vec3_angle;

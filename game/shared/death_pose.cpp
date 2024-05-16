@@ -14,13 +14,13 @@ void GetRagdollCurSequenceWithDeathPose( C_BaseAnimating *entity, matrix3x4_t *c
 	// blow the cached prev bones
 	entity->InvalidateBoneCache();
 
-	Vector vPrevOrigin = entity->GetAbsOrigin();
+	Vector vPrevOrigin = entity->GetEngineObject()->GetAbsOrigin();
 
 	entity->Interpolate( flTime );
 	
 	if ( activity != ACT_INVALID )
 	{
-		Vector vNewOrigin = entity->GetAbsOrigin();
+		Vector vNewOrigin = entity->GetEngineObject()->GetAbsOrigin();
 		Vector vDirection = vNewOrigin - vPrevOrigin;
 
 		float flVelocity = VectorNormalize( vDirection );
@@ -34,12 +34,12 @@ void GetRagdollCurSequenceWithDeathPose( C_BaseAnimating *entity, matrix3x4_t *c
 
 		entity->SetCycle( (float)frame / MAX_DEATHPOSE_FRAMES );
 
-		entity->SetAbsOrigin( vAdjustedOrigin );
+		entity->GetEngineObject()->SetAbsOrigin( vAdjustedOrigin );
 
 		// Now do the current bone setup
 		entity->SetupBones( curBones, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, flTime );
 
-		entity->SetAbsOrigin( vNewOrigin );
+		entity->GetEngineObject()->SetAbsOrigin( vNewOrigin );
 
 		// blow the cached prev bones
 		entity->InvalidateBoneCache();

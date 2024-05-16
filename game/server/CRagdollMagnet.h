@@ -20,7 +20,7 @@ public:
 
 	Vector GetForceVector( CBaseEntity *pNPC );
 	float GetRadius( void ) { return m_radius; }
-	Vector GetAxisVector( void ) { return m_axis - GetAbsOrigin(); }
+	Vector GetAxisVector( void ) { return m_axis - GetEngineObject()->GetAbsOrigin(); }
 	float DistToPoint( const Vector &vecPoint );
 
 	bool IsEnabled( void ) { return !m_bDisabled; }

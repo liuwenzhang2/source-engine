@@ -1809,12 +1809,12 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 						if ( !player )
 							continue;
 
-						Vector playerOrigin = player->GetAbsOrigin();
+						Vector playerOrigin = player->GetEngineObject()->GetAbsOrigin();
 
 						if ( AttenuateCaption( lowercase, playerOrigin, es.m_UtlVecSoundOrigin ) )
 						{
 							// If the player has a view entity, measure the distance to that
-							if ( !player->GetViewEntity() || AttenuateCaption( lowercase, player->GetViewEntity()->GetAbsOrigin(), es.m_UtlVecSoundOrigin ) )
+							if ( !player->GetViewEntity() || AttenuateCaption( lowercase, player->GetViewEntity()->GetEngineObject()->GetAbsOrigin(), es.m_UtlVecSoundOrigin ) )
 							{
 								filter.RemoveRecipient( player );
 							}
@@ -3623,7 +3623,7 @@ public:
 
 		// We only want marks that are clear
 		trace_t tr;
-		Vector vecOrigin = pEntity->GetAbsOrigin();
+		Vector vecOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
 		AI_TraceHull( vecOrigin, vecOrigin, m_hActor->WorldAlignMins(), m_hActor->WorldAlignMaxs(), MASK_SOLID, m_hActor, COLLISION_GROUP_NONE, &tr );
 		if ( tr.startsolid )
 		{
@@ -3668,7 +3668,7 @@ public:
 		m_hActor = pActor;
 		if (pActor)
 		{
-			m_vecPos1 = pActor->GetAbsOrigin();
+			m_vecPos1 = pActor->GetEngineObject()->GetAbsOrigin();
 			m_flMaxSegmentDistance = MIN( flMaxRadius, (m_vecPos1 - m_vecPos2).Length() + 1.0 );
 			if (m_flMaxSegmentDistance <= 1.0)
 			{
@@ -3691,12 +3691,12 @@ public:
 
 		// We only want marks that are clear
 		trace_t tr;
-		Vector vecOrigin = pEntity->GetAbsOrigin();
+		Vector vecOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
 		AI_TraceHull( vecOrigin, vecOrigin, m_hActor->WorldAlignMins(), m_hActor->WorldAlignMaxs(), MASK_SOLID, m_hActor, COLLISION_GROUP_NONE, &tr );
 		if ( !tr.startsolid || tr.m_pEnt == m_hActor)
 		{
-			float dist1 = (m_vecPos1 - pEntity->GetAbsOrigin()).Length();
-			float dist2 = (m_vecPos2 - pEntity->GetAbsOrigin()).Length();
+			float dist1 = (m_vecPos1 - pEntity->GetEngineObject()->GetAbsOrigin()).Length();
+			float dist2 = (m_vecPos2 - pEntity->GetEngineObject()->GetAbsOrigin()).Length();
 			/*
 			char text[256];
 			Q_snprintf( text, sizeof( text ), "%.0f : %.0f", dist1, dist2 );
@@ -3916,7 +3916,7 @@ CBaseEntity *CSceneEntity::FindNamedEntityClosest( const char *name, CBaseEntity
 
 			if (pActor2)
 			{
-				CSceneFindNearestMarkFilter *pFilter = new CSceneFindNearestMarkFilter( pActor, pActor2->GetAbsOrigin() );
+				CSceneFindNearestMarkFilter *pFilter = new CSceneFindNearestMarkFilter( pActor, pActor2->GetEngineObject()->GetAbsOrigin() );
 
 				entity = pActor->MyNPCPointer()->FindNamedEntity( name, pFilter );
 				if (!entity && pFilter)

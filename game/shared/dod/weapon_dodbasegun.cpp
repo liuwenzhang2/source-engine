@@ -174,7 +174,7 @@ bool CWeaponDODBaseGun::DODBaseGunFire()
 		GetWeaponID(),
 		Primary_Mode,
 		CBaseEntity::GetPredictionRandomSeed() & 255,
-		GetWeaponAccuracy( pPlayer->GetAbsVelocity().Length2D() ) );
+		GetWeaponAccuracy( pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() ) );
 
 	DoFireEffects();
 

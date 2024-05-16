@@ -140,7 +140,7 @@ void C_LightGlow::Simulate( void )
 {
 	BaseClass::Simulate();
 
-	m_Glow.m_vPos = GetAbsOrigin();
+	m_Glow.m_vPos = GetEngineObject()->GetAbsOrigin();
 }
 
 //-----------------------------------------------------------------------------
@@ -151,7 +151,7 @@ void C_LightGlow::OnDataChanged( DataUpdateType_t updateType )
 {
 	BaseClass::OnDataChanged( updateType );
 
-	m_Glow.m_vPos = GetAbsOrigin();
+	m_Glow.m_vPos = GetEngineObject()->GetAbsOrigin();
 
 	if ( updateType == DATA_UPDATE_CREATED )
 	{
@@ -167,7 +167,7 @@ void C_LightGlow::OnDataChanged( DataUpdateType_t updateType )
 		m_Glow.m_Sprites[0].m_flHorzSize = (float) m_nHorizontalSize;
 		m_Glow.m_Sprites[0].m_vColor = vColor;
 		
-		m_Glow.SetOrigin( GetAbsOrigin() );
+		m_Glow.SetOrigin(GetEngineObject()->GetAbsOrigin() );
 		m_Glow.SetFadeDistances( m_nMinDist, m_nMaxDist, m_nOuterMaxDist );
 		m_Glow.m_flProxyRadius = m_flGlowProxySize;
 
@@ -191,7 +191,7 @@ void C_LightGlow::OnDataChanged( DataUpdateType_t updateType )
 	
 
 	Vector forward;
-	AngleVectors( GetAbsAngles(), &forward, NULL, NULL );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, NULL, NULL );
 	
 	m_Glow.SetDirection( forward );
 }
@@ -201,7 +201,7 @@ void C_LightGlow::OnDataChanged( DataUpdateType_t updateType )
 //-----------------------------------------------------------------------------
 void C_LightGlow::ClientThink( void )
 {
-	Vector mins = GetAbsOrigin();
+	Vector mins = GetEngineObject()->GetAbsOrigin();
 	if ( engine->IsBoxVisible( mins, mins ) )
 	{
 		m_Glow.Activate();

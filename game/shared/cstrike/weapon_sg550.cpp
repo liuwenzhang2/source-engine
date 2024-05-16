@@ -152,7 +152,7 @@ float CWeaponSG550::GetInaccuracy() const
 	
 		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 			fSpread = 0.45f * (1 - m_flAccuracy);
-		else if (pPlayer->GetAbsVelocity().Length2D() > 5)
+		else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 			fSpread = 0.15f;
 		else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
 			fSpread = 0.04f * (1 - m_flAccuracy);

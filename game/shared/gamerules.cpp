@@ -189,12 +189,12 @@ CBaseEntity *CGameRules::GetPlayerSpawnSpot( CBasePlayer *pPlayer )
 	CBaseEntity *pSpawnSpot = pPlayer->EntSelectSpawnPoint();
 	Assert( pSpawnSpot );
 
-	pPlayer->SetLocalOrigin( pSpawnSpot->GetAbsOrigin() + Vector(0,0,1) );
-	pPlayer->SetAbsVelocity( vec3_origin );
-	pPlayer->SetLocalAngles( pSpawnSpot->GetLocalAngles() );
+	pPlayer->GetEngineObject()->SetLocalOrigin( pSpawnSpot->GetEngineObject()->GetAbsOrigin() + Vector(0,0,1) );
+	pPlayer->GetEngineObject()->SetAbsVelocity( vec3_origin );
+	pPlayer->GetEngineObject()->SetLocalAngles( pSpawnSpot->GetEngineObject()->GetLocalAngles() );
 	pPlayer->m_Local.m_vecPunchAngle = vec3_angle;
 	pPlayer->m_Local.m_vecPunchAngleVel = vec3_angle;
-	pPlayer->SnapEyeAngles( pSpawnSpot->GetLocalAngles() );
+	pPlayer->SnapEyeAngles( pSpawnSpot->GetEngineObject()->GetLocalAngles() );
 
 	return pSpawnSpot;
 }
@@ -209,7 +209,7 @@ bool CGameRules::IsSpawnPointValid( CBaseEntity *pSpot, CBasePlayer *pPlayer  )
 		return false;
 	}
 
-	for ( CEntitySphereQuery sphere( pSpot->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
+	for ( CEntitySphereQuery sphere( pSpot->GetEngineObject()->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 	{
 		// if ent is a client, don't spawn on 'em
 		if ( ent->IsPlayer() && ent != pPlayer )

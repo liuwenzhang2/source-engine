@@ -705,7 +705,7 @@ float CWeaponCSBase::GetInaccuracy() const
 		fMaxSpeed = GetCSWpnData().m_flMaxSpeed;
 
 	return m_fAccuracyPenalty + 
-		RemapValClamped(pPlayer->GetAbsVelocity().Length2D(), 
+		RemapValClamped(pPlayer->GetEngineObject()->GetAbsVelocity().Length2D(),
 		fMaxSpeed * CS_PLAYER_SPEED_DUCK_MODIFIER, 
 		fMaxSpeed * 0.95f,							// max out at 95% of run speed to avoid jitter near max speed
 		0.0f, weaponInfo.m_fInaccuracyMove[m_weaponMode]);
@@ -975,7 +975,7 @@ void CWeaponCSBase::Drop(const Vector &vecVelocity)
 	}
 	else
 	{
-		SetAbsVelocity( vecVelocity );
+		GetEngineObject()->SetAbsVelocity( vecVelocity );
 	}
 
 	SetNextThink( gpGlobals->curtime );
@@ -1119,7 +1119,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 						fCrosshairDistanceGoal *= 2.0f;
 					else if ( pPlayer->GetFlags() & FL_DUCKING )
 						fCrosshairDistanceGoal *= 0.5f;
-					else if ( pPlayer->GetAbsVelocity().Length() > 100 )
+					else if ( pPlayer->GetEngineObject()->GetAbsVelocity().Length() > 100 )
 						fCrosshairDistanceGoal *= 1.5f;
 				}
 
@@ -1463,7 +1463,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 	{
 		// make a copy of this weapon that is invisible and inaccessible to players (no touch function). The weapon spawn/respawn code
 		// will decide when to make the weapon visible and touchable.
-		CBaseEntity *pNewWeapon = CBaseEntity::Create( GetClassname(), g_pGameRules->VecWeaponRespawnSpot( this ), GetAbsAngles(), GetOwner() );
+		CBaseEntity *pNewWeapon = CBaseEntity::Create( GetClassname(), g_pGameRules->VecWeaponRespawnSpot( this ), GetEngineObject()->GetAbsAngles(), GetOwner() );
 
 		if ( pNewWeapon )
 		{
@@ -1563,7 +1563,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 			return;
 
 		// Send a message to any clients that have this entity to play the reload.
-		CPASFilter filter( pPlayer->GetAbsOrigin() );
+		CPASFilter filter( pPlayer->GetEngineObject()->GetAbsOrigin() );
 		filter.RemoveRecipient( pPlayer );
 
 		UserMessageBegin( filter, "ReloadEffect" );
@@ -1649,7 +1649,7 @@ bool CWeaponCSBase::IsUseable()
 		}
 
 		//Find the speed of the player
-		float speed = player->GetLocalVelocity().Length2D();
+		float speed = player->GetEngineObject()->GetLocalVelocity().Length2D();
 		float flmaxSpeedDelta = MAX( 0, (gpGlobals->curtime - lastbobtime) * 320.0f );
 
 		// don't allow too big speed changes

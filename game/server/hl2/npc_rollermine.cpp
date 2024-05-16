@@ -226,7 +226,7 @@ public:
 		{
 			float dist = GetSenses()->GetDistLook();
 			Vector range(dist, dist, 64);
-			NDebugOverlay::Box( GetAbsOrigin(), -range, range, 255, 0, 0, 0, 0 );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), -range, range, 255, 0, 0, 0, 0 );
 		}
 		BaseClass::DrawDebugGeometryOverlays();
 	}
@@ -454,7 +454,7 @@ CBaseEntity *NPC_Rollermine_DropFromPoint( const Vector &originStart, CBaseEntit
 
 	if ( pMine )
 	{
-		pMine->SetAbsOrigin( originStart );
+		pMine->GetEngineObject()->SetAbsOrigin( originStart );
 		pMine->SetOwnerEntity( pOwner );
 		pMine->Spawn();
 
@@ -622,7 +622,7 @@ unsigned int CNPC_RollerMine::PhysicsSolidMaskForEntity( void ) const
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::Bury( trace_t *tr )
 {
-	AI_TraceHull( GetAbsOrigin() + Vector(0,0,64), GetAbsOrigin() - Vector( 0, 0, MAX_TRACE_LENGTH ), Vector(-16,-16,-16), Vector(16,16,16), MASK_NPCSOLID, this, GetCollisionGroup(), tr );
+	AI_TraceHull(GetEngineObject()->GetAbsOrigin() + Vector(0,0,64), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, MAX_TRACE_LENGTH ), Vector(-16,-16,-16), Vector(16,16,16), MASK_NPCSOLID, this, GetCollisionGroup(), tr );
 
 	//NDebugOverlay::Box( tr->startpos, Vector(-16,-16,-16), Vector(16,16,16), 255, 0, 0, 64, 10.0 );
 	//NDebugOverlay::Box( tr->endpos, Vector(-16,-16,-16), Vector(16,16,16), 0, 255, 0, 64, 10.0 );
@@ -678,7 +678,7 @@ void CNPC_RollerMine::WakeNeighbors()
 
 	CBaseEntity *entityList[64];
 	Vector range(ROLLERMINE_WAKEUP_DIST,ROLLERMINE_WAKEUP_DIST,64);
-	int boxCount = UTIL_EntitiesInBox( entityList, ARRAYSIZE(entityList), GetAbsOrigin()-range, GetAbsOrigin()+range, FL_NPC );
+	int boxCount = UTIL_EntitiesInBox( entityList, ARRAYSIZE(entityList), GetEngineObject()->GetAbsOrigin()-range, GetEngineObject()->GetAbsOrigin()+range, FL_NPC );
 	//NDebugOverlay::Box( GetAbsOrigin(), -range, range, 255, 0, 0, 64, 10.0 );
 	int wakeCount = 0;
 	while ( boxCount > 0 )
@@ -941,7 +941,7 @@ int CNPC_RollerMine::GetHackedIdleSchedule( void )
 	if ( !HasCondition(COND_SEE_PLAYER) )
 		return SCHED_ROLLERMINE_PATH_TO_PLAYER;
 
-	if ( GetAbsOrigin().DistToSqr( pPlayer->GetAbsOrigin() ) > ROLLERMINE_RETURN_TO_PLAYER_DIST )
+	if (GetEngineObject()->GetAbsOrigin().DistToSqr( pPlayer->GetEngineObject()->GetAbsOrigin() ) > ROLLERMINE_RETURN_TO_PLAYER_DIST )
 		return SCHED_ROLLERMINE_ROLL_TO_PLAYER;
 
 	return SCHED_NONE;
@@ -1070,15 +1070,15 @@ void CNPC_RollerMine::StartTask( const Task_t *pTask )
 		{
 			AddSolidFlags( FSOLID_NOT_SOLID );
 			SetMoveType( MOVETYPE_NOCLIP );
-			SetAbsVelocity( Vector( 0, 0, 256 ) );
+			GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 256 ) );
 			Open();
 
 			trace_t	tr;
-			AI_TraceLine( GetAbsOrigin()+Vector(0,0,1), GetAbsOrigin()-Vector(0,0,64), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+			AI_TraceLine(GetEngineObject()->GetAbsOrigin()+Vector(0,0,1), GetEngineObject()->GetAbsOrigin()-Vector(0,0,64), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 			if ( tr.fraction < 1.0f )
 			{
-				UTIL_CreateAntlionDust( tr.endpos + Vector(0,0,24), GetLocalAngles() );		
+				UTIL_CreateAntlionDust( tr.endpos + Vector(0,0,24), GetEngineObject()->GetLocalAngles() );
 			}
 		}
 
@@ -1298,16 +1298,16 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 		}
 
 		// Start turning early
-		if( (GetLocalOrigin() - GetNavigator()->GetCurWaypointPos() ).Length() <= 64 )
+		if( (GetEngineObject()->GetLocalOrigin() - GetNavigator()->GetCurWaypointPos() ).Length() <= 64 )
 		{
 			if( GetNavigator()->CurWaypointIsGoal() )
 			{
 				// Hit the brakes a bit.
-				float yaw = UTIL_VecToYaw( GetNavigator()->GetCurWaypointPos() - GetLocalOrigin() );
+				float yaw = UTIL_VecToYaw( GetNavigator()->GetCurWaypointPos() - GetEngineObject()->GetLocalOrigin() );
 				Vector vecRight;
 				AngleVectors( QAngle( 0, yaw, 0 ), NULL, &vecRight, NULL );
 
-				m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, -m_flForwardSpeed * 5 );
+				m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetEngineObject()->GetLocalAngles()), vecRight, -m_flForwardSpeed * 5 );
 
 				TaskComplete();
 				return;
@@ -1317,7 +1317,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 		}
 
 		{
-			float yaw = UTIL_VecToYaw( GetNavigator()->GetCurWaypointPos() - GetLocalOrigin() );
+			float yaw = UTIL_VecToYaw( GetNavigator()->GetCurWaypointPos() - GetEngineObject()->GetLocalOrigin() );
 
 			Vector vecRight;
 			Vector vecToPath; // points at the path
@@ -1356,17 +1356,17 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 				vecCompensate.y = -vecVelocity.x;
 				vecCompensate.z = 0;
 
-				m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75 );
+				m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetEngineObject()->GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75 );
 			}
 
 			if( m_bHackedByAlyx )
 			{
 				// Move faster. 
-				m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, m_flForwardSpeed * 2.0f );
+				m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetEngineObject()->GetLocalAngles()), vecRight, m_flForwardSpeed * 2.0f );
 			}
 			else
 			{
-				m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, m_flForwardSpeed );
+				m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetEngineObject()->GetLocalAngles()), vecRight, m_flForwardSpeed );
 			}
 		}
 		break;
@@ -1386,7 +1386,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			}
 
 			CBaseEntity *pEnemy = GetEnemy();
-			Vector vecTargetPosition = pEnemy->GetAbsOrigin();
+			Vector vecTargetPosition = pEnemy->GetEngineObject()->GetAbsOrigin();
 
 			// If we're chasing a vehicle, try and get ahead of it
 			if ( EnemyInVehicle() )
@@ -1399,11 +1399,11 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 				Vector vecProjected = vecTargetPosition + (vecVehicleVelocity * 1.0);
 				Vector2D vecProjected2D( vecProjected.x, vecProjected.y );
 				Vector2D vecTargetPosition2D( vecTargetPosition.x, vecTargetPosition.y );
-				Vector2D vecOrigin2D( GetAbsOrigin().x, GetAbsOrigin().y );
+				Vector2D vecOrigin2D(GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y );
 				Vector2D vecIntercept2D;
 
 				CalcClosestPointOnLine2D( vecOrigin2D, vecTargetPosition2D, vecProjected2D, vecIntercept2D, &flT );
-				Vector vecIntercept( vecIntercept2D.x, vecIntercept2D.y, GetAbsOrigin().z );
+				Vector vecIntercept( vecIntercept2D.x, vecIntercept2D.y, GetEngineObject()->GetAbsOrigin().z );
 				
 				//NDebugOverlay::Line( vecTargetPosition, vecProjected, 0,255,0, true, 0.1 );
 
@@ -1418,7 +1418,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 					}
 
 					// If we're closer to the intercept point than to the vehicle, move towards the intercept
-					if ( (GetAbsOrigin() - vecTargetPosition).LengthSqr() > (GetAbsOrigin() - vecIntercept).LengthSqr() )
+					if ( (GetEngineObject()->GetAbsOrigin() - vecTargetPosition).LengthSqr() > (GetEngineObject()->GetAbsOrigin() - vecIntercept).LengthSqr() )
 					{
 						//NDebugOverlay::Box( vecIntercept, -Vector(20,20,20), Vector(20,20,20), 255,0,0, 0.1, 0.1 );
 
@@ -1434,7 +1434,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			}
 
 			float flTorqueFactor;
-			Vector vecToTarget = vecTargetPosition - GetLocalOrigin();
+			Vector vecToTarget = vecTargetPosition - GetEngineObject()->GetLocalOrigin();
 			float yaw = UTIL_VecToYaw( vecToTarget );
 			Vector vecRight;
 
@@ -1490,11 +1490,11 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			vecCompensate.z = 0;
 			VectorNormalize( vecCompensate );
 
-			m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75 );
-			m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, m_flForwardSpeed  * flTorqueFactor );
+			m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetEngineObject()->GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75 );
+			m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetEngineObject()->GetLocalAngles()), vecRight, m_flForwardSpeed  * flTorqueFactor );
 		
 			// Taunt when I get closer
-			if( !(m_iSoundEventFlags & ROLLERMINE_SE_TAUNT) && UTIL_DistApprox( GetLocalOrigin(), vecTargetPosition ) <= 400 )
+			if( !(m_iSoundEventFlags & ROLLERMINE_SE_TAUNT) && UTIL_DistApprox(GetEngineObject()->GetLocalOrigin(), vecTargetPosition ) <= 400 )
 			{
 				m_iSoundEventFlags |= ROLLERMINE_SE_TAUNT; // Don't repeat.
 
@@ -1517,13 +1517,13 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			}
 
 			// Open the spikes if i'm close enough to cut the enemy!!
-  			if( ( m_bIsOpen == false ) && ( ( UTIL_DistApprox( GetAbsOrigin(), GetEnemy()->GetAbsOrigin() ) <= flThreshold ) || !IsActive() ) )
+  			if( ( m_bIsOpen == false ) && ( ( UTIL_DistApprox(GetEngineObject()->GetAbsOrigin(), GetEnemy()->GetEngineObject()->GetAbsOrigin() ) <= flThreshold ) || !IsActive() ) )
 			{
 				Open();
 			}
 			else if ( m_bIsOpen )
 			{
-				float flDistance = UTIL_DistApprox( GetAbsOrigin(), GetEnemy()->GetAbsOrigin() );
+				float flDistance = UTIL_DistApprox(GetEngineObject()->GetAbsOrigin(), GetEnemy()->GetEngineObject()->GetAbsOrigin() );
 				if ( flDistance >= flThreshold )
 				{
 					// Otherwise close them if the enemy is getting away!
@@ -1573,9 +1573,9 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 				return;
 			}
 
-			Vector vecTargetPosition = pPlayer->GetAbsOrigin();
+			Vector vecTargetPosition = pPlayer->GetEngineObject()->GetAbsOrigin();
 			float flTorqueFactor;
-			Vector vecToTarget = vecTargetPosition - GetLocalOrigin();
+			Vector vecToTarget = vecTargetPosition - GetEngineObject()->GetLocalOrigin();
 			float yaw = UTIL_VecToYaw( vecToTarget );
 			Vector vecRight;
 
@@ -1617,11 +1617,11 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			vecCompensate.z = 0;
 			VectorNormalize( vecCompensate );
 
-			m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75 );
-			m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, m_flForwardSpeed  * flTorqueFactor );
+			m_RollerController.m_vecAngular = WorldToLocalRotation( SetupMatrixAngles(GetEngineObject()->GetLocalAngles()), vecCompensate, m_flForwardSpeed * -0.75 );
+			m_RollerController.m_vecAngular += WorldToLocalRotation( SetupMatrixAngles(GetEngineObject()->GetLocalAngles()), vecRight, m_flForwardSpeed  * flTorqueFactor );
 
 			// Once we're near the player, slow & stop
-			if ( GetAbsOrigin().DistToSqr( vecTargetPosition ) < (ROLLERMINE_RETURN_TO_PLAYER_DIST*2.0) )
+			if (GetEngineObject()->GetAbsOrigin().DistToSqr( vecTargetPosition ) < (ROLLERMINE_RETURN_TO_PLAYER_DIST*2.0) )
 			{
 				TaskComplete();
 			}
@@ -1644,7 +1644,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 				params.m_bWarnOnDirectWaveReference = true;
 				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-				CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), 400, 0.5f, this );
+				CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), 400, 0.5f, this );
 
 				if ( m_bIsOpen == false )
 				{
@@ -1847,7 +1847,7 @@ void CNPC_RollerMine::EmbedTouch( CBaseEntity *pOther )
 		UTIL_DecalTrace( &tr, "Rollermine.Crater" );
 
 		// Make some dust
-		UTIL_CreateAntlionDust( tr.endpos, GetLocalAngles() );
+		UTIL_CreateAntlionDust( tr.endpos, GetEngineObject()->GetLocalAngles() );
 	}
 
 	// Don't try and embed again
@@ -1959,7 +1959,7 @@ void CNPC_RollerMine::ShockTarget( CBaseEntity *pOther )
 		pAnimating->GetAttachment( startAttach, shockPos );
 	}
 
-	Vector shockDir = ( GetAbsOrigin() - shockPos );
+	Vector shockDir = (GetEngineObject()->GetAbsOrigin() - shockPos );
 	VectorNormalize( shockDir );
 
 	CPVSFilter filter( shockPos );
@@ -2163,17 +2163,17 @@ void CNPC_RollerMine::StickToVehicle( CBaseEntity *pOther )
 	m_pConstraint->SetGameData( (void *)this );
 
 	// Kick the vehicle so the player knows we've arrived
-	Vector impulse = pOther->GetAbsOrigin() - GetAbsOrigin();
+	Vector impulse = pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( impulse );
 	impulse.z = -0.75;
 	VectorNormalize( impulse );
 	impulse *= 600;
 	Vector vecForce = impulse * pPhysics->GetMass() * 10;
-	pOtherPhysics->ApplyForceOffset( vecForce, GetAbsOrigin() );
+	pOtherPhysics->ApplyForceOffset( vecForce, GetEngineObject()->GetAbsOrigin() );
 
 	// Get the velocity at the point we're sticking to
 	Vector vecVelocity;
-	pOtherPhysics->GetVelocityAtPoint( GetAbsOrigin(), &vecVelocity );
+	pOtherPhysics->GetVelocityAtPoint(GetEngineObject()->GetAbsOrigin(), &vecVelocity );
 	AngularImpulse angNone( 0.0f, 0.0f, 0.0f );
 	pPhysics->SetVelocity( &vecVelocity, &angNone );
 
@@ -2194,7 +2194,7 @@ int CNPC_RollerMine::CountRollersOnMyVehicle( CUtlVector<CNPC_RollerMine*> *pRol
 	CBaseEntity *entityList[64];
 	Vector range(256,256,256);
 	pRollerList->AddToTail( this );
-	int boxCount = UTIL_EntitiesInBox( entityList, ARRAYSIZE(entityList), GetAbsOrigin()-range, GetAbsOrigin()+range, FL_NPC );
+	int boxCount = UTIL_EntitiesInBox( entityList, ARRAYSIZE(entityList), GetEngineObject()->GetAbsOrigin()-range, GetEngineObject()->GetAbsOrigin()+range, FL_NPC );
 	for ( int i = 0; i < boxCount; i++ )
 	{
 		CAI_BaseNPC *pNPC = entityList[i]->MyNPCPointer();
@@ -2343,14 +2343,14 @@ void CNPC_RollerMine::InputJoltVehicle( inputdata_t &inputdata )
 	}
 
 	// Now smack the vehicle
-	Vector impulse = GetVehicleStuckTo()->GetAbsOrigin() - GetAbsOrigin();
+	Vector impulse = GetVehicleStuckTo()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( impulse );
 	// Randomly apply a little vertical lift, to get the wheels off the ground
 	impulse.z = RandomFloat( 0.5, 1.0 );
 	VectorNormalize( impulse );
 	IPhysicsObject *pVehiclePhysics = GetVehicleStuckTo()->VPhysicsGetObject();
 	Vector vecForce = impulse * ImpulseScale( pVehiclePhysics->GetMass(), RandomFloat(150,250) );
-	pVehiclePhysics->ApplyForceOffset( vecForce, GetAbsOrigin() );
+	pVehiclePhysics->ApplyForceOffset( vecForce, GetEngineObject()->GetAbsOrigin() );
 
 	// Play sounds & effects
 	const char* soundname = "NPC_RollerMine.JoltVehicle";
@@ -2621,7 +2621,7 @@ void CNPC_RollerMine::Explode( void )
 	}
 
 	// Underwater explosion?
-	if ( UTIL_PointContents( GetAbsOrigin() ) & MASK_WATER )
+	if ( UTIL_PointContents(GetEngineObject()->GetAbsOrigin() ) & MASK_WATER )
 	{
 		CEffectData	data;
 		data.m_vOrigin = WorldSpaceCenter();
@@ -2632,7 +2632,7 @@ void CNPC_RollerMine::Explode( void )
 	}
 	else
 	{
-		ExplosionCreate( WorldSpaceCenter(), GetLocalAngles(), this, expDamage, 128, true );
+		ExplosionCreate( WorldSpaceCenter(), GetEngineObject()->GetLocalAngles(), this, expDamage, 128, true );
 	}
 
 	CTakeDamageInfo	info( this, this, 1, DMG_GENERIC );
@@ -2693,10 +2693,10 @@ void CNPC_RollerMine::EmbedOnGroundImpact()
 void CNPC_RollerMine::PrescheduleThink()
 {
 	// Are we underwater?
-	if ( UTIL_PointContents( GetAbsOrigin() ) & MASK_WATER )
+	if ( UTIL_PointContents(GetEngineObject()->GetAbsOrigin() ) & MASK_WATER )
 	{
 		// As soon as we're far enough underwater, detonate
-		Vector vecAboveMe = GetAbsOrigin() + Vector(0,0,64);
+		Vector vecAboveMe = GetEngineObject()->GetAbsOrigin() + Vector(0,0,64);
 		if ( UTIL_PointContents( vecAboveMe ) & MASK_WATER )
 		{
 			Explode();
@@ -2840,7 +2840,7 @@ bool CNPC_RollerMine::IsValidEnemy( CBaseEntity *pEnemy )
 	// If the enemy's over the vehicle detection range, and it's not a player in a vehicle, ignore it
 	if ( pEnemy )
 	{
-		float flDistance = GetAbsOrigin().DistTo( pEnemy->GetAbsOrigin() );
+		float flDistance = GetEngineObject()->GetAbsOrigin().DistTo( pEnemy->GetEngineObject()->GetAbsOrigin() );
 		if ( flDistance >= m_flSeeVehiclesOnlyBeyond )
 		{
 			// Handle vehicles
@@ -2894,7 +2894,7 @@ float CNPC_RollerMine::VehicleHeading( CBaseEntity *pVehicle )
 {
 	Vector vecVelocity = pVehicle->GetSmoothedVelocity();
 	float flSpeed = VectorNormalize( vecVelocity );
-	Vector vecToMine = GetAbsOrigin() - pVehicle->GetAbsOrigin();
+	Vector vecToMine = GetEngineObject()->GetAbsOrigin() - pVehicle->GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( vecToMine );
 
 	// If it's not moving, consider it moving towards us, but not directly

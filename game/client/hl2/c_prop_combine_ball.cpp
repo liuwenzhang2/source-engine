@@ -55,7 +55,7 @@ void C_PropCombineBall::OnDataChanged( DataUpdateType_t updateType )
 
 	if ( updateType == DATA_UPDATE_CREATED )
 	{
-		m_vecLastOrigin = GetAbsOrigin();
+		m_vecLastOrigin = GetEngineObject()->GetAbsOrigin();
 		InitMaterials();
 	}
 }
@@ -112,14 +112,14 @@ void C_PropCombineBall::DrawMotionBlur( void )
 {
 	float color[3];
 
-	Vector	vecDir = GetAbsOrigin() - m_vecLastOrigin;
+	Vector	vecDir = GetEngineObject()->GetAbsOrigin() - m_vecLastOrigin;
 	float	speed = VectorNormalize( vecDir );
 	
 	speed = clamp( speed, 0, 32 );
 	
 	float	stepSize = MIN( ( speed * 0.5f ), 4.0f );
 
-	Vector	spawnPos = GetAbsOrigin();
+	Vector	spawnPos = GetEngineObject()->GetAbsOrigin();
 	Vector	spawnStep = -vecDir * stepSize;
 
 	float base = RemapValClamped( speed, 4, 32, 0.0f, 1.0f );
@@ -158,7 +158,7 @@ void C_PropCombineBall::DrawFlicker( void )
 	// Draw the flickering glow
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->Bind( m_pFlickerMaterial );
-	DrawHalo( m_pFlickerMaterial, GetAbsOrigin(), m_flRadius * rand2, color );
+	DrawHalo( m_pFlickerMaterial, GetEngineObject()->GetAbsOrigin(), m_flRadius * rand2, color );
 }
 
 //-----------------------------------------------------------------------------
@@ -257,7 +257,7 @@ int C_PropCombineBall::DrawModel( int flags )
 		VectorAngles( -CurrentViewForward(), angles );
 
 		// Always orient towards the camera!
-		SetAbsAngles( angles );
+		GetEngineObject()->SetAbsAngles( angles );
 
 		BaseClass::DrawModel( flags );
 	}
@@ -273,10 +273,10 @@ int C_PropCombineBall::DrawModel( int flags )
 		// Draw the main ball body
 		CMatRenderContextPtr pRenderContext( materials );
 		pRenderContext->Bind( m_pBodyMaterial, (C_BaseEntity*) this );
-		DrawHaloOriented( GetAbsOrigin(), m_flRadius + sinOffs, color, roll );
+		DrawHaloOriented(GetEngineObject()->GetAbsOrigin(), m_flRadius + sinOffs, color, roll );
 	}
 	
-	m_vecLastOrigin = GetAbsOrigin();
+	m_vecLastOrigin = GetEngineObject()->GetAbsOrigin();
 
 	return 1;
 }

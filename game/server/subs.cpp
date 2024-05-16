@@ -204,14 +204,14 @@ void CBaseToggle::LinearMove( const Vector &vecDest, float flSpeed )
 
 	m_movementType = MOVE_TOGGLE_LINEAR;
 	// Already there?
-	if (vecDest == GetLocalOrigin())
+	if (vecDest == GetEngineObject()->GetLocalOrigin())
 	{
 		MoveDone();
 		return;
 	}
 		
 	// set destdelta to the vector needed to move
-	Vector vecDestDelta = vecDest - GetLocalOrigin();
+	Vector vecDestDelta = vecDest - GetEngineObject()->GetLocalOrigin();
 	
 	// divide vector length by speed to get time to reach dest
 	float flTravelTime = vecDestDelta.Length() / flSpeed;
@@ -220,7 +220,7 @@ void CBaseToggle::LinearMove( const Vector &vecDest, float flSpeed )
 	SetMoveDoneTime( flTravelTime );
 
 	// scale the destdelta vector by the time spent traveling to get velocity
-	SetLocalVelocity( vecDestDelta / flTravelTime );
+	GetEngineObject()->SetLocalVelocity( vecDestDelta / flTravelTime );
 }
 
 
@@ -244,7 +244,7 @@ void CBaseToggle::MoveDone( void )
 void CBaseToggle::LinearMoveDone( void )
 {
 	UTIL_SetOrigin( this, m_vecFinalDest);
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetMoveDoneTime( -1 );
 }
 
@@ -273,14 +273,14 @@ void CBaseToggle::AngularMove( const QAngle &vecDestAngle, float flSpeed )
 
 	m_movementType = MOVE_TOGGLE_ANGULAR;
 	// Already there?
-	if (vecDestAngle == GetLocalAngles())
+	if (vecDestAngle == GetEngineObject()->GetLocalAngles())
 	{
 		MoveDone();
 		return;
 	}
 	
 	// set destdelta to the vector needed to move
-	QAngle vecDestDelta = vecDestAngle - GetLocalAngles();
+	QAngle vecDestDelta = vecDestAngle - GetEngineObject()->GetLocalAngles();
 	
 	// divide by speed to get time to reach dest
 	float flTravelTime = vecDestDelta.Length() / flSpeed;
@@ -306,7 +306,7 @@ void CBaseToggle::AngularMove( const QAngle &vecDestAngle, float flSpeed )
 //-----------------------------------------------------------------------------
 void CBaseToggle::AngularMoveDone( void )
 {
-	SetLocalAngles( m_vecFinalAngle );
+	GetEngineObject()->SetLocalAngles( m_vecFinalAngle );
 	SetLocalAngularVelocity( vec3_angle );
 	SetMoveDoneTime( -1 );
 }

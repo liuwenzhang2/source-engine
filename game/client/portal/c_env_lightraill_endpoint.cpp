@@ -93,7 +93,7 @@ bool C_Env_Lightrail_Endpoint::SetupEmitters( void )
 	// Setup the attractor emitter
 	if ( m_pAttractorEmitter.IsValid() == false )
 	{
-		m_pAttractorEmitter = CParticleAttractor::Create( GetAbsOrigin(), "energyattractor" );
+		m_pAttractorEmitter = CParticleAttractor::Create(GetEngineObject()->GetAbsOrigin(), "energyattractor" );
 
 		if ( m_pAttractorEmitter.IsValid() == false )
 			return false;
@@ -121,15 +121,15 @@ void C_Env_Lightrail_Endpoint::UpdateIdle( float percentage )
 		return;
 
 	// Reset our sort origin
-	m_pSimpleEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pSimpleEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	SimpleParticle *sParticle;
 
 	// Do the charging particles
-	m_pAttractorEmitter->SetAttractorOrigin( GetAbsOrigin() );
+	m_pAttractorEmitter->SetAttractorOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	Vector forward, right, up;
-	AngleVectors( GetAbsAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
 
 	Vector	offset;
 	float	dist;
@@ -146,7 +146,7 @@ void C_Env_Lightrail_Endpoint::UpdateIdle( float percentage )
 		offset += right * random->RandomFloat( -4.0f * dist, 4.0f * dist );
 		offset += up * random->RandomFloat( -4.0f * dist, 4.0f * dist );
 
-		offset += GetAbsOrigin();
+		offset += GetEngineObject()->GetAbsOrigin();
 
 		sParticle = (SimpleParticle *) m_pAttractorEmitter->AddParticle( sizeof(SimpleParticle), m_pAttractorEmitter->GetPMaterial( "effects/strider_muzzle" ), offset );
 
@@ -187,7 +187,7 @@ void C_Env_Lightrail_Endpoint::UpdateCharging( float percentage )
 		return;
 
 	// Reset our sort origin
-	m_pSimpleEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pSimpleEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	float flLargeScale = 4.0f * m_flLargeScale * percentage;
 	//float flSmallScale = 4.0f * m_flSmallScale * percentage;
@@ -197,7 +197,7 @@ void C_Env_Lightrail_Endpoint::UpdateCharging( float percentage )
 	// Do the core effects
 	for ( int i = 0; i < 2; i++ )
 	{
-		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( "effects/strider_muzzle" ), GetAbsOrigin() );
+		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( "effects/strider_muzzle" ), GetEngineObject()->GetAbsOrigin() );
 
 		if ( sParticle == NULL )
 			return;
@@ -243,10 +243,10 @@ void C_Env_Lightrail_Endpoint::UpdateCharging( float percentage )
 	//	return;
 
 	// Do the charging particles
-	m_pAttractorEmitter->SetAttractorOrigin( GetAbsOrigin() );
+	m_pAttractorEmitter->SetAttractorOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	Vector forward, right, up;
-	AngleVectors( GetAbsAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
 
 	Vector	offset;
 	float	dist;
@@ -263,7 +263,7 @@ void C_Env_Lightrail_Endpoint::UpdateCharging( float percentage )
 		offset += right * random->RandomFloat( -4.0f * dist, 4.0f * dist );
 		offset += up * random->RandomFloat( -4.0f * dist, 4.0f * dist );
 
-		offset += GetAbsOrigin();
+		offset += GetEngineObject()->GetAbsOrigin();
 
 		sParticle = (SimpleParticle *) m_pAttractorEmitter->AddParticle( sizeof(SimpleParticle), m_pAttractorEmitter->GetPMaterial( "effects/strider_muzzle" ), offset );
 
@@ -309,17 +309,17 @@ void C_Env_Lightrail_Endpoint::UpdateLargeFX( void )
 		return;
 
 	// Reset our sort origin
-	m_pSimpleEmitter->SetSortOrigin( GetAbsOrigin() );
+	m_pSimpleEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	float flLargeScale = 8.0f * m_flLargeScale;
 
 	Vector forward, right, up;
-	AngleVectors( GetAbsAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
 
 	SimpleParticle *sParticle;
 
 	// Base of the core effect
-	sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( "effects/strider_muzzle" ), GetAbsOrigin() );
+	sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( "effects/strider_muzzle" ), GetEngineObject()->GetAbsOrigin() );
 
 	if ( sParticle == NULL )
 		return;
@@ -348,7 +348,7 @@ void C_Env_Lightrail_Endpoint::UpdateLargeFX( void )
 	// Do the core effects
 	for ( int i = 0; i < 2; i++ )
 	{
-		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( "effects/combinemuzzle2" ), GetAbsOrigin() );
+		sParticle = (SimpleParticle *) m_pSimpleEmitter->AddParticle( sizeof(SimpleParticle), m_pSimpleEmitter->GetPMaterial( "effects/combinemuzzle2" ), GetEngineObject()->GetAbsOrigin() );
 
 		if ( sParticle == NULL )
 			return;
@@ -394,7 +394,7 @@ void C_Env_Lightrail_Endpoint::UpdateLargeFX( void )
 	//	return;
 
 	// Do the charging particles
-	m_pAttractorEmitter->SetAttractorOrigin( GetAbsOrigin() );
+	m_pAttractorEmitter->SetAttractorOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	Vector	offset;
 	float	dist;
@@ -409,7 +409,7 @@ void C_Env_Lightrail_Endpoint::UpdateLargeFX( void )
 		offset += right * random->RandomFloat( -2.0f * dist * m_flLargeScale, 2.0f * dist * m_flLargeScale );
 		offset += up * random->RandomFloat( -2.0f * dist * m_flLargeScale, 2.0f * dist * m_flLargeScale );
 
-		offset += GetAbsOrigin();
+		offset += GetEngineObject()->GetAbsOrigin();
 
 		sParticle = (SimpleParticle *) m_pAttractorEmitter->AddParticle( sizeof(SimpleParticle), m_pAttractorEmitter->GetPMaterial( "effects/combinemuzzle2_dark" ), offset );
 

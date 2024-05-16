@@ -155,8 +155,8 @@ void CScriptIntro::InputSetCameraViewEntity( inputdata_t &inputdata )
 	}
 
 	m_hCameraEntity = pEntity;
-	m_vecCameraView = pEntity->GetAbsOrigin();
-	m_vecCameraViewAngles = pEntity->GetAbsAngles();
+	m_vecCameraView = pEntity->GetEngineObject()->GetAbsOrigin();
+	m_vecCameraViewAngles = pEntity->GetEngineObject()->GetAbsAngles();
 }
 
 //-----------------------------------------------------------------------------
@@ -167,7 +167,7 @@ bool CScriptIntro::GetIncludedPVSOrigin( Vector *pOrigin, CBaseEntity **ppCamera
 	if ( m_bActive && m_hCameraEntity.Get() )
 	{
 		*ppCamera = m_hCameraEntity.Get();
-		*pOrigin = m_hCameraEntity.Get()->GetAbsOrigin();
+		*pOrigin = m_hCameraEntity.Get()->GetEngineObject()->GetAbsOrigin();
 		return true;
 	}
 

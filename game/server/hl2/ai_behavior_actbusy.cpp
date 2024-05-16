@@ -532,7 +532,7 @@ CAI_Hint *CAI_ActBusyBehavior::FindCombatActBusyHintNode()
 
 	criteria.AddHintType( HINT_WORLD_WORK_POSITION );
 	criteria.SetFlag( iBits );
-	criteria.AddIncludePosition( pPlayer->GetAbsOrigin(), ACTBUSY_COMBAT_PLAYER_MAX_DIST );
+	criteria.AddIncludePosition( pPlayer->GetEngineObject()->GetAbsOrigin(), ACTBUSY_COMBAT_PLAYER_MAX_DIST );
 
 	CAI_Hint *pNode = CAI_HintManager::FindHint( GetOuter(), criteria );
 
@@ -567,7 +567,7 @@ CAI_Hint *CAI_ActBusyBehavior::FindCombatActBusyTeleportHintNode()
 
 	criteria.AddHintType( HINT_WORLD_WORK_POSITION );
 	criteria.SetFlag( iBits );
-	criteria.AddIncludePosition( pPlayer->GetAbsOrigin(), ACTBUSY_COMBAT_PLAYER_MAX_DIST * 1.1f );
+	criteria.AddIncludePosition( pPlayer->GetEngineObject()->GetAbsOrigin(), ACTBUSY_COMBAT_PLAYER_MAX_DIST * 1.1f );
 
 	CAI_Hint *pNode = CAI_HintManager::FindHint( GetOuter(), criteria );
 
@@ -596,15 +596,15 @@ bool CAI_ActBusyBehavior::FValidateHintType( CAI_Hint *pHint )
 
 	// Check for clearance
 	trace_t tr;
-	AI_TraceHull( pHint->GetAbsOrigin(), pHint->GetAbsOrigin(), GetOuter()->WorldAlignMins(), GetOuter()->WorldAlignMaxs(), MASK_SOLID, GetOuter(), COLLISION_GROUP_NONE, &tr );
+	AI_TraceHull( pHint->GetEngineObject()->GetAbsOrigin(), pHint->GetEngineObject()->GetAbsOrigin(), GetOuter()->WorldAlignMins(), GetOuter()->WorldAlignMaxs(), MASK_SOLID, GetOuter(), COLLISION_GROUP_NONE, &tr );
 	if ( tr.fraction == 1.0 )
 		return true;
 
 	// Report failures
 	if ( ai_debug_actbusy.GetInt() == 3 && GetOuter()->m_debugOverlays & OVERLAY_NPC_SELECTED_BIT )
 	{
-		NDebugOverlay::Text( pHint->GetAbsOrigin(), "Node isn't clear.", false, 60 );
-		NDebugOverlay::Box( pHint->GetAbsOrigin(), GetOuter()->WorldAlignMins(), GetOuter()->WorldAlignMaxs(), 255,0,0, 8, 2.0 );
+		NDebugOverlay::Text( pHint->GetEngineObject()->GetAbsOrigin(), "Node isn't clear.", false, 60 );
+		NDebugOverlay::Box( pHint->GetEngineObject()->GetAbsOrigin(), GetOuter()->WorldAlignMins(), GetOuter()->WorldAlignMaxs(), 255,0,0, 8, 2.0 );
 	}
 
 	return false;
@@ -843,7 +843,7 @@ void CAI_ActBusyBehavior::GatherConditions( void )
 
 					if( pPlayer )
 					{
-						float flDist = pPlayer->GetAbsOrigin().DistTo( GetAbsOrigin() );
+						float flDist = pPlayer->GetEngineObject()->GetAbsOrigin().DistTo( GetAbsOrigin() );
 
 						if( flDist <= 60 )
 						{
@@ -1095,7 +1095,7 @@ int	CAI_ActBusyBehavior::SelectScheduleForLeaving( void )
 		if ( GetHintNode()->HintType() == HINT_NPC_EXIT_POINT )
 		{
 			// Are we near it? If so, we're done. If not, move to it.
-			if ( UTIL_DistApprox( GetHintNode()->GetAbsOrigin(), GetAbsOrigin() ) < 64 )
+			if ( UTIL_DistApprox( GetHintNode()->GetEngineObject()->GetAbsOrigin(), GetAbsOrigin() ) < 64 )
 			{
 				if ( !GetOuter()->IsMarkedForDeletion() )
 				{
@@ -1132,7 +1132,7 @@ int	CAI_ActBusyBehavior::SelectScheduleForLeaving( void )
 	CHintCriteria	hintCriteria;
 	hintCriteria.SetHintType( HINT_NPC_EXIT_POINT );
 	hintCriteria.SetFlag( bits_HINT_NODE_RANDOM | bits_HINT_NODE_CLEAR | bits_HINT_NODE_USE_GROUP );
-	CAI_Hint *pNode = CAI_HintManager::FindHintRandom( GetOuter(), GetOuter()->GetAbsOrigin(), hintCriteria );
+	CAI_Hint *pNode = CAI_HintManager::FindHintRandom( GetOuter(), GetOuter()->GetEngineObject()->GetAbsOrigin(), hintCriteria );
 	if ( pNode )
 	{
 		SetHintNode( pNode );
@@ -1250,8 +1250,8 @@ int CAI_ActBusyBehavior::SelectScheduleWhileNotBusy( int iBase )
 					if ( ai_debug_actbusy.GetInt() == 2 )
 					{
 						// Show which actbusy we're moving towards
-						NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), pNode->GetAbsOrigin(), 0, 255, 0, true, 5.0 );
-						NDebugOverlay::Box( pNode->GetAbsOrigin(), GetOuter()->WorldAlignMins(), GetOuter()->WorldAlignMaxs(), 0, 255, 0, 64, 5.0 );
+						NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), pNode->GetEngineObject()->GetAbsOrigin(), 0, 255, 0, true, 5.0 );
+						NDebugOverlay::Box( pNode->GetEngineObject()->GetAbsOrigin(), GetOuter()->WorldAlignMins(), GetOuter()->WorldAlignMaxs(), 0, 255, 0, 64, 5.0 );
 					}
 
 					// Let our act busy know we're moving to a node
@@ -1468,7 +1468,7 @@ void CAI_ActBusyBehavior::OnSeeEntity( CBaseEntity *pEntity )
 
 	if( IsCombatActBusy() && GetOuter()->IRelationType(pEntity) < D_LI )
 	{
-		if( pEntity->GetAbsOrigin().DistToSqr( GetAbsOrigin() ) <= ACTBUSY_ENEMY_TOO_CLOSE_DIST_SQR )
+		if( pEntity->GetEngineObject()->GetAbsOrigin().DistToSqr( GetAbsOrigin() ) <= ACTBUSY_ENEMY_TOO_CLOSE_DIST_SQR )
 		{
 			SetCondition( COND_ACTBUSY_ENEMY_TOO_CLOSE );
 		}
@@ -1727,7 +1727,7 @@ void CAI_ActBusyBehavior::StartTask( const Task_t *pTask )
 			// character off the node.
 			if ( m_bMovingToBusy )
 			{
-				if ( UTIL_DistApprox( GetHintNode()->GetAbsOrigin(), GetAbsOrigin() ) > 16 || !GetOuter()->FacingIdeal() )
+				if ( UTIL_DistApprox( GetHintNode()->GetEngineObject()->GetAbsOrigin(), GetAbsOrigin() ) > 16 || !GetOuter()->FacingIdeal() )
 				{
 					TaskFail( "Not correctly on hintnode" );
 					m_flEndBusyAt = gpGlobals->curtime;
@@ -1831,7 +1831,7 @@ void CAI_ActBusyBehavior::StartTask( const Task_t *pTask )
 			}
 
 			// Fail if we're not on the node & facing the correct way
-			if ( UTIL_DistApprox( GetHintNode()->GetAbsOrigin(), GetAbsOrigin() ) > 16 || !GetOuter()->FacingIdeal() )
+			if ( UTIL_DistApprox( GetHintNode()->GetEngineObject()->GetAbsOrigin(), GetAbsOrigin() ) > 16 || !GetOuter()->FacingIdeal() )
 			{
 				m_bBusy = false;
 				TaskFail( "Not correctly on hintnode" );
@@ -1898,8 +1898,8 @@ void CAI_ActBusyBehavior::StartTask( const Task_t *pTask )
 				return;
 			}
 
-			Vector vecAbsOrigin = GetHintNode()->GetAbsOrigin();
-			QAngle vecAbsAngles = GetHintNode()->GetAbsAngles();
+			Vector vecAbsOrigin = GetHintNode()->GetEngineObject()->GetAbsOrigin();
+			QAngle vecAbsAngles = GetHintNode()->GetEngineObject()->GetAbsAngles();
 			GetOuter()->Teleport( &vecAbsOrigin, &vecAbsAngles, NULL );
 			GetOuter()->GetMotor()->SetIdealYaw( vecAbsAngles.y );
 
@@ -1980,7 +1980,7 @@ void CAI_ActBusyBehavior::StartTask( const Task_t *pTask )
 					if ( GetHintNode() )
 					{
 						// Show which actbusy we're moving towards
-						NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), GetHintNode()->GetAbsOrigin(), 255, 0, 0, true, 1.0 );
+						NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), GetHintNode()->GetEngineObject()->GetAbsOrigin(), 255, 0, 0, true, 1.0 );
 					}
 				}
 			}
@@ -2017,7 +2017,7 @@ void CAI_ActBusyBehavior::RunTask( const Task_t *pTask )
 				if ( GetHintNode() )
 				{
 					// Show which actbusy we're moving towards
-					NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), GetHintNode()->GetAbsOrigin(), 0, 255, 0, true, 0.2 );
+					NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), GetHintNode()->GetEngineObject()->GetAbsOrigin(), 0, 255, 0, true, 0.2 );
 				}
 			}
 
@@ -2042,7 +2042,7 @@ void CAI_ActBusyBehavior::RunTask( const Task_t *pTask )
 				{
 					// Break a combat actbusy if an enemy gets very close.
 					// I'll probably go to hell for not doing this with conditions like I should. (sjb)
-					float flDistSqr = GetAbsOrigin().DistToSqr( GetEnemy()->GetAbsOrigin() );
+					float flDistSqr = GetAbsOrigin().DistToSqr( GetEnemy()->GetEngineObject()->GetAbsOrigin() );
 
 					if( flDistSqr < Square(12.0f * 15.0f) )
 					{
@@ -2094,7 +2094,7 @@ void CAI_ActBusyBehavior::RunTask( const Task_t *pTask )
 				// Trace my normal hull over this spot to see if I'm able to stand up right now.
 				trace_t tr;
 				CTraceFilterOnlyNPCsAndPlayer filter( GetOuter(), COLLISION_GROUP_NONE );
-				UTIL_TraceHull( GetOuter()->GetAbsOrigin(), GetOuter()->GetAbsOrigin(), NAI_Hull::Mins( HULL_HUMAN ), NAI_Hull::Maxs( HULL_HUMAN ), MASK_NPCSOLID, &filter, &tr );
+				UTIL_TraceHull( GetOuter()->GetEngineObject()->GetAbsOrigin(), GetOuter()->GetEngineObject()->GetAbsOrigin(), NAI_Hull::Mins( HULL_HUMAN ), NAI_Hull::Maxs( HULL_HUMAN ), MASK_NPCSOLID, &filter, &tr );
 
 				if( tr.startsolid )
 				{
@@ -2104,7 +2104,7 @@ void CAI_ActBusyBehavior::RunTask( const Task_t *pTask )
 				else
 				{
 					// Put an entity blocker here for a moment until I get into my bounding box.
-					CBaseEntity *pBlocker = CEntityBlocker::Create( GetOuter()->GetAbsOrigin(), NAI_Hull::Mins( HULL_HUMAN ), NAI_Hull::Maxs( HULL_HUMAN ), GetOuter(), true );
+					CBaseEntity *pBlocker = CEntityBlocker::Create( GetOuter()->GetEngineObject()->GetAbsOrigin(), NAI_Hull::Mins( HULL_HUMAN ), NAI_Hull::Maxs( HULL_HUMAN ), GetOuter(), true );
 					g_EventQueue.AddEvent( pBlocker, "Kill", 1.0, GetOuter(), GetOuter() );
 					TaskComplete();
 				}
@@ -2731,11 +2731,11 @@ void CAI_ActBusyQueueGoal::DrawDebugGeometryOverlays( void )
 			continue;
 		if ( m_bPlayerBlockedNodes[i] )
 		{
-			NDebugOverlay::Box( m_hNodes[i]->GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255, 0, 0, 0, 0.1 );
+			NDebugOverlay::Box( m_hNodes[i]->GetEngineObject()->GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255, 0, 0, 0, 0.1 );
 		}
 		else
 		{
-			NDebugOverlay::Box( m_hNodes[i]->GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255, 255, 255, 0, 0.1 );
+			NDebugOverlay::Box( m_hNodes[i]->GetEngineObject()->GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255, 255, 255, 0, 0.1 );
 		}
 	}
 }

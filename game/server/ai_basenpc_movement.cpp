@@ -52,7 +52,7 @@ void CAI_BaseNPC::ForceSelectedGo(CBaseEntity *pPlayer, const Vector &targetPos,
 			if (tr.startsolid || tr.fraction != 1.0 )
 			{
 				NDebugOverlay::BoxAngles(chasePosition, npc->GetHullMins(), 
-					npc->GetHullMaxs(), npc->GetAbsAngles(), 255,0,0,20,0.5);
+					npc->GetHullMaxs(), npc->GetEngineObject()->GetAbsAngles(), 255,0,0,20,0.5);
 			}
 
 			npc->m_vecLastPosition = chasePosition;
@@ -109,7 +109,7 @@ bool CAI_BaseNPC::ScheduledMoveToGoalEntity( int scheduleType, CBaseEntity *pGoa
 	// HACKHACK: Call through TranslateNavGoal to fixup this goal position
 	// UNDONE: Remove this and have NPCs that need this functionality fix up paths in the 
 	// movement system instead of when they are specified.
-	AI_NavGoal_t goal(pGoalEntity->GetAbsOrigin(), movementActivity, AIN_DEF_TOLERANCE, AIN_YAW_TO_DEST);
+	AI_NavGoal_t goal(pGoalEntity->GetEngineObject()->GetAbsOrigin(), movementActivity, AIN_DEF_TOLERANCE, AIN_YAW_TO_DEST);
 
 	TranslateNavGoal( pGoalEntity, goal.dest );
 	
@@ -131,7 +131,7 @@ bool CAI_BaseNPC::ScheduledFollowPath( int scheduleType, CBaseEntity *pPathStart
 	SetGoalEnt( pPathStart );
 
 	// HACKHACK: Call through TranslateNavGoal to fixup this goal position
-	AI_NavGoal_t goal(GOALTYPE_PATHCORNER, pPathStart->GetLocalOrigin(), movementActivity, AIN_DEF_TOLERANCE, AIN_YAW_TO_DEST);
+	AI_NavGoal_t goal(GOALTYPE_PATHCORNER, pPathStart->GetEngineObject()->GetLocalOrigin(), movementActivity, AIN_DEF_TOLERANCE, AIN_YAW_TO_DEST);
 
 	TranslateNavGoal( pPathStart, goal.dest );
 
@@ -445,18 +445,18 @@ bool CAI_BaseNPC::AutoMovement( float flInterval, CBaseEntity *pTarget, AIMoveTr
 				// FIXME: add callbacks into the script system for validation
 				// FIXME: add function on scripts to force only legal movements
 				// FIXME: GetIntervalMovement deals in Local space, nor global.  Currently now way to communicate that through these interfaces.
-				SetLocalOrigin( newPos );
-				SetLocalAngles( newAngles );
+				GetEngineObject()->SetLocalOrigin( newPos );
+				GetEngineObject()->SetLocalAngles( newAngles );
 				return true;
 			}
 		}
 		else if (GetMoveType() == MOVETYPE_FLY)
 		{
-			Vector dist = newPos - GetLocalOrigin();
+			Vector dist = newPos - GetEngineObject()->GetLocalOrigin();
 
 			VectorScale( dist, 1.0 / flInterval, dist );
 
-			SetLocalVelocity( dist );
+			GetEngineObject()->SetLocalVelocity( dist );
 			return true;
 		}
 	}

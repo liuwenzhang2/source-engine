@@ -296,24 +296,24 @@ void CFuncPlat::Setup( void )
 		m_flTWidth = 10;
 	}
 	
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 	SetSolid( SOLID_BSP );
 	SetMoveType( MOVETYPE_PUSH );
 
 	// Set size and link into world
 	SetModel( STRING( GetModelName() ) );
 
-	m_vecPosition1 = GetLocalOrigin();	//Top
-	m_vecPosition2 = GetLocalOrigin();	//Bottom
+	m_vecPosition1 = GetEngineObject()->GetLocalOrigin();	//Top
+	m_vecPosition2 = GetEngineObject()->GetLocalOrigin();	//Bottom
 
 	if ( m_flHeight != 0 )
 	{
-		m_vecPosition2.z = GetLocalOrigin().z - m_flHeight;
+		m_vecPosition2.z = GetEngineObject()->GetLocalOrigin().z - m_flHeight;
 	}
 	else
 	{
 		// NOTE: This works because the angles were set to vec3_angle above
-		m_vecPosition2.z = GetLocalOrigin().z - CollisionProp()->OBBSize().z + 8;
+		m_vecPosition2.z = GetEngineObject()->GetLocalOrigin().z - CollisionProp()->OBBSize().z + 8;
 	}
 
 	if (m_flSpeed == 0)
@@ -386,7 +386,7 @@ void CPlatTrigger::SpawnInsideTrigger( CFuncPlat *pPlatform )
 	SetSolid( SOLID_BSP );
 	AddSolidFlags( FSOLID_TRIGGER );
 	SetMoveType( MOVETYPE_NONE );
-	SetLocalOrigin( pPlatform->GetLocalOrigin() );
+	GetEngineObject()->SetLocalOrigin( pPlatform->GetEngineObject()->GetLocalOrigin() );
 
 	// Establish the trigger field's size
 	CCollisionProperty *pCollision = m_pPlatform->CollisionProp();
@@ -646,8 +646,8 @@ void CFuncPlatRot::SetupRotation( void )
 	if ( m_vecFinalAngle.x != 0 )		// This plat rotates too!
 	{
 		CBaseToggle::AxisDir();
-		m_start	= GetLocalAngles();
-		m_end = GetLocalAngles() + m_vecMoveAng * m_vecFinalAngle.x;
+		m_start	= GetEngineObject()->GetLocalAngles();
+		m_end = GetEngineObject()->GetLocalAngles() + m_vecMoveAng * m_vecFinalAngle.x;
 	}
 	else
 	{
@@ -656,7 +656,7 @@ void CFuncPlatRot::SetupRotation( void )
 	}
 	if ( GetEntityName() != NULL_STRING )	// Start at top
 	{
-		SetLocalAngles( m_end );
+		GetEngineObject()->SetLocalAngles( m_end );
 	}
 }
 
@@ -681,7 +681,7 @@ void CFuncPlatRot::HitBottom( void )
 {
 	BaseClass::HitBottom();
 	SetLocalAngularVelocity( vec3_angle );
-	SetLocalAngles( m_start );
+	GetEngineObject()->SetLocalAngles( m_start );
 }
 
 
@@ -702,14 +702,14 @@ void CFuncPlatRot::HitTop( void )
 {
 	BaseClass::HitTop();
 	SetLocalAngularVelocity( vec3_angle );
-	SetLocalAngles( m_end );
+	GetEngineObject()->SetLocalAngles( m_end );
 }
 
 
 void CFuncPlatRot::RotMove( QAngle &destAngle, float time )
 {
 	// set destdelta to the vector needed to move
-	QAngle vecDestDelta = destAngle - GetLocalAngles();
+	QAngle vecDestDelta = destAngle - GetEngineObject()->GetLocalAngles();
 
 	// Travel time is so short, we're practically there already;  so make it so.
 	if ( time >= 0.1)
@@ -820,7 +820,7 @@ void CFuncTrain::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 		}
 
 		SetNextThink( TICK_NEVER_THINK );
-		SetLocalVelocity( vec3_origin );
+		GetEngineObject()->SetLocalVelocity( vec3_origin );
 		
 		if ( m_NoiseArrived != NULL_STRING )
 		{
@@ -954,7 +954,7 @@ void CFuncTrain::Next( void )
 
 		// This is supposed to place the center of the func_train at the target's origin.
 		// FIXME: This is totally busted! It's using the wrong space for the computation...
-		UTIL_SetOrigin( this, pTarg->GetLocalOrigin() - CollisionProp()->OBBCenter() );
+		UTIL_SetOrigin( this, pTarg->GetEngineObject()->GetLocalOrigin() - CollisionProp()->OBBCenter() );
 		
 		// Get on with doing the next path corner.
 		Wait(); 
@@ -968,7 +968,7 @@ void CFuncTrain::Next( void )
 
 		// This is supposed to place the center of the func_train at the target's origin.
 		// FIXME: This is totally busted! It's using the wrong space for the computation...
-		LinearMove ( pTarg->GetLocalOrigin() - CollisionProp()->OBBCenter(), m_flSpeed );
+		LinearMove ( pTarg->GetEngineObject()->GetLocalOrigin() - CollisionProp()->OBBCenter(), m_flSpeed );
 	}
 }
 
@@ -992,7 +992,7 @@ void CFuncTrain::Activate( void )
 
 		// This is supposed to place the center of the func_train at the target's origin.
 		// FIXME: This is totally busted! It's using the wrong space for the computation...
-		UTIL_SetOrigin( this, m_hCurrentTarget->GetLocalOrigin() - CollisionProp()->OBBCenter() );
+		UTIL_SetOrigin( this, m_hCurrentTarget->GetEngineObject()->GetLocalOrigin() - CollisionProp()->OBBCenter() );
 		if ( GetSolid() == SOLID_BSP )
 		{
 			VPhysicsInitShadow( false, false );
@@ -1145,7 +1145,7 @@ void CFuncTrain::Stop( void )
 		}
 
 		SetNextThink( TICK_NEVER_THINK );
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		
 		if ( m_NoiseArrived != NULL_STRING )
 		{
@@ -1274,11 +1274,11 @@ int CFuncTrackTrain::DrawDebugTextOverlays( void )
 	if (m_debugOverlays & OVERLAY_TEXT_BIT) 
 	{
 		char tempstr[512];
-		Q_snprintf( tempstr,sizeof(tempstr), "angles: %g %g %g", (double)GetLocalAngles()[PITCH], (double)GetLocalAngles()[YAW], (double)GetLocalAngles()[ROLL] );
+		Q_snprintf( tempstr,sizeof(tempstr), "angles: %g %g %g", (double)GetEngineObject()->GetLocalAngles()[PITCH], (double)GetEngineObject()->GetLocalAngles()[YAW], (double)GetEngineObject()->GetLocalAngles()[ROLL] );
 		EntityText( nOffset, tempstr, 0 );
 		nOffset++;
 
-		float flCurSpeed = GetLocalVelocity().Length();
+		float flCurSpeed = GetEngineObject()->GetLocalVelocity().Length();
 		Q_snprintf( tempstr,sizeof(tempstr), "current speed (goal): %g (%g)", (double)flCurSpeed, (double)m_flSpeed );
 		EntityText( nOffset, tempstr, 0 );
 		nOffset++;
@@ -1297,7 +1297,7 @@ void CFuncTrackTrain::DrawDebugGeometryOverlays()
 	BaseClass::DrawDebugGeometryOverlays();
 	if (m_debugOverlays & OVERLAY_BBOX_BIT) 
 	{
-		NDebugOverlay::Box( GetAbsOrigin(), -Vector(4,4,4),Vector(4,4,4), 255, 0, 255, 0, 0);
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), -Vector(4,4,4),Vector(4,4,4), 255, 0, 255, 0, 0);
 		Vector out;
 		VectorTransform( Vector(m_length,0,0), GetEngineObject()->EntityToWorldTransform(), out );
 		NDebugOverlay::Box( out, -Vector(4,4,4),Vector(4,4,4), 255, 0, 255, 0, 0);
@@ -1622,7 +1622,7 @@ void CFuncTrackTrain::SetSpeed( float flSpeed, bool bAccel /*= false */  )
 //-----------------------------------------------------------------------------
 void CFuncTrackTrain::Stop( void )
 {
-	SetLocalVelocity( vec3_origin );
+	GetEngineObject()->SetLocalVelocity( vec3_origin );
 	SetLocalAngularVelocity( vec3_angle );
 	m_oldSpeed = m_flSpeed;
 	m_flSpeed = 0;
@@ -1650,7 +1650,7 @@ static CBaseEntity *FindPhysicsBlockerForHierarchy( CBaseEntity *pParentEntity )
 				{
 					Vector normal;
 					pSnapshot->GetSurfaceNormal(normal);
-					float dot = DotProduct( pParentEntity->GetAbsVelocity(), pSnapshot->GetNormalForce() * normal );
+					float dot = DotProduct( pParentEntity->GetEngineObject()->GetAbsVelocity(), pSnapshot->GetNormalForce() * normal );
 					if ( !pPhysicsBlocker || dot > maxForce )
 					{
 						pPhysicsBlocker = pOtherEntity;
@@ -1690,10 +1690,10 @@ void CFuncTrackTrain::Blocked( CBaseEntity *pOther )
 	else
 	{
 		Vector vecNewVelocity;
-		vecNewVelocity = pOther->GetAbsOrigin() - GetAbsOrigin();
+		vecNewVelocity = pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 		VectorNormalize(vecNewVelocity);
 		vecNewVelocity *= m_flBlockDamage;
-		pOther->SetAbsVelocity( vecNewVelocity );
+		pOther->GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 	}
 	if ( HasSpawnFlags(SF_TRACKTRAIN_UNBLOCKABLE_BY_PLAYER) )
 	{
@@ -1710,9 +1710,9 @@ void CFuncTrackTrain::Blocked( CBaseEntity *pOther )
 			const int MIN_BLOCKED_TICKS = 10;
 			if ( ticksBlocked > MIN_BLOCKED_TICKS )
 			{
-				dist = (GetAbsOrigin() - m_lastBlockPos).Length();
+				dist = (GetEngineObject()->GetAbsOrigin() - m_lastBlockPos).Length();
 				// must have moved at least 10% of normal velocity over the blocking interval, or we're being blocked
-				float minLength = GetAbsVelocity().Length() * TICK_INTERVAL * MIN_BLOCKED_TICKS * 0.10f;
+				float minLength = GetEngineObject()->GetAbsVelocity().Length() * TICK_INTERVAL * MIN_BLOCKED_TICKS * 0.10f;
 				if ( dist < minLength )
 				{
 					// been stuck for more than one tick without moving much?
@@ -1723,7 +1723,7 @@ void CFuncTrackTrain::Blocked( CBaseEntity *pOther )
 			// first time blocking or moved too far since last block, reset
 			if ( dist > 1.0f || m_lastBlockTick < 0  )
 			{
-				m_lastBlockPos = GetAbsOrigin();
+				m_lastBlockPos = GetEngineObject()->GetAbsOrigin();
 				m_lastBlockTick = gpGlobals->tickcount;
 			}
 		}
@@ -1944,10 +1944,10 @@ void CFuncTrackTrain::UpdateTrainVelocity( CPathTrack *pPrev, CPathTrack *pNext,
 	{
 		case TrainVelocity_Instantaneous:
 		{
-			Vector velDesired = nextPos - GetLocalOrigin();
+			Vector velDesired = nextPos - GetEngineObject()->GetLocalOrigin();
 			VectorNormalize( velDesired );
 			velDesired *= fabs( m_flSpeed );
-			SetLocalVelocity( velDesired );
+			GetEngineObject()->SetLocalVelocity( velDesired );
 			break;
 		}
 
@@ -1984,11 +1984,11 @@ void CFuncTrackTrain::UpdateTrainVelocity( CPathTrack *pPrev, CPathTrack *pNext,
 				// If they're different, do the blend.
 				if ( flPrevSpeed != flNextSpeed )
 				{
-					Vector vecSegment = pNext->GetLocalOrigin() - pPrev->GetLocalOrigin();
+					Vector vecSegment = pNext->GetEngineObject()->GetLocalOrigin() - pPrev->GetEngineObject()->GetLocalOrigin();
 					float flSegmentLen = vecSegment.Length();
 					if ( flSegmentLen )
 					{
-						Vector vecCurOffset = GetLocalOrigin() - pPrev->GetLocalOrigin();
+						Vector vecCurOffset = GetEngineObject()->GetLocalOrigin() - pPrev->GetEngineObject()->GetLocalOrigin();
 						float p = vecCurOffset.Length() / flSegmentLen;
 						if ( GetTrainVelocityType() == TrainVelocity_EaseInEaseOut )
 						{
@@ -2004,10 +2004,10 @@ void CFuncTrackTrain::UpdateTrainVelocity( CPathTrack *pPrev, CPathTrack *pNext,
 				}
 			}
 
-			Vector velDesired = nextPos - GetLocalOrigin();
+			Vector velDesired = nextPos - GetEngineObject()->GetLocalOrigin();
 			VectorNormalize( velDesired );
 			velDesired *= fabs( m_flSpeed );
-			SetLocalVelocity( velDesired );
+			GetEngineObject()->SetLocalVelocity( velDesired );
 			break;
 		}
 	}
@@ -2075,7 +2075,7 @@ void CFuncTrackTrain::UpdateOrientationAtPathTracks( CPathTrack *pPrev, CPathTra
 	if ( !m_ppath )
 		return;
 
-	Vector nextFront = GetLocalOrigin();
+	Vector nextFront = GetEngineObject()->GetLocalOrigin();
 
 	CPathTrack *pNextNode = NULL;
 
@@ -2090,7 +2090,7 @@ void CFuncTrackTrain::UpdateOrientationAtPathTracks( CPathTrack *pPrev, CPathTra
 	}
 	nextFront.z += m_height;
 
-	Vector vecFaceDir = nextFront - GetLocalOrigin();
+	Vector vecFaceDir = nextFront - GetEngineObject()->GetLocalOrigin();
 	if ( !IsDirForward() )
 	{
 		vecFaceDir *= -1;
@@ -2109,7 +2109,7 @@ void CFuncTrackTrain::UpdateOrientationAtPathTracks( CPathTrack *pPrev, CPathTra
 		}
 	}
 
-	QAngle curAngles = GetLocalAngles();
+	QAngle curAngles = GetEngineObject()->GetLocalAngles();
 	FixupAngles( curAngles );
 
 	if ( !pPrev || (vecFaceDir.x == 0 && vecFaceDir.y == 0) )
@@ -2152,11 +2152,11 @@ void CFuncTrackTrain::UpdateOrientationBlend( TrainOrientationType_t eOrientatio
 	float p = 0;
 	if ( pPrev && ( angPrev != angNext ) )
 	{
-		Vector vecSegment = pNext->GetLocalOrigin() - pPrev->GetLocalOrigin();
+		Vector vecSegment = pNext->GetEngineObject()->GetLocalOrigin() - pPrev->GetEngineObject()->GetLocalOrigin();
 		float flSegmentLen = vecSegment.Length();
 		if ( flSegmentLen )
 		{
-			Vector vecCurOffset = GetLocalOrigin() - pPrev->GetLocalOrigin();
+			Vector vecCurOffset = GetEngineObject()->GetLocalOrigin() - pPrev->GetEngineObject()->GetLocalOrigin();
 			p = vecCurOffset.Length() / flSegmentLen;
 		}
 	}
@@ -2188,7 +2188,7 @@ void CFuncTrackTrain::UpdateOrientationBlend( TrainOrientationType_t eOrientatio
 		angNew[PITCH] = angPrev[PITCH];
 	}
 
-	DoUpdateOrientation( GetLocalAngles(), angNew, flInterval );
+	DoUpdateOrientation(GetEngineObject()->GetLocalAngles(), angNew, flInterval );
 }
 
 
@@ -2254,16 +2254,16 @@ void CFuncTrackTrain::DoUpdateOrientation( const QAngle &curAngles, const QAngle
 //-----------------------------------------------------------------------------
 void CFuncTrackTrain::TeleportToPathTrack( CPathTrack *pTeleport )
 {
-	QAngle angCur = GetLocalAngles();
+	QAngle angCur = GetEngineObject()->GetLocalAngles();
 
-	Vector nextPos = pTeleport->GetLocalOrigin();
+	Vector nextPos = pTeleport->GetEngineObject()->GetLocalOrigin();
 	Vector look = nextPos;
 	pTeleport->LookAhead( look, m_length, 0 );
 
 	QAngle nextAngles;
 	if ( HasSpawnFlags( SF_TRACKTRAIN_FIXED_ORIENTATION ) || ( look == nextPos ) )
 	{
-		nextAngles = GetLocalAngles();
+		nextAngles = GetEngineObject()->GetLocalAngles();
 	}
 	else
 	{
@@ -2274,7 +2274,7 @@ void CFuncTrackTrain::TeleportToPathTrack( CPathTrack *pTeleport )
 		}
 	}
 
-	Teleport( &pTeleport->GetLocalOrigin(), &nextAngles, NULL );
+	Teleport( &pTeleport->GetEngineObject()->GetLocalOrigin(), &nextAngles, NULL );
 	SetLocalAngularVelocity( vec3_angle );
 
 	variant_t emptyVariant;
@@ -2308,7 +2308,7 @@ void CFuncTrackTrain::Next( void )
 	// Based on our current position and speed, look ahead along our path and see
 	// where we should be in 0.1 seconds.
 	//
-	Vector nextPos = GetLocalOrigin();
+	Vector nextPos = GetEngineObject()->GetLocalOrigin();
 	float flSpeed = m_flSpeed;
 
 	nextPos.z -= m_height;
@@ -2328,16 +2328,16 @@ void CFuncTrackTrain::Next( void )
 	{
 		if ( pNext != NULL )
 		{
-			NDebugOverlay::Line( GetAbsOrigin(), pNext->GetAbsOrigin(), 255, 0, 0, true, 0.1 );
-			NDebugOverlay::Line( pNext->GetAbsOrigin(), pNext->GetAbsOrigin() + Vector( 0,0,32), 255, 0, 0, true, 0.1 );
-			NDebugOverlay::Box( pNext->GetAbsOrigin(), Vector( -8, -8, -8 ), Vector( 8, 8, 8 ), 255, 0, 0, 0, 0.1 );
+			NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), pNext->GetEngineObject()->GetAbsOrigin(), 255, 0, 0, true, 0.1 );
+			NDebugOverlay::Line( pNext->GetEngineObject()->GetAbsOrigin(), pNext->GetEngineObject()->GetAbsOrigin() + Vector( 0,0,32), 255, 0, 0, true, 0.1 );
+			NDebugOverlay::Box( pNext->GetEngineObject()->GetAbsOrigin(), Vector( -8, -8, -8 ), Vector( 8, 8, 8 ), 255, 0, 0, 0, 0.1 );
 		}
 
 		if ( pNextNext != NULL )
 		{
-			NDebugOverlay::Line( GetAbsOrigin(), pNextNext->GetAbsOrigin(), 0, 255, 0, true, 0.1 );
-			NDebugOverlay::Line( pNextNext->GetAbsOrigin(), pNextNext->GetAbsOrigin() + Vector( 0,0,32), 0, 255, 0, true, 0.1 );
-			NDebugOverlay::Box( pNextNext->GetAbsOrigin(), Vector( -8, -8, -8 ), Vector( 8, 8, 8 ), 0, 255, 0, 0, 0.1 );
+			NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), pNextNext->GetEngineObject()->GetAbsOrigin(), 0, 255, 0, true, 0.1 );
+			NDebugOverlay::Line( pNextNext->GetEngineObject()->GetAbsOrigin(), pNextNext->GetEngineObject()->GetAbsOrigin() + Vector( 0,0,32), 0, 255, 0, true, 0.1 );
+			NDebugOverlay::Box( pNextNext->GetEngineObject()->GetAbsOrigin(), Vector( -8, -8, -8 ), Vector( 8, 8, 8 ), 0, 255, 0, 0, 0.1 );
 		}
 	}
 
@@ -2386,9 +2386,9 @@ void CFuncTrackTrain::Next( void )
 		// We've reached the end of the path, stop.
 		//
 		SoundStop();
-		SetLocalVelocity(nextPos - GetLocalOrigin());
+		GetEngineObject()->SetLocalVelocity(nextPos - GetEngineObject()->GetLocalOrigin());
 		SetLocalAngularVelocity( vec3_angle );
-		float distance = GetLocalVelocity().Length();
+		float distance = GetEngineObject()->GetLocalVelocity().Length();
 		m_oldSpeed = m_flSpeed;
 
 		m_flSpeed = 0;
@@ -2400,7 +2400,7 @@ void CFuncTrackTrain::Next( void )
 		{
 			// no, how long to get there?
 			float flTime = distance / fabs( m_oldSpeed );
-			SetLocalVelocity( GetLocalVelocity() * (m_oldSpeed / distance) );
+			GetEngineObject()->SetLocalVelocity(GetEngineObject()->GetLocalVelocity() * (m_oldSpeed / distance) );
 			SetMoveDone( &CFuncTrackTrain::DeadEnd );
 			SetNextThink( TICK_NEVER_THINK );
 			SetMoveDoneTime( flTime );
@@ -2467,7 +2467,7 @@ void CFuncTrackTrain::DeadEnd( void )
 		}
 	}
 
-	SetLocalVelocity( vec3_origin );
+	GetEngineObject()->SetLocalVelocity( vec3_origin );
 	SetLocalAngularVelocity( vec3_angle );
 	if ( pTrack )
 	{
@@ -2484,7 +2484,7 @@ void CFuncTrackTrain::DeadEnd( void )
 
 void CFuncTrackTrain::SetControls( CBaseEntity *pControls )
 {
-	Vector offset = pControls->GetLocalOrigin();
+	Vector offset = pControls->GetEngineObject()->GetLocalOrigin();
 
 	m_controlMins = pControls->WorldAlignMins() + offset;
 	m_controlMaxs = pControls->WorldAlignMaxs() + offset;
@@ -2496,13 +2496,13 @@ void CFuncTrackTrain::SetControls( CBaseEntity *pControls )
 //-----------------------------------------------------------------------------
 bool CFuncTrackTrain::OnControls( CBaseEntity *pTest )
 {
-	Vector offset = pTest->GetLocalOrigin() - GetLocalOrigin();
+	Vector offset = pTest->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin();
 
 	if ( m_spawnflags & SF_TRACKTRAIN_NOCONTROL )
 		return false;
 
 	// Transform offset into local coordinates
-	VMatrix tmp = SetupMatrixAngles( GetLocalAngles() );
+	VMatrix tmp = SetupMatrixAngles(GetEngineObject()->GetLocalAngles() );
 	// rotate into local space
 	Vector local = tmp.VMul3x3Transpose( offset );
 
@@ -2542,7 +2542,7 @@ void CFuncTrackTrain::Find( void )
 
 
 
-	Vector nextPos = m_ppath->GetLocalOrigin();
+	Vector nextPos = m_ppath->GetEngineObject()->GetLocalOrigin();
 	Vector look = nextPos;
 	m_ppath->LookAhead( look, m_length, 0 );
 	nextPos.z += m_height;
@@ -2551,7 +2551,7 @@ void CFuncTrackTrain::Find( void )
 	QAngle nextAngles;
 	if ( HasSpawnFlags( SF_TRACKTRAIN_FIXED_ORIENTATION ) )
 	{
-		nextAngles = GetLocalAngles();
+		nextAngles = GetEngineObject()->GetLocalAngles();
 	}
 	else
 	{
@@ -2583,12 +2583,12 @@ void CFuncTrackTrain::NearestPath( void )
 
 	closest = 1024;
 
-	for ( CEntitySphereQuery sphere( GetAbsOrigin(), 1024 ); ( pTrack = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
+	for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), 1024 ); ( pTrack = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 	{
 		// filter out non-tracks
 		if ( !(pTrack->GetFlags() & (FL_CLIENT|FL_NPC)) && FClassnameIs( pTrack, "path_track" ) )
 		{
-			dist = (GetAbsOrigin() - pTrack->GetAbsOrigin()).Length();
+			dist = (GetEngineObject()->GetAbsOrigin() - pTrack->GetEngineObject()->GetAbsOrigin()).Length();
 			if ( dist < closest )
 			{
 				closest = dist;
@@ -2609,7 +2609,7 @@ void CFuncTrackTrain::NearestPath( void )
 	pTrack = ((CPathTrack *)pNearest)->GetNext();
 	if ( pTrack )
 	{
-		if ( (GetLocalOrigin() - pTrack->GetLocalOrigin()).Length() < (GetLocalOrigin() - pNearest->GetLocalOrigin()).Length() )
+		if ( (GetEngineObject()->GetLocalOrigin() - pTrack->GetEngineObject()->GetLocalOrigin()).Length() < (GetEngineObject()->GetLocalOrigin() - pNearest->GetEngineObject()->GetLocalOrigin()).Length() )
 			pNearest = pTrack;
 	}
 
@@ -2673,7 +2673,7 @@ void CFuncTrackTrain::Spawn( void )
 		m_nMoveSoundMaxPitch = 200;
 	}
 
-	SetLocalVelocity(vec3_origin);
+	GetEngineObject()->SetLocalVelocity(vec3_origin);
 	SetLocalAngularVelocity( vec3_angle );
 
 	m_dir = 1;
@@ -2928,7 +2928,7 @@ void CFuncTrackChange::Spawn( void )
 {
 	Setup();
 	if ( FBitSet( m_spawnflags, SF_TRACK_DONT_MOVE ) )
-		m_vecPosition2.z = GetLocalOrigin().z;
+		m_vecPosition2.z = GetEngineObject()->GetLocalOrigin().z;
 
 	SetupRotation();
 
@@ -2936,14 +2936,14 @@ void CFuncTrackChange::Spawn( void )
 	{
 		UTIL_SetOrigin( this, m_vecPosition2);
 		m_toggle_state = TS_AT_BOTTOM;
-		SetLocalAngles( m_start );
+		GetEngineObject()->SetLocalAngles( m_start );
 		m_targetState = TS_AT_TOP;
 	}
 	else
 	{
 		UTIL_SetOrigin( this, m_vecPosition1);
 		m_toggle_state = TS_AT_TOP;
-		SetLocalAngles( m_end );
+		GetEngineObject()->SetLocalAngles( m_end );
 		m_targetState = TS_AT_BOTTOM;
 	}
 
@@ -3031,7 +3031,7 @@ TRAIN_CODE CFuncTrackChange::EvaluateTrain( CPathTrack *pcurrent )
 		if ( m_train->m_flSpeed != 0 )
 			return TRAIN_BLOCKING;
 
-		Vector dist = GetLocalOrigin() - m_train->GetLocalOrigin();
+		Vector dist = GetEngineObject()->GetLocalOrigin() - m_train->GetEngineObject()->GetLocalOrigin();
 		float length = dist.Length2D();
 		if ( length < m_train->m_length )		// Empirically determined close distance
 			return TRAIN_FOLLOWING;
@@ -3049,7 +3049,7 @@ void CFuncTrackChange::UpdateTrain( QAngle &dest )
 {
 	float time = GetMoveDoneTime();
 
-	m_train->SetAbsVelocity( GetAbsVelocity() );
+	m_train->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() );
 	m_train->SetLocalAngularVelocity( GetLocalAngularVelocity() );
 	m_train->SetMoveDoneTime( time );
 
@@ -3057,8 +3057,8 @@ void CFuncTrackChange::UpdateTrain( QAngle &dest )
 	if ( time <= 0 )
 		return;
 
-	Vector offset = m_train->GetLocalOrigin() - GetLocalOrigin();
-	QAngle delta = dest - GetLocalAngles();
+	Vector offset = m_train->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin();
+	QAngle delta = dest - GetEngineObject()->GetLocalAngles();
 	// Transform offset into local coordinates
 	Vector forward, right, up;
 	AngleVectorsTranspose( delta, &forward, &right, &up );
@@ -3068,7 +3068,7 @@ void CFuncTrackChange::UpdateTrain( QAngle &dest )
 	local.z = DotProduct( offset, up );
 
 	local = local - offset;
-	m_train->SetAbsVelocity( GetAbsVelocity() + (local * (1.0/time)) );
+	m_train->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() + (local * (1.0/time)) );
 }
 
 

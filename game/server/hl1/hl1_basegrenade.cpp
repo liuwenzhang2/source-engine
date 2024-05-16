@@ -46,10 +46,10 @@ void CHL1BaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	// Pull out of the wall a bit
 	if ( pTrace->fraction != 1.0 )
 	{
-		SetLocalOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6) );
+		GetEngineObject()->SetLocalOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6) );
 	}
 
-	Vector vecAbsOrigin = GetAbsOrigin();
+	Vector vecAbsOrigin = GetEngineObject()->GetAbsOrigin();
 	int contents = UTIL_PointContents ( vecAbsOrigin );
 
 	if ( pTrace->fraction != 1.0 )
@@ -81,14 +81,14 @@ void CHL1BaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 			m_flDamage );
 	}
 
-	CSoundEnt::InsertSound ( SOUND_COMBAT, GetAbsOrigin(), BASEGRENADE_EXPLOSION_VOLUME, 3.0 );
+	CSoundEnt::InsertSound ( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), BASEGRENADE_EXPLOSION_VOLUME, 3.0 );
 
 	// Use the owner's position as the reported position
-	Vector vecReported = GetThrower() ? GetThrower()->GetAbsOrigin() : vec3_origin;
+	Vector vecReported = GetThrower() ? GetThrower()->GetEngineObject()->GetAbsOrigin() : vec3_origin;
 	
-	CTakeDamageInfo info( this, GetThrower(), GetBlastForce(), GetAbsOrigin(), m_flDamage, bitsDamageType, 0, &vecReported );
+	CTakeDamageInfo info( this, GetThrower(), GetBlastForce(), GetEngineObject()->GetAbsOrigin(), m_flDamage, bitsDamageType, 0, &vecReported );
 
-	RadiusDamage( info, GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
+	RadiusDamage( info, GetEngineObject()->GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
 
 	UTIL_DecalTrace( pTrace, "Scorch" );
 
@@ -107,7 +107,7 @@ void CHL1BaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	SetTouch( NULL );
 	
 	AddEffects( EF_NODRAW );
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 	SetThink( &CBaseGrenade::Smoke );
 	SetNextThink( gpGlobals->curtime + 0.3);
@@ -119,6 +119,6 @@ void CHL1BaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 		VectorAngles( pTrace->plane.normal, angles );
 
 		for ( int i = 0; i < sparkCount; i++ )
-			Create( "spark_shower", GetAbsOrigin(), angles, NULL );
+			Create( "spark_shower", GetEngineObject()->GetAbsOrigin(), angles, NULL );
 	}
 }

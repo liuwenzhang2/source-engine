@@ -270,7 +270,7 @@ inline void CBeam::SetStartPos( const Vector &pos )
 #if defined( CLIENT_DLL )
 	GetEngineObject()->SetNetworkOrigin( pos );
 #endif
-	SetLocalOrigin( pos );
+	GetEngineObject()->SetLocalOrigin( pos );
 }
 
 inline void CBeam::SetEndPos( const Vector &pos ) 

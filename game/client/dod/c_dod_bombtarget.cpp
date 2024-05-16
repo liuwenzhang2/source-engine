@@ -47,7 +47,7 @@ void C_DODBombTarget::ClientThink( void )
 
 	if ( pPlayer && pPlayer->IsAlive() )
 	{
-		Vector vecDist = GetAbsOrigin() - pPlayer->GetAbsOrigin();
+		Vector vecDist = GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin();
 
 		if ( vecDist.Length() < 200 )
 		{

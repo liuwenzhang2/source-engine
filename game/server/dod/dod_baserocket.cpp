@@ -162,23 +162,23 @@ void CDODBaseRocket::DoExplosion( trace_t *pTrace )
 	// Pull out of the wall a bit
 	if ( pTrace->fraction != 1.0 )
 	{
-		SetAbsOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6) );
+		GetEngineObject()->SetAbsOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6) );
 	}
 
 	// Explosion effect on client
-	Vector vecOrigin = GetAbsOrigin();
+	Vector vecOrigin = GetEngineObject()->GetAbsOrigin();
 	CPVSFilter filter( vecOrigin );
 	TE_DODExplosion( filter, 0.0f, vecOrigin, pTrace->plane.normal );
 
-	CTakeDamageInfo info( this, GetOwnerEntity(), vec3_origin, GetAbsOrigin(), GetDamage(), DMG_BLAST, 0 );
+	CTakeDamageInfo info( this, GetOwnerEntity(), vec3_origin, GetEngineObject()->GetAbsOrigin(), GetDamage(), DMG_BLAST, 0 );
 	RadiusDamage( info, vecOrigin, mp_rocketradius.GetFloat() /* GetDamageRadius() */, CLASS_NONE, NULL );
 
 	// stun players in a radius
 	const float flStunDamage = 75;
 	const float flRadius = 150;
 
-	CTakeDamageInfo stunInfo( this, GetOwnerEntity(), vec3_origin, GetAbsOrigin(), flStunDamage, DMG_STUN );
-	DODGameRules()->RadiusStun( stunInfo, GetAbsOrigin(), flRadius );
+	CTakeDamageInfo stunInfo( this, GetOwnerEntity(), vec3_origin, GetEngineObject()->GetAbsOrigin(), flStunDamage, DMG_STUN );
+	DODGameRules()->RadiusStun( stunInfo, GetEngineObject()->GetAbsOrigin(), flRadius );
 }
 
 
@@ -238,7 +238,7 @@ void CDODBaseRocket::RocketTouch( CBaseEntity *pOther )
 		info.SetDamageType( DMG_CLUB );
 
 		Vector dir;
-		AngleVectors( GetAbsAngles(), &dir );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &dir );
 
 		pOther->DispatchTraceAttack( info, dir, newTrace );
 		ApplyMultiDamage();
@@ -260,9 +260,9 @@ void CDODBaseRocket::FlyThink( void )
 {
 	QAngle angles;
 
-	VectorAngles( GetAbsVelocity(), angles );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
 
-	SetAbsAngles( angles );
+	GetEngineObject()->SetAbsAngles( angles );
 
 	if ( gpGlobals->curtime > m_flCollideWithTeammatesTime && m_bCollideWithTeammates == false )
 	{
@@ -293,10 +293,10 @@ CDODBaseRocket *CDODBaseRocket::Create( const char *szClassname, const Vector &v
 
 	Vector vRocket = vecForward * 1300;
 
-	pMissile->SetAbsVelocity( vRocket );	
+	pMissile->GetEngineObject()->SetAbsVelocity( vRocket );
 	pMissile->SetupInitialTransmittedGrenadeVelocity( vRocket );
 
-	pMissile->SetAbsAngles( vecAngles );
+	pMissile->GetEngineObject()->SetAbsAngles( vecAngles );
 
 	// remember what team we should be on
 	pMissile->ChangeTeam( pOwner->GetTeamNumber() );

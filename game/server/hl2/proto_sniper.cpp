@@ -985,7 +985,7 @@ void CProtoSniper::Spawn( void )
 	// Point the cursor straight ahead so that the sniper's
 	// first sweep of the laser doesn't look weird.
 	Vector vecForward;
-	AngleVectors( GetLocalAngles(), &vecForward );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &vecForward );
 	m_vecPaintCursor = GetBulletOrigin() + vecForward * 1024;
 
 	m_fWeaponLoaded = true;
@@ -1154,7 +1154,7 @@ int CProtoSniper::IRelationPriority( CBaseEntity *pTarget )
 	// If we have a target to protect, increase priority on targets closer to it
 	if ( m_hProtectTarget )
 	{
-		float flDistance = (pTarget->GetAbsOrigin() - m_hProtectTarget->GetAbsOrigin()).LengthSqr();
+		float flDistance = (pTarget->GetEngineObject()->GetAbsOrigin() - m_hProtectTarget->GetEngineObject()->GetAbsOrigin()).LengthSqr();
 		if ( flDistance <= SNIPER_PROTECTION_MINDIST )
  		{
  			float flBonus = (1.0 - (flDistance / SNIPER_PROTECTION_MINDIST)) * SNIPER_PROTECTION_PRIORITYCAP;
@@ -1162,7 +1162,7 @@ int CProtoSniper::IRelationPriority( CBaseEntity *pTarget )
 
 			if ( m_debugOverlays & OVERLAY_NPC_SELECTED_BIT )
 			{
-				NDebugOverlay::Text( pTarget->GetAbsOrigin() + Vector(0,0,16), UTIL_VarArgs("P: %d (b %f)!", priority, flBonus), false, 0.1 );
+				NDebugOverlay::Text( pTarget->GetEngineObject()->GetAbsOrigin() + Vector(0,0,16), UTIL_VarArgs("P: %d (b %f)!", priority, flBonus), false, 0.1 );
 			}
 		}
 	}
@@ -1195,12 +1195,12 @@ Vector CProtoSniper::GetBulletOrigin( void )
 {
 	if( m_spawnflags & SF_SNIPER_HIDDEN )
 	{
-		return GetAbsOrigin();
+		return GetEngineObject()->GetAbsOrigin();
 	}
 	else
 	{
 		Vector vecForward;
-		AngleVectors( GetLocalAngles(), &vecForward );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), &vecForward );
 		return WorldSpaceCenter() + vecForward * 20;
 	}
 }
@@ -1298,7 +1298,7 @@ int CProtoSniper::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		return 0;
 	}
 
-	float flDist = GetAbsOrigin().DistTo( info.GetInflictor()->GetAbsOrigin() );
+	float flDist = GetEngineObject()->GetAbsOrigin().DistTo( info.GetInflictor()->GetEngineObject()->GetAbsOrigin() );
 	if( flDist > SNIPER_MAX_INFLICTOR_DIST )
 	{
 		// Sniper only takes damage from explosives that are nearby. This makes a sniper 
@@ -1331,7 +1331,7 @@ void CProtoSniper::Event_Killed( const CTakeDamageInfo &info )
 		
 		float flForce = random->RandomFloat( 500, 700 ) * 10;
 
-		AngleVectors( GetLocalAngles(), &vecForward );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), &vecForward );
 		
 		float flFadeTime = 0.0;
 
@@ -1342,7 +1342,7 @@ void CProtoSniper::Event_Killed( const CTakeDamageInfo &info )
 
 		CBaseEntity *pGib;
 		bool bShouldIgnite = IsOnFire() || hl2_episodic.GetBool();
-		pGib = CreateRagGib( "models/combine_soldier.mdl", GetLocalOrigin(), GetLocalAngles(), (vecForward * flForce) + Vector(0, 0, 600), flFadeTime, bShouldIgnite );
+		pGib = CreateRagGib( "models/combine_soldier.mdl", GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles(), (vecForward * flForce) + Vector(0, 0, 600), flFadeTime, bShouldIgnite );
 
 	}
 
@@ -1715,7 +1715,7 @@ bool CProtoSniper::FindDecoyObject( void )
 			// Throw some noise in, don't always hit the center.
 			Vector vecNoise;
 			pProspect->CollisionProp()->RandomPointInBounds( Vector( 0.25, 0.25, 0.25 ), Vector( 0.75, 0.75, 0.75 ), &vecNoise );
-			m_vecDecoyObjectTarget += vecNoise - pProspect->GetAbsOrigin();
+			m_vecDecoyObjectTarget += vecNoise - pProspect->GetEngineObject()->GetAbsOrigin();
 			return true;
 		}
 	}
@@ -1819,7 +1819,7 @@ int CProtoSniper::RangeAttack1Conditions ( float flDot, float flDist )
 
 			float flDist;
 
-			flDist = ( GetLocalOrigin() - GetEnemy()->GetLocalOrigin() ).Length2D();
+			flDist = (GetEngineObject()->GetLocalOrigin() - GetEnemy()->GetEngineObject()->GetLocalOrigin() ).Length2D();
 
 			if( flDist <= m_flPatience )
 			{
@@ -1891,7 +1891,7 @@ void CProtoSniper::ScopeGlint()
 {
 	CEffectData data;
 
-	data.m_vOrigin = GetAbsOrigin();
+	data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 	data.m_vNormal = vec3_origin;
 	data.m_vAngles = vec3_angle;
 	data.m_nColor = COMMAND_POINT_BLUE;
@@ -1917,7 +1917,7 @@ bool CProtoSniper::FireBullet( const Vector &vecTarget, bool bDirectShot )
 
 	vecBulletOrigin = GetBulletOrigin();
 
-	pBullet = (CSniperBullet *)Create( "sniperbullet", GetBulletOrigin(), GetLocalAngles(), NULL );
+	pBullet = (CSniperBullet *)Create( "sniperbullet", GetBulletOrigin(), GetEngineObject()->GetLocalAngles(), NULL );
 
 	Assert( pBullet != NULL );
 
@@ -1986,7 +1986,7 @@ void CProtoSniper::StartTask( const Task_t *pTask )
 		{
 			m_hSweepTarget = AI_GetSinglePlayer();
 			SetWait( 4.0f );
-			LaserOn( m_hSweepTarget->GetAbsOrigin(), vec3_origin );
+			LaserOn( m_hSweepTarget->GetEngineObject()->GetAbsOrigin(), vec3_origin );
 		}
 		break;
 
@@ -2018,10 +2018,10 @@ void CProtoSniper::StartTask( const Task_t *pTask )
 		// Otherwise, sweep from wherever the cursor was.
 		if( m_hSweepTarget->HasSpawnFlags( SF_SNIPERTARGET_SNAPTO ) )
 		{
-			m_vecPaintCursor = m_hSweepTarget->GetLocalOrigin();
+			m_vecPaintCursor = m_hSweepTarget->GetEngineObject()->GetLocalOrigin();
 		}
 
-		LaserOn( m_hSweepTarget->GetLocalOrigin(), vec3_origin );
+		LaserOn( m_hSweepTarget->GetEngineObject()->GetLocalOrigin(), vec3_origin );
 		break;
 
 	case TASK_SNIPER_PAINT_ENEMY:
@@ -2090,7 +2090,7 @@ void CProtoSniper::StartTask( const Task_t *pTask )
 			else
 			{
 				// Try to start the laser where the player can't miss seeing it!
-				AngleVectors( GetEnemy()->GetLocalAngles(), &vecCursor );
+				AngleVectors( GetEnemy()->GetEngineObject()->GetLocalAngles(), &vecCursor );
 				vecCursor = vecCursor * 300;
 				vecCursor += GetEnemy()->EyePosition();				
 				LaserOn( vecCursor, Vector( 16, 16, 16 ) );
@@ -2172,7 +2172,7 @@ void CProtoSniper::RunTask( const Task_t *pTask )
 		}
 		else
 		{
-			PaintTarget( m_hSweepTarget->GetAbsOrigin(), 4.0f );
+			PaintTarget( m_hSweepTarget->GetEngineObject()->GetAbsOrigin(), 4.0f );
 		}
 		break;
 
@@ -2224,7 +2224,7 @@ void CProtoSniper::RunTask( const Task_t *pTask )
 
 			if ( m_hSweepTarget->HasSpawnFlags( SF_SNIPERTARGET_SHOOTME ) )
 			{
-				FireBullet( m_hSweepTarget->GetLocalOrigin(), false );
+				FireBullet( m_hSweepTarget->GetEngineObject()->GetLocalOrigin(), false );
 				TaskComplete(); // Force a reload.
 			}
 
@@ -2233,7 +2233,7 @@ void CProtoSniper::RunTask( const Task_t *pTask )
 				// Bump the timer up, update the cursor, paint the new target!
 				// This is done regardless of whether we just fired at the current target.
 
-				m_vecPaintCursor = m_hSweepTarget->GetLocalOrigin();
+				m_vecPaintCursor = m_hSweepTarget->GetEngineObject()->GetLocalOrigin();
 				if( IsSweepingRandomly() )
 				{
 					// If sweeping randomly, just pick another target.
@@ -2277,7 +2277,7 @@ void CProtoSniper::RunTask( const Task_t *pTask )
 				m_fSnapShot = true;
 			}
 
-			PaintTarget( m_hSweepTarget->GetAbsOrigin(), m_hSweepTarget->m_flSpeed );
+			PaintTarget( m_hSweepTarget->GetEngineObject()->GetAbsOrigin(), m_hSweepTarget->m_flSpeed );
 		}
 
 		break;
@@ -2423,7 +2423,7 @@ Vector CProtoSniper::EyePosition( void )
 {
 	if( m_spawnflags & SF_SNIPER_HIDDEN )
 	{
-		return GetLocalOrigin();
+		return GetEngineObject()->GetLocalOrigin();
 	}
 	else
 	{
@@ -2454,7 +2454,7 @@ Vector CProtoSniper::DesiredBodyTarget( CBaseEntity *pTarget )
 		if( pTarget->Classify() == CLASS_HEADCRAB )
 		{
 			// Headcrabs are tiny inside their boxes.
-			vecTarget = pTarget->GetAbsOrigin();
+			vecTarget = pTarget->GetEngineObject()->GetAbsOrigin();
 			vecTarget.z += 4.0;
 		}
 		else if( !m_bShootZombiesInChest && pTarget->Classify() == CLASS_ZOMBIE )
@@ -2473,7 +2473,7 @@ Vector CProtoSniper::DesiredBodyTarget( CBaseEntity *pTarget )
 		{
 			// Shoot about a few inches above the origin. This makes it easy to hit antlions
 			// even if they are on their backs.
-			vecTarget = pTarget->GetAbsOrigin();
+			vecTarget = pTarget->GetEngineObject()->GetAbsOrigin();
 			vecTarget.z += 18.0f;
 		}
 		else if( pTarget->Classify() == CLASS_EARTH_FAUNA )
@@ -2546,7 +2546,7 @@ Vector CProtoSniper::LeadTarget( CBaseEntity *pTarget )
 		if( pTarget->MyNPCPointer() && pTarget->MyNPCPointer()->GetNavType() == NAV_FLY )
 		{
 			// Take a flying monster's velocity directly.
-			vecVelocity = pTarget->GetAbsVelocity();
+			vecVelocity = pTarget->GetEngineObject()->GetAbsVelocity();
 		}
 		else
 		{
@@ -2562,7 +2562,7 @@ Vector CProtoSniper::LeadTarget( CBaseEntity *pTarget )
 			vecAngle.x = 0;
 			vecAngle.z = 0;
 
-			vecAngle.y += pTarget->GetLocalAngles().y;
+			vecAngle.y += pTarget->GetEngineObject()->GetLocalAngles().y;
 
 			AngleVectors( vecAngle, &vecVelocity );
 
@@ -2597,7 +2597,7 @@ Vector CProtoSniper::LeadTarget( CBaseEntity *pTarget )
 	{
 		Vector vecBulletOrigin;
 		vecBulletOrigin = GetBulletOrigin();
-		CPVSFilter filter( GetLocalOrigin() );
+		CPVSFilter filter(GetEngineObject()->GetLocalOrigin() );
 		te->ShowLine( filter, 0.0, &vecBulletOrigin, &vecAdjustedShot );
 	}
 
@@ -2632,7 +2632,7 @@ CBaseEntity *CProtoSniper::PickDeadPlayerTarget()
 	CBaseEntity *pTarget = AI_GetSinglePlayer();
 	CBaseEntity *pEntities[ iSearchSize ];
 
-	int iNumEntities = UTIL_EntitiesInSphere( pEntities, iSearchSize, AI_GetSinglePlayer()->GetAbsOrigin(), 180.0f, 0 );
+	int iNumEntities = UTIL_EntitiesInSphere( pEntities, iSearchSize, AI_GetSinglePlayer()->GetEngineObject()->GetAbsOrigin(), 180.0f, 0 );
 
 	// Not very robust, but doesn't need to be. Randomly select a nearby object in the list that isn't an NPC.
 	if( iNumEntities > 0 )
@@ -2716,7 +2716,7 @@ bool CProtoSniper::FindFrustratedShot( float flNoise )
 
 		Vector vecSrc, vecDir;
 
-		vecSrc = GetAbsOrigin(); 
+		vecSrc = GetEngineObject()->GetAbsOrigin();
 		vecDir = vecSpot - vecSrc;
 		VectorNormalize( vecDir );
 
@@ -2782,7 +2782,7 @@ bool CProtoSniper::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **
 	Vector	vecEye;
 	trace_t	tr;
 
-	if( fabs( GetAbsOrigin().z - pEntity->WorldSpaceCenter().z ) <= 120.f )
+	if( fabs(GetEngineObject()->GetAbsOrigin().z - pEntity->WorldSpaceCenter().z ) <= 120.f )
 	{
 		// If the player is around the same elevation, look straight at his eyes. 
 		// At the same elevation, the vertical peeking allowance makes it too easy
@@ -2796,7 +2796,7 @@ bool CProtoSniper::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **
 		vecVerticalOffset = SNIPER_TARGET_VERTICAL_OFFSET;
 	}
 
-	AngleVectors( pEntity->GetLocalAngles(), NULL, &vecRight, NULL );
+	AngleVectors( pEntity->GetEngineObject()->GetLocalAngles(), NULL, &vecRight, NULL );
 
 	vecEye = vecRight * SNIPER_EYE_DIST - vecVerticalOffset;
 	UTIL_TraceLine( EyePosition(), pEntity->EyePosition() + vecEye, MASK_BLOCKLOS, this, COLLISION_GROUP_NONE, &tr );
@@ -2904,7 +2904,7 @@ int CProtoSniper::DrawDebugTextOverlays()
 		{
 			if ( m_pGroupTarget[i] != NULL )
 			{
-				NDebugOverlay::VertArrow( EyePosition(), m_pGroupTarget[i]->GetAbsOrigin(), 8, 0, 255, 0, 0, true, 0);
+				NDebugOverlay::VertArrow( EyePosition(), m_pGroupTarget[i]->GetEngineObject()->GetAbsOrigin(), 8, 0, 255, 0, 0, true, 0);
 			}
 		}
 	}
@@ -3239,7 +3239,7 @@ void CSniperBullet::BulletThink( void )
 	float flInterval;
 
 	flInterval = gpGlobals->curtime - GetLastThink();
-	vecStart = GetAbsOrigin();
+	vecStart = GetEngineObject()->GetAbsOrigin();
 	vecEnd = vecStart + ( m_vecDir * (m_Speed * flInterval) );
 	float flDist = (vecStart - vecEnd).Length();
 
@@ -3288,7 +3288,7 @@ void CSniperBullet::BulletThink( void )
 				if( UTIL_PointContents( vecCursor ) != CONTENTS_SOLID )
 				{
 					// Passed out of a solid! 
-					SetAbsOrigin( vecCursor );
+					GetEngineObject()->SetAbsOrigin( vecCursor );
 
 					// Fire another tracer.
 					AI_TraceLine( vecCursor, vecCursor + m_vecDir * 8192, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
@@ -3314,7 +3314,7 @@ void CSniperBullet::BulletThink( void )
 	}
 	else
 	{
-		SetAbsOrigin( vecEnd );
+		GetEngineObject()->SetAbsOrigin( vecEnd );
 	}
 }
 
@@ -3364,7 +3364,7 @@ bool CSniperBullet::Start( const Vector &vecOrigin, const Vector &vecTarget, CBa
 	// Start the tracer here, and tell it to end at the end of the last trace
 	// the trace comes from the loop above that does penetration.
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + m_vecDir * 8192, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + m_vecDir * 8192, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 	UTIL_Tracer( vecOrigin, tr.endpos, 0, TRACER_DONT_USE_ATTACHMENT, m_Speed, true, "StriderTracer" );
 
 	float flElapsedTime = ( (tr.startpos - tr.endpos).Length() / m_Speed );

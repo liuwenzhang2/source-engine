@@ -109,7 +109,7 @@ void C_Flare::OnDataChanged( DataUpdateType_t updateType )
 {
 	if ( updateType == DATA_UPDATE_CREATED )
 	{
-		SetSortOrigin( GetAbsOrigin() );
+		SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 		if ( m_bSmoke )
 		{
 			m_teSmokeSpawn.Init( 8 );
@@ -126,7 +126,7 @@ void C_Flare::RestoreResources( void )
 {
 	if ( m_pParticle[0] == NULL )
 	{
-		m_pParticle[0] = (SimpleParticle *) AddParticle( sizeof( SimpleParticle ), GetPMaterial( "effects/redflare" ), GetAbsOrigin() );
+		m_pParticle[0] = (SimpleParticle *) AddParticle( sizeof( SimpleParticle ), GetPMaterial( "effects/redflare" ), GetEngineObject()->GetAbsOrigin() );
 		
 		if ( m_pParticle[0] != NULL )
 		{
@@ -144,7 +144,7 @@ void C_Flare::RestoreResources( void )
 
 	if ( m_pParticle[1] == NULL )
 	{
-		m_pParticle[1] = (SimpleParticle *) AddParticle( sizeof( SimpleParticle ), GetPMaterial( "effects/yellowflare_noz" ), GetAbsOrigin() );
+		m_pParticle[1] = (SimpleParticle *) AddParticle( sizeof( SimpleParticle ), GetPMaterial( "effects/yellowflare_noz" ), GetEngineObject()->GetAbsOrigin() );
 		
 		if ( m_pParticle[1] != NULL )
 		{
@@ -200,7 +200,7 @@ void C_Flare::Update( float timeDelta )
 
 	//Check for LOS
 	pixelvis_queryparams_t params;
-	params.Init(GetAbsOrigin());
+	params.Init(GetEngineObject()->GetAbsOrigin());
 	params.proxySize = 8.0f; // Inches
 	
 	float visible = PixelVisibility_FractionVisible( params, &m_queryHandle );
@@ -256,7 +256,7 @@ void C_Flare::Update( float timeDelta )
 
 		if ( m_bPropFlare == false )
 		{
-			dl->origin	= GetAbsOrigin();
+			dl->origin	= GetEngineObject()->GetAbsOrigin();
 			dl->color.r = 255;
 			dl->die		= gpGlobals->curtime + 0.1f;
 
@@ -306,7 +306,7 @@ void C_Flare::Update( float timeDelta )
 	{
 		while ( m_teSmokeSpawn.NextEvent( dt ) )
 		{
-			Vector	smokeOrg = GetAbsOrigin();
+			Vector	smokeOrg = GetEngineObject()->GetAbsOrigin();
 
 			Vector	flareScreenDir = ( smokeOrg - MainViewOrigin() );
 			VectorNormalize( flareScreenDir );
@@ -357,7 +357,7 @@ void C_Flare::Update( float timeDelta )
 	
 	//Cause the base of the effect to shake
 	offset.Random( -0.5f * baseScale, 0.5f * baseScale );
-	offset += GetAbsOrigin();
+	offset += GetEngineObject()->GetAbsOrigin();
 
 	if ( m_pParticle[0] != NULL )
 	{
@@ -390,7 +390,7 @@ void C_Flare::Update( float timeDelta )
 
 	//Cause the base of the effect to shake
 	offset.Random( -1.0f * baseScale, 1.0f * baseScale );
-	offset += GetAbsOrigin();
+	offset += GetEngineObject()->GetAbsOrigin();
 
 	if ( m_pParticle[1] != NULL )
 	{

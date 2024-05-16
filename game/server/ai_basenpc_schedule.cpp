@@ -841,7 +841,7 @@ bool CAI_BaseNPC::FindCoverPos( CBaseEntity *pEntity, Vector *pResult )
 
 	if ( !GetTacticalServices()->FindLateralCover( pEntity->EyePosition(), 0, pResult ) )
 	{
-		if ( !GetTacticalServices()->FindCoverPos( pEntity->GetAbsOrigin(), pEntity->EyePosition(), 0, CoverRadius(), pResult ) ) 
+		if ( !GetTacticalServices()->FindCoverPos( pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->EyePosition(), 0, CoverRadius(), pResult ) )
 		{
 			return false;
 		}
@@ -863,7 +863,7 @@ bool CAI_BaseNPC::FindCoverPosInRadius( CBaseEntity *pEntity, const Vector &goal
 
 	Vector					coverPos			= vec3_invalid;
 	CAI_TacticalServices *	pTacticalServices	= GetTacticalServices();
-	const Vector &			enemyPos			= pEntity->GetAbsOrigin();
+	const Vector &			enemyPos			= pEntity->GetEngineObject()->GetAbsOrigin();
 	Vector					enemyEyePos			= pEntity->EyePosition();
 
 	if( ( !GetSquad() || GetSquad()->GetFirstMember() == this ) &&
@@ -918,7 +918,7 @@ void CAI_BaseNPC::StartTurn( float flDeltaYaw )
 {
 	float flCurrentYaw;
 	
-	flCurrentYaw = UTIL_AngleMod( GetLocalAngles().y );
+	flCurrentYaw = UTIL_AngleMod(GetEngineObject()->GetLocalAngles().y );
 	GetMotor()->SetIdealYaw( UTIL_AngleMod( flCurrentYaw + flDeltaYaw ) );
 	SetTurnActivity();
 }
@@ -963,7 +963,7 @@ bool CAI_BaseNPC::FindCoverFromEnemy( bool bNodesOnly, float flMinDistance, floa
 		if ( flMaxDistance == FLT_MAX )
 			flMaxDistance = CoverRadius();
 		
-		if ( !GetTacticalServices()->FindCoverPos( pEntity->GetAbsOrigin(), pEntity->EyePosition(), flMinDistance, flMaxDistance, &coverPos ) )
+		if ( !GetTacticalServices()->FindCoverPos( pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->EyePosition(), flMinDistance, flMaxDistance, &coverPos ) )
 			return false;
 	}
 	else
@@ -1046,7 +1046,7 @@ float CAI_BaseNPC::CalcReasonableFacing( bool bIgnoreOriginalFacing )
 		const float SIZE_SLICE = 360.0 / SLICES;
 		const int SEARCH_MAX = (int)SLICES / 2;
 
-		float zEye = GetAbsOrigin().z + m_vDefaultEyeOffset.z; // always use standing eye so as to not screw with crouch cover
+		float zEye = GetEngineObject()->GetAbsOrigin().z + m_vDefaultEyeOffset.z; // always use standing eye so as to not screw with crouch cover
 
 		for( int i = 0 ; i <= SEARCH_MAX; i++ )
 		{
@@ -1087,7 +1087,7 @@ float CAI_BaseNPC::GetReasonableFacingDist( void )
 		const float dist = 3.5*12;
 		if ( GetEnemy() )
 		{
-			float distEnemy = ( GetEnemy()->GetAbsOrigin().AsVector2D() - GetAbsOrigin().AsVector2D() ).Length() - 1.0; 
+			float distEnemy = ( GetEnemy()->GetEngineObject()->GetAbsOrigin().AsVector2D() - GetEngineObject()->GetAbsOrigin().AsVector2D() ).Length() - 1.0;
 			return MIN( distEnemy, dist );
 		}
 
@@ -1107,7 +1107,7 @@ void CAI_BaseNPC::StartScriptMoveToTargetTask( int task )
 	{
 		TaskFail(FAIL_NO_TARGET);
 	}
-	else if ( (m_hTargetEnt->GetAbsOrigin() - GetLocalOrigin()).Length() < 1 )
+	else if ( (m_hTargetEnt->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetLocalOrigin()).Length() < 1 )
 	{
 		TaskComplete();
 	}
@@ -1174,7 +1174,7 @@ void CAI_BaseNPC::StartScriptMoveToTargetTask( int task )
 				}
 				else
 				{
-					GetNavigator()->SetArrivalDirection( m_hTargetEnt->GetAbsAngles() );
+					GetNavigator()->SetArrivalDirection( m_hTargetEnt->GetEngineObject()->GetAbsAngles() );
 				}
 			}
 		}
@@ -1288,7 +1288,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 	}
 
 	case TASK_STORE_LASTPOSITION:
-		m_vecLastPosition = GetLocalOrigin();
+		m_vecLastPosition = GetEngineObject()->GetLocalOrigin();
 		TaskComplete();
 		break;
 
@@ -1298,7 +1298,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 		break;
 
 	case TASK_STORE_POSITION_IN_SAVEPOSITION:
-		m_vSavePosition = GetLocalOrigin();
+		m_vSavePosition = GetEngineObject()->GetLocalOrigin();
 		TaskComplete();
 		break;
 
@@ -1345,7 +1345,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 	case TASK_STORE_ENEMY_POSITION_IN_SAVEPOSITION:
 		if ( GetEnemy() != NULL )
 		{
-			m_vSavePosition = GetEnemy()->GetAbsOrigin();
+			m_vSavePosition = GetEnemy()->GetEngineObject()->GetAbsOrigin();
 			TaskComplete();
 		}
 		else
@@ -1511,7 +1511,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 		{
 			Vector coverPos;
 
-			if ( GetTacticalServices()->FindCoverPos( GetLocalOrigin(), EyePosition(), 0, CoverRadius(), &coverPos ) ) 
+			if ( GetTacticalServices()->FindCoverPos(GetEngineObject()->GetLocalOrigin(), EyePosition(), 0, CoverRadius(), &coverPos ) )
 			{
 				AI_NavGoal_t goal(coverPos, ACT_RUN, AIN_HULL_TOLERANCE);
 				GetNavigator()->SetGoal( goal );
@@ -1564,14 +1564,14 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 		break;
 
 	case TASK_SET_IDEAL_YAW_TO_CURRENT:
-		GetMotor()->SetIdealYaw( UTIL_AngleMod( GetLocalAngles().y ) );
+		GetMotor()->SetIdealYaw( UTIL_AngleMod(GetEngineObject()->GetLocalAngles().y ) );
 		TaskComplete();
 		break;
 
 	case TASK_FACE_TARGET:
 		if ( m_hTargetEnt != NULL )
 		{
-			GetMotor()->SetIdealYawToTarget( m_hTargetEnt->GetAbsOrigin() );
+			GetMotor()->SetIdealYawToTarget( m_hTargetEnt->GetEngineObject()->GetAbsOrigin() );
 			SetTurnActivity(); 
 		}
 		else
@@ -1679,7 +1679,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 			{
 				TaskFail(FAIL_NO_TARGET);
 			}
-			else if ( (pTarget->GetAbsOrigin() - GetLocalOrigin()).Length() < 1 )
+			else if ( (pTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetLocalOrigin()).Length() < 1 )
 			{
 				TaskComplete();
 			}
@@ -1783,7 +1783,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 				return;
 			}
 
-			if ( ( pEnemy->GetAbsOrigin() - GetEnemyLKP() ).LengthSqr() < Square(pTask->flTaskData) )
+			if ( ( pEnemy->GetEngineObject()->GetAbsOrigin() - GetEnemyLKP() ).LengthSqr() < Square(pTask->flTaskData) )
 			{
 				ChainStartTask( TASK_GET_PATH_TO_ENEMY );
 			}
@@ -1877,7 +1877,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 						
 				// For now, just try running straight at enemy
 				float dist = EnemyDistance( GetEnemy() );
-				if ( dist <= flRange || GetNavigator()->SetVectorGoalFromTarget( GetEnemy()->GetAbsOrigin(), dist - flRange ) )
+				if ( dist <= flRange || GetNavigator()->SetVectorGoalFromTarget( GetEnemy()->GetEngineObject()->GetAbsOrigin(), dist - flRange ) )
 				{
 					TaskComplete();
 					break;
@@ -1920,7 +1920,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 				flMaxRange = m_flDistTooFar;
 			}
 
-			Vector vecEnemy 	= ( task != TASK_GET_PATH_TO_ENEMY_LKP ) ? GetEnemy()->GetAbsOrigin() : GetEnemyLKP();
+			Vector vecEnemy 	= ( task != TASK_GET_PATH_TO_ENEMY_LKP ) ? GetEnemy()->GetEngineObject()->GetAbsOrigin() : GetEnemyLKP();
 			Vector vecEnemyEye	= vecEnemy + GetEnemy()->GetViewOffset();
 
 			Vector posLos;
@@ -1990,7 +1990,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 			}
 			
 			//Setup our stored info
-			m_vecStoredPathGoal = GetEnemy()->GetAbsOrigin();
+			m_vecStoredPathGoal = GetEnemy()->GetEngineObject()->GetAbsOrigin();
 			m_nStoredPathType	= GOALTYPE_ENEMY;
 			m_fStoredPathFlags	= 0;
 			m_hStoredPathTarget	= GetEnemy();
@@ -2022,7 +2022,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 			}
 			
 			//Setup our stored info
-			m_vecStoredPathGoal = m_hTargetEnt->GetAbsOrigin();
+			m_vecStoredPathGoal = m_hTargetEnt->GetEngineObject()->GetAbsOrigin();
 			m_nStoredPathType	= GOALTYPE_TARGETENT;
 			m_fStoredPathFlags	= 0;
 			m_hStoredPathTarget	= m_hTargetEnt;
@@ -2128,7 +2128,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 					else
 					{
 						//Try any cover
-						if ( GetTacticalServices()->FindCoverPos( pEntity->GetAbsOrigin(), pEntity->EyePosition(), 0, CoverRadius(), &coverPos ) ) 
+						if ( GetTacticalServices()->FindCoverPos( pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->EyePosition(), 0, CoverRadius(), &coverPos ) )
 						{
 							//If we've found it, find a safe route there
 							AI_NavGoal_t coverGoal( GOALTYPE_COVER, 
@@ -2196,7 +2196,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 	case TASK_GET_PATH_TO_ENEMY_CORPSE:
 		{
 			Vector forward;
-			AngleVectors( GetLocalAngles(), &forward );
+			AngleVectors(GetEngineObject()->GetLocalAngles(), &forward );
 			Vector vecEnemyLKP = GetEnemyLKP();
 
 			GetNavigator()->SetGoal( vecEnemyLKP - forward * 64, AIN_CLEAR_TARGET);
@@ -2273,7 +2273,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 			{
 				// Since this weapon MAY be on a table, we find the nearest node without verifying
 				// line-of-sight, since weapons on the table will not be able to see nodes very nearby.
-				int node = GetNavigator()->GetNetwork()->NearestNodeToPoint( this, m_hTargetEnt->GetAbsOrigin(), false );
+				int node = GetNavigator()->GetNetwork()->NearestNodeToPoint( this, m_hTargetEnt->GetEngineObject()->GetAbsOrigin(), false );
 				CAI_Node *pNode = GetNavigator()->GetNetwork()->GetNode( node );
 
 				if( !pNode )
@@ -2288,7 +2288,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 				vecNodePos = pNode->GetPosition( GetHullType() );
 
 				float flDistZ;
-				flDistZ = fabs( vecNodePos.z - m_hTargetEnt->GetAbsOrigin().z );
+				flDistZ = fabs( vecNodePos.z - m_hTargetEnt->GetEngineObject()->GetAbsOrigin().z );
 				if( flDistZ > Z_LENIENCY )
 				{
 					// The gun is too far away from its nearest node on the Z axis.
@@ -2305,7 +2305,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 				if( flDistZ >= 16.0 )
 				{
 					// The gun is higher or lower, but it's within reach. (probably on a table).
-					float flDistXY = ( vecNodePos - m_hTargetEnt->GetAbsOrigin() ).Length2D();
+					float flDistXY = ( vecNodePos - m_hTargetEnt->GetEngineObject()->GetAbsOrigin() ).Length2D();
 
 					// This means we have to stand on the nearest node and still be able to
 					// reach the gun.
@@ -2328,7 +2328,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 				else
 				{
 					// The gun is likely just lying on the floor. Just pick it up.
-					AI_NavGoal_t goal( m_hTargetEnt->GetAbsOrigin() );
+					AI_NavGoal_t goal( m_hTargetEnt->GetEngineObject()->GetAbsOrigin() );
 					goal.pTarget = m_hTargetEnt;
 					bHasPath = GetNavigator()->SetGoal( goal );
 				}
@@ -2567,7 +2567,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 	case TASK_RUN_PATH_FLEE:
 		{
 			Vector vecDiff;
-			vecDiff = GetLocalOrigin() - GetNavigator()->GetGoalPos();
+			vecDiff = GetEngineObject()->GetLocalOrigin() - GetNavigator()->GetGoalPos();
 
 			if( vecDiff.Length() <= pTask->flTaskData )
 			{
@@ -2600,9 +2600,9 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 
 			// to start strafing, we have to first figure out if the target is on the left side or right side
 			Vector right;
-			AngleVectors( GetLocalAngles(), NULL, &right, NULL );
+			AngleVectors(GetEngineObject()->GetLocalAngles(), NULL, &right, NULL );
 
-			vec2DirToPoint = ( GetNavigator()->GetCurWaypointPos() - GetLocalOrigin() ).AsVector2D();
+			vec2DirToPoint = ( GetNavigator()->GetCurWaypointPos() - GetEngineObject()->GetLocalOrigin() ).AsVector2D();
 			Vector2DNormalize(vec2DirToPoint);
 			vec2RightSide = right.AsVector2D();
 			Vector2DNormalize(vec2RightSide);
@@ -2894,7 +2894,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 		{
 			if ( m_hTargetEnt != NULL )
 			{
-				SetLocalOrigin( m_hTargetEnt->GetAbsOrigin() );	// Plant on target
+				GetEngineObject()->SetLocalOrigin( m_hTargetEnt->GetEngineObject()->GetAbsOrigin() );	// Plant on target
 			}
 
 			TaskComplete();
@@ -2904,7 +2904,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 		{
 			if ( m_hTargetEnt != NULL )
 			{
-				GetMotor()->SetIdealYaw( UTIL_AngleMod( m_hTargetEnt->GetLocalAngles().y ) );
+				GetMotor()->SetIdealYaw( UTIL_AngleMod( m_hTargetEnt->GetEngineObject()->GetLocalAngles().y ) );
 			}
 
 			if ( m_scriptState != SCRIPT_CUSTOM_MOVE_TO_MARK )
@@ -3224,7 +3224,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 				pTarget = GetEnemy();
 			if ( pTarget )
 			{
-				GetMotor()->SetIdealYawAndUpdate( pTarget->GetAbsOrigin() - GetLocalOrigin() , AI_KEEP_YAW_SPEED );
+				GetMotor()->SetIdealYawAndUpdate( pTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetLocalOrigin() , AI_KEEP_YAW_SPEED );
 			}
 
 			if ( IsActivityFinished() )
@@ -3366,7 +3366,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 			CBasePlayer *pPlayer = AI_GetSinglePlayer();
 			if ( pPlayer )
 			{
-				GetMotor()->SetIdealYawToTargetAndUpdate( pPlayer->GetAbsOrigin(), AI_KEEP_YAW_SPEED );
+				GetMotor()->SetIdealYawToTargetAndUpdate( pPlayer->GetEngineObject()->GetAbsOrigin(), AI_KEEP_YAW_SPEED );
 				SetTurnActivity();
 				if ( IsWaitFinished() && GetMotor()->DeltaIdealYaw() < 10 )
 				{
@@ -3527,10 +3527,10 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 
 				// Check Z first, and only check 2d if we're within that
 				Vector vecGoalPos = GetNavigator()->GetGoalPos();
-				distance = fabs(vecGoalPos.z - GetLocalOrigin().z);
+				distance = fabs(vecGoalPos.z - GetEngineObject()->GetLocalOrigin().z);
 				if ( distance < pTask->flTaskData )
 				{
-					distance = ( vecGoalPos - GetLocalOrigin() ).Length2D();
+					distance = ( vecGoalPos - GetEngineObject()->GetLocalOrigin() ).Length2D();
 				}
 				else
 				{
@@ -3542,10 +3542,10 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 				if ( GetNavigator()->GetNavType() != NAV_JUMP )
 				{
 					// Re-evaluate when you think your finished, or the target has moved too far
-					if ( (distance < pTask->flTaskData) || (vecGoalPos - pTarget->GetAbsOrigin()).Length() > pTask->flTaskData * 0.5 )
+					if ( (distance < pTask->flTaskData) || (vecGoalPos - pTarget->GetEngineObject()->GetAbsOrigin()).Length() > pTask->flTaskData * 0.5 )
 					{
-						distance = ( pTarget->GetAbsOrigin() - GetLocalOrigin() ).Length2D();
-						if ( !GetNavigator()->UpdateGoalPos( pTarget->GetAbsOrigin() ) )
+						distance = ( pTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetLocalOrigin() ).Length2D();
+						if ( !GetNavigator()->UpdateGoalPos( pTarget->GetEngineObject()->GetAbsOrigin() ) )
 						{
 							TaskFail( FAIL_NO_ROUTE );
 							break;
@@ -3609,7 +3609,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 			{
 				ClearTaskInterrupt();
 
-				Vector vecEnemy = ( pTask->iTask == TASK_GET_PATH_TO_ENEMY_LOS ) ? GetEnemy()->GetAbsOrigin() : GetEnemyLKP();
+				Vector vecEnemy = ( pTask->iTask == TASK_GET_PATH_TO_ENEMY_LOS ) ? GetEnemy()->GetEngineObject()->GetAbsOrigin() : GetEnemyLKP();
 				AI_NavGoal_t goal( m_vInterruptSavePosition, ACT_RUN, AIN_HULL_TOLERANCE );
 
 				GetNavigator()->SetGoal( goal, AIN_CLEAR_TARGET );
@@ -3626,7 +3626,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 		if ( GetNavigator()->IsGoalActive() )
 		{
 			Vector vecDest = GetNavigator()->GetGoalPos();
-			float flDist = ( GetAbsOrigin() - vecDest ).Length();
+			float flDist = (GetEngineObject()->GetAbsOrigin() - vecDest ).Length();
 
 			if( flDist < 10.0 * 12.0 )
 			{
@@ -3638,7 +3638,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 
 	case TASK_MOVE_AWAY_PATH:
 		{
-			QAngle ang = GetLocalAngles();
+			QAngle ang = GetEngineObject()->GetLocalAngles();
 			ang.y = GetMotor()->GetIdealYaw() + 180;
 			Vector move;
 
@@ -3654,17 +3654,17 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 
 						hintCriteria.AddHintType( HINT_PLAYER_ALLY_MOVE_AWAY_DEST );
 						hintCriteria.SetFlag( bits_HINT_NODE_NEAREST );
-						hintCriteria.AddIncludePosition( GetAbsOrigin(), (20.0f * 12.0f) ); // 20 feet max
-						hintCriteria.AddExcludePosition( GetAbsOrigin(), 28.0f ); // don't plant on an hint that you start on
+						hintCriteria.AddIncludePosition(GetEngineObject()->GetAbsOrigin(), (20.0f * 12.0f) ); // 20 feet max
+						hintCriteria.AddExcludePosition(GetEngineObject()->GetAbsOrigin(), 28.0f ); // don't plant on an hint that you start on
 
 						pHint = CAI_HintManager::FindHint( this, hintCriteria );
 
 						if( pHint )
 						{
 							CBasePlayer *pPlayer = AI_GetSinglePlayer();
-							Vector vecGoal = pHint->GetAbsOrigin();
+							Vector vecGoal = pHint->GetEngineObject()->GetAbsOrigin();
 
-							if( vecGoal.DistToSqr(GetAbsOrigin()) < vecGoal.DistToSqr(pPlayer->GetAbsOrigin()) )
+							if( vecGoal.DistToSqr(GetEngineObject()->GetAbsOrigin()) < vecGoal.DistToSqr(pPlayer->GetEngineObject()->GetAbsOrigin()) )
 							{
 								if( GetNavigator()->SetGoal(vecGoal) )
 								{
@@ -3682,7 +3682,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 					if ( pBestSound && pBestSound->m_hOwner && pBestSound->m_hOwner->GetServerVehicle() )
 					{
 						// Move away from the vehicle's center, regardless of our facing
-						move = ( GetAbsOrigin() - pBestSound->m_hOwner->WorldSpaceCenter() );
+						move = (GetEngineObject()->GetAbsOrigin() - pBestSound->m_hOwner->WorldSpaceCenter() );
 						VectorNormalize( move );
 					}
 					else
@@ -3758,7 +3758,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 					ClearTaskInterrupt();
 					Vector coverPos;
 
-					if ( GetTacticalServices()->FindCoverPos( GetLocalOrigin(), EyePosition(), 0, CoverRadius(), &coverPos ) && IsValidMoveAwayDest( GetNavigator()->GetGoalPos() ) ) 
+					if ( GetTacticalServices()->FindCoverPos(GetEngineObject()->GetLocalOrigin(), EyePosition(), 0, CoverRadius(), &coverPos ) && IsValidMoveAwayDest( GetNavigator()->GetGoalPos() ) )
 					{
 						GetNavigator()->SetGoal( AI_NavGoal_t( coverPos, ACT_RUN ) );
 						m_flMoveWaitFinished = gpGlobals->curtime + 2;
@@ -4011,7 +4011,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 	{
 		float distance;
 
-		distance = (m_vecLastPosition - GetLocalOrigin()).Length2D();
+		distance = (m_vecLastPosition - GetEngineObject()->GetLocalOrigin()).Length2D();
 
 		// Walk path until far enough away
 		if ( distance > pTask->flTaskData || 
@@ -4025,7 +4025,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 	case TASK_RUN_PATH_FLEE:
 		{
 			Vector vecDiff;
-			vecDiff = GetLocalOrigin() - GetNavigator()->GetGoalPos();
+			vecDiff = GetEngineObject()->GetLocalOrigin() - GetNavigator()->GetGoalPos();
 
 			if( vecDiff.Length() <= pTask->flTaskData )
 			{
@@ -4039,7 +4039,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 		{
 			Vector vecDiff;
 
-			vecDiff = GetLocalOrigin() - GetNavigator()->GetGoalPos();
+			vecDiff = GetEngineObject()->GetLocalOrigin() - GetNavigator()->GetGoalPos();
 
 			if( vecDiff.Length() <= pTask->flTaskData )
 			{
@@ -4106,8 +4106,8 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 				// isn't actually falling, and make an attempt to slam the ground entity to whatever's under the NPC.
 				Vector maxs = WorldAlignMaxs() - Vector( .1, .1, .2 );
 				Vector mins = WorldAlignMins() + Vector( .1, .1, 0 );
-				Vector vecStart	= GetAbsOrigin() + Vector( 0, 0, .1 );
-				Vector vecDown	= GetAbsOrigin();
+				Vector vecStart	= GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, .1 );
+				Vector vecDown	= GetEngineObject()->GetAbsOrigin();
 				vecDown.z -= 0.2;
 
 				trace_t trace;
@@ -4253,7 +4253,7 @@ void CAI_BaseNPC::TranslateNavGoal( CBaseEntity *pEnemy, Vector &chasePosition )
 	if ( GetNavType() == NAV_FLY )
 	{
 		// UNDONE: Cache these per enemy instead?
-		Vector offset = pEnemy->EyePosition() - pEnemy->GetAbsOrigin();
+		Vector offset = pEnemy->EyePosition() - pEnemy->GetEngineObject()->GetAbsOrigin();
 		chasePosition += offset;
 	}
 }

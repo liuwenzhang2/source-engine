@@ -368,7 +368,7 @@ float CWeaponPortalgun::TraceFirePortal( bool bPortal2, const Vector &vTraceStar
 
 				pPortal->m_iDelayedFailure = ( ( pNearPortal->m_bIsPortal2 ) ? ( PORTAL_FIZZLE_NEAR_RED ) : ( PORTAL_FIZZLE_NEAR_BLUE ) );
 				VectorAngles( vPortalForward, pPortal->m_qDelayedAngles );
-				pPortal->m_vDelayedPosition = pNearPortal->GetAbsOrigin();
+				pPortal->m_vDelayedPosition = pNearPortal->GetEngineObject()->GetAbsOrigin();
 
 				vFinalPosition = pPortal->m_vDelayedPosition;
 				qFinalAngles = pPortal->m_qDelayedAngles;
@@ -539,7 +539,7 @@ float CWeaponPortalgun::FirePortal( bool bPortal2, Vector *pVector /*= 0*/, bool
 			Vector ptPortalCenter;
 			Vector vPortalForward;
 
-			ptPortalCenter = pPlayerPortal->GetAbsOrigin();
+			ptPortalCenter = pPlayerPortal->GetEngineObject()->GetAbsOrigin();
 			pPlayerPortal->GetVectors( &vPortalForward, NULL, NULL );
 
 			Vector vEyeToPortalCenter = ptPortalCenter - vEye;

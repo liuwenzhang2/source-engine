@@ -70,11 +70,11 @@ CBaseEntity *CreateCombineBall( const Vector &origin, const Vector &velocity, fl
 	CPropCombineBall *pBall = static_cast<CPropCombineBall*>(gEntList.CreateEntityByName( "prop_combine_ball" ) );
 	pBall->SetRadius( radius );
 
-	pBall->SetAbsOrigin( origin );
+	pBall->GetEngineObject()->SetAbsOrigin( origin );
 	pBall->SetOwnerEntity( pOwner );
 	pBall->SetOriginalOwner( pOwner );
 
-	pBall->SetAbsVelocity( velocity );
+	pBall->GetEngineObject()->SetAbsVelocity( velocity );
 	pBall->Spawn();
 
 	pBall->SetState( CPropCombineBall::STATE_THROWN );
@@ -339,7 +339,7 @@ bool CPropCombineBall::CreateVPhysics()
 	objectparams_t params = g_PhysDefaultObjectParams;
 	params.pGameData = static_cast<void *>(this);
 	int nMaterialIndex = physprops->GetSurfaceIndex("metal_bouncy");
-	IPhysicsObject *pPhysicsObject = physenv->CreateSphereObject( flSize, nMaterialIndex, GetAbsOrigin(), GetAbsAngles(), &params, false );
+	IPhysicsObject *pPhysicsObject = physenv->CreateSphereObject( flSize, nMaterialIndex, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &params, false );
 	if ( !pPhysicsObject )
 		return false;
 
@@ -391,7 +391,7 @@ void CPropCombineBall::Spawn( void )
 
 	CreateVPhysics();
 
-	Vector vecAbsVelocity = GetAbsVelocity();
+	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 	VPhysicsGetObject()->SetVelocity( &vecAbsVelocity, NULL );
 
 	m_nState = STATE_NOT_THROWN;
@@ -404,7 +404,7 @@ void CPropCombineBall::Spawn( void )
 	AddEffects( EF_NOSHADOW );
 
 	// Start up the eye trail
-	m_pGlowTrail = CSpriteTrail::SpriteTrailCreate( PROP_COMBINE_BALL_SPRITE_TRAIL, GetAbsOrigin(), false );
+	m_pGlowTrail = CSpriteTrail::SpriteTrailCreate( PROP_COMBINE_BALL_SPRITE_TRAIL, GetEngineObject()->GetAbsOrigin(), false );
 	
 	if ( m_pGlowTrail != NULL )
 	{
@@ -494,7 +494,7 @@ void CPropCombineBall::ReplaceInSpawner( float flSpeed )
 	// Slam velocity to what the field wants
 	Vector vecTarget, vecVelocity;
 	GetSpawner()->GetTargetEndpoint( m_bForward, &vecTarget );
-	VectorSubtract( vecTarget, GetAbsOrigin(), vecVelocity );
+	VectorSubtract( vecTarget, GetEngineObject()->GetAbsOrigin(), vecVelocity );
 	VectorNormalize( vecVelocity );
 	vecVelocity *= flSpeed; 
 	VPhysicsGetObject()->SetVelocity( &vecVelocity, NULL );
@@ -721,13 +721,13 @@ void CPropCombineBall::WhizSoundThink()
 		if ( pPlayer )
 		{
 			Vector vecDelta;
-			VectorSubtract( pPlayer->GetAbsOrigin(), vecPosition, vecDelta );
+			VectorSubtract( pPlayer->GetEngineObject()->GetAbsOrigin(), vecPosition, vecDelta );
 			VectorNormalize( vecDelta );
 			if ( DotProduct( vecDelta, vecVelocity ) > 0.5f )
 			{
 				Vector vecEndPoint;
 				VectorMA( vecPosition, 2.0f * TICK_INTERVAL, vecVelocity, vecEndPoint );
-				float flDist = CalcDistanceToLineSegment( pPlayer->GetAbsOrigin(), vecPosition, vecEndPoint );
+				float flDist = CalcDistanceToLineSegment( pPlayer->GetEngineObject()->GetAbsOrigin(), vecPosition, vecEndPoint );
 				if ( flDist < 200.0f )
 				{
 					CPASAttenuationFilter filter( vecPosition, ATTN_NORM );
@@ -817,7 +817,7 @@ void CPropCombineBall::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup
 	if ( reason != PUNTED_BY_CANNON )
 	{
 		SetState( STATE_HOLDING );
-		CPASAttenuationFilter filter( GetAbsOrigin(), ATTN_NORM );
+		CPASAttenuationFilter filter(GetEngineObject()->GetAbsOrigin(), ATTN_NORM );
 		filter.MakeReliable();
 		
 		EmitSound_t ep;
@@ -1064,15 +1064,15 @@ void CPropCombineBall::DoExplosion( )
 			g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		}
 
-		UTIL_ScreenShake( GetAbsOrigin(), 20.0f, 150.0, 1.0, 1250.0f, SHAKE_START );
+		UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 20.0f, 150.0, 1.0, 1250.0f, SHAKE_START );
 
 		CEffectData data;
 
-		data.m_vOrigin = GetAbsOrigin();
+		data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 
 		DispatchEffect( "cball_explode", data );
 
-		te->BeamRingPoint( filter2, 0, GetAbsOrigin(),	//origin
+		te->BeamRingPoint( filter2, 0, GetEngineObject()->GetAbsOrigin(),	//origin
 			m_flRadius,	//start radius
 			1024,		//end radius
 			s_nExplosionTexture, //texture
@@ -1092,7 +1092,7 @@ void CPropCombineBall::DoExplosion( )
 			);
 
 		//Shockring
-		te->BeamRingPoint( filter2, 0, GetAbsOrigin(),	//origin
+		te->BeamRingPoint( filter2, 0, GetEngineObject()->GetAbsOrigin(),	//origin
 			m_flRadius,	//start radius
 			1024,		//end radius
 			s_nExplosionTexture, //texture
@@ -1114,7 +1114,7 @@ void CPropCombineBall::DoExplosion( )
 	else
 	{
 		//Shockring
-		te->BeamRingPoint( filter2, 0, GetAbsOrigin(),	//origin
+		te->BeamRingPoint( filter2, 0, GetEngineObject()->GetAbsOrigin(),	//origin
 			128,	//start radius
 			384,		//end radius
 			s_nExplosionTexture, //texture
@@ -1140,7 +1140,7 @@ void CPropCombineBall::DoExplosion( )
 	}
 
 	// Turn us off and wait because we need our trails to finish up properly
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetMoveType( MOVETYPE_NONE );
 	AddSolidFlags( FSOLID_NOT_SOLID );
 
@@ -1237,7 +1237,7 @@ void CPropCombineBall::OnHitEntity( CBaseEntity *pHitEntity, float flSpeed, int 
 		return;
 	}
 
-	CTakeDamageInfo info( this, GetOwnerEntity(), GetAbsVelocity(), GetAbsOrigin(), sk_npc_dmg_combineball.GetFloat(), DMG_DISSOLVE );
+	CTakeDamageInfo info( this, GetOwnerEntity(), GetEngineObject()->GetAbsVelocity(), GetEngineObject()->GetAbsOrigin(), sk_npc_dmg_combineball.GetFloat(), DMG_DISSOLVE );
 
 	bool bIsDissolving = (pHitEntity->GetFlags() & FL_DISSOLVING) != 0;
 	bool bShouldHit = pHitEntity->PassesDamageFilter( info );
@@ -1500,7 +1500,7 @@ void CPropCombineBall::DeflectTowardEnemy( float flSpeed, int index, gamevcollis
 
 	if ( bSeekKill )
 	{
-		int nCount = UTIL_EntitiesInSphere( list, 1024, GetAbsOrigin(), sk_combine_ball_search_radius.GetFloat(), FL_NPC | FL_CLIENT );
+		int nCount = UTIL_EntitiesInSphere( list, 1024, GetEngineObject()->GetAbsOrigin(), sk_combine_ball_search_radius.GetFloat(), FL_NPC | FL_CLIENT );
 		
 		for ( int i = 0; i < nCount; i++ )
 		{
@@ -1589,7 +1589,7 @@ void CPropCombineBall::BounceInSpawner( float flSpeed, int index, gamevcollision
 	GetSpawner()->GetTargetEndpoint( m_bForward, &vecTarget );
 
 	Vector vecVelocity;
-	VectorSubtract( vecTarget, GetAbsOrigin(), vecVelocity );
+	VectorSubtract( vecTarget, GetEngineObject()->GetAbsOrigin(), vecVelocity );
 	VectorNormalize( vecVelocity );
 	vecVelocity *= flSpeed;
 
@@ -1806,13 +1806,13 @@ void CFuncCombineBallSpawner::SpawnBall()
 	MatrixGetColumn(GetEngineObject()->EntityToWorldTransform(), 2, zaxis );
 	VectorMA( vecAbsOrigin, flRadius, zaxis, vecAbsOrigin );
 
-	pBall->SetAbsOrigin( vecAbsOrigin );
+	pBall->GetEngineObject()->SetAbsOrigin( vecAbsOrigin );
 	pBall->SetSpawner( this );
 
 	float flSpeed = random->RandomFloat( m_flMinSpeed, m_flMaxSpeed );
 
 	zaxis *= flSpeed;
-	pBall->SetAbsVelocity( zaxis );
+	pBall->GetEngineObject()->SetAbsVelocity( zaxis );
 	if ( HasSpawnFlags( SF_SPAWNER_POWER_SUPPLY ) )
 	{
 		pBall->AddSpawnFlags( SF_COMBINE_BALL_BOUNCING_IN_SPAWNER );
@@ -2177,23 +2177,23 @@ void CPointCombineBallLauncher::SpawnBall()
 	float flRadius = m_flBallRadius;
 	pBall->SetRadius( flRadius );
 
-	Vector vecAbsOrigin = GetAbsOrigin();
+	Vector vecAbsOrigin = GetEngineObject()->GetAbsOrigin();
 	Vector zaxis;
 	
-	pBall->SetAbsOrigin( vecAbsOrigin );
+	pBall->GetEngineObject()->SetAbsOrigin( vecAbsOrigin );
 	pBall->SetSpawner( this );
 
 	float flSpeed = random->RandomFloat( m_flMinSpeed, m_flMaxSpeed );
 
 	Vector vDirection;
-	QAngle qAngle = GetAbsAngles();
+	QAngle qAngle = GetEngineObject()->GetAbsAngles();
 
 	qAngle = qAngle + QAngle ( random->RandomFloat( -m_flConeDegrees, m_flConeDegrees ), random->RandomFloat( -m_flConeDegrees, m_flConeDegrees ), 0 );
 
 	AngleVectors( qAngle, &vDirection, NULL, NULL );
 
 	vDirection *= flSpeed;
-	pBall->SetAbsVelocity( vDirection );
+	pBall->GetEngineObject()->SetAbsVelocity( vDirection );
 
 	DispatchSpawn(pBall);
 	pBall->Activate();
@@ -2211,8 +2211,8 @@ void CPointCombineBallLauncher::SpawnBall()
 
 		if( pBullseye )
 		{
-			pBullseye->SetAbsOrigin( pBall->GetAbsOrigin() );
-			pBullseye->SetAbsAngles( QAngle( 0, 0, 0 ) );
+			pBullseye->GetEngineObject()->SetAbsOrigin( pBall->GetEngineObject()->GetAbsOrigin() );
+			pBullseye->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 			pBullseye->KeyValue( "solid", "6" );
 			pBullseye->KeyValue( "targetname", STRING(m_iszBullseyeName) );
 			pBullseye->Spawn();

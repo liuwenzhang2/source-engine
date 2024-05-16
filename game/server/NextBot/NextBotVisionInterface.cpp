@@ -504,13 +504,13 @@ void IVision::UpdateKnownEntities( void )
 						if ( IsAwareOf( known ) )
 						{
 							if ( known.IsVisibleInFOVNow() )
-								NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetAbsOrigin(), known.GetLastKnownPosition(), 5.0f, 0, 255, 0, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
+								NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetEngineObject()->GetAbsOrigin(), known.GetLastKnownPosition(), 5.0f, 0, 255, 0, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 							else
-								NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetAbsOrigin(), known.GetLastKnownPosition(), 2.0f, 0, 100, 0, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
+								NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetEngineObject()->GetAbsOrigin(), known.GetLastKnownPosition(), 2.0f, 0, 100, 0, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 						}
 						else
 						{
-							NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetAbsOrigin(), known.GetLastKnownPosition(), 1.0f, 0, 100, 0, 128, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
+							NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetEngineObject()->GetAbsOrigin(), known.GetLastKnownPosition(), 1.0f, 0, 100, 0, 128, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 						}
 					}
 					else
@@ -518,13 +518,13 @@ void IVision::UpdateKnownEntities( void )
 						if ( IsAwareOf( known ) )
 						{
 							if ( known.IsVisibleInFOVNow() )
-								NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetAbsOrigin(), known.GetLastKnownPosition(), 5.0f, 255, 0, 0, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
+								NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetEngineObject()->GetAbsOrigin(), known.GetLastKnownPosition(), 5.0f, 255, 0, 0, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 							else
-								NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetAbsOrigin(), known.GetLastKnownPosition(), 2.0f, 100, 0, 0, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
+								NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetEngineObject()->GetAbsOrigin(), known.GetLastKnownPosition(), 2.0f, 100, 0, 0, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 						}
 						else
 						{
-							NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetAbsOrigin(), known.GetLastKnownPosition(), 1.0f, 100, 0, 0, 128, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
+							NDebugOverlay::HorzArrow( GetBot()->GetEntity()->GetEngineObject()->GetAbsOrigin(), known.GetLastKnownPosition(), 1.0f, 100, 0, 0, 128, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 						}
 					}
 				}
@@ -759,7 +759,7 @@ bool IVision::IsLineOfSightClearToEntity( const CBaseEntity *subject, Vector *vi
 
 		if ( result.DidHit() )
 		{
-			UTIL_TraceLine( GetBot()->GetBodyInterface()->GetEyePosition(), subject->GetAbsOrigin(), MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE, &filter, &result );
+			UTIL_TraceLine( GetBot()->GetBodyInterface()->GetEyePosition(), subject->GetEngineObject()->GetAbsOrigin(), MASK_BLOCKLOS_AND_NPCS|CONTENTS_IGNORE_NODRAW_OPAQUE, &filter, &result );
 		}
 	}
 

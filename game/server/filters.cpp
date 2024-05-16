@@ -523,7 +523,7 @@ bool CFilterEnemy::PassesProximityFilter( CBaseEntity *pCaller, CBaseEntity *pEn
 	bool bAlreadyEnemy = ( pCaller->GetEnemy() == pEnemy );
 
 	// Get our squared length to the enemy from the caller
-	float flDistToEnemySqr = ( pCaller->GetAbsOrigin() - pEnemy->GetAbsOrigin() ).LengthSqr();
+	float flDistToEnemySqr = ( pCaller->GetEngineObject()->GetAbsOrigin() - pEnemy->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 
 	// Two radii are used to control oscillation between true/false cases
 	// The larger radius is either specified or defaulted to be double or half the size of the inner radius

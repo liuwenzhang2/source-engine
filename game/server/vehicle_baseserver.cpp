@@ -538,12 +538,12 @@ void CBaseServerVehicle::GetPassengerSeatPoint( int nRole, Vector *pPoint, QAngl
 	// Couldn't find the attachment point, so just use the origin
 	if ( pPoint )
 	{
-		*pPoint = m_pVehicle->GetAbsOrigin();
+		*pPoint = m_pVehicle->GetEngineObject()->GetAbsOrigin();
 	}
 
 	if ( pAngles )
 	{
-		*pAngles = m_pVehicle->GetAbsAngles();
+		*pAngles = m_pVehicle->GetEngineObject()->GetAbsAngles();
 	}
 }
 
@@ -557,8 +557,8 @@ void CBaseServerVehicle::GetPassengerSeatPoint( int nRole, Vector *pPoint, QAngl
 //---------------------------------------------------------------------------------
 bool CBaseServerVehicle::CheckExitPoint( float yaw, int distance, Vector *pEndPoint )
 {
-	QAngle vehicleAngles = m_pVehicle->GetLocalAngles();
-  	Vector vecStart = m_pVehicle->GetAbsOrigin();
+	QAngle vehicleAngles = m_pVehicle->GetEngineObject()->GetLocalAngles();
+  	Vector vecStart = m_pVehicle->GetEngineObject()->GetAbsOrigin();
   	Vector vecDir;
    
   	vecStart.z += 12;		// always 12" from ground
@@ -1100,8 +1100,8 @@ bool CBaseServerVehicle::HandlePassengerExit( CBaseCombatCharacter *pPassenger )
 
 		// If all exit points were blocked and this vehicle doesn't allow exiting in
 		// these cases, bail.
-		Vector vecNewPos = pPlayer->GetAbsOrigin();
-		QAngle angNewAngles = pPlayer->GetAbsAngles();
+		Vector vecNewPos = pPlayer->GetEngineObject()->GetAbsOrigin();
+		QAngle angNewAngles = pPlayer->GetEngineObject()->GetAbsAngles();
 
 		int nRole = GetPassengerRole( pPlayer );
 		if ( ( bAllPointsBlocked ) || ( iSequence == ACTIVITY_NOT_AVAILABLE ) )
@@ -1146,7 +1146,7 @@ bool CBaseServerVehicle::HandlePassengerExit( CBaseCombatCharacter *pPassenger )
 				m_hExitBlocker = CEntityBlocker::Create( vecExitFeetPoint, VEC_HULL_MIN, VEC_HULL_MAX, pPlayer, true );
 
 				// We may as well stand where we're going to get out at and stop being parented
-				pPlayer->SetAbsOrigin( vecExitFeetPoint );
+				pPlayer->GetEngineObject()->SetAbsOrigin( vecExitFeetPoint );
 				pPlayer->GetEngineObject()->SetParent( NULL );
 
 				return true;
@@ -1551,7 +1551,7 @@ void CBaseServerVehicle::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMove
 	GetDrivableVehicle()->ProcessMovement( pPlayer, pMoveData );
 
 	trace_t	tr;
-	UTIL_TraceLine( pPlayer->GetAbsOrigin(), pPlayer->GetAbsOrigin() - Vector( 0, 0, 256 ), MASK_PLAYERSOLID, GetVehicleEnt(), COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine( pPlayer->GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 256 ), MASK_PLAYERSOLID, GetVehicleEnt(), COLLISION_GROUP_NONE, &tr );
 
 	// If our gamematerial has changed, tell any player surface triggers that are watching
 	IPhysicsSurfaceProps *physprops = MoveHelper()->GetSurfaceProps();
@@ -1872,7 +1872,7 @@ bool CBaseServerVehicle::PlayCrashSound( float speed )
 	{
 		if ( GetDriver() )
 		{
-			UTIL_ScreenShake( GetDriver()->GetAbsOrigin(), rumble, 150.0f, 1.0f, 240.0f, SHAKE_START_RUMBLEONLY, true );
+			UTIL_ScreenShake( GetDriver()->GetEngineObject()->GetAbsOrigin(), rumble, 150.0f, 1.0f, 240.0f, SHAKE_START_RUMBLEONLY, true );
 		}
 	}
 

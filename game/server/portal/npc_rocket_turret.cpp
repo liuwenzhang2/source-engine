@@ -382,7 +382,7 @@ void CNPC_RocketTurret::Spawn( void )
 	m_iPosePitch = LookupPoseParameter( "aim_pitch" );
 	m_iPoseYaw   = LookupPoseParameter( "aim_yaw" );
 
-	m_vecCurrentAngles = m_vecGoalAngles = GetAbsAngles();
+	m_vecCurrentAngles = m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
 	CreateVPhysics();
 
@@ -469,13 +469,13 @@ void CNPC_RocketTurret::UpdateAimPoint ( void )
 	{
 		SetEnemy( NULL );
 		SetNextThink( TICK_NEVER_THINK );
-		m_vecGoalAngles = GetAbsAngles();
+		m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 		return;
 	}
 
 	//Get our shot positions
 	Vector vecMid = EyePosition();
-	Vector vecMidEnemy = GetEnemy()->GetAbsOrigin() + (GetEnemy()->WorldAlignMins() + GetEnemy()->WorldAlignMaxs()) * 0.5f;
+	Vector vecMidEnemy = GetEnemy()->GetEngineObject()->GetAbsOrigin() + (GetEnemy()->WorldAlignMins() + GetEnemy()->WorldAlignMaxs()) * 0.5f;
 
 	//Calculate dir and dist to enemy
 	m_vecDirToEnemy = vecMidEnemy - vecMid;	
@@ -789,7 +789,7 @@ void CNPC_RocketTurret::FireRocket ( void )
 	pRocket->SetModel( ROCKET_TURRET_PROJECTILE_NAME );
 	UTIL_SetSize( pRocket, vec3_origin, vec3_origin );
 
-	pRocket->SetAbsVelocity( vForward * 550 );
+	pRocket->GetEngineObject()->SetAbsVelocity( vForward * 550 );
 	pRocket->SetLauncher ( this );
 }
 
@@ -1012,7 +1012,7 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 	{
 		return false;
 	}
-	Vector vAimPoint = pTarget->GetAbsOrigin() + (pTarget->WorldAlignMins() + pTarget->WorldAlignMaxs()) * 0.5f;
+	Vector vAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + (pTarget->WorldAlignMins() + pTarget->WorldAlignMaxs()) * 0.5f;
 
 	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount == 0 )
@@ -1103,7 +1103,7 @@ bool CNPC_RocketTurret::FindAimPointThroughPortal( const CProp_Portal* pPortal, 
 
 		// Require that the portal is facing towards the beam to test through it
 		Vector vRocketToPortal, vPortalForward;
-		VectorSubtract ( pPortal->GetAbsOrigin(), EyePosition(), vRocketToPortal );
+		VectorSubtract ( pPortal->GetEngineObject()->GetAbsOrigin(), EyePosition(), vRocketToPortal );
 		pPortal->GetVectors( &vPortalForward, NULL, NULL);
 		float fDot = DotProduct( vRocketToPortal, vPortalForward );
 
@@ -1111,7 +1111,7 @@ bool CNPC_RocketTurret::FindAimPointThroughPortal( const CProp_Portal* pPortal, 
 		if ( fDot < 0.0f && pLinked && pLinked->m_bActivated && pTarget )
 		{
 			VMatrix matToPortalView = pLinked->m_matrixThisToLinked;
-			Vector vTargetAimPoint = pTarget->GetAbsOrigin() + (pTarget->WorldAlignMins() + pTarget->WorldAlignMaxs()) * 0.5f;
+			Vector vTargetAimPoint = pTarget->GetEngineObject()->GetAbsOrigin() + (pTarget->WorldAlignMins() + pTarget->WorldAlignMaxs()) * 0.5f;
 			*pVecOut =  matToPortalView * vTargetAimPoint;   
 			return true;
 		}
@@ -1273,17 +1273,17 @@ void CRocket_Turret_Projectile::Spawn( void )
 void CRocket_Turret_Projectile::MissileTouch( CBaseEntity *pOther )
 {
 	Assert( pOther );
-	Vector vVel = GetAbsVelocity();
+	Vector vVel = GetEngineObject()->GetAbsVelocity();
 
 	// Touched a launcher, and is heading towards that launcher
 	if ( FClassnameIs( pOther, "npc_rocket_turret" ) )
 	{
 		Dissolve( NULL, gpGlobals->curtime + 0.1f, false, ENTITY_DISSOLVE_NORMAL );
 		Vector vBounceVel = Vector( -vVel.x, -vVel.y, 200 );
-		SetAbsVelocity (  vBounceVel * 0.1f );
+		GetEngineObject()->SetAbsVelocity (  vBounceVel * 0.1f );
 		QAngle vBounceAngles;
 		VectorAngles( vBounceVel, vBounceAngles );
-		SetAbsAngles ( vBounceAngles );
+		GetEngineObject()->SetAbsAngles ( vBounceAngles );
 		SetLocalAngularVelocity ( QAngle ( 180, 90, 45 ) );
 		UTIL_Remove ( m_hRocketTrail );
 
@@ -1353,17 +1353,17 @@ void CRocket_Turret_Projectile::DoExplosion( void )
 	StopLoopingSounds();
 
 	// Explode
-	ExplosionCreate( GetAbsOrigin(), GetAbsAngles(), GetOwnerEntity(), 200, 25, 
+	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetOwnerEntity(), 200, 25,
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 100.0f, this);
 
 	// Hackish: Knock turrets in the area
 	CBaseEntity* pTurretIter = NULL;
 
-	while ( (pTurretIter = gEntList.FindEntityByClassnameWithin( pTurretIter, "npc_portal_turret_floor", GetAbsOrigin(), 128 )) != NULL )
+	while ( (pTurretIter = gEntList.FindEntityByClassnameWithin( pTurretIter, "npc_portal_turret_floor", GetEngineObject()->GetAbsOrigin(), 128 )) != NULL )
 	{
 		CTakeDamageInfo info( this, this, 200, DMG_BLAST );
-		info.SetDamagePosition( GetAbsOrigin() );
-		CalculateExplosiveDamageForce( &info, (pTurretIter->GetAbsOrigin() - GetAbsOrigin()), GetAbsOrigin() );
+		info.SetDamagePosition(GetEngineObject()->GetAbsOrigin() );
+		CalculateExplosiveDamageForce( &info, (pTurretIter->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), GetEngineObject()->GetAbsOrigin() );
 
 		pTurretIter->VPhysicsTakeDamage( info );
 	}	
@@ -1446,7 +1446,7 @@ static void fire_rocket_projectile_f( void )
 
 	pRocket->CreateSmokeTrail();
 
-	pRocket->SetAbsVelocity( vForward * 550 );
+	pRocket->GetEngineObject()->SetAbsVelocity( vForward * 550 );
 	pRocket->SetLauncher ( NULL );
 }
 

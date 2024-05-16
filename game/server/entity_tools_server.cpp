@@ -147,7 +147,7 @@ bool CServerTools::SnapPlayerToPosition( const Vector &org, const QAngle &ang, I
 	if ( pPlayer == NULL )
 		return false;
 
-	pPlayer->SetAbsOrigin( org - pPlayer->GetViewOffset() );
+	pPlayer->GetEngineObject()->SetAbsOrigin( org - pPlayer->GetViewOffset() );
 	pPlayer->SnapEyeAngles( ang );
 
 	// Disengage from hierarchy
@@ -280,9 +280,9 @@ void CServerTools::MoveEngineViewTo( const Vector &vPos, const QAngle &vAngles )
 	extern void EnableNoClip( CBasePlayer *pPlayer );
 	EnableNoClip( pPlayer );
 
-	Vector zOffset = pPlayer->EyePosition() - pPlayer->GetAbsOrigin();
+	Vector zOffset = pPlayer->EyePosition() - pPlayer->GetEngineObject()->GetAbsOrigin();
 
-	pPlayer->SetAbsOrigin( vPos - zOffset );
+	pPlayer->GetEngineObject()->SetAbsOrigin( vPos - zOffset );
 	pPlayer->SnapEyeAngles( vAngles );
 }
 

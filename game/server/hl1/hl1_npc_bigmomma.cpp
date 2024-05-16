@@ -240,8 +240,8 @@ public:
 		if ( m_crabTime < gpGlobals->curtime && m_crabCount < BIG_MAXCHILDREN )
 		{
 			// Don't spawn crabs inside each other
-			Vector mins = GetAbsOrigin() - Vector( 32, 32, 0 );
-			Vector maxs = GetAbsOrigin() + Vector( 32, 32, 0 );
+			Vector mins = GetEngineObject()->GetAbsOrigin() - Vector( 32, 32, 0 );
+			Vector maxs = GetEngineObject()->GetAbsOrigin() + Vector( 32, 32, 0 );
 
 			CBaseEntity *pList[2];
 			int count = UTIL_EntitiesInBox( pList, 2, mins, maxs, FL_NPC );
@@ -315,11 +315,11 @@ public:
 
 		if ( pTarget )
 		{
-			if ( pTarget->GetAbsAngles().y != 0 )
-				 return pTarget->GetAbsAngles().y;
+			if ( pTarget->GetEngineObject()->GetAbsAngles().y != 0 )
+				 return pTarget->GetEngineObject()->GetAbsAngles().y;
 		}
 		
-		return GetAbsAngles().y;
+		return GetEngineObject()->GetAbsAngles().y;
 	}
 	
 	// Restart the crab count on each new level
@@ -721,7 +721,7 @@ void CNPC_BigMomma::StartTask( const Task_t *pTask )
 				TaskFail( FAIL_NO_TARGET );
 			else
 			{
-				if ( ( pTarget->GetAbsOrigin() - GetAbsOrigin() ).Length() < GetNodeRange() )
+				if ( ( pTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length() < GetNodeRange() )
 					TaskComplete();
 				else
 				{
@@ -778,7 +778,7 @@ void CNPC_BigMomma::RunTask( const Task_t *pTask )
 			{
 				if ( GetNavigator()->IsGoalActive() )
 				{
-					distance = ( GetTarget()->GetAbsOrigin() - GetAbsOrigin() ).Length2D();
+					distance = ( GetTarget()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length2D();
 					// Set the appropriate activity based on an overlapping range
 					// overlap the range to prevent oscillation
 					if ( distance < GetNodeRange() )
@@ -841,7 +841,7 @@ void CNPC_BigMomma::HandleAnimEvent( animevent_t *pEvent )
 
 	Vector vecFwd, vecRight, vecUp;
 	QAngle angles;
-	angles = GetAbsAngles();
+	angles = GetEngineObject()->GetAbsAngles();
 	AngleVectors( angles, &vecFwd, &vecRight, &vecUp );
 
 	switch( pEvent->event )
@@ -850,7 +850,7 @@ void CNPC_BigMomma::HandleAnimEvent( animevent_t *pEvent )
 		case BIG_AE_MELEE_ATTACKBL:
 		case BIG_AE_MELEE_ATTACK1:
 		{
-			Vector center = GetAbsOrigin() + vecFwd * 128;
+			Vector center = GetEngineObject()->GetAbsOrigin() + vecFwd * 128;
 			Vector mins = center - Vector( 64, 64, 0 );
 			Vector maxs = center + Vector( 64, 64, 64 );
 
@@ -872,7 +872,7 @@ void CNPC_BigMomma::HandleAnimEvent( animevent_t *pEvent )
 			if ( pHurt )
 			{
 				CTakeDamageInfo info( this, this, 15, DMG_CLUB | DMG_SLASH );
-				CalculateMeleeDamageForce( &info, (pHurt->GetAbsOrigin() - GetAbsOrigin()), pHurt->GetAbsOrigin() );
+				CalculateMeleeDamageForce( &info, (pHurt->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), pHurt->GetEngineObject()->GetAbsOrigin() );
 				pHurt->TakeDamage( info );
 				QAngle newAngles = angles;
 				newAngles.x = 15;
@@ -884,15 +884,15 @@ void CNPC_BigMomma::HandleAnimEvent( animevent_t *pEvent )
 				{
 					case BIG_AE_MELEE_ATTACKBR:
 //						pHurt->pev->velocity = pHurt->pev->velocity + (vecFwd * 150) + Vector(0,0,250) - (vecRight * 200);
-						pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() + (vecFwd * 150) + Vector(0,0,250) - (vecRight * 200) );
+						pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() + (vecFwd * 150) + Vector(0,0,250) - (vecRight * 200) );
 					break;
 
 					case BIG_AE_MELEE_ATTACKBL:
-						pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() + (vecFwd * 150) + Vector(0,0,250) + (vecRight * 200) );
+						pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() + (vecFwd * 150) + Vector(0,0,250) + (vecRight * 200) );
 					break;
 
 					case BIG_AE_MELEE_ATTACK1:
-						pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() + (vecFwd * 220) + Vector(0,0,200) );
+						pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() + (vecFwd * 220) + Vector(0,0,200) );
 					break;
 				}
 
@@ -949,8 +949,8 @@ void CNPC_BigMomma::HandleAnimEvent( animevent_t *pEvent )
 
 		case BIG_AE_JUMP_FORWARD:
 			SetGroundEntity( NULL );
-			SetAbsOrigin(GetAbsOrigin() + Vector ( 0 , 0 , 1) );// take him off ground so engine doesn't instantly reset onground 
-			SetAbsVelocity(vecFwd * 200 + vecUp * 500 );
+			GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() + Vector ( 0 , 0 , 1) );// take him off ground so engine doesn't instantly reset onground 
+			GetEngineObject()->SetAbsVelocity(vecFwd * 200 + vecUp * 500 );
 			break;
 
 		case BIG_AE_EARLY_TARGET:
@@ -975,7 +975,7 @@ void CNPC_BigMomma::HandleAnimEvent( animevent_t *pEvent )
 
 void CNPC_BigMomma::LayHeadcrab( void )
 {
-	CBaseEntity *pChild = CBaseEntity::Create( BIG_CHILDCLASS, GetAbsOrigin(), GetAbsAngles(), this );
+	CBaseEntity *pChild = CBaseEntity::Create( BIG_CHILDCLASS, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), this );
 
 	pChild->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 
@@ -994,7 +994,7 @@ void CNPC_BigMomma::LayHeadcrab( void )
 	}
 
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector(0,0,100), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector(0,0,100), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 	UTIL_DecalTrace( &tr, "MommaBlob" );
 
 	CPASAttenuationFilter filter( this );
@@ -1022,7 +1022,7 @@ void CNPC_BigMomma::LaunchMortar( void )
 {
 	m_mortarTime = gpGlobals->curtime + RandomFloat( 2, 15 );
 	
-	Vector startPos = GetAbsOrigin();
+	Vector startPos = GetEngineObject()->GetAbsOrigin();
 	startPos.z += 180;
 
 	CPASAttenuationFilter filter( this );
@@ -1117,10 +1117,10 @@ int CNPC_BigMomma::RangeAttack1Conditions( float flDot, float flDist )
 
 		if ( pEnemy )
 		{
-			Vector startPos = GetAbsOrigin();
+			Vector startPos = GetEngineObject()->GetAbsOrigin();
 			startPos.z += 180;
 
-			m_vTossDir = VecCheckSplatToss( this, startPos, pEnemy->BodyTarget( GetAbsOrigin() ), random->RandomFloat( 150, 500 ) );
+			m_vTossDir = VecCheckSplatToss( this, startPos, pEnemy->BodyTarget(GetEngineObject()->GetAbsOrigin() ), random->RandomFloat( 150, 500 ) );
 
 			if ( m_vTossDir != vec3_origin )
 				return COND_CAN_RANGE_ATTACK1;
@@ -1151,7 +1151,7 @@ void CBMortar:: Spawn( void )
 	
 	SetSolid( SOLID_BBOX );
 
-	pSprite = CSprite::SpriteCreate( "sprites/mommaspit.vmt", GetAbsOrigin(), true ); 
+	pSprite = CSprite::SpriteCreate( "sprites/mommaspit.vmt", GetEngineObject()->GetAbsOrigin(), true );
 
 	if ( pSprite )
 	{
@@ -1176,14 +1176,14 @@ void CBMortar::Animate( void )
 {
 	SetNextThink( gpGlobals->curtime + 0.1 );
 
-	Vector vVelocity = GetAbsVelocity();
+	Vector vVelocity = GetEngineObject()->GetAbsVelocity();
 
 	VectorNormalize( vVelocity );
 
 	if ( gpGlobals->curtime > m_flDmgTime )
 	{
 		m_flDmgTime = gpGlobals->curtime + 0.2;
-		MortarSpray( GetAbsOrigin() + Vector( 0, 0, 15 ), -vVelocity, gSpitSprite, 3 );
+		MortarSpray(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 15 ), -vVelocity, gSpitSprite, 3 );
 	}
 	if ( m_iFrame++ )
 	{
@@ -1200,7 +1200,7 @@ CBMortar *CBMortar::Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVeloc
 	pSpit->Spawn();
 	
 	UTIL_SetOrigin( pSpit, vecStart );
-	pSpit->SetAbsVelocity( vecVelocity );
+	pSpit->GetEngineObject()->SetAbsVelocity( vecVelocity );
 	pSpit->SetOwnerEntity( pOwner );
 	pSpit->SetThink ( &CBMortar::Animate );
 	pSpit->SetNextThink( gpGlobals->curtime + 0.1 );
@@ -1260,14 +1260,14 @@ void CBMortar::Touch( CBaseEntity *pOther )
 	if ( pOther->IsBSPModel() )
 	{
 		// make a splat on the wall
-		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + GetAbsVelocity() * 10, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 10, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 		UTIL_DecalTrace( &tr, "MommaBlob" );
 	}
 	else
 	{
-		tr.endpos = GetAbsOrigin();
+		tr.endpos = GetEngineObject()->GetAbsOrigin();
 
-		Vector vVelocity = GetAbsVelocity();
+		Vector vVelocity = GetEngineObject()->GetAbsVelocity();
 		VectorNormalize( vVelocity );
 
 		tr.plane.normal = -1 * vVelocity;
@@ -1277,7 +1277,7 @@ void CBMortar::Touch( CBaseEntity *pOther )
 
 	CBaseEntity *pOwner = GetOwnerEntity();
 
-	RadiusDamage( CTakeDamageInfo( this, pOwner, sk_bigmomma_dmg_blast.GetFloat(), DMG_ACID ), GetAbsOrigin(), sk_bigmomma_radius_blast.GetFloat(), CLASS_NONE, NULL );
+	RadiusDamage( CTakeDamageInfo( this, pOwner, sk_bigmomma_dmg_blast.GetFloat(), DMG_ACID ), GetEngineObject()->GetAbsOrigin(), sk_bigmomma_radius_blast.GetFloat(), CLASS_NONE, NULL );
 		
 	UTIL_Remove( pSprite );
 	UTIL_Remove( this );

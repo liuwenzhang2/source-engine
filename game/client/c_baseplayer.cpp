@@ -680,7 +680,7 @@ void C_BasePlayer::SetLocalViewAngles( const QAngle &viewAngles )
 //-----------------------------------------------------------------------------
 void C_BasePlayer::SetViewAngles( const QAngle& ang )
 {
-	SetLocalAngles( ang );
+	GetEngineObject()->SetLocalAngles( ang );
 	GetEngineObject()->SetNetworkAngles( ang );
 }
 
@@ -691,7 +691,7 @@ surfacedata_t* C_BasePlayer::GetGroundSurface()
 	// Find the name of the material that lies beneath the player.
 	//
 	Vector start, end;
-	VectorCopy( GetAbsOrigin(), start );
+	VectorCopy(GetEngineObject()->GetAbsOrigin(), start );
 	VectorCopy( start, end );
 
 	// Straight down
@@ -827,7 +827,7 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 		if ( flTimeDelta > 0  &&  !( IsNoInterpolationFrame() || bForceEFNoInterp ) )
 		{
 			Vector newVelo = (GetEngineObject()->GetNetworkOrigin() - GetOldOrigin()  ) / flTimeDelta;
-			SetAbsVelocity( newVelo);
+			GetEngineObject()->SetAbsVelocity( newVelo);
 		}
 	}
 
@@ -841,7 +841,7 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 		if ( updateType == DATA_UPDATE_CREATED )
 		{
 			SetLocalViewAngles( angles );
-			m_flOldPlayerZ = GetLocalOrigin().z;
+			m_flOldPlayerZ = GetEngineObject()->GetLocalOrigin().z;
 			// NVNT the local player has just been created.
 			//   set in the "on_foot" navigation.
 			if ( haptics )
@@ -852,7 +852,7 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 			}
 		
 		}
-		SetLocalAngles( angles );
+		GetEngineObject()->SetLocalAngles( angles );
 
 		if ( !m_bWasFreezeFraming && GetObserverMode() == OBS_MODE_FREEZECAM )
 		{
@@ -1579,7 +1579,7 @@ void C_BasePlayer::CalcRoamingView(Vector& eyeOrigin, QAngle& eyeAngles, float& 
 
 		if ( target )
 		{
-			Vector v = target->GetAbsOrigin(); v.z += 54;
+			Vector v = target->GetEngineObject()->GetAbsOrigin(); v.z += 54;
 			QAngle a; VectorAngles( v - eyeOrigin, a );
 
 			NormalizeAngles( a );
@@ -1703,7 +1703,7 @@ void C_BasePlayer::CalcInEyeCamView(Vector& eyeOrigin, QAngle& eyeAngles, float&
 	m_flObserverChaseDistance = 0.0;
 
 	eyeAngles = target->EyeAngles();
-	eyeOrigin = target->GetAbsOrigin();
+	eyeOrigin = target->GetEngineObject()->GetAbsOrigin();
 
 	// Apply punch angle
 	VectorAdd( eyeAngles, GetPunchAngle(), eyeAngles );
@@ -2006,7 +2006,7 @@ void C_BasePlayer::PreThink( void )
 	//
 	if ( !( GetFlags() & FL_ONGROUND ) )
 	{
-		m_Local.m_flFallVelocity = -GetAbsVelocity().z;
+		m_Local.m_flFallVelocity = -GetEngineObject()->GetAbsVelocity().z;
 	}
 #endif
 }
@@ -2121,7 +2121,7 @@ void C_BasePlayer::Simulate()
 		// update step sounds for all other players
 		Vector vel;
 		GetEngineObject()->EstimateAbsVelocity( vel );
-		UpdateStepSound( GetGroundSurface(), GetAbsOrigin(), vel );
+		UpdateStepSound( GetGroundSurface(), GetEngineObject()->GetAbsOrigin(), vel );
 	}
 
 	BaseClass::Simulate();
@@ -2183,7 +2183,7 @@ Vector C_BasePlayer::GetAutoaimVector( float flScale )
 {
 	// Never autoaim a predicted weapon (for now)
 	Vector	forward;
-	AngleVectors( GetAbsAngles() + m_Local.m_vecPunchAngle, &forward );
+	AngleVectors(GetEngineObject()->GetAbsAngles() + m_Local.m_vecPunchAngle, &forward );
 	return	forward;
 }
 
@@ -2602,7 +2602,7 @@ void C_BasePlayer::ForceSetupBonesAtTimeFakeInterpolation( matrix3x4_t *pBonesOu
 {
 	// we don't have any interpolation data, so fake it
 	float cycle = m_flCycle;
-	Vector origin = GetLocalOrigin();
+	Vector origin = GetEngineObject()->GetLocalOrigin();
 
 	// blow the cached prev bones
 	InvalidateBoneCache();
@@ -2611,12 +2611,12 @@ void C_BasePlayer::ForceSetupBonesAtTimeFakeInterpolation( matrix3x4_t *pBonesOu
 
 	// force cycle back by boneDt
 	m_flCycle = fmod( 10 + cycle + m_flPlaybackRate * curtimeOffset, 1.0f );
-	SetLocalOrigin( origin + curtimeOffset * GetLocalVelocity() );
+	GetEngineObject()->SetLocalOrigin( origin + curtimeOffset * GetEngineObject()->GetLocalVelocity() );
 	// Setup bone state to extrapolate physics velocity
 	SetupBones( pBonesOut, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, gpGlobals->curtime + curtimeOffset );
 
 	m_flCycle = cycle;
-	SetLocalOrigin( origin );
+	GetEngineObject()->SetLocalOrigin( origin );
 }
 
 void C_BasePlayer::GetRagdollInitBoneArrays( matrix3x4_t *pDeltaBones0, matrix3x4_t *pDeltaBones1, matrix3x4_t *pCurrentBones, float boneDt )
@@ -2974,12 +2974,12 @@ void CC_DumpClientSoundscapeData( const CCommand& args )
 		return;
 
 	Msg("Client Soundscape data dump:\n");
-	Msg("   Position: %.2f %.2f %.2f\n", pPlayer->GetAbsOrigin().x, pPlayer->GetAbsOrigin().y, pPlayer->GetAbsOrigin().z );
+	Msg("   Position: %.2f %.2f %.2f\n", pPlayer->GetEngineObject()->GetAbsOrigin().x, pPlayer->GetEngineObject()->GetAbsOrigin().y, pPlayer->GetEngineObject()->GetAbsOrigin().z );
 	Msg("   soundscape index: %d\n", pPlayer->m_Local.m_audio.soundscapeIndex.Get() );
 	Msg("   entity index: %d\n", pPlayer->m_Local.m_audio.ent.Get() ? pPlayer->m_Local.m_audio.ent->entindex() : -1 );
 	if ( pPlayer->m_Local.m_audio.ent.Get() )
 	{
-		Msg("   entity pos: %.2f %.2f %.2f\n", pPlayer->m_Local.m_audio.ent.Get()->GetAbsOrigin().x, pPlayer->m_Local.m_audio.ent.Get()->GetAbsOrigin().y, pPlayer->m_Local.m_audio.ent.Get()->GetAbsOrigin().z );
+		Msg("   entity pos: %.2f %.2f %.2f\n", pPlayer->m_Local.m_audio.ent.Get()->GetEngineObject()->GetAbsOrigin().x, pPlayer->m_Local.m_audio.ent.Get()->GetEngineObject()->GetAbsOrigin().y, pPlayer->m_Local.m_audio.ent.Get()->GetEngineObject()->GetAbsOrigin().z );
 		if ( pPlayer->m_Local.m_audio.ent.Get()->IsDormant() )
 		{
 			Msg("     ENTITY IS DORMANT\n");

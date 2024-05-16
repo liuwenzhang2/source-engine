@@ -152,7 +152,7 @@ public:
 
 	Vector EyePosition()
 	{
-		return GetAbsOrigin() + EyeOffset(GetActivity());
+		return GetEngineObject()->GetAbsOrigin() + EyeOffset(GetActivity());
 	}
 
 protected:
@@ -307,7 +307,7 @@ void CNPC_CombineCamera::Spawn()
 
 	SetModel(COMBINE_CAMERA_MODEL);
 
-	m_pEyeFlash = CSprite::SpriteCreate(COMBINE_CAMERA_FLASH_SPRITE, GetLocalOrigin(), FALSE);
+	m_pEyeFlash = CSprite::SpriteCreate(COMBINE_CAMERA_FLASH_SPRITE, GetEngineObject()->GetLocalOrigin(), FALSE);
 	m_pEyeFlash->SetTransparency(kRenderGlow, 255, 255, 255, 0, kRenderFxNoDissipation);
 	m_pEyeFlash->SetAttachment(this, 2);
 	m_pEyeFlash->SetBrightness(0);
@@ -335,7 +335,7 @@ void CNPC_CombineCamera::Spawn()
 	m_iAmmoType = GetAmmoDef()->Index("Pistol");
 
 	// Create our eye sprite
-	m_pEyeGlow = CSprite::SpriteCreate(COMBINE_CAMERA_GLOW_SPRITE, GetLocalOrigin(), false);
+	m_pEyeGlow = CSprite::SpriteCreate(COMBINE_CAMERA_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin(), false);
 	m_pEyeGlow->SetTransparency(kRenderWorldGlow, 255, 0, 0, 128, kRenderFxNoDissipation);
 	m_pEyeGlow->SetAttachment(this, 2);
 
@@ -415,7 +415,7 @@ int CNPC_CombineCamera::OnTakeDamage(const CTakeDamageInfo &inputInfo)
 
 		// FIXME: This needs to throw a ragdoll gib or something other than animating the retraction -- jdw
 
-		ExplosionCreate(GetAbsOrigin(), GetLocalAngles(), this, 100, 100, false);
+		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetLocalAngles(), this, 100, 100, false);
 		SetThink(&CNPC_CombineCamera::DeathThink);
 
 		g_pSoundEmitterSystem->StopSound(this, "Alert");
@@ -436,7 +436,7 @@ int CNPC_CombineCamera::OnTakeDamage(const CTakeDamageInfo &inputInfo)
 //-----------------------------------------------------------------------------
 void CNPC_CombineCamera::Deploy()
 {
-	m_vecGoalAngles = GetAbsAngles();
+	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
 	SetNextThink( gpGlobals->curtime );
 
@@ -580,7 +580,7 @@ bool CNPC_CombineCamera::FVisible(CBaseEntity *pEntity, int traceMask, CBaseEnti
 //-----------------------------------------------------------------------------
 bool CNPC_CombineCamera::IsValidEnemy( CBaseEntity *pEnemy )
 {
-	Vector vecDelta = pEnemy->GetAbsOrigin() - GetAbsOrigin();
+	Vector vecDelta = pEnemy->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	float flDist = vecDelta.Length();
 	if ( (flDist > m_nOuterRadius) || !FInViewCone(pEnemy) )
 		return false;
@@ -602,7 +602,7 @@ CBaseEntity *CNPC_CombineCamera::MaintainEnemy()
 	if (pEnemy)
 	{
 		// See if our best enemy is too far away to care about.
-		Vector vecDelta = pEnemy->GetAbsOrigin() - GetAbsOrigin();
+		Vector vecDelta = pEnemy->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 		float flDist = vecDelta.Length();
 		if (flDist < m_nOuterRadius)
 		{
@@ -658,7 +658,7 @@ void CNPC_CombineCamera::ActiveThink()
 	// Examine the target until it reaches our inner radius
 	if ( pTarget != m_hEnemyTarget )
 	{
-		Vector vecDelta = pTarget->GetAbsOrigin() - GetAbsOrigin();
+		Vector vecDelta = pTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 		float flDist = vecDelta.Length();
 		if ( (flDist < m_nInnerRadius) && FInViewCone(pTarget) )
 		{
@@ -829,7 +829,7 @@ void CNPC_CombineCamera::SearchThink()
 
 	// Display that we're scanning
 	m_vecGoalAngles.x = 15.0f;
-	m_vecGoalAngles.y = GetAbsAngles().y + (sin(gpGlobals->curtime * 2.0f) * 45.0f);
+	m_vecGoalAngles.y = GetEngineObject()->GetAbsAngles().y + (sin(gpGlobals->curtime * 2.0f) * 45.0f);
 
 	// Turn and ping
 	UpdateFacing();
@@ -1125,7 +1125,7 @@ void CNPC_CombineCamera::DeathThink()
 		return;
 
 	// Level out our angles
-	m_vecGoalAngles = GetAbsAngles();
+	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if (m_lifeState != LIFE_DEAD)
@@ -1176,7 +1176,7 @@ void CNPC_CombineCamera::DeathThink()
 void CNPC_CombineCamera::SetHeight(float height)
 {
 	Vector forward, right, up;
-	AngleVectors(GetLocalAngles(), &forward, &right, &up);
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, &right, &up);
 
 	Vector mins = (forward * -16.0f) + (right * -16.0f);
 	Vector maxs = (forward *  16.0f) + (right *  16.0f) + (up * -height);

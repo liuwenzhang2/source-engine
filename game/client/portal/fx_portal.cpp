@@ -67,7 +67,7 @@ void C_PortalBlast::Init( bool bIsPortal2, PortalPlacedByType ePlacedBy, const V
 	m_ptCreationPoint = vStart;
 	m_ptDeathPoint = vEnd;
 
-	SetAbsOrigin( m_ptCreationPoint );
+	GetEngineObject()->SetAbsOrigin( m_ptCreationPoint );
 
 	m_fCreationTime = gpGlobals->curtime;
 	m_fDeathTime = fDeathTime;
@@ -102,7 +102,7 @@ void C_PortalBlast::ClientThink( void )
 	if ( fT >= 1.0f )
 	{
 		// Ready to die! But we want one more frame in the final position
-		SetAbsOrigin( m_ptDeathPoint );
+		GetEngineObject()->SetAbsOrigin( m_ptDeathPoint );
 
 		m_fCreationTime = 0.0f;
 		m_fDeathTime = 0.0f;
@@ -112,7 +112,7 @@ void C_PortalBlast::ClientThink( void )
 
 	// Set the interpolated position
 	Vector vTarget = m_ptAimPoint * ( 1.0f - fT ) + m_ptDeathPoint * fT;
-	SetAbsOrigin( m_ptCreationPoint * ( 1.0f - fT ) + vTarget * fT );
+	GetEngineObject()->SetAbsOrigin( m_ptCreationPoint * ( 1.0f - fT ) + vTarget * fT );
 }
 
 

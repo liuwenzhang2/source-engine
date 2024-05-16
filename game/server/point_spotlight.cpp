@@ -231,9 +231,9 @@ void CPointSpotlight::CreateEfficientSpotlight()
 
 	SpotlightCreate();
 	m_vSpotlightCurrentPos = SpotlightCurrentPos();
-	m_hSpotlightTarget->SetAbsOrigin( m_vSpotlightCurrentPos );
-	m_hSpotlightTarget->m_vSpotlightOrg = GetAbsOrigin();
-	VectorSubtract( m_hSpotlightTarget->GetAbsOrigin(), m_hSpotlightTarget->m_vSpotlightOrg, m_hSpotlightTarget->m_vSpotlightDir );
+	m_hSpotlightTarget->GetEngineObject()->SetAbsOrigin( m_vSpotlightCurrentPos );
+	m_hSpotlightTarget->m_vSpotlightOrg = GetEngineObject()->GetAbsOrigin();
+	VectorSubtract( m_hSpotlightTarget->GetEngineObject()->GetAbsOrigin(), m_hSpotlightTarget->m_vSpotlightOrg, m_hSpotlightTarget->m_vSpotlightDir );
 	m_flSpotlightCurLength = VectorNormalize( m_hSpotlightTarget->m_vSpotlightDir );
 	m_hSpotlightTarget->SetMoveType( MOVETYPE_NONE );
 	ComputeRenderInfo();
@@ -330,14 +330,14 @@ void CPointSpotlight::SpotlightCreate(void)
 	if ( m_hSpotlightTarget.Get() != NULL )
 		return;
 
-	AngleVectors( GetAbsAngles(), &m_vSpotlightDir );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &m_vSpotlightDir );
 
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + m_vSpotlightDir * m_flSpotlightMaxLength, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + m_vSpotlightDir * m_flSpotlightMaxLength, MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 
 	m_hSpotlightTarget = (CSpotlightEnd*)gEntList.CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
-	m_hSpotlightTarget->SetAbsOrigin( tr.endpos );
+	m_hSpotlightTarget->GetEngineObject()->SetAbsOrigin( tr.endpos );
 	m_hSpotlightTarget->SetOwnerEntity( this );
 	m_hSpotlightTarget->m_clrRender = m_clrRender;
 	m_hSpotlightTarget->m_Radius = m_flSpotlightMaxLength;
@@ -363,7 +363,7 @@ void CPointSpotlight::SpotlightCreate(void)
 
 	if ( m_bEfficientSpotlight )
 	{
-		m_hSpotlight->PointsInit( GetAbsOrigin(), m_hSpotlightTarget->GetAbsOrigin() );
+		m_hSpotlight->PointsInit(GetEngineObject()->GetAbsOrigin(), m_hSpotlightTarget->GetEngineObject()->GetAbsOrigin() );
 	}
 	else
 	{
@@ -378,11 +378,11 @@ void CPointSpotlight::SpotlightCreate(void)
 //------------------------------------------------------------------------------
 Vector CPointSpotlight::SpotlightCurrentPos(void)
 {
-	AngleVectors( GetAbsAngles(), &m_vSpotlightDir );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &m_vSpotlightDir );
 
 	//	Get beam end point.  Only collide with solid objects, not npcs
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + (m_vSpotlightDir * 2 * m_flSpotlightMaxLength), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + (m_vSpotlightDir * 2 * m_flSpotlightMaxLength), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 	return tr.endpos;
 }
 
@@ -443,13 +443,13 @@ void CPointSpotlight::SpotlightUpdate(void)
 
 	//  Update spotlight target velocity
 	Vector vTargetDir;
-	VectorSubtract( m_vSpotlightCurrentPos, m_hSpotlightTarget->GetAbsOrigin(), vTargetDir );
+	VectorSubtract( m_vSpotlightCurrentPos, m_hSpotlightTarget->GetEngineObject()->GetAbsOrigin(), vTargetDir );
 	float vTargetDist = vTargetDir.Length();
 
 	// If we haven't moved at all, don't recompute
 	if ( vTargetDist < 1 )
 	{
-		m_hSpotlightTarget->SetAbsVelocity( vec3_origin );
+		m_hSpotlightTarget->GetEngineObject()->SetAbsVelocity( vec3_origin );
 		return;
 	}
 
@@ -463,13 +463,13 @@ void CPointSpotlight::SpotlightUpdate(void)
 		VectorNormalize(vecNewVelocity);
 		vecNewVelocity *= 200;
 		VectorNormalize(vTargetDir);
-		m_hSpotlightTarget->SetAbsOrigin( m_vSpotlightCurrentPos );
+		m_hSpotlightTarget->GetEngineObject()->SetAbsOrigin( m_vSpotlightCurrentPos );
 	}
-	m_hSpotlightTarget->SetAbsVelocity( vecNewVelocity );
-	m_hSpotlightTarget->m_vSpotlightOrg = GetAbsOrigin();
+	m_hSpotlightTarget->GetEngineObject()->SetAbsVelocity( vecNewVelocity );
+	m_hSpotlightTarget->m_vSpotlightOrg = GetEngineObject()->GetAbsOrigin();
 
 	// Avoid sudden change in where beam fades out when cross disconinuities
-	VectorSubtract( m_hSpotlightTarget->GetAbsOrigin(), m_hSpotlightTarget->m_vSpotlightOrg, m_hSpotlightTarget->m_vSpotlightDir );
+	VectorSubtract( m_hSpotlightTarget->GetEngineObject()->GetAbsOrigin(), m_hSpotlightTarget->m_vSpotlightOrg, m_hSpotlightTarget->m_vSpotlightDir );
 	float flBeamLength	= VectorNormalize( m_hSpotlightTarget->m_vSpotlightDir );
 	m_flSpotlightCurLength = (0.60*m_flSpotlightCurLength) + (0.4*flBeamLength);
 

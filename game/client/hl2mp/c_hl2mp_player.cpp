@@ -115,7 +115,7 @@ void C_HL2MP_Player::TraceAttack( const CTakeDamageInfo &info, const Vector &vec
 	
 	if ( info.GetAttacker() )
 	{
-		flDistance = (ptr->endpos - info.GetAttacker()->GetAbsOrigin()).Length();
+		flDistance = (ptr->endpos - info.GetAttacker()->GetEngineObject()->GetAbsOrigin()).Length();
 	}
 
 	if ( m_takedamage )
@@ -197,7 +197,7 @@ void C_HL2MP_Player::UpdateLookAt( void )
 
 	// Figure out where our body is facing in world space.
 	QAngle bodyAngles( 0, 0, 0 );
-	bodyAngles[YAW] = GetLocalAngles()[YAW];
+	bodyAngles[YAW] = GetEngineObject()->GetLocalAngles()[YAW];
 
 
 	float flBodyYawDiff = bodyAngles[YAW] - m_flLastBodyYaw;
@@ -230,7 +230,7 @@ void C_HL2MP_Player::ClientThink( void )
 	bool bFoundViewTarget = false;
 	
 	Vector vForward;
-	AngleVectors( GetLocalAngles(), &vForward );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &vForward );
 
 	for( int iClient = 1; iClient <= gpGlobals->maxClients; ++iClient )
 	{
@@ -241,8 +241,8 @@ void C_HL2MP_Player::ClientThink( void )
 		if ( pEnt->entindex() == entindex() )
 			continue;
 
-		Vector vTargetOrigin = pEnt->GetAbsOrigin();
-		Vector vMyOrigin =  GetAbsOrigin();
+		Vector vTargetOrigin = pEnt->GetEngineObject()->GetAbsOrigin();
+		Vector vMyOrigin = GetEngineObject()->GetAbsOrigin();
 
 		Vector vDir = vTargetOrigin - vMyOrigin;
 		
@@ -261,7 +261,7 @@ void C_HL2MP_Player::ClientThink( void )
 
 	if ( bFoundViewTarget == false )
 	{
-		m_vLookAtTarget = GetAbsOrigin() + vForward * 512;
+		m_vLookAtTarget = GetEngineObject()->GetAbsOrigin() + vForward * 512;
 	}
 
 	UpdateIDTarget();
@@ -309,7 +309,7 @@ void C_HL2MP_Player::DoImpactEffect( trace_t &tr, int nDamageType )
 
 void C_HL2MP_Player::PreThink( void )
 {
-	QAngle vTempAngles = GetLocalAngles();
+	QAngle vTempAngles = GetEngineObject()->GetLocalAngles();
 
 	if ( GetLocalPlayer() == this )
 	{
@@ -325,7 +325,7 @@ void C_HL2MP_Player::PreThink( void )
 		vTempAngles[YAW] += 360.0f;
 	}
 
-	SetLocalAngles( vTempAngles );
+	GetEngineObject()->SetLocalAngles( vTempAngles );
 
 	BaseClass::PreThink();
 
@@ -359,15 +359,15 @@ void C_HL2MP_Player::AddEntity( void )
 {
 	BaseClass::AddEntity();
 
-	QAngle vTempAngles = GetLocalAngles();
+	QAngle vTempAngles = GetEngineObject()->GetLocalAngles();
 	vTempAngles[PITCH] = m_angEyeAngles[PITCH];
 
-	SetLocalAngles( vTempAngles );
+	GetEngineObject()->SetLocalAngles( vTempAngles );
 		
 	m_PlayerAnimState.Update();
 
 	// Zero out model pitch, blending takes care of all of it.
-	SetLocalAnglesDim( X_INDEX, 0 );
+	GetEngineObject()->SetLocalAnglesDim( X_INDEX, 0 );
 
 	if( this != C_BasePlayer::GetLocalPlayer() )
 	{
@@ -858,7 +858,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 		{
 			Interp_Copy( pPlayer );
 
-			SetAbsAngles( pPlayer->GetRenderAngles() );
+			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 			GetEngineObject()->GetRotationInterpolator().Reset();
 
 			m_flAnimTime = pPlayer->m_flAnimTime;
@@ -869,11 +869,11 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 		{
 			// This is the local player, so set them in a default
 			// pose and slam their velocity, angles and origin
-			SetAbsOrigin( m_vecRagdollOrigin );
+			GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
 			
-			SetAbsAngles( pPlayer->GetRenderAngles() );
+			GetEngineObject()->SetAbsAngles( pPlayer->GetRenderAngles() );
 
-			SetAbsVelocity( m_vecRagdollVelocity );
+			GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 			int iSeq = pPlayer->GetSequence();
 			if ( iSeq == -1 )
@@ -894,8 +894,8 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 		// use this position
 		GetEngineObject()->SetNetworkOrigin( m_vecRagdollOrigin );
 
-		SetAbsOrigin( m_vecRagdollOrigin );
-		SetAbsVelocity( m_vecRagdollVelocity );
+		GetEngineObject()->SetAbsOrigin( m_vecRagdollOrigin );
+		GetEngineObject()->SetAbsVelocity( m_vecRagdollVelocity );
 
 		GetEngineObject()->Interp_Reset(GetEngineObject()->GetVarMapping() );
 		

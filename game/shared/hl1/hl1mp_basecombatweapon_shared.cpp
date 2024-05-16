@@ -37,12 +37,12 @@ CBaseHL1MPCombatWeapon::CBaseHL1MPCombatWeapon()
 
 void CBaseHL1MPCombatWeapon::EjectShell( CBaseEntity *pPlayer, int iType )
 {
-	QAngle angShellAngles = pPlayer->GetAbsAngles();
+	QAngle angShellAngles = pPlayer->GetEngineObject()->GetAbsAngles();
 
 	Vector vecForward, vecRight, vecUp;
 	AngleVectors( angShellAngles, &vecForward, &vecRight, &vecUp );
 
-	Vector vecShellPosition = pPlayer->GetAbsOrigin() + pPlayer->GetViewOffset();
+	Vector vecShellPosition = pPlayer->GetEngineObject()->GetAbsOrigin() + pPlayer->GetViewOffset();
 	switch ( iType )
 	{
 	case 0:
@@ -128,7 +128,7 @@ void CBaseHL1MPCombatWeapon::WeaponSound( WeaponSound_t sound_type, float soundt
 	if ( !te->CanPredict() )
 		return;
 				
-	g_pSoundEmitterSystem->EmitSound( filter, GetPlayerOwner()->entindex(), shootsound, &GetPlayerOwner()->GetAbsOrigin() ); //CBaseEntity::
+	g_pSoundEmitterSystem->EmitSound( filter, GetPlayerOwner()->entindex(), shootsound, &GetPlayerOwner()->GetEngineObject()->GetAbsOrigin() ); //CBaseEntity::
 #else
 	BaseClass::WeaponSound( sound_type, soundtime );
 #endif

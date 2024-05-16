@@ -310,7 +310,7 @@ void CPathTrack::DrawDebugGeometryOverlays()
 	{
 		if (m_pnext)
 		{
-			NDebugOverlay::Line(GetAbsOrigin(),m_pnext->GetAbsOrigin(),255,100,100,true,0.0);
+			NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(),m_pnext->GetEngineObject()->GetAbsOrigin(),255,100,100,true,0.0);
 		}
 	}
 	BaseClass::DrawDebugGeometryOverlays();
@@ -332,9 +332,9 @@ void CPathTrack::Project( CPathTrack *pstart, CPathTrack *pend, Vector &origin, 
 {
 	if ( pstart && pend )
 	{
-		Vector dir = (pend->GetLocalOrigin() - pstart->GetLocalOrigin());
+		Vector dir = (pend->GetEngineObject()->GetLocalOrigin() - pstart->GetEngineObject()->GetLocalOrigin());
 		VectorNormalize( dir );
-		origin = pend->GetLocalOrigin() + dir * dist;
+		origin = pend->GetEngineObject()->GetLocalOrigin() + dir * dist;
 	}
 }
 
@@ -420,7 +420,7 @@ CPathTrack *CPathTrack::LookAhead( Vector &origin, float dist, int move, CPathTr
 		}
 
 		// The next path track is valid. How far are we from it?
-		Vector dir = pcurrent->GetNextInDir( bForward )->GetLocalOrigin() - currentPos;
+		Vector dir = pcurrent->GetNextInDir( bForward )->GetEngineObject()->GetLocalOrigin() - currentPos;
 		float length = dir.Length();
 
 		// If we are at the next node and there isn't one beyond it, return the next node.
@@ -454,7 +454,7 @@ CPathTrack *CPathTrack::LookAhead( Vector &origin, float dist, int move, CPathTr
 
 		// We hit the next path track, advance to it.
 		dist -= length;
-		currentPos = pcurrent->GetNextInDir( bForward )->GetLocalOrigin();
+		currentPos = pcurrent->GetNextInDir( bForward )->GetEngineObject()->GetLocalOrigin();
 		pcurrent = pcurrent->GetNextInDir( bForward );
 		origin = currentPos;
 	}
@@ -478,7 +478,7 @@ CPathTrack *CPathTrack::Nearest( const Vector &origin )
 	CPathTrack	*ppath, *pnearest;
 
 
-	delta = origin - GetLocalOrigin();
+	delta = origin - GetEngineObject()->GetLocalOrigin();
 	delta.z = 0;
 	minDist = delta.Length();
 	pnearest = this;
@@ -495,7 +495,7 @@ CPathTrack *CPathTrack::Nearest( const Vector &origin )
 			Assert(0);
 			return NULL;
 		}
-		delta = origin - ppath->GetLocalOrigin();
+		delta = origin - ppath->GetEngineObject()->GetLocalOrigin();
 		delta.z = 0;
 		dist = delta.Length();
 		if ( dist < minDist )
@@ -527,7 +527,7 @@ QAngle CPathTrack::GetOrientation( bool bForwardDir )
 	TrackOrientationType_t eOrient = GetOrientationType();
 	if ( eOrient == TrackOrientation_FacePathAngles )
 	{
-		return GetLocalAngles();
+		return GetEngineObject()->GetLocalAngles();
 	}
 
 	CPathTrack *pPrev = this;
@@ -538,7 +538,7 @@ QAngle CPathTrack::GetOrientation( bool bForwardDir )
 		pNext = this;
 	}
 
-	Vector vecDir = pNext->GetLocalOrigin() - pPrev->GetLocalOrigin();
+	Vector vecDir = pNext->GetEngineObject()->GetLocalOrigin() - pPrev->GetEngineObject()->GetLocalOrigin();
 
 	QAngle angDir;
 	VectorAngles( vecDir, angDir );

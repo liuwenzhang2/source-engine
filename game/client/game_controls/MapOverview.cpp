@@ -1334,7 +1334,7 @@ void CMapOverview::UpdateObjects()
 		if ( !entity )
 			continue;
 
-		obj->position = entity->GetAbsOrigin();
-		obj->angle = entity->GetAbsAngles();
+		obj->position = entity->GetEngineObject()->GetAbsOrigin();
+		obj->angle = entity->GetEngineObject()->GetAbsAngles();
 	}
 }

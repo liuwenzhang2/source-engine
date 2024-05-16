@@ -35,7 +35,7 @@ Vector IIntention::SelectTargetPoint( const INextBot *me, const CBaseCombatChara
 	// no answer, use a reasonable position
 	Vector threatMins, threatMaxs;
 	subject->CollisionProp()->WorldSpaceAABB( &threatMins, &threatMaxs );
-	Vector targetPoint = subject->GetAbsOrigin();
+	Vector targetPoint = subject->GetEngineObject()->GetAbsOrigin();
 	targetPoint.z += 0.7f * ( threatMaxs.z - threatMins.z );
 
 	return targetPoint;
@@ -75,8 +75,8 @@ const CKnownEntity *IIntention::SelectMoreDangerousThreat( const INextBot *me, c
 	}
 
 	// no specific decision was made - return closest threat as most dangerous
-	float range1 = ( subject->GetAbsOrigin() - threat1->GetLastKnownPosition() ).LengthSqr();
-	float range2 = ( subject->GetAbsOrigin() - threat2->GetLastKnownPosition() ).LengthSqr();
+	float range1 = ( subject->GetEngineObject()->GetAbsOrigin() - threat1->GetLastKnownPosition() ).LengthSqr();
+	float range2 = ( subject->GetEngineObject()->GetAbsOrigin() - threat2->GetLastKnownPosition() ).LengthSqr();
 
 	if ( range1 < range2 )
 	{

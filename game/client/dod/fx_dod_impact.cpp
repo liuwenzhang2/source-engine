@@ -164,7 +164,7 @@ void ImpactCallback( const CEffectData &data )
 
 		if ( pPlayer )
 		{
-			float flDistSqr = (vecOrigin - pPlayer->GetAbsOrigin()).LengthSqr();
+			float flDistSqr = (vecOrigin - pPlayer->GetEngineObject()->GetAbsOrigin()).LengthSqr();
 
 			flScale = RemapValClamped( flDistSqr, (400*400), (1000*1000), 0.8, 1.2 );
 		}		

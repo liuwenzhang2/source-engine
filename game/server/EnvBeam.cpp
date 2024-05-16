@@ -354,7 +354,7 @@ void CEnvBeam::StrikeThink( void )
 			CBaseEntity *pStart = RandomTargetname( STRING(m_iszStartEntity) );
 			if (pStart != NULL)
 			{
-				RandomPoint( pStart->GetAbsOrigin() );
+				RandomPoint( pStart->GetEngineObject()->GetAbsOrigin() );
 			}
 			else
 			{
@@ -396,9 +396,9 @@ void CEnvBeam::Strike( void )
 
 		te->BeamEntPoint( filter, 0.0,
 			pointStart ? 0 : pStart->entindex(),
-			pointStart ? &pStart->GetAbsOrigin() : NULL,
+			pointStart ? &pStart->GetEngineObject()->GetAbsOrigin() : NULL,
 			pointEnd ? 0 : pEnd->entindex(),
-			pointEnd ? &pEnd->GetAbsOrigin() : NULL,
+			pointEnd ? &pEnd->GetEngineObject()->GetAbsOrigin() : NULL,
 			m_spriteTexture,
 			0,	// No halo
 			m_frameStart,
@@ -455,11 +455,11 @@ void CEnvBeam::Strike( void )
 		}
 	}
 
-	DoSparks( pStart->GetAbsOrigin(), pEnd->GetAbsOrigin() );
+	DoSparks( pStart->GetEngineObject()->GetAbsOrigin(), pEnd->GetEngineObject()->GetAbsOrigin() );
 	if ( m_flDamage > 0 )
 	{
 		trace_t tr;
-		UTIL_TraceLine( pStart->GetAbsOrigin(), pEnd->GetAbsOrigin(), MASK_SOLID, NULL, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine( pStart->GetEngineObject()->GetAbsOrigin(), pEnd->GetEngineObject()->GetAbsOrigin(), MASK_SOLID, NULL, COLLISION_GROUP_NONE, &tr );
 		BeamDamageInstant( &tr, m_flDamage );
 	}
 	
@@ -632,7 +632,7 @@ void CEnvBeam::RandomArea( void )
 
 	for (iLoops = 0; iLoops < 10; iLoops++)
 	{
-		Vector vecSrc = GetAbsOrigin();
+		Vector vecSrc = GetEngineObject()->GetAbsOrigin();
 
 		Vector vecDir1 = Vector( random->RandomFloat( -1.0, 1.0 ), random->RandomFloat( -1.0, 1.0 ),random->RandomFloat( -1.0, 1.0 ) );
 		VectorNormalize( vecDir1 );
@@ -729,7 +729,7 @@ void CEnvBeam::BeamUpdateVars( void )
 
 	if ( IsStaticPointEntity( pStart ) )
 	{
-		SetAbsStartPos( pStart->GetAbsOrigin() );
+		SetAbsStartPos( pStart->GetEngineObject()->GetAbsOrigin() );
 	}
 	else
 	{
@@ -738,7 +738,7 @@ void CEnvBeam::BeamUpdateVars( void )
 
 	if ( IsStaticPointEntity( pEnd ) )
 	{
-		SetAbsEndPos( pEnd->GetAbsOrigin() );
+		SetAbsEndPos( pEnd->GetEngineObject()->GetAbsOrigin() );
 	}
 	else
 	{

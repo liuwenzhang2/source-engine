@@ -371,7 +371,7 @@ void CCSBot::Attack( CCSPlayer *victim )
 	if (IsUsingGrenade())
 	{
 		// throw towards their feet
-		ThrowGrenade( victim->GetAbsOrigin() );
+		ThrowGrenade( victim->GetEngineObject()->GetAbsOrigin() );
 		return;
 	}
 
@@ -642,7 +642,7 @@ bool CCSBot::MoveToInitialEncounter( void )
 	// build a path from us to the enemy spawn
 	CCSNavPath path;
 	PathCost cost( this, FASTEST_ROUTE );
-	path.Compute( WorldSpaceCenter(), enemySpawn->GetAbsOrigin(), cost );
+	path.Compute( WorldSpaceCenter(), enemySpawn->GetEngineObject()->GetAbsOrigin(), cost );
 
 	if (!path.IsValid())
 	{

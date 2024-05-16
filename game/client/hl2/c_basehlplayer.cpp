@@ -158,16 +158,16 @@ void C_BaseHLPlayer::Zoom( float FOVOffset, float time )
 int C_BaseHLPlayer::DrawModel( int flags )
 {
 	// Not pitch for player
-	QAngle saveAngles = GetLocalAngles();
+	QAngle saveAngles = GetEngineObject()->GetLocalAngles();
 
 	QAngle useAngles = saveAngles;
 	useAngles[ PITCH ] = 0.0f;
 
-	SetLocalAngles( useAngles );
+	GetEngineObject()->SetLocalAngles( useAngles );
 
 	int iret = BaseClass::DrawModel( flags );
 
-	SetLocalAngles( saveAngles );
+	GetEngineObject()->SetLocalAngles( saveAngles );
 
 	return iret;
 }
@@ -199,7 +199,7 @@ bool C_BaseHLPlayer::TestMove( const Vector &pos, float fVertDist, float radius,
 	trace_t trDown;
 	float flHit1, flHit2;
 	
-	UTIL_TraceHull( GetAbsOrigin(), pos, GetPlayerMins(), GetPlayerMaxs(), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trOver );
+	UTIL_TraceHull(GetEngineObject()->GetAbsOrigin(), pos, GetPlayerMins(), GetPlayerMaxs(), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trOver );
 	if ( trOver.fraction < 1.0f )
 	{
 		// check if the endpos intersects with the direction the object is travelling.  if it doesn't, this is a good direction to move.
@@ -211,7 +211,7 @@ bool C_BaseHLPlayer::TestMove( const Vector &pos, float fVertDist, float radius,
 			// our first trace failed, so see if we can go farther if we step up.
 
 			// trace up to see if we have enough room.
-			UTIL_TraceHull( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, m_Local.m_flStepSize ), 
+			UTIL_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, m_Local.m_flStepSize ),
 				GetPlayerMins(), GetPlayerMaxs(), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trUp );
 
 			// do a trace from the stepped up height
@@ -260,7 +260,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 	Vector size = WorldAlignSize();
 
 	float radius = 0.7f * sqrt( size.x * size.x + size.y * size.y );
-	float curspeed = GetLocalVelocity().Length2D();
+	float curspeed = GetEngineObject()->GetLocalVelocity().Length2D();
 
 	//int slot = 1;
 	//engine->Con_NPrintf( slot++, "speed %f\n", curspeed );
@@ -303,7 +303,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 		 radius *= 1.3f;
 
 	CPlayerAndObjectEnumerator avoid( radius );
-	partition->EnumerateElementsInSphere( PARTITION_CLIENT_SOLID_EDICTS, GetAbsOrigin(), radius, false, &avoid );
+	partition->EnumerateElementsInSphere( PARTITION_CLIENT_SOLID_EDICTS, GetEngineObject()->GetAbsOrigin(), radius, false, &avoid );
 
 	// Okay, decide how to avoid if there's anything close by
 	int c = avoid.GetObjectCount();
@@ -322,7 +322,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 		if( !obj )
 			continue;
 
-		Vector vecToObject = obj->GetAbsOrigin() - GetAbsOrigin();
+		Vector vecToObject = obj->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 
 		float flDist = vecToObject.Length2D();
 		
@@ -346,7 +346,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 		obj->GetEngineObject()->EstimateAbsVelocity( vecNPCVelocity );
 		float flNPCSpeed = VectorNormalize( vecNPCVelocity );
 
-		Vector vPlayerVel = GetAbsVelocity();
+		Vector vPlayerVel = GetEngineObject()->GetAbsVelocity();
 		VectorNormalize( vPlayerVel );
 
 		float flHit1, flHit2;
@@ -357,9 +357,9 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 		float flDirProduct = DotProduct( vRayDir, vPlayerVel );
 
 		if ( !IntersectInfiniteRayWithSphere(
-				GetAbsOrigin(),
+			GetEngineObject()->GetAbsOrigin(),
 				vRayDir,
-				obj->GetAbsOrigin(),
+				obj->GetEngineObject()->GetAbsOrigin(),
 				radius,
 				&flHit1,
 				&flHit2 ) )
@@ -387,9 +387,9 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 				Vector vecTryMove = vecNPCTrajectoryRight * iDirection;
 				VectorNormalize( vecTryMove );
 				
-				Vector vTestPosition = GetAbsOrigin() + vecTryMove * radius * 2;
+				Vector vTestPosition = GetEngineObject()->GetAbsOrigin() + vecTryMove * radius * 2;
 
-				if ( TestMove( vTestPosition, size.z * 2, radius * 2, obj->GetAbsOrigin(), vMoveDir ) )
+				if ( TestMove( vTestPosition, size.z * 2, radius * 2, obj->GetEngineObject()->GetAbsOrigin(), vMoveDir ) )
 				{
 					fwd = currentdir.Dot( vecTryMove );
 					rt = rightdir.Dot( vecTryMove );
@@ -412,8 +412,8 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 			Vector vecNPCForward;
 			obj->GetEngineObject()->GetVectors( &vecNPCForward, NULL, NULL );
 			
-			Vector vTestPosition = GetAbsOrigin() - vecNPCForward * radius * 2;
-			if ( TestMove( vTestPosition, size.z * 2, radius * 2, obj->GetAbsOrigin(), vMoveDir ) )
+			Vector vTestPosition = GetEngineObject()->GetAbsOrigin() - vecNPCForward * radius * 2;
+			if ( TestMove( vTestPosition, size.z * 2, radius * 2, obj->GetEngineObject()->GetAbsOrigin(), vMoveDir ) )
 			{
 				fwd = currentdir.Dot( -vecNPCForward );
 				rt = rightdir.Dot( -vecNPCForward );
@@ -432,8 +432,8 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 		if ( !foundResult )
 		{
 			// test if we can move in the direction the object is moving
-			Vector vTestPosition = GetAbsOrigin() + vMoveDir * radius * 2;
-			if ( TestMove( vTestPosition, size.z * 2, radius * 2, obj->GetAbsOrigin(), vMoveDir ) )
+			Vector vTestPosition = GetEngineObject()->GetAbsOrigin() + vMoveDir * radius * 2;
+			if ( TestMove( vTestPosition, size.z * 2, radius * 2, obj->GetEngineObject()->GetAbsOrigin(), vMoveDir ) )
 			{
 				fwd = currentdir.Dot( vMoveDir );
 				rt = rightdir.Dot( vMoveDir );
@@ -450,8 +450,8 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 			else
 			{
 				// try moving directly away from the object
-				Vector vTestPosition = GetAbsOrigin() - dirToObject * radius * 2;
-				if ( TestMove( vTestPosition, size.z * 2, radius * 2, obj->GetAbsOrigin(), vMoveDir ) )
+				Vector vTestPosition = GetEngineObject()->GetAbsOrigin() - dirToObject * radius * 2;
+				if ( TestMove( vTestPosition, size.z * 2, radius * 2, obj->GetEngineObject()->GetAbsOrigin(), vMoveDir ) )
 				{
 					fwd = currentdir.Dot( -dirToObject );
 					rt = rightdir.Dot( -dirToObject );
@@ -465,7 +465,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 		if ( !foundResult )
 		{
 			// test if we can move through the object
-			Vector vTestPosition = GetAbsOrigin() - vMoveDir * radius * 2;
+			Vector vTestPosition = GetEngineObject()->GetAbsOrigin() - vMoveDir * radius * 2;
 			fwd = currentdir.Dot( -vMoveDir );
 			rt = rightdir.Dot( -vMoveDir );
 
@@ -547,7 +547,7 @@ void C_BaseHLPlayer::PerformClientSideNPCSpeedModifiers( float flFrameTime, CUse
 
 		if ( pNPC )
 		{
-			float flDist = (GetAbsOrigin() - pNPC->GetAbsOrigin()).LengthSqr();
+			float flDist = (GetEngineObject()->GetAbsOrigin() - pNPC->GetEngineObject()->GetAbsOrigin()).LengthSqr();
 			bool bShouldModSpeed = false; 
 
 			// Within range?
@@ -555,12 +555,12 @@ void C_BaseHLPlayer::PerformClientSideNPCSpeedModifiers( float flFrameTime, CUse
 			{
 				// Now, only slowdown if we're facing & running parallel to the target's movement
 				// Facing check first (in 2D)
-				Vector vecTargetOrigin = pNPC->GetAbsOrigin();
+				Vector vecTargetOrigin = pNPC->GetEngineObject()->GetAbsOrigin();
 				Vector los = ( vecTargetOrigin - EyePosition() );
 				los.z = 0;
 				VectorNormalize( los );
 				Vector facingDir;
-				AngleVectors( GetAbsAngles(), &facingDir );
+				AngleVectors(GetEngineObject()->GetAbsAngles(), &facingDir );
 				float flDot = DotProduct( los, facingDir );
 				if ( flDot > 0.8 )
 				{

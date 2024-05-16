@@ -65,11 +65,11 @@ int C_RollerMine::DrawModel( int flags )
 			// Inner beams
 			BeamInfo_t beamInfo;
 
-			beamInfo.m_vecStart = GetAbsOrigin();
+			beamInfo.m_vecStart = GetEngineObject()->GetAbsOrigin();
 			Vector	offset = RandomVector( -6*scale, 2*scale );
 
 			offset += Vector(2,2,2) * scale;
-			beamInfo.m_vecEnd = GetAbsOrigin() + offset;
+			beamInfo.m_vecEnd = GetEngineObject()->GetAbsOrigin() + offset;
 
 			beamInfo.m_pStartEnt= cl_entitylist->GetEnt( BEAMENT_ENTITY( entindex() ) );
 			beamInfo.m_pEndEnt	= beamInfo.m_pStartEnt;
@@ -140,7 +140,7 @@ int C_RollerMine::DrawModel( int flags )
 
 			CMatRenderContextPtr pRenderContext( materials );
 			pRenderContext->Bind( pMaterial );
-			DrawHalo( pMaterial, GetAbsOrigin(), random->RandomFloat( 6.0f*scale, 6.5f*scale ), color );
+			DrawHalo( pMaterial, GetEngineObject()->GetAbsOrigin(), random->RandomFloat( 6.0f*scale, 6.5f*scale ), color );
 
 			if ( m_bPowerDown )
 			{

@@ -733,7 +733,7 @@ void CCollisionEvent::UpdateFrictionSounds( void )
 //			&normal - 
 // Output : static int
 //-----------------------------------------------------------------------------
-static int BestAxisMatchingNormal( matrix3x4_t &matrix, const Vector &normal )
+static int BestAxisMatchingNormal(const matrix3x4_t &matrix, const Vector &normal )
 {
 	float bestDot = -1;
 	int best = 0;
@@ -776,7 +776,7 @@ void PhysicsSplash( IPhysicsFluidController *pFluid, IPhysicsObject *pObject, CB
 	float dist;
 	pFluid->GetSurfacePlane( &normal, &dist );
 
-	matrix3x4_t &matrix = pEntity->GetEngineObject()->EntityToWorldTransform();
+	const matrix3x4_t &matrix = pEntity->GetEngineObject()->EntityToWorldTransform();
 	
 	// Find the local axis that best matches the water surface normal
 	int bestAxis = BestAxisMatchingNormal( matrix, normal );
@@ -793,10 +793,10 @@ void PhysicsSplash( IPhysicsFluidController *pFluid, IPhysicsObject *pObject, CB
 	
 	// Get object extents in basis
 	Vector tanPts[2], binPts[2];
-	tanPts[0] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetAbsOrigin(), pEntity->GetAbsAngles(), -tangent );
-	tanPts[1] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetAbsOrigin(), pEntity->GetAbsAngles(), tangent );
-	binPts[0] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetAbsOrigin(), pEntity->GetAbsAngles(), -binormal );
-	binPts[1] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetAbsOrigin(), pEntity->GetAbsAngles(), binormal );
+	tanPts[0] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -tangent );
+	tanPts[1] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), tangent );
+	binPts[0] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), -binormal );
+	binPts[1] = physcollision->CollideGetExtent( pObject->GetCollide(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), binormal );
 
 	// now compute the centered bbox
 	float mins[2], maxs[2], center[2], extents[2];

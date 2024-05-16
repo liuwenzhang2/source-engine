@@ -716,10 +716,6 @@ void C_BaseEntity::Clear( void )
 		GetEngineObject()->SetLocalOrigin(vec3_origin);
 		GetEngineObject()->SetLocalAngles(vec3_angle);
 		GetEngineObject()->Clear();
-		GetEngineObject()->GetAbsOrigin().Init();
-		GetEngineObject()->GetAbsAngles().Init();
-		GetEngineObject()->GetLocalVelocity().Init();
-		GetEngineObject()->GetAbsVelocity().Init();//GetLocalVelocity ???
 	}
 	ClearFlags();
 	m_vecViewOffset.Init();

@@ -272,7 +272,7 @@ void CNPC_CScanner::Spawn(void)
 	m_hSpotlight			= NULL;
 	m_hSpotlightTarget		= NULL;
 
-	AngleVectors( GetLocalAngles(), &m_vSpotlightDir );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &m_vSpotlightDir );
 	m_vSpotlightAngVelocity = vec3_origin;
 
 	m_pEyeFlash				= 0;
@@ -312,7 +312,7 @@ void CNPC_CScanner::Activate()
 	BaseClass::Activate();
 
 	// Have to do this here because sprites do not go across level transitions
-	m_pEyeFlash = CSprite::SpriteCreate( "sprites/blueflare1.vmt", GetLocalOrigin(), FALSE );
+	m_pEyeFlash = CSprite::SpriteCreate( "sprites/blueflare1.vmt", GetEngineObject()->GetLocalOrigin(), FALSE );
 	m_pEyeFlash->SetTransparency( kRenderGlow, 255, 255, 255, 0, kRenderFxNoDissipation );
 	m_pEyeFlash->SetAttachment( this, LookupAttachment( SCANNER_ATTACHMENT_LIGHT ) );
 	m_pEyeFlash->SetBrightness( 0 );
@@ -363,8 +363,8 @@ void CNPC_CScanner::Gib( void )
 		CItem *pBattery = (CItem*)gEntList.CreateEntityByName("item_battery");
 		if ( pBattery )
 		{
-			pBattery->SetAbsOrigin( GetAbsOrigin() );
-			pBattery->SetAbsVelocity( GetAbsVelocity() );
+			pBattery->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
+			pBattery->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() );
 			pBattery->SetLocalAngularVelocity( GetLocalAngularVelocity() );
 			pBattery->ActivateWhenAtRest();
 			pBattery->Spawn();
@@ -406,7 +406,7 @@ void CNPC_CScanner::Event_Killed( const CTakeDamageInfo &info )
 	// If I have an enemy and I'm up high, do a dive bomb (unless dissolved)
 	if ( !m_bIsClawScanner && GetEnemy() != NULL && (info.GetDamageType() & DMG_DISSOLVE) == false )
 	{
-		Vector vecDelta = GetLocalOrigin() - GetEnemy()->GetLocalOrigin();
+		Vector vecDelta = GetEngineObject()->GetLocalOrigin() - GetEnemy()->GetEngineObject()->GetLocalOrigin();
 		if ( ( vecDelta.z > 120 ) && ( vecDelta.Length() > 360 ) )
 		{	
 			// If I'm divebombing, don't take any more damage. It will make Event_Killed() be called again.
@@ -671,7 +671,7 @@ CBaseEntity* CNPC_CScanner::BestInspectTarget(void)
 	float	fSearchDist;
 	if (m_hSpotlightTarget != NULL)
 	{
-		vSearchOrigin	= m_hSpotlightTarget->GetAbsOrigin();
+		vSearchOrigin	= m_hSpotlightTarget->GetEngineObject()->GetAbsOrigin();
 		fSearchDist		= SCANNER_CIT_INSPECT_GROUND_DIST;
 	}
 	else
@@ -706,7 +706,7 @@ CBaseEntity* CNPC_CScanner::BestInspectTarget(void)
 
 			if ( pPlayer )
 			{
-				if ( vSearchOrigin.DistToSqr(pPlayer->GetAbsOrigin()) < fSearchDistSq )
+				if ( vSearchOrigin.DistToSqr(pPlayer->GetEngineObject()->GetAbsOrigin()) < fSearchDistSq )
 				{
 					candidates.AddToTail( pPlayer );
 				}
@@ -719,7 +719,7 @@ CBaseEntity* CNPC_CScanner::BestInspectTarget(void)
 	
 	for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
 	{
-		if ( ppAIs[i] != this && vSearchOrigin.DistToSqr(ppAIs[i]->GetAbsOrigin()) < fSearchDistSq )
+		if ( ppAIs[i] != this && vSearchOrigin.DistToSqr(ppAIs[i]->GetEngineObject()->GetAbsOrigin()) < fSearchDistSq )
 		{
 			candidates.AddToTail( ppAIs[i] );
 		}
@@ -743,7 +743,7 @@ CBaseEntity* CNPC_CScanner::BestInspectTarget(void)
 			if ( !FVisible( pEntity ) )
 				continue;
 
-			fTestDist = ( GetAbsOrigin() - pEntity->EyePosition() ).Length();
+			fTestDist = (GetEngineObject()->GetAbsOrigin() - pEntity->EyePosition() ).Length();
 			if ( fTestDist < fBestDist )
 			{
 				if ( IsValidInspectTarget( pEntity ) )
@@ -930,7 +930,7 @@ void CNPC_CScanner::DeployMine()
 		if( FClassnameIs( child, "combine_mine" ) )
 		{
 			child->GetEngineObject()->SetParent( NULL );
-			child->SetAbsVelocity( GetAbsVelocity() );
+			child->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() );
 			child->SetOwnerEntity( this );
 
 			ScannerEmitSound( "DeployMine" );
@@ -1008,8 +1008,8 @@ void CNPC_CScanner::InputEquipMine(inputdata_t &inputdata)
 		{
 			GetAttachment( attachment, vecOrigin, angles );
 			
-			pEnt->SetAbsOrigin( vecOrigin );
-			pEnt->SetAbsAngles( angles );
+			pEnt->GetEngineObject()->SetAbsOrigin( vecOrigin );
+			pEnt->GetEngineObject()->SetAbsAngles( angles );
 			pEnt->SetOwnerEntity( this );
 			pEnt->GetEngineObject()->SetParent( this->GetEngineObject(), attachment);
 
@@ -1022,11 +1022,11 @@ void CNPC_CScanner::InputEquipMine(inputdata_t &inputdata)
 
 	if( !bPlacedMine )
 	{
-		Vector vecMineLocation = GetAbsOrigin();
+		Vector vecMineLocation = GetEngineObject()->GetAbsOrigin();
 		vecMineLocation.z -= 32.0;
 
-		pEnt->SetAbsOrigin( vecMineLocation );
-		pEnt->SetAbsAngles( GetAbsAngles() );
+		pEnt->GetEngineObject()->SetAbsOrigin( vecMineLocation );
+		pEnt->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 		pEnt->SetOwnerEntity( this );
 		pEnt->GetEngineObject()->SetParent( this->GetEngineObject() );
 	}
@@ -1228,7 +1228,7 @@ void CNPC_CScanner::GatherConditions( void )
 		// Otherwise just check by beam direction
 		else
 		{
-			Vector vTargetDir = SpotlightTargetPos() - GetLocalOrigin();
+			Vector vTargetDir = SpotlightTargetPos() - GetEngineObject()->GetLocalOrigin();
 			VectorNormalize(vTargetDir);
 			float dotpr = DotProduct(vTargetDir, m_vSpotlightDir);
 			if (dotpr > 0.95)
@@ -1252,16 +1252,16 @@ void CNPC_CScanner::GatherConditions( void )
 		if ( gpGlobals->curtime > m_fNextPhotographTime && HaveInspectTarget() && GetCurrentVelocity().LengthSqr() < (64*64) )
 		{
 			// Check that I'm in the right distance range
-			float  fInspectDist = (InspectTargetPosition() - GetAbsOrigin()).Length2D();
+			float  fInspectDist = (InspectTargetPosition() - GetEngineObject()->GetAbsOrigin()).Length2D();
 			
 			// See if we're within range
 			if ( fInspectDist > SCANNER_PHOTO_NEAR_DIST && fInspectDist < SCANNER_PHOTO_FAR_DIST )
 			{
 				// Make sure we're looking at the target
-				if ( UTIL_AngleDiff( GetAbsAngles().y, VecToYaw( InspectTargetPosition() - GetAbsOrigin() ) ) < 4.0f )
+				if ( UTIL_AngleDiff(GetEngineObject()->GetAbsAngles().y, VecToYaw( InspectTargetPosition() - GetEngineObject()->GetAbsOrigin() ) ) < 4.0f )
 				{
 					trace_t tr;
-					AI_TraceLine ( GetAbsOrigin(), InspectTargetPosition(), MASK_BLOCKLOS, GetTarget(), COLLISION_GROUP_NONE, &tr);
+					AI_TraceLine (GetEngineObject()->GetAbsOrigin(), InspectTargetPosition(), MASK_BLOCKLOS, GetTarget(), COLLISION_GROUP_NONE, &tr);
 					
 					if ( tr.fraction == 1.0f )
 					{
@@ -1460,7 +1460,7 @@ int CNPC_CScanner::SelectSchedule(void)
 		}
 
 		// If I'm far from the enemy, stay up high and approach in spotlight mode
-		float fAttack2DDist = ( GetEnemyLKP() - GetAbsOrigin() ).Length2D();
+		float fAttack2DDist = ( GetEnemyLKP() - GetEngineObject()->GetAbsOrigin() ).Length2D();
 
 		if ( fAttack2DDist > SCANNER_ATTACK_FAR_DIST )
 			return SCHED_CSCANNER_SPOTLIGHT_HOVER;
@@ -1570,15 +1570,15 @@ void CNPC_CScanner::SpotlightCreate(void)
 		Vector vEnemyPos	= GetEnemyLKP();
 		Vector vTargetPos	= vEnemyPos;
 		vTargetPos.z		= GetFloorZ(vEnemyPos);
-		m_vSpotlightDir = vTargetPos - GetLocalOrigin();
+		m_vSpotlightDir = vTargetPos - GetEngineObject()->GetLocalOrigin();
 		VectorNormalize(m_vSpotlightDir);
 	}
 	// If I have an target, start spotlight on my target
 	else if (GetTarget() != NULL)
 	{
-		Vector vTargetPos	= GetTarget()->GetLocalOrigin();
-		vTargetPos.z		= GetFloorZ(GetTarget()->GetLocalOrigin());
-		m_vSpotlightDir = vTargetPos - GetLocalOrigin();
+		Vector vTargetPos	= GetTarget()->GetEngineObject()->GetLocalOrigin();
+		vTargetPos.z		= GetFloorZ(GetTarget()->GetEngineObject()->GetLocalOrigin());
+		m_vSpotlightDir = vTargetPos - GetEngineObject()->GetLocalOrigin();
 		VectorNormalize(m_vSpotlightDir);
 	}
 	// Other wise just start looking down
@@ -1588,11 +1588,11 @@ void CNPC_CScanner::SpotlightCreate(void)
 	}
 
 	trace_t tr;
-	AI_TraceLine ( GetAbsOrigin(), GetAbsOrigin() + m_vSpotlightDir * 2024, MASK_OPAQUE, this, COLLISION_GROUP_NONE, &tr );
+	AI_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + m_vSpotlightDir * 2024, MASK_OPAQUE, this, COLLISION_GROUP_NONE, &tr );
 
 	m_hSpotlightTarget = (CSpotlightEnd*)gEntList.CreateEntityByName( "spotlight_end" );
 	m_hSpotlightTarget->Spawn();
-	m_hSpotlightTarget->SetLocalOrigin( tr.endpos );
+	m_hSpotlightTarget->GetEngineObject()->SetLocalOrigin( tr.endpos );
 	m_hSpotlightTarget->SetOwnerEntity( this );
 	// YWB:  Because the scanner only moves the target during think, make sure we interpolate over 0.1 sec instead of every tick!!!
 	m_hSpotlightTarget->SetSimulatedEveryTick( false );
@@ -1641,8 +1641,8 @@ Vector CNPC_CScanner::SpotlightTargetPos(void)
 			// Otherwise same for his feet
 			else
 			{
-				m_vSpotlightTargetPos	= GetEnemy()->GetLocalOrigin();
-				m_vSpotlightTargetPos.z	= GetFloorZ(GetEnemy()->GetLocalOrigin());
+				m_vSpotlightTargetPos	= GetEnemy()->GetEngineObject()->GetLocalOrigin();
+				m_vSpotlightTargetPos.z	= GetFloorZ(GetEnemy()->GetEngineObject()->GetLocalOrigin());
 			}
 		}
 		// Otherwise aim for last known position if I can see LKP
@@ -1675,7 +1675,7 @@ Vector CNPC_CScanner::SpotlightTargetPos(void)
 		m_vSpotlightTargetPos.x += noiseScale*sin(noiseMod.x * gpGlobals->curtime + noiseMod.x);
 		m_vSpotlightTargetPos.y += noiseScale*cos(noiseMod.y* gpGlobals->curtime + noiseMod.y);
 		m_vSpotlightTargetPos.z -= fabs(noiseScale*cos(noiseMod.z* gpGlobals->curtime + noiseMod.z) );
-		m_vSpotlightTargetPos   = GetLocalOrigin()+m_vSpotlightTargetPos * 2024;
+		m_vSpotlightTargetPos   = GetEngineObject()->GetLocalOrigin()+m_vSpotlightTargetPos * 2024;
 	}
 
 	return m_vSpotlightTargetPos;
@@ -1687,7 +1687,7 @@ Vector CNPC_CScanner::SpotlightTargetPos(void)
 //------------------------------------------------------------------------------
 Vector CNPC_CScanner::SpotlightCurrentPos(void)
 {
-	Vector vTargetDir		= SpotlightTargetPos() - GetLocalOrigin();
+	Vector vTargetDir		= SpotlightTargetPos() - GetEngineObject()->GetLocalOrigin();
 	VectorNormalize(vTargetDir);
 
 	if (!m_hSpotlight)
@@ -1700,7 +1700,7 @@ Vector CNPC_CScanner::SpotlightCurrentPos(void)
 	//  so sclae the turn rate based on its distance
 	//  from the beam source
 	// -------------------------------------------------
-	float	fBeamDist		= (m_hSpotlightTarget->GetLocalOrigin() - GetLocalOrigin()).Length();
+	float	fBeamDist		= (m_hSpotlightTarget->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin()).Length();
 
 	float	fBeamTurnRate	= atan(50/fBeamDist);
 	Vector  vNewAngVelocity = fBeamTurnRate * (vTargetDir - m_vSpotlightDir);
@@ -1732,8 +1732,8 @@ Vector CNPC_CScanner::SpotlightCurrentPos(void)
 	//  solid objects, not npcs
 	// ---------------------------------------------
 	trace_t tr;
-	Vector vTraceEnd = GetAbsOrigin() + (m_vSpotlightDir * 2 * m_flSpotlightMaxLength);
-	AI_TraceLine ( GetAbsOrigin(), vTraceEnd, MASK_OPAQUE, this, COLLISION_GROUP_NONE, &tr);
+	Vector vTraceEnd = GetEngineObject()->GetAbsOrigin() + (m_vSpotlightDir * 2 * m_flSpotlightMaxLength);
+	AI_TraceLine (GetEngineObject()->GetAbsOrigin(), vTraceEnd, MASK_OPAQUE, this, COLLISION_GROUP_NONE, &tr);
 
 	return (tr.endpos);
 }
@@ -1782,11 +1782,11 @@ void CNPC_CScanner::SpotlightUpdate(void)
 	// ------------------------------------------------------------------
 	//  If I'm not facing the spotlight turn it off 
 	// ------------------------------------------------------------------
-	Vector vSpotDir = m_vSpotlightCurrentPos - GetAbsOrigin();
+	Vector vSpotDir = m_vSpotlightCurrentPos - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize(vSpotDir);
 	
 	Vector	vForward;
-	AngleVectors( GetAbsAngles(), &vForward );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
 
 	float dotpr = DotProduct( vForward, vSpotDir );
 	
@@ -1802,7 +1802,7 @@ void CNPC_CScanner::SpotlightUpdate(void)
 	// --------------------------------------------------------------
 	//  Update spotlight target velocity
 	// --------------------------------------------------------------
-	Vector vTargetDir  = (m_vSpotlightCurrentPos - m_hSpotlightTarget->GetLocalOrigin());
+	Vector vTargetDir  = (m_vSpotlightCurrentPos - m_hSpotlightTarget->GetEngineObject()->GetLocalOrigin());
 	float  vTargetDist = vTargetDir.Length();
 
 	Vector vecNewVelocity = vTargetDir;
@@ -1815,14 +1815,14 @@ void CNPC_CScanner::SpotlightUpdate(void)
 	{
 		VectorNormalize(vecNewVelocity);
 		vecNewVelocity *= 200;
-		m_hSpotlightTarget->SetLocalOrigin( m_vSpotlightCurrentPos );
+		m_hSpotlightTarget->GetEngineObject()->SetLocalOrigin( m_vSpotlightCurrentPos );
 	}
-	m_hSpotlightTarget->SetAbsVelocity( vecNewVelocity );
+	m_hSpotlightTarget->GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
-	m_hSpotlightTarget->m_vSpotlightOrg = GetAbsOrigin();
+	m_hSpotlightTarget->m_vSpotlightOrg = GetEngineObject()->GetAbsOrigin();
 
 	// Avoid sudden change in where beam fades out when cross disconinuities
-	m_hSpotlightTarget->m_vSpotlightDir = m_hSpotlightTarget->GetLocalOrigin() - m_hSpotlightTarget->m_vSpotlightOrg;
+	m_hSpotlightTarget->m_vSpotlightDir = m_hSpotlightTarget->GetEngineObject()->GetLocalOrigin() - m_hSpotlightTarget->m_vSpotlightOrg;
 	float flBeamLength	= VectorNormalize( m_hSpotlightTarget->m_vSpotlightDir );
 	m_flSpotlightCurLength = (0.80*m_flSpotlightCurLength) + (0.2*flBeamLength);
 
@@ -1961,7 +1961,7 @@ void CNPC_CScanner::BlindFlashTarget( CBaseEntity *pTarget )
 		{
 			if( FClassnameIs( ppAIs[ i ], "npc_strider" ) )
 			{
-				ppAIs[ i ]->UpdateEnemyMemory( pTarget, pTarget->GetAbsOrigin(), this );
+				ppAIs[ i ]->UpdateEnemyMemory( pTarget, pTarget->GetEngineObject()->GetAbsOrigin(), this );
 			}
 		}
 	}
@@ -1971,7 +1971,7 @@ void CNPC_CScanner::BlindFlashTarget( CBaseEntity *pTarget )
 		return;
 
 	// Scale the flash value by how closely the player is looking at me
-	Vector vFlashDir = GetAbsOrigin() - pTarget->EyePosition();
+	Vector vFlashDir = GetEngineObject()->GetAbsOrigin() - pTarget->EyePosition();
 	VectorNormalize(vFlashDir);
 	
 	Vector vFacing;
@@ -1984,7 +1984,7 @@ void CNPC_CScanner::BlindFlashTarget( CBaseEntity *pTarget )
 	{
 		// Make sure nothing in the way
 		trace_t tr;
-		AI_TraceLine ( GetAbsOrigin(), pTarget->EyePosition(), MASK_OPAQUE, this, COLLISION_GROUP_NONE, &tr );
+		AI_TraceLine (GetEngineObject()->GetAbsOrigin(), pTarget->EyePosition(), MASK_OPAQUE, this, COLLISION_GROUP_NONE, &tr );
 
 		if ( tr.startsolid == false && tr.fraction == 1.0)
 		{
@@ -2334,7 +2334,7 @@ bool CNPC_CScanner::OverrideMove( float flInterval )
 			}
 			else if ( GetEnemy() != NULL )
 			{
-				vMoveTargetPos = GetEnemy()->GetAbsOrigin();
+				vMoveTargetPos = GetEnemy()->GetEngineObject()->GetAbsOrigin();
 			}
 		}
 		else
@@ -2349,15 +2349,15 @@ bool CNPC_CScanner::OverrideMove( float flInterval )
 		if ( pMoveTarget || HaveInspectTarget() )
 		{
 			trace_t tr;
-			AI_TraceHull( GetAbsOrigin(), vMoveTargetPos, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+			AI_TraceHull(GetEngineObject()->GetAbsOrigin(), vMoveTargetPos, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
-			float fTargetDist = (1.0f-tr.fraction)*(GetAbsOrigin() - vMoveTargetPos).Length();
+			float fTargetDist = (1.0f-tr.fraction)*(GetEngineObject()->GetAbsOrigin() - vMoveTargetPos).Length();
 			
 			if ( ( tr.m_pEnt == pMoveTarget ) || ( fTargetDist < 50 ) )
 			{
 				if ( g_debug_cscanner.GetBool() )
 				{
-					NDebugOverlay::Line(GetLocalOrigin(), vMoveTargetPos, 0,255,0, true, 0);
+					NDebugOverlay::Line(GetEngineObject()->GetLocalOrigin(), vMoveTargetPos, 0,255,0, true, 0);
 					NDebugOverlay::Cross3D(tr.endpos,Vector(-5,-5,-5),Vector(5,5,5),0,255,0,true,0.1);
 				}
 
@@ -2368,7 +2368,7 @@ bool CNPC_CScanner::OverrideMove( float flInterval )
 				//HANDY DEBUG TOOL	
 				if ( g_debug_cscanner.GetBool() )
 				{
-					NDebugOverlay::Line(GetLocalOrigin(), vMoveTargetPos, 255,0,0, true, 0);
+					NDebugOverlay::Line(GetEngineObject()->GetLocalOrigin(), vMoveTargetPos, 255,0,0, true, 0);
 					NDebugOverlay::Cross3D(tr.endpos,Vector(-5,-5,-5),Vector(5,5,5),255,0,0,true,0.1);
 				}
 
@@ -2465,7 +2465,7 @@ void CNPC_CScanner::MoveToTarget( float flInterval, const Vector &vecMoveTarget 
 	vecCurrentDir = GetCurrentVelocity();
 	VectorNormalize( vecCurrentDir );
 
-	Vector targetDir = vecMoveTarget - GetAbsOrigin();
+	Vector targetDir = vecMoveTarget - GetEngineObject()->GetAbsOrigin();
 	float flDist = VectorNormalize(targetDir);
 
 	float flDot;
@@ -2542,7 +2542,7 @@ void CNPC_CScanner::MoveToSpotlight( float flInterval )
 		flIdealHeightDiff *= 0.5;
 	}
 
-	Vector idealPos = IdealGoalForMovement( vTargetPos, GetAbsOrigin(), GetGoalDistance(), flIdealHeightDiff );
+	Vector idealPos = IdealGoalForMovement( vTargetPos, GetEngineObject()->GetAbsOrigin(), GetGoalDistance(), flIdealHeightDiff );
 
 	MoveToTarget( flInterval, idealPos );
 
@@ -2623,7 +2623,7 @@ void CNPC_CScanner::MoveToPhotograph(float flInterval)
 
 	//float flDesiredDist = SCANNER_PHOTO_NEAR_DIST + ( ( SCANNER_PHOTO_FAR_DIST - SCANNER_PHOTO_NEAR_DIST ) / 2 );
 	
-	Vector idealPos = IdealGoalForMovement( InspectTargetPosition(), GetAbsOrigin(), GetGoalDistance(), 32.0f );
+	Vector idealPos = IdealGoalForMovement( InspectTargetPosition(), GetEngineObject()->GetAbsOrigin(), GetGoalDistance(), 32.0f );
 
 	MoveToTarget( flInterval, idealPos );
 
@@ -2671,7 +2671,7 @@ bool CNPC_CScanner::HandleInteraction(int interactionType, void *data, CBaseComb
 		{
 			// Only accept if target is a reasonable distance away
 			CBaseEntity* pTarget = (CBaseEntity*)data;
-			float fTargetDist = (pTarget->GetLocalOrigin() - GetLocalOrigin()).Length();
+			float fTargetDist = (pTarget->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin()).Length();
 
 			if (fTargetDist < SCANNER_SQUAD_HELP_DIST)
 			{
@@ -2701,7 +2701,7 @@ bool CNPC_CScanner::HandleInteraction(int interactionType, void *data, CBaseComb
 			vInspectPos.y = ((Vector *)data)->y;
 			vInspectPos.z = ((Vector *)data)->z;
 
-			float fTargetDist = (vInspectPos - GetLocalOrigin()).Length();
+			float fTargetDist = (vInspectPos - GetEngineObject()->GetLocalOrigin()).Length();
 
 			if (fTargetDist < SCANNER_SQUAD_HELP_DIST)
 			{

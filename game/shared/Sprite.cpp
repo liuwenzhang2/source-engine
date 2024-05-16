@@ -216,14 +216,14 @@ void CSprite::Spawn( void )
 	}
 	
 	// Worldcraft only sets y rotation, copy to Z
-	if ( GetLocalAngles().y != 0 && GetLocalAngles().z == 0 )
+	if (GetEngineObject()->GetLocalAngles().y != 0 && GetEngineObject()->GetLocalAngles().z == 0 )
 	{
-		QAngle angles = GetLocalAngles();
+		QAngle angles = GetEngineObject()->GetLocalAngles();
 
 		angles.z = angles.y;
 		angles.y = 0;
 
-		SetLocalAngles( angles );
+		GetEngineObject()->SetLocalAngles( angles );
 	}
 
 	// Clamp our scale if necessary
@@ -274,8 +274,8 @@ void CSprite::ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pV
 
 	pVecWorldMins->Init( -flScale, -flScale, -flScale );
 	pVecWorldMaxs->Init( flScale, flScale, flScale );
-	*pVecWorldMins += GetAbsOrigin();
-	*pVecWorldMaxs += GetAbsOrigin();
+	*pVecWorldMins += GetEngineObject()->GetAbsOrigin();
+	*pVecWorldMaxs += GetEngineObject()->GetAbsOrigin();
 }
 
 
@@ -318,7 +318,7 @@ void CSprite::Precache( void )
 void CSprite::SpriteInit( const char *pSpriteName, const Vector &origin )
 {
 	SetModelName( MAKE_STRING(pSpriteName) );
-	SetLocalOrigin( origin );
+	GetEngineObject()->SetLocalOrigin( origin );
 	Spawn();
 }
 
@@ -792,8 +792,8 @@ int CSprite::DrawModel( int flags )
 	int drawn = DrawSprite( 
 		this,
 		GetModel(), 
-		GetAbsOrigin(), 
-		GetAbsAngles(), 
+		GetEngineObject()->GetAbsOrigin(),
+		GetEngineObject()->GetAbsAngles(),
 		m_flFrame,				// sprite frame to render
 		m_hAttachedToEntity,	// attach to
 		m_nAttachment,			// attachment point
@@ -814,7 +814,7 @@ int CSprite::DrawModel( int flags )
 const Vector& CSprite::GetRenderOrigin()
 {
 	static Vector vOrigin;
-	vOrigin = GetAbsOrigin();
+	vOrigin = GetEngineObject()->GetAbsOrigin();
 
 	if ( m_hAttachedToEntity )
 	{
@@ -851,11 +851,11 @@ END_RECV_TABLE()
 void CSpriteOriented::Spawn( void )
 {
 	// save a copy of the angles, CSprite swaps the yaw and roll
-	QAngle angles = GetAbsAngles();
+	QAngle angles = GetEngineObject()->GetAbsAngles();
 	BaseClass::Spawn();
 	// ORIENTED sprites "forward" vector points in the players "view" direction, not the direction "out" from the sprite (gah)
 	angles.y = anglemod( angles.y + 180 );
-	SetAbsAngles( angles );
+	GetEngineObject()->SetAbsAngles( angles );
 }
 
 #else

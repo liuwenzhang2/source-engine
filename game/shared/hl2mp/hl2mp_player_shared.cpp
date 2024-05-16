@@ -157,7 +157,7 @@ CPlayerAnimState::CPlayerAnimState( CHL2MP_Player *outer )
 //-----------------------------------------------------------------------------
 void CPlayerAnimState::Update()
 {
-	m_angRender = GetOuter()->GetLocalAngles();
+	m_angRender = GetOuter()->GetEngineObject()->GetLocalAngles();
 	m_angRender[ PITCH ] = m_angRender[ ROLL ] = 0.0f;
 
 	ComputePoseParam_BodyYaw();
@@ -230,7 +230,7 @@ void CPlayerAnimState::EstimateYaw( void )
 
 	GetOuterAbsVelocity( est_velocity );
 
-	angles = GetOuter()->GetLocalAngles();
+	angles = GetOuter()->GetEngineObject()->GetLocalAngles();
 
 	if ( est_velocity[1] == 0 && est_velocity[0] == 0 )
 	{
@@ -275,7 +275,7 @@ void CPlayerAnimState::ComputePoseParam_BodyYaw( void )
 
 	EstimateYaw();
 
-	QAngle	angles = GetOuter()->GetLocalAngles();
+	QAngle	angles = GetOuter()->GetEngineObject()->GetLocalAngles();
 	float ang = angles[ YAW ];
 	if ( ang > 180.0f )
 	{
@@ -305,7 +305,7 @@ void CPlayerAnimState::ComputePoseParam_BodyYaw( void )
 
 #ifndef CLIENT_DLL
 		//Adrian: Make the model's angle match the legs so the hitboxes match on both sides.
-		GetOuter()->SetLocalAngles( QAngle( GetOuter()->GetAnimEyeAngles().x, m_flCurrentFeetYaw, 0 ) );
+		GetOuter()->GetEngineObject()->SetLocalAngles( QAngle( GetOuter()->GetAnimEyeAngles().x, m_flCurrentFeetYaw, 0 ) );
 #endif
 }
 
@@ -315,7 +315,7 @@ void CPlayerAnimState::ComputePoseParam_BodyYaw( void )
 void CPlayerAnimState::ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr )
 {
 	// Get pitch from v_angle
-	float flPitch = GetOuter()->GetLocalAngles()[ PITCH ];
+	float flPitch = GetOuter()->GetEngineObject()->GetLocalAngles()[ PITCH ];
 
 	if ( flPitch > 180.0f )
 	{
@@ -323,7 +323,7 @@ void CPlayerAnimState::ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr )
 	}
 	flPitch = clamp( flPitch, -90, 90 );
 
-	QAngle absangles = GetOuter()->GetAbsAngles();
+	QAngle absangles = GetOuter()->GetEngineObject()->GetAbsAngles();
 	absangles.x = 0.0f;
 	m_angRender = absangles;
 	m_angRender[ PITCH ] = m_angRender[ ROLL ] = 0.0f;
@@ -384,7 +384,7 @@ int CPlayerAnimState::ConvergeAngles( float goal,float maxrate, float dt, float&
 
 void CPlayerAnimState::ComputePoseParam_BodyLookYaw( void )
 {
-	QAngle absangles = GetOuter()->GetAbsAngles();
+	QAngle absangles = GetOuter()->GetEngineObject()->GetAbsAngles();
 	absangles.y = AngleNormalize( absangles.y );
 	m_angRender = absangles;
 	m_angRender[ PITCH ] = m_angRender[ ROLL ] = 0.0f;
@@ -435,7 +435,7 @@ void CPlayerAnimState::ComputePoseParam_BodyLookYaw( void )
 		turning = ConvergeAngles( m_flGoalFeetYaw, turnrate, gpGlobals->frametime, m_flCurrentFeetYaw );
 
 		QAngle eyeAngles = GetOuter()->GetAnimEyeAngles();
-		QAngle vAngle = GetOuter()->GetLocalAngles();
+		QAngle vAngle = GetOuter()->GetEngineObject()->GetLocalAngles();
 
 		// See how far off current feetyaw is from true yaw
 		float yawdelta = GetOuter()->GetAnimEyeAngles().y - m_flCurrentFeetYaw;
@@ -508,7 +508,7 @@ void CPlayerAnimState::ComputePoseParam_BodyLookYaw( void )
 	}
 
 	// Rotate entire body into position
-	absangles = GetOuter()->GetAbsAngles();
+	absangles = GetOuter()->GetEngineObject()->GetAbsAngles();
 	absangles.y = m_flCurrentFeetYaw;
 	m_angRender = absangles;
 	m_angRender[ PITCH ] = m_angRender[ ROLL ] = 0.0f;
@@ -572,6 +572,6 @@ void CPlayerAnimState::GetOuterAbsVelocity( Vector& vel )
 #if defined( CLIENT_DLL )
 	GetOuter()->GetEngineObject()->EstimateAbsVelocity( vel );
 #else
-	vel = GetOuter()->GetAbsVelocity();
+	vel = GetOuter()->GetEngineObject()->GetAbsVelocity();
 #endif
 }

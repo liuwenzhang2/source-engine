@@ -397,13 +397,13 @@ void CHudRadar::DrawPositionOnRadar( Vector vecPos, C_BasePlayer *pLocalPlayer, 
 
 	if( m_pVehicle != NULL )
 	{
-		viewAngle = m_pVehicle->GetAbsAngles();
+		viewAngle = m_pVehicle->GetEngineObject()->GetAbsAngles();
 		viewAngle.y += 90.0f;
 	}
 
 	float flScale;
 
-	WorldToRadar( vecPos, pLocalPlayer->GetAbsOrigin(), viewAngle, x, y, z_delta, flScale );
+	WorldToRadar( vecPos, pLocalPlayer->GetEngineObject()->GetAbsOrigin(), viewAngle, x, y, z_delta, flScale );
 
 	if( flags & RADAR_IGNORE_Z )
 		z_delta = 0;
@@ -452,12 +452,12 @@ void CHudRadar::DrawIconOnRadar( Vector vecPos, C_BasePlayer *pLocalPlayer, int 
 
 	// Assume we're going to use the player's location and orientation
 	QAngle viewAngle = pLocalPlayer->EyeAngles();
-	Vector viewOrigin = pLocalPlayer->GetAbsOrigin();
+	Vector viewOrigin = pLocalPlayer->GetEngineObject()->GetAbsOrigin();
 
 	// However, happily use those of the vehicle if available!
 	if( m_pVehicle != NULL )
 	{
-		viewAngle = m_pVehicle->GetAbsAngles();
+		viewAngle = m_pVehicle->GetEngineObject()->GetAbsAngles();
 		viewAngle.y += 90.0f;
 		viewOrigin = m_pVehicle->WorldSpaceCenter();
 	}

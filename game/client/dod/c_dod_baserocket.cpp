@@ -71,11 +71,11 @@ void C_DODBaseRocket::PostDataUpdate( DataUpdateType_t type )
 		float changeTime = GetLastChangeTime( LATCH_SIMULATION_VAR );
 
 		// Add a sample 1 second back.
-		Vector vCurOrigin = GetLocalOrigin() - m_vInitialVelocity;
+		Vector vCurOrigin = GetEngineObject()->GetLocalOrigin() - m_vInitialVelocity;
 		interpolator.AddToHead( changeTime - 1.0, &vCurOrigin, false );
 
 		// Add the current sample.
-		vCurOrigin = GetLocalOrigin();
+		vCurOrigin = GetEngineObject()->GetLocalOrigin();
 		interpolator.AddToHead( changeTime, &vCurOrigin, false );
 
 		// do the same for angles
@@ -84,7 +84,7 @@ void C_DODBaseRocket::PostDataUpdate( DataUpdateType_t type )
 		rotInterpolator.ClearHistory();
 
 		// Add a rotation sample 1 second back
-		QAngle vCurAngles = GetLocalAngles();
+		QAngle vCurAngles = GetEngineObject()->GetLocalAngles();
 		rotInterpolator.AddToHead( changeTime - 1.0, &vCurAngles, false );
 
 		// Add the current rotation

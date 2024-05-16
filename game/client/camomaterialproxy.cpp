@@ -357,10 +357,10 @@ void CCamoMaterialProxy::GenerateCamoTexture( ITexture* pTexture, IVTFTexture *p
 #endif
 
 	Vector entityPosition;
-	entityPosition = m_pEnt->GetAbsOrigin();
+	entityPosition = m_pEnt->GetEngineObject()->GetAbsOrigin();
 
 	QAngle entityAngles;
-	entityAngles = m_pEnt->GetAbsAngles();
+	entityAngles = m_pEnt->GetEngineObject()->GetAbsAngles();
 
 	// Get the bounding box for the entity
 	Vector mins, maxs;

@@ -532,7 +532,7 @@ void CAI_BaseNPC::CleanupOnDeath( CBaseEntity *pCulprit, bool bFireDeathOutput )
 				// If we already have some danger memory, don't do this cheat
 				if ( GetEnemies()->GetDangerMemory() == NULL )
 				{
-					UpdateEnemyMemory( pCulprit, GetAbsOrigin() );
+					UpdateEnemyMemory( pCulprit, GetEngineObject()->GetAbsOrigin() );
 				}
 			}
 
@@ -820,11 +820,11 @@ int CAI_BaseNPC::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			Vector vAttackPos;
 			if (info.GetInflictor())
 			{
-				vAttackPos = info.GetInflictor()->GetAbsOrigin();
+				vAttackPos = info.GetInflictor()->GetEngineObject()->GetAbsOrigin();
 			}
 			else
 			{
-				vAttackPos = (GetAbsOrigin() + ( g_vecAttackDir * 64 ));
+				vAttackPos = (GetEngineObject()->GetAbsOrigin() + ( g_vecAttackDir * 64 ));
 			}
 
 
@@ -892,7 +892,7 @@ int CAI_BaseNPC::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	// ---------------------------------------------------------------
 	//  Insert a combat sound so that nearby NPCs know I've been hit
 	// ---------------------------------------------------------------
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 1024, 0.5, this, SOUNDENT_CHANNEL_INJURY );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 1024, 0.5, this, SOUNDENT_CHANNEL_INJURY );
 
 	return 1;
 }
@@ -982,7 +982,7 @@ void CAI_BaseNPC::NotifyFriendsOfDamage( CBaseEntity *pAttackerEntity )
 	CAI_BaseNPC *pAttacker = pAttackerEntity->MyNPCPointer();
 	if ( pAttacker )
 	{
-		const Vector &origin = GetAbsOrigin();
+		const Vector &origin = GetEngineObject()->GetAbsOrigin();
 		for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
 			const float NEAR_Z		= 10*12;
@@ -990,7 +990,7 @@ void CAI_BaseNPC::NotifyFriendsOfDamage( CBaseEntity *pAttackerEntity )
 			CAI_BaseNPC *pNpc = g_AI_Manager.AccessAIs()[i];
 			if ( pNpc && pNpc != this )
 			{
-				const Vector &originNpc = pNpc->GetAbsOrigin();
+				const Vector &originNpc = pNpc->GetEngineObject()->GetAbsOrigin();
 				if ( fabsf( originNpc.z - origin.z ) < NEAR_Z )
 				{
 					if ( (originNpc.AsVector2D() - origin.AsVector2D()).LengthSqr() < NEAR_XY_SQ )
@@ -1010,7 +1010,7 @@ void CAI_BaseNPC::OnFriendDamaged( CBaseCombatCharacter *pSquadmate, CBaseEntity
 {
 	if ( GetSleepState() != AISS_WAITING_FOR_INPUT )
 	{
-		float distSqToThreat = ( GetAbsOrigin() - pAttacker->GetAbsOrigin() ).LengthSqr();
+		float distSqToThreat = (GetEngineObject()->GetAbsOrigin() - pAttacker->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 
 		if ( GetSleepState() != AISS_AWAKE && distSqToThreat < Square( 20 * 12 ) )
 			Wake();
@@ -1035,7 +1035,7 @@ bool CAI_BaseNPC::IsHeavyDamage( const CTakeDamageInfo &info )
 
 void CAI_BaseNPC::DoRadiusDamage( const CTakeDamageInfo &info, int iClassIgnore, CBaseEntity *pEntityIgnore )
 {
-	RadiusDamage( info, GetAbsOrigin(), info.GetDamage() * 2.5, iClassIgnore, pEntityIgnore );
+	RadiusDamage( info, GetEngineObject()->GetAbsOrigin(), info.GetDamage() * 2.5, iClassIgnore, pEntityIgnore );
 }
 
 
@@ -2036,12 +2036,12 @@ void CAI_BaseNPC::OnLooked( int iDistance )
 					{
 						SetCondition(COND_SEE_HATE);
 					}
-					UpdateEnemyMemory(pSightEnt,pSightEnt->GetAbsOrigin());
+					UpdateEnemyMemory(pSightEnt,pSightEnt->GetEngineObject()->GetAbsOrigin());
 					break;
 
 				}
 			case D_FR:
-				UpdateEnemyMemory(pSightEnt,pSightEnt->GetAbsOrigin());
+				UpdateEnemyMemory(pSightEnt,pSightEnt->GetEngineObject()->GetAbsOrigin());
 				SetCondition(COND_SEE_FEAR);
 				break;
 			case D_LI:
@@ -2226,12 +2226,12 @@ CBaseGrenade* CAI_BaseNPC::IncomingGrenade(void)
 			continue;
 
 		// Check if it's near me
-		iDist = ( pBG->GetAbsOrigin() - GetAbsOrigin() ).Length();
+		iDist = ( pBG->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length();
 		if ( iDist <= NPC_GRENADE_FEAR_DIST )
 			return pBG;
 
 		// Check if it's headed towards me
-		Vector	vGrenadeDir = GetAbsOrigin() - pBG->GetAbsOrigin();
+		Vector	vGrenadeDir = GetEngineObject()->GetAbsOrigin() - pBG->GetEngineObject()->GetAbsOrigin();
 		Vector  vGrenadeVel;
 		pBG->GetVelocity( &vGrenadeVel, NULL );
 		VectorNormalize(vGrenadeDir);
@@ -2254,10 +2254,10 @@ void CAI_BaseNPC::TryRestoreHull(void)
 	if ( IsUsingSmallHull() && GetCurSchedule() )
 	{
 		trace_t tr;
-		Vector	vUpBit = GetAbsOrigin();
+		Vector	vUpBit = GetEngineObject()->GetAbsOrigin();
 		vUpBit.z += 1;
 
-		AI_TraceHull( GetAbsOrigin(), vUpBit, GetHullMins(),
+		AI_TraceHull(GetEngineObject()->GetAbsOrigin(), vUpBit, GetHullMins(),
 			GetHullMaxs(), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 		if ( !tr.startsolid && (tr.fraction == 1.0) )
 		{
@@ -2421,7 +2421,7 @@ void CAI_BaseNPC::SetHeadDirection( const Vector &vTargetPos, float flInterval)
 	//--------------------------------------
 	// Set head yaw
 	//--------------------------------------
-	float flDesiredYaw = VecToYaw(vTargetPos - GetLocalOrigin()) - GetLocalAngles().y;
+	float flDesiredYaw = VecToYaw(vTargetPos - GetEngineObject()->GetLocalOrigin()) - GetEngineObject()->GetLocalAngles().y;
 	if (flDesiredYaw > 180)
 		flDesiredYaw -= 360;
 	if (flDesiredYaw < -180)
@@ -2543,7 +2543,7 @@ CBaseEntity *CAI_BaseNPC::EyeLookTarget( void )
 
 		CBaseEntity *pEntity = NULL;
 
-		for ( CEntitySphereQuery sphere( GetAbsOrigin(), 1024, 0 ); (pEntity = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
+		for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), 1024, 0 ); (pEntity = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 		{
 			if (pEntity == this)
 			{
@@ -2552,7 +2552,7 @@ CBaseEntity *CAI_BaseNPC::EyeLookTarget( void )
 			CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
 			if (pNPC || (pEntity->GetFlags() & FL_CLIENT))
 			{
-				fTestDist = (GetAbsOrigin() - pEntity->EyePosition()).Length();
+				fTestDist = (GetEngineObject()->GetAbsOrigin() - pEntity->EyePosition()).Length();
 				if (fTestDist < fBestDist)
 				{
 					if (ValidEyeTarget(pEntity->EyePosition()))
@@ -2583,7 +2583,7 @@ CBaseEntity *CAI_BaseNPC::EyeLookTarget( void )
 
 bool CAI_BaseNPC::FInAimCone( const Vector &vecSpot )
 {
-	Vector los = ( vecSpot - GetAbsOrigin() );
+	Vector los = ( vecSpot - GetEngineObject()->GetAbsOrigin() );
 
 	// do this in 2D
 	los.z = 0;
@@ -2636,7 +2636,7 @@ void CAI_BaseNPC::SetAim( const Vector &aimDir )
 		// clamp and dampen movement
 		newPitch = curPitch + 0.8 * UTIL_AngleDiff( UTIL_ApproachAngle( angDir.x, curPitch, 20 ), curPitch );
 
-		float flRelativeYaw = UTIL_AngleDiff( angDir.y, GetAbsAngles().y );
+		float flRelativeYaw = UTIL_AngleDiff( angDir.y, GetEngineObject()->GetAbsAngles().y );
 		// float flNewTargetYaw = UTIL_ApproachAngle( flRelativeYaw, curYaw, 20 );
 		// float newYaw = curYaw + 0.8 * UTIL_AngleDiff( flNewTargetYaw, curYaw );
 		newYaw = curYaw + UTIL_AngleDiff( flRelativeYaw, curYaw );
@@ -2646,7 +2646,7 @@ void CAI_BaseNPC::SetAim( const Vector &aimDir )
 		// Sweep your weapon more slowly if you're not fighting someone
 		newPitch = curPitch + 0.6 * UTIL_AngleDiff( UTIL_ApproachAngle( angDir.x, curPitch, 20 ), curPitch );
 
-		float flRelativeYaw = UTIL_AngleDiff( angDir.y, GetAbsAngles().y );
+		float flRelativeYaw = UTIL_AngleDiff( angDir.y, GetEngineObject()->GetAbsAngles().y );
 		newYaw = curYaw + 0.6 * UTIL_AngleDiff( flRelativeYaw, curYaw );
 	}
 
@@ -2667,7 +2667,7 @@ void CAI_BaseNPC::SetAim( const Vector &aimDir )
 	}
 	else
 	{
- 		m_flInteractionYaw = GetAbsAngles().y;
+ 		m_flInteractionYaw = GetEngineObject()->GetAbsAngles().y;
 	}
 }
 
@@ -2875,7 +2875,7 @@ void CAI_BaseNPC::PostMovement()
 		else
 		{
 			// NPCs with bits_CAP_AIM_GUN update this in SetAim, called by AimGun.
-			m_flInteractionYaw = GetAbsAngles().y;
+			m_flInteractionYaw = GetEngineObject()->GetAbsAngles().y;
 		}
 
 		// set look targets for npcs with animated faces
@@ -3123,7 +3123,7 @@ void CAI_BaseNPC::UpdateEfficiency( bool bInPVS )
 		}
 	}
 
-	Vector	vToNPC		= GetAbsOrigin() - vPlayerEyePosition;
+	Vector	vToNPC		= GetEngineObject()->GetAbsOrigin() - vPlayerEyePosition;
 	float	playerDist	= VectorNormalize( vToNPC );
 	bool	bPlayerFacing;
 
@@ -3368,7 +3368,7 @@ void CAI_BaseNPC::UpdateSleepState( bool bInPVS )
 			return;
 		}
 
-		if ( m_flWakeRadius > .1 && !(pLocalPlayer->GetFlags() & FL_NOTARGET) && ( pLocalPlayer->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr() <= Square(m_flWakeRadius) )
+		if ( m_flWakeRadius > .1 && !(pLocalPlayer->GetFlags() & FL_NOTARGET) && ( pLocalPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).LengthSqr() <= Square(m_flWakeRadius) )
 			Wake();
 		else if ( GetSleepState() == AISS_WAITING_FOR_PVS )
 		{
@@ -3839,15 +3839,15 @@ void CAI_BaseNPC::SetPlayerAvoidState( void )
 
 		if ( pLocalPlayer )
 		{
-			bShouldPlayerAvoid = IsBoxIntersectingBox( GetAbsOrigin() + vMins, GetAbsOrigin() + vMaxs, 
-				pLocalPlayer->GetAbsOrigin() + pLocalPlayer->WorldAlignMins(), pLocalPlayer->GetAbsOrigin() + pLocalPlayer->WorldAlignMaxs() );
+			bShouldPlayerAvoid = IsBoxIntersectingBox(GetEngineObject()->GetAbsOrigin() + vMins, GetEngineObject()->GetAbsOrigin() + vMaxs,
+				pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->WorldAlignMins(), pLocalPlayer->GetEngineObject()->GetAbsOrigin() + pLocalPlayer->WorldAlignMaxs() );
 		}
 
 		if ( ai_debug_avoidancebounds.GetBool() )
 		{
 			int iRed = ( bShouldPlayerAvoid == true ) ? 255 : 0;
 
-			NDebugOverlay::Box( GetAbsOrigin(), vMins, vMaxs, iRed, 0, 255, 64, 0.1 );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), vMins, vMaxs, iRed, 0, 255, 64, 0.1 );
 		}
 	}
 
@@ -4225,7 +4225,7 @@ void CAI_BaseNPC::GatherAttackConditions( CBaseEntity *pTarget, float flDist )
 {
 	AI_PROFILE_SCOPE(CAI_BaseNPC_GatherAttackConditions);
 	
-	Vector vecLOS = ( pTarget->GetAbsOrigin() - GetAbsOrigin() );
+	Vector vecLOS = ( pTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 	vecLOS.z = 0;
 	VectorNormalize( vecLOS );
 
@@ -4263,7 +4263,7 @@ void CAI_BaseNPC::GatherAttackConditions( CBaseEntity *pTarget, float flDist )
 	{
 		AI_PROFILE_SCOPE( CAI_BaseNPC_GatherAttackConditions_SecondaryWeaponLOS );
 		ClearAttackConditions( );
-		targetPos		= pTarget->BodyTarget( GetAbsOrigin() );
+		targetPos		= pTarget->BodyTarget(GetEngineObject()->GetAbsOrigin() );
 		bWeaponHasLOS	= CurrentWeaponLOSCondition( targetPos, true );
 	}
 	else
@@ -4520,8 +4520,8 @@ void CAI_BaseNPC::CheckOnGround( void )
 				{
 					maxs -= Vector( 0.0f, 0.0f, 0.2f );
 
-					Vector vecStart	= GetAbsOrigin() + Vector( 0, 0, .1f );
-					Vector vecDown	= GetAbsOrigin();
+					Vector vecStart	= GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, .1f );
+					Vector vecDown	= GetEngineObject()->GetAbsOrigin();
 					vecDown.z -= 4.0;
 
 					trace_t trace;
@@ -5635,12 +5635,12 @@ void CAI_BaseNPC::GatherEnemyConditions( CBaseEntity *pEnemy )
 		// Trail the enemy a bit if he's moving
 		if (pEnemy->GetSmoothedVelocity() != vec3_origin)
 		{
-			Vector vTrailPos = pEnemy->GetAbsOrigin() - pEnemy->GetSmoothedVelocity() * random->RandomFloat( -0.05, 0 );
+			Vector vTrailPos = pEnemy->GetEngineObject()->GetAbsOrigin() - pEnemy->GetSmoothedVelocity() * random->RandomFloat( -0.05, 0 );
 			UpdateEnemyMemory(pEnemy,vTrailPos);
 		}
 		else
 		{
-			UpdateEnemyMemory(pEnemy,pEnemy->GetAbsOrigin());
+			UpdateEnemyMemory(pEnemy,pEnemy->GetEngineObject()->GetAbsOrigin());
 		}
 
 		// If it's not an NPC, assume it can't see me
@@ -5661,7 +5661,7 @@ void CAI_BaseNPC::GatherEnemyConditions( CBaseEntity *pEnemy )
 		// if the enemy is near enough the npc, we go ahead and let the npc know where the
 		// enemy is. Send the enemy in as the informer so this knowledge will be regarded as 
 		// secondhand so that the NPC doesn't 
-		UpdateEnemyMemory( pEnemy, pEnemy->GetAbsOrigin(), pEnemy );
+		UpdateEnemyMemory( pEnemy, pEnemy->GetEngineObject()->GetAbsOrigin(), pEnemy );
 	}
 
 	AI_PROFILE_SCOPE_END();
@@ -5720,7 +5720,7 @@ void CAI_BaseNPC::GatherEnemyConditions( CBaseEntity *pEnemy )
 		// I'm at last known position at enemy isn't in sight then has eluded me
 		// ----------------------------------------------------------------------
 		Vector flEnemyLKP = GetEnemyLKP();
-		if (((flEnemyLKP - GetAbsOrigin()).Length2D() < 48) &&
+		if (((flEnemyLKP - GetEngineObject()->GetAbsOrigin()).Length2D() < 48) &&
 			!HasCondition(COND_SEE_ENEMY))
 		{
 			MarkEnemyAsEluded();
@@ -5745,7 +5745,7 @@ void CAI_BaseNPC::GatherEnemyConditions( CBaseEntity *pEnemy )
 //-----------------------------------------------------------------------------
 float CAI_BaseNPC::GetGoalRepathTolerance( CBaseEntity *pGoalEnt, GoalType_t type, const Vector &curGoal, const Vector &curTargetPos )
 {
-	float distToGoal = ( GetAbsOrigin() - curTargetPos ).Length() - GetNavigator()->GetArrivalDistance();
+	float distToGoal = (GetEngineObject()->GetAbsOrigin() - curTargetPos ).Length() - GetNavigator()->GetArrivalDistance();
 	float distMoved1Sec = GetSmoothedVelocity().Length();
 	float result = 120;  // FIXME: why 120?
 	
@@ -5826,7 +5826,7 @@ void CAI_BaseNPC::UpdateTargetPos()
 		}
 		else if ( GetNavigator()->GetGoalFlags() & AIN_UPDATE_TARGET_POS )
 		{
-			if ( GetTarget() == NULL || (GetNavigator()->GetGoalPos() - GetTarget()->GetAbsOrigin()).Length() > GetGoalRepathTolerance( GetTarget(), GOALTYPE_TARGETENT, GetNavigator()->GetGoalPos(), GetTarget()->GetAbsOrigin()) )
+			if ( GetTarget() == NULL || (GetNavigator()->GetGoalPos() - GetTarget()->GetEngineObject()->GetAbsOrigin()).Length() > GetGoalRepathTolerance( GetTarget(), GOALTYPE_TARGETENT, GetNavigator()->GetGoalPos(), GetTarget()->GetEngineObject()->GetAbsOrigin()) )
 			{
 				if ( !GetNavigator()->RefindPathToGoal( false ) )
 				{
@@ -5887,7 +5887,7 @@ CAI_BaseNPC *CAI_BaseNPC::CreateCustomTarget( const Vector &vecOrigin, float dur
 	// Build a nonsolid bullseye and place it in the desired location
 	// The bullseye must take damage or the SetHealth 0 call will not be able
 	pTarget->AddSpawnFlags( SF_BULLSEYE_NONSOLID );
-	pTarget->SetAbsOrigin( vecOrigin );
+	pTarget->GetEngineObject()->SetAbsOrigin( vecOrigin );
 	pTarget->Spawn();
 
 	// Set it up to remove itself, unless told to be infinite (-1)
@@ -6607,7 +6607,7 @@ void CAI_BaseNPC::CheckPhysicsContacts()
 		IPhysicsObject *pPhysics = VPhysicsGetObject();
 		IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
 		CBaseEntity *pGroundEntity = GetGroundEntity();
-		float heightCheck = GetAbsOrigin().z + GetHullMaxs().z;
+		float heightCheck = GetEngineObject()->GetAbsOrigin().z + GetHullMaxs().z;
 		Vector npcVel;
 		pPhysics->GetVelocity( &npcVel, NULL );
 		CBaseEntity *pOtherEntity = NULL;
@@ -6744,9 +6744,9 @@ bool CAI_BaseNPC::IsNavHullValid() const
 	{
 		Assert( VPhysicsGetObject() );
 		const CPhysCollide *pPhysCollide = VPhysicsGetObject()->GetCollide();
-		physcollision->CollideGetAABB( &vecMins, &vecMaxs, pPhysCollide, GetAbsOrigin(), GetAbsAngles() ); 
-		vecMins -= GetAbsOrigin();
-		vecMaxs -= GetAbsOrigin();
+		physcollision->CollideGetAABB( &vecMins, &vecMaxs, pPhysCollide, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
+		vecMins -= GetEngineObject()->GetAbsOrigin();
+		vecMaxs -= GetEngineObject()->GetAbsOrigin();
 	}
 	else
 	{
@@ -6805,13 +6805,13 @@ void CAI_BaseNPC::NPCInit ( void )
 	AddFlag( FL_AIMTARGET | FL_NPC );
 	AddSolidFlags( FSOLID_NOT_STANDABLE );
 
-	m_flOriginalYaw = GetAbsAngles().y;
+	m_flOriginalYaw = GetEngineObject()->GetAbsAngles().y;
 
 	SetBlocksLOS( false );
 
 	SetGravity(1.0);	// Don't change
 	m_takedamage		= DAMAGE_YES;
-	GetMotor()->SetIdealYaw( GetLocalAngles().y );
+	GetMotor()->SetIdealYaw(GetEngineObject()->GetLocalAngles().y );
 	m_iMaxHealth		= m_iHealth;
 	m_lifeState			= LIFE_ALIVE;
 	SetIdealState( NPC_STATE_IDLE );// Assume npc will be idle, until proven otherwise
@@ -7312,18 +7312,18 @@ void CAI_BaseNPC::StartNPC( void )
 		 !(CapabilitiesGet() & bits_CAP_MOVE_FLY) &&
 		 !HasSpawnFlags( SF_NPC_FALL_TO_GROUND ) && !IsWaitingToRappel() && !GetMoveParent() )
 	{
-		Vector origin = GetLocalOrigin();
+		Vector origin = GetEngineObject()->GetLocalOrigin();
 
 		if (!GetMoveProbe()->FloorPoint( origin + Vector(0, 0, 0.1), MASK_NPCSOLID, 0, -2048, &origin ))
 		{
-			Warning( "NPC %s stuck in wall--level design error at (%.2f %.2f %.2f)\n", GetClassname(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+			Warning( "NPC %s stuck in wall--level design error at (%.2f %.2f %.2f)\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 			if ( g_pDeveloper->GetInt() > 1 )
 			{
 				m_debugOverlays |= OVERLAY_BBOX_BIT;
 			}
 		}
 
-		SetLocalOrigin( origin );
+		GetEngineObject()->SetLocalOrigin( origin );
 	}
 	else
 	{
@@ -7423,7 +7423,7 @@ void CAI_BaseNPC::StartTargetHandling( CBaseEntity *pTargetEnt )
 
 	// NPC will start turning towards his destination
 	bool bIsFlying = (GetMoveType() == MOVETYPE_FLY) || (GetMoveType() == MOVETYPE_FLYGRAVITY);
-	AI_NavGoal_t goal( GOALTYPE_PATHCORNER, pTargetEnt->GetAbsOrigin(),
+	AI_NavGoal_t goal( GOALTYPE_PATHCORNER, pTargetEnt->GetEngineObject()->GetAbsOrigin(),
 					   bIsFlying ? ACT_FLY : ACT_WALK,
 					   AIN_DEF_TOLERANCE, AIN_YAW_TO_DEST);
 
@@ -7606,7 +7606,7 @@ void CAI_BaseNPC::RememberUnreachable(CBaseEntity *pEntity, float duration )
 		if (pEntity == m_UnreachableEnts[i].hUnreachableEnt)
 		{
 			m_UnreachableEnts[i].fExpireTime	 = gpGlobals->curtime + NPC_UNREACHABLE_TIMEOUT;
-			m_UnreachableEnts[i].vLocationWhenUnreachable = pEntity->GetAbsOrigin();
+			m_UnreachableEnts[i].vLocationWhenUnreachable = pEntity->GetEngineObject()->GetAbsOrigin();
 			return;
 		}
 	}
@@ -7615,7 +7615,7 @@ void CAI_BaseNPC::RememberUnreachable(CBaseEntity *pEntity, float duration )
 	int nNewIndex = m_UnreachableEnts.AddToTail();
 	m_UnreachableEnts[nNewIndex].hUnreachableEnt = pEntity;
 	m_UnreachableEnts[nNewIndex].fExpireTime	 = gpGlobals->curtime + NPC_UNREACHABLE_TIMEOUT;
-	m_UnreachableEnts[nNewIndex].vLocationWhenUnreachable = pEntity->GetAbsOrigin();
+	m_UnreachableEnts[nNewIndex].vLocationWhenUnreachable = pEntity->GetEngineObject()->GetAbsOrigin();
 }
 
 //------------------------------------------------------------------------------
@@ -7641,7 +7641,7 @@ bool CAI_BaseNPC::IsUnreachable(CBaseEntity *pEntity)
 		{
 			// Test for reachablility on any elements that have timed out
 			if ( gpGlobals->curtime > m_UnreachableEnts[i].fExpireTime ||
-				  pEntity->GetAbsOrigin().DistToSqr(m_UnreachableEnts[i].vLocationWhenUnreachable) > UNREACHABLE_DIST_TOLERANCE_SQ)
+				  pEntity->GetEngineObject()->GetAbsOrigin().DistToSqr(m_UnreachableEnts[i].vLocationWhenUnreachable) > UNREACHABLE_DIST_TOLERANCE_SQ)
 			{
 				m_UnreachableEnts.FastRemove(i);
 				return false;
@@ -7788,7 +7788,7 @@ CBaseEntity *CAI_BaseNPC::BestEnemy( void )
 				DbgEnemyMsg( this, "    (%s displaced)\n", pBestEnemy->GetDebugName() );
 
 			iBestPriority	 = IRelationPriority ( pEnemy );
-			iBestDistSq		 = (pEnemy->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
+			iBestDistSq		 = (pEnemy->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 			pBestEnemy		 = pEnemy;
 			bBestUnreachable = bUnreachable;
 			fBestSeen		 = TRS_NONE;
@@ -7804,7 +7804,7 @@ CBaseEntity *CAI_BaseNPC::BestEnemy( void )
 			// currently think is the best visible enemy. No need to do
 			// a distance check, just get mad at this one for now.
 			iBestPriority	 = IRelationPriority ( pEnemy );
-			iBestDistSq		 = ( pEnemy->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
+			iBestDistSq		 = ( pEnemy->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 			pBestEnemy		 = pEnemy;
 			bBestUnreachable = bUnreachable;
 			fBestSeen		 = TRS_NONE;
@@ -7815,7 +7815,7 @@ CBaseEntity *CAI_BaseNPC::BestEnemy( void )
 			// this entity is disliked just as much as the entity that
 			// we currently think is the best visible enemy, so we only
 			// get mad at it if it is closer.
-			iDistSq = ( pEnemy->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
+			iDistSq = ( pEnemy->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 
 			bool bAcceptCurrent = false;
 			bool bCloser = ( ( iBestDistSq - iDistSq ) > EnemyDistTolerance() );
@@ -7968,7 +7968,7 @@ Activity CAI_BaseNPC::GetReloadActivity( CAI_Hint* pHint )
 			{
 				if (SelectWeightedSequence( ACT_RELOAD_LOW ) != ACTIVITY_NOT_AVAILABLE)
 				{
-					Vector vEyePos = GetAbsOrigin() + EyeOffset(ACT_RELOAD_LOW);
+					Vector vEyePos = GetEngineObject()->GetAbsOrigin() + EyeOffset(ACT_RELOAD_LOW);
 					// Check if this location will block the threat's line of sight to me
 					trace_t tr;
 					AI_TraceLOS( vEyePos, GetEnemy()->EyePosition(), this, &tr );
@@ -8034,18 +8034,18 @@ float CAI_BaseNPC::CalcIdealYaw( const Vector &vecTarget )
 		vecProjection.x = -vecTarget.y;
 		vecProjection.y = vecTarget.x;
 
-		return UTIL_VecToYaw( vecProjection - GetLocalOrigin() );
+		return UTIL_VecToYaw( vecProjection - GetEngineObject()->GetLocalOrigin() );
 	}
 	else if ( GetNavigator()->GetMovementActivity() == ACT_STRAFE_RIGHT )
 	{
 		vecProjection.x = vecTarget.y;
 		vecProjection.y = vecTarget.x;
 
-		return UTIL_VecToYaw( vecProjection - GetLocalOrigin() );
+		return UTIL_VecToYaw( vecProjection - GetEngineObject()->GetLocalOrigin() );
 	}
 	else
 	{
-		return UTIL_VecToYaw ( vecTarget - GetLocalOrigin() );
+		return UTIL_VecToYaw ( vecTarget - GetEngineObject()->GetLocalOrigin() );
 	}
 }
 
@@ -8106,7 +8106,7 @@ Vector CAI_BaseNPC::EyeOffset( Activity nActivity )
 Vector CAI_BaseNPC::EyePosition( void ) 
 {
 	if ( IsCrouching() )
-		return GetAbsOrigin() + GetCrouchEyeOffset();
+		return GetEngineObject()->GetAbsOrigin() + GetCrouchEyeOffset();
 
 	return BaseClass::EyePosition();
 }
@@ -8279,7 +8279,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			//DevMsg( "Turned!\n" );
 			SetIdealActivity( ACT_IDLE );
 			Forget( bits_MEMORY_TURNING );
-			SetBoneController( 0, GetLocalAngles().y );
+			SetBoneController( 0, GetEngineObject()->GetLocalAngles().y );
 			IncrementInterpolationFrame();
 			break;
 		}
@@ -8294,7 +8294,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			if ( pEvent->options && strlen( pEvent->options ) > 0 )
 			{
 				// Pick up the weapon or item that was specified in the anim event.
-				pPickup = gEntList.FindEntityGenericNearest( pEvent->options, GetAbsOrigin(), 256, this );
+				pPickup = gEntList.FindEntityGenericNearest( pEvent->options, GetEngineObject()->GetAbsOrigin(), 256, this );
 			}
 			else
 			{
@@ -8310,7 +8310,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			}
 
 			// Make sure the item hasn't moved.
-			float flDist = ( pPickup->WorldSpaceCenter() - GetAbsOrigin() ).Length2D();
+			float flDist = ( pPickup->WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin() ).Length2D();
 			if ( flDist > ITEM_PICKUP_TOLERANCE )
 			{
 				TaskFail("Item has moved!\n");
@@ -8739,7 +8739,7 @@ void CAI_BaseNPC::DrawDebugGeometryOverlays(void)
 	if (!(CAI_BaseNPC::m_nDebugBits & bits_debugDisableAI) && (IsCurSchedule(SCHED_FORCED_GO) || IsCurSchedule(SCHED_FORCED_GO_RUN)))
 	{
 		NDebugOverlay::Box(m_vecLastPosition, Vector(-5,-5,-5),Vector(5,5,5), 255, 0, 255, 0, 0);
-		NDebugOverlay::HorzArrow( GetAbsOrigin(), m_vecLastPosition, 16, 255, 0, 255, 64, true, 0 );
+		NDebugOverlay::HorzArrow(GetEngineObject()->GetAbsOrigin(), m_vecLastPosition, 16, 255, 0, 255, 64, true, 0 );
 	}
 
 	// ------------------------------
@@ -8815,7 +8815,7 @@ void CAI_BaseNPC::DrawDebugGeometryOverlays(void)
 			UTIL_GetDebugColorForRelationship( nRelationship, r, g, b );
 
 			// Draw an arrow
-			NDebugOverlay::HorzArrow( GetAbsOrigin(), ppAIs[i]->GetAbsOrigin(), 16, r, g, b, 64, true, 0.0f );
+			NDebugOverlay::HorzArrow(GetEngineObject()->GetAbsOrigin(), ppAIs[i]->GetEngineObject()->GetAbsOrigin(), 16, r, g, b, 64, true, 0.0f );
 		}
 
 		// Also include all players
@@ -8832,7 +8832,7 @@ void CAI_BaseNPC::DrawDebugGeometryOverlays(void)
 			UTIL_GetDebugColorForRelationship( nRelationship, r, g, b );
 
 			// Draw an arrow
-			NDebugOverlay::HorzArrow( GetAbsOrigin(), pPlayer->GetAbsOrigin(), 16, r, g, b, 64, true, 0.0f );
+			NDebugOverlay::HorzArrow(GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsOrigin(), 16, r, g, b, 64, true, 0.0f );
 		}
 	}
 
@@ -8915,7 +8915,7 @@ void CAI_BaseNPC::DrawDebugGeometryOverlays(void)
 
 					// If has a line on the player draw cross slightly in front so player can see
 					if (npcEnemy->IsPlayer() &&
-						(eMemory->vLastKnownLocation - npcEnemy->GetAbsOrigin()).Length()<10 )
+						(eMemory->vLastKnownLocation - npcEnemy->GetEngineObject()->GetAbsOrigin()).Length()<10 )
 					{
 						Vector vEnemyFacing = npcEnemy->BodyDirection2D( );
 						Vector eyePos = npcEnemy->EyePosition() + vEnemyFacing*10.0;
@@ -9235,11 +9235,11 @@ int CAI_BaseNPC::DrawDebugTextOverlays(void)
 			EntityText(text_offset,"Enemy too far to attack",0);
 			text_offset++;
 		}
-		if ( GetAbsVelocity() != vec3_origin || GetLocalAngularVelocity() != vec3_angle )
+		if (GetEngineObject()->GetAbsVelocity() != vec3_origin || GetLocalAngularVelocity() != vec3_angle )
 		{
 			char tmp[512];
 			Q_snprintf( tmp, sizeof(tmp), "Vel %.1f %.1f %.1f   Ang: %.1f %.1f %.1f\n", 
-				GetAbsVelocity().x, GetAbsVelocity().y, GetAbsVelocity().z, 
+				GetEngineObject()->GetAbsVelocity().x, GetEngineObject()->GetAbsVelocity().y, GetEngineObject()->GetAbsVelocity().z,
 				GetLocalAngularVelocity().x, GetLocalAngularVelocity().y, GetLocalAngularVelocity().z );
 			EntityText(text_offset,tmp,0);
 			text_offset++;
@@ -9345,7 +9345,7 @@ void CAI_BaseNPC::ReportAIState( void )
 
 	if ( GetEnemy() != NULL )
 	{
-		g_pEffects->Sparks( GetEnemy()->GetAbsOrigin() + Vector( 0, 0, 64 ) );
+		g_pEffects->Sparks( GetEnemy()->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 64 ) );
 		DevMsg( "\nEnemy is %s", GetEnemy()->GetClassname() );
 	}
 	else
@@ -9521,7 +9521,7 @@ Vector CAI_BaseNPC::GetShootEnemyDir( const Vector &shootOrigin, bool bNoisy )
 	{
 		Vector vecEnemyLKP = GetEnemyLKP();
 
-		Vector vecEnemyOffset = pEnemy->BodyTarget( shootOrigin, bNoisy ) - pEnemy->GetAbsOrigin();
+		Vector vecEnemyOffset = pEnemy->BodyTarget( shootOrigin, bNoisy ) - pEnemy->GetEngineObject()->GetAbsOrigin();
 
 #ifdef PORTAL
 		// Translate the enemy's position across the portals if it's only seen in the portal view cone
@@ -9543,7 +9543,7 @@ Vector CAI_BaseNPC::GetShootEnemyDir( const Vector &shootOrigin, bool bNoisy )
 	else
 	{
 		Vector forward;
-		AngleVectors( GetLocalAngles(), &forward );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), &forward );
 		return forward;
 	}
 }
@@ -9603,7 +9603,7 @@ Vector CAI_BaseNPC::GetActualShootPosition( const Vector &shootOrigin )
 {
 	// Project the target's location into the future.
 	Vector vecEnemyLKP = GetEnemyLKP();
-	Vector vecEnemyOffset = GetEnemy()->BodyTarget( shootOrigin ) - GetEnemy()->GetAbsOrigin();
+	Vector vecEnemyOffset = GetEnemy()->BodyTarget( shootOrigin ) - GetEnemy()->GetEngineObject()->GetAbsOrigin();
 	Vector vecTargetPosition = vecEnemyOffset + vecEnemyLKP;
 
 #ifdef PORTAL
@@ -9619,8 +9619,8 @@ Vector CAI_BaseNPC::GetActualShootPosition( const Vector &shootOrigin )
 		Vector vecTargetPositionTransformed = vecEnemyOffsetTransformed + vecEnemyLKPTransformed;
 
 		// Get the distance to the target with and without portals
-		float fDistanceToEnemyThroughPortalSqr = GetAbsOrigin().DistToSqr( vecTargetPositionTransformed );
-		float fDistanceToEnemySqr = GetAbsOrigin().DistToSqr( vecTargetPosition );
+		float fDistanceToEnemyThroughPortalSqr = GetEngineObject()->GetAbsOrigin().DistToSqr( vecTargetPositionTransformed );
+		float fDistanceToEnemySqr = GetEngineObject()->GetAbsOrigin().DistToSqr( vecTargetPosition );
 
 		if ( fDistanceToEnemyThroughPortalSqr < fDistanceToEnemySqr || !FInViewCone( vecEnemyLKP ) || !FVisible( vecEnemyLKP ) )
 		{
@@ -9839,7 +9839,7 @@ Vector CAI_BaseNPC::GetActualShootTrajectory( const Vector &shootOrigin )
 
 Vector CAI_BaseNPC::BodyTarget( const Vector &posSrc, bool bNoisy ) 
 { 
-	Vector low = WorldSpaceCenter() - ( WorldSpaceCenter() - GetAbsOrigin() ) * .25;
+	Vector low = WorldSpaceCenter() - ( WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin() ) * .25;
 	Vector high = EyePosition();
 	Vector delta = high - low;
 	Vector result;
@@ -10067,15 +10067,15 @@ bool CAI_BaseNPC::BBoxFlat ( void )
 	flXSize = WorldAlignSize().x / 2;
 	flYSize = WorldAlignSize().y / 2;
 
-	vecPoint.x = GetAbsOrigin().x + flXSize;
-	vecPoint.y = GetAbsOrigin().y + flYSize;
-	vecPoint.z = GetAbsOrigin().z;
+	vecPoint.x = GetEngineObject()->GetAbsOrigin().x + flXSize;
+	vecPoint.y = GetEngineObject()->GetAbsOrigin().y + flYSize;
+	vecPoint.z = GetEngineObject()->GetAbsOrigin().z;
 
 	AI_TraceLine ( vecPoint, vecPoint - Vector ( 0, 0, 100 ), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 	flLength = (vecPoint - tr.endpos).Length();
 
-	vecPoint.x = GetAbsOrigin().x - flXSize;
-	vecPoint.y = GetAbsOrigin().y - flYSize;
+	vecPoint.x = GetEngineObject()->GetAbsOrigin().x - flXSize;
+	vecPoint.y = GetEngineObject()->GetAbsOrigin().y - flYSize;
 
 	AI_TraceLine ( vecPoint, vecPoint - Vector ( 0, 0, 100 ), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 	flLength2 = (vecPoint - tr.endpos).Length();
@@ -10085,8 +10085,8 @@ bool CAI_BaseNPC::BBoxFlat ( void )
 	}
 	flLength = flLength2;
 
-	vecPoint.x = GetAbsOrigin().x - flXSize;
-	vecPoint.y = GetAbsOrigin().y + flYSize;
+	vecPoint.x = GetEngineObject()->GetAbsOrigin().x - flXSize;
+	vecPoint.y = GetEngineObject()->GetAbsOrigin().y + flYSize;
 	AI_TraceLine ( vecPoint, vecPoint - Vector ( 0, 0, 100 ), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 	flLength2 = (vecPoint - tr.endpos).Length();
 	if ( flLength2 > flLength )
@@ -10095,8 +10095,8 @@ bool CAI_BaseNPC::BBoxFlat ( void )
 	}
 	flLength = flLength2;
 
-	vecPoint.x = GetAbsOrigin().x + flXSize;
-	vecPoint.y = GetAbsOrigin().y - flYSize;
+	vecPoint.x = GetEngineObject()->GetAbsOrigin().x + flXSize;
+	vecPoint.y = GetEngineObject()->GetAbsOrigin().y - flYSize;
 	AI_TraceLine ( vecPoint, vecPoint - Vector ( 0, 0, 100 ), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 	flLength2 = (vecPoint - tr.endpos).Length();
 	if ( flLength2 > flLength )
@@ -10428,7 +10428,7 @@ CBaseEntity *CAI_BaseNPC::DropItem ( const char *pszItemName, Vector vecPos, QAn
 		else
 		{
 			// do we want this behavior to be default?! (sjb)
-			pItem->ApplyAbsVelocityImpulse( GetAbsVelocity() );
+			pItem->ApplyAbsVelocityImpulse(GetEngineObject()->GetAbsVelocity() );
 			pItem->ApplyLocalAngularVelocityImpulse( AngularImpulse( 0, random->RandomFloat( 0, 100 ), 0 ) );
 		}
 
@@ -11302,7 +11302,7 @@ void CAI_BaseNPC::ToggleFreeze(void)
 		SetMoveType(MOVETYPE_NONE);
 		SetGravity(0);
 		SetLocalAngularVelocity(vec3_angle);
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 	}
 	else
 	{
@@ -11713,7 +11713,7 @@ void CAI_BaseNPC::InputUpdateEnemyMemory( inputdata_t &inputdata )
 
 	if( pEnemy )
 	{
-		UpdateEnemyMemory( pEnemy, pEnemy->GetAbsOrigin(), this );
+		UpdateEnemyMemory( pEnemy, pEnemy->GetEngineObject()->GetAbsOrigin(), this );
 	}
 }
 
@@ -11930,7 +11930,7 @@ bool CAI_BaseNPC::CineCleanup()
 			// irregular motion that can't be properly accounted for.
 
 			// UNDONE: THIS SHOULD ONLY HAPPEN IF WE ACTUALLY PLAYED THE SEQUENCE.
-			Vector oldOrigin = GetLocalOrigin();
+			Vector oldOrigin = GetEngineObject()->GetLocalOrigin();
 
 			// UNDONE: ugly hack.  Don't move NPC if they don't "seem" to move
 			// this really needs to be done with the AX,AY,etc. flags, but that aren't consistantly
@@ -11938,7 +11938,7 @@ bool CAI_BaseNPC::CineCleanup()
 			if ((oldOrigin - new_origin).Length2D() < 8.0)
 				new_origin = oldOrigin;
 
-			Vector origin = GetLocalOrigin();
+			Vector origin = GetEngineObject()->GetLocalOrigin();
 
 			origin.x = new_origin.x;
 			origin.y = new_origin.y;
@@ -11947,36 +11947,36 @@ bool CAI_BaseNPC::CineCleanup()
 			if ( nSavedFlags & FL_FLY )
 			{
 				origin.z = new_origin.z;
-				SetLocalOrigin( origin );
+				GetEngineObject()->SetLocalOrigin( origin );
 			}
 			else
 			{
-				SetLocalOrigin( origin );
+				GetEngineObject()->SetLocalOrigin( origin );
 
 				int drop = UTIL_DropToFloor( this, MASK_NPCSOLID, UTIL_GetLocalPlayer() );
 
 				// Origin in solid?  Set to org at the end of the sequence
 				if ( ( drop < 0 ) || sv_test_scripted_sequences.GetBool() )
 				{
-					SetLocalOrigin( oldOrigin );
+					GetEngineObject()->SetLocalOrigin( oldOrigin );
 				}
 				else if ( drop == 0 ) // Hanging in air?
 				{
-					Vector origin = GetLocalOrigin();
+					Vector origin = GetEngineObject()->GetLocalOrigin();
 					origin.z = new_origin.z;
-					SetLocalOrigin( origin );
+					GetEngineObject()->SetLocalOrigin( origin );
 					SetGroundEntity( NULL );
 				}
 			}
 
-			origin = GetLocalOrigin();
+			origin = GetEngineObject()->GetLocalOrigin();
 
 			// teleport if it's a non-trivial distance
 			if ((oldOrigin - origin).Length() > 8.0)
 			{
 				// Call teleport to notify
 				Teleport( &origin, NULL, NULL );
-				SetLocalOrigin( origin );
+				GetEngineObject()->SetLocalOrigin( origin );
 				IncrementInterpolationFrame();
 			}
 
@@ -12158,7 +12158,7 @@ bool CAI_BaseNPC::OverrideMove( float flInterval )
 float CAI_BaseNPC::VecToYaw( const Vector &vecDir )
 {
 	if (vecDir.x == 0 && vecDir.y == 0 && vecDir.z == 0)
-		return GetLocalAngles().y;
+		return GetEngineObject()->GetLocalAngles().y;
 
 	return UTIL_VecToYaw( vecDir );
 }
@@ -12279,7 +12279,7 @@ bool CAI_BaseNPC::OnUpcomingPropDoor( AILocalMoveGoal_t *pMoveGoal,
 		
 		// dvs: FIXME: local route might not be sufficient
 		pOpenDoorRoute = GetPathfinder()->BuildLocalRoute(
-			GetLocalOrigin(), 
+			GetEngineObject()->GetLocalOrigin(),
 			opendata.vecStandPos,
 			NULL, 
 			bits_WP_TO_DOOR | bits_WP_DONT_SIMPLIFY, 
@@ -12400,7 +12400,7 @@ int CAI_BaseNPC::FlyMove( const Vector& pfPosition, unsigned int mask )
 	trace_t		trace;
 
 	// try the move	
-	VectorCopy( GetAbsOrigin(), oldorg );
+	VectorCopy(GetEngineObject()->GetAbsOrigin(), oldorg );
 	VectorAdd( oldorg, pfPosition, neworg );
 	UTIL_TraceEntity( this, oldorg, neworg, mask, &trace );				
 	if (trace.fraction == 1)
@@ -12408,7 +12408,7 @@ int CAI_BaseNPC::FlyMove( const Vector& pfPosition, unsigned int mask )
 		if ( (GetFlags() & FL_SWIM) && enginetrace->GetPointContents(trace.endpos) == CONTENTS_EMPTY )
 			return false;	// swim monster left water
 
-		SetAbsOrigin( trace.endpos );
+		GetEngineObject()->SetAbsOrigin( trace.endpos );
 		PhysicsTouchTriggers();
 		return true;
 	}
@@ -12440,7 +12440,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 	trace_t	trace;
 	Vector oldorg, neworg, end;
 	Vector move( vecPosition[0], vecPosition[1], 0.0f );
-	VectorCopy( GetAbsOrigin(), oldorg );
+	VectorCopy(GetEngineObject()->GetAbsOrigin(), oldorg );
 	VectorAdd( oldorg, move, neworg );
 
 	// push down from a step height above the wished position
@@ -12466,7 +12466,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 		// if monster had the ground pulled out, go ahead and fall
 		if ( GetFlags() & FL_PARTIALGROUND )
 		{
-			SetAbsOrigin( oldorg + move );
+			GetEngineObject()->SetAbsOrigin( oldorg + move );
 			PhysicsTouchTriggers();
 			SetGroundEntity( NULL );
 			return true;
@@ -12476,7 +12476,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 	}
 
 	// check point traces down for dangling corners
-	SetAbsOrigin( trace.endpos );
+	GetEngineObject()->SetAbsOrigin( trace.endpos );
 
 	if (UTIL_CheckBottom( this, NULL, flStepSize ) == 0)
 	{
@@ -12489,7 +12489,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 		}
 
 		// Reset to original position
-		SetAbsOrigin( oldorg );
+		GetEngineObject()->SetAbsOrigin( oldorg );
 		return false;
 	}
 
@@ -12720,10 +12720,10 @@ void CAI_BaseNPC::TestPlayerPushing( CBaseEntity *pEntity )
 	if ( pPlayer && !( pPlayer->GetFlags() & FL_NOTARGET ) )
 	{
 		if ( (pPlayer->m_nButtons & (IN_FORWARD|IN_BACK|IN_MOVELEFT|IN_MOVERIGHT)) || 
-			 pPlayer->GetAbsVelocity().AsVector2D().LengthSqr() > 50*50 )
+			 pPlayer->GetEngineObject()->GetAbsVelocity().AsVector2D().LengthSqr() > 50*50 )
 		{
 			SetCondition( COND_PLAYER_PUSHING );
-			Vector vecPush = GetAbsOrigin() - pPlayer->GetAbsOrigin();
+			Vector vecPush = GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin();
 			VectorNormalize( vecPush );
 			CascadePlayerPush( vecPush, pPlayer->WorldSpaceCenter() );
 		}
@@ -12736,7 +12736,7 @@ void CAI_BaseNPC::CascadePlayerPush( const Vector &push, const Vector &pushOrigi
 	// Try to push any friends that are in the way.
 	//
 	float			hullWidth						= GetHullWidth();
-	const Vector &	origin							= GetAbsOrigin();
+	const Vector &	origin							= GetEngineObject()->GetAbsOrigin();
 	const Vector2D &origin2D						= origin.AsVector2D();
 
 	const float		MIN_Z_TO_TRANSMIT				= GetHullHeight() * 0.5 + 0.1;
@@ -12750,7 +12750,7 @@ void CAI_BaseNPC::CascadePlayerPush( const Vector &push, const Vector &pushOrigi
 		CAI_BaseNPC *pOther = g_AI_Manager.AccessAIs()[i];
 		if ( pOther != this && pOther->IRelationType(this) == D_LI && !pOther->HasCondition( COND_PLAYER_PUSHING ) )
 		{
-			const Vector &friendOrigin = pOther->GetAbsOrigin();
+			const Vector &friendOrigin = pOther->GetEngineObject()->GetAbsOrigin();
 			if ( fabsf( friendOrigin.z - origin.z ) < MIN_Z_TO_TRANSMIT &&
 				 ( friendOrigin.AsVector2D() - origin.AsVector2D() ).LengthSqr() < DIST_REQD_TO_TRANSMIT_PUSH_SQ )
 			{
@@ -12795,13 +12795,13 @@ void CAI_BaseNPC::Break( CBaseEntity *pBreaker )
 	}
 	else
 	{
-		velocity = GetAbsVelocity();
+		velocity = GetEngineObject()->GetAbsVelocity();
 		QAngleToAngularImpulse( GetLocalAngularVelocity(), angVelocity );
-		origin = GetAbsOrigin();
-		angles = GetAbsAngles();
+		origin = GetEngineObject()->GetAbsOrigin();
+		angles = GetEngineObject()->GetAbsAngles();
 	}
 
-	breakablepropparams_t params( GetAbsOrigin(), GetAbsAngles(), velocity, angVelocity );
+	breakablepropparams_t params(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, angVelocity );
 	params.impactEnergyScale = m_impactEnergyScale;
 	params.defCollisionGroup = GetCollisionGroup();
 	if ( params.defCollisionGroup == COLLISION_GROUP_NONE )
@@ -12864,7 +12864,7 @@ bool CAI_BaseNPC::FindNearestValidGoalPos( const Vector &vTestPoint, Vector *pRe
 
 	if ( vCandidate != vec3_invalid )
 	{
-		AI_Waypoint_t *pPathToPoint = GetPathfinder()->BuildRoute( GetAbsOrigin(), vCandidate, AI_GetSinglePlayer(), 5*12, NAV_NONE, true );
+		AI_Waypoint_t *pPathToPoint = GetPathfinder()->BuildRoute(GetEngineObject()->GetAbsOrigin(), vCandidate, AI_GetSinglePlayer(), 5*12, NAV_NONE, true );
 		if ( pPathToPoint )
 		{
 			GetPathfinder()->UnlockRouteNodes( pPathToPoint );
@@ -12878,7 +12878,7 @@ bool CAI_BaseNPC::FindNearestValidGoalPos( const Vector &vTestPoint, Vector *pRe
 	if ( vCandidate == vec3_invalid )
 	{
 		GetMoveProbe()->MoveLimit( NAV_GROUND, 
-								   GetAbsOrigin(), 
+									GetEngineObject()->GetAbsOrigin(),
 								   vTestPoint, 
 								   MASK_SOLID_BRUSHONLY, 
 								   NULL, 
@@ -12920,7 +12920,7 @@ float CAI_BaseNPC::LineOfSightDist( const Vector &vecDir, float zEye )
 	
 	trace_t tr;
 	// Need to center trace so don't get erratic results based on orientation
-	Vector testPos( GetAbsOrigin().x, GetAbsOrigin().y, zEye ); 
+	Vector testPos(GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, zEye );
 	AI_TraceLOS( testPos, testPos + testDir * MAX_COORD_RANGE, this, &tr );
 	return (tr.startpos - tr.endpos ).Length();
 }
@@ -13286,12 +13286,12 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 	pMySequence->KeyValue( "m_iszPlay", pszSequence );
 	pMySequence->KeyValue( "m_iszPostIdle", pszExitSequence );
 	pMySequence->KeyValue( "m_fMoveTo", "5" );
-	pMySequence->SetAbsOrigin( GetAbsOrigin() );
+	pMySequence->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 
-	QAngle angDesired = GetAbsAngles();
+	QAngle angDesired = GetEngineObject()->GetAbsAngles();
 	angDesired[YAW] = m_flInteractionYaw;
 
-	pMySequence->SetAbsAngles( angDesired );
+	pMySequence->GetEngineObject()->SetAbsAngles( angDesired );
 	pMySequence->ForceSetTargetEntity( this, true );
 	pMySequence->SetName( szSSName );
  	pMySequence->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
@@ -13315,8 +13315,8 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 		pTheirSequence->KeyValue( "m_iszPlay", pszSequence );
 		pTheirSequence->KeyValue( "m_iszPostIdle", pszExitSequence );
 		pTheirSequence->KeyValue( "m_fMoveTo", "5" );
-		pTheirSequence->SetAbsOrigin( vecOtherOrigin );
-		pTheirSequence->SetAbsAngles( angOtherAngles );
+		pTheirSequence->GetEngineObject()->SetAbsOrigin( vecOtherOrigin );
+		pTheirSequence->GetEngineObject()->SetAbsAngles( angOtherAngles );
 		pTheirSequence->ForceSetTargetEntity( pOtherNPC, true );
 		pTheirSequence->SetName( szSSName );
 		pTheirSequence->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
@@ -13670,12 +13670,12 @@ bool CanNPCsTradePlaces( CAI_BaseNPC *pNPC1, CAI_BaseNPC *pNPC2, bool bDebug )
 
 	if ( bTest1At2 )
 	{
-		AI_TraceHull( pNPC2->GetAbsOrigin(), pNPC2->GetAbsOrigin(), pNPC1->GetHullMins(), pNPC1->GetHullMaxs(), MASK_SOLID, &traceFilter, &tr );
+		AI_TraceHull( pNPC2->GetEngineObject()->GetAbsOrigin(), pNPC2->GetEngineObject()->GetAbsOrigin(), pNPC1->GetHullMins(), pNPC1->GetHullMaxs(), MASK_SOLID, &traceFilter, &tr );
 		if ( tr.startsolid )
 		{
 			if ( bDebug )
 			{
-				NDebugOverlay::Box(  pNPC2->GetAbsOrigin(), pNPC1->GetHullMins(), pNPC1->GetHullMaxs(), 255,0,0, true, 1.0 );
+				NDebugOverlay::Box(  pNPC2->GetEngineObject()->GetAbsOrigin(), pNPC1->GetHullMins(), pNPC1->GetHullMaxs(), 255,0,0, true, 1.0 );
 			}
 			return false;
 		}
@@ -13683,12 +13683,12 @@ bool CanNPCsTradePlaces( CAI_BaseNPC *pNPC1, CAI_BaseNPC *pNPC2, bool bDebug )
 
 	if ( bTest2At1 )
 	{
-		AI_TraceHull( pNPC1->GetAbsOrigin(), pNPC1->GetAbsOrigin(), pNPC2->GetHullMins(), pNPC2->GetHullMaxs(), MASK_SOLID, &traceFilter, &tr );
+		AI_TraceHull( pNPC1->GetEngineObject()->GetAbsOrigin(), pNPC1->GetEngineObject()->GetAbsOrigin(), pNPC2->GetHullMins(), pNPC2->GetHullMaxs(), MASK_SOLID, &traceFilter, &tr );
 		if ( tr.startsolid )
 		{
 			if ( bDebug )
 			{
-				NDebugOverlay::Box(  pNPC1->GetAbsOrigin(), pNPC2->GetHullMins(), pNPC2->GetHullMaxs(), 255,0,0, true, 1.0 );
+				NDebugOverlay::Box(  pNPC1->GetEngineObject()->GetAbsOrigin(), pNPC2->GetHullMins(), pNPC2->GetHullMaxs(), 255,0,0, true, 1.0 );
 			}
 			return false;
 		}
@@ -13705,9 +13705,9 @@ bool CAI_BaseNPC::InteractionCouldStart( CAI_BaseNPC *pOtherNPC, ScriptedNPCInte
 {
 	// Get a matrix that'll convert from my local interaction space to world space
 	VMatrix matMeToWorld, matLocalToWorld;
-	QAngle angMyCurrent = GetAbsAngles();
+	QAngle angMyCurrent = GetEngineObject()->GetAbsAngles();
 	angMyCurrent[YAW] = m_flInteractionYaw;
-	matMeToWorld.SetupMatrixOrgAngles( GetAbsOrigin(), angMyCurrent );
+	matMeToWorld.SetupMatrixOrgAngles(GetEngineObject()->GetAbsOrigin(), angMyCurrent );
 	MatrixMultiply( matMeToWorld, pInteraction->matDesiredLocalToWorld, matLocalToWorld );
 
 	// Get the desired NPC position in worldspace
@@ -13721,7 +13721,7 @@ bool CAI_BaseNPC::InteractionCouldStart( CAI_BaseNPC *pOtherNPC, ScriptedNPCInte
 	}
 
 	// Determine whether or not the enemy is on the target
-	float flDistSqr = (vecOrigin - pOtherNPC->GetAbsOrigin()).LengthSqr();
+	float flDistSqr = (vecOrigin - pOtherNPC->GetEngineObject()->GetAbsOrigin()).LengthSqr();
 	if ( flDistSqr > pInteraction->flDistSqr )
 	{
 		if ( bDebug )
@@ -13731,7 +13731,7 @@ bool CAI_BaseNPC::InteractionCouldStart( CAI_BaseNPC *pOtherNPC, ScriptedNPCInte
 				if ( ai_debug_dyninteractions.GetFloat() == 2 )
 				{
 					Msg("   %s distsqr: %0.2f (%0.2f %0.2f %0.2f), desired: <%0.2f (%0.2f %0.2f %0.2f)\n", GetDebugName(), flDistSqr,
-						pOtherNPC->GetAbsOrigin().x, pOtherNPC->GetAbsOrigin().y, pOtherNPC->GetAbsOrigin().z, pInteraction->flDistSqr, vecOrigin.x, vecOrigin.y, vecOrigin.z );
+						pOtherNPC->GetEngineObject()->GetAbsOrigin().x, pOtherNPC->GetEngineObject()->GetAbsOrigin().y, pOtherNPC->GetEngineObject()->GetAbsOrigin().z, pInteraction->flDistSqr, vecOrigin.x, vecOrigin.y, vecOrigin.z );
 				}
 			}
 		}
@@ -13741,9 +13741,9 @@ bool CAI_BaseNPC::InteractionCouldStart( CAI_BaseNPC *pOtherNPC, ScriptedNPCInte
  	if ( bDebug )
 	{
 		Msg("DYNINT: (%s) testing interaction \"%s\"\n", GetDebugName(), STRING(pInteraction->iszInteractionName) );
-		Msg("   %s is at: %0.2f %0.2f %0.2f\n", GetDebugName(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		Msg("   %s is at: %0.2f %0.2f %0.2f\n", GetDebugName(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 		Msg("   %s distsqr: %0.2f (%0.2f %0.2f %0.2f), desired: (%0.2f %0.2f %0.2f)\n", GetDebugName(), flDistSqr,
-			pOtherNPC->GetAbsOrigin().x, pOtherNPC->GetAbsOrigin().y, pOtherNPC->GetAbsOrigin().z, vecOrigin.x, vecOrigin.y, vecOrigin.z );
+			pOtherNPC->GetEngineObject()->GetAbsOrigin().x, pOtherNPC->GetEngineObject()->GetAbsOrigin().y, pOtherNPC->GetEngineObject()->GetAbsOrigin().z, vecOrigin.x, vecOrigin.y, vecOrigin.z );
 
 		if ( pOtherNPC )
 		{
@@ -13755,7 +13755,7 @@ bool CAI_BaseNPC::InteractionCouldStart( CAI_BaseNPC *pOtherNPC, ScriptedNPCInte
 	// Angle check, if we're supposed to
 	if ( pInteraction->iFlags & SCNPC_FLAG_TEST_OTHER_ANGLES )
 	{
-		QAngle angEnemyAngles = pOtherNPC->GetAbsAngles();
+		QAngle angEnemyAngles = pOtherNPC->GetEngineObject()->GetAbsAngles();
 		bool bMatches = true;
 		for ( int ang = 0; ang < 3; ang++ )
 		{
@@ -13975,18 +13975,18 @@ void CAI_BaseNPC::CalculateForcedInteractionPosition( void )
    	ScriptedNPCInteraction_t *pInteraction = GetRunningDynamicInteraction();
 
 	// Pretend I was facing the target, and extrapolate from that the position I should be at
-	Vector vecToTarget = m_hForcedInteractionPartner->GetAbsOrigin() - GetAbsOrigin();
+	Vector vecToTarget = m_hForcedInteractionPartner->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( vecToTarget );
 	QAngle angToTarget;
 	VectorAngles( vecToTarget, angToTarget );
 
 	// Get the desired position in worldspace, relative to the target
 	VMatrix matMeToWorld, matLocalToWorld;
- 	matMeToWorld.SetupMatrixOrgAngles( GetAbsOrigin(), angToTarget );
+ 	matMeToWorld.SetupMatrixOrgAngles(GetEngineObject()->GetAbsOrigin(), angToTarget );
 	MatrixMultiply( matMeToWorld, pInteraction->matDesiredLocalToWorld, matLocalToWorld );
 
- 	Vector vecOrigin = GetAbsOrigin() - matLocalToWorld.GetTranslation();
- 	m_vecForcedWorldPosition = m_hForcedInteractionPartner->GetAbsOrigin() + vecOrigin;
+ 	Vector vecOrigin = GetEngineObject()->GetAbsOrigin() - matLocalToWorld.GetTranslation();
+ 	m_vecForcedWorldPosition = m_hForcedInteractionPartner->GetEngineObject()->GetAbsOrigin() + vecOrigin;
 
 	//NDebugOverlay::Axis( m_vecForcedWorldPosition, angToTarget, 20, true, 3.0 );
 }
@@ -14056,14 +14056,14 @@ bool CAI_BaseNPC::CouldShootIfCrouching( CBaseEntity *pTarget )
 	Vector vecTarget;
 	if (GetActiveWeapon())
 	{
-		vecTarget = pTarget->BodyTarget( GetActiveWeapon()->GetLocalOrigin() );
+		vecTarget = pTarget->BodyTarget( GetActiveWeapon()->GetEngineObject()->GetLocalOrigin() );
 	}
 	else 
 	{
-		vecTarget = pTarget->BodyTarget( GetLocalOrigin() );
+		vecTarget = pTarget->BodyTarget(GetEngineObject()->GetLocalOrigin() );
 	}
 
-	bool bResult = WeaponLOSCondition( GetLocalOrigin(), vecTarget, false );
+	bool bResult = WeaponLOSCondition(GetEngineObject()->GetLocalOrigin(), vecTarget, false );
 
 	if ( bWasStanding )
 	{
@@ -14111,7 +14111,7 @@ Vector CAI_BaseNPC::Weapon_ShootPosition( void )
 	}
 
 	if  ( !bStanding )
-		return (GetAbsOrigin() + GetCrouchGunOffset() + right * 8);
+		return (GetEngineObject()->GetAbsOrigin() + GetCrouchGunOffset() + right * 8);
 
 	return BaseClass::Weapon_ShootPosition();
 }

@@ -309,7 +309,7 @@ void CNPC_Tentacle::Spawn( )
 
 	SetTouch( &CNPC_Tentacle::HitTouch );
 
-	m_flInitialYaw = GetAbsAngles().y;
+	m_flInitialYaw = GetEngineObject()->GetAbsAngles().y;
 	GetMotor()->SetIdealYawAndUpdate( m_flInitialYaw );
 	
 	g_fFlySound = FALSE;
@@ -322,7 +322,7 @@ void CNPC_Tentacle::Spawn( )
 
 	m_NPCState = NPC_STATE_IDLE;
 
-	UTIL_SetOrigin( this, GetAbsOrigin() );
+	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() );
 
 	CreateVPhysics();
 
@@ -489,7 +489,7 @@ void CNPC_Tentacle::Cycle( void )
 
 	if ( m_NPCState == NPC_STATE_SCRIPT || GetIdealState() == NPC_STATE_SCRIPT)
 	{
-		SetAbsAngles( QAngle( GetAbsAngles().x, m_flInitialYaw, GetAbsAngles().z ) );
+		GetEngineObject()->SetAbsAngles( QAngle(GetEngineObject()->GetAbsAngles().x, m_flInitialYaw, GetEngineObject()->GetAbsAngles().z ) );
 		GetMotor()->SetIdealYaw( m_flInitialYaw );	
 		RemoveIgnoredConditions();
 		NPCThink( );
@@ -521,11 +521,11 @@ void CNPC_Tentacle::Cycle( void )
 		if ( gpGlobals->curtime - m_flPrevSoundTime < 0.5 )
 		{
 			float dt = gpGlobals->curtime - m_flPrevSoundTime;
-			vecDir = pSound->GetSoundOrigin() + (pSound->GetSoundOrigin() - m_vecPrevSound) / dt - GetAbsOrigin();
+			vecDir = pSound->GetSoundOrigin() + (pSound->GetSoundOrigin() - m_vecPrevSound) / dt - GetEngineObject()->GetAbsOrigin();
 		}
 		else
 		{
-			vecDir = pSound->GetSoundOrigin() - GetAbsOrigin();
+			vecDir = pSound->GetSoundOrigin() - GetEngineObject()->GetAbsOrigin();
 		}
 
 		m_flPrevSoundTime = gpGlobals->curtime;
@@ -544,7 +544,7 @@ void CNPC_Tentacle::Cycle( void )
 		if (m_flSoundTime < gpGlobals->curtime)
 		{
 			// play "I hear new something" sound
-			 UTIL_EmitAmbientSound( GetSoundSourceIndex(), GetAbsOrigin() + Vector( 0, 0, MyHeight()), "Tentacle.Alert", 1.0, SNDLVL_GUNFIRE, 0, 100);
+			 UTIL_EmitAmbientSound( GetSoundSourceIndex(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, MyHeight()), "Tentacle.Alert", 1.0, SNDLVL_GUNFIRE, 0, 100);
 		}
 		m_flSoundTime = gpGlobals->curtime + random->RandomFloat( 5.0, 10.0 );
 	}
@@ -802,14 +802,14 @@ void CNPC_Tentacle::Cycle( void )
 		case TENTACLE_ANIM_Lev3_Tap:
 			{
 				Vector vecSrc, v_forward;
-				AngleVectors( GetAbsAngles(), &v_forward );
+				AngleVectors(GetEngineObject()->GetAbsAngles(), &v_forward );
 
 				trace_t tr1, tr2;
 
-				vecSrc = GetAbsOrigin() + Vector( 0, 0, MyHeight() - 4);
+				vecSrc = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, MyHeight() - 4);
 				UTIL_TraceLine( vecSrc, vecSrc + v_forward * 512, MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr1 );
 
-				vecSrc = GetAbsOrigin() + Vector( 0, 0, MyHeight() + 8);
+				vecSrc = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, MyHeight() + 8);
 				UTIL_TraceLine( vecSrc, vecSrc + v_forward * 512, MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr2 );
 
 				// ALERT( at_console, "%f %f\n", tr1.flFraction * 512, tr2.flFraction * 512 );
@@ -882,7 +882,7 @@ void CNPC_Tentacle::HandleAnimEvent( animevent_t *pEvent )
 	case 2:	// tap scrape
 	case 6: // light tap
 		{
-			Vector vecSrc = GetAbsOrigin() + m_flTapRadius * Vector( cos( GetAbsAngles().y * (M_PI / 180.0) ), sin( GetAbsAngles().y * (M_PI / 180.0) ), 0.0 );
+			Vector vecSrc = GetEngineObject()->GetAbsOrigin() + m_flTapRadius * Vector( cos(GetEngineObject()->GetAbsAngles().y * (M_PI / 180.0) ), sin(GetEngineObject()->GetAbsAngles().y * (M_PI / 180.0) ), 0.0 );
 
 			vecSrc.z += MyHeight( );
 
@@ -907,15 +907,15 @@ void CNPC_Tentacle::HandleAnimEvent( animevent_t *pEvent )
 
 
 	case 7: // roar
-		UTIL_EmitAmbientSound( GetSoundSourceIndex(), GetAbsOrigin() + Vector( 0, 0, MyHeight()), "Tentacle.Roar", 1.0, SNDLVL_GUNFIRE, 0, 100);
+		UTIL_EmitAmbientSound( GetSoundSourceIndex(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, MyHeight()), "Tentacle.Roar", 1.0, SNDLVL_GUNFIRE, 0, 100);
 		break;
 
 	case 8: // search
-		UTIL_EmitAmbientSound( GetSoundSourceIndex(), GetAbsOrigin() + Vector( 0, 0, MyHeight()), "Tentacle.Search", 1.0, SNDLVL_GUNFIRE, 0, 100);
+		UTIL_EmitAmbientSound( GetSoundSourceIndex(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, MyHeight()), "Tentacle.Search", 1.0, SNDLVL_GUNFIRE, 0, 100);
 		break;
 
 	case 9: // swing
-		UTIL_EmitAmbientSound( GetSoundSourceIndex(), GetAbsOrigin() + Vector( 0, 0, MyHeight()), "Tentacle.Swing", 1.0, SNDLVL_GUNFIRE, 0, 100);
+		UTIL_EmitAmbientSound( GetSoundSourceIndex(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, MyHeight()), "Tentacle.Swing", 1.0, SNDLVL_GUNFIRE, 0, 100);
 		break;
 	default:
 		BaseClass::HandleAnimEvent( pEvent );
@@ -938,10 +938,10 @@ void CNPC_Tentacle::HitTouch( CBaseEntity *pOther )
 	{
 		CTakeDamageInfo info( this, this, m_iHitDmg, DMG_CLUB );
 
-		Vector vDamageForce = pOther->GetAbsOrigin() - GetAbsOrigin();
+		Vector vDamageForce = pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 		VectorNormalize( vDamageForce );
 
-		CalculateMeleeDamageForce( &info, vDamageForce, pOther->GetAbsOrigin() );
+		CalculateMeleeDamageForce( &info, vDamageForce, pOther->GetEngineObject()->GetAbsOrigin() );
 		pOther->TakeDamage( info );
 
 		m_flHitTime = gpGlobals->curtime + 0.5;

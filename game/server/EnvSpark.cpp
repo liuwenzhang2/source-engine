@@ -130,7 +130,7 @@ void CEnvSpark::SparkThink(void)
 	Vector vecDir = vec3_origin;
 	if ( FBitSet( m_spawnflags, SF_SPARK_DIRECTIONAL ) )
 	{
-		AngleVectors( GetAbsAngles(), &vecDir );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &vecDir );
 	}
 
 	DoSpark( this, WorldSpaceCenter(), m_nMagnitude, m_nTrailLength, !( m_spawnflags & SF_SPARK_SILENT ), vecDir );
@@ -139,8 +139,8 @@ void CEnvSpark::SparkThink(void)
 
 	if (FBitSet(m_spawnflags, SF_SPARK_GLOW))
 	{
-		CPVSFilter filter( GetAbsOrigin() );
-		te->GlowSprite( filter, 0.0, &GetAbsOrigin(), m_nGlowSpriteIndex, 0.2, 1.5, 25 );
+		CPVSFilter filter(GetEngineObject()->GetAbsOrigin() );
+		te->GlowSprite( filter, 0.0, &GetEngineObject()->GetAbsOrigin(), m_nGlowSpriteIndex, 0.2, 1.5, 25 );
 	}
 }
 

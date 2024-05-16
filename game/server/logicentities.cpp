@@ -575,7 +575,7 @@ void CLogicLineToEntity::Think(void)
 	}
 
 	Vector delta;
-	VectorSubtract( pDest->GetAbsOrigin(), pSrc->GetAbsOrigin(), delta ); 
+	VectorSubtract( pDest->GetEngineObject()->GetAbsOrigin(), pSrc->GetEngineObject()->GetAbsOrigin(), delta );
 	m_Line.Set(delta, this, this);
 
 	SetNextThink( gpGlobals->curtime + 0.01f );

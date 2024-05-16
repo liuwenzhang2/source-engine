@@ -3379,7 +3379,7 @@ void CNavMesh::AddWalkableSeeds( void )
 	if (spawn )
 	{
 		// snap it to the sampling grid
-		Vector pos = spawn->GetAbsOrigin();
+		Vector pos = spawn->GetEngineObject()->GetAbsOrigin();
 		pos.x = TheNavMesh->SnapToGrid( pos.x );
 		pos.y = TheNavMesh->SnapToGrid( pos.y );
 
@@ -3903,7 +3903,7 @@ bool CNavMesh::UpdateGeneration( float maxTime )
 					{
 						eyePos.z += HalfHumanHeight - StepHeight;	// players light from their centers, and we light from slightly below that, to allow for low ceilings
 					}
-					host->SetAbsOrigin( eyePos );
+					host->GetEngineObject()->SetAbsOrigin( eyePos );
 					AnalysisProgress( "Finding light intensity...", 100, 100 * (TheNavAreas.Count() - s_unlitAreas.Count()) / TheNavAreas.Count() );
 					s_movedPlayerToArea = moveArea->GetID();
 					s_playerSettleTimer.Start( 0.1f );

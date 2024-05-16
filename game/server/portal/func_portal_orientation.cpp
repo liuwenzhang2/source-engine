@@ -47,7 +47,7 @@ bool UTIL_TestForOrientationVolumes( QAngle& vecCurAngles, const Vector& vecCurO
 		}
 
 		if ( IsOBBIntersectingOBB( vecCurOrigin, vecCurAngles, CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs, 
-			pList->GetAbsOrigin(), pList->GetCollideable()->GetCollisionAngles(), pList->GetCollideable()->OBBMins(), pList->GetCollideable()->OBBMaxs() ) )
+			pList->GetEngineObject()->GetAbsOrigin(), pList->GetCollideable()->GetCollisionAngles(), pList->GetCollideable()->OBBMins(), pList->GetCollideable()->OBBMaxs() ) )
 		{
 			QAngle vecGoalAngles;
 			// Ent is marked to match angles of it's linked partner
@@ -59,7 +59,7 @@ bool UTIL_TestForOrientationVolumes( QAngle& vecCurAngles, const Vector& vecCurO
 				if ( !pLinked || !(AnglesAreEqual( vecCurAngles.x, -90.0f, 0.1f ) || AnglesAreEqual( vecCurAngles.x, 90.0f, 0.1f )) )
 					return false;
 
-				vecGoalAngles = pLinked->GetAbsAngles();
+				vecGoalAngles = pLinked->GetEngineObject()->GetAbsAngles();
 				vecCurAngles.y = 0.0f;
 				vecCurAngles.z = vecGoalAngles.z;
 			}
@@ -131,8 +131,8 @@ void CFuncPortalOrientation::OnActivate( void )
 		for( int i = 0; i != iPortalCount; ++i )
 		{
 			CProp_Portal *pTempPortal = pPortals[i];
-			if( IsOBBIntersectingOBB( pTempPortal->GetAbsOrigin(), pTempPortal->GetAbsAngles(), CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs, 
-			GetAbsOrigin(), GetCollideable()->GetCollisionAngles(), GetCollideable()->OBBMins(), GetCollideable()->OBBMaxs() ) )
+			if( IsOBBIntersectingOBB( pTempPortal->GetEngineObject()->GetAbsOrigin(), pTempPortal->GetEngineObject()->GetAbsAngles(), CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs,
+			GetEngineObject()->GetAbsOrigin(), GetCollideable()->GetCollisionAngles(), GetCollideable()->OBBMins(), GetCollideable()->OBBMaxs() ) )
 			{
 				QAngle angNewAngles;
 				if ( m_bMatchLinkedAngles )
@@ -141,14 +141,14 @@ void CFuncPortalOrientation::OnActivate( void )
 					if ( !pLinked )
 						return;
 
-					angNewAngles = pTempPortal->m_hLinkedPortal->GetAbsAngles();
+					angNewAngles = pTempPortal->m_hLinkedPortal->GetEngineObject()->GetAbsAngles();
 				}
 				else
 				{
 					angNewAngles = m_vecAnglesToFace;
 				}
 
-				pTempPortal->PlacePortal( pTempPortal->GetAbsOrigin(), angNewAngles, PORTAL_ANALOG_SUCCESS_NO_BUMP );
+				pTempPortal->PlacePortal( pTempPortal->GetEngineObject()->GetAbsOrigin(), angNewAngles, PORTAL_ANALOG_SUCCESS_NO_BUMP );
 			}
 		}
 	}

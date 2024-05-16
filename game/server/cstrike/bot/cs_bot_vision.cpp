@@ -29,16 +29,16 @@ inline float StayOnLadderLine( CCSBot *me, const CNavLadder *ladder )
 	switch( faceDir )
 	{
 		case NORTH:
-			return stiffness * (ladder->m_top.x - me->GetAbsOrigin().x);
+			return stiffness * (ladder->m_top.x - me->GetEngineObject()->GetAbsOrigin().x);
 
 		case SOUTH:
-			return -stiffness * (ladder->m_top.x - me->GetAbsOrigin().x);
+			return -stiffness * (ladder->m_top.x - me->GetEngineObject()->GetAbsOrigin().x);
 
 		case WEST:
-			return -stiffness * (ladder->m_top.y - me->GetAbsOrigin().y);
+			return -stiffness * (ladder->m_top.y - me->GetEngineObject()->GetAbsOrigin().y);
 
 		case EAST:
-			return stiffness * (ladder->m_top.y - me->GetAbsOrigin().y);
+			return stiffness * (ladder->m_top.y - me->GetEngineObject()->GetAbsOrigin().y);
 	}
 
 	return 0.0f;
@@ -460,7 +460,7 @@ void CCSBot::ComputePartPositions( CCSPlayer *player )
 	PartInfo *info = &m_partInfo[ player->entindex() % MAX_PLAYERS ];
 
 	// always compute feet, since it doesn't rely on bones
-	info->m_feetPos = player->GetAbsOrigin();
+	info->m_feetPos = player->GetEngineObject()->GetAbsOrigin();
 	info->m_feetPos.z += 5.0f;
 
 	// get bone positions for interesting points on the player
@@ -718,10 +718,10 @@ void CCSBot::UpdateLookAround( bool updateNow )
 	{
 		// update approach points
 		const float recomputeApproachPointTolerance = 50.0f;
-		if ((m_approachPointViewPosition - GetAbsOrigin()).IsLengthGreaterThan( recomputeApproachPointTolerance ))
+		if ((m_approachPointViewPosition - GetEngineObject()->GetAbsOrigin()).IsLengthGreaterThan( recomputeApproachPointTolerance ))
 		{
 			ComputeApproachPoints();
-			m_approachPointViewPosition = GetAbsOrigin();
+			m_approachPointViewPosition = GetEngineObject()->GetAbsOrigin();
 		}
 
 		// if we're sniping, zoom in to watch our approach points
@@ -1094,7 +1094,7 @@ bool CCSBot::IsNoticable( const CCSPlayer *player, unsigned char visParts ) cons
 
 
 	// compute range modifier - farther away players are harder to notice, depeding on what they are doing
-	float range = (player->GetAbsOrigin() - GetAbsOrigin()).Length();
+	float range = (player->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
 	const float closeRange = 300.0f;
 	const float farRange = 1000.0f;
 
@@ -1118,7 +1118,7 @@ bool CCSBot::IsNoticable( const CCSPlayer *player, unsigned char visParts ) cons
 
 
 	// moving players are easier to spot
-	float playerSpeedSq = player->GetAbsVelocity().LengthSqr();
+	float playerSpeedSq = player->GetEngineObject()->GetAbsVelocity().LengthSqr();
 	const float runSpeed = 200.0f;
 	const float walkSpeed = 30.0f;
 	float farChance, closeChance;
@@ -1270,7 +1270,7 @@ CCSPlayer *CCSBot::FindMostDangerousThreat( void )
 					m_watchInfo[idx].isEnemy = false;
 
 					// keep track of our closest friend 
-					Vector to = GetAbsOrigin() - player->GetAbsOrigin();
+					Vector to = GetEngineObject()->GetAbsOrigin() - player->GetEngineObject()->GetAbsOrigin();
 					float rangeSq = to.LengthSqr();
 					if (rangeSq < closeFriendRange)
 					{
@@ -1315,7 +1315,7 @@ CCSPlayer *CCSBot::FindMostDangerousThreat( void )
 			}
 
 			// keep track of all visible threats
-			Vector d = GetAbsOrigin() - player->GetAbsOrigin();
+			Vector d = GetEngineObject()->GetAbsOrigin() - player->GetEngineObject()->GetAbsOrigin();
 			float distSq = d.LengthSqr();
 
 			// track enemy sniper threats
@@ -1675,7 +1675,7 @@ float CCSBot::GetRangeToNearestRecognizedEnemy( void )
 	const CCSPlayer *enemy = GetRecognizedEnemy();
 
 	if (enemy)
-		return (GetAbsOrigin() - enemy->GetAbsOrigin()).Length();
+		return (GetEngineObject()->GetAbsOrigin() - enemy->GetEngineObject()->GetAbsOrigin()).Length();
 
 	return 99999999.9f;
 }

@@ -22,7 +22,7 @@
 #include "tier0/memdbgon.h"
 
 #define REPORTFAILURE(text) if ( hintCriteria.HasFlag( bits_HINT_NODE_REPORT_FAILURES ) ) \
-								NDebugOverlay::Text( GetAbsOrigin(), text, false, 60 )
+								NDebugOverlay::Text( GetEngineObject()->GetAbsOrigin(), text, false, 60 )
 
 //==================================================
 // CHintCriteria
@@ -547,7 +547,7 @@ CAI_Hint* CAI_HintManager::FindHint( CAI_BaseNPC *pNPC, Hint_e nHintType, int nF
 	}
 
 	// Add the search position
-	Vector vecPosition = ( pMaxDistFrom != NULL ) ? (*pMaxDistFrom) : pNPC->GetAbsOrigin();
+	Vector vecPosition = ( pMaxDistFrom != NULL ) ? (*pMaxDistFrom) : pNPC->GetEngineObject()->GetAbsOrigin();
 	hintCriteria.AddIncludePosition( vecPosition, flMaxDist );
 
 	// If asking for a random node, use random logic instead
@@ -576,7 +576,7 @@ CAI_Hint *CAI_HintManager::FindHint( CAI_BaseNPC *pNPC, const CHintCriteria &hin
 	if ( pNPC == NULL )
 		return NULL;
 
-	return FindHint( pNPC, pNPC->GetAbsOrigin(), hintCriteria );
+	return FindHint( pNPC, pNPC->GetEngineObject()->GetAbsOrigin(), hintCriteria );
 }
 
 //------------------------------------------------------------------------------
@@ -603,7 +603,7 @@ CAI_Hint* CAI_HintManager::CreateHint( HintNodeData *pNodeData, const char *pMap
 		}
 
 		pHint->SetName( STRING( pNodeData->strEntityName) );
-		pHint->SetAbsOrigin( pNodeData->vecPosition );
+		pHint->GetEngineObject()->SetAbsOrigin( pNodeData->vecPosition );
 		memcpy( &(pHint->m_NodeData), pNodeData, sizeof(HintNodeData) );
 		DispatchSpawn( pHint );
 
@@ -764,7 +764,7 @@ void CAI_HintManager::DumpHints()
 	CAI_Hint *pCurHint = GetFirstHint( &iter );
 	while (pCurHint)
 	{
-		const Vector &v = pCurHint->GetAbsOrigin();
+		const Vector &v = pCurHint->GetEngineObject()->GetAbsOrigin();
 		Msg( "(%.1f, %.1f, %.1f) -- Node ID: %d; WC id %d; type %d\n",
 				v.x, v.y, v.z,
 				pCurHint->GetNodeId(),
@@ -821,7 +821,7 @@ void CAI_HintManager::DrawHintOverlays(float flDrawDuration)
 		}
 		else
 		{
-			vHintPos = pHint->GetAbsOrigin();
+			vHintPos = pHint->GetEngineObject()->GetAbsOrigin();
 		}
 
 		if ( pHint->GetNodeId() != NO_NODE )
@@ -962,7 +962,7 @@ void CAI_Hint::GetPosition(CBaseCombatCharacter *pBCC, Vector *vPosition)
 	}
 	else
 	{
-		*vPosition = GetAbsOrigin();
+		*vPosition = GetEngineObject()->GetAbsOrigin();
 	}
 }
 
@@ -979,7 +979,7 @@ void CAI_Hint::GetPosition( Hull_t hull, Vector *vPosition )
 	}
 	else
 	{
-		*vPosition = GetAbsOrigin();
+		*vPosition = GetEngineObject()->GetAbsOrigin();
 	}
 }
 
@@ -1012,7 +1012,7 @@ float CAI_Hint::Yaw(void)
 	}
 	else
 	{
-		return GetLocalAngles().y;
+		return GetEngineObject()->GetLocalAngles().y;
 	}
 }
 
@@ -1056,7 +1056,7 @@ bool CAI_Hint::IsInNodeFOV( CBaseEntity *pOther )
 	NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + m_vecForward * 16, 255, 255, 0, false, 1 );
 #endif
 
-	Vector vecToNPC = pOther->GetAbsOrigin() - GetAbsOrigin();
+	Vector vecToNPC = pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( vecToNPC );
 	float flDot = DotProduct( vecToNPC, m_vecForward );
 
@@ -1172,14 +1172,14 @@ bool CAI_Hint::HintMatchesCriteria( CAI_BaseNPC *pNPC, const CHintCriteria &hint
 	}
 
 	// If we're watching for include zones, test it
-	if ( ( hintCriteria.HasIncludeZones() ) && ( hintCriteria.InIncludedZone( GetAbsOrigin() ) == false ) )
+	if ( ( hintCriteria.HasIncludeZones() ) && ( hintCriteria.InIncludedZone(GetEngineObject()->GetAbsOrigin() ) == false ) )
 	{
 		REPORTFAILURE( "Not inside include zones." );
 		return false;
 	}
 
 	// If we're watching for exclude zones, test it
-	if ( ( hintCriteria.HasExcludeZones() ) && ( hintCriteria.InExcludedZone( GetAbsOrigin() ) ) )
+	if ( ( hintCriteria.HasExcludeZones() ) && ( hintCriteria.InExcludedZone(GetEngineObject()->GetAbsOrigin() ) ) )
 	{
 		REPORTFAILURE( "Inside exclude zones." );
 		return false;
@@ -1216,7 +1216,7 @@ bool CAI_Hint::HintMatchesCriteria( CAI_BaseNPC *pNPC, const CHintCriteria &hint
 		}
 		else
 		{
-			if( !pNPC->FInAimCone( GetAbsOrigin() ) )
+			if( !pNPC->FInAimCone(GetEngineObject()->GetAbsOrigin() ) )
 			{
 				REPORTFAILURE( "Hint isn't in NPC's aimcone" );
 				return false;
@@ -1250,7 +1250,7 @@ bool CAI_Hint::HintMatchesCriteria( CAI_BaseNPC *pNPC, const CHintCriteria &hint
 		{
 			if( pNPC->GetEnemy() )
 			{
-				float flDistHintToEnemySqr = GetAbsOrigin().DistToSqr( pNPC->GetEnemy()->GetAbsOrigin() ) ;
+				float flDistHintToEnemySqr = GetEngineObject()->GetAbsOrigin().DistToSqr( pNPC->GetEnemy()->GetEngineObject()->GetAbsOrigin() ) ;
 
 				if( flDistHintToEnemySqr < Square( 30.0f * 12.0f ) )
 				{
@@ -1311,7 +1311,7 @@ bool CAI_Hint::HintMatchesCriteria( CAI_BaseNPC *pNPC, const CHintCriteria &hint
 		{
 			trace_t tr;
 			// Can my bounding box fit there?
-			AI_TraceHull ( GetAbsOrigin(), GetAbsOrigin(), pNPC->WorldAlignMins(), pNPC->WorldAlignMaxs(), 
+			AI_TraceHull (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), pNPC->WorldAlignMins(), pNPC->WorldAlignMaxs(),
 				MASK_SOLID, pNPC, COLLISION_GROUP_NONE, &tr );
 
 			if ( tr.fraction != 1.0 )
@@ -1328,7 +1328,7 @@ bool CAI_Hint::HintMatchesCriteria( CAI_BaseNPC *pNPC, const CHintCriteria &hint
 		Assert( flNearestDistance );
 
 		// Calculate our distance
-		float distance = (GetAbsOrigin() - position).Length();
+		float distance = (GetEngineObject()->GetAbsOrigin() - position).Length();
 
 		// Must be closer than the current best
 		if ( distance > *flNearestDistance )
@@ -1347,7 +1347,7 @@ bool CAI_Hint::HintMatchesCriteria( CAI_BaseNPC *pNPC, const CHintCriteria &hint
 
 		if( pPlayer != NULL )
 		{
-			Vector vecDest = GetAbsOrigin(); 
+			Vector vecDest = GetEngineObject()->GetAbsOrigin();
 
 			if( hintCriteria.HasFlag(bits_HAS_EYEPOSITION_LOS_TO_PLAYER) )
 			{
@@ -1375,14 +1375,14 @@ bool CAI_Hint::HintMatchesCriteria( CAI_BaseNPC *pNPC, const CHintCriteria &hint
 			{
 				// Only spawn if the player's looking away from me
 				Vector vLookDir = pPlayer->EyeDirection3D();
-				Vector vTargetDir = GetAbsOrigin() - pPlayer->EyePosition();
+				Vector vTargetDir = GetEngineObject()->GetAbsOrigin() - pPlayer->EyePosition();
 				VectorNormalize(vTargetDir);
 
 				float fDotPr = DotProduct(vLookDir,vTargetDir);
 				if ( fDotPr > 0 )
 				{
 					trace_t tr;
-					UTIL_TraceLine( pPlayer->EyePosition(), GetAbsOrigin(), MASK_SOLID_BRUSHONLY, pPlayer, COLLISION_GROUP_NONE, &tr);
+					UTIL_TraceLine( pPlayer->EyePosition(), GetEngineObject()->GetAbsOrigin(), MASK_SOLID_BRUSHONLY, pPlayer, COLLISION_GROUP_NONE, &tr);
 					
 					if ( tr.fraction == 1.0 )
 					{

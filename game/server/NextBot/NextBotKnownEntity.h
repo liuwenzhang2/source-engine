@@ -42,7 +42,7 @@ public:
 	{
 		if ( m_who.Get() )
 		{
-			m_lastKnownPostion = m_who->GetAbsOrigin();
+			m_lastKnownPostion = m_who->GetEngineObject()->GetAbsOrigin();
 			m_lastKnownArea = m_who->MyCombatCharacterPointer() ? m_who->MyCombatCharacterPointer()->GetLastKnownArea() : NULL;
 			m_whenLastKnown = gpGlobals->curtime;
 		}

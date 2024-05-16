@@ -68,7 +68,7 @@ float PercentageOfFlashForPlayer(CBaseEntity *player, Vector flashPos, CBaseEnti
 		float flInnerRadius = SMOKEGRENADE_PARTICLERADIUS;
 //		float flOutterRadius = flInnerRadius + ( 0.5 * SMOKEPARTICLE_SIZE );
 
-		Vector vPos = pSGren->GetAbsOrigin();
+		Vector vPos = pSGren->GetEngineObject()->GetAbsOrigin();
 
 		/*debugoverlay->AddBoxOverlay( pSGren->GetAbsOrigin(), Vector( flInnerRadius, flInnerRadius, flInnerRadius ),
 			Vector( -flInnerRadius, -flInnerRadius, -flInnerRadius ), QAngle( 0, 0, 0 ), 0, 255, 0, 30, 10 );
@@ -245,7 +245,7 @@ CFlashbangProjectile* CFlashbangProjectile::Create(
 	
 	// Set the timer for 1 second less than requested. We're going to issue a SOUND_DANGER
 	// one second before detonation.
-	pGrenade->SetAbsVelocity( velocity );
+	pGrenade->GetEngineObject()->SetAbsVelocity( velocity );
 	pGrenade->SetupInitialTransmittedGrenadeVelocity( velocity );
 	pGrenade->SetThrower( pOwner );
 	pGrenade->m_flDamage = 100;
@@ -288,7 +288,7 @@ void CFlashbangProjectile::Precache()
 
 void CFlashbangProjectile::Detonate()
 {
-	RadiusFlash ( GetAbsOrigin(), this, GetThrower(), 4, CLASS_NONE, DMG_BLAST );
+	RadiusFlash (GetEngineObject()->GetAbsOrigin(), this, GetThrower(), 4, CLASS_NONE, DMG_BLAST );
 	const char* soundname = "Flashbang.Explode";
 	CPASAttenuationFilter filter(this, soundname);
 
@@ -307,9 +307,9 @@ void CFlashbangProjectile::Detonate()
 		if ( event )
 		{
 			event->SetInt( "userid", player->GetUserID() );
-			event->SetFloat( "x", GetAbsOrigin().x );
-			event->SetFloat( "y", GetAbsOrigin().y );
-			event->SetFloat( "z", GetAbsOrigin().z );
+			event->SetFloat( "x", GetEngineObject()->GetAbsOrigin().x );
+			event->SetFloat( "y", GetEngineObject()->GetAbsOrigin().y );
+			event->SetFloat( "z", GetEngineObject()->GetAbsOrigin().z );
 			gameeventmanager->FireEvent( event );
 		}
 	}

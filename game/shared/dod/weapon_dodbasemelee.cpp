@@ -186,7 +186,7 @@ CBaseEntity *CWeaponDODBaseMelee::MeleeAttack( int iDamageAmount, int iDamageTyp
 			CDODPlayer *pVictim = ToDODPlayer((CBaseEntity*)tr.m_pEnt );
 
 			Vector victimForward;
-			AngleVectors( pVictim->GetAbsAngles(), &victimForward );
+			AngleVectors( pVictim->GetEngineObject()->GetAbsAngles(), &victimForward );
 
 			if ( DotProduct( victimForward, vForward ) > 0.3 )
 			{

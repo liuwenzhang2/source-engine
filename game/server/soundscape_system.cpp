@@ -117,9 +117,9 @@ void CSoundscapeSystem::PrintDebugInfo()
 		Msg("- %d: %s x:%.4f y:%.4f z:%.4f\n", 
 			entityIndex, 
 			STRING(currentSoundscape->GetSoundscapeName()), 
-			currentSoundscape->GetAbsOrigin().x,
-			currentSoundscape->GetAbsOrigin().y,
-			currentSoundscape->GetAbsOrigin().z
+			currentSoundscape->GetEngineObject()->GetAbsOrigin().x,
+			currentSoundscape->GetEngineObject()->GetAbsOrigin().y,
+			currentSoundscape->GetEngineObject()->GetAbsOrigin().z
 			);
 	}
 	Msg( "----------------------------------\n\n" );
@@ -219,7 +219,7 @@ void CSoundscapeSystem::LevelInitPostEntity()
 	// add this soundscape to the list of soundscapes for that cluster, clip cluster bounds to radius
 	for ( int i = 0; i < m_soundscapeEntities.Count(); i++ )
 	{
-		Vector position = m_soundscapeEntities[i]->GetAbsOrigin();
+		Vector position = m_soundscapeEntities[i]->GetEngineObject()->GetAbsOrigin();
 		float radius = m_soundscapeEntities[i]->m_flRadius;
 		float radiusSq = radius * radius;
 		engine->GetPVSForCluster( engine->GetClusterForOrigin( position ), sizeof( myPVS ), myPVS );

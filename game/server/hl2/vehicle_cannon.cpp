@@ -680,7 +680,7 @@ void CPropCannon::LaunchProjectile( void )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	UTIL_ScreenShake( GetDriver()->GetAbsOrigin(), 50.0, 150.0, 1.0, 750, SHAKE_START, true );
+	UTIL_ScreenShake( GetDriver()->GetEngineObject()->GetAbsOrigin(), 50.0, 150.0, 1.0, 750, SHAKE_START, true );
 }
 
 //========================================================================================================================================

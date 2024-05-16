@@ -310,7 +310,7 @@ void CDODBombTarget::Explode( void )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
-	Vector origin = GetAbsOrigin();
+	Vector origin = GetEngineObject()->GetAbsOrigin();
 
 	CPASFilter filter( origin );
 
@@ -332,8 +332,8 @@ void CDODBombTarget::Explode( void )
 	// stun players in a radius
 	const float flStunDamage = 100;
 
-	CTakeDamageInfo stunInfo( this, this, vec3_origin, GetAbsOrigin(), flStunDamage, DMG_STUN );
-	DODGameRules()->RadiusStun( stunInfo, GetAbsOrigin(), flDmgRadius );
+	CTakeDamageInfo stunInfo( this, this, vec3_origin, GetEngineObject()->GetAbsOrigin(), flStunDamage, DMG_STUN );
+	DODGameRules()->RadiusStun( stunInfo, GetEngineObject()->GetAbsOrigin(), flDmgRadius );
 
 	State_Transition( BOMB_TARGET_INACTIVE );
 
@@ -429,7 +429,7 @@ bool CDODBombTarget::CanPlayerStartDefuse( CDODPlayer *pPlayer )
 		return false;
 	}
 
-	Vector vecDist = ( pPlayer->GetAbsOrigin() - GetAbsOrigin() );
+	Vector vecDist = ( pPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 	float flDist = vecDist.Length();
 
 	if ( flDist > DOD_BOMB_DEFUSE_MAXDIST )	// PLAYER_USE_RADIUS is not actually used by the playerUse code!!
@@ -547,7 +547,7 @@ void CDODBombTarget::State_Use_ACTIVE( CBaseEntity *pActivator, CBaseEntity *pCa
 
 	Vector pos = pPlayer->WorldSpaceCenter();
 
-	float flDist = ( pos - GetAbsOrigin() ).Length();
+	float flDist = ( pos - GetEngineObject()->GetAbsOrigin() ).Length();
 
 	if ( flDist > DOD_BOMB_PLANT_RADIUS )
 	{

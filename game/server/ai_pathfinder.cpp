@@ -643,7 +643,7 @@ bool CAI_Pathfinder::IsLinkUsable(CAI_Link *pLink, int startID)
 		{
 			if ( pStartHint->HintType() == HINT_JUMP_OVERRIDE && 
 				 pEndHint->HintType() == HINT_JUMP_OVERRIDE &&
-				 ( ( ( pStartHint->GetSpawnFlags() | pEndHint->GetSpawnFlags() ) & SF_ALLOW_JUMP_UP ) || pStartHint->GetAbsOrigin().z > pEndHint->GetAbsOrigin().z ) )
+				 ( ( ( pStartHint->GetSpawnFlags() | pEndHint->GetSpawnFlags() ) & SF_ALLOW_JUMP_UP ) || pStartHint->GetEngineObject()->GetAbsOrigin().z > pEndHint->GetEngineObject()->GetAbsOrigin().z ) )
 			{
 				if ( !pStartNode->IsLocked() )
 				{
@@ -699,7 +699,7 @@ bool CAI_Pathfinder::IsLinkUsable(CAI_Link *pLink, int startID)
 static int NPCBuildFlags( CAI_BaseNPC *pNPC, const Vector &vecOrigin )
 {
 	// If vecOrigin the the npc's position and npc is climbing only climb nodes allowed
-	if (pNPC->GetLocalOrigin() == vecOrigin && pNPC->GetNavType() == NAV_CLIMB) 
+	if (pNPC->GetEngineObject()->GetLocalOrigin() == vecOrigin && pNPC->GetNavType() == NAV_CLIMB)
 	{
 		return bits_BUILD_CLIMB;
 	}
@@ -1105,7 +1105,7 @@ AI_Waypoint_t *CAI_Pathfinder::BuildRouteThroughPoints( Vector *vecPoints, int n
 	int nNextIndex;
 
 	// FIXME: Must be able to move to the first position (these needs some parameterization) 
-	pMoveProbe->MoveLimit( navType, GetOuter()->GetAbsOrigin(), vecPoints[nStartIndex], MASK_NPCSOLID, pTarget, &endTrace );
+	pMoveProbe->MoveLimit( navType, GetOuter()->GetEngineObject()->GetAbsOrigin(), vecPoints[nStartIndex], MASK_NPCSOLID, pTarget, &endTrace );
 	if ( IsMoveBlocked( endTrace ) )
 	{
 		// NDebugOverlay::HorzArrow( GetOuter()->GetAbsOrigin(), vecPoints[nStartIndex], 8.0f, 255, 0, 0, 0, true, 4.0f );

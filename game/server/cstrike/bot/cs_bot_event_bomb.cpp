@@ -33,10 +33,10 @@ void CCSBot::OnBombPickedUp( IGameEvent *event )
 		const float bombPickupHearRangeSq = 1000.0f * 1000.0f;
 		Vector myOrigin = GetCentroid( this );
 
-		if ((myOrigin - player->GetAbsOrigin()).LengthSqr() < bombPickupHearRangeSq)
+		if ((myOrigin - player->GetEngineObject()->GetAbsOrigin()).LengthSqr() < bombPickupHearRangeSq)
 		{
 			GetChatter()->TheyPickedUpTheBomb();
-			GetGameState()->UpdateBomber( player->GetAbsOrigin() );
+			GetGameState()->UpdateBomber( player->GetEngineObject()->GetAbsOrigin() );
 		}
 	}
 }
@@ -89,18 +89,18 @@ void CCSBot::OnBombBeep( IGameEvent *event )
 	{
 		// check if we're close enough to hear it
 		const float bombBeepHearRangeSq = 1500.0f * 1500.0f;
-		if ((myOrigin - entity->GetAbsOrigin()).LengthSqr() < bombBeepHearRangeSq)
+		if ((myOrigin - entity->GetEngineObject()->GetAbsOrigin()).LengthSqr() < bombBeepHearRangeSq)
 		{
 			// radio the news to our team
 			if (GetTeamNumber() == TEAM_CT && GetGameState()->GetPlantedBombsite() == CSGameState::UNKNOWN)
 			{
-				const CCSBotManager::Zone *zone = TheCSBots()->GetZone( entity->GetAbsOrigin() );
+				const CCSBotManager::Zone *zone = TheCSBots()->GetZone( entity->GetEngineObject()->GetAbsOrigin() );
 				if (zone)
 					GetChatter()->FoundPlantedBomb( zone->m_index );
 			}
 
 			// remember where the bomb is
-			GetGameState()->UpdatePlantedBomb( entity->GetAbsOrigin() );
+			GetGameState()->UpdatePlantedBomb( entity->GetEngineObject()->GetAbsOrigin() );
 		}
 	}
 }

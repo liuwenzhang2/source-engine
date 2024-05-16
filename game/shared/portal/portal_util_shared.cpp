@@ -485,11 +485,11 @@ bool UTIL_DidTraceTouchPortals( const Ray_t& ray, const trace_t& trace, CProp_Po
 			if( iBoxIntersectsPortalsCount > 1 )
 			{
 				//hit more than one, use the closest
-				float fDistToBeat = (ptRayEndPoint - pIntersectedPortal->GetAbsOrigin()).LengthSqr();
+				float fDistToBeat = (ptRayEndPoint - pIntersectedPortal->GetEngineObject()->GetAbsOrigin()).LengthSqr();
 
 				for( int i = 1; i != iBoxIntersectsPortalsCount; ++i )
 				{
-					float fDist = (ptRayEndPoint - pBoxIntersectsPortals[i]->GetAbsOrigin()).LengthSqr();
+					float fDist = (ptRayEndPoint - pBoxIntersectsPortals[i]->GetEngineObject()->GetAbsOrigin()).LengthSqr();
 					if( fDist < fDistToBeat )
 					{
 						pIntersectedPortal = pBoxIntersectsPortals[i];
@@ -1174,7 +1174,7 @@ void UTIL_Portal_Triangles( const Vector &ptPortalCenter, const QAngle &qPortalA
 
 void UTIL_Portal_Triangles( const CProp_Portal *pPortal, Vector pvTri1[ 3 ], Vector pvTri2[ 3 ] )
 {
-	UTIL_Portal_Triangles( pPortal->GetAbsOrigin(), pPortal->GetAbsAngles(), pvTri1, pvTri2 );
+	UTIL_Portal_Triangles( pPortal->GetEngineObject()->GetAbsOrigin(), pPortal->GetEngineObject()->GetAbsAngles(), pvTri1, pvTri2 );
 }
 
 float UTIL_Portal_DistanceThroughPortal( const CProp_Portal *pPortal, const Vector &vPoint1, const Vector &vPoint2 )
@@ -1191,7 +1191,7 @@ float UTIL_Portal_DistanceThroughPortalSqr( const CProp_Portal *pPortal, const V
 	if ( !pPortalLinked || !pPortalLinked->m_bActivated )
 		return -1.0f;
 
-	return vPoint1.DistToSqr( pPortal->GetAbsOrigin() ) + pPortalLinked->GetAbsOrigin().DistToSqr( vPoint2 );
+	return vPoint1.DistToSqr( pPortal->GetEngineObject()->GetAbsOrigin() ) + pPortalLinked->GetEngineObject()->GetAbsOrigin().DistToSqr( vPoint2 );
 }
 
 float UTIL_Portal_ShortestDistance( const Vector &vPoint1, const Vector &vPoint2, CProp_Portal **pShortestDistPortal_Out /*= NULL*/, bool bRequireStraightLine /*= false*/ )
@@ -1254,7 +1254,7 @@ float UTIL_Portal_ShortestDistanceSqr( const Vector &vPoint1, const Vector &vPoi
 						Vector vRight, vUp;
 						pLinkedPortal->GetEngineObject()->GetVectors( NULL, &vRight, &vUp );
 						
-						Vector ptLinkedCenter = pLinkedPortal->GetAbsOrigin();
+						Vector ptLinkedCenter = pLinkedPortal->GetEngineObject()->GetAbsOrigin();
 						Vector vCenterToIntersection = ptPlaneIntersection - ptLinkedCenter;
 						float fRight = vRight.Dot( vCenterToIntersection );
 						float fUp = vUp.Dot( vCenterToIntersection );
@@ -1313,7 +1313,7 @@ float UTIL_Portal_ShortestDistanceSqr( const Vector &vPoint1, const Vector &vPoi
 						//do some crazy wrapped line intersection algorithm
 
 						//for now, just do the cheap and easy solution
-						float fWrapDist = vPoint1.DistToSqr( pTempPortal->GetAbsOrigin() ) + pLinkedPortal->GetAbsOrigin().DistToSqr( vPoint2 );
+						float fWrapDist = vPoint1.DistToSqr( pTempPortal->GetEngineObject()->GetAbsOrigin() ) + pLinkedPortal->GetEngineObject()->GetAbsOrigin().DistToSqr( vPoint2 );
 						if( fWrapDist < fMinDist )
 						{
 							fMinDist = fWrapDist;
@@ -1330,8 +1330,8 @@ float UTIL_Portal_ShortestDistanceSqr( const Vector &vPoint1, const Vector &vPoi
 
 void UTIL_Portal_AABB( const CProp_Portal *pPortal, Vector &vMin, Vector &vMax )
 {
-	Vector vOrigin = pPortal->GetAbsOrigin();
-	QAngle qAngles = pPortal->GetAbsAngles();
+	Vector vOrigin = pPortal->GetEngineObject()->GetAbsOrigin();
+	QAngle qAngles = pPortal->GetEngineObject()->GetAbsAngles();
 
 	Vector vOBBForward;
 	Vector vOBBRight;
@@ -1404,7 +1404,7 @@ float UTIL_IntersectRayWithPortal( const Ray_t &ray, const CProp_Portal *pPortal
 
 bool UTIL_IntersectRayWithPortalOBB( const CProp_Portal *pPortal, const Ray_t &ray, trace_t *pTrace )
 {
-	return IntersectRayWithOBB( ray, pPortal->GetAbsOrigin(), pPortal->GetAbsAngles(), CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs, 0.0f, pTrace );
+	return IntersectRayWithOBB( ray, pPortal->GetEngineObject()->GetAbsOrigin(), pPortal->GetEngineObject()->GetAbsAngles(), CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs, 0.0f, pTrace );
 }
 
 bool UTIL_IntersectRayWithPortalOBBAsAABB( const CProp_Portal *pPortal, const Ray_t &ray, trace_t *pTrace )
@@ -1445,7 +1445,7 @@ bool UTIL_IsBoxIntersectingPortal( const Vector &vecBoxCenter, const Vector &vec
 	if( pPortal == NULL )
 		return false;
 
-	return UTIL_IsBoxIntersectingPortal( vecBoxCenter, vecBoxExtents, pPortal->GetAbsOrigin(), pPortal->GetAbsAngles(), flTolerance );
+	return UTIL_IsBoxIntersectingPortal( vecBoxCenter, vecBoxExtents, pPortal->GetEngineObject()->GetAbsOrigin(), pPortal->GetEngineObject()->GetAbsAngles(), flTolerance );
 }
 
 CProp_Portal *UTIL_IntersectEntityExtentsWithPortal( const CBaseEntity *pEntity )
@@ -1489,7 +1489,7 @@ void UTIL_Portal_NDebugOverlay( const Vector &ptPortalCenter, const QAngle &qPor
 void UTIL_Portal_NDebugOverlay( const CProp_Portal *pPortal, int r, int g, int b, int a, bool noDepthTest, float duration )
 {
 #ifndef CLIENT_DLL
-	UTIL_Portal_NDebugOverlay( pPortal->GetAbsOrigin(), pPortal->GetAbsAngles(), r, g, b, a, noDepthTest, duration );
+	UTIL_Portal_NDebugOverlay( pPortal->GetEngineObject()->GetAbsOrigin(), pPortal->GetEngineObject()->GetAbsAngles(), r, g, b, a, noDepthTest, duration );
 #endif //#ifndef CLIENT_DLL
 }
 
@@ -1561,9 +1561,9 @@ bool FindClosestPassableSpace( CBaseEntity *pEntity, const Vector &vIndecisivePu
 		UTIL_TraceRay( entRay, fMask, pEntity, iEntityCollisionGroup, &traces[0] );
 		if( traces[0].startsolid == false )
 		{
-			Vector vNewPos = traces[0].endpos + (pEntity->GetAbsOrigin() - ptEntityOriginalCenter);
+			Vector vNewPos = traces[0].endpos + (pEntity->GetEngineObject()->GetAbsOrigin() - ptEntityOriginalCenter);
 #ifdef CLIENT_DLL
-			pEntity->SetAbsOrigin( vNewPos );
+			pEntity->GetEngineObject()->SetAbsOrigin( vNewPos );
 #else
 			pEntity->Teleport( &vNewPos, NULL, NULL );
 #endif
@@ -1669,9 +1669,9 @@ bool UTIL_Portal_EntityIsInPortalHole( const CProp_Portal *pPortal, CBaseEntity 
 	Vector vMaxs = pCollisionProp->OBBMaxs();
 	Vector vForward, vUp, vRight;
 	AngleVectors( pCollisionProp->GetCollisionAngles(), &vForward, &vRight, &vUp );
-	Vector ptOrigin = pEntity->GetAbsOrigin();
+	Vector ptOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
 
-	Vector ptOBBCenter = pEntity->GetAbsOrigin() + (vMins + vMaxs * 0.5f);
+	Vector ptOBBCenter = pEntity->GetEngineObject()->GetAbsOrigin() + (vMins + vMaxs * 0.5f);
 	Vector vExtents = (vMaxs - vMins) * 0.5f;
 
 	vForward *= vExtents.x;
@@ -1680,7 +1680,7 @@ bool UTIL_Portal_EntityIsInPortalHole( const CProp_Portal *pPortal, CBaseEntity 
 
 	Vector vPortalForward, vPortalRight, vPortalUp;
 	pPortal->GetEngineObject()->GetVectors( &vPortalForward, &vPortalRight, &vPortalUp );
-	Vector ptPortalCenter = pPortal->GetAbsOrigin();
+	Vector ptPortalCenter = pPortal->GetEngineObject()->GetAbsOrigin();
 
 	return OBBHasFullyContainedIntersectionWithQuad( vForward, vRight, vUp, ptOBBCenter, 
 		vPortalForward, vPortalForward.Dot( ptPortalCenter ), ptPortalCenter, 

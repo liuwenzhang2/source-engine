@@ -280,8 +280,8 @@ void CBreakable::Spawn( void )
     SetMoveType( MOVETYPE_PUSH );
 	
 	// this is a hack to shoot the gibs in a specific yaw/direction
-	m_angle = GetLocalAngles().y;
-	SetLocalAngles( vec3_angle );
+	m_angle = GetEngineObject()->GetLocalAngles().y;
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 	
 	SetModel( STRING( GetModelName() ) );//set size and link into world.
 
@@ -440,7 +440,7 @@ void CBreakable::Precache( void )
 #endif
 
 	default:
-		Warning("%s (%s) at (%.3f %.3f %.3f) using obsolete or unknown material type.\n", GetClassname(), GetDebugName(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		Warning("%s (%s) at (%.3f %.3f %.3f) using obsolete or unknown material type.\n", GetClassname(), GetDebugName(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 		pGibName = "WoodChunks";
 		break;
 	}
@@ -591,7 +591,7 @@ void CBreakable::BreakTouch( CBaseEntity *pOther )
 
 			// do a little damage to player if we broke glass or computer
 			CTakeDamageInfo info( pOther, pOther, flDamage/4, DMG_SLASH );
-			CalculateMeleeDamageForce( &info, (pOther->GetAbsOrigin() - GetAbsOrigin()), GetAbsOrigin() );
+			CalculateMeleeDamageForce( &info, (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), GetEngineObject()->GetAbsOrigin() );
 			pOther->TakeDamage( info );
 		}
 	}
@@ -724,9 +724,9 @@ void CBreakable::Break( CBaseEntity *pBreaker )
 {
 	if ( IsBreakable() )
 	{
-		QAngle angles = GetLocalAngles();
+		QAngle angles = GetEngineObject()->GetLocalAngles();
 		angles.y = m_angle;
-		SetLocalAngles( angles );
+		GetEngineObject()->SetLocalAngles( angles );
 		m_hBreaker = pBreaker;
 		Die();
 	}
@@ -840,7 +840,7 @@ int CBreakable::OnTakeDamage( const CTakeDamageInfo &info )
 		return 1;
 	}
 
-	vecTemp = subInfo.GetInflictor()->GetAbsOrigin() - WorldSpaceCenter();
+	vecTemp = subInfo.GetInflictor()->GetEngineObject()->GetAbsOrigin() - WorldSpaceCenter();
 
 	if (!IsBreakable())
 		return 0;

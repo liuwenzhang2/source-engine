@@ -694,7 +694,7 @@ void CHostState::RememberLocation()
 	m_vecLocation = MainViewOrigin();
 	VectorAngles( MainViewForward(), m_angLocation );
 
-	IClientEntity *localPlayer = entitylist ? entitylist->GetClientEntity( cl.m_nPlayerSlot + 1 ) : NULL;
+	IEngineObjectClient *localPlayer = entitylist ? entitylist->GetEngineObject( cl.m_nPlayerSlot + 1 ) : NULL;
 	if ( localPlayer )
 	{
 		m_vecLocation = localPlayer->GetAbsOrigin();

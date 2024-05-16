@@ -175,7 +175,7 @@ void CNPC_Hornet::DieTouch ( CBaseEntity *pOther )
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Hornet.Die" );
 			
 	CTakeDamageInfo info( this, GetOwnerEntity(), m_flDamage, DMG_BULLET );
-	CalculateBulletDamageForce( &info, GetAmmoDef()->Index("Hornet"), GetAbsVelocity(), GetAbsOrigin() );
+	CalculateBulletDamageForce( &info, GetAmmoDef()->Index("Hornet"), GetEngineObject()->GetAbsVelocity(), GetEngineObject()->GetAbsOrigin() );
 	pOther->TakeDamage( info );
 
 	m_takedamage	= DAMAGE_NO;
@@ -260,15 +260,15 @@ void CNPC_Hornet::TrackTouch ( CBaseEntity *pOther )
 	if ( (nRelationship == D_FR || nRelationship == D_NU || nRelationship == D_LI) )
 	{
 		// hit something we don't want to hurt, so turn around.
-		Vector vecVel = GetAbsVelocity();
+		Vector vecVel = GetEngineObject()->GetAbsVelocity();
 
 		VectorNormalize( vecVel );
 
 		vecVel.x *= -1;
 		vecVel.y *= -1;
 
-		SetAbsOrigin( GetAbsOrigin() + vecVel * 4 ); // bounce the hornet off a bit.
-		SetAbsVelocity( vecVel * m_flFlySpeed );
+		GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() + vecVel * 4 ); // bounce the hornet off a bit.
+		GetEngineObject()->SetAbsVelocity( vecVel * m_flFlySpeed );
 
 		return;
 	}
@@ -309,25 +309,25 @@ void CNPC_Hornet::TrackTarget ( void )
 	
 	if ( GetEnemy() != NULL && FVisible( GetEnemy() ))
 	{
-		m_vecEnemyLKP = GetEnemy()->BodyTarget( GetAbsOrigin() );
+		m_vecEnemyLKP = GetEnemy()->BodyTarget(GetEngineObject()->GetAbsOrigin() );
 	}
 	else
 	{
-		m_vecEnemyLKP = m_vecEnemyLKP + GetAbsVelocity() * m_flFlySpeed * 0.1;
+		m_vecEnemyLKP = m_vecEnemyLKP + GetEngineObject()->GetAbsVelocity() * m_flFlySpeed * 0.1;
 	}
 
-	vecDirToEnemy = m_vecEnemyLKP - GetAbsOrigin();
+	vecDirToEnemy = m_vecEnemyLKP - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( vecDirToEnemy );
 
-	if ( GetAbsVelocity().Length() < 0.1 )
+	if (GetEngineObject()->GetAbsVelocity().Length() < 0.1 )
 		vecFlightDir = vecDirToEnemy;
 	else 
 	{
-		vecFlightDir = GetAbsVelocity();
+		vecFlightDir = GetEngineObject()->GetAbsVelocity();
 		VectorNormalize( vecFlightDir );
 	}
 
-	SetAbsVelocity( vecFlightDir + vecDirToEnemy );
+	GetEngineObject()->SetAbsVelocity( vecFlightDir + vecDirToEnemy );
 
 	// measure how far the turn is, the wider the turn, the slow we'll go this time.
 	flDelta = DotProduct ( vecFlightDir, vecDirToEnemy );
@@ -358,20 +358,20 @@ void CNPC_Hornet::TrackTarget ( void )
 	switch ( m_iHornetType )
 	{
 		case HORNET_TYPE_RED:
-			SetAbsVelocity( vecVel * ( m_flFlySpeed * flDelta ) );// scale the dir by the ( speed * width of turn )
+			GetEngineObject()->SetAbsVelocity( vecVel * ( m_flFlySpeed * flDelta ) );// scale the dir by the ( speed * width of turn )
 			SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1, 0.3 ) );
 			break;
 		default:
 			Assert( false );	//fall through if release
 		case HORNET_TYPE_ORANGE:
-			SetAbsVelocity( vecVel * m_flFlySpeed );// do not have to slow down to turn.
+			GetEngineObject()->SetAbsVelocity( vecVel * m_flFlySpeed );// do not have to slow down to turn.
 			SetNextThink( gpGlobals->curtime + 0.1f );// fixed think time
 			break;
 	}
 
 	QAngle angNewAngles;
-	VectorAngles( GetAbsVelocity(), angNewAngles );
-	SetAbsAngles( angNewAngles );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angNewAngles );
+	GetEngineObject()->SetAbsAngles( angNewAngles );
 	
 	SetSolid( SOLID_BBOX );
 
@@ -379,11 +379,11 @@ void CNPC_Hornet::TrackTarget ( void )
 	// (only in the single player game)
 	if ( GetEnemy() != NULL && !g_pGameRules->IsMultiplayer() )
 	{
-		if ( flDelta >= 0.4 && ( GetAbsOrigin() - m_vecEnemyLKP ).Length() <= 300 )
+		if ( flDelta >= 0.4 && (GetEngineObject()->GetAbsOrigin() - m_vecEnemyLKP ).Length() <= 300 )
 		{
-			CPVSFilter filter( GetAbsOrigin() );
+			CPVSFilter filter(GetEngineObject()->GetAbsOrigin() );
 			te->Sprite( filter, 0.0,
-				&GetAbsOrigin(), // pos
+				&GetEngineObject()->GetAbsOrigin(), // pos
 				iHornetPuff,	// model
 				0.2,				//size
 				128				// brightness
@@ -391,7 +391,7 @@ void CNPC_Hornet::TrackTarget ( void )
 
 			CPASAttenuationFilter filter2( this );
 			g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "Hornet.Buzz" );
-			SetAbsVelocity( GetAbsVelocity() * 2 );
+			GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 2 );
 			SetNextThink( gpGlobals->curtime + 1.0f );
 			// don't attack again
 			m_flStopAttack = gpGlobals->curtime;

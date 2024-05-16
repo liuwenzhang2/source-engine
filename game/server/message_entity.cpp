@@ -127,7 +127,7 @@ void CMessageEntity::Think( void )
 	Vector worldTargetPosition = pPlayer->EyePosition();
 
 	// bail if player is too far away
-	if ( (worldTargetPosition - GetAbsOrigin()).Length() > m_radius )
+	if ( (worldTargetPosition - GetEngineObject()->GetAbsOrigin()).Length() > m_radius )
 	{
 		m_drawText = false;
 		return;

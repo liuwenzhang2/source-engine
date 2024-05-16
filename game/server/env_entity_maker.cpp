@@ -152,8 +152,8 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 		return;
 
 	// Spawn our template
-	Vector vecSpawnOrigin = GetAbsOrigin();
-	QAngle vecSpawnAngles = GetAbsAngles();
+	Vector vecSpawnOrigin = GetEngineObject()->GetAbsOrigin();
+	QAngle vecSpawnAngles = GetEngineObject()->GetAbsAngles();
 
 	if( vecAlternateOrigin != vec3_invalid )
 	{
@@ -175,14 +175,14 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 
 	// Assume it'll block us
 	m_hCurrentBlocker = m_hCurrentInstance;
-	m_vecBlockerOrigin = m_hCurrentBlocker->GetAbsOrigin();
+	m_vecBlockerOrigin = m_hCurrentBlocker->GetEngineObject()->GetAbsOrigin();
 
 	// Store off the mins & maxs the first time we spawn
 	if ( m_vecEntityMins == vec3_origin )
 	{
 		m_hCurrentInstance->CollisionProp()->WorldSpaceAABB( &m_vecEntityMins, &m_vecEntityMaxs );
-		m_vecEntityMins -= m_hCurrentInstance->GetAbsOrigin();
-		m_vecEntityMaxs -= m_hCurrentInstance->GetAbsOrigin();
+		m_vecEntityMins -= m_hCurrentInstance->GetEngineObject()->GetAbsOrigin();
+		m_vecEntityMaxs -= m_hCurrentInstance->GetEngineObject()->GetAbsOrigin();
 	}
 
 	// Fire our output
@@ -211,11 +211,11 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 			{
 				if (GetMoveParent() )
 				{
-					angSpawnDir += GetMoveParent()->GetAbsAngles();
+					angSpawnDir += GetMoveParent()->GetEngineObject()->GetAbsAngles();
 				}
 				else
 				{
-					angSpawnDir += GetAbsAngles();
+					angSpawnDir += GetEngineObject()->GetAbsAngles();
 				}
 			}
 			AngleVectors( angSpawnDir, &vForward, &vRight, &vUp );
@@ -234,7 +234,7 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 			}
 			else
 			{
-				pEntity->SetAbsVelocity( vecShootDir );
+				pEntity->GetEngineObject()->SetAbsVelocity( vecShootDir );
 			}
 		}
 	}
@@ -251,7 +251,7 @@ bool CEnvEntityMaker::HasRoomToSpawn()
 	if ( m_hCurrentBlocker )
 	{
 		// If it hasn't moved, abort immediately
-		if ( m_vecBlockerOrigin == m_hCurrentBlocker->GetAbsOrigin() )
+		if ( m_vecBlockerOrigin == m_hCurrentBlocker->GetEngineObject()->GetAbsOrigin() )
 		{
 			return false;
 		}
@@ -259,14 +259,14 @@ bool CEnvEntityMaker::HasRoomToSpawn()
 
 	// Check to see if there's enough room to spawn
 	trace_t tr;
-	UTIL_TraceHull( GetAbsOrigin(), GetAbsOrigin(), m_vecEntityMins, m_vecEntityMaxs, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), m_vecEntityMins, m_vecEntityMaxs, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 	if ( tr.m_pEnt || tr.startsolid )
 	{
 		// Store off our blocker to check later
 		m_hCurrentBlocker = (CBaseEntity*)tr.m_pEnt;
 		if ( m_hCurrentBlocker )
 		{
-			m_vecBlockerOrigin = m_hCurrentBlocker->GetAbsOrigin();
+			m_vecBlockerOrigin = m_hCurrentBlocker->GetEngineObject()->GetAbsOrigin();
 		}
 
 		return false;
@@ -288,7 +288,7 @@ bool CEnvEntityMaker::IsPlayerLooking()
 		{
 			// Only spawn if the player's looking away from me
 			Vector vLookDir = pPlayer->EyeDirection3D();
-			Vector vTargetDir = GetAbsOrigin() - pPlayer->EyePosition();
+			Vector vTargetDir = GetEngineObject()->GetAbsOrigin() - pPlayer->EyePosition();
 			VectorNormalize( vTargetDir );
 
 			float fDotPr = DotProduct( vLookDir,vTargetDir );
@@ -361,6 +361,6 @@ void CEnvEntityMaker::InputForceSpawnAtEntityOrigin( inputdata_t &inputdata )
 		
 	if( pTargetEntity )
 	{
-		SpawnEntity( pTargetEntity->GetAbsOrigin(), pTargetEntity->GetAbsAngles() );
+		SpawnEntity( pTargetEntity->GetEngineObject()->GetAbsOrigin(), pTargetEntity->GetEngineObject()->GetAbsAngles() );
 	}
 }

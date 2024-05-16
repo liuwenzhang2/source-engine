@@ -150,7 +150,7 @@ public:
 	void			ClearFollowGoal( CAI_FollowGoal *pGoal );
 	void			SetFollowGoalDirect( CAI_FollowGoal *pGoal );
 
-	virtual bool	FarFromFollowTarget()	{ return ( m_hFollowTarget && (GetAbsOrigin() - m_hFollowTarget->GetAbsOrigin()).LengthSqr() > (75*12)*(75*12) ); }
+	virtual bool	FarFromFollowTarget()	{ return ( m_hFollowTarget && (GetAbsOrigin() - m_hFollowTarget->GetEngineObject()->GetAbsOrigin()).LengthSqr() > (75*12)*(75*12) ); }
 
 	virtual bool	TargetIsUnreachable() { return m_bTargetUnreachable; }
 	

@@ -278,7 +278,7 @@ void CGameUI::Think( void )
 	{
 		Vector vPlayerFacing;
 		pPlayer->EyeVectors( &vPlayerFacing );
-		Vector vPlayerToUI =  GetAbsOrigin() - pPlayer->WorldSpaceCenter();
+		Vector vPlayerToUI = GetEngineObject()->GetAbsOrigin() - pPlayer->WorldSpaceCenter();
 		VectorNormalize(vPlayerToUI);
 
 		float flDotPr = DotProduct(vPlayerFacing,vPlayerToUI);

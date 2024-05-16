@@ -101,7 +101,7 @@ int CFuncBrush::DrawDebugTextOverlays( void )
 	if (m_debugOverlays & OVERLAY_TEXT_BIT) 
 	{
 		char tempstr[512];
-		Q_snprintf( tempstr,sizeof(tempstr), "angles: %g %g %g", (double)GetLocalAngles()[PITCH], (double)GetLocalAngles()[YAW], (double)GetLocalAngles()[ROLL] );
+		Q_snprintf( tempstr,sizeof(tempstr), "angles: %g %g %g", (double)GetEngineObject()->GetLocalAngles()[PITCH], (double)GetEngineObject()->GetLocalAngles()[YAW], (double)GetEngineObject()->GetLocalAngles()[ROLL] );
 		EntityText( nOffset, tempstr, 0 );
 		nOffset++;
 	}

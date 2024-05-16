@@ -61,7 +61,7 @@ QAngle CAI_BaseFlyingBot::BodyAngles()
 //-----------------------------------------------------------------------------
 void CAI_BaseFlyingBot::TurnHeadToTarget(float flInterval, const Vector &MoveTarget )
 {
-	float flDestYaw = VecToYaw( MoveTarget - GetLocalOrigin() );
+	float flDestYaw = VecToYaw( MoveTarget - GetEngineObject()->GetLocalOrigin() );
 	
 	float newYaw = AI_ClampYaw( GetHeadTurnRate() * 10.0f, m_fHeadYaw, flDestYaw, gpGlobals->curtime - GetLastThink() );
 		
@@ -96,8 +96,8 @@ Vector CAI_BaseFlyingBot::VelocityToAvoidObstacles(float flInterval)
 	// --------------------------------
 	trace_t tr;
 	Vector vTravelDir = m_vCurrentVelocity*flInterval;
-	Vector endPos = GetAbsOrigin() + vTravelDir;
-	AI_TraceEntity( this, GetAbsOrigin(), endPos, MASK_NPCSOLID|CONTENTS_WATER, &tr );
+	Vector endPos = GetEngineObject()->GetAbsOrigin() + vTravelDir;
+	AI_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), endPos, MASK_NPCSOLID|CONTENTS_WATER, &tr );
 	if (tr.fraction != 1.0)
 	{	
 		// Bounce off in normal 
@@ -109,7 +109,7 @@ Vector CAI_BaseFlyingBot::VelocityToAvoidObstacles(float flInterval)
 	// Try to remain above the ground.
 	// --------------------------------
 	float flMinGroundDist = MinGroundDist();
-	AI_TraceLine(GetAbsOrigin(), GetAbsOrigin() + Vector(0, 0, -flMinGroundDist), 
+	AI_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector(0, 0, -flMinGroundDist),
 		MASK_NPCSOLID_BRUSHONLY|CONTENTS_WATER, this, COLLISION_GROUP_NONE, &tr);
 	if (tr.fraction < 1)
 	{
@@ -245,7 +245,7 @@ void CAI_BaseFlyingBot::TranslateNavGoal( CBaseEntity *pTarget, Vector &chasePos
 	}
 
 	// Chase their eyes
-	chasePosition = pTarget->GetAbsOrigin() + pTarget->GetViewOffset();
+	chasePosition = pTarget->GetEngineObject()->GetAbsOrigin() + pTarget->GetViewOffset();
 }
 
 //------------------------------------------------------------------------------

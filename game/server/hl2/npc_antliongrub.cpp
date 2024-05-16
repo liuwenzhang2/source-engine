@@ -161,7 +161,7 @@ LINK_ENTITY_TO_CLASS( npc_antlion_grub, CAntlionGrub );
 void CAntlionGrub::CreateGlow( void )
 {
 	// Create the glow sprite
-	m_hGlowSprite = CSprite::SpriteCreate( "sprites/grubflare1.vmt", GetLocalOrigin(), false );
+	m_hGlowSprite = CSprite::SpriteCreate( "sprites/grubflare1.vmt", GetEngineObject()->GetLocalOrigin(), false );
 	Assert( m_hGlowSprite );
 	if ( m_hGlowSprite == NULL )
 		return;
@@ -172,7 +172,7 @@ void CAntlionGrub::CreateGlow( void )
 	m_hGlowSprite->SetGlowProxySize( 16.0f );
 	int nAttachment = LookupAttachment( "glow" );
 	m_hGlowSprite->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment );
-	m_hGlowSprite->SetLocalOrigin( vec3_origin );
+	m_hGlowSprite->GetEngineObject()->SetLocalOrigin( vec3_origin );
 	
 	// Don't uselessly animate, we're a static sprite!
 	m_hGlowSprite->SetThink( NULL );
@@ -264,8 +264,8 @@ void CAntlionGrub::CreateNugget( void )
 	int nDenomination = GetNuggetDenomination();
 	pNugget->SetDenomination( nDenomination );
 	
-	pNugget->SetAbsOrigin( vecOrigin );
-	pNugget->SetAbsAngles( RandomAngle( 0, 360 ) );
+	pNugget->GetEngineObject()->SetAbsOrigin( vecOrigin );
+	pNugget->GetEngineObject()->SetAbsAngles( RandomAngle( 0, 360 ) );
 	DispatchSpawn( pNugget );
 
 	IPhysicsObject *pPhys = pNugget->VPhysicsGetObject();
@@ -354,7 +354,7 @@ void CAntlionGrub::SetNextThinkByDistance( void )
 		return;
 	}
 
-	float flDistToPlayerSqr = ( GetAbsOrigin() - pPlayer->GetAbsOrigin() ).LengthSqr();
+	float flDistToPlayerSqr = (GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 	float scale = RemapValClamped( flDistToPlayerSqr, Square( 400 ), Square( 5000 ), 1.0f, 5.0f );
 	float time = random->RandomFloat( 1.0f, 3.0f );
 	SetNextThink( gpGlobals->curtime + ( time * scale ) );
@@ -465,7 +465,7 @@ void CAntlionGrub::AttachToSurface( void )
 	if ( ProbeSurface( WorldSpaceCenter() + vecOffset, vecDown, &vecMid, &vecMidNormal ) == false )
 	{
 		// A grub was left hanging in the air, it must not be near any valid surfaces!
-		Warning("Antlion grub stranded in space at (%.02f, %.02f, %.02f) : REMOVED\n", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		Warning("Antlion grub stranded in space at (%.02f, %.02f, %.02f) : REMOVED\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 		UTIL_Remove( this );
 		return;
 	}
@@ -489,7 +489,7 @@ void CAntlionGrub::AttachToSurface( void )
 
 			QAngle vecAngles;
 			VectorAngles( vecForward, vecMidNormal, vecAngles );
-			SetAbsAngles( vecAngles );
+			GetEngineObject()->SetAbsAngles( vecAngles );
 			return;
 		}
 
@@ -511,7 +511,7 @@ void CAntlionGrub::AttachToSurface( void )
 	QAngle vecAngles;
 	VectorAngles( vecLieDir, vecPseudoUp, vecAngles );
 
-	SetAbsAngles( vecAngles );
+	GetEngineObject()->SetAbsAngles( vecAngles );
 }
 
 //-----------------------------------------------------------------------------
@@ -600,7 +600,7 @@ void CAntlionGrub::IdleThink( void )
 
 	// See how close the player is
 	CBasePlayer *pPlayerEnt = AI_GetSinglePlayer();
-	float flDistToPlayerSqr = ( GetAbsOrigin() - pPlayerEnt->GetAbsOrigin() ).LengthSqr();
+	float flDistToPlayerSqr = (GetEngineObject()->GetAbsOrigin() - pPlayerEnt->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 
 	bool bFlinching = ( m_flFlinchTime > gpGlobals->curtime );
 
@@ -723,7 +723,7 @@ void CAntlionGrub::SpawnSquashedGrub( void )
 
 	Vector vecUp;
 	GetVectors( NULL, NULL, &vecUp );
-	CBaseEntity *pGib = CreateRagGib( ANTLIONGRUB_SQUASHED_MODEL, GetAbsOrigin(), GetAbsAngles(), vecUp * 16.0f );
+	CBaseEntity *pGib = CreateRagGib( ANTLIONGRUB_SQUASHED_MODEL, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), vecUp * 16.0f );
 	if ( pGib )
 	{
 		pGib->AddEffects( EF_NOSHADOW );
@@ -813,26 +813,26 @@ void CAntlionGrub::Squash( CBaseEntity *pOther, bool bDealDamage, bool bSpawnBlo
 	{
 		// Temp squash effect
 		Vector vecForward, vecUp;
-		AngleVectors( GetAbsAngles(), &vecForward, NULL, &vecUp );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &vecForward, NULL, &vecUp );
 
 		// Start effects at either end of the grub
-		Vector vecSplortPos = GetAbsOrigin() + vecForward * 14.0f;
-		DispatchParticleEffect( "GrubSquashBlood", vecSplortPos, GetAbsAngles() );
+		Vector vecSplortPos = GetEngineObject()->GetAbsOrigin() + vecForward * 14.0f;
+		DispatchParticleEffect( "GrubSquashBlood", vecSplortPos, GetEngineObject()->GetAbsAngles() );
 
-		vecSplortPos = GetAbsOrigin() - vecForward * 16.0f;
+		vecSplortPos = GetEngineObject()->GetAbsOrigin() - vecForward * 16.0f;
 		Vector vecDir = -vecForward;
 		QAngle vecAngles;
 		VectorAngles( vecDir, vecAngles );
 		DispatchParticleEffect( "GrubSquashBlood", vecSplortPos, vecAngles );
 		
-		MakeSquashDecals( GetAbsOrigin() + vecForward * 32.0f );
-		MakeSquashDecals( GetAbsOrigin() - vecForward * 32.0f );
+		MakeSquashDecals(GetEngineObject()->GetAbsOrigin() + vecForward * 32.0f );
+		MakeSquashDecals(GetEngineObject()->GetAbsOrigin() - vecForward * 32.0f );
 	}
 
 	// Deal deadly damage to ourself
 	if ( bDealDamage )
 	{
-		CTakeDamageInfo info( pOther, pOther, Vector( 0, 0, -1 ), GetAbsOrigin(), GetHealth()+1, DMG_CRUSH );
+		CTakeDamageInfo info( pOther, pOther, Vector( 0, 0, -1 ), GetEngineObject()->GetAbsOrigin(), GetHealth()+1, DMG_CRUSH );
 		TakeDamage( info );
 	}
 }
@@ -1007,7 +1007,7 @@ void CGrubNugget::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 void CGrubNugget::Event_Killed( const CTakeDamageInfo &info )
 {
 	AddEffects( EF_NODRAW );
-	DispatchParticleEffect( "antlion_spit_player", GetAbsOrigin(), QAngle( -90, 0, 0 ) );
+	DispatchParticleEffect( "antlion_spit_player", GetEngineObject()->GetAbsOrigin(), QAngle( -90, 0, 0 ) );
 	const char* soundname = "NPC_Antlion_Grub.Explode";
 	CPASAttenuationFilter filter(this, soundname);
 

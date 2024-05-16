@@ -344,8 +344,8 @@ void C_EntityFlame::CreateEffect( void )
 		m_hOldAttached = m_hEntAttached;
 
 		ParticleProp()->AddControlPoint( m_hEffect, 1, pEntity, PATTACH_ABSORIGIN_FOLLOW );
-		m_hEffect->SetControlPoint( 0, GetAbsOrigin() );
-		m_hEffect->SetControlPoint( 1, GetAbsOrigin() );
+		m_hEffect->SetControlPoint( 0, GetEngineObject()->GetAbsOrigin() );
+		m_hEffect->SetControlPoint( 1, GetEngineObject()->GetAbsOrigin() );
 		m_hEffect->SetControlPointEntity( 0, pEntity );
 		m_hEffect->SetControlPointEntity( 1, pEntity );
 	}
@@ -387,7 +387,7 @@ void C_EntityFlame::Simulate( void )
 	if ( IsEffectActive(EF_BRIGHTLIGHT) || IsEffectActive(EF_DIMLIGHT) )
 	{
 		dlight_t *dl = effects->CL_AllocDlight (entindex());
-		dl->origin = GetAbsOrigin();
+		dl->origin = GetEngineObject()->GetAbsOrigin();
  		dl->origin[2] += 16;
 		dl->color.r = 254;
 		dl->color.g = 174;

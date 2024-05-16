@@ -174,15 +174,15 @@ void CHudRadar::MsgFunc_UpdateRadar(bf_read &msg )
 		// HPE_END
 		//=============================================================================
 		// update origin and angle for players out of my PVS
-		origin = pPlayer->GetAbsOrigin();
-		angles = pPlayer->GetAbsAngles();
+		origin = pPlayer->GetEngineObject()->GetAbsOrigin();
+		angles = pPlayer->GetEngineObject()->GetAbsAngles();
 
 		origin.x = x;
 		origin.y = y;
 		angles.y = a;
 
-		pPlayer->SetAbsOrigin( origin );
-		pPlayer->SetAbsAngles( angles );
+		pPlayer->GetEngineObject()->SetAbsOrigin( origin );
+		pPlayer->GetEngineObject()->SetAbsAngles( angles );
 		pPlayer->m_bDetected = true;
 	}
 }
@@ -290,7 +290,7 @@ void CHudRadar::DrawPlayerOnRadar( int iPlayer, C_CSPlayer *pLocalPlayer )
 		return;
 
 	
-	WorldToRadar( pPlayer->GetAbsOrigin(), pLocalPlayer->GetAbsOrigin(), pLocalPlayer->LocalEyeAngles(), x, y, z_delta );
+	WorldToRadar( pPlayer->GetEngineObject()->GetAbsOrigin(), pLocalPlayer->GetEngineObject()->GetAbsOrigin(), pLocalPlayer->LocalEyeAngles(), x, y, z_delta );
 
 	if( pCSPR->HasC4( iPlayer ) || pCSPR->IsVIP( iPlayer ) || bOppositeTeams )
 	{
@@ -329,7 +329,7 @@ void CHudRadar::DrawEntityOnRadar( CBaseEntity *pEnt, C_CSPlayer *pLocalPlayer, 
 	float x, y, z_delta;
 	int iBaseDotSize = 4;
 
-	WorldToRadar( pEnt->GetAbsOrigin(), pLocalPlayer->GetAbsOrigin(), pLocalPlayer->LocalEyeAngles(), x, y, z_delta );
+	WorldToRadar( pEnt->GetEngineObject()->GetAbsOrigin(), pLocalPlayer->GetEngineObject()->GetAbsOrigin(), pLocalPlayer->LocalEyeAngles(), x, y, z_delta );
 
 	if( flags & RADAR_IGNORE_Z )
 		z_delta = 0;

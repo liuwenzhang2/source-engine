@@ -137,7 +137,7 @@ static void RestorePlayerTo( CBasePlayer *pPlayer, const Vector &vWantedPos )
 					pPlayer->GetPlayerName(), vWantedPos.x, vWantedPos.y, vWantedPos.z );
 		}
 
-		UTIL_TraceEntity( pPlayer, pPlayer->GetLocalOrigin(), vWantedPos, MASK_PLAYERSOLID, pPlayer, COLLISION_GROUP_PLAYER_MOVEMENT, &tr );
+		UTIL_TraceEntity( pPlayer, pPlayer->GetEngineObject()->GetLocalOrigin(), vWantedPos, MASK_PLAYERSOLID, pPlayer, COLLISION_GROUP_PLAYER_MOVEMENT, &tr );
 		if ( tr.startsolid || tr.allsolid )
 		{
 			// In this case, the guy got stuck back wherever we lag compensated him to. Nasty.
@@ -149,7 +149,7 @@ static void RestorePlayerTo( CBasePlayer *pPlayer, const Vector &vWantedPos )
 		{
 			// We can get to a valid place, but not all the way back to where we were.
 			Vector vPos;
-			VectorLerp( pPlayer->GetLocalOrigin(), vWantedPos, tr.fraction * g_flFractionScale, vPos );
+			VectorLerp( pPlayer->GetEngineObject()->GetLocalOrigin(), vWantedPos, tr.fraction * g_flFractionScale, vPos );
 			UTIL_SetOrigin( pPlayer, vPos, true );
 
 			if ( sv_unlag_debug.GetBool() )
@@ -294,8 +294,8 @@ void CLagCompensationManager::FrameUpdatePostEntityThink()
 		}
 
 		record.m_flSimulationTime	= pPlayer->GetSimulationTime();
-		record.m_vecAngles			= pPlayer->GetLocalAngles();
-		record.m_vecOrigin			= pPlayer->GetLocalOrigin();
+		record.m_vecAngles			= pPlayer->GetEngineObject()->GetLocalAngles();
+		record.m_vecOrigin			= pPlayer->GetEngineObject()->GetLocalOrigin();
 		record.m_vecMinsPreScaled	= pPlayer->CollisionProp()->OBBMinsPreScaled();
 		record.m_vecMaxsPreScaled	= pPlayer->CollisionProp()->OBBMaxsPreScaled();
 
@@ -433,7 +433,7 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 	LagRecord *prevRecord = NULL;
 	LagRecord *record = NULL;
 
-	Vector prevOrg = pPlayer->GetLocalOrigin();
+	Vector prevOrg = pPlayer->GetEngineObject()->GetLocalOrigin();
 	
 	// Walk context looking for any invalidating event
 	while( track->IsValidIndex(curr) )
@@ -546,7 +546,7 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 			}
 
 			// now trace us back as far as we can go
-			UTIL_TraceEntity( pPlayer, pPlayer->GetLocalOrigin(), org, MASK_PLAYERSOLID, &tr );
+			UTIL_TraceEntity( pPlayer, pPlayer->GetEngineObject()->GetLocalOrigin(), org, MASK_PLAYERSOLID, &tr );
 
 			if ( tr.startsolid || tr.allsolid )
 			{
@@ -559,7 +559,7 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 			{
 				// We can get to a valid place, but not all the way to the target
 				Vector vPos;
-				VectorLerp( pPlayer->GetLocalOrigin(), org, tr.fraction * g_flFractionScale, vPos );
+				VectorLerp( pPlayer->GetEngineObject()->GetLocalOrigin(), org, tr.fraction * g_flFractionScale, vPos );
 				
 				// This is as close as we're going to get
 				org = vPos;
@@ -575,8 +575,8 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 	LagRecord *restore = &m_RestoreData[ pl_index ];
 	LagRecord *change  = &m_ChangeData[ pl_index ];
 
-	QAngle angdiff = pPlayer->GetLocalAngles() - ang;
-	Vector orgdiff = pPlayer->GetLocalOrigin() - org;
+	QAngle angdiff = pPlayer->GetEngineObject()->GetLocalAngles() - ang;
+	Vector orgdiff = pPlayer->GetEngineObject()->GetLocalOrigin() - org;
 
 	// Always remember the pristine simulation time in case we need to restore it.
 	restore->m_flSimulationTime = pPlayer->GetSimulationTime();
@@ -584,8 +584,8 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 	if ( angdiff.LengthSqr() > LAG_COMPENSATION_EPS_SQR )
 	{
 		flags |= LC_ANGLES_CHANGED;
-		restore->m_vecAngles = pPlayer->GetLocalAngles();
-		pPlayer->SetLocalAngles( ang );
+		restore->m_vecAngles = pPlayer->GetEngineObject()->GetLocalAngles();
+		pPlayer->GetEngineObject()->SetLocalAngles( ang );
 		change->m_vecAngles = ang;
 	}
 
@@ -607,8 +607,8 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 	if ( orgdiff.LengthSqr() > LAG_COMPENSATION_EPS_SQR )
 	{
 		flags |= LC_ORIGIN_CHANGED;
-		restore->m_vecOrigin = pPlayer->GetLocalOrigin();
-		pPlayer->SetLocalOrigin( org );
+		restore->m_vecOrigin = pPlayer->GetEngineObject()->GetLocalOrigin();
+		pPlayer->GetEngineObject()->SetLocalOrigin( org );
 		change->m_vecOrigin = org;
 	}
 
@@ -782,9 +782,9 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 		{		   
 			restoreSimulationTime = true;
 
-			if ( pPlayer->GetLocalAngles() == change->m_vecAngles )
+			if ( pPlayer->GetEngineObject()->GetLocalAngles() == change->m_vecAngles )
 			{
-				pPlayer->SetLocalAngles( restore->m_vecAngles );
+				pPlayer->GetEngineObject()->SetLocalAngles( restore->m_vecAngles );
 			}
 		}
 
@@ -793,7 +793,7 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 			restoreSimulationTime = true;
 
 			// Okay, let's see if we can do something reasonable with the change
-			Vector delta = pPlayer->GetLocalOrigin() - change->m_vecOrigin;
+			Vector delta = pPlayer->GetEngineObject()->GetLocalOrigin() - change->m_vecOrigin;
 			
 			// If it moved really far, just leave the player in the new spot!!!
 			if ( delta.Length2DSqr() < m_flTeleportDistanceSqr )

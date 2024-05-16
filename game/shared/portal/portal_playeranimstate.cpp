@@ -183,7 +183,7 @@ void CPortalPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t event, int nDat
 //-----------------------------------------------------------------------------
 void CPortalPlayerAnimState::Teleport( const Vector *pNewOrigin, const QAngle *pNewAngles, CPortal_Player* pPlayer )
 {
-	QAngle absangles = pPlayer->GetAbsAngles();
+	QAngle absangles = pPlayer->GetEngineObject()->GetAbsAngles();
 	m_angRender = absangles;
 	m_angRender.x = m_angRender.z = 0.0f;
 	if ( pPlayer )

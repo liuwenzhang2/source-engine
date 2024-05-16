@@ -202,7 +202,7 @@ void C_AR2Explosion::Start(CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArg
 	int nSurfInfos;
 
 	// Center of explosion.
-	Vector vCenter = GetAbsOrigin(); // HACKHACK.. when the engine bug is fixed, use origin.
+	Vector vCenter = GetEngineObject()->GetAbsOrigin(); // HACKHACK.. when the engine bug is fixed, use origin.
 
 	if ( IsXbox() )
 	{

@@ -84,7 +84,7 @@ void HideState::OnUpdate( CCSBot *me )
 
 			// BOTPORT: Determine walk/run velocity thresholds
 			float runThreshold = 200.0f;
-			if (leader->GetAbsVelocity().IsLengthGreaterThan( runThreshold ))
+			if (leader->GetEngineObject()->GetAbsVelocity().IsLengthGreaterThan( runThreshold ))
 			{
 				// leader is running, stay with him
 				me->Follow( leader );

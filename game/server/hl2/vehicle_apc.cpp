@@ -173,7 +173,7 @@ void CPropAPC::CreateAPCLaserDot( void )
 	// Create a laser if we don't have one
 	if ( m_hLaserDot == NULL )
 	{
-		m_hLaserDot = CreateLaserDot( GetAbsOrigin(), this, false );
+		m_hLaserDot = CreateLaserDot(GetEngineObject()->GetAbsOrigin(), this, false );
 	}
 }
 
@@ -331,13 +331,13 @@ void CPropAPC::AddSmokeTrail( const Vector &vecPos )
 
 	if ( nAttachment == 0 )
 	{
-		pSmokeTrail->SetAbsOrigin( vecPos );
-		pSmokeTrail->SetAbsAngles( angles );
+		pSmokeTrail->GetEngineObject()->SetAbsOrigin( vecPos );
+		pSmokeTrail->GetEngineObject()->SetAbsAngles( angles );
 	}
 	else
 	{
-		pSmokeTrail->SetLocalOrigin( vec3_origin );
-		pSmokeTrail->SetLocalAngles( angles );
+		pSmokeTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
+		pSmokeTrail->GetEngineObject()->SetLocalAngles( angles );
 	}
 
 	pSmokeTrail->SetMoveType( MOVETYPE_NONE );
@@ -361,8 +361,8 @@ void CPropAPC::ExplodeAndThrowChunk( const Vector &vecExplosionPos )
 
 	QAngle vecSpawnAngles;
 	vecSpawnAngles.Random( -90, 90 );
-	pChunk->SetAbsOrigin( vecExplosionPos );
-	pChunk->SetAbsAngles( vecSpawnAngles );
+	pChunk->GetEngineObject()->SetAbsOrigin( vecExplosionPos );
+	pChunk->GetEngineObject()->SetAbsAngles( vecSpawnAngles );
 
 	int nGib = random->RandomInt( 0, APC_MAX_CHUNKS - 1 );
 	pChunk->Spawn( s_pChunkModelName[nGib] );
@@ -384,12 +384,12 @@ void CPropAPC::ExplodeAndThrowChunk( const Vector &vecExplosionPos )
 		AngleVectors( angles, &vecVelocity );
 		
 		vecVelocity *= random->RandomFloat( 300, 900 );
-		vecVelocity += GetAbsVelocity();
+		vecVelocity += GetEngineObject()->GetAbsVelocity();
 
 		AngularImpulse angImpulse;
 		angImpulse = RandomAngularImpulse( -180, 180 );
 
-		pChunk->SetAbsVelocity( vecVelocity );
+		pChunk->GetEngineObject()->SetAbsVelocity( vecVelocity );
 		pPhysicsObject->SetVelocity(&vecVelocity, &angImpulse );
 	}
 
@@ -427,7 +427,7 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 	CollisionProp()->WorldToNormalizedSpace( vecAbsMaxs, &vecNormalizedMaxs );
 
 	Vector vecAbsPoint;
-	CPASFilter filter( GetAbsOrigin() );
+	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 	for (int i = 0; i < 5; i++)
 	{
 		CollisionProp()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint );
@@ -449,8 +449,8 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 
 		QAngle vecSpawnAngles;
 		vecSpawnAngles.Random( -90, 90 );
-		pChunk->SetAbsOrigin( vecAbsPoint );
-		pChunk->SetAbsAngles( vecSpawnAngles );
+		pChunk->GetEngineObject()->SetAbsOrigin( vecAbsPoint );
+		pChunk->GetEngineObject()->SetAbsAngles( vecSpawnAngles );
 
 		int nGib = random->RandomInt( 0, APC_MAX_CHUNKS - 1 );
 		pChunk->Spawn( s_pChunkModelName[nGib] );
@@ -472,12 +472,12 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 			AngleVectors( angles, &vecVelocity );
 			
 			vecVelocity *= random->RandomFloat( 300, 900 );
-			vecVelocity += GetAbsVelocity();
+			vecVelocity += GetEngineObject()->GetAbsVelocity();
 
 			AngularImpulse angImpulse;
 			angImpulse = RandomAngularImpulse( -180, 180 );
 
-			pChunk->SetAbsVelocity( vecVelocity );
+			pChunk->GetEngineObject()->SetAbsVelocity( vecVelocity );
 			pPhysicsObject->SetVelocity(&vecVelocity, &angImpulse );
 		}
 
@@ -598,8 +598,8 @@ void CPropAPC::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData )
 	if ( m_flDangerSoundTime > gpGlobals->curtime )
 		return;
 
-	QAngle vehicleAngles = GetLocalAngles();
-	Vector vecStart = GetAbsOrigin();
+	QAngle vehicleAngles = GetEngineObject()->GetLocalAngles();
+	Vector vecStart = GetEngineObject()->GetAbsOrigin();
 	Vector vecDir;
 
 	GetVectors( &vecDir, NULL, NULL );
@@ -684,7 +684,7 @@ void CPropAPC::AimSecondaryWeaponAt( CBaseEntity *pTarget )
 
 	if ( m_hRocketTarget )
 	{
-		m_hLaserDot->SetAbsOrigin( m_hRocketTarget->BodyTarget( WorldSpaceCenter(), false ) );
+		m_hLaserDot->GetEngineObject()->SetAbsOrigin( m_hRocketTarget->BodyTarget( WorldSpaceCenter(), false ) );
 	}
 	SetLaserDotTarget( m_hLaserDot, m_hRocketTarget );
 	EnableLaserDot( m_hLaserDot, m_hRocketTarget != NULL );
@@ -885,9 +885,9 @@ void CPropAPC::CreateCorpse( )
 	for ( int i = 0; i < APC_MAX_GIBS; ++i )
 	{
 		CPhysicsProp *pGib = assert_cast<CPhysicsProp*>(gEntList.CreateEntityByName( "prop_physics" ));
-		pGib->SetAbsOrigin( GetAbsOrigin() );
-		pGib->SetAbsAngles( GetAbsAngles() );
-		pGib->SetAbsVelocity( GetAbsVelocity() );
+		pGib->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
+		pGib->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
+		pGib->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() );
 		pGib->SetModel( s_pGibModelName[i] );
 		pGib->Spawn();
 		pGib->SetMoveType( MOVETYPE_VPHYSICS );

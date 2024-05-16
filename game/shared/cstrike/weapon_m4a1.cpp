@@ -226,7 +226,7 @@ float CWeaponM4A1::GetInaccuracy() const
 		{
 			return 0.035f + 0.4f * m_flAccuracy;
 		}
-		else if (pPlayer->GetAbsVelocity().Length2D() > 140)
+		else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 140)
 		{
 			return 0.035f + 0.07f * m_flAccuracy;
 		}
@@ -263,7 +263,7 @@ void CWeaponM4A1::PrimaryAttack()
 	if ( !pPlayer )
 		return;
 
-	if (pPlayer->GetAbsVelocity().Length2D() > 5)
+	if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 		pPlayer->KickBack (1.0, 0.45, 0.28, 0.045, 3.75, 3, 7);
 	else if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 		pPlayer->KickBack (1.2, 0.5, 0.23, 0.15, 5.5, 3.5, 6);

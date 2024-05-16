@@ -73,7 +73,7 @@ void CHandGrenade::Precache( void )
 
 void CHandGrenade::ShootTimed( CBaseCombatCharacter *pOwner, Vector vecVelocity, float flTime )
 {
-	SetAbsVelocity( vecVelocity );
+	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 	SetThrower( pOwner );
 	SetOwnerEntity( pOwner );
@@ -86,14 +86,14 @@ void CHandGrenade::ShootTimed( CBaseCombatCharacter *pOwner, Vector vecVelocity,
 	if ( flTime < 0.1 )
 	{
 		SetNextThink( gpGlobals->curtime );
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 	}
 
 //	SetSequence( SelectWeightedSequence( ACT_GRENADE_TOSS ) );
 	SetSequence( 0 );
 	m_flPlaybackRate = 1.0;
 
-	SetAbsAngles( QAngle( 0,0,60) );
+	GetEngineObject()->SetAbsAngles( QAngle( 0,0,60) );
 
 	AngularImpulse angImpulse;
 	angImpulse[0] = random->RandomInt( -200, 200 );
@@ -139,7 +139,7 @@ void CHandGrenade::BounceTouch( CBaseEntity *pOther )
 		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	}
 	// only do damage if we're moving fairly fast
-	if ( (pOther->m_takedamage != DAMAGE_NO) && (m_flNextAttack < gpGlobals->curtime && GetAbsVelocity().Length() > 100))
+	if ( (pOther->m_takedamage != DAMAGE_NO) && (m_flNextAttack < gpGlobals->curtime && GetEngineObject()->GetAbsVelocity().Length() > 100))
 	{
 		if ( GetThrower() )
 		{
@@ -147,7 +147,7 @@ void CHandGrenade::BounceTouch( CBaseEntity *pOther )
 			tr = CBaseEntity::GetTouchTrace( );
 			ClearMultiDamage( );
 			Vector forward;
-			AngleVectors( GetAbsAngles(), &forward );
+			AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
 
 			CTakeDamageInfo info( this, GetThrower(), 1, DMG_CLUB );
 			CalculateMeleeDamageForce( &info, forward, tr.endpos );
@@ -163,7 +163,7 @@ void CHandGrenade::BounceTouch( CBaseEntity *pOther )
 	// this is my heuristic for modulating the grenade velocity because grenades dropped purely vertical
 	// or thrown very far tend to slow down too quickly for me to always catch just by testing velocity. 
 	// trimming the Z velocity a bit seems to help quite a bit.
-	vecTestVelocity = GetAbsVelocity(); 
+	vecTestVelocity = GetEngineObject()->GetAbsVelocity();
 	vecTestVelocity.z *= 0.45;
 
 	if ( !m_bHasWarnedAI && vecTestVelocity.Length() <= 60 )
@@ -172,26 +172,26 @@ void CHandGrenade::BounceTouch( CBaseEntity *pOther )
 		// emit the danger sound.
 		
 		// register a radius louder than the explosion, so we make sure everyone gets out of the way
-		CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), m_flDamage / 0.4, 0.3 );
+		CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), m_flDamage / 0.4, 0.3 );
 		m_bHasWarnedAI = TRUE;
 	}
 
 	// HACKHACK - On ground isn't always set, so look for ground underneath
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector(0,0,10), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector(0,0,10), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 	if ( tr.fraction < 1.0 )
 	{
 		// add a bit of static friction
 //		SetAbsVelocity( GetAbsVelocity() * 0.8 );
 		SetSequence( SelectWeightedSequence( ACT_IDLE ) );
-		SetAbsAngles( vec3_angle );
+		GetEngineObject()->SetAbsAngles( vec3_angle );
 	}
 
 	// play bounce sound
 	BounceSound();
 
-	m_flPlaybackRate = GetAbsVelocity().Length() / 200.0;
+	m_flPlaybackRate = GetEngineObject()->GetAbsVelocity().Length() / 200.0;
 	if (m_flPlaybackRate > 1.0)
 		m_flPlaybackRate = 1;
 	else if (m_flPlaybackRate < 0.5)
@@ -344,7 +344,7 @@ void CWeaponHandGrenade::WeaponIdle( void )
 		AngleVectors( angThrow, &vecFwd );
 
 		Vector vecSrc	= pPlayer->EyePosition() + vecFwd * 16;
-		Vector vecThrow	= vecFwd * flVel + pPlayer->GetAbsVelocity();
+		Vector vecThrow	= vecFwd * flVel + pPlayer->GetEngineObject()->GetAbsVelocity();
 
 		QAngle angles;
 		VectorAngles( vecThrow, angles );

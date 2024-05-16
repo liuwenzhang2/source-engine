@@ -187,7 +187,7 @@ void CPropEnergyBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEven
 		// Only lock to the portal's forward axis if we're in it's world bounds
 		// We use a tolerance of four, because the render bounds thickness for a portal is 4, and this function
 		// intersects with a plane.
-		bool bHitPortal = UTIL_IsBoxIntersectingPortal( GetAbsOrigin(), WorldAlignSize(), pPortal, 4.0f );
+		bool bHitPortal = UTIL_IsBoxIntersectingPortal(GetEngineObject()->GetAbsOrigin(), WorldAlignSize(), pPortal, 4.0f );
 
 		// We definitely hit a portal
 		if ( bHitPortal && pPortal && pPortal->IsActivedAndLinked() )
@@ -219,7 +219,7 @@ void CPropEnergyBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEven
 	if ( !bIsEnteringPortalAndLockingAxisForward )
 	{
 		trace_t		tr;
-		UTIL_TraceLine ( GetAbsOrigin(), GetAbsOrigin() + 60*preVelocity, MASK_SHOT, 
+		UTIL_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + 60*preVelocity, MASK_SHOT,
 			this, COLLISION_GROUP_NONE, &tr);
 
 		// Only place decals and draw effects if we hit something valid
@@ -354,7 +354,7 @@ void CPropEnergyBall::ExplodeThink( )
 	//Destruction effect
 	CBroadcastRecipientFilter filter2;
 	CEffectData data;
-	data.m_vOrigin = GetAbsOrigin();
+	data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 	DispatchEffect( "ManhackSparks", data );
 	const char* soundname = "EnergyBall.Explosion";
 	CPASAttenuationFilter filter(this, soundname);
@@ -367,7 +367,7 @@ void CPropEnergyBall::ExplodeThink( )
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Turn us off and wait because we need our trails to finish up properly
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetMoveType( MOVETYPE_NONE );
 	AddSolidFlags( FSOLID_NOT_SOLID );
 
@@ -391,7 +391,7 @@ void CPropEnergyBall::StartTouch( CBaseEntity *pOther )
 	// Kill the player on hit.
 	if ( pOther->IsPlayer() )
 	{
-		CTakeDamageInfo info( this, GetOwnerEntity(), GetAbsVelocity(), GetAbsOrigin(), 1500.0f, DMG_DISSOLVE );
+		CTakeDamageInfo info( this, GetOwnerEntity(), GetEngineObject()->GetAbsVelocity(), GetEngineObject()->GetAbsOrigin(), 1500.0f, DMG_DISSOLVE );
 	 	pOther->OnTakeDamage( info );
 		
 		// Destruct when we hit the player
@@ -494,21 +494,21 @@ void CEnergyBallLauncher::SpawnBall()
 		return;
 
 	pBall->SetRadius( m_flBallRadius );
-	Vector vecAbsOrigin = GetAbsOrigin();
+	Vector vecAbsOrigin = GetEngineObject()->GetAbsOrigin();
 	Vector zaxis;
 
-	pBall->SetAbsOrigin( vecAbsOrigin );
+	pBall->GetEngineObject()->SetAbsOrigin( vecAbsOrigin );
 	pBall->SetSpawner( this );
 
 	pBall->SetSpeed( m_flMaxSpeed );
 	float flSpeed = m_flMaxSpeed;
 
 	Vector vDirection;
-	QAngle qAngle = GetAbsAngles();
+	QAngle qAngle = GetEngineObject()->GetAbsAngles();
 	AngleVectors( qAngle, &vDirection, NULL, NULL );
 
 	vDirection *= flSpeed;
-	pBall->SetAbsVelocity( vDirection );
+	pBall->GetEngineObject()->SetAbsVelocity( vDirection );
 
 	DispatchSpawn(pBall);
 	pBall->Activate();
@@ -595,13 +595,13 @@ static void fire_energy_ball_f( void )
 
 		pBall->SetRadius( 12.0f );
 
-		pBall->SetAbsOrigin( ptEyes + (vForward * 50.0f) );
+		pBall->GetEngineObject()->SetAbsOrigin( ptEyes + (vForward * 50.0f) );
 		pBall->SetSpawner( NULL );
 
 		pBall->SetSpeed( 400.0f );
 				
 
-		pBall->SetAbsVelocity( vForward * 400.0f );
+		pBall->GetEngineObject()->SetAbsVelocity( vForward * 400.0f );
 
 		DispatchSpawn(pBall);
 		pBall->Activate();

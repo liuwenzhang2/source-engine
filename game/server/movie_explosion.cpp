@@ -28,7 +28,7 @@ MovieExplosion* MovieExplosion::CreateMovieExplosion(const Vector &pos)
 		MovieExplosion *pEffect = dynamic_cast<MovieExplosion*>(pEnt);
 		if(pEffect && pEffect->entindex()!=-1)
 		{
-			pEffect->SetLocalOrigin( pos );
+			pEffect->GetEngineObject()->SetLocalOrigin( pos );
 			pEffect->Activate();
 			return pEffect;
 		}

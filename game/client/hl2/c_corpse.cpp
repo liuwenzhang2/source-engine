@@ -54,8 +54,8 @@ int C_Corpse::DrawModel( int flags )
 			MODEL_INSTANCE_INVALID,
 			m_nReferencePlayer, 
 			GetModel(),
-			GetAbsOrigin(),
-			GetAbsAngles(),
+			GetEngineObject()->GetAbsOrigin(),
+			GetEngineObject()->GetAbsAngles(),
 			m_nSkin,
 			m_nBody,
 			m_nHitboxSet );

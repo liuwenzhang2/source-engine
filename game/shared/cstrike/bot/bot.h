@@ -46,7 +46,7 @@ extern bool AreBotsAllowed();
 //
 inline Vector GetCentroid( const CBaseEntity *player )
 {
-	Vector centroid = player->GetAbsOrigin();
+	Vector centroid = player->GetEngineObject()->GetAbsOrigin();
 
 	const Vector &mins = player->WorldAlignMins();
 	const Vector &maxs = player->WorldAlignMaxs();
@@ -354,7 +354,7 @@ inline void CBot<T>::PopPostureContext( void )
 template < class T >
 inline bool CBot<T>::IsPlayerFacingMe( CBasePlayer *other ) const
 {
-	Vector toOther = other->GetAbsOrigin() - this->GetAbsOrigin();
+	Vector toOther = other->GetEngineObject()->GetAbsOrigin() - this->GetEngineObject()->GetAbsOrigin();
 
 	Vector otherForward;
 	AngleVectors( other->EyeAngles() + other->GetPunchAngle(), &otherForward );
@@ -369,7 +369,7 @@ inline bool CBot<T>::IsPlayerFacingMe( CBasePlayer *other ) const
 template < class T >
 inline bool CBot<T>::IsPlayerLookingAtMe( CBasePlayer *other, float cosTolerance ) const
 {
-	Vector toOther = other->GetAbsOrigin() - this->GetAbsOrigin();
+	Vector toOther = other->GetEngineObject()->GetAbsOrigin() - this->GetEngineObject()->GetAbsOrigin();
 	toOther.NormalizeInPlace();
 
 	Vector otherForward;

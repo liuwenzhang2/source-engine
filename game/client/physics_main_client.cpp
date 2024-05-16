@@ -82,19 +82,19 @@ void C_BaseEntity::PhysicsPushEntity( const Vector& push, trace_t *pTrace )
 
 	// NOTE: absorigin and origin must be equal because there is no moveparent
 	Vector prevOrigin;
-	VectorCopy( GetAbsOrigin(), prevOrigin );
+	VectorCopy(GetEngineObject()->GetAbsOrigin(), prevOrigin );
 
 	trace_t		trace;
 	PhysicsCheckSweep( prevOrigin, push, pTrace );
 
 	if ( pTrace->fraction )
 	{
-		SetAbsOrigin( pTrace->endpos );
+		GetEngineObject()->SetAbsOrigin( pTrace->endpos );
 	}
 
 	// CLIENT DLL HACKS
-	GetEngineObject()->SetNetworkOrigin(GetLocalOrigin());
-	GetEngineObject()->SetNetworkAngles(GetLocalAngles());
+	GetEngineObject()->SetNetworkOrigin(GetEngineObject()->GetLocalOrigin());
+	GetEngineObject()->SetNetworkAngles(GetEngineObject()->GetLocalAngles());
 
 //	InvalidatePhysicsRecursive( POSITION_CHANGED | ANGLES_CHANGED );
 
@@ -130,13 +130,13 @@ void C_BaseEntity::PhysicsCustom()
 		return;
 
 	// Moving upward, off the ground, or  resting on something that isn't ground
-	if ( GetLocalVelocity()[2] > 0 || !GetGroundEntity() || !GetGroundEntity()->IsStandable() )
+	if (GetEngineObject()->GetLocalVelocity()[2] > 0 || !GetGroundEntity() || !GetGroundEntity()->IsStandable() )
 	{
 		SetGroundEntity( NULL );
 	}
 
 	// NOTE: The entity must set the position, angles, velocity in its custom movement
-	Vector vecNewPosition = GetAbsOrigin();
+	Vector vecNewPosition = GetEngineObject()->GetAbsOrigin();
 
 	if ( vecNewPosition == vec3_origin )
 	{
@@ -144,19 +144,19 @@ void C_BaseEntity::PhysicsCustom()
 		Assert( 0 );
 	}
 
-	Vector vecNewVelocity = GetLocalVelocity();
-	QAngle angNewAngles = GetAbsAngles();
+	Vector vecNewVelocity = GetEngineObject()->GetLocalVelocity();
+	QAngle angNewAngles = GetEngineObject()->GetAbsAngles();
 	QAngle angNewAngVelocity = m_vecAngVelocity;
 
 	PerformCustomPhysics( &vecNewPosition, &vecNewVelocity, &angNewAngles, &angNewAngVelocity );
 
 	// Store off all of the new state information...
-	SetLocalVelocity(vecNewVelocity);
-	SetAbsAngles( angNewAngles );
+	GetEngineObject()->SetLocalVelocity(vecNewVelocity);
+	GetEngineObject()->SetAbsAngles( angNewAngles );
 	m_vecAngVelocity = angNewAngVelocity;
 
 	Vector move;
-	VectorSubtract( vecNewPosition, GetAbsOrigin(), move );
+	VectorSubtract( vecNewPosition, GetEngineObject()->GetAbsOrigin(), move );
 
 	// move origin
 	trace_t trace;
@@ -169,7 +169,7 @@ void C_BaseEntity::PhysicsCustom()
 		// entity is trapped in another solid
 		// UNDONE: does this entity needs to be removed?
 		//VectorCopy (vec3_origin, m_vecVelocity);
-		SetLocalVelocity(vec3_origin);
+		GetEngineObject()->SetLocalVelocity(vec3_origin);
 		//VectorCopy (vec3_angle, m_vecAngVelocity);
 		SetLocalAngularVelocity(vec3_angle);
 		return;

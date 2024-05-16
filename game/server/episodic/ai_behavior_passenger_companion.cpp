@@ -143,7 +143,7 @@ void CAI_PassengerBehaviorCompanion::OnUpdateShotRegulator( void )
 bool CAI_PassengerBehaviorCompanion::IsValidEnemy( CBaseEntity *pEntity )
 {
 	// The target must be much closer in the vehicle 
-	float flDistSqr = ( pEntity->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
+	float flDistSqr = ( pEntity->GetEngineObject()->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
 	if ( flDistSqr > Square( (40*12) ) && pEntity->Classify() != CLASS_BULLSEYE )
 		return false;
 
@@ -196,7 +196,7 @@ void CAI_PassengerBehaviorCompanion::GatherVehicleCollisionConditions( const Vec
 		SinCos( DEG2RAD( m_vehicleState.m_vecLastAngles.z * dt ), &vecAngularVelocity.y, &vecAngularVelocity.x );
 		
 		Vector vecOffset;
-		VectorRotate( vecAngularVelocity, m_hVehicle->GetAbsAngles() + QAngle( 0, 90, 0 ), vecOffset );
+		VectorRotate( vecAngularVelocity, m_hVehicle->GetEngineObject()->GetAbsAngles() + QAngle( 0, 90, 0 ), vecOffset );
 
 		vForward += vecOffset;
 		VectorNormalize( vForward );
@@ -205,7 +205,7 @@ void CAI_PassengerBehaviorCompanion::GatherVehicleCollisionConditions( const Vec
 		CTraceFilterNoNPCsOrPlayer filter( m_hVehicle, COLLISION_GROUP_NONE ); // We don't care about NPCs or the player (certainly if they're in the vehicle!)
 
 		trace_t	tr;
-		UTIL_TraceHull( m_hVehicle->GetAbsOrigin(), m_hVehicle->GetAbsOrigin() + ( vForward * distance ), mins, maxs, MASK_SOLID, &filter, &tr );
+		UTIL_TraceHull( m_hVehicle->GetEngineObject()->GetAbsOrigin(), m_hVehicle->GetEngineObject()->GetAbsOrigin() + ( vForward * distance ), mins, maxs, MASK_SOLID, &filter, &tr );
 		
 		bool bWarnCollision = true;
 		if ( tr.DidHit() )
@@ -403,7 +403,7 @@ void CAI_PassengerBehaviorCompanion::UpdateStuckStatus( void )
 	CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
 	if ( pPlayer )
 	{
-		bVisibleToPlayer = pPlayer->FInViewCone( GetOuter()->GetAbsOrigin() );
+		bVisibleToPlayer = pPlayer->FInViewCone( GetOuter()->GetEngineObject()->GetAbsOrigin() );
 		bPlayerInVehicle = pPlayer->IsInAVehicle();
 	}
 
@@ -559,7 +559,7 @@ void CAI_PassengerBehaviorCompanion::AimGun( void )
 
 	Vector vecShootDir = GetOuter()->GetShootEnemyDir( vecTorso, false );
 	
-	Vector vecDirToEnemy = GetEnemy()->GetAbsOrigin() - vecTorso;
+	Vector vecDirToEnemy = GetEnemy()->GetEngineObject()->GetAbsOrigin() - vecTorso;
 	VectorNormalize( vecDirToEnemy );
 
 	bool bRightSide = ( DotProduct( vecDirToEnemy, vecRight ) > 0.0f );
@@ -809,9 +809,9 @@ bool CAI_PassengerBehaviorCompanion::CanEnterVehicleImmediately( int *pResultSeq
 	CPlane lateralPlane;
 	lateralPlane.InitializePlane( vecRight, m_hVehicle->WorldSpaceCenter() );
 
-	bool bPlaneSide = lateralPlane.PointInFront( GetOuter()->GetAbsOrigin() );
+	bool bPlaneSide = lateralPlane.PointInFront( GetOuter()->GetEngineObject()->GetAbsOrigin() );
 
-	Vector	vecPassengerOffset = ( GetOuter()->WorldSpaceCenter() - GetOuter()->GetAbsOrigin() );
+	Vector	vecPassengerOffset = ( GetOuter()->WorldSpaceCenter() - GetOuter()->GetEngineObject()->GetAbsOrigin() );
 
 	const CPassengerSeatTransition *pTransition;
 	float	flNearestDistSqr = FLT_MAX;
@@ -839,7 +839,7 @@ bool CAI_PassengerBehaviorCompanion::CanEnterVehicleImmediately( int *pResultSeq
 			continue;
 
 		// Otherwise distance is the deciding factor
-		flSeatDistSqr = ( vecStartPos - GetOuter()->GetAbsOrigin() ).LengthSqr();
+		flSeatDistSqr = ( vecStartPos - GetOuter()->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 
 		// We must be within a certain distance to the vehicle
 		if ( flSeatDistSqr > Square( 25*12 ) )
@@ -944,7 +944,7 @@ int CAI_PassengerBehaviorCompanion::SelectFailSchedule( int failedSchedule, int 
 			}
 
 			// If we're not close enough, then get nearer the target
-			if ( UTIL_DistApprox( m_hVehicle->GetAbsOrigin(), GetOuter()->GetAbsOrigin() ) > PASSENGER_NEAR_VEHICLE_THRESHOLD )
+			if ( UTIL_DistApprox( m_hVehicle->GetEngineObject()->GetAbsOrigin(), GetOuter()->GetEngineObject()->GetAbsOrigin() ) > PASSENGER_NEAR_VEHICLE_THRESHOLD )
 				return SCHED_PASSENGER_RUN_TO_ENTER_VEHICLE_FAILED;
 		}
 		
@@ -1050,7 +1050,7 @@ bool CAI_PassengerBehaviorCompanion::FindPathToVehicleEntryPoint( void )
 	}
 
 	// If we're already close enough, just succeed
-	float flDistToGoalSqr = ( GetOuter()->GetAbsOrigin() - vecEntryPoint ).LengthSqr();
+	float flDistToGoalSqr = ( GetOuter()->GetEngineObject()->GetAbsOrigin() - vecEntryPoint ).LengthSqr();
 	if ( flDistToGoalSqr < Square(3*12) )
 		return true;
 
@@ -1567,8 +1567,8 @@ bool CAI_PassengerBehaviorCompanion::UseRadialRouteToEntryPoint( const Vector &v
 	vecCenterPos.z = vecEntryPoint.z;
 
 	// Find out if we need to go around the vehicle 
-	float flDistToVehicleCenter = ( vecCenterPos - GetOuter()->GetAbsOrigin() ).Length();
-	float flDistToGoal = ( vecEntryPoint - GetOuter()->GetAbsOrigin() ).Length();
+	float flDistToVehicleCenter = ( vecCenterPos - GetOuter()->GetEngineObject()->GetAbsOrigin() ).Length();
+	float flDistToGoal = ( vecEntryPoint - GetOuter()->GetEngineObject()->GetAbsOrigin() ).Length();
 	if ( flDistToGoal > flDistToVehicleCenter )
 		return true;
 
@@ -1589,7 +1589,7 @@ float CAI_PassengerBehaviorCompanion::GetArcToEntryPoint( const Vector &vecCente
 	vecEntryPointAdjusted.z = vecCenterPoint.z;
 
 	// Direction from vehicle center to passenger
-	Vector vecVehicleToPassenger = ( GetOuter()->GetAbsOrigin() - vecCenterPoint );
+	Vector vecVehicleToPassenger = ( GetOuter()->GetEngineObject()->GetAbsOrigin() - vecCenterPoint );
 	VectorNormalize( vecVehicleToPassenger );
 
 	// Direction from vehicle center to entry point
@@ -1719,7 +1719,7 @@ int CAI_PassengerBehaviorCompanion::FindEntrySequence( bool bNearest /*= false*/
 				return nSequence;
 
 			// Otherwise distance is the deciding factor
-			flSeatDistSqr = ( vecStartPos - GetOuter()->GetAbsOrigin() ).LengthSqr();
+			flSeatDistSqr = ( vecStartPos - GetOuter()->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 
 			// Closer, take it
 			if ( flSeatDistSqr < flNearestDistSqr )

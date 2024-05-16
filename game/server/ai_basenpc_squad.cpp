@@ -143,7 +143,7 @@ bool CAI_BaseNPC::IsValidShootPosition( const Vector &vecShootLocation, CAI_Node
 	{
 		if (!pHint || pHint->GetGroup() != GetHintGroup())
 		{
-			if ( ( vecShootLocation - GetAbsOrigin() ).Length2DSqr() > 1 )
+			if ( ( vecShootLocation - GetEngineObject()->GetAbsOrigin() ).Length2DSqr() > 1 )
 				return false;
 		}
 	}
@@ -168,7 +168,7 @@ bool CAI_BaseNPC::IsSquadmateInSpread( const Vector &sourcePos, const Vector &ta
 		{
 			if ( pSquadmate != this )
 			{
-				if ( PointInSpread( pSquadmate, sourcePos, targetPos, pSquadmate->GetAbsOrigin(), flSpread, maxDistOffCenter ) )
+				if ( PointInSpread( pSquadmate, sourcePos, targetPos, pSquadmate->GetEngineObject()->GetAbsOrigin(), flSpread, maxDistOffCenter ) )
 					return true;
 			}
 		}

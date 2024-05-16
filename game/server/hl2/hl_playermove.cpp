@@ -95,7 +95,7 @@ void CHLPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 		}
 		else
 		{
-			m_vecSaveOrigin = player->GetAbsOrigin();
+			m_vecSaveOrigin = player->GetEngineObject()->GetAbsOrigin();
 			if ( m_bWasInVehicle )
 			{
 				m_bWasInVehicle = false;
@@ -149,7 +149,7 @@ void CHLPlayerMove::FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *
 		else
 		{
 			m_bVehicleFlipped = false;
-			distance = VectorLength( player->GetAbsOrigin() - m_vecSaveOrigin );
+			distance = VectorLength( player->GetEngineObject()->GetAbsOrigin() - m_vecSaveOrigin );
 		}
 		if ( distance > 0 )
 		{

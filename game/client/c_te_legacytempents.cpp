@@ -178,8 +178,8 @@ int C_LocalTempEntity::DrawStudioModel( int flags )
 			MODEL_INSTANCE_INVALID,
 			entindex(),
 			GetModel(),
-			GetAbsOrigin(),
-			GetAbsAngles(),
+			GetEngineObject()->GetAbsOrigin(),
+			GetEngineObject()->GetAbsAngles(),
 			m_nSkin,
 			m_nBody,
 			m_nHitboxSet );
@@ -206,7 +206,7 @@ int	C_LocalTempEntity::DrawModel( int flags )
 	if ( this->flags & FTENT_BEOCCLUDED )
 	{
 		// Check normal
-		Vector vecDelta = (GetAbsOrigin() - MainViewOrigin());
+		Vector vecDelta = (GetEngineObject()->GetAbsOrigin() - MainViewOrigin());
 		VectorNormalize( vecDelta );
 		float flDot = DotProduct( m_vecNormal, vecDelta );
 		if ( flDot > 0 )
@@ -223,8 +223,8 @@ int	C_LocalTempEntity::DrawModel( int flags )
 		drawn = DrawSprite( 
 			this,
 			GetModel(), 
-			GetAbsOrigin(), 
-			GetAbsAngles(), 
+			GetEngineObject()->GetAbsOrigin(),
+			GetEngineObject()->GetAbsAngles(),
 			m_flFrame,  // sprite frame to render
 			m_nBody > 0 ? cl_entitylist->GetBaseEntity( m_nBody ) : NULL,  // attach to
 			m_nSkin,  // attachment point
@@ -301,15 +301,15 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 
 	Assert( !GetEngineObject()->GetMoveParent() );
 
-	m_vecPrevLocalOrigin = GetLocalOrigin();
+	m_vecPrevLocalOrigin = GetEngineObject()->GetLocalOrigin();
 
 	m_vecTempEntVelocity = m_vecTempEntVelocity + ( m_vecTempEntAcceleration * frametime );
 
 	if ( flags & FTENT_PLYRATTACHMENT )
 	{
-		if ( IClientEntity *pClient = cl_entitylist->GetClientEntity( clientIndex ) )
+		if ( C_BaseEntity *pClient = cl_entitylist->GetBaseEntity( clientIndex ) )
 		{
-			SetLocalOrigin( pClient->GetAbsOrigin() + tentOffset );
+			GetEngineObject()->SetLocalOrigin( pClient->GetEngineObject()->GetAbsOrigin() + tentOffset );
 		}
 	}
 	else if ( flags & FTENT_SINEWAVE )
@@ -317,24 +317,24 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 		x += m_vecTempEntVelocity[0] * frametime;
 		y += m_vecTempEntVelocity[1] * frametime;
 
-		SetLocalOrigin( Vector(
+		GetEngineObject()->SetLocalOrigin( Vector(
 			x + sin( m_vecTempEntVelocity[2] + gpGlobals->curtime /* * anim.prevframe */ ) * (10*m_flSpriteScale),
 			y + sin( m_vecTempEntVelocity[2] + fastFreq + 0.7 ) * (8*m_flSpriteScale),
-			GetLocalOriginDim( Z_INDEX ) + m_vecTempEntVelocity[2] * frametime ) );
+			GetEngineObject()->GetLocalOriginDim( Z_INDEX ) + m_vecTempEntVelocity[2] * frametime ) );
 	}
 	else if ( flags & FTENT_SPIRAL )
 	{
 		float s, c;
 		SinCos( m_vecTempEntVelocity[2] + fastFreq, &s, &c );
 
-		SetLocalOrigin( GetLocalOrigin() + Vector(
+		GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() + Vector(
 			m_vecTempEntVelocity[0] * frametime + 8 * sin( gpGlobals->curtime * 20 ),
 			m_vecTempEntVelocity[1] * frametime + 4 * sin( gpGlobals->curtime * 30 ),
 			m_vecTempEntVelocity[2] * frametime ) );
 	}
 	else
 	{
-		SetLocalOrigin( GetLocalOrigin() + m_vecTempEntVelocity * frametime );
+		GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() + m_vecTempEntVelocity * frametime );
 	}
 	
 	if ( flags & FTENT_SPRANIMATE )
@@ -369,7 +369,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 
 	if ( flags & FTENT_ROTATE )
 	{
-		SetLocalAngles( GetLocalAngles() + m_vecTempEntAngVelocity * frametime );
+		GetEngineObject()->SetLocalAngles(GetEngineObject()->GetLocalAngles() + m_vecTempEntAngVelocity * frametime );
 	}
 	else if ( flags & FTENT_ALIGNTOMOTION )
 	{
@@ -377,7 +377,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 		{
 			QAngle angles;
 			VectorAngles( m_vecTempEntVelocity, angles );
-			SetAbsAngles( angles );
+			GetEngineObject()->SetAbsAngles( angles );
 		}
 	}
 
@@ -420,7 +420,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 					collisionGroup = GetCollisionGroup();
 				}
 
-				UTIL_TraceLine( vPrevOrigin, GetLocalOrigin(), MASK_SOLID, GetOwnerEntity(), collisionGroup, &trace );
+				UTIL_TraceLine( vPrevOrigin, GetEngineObject()->GetLocalOrigin(), MASK_SOLID, GetOwnerEntity(), collisionGroup, &trace );
 
 				if ( (flags & FTENT_COLLIDEPROPS) && trace.m_pEnt )
 				{
@@ -447,7 +447,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 		else if ( flags & FTENT_COLLIDEWORLD )
 		{
 			CTraceFilterWorldOnly traceFilter;
-			UTIL_TraceLine( m_vecPrevLocalOrigin, GetLocalOrigin(), MASK_SOLID, &traceFilter, &trace );
+			UTIL_TraceLine( m_vecPrevLocalOrigin, GetEngineObject()->GetLocalOrigin(), MASK_SOLID, &traceFilter, &trace );
 			if ( trace.fraction != 1 )
 			{
 				traceFraction = trace.fraction;
@@ -458,7 +458,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 		if ( traceFraction != 1  )	// Decent collision now, and damping works
 		{
 			float  proj, damp;
-			SetLocalOrigin( trace.endpos );
+			GetEngineObject()->SetLocalOrigin( trace.endpos );
 			
 			// Damp velocity
 			damp = bounceFactor;
@@ -471,8 +471,8 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 					{
 						damp = 0;		// Stop
 						flags &= ~(FTENT_ROTATE|FTENT_GRAVITY|FTENT_SLOWGRAVITY|FTENT_COLLIDEWORLD|FTENT_SMOKETRAIL);
-						SetLocalAnglesDim( X_INDEX, 0 );
-						SetLocalAnglesDim( Z_INDEX, 0 );
+						GetEngineObject()->SetLocalAnglesDim( X_INDEX, 0 );
+						GetEngineObject()->SetLocalAnglesDim( Z_INDEX, 0 );
 					}
 				}
 			}
@@ -557,13 +557,13 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 					proj = ((Vector)m_vecTempEntVelocity).Dot(traceNormal);
 					VectorMA( m_vecTempEntVelocity, -proj*2, traceNormal, m_vecTempEntVelocity );
 					// Reflect rotation (fake)
-					SetLocalAnglesDim( Y_INDEX, -GetLocalAnglesDim( Y_INDEX ) );
+					GetEngineObject()->SetLocalAnglesDim( Y_INDEX, -GetEngineObject()->GetLocalAnglesDim( Y_INDEX ) );
 				}
 				
 				if ( damp != 1 )
 				{
 					VectorScale( m_vecTempEntVelocity, damp, m_vecTempEntVelocity );
-					SetLocalAngles( GetLocalAngles() * 0.9 );
+					GetEngineObject()->SetLocalAngles(GetEngineObject()->GetLocalAngles() * 0.9 );
 				}
 			}
 		}
@@ -573,7 +573,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 	if ( (flags & FTENT_FLICKER) && framenumber == m_nFlickerFrame )
 	{
 		dlight_t *dl = effects->CL_AllocDlight (LIGHT_INDEX_TE_DYNAMIC);
-		VectorCopy (GetLocalOrigin(), dl->origin);
+		VectorCopy (GetEngineObject()->GetLocalOrigin(), dl->origin);
 		dl->radius = 60;
 		dl->color.r = 255;
 		dl->color.g = 120;
@@ -738,7 +738,7 @@ const Vector *CBreakableHelper::GetLightingOrigin( C_LocalTempEntity *entity )
 		if ( e.entity == entity )
 		{
 			Assert( head );
-			return head ? &head->GetAbsOrigin() : NULL;
+			return head ? &head->GetEngineObject()->GetAbsOrigin() : NULL;
 		}
 	}
 	return NULL;
@@ -815,7 +815,7 @@ void CTempEnts::FizzEffect( C_BaseEntity *pent, int modelIndex, int density, int
 	depth = maxs[1] - mins[1];
 	speed = current;
 
-	SinCos( pent->GetLocalAngles()[1]*M_PI/180, &yspeed, &xspeed );
+	SinCos( pent->GetEngineObject()->GetLocalAngles()[1]*M_PI/180, &yspeed, &xspeed );
 	xspeed *= speed;
 	yspeed *= speed;
 	frameCount = modelinfo->GetModelFrameCount( model );
@@ -1115,8 +1115,8 @@ void CTempEnts::PhysicsProp( int modelindex, int skin, const Vector& pos, const 
 
 	pEntity->SetModelName(MAKE_STRING(modelinfo->GetModelName(model)) );
 	pEntity->m_nSkin = skin;
-	pEntity->SetAbsOrigin( pos );
-	pEntity->SetAbsAngles( angles );
+	pEntity->GetEngineObject()->SetAbsOrigin( pos );
+	pEntity->GetEngineObject()->SetAbsAngles( angles );
 	pEntity->SetPhysicsMode( PHYSICS_MULTIPLAYER_CLIENTSIDE );
 	pEntity->SetEffects( effects );
 
@@ -1177,8 +1177,8 @@ C_LocalTempEntity *CTempEnts::ClientProjectile( const Vector& vecOrigin, const V
 	pTemp->SetAcceleration( vecAcceleration );
 	QAngle angles;
 	VectorAngles( vecVelocity, angles );
-	pTemp->SetAbsAngles( angles );
-	pTemp->SetAbsOrigin( vecOrigin );
+	pTemp->GetEngineObject()->SetAbsAngles( angles );
+	pTemp->GetEngineObject()->SetAbsOrigin( vecOrigin );
 	pTemp->die = gpGlobals->curtime + lifetime;
 	pTemp->flags = FTENT_COLLIDEALL | FTENT_ATTACHTOTARGET | FTENT_ALIGNTOMOTION;
 	pTemp->clientIndex = ( pOwner != NULL ) ? pOwner->entindex() : 0; 
@@ -1244,7 +1244,7 @@ C_LocalTempEntity *CTempEnts::TempSprite( const Vector &pos, const Vector &dir, 
 	pTemp->flags |= flags;
 
 	pTemp->SetVelocity( dir );
-	pTemp->SetLocalOrigin( pos );
+	pTemp->GetEngineObject()->SetLocalOrigin( pos );
 	if ( life )
 		pTemp->die = gpGlobals->curtime + life;
 	else
@@ -1315,7 +1315,7 @@ void CTempEnts::Sprite_Spray( const Vector &pos, const Vector &dir, int modelInd
 		velocity *= random->RandomFloat( (speed * 0.8), (speed * 1.2) );
 		pTemp->SetVelocity( velocity );
 
-		pTemp->SetLocalOrigin( pos );
+		pTemp->GetEngineObject()->SetLocalOrigin( pos );
 
 		pTemp->die = gpGlobals->curtime + 0.35;
 
@@ -1373,7 +1373,7 @@ void CTempEnts::Sprite_Trail( const Vector &vecStart, const Vector &vecEnd, int 
 		vecVel.y += random->RandomInt( -127,128 ) * flAmplitude;
 		vecVel.z += random->RandomInt( -127,128 ) * flAmplitude;
 		pTemp->SetVelocity( vecVel );
-		pTemp->SetLocalOrigin( vecPos );
+		pTemp->GetEngineObject()->SetLocalOrigin( vecPos );
 
 		pTemp->m_flSpriteScale		= flSize;
 		pTemp->SetRenderMode( kRenderGlow );
@@ -1407,7 +1407,7 @@ void CTempEnts::AttachTentToPlayer( int client, int modelIndex, float zoffset, f
 		return;
 	}
 
-	IClientEntity *clientClass = cl_entitylist->GetClientEntity( client );
+	C_BaseEntity *clientClass = cl_entitylist->GetBaseEntity( client );
 	if ( !clientClass )
 	{
 		Warning("Couldn't get IClientEntity for %i\n", client );
@@ -1422,7 +1422,7 @@ void CTempEnts::AttachTentToPlayer( int client, int modelIndex, float zoffset, f
 		return;
 	}
 
-	VectorCopy( clientClass->GetAbsOrigin(), position );
+	VectorCopy( clientClass->GetEngineObject()->GetAbsOrigin(), position );
 	position[ 2 ] += zoffset;
 
 	pTemp = TempEntAllocHigh( position, pModel );
@@ -1514,13 +1514,13 @@ void CTempEnts::RicochetSprite( const Vector &pos, model_t *pmodel, float durati
 
 	pTemp->SetVelocity( vec3_origin );
 
-	pTemp->SetLocalOrigin( pos );
+	pTemp->GetEngineObject()->SetLocalOrigin( pos );
 	
 	pTemp->fadeSpeed = 8;
 	pTemp->die = gpGlobals->curtime;
 
 	pTemp->m_flFrame = 0;
-	pTemp->SetLocalAnglesDim( Z_INDEX, 45 * random->RandomInt( 0, 7 ) );
+	pTemp->GetEngineObject()->SetLocalAnglesDim( Z_INDEX, 45 * random->RandomInt( 0, 7 ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1561,7 +1561,7 @@ void CTempEnts::BloodSprite( const Vector &org, int r, int g, int b, int a, int 
 			pTemp->m_flFrame		= 0;
 			pTemp->m_flFrameMax		= frameCount - 1;
 			pTemp->bounceFactor		= 0;
-			pTemp->SetLocalAnglesDim( Z_INDEX, random->RandomInt( 0, 360 ) );
+			pTemp->GetEngineObject()->SetLocalAnglesDim( Z_INDEX, random->RandomInt( 0, 360 ) );
 		}
 	}
 }
@@ -1605,7 +1605,7 @@ C_LocalTempEntity *CTempEnts::DefaultSprite( const Vector &pos, int spriteIndex,
 	pTemp->m_flFrameRate = framerate;
 	pTemp->die = gpGlobals->curtime + (float)frameCount / framerate;
 	pTemp->m_flFrame = 0;
-	pTemp->SetLocalOrigin( pos );
+	pTemp->GetEngineObject()->SetLocalOrigin( pos );
 
 	return pTemp;
 }
@@ -1628,7 +1628,7 @@ void CTempEnts::Sprite_Smoke( C_LocalTempEntity *pTemp, float scale )
 		iColor,
 		iColor,
 		255 );
-	pTemp->SetLocalOriginDim( Z_INDEX, pTemp->GetLocalOriginDim( Z_INDEX ) + 20 );
+	pTemp->GetEngineObject()->SetLocalOriginDim( Z_INDEX, pTemp->GetEngineObject()->GetLocalOriginDim( Z_INDEX ) + 20 );
 	pTemp->m_flSpriteScale = scale;
 	pTemp->flags = FTENT_WINDBLOWN;
 
@@ -1674,7 +1674,7 @@ void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAng
 	pTemp->m_vecTempEntAngVelocity[2] = random->RandomFloat(-1024,1024);
 
 	//Face forward
-	pTemp->SetAbsAngles( gunAngles );
+	pTemp->GetEngineObject()->SetAbsAngles( gunAngles );
 
 	pTemp->SetRenderMode( kRenderNormal );
 	pTemp->tempent_renderamt = 255;		// Set this for fadeout
@@ -1704,7 +1704,7 @@ C_LocalTempEntity * CTempEnts::SpawnTempModel( const model_t *pModel, const Vect
 	if ( !pTemp )
 		return NULL;
 
-	pTemp->SetAbsAngles( vecAngles );
+	pTemp->GetEngineObject()->SetAbsAngles( vecAngles );
 	pTemp->m_nBody	= 0;
 	pTemp->flags |= iFlags;
 	pTemp->m_vecTempEntAngVelocity[0] = random->RandomFloat(-255,255);
@@ -1909,13 +1909,13 @@ void CTempEnts::Sprite_Explode( C_LocalTempEntity *pTemp, float scale, int flags
 
 	if ( flags & TE_EXPLFLAG_ROTATE )
 	{
-		pTemp->SetLocalAnglesDim( Z_INDEX, random->RandomInt( 0, 360 ) );
+		pTemp->GetEngineObject()->SetLocalAnglesDim( Z_INDEX, random->RandomInt( 0, 360 ) );
 	}
 
 	pTemp->m_nRenderFX = kRenderFxNone;
 	pTemp->SetVelocity( Vector( 0, 0, 8 ) );
 	pTemp->SetRenderColor( 255, 255, 255 );
-	pTemp->SetLocalOriginDim( Z_INDEX, pTemp->GetLocalOriginDim( Z_INDEX ) + 10 );
+	pTemp->GetEngineObject()->SetLocalOriginDim( Z_INDEX, pTemp->GetEngineObject()->GetLocalOriginDim( Z_INDEX ) + 10 );
 	pTemp->m_flSpriteScale = scale;
 }
 
@@ -1988,7 +1988,7 @@ C_LocalTempEntity *CTempEnts::TempEntAlloc( const Vector& org, const model_t *mo
 	pTemp->Prepare( model, gpGlobals->curtime );
 
 	pTemp->priority = TENTPRIORITY_LOW;
-	pTemp->SetAbsOrigin( org );
+	pTemp->GetEngineObject()->SetAbsOrigin( org );
 
 	pTemp->m_RenderGroup = RENDER_GROUP_OTHER;
 	pTemp->AddToLeafSystem( pTemp->m_RenderGroup );
@@ -2115,7 +2115,7 @@ C_LocalTempEntity *CTempEnts::TempEntAllocHigh( const Vector& org, const model_t
 	pTemp->Prepare( model, gpGlobals->curtime );
 
 	pTemp->priority = TENTPRIORITY_HIGH;
-	pTemp->SetLocalOrigin( org );
+	pTemp->GetEngineObject()->SetLocalOrigin( org );
 
 	pTemp->m_RenderGroup = RENDER_GROUP_OTHER;
 	pTemp->AddToLeafSystem( pTemp->m_RenderGroup );
@@ -2269,7 +2269,7 @@ void CTempEnts::PlaySound ( C_LocalTempEntity *pTemp, float damp )
 		ep.m_flVolume = fvol;
 		ep.m_SoundLevel = params.soundlevel;
 		ep.m_nPitch = pitch;
-		ep.m_pOrigin = &pTemp->GetAbsOrigin();
+		ep.m_pOrigin = &pTemp->GetEngineObject()->GetAbsOrigin();
 
 		g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );//C_BaseEntity::
 	}
@@ -2293,8 +2293,8 @@ int CTempEnts::AddVisibleTempEntity( C_LocalTempEntity *pEntity )
 
 	for (i=0 ; i<3 ; i++)
 	{
-		mins[i] = pEntity->GetAbsOrigin()[i] + model_mins[i];
-		maxs[i] = pEntity->GetAbsOrigin()[i] + model_maxs[i];
+		mins[i] = pEntity->GetEngineObject()->GetAbsOrigin()[i] + model_mins[i];
+		maxs[i] = pEntity->GetEngineObject()->GetAbsOrigin()[i] + model_maxs[i];
 	}
 
 	// FIXME: Vis isn't setup by the time we get here, so this call fails if 
@@ -3268,7 +3268,7 @@ void CTempEnts::RocketFlare( const Vector& pos )
 	pTemp->m_flFrameRate = 1.0;
 	pTemp->m_flFrame = random->RandomInt( 0, nframeCount - 1);
 	pTemp->m_flSpriteScale = 1.0;
-	pTemp->SetAbsOrigin( pos );
+	pTemp->GetEngineObject()->SetAbsOrigin( pos );
 	pTemp->die = gpGlobals->curtime + 0.01;
 }
 
@@ -3316,7 +3316,7 @@ void CTempEnts::HL1EjectBrass( const Vector &vecPosition, const QAngle &angAngle
 	pTemp->m_vecTempEntAngVelocity[2] = random->RandomFloat( -256,255 );
 
 	//Face forward
-	pTemp->SetAbsAngles( angAngles );
+	pTemp->GetEngineObject()->SetAbsAngles( angAngles );
 
 	pTemp->SetRenderMode( kRenderNormal );
 	pTemp->tempent_renderamt	= 255;		// Set this for fadeout
@@ -3385,16 +3385,16 @@ void CTempEnts::CSEjectBrass( const Vector &vecPosition, const QAngle &angVeloci
 			   right * random->RandomFloat( -20, 20 );
 
 	if( pShooter )
-		velocity += pShooter->GetAbsVelocity();
+		velocity += pShooter->GetEngineObject()->GetAbsVelocity();
 
 	C_LocalTempEntity *pTemp = TempEntAlloc( vecPosition, pModel );
 	if ( !pTemp )
 		return;
 
 	if( pShooter )
-		pTemp->SetAbsAngles( pShooter->EyeAngles() );
+		pTemp->GetEngineObject()->SetAbsAngles( pShooter->EyeAngles() );
 	else
-		pTemp->SetAbsAngles( vec3_angle );
+		pTemp->GetEngineObject()->SetAbsAngles( vec3_angle );
 
 	pTemp->SetVelocity( velocity );
 

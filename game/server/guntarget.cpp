@@ -40,7 +40,7 @@ public:
 	virtual Class_T Classify( void ) { return CLASS_NONE; }
 #endif
 	virtual int OnTakeDamage( const CTakeDamageInfo &info );
-	virtual Vector BodyTarget( const Vector &posSrc, bool bNoisy = true ) { return GetAbsOrigin(); }
+	virtual Vector BodyTarget( const Vector &posSrc, bool bNoisy = true ) { return GetEngineObject()->GetAbsOrigin(); }
 
 	// Input handlers
 	void InputStart( inputdata_t &inputdata );
@@ -132,7 +132,7 @@ void CGunTarget::Activate( void )
 	if ( pTarg )
 	{
 		m_hTargetEnt = pTarg;
-		Vector nextPos = pTarg->GetAbsOrigin();
+		Vector nextPos = pTarg->GetEngineObject()->GetAbsOrigin();
 		Teleport( &nextPos, NULL, NULL );
 	}
 }
@@ -164,7 +164,7 @@ void CGunTarget::Next( void )
 	}
 
 	SetMoveDone( &CGunTarget::Wait );
-	LinearMove( pTarget->GetLocalOrigin(), m_flSpeed );
+	LinearMove( pTarget->GetEngineObject()->GetLocalOrigin(), m_flSpeed );
 }
 
 
@@ -198,7 +198,7 @@ void CGunTarget::Wait( void )
 
 void CGunTarget::Stop( void )
 {
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetMoveDoneTime( -1 );
 	m_takedamage = DAMAGE_NO;
 }

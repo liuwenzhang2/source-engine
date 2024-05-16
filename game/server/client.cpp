@@ -351,8 +351,8 @@ CON_COMMAND_F( cast_ray, "Tests collision detection", FCVAR_CHEAT )
 	if ( tr.DidHit() )
 	{
 		DevMsg(1, "Hit %s\nposition %.2f, %.2f, %.2f\nangles %.2f, %.2f, %.2f\n", ((CBaseEntity*)tr.m_pEnt)->GetClassname(),
-			((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().x, ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().y, ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().z,
-			((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().x, ((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().y, ((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().z );
+			((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin().x, ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin().y, ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin().z,
+			((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsAngles().x, ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsAngles().y, ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsAngles().z );
 		DevMsg(1, "Hit: hitbox %d, hitgroup %d, physics bone %d, solid %d, surface %s, surfaceprop %s, contents %08x\n", tr.hitbox, tr.hitgroup, tr.physicsbone, ((CBaseEntity*)tr.m_pEnt)->GetSolid(), tr.surface.name, physprops->GetPropName( tr.surface.surfaceProps ), tr.contents );
 		NDebugOverlay::Line( start, tr.endpos, 0, 255, 0, false, 10 );
 		NDebugOverlay::Line( tr.endpos, tr.endpos + tr.plane.normal * 12, 255, 255, 0, false, 10 );
@@ -374,8 +374,8 @@ CON_COMMAND_F( cast_hull, "Tests hull collision detection", FCVAR_CHEAT )
 	if ( tr.DidHit() )
 	{
 		DevMsg(1, "Hit %s\nposition %.2f, %.2f, %.2f\nangles %.2f, %.2f, %.2f\n", ((CBaseEntity*)tr.m_pEnt)->GetClassname(),
-			((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().x, ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().y, ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin().z,
-			((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().x, ((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().y, ((CBaseEntity*)tr.m_pEnt)->GetAbsAngles().z );
+			((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin().x, ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin().y, ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin().z,
+			((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsAngles().x, ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsAngles().y, ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsAngles().z );
 		DevMsg(1, "Hit: hitbox %d, hitgroup %d, physics bone %d, solid %d, surface %s, surfaceprop %s\n", tr.hitbox, tr.hitgroup, tr.physicsbone, ((CBaseEntity*)tr.m_pEnt)->GetSolid(), tr.surface.name, physprops->GetPropName( tr.surface.surfaceProps ) );
 		NDebugOverlay::SweptBox( start, tr.endpos, -extents, extents, vec3_angle, 0, 0, 255, 0, 10 );
 		Vector end = tr.endpos;// - tr.plane.normal * DotProductAbs( tr.plane.normal, extents );
@@ -1029,7 +1029,7 @@ static ConCommand use("use", CC_Player_Use, "Use a particular weapon\t\nArgument
 static bool TestEntityPosition ( CBasePlayer *pPlayer )
 {	
 	trace_t	trace;
-	UTIL_TraceEntity( pPlayer, pPlayer->GetAbsOrigin(), pPlayer->GetAbsOrigin(), MASK_PLAYERSOLID, &trace );
+	UTIL_TraceEntity( pPlayer, pPlayer->GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, &trace );
 	return (trace.startsolid == 0);
 }
 
@@ -1044,12 +1044,12 @@ static int FindPassableSpace( CBasePlayer *pPlayer, const Vector& direction, flo
 	int i;
 	for ( i = 0; i < 100; i++ )
 	{
-		Vector origin = pPlayer->GetAbsOrigin();
+		Vector origin = pPlayer->GetEngineObject()->GetAbsOrigin();
 		VectorMA( origin, step, direction, origin );
-		pPlayer->SetAbsOrigin( origin );
+		pPlayer->GetEngineObject()->SetAbsOrigin( origin );
 		if ( TestEntityPosition( pPlayer ) )
 		{
-			VectorCopy( pPlayer->GetAbsOrigin(), oldorigin );
+			VectorCopy( pPlayer->GetEngineObject()->GetAbsOrigin(), oldorigin );
 			return 1;
 		}
 	}
@@ -1090,7 +1090,7 @@ void CC_Player_NoClip( void )
 	pPlayer->GetEngineObject()->RemoveEFlags( EFL_NOCLIP_ACTIVE );
 	pPlayer->SetMoveType( MOVETYPE_WALK );
 
-	Vector oldorigin = pPlayer->GetAbsOrigin();
+	Vector oldorigin = pPlayer->GetEngineObject()->GetAbsOrigin();
 	ClientPrint( pPlayer, HUD_PRINTCONSOLE, "noclip OFF\n");
 	if ( !TestEntityPosition( pPlayer ) )
 	{
@@ -1119,7 +1119,7 @@ void CC_Player_NoClip( void )
 			}
 		}
 
-		pPlayer->SetAbsOrigin( oldorigin );
+		pPlayer->GetEngineObject()->SetAbsOrigin( oldorigin );
 	}
 }
 
@@ -1177,14 +1177,14 @@ CON_COMMAND_F( setpos, "Move player to specified origin (must have sv_cheats).",
 		return;
 	}
 
-	Vector oldorigin = pPlayer->GetAbsOrigin();
+	Vector oldorigin = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	Vector newpos;
 	newpos.x = atof( args[1] );
 	newpos.y = atof( args[2] );
 	newpos.z = args.ArgC() == 4 ? atof( args[3] ) : oldorigin.z;
 
-	pPlayer->SetAbsOrigin( newpos );
+	pPlayer->GetEngineObject()->SetAbsOrigin( newpos );
 
 	if ( !TestEntityPosition( pPlayer ) )
 	{
@@ -1211,7 +1211,7 @@ void CC_setang_f (const CCommand &args)
 		return;
 	}
 
-	QAngle oldang = pPlayer->GetAbsAngles();
+	QAngle oldang = pPlayer->GetEngineObject()->GetAbsAngles();
 
 	QAngle newang;
 	newang.x = atof( args[1] );
@@ -1252,7 +1252,7 @@ CON_COMMAND_F( setpos_exact, "Move player to an exact specified origin (must hav
 		return;
 	}
 
-	Vector oldorigin = pPlayer->GetAbsOrigin();
+	Vector oldorigin = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	Vector newpos;
 	newpos.x = GetHexFloat( args[1] );
@@ -1286,7 +1286,7 @@ CON_COMMAND_F( setang_exact, "Snap player eyes and orientation to specified pitc
 		return;
 	}
 
-	QAngle oldang = pPlayer->GetAbsAngles();
+	QAngle oldang = pPlayer->GetEngineObject()->GetAbsAngles();
 
 	QAngle newang;
 	newang.x = GetHexFloat( args[1] );

@@ -113,7 +113,7 @@ void CTempEntTester::Think( void )
 		return;
 	}
 
-	m_pCurrent->Test( GetLocalOrigin(), GetLocalAngles() );
+	m_pCurrent->Test(GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles() );
 	SetNextThink( gpGlobals->curtime + TEMPENT_TEST_GAP );
 
 	// Time to destroy?

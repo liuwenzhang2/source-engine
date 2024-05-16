@@ -46,7 +46,7 @@ END_DATADESC()
 
 void CFuncWall::Spawn( void )
 {
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	SetModel( STRING( GetModelName() ) );
 	
@@ -210,7 +210,7 @@ LINK_ENTITY_TO_CLASS( func_vehicleclip, CFuncVehicleClip );
 void CFuncVehicleClip::Spawn()
 {
 
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	SetModel( STRING( GetModelName() ) );
 	
@@ -377,7 +377,7 @@ LINK_ENTITY_TO_CLASS( func_illusionary, CFuncIllusionary );
 
 void CFuncIllusionary::Spawn( void )
 {
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 	SetMoveType( MOVETYPE_NONE );  
 	SetSolid( SOLID_NONE );
 	SetModel( STRING( GetModelName() ) );
@@ -538,8 +538,8 @@ void SendProxy_FuncRotatingAngleX( const SendProp *pProp, const void *pStruct, c
 	CFuncRotating *entity = (CFuncRotating*)pStruct;
 	Assert( entity );
 
-	vec_t const* qa = &entity->GetLocalAngles().x;//(vec_t*)pData;
-	vec_t const *ea = entity->GetLocalAngles().Base();
+	vec_t const* qa = &entity->GetEngineObject()->GetLocalAngles().x;//(vec_t*)pData;
+	vec_t const *ea = entity->GetEngineObject()->GetLocalAngles().Base();
 	NOTE_UNUSED(ea);
 	// Assert its actually an index into m_angRotation if not this won't work
 
@@ -565,8 +565,8 @@ void SendProxy_FuncRotatingAngleY(const SendProp* pProp, const void* pStruct, co
 	CFuncRotating* entity = (CFuncRotating*)pStruct;
 	Assert(entity);
 
-	vec_t const* qa = &entity->GetLocalAngles().y;//(vec_t*)pData;
-	vec_t const* ea = entity->GetLocalAngles().Base();
+	vec_t const* qa = &entity->GetEngineObject()->GetLocalAngles().y;//(vec_t*)pData;
+	vec_t const* ea = entity->GetEngineObject()->GetLocalAngles().Base();
 	NOTE_UNUSED(ea);
 	// Assert its actually an index into m_angRotation if not this won't work
 
@@ -592,8 +592,8 @@ void SendProxy_FuncRotatingAngleZ(const SendProp* pProp, const void* pStruct, co
 	CFuncRotating* entity = (CFuncRotating*)pStruct;
 	Assert(entity);
 
-	vec_t const* qa = &entity->GetLocalAngles().z;//(vec_t*)pData;
-	vec_t const* ea = entity->GetLocalAngles().Base();
+	vec_t const* qa = &entity->GetEngineObject()->GetLocalAngles().z;//(vec_t*)pData;
+	vec_t const* ea = entity->GetEngineObject()->GetLocalAngles().Base();
 	NOTE_UNUSED(ea);
 	// Assert its actually an index into m_angRotation if not this won't work
 
@@ -794,7 +794,7 @@ void CFuncRotating::Spawn( )
 	Precache( );
 	CreateVPhysics();
 
-	m_angStart = GetLocalAngles();
+	m_angStart = GetEngineObject()->GetLocalAngles();
 	
 	// Slam the object back to solid - if we really want it to be solid.
 	if ( m_bSolidBsp )
@@ -871,10 +871,10 @@ void CFuncRotating::HurtTouch ( CBaseEntity *pOther )
 	{
 		pOther->TakeDamage( CTakeDamageInfo( this, this, m_flBlockDamage, DMG_CRUSH ) );
 	
-		Vector vecNewVelocity = pOther->GetAbsOrigin() - WorldSpaceCenter();
+		Vector vecNewVelocity = pOther->GetEngineObject()->GetAbsOrigin() - WorldSpaceCenter();
 		VectorNormalize(vecNewVelocity);
 		vecNewVelocity *= m_flBlockDamage;
-		pOther->SetAbsVelocity( vecNewVelocity );
+		pOther->GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 	}
 }
 
@@ -906,7 +906,7 @@ void CFuncRotating::RampPitchVol( void )
 	//
 	// Update the fan's volume and pitch.
 	//
-	CPASAttenuationFilter filter( GetAbsOrigin(), m_flAttenuation );
+	CPASAttenuationFilter filter(GetEngineObject()->GetAbsOrigin(), m_flAttenuation );
 	filter.MakeReliable();
 
 	EmitSound_t ep;
@@ -955,7 +955,7 @@ void CFuncRotating::UpdateSpeed( float flNewSpeed )
 			checkAxis = 1;
 		}
 
-		float angDelta = anglemod( GetLocalAngles()[ checkAxis ] - m_angStart[ checkAxis ] );
+		float angDelta = anglemod(GetEngineObject()->GetLocalAngles()[ checkAxis ] - m_angStart[ checkAxis ] );
 		if ( angDelta > 180.0f )
 		{
 			angDelta -= 360.0f;
@@ -969,7 +969,7 @@ void CFuncRotating::UpdateSpeed( float flNewSpeed )
 				m_bStopAtStartPos = false;
 				m_flSpeed = 0.0f;
 
-				SetLocalAngles( m_angStart );
+				GetEngineObject()->SetLocalAngles( m_angStart );
 			}
 			else if ( fabs( angDelta ) > 90.0f )
 			{
@@ -991,7 +991,7 @@ void CFuncRotating::UpdateSpeed( float flNewSpeed )
 	if ( ( flOldSpeed == 0 ) && ( m_flSpeed != 0 ) )
 	{
 		// Starting to move - emit the sound.
-		CPASAttenuationFilter filter( GetAbsOrigin(), m_flAttenuation );
+		CPASAttenuationFilter filter(GetEngineObject()->GetAbsOrigin(), m_flAttenuation );
 		filter.MakeReliable();
 	
 		EmitSound_t ep;
@@ -1161,7 +1161,7 @@ void CFuncRotating::RotateMove( void )
 			checkAxis = 1;
 		}
 
-		float angDelta = anglemod( GetLocalAngles()[ checkAxis ] - m_angStart[ checkAxis ] );
+		float angDelta = anglemod(GetEngineObject()->GetLocalAngles()[ checkAxis ] - m_angStart[ checkAxis ] );
 		if ( angDelta > 180.0f )
 			angDelta -= 360.0f;
 
@@ -1172,7 +1172,7 @@ void CFuncRotating::RotateMove( void )
 		if ( fabs( angDelta ) < fabs( avelpertick[ checkAxis ] ) )
 		{
 			SetTargetSpeed( 0 );
-			SetLocalAngles( m_angStart );
+			GetEngineObject()->SetLocalAngles( m_angStart );
 			m_bStopAtStartPos = false;
 		}
 	}

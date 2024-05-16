@@ -49,7 +49,7 @@ public:
 		if ( !pEnt->IsPlayer() )
 			return ITERATION_CONTINUE;
 
-		Vector	deltaPos = pEnt->GetAbsOrigin() - m_vecOrigin;
+		Vector	deltaPos = pEnt->GetEngineObject()->GetAbsOrigin() - m_vecOrigin;
 		if ( deltaPos.LengthSqr() > m_flRadiusSquared )
 			return ITERATION_CONTINUE;
 

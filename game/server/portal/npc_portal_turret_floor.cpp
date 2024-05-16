@@ -540,7 +540,7 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 	// Shoot out of the left barrel if there's nothing solid between the turret's center and the muzzle
 	trace_t tr;
 	GetAttachment( m_iBarrelAttachments[ iBarrelIndex ], info.m_vecSrc, angBarrelDir );
-	Vector vecCenter = GetAbsOrigin();
+	Vector vecCenter = GetEngineObject()->GetAbsOrigin();
 	UTIL_TraceLine( vecCenter, info.m_vecSrc, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 	if ( !tr.m_pEnt || !((CBaseEntity*)tr.m_pEnt)->IsWorld() )
 	{
@@ -549,7 +549,7 @@ void CNPC_Portal_FloorTurret::Shoot( const Vector &vecSrc, const Vector &vecDirT
 
 	// Shoot out of the right barrel if there's nothing solid between the turret's center and the muzzle
 	GetAttachment( m_iBarrelAttachments[ iBarrelIndex + 1 ], info.m_vecSrc, angBarrelDir );
-	vecCenter = GetAbsOrigin();
+	vecCenter = GetEngineObject()->GetAbsOrigin();
 	UTIL_TraceLine( vecCenter, info.m_vecSrc, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 	if ( !tr.m_pEnt || !((CBaseEntity*)tr.m_pEnt)->IsWorld() )
 	{
@@ -617,7 +617,7 @@ void CNPC_Portal_FloorTurret::SetEyeState( eyeState_t state )
 	if ( !m_hEyeGlow )
 	{
 		// Create our eye sprite
-		m_hEyeGlow = CSprite::SpriteCreate( FLOOR_TURRET_GLOW_SPRITE, GetLocalOrigin(), false );
+		m_hEyeGlow = CSprite::SpriteCreate( FLOOR_TURRET_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin(), false );
 		if ( !m_hEyeGlow )
 			return;
 
@@ -775,7 +775,7 @@ void CNPC_Portal_FloorTurret::ActiveThink( void )
 		SetEnemy( NULL );
 		m_flLastSight = gpGlobals->curtime + FLOOR_TURRET_MAX_WAIT;
 		SetThink( &CNPC_FloorTurret::SearchThink );
-		m_vecGoalAngles = GetAbsAngles();
+		m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 		return;
 	}
 
@@ -860,7 +860,7 @@ void CNPC_Portal_FloorTurret::ActiveThink( void )
 		}
 
 		SetThink( &CNPC_FloorTurret::SearchThink );
-		m_vecGoalAngles = GetAbsAngles();
+		m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
 		SpinDown();
 
@@ -890,7 +890,7 @@ void CNPC_Portal_FloorTurret::ActiveThink( void )
 		// Visualize vertical firing ranges
 		for ( int i = 0; i < 4; i++ )
 		{
-			QAngle angMaxDownPitch = GetAbsAngles();
+			QAngle angMaxDownPitch = GetEngineObject()->GetAbsAngles();
 
 			switch( i )
 			{
@@ -1090,8 +1090,8 @@ void CNPC_Portal_FloorTurret::SearchThink( void )
 	}
 
 	//Display that we're scanning
-	m_vecGoalAngles.x = GetAbsAngles().x + ( sin( ( m_flLastSight + gpGlobals->curtime * m_fSearchSpeed ) * 1.5f ) * 20.0f );
-	m_vecGoalAngles.y = GetAbsAngles().y + ( sin( ( m_flLastSight + gpGlobals->curtime * m_fSearchSpeed ) * 2.5f ) * 20.0f );
+	m_vecGoalAngles.x = GetEngineObject()->GetAbsAngles().x + ( sin( ( m_flLastSight + gpGlobals->curtime * m_fSearchSpeed ) * 1.5f ) * 20.0f );
+	m_vecGoalAngles.y = GetEngineObject()->GetAbsAngles().y + ( sin( ( m_flLastSight + gpGlobals->curtime * m_fSearchSpeed ) * 2.5f ) * 20.0f );
 
 	//Turn and ping
 	UpdateFacing();
@@ -1162,15 +1162,15 @@ void CNPC_Portal_FloorTurret::TippedThink( void )
 			m_flShotTime = gpGlobals->curtime + 0.05f;
 		}
 
-		m_vecGoalAngles.x = GetAbsAngles().x + random->RandomFloat( -60, 60 );
-		m_vecGoalAngles.y = GetAbsAngles().y + random->RandomFloat( -60, 60 );
+		m_vecGoalAngles.x = GetEngineObject()->GetAbsAngles().x + random->RandomFloat( -60, 60 );
+		m_vecGoalAngles.y = GetEngineObject()->GetAbsAngles().y + random->RandomFloat( -60, 60 );
 
 		UpdateFacing();
 	}
 	else
 	{
 		//Face forward
-		m_vecGoalAngles = GetAbsAngles();
+		m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
 		//Set ourselves to close
 		if ( GetActivity() != ACT_FLOOR_TURRET_CLOSE )
@@ -1293,8 +1293,8 @@ void CNPC_Portal_FloorTurret::HeldThink( void )
 
 			m_flShotTime = gpGlobals->curtime + RandomFloat( 0.25f, 0.75f );
 
-			m_vecGoalAngles.x = GetAbsAngles().x + RandomFloat( -15, 15 );
-			m_vecGoalAngles.y = GetAbsAngles().y + RandomFloat( -40, 40 );
+			m_vecGoalAngles.x = GetEngineObject()->GetAbsAngles().x + RandomFloat( -15, 15 );
+			m_vecGoalAngles.y = GetEngineObject()->GetAbsAngles().y + RandomFloat( -40, 40 );
 		}
 
 		UpdateFacing();
@@ -1385,7 +1385,7 @@ void CNPC_Portal_FloorTurret::HackFindEnemy( void )
 			if ( vVelocity.LengthSqr() < m_fMovingTargetThreashold )
 				continue;
 
-			float flDistSqr = pObject->WorldSpaceCenter().DistToSqr( GetAbsOrigin() );
+			float flDistSqr = pObject->WorldSpaceCenter().DistToSqr(GetEngineObject()->GetAbsOrigin() );
 			if ( flDistSqr < flClosestDistSqr )
 			{
 				flClosestDistSqr = flDistSqr;
@@ -1430,7 +1430,7 @@ void CNPC_Portal_FloorTurret::StartTouch( CBaseEntity *pOther )
 		if ( !pOther->IsPlayer() && pOther->GetMoveType() == MOVETYPE_VPHYSICS && !(pTurretPhys && ((pTurretPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD) != 0)) )
 		{
 			// Get a lateral impulse
-			Vector vVelocityImpulse = GetAbsOrigin() - pOther->GetAbsOrigin();
+			Vector vVelocityImpulse = GetEngineObject()->GetAbsOrigin() - pOther->GetEngineObject()->GetAbsOrigin();
 			vVelocityImpulse.z = 0.0f;
 			if ( vVelocityImpulse.IsZero() )
 			{

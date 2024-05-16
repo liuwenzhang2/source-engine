@@ -115,7 +115,7 @@ void CNPC_BaseScanner::Spawn(void)
 	m_flGoalOverrideDistance = 0.0f;
 
 	m_nFlyMode = SCANNER_FLY_PATROL;
-	AngleVectors( GetLocalAngles(), &m_vCurrentBanking );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &m_vCurrentBanking );
 	m_fHeadYaw = 0;
 	m_pSmokeTrail = NULL;
 
@@ -281,7 +281,7 @@ int CNPC_BaseScanner::MeleeAttack1Conditions( float flDot, float flDist )
 	}
 
 	// Check too far to attack with 2D distance
-	float vEnemyDist2D = (GetEnemy()->GetLocalOrigin() - GetLocalOrigin()).Length2D();
+	float vEnemyDist2D = (GetEnemy()->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin()).Length2D();
 
 	if (m_flNextAttack > gpGlobals->curtime)
 	{
@@ -351,7 +351,7 @@ void CNPC_BaseScanner::StartTask( const Task_t *pTask )
 			{
 				// Fly towards my enemy
 				Vector vEnemyPos = GetEnemyLKP();
-				m_vecDiveBombDirection = vEnemyPos - GetLocalOrigin();
+				m_vecDiveBombDirection = vEnemyPos - GetEngineObject()->GetLocalOrigin();
 			}
 			else
 			{
@@ -436,7 +436,7 @@ void CNPC_BaseScanner::TakeDamageFromPhyscannon( CBasePlayer *pPlayer )
 	info.SetDamageType( DMG_GENERIC );
 	info.SetInflictor( this );
 	info.SetAttacker( pPlayer );
-	info.SetDamagePosition( GetAbsOrigin() );
+	info.SetDamagePosition(GetEngineObject()->GetAbsOrigin() );
 	info.SetDamageForce( Vector( 1.0, 1.0, 1.0 ) );
 
 	// Convert velocity into damage.
@@ -547,7 +547,7 @@ void CNPC_BaseScanner::Gib( void )
 	// Sparks
 	for ( int i = 0; i < 4; i++ )
 	{
-		Vector sparkPos = GetAbsOrigin();
+		Vector sparkPos = GetEngineObject()->GetAbsOrigin();
 		sparkPos.x += random->RandomFloat(-12,12);
 		sparkPos.y += random->RandomFloat(-12,12);
 		sparkPos.z += random->RandomFloat(-12,12);
@@ -559,7 +559,7 @@ void CNPC_BaseScanner::Gib( void )
 	te->DynamicLight( filter, 0.0, &WorldSpaceCenter(), 255, 180, 100, 0, 100, 0.1, 0 );
 
 	// Cover the gib spawn
-	ExplosionCreate( WorldSpaceCenter(), GetAbsAngles(), this, 64, 64, false );
+	ExplosionCreate( WorldSpaceCenter(), GetEngineObject()->GetAbsAngles(), this, 64, 64, false );
 
 	// Turn off any smoke trail
 	if ( m_pSmokeTrail )
@@ -677,7 +677,7 @@ void CNPC_BaseScanner::Event_Killed( const CTakeDamageInfo &info )
 	// If I have an enemy and I'm up high, do a dive bomb (unless dissolved)
 	if ( GetEnemy() != NULL && (info.GetDamageType() & DMG_DISSOLVE) == false )
 	{
-		Vector vecDelta = GetLocalOrigin() - GetEnemy()->GetLocalOrigin();
+		Vector vecDelta = GetEngineObject()->GetLocalOrigin() - GetEnemy()->GetEngineObject()->GetLocalOrigin();
 		if ( ( vecDelta.z > 120 ) && ( vecDelta.Length() > 360 ) )
 		{	
 			// If I'm divebombing, don't take any more damage. It will make Event_Killed() be called again.
@@ -710,10 +710,10 @@ void CNPC_BaseScanner::AttackDivebombCollide(float flInterval)
 	//
 	// Trace forward to see if I hit anything
 	//
-	Vector			checkPos = GetAbsOrigin() + (GetCurrentVelocity() * flInterval);
+	Vector			checkPos = GetEngineObject()->GetAbsOrigin() + (GetCurrentVelocity() * flInterval);
 	trace_t			tr;
 	CBaseEntity*	pHitEntity = NULL;
-	AI_TraceHull( GetAbsOrigin(), checkPos, GetHullMins(), GetHullMaxs(), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+	AI_TraceHull(GetEngineObject()->GetAbsOrigin(), checkPos, GetHullMins(), GetHullMaxs(), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 
 	if (tr.m_pEnt)
 	{
@@ -741,14 +741,14 @@ void CNPC_BaseScanner::AttackDivebombCollide(float flInterval)
 		// norm of what we've hit
 		if (flInterval > 0)
 		{
-			float moveLen	= (1.0 - tr.fraction)*(GetAbsOrigin() - checkPos).Length();
+			float moveLen	= (1.0 - tr.fraction)*(GetEngineObject()->GetAbsOrigin() - checkPos).Length();
 			Vector vBounceVel	= moveLen*tr.plane.normal/flInterval;
 
 			// If I'm right over the ground don't push down
 			if (vBounceVel.z < 0)
 			{
-				float floorZ = GetFloorZ(GetAbsOrigin());
-				if (abs(GetAbsOrigin().z - floorZ) < 36)
+				float floorZ = GetFloorZ(GetEngineObject()->GetAbsOrigin());
+				if (abs(GetEngineObject()->GetAbsOrigin().z - floorZ) < 36)
 				{
 					vBounceVel.z = 0;
 				}
@@ -771,16 +771,16 @@ void CNPC_BaseScanner::AttackDivebombCollide(float flInterval)
 			}
 			// For sparks we must trace a line in the direction of the surface norm
 			// that we hit.
-			checkPos = GetAbsOrigin() - (tr.plane.normal * 24);
+			checkPos = GetEngineObject()->GetAbsOrigin() - (tr.plane.normal * 24);
 
-			AI_TraceLine( GetAbsOrigin(), checkPos,MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+			AI_TraceLine(GetEngineObject()->GetAbsOrigin(), checkPos,MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 			if (tr.fraction != 1.0)
 			{
 				g_pEffects->Sparks( tr.endpos );
 
 				CBroadcastRecipientFilter filter;
 				te->DynamicLight( filter, 0.0,
-					&GetAbsOrigin(), 255, 180, 100, 0, 50, 0.1, 0 );
+					&GetEngineObject()->GetAbsOrigin(), 255, 180, 100, 0, 50, 0.1, 0 );
 			}
 		}
 	}
@@ -1001,7 +1001,7 @@ void CNPC_BaseScanner::MoveExecute_Alive(float flInterval)
 bool CNPC_BaseScanner::OverridePathMove( CBaseEntity *pMoveTarget, float flInterval )
 {
 	// Save our last patrolling direction
-	Vector lastPatrolDir = GetNavigator()->GetCurWaypointPos() - GetAbsOrigin();
+	Vector lastPatrolDir = GetNavigator()->GetCurWaypointPos() - GetEngineObject()->GetAbsOrigin();
 
 	// Continue on our path
 	if ( ProgressFlyPath( flInterval, pMoveTarget, (MASK_NPCSOLID|CONTENTS_WATER), false, 64 ) == AINPP_COMPLETE )
@@ -1055,7 +1055,7 @@ bool CNPC_BaseScanner::OverrideMove( float flInterval )
 			// Select move target position 
 			if ( GetEnemy() != NULL )
 			{
-				vMoveTargetPos = GetEnemy()->GetAbsOrigin();
+				vMoveTargetPos = GetEnemy()->GetEngineObject()->GetAbsOrigin();
 			}
 		}
 		else
@@ -1070,15 +1070,15 @@ bool CNPC_BaseScanner::OverrideMove( float flInterval )
 		if ( pMoveTarget )
 		{
 			trace_t tr;
-			AI_TraceHull( GetAbsOrigin(), vMoveTargetPos, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+			AI_TraceHull(GetEngineObject()->GetAbsOrigin(), vMoveTargetPos, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
-			float fTargetDist = (1.0f-tr.fraction)*(GetAbsOrigin() - vMoveTargetPos).Length();
+			float fTargetDist = (1.0f-tr.fraction)*(GetEngineObject()->GetAbsOrigin() - vMoveTargetPos).Length();
 
 			if ( ( tr.m_pEnt == pMoveTarget ) || ( fTargetDist < 50 ) )
 			{
 				if ( g_debug_basescanner.GetBool() )
 				{
-					NDebugOverlay::Line(GetLocalOrigin(), vMoveTargetPos, 0,255,0, true, 0);
+					NDebugOverlay::Line(GetEngineObject()->GetLocalOrigin(), vMoveTargetPos, 0,255,0, true, 0);
 					NDebugOverlay::Cross3D(tr.endpos,Vector(-5,-5,-5),Vector(5,5,5),0,255,0,true,0.1);
 				}
 
@@ -1089,7 +1089,7 @@ bool CNPC_BaseScanner::OverrideMove( float flInterval )
 				//HANDY DEBUG TOOL	
 				if ( g_debug_basescanner.GetBool() )
 				{
-					NDebugOverlay::Line(GetLocalOrigin(), vMoveTargetPos, 255,0,0, true, 0);
+					NDebugOverlay::Line(GetEngineObject()->GetLocalOrigin(), vMoveTargetPos, 255,0,0, true, 0);
 					NDebugOverlay::Cross3D(tr.endpos,Vector(-5,-5,-5),Vector(5,5,5),255,0,0,true,0.1);
 				}
 
@@ -1194,7 +1194,7 @@ void CNPC_BaseScanner::MoveToAttack(float flInterval)
 
 	//float flDesiredDist = m_flAttackNearDist + ( ( m_flAttackFarDist - m_flAttackNearDist ) / 2 );
 
-	Vector idealPos = IdealGoalForMovement( vTargetPos, GetAbsOrigin(), GetGoalDistance(), m_flAttackNearDist );
+	Vector idealPos = IdealGoalForMovement( vTargetPos, GetEngineObject()->GetAbsOrigin(), GetGoalDistance(), m_flAttackNearDist );
 
 	MoveToTarget( flInterval, idealPos );
 
@@ -1247,7 +1247,7 @@ void CNPC_BaseScanner::MoveToTarget( float flInterval, const Vector &vecMoveTarg
 	vecCurrentDir = GetCurrentVelocity();
 	VectorNormalize( vecCurrentDir );
 
-	Vector targetDir = vecMoveTarget - GetAbsOrigin();
+	Vector targetDir = vecMoveTarget - GetEngineObject()->GetAbsOrigin();
 	float flDist = VectorNormalize(targetDir);
 
 	float flDot;
@@ -1309,13 +1309,13 @@ void CNPC_BaseScanner::DiveBombSoundThink()
 	if ( pPlayer )
 	{
 		Vector vecDelta;
-		VectorSubtract( pPlayer->GetAbsOrigin(), vecPosition, vecDelta );
+		VectorSubtract( pPlayer->GetEngineObject()->GetAbsOrigin(), vecPosition, vecDelta );
 		VectorNormalize( vecDelta );
 		if ( DotProduct( vecDelta, vecVelocity ) > 0.5f )
 		{
 			Vector vecEndPoint;
 			VectorMA( vecPosition, 2.0f * TICK_INTERVAL, vecVelocity, vecEndPoint );
-			float flDist = CalcDistanceToLineSegment( pPlayer->GetAbsOrigin(), vecPosition, vecEndPoint );
+			float flDist = CalcDistanceToLineSegment( pPlayer->GetEngineObject()->GetAbsOrigin(), vecPosition, vecEndPoint );
 			if ( flDist < 200.0f )
 			{
 				ScannerEmitSound( "DiveBombFlyby" );
@@ -1340,7 +1340,7 @@ void CNPC_BaseScanner::MoveToDivebomb(float flInterval)
 
 	// Fly towards my enemy
 	Vector vEnemyPos = GetEnemyLKP();
-	Vector vFlyDirection  = vEnemyPos - GetLocalOrigin();
+	Vector vFlyDirection  = vEnemyPos - GetEngineObject()->GetLocalOrigin();
 	VectorNormalize( vFlyDirection );
 
 	// Set net velocity 
@@ -1417,7 +1417,7 @@ bool CNPC_BaseScanner::GetGoalDirection( Vector *vOut )
 
 	if ( FClassnameIs( pTarget, "info_hint_air" ) || FClassnameIs( pTarget, "info_target" ) )
 	{
-		AngleVectors( pTarget->GetAbsAngles(), vOut );
+		AngleVectors( pTarget->GetEngineObject()->GetAbsAngles(), vOut );
 		return true;
 	}
 
@@ -1435,7 +1435,7 @@ Vector CNPC_BaseScanner::VelocityToEvade(CBaseCombatCharacter *pEnemy)
 		//  Keep out of enemy's shooting position
 		// -----------------------------------------
 		Vector vEnemyFacing = pEnemy->BodyDirection2D( );
-		Vector	vEnemyDir   = pEnemy->EyePosition() - GetLocalOrigin();
+		Vector	vEnemyDir   = pEnemy->EyePosition() - GetEngineObject()->GetLocalOrigin();
 		VectorNormalize(vEnemyDir);
 		float  fDotPr		= DotProduct(vEnemyFacing,vEnemyDir);
 

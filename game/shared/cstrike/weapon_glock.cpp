@@ -147,7 +147,7 @@ float CWeaponGlock::GetInaccuracy() const
 			if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 				return 1.2f * (1 - m_flAccuracy);
 
-			else if (pPlayer->GetAbsVelocity().Length2D() > 5)
+			else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 				return 0.185f * (1 - m_flAccuracy);
 
 			else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
@@ -161,7 +161,7 @@ float CWeaponGlock::GetInaccuracy() const
 			if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 				return 1.0f * (1 - m_flAccuracy);
 
-			else if (pPlayer->GetAbsVelocity().Length2D() > 5)
+			else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 				return 0.165f * (1 - m_flAccuracy);
 
 			else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )

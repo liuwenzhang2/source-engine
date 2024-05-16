@@ -39,7 +39,7 @@ bool FBoxVisible( CBaseEntity *pLooker, CBaseEntity *pTarget, Vector &vecTargetO
 	Vector	vecLookerOrigin = pLooker->EyePosition();//look through the NPC's 'eyes'
 	for (int i = 0; i < 5; i++)
 	{
-		Vector vecTarget = pTarget->GetAbsOrigin();
+		Vector vecTarget = pTarget->GetEngineObject()->GetAbsOrigin();
 		vecTarget.x += random->RandomFloat( pTarget->WorldAlignMins().x + flSize, pTarget->WorldAlignMaxs().x - flSize);
 		vecTarget.y += random->RandomFloat( pTarget->WorldAlignMins().y + flSize, pTarget->WorldAlignMaxs().y - flSize);
 		vecTarget.z += random->RandomFloat( pTarget->WorldAlignMins().z + flSize, pTarget->WorldAlignMaxs().z - flSize);
@@ -92,7 +92,7 @@ Vector VecCheckToss( CBaseEntity *pEntity, ITraceFilter *pFilter, Vector vecSpot
 	}
 
 	Vector forward, right;
-	AngleVectors( pEntity->GetLocalAngles(), &forward, &right, NULL );
+	AngleVectors( pEntity->GetEngineObject()->GetLocalAngles(), &forward, &right, NULL );
 
 	if (bRandomize)
 	{

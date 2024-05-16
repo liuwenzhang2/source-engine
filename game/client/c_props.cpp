@@ -158,7 +158,7 @@ void C_BasePropDoor::OnDataChanged( DataUpdateType_t type )
 	}
 	else if ( VPhysicsGetObject() )
 	{
-		VPhysicsGetObject()->UpdateShadow( GetAbsOrigin(), GetAbsAngles(), false, TICK_INTERVAL );
+		VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), false, TICK_INTERVAL );
 	}
 }
 
@@ -171,7 +171,7 @@ bool C_BasePropDoor::TestCollision( const Ray_t &ray, unsigned int mask, trace_t
 	if (!pStudioHdr)
 		return false;
 
-	physcollision->TraceBox( ray, VPhysicsGetObject()->GetCollide(), GetAbsOrigin(), GetAbsAngles(), &trace );
+	physcollision->TraceBox( ray, VPhysicsGetObject()->GetCollide(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
 
 	if ( trace.DidHit() )
 	{

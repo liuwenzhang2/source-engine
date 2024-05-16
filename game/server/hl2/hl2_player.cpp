@@ -568,7 +568,7 @@ void CHL2_Player::PreThink(void)
 		UTIL_PredictedPosition( this, player_showpredictedposition_timestep.GetFloat(), &predPos );
 
 		NDebugOverlay::Box( predPos, NAI_Hull::Mins( GetHullType() ), NAI_Hull::Maxs( GetHullType() ), 0, 255, 0, 0, 0.01f );
-		NDebugOverlay::Line( GetAbsOrigin(), predPos, 0, 255, 0, 0, 0.01f );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), predPos, 0, 255, 0, 0, 0.01f );
 	}
 
 #ifdef HL2_EPISODIC
@@ -608,7 +608,7 @@ void CHL2_Player::PreThink(void)
 		// check autojump
 		Vector vecCheckDir;
 
-		vecCheckDir = GetAbsVelocity();
+		vecCheckDir = GetEngineObject()->GetAbsVelocity();
 
 		float flVelocity = VectorNormalize( vecCheckDir );
 
@@ -635,9 +635,9 @@ void CHL2_Player::PreThink(void)
 					// !!!HACKHACK
 					// I KNOW, I KNOW, this is definitely not the right way to do this,
 					// but I'm prototyping! (sjb)
-					Vector vecNewVelocity = GetAbsVelocity();
+					Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 					vecNewVelocity.z += 250;
-					SetAbsVelocity( vecNewVelocity );
+					GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 				}
 			}
 		}
@@ -777,7 +777,7 @@ void CHL2_Player::PreThink(void)
 			{
 				trace_t trainTrace;
 				// Maybe this is on the other side of a level transition
-				UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector(0,0,-38), 
+				UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector(0,0,-38),
 					MASK_PLAYERSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trainTrace );
 
 				if ( trainTrace.fraction != 1.0 && trainTrace.m_pEnt )
@@ -801,7 +801,7 @@ void CHL2_Player::PreThink(void)
 			return;
 		}
 
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		vel = 0;
 		if ( m_afButtonPressed & IN_FORWARD )
 		{
@@ -831,7 +831,7 @@ void CHL2_Player::PreThink(void)
 	//
 	if ( !( GetFlags() & FL_ONGROUND ) )
 	{
-		m_Local.m_flFallVelocity = -GetAbsVelocity().z;
+		m_Local.m_flFallVelocity = -GetEngineObject()->GetAbsVelocity().z;
 	}
 
 	if ( m_afPhysicsFlags & PFLAG_ONBARNACLE )
@@ -859,7 +859,7 @@ void CHL2_Player::PreThink(void)
 		}
 		else
 		{
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 		}
 	}
 	// StudioFrameAdvance( );//!!!HACKHACK!!! Can't be hit by traceline when not animating?
@@ -1430,7 +1430,7 @@ bool CHL2_Player::CommanderFindGoal( commandgoal_t *pGoal )
 
 	if (((CBaseEntity*)tr.m_pEnt)->IsNPC() && ((CAI_BaseNPC *)(tr.m_pEnt))->IsCommandable() )
 	{
-		pGoal->m_vecGoalLocation = ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin();
+		pGoal->m_vecGoalLocation = ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin();
 	}
 	else
 	{
@@ -1734,10 +1734,10 @@ void CHL2_Player::CheatImpulseCommands( int iImpulse )
 		CBaseEntity *pItem = (CBaseEntity *)gEntList.CreateEntityByName( "item_dynamic_resupply" );
 		if ( pItem )
 		{
-			Vector vecOrigin = GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);
-			QAngle vecAngles( 0, GetAbsAngles().y - 90, 0 );
-			pItem->SetAbsOrigin( vecOrigin );
-			pItem->SetAbsAngles( vecAngles );
+			Vector vecOrigin = GetEngineObject()->GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);
+			QAngle vecAngles( 0, GetEngineObject()->GetAbsAngles().y - 90, 0 );
+			pItem->GetEngineObject()->SetAbsOrigin( vecOrigin );
+			pItem->GetEngineObject()->SetAbsAngles( vecAngles );
 			pItem->KeyValue( "targetname", "resupply" );
 			pItem->Spawn();
 			pItem->Activate();
@@ -1813,7 +1813,7 @@ void CHL2_Player::SuitPower_Update( void )
 		{
 			if( SuitPower_IsDeviceActive(SuitDeviceSprint) )
 			{
-				if( !fabs(GetAbsVelocity().x) && !fabs(GetAbsVelocity().y) )
+				if( !fabs(GetEngineObject()->GetAbsVelocity().x) && !fabs(GetEngineObject()->GetAbsVelocity().y) )
 				{
 					// If player's not moving, don't drain sprint juice.
 					flPowerLoad -= SuitDeviceSprint.GetDeviceDrainRate();
@@ -2117,7 +2117,7 @@ bool CHL2_Player::IsIlluminatedByFlashlight( CBaseEntity *pEntity, float *flRetu
 	}
 
 	// Within 50 feet?
- 	float flDistSqr = GetAbsOrigin().DistToSqr(pEntity->GetAbsOrigin());
+ 	float flDistSqr = GetEngineObject()->GetAbsOrigin().DistToSqr(pEntity->GetEngineObject()->GetAbsOrigin());
 	if( flDistSqr > FLASHLIGHT_RANGE )
 		return false;
 
@@ -2293,7 +2293,7 @@ void CHL2_Player::NotifyFriendsOfDamage( CBaseEntity *pAttackerEntity )
 	CAI_BaseNPC *pAttacker = pAttackerEntity->MyNPCPointer();
 	if ( pAttacker )
 	{
-		const Vector &origin = GetAbsOrigin();
+		const Vector &origin = GetEngineObject()->GetAbsOrigin();
 		for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
 			const float NEAR_Z = 12*12;
@@ -2301,7 +2301,7 @@ void CHL2_Player::NotifyFriendsOfDamage( CBaseEntity *pAttackerEntity )
 			CAI_BaseNPC *pNpc = g_AI_Manager.AccessAIs()[i];
 			if ( pNpc->IsPlayerAlly() )
 			{
-				const Vector &originNpc = pNpc->GetAbsOrigin();
+				const Vector &originNpc = pNpc->GetEngineObject()->GetAbsOrigin();
 				if ( fabsf( originNpc.z - origin.z ) < NEAR_Z )
 				{
 					if ( (originNpc.AsVector2D() - origin.AsVector2D()).LengthSqr() < NEAR_XY_SQ )
@@ -2459,7 +2459,7 @@ void CHL2_Player::OnDamagedByExplosion( const CTakeDamageInfo &info )
 	if ( info.GetInflictor() && info.GetInflictor()->ClassMatches( "mortarshell" ) )
 	{
 		// No ear ringing for mortar
-		UTIL_ScreenShake( info.GetInflictor()->GetAbsOrigin(), 4.0, 1.0, 0.5, 1000, SHAKE_START, false );
+		UTIL_ScreenShake( info.GetInflictor()->GetEngineObject()->GetAbsOrigin(), 4.0, 1.0, 0.5, 1000, SHAKE_START, false );
 		return;
 	}
 	BaseClass::OnDamagedByExplosion( info );
@@ -3273,7 +3273,7 @@ void CHL2_Player::UpdateClientData( void )
 	if (m_DmgTake || m_DmgSave || m_bitsHUDDamage != m_bitsDamageType)
 	{
 		// Comes from inside me if not set
-		Vector damageOrigin = GetLocalOrigin();
+		Vector damageOrigin = GetEngineObject()->GetLocalOrigin();
 		// send "damage" message
 		// causes screen to flash, and pain compass to show direction of damage
 		damageOrigin = m_DmgOrigin;
@@ -3618,7 +3618,7 @@ void CHL2_Player::DrawDebugGeometryOverlays(void)
 		maxs.x *= PLAYER_HULL_REDUCTION;
 		maxs.y *= PLAYER_HULL_REDUCTION;
 
-		NDebugOverlay::Box( GetAbsOrigin(), mins, maxs, 255, 0, 0, 100, 0 );
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), mins, maxs, 255, 0, 0, 100, 0 );
 	}
 }
 
@@ -3799,7 +3799,7 @@ void CHL2_Player::Splash( void )
 {
 	CEffectData data;
 	data.m_fFlags = 0;
-	data.m_vOrigin = GetAbsOrigin();
+	data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 	data.m_vNormal = Vector(0,0,1);
 	data.m_vAngles = QAngle( 0, 0, 0 );
 	
@@ -3808,7 +3808,7 @@ void CHL2_Player::Splash( void )
 		data.m_fFlags |= FX_WATER_IN_SLIME;
 	}
 
-	float flSpeed = GetAbsVelocity().Length();
+	float flSpeed = GetEngineObject()->GetAbsVelocity().Length();
 	if ( flSpeed < 300 )
 	{
 		data.m_flScale = random->RandomFloat( 10, 12 );

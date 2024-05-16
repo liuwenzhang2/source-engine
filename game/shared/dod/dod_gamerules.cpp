@@ -1623,7 +1623,7 @@ static CDODViewVectors g_DODViewVectors(
 			if ( !pPlayer )
 				continue;
 
-			Vector origin = pPlayer->GetAbsOrigin();
+			Vector origin = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 			Vector2D pos( (int)(origin.x/4), (int)(origin.y/4) );
 
@@ -1686,7 +1686,7 @@ static CDODViewVectors g_DODViewVectors(
 				WRITE_BYTE( i+1 ); // player entity index 
 				WRITE_SBITLONG( m_vecPlayerPositions[i].x, COORD_INTEGER_BITS-1 );
 				WRITE_SBITLONG( m_vecPlayerPositions[i].y, COORD_INTEGER_BITS-1 );
-				WRITE_SBITLONG( AngleNormalize( pOtherPlayer->GetAbsAngles().y ), 9 );
+				WRITE_SBITLONG( AngleNormalize( pOtherPlayer->GetEngineObject()->GetAbsAngles().y ), 9 );
 			}
 
 			WRITE_BYTE( 0 ); // end marker
@@ -1718,24 +1718,24 @@ static CDODViewVectors g_DODViewVectors(
 			if( g_pGameRules->IsSpawnPointValid( pSpot, NULL ) )
 			{
 				// the successful spawn point's location
-				NDebugOverlay::Box( pSpot->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 0, 255, 0, 100, 60 );
+				NDebugOverlay::Box( pSpot->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 0, 255, 0, 100, 60 );
 
 				// drop down to ground
-				Vector GroundPos = DropToGround( NULL, pSpot->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX );
+				Vector GroundPos = DropToGround( NULL, pSpot->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX );
 
 				// the location the player will spawn at
 				NDebugOverlay::Box( GroundPos, VEC_HULL_MIN, VEC_HULL_MAX, 0, 0, 255, 100, 60 );
 
 				// draw the spawn angles
-				QAngle spotAngles = pSpot->GetLocalAngles();
+				QAngle spotAngles = pSpot->GetEngineObject()->GetLocalAngles();
 				Vector vecForward;
 				AngleVectors( spotAngles, &vecForward );
-				NDebugOverlay::HorzArrow( pSpot->GetAbsOrigin(), pSpot->GetAbsOrigin() + vecForward * 32, 10, 255, 0, 0, 255, true, 60 );
+				NDebugOverlay::HorzArrow( pSpot->GetEngineObject()->GetAbsOrigin(), pSpot->GetEngineObject()->GetAbsOrigin() + vecForward * 32, 10, 255, 0, 0, 255, true, 60 );
 			}
 			else
 			{
 				// failed spawn point location
-				NDebugOverlay::Box( pSpot->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 255, 0, 0, 100, 60 );
+				NDebugOverlay::Box( pSpot->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX, 255, 0, 0, 100, 60 );
 			}
 
 			// increment pSpot
@@ -1756,10 +1756,10 @@ static CDODViewVectors g_DODViewVectors(
 		CBaseEntity *pSpawnSpot = pPlayer->EntSelectSpawnPoint();
 
 		// drop down to ground
-		Vector GroundPos = DropToGround( pPlayer, pSpawnSpot->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX );
+		Vector GroundPos = DropToGround( pPlayer, pSpawnSpot->GetEngineObject()->GetAbsOrigin(), VEC_HULL_MIN, VEC_HULL_MAX );
 
 		// Move the player to the place it said.
-		pPlayer->Teleport( &GroundPos, &pSpawnSpot->GetLocalAngles(), &vec3_origin );
+		pPlayer->Teleport( &GroundPos, &pSpawnSpot->GetEngineObject()->GetLocalAngles(), &vec3_origin );
 		pPlayer->m_Local.m_vecPunchAngle = vec3_angle;
 
 		return pSpawnSpot;
@@ -1786,8 +1786,8 @@ static CDODViewVectors g_DODViewVectors(
 		Vector mins = GetViewVectors()->m_vHullMin;
 		Vector maxs = GetViewVectors()->m_vHullMax;
 
-		Vector vTestMins = pSpot->GetAbsOrigin() + mins;
-		Vector vTestMaxs = pSpot->GetAbsOrigin() + maxs;
+		Vector vTestMins = pSpot->GetEngineObject()->GetAbsOrigin() + mins;
+		Vector vTestMaxs = pSpot->GetEngineObject()->GetAbsOrigin() + maxs;
 
 		// First test the starting origin.
 		return UTIL_IsSpaceEmpty( pPlayer, vTestMins, vTestMaxs );
@@ -2023,8 +2023,8 @@ static CDODViewVectors g_DODViewVectors(
 			 
 		Vector mins, maxs;
 		pMainEnt->CollisionProp()->WorldSpaceAABB( &mins, &maxs );
-		mins -= pMainEnt->GetAbsOrigin();
-		maxs -= pMainEnt->GetAbsOrigin();
+		mins -= pMainEnt->GetEngineObject()->GetAbsOrigin();
+		maxs -= pMainEnt->GetEngineObject()->GetAbsOrigin();
 
 		// Put some padding on their bbox.
 
@@ -3841,7 +3841,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 				else
 				{
 					Warning("Invalid allies spawnpoint at (%.1f,%.1f,%.1f)\n",
-						ent->GetAbsOrigin()[0],ent->GetAbsOrigin()[2],ent->GetAbsOrigin()[2] );
+						ent->GetEngineObject()->GetAbsOrigin()[0],ent->GetEngineObject()->GetAbsOrigin()[2],ent->GetEngineObject()->GetAbsOrigin()[2] );
 				}
 			}
 
@@ -3857,7 +3857,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 				else
 				{
 					Warning("Invalid axis spawnpoint at (%.1f,%.1f,%.1f)\n",
-						ent->GetAbsOrigin()[0],ent->GetAbsOrigin()[2],ent->GetAbsOrigin()[2] );
+						ent->GetEngineObject()->GetAbsOrigin()[0],ent->GetEngineObject()->GetAbsOrigin()[2],ent->GetEngineObject()->GetAbsOrigin()[2] );
 				}
 			}
 
@@ -5292,7 +5292,7 @@ void CFuncTeamWall::Spawn( void )
 		SetCollisionBounds( m_vecMins, m_vecMaxs );
 
 		// If we delcared an angle in the .ent file, make us OBB
-		if ( GetAbsAngles() != vec3_angle )
+		if (GetEngineObject()->GetAbsAngles() != vec3_angle )
 		{
 			SetSolid( SOLID_OBB );
 		}

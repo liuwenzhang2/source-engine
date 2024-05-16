@@ -119,7 +119,7 @@ void CWeaponHL2MPBase::WeaponSound( WeaponSound_t sound_type, float soundtime /*
 		if ( !te->CanPredict() )
 			return;
 				
-		g_pSoundEmitterSystem->EmitSound( filter, GetPlayerOwner()->entindex(), shootsound, &GetPlayerOwner()->GetAbsOrigin() ); //CBaseEntity::
+		g_pSoundEmitterSystem->EmitSound( filter, GetPlayerOwner()->entindex(), shootsound, &GetPlayerOwner()->GetEngineObject()->GetAbsOrigin() ); //CBaseEntity::
 #else
 		BaseClass::WeaponSound( sound_type, soundtime );
 #endif
@@ -197,8 +197,8 @@ void CWeaponHL2MPBase::Materialize( void )
 	{
 		if ( GetOriginalSpawnOrigin() == vec3_origin )
 		{
-			m_vOriginalSpawnOrigin = GetAbsOrigin();
-			m_vOriginalSpawnAngles = GetAbsAngles();
+			m_vOriginalSpawnOrigin = GetEngineObject()->GetAbsOrigin();
+			m_vOriginalSpawnAngles = GetEngineObject()->GetAbsAngles();
 		}
 	}
 
@@ -295,8 +295,8 @@ void CWeaponHL2MPBase::FallThink( void )
 	{
 		if( GetOriginalSpawnOrigin() == vec3_origin )
 		{
-			m_vOriginalSpawnOrigin = GetAbsOrigin();
-			m_vOriginalSpawnAngles = GetAbsAngles();
+			m_vOriginalSpawnOrigin = GetEngineObject()->GetAbsOrigin();
+			m_vOriginalSpawnAngles = GetEngineObject()->GetAbsAngles();
 		}
 	}
 

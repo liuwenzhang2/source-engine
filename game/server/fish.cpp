@@ -51,7 +51,7 @@ void SendProxy_FishOriginX( const SendProp *pProp, const void *pStruct, const vo
 	CFish *fish = (CFish *)pStruct;
 	Assert( fish );
 
-	const Vector &v = fish->GetAbsOrigin();
+	const Vector &v = fish->GetEngineObject()->GetAbsOrigin();
 	Vector origin = fish->m_poolOrigin;
 
 	pOut->m_Float = v.x - origin.x;
@@ -62,7 +62,7 @@ void SendProxy_FishOriginY( const SendProp *pProp, const void *pStruct, const vo
 	CFish *fish = (CFish *)pStruct;
 	Assert( fish );
 
-	const Vector &v = fish->GetAbsOrigin();
+	const Vector &v = fish->GetEngineObject()->GetAbsOrigin();
 	Vector origin = fish->m_poolOrigin;
 
 	pOut->m_Float = v.y - origin.y;
@@ -125,11 +125,11 @@ void CFish::Initialize( CFishPool *pool, unsigned int id )
 	m_pool = pool;
 	m_id = id;
 
-	m_poolOrigin = pool->GetAbsOrigin();
+	m_poolOrigin = pool->GetEngineObject()->GetAbsOrigin();
 	m_waterLevel = pool->GetWaterLevel();
 
 	// pass relative position to the client
-	Vector deltaPos = GetAbsOrigin() - m_poolOrigin;
+	Vector deltaPos = GetEngineObject()->GetAbsOrigin() - m_poolOrigin;
 	m_x = deltaPos.x;
 	m_y = deltaPos.y;
 	m_z = m_poolOrigin->z;
@@ -212,7 +212,7 @@ void CFish::FlockTo( CFish *other, float amount )
 
 	const float maxRange = (other) ? 100.0f : 300.0f;
 
-	Vector to = (other) ? (other->GetAbsOrigin() - GetAbsOrigin()) : (m_pool->GetAbsOrigin() - GetAbsOrigin());
+	Vector to = (other) ? (other->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()) : (m_pool->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin());
 	float range = to.NormalizeInPlace();
 
 	if (range > maxRange)
@@ -223,7 +223,7 @@ void CFish::FlockTo( CFish *other, float amount )
 	if (other && range < avoidRange)
 	{
 		// compute their relative velocity to us
-		Vector relVel = other->GetAbsVelocity() - GetAbsVelocity();
+		Vector relVel = other->GetEngineObject()->GetAbsVelocity() - GetEngineObject()->GetAbsVelocity();
 
 		if (DotProduct( to, relVel ) < 0.0f)
 		{
@@ -276,7 +276,7 @@ float CFish::Avoid( void )
 	// This may cause problems with pools with oddly concave portions
 	// right at the max range.
 	//
-	Vector toCenter = m_pool->GetAbsOrigin() - GetAbsOrigin();
+	Vector toCenter = m_pool->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	const float avoidZone = 20.0f;
 	if (toCenter.IsLengthGreaterThan( m_pool->GetMaxRange() - avoidZone ))
 	{
@@ -297,14 +297,14 @@ float CFish::Avoid( void )
 	float leftDanger = 0.0f;
 
 	// slightly right of forward
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + m_avoidRange * (m_forward + sideOffset * m_perp), MASK_PLAYERSOLID, this, COLLISION_GROUP_NONE, &result );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + m_avoidRange * (m_forward + sideOffset * m_perp), MASK_PLAYERSOLID, this, COLLISION_GROUP_NONE, &result );
 	if (result.fraction < 1.0f)
 	{
 		rightDanger = 1.0f - result.fraction;
 	}
 
 	// slightly left of forward
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + m_avoidRange * (m_forward - sideOffset * m_perp), MASK_PLAYERSOLID, this, COLLISION_GROUP_NONE, &result );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + m_avoidRange * (m_forward - sideOffset * m_perp), MASK_PLAYERSOLID, this, COLLISION_GROUP_NONE, &result );
 	if (result.fraction < 1.0f)
 	{
 		// steer away
@@ -356,7 +356,7 @@ void CFish::Panic( void )
  */
 void CFish::Update( float deltaT )
 {
-	Vector deltaPos = GetAbsOrigin() - m_poolOrigin;
+	Vector deltaPos = GetEngineObject()->GetAbsOrigin() - m_poolOrigin;
 	const float safetyMargin = 5.0f;
 
 	// pass relative position to the client
@@ -375,17 +375,17 @@ void CFish::Update( float deltaT )
 		// don't allow fish to leave maximum range of pool
 		if (deltaPos.IsLengthGreaterThan( m_pool->GetMaxRange() - safetyMargin ))
 		{
-			SetAbsVelocity( Vector( 0, 0, 0 ) );
+			GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 0 ) );
 		}
 		else
 		{
 			// decay movement speed to zero
-			Vector vel = GetAbsVelocity();
+			Vector vel = GetEngineObject()->GetAbsVelocity();
 
 			const float drag = 1.0f;
 			vel -= drag * vel * deltaT;
 
-			SetAbsVelocity( vel );
+			GetEngineObject()->SetAbsVelocity( vel );
 		}
 
 		return;
@@ -497,7 +497,7 @@ void CFish::Update( float deltaT )
 		}
 	}
 
-	SetAbsVelocity( vel );
+	GetEngineObject()->SetAbsVelocity( vel );
 
 	m_flSpeed = m_speed;
 }
@@ -573,14 +573,14 @@ void CFishPool::Spawn()
 	SetThink( &CFishPool::Update );
 	SetNextThink( gpGlobals->curtime );
 
-	m_waterLevel = UTIL_WaterLevel( GetAbsOrigin(), GetAbsOrigin().z, GetAbsOrigin().z + 1000.0f );
+	m_waterLevel = UTIL_WaterLevel(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin().z, GetEngineObject()->GetAbsOrigin().z + 1000.0f );
 
 	trace_t result;
 	for( int i=0; i<m_fishCount; ++i )
 	{
 		QAngle heading( 0.0f, RandomFloat( 0, 360.0f ), 0.0f );
 
-		CFish *fish = (CFish *)Create( "fish", GetAbsOrigin(), heading, this );
+		CFish *fish = (CFish *)Create( "fish", GetEngineObject()->GetAbsOrigin(), heading, this );
 		fish->Initialize( this, i );
 
 		if (fish)
@@ -646,7 +646,7 @@ void CFishPool::FireGameEvent( IGameEvent *event )
 	for( int i=0; i<m_fishes.Count(); ++i )
 	{
 		// if player is NULL, assume a game-wide event
-		if (player && (player->GetAbsOrigin() - m_fishes[i]->GetAbsOrigin()).IsLengthGreaterThan( range ))
+		if (player && (player->GetEngineObject()->GetAbsOrigin() - m_fishes[i]->GetEngineObject()->GetAbsOrigin()).IsLengthGreaterThan( range ))
 		{
 			// event too far away to care
 			continue;
@@ -675,7 +675,7 @@ void CFishPool::Update( void )
 			// stop all the fish
 			for( int i=0; i<m_fishes.Count(); ++i )
 			{
-				m_fishes[i]->SetAbsVelocity( Vector( 0, 0, 0 ) );
+				m_fishes[i]->GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 0 ) );
 			}
 			
 			m_isDormant = true;
@@ -713,7 +713,7 @@ void CFishPool::Update( void )
 				if (!m_fishes[j]->IsAlive())
 					continue;
 
-				UTIL_TraceLine( m_fishes[i]->GetAbsOrigin(), m_fishes[j]->GetAbsOrigin(), MASK_PLAYERSOLID, m_fishes[i], COLLISION_GROUP_NONE, &result );
+				UTIL_TraceLine( m_fishes[i]->GetEngineObject()->GetAbsOrigin(), m_fishes[j]->GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, m_fishes[i], COLLISION_GROUP_NONE, &result );
 				if (result.fraction >= 1.0f)
 				{
 					// the fish can see each other

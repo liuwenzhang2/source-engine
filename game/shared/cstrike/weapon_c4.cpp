@@ -270,8 +270,8 @@ END_PREDICTION_DATA()
 
 		SetCollisionBounds( Vector( 0, 0, 0 ), Vector( 8, 8, 8 ) );
 
-		SetAbsOrigin( vecStart );
-		SetAbsAngles( vecAngles );
+		GetEngineObject()->SetAbsOrigin( vecStart );
+		GetEngineObject()->SetAbsAngles( vecAngles );
 		SetOwnerEntity( pevOwner );
         
         //=============================================================================
@@ -348,7 +348,7 @@ END_PREDICTION_DATA()
 			CSGameRules()->m_bBombDropped = false;
 
 			trace_t tr;
-			Vector vecSpot = GetAbsOrigin();
+			Vector vecSpot = GetEngineObject()->GetAbsOrigin();
 			vecSpot[2] += 8;
 
 			UTIL_TraceLine( vecSpot, vecSpot + Vector ( 0, 0, -40 ), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
@@ -465,7 +465,7 @@ END_PREDICTION_DATA()
 				}
 
 			
-				Vector soundPosition = m_pBombDefuser->GetAbsOrigin() + Vector( 0, 0, 5 );
+				Vector soundPosition = m_pBombDefuser->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 5 );
 				CPASAttenuationFilter filter( soundPosition );
 
 				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "c4.disarmfinish" );
@@ -595,11 +595,11 @@ END_PREDICTION_DATA()
 		// Pull out of the wall a bit
 		if ( pTrace->fraction != 1.0 )
 		{
-			SetAbsOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6) );
+			GetEngineObject()->SetAbsOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6) );
 		}
 
 		{
-			Vector pos = GetAbsOrigin() + Vector( 0,0,8 );
+			Vector pos = GetEngineObject()->GetAbsOrigin() + Vector( 0,0,8 );
 
 			// add an explosion TE so it affects clientside physics
 			CPASFilter filter( pos );
@@ -630,7 +630,7 @@ END_PREDICTION_DATA()
 
 		CSGameRules()->RadiusDamage( 
 			CTakeDamageInfo( this, GetOwnerEntity(), flBombRadius, bitsDamageType ),
-			GetAbsOrigin(),
+			GetEngineObject()->GetAbsOrigin(),
 			flBombRadius * 3.5,	//Matt - don't ask me, this is how CS does it.
 			CLASS_NONE,
 			true );	// IGNORE THE WORLD!!
@@ -701,7 +701,7 @@ END_PREDICTION_DATA()
                 gameeventmanager->FireEvent( event );
 			}
 
-			Vector soundPosition = player->GetAbsOrigin() + Vector( 0, 0, 5 );
+			Vector soundPosition = player->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 5 );
 			CPASAttenuationFilter filter( soundPosition );
 
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "c4.disarmstart" );
@@ -1034,15 +1034,15 @@ void CC4::PrimaryAttack()
 		if( pPlayer->m_bInBombZone )
 		{
 #if !defined( CLIENT_DLL )
-			CPlantedC4 *pC4 = CPlantedC4::ShootSatchelCharge( pPlayer, pPlayer->GetAbsOrigin(), pPlayer->GetAbsAngles() );
+			CPlantedC4 *pC4 = CPlantedC4::ShootSatchelCharge( pPlayer, pPlayer->GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsAngles() );
 
 			if ( pC4 )
 			{
 				pC4->SetBombSiteIndex( pPlayer->m_iBombSiteIndex );
 
 				trace_t tr;
-				UTIL_TraceEntity( pC4, GetAbsOrigin(), GetAbsOrigin() + Vector(0,0,-200), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
-				pC4->SetAbsOrigin( tr.endpos );
+				UTIL_TraceEntity( pC4, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector(0,0,-200), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+				pC4->GetEngineObject()->SetAbsOrigin( tr.endpos );
 
 				CBombTarget *pBombTarget = (CBombTarget*)UTIL_EntityByIndex( pPlayer->m_iBombSiteIndex );
 				
@@ -1052,8 +1052,8 @@ void CC4::PrimaryAttack()
 
 					if ( pAttachPoint )
 					{
-						pC4->SetAbsOrigin( pAttachPoint->GetAbsOrigin() );
-						pC4->SetAbsAngles( pAttachPoint->GetAbsAngles() );
+						pC4->GetEngineObject()->SetAbsOrigin( pAttachPoint->GetEngineObject()->GetAbsOrigin() );
+						pC4->GetEngineObject()->SetAbsAngles( pAttachPoint->GetEngineObject()->GetAbsAngles() );
 						pC4->GetEngineObject()->SetParent( pAttachPoint->GetEngineObject() );
 					}
 
@@ -1091,8 +1091,8 @@ void CC4::PrimaryAttack()
 			{
 				event->SetInt("userid", pPlayer->GetUserID() );
 				event->SetInt("site", pPlayer->m_iBombSiteIndex );
-				event->SetInt("posx", pPlayer->GetAbsOrigin().x );
-				event->SetInt("posy", pPlayer->GetAbsOrigin().y );
+				event->SetInt("posx", pPlayer->GetEngineObject()->GetAbsOrigin().x );
+				event->SetInt("posy", pPlayer->GetEngineObject()->GetAbsOrigin().y );
 				event->SetInt( "priority", 8 );
 				gameeventmanager->FireEvent( event );
 			}
@@ -1112,7 +1112,7 @@ void CC4::PrimaryAttack()
 			CSGameRules()->m_bBombPlanted = true;
 
 			// Play the plant sound.
-			Vector plantPosition = pPlayer->GetAbsOrigin() + Vector( 0, 0, 5 );
+			Vector plantPosition = pPlayer->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 5 );
 			CPASAttenuationFilter filter( plantPosition );
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "c4.plant" );
 
@@ -1222,7 +1222,7 @@ void CC4::PlayArmingBeeps( void )
 			m_bPlayedArmingBeeps[i] = true;
 
 			CCSPlayer *owner = GetPlayerOwner();
-			Vector soundPosition = owner->GetAbsOrigin() + Vector( 0, 0, 5 );
+			Vector soundPosition = owner->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 5 );
 			CPASAttenuationFilter filter( soundPosition );
 
 			filter.RemoveRecipient( owner );

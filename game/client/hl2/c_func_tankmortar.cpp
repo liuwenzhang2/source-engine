@@ -57,7 +57,7 @@ void C_MortarShell::OnDataChanged( DataUpdateType_t updateType )
 		AddToLeafSystem( RENDER_GROUP_TRANSLUCENT_ENTITY );
 
 		m_pEmitter = CSimpleEmitter::Create( "C_EntityDissolve" );
-		m_pEmitter->SetSortOrigin( GetAbsOrigin() );
+		m_pEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
 		m_ParticleEvent.Init( 128 );
 	}
@@ -85,7 +85,7 @@ void C_MortarShell::AddRisingParticles( float flPerc )
 		offset.y = random->RandomFloat( -radius, radius );
 		offset.z = random->RandomFloat( -8.0f, 8.0f );
 
-		offset += GetAbsOrigin();
+		offset += GetEngineObject()->GetAbsOrigin();
 
 		sParticle = (SimpleParticle *) m_pEmitter->AddParticle( sizeof(SimpleParticle), m_pEmitter->GetPMaterial( "effects/spark" ), offset );
 		
@@ -134,7 +134,7 @@ void C_MortarShell::AddExplodingParticles( float flPerc )
 		offset.y = random->RandomFloat( -radius, radius );
 		offset.z = random->RandomFloat( -8.0f, 8.0f );
 
-		offset += GetAbsOrigin();
+		offset += GetEngineObject()->GetAbsOrigin();
 
 		sParticle = (SimpleParticle *) m_pEmitter->AddParticle( sizeof(SimpleParticle), m_pEmitter->GetPMaterial( "effects/spark" ), offset );
 		
@@ -219,7 +219,7 @@ int C_MortarShell::DrawModel( int flags )
 	float flScale = ( ending ) ? m_flRadius : ( (m_flRadius*0.1f)+ ( ( m_flRadius - (m_flRadius*0.1f) ) * flPerc ) );
 
 	// Do the ground effect
-	FX_AddQuad( GetAbsOrigin() + ( m_vecSurfaceNormal * 2.0f ), 
+	FX_AddQuad(GetEngineObject()->GetAbsOrigin() + ( m_vecSurfaceNormal * 2.0f ),
 				m_vecSurfaceNormal, 
 				flScale,
 				flScale,

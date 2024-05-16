@@ -194,15 +194,15 @@ public:
 	void OnRestore();
 
 	void SetAbsVelocity(const Vector& vecVelocity);
-	Vector& GetAbsVelocity();
+	const Vector& GetAbsVelocity();
 	const Vector& GetAbsVelocity() const;
 	// NOTE: Setting the abs origin or angles will cause the local origin + angles to be set also
 	void SetAbsOrigin(const Vector& origin);
-	Vector& GetAbsOrigin(void);
+	const Vector& GetAbsOrigin(void);
 	const Vector& GetAbsOrigin(void) const;
 
 	void SetAbsAngles(const QAngle& angles);
-	QAngle& GetAbsAngles(void);
+	const QAngle& GetAbsAngles(void);
 	const QAngle& GetAbsAngles(void) const;
 
 	// Origin and angles in local space ( relative to parent )
@@ -258,12 +258,12 @@ public:
 	void SetParent(IEngineObjectServer* pNewParent, int iAttachment = -1);
 	// FIXME: Make hierarchy a member of CBaseEntity
 	// or a contained private class...
-	//static void UnlinkChild(CEngineObject* pParent, CEngineObject* pChild);
-	//static void LinkChild(CEngineObject* pParent, CEngineObject* pChild);
-	//static void ClearParent(CEngineObject* pEntity);
-	//static void UnlinkAllChildren(CEngineObject* pParent);
-	//static void UnlinkFromParent(CEngineObject* pRemove);
-	//static void TransferChildren(CEngineObject* pOldParent, CEngineObject* pNewParent);
+	void UnlinkChild(IEngineObjectServer* pChild);
+	void LinkChild(IEngineObjectServer* pChild);
+	//virtual void ClearParent(IEngineObjectServer* pEntity);
+	void UnlinkAllChildren();
+	void UnlinkFromParent();
+	void TransferChildren(IEngineObjectServer* pNewParent);
 
 	virtual int AreaNum() const;
 	virtual PVSInfo_t* GetPVSInfo();
@@ -1402,7 +1402,7 @@ int CGlobalEntityList<T>::AddLandmarkToList(levellist_t* pLevelList, int listCou
 	T* ent = (pentLandmark);
 	Assert(ent);
 
-	pLevelList[listCount].vecLandmarkOrigin = ent->GetAbsOrigin();
+	pLevelList[listCount].vecLandmarkOrigin = ent->GetEngineObject()->GetAbsOrigin();
 
 	return 1;
 }
@@ -1464,7 +1464,7 @@ bool CGlobalEntityList<T>::IsEntityInTransition(T* pEntity, const char* pLandmar
 
 	// Check to make sure it's also in the PVS of landmark
 	byte pvs[MAX_MAP_CLUSTERS / 8];
-	int clusterIndex = engine->GetClusterForOrigin(pLandmark->GetAbsOrigin());
+	int clusterIndex = engine->GetClusterForOrigin(pLandmark->GetEngineObject()->GetAbsOrigin());
 	engine->GetPVSForCluster(clusterIndex, sizeof(pvs), pvs);
 	Vector vecSurroundMins, vecSurroundMaxs;
 	pEntity->CollisionProp()->WorldSpaceSurroundingBounds(&vecSurroundMins, &vecSurroundMaxs);
@@ -2367,7 +2367,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByNameNearest(const char* szName, c
 		if (pSearch->entindex()==-1)
 			continue;
 
-		float flDist2 = (pSearch->GetAbsOrigin() - vecSrc).LengthSqr();
+		float flDist2 = (pSearch->GetEngineObject()->GetAbsOrigin() - vecSrc).LengthSqr();
 
 		if (flMaxDist2 > flDist2)
 		{
@@ -2410,7 +2410,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByNameWithin(CBaseEntity* pStartEnt
 		if (pEntity->entindex()==-1)
 			continue;
 
-		float flDist2 = (pEntity->GetAbsOrigin() - vecSrc).LengthSqr();
+		float flDist2 = (pEntity->GetEngineObject()->GetAbsOrigin() - vecSrc).LengthSqr();
 
 		if (flMaxDist2 > flDist2)
 		{
@@ -2450,7 +2450,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameNearest(const char* szNa
 		if (pSearch->entindex()==-1)
 			continue;
 
-		float flDist2 = (pSearch->GetAbsOrigin() - vecSrc).LengthSqr();
+		float flDist2 = (pSearch->GetEngineObject()->GetAbsOrigin() - vecSrc).LengthSqr();
 
 		if (flMaxDist2 > flDist2)
 		{
@@ -2490,7 +2490,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pSta
 		if (pEntity->entindex()==-1)
 			continue;
 
-		float flDist2 = (pEntity->GetAbsOrigin() - vecSrc).LengthSqr();
+		float flDist2 = (pEntity->GetEngineObject()->GetAbsOrigin() - vecSrc).LengthSqr();
 
 		if (flMaxDist2 > flDist2)
 		{
@@ -2647,7 +2647,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityClassNearestFacing(const Vector& or
 			continue;
 
 		// Make vector to entity
-		Vector	to_ent = (ent->GetAbsOrigin() - origin);
+		Vector	to_ent = (ent->GetEngineObject()->GetAbsOrigin() - origin);
 
 		VectorNormalize(to_ent);
 		float dot = DotProduct(facing, to_ent);

@@ -80,23 +80,23 @@ public:
 
 		if ( index >= 0 )
 		{
-			effects->DecalShoot( index, pOther->entindex(), pOther->GetModel(), pOther->GetAbsOrigin(), pOther->GetAbsAngles(), GetAbsOrigin(), 0, 0 );
+			effects->DecalShoot( index, pOther->entindex(), pOther->GetModel(), pOther->GetEngineObject()->GetAbsOrigin(), pOther->GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), 0, 0 );
 		}
 
 
 		if ( GetFlags() & FL_ONGROUND )
 		{
-			QAngle vAngles = GetAbsAngles();
+			QAngle vAngles = GetEngineObject()->GetAbsAngles();
 			QAngle vAngularVelocity = GetLocalAngularVelocity();
 
-			SetAbsVelocity( GetAbsVelocity() * 0.9 );
+			GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.9 );
 
 			vAngles.x = 0;
 			vAngles.z = 0;
 			vAngularVelocity.x = 0;
 			vAngularVelocity.z = 0;
 
-			SetAbsAngles( vAngles );
+			GetEngineObject()->SetAbsAngles( vAngles );
 			SetLocalAngularVelocity( vAngularVelocity );
 		}
 	}

@@ -46,7 +46,7 @@ public:
 	bool QuerySeeEntity( CBaseEntity *pEntity, bool bOnlyHateOrFearIfNPC = false );
 
 
-	bool IsOpeningOrClosing() { return (GetAbsVelocity().z != 0.0f); }
+	bool IsOpeningOrClosing() { return (GetEngineObject()->GetAbsVelocity().z != 0.0f); }
 	bool IsEnabled();
 	bool IsOpen();
 

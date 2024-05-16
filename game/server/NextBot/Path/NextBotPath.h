@@ -177,7 +177,7 @@ public:
 			return false;
 		}
 
-		Vector subjectPos = subject->GetAbsOrigin();
+		Vector subjectPos = subject->GetEngineObject()->GetAbsOrigin();
 		
 		// if we are already in the subject area, build trivial path
 		if ( startArea == subjectArea )
@@ -446,7 +446,7 @@ public:
 					continue;
 
 				// don't use this area if it is out of range
-				if ( maxSearchRadius > 0.0f && ( newArea->GetCenter() - bot->GetEntity()->GetAbsOrigin() ).IsLengthGreaterThan( maxSearchRadius ) )
+				if ( maxSearchRadius > 0.0f && ( newArea->GetCenter() - bot->GetEntity()->GetEngineObject()->GetAbsOrigin() ).IsLengthGreaterThan( maxSearchRadius ) )
 					continue;
 
 				// determine cost of traversing this area

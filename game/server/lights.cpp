@@ -44,9 +44,9 @@ bool CLight::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if (FStrEq(szKeyName, "pitch"))
 	{
-		QAngle angles = GetAbsAngles();
+		QAngle angles = GetEngineObject()->GetAbsAngles();
 		angles.x = atof(szValue);
-		SetAbsAngles( angles );
+		GetEngineObject()->SetAbsAngles( angles );
 	}
 	else
 	{

@@ -32,10 +32,10 @@ void CBaseGrenadeTimed::Spawn( void )
 	UTIL_SetSize(this, Vector( -4, -4, -4), Vector(4, 4, 4));
 
 	QAngle angles;
-	Vector vel = GetAbsVelocity();
+	Vector vel = GetEngineObject()->GetAbsVelocity();
 
 	VectorAngles( vel, angles );
-	SetLocalAngles( angles );
+	GetEngineObject()->SetLocalAngles( angles );
 	
 	SetTouch( &CBaseGrenadeTimed::BounceTouch );	// Bounce if touched
 	
@@ -50,7 +50,7 @@ void CBaseGrenadeTimed::Spawn( void )
 	if ((m_flDetonateTime - gpGlobals->curtime) < 0.1)
 	{
 		SetNextThink( gpGlobals->curtime );
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 	}
 
 	// Tumble through the air

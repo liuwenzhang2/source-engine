@@ -173,7 +173,7 @@ void CMumbleSystem::PostRender()
 	if ( pPlayer )
 	{
 		vecOriginPlayer = pPlayer->EyePosition();
-		anglesPlayer = pPlayer->GetAbsAngles();
+		anglesPlayer = pPlayer->GetEngineObject()->GetAbsAngles();
 	}
 	else
 	{

@@ -162,7 +162,7 @@ void CWeaponGlock::GlockFire( float flSpread , float flCycleTime, bool fUseAutoA
 #if !defined(CLIENT_DLL)
 	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5 );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 400, 0.2 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 400, 0.2 );
 #endif
 
 	if ( !m_iClip1 && pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )

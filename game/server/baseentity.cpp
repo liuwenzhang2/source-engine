@@ -540,7 +540,7 @@ void CBaseEntity::UpdateOnRemove(void)
 
 	// If we have a parent, unlink from it.
 	this->BeforeParentChanged(NULL);
-	IEngineObjectServer::UnlinkFromParent(this->GetEngineObject());
+	this->GetEngineObject()->UnlinkFromParent();
 
 	// Any children still connected are orphans, mark all for delete
 	CUtlVector<CBaseEntity*> childrenList;

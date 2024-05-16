@@ -123,7 +123,7 @@ void CSun::Activate()
 	// Find our target.
 	if ( m_bUseAngles )
 	{
-		SetupLightNormalFromProps( GetAbsAngles(), m_flYaw, m_flPitch, m_vDirection.GetForModify() );
+		SetupLightNormalFromProps(GetEngineObject()->GetAbsAngles(), m_flYaw, m_flPitch, m_vDirection.GetForModify() );
 		m_vDirection = -m_vDirection.Get();
 	}
 	else
@@ -131,7 +131,7 @@ void CSun::Activate()
 		CBaseEntity *pEnt = gEntList.FindEntityByName( 0, m_target );
 		if( pEnt )
 		{
-			Vector vDirection = GetAbsOrigin() - pEnt->GetAbsOrigin();
+			Vector vDirection = GetEngineObject()->GetAbsOrigin() - pEnt->GetEngineObject()->GetAbsOrigin();
 			VectorNormalize( vDirection );
 			m_vDirection = vDirection;
 		}

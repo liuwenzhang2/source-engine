@@ -743,7 +743,7 @@ CNavArea *CNavMesh::GetNavArea( CBaseEntity *pEntity, int nFlags, float flBeneat
 	if ( !m_grid.Count() )
 		return NULL;
 
-	Vector testPos = pEntity->GetAbsOrigin();
+	Vector testPos = pEntity->GetEngineObject()->GetAbsOrigin();
 
 	float flStepHeight = 1e-3;
 	CBaseCombatCharacter *pBCC = pEntity->MyCombatCharacterPointer();
@@ -1011,7 +1011,7 @@ CNavArea *CNavMesh::GetNearestNavArea( CBaseEntity *pEntity, int nFlags, float m
 
 	bool bCheckLOS = ( nFlags & GETNAVAREA_CHECK_LOS ) != 0;
 	bool bCheckGround = ( nFlags & GETNAVAREA_CHECK_GROUND ) != 0;
-	return GetNearestNavArea( pEntity->GetAbsOrigin(), false, maxDist, bCheckLOS, bCheckGround, pEntity->GetTeamNumber() );
+	return GetNearestNavArea( pEntity->GetEngineObject()->GetAbsOrigin(), false, maxDist, bCheckLOS, bCheckGround, pEntity->GetTeamNumber() );
 }
 
 
@@ -2679,7 +2679,7 @@ void CNavMesh::CommandNavMarkWalkable( void )
 			return;
 		}
 
-		pos = player->GetAbsOrigin();
+		pos = player->GetEngineObject()->GetAbsOrigin();
 	}
 
 	// snap position to the sampling grid

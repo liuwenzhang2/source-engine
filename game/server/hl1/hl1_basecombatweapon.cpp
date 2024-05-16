@@ -60,9 +60,9 @@ void CBaseHL1CombatWeapon::FallInit( void )
 
 	// HACKHACK - On ground isn't always set, so look for ground underneath
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector(0,0,256), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector(0,0,256), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
-	SetAbsOrigin( tr.endpos );
+	GetEngineObject()->SetAbsOrigin( tr.endpos );
 
 	if ( tr.fraction < 1.0 )
 	{

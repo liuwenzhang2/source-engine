@@ -250,7 +250,7 @@ bool CCSBot::RespondToHelpRequest( CCSPlayer *them, Place place, float maxRange 
 		// if we have no "place" identifier, go directly to them
 
 		// if we are already there, ignore
-		float rangeSq = (them->GetAbsOrigin() - GetAbsOrigin()).LengthSqr();
+		float rangeSq = (them->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).LengthSqr();
 		const float close = 750.0f * 750.0f;
 		if (rangeSq < close)
 			return true;

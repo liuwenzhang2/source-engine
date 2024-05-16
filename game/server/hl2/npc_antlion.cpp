@@ -611,7 +611,7 @@ void CNPC_Antlion::Event_Killed( const CTakeDamageInfo &info )
 
 	if ( info.GetDamageType() & DMG_CRUSH )
 	{
-		CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, GetAbsOrigin(), 256, 0.5f, this );
+		CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, GetEngineObject()->GetAbsOrigin(), 256, 0.5f, this );
 	}
 
 	BaseClass::Event_Killed( info );
@@ -621,10 +621,10 @@ void CNPC_Antlion::Event_Killed( const CTakeDamageInfo &info )
 	if ( pAttacker && pAttacker->GetServerVehicle() && ShouldGib( info ) == true )
 	{
 		trace_t tr;
-		UTIL_TraceLine( GetAbsOrigin() + Vector( 0, 0, 64 ), pAttacker->GetAbsOrigin(), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 64 ), pAttacker->GetEngineObject()->GetAbsOrigin(), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 		UTIL_DecalTrace( &tr, "Antlion.Splat" );
 
-		SpawnBlood( GetAbsOrigin(), g_vecAttackDir, BloodColor(), info.GetDamage() );
+		SpawnBlood(GetEngineObject()->GetAbsOrigin(), g_vecAttackDir, BloodColor(), info.GetDamage() );
 
 		CPASAttenuationFilter filter( this );
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NPC_Antlion.RunOverByVehicle" );
@@ -643,9 +643,9 @@ void CNPC_Antlion::MeleeAttack( float distance, float damage, QAngle &viewPunch,
 	// Always hurt bullseyes for now
 	if ( ( GetEnemy() != NULL ) && ( GetEnemy()->Classify() == CLASS_BULLSEYE ) )
 	{
-		vecForceDir = (GetEnemy()->GetAbsOrigin() - GetAbsOrigin());
+		vecForceDir = (GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin());
 		CTakeDamageInfo info( this, this, damage, DMG_SLASH );
-		CalculateMeleeDamageForce( &info, vecForceDir, GetEnemy()->GetAbsOrigin() );
+		CalculateMeleeDamageForce( &info, vecForceDir, GetEnemy()->GetEngineObject()->GetAbsOrigin() );
 		GetEnemy()->TakeDamage( info );
 		return;
 	}
@@ -660,7 +660,7 @@ void CNPC_Antlion::MeleeAttack( float distance, float damage, QAngle &viewPunch,
 		if ( FClassnameIs( pHurt, "npc_combine_s" ) )
 		{
 			CTakeDamageInfo	dmgInfo( this, this, pHurt->m_iHealth+25, DMG_SLASH );
-			CalculateMeleeDamageForce( &dmgInfo, vecForceDir, pHurt->GetAbsOrigin() );
+			CalculateMeleeDamageForce( &dmgInfo, vecForceDir, pHurt->GetEngineObject()->GetAbsOrigin() );
 			pHurt->TakeDamage( dmgInfo );
 			return;
 		}
@@ -674,7 +674,7 @@ void CNPC_Antlion::MeleeAttack( float distance, float damage, QAngle &viewPunch,
 			{
 				pPlayer->ViewPunch( viewPunch );
 
-				Vector	dir = pHurt->GetAbsOrigin() - GetAbsOrigin();
+				Vector	dir = pHurt->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 				VectorNormalize(dir);
 
 				QAngle angles;
@@ -717,7 +717,7 @@ bool CNPC_Antlion::FindChasePosition( const Vector &targetPos, Vector &result )
 		 return true;
 	}
 
-	Vector runDir = ( targetPos - GetAbsOrigin() );
+	Vector runDir = ( targetPos - GetEngineObject()->GetAbsOrigin() );
 	VectorNormalize( runDir );
 	
 	Vector	vRight, vUp;
@@ -846,9 +846,9 @@ bool CNPC_Antlion::GetPathToSoundFleePoint( int soundType )
 	Vector vecSoundPos = pSound->GetSoundOrigin();
 
 	// Put the sound location on the same plane as the antlion.
-	vecSoundPos.z = GetAbsOrigin().z;
+	vecSoundPos.z = GetEngineObject()->GetAbsOrigin().z;
 
-	Vector vecFleeDir = GetAbsOrigin() - vecSoundPos;
+	Vector vecFleeDir = GetEngineObject()->GetAbsOrigin() - vecSoundPos;
 	VectorNormalize( vecFleeDir );
 
 	if ( pHint != NULL )
@@ -1073,10 +1073,10 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 				Vector	vTarget;
 				
 				// If our enemy is looking at us and far enough away, lead him
-				if ( HasCondition( COND_ENEMY_FACING_ME ) && UTIL_DistApprox( GetAbsOrigin(), GetEnemy()->GetAbsOrigin() ) > (40*12) )
+				if ( HasCondition( COND_ENEMY_FACING_ME ) && UTIL_DistApprox(GetEngineObject()->GetAbsOrigin(), GetEnemy()->GetEngineObject()->GetAbsOrigin() ) > (40*12) )
 				{
 					UTIL_PredictedPosition( GetEnemy(), 0.5f, &vTarget ); 
-					vTarget.z = GetEnemy()->GetAbsOrigin().z;
+					vTarget.z = GetEnemy()->GetEngineObject()->GetAbsOrigin().z;
 				}
 				else
 				{
@@ -1118,8 +1118,8 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 				for ( int i = 0; i < 6; i++ )
 				{
 					CGrenadeSpit *pGrenade = (CGrenadeSpit*)gEntList.CreateEntityByName( "grenade_spit" );
-					pGrenade->SetAbsOrigin( vSpitPos );
-					pGrenade->SetAbsAngles( vec3_angle );
+					pGrenade->GetEngineObject()->SetAbsOrigin( vSpitPos );
+					pGrenade->GetEngineObject()->SetAbsAngles( vec3_angle );
 					DispatchSpawn( pGrenade );
 					pGrenade->SetThrower( this );
 					pGrenade->SetOwnerEntity( this );
@@ -1127,11 +1127,11 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 					if ( i == 0 )
 					{
 						pGrenade->SetSpitSize( SPIT_LARGE );
-						pGrenade->SetAbsVelocity( vecToss * flVelocity );
+						pGrenade->GetEngineObject()->SetAbsVelocity( vecToss * flVelocity );
 					}
 					else
 					{
-						pGrenade->SetAbsVelocity( ( vecToss + RandomVector( -0.035f, 0.035f ) ) * flVelocity );
+						pGrenade->GetEngineObject()->SetAbsVelocity( ( vecToss + RandomVector( -0.035f, 0.035f ) ) * flVelocity );
 						pGrenade->SetSpitSize( random->RandomInt( SPIT_SMALL, SPIT_MEDIUM ) );
 					}
 
@@ -1244,7 +1244,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		//Shake the screen
-		UTIL_ScreenShake( GetAbsOrigin(), 0.5f, 80.0f, 1.0f, 256.0f, SHAKE_START );
+		UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 0.5f, 80.0f, 1.0f, 256.0f, SHAKE_START );
 
 		//Throw dust up
 		CreateDust();
@@ -1270,7 +1270,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		//Shake the screen
-		UTIL_ScreenShake( GetAbsOrigin(), 0.5f, 80.0f, 1.0f, 256.0f, SHAKE_START );
+		UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 0.5f, 80.0f, 1.0f, 256.0f, SHAKE_START );
 
 		//Throw dust up
 		CreateDust();
@@ -1379,7 +1379,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLION_WORKER_EXPLODE_WARN )
 	{
-		CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, GetAbsOrigin(), sk_antlion_worker_burst_radius.GetFloat(), 0.5f, this );
+		CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, GetEngineObject()->GetAbsOrigin(), sk_antlion_worker_burst_radius.GetFloat(), 0.5f, this );
 		return;
 	}
 
@@ -1561,7 +1561,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 	{
 		// Set the gravity really low here! Sink slowly
 		SetGravity( 0 );
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		m_flTimeDrownSplash = gpGlobals->curtime + random->RandomFloat( 0, 0.5 );
 		m_flTimeDrown = gpGlobals->curtime + 4;
 		break;
@@ -1581,7 +1581,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 			{
 				trace_t trace;
 				CTraceFilterAntlion traceFilter( this );
-				AI_TraceHull( GetAbsOrigin(), GetAbsOrigin(), WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, &traceFilter, &trace );
+				AI_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), WorldAlignMins(), WorldAlignMaxs(), MASK_SOLID, &traceFilter, &trace );
 
 				if ( trace.m_pEnt )
 				{
@@ -1598,9 +1598,9 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 				SetGroundEntity( NULL );
 				
 				// Bump up
-				UTIL_SetOrigin( this, GetAbsOrigin() + Vector( 0, 0 , 1 ) );
+				UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() + Vector( 0, 0 , 1 ) );
 				
-				SetAbsVelocity( vecJumpDir * -200 + Vector( 0, 0, 100 ) );
+				GetEngineObject()->SetAbsVelocity( vecJumpDir * -200 + Vector( 0, 0, 100 ) );
 
 				// Doing ACT_RESET first assures they play the animation, even when in transition
 				ResetActivity();
@@ -1698,7 +1698,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 		
 		m_iUnBurrowAttempts = 0;
 
-		if ( ValidBurrowPoint( GetAbsOrigin() ) )
+		if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 		{
 			m_spawnflags &= ~SF_NPC_GAG;
 			RemoveSolidFlags( FSOLID_NOT_SOLID );
@@ -1719,7 +1719,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 
 	case TASK_ANTLION_FIND_BURROW_IN_POINT:
 		
-		if ( FindBurrow( GetAbsOrigin(), pTask->flTaskData, ANTLION_BURROW_IN ) == false )
+		if ( FindBurrow(GetEngineObject()->GetAbsOrigin(), pTask->flTaskData, ANTLION_BURROW_IN ) == false )
 		{
 			TaskFail( "TASK_ANTLION_FIND_BURROW_IN_POINT: Unable to find burrow in position\n" );
 		}
@@ -1732,7 +1732,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 
 	case TASK_ANTLION_FIND_BURROW_OUT_POINT:
 		
-		if ( FindBurrow( GetAbsOrigin(), pTask->flTaskData, ANTLION_BURROW_OUT ) == false )
+		if ( FindBurrow(GetEngineObject()->GetAbsOrigin(), pTask->flTaskData, ANTLION_BURROW_OUT ) == false )
 		{
 			TaskFail( "TASK_ANTLION_FIND_BURROW_OUT_POINT: Unable to find burrow out position\n" );
 		}
@@ -1855,11 +1855,11 @@ void CNPC_Antlion::RunTask( const Task_t *pTask )
 	{
 		if ( gpGlobals->curtime > m_flTimeDrownSplash )
 		{
-			float flWaterZ = UTIL_FindWaterSurface( GetAbsOrigin(), GetAbsOrigin().z, GetAbsOrigin().z + NAI_Hull::Maxs( GetHullType() ).z );
+			float flWaterZ = UTIL_FindWaterSurface(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin().z, GetEngineObject()->GetAbsOrigin().z + NAI_Hull::Maxs( GetHullType() ).z );
 
 			CEffectData	data;
 			data.m_fFlags = 0;
-			data.m_vOrigin = GetAbsOrigin();
+			data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 			data.m_vOrigin.z = flWaterZ;
 			data.m_vNormal = Vector( 0, 0, 1 );
 			data.m_flScale = random->RandomFloat( 12.0, 16.0 );
@@ -1897,11 +1897,11 @@ void CNPC_Antlion::RunTask( const Task_t *pTask )
 				SetGroundEntity( NULL );	
 				
 				// Bump up
-				UTIL_SetOrigin( this, GetAbsOrigin() + Vector( 0, 0 , 1 ) );
+				UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() + Vector( 0, 0 , 1 ) );
 				
 				Vector vecRandom = RandomVector( -250.0f, 250.0f );
 				vecRandom[2] = random->RandomFloat( 100.0f, 200.0f );
-				SetAbsVelocity( vecRandom );
+				GetEngineObject()->SetAbsVelocity( vecRandom );
 
 				// Doing ACT_RESET first assures they play the animation, even when in transition
 				ResetActivity();
@@ -1959,7 +1959,7 @@ void CNPC_Antlion::RunTask( const Task_t *pTask )
 			return;
 
 		//See if we can pop up
-		if ( ValidBurrowPoint( GetAbsOrigin() ) )
+		if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 		{
 			m_spawnflags &= ~SF_NPC_GAG;
 			RemoveSolidFlags( FSOLID_NOT_SOLID );
@@ -2039,7 +2039,7 @@ bool CNPC_Antlion::IsJumpLegal( const Vector &startPos, const Vector &apex, cons
 		 return false;
 	
 	//Adrian: Don't try to jump if my destination is right next to me.
-	if ( ( endPos - GetAbsOrigin()).Length() < MIN_JUMP_DISTANCE ) 
+	if ( ( endPos - GetEngineObject()->GetAbsOrigin()).Length() < MIN_JUMP_DISTANCE )
 		 return false;
 
 	if ( HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) && g_test_new_antlion_jump.GetBool() == true )
@@ -2083,28 +2083,28 @@ bool CNPC_Antlion::IsFirmlyOnGround( void )
 
 	float flHeight =  fabs( GetHullMaxs().z - GetHullMins().z );
 	
-	Vector vOrigin = GetAbsOrigin() + Vector( GetHullMins().x, GetHullMins().y, 0 );
+	Vector vOrigin = GetEngineObject()->GetAbsOrigin() + Vector( GetHullMins().x, GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
 	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 
 	if ( tr.fraction != 1.0f )
 		 return true;
 	
-	vOrigin = GetAbsOrigin() - Vector( GetHullMins().x, GetHullMins().y, 0 );
+	vOrigin = GetEngineObject()->GetAbsOrigin() - Vector( GetHullMins().x, GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
 	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 
 	if ( tr.fraction != 1.0f )
 		 return true;
 
-	vOrigin = GetAbsOrigin() + Vector( GetHullMins().x, -GetHullMins().y, 0 );
+	vOrigin = GetEngineObject()->GetAbsOrigin() + Vector( GetHullMins().x, -GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
 	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 
 	if ( tr.fraction != 1.0f )
 		 return true;
 
-	vOrigin = GetAbsOrigin() + Vector( -GetHullMins().x, GetHullMins().y, 0 );
+	vOrigin = GetEngineObject()->GetAbsOrigin() + Vector( -GetHullMins().x, GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
 	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
 
@@ -2190,7 +2190,7 @@ bool CNPC_Antlion::ShouldJump( void )
 	UTIL_PredictedPosition( GetEnemy(), flDot * 2.5f, &vecPredictedPos );
 
 	// Don't jump if we're already near the target
-	if ( ( GetAbsOrigin() - vecPredictedPos ).LengthSqr() < (512*512) )
+	if ( (GetEngineObject()->GetAbsOrigin() - vecPredictedPos ).LengthSqr() < (512*512) )
 		return false;
 
 	//Don't retest if the target hasn't moved enough
@@ -2201,7 +2201,7 @@ bool CNPC_Antlion::ShouldJump( void )
 		return false;
 	}
 
-	Vector	targetDir = ( vecPredictedPos - GetAbsOrigin() );
+	Vector	targetDir = ( vecPredictedPos - GetEngineObject()->GetAbsOrigin() );
 
 	float flDist = VectorNormalize( targetDir );
 
@@ -2216,7 +2216,7 @@ bool CNPC_Antlion::ShouldJump( void )
 
 	// Try the jump
 	AIMoveTrace_t moveTrace;
-	GetMoveProbe()->MoveLimit( NAV_JUMP, GetAbsOrigin(), targetPos, MASK_NPCSOLID, GetNavTargetEntity(), &moveTrace );
+	GetMoveProbe()->MoveLimit( NAV_JUMP, GetEngineObject()->GetAbsOrigin(), targetPos, MASK_NPCSOLID, GetNavTargetEntity(), &moveTrace );
 
 	//See if it succeeded
 	if ( IsMoveBlocked( moveTrace.fStatus ) )
@@ -2224,7 +2224,7 @@ bool CNPC_Antlion::ShouldJump( void )
 		if ( g_debug_antlion.GetInt() == 2 )
 		{
 			NDebugOverlay::Box( targetPos, GetHullMins(), GetHullMaxs(), 255, 0, 0, 0, 5 );
-			NDebugOverlay::Line( GetAbsOrigin(), targetPos, 255, 0, 0, 0, 5 );
+			NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), targetPos, 255, 0, 0, 0, 5 );
 		}
 
 		m_flJumpTime = gpGlobals->curtime + random->RandomFloat( 1.0f, 2.0f );
@@ -2234,7 +2234,7 @@ bool CNPC_Antlion::ShouldJump( void )
 	if ( g_debug_antlion.GetInt() == 2 )
 	{
 		NDebugOverlay::Box( targetPos, GetHullMins(), GetHullMaxs(), 0, 255, 0, 0, 5 );
-		NDebugOverlay::Line( GetAbsOrigin(), targetPos, 0, 255, 0, 0, 5 );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), targetPos, 0, 255, 0, 0, 5 );
 	}
 
 	//Save this jump in case the next time fails
@@ -2303,12 +2303,12 @@ int CNPC_Antlion::ChooseMoveSchedule( void )
 		{
 			if ( m_hFightGoalTarget )
 			{
-				float targetDist = UTIL_DistApprox( WorldSpaceCenter(), m_hFightGoalTarget->GetAbsOrigin() );
+				float targetDist = UTIL_DistApprox( WorldSpaceCenter(), m_hFightGoalTarget->GetEngineObject()->GetAbsOrigin() );
 
 				if ( targetDist > 256 )
 				{
 					Vector testPos;
-					Vector targetPos = ( m_hFightGoalTarget ) ? m_hFightGoalTarget->GetAbsOrigin() : m_vSavePosition;
+					Vector targetPos = ( m_hFightGoalTarget ) ? m_hFightGoalTarget->GetEngineObject()->GetAbsOrigin() : m_vSavePosition;
 
 					// Find a suitable chase position
 					if ( FindChasePosition( targetPos, testPos ) )
@@ -2574,7 +2574,7 @@ int CNPC_Antlion::SelectSchedule( void )
 						SetNextAttack( gpGlobals->curtime + random->RandomFloat( 0.5f, 2.5f ) );
 						if ( GetEnemy() )
 						{
-							m_vSavePosition = GetEnemy()->BodyTarget( GetAbsOrigin() );
+							m_vSavePosition = GetEnemy()->BodyTarget(GetEngineObject()->GetAbsOrigin() );
 						}
 
 						return SCHED_ANTLION_WORKER_RANGE_ATTACK1;
@@ -2662,7 +2662,7 @@ void CNPC_Antlion::Ignite ( float flFlameLifetime, bool bNPCOnly, float flSize, 
 	float flDamage = m_iHealth + 1;
 
 	CTakeDamageInfo	dmgInfo( this, this, flDamage, DMG_GENERIC );
-	GuessDamageForce( &dmgInfo, Vector( 0, 0, 8 ), GetAbsOrigin() );
+	GuessDamageForce( &dmgInfo, Vector( 0, 0, 8 ), GetEngineObject()->GetAbsOrigin() );
 	TakeDamage( dmgInfo );
 #else
 	BaseClass::Ignite( flFlameLifetime, bNPCOnly, flSize, bCalledByLevelDesigner );
@@ -2729,7 +2729,7 @@ void CNPC_Antlion::CascadePush( const Vector &vecForce )
 
 	Vector vecForceDir = vecForce;
 	float flMagnitude = VectorNormalize( vecForceDir );
-	Vector vecPushBack = GetAbsOrigin() + ( vecForceDir * (flMagnitude*0.1f) );
+	Vector vecPushBack = GetEngineObject()->GetAbsOrigin() + ( vecForceDir * (flMagnitude*0.1f) );
 
 	// Make antlions flip all around us!
 	CBaseEntity *pEnemySearch[32];
@@ -2743,7 +2743,7 @@ void CNPC_Antlion::CascadePush( const Vector &vecForce )
 		CNPC_Antlion *pAntlion = dynamic_cast<CNPC_Antlion *>(pEnemySearch[i]);
 		if ( pAntlion != NULL )
 		{
-			Vector vecDir = ( pAntlion->GetAbsOrigin() - GetAbsOrigin() );
+			Vector vecDir = ( pAntlion->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 			vecDir[2] = 0.0f;
 			float flDist = VectorNormalize( vecDir );
 			float flFalloff = RemapValClamped( flDist, 0, 256, 1.0f, 0.1f );
@@ -3002,12 +3002,12 @@ int CNPC_Antlion::MeleeAttack1Conditions( float flDot, float flDist )
 	UTIL_PredictedPosition( GetEnemy(), 0.5f, &vecPrPos );
 
 	//Get the predicted distance and direction
-	float flPrDist = ( vecPrPos - GetAbsOrigin() ).LengthSqr();
+	float flPrDist = ( vecPrPos - GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 	if ( flPrDist > Square( ANTLION_MELEE1_RANGE ) )
 		return COND_TOO_FAR_TO_ATTACK;
 
 	// Compare our target direction to our body facing
-	Vector2D vec2DPrDir	= ( vecPrPos - GetAbsOrigin() ).AsVector2D();
+	Vector2D vec2DPrDir	= ( vecPrPos - GetEngineObject()->GetAbsOrigin() ).AsVector2D();
 	Vector2D vec2DBodyDir = BodyDirection2D().AsVector2D();
 	
 	float flPrDot = DotProduct2D ( vec2DPrDir, vec2DBodyDir );
@@ -3072,8 +3072,8 @@ int CNPC_Antlion::MeleeAttack2Conditions( float flDot, float flDist )
 	UTIL_PredictedPosition( GetEnemy(), 0.25f, &vecPrPos );
 
 	//Get the predicted distance and direction
-	flPrDist	= ( vecPrPos - GetAbsOrigin() ).Length();
-	vec2DPrDir	= ( vecPrPos - GetAbsOrigin() ).AsVector2D();
+	flPrDist	= ( vecPrPos - GetEngineObject()->GetAbsOrigin() ).Length();
+	vec2DPrDir	= ( vecPrPos - GetEngineObject()->GetAbsOrigin() ).AsVector2D();
 
 	Vector vecBodyDir = BodyDirection2D();
 
@@ -3181,7 +3181,7 @@ void CNPC_Antlion::StartJump( void )
 
 	//Take us off the ground
 	SetGroundEntity( NULL );
-	SetAbsVelocity( m_vecSavedJump );
+	GetEngineObject()->SetAbsVelocity( m_vecSavedJump );
 
 	m_bForcedStuckJump = false;
 #if HL2_EPISODIC
@@ -3385,7 +3385,7 @@ bool CNPC_Antlion::FindBurrow( const Vector &origin, float distance, int type, b
 
 	if ( GetEnemy() != NULL )
 	{
-		hintCriteria.AddIncludePosition( GetEnemy()->GetAbsOrigin(), distance );
+		hintCriteria.AddIncludePosition( GetEnemy()->GetEngineObject()->GetAbsOrigin(), distance );
 	}
 
 	//Attempt to find an open burrow point
@@ -3452,17 +3452,17 @@ bool CNPC_Antlion::CheckLanding( void )
 	const float	timeStep = 0.1f;
 
 	//Roughly looks one second into the future
-	testPos = GetAbsOrigin() + ( GetAbsVelocity() * timeStep );
+	testPos = GetEngineObject()->GetAbsOrigin() + (GetEngineObject()->GetAbsVelocity() * timeStep );
 	testPos[2] -= ( 0.5 * GetCurrentGravity() * GetGravity() * timeStep * timeStep);
 
 	if ( g_debug_antlion.GetInt() == 2 )
 	{
-		NDebugOverlay::Line( GetAbsOrigin(), testPos, 255, 0, 0, 0, 0.5f );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), testPos, 255, 0, 0, 0, 0.5f );
 		NDebugOverlay::Cross3D( m_vecSavedJump, -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, true, 0.5f );
 	} 
 	
 	// Look below
-	AI_TraceHull( GetAbsOrigin(), testPos, NAI_Hull::Mins( GetHullType() ), NAI_Hull::Maxs( GetHullType() ), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
+	AI_TraceHull(GetEngineObject()->GetAbsOrigin(), testPos, NAI_Hull::Mins( GetHullType() ), NAI_Hull::Maxs( GetHullType() ), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
 
 	//See if we're about to contact, or have already contacted the ground
 	if ( ( tr.fraction != 1.0f ) || ( GetFlags() & FL_ONGROUND ) )
@@ -3498,7 +3498,7 @@ bool CNPC_Antlion::CheckLanding( void )
 				}
 			}
 
-			SetAbsVelocity( GetAbsVelocity() * 0.33f );
+			GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.33f );
 			return false;
 		}
 
@@ -3580,12 +3580,12 @@ void CNPC_Antlion::Unburrow( void )
 	//If we have an enemy, come out facing them
 	if ( GetEnemy() )
 	{
-		Vector	dir = GetEnemy()->GetAbsOrigin() - GetAbsOrigin();
+		Vector	dir = GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 		VectorNormalize(dir);
 
-		QAngle angles = GetAbsAngles();
+		QAngle angles = GetEngineObject()->GetAbsAngles();
 		angles[ YAW ] = UTIL_VecToYaw( dir );
-		SetLocalAngles( angles );
+		GetEngineObject()->SetLocalAngles( angles );
 	}
 
 	//fire output upon unburrowing
@@ -3634,7 +3634,7 @@ void CNPC_Antlion::InputBurrowAway( inputdata_t &inputdata )
 void CNPC_Antlion::CreateDust( bool placeDecal )
 {
 	trace_t	tr;
-	AI_TraceLine( GetAbsOrigin()+Vector(0,0,1), GetAbsOrigin()-Vector(0,0,64), MASK_SOLID_BRUSHONLY | CONTENTS_PLAYERCLIP | CONTENTS_MONSTERCLIP, this, COLLISION_GROUP_NONE, &tr );
+	AI_TraceLine(GetEngineObject()->GetAbsOrigin()+Vector(0,0,1), GetEngineObject()->GetAbsOrigin()-Vector(0,0,64), MASK_SOLID_BRUSHONLY | CONTENTS_PLAYERCLIP | CONTENTS_MONSTERCLIP, this, COLLISION_GROUP_NONE, &tr );
 
 	if ( tr.fraction < 1.0f )
 	{
@@ -3647,7 +3647,7 @@ void CNPC_Antlion::CreateDust( bool placeDecal )
 
 			if ( !m_bSuppressUnburrowEffects )
 			{
-				UTIL_CreateAntlionDust( tr.endpos + Vector(0,0,24), GetAbsAngles() );
+				UTIL_CreateAntlionDust( tr.endpos + Vector(0,0,24), GetEngineObject()->GetAbsAngles() );
 				
 				if ( placeDecal )
 				{
@@ -3783,14 +3783,14 @@ bool CNPC_Antlion::IsValidEnemy( CBaseEntity *pEnemy )
 	if ( IsCurSchedule( GetGlobalScheduleId( SCHED_ANTLION_CHASE_BUGBAIT ) ) && ( GetNavigator() != NULL ) )
 	{
 		//If the enemy is without the target radius, then don't allow them
-		if ( ( GetNavigator()->IsGoalActive() ) && ( GetNavigator()->GetGoalPos() - pEnemy->GetAbsOrigin() ).Length() > bugbait_radius.GetFloat() )
+		if ( ( GetNavigator()->IsGoalActive() ) && ( GetNavigator()->GetGoalPos() - pEnemy->GetEngineObject()->GetAbsOrigin() ).Length() > bugbait_radius.GetFloat() )
 			return false;
 	}
 
 	// If we're following an entity we limit our attack distances
 	if ( m_FollowBehavior.GetFollowTarget() != NULL )
 	{
-		float enemyDist = ( pEnemy->GetAbsOrigin() - GetAbsOrigin() ).LengthSqr();
+		float enemyDist = ( pEnemy->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 
 		if ( m_flObeyFollowTime > gpGlobals->curtime )
 		{
@@ -4069,13 +4069,13 @@ void CNPC_Antlion::GatherEnemyConditions( CBaseEntity *pEnemy )
 		Vector	predPosition;
 		UTIL_PredictedPosition( GetEnemy(), 1.0f, &predPosition );
 
-		Vector	predDir = ( predPosition - GetAbsOrigin() );
+		Vector	predDir = ( predPosition - GetEngineObject()->GetAbsOrigin() );
 		float	predLength = VectorNormalize( predDir );
 
 		// See if we'll be outside our effective target range
 		if ( predLength > m_flEludeDistance )
 		{
-			Vector	predVelDir = ( predPosition - GetEnemy()->GetAbsOrigin() );
+			Vector	predVelDir = ( predPosition - GetEnemy()->GetEngineObject()->GetAbsOrigin() );
 			float	predSpeed  = VectorNormalize( predVelDir );
 
 			// See if the enemy is moving mostly away from us
@@ -4155,7 +4155,7 @@ bool CNPC_Antlion::CorpseGib( const CTakeDamageInfo &info )
 
 	Vector velocity = vec3_origin;
 	AngularImpulse angVelocity = RandomAngularImpulse( -150, 150 );
-	static breakablepropparams_t params( EyePosition(), GetAbsAngles(), velocity, angVelocity );
+	static breakablepropparams_t params( EyePosition(), GetEngineObject()->GetAbsAngles(), velocity, angVelocity );
 	params.impactEnergyScale = 1.0f;
 	params.defBurstScale = 150.0f;
 	params.defCollisionGroup = COLLISION_GROUP_DEBRIS;
@@ -4187,8 +4187,8 @@ void CNPC_Antlion::Touch( CBaseEntity *pOther )
 			if ( pDrivableVehicle != NULL )
 			{
 				//Get tossed!
-				Vector	vecShoveDir = pOther->GetAbsVelocity();
-				Vector	vecTargetDir = GetAbsOrigin() - pOther->GetAbsOrigin();
+				Vector	vecShoveDir = pOther->GetEngineObject()->GetAbsVelocity();
+				Vector	vecTargetDir = GetEngineObject()->GetAbsOrigin() - pOther->GetEngineObject()->GetAbsOrigin();
 				
 				VectorNormalize( vecShoveDir );
 				VectorNormalize( vecTargetDir );
@@ -4206,7 +4206,7 @@ void CNPC_Antlion::Touch( CBaseEntity *pOther )
 									
 						CTakeDamageInfo	dmgInfo( pVehicleEnt, pPlayer, flDamage, DMG_VEHICLE );
 					
-						CalculateMeleeDamageForce( &dmgInfo, vecShoveDir, pOther->GetAbsOrigin() );
+						CalculateMeleeDamageForce( &dmgInfo, vecShoveDir, pOther->GetEngineObject()->GetAbsOrigin() );
 						TakeDamage( dmgInfo );
 					}
 					else
@@ -4222,7 +4222,7 @@ void CNPC_Antlion::Touch( CBaseEntity *pOther )
 						ApplyAbsVelocityImpulse( ( vecTargetDir * 250.0f ) + Vector(0,0,64.0f) );
 						SetGroundEntity( NULL );
 
-						CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, GetAbsOrigin(), 256, 0.5f, this );
+						CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, GetEngineObject()->GetAbsOrigin(), 256, 0.5f, this );
 					}
 				}
 			}
@@ -4238,7 +4238,7 @@ void CNPC_Antlion::Touch( CBaseEntity *pOther )
 	{
 		CTakeDamageInfo	dmgInfo( this, this, sk_antlion_air_attack_dmg.GetInt(), DMG_SLASH );
 
-		CalculateMeleeDamageForce( &dmgInfo, Vector( 0, 0, 1 ), GetAbsOrigin() );
+		CalculateMeleeDamageForce( &dmgInfo, Vector( 0, 0, 1 ), GetEngineObject()->GetAbsOrigin() );
 		pOther->TakeDamage( dmgInfo );
 
 		//Kick the player angles
@@ -4280,7 +4280,7 @@ void CNPC_Antlion::Touch( CBaseEntity *pOther )
 			float flDamage = m_iHealth + 25;
 						
 			CTakeDamageInfo	dmgInfo( pOther, pOther, flDamage, DMG_GENERIC );
-			GuessDamageForce( &dmgInfo, (pOther->GetAbsOrigin() - GetAbsOrigin()), pOther->GetAbsOrigin() );
+			GuessDamageForce( &dmgInfo, (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()), pOther->GetEngineObject()->GetAbsOrigin() );
 			TakeDamage( dmgInfo );
 		}
 	}
@@ -4315,7 +4315,7 @@ bool CNPC_Antlion::OverrideMoveFacing( const AILocalMoveGoal_t &move, float flIn
   	{
 		// FIXME: this will break scripted sequences that walk when they have an enemy
 		Vector vecEnemyLKP = GetEnemyLKP();
-		if ( UTIL_DistApprox( vecEnemyLKP, GetAbsOrigin() ) < 512 )
+		if ( UTIL_DistApprox( vecEnemyLKP, GetEngineObject()->GetAbsOrigin() ) < 512 )
 		{
 			// Only start facing when we're close enough
 			AddFacingTarget( GetEnemy(), vecEnemyLKP, 1.0, 0.2 );
@@ -4509,7 +4509,7 @@ void CNPC_Antlion::InputJumpAtTarget( inputdata_t &inputdata )
 
 	// Try the jump
 	AIMoveTrace_t moveTrace;
-	Vector targetPos = pJumpTarget->GetAbsOrigin();
+	Vector targetPos = pJumpTarget->GetEngineObject()->GetAbsOrigin();
 
 	// initialize jump state
 	float minJumpHeight = 0.0;
@@ -4517,13 +4517,13 @@ void CNPC_Antlion::InputJumpAtTarget( inputdata_t &inputdata )
 
 	// initial jump, sets baseline for minJumpHeight
 	Vector vecApex;
-	Vector rawJumpVel = GetMoveProbe()->CalcJumpLaunchVelocity(GetAbsOrigin(), targetPos, GetCurrentGravity() * GetJumpGravity(), &minJumpHeight, maxHorzVel, &vecApex );
+	Vector rawJumpVel = GetMoveProbe()->CalcJumpLaunchVelocity(GetEngineObject()->GetAbsOrigin(), targetPos, GetCurrentGravity() * GetJumpGravity(), &minJumpHeight, maxHorzVel, &vecApex );
 
 	if ( g_debug_antlion.GetInt() == 2 )
 	{
 		NDebugOverlay::Box( targetPos, GetHullMins(), GetHullMaxs(), 0, 255, 0, 0, 5 );
-		NDebugOverlay::Line( GetAbsOrigin(), targetPos, 0, 255, 0, 0, 5 );
-		NDebugOverlay::Line( GetAbsOrigin(), rawJumpVel, 255, 255, 0, 0, 5 );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), targetPos, 0, 255, 0, 0, 5 );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), rawJumpVel, 255, 255, 0, 0, 5 );
 	}
 
 	m_vecSavedJump = rawJumpVel;
@@ -4531,7 +4531,7 @@ void CNPC_Antlion::InputJumpAtTarget( inputdata_t &inputdata )
 #else	
 
 	// Get the direction and speed to our target
-	Vector vecJumpDir = ( pJumpTarget->GetAbsOrigin() - GetAbsOrigin() );
+	Vector vecJumpDir = ( pJumpTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 	VectorNormalize( vecJumpDir );
 	vecJumpDir *= 800.0f;	// FIXME: We'd like to pass this in as a parameter, but comma delimited lists are bad
 	m_vecSavedJump = vecJumpDir;
@@ -4551,9 +4551,9 @@ void CNPC_Antlion::DoPoisonBurst()
 	{
 		CTakeDamageInfo info( this, this, sk_antlion_worker_burst_damage.GetFloat(), DMG_BLAST_SURFACE | ( ANTLION_WORKER_BURST_IS_POISONOUS() ? DMG_POISON : DMG_ACID ) );
 
-		RadiusDamage( info, GetAbsOrigin(), sk_antlion_worker_burst_radius.GetFloat(), CLASS_NONE, this );
+		RadiusDamage( info, GetEngineObject()->GetAbsOrigin(), sk_antlion_worker_burst_radius.GetFloat(), CLASS_NONE, this );
 
-		DispatchParticleEffect( "antlion_gib_02", WorldSpaceCenter(), GetAbsAngles() );
+		DispatchParticleEffect( "antlion_gib_02", WorldSpaceCenter(), GetEngineObject()->GetAbsAngles() );
 	}
 	else
 	{
@@ -4676,7 +4676,7 @@ bool CAntlionRepellant::IsPositionRepellantFree( Vector vDesiredPos )
 
 			if ( pRep )
 			{
-				float flDist = (vDesiredPos - pRep->GetAbsOrigin()).Length();
+				float flDist = (vDesiredPos - pRep->GetEngineObject()->GetAbsOrigin()).Length();
 
 				if ( flDist <= pRep->GetRadius() )
 					 return false;

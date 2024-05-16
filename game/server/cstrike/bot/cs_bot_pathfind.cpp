@@ -234,7 +234,7 @@ void CCSBot::ComputeLadderEndpoint( bool isAscending )
 		// find actual top in case m_pathLadder penetrates the ceiling
 		// trace from our chest height at m_pathLadder base
 		from = m_pathLadder->m_bottom + m_pathLadder->GetNormal() * HalfHumanWidth;
-		from.z = GetAbsOrigin().z + HalfHumanHeight;
+		from.z = GetEngineObject()->GetAbsOrigin().z + HalfHumanHeight;
 		to = m_pathLadder->m_top;
 	}
 	else
@@ -242,7 +242,7 @@ void CCSBot::ComputeLadderEndpoint( bool isAscending )
 		// find actual bottom in case m_pathLadder penetrates the floor
 		// trace from our chest height at m_pathLadder top
 		from = m_pathLadder->m_top + m_pathLadder->GetNormal() * HalfHumanWidth;
-		from.z = GetAbsOrigin().z + HalfHumanHeight;
+		from.z = GetEngineObject()->GetAbsOrigin().z + HalfHumanHeight;
 		to = m_pathLadder->m_bottom;
 	}
 
@@ -359,11 +359,11 @@ bool CCSBot::UpdateLadderMovement( void )
 
 			if ( d.IsLengthLessThan( 100.0f ) )
 			{
-				if ( !IsOnLadder() && (m_pathLadder->m_bottom.z - GetAbsOrigin().z > JumpCrouchHeight ) )
+				if ( !IsOnLadder() && (m_pathLadder->m_bottom.z - GetEngineObject()->GetAbsOrigin().z > JumpCrouchHeight ) )
 				{
 					// find yaw to directly aim at ladder
 					QAngle idealAngle;
-					VectorAngles( GetAbsVelocity(), idealAngle );
+					VectorAngles(GetEngineObject()->GetAbsVelocity(), idealAngle );
 					const float angleTolerance = 15.0f;
 					if (AnglesAreEqual( EyeAngles().y, idealAngle.y, angleTolerance ))
 					{
@@ -526,7 +526,7 @@ bool CCSBot::UpdateLadderMovement( void )
 			}
 
 			// move toward ladder mount point
-			if ( !IsOnLadder() && (m_pathLadder->m_bottom.z - GetAbsOrigin().z > JumpCrouchHeight ) )
+			if ( !IsOnLadder() && (m_pathLadder->m_bottom.z - GetEngineObject()->GetAbsOrigin().z > JumpCrouchHeight ) )
 			{
 				Jump();
 			}
@@ -740,7 +740,7 @@ int CCSBot::FindOurPositionOnPath( Vector *close, bool local ) const
 		return -1;
 
 	Vector along, toFeet;
-	Vector feet = GetAbsOrigin();
+	Vector feet = GetEngineObject()->GetAbsOrigin();
 	Vector eyes = feet + Vector( 0, 0, HalfHumanHeight );	// in case we're crouching
 	Vector pos;
 	const Vector *from, *to;
@@ -828,7 +828,7 @@ return true;
 
 	const float inc = GenerationStepSize;
 
-	Vector feet = GetAbsOrigin();
+	Vector feet = GetEngineObject()->GetAbsOrigin();
 	Vector dir = goal - feet;
 	float length = dir.NormalizeInPlace();
 
@@ -972,7 +972,7 @@ int CCSBot::FindPathPoint( float aheadRange, Vector *point, int *prevIndex )
 	Vector initDir = m_path[ startIndex ].pos - m_path[ startIndex-1 ].pos;
 	initDir.NormalizeInPlace();
 
-	Vector feet = GetAbsOrigin();
+	Vector feet = GetEngineObject()->GetAbsOrigin();
 	Vector eyes = feet + Vector( 0, 0, HalfHumanHeight );
 	float rangeSoFar = 0;
 
@@ -1228,7 +1228,7 @@ bool CCSBot::IsFriendInTheWay( const Vector &goalPos )
 			continue;
 
 		// compute vector from us to our friend
-		Vector toFriend = player->GetAbsOrigin() - GetAbsOrigin();
+		Vector toFriend = player->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 
 		// check if friend is in our "personal space"
 		const float personalSpace = 100.0f;
@@ -1301,7 +1301,7 @@ void CCSBot::FeelerReflexAdjustment( Vector *goalPosition )
 	lat = CrossProduct( dir, normal );
 
 
-	Vector feet = GetAbsOrigin();
+	Vector feet = GetEngineObject()->GetAbsOrigin();
 	feet.z += feelerHeight;
 
 	Vector from = feet + feelerOffset * lat;
@@ -1438,7 +1438,7 @@ CCSBot::PathResult CCSBot::UpdatePathMovement( bool allowSpeedChange )
 			ResetStuckMonitor();
 			ClearMovement();
 
-			if ( GetAbsVelocity().LengthSqr() < 0.1f )
+			if (GetEngineObject()->GetAbsVelocity().LengthSqr() < 0.1f )
 			{
 				m_isStopping = false;
 			}
@@ -1456,7 +1456,7 @@ CCSBot::PathResult CCSBot::UpdatePathMovement( bool allowSpeedChange )
 	bool nearEndOfPath = false;
 	if (m_pathIndex >= m_pathLength-1)
 	{
-		Vector toEnd = GetPathEndpoint() - GetAbsOrigin();
+		Vector toEnd = GetPathEndpoint() - GetEngineObject()->GetAbsOrigin();
 		Vector d = toEnd;	// can't use 2D because path end may be below us (jump down)
 
 		const float walkRange = 200.0f;
@@ -1804,7 +1804,7 @@ CCSBot::PathResult CCSBot::UpdatePathMovement( bool allowSpeedChange )
 		ClearLookAt();
 
 		// See if we should be on a different nav area
-		CNavArea *area = TheNavMesh->GetNearestNavArea( GetAbsOrigin(), false, 500.0f, true );
+		CNavArea *area = TheNavMesh->GetNearestNavArea(GetEngineObject()->GetAbsOrigin(), false, 500.0f, true );
 		if (area && area != m_lastNavArea)
 		{
 			if (m_lastNavArea)
@@ -1902,11 +1902,11 @@ bool CCSBot::ComputePath( const Vector &goal, RouteType route )
 	// ledge above our heads, resulting in a path we can't follow.
 	Vector close;
 	startArea->GetClosestPointOnArea( EyePosition(), &close );
-	if (close.z - GetAbsOrigin().z > JumpCrouchHeight)
+	if (close.z - GetEngineObject()->GetAbsOrigin().z > JumpCrouchHeight)
 	{
 		// we can't reach our last known area - find nearest area to us
 		PrintIfWatched( "Last known area is above my head - resetting to nearest area.\n" );
-		m_lastKnownArea = (CCSNavArea*)TheNavMesh->GetNearestNavArea( GetAbsOrigin(), false, 500.0f, true );
+		m_lastKnownArea = (CCSNavArea*)TheNavMesh->GetNearestNavArea(GetEngineObject()->GetAbsOrigin(), false, 500.0f, true );
 		if (m_lastKnownArea == NULL)
 		{
 			return false;

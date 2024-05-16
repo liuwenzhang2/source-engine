@@ -457,7 +457,7 @@ Vector CHL2MPRules::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
 	}
 #endif
 	
-	return pWeapon->GetAbsOrigin();
+	return pWeapon->GetEngineObject()->GetAbsOrigin();
 }
 
 #ifndef CLIENT_DLL
@@ -517,7 +517,7 @@ void CHL2MPRules::ManageObjectRelocation( void )
 
 				if ( GetObjectsOriginalParameters( pEntity, vSpawOrigin, vSpawnAngles ) == true )
 				{
-					float flDistanceFromSpawn = (pEntity->GetAbsOrigin() - vSpawOrigin ).Length();
+					float flDistanceFromSpawn = (pEntity->GetEngineObject()->GetAbsOrigin() - vSpawOrigin ).Length();
 
 					if ( flDistanceFromSpawn > WEAPON_MAX_DISTANCE_FROM_SPAWN )
 					{

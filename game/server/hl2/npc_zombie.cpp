@@ -778,9 +778,9 @@ void CZombie::StartTask( const Task_t *pTask )
 		{
 			if ( !GetEnemy() )
 				TaskFail( FAIL_NO_ENEMY );
-			else if ( GetNavigator()->SetVectorGoalFromTarget( GetEnemy()->GetLocalOrigin() ) )
+			else if ( GetNavigator()->SetVectorGoalFromTarget( GetEnemy()->GetEngineObject()->GetLocalOrigin() ) )
 			{
-				m_vPositionCharged = GetEnemy()->GetLocalOrigin();
+				m_vPositionCharged = GetEnemy()->GetEngineObject()->GetLocalOrigin();
 				TaskComplete();
 			}
 			else

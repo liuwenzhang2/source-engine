@@ -719,7 +719,7 @@ void CPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *
 	move->m_bFirstRunOfFunctions = IsFirstTimePredicted();
 	
 	move->m_nPlayerHandle = player;// ->GetClientHandle();
-	move->m_vecVelocity		= player->GetAbsVelocity();
+	move->m_vecVelocity		= player->GetEngineObject()->GetAbsVelocity();
 	move->SetAbsOrigin(player->GetEngineObject()->GetNetworkOrigin());
 	move->m_vecOldAngles	= move->m_vecAngles;
 	move->m_nOldButtons		= player->m_Local.m_nOldButtons;
@@ -766,7 +766,7 @@ void CPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *
 
 	// Copy constraint information
 	if ( player->m_hConstraintEntity )
-		move->m_vecConstraintCenter = player->m_hConstraintEntity->GetAbsOrigin();
+		move->m_vecConstraintCenter = player->m_hConstraintEntity->GetEngineObject()->GetAbsOrigin();
 	else
 		move->m_vecConstraintCenter = player->m_vecConstraintCenter;
 
@@ -799,7 +799,7 @@ void CPrediction::FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *m
 
 	//player->m_RefEHandle = move->m_nPlayerHandle;
 
-	player->SetLocalVelocity(move->m_vecVelocity);
+	player->GetEngineObject()->SetLocalVelocity(move->m_vecVelocity);
 
 	player->GetEngineObject()->SetNetworkOrigin(move->GetAbsOrigin());
 	
@@ -811,7 +811,7 @@ void CPrediction::FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *m
 	
 	m_hLastGround = player->GetGroundEntity();
  
-	player->SetLocalOrigin( move->GetAbsOrigin() );
+	player->GetEngineObject()->SetLocalOrigin( move->GetAbsOrigin() );
 
 	IClientVehicle *pVehicle = player->GetVehicle();
 	if (pVehicle)
@@ -1765,7 +1765,7 @@ void CPrediction::_Update( bool received_new_world_update, bool validframe,
 	// NOTE: ViewAngles are always interpreted as being *relative* to the player
 	QAngle viewangles;
 	engine->GetViewAngles( viewangles );
-	localPlayer->SetLocalAngles( viewangles );
+	localPlayer->GetEngineObject()->SetLocalAngles( viewangles );
 
 	if ( !validframe )
 	{
@@ -1802,13 +1802,13 @@ void CPrediction::_Update( bool received_new_world_update, bool validframe,
 	}
 
 	// Overwrite predicted angles with the actual view angles
-	localPlayer->SetLocalAngles( viewangles );
+	localPlayer->GetEngineObject()->SetLocalAngles( viewangles );
 
 	// This allows us to sample the world when it may not be ready to be sampled
 	Assert( C_BaseEntity::IsAbsQueriesValid() );
 	
 	// FIXME: What about hierarchy here?!?
-	SetIdealPitch( localPlayer, localPlayer->GetLocalOrigin(), localPlayer->GetLocalAngles(), localPlayer->m_vecViewOffset );
+	SetIdealPitch( localPlayer, localPlayer->GetEngineObject()->GetLocalOrigin(), localPlayer->GetEngineObject()->GetLocalAngles(), localPlayer->m_vecViewOffset );
 #endif
 }
 
@@ -1840,7 +1840,7 @@ void CPrediction::GetViewOrigin( Vector& org )
 	}
 	else 
 	{
-		org = player->GetLocalOrigin();
+		org = player->GetEngineObject()->GetLocalOrigin();
 	}
 }
 
@@ -1854,7 +1854,7 @@ void CPrediction::SetViewOrigin( Vector& org )
 	if ( !player )
 		return;
 
-	player->SetLocalOrigin( org );
+	player->GetEngineObject()->SetLocalOrigin( org );
 	player->GetEngineObject()->SetNetworkOrigin(org);
 
 	player->GetEngineObject()->GetOriginInterpolator().Reset();//m_iv_vecOrigin
@@ -1873,7 +1873,7 @@ void CPrediction::GetViewAngles( QAngle& ang )
 	}
 	else 
 	{
-		ang = player->GetLocalAngles();
+		ang = player->GetEngineObject()->GetLocalAngles();
 	}
 }
 

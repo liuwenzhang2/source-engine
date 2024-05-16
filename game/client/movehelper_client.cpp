@@ -143,7 +143,7 @@ void CMoveHelperClient::ProcessImpacts( void )
 		return;
 
 	// Save off the velocity, cause we need to temporarily reset it
-	Vector vel = pPlayer->GetAbsVelocity();
+	Vector vel = pPlayer->GetEngineObject()->GetAbsVelocity();
 
 	// Touch other objects that were intersected during the movement.
 	for (int i = 0 ; i < m_TouchList.Size(); i++)
@@ -162,13 +162,13 @@ void CMoveHelperClient::ProcessImpacts( void )
 		m_TouchList[i].trace.m_pEnt = entity;
 
 		// Use the velocity we had when we collided, so boxes will move, etc.
-		pPlayer->SetAbsVelocity( m_TouchList[i].deltavelocity );
+		pPlayer->GetEngineObject()->SetAbsVelocity( m_TouchList[i].deltavelocity );
 
 		entity->PhysicsImpact( pPlayer, m_TouchList[i].trace );
 	}
 
 	// Restore the velocity
-	pPlayer->SetAbsVelocity( vel );
+	pPlayer->GetEngineObject()->SetAbsVelocity( vel );
 
 	// So no stuff is ever left over, sigh...
 	ResetTouchList();

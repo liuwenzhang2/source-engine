@@ -209,8 +209,8 @@ bool CAI_LeadBehavior::SetGoal( const AI_LeadArgs_t &args )
 		return false;
 
 	m_args 		= args;	// @Q (toml 08-13-02): need to copy string?
-	m_goal 		= pGoalEnt->GetLocalOrigin();
-	m_goalyaw 	= (args.flags & AILF_USE_GOAL_FACING) ? pGoalEnt->GetLocalAngles().y : -1;
+	m_goal 		= pGoalEnt->GetEngineObject()->GetLocalOrigin();
+	m_goalyaw 	= (args.flags & AILF_USE_GOAL_FACING) ? pGoalEnt->GetEngineObject()->GetLocalAngles().y : -1;
 	m_waitpoint = vec3_origin;
 	m_waitdistance = args.flWaitDistance;
 	m_leaddistance = args.flLeadDistance ? args.flLeadDistance : 64;
@@ -231,7 +231,7 @@ bool CAI_LeadBehavior::SetGoal( const AI_LeadArgs_t &args )
 		CBaseEntity *pWaitPoint = gEntList.FindEntityByName( NULL, args.pszWaitPoint );
 		if ( pWaitPoint )
 		{
-			m_waitpoint = pWaitPoint->GetLocalOrigin();
+			m_waitpoint = pWaitPoint->GetEngineObject()->GetLocalOrigin();
 		}
 	}
 
@@ -256,7 +256,7 @@ bool CAI_LeadBehavior::GetClosestPointOnRoute( const Vector &targetPos, Vector *
 			return true;
 
 		// Build a temp route to the gold and use that
-		builtwaypoints = GetOuter()->GetPathfinder()->BuildRoute( GetOuter()->GetAbsOrigin(), m_goal, NULL, GetOuter()->GetDefaultNavGoalTolerance(), GetOuter()->GetNavType(), true );
+		builtwaypoints = GetOuter()->GetPathfinder()->BuildRoute( GetOuter()->GetEngineObject()->GetAbsOrigin(), m_goal, NULL, GetOuter()->GetDefaultNavGoalTolerance(), GetOuter()->GetNavType(), true );
 		if ( !builtwaypoints )
 			return false;
 
@@ -270,7 +270,7 @@ bool CAI_LeadBehavior::GetClosestPointOnRoute( const Vector &targetPos, Vector *
 	float		flPathDist, flPathDist2D;
 
 	Vector vecNearestPoint;
-	Vector vecPrevPos = GetOuter()->GetAbsOrigin();
+	Vector vecPrevPos = GetOuter()->GetEngineObject()->GetAbsOrigin();
 	for ( ; (waypoint != NULL) ; waypoint = waypoint->GetNext() )
 	{
 		// Find the closest point on the line segment on the path
@@ -326,11 +326,11 @@ bool CAI_LeadBehavior::PlayerIsAheadOfMe( bool bForce )
 	m_bInitialAheadTest = false;
 
 	Vector vecClosestPoint;
-	if ( GetClosestPointOnRoute( AI_GetSinglePlayer()->GetAbsOrigin(), &vecClosestPoint ) )
+	if ( GetClosestPointOnRoute( AI_GetSinglePlayer()->GetEngineObject()->GetAbsOrigin(), &vecClosestPoint ) )
 	{
 		// If the closest point is not right next to me, then 
 		// the player is somewhere ahead of me on the route.
-		if ( (vecClosestPoint - GetOuter()->GetAbsOrigin()).LengthSqr() > (32*32) )
+		if ( (vecClosestPoint - GetOuter()->GetEngineObject()->GetAbsOrigin()).LengthSqr() > (32*32) )
 			return true;
 	}
 
@@ -378,7 +378,7 @@ void CAI_LeadBehavior::GatherConditions( void )
 				Vector vecVelocity = pFollower->GetSmoothedVelocity();
 				if ( VectorNormalize(vecVelocity) > 50 )
 				{
-					Vector vecToPlayer = (GetAbsOrigin() - pFollower->GetAbsOrigin());
+					Vector vecToPlayer = (GetAbsOrigin() - pFollower->GetEngineObject()->GetAbsOrigin());
 					VectorNormalize( vecToPlayer );
 					if ( DotProduct( vecVelocity, vecToPlayer ) > 0.5 )
 					{
@@ -500,7 +500,7 @@ void CAI_LeadBehavior::GatherConditions( void )
 					}
 					else if ( m_successdistance )
 					{
-						float flDistSqr = (pFollower->GetAbsOrigin() - GetLocalOrigin()).Length2DSqr();
+						float flDistSqr = (pFollower->GetEngineObject()->GetAbsOrigin() - GetLocalOrigin()).Length2DSqr();
 						if ( flDistSqr < (m_successdistance*m_successdistance) )
 						{
 							SetCondition( COND_LEAD_SUCCESS );

@@ -168,7 +168,7 @@ void CNPC_Barnacle::InitTonguePosition( void )
 
 	GetAttachment( "TongueEnd", origin, angle );
 
-	m_flTongueAdj = origin.z - GetAbsOrigin().z;
+	m_flTongueAdj = origin.z - GetEngineObject()->GetAbsOrigin().z;
 }
 
 //-----------------------------------------------------------------------------
@@ -212,19 +212,19 @@ void CNPC_Barnacle::BarnacleThink ( void )
 			}
 
 	// still pulling prey.
-			Vector vecNewEnemyOrigin = GetEnemy()->GetLocalOrigin();
-			vecNewEnemyOrigin.x = GetLocalOrigin().x;
-			vecNewEnemyOrigin.y = GetLocalOrigin().y;
+			Vector vecNewEnemyOrigin = GetEnemy()->GetEngineObject()->GetLocalOrigin();
+			vecNewEnemyOrigin.x = GetEngineObject()->GetLocalOrigin().x;
+			vecNewEnemyOrigin.y = GetEngineObject()->GetLocalOrigin().y;
 
 			// guess as to where their neck is
 			// FIXME: remove, ask victim where their neck is
-			vecNewEnemyOrigin.x -= 6 * cos(GetEnemy()->GetLocalAngles().y * M_PI/180.0);	
-			vecNewEnemyOrigin.y -= 6 * sin(GetEnemy()->GetLocalAngles().y * M_PI/180.0);
+			vecNewEnemyOrigin.x -= 6 * cos(GetEnemy()->GetEngineObject()->GetLocalAngles().y * M_PI/180.0);
+			vecNewEnemyOrigin.y -= 6 * sin(GetEnemy()->GetEngineObject()->GetLocalAngles().y * M_PI/180.0);
 
 			m_flAltitude -= BARNACLE_PULL_SPEED;
 			vecNewEnemyOrigin.z += BARNACLE_PULL_SPEED;
 
-			if ( fabs( GetLocalOrigin().z - ( vecNewEnemyOrigin.z + GetEnemy()->GetViewOffset().z ) ) < BARNACLE_BODY_HEIGHT )
+			if ( fabs(GetEngineObject()->GetLocalOrigin().z - ( vecNewEnemyOrigin.z + GetEnemy()->GetViewOffset().z ) ) < BARNACLE_BODY_HEIGHT )
 			{
 		// prey has just been lifted into position ( if the victim origin + eye height + 8 is higher than the bottom of the barnacle, it is assumed that the head is within barnacle's body )
 				m_fLiftingPrey = FALSE;
@@ -245,7 +245,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 			CBaseEntity *pEnemy = GetEnemy();
 
 			trace_t trace;
-			UTIL_TraceEntity( pEnemy, pEnemy->GetAbsOrigin(), vecNewEnemyOrigin, MASK_SOLID_BRUSHONLY, pEnemy, COLLISION_GROUP_NONE, &trace );
+			UTIL_TraceEntity( pEnemy, pEnemy->GetEngineObject()->GetAbsOrigin(), vecNewEnemyOrigin, MASK_SOLID_BRUSHONLY, pEnemy, COLLISION_GROUP_NONE, &trace );
 
 			if( trace.fraction != 1.0 )
 			{
@@ -309,7 +309,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 
 			if( pPlayer )
 			{
-				Vector vecDist = pPlayer->GetAbsOrigin() - GetAbsOrigin();
+				Vector vecDist = pPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 
 				if( vecDist.Length2DSqr() >= Square(600.0f) )
 				{
@@ -343,7 +343,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 			CBaseCombatCharacter* pBCC = (CBaseCombatCharacter *)pTouchEnt;
 
 			// FIXME: humans should return neck position
-			Vector vecGrabPos = pTouchEnt->GetAbsOrigin();
+			Vector vecGrabPos = pTouchEnt->GetEngineObject()->GetAbsOrigin();
 
 			if ( pBCC && pBCC->DispatchInteraction( g_interactionBarnacleVictimGrab, &vecGrabPos, this ) )
 			{
@@ -355,16 +355,16 @@ void CNPC_Barnacle::BarnacleThink ( void )
 				SetEnemy( pTouchEnt );
 
 				pTouchEnt->SetMoveType( MOVETYPE_FLY );
-				pTouchEnt->SetAbsVelocity( vec3_origin );
+				pTouchEnt->GetEngineObject()->SetAbsVelocity( vec3_origin );
 				pTouchEnt->SetBaseVelocity( vec3_origin );
-				Vector origin = GetAbsOrigin();
-				origin.z = pTouchEnt->GetAbsOrigin().z;
-				pTouchEnt->SetLocalOrigin( origin );
+				Vector origin = GetEngineObject()->GetAbsOrigin();
+				origin.z = pTouchEnt->GetEngineObject()->GetAbsOrigin().z;
+				pTouchEnt->GetEngineObject()->SetLocalOrigin( origin );
 				
 				m_fLiftingPrey = TRUE;// indicate that we should be lifting prey.
 				m_flKillVictimTime = -1;// set this to a bogus time while the victim is lifted.
 
-				m_flAltitude = (GetAbsOrigin().z - vecGrabPos.z);
+				m_flAltitude = (GetEngineObject()->GetAbsOrigin().z - vecGrabPos.z);
 			}
 		}
 		else
@@ -467,14 +467,14 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 	trace_t		tr;
 	float		length;
 
-	Vector origin(GetAbsOrigin());
+	Vector origin(GetEngineObject()->GetAbsOrigin());
 	origin.z -= 1.f;
 
 	// trace once to hit architecture and see if the tongue needs to change position.
 	UTIL_TraceLine ( origin, origin - Vector ( 0 , 0 , 2048 ), 
 		MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
-	length = fabs( GetAbsOrigin().z - tr.endpos.z );
+	length = fabs(GetEngineObject()->GetAbsOrigin().z - tr.endpos.z );
 	// Pull it up a tad
 	length -= 16;
 	if ( pflLength )
@@ -487,9 +487,9 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 		return NULL;
 
 	Vector delta = Vector( BARNACLE_CHECK_SPACING, BARNACLE_CHECK_SPACING, 0 );
-	Vector mins = GetAbsOrigin() - delta;
-	Vector maxs = GetAbsOrigin() + delta;
-	maxs.z = GetAbsOrigin().z;
+	Vector mins = GetEngineObject()->GetAbsOrigin() - delta;
+	Vector maxs = GetEngineObject()->GetAbsOrigin() + delta;
+	maxs.z = GetEngineObject()->GetAbsOrigin().z;
 	
 	// Take our current tongue's length or a point higher if we hit a wall 
 	// NOTENOTE: (this relieves the need to know if the tongue is currently moving)

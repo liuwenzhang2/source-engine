@@ -46,7 +46,7 @@ void CHL1NPCTalker::RunTask( const Task_t *pTask )
 			{
 				float distance;
 
-				distance = (m_vecLastPosition - GetLocalOrigin()).Length2D();
+				distance = (m_vecLastPosition - GetEngineObject()->GetLocalOrigin()).Length2D();
 
 				// Walk path until far enough away
 				if ( distance > pTask->flTaskData || 
@@ -86,15 +86,15 @@ void CHL1NPCTalker::RunTask( const Task_t *pTask )
 			if ( pTask->iTask == TASK_TALKER_CLIENT_STARE )
 			{
 				// fail out if the player looks away or moves away.
-				if ( ( pPlayer->GetAbsOrigin() - GetAbsOrigin() ).Length2D() > TALKER_STARE_DIST )
+				if ( ( pPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length2D() > TALKER_STARE_DIST )
 				{
 					// player moved away.
 					TaskFail( NO_TASK_FAILURE );
 				}
 
 				Vector vForward;
-				AngleVectors( GetAbsAngles(), &vForward );
-				if ( UTIL_DotPoints( pPlayer->GetAbsOrigin(), GetAbsOrigin(), vForward ) < m_flFieldOfView )
+				AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
+				if ( UTIL_DotPoints( pPlayer->GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), vForward ) < m_flFieldOfView )
 				{
 					// player looked away
 					TaskFail( "looked away" );
@@ -374,7 +374,7 @@ bool CHL1NPCTalker::HandleInteraction(int interactionType, void *data, CBaseComb
 		}
 
 		m_bInBarnacleMouth	= false;
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		SetMoveType( MOVETYPE_STEP );
 		return true;
 	}
@@ -589,7 +589,7 @@ bool CHL1NPCTalker::CorpseGib( const CTakeDamageInfo &info )
 
 	BaseClass::CorpseGib( info );
 
-	CSoundEnt::InsertSound( SOUND_MEAT, GetAbsOrigin(), 256, 0.5f, this );
+	CSoundEnt::InsertSound( SOUND_MEAT, GetEngineObject()->GetAbsOrigin(), 256, 0.5f, this );
 
 	return true;
 }

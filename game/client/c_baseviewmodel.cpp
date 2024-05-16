@@ -122,7 +122,7 @@ void C_BaseViewModel::FireEvent( const Vector& origin, const QAngle& angles, int
 		if ( GetOwner() != NULL )
 		{
 			CLocalPlayerFilter filter;
-			g_pSoundEmitterSystem->EmitSound( filter, GetOwner()->GetSoundSourceIndex(), options, &GetAbsOrigin() );
+			g_pSoundEmitterSystem->EmitSound( filter, GetOwner()->GetSoundSourceIndex(), options, &GetEngineObject()->GetAbsOrigin() );
 			return;
 		}
 	}

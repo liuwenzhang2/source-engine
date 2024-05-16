@@ -38,11 +38,11 @@ void C_RpgRocket::CreateLightEffects( void )
 	if ( IsEffectActive(EF_DIMLIGHT) )
 	{			
 		dl = effects->CL_AllocDlight (entindex());
-		dl->origin = GetAbsOrigin();
+		dl->origin = GetEngineObject()->GetAbsOrigin();
 		dl->color.r = dl->color.g = dl->color.b = 100;
 		dl->radius = 200;
 		dl->die = gpGlobals->curtime + 0.001;
 
-		tempents->RocketFlare( GetAbsOrigin() );
+		tempents->RocketFlare(GetEngineObject()->GetAbsOrigin() );
 	}
 }

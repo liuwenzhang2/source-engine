@@ -279,7 +279,7 @@ inline float INextBot::GetImmobileDuration( void ) const
 inline void INextBot::ClearImmobileStatus( void )
 {
 	m_immobileTimer.Invalidate();
-	m_immobileAnchor = GetEntity()->GetAbsOrigin();
+	m_immobileAnchor = GetEntity()->GetEngineObject()->GetAbsOrigin();
 }
 
 inline float INextBot::GetImmobileSpeedThreshold( void ) const

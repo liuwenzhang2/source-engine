@@ -121,7 +121,7 @@ void CWeaponMAC10::PrimaryAttack()
 
 	if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )	// jumping
 		pPlayer->KickBack (1.3, 0.55, 0.4, 0.05, 4.75, 3.75, 5);
-	else if (pPlayer->GetAbsVelocity().Length2D() > 5)				// running
+	else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)				// running
 		pPlayer->KickBack (0.9, 0.45, 0.25, 0.035, 3.5, 2.75, 7);
 	else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )	// ducking
 		pPlayer->KickBack (0.75, 0.4, 0.175, 0.03, 2.75, 2.5, 10);

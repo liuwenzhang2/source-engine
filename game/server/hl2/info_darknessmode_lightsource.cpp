@@ -93,12 +93,12 @@ public:
 	void DebugThink( void )
 	{
 		Vector vecRadius( m_flLightRadius, m_flLightRadius, m_flLightRadius );
-		NDebugOverlay::Box( GetAbsOrigin(), -vecRadius, vecRadius, 255,255,255, 8, 0.1 );
-		NDebugOverlay::Box( GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255,0,0, 8, 0.1 );
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), -vecRadius, vecRadius, 255,255,255, 8, 0.1 );
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255,0,0, 8, 0.1 );
 		SetNextThink( gpGlobals->curtime + 0.1 );
 
 		int textoffset = 0;
-		EntityText( textoffset, UTIL_VarArgs("Org: %.2f %.2f %.2f", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z ), 0.1 );
+		EntityText( textoffset, UTIL_VarArgs("Org: %.2f %.2f %.2f", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z ), 0.1 );
 		textoffset++;
 		EntityText( textoffset, UTIL_VarArgs("Radius %.2f", m_flLightRadius), 0.1 );
 		textoffset++;
@@ -214,21 +214,21 @@ bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker,
 		CInfoDarknessLightSource *pLightSource = m_LightSources[i].hEntity;
 
 		// Close enough to a light source?
-		float flDistanceSqr = (pTarget->WorldSpaceCenter() - pLightSource->GetAbsOrigin()).LengthSqr();
+		float flDistanceSqr = (pTarget->WorldSpaceCenter() - pLightSource->GetEngineObject()->GetAbsOrigin()).LengthSqr();
 		if ( flDistanceSqr < m_LightSources[i].flLightRadiusSqr )
 		{
 			if ( pLightSource->ShouldIgnoreLOS() )
 			{
 				if ( bDebug )
 				{
-					NDebugOverlay::Line( pTarget->WorldSpaceCenter(), pLightSource->GetAbsOrigin(), 0,255,0,true, 0.1);
+					NDebugOverlay::Line( pTarget->WorldSpaceCenter(), pLightSource->GetEngineObject()->GetAbsOrigin(), 0,255,0,true, 0.1);
 				}
 				return true;
 			}
 
 			// Check LOS from the light to the target
 			CTraceFilterSkipTwoEntities filter( pTarget, pLooker, COLLISION_GROUP_NONE );
-			AI_TraceLine( pTarget->WorldSpaceCenter(), pLightSource->GetAbsOrigin(), MASK_BLOCKLOS, &filter, &tr );
+			AI_TraceLine( pTarget->WorldSpaceCenter(), pLightSource->GetEngineObject()->GetAbsOrigin(), MASK_BLOCKLOS, &filter, &tr );
 			if ( tr.fraction == 1.0 )
 			{
 				if ( bDebug )
@@ -241,7 +241,7 @@ bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker,
 			if ( bDebug )
 			{
 				NDebugOverlay::Line( tr.startpos, tr.endpos, 255,0,0,true, 0.1);
-				NDebugOverlay::Line( tr.endpos, pLightSource->GetAbsOrigin(), 128,0,0,true, 0.1);
+				NDebugOverlay::Line( tr.endpos, pLightSource->GetEngineObject()->GetAbsOrigin(), 128,0,0,true, 0.1);
 			}
 
 			// If the target is within the radius of the light, don't do sillhouette checks
@@ -252,7 +252,7 @@ bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker,
 			continue;
 
 		// Between a light source and the looker?
-		Vector vecLookerToLight = (pLightSource->GetAbsOrigin() - pLooker->WorldSpaceCenter());
+		Vector vecLookerToLight = (pLightSource->GetEngineObject()->GetAbsOrigin() - pLooker->WorldSpaceCenter());
 		Vector vecLookerToTarget = (pTarget->WorldSpaceCenter() - pLooker->WorldSpaceCenter());
 		float flDistToSource = VectorNormalize( vecLookerToLight );
 		float flDistToTarget = VectorNormalize( vecLookerToTarget );
@@ -293,7 +293,7 @@ bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker,
 						else
 						{
 							NDebugOverlay::Line( pLooker->WorldSpaceCenter(), vecSpherePoint, 0,255,0,true, 0.1);
-							NDebugOverlay::Line( pLightSource->GetAbsOrigin(), vecSpherePoint, 255,0,0,true, 0.1);
+							NDebugOverlay::Line( pLightSource->GetEngineObject()->GetAbsOrigin(), vecSpherePoint, 255,0,0,true, 0.1);
 						}
 					}
 
@@ -325,11 +325,11 @@ bool CDarknessLightSourcesSystem::AreThereLightSourcesWithinRadius( CBaseEntity 
 		CBaseEntity *pLightSource = m_LightSources[i].hEntity;
 
 		// Close enough to a light source?
-		float flDistanceSqr = (pLooker->WorldSpaceCenter() - pLightSource->GetAbsOrigin()).LengthSqr();
+		float flDistanceSqr = (pLooker->WorldSpaceCenter() - pLightSource->GetEngineObject()->GetAbsOrigin()).LengthSqr();
 		if ( flDistanceSqr < flRadiusSqr )
 		{
 			trace_t tr;
-			AI_TraceLine( pLooker->EyePosition(), pLightSource->GetAbsOrigin(), MASK_SOLID_BRUSHONLY, pLooker, COLLISION_GROUP_NONE, &tr );
+			AI_TraceLine( pLooker->EyePosition(), pLightSource->GetEngineObject()->GetAbsOrigin(), MASK_SOLID_BRUSHONLY, pLooker, COLLISION_GROUP_NONE, &tr );
 
 			if ( g_debug_darkness.GetBool() )
 			{
@@ -340,7 +340,7 @@ bool CDarknessLightSourcesSystem::AreThereLightSourcesWithinRadius( CBaseEntity 
 				else
 				{
 					NDebugOverlay::Line( pLooker->WorldSpaceCenter(), tr.endpos, 0,255,0,true, 0.1);
-					NDebugOverlay::Line( pLightSource->GetAbsOrigin(), tr.endpos, 255,0,0,true, 0.1);
+					NDebugOverlay::Line( pLightSource->GetEngineObject()->GetAbsOrigin(), tr.endpos, 255,0,0,true, 0.1);
 				}
 			}
 
@@ -396,7 +396,7 @@ void AddEntityToDarknessCheck( CBaseEntity *pEntity, float flLightRadius /*=DARK
 	{
 		pLightSource->SetLightRadius( flLightRadius );
 		DispatchSpawn( pLightSource );
-  		pLightSource->SetAbsOrigin( pEntity->WorldSpaceCenter() );
+  		pLightSource->GetEngineObject()->SetAbsOrigin( pEntity->WorldSpaceCenter() );
 		pLightSource->GetEngineObject()->SetParent( pEntity->GetEngineObject());
 		pLightSource->Activate();
 

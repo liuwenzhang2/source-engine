@@ -464,7 +464,7 @@ bool CPortalSimulator::EntityIsInPortalHole( CBaseEntity *pEntity ) const
 
 	case SOLID_BBOX:
 		{
-			Vector ptEntityPosition = pEntity->GetAbsOrigin();
+			Vector ptEntityPosition = pEntity->GetEngineObject()->GetAbsOrigin();
 			CCollisionProperty *pCollisionProp = pEntity->CollisionProp();
 
 			physcollision->TraceBox( ptEntityPosition, ptEntityPosition, pCollisionProp->OBBMins(), pCollisionProp->OBBMaxs(), m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace );

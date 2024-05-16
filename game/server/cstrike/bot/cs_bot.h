@@ -1264,7 +1264,7 @@ private:
 
 inline float CCSBot::GetFeetZ( void ) const
 {
-	return GetAbsOrigin().z;
+	return GetEngineObject()->GetAbsOrigin().z;
 }
 
 inline const Vector *CCSBot::GetNoisePosition( void ) const
@@ -1733,8 +1733,8 @@ inline bool CCSBot::IsSignificantlyCloser( const CCSPlayer *testPlayer, const CC
 	if ( !testPlayer )
 		return false;
 
-	float testDist = ( GetAbsOrigin() - testPlayer->GetAbsOrigin() ).Length();
-	float referenceDist = ( GetAbsOrigin() - referencePlayer->GetAbsOrigin() ).Length();
+	float testDist = (GetEngineObject()->GetAbsOrigin() - testPlayer->GetEngineObject()->GetAbsOrigin() ).Length();
+	float referenceDist = (GetEngineObject()->GetAbsOrigin() - referencePlayer->GetEngineObject()->GetAbsOrigin() ).Length();
 
 	const float significantRangeFraction = 0.7f;
 	if ( testDist < referenceDist * significantRangeFraction )

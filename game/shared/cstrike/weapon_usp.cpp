@@ -242,7 +242,7 @@ float CWeaponUSP::GetInaccuracy() const
 		{
 			if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 				return 1.3f * (1 - m_flAccuracy);
-			else if (pPlayer->GetAbsVelocity().Length2D() > 5)
+			else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 				return 0.25f * (1 - m_flAccuracy);
 			else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
 				return 0.125f * (1 - m_flAccuracy);
@@ -253,7 +253,7 @@ float CWeaponUSP::GetInaccuracy() const
 		{
 			if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 				return 1.2f * (1 - m_flAccuracy );
-			else if (pPlayer->GetAbsVelocity().Length2D() > 5)
+			else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 				return 0.225f * (1 - m_flAccuracy);
 			else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
 				return 0.08f * (1 - m_flAccuracy);

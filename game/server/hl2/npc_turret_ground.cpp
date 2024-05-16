@@ -137,17 +137,17 @@ void CNPC_GroundTurret::Spawn( void )
 	m_flTimeNextShoot = gpGlobals->curtime;
 	m_flTimeNextPing = gpGlobals->curtime;
 
-	m_vecClosedPos = GetAbsOrigin();
+	m_vecClosedPos = GetEngineObject()->GetAbsOrigin();
 
 	StudioFrameAdvance();
 
 	Vector vecPos;
 
 	GetAttachment( "eyes", vecPos );
-	SetViewOffset( vecPos - GetAbsOrigin() );
+	SetViewOffset( vecPos - GetEngineObject()->GetAbsOrigin() );
 
 	GetAttachment( "light", vecPos );
-	m_vecLightOffset = vecPos - GetAbsOrigin();
+	m_vecLightOffset = vecPos - GetEngineObject()->GetAbsOrigin();
 }
 
 //-----------------------------------------------------------------------------
@@ -405,10 +405,10 @@ Vector CNPC_GroundTurret::EyePosition()
 {
 	if( ai_newgroundturret.GetBool() )
 	{
-		return GetAbsOrigin() + Vector( 0, 0, 6 );
+		return GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 6 );
 	}
 
-	return GetAbsOrigin() + GetViewOffset();
+	return GetEngineObject()->GetAbsOrigin() + GetViewOffset();
 }
 
 //---------------------------------------------------------
@@ -417,9 +417,9 @@ bool CNPC_GroundTurret::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEnti
 {
 	if ( BaseClass::FVisible( pEntity, traceMask, ppBlocker ) )
 		return true;
-	if ( ( pEntity->GetAbsOrigin().AsVector2D() - GetAbsOrigin().AsVector2D() ).LengthSqr() < Square(10*12) &&
-		 FInViewCone( pEntity->GetAbsOrigin() ) &&
-		 BaseClass::FVisible( pEntity->GetAbsOrigin() + Vector( 0, 0, 1 ), traceMask, ppBlocker ) )
+	if ( ( pEntity->GetEngineObject()->GetAbsOrigin().AsVector2D() - GetEngineObject()->GetAbsOrigin().AsVector2D() ).LengthSqr() < Square(10*12) &&
+		 FInViewCone( pEntity->GetEngineObject()->GetAbsOrigin() ) &&
+		 BaseClass::FVisible( pEntity->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 1 ), traceMask, ppBlocker ) )
 		return true;
 	return false;
 }
@@ -430,7 +430,7 @@ bool CNPC_GroundTurret::QuerySeeEntity( CBaseEntity *pEntity, bool bOnlyHateOrFe
 {
 	float flDist;
 
-	flDist = (pEntity->GetAbsOrigin() - EyePosition()).Length2DSqr();
+	flDist = (pEntity->GetEngineObject()->GetAbsOrigin() - EyePosition()).Length2DSqr();
 
 	if( flDist <= m_flSensingDist * m_flSensingDist )
 	{
@@ -458,7 +458,7 @@ bool CNPC_GroundTurret::IsOpen()
 {
 	// The method is hacky but in the end, this does actually give
 	// us a pretty good idea if the turret is open or closed.
-	return( fabs(GetAbsOrigin().z - m_vecClosedPos.z ) > 1.0f );
+	return( fabs(GetEngineObject()->GetAbsOrigin().z - m_vecClosedPos.z ) > 1.0f );
 }
 
 //---------------------------------------------------------
@@ -657,21 +657,21 @@ void CNPC_GroundTurret::Scan()
 
 	QAngle	scanAngle;
 	Vector	forward;
-	Vector	vecEye = GetAbsOrigin() + m_vecLightOffset;
+	Vector	vecEye = GetEngineObject()->GetAbsOrigin() + m_vecLightOffset;
 
 	// Draw the outer extents
-	scanAngle = GetAbsAngles();
+	scanAngle = GetEngineObject()->GetAbsAngles();
 	scanAngle.y += (GROUNDTURRET_VIEWCONE / 2.0f);
 	AngleVectors( scanAngle, &forward, NULL, NULL );
 	ProjectBeam( vecEye, forward, 1, 30, 0.1 );
 
-	scanAngle = GetAbsAngles();
+	scanAngle = GetEngineObject()->GetAbsAngles();
 	scanAngle.y -= (GROUNDTURRET_VIEWCONE / 2.0f);
 	AngleVectors( scanAngle, &forward, NULL, NULL );
 	ProjectBeam( vecEye, forward, 1, 30, 0.1 );
 
 	// Draw a sweeping beam
-	scanAngle = GetAbsAngles();
+	scanAngle = GetEngineObject()->GetAbsAngles();
 	scanAngle.y += (GROUNDTURRET_VIEWCONE / 2.0f) * sin( gpGlobals->curtime * 3.0f );
 	
 	AngleVectors( scanAngle, &forward, NULL, NULL );

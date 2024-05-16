@@ -38,7 +38,7 @@ AR2Explosion* AR2Explosion::CreateAR2Explosion(const Vector &pos)
 		AR2Explosion *pEffect = dynamic_cast<AR2Explosion*>(pEnt);
 		if(pEffect && pEffect->entindex()!=-1)
 		{
-			pEffect->SetLocalOrigin( pos );
+			pEffect->GetEngineObject()->SetLocalOrigin( pos );
 			pEffect->Activate();
 			return pEffect;
 		}
@@ -100,7 +100,7 @@ void CEnvAR2Explosion::Spawn( void )
 //-----------------------------------------------------------------------------
 void CEnvAR2Explosion::InputExplode( inputdata_t &inputdata )
 {
-	AR2Explosion *pExplosion = AR2Explosion::CreateAR2Explosion(GetAbsOrigin());
+	AR2Explosion *pExplosion = AR2Explosion::CreateAR2Explosion(GetEngineObject()->GetAbsOrigin());
 	if (pExplosion)
 	{
 		pExplosion->SetLifetime( 10 );

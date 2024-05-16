@@ -367,7 +367,7 @@ void CBaseCSGrenade::ItemPostFrame()
 
 		AngleVectors( angThrow, &vForward, &vRight, &vUp );
 
-		Vector vecSrc = pPlayer->GetAbsOrigin() + pPlayer->GetViewOffset();
+		Vector vecSrc = pPlayer->GetEngineObject()->GetAbsOrigin() + pPlayer->GetViewOffset();
 
 		// We want to throw the grenade from 16 units out.  But that can cause problems if we're facing
 		// a thin wall.  Do a hull trace to be safe.
@@ -377,7 +377,7 @@ void CBaseCSGrenade::ItemPostFrame()
 		UTIL_TraceHull( vecSrc, vecSrc + vForward * 16, mins, maxs, MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &trace );
 		vecSrc = trace.endpos;
 
-		Vector vecThrow = vForward * flVel + pPlayer->GetAbsVelocity();
+		Vector vecThrow = vForward * flVel + pPlayer->GetEngineObject()->GetAbsVelocity();
 
 		EmitGrenade( vecSrc, vec3_angle, vecThrow, AngularImpulse(600,random->RandomInt(-1200,1200),0), pPlayer );
 
@@ -407,9 +407,9 @@ void CBaseCSGrenade::ItemPostFrame()
 
 		Vector vForward;
 		pPlayer->EyeVectors( &vForward );
-		Vector vecSrc = pPlayer->GetAbsOrigin() + pPlayer->GetViewOffset() + vForward * 16; 
+		Vector vecSrc = pPlayer->GetEngineObject()->GetAbsOrigin() + pPlayer->GetViewOffset() + vForward * 16;
 
-		Vector vecVel = pPlayer->GetAbsVelocity();
+		Vector vecVel = pPlayer->GetEngineObject()->GetAbsVelocity();
 
 		EmitGrenade( vecSrc, vec3_angle, vecVel, AngularImpulse(600,random->RandomInt(-1200,1200),0), pPlayer );
 

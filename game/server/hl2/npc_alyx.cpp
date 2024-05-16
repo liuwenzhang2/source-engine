@@ -61,8 +61,8 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 
 		int iAttachment = LookupAttachment( pEvent->options );
 		m_hEmpTool->GetEngineObject()->SetParent(this->GetEngineObject(), iAttachment);
-		m_hEmpTool->SetLocalOrigin( Vector( 0, 0, 0 ) );
-		m_hEmpTool->SetLocalAngles( QAngle( 0, 0, 0 ) );
+		m_hEmpTool->GetEngineObject()->SetLocalOrigin( Vector( 0, 0, 0 ) );
+		m_hEmpTool->GetEngineObject()->SetLocalAngles( QAngle( 0, 0, 0 ) );
 
 		return;
 	}
@@ -191,8 +191,8 @@ void CNPC_Alyx::CreateEmpTool( void )
 		m_hEmpTool->GetEngineObject()->SetParent(this->GetEngineObject(), iAttachment);
 		m_hEmpTool->SetOwnerEntity(this);
 		m_hEmpTool->SetSolid( SOLID_NONE );
-		m_hEmpTool->SetLocalOrigin( Vector( 0, 0, 0 ) );
-		m_hEmpTool->SetLocalAngles( QAngle( 0, 0, 0 ) );
+		m_hEmpTool->GetEngineObject()->SetLocalOrigin( Vector( 0, 0, 0 ) );
+		m_hEmpTool->GetEngineObject()->SetLocalAngles( QAngle( 0, 0, 0 ) );
 		m_hEmpTool->Spawn();
 	}
 }

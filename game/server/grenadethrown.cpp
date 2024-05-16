@@ -54,8 +54,8 @@ void CThrownGrenade::Spawn( void )
 	SetGravity( UTIL_ScaleForGravity( 648 ) );
 	SetFriction(0.6);
 	QAngle angles;
-	VectorAngles( GetAbsVelocity(), angles );
-	SetLocalAngles( angles );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
+	GetEngineObject()->SetLocalAngles( angles );
 	QAngle vecAngVel( random->RandomFloat ( -100, -500 ), 0, 0 );
 	SetLocalAngularVelocity( vecAngVel );
 	
@@ -71,8 +71,8 @@ void CThrownGrenade::Spawn( void )
 void CThrownGrenade::Thrown( Vector vecOrigin, Vector vecVelocity, float flExplodeTime )
 {
 	// Throw
-	SetLocalOrigin( vecOrigin );
-	SetAbsVelocity( vecVelocity );
+	GetEngineObject()->SetLocalOrigin( vecOrigin );
+	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 	// Explode in 3 seconds
 	SetThink( &CThrownGrenade::Detonate );

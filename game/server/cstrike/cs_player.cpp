@@ -205,8 +205,8 @@ public:
 		SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 		m_takedamage = DAMAGE_NO;
 		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-		SetAbsOrigin( m_hPlayer->GetAbsOrigin() );
-		SetAbsVelocity( m_hPlayer->GetAbsVelocity() );
+		GetEngineObject()->SetAbsOrigin( m_hPlayer->GetEngineObject()->GetAbsOrigin() );
+		GetEngineObject()->SetAbsVelocity( m_hPlayer->GetEngineObject()->GetAbsVelocity() );
 		AddSolidFlags( FSOLID_NOT_SOLID );
 		ChangeTeam( m_hPlayer->GetTeamNumber() );
 		UseClientSideAnimation();
@@ -431,7 +431,7 @@ void cc_CreatePredictionError_f( const CCommand &args )
 	}
 
 	CBaseEntity *pEnt = gEntList.GetBaseEntity( 1 );
-	pEnt->SetAbsOrigin( pEnt->GetAbsOrigin() + Vector( distance, 0, 0 ) );
+	pEnt->GetEngineObject()->SetAbsOrigin( pEnt->GetEngineObject()->GetAbsOrigin() + Vector( distance, 0, 0 ) );
 }
 
 ConCommand cc_CreatePredictionError( "CreatePredictionError", cc_CreatePredictionError_f, "Create a prediction error", FCVAR_CHEAT );
@@ -1015,8 +1015,8 @@ void CCSPlayer::CreateRagdollEntity()
 	if ( pRagdoll )
 	{
 		pRagdoll->m_hPlayer = this;
-		pRagdoll->m_vecRagdollOrigin = GetAbsOrigin();
-		pRagdoll->m_vecRagdollVelocity = GetAbsVelocity();
+		pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
+		pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
 		pRagdoll->m_nModelIndex = m_nModelIndex;
 		pRagdoll->m_nForceBone = m_nForceBone;
 		pRagdoll->m_vecForce = m_vecTotalBulletForce;
@@ -1243,7 +1243,7 @@ void CCSPlayer::Event_Killed( const CTakeDamageInfo &info )
 	{
 		if ( RandomInt( 0, 100 ) < 20 )
 		{
-			CHolidayGift::Create( WorldSpaceCenter(), GetAbsAngles(), EyeAngles(), GetAbsVelocity(), this );
+			CHolidayGift::Create( WorldSpaceCenter(), GetEngineObject()->GetAbsAngles(), EyeAngles(), GetEngineObject()->GetAbsVelocity(), this );
 		}
 	}
 
@@ -1547,10 +1547,10 @@ void CCSPlayer::UpdateRadar()
 			continue; // don't update specattors or dead players
 
 		WRITE_BYTE( i+1 ); // player index as entity
-		WRITE_SBITLONG( pPlayer->GetAbsOrigin().x/4, COORD_INTEGER_BITS-1 );
-		WRITE_SBITLONG( pPlayer->GetAbsOrigin().y/4, COORD_INTEGER_BITS-1 );
-		WRITE_SBITLONG( pPlayer->GetAbsOrigin().z/4, COORD_INTEGER_BITS-1 );
-		WRITE_SBITLONG(  AngleNormalize( pPlayer->GetAbsAngles().y ), 9 );
+		WRITE_SBITLONG( pPlayer->GetEngineObject()->GetAbsOrigin().x/4, COORD_INTEGER_BITS-1 );
+		WRITE_SBITLONG( pPlayer->GetEngineObject()->GetAbsOrigin().y/4, COORD_INTEGER_BITS-1 );
+		WRITE_SBITLONG( pPlayer->GetEngineObject()->GetAbsOrigin().z/4, COORD_INTEGER_BITS-1 );
+		WRITE_SBITLONG(  AngleNormalize( pPlayer->GetEngineObject()->GetAbsAngles().y ), 9 );
 	}
 
 	WRITE_BYTE( 0 ); // end marker
@@ -1667,9 +1667,9 @@ void CCSPlayer::PostThink()
 		}
 	}
 
-	QAngle angles = GetLocalAngles();
+	QAngle angles = GetEngineObject()->GetLocalAngles();
 	angles[PITCH] = 0;
-	SetLocalAngles( angles );
+	GetEngineObject()->SetLocalAngles( angles );
 
 	// Store the eye angles pitch so the client can compute its animation state correctly.
 	m_angEyeAngles = EyeAngles();
@@ -1955,7 +1955,7 @@ int CCSPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 		if ( ShouldDoLargeFlinch( m_LastHitGroup, info.GetAttacker() ) )
 		{
-			if ( GetAbsVelocity().Length() < 300 )
+			if (GetEngineObject()->GetAbsVelocity().Length() < 300 )
 			{
 				m_flVelocityModifier = 0.65;
 			}
@@ -2207,7 +2207,7 @@ bool CCSPlayer::IsHittingShield( const Vector &vecDirection, trace_t *ptr )
 	float		flDot;
 	Vector		vForward;
 	Vector2D	vec2LOS = vecDirection.AsVector2D();
-	AngleVectors( GetLocalAngles(), &vForward );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &vForward );
 
 	Vector2DNormalize( vForward.AsVector2D() );
 	Vector2DNormalize( vec2LOS );
@@ -2788,7 +2788,7 @@ void CCSPlayer::PreThink()
 #ifndef _XBOX
 	// CS would like their players to continue to update their LastArea since it is displayed in the hud voice chat UI
 	// But we won't do the population tracking while dead.
-	CNavArea *area = TheNavMesh->GetNavArea( GetAbsOrigin(), 1000 );
+	CNavArea *area = TheNavMesh->GetNavArea(GetEngineObject()->GetAbsOrigin(), 1000 );
 	if (area && area != m_lastNavArea)
 	{
 		m_lastNavArea = area;
@@ -2830,25 +2830,25 @@ void CCSPlayer::MoveToNextIntroCamera()
 	if( !Target ) //if there are no cameras(or the camera has no target, find a spawn point and black out the screen
 	{
 		if ( m_pIntroCamera.IsValid() )
-			SetAbsOrigin( m_pIntroCamera->GetAbsOrigin() + VEC_VIEW );
+			GetEngineObject()->SetAbsOrigin( m_pIntroCamera->GetEngineObject()->GetAbsOrigin() + VEC_VIEW );
 
-		SetAbsAngles( QAngle( 0, 0, 0 ) );
+		GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 
 		m_pIntroCamera = NULL;  // never update again
 		return;
 	}
 
 
-	Vector vCamera = Target->GetAbsOrigin() - m_pIntroCamera->GetAbsOrigin();
-	Vector vIntroCamera = m_pIntroCamera->GetAbsOrigin();
+	Vector vCamera = Target->GetEngineObject()->GetAbsOrigin() - m_pIntroCamera->GetEngineObject()->GetAbsOrigin();
+	Vector vIntroCamera = m_pIntroCamera->GetEngineObject()->GetAbsOrigin();
 
 	VectorNormalize( vCamera );
 
 	QAngle CamAngles;
 	VectorAngles( vCamera, CamAngles );
 
-	SetAbsOrigin( vIntroCamera );
-	SetAbsAngles( CamAngles );
+	GetEngineObject()->SetAbsOrigin( vIntroCamera );
+	GetEngineObject()->SetAbsAngles( CamAngles );
 	SnapEyeAngles( CamAngles );
 	m_fIntroCamTime = gpGlobals->curtime + 6;
 }
@@ -3046,8 +3046,8 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 			// find offset of root bone from origin in local space
 			// Make sure we're detached from hierarchy before doing this!!!
 			pWeapon->StopFollowingEntity();
-			pWeapon->SetAbsOrigin( Vector( 0, 0, 0 ) );
-			pWeapon->SetAbsAngles( QAngle( 0, 0, 0 ) );
+			pWeapon->GetEngineObject()->SetAbsOrigin( Vector( 0, 0, 0 ) );
+			pWeapon->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 			pWeapon->InvalidateBoneCache();
 			matrix3x4_t rootLocal;
 			pWeapon->GetBoneTransform( iWeaponBoneIndex, rootLocal );
@@ -3074,7 +3074,7 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 				pWeaponPhys->SetPosition( vPos, angles, true );
 
 				AngularImpulse	angImp(0,0,0);
-				Vector vecAdd = GetAbsVelocity();
+				Vector vecAdd = GetEngineObject()->GetAbsVelocity();
 				pWeaponPhys->AddVelocity( &vecAdd, &angImp );
 			}
 		}
@@ -4127,7 +4127,7 @@ void CCSPlayer::OnDamagedByExplosion( const CTakeDamageInfo &info )
 	CBaseEntity *inflictor = info.GetInflictor();
 	if ( inflictor )
 	{
-		Vector delta = GetAbsOrigin() - inflictor->GetAbsOrigin();
+		Vector delta = GetEngineObject()->GetAbsOrigin() - inflictor->GetEngineObject()->GetAbsOrigin();
 		distanceFromPlayer = delta.Length();
 	}
 
@@ -5115,7 +5115,7 @@ bool CCSPlayer::SelectSpawnSpot( const char *pEntClassName, CBaseEntity* &pSpot 
 			// check if pSpot is valid
 			if ( g_pGameRules->IsSpawnPointValid( pSpot, this ) )
 			{
-				if ( pSpot->GetAbsOrigin() == Vector( 0, 0, 0 ) )
+				if ( pSpot->GetEngineObject()->GetAbsOrigin() == Vector( 0, 0, 0 ) )
 				{
 					pSpot = gEntList.FindEntityByClassname( pSpot, pEntClassName );
 					continue;
@@ -5416,17 +5416,17 @@ void CCSPlayer::State_PreThink_DEATH_ANIM()
 	// either respawn the guy or put him into observer mode).
 	if ( GetFlags() & FL_ONGROUND )
 	{
-		float flForward = GetAbsVelocity().Length() - 20;
+		float flForward = GetEngineObject()->GetAbsVelocity().Length() - 20;
 		if (flForward <= 0)
 		{
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 		}
 		else
 		{
-			Vector vAbsVel = GetAbsVelocity();
+			Vector vAbsVel = GetEngineObject()->GetAbsVelocity();
 			VectorNormalize( vAbsVel );
 			vAbsVel *= flForward;
-			SetAbsVelocity( vAbsVel );
+			GetEngineObject()->SetAbsVelocity( vAbsVel );
 		}
 	}
 
@@ -6649,7 +6649,7 @@ CBaseEntity *CCSPlayer::FindUseEntity()
 		CBaseEntity *bomb = gEntList.FindEntityByClassname( NULL, PLANTED_C4_CLASSNAME );
 		if (bomb != NULL)
 		{
-			Vector bombPos = bomb->GetAbsOrigin();
+			Vector bombPos = bomb->GetEngineObject()->GetAbsOrigin();
 			Vector vecLOS = EyePosition() - bombPos;
 
 			if (vecLOS.LengthSqr() < (96*96)) // 64 is the distance in Goldsrc.  However since Goldsrc did distance from the player's origin and we're doing distance from the player's eye, make the radius a bit bigger.
@@ -6743,7 +6743,7 @@ CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 		return NULL;
 	}
 
-	pent->SetLocalOrigin( GetLocalOrigin() );
+	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
 	pent->AddSpawnFlags( SF_NORESPAWN );
 
 	CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( (CBaseEntity*)pent );
@@ -6880,9 +6880,9 @@ void CCSPlayer::DropWeapons( bool fromDeath, bool friendlyFire )
 	{
 		//Drop an item_defuser
 		Vector vForward, vRight;
-		AngleVectors( GetAbsAngles(), &vForward, &vRight, NULL );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward, &vRight, NULL );
 
-		CBaseAnimating *pDefuser = (CBaseAnimating *)CBaseEntity::Create( "item_defuser", WorldSpaceCenter(), GetLocalAngles(), this );
+		CBaseAnimating *pDefuser = (CBaseAnimating *)CBaseEntity::Create( "item_defuser", WorldSpaceCenter(), GetEngineObject()->GetLocalAngles(), this );
 		pDefuser->ApplyAbsVelocityImpulse( vForward * 200 + vRight * random->RandomFloat( -50, 50 ) );
 
 		RemoveDefuser();
@@ -7307,7 +7307,7 @@ void CCSPlayer::CreateViewModel( int index /*=0*/ )
 	CPredictedViewModel *vm = ( CPredictedViewModel * )gEntList.CreateEntityByName( "predicted_viewmodel" );
 	if ( vm )
 	{
-		vm->SetAbsOrigin( GetAbsOrigin() );
+		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		vm->SetOwner( this );
 		vm->SetIndex( index );
 		DispatchSpawn( vm );
@@ -7994,7 +7994,7 @@ CBaseEntity* CCSPlayer::GetNearestSurfaceBelow(float maxTrace)
 	trace_t trace;
 	Ray_t ray;
 
-	Vector traceStart = this->GetAbsOrigin();
+	Vector traceStart = this->GetEngineObject()->GetAbsOrigin();
 	Vector traceEnd = traceStart;
 	traceEnd.z -= maxTrace;
 

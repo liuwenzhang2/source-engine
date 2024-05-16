@@ -119,19 +119,19 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 		return;
 	}
 
-	Vector vForward, vRight, vUp, vPos = GetAbsOrigin();
+	Vector vForward, vRight, vUp, vPos = GetEngineObject()->GetAbsOrigin();
 	FlashlightState_t state;
 
 	if ( m_hTargetEntity != NULL )
 	{
 		if ( m_bCameraSpace )
 		{
-			const QAngle &angles = GetLocalAngles();
+			const QAngle &angles = GetEngineObject()->GetLocalAngles();
 
 			C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 			if( pPlayer )
 			{
-				const QAngle playerAngles = pPlayer->GetAbsAngles();
+				const QAngle playerAngles = pPlayer->GetEngineObject()->GetAbsAngles();
 				
 				Vector vPlayerForward, vPlayerRight, vPlayerUp;
 				AngleVectors( playerAngles, &vPlayerForward, &vPlayerRight, &vPlayerUp );
@@ -143,8 +143,8 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 				VectorITransform( vPlayerRight, mRotMatrix, vRight );
 				VectorITransform( vPlayerUp, mRotMatrix, vUp );
 
-				float dist = (m_hTargetEntity->GetAbsOrigin() - GetAbsOrigin()).Length();
-				vPos = m_hTargetEntity->GetAbsOrigin() - vForward*dist;
+				float dist = (m_hTargetEntity->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
+				vPos = m_hTargetEntity->GetEngineObject()->GetAbsOrigin() - vForward*dist;
 
 				VectorNormalize( vForward );
 				VectorNormalize( vRight );
@@ -153,7 +153,7 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 		}
 		else
 		{
-			vForward = m_hTargetEntity->GetAbsOrigin() - GetAbsOrigin();
+			vForward = m_hTargetEntity->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 			VectorNormalize( vForward );
 
 			// JasonM - unimplemented
@@ -172,7 +172,7 @@ void C_EnvProjectedTexture::UpdateLight( bool bForceUpdate )
 	}
 	else
 	{
-		AngleVectors( GetAbsAngles(), &vForward, &vRight, &vUp );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward, &vRight, &vUp );
 	}
 
 	state.m_fHorizontalFOVDegrees = m_flLightFOV;

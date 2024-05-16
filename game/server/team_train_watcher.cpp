@@ -900,7 +900,7 @@ void CTeamTrainWatcher::WatcherActivate( void )
 		// don't check the start node for links. If it's linked, it will have 0 distance anyway
 		while ( pNode )
 		{
-			Vector dir = pNode->GetLocalOrigin() - pPrev->GetLocalOrigin();
+			Vector dir = pNode->GetEngineObject()->GetLocalOrigin() - pPrev->GetEngineObject()->GetLocalOrigin();
 			float length = dir.Length();
 
 			m_flTotalPathDistance += length;
@@ -1187,7 +1187,7 @@ void CTeamTrainWatcher::WatcherThink( void )
 			float flDistanceToGoal = 0;
 
 			// distance to next node
-			Vector vecDir = pNode->GetLocalOrigin() - pTrain->GetLocalOrigin();
+			Vector vecDir = pNode->GetEngineObject()->GetLocalOrigin() - pTrain->GetEngineObject()->GetLocalOrigin();
 			flDistanceToGoal = vecDir.Length();
 
 			// distance of next node to goal node
@@ -1198,7 +1198,7 @@ void CTeamTrainWatcher::WatcherThink( void )
 				pNode = pNode->GetNext();
 				while ( pNode )
 				{
-					vecDir = pNode->GetLocalOrigin() - pPrev->GetLocalOrigin();
+					vecDir = pNode->GetEngineObject()->GetLocalOrigin() - pPrev->GetEngineObject()->GetLocalOrigin();
 					flDistanceToGoal += vecDir.Length();
 
 					if ( pNode == m_hGoalNode )
@@ -1343,7 +1343,7 @@ void CTeamTrainWatcher::WatcherThink( void )
 				if ( !nextNode || nextNode->HasBeenVisited() )
 					break;
 
-				NDebugOverlay::Line( node->GetAbsOrigin(), nextNode->GetAbsOrigin(), 255, 255, 0, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
+				NDebugOverlay::Line( node->GetEngineObject()->GetAbsOrigin(), nextNode->GetEngineObject()->GetAbsOrigin(), 255, 255, 0, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 
 				node = nextNode;
 			}
@@ -1353,7 +1353,7 @@ void CTeamTrainWatcher::WatcherThink( void )
 			node = pTrain->m_ppath;
 			if ( node && node->GetNext() )
 			{
-				NDebugOverlay::HorzArrow( node->GetAbsOrigin(), node->GetNext()->GetAbsOrigin(), 5.0f, 255, 0, 0, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
+				NDebugOverlay::HorzArrow( node->GetEngineObject()->GetAbsOrigin(), node->GetNext()->GetEngineObject()->GetAbsOrigin(), 5.0f, 255, 0, 0, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 			}
 		}
 	}
@@ -1430,16 +1430,16 @@ void CTeamTrainWatcher::ProjectPointOntoPath( const Vector &pos, Vector *posOnPa
 		if ( !nextNode || nextNode->HasBeenVisited() )
 			break;
 
-		alongPath = nextNode->GetAbsOrigin() - node->GetAbsOrigin();
+		alongPath = nextNode->GetEngineObject()->GetAbsOrigin() - node->GetEngineObject()->GetAbsOrigin();
 		float segmentLength = alongPath.NormalizeInPlace();
 
-		toPos = pos - node->GetAbsOrigin();
+		toPos = pos - node->GetEngineObject()->GetAbsOrigin();
 		float segmentOverlap = DotProduct( toPos, alongPath );
 
 		if ( segmentOverlap >= 0.0f && segmentOverlap < segmentLength )
 		{
 			// projection is within segment bounds
-			Vector onPath = node->GetAbsOrigin() + alongPath * segmentOverlap;
+			Vector onPath = node->GetEngineObject()->GetAbsOrigin() + alongPath * segmentOverlap;
 
 			float perpendicularDistanceSq = ( onPath - pos ).LengthSqr();
 			if ( perpendicularDistanceSq < closestPerpendicularDistanceSq )
@@ -1507,7 +1507,7 @@ Vector CTeamTrainWatcher::GetNextCheckpointPosition( void ) const
 	{
 		if ( m_flTrainDistanceFromStart < m_CPLinks[i].flDistanceFromStart )
 		{
-			return m_CPLinks[i].hPathTrack->GetAbsOrigin();
+			return m_CPLinks[i].hPathTrack->GetEngineObject()->GetAbsOrigin();
 		}
 	}
 

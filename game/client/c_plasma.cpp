@@ -236,7 +236,7 @@ void C_Plasma::AddEntity( void )
 
 	// Note: Sprite renderer assumes scale of 0.0 is 1.0
 	m_entGlow.SetScale( MAX( 0.0000001f, (m_flScaleRegister*1.5f) + GetFlickerScale() ) );
-	m_entGlow.SetLocalOriginDim( Z_INDEX, m_entGlow.GetLocalOriginDim( Z_INDEX ) + ( dScale * 32.0f ) );
+	m_entGlow.GetEngineObject()->SetLocalOriginDim( Z_INDEX, m_entGlow.GetEngineObject()->GetLocalOriginDim( Z_INDEX ) + ( dScale * 32.0f ) );
 }
 
 #define	FLAME_ALPHA_START	0.8f
@@ -249,7 +249,7 @@ void C_Plasma::AddEntity( void )
 //-----------------------------------------------------------------------------
 void C_Plasma::AddFlames( void )
 {
-	Vector	viewDir = GetAbsOrigin() - CurrentViewOrigin();
+	Vector	viewDir = GetEngineObject()->GetAbsOrigin() - CurrentViewOrigin();
 	VectorNormalize(viewDir);
 	float	dot		= viewDir.Dot( Vector( 0, 0, 1 ) );	//NOTENOTE: Flames always point up
 	float	alpha	= 1.0f;
@@ -326,7 +326,7 @@ void C_Plasma::Start( void )
 
 		// Setup all the information for the client entity
 		m_entFlames[i].SetModelByIndex( nModelIndex );
-		m_entFlames[i].SetLocalOrigin( GetLocalOrigin() );
+		m_entFlames[i].GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
 		m_entFlames[i].m_flFrame			= random->RandomInt( 0.0f, maxFrames );
 		m_entFlames[i].m_flSpriteFramerate	= (float) random->RandomInt( 15, 20 );
 		m_entFlames[i].SetScale( m_flStartScale );
@@ -349,7 +349,7 @@ void C_Plasma::Start( void )
 
 	// Setup the glow
 	m_entGlow.SetModelByIndex( m_nGlowModelIndex );
-	m_entGlow.SetLocalOrigin( GetLocalOrigin() );
+	m_entGlow.GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
 	m_entGlow.SetScale( m_flStartScale );
 	m_entGlow.SetRenderMode( kRenderTransAdd );
 	m_entGlow.m_nRenderFX		= kRenderFxNone;
@@ -403,19 +403,19 @@ void C_Plasma::UpdateFlames( void )
 		VectorNormalize( dir );
 		dir[2] = 0.0f;
 
-		Vector	offset = GetAbsOrigin();
-		offset[2] = m_entFlames[i].GetAbsOrigin()[2];
+		Vector	offset = GetEngineObject()->GetAbsOrigin();
+		offset[2] = m_entFlames[i].GetEngineObject()->GetAbsOrigin()[2];
 
 		// Note: Sprite render assumes 0 scale means 1.0
 		m_entFlames[i].SetScale ( MAX(0.000001,newScale) );
 		
 		if ( i != 0 )
 		{
-			m_entFlames[i].SetLocalOrigin( offset + ( m_entFlames[i].m_vecMoveDir * ((m_entFlames[i].GetScale())*CHILD_SPREAD) ) );
+			m_entFlames[i].GetEngineObject()->SetLocalOrigin( offset + ( m_entFlames[i].m_vecMoveDir * ((m_entFlames[i].GetScale())*CHILD_SPREAD) ) );
 		}
 
 		Assert( !m_entFlames[i].GetEngineObject()->GetMoveParent() );
-		m_entFlames[i].SetLocalOriginDim( Z_INDEX, m_entFlames[i].GetLocalOriginDim( Z_INDEX ) + ( dScale * 64.0f ) );
+		m_entFlames[i].GetEngineObject()->SetLocalOriginDim( Z_INDEX, m_entFlames[i].GetEngineObject()->GetLocalOriginDim( Z_INDEX ) + ( dScale * 64.0f ) );
 	}
 }
 
@@ -467,7 +467,7 @@ void C_Plasma::Update( void )
 				int index = decalsystem->GetDecalIndexForName( "PlasmaGlowFade" );
 				if ( index >= 0 )
 				{
-					effects->DecalShoot( index, 0, ent->GetModel(), ent->GetAbsOrigin(), ent->GetAbsAngles(), GetAbsOrigin(), 0, 0 );
+					effects->DecalShoot( index, 0, ent->GetModel(), ent->GetEngineObject()->GetAbsOrigin(), ent->GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), 0, 0 );
 				}
 			}
 		}

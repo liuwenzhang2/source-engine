@@ -60,11 +60,11 @@ void C_PortalGhostRenderable::PerFrameUpdate( void )
 
 
 	// Set position and angles relative to the object it's ghosting
-	Vector ptNewOrigin = m_matGhostTransform * m_pGhostedRenderable->GetAbsOrigin();		
-	QAngle qNewAngles = TransformAnglesToWorldSpace( m_pGhostedRenderable->GetAbsAngles(), m_matGhostTransform.As3x4() );
+	Vector ptNewOrigin = m_matGhostTransform * m_pGhostedRenderable->GetEngineObject()->GetAbsOrigin();
+	QAngle qNewAngles = TransformAnglesToWorldSpace( m_pGhostedRenderable->GetEngineObject()->GetAbsAngles(), m_matGhostTransform.As3x4() );
 
-	SetAbsOrigin( ptNewOrigin );
-	SetAbsAngles( qNewAngles );
+	GetEngineObject()->SetAbsOrigin( ptNewOrigin );
+	GetEngineObject()->SetAbsAngles( qNewAngles );
 
 	AddEffects( EF_NOINTERP );
 

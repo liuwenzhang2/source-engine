@@ -84,9 +84,9 @@ void CFuncMoveLinear::Spawn( void )
 		m_flMoveDistance = DotProductAbs( m_vecMoveDir, vecOBB ) - m_flLip;
 	}
 
-	m_vecPosition1 = GetAbsOrigin() - (m_vecMoveDir * m_flMoveDistance * m_flStartPosition);
+	m_vecPosition1 = GetEngineObject()->GetAbsOrigin() - (m_vecMoveDir * m_flMoveDistance * m_flStartPosition);
 	m_vecPosition2 = m_vecPosition1 + (m_vecMoveDir * m_flMoveDistance);
-	m_vecFinalDest = GetAbsOrigin();
+	m_vecFinalDest = GetEngineObject()->GetAbsOrigin();
 
 	SetTouch( NULL );
 
@@ -256,11 +256,11 @@ void CFuncMoveLinear::MoveDone( void )
 	SetNextThink( gpGlobals->curtime + 0.1f );
 	BaseClass::MoveDone();
 
-	if ( GetAbsOrigin() == m_vecPosition2 )
+	if (GetEngineObject()->GetAbsOrigin() == m_vecPosition2 )
 	{
 		m_OnFullyOpen.FireOutput( this, this );
 	}
-	else if ( GetAbsOrigin() == m_vecPosition1 )
+	else if (GetEngineObject()->GetAbsOrigin() == m_vecPosition1 )
 	{
 		m_OnFullyClosed.FireOutput( this, this );
 	}
@@ -279,7 +279,7 @@ void CFuncMoveLinear::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		value = 1.0;
 	Vector move = m_vecPosition1 + (value * (m_vecPosition2 - m_vecPosition1));
 	
-	Vector delta = move - GetLocalOrigin();
+	Vector delta = move - GetEngineObject()->GetLocalOrigin();
 	float speed = delta.Length() * 10;
 
 	MoveTo(move, speed);
@@ -292,7 +292,7 @@ void CFuncMoveLinear::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 void CFuncMoveLinear::SetPosition( float flPosition )
 {
 	Vector vTargetPos = m_vecPosition1 + ( flPosition * (m_vecPosition2 - m_vecPosition1));
-	if ((vTargetPos - GetLocalOrigin()).Length() > 0.001)
+	if ((vTargetPos - GetEngineObject()->GetLocalOrigin()).Length() > 0.001)
 	{
 		MoveTo(vTargetPos, m_flSpeed);
 	}
@@ -304,7 +304,7 @@ void CFuncMoveLinear::SetPosition( float flPosition )
 //------------------------------------------------------------------------------
 void CFuncMoveLinear::InputOpen( inputdata_t &inputdata )
 {
-	if (GetLocalOrigin() != m_vecPosition2)
+	if (GetEngineObject()->GetLocalOrigin() != m_vecPosition2)
 	{
 		MoveTo(m_vecPosition2, m_flSpeed);
 	}
@@ -316,7 +316,7 @@ void CFuncMoveLinear::InputOpen( inputdata_t &inputdata )
 //------------------------------------------------------------------------------
 void CFuncMoveLinear::InputClose( inputdata_t &inputdata )
 {
-	if (GetLocalOrigin() != m_vecPosition1)
+	if (GetEngineObject()->GetLocalOrigin() != m_vecPosition1)
 	{
 		MoveTo(m_vecPosition1, m_flSpeed);
 	}
@@ -362,7 +362,7 @@ void CFuncMoveLinear::InputSetSpeed( inputdata_t &inputdata )
 	m_flSpeed = inputdata.value.Float();
 
 	// FIXME: This is a little questionable.  Do we want to fix the speed, or let it continue on at the old speed?
-	float flDistToGoalSqr = ( m_vecFinalDest - GetAbsOrigin() ).LengthSqr();
+	float flDistToGoalSqr = ( m_vecFinalDest - GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 	if ( flDistToGoalSqr > Square( FLT_EPSILON ) )
 	{
 		// NOTE: We do NOT want to call sound functions here, just vanilla position changes
@@ -382,7 +382,7 @@ int CFuncMoveLinear::DrawDebugTextOverlays(void)
 	{
 		char tempstr[512];
 		float flTravelDist = (m_vecPosition1 - m_vecPosition2).Length();
-		float flCurDist	   = (m_vecPosition1 - GetLocalOrigin()).Length();
+		float flCurDist	   = (m_vecPosition1 - GetEngineObject()->GetLocalOrigin()).Length();
 		Q_snprintf(tempstr,sizeof(tempstr),"Current Pos: %3.3f",flCurDist/flTravelDist);
 		EntityText(text_offset,tempstr,0);
 		text_offset++;

@@ -37,7 +37,7 @@ LINK_ENTITY_TO_CLASS( spark_shower, CShower );
 void CShower::Spawn( void )
 {
 	Vector vecForward;
-	AngleVectors( GetLocalAngles(), &vecForward );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &vecForward );
 
 	Vector vecNewVelocity;
 	vecNewVelocity = random->RandomFloat( 200, 300 ) * vecForward;
@@ -47,7 +47,7 @@ void CShower::Spawn( void )
 		vecNewVelocity.z += 200;
 	else
 		vecNewVelocity.z -= 200;
-	SetAbsVelocity( vecNewVelocity );
+	GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	SetGravity( UTIL_ScaleForGravity( 400 ) ); // fall a bit more slowly than normal
@@ -57,13 +57,13 @@ void CShower::Spawn( void )
 	AddEffects( EF_NODRAW );
 	m_flSpeed = random->RandomFloat( 0.5, 1.5 );
 
-	SetLocalAngles( vec3_angle );
+	GetEngineObject()->SetLocalAngles( vec3_angle );
 }
 
 
 void CShower::Think( void )
 {
-	g_pEffects->Sparks( GetAbsOrigin() );
+	g_pEffects->Sparks(GetEngineObject()->GetAbsOrigin() );
 
 	m_flSpeed -= 0.1;
 	if ( m_flSpeed > 0 )
@@ -76,7 +76,7 @@ void CShower::Think( void )
 
 void CShower::Touch( CBaseEntity *pOther )
 {
-	Vector vecNewVelocity = GetAbsVelocity();
+	Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 
 	if ( GetFlags() & FL_ONGROUND )
 		vecNewVelocity *= 0.1;
@@ -86,7 +86,7 @@ void CShower::Touch( CBaseEntity *pOther )
 	if ( (vecNewVelocity.x*vecNewVelocity.x+vecNewVelocity.y*vecNewVelocity.y) < 10.0 )
 		m_flSpeed = 0;
 
-	SetAbsVelocity( vecNewVelocity );
+	GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 }
 
 
@@ -242,14 +242,14 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 	SetModelName( NULL_STRING );//invisible
 	SetSolid( SOLID_NONE );// intangible
 
-	Vector vecSpot = GetAbsOrigin() + Vector( 0 , 0 , 8 );
+	Vector vecSpot = GetEngineObject()->GetAbsOrigin() + Vector( 0 , 0 , 8 );
 	UTIL_TraceLine( vecSpot, vecSpot + Vector( 0, 0, -40 ), (MASK_SOLID_BRUSHONLY | MASK_WATER), this, COLLISION_GROUP_NONE, &tr );
 	
 	// Pull out of the wall a bit. We used to move the explosion origin itself, but that seems unnecessary, not to mention a
 	// little weird when you consider that it might be in hierarchy. Instead we just calculate a new virtual position at
 	// which to place the explosion. We don't use that new position to calculate radius damage because according to Steve's
 	// comment, that adversely affects the force vector imparted on explosion victims when they ragdoll.
-	Vector vecExplodeOrigin = GetAbsOrigin();
+	Vector vecExplodeOrigin = GetEngineObject()->GetAbsOrigin();
 	if ( tr.fraction != 1.0 )
 	{
 		vecExplodeOrigin = tr.endpos + (tr.plane.normal * 24 );
@@ -341,18 +341,18 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 		if ( m_flDamageForce )
 		{
 			// Not the right direction, but it'll be fixed up by RadiusDamage.
-			info.SetDamagePosition( GetAbsOrigin() );
+			info.SetDamagePosition(GetEngineObject()->GetAbsOrigin() );
 			info.SetDamageForce( Vector( m_flDamageForce, 0, 0 ) );
 		}
 
-		RadiusDamage( info, GetAbsOrigin(), iRadius, m_iClassIgnore, m_hEntityIgnore.Get() );
+		RadiusDamage( info, GetEngineObject()->GetAbsOrigin(), iRadius, m_iClassIgnore, m_hEntityIgnore.Get() );
 	}
 
 	SetThink( &CEnvExplosion::Smoke );
 	SetNextThink( gpGlobals->curtime + 0.3 );
 
 	// Only do these effects if we're not submerged
-	if ( UTIL_PointContents( GetAbsOrigin() ) & CONTENTS_WATER )
+	if ( UTIL_PointContents(GetEngineObject()->GetAbsOrigin() ) & CONTENTS_WATER )
 	{
 		// draw sparks
 		if ( !( m_spawnflags & SF_ENVEXPLOSION_NOSPARKS ) )

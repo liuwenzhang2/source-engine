@@ -149,7 +149,7 @@ void CSquidSpit:: Spawn( void )
 	SetRenderColorA( 255 );
 	SetModel( "" );
 
-	SetSprite( CSprite::SpriteCreate( "sprites/bigspit.vmt", GetAbsOrigin(), true ) );
+	SetSprite( CSprite::SpriteCreate( "sprites/bigspit.vmt", GetEngineObject()->GetAbsOrigin(), true ) );
 	
 	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0) );
 
@@ -162,7 +162,7 @@ void CSquidSpit::Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVelocity
 	pSpit->Spawn();
 	
 	UTIL_SetOrigin( pSpit, vecStart );
-	pSpit->SetAbsVelocity( vecVelocity );
+	pSpit->GetEngineObject()->SetAbsVelocity( vecVelocity );
 	pSpit->SetOwnerEntity( pOwner );
 
 	CSprite *pSprite = (CSprite*)pSpit->GetSprite();
@@ -234,7 +234,7 @@ void CSquidSpit::Touch ( CBaseEntity *pOther )
 	if ( !pOther->m_takedamage )
 	{
 		// make a splat on the wall
-		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + GetAbsVelocity() * 10, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 10, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 		UTIL_DecalTrace(&tr, "BeerSplash" );
 
 		// make some flecks
@@ -246,7 +246,7 @@ void CSquidSpit::Touch ( CBaseEntity *pOther )
 	else
 	{
 		CTakeDamageInfo info( this, this, sk_bullsquid_dmg_spit.GetFloat(), DMG_BULLET );
-		CalculateBulletDamageForce( &info, GetAmmoDef()->Index("9mmRound"), GetAbsVelocity(), GetAbsOrigin() );
+		CalculateBulletDamageForce( &info, GetAmmoDef()->Index("9mmRound"), GetEngineObject()->GetAbsVelocity(), GetEngineObject()->GetAbsOrigin() );
 		pOther->TakeDamage( info );
 	}
 
@@ -422,13 +422,13 @@ void CNPC_Bullsquid::HandleAnimEvent( animevent_t *pEvent )
 				Vector	vecSpitDir;
 				Vector  vRight, vUp, vForward;
 
-				AngleVectors ( GetAbsAngles(), &vForward, &vRight, &vUp );
+				AngleVectors (GetEngineObject()->GetAbsAngles(), &vForward, &vRight, &vUp );
 
 				// !!!HACKHACK - the spot at which the spit originates (in front of the mouth) was measured in 3ds and hardcoded here.
 				// we should be able to read the position of bones at runtime for this info.
 				vecSpitOffset = ( vRight * 8 + vForward * 60 + vUp * 50 );		
-				vecSpitOffset = ( GetAbsOrigin() + vecSpitOffset );
-				vecSpitDir = ( ( GetEnemy()->BodyTarget( GetAbsOrigin() ) ) - vecSpitOffset );
+				vecSpitOffset = (GetEngineObject()->GetAbsOrigin() + vecSpitOffset );
+				vecSpitDir = ( ( GetEnemy()->BodyTarget(GetEngineObject()->GetAbsOrigin() ) ) - vecSpitOffset );
 
 				VectorNormalize( vecSpitDir );
 
@@ -450,9 +450,9 @@ void CNPC_Bullsquid::HandleAnimEvent( animevent_t *pEvent )
 			if ( pHurt )
 			{
 				Vector forward, up;
-				AngleVectors( GetAbsAngles(), &forward, NULL, &up );
-				pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() - (forward * 100) );
-				pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() + (up * 100) );
+				AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, NULL, &up );
+				pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() - (forward * 100) );
+				pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() + (up * 100) );
 				pHurt->SetGroundEntity( NULL );
 			}
 		}
@@ -464,13 +464,13 @@ void CNPC_Bullsquid::HandleAnimEvent( animevent_t *pEvent )
 			if ( pHurt ) 
 			{
 				Vector right, up;
-				AngleVectors( GetAbsAngles(), NULL, &right, &up );
+				AngleVectors(GetEngineObject()->GetAbsAngles(), NULL, &right, &up );
 
 				if ( pHurt->GetFlags() & ( FL_NPC | FL_CLIENT ) )
 					 pHurt->ViewPunch( QAngle( 20, 0, -20 ) );
 			
-				pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() + (right * 200) );
-				pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() + (up * 100) );
+				pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() + (right * 200) );
+				pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() + (up * 100) );
 			}
 		}
 		break;
@@ -493,9 +493,9 @@ void CNPC_Bullsquid::HandleAnimEvent( animevent_t *pEvent )
 			}
 
 			// jump into air for 0.8 (24/30) seconds
-			Vector vecVel = GetAbsVelocity();
+			Vector vecVel = GetEngineObject()->GetAbsVelocity();
 			vecVel.z += ( 0.625 * flGravity ) * 0.5;
-			SetAbsVelocity( vecVel );
+			GetEngineObject()->SetAbsVelocity( vecVel );
 		}
 		break;
 
@@ -512,14 +512,14 @@ void CNPC_Bullsquid::HandleAnimEvent( animevent_t *pEvent )
 					g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Bullsquid.Bite" );
 
 					// screeshake transforms the viewmodel as well as the viewangle. No problems with seeing the ends of the viewmodels.
-					UTIL_ScreenShake( pHurt->GetAbsOrigin(), 25.0, 1.5, 0.7, 2, SHAKE_START );
+					UTIL_ScreenShake( pHurt->GetEngineObject()->GetAbsOrigin(), 25.0, 1.5, 0.7, 2, SHAKE_START );
 
 					if ( pHurt->IsPlayer() )
 					{
 						Vector forward, up;
-						AngleVectors( GetAbsAngles(), &forward, NULL, &up );
+						AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, NULL, &up );
 				
-						pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() + forward * 300 + up * 300 );
+						pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() + forward * 300 + up * 300 );
 					}
 				}
 			}
@@ -542,7 +542,7 @@ int CNPC_Bullsquid::RangeAttack1Conditions( float flDot, float flDist )
 	{
 		if ( GetEnemy() != NULL )
 		{
-			if ( fabs( GetAbsOrigin().z - GetEnemy()->GetAbsOrigin().z ) > 256 )
+			if ( fabs(GetEngineObject()->GetAbsOrigin().z - GetEnemy()->GetEngineObject()->GetAbsOrigin().z ) > 256 )
 			{
 				// don't try to spit at someone up really high or down really low.
 				return( COND_NONE );
@@ -760,7 +760,7 @@ void CNPC_Bullsquid::RunAI ( void )
 	if ( GetEnemy() != NULL && GetActivity() == ACT_RUN )
 	{
 		// chasing enemy. Sprint for last bit
-		if ( (GetAbsOrigin() - GetEnemy()->GetAbsOrigin()).Length2D() < SQUID_SPRINT_DIST )
+		if ( (GetEngineObject()->GetAbsOrigin() - GetEnemy()->GetEngineObject()->GetAbsOrigin()).Length2D() < SQUID_SPRINT_DIST )
 		{
 			m_flPlaybackRate = 1.25;
 		}
@@ -880,7 +880,7 @@ int CNPC_Bullsquid::SelectSchedule( void )
 //=========================================================
 bool CNPC_Bullsquid::FInViewCone ( Vector pOrigin )
 {
-	Vector los = ( pOrigin - GetAbsOrigin() );
+	Vector los = ( pOrigin - GetEngineObject()->GetAbsOrigin() );
 
 	// do this in 2D
 	los.z = 0;
@@ -938,7 +938,7 @@ void CNPC_Bullsquid::StartTask ( const Task_t *pTask )
 			
 			if ( GetEnemy() )
 			{
-				Vector	vecFacing = ( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() );
+				Vector	vecFacing = ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 				VectorNormalize( vecFacing );
 
 				GetMotor()->SetIdealYaw( vecFacing );
@@ -971,7 +971,7 @@ void CNPC_Bullsquid::RunTask ( const Task_t *pTask )
 		{
 			if ( GetEnemy() )
 			{
-				Vector	vecFacing = ( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() );
+				Vector	vecFacing = ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 				VectorNormalize( vecFacing );
 				GetMotor()->SetIdealYaw( vecFacing );
 			}

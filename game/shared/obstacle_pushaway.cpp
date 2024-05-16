@@ -173,7 +173,7 @@ int GetPushawayEnts( CBaseCombatCharacter *pPushingEntity, CBaseEntity **ents, i
 	Vector vExpand( flPlayerExpand, flPlayerExpand, flPlayerExpand );
 
 	Ray_t ray;
-	ray.Init( pPushingEntity->GetAbsOrigin(), pPushingEntity->GetAbsOrigin(), pPushingEntity->GetCollideable()->OBBMins() - vExpand, pPushingEntity->GetCollideable()->OBBMaxs() + vExpand );
+	ray.Init( pPushingEntity->GetEngineObject()->GetAbsOrigin(), pPushingEntity->GetEngineObject()->GetAbsOrigin(), pPushingEntity->GetCollideable()->OBBMins() - vExpand, pPushingEntity->GetCollideable()->OBBMaxs() + vExpand );
 
 	CPushAwayEnumerator *physPropEnum = NULL;
 	if  ( !enumerator )
@@ -312,7 +312,7 @@ void PerformObstaclePushaway( CBaseCombatCharacter *pPushingEntity )
 
 		if ( pInterface && pInterface->GetMultiplayerPhysicsMode() == PHYSICS_MULTIPLAYER_SOLID )
 		{
-			if ( pPushingEntity->GetAbsVelocity().Length2D() < sv_pushaway_min_player_speed.GetFloat() )
+			if ( pPushingEntity->GetEngineObject()->GetAbsVelocity().Length2D() < sv_pushaway_min_player_speed.GetFloat() )
 				continue;
 		}
 

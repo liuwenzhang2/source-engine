@@ -470,7 +470,7 @@ void CSprite::GetToolRecordingState( KeyValues *msg )
 
 			// override position if we're driven by an attachment
 			QAngle temp;
-			pState->m_vecRenderOrigin = GetAbsOrigin();
+			pState->m_vecRenderOrigin = GetEngineObject()->GetAbsOrigin();
 			ent->GetAttachment( m_nAttachment, pState->m_vecRenderOrigin, temp );
 
 			// override viewmodel if we're driven by an attachment

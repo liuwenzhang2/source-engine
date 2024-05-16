@@ -38,7 +38,7 @@ public:
 	{
 		if ( m_distSq != 0 )
 		{
-			float distSq = ( pEntity1->GetAbsOrigin() - pEntity2->GetAbsOrigin() ).LengthSqr();
+			float distSq = ( pEntity1->GetEngineObject()->GetAbsOrigin() - pEntity2->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 			bool fInside = ( distSq < m_distSq );
 
 			return ( m_fInside == fInside );

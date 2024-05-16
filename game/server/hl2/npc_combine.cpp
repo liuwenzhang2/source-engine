@@ -413,7 +413,7 @@ void CNPC_Combine::GatherConditions()
 			if( GetEnemy() != NULL && !HasCondition(COND_ENEMY_OCCLUDED) )
 			{
 				// Now we're close to our enemy, stop using the tactical variant.
-				if( GetAbsOrigin().DistToSqr(GetEnemy()->GetAbsOrigin()) < Square(30.0f * 12.0f) )
+				if(GetEngineObject()->GetAbsOrigin().DistToSqr(GetEnemy()->GetEngineObject()->GetAbsOrigin()) < Square(30.0f * 12.0f) )
 					m_iTacticalVariant = TACTICAL_VARIANT_DEFAULT;
 			}
 		}
@@ -771,7 +771,7 @@ void CNPC_Combine::StartTask( const Task_t *pTask )
 
 					GetVectors( NULL, &right, NULL );
 
-					tosound = pSound->GetSoundReactOrigin() - GetAbsOrigin();
+					tosound = pSound->GetSoundReactOrigin() - GetEngineObject()->GetAbsOrigin();
 					VectorNormalize( tosound);
 
 					tosound.z = 0;
@@ -867,7 +867,7 @@ void CNPC_Combine::StartTask( const Task_t *pTask )
 			float flMaxRange = 2000;
 			float flMinRange = 0;
 
-			Vector vecEnemy = m_hForcedGrenadeTarget->GetAbsOrigin();
+			Vector vecEnemy = m_hForcedGrenadeTarget->GetEngineObject()->GetAbsOrigin();
 			Vector vecEnemyEye = vecEnemy + m_hForcedGrenadeTarget->GetViewOffset();
 
 			Vector posLos;
@@ -1091,7 +1091,7 @@ void CNPC_Combine::RunTask( const Task_t *pTask )
 	case TASK_COMBINE_FACE_TOSS_DIR:
 		{
 			// project a point along the toss vector and turn to face that point.
-			GetMotor()->SetIdealYawToTargetAndUpdate( GetLocalOrigin() + m_vecTossVelocity * 64, AI_KEEP_YAW_SPEED );
+			GetMotor()->SetIdealYawToTargetAndUpdate(GetEngineObject()->GetLocalOrigin() + m_vecTossVelocity * 64, AI_KEEP_YAW_SPEED );
 
 			if ( FacingIdeal() )
 			{
@@ -1112,7 +1112,7 @@ void CNPC_Combine::RunTask( const Task_t *pTask )
 			{
 				ClearTaskInterrupt();
 
-				Vector vecEnemy = m_hForcedGrenadeTarget->GetAbsOrigin();
+				Vector vecEnemy = m_hForcedGrenadeTarget->GetEngineObject()->GetAbsOrigin();
 				AI_NavGoal_t goal( m_vInterruptSavePosition, ACT_RUN, AIN_HULL_TOLERANCE );
 
 				GetNavigator()->SetGoal( goal, AIN_CLEAR_TARGET );
@@ -2018,7 +2018,7 @@ int CNPC_Combine::SelectScheduleAttack()
 		float flDist;
 
 		flTime = gpGlobals->curtime - GetEnemies()->LastTimeSeen( GetEnemy() );
-		flDist = ( GetEnemy()->GetAbsOrigin() - GetEnemies()->LastSeenPosition( GetEnemy() ) ).Length();
+		flDist = ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEnemies()->LastSeenPosition( GetEnemy() ) ).Length();
 
 		//Msg("Time: %f   Dist: %f\n", flTime, flDist );
 		if ( flTime <= COMBINE_GRENADE_FLUSH_TIME && flDist <= COMBINE_GRENADE_FLUSH_DIST && CanGrenadeEnemy( false ) && OccupyStrategySlot( SQUAD_SLOT_GRENADE1 ) )
@@ -2213,7 +2213,7 @@ int CNPC_Combine::TranslateSchedule( int scheduleType )
 				// See if we can crouch and shoot
 				if (GetEnemy() != NULL)
 				{
-					float dist = (GetLocalOrigin() - GetEnemy()->GetLocalOrigin()).Length();
+					float dist = (GetEngineObject()->GetLocalOrigin() - GetEnemy()->GetEngineObject()->GetLocalOrigin()).Length();
 
 					// only crouch if they are relatively far away
 					if (dist > COMBINE_MIN_CROUCH_DISTANCE)
@@ -2221,10 +2221,10 @@ int CNPC_Combine::TranslateSchedule( int scheduleType )
 						// try crouching
 						Crouch();
 
-						Vector targetPos = GetEnemy()->BodyTarget(GetActiveWeapon()->GetLocalOrigin());
+						Vector targetPos = GetEnemy()->BodyTarget(GetActiveWeapon()->GetEngineObject()->GetLocalOrigin());
 
 						// if we can't see it crouched, stand up
-						if (!WeaponLOSCondition(GetLocalOrigin(),targetPos,false))
+						if (!WeaponLOSCondition(GetEngineObject()->GetLocalOrigin(),targetPos,false))
 						{
 							Stand();
 						}
@@ -2267,7 +2267,7 @@ int CNPC_Combine::TranslateSchedule( int scheduleType )
 #define MIN_SIGNAL_DIST	256
 			if ( GetEnemy() != NULL && GetEnemy()->IsPlayer() && m_bFirstEncounter )
 			{
-				float flDistToEnemy = ( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() ).Length();
+				float flDistToEnemy = ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length();
 
 				if( flDistToEnemy >= MIN_SIGNAL_DIST )
 				{
@@ -2488,7 +2488,7 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 				if (pBCC)
 				{
 					Vector forward, up;
-					AngleVectors( GetLocalAngles(), &forward, NULL, &up );
+					AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, NULL, &up );
 
 					if ( !pBCC->DispatchInteraction( g_interactionCombineBash, NULL, this ) )
 					{
@@ -2499,7 +2499,7 @@ void CNPC_Combine::HandleAnimEvent( animevent_t *pEvent )
 						}
 
 						CTakeDamageInfo info( this, this, m_nKickDamage, DMG_CLUB );
-						CalculateMeleeDamageForce( &info, forward, pBCC->GetAbsOrigin() );
+						CalculateMeleeDamageForce( &info, forward, pBCC->GetEngineObject()->GetAbsOrigin() );
 						pBCC->TakeDamage( info );
 
 						const char* soundname = "NPC_Combine.WeaponBash";
@@ -2562,22 +2562,22 @@ Vector CNPC_Combine::Weapon_ShootPosition( )
 	{
 		if( HasShotgun() )
 		{
-			return GetAbsOrigin() + COMBINE_SHOTGUN_STANDING_POSITION + right * 8;
+			return GetEngineObject()->GetAbsOrigin() + COMBINE_SHOTGUN_STANDING_POSITION + right * 8;
 		}
 		else
 		{
-			return GetAbsOrigin() + COMBINE_GUN_STANDING_POSITION + right * 8;
+			return GetEngineObject()->GetAbsOrigin() + COMBINE_GUN_STANDING_POSITION + right * 8;
 		}
 	}
 	else
 	{
 		if( HasShotgun() )
 		{
-			return GetAbsOrigin() + COMBINE_SHOTGUN_CROUCHING_POSITION + right * 8;
+			return GetEngineObject()->GetAbsOrigin() + COMBINE_SHOTGUN_CROUCHING_POSITION + right * 8;
 		}
 		else
 		{
-			return GetAbsOrigin() + COMBINE_GUN_CROUCHING_POSITION + right * 8;
+			return GetEngineObject()->GetAbsOrigin() + COMBINE_GUN_CROUCHING_POSITION + right * 8;
 		}
 	}
 }
@@ -2816,7 +2816,7 @@ bool CNPC_Combine::CanThrowGrenade( const Vector &vecTarget )
 	}
 
 	float flDist;
-	flDist = ( vecTarget - GetAbsOrigin() ).Length();
+	flDist = ( vecTarget - GetEngineObject()->GetAbsOrigin() ).Length();
 
 	if( flDist > 1024 || flDist < 128 )
 	{
@@ -3034,7 +3034,7 @@ int CNPC_Combine::MeleeAttack1Conditions ( float flDot, float flDist )
 	}
 
 	// Check Z
-	if ( GetEnemy() && fabs(GetEnemy()->GetAbsOrigin().z - GetAbsOrigin().z) > 64 )
+	if ( GetEnemy() && fabs(GetEnemy()->GetEngineObject()->GetAbsOrigin().z - GetEngineObject()->GetAbsOrigin().z) > 64 )
 		return COND_NONE;
 
 	if ( dynamic_cast<CBaseHeadcrab *>(GetEnemy()) != NULL )
@@ -3066,11 +3066,11 @@ Vector CNPC_Combine::EyePosition( void )
 {
 	if ( !IsCrouching() )
 	{
-		return GetAbsOrigin() + COMBINE_EYE_STANDING_POSITION;
+		return GetEngineObject()->GetAbsOrigin() + COMBINE_EYE_STANDING_POSITION;
 	}
 	else
 	{
-		return GetAbsOrigin() + COMBINE_EYE_CROUCHING_POSITION;
+		return GetEngineObject()->GetAbsOrigin() + COMBINE_EYE_CROUCHING_POSITION;
 	}
 
 	/*
@@ -3263,7 +3263,7 @@ bool CNPC_Combine::HandleInteraction(int interactionType, void *data, CBaseComba
 		{
 			// It's still my enemy. Time to grenade it.
 			Vector forward, up;
-			AngleVectors( GetLocalAngles(), &forward, NULL, &up );
+			AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, NULL, &up );
 			m_vecTossVelocity = forward * 10;
 			SetCondition( COND_COMBINE_DROP_GRENADE );
 			ClearSchedule( "Failed to kick over turret" );

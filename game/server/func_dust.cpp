@@ -325,9 +325,9 @@ END_DATADESC()
 void CEnvDustPuff::InputSpawnDust( inputdata_t &inputdata )
 {
 	Vector dir;
-	AngleVectors( GetAbsAngles(), &dir );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &dir );
 
 	VectorNormalize( dir );
 
-	g_pEffects->Dust( GetAbsOrigin(), dir, m_flScale, m_flSpeed );
+	g_pEffects->Dust(GetEngineObject()->GetAbsOrigin(), dir, m_flScale, m_flSpeed );
 }

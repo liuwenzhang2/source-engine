@@ -134,7 +134,7 @@ void CWeapon357::PrimaryAttack( void )
 	pPlayer->FireBullets( info );
 
 	//Disorient the player
-	QAngle angles = pPlayer->GetLocalAngles();
+	QAngle angles = pPlayer->GetEngineObject()->GetLocalAngles();
 
 	angles.x += random->RandomInt( -1, 1 );
 	angles.y += random->RandomInt( -1, 1 );

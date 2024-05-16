@@ -63,10 +63,10 @@ void CWorldItem::Spawn( void )
 	switch (m_iType) 
 	{
 	case 44: // ITEM_BATTERY:
-		pEntity = CBaseEntity::Create( "item_battery", GetLocalOrigin(), GetLocalAngles() );
+		pEntity = CBaseEntity::Create( "item_battery", GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles() );
 		break;
 	case 45: // ITEM_SUIT:
-		pEntity = CBaseEntity::Create( "item_suit", GetLocalOrigin(), GetLocalAngles() );
+		pEntity = CBaseEntity::Create( "item_suit", GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles() );
 		break;
 	}
 
@@ -135,7 +135,7 @@ bool CItem::CreateItemVPhysicsObject( void )
 		// If it's not physical, drop it to the floor
 		if (UTIL_DropToFloor(this, MASK_SOLID) == 0)
 		{
-			Warning( "Item %s fell out of level at %f,%f,%f\n", GetClassname(), GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z);
+			Warning( "Item %s fell out of level at %f,%f,%f\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z);
 			UTIL_Remove( this );
 			return false;
 		}
@@ -300,8 +300,8 @@ void CItem::FallThink ( void )
 	{
 		SetThink ( NULL );
 
-		m_vOriginalSpawnOrigin = GetAbsOrigin();
-		m_vOriginalSpawnAngles = GetAbsAngles();
+		m_vOriginalSpawnOrigin = GetEngineObject()->GetAbsOrigin();
+		m_vOriginalSpawnAngles = GetEngineObject()->GetAbsAngles();
 
 		HL2MPRules()->AddLevelDesignerPlacedObject( this );
 	}
@@ -470,7 +470,7 @@ CBaseEntity* CItem::Respawn( void )
 	AddSolidFlags( FSOLID_TRIGGER );
 
 	UTIL_SetOrigin( this, g_pGameRules->VecItemRespawnSpot( this ) );// blip to whereever you should respawn.
-	SetAbsAngles( g_pGameRules->VecItemRespawnAngles( this ) );// set the angles.
+	GetEngineObject()->SetAbsAngles( g_pGameRules->VecItemRespawnAngles( this ) );// set the angles.
 
 #if !defined( TF_DLL )
 	UTIL_DropToFloor( this, MASK_SOLID );

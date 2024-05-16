@@ -1399,7 +1399,7 @@ void CCSBotManager::ExtractScenarioData( void )
 				entity->CollisionProp()->WorldSpaceAABB( &absmin, &absmax );
 
 				m_zone[ m_zoneCount ].m_isBlocked = false;
-				m_zone[ m_zoneCount ].m_center = (isLegacy) ? entity->GetAbsOrigin() : (absmin + absmax)/2.0f;
+				m_zone[ m_zoneCount ].m_center = (isLegacy) ? entity->GetEngineObject()->GetAbsOrigin() : (absmin + absmax)/2.0f;
 				m_zone[ m_zoneCount ].m_isLegacy = isLegacy;
 				m_zone[ m_zoneCount ].m_index = m_zoneCount;
 				m_zone[ m_zoneCount++ ].m_entity = entity;
@@ -1422,7 +1422,7 @@ void CCSBotManager::ExtractScenarioData( void )
 			if (m_zoneCount < MAX_ZONES)
 			{
 				m_zone[ m_zoneCount ].m_isBlocked = false;
-				m_zone[ m_zoneCount ].m_center = entity->GetAbsOrigin();
+				m_zone[ m_zoneCount ].m_center = entity->GetEngineObject()->GetAbsOrigin();
 				m_zone[ m_zoneCount ].m_isLegacy = true;
 				m_zone[ m_zoneCount ].m_index = m_zoneCount;
 				m_zone[ m_zoneCount++ ].m_entity = entity;
@@ -1797,7 +1797,7 @@ static CBaseEntity * SelectSpawnSpot( const char *pEntClassName )
 		if ( pSpot )
 		{
 			// check if pSpot is valid
-			if ( pSpot->GetAbsOrigin() == Vector( 0, 0, 0 ) )
+			if ( pSpot->GetEngineObject()->GetAbsOrigin() == Vector( 0, 0, 0 ) )
 			{
 				pSpot = gEntList.FindEntityByClassname( pSpot, pEntClassName );
 				continue;
@@ -1828,7 +1828,7 @@ void CCSBotManager::CheckForBlockedZones( void )
 	if ( !pSpot )
 		return;
 
-	Vector spawnPos = pSpot->GetAbsOrigin();
+	Vector spawnPos = pSpot->GetEngineObject()->GetAbsOrigin();
 	CNavArea *spawnArea = TheNavMesh->GetNearestNavArea( spawnPos );
 	if ( !spawnArea )
 		return;
@@ -2049,7 +2049,7 @@ void CCSBotManager::SetLooseBomb( CBaseEntity *bomb )
 
 	if (bomb)
 	{
-		m_looseBombArea = TheNavMesh->GetNearestNavArea( bomb->GetAbsOrigin() );
+		m_looseBombArea = TheNavMesh->GetNearestNavArea( bomb->GetEngineObject()->GetAbsOrigin() );
 	}
 	else
 	{

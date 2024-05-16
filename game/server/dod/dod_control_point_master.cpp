@@ -174,7 +174,7 @@ bool CControlPointMaster::FindControlPoints( void )
 
 		g_pObjectiveResource->SetOwningTeam( iPointIndex, pPoint->GetOwner() );
 		g_pObjectiveResource->SetCPVisible( iPointIndex, pPoint->PointIsVisible() );
-		g_pObjectiveResource->SetCPPosition( iPointIndex, pPoint->GetAbsOrigin() );
+		g_pObjectiveResource->SetCPPosition( iPointIndex, pPoint->GetEngineObject()->GetAbsOrigin() );
 	
 		g_pObjectiveResource->SetBombsRequired( iPointIndex, pPoint->GetBombsRequired() );
 		g_pObjectiveResource->SetBombsRemaining( iPointIndex, pPoint->GetBombsRemaining() );

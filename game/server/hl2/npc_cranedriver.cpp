@@ -175,8 +175,8 @@ int CNPC_CraneDriver::RangeAttack1Conditions( float flDot, float flDist )
 		return COND_NONE;
 
 	// Do our distance check in 2D
-	Vector2D vecOrigin2D( m_hCrane->GetAbsOrigin().x, m_hCrane->GetAbsOrigin().y );
-	Vector2D vecEnemy2D( GetEnemy()->GetAbsOrigin().x, GetEnemy()->GetAbsOrigin().y );
+	Vector2D vecOrigin2D( m_hCrane->GetEngineObject()->GetAbsOrigin().x, m_hCrane->GetEngineObject()->GetAbsOrigin().y );
+	Vector2D vecEnemy2D( GetEnemy()->GetEngineObject()->GetAbsOrigin().x, GetEnemy()->GetEngineObject()->GetAbsOrigin().y );
 	flDist = (vecOrigin2D - vecEnemy2D).Length();
 
 	// Maximum & Minimum size of the crane's reach
@@ -308,7 +308,7 @@ void CNPC_CraneDriver::StartTask( const Task_t *pTask )
 				return;
 			}
 
-			SetDesiredPosition( GetEnemy()->GetAbsOrigin() );
+			SetDesiredPosition( GetEnemy()->GetEngineObject()->GetAbsOrigin() );
 			TaskComplete();
 		}
 		break;
@@ -321,7 +321,7 @@ void CNPC_CraneDriver::StartTask( const Task_t *pTask )
 				return;
 			}
 
-			SetDesiredPosition( m_hPickupTarget->GetAbsOrigin() );
+			SetDesiredPosition( m_hPickupTarget->GetEngineObject()->GetAbsOrigin() );
 			TaskComplete();
 		}
 		break;
@@ -363,7 +363,7 @@ void CNPC_CraneDriver::StartTask( const Task_t *pTask )
 
 	case TASK_CRANE_FIND_OBJECT_TO_PICKUP:
 		{
-			Vector2D vecOrigin2D( m_hCrane->GetAbsOrigin().x, m_hCrane->GetAbsOrigin().y );
+			Vector2D vecOrigin2D( m_hCrane->GetEngineObject()->GetAbsOrigin().x, m_hCrane->GetEngineObject()->GetAbsOrigin().y );
 
 			// Find a large physics object within our reach to pickup
 			float flLargestMass = 0;
@@ -371,7 +371,7 @@ void CNPC_CraneDriver::StartTask( const Task_t *pTask )
 			
 			CBaseEntity *pList[1024];
 			Vector delta( m_flDistTooFar, m_flDistTooFar, m_flDistTooFar*2 );
-			int count = UTIL_EntitiesInBox( pList, 1024, m_hCrane->GetAbsOrigin() - delta, m_hCrane->GetAbsOrigin() + delta, 0 );
+			int count = UTIL_EntitiesInBox( pList, 1024, m_hCrane->GetEngineObject()->GetAbsOrigin() - delta, m_hCrane->GetEngineObject()->GetAbsOrigin() + delta, 0 );
 			for ( int i = 0; i < count; i++ )
 			{
 				if ( !pList[i] ) 
@@ -393,8 +393,8 @@ void CNPC_CraneDriver::StartTask( const Task_t *pTask )
 
 						// Now make sure it's within our reach
 						// Do our distance check in 2D
-						Vector2D vecOrigin2D( m_hCrane->GetAbsOrigin().x, m_hCrane->GetAbsOrigin().y );
-						Vector2D vecEnemy2D( pList[i]->GetAbsOrigin().x, pList[i]->GetAbsOrigin().y );
+						Vector2D vecOrigin2D( m_hCrane->GetEngineObject()->GetAbsOrigin().x, m_hCrane->GetEngineObject()->GetAbsOrigin().y );
+						Vector2D vecEnemy2D( pList[i]->GetEngineObject()->GetAbsOrigin().x, pList[i]->GetEngineObject()->GetAbsOrigin().y );
 						float flDist = (vecOrigin2D - vecEnemy2D).Length();
 						// Maximum & Minimum size of the crane's reach
 						if ( flDist > MAX_CRANE_FLAT_REACH )
@@ -539,11 +539,11 @@ void CNPC_CraneDriver::DriveVehicle( void )
 	// Track our targets
 	if ( m_hPickupTarget )
 	{
-		vecTarget = m_hPickupTarget->GetAbsOrigin();
+		vecTarget = m_hPickupTarget->GetEngineObject()->GetAbsOrigin();
 	}
 	else if ( !m_bForcedPickup && !m_bForcedDropoff && GetEnemy() )
 	{
-		vecTarget = GetEnemy()->GetAbsOrigin();
+		vecTarget = GetEnemy()->GetEngineObject()->GetAbsOrigin();
 	}
 
 	// Move the crane over the target
@@ -551,7 +551,7 @@ void CNPC_CraneDriver::DriveVehicle( void )
 	Vector vecCraneTip = m_hCrane->GetCraneTipPosition();
 	Vector2D vecCraneTip2D( vecCraneTip.x, vecCraneTip.y );
 	Vector2D vecTarget2D( vecTarget.x, vecTarget.y );
-	Vector2D vecOrigin2D( m_hCrane->GetAbsOrigin().x, m_hCrane->GetAbsOrigin().y );
+	Vector2D vecOrigin2D( m_hCrane->GetEngineObject()->GetAbsOrigin().x, m_hCrane->GetEngineObject()->GetAbsOrigin().y );
 
 	if ( g_debug_vehicledriver.GetInt() )
 	{
@@ -594,7 +594,7 @@ void CNPC_CraneDriver::DriveVehicle( void )
 	vecForward.z = 0;
 	VectorNormalize( vecRight );
 	VectorNormalize( vecForward );
-	Vector vecToTarget = ( vecTarget - m_hCrane->GetAbsOrigin() );
+	Vector vecToTarget = ( vecTarget - m_hCrane->GetEngineObject()->GetAbsOrigin() );
 	vecToTarget.z = 0;
 	VectorNormalize( vecToTarget );
 	float flDotRight = DotProduct( vecRight, vecToTarget );
@@ -660,7 +660,7 @@ void CNPC_CraneDriver::InputForceDrop( inputdata_t &inputdata )
 		}
 		m_bForcedPickup = false;
 		m_bForcedDropoff = true;
-		SetDesiredPosition( pEntity->GetAbsOrigin() );
+		SetDesiredPosition( pEntity->GetEngineObject()->GetAbsOrigin() );
 		SetCondition( COND_PROVOKED );
 		CLEARBITS( m_spawnflags, SF_VEHICLEDRIVER_INACTIVE );
 	}

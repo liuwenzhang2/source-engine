@@ -206,9 +206,9 @@ void CPointTemplate::AddTemplate( CBaseEntity *pEntity, const char *pszMapData, 
 
 	// Store the entity's origin & angles in a matrix in the template's local space
 	VMatrix matTemplateToWorld, matWorldToTemplate, matEntityToWorld, matEntityToTemplate;
-	matTemplateToWorld.SetupMatrixOrgAngles( GetAbsOrigin(), GetAbsAngles() );
+	matTemplateToWorld.SetupMatrixOrgAngles(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 	matTemplateToWorld.InverseTR( matWorldToTemplate );
-	matEntityToWorld.SetupMatrixOrgAngles( pEntity->GetAbsOrigin(), pEntity->GetAbsAngles() );
+	matEntityToWorld.SetupMatrixOrgAngles( pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles() );
 	MatrixMultiply( matWorldToTemplate, matEntityToWorld, matEntityToTemplate );
 
 	newTemplate.matEntityToTemplate = matEntityToTemplate;
@@ -372,8 +372,8 @@ bool CPointTemplate::CreateInstance( const Vector &vecOrigin, const QAngle &vecA
 		MatrixToAngles( matStoredLocalToWorld, vecNewAngles );
 
 		// Set its origin & angles
-		pEntity->SetAbsOrigin( vecNewOrigin );
-		pEntity->SetAbsAngles( vecNewAngles );
+		pEntity->GetEngineObject()->SetAbsOrigin( vecNewOrigin );
+		pEntity->GetEngineObject()->SetAbsAngles( vecNewAngles );
 
 		pSpawnList[i].m_pEntity = pEntity;
 		pSpawnList[i].m_nDepth = 0;
@@ -401,7 +401,7 @@ void CPointTemplate::InputForceSpawn( inputdata_t &inputdata )
 {
 	// Spawn our template
 	CUtlVector<CBaseEntity*> hNewEntities;
-	if ( !CreateInstance( GetAbsOrigin(), GetAbsAngles(), &hNewEntities ) )
+	if ( !CreateInstance(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &hNewEntities ) )
 		return;
 	
 	// Fire our output

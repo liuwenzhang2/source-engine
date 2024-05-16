@@ -169,7 +169,7 @@ void C_PropVehicleChoreoGeneric::PostDataUpdate( DataUpdateType_t updateType )
 		m_ViewSmoothingData.bWasRunningAnim = false;
 
 		//There's no need to "smooth" the view when leaving the vehicle so just set this here so the stair code doesn't get confused.
-		m_hPrevPlayer->SetOldPlayerZ( m_hPrevPlayer->GetLocalOrigin().z );
+		m_hPrevPlayer->SetOldPlayerZ( m_hPrevPlayer->GetEngineObject()->GetLocalOrigin().z );
 	}
 
 	m_ViewSmoothingData.bClampEyeAngles = m_vehicleView.bClampEyeAngles;

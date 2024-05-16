@@ -53,7 +53,7 @@ bool CHL1BaseNPC::NoFriendlyFire( void )
 	if ( GetEnemy() != NULL )
 	{
 		//!!!BUGBUG - to fix this, the planes must be aligned to where the monster will be firing its gun, not the direction it is facing!!!
-		VectorAngles( ( GetEnemy()->WorldSpaceCenter() - GetAbsOrigin() ), vAngleToEnemy );
+		VectorAngles( ( GetEnemy()->WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin() ), vAngleToEnemy );
 
 		AngleVectors ( vAngleToEnemy, &vForward, &vRight, &vUp );
 	}
@@ -63,13 +63,13 @@ bool CHL1BaseNPC::NoFriendlyFire( void )
 		return false;
 	}
 	
-	vecLeftSide = GetAbsOrigin() - ( vRight * ( WorldAlignSize().x * 1.5 ) );
-	vecRightSide = GetAbsOrigin() + ( vRight * ( WorldAlignSize().x * 1.5 ) );
+	vecLeftSide = GetEngineObject()->GetAbsOrigin() - ( vRight * ( WorldAlignSize().x * 1.5 ) );
+	vecRightSide = GetEngineObject()->GetAbsOrigin() + ( vRight * ( WorldAlignSize().x * 1.5 ) );
 	v_left = vRight * -1;
 
 	leftPlane.InitializePlane ( vRight, vecLeftSide );
 	rightPlane.InitializePlane ( v_left, vecRightSide );
-	backPlane.InitializePlane ( vForward, GetAbsOrigin() );
+	backPlane.InitializePlane ( vForward, GetEngineObject()->GetAbsOrigin() );
 
 	AISquadIter_t iter;
 	for ( CAI_BaseNPC *pSquadMember = m_pSquad->GetFirstMember( &iter ); pSquadMember; pSquadMember = m_pSquad->GetNextMember( &iter ) )
@@ -80,9 +80,9 @@ bool CHL1BaseNPC::NoFriendlyFire( void )
 		if ( pSquadMember == this )
 			 continue;
 
-		if ( backPlane.PointInFront  ( pSquadMember->GetAbsOrigin() ) &&
-				 leftPlane.PointInFront  ( pSquadMember->GetAbsOrigin() ) && 
-				 rightPlane.PointInFront ( pSquadMember->GetAbsOrigin()) )
+		if ( backPlane.PointInFront  ( pSquadMember->GetEngineObject()->GetAbsOrigin() ) &&
+				 leftPlane.PointInFront  ( pSquadMember->GetEngineObject()->GetAbsOrigin() ) &&
+				 rightPlane.PointInFront ( pSquadMember->GetEngineObject()->GetAbsOrigin()) )
 			{
 				// this guy is in the check volume! Don't shoot!
 				return false;
@@ -178,7 +178,7 @@ bool CHL1BaseNPC::CorpseGib( const CTakeDamageInfo &info )
 
 	DispatchEffect( "HL1Gib", data );
 
-	CSoundEnt::InsertSound( SOUND_MEAT, GetAbsOrigin(), 256, 0.5f, this );
+	CSoundEnt::InsertSound( SOUND_MEAT, GetEngineObject()->GetAbsOrigin(), 256, 0.5f, this );
 
 	BaseClass::CorpseGib( info );
 

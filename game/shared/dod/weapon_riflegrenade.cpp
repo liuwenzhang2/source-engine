@@ -163,7 +163,7 @@ extern ConVar dod_grenadegravity;
 		Vector vForward, vRight, vUp;
 		AngleVectors( angThrow, &vForward, &vRight, &vUp );
 
-		Vector eyes = pPlayer->GetAbsOrigin() + pPlayer->GetViewOffset();
+		Vector eyes = pPlayer->GetEngineObject()->GetAbsOrigin() + pPlayer->GetViewOffset();
 		Vector vecSrc = eyes; 	
 		Vector vecThrow = vForward * DOD_RIFLEGRENADE_SPEED;
 

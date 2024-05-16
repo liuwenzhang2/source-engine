@@ -254,7 +254,7 @@ void CGameWeaponManager::Think()
 			{
 				fRemovedOne = true;
 			}
-			else if ( UTIL_DistApprox( pPlayer->GetAbsOrigin(), pCandidate->GetAbsOrigin() ) > (30*12) )
+			else if ( UTIL_DistApprox( pPlayer->GetEngineObject()->GetAbsOrigin(), pCandidate->GetEngineObject()->GetAbsOrigin() ) > (30*12) )
 			{
 				fRemovedOne = true;
 			}

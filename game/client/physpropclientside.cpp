@@ -466,10 +466,10 @@ void C_PhysPropClientside::Break()
 	}
 	else
 	{
-		velocity = GetAbsVelocity();
+		velocity = GetEngineObject()->GetAbsVelocity();
 		QAngleToAngularImpulse( GetLocalAngularVelocity(), angVelocity );
-		origin = GetAbsOrigin();
-		angles = GetAbsAngles();
+		origin = GetEngineObject()->GetAbsOrigin();
+		angles = GetEngineObject()->GetAbsAngles();
 	}
 
 	breakablepropparams_t params( origin, angles, velocity, angVelocity );
@@ -508,8 +508,8 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 	pEntity->SetDmgModExplosive( GetDmgModExplosive() );
 	
 	pEntity->SetModelName( GetModelName() );
-	pEntity->SetLocalOrigin( GetLocalOrigin() );
-	pEntity->SetLocalAngles( GetLocalAngles() );
+	pEntity->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
+	pEntity->GetEngineObject()->SetLocalAngles(GetEngineObject()->GetLocalAngles() );
 	pEntity->SetOwnerEntity( this );
 	pEntity->SetPhysicsMode( PHYSICS_MULTIPLAYER_CLIENTSIDE );
 
@@ -747,8 +747,8 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 	}
 	
 	pEntity->SetModelName( AllocPooledString( pModel->modelName ) );
-	pEntity->SetLocalOrigin( position );
-	pEntity->SetLocalAngles( angles );
+	pEntity->GetEngineObject()->SetLocalOrigin( position );
+	pEntity->GetEngineObject()->SetLocalAngles( angles );
 	pEntity->SetOwnerEntity( pOwner );
 	pEntity->SetPhysicsMode( PHYSICS_MULTIPLAYER_CLIENTSIDE );
 
@@ -916,8 +916,8 @@ void C_FuncPhysicsRespawnZone::InitializePropsWithin( void )
 			// This is a crappy way to do this
 			int index = m_PropList.AddToTail();
 			m_PropList[index].iszModelName = pProp->GetModelName();
-			m_PropList[index].vecOrigin = pProp->GetAbsOrigin();
-			m_PropList[index].vecAngles = pProp->GetAbsAngles();
+			m_PropList[index].vecOrigin = pProp->GetEngineObject()->GetAbsOrigin();
+			m_PropList[index].vecAngles = pProp->GetEngineObject()->GetAbsAngles();
 			m_PropList[index].iSkin = pProp->m_nSkin;
 			m_PropList[index].iHealth = pProp->m_iHealth;
 			m_PropList[index].iSpawnFlags = pProp->m_spawnflags;
@@ -983,8 +983,8 @@ void C_FuncPhysicsRespawnZone::RespawnProps( void )
 			{
 				pEntity->m_spawnflags = m_PropList[i].iSpawnFlags;
 				pEntity->SetModelName( m_PropList[i].iszModelName );
-				pEntity->SetAbsOrigin( m_PropList[i].vecOrigin );
-				pEntity->SetAbsAngles( m_PropList[i].vecAngles );
+				pEntity->GetEngineObject()->SetAbsOrigin( m_PropList[i].vecOrigin );
+				pEntity->GetEngineObject()->SetAbsAngles( m_PropList[i].vecAngles );
 				pEntity->SetPhysicsMode( PHYSICS_MULTIPLAYER_CLIENTSIDE );
 				pEntity->m_nSkin = m_PropList[i].iSkin;
 				pEntity->m_iHealth = m_PropList[i].iHealth;
@@ -1015,16 +1015,16 @@ void C_FuncPhysicsRespawnZone::RespawnProps( void )
 					Vector vecMins, vecMaxs;
 					pEntity->CollisionProp()->WorldSpaceSurroundingBounds( &vecMins, &vecMaxs );
 					if ( !CanMovePropAt( m_PropList[i].vecOrigin, vecMins, vecMaxs ) || 
-						 !CanMovePropAt( pEntity->GetAbsOrigin(), vecMins, vecMaxs ) )
+						 !CanMovePropAt( pEntity->GetEngineObject()->GetAbsOrigin(), vecMins, vecMaxs ) )
 						continue;
 
-					pEntity->SetAbsOrigin( m_PropList[i].vecOrigin );
-					pEntity->SetAbsAngles( m_PropList[i].vecAngles );
+					pEntity->GetEngineObject()->SetAbsOrigin( m_PropList[i].vecOrigin );
+					pEntity->GetEngineObject()->SetAbsAngles( m_PropList[i].vecAngles );
 
 					IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
 					if ( pPhys )
 					{
-						pPhys->SetPosition( pEntity->GetAbsOrigin(), pEntity->GetAbsAngles(), true );
+						pPhys->SetPosition( pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsAngles(), true );
 					}
 				}
 			}

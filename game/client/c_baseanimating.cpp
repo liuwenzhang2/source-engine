@@ -1647,9 +1647,9 @@ void C_BaseAnimating::CreateUnragdollInfo( C_BaseAnimating *pRagdoll )
 	pRagdoll->SetupBones( NULL, -1, BONE_USED_BY_ANYTHING, gpGlobals->curtime );
 
 	matrix3x4_t parentTransform;
-	QAngle newAngles( 0, pRagdoll->GetAbsAngles()[YAW], 0 );
+	QAngle newAngles( 0, pRagdoll->GetEngineObject()->GetAbsAngles()[YAW], 0 );
 
-	AngleMatrix( GetAbsAngles(), GetAbsOrigin(), parentTransform );
+	AngleMatrix(GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), parentTransform );
 	// pRagdoll->SaveRagdollInfo( hdr->numbones, parentTransform, m_BoneAccessor );
 	
 	if ( !m_pRagdollInfo )
@@ -2075,8 +2075,8 @@ bool C_BaseAnimating::GetAttachment( int number, Vector &origin, QAngle &angles 
 	if ( number < 1 || number > m_Attachments.Count() || !CalcAttachments() )
 	{
 		// Set this to the model origin/angles so that we don't have stack fungus in origin and angles.
-		origin = GetAbsOrigin();
-		angles = GetAbsAngles();
+		origin = GetEngineObject()->GetAbsOrigin();
+		angles = GetEngineObject()->GetAbsAngles();
 		return false;
 	}
 
@@ -2117,7 +2117,7 @@ bool C_BaseAnimating::GetAttachment( int number, Vector &origin )
 	if ( !GetAttachment( number, attachmentToWorld ) )
 	{
 		// Set this to the model origin/angles so that we don't have stack fungus in origin and angles.
-		origin = GetAbsOrigin();
+		origin = GetEngineObject()->GetAbsOrigin();
 		return false;
 	}
 
@@ -2218,7 +2218,7 @@ bool C_BaseAnimating::GetSoundSpatialization( SpatializationInfo_t& info )
 	// move sound origin to center if npc has IK
 	if ( info.pOrigin && IsNPC() && m_pIk)
 	{
-		*info.pOrigin = GetAbsOrigin();
+		*info.pOrigin = GetEngineObject()->GetAbsOrigin();
 
 		Vector mins, maxs, center;
 
@@ -2351,7 +2351,7 @@ void C_BaseAnimating::UpdateIKLocks( float currentTime )
 			C_BaseEntity *pOwner = cl_entitylist->GetEnt( pTarget->GetOwner() );
 			if (pOwner != NULL)
 			{
-				pTarget->UpdateOwner( pOwner->entindex(), pOwner->GetAbsOrigin(), pOwner->GetAbsAngles() );
+				pTarget->UpdateOwner( pOwner->entindex(), pOwner->GetEngineObject()->GetAbsOrigin(), pOwner->GetEngineObject()->GetAbsAngles() );
 			}				
 		}
 	}
@@ -2406,7 +2406,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 				// adjust ground to original ground position
 				estGround = (pTarget->est.pos - GetRenderOrigin());
 				estGround = estGround - (estGround * up) * up;
-				estGround = GetAbsOrigin() + estGround + pTarget->est.floor * up;
+				estGround = GetEngineObject()->GetAbsOrigin() + estGround + pTarget->est.floor * up;
 
 				VectorMA( estGround, pTarget->est.height, up, p1 );
 				VectorMA( estGround, -pTarget->est.height, up, p2 );
@@ -2419,7 +2419,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 
 				if ( trace.m_pEnt != NULL && ((C_BaseEntity*)trace.m_pEnt)->GetMoveType() == MOVETYPE_PUSH )
 				{
-					pTarget->SetOwner(((C_BaseEntity*)trace.m_pEnt)->entindex(), ((C_BaseEntity*)trace.m_pEnt)->GetAbsOrigin(), ((C_BaseEntity*)trace.m_pEnt)->GetAbsAngles() );
+					pTarget->SetOwner(((C_BaseEntity*)trace.m_pEnt)->entindex(), ((C_BaseEntity*)trace.m_pEnt)->GetEngineObject()->GetAbsOrigin(), ((C_BaseEntity*)trace.m_pEnt)->GetEngineObject()->GetAbsAngles() );
 				}
 				else
 				{
@@ -3188,7 +3188,7 @@ bool C_BaseAnimating::OnInternalDrawModel( ClientModelRenderInfo_t *pInfo )
 	}
 	if ( m_hLightingOrigin )
 	{
-		pInfo->pLightingOrigin = &(m_hLightingOrigin->GetAbsOrigin());
+		pInfo->pLightingOrigin = &(m_hLightingOrigin->GetEngineObject()->GetAbsOrigin());
 	}
 
 	return true;
@@ -3217,7 +3217,7 @@ void C_BaseAnimating::DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawM
 			{
 				static color32 debugColor = {0,255,255,0};
 				matrix3x4_t matrix;
-				AngleMatrix( GetAbsAngles(), GetAbsOrigin(), matrix );
+				AngleMatrix(GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), matrix );
 				engine->DebugDrawPhysCollide( pCollide->solids[0], NULL, matrix, debugColor );
 				if ( VPhysicsGetObject() )
 				{
@@ -3494,7 +3494,7 @@ void C_BaseAnimating::DoAnimationEvents( CStudioHdr *pStudioHdr )
 			}
 				
 				
-			FireEvent( GetAbsOrigin(), GetAbsAngles(), pevent[ i ].event, pevent[ i ].pszOptions() );
+			FireEvent(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), pevent[ i ].event, pevent[ i ].pszOptions() );
 		}
 
 		// Necessary to get the next loop working
@@ -3525,7 +3525,7 @@ void C_BaseAnimating::DoAnimationEvents( CStudioHdr *pStudioHdr )
 					gpGlobals->curtime );
 			}
 
-			FireEvent( GetAbsOrigin(), GetAbsAngles(), pevent[ i ].event, pevent[ i ].pszOptions() );
+			FireEvent(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), pevent[ i ].event, pevent[ i ].pszOptions() );
 		}
 	}
 
@@ -3755,7 +3755,7 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 			}
 			else
 			{
-				g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), options, &GetAbsOrigin() );
+				g_pSoundEmitterSystem->EmitSound( filter, GetSoundSourceIndex(), options, &GetEngineObject()->GetAbsOrigin() );
 			} 
 		}
 		break;
@@ -3861,14 +3861,14 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 	case CL_EVENT_EJECTBRASS1:
 		if ( m_Attachments.Count() > 0 )
 		{
-			if ( MainViewOrigin().DistToSqr( GetAbsOrigin() ) < (256 * 256) )
+			if ( MainViewOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin() ) < (256 * 256) )
 			{
 				Vector attachOrigin;
 				QAngle attachAngles; 
 				
 				if( GetAttachment( 2, attachOrigin, attachAngles ) )
 				{
-					tempents->EjectBrass( attachOrigin, attachAngles, GetAbsAngles(), atoi( options ) );
+					tempents->EjectBrass( attachOrigin, attachAngles, GetEngineObject()->GetAbsAngles(), atoi( options ) );
 				}
 			}
 		}
@@ -4399,8 +4399,8 @@ const QAngle& C_BaseAnimating::GetRenderAngles( void )
 
 void C_BaseAnimating::RagdollMoved( void ) 
 {
-	SetAbsOrigin( m_pRagdoll->GetRagdollOrigin() );
-	SetAbsAngles( vec3_angle );
+	GetEngineObject()->SetAbsOrigin( m_pRagdoll->GetRagdollOrigin() );
+	GetEngineObject()->SetAbsAngles( vec3_angle );
 
 	Vector mins, maxs;
 	m_pRagdoll->GetRagdollBounds( mins, maxs );
@@ -4609,8 +4609,8 @@ C_BaseAnimating *C_BaseAnimating::CreateRagdollCopy()
 	SnatchModelInstance( pRagdoll );
 
 	// We need to take these from the entity
-	pRagdoll->SetAbsOrigin( GetAbsOrigin() );
-	pRagdoll->SetAbsAngles( GetAbsAngles() );
+	pRagdoll->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
+	pRagdoll->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 
 	pRagdoll->IgniteRagdoll( this );
 	pRagdoll->TransferDissolveFrom( this );
@@ -4649,7 +4649,7 @@ C_BaseAnimating *C_BaseAnimating::CreateRagdollCopy()
 C_BaseAnimating *C_BaseAnimating::BecomeRagdollOnClient()
 {
 	MoveToLastReceivedPosition( true );
-	GetAbsOrigin();
+	GetEngineObject()->GetAbsOrigin();
 	C_BaseAnimating *pRagdoll = CreateRagdollCopy();
 
 	matrix3x4_t boneDelta0[MAXSTUDIOBONES];
@@ -4694,7 +4694,7 @@ bool C_BaseAnimating::InitAsClientRagdoll( const matrix3x4_t *pDeltaBones0, cons
 	if ( m_bStoreRagdollInfo && m_pRagdoll )
 	{
 		matrix3x4_t parentTransform;
-		AngleMatrix( GetAbsAngles(), GetAbsOrigin(), parentTransform );
+		AngleMatrix(GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), parentTransform );
 		// FIXME/CHECK:  This might be too expensive to do every frame???
 		SaveRagdollInfo( hdr->numbones(), parentTransform, m_BoneAccessor );
 	}
@@ -5995,7 +5995,7 @@ int C_BoneFollower::DrawModel( int flags )
 	{
 		static color32 debugColor = {0,255,255,0};
 		matrix3x4_t matrix;
-		AngleMatrix( GetAbsAngles(), GetAbsOrigin(), matrix );
+		AngleMatrix(GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsOrigin(), matrix );
 		engine->DebugDrawPhysCollide( pCollide->solids[m_solidIndex], NULL, matrix, debugColor );
 	}
 	return 1;
@@ -6006,7 +6006,7 @@ bool C_BoneFollower::TestCollision( const Ray_t &ray, unsigned int mask, trace_t
 	vcollide_t *pCollide = modelinfo->GetVCollide( m_modelIndex );
 	Assert( pCollide && pCollide->solidCount > m_solidIndex );
 
-	physcollision->TraceBox( ray, pCollide->solids[m_solidIndex], GetAbsOrigin(), GetAbsAngles(), &trace );
+	physcollision->TraceBox( ray, pCollide->solids[m_solidIndex], GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &trace );
 
 	if ( trace.fraction >= 1 )
 		return false;
@@ -6314,11 +6314,11 @@ void C_BaseAnimating::UpdateBoneAttachments( void )
 
 		Vector absOrigin;
 		MatrixGetColumn( GetBone( 0 ), 3, absOrigin );
-		SetAbsOrigin( absOrigin );
+		GetEngineObject()->SetAbsOrigin( absOrigin );
 
 		QAngle absAngle;
 		MatrixAngles( GetBone( 0 ), absAngle );
-		SetAbsAngles( absAngle);
+		GetEngineObject()->SetAbsAngles( absAngle);
 	}
 }
 

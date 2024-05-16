@@ -57,7 +57,7 @@ void CRopeAnchor::Spawn()
 
 	if( GetOwnerEntity() )
 	{
-		flDist = fabs( GetOwnerEntity()->GetAbsOrigin().z - GetAbsOrigin().z );
+		flDist = fabs( GetOwnerEntity()->GetEngineObject()->GetAbsOrigin().z - GetEngineObject()->GetAbsOrigin().z );
 	}
 
 	m_hRope = CRopeKeyframe::CreateWithSecondPointDetached( this, -1, flDist, RAPPEL_ROPE_WIDTH, "cable/cable.vmt", 5, true );
@@ -74,12 +74,12 @@ void CRopeAnchor::FallThink()
 {
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 
-	Vector vecVelocity = GetAbsVelocity();
+	Vector vecVelocity = GetEngineObject()->GetAbsVelocity();
 
 	vecVelocity.x = random->RandomFloat( -30.0f, 30.0f );
 	vecVelocity.y = random->RandomFloat( -30.0f, 30.0f );
 
-	SetAbsVelocity( vecVelocity );
+	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 	SetThink( &CRopeAnchor::RemoveThink );
 	SetNextThink( gpGlobals->curtime + 3.0 );
@@ -138,9 +138,9 @@ void CAI_RappelBehavior::SetDescentSpeed()
 	// Trace to the floor and see how close we're getting. Slow down if we're close.
 	// STOP if there's an NPC under us.
 	trace_t tr;
-	AI_TraceLine( GetOuter()->GetAbsOrigin(), GetOuter()->GetAbsOrigin() - Vector( 0, 0, 8192 ), MASK_SHOT, GetOuter(), COLLISION_GROUP_NONE, &tr );
+	AI_TraceLine( GetOuter()->GetEngineObject()->GetAbsOrigin(), GetOuter()->GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 8192 ), MASK_SHOT, GetOuter(), COLLISION_GROUP_NONE, &tr );
 
-	float flDist = fabs( GetOuter()->GetAbsOrigin().z - tr.endpos.z );
+	float flDist = fabs( GetOuter()->GetEngineObject()->GetAbsOrigin().z - tr.endpos.z );
 
 	float speed = RAPPEL_MAX_SPEED;
 
@@ -154,7 +154,7 @@ void CAI_RappelBehavior::SetDescentSpeed()
 
 	Vector vecNewVelocity = vec3_origin;
 	vecNewVelocity.z = -speed;
-	GetOuter()->SetAbsVelocity( vecNewVelocity );
+	GetOuter()->GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 }
 
 
@@ -182,7 +182,7 @@ void CAI_RappelBehavior::StartTask( const Task_t *pTask )
 	switch( pTask->iTask )
 	{
 	case TASK_MOVE_AWAY_PATH:
-		GetOuter()->GetMotor()->SetIdealYaw( UTIL_AngleMod( GetOuter()->GetLocalAngles().y - 180.0f ) );
+		GetOuter()->GetMotor()->SetIdealYaw( UTIL_AngleMod( GetOuter()->GetEngineObject()->GetLocalAngles().y - 180.0f ) );
 		BaseClass::StartTask( pTask );
 		break;
 
@@ -252,7 +252,7 @@ void CAI_RappelBehavior::RunTask( const Task_t *pTask )
 					// try to shove the player in the opposite direction as they are facing (so they'll see me)
 					Vector vecForward;
 					pGroundEnt->GetVectors( &vecForward, NULL, NULL );
-					pGroundEnt->SetAbsVelocity( vecForward * -500 );
+					pGroundEnt->GetEngineObject()->SetAbsVelocity( vecForward * -500 );
 					break;
 				}
 
@@ -300,7 +300,7 @@ void CAI_RappelBehavior::GatherConditions()
 	if( HasCondition( COND_CAN_RANGE_ATTACK1 ) )
 	{
 		// Shoot at the enemy so long as I'm six feet or more above them.
-		if( (GetAbsOrigin().z - GetEnemy()->GetAbsOrigin().z >= 36.0f) && GetOuter()->GetShotRegulator()->ShouldShoot() )
+		if( (GetAbsOrigin().z - GetEnemy()->GetEngineObject()->GetAbsOrigin().z >= 36.0f) && GetOuter()->GetShotRegulator()->ShouldShoot() )
 		{
 			Activity activity = GetOuter()->TranslateActivity( ACT_GESTURE_RANGE_ATTACK1 );
 			Assert( activity != ACT_INVALID );
@@ -344,7 +344,7 @@ void CAI_RappelBehavior::BeginRappel()
 	// Send the message to begin rappeling!
 	SetCondition( COND_BEGIN_RAPPEL );
 
-	m_vecRopeAnchor = GetOuter()->GetAbsOrigin();
+	m_vecRopeAnchor = GetOuter()->GetEngineObject()->GetAbsOrigin();
 
 	trace_t tr;
 
@@ -370,7 +370,7 @@ void CAI_RappelBehavior::CutZipline()
 
 	CBaseEntity *pAnchor = gEntList.CreateEntityByName( "rope_anchor" );
 	pAnchor->SetOwnerEntity( GetOuter() ); // Boy, this is a hack!!
-	pAnchor->SetAbsOrigin( m_vecRopeAnchor );
+	pAnchor->GetEngineObject()->SetAbsOrigin( m_vecRopeAnchor );
 	pAnchor->Spawn();
 }
 
@@ -392,7 +392,7 @@ void CAI_RappelBehavior::CreateZipline()
 			pBeam->SetEndWidth( 0.3 );
 
 			CAI_BaseNPC *pNPC = GetOuter();
-			pBeam->PointEntInit( pNPC->GetAbsOrigin() + Vector( 0, 0, 80 ), pNPC );
+			pBeam->PointEntInit( pNPC->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 80 ), pNPC );
 
 			pBeam->SetEndAttachment( attachment );
 

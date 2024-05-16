@@ -501,7 +501,7 @@ void CBasePlayer::CreateViewModel( int index /*=0*/ )
 	CBaseViewModel *vm = ( CBaseViewModel * )gEntList.CreateEntityByName( "viewmodel" );
 	if ( vm )
 	{
-		vm->SetAbsOrigin( GetAbsOrigin() );
+		vm->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		vm->SetOwner( this );
 		vm->SetIndex( index );
 		DispatchSpawn( vm );
@@ -735,8 +735,8 @@ bool CBasePlayer::WantsLagCompensationOnEntity( const CBasePlayer *pPlayer, cons
 	if ( pEntityTransmitBits && !pEntityTransmitBits->Get( pPlayer->entindex() ) )
 		return false;
 
-	const Vector &vMyOrigin = GetAbsOrigin();
-	const Vector &vHisOrigin = pPlayer->GetAbsOrigin();
+	const Vector &vMyOrigin = GetEngineObject()->GetAbsOrigin();
+	const Vector &vHisOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	// get max distance player could have moved within max lag compensation time, 
 	// multiply by 1.5 to to avoid "dead zones"  (sqrt(2) would be the exact value)
@@ -1177,7 +1177,7 @@ int CBasePlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		CTakeDamageInfo::DebugGetDamageTypeString( info.GetDamageType(), dmgtype, 512 );
 		char outputString[256];
 		Q_snprintf( outputString, 256, "%f: Player %s at [%0.2f %0.2f %0.2f] took %f damage from %s, type %s\n", gpGlobals->curtime, GetDebugName(),
-			GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z, info.GetDamage(), info.GetInflictor()->GetDebugName(), dmgtype );
+			GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z, info.GetDamage(), info.GetInflictor()->GetDebugName(), dmgtype );
 
 		//Msg( "%f: Player %s at [%0.2f %0.2f %0.2f] took %f damage from %s, type %s\n", gpGlobals->curtime, GetDebugName(),
 		//	GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z, info.GetDamage(), info.GetInflictor()->GetDebugName(), dmgtype );
@@ -1254,7 +1254,7 @@ int CBasePlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	// message at the end of the frame
 	// todo: remove after combining shotgun blasts?
 	if ( info.GetInflictor() && info.GetInflictor()->entindex()!=-1 )
-		m_DmgOrigin = info.GetInflictor()->GetAbsOrigin();
+		m_DmgOrigin = info.GetInflictor()->GetEngineObject()->GetAbsOrigin();
 
 	m_DmgTake += (int)info.GetDamage();
 	
@@ -1464,7 +1464,7 @@ void CBasePlayer::OnDamagedByExplosion( const CTakeDamageInfo &info )
 	CBaseEntity *inflictor = info.GetInflictor();
 	if ( inflictor )
 	{
-		Vector delta = GetAbsOrigin() - inflictor->GetAbsOrigin();
+		Vector delta = GetEngineObject()->GetAbsOrigin() - inflictor->GetEngineObject()->GetAbsOrigin();
 		distanceFromPlayer = delta.Length();
 	}
 
@@ -1680,7 +1680,7 @@ int CBasePlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	// Insert a combat sound so that nearby NPCs hear battle
 	if ( attacker->IsNPC() )
 	{
-		CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 512, 0.5, this );//<<TODO>>//magic number
+		CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 512, 0.5, this );//<<TODO>>//magic number
 	}
 
 	return 1;
@@ -1780,12 +1780,12 @@ void CBasePlayer::Event_Dying( const CTakeDamageInfo& info )
 		LeaveVehicle();
 	}
 
-	QAngle angles = GetLocalAngles();
+	QAngle angles = GetEngineObject()->GetLocalAngles();
 
 	angles.x = 0;
 	angles.z = 0;
 	
-	SetLocalAngles( angles );
+	GetEngineObject()->SetLocalAngles( angles );
 
 	SetThink(&CBasePlayer::PlayerDeathThink);
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -1801,7 +1801,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 
 	float speed;
 
-	speed = GetAbsVelocity().Length2D();
+	speed = GetEngineObject()->GetAbsVelocity().Length2D();
 
 	if (GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
 	{
@@ -2124,17 +2124,17 @@ void CBasePlayer::PlayerDeathThink(void)
 
 	if (GetFlags() & FL_ONGROUND)
 	{
-		flForward = GetAbsVelocity().Length() - 20;
+		flForward = GetEngineObject()->GetAbsVelocity().Length() - 20;
 		if (flForward <= 0)
 		{
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 		}
 		else
 		{
-			Vector vecNewVelocity = GetAbsVelocity();
+			Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 			VectorNormalize( vecNewVelocity );
 			vecNewVelocity *= flForward;
-			SetAbsVelocity( vecNewVelocity );
+			GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 		}
 	}
 
@@ -2292,7 +2292,7 @@ bool CBasePlayer::StartObserverMode(int mode)
 	if ( !IsObserver() )
 	{
 		// set position to last view offset
-		SetAbsOrigin( GetAbsOrigin() + GetViewOffset() );
+		GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() + GetViewOffset() );
 		SetViewOffset( vec3_origin );
 	}
 
@@ -2667,9 +2667,9 @@ void CBasePlayer::JumptoPosition(const Vector &origin, const QAngle &angles)
     newangles.y = clamp( angles.y, MIN_COORD_FLOAT, MAX_COORD_FLOAT );
     newangles.z = clamp( angles.z, MIN_COORD_FLOAT, MAX_COORD_FLOAT ); // not clamped in original valve's code, idk why
 
-    SetAbsOrigin( neworigin );
-    SetAbsVelocity( vec3_origin );    // stop movement
-    SetLocalAngles( newangles );
+	GetEngineObject()->SetAbsOrigin( neworigin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );    // stop movement
+	GetEngineObject()->SetLocalAngles( newangles );
     SnapEyeAngles( newangles );
 }
 
@@ -3426,7 +3426,7 @@ void CBasePlayer::PhysicsSimulate( void )
 		{
 			pi = &m_vecPlayerSimInfo[ m_vecPlayerSimInfo.Tail() ];
 			pi->m_flTime = Plat_FloatTime();
-			pi->m_vecAbsOrigin = GetAbsOrigin();
+			pi->m_vecAbsOrigin = GetEngineObject()->GetAbsOrigin();
 			pi->m_flGameSimulationTime = gpGlobals->curtime;
 			pi->m_nNumCmds = commandsToRun;
 		}
@@ -3822,7 +3822,7 @@ void CBasePlayer::HandleFuncTrain(void)
 		{
 			trace_t trainTrace;
 			// Maybe this is on the other side of a level transition
-			UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector(0,0,-38), 
+			UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector(0,0,-38),
 				MASK_PLAYERSOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &trainTrace );
 
 			if ( trainTrace.fraction != 1.0 && trainTrace.m_pEnt )
@@ -3845,7 +3845,7 @@ void CBasePlayer::HandleFuncTrain(void)
 		return;
 	}
 
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	vel = 0;
 	if ( m_afButtonPressed & IN_FORWARD )
 	{
@@ -3921,7 +3921,7 @@ void CBasePlayer::PreThink(void)
 	//
 	if ( !( GetFlags() & FL_ONGROUND ) )
 	{
-		m_Local.m_flFallVelocity = -GetAbsVelocity().z;
+		m_Local.m_flFallVelocity = -GetEngineObject()->GetAbsVelocity().z;
 	}
 
 	// track where we are in the nav mesh
@@ -4416,7 +4416,7 @@ void CBasePlayer::UpdatePlayerSound ( void )
 	// now figure out how loud the player's movement is.
 	if ( GetFlags() & FL_ONGROUND )
 	{	
-		iBodyVolume = GetAbsVelocity().Length(); 
+		iBodyVolume = GetEngineObject()->GetAbsVelocity().Length();
 
 		// clamp the noise that can be made by the body, in case a push trigger,
 		// weapon recoil, or anything shoves the player abnormally fast. 
@@ -4462,7 +4462,7 @@ void CBasePlayer::UpdatePlayerSound ( void )
 
 	if ( pSound )
 	{
-		pSound->SetSoundOrigin( GetAbsOrigin() );
+		pSound->SetSoundOrigin(GetEngineObject()->GetAbsOrigin() );
 		pSound->m_iType = SOUND_PLAYER;
 		pSound->m_iVolume = iVolume;
 	}
@@ -4483,32 +4483,32 @@ void FixPlayerCrouchStuck( CBasePlayer *pPlayer )
 
 	// Move up as many as 18 pixels if the player is stuck.
 	int i;
-	Vector org = pPlayer->GetAbsOrigin();;
+	Vector org = pPlayer->GetEngineObject()->GetAbsOrigin();;
 	for ( i = 0; i < 18; i++ )
 	{
-		UTIL_TraceHull( pPlayer->GetAbsOrigin(), pPlayer->GetAbsOrigin(), 
+		UTIL_TraceHull( pPlayer->GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsOrigin(),
 			VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, MASK_PLAYERSOLID, pPlayer, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 		if ( trace.startsolid )
 		{
-			Vector origin = pPlayer->GetAbsOrigin();
+			Vector origin = pPlayer->GetEngineObject()->GetAbsOrigin();
 			origin.z += 1.0f;
-			pPlayer->SetLocalOrigin( origin );
+			pPlayer->GetEngineObject()->SetLocalOrigin( origin );
 		}
 		else
 			return;
 	}
 
-	pPlayer->SetAbsOrigin( org );
+	pPlayer->GetEngineObject()->SetAbsOrigin( org );
 
 	for ( i = 0; i < 18; i++ )
 	{
-		UTIL_TraceHull( pPlayer->GetAbsOrigin(), pPlayer->GetAbsOrigin(), 
+		UTIL_TraceHull( pPlayer->GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsOrigin(),
 			VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX, MASK_PLAYERSOLID, pPlayer, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 		if ( trace.startsolid )
 		{
-			Vector origin = pPlayer->GetAbsOrigin();
+			Vector origin = pPlayer->GetEngineObject()->GetAbsOrigin();
 			origin.z -= 1.0f;
-			pPlayer->SetLocalOrigin( origin );
+			pPlayer->GetEngineObject()->SetLocalOrigin( origin );
 		}
 		else
 			return;
@@ -4557,7 +4557,7 @@ void CBasePlayer::ForceOrigin( const Vector &vecOrigin )
 //-----------------------------------------------------------------------------
 void CBasePlayer::PostThink()
 {
-	m_vecSmoothedVelocity = m_vecSmoothedVelocity * SMOOTHING_FACTOR + GetAbsVelocity() * ( 1 - SMOOTHING_FACTOR );
+	m_vecSmoothedVelocity = m_vecSmoothedVelocity * SMOOTHING_FACTOR + GetEngineObject()->GetAbsVelocity() * ( 1 - SMOOTHING_FACTOR );
 
 	if ( !g_fGameOver && !m_iPlayerLocked )
 	{
@@ -4607,7 +4607,7 @@ void CBasePlayer::PostThink()
 			{		
 				if (m_Local.m_flFallVelocity > 64 && !g_pGameRules->IsMultiplayer())
 				{
-					CSoundEnt::InsertSound ( SOUND_PLAYER, GetAbsOrigin(), m_Local.m_flFallVelocity, 0.2, this );
+					CSoundEnt::InsertSound ( SOUND_PLAYER, GetEngineObject()->GetAbsOrigin(), m_Local.m_flFallVelocity, 0.2, this );
 					// Msg( "fall %f\n", m_Local.m_flFallVelocity );
 				}
 				m_Local.m_flFallVelocity = 0;
@@ -4618,9 +4618,9 @@ void CBasePlayer::PostThink()
 			// If he's in a vehicle, sit down
 			if ( IsInAVehicle() )
 				SetAnimation( PLAYER_IN_VEHICLE );
-			else if (!GetAbsVelocity().x && !GetAbsVelocity().y)
+			else if (!GetEngineObject()->GetAbsVelocity().x && !GetEngineObject()->GetAbsVelocity().y)
 				SetAnimation( PLAYER_IDLE );
-			else if ((GetAbsVelocity().x || GetAbsVelocity().y) && ( GetFlags() & FL_ONGROUND ))
+			else if ((GetEngineObject()->GetAbsVelocity().x || GetEngineObject()->GetAbsVelocity().y) && ( GetFlags() & FL_ONGROUND ))
 				SetAnimation( PLAYER_WALK );
 			else if (GetWaterLevel() > 1)
 				SetAnimation( PLAYER_WALK );
@@ -4653,8 +4653,8 @@ void CBasePlayer::PostThink()
 
 		if ( m_bForceOrigin )
 		{
-			SetLocalOrigin( m_vForcedOrigin );
-			SetLocalAngles( m_Local.m_vecPunchAngle );
+			GetEngineObject()->SetLocalOrigin( m_vForcedOrigin );
+			GetEngineObject()->SetLocalAngles( m_Local.m_vecPunchAngle );
 			m_Local.m_vecPunchAngle = RandomAngle( -25, 25 );
 			m_Local.m_vecPunchAngleVel.Init();
 		}
@@ -4696,7 +4696,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 	if ( !m_pPhysicsController )
 		return;
 
-	Vector newPosition = GetAbsOrigin();
+	Vector newPosition = GetEngineObject()->GetAbsOrigin();
 	float frametime = gpGlobals->frametime;
 	if ( frametime <= 0 || frametime > 0.1f )
 		frametime = 0.1f;
@@ -4706,7 +4706,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 	if ( !pPhysGround && m_touchedPhysObject && g_pMoveData->m_outStepHeight <= 0.f && (GetFlags() & FL_ONGROUND) )
 	{
 		newPosition = m_oldOrigin + frametime * g_pMoveData->m_outWishVel;
-		newPosition = (GetAbsOrigin() * 0.5f) + (newPosition * 0.5f);
+		newPosition = (GetEngineObject()->GetAbsOrigin() * 0.5f) + (newPosition * 0.5f);
 	}
 
 	int collisionState = VPHYS_WALK;
@@ -4721,7 +4721,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 
 	if ( collisionState != m_vphysicsCollisionState )
 	{
-		SetVCollisionState( GetAbsOrigin(), GetAbsVelocity(), collisionState );
+		SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), collisionState );
 	}
 
 	if ( !(TouchedPhysics() || pPhysGround) )
@@ -4735,7 +4735,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 	{
 		if ( g_pMoveData->m_outStepHeight > 4.0f )
 		{
-			VPhysicsGetObject()->SetPosition( GetAbsOrigin(), vec3_angle, true );
+			VPhysicsGetObject()->SetPosition(GetEngineObject()->GetAbsOrigin(), vec3_angle, true );
 		}
 		else
 		{
@@ -4761,7 +4761,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 	m_vNewVPhysicsPosition = newPosition;
 	m_vNewVPhysicsVelocity = g_pMoveData->m_outWishVel;
 
-	m_oldOrigin = GetAbsOrigin();
+	m_oldOrigin = GetEngineObject()->GetAbsOrigin();
 }
 
 void CBasePlayer::UpdateVPhysicsPosition( const Vector &position, const Vector &velocity, float secondsToArrival )
@@ -4781,7 +4781,7 @@ void CBasePlayer::UpdateVPhysicsPosition( const Vector &position, const Vector &
 
 void CBasePlayer::UpdatePhysicsShadowToCurrentPosition()
 {
-	UpdateVPhysicsPosition( GetAbsOrigin(), vec3_origin, gpGlobals->frametime );
+	UpdateVPhysicsPosition(GetEngineObject()->GetAbsOrigin(), vec3_origin, gpGlobals->frametime );
 }
 
 void CBasePlayer::UpdatePhysicsShadowToPosition( const Vector &vecAbsOrigin )
@@ -4873,7 +4873,7 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 				// check if pSpot is valid
 				if ( g_pGameRules->IsSpawnPointValid( pSpot, this ) )
 				{
-					if ( pSpot->GetLocalOrigin() == vec3_origin )
+					if ( pSpot->GetEngineObject()->GetLocalOrigin() == vec3_origin )
 					{
 						pSpot = gEntList.FindEntityByClassname( pSpot, "info_player_deathmatch" );
 						continue;
@@ -4891,7 +4891,7 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 		if ( pSpot )
 		{
 			CBaseEntity *ent = NULL;
-			for ( CEntitySphereQuery sphere( pSpot->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
+			for ( CEntitySphereQuery sphere( pSpot->GetEngineObject()->GetAbsOrigin(), 128 ); (ent = sphere.GetCurrentEntity()) != NULL; sphere.NextEntity() )
 			{
 				// if ent is a client, kill em (unless they are ourselves)
 				if ( ent->IsPlayer() && !(ent->entindex() == entindex()) )
@@ -5072,7 +5072,7 @@ void CBasePlayer::Spawn( void )
 
 	m_flLaggedMovementValue = 1.0f;
 	m_vecSmoothedVelocity = vec3_origin;
-	InitVCollision( GetAbsOrigin(), GetAbsVelocity() );
+	InitVCollision(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity() );
 
 #if !defined( TF_DLL )
 	IGameEvent *event = gameeventmanager->CreateEvent( "player_spawn" );
@@ -5235,13 +5235,13 @@ int CBasePlayer::Restore( IRestore &restore )
 
 		// default to normal spawn
 		CBaseEntity *pSpawnSpot = EntSelectSpawnPoint();
-		SetLocalOrigin( pSpawnSpot->GetLocalOrigin() + Vector(0,0,1) );
-		SetLocalAngles( pSpawnSpot->GetLocalAngles() );
+		GetEngineObject()->SetLocalOrigin( pSpawnSpot->GetEngineObject()->GetLocalOrigin() + Vector(0,0,1) );
+		GetEngineObject()->SetLocalAngles( pSpawnSpot->GetEngineObject()->GetLocalAngles() );
 	}
 
 	QAngle newViewAngles = pl.v_angle;
 	newViewAngles.z = 0;	// Clear out roll
-	SetLocalAngles( newViewAngles );
+	GetEngineObject()->SetLocalAngles( newViewAngles );
 	SnapEyeAngles( newViewAngles );
 
 	// Copied from spawn() for now
@@ -5492,7 +5492,7 @@ bool CBasePlayer::GetInVehicle( IServerVehicle *pVehicle, int nRole )
 	ViewPunchReset();
 
 	// Setting the velocity to 0 will cause the IDLE animation to play
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetMoveType( MOVETYPE_NOCLIP );
 
 	// This is a hack to fixup the player's stats since they really didn't "cheat" and enter noclip from the console
@@ -5504,8 +5504,8 @@ bool CBasePlayer::GetInVehicle( IServerVehicle *pVehicle, int nRole )
 	pVehicle->GetPassengerSeatPoint( nRole, &vSeatOrigin, &qSeatAngles );
 	
 	// Set us to that position
-	SetAbsOrigin( vSeatOrigin );
-	SetAbsAngles( qSeatAngles );
+	GetEngineObject()->SetAbsOrigin( vSeatOrigin );
+	GetEngineObject()->SetAbsAngles( qSeatAngles );
 	
 	// Parent to the vehicle
 	GetEngineObject()->SetParent( pEnt?pEnt->GetEngineObject():NULL );
@@ -5558,8 +5558,8 @@ void CBasePlayer::LeaveVehicle( const Vector &vecExitPoint, const QAngle &vecExi
 	GetEngineObject()->SetParent( NULL );
 
 	// Find the first non-blocked exit point:
-	Vector vNewPos = GetAbsOrigin();
-	QAngle qAngles = GetAbsAngles();
+	Vector vNewPos = GetEngineObject()->GetAbsOrigin();
+	QAngle qAngles = GetEngineObject()->GetAbsAngles();
 	if ( vecExitPoint == vec3_origin )
 	{
 		// FIXME: this might fail to find a safe exit point!!
@@ -5571,10 +5571,10 @@ void CBasePlayer::LeaveVehicle( const Vector &vecExitPoint, const QAngle &vecExi
 		qAngles = vecExitAngles;
 	}
 	OnVehicleEnd( vNewPos );
-	SetAbsOrigin( vNewPos );
-	SetAbsAngles( qAngles );
+	GetEngineObject()->SetAbsOrigin( vNewPos );
+	GetEngineObject()->SetAbsAngles( qAngles );
 	// Clear out any leftover velocity
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 	qAngles[ROLL] = 0;
 	SnapEyeAngles( qAngles );
@@ -5635,8 +5635,8 @@ PRECACHE_REGISTER( spraycan );
 
 void CSprayCan::Spawn ( CBasePlayer *pOwner )
 {
-	SetLocalOrigin( pOwner->WorldSpaceCenter() + Vector ( 0 , 0 , 32 ) );
-	SetLocalAngles( pOwner->EyeAngles() );
+	GetEngineObject()->SetLocalOrigin( pOwner->WorldSpaceCenter() + Vector ( 0 , 0 , 32 ) );
+	GetEngineObject()->SetLocalAngles( pOwner->EyeAngles() );
 	SetOwnerEntity( pOwner );
 	SetNextThink( gpGlobals->curtime );
 	const char* soundname = "SprayCan.Paint";
@@ -5667,8 +5667,8 @@ void CSprayCan::Think( void )
 		Vector forward;
 		trace_t	tr;	
 
-		AngleVectors( GetAbsAngles(), &forward );
-		UTIL_TraceLine ( GetAbsOrigin(), GetAbsOrigin() + forward * 128, 
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
+		UTIL_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + forward * 128,
 			MASK_SOLID_BRUSHONLY, pPlayer, COLLISION_GROUP_NONE, & tr);
 
 		UTIL_PlayerDecalTrace( &tr, playernum );
@@ -5689,8 +5689,8 @@ public:
 
 void CBloodSplat::Spawn ( CBaseEntity *pOwner )
 {
-	SetLocalOrigin( pOwner->WorldSpaceCenter() + Vector ( 0 , 0 , 32 ) );
-	SetLocalAngles( pOwner->GetLocalAngles() );
+	GetEngineObject()->SetLocalOrigin( pOwner->WorldSpaceCenter() + Vector ( 0 , 0 , 32 ) );
+	GetEngineObject()->SetLocalAngles( pOwner->GetEngineObject()->GetLocalAngles() );
 	SetOwnerEntity( pOwner );
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -5706,8 +5706,8 @@ void CBloodSplat::Think( void )
 		pPlayer = ToBasePlayer( GetOwnerEntity() );
 
 		Vector forward;
-		AngleVectors( GetAbsAngles(), &forward );
-		UTIL_TraceLine ( GetAbsOrigin(), GetAbsOrigin() + forward * 128, 
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
+		UTIL_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + forward * 128,
 			MASK_SOLID_BRUSHONLY, pPlayer, COLLISION_GROUP_NONE, & tr);
 
 		UTIL_BloodDecalTrace( &tr, BLOOD_COLOR_RED );
@@ -5737,7 +5737,7 @@ CBaseEntity	*CBasePlayer::GiveNamedItem( const char *pszName, int iSubType )
 		return NULL;
 	}
 
-	pent->SetLocalOrigin( GetLocalOrigin() );
+	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
 	pent->AddSpawnFlags( SF_NORESPAWN );
 
 	CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( (CBaseEntity*)pent );
@@ -6050,10 +6050,10 @@ static void CreateJalopy( CBasePlayer *pPlayer )
 	CBaseEntity *pJeep = (CBaseEntity *)gEntList.CreateEntityByName( "prop_vehicle_jeep" );
 	if ( pJeep )
 	{
-		Vector vecOrigin = pPlayer->GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);
-		QAngle vecAngles( 0, pPlayer->GetAbsAngles().y - 90, 0 );
-		pJeep->SetAbsOrigin( vecOrigin );
-		pJeep->SetAbsAngles( vecAngles );
+		Vector vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);
+		QAngle vecAngles( 0, pPlayer->GetEngineObject()->GetAbsAngles().y - 90, 0 );
+		pJeep->GetEngineObject()->SetAbsOrigin( vecOrigin );
+		pJeep->GetEngineObject()->SetAbsAngles( vecAngles );
 		pJeep->KeyValue( "model", "models/vehicle.mdl" );
 		pJeep->KeyValue( "solid", "6" );
 		pJeep->KeyValue( "targetname", "jeep" );
@@ -6087,10 +6087,10 @@ static void CreateJeep( CBasePlayer *pPlayer )
 	CBaseEntity *pJeep = (CBaseEntity *)gEntList.CreateEntityByName( "prop_vehicle_jeep" );
 	if ( pJeep )
 	{
-		Vector vecOrigin = pPlayer->GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);
-		QAngle vecAngles( 0, pPlayer->GetAbsAngles().y - 90, 0 );
-		pJeep->SetAbsOrigin( vecOrigin );
-		pJeep->SetAbsAngles( vecAngles );
+		Vector vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin() + vecForward * 256 + Vector(0,0,64);
+		QAngle vecAngles( 0, pPlayer->GetEngineObject()->GetAbsAngles().y - 90, 0 );
+		pJeep->GetEngineObject()->SetAbsOrigin( vecOrigin );
+		pJeep->GetEngineObject()->SetAbsAngles( vecAngles );
 		pJeep->KeyValue( "model", "models/buggy.mdl" );
 		pJeep->KeyValue( "solid", "6" );
 		pJeep->KeyValue( "targetname", "jeep" );
@@ -6124,10 +6124,10 @@ static void CreateAirboat( CBasePlayer *pPlayer )
 	CBaseEntity *pJeep = ( CBaseEntity* )gEntList.CreateEntityByName( "prop_vehicle_airboat" );
 	if ( pJeep )
 	{
-		Vector vecOrigin = pPlayer->GetAbsOrigin() + vecForward * 256 + Vector( 0,0,64 );
-		QAngle vecAngles( 0, pPlayer->GetAbsAngles().y - 90, 0 );
-		pJeep->SetAbsOrigin( vecOrigin );
-		pJeep->SetAbsAngles( vecAngles );
+		Vector vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin() + vecForward * 256 + Vector( 0,0,64 );
+		QAngle vecAngles( 0, pPlayer->GetEngineObject()->GetAbsAngles().y - 90, 0 );
+		pJeep->GetEngineObject()->SetAbsOrigin( vecOrigin );
+		pJeep->GetEngineObject()->SetAbsAngles( vecAngles );
 		pJeep->KeyValue( "model", "models/airboat.mdl" );
 		pJeep->KeyValue( "solid", "6" );
 		pJeep->KeyValue( "targetname", "airboat" );
@@ -6179,7 +6179,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 			else
 			{
 				Vector forward = UTIL_YawToVector( EyeAngles().y );
-				Create("NPC_human_grunt", GetLocalOrigin() + forward * 128, GetLocalAngles());
+				Create("NPC_human_grunt", GetEngineObject()->GetLocalOrigin() + forward * 128, GetEngineObject()->GetLocalAngles());
 			}
 			break;
 		}
@@ -6321,17 +6321,17 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 
 	case	195:// show shortest paths for entire level to nearest node
 		{
-			Create("node_viewer_fly", GetLocalOrigin(), GetLocalAngles());
+			Create("node_viewer_fly", GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles());
 		}
 		break;
 	case	196:// show shortest paths for entire level to nearest node
 		{
-			Create("node_viewer_large", GetLocalOrigin(), GetLocalAngles());
+			Create("node_viewer_large", GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles());
 		}
 		break;
 	case	197:// show shortest paths for entire level to nearest node
 		{
-			Create("node_viewer_human", GetLocalOrigin(), GetLocalAngles());
+			Create("node_viewer_human", GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles());
 		}
 		break;
 	case	202:// Random blood splatter
@@ -6784,7 +6784,7 @@ Vector CBasePlayer::BodyTarget( const Vector &posSrc, bool bNoisy )
 	}
 	if (bNoisy)
 	{
-		return GetAbsOrigin() + (GetViewOffset() * random->RandomFloat( 0.7, 1.0 )); 
+		return GetEngineObject()->GetAbsOrigin() + (GetViewOffset() * random->RandomFloat( 0.7, 1.0 ));
 	}
 	else
 	{
@@ -8114,11 +8114,11 @@ void CBasePlayer::SetupVPhysicsShadow( const Vector &vecAbsOrigin, const Vector 
 	//disable drag
 	solid.params.dragCoefficient = 0;
 	// create standing hull
-	m_pShadowStand = PhysModelCreateCustom( this, pStandModel, GetLocalOrigin(), GetLocalAngles(), pStandHullName, false, &solid );
+	m_pShadowStand = PhysModelCreateCustom( this, pStandModel, GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles(), pStandHullName, false, &solid );
 	m_pShadowStand->SetCallbackFlags( CALLBACK_GLOBAL_COLLISION | CALLBACK_SHADOW_COLLISION );
 
 	// create crouchig hull
-	m_pShadowCrouch = PhysModelCreateCustom( this, pCrouchModel, GetLocalOrigin(), GetLocalAngles(), pCrouchHullName, false, &solid );
+	m_pShadowCrouch = PhysModelCreateCustom( this, pCrouchModel, GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles(), pCrouchHullName, false, &solid );
 	m_pShadowCrouch->SetCallbackFlags( CALLBACK_GLOBAL_COLLISION | CALLBACK_SHADOW_COLLISION );
 
 	// default to stand
@@ -8233,7 +8233,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 	if ( GetMoveType() == MOVETYPE_NOCLIP || pl.deadflag )
 	{
-		m_oldOrigin = GetAbsOrigin();
+		m_oldOrigin = GetEngineObject()->GetAbsOrigin();
 		return;
 	}
 
@@ -8255,19 +8255,19 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 	if ( physicsshadowupdate_render.GetBool() )
 	{
-		NDebugOverlay::Box( GetAbsOrigin(), WorldAlignMins(), WorldAlignMaxs(), 255, 0, 0, 24, 15.0f );
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), WorldAlignMins(), WorldAlignMaxs(), 255, 0, 0, 24, 15.0f );
 		NDebugOverlay::Box( newPosition, WorldAlignMins(), WorldAlignMaxs(), 0,0,255, 24, 15.0f);
 		//	NDebugOverlay::Box( newPosition, WorldAlignMins(), WorldAlignMaxs(), 0,0,255, 24, .01f);
 	}
 
-	Vector tmp = GetAbsOrigin() - newPosition;
+	Vector tmp = GetEngineObject()->GetAbsOrigin() - newPosition;
 	if ( !m_touchedPhysObject && !(GetFlags() & FL_ONGROUND) )
 	{
 		tmp.z *= 0.5f;	// don't care about z delta as much
 	}
 
 	float dist = tmp.LengthSqr();
-	float deltaV = (newVelocity - GetAbsVelocity()).LengthSqr();
+	float deltaV = (newVelocity - GetEngineObject()->GetAbsVelocity()).LengthSqr();
 
 	float maxDistErrorSqr = VPHYS_MAX_DISTSQR;
 	float maxVelErrorSqr = VPHYS_MAX_VELSQR;
@@ -8284,16 +8284,16 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		// check my position (physics object could have simulated into my position
 		// physics is not very far away, check my position
 		trace_t trace;
-		UTIL_TraceEntity( this, GetAbsOrigin(), GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
+		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 		if ( !trace.startsolid )
 			return;
 
 		// The physics shadow position is probably not in solid, try to move from there to the desired position
-		UTIL_TraceEntity( this, newPosition, GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
+		UTIL_TraceEntity( this, newPosition, GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 		if ( !trace.startsolid )
 		{
 			// found a valid position between the two?  take it.
-			SetAbsOrigin( trace.endpos );
+			GetEngineObject()->SetAbsOrigin( trace.endpos );
 			UpdateVPhysicsPosition(trace.endpos, vec3_origin, 0);
 			return;
 		}
@@ -8306,7 +8306,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			// BUGBUG: Rewrite this code using fixed timestep
 			if ( deltaV >= maxVelErrorSqr && !m_bPhysicsWasFrozen )
 			{
-				Vector dir = GetAbsVelocity();
+				Vector dir = GetEngineObject()->GetAbsVelocity();
 				float len = VectorNormalize(dir);
 				float dot = DotProduct( newVelocity, dir );
 				if ( dot > len )
@@ -8340,7 +8340,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			UTIL_TraceEntity( this, newPosition, newPosition, MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 			if ( !trace.allsolid && !trace.startsolid )
 			{
-				SetAbsOrigin( newPosition );
+				GetEngineObject()->SetAbsOrigin( newPosition );
 			}
 		}
 		else
@@ -8355,7 +8355,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 			// check my position (physics object could have simulated into my position
 			// physics is not very far away, check my position
 			trace_t trace;
-			UTIL_TraceEntity( this, GetAbsOrigin(), GetAbsOrigin(),
+			UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),
 				MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 			
 			// is current position ok?
@@ -8364,7 +8364,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 				// no use the final stuck check to move back to old if this stuck fix didn't work
 				bCheckStuck = true;
 				lastValidPosition = m_oldOrigin;
-				SetAbsOrigin( newPosition );
+				GetEngineObject()->SetAbsOrigin( newPosition );
 			}
 		}
 	}
@@ -8372,17 +8372,17 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 	if ( bCheckStuck )
 	{
 		trace_t trace;
-		UTIL_TraceEntity( this, GetAbsOrigin(), GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
+		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), MASK_PLAYERSOLID, this, COLLISION_GROUP_PLAYER_MOVEMENT, &trace );
 
 		// current position is not ok, fixup
 		if ( trace.allsolid || trace.startsolid )
 		{
 			// STUCK!?!?!
 			//Warning( "Checkstuck failed.  Stuck on %s!!\n", trace.m_pEnt->GetClassname() );
-			SetAbsOrigin( lastValidPosition );
+			GetEngineObject()->SetAbsOrigin( lastValidPosition );
 		}
 	}
-	m_oldOrigin = GetAbsOrigin();
+	m_oldOrigin = GetEngineObject()->GetAbsOrigin();
 	m_bPhysicsWasFrozen = false;
 }
 
@@ -8396,7 +8396,7 @@ void CBasePlayer::RefreshCollisionBounds( void )
 {
 	BaseClass::RefreshCollisionBounds();
 
-	InitVCollision( GetAbsOrigin(), GetAbsVelocity() );
+	InitVCollision(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity() );
 	SetViewOffset( VEC_VIEW_SCALED( this ) );
 }
 
@@ -8609,7 +8609,7 @@ void CBasePlayer::ModifyOrAppendPlayerCriteria( AI_CriteriaSet& set )
 	// Append current activity name
 	set.AppendCriteria( "playeractivity", CAI_BaseNPC::GetActivityName( GetActivity() ) );
 
-	set.AppendCriteria( "playerspeed", UTIL_VarArgs( "%.3f", GetAbsVelocity().Length() ) );
+	set.AppendCriteria( "playerspeed", UTIL_VarArgs( "%.3f", GetEngineObject()->GetAbsVelocity().Length() ) );
 
 	AppendContextToCriteria( set, "player" );
 }
@@ -9148,13 +9148,13 @@ bool CPlayerInfo::IsObserver()
 const Vector CPlayerInfo::GetAbsOrigin() 
 { 
 	Assert( m_pParent );
-	return m_pParent->GetAbsOrigin(); 
+	return m_pParent->GetEngineObject()->GetAbsOrigin();
 }
 
 const QAngle CPlayerInfo::GetAbsAngles() 
 { 
 	Assert( m_pParent );
-	return m_pParent->GetAbsAngles(); 
+	return m_pParent->GetEngineObject()->GetAbsAngles();
 }
 
 const Vector CPlayerInfo::GetPlayerMins() 
@@ -9207,7 +9207,7 @@ void CPlayerInfo::SetAbsOrigin( Vector & vec )
 	Assert( m_pParent );
 	if ( m_pParent->IsBot() )
 	{
-		m_pParent->SetAbsOrigin(vec); 
+		m_pParent->GetEngineObject()->SetAbsOrigin(vec);
 	}
 }
 
@@ -9216,7 +9216,7 @@ void CPlayerInfo::SetAbsAngles( QAngle & ang )
 	Assert( m_pParent );
 	if ( m_pParent->IsBot() )
 	{
-		m_pParent->SetAbsAngles(ang); 
+		m_pParent->GetEngineObject()->SetAbsAngles(ang);
 	}
 }
 
@@ -9248,7 +9248,7 @@ void CPlayerInfo::SetLocalOrigin( const Vector& origin )
 	Assert( m_pParent );
 	if ( m_pParent->IsBot() )
 	{
-		m_pParent->SetLocalOrigin(origin); 
+		m_pParent->GetEngineObject()->SetLocalOrigin(origin);
 	}
 }
 
@@ -9257,7 +9257,7 @@ const Vector CPlayerInfo::GetLocalOrigin( void )
 	Assert( m_pParent );
 	if ( m_pParent->IsBot() )
 	{
-		Vector origin = m_pParent->GetLocalOrigin();
+		Vector origin = m_pParent->GetEngineObject()->GetLocalOrigin();
 		return origin; 
 	}
 	else
@@ -9271,7 +9271,7 @@ void CPlayerInfo::SetLocalAngles( const QAngle& angles )
 	Assert( m_pParent );
 	if ( m_pParent->IsBot() )
 	{
-		m_pParent->SetLocalAngles( angles ); 
+		m_pParent->GetEngineObject()->SetLocalAngles( angles );
 	}
 }
 
@@ -9280,7 +9280,7 @@ const QAngle CPlayerInfo::GetLocalAngles( void )
 	Assert( m_pParent );
 	if ( m_pParent->IsBot() )
 	{
-		return m_pParent->GetLocalAngles(); 
+		return m_pParent->GetEngineObject()->GetLocalAngles();
 	}
 	else
 	{

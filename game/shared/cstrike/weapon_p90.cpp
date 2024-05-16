@@ -67,7 +67,7 @@ float CWeaponP90::GetInaccuracy() const
 	
 		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 			return 0.3f * m_flAccuracy;
-		else if (pPlayer->GetAbsVelocity().Length2D() > 170)
+		else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 170)
 			return 0.115f * m_flAccuracy;
 		else
 			return 0.045f * m_flAccuracy;
@@ -88,7 +88,7 @@ void CWeaponP90::PrimaryAttack()
 	// Kick the gun based on the state of the player.
 	if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
 		pPlayer->KickBack (0.9, 0.45, 0.35, 0.04, 5.25, 3.5, 4);
-	else if (pPlayer->GetAbsVelocity().Length2D() > 5)
+	else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 		pPlayer->KickBack (0.45, 0.3, 0.2, 0.0275, 4, 2.25, 7);
 	else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
 		pPlayer->KickBack (0.275, 0.2, 0.125, 0.02, 3, 1, 9);

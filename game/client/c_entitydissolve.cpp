@@ -71,7 +71,7 @@ void C_EntityDissolve::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 	}
 	else
 	{
-		theMins = GetAbsOrigin();
+		theMins = GetEngineObject()->GetAbsOrigin();
 		theMaxs = theMaxs;
 	}
 }
@@ -422,7 +422,7 @@ void C_EntityDissolve::SetupEmitter( void )
 	if ( !m_pEmitter )
 	{
 		m_pEmitter = CSimpleEmitter::Create( "C_EntityDissolve" );
-		m_pEmitter->SetSortOrigin( GetAbsOrigin() );
+		m_pEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 	}
 }
 

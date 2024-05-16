@@ -281,17 +281,17 @@ void SpawnBlood(Vector vecSpot, const Vector &vecDir, int bloodColor, float flDa
 // position of eyes
 Vector CBaseEntity::EyePosition( void )
 { 
-	return GetAbsOrigin() + GetViewOffset(); 
+	return GetEngineObject()->GetAbsOrigin() + GetViewOffset();
 }
 
 const QAngle &CBaseEntity::EyeAngles( void )
 {
-	return GetAbsAngles();
+	return GetEngineObject()->GetAbsAngles();
 }
 
 const QAngle &CBaseEntity::LocalEyeAngles( void )
 {
-	return GetLocalAngles();
+	return GetEngineObject()->GetLocalAngles();
 }
 
 // position of ears
@@ -657,7 +657,7 @@ bool CBaseEntity::GetKeyValue( const char *szKeyName, char *szValue, int iMaxLen
 	// NOTE: Have to do these separate because they set two values instead of one
 	if( FStrEq( szKeyName, "angles" ) )
 	{
-		QAngle angles = GetAbsAngles();
+		QAngle angles = GetEngineObject()->GetAbsAngles();
 
 		Q_snprintf( szValue, iMaxLen, "%f %f %f", angles.x, angles.y, angles.z );
 		return true;
@@ -665,7 +665,7 @@ bool CBaseEntity::GetKeyValue( const char *szKeyName, char *szValue, int iMaxLen
 
 	if( FStrEq( szKeyName, "origin" ) )
 	{
-		Vector vecOrigin = GetAbsOrigin();
+		Vector vecOrigin = GetEngineObject()->GetAbsOrigin();
 		Q_snprintf( szValue, iMaxLen, "%f %f %f", vecOrigin.x, vecOrigin.y, vecOrigin.z );
 		return true;
 	}
@@ -1243,12 +1243,12 @@ void CBaseEntity::VPhysicsUpdate( IPhysicsObject *pPhysics )
 				angles = vec3_angle;
 			}
 #ifndef CLIENT_DLL 
-			Vector prevOrigin = GetAbsOrigin();
+			Vector prevOrigin = GetEngineObject()->GetAbsOrigin();
 #endif
 
 			if ( IsEntityPositionReasonable( origin ) )
 			{
-				SetAbsOrigin( origin );
+				GetEngineObject()->SetAbsOrigin( origin );
 			}
 			else
 			{
@@ -1262,7 +1262,7 @@ void CBaseEntity::VPhysicsUpdate( IPhysicsObject *pPhysics )
 			{
 				angles[ i ] = AngleNormalize( angles[ i ] );
 			}
-			SetAbsAngles( angles );
+			GetEngineObject()->SetAbsAngles( angles );
 
 			// Interactive debris converts back to debris when it comes to rest
 			if ( pPhysics->IsAsleep() && GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
@@ -1318,11 +1318,11 @@ IPhysicsObject *CBaseEntity::VPhysicsInitStatic( void )
 	IPhysicsObject *pPhysicsObject = NULL;
 	if ( GetSolid() == SOLID_BBOX )
 	{
-		pPhysicsObject = PhysModelCreateBox( this, WorldAlignMins(), WorldAlignMaxs(), GetAbsOrigin(), true );
+		pPhysicsObject = PhysModelCreateBox( this, WorldAlignMins(), WorldAlignMaxs(), GetEngineObject()->GetAbsOrigin(), true );
 	}
 	else
 	{
-		pPhysicsObject = PhysModelCreateUnmoveable( this, GetModelIndex(), GetAbsOrigin(), GetAbsAngles() );
+		pPhysicsObject = PhysModelCreateUnmoveable( this, GetModelIndex(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 	}
 	VPhysicsSetObject( pPhysicsObject );
 	return pPhysicsObject;
@@ -1401,7 +1401,7 @@ IPhysicsObject *CBaseEntity::VPhysicsInitNormal( SolidType_t solidType, int nSol
 	}
 
 	// create a normal physics object
-	IPhysicsObject *pPhysicsObject = PhysModelCreate( this, GetModelIndex(), GetAbsOrigin(), GetAbsAngles(), pSolid );
+	IPhysicsObject *pPhysicsObject = PhysModelCreate( this, GetModelIndex(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), pSolid );
 	if ( pPhysicsObject )
 	{
 		VPhysicsSetObject( pPhysicsObject );
@@ -1426,8 +1426,8 @@ IPhysicsObject *CBaseEntity::VPhysicsInitShadow( bool allowPhysicsMovement, bool
 	if ( GetSolid() == SOLID_NONE )
 		return NULL;
 
-	const Vector &origin = GetAbsOrigin();
-	QAngle angles = GetAbsAngles();
+	const Vector &origin = GetEngineObject()->GetAbsOrigin();
+	QAngle angles = GetEngineObject()->GetAbsAngles();
 	IPhysicsObject *pPhysicsObject = NULL;
 
 	if ( GetSolid() == SOLID_BBOX )
@@ -2317,8 +2317,8 @@ void CBaseEntity::FollowEntity( CBaseEntity *pBaseEntity, bool bBoneMerge )
 			AddEffects( EF_BONEMERGE );
 
 		AddSolidFlags( FSOLID_NOT_SOLID );
-		SetLocalOrigin( vec3_origin );
-		SetLocalAngles( vec3_angle );
+		GetEngineObject()->SetLocalOrigin( vec3_origin );
+		GetEngineObject()->SetLocalAngles( vec3_angle );
 	}
 	else
 	{
@@ -2371,7 +2371,7 @@ void CBaseEntity::ApplyLocalVelocityImpulse( const Vector &inVecImpulse )
 			GetEngineObject()->SetLocalVelocity(GetEngineObject()->GetLocalVelocity() + vecImpulse);
 #endif // GAME_DLL
 #ifdef CLIENT_DLL
-			SetLocalVelocity(GetLocalVelocity() + vecImpulse);
+			GetEngineObject()->SetLocalVelocity(GetEngineObject()->GetLocalVelocity() + vecImpulse);
 #endif // CLIENT_DLL
 
 		}
@@ -2407,8 +2407,8 @@ void CBaseEntity::ApplyAbsVelocityImpulse( const Vector &inVecImpulse )
 		{
 			// NOTE: Have to use GetAbsVelocity here to ensure it's the correct value
 			Vector vecResult;
-			VectorAdd( GetAbsVelocity(), vecImpulse, vecResult );
-			SetAbsVelocity( vecResult );
+			VectorAdd(GetEngineObject()->GetAbsVelocity(), vecImpulse, vecResult );
+			GetEngineObject()->SetAbsVelocity( vecResult );
 		}
 	}
 }

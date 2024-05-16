@@ -1185,10 +1185,10 @@ void C_RopeKeyframe::SetupHangDistance( float flHangDist )
 	QAngle dummyAngles;
 
 	// Calculate starting conditions so we can force it to hang down N inches.
-	Vector v1 = pEnt1->GetAbsOrigin();
+	Vector v1 = pEnt1->GetEngineObject()->GetAbsOrigin();
 	pEnt1->GetAttachment( m_iStartAttachment, v1, dummyAngles );
 		
-	Vector v2 = pEnt2->GetAbsOrigin();
+	Vector v2 = pEnt2->GetEngineObject()->GetAbsOrigin();
 	pEnt2->GetAttachment( m_iEndAttachment, v2, dummyAngles );
 
 	float flSlack, flLen;
@@ -1468,7 +1468,7 @@ bool C_RopeKeyframe::ShouldDraw()
 
 const Vector& C_RopeKeyframe::WorldSpaceCenter( ) const
 {
-	return GetAbsOrigin();
+	return GetEngineObject()->GetAbsOrigin();
 }
 
 bool C_RopeKeyframe::GetAttachment( int number, matrix3x4_t &matrix )
@@ -1840,8 +1840,8 @@ void C_RopeKeyframe::UpdateBBox()
 		AddPointToBounds( vPos, mins, maxs );
 	}
 	
-	mins -= GetAbsOrigin();
-	maxs -= GetAbsOrigin();
+	mins -= GetEngineObject()->GetAbsOrigin();
+	maxs -= GetEngineObject()->GetAbsOrigin();
 	SetCollisionBounds( mins, maxs );
 }
 
@@ -1942,7 +1942,7 @@ bool C_RopeKeyframe::CalculateEndPointAttachment( C_BaseEntity *pEnt, int iAttac
 	vPos = pEnt->WorldSpaceCenter( );
 	if ( pAngles )
 	{
-		*pAngles = pEnt->GetAbsAngles();
+		*pAngles = pEnt->GetEngineObject()->GetAbsAngles();
 	}
 	return true;
 }

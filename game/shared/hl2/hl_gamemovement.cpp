@@ -79,7 +79,7 @@ CReservePlayerSpot *CReservePlayerSpot::ReserveSpot(
 	CReservePlayerSpot *spot = ( CReservePlayerSpot * )gEntList.CreateEntityByName( "reserved_spot" );
 	Assert( spot );
 
-	spot->SetAbsOrigin( org );
+	spot->GetEngineObject()->SetAbsOrigin( org );
 	UTIL_SetSize( spot, mins, maxs );
 	spot->SetOwnerEntity( owner );
 	spot->Spawn();
@@ -395,7 +395,7 @@ void CHL2GameMovement::GetSortedDismountNodeList( const Vector &org, float radiu
 		if ( !spot )
 			continue;
 
-		float distSqr = ( spot->GetAbsOrigin() - org ).LengthSqr();
+		float distSqr = ( spot->GetEngineObject()->GetAbsOrigin() - org ).LengthSqr();
 		if ( distSqr > radiusSqr )
 			continue;
 
@@ -441,7 +441,7 @@ bool CHL2GameMovement::ExitLadderViaDismountNode( CFuncLadder *ladder, bool stri
 		}
 
 		// See if it's valid to put the player there...
-		Vector org = spot->GetAbsOrigin() + Vector( 0, 0, 1 );
+		Vector org = spot->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 1 );
 
 		trace_t tr;
 		UTIL_TraceHull(

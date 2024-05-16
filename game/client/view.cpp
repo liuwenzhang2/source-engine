@@ -456,7 +456,7 @@ void CViewRender::DriftPitch (void)
 	}
 	
 	// How far off are we
-	delta = prediction->GetIdealPitch() - player->GetAbsAngles()[ PITCH ];
+	delta = prediction->GetIdealPitch() - player->GetEngineObject()->GetAbsAngles()[ PITCH ];
 	if ( !delta )
 	{
 		m_PitchDrift.pitchvel = 0;
@@ -476,7 +476,7 @@ void CViewRender::DriftPitch (void)
 			m_PitchDrift.pitchvel = 0;
 			move = delta;
 		}
-		player->SetLocalAngles( player->GetLocalAngles() + QAngle( move, 0, 0 ) );
+		player->GetEngineObject()->SetLocalAngles( player->GetEngineObject()->GetLocalAngles() + QAngle( move, 0, 0 ) );
 	}
 	else if ( delta < 0 )
 	{
@@ -485,7 +485,7 @@ void CViewRender::DriftPitch (void)
 			m_PitchDrift.pitchvel = 0;
 			move = -delta;
 		}
-		player->SetLocalAngles( player->GetLocalAngles() - QAngle( move, 0, 0 ) );
+		player->GetEngineObject()->SetLocalAngles( player->GetEngineObject()->GetLocalAngles() - QAngle( move, 0, 0 ) );
 	}
 }
 
@@ -700,8 +700,8 @@ void CViewRender::SetUpViews()
 				C_BaseEntity *ve = cl_entitylist->GetEnt( viewentity );
 				if ( ve )
 				{
-					VectorCopy( ve->GetAbsOrigin(), view.origin );
-					VectorCopy( ve->GetAbsAngles(), view.angles );
+					VectorCopy( ve->GetEngineObject()->GetAbsOrigin(), view.origin );
+					VectorCopy( ve->GetEngineObject()->GetAbsAngles(), view.angles );
 				}
 			}
 
@@ -1328,8 +1328,8 @@ static void GetPos( const CCommand &args, Vector &vecOrigin, QAngle &angles )
 		C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 		if ( pPlayer )
 		{
-			vecOrigin = pPlayer->GetAbsOrigin();
-			angles = pPlayer->GetAbsAngles();
+			vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
+			angles = pPlayer->GetEngineObject()->GetAbsAngles();
 		}
 	}
 }

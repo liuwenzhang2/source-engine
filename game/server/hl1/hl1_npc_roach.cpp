@@ -240,7 +240,7 @@ void CNPC_Roach::NPCThink( void  )
 					CSound *pSound = GetLoudestSoundOfType( ALL_SOUNDS );
 
 					// roach smells food and is just standing around. Go to food unless food isn't on same z-plane.
-					if ( pSound && abs( pSound->GetSoundOrigin().z - GetAbsOrigin().z ) <= 3 )
+					if ( pSound && abs( pSound->GetSoundOrigin().z - GetEngineObject()->GetAbsOrigin().z ) <= 3 )
 					{
 						PickNewDest( ROACH_SMELL_FOOD );
 						SetActivity ( ACT_WALK );
@@ -298,15 +298,15 @@ void CNPC_Roach::PickNewDest ( int iCondition )
 		vecNewDir.x = random->RandomInt( -1, 1 );
 		vecNewDir.y = random->RandomInt( -1, 1 );
 		flDist		= 256 + ( random->RandomInt(0,255) );
-		vecDest = GetAbsOrigin() + vecNewDir * flDist;
+		vecDest = GetEngineObject()->GetAbsOrigin() + vecNewDir * flDist;
 
-	} while ( ( vecDest - GetAbsOrigin() ).Length2D() < 128 );
+	} while ( ( vecDest - GetEngineObject()->GetAbsOrigin() ).Length2D() < 128 );
 
 	Vector vecLocation;
 
 	vecLocation.x = vecDest.x;
 	vecLocation.y = vecDest.y;
-	vecLocation.z = GetAbsOrigin().z;
+	vecLocation.z = GetEngineObject()->GetAbsOrigin().z;
 	
 	AI_NavGoal_t goal( GOALTYPE_LOCATION, vecLocation, ACT_WALK );
 
@@ -343,7 +343,7 @@ void CNPC_Roach::Look ( int iDistance )
 	// Examine all entities within a reasonable radius
 	// !!!PERFORMANCE - let's trivially reject the ent list before radius searching!
 
-	for ( CEntitySphereQuery sphere( GetAbsOrigin(), iDistance ); ( pSightEnt = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
+	for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), iDistance ); ( pSightEnt = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 	{
 		// only consider ents that can be damaged. !!!temporarily only considering other monsters and clients
 		if (  pSightEnt->IsPlayer() || FBitSet ( pSightEnt->GetFlags(), FL_NPC ) )
@@ -377,13 +377,13 @@ void CNPC_Roach::Move ( float flInterval )
 	Vector		vecApex;
 
 	// local move to waypoint.
-	flWaypointDist = ( GetNavigator()->GetGoalPos() - GetAbsOrigin() ).Length2D();
+	flWaypointDist = ( GetNavigator()->GetGoalPos() - GetEngineObject()->GetAbsOrigin() ).Length2D();
 	
 	GetMotor()->SetIdealYawToTargetAndUpdate( GetNavigator()->GetGoalPos() );
 
 	float speed = 150 * flInterval;
 
-	Vector vToTarget = GetNavigator()->GetGoalPos() - GetAbsOrigin();
+	Vector vToTarget = GetNavigator()->GetGoalPos() - GetEngineObject()->GetAbsOrigin();
 	vToTarget.NormalizeInPlace();
 	Vector vMovePos = vToTarget * speed;
 
@@ -428,12 +428,12 @@ void CNPC_Roach::Touch ( CBaseEntity *pOther )
 	Vector		vecSpot;
 	trace_t		tr;
 
-	if ( pOther->GetAbsVelocity() == vec3_origin || !pOther->IsPlayer() )
+	if ( pOther->GetEngineObject()->GetAbsVelocity() == vec3_origin || !pOther->IsPlayer() )
 	{
 		return;
 	}
 
-	vecSpot = GetAbsOrigin() + Vector ( 0 , 0 , 8 );//move up a bit, and trace down.
+	vecSpot = GetEngineObject()->GetAbsOrigin() + Vector ( 0 , 0 , 8 );//move up a bit, and trace down.
 	//UTIL_TraceLine ( vecSpot, vecSpot + Vector ( 0, 0, -24 ),  ignore_monsters, ENT(pev), & tr);
 
 	UTIL_TraceLine ( vecSpot, vecSpot + Vector ( 0, 0, -24 ), MASK_ALL, this, COLLISION_GROUP_NONE, &tr);
@@ -461,7 +461,7 @@ void CNPC_Roach::Event_Killed( const CTakeDamageInfo &info )
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Roach.Smash" );
 	}
 	
-	CSoundEnt::InsertSound ( SOUND_WORLD, GetAbsOrigin(), 128, 1 );
+	CSoundEnt::InsertSound ( SOUND_WORLD, GetEngineObject()->GetAbsOrigin(), 128, 1 );
 
 	UTIL_Remove( this );
 }

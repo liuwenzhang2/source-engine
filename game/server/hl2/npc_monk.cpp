@@ -394,7 +394,7 @@ bool CNPC_Monk::ShouldBackAway()
 	if( !GetEnemy() )
 		return false;
 
-	if( GetAbsOrigin().z - GetEnemy()->GetAbsOrigin().z >= MONK_STAND_GROUND_HEIGHT )
+	if(GetEngineObject()->GetAbsOrigin().z - GetEnemy()->GetEngineObject()->GetAbsOrigin().z >= MONK_STAND_GROUND_HEIGHT )
 	{
 		// This is a fairly special case. Grigori looks better fighting from his assault points in the
 		// elevated places of the Graveyard, so we prevent his back away behavior anytime he has a height
@@ -403,7 +403,7 @@ bool CNPC_Monk::ShouldBackAway()
 	}
 
 	float flDist;
-	flDist = ( GetAbsOrigin() - GetEnemy()->GetAbsOrigin() ).Length();
+	flDist = (GetEngineObject()->GetAbsOrigin() - GetEnemy()->GetEngineObject()->GetAbsOrigin() ).Length();
 
 	if( flDist <= 180 )
 		return true;
@@ -419,7 +419,7 @@ bool CNPC_Monk::IsValidEnemy( CBaseEntity *pEnemy )
 	{
 		float flDist;
 
-		flDist = ( GetAbsOrigin() - pEnemy->GetAbsOrigin() ).Length();
+		flDist = (GetEngineObject()->GetAbsOrigin() - pEnemy->GetEngineObject()->GetAbsOrigin() ).Length();
 		if( flDist <= GetActiveWeapon()->m_fMaxRange1 )
 			return true;
 	}
@@ -595,7 +595,7 @@ void CNPC_Monk::GatherConditions()
 				// if this zombie is close enough to attack, add him to the zombie danger!
 				float flDist;
 
-				flDist = (pZombie->GetAbsOrigin() - GetAbsOrigin()).Length2DSqr();
+				flDist = (pZombie->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length2DSqr();
 
 				if( flDist <= 128.0f * 128.0f )
 				{

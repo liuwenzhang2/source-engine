@@ -68,7 +68,7 @@ int FindBullseyesInCone( CBaseEntity **pList, int listMax, const Vector &coneOri
 	{
 		CNPC_Bullseye *pTest = g_BullseyeList.m_list[i];
 
-		if ( IsPointInCone( pTest->GetAbsOrigin(), coneOrigin, coneAxis, coneAngleCos, coneLength ) )
+		if ( IsPointInCone( pTest->GetEngineObject()->GetAbsOrigin(), coneOrigin, coneAxis, coneAngleCos, coneLength ) )
 		{
 			pList[count] = pTest;
 			count++;
@@ -363,7 +363,7 @@ bool CNPC_Bullseye::CanBeAnEnemyOf( CBaseEntity *pEnemy )
 
 	if ( m_flMinDistValidEnemy > 0 )
 	{
-		float distSq = ( GetAbsOrigin().AsVector2D() - pEnemy->GetAbsOrigin().AsVector2D() ).LengthSqr();
+		float distSq = (GetEngineObject()->GetAbsOrigin().AsVector2D() - pEnemy->GetEngineObject()->GetAbsOrigin().AsVector2D() ).LengthSqr();
 		if ( distSq < Square( m_flMinDistValidEnemy ) )
 		{
 			return false;

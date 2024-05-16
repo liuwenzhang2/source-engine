@@ -1119,7 +1119,7 @@ void CDODPlayerAnimState::EstimateYaw( void )
 	// Get the player's velocity and angles.
 	Vector vecEstVelocity;
 	GetOuterAbsVelocity( vecEstVelocity );
-	QAngle angles = GetOuterDOD()->GetLocalAngles();
+	QAngle angles = GetOuterDOD()->GetEngineObject()->GetLocalAngles();
 
 	// If we are not moving, sync up the feet and eyes slowly.
 	if ( vecEstVelocity.x == 0.0f && vecEstVelocity.y == 0.0f )

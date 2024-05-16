@@ -874,8 +874,8 @@ void UpdateClassImageEntity(
 	}
 
 	// move player model in front of our view
-	pPlayerModel->SetAbsOrigin( origin );
-	pPlayerModel->SetAbsAngles( QAngle( 0, 210, 0 ) );
+	pPlayerModel->GetEngineObject()->SetAbsOrigin( origin );
+	pPlayerModel->GetEngineObject()->SetAbsAngles( QAngle( 0, 210, 0 ) );
 
 	// wacky hacky, set upper body animation
 	pPlayerModel->m_SequenceTransitioner.CheckForSequenceChange( 

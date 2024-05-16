@@ -481,11 +481,11 @@ const Vector &CBeam::GetAbsStartPos( void ) const
 		CBaseEntity* ent =  (CBaseEntity*)gEntList.GetServerEntity( GetStartEntity() );
 		if ( !ent )
 		{
-			return GetAbsOrigin();
+			return GetEngineObject()->GetAbsOrigin();
 		}
-		return ent->GetAbsOrigin();
+		return ent->GetEngineObject()->GetAbsOrigin();
 	}
-	return GetAbsOrigin();
+	return GetEngineObject()->GetAbsOrigin();
 }
 
 
@@ -495,7 +495,7 @@ const Vector &CBeam::GetAbsEndPos( void ) const
 	{
 		CBaseEntity *ent =  (CBaseEntity*)gEntList.GetServerEntity( GetEndEntity() );
 		if ( ent )
-			return ent->GetAbsOrigin();
+			return ent->GetEngineObject()->GetAbsOrigin();
 	}
 
 	if (!const_cast<CBeam*>(this)->GetEngineObject()->GetMoveParent())
@@ -521,7 +521,7 @@ const Vector &C_Beam::GetAbsStartPos( void ) const
 			return vecStartAbsPosition;
 	}
 
-	return GetAbsOrigin();
+	return GetEngineObject()->GetAbsOrigin();
 }
 
 
@@ -726,7 +726,7 @@ void CBeam::RelinkBeam( void )
 		VectorMax( vecBeamMax, vecAbsExtra2, vecBeamMax );
 	}
 
-	SetCollisionBounds( vecBeamMin - GetAbsOrigin(), vecBeamMax - GetAbsOrigin() );
+	SetCollisionBounds( vecBeamMin - GetEngineObject()->GetAbsOrigin(), vecBeamMax - GetEngineObject()->GetAbsOrigin() );
 }
 
 
@@ -782,7 +782,7 @@ void CBeam::BeamDamage( trace_t *ptr )
 		if ( pHit )
 		{
 			ClearMultiDamage();
-			Vector dir = ptr->endpos - GetAbsOrigin();
+			Vector dir = ptr->endpos - GetEngineObject()->GetAbsOrigin();
 			VectorNormalize( dir );
 			int nDamageType = DMG_ENERGYBEAM;
 
@@ -920,7 +920,7 @@ int CBeam::DrawDebugTextOverlays(void)
 	{
 		// Print state
 		char tempstr[512];
-		Q_snprintf(tempstr, sizeof(tempstr), "start: (%.2f,%.2f,%.2f)", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z);
+		Q_snprintf(tempstr, sizeof(tempstr), "start: (%.2f,%.2f,%.2f)", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z);
 		EntityText(text_offset,tempstr,0);
 		text_offset++;
 
@@ -1125,7 +1125,7 @@ void CBeam::ComputeBounds( Vector& mins, Vector& maxs )
 				{
 					if ( pTestEnt == this )
 					{
-						mins = maxs = GetAbsOrigin();
+						mins = maxs = GetEngineObject()->GetAbsOrigin();
 					}
 					else
 					{
@@ -1200,7 +1200,7 @@ void CBeam::ComputeBounds( Vector& mins, Vector& maxs )
 	maxs += vecRad;
 
 	// Make sure the bounds are measured in *relative coords*
-	Vector vecAbsOrigin = GetAbsOrigin();
+	Vector vecAbsOrigin = GetEngineObject()->GetAbsOrigin();
 	mins -= vecAbsOrigin;
 	maxs -= vecAbsOrigin;
 }

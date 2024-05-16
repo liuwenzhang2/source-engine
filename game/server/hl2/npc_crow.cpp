@@ -164,7 +164,7 @@ Class_T	CNPC_Crow::Classify( void )
 //-----------------------------------------------------------------------------
 void CNPC_Crow::GatherEnemyConditions( CBaseEntity *pEnemy )
 {
-	m_flEnemyDist = (GetLocalOrigin() - pEnemy->GetLocalOrigin()).Length();
+	m_flEnemyDist = (GetEngineObject()->GetLocalOrigin() - pEnemy->GetEngineObject()->GetLocalOrigin()).Length();
 
 	if ( m_flEnemyDist < 512 )
 	{
@@ -188,7 +188,7 @@ void CNPC_Crow::GatherEnemyConditions( CBaseEntity *pEnemy )
 Vector CNPC_Crow::BodyTarget( const Vector &posSrc, bool bNoisy ) 
 { 
 	Vector vecResult;
-	vecResult = GetAbsOrigin();
+	vecResult = GetEngineObject()->GetAbsOrigin();
 	vecResult.z += 6;
 	return vecResult;
 }
@@ -233,12 +233,12 @@ void CNPC_Crow::HandleAnimEvent( animevent_t *pEvent )
 		//
 		// Take him off ground so engine doesn't instantly reset FL_ONGROUND.
 		//
-		UTIL_SetOrigin( this, GetLocalOrigin() + Vector( 0 , 0 , 1 ));
+		UTIL_SetOrigin( this, GetEngineObject()->GetLocalOrigin() + Vector( 0 , 0 , 1 ));
 
 		//
 		// How fast does the crow need to travel to reach the hop goal given gravity?
 		//
-		float flHopDistance = ( m_vSavePosition - GetLocalOrigin() ).Length();
+		float flHopDistance = ( m_vSavePosition - GetEngineObject()->GetLocalOrigin() ).Length();
 		float gravity = GetCurrentGravity();
 		if ( gravity <= 1 )
 		{
@@ -252,7 +252,7 @@ void CNPC_Crow::HandleAnimEvent( animevent_t *pEvent )
 		//
 		// Scale the sideways velocity to get there at the right time
 		//
-		Vector vecJumpDir = m_vSavePosition - GetLocalOrigin();
+		Vector vecJumpDir = m_vSavePosition - GetEngineObject()->GetLocalOrigin();
 		vecJumpDir = vecJumpDir / time;
 
 		//
@@ -286,7 +286,7 @@ void CNPC_Crow::HandleAnimEvent( animevent_t *pEvent )
 		params.m_bWarnOnDirectWaveReference = true;
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-		SetAbsVelocity( vecJumpDir );
+		GetEngineObject()->SetAbsVelocity( vecJumpDir );
 		return;
 	}
 
@@ -345,7 +345,7 @@ void CNPC_Crow::InputFlyAway( inputdata_t &inputdata )
 		if ( pEnt )
 		{
 			trace_t tr;
-			AI_TraceLine ( EyePosition(), pEnt->GetAbsOrigin(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
+			AI_TraceLine ( EyePosition(), pEnt->GetEngineObject()->GetAbsOrigin(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
 
 			if ( tr.fraction != 1.0f )
 				 return;
@@ -403,26 +403,26 @@ bool CNPC_Crow::OverrideMove( float flInterval )
 		{
 			if ( m_flLastStuckCheck <= gpGlobals->curtime )
 			{
-				if ( m_vLastStoredOrigin == GetAbsOrigin() )
+				if ( m_vLastStoredOrigin == GetEngineObject()->GetAbsOrigin() )
 				{
-					if ( GetAbsVelocity() == vec3_origin )
+					if (GetEngineObject()->GetAbsVelocity() == vec3_origin )
 					{
 						float flDamage = m_iHealth;
 						
 						CTakeDamageInfo	dmgInfo( this, this, flDamage, DMG_GENERIC );
-						GuessDamageForce( &dmgInfo, vec3_origin - Vector( 0, 0, 0.1 ), GetAbsOrigin() );
+						GuessDamageForce( &dmgInfo, vec3_origin - Vector( 0, 0, 0.1 ), GetEngineObject()->GetAbsOrigin() );
 						TakeDamage( dmgInfo );
 
 						return false;
 					}
 					else
 					{
-						m_vLastStoredOrigin = GetAbsOrigin();
+						m_vLastStoredOrigin = GetEngineObject()->GetAbsOrigin();
 					}
 				}
 				else
 				{
-					m_vLastStoredOrigin = GetAbsOrigin();
+					m_vLastStoredOrigin = GetEngineObject()->GetAbsOrigin();
 				}
 				
 				m_flLastStuckCheck = gpGlobals->curtime + 1.0f;
@@ -465,7 +465,7 @@ Activity CNPC_Crow::NPC_TranslateActivity( Activity eNewActivity )
 		if ( m_flSoarTime < gpGlobals->curtime )
 		{
 			//Adrian: This should be revisited.
-			if ( random->RandomInt( 0, 100 ) <= 50 && m_bSoar == false && GetAbsVelocity().z < 0 )
+			if ( random->RandomInt( 0, 100 ) <= 50 && m_bSoar == false && GetEngineObject()->GetAbsVelocity().z < 0 )
 			{
 				m_bSoar = true;
 				m_flSoarTime = gpGlobals->curtime + random->RandomFloat( 1, 4 );
@@ -509,7 +509,7 @@ void CNPC_Crow::MoveCrowFly( float flInterval )
 	//
 	// Determine the goal of our movement.
 	//
-	Vector vecMoveGoal = GetAbsOrigin();
+	Vector vecMoveGoal = GetEngineObject()->GetAbsOrigin();
 
 	if ( GetNavigator()->IsGoalActive() )
 	{
@@ -532,19 +532,19 @@ void CNPC_Crow::MoveCrowFly( float flInterval )
 	else
 	{
 		// No movement goal.
-		vecMoveGoal = GetAbsOrigin();
-		SetAbsVelocity( vec3_origin );
+		vecMoveGoal = GetEngineObject()->GetAbsOrigin();
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		return;
 	}
 
-	Vector vecMoveDir = ( vecMoveGoal - GetAbsOrigin() );
+	Vector vecMoveDir = ( vecMoveGoal - GetEngineObject()->GetAbsOrigin() );
 	Vector vForward;
-	AngleVectors( GetAbsAngles(), &vForward );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
 	
 	//
 	// Fly towards the movement goal.
 	//
-	float flDistance = ( vecMoveGoal - GetAbsOrigin() ).Length();
+	float flDistance = ( vecMoveGoal - GetEngineObject()->GetAbsOrigin() ).Length();
 
 	if ( vecMoveGoal != m_vDesiredTarget )
 	{
@@ -552,7 +552,7 @@ void CNPC_Crow::MoveCrowFly( float flInterval )
 	}
 	else
 	{
-		m_vCurrentTarget = ( m_vDesiredTarget - GetAbsOrigin() );
+		m_vCurrentTarget = ( m_vDesiredTarget - GetEngineObject()->GetAbsOrigin() );
 		VectorNormalize( m_vCurrentTarget );
 	}
 
@@ -587,7 +587,7 @@ void CNPC_Crow::MoveCrowFly( float flInterval )
 	if ( GetHintNode() )
 	{
 		AIMoveTrace_t moveTrace;
-		GetMoveProbe()->MoveLimit( NAV_FLY, GetAbsOrigin(), GetNavigator()->GetCurWaypointPos(), MASK_NPCSOLID, GetNavTargetEntity(), &moveTrace );
+		GetMoveProbe()->MoveLimit( NAV_FLY, GetEngineObject()->GetAbsOrigin(), GetNavigator()->GetCurWaypointPos(), MASK_NPCSOLID, GetNavTargetEntity(), &moveTrace );
 
 		//See if it succeeded
 		if ( IsMoveBlocked( moveTrace.fStatus ) )
@@ -610,9 +610,9 @@ void CNPC_Crow::MoveCrowFly( float flInterval )
 		VectorNormalize( vForward );
 	}
 
-	SetAbsVelocity( vForward * CROW_AIRSPEED );
+	GetEngineObject()->SetAbsVelocity( vForward * CROW_AIRSPEED );
 
-	if ( GetAbsVelocity().Length() > 0 && GetNavigator()->CurWaypointIsGoal() && flDistance < CROW_AIRSPEED )
+	if (GetEngineObject()->GetAbsVelocity().Length() > 0 && GetNavigator()->CurWaypointIsGoal() && flDistance < CROW_AIRSPEED )
 	{
 		SetIdealActivity( (Activity)ACT_CROW_LAND );
 	}
@@ -631,7 +631,7 @@ void CNPC_Crow::MoveCrowFly( float flInterval )
 	flRoll = clamp( flRoll, -45, 45 );
 
 	vRollAngle[ROLL] = flRoll;
-	SetAbsAngles( vRollAngle );
+	GetEngineObject()->SetAbsAngles( vRollAngle );
 }
 
 //-----------------------------------------------------------------------------
@@ -649,7 +649,7 @@ bool CNPC_Crow::Probe( const Vector &vecMoveDir, float flSpeed, Vector &vecDefle
 	// Look 1/2 second ahead.
 	//
 	trace_t tr;
-	AI_TraceHull( GetAbsOrigin(), GetAbsOrigin() + vecMoveDir * flSpeed, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, HL2COLLISION_GROUP_CROW, &tr );
+	AI_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecMoveDir * flSpeed, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, HL2COLLISION_GROUP_CROW, &tr );
 	if ( tr.fraction < 1.0f )
 	{
 		//
@@ -681,17 +681,17 @@ void CNPC_Crow::SetFlyingState( FlyState_t eState )
 		CapabilitiesRemove( bits_CAP_MOVE_GROUND );
 		CapabilitiesAdd( bits_CAP_MOVE_FLY );
 		SetMoveType( MOVETYPE_STEP );
-		m_vLastStoredOrigin = GetAbsOrigin();
+		m_vLastStoredOrigin = GetEngineObject()->GetAbsOrigin();
 		m_flLastStuckCheck = gpGlobals->curtime + 3.0f;
 		m_flGroundIdleMoveTime = gpGlobals->curtime + random->RandomFloat( 5.0f, 10.0f );
 	}
 	else if ( eState == FlyState_Walking )
 	{
 		// Walking
-		QAngle angles = GetAbsAngles();
+		QAngle angles = GetEngineObject()->GetAbsAngles();
 		angles[PITCH] = 0.0f;
 		angles[ROLL] = 0.0f;
-		SetAbsAngles( angles );
+		GetEngineObject()->SetAbsAngles( angles );
 
 		RemoveFlag( FL_FLY );
 		SetNavType( NAV_GROUND );
@@ -726,12 +726,12 @@ void CNPC_Crow::Takeoff( const Vector &vGoal )
 		//
 		// Lift us off ground so engine doesn't instantly reset FL_ONGROUND.
 		//
-		UTIL_SetOrigin( this, GetAbsOrigin() + Vector( 0 , 0 , 1 ));
+		UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() + Vector( 0 , 0 , 1 ));
 
 		//
 		// Fly straight at the goal entity at our maximum airspeed.
 		//
-		Vector vecMoveDir = vGoal - GetAbsOrigin();
+		Vector vecMoveDir = vGoal - GetEngineObject()->GetAbsOrigin();
 		VectorNormalize( vecMoveDir );
 		
 		// FIXME: pitch over time
@@ -740,9 +740,9 @@ void CNPC_Crow::Takeoff( const Vector &vGoal )
 
 		QAngle angles;
 		VectorAngles( vecMoveDir, angles );
-		SetAbsAngles( angles );
+		GetEngineObject()->SetAbsAngles( angles );
 
-		SetAbsVelocity( vecMoveDir * CROW_TAKEOFF_SPEED );
+		GetEngineObject()->SetAbsVelocity( vecMoveDir * CROW_TAKEOFF_SPEED );
 	}
 }
 
@@ -766,7 +766,7 @@ void CNPC_Crow::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, 
 
 void CNPC_Crow::StartTargetHandling( CBaseEntity *pTargetEnt )
 {
-	AI_NavGoal_t goal( GOALTYPE_PATHCORNER, pTargetEnt->GetAbsOrigin(),
+	AI_NavGoal_t goal( GOALTYPE_PATHCORNER, pTargetEnt->GetEngineObject()->GetAbsOrigin(),
 					   ACT_FLY,
 					   AIN_DEF_TOLERANCE, AIN_YAW_TO_DEST);
 
@@ -814,15 +814,15 @@ void CNPC_Crow::StartTask( const Task_t *pTask )
 				//
 				// Get our enemy's position in x/y.
 				//
-				Vector vecEnemyOrigin = GetEnemy()->GetAbsOrigin();
-				vecEnemyOrigin.z = GetAbsOrigin().z;
+				Vector vecEnemyOrigin = GetEnemy()->GetEngineObject()->GetAbsOrigin();
+				vecEnemyOrigin.z = GetEngineObject()->GetAbsOrigin().z;
 
 				//
 				// Pick a hop goal a random distance along a vector away from our enemy.
 				//
-				m_vSavePosition = GetAbsOrigin() - vecEnemyOrigin;
+				m_vSavePosition = GetEngineObject()->GetAbsOrigin() - vecEnemyOrigin;
 				VectorNormalize( m_vSavePosition );
-				m_vSavePosition = GetAbsOrigin() + m_vSavePosition * ( 32 + random->RandomInt( 0, 32 ) );
+				m_vSavePosition = GetEngineObject()->GetAbsOrigin() + m_vSavePosition * ( 32 + random->RandomInt( 0, 32 ) );
 
 				GetMotor()->SetIdealYawToTarget( m_vSavePosition );
 				TaskComplete();
@@ -924,7 +924,7 @@ void CNPC_Crow::StartTask( const Task_t *pTask )
 
 			Vector vecNewVelocity( cos( DEG2RAD( flYaw ) ), sin( DEG2RAD( flYaw ) ), random->RandomFloat( 0.1f, 0.5f ) );
 			vecNewVelocity *= CROW_AIRSPEED;
-			SetAbsVelocity( vecNewVelocity );
+			GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
 			SetIdealActivity( ACT_FLY );
 
@@ -936,7 +936,7 @@ void CNPC_Crow::StartTask( const Task_t *pTask )
 
 		case TASK_CROW_PICK_RANDOM_GOAL:
 		{
-			m_vSavePosition = GetLocalOrigin() + Vector( random->RandomFloat( -48.0f, 48.0f ), random->RandomFloat( -48.0f, 48.0f ), 0 );
+			m_vSavePosition = GetEngineObject()->GetLocalOrigin() + Vector( random->RandomFloat( -48.0f, 48.0f ), random->RandomFloat( -48.0f, 48.0f ), 0 );
 			TaskComplete();
 			break;
 		}
@@ -944,7 +944,7 @@ void CNPC_Crow::StartTask( const Task_t *pTask )
 		case TASK_CROW_HOP:
 		{
 			SetIdealActivity( ACT_HOP );
-			m_flHopStartZ = GetLocalOrigin().z;
+			m_flHopStartZ = GetEngineObject()->GetLocalOrigin().z;
 			break;
 		}
 
@@ -973,7 +973,7 @@ void CNPC_Crow::RunTask( const Task_t *pTask )
 		{
 			if ( GetNavigator()->IsGoalActive() )
 			{
-				GetMotor()->SetIdealYawToTargetAndUpdate( GetAbsOrigin() + GetNavigator()->GetCurWaypointPos(), AI_KEEP_YAW_SPEED );
+				GetMotor()->SetIdealYawToTargetAndUpdate(GetEngineObject()->GetAbsOrigin() + GetNavigator()->GetCurWaypointPos(), AI_KEEP_YAW_SPEED );
 			}
 			else
 				TaskFail( FAIL_NO_ROUTE );
@@ -998,13 +998,13 @@ void CNPC_Crow::RunTask( const Task_t *pTask )
 				SetIdealActivity( ACT_IDLE );
 			}
 
-			if ( ( GetAbsOrigin().z < m_flHopStartZ ) && ( !( GetFlags() & FL_ONGROUND ) ) )
+			if ( (GetEngineObject()->GetAbsOrigin().z < m_flHopStartZ ) && ( !( GetFlags() & FL_ONGROUND ) ) )
 			{
 				//
 				// We've hopped off of something! See if we're going to fall very far.
 				//
 				trace_t tr;
-				AI_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, -32 ), MASK_SOLID, this, HL2COLLISION_GROUP_CROW, &tr );
+				AI_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, -32 ), MASK_SOLID, this, HL2COLLISION_GROUP_CROW, &tr );
 				if ( tr.fraction == 1.0f )
 				{
 					//
@@ -1018,7 +1018,7 @@ void CNPC_Crow::RunTask( const Task_t *pTask )
 					// We'll be okay. Don't check again unless what we're hopping onto moves
 					// out from under us.
 					//
-					m_flHopStartZ = GetAbsOrigin().z - ( 32 * tr.fraction );
+					m_flHopStartZ = GetEngineObject()->GetAbsOrigin().z - ( 32 * tr.fraction );
 				}
 			}
 
@@ -1030,7 +1030,7 @@ void CNPC_Crow::RunTask( const Task_t *pTask )
 		//
 		case TASK_CROW_FLY:
 		{
-			GetMotor()->SetIdealYawToTargetAndUpdate( GetAbsOrigin() + GetAbsVelocity(), AI_KEEP_YAW_SPEED );
+			GetMotor()->SetIdealYawToTargetAndUpdate(GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity(), AI_KEEP_YAW_SPEED );
 
 			break;
 		}
@@ -1415,7 +1415,7 @@ bool CNPC_Crow::HandleInteraction( int interactionType, void *data, CBaseCombatC
 		if (data)
 		{
 			// FIXME: need a good way to ensure this contract
-			*((Vector *)data) = GetAbsOrigin() + Vector( 0, 0, 5 );
+			*((Vector *)data) = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 5 );
 		}
 
 		StopLoopingSounds();

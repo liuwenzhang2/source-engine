@@ -278,9 +278,9 @@ void CFunc_LiquidPortal::TeleportImmersedEntity( CBaseEntity *pEntity )
 	{
 		CPortal_Player *pEntityAsPlayer = (CPortal_Player *)pEntity;
 
-		Vector vNewOrigin = m_matrixThisToLinked * pEntity->GetAbsOrigin();
+		Vector vNewOrigin = m_matrixThisToLinked * pEntity->GetEngineObject()->GetAbsOrigin();
 		QAngle qNewAngles = TransformAnglesToWorldSpace( pEntityAsPlayer->EyeAngles(), m_matrixThisToLinked.As3x4() );
-		Vector vNewVelocity = m_matrixThisToLinked.ApplyRotation( pEntity->GetAbsVelocity() );
+		Vector vNewVelocity = m_matrixThisToLinked.ApplyRotation( pEntity->GetEngineObject()->GetAbsVelocity() );
 
 		pEntity->Teleport( &vNewOrigin, &qNewAngles, &vNewVelocity );
 
@@ -288,9 +288,9 @@ void CFunc_LiquidPortal::TeleportImmersedEntity( CBaseEntity *pEntity )
 	}
 	else
 	{
-		Vector vNewOrigin = m_matrixThisToLinked * pEntity->GetAbsOrigin();
-		QAngle qNewAngles = TransformAnglesToWorldSpace( pEntity->GetAbsAngles(), m_matrixThisToLinked.As3x4() );
-		Vector vNewVelocity = m_matrixThisToLinked.ApplyRotation( pEntity->GetAbsVelocity() );
+		Vector vNewOrigin = m_matrixThisToLinked * pEntity->GetEngineObject()->GetAbsOrigin();
+		QAngle qNewAngles = TransformAnglesToWorldSpace( pEntity->GetEngineObject()->GetAbsAngles(), m_matrixThisToLinked.As3x4() );
+		Vector vNewVelocity = m_matrixThisToLinked.ApplyRotation( pEntity->GetEngineObject()->GetAbsVelocity() );
 
 		pEntity->Teleport( &vNewOrigin, &qNewAngles, &vNewVelocity );
 	}

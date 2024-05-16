@@ -601,7 +601,7 @@ public:
 			return true;
 
 		// player is on a ladder - is it this one?
-		const Vector &feet = player->GetAbsOrigin();
+		const Vector &feet = player->GetEngineObject()->GetAbsOrigin();
 
 		if (feet.z > m_ladder->m_top.z + HalfHumanHeight)
 			return true;

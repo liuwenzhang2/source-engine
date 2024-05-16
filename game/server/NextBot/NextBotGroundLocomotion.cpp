@@ -193,8 +193,8 @@ void NextBotGroundLocomotion::Update( void )
 	{
 		m_acceleration.x = 0.0f;
 		m_acceleration.y = 0.0f;
-		m_velocity.x = GetBot()->GetEntity()->GetAbsVelocity().x;
-		m_velocity.y = GetBot()->GetEntity()->GetAbsVelocity().y;
+		m_velocity.x = GetBot()->GetEntity()->GetEngineObject()->GetAbsVelocity().x;
+		m_velocity.y = GetBot()->GetEntity()->GetEngineObject()->GetAbsVelocity().y;
 	}
 	else
 	{
@@ -210,7 +210,7 @@ void NextBotGroundLocomotion::Update( void )
 	if ( body->HasActivityType( IBody::MOTION_CONTROLLED_Z ) )
 	{
 		m_acceleration.z = 0.0f;
-		m_velocity.z = GetBot()->GetEntity()->GetAbsVelocity().z;
+		m_velocity.z = GetBot()->GetEntity()->GetEngineObject()->GetAbsVelocity().z;
 	}
 	else
 	{
@@ -271,7 +271,7 @@ void NextBotGroundLocomotion::Update( void )
 	}
 
 	// update entity velocity to that of locomotor
-	m_nextBot->SetAbsVelocity( m_velocity );
+	m_nextBot->GetEngineObject()->SetAbsVelocity( m_velocity );
 
 
 #ifdef LEANING
@@ -1307,10 +1307,10 @@ void NextBotGroundLocomotion::DescendLadder( const CNavLadder *ladder, const CNa
 
 		float ladderYaw = UTIL_VecToYaw( -m_ladder->GetNormal() );
 
-		QAngle angles = m_nextBot->GetLocalAngles();
+		QAngle angles = m_nextBot->GetEngineObject()->GetLocalAngles();
 		angles.y = ladderYaw;
 		
-		m_nextBot->SetLocalAngles( angles );
+		m_nextBot->GetEngineObject()->SetLocalAngles( angles );
 
 		body->StartActivity( ACT_CLIMB_DOWN, IBody::MOTION_CONTROLLED_Z );
 	}
@@ -1402,7 +1402,7 @@ void NextBotGroundLocomotion::OnMoveToFailure( const Path *path, MoveToFailureTy
 //----------------------------------------------------------------------------------------------------------
 bool NextBotGroundLocomotion::DidJustJump( void ) const
 {
-	return IsClimbingOrJumping() && (m_nextBot->GetAbsVelocity().z > 0.0f);
+	return IsClimbingOrJumping() && (m_nextBot->GetEngineObject()->GetAbsVelocity().z > 0.0f);
 }
 
 
@@ -1414,7 +1414,7 @@ void NextBotGroundLocomotion::FaceTowards( const Vector &target )
 {
 	const float deltaT = GetUpdateInterval();
 	
-	QAngle angles = m_nextBot->GetLocalAngles();
+	QAngle angles = m_nextBot->GetEngineObject()->GetLocalAngles();
 	
 	float desiredYaw = UTIL_VecToYaw( target - GetFeet() );
 
@@ -1435,7 +1435,7 @@ void NextBotGroundLocomotion::FaceTowards( const Vector &target )
 		angles.y += angleDiff;
 	}
 	
-	m_nextBot->SetLocalAngles( angles );
+	m_nextBot->GetEngineObject()->SetLocalAngles( angles );
 }
 
 

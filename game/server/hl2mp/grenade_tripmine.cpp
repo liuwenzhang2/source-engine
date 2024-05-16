@@ -92,11 +92,11 @@ void CTripmineGrenade::Spawn( void )
 	SetDamageRadius( sk_tripmine_radius.GetFloat() );
 
 	// Tripmine sits at 90 on wall so rotate back to get m_vecDir
-	QAngle angles = GetAbsAngles();
+	QAngle angles = GetEngineObject()->GetAbsAngles();
 	angles.x -= 90;
 
 	AngleVectors( angles, &m_vecDir );
-	m_vecEnd = GetAbsOrigin() + m_vecDir * 2048;
+	m_vecEnd = GetEngineObject()->GetAbsOrigin() + m_vecDir * 2048;
 
 	AddEffects( EF_NOSHADOW );
 }
@@ -156,7 +156,7 @@ void CTripmineGrenade::MakeBeam( void )
 {
 	trace_t tr;
 
-	UTIL_TraceLine( GetAbsOrigin(), m_vecEnd, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), m_vecEnd, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
 	m_flBeamLength = tr.fraction;
 
@@ -172,7 +172,7 @@ void CTripmineGrenade::MakeBeam( void )
 	if (pBCC)
 	{
 		SetOwnerEntity( pBCC );
-		UTIL_TraceLine( GetAbsOrigin(), m_vecEnd, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), m_vecEnd, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 		m_flBeamLength = tr.fraction;
 		SetOwnerEntity( NULL );
 		
@@ -185,7 +185,7 @@ void CTripmineGrenade::MakeBeam( void )
 	// to appear if person right in front of it
 	SetNextThink( gpGlobals->curtime + 1.0f );
 
-	Vector vecTmpEnd = GetLocalOrigin() + m_vecDir * 2048 * drawLength;
+	Vector vecTmpEnd = GetEngineObject()->GetLocalOrigin() + m_vecDir * 2048 * drawLength;
 
 	m_pBeam = CBeam::BeamCreate( g_pModelNameLaser, 0.35 );
 	m_pBeam->PointEntInit( vecTmpEnd, this );
@@ -204,10 +204,10 @@ void CTripmineGrenade::BeamBreakThink( void  )
 	if (IsSolidFlagSet( FSOLID_NOT_SOLID ))
 	{
 		trace_t tr;
-		Vector	vUpBit = GetAbsOrigin();
+		Vector	vUpBit = GetEngineObject()->GetAbsOrigin();
 		vUpBit.z += 5.0;
 
-		UTIL_TraceEntity( this, GetAbsOrigin(), vUpBit, MASK_SHOT, &tr );
+		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vUpBit, MASK_SHOT, &tr );
 		if ( !tr.startsolid && (tr.fraction == 1.0) )
 		{
 			RemoveSolidFlags( FSOLID_NOT_SOLID );
@@ -217,7 +217,7 @@ void CTripmineGrenade::BeamBreakThink( void  )
 	trace_t tr;
 
 	// NOT MASK_SHOT because we want only simple hit boxes
-	UTIL_TraceLine( GetAbsOrigin(), m_vecEnd, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), m_vecEnd, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 
 	// ALERT( at_console, "%f : %f\n", tr.flFraction, m_flBeamLength );
 
@@ -287,10 +287,10 @@ void CTripmineGrenade::DelayDeathThink( void )
 {
 	KillBeam();
 	trace_t tr;
-	UTIL_TraceLine ( GetAbsOrigin() + m_vecDir * 8, GetAbsOrigin() - m_vecDir * 64,  MASK_SOLID, this, COLLISION_GROUP_NONE, & tr);
-	UTIL_ScreenShake( GetAbsOrigin(), 25.0, 150.0, 1.0, 750, SHAKE_START );
+	UTIL_TraceLine (GetEngineObject()->GetAbsOrigin() + m_vecDir * 8, GetEngineObject()->GetAbsOrigin() - m_vecDir * 64,  MASK_SOLID, this, COLLISION_GROUP_NONE, & tr);
+	UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 25.0, 150.0, 1.0, 750, SHAKE_START );
 
-	ExplosionCreate( GetAbsOrigin() + m_vecDir * 8, GetAbsAngles(), m_hOwner, GetDamage(), GetDamageRadius(), 
+	ExplosionCreate(GetEngineObject()->GetAbsOrigin() + m_vecDir * 8, GetEngineObject()->GetAbsAngles(), m_hOwner, GetDamage(), GetDamageRadius(),
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 0.0f, this);
 
 	UTIL_Remove( this );

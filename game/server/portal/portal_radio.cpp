@@ -546,8 +546,8 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 		{
 			if ( V_strcmp( STRING( pOldDinosaur->GetModelName() ), RADIO_MODEL_NAME ) == 0 )
 			{
-				vSpawnPos = pOldDinosaur->GetAbsOrigin();
-				vSpawnAng = pOldDinosaur->GetAbsAngles();
+				vSpawnPos = pOldDinosaur->GetEngineObject()->GetAbsOrigin();
+				vSpawnAng = pOldDinosaur->GetEngineObject()->GetAbsAngles();
 
 				UTIL_Remove( pOldDinosaur );
 
@@ -567,8 +567,8 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 	Assert ( pDinosaur );
 	if ( pDinosaur )
 	{
-		pDinosaur->SetAbsOrigin( vSpawnPos );
-		pDinosaur->SetAbsAngles( vSpawnAng );
+		pDinosaur->GetEngineObject()->SetAbsOrigin( vSpawnPos );
+		pDinosaur->GetEngineObject()->SetAbsAngles( vSpawnAng );
 		DispatchSpawn( pDinosaur );
 	}
 
@@ -589,7 +589,7 @@ CDinosaurSignal *CSpawnDinosaurHack::SpawnSignal( radiolocs& loc )
 			swap( loc.soundinnerrad, loc.soundouterrad );
 		}
 #endif
-		pSignal->SetAbsOrigin( Vector( loc.soundpos[0], loc.soundpos[1], loc.soundpos[2] ) );
+		pSignal->GetEngineObject()->SetAbsOrigin( Vector( loc.soundpos[0], loc.soundpos[1], loc.soundpos[2] ) );
 		pSignal->m_flInnerRadius	= loc.soundinnerrad;
 		pSignal->m_flOuterRadius	= loc.soundouterrad;
 		V_strncpy( pSignal->m_szSoundName.GetForModify(), loc.soundname, 128 );

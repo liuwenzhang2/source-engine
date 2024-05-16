@@ -140,7 +140,7 @@ void CWeapon357::PrimaryAttack( void )
 	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 0.5 );
 
 	//Disorient the player
-	QAngle angles = pPlayer->GetLocalAngles();
+	QAngle angles = pPlayer->GetEngineObject()->GetLocalAngles();
 
 	angles.x += random->RandomInt( -1, 1 );
 	angles.y += random->RandomInt( -1, 1 );
@@ -150,7 +150,7 @@ void CWeapon357::PrimaryAttack( void )
 
 	pPlayer->ViewPunch( QAngle( -8, random->RandomFloat( -2, 2 ), 0 ) );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 600, 0.2, GetOwner() );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 600, 0.2, GetOwner() );
 
 	if ( !m_iClip1 && pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
 	{

@@ -121,7 +121,7 @@ Vector CRagdollMagnet::GetForceVector( CBaseEntity *pNPC )
 		Vector vecForceDir;
 		Vector vecClosest;
 
-		CalcClosestPointOnLineSegment( pNPC->WorldSpaceCenter(), GetAbsOrigin(), m_axis, vecClosest, NULL );
+		CalcClosestPointOnLineSegment( pNPC->WorldSpaceCenter(), GetEngineObject()->GetAbsOrigin(), m_axis, vecClosest, NULL );
 
 		vecForceDir = (vecClosest - pNPC->WorldSpaceCenter() );
 		VectorNormalize( vecForceDir );
@@ -132,7 +132,7 @@ Vector CRagdollMagnet::GetForceVector( CBaseEntity *pNPC )
 	{
 		Vector vecForce;
 
-		vecForce = GetAbsOrigin() - pNPC->WorldSpaceCenter();
+		vecForce = GetEngineObject()->GetAbsOrigin() - pNPC->WorldSpaceCenter();
 		VectorNormalize( vecForce );
 
 		vecForceToApply = vecForce * m_force;
@@ -180,7 +180,7 @@ float CRagdollMagnet::DistToPoint( const Vector &vecPoint )
 		CPlane top, bottom;
 
 		bottom.InitializePlane( -vecAxis, m_axis );
-		top.InitializePlane( vecAxis, GetAbsOrigin() );
+		top.InitializePlane( vecAxis, GetEngineObject()->GetAbsOrigin() );
 
 		if( top.PointInFront( vecPoint ) && bottom.PointInFront( vecPoint ) )
 		{
@@ -201,10 +201,10 @@ float CRagdollMagnet::DistToPoint( const Vector &vecPoint )
 			//VectorNormalize( vecUp );
 
 			// Set up the plane to measure horizontal dist.
-			axis.InitializePlane( vecRight, GetAbsOrigin() );
+			axis.InitializePlane( vecRight, GetEngineObject()->GetAbsOrigin() );
 			hDist = fabs( axis.PointDist( vecPoint ) );
 
-			axis.InitializePlane( vecUp, GetAbsOrigin() );
+			axis.InitializePlane( vecUp, GetEngineObject()->GetAbsOrigin() );
 			vDist = fabs( axis.PointDist( vecPoint ) );
 
 			return MAX( hDist, vDist );
@@ -217,6 +217,6 @@ float CRagdollMagnet::DistToPoint( const Vector &vecPoint )
 	else
 	{
 		// I'm a point magnet. Just return dist
-		return ( GetAbsOrigin() - vecPoint ).Length();
+		return (GetEngineObject()->GetAbsOrigin() - vecPoint ).Length();
 	}
 }

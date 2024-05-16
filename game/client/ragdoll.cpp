@@ -756,7 +756,7 @@ public:
 			VectorTransform( m_attachmentPointRagdollSpace, matrix, ragOrigin );
 			offset = worldOrigin - ragOrigin;
 			// fixes culling
-			SetAbsOrigin( worldOrigin );
+			GetEngineObject()->SetAbsOrigin( worldOrigin );
 			m_vecOffset = offset;
 		}
 

@@ -65,7 +65,7 @@ void CC_Test_Entity_Blocker( void )
 	pPlayer->GetVectors( &vecForward, NULL, NULL );
 
 	trace_t tr;
-	Vector vecOrigin = pPlayer->GetAbsOrigin() + (vecForward * 256);
+	Vector vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin() + (vecForward * 256);
 	UTIL_TraceHull( vecOrigin + Vector(0,0,256), vecOrigin - Vector(0,0,256), VEC_HULL_MIN_SCALED( pPlayer ), VEC_HULL_MAX_SCALED( pPlayer ), MASK_SOLID, pPlayer, COLLISION_GROUP_NONE, &tr );
 	if ( !tr.allsolid && !tr.startsolid )
 	{

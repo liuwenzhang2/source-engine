@@ -189,7 +189,7 @@ C_PlasmaBeamNode::~C_PlasmaBeamNode(void)
 //-----------------------------------------------------------------------------
 void C_PlasmaBeamNode::AddEntity( void )
 {
-	m_pFirePlasmaSpray->SetSortOrigin( GetAbsOrigin() );
+	m_pFirePlasmaSpray->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 }
 
 //------------------------------------------------------------------------------
@@ -201,9 +201,9 @@ void C_PlasmaBeamNode::OnDataChanged(DataUpdateType_t updateType)
 {
 	if (updateType == DATA_UPDATE_CREATED)
 	{
-		Vector vMoveDir = GetAbsVelocity();
+		Vector vMoveDir = GetEngineObject()->GetAbsVelocity();
 		float  flVel = VectorNormalize(vMoveDir);
-		m_pFirePlasmaSpray->m_ParticleCollision.Setup( GetAbsOrigin(), &vMoveDir, 0.3, 
+		m_pFirePlasmaSpray->m_ParticleCollision.Setup(GetEngineObject()->GetAbsOrigin(), &vMoveDir, 0.3,
 											flVel-50, flVel+50, 800, 0.5 );
 		SetNextClientThink(gpGlobals->curtime + 0.01);
 	}
@@ -233,8 +233,8 @@ void C_PlasmaBeamNode::ClientThink(void)
 	}
 	
 	trace_t trace;
-	Vector vEndTrace = GetAbsOrigin() + (0.3*GetAbsVelocity());
-	UTIL_TraceLine( GetAbsOrigin(), vEndTrace, MASK_SHOT, NULL, COLLISION_GROUP_NONE, &trace );
+	Vector vEndTrace = GetEngineObject()->GetAbsOrigin() + (0.3* GetEngineObject()->GetAbsVelocity());
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), vEndTrace, MASK_SHOT, NULL, COLLISION_GROUP_NONE, &trace );
 	if ( trace.fraction != 1.0f || trace.startsolid)
 	{
 		m_bSprayOn = false;
@@ -253,8 +253,8 @@ void C_PlasmaBeamNode::ClientThink(void)
 			float rany = random->RandomFloat( -28.0f, 28.0f );
 			float ranz = random->RandomFloat( -28.0f, 28.0f );
 
-			Vector vNewPos	=  GetAbsOrigin();
-			Vector vAdd		=  Vector(GetAbsAngles().x,GetAbsAngles().y,GetAbsAngles().z)*random->RandomFloat(-60,120);
+			Vector vNewPos	= GetEngineObject()->GetAbsOrigin();
+			Vector vAdd		=  Vector(GetEngineObject()->GetAbsAngles().x, GetEngineObject()->GetAbsAngles().y, GetEngineObject()->GetAbsAngles().z)*random->RandomFloat(-60,120);
 			vNewPos			+= vAdd;
 
 			sParticle = (SimpleParticle *) m_pFirePlasmaSpray->AddParticle( sizeof(SimpleParticle), handle, vNewPos );
@@ -262,7 +262,7 @@ void C_PlasmaBeamNode::ClientThink(void)
 			sParticle->m_flLifetime		= 0.0f;
 			sParticle->m_flDieTime		= PLASMASPARK_LIFETIME;
 
-			sParticle->m_vecVelocity	= GetAbsVelocity();
+			sParticle->m_vecVelocity	= GetEngineObject()->GetAbsVelocity();
 			sParticle->m_vecVelocity.x	+= ranx;
 			sParticle->m_vecVelocity.y	+= rany;
 			sParticle->m_vecVelocity.z	+= ranz;

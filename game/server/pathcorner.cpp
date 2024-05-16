@@ -127,14 +127,14 @@ void CPathCorner::DrawDebugGeometryOverlays(void)
 	// ----------------------------------------------
 	if (m_debugOverlays & (OVERLAY_BBOX_BIT|OVERLAY_ABSBOX_BIT))
 	{
-		NDebugOverlay::Box(GetAbsOrigin(), Vector(-10,-10,-10), Vector(10,10,10), 255, 100, 100, 0 ,0);
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), Vector(-10,-10,-10), Vector(10,10,10), 255, 100, 100, 0 ,0);
 
 		if (m_target != NULL_STRING)
 		{
 			CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_target );
 			if (pTarget)
 			{
-				NDebugOverlay::Line(GetAbsOrigin(),pTarget->GetAbsOrigin(),255,100,100,true,0.0);
+				NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(),pTarget->GetEngineObject()->GetAbsOrigin(),255,100,100,true,0.0);
 			}
 		}
 	}

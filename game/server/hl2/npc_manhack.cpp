@@ -374,7 +374,7 @@ void CNPC_Manhack::Event_Killed( const CTakeDamageInfo &info )
 	// Sparks
 	for (int i = 0; i < 3; i++)
 	{
-		Vector sparkPos = GetAbsOrigin();
+		Vector sparkPos = GetEngineObject()->GetAbsOrigin();
 		sparkPos.x += random->RandomFloat(-12,12);
 		sparkPos.y += random->RandomFloat(-12,12);
 		sparkPos.z += random->RandomFloat(-12,12);
@@ -383,7 +383,7 @@ void CNPC_Manhack::Event_Killed( const CTakeDamageInfo &info )
 
 	// Light
 	CBroadcastRecipientFilter filter;
-	te->DynamicLight( filter, 0.0, &GetAbsOrigin(), 255, 180, 100, 0, 100, 0.1, 0 );
+	te->DynamicLight( filter, 0.0, &GetEngineObject()->GetAbsOrigin(), 255, 180, 100, 0, 100, 0.1, 0 );
 
 	if ( m_nEnginePitch1 < 0 )
 	{
@@ -442,7 +442,7 @@ void CNPC_Manhack::TakeDamageFromPhyscannon( CBasePlayer *pPlayer )
 	info.SetDamageType( DMG_GENERIC );
 	info.SetInflictor( this );
 	info.SetAttacker( pPlayer );
-	info.SetDamagePosition( GetAbsOrigin() );
+	info.SetDamagePosition(GetEngineObject()->GetAbsOrigin() );
 	info.SetDamageForce( Vector( 1.0, 1.0, 1.0 ) );
 
 	// Convert velocity into damage.
@@ -717,7 +717,7 @@ int	CNPC_Manhack::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		Vector attackDir = info.GetDamageForce();
 		VectorNormalize( attackDir );
 
-		Vector testCenter = GetAbsOrigin() + ( attackDir * MANHACK_PHYSICS_SEARCH_RADIUS );
+		Vector testCenter = GetEngineObject()->GetAbsOrigin() + ( attackDir * MANHACK_PHYSICS_SEARCH_RADIUS );
 		Vector vecDelta( MANHACK_PHYSICS_SEARCH_RADIUS, MANHACK_PHYSICS_SEARCH_RADIUS, MANHACK_PHYSICS_SEARCH_RADIUS );
 
 		int count = UTIL_EntitiesInBox( pList, MANHACK_PHYS_SEARCH_SIZE, testCenter - vecDelta, testCenter + vecDelta, 0 );
@@ -846,7 +846,7 @@ bool CNPC_Manhack::CorpseGib( const CTakeDamageInfo &info )
 		vecGibAVelocity.z = random->RandomFloat( -500, 500 );
 	}
 
-	PropBreakableCreateAll( GetModelIndex(), NULL, GetAbsOrigin(), GetAbsAngles(), vecGibVelocity, vecGibAVelocity, 1.0, 60, COLLISION_GROUP_DEBRIS );
+	PropBreakableCreateAll( GetModelIndex(), NULL, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), vecGibVelocity, vecGibAVelocity, 1.0, 60, COLLISION_GROUP_DEBRIS );
 
 	RemoveDeferred();
 
@@ -1042,11 +1042,11 @@ void CNPC_Manhack::Loiter()
 	// Friendly manhack is loitering.
 	if( !m_bHeld )
 	{
-		float distSqr = m_vecLoiterPosition.DistToSqr(GetAbsOrigin());
+		float distSqr = m_vecLoiterPosition.DistToSqr(GetEngineObject()->GetAbsOrigin());
 
 		if( distSqr > MAX_LOITER_DIST_SQR )
 		{
-			Vector vecDir = m_vecLoiterPosition - GetAbsOrigin();
+			Vector vecDir = m_vecLoiterPosition - GetEngineObject()->GetAbsOrigin();
 			VectorNormalize( vecDir );
 
 			// Move back to our loiter position.
@@ -1093,8 +1093,8 @@ void CNPC_Manhack::MaintainGroundHeight( void )
 	const float minGroundHeight = 52.0f;
 
 	trace_t	tr;
-	AI_TraceHull(	GetAbsOrigin(), 
-		GetAbsOrigin() - Vector( 0, 0, minGroundHeight ), 
+	AI_TraceHull(GetEngineObject()->GetAbsOrigin(),
+		GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, minGroundHeight ),
 		GetHullMins(), 
 		GetHullMaxs(), 
 		(MASK_NPCSOLID_BRUSHONLY), 
@@ -1134,7 +1134,7 @@ bool CNPC_Manhack::OverrideMove( float flInterval )
 	// So cops, etc. will try to avoid them
 	if ( !HasSpawnFlags( SF_MANHACK_NO_DANGER_SOUNDS ) && !m_bHeld )
 	{
-		CSoundEnt::InsertSound( SOUND_DANGER, GetAbsOrigin(), 75, flInterval, this );
+		CSoundEnt::InsertSound( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), 75, flInterval, this );
 	}
 
 	// -----------------------------------------------------------------
@@ -1260,7 +1260,7 @@ void CNPC_Manhack::MoveToTarget(float flInterval, const Vector &vMoveTarget)
 		// Steer towards our enemy if we're able to
 		if ( GetEnemy() != NULL )
 		{
-			Vector steerDir = ( GetEnemy()->EyePosition() - GetAbsOrigin() );
+			Vector steerDir = ( GetEnemy()->EyePosition() - GetEngineObject()->GetAbsOrigin() );
 			zDist = fabs( steerDir.z );
 			VectorNormalize( steerDir );
 
@@ -1300,7 +1300,7 @@ void CNPC_Manhack::MoveToTarget(float flInterval, const Vector &vMoveTarget)
 		Vector vecCurrentDir = GetCurrentVelocity();
 		VectorNormalize( vecCurrentDir );
 
-		targetDir = vMoveTarget - GetAbsOrigin();
+		targetDir = vMoveTarget - GetEngineObject()->GetAbsOrigin();
 		flDist = VectorNormalize( targetDir );
 		
 		float flDot = DotProduct( targetDir, vecCurrentDir );
@@ -1388,7 +1388,7 @@ void CNPC_Manhack::Splash( const Vector &vecSplashPos )
 	{
 		// We're leaving the water so we have to reverify what it was
 		trace_t	tr;
-		UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector( 0, 0, 256 ), (CONTENTS_WATER|CONTENTS_SLIME), this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 256 ), (CONTENTS_WATER|CONTENTS_SLIME), this, COLLISION_GROUP_NONE, &tr );
 
 		// Re-validate this
 		if ( !(tr.contents&(CONTENTS_WATER|CONTENTS_SLIME)) )
@@ -1435,7 +1435,7 @@ void CNPC_Manhack::ComputeSliceBounceVelocity( CBaseEntity *pHitEntity, trace_t 
 	// Knock it away from us
 	if ( VPhysicsGetObject() != NULL )
 	{
-		VPhysicsGetObject()->ApplyForceOffset( vecDir * 4, GetAbsOrigin() );
+		VPhysicsGetObject()->ApplyForceOffset( vecDir * 4, GetEngineObject()->GetAbsOrigin() );
 	}
 
 	// Also set our velocity
@@ -1521,7 +1521,7 @@ void CNPC_Manhack::Slice( CBaseEntity *pHitEntity, float flInterval, trace_t &tr
 	Vector dir = (tr.endpos - tr.startpos);
 	if ( dir == vec3_origin )
 	{
-		dir = ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin() - GetAbsOrigin();
+		dir = ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	}
 	CalculateMeleeDamageForce( &info, dir, tr.endpos );
 	pHitEntity->TakeDamage( info );
@@ -1533,7 +1533,7 @@ void CNPC_Manhack::Slice( CBaseEntity *pHitEntity, float flInterval, trace_t &tr
 		Vector velocity = GetCurrentVelocity();
 
 		data.m_vOrigin = tr.endpos;
-		data.m_vAngles = GetAbsAngles();
+		data.m_vAngles = GetEngineObject()->GetAbsAngles();
 
 		VectorNormalize( velocity );
 		
@@ -1613,8 +1613,8 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 		// If I'm right over the ground don't push down
 		if (moveVec.z < 0)
 		{
-			float floorZ = GetFloorZ(GetAbsOrigin());
-			if (abs(GetAbsOrigin().z - floorZ) < 36)
+			float floorZ = GetFloorZ(GetEngineObject()->GetAbsOrigin());
+			if (abs(GetEngineObject()->GetAbsOrigin().z - floorZ) < 36)
 			{
 				moveVec.z = 0;
 			}
@@ -1630,7 +1630,7 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 			Vector velocity = GetCurrentVelocity();
 
 			data.m_vOrigin = tr.endpos;
-			data.m_vAngles = GetAbsAngles();
+			data.m_vAngles = GetEngineObject()->GetAbsAngles();
 
 			VectorNormalize( velocity );
 			
@@ -1640,7 +1640,7 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 
 			CBroadcastRecipientFilter filter;
 
-			te->DynamicLight( filter, 0.0, &GetAbsOrigin(), 255, 180, 100, 0, 50, 0.3, 150 );
+			te->DynamicLight( filter, 0.0, &GetEngineObject()->GetAbsOrigin(), 255, 180, 100, 0, 50, 0.3, 150 );
 			
 			// add some spin, but only if we're not already going fast..
 			Vector vecVelocity;
@@ -1670,7 +1670,7 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 			// For decals and sparks we must trace a line in the direction of the surface norm
 			// that we hit.
 			trace_t	decalTrace;
-			AI_TraceLine( GetAbsOrigin(), GetAbsOrigin() - (tr.plane.normal * 24),MASK_SOLID, this, COLLISION_GROUP_NONE, &decalTrace );
+			AI_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - (tr.plane.normal * 24),MASK_SOLID, this, COLLISION_GROUP_NONE, &decalTrace );
 
 			if ( decalTrace.fraction != 1.0 )
 			{
@@ -1714,7 +1714,7 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 	if (GetNavigator()->IsGoalActive() && !(GetNavigator()->GetPath()->CurWaypointFlags() & bits_WP_TO_PATHCORNER) )
 	{
 		AIMoveTrace_t moveTrace;
-		GetMoveProbe()->MoveLimit( NAV_GROUND, GetAbsOrigin(), GetNavigator()->GetCurWaypointPos(), 
+		GetMoveProbe()->MoveLimit( NAV_GROUND, GetEngineObject()->GetAbsOrigin(), GetNavigator()->GetCurWaypointPos(),
 			MoveCollisionMask(), GetEnemy(), &moveTrace );
 
 		if (IsMoveBlocked( moveTrace ) && 
@@ -1753,12 +1753,12 @@ void CNPC_Manhack::CheckCollisions(float flInterval)
 		}
 	}
 
-	VectorAdd( GetAbsOrigin(), vecTraceDir, vecCheckPos );
+	VectorAdd(GetEngineObject()->GetAbsOrigin(), vecTraceDir, vecCheckPos );
 	
 	trace_t			tr;
 	CBaseEntity*	pHitEntity = NULL;
 	
-	AI_TraceHull(	GetAbsOrigin(), 
+	AI_TraceHull(GetEngineObject()->GetAbsOrigin(),
 					vecCheckPos, 
 					GetHullMins(), 
 					GetHullMaxs(),
@@ -1809,7 +1809,7 @@ void CNPC_Manhack::PlayFlySound(void)
 
 	if( GetEnemy() )
 	{
-		flEnemyDist = (GetAbsOrigin() - GetEnemy()->GetAbsOrigin()).Length();
+		flEnemyDist = (GetEngineObject()->GetAbsOrigin() - GetEnemy()->GetEngineObject()->GetAbsOrigin()).Length();
 	}
 	else
 	{
@@ -1921,7 +1921,7 @@ void CNPC_Manhack::MoveExecute_Alive(float flInterval)
 
 	if ( (CBaseEntity*)GetEnemy() )
 	{
-		float flDist = (GetAbsOrigin() - GetEnemy()->GetAbsOrigin()).Length2D();
+		float flDist = (GetEngineObject()->GetAbsOrigin() - GetEnemy()->GetEngineObject()->GetAbsOrigin()).Length2D();
 
 		if( flDist < MANHACK_CHARGE_MIN_DIST )
 		{
@@ -1979,7 +1979,7 @@ void CNPC_Manhack::MoveExecute_Alive(float flInterval)
 
 	if( m_flWaterSuspendTime > gpGlobals->curtime )
 	{ 
-		if( UTIL_PointContents( GetAbsOrigin() ) & (CONTENTS_WATER|CONTENTS_SLIME) )
+		if( UTIL_PointContents(GetEngineObject()->GetAbsOrigin() ) & (CONTENTS_WATER|CONTENTS_SLIME) )
 		{
 			// Ooops, we're submerged somehow. Move upwards until our origin is out of the water.
 			m_vCurrentVelocity.z = 20.0;
@@ -2009,7 +2009,7 @@ void CNPC_Manhack::MoveExecute_Alive(float flInterval)
 		VectorLerp( vecCurrentVelocity, m_vCurrentVelocity, flLerpFactor, m_vCurrentVelocity );
 	}
 
-	QAngle angles = GetLocalAngles();
+	QAngle angles = GetEngineObject()->GetLocalAngles();
 
 	// ------------------------------------------
 	//  Stalling
@@ -2159,7 +2159,7 @@ void CNPC_Manhack::MoveExecute_Dead(float flInterval)
 	// Periodically emit sparks.
 	if (gpGlobals->curtime > m_fSparkTime)
 	{
-		g_pEffects->Sparks( GetAbsOrigin() );
+		g_pEffects->Sparks(GetEngineObject()->GetAbsOrigin() );
 		m_fSparkTime = gpGlobals->curtime + random->RandomFloat(0.1, 0.3);
 	}
 
@@ -2188,7 +2188,7 @@ void CNPC_Manhack::MoveExecute_Dead(float flInterval)
 	// ----------------------
 	LimitSpeed( -1, MANHACK_MAX_SPEED * 2.0 );
 
-	QAngle angles = GetLocalAngles();
+	QAngle angles = GetEngineObject()->GetLocalAngles();
 
 	// ------------------------------------------
 	// If I'm dying, add random banking noise
@@ -2256,14 +2256,14 @@ void CNPC_Manhack::GatherEnemyConditions( CBaseEntity *pEnemy )
 		flZDist = 24.0f;
 	}
 
-	if ((GetAbsOrigin() - pEnemy->GetAbsOrigin()).Length2D() > fl2DDist) 
+	if ((GetEngineObject()->GetAbsOrigin() - pEnemy->GetEngineObject()->GetAbsOrigin()).Length2D() > fl2DDist)
 	{
 		SetCondition(COND_MANHACK_START_ATTACK);
 	}
 	else
 	{
 		float targetZ	= pEnemy->EyePosition().z;
-		if (fabs(GetAbsOrigin().z - targetZ) < flZDist)
+		if (fabs(GetEngineObject()->GetAbsOrigin().z - targetZ) < flZDist)
 		{
 			SetCondition(COND_MANHACK_START_ATTACK);
 		}
@@ -2315,7 +2315,7 @@ int CNPC_Manhack::MeleeAttack1Conditions( float flDot, float flDist )
 
 	// Assume the this check is in regards to my current enemy
 	// for the Manhacks spetial condition
-	float deltaZ = GetAbsOrigin().z - GetEnemy()->EyePosition().z;
+	float deltaZ = GetEngineObject()->GetAbsOrigin().z - GetEnemy()->EyePosition().z;
 	if ( (deltaZ > 12.0f) || (deltaZ < -24.0f) )
 	{
 		return COND_TOO_CLOSE_TO_ATTACK;
@@ -2364,7 +2364,7 @@ void CNPC_Manhack::RunTask( const Task_t *pTask )
 
 //			NDebugOverlay::Line( GetAbsOrigin(), m_vSavePosition, 0, 255, 0, true, 0.1);
 
-			Vector dir = (m_vSavePosition - GetAbsOrigin());
+			Vector dir = (m_vSavePosition - GetEngineObject()->GetAbsOrigin());
 			float dist = VectorNormalize( dir );
 			float t = m_fSwarmMoveTime - gpGlobals->curtime;
 
@@ -2381,11 +2381,11 @@ void CNPC_Manhack::RunTask( const Task_t *pTask )
 			}
 			else if (dist < 64)
 			{
-				m_vSwarmMoveTarget = GetAbsOrigin() - Vector( -dir.y, dir.x, 0 ) * 4;
+				m_vSwarmMoveTarget = GetEngineObject()->GetAbsOrigin() - Vector( -dir.y, dir.x, 0 ) * 4;
 			}
 			else
 			{
-				m_vSwarmMoveTarget = GetAbsOrigin() + dir * 10;
+				m_vSwarmMoveTarget = GetEngineObject()->GetAbsOrigin() + dir * 10;
 			}
 			break;
 		}
@@ -2505,7 +2505,7 @@ void CNPC_Manhack::StartEye( void )
 	//Create our Eye sprite
 	if ( m_pEyeGlow == NULL )
 	{
-		m_pEyeGlow = CSprite::SpriteCreate( MANHACK_GLOW_SPRITE, GetLocalOrigin(), false );
+		m_pEyeGlow = CSprite::SpriteCreate( MANHACK_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin(), false );
 		m_pEyeGlow->SetAttachment( this, LookupAttachment( "Eye" ) );
 		
 		if( m_bHackedByAlyx )
@@ -2527,7 +2527,7 @@ void CNPC_Manhack::StartEye( void )
 	//Create our light sprite
 	if ( m_pLightGlow == NULL )
 	{
-		m_pLightGlow = CSprite::SpriteCreate( MANHACK_GLOW_SPRITE, GetLocalOrigin(), false );
+		m_pLightGlow = CSprite::SpriteCreate( MANHACK_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin(), false );
 		m_pLightGlow->SetAttachment( this, LookupAttachment( "Light" ) );
 
 		if( m_bHackedByAlyx )
@@ -2735,7 +2735,7 @@ void CNPC_Manhack::StartTask( const Task_t *pTask )
 		{
 			if (!m_pSquad)
 			{
-				m_vSavePosition = GetAbsOrigin();
+				m_vSavePosition = GetEngineObject()->GetAbsOrigin();
 				TaskComplete();
 				break;
 			}
@@ -2750,12 +2750,12 @@ void CNPC_Manhack::StartTask( const Task_t *pTask )
 			{
 				if (pSquadMember->HasStrategySlotRange( SQUAD_SLOT_ATTACK1, SQUAD_SLOT_ATTACK2 ))
 				{
-					m_vSavePosition += pSquadMember->GetAbsOrigin() * 10;
+					m_vSavePosition += pSquadMember->GetEngineObject()->GetAbsOrigin() * 10;
 					count += 10;
 				}
 				else
 				{
-					m_vSavePosition += pSquadMember->GetAbsOrigin();
+					m_vSavePosition += pSquadMember->GetEngineObject()->GetAbsOrigin();
 					count++;
 				}
 			}
@@ -2779,7 +2779,7 @@ void CNPC_Manhack::StartTask( const Task_t *pTask )
 			if (m_pSquad)
 			{
 				CAI_BaseNPC *pSquadMember = m_pSquad->GetAnyMember();
-				m_vSavePosition = pSquadMember->GetAbsOrigin();
+				m_vSavePosition = pSquadMember->GetEngineObject()->GetAbsOrigin();
 
 				// find attacking members
 				AISquadIter_t iter;
@@ -2788,20 +2788,20 @@ void CNPC_Manhack::StartTask( const Task_t *pTask )
 					// are they attacking?
 					if (pSquadMember->HasStrategySlotRange( SQUAD_SLOT_ATTACK1, SQUAD_SLOT_ATTACK2 ))
 					{
-						m_vSavePosition = pSquadMember->GetAbsOrigin();
+						m_vSavePosition = pSquadMember->GetEngineObject()->GetAbsOrigin();
 						break;
 					}
 					// do they have a goal?
 					if (pSquadMember->GetNavigator()->IsGoalActive())
 					{
-						m_vSavePosition = pSquadMember->GetAbsOrigin();
+						m_vSavePosition = pSquadMember->GetEngineObject()->GetAbsOrigin();
 						break;
 					}
 				}
 			}
 			else
 			{
-				m_vSavePosition = GetAbsOrigin();
+				m_vSavePosition = GetEngineObject()->GetAbsOrigin();
 			}
 
 			TaskComplete();
@@ -2811,7 +2811,7 @@ void CNPC_Manhack::StartTask( const Task_t *pTask )
 	case TASK_MANHACK_MOVEAT_SAVEPOSITION:
 		{
 			trace_t tr;
-			AI_TraceLine( GetAbsOrigin(), m_vSavePosition, MASK_NPCWORLDSTATIC, this, COLLISION_GROUP_NONE, &tr );
+			AI_TraceLine(GetEngineObject()->GetAbsOrigin(), m_vSavePosition, MASK_NPCWORLDSTATIC, this, COLLISION_GROUP_NONE, &tr );
 			if (tr.DidHitWorld())
 			{
 				TaskFail( FAIL_NO_ROUTE );
@@ -3098,7 +3098,7 @@ void CNPC_Manhack::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 		{
 			// If a hacked manhack is released in peaceable conditions, 
 			// just loiter, don't zip off.
-			StartLoitering( GetAbsOrigin() );
+			StartLoitering(GetEngineObject()->GetAbsOrigin() );
 		}
 
 		m_hPhysicsAttacker = NULL;
@@ -3111,7 +3111,7 @@ void CNPC_Manhack::StartLoitering( const Vector &vecLoiterPosition )
 	//Msg("Start Loitering\n");
 
 	m_vTargetBanking = vec3_origin;
-	m_vecLoiterPosition = GetAbsOrigin();
+	m_vecLoiterPosition = GetEngineObject()->GetAbsOrigin();
 	m_vForceVelocity = vec3_origin;
 	SetCurrentVelocity( vec3_origin );
 }

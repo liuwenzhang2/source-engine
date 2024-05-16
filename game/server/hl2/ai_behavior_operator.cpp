@@ -51,7 +51,7 @@ bool CAI_OperatorBehavior::CanSeePositionEntity()
 		return false;
 	}
 
-	bool bSpotted = (pOuter->EyePosition().DistToSqr(m_hPositionEnt->GetAbsOrigin()) <= POSITION_ENT_ALWAYS_SEE_DIST);
+	bool bSpotted = (pOuter->EyePosition().DistToSqr(m_hPositionEnt->GetEngineObject()->GetAbsOrigin()) <= POSITION_ENT_ALWAYS_SEE_DIST);
 	if ( !bSpotted )
 	{
 		bSpotted = ( pOuter->FInViewCone(m_hPositionEnt) && pOuter->FVisible(m_hPositionEnt) );
@@ -83,7 +83,7 @@ bool CAI_OperatorBehavior::CanSeePositionEntity()
 bool CAI_OperatorBehavior::IsAtPositionEntity()
 {
 	Vector myPos = GetAbsOrigin();
-	Vector objectPos = m_hPositionEnt->GetAbsOrigin();
+	Vector objectPos = m_hPositionEnt->GetEngineObject()->GetAbsOrigin();
 
 	Vector vecDir = objectPos - myPos;
 
@@ -187,7 +187,7 @@ void CAI_OperatorBehavior::StartTask( const Task_t *pTask )
 				break;
 			}
 
-			AI_NavGoal_t goal( pGoal->GetAbsOrigin() );
+			AI_NavGoal_t goal( pGoal->GetEngineObject()->GetAbsOrigin() );
 			goal.pTarget = pGoal;
 
 			if ( GetNavigator()->SetGoal( goal ) == false )
@@ -207,7 +207,7 @@ void CAI_OperatorBehavior::StartTask( const Task_t *pTask )
 				*/
 			}
 
-			GetNavigator()->SetArrivalDirection( pGoal->GetAbsAngles() );
+			GetNavigator()->SetArrivalDirection( pGoal->GetEngineObject()->GetAbsAngles() );
 		}
 		break;
 

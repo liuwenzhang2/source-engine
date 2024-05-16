@@ -40,8 +40,8 @@ void CBaseGrenadeContact::Spawn( void )
 	SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for grenades to make them easier to see
 
 	QAngle angles;
-	VectorAngles(GetAbsVelocity(), angles);
-	SetLocalAngles( angles );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles);
+	GetEngineObject()->SetLocalAngles( angles );
 	
 	// make NPCs afaid of it while in the air
 	SetThink( &CBaseGrenadeContact::DangerSoundThink );

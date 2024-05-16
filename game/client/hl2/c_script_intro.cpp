@@ -239,8 +239,8 @@ void C_ScriptIntro::ClientThink( void )
 
 	if ( m_hCameraEntity )
 	{
-		m_IntroData.m_vecCameraView = m_hCameraEntity->GetAbsOrigin();
-		m_IntroData.m_vecCameraViewAngles = m_hCameraEntity->GetAbsAngles();
+		m_IntroData.m_vecCameraView = m_hCameraEntity->GetEngineObject()->GetAbsOrigin();
+		m_IntroData.m_vecCameraViewAngles = m_hCameraEntity->GetEngineObject()->GetAbsAngles();
 	}
 
 	CalculateFOV();

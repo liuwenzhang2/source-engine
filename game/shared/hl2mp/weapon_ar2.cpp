@@ -200,7 +200,7 @@ void CWeaponAR2::DelayedAttack( void )
 #endif
 	
 	//Disorient the player
-	QAngle angles = pOwner->GetLocalAngles();
+	QAngle angles = pOwner->GetEngineObject()->GetLocalAngles();
 
 	angles.x += random->RandomInt( -4, 4 );
 	angles.y += random->RandomInt( -4, 4 );

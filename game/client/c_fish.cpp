@@ -326,10 +326,10 @@ void C_Fish::ClientThink()
 	m_pos += m_vel * deltaT;
 
 	GetEngineObject()->SetNetworkOrigin( m_pos );
-	SetAbsOrigin( m_pos );
+	GetEngineObject()->SetAbsOrigin( m_pos );
 
 	GetEngineObject()->SetNetworkAngles( m_angles );
-	SetAbsAngles( m_angles );
+	GetEngineObject()->SetAbsAngles( m_angles );
 }
 
 

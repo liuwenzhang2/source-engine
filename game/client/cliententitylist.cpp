@@ -539,7 +539,7 @@ ITypedInterpolatedVar< Vector >& C_EngineObjectInternal::GetOriginInterpolator()
 // Purpose: Last received origin
 // Output : const float
 //-----------------------------------------------------------------------------
-Vector& C_EngineObjectInternal::GetAbsOrigin(void)
+const Vector& C_EngineObjectInternal::GetAbsOrigin(void)
 {
 	//Assert( s_bAbsQueriesValid );
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsolutePosition();
@@ -561,7 +561,7 @@ const Vector& C_EngineObjectInternal::GetAbsOrigin(void) const
 // Purpose: Last received angles
 // Output : const
 //-----------------------------------------------------------------------------
-QAngle& C_EngineObjectInternal::GetAbsAngles(void)
+const QAngle& C_EngineObjectInternal::GetAbsAngles(void)
 {
 	//Assert( s_bAbsQueriesValid );
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsolutePosition();
@@ -580,20 +580,20 @@ const QAngle& C_EngineObjectInternal::GetAbsAngles(void) const
 }
 
 
-void C_EngineObjectInternal::UnlinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild)
+void C_EngineObjectInternal::UnlinkChild(IEngineObjectClient* pChild)
 {
 	Assert(pChild);
-	Assert(pParent != pChild);
-	Assert(pChild->GetMoveParent() == pParent);
+	Assert(this != pChild);
+	Assert(pChild->GetMoveParent() == this);
 
 	// Unlink from parent
 	// NOTE: pParent *may well be NULL*! This occurs
 	// when a child has unlinked from a parent, and the child
 	// remains in the PVS but the parent has not
-	if (pParent && (pParent->FirstMoveChild() == pChild))
+	if (this && (this->FirstMoveChild() == pChild))
 	{
 		Assert(!(pChild->MovePrevPeer()));
-		pParent->SetFirstMoveChild(pChild->NextMovePeer());
+		this->SetFirstMoveChild(pChild->NextMovePeer());
 	}
 
 	// Unlink from siblings...
@@ -614,12 +614,12 @@ void C_EngineObjectInternal::UnlinkChild(IEngineObjectClient* pParent, IEngineOb
 	Interp_HierarchyUpdateInterpolationAmounts();
 }
 
-void C_EngineObjectInternal::LinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild)
+void C_EngineObjectInternal::LinkChild(IEngineObjectClient* pChild)
 {
 	Assert(!pChild->NextMovePeer());
 	Assert(!pChild->MovePrevPeer());
 	Assert(!pChild->GetMoveParent());
-	Assert(pParent != pChild);
+	Assert(this != pChild);
 
 #ifdef _DEBUG
 	// Make sure the child isn't already in this list
@@ -631,13 +631,13 @@ void C_EngineObjectInternal::LinkChild(IEngineObjectClient* pParent, IEngineObje
 #endif
 
 	pChild->SetMovePrevPeer( NULL);
-	pChild->SetNextMovePeer( pParent->FirstMoveChild());
+	pChild->SetNextMovePeer( this->FirstMoveChild());
 	if (pChild->NextMovePeer())
 	{
 		pChild->NextMovePeer()->SetMovePrevPeer( pChild);
 	}
-	pParent->SetFirstMoveChild( pChild);
-	pChild->SetMoveParent( pParent);
+	this->SetFirstMoveChild( pChild);
+	pChild->SetMoveParent( this);
 	pChild->GetOuter()->AddToAimEntsList();
 
 	Interp_HierarchyUpdateInterpolationAmounts();
@@ -658,11 +658,11 @@ void C_EngineObjectInternal::HierarchySetParent(IEngineObjectClient* pNewParent)
 
 	if (m_pMoveParent)
 	{
-		UnlinkChild(m_pMoveParent, this);
+		m_pMoveParent->UnlinkChild(this);
 	}
 	if (pNewParent)
 	{
-		LinkChild(pNewParent, this);
+		pNewParent->LinkChild(this);
 	}
 
 	InvalidatePhysicsRecursive(POSITION_CHANGED | ANGLES_CHANGED | VELOCITY_CHANGED);
@@ -693,12 +693,12 @@ void C_EngineObjectInternal::SetParent(IEngineObjectClient* pParentEntity, int i
 	// First deal with unlinking
 	if (m_pMoveParent)
 	{
-		UnlinkChild(m_pMoveParent, this);
+		m_pMoveParent->UnlinkChild(this);
 	}
 
 	if (pParentEntity)
 	{
-		LinkChild(pParentEntity, this);
+		pParentEntity->LinkChild(this);
 	}
 
 	if (!m_pOuter->IsServerEntity())
@@ -708,9 +708,9 @@ void C_EngineObjectInternal::SetParent(IEngineObjectClient* pParentEntity, int i
 
 	m_iParentAttachment = iParentAttachment;
 
-	GetAbsOrigin().Init(FLT_MAX, FLT_MAX, FLT_MAX);
-	GetAbsAngles().Init(FLT_MAX, FLT_MAX, FLT_MAX);
-	GetAbsVelocity().Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	m_vecAbsOrigin.Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	m_angAbsRotation.Init(FLT_MAX, FLT_MAX, FLT_MAX);
+	m_vecAbsVelocity.Init(FLT_MAX, FLT_MAX, FLT_MAX);
 
 	SetAbsOrigin(vecAbsOrigin);
 	SetAbsAngles(angAbsRotation);
@@ -727,7 +727,7 @@ void C_EngineObjectInternal::UnlinkFromHierarchy()
 	// Clear out links if we're out of the picture...
 	if (m_pMoveParent)
 	{
-		UnlinkChild(m_pMoveParent, this);
+		m_pMoveParent->UnlinkChild(this);
 	}
 
 	//Adrian: This was causing problems with the local network backdoor with entities coming in and out of the PVS at certain times.
@@ -743,7 +743,7 @@ void C_EngineObjectInternal::UnlinkFromHierarchy()
 		{
 			Warning("C_BaseEntity::UnlinkFromHierarchy(): Entity has a child with the wrong parent!\n");
 			Assert(0);
-			UnlinkChild(this, pChild);
+			UnlinkChild(pChild);
 			pChild->UnlinkFromHierarchy();
 		}
 		else
@@ -1006,7 +1006,7 @@ const Vector& C_EngineObjectInternal::GetLocalOrigin(void) const
 	return m_vecOrigin;
 }
 
-vec_t C_EngineObjectInternal::GetLocalOriginDim(int iDim) const
+const vec_t C_EngineObjectInternal::GetLocalOriginDim(int iDim) const
 {
 	return m_vecOrigin[iDim];
 }
@@ -1037,7 +1037,7 @@ const QAngle& C_EngineObjectInternal::GetLocalAngles(void) const
 	return m_angRotation;
 }
 
-vec_t C_EngineObjectInternal::GetLocalAnglesDim(int iDim) const
+const vec_t C_EngineObjectInternal::GetLocalAnglesDim(int iDim) const
 {
 	return m_angRotation[iDim];
 }
@@ -1072,7 +1072,7 @@ void C_EngineObjectInternal::SetLocalAnglesDim(int iDim, vec_t flValue)
 	}
 }
 
-Vector& C_EngineObjectInternal::GetAbsVelocity()
+const Vector& C_EngineObjectInternal::GetAbsVelocity()
 {
 	Assert(C_BaseEntity::s_bAbsQueriesValid);
 	const_cast<C_EngineObjectInternal*>(this)->CalcAbsoluteVelocity();

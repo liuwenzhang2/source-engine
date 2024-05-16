@@ -587,8 +587,8 @@ void CModelPanel::Paint()
 		}
 	}
 
-	m_hModel->SetAbsOrigin( m_pModelInfo->m_vecOriginOffset + vecExtraModelOffset );
-	m_hModel->SetAbsAngles( QAngle( m_pModelInfo->m_vecAbsAngles.x, m_pModelInfo->m_vecAbsAngles.y, m_pModelInfo->m_vecAbsAngles.z ) );
+	m_hModel->GetEngineObject()->SetAbsOrigin( m_pModelInfo->m_vecOriginOffset + vecExtraModelOffset );
+	m_hModel->GetEngineObject()->SetAbsAngles( QAngle( m_pModelInfo->m_vecAbsAngles.x, m_pModelInfo->m_vecAbsAngles.y, m_pModelInfo->m_vecAbsAngles.z ) );
 
 	// do we have a valid sequence?
 	if ( m_hModel->GetSequence() != -1 )
@@ -653,7 +653,7 @@ void CModelPanel::Paint()
 	{
 		Vector vecMins, vecMaxs;
 		m_hModel->GetRenderBounds( vecMins, vecMaxs );
-		LightDesc_t spotLight( vec3_origin + Vector( 0, 0, 200 ), Vector( 1, 1, 1 ), m_hModel->GetAbsOrigin() + Vector( 0, 0, ( vecMaxs.z - vecMins.z ) * 0.75 ), 0.035, 0.873 );
+		LightDesc_t spotLight( vec3_origin + Vector( 0, 0, 200 ), Vector( 1, 1, 1 ), m_hModel->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, ( vecMaxs.z - vecMins.z ) * 0.75 ), 0.035, 0.873 );
 		g_pStudioRender->SetLocalLights( 1, &spotLight );
 	}
 

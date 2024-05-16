@@ -123,7 +123,7 @@ void C_PlantedC4::ClientThink( void )
 		{
 			EmitSound_t ep( params, gpGlobals->curtime);
 			ep.m_SoundLevel = ATTN_TO_SNDLVL( attenuation );
-			ep.m_pOrigin = &GetAbsOrigin();
+			ep.m_pOrigin = &GetEngineObject()->GetAbsOrigin();
 
 			g_pSoundEmitterSystem->EmitSound( filter, SOUND_FROM_WORLD, ep );
 		}
@@ -138,7 +138,7 @@ void C_PlantedC4::ClientThink( void )
 		int modelindex = modelinfo->GetModelIndex( "sprites/ledglow.vmt" );
 
 		float scale = 0.8f;
-		Vector vPos = GetAbsOrigin();
+		Vector vPos = GetEngineObject()->GetAbsOrigin();
 		const Vector offset( 0, 0, 4 );
 
 		// See if the c4 ended up underwater - we need to pull the flash up, or it won't get seen
@@ -186,7 +186,7 @@ void C_PlantedC4::ClientThink( void )
 
 			if( dl ) 
 			{
-				dl->origin = GetAbsOrigin() + offset; // can't use vPos because it might have been moved
+				dl->origin = GetEngineObject()->GetAbsOrigin() + offset; // can't use vPos because it might have been moved
 				dl->color.r = 255;
 				dl->color.g = 0;
 				dl->color.b = 0;

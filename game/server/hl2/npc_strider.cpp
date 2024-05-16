@@ -532,12 +532,12 @@ void CNPC_Strider::Spawn()
 
 	// find the ground, move up to strider stand height
 	Vector mins(-16,-16,-16), maxs(16,16,16);
-	Vector origin = GetLocalOrigin();
+	Vector origin = GetEngineObject()->GetLocalOrigin();
 
 	MoveToGround( &origin, this, mins, maxs );
 	origin.z += GetMaxHeight();//(GetAbsOrigin().z - vecSurroundMins.z) + mins.z;
 
-	SetLocalOrigin( origin );
+	GetEngineObject()->SetLocalOrigin( origin );
 
 	NPCInit();
 
@@ -701,12 +701,12 @@ void CNPC_Strider::Activate()
 
 		pStrider->SetActivity( ACT_DIERAGDOLL );
 		pStrider->InvalidateBoneCache();
-		gm_zCannonDist = pStrider->CannonPosition().z - pStrider->GetAbsOrigin().z;
+		gm_zCannonDist = pStrider->CannonPosition().z - pStrider->GetEngineObject()->GetAbsOrigin().z;
 
 		// Currently just using the gun for the vertical component!
 		Vector defEyePos;
 		pStrider->GetAttachment( "minigunbase", defEyePos );
-		gm_zMinigunDist = defEyePos.z - pStrider->GetAbsOrigin().z;
+		gm_zMinigunDist = defEyePos.z - pStrider->GetEngineObject()->GetAbsOrigin().z;
 
 		Vector position;
 		pStrider->GetAttachment( "biggun", position );
@@ -955,7 +955,7 @@ void CNPC_Strider::PrescheduleThink()
 		angles.y = angles.x * 0.5f;
 		angles.z = 0.0f;
 
-		NDebugOverlay::Cross3DOriented( GetFocus()->GetAbsOrigin(), angles, 24, 255, 255, 0, false, 0.1 );
+		NDebugOverlay::Cross3DOriented( GetFocus()->GetEngineObject()->GetAbsOrigin(), angles, 24, 255, 255, 0, false, 0.1 );
 	}
 }
 
@@ -1015,8 +1015,8 @@ void CNPC_Strider::GatherConditions()
 				float flPlayerMissileDist;
 				float flPlayerStriderDist;
 
-				flPlayerMissileDist = GetEnemy()->GetAbsOrigin().DistTo( m_hPlayersMissile->GetAbsOrigin() );
-				flPlayerStriderDist = GetEnemy()->GetAbsOrigin().DistTo( EyePosition() );
+				flPlayerMissileDist = GetEnemy()->GetEngineObject()->GetAbsOrigin().DistTo( m_hPlayersMissile->GetEngineObject()->GetAbsOrigin() );
+				flPlayerStriderDist = GetEnemy()->GetEngineObject()->GetAbsOrigin().DistTo( EyePosition() );
 				float flDiff = flPlayerMissileDist - flPlayerStriderDist;
 
 				// Figure out how long it's been since I've fired my cannon because of a player's missile.
@@ -1070,7 +1070,7 @@ void CNPC_Strider::GatherConditions()
 		{	
 			if( !IsStriderCrouching() && !IsStriderStanding() )
 			{
-				if ( WeaponLOSCondition( GetAdjustedOrigin(), m_hCannonTarget->GetAbsOrigin(), false ) )
+				if ( WeaponLOSCondition( GetAdjustedOrigin(), m_hCannonTarget->GetEngineObject()->GetAbsOrigin(), false ) )
 				{
 					SetCondition( COND_CAN_RANGE_ATTACK2 );
 				}
@@ -1143,7 +1143,7 @@ void CNPC_Strider::GatherConditions()
 	}
 	else
 	{
-		if( m_hCannonTarget != NULL && CurrentWeaponLOSCondition( m_hCannonTarget->GetAbsOrigin(), false ) )
+		if( m_hCannonTarget != NULL && CurrentWeaponLOSCondition( m_hCannonTarget->GetEngineObject()->GetAbsOrigin(), false ) )
 			SetCondition( COND_CAN_RANGE_ATTACK2 );
 	}
 
@@ -1165,14 +1165,14 @@ void CNPC_Strider::GatherHeightConditions( const Vector &vTestPos, CBaseEntity *
 	if ( HasCondition( COND_STRIDER_SHOULD_CROUCH ) )
 		return;
 
-	float maxZ = (GetAbsOrigin().z - (GetMaxHeightModel() - GetMaxHeight()));
+	float maxZ = (GetEngineObject()->GetAbsOrigin().z - (GetMaxHeightModel() - GetMaxHeight()));
 	float minZ = (maxZ - ( GetMaxHeight() - GetMinHeight()));;
 	float newHeight = FLT_MAX;
 
 	if( FInViewCone( pEntity ) && GetWeaponLosZ( vTestPos, minZ, maxZ, GetHeightRange() * .1, pEntity, &newHeight ) )
 	{
 		bool bDoProceduralHeightChange = true;
-		newHeight = GetMaxHeightModel() - ( GetAbsOrigin().z - newHeight);
+		newHeight = GetMaxHeightModel() - (GetEngineObject()->GetAbsOrigin().z - newHeight);
 
 		if ( m_LowZCorrectionTimer.Expired() )
 		{
@@ -1193,7 +1193,7 @@ void CNPC_Strider::GatherHeightConditions( const Vector &vTestPos, CBaseEntity *
 					{
 						return;
 					}
-					newHeight = GetMaxHeightModel() - ( GetAbsOrigin().z - newHeight);
+					newHeight = GetMaxHeightModel() - (GetEngineObject()->GetAbsOrigin().z - newHeight);
 				}
 				else
 				{
@@ -1587,13 +1587,13 @@ void CNPC_Strider::StartTask( const Task_t *pTask )
 		Assert( GetGoalEnt() );
 		if ( GetGoalEnt() )
 		{
-			AI_NavGoal_t goal(GOALTYPE_PATHCORNER, GetGoalEnt()->GetLocalOrigin(), ACT_WALK, AIN_DEF_TOLERANCE, AIN_YAW_TO_DEST);
+			AI_NavGoal_t goal(GOALTYPE_PATHCORNER, GetGoalEnt()->GetEngineObject()->GetLocalOrigin(), ACT_WALK, AIN_DEF_TOLERANCE, AIN_YAW_TO_DEST);
 
 			TranslateNavGoal( GetGoalEnt(), goal.dest );
 
 			if ( ( m_debugOverlays & OVERLAY_NPC_SELECTED_BIT ) && ( m_debugOverlays & OVERLAY_NPC_ROUTE_BIT ) )
 			{
-				NDebugOverlay::Line( GetAbsOrigin() + Vector( 0, 0, 4), goal.dest, 255, 0, 255, true, 3 );
+				NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 4), goal.dest, 255, 0, 255, true, 3 );
 			}
 
 			if ( GetNavigator()->SetGoal( goal ) )
@@ -1661,7 +1661,7 @@ void CNPC_Strider::StartTask( const Task_t *pTask )
 				return;
 			}
 
-			AI_NavGoal_t goal( m_hCannonTarget->GetAbsOrigin() );
+			AI_NavGoal_t goal( m_hCannonTarget->GetEngineObject()->GetAbsOrigin() );
 
 			TranslateNavGoal( m_hCannonTarget, goal.dest );
 
@@ -1714,18 +1714,18 @@ void CNPC_Strider::RunTask( const Task_t *pTask )
 	case TASK_STRIDER_FALL_TO_GROUND:
 		{
 			// This doesn't work right now. (sjb)
-			Vector vecVelocity = GetAbsVelocity();
+			Vector vecVelocity = GetEngineObject()->GetAbsVelocity();
 
 			vecVelocity.z -= (GetCurrentGravity() * 0.1);
 
-			SetAbsVelocity( vecVelocity );
+			GetEngineObject()->SetAbsVelocity( vecVelocity );
 
-			Vector pos = GetAbsOrigin();
+			Vector pos = GetEngineObject()->GetAbsOrigin();
 			TranslateNavGoal( NULL, pos );
 
-			if( GetAbsOrigin().z - pos.z <= 0.0f )
+			if(GetEngineObject()->GetAbsOrigin().z - pos.z <= 0.0f )
 			{
-				SetAbsVelocity( vec3_origin );
+				GetEngineObject()->SetAbsVelocity( vec3_origin );
 				TaskComplete();
 			}
 		}
@@ -1817,7 +1817,7 @@ void CNPC_Strider::Explode( void )
 	AngularImpulse	angVelocity = RandomAngularImpulse( -150, 150 );
 
 	// Break into pieces
-	breakablepropparams_t params( EyePosition(), GetAbsAngles(), velocity, angVelocity );
+	breakablepropparams_t params( EyePosition(), GetEngineObject()->GetAbsAngles(), velocity, angVelocity );
 	params.impactEnergyScale = 1.0f;
 	params.defBurstScale = 600.0f;
 	params.defCollisionGroup = COLLISION_GROUP_NPC;
@@ -2003,7 +2003,7 @@ Disposition_t CNPC_Strider::IRelationType( CBaseEntity *pTarget )
 void CNPC_Strider::AddEntityRelationship( CBaseEntity *pEntity, Disposition_t nDisposition, int nPriority )
 {
 	if ( nDisposition ==  D_HT && pEntity->ClassMatches("npc_bullseye") )
-		UpdateEnemyMemory( pEntity, pEntity->GetAbsOrigin() );
+		UpdateEnemyMemory( pEntity, pEntity->GetEngineObject()->GetAbsOrigin() );
 	BaseClass::AddEntityRelationship( pEntity, nDisposition, nPriority );
 }
 
@@ -2449,7 +2449,7 @@ bool CNPC_Strider::UpdateEnemyMemory( CBaseEntity *pEnemy, const Vector &positio
 		// Move Strider's focus to this location and make strider mad at it
 		// (but less mad than at any other potential entities in the scene).
 #if 1
-		GetFocus()->SetAbsOrigin( position + Vector( 0, 0, 32 ) );
+		GetFocus()->GetEngineObject()->SetAbsOrigin( position + Vector( 0, 0, 32 ) );
 #else
 		trace_t tr;
 		AI_TraceLine( EyePosition(), position + Vector( 0, 0, 32 ), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
@@ -2467,7 +2467,7 @@ bool CNPC_Strider::UpdateEnemyMemory( CBaseEntity *pEnemy, const Vector &positio
 			m_PlayerFreePass.Revoke();
 		}
 		
-		BaseClass::UpdateEnemyMemory( GetFocus(), GetFocus()->GetAbsOrigin(), pInformer );
+		BaseClass::UpdateEnemyMemory( GetFocus(), GetFocus()->GetEngineObject()->GetAbsOrigin(), pInformer );
 
 		// Change the informer to myself so that information provided by a scanner is 
 		// as good as firsthand knowledge insofar as enemy memory is concerned.
@@ -2585,7 +2585,7 @@ int CNPC_Strider::MeleeAttack1Conditions( float flDot, float flDist )
 	// strider will cross his feet, but only 6ft over
 	Vector right;
 	GetVectors( NULL, &right, NULL );
-	if ( DotProduct( pEnemy->GetAbsOrigin() - GetAbsOrigin(), right ) > 72 )
+	if ( DotProduct( pEnemy->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin(), right ) > 72 )
 	{
 		return COND_NONE;
 	}
@@ -2597,9 +2597,9 @@ int CNPC_Strider::MeleeAttack1Conditions( float flDot, float flDist )
 	}
 
 	// Don't skewer if target is too high above or below ground.
-	Vector vecGround = GetAbsOrigin();
+	Vector vecGround = GetEngineObject()->GetAbsOrigin();
 	MoveToGround( &vecGround, this, Vector( -16, -16, -16 ), Vector( 16, 16, 16 ) );
-	if( fabs( vecGround.z - GetEnemy()->GetAbsOrigin().z ) > 64.0f )
+	if( fabs( vecGround.z - GetEnemy()->GetEngineObject()->GetAbsOrigin().z ) > 64.0f )
 	{
 		return COND_NONE;
 	}
@@ -2860,7 +2860,7 @@ void CNPC_Strider::CreateFocus()
 
 	ASSERT( m_hFocus != NULL );
 	m_hFocus->AddSpawnFlags( SF_BULLSEYE_NONSOLID | SF_BULLSEYE_NODAMAGE );
-	m_hFocus->SetAbsOrigin( GetAbsOrigin() );
+	m_hFocus->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 	m_hFocus->Spawn();
 }
 
@@ -3137,7 +3137,7 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		// Any damage the player inflicts gets my attention, even if it doesn't actually harm me.
 		if ( info.GetAttacker()->IsPlayer() )
 		{
-			UpdateEnemyMemory( info.GetAttacker(), info.GetAttacker()->GetAbsOrigin() );
+			UpdateEnemyMemory( info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin() );
 		}
 	}
 
@@ -3154,12 +3154,12 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			if ( bPlayer )
 			{
 				m_PlayerFreePass.Revoke();
-				AddFacingTarget( info.GetAttacker(), info.GetAttacker()->GetAbsOrigin(), 1.0, 2.0 );
+				AddFacingTarget( info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin(), 1.0, 2.0 );
 
-				UpdateEnemyMemory( info.GetAttacker(), info.GetAttacker()->GetAbsOrigin() );
+				UpdateEnemyMemory( info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin() );
 			}
 			else
-				AddFacingTarget( info.GetAttacker(), info.GetAttacker()->GetAbsOrigin(), 0.5, 2.0 );
+				AddFacingTarget( info.GetAttacker(), info.GetAttacker()->GetEngineObject()->GetAbsOrigin(), 0.5, 2.0 );
 
 			// Default to NPC damage value
 			int damage = 20;
@@ -3272,7 +3272,7 @@ int CNPC_Strider::TakeDamageFromCombineBall( const CTakeDamageInfo &info )
 		damage = g_pGameRules->AdjustPlayerDamageInflicted(damage);
 	}
 
-	AddFacingTarget( info.GetInflictor(), info.GetInflictor()->GetAbsOrigin(), 0.5, 2.0 );
+	AddFacingTarget( info.GetInflictor(), info.GetInflictor()->GetEngineObject()->GetAbsOrigin(), 0.5, 2.0 );
 	if ( !UTIL_IsAR2CombineBall( info.GetInflictor() ) )
 		RestartGesture( ACT_GESTURE_BIG_FLINCH );
 	else
@@ -3446,7 +3446,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 
 					for ( int i = 0; i < striderRagdolls.Count(); i++ )
 					{
-						float distSqrCur = CalcSqrDistanceToAABB( striderRagdolls[i]->WorldAlignMins(), striderRagdolls[i]->WorldAlignMaxs(), pPlayer->GetAbsOrigin() );
+						float distSqrCur = CalcSqrDistanceToAABB( striderRagdolls[i]->WorldAlignMins(), striderRagdolls[i]->WorldAlignMaxs(), pPlayer->GetEngineObject()->GetAbsOrigin() );
 						if ( distSqrCur < distSqrFurthest )
 						{
 							distSqrFurthest = distSqrCur;
@@ -3550,7 +3550,7 @@ void CNPC_Strider::SetIdealHeight( float h )
 //---------------------------------------------------------
 void CNPC_Strider::SetAbsIdealHeight( float z )
 {
-	float h = GetMaxHeight() - ( z - GetAbsOrigin().z );
+	float h = GetMaxHeight() - ( z - GetEngineObject()->GetAbsOrigin().z );
 	
 	SetIdealHeight( h );
 }
@@ -3586,7 +3586,7 @@ bool CNPC_Strider::OverrideMove( float flInterval )
 {
 	if ( GetCannonTarget() )
 	{
-		AddFacingTarget( GetCannonTarget(), GetCannonTarget()->GetAbsOrigin(), 1.0, 0.5 );
+		AddFacingTarget( GetCannonTarget(), GetCannonTarget()->GetEngineObject()->GetAbsOrigin(), 1.0, 0.5 );
 	}
 	else if ( GetEnemy() )
 	{
@@ -3660,9 +3660,9 @@ bool CNPC_Strider::OverrideMove( float flInterval )
 void CNPC_Strider::MaintainTurnActivity( void )
 {
 	// detect that the npc has turned
-	if (m_prevYaw != GetAbsAngles().y)
+	if (m_prevYaw != GetEngineObject()->GetAbsAngles().y)
 	{
-		float diff = UTIL_AngleDiff( m_prevYaw, GetAbsAngles().y );
+		float diff = UTIL_AngleDiff( m_prevYaw, GetEngineObject()->GetAbsAngles().y );
 		if (diff < 0.0)
 		{
 			m_doLeft += -diff;
@@ -3671,7 +3671,7 @@ void CNPC_Strider::MaintainTurnActivity( void )
 		{
 			m_doRight += diff;
 		}
-		m_prevYaw = GetAbsAngles().y;
+		m_prevYaw = GetEngineObject()->GetAbsAngles().y;
 	}
 	// accumulate turn angle, delay response for short turns
 	m_doTurn += m_doRight + m_doLeft;
@@ -3772,7 +3772,7 @@ void CNPC_Strider::SetTargetPath()
 		return;
 	}
 
-	const Vector &absOrigin = GetAbsOrigin();
+	const Vector &absOrigin = GetEngineObject()->GetAbsOrigin();
 	CBaseEntity *pClosestEnt = NULL;
 	CBaseEntity *pCurEnt = pGoalEnt;
 	float distClosestSq = FLT_MAX;
@@ -3782,7 +3782,7 @@ void CNPC_Strider::SetTargetPath()
 
 	while ( pCurEnt && visits.Find( pCurEnt ) == visits.InvalidIndex() )
 	{
-		float distCurSq = ( pCurEnt->GetAbsOrigin() - absOrigin ).LengthSqr();
+		float distCurSq = ( pCurEnt->GetEngineObject()->GetAbsOrigin() - absOrigin ).LengthSqr();
 		if ( distCurSq < distClosestSq )
 		{
 			distClosestSq = distCurSq;
@@ -4021,8 +4021,8 @@ Vector CNPC_Strider::CannonPosition()
 
 	// Currently just using the gun for the vertical component!
 	GetAttachment( "biggun", position );
-	position.x = GetAbsOrigin().x;
-	position.y = GetAbsOrigin().y;
+	position.x = GetEngineObject()->GetAbsOrigin().x;
+	position.y = GetEngineObject()->GetAbsOrigin().y;
 
 	return position;
 }
@@ -4069,9 +4069,9 @@ bool CNPC_Strider::AimCannonAt( CBaseEntity *pEntity, float flInterval )
 	GetAttachment( gm_CannonAttachment, gunMatrix );
 
 	// transform the enemy into gun space
-	m_vecHitPos = pEntity->GetAbsOrigin();
+	m_vecHitPos = pEntity->GetEngineObject()->GetAbsOrigin();
 	Vector localEnemyPosition;
-	VectorITransform( pEntity->GetAbsOrigin(), gunMatrix, localEnemyPosition );
+	VectorITransform( pEntity->GetEngineObject()->GetAbsOrigin(), gunMatrix, localEnemyPosition );
 	
 	// do a look at in gun space (essentially a delta-lookat)
 	QAngle localEnemyAngles;
@@ -4247,7 +4247,7 @@ bool CNPC_Strider::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& 
 		return BaseClass::TestCollision( ray, mask, trace );
 	}
 
-	if ( IntersectRayWithBox( ray, WorldAlignMins() + GetAbsOrigin(), WorldAlignMaxs() + GetAbsOrigin(), DIST_EPSILON, &trace ) )
+	if ( IntersectRayWithBox( ray, WorldAlignMins() + GetEngineObject()->GetAbsOrigin(), WorldAlignMaxs() + GetEngineObject()->GetAbsOrigin(), DIST_EPSILON, &trace ) )
 	{
 		trace.hitbox = 0;
 		trace.hitgroup = HITGROUP_HEAD;
@@ -4274,7 +4274,7 @@ void CNPC_Strider::CarriedThink()
 	SetNextThink( gpGlobals->curtime + 0.05 );
 	StudioFrameAdvance();
 
-	Vector vecGround = GetAbsOrigin();
+	Vector vecGround = GetEngineObject()->GetAbsOrigin();
 	TranslateNavGoal( NULL, vecGround );
 
 	if( !CarriedByDropship() )
@@ -4414,13 +4414,13 @@ void CNPC_Strider::StompHit( int followerBoneIndex )
 		return;
 
 	Vector delta;
-	VectorSubtract( pEnemy->GetAbsOrigin(), hitPosition, delta );
+	VectorSubtract( pEnemy->GetEngineObject()->GetAbsOrigin(), hitPosition, delta );
 	if ( delta.LengthSqr() > (STRIDER_STOMP_RANGE * STRIDER_STOMP_RANGE) )
 		return;
 
 	// DVS E3 HACK: Assume we stab our victim midway between their eyes and their center.
 	Vector vecStabPos = ( pEnemy->WorldSpaceCenter() + pEnemy->EyePosition() ) * 0.5f;
-	hitPosition = pEnemy->GetAbsOrigin();
+	hitPosition = pEnemy->GetEngineObject()->GetAbsOrigin();
 
 	Vector footPosition;
 	GetAttachment( "left foot", footPosition );
@@ -4662,7 +4662,7 @@ bool CNPC_Strider::CNavigator::DoFindPathToPos()
 			 pFirstWaypoint->GetNext()->NavType() == GetNavType() )
 		{
 			// Find nearest point on the line segment of our path
-			Vector vOrigin = GetOuter()->GetAbsOrigin();
+			Vector vOrigin = GetOuter()->GetEngineObject()->GetAbsOrigin();
 			Vector vClosest;
 			CalcClosestPointOnLineSegment( vOrigin,
 				pFirstWaypoint->GetPos(), 
@@ -5208,7 +5208,7 @@ void CStriderMinigun::SetTarget( IStriderMinigunHost *pHost, CBaseEntity *pTarge
 			Vector right;
 			pHost->GetEntity()->GetVectors( NULL, &right, NULL );
 
-			m_vecAnchor = pTarget->GetAbsOrigin() - Vector( 0, 0, 256 );
+			m_vecAnchor = pTarget->GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 256 );
 			m_vecAnchor += right * random->RandomFloat( -60.0f, 60.0f );
 		}
 	}
@@ -5432,7 +5432,7 @@ void CStriderMinigun::Think( IStriderMinigunHost *pHost, float dt )
 		}
 		else
 		{
-			const Vector *pTargetPoint = pTargetEnt ? &pTargetEnt->GetAbsOrigin() : NULL;
+			const Vector *pTargetPoint = pTargetEnt ? &pTargetEnt->GetEngineObject()->GetAbsOrigin() : NULL;
 			pHost->ShootMinigun( pTargetPoint, GetAimError() );
 		}
 
@@ -5489,7 +5489,7 @@ void CSparkTrail::Spawn()
 		SetMoveType( MOVETYPE_FLY );
 	}
 
-	SetAbsVelocity( vecVelocity );
+	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 	SetThink( &CSparkTrail::SparkThink );
 	SetNextThink( gpGlobals->curtime );
@@ -5499,7 +5499,7 @@ void CSparkTrail::SparkThink()
 {
 	SetNextThink( gpGlobals->curtime + 0.05 );
 
-	g_pEffects->Sparks( GetAbsOrigin() );
+	g_pEffects->Sparks(GetEngineObject()->GetAbsOrigin() );
 
 	if( m_iHealth-- < 1 )
 	{

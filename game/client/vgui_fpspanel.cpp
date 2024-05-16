@@ -286,8 +286,8 @@ void CFPSPanel::Paint()
 			C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
 			if ( pPlayer )
 			{
-				vecOrigin = pPlayer->GetAbsOrigin();
-				angles = pPlayer->GetAbsAngles();
+				vecOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
+				angles = pPlayer->GetEngineObject()->GetAbsAngles();
 			}
 		}
 
@@ -307,7 +307,7 @@ void CFPSPanel::Paint()
 		C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
 		if ( player )
 		{
-			vel = player->GetLocalVelocity();
+			vel = player->GetEngineObject()->GetLocalVelocity();
 		}
 
 		if( nShowPosMode > 1 )

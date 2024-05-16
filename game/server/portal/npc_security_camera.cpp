@@ -147,7 +147,7 @@ public:
 
 	Vector	EyePosition( void )
 	{
-		return GetAbsOrigin() + EyeOffset(GetActivity());
+		return GetEngineObject()->GetAbsOrigin() + EyeOffset(GetActivity());
 	}
 
 
@@ -421,7 +421,7 @@ int CNPC_SecurityCamera::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 		RemoveFlag( FL_NPC ); // why are they set in the first place???
 
-		ExplosionCreate( GetAbsOrigin(), GetLocalAngles(), this, 100, 100, false );
+		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetLocalAngles(), this, 100, 100, false );
 		SetThink( &CNPC_SecurityCamera::DeathThink );
 
 		g_pSoundEmitterSystem->StopSound(this, "NPC_SecurityCamera.Alert" );
@@ -462,7 +462,7 @@ void CNPC_SecurityCamera::Retire( void )
 		return;
 
 	//Level out the turret
-	m_vecGoalAngles = GetAbsAngles();
+	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 	SetNextThink( gpGlobals->curtime );
 
 	//Set ourselves to close
@@ -486,7 +486,7 @@ void CNPC_SecurityCamera::Deploy( void )
 	if ( PreThink( TURRET_DEPLOYING ) )
 		return;
 
-	m_vecGoalAngles = GetAbsAngles();
+	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
 	SetNextThink( gpGlobals->curtime );
 
@@ -645,13 +645,13 @@ void CNPC_SecurityCamera::ActiveThink( void )
 		SetEnemy( NULL );
 		SetLastSightTime();
 		SetThink( &CNPC_SecurityCamera::SearchThink );
-		m_vecGoalAngles = GetAbsAngles();
+		m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 		return;
 	}
 	
 	//Get our shot positions
 	Vector vecMid = EyePosition();
-	Vector vecMidEnemy = pEnemy->GetAbsOrigin();
+	Vector vecMidEnemy = pEnemy->GetEngineObject()->GetAbsOrigin();
 
 	//Store off our last seen location
 	UpdateEnemyMemory( pEnemy, vecMidEnemy );
@@ -754,7 +754,7 @@ void CNPC_SecurityCamera::ActiveThink( void )
 			SetEnemy( NULL );
 			SetLastSightTime();
 			SetThink( &CNPC_SecurityCamera::SearchThink );
-			m_vecGoalAngles = GetAbsAngles();
+			m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
 			return;
 		}
@@ -981,7 +981,7 @@ void CNPC_SecurityCamera::EyeOn( void )
 	if ( !m_hEyeGlow )
 	{
 		// Create our eye sprite
-		m_hEyeGlow = CSprite::SpriteCreate( SECURITY_CAMERA_GLOW_SPRITE, GetLocalOrigin(), false );
+		m_hEyeGlow = CSprite::SpriteCreate( SECURITY_CAMERA_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin(), false );
 		if ( !m_hEyeGlow )
 			return;
 
@@ -1034,7 +1034,7 @@ void CNPC_SecurityCamera::InputRagdoll( inputdata_t &inputdata )
 	GetVectors( &vForward, NULL, NULL );
 
 	trace_t tr;
-	UTIL_TraceLine ( GetAbsOrigin() + 10.0f * vForward, GetAbsOrigin() -60.0f * vForward, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine (GetEngineObject()->GetAbsOrigin() + 10.0f * vForward, GetEngineObject()->GetAbsOrigin() -60.0f * vForward, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 	if ( tr.m_pEnt )
 		UTIL_DecalTrace( &tr, "SecurityCamera.Detachment" );
 

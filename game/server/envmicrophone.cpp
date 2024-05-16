@@ -261,7 +261,7 @@ bool CEnvMicrophone::CanHearSound(CSound *pSound, float &flVolume)
 		}
 	}
 
-	float flDistance = (pSound->GetSoundOrigin() - m_hMeasureTarget->GetAbsOrigin()).Length();
+	float flDistance = (pSound->GetSoundOrigin() - m_hMeasureTarget->GetEngineObject()->GetAbsOrigin()).Length();
 
 	if (flDistance == 0)
 	{
@@ -322,11 +322,11 @@ bool CEnvMicrophone::CanHearSound( int entindex, soundlevel_t soundlevel, float 
 	float flDistance = 0;
 	if ( pOrigin )
 	{
-		flDistance = pOrigin->DistTo( m_hMeasureTarget->GetAbsOrigin() );
+		flDistance = pOrigin->DistTo( m_hMeasureTarget->GetEngineObject()->GetAbsOrigin() );
 	}
 	else if ( pEntity )
 	{
-		flDistance = pEntity->WorldSpaceCenter().DistTo( m_hMeasureTarget->GetAbsOrigin() );
+		flDistance = pEntity->WorldSpaceCenter().DistTo( m_hMeasureTarget->GetEngineObject()->GetAbsOrigin() );
 	}
 
 	// Over our max range?
@@ -486,7 +486,7 @@ MicrophoneResult_t CEnvMicrophone::SoundPlayed( int entindex, const char *soundn
 	ep.m_SoundLevel = soundlevel;
 	ep.m_nFlags = iFlags;
 	ep.m_nPitch = iPitch;
-	ep.m_pOrigin = &m_hSpeaker->GetAbsOrigin();
+	ep.m_pOrigin = &m_hSpeaker->GetEngineObject()->GetAbsOrigin();
 	ep.m_flSoundTime = soundtime;
 	ep.m_nSpeakerEntity = entindex;
 

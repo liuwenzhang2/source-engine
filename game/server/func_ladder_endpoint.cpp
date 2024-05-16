@@ -39,7 +39,7 @@ void CFuncLadderEndPoint::Activate()
 bool CFuncLadderEndPoint::Validate()
 {
 	// Find the the other end
-	Vector startPos = GetAbsOrigin();
+	Vector startPos = GetEngineObject()->GetAbsOrigin();
 	
 	CFuncLadderEndPoint *other = dynamic_cast< CFuncLadderEndPoint * >( GetNextTarget() );
 	if ( !other )
@@ -48,13 +48,13 @@ bool CFuncLadderEndPoint::Validate()
 		return false;
 	}
 
-	Vector endPos = other->GetAbsOrigin();
+	Vector endPos = other->GetEngineObject()->GetAbsOrigin();
 
 	CFuncLadder *ladder = ( CFuncLadder * )gEntList.CreateEntityByName( "func_useableladder" );
 	if ( ladder )
 	{
 		ladder->SetEndPoints( startPos, endPos );
-		ladder->SetAbsOrigin( GetAbsOrigin() );
+		ladder->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		ladder->GetEngineObject()->SetParent(GetMoveParent()?GetMoveParent()->GetEngineObject():NULL );
 		ladder->SetName(STRING( GetEntityName()) );
 		ladder->Spawn();

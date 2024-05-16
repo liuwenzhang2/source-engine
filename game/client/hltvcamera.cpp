@@ -312,7 +312,7 @@ void C_HLTVCamera::CalcInEyeCamView( Vector& eyeOrigin, QAngle& eyeAngles, float
 	}
 
 	m_aCamAngle	= pPlayer->EyeAngles();
-	m_vCamOrigin = pPlayer->GetAbsOrigin();
+	m_vCamOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
 	m_flFOV = pPlayer->GetFOV();
 
 	if ( pPlayer->GetFlags() & FL_DUCKING )
@@ -481,7 +481,7 @@ void C_HLTVCamera::CalcFixedView(Vector& eyeOrigin, QAngle& eyeAngles, float& fo
 	{
 		// if we're chasing a target, change viewangles
 		QAngle angle;
-		VectorAngles( (target->GetAbsOrigin()+VEC_VIEW) - m_vCamOrigin, angle );
+		VectorAngles( (target->GetEngineObject()->GetAbsOrigin()+VEC_VIEW) - m_vCamOrigin, angle );
 		SmoothCameraAngle( angle );
 	}
 }

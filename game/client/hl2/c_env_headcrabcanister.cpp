@@ -91,7 +91,7 @@ void C_EnvHeadcrabCanister::ClientThink()
 	Vector vecEndPosition;
 	QAngle vecEndAngles;
 	m_Shared.GetPositionAtTime( gpGlobals->curtime, vecEndPosition, vecEndAngles );
-	SetAbsOrigin( vecEndPosition );
-	SetAbsAngles( vecEndAngles );
+	GetEngineObject()->SetAbsOrigin( vecEndPosition );
+	GetEngineObject()->SetAbsAngles( vecEndAngles );
 }
 

@@ -1455,7 +1455,7 @@ static ConVar smoothstairs( "smoothstairs", "1", FCVAR_REPLICATED, "Smooth playe
 void CBasePlayer::SmoothViewOnStairs( Vector& eyeOrigin )
 {
 	CBaseEntity *pGroundEntity = GetGroundEntity();
-	float flCurrentPlayerZ = GetLocalOrigin().z;
+	float flCurrentPlayerZ = GetEngineObject()->GetLocalOrigin().z;
 	float flCurrentPlayerViewOffsetZ = GetViewOffset().z;
 
 	// Smooth out stair step ups
@@ -1771,7 +1771,7 @@ void CBasePlayer::CalcViewRoll( QAngle& eyeAngles )
 	if ( GetMoveType() == MOVETYPE_NOCLIP )
 		return;
 
-	float side = CalcRoll( GetAbsAngles(), GetAbsVelocity(), sv_rollangle.GetFloat(), sv_rollspeed.GetFloat() );
+	float side = CalcRoll(GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsVelocity(), sv_rollangle.GetFloat(), sv_rollspeed.GetFloat() );
 	eyeAngles[ROLL] += side;
 }
 

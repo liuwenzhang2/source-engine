@@ -185,7 +185,7 @@ void CWeaponIFMSteadyCam::UpdateLockedRelativeOrientation()
 	CBaseEntity *pLock = m_hLockTarget.Get();
 	if ( pLock )
 	{
-		vecDesiredDirection += pLock->GetAbsOrigin();
+		vecDesiredDirection += pLock->GetEngineObject()->GetAbsOrigin();
 	}
 
 	Vector vecAbsOrigin;
@@ -341,7 +341,7 @@ void CWeaponIFMSteadyCam::LockCamera()
 	m_vecOffset = tr.endpos;
 	if ( tr.m_pEnt )
 	{
-		m_vecOffset -= ((CBaseEntity*)tr.m_pEnt)->GetAbsOrigin();
+		m_vecOffset -= ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin();
 	}
 }
 
@@ -362,7 +362,7 @@ void CWeaponIFMSteadyCam::ComputeAbsCameraTransform( Vector &vecAbsOrigin, QAngl
 	Vector vecDesiredDirection = m_vecOffset;
 	if ( pLock )
 	{
-		vecDesiredDirection += pLock->GetAbsOrigin();
+		vecDesiredDirection += pLock->GetEngineObject()->GetAbsOrigin();
 	}
 
 	BaseClass::ComputeAbsCameraTransform( vecAbsOrigin, angAbsRotation );

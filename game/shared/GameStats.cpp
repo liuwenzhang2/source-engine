@@ -1504,11 +1504,11 @@ void CPointGamestatsCounter::InputIncrement( inputdata_t &inputdata )
 	if ( NULL_STRING == m_strStatisticName )
 	{
 		DevMsg( 1, "CPointGamestatsCounter::InputIncrement:  No stat name specified for point_gamestats_counter @%f, %f, %f [ent index %d]\n",
-			GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z, entindex() );
+			GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z, entindex() );
 		return;
 	}
 
-	gamestats->Event_IncrementCountedStatistic( GetAbsOrigin(), STRING( m_strStatisticName ), inputdata.value.Float() );
+	gamestats->Event_IncrementCountedStatistic(GetEngineObject()->GetAbsOrigin(), STRING( m_strStatisticName ), inputdata.value.Float() );
 }
 
 void CPointGamestatsCounter::InputEnable( inputdata_t &inputdata )

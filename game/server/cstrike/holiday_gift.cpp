@@ -46,8 +46,8 @@ CHolidayGift* CHolidayGift::Create( const Vector &position, const QAngle &angles
 		}
 
 		pGift->SetMoveType( MOVETYPE_FLYGRAVITY );
-		pGift->SetAbsVelocity( vecImpulse * 2.f + Vector(0,0,200) );
-		pGift->SetAbsAngles( QAngle(0,0,0) );
+		pGift->GetEngineObject()->SetAbsVelocity( vecImpulse * 2.f + Vector(0,0,200) );
+		pGift->GetEngineObject()->SetAbsAngles( QAngle(0,0,0) );
 		pGift->UseClientSideAnimation();
 		pGift->ResetSequence( pGift->LookupSequence("idle") );
 
@@ -145,8 +145,8 @@ void CHolidayGift::ItemTouch( CBaseEntity *pOther )
 {
 	if ( pOther->IsWorld() )
 	{
-		Vector absVel = GetAbsVelocity();
-		SetAbsVelocity( Vector( 0,0,absVel.z ) );
+		Vector absVel = GetEngineObject()->GetAbsVelocity();
+		GetEngineObject()->SetAbsVelocity( Vector( 0,0,absVel.z ) );
 		return;
 	}
 

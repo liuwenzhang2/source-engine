@@ -732,7 +732,7 @@ void CEngineObjectInternal::OnRestore()
 			Warning("Fixing up parent on %s\n", GetClassname());
 #endif
 			// We only need to be back in the parent's list because we're already in the right place and with the right data
-			IEngineObjectServer::LinkChild(GetMoveParent(), this);
+			GetMoveParent()->LinkChild(this);
 			this->m_pOuter->AfterParentChanged(NULL);
 		}
 	}
@@ -880,7 +880,7 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 
 	this->m_pOuter->BeforeParentChanged(pParentEntity ? pParentEntity->GetOuter() : NULL, iAttachment);
 	// notify the old parent of the loss
-	IEngineObjectServer::UnlinkFromParent(this);
+	this->UnlinkFromParent();
 	m_iParent = NULL_STRING;
 	m_iParentAttachment = 0;
 
@@ -907,7 +907,7 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 	// set the move parent if we have one
 
 	// add ourselves to the list
-	IEngineObjectServer::LinkChild(pParentEntity, this);
+	pParentEntity->LinkChild(this);
 	// set the new name
 //m_pParent = pParentEntity;
 	m_iParent = pParentEntity->GetEntityName();
@@ -944,6 +944,128 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 		}
 	}
 	m_pOuter->CollisionRulesChanged();
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Does the linked list work of removing a child object from the hierarchy.
+// Input  : pParent - 
+//			pChild - 
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::UnlinkChild(IEngineObjectServer* pChild)
+{
+	CEngineObjectInternal* pList = this->FirstMoveChild();
+	CEngineObjectInternal* pPrev = NULL;
+
+	while (pList)
+	{
+		CEngineObjectInternal* pNext = pList->NextMovePeer();
+		if (pList == pChild)
+		{
+			// patch up the list
+			if (!pPrev) {
+				this->SetFirstMoveChild(pNext);
+			}
+			else {
+				pPrev->SetNextMovePeer(pNext);
+			}
+
+			// Clear hierarchy bits for this guy
+			pChild->SetMoveParent(NULL);
+			pChild->SetNextMovePeer(NULL);
+			//pList->GetOuter()->NetworkProp()->SetNetworkParent( CBaseHandle() );
+			pChild->GetOuter()->DispatchUpdateTransmitState();
+			pChild->GetOuter()->OnEntityEvent(ENTITY_EVENT_PARENT_CHANGED, NULL);
+
+			this->GetOuter()->RecalcHasPlayerChildBit();
+			return;
+		}
+		else
+		{
+			pPrev = pList;
+			pList = pNext;
+		}
+	}
+
+	// This only happens if the child wasn't found in the parent's child list
+	Assert(0);
+}
+
+void CEngineObjectInternal::LinkChild(IEngineObjectServer* pChild)
+{
+	//EHANDLE hParent;
+	//hParent.Set( pParent->GetOuter() );
+	pChild->SetNextMovePeer(this->FirstMoveChild());
+	this->SetFirstMoveChild(pChild);
+	pChild->SetMoveParent(this);
+	//pChild->GetOuter()->NetworkProp()->SetNetworkParent(pParent->GetOuter());
+	pChild->GetOuter()->DispatchUpdateTransmitState();
+	pChild->GetOuter()->OnEntityEvent(ENTITY_EVENT_PARENT_CHANGED, NULL);
+	this->GetOuter()->RecalcHasPlayerChildBit();
+}
+
+void CEngineObjectInternal::TransferChildren(IEngineObjectServer* pNewParent)
+{
+	CEngineObjectInternal* pChild = this->FirstMoveChild();
+	while (pChild)
+	{
+		// NOTE: Have to do this before the unlink to ensure local coords are valid
+		Vector vecAbsOrigin = pChild->GetAbsOrigin();
+		QAngle angAbsRotation = pChild->GetAbsAngles();
+		Vector vecAbsVelocity = pChild->GetAbsVelocity();
+		//		QAngle vecAbsAngVelocity = pChild->GetAbsAngularVelocity();
+		pChild->GetOuter()->BeforeParentChanged(pNewParent->GetOuter());
+		UnlinkChild(pChild);
+		pNewParent->LinkChild(pChild);
+		pChild->GetOuter()->AfterParentChanged(this->GetOuter());
+
+		// FIXME: This is a hack to guarantee update of the local origin, angles, etc.
+		pChild->m_vecAbsOrigin.Init(FLT_MAX, FLT_MAX, FLT_MAX);
+		pChild->m_angAbsRotation.Init(FLT_MAX, FLT_MAX, FLT_MAX);
+		pChild->m_vecAbsVelocity.Init(FLT_MAX, FLT_MAX, FLT_MAX);
+
+		pChild->SetAbsOrigin(vecAbsOrigin);
+		pChild->SetAbsAngles(angAbsRotation);
+		pChild->SetAbsVelocity(vecAbsVelocity);
+		//		pChild->SetAbsAngularVelocity(vecAbsAngVelocity);
+
+		pChild = this->FirstMoveChild();
+	}
+}
+
+void CEngineObjectInternal::UnlinkFromParent()
+{
+	if (this->GetMoveParent())
+	{
+		// NOTE: Have to do this before the unlink to ensure local coords are valid
+		Vector vecAbsOrigin = this->GetAbsOrigin();
+		QAngle angAbsRotation = this->GetAbsAngles();
+		Vector vecAbsVelocity = this->GetAbsVelocity();
+		//		QAngle vecAbsAngVelocity = pRemove->GetAbsAngularVelocity();
+
+		this->GetMoveParent()->UnlinkChild(this);
+
+		this->SetLocalOrigin(vecAbsOrigin);
+		this->SetLocalAngles(angAbsRotation);
+		this->SetLocalVelocity(vecAbsVelocity);
+		//		pRemove->SetLocalAngularVelocity(vecAbsAngVelocity);
+		this->GetOuter()->UpdateWaterState();
+	}
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Clears the parent of all the children of the given object.
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::UnlinkAllChildren()
+{
+	CEngineObjectInternal* pChild = this->FirstMoveChild();
+	while (pChild)
+	{
+		CEngineObjectInternal* pNext = pChild->NextMovePeer();
+		pChild->UnlinkFromParent();
+		pChild = pNext;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1309,7 +1431,7 @@ const Vector& CEngineObjectInternal::GetLocalVelocity() const
 	return m_vecVelocity;
 }
 
-Vector& CEngineObjectInternal::GetAbsVelocity()
+const Vector& CEngineObjectInternal::GetAbsVelocity()
 {
 	Assert(CBaseEntity::IsAbsQueriesValid());
 
@@ -1345,7 +1467,7 @@ const QAngle& CEngineObjectInternal::GetLocalAngles(void) const
 	return m_angRotation;
 }
 
-Vector& CEngineObjectInternal::GetAbsOrigin(void)
+const Vector& CEngineObjectInternal::GetAbsOrigin(void)
 {
 	Assert(CBaseEntity::IsAbsQueriesValid());
 
@@ -1367,7 +1489,7 @@ const Vector& CEngineObjectInternal::GetAbsOrigin(void) const
 	return m_vecAbsOrigin;
 }
 
-QAngle& CEngineObjectInternal::GetAbsAngles(void)
+const QAngle& CEngineObjectInternal::GetAbsAngles(void)
 {
 	Assert(CBaseEntity::IsAbsQueriesValid());
 
@@ -1686,7 +1808,7 @@ bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* 
 			ICollideable* pCollide = pTrigger->CollisionProp();
 			Ray_t ray;
 			trace_t tr;
-			ray.Init(pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin(), pEntity->WorldAlignMins(), pEntity->WorldAlignMaxs());
+			ray.Init(pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->WorldAlignMins(), pEntity->WorldAlignMaxs());
 			enginetrace->ClipRayToCollideable(ray, MASK_ALL, pCollide, &tr);
 
 			if (tr.startsolid)
@@ -1723,8 +1845,8 @@ bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* 
 				{
 					collidelist_t element;
 					element.pCollide = pVCollide->solids[0];
-					element.origin = pEntity->GetAbsOrigin();
-					element.angles = pEntity->GetAbsAngles();
+					element.origin = pEntity->GetEngineObject()->GetAbsOrigin();
+					element.angles = pEntity->GetEngineObject()->GetAbsAngles();
 					collideList.AddToTail(element);
 				}
 			}
@@ -1732,7 +1854,7 @@ bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* 
 			{
 				const collidelist_t& element = collideList[i];
 				trace_t tr;
-				physcollision->TraceCollide(element.origin, element.origin, element.pCollide, element.angles, pTriggerCollide, pTrigger->GetAbsOrigin(), pTrigger->GetAbsAngles(), &tr);
+				physcollision->TraceCollide(element.origin, element.origin, element.pCollide, element.angles, pTriggerCollide, pTrigger->GetEngineObject()->GetAbsOrigin(), pTrigger->GetEngineObject()->GetAbsAngles(), &tr);
 				if (tr.startsolid)
 					return true;
 			}

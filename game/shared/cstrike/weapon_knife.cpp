@@ -294,7 +294,7 @@ void CKnife::Smack( void )
 	filter.RemoveRecipient( GetPlayerOwner() );
 #endif
 
-	data.m_vAngles = GetPlayerOwner()->GetAbsAngles();
+	data.m_vAngles = GetPlayerOwner()->GetEngineObject()->GetAbsAngles();
 	data.m_fFlags = 0x1;	//IMPACT_NODECAL;
 	te->DispatchEffect( filter, 0.0, data.m_vOrigin, "KnifeSlash", data );
 }
@@ -433,9 +433,9 @@ bool CKnife::SwingOrStab( bool bStab )
 			{
 				Vector vTragetForward;
 
-				AngleVectors( pEntity->GetAbsAngles(), &vTragetForward );
+				AngleVectors( pEntity->GetEngineObject()->GetAbsAngles(), &vTragetForward );
 				
-				Vector2D vecLOS = (pEntity->GetAbsOrigin() - pPlayer->GetAbsOrigin()).AsVector2D();
+				Vector2D vecLOS = (pEntity->GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin()).AsVector2D();
 				Vector2DNormalize( vecLOS );
 
 				float flDot = vecLOS.Dot( vTragetForward.AsVector2D() );

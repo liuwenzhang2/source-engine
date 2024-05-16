@@ -155,7 +155,7 @@ void FX_FireBullets(
 		if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING) )
 			V_strcat(szFlags, "DUCKING ", sizeof(szFlags));
 
-		float fVelocity = pPlayer->GetAbsVelocity().Length2D();
+		float fVelocity = pPlayer->GetEngineObject()->GetAbsVelocity().Length2D();
 
 		Msg("FireBullets @ %10f [ %s ]: inaccuracy=%f  spread=%f  max dispersion=%f  mode=%2i  vel=%10f  seed=%3i  %s\n", 
 			gpGlobals->curtime, weaponAlias, fInaccuracy, fSpread, fInaccuracy + fSpread, iMode, fVelocity, iSeed, szFlags);

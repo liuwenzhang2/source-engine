@@ -479,7 +479,7 @@ void CNPC_Stalker::UpdateAttackBeam( void )
 			// ---------------------------------------------
 			//	Get beam end point
 			// ---------------------------------------------
-			Vector vecSrc = LaserStartPosition(GetAbsOrigin());
+			Vector vecSrc = LaserStartPosition(GetEngineObject()->GetAbsOrigin());
 			Vector targetDir = m_vLaserTargetPos - vecSrc;
 			VectorNormalize(targetDir);
 			// --------------------------------------------------------
@@ -597,7 +597,7 @@ void CNPC_Stalker::StartTask( const Task_t *pTask )
 				CBaseCombatCharacter *pBCC = ToBaseCombatCharacter(pEnemy);
 				if (pBCC)
 				{
-					Vector targetToMe = (pBCC->GetAbsOrigin() - GetAbsOrigin());
+					Vector targetToMe = (pBCC->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin());
 					Vector vBCCFacing = pBCC->BodyDirection2D( );
 					if ((DotProduct(vBCCFacing,targetToMe) < 0) &&
 						(pBCC->GetSmoothedVelocity().Length() < 50))
@@ -613,7 +613,7 @@ void CNPC_Stalker::StartTask( const Task_t *pTask )
 						missPos.z += 60;
 					}
 				}
-				m_vLaserDir = missPos - LaserStartPosition(GetAbsOrigin());
+				m_vLaserDir = missPos - LaserStartPosition(GetEngineObject()->GetAbsOrigin());
 				VectorNormalize(m_vLaserDir);	
 			}
 			else
@@ -844,7 +844,7 @@ Vector CNPC_Stalker::LaserStartPosition(Vector vStalkerPos)
 	GetAttachment(STALKER_LASER_ATTACHMENT,vAttachPos);
 
 	// Now convert to vStalkerPos
-	vAttachPos = vAttachPos - GetAbsOrigin() + vStalkerPos;
+	vAttachPos = vAttachPos - GetEngineObject()->GetAbsOrigin() + vStalkerPos;
 	return vAttachPos;
 }
 
@@ -855,7 +855,7 @@ Vector CNPC_Stalker::LaserStartPosition(Vector vStalkerPos)
 //------------------------------------------------------------------------------
 void CNPC_Stalker::CalcBeamPosition(void)
 {
-	Vector targetDir = m_vLaserTargetPos - LaserStartPosition(GetAbsOrigin());
+	Vector targetDir = m_vLaserTargetPos - LaserStartPosition(GetEngineObject()->GetAbsOrigin());
 	VectorNormalize(targetDir);
 
 	// ---------------------------------------
@@ -883,7 +883,7 @@ void CNPC_Stalker::CalcBeamPosition(void)
 		// Add time-coherent noise to the position
 		// Must be scaled with distance 
 		// -----------------------------------------
-		float fTargetDist = (GetAbsOrigin() - m_vLaserTargetPos).Length();
+		float fTargetDist = (GetEngineObject()->GetAbsOrigin() - m_vLaserTargetPos).Length();
 		float noiseScale		= atan(0.2/fTargetDist);
 		float m_fNoiseModX		= 5;
 		float m_fNoiseModY		= 5;
@@ -909,7 +909,7 @@ void CNPC_Stalker::StartAttackBeam( void )
 	// UNDONE: Why would I ever have a beam already?!?!?!
 	if (!m_pBeam)
 	{
-		Vector vecSrc = LaserStartPosition(GetAbsOrigin());
+		Vector vecSrc = LaserStartPosition(GetEngineObject()->GetAbsOrigin());
 		trace_t tr;
 		AI_TraceLine ( vecSrc, vecSrc + m_vLaserDir * MAX_STALKER_FIRE_RANGE, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr);
 		if ( tr.fraction >= 1.0 )
@@ -929,15 +929,15 @@ void CNPC_Stalker::StartAttackBeam( void )
 		{
 			case STALKER_BEAM_LOW:
 				m_pBeam->SetColor( 255, 0, 0 );
-				m_pLightGlow = CSprite::SpriteCreate( "sprites/redglow1.vmt", GetAbsOrigin(), FALSE );
+				m_pLightGlow = CSprite::SpriteCreate( "sprites/redglow1.vmt", GetEngineObject()->GetAbsOrigin(), FALSE );
 				break;
 			case STALKER_BEAM_MED:
 				m_pBeam->SetColor( 255, 50, 0 );
-				m_pLightGlow = CSprite::SpriteCreate( "sprites/orangeglow1.vmt", GetAbsOrigin(), FALSE );
+				m_pLightGlow = CSprite::SpriteCreate( "sprites/orangeglow1.vmt", GetEngineObject()->GetAbsOrigin(), FALSE );
 				break;
 			case STALKER_BEAM_HIGH:
 				m_pBeam->SetColor( 255, 150, 0 );
-				m_pLightGlow = CSprite::SpriteCreate( "sprites/yellowglow1.vmt", GetAbsOrigin(), FALSE );
+				m_pLightGlow = CSprite::SpriteCreate( "sprites/yellowglow1.vmt", GetEngineObject()->GetAbsOrigin(), FALSE );
 				break;
 		}
 
@@ -1034,7 +1034,7 @@ void CNPC_Stalker::DrawAttackBeam(void)
 	// ---------------------------------------------
 	//	Get beam end point
 	// ---------------------------------------------
-	Vector vecSrc = LaserStartPosition(GetAbsOrigin());
+	Vector vecSrc = LaserStartPosition(GetEngineObject()->GetAbsOrigin());
 	trace_t tr;
 	AI_TraceLine( vecSrc, vecSrc + m_vLaserDir * MAX_STALKER_FIRE_RANGE, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr);
 
@@ -1417,7 +1417,7 @@ void CNPC_Stalker::AddZigZagToPath(void)
 	}
 
 	Vector waypointPos = GetNavigator()->GetCurWaypointPos();
-	Vector waypointDir = (waypointPos - GetAbsOrigin());
+	Vector waypointDir = (waypointPos - GetEngineObject()->GetAbsOrigin());
 
 	// If the distance to the next node is greater than ZIG_ZAG_SIZE
 	// then add a random zig/zag to the path
@@ -1439,14 +1439,14 @@ void CNPC_Stalker::AddZigZagToPath(void)
 		}
 
 		// Get zigzag position in direction of target waypoint
-		Vector zigZagPos = GetAbsOrigin() + waypointDir * 60;
+		Vector zigZagPos = GetEngineObject()->GetAbsOrigin() + waypointDir * 60;
 
 		// Now offset 
 		zigZagPos = zigZagPos + (vDir * distance);
 
 		// Now make sure that we can still get to the zigzag position and the waypoint
 		AIMoveTrace_t moveTrace1, moveTrace2;
-		GetMoveProbe()->MoveLimit( NAV_GROUND, GetAbsOrigin(), zigZagPos, MASK_NPCSOLID, NULL, &moveTrace1);
+		GetMoveProbe()->MoveLimit( NAV_GROUND, GetEngineObject()->GetAbsOrigin(), zigZagPos, MASK_NPCSOLID, NULL, &moveTrace1);
 		GetMoveProbe()->MoveLimit( NAV_GROUND, zigZagPos, waypointPos, MASK_NPCSOLID, NULL, &moveTrace2);
 		if ( !IsMoveBlocked( moveTrace1 ) && !IsMoveBlocked( moveTrace2 ) )
 		{

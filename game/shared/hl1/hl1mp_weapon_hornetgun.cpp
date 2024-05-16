@@ -138,7 +138,7 @@ void CWeaponHgun::PrimaryAttack( void )
 
 	WeaponSound( SINGLE );
 #if !defined(CLIENT_DLL)
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 200, 0.2 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 200, 0.2 );
 #endif
 	pPlayer->DoMuzzleFlash();
 
@@ -153,7 +153,7 @@ void CWeaponHgun::PrimaryAttack( void )
 
 #if !defined(CLIENT_DLL)
 	CBaseEntity *pHornet = CBaseEntity::Create( "hornet", pPlayer->Weapon_ShootPosition() + vForward * 16 + vRight * 8 + vUp * -12, vecAngles, pPlayer );
-	pHornet->SetAbsVelocity( vForward * 300 );
+	pHornet->GetEngineObject()->SetAbsVelocity( vForward * 300 );
 #endif
 
 	m_flRechargeTime = gpGlobals->curtime + 0.5;
@@ -190,7 +190,7 @@ void CWeaponHgun::SecondaryAttack( void )
 
 	WeaponSound( SINGLE );
 #if !defined(CLIENT_DLL)
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 200, 0.2 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 200, 0.2 );
 #endif
 	pPlayer->DoMuzzleFlash();
 
@@ -246,7 +246,7 @@ void CWeaponHgun::SecondaryAttack( void )
 	pHornet = NULL;
 #else
 	pHornet = CBaseEntity::Create( "hornet", vecSrc, vecAngles, pPlayer );
-	pHornet->SetAbsVelocity( vForward * 1200 );
+	pHornet->GetEngineObject()->SetAbsVelocity( vForward * 1200 );
 	pHornet->SetThink( &CNPC_Hornet::StartDart );
 #endif
 

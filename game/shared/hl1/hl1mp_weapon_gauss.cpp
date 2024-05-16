@@ -401,20 +401,20 @@ void CWeaponGauss::StartFire( void )
 	}
 
 	//ALERT ( at_console, "Time:%f Damage:%f\n", gpGlobals->curtime - m_pPlayer->m_flStartCharge, flDamage );
-	Vector	vecNewVel	= pPlayer->GetAbsVelocity();
+	Vector	vecNewVel	= pPlayer->GetEngineObject()->GetAbsVelocity();
 	float	flZVel		= vecNewVel.z;
 
 	if ( !m_bPrimaryFire )
 	{
 		vecNewVel = vecNewVel - vecAiming * flDamage * 5;
-		pPlayer->SetAbsVelocity( vecNewVel );
+		pPlayer->GetEngineObject()->SetAbsVelocity( vecNewVel );
 	}
 
 	if ( !g_pGameRules->IsMultiplayer() )
 	{
 		// in deathmatch, gauss can pop you up into the air. Not in single play.
 		vecNewVel.z = flZVel;
-		pPlayer->SetAbsVelocity( vecNewVel );
+		pPlayer->GetEngineObject()->SetAbsVelocity( vecNewVel );
 	}
 
 	// player "shoot" animation
@@ -606,7 +606,7 @@ void CWeaponGauss::Fire( Vector vecOrigSrc, Vector vecDir, float flDamage )
 #if !defined( CLIENT_DLL)
 							RadiusDamage( CTakeDamageInfo( this, pPlayer, flDamage, DMG_BLAST ), exit_tr.endpos + vecDir * 8, flDamageRadius, CLASS_NONE, NULL );
 
-							CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 1024, 3.0 );
+							CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 1024, 3.0 );
 #endif
 
 							vecSrc = exit_tr.endpos + vecDir;
@@ -630,7 +630,7 @@ void CWeaponGauss::Fire( Vector vecOrigSrc, Vector vecDir, float flDamage )
 						data5.m_vNormal		= tr.plane.normal;
 						DispatchEffect( "HL1GaussWallImpact2", data5 );
 #if !defined( CLIENT_DLL)
-						CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 600, 0.5 );
+						CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 600, 0.5 );
 #endif
 					}
 					

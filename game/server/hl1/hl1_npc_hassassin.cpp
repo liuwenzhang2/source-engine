@@ -225,9 +225,9 @@ int CNPC_HAssassin::MeleeAttack1Conditions ( float flDot, float flDist )
 		Vector vecMin = Vector( random->RandomFloat( 0, -64), random->RandomFloat( 0, -64 ), 0 );
 		Vector vecMax = Vector( random->RandomFloat( 0, 64), random->RandomFloat( 0, 64 ), 160 );
 
-		Vector vecDest = GetAbsOrigin() + Vector( random->RandomFloat( -64, 64), random->RandomFloat( -64, 64 ), 160 );
+		Vector vecDest = GetEngineObject()->GetAbsOrigin() + Vector( random->RandomFloat( -64, 64), random->RandomFloat( -64, 64 ), 160 );
 
-		UTIL_TraceHull( GetAbsOrigin() + Vector( 0, 0, 36 ), GetAbsOrigin() + Vector( 0, 0, 36 ), vecMin, vecMax, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+		UTIL_TraceHull(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 36 ), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 36 ), vecMin, vecMax, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 
 		//NDebugOverlay::Box( GetAbsOrigin() + Vector( 0, 0, 36 ), vecMin, vecMax, 0,0, 255, 0, 2.0 );
 
@@ -240,7 +240,7 @@ int CNPC_HAssassin::MeleeAttack1Conditions ( float flDot, float flDist )
 
 		float time = sqrt( 160 / (0.5 * flGravity));
 		float speed = flGravity * time / 160;
-		m_vecJumpVelocity = ( vecDest - GetAbsOrigin() ) * speed;
+		m_vecJumpVelocity = ( vecDest - GetEngineObject()->GetAbsOrigin() ) * speed;
 
 		return COND_CAN_MELEE_ATTACK1;
 	}
@@ -261,7 +261,7 @@ int CNPC_HAssassin::RangeAttack1Conditions ( float flDot, float flDist )
 	{
 		trace_t	tr;
 
-		Vector vecSrc = GetAbsOrigin() + m_HackedGunPos;
+		Vector vecSrc = GetEngineObject()->GetAbsOrigin() + m_HackedGunPos;
 
 		// verify that a bullet fired from the gun will hit the enemy before the world.
 		UTIL_TraceLine( vecSrc, GetEnemy()->BodyTarget(vecSrc), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr);
@@ -353,7 +353,7 @@ void CNPC_HAssassin::RunTask ( const Task_t *pTask )
 
 		if ( IsSequenceFinished() )
 		{
-			if ( GetAbsVelocity().z > 0)
+			if (GetEngineObject()->GetAbsVelocity().z > 0)
 			{
 				SetActivity( ACT_ASSASSIN_FLY_UP );
 			}
@@ -375,11 +375,11 @@ void CNPC_HAssassin::RunTask ( const Task_t *pTask )
 		{
 			TaskComplete( );
 		}
-		else if( gpGlobals->curtime > m_flWaitFinished || GetAbsVelocity().z == 0.0 )
+		else if( gpGlobals->curtime > m_flWaitFinished || GetEngineObject()->GetAbsVelocity().z == 0.0 )
 		{
 			// I've waited two seconds and haven't hit the ground. Try to force it.
 			trace_t trace;
-			UTIL_TraceEntity( this, GetAbsOrigin(), GetAbsOrigin() - Vector( 0, 0, 1 ), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &trace );
+			UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 1 ), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &trace );
 
 			if( trace.DidHitWorld() )
 			{
@@ -553,7 +553,7 @@ void CNPC_HAssassin::HandleAnimEvent( animevent_t *pEvent )
 		{
 			SetMoveType( MOVETYPE_FLYGRAVITY );
 			SetGroundEntity( NULL );
-			SetAbsVelocity( m_vecJumpVelocity );
+			GetEngineObject()->SetAbsVelocity( m_vecJumpVelocity );
 			m_flNextJump = gpGlobals->curtime + 3.0;
 		}
 		return;
@@ -595,10 +595,10 @@ void CNPC_HAssassin::Shoot ( void )
 	}
 	m_flLastShot = gpGlobals->curtime;
 
-	AngleVectors( GetAbsAngles(), &vForward, &vRight, &vUp );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward, &vRight, &vUp );
 
 	Vector	vecShellVelocity = vRight * random->RandomFloat(40,90) + vUp * random->RandomFloat(75,200) + vForward * random->RandomFloat(-40, 40);
-	EjectShell( GetAbsOrigin() + vUp * 32 + vForward * 12, vecShellVelocity, GetAbsAngles().y, 0 ); 
+	EjectShell(GetEngineObject()->GetAbsOrigin() + vUp * 32 + vForward * 12, vecShellVelocity, GetEngineObject()->GetAbsAngles().y, 0 );
 	FireBullets( 1, vecShootOrigin, vecShootDir, Vector( m_flDiviation, m_flDiviation, m_flDiviation ), 2048, m_iAmmoType ); // shoot +-8 degrees
 
 	//NDebugOverlay::Line( vecShootOrigin, vecShootOrigin + vecShootDir * 2048, 255, 0, 0, true, 2.0 );

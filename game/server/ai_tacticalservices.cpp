@@ -353,7 +353,7 @@ int CAI_TacticalServices::FindCoverNode(const Vector &vNearPos, const Vector &vT
 
 	if ( iMyNode == NO_NODE )
 	{
-		Vector pos = GetOuter()->GetAbsOrigin();
+		Vector pos = GetOuter()->GetEngineObject()->GetAbsOrigin();
 		DevWarning( 2, "FindCover() - %s has no nearest node! (Check near %f %f %f)\n", GetEntClassname(), pos.x, pos.y, pos.z);
 		return NO_NODE;
 	}
@@ -512,7 +512,7 @@ int CAI_TacticalServices::FindLosNode(const Vector &vThreatPos, const Vector &vT
 	int iMyNode	= GetPathfinder()->NearestNodeToNPC();
 	if ( iMyNode == NO_NODE )
 	{
-		Vector pos = GetOuter()->GetAbsOrigin();
+		Vector pos = GetOuter()->GetEngineObject()->GetAbsOrigin();
 		DevWarning( 2, "FindCover() - %s has no nearest node! (Check near %f %f %f)\n", GetEntClassname(), pos.x, pos.y, pos.z);
 		return NO_NODE;
 	}

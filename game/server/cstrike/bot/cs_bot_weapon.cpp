@@ -1036,7 +1036,7 @@ public:
 				return true;
 			}
 
-			Vector velDir = ag->GetEntity()->GetAbsVelocity();
+			Vector velDir = ag->GetEntity()->GetEngineObject()->GetAbsVelocity();
 			float grenadeSpeed = velDir.NormalizeInPlace();
 			const float atRestSpeed = 50.0f;
 
@@ -1067,7 +1067,7 @@ public:
 			// flee from grenades if close by or thrown towards us
 			const float throwDangerRange = 750.0f;
 			const float nearDangerRange = 300.0f;
-			Vector to = ag->GetPosition() - m_me->GetAbsOrigin();
+			Vector to = ag->GetPosition() - m_me->GetEngineObject()->GetAbsOrigin();
 			float range = to.NormalizeInPlace();
 			if (range > throwDangerRange)
 			{

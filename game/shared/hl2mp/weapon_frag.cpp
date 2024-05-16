@@ -529,7 +529,7 @@ void CWeaponFrag::RollGrenade( CBasePlayer *pPlayer )
 	pPlayer->GetVelocity( &vecThrow, NULL );
 	vecThrow += vecFacing * 700;
 	// put it on its side
-	QAngle orientation(0,pPlayer->GetLocalAngles().y,-90);
+	QAngle orientation(0,pPlayer->GetEngineObject()->GetLocalAngles().y,-90);
 	// roll it
 	AngularImpulse rotSpeed(0,0,720);
 	CBaseGrenade *pGrenade = Fraggrenade_Create( vecSrc, orientation, vecThrow, rotSpeed, pPlayer, GRENADE_TIMER, false );

@@ -996,8 +996,8 @@ void CNPC_AttackHelicopter::InputOutsideTransition( inputdata_t &inputdata )
 
 	if ( pEnt )
 	{
-		Vector teleportLocation = pEnt->GetAbsOrigin();
-		QAngle teleportAngles = pEnt->GetAbsAngles();
+		Vector teleportLocation = pEnt->GetEngineObject()->GetAbsOrigin();
+		QAngle teleportAngles = pEnt->GetEngineObject()->GetAbsAngles();
 		Teleport( &teleportLocation, &teleportAngles, &vec3_origin );
 		Teleported();
 	}
@@ -1101,8 +1101,8 @@ void CNPC_AttackHelicopter::Spawn( void )
 	m_hSensor = static_cast<CBombDropSensor*>(gEntList.CreateEntityByName( "npc_helicoptersensor" ));
 	m_hSensor->Spawn();
 	m_hSensor->GetEngineObject()->SetParent( this->GetEngineObject(), nBombAttachment);
-	m_hSensor->SetLocalOrigin( vec3_origin );
-	m_hSensor->SetLocalAngles( vec3_angle );
+	m_hSensor->GetEngineObject()->SetLocalOrigin( vec3_origin );
+	m_hSensor->GetEngineObject()->SetLocalAngles( vec3_angle );
 	m_hSensor->SetOwnerEntity( this );
 
 	AddFlag( FL_AIMTARGET );
@@ -1147,8 +1147,8 @@ void CNPC_AttackHelicopter::Startup()
 				continue;
 
 			m_hLights[i]->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
-			m_hLights[i]->SetLocalOrigin( vec3_origin );
-			m_hLights[i]->SetLocalVelocity( vec3_origin );
+			m_hLights[i]->GetEngineObject()->SetLocalOrigin( vec3_origin );
+			m_hLights[i]->GetEngineObject()->SetLocalVelocity( vec3_origin );
 			m_hLights[i]->SetMoveType( MOVETYPE_NONE );
 			m_hLights[i]->SetTransparency( kRenderTransAdd, 255, 255, 255, 200, kRenderFxNone );
 			m_hLights[i]->SetScale( 1.0f );
@@ -2237,7 +2237,7 @@ void CNPC_AttackHelicopter::ComputeVehicleFireAtPosition( Vector *pVecActualTarg
 
 	// Make sure the circle of death doesn't move more than N units
 	// This will cause the target to have to maintain a large enough speed
-	*pVecActualTargetPosition = pVehicle->BodyTarget( GetAbsOrigin(), false );
+	*pVecActualTargetPosition = pVehicle->BodyTarget(GetEngineObject()->GetAbsOrigin(), false );
 
 //	NDebugOverlay::Box( *pVecActualTargetPosition,
 //		Vector(-m_flCircleOfDeathRadius, -m_flCircleOfDeathRadius, 0), 
@@ -2762,7 +2762,7 @@ bool CNPC_AttackHelicopter::IsBombDropFair( const Vector &vecBombStartPos, const
 	{
 		// How much time will it take to fall?
 		// dx = 0.5 * a * t^2
-		Vector vecTarget = GetEnemy()->BodyTarget( GetAbsOrigin(), false );
+		Vector vecTarget = GetEnemy()->BodyTarget(GetEngineObject()->GetAbsOrigin(), false );
 		float dz = vecBombStartPos.z - vecTarget.z;
 		float dt = (dz > 0.0f) ? sqrt( 2 * dz / GetCurrentGravity() ) : 0.0f;
 
@@ -2796,10 +2796,10 @@ CGrenadeHelicopter *CNPC_AttackHelicopter::SpawnBombEntity( const Vector &vecPos
 {
 	// Create the grenade and set it up
 	CGrenadeHelicopter *pGrenade = static_cast<CGrenadeHelicopter*>(gEntList.CreateEntityByName( "grenade_helicopter" ));
-	pGrenade->SetAbsOrigin( vecPos );
+	pGrenade->GetEngineObject()->SetAbsOrigin( vecPos );
 	pGrenade->SetOwnerEntity( this );
 	pGrenade->SetThrower( this );
-	pGrenade->SetAbsVelocity( vecVelocity );
+	pGrenade->GetEngineObject()->SetAbsVelocity( vecVelocity );
 	DispatchSpawn( pGrenade );
 	pGrenade->SetExplodeOnContact( m_bBombsExplodeOnContact );
 
@@ -2836,7 +2836,7 @@ void CNPC_AttackHelicopter::CreateBomb( bool bCheckForFairness, Vector *pVecVelo
 	if ( !pVecVelocity )
 	{
 		Vector vecAcross;
-		vecActualVelocity = GetAbsVelocity();
+		vecActualVelocity = GetEngineObject()->GetAbsVelocity();
 		CrossProduct( vecActualVelocity, Vector( 0, 0, 1 ), vecAcross );
 		VectorNormalize( vecAcross );
 		vecAcross *= random->RandomFloat( 10.0f, 30.0f );
@@ -2951,7 +2951,7 @@ void CNPC_AttackHelicopter::InputDropBombAtTargetInternal( inputdata_t &inputdat
 	GetAttachment( m_nBombAttachment, vTipPos );
 
 	// Compute the time it would take to fall to the target
-	Vector vecTarget = pBombEnt->BodyTarget( GetAbsOrigin(), false );
+	Vector vecTarget = pBombEnt->BodyTarget(GetEngineObject()->GetAbsOrigin(), false );
 	float dz = vTipPos.z - vecTarget.z;
 	if ( dz <= 0.0f )
 	{
@@ -3049,7 +3049,7 @@ void CNPC_AttackHelicopter::DropBombs( )
 		// Skip out if we're bullrushing but too far from the player
 		if ( GetEnemy() )
 		{
-			if ( GetEnemy()->GetAbsOrigin().AsVector2D().DistToSqr( GetAbsOrigin().AsVector2D() ) > MAX_BULLRUSH_BOMB_DISTANCE_SQR )
+			if ( GetEnemy()->GetEngineObject()->GetAbsOrigin().AsVector2D().DistToSqr(GetEngineObject()->GetAbsOrigin().AsVector2D() ) > MAX_BULLRUSH_BOMB_DISTANCE_SQR )
 				return;
 		}
 	}
@@ -3146,7 +3146,7 @@ void CNPC_AttackHelicopter::BullrushBombs( )
 	else
 	{
 		Vector vecAcross;
-		Vector vecVelocity = GetAbsVelocity();
+		Vector vecVelocity = GetEngineObject()->GetAbsVelocity();
 		CrossProduct( vecVelocity, Vector( 0, 0, 1 ), vecAcross );
 		VectorNormalize( vecAcross );
 		vecAcross *= random->RandomFloat( 300.0f, 500.0f );
@@ -3322,7 +3322,7 @@ void CNPC_AttackHelicopter::AddSmokeTrail( const Vector &vecPos )
 
 		pFireTrail->FollowEntity( this, UTIL_VarArgs( "damage%d", m_nSmokeTrailCount ) );
 		pFireTrail->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
-		pFireTrail->SetLocalOrigin( vec3_origin );
+		pFireTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
 		pFireTrail->SetMoveType( MOVETYPE_NONE );
 		pFireTrail->SetLifetime( -1 );
 	}
@@ -3346,7 +3346,7 @@ void CNPC_AttackHelicopter::AddSmokeTrail( const Vector &vecPos )
 		pSmokeTrail->m_MaxSpeed = 64;
 		pSmokeTrail->SetLifetime(-1);
 		pSmokeTrail->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
-		pSmokeTrail->SetLocalOrigin( vec3_origin );
+		pSmokeTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
 		pSmokeTrail->SetMoveType( MOVETYPE_NONE );
 	}
 
@@ -3377,8 +3377,8 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 	pChunk->Spawn( pszChunkName );
 	pChunk->SetBloodColor( DONT_BLEED );
 
-	pChunk->SetAbsOrigin( vecChunkPos );
-	pChunk->SetAbsAngles( vecChunkAngles );
+	pChunk->GetEngineObject()->SetAbsOrigin( vecChunkPos );
+	pChunk->GetEngineObject()->SetAbsAngles( vecChunkAngles );
 
 	pChunk->SetOwnerEntity( pChopper );
 	
@@ -3408,11 +3408,11 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 	AngleVectors( angles, &vecVelocity );
 	
 	vecVelocity *= random->RandomFloat( 550, 800 );
-	vecVelocity += pChopper->GetAbsVelocity();
+	vecVelocity += pChopper->GetEngineObject()->GetAbsVelocity();
 
 	angImpulse = RandomAngularImpulse( -180, 180 );
 
-	pChunk->SetAbsVelocity( vecVelocity );
+	pChunk->GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 	if ( bSmall == false )
 	{
@@ -3432,7 +3432,7 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 
 	pFireTrail->FollowEntity( pChunk, "" );
 	pFireTrail->GetEngineObject()->SetParent( pChunk->GetEngineObject(), 0);
-	pFireTrail->SetLocalOrigin( vec3_origin );
+	pFireTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
 	pFireTrail->SetMoveType( MOVETYPE_NONE );
 	pFireTrail->SetLifetime( pChunk->m_lifeTime );
 }
@@ -3499,7 +3499,7 @@ void CNPC_AttackHelicopter::DropCorpse( int nDamage )
 	vecForceVector.z = 0.5;
 	vecForceVector *= forceScale;
 
-	CBaseEntity *pGib = CreateRagGib( "models/combine_soldier.mdl", GetAbsOrigin(), GetAbsAngles(), vecForceVector );
+	CBaseEntity *pGib = CreateRagGib( "models/combine_soldier.mdl", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), vecForceVector );
 	if ( pGib )
 	{
 		pGib->SetOwnerEntity( this );
@@ -3669,7 +3669,7 @@ int CNPC_AttackHelicopter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void Chopper_BecomeChunks( CBaseEntity *pChopper )
 {
-	QAngle vecChunkAngles = pChopper->GetAbsAngles();
+	QAngle vecChunkAngles = pChopper->GetEngineObject()->GetAbsAngles();
 	Vector vecForward, vecUp;
 	pChopper->GetVectors( &vecForward, NULL, &vecUp );
 
@@ -3695,7 +3695,7 @@ void Chopper_BecomeChunks( CBaseEntity *pChopper )
 #endif//HL2_EPISODIC
 
 
-	Vector vecChunkPos = pChopper->GetAbsOrigin();
+	Vector vecChunkPos = pChopper->GetEngineObject()->GetAbsOrigin();
 
 	Vector vecRight(0,0,0);
 
@@ -3708,21 +3708,21 @@ void Chopper_BecomeChunks( CBaseEntity *pChopper )
 	}
 
 	// Body
-	CHelicopterChunk *pBodyChunk = CHelicopterChunk::CreateHelicopterChunk( vecChunkPos, vecChunkAngles, pChopper->GetAbsVelocity(), HELICOPTER_CHUNK_BODY, CHUNK_BODY );
+	CHelicopterChunk *pBodyChunk = CHelicopterChunk::CreateHelicopterChunk( vecChunkPos, vecChunkAngles, pChopper->GetEngineObject()->GetAbsVelocity(), HELICOPTER_CHUNK_BODY, CHUNK_BODY );
 	Chopper_CreateChunk( pChopper, vecChunkPos, RandomAngle( 0, 360 ), s_pChunkModelName[random->RandomInt( 0, CHOPPER_MAX_CHUNKS - 1 )], false );
 
-	vecChunkPos = pChopper->GetAbsOrigin() + ( vecForward * 100.0f ) + ( vecUp * -38.0f );
+	vecChunkPos = pChopper->GetEngineObject()->GetAbsOrigin() + ( vecForward * 100.0f ) + ( vecUp * -38.0f );
 
 	// Cockpit
-	CHelicopterChunk *pCockpitChunk = CHelicopterChunk::CreateHelicopterChunk( vecChunkPos, vecChunkAngles, pChopper->GetAbsVelocity() + vecRight * -800.0f, HELICOPTER_CHUNK_COCKPIT, CHUNK_COCKPIT );
+	CHelicopterChunk *pCockpitChunk = CHelicopterChunk::CreateHelicopterChunk( vecChunkPos, vecChunkAngles, pChopper->GetEngineObject()->GetAbsVelocity() + vecRight * -800.0f, HELICOPTER_CHUNK_COCKPIT, CHUNK_COCKPIT );
 	Chopper_CreateChunk( pChopper, vecChunkPos, RandomAngle( 0, 360 ), s_pChunkModelName[random->RandomInt( 0, CHOPPER_MAX_CHUNKS - 1 )], false );
 
 	pCockpitChunk->m_hMaster = pBodyChunk;
 
-	vecChunkPos = pChopper->GetAbsOrigin() + ( vecForward * -175.0f );
+	vecChunkPos = pChopper->GetEngineObject()->GetAbsOrigin() + ( vecForward * -175.0f );
 
 	// Tail
-	CHelicopterChunk *pTailChunk = CHelicopterChunk::CreateHelicopterChunk( vecChunkPos, vecChunkAngles, pChopper->GetAbsVelocity() + vecRight * 800.0f, HELICOPTER_CHUNK_TAIL, CHUNK_TAIL );
+	CHelicopterChunk *pTailChunk = CHelicopterChunk::CreateHelicopterChunk( vecChunkPos, vecChunkAngles, pChopper->GetEngineObject()->GetAbsVelocity() + vecRight * 800.0f, HELICOPTER_CHUNK_TAIL, CHUNK_TAIL );
 	Chopper_CreateChunk( pChopper, vecChunkPos, RandomAngle( 0, 360 ), s_pChunkModelName[random->RandomInt( 0, CHOPPER_MAX_CHUNKS - 1 )], false );
 
 	pTailChunk->m_hMaster = pBodyChunk;
@@ -3775,7 +3775,7 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 		if( pCrashPoint != NULL )
 		{
 			m_hCrashPoint.Set( pCrashPoint );
-			SetDesiredPosition( pCrashPoint->GetAbsOrigin() );
+			SetDesiredPosition( pCrashPoint->GetEngineObject()->GetAbsOrigin() );
 
 			// Start the failing engine sound
 			CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
@@ -3829,8 +3829,8 @@ void CNPC_AttackHelicopter::CreateChopperHusk()
 {
 	// We're embedded into the ground
 	CBaseEntity *pCorpse = gEntList.CreateEntityByName( "prop_physics" );
-	pCorpse->SetAbsOrigin( GetAbsOrigin() );
-	pCorpse->SetAbsAngles( GetAbsAngles() );
+	pCorpse->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
+	pCorpse->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 	pCorpse->SetModel( CHOPPER_MODEL_CORPSE_NAME );
 	pCorpse->AddSpawnFlags( SF_PHYSPROP_MOTIONDISABLED );
 	pCorpse->Spawn();
@@ -3950,14 +3950,14 @@ void CNPC_AttackHelicopter::ComputeVelocity( const Vector &vecTargetPosition,
 	float flAdditionalHeight, float flMinDistFromSegment, float flMaxDistFromSegment, Vector *pVecAccel )
 {
 	Vector deltaPos;
-	VectorSubtract( vecTargetPosition, GetAbsOrigin(), deltaPos ); 
+	VectorSubtract( vecTargetPosition, GetEngineObject()->GetAbsOrigin(), deltaPos );
 
 	// calc goal linear accel to hit deltaPos in dt time.
 	// This is solving the equation xf = 0.5 * a * dt^2 + vo * dt + xo
 	float dt = 1.0f;
-	pVecAccel->x = 2.0f * (deltaPos.x - GetAbsVelocity().x * dt) / (dt * dt);
-	pVecAccel->y = 2.0f * (deltaPos.y - GetAbsVelocity().y * dt) / (dt * dt);
-	pVecAccel->z = 2.0f * (deltaPos.z - GetAbsVelocity().z * dt) / (dt * dt) + HELICOPTER_GRAVITY;
+	pVecAccel->x = 2.0f * (deltaPos.x - GetEngineObject()->GetAbsVelocity().x * dt) / (dt * dt);
+	pVecAccel->y = 2.0f * (deltaPos.y - GetEngineObject()->GetAbsVelocity().y * dt) / (dt * dt);
+	pVecAccel->z = 2.0f * (deltaPos.z - GetEngineObject()->GetAbsVelocity().z * dt) / (dt * dt) + HELICOPTER_GRAVITY;
 
 	float flDistFromPath = 0.0f;
 	Vector vecPoint, vecDelta;
@@ -3971,11 +3971,11 @@ void CNPC_AttackHelicopter::ComputeVelocity( const Vector &vecTargetPosition,
 			Vector vecEndPoint, vecClosest;
 			vecEndPoint = vecPoint;
 			vecEndPoint.z += flAdditionalHeight;
-			CalcClosestPointOnLineSegment( GetAbsOrigin(), vecPoint, vecEndPoint, vecClosest );
+			CalcClosestPointOnLineSegment(GetEngineObject()->GetAbsOrigin(), vecPoint, vecEndPoint, vecClosest );
 			vecPoint = vecClosest;
 		}
 
-		VectorSubtract( vecPoint, GetAbsOrigin(), vecDelta );
+		VectorSubtract( vecPoint, GetEngineObject()->GetAbsOrigin(), vecDelta );
  		flDistFromPath = VectorNormalize( vecDelta );
 		if ( flDistFromPath > flMaxDistFromSegment )
 		{
@@ -4039,7 +4039,7 @@ void CNPC_AttackHelicopter::ComputeVelocity( const Vector &vecTargetPosition,
 
 		if ( flMinDistFromSegment != 0.0f && ( flDistFromPath > flMinDistFromSegment ) )
 		{
-			Vector	vecVelDir = GetAbsVelocity();
+			Vector	vecVelDir = GetEngineObject()->GetAbsVelocity();
 
 			// Strongly constrain to an n unit pipe around the current path
 			// by damping out all impulse forces that would push us further from the pipe
@@ -4099,9 +4099,9 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 
 		// calc angular accel needed to hit goal pitch in dt time.
 		float dt = 0.6;
-		goalAngAccel.x = 2.0 * (AngleDiff( goalPitch, AngleNormalize( GetAbsAngles().x ) ) - GetLocalAngularVelocity().x * dt) / (dt * dt);
-		goalAngAccel.y = 2.0 * (AngleDiff( goalYaw, AngleNormalize( GetAbsAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
-		goalAngAccel.z = 2.0 * (AngleDiff( goalRoll, AngleNormalize( GetAbsAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
+		goalAngAccel.x = 2.0 * (AngleDiff( goalPitch, AngleNormalize(GetEngineObject()->GetAbsAngles().x ) ) - GetLocalAngularVelocity().x * dt) / (dt * dt);
+		goalAngAccel.y = 2.0 * (AngleDiff( goalYaw, AngleNormalize(GetEngineObject()->GetAbsAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
+		goalAngAccel.z = 2.0 * (AngleDiff( goalRoll, AngleNormalize(GetEngineObject()->GetAbsAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
 
 		goalAngAccel.x = clamp( goalAngAccel.x, -300, 300 );
 		//goalAngAccel.y = clamp( goalAngAccel.y, -60, 60 );
@@ -4140,9 +4140,9 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 	// Fix up pitch and yaw to tend toward small values
 	if ( m_lifeState == LIFE_DYING && GetCrashPoint() == NULL )
 	{
-		float flPitchDiff = random->RandomFloat( -5, 5 ) - GetAbsAngles().x;
+		float flPitchDiff = random->RandomFloat( -5, 5 ) - GetEngineObject()->GetAbsAngles().x;
 		angVel.x = flPitchDiff * 0.1f;
-		float flRollDiff = random->RandomFloat( -5, 5 ) - GetAbsAngles().z;
+		float flRollDiff = random->RandomFloat( -5, 5 ) - GetEngineObject()->GetAbsAngles().z;
 		angVel.z = flRollDiff * 0.1f;
 	}
 
@@ -4170,7 +4170,7 @@ void CNPC_AttackHelicopter::FlightDirectlyOverhead( void )
 			{
 				Vector vecEnemyVel = pEnemyVehicle->GetSmoothedVelocity();
 				Vector vecRelativePosition;
-				VectorSubtract( GetAbsOrigin(), pEnemyVehicle->GetAbsOrigin(), vecRelativePosition );
+				VectorSubtract(GetEngineObject()->GetAbsOrigin(), pEnemyVehicle->GetEngineObject()->GetAbsOrigin(), vecRelativePosition );
 				float flDist = VectorNormalize( vecRelativePosition );
 				float flEnemySpeed = VectorNormalize( vecEnemyVel );
 				float flDot = DotProduct( vecRelativePosition, vecEnemyVel );  
@@ -4185,7 +4185,7 @@ void CNPC_AttackHelicopter::FlightDirectlyOverhead( void )
 				{
 					float t = ( -b + sqrt( flDiscrim ) ) / (2 * a);
 					t = clamp( t, 0.0f, 4.0f );
-					VectorMA( pEnemyVehicle->GetAbsOrigin(), t * flEnemySpeed, vecEnemyVel, vecTargetPosition );
+					VectorMA( pEnemyVehicle->GetEngineObject()->GetAbsOrigin(), t * flEnemySpeed, vecEnemyVel, vecTargetPosition );
 				}
 			}
 		}
@@ -4249,7 +4249,7 @@ void CNPC_AttackHelicopter::Flight( void )
 	GetMaxSpeedAndAccel( &maxSpeed, &accelRate );
 
 	Vector vecTargetPosition;
-	float flCurrentSpeed = GetAbsVelocity().Length();
+	float flCurrentSpeed = GetEngineObject()->GetAbsVelocity().Length();
 	float flDist = MIN( flCurrentSpeed + accelRate, maxSpeed );
 	float dt = 1.0f;
 	ComputeActualTargetPosition( flDist, dt, flPerpDist, &vecTargetPosition );
@@ -4283,12 +4283,12 @@ void CNPC_AttackHelicopter::UpdateFacingDirection( const Vector &vecActualDesire
 		{
 			if( IsCarpetBombing() && hl2_episodic.GetBool() )
 			{
-				m_vecDesiredFaceDir = vecActualDesiredPosition - GetAbsOrigin();
+				m_vecDesiredFaceDir = vecActualDesiredPosition - GetEngineObject()->GetAbsOrigin();
 			}
 			else if ( !IsCrashing() && bSeenTargetRecently )
 			{
 				// If we've seen the target recently, face the target.
-				m_vecDesiredFaceDir = m_vecTargetPosition - GetAbsOrigin();
+				m_vecDesiredFaceDir = m_vecTargetPosition - GetEngineObject()->GetAbsOrigin();
 			}
 			else
 			{
@@ -4299,23 +4299,23 @@ void CNPC_AttackHelicopter::UpdateFacingDirection( const Vector &vecActualDesire
 		{
 			if ( ShouldDropBombs() || IsCarpetBombing() )
 			{
-				m_vecDesiredFaceDir = vecActualDesiredPosition - GetAbsOrigin();
+				m_vecDesiredFaceDir = vecActualDesiredPosition - GetEngineObject()->GetAbsOrigin();
 			}
 			else
 			{
-				m_vecDesiredFaceDir = m_vecTargetPosition - GetAbsOrigin();
+				m_vecDesiredFaceDir = m_vecTargetPosition - GetEngineObject()->GetAbsOrigin();
 			}
 		}
 	}
 	else
 	{
 		// Face our desired position
-		float flDistSqr = vecActualDesiredPosition.AsVector2D().DistToSqr( GetAbsOrigin().AsVector2D() );
+		float flDistSqr = vecActualDesiredPosition.AsVector2D().DistToSqr(GetEngineObject()->GetAbsOrigin().AsVector2D() );
 		if ( flDistSqr <= 50 * 50 )
 		{
 			if (( flDistSqr > 1 * 1 ) && bSeenTargetRecently && IsInSecondaryMode( BULLRUSH_MODE_SHOOT_IDLE_PLAYER ) ) 
 			{
-				m_vecDesiredFaceDir = m_vecTargetPosition - GetAbsOrigin();
+				m_vecDesiredFaceDir = m_vecTargetPosition - GetEngineObject()->GetAbsOrigin();
 				m_vecDesiredFaceDir.z = 0.0f;
 			}
 			else
@@ -4325,7 +4325,7 @@ void CNPC_AttackHelicopter::UpdateFacingDirection( const Vector &vecActualDesire
 		}
 		else
 		{
-			m_vecDesiredFaceDir = vecActualDesiredPosition - GetAbsOrigin();
+			m_vecDesiredFaceDir = vecActualDesiredPosition - GetEngineObject()->GetAbsOrigin();
 		}
 	}
 	VectorNormalize( m_vecDesiredFaceDir ); 
@@ -4485,11 +4485,11 @@ void CNPC_AttackHelicopter::ShutdownGunDuringBullrush( )
 bool CNPC_AttackHelicopter::ShouldBombIdlePlayer( void )
 {
 	// Must be settled over a position and not moving too quickly to do this
-	if ( GetAbsVelocity().LengthSqr() > Square(HELICOPTER_MIN_IDLE_BOMBING_SPEED) )
+	if (GetEngineObject()->GetAbsVelocity().LengthSqr() > Square(HELICOPTER_MIN_IDLE_BOMBING_SPEED) )
 		return false;
 
 	// Must be within a certain range of the target
-	float flDistToTargetSqr = (GetEnemy()->WorldSpaceCenter() - GetAbsOrigin()).Length2DSqr();
+	float flDistToTargetSqr = (GetEnemy()->WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin()).Length2DSqr();
 	
 	if ( flDistToTargetSqr < Square(HELICOPTER_MIN_IDLE_BOMBING_DIST) )
 		return true;
@@ -4529,7 +4529,7 @@ void CNPC_AttackHelicopter::UpdateBullrushState( void )
 					float flDistanceToGoal = ComputeDistanceToTargetPosition();
 					Vector vecPathDir;
 					CurrentPathDirection( &vecPathDir );
-					bool bMovingForward = DotProduct2D( GetAbsVelocity().AsVector2D(), vecPathDir.AsVector2D() ) >= 0.0f;
+					bool bMovingForward = DotProduct2D(GetEngineObject()->GetAbsVelocity().AsVector2D(), vecPathDir.AsVector2D() ) >= 0.0f;
 					if ( flDistanceToGoal * (bMovingForward ? 1.0f : -1.0f) > 1000 )
 					{
 						m_bRushForward = bMovingForward;
@@ -5064,7 +5064,7 @@ void CGrenadeHelicopter::Spawn( void )
 		IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, GetSolidFlags(), false );
 		SetMoveType( MOVETYPE_VPHYSICS );
 
-		Vector vecAbsVelocity = GetAbsVelocity();
+		Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 		pPhysicsObject->AddVelocity( &vecAbsVelocity, NULL );
 	}
 	else
@@ -5083,8 +5083,8 @@ void CGrenadeHelicopter::Spawn( void )
 
 	// contact grenades arc lower
 	QAngle angles;
-	VectorAngles(GetAbsVelocity(), angles );
-	SetLocalAngles( angles );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
+	GetEngineObject()->SetLocalAngles( angles );
 	
 	SetThink( NULL );
 	
@@ -5332,7 +5332,7 @@ void CGrenadeHelicopter::OnEntityEvent( EntityEvent_t event, void *pEventData )
 //------------------------------------------------------------------------------
 void CGrenadeHelicopter::PhysicsSimulate( void )
 {
-	Vector vecPrevPosition = GetAbsOrigin();
+	Vector vecPrevPosition = GetEngineObject()->GetAbsOrigin();
 	
 	BaseClass::PhysicsSimulate();
 
@@ -5340,15 +5340,15 @@ void CGrenadeHelicopter::PhysicsSimulate( void )
 	{
 		if ( GetWaterLevel() > 1 )
 		{
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 			SetMoveType( MOVETYPE_NONE );
 			BecomeActive();
 		}
 
 		// Stuck condition, can happen pretty often
-		if ( vecPrevPosition == GetAbsOrigin() )
+		if ( vecPrevPosition == GetEngineObject()->GetAbsOrigin() )
 		{
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 			SetMoveType( MOVETYPE_NONE );
 			BecomeActive();
 		}
@@ -5369,7 +5369,7 @@ void CGrenadeHelicopter::VPhysicsCollision( int index, gamevcollisionevent_t *pE
 	{
 		Vector vecVelocity;
 		GetVelocity( &vecVelocity, NULL );
-		DoExplosion( GetAbsOrigin(), vecVelocity );
+		DoExplosion(GetEngineObject()->GetAbsOrigin(), vecVelocity );
 	}
 #endif
 	
@@ -5436,13 +5436,13 @@ int CGrenadeHelicopter::OnTakeDamage( const CTakeDamageInfo &info )
 //------------------------------------------------------------------------------
 void CGrenadeHelicopter::DoExplosion( const Vector &vecOrigin, const Vector &vecVelocity )
 {
-	ExplosionCreate( GetAbsOrigin(), GetAbsAngles(), GetOwnerEntity() ? GetOwnerEntity() : this, sk_helicopter_grenadedamage.GetFloat(), 
+	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetOwnerEntity() ? GetOwnerEntity() : this, sk_helicopter_grenadedamage.GetFloat(),
 		sk_helicopter_grenaderadius.GetFloat(), (SF_ENVEXPLOSION_NOSPARKS|SF_ENVEXPLOSION_NODLIGHTS|SF_ENVEXPLOSION_NODECAL|SF_ENVEXPLOSION_NOFIREBALL|SF_ENVEXPLOSION_NOPARTICLES), 
 		sk_helicopter_grenadeforce.GetFloat(), this );
 
 	if ( GetShakeAmplitude() )
 	{
-		UTIL_ScreenShake( GetAbsOrigin(), GetShakeAmplitude(), 150.0, 1.0, GetShakeRadius(), SHAKE_START );
+		UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), GetShakeAmplitude(), 150.0, 1.0, GetShakeRadius(), SHAKE_START );
 	}
 
 	CEffectData data;
@@ -5459,7 +5459,7 @@ void CGrenadeHelicopter::DoExplosion( const Vector &vecOrigin, const Vector &vec
 	else
 	{
 		// Otherwise do a normal explosion
-		data.m_vOrigin = GetAbsOrigin();
+		data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 		DispatchEffect( "HelicopterMegaBomb", data );
 	}
 
@@ -5486,7 +5486,7 @@ void CGrenadeHelicopter::ExplodeThink(void)
 
 	Vector vecVelocity;
 	GetVelocity( &vecVelocity, NULL );
-	DoExplosion( GetAbsOrigin(), vecVelocity );
+	DoExplosion(GetEngineObject()->GetAbsOrigin(), vecVelocity );
 
 #ifdef HL2_EPISODIC
 	// if we were thrown by player, look at health of helicopter after explosion and determine if we damaged it
@@ -5552,7 +5552,7 @@ void CGrenadeHelicopter::ExplodeConcussion( CBaseEntity *pOther )
 
 	Vector vecVelocity;
 	GetVelocity( &vecVelocity, NULL );
-	DoExplosion( GetAbsOrigin(), vecVelocity );
+	DoExplosion(GetEngineObject()->GetAbsOrigin(), vecVelocity );
 }
 
 
@@ -5685,8 +5685,8 @@ CBaseEntity *CreateHelicopterAvoidanceSphere( CBaseEntity *pParent, int nAttachm
 	}
 	pSphere->Spawn();
 	pSphere->GetEngineObject()->SetParent( pParent?pParent->GetEngineObject():NULL, nAttachment);
-	pSphere->SetLocalOrigin( vec3_origin );
-	pSphere->SetLocalAngles( vec3_angle );
+	pSphere->GetEngineObject()->SetLocalOrigin( vec3_origin );
+	pSphere->GetEngineObject()->SetLocalAngles( vec3_angle );
 	pSphere->SetOwnerEntity( pParent );
 	return pSphere;
 }
@@ -5726,7 +5726,7 @@ void CAvoidSphere::ComputeAvoidanceForces( CBaseEntity *pEntity, float flEntityR
 	pVecAvoidForce->Init( );
 
 	Vector vecEntityDelta;
-	VectorMultiply( pEntity->GetAbsVelocity(), flAvoidTime, vecEntityDelta );
+	VectorMultiply( pEntity->GetEngineObject()->GetAbsVelocity(), flAvoidTime, vecEntityDelta );
 	Vector vecEntityCenter = pEntity->WorldSpaceCenter();
 
 	for ( int i = s_AvoidSpheres.Count(); --i >= 0; )
@@ -5845,11 +5845,11 @@ void CAvoidBox::ComputeAvoidanceForces( CBaseEntity *pEntity, float flEntityRadi
 	pVecAvoidForce->Init( );
 
 	Vector vecEntityDelta, vecEntityEnd;
-	VectorMultiply( pEntity->GetAbsVelocity(), flAvoidTime, vecEntityDelta );
+	VectorMultiply( pEntity->GetEngineObject()->GetAbsVelocity(), flAvoidTime, vecEntityDelta );
 	Vector vecEntityCenter = pEntity->WorldSpaceCenter();
 	VectorAdd( vecEntityCenter, vecEntityDelta, vecEntityEnd );
 
-	Vector vecVelDir = pEntity->GetAbsVelocity();
+	Vector vecVelDir = pEntity->GetEngineObject()->GetAbsVelocity();
 	VectorNormalize( vecVelDir );
 
 	for ( int i = s_AvoidBoxes.Count(); --i >= 0; )
@@ -6034,7 +6034,7 @@ void CHelicopterChunk::FallThink( void )
 	if ( random->RandomInt( 0, 8 ) == 0 )
 	{
 		CEffectData data;
-		data.m_vOrigin = GetAbsOrigin() + RandomVector( -64, 64 );
+		data.m_vOrigin = GetEngineObject()->GetAbsOrigin() + RandomVector( -64, 64 );
 		DispatchEffect( "HelicopterMegaBomb", data );
 
 		const char* soundname = "BaseExplosionEffect.Sound";
@@ -6106,7 +6106,7 @@ void CHelicopterChunk::CollisionCallback( CHelicopterChunk *pCaller )
 		}
 		
 		// Add a dust cloud
-		AR2Explosion *pExplosion = AR2Explosion::CreateAR2Explosion( GetAbsOrigin() );
+		AR2Explosion *pExplosion = AR2Explosion::CreateAR2Explosion(GetEngineObject()->GetAbsOrigin() );
 
 		if ( pExplosion != NULL )
 		{
@@ -6146,8 +6146,8 @@ CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos,
 
 	pChunk->Spawn();
 
-	pChunk->SetAbsOrigin( vecPos );
-	pChunk->SetAbsAngles( vecAngles );
+	pChunk->GetEngineObject()->SetAbsOrigin( vecPos );
+	pChunk->GetEngineObject()->SetAbsAngles( vecAngles );
 
 	pChunk->SetModel( pszModelName );
 
@@ -6197,7 +6197,7 @@ CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos,
 
 	pFireTrail->FollowEntity( pChunk, "damage" );
 	pFireTrail->GetEngineObject()->SetParent( pChunk->GetEngineObject(), 1);
-	pFireTrail->SetLocalOrigin( vec3_origin );
+	pFireTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
 	pFireTrail->SetMoveType( MOVETYPE_NONE );
 	pFireTrail->SetLifetime( 10.0f );
 

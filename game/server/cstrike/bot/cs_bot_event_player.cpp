@@ -113,7 +113,7 @@ void CCSBot::OnPlayerDeath( IGameEvent *event )
 						{
 							const float someTime = 10.0f;
 							const float farAway = 750.0f;
-							if (GetTimeSinceLastSawEnemy() > someTime && (playerOrigin - GetAbsOrigin()).IsLengthGreaterThan( farAway ))
+							if (GetTimeSinceLastSawEnemy() > someTime && (playerOrigin - GetEngineObject()->GetAbsOrigin()).IsLengthGreaterThan( farAway ))
 							{
 								PrintIfWatched( "Checking out where our friend was killed\n" );
 								MoveTo( playerOrigin, FASTEST_ROUTE );

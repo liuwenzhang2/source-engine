@@ -835,7 +835,7 @@ CBaseEntity *PathFollower::FindBlocker( INextBot *bot )
 		if ( result.DidHitNonWorldEntity() )
 		{
 			// if blocker is close, they could be behind us - check
-			Vector toBlocker = ((CBaseEntity*)result.m_pEnt)->GetAbsOrigin() - bot->GetLocomotionInterface()->GetFeet();
+			Vector toBlocker = ((CBaseEntity*)result.m_pEnt)->GetEngineObject()->GetAbsOrigin() - bot->GetLocomotionInterface()->GetFeet();
 
 			Vector alongPath = s->pos - from;
 			alongPath.z = 0.0f;
@@ -848,7 +848,7 @@ CBaseEntity *PathFollower::FindBlocker( INextBot *bot )
 					if ( bot->IsDebugging( NEXTBOT_PATH ) )
 					{
 						NDebugOverlay::Circle( bot->GetLocomotionInterface()->GetFeet(), QAngle( -90.0f, 0, 0 ), 10.0f, 255, 0, 0, 255, true, 1.0f );
-						NDebugOverlay::HorzArrow( bot->GetLocomotionInterface()->GetFeet(), ((CBaseEntity*)result.m_pEnt)->GetAbsOrigin(), 1.0f, 255, 0, 0, 255, true, 1.0f );
+						NDebugOverlay::HorzArrow( bot->GetLocomotionInterface()->GetFeet(), ((CBaseEntity*)result.m_pEnt)->GetEngineObject()->GetAbsOrigin(), 1.0f, 255, 0, 0, 255, true, 1.0f );
 					}
 
 					// we are blocked
@@ -1019,15 +1019,15 @@ Vector PathFollower::Avoid( INextBot *bot, const Vector &goalPos, const Vector &
 	if ( door && !m_isLeftClear && !m_isRightClear )
 	{
 		Vector forward, right, up;
-		AngleVectors( door->GetAbsAngles(), &forward, &right, &up );
+		AngleVectors( door->GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
 
 		const float doorWidth = 100.0f;
-		Vector doorEdge = door->GetAbsOrigin() - doorWidth * right;
+		Vector doorEdge = door->GetEngineObject()->GetAbsOrigin() - doorWidth * right;
 
 		if ( bot->IsDebugging( NEXTBOT_PATH ) )
 		{
-			NDebugOverlay::Axis( door->GetAbsOrigin(), door->GetAbsAngles(), 20.0f, true, 10.0f );
-			NDebugOverlay::Line( door->GetAbsOrigin(), doorEdge, 255, 255, 0, true, 10.0f );
+			NDebugOverlay::Axis( door->GetEngineObject()->GetAbsOrigin(), door->GetEngineObject()->GetAbsAngles(), 20.0f, true, 10.0f );
+			NDebugOverlay::Line( door->GetEngineObject()->GetAbsOrigin(), doorEdge, 255, 255, 0, true, 10.0f );
 		}
 
 		// move around door

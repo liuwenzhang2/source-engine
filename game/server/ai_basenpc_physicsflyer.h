@@ -54,7 +54,7 @@ protected:
 	void MoveToLocation( float flInterval, const Vector &target, 
 						 float accelXY, float accelZ, float decay)
 	{
-		Vector targetDir = target - GetLocalOrigin();
+		Vector targetDir = target - GetEngineObject()->GetLocalOrigin();
 		VectorNormalize(targetDir);
 
 		MoveInDirection(flInterval, targetDir, accelXY, accelZ, decay);

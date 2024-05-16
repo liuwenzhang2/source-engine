@@ -571,7 +571,7 @@ bool CBaseCombatCharacter::ComputeTargetIsInDarkness( const Vector &vecEyePositi
 */
 bool CBaseCombatCharacter::IsLookingTowards( const CBaseEntity *target, float cosTolerance ) const
 {
-	return IsLookingTowards( target->WorldSpaceCenter(), cosTolerance ) || IsLookingTowards( target->EyePosition(), cosTolerance ) || IsLookingTowards( target->GetAbsOrigin(), cosTolerance );
+	return IsLookingTowards( target->WorldSpaceCenter(), cosTolerance ) || IsLookingTowards( target->EyePosition(), cosTolerance ) || IsLookingTowards( target->GetEngineObject()->GetAbsOrigin(), cosTolerance );
 }
 
 
@@ -610,7 +610,7 @@ bool CBaseCombatCharacter::IsInFieldOfView( CBaseEntity *entity ) const
 
 	// Check 3 spots, or else when standing right next to someone looking at their eyes, 
 	// the angle will be too great to see their center.
-	Vector vecToTarget = entity->GetAbsOrigin() - vecEyePosition;
+	Vector vecToTarget = entity->GetEngineObject()->GetAbsOrigin() - vecEyePosition;
 	vecToTarget.NormalizeInPlace();
 	if ( DotProduct( vecForward, vecToTarget ) >= flTolerance )
 		return true;
@@ -653,7 +653,7 @@ bool CBaseCombatCharacter::IsLineOfSightClear( CBaseEntity *entity, LineOfSightC
 	return IsLineOfSightClear( entity->WorldSpaceCenter(), checkType, entity );
 #else
 	// FIXME: Should we do the same check here as the client does?
-	return IsLineOfSightClear( entity->WorldSpaceCenter(), checkType, entity ) || IsLineOfSightClear( entity->EyePosition(), checkType, entity ) || IsLineOfSightClear( entity->GetAbsOrigin(), checkType, entity );
+	return IsLineOfSightClear( entity->WorldSpaceCenter(), checkType, entity ) || IsLineOfSightClear( entity->EyePosition(), checkType, entity ) || IsLineOfSightClear( entity->GetEngineObject()->GetAbsOrigin(), checkType, entity );
 #endif
 }
 

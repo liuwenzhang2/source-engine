@@ -177,7 +177,7 @@ void CWeapon357::PrimaryAttack( void )
 	pPlayer->ViewPunch( QAngle( -10, 0, 0 ) );
 
 #ifndef CLIENT_DLL
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 600, 0.2 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetEngineObject()->GetAbsOrigin(), 600, 0.2 );
 #endif
 
 	if ( !m_iClip1 && pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )

@@ -53,8 +53,8 @@ void KnifeSlash( const CEffectData &data )
 			effects->DecalShoot( decalNumber,
 						pEntity->entindex(),
 						pEntity->GetModel(),
-						pEntity->GetAbsOrigin(),
-						pEntity->GetAbsAngles(),
+						pEntity->GetEngineObject()->GetAbsOrigin(),
+						pEntity->GetEngineObject()->GetAbsAngles(),
 						vecOrigin,
 						&vecPerp,
 						0 );

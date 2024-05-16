@@ -97,7 +97,7 @@ void CAI_TrackPather::InitPathingData( float flTrackArrivalTolerance, float flTa
 	m_bPatrolBreakable = false;
 	m_flLeadDistance = 0.0f;
 	m_bMovingForward = true;
-	m_vecSegmentStartPoint = m_vecSegmentStartSplinePoint = m_vecDesiredPosition = GetAbsOrigin();
+	m_vecSegmentStartPoint = m_vecSegmentStartSplinePoint = m_vecDesiredPosition = GetEngineObject()->GetAbsOrigin();
 	m_bChooseFarthestPoint = true;
 	m_flFarthestPathDist = 1e10;
 	m_flPathMaxSpeed = 0;
@@ -187,7 +187,7 @@ void CAI_TrackPather::EnableLeading( bool bEnable )
 		// to prevent us from hovering around our old, no longer valid lead position.
   		if ( m_pCurrentPathTarget )
 		{
-			SetDesiredPosition( m_pCurrentPathTarget->GetAbsOrigin() );
+			SetDesiredPosition( m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin() );
 		}
 	}
 }
@@ -300,7 +300,7 @@ CPathTrack *CAI_TrackPather::BestPointOnPath( CPathTrack *pPath, const Vector &t
 			pNextPath = (i == 0) ? pTravPath->GetPrevious() : pTravPath->GetNext();
 
 			// Find the distance between this test point and our goal point
-			flPathDist = ( pTravPath->GetAbsOrigin() - targetPos ).LengthSqr();
+			flPathDist = ( pTravPath->GetEngineObject()->GetAbsOrigin() - targetPos ).LengthSqr();
 
 			// See if it's closer and it's also not within our avoidance radius
 			if ( bFarthestPoint )
@@ -315,13 +315,13 @@ CPathTrack *CAI_TrackPather::BestPointOnPath( CPathTrack *pPath, const Vector &t
 			}
 
 			// Don't choose points that are within the avoid radius
-			if ( flAvoidRadius && ( pTravPath->GetAbsOrigin() - targetPos ).Length2DSqr() <= flAvoidRadius )
+			if ( flAvoidRadius && ( pTravPath->GetEngineObject()->GetAbsOrigin() - targetPos ).Length2DSqr() <= flAvoidRadius )
 				continue;
 
 			if ( visible )
 			{
 				// If it has to be visible, run those checks
-				CBaseEntity *pBlocker = FindTrackBlocker( pTravPath->GetAbsOrigin(), targetPos );
+				CBaseEntity *pBlocker = FindTrackBlocker( pTravPath->GetEngineObject()->GetAbsOrigin(), targetPos );
 
 				// Check to see if we've hit the target, or the player's vehicle if it's a player in a vehicle
 				bool bHitTarget = ( pTargetEnt && ( pTargetEnt == pBlocker ) ) ||
@@ -366,20 +366,20 @@ CPathTrack *CAI_TrackPather::ComputeLeadingPointAlongPath( const Vector &vecStar
 		pNextPath = bMovingForward ? pTravPath->GetNext() : pTravPath->GetPrevious();
 
 		// Find the distance between this test point and our goal point
-		float flPathDist = pTarget->DistTo( pTravPath->GetAbsOrigin() );
+		float flPathDist = pTarget->DistTo( pTravPath->GetEngineObject()->GetAbsOrigin() );
 
 		// Find the distance between this test point and our goal point
 		if ( flPathDist <= flDistance )
 		{
 			flDistance -= flPathDist;
-			*pTarget = pTravPath->GetAbsOrigin();
+			*pTarget = pTravPath->GetEngineObject()->GetAbsOrigin();
 			if ( !CPathTrack::ValidPath(pNextPath) )
 				return bMovingForward ? pTravPath : pTravPath->GetNext();
 
 			continue;
 		}
 		
-		ComputeClosestPoint( *pTarget, flDistance, pTravPath->GetAbsOrigin(), pTarget );
+		ComputeClosestPoint( *pTarget, flDistance, pTravPath->GetEngineObject()->GetAbsOrigin(), pTarget );
 		return bMovingForward ? pTravPath : pTravPath->GetNext();
 	}
 
@@ -429,8 +429,8 @@ float CAI_TrackPather::ComputeDistanceAlongPathToPoint( CPathTrack *pStartTrack,
 		// The starting vecPoint is sometimes *not* within the bounds of the line segment.
 
 		// Find the distance between this test point and our goal point
-		flTotalDist += (bMovingForward ? 1.0f : -1.0f) * vecPoint.AsVector2D().DistTo( pTestPath->GetAbsOrigin().AsVector2D() ); 
-		vecPoint = pTestPath->GetAbsOrigin();
+		flTotalDist += (bMovingForward ? 1.0f : -1.0f) * vecPoint.AsVector2D().DistTo( pTestPath->GetEngineObject()->GetAbsOrigin().AsVector2D() );
+		vecPoint = pTestPath->GetEngineObject()->GetAbsOrigin();
 	}
 
 	return flTotalDist;
@@ -446,13 +446,13 @@ void CAI_TrackPather::VisualizeDebugInfo( const Vector &vecNearestPoint, const V
 	{
 		NDebugOverlay::Line( m_vecSegmentStartPoint, vecTarget, 0, 0, 255, true, 0.1f );
 		NDebugOverlay::Cross3D( vecNearestPoint, -Vector(16,16,16), Vector(16,16,16), 255, 0, 0, true, 0.1f );
-		NDebugOverlay::Cross3D( m_pCurrentPathTarget->GetAbsOrigin(), -Vector(16,16,16), Vector(16,16,16), 0, 255, 0, true, 0.1f );
+		NDebugOverlay::Cross3D( m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin(), -Vector(16,16,16), Vector(16,16,16), 0, 255, 0, true, 0.1f );
 		NDebugOverlay::Cross3D( m_vecDesiredPosition, -Vector(16,16,16), Vector(16,16,16), 0, 0, 255, true, 0.1f );
-		NDebugOverlay::Cross3D( m_pDestPathTarget->GetAbsOrigin(), -Vector(16,16,16), Vector(16,16,16), 255, 255, 255, true, 0.1f );
+		NDebugOverlay::Cross3D( m_pDestPathTarget->GetEngineObject()->GetAbsOrigin(), -Vector(16,16,16), Vector(16,16,16), 255, 255, 255, true, 0.1f );
 
 		if ( m_pTargetNearestPath )
 		{
-			NDebugOverlay::Cross3D( m_pTargetNearestPath->GetAbsOrigin(), -Vector(24,24,24), Vector(24,24,24), 255, 0, 255, true, 0.1f );
+			NDebugOverlay::Cross3D( m_pTargetNearestPath->GetEngineObject()->GetAbsOrigin(), -Vector(24,24,24), Vector(24,24,24), 255, 0, 255, true, 0.1f );
 		}
 	}
 
@@ -463,10 +463,10 @@ void CAI_TrackPather::VisualizeDebugInfo( const Vector &vecNearestPoint, const V
 			CPathTrack *pPathTrack = m_pCurrentPathTarget;
 			for ( ; CPathTrack::ValidPath( pPathTrack ); pPathTrack = pPathTrack->GetNext() )
 			{
-				NDebugOverlay::Box( pPathTrack->GetAbsOrigin(), -Vector(2,2,2), Vector(2,2,2), 0,255, 0, 8, 0.1 );
+				NDebugOverlay::Box( pPathTrack->GetEngineObject()->GetAbsOrigin(), -Vector(2,2,2), Vector(2,2,2), 0,255, 0, 8, 0.1 );
 				if ( CPathTrack::ValidPath( pPathTrack->GetNext() ) )
 				{
-					NDebugOverlay::Line( pPathTrack->GetAbsOrigin(), pPathTrack->GetNext()->GetAbsOrigin(), 0,255,0, true, 0.1 );
+					NDebugOverlay::Line( pPathTrack->GetEngineObject()->GetAbsOrigin(), pPathTrack->GetNext()->GetEngineObject()->GetAbsOrigin(), 0,255,0, true, 0.1 );
 				}
 
 				if ( pPathTrack->GetNext() == m_pCurrentPathTarget )
@@ -499,7 +499,7 @@ bool CAI_TrackPather::HasLOSToTarget( CPathTrack *pTrack )
 	}
 
 	// If it has to be visible, run those checks
-	CBaseEntity *pBlocker = FindTrackBlocker( pTrack->GetAbsOrigin(), targetPos );
+	CBaseEntity *pBlocker = FindTrackBlocker( pTrack->GetEngineObject()->GetAbsOrigin(), targetPos );
 
 	// Check to see if we've hit the target, or the player's vehicle if it's a player in a vehicle
 	bool bHitTarget = ( pTargetEnt && ( pTargetEnt == pBlocker ) ) ||
@@ -515,7 +515,7 @@ bool CAI_TrackPather::HasLOSToTarget( CPathTrack *pTrack )
 void CAI_TrackPather::UpdateCurrentTarget()
 {
 	// Find the point along the line that we're closest to.
-	const Vector &vecTarget = m_pCurrentPathTarget->GetAbsOrigin();
+	const Vector &vecTarget = m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin();
 	Vector vecPoint;
 	float t = ClosestPointToCurrentPath( &vecPoint );
 	if ( (t < 1.0f) && ( vecPoint.DistToSqr( vecTarget ) > m_flTargetTolerance * m_flTargetTolerance ) )
@@ -573,9 +573,9 @@ void CAI_TrackPather::UpdateCurrentTarget()
 		m_bMovingForward = true;
 	}
 
-	SetDesiredPosition( m_pCurrentPathTarget->GetAbsOrigin() );
+	SetDesiredPosition( m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin() );
 	m_vecSegmentStartSplinePoint = m_vecSegmentStartPoint;
-	m_vecSegmentStartPoint = m_pLastPathTarget->GetAbsOrigin();
+	m_vecSegmentStartPoint = m_pLastPathTarget->GetEngineObject()->GetAbsOrigin();
 
 visualizeDebugInfo:
 	VisualizeDebugInfo( vecPoint, vecTarget );
@@ -649,13 +649,13 @@ void CAI_TrackPather::ComputePathDirection( CPathTrack *pPath, Vector *pVecPathD
 {
 	if ( pPath->GetPrevious() )
 	{
-		VectorSubtract( pPath->GetAbsOrigin(), pPath->GetPrevious()->GetAbsOrigin(), *pVecPathDir );
+		VectorSubtract( pPath->GetEngineObject()->GetAbsOrigin(), pPath->GetPrevious()->GetEngineObject()->GetAbsOrigin(), *pVecPathDir );
 	}
 	else
 	{
 		if ( pPath->GetNext() )
 		{
-			VectorSubtract( pPath->GetNext()->GetAbsOrigin(), pPath->GetAbsOrigin(), *pVecPathDir );
+			VectorSubtract( pPath->GetNext()->GetEngineObject()->GetAbsOrigin(), pPath->GetEngineObject()->GetAbsOrigin(), *pVecPathDir );
 		}
 		else
 		{
@@ -718,26 +718,26 @@ void CAI_TrackPather::ComputePointAlongCurrentPath( float flDistance, float flPe
 			}
 
 			// Find the distance between this test point and our goal point
-			float flPathDist = pTarget->DistTo( pTravPath->GetAbsOrigin() );
+			float flPathDist = pTarget->DistTo( pTravPath->GetEngineObject()->GetAbsOrigin() );
 
 			// Find the distance between this test point and our goal point
 			if ( flPathDist <= flDistance )
 			{
 				flDistance -= flPathDist;
-				*pTarget = pTravPath->GetAbsOrigin();
+				*pTarget = pTravPath->GetEngineObject()->GetAbsOrigin();
 
 				// FIXME: Reduce the distance further based on the angle between this segment + the next
 				continue;
 			}
 			
 			ComputePathDirection( pTravPath, &vecPathDir );
-			ComputeClosestPoint( *pTarget, flDistance, pTravPath->GetAbsOrigin(), pTarget );
+			ComputeClosestPoint( *pTarget, flDistance, pTravPath->GetEngineObject()->GetAbsOrigin(), pTarget );
 			break;
 		}
 	}
 	else
 	{
-		VectorSubtract( m_pCurrentPathTarget->GetAbsOrigin(), m_vecSegmentStartPoint, vecPathDir );
+		VectorSubtract( m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin(), m_vecSegmentStartPoint, vecPathDir );
 		VectorNormalize( vecPathDir );
 	}
 
@@ -837,7 +837,7 @@ CPathTrack *CAI_TrackPather::FindClosestPointOnPath( CPathTrack *pPath,
 
 			// Find the closest point on the line segment on the path
 			Vector vecClosest;
-			CalcClosestPointOnLineSegment( targetPos, pTravPath->GetAbsOrigin(), pNextPath->GetAbsOrigin(), vecClosest );
+			CalcClosestPointOnLineSegment( targetPos, pTravPath->GetEngineObject()->GetAbsOrigin(), pNextPath->GetEngineObject()->GetAbsOrigin(), vecClosest );
 
 			// Find the distance between this test point and our goal point
 			flPathDist2D = vecClosest.AsVector2D().DistToSqr( targetPos.AsVector2D() );
@@ -854,7 +854,7 @@ CPathTrack *CAI_TrackPather::FindClosestPointOnPath( CPathTrack *pPath,
 			flNearestDist2D	= flPathDist2D;
 			flNearestDist	= flPathDist;
 			vecNearestPoint	= vecClosest;
-			VectorSubtract( pNextPath->GetAbsOrigin(), pTravPath->GetAbsOrigin(), vecNearestPathSegment );
+			VectorSubtract( pNextPath->GetEngineObject()->GetAbsOrigin(), pTravPath->GetEngineObject()->GetAbsOrigin(), vecNearestPathSegment );
 			if ( i == 0 )
 			{
 				vecNearestPathSegment *= -1.0f;
@@ -1027,7 +1027,7 @@ void CAI_TrackPather::UpdateCurrentTargetLeading()
 	CPathTrack *pAdjustedDest;
 
 	// Find the point along the line that we're closest to.
-	const Vector &vecTarget = m_pCurrentPathTarget->GetAbsOrigin();
+	const Vector &vecTarget = m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin();
 	Vector vecPoint;
 	float t = ClosestPointToCurrentPath( &vecPoint );
 	if ( (t < 1.0f) && ( vecPoint.DistToSqr( vecTarget ) > m_flTargetTolerance * m_flTargetTolerance ) )
@@ -1085,11 +1085,11 @@ void CAI_TrackPather::UpdateCurrentTargetLeading()
 		{
 			pSegmentStart = m_pCurrentPathTarget;
 		}
-		m_vecSegmentStartPoint = pSegmentStart->GetAbsOrigin();
+		m_vecSegmentStartPoint = pSegmentStart->GetEngineObject()->GetAbsOrigin();
 	}
 	else
 	{
-		m_vecSegmentStartPoint = m_pLastPathTarget->GetAbsOrigin();
+		m_vecSegmentStartPoint = m_pLastPathTarget->GetEngineObject()->GetAbsOrigin();
 	}
 
 visualizeDebugInfo:
@@ -1161,7 +1161,7 @@ void CAI_TrackPather::UpdateTargetPositionLeading( void )
 
 			// Oops! Need to reverse direction
 			m_bMovingForward = bMovingForward;
-			m_vecSegmentStartPoint = m_pCurrentPathTarget->GetAbsOrigin();
+			m_vecSegmentStartPoint = m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin();
 			m_pCurrentPathTarget = NextAlongCurrentPath( m_pCurrentPathTarget );
 		}
 		m_pDestPathTarget = pDest;
@@ -1298,8 +1298,8 @@ float CAI_TrackPather::MaxDistanceFromCurrentPath() const
 	// NOTE: Can't use m_vecSegmentStartPoint because we don't have a radius defined for it
 	float t;
 	Vector vecTemp;
-	CalcClosestPointOnLine( GetAbsOrigin(), pPrevPath->GetAbsOrigin(), 
-		m_pCurrentPathTarget->GetAbsOrigin(), vecTemp, &t );
+	CalcClosestPointOnLine(GetEngineObject()->GetAbsOrigin(), pPrevPath->GetEngineObject()->GetAbsOrigin(),
+		m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin(), vecTemp, &t );
 	t = clamp( t, 0.0f, 1.0f );
 	float flRadius = (1.0f - t) * pPrevPath->GetRadius() + t * m_pCurrentPathTarget->GetRadius(); 
 	return flRadius;
@@ -1356,10 +1356,10 @@ void CAI_TrackPather::SetFarthestPathDist( float flMaxPathDist )
 void CAI_TrackPather::SetupNewCurrentTarget( CPathTrack *pTrack )
 {
 	Assert( pTrack );
-	m_vecSegmentStartPoint = GetAbsOrigin();
-	VectorMA( m_vecSegmentStartPoint, -2.0f, GetAbsVelocity(), m_vecSegmentStartSplinePoint );
+	m_vecSegmentStartPoint = GetEngineObject()->GetAbsOrigin();
+	VectorMA( m_vecSegmentStartPoint, -2.0f, GetEngineObject()->GetAbsVelocity(), m_vecSegmentStartSplinePoint );
 	m_pCurrentPathTarget = pTrack;
-	SetDesiredPosition( m_pCurrentPathTarget->GetAbsOrigin() );
+	SetDesiredPosition( m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin() );
 }
 
 
@@ -1497,7 +1497,7 @@ float CAI_TrackPather::ComputePathDistance( CPathTrack *pPath, CPathTrack *pDest
 
 		pPath->Visit();
 
-		flDist += pLast->GetAbsOrigin().DistTo( pPath->GetAbsOrigin() );
+		flDist += pLast->GetEngineObject()->GetAbsOrigin().DistTo( pPath->GetEngineObject()->GetAbsOrigin() );
 
 		if ( pDest == pPath )
 			return flDist;
@@ -1531,13 +1531,13 @@ float CAI_TrackPather::ClosestPointToCurrentPath( Vector *pVecPoint ) const
 {
 	if (!m_pCurrentPathTarget)
 	{
-		*pVecPoint = GetAbsOrigin();
+		*pVecPoint = GetEngineObject()->GetAbsOrigin();
 		return 0;
 	}
 
 	float t;
-	CalcClosestPointOnLine( GetAbsOrigin(), m_vecSegmentStartPoint, 
-		m_pCurrentPathTarget->GetAbsOrigin(), *pVecPoint, &t );
+	CalcClosestPointOnLine(GetEngineObject()->GetAbsOrigin(), m_vecSegmentStartPoint,
+		m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin(), *pVecPoint, &t );
 	return t;
 }
 
@@ -1556,7 +1556,7 @@ void CAI_TrackPather::ComputePathTangent( float t, Vector *pVecTangent ) const
 	t = clamp( t, 0.0f, 1.0f );
 	pVecTangent->Init(0,0,0);
 	Catmull_Rom_Spline_Tangent( m_vecSegmentStartSplinePoint, m_vecSegmentStartPoint, 
-		m_pCurrentPathTarget->GetAbsOrigin(), pNextTrack->GetAbsOrigin(), t, *pVecTangent );
+		m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin(), pNextTrack->GetEngineObject()->GetAbsOrigin(), t, *pVecTangent );
 	VectorNormalize( *pVecTangent );
 }
 
@@ -1584,12 +1584,12 @@ void CAI_TrackPather::ComputeNormalizedDestVelocity( Vector *pVecVelocity ) cons
 		return;
 	}
 
-	VectorSubtract( pNextTrack->GetAbsOrigin(), m_pCurrentPathTarget->GetAbsOrigin(), *pVecVelocity );
+	VectorSubtract( pNextTrack->GetEngineObject()->GetAbsOrigin(), m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin(), *pVecVelocity );
 	VectorNormalize( *pVecVelocity );
 
 	// Slow it down if we're approaching a sharp corner
 	Vector vecDelta;
-	VectorSubtract( m_pCurrentPathTarget->GetAbsOrigin(), m_vecSegmentStartPoint, vecDelta );
+	VectorSubtract( m_pCurrentPathTarget->GetEngineObject()->GetAbsOrigin(), m_vecSegmentStartPoint, vecDelta );
 	VectorNormalize( vecDelta );
 	float flDot = DotProduct( *pVecVelocity, vecDelta );
 	*pVecVelocity *= clamp( flDot, 0.0f, 1.0f );

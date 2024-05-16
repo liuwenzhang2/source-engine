@@ -291,7 +291,7 @@ CAI_BaseNPC *CAI_Squad::SquadMemberInRange( const Vector &vecLocation, float flD
 {
 	for (int i = 0; i < m_SquadMembers.Count(); i++)
 	{
-		if (m_SquadMembers[i] != NULL && (vecLocation - m_SquadMembers[i]->GetAbsOrigin() ).Length2D() <= flDist)
+		if (m_SquadMembers[i] != NULL && (vecLocation - m_SquadMembers[i]->GetEngineObject()->GetAbsOrigin() ).Length2D() <= flDist)
 			return m_SquadMembers[i];
 	}
 	return NULL;
@@ -305,12 +305,12 @@ CAI_BaseNPC *CAI_Squad::NearestSquadMember( CAI_BaseNPC *pMember )
 {
 	float			fBestDist	= MAX_COORD_RANGE;
 	CAI_BaseNPC		*fNearestEnt = NULL;
-	Vector			fStartLoc = pMember->GetAbsOrigin();
+	Vector			fStartLoc = pMember->GetEngineObject()->GetAbsOrigin();
 	for (int i = 0; i < m_SquadMembers.Count(); i++)
 	{
 		if (m_SquadMembers[i] != NULL)
 		{
-			float fDist = (fStartLoc - m_SquadMembers[i]->GetAbsOrigin()).Length();
+			float fDist = (fStartLoc - m_SquadMembers[i]->GetEngineObject()->GetAbsOrigin()).Length();
 			if (m_SquadMembers[i]	!=	pMember	&&
 				fDist				<	fBestDist	)
 			{
@@ -355,7 +355,7 @@ CAI_BaseNPC *CAI_Squad::GetSquadMemberNearestTo( const Vector &vecLocation )
 	for ( int i = 0; i < m_SquadMembers.Count(); i++ )
 	{
 		float flDist;
-		flDist = m_SquadMembers[i]->GetAbsOrigin().DistToSqr( vecLocation );
+		flDist = m_SquadMembers[i]->GetEngineObject()->GetAbsOrigin().DistToSqr( vecLocation );
 
 		if( flDist < flNearest )
 		{

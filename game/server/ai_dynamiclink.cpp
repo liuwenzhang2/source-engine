@@ -469,7 +469,7 @@ void CAI_DynamicLink::SetLinkState(void)
 
 	if (m_nSrcID == NO_NODE || m_nDestID == NO_NODE)
 	{
-		Vector pos = GetAbsOrigin();
+		Vector pos = GetEngineObject()->GetAbsOrigin();
 		DevWarning("ERROR: Dynamic link at %f %f %f pointing to invalid node ID!!\n", pos.x, pos.y, pos.z);
 		return;
 	}
@@ -614,7 +614,7 @@ void CAI_RadialLinkController::Activate()
 
 	if(GetMoveParent() != NULL )
 	{
-		float flDist = GetAbsOrigin().DistTo(GetMoveParent()->GetAbsOrigin() );
+		float flDist = GetEngineObject()->GetAbsOrigin().DistTo(GetMoveParent()->GetEngineObject()->GetAbsOrigin() );
 
 		if( flDist > 200.0f )
 		{
@@ -639,7 +639,7 @@ void CAI_RadialLinkController::PollMotionThink()
 		{
 			if( !m_bAtRest )
 			{
-				m_vecAtRestOrigin = GetAbsOrigin();
+				m_vecAtRestOrigin = GetEngineObject()->GetAbsOrigin();
 				ModifyNodeLinks( true );
 				m_bAtRest = true;
 				//Msg("At Rest!\n");
@@ -651,7 +651,7 @@ void CAI_RadialLinkController::PollMotionThink()
 			{
 				float flDist; 
 
-				flDist = GetAbsOrigin().DistTo(m_vecAtRestOrigin);
+				flDist = GetEngineObject()->GetAbsOrigin().DistTo(m_vecAtRestOrigin);
 
 				if( flDist < 18.0f )
 				{

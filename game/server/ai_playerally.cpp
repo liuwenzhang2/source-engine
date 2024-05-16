@@ -216,7 +216,7 @@ void CAI_AllySpeechManager::OnSpokeConcept( CAI_PlayerAlly *pPlayerAlly, AIConce
 				pTalker = dynamic_cast<CAI_PlayerAlly *>(ppAIs[i]);
 
 				if ( pTalker && pTalker != pPlayerAlly && 
-					 (pTalker->GetAbsOrigin() - pPlayerAlly->GetAbsOrigin()).LengthSqr() < Square(TALKRANGE_MIN * 2) && 
+					 (pTalker->GetEngineObject()->GetAbsOrigin() - pPlayerAlly->GetEngineObject()->GetAbsOrigin()).LengthSqr() < Square(TALKRANGE_MIN * 2) &&
 					 pPlayerAlly->FVisible( pTalker ) )
 				{
 					// Tell this guy he's already said the concept to the player, too.
@@ -376,7 +376,7 @@ void CAI_PlayerAlly::DisplayDeathMessage( void )
 		ToBasePlayer(pPlayer)->NotifySinglePlayerGameEnding();
 	}
 
-	CBaseEntity *pReload = CreatePlayerLoadSave( GetAbsOrigin(), 1.5f, 8.0f, 4.5f );
+	CBaseEntity *pReload = CreatePlayerLoadSave(GetEngineObject()->GetAbsOrigin(), 1.5f, 8.0f, 4.5f );
 
 	if ( pReload )
 	{
@@ -426,7 +426,7 @@ void CAI_PlayerAlly::GatherConditions( void )
 	{
 				
 		bool bPlayerIsLooking = false;
-		if ( ( pLocalPlayer->GetAbsOrigin() - GetAbsOrigin() ).Length2DSqr() < Square(TALKER_STARE_DIST) )
+		if ( ( pLocalPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length2DSqr() < Square(TALKER_STARE_DIST) )
 		{
 			if ( pLocalPlayer->FInViewCone( EyePosition() ) )
 			{
@@ -470,7 +470,7 @@ void CAI_PlayerAlly::GatherEnemyConditions( CBaseEntity *pEnemy )
 					if( !pPlayer->FInViewCone(pEnemy) && FVisible( pPlayer ) && pPlayer->FVisible(pEnemy) )
 					{
 						Vector2D vecPlayerView = pPlayer->EyeDirection2D().AsVector2D();
-						Vector2D vecToEnemy = ( pEnemy->GetAbsOrigin() - pPlayer->GetAbsOrigin() ).AsVector2D();
+						Vector2D vecToEnemy = ( pEnemy->GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin() ).AsVector2D();
 						Vector2DNormalize( vecToEnemy );
 						
 						if( DotProduct2D(vecPlayerView, vecToEnemy) <= -0.75 )
@@ -758,7 +758,7 @@ void CAI_PlayerAlly::PostSpeakDispatchResponse( AIConcept_t concept, AI_Response
 			{
 				Warning("Q&A: '%s' questioned '%s' (concept %s)\n", GetDebugName(), GetSpeechTarget()->GetDebugName(), concept );
 			}
-			NDebugOverlay::HorzArrow( GetAbsOrigin(), GetSpeechTarget()->GetAbsOrigin(), 8, 0, 255, 0, 64, true, duration );
+			NDebugOverlay::HorzArrow(GetEngineObject()->GetAbsOrigin(), GetSpeechTarget()->GetEngineObject()->GetAbsOrigin(), 8, 0, 255, 0, 64, true, duration );
 		}
 
 		// If we spoke a Question, tell our friend to answer
@@ -791,7 +791,7 @@ void CAI_PlayerAlly::PostSpeakDispatchResponse( AIConcept_t concept, AI_Response
 		float duration = GetExpresser()->GetSemaphoreAvailableTime(this) - gpGlobals->curtime;
 		if ( rr_debug_qa.GetBool() )
 		{
-			NDebugOverlay::HorzArrow( GetAbsOrigin(), GetSpeechTarget()->GetAbsOrigin(), 8, 0, 255, 0, 64, true, duration );
+			NDebugOverlay::HorzArrow(GetEngineObject()->GetAbsOrigin(), GetSpeechTarget()->GetEngineObject()->GetAbsOrigin(), 8, 0, 255, 0, 64, true, duration );
 		}
 		if ( GetSpeechTarget()->MyNPCPointer() )
 		{
@@ -1305,7 +1305,7 @@ bool CAI_PlayerAlly::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 CBaseEntity *CAI_PlayerAlly::FindSpeechTarget( int flags )
 {
-	const Vector &	vAbsOrigin 		= GetAbsOrigin();
+	const Vector &	vAbsOrigin 		= GetEngineObject()->GetAbsOrigin();
 	float 			closestDistSq 	= FLT_MAX;
 	CBaseEntity *	pNearest 		= NULL;
 	float			distSq;
@@ -1318,7 +1318,7 @@ CBaseEntity *CAI_PlayerAlly::FindSpeechTarget( int flags )
 			CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
 			if ( pPlayer )
 			{
-				distSq = ( vAbsOrigin - pPlayer->GetAbsOrigin() ).LengthSqr();
+				distSq = ( vAbsOrigin - pPlayer->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 				
 				if ( distSq > Square(TALKRANGE_MIN) )
 					continue;
@@ -1344,7 +1344,7 @@ CBaseEntity *CAI_PlayerAlly::FindSpeechTarget( int flags )
 		{
 			CAI_BaseNPC *pNPC = (g_AI_Manager.AccessAIs())[i];
 
-			distSq = ( vAbsOrigin - pNPC->GetAbsOrigin() ).LengthSqr();
+			distSq = ( vAbsOrigin - pNPC->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 			
 			if ( distSq > Square(TALKRANGE_MIN) )
 				continue;

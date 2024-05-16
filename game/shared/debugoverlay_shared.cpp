@@ -105,16 +105,16 @@ void NDebugOverlay::Line( const Vector &origin, const Vector &target, int r, int
 		return;
 
 	// Clip line that is far away
-	if (((player->GetAbsOrigin() - origin).LengthSqr() > MAX_OVERLAY_DIST_SQR) &&
-		((player->GetAbsOrigin() - target).LengthSqr() > MAX_OVERLAY_DIST_SQR) ) 
+	if (((player->GetEngineObject()->GetAbsOrigin() - origin).LengthSqr() > MAX_OVERLAY_DIST_SQR) &&
+		((player->GetEngineObject()->GetAbsOrigin() - target).LengthSqr() > MAX_OVERLAY_DIST_SQR) )
 		return;
 
 	// Clip line that is behind the client 
 	Vector clientForward;
 	player->EyeVectors( &clientForward );
 
-	Vector toOrigin		= origin - player->GetAbsOrigin();
-	Vector toTarget		= target - player->GetAbsOrigin();
+	Vector toOrigin		= origin - player->GetEngineObject()->GetAbsOrigin();
+	Vector toTarget		= target - player->GetEngineObject()->GetAbsOrigin();
  	float  dotOrigin	= DotProduct(clientForward,toOrigin);
  	float  dotTarget	= DotProduct(clientForward,toTarget);
 	
@@ -138,9 +138,9 @@ void NDebugOverlay::Triangle( const Vector &p1, const Vector &p2, const Vector &
 		return;
 
 	// Clip triangles that are far away
-	Vector to1 = p1 - player->GetAbsOrigin();
-	Vector to2 = p2 - player->GetAbsOrigin();
-	Vector to3 = p3 - player->GetAbsOrigin();
+	Vector to1 = p1 - player->GetEngineObject()->GetAbsOrigin();
+	Vector to2 = p2 - player->GetEngineObject()->GetAbsOrigin();
+	Vector to3 = p3 - player->GetEngineObject()->GetAbsOrigin();
 
 	if ((to1.LengthSqr() > MAX_OVERLAY_DIST_SQR) && 
 		(to2.LengthSqr() > MAX_OVERLAY_DIST_SQR) && 
@@ -212,14 +212,14 @@ void NDebugOverlay::Text( const Vector &origin, const char *text, bool bViewChec
 		return;
 
 	// Clip text that is far away
-	if ( ( player->GetAbsOrigin() - origin ).LengthSqr() > MAX_OVERLAY_DIST_SQR ) 
+	if ( ( player->GetEngineObject()->GetAbsOrigin() - origin ).LengthSqr() > MAX_OVERLAY_DIST_SQR )
 		return;
 
 	// Clip text that is behind the client 
 	Vector clientForward;
 	player->EyeVectors( &clientForward );
 
-	Vector toText	= origin - player->GetAbsOrigin();
+	Vector toText	= origin - player->GetEngineObject()->GetAbsOrigin();
  	float  dotPr	= DotProduct(clientForward,toText);
 	
 	if (dotPr < 0) 
@@ -229,7 +229,7 @@ void NDebugOverlay::Text( const Vector &origin, const char *text, bool bViewChec
 	if (bViewCheck)
 	{
 		trace_t tr;
-		UTIL_TraceLine(player->GetAbsOrigin(), origin, MASK_OPAQUE, NULL, COLLISION_GROUP_NONE, &tr);
+		UTIL_TraceLine(player->GetEngineObject()->GetAbsOrigin(), origin, MASK_OPAQUE, NULL, COLLISION_GROUP_NONE, &tr);
 		
 		if ((tr.endpos - origin).Length() > 10)
 			return;

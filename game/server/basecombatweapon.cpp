@@ -199,7 +199,7 @@ CBaseEntity* CBaseCombatWeapon::Respawn( void )
 {
 	// make a copy of this weapon that is invisible and inaccessible to players (no touch function). The weapon spawn/respawn code
 	// will decide when to make the weapon visible and touchable.
-	CBaseEntity *pNewWeapon = CBaseEntity::Create( GetClassname(), g_pGameRules->VecWeaponRespawnSpot( this ), GetLocalAngles(), GetOwnerEntity() );
+	CBaseEntity *pNewWeapon = CBaseEntity::Create( GetClassname(), g_pGameRules->VecWeaponRespawnSpot( this ), GetEngineObject()->GetLocalAngles(), GetOwnerEntity() );
 
 	if ( pNewWeapon )
 	{
@@ -281,7 +281,7 @@ bool CBaseCombatWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector
 
 	// Find its relative shoot position
 	Vector vecRelativeShootPosition;
-	VectorSubtract( npcOwner->Weapon_ShootPosition(), npcOwner->GetAbsOrigin(), vecRelativeShootPosition );
+	VectorSubtract( npcOwner->Weapon_ShootPosition(), npcOwner->GetEngineObject()->GetAbsOrigin(), vecRelativeShootPosition );
 	Vector barrelPos = ownerPos + vecRelativeShootPosition;
 
 	// FIXME: If we're in a vehicle, we need some sort of way to handle shooting out of them
@@ -699,7 +699,7 @@ int CBaseCombatWeapon::GetAvailableWeaponsInBox( CBaseCombatWeapon **pList, int 
 		if ( !pWeapon->GetOwner() )
 		{
 			// restrict to mins/maxs
-			if ( IsPointInBox( pWeapon->GetAbsOrigin(), mins, maxs ) )
+			if ( IsPointInBox( pWeapon->GetEngineObject()->GetAbsOrigin(), mins, maxs ) )
 			{
 				if ( count < listMax )
 				{

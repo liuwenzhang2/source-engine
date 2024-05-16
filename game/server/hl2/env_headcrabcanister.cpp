@@ -264,7 +264,7 @@ void CEnvHeadcrabCanister::Spawn( void )
 		// It doesn't have any real presence at first.
 		SetSolid( SOLID_NONE );
 
-		m_vecImpactPosition = GetAbsOrigin();
+		m_vecImpactPosition = GetEngineObject()->GetAbsOrigin();
 		m_bIncomingSoundStarted = false;
 		m_bLanded = false;
 		m_bHasDetonated = false;
@@ -282,14 +282,14 @@ void CEnvHeadcrabCanister::Spawn( void )
 			vecForward *= -1.0f;
 
 			trace_t trace;
-			UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + vecForward * 10000, MASK_NPCWORLDSTATIC, 
+			UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecForward * 10000, MASK_NPCWORLDSTATIC,
 				this, COLLISION_GROUP_NONE, &trace );
 
 			m_vecImpactPosition = trace.endpos;
 		}
 		else
 		{
-			m_vecImpactPosition = GetAbsOrigin();
+			m_vecImpactPosition = GetEngineObject()->GetAbsOrigin();
 		}
 
 		m_bIncomingSoundStarted = false;
@@ -302,7 +302,7 @@ void CEnvHeadcrabCanister::Spawn( void )
 		m_bHasDetonated = true;
 		m_bIncomingSoundStarted = true;
 		m_bOpened = false;
-		m_vecImpactPosition = GetAbsOrigin();
+		m_vecImpactPosition = GetEngineObject()->GetAbsOrigin();
 		Landed();
 	}
 }
@@ -358,11 +358,11 @@ void CEnvHeadcrabCanister::ComputeWorldEntryPoint( Vector *pStartPosition, QAngl
 	// since it'll be buried in the ground oftentimes)
 	trace_t tr;
 	CTraceFilterWorldOnly filter;
-	UTIL_TraceLine( GetAbsOrigin() + vecForward * 100, GetAbsOrigin() + vecForward * 10000,
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin() + vecForward * 100, GetEngineObject()->GetAbsOrigin() + vecForward * 10000,
 		CONTENTS_SOLID, &filter, &tr );
 
 	*pStartPosition = tr.endpos;
-	*pStartAngles = GetAbsAngles();
+	*pStartAngles = GetEngineObject()->GetAbsAngles();
 	VectorMultiply( vecForward, -1.0f, *pStartDirection );
 }
 
@@ -392,7 +392,7 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 			GetVectors( &vecForward, NULL, NULL );
 			VectorMultiply( vecForward, -1.0f, vecImpactDirection );
 
-			m_Shared.InitInWorld( gpGlobals->curtime, pLaunchPos->GetAbsOrigin(), GetAbsAngles(), 
+			m_Shared.InitInWorld( gpGlobals->curtime, pLaunchPos->GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(),
 				vecImpactDirection, m_vecImpactPosition, true );
 			SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterWorldThink );
 			SetNextThink( gpGlobals->curtime );
@@ -409,7 +409,7 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 		GetVectors( &vecForward, NULL, NULL );
 		vecForward *= -1.0f;
 
-		m_Shared.InitInSkybox( gpGlobals->curtime, m_vecImpactPosition, GetAbsAngles(), vecForward, 
+		m_Shared.InitInSkybox( gpGlobals->curtime, m_vecImpactPosition, GetEngineObject()->GetAbsAngles(), vecForward,
 			m_vecImpactPosition, pCamera->m_skyboxData.origin, pCamera->m_skyboxData.scale );
 		GetEngineObject()->AddEFlags( EFL_IN_SKYBOX );
 		SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterSkyboxOnlyThink );
@@ -454,8 +454,8 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 	Vector vecEndPosition;
 	QAngle vecEndAngles;
 	m_Shared.GetPositionAtTime( gpGlobals->curtime, vecEndPosition, vecEndAngles );
-	SetAbsOrigin( vecEndPosition );
-	SetAbsAngles( vecEndAngles );
+	GetEngineObject()->SetAbsOrigin( vecEndPosition );
+	GetEngineObject()->SetAbsAngles( vecEndAngles );
 
 	return pCamera;
 }
@@ -489,7 +489,7 @@ void CEnvHeadcrabCanister::InputFireCanister( inputdata_t &inputdata )
 	CSkyCamera *pCamera = PlaceCanisterInWorld();
 
 	// Hook up a smoke trail
-	m_hTrail = CSpriteTrail::SpriteTrailCreate( "sprites/smoke.vmt", GetAbsOrigin(), true );
+	m_hTrail = CSpriteTrail::SpriteTrailCreate( "sprites/smoke.vmt", GetEngineObject()->GetAbsOrigin(), true );
 	m_hTrail->SetTransparency( kRenderTransAdd, 224, 224, 255, 255, kRenderFxNone );
 	m_hTrail->SetAttachment( this, 0 );
 	m_hTrail->SetStartWidth( 32.0 );
@@ -598,7 +598,7 @@ void CEnvHeadcrabCanister::TestForCollisionsAgainstEntities( const Vector &vecEn
 	Vector vecMaxs( flRadius, flRadius, flRadius );
 
 	Ray_t ray;
-	ray.Init( GetAbsOrigin(), vecEndPosition, vecMins, vecMaxs );
+	ray.Init(GetEngineObject()->GetAbsOrigin(), vecEndPosition, vecMins, vecMaxs );
 
 	CCollideList collideList( &ray, this, MASK_SOLID );
 	enginetrace->EnumerateEntities( ray, false, &collideList );
@@ -623,7 +623,7 @@ void CEnvHeadcrabCanister::TestForCollisionsAgainstEntities( const Vector &vecEn
 		if ( pEntity->m_takedamage && ( m_flDamage != 0.0f ) )
 		{
 			CTakeDamageInfo info( this, this, flDamage, DMG_BLAST );
-			CalculateExplosiveDamageForce( &info, vecForceDir, pEntity->GetAbsOrigin() );
+			CalculateExplosiveDamageForce( &info, vecForceDir, pEntity->GetEngineObject()->GetAbsOrigin() );
 			pEntity->TakeDamage( info );
 		}
 	}
@@ -653,7 +653,7 @@ void CEnvHeadcrabCanister::TestForCollisionsAgainstWorld( const Vector &vecEndPo
 
 		// Get distance to object and use it as a scale value.
 		Vector vecSegment;
-		VectorSubtract( pEntity->GetAbsOrigin(), vecEndPosition, vecSegment ); 
+		VectorSubtract( pEntity->GetEngineObject()->GetAbsOrigin(), vecEndPosition, vecSegment );
 		float flDistance = VectorNormalize( vecSegment );
 
 		float flFactor = 1.0f / ( flDamageRadius * (INNER_RADIUS_FRACTION - 1) );
@@ -679,7 +679,7 @@ void CEnvHeadcrabCanister::TestForCollisionsAgainstWorld( const Vector &vecEndPo
 		if ( pEntity->m_takedamage && ( m_flDamage != 0.0f ) )
 		{
 			CTakeDamageInfo info( this, this, flDamage * flScale, DMG_BLAST );
-			CalculateExplosiveDamageForce( &info, vecSegment, pEntity->GetAbsOrigin() );
+			CalculateExplosiveDamageForce( &info, vecSegment, pEntity->GetEngineObject()->GetAbsOrigin() );
 			pEntity->TakeDamage( info );
 		}
 
@@ -722,8 +722,8 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSpawnHeadcrabThink()
 		pHeadCrab->SetOwnerEntity( this );
 		DispatchSpawn( pHeadCrab );
 		pHeadCrab->GetEngineObject()->SetParent( this->GetEngineObject(), nHeadCrabAttachment);
-		pHeadCrab->SetLocalOrigin( vec3_origin );
-		pHeadCrab->SetLocalAngles( vec3_angle );
+		pHeadCrab->GetEngineObject()->SetLocalOrigin( vec3_origin );
+		pHeadCrab->GetEngineObject()->SetLocalAngles( vec3_angle );
 		pHeadCrab->CrawlFromCanister();
 	}
 
@@ -826,7 +826,7 @@ void CEnvHeadcrabCanister::OpenCanister( void )
 //-----------------------------------------------------------------------------
 void CEnvHeadcrabCanister::SetLanded( void )
 {
-	SetAbsOrigin( m_vecImpactPosition );
+	GetEngineObject()->SetAbsOrigin( m_vecImpactPosition );
 	SetModel( ENV_HEADCRABCANISTER_BROKEN_MODEL );
 	SetMoveType( MOVETYPE_NONE );
 	SetSolid( SOLID_VPHYSICS );
@@ -928,7 +928,7 @@ void CEnvHeadcrabCanister::Detonate( )
 	// If we're supposed to be removed, do that now
 	if ( HasSpawnFlags( SF_REMOVE_ON_IMPACT ) )
 	{
-		SetAbsOrigin( m_vecImpactPosition );
+		GetEngineObject()->SetAbsOrigin( m_vecImpactPosition );
 		SetModel( ENV_HEADCRABCANISTER_BROKEN_MODEL );
 		SetMoveType( MOVETYPE_NONE );
 		IncrementInterpolationFrame();
@@ -962,7 +962,7 @@ void CEnvHeadcrabCanister::Detonate( )
 	if ( !HasSpawnFlags( SF_NO_IMPACT_EFFECTS ) )
 	{
 		// Normal explosion
-		ExplosionCreate( m_vecImpactPosition, GetAbsAngles(), this, 50.0f, 500.0f, 
+		ExplosionCreate( m_vecImpactPosition, GetEngineObject()->GetAbsAngles(), this, 50.0f, 500.0f,
 			SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODAMAGE | SF_ENVEXPLOSION_NOSOUND, 1300.0f );
 			
 		// Dust explosion
@@ -985,7 +985,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterWorldThink( void )
 	// Get the current time.
 	float flTime = gpGlobals->curtime;
 
-	Vector vecStartPosition = GetAbsOrigin();
+	Vector vecStartPosition = GetEngineObject()->GetAbsOrigin();
 
 	// Update HeadcrabCanister position for swept collision test.
 	Vector vecEndPosition;
@@ -1030,13 +1030,13 @@ void CEnvHeadcrabCanister::HeadcrabCanisterWorldThink( void )
 	}
 		   
 	// Always move full movement.
-	SetAbsOrigin( vecEndPosition );
+	GetEngineObject()->SetAbsOrigin( vecEndPosition );
 
 	// Touch triggers along the way
 	PhysicsTouchTriggers( &vecStartPosition );
 
 	SetNextThink( gpGlobals->curtime + 0.2f );
-	SetAbsAngles( vecEndAngles );
+	GetEngineObject()->SetAbsAngles( vecEndAngles );
 
 	if ( !m_bHasDetonated )
 	{
@@ -1062,7 +1062,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSkyboxThink( void )
 	QAngle vecEndAngles;
 	m_Shared.GetPositionAtTime( gpGlobals->curtime, vecEndPosition, vecEndAngles );
 	UTIL_SetOrigin( this, vecEndPosition );
-	SetAbsAngles( vecEndAngles );
+	GetEngineObject()->SetAbsAngles( vecEndAngles );
 	GetEngineObject()->RemoveEFlags( EFL_IN_SKYBOX );
 
 	// Switch to the actual-scale model
@@ -1086,7 +1086,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSkyboxOnlyThink( void )
 	QAngle vecEndAngles;
 	m_Shared.GetPositionAtTime( gpGlobals->curtime, vecEndPosition, vecEndAngles );
 	UTIL_SetOrigin( this, vecEndPosition );
-	SetAbsAngles( vecEndAngles );
+	GetEngineObject()->SetAbsAngles( vecEndAngles );
 
 	if ( !HasSpawnFlags( SF_NO_IMPACT_SOUND ) )
 	{	

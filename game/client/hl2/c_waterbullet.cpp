@@ -27,9 +27,9 @@ public:
 		if ( updateType == DATA_UPDATE_CREATED )
 		{
 			m_pEmitter = CSimpleEmitter::Create( "FX_Bubble" );
-			m_pEmitter->SetSortOrigin( GetAbsOrigin() );
+			m_pEmitter->SetSortOrigin(GetEngineObject()->GetAbsOrigin() );
 
-			m_vecLastOrigin = GetAbsOrigin();
+			m_vecLastOrigin = GetEngineObject()->GetAbsOrigin();
 		}
 	}
 
@@ -37,7 +37,7 @@ public:
 
 	void AddEntity( void )
 	{
-		Vector	direction = GetAbsOrigin() - m_vecLastOrigin;
+		Vector	direction = GetEngineObject()->GetAbsOrigin() - m_vecLastOrigin;
 		float	flDist = VectorNormalize( direction );
 
 		int	numBubbles = (int) ( flDist * BUBBLES_PER_INCH );
@@ -102,7 +102,7 @@ public:
 		}
 
 		// Save our last position
-		m_vecLastOrigin = GetAbsOrigin();
+		m_vecLastOrigin = GetEngineObject()->GetAbsOrigin();
 
 		BaseClass::AddEntity();
 	}

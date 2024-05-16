@@ -462,7 +462,7 @@ void CPropJeep::AimGunAt( Vector *endPos, float flInterval )
 
 		// Make the gun go limp and look "down"
 		Vector	v_forward, v_up;
-		AngleVectors( GetLocalAngles(), NULL, &v_forward, &v_up );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), NULL, &v_forward, &v_up );
 		aimPos = WorldSpaceCenter() + ( v_forward * -32.0f ) - Vector( 0, 0, 128.0f );
 	}
 
@@ -1389,8 +1389,8 @@ void CPropJeep::CreateDangerSounds( void )
 	if ( m_flDangerSoundTime > gpGlobals->curtime )
 		return;
 
-	QAngle vehicleAngles = GetLocalAngles();
-	Vector vecStart = GetAbsOrigin();
+	QAngle vehicleAngles = GetEngineObject()->GetLocalAngles();
+	Vector vecStart = GetEngineObject()->GetAbsOrigin();
 	Vector vecDir, vecRight;
 
 	GetVectors( &vecDir, &vecRight, NULL );

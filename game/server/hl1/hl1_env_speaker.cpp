@@ -63,7 +63,7 @@ void CSpeaker::Spawn( void )
 
 	if ( !m_preset && ( m_iszMessage == NULL_STRING || strlen( szSoundFile ) < 1 ) )
 	{
-		Msg( "SPEAKER with no Level/Sentence! at: %f, %f, %f\n", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		Msg( "SPEAKER with no Level/Sentence! at: %f, %f, %f\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 		SetNextThink( gpGlobals->curtime + 0.1 );
 		SetThink( &CSpeaker::SUB_Remove );
 		return;
@@ -130,7 +130,7 @@ void CSpeaker::SpeakerThink( void )
 	if (szSoundFile[0] == '!')
 	{
 		// play single sentence, one shot
-		UTIL_EmitAmbientSound ( GetSoundSourceIndex(), GetAbsOrigin(), szSoundFile, 
+		UTIL_EmitAmbientSound ( GetSoundSourceIndex(), GetEngineObject()->GetAbsOrigin(), szSoundFile,
 			flvolume, SNDLVL_120dB, flags, pitch);
 
 		// shut off and reset

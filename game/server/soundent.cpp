@@ -138,7 +138,7 @@ const Vector &CSound::GetSoundReactOrigin( void )
 		{
 			// We really want the origin of this sound's 
 			// owner.
-			return m_hOwner->GetAbsOrigin();
+			return m_hOwner->GetEngineObject()->GetAbsOrigin();
 		}
 		else
 		{
@@ -153,7 +153,7 @@ const Vector &CSound::GetSoundReactOrigin( void )
 	{
 		if( m_hOwner.Get() != NULL )
 		{
-			return m_hOwner->GetAbsOrigin();
+			return m_hOwner->GetEngineObject()->GetAbsOrigin();
 		}
 	}
 
@@ -165,7 +165,7 @@ const Vector &CSound::GetSoundReactOrigin( void )
 			if( m_hOwner.Get() != NULL )
 			{
 				// Be afraid of the sniper's location, not where the bullet will hit.
-				return m_hOwner->GetAbsOrigin();
+				return m_hOwner->GetEngineObject()->GetAbsOrigin();
 			}
 			else
 			{
@@ -765,7 +765,7 @@ void CAISound::InputInsertSound( inputdata_t &inputdata )
 
 	iVolume = inputdata.value.Int();
 
-	Vector vecLocation = GetAbsOrigin();
+	Vector vecLocation = GetEngineObject()->GetAbsOrigin();
 
 	if( m_iszProxyEntityName != NULL_STRING )
 	{
@@ -773,7 +773,7 @@ void CAISound::InputInsertSound( inputdata_t &inputdata )
 
 		if( pProxy )
 		{
-			vecLocation = pProxy->GetAbsOrigin();
+			vecLocation = pProxy->GetEngineObject()->GetAbsOrigin();
 		}
 		else
 		{
@@ -786,7 +786,7 @@ void CAISound::InputInsertSound( inputdata_t &inputdata )
 
 void CAISound::InputEmitAISound( inputdata_t &inputdata )
 {
-	Vector vecLocation = GetAbsOrigin();
+	Vector vecLocation = GetEngineObject()->GetAbsOrigin();
 
 	if( m_iszProxyEntityName != NULL_STRING )
 	{
@@ -794,7 +794,7 @@ void CAISound::InputEmitAISound( inputdata_t &inputdata )
 
 		if( pProxy )
 		{
-			vecLocation = pProxy->GetAbsOrigin();
+			vecLocation = pProxy->GetEngineObject()->GetAbsOrigin();
 		}
 		else
 		{

@@ -207,7 +207,7 @@ int CAI_AssaultBehavior::DrawDebugTextOverlays( int text_offset )
 	offset = BaseClass::DrawDebugTextOverlays( text_offset );
 	if ( GetOuter()->m_debugOverlays & OVERLAY_TEXT_BIT )
 	{	
-		Q_snprintf( tempstr, sizeof(tempstr), "Assault Point: %s %s", STRING( m_AssaultPointName ), VecToString( m_hAssaultPoint->GetAbsOrigin() ) );
+		Q_snprintf( tempstr, sizeof(tempstr), "Assault Point: %s %s", STRING( m_AssaultPointName ), VecToString( m_hAssaultPoint->GetEngineObject()->GetAbsOrigin() ) );
 		GetOuter()->EntityText( offset, tempstr, 0 );
 		offset++;
 	}
@@ -274,7 +274,7 @@ CAssaultPoint *CAI_AssaultBehavior::FindAssaultPoint( string_t iszAssaultPointNa
 		CAI_BaseNPC *pNPC = GetOuter();
 		CAssaultPoint *pAssaultPoint = pAssaultPoints[i];
 
-		AI_TraceHull ( pAssaultPoint->GetAbsOrigin(), pAssaultPoint->GetAbsOrigin(), pNPC->WorldAlignMins(), pNPC->WorldAlignMaxs(), MASK_SOLID, pNPC, COLLISION_GROUP_NONE, &tr );
+		AI_TraceHull ( pAssaultPoint->GetEngineObject()->GetAbsOrigin(), pAssaultPoint->GetEngineObject()->GetAbsOrigin(), pNPC->WorldAlignMins(), pNPC->WorldAlignMaxs(), MASK_SOLID, pNPC, COLLISION_GROUP_NONE, &tr );
 
 		if ( tr.fraction == 1.0 )
 		{
@@ -409,14 +409,14 @@ void CAI_AssaultBehavior::GatherConditions( void )
 	{
 		if( m_hAssaultPoint && m_hAssaultPoint->HasSpawnFlags(SF_ASSAULTPOINT_CLEARONARRIVAL) && m_hAssaultPoint->m_NextAssaultPointName != NULL_STRING )
 		{
-			float flDist = GetAbsOrigin().DistTo( m_hAssaultPoint->GetAbsOrigin() );
+			float flDist = GetAbsOrigin().DistTo( m_hAssaultPoint->GetEngineObject()->GetAbsOrigin() );
 
 			if( flDist <= GetOuter()->GetMotor()->MinStoppingDist() )
 			{
 				OnHitAssaultPoint();
 				ClearAssaultPoint();
 
-				AI_NavGoal_t goal( m_hAssaultPoint->GetAbsOrigin() );
+				AI_NavGoal_t goal( m_hAssaultPoint->GetEngineObject()->GetAbsOrigin() );
 				goal.pTarget = m_hAssaultPoint;
 				
 				if ( GetNavigator()->SetGoal( goal ) == false )
@@ -497,22 +497,22 @@ void CAI_AssaultBehavior::StartTask( const Task_t *pTask )
 
 	case TASK_GET_PATH_TO_RALLY_POINT:
 		{
-			AI_NavGoal_t goal( m_hRallyPoint->GetAbsOrigin() );
+			AI_NavGoal_t goal( m_hRallyPoint->GetEngineObject()->GetAbsOrigin() );
 			goal.pTarget = m_hRallyPoint;
 			if ( GetNavigator()->SetGoal( goal ) == false )
 			{
 				// Try and get as close as possible otherwise
-				AI_NavGoal_t nearGoal( GOALTYPE_LOCATION_NEAREST_NODE, m_hRallyPoint->GetAbsOrigin(), AIN_DEF_ACTIVITY, 256 );
+				AI_NavGoal_t nearGoal( GOALTYPE_LOCATION_NEAREST_NODE, m_hRallyPoint->GetEngineObject()->GetAbsOrigin(), AIN_DEF_ACTIVITY, 256 );
 				if ( GetNavigator()->SetGoal( nearGoal, AIN_CLEAR_PREVIOUS_STATE ) )
 				{
 					//FIXME: HACK! The internal pathfinding is setting this without our consent, so override it!
 					ClearCondition( COND_TASK_FAILED );
-					GetNavigator()->SetArrivalDirection( m_hRallyPoint->GetAbsAngles() );
+					GetNavigator()->SetArrivalDirection( m_hRallyPoint->GetEngineObject()->GetAbsAngles() );
 					TaskComplete();
 					return;
 				}
 			}
-			GetNavigator()->SetArrivalDirection( m_hRallyPoint->GetAbsAngles() );
+			GetNavigator()->SetArrivalDirection( m_hRallyPoint->GetEngineObject()->GetAbsAngles() );
 		}
 		break;
 
@@ -520,29 +520,29 @@ void CAI_AssaultBehavior::StartTask( const Task_t *pTask )
 		{
 			UpdateForceCrouch();
 			
-			GetMotor()->SetIdealYaw( m_hRallyPoint->GetAbsAngles().y );
+			GetMotor()->SetIdealYaw( m_hRallyPoint->GetEngineObject()->GetAbsAngles().y );
 			GetOuter()->SetTurnActivity(); 
 		}
 		break;
 
 	case TASK_GET_PATH_TO_ASSAULT_POINT:
 		{
-			AI_NavGoal_t goal( m_hAssaultPoint->GetAbsOrigin() );
+			AI_NavGoal_t goal( m_hAssaultPoint->GetEngineObject()->GetAbsOrigin() );
 			goal.pTarget = m_hAssaultPoint;
 			if ( GetNavigator()->SetGoal( goal ) == false )
 			{
 				// Try and get as close as possible otherwise
-				AI_NavGoal_t nearGoal( GOALTYPE_LOCATION_NEAREST_NODE, m_hAssaultPoint->GetAbsOrigin(), AIN_DEF_ACTIVITY, 256 );
+				AI_NavGoal_t nearGoal( GOALTYPE_LOCATION_NEAREST_NODE, m_hAssaultPoint->GetEngineObject()->GetAbsOrigin(), AIN_DEF_ACTIVITY, 256 );
 				if ( GetNavigator()->SetGoal( nearGoal, AIN_CLEAR_PREVIOUS_STATE ) )
 				{
 					//FIXME: HACK! The internal pathfinding is setting this without our consent, so override it!
 					ClearCondition( COND_TASK_FAILED );
-					GetNavigator()->SetArrivalDirection( m_hAssaultPoint->GetAbsAngles() );
+					GetNavigator()->SetArrivalDirection( m_hAssaultPoint->GetEngineObject()->GetAbsAngles() );
 					TaskComplete();
 					return;
 				}
 			}
-			GetNavigator()->SetArrivalDirection( m_hAssaultPoint->GetAbsAngles() );
+			GetNavigator()->SetArrivalDirection( m_hAssaultPoint->GetEngineObject()->GetAbsAngles() );
 		}
 		break;
 
@@ -559,7 +559,7 @@ void CAI_AssaultBehavior::StartTask( const Task_t *pTask )
 			}
 			else
 			{
-				GetMotor()->SetIdealYaw( m_hAssaultPoint->GetAbsAngles().y );
+				GetMotor()->SetIdealYaw( m_hAssaultPoint->GetEngineObject()->GetAbsAngles().y );
 				GetOuter()->SetTurnActivity(); 
 			}
 		}
@@ -786,7 +786,7 @@ bool CAI_AssaultBehavior::IsValidShootPosition( const Vector &vLocation, CAI_Nod
 		}
 	}
 
-	if ( pCuePoint && (vLocation - pCuePoint->GetAbsOrigin()).Length2DSqr() > Square( flTolerance - 0.1 ) )
+	if ( pCuePoint && (vLocation - pCuePoint->GetEngineObject()->GetAbsOrigin()).Length2DSqr() > Square( flTolerance - 0.1 ) )
 		return false;
 
 	return BaseClass::IsValidShootPosition( vLocation, pNode, pHint );
@@ -825,7 +825,7 @@ bool CAI_AssaultBehavior::UpdateForceCrouch( void )
 	if ( IsForcingCrouch() )
 	{
 		// Only force crouch when we're near the point we're supposed to crouch at
-		float flDistanceToTargetSqr = GetOuter()->GetAbsOrigin().DistToSqr( AssaultHasBegun() ? m_hAssaultPoint->GetAbsOrigin() : m_hRallyPoint->GetAbsOrigin() );
+		float flDistanceToTargetSqr = GetOuter()->GetEngineObject()->GetAbsOrigin().DistToSqr( AssaultHasBegun() ? m_hAssaultPoint->GetEngineObject()->GetAbsOrigin() : m_hRallyPoint->GetEngineObject()->GetAbsOrigin() );
 		if ( flDistanceToTargetSqr < (64*64) )
 		{
 			GetOuter()->ForceCrouch();
@@ -959,12 +959,12 @@ void CAI_AssaultBehavior::SetParameters( string_t rallypointname, AssaultCue_t a
 					{
 						// This point is the same priority as my current best. 
 						// I must take it if it is closer.
-						Vector vecStart = GetOuter()->GetAbsOrigin();
+						Vector vecStart = GetOuter()->GetEngineObject()->GetAbsOrigin();
 
 						float flNewDist, flBestDist;
 
-						flNewDist = ( pRallyEnt->GetAbsOrigin() - vecStart ).LengthSqr();
-						flBestDist = ( pBest->GetAbsOrigin() - vecStart ).LengthSqr();
+						flNewDist = ( pRallyEnt->GetEngineObject()->GetAbsOrigin() - vecStart ).LengthSqr();
+						flBestDist = ( pBest->GetEngineObject()->GetAbsOrigin() - vecStart ).LengthSqr();
 
 						if( flNewDist < flBestDist )
 						{
@@ -1265,7 +1265,7 @@ int CAI_AssaultBehavior::TranslateSchedule( int scheduleType )
 
 	case SCHED_MOVE_TO_ASSAULT_POINT:
 		{
-		float flDist = ( m_hAssaultPoint->GetAbsOrigin() - GetAbsOrigin() ).Length();
+		float flDist = ( m_hAssaultPoint->GetEngineObject()->GetAbsOrigin() - GetAbsOrigin() ).Length();
 		if ( flDist <= 12.0f )
 			return SCHED_AT_ASSAULT_POINT;
 		}
@@ -1313,7 +1313,7 @@ bool CAI_AssaultBehavior::IsAllowedToDivert( void )
 {
 	if ( m_hAssaultPoint && m_hAssaultPoint->m_bAllowDiversion )
 	{
-		if ( m_hAssaultPoint->m_flAllowDiversionRadius == 0.0f || (m_bHitAssaultPoint && GetEnemy() != NULL && GetEnemy()->GetAbsOrigin().DistToSqr(m_hAssaultPoint->GetAbsOrigin()) <= Square(m_hAssaultPoint->m_flAllowDiversionRadius)) ) 
+		if ( m_hAssaultPoint->m_flAllowDiversionRadius == 0.0f || (m_bHitAssaultPoint && GetEnemy() != NULL && GetEnemy()->GetEngineObject()->GetAbsOrigin().DistToSqr(m_hAssaultPoint->GetEngineObject()->GetAbsOrigin()) <= Square(m_hAssaultPoint->m_flAllowDiversionRadius)) )
 		{
 			if ( m_flLastSawAnEnemyAt && ((gpGlobals->curtime - m_flLastSawAnEnemyAt) < ASSAULT_DIVERSION_TIME) )
 				return true;
@@ -1388,7 +1388,7 @@ int CAI_AssaultBehavior::SelectSchedule()
 		// If I have hit my rally point, but I haven't hit my assault point yet, 
 		// Make sure I'm still on my rally point, cause another behavior may have moved me.
 		// 2D check to be within 32 units of my rallypoint.
-		Vector vecDiff = GetAbsOrigin() - m_hRallyPoint->GetAbsOrigin();
+		Vector vecDiff = GetAbsOrigin() - m_hRallyPoint->GetEngineObject()->GetAbsOrigin();
 		vecDiff.z = 0.0;
 
 		if( vecDiff.LengthSqr() > Square(CUE_POINT_TOLERANCE) )
@@ -1402,7 +1402,7 @@ int CAI_AssaultBehavior::SelectSchedule()
 	{
 		// Likewise. If I have hit my assault point, make sure I'm still there. Another
 		// behavior (hide and reload) may have moved me away. 
-		Vector vecDiff = GetAbsOrigin() - m_hAssaultPoint->GetAbsOrigin();
+		Vector vecDiff = GetAbsOrigin() - m_hAssaultPoint->GetEngineObject()->GetAbsOrigin();
 		vecDiff.z = 0.0;
 
 		if( vecDiff.LengthSqr() > Square(CUE_POINT_TOLERANCE) )

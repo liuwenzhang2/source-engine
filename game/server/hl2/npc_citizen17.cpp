@@ -863,8 +863,8 @@ bool CNPC_Citizen::ShouldBehaviorSelectSchedule( CAI_BehaviorBase *pBehavior )
 	{
 		if( m_FollowBehavior.GetFollowTarget() )
 		{
-			Vector vecFollowGoal = m_FollowBehavior.GetFollowTarget()->GetAbsOrigin();
-			if( vecFollowGoal.DistToSqr( GetAbsOrigin() ) > Square(CITIZEN_FOLLOWER_DESERT_FUNCTANK_DIST) )
+			Vector vecFollowGoal = m_FollowBehavior.GetFollowTarget()->GetEngineObject()->GetAbsOrigin();
+			if( vecFollowGoal.DistToSqr(GetEngineObject()->GetAbsOrigin() ) > Square(CITIZEN_FOLLOWER_DESERT_FUNCTANK_DIST) )
 			{
 				return false;
 			}
@@ -909,7 +909,7 @@ void CNPC_Citizen::GatherConditions()
 		for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
 			CAI_BaseNPC *pNpc = g_AI_Manager.AccessAIs()[i];
-			if ( pNpc != this && pNpc->GetClassname() == GetClassname() && pNpc->GetAbsOrigin().DistToSqr( GetAbsOrigin() ) < Square( 15*12 ) && FVisible( pNpc ) )
+			if ( pNpc != this && pNpc->GetClassname() == GetClassname() && pNpc->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin() ) < Square( 15*12 ) && FVisible( pNpc ) )
 			{
 				(assert_cast<CNPC_Citizen *>(pNpc))->SetSpokeConcept( TLK_JOINPLAYER, NULL );
 			}
@@ -918,7 +918,7 @@ void CNPC_Citizen::GatherConditions()
 
 	if( ShouldLookForHealthItem() )
 	{
-		if( FindHealthItem( GetAbsOrigin(), Vector( 240, 240, 240 ) ) )
+		if( FindHealthItem(GetEngineObject()->GetAbsOrigin(), Vector( 240, 240, 240 ) ) )
 			SetCondition( COND_HEALTH_ITEM_AVAILABLE );
 		else
 			ClearCondition( COND_HEALTH_ITEM_AVAILABLE );
@@ -938,7 +938,7 @@ void CNPC_Citizen::GatherConditions()
 			return;
 		}
 
-		float flDistSqr = ( GetAbsOrigin() - pPlayer->GetAbsOrigin() ).Length2DSqr();
+		float flDistSqr = (GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin() ).Length2DSqr();
 		float flStareDist = sk_citizen_player_stare_dist.GetFloat();
 		float flPlayerDamage = pPlayer->GetMaxHealth() - pPlayer->GetHealth();
 
@@ -1016,8 +1016,8 @@ void CNPC_Citizen::PrescheduleThink()
 
 	if ( !npc_citizen_insignia.GetBool() && npc_citizen_squad_marker.GetBool() && IsInPlayerSquad() )
 	{
-		Vector mins = WorldAlignMins() * .5 + GetAbsOrigin();
-		Vector maxs = WorldAlignMaxs() * .5 + GetAbsOrigin();
+		Vector mins = WorldAlignMins() * .5 + GetEngineObject()->GetAbsOrigin();
+		Vector maxs = WorldAlignMaxs() * .5 + GetEngineObject()->GetAbsOrigin();
 		
 		float rMax = 255;
 		float gMax = 255;
@@ -1038,8 +1038,8 @@ void CNPC_Citizen::PrescheduleThink()
 		float b = bMin + ( bMax - bMin ) * fade;
 
 		// THIS IS A PLACEHOLDER UNTIL WE HAVE A REAL DESIGN & ART -- DO NOT REMOVE
-		NDebugOverlay::Line( Vector( mins.x, GetAbsOrigin().y, GetAbsOrigin().z+1 ), Vector( maxs.x, GetAbsOrigin().y, GetAbsOrigin().z+1 ), r, g, b, false, .11 );
-		NDebugOverlay::Line( Vector( GetAbsOrigin().x, mins.y, GetAbsOrigin().z+1 ), Vector( GetAbsOrigin().x, maxs.y, GetAbsOrigin().z+1 ), r, g, b, false, .11 );
+		NDebugOverlay::Line( Vector( mins.x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z+1 ), Vector( maxs.x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z+1 ), r, g, b, false, .11 );
+		NDebugOverlay::Line( Vector(GetEngineObject()->GetAbsOrigin().x, mins.y, GetEngineObject()->GetAbsOrigin().z+1 ), Vector(GetEngineObject()->GetAbsOrigin().x, maxs.y, GetEngineObject()->GetAbsOrigin().z+1 ), r, g, b, false, .11 );
 	}
 	if( GetEnemy() && g_ai_citizen_show_enemy.GetBool() )
 	{
@@ -1054,7 +1054,7 @@ void CNPC_Citizen::PrescheduleThink()
 			
 			if ( pCommandPoint )
 			{
-				NDebugOverlay::Cross3D(pCommandPoint->GetAbsOrigin(), 16, 0, 255, 255, false, 0.1 );
+				NDebugOverlay::Cross3D(pCommandPoint->GetEngineObject()->GetAbsOrigin(), 16, 0, 255, 255, false, 0.1 );
 			}
 		}
 	}
@@ -1213,7 +1213,7 @@ int CNPC_Citizen::SelectScheduleHeal()
 
 	if ( CanHeal() )
 	{
-		CBaseEntity *pEntity = PlayerInRange( GetLocalOrigin(), HEAL_TOSS_TARGET_RANGE );
+		CBaseEntity *pEntity = PlayerInRange(GetEngineObject()->GetLocalOrigin(), HEAL_TOSS_TARGET_RANGE );
 		if ( pEntity )
 		{
 			if ( USE_EXPERIMENTAL_MEDIC_CODE() && IsMedic() )
@@ -1225,7 +1225,7 @@ int CNPC_Citizen::SelectScheduleHeal()
 					return SCHED_CITIZEN_HEAL_TOSS;
 				}
 			}
-			else if ( PlayerInRange( GetLocalOrigin(), HEAL_MOVE_RANGE ) )
+			else if ( PlayerInRange(GetEngineObject()->GetLocalOrigin(), HEAL_MOVE_RANGE ) )
 			{
 				// use old mechanism for ammo
 				if ( ShouldHealTarget( pEntity, HasCondition( COND_CIT_PLAYERHEALREQUEST ) ) )
@@ -1249,7 +1249,7 @@ int CNPC_Citizen::SelectScheduleHeal()
 			{
 				if ( pSquadmate != this )
 				{
-					distCurSq = ( GetAbsOrigin() - pSquadmate->GetAbsOrigin() ).LengthSqr();
+					distCurSq = (GetEngineObject()->GetAbsOrigin() - pSquadmate->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 					if ( distCurSq < distClosestSq && ShouldHealTarget( pSquadmate ) )
 					{
 						distClosestSq = distCurSq;
@@ -1279,7 +1279,7 @@ int CNPC_Citizen::SelectScheduleHeal()
 
 	if ( CanHeal() )
 	{
-		CBaseEntity *pEntity = PlayerInRange( GetLocalOrigin(), HEAL_MOVE_RANGE );
+		CBaseEntity *pEntity = PlayerInRange(GetEngineObject()->GetLocalOrigin(), HEAL_MOVE_RANGE );
 		if ( pEntity && ShouldHealTarget( pEntity, HasCondition( COND_CIT_PLAYERHEALREQUEST ) ) )
 		{
 			SetTarget( pEntity );
@@ -1298,7 +1298,7 @@ int CNPC_Citizen::SelectScheduleHeal()
 			{
 				if ( pSquadmate != this )
 				{
-					distCurSq = ( GetAbsOrigin() - pSquadmate->GetAbsOrigin() ).LengthSqr();
+					distCurSq = (GetEngineObject()->GetAbsOrigin() - pSquadmate->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 					if ( distCurSq < distClosestSq && ShouldHealTarget( pSquadmate ) )
 					{
 						distClosestSq = distCurSq;
@@ -1353,7 +1353,7 @@ int CNPC_Citizen::SelectScheduleRetrieveItem()
 		}
 		else
 		{
-			CBaseEntity *pBase = FindHealthItem(m_FollowBehavior.GetFollowTarget()->GetAbsOrigin(), Vector( 120, 120, 120 ) );
+			CBaseEntity *pBase = FindHealthItem(m_FollowBehavior.GetFollowTarget()->GetEngineObject()->GetAbsOrigin(), Vector( 120, 120, 120 ) );
 			CItem *pItem = dynamic_cast<CItem *>(pBase);
 
 			if( pItem )
@@ -1396,9 +1396,9 @@ int CNPC_Citizen::SelectScheduleManhackCombat()
 	{
 		if ( !HasCondition( COND_CAN_MELEE_ATTACK1 ) )
 		{
-			float distSqEnemy = ( GetEnemy()->GetAbsOrigin() - EyePosition() ).LengthSqr();
+			float distSqEnemy = ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - EyePosition() ).LengthSqr();
 			if ( distSqEnemy < 48.0*48.0 &&
-				 ( ( GetEnemy()->GetAbsOrigin() + GetEnemy()->GetSmoothedVelocity() * .1 ) - EyePosition() ).LengthSqr() < distSqEnemy )
+				 ( ( GetEnemy()->GetEngineObject()->GetAbsOrigin() + GetEnemy()->GetSmoothedVelocity() * .1 ) - EyePosition() ).LengthSqr() < distSqEnemy )
 				return SCHED_COWER;
 
 			int iRoll = random->RandomInt( 1, 4 );
@@ -1449,7 +1449,7 @@ int CNPC_Citizen::TranslateSchedule( int scheduleType )
 		{
 			// Player is dead! 
 			float flDist;
-			flDist = ( pLocalPlayer->GetAbsOrigin() - GetAbsOrigin() ).Length();
+			flDist = ( pLocalPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length();
 
 			if( flDist < 50 * 12 )
 			{
@@ -1495,8 +1495,8 @@ int CNPC_Citizen::TranslateSchedule( int scheduleType )
 			else
 			{
 				CBasePlayer *pPlayer = AI_GetSinglePlayer();
-				if ( pPlayer && GetEnemy() && ( ( GetEnemy()->GetAbsOrigin() - 
-					pPlayer->GetAbsOrigin() ).LengthSqr() < RPG_SAFE_DISTANCE * RPG_SAFE_DISTANCE ) )
+				if ( pPlayer && GetEnemy() && ( ( GetEnemy()->GetEngineObject()->GetAbsOrigin() -
+					pPlayer->GetEngineObject()->GetAbsOrigin() ).LengthSqr() < RPG_SAFE_DISTANCE * RPG_SAFE_DISTANCE ) )
 				{
 					// Don't fire our RPG at an enemy too close to the player
 					return SCHED_STANDOFF;
@@ -1697,10 +1697,10 @@ void CNPC_Citizen::RunTask( const Task_t *pTask )
 			}
 			else
 			{
-				if ( ( GetTarget()->GetAbsOrigin() - GetAbsOrigin() ).Length2D() > HEAL_MOVE_RANGE/2 )
+				if ( ( GetTarget()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length2D() > HEAL_MOVE_RANGE/2 )
 					TaskComplete();
 
-				GetMotor()->SetIdealYawToTargetAndUpdate( GetTarget()->GetAbsOrigin() );
+				GetMotor()->SetIdealYawToTargetAndUpdate( GetTarget()->GetEngineObject()->GetAbsOrigin() );
 			}
 			break;
 
@@ -1718,7 +1718,7 @@ void CNPC_Citizen::RunTask( const Task_t *pTask )
 			}
 			else
 			{
-				GetMotor()->SetIdealYawToTargetAndUpdate( GetTarget()->GetAbsOrigin() );
+				GetMotor()->SetIdealYawToTargetAndUpdate( GetTarget()->GetEngineObject()->GetAbsOrigin() );
 			}
 			break;
 
@@ -1766,9 +1766,9 @@ void CNPC_Citizen::RunTask( const Task_t *pTask )
 						pRPG->StartGuiding();
 					}
 
-					Vector vecEnemyPos = GetEnemy()->BodyTarget(GetAbsOrigin(), false);
+					Vector vecEnemyPos = GetEnemy()->BodyTarget(GetEngineObject()->GetAbsOrigin(), false);
 					CBasePlayer *pPlayer = AI_GetSinglePlayer();
-					if ( pPlayer && ( ( vecEnemyPos - pPlayer->GetAbsOrigin() ).LengthSqr() < RPG_SAFE_DISTANCE * RPG_SAFE_DISTANCE ) )
+					if ( pPlayer && ( ( vecEnemyPos - pPlayer->GetEngineObject()->GetAbsOrigin() ).LengthSqr() < RPG_SAFE_DISTANCE * RPG_SAFE_DISTANCE ) )
 					{
 						m_bRPGAvoidPlayer = true;
 						Speak( TLK_WATCHOUT );
@@ -2399,11 +2399,11 @@ bool CNPC_Citizen::ShouldAutoSummon()
 
 	CHL2_Player *pPlayer = (CHL2_Player *)UTIL_GetLocalPlayer();
 	
-	float distMovedSq = ( pPlayer->GetAbsOrigin() - m_vAutoSummonAnchor ).LengthSqr();
+	float distMovedSq = ( pPlayer->GetEngineObject()->GetAbsOrigin() - m_vAutoSummonAnchor ).LengthSqr();
 	float moveTolerance = player_squad_autosummon_move_tolerance.GetFloat() * 12;
 	const Vector &vCommandGoal = GetCommandGoal();
 
-	if ( distMovedSq < Square(moveTolerance * 10) && (GetAbsOrigin() - vCommandGoal).LengthSqr() > Square(10*12) && IsCommandMoving() )
+	if ( distMovedSq < Square(moveTolerance * 10) && (GetEngineObject()->GetAbsOrigin() - vCommandGoal).LengthSqr() > Square(10*12) && IsCommandMoving() )
 	{
 		m_AutoSummonTimer.Set( player_squad_autosummon_time.GetFloat() );
 		if ( player_squad_autosummon_debug.GetBool() )
@@ -2431,12 +2431,12 @@ bool CNPC_Citizen::ShouldAutoSummon()
 			if ( !bSetFollow && bCommandPointIsVisible && distMovedSq > Square(24) )
 			{
 				float closenessTolerance = player_squad_autosummon_player_tolerance.GetFloat() * 12;
-				if ( (pPlayer->GetAbsOrigin() - vCommandGoal).LengthSqr() < Square( closenessTolerance ) &&
+				if ( (pPlayer->GetEngineObject()->GetAbsOrigin() - vCommandGoal).LengthSqr() < Square( closenessTolerance ) &&
 					 ((m_vAutoSummonAnchor - vCommandGoal).LengthSqr() > Square( closenessTolerance )) )
 				{
 					bSetFollow = true;
 					if ( player_squad_autosummon_debug.GetBool() )
-						DevMsg( "Auto summoning squad: player close to command point (%f)\n", (GetAbsOrigin() - vCommandGoal).Length() );
+						DevMsg( "Auto summoning squad: player close to command point (%f)\n", (GetEngineObject()->GetAbsOrigin() - vCommandGoal).Length() );
 				}
 			}
 			
@@ -2580,7 +2580,7 @@ void CNPC_Citizen::MoveOrder( const Vector &vecDest, CAI_BaseNPC **Allies, int n
 	CHL2_Player *pPlayer = (CHL2_Player *)UTIL_GetLocalPlayer();
 
 	m_AutoSummonTimer.Set( player_squad_autosummon_time.GetFloat() );
-	m_vAutoSummonAnchor = pPlayer->GetAbsOrigin();
+	m_vAutoSummonAnchor = pPlayer->GetEngineObject()->GetAbsOrigin();
 
 	if( m_StandoffBehavior.IsRunning() )
 	{
@@ -2604,7 +2604,7 @@ void CNPC_Citizen::MoveOrder( const Vector &vecDest, CAI_BaseNPC **Allies, int n
 		if( Allies[i]->IsInPlayerSquad() )
 		{
 			Assert( Allies[i]->IsCommandable() );
-			float distSq = ( pPlayer->GetAbsOrigin() - Allies[i]->GetAbsOrigin() ).LengthSqr();
+			float distSq = ( pPlayer->GetEngineObject()->GetAbsOrigin() - Allies[i]->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 			if( distSq < closestDistSq )
 			{
 				pClosest = Allies[i];
@@ -2630,8 +2630,8 @@ void CNPC_Citizen::MoveOrder( const Vector &vecDest, CAI_BaseNPC **Allies, int n
 
 	if ( !spoke && pClosest == this )
 	{
-		float destDistToPlayer = ( vecDest - pPlayer->GetAbsOrigin() ).Length();
-		float destDistToClosest = ( vecDest - GetAbsOrigin() ).Length();
+		float destDistToPlayer = ( vecDest - pPlayer->GetEngineObject()->GetAbsOrigin() ).Length();
+		float destDistToClosest = ( vecDest - GetEngineObject()->GetAbsOrigin() ).Length();
 		CFmtStr modifiers( "commandpoint_dist_to_player:%.0f,"
 						   "commandpoint_dist_to_npc:%.0f",
 						   destDistToPlayer,
@@ -2810,7 +2810,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 		return;
 
 	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
-	if ( ( pPlayer->GetAbsOrigin().AsVector2D() - GetAbsOrigin().AsVector2D() ).LengthSqr() < Square(20*12) )
+	if ( ( pPlayer->GetEngineObject()->GetAbsOrigin().AsVector2D() - GetEngineObject()->GetAbsOrigin().AsVector2D() ).LengthSqr() < Square(20*12) )
 		m_flTimeLastCloseToPlayer = gpGlobals->curtime;
 
 	if ( !gm_PlayerSquadEvaluateTimer.Expired() )
@@ -2837,15 +2837,15 @@ void CNPC_Citizen::UpdatePlayerSquad()
 				 !pCitizen->m_FollowBehavior.FollowTargetVisible() && 
 				 pCitizen->m_FollowBehavior.GetNumFailedFollowAttempts() > 0 && 
 				 gpGlobals->curtime - pCitizen->m_FollowBehavior.GetTimeFailFollowStarted() > 20 &&
-				 ( fabsf(( pCitizen->m_FollowBehavior.GetFollowTarget()->GetAbsOrigin().z - pCitizen->GetAbsOrigin().z )) > 196 ||
-				   ( pCitizen->m_FollowBehavior.GetFollowTarget()->GetAbsOrigin().AsVector2D() - pCitizen->GetAbsOrigin().AsVector2D() ).LengthSqr() > Square(50*12) ) )
+				 ( fabsf(( pCitizen->m_FollowBehavior.GetFollowTarget()->GetEngineObject()->GetAbsOrigin().z - pCitizen->GetEngineObject()->GetAbsOrigin().z )) > 196 ||
+				   ( pCitizen->m_FollowBehavior.GetFollowTarget()->GetEngineObject()->GetAbsOrigin().AsVector2D() - pCitizen->GetEngineObject()->GetAbsOrigin().AsVector2D() ).LengthSqr() > Square(50*12) ) )
 			{
 				if ( DebuggingCommanderMode() )
 				{
 					DevMsg( "Player follower is lost (%d, %f, %d)\n", 
 						 pCitizen->m_FollowBehavior.GetNumFailedFollowAttempts(), 
 						 gpGlobals->curtime - pCitizen->m_FollowBehavior.GetTimeFailFollowStarted(), 
-						 (int)((pCitizen->m_FollowBehavior.GetFollowTarget()->GetAbsOrigin().AsVector2D() - pCitizen->GetAbsOrigin().AsVector2D() ).Length()) );
+						 (int)((pCitizen->m_FollowBehavior.GetFollowTarget()->GetEngineObject()->GetAbsOrigin().AsVector2D() - pCitizen->GetEngineObject()->GetAbsOrigin().AsVector2D() ).Length()) );
 				}
 
 				squadMembersToRemove.AddToTail( pCitizen );
@@ -2867,7 +2867,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 	{
 		CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
 		CUtlVector<SquadCandidate_t> candidates;
-		const Vector &vPlayerPos = pPlayer->GetAbsOrigin();
+		const Vector &vPlayerPos = pPlayer->GetEngineObject()->GetAbsOrigin();
 		bool bFoundNewGuy = false;
 		int i;
 
@@ -2892,7 +2892,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 			}
 			else
 			{
-				float distSq = (vPlayerPos.AsVector2D() - pCitizen->GetAbsOrigin().AsVector2D()).LengthSqr(); 
+				float distSq = (vPlayerPos.AsVector2D() - pCitizen->GetEngineObject()->GetAbsOrigin().AsVector2D()).LengthSqr();
 				if ( distSq > JOIN_PLAYER_XY_TOLERANCE_SQ && 
 					( pCitizen->m_flTimeJoinedPlayerSquad == 0 || gpGlobals->curtime - pCitizen->m_flTimeJoinedPlayerSquad > 60.0 ) && 
 					( pCitizen->m_flTimeLastCloseToPlayer == 0 || gpGlobals->curtime - pCitizen->m_flTimeLastCloseToPlayer > 15.0 ) )
@@ -2912,7 +2912,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 					{
 						if ( pCitizen->HasCondition( COND_HEAR_PLAYER ) )
 							bShouldAdd = true;
-						else if ( distSq < UNCONDITIONAL_JOIN_PLAYER_XY_TOLERANCE_SQ && fabsf(vPlayerPos.z - pCitizen->GetAbsOrigin().z) < UNCONDITIONAL_JOIN_PLAYER_Z_TOLERANCE )
+						else if ( distSq < UNCONDITIONAL_JOIN_PLAYER_XY_TOLERANCE_SQ && fabsf(vPlayerPos.z - pCitizen->GetEngineObject()->GetAbsOrigin().z) < UNCONDITIONAL_JOIN_PLAYER_Z_TOLERANCE )
 							bShouldAdd = true;
 					}
 				}
@@ -2920,7 +2920,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 				if ( bShouldAdd )
 				{
 					// @TODO (toml 05-25-04): probably everyone in a squad should be a candidate if one of them sees the player
-					AI_Waypoint_t *pPathToPlayer = pCitizen->GetPathfinder()->BuildRoute( pCitizen->GetAbsOrigin(), vPlayerPos, pPlayer, 5*12, NAV_NONE, true );
+					AI_Waypoint_t *pPathToPlayer = pCitizen->GetPathfinder()->BuildRoute( pCitizen->GetEngineObject()->GetAbsOrigin(), vPlayerPos, pPlayer, 5*12, NAV_NONE, true );
 					GetPathfinder()->UnlockRouteNodes( pPathToPlayer );
 
 					if ( !pPathToPlayer )
@@ -2963,11 +2963,11 @@ void CNPC_Citizen::UpdatePlayerSquad()
 
 						CNPC_Citizen *pCitizen = assert_cast<CNPC_Citizen *>(ppAIs[j]);
 
-						float distSq = (vPlayerPos - pCitizen->GetAbsOrigin()).Length2DSqr(); 
+						float distSq = (vPlayerPos - pCitizen->GetEngineObject()->GetAbsOrigin()).Length2DSqr();
 						if ( distSq > JOIN_PLAYER_XY_TOLERANCE_SQ )
 							continue;
 
-						distSq = (candidates[i].pCitizen->GetAbsOrigin() - pCitizen->GetAbsOrigin()).Length2DSqr(); 
+						distSq = (candidates[i].pCitizen->GetEngineObject()->GetAbsOrigin() - pCitizen->GetEngineObject()->GetAbsOrigin()).Length2DSqr();
 						if ( distSq > SECOND_TIER_JOIN_DIST_SQ )
 							continue;
 
@@ -3189,7 +3189,7 @@ void CNPC_Citizen::UpdateFollowCommandPoint()
 				m_FollowBehavior.SetParameters( AIF_COMMANDER );
 			}
 			
-			if ( ( pCommandPoint->GetAbsOrigin() - GetCommandGoal() ).LengthSqr() > 0.01 )
+			if ( ( pCommandPoint->GetEngineObject()->GetAbsOrigin() - GetCommandGoal() ).LengthSqr() > 0.01 )
 			{
 				UTIL_SetOrigin( pCommandPoint, GetCommandGoal(), false );
 			}
@@ -3272,7 +3272,7 @@ CAI_BaseNPC *CNPC_Citizen::GetSquadCommandRepresentative()
 						int i = candidates.AddToTail();
 						candidates[i].pMember = (CNPC_Citizen *)(pAllyNpc);
 						candidates[i].bSeesPlayer = pAllyNpc->HasCondition( COND_SEE_PLAYER );
-						candidates[i].distSq = ( pAllyNpc->GetAbsOrigin() - pPlayer->GetAbsOrigin() ).LengthSqr();
+						candidates[i].distSq = ( pAllyNpc->GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 					}
 				}
 
@@ -3449,7 +3449,7 @@ bool CNPC_Citizen::ShouldHealTarget( CBaseEntity *pTarget, bool bActiveUse )
 
 	if ( IsMedic() )
 	{
-		Vector toPlayer = ( pTarget->GetAbsOrigin() - GetAbsOrigin() );
+		Vector toPlayer = ( pTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 	 	if (( bActiveUse || !HaveCommandGoal() || toPlayer.Length() < HEAL_TARGET_RANGE) 
 #ifdef HL2_EPISODIC
 			&& fabs(toPlayer.z) < HEAL_TARGET_RANGE_Z
@@ -3547,7 +3547,7 @@ bool CNPC_Citizen::ShouldHealTossTarget( CBaseEntity *pTarget, bool bActiveUse )
 	if ( pCCTarget != NULL && pCCTarget->IsInAVehicle() )
 		return false;
 
-	Vector toPlayer = ( pTarget->GetAbsOrigin() - GetAbsOrigin() );
+	Vector toPlayer = ( pTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 	if ( bActiveUse || !HaveCommandGoal() || toPlayer.Length() < HEAL_TOSS_TARGET_RANGE )
 	{
 		if ( pTarget->m_iHealth > 0 )
@@ -3601,7 +3601,7 @@ void CNPC_Citizen::Heal()
 
 	CBaseEntity *pTarget = GetTarget();
 
-	Vector target = pTarget->GetAbsOrigin() - GetAbsOrigin();
+	Vector target = pTarget->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	if ( target.Length() > HEAL_TARGET_RANGE * 2 )
 		return;
 
@@ -3715,7 +3715,7 @@ void	CNPC_Citizen::TossHealthKit(CBaseCombatCharacter *pThrowAt, const Vector &o
 	Assert(pHealthKit);
 	if (pHealthKit)
 	{
-		pHealthKit->SetAbsOrigin( medKitOriginPoint );
+		pHealthKit->GetEngineObject()->SetAbsOrigin( medKitOriginPoint );
 		pHealthKit->SetOwnerEntity( this );
 		// pHealthKit->SetAbsVelocity( tossVelocity );
 		DispatchSpawn( pHealthKit );
@@ -4257,12 +4257,12 @@ void CSquadInsignia::Spawn()
 		int attachment = pOwner->LookupAttachment( "eyes" );
 		if ( attachment )
 		{
-			SetAbsAngles( GetOwnerEntity()->GetAbsAngles() );
+			GetEngineObject()->SetAbsAngles( GetOwnerEntity()->GetEngineObject()->GetAbsAngles() );
 			GetEngineObject()->SetParent( GetOwnerEntity()->GetEngineObject(), attachment);
 
 			Vector vecPosition;
 			vecPosition.Init( -2.5, 0, 3.9 );
-			SetLocalOrigin( vecPosition );
+			GetEngineObject()->SetLocalOrigin( vecPosition );
 		}
 	}
 

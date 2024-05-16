@@ -141,7 +141,7 @@ void CGrenadeAR2::GrenadeAR2Think( void )
 	// the floor already when I went solid so blow up
 	if (m_bIsLive)
 	{
-		if (GetAbsVelocity().Length() == 0.0 ||
+		if (GetEngineObject()->GetAbsVelocity().Length() == 0.0 ||
 			GetGroundEntity() != NULL )
 		{
 			Detonate();
@@ -156,7 +156,7 @@ void CGrenadeAR2::GrenadeAR2Think( void )
 		m_fDangerRadius += ( AR2_GRENADE_MAX_DANGER_RADIUS * 0.05 );
 	}
 
-	CSoundEnt::InsertSound( SOUND_DANGER, GetAbsOrigin() + GetAbsVelocity() * 0.5, m_fDangerRadius, 0.2, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
+	CSoundEnt::InsertSound( SOUND_DANGER, GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 0.5, m_fDangerRadius, 0.2, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
 }
 
 void CGrenadeAR2::Event_Killed( const CTakeDamageInfo &info )
@@ -203,10 +203,10 @@ void CGrenadeAR2::Detonate(void)
 		m_hSmokeTrail = NULL;
 	}
 
-	CPASFilter filter( GetAbsOrigin() );
+	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 
 	te->Explosion( filter, 0.0,
-		&GetAbsOrigin(), 
+		&GetEngineObject()->GetAbsOrigin(),
 		g_sModelIndexFireball,
 		2.0, 
 		15,
@@ -214,10 +214,10 @@ void CGrenadeAR2::Detonate(void)
 		m_DmgRadius,
 		m_flDamage );
 
-	Vector vecForward = GetAbsVelocity();
+	Vector vecForward = GetEngineObject()->GetAbsVelocity();
 	VectorNormalize(vecForward);
 	trace_t		tr;
-	UTIL_TraceLine ( GetAbsOrigin(), GetAbsOrigin() + 60*vecForward, MASK_SHOT, 
+	UTIL_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + 60*vecForward, MASK_SHOT,
 		this, COLLISION_GROUP_NONE, &tr);
 
 
@@ -234,9 +234,9 @@ void CGrenadeAR2::Detonate(void)
 		UTIL_DecalTrace( &tr, "Scorch" );
 	}
 
-	UTIL_ScreenShake( GetAbsOrigin(), 25.0, 150.0, 1.0, 750, SHAKE_START );
+	UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 25.0, 150.0, 1.0, 750, SHAKE_START );
 
-	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
+	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetEngineObject()->GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
 
 	UTIL_Remove( this );
 }

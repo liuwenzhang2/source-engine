@@ -329,7 +329,7 @@ void CCSBot::Update( void )
 
 	// keep track of how long we have been motionless
 	const float stillSpeed = 10.0f;
-	if (GetAbsVelocity().IsLengthLessThan( stillSpeed ))
+	if (GetEngineObject()->GetAbsVelocity().IsLengthLessThan( stillSpeed ))
 	{
 		m_stillTimer.Start();
 	}
@@ -446,7 +446,7 @@ void CCSBot::Update( void )
 				{
 					// if hiding with a knife, wait until threat is close
 					const float knifeAttackRange = 250.0f;
-					if ((GetAbsOrigin() - threat->GetAbsOrigin()).IsLengthLessThan( knifeAttackRange ))
+					if ((GetEngineObject()->GetAbsOrigin() - threat->GetEngineObject()->GetAbsOrigin()).IsLengthLessThan( knifeAttackRange ))
 					{
 						Attack( threat );
 					}

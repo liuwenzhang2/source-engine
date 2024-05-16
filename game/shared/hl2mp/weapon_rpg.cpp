@@ -298,8 +298,8 @@ void CMissile::AccelerateThink( void )
 
 	// SetEffects( EF_LIGHT );
 
-	AngleVectors( GetLocalAngles(), &vecForward );
-	SetAbsVelocity( vecForward * RPG_SPEED );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &vecForward );
+	GetEngineObject()->SetAbsVelocity( vecForward * RPG_SPEED );
 
 	SetThink( &CMissile::SeekThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -325,18 +325,18 @@ void CMissile::AugerThink( void )
 		m_lifeState = LIFE_DYING;
 	}
 
-	QAngle angles = GetLocalAngles();
+	QAngle angles = GetEngineObject()->GetLocalAngles();
 
 	angles.y += random->RandomFloat( -AUGER_YDEVIANCE, AUGER_YDEVIANCE );
 	angles.x += random->RandomFloat( -AUGER_XDEVIANCEDOWN, AUGER_XDEVIANCEUP );
 
-	SetLocalAngles( angles );
+	GetEngineObject()->SetLocalAngles( angles );
 
 	Vector vecForward;
 
-	AngleVectors( GetLocalAngles(), &vecForward );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &vecForward );
 	
-	SetAbsVelocity( vecForward * 1000.0f );
+	GetEngineObject()->SetAbsVelocity( vecForward * 1000.0f );
 
 	SetNextThink( gpGlobals->curtime + 0.05f );
 }
@@ -347,7 +347,7 @@ void CMissile::AugerThink( void )
 void CMissile::ShotDown( void )
 {
 	CEffectData	data;
-	data.m_vOrigin = GetAbsOrigin();
+	data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 
 	DispatchEffect( "RPGShotDown", data );
 
@@ -376,12 +376,12 @@ void CMissile::ShotDown( void )
 void CMissile::DoExplosion( void )
 {
 	//Fix GetAbsOrigin().z+1 in gamerules.cpp:349
-	Vector origin = GetAbsOrigin();
+	Vector origin = GetEngineObject()->GetAbsOrigin();
 	origin.z -= 1;
-	SetAbsOrigin( origin );
+	GetEngineObject()->SetAbsOrigin( origin );
 
 	// Explode
-	ExplosionCreate( GetAbsOrigin(), GetAbsAngles(), GetOwnerEntity(), GetDamage(), GetDamage() * 2, 
+	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetOwnerEntity(), GetDamage(), GetDamage() * 2,
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 0.0f, this);
 }
 
@@ -398,7 +398,7 @@ void CMissile::Explode( void )
 	GetVectors( &forward, NULL, NULL );
 
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + forward * 16, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + forward * 16, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
 	m_takedamage = DAMAGE_NO;
 	SetSolid( SOLID_NONE );
@@ -490,8 +490,8 @@ void CMissile::IgniteThink( void )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	AngleVectors( GetLocalAngles(), &vecForward );
-	SetAbsVelocity( vecForward * RPG_SPEED );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &vecForward );
+	GetEngineObject()->SetAbsVelocity( vecForward * RPG_SPEED );
 
 	SetThink( &CMissile::SeekThink );
 	SetNextThink( gpGlobals->curtime );
@@ -550,17 +550,17 @@ void CMissile::ComputeActualDotPosition( CLaserDot *pLaserDot, Vector *pActualDo
 	float flLaserLength = VectorNormalize( vLaserDir );
 	
 	//Find the length from the missile to the laser's owner
-	float flMissileLength = GetAbsOrigin().DistTo( vLaserStart );
+	float flMissileLength = GetEngineObject()->GetAbsOrigin().DistTo( vLaserStart );
 
 	//Find the length from the missile to the laser's position
 	Vector vecTargetToMissile;
-	VectorSubtract( GetAbsOrigin(), pLaserDot->GetChasePosition(), vecTargetToMissile ); 
+	VectorSubtract(GetEngineObject()->GetAbsOrigin(), pLaserDot->GetChasePosition(), vecTargetToMissile );
 	float flTargetLength = VectorNormalize( vecTargetToMissile );
 
 	// See if we should chase the line segment nearest us
 	if ( ( flMissileLength < flLaserLength ) || ( flTargetLength <= 512.0f ) )
 	{
-		*pActualDotPosition = UTIL_PointOnLineNearestPoint( vLaserStart, pLaserDot->GetChasePosition(), GetAbsOrigin() );
+		*pActualDotPosition = UTIL_PointOnLineNearestPoint( vLaserStart, pLaserDot->GetChasePosition(), GetEngineObject()->GetAbsOrigin() );
 		*pActualDotPosition += ( vLaserDir * 256.0f );
 	}
 	else
@@ -603,7 +603,7 @@ void CMissile::SeekThink( void )
 		if ( pEnt->GetOwnerEntity() != GetOwnerEntity() )
 			continue;
 
-		dotDist = (GetAbsOrigin() - pEnt->GetAbsOrigin()).Length();
+		dotDist = (GetEngineObject()->GetAbsOrigin() - pEnt->GetEngineObject()->GetAbsOrigin()).Length();
 
 		//Find closest
 		if ( dotDist < flBestDist )
@@ -632,10 +632,10 @@ void CMissile::SeekThink( void )
 		flHomingSpeed *= 2;
 
 	Vector	vTargetDir;
-	VectorSubtract( targetPos, GetAbsOrigin(), vTargetDir );
+	VectorSubtract( targetPos, GetEngineObject()->GetAbsOrigin(), vTargetDir );
 	float flDist = VectorNormalize( vTargetDir );
 
-	Vector	vDir	= GetAbsVelocity();
+	Vector	vDir	= GetEngineObject()->GetAbsVelocity();
 	float	flSpeed	= VectorNormalize( vDir );
 	Vector	vNewVelocity = vDir;
 	if ( gpGlobals->frametime > 0.0f )
@@ -658,12 +658,12 @@ void CMissile::SeekThink( void )
 
 	QAngle	finalAngles;
 	VectorAngles( vNewVelocity, finalAngles );
-	SetAbsAngles( finalAngles );
+	GetEngineObject()->SetAbsAngles( finalAngles );
 
 	vNewVelocity *= flSpeed;
-	SetAbsVelocity( vNewVelocity );
+	GetEngineObject()->SetAbsVelocity( vNewVelocity );
 
-	if( GetAbsVelocity() == vec3_origin )
+	if(GetEngineObject()->GetAbsVelocity() == vec3_origin )
 	{
 		// Strange circumstances have brought this missile to halt. Just blow it up.
 		Explode();
@@ -695,7 +695,7 @@ CMissile *CMissile::Create( const Vector &vecOrigin, const QAngle &vecAngles, CB
 	Vector vecForward;
 	AngleVectors( vecAngles, &vecForward );
 
-	pMissile->SetAbsVelocity( vecForward * 300 + Vector( 0,0, 128 ) );
+	pMissile->GetEngineObject()->SetAbsVelocity( vecForward * 300 + Vector( 0,0, 128 ) );
 
 	return pMissile;
 }
@@ -786,7 +786,7 @@ CBaseEntity *CInfoAPCMissileHint::FindAimTarget( CBaseEntity *pMissile, const ch
 	if ( !pTargetName )
 		return NULL;
 
-	float flOOSpeed = pMissile->GetAbsVelocity().Length();
+	float flOOSpeed = pMissile->GetEngineObject()->GetAbsVelocity().Length();
 	if ( flOOSpeed != 0.0f )
 	{
 		flOOSpeed = 1.0f / flOOSpeed;
@@ -802,8 +802,8 @@ CBaseEntity *CInfoAPCMissileHint::FindAimTarget( CBaseEntity *pMissile, const ch
 			continue;
 
 		Vector vecMissileToHint, vecMissileToEnemy;
-		VectorSubtract( pHint->m_hTarget->WorldSpaceCenter(), pMissile->GetAbsOrigin(), vecMissileToHint );
-		VectorSubtract( vecCurrentEnemyPos, pMissile->GetAbsOrigin(), vecMissileToEnemy );
+		VectorSubtract( pHint->m_hTarget->WorldSpaceCenter(), pMissile->GetEngineObject()->GetAbsOrigin(), vecMissileToHint );
+		VectorSubtract( vecCurrentEnemyPos, pMissile->GetEngineObject()->GetAbsOrigin(), vecMissileToEnemy );
 		float flDistMissileToHint = VectorNormalize( vecMissileToHint );
 		VectorNormalize( vecMissileToEnemy );
 		if ( DotProduct( vecMissileToHint, vecMissileToEnemy ) < 0.866f )
@@ -856,7 +856,7 @@ CAPCMissile *FindAPCMissileInCone( const Vector &vecOrigin, const Vector &vecDir
 			continue;
 
 		Vector vecDelta;
-		VectorSubtract( pEnt->GetAbsOrigin(), vecOrigin, vecDelta );
+		VectorSubtract( pEnt->GetEngineObject()->GetAbsOrigin(), vecOrigin, vecDelta );
 		VectorNormalize( vecDelta );
 		float flDot = DotProduct( vecDelta, vecDirection );
 		if ( flDot > flCosAngle )
@@ -909,7 +909,7 @@ CAPCMissile *CAPCMissile::Create( const Vector &vecOrigin, const QAngle &vecAngl
 	CAPCMissile *pMissile = (CAPCMissile *)CBaseEntity::Create( "apc_missile", vecOrigin, vecAngles, pOwner );
 	pMissile->SetOwnerEntity( pOwner );
 	pMissile->Spawn();
-	pMissile->SetAbsVelocity( vecVelocity );
+	pMissile->GetEngineObject()->SetAbsVelocity( vecVelocity );
 	pMissile->AddFlag( FL_NOTARGET );
 	pMissile->AddEffects( EF_NOSHADOW );
 	return pMissile;
@@ -1065,7 +1065,7 @@ void CAPCMissile::DoExplosion( void )
 	}
 	else
 	{
-		ExplosionCreate( GetAbsOrigin(), GetAbsAngles(), GetOwnerEntity(), 
+		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetOwnerEntity(),
 			APC_MISSILE_DAMAGE, 100, true, 20000 );
 	}
 }
@@ -1077,7 +1077,7 @@ void CAPCMissile::DoExplosion( void )
 void CAPCMissile::ComputeLeadingPosition( const Vector &vecShootPosition, CBaseEntity *pTarget, Vector *pLeadPosition )
 {
 	Vector vecTarget = pTarget->BodyTarget( vecShootPosition, false );
-	float flShotSpeed = GetAbsVelocity().Length();
+	float flShotSpeed = GetEngineObject()->GetAbsVelocity().Length();
 	if ( flShotSpeed == 0 )
 	{
 		*pLeadPosition = vecTarget;
@@ -1133,7 +1133,7 @@ void CAPCMissile::ComputeActualDotPosition( CLaserDot *pLaserDot, Vector *pActua
 {
 	if ( m_bGuidingDisabled )
 	{
-		*pActualDotPosition = GetAbsOrigin();
+		*pActualDotPosition = GetEngineObject()->GetAbsOrigin();
 		*pHomingSpeed = 0.0f;
 		m_flLastHomingSpeed = *pHomingSpeed;
 		return;
@@ -1145,7 +1145,7 @@ void CAPCMissile::ComputeActualDotPosition( CLaserDot *pLaserDot, Vector *pActua
 		CBaseEntity *pTarget = pLaserDot->GetTargetEntity();
 		if ( pTarget )
 		{
-			vecOrigin = pTarget->BodyTarget( GetAbsOrigin(), false );
+			vecOrigin = pTarget->BodyTarget(GetEngineObject()->GetAbsOrigin(), false );
 			vecVelocity	= pTarget->GetSmoothedVelocity();
 		}
 		else
@@ -1196,14 +1196,14 @@ void CAPCMissile::ComputeActualDotPosition( CLaserDot *pLaserDot, Vector *pActua
 	*pHomingSpeed = APC_LAUNCH_HOMING_SPEED;
 
 	//Get the laser's vector
-	Vector vecTargetPosition = pLaserTarget->BodyTarget( GetAbsOrigin(), false );
+	Vector vecTargetPosition = pLaserTarget->BodyTarget(GetEngineObject()->GetAbsOrigin(), false );
 
 	// Compute leading position
 	Vector vecLeadPosition;
-	ComputeLeadingPosition( GetAbsOrigin(), pLaserTarget, &vecLeadPosition );
+	ComputeLeadingPosition(GetEngineObject()->GetAbsOrigin(), pLaserTarget, &vecLeadPosition );
 
 	Vector vecTargetToMissile, vecTargetToShooter;
-	VectorSubtract( GetAbsOrigin(), vecTargetPosition, vecTargetToMissile ); 
+	VectorSubtract(GetEngineObject()->GetAbsOrigin(), vecTargetPosition, vecTargetToMissile );
 	VectorSubtract( vLaserStart, vecTargetPosition, vecTargetToShooter );
 
 	*pActualDotPosition = vecLeadPosition;
@@ -1226,7 +1226,7 @@ void CAPCMissile::ComputeActualDotPosition( CLaserDot *pLaserDot, Vector *pActua
 			flMinHomingDistance = MIN_NEAR_HOMING_DISTANCE;
 			flMaxHomingDistance = MAX_NEAR_HOMING_DISTANCE;
 			Vector vecDelta;
-			VectorSubtract( GetAbsOrigin(), *pActualDotPosition, vecDelta );
+			VectorSubtract(GetEngineObject()->GetAbsOrigin(), *pActualDotPosition, vecDelta );
 			if ( vecDelta.z > MIN_HEIGHT_DIFFERENCE )
 			{
 				float flClampedHeight = clamp( vecDelta.z, MIN_HEIGHT_DIFFERENCE, MAX_HEIGHT_DIFFERENCE );
@@ -1239,7 +1239,7 @@ void CAPCMissile::ComputeActualDotPosition( CLaserDot *pLaserDot, Vector *pActua
 				if ( flDist > flForwardOffset )
 				{
 					Vector vecNewPosition;
-					VectorMA( GetAbsOrigin(), -flForwardOffset, vecDelta, vecNewPosition );
+					VectorMA(GetEngineObject()->GetAbsOrigin(), -flForwardOffset, vecDelta, vecNewPosition );
 					vecNewPosition.z = pActualDotPosition->z;
 
 					VectorLerp( *pActualDotPosition, vecNewPosition, flHeightAdjustFactor, *pActualDotPosition );
@@ -1254,7 +1254,7 @@ void CAPCMissile::ComputeActualDotPosition( CLaserDot *pLaserDot, Vector *pActua
 		// Allows for players right at the edge of rocket range to be threatened
 		if ( flBlendTime > 0.6f )
 		{
-			float flTargetLength = GetAbsOrigin().DistTo( pLaserTarget->WorldSpaceCenter() );
+			float flTargetLength = GetEngineObject()->GetAbsOrigin().DistTo( pLaserTarget->WorldSpaceCenter() );
 			flTargetLength = clamp( flTargetLength, flMinHomingDistance, flMaxHomingDistance ); 
 			*pHomingSpeed = SimpleSplineRemapVal( flTargetLength, flMaxHomingDistance, flMinHomingDistance, *pHomingSpeed, 0.01f );
 		}
@@ -1613,7 +1613,7 @@ Vector CWeaponRPG::GetLaserPosition( void )
 	CreateLaserPointer();
 
 	if ( m_hLaserDot != NULL )
-		return m_hLaserDot->GetAbsOrigin();
+		return m_hLaserDot->GetEngineObject()->GetAbsOrigin();
 
 	//FIXME: The laser dot sprite is not active, this code should not be allowed!
 	assert(0);
@@ -1828,7 +1828,7 @@ void CWeaponRPG::CreateLaserPointer( void )
 	if ( pOwner->GetAmmoCount(m_iPrimaryAmmoType) <= 0 )
 		return;
 
-	m_hLaserDot = CLaserDot::Create( GetAbsOrigin(), GetOwner() );
+	m_hLaserDot = CLaserDot::Create(GetEngineObject()->GetAbsOrigin(), GetOwner() );
 	m_hLaserDot->TurnOff();
 
 	UpdateLaserPosition();
@@ -2199,13 +2199,13 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 
 void CLaserDot::SetLaserPosition( const Vector &origin, const Vector &normal )
 {
-	SetAbsOrigin( origin );
+	GetEngineObject()->SetAbsOrigin( origin );
 	m_vecSurfaceNormal = normal;
 }
 
 Vector CLaserDot::GetChasePosition()
 {
-	return GetAbsOrigin() - m_vecSurfaceNormal * 10;
+	return GetEngineObject()->GetAbsOrigin() - m_vecSurfaceNormal * 10;
 }
 
 //-----------------------------------------------------------------------------
@@ -2284,7 +2284,7 @@ int CLaserDot::DrawModel( int flags )
 	else
 	{
 		// Just use our position if we can't predict it otherwise
-		endPos = GetAbsOrigin();
+		endPos = GetEngineObject()->GetAbsOrigin();
 	}
 
 	// Randomly flutter

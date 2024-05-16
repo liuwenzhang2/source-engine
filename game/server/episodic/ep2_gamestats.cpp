@@ -273,7 +273,7 @@ void CEP2GameStats::Event_PlayerKilled( CBasePlayer *pPlayer, const CTakeDamageI
 	Ep2LevelStats_t::PlayerDeathsLump_t death;
 
 	// set the location where the target died
-	const Vector &org = pPlayer->GetAbsOrigin();
+	const Vector &org = pPlayer->GetEngineObject()->GetAbsOrigin();
 	death.nPosition[ 0 ] = static_cast<short>( org.x );
 	death.nPosition[ 1 ] = static_cast<short>( org.y );
 	death.nPosition[ 2 ] = static_cast<short>( org.z );
@@ -369,7 +369,7 @@ void CEP2GameStats::Event_PlayerTraveled( CBasePlayer *pBasePlayer, float distan
 	if ( rec && 
 		rec->m_nSaveHealth == -1 )
 	{
-		Vector pos = pBasePlayer->GetAbsOrigin();
+		Vector pos = pBasePlayer->GetEngineObject()->GetAbsOrigin();
 		rec->m_nSavePos[ 0 ] = (short)pos.x;
 		rec->m_nSavePos[ 1 ] = (short)pos.y;
 		rec->m_nSavePos[ 2 ] = (short)pos.z;
@@ -428,7 +428,7 @@ void CEP2GameStats::Event_SaveGame( void )
 	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 	if ( pPlayer )
 	{
-		Vector pos = pPlayer->GetAbsOrigin();
+		Vector pos = pPlayer->GetEngineObject()->GetAbsOrigin();
 		rec->m_nSavePos[ 0 ] = (short)pos.x;
 		rec->m_nSavePos[ 1 ] = (short)pos.y;
 		rec->m_nSavePos[ 2 ] = (short)pos.z;

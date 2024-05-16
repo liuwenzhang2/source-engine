@@ -416,7 +416,7 @@ void CWeaponEgon::UpdateEffect( const Vector &startPoint, const Vector &endPoint
 
 	if ( m_hSprite )
 	{
-		m_hSprite->SetAbsOrigin( endPoint );
+		m_hSprite->GetEngineObject()->SetAbsOrigin( endPoint );
 
 		m_hSprite->m_flFrame += 8 * gpGlobals->frametime;
 		if ( m_hSprite->m_flFrame > m_hSprite->Frames() )
@@ -441,7 +441,7 @@ void CWeaponEgon::CreateEffect( void )
 	DestroyEffect();
 
 	m_hBeam = CBeam::BeamCreate( EGON_BEAM_SPRITE, 3.5 );
-	m_hBeam->PointEntInit( GetAbsOrigin(), this );
+	m_hBeam->PointEntInit(GetEngineObject()->GetAbsOrigin(), this );
 	m_hBeam->SetBeamFlags( FBEAM_SINENOISE );
 	m_hBeam->SetEndAttachment( 1 );
 	m_hBeam->AddSpawnFlags( SF_BEAM_TEMPORARY );	// Flag these to be destroyed on save/restore or level transition
@@ -452,7 +452,7 @@ void CWeaponEgon::CreateEffect( void )
 	m_hBeam->SetNoise( 0.2 );
 
 	m_hNoise = CBeam::BeamCreate( EGON_BEAM_SPRITE, 5.0 );
-	m_hNoise->PointEntInit( GetAbsOrigin(), this );
+	m_hNoise->PointEntInit(GetEngineObject()->GetAbsOrigin(), this );
 	m_hNoise->SetEndAttachment( 1 );
 	m_hNoise->AddSpawnFlags( SF_BEAM_TEMPORARY );
 	m_hNoise->SetOwnerEntity( pPlayer );
@@ -461,7 +461,7 @@ void CWeaponEgon::CreateEffect( void )
 	m_hNoise->SetColor( 50, 50, 255 );
 	m_hNoise->SetNoise( 0.8 );
 
-	m_hSprite = CSprite::SpriteCreate( EGON_FLARE_SPRITE, GetAbsOrigin(), false );
+	m_hSprite = CSprite::SpriteCreate( EGON_FLARE_SPRITE, GetEngineObject()->GetAbsOrigin(), false );
 	m_hSprite->SetScale( 1.0 );
 	m_hSprite->SetTransparency( kRenderGlow, 255, 255, 255, 255, kRenderFxNoDissipation );
 	m_hSprite->AddSpawnFlags( SF_SPRITE_TEMPORARY );

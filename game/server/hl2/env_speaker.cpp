@@ -59,7 +59,7 @@ void CSpeaker::Spawn( void )
 
 	if ( Q_strlen( soundfile ) < 1 )
 	{
-		Warning( "'speaker' entity with no Level/Sentence! at: %f, %f, %f\n", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
+		Warning( "'speaker' entity with no Level/Sentence! at: %f, %f, %f\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 		SetNextThink( gpGlobals->curtime + 0.1f );
 		SetThink( &CSpeaker::SUB_Remove );
 		return;

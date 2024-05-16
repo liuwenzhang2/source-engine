@@ -104,14 +104,14 @@ void CGravityVortexController::PullPlayersInRange( void )
 {
 	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 	
-	Vector	vecForce = GetAbsOrigin() - pPlayer->WorldSpaceCenter();
+	Vector	vecForce = GetEngineObject()->GetAbsOrigin() - pPlayer->WorldSpaceCenter();
 	float	dist = VectorNormalize( vecForce );
 	
 	// FIXME: Need a more deterministic method here
 	if ( dist < 128.0f )
 	{
 		// Kill the player (with falling death sound and effects)
-		CTakeDamageInfo deathInfo( this, this, GetAbsOrigin(), GetAbsOrigin(), 200, DMG_FALL );
+		CTakeDamageInfo deathInfo( this, this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), 200, DMG_FALL );
 		pPlayer->TakeDamage( deathInfo );
 		
 		if ( pPlayer->IsAlive() == false )
@@ -190,7 +190,7 @@ void CGravityVortexController::CreateDenseBall( void )
 	CBaseEntity *pBall = gEntList.CreateEntityByName( "prop_physics" );
 	
 	pBall->SetModel( DENSE_BALL_MODEL );
-	pBall->SetAbsOrigin( GetAbsOrigin() );
+	pBall->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 	pBall->Spawn();
 
 	IPhysicsObject *pObj = pBall->VPhysicsGetObject();
@@ -209,13 +209,13 @@ void CGravityVortexController::PullThink( void )
 	PullPlayersInRange();
 
 	Vector mins, maxs;
-	mins = GetAbsOrigin() - Vector( m_flRadius, m_flRadius, m_flRadius );
-	maxs = GetAbsOrigin() + Vector( m_flRadius, m_flRadius, m_flRadius );
+	mins = GetEngineObject()->GetAbsOrigin() - Vector( m_flRadius, m_flRadius, m_flRadius );
+	maxs = GetEngineObject()->GetAbsOrigin() + Vector( m_flRadius, m_flRadius, m_flRadius );
 
 	// Draw debug information
 	if ( g_debug_hopwire.GetBool() )
 	{
-		NDebugOverlay::Box( GetAbsOrigin(), mins - GetAbsOrigin(), maxs - GetAbsOrigin(), 0, 255, 0, 16, 4.0f );
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), mins - GetEngineObject()->GetAbsOrigin(), maxs - GetEngineObject()->GetAbsOrigin(), 0, 255, 0, 16, 4.0f );
 	}
 
 	CBaseEntity *pEnts[128];
@@ -253,7 +253,7 @@ void CGravityVortexController::PullThink( void )
 			mass = pPhysObject->GetMass();
 		}
 
-		Vector	vecForce = GetAbsOrigin() - pEnts[i]->WorldSpaceCenter();
+		Vector	vecForce = GetEngineObject()->GetAbsOrigin() - pEnts[i]->WorldSpaceCenter();
 		Vector	vecForce2D = vecForce;
 		vecForce2D[2] = 0.0f;
 		float	dist2D = VectorNormalize( vecForce2D );
@@ -276,7 +276,7 @@ void CGravityVortexController::PullThink( void )
 		if ( pEnts[i]->VPhysicsGetObject() )
 		{
 			// Pull the object in
-			pEnts[i]->VPhysicsTakeDamage( CTakeDamageInfo( this, this, vecForce, GetAbsOrigin(), m_flStrength, DMG_BLAST ) );
+			pEnts[i]->VPhysicsTakeDamage( CTakeDamageInfo( this, this, vecForce, GetEngineObject()->GetAbsOrigin(), m_flStrength, DMG_BLAST ) );
 		}
 	}
 
@@ -298,7 +298,7 @@ void CGravityVortexController::PullThink( void )
 //-----------------------------------------------------------------------------
 void CGravityVortexController::StartPull( const Vector &origin, float radius, float strength, float duration )
 {
-	SetAbsOrigin( origin );
+	GetEngineObject()->SetAbsOrigin( origin );
 	m_flEndTime	= gpGlobals->curtime + duration;
 	m_flRadius	= radius;
 	m_flStrength= strength;
@@ -423,7 +423,7 @@ void CGrenadeHopwire::KillStriders( void )
 	// FIXME: It's probably much faster to simply iterate over the striders in the map, rather than any entity in the radius - jdw
 
 	// Find any striders in range of us
-	int numTargets = UTIL_EntitiesInBox( pEnts, ARRAYSIZE( pEnts ), GetAbsOrigin()+mins, GetAbsOrigin()+maxs, FL_NPC );
+	int numTargets = UTIL_EntitiesInBox( pEnts, ARRAYSIZE( pEnts ), GetEngineObject()->GetAbsOrigin()+mins, GetEngineObject()->GetAbsOrigin()+maxs, FL_NPC );
 	float targetDistHorz, targetDistVert;
 
 	for ( int i = 0; i < numTargets; i++ )
@@ -433,19 +433,19 @@ void CGrenadeHopwire::KillStriders( void )
 			continue;
 
 		// We categorize our spatial relation to the strider in horizontal and vertical terms, so that we can specify both parameters separately
-		targetDistHorz = UTIL_DistApprox2D( pEnts[i]->GetAbsOrigin(), GetAbsOrigin() );
-		targetDistVert = fabs( pEnts[i]->GetAbsOrigin()[2] - GetAbsOrigin()[2] );
+		targetDistHorz = UTIL_DistApprox2D( pEnts[i]->GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() );
+		targetDistVert = fabs( pEnts[i]->GetEngineObject()->GetAbsOrigin()[2] - GetEngineObject()->GetAbsOrigin()[2] );
 
 		if ( targetDistHorz < MAX_STRIDER_KILL_DISTANCE_HORZ && targetDistHorz < MAX_STRIDER_KILL_DISTANCE_VERT )
 		{
 			// Kill the strider
 			float fracDamage = ( pEnts[i]->GetMaxHealth() / hopwire_strider_hits.GetFloat() ) + 1.0f;
 			CTakeDamageInfo killInfo( this, this, fracDamage, DMG_GENERIC );
-			Vector	killDir = pEnts[i]->GetAbsOrigin() - GetAbsOrigin();
+			Vector	killDir = pEnts[i]->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 			VectorNormalize( killDir );
 
 			killInfo.SetDamageForce( killDir * -1000.0f );
-			killInfo.SetDamagePosition( GetAbsOrigin() );
+			killInfo.SetDamagePosition(GetEngineObject()->GetAbsOrigin() );
 
 			pEnts[i]->TakeDamage( killInfo );
 		}
@@ -483,7 +483,7 @@ void CGrenadeHopwire::CombatThink( void )
 	GetEngineObject()->AddEFlags( EF_NODRAW );
 	AddFlag( FSOLID_NOT_SOLID );
 	VPhysicsDestroyObject();
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetMoveType( MOVETYPE_NONE );
 
 	// Do special behaviors if there are any striders in the area
@@ -501,7 +501,7 @@ void CGrenadeHopwire::CombatThink( void )
 	// Create the vortex controller to pull entities towards us
 	if ( hopwire_vortex.GetBool() )
 	{
-		m_hVortexController = CGravityVortexController::Create( GetAbsOrigin(), 512, 150, 3.0f );
+		m_hVortexController = CGravityVortexController::Create(GetEngineObject()->GetAbsOrigin(), 512, 150, 3.0f );
 
 		// Start our client-side effect
 		EntityMessageBegin( this, true );
@@ -544,7 +544,7 @@ void CGrenadeHopwire::Detonate( void )
 
 	//Find out how tall the ceiling is and always try to hop halfway
 	trace_t	tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, MAX_HOP_HEIGHT*2 ), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, MAX_HOP_HEIGHT*2 ), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 
 	// Jump half the height to the found ceiling
 	float hopHeight = MIN( MAX_HOP_HEIGHT, (MAX_HOP_HEIGHT*tr.fraction) );

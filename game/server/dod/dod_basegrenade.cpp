@@ -153,7 +153,7 @@ void CDODBaseGrenade::DetonateThink( void )
 
 	if (GetWaterLevel() != 0)
 	{
-		SetAbsVelocity( GetAbsVelocity() * 0.5 );
+		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.5 );
 	}
 
 	SetNextThink( gpGlobals->curtime + 0.2 );
@@ -181,7 +181,7 @@ void CDODBaseGrenade::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelo
 
 	// NOTE: A backoff of 2.0f is a reflection
 	Vector vecAbsVelocity;
-	PhysicsClipVelocity( GetAbsVelocity(), trace.plane.normal, vecAbsVelocity, 2.0f );
+	PhysicsClipVelocity(GetEngineObject()->GetAbsVelocity(), trace.plane.normal, vecAbsVelocity, 2.0f );
 	vecAbsVelocity *= flTotalElasticity;
 
 	// Get the total velocity (player + conveyors, etc.)
@@ -205,7 +205,7 @@ void CDODBaseGrenade::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelo
 
 			vecAbsVelocity.z = 0.0f;
 		}
-		SetAbsVelocity( vecAbsVelocity );
+		GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 
 		if ( flSpeedSqr < ( 30 * 30 ) )
 		{
@@ -215,7 +215,7 @@ void CDODBaseGrenade::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelo
 			}
 
 			// Reset velocities.
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 			SetLocalAngularVelocity( vec3_angle );
 		}
 		else
@@ -237,12 +237,12 @@ void CDODBaseGrenade::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelo
 		if ( flSpeedSqr < ( 30 * 30 ) )
 		{
 			// Reset velocities.
-			SetAbsVelocity( vec3_origin );
+			GetEngineObject()->SetAbsVelocity( vec3_origin );
 			SetLocalAngularVelocity( vec3_angle );
 		}
 		else
 		{
-			SetAbsVelocity( vecAbsVelocity );
+			GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 		}
 	}
 	
@@ -351,8 +351,8 @@ void CDODBaseGrenade::Detonate()
 	// stun players in a radius
 	const float flStunDamage = 100;
 
-	CTakeDamageInfo info( this, GetThrower(), GetBlastForce(), GetAbsOrigin(), flStunDamage, DMG_STUN );
-	DODGameRules()->RadiusStun( info, GetAbsOrigin(), m_DmgRadius );
+	CTakeDamageInfo info( this, GetThrower(), GetBlastForce(), GetEngineObject()->GetAbsOrigin(), flStunDamage, DMG_STUN );
+	DODGameRules()->RadiusStun( info, GetEngineObject()->GetAbsOrigin(), m_DmgRadius );
 
 	BaseClass::Detonate();
 }
@@ -374,18 +374,18 @@ void CDODBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	// Pull out of the wall a bit
 	if ( pTrace->fraction != 1.0 )
 	{
-		SetAbsOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6) );
+		GetEngineObject()->SetAbsOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6) );
 	}
 
 	// Explosion effect on client
-	Vector vecOrigin = GetAbsOrigin();
+	Vector vecOrigin = GetEngineObject()->GetAbsOrigin();
 	CPVSFilter filter( vecOrigin );
 	TE_DODExplosion( filter, 0.0f, vecOrigin, pTrace->plane.normal );
 
 	// Use the thrower's position as the reported position
-	Vector vecReported = GetThrower() ? GetThrower()->GetAbsOrigin() : vec3_origin;
+	Vector vecReported = GetThrower() ? GetThrower()->GetEngineObject()->GetAbsOrigin() : vec3_origin;
 
-	CTakeDamageInfo info( this, GetThrower(), GetBlastForce(), GetAbsOrigin(), m_flDamage, bitsDamageType, 0, &vecReported );
+	CTakeDamageInfo info( this, GetThrower(), GetBlastForce(), GetEngineObject()->GetAbsOrigin(), m_flDamage, bitsDamageType, 0, &vecReported );
 
 	RadiusDamage( info, vecOrigin, GetDamageRadius(), CLASS_NONE, NULL );
 
@@ -399,7 +399,7 @@ void CDODBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	SetTouch( NULL );
 
 	AddEffects( EF_NODRAW );
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetNextThink( gpGlobals->curtime );
 }
 
@@ -448,7 +448,7 @@ void CDODBaseGrenade::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	AngularImpulse angVel;
 	pPhysics->GetVelocity( &vel, &angVel );
 
-	Vector start = GetAbsOrigin();
+	Vector start = GetEngineObject()->GetAbsOrigin();
 	// find all entities that my collision group wouldn't hit, but COLLISION_GROUP_NONE would and bounce off of them as a ray cast
 	CTraceFilterCollisionGroupDelta filter( this, GetCollisionGroup(), COLLISION_GROUP_NONE );
 	trace_t tr;
@@ -483,13 +483,13 @@ void CDODBaseGrenade::VPhysicsUpdate( IPhysicsObject *pPhysics )
 		float flDmg = 5 * flPercent;
 
 		// send a tiny amount of damage so the character will react to getting bonked
-		CTakeDamageInfo info( this, GetThrower(), pPhysics->GetMass() * vel, GetAbsOrigin(), flDmg, DMG_CRUSH );
+		CTakeDamageInfo info( this, GetThrower(), pPhysics->GetMass() * vel, GetEngineObject()->GetAbsOrigin(), flDmg, DMG_CRUSH );
 		((CBaseEntity*)tr.m_pEnt)->DispatchTraceAttack( info, dir, &tr );
 		ApplyMultiDamage();
 
 		if ( vel.Length() > 1000 )
 		{
-			CTakeDamageInfo stunInfo( this, GetThrower(), vec3_origin, GetAbsOrigin(), flDmg, DMG_STUN );
+			CTakeDamageInfo stunInfo( this, GetThrower(), vec3_origin, GetEngineObject()->GetAbsOrigin(), flDmg, DMG_STUN );
 			((CBaseEntity*)tr.m_pEnt)->TakeDamage( stunInfo );
 		}
 

@@ -204,8 +204,8 @@ void CPortalGameMovement::FunnelIntoPortal( CProp_Portal *pPortal, Vector &wishd
 	if ( vPlayerForward.z > -0.1f )
 		return;
 
-	Vector vPlayerOrigin = pPlayer->GetAbsOrigin();
-	Vector vPlayerToPortal = pPortal->GetAbsOrigin() - vPlayerOrigin;
+	Vector vPlayerOrigin = pPlayer->GetEngineObject()->GetAbsOrigin();
+	Vector vPlayerToPortal = pPortal->GetEngineObject()->GetAbsOrigin() - vPlayerOrigin;
 
 	// Make sure the player is trying to air control, they're falling downward and they are vertically close to the portal
 	if ( fabsf( wishdir[ 0 ] ) > 64.0f || fabsf( wishdir[ 1 ] ) > 64.0f || mv->m_vecVelocity[ 2 ] > -165.0f || vPlayerToPortal.z < -512.0f )
@@ -379,7 +379,7 @@ void CPortalGameMovement::PlayerRoughLandingEffects( float fvol )
 	{
 		// Play the future shoes sound
 		CRecipientFilter filter;
-		filter.AddRecipientsByPAS( player->GetAbsOrigin() );
+		filter.AddRecipientsByPAS( player->GetEngineObject()->GetAbsOrigin() );
 
 		CSoundParameters params;
 		if (g_pSoundEmitterSystem->GetParametersForSound( "PortalPlayer.FallRecover", params, NULL ) )//CBaseEntity::
@@ -631,7 +631,7 @@ int CPortalGameMovement::CheckStuck( void )
 		{
 			vIndecisive.Init( 0.0f, 0.0f, 1.0f );
 		}
-		Vector ptOldOrigin = pPortalPlayer->GetAbsOrigin();
+		Vector ptOldOrigin = pPortalPlayer->GetEngineObject()->GetAbsOrigin();
 
 		if( pPortalPlayer->m_hPortalEnvironment )
 		{
@@ -646,14 +646,14 @@ int CPortalGameMovement::CheckStuck( void )
 			}
 
 			//make sure we didn't get put behind the portal >_<
-			Vector ptCurrentOrigin = pPortalPlayer->GetAbsOrigin();
+			Vector ptCurrentOrigin = pPortalPlayer->GetEngineObject()->GetAbsOrigin();
 			if( vIndecisive.Dot( ptCurrentOrigin - ptOldOrigin ) < 0.0f )
 			{
-				pPortalPlayer->SetAbsOrigin( ptOldOrigin + (vIndecisive * 5.0f) ); //this is an anti-bug hack, since this would have probably popped them out of the world, we're just going to move them forward a few units
+				pPortalPlayer->GetEngineObject()->SetAbsOrigin( ptOldOrigin + (vIndecisive * 5.0f) ); //this is an anti-bug hack, since this would have probably popped them out of the world, we're just going to move them forward a few units
 			}
 		}
 
-		mv->SetAbsOrigin( pPortalPlayer->GetAbsOrigin() );
+		mv->SetAbsOrigin( pPortalPlayer->GetEngineObject()->GetAbsOrigin() );
 		return BaseClass::CheckStuck();
 	}
 	else

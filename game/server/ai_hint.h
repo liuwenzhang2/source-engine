@@ -228,7 +228,7 @@ public:
 	static CAI_Hint		*FindHintRandom( CAI_BaseNPC *pNPC, const Vector &position, const CHintCriteria &hintCriteria );
 	static int			FindAllHints( CAI_BaseNPC *pNPC, const Vector &position, const CHintCriteria &hintCriteria, CUtlVector<CAI_Hint *> *pResult );
 	static int			FindAllHints( const Vector &position, const CHintCriteria &hintCriteria, CUtlVector<CAI_Hint *> *pResult )	{ return FindAllHints( NULL, position, hintCriteria, pResult ); }
-	static int			FindAllHints( CAI_BaseNPC *pNPC, const CHintCriteria &hintCriteria, CUtlVector<CAI_Hint *> *pResult )		{ return FindAllHints( pNPC, pNPC->GetAbsOrigin(), hintCriteria, pResult ); }
+	static int			FindAllHints( CAI_BaseNPC *pNPC, const CHintCriteria &hintCriteria, CUtlVector<CAI_Hint *> *pResult )		{ return FindAllHints( pNPC, pNPC->GetEngineObject()->GetAbsOrigin(), hintCriteria, pResult ); }
 	static int			GetFlags( const char *token );
 
 	static CAI_Hint		*GetFirstHint( AIHintIter_t *pIter );					

@@ -59,30 +59,30 @@ public:
 	// NOTE: Setting the abs velocity in either space will cause a recomputation
 // in the other space, so setting the abs velocity will also set the local vel
 	virtual void SetAbsVelocity(const Vector& vecVelocity) = 0;
-	virtual Vector& GetAbsVelocity() = 0;
+	//virtual const Vector& GetAbsVelocity() = 0;
 	virtual const Vector& GetAbsVelocity() const = 0;
 
 	// Sets abs angles, but also sets local angles to be appropriate
 	virtual void SetAbsOrigin(const Vector& origin) = 0;
-	virtual Vector& GetAbsOrigin(void) = 0;
+	//virtual const Vector& GetAbsOrigin(void) = 0;
 	virtual const Vector& GetAbsOrigin(void) const = 0;
 
 	virtual void SetAbsAngles(const QAngle& angles) = 0;
-	virtual QAngle& GetAbsAngles(void) = 0;
+	//virtual const QAngle& GetAbsAngles(void) = 0;
 	virtual const QAngle& GetAbsAngles(void) const = 0;
 
 	virtual void SetLocalOrigin(const Vector& origin) = 0;
 	virtual void SetLocalOriginDim(int iDim, vec_t flValue) = 0;
 	virtual const Vector& GetLocalOrigin(void) const = 0;
-	virtual vec_t GetLocalOriginDim(int iDim) const = 0;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
+	virtual const vec_t GetLocalOriginDim(int iDim) const = 0;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
 
 	virtual void SetLocalAngles(const QAngle& angles) = 0;
 	virtual void SetLocalAnglesDim(int iDim, vec_t flValue) = 0;
 	virtual const QAngle& GetLocalAngles(void) const = 0;
-	virtual vec_t GetLocalAnglesDim(int iDim) const = 0;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
+	virtual const vec_t GetLocalAnglesDim(int iDim) const = 0;		// You can use the X_INDEX, Y_INDEX, and Z_INDEX defines here.
 
 	virtual void SetLocalVelocity(const Vector& vecVelocity) = 0;
-	virtual Vector& GetLocalVelocity() = 0;
+	//virtual const Vector& GetLocalVelocity() = 0;
 	virtual const Vector& GetLocalVelocity() const = 0;
 
 	virtual const Vector& GetPrevLocalOrigin() const = 0;
@@ -102,8 +102,8 @@ public:
 	// If iAttachment is a valid attachment on the parent, then your local origin and angles 
 	// are relative to the attachment on this entity.
 	virtual void SetParent(IEngineObjectClient* pParentEntity, int iParentAttachment = 0) = 0;
-	virtual void UnlinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild) = 0;
-	virtual void LinkChild(IEngineObjectClient* pParent, IEngineObjectClient* pChild) = 0;
+	virtual void UnlinkChild(IEngineObjectClient* pChild) = 0;
+	virtual void LinkChild(IEngineObjectClient* pChild) = 0;
 	virtual void HierarchySetParent(IEngineObjectClient* pNewParent) = 0;
 	virtual void UnlinkFromHierarchy() = 0;
 
@@ -120,7 +120,7 @@ public:
 
 	virtual void ResetRgflCoordinateFrame() = 0;
 	// Returns the entity-to-world transform
-	virtual matrix3x4_t& EntityToWorldTransform() = 0;
+	//virtual matrix3x4_t& EntityToWorldTransform() = 0;
 	virtual const matrix3x4_t& EntityToWorldTransform() const = 0;
 
 	// Some helper methods that transform a point from entity space to world space + back
@@ -230,8 +230,8 @@ public:
 	virtual void			Release( void ) = 0;
 	
 	// Network origin + angles
-	virtual const Vector&	GetAbsOrigin( void ) const = 0;
-	virtual const QAngle&	GetAbsAngles( void ) const = 0;
+	//virtual const Vector&	GetAbsOrigin( void ) const = 0;
+	//virtual const QAngle&	GetAbsAngles( void ) const = 0;
 
 	virtual CMouthInfo		*GetMouth( void ) = 0;
 

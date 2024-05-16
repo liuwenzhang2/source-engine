@@ -455,8 +455,8 @@ void CPendulum::Spawn( void )
 
 		m_flAccel = ( m_flSpeed * m_flSpeed ) / ( 2 * fabs( m_flMoveDistance ));	// Calculate constant acceleration from speed and distance
 		m_flMaxSpeed = m_flSpeed;
-		m_vStart = GetAbsAngles();
-		m_vCenter = GetAbsAngles() + ( m_flMoveDistance * 0.05 ) * m_vecMoveAng;
+		m_vStart = GetEngineObject()->GetAbsAngles();
+		m_vCenter = GetEngineObject()->GetAbsAngles() + ( m_flMoveDistance * 0.05 ) * m_vecMoveAng;
 
 		if ( FBitSet( m_spawnflags, SF_BRUSH_ROTATE_START_ON ) )
 		{		
@@ -486,7 +486,7 @@ void CPendulum::PendulumUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 		{		
 			float	delta;
 
-			delta = CBaseToggle::AxisDelta( m_spawnflags, GetAbsAngles(), m_vStart );
+			delta = CBaseToggle::AxisDelta( m_spawnflags, GetEngineObject()->GetAbsAngles(), m_vStart );
 
 			SetLocalAngularVelocity( m_flMaxSpeed * m_vecMoveAng );
 			SetNextThink( gpGlobals->curtime + delta / m_flMaxSpeed);
@@ -518,7 +518,7 @@ void CPendulum::InputActivate( inputdata_t &inputdata )
 
 void CPendulum::Stop( void )
 {
-	SetAbsAngles( m_vStart );
+	GetEngineObject()->SetAbsAngles( m_vStart );
 	m_flSpeed = 0;
 	SetThink( NULL );
 	SetLocalAngularVelocity( QAngle ( 0, 0, 0 ) );
@@ -534,7 +534,7 @@ void CPendulum::Swing( void )
 {
 	float delta, dt;
 	
-	delta = CBaseToggle::AxisDelta( m_spawnflags, GetAbsAngles(), m_vCenter );
+	delta = CBaseToggle::AxisDelta( m_spawnflags, GetEngineObject()->GetAbsAngles(), m_vCenter );
 	dt = gpGlobals->curtime - m_flTime;	// How much time has passed?
 	m_flTime = gpGlobals->curtime;		// Remember the last time called
 
@@ -560,7 +560,7 @@ void CPendulum::Swing( void )
 		m_flDampSpeed -= m_flDamp * m_flDampSpeed * dt;
 		if ( m_flDampSpeed < 30.0 )
 		{
-			SetAbsAngles( m_vCenter );
+			GetEngineObject()->SetAbsAngles( m_vCenter );
 			m_flSpeed = 0;
 			SetThink( NULL );
 			SetLocalAngularVelocity( QAngle( 0, 0, 0 ) );
@@ -589,11 +589,11 @@ void CPendulum::Touch ( CBaseEntity *pOther )
 
 	pOther->TakeDamage( CTakeDamageInfo( this, this, damage, DMG_CRUSH ) );
 	
-	Vector vNewVel = (pOther->GetAbsOrigin() - GetAbsOrigin());
+	Vector vNewVel = (pOther->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin());
 	
 	VectorNormalize( vNewVel );
 
-	pOther->SetAbsVelocity( vNewVel * damage );
+	pOther->GetEngineObject()->SetAbsVelocity( vNewVel * damage );
 }
 
 void CPendulum::RopeTouch ( CBaseEntity *pOther )
@@ -608,7 +608,7 @@ void CPendulum::RopeTouch ( CBaseEntity *pOther )
 		 return;
 	
 	m_hEnemy = pOther;
-	pOther->SetAbsVelocity( Vector ( 0, 0, 0 ) );
+	pOther->GetEngineObject()->SetAbsVelocity( Vector ( 0, 0, 0 ) );
 	pOther->SetMoveType( MOVETYPE_NONE );
 }
 
@@ -690,8 +690,8 @@ void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 	case 1: // Trigger Activator
 		if (inputdata.pActivator != NULL)
 		{
-			vecStart.x = inputdata.pActivator->GetAbsOrigin().x;
-			vecStart.y = inputdata.pActivator->GetAbsOrigin().y;
+			vecStart.x = inputdata.pActivator->GetEngineObject()->GetAbsOrigin().x;
+			vecStart.y = inputdata.pActivator->GetEngineObject()->GetAbsOrigin().y;
 		}
 		break;
 	case 2: // table
@@ -706,7 +706,7 @@ void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 					if ( FClassnameIs( pController, "momentary_rot_button" ) )
 					{
 						CMomentaryRotButton *pXController = static_cast<CMomentaryRotButton*>( pController );
-						Vector vecNormalizedPos( pXController->GetPos( pXController->GetLocalAngles() ), 0.0f, 0.0f );
+						Vector vecNormalizedPos( pXController->GetPos( pXController->GetEngineObject()->GetLocalAngles() ), 0.0f, 0.0f );
 						Vector vecWorldSpace;
 						CollisionProp()->NormalizedToWorldSpace( vecNormalizedPos, &vecWorldSpace );
 						vecStart.x = vecWorldSpace.x;
@@ -725,7 +725,7 @@ void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 					if ( FClassnameIs( pController, "momentary_rot_button" ) )
 					{
 						CMomentaryRotButton *pYController = static_cast<CMomentaryRotButton*>( pController );
-						Vector vecNormalizedPos( 0.0f, pYController->GetPos( pYController->GetLocalAngles() ), 0.0f );
+						Vector vecNormalizedPos( 0.0f, pYController->GetPos( pYController->GetEngineObject()->GetLocalAngles() ), 0.0f );
 						Vector vecWorldSpace;
 						CollisionProp()->NormalizedToWorldSpace( vecNormalizedPos, &vecWorldSpace );
 						vecStart.y = vecWorldSpace.y;
@@ -808,14 +808,14 @@ void CMortar::Precache( )
 
 void CMortar::MortarExplode( void )
 {
-	Vector vecStart	= GetAbsOrigin();
+	Vector vecStart	= GetEngineObject()->GetAbsOrigin();
 	Vector vecEnd	= vecStart;
 	vecEnd.z += 1024;
 
 	UTIL_Beam( vecStart, vecEnd, m_spriteTexture, 0, 0, 0, 0.5, 4.0, 4.0, 100, 0, 255, 160, 100, 128, 0 );
 
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin() + Vector( 0, 0, 1024 ), GetAbsOrigin() - Vector( 0, 0, 1024 ), MASK_ALL, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 1024 ), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 1024 ), MASK_ALL, this, COLLISION_GROUP_NONE, &tr );
 
 
 	Explode( &tr, DMG_BLAST | DMG_MISSILEDEFENSE );
@@ -1010,7 +1010,7 @@ void CXenPLight::Spawn( void )
 	SetNextThink( gpGlobals->curtime + 0.1 );
 	SetCycle( random->RandomFloat(0,1) );
 
-	m_pGlow = CSprite::SpriteCreate( XEN_PLANT_GLOW_SPRITE, GetLocalOrigin() + Vector(0,0,(WorldAlignMins().z+WorldAlignMaxs().z)*0.5), FALSE );
+	m_pGlow = CSprite::SpriteCreate( XEN_PLANT_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin() + Vector(0,0,(WorldAlignMins().z+WorldAlignMaxs().z)*0.5), FALSE );
 	m_pGlow->SetTransparency( kRenderGlow, GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, GetRenderColor().a, m_nRenderFX );
 	m_pGlow->SetAttachment( this, 1 );
 }
@@ -1148,7 +1148,7 @@ LINK_ENTITY_TO_CLASS( xen_ttrigger, CXenTreeTrigger );
 CXenTreeTrigger *CXenTreeTrigger::TriggerCreate( CBaseEntity *pOwner, const Vector &position )
 {
 	CXenTreeTrigger *pTrigger = (CXenTreeTrigger*)gEntList.CreateEntityByName( "xen_ttrigger" );
-	pTrigger->SetAbsOrigin( position );
+	pTrigger->GetEngineObject()->SetAbsOrigin( position );
 
 	pTrigger->SetSolid( SOLID_BBOX );
 	pTrigger->AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
@@ -1212,8 +1212,8 @@ void CXenTree::Spawn( void )
 
 	Vector triggerPosition, vForward;
 
-	AngleVectors( GetAbsAngles(), &vForward );
-	triggerPosition = GetAbsOrigin() + (vForward * 64);
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
+	triggerPosition = GetEngineObject()->GetAbsOrigin() + (vForward * 64);
 	
 	// Create the trigger
 	m_pTrigger = CXenTreeTrigger::TriggerCreate( this, triggerPosition );
@@ -1260,10 +1260,10 @@ void CXenTree::HandleAnimEvent( animevent_t *pEvent )
 		{
 			CBaseEntity *pList[8];
 			BOOL sound = FALSE;
-			int count = UTIL_EntitiesInBox( pList, 8, m_pTrigger->GetAbsOrigin() + m_pTrigger->WorldAlignMins(), m_pTrigger->GetAbsOrigin() +  m_pTrigger->WorldAlignMaxs(), FL_NPC|FL_CLIENT );
+			int count = UTIL_EntitiesInBox( pList, 8, m_pTrigger->GetEngineObject()->GetAbsOrigin() + m_pTrigger->WorldAlignMins(), m_pTrigger->GetEngineObject()->GetAbsOrigin() +  m_pTrigger->WorldAlignMaxs(), FL_NPC|FL_CLIENT );
 
 			Vector forward;
-			AngleVectors( GetAbsAngles(), &forward );
+			AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
 
 			for ( int i = 0; i < count; i++ )
 			{
@@ -1275,7 +1275,7 @@ void CXenTree::HandleAnimEvent( animevent_t *pEvent )
 						pList[i]->TakeDamage( CTakeDamageInfo(this, this, 25, DMG_CRUSH | DMG_SLASH ) );
 						pList[i]->ViewPunch( QAngle( 15, 0, 18 ) );
 
-						pList[i]->SetAbsVelocity( pList[i]->GetAbsVelocity() + forward * 100 );
+						pList[i]->GetEngineObject()->SetAbsVelocity( pList[i]->GetEngineObject()->GetAbsVelocity() + forward * 100 );
 					}
 				}
 			}
@@ -1361,7 +1361,7 @@ CXenHull *CXenHull::CreateHull( CBaseEntity *source, const Vector &mins, const V
 {
 	CXenHull *pHull = (CXenHull*)gEntList.CreateEntityByName( "xen_hull" );
 
-	UTIL_SetOrigin( pHull, source->GetAbsOrigin() + offset );
+	UTIL_SetOrigin( pHull, source->GetEngineObject()->GetAbsOrigin() + offset );
 	pHull->SetSolid( SOLID_BBOX );
 	pHull->SetMoveType( MOVETYPE_NONE );
 	pHull->SetOwnerEntity( source );
@@ -1409,7 +1409,7 @@ void CXenSporeLarge::Spawn( void )
 	
 	Vector forward, right;
 
-	AngleVectors( GetAbsAngles(), &forward, &right, NULL );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, NULL );
 
 	// Rotate the leg hulls into position
 	for ( int i = 0; i < ARRAYSIZE(m_hullSizes); i++ )
@@ -1469,7 +1469,7 @@ void CHL1Gib::WaitTillLand ( void )
 		return;
 	}
 
-	if ( GetAbsVelocity() == vec3_origin )
+	if (GetEngineObject()->GetAbsVelocity() == vec3_origin )
 	{
 	/*	SetRenderColorA( 255 );
 		m_nRenderMode = kRenderTransTexture;
@@ -1502,16 +1502,16 @@ void CHL1Gib::BounceGibTouch ( CBaseEntity *pOther )
 	
 	if ( GetFlags() & FL_ONGROUND)
 	{
-		SetAbsVelocity( GetAbsVelocity() * 0.9 );
+		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.9 );
 
-		SetAbsAngles( QAngle( 0, GetAbsAngles().y, 0 ) );
+		GetEngineObject()->SetAbsAngles( QAngle( 0, GetEngineObject()->GetAbsAngles().y, 0 ) );
 		SetLocalAngularVelocity( QAngle( 0, GetLocalAngularVelocity().y, 0 ) );
 	}
 	else
 	{
 		if ( m_cBloodDecals > 0 && m_bloodColor != DONT_BLEED )
 		{
-			vecSpot = GetAbsOrigin() + Vector ( 0 , 0 , 8 );//move up a bit, and trace down.
+			vecSpot = GetEngineObject()->GetAbsOrigin() + Vector ( 0 , 0 , 8 );//move up a bit, and trace down.
 			UTIL_TraceLine ( vecSpot, vecSpot + Vector ( 0, 0, -24 ),  MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr);
 
 			UTIL_BloodDecalTrace( &tr, m_bloodColor );
@@ -1522,7 +1522,7 @@ void CHL1Gib::BounceGibTouch ( CBaseEntity *pOther )
 		if ( m_material != matNone && random->RandomInt( 0, 2 ) == 0 )
 		{
 			float volume;
-			float zvel = fabs( GetAbsVelocity().z );
+			float zvel = fabs(GetEngineObject()->GetAbsVelocity().z );
 		
 			volume = 0.8 * MIN(1.0, ((float)zvel) / 450.0);
 
@@ -1548,18 +1548,18 @@ void CHL1Gib::StickyGibTouch ( CBaseEntity *pOther )
 		return;
 	}
 
-	UTIL_TraceLine ( GetAbsOrigin(), GetAbsOrigin() + GetAbsVelocity() * 32,  MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine (GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 32,  MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 	UTIL_BloodDecalTrace( &tr, m_bloodColor );
 
-	SetAbsVelocity( tr.plane.normal * -1 );
+	GetEngineObject()->SetAbsVelocity( tr.plane.normal * -1 );
 
 	QAngle qAngle;
 
-	VectorAngles( GetAbsVelocity(), qAngle );
-	SetAbsAngles( qAngle );
+	VectorAngles(GetEngineObject()->GetAbsVelocity(), qAngle );
+	GetEngineObject()->SetAbsAngles( qAngle );
 
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetLocalAngularVelocity( QAngle( 0, 0, 0 ) );
 	SetMoveType( MOVETYPE_NONE );
 }

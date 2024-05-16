@@ -339,7 +339,7 @@ void CPhysicsSpring::Activate( void )
 void CPhysicsSpring::Spawn( void )
 {
 	SetSolid( SOLID_NONE );
-	m_start = GetAbsOrigin();
+	m_start = GetEngineObject()->GetAbsOrigin();
 	if ( m_tempLength <= 0 )
 	{
 		m_tempLength = (m_end - m_start).Length();
@@ -442,7 +442,7 @@ void CPhysBox::Spawn( void )
 	}
   
 	SetMoveType( MOVETYPE_NONE );
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetModel( STRING( GetModelName() ) );
 	SetSolid( SOLID_VPHYSICS );
 	if ( HasSpawnFlags( SF_PHYSBOX_DEBRIS ) )
@@ -908,11 +908,11 @@ CBaseEntity *CPhysExplosion::FindEntity( CBaseEntity *pEntity, CBaseEntity *pAct
 			return pTarget;
 
 		// Failing that, try a classname
-		return gEntList.FindEntityByClassnameWithin( pEntity, STRING(m_targetEntityName), GetAbsOrigin(), GetRadius() );
+		return gEntList.FindEntityByClassnameWithin( pEntity, STRING(m_targetEntityName), GetEngineObject()->GetAbsOrigin(), GetRadius() );
 	}
 
 	// Just find anything in the radius
-	return gEntList.FindEntityInSphere( pEntity, GetAbsOrigin(), GetRadius() );
+	return gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), GetRadius() );
 }
 
 
@@ -945,7 +945,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 		// UNDONE: Ask the object if it should get force if it's not MOVETYPE_VPHYSICS?
 		if ( pEntity->m_takedamage != DAMAGE_NO && (pEntity->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() /*&& !pEntity->IsPlayer()*/)) )
 		{
-			vecOrigin = GetAbsOrigin();
+			vecOrigin = GetEngineObject()->GetAbsOrigin();
 			
 			vecSpot = pEntity->BodyTarget( vecOrigin );
 			// Squash this down to a circle
@@ -961,7 +961,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 			{
 				if ( HasSpawnFlags( SF_PHYSEXPLOSION_TEST_LOS ) )
 				{
-					Vector vecStartPos = GetAbsOrigin();
+					Vector vecStartPos = GetEngineObject()->GetAbsOrigin();
 					Vector vecEndPos = pEntity->BodyTarget( vecStartPos, false );
 
 					if ( m_flInnerRadius != 0.0f )
@@ -969,7 +969,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 						// Find a point on our inner radius sphere to begin from
 						Vector vecDirToTarget = ( vecEndPos - vecStartPos );
 						VectorNormalize( vecDirToTarget );
-						vecStartPos = GetAbsOrigin() + ( vecDirToTarget * m_flInnerRadius );
+						vecStartPos = GetEngineObject()->GetAbsOrigin() + ( vecDirToTarget * m_flInnerRadius );
 					}
 
 					trace_t tr;
@@ -1000,7 +1000,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 				{
 					if ( pEntity->IsPlayer() )
 					{
-						Vector vecPushDir = ( pEntity->BodyTarget( GetAbsOrigin(), false ) - GetAbsOrigin() );
+						Vector vecPushDir = ( pEntity->BodyTarget(GetEngineObject()->GetAbsOrigin(), false ) - GetEngineObject()->GetAbsOrigin() );
 						float dist = VectorNormalize( vecPushDir );
 
 						float flFalloff = RemapValClamped( dist, m_radius, m_radius*0.75f, 0.0f, 1.0f );
@@ -1015,7 +1015,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 							vecDeltaAngles.z = 0.0f;
 
 							CBasePlayer *pPlayer = ToBasePlayer( pEntity );
-							pPlayer->SnapEyeAngles( GetLocalAngles() + vecDeltaAngles );
+							pPlayer->SnapEyeAngles(GetEngineObject()->GetLocalAngles() + vecDeltaAngles );
 							pEntity->ViewPunch( vecDeltaAngles );
 						}
 
@@ -1027,9 +1027,9 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 						if ( vecPush.z > 0 && (pEntity->GetFlags() & FL_ONGROUND) )
 						{
 							pEntity->SetGroundEntity( NULL );
-							Vector origin = pEntity->GetAbsOrigin();
+							Vector origin = pEntity->GetEngineObject()->GetAbsOrigin();
 							origin.z += 1.0f;
-							pEntity->SetAbsOrigin( origin );
+							pEntity->GetEngineObject()->SetAbsOrigin( origin );
 						}
 
 						pEntity->SetBaseVelocity( vecPush );
@@ -1160,11 +1160,11 @@ void CPhysImpact::InputImpact( inputdata_t &inputdata )
 		PointAtEntity();
 	}
 
-	AngleVectors( GetAbsAngles(), &dir );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &dir );
 	
 	//Setup our trace information
 	float	dist	= HasSpawnFlags( bitsPHYSIMPACT_INFINITE_LENGTH ) ? MAX_TRACE_LENGTH : m_distance;
-	Vector	start	= GetAbsOrigin();
+	Vector	start	= GetEngineObject()->GetAbsOrigin();
 	Vector	end		= start + ( dir * dist );
 
 	//Trace out
@@ -1331,8 +1331,8 @@ static CBaseEntity *CreateSimplePhysicsObject( CBaseEntity *pEntity, bool create
 	}
 
 	pPhysEntity->KeyValue( "model", STRING(pEntity->GetModelName()) );
-	pPhysEntity->SetAbsOrigin( pEntity->GetAbsOrigin() );
-	pPhysEntity->SetAbsAngles( pEntity->GetAbsAngles() );
+	pPhysEntity->GetEngineObject()->SetAbsOrigin( pEntity->GetEngineObject()->GetAbsOrigin() );
+	pPhysEntity->GetEngineObject()->SetAbsAngles( pEntity->GetEngineObject()->GetAbsAngles() );
 	pPhysEntity->Spawn();
 	if ( !TransferPhysicsObject( pEntity, pPhysEntity, !createAsleep ) )
 	{
@@ -1422,7 +1422,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 			continue;
 		}
 
-		IEngineObjectServer::UnlinkFromParent( pEntity->GetEngineObject());
+		pEntity->GetEngineObject()->UnlinkFromParent();
 
 		if ( pSwap )
 		{
@@ -1447,7 +1447,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 
 			pPhys->SetName( STRING(pEntity->GetEntityName()) );
 			UTIL_TransferPoseParameters( pEntity, pPhys );
-			IEngineObjectServer::TransferChildren( pEntity->GetEngineObject(), pPhys->GetEngineObject());
+			pEntity->GetEngineObject()->TransferChildren(pPhys->GetEngineObject());
 			pEntity->AddSolidFlags( FSOLID_NOT_SOLID );
 			pEntity->AddEffects( EF_NODRAW );
 			UTIL_Remove( pEntity );
@@ -1774,11 +1774,11 @@ void CPhysMagnet::DoMagnetSuck( CBaseEntity *pOther )
 		{
 			// Do we have line of sight to it?
 			trace_t tr;
-			UTIL_TraceLine( GetAbsOrigin(), pEntity->GetAbsOrigin(), MASK_SHOT, this, 0, &tr );
+			UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsOrigin(), MASK_SHOT, this, 0, &tr );
 			if ( tr.fraction == 1.0 || tr.m_pEnt == pEntity )
 			{
 				// Pull it towards the magnet
-				Vector vecVelocity = (vecSuckPoint - pEntity->GetAbsOrigin());
+				Vector vecVelocity = (vecSuckPoint - pEntity->GetEngineObject()->GetAbsOrigin());
 				VectorNormalize(vecVelocity);
 				vecVelocity *= 5 * pPhys->GetMass();
 				pPhys->AddVelocity( &vecVelocity, NULL );
@@ -1914,7 +1914,7 @@ public:
 		if ( m_target != NULL_STRING )
 		{
 			masscenteroverride_t params;
-			params.SnapToPoint( m_target, GetAbsOrigin() );
+			params.SnapToPoint( m_target, GetEngineObject()->GetAbsOrigin() );
 			PhysSetMassCenterOverride( params );
 			UTIL_Remove( this );
 		}
@@ -1999,7 +1999,7 @@ void CPointPush::PushEntity( CBaseEntity *pTarget )
 	}
 	else
 	{
-		vecPushDir = ( pTarget->BodyTarget( GetAbsOrigin(), false ) - GetAbsOrigin() );
+		vecPushDir = ( pTarget->BodyTarget(GetEngineObject()->GetAbsOrigin(), false ) - GetEngineObject()->GetAbsOrigin() );
 	}
 
 	float dist = VectorNormalize( vecPushDir );
@@ -2043,9 +2043,9 @@ void CPointPush::PushEntity( CBaseEntity *pTarget )
 			if ( vecPush.z > 0 && (pTarget->GetFlags() & FL_ONGROUND) )
 			{
 				pTarget->SetGroundEntity( NULL );
-				Vector origin = pTarget->GetAbsOrigin();
+				Vector origin = pTarget->GetEngineObject()->GetAbsOrigin();
 				origin.z += 1.0f;
-				pTarget->SetAbsOrigin( origin );
+				pTarget->GetEngineObject()->SetAbsOrigin( origin );
 			}
 
 			pTarget->SetBaseVelocity( vecPush );
@@ -2062,7 +2062,7 @@ void CPointPush::PushThink( void )
 {
 	// Get a collection of entities in a radius around us
 	CBaseEntity *pEnts[256];
-	int numEnts = UTIL_EntitiesInSphere( pEnts, 256, GetAbsOrigin(), m_flRadius, 0 );
+	int numEnts = UTIL_EntitiesInSphere( pEnts, 256, GetEngineObject()->GetAbsOrigin(), m_flRadius, 0 );
 	for ( int i = 0; i < numEnts; i++ )
 	{
 		// Must be solid
@@ -2090,7 +2090,7 @@ void CPointPush::PushThink( void )
 		// Test for LOS if asked to
 		if ( HasSpawnFlags( SF_PUSH_TEST_LOS ) )
 		{
-			Vector vecStartPos = GetAbsOrigin();
+			Vector vecStartPos = GetEngineObject()->GetAbsOrigin();
 			Vector vecEndPos = pEnts[i]->BodyTarget( vecStartPos, false );
 
 			if ( m_flInnerRadius != 0.0f )
@@ -2098,7 +2098,7 @@ void CPointPush::PushThink( void )
 				// Find a point on our inner radius sphere to begin from
 				Vector vecDirToTarget = ( vecEndPos - vecStartPos );
 				VectorNormalize( vecDirToTarget );
-				vecStartPos = GetAbsOrigin() + ( vecDirToTarget * m_flInnerRadius );
+				vecStartPos = GetEngineObject()->GetAbsOrigin() + ( vecDirToTarget * m_flInnerRadius );
 			}
 
 			trace_t tr;

@@ -956,7 +956,7 @@ float	CAI_Motor::GetSequenceGroundSpeed( int iSequence )
 
 void CAI_Motor::SetSmoothedVelocity(const Vector &vecVelocity)
 {
-	GetOuter()->SetAbsVelocity(vecVelocity);
+	GetOuter()->GetEngineObject()->SetAbsVelocity(vecVelocity);
 }
 
 Vector CAI_Motor::GetSmoothedVelocity()

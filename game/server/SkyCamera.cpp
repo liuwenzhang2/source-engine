@@ -102,7 +102,7 @@ CSkyCamera::~CSkyCamera()
 
 void CSkyCamera::Spawn( void ) 
 { 
-	m_skyboxData.origin = GetLocalOrigin();
+	m_skyboxData.origin = GetEngineObject()->GetLocalOrigin();
 	m_skyboxData.area = engine->GetArea( m_skyboxData.origin );
 	
 	Precache();
@@ -118,7 +118,7 @@ void CSkyCamera::Activate( )
 
 	if ( m_bUseAngles )
 	{
-		AngleVectors( GetAbsAngles(), &m_skyboxData.fog.dirPrimary.GetForModify() );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &m_skyboxData.fog.dirPrimary.GetForModify() );
 		m_skyboxData.fog.dirPrimary.GetForModify() *= -1.0f; 
 	}
 

@@ -174,7 +174,7 @@ bool CAI_BehaviorAlyxInjured::ShouldRunToCover( void )
 bool CAI_BehaviorAlyxInjured::ShouldRunToFollowGoal( void )
 {
 	// If we're too far from our follow target, we need to chase after them
-	float flDistToFollowGoalSqr = ( GetOuter()->GetAbsOrigin() - GetFollowTarget()->GetAbsOrigin() ).LengthSqr();
+	float flDistToFollowGoalSqr = ( GetOuter()->GetEngineObject()->GetAbsOrigin() - GetFollowTarget()->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 	if ( flDistToFollowGoalSqr > Square(MAX_DIST_FROM_FOLLOW_TARGET) )
 		return true;
 
@@ -237,7 +237,7 @@ int CAI_BehaviorAlyxInjured::SelectFailSchedule( int failedSchedule, int failedT
 	case TASK_FIND_INJURED_COVER_FROM_ENEMY:
 		
 		// Only cower if we're already near enough to our follow target
-		float flDistToFollowTargetSqr = ( GetOuter()->GetAbsOrigin() - GetFollowTarget()->GetAbsOrigin() ).LengthSqr();
+		float flDistToFollowTargetSqr = ( GetOuter()->GetEngineObject()->GetAbsOrigin() - GetFollowTarget()->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 		if (  flDistToFollowTargetSqr > Square( 256 ) )
 			return SCHED_FOLLOW;
 
@@ -289,7 +289,7 @@ bool CAI_BehaviorAlyxInjured::FindCoverFromEnemyBehindTarget( CBaseEntity *pTarg
 	if ( pTarget == NULL )
 		return false;
 
-	Vector	vecTargetPos = pTarget->GetAbsOrigin();
+	Vector	vecTargetPos = pTarget->GetEngineObject()->GetAbsOrigin();
 	Vector	vecThreatDir = vec3_origin;
 	
 	// Find our threat direction and base our cover on that
@@ -300,18 +300,18 @@ bool CAI_BehaviorAlyxInjured::FindCoverFromEnemyBehindTarget( CBaseEntity *pTarg
 
 		if ( g_debug_injured_follow.GetBool() )
 		{
-			NDebugOverlay::HorzArrow( GetOuter()->GetAbsOrigin(), vecTestPos, 8.0f, 255, 255, 0, 32, true, 2.0f );
+			NDebugOverlay::HorzArrow( GetOuter()->GetEngineObject()->GetAbsOrigin(), vecTestPos, 8.0f, 255, 255, 0, 32, true, 2.0f );
 		}
 
 		// Make sure we never move towards our threat to get to cover!
-		Vector vecMoveDir = GetOuter()->GetAbsOrigin() - vecTestPos;
+		Vector vecMoveDir = GetOuter()->GetEngineObject()->GetAbsOrigin() - vecTestPos;
 		VectorNormalize( vecMoveDir );
 		float flDotToCover = DotProduct( vecMoveDir, vecThreatDir );
 		if ( flDotToCover > 0.0f )
 		{
 			if ( g_debug_injured_follow.GetBool() )
 			{
-				NDebugOverlay::HorzArrow( GetOuter()->GetAbsOrigin(), vecTestPos, 8.0f, 255, 0, 0, 32, true, 2.0f );
+				NDebugOverlay::HorzArrow( GetOuter()->GetEngineObject()->GetAbsOrigin(), vecTestPos, 8.0f, 255, 0, 0, 32, true, 2.0f );
 			}
 
 			return false;
@@ -319,7 +319,7 @@ bool CAI_BehaviorAlyxInjured::FindCoverFromEnemyBehindTarget( CBaseEntity *pTarg
 
 		AIMoveTrace_t moveTrace;
 		GetOuter()->GetMoveProbe()->MoveLimit(	NAV_GROUND, 
-			GetOuter()->GetAbsOrigin(), 
+			GetOuter()->GetEngineObject()->GetAbsOrigin(),
 			vecTestPos, 
 			MASK_SOLID_BRUSHONLY, 
 			NULL, 
@@ -333,7 +333,7 @@ bool CAI_BehaviorAlyxInjured::FindCoverFromEnemyBehindTarget( CBaseEntity *pTarg
 		{
 			if ( g_debug_injured_follow.GetBool() )
 			{
-				NDebugOverlay::SweptBox( GetOuter()->GetAbsOrigin(), vecTestPos, GetOuter()->GetHullMins(), GetOuter()->GetHullMaxs(), vec3_angle, 255, 0, 0, 0, 2.0f );
+				NDebugOverlay::SweptBox( GetOuter()->GetEngineObject()->GetAbsOrigin(), vecTestPos, GetOuter()->GetHullMins(), GetOuter()->GetHullMaxs(), vec3_angle, 255, 0, 0, 0, 2.0f );
 			}
 
 			return false;
@@ -344,7 +344,7 @@ bool CAI_BehaviorAlyxInjured::FindCoverFromEnemyBehindTarget( CBaseEntity *pTarg
 
 		if ( g_debug_injured_follow.GetBool() )
 		{
-			NDebugOverlay::SweptBox( GetOuter()->GetAbsOrigin(),  (*vecOut), GetOuter()->GetHullMins(), GetOuter()->GetHullMaxs(), vec3_angle, 0, 255, 0, 0, 2.0f );
+			NDebugOverlay::SweptBox( GetOuter()->GetEngineObject()->GetAbsOrigin(),  (*vecOut), GetOuter()->GetHullMins(), GetOuter()->GetHullMaxs(), vec3_angle, 0, 255, 0, 0, 2.0f );
 		}
 
 		return true;
@@ -412,7 +412,7 @@ void CAI_BehaviorAlyxInjured::GatherConditions( void )
 	ClearCondition( COND_INJURED_OVERWHELMED );
 
 	// See if we're overwhelmed by foes
-	if ( NumKnownEnemiesInRadius( GetOuter()->GetAbsOrigin(), COVER_DISTANCE ) >= MIN_ENEMY_MOB )
+	if ( NumKnownEnemiesInRadius( GetOuter()->GetEngineObject()->GetAbsOrigin(), COVER_DISTANCE ) >= MIN_ENEMY_MOB )
 	{
 		SetCondition( COND_INJURED_OVERWHELMED );
 	}
@@ -434,7 +434,7 @@ void CAI_BehaviorAlyxInjured::GatherConditions( void )
 			// FIXME: This distance may need to be the length of the shortest walked path between the follower and the target
 
 			// Get our approximate distance to the player
-			float flDistToPlayer = UTIL_DistApprox2D( GetOuter()->GetAbsOrigin(), pPlayer->GetAbsOrigin() );
+			float flDistToPlayer = UTIL_DistApprox2D( GetOuter()->GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsOrigin() );
 			if ( flDistToPlayer > injured_help_plee_range.GetFloat() )
 			{
 				bWarnPlayer = true;
@@ -526,7 +526,7 @@ int CAI_BehaviorAlyxInjured::NumKnownEnemiesInRadius( const Vector &vecSource, f
 			continue;
 
 		// Must be within the radius we've specified
-		float flEnemyDistSqr = ( vecSource - pMemory->hEnemy->GetAbsOrigin() ).Length2DSqr();
+		float flEnemyDistSqr = ( vecSource - pMemory->hEnemy->GetEngineObject()->GetAbsOrigin() ).Length2DSqr();
 		if ( flEnemyDistSqr < flRadiusSqr )
 		{
 			nNumEnemies++;

@@ -115,7 +115,7 @@ void CPhysicsPushedEntities::AddEntity( CBaseEntity *ent )
 {
 	int i = m_rgMoved.AddToTail();
 	m_rgMoved[i].m_pEntity = ent;
-	m_rgMoved[i].m_vecStartAbsOrigin = ent->GetAbsOrigin();
+	m_rgMoved[i].m_vecStartAbsOrigin = ent->GetEngineObject()->GetAbsOrigin();
 }
 
 
@@ -209,7 +209,7 @@ bool CPhysicsPushedEntities::IsPushedPositionValid( CBaseEntity *pBlocker )
 	CTraceFilterPushFinal pushFilter(pBlocker, pBlocker->GetCollisionGroup() );
 
 	trace_t trace;
-	UTIL_TraceEntity( pBlocker, pBlocker->GetAbsOrigin(), pBlocker->GetAbsOrigin(), pBlocker->PhysicsSolidMaskForEntity(), &pushFilter, &trace );
+	UTIL_TraceEntity( pBlocker, pBlocker->GetEngineObject()->GetAbsOrigin(), pBlocker->GetEngineObject()->GetAbsOrigin(), pBlocker->PhysicsSolidMaskForEntity(), &pushFilter, &trace );
 
 	return !trace.startsolid;
 }
@@ -226,8 +226,8 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 	UnlinkPusherList( pPusherHandles );
 	CTraceFilterPushMove pushFilter(pBlocker, pBlocker->GetCollisionGroup() );
 
-	Vector pushDestPosition = pBlocker->GetAbsOrigin() + vecAbsPush;
-	UTIL_TraceEntity( pBlocker, pBlocker->GetAbsOrigin(), pushDestPosition, 
+	Vector pushDestPosition = pBlocker->GetEngineObject()->GetAbsOrigin() + vecAbsPush;
+	UTIL_TraceEntity( pBlocker, pBlocker->GetEngineObject()->GetAbsOrigin(), pushDestPosition,
 		pBlocker->PhysicsSolidMaskForEntity(), &pushFilter, &info.m_Trace );
 
 	RelinkPusherList(pPusherHandles);
@@ -240,14 +240,14 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 	bool bIsUnblockable = (m_bIsUnblockableByPlayer && (pBlocker->IsPlayer() || pBlocker->MyNPCPointer())) ? true : false;
 	if ( bIsUnblockable )
 	{
-		pBlocker->SetAbsOrigin( pushDestPosition );
+		pBlocker->GetEngineObject()->SetAbsOrigin( pushDestPosition );
 	}
 	else
 	{
 		// Move the blocker into its new position
 		if ( info.m_Trace.fraction )
 		{
-			pBlocker->SetAbsOrigin( info.m_Trace.endpos );
+			pBlocker->GetEngineObject()->SetAbsOrigin( info.m_Trace.endpos );
 		}
 
 		// We're not blocked if the blocker is point-sized or non-solid
@@ -280,7 +280,7 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 	// if the player is blocking the train try nudging him around to fix accumulated error
 	if ( bIsUnblockable )
 	{
-		Vector org = pBlocker->GetAbsOrigin();
+		Vector org = pBlocker->GetEngineObject()->GetAbsOrigin();
 		for ( int checkCount = 0; checkCount < 4; checkCount++ )
 		{
 			Vector move;
@@ -288,12 +288,12 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 			
 			// alternate movements 1/2" in each direction
 			float factor = ( checkCount & 1 ) ? -0.5f : 0.5f;
-			pBlocker->SetAbsOrigin( org + move * factor );
+			pBlocker->GetEngineObject()->SetAbsOrigin( org + move * factor );
 			info.m_bBlocked = !IsPushedPositionValid(pBlocker);
 			if ( !info.m_bBlocked )
 				return true;
 		}
-		pBlocker->SetAbsOrigin( pushDestPosition );
+		pBlocker->GetEngineObject()->SetAbsOrigin( pushDestPosition );
 
 #ifndef TF_DLL
 		DevMsg(1, "Ignoring player blocking train!\n");
@@ -386,12 +386,12 @@ void CPhysicsPushedEntities::FinishRotPushedEntity( CBaseEntity *pPushedEntity, 
 	}
 	else
 	{
-		QAngle angles = pPushedEntity->GetAbsAngles();
+		QAngle angles = pPushedEntity->GetEngineObject()->GetAbsAngles();
 		
 		// only rotate YAW with pushing.  Freely rotateable entities should either use VPHYSICS
 		// or be set up as children
 		angles.y += rotPushMove.amove.y;
-		pPushedEntity->SetAbsAngles( angles );
+		pPushedEntity->GetEngineObject()->SetAbsAngles( angles );
 	}
 }
 
@@ -438,8 +438,8 @@ void CPhysicsPushedEntities::BeginPush( CBaseEntity *pRoot )
 	m_rgMoved.RemoveAll();
 	m_rgPusher.RemoveAll();
 
-	m_rootPusherStartLocalOrigin = pRoot->GetLocalOrigin();
-	m_rootPusherStartLocalAngles = pRoot->GetLocalAngles();
+	m_rootPusherStartLocalOrigin = pRoot->GetEngineObject()->GetLocalOrigin();
+	m_rootPusherStartLocalAngles = pRoot->GetEngineObject()->GetLocalAngles();
 	m_rootPusherStartLocaltime = pRoot->GetLocalTime();
 }
 
@@ -458,7 +458,7 @@ void CPhysicsPushedEntities::StoreMovedEntities( physicspushlist_t &list )
 	for ( int i = 0; i < list.pushedCount; i++ )
 	{
 		list.pushedEnts[i] = m_rgMoved[i].m_pEntity;
-		list.pushVec[i] = m_rgMoved[i].m_pEntity->GetAbsOrigin() - m_rgMoved[i].m_vecStartAbsOrigin;
+		list.pushVec[i] = m_rgMoved[i].m_pEntity->GetEngineObject()->GetAbsOrigin() - m_rgMoved[i].m_vecStartAbsOrigin;
 	}
 }
 
@@ -491,7 +491,7 @@ void CPhysicsPushedEntities::RestoreEntities( )
 	// Reset all of the pushed entities to get them back into place also
 	for ( int i = m_rgMoved.Count(); --i >= 0; )
 	{
-		m_rgMoved[ i ].m_pEntity->SetAbsOrigin( m_rgMoved[ i ].m_vecStartAbsOrigin );
+		m_rgMoved[ i ].m_pEntity->GetEngineObject()->SetAbsOrigin( m_rgMoved[ i ].m_vecStartAbsOrigin );
 	}
 }
 
@@ -604,7 +604,7 @@ private:
 		trace_t tr;
 
 		ICollideable *pCollision = pTest->GetCollideable();
-		enginetrace->SweepCollideable( pCollision, pTest->GetAbsOrigin(), pTest->GetAbsOrigin(), pCollision->GetCollisionAngles(), 
+		enginetrace->SweepCollideable( pCollision, pTest->GetEngineObject()->GetAbsOrigin(), pTest->GetEngineObject()->GetAbsOrigin(), pCollision->GetCollisionAngles(),
 			pTest->PhysicsSolidMaskForEntity(), &m_pushersOnly, &tr );
 
 		return tr.startsolid;
@@ -759,7 +759,7 @@ void CPhysicsPushedEntities::SetupAllInHierarchy( CBaseEntity *pParent )
 	// We'll fix that up later
 	int i = m_rgPusher.AddToTail();
 	m_rgPusher[i].m_pEntity = pParent;
-	m_rgPusher[i].m_vecStartAbsOrigin = pParent->GetAbsOrigin();
+	m_rgPusher[i].m_vecStartAbsOrigin = pParent->GetEngineObject()->GetAbsOrigin();
 
 	CBaseEntity *pChild;
 	for ( pChild = pParent->FirstMoveChild(); pChild != NULL; pChild = pChild->NextMovePeer() )
@@ -777,17 +777,17 @@ void CPhysicsPushedEntities::RotateRootEntity( CBaseEntity *pRoot, float movetim
 	VPROF("CPhysicsPushedEntities::RotateRootEntity");
 
 	rotation.amove = pRoot->GetLocalAngularVelocity() * movetime;
-	rotation.origin = pRoot->GetAbsOrigin();
+	rotation.origin = pRoot->GetEngineObject()->GetAbsOrigin();
 
 	// Knowing the initial + ending basis is needed for determining
 	// which corner we're pushing 
 	MatrixCopy( pRoot->GetEngineObject()->EntityToWorldTransform(), rotation.startLocalToWorld );
 
 	// rotate the pusher to it's final position
-	QAngle angles = pRoot->GetLocalAngles();
+	QAngle angles = pRoot->GetEngineObject()->GetLocalAngles();
 	angles += pRoot->GetLocalAngularVelocity() * movetime;
 
-	pRoot->SetLocalAngles( angles );
+	pRoot->GetEngineObject()->SetLocalAngles( angles );
 	
 	// Compute the change in absangles
 	MatrixCopy( pRoot->GetEngineObject()->EntityToWorldTransform(), rotation.endLocalToWorld );
@@ -809,7 +809,7 @@ CBaseEntity *CPhysicsPushedEntities::PerformRotatePush( CBaseEntity *pRoot, floa
 	SetupAllInHierarchy( pRoot );
 
 	// save where we rotated from, in case we're blocked
-	QAngle angPrevAngles = pRoot->GetLocalAngles();
+	QAngle angPrevAngles = pRoot->GetEngineObject()->GetLocalAngles();
 
 	// Apply the rotation
 	RotatingPushMove_t	rotPushMove;
@@ -825,7 +825,7 @@ CBaseEntity *CPhysicsPushedEntities::PerformRotatePush( CBaseEntity *pRoot, floa
 	if (!SpeculativelyCheckRotPush( rotPushMove, pRoot ))
 	{
 		CBaseEntity *pBlocker = RegisterBlockage();
-		pRoot->SetLocalAngles( angPrevAngles );
+		pRoot->GetEngineObject()->SetLocalAngles( angPrevAngles );
 		RestoreEntities( );
 		return pBlocker;
 	}
@@ -842,13 +842,13 @@ void CPhysicsPushedEntities::LinearlyMoveRootEntity( CBaseEntity *pRoot, float m
 	VPROF("CPhysicsPushedEntities::LinearlyMoveRootEntity");
 
 	// move the pusher to it's final position
-	Vector move = pRoot->GetLocalVelocity() * movetime;
-	Vector origin = pRoot->GetLocalOrigin();
+	Vector move = pRoot->GetEngineObject()->GetLocalVelocity() * movetime;
+	Vector origin = pRoot->GetEngineObject()->GetLocalOrigin();
 	origin += move;		
-	pRoot->SetLocalOrigin( origin );
+	pRoot->GetEngineObject()->SetLocalOrigin( origin );
 
 	// Store off the abs push vector
-	*pAbsPushVector = pRoot->GetAbsVelocity() * movetime;
+	*pAbsPushVector = pRoot->GetEngineObject()->GetAbsVelocity() * movetime;
 }
 
 
@@ -869,7 +869,7 @@ CBaseEntity *CPhysicsPushedEntities::PerformLinearPush( CBaseEntity *pRoot, floa
 	SetupAllInHierarchy( pRoot );
 
 	// save where we started from, in case we're blocked
-	Vector vecPrevOrigin = pRoot->GetLocalOrigin();
+	Vector vecPrevOrigin = pRoot->GetEngineObject()->GetLocalOrigin();
 
 	// Move the root (and all children) into its new position
 	Vector vecAbsPush;
@@ -885,7 +885,7 @@ CBaseEntity *CPhysicsPushedEntities::PerformLinearPush( CBaseEntity *pRoot, floa
 	if (!SpeculativelyCheckLinearPush( vecAbsPush ))
 	{
 		CBaseEntity *pBlocker = RegisterBlockage();
-		pRoot->SetLocalOrigin( vecPrevOrigin );
+		pRoot->GetEngineObject()->SetLocalOrigin( vecPrevOrigin );
 		RestoreEntities();
 		return pBlocker;
 	}
@@ -1018,7 +1018,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 
 	numbumps = 4;
 
-	Vector vecAbsVelocity = GetAbsVelocity();
+	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 
 	blocked = 0;
 	VectorCopy (vecAbsVelocity, original_velocity);
@@ -1032,19 +1032,19 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 		if (vecAbsVelocity == vec3_origin)
 			break;
 
-		VectorMA( GetAbsOrigin(), time_left, vecAbsVelocity, end );
+		VectorMA(GetEngineObject()->GetAbsOrigin(), time_left, vecAbsVelocity, end );
 
-		Physics_TraceEntity( this, GetAbsOrigin(), end, mask, &trace );
+		Physics_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), end, mask, &trace );
 
 		if (trace.startsolid)
 		{	// entity is trapped in another solid
-			SetAbsVelocity(vec3_origin);
+			GetEngineObject()->SetAbsVelocity(vec3_origin);
 			return 4;
 		}
 
 		if (trace.fraction > 0)
 		{	// actually covered some distance
-			SetAbsOrigin( trace.endpos );
+			GetEngineObject()->SetAbsOrigin( trace.endpos );
 			VectorCopy (vecAbsVelocity, original_velocity);
 			numplanes = 0;
 		}
@@ -1054,7 +1054,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 
 		if (!trace.m_pEnt)
 		{
-			SetAbsVelocity( vecAbsVelocity );
+			GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 			Warning( "PhysicsTryMove: !trace.u.ent" );
 			Assert(0);
 			return 4;
@@ -1092,7 +1092,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 		// clipped to another plane
 		if (numplanes >= MAX_CLIP_PLANES)
 		{	// this shouldn't really happen
-			SetAbsVelocity(vec3_origin);
+			GetEngineObject()->SetAbsVelocity(vec3_origin);
 			return blocked;
 		}
 
@@ -1144,7 +1144,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 				if (numplanes != 2)
 				{
 	//				Msg( "clip velocity, numplanes == %i\n",numplanes);
-					SetAbsVelocity( vecAbsVelocity );
+					GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 					return blocked;
 				}
 				CrossProduct (planes[0], planes[1], dir);
@@ -1158,13 +1158,13 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 			//
 			if (DotProduct (vecAbsVelocity, primal_velocity) <= 0)
 			{
-				SetAbsVelocity(vec3_origin);
+				GetEngineObject()->SetAbsVelocity(vec3_origin);
 				return blocked;
 			}
 		}
 	}
 
-	SetAbsVelocity( vecAbsVelocity );
+	GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 	return blocked;
 }
 
@@ -1192,10 +1192,10 @@ void CBaseEntity::PhysicsAddHalfGravity( float timestep )
 	}
 
 	// Add 1/2 of the total gravitational effects over this timestep
-	Vector vecAbsVelocity = GetAbsVelocity();
+	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 	vecAbsVelocity[2] -= ( 0.5 * ent_gravity * GetCurrentGravity() * timestep );
 	vecAbsVelocity[2] += GetBaseVelocity()[2] * gpGlobals->frametime;
-	SetAbsVelocity( vecAbsVelocity );
+	GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 
 	Vector vecNewBaseVelocity = GetBaseVelocity();
 	vecNewBaseVelocity[2] = 0;
@@ -1223,13 +1223,13 @@ void CBaseEntity::PhysicsPushEntity( const Vector& push, trace_t *pTrace )
 
 	// NOTE: absorigin and origin must be equal because there is no moveparent
 	Vector prevOrigin;
-	VectorCopy( GetAbsOrigin(), prevOrigin );
+	VectorCopy(GetEngineObject()->GetAbsOrigin(), prevOrigin );
 
 	::PhysicsCheckSweep( this, prevOrigin, push, pTrace );
 
 	if ( pTrace->fraction )
 	{
-		SetAbsOrigin( pTrace->endpos );
+		GetEngineObject()->SetAbsOrigin( pTrace->endpos );
 
 		// FIXME(ywb):  Should we try to enable this here
 		// WakeRestingObjects();
@@ -1259,7 +1259,7 @@ bool CBaseEntity::PhysicsTestEntityPosition( CBaseEntity **ppEntity /*=NULL*/ )
 	
 	unsigned int mask = PhysicsSolidMaskForEntity();
 
-	Physics_TraceEntity( this, GetAbsOrigin(), GetAbsOrigin(), mask, &trace );
+	Physics_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), mask, &trace );
 	
 	if ( trace.startsolid )
 	{
@@ -1284,7 +1284,7 @@ CBaseEntity *CBaseEntity::PhysicsPushMove( float movetime )
 	// If this entity isn't moving, just update the time.
 	IncrementLocalTime( movetime );
 
-	if ( GetLocalVelocity() == vec3_origin )
+	if (GetEngineObject()->GetLocalVelocity() == vec3_origin )
 	{
 		return NULL;
 	}
@@ -1341,7 +1341,7 @@ void CBaseEntity::PerformPush( float movetime )
 	{
 		if ( GetLocalAngularVelocity() != vec3_angle )
 		{
-			if ( GetLocalVelocity() != vec3_origin )
+			if (GetEngineObject()->GetLocalVelocity() != vec3_origin )
 			{
 				// NOTE: Both PhysicsPushRotate + PhysicsPushMove
 				// will attempt to advance local time. Choose the one that's
@@ -1488,8 +1488,8 @@ void CBaseEntity::PhysicsNoclip( void )
 	SimulateAngles( gpGlobals->frametime );
 
 	Vector origin;
-	VectorMA( GetLocalOrigin(), gpGlobals->frametime, GetLocalVelocity(), origin );
-	SetLocalOrigin( origin );
+	VectorMA(GetEngineObject()->GetLocalOrigin(), gpGlobals->frametime, GetEngineObject()->GetLocalVelocity(), origin );
+	GetEngineObject()->SetLocalOrigin( origin );
 }
 
 
@@ -1519,20 +1519,20 @@ void CBaseEntity::PhysicsCustom()
 	}
 
 	// NOTE: The entity must set the position, angles, velocity in its custom movement
-	Vector vecNewPosition = GetAbsOrigin();
-	Vector vecNewVelocity = GetAbsVelocity();
-	QAngle angNewAngles = GetAbsAngles();
+	Vector vecNewPosition = GetEngineObject()->GetAbsOrigin();
+	Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
+	QAngle angNewAngles = GetEngineObject()->GetAbsAngles();
 	QAngle angNewAngVelocity = GetLocalAngularVelocity();
 
 	PerformCustomPhysics( &vecNewPosition, &vecNewVelocity, &angNewAngles, &angNewAngVelocity );
 
 	// Store off all of the new state information...
-	SetAbsVelocity( vecNewVelocity );
-	SetAbsAngles( angNewAngles );
+	GetEngineObject()->SetAbsVelocity( vecNewVelocity );
+	GetEngineObject()->SetAbsAngles( angNewAngles );
 	SetLocalAngularVelocity( angNewAngVelocity );
 
 	Vector move;
-	VectorSubtract( vecNewPosition, GetAbsOrigin(), move );
+	VectorSubtract( vecNewPosition, GetEngineObject()->GetAbsOrigin(), move );
 
 	// move origin
 	trace_t trace;
@@ -1544,7 +1544,7 @@ void CBaseEntity::PhysicsCustom()
 	{	
 		// entity is trapped in another solid
 		// UNDONE: does this entity needs to be removed?
-		SetAbsVelocity(vec3_origin);
+		GetEngineObject()->SetAbsVelocity(vec3_origin);
 		SetLocalAngularVelocity(vec3_angle);
 		return;
 	}
@@ -1718,7 +1718,7 @@ void CBaseEntity::PhysicsStep()
 		return;
 	}
 
-	Vector oldOrigin = GetAbsOrigin();
+	Vector oldOrigin = GetEngineObject()->GetAbsOrigin();
 
 	// Feed the position delta back from vphysics if enabled
 	bool updateFromVPhysics = npc_vphysics.GetBool();
@@ -1742,19 +1742,19 @@ void CBaseEntity::PhysicsStep()
 	{
 		Vector position;
 		VPhysicsGetObject()->GetShadowPosition( &position, NULL );
-		float delta = (GetAbsOrigin() - position).LengthSqr();
+		float delta = (GetEngineObject()->GetAbsOrigin() - position).LengthSqr();
 		// for now, use a tolerance of 1 inch for these tests
 		if ( delta < 1 )
 		{
 			// physics is really close, check to see if my current position is valid.
 			// If so, ignore the physics result.
 			trace_t tr;
-			Physics_TraceEntity( this, GetAbsOrigin(), GetAbsOrigin(), PhysicsSolidMaskForEntity(), &tr );
+			Physics_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), PhysicsSolidMaskForEntity(), &tr );
 			updateFromVPhysics = tr.startsolid;
 		}
 		if ( updateFromVPhysics )
 		{
-			SetAbsOrigin( position );
+			GetEngineObject()->SetAbsOrigin( position );
 			PhysicsTouchTriggers();
 		}
 		//NDebugOverlay::Box( position, WorldAlignMins(), WorldAlignMaxs(), 255, 255, 0, 0, 0.0 );
@@ -1782,9 +1782,9 @@ void CBaseEntity::PhysicsStep()
 
 	if ( VPhysicsGetObject() )
 	{
-		if ( !VectorCompare( oldOrigin, GetAbsOrigin() ) )
+		if ( !VectorCompare( oldOrigin, GetEngineObject()->GetAbsOrigin() ) )
 		{
-			VPhysicsGetObject()->UpdateShadow( GetAbsOrigin(), vec3_angle, (GetFlags() & FL_FLY) ? true : false, dt );
+			VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), vec3_angle, (GetFlags() & FL_FLY) ? true : false, dt );
 		}
 	}
 	PhysicsRelinkChildren(dt);
@@ -1803,8 +1803,8 @@ void CBaseEntity::PhysicsStepRecheckGround()
 	int		x, y;
 	trace_t trace;
 	
-	VectorAdd (GetAbsOrigin(), WorldAlignMins(), mins);
-	VectorAdd (GetAbsOrigin(), WorldAlignMaxs(), maxs);
+	VectorAdd (GetEngineObject()->GetAbsOrigin(), WorldAlignMins(), mins);
+	VectorAdd (GetEngineObject()->GetAbsOrigin(), WorldAlignMaxs(), maxs);
 	point[2] = mins[2] - 1;
 	for	(x=0 ; x<=1 ; x++)
 	{
@@ -1863,7 +1863,7 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 		{
 			if ( !( ( GetFlags() & FL_SWIM ) && ( GetWaterLevel() > 0 ) ) )
 			{
-				if ( GetAbsVelocity()[2] < ( GetCurrentGravity() * -0.1 ) )
+				if (GetEngineObject()->GetAbsVelocity()[2] < ( GetCurrentGravity() * -0.1 ) )
 				{
 					hitsound = true;
 				}
@@ -1878,10 +1878,10 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 	}
 
 	if ( !(GetFlags() & FL_STEPMOVEMENT) &&
-		(!VectorCompare(GetAbsVelocity(), vec3_origin) || 
+		(!VectorCompare(GetEngineObject()->GetAbsVelocity(), vec3_origin) ||
 		 !VectorCompare(GetBaseVelocity(), vec3_origin)))
 	{
-		Vector vecAbsVelocity = GetAbsVelocity();
+		Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 
 		SetGroundEntity( NULL );
 		// apply friction
@@ -1906,7 +1906,7 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 		}
 
 		vecAbsVelocity += GetBaseVelocity();
-		SetAbsVelocity( vecAbsVelocity );
+		GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 
 		// Apply angular velocity
 		SimulateAngles( timestep );
@@ -1917,9 +1917,9 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 
 		PhysicsCheckVelocity();
 
-		vecAbsVelocity = GetAbsVelocity();
+		vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 		vecAbsVelocity -= GetBaseVelocity();
-		SetAbsVelocity( vecAbsVelocity );
+		GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 
 		PhysicsCheckVelocity();
 

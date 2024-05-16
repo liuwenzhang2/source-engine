@@ -157,7 +157,7 @@ private:
 		return GetSmokeParticlePos(x, y, z);
 	}
 
-	inline const Vector&		GetPos()	{ return GetAbsOrigin(); }
+	inline const Vector&		GetPos()	{ return GetEngineObject()->GetAbsOrigin(); }
 
 	// Start filling the smoke volume (and stop the smoke trail).
 	void						FillVolume();
@@ -364,7 +364,7 @@ void C_ParticleSmokeGrenade::Start(CParticleMgr *pParticleMgr, IPrototypeArgAcce
 	m_pSmokeTrail->m_EndSize = 10;
 	m_pSmokeTrail->m_SpawnRadius = 0;
 
-	m_pSmokeTrail->SetLocalOrigin( GetAbsOrigin() );
+	m_pSmokeTrail->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetAbsOrigin() );
 
 	for(int i=0; i < NUM_MATERIAL_HANDLES; i++)
 	{
@@ -439,15 +439,15 @@ void C_ParticleSmokeGrenade::UpdateSmokeTrail( float fTimeDelta )
 		// Update the smoke particle color.
 		if(m_CurrentStage == 0)
 		{
-			m_pSmokeTrail->m_StartColor = EngineGetLightForPoint(GetAbsOrigin()) * 0.5f;
+			m_pSmokeTrail->m_StartColor = EngineGetLightForPoint(GetEngineObject()->GetAbsOrigin()) * 0.5f;
 			m_pSmokeTrail->m_EndColor = m_pSmokeTrail->m_StartColor;
 		}
 
 		// Spin the smoke trail.
-		AngleVectors(pAimEnt->GetAbsAngles(), &forward, &right, &up);
-		m_pSmokeTrail->m_VelocityOffset = forward * 30 + GetAbsVelocity();
+		AngleVectors(pAimEnt->GetEngineObject()->GetAbsAngles(), &forward, &right, &up);
+		m_pSmokeTrail->m_VelocityOffset = forward * 30 + GetEngineObject()->GetAbsVelocity();
 
-		m_pSmokeTrail->SetLocalOrigin( GetAbsOrigin() );
+		m_pSmokeTrail->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetAbsOrigin() );
 		m_pSmokeTrail->Update(fTimeDelta);
 	}	
 }

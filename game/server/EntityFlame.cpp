@@ -139,7 +139,7 @@ CEntityFlame *CEntityFlame::Create( CBaseEntity *pTarget, bool useHitboxes )
 		size = 16.0f;
 	}
 
-	UTIL_SetOrigin( pFlame, pTarget->GetAbsOrigin() );
+	UTIL_SetOrigin( pFlame, pTarget->GetEngineObject()->GetAbsOrigin() );
 
 	pFlame->m_flSize = size;
 	pFlame->SetThink( &CEntityFlame::FlameThink );
@@ -332,7 +332,7 @@ void CEntityFlame::FlameThink( void )
 	if ( m_hEntAttached )
 	{
 		// Do radius damage ignoring the entity I'm attached to. This will harm things around me.
-		RadiusDamage( CTakeDamageInfo( this, this, 4.0f, DMG_BURN ), GetAbsOrigin(), m_flSize/2, CLASS_NONE, m_hEntAttached );
+		RadiusDamage( CTakeDamageInfo( this, this, 4.0f, DMG_BURN ), GetEngineObject()->GetAbsOrigin(), m_flSize/2, CLASS_NONE, m_hEntAttached );
 
 		// Directly harm the entity I'm attached to. This is so we can precisely control how much damage the entity
 		// that is on fire takes without worrying about the flame's position relative to the bodytarget (which is the
@@ -343,16 +343,16 @@ void CEntityFlame::FlameThink( void )
 		{
 			const float ENTITYFLAME_MOVE_AWAY_DIST = 24.0f;
 			// Make a sound near my origin, and up a little higher (in case I'm on the ground, so NPC's still hear it)
-			CSoundEnt::InsertSound( SOUND_MOVE_AWAY, GetAbsOrigin(), ENTITYFLAME_MOVE_AWAY_DIST, 0.1f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
-			CSoundEnt::InsertSound( SOUND_MOVE_AWAY, GetAbsOrigin() + Vector( 0, 0, 48.0f ), ENTITYFLAME_MOVE_AWAY_DIST, 0.1f, this, SOUNDENT_CHANNEL_REPEATING );
+			CSoundEnt::InsertSound( SOUND_MOVE_AWAY, GetEngineObject()->GetAbsOrigin(), ENTITYFLAME_MOVE_AWAY_DIST, 0.1f, this, SOUNDENT_CHANNEL_REPEATED_DANGER );
+			CSoundEnt::InsertSound( SOUND_MOVE_AWAY, GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 48.0f ), ENTITYFLAME_MOVE_AWAY_DIST, 0.1f, this, SOUNDENT_CHANNEL_REPEATING );
 		}
 	}
 	else
 	{
-		RadiusDamage( CTakeDamageInfo( this, this, FLAME_RADIUS_DAMAGE, DMG_BURN ), GetAbsOrigin(), m_flSize/2, CLASS_NONE, NULL );
+		RadiusDamage( CTakeDamageInfo( this, this, FLAME_RADIUS_DAMAGE, DMG_BURN ), GetEngineObject()->GetAbsOrigin(), m_flSize/2, CLASS_NONE, NULL );
 	}
 
-	FireSystem_AddHeatInRadius( GetAbsOrigin(), m_flSize/2, 2.0f );
+	FireSystem_AddHeatInRadius(GetEngineObject()->GetAbsOrigin(), m_flSize/2, 2.0f );
 
 }  
 

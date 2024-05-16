@@ -196,7 +196,7 @@ void CAI_PassengerBehavior::AddPhysicsPush( float force )
 
 	Vector vecForce = vecDir * force;
 
-	m_hVehicle->VPhysicsGetObject()->ApplyForceOffset( vecForce, GetOuter()->GetAbsOrigin() );
+	m_hVehicle->VPhysicsGetObject()->ApplyForceOffset( vecForce, GetOuter()->GetEngineObject()->GetAbsOrigin() );
 }
 
 //-----------------------------------------------------------------------------
@@ -229,7 +229,7 @@ void CAI_PassengerBehavior::InitVehicleState( void )
 	m_vehicleState.m_flNextWarningTime = 0.0f;
 	m_vehicleState.m_vecDeltaVelocity = vec3_origin;
 	m_vehicleState.m_flNextWarningTime = gpGlobals->curtime;
-	m_vehicleState.m_vecLastAngles = m_hVehicle->GetAbsAngles();
+	m_vehicleState.m_vecLastAngles = m_hVehicle->GetEngineObject()->GetAbsAngles();
 
 	Vector	localVelocity;
 	GetLocalVehicleVelocity( &m_vehicleState.m_vecLastLocalVelocity );
@@ -251,8 +251,8 @@ void CAI_PassengerBehavior::FinishEnterVehicle( void )
 	GetEntryTarget( &vecFinalPos, &vecFinalAngles );
 
 	// Make sure we're exactly where we need to be
-	GetOuter()->SetLocalOrigin( vecFinalPos );
-	GetOuter()->SetLocalAngles( vecFinalAngles );
+	GetOuter()->GetEngineObject()->SetLocalOrigin( vecFinalPos );
+	GetOuter()->GetEngineObject()->SetLocalAngles( vecFinalAngles );
 	GetOuter()->SetMoveType( MOVETYPE_NONE );
 	GetOuter()->GetMotor()->SetYawLocked( true );
 
@@ -393,8 +393,8 @@ int CAI_PassengerBehavior::SelectTransitionSchedule( void )
 		else if ( GetPassengerState() == PASSENGER_STATE_ENTERING )
 		{
 			// Force them into the proper position
-			GetOuter()->SetLocalOrigin( m_vecTargetPosition );
-			GetOuter()->SetLocalAngles( m_vecTargetAngles ); 
+			GetOuter()->GetEngineObject()->SetLocalOrigin( m_vecTargetPosition );
+			GetOuter()->GetEngineObject()->SetLocalAngles( m_vecTargetAngles );
 			FinishEnterVehicle();
 		}
 
@@ -547,7 +547,7 @@ bool CAI_PassengerBehavior::GetExitPoint( int nSequence, Vector *vecExitPoint, Q
 
 	// Rotate the delta position by our starting angles
 	Vector vecRotPos = vecDeltaPos;
-	VectorRotate( vecRotPos, GetOuter()->GetAbsAngles(), vecDeltaPos );
+	VectorRotate( vecRotPos, GetOuter()->GetEngineObject()->GetAbsAngles(), vecDeltaPos );
 
 	if ( vecExitPoint != NULL )
 	{
@@ -555,7 +555,7 @@ bool CAI_PassengerBehavior::GetExitPoint( int nSequence, Vector *vecExitPoint, Q
 		float flUpDelta = 16.0f;
 		Vector vecGroundPos;
 		
-		bool bFoundGround = FindGroundAtPosition( GetOuter()->GetAbsOrigin() + vecDeltaPos, flUpDelta, flDownDelta, &vecGroundPos );
+		bool bFoundGround = FindGroundAtPosition( GetOuter()->GetEngineObject()->GetAbsOrigin() + vecDeltaPos, flUpDelta, flDownDelta, &vecGroundPos );
 		if ( bFoundGround )
 		{
 			if ( PointIsNavigable( vecGroundPos ) == false )
@@ -573,7 +573,7 @@ bool CAI_PassengerBehavior::GetExitPoint( int nSequence, Vector *vecExitPoint, Q
 
 	if ( vecExitAngles != NULL )
 	{
-		QAngle newAngles = GetOuter()->GetAbsAngles() + vecDeltaAngles;
+		QAngle newAngles = GetOuter()->GetEngineObject()->GetAbsAngles() + vecDeltaAngles;
 		newAngles.x = UTIL_AngleMod( newAngles.x );
 		newAngles.y = UTIL_AngleMod( newAngles.y );
 		newAngles.z = UTIL_AngleMod( newAngles.z );
@@ -674,7 +674,7 @@ int CAI_PassengerBehavior::FindEntrySequence( bool bNearest /*= false*/ )
 				return nSequence;
 
 			// Otherwise distance is the deciding factor
-			vecSeatDir = ( vecStartPos - GetOuter()->GetAbsOrigin() );
+			vecSeatDir = ( vecStartPos - GetOuter()->GetEngineObject()->GetAbsOrigin() );
 			flSeatDist = VectorNormalize( vecSeatDir );
 
 			// Closer, take it
@@ -1126,7 +1126,7 @@ bool CAI_PassengerBehavior::LocalIntervalMovement( float flInterval, bool &bMove
 	if ( Studio_SeqMovement( pstudiohdr, GetOuter()->GetSequence(), GetOuter()->GetCycle(), flNextCycle, GetOuter()->GetPoseParameterArray(), deltaPos, deltaAngles ))
 	{
 		Vector vecPreDelta = deltaPos;
-		VectorRotate( vecPreDelta, GetOuter()->GetLocalAngles(), deltaPos );
+		VectorRotate( vecPreDelta, GetOuter()->GetEngineObject()->GetLocalAngles(), deltaPos );
 		
 		newPosition = GetLocalOrigin() + deltaPos;
 		newAngles = GetLocalAngles() + deltaAngles;
@@ -1219,8 +1219,8 @@ bool CAI_PassengerBehavior::DoTransitionMovement( void )
 		vecDeltaAngles.z = AngleDiff( vecIdealAngles.z, vecAnimAngles.z ) * flAngBlend;
 
 		// Factor in the error
-		GetOuter()->SetLocalOrigin( vecAnimPos + vecDelta );
-		GetOuter()->SetLocalAngles( vecAnimAngles + vecDeltaAngles );
+		GetOuter()->GetEngineObject()->SetLocalOrigin( vecAnimPos + vecDelta );
+		GetOuter()->GetEngineObject()->SetLocalAngles( vecAnimAngles + vecDeltaAngles );
 
 		// Draw our debug information
 		if ( passenger_debug_transition.GetBool() )
@@ -1262,7 +1262,7 @@ void CAI_PassengerBehavior::GetLocalVehicleVelocity( Vector *pOut  )
 {
 	Vector velocity;
 	m_hVehicle->GetVelocity( &velocity, NULL );
-	m_hVehicle->GetEngineObject()->WorldToEntitySpace( m_hVehicle->GetAbsOrigin() + velocity, pOut );
+	m_hVehicle->GetEngineObject()->WorldToEntitySpace( m_hVehicle->GetEngineObject()->GetAbsOrigin() + velocity, pOut );
 }
 
 //-----------------------------------------------------------------------------

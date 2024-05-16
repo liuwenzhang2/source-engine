@@ -159,7 +159,7 @@ void CLookDoor::MoveThink(void)
 	//--------------------------------------
 	// Calculate an orgin for the door
 	//--------------------------------------
-	Vector vOrigin = WorldSpaceCenter() - GetAbsOrigin();
+	Vector vOrigin = WorldSpaceCenter() - GetEngineObject()->GetAbsOrigin();
 
 	// If FROM_OPEN flag is set, door proximity is measured
 	// from the open and not the closed position
@@ -174,7 +174,7 @@ void CLookDoor::MoveThink(void)
 	float flProxMove = 0;
 	if (m_flProximityDistance > 0)
 	{
-		float flDist = (m_hLooker->GetAbsOrigin() - vOrigin).Length()-m_flProximityOffset;
+		float flDist = (m_hLooker->GetEngineObject()->GetAbsOrigin() - vOrigin).Length()-m_flProximityOffset;
 		if (flDist < 0) flDist = 0;
 
 		if (flDist < m_flProximityDistance)

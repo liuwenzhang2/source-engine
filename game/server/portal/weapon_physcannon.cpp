@@ -419,7 +419,7 @@ static void ComputePlayerMatrix( CBasePlayer *pPlayer, matrix3x4_t &out )
 	//angles.x = clamp( angles.x, -PLAYER_LOOK_PITCH_RANGE, PLAYER_LOOK_PITCH_RANGE );
 	angles.x = 0;
 
-	float feet = pPlayer->GetAbsOrigin().z + pPlayer->WorldAlignMins().z;
+	float feet = pPlayer->GetEngineObject()->GetAbsOrigin().z + pPlayer->WorldAlignMins().z;
 	float eyes = origin.z;
 	float zoffset = 0;
 	// moving up (negative pitch is up)
@@ -789,7 +789,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 		Vector vPlayerForward;
 		pPlayer->EyeVectors( &vPlayerForward );
 
-		Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetAbsAngles(), -vPlayerForward );
+		Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -vPlayerForward );
 		Vector player2d = pPlayer->CollisionProp()->OBBMaxs();
 		float playerRadius = player2d.Length2D();
 		float flDot = DotProduct( vPlayerForward, radial );
@@ -1340,7 +1340,7 @@ void PlayerPickupObject( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	if ( pObject->GetBaseAnimating() && pObject->GetBaseAnimating()->IsDissolving() )
 		return;
 
-	CPlayerPickupController *pController = (CPlayerPickupController *)CBaseEntity::Create( "player_pickup", pObject->GetAbsOrigin(), vec3_angle, pPlayer );
+	CPlayerPickupController *pController = (CPlayerPickupController *)CBaseEntity::Create( "player_pickup", pObject->GetEngineObject()->GetAbsOrigin(), vec3_angle, pPlayer );
 	
 	if ( !pController )
 		return;
@@ -2104,7 +2104,7 @@ void CWeaponPhysCannon::ApplyVelocityBasedForce( CBaseEntity *pEntity, const Vec
 		{
 			// We want the point to emanate low on the vehicle to move it along the ground, not to twist it
 			Vector vecFinalPos = vecHitPos;
-			vecFinalPos.z = pEntity->GetAbsOrigin().z;
+			vecFinalPos.z = pEntity->GetEngineObject()->GetAbsOrigin().z;
 			pPhysicsObject->ApplyForceOffset( vVel, vecFinalPos );
 		}
 		else
@@ -2977,7 +2977,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 		pPortal = NULL;
 	}
 
-	QAngle qEntityAngles = pEntity->GetAbsAngles();
+	QAngle qEntityAngles = pEntity->GetEngineObject()->GetAbsAngles();
 
 	if ( pPortal )
 	{
@@ -3075,13 +3075,13 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 			Vector vTeleportedPosition;
 			QAngle qTeleportedAngles;
 
-			if ( !bLookingAtHeldPortal && ( start - pPortal->GetAbsOrigin() ).Length() > distance - radius )
+			if ( !bLookingAtHeldPortal && ( start - pPortal->GetEngineObject()->GetAbsOrigin() ).Length() > distance - radius )
 			{
 				// Pull the object through the portal
 				Vector vPortalLinkedForward;
 				pPortalLinked->GetVectors( &vPortalLinkedForward, NULL, NULL );
-				vTeleportedPosition = pPortalLinked->GetAbsOrigin() - vPortalLinkedForward * ( 1.0f + offset.Length() );
-				qTeleportedAngles = pPortalLinked->GetAbsAngles();
+				vTeleportedPosition = pPortalLinked->GetEngineObject()->GetAbsOrigin() - vPortalLinkedForward * ( 1.0f + offset.Length() );
+				qTeleportedAngles = pPortalLinked->GetEngineObject()->GetAbsAngles();
 			}
 			else
 			{
@@ -3398,8 +3398,8 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 
 				pBeamEnt->GetAttachment( iAttachment, vOrigin, vAngle );
 
-				pCore->SetAbsOrigin( vOrigin );
-				pCore->SetAbsAngles( vAngle );
+				pCore->GetEngineObject()->SetAbsOrigin( vOrigin );
+				pCore->GetEngineObject()->SetAbsAngles( vAngle );
 
 				DispatchSpawn( pCore );
 				pCore->Activate();
@@ -3647,7 +3647,7 @@ void CWeaponPhysCannon::LaunchObject( const Vector &vecDir, float flForce )
 		// Trace ahead a bit and make a chain of danger sounds ahead of the phys object
 		// to scare potential targets
 		trace_t	tr;
-		Vector	vecStart = pObject->GetAbsOrigin();
+		Vector	vecStart = pObject->GetEngineObject()->GetAbsOrigin();
 		Vector	vecSpot;
 		int		iLength;
 		int		i;
@@ -4050,7 +4050,7 @@ void CWeaponPhysCannon::StartEffects( void )
 
 		m_hGlowSprites[i] = CSprite::SpriteCreate( 
 			bIsMegaCannon ? MEGACANNON_GLOW_SPRITE : PHYSCANNON_GLOW_SPRITE, 
-			GetAbsOrigin(), false );
+			GetEngineObject()->GetAbsOrigin(), false );
 
 		m_hGlowSprites[i]->SetAsTemporary();
 
@@ -4082,7 +4082,7 @@ void CWeaponPhysCannon::StartEffects( void )
 
 			m_hEndSprites[i] = CSprite::SpriteCreate( 
 				bIsMegaCannon ? MEGACANNON_ENDCAP_SPRITE : PHYSCANNON_ENDCAP_SPRITE, 
-				GetAbsOrigin(), false );
+				GetEngineObject()->GetAbsOrigin(), false );
 
 			m_hEndSprites[i]->SetAsTemporary();
 			m_hEndSprites[i]->SetAttachment( pOwner->GetViewModel(), LookupAttachment( attachNames[i] ) );
@@ -4098,7 +4098,7 @@ void CWeaponPhysCannon::StartEffects( void )
 	{
 		m_hCenterSprite = CSprite::SpriteCreate( 
 			bIsMegaCannon ? MEGACANNON_CENTER_GLOW : PHYSCANNON_CENTER_GLOW, 
-			GetAbsOrigin(), false );
+			GetEngineObject()->GetAbsOrigin(), false );
 
 		m_hCenterSprite->SetAsTemporary();
 		m_hCenterSprite->SetAttachment( pOwner->GetViewModel(), 1 );
@@ -4112,7 +4112,7 @@ void CWeaponPhysCannon::StartEffects( void )
 	{
 		m_hBlastSprite = CSprite::SpriteCreate( 
 			bIsMegaCannon ? MEGACANNON_BLAST_SPRITE : PHYSCANNON_BLAST_SPRITE, 
-			GetAbsOrigin(), false );
+			GetEngineObject()->GetAbsOrigin(), false );
 
 		m_hBlastSprite->SetAsTemporary();
 		m_hBlastSprite->SetAttachment( pOwner->GetViewModel(), 1 );

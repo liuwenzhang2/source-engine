@@ -66,7 +66,7 @@ public:
 		pAnchor->hEntity = pEntity->GetMoveParent();
 		pAnchor->parentAttachment = pEntity->GetEngineObject()->GetParentAttachment();
 		pAnchor->name = pEntity->GetEntityName();
-		pAnchor->localOrigin = pEntity->GetLocalOrigin();
+		pAnchor->localOrigin = pEntity->GetEngineObject()->GetLocalOrigin();
 		pAnchor->massScale = massScale;
 	}
 
@@ -178,7 +178,7 @@ void PhysTeleportConstrainedEntity( CBaseEntity *pTeleportSource, IPhysicsObject
 
 	if ( !physicsRotate )
 	{
-		oldAngles = pTeleportSource->GetAbsAngles();
+		oldAngles = pTeleportSource->GetEngineObject()->GetAbsAngles();
 	}
 
 	matrix3x4_t startCoord, startInv, endCoord, xform;
@@ -275,7 +275,7 @@ void CPhysConstraint::OnBreak( void )
 	{
 		CPASAttenuationFilter filter( this, ATTN_STATIC );
 
-		Vector origin = GetAbsOrigin();
+		Vector origin = GetEngineObject()->GetAbsOrigin();
 		Vector refPos = origin, attachPos = origin;
 
 		IPhysicsObject *pRef = m_pConstraint->GetReferenceObject();
@@ -357,7 +357,7 @@ int CPhysConstraint::DrawDebugTextOverlays()
 		if ( (params.bodyMassScale[0] != 1.0f && params.bodyMassScale[0] != 0.0f) || (params.bodyMassScale[1] != 1.0f && params.bodyMassScale[1] != 0.0f) )
 		{
 			CFmtStr str("mass ratio %.4f:%.4f\n", params.bodyMassScale[0], params.bodyMassScale[1] );
-			NDebugOverlay::EntityTextAtPosition( GetAbsOrigin(), pos, str.Access(), 0, 255, 255, 0, 255 );
+			NDebugOverlay::EntityTextAtPosition(GetEngineObject()->GetAbsOrigin(), pos, str.Access(), 0, 255, 255, 0, 255 );
 		}
 		pos++;
 	}
@@ -688,7 +688,7 @@ void CPhysConstraint::NotifySystemEvent( CBaseEntity *pNotify, notify_system_eve
 	if ( eventType != NOTIFY_EVENT_TELEPORT || (unsigned int)gpGlobals->tickcount == m_teleportTick )
 		return;
 
-	float distance = (params.pTeleport->prevOrigin - pNotify->GetAbsOrigin()).Length();
+	float distance = (params.pTeleport->prevOrigin - pNotify->GetEngineObject()->GetAbsOrigin()).Length();
 	
 	// no need to follow a small teleport
 	if ( distance <= m_minTeleportDistance )
@@ -905,8 +905,8 @@ LINK_ENTITY_TO_CLASS( phys_hinge, CPhysHinge );
 
 void CPhysHinge::Spawn( void )
 {
-	m_hinge.worldPosition = GetLocalOrigin();
-	m_hinge.worldAxisDirection -= GetLocalOrigin();
+	m_hinge.worldPosition = GetEngineObject()->GetLocalOrigin();
+	m_hinge.worldAxisDirection -= GetEngineObject()->GetLocalOrigin();
 	VectorNormalize(m_hinge.worldAxisDirection);
 	UTIL_SnapDirectionToAxis( m_hinge.worldAxisDirection );
 
@@ -1017,7 +1017,7 @@ void CPhysHinge::SoundThink( void )
 		Vector relativeVel = VelocitySampler::GetRelativeAngularVelocity(pAttached,pReference);
 		if (g_debug_constraint_sounds.GetBool())
 		{
-			NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + (relativeVel), 255, 255, 0, true, 0.1f );
+			NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + (relativeVel), 255, 255, 0, true, 0.1f );
 		}
 		m_soundInfo.OnThink( this, relativeVel );
 
@@ -1039,7 +1039,7 @@ public:
 		
 		for ( int i = 0; i < 2; i++ )
 		{
-			info.pObjects[i]->WorldToLocal( &ballsocket.constraintPosition[i], GetAbsOrigin() );
+			info.pObjects[i]->WorldToLocal( &ballsocket.constraintPosition[i], GetEngineObject()->GetAbsOrigin() );
 		}
 		GetBreakParams( ballsocket.constraint, info );
 		ballsocket.constraint.torqueLimit = 0;
@@ -1089,9 +1089,9 @@ public:
 	{
 		if ( m_debugOverlays & (OVERLAY_BBOX_BIT|OVERLAY_PIVOT_BIT|OVERLAY_ABSBOX_BIT) )
 		{
-			NDebugOverlay::Box( GetAbsOrigin(), -Vector(8,8,8), Vector(8,8,8), 0, 255, 0, 0, 0 );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), -Vector(8,8,8), Vector(8,8,8), 0, 255, 0, 0, 0 );
 			NDebugOverlay::Box( m_axisEnd, -Vector(4,4,4), Vector(4,4,4), 0, 0, 255, 0, 0 );
-			NDebugOverlay::Line( GetAbsOrigin(), m_axisEnd, 255, 255, 0, false, 0 );
+			NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), m_axisEnd, 255, 255, 0, false, 0 );
 		}
 		BaseClass::DrawDebugGeometryOverlays();
 	}
@@ -1109,7 +1109,7 @@ public:
 			// Did something wake up when I was not thinking?
 			if ( GetNextThink() == TICK_NEVER_THINK )
 			{
-				Vector axisDirection = m_axisEnd - GetAbsOrigin();
+				Vector axisDirection = m_axisEnd - GetEngineObject()->GetAbsOrigin();
 				VectorNormalize( axisDirection );
 				UTIL_SnapDirectionToAxis( axisDirection );
 
@@ -1208,7 +1208,7 @@ IPhysicsConstraint *CPhysSlideConstraint::CreateConstraint( IPhysicsConstraintGr
 	GetBreakParams( sliding.constraint, info );
 	sliding.constraint.strength = 1.0;
 
-	Vector axisDirection = m_axisEnd - GetAbsOrigin();
+	Vector axisDirection = m_axisEnd - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( axisDirection );
 	UTIL_SnapDirectionToAxis( axisDirection );
 
@@ -1219,7 +1219,7 @@ IPhysicsConstraint *CPhysSlideConstraint::CreateConstraint( IPhysicsConstraintGr
 		Vector position;
 		info.pObjects[1]->GetPosition( &position, NULL );
 
-		sliding.limitMin = DotProduct( axisDirection, GetAbsOrigin() );
+		sliding.limitMin = DotProduct( axisDirection, GetEngineObject()->GetAbsOrigin() );
 		sliding.limitMax = DotProduct( axisDirection, m_axisEnd );
 		if ( sliding.limitMax < sliding.limitMin )
 		{
@@ -1259,7 +1259,7 @@ void CPhysSlideConstraint::SoundThink( void )
 		Vector relativeVel = VelocitySampler::GetRelativeVelocity(pAttached,pReference);
 		// project velocity onto my primary axis.:
 
-		Vector axisDirection = m_axisEnd - GetAbsOrigin();
+		Vector axisDirection = m_axisEnd - GetEngineObject()->GetAbsOrigin();
 		relativeVel = m_axisEnd * relativeVel.Dot(m_axisEnd)/m_axisEnd.Dot(m_axisEnd);
 
 		m_soundInfo.OnThink( this, relativeVel );
@@ -1275,7 +1275,7 @@ void CPhysSlideConstraint::Activate( void )
 
 	m_soundInfo.OnActivate(this);
 
-	Vector axisDirection = m_axisEnd - GetAbsOrigin();
+	Vector axisDirection = m_axisEnd - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( axisDirection );
 	UTIL_SnapDirectionToAxis( axisDirection );
 	m_soundInfo.StartThinking(this, 
@@ -1331,7 +1331,7 @@ public:
 	{
 		if ( m_debugOverlays & (OVERLAY_BBOX_BIT|OVERLAY_PIVOT_BIT|OVERLAY_ABSBOX_BIT) )
 		{
-			Vector origin = GetAbsOrigin();
+			Vector origin = GetEngineObject()->GetAbsOrigin();
 			Vector refPos = origin, attachPos = origin;
 			IPhysicsObject *pRef = m_pConstraint->GetReferenceObject();
 			if ( pRef )
@@ -1385,7 +1385,7 @@ IPhysicsConstraint *CPhysPulley::CreateConstraint( IPhysicsConstraintGroup *pGro
 {
 	constraint_pulleyparams_t pulley;
 	pulley.Defaults();
-	pulley.pulleyPosition[0] = GetAbsOrigin();
+	pulley.pulleyPosition[0] = GetEngineObject()->GetAbsOrigin();
 	pulley.pulleyPosition[1] = m_position2;
 
 	matrix3x4_t matrix;
@@ -1432,7 +1432,7 @@ public:
 	{
 		if ( m_debugOverlays & (OVERLAY_BBOX_BIT|OVERLAY_PIVOT_BIT|OVERLAY_ABSBOX_BIT) )
 		{
-			Vector origin = GetAbsOrigin();
+			Vector origin = GetEngineObject()->GetAbsOrigin();
 			Vector refPos = origin, attachPos = origin;
 			IPhysicsObject *pRef = m_pConstraint->GetReferenceObject();
 			if ( pRef )
@@ -1496,7 +1496,7 @@ IPhysicsConstraint *CPhysLength::CreateConstraint( IPhysicsConstraintGroup *pGro
 	constraint_lengthparams_t length;
 	length.Defaults();
 	Vector position[2];
-	position[0] = GetAbsOrigin();
+	position[0] = GetEngineObject()->GetAbsOrigin();
 	position[1] = m_vecAttach;
 	int index = info.swapped ? 1 : 0;
 	length.InitWorldspace( info.pObjects[0], info.pObjects[1], position[index], position[!index] );

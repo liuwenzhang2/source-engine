@@ -303,7 +303,7 @@ void PortalSimulatorDumps_DumpCollideToGlView( CPhysCollide *pCollide, const Vec
 
 bool CProp_Portal::TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
-	physcollision->TraceBox( ray, MASK_ALL, NULL, m_pCollisionShape, GetAbsOrigin(), GetAbsAngles(), &tr );
+	physcollision->TraceBox( ray, MASK_ALL, NULL, m_pCollisionShape, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &tr );
 	return tr.DidHit();
 }
 
@@ -312,8 +312,8 @@ bool CProp_Portal::TestCollision( const Ray_t &ray, unsigned int fContentsMask, 
 //-----------------------------------------------------------------------------
 void CProp_Portal::DelayedPlacementThink( void )
 {
-	Vector vOldOrigin = GetLocalOrigin();
-	QAngle qOldAngles = GetLocalAngles();
+	Vector vOldOrigin = GetEngineObject()->GetLocalOrigin();
+	QAngle qOldAngles = GetEngineObject()->GetLocalAngles();
 
 	Vector vForward;
 	AngleVectors( m_qDelayedAngles, &vForward );
@@ -378,7 +378,7 @@ void CProp_Portal::DelayedPlacementThink( void )
 void CProp_Portal::TestRestingSurfaceThink( void )
 {
 	// Make sure there's still a surface behind the portal
-	Vector vOrigin = GetAbsOrigin();
+	Vector vOrigin = GetEngineObject()->GetAbsOrigin();
 
 	Vector vForward, vRight, vUp;
 	GetVectors( &vForward, &vRight, &vUp );
@@ -457,11 +457,11 @@ void CProp_Portal::ResetModel( void )
 
 void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
 {
-	m_vAudioOrigin = ( ( bDelayedPos ) ? ( m_vDelayedPosition ) : ( GetAbsOrigin() ) );
+	m_vAudioOrigin = ( ( bDelayedPos ) ? ( m_vDelayedPosition ) : (GetEngineObject()->GetAbsOrigin() ) );
 
 	CEffectData	fxData;
 
-	fxData.m_vAngles = ( ( bDelayedPos ) ? ( m_qDelayedAngles ) : ( GetAbsAngles() ) );
+	fxData.m_vAngles = ( ( bDelayedPos ) ? ( m_qDelayedAngles ) : (GetEngineObject()->GetAbsAngles() ) );
 
 	Vector vForward, vUp;
 	AngleVectors( fxData.m_vAngles, &vForward, &vUp, NULL );
@@ -558,14 +558,14 @@ void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
 			{
 				Vector vLinkedForward;
 				m_hLinkedPortal->GetVectors( &vLinkedForward, NULL, NULL );
-				fxData.m_vOrigin = m_hLinkedPortal->GetAbsOrigin() + vLinkedForward * 16.0f;
-				fxData.m_vAngles = m_hLinkedPortal->GetAbsAngles();
+				fxData.m_vOrigin = m_hLinkedPortal->GetEngineObject()->GetAbsOrigin() + vLinkedForward * 16.0f;
+				fxData.m_vAngles = m_hLinkedPortal->GetEngineObject()->GetAbsAngles();
 			}
 			else
 			{
 				GetVectors( &vForward, NULL, NULL );
-				fxData.m_vOrigin = GetAbsOrigin() + vForward * 16.0f;
-				fxData.m_vAngles = GetAbsAngles();
+				fxData.m_vOrigin = GetEngineObject()->GetAbsOrigin() + vForward * 16.0f;
+				fxData.m_vAngles = GetEngineObject()->GetAbsAngles();
 			}
 
 			//DispatchEffect( "PortalFizzleNear", fxData );
@@ -582,14 +582,14 @@ void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
 			{
 				Vector vLinkedForward;
 				m_hLinkedPortal->GetVectors( &vLinkedForward, NULL, NULL );
-				fxData.m_vOrigin = m_hLinkedPortal->GetAbsOrigin() + vLinkedForward * 16.0f;
-				fxData.m_vAngles = m_hLinkedPortal->GetAbsAngles();
+				fxData.m_vOrigin = m_hLinkedPortal->GetEngineObject()->GetAbsOrigin() + vLinkedForward * 16.0f;
+				fxData.m_vAngles = m_hLinkedPortal->GetEngineObject()->GetAbsAngles();
 			}
 			else
 			{
 				GetVectors( &vForward, NULL, NULL );
-				fxData.m_vOrigin = GetAbsOrigin() + vForward * 16.0f;
-				fxData.m_vAngles = GetAbsAngles();
+				fxData.m_vOrigin = GetEngineObject()->GetAbsOrigin() + vForward * 16.0f;
+				fxData.m_vAngles = GetEngineObject()->GetAbsAngles();
 			}
 
 			//DispatchEffect( "PortalFizzleNear", fxData );
@@ -757,8 +757,8 @@ void CProp_Portal::Activate( void )
 
 	if( m_bActivated && (m_hLinkedPortal.Get() != NULL) )
 	{
-		Vector ptCenter = GetAbsOrigin();
-		QAngle qAngles = GetAbsAngles();
+		Vector ptCenter = GetEngineObject()->GetAbsOrigin();
+		QAngle qAngles = GetEngineObject()->GetAbsAngles();
 		m_PortalSimulator.MoveTo( ptCenter, qAngles );
 
 		//resimulate everything we're touching
@@ -931,7 +931,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 
 	Assert( m_hLinkedPortal.Get() != NULL );
 
-	Vector ptOtherOrigin = pOther->GetAbsOrigin();
+	Vector ptOtherOrigin = pOther->GetEngineObject()->GetAbsOrigin();
 	Vector ptOtherCenter;
 
 	bool bPlayer = pOther->IsPlayer();
@@ -975,7 +975,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 
 			if ( vOtherVelocity == vec3_origin )
 			{
-				vOtherVelocity = pOther->GetAbsVelocity();
+				vOtherVelocity = pOther->GetEngineObject()->GetAbsVelocity();
 			}
 		}
 		else
@@ -1042,7 +1042,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 	}
 	else
 	{
-		qOtherAngles = pOther->GetAbsAngles();
+		qOtherAngles = pOther->GetEngineObject()->GetAbsAngles();
 		bNonPhysical = FClassnameIs( pOther, "prop_energy_ball" );
 	}
 
@@ -1357,7 +1357,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 				}
 				else
 				{
-					Vector vOrigin = GetAbsOrigin();
+					Vector vOrigin = GetEngineObject()->GetAbsOrigin();
 
 					trace_t tr;
 
@@ -1576,8 +1576,8 @@ void CProp_Portal::WakeNearbyEntities( void )
 	Vector vForward, vUp, vRight;
 	GetVectors( &vForward, &vRight, &vUp );
 
-	Vector ptOrigin = GetAbsOrigin();
-	QAngle qAngles = GetAbsAngles();
+	Vector ptOrigin = GetEngineObject()->GetAbsOrigin();
+	QAngle qAngles = GetEngineObject()->GetAbsAngles();
 
 	Vector ptOBBStart = ptOrigin;
 	ptOBBStart += vForward * CProp_Portal_Shared::vLocalMins.x;
@@ -1689,11 +1689,11 @@ void CProp_Portal::ForceEntityToFitInPortalWall( CBaseEntity *pEntity )
 	Vector vWorldMins, vWorldMaxs;
 	pCollision->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 	Vector ptCenter = pEntity->WorldSpaceCenter(); //(vWorldMins + vWorldMaxs) / 2.0f;
-	Vector ptOrigin = pEntity->GetAbsOrigin();
+	Vector ptOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
 	Vector vEntityCenterToOrigin = ptOrigin - ptCenter;
 
 
-	Vector ptPortalCenter = GetAbsOrigin();
+	Vector ptPortalCenter = GetEngineObject()->GetAbsOrigin();
 	Vector vPortalCenterToEntityCenter = ptCenter - ptPortalCenter;
 	Vector vPortalForward;
 	GetVectors( &vPortalForward, NULL, NULL );
@@ -1768,7 +1768,7 @@ void CProp_Portal::UpdatePortalTeleportMatrix( void )
 
 	//setup our origin plane
 	GetVectors( &m_plane_Origin.normal, NULL, NULL );
-	m_plane_Origin.dist = m_plane_Origin.normal.Dot( GetAbsOrigin() );
+	m_plane_Origin.dist = m_plane_Origin.normal.Dot(GetEngineObject()->GetAbsOrigin() );
 	m_plane_Origin.signbits = SignbitsForPlane( &m_plane_Origin );
 
 	Vector vAbsNormal;
@@ -1947,12 +1947,12 @@ void CProp_Portal::UpdatePortalLinkage( void )
 
 			CEnvMicrophone *pMicrophone = static_cast<CEnvMicrophone*>( m_hMicrophone.Get() );
 			pMicrophone->AddSpawnFlags( SF_MICROPHONE_IGNORE_NONATTENUATED );
-			pMicrophone->Teleport( &GetAbsOrigin(), &GetAbsAngles(), &vZero );
+			pMicrophone->Teleport( &GetEngineObject()->GetAbsOrigin(), &GetEngineObject()->GetAbsAngles(), &vZero );
 			inputdata_t in;
 			pMicrophone->InputEnable( in );
 
 			CSpeaker *pSpeaker = static_cast<CSpeaker*>( m_hSpeaker.Get() );
-			pSpeaker->Teleport( &GetAbsOrigin(), &GetAbsAngles(), &vZero );
+			pSpeaker->Teleport( &GetEngineObject()->GetAbsOrigin(), &GetEngineObject()->GetAbsAngles(), &vZero );
 			pSpeaker->InputTurnOn( in );
 
 			UpdatePortalTeleportMatrix();
@@ -1963,8 +1963,8 @@ void CProp_Portal::UpdatePortalLinkage( void )
 			m_PortalSimulator.ReleaseAllEntityOwnership();
 		}
 
-		Vector ptCenter = GetAbsOrigin();
-		QAngle qAngles = GetAbsAngles();
+		Vector ptCenter = GetEngineObject()->GetAbsOrigin();
+		QAngle qAngles = GetEngineObject()->GetAbsAngles();
 		m_PortalSimulator.MoveTo( ptCenter, qAngles );
 
 		if( pLink )
@@ -1988,8 +1988,8 @@ void CProp_Portal::UpdatePortalLinkage( void )
 
 void CProp_Portal::PlacePortal( const Vector &vOrigin, const QAngle &qAngles, float fPlacementSuccess, bool bDelay /*= false*/ )
 {
-	Vector vOldOrigin = GetLocalOrigin();
-	QAngle qOldAngles = GetLocalAngles();
+	Vector vOldOrigin = GetEngineObject()->GetLocalOrigin();
+	QAngle qOldAngles = GetEngineObject()->GetLocalAngles();
 
 	Vector vNewOrigin = vOrigin;
 	QAngle qNewAngles = qAngles;
@@ -2025,7 +2025,7 @@ void CProp_Portal::PlacePortal( const Vector &vOrigin, const QAngle &qAngles, fl
 			CPortal_Player *pFiringPlayer = dynamic_cast<CPortal_Player *>( pPortalGun->GetOwner() );
 			if( pFiringPlayer )
 			{
-				g_PortalGameStats.Event_PortalPlacement( pFiringPlayer->GetAbsOrigin(), vOrigin, m_iDelayedFailure );
+				g_PortalGameStats.Event_PortalPlacement( pFiringPlayer->GetEngineObject()->GetAbsOrigin(), vOrigin, m_iDelayedFailure );
 			}
 		}
 
@@ -2054,7 +2054,7 @@ void CProp_Portal::PlacePortal( const Vector &vOrigin, const QAngle &qAngles, fl
 		CPortal_Player *pFiringPlayer = dynamic_cast<CPortal_Player *>( pPortalGun->GetOwner() );
 		if( pFiringPlayer )
 		{
-			g_PortalGameStats.Event_PortalPlacement( pFiringPlayer->GetAbsOrigin(), vOrigin, m_iDelayedFailure );
+			g_PortalGameStats.Event_PortalPlacement( pFiringPlayer->GetEngineObject()->GetAbsOrigin(), vOrigin, m_iDelayedFailure );
 		}
 	}	
 }
@@ -2158,7 +2158,7 @@ void CProp_Portal::InputSetActivatedState( inputdata_t &inputdata )
 	if ( m_bActivated )
 	{
 		Vector vOrigin;
-		vOrigin = GetAbsOrigin();
+		vOrigin = GetEngineObject()->GetAbsOrigin();
 
 		Vector vForward, vUp;
 		GetVectors( &vForward, 0, &vUp );
@@ -2179,7 +2179,7 @@ void CProp_Portal::InputSetActivatedState( inputdata_t &inputdata )
 		// If the fixed portal is overlapping a portal that was placed before it... kill it!
 		if ( fPlacementSuccess )
 		{
-			IsPortalOverlappingOtherPortals( this, vOrigin, GetAbsAngles(), true );
+			IsPortalOverlappingOtherPortals( this, vOrigin, GetEngineObject()->GetAbsAngles(), true );
 
 			CreateSounds();
 
@@ -2275,7 +2275,7 @@ void CProp_Portal::InputNewLocation( inputdata_t &inputdata )
 
 void CProp_Portal::UpdateCorners()
 {
-	Vector vOrigin = GetAbsOrigin();
+	Vector vOrigin = GetEngineObject()->GetAbsOrigin();
 	Vector vUp, vRight;
 	GetVectors( NULL, &vRight, &vUp );
 

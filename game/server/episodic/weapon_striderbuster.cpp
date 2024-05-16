@@ -256,7 +256,7 @@ void CWeaponStriderBuster::Spawn( void )
 		{
 			m_hParticleEffect->Activate();
 		}
-		m_hParticleEffect->SetAbsOrigin( GetAbsOrigin() );
+		m_hParticleEffect->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 		m_hParticleEffect->GetEngineObject()->SetParent( this->GetEngineObject() );
 	}
 
@@ -415,7 +415,7 @@ bool CWeaponStriderBuster::ShouldStickToEntity( CBaseEntity *pEntity )
 	CBoneFollower *pFollower = static_cast<CBoneFollower *>(pEntity);
 	if ( pStrider->IsLegBoneFollower( pFollower ) )
 	{
-		Vector vecDelta = pStrider->GetAdjustedOrigin() - GetAbsOrigin();
+		Vector vecDelta = pStrider->GetAdjustedOrigin() - GetEngineObject()->GetAbsOrigin();
 		if ( vecDelta.Length() > striderbuster_leg_stick_dist.GetFloat() )
 		{
 			return false;
@@ -463,7 +463,7 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 				params.m_bWarnOnDirectWaveReference = true;
 				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 				
-				DispatchParticleEffect( "striderbuster_attach", GetAbsOrigin(), GetAbsAngles(), NULL );
+				DispatchParticleEffect( "striderbuster_attach", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), NULL );
 
 				if( striderbuster_use_particle_flare.GetBool() )
 				{
@@ -476,7 +476,7 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 						pFlare->KeyValue( "start_active", "1" );
 						pFlare->KeyValue( "effect_name", "striderbuster_attached_pulse" );
 						pFlare->GetEngineObject()->SetParent( this->GetEngineObject() );
-						pFlare->SetLocalOrigin( vec3_origin );
+						pFlare->GetEngineObject()->SetLocalOrigin( vec3_origin );
 						DispatchSpawn( pFlare );
 						pFlare->Activate();
 					}
@@ -484,14 +484,14 @@ bool CWeaponStriderBuster::StickToEntity( CBaseEntity *pOther )
 				else
 				{
 					// Create a glow sprite
-					m_hGlowSprite = CSprite::SpriteCreate( "sprites/orangeflare1.vmt", GetLocalOrigin(), false );
+					m_hGlowSprite = CSprite::SpriteCreate( "sprites/orangeflare1.vmt", GetEngineObject()->GetLocalOrigin(), false );
 
 					Assert( m_hGlowSprite );
 					if ( m_hGlowSprite != NULL )
 					{
 						m_hGlowSprite->TurnOn();
 						m_hGlowSprite->SetTransparency( kRenderWorldGlow, 255, 255, 255, 255, kRenderFxNoDissipation );
-						m_hGlowSprite->SetAbsOrigin( GetAbsOrigin() );
+						m_hGlowSprite->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 						m_hGlowSprite->SetScale( 5.0f );
 						m_hGlowSprite->m_nRenderFX = kRenderFxStrobeFaster;
 						m_hGlowSprite->SetGlowProxySize( 16.0f );
@@ -544,7 +544,7 @@ void CWeaponStriderBuster::CreateDestroyedEffect( void )
 		DispatchSpawn( pTrail );
 	}
 	
-	DispatchParticleEffect( "striderbuster_explode_core", GetAbsOrigin(), GetAbsAngles() );
+	DispatchParticleEffect( "striderbuster_explode_core", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 
 	// Create liquid fountain gushtacular effect here!
 	CEffectData	data;
@@ -553,7 +553,7 @@ void CWeaponStriderBuster::CreateDestroyedEffect( void )
 	float flRadStep = (2*M_PI) / nNumSteps;
 	for ( int i = 0; i < nNumSteps; i++ )
 	{
-		data.m_vOrigin = GetAbsOrigin() + RandomVector( -32.0f, 32.0f );
+		data.m_vOrigin = GetEngineObject()->GetAbsOrigin() + RandomVector( -32.0f, 32.0f );
 		data.m_vNormal.x = cos( flRadStep*i );
 		data.m_vNormal.y = sin( flRadStep*i );
 		data.m_vNormal.z = 0.0f;
@@ -563,9 +563,9 @@ void CWeaponStriderBuster::CreateDestroyedEffect( void )
 	}
 
 	// More effects
-	UTIL_ScreenShake( GetAbsOrigin(), 20.0f, 150.0, 1.0, 1250.0f, SHAKE_START );
+	UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 20.0f, 150.0, 1.0, 1250.0f, SHAKE_START );
 
-	data.m_vOrigin = GetAbsOrigin();
+	data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 	DispatchEffect( "cball_explode", data );
 }
 
@@ -655,7 +655,7 @@ void CWeaponStriderBuster::Detonate( void )
 	{
 		// Kill the strider (with magic effect)
 		CBasePlayer *pPlayer = AI_GetSinglePlayer();
-		CTakeDamageInfo info( pPlayer, this, RandomVector( -100.0f, 100.0f ), GetAbsOrigin(), pVictim->GetHealth(), DMG_GENERIC );
+		CTakeDamageInfo info( pPlayer, this, RandomVector( -100.0f, 100.0f ), GetEngineObject()->GetAbsOrigin(), pVictim->GetHealth(), DMG_GENERIC );
 		pVictim->TakeDamage( info );
 
 		gamestats->Event_WeaponHit( ToBasePlayer( pPlayer ), true, GetClassname(), info );
@@ -684,7 +684,7 @@ void CWeaponStriderBuster::Detonate( void )
 	}
 	else
 	{
-		DispatchParticleEffect( "striderbuster_explode_dummy_core", GetAbsOrigin(), GetAbsAngles() );
+		DispatchParticleEffect( "striderbuster_explode_dummy_core", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 		const char* soundname = "Weapon_StriderBuster.Dud_Detonate";
 		CPASAttenuationFilter filter(this, soundname);
 
@@ -781,7 +781,7 @@ int CWeaponStriderBuster::OnTakeDamage( const CTakeDamageInfo &info )
 					params.m_pflSoundDuration = NULL;
 					params.m_bWarnOnDirectWaveReference = true;
 					g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-					DispatchParticleEffect( "striderbuster_break_flechette", GetAbsOrigin(), GetAbsAngles() );
+					DispatchParticleEffect( "striderbuster_break_flechette", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 					SetHealth( 0 );
 
 					Shatter( info.GetAttacker() );
@@ -865,7 +865,7 @@ void CWeaponStriderBuster::Launch( CBasePlayer *pPhysGunUser )
 	Hunter_StriderBusterLaunched( this );
 
 	// Start up the eye glow
-	m_hMainGlow = CSprite::SpriteCreate( "sprites/blueglow1.vmt", GetLocalOrigin(), false );
+	m_hMainGlow = CSprite::SpriteCreate( "sprites/blueglow1.vmt", GetEngineObject()->GetLocalOrigin(), false );
 
 	if ( m_hMainGlow != NULL )
 	{
@@ -919,7 +919,7 @@ void CWeaponStriderBuster::Shatter( CBaseEntity *pAttacker )
 	{
 		// Don't display this particular effect if we're attached to a strider. This effect just gets lost 
 		// in the big strider explosion anyway, so let's recover some perf.
-		DispatchParticleEffect( "striderbuster_break", GetAbsOrigin(), GetAbsAngles() );
+		DispatchParticleEffect( "striderbuster_break", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 	}
 
 	// Buster is useless now. Stop thinking, touching.
@@ -928,7 +928,7 @@ void CWeaponStriderBuster::Shatter( CBaseEntity *pAttacker )
 	SetContextThink( NULL, gpGlobals->curtime, s_pBusterPingThinkContext );
 
 	// Deal deadly damage to ourselves (DMG_CRUSH is allowed, others are blocked)
-	CTakeDamageInfo info( pAttacker, pAttacker, RandomVector( -100, 100 ), GetAbsOrigin(), 100.0f, DMG_CRUSH );
+	CTakeDamageInfo info( pAttacker, pAttacker, RandomVector( -100, 100 ), GetEngineObject()->GetAbsOrigin(), 100.0f, DMG_CRUSH );
 	TakeDamage( info );
 }
 
@@ -960,7 +960,7 @@ void CWeaponStriderBuster::BusterFlyThink()
 	{
 		// find the nearest enemy.
 		CBaseEntity *pList[16];
-		Vector origin = GetAbsOrigin();
+		Vector origin = GetEngineObject()->GetAbsOrigin();
 
 		// do a find in box ( a little faster than sphere )
 		int count;
@@ -987,7 +987,7 @@ void CWeaponStriderBuster::BusterFlyThink()
 			if ( pStrider && !pStrider->CarriedByDropship() ) // ShouldStickToEntity() doesn't work because the strider NPC isn't what we glue to
 			{
 				// get distance squared
-				VectorSubtract( pStrider->GetAdjustedOrigin(), GetAbsOrigin(), toTarget );
+				VectorSubtract( pStrider->GetAdjustedOrigin(), GetEngineObject()->GetAbsOrigin(), toTarget );
 
 				//NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + toTarget, 128, 0, 128, false, 0.1 );
 
@@ -1004,8 +1004,8 @@ void CWeaponStriderBuster::BusterFlyThink()
 		{
 			if ( striderbuster_debugseek.GetBool() )
 			{
-				NDebugOverlay::Circle( GetAbsOrigin() + toTarget, magradius, 255, 255, 255, 255, true, .1 );
-				NDebugOverlay::Cross3D( GetAbsOrigin() + toTarget, magradius, 255, 255, 255, true, .1 );
+				NDebugOverlay::Circle(GetEngineObject()->GetAbsOrigin() + toTarget, magradius, 255, 255, 255, 255, true, .1 );
+				NDebugOverlay::Cross3D(GetEngineObject()->GetAbsOrigin() + toTarget, magradius, 255, 255, 255, true, .1 );
 			}
 
 			// force magnitude. 
@@ -1033,7 +1033,7 @@ void CWeaponStriderBuster::BusterFlyThink()
 						NDebugOverlay::Cross3D( toTarget, magradius, 255, 0, 255, true, .1 );
 					}
 
-					toTarget -= GetAbsOrigin();
+					toTarget -= GetEngineObject()->GetAbsOrigin();
 					toTarget.NormalizeInPlace();
 					VPhysicsGetObject()->ApplyForceCenter( toTarget * magnitude );
 
@@ -1056,7 +1056,7 @@ void CWeaponStriderBuster::BusterDetachThink()
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	trace_t tr;
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector( 0, 0, 1200), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 1200), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 	if( fabs(tr.startpos.z - tr.endpos.z) < 240.0f )
 	{
@@ -1070,7 +1070,7 @@ void CWeaponStriderBuster::BusterDetachThink()
 		params.m_pflSoundDuration = NULL;
 		params.m_bWarnOnDirectWaveReference = true;
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-		DispatchParticleEffect( "striderbuster_break_flechette", GetAbsOrigin(), GetAbsAngles() );
+		DispatchParticleEffect( "striderbuster_break_flechette", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 		SetHealth( 0 );
 		CTakeDamageInfo info;
 		info.SetDamage( 1.0f );

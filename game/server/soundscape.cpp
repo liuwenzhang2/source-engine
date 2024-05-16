@@ -229,7 +229,7 @@ void CEnvSoundscape::WriteAudioParamsTo( audioparams_t &audio )
 			if ( pEntity )
 			{
 				audio.localBits |= 1<<i;
-				audio.localSound.Set( i, pEntity->GetAbsOrigin() );
+				audio.localSound.Set( i, pEntity->GetEngineObject()->GetAbsOrigin() );
 			}
 		}
 	}
@@ -305,7 +305,7 @@ void CEnvSoundscape::UpdateForPlayer( ss_update_t &update )
 	if ( soundscape_debug.GetBool() )
 	{
 		// draw myself
-		NDebugOverlay::Box(GetAbsOrigin(), Vector(-10,-10,-10), Vector(10,10,10),  255, 0, 255, 64, NDEBUG_PERSIST_TILL_NEXT_SERVER );
+		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), Vector(-10,-10,-10), Vector(10,10,10),  255, 0, 255, 64, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 
  		if ( update.pPlayer )
 		{
@@ -314,22 +314,22 @@ void CEnvSoundscape::UpdateForPlayer( ss_update_t &update )
 			{
 				if ( InRangeOfPlayer( update.pPlayer ) )
 				{
-					NDebugOverlay::Line( GetAbsOrigin(), update.pPlayer->WorldSpaceCenter(), 255, 255, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
+					NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), update.pPlayer->WorldSpaceCenter(), 255, 255, 255, true, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 				}
 				else
 				{
-					NDebugOverlay::Line( GetAbsOrigin(), update.pPlayer->WorldSpaceCenter(), 255, 0, 0, true, NDEBUG_PERSIST_TILL_NEXT_SERVER  );
+					NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), update.pPlayer->WorldSpaceCenter(), 255, 0, 0, true, NDEBUG_PERSIST_TILL_NEXT_SERVER  );
 				}
 			}
 			else
 			{
 				if ( InRangeOfPlayer( update.pPlayer ) )
 				{
-					NDebugOverlay::Line( GetAbsOrigin(), update.pPlayer->WorldSpaceCenter(), 0, 255, 0, true, NDEBUG_PERSIST_TILL_NEXT_SERVER  );
+					NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), update.pPlayer->WorldSpaceCenter(), 0, 255, 0, true, NDEBUG_PERSIST_TILL_NEXT_SERVER  );
 				}
   				else
 				{
-					NDebugOverlay::Line( GetAbsOrigin(), update.pPlayer->WorldSpaceCenter(), 255, 170, 0, true, NDEBUG_PERSIST_TILL_NEXT_SERVER  );
+					NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), update.pPlayer->WorldSpaceCenter(), 255, 170, 0, true, NDEBUG_PERSIST_TILL_NEXT_SERVER  );
 				}
 
 				// also draw lines to each sound position.
@@ -341,14 +341,14 @@ void CEnvSoundscape::UpdateForPlayer( ss_update_t &update )
 					if ( soundbits & (1 << ii) )
 					{
 						const Vector &soundLoc = audio.localSound.Get(ii);
-						NDebugOverlay::Line( GetAbsOrigin(), soundLoc, 0, 32 , 255 , false, NDEBUG_PERSIST_TILL_NEXT_SERVER );
+						NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), soundLoc, 0, 32 , 255 , false, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 						NDebugOverlay::Cross3D( soundLoc, 16.0f + periodic, 0, 0, 255, false, NDEBUG_PERSIST_TILL_NEXT_SERVER );
 					}
 				}
 			}
 		}
 
-		NDebugOverlay::EntityTextAtPosition( GetAbsOrigin(), 0, STRING(m_soundscapeName), NDEBUG_PERSIST_TILL_NEXT_SERVER );
+		NDebugOverlay::EntityTextAtPosition(GetEngineObject()->GetAbsOrigin(), 0, STRING(m_soundscapeName), NDEBUG_PERSIST_TILL_NEXT_SERVER );
 	}
 }
 
@@ -398,7 +398,7 @@ void CEnvSoundscape::DrawDebugGeometryOverlays( void )
 				CBaseEntity *pEnt = pPlayer; // ->GetSoundscapeListener();
 				if ( pEnt )
 				{
-					NDebugOverlay::Line(GetAbsOrigin(), pEnt->WorldSpaceCenter(), 255, 0, 255, false, 0 );
+					NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), pEnt->WorldSpaceCenter(), 255, 0, 255, false, 0 );
 				}
 			}
 		}

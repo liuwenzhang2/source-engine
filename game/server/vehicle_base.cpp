@@ -494,7 +494,7 @@ void CPropVehicleDriveable::OnRestore( void )
 	// eye exit endpoint field isn't being used at all.
 	if ( !m_bExitAnimOn )
 	{
-		m_vecEyeExitEndpoint = GetAbsOrigin();
+		m_vecEyeExitEndpoint = GetEngineObject()->GetAbsOrigin();
 	}
 
 	m_flNoImpactDamageTime = gpGlobals->curtime + 5.0f;
@@ -604,7 +604,7 @@ void CPropVehicleDriveable::EnterVehicle( CBaseCombatCharacter *pPassenger )
 		Vector vecViewOffset = m_pServerVehicle->GetSavedViewOffset();
 
 		// Clear our state
-		m_pServerVehicle->InitViewSmoothing( pPlayer->GetAbsOrigin() + vecViewOffset, pPlayer->EyeAngles() );
+		m_pServerVehicle->InitViewSmoothing( pPlayer->GetEngineObject()->GetAbsOrigin() + vecViewOffset, pPlayer->EyeAngles() );
 
 		m_VehiclePhysics.GetVehicle()->OnVehicleEnter();
 	}
@@ -717,7 +717,7 @@ void CPropVehicleDriveable::DriveVehicle( float flFrameTime, CUserCmd *ucmd, int
 bool CPropVehicleDriveable::IsOverturned( void )
 {
 	Vector	vUp;
-	VehicleAngleVectors( GetAbsAngles(), NULL, NULL, &vUp );
+	VehicleAngleVectors(GetEngineObject()->GetAbsAngles(), NULL, NULL, &vUp );
 
 	float	upDot = DotProduct( Vector(0,0,1), vUp );
 
@@ -980,7 +980,7 @@ void CPropVehicleDriveable::TraceAttack( const CTakeDamageInfo &info, const Vect
 			else
 			{
 				// If we don't have one, create an upright controller for us
-				m_hKeepUpright = CreateKeepUpright( GetAbsOrigin(), vec3_angle, this, GetUprightStrength(), false );
+				m_hKeepUpright = CreateKeepUpright(GetEngineObject()->GetAbsOrigin(), vec3_angle, this, GetUprightStrength(), false );
 			}
 
 			Assert( m_hKeepUpright );
@@ -1278,23 +1278,23 @@ void CFourWheelServerVehicle::NPC_DriveVehicle( void )
 			GetFourWheelVehicle()->GetVectors( &vecForward, &vecRight, NULL );
 			if ( m_nNPCButtons & IN_FORWARD )
 			{
-				NDebugOverlay::Line( GetFourWheelVehicle()->GetAbsOrigin(), GetFourWheelVehicle()->GetAbsOrigin() + vecForward * 200, 0,255,0, true, 0.1 );
+				NDebugOverlay::Line( GetFourWheelVehicle()->GetEngineObject()->GetAbsOrigin(), GetFourWheelVehicle()->GetEngineObject()->GetAbsOrigin() + vecForward * 200, 0,255,0, true, 0.1 );
 			}
 			if ( m_nNPCButtons & IN_BACK )
 			{
-				NDebugOverlay::Line( GetFourWheelVehicle()->GetAbsOrigin(), GetFourWheelVehicle()->GetAbsOrigin() - vecForward * 200, 0,255,0, true, 0.1 );
+				NDebugOverlay::Line( GetFourWheelVehicle()->GetEngineObject()->GetAbsOrigin(), GetFourWheelVehicle()->GetEngineObject()->GetAbsOrigin() - vecForward * 200, 0,255,0, true, 0.1 );
 			}
 			if ( m_nNPCButtons & IN_MOVELEFT )
 			{
-				NDebugOverlay::Line( GetFourWheelVehicle()->GetAbsOrigin(), GetFourWheelVehicle()->GetAbsOrigin() - vecRight * 200 * -m_flTurnDegrees, 0,255,0, true, 0.1 );
+				NDebugOverlay::Line( GetFourWheelVehicle()->GetEngineObject()->GetAbsOrigin(), GetFourWheelVehicle()->GetEngineObject()->GetAbsOrigin() - vecRight * 200 * -m_flTurnDegrees, 0,255,0, true, 0.1 );
 			}
 			if ( m_nNPCButtons & IN_MOVERIGHT )
 			{
-				NDebugOverlay::Line( GetFourWheelVehicle()->GetAbsOrigin(), GetFourWheelVehicle()->GetAbsOrigin() + vecRight * 200 * m_flTurnDegrees, 0,255,0, true, 0.1 );
+				NDebugOverlay::Line( GetFourWheelVehicle()->GetEngineObject()->GetAbsOrigin(), GetFourWheelVehicle()->GetEngineObject()->GetAbsOrigin() + vecRight * 200 * m_flTurnDegrees, 0,255,0, true, 0.1 );
 			}
 			if ( m_nNPCButtons & IN_JUMP )
 			{
-				NDebugOverlay::Box( GetFourWheelVehicle()->GetAbsOrigin(), -Vector(20,20,20), Vector(20,20,20), 0,255,0, true, 0.1 );
+				NDebugOverlay::Box( GetFourWheelVehicle()->GetEngineObject()->GetAbsOrigin(), -Vector(20,20,20), Vector(20,20,20), 0,255,0, true, 0.1 );
 			}
 		}
 	}

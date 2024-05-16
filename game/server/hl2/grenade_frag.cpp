@@ -165,7 +165,7 @@ void CGrenadeFrag::CreateEffects( void )
 {
 	// Start up the eye glow
 	if( !m_pMainGlow )
-		m_pMainGlow = CSprite::SpriteCreate( "sprites/redglow1.vmt", GetLocalOrigin(), false );
+		m_pMainGlow = CSprite::SpriteCreate( "sprites/redglow1.vmt", GetEngineObject()->GetLocalOrigin(), false );
 
 	int nAttachment = LookupAttachment( "fuse" );
 
@@ -180,7 +180,7 @@ void CGrenadeFrag::CreateEffects( void )
 
 	// Start up the eye trail
 	if( !m_pGlowTrail )
-		m_pGlowTrail = CSpriteTrail::SpriteTrailCreate( "sprites/bluelaser1.vmt", GetLocalOrigin(), false );
+		m_pGlowTrail = CSpriteTrail::SpriteTrailCreate( "sprites/bluelaser1.vmt", GetEngineObject()->GetLocalOrigin(), false );
 
 	if ( m_pGlowTrail != NULL )
 	{
@@ -242,7 +242,7 @@ void CGrenadeFrag::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	AngularImpulse angVel;
 	pPhysics->GetVelocity( &vel, &angVel );
 	
-	Vector start = GetAbsOrigin();
+	Vector start = GetEngineObject()->GetAbsOrigin();
 	// find all entities that my collision group wouldn't hit, but COLLISION_GROUP_NONE would and bounce off of them as a ray cast
 	CTraceFilterCollisionGroupDelta filter( this, GetCollisionGroup(), COLLISION_GROUP_NONE );
 	trace_t tr;
@@ -270,7 +270,7 @@ void CGrenadeFrag::VPhysicsUpdate( IPhysicsObject *pPhysics )
 		Vector dir = vel;
 		VectorNormalize(dir);
 		// send a tiny amount of damage so the character will react to getting bonked
-		CTakeDamageInfo info( this, GetThrower(), pPhysics->GetMass() * vel, GetAbsOrigin(), 0.1f, DMG_CRUSH );
+		CTakeDamageInfo info( this, GetThrower(), pPhysics->GetMass() * vel, GetEngineObject()->GetAbsOrigin(), 0.1f, DMG_CRUSH );
 		((CBaseEntity*)tr.m_pEnt)->TakeDamage( info );
 
 		// reflect velocity around normal
@@ -344,7 +344,7 @@ void CGrenadeFrag::DelayThink()
 	if( !m_bHasWarnedAI && gpGlobals->curtime >= m_flWarnAITime )
 	{
 #if !defined( CLIENT_DLL )
-		CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), 400, 1.5, this );
+		CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), 400, 1.5, this );
 #endif
 		m_bHasWarnedAI = true;
 	}

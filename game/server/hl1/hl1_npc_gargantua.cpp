@@ -157,7 +157,7 @@ CStomp *CStomp::StompCreate( Vector &origin, Vector &end, float speed, CBaseEnti
 {
 	CStomp *pStomp = (CStomp*)gEntList.CreateEntityByName( "garg_stomp" );
 
-	pStomp->SetAbsOrigin( origin );
+	pStomp->GetEngineObject()->SetAbsOrigin( origin );
 	Vector dir = (end - origin);
 //	pStomp->m_flScale = dir.Length();
 	pStomp->m_flScale = 2048;
@@ -206,7 +206,7 @@ void CStomp::Think( void )
 	SetNextThink( gpGlobals->curtime + 0.1 );
 
 	// Do damage for this frame
-	Vector vecStart = GetAbsOrigin();
+	Vector vecStart = GetEngineObject()->GetAbsOrigin();
 	vecStart.z += 30;
 	Vector vecEnd = vecStart + (m_vecMoveDir * m_flSpeed * gpGlobals->frametime);
 
@@ -233,14 +233,14 @@ void CStomp::Think( void )
 
 	while ( gpGlobals->curtime - m_flDmgTime > STOMP_INTERVAL )
 	{
-		SetAbsOrigin( GetAbsOrigin() + m_vecMoveDir * m_flSpeed * STOMP_INTERVAL );
+		GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() + m_vecMoveDir * m_flSpeed * STOMP_INTERVAL );
 		for ( int i = 0; i < 2; i++ )
 		{
-			CSprite *pSprite = CSprite::SpriteCreate( GARG_STOMP_SPRITE_NAME, GetAbsOrigin(), TRUE );
+			CSprite *pSprite = CSprite::SpriteCreate( GARG_STOMP_SPRITE_NAME, GetEngineObject()->GetAbsOrigin(), TRUE );
 			if ( pSprite )
 			{
-				UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector(0,0,500), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
-				pSprite->SetAbsOrigin( tr.endpos );
+				UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector(0,0,500), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
+				pSprite->GetEngineObject()->SetAbsOrigin( tr.endpos );
 //				pSprite->pev->velocity = Vector(RandomFloat(-200,200),RandomFloat(-200,200),175);
 				pSprite->SetNextThink( gpGlobals->curtime + 0.3 );
 				pSprite->SetThink( &CSprite::SUB_Remove );
@@ -296,7 +296,7 @@ void CNPC_Gargantua::Spawn()
 	SetHullType( HULL_LARGE );
 	SetHullSizeNormal();
 
-	m_pEyeGlow = CSprite::SpriteCreate( GARG_EYE_SPRITE_NAME, GetAbsOrigin(), FALSE );
+	m_pEyeGlow = CSprite::SpriteCreate( GARG_EYE_SPRITE_NAME, GetEngineObject()->GetAbsOrigin(), FALSE );
 	m_pEyeGlow->SetTransparency( kRenderGlow, 255, 255, 255, 0, kRenderFxNoDissipation );
 	m_pEyeGlow->SetAttachment( this, 1 );
 	EyeOff();
@@ -456,15 +456,15 @@ CBaseEntity* CNPC_Gargantua::GargantuaCheckTraceHullAttack(float flDist, int iDa
 	trace_t tr;
 
 	Vector vForward, vUp;
-	AngleVectors( GetAbsAngles(), &vForward, NULL, &vUp );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward, NULL, &vUp );
 
-	Vector vecStart = GetAbsOrigin();
+	Vector vecStart = GetEngineObject()->GetAbsOrigin();
 	vecStart.z += 64;
 	Vector vecEnd = vecStart + ( vForward * flDist) - ( vUp * flDist * 0.3);
 
 	//UTIL_TraceHull( vecStart, vecEnd, dont_ignore_monsters, head_hull, ENT(pev), &tr );
 
-	UTIL_TraceEntity( this, GetAbsOrigin(), vecEnd, MASK_SOLID, &tr );
+	UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vecEnd, MASK_SOLID, &tr );
 	
 	if ( tr.m_pEnt )
 	{
@@ -501,8 +501,8 @@ void CNPC_Gargantua::HandleAnimEvent( animevent_t *pEvent )
 					pHurt->ViewPunch( QAngle( -30, -30, 30 ) );
 
 					Vector vRight;
-					AngleVectors( GetAbsAngles(), NULL, &vRight, NULL );
-					pHurt->SetAbsVelocity( pHurt->GetAbsVelocity() - vRight * 100 );
+					AngleVectors(GetEngineObject()->GetAbsAngles(), NULL, &vRight, NULL );
+					pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() - vRight * 100 );
 				}
 
 				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Garg.AttackHit" );
@@ -517,7 +517,7 @@ void CNPC_Gargantua::HandleAnimEvent( animevent_t *pEvent )
 	case GARG_AE_RIGHT_FOOT:
 	case GARG_AE_LEFT_FOOT:
 
-		UTIL_ScreenShake( GetAbsOrigin(), 4.0, 3.0, 1.0, 1500, SHAKE_START );
+		UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 4.0, 3.0, 1.0, 1500, SHAKE_START );
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Garg.Footstep" );
 		break;
 
@@ -640,16 +640,16 @@ void CNPC_Gargantua::RunTask( const Task_t *pTask )
 				pGib->SetBodygroup( 0, bodyPart );
 				pGib->SetBloodColor( BLOOD_COLOR_YELLOW );
 				pGib->m_material = matNone;
-				pGib->SetAbsOrigin( GetAbsOrigin() );
-				pGib->SetAbsVelocity( UTIL_RandomBloodVector() * random->RandomFloat( 300, 500 ) );
+				pGib->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
+				pGib->GetEngineObject()->SetAbsVelocity( UTIL_RandomBloodVector() * random->RandomFloat( 300, 500 ) );
 	
 				pGib->SetNextThink( gpGlobals->curtime + 1.25 );
 				pGib->SetThink( &CBaseEntity::SUB_FadeOut );
 			}
 	
 			Vector vecSize = Vector( 200, 200, 128 );
-			CPVSFilter filter( GetAbsOrigin() );
-			te->BreakModel( filter, 0.0, GetAbsOrigin(), vec3_angle, vecSize, vec3_origin, 
+			CPVSFilter filter(GetEngineObject()->GetAbsOrigin() );
+			te->BreakModel( filter, 0.0, GetEngineObject()->GetAbsOrigin(), vec3_angle, vecSize, vec3_origin,
 				gGargGibModel, 200, 50, 3.0, BREAK_FLESH );
 	
 			return;
@@ -680,13 +680,13 @@ void CNPC_Gargantua::RunTask( const Task_t *pTask )
 
 			if ( pEnemy )
 			{
-				Vector org = GetAbsOrigin();
+				Vector org = GetEngineObject()->GetAbsOrigin();
 				org.z += 64;
 				Vector dir = pEnemy->BodyTarget(org) - org;
 
 				VectorAngles( dir, angles );
 				angles.x = -angles.x;
-				angles.y -= GetAbsAngles().y;
+				angles.y -= GetEngineObject()->GetAbsAngles().y;
 
 				if ( dir.Length() > 400 )
 					cancel = true;
@@ -722,7 +722,7 @@ void CNPC_Gargantua::FlameCreate( void )
 
 	Vector	vForward;
 
-	AngleVectors( GetAbsAngles(), &vForward );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
 
  	for ( i = 0; i < 4; i++ )
 	{
@@ -796,7 +796,7 @@ void CNPC_Gargantua::FlameUpdate( void )
 	{
 		if ( m_pFlame[i] )
 		{
-			QAngle vecAim = GetAbsAngles();
+			QAngle vecAim = GetEngineObject()->GetAbsAngles();
 			vecAim.x += -m_flameX;
 			vecAim.y += m_flameY;
 
@@ -848,7 +848,7 @@ void CNPC_Gargantua::FlameDamage( Vector vecStart, Vector vecEnd, CBaseEntity *p
 	VectorNormalize( vecAim );
 
 	// iterate on all entities in the vicinity.
-	while ((pEntity = gEntList.FindEntityInSphere( pEntity, GetAbsOrigin(), searchRadius )) != NULL)
+	while ((pEntity = gEntList.FindEntityInSphere( pEntity, GetEngineObject()->GetAbsOrigin(), searchRadius )) != NULL)
 	{
 
 		if ( pEntity->m_takedamage != DAMAGE_NO )
@@ -961,14 +961,14 @@ void CNPC_Gargantua::StompAttack( void )
 	trace_t trace;
 
 	Vector vecForward;
-	AngleVectors(GetAbsAngles(), &vecForward );
-	Vector vecStart = GetAbsOrigin() + Vector(0,0,60) + 35 * vecForward;
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vecForward );
+	Vector vecStart = GetEngineObject()->GetAbsOrigin() + Vector(0,0,60) + 35 * vecForward;
 
 	CBaseEntity* pPlayer = GetEnemy();
 	if ( !pPlayer )
 		return;
 
-	Vector vecAim = pPlayer->GetAbsOrigin() - GetAbsOrigin();
+	Vector vecAim = pPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( vecAim );
 	Vector vecEnd = (vecAim * 1024) + vecStart;
 
@@ -976,11 +976,11 @@ void CNPC_Gargantua::StompAttack( void )
 //	NDebugOverlay::Line( vecStart, vecEnd, 255, 0, 0, false, 10.0f );
 
 	CStomp::StompCreate( vecStart, trace.endpos, 0, this );
-	UTIL_ScreenShake( GetAbsOrigin(), 12.0, 100.0, 2.0, 1000, SHAKE_START );
+	UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 12.0, 100.0, 2.0, 1000, SHAKE_START );
 	CPASAttenuationFilter filter( this );
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Garg.StompSound" );
 
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() - Vector(0,0,20), MASK_SOLID, this, COLLISION_GROUP_NONE, &trace );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector(0,0,20), MASK_SOLID, this, COLLISION_GROUP_NONE, &trace );
 	if ( trace.fraction < 1.0 )
 	{
 		UTIL_DecalTrace( &trace, "SmallScorch" );
@@ -992,21 +992,21 @@ void CNPC_Gargantua::DeathEffect( void )
 	int i;
 
 	Vector vForward;
-	AngleVectors( GetAbsAngles(), &vForward );
-	Vector deathPos = GetAbsOrigin() + vForward * 100;
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
+	Vector deathPos = GetEngineObject()->GetAbsOrigin() + vForward * 100;
 
-	Vector position = GetAbsOrigin();
+	Vector position = GetEngineObject()->GetAbsOrigin();
 	position.z += 32;
 
-	CPASFilter filter( GetAbsOrigin() );
+	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 	for ( i = 0; i < 7; i++)
 	{
-		te->Explosion( filter, i * 0.2,	&GetAbsOrigin(), g_sModelIndexFireball,	10, 15, TE_EXPLFLAG_NONE, 100, 0 );
+		te->Explosion( filter, i * 0.2,	&GetEngineObject()->GetAbsOrigin(), g_sModelIndexFireball,	10, 15, TE_EXPLFLAG_NONE, 100, 0 );
 		position.z += 15;
 	}
 
-	UTIL_Smoke(GetAbsOrigin(),random->RandomInt(10, 15), 10);
-	UTIL_ScreenShake( GetAbsOrigin(), 25.0, 100.0, 5.0, 1000, SHAKE_START );
+	UTIL_Smoke(GetEngineObject()->GetAbsOrigin(),random->RandomInt(10, 15), 10);
+	UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 25.0, 100.0, 5.0, 1000, SHAKE_START );
 
 }
 

@@ -400,7 +400,7 @@ CHunterFlechette *CHunterFlechette::FlechetteCreate( const Vector &vecOrigin, co
 	// Create a new entity with CHunterFlechette private data
 	CHunterFlechette *pFlechette = (CHunterFlechette *)gEntList.CreateEntityByName( "hunter_flechette" );
 	UTIL_SetOrigin( pFlechette, vecOrigin );
-	pFlechette->SetAbsAngles( angAngles );
+	pFlechette->GetEngineObject()->SetAbsAngles( angAngles );
 	pFlechette->Spawn();
 	pFlechette->Activate();
 	pFlechette->SetOwnerEntity( pentOwner );
@@ -622,7 +622,7 @@ void CHunterFlechette::StickTo( CBaseEntity *pOther, trace_t &tr )
 	//data.m_nEntIndex = 0;
 	//DispatchEffect( "BoltImpact", data );
 	
-	Vector vecVelocity = GetAbsVelocity();
+	Vector vecVelocity = GetEngineObject()->GetAbsVelocity();
 	bool bAttachedToBuster = StriderBuster_OnFlechetteAttach( pOther, vecVelocity );
 
 	SetTouch( NULL );
@@ -655,9 +655,9 @@ void CHunterFlechette::StickTo( CBaseEntity *pOther, trace_t &tr )
 		UTIL_ImpactTrace( &tr, DMG_BULLET );
 		
 		// Shoot some sparks
-		if ( UTIL_PointContents( GetAbsOrigin() ) != CONTENTS_WATER)
+		if ( UTIL_PointContents(GetEngineObject()->GetAbsOrigin() ) != CONTENTS_WATER)
 		{
-			g_pEffects->Sparks( GetAbsOrigin() );
+			g_pEffects->Sparks(GetEngineObject()->GetAbsOrigin() );
 		}
 	}
 }
@@ -682,7 +682,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 
 	if ( pOther->m_takedamage != DAMAGE_NO )
 	{
-		Vector	vecNormalizedVel = GetAbsVelocity();
+		Vector	vecNormalizedVel = GetEngineObject()->GetAbsVelocity();
 
 		ClearMultiDamage();
 		VectorNormalize( vecNormalizedVel );
@@ -705,7 +705,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 		if ( pOther->GetCollisionGroup() == COLLISION_GROUP_BREAKABLE_GLASS )
 			 return;
 			 
-		SetAbsVelocity( Vector( 0, 0, 0 ) );
+		GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 0 ) );
 
 		// play body "thwack" sound
 		const char* soundname = "NPC_Hunter.FlechetteHitBody";
@@ -721,11 +721,11 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 		StopParticleEffects( this );
 
 		Vector vForward;
-		AngleVectors( GetAbsAngles(), &vForward );
+		AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward );
 		VectorNormalize ( vForward );
 
 		trace_t	tr2;
-		UTIL_TraceLine( GetAbsOrigin(),	GetAbsOrigin() + vForward * 128, MASK_BLOCKLOS, pOther, COLLISION_GROUP_NONE, &tr2 );
+		UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vForward * 128, MASK_BLOCKLOS, pOther, COLLISION_GROUP_NONE, &tr2 );
 
 		if ( tr2.fraction != 1.0f )
 		{
@@ -799,10 +799,10 @@ void CHunterFlechette::SeekThink()
 {
 	if ( m_hSeekTarget )
 	{
-		Vector vecBodyTarget = m_hSeekTarget->BodyTarget( GetAbsOrigin() );
+		Vector vecBodyTarget = m_hSeekTarget->BodyTarget(GetEngineObject()->GetAbsOrigin() );
 
 		Vector vecClosest;
-		CalcClosestPointOnLineSegment( GetAbsOrigin(), m_vecShootPosition, vecBodyTarget, vecClosest, NULL );
+		CalcClosestPointOnLineSegment(GetEngineObject()->GetAbsOrigin(), m_vecShootPosition, vecBodyTarget, vecClosest, NULL );
 
 		Vector vecDelta = vecBodyTarget - m_vecShootPosition;
 		VectorNormalize( vecDelta );
@@ -833,11 +833,11 @@ void CHunterFlechette::DopplerThink()
 	if ( !pPlayer )
 		return;
 
-	Vector vecVelocity = GetAbsVelocity();
+	Vector vecVelocity = GetEngineObject()->GetAbsVelocity();
 	VectorNormalize( vecVelocity );
 	
-	float flMyDot = DotProduct( vecVelocity, GetAbsOrigin() );
-	float flPlayerDot = DotProduct( vecVelocity, pPlayer->GetAbsOrigin() );
+	float flMyDot = DotProduct( vecVelocity, GetEngineObject()->GetAbsOrigin() );
+	float flPlayerDot = DotProduct( vecVelocity, pPlayer->GetEngineObject()->GetAbsOrigin() );
 
 	if ( flPlayerDot <= flMyDot )
 	{
@@ -871,7 +871,7 @@ void CHunterFlechette::BubbleThink()
 	if ( GetWaterLevel()  == 0 )
 		return;
 
-	UTIL_BubbleTrail( GetAbsOrigin() - GetAbsVelocity() * 0.1f, GetAbsOrigin(), 5 );
+	UTIL_BubbleTrail(GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsVelocity() * 0.1f, GetEngineObject()->GetAbsOrigin(), 5 );
 }
 
 
@@ -881,9 +881,9 @@ void CHunterFlechette::Shoot( Vector &vecVelocity, bool bBrightFX )
 {
 	CreateSprites( bBrightFX );
 
-	m_vecShootPosition = GetAbsOrigin();
+	m_vecShootPosition = GetEngineObject()->GetAbsOrigin();
 
-	SetAbsVelocity( vecVelocity );
+	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 	SetThink( &CHunterFlechette::DopplerThink );
 	SetNextThink( gpGlobals->curtime );
@@ -906,7 +906,7 @@ void CHunterFlechette::DangerSoundThink()
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	CSoundEnt::InsertSound( SOUND_DANGER|SOUND_CONTEXT_EXCLUDE_COMBINE, GetAbsOrigin(), 150.0f, 0.5, this );
+	CSoundEnt::InsertSound( SOUND_DANGER|SOUND_CONTEXT_EXCLUDE_COMBINE, GetEngineObject()->GetAbsOrigin(), 150.0f, 0.5, this );
 	SetThink( &CHunterFlechette::ExplodeThink );
 	SetNextThink( gpGlobals->curtime + HUNTER_FLECHETTE_WARN_TIME );
 }
@@ -942,7 +942,7 @@ void CHunterFlechette::Explode()
 	// Move the explosion effect to the tip to reduce intersection with the world.
 	Vector vecFuse;
 	GetAttachment( s_nFlechetteFuseAttach, vecFuse );
-	DispatchParticleEffect( "hunter_projectile_explosion_1", vecFuse, GetAbsAngles(), NULL );
+	DispatchParticleEffect( "hunter_projectile_explosion_1", vecFuse, GetEngineObject()->GetAbsAngles(), NULL );
 
 	int nDamageType = DMG_DISSOLVE;
 
@@ -955,7 +955,7 @@ void CHunterFlechette::Explode()
 		nDamageType |= DMG_PREVENT_PHYSICS_FORCE;
 	}
 
-	RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), sk_hunter_flechette_explode_dmg.GetFloat(), nDamageType ), GetAbsOrigin(), sk_hunter_flechette_explode_radius.GetFloat(), CLASS_NONE, NULL );
+	RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), sk_hunter_flechette_explode_dmg.GetFloat(), nDamageType ), GetEngineObject()->GetAbsOrigin(), sk_hunter_flechette_explode_radius.GetFloat(), CLASS_NONE, NULL );
 		
     AddEffects( EF_NODRAW );
 
@@ -1081,7 +1081,7 @@ public:
 
 	bool FarFromFollowTarget()
 	{ 
-		return ( GetFollowTarget() && (GetAbsOrigin() - GetFollowTarget()->GetAbsOrigin()).LengthSqr() > HUNTER_FOLLOW_DISTANCE_SQR ); 
+		return ( GetFollowTarget() && (GetAbsOrigin() - GetFollowTarget()->GetEngineObject()->GetAbsOrigin()).LengthSqr() > HUNTER_FOLLOW_DISTANCE_SQR );
 	}
 
 	void DrawDebugGeometryOverlays();
@@ -1999,7 +1999,7 @@ bool CNPC_Hunter::OverrideMoveFacing( const AILocalMoveGoal_t &move, float flInt
 		Vector vecEnemyLKP = GetEnemyLKP();
 		
 		// Face my enemy if we're close enough
-		if ( bSideStepping || UTIL_DistApprox( vecEnemyLKP, GetAbsOrigin() ) < HUNTER_FACE_ENEMY_DIST )
+		if ( bSideStepping || UTIL_DistApprox( vecEnemyLKP, GetEngineObject()->GetAbsOrigin() ) < HUNTER_FACE_ENEMY_DIST )
 		{
 			AddFacingTarget( GetEnemy(), vecEnemyLKP, 1.0, 0.2 );
 		}
@@ -2060,7 +2060,7 @@ void CNPC_Hunter::Activate()
 		// Currently just using the gun for the vertical component!
 		Vector defEyePos;
 		pHunter->GetAttachment( "minigunbase", defEyePos );
-		gm_flMinigunDistZ = defEyePos.z - pHunter->GetAbsOrigin().z;
+		gm_flMinigunDistZ = defEyePos.z - pHunter->GetEngineObject()->GetAbsOrigin().z;
 
 		Vector position;
 		pHunter->GetAttachment( gm_nTopGunAttachment, position );
@@ -2297,7 +2297,7 @@ void CNPC_Hunter::GatherChargeConditions()
 	if ( m_EscortBehavior.GetEscortTarget() && GetEnemy()->MyCombatCharacterPointer() && !GetEnemy()->MyCombatCharacterPointer()->FInViewCone( this ) )
 		return;
 
-	if ( ShouldCharge( GetAbsOrigin(), GetEnemy()->GetAbsOrigin(), true, false ) )
+	if ( ShouldCharge(GetEngineObject()->GetAbsOrigin(), GetEnemy()->GetEngineObject()->GetAbsOrigin(), true, false ) )
 	{
 		SetCondition( COND_HUNTER_CAN_CHARGE_ENEMY );
 	}
@@ -2325,20 +2325,20 @@ void CNPC_Hunter::GatherConditions()
 
 			// Extrapolate the position of the vehicle and see if it's heading toward us.
 			float predictTime = hunter_dodge_warning.GetFloat();
-			Vector2D vecFuturePos = pVehicle->GetAbsOrigin().AsVector2D() + pVehicle->GetSmoothedVelocity().AsVector2D() * predictTime;
+			Vector2D vecFuturePos = pVehicle->GetEngineObject()->GetAbsOrigin().AsVector2D() + pVehicle->GetSmoothedVelocity().AsVector2D() * predictTime;
 			if ( pVehicle->GetSmoothedVelocity().LengthSqr() > Square( 200 ) )
 			{
 				float t = 0;
 				Vector2D vDirMovement = pVehicle->GetSmoothedVelocity().AsVector2D();
 				if ( hunter_dodge_debug.GetBool() )
 				{
-					NDebugOverlay::Line( pVehicle->GetAbsOrigin(), pVehicle->GetAbsOrigin() + pVehicle->GetSmoothedVelocity(), 255, 255, 255, true, .1 );
+					NDebugOverlay::Line( pVehicle->GetEngineObject()->GetAbsOrigin(), pVehicle->GetEngineObject()->GetAbsOrigin() + pVehicle->GetSmoothedVelocity(), 255, 255, 255, true, .1 );
 				}
 				vDirMovement.NormalizeInPlace();
-				Vector2D vDirToHunter = GetAbsOrigin().AsVector2D() - pVehicle->GetAbsOrigin().AsVector2D();
+				Vector2D vDirToHunter = GetEngineObject()->GetAbsOrigin().AsVector2D() - pVehicle->GetEngineObject()->GetAbsOrigin().AsVector2D();
 				vDirToHunter.NormalizeInPlace();
 				if ( DotProduct2D( vDirMovement, vDirToHunter ) > hunter_dodge_warning_cone.GetFloat() && 
-					 CalcDistanceSqrToLine2D( GetAbsOrigin().AsVector2D(), pVehicle->GetAbsOrigin().AsVector2D(), vecFuturePos, &t ) < Square( hunter_dodge_warning_width.GetFloat() * .5 ) && 
+					 CalcDistanceSqrToLine2D(GetEngineObject()->GetAbsOrigin().AsVector2D(), pVehicle->GetEngineObject()->GetAbsOrigin().AsVector2D(), vecFuturePos, &t ) < Square( hunter_dodge_warning_width.GetFloat() * .5 ) &&
 					 t > 0.0 && t < 1.0 )
 				{
 					if ( fabs( predictTime - hunter_dodge_warning.GetFloat() ) < .05 || random->RandomInt( 0, 3 ) )
@@ -2392,7 +2392,7 @@ void CNPC_Hunter::GatherConditions()
 
 		}
 
-		m_vecEnemyLastSeen = GetEnemy()->GetAbsOrigin();
+		m_vecEnemyLastSeen = GetEnemy()->GetEngineObject()->GetAbsOrigin();
 	}
 
 	if( !HasCondition(COND_ENEMY_OCCLUDED) )
@@ -2486,7 +2486,7 @@ void CNPC_Hunter::ManageSiegeTargets()
 			if ( pCandidate == NULL )
 				continue;
 
-			float flDistSqr = pCandidate->GetAbsOrigin().DistToSqr(pPlayer->GetAbsOrigin());
+			float flDistSqr = pCandidate->GetEngineObject()->GetAbsOrigin().DistToSqr(pPlayer->GetEngineObject()->GetAbsOrigin());
 
 			if( flDistSqr < flClosestDistSqr )
 			{
@@ -2511,13 +2511,13 @@ void CNPC_Hunter::ManageSiegeTargets()
 
 			// Create a bullseye that will live for 20 seconds. If we can't attack it within 20 seconds, it's probably
 			// out of reach anyone, so have it clean itself up after that long.
-			CBaseEntity *pSiegeTarget = CreateCustomTarget( pSiegeTargetLocation->GetAbsOrigin(), 20.0f );
+			CBaseEntity *pSiegeTarget = CreateCustomTarget( pSiegeTargetLocation->GetEngineObject()->GetAbsOrigin(), 20.0f );
 			pSiegeTarget->SetName( "siegetarget" );
 
 			m_hCurrentSiegeTarget.Set( pSiegeTarget );
 
 			AddEntityRelationship( pSiegeTarget, D_HT, 1 );
-			GetEnemies()->UpdateMemory( GetNavigator()->GetNetwork(), pSiegeTarget, pSiegeTarget->GetAbsOrigin(), 0.0f, true );
+			GetEnemies()->UpdateMemory( GetNavigator()->GetNetwork(), pSiegeTarget, pSiegeTarget->GetEngineObject()->GetAbsOrigin(), 0.0f, true );
 			AI_EnemyInfo_t *pMemory = GetEnemies()->Find( pSiegeTarget );
 
 			if( pMemory )
@@ -2574,7 +2574,7 @@ void CNPC_Hunter::GatherIndoorOutdoorConditions()
 	// whether we're indoors or out.
 	trace_t tr;
 
-	UTIL_TraceLine( GetAbsOrigin(), GetAbsOrigin() + Vector( 0, 0, 40.0f * 12.0f ), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 40.0f * 12.0f ), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 	if( tr.fraction < 1.0f )
 	{
 		SetCondition( COND_HUNTER_IS_INDOORS );
@@ -3017,11 +3017,11 @@ int CNPC_Hunter::SelectSchedule()
 			ClearCondition( COND_HUNTER_NEW_HINTGROUP );
 			if ( GetEnemy() )
 			{
-				pHint = CAI_HintManager::FindHint( NULL, GetEnemy()->GetAbsOrigin(), criteria );
+				pHint = CAI_HintManager::FindHint( NULL, GetEnemy()->GetEngineObject()->GetAbsOrigin(), criteria );
 			}
 			else
 			{
-				pHint = CAI_HintManager::FindHint( GetAbsOrigin(), criteria );
+				pHint = CAI_HintManager::FindHint(GetEngineObject()->GetAbsOrigin(), criteria );
 			}
 
 			if ( pHint )
@@ -3031,10 +3031,10 @@ int CNPC_Hunter::SelectSchedule()
 		} 
 		else
 		{
-			pHint = CAI_HintManager::FindHint( GetAbsOrigin(), criteria );
+			pHint = CAI_HintManager::FindHint(GetEngineObject()->GetAbsOrigin(), criteria );
 			if ( pHint )
 			{
-				if ( (pHint->GetAbsOrigin() - GetAbsOrigin()).Length2DSqr() < Square( 20*12 ) )
+				if ( (pHint->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length2DSqr() < Square( 20*12 ) )
 				{
 					m_CheckHintGroupTimer.Set( 5 );
 					pHint = NULL;
@@ -3291,7 +3291,7 @@ void CNPC_Hunter::TaskFindDodgeActivity()
 	GetVectors( NULL, &vecRight, &vecUp );
 
 	// TODO: find most perpendicular 8-way dodge when we get the anims
-	Vector vecEnemyDir = GetEnemy()->GetAbsOrigin() - GetAbsOrigin();
+	Vector vecEnemyDir = GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	//Vector vecDir = CrossProduct( vecEnemyDir, vecUp );
 	VectorNormalize( vecEnemyDir );
 	if ( fabs( DotProduct( vecEnemyDir, vecRight ) ) > 0.7 )
@@ -3307,10 +3307,10 @@ void CNPC_Hunter::TaskFindDodgeActivity()
 	{
 		Ray_t enemyRay;
 		Ray_t perpendicularRay;
-		enemyRay.Init( pVehicle->GetAbsOrigin(), pVehicle->GetAbsOrigin() + pVehicle->GetSmoothedVelocity() );
+		enemyRay.Init( pVehicle->GetEngineObject()->GetAbsOrigin(), pVehicle->GetEngineObject()->GetAbsOrigin() + pVehicle->GetSmoothedVelocity() );
 		Vector vPerpendicularPt = vecEnemyDir;
 		vPerpendicularPt.y = -vPerpendicularPt.y;
-		perpendicularRay.Init( GetAbsOrigin(), GetAbsOrigin() + vPerpendicularPt );
+		perpendicularRay.Init(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vPerpendicularPt );
 
 		enemyRay.m_Start.z = enemyRay.m_Delta.z = enemyRay.m_StartOffset.z;
 		perpendicularRay.m_Start.z = perpendicularRay.m_Delta.z = perpendicularRay.m_StartOffset.z;
@@ -3351,7 +3351,7 @@ void CNPC_Hunter::TaskFindDodgeActivity()
 
 		// Transform the sequence delta into local space.
 		matrix3x4_t fRotateMatrix;
-		AngleMatrix( GetLocalAngles(), fRotateMatrix );
+		AngleMatrix(GetEngineObject()->GetLocalAngles(), fRotateMatrix );
 		Vector vecDelta;
 		VectorRotate( vecLocalDelta, fRotateMatrix, vecDelta );
 
@@ -3361,7 +3361,7 @@ void CNPC_Hunter::TaskFindDodgeActivity()
 
 		// See if all is clear in that direction.
 		trace_t tr;
-		HunterTraceHull_SkipPhysics( GetAbsOrigin(), GetAbsOrigin() + vecDelta, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, GetCollisionGroup(), &tr, VPhysicsGetObject()->GetMass() * 0.5f );
+		HunterTraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecDelta, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, GetCollisionGroup(), &tr, VPhysicsGetObject()->GetMass() * 0.5f );
 
 		// TODO: dodge anyway if we'll make it a certain percentage of the way through the dodge?
 		if ( tr.fraction == 1.0f )
@@ -3432,12 +3432,12 @@ void CNPC_Hunter::StartTask( const Task_t *pTask )
 					pNPC = GetSquad()->GetNextMember( &iter );
 				}
 
-				m_vSavePosition = pNPC->GetAbsOrigin();
+				m_vSavePosition = pNPC->GetEngineObject()->GetAbsOrigin();
 			}
 			else
 			{
 				// Flank relative to our current position.
-				m_vSavePosition = GetAbsOrigin();
+				m_vSavePosition = GetEngineObject()->GetAbsOrigin();
 			}
 			
 			TaskComplete();
@@ -3499,7 +3499,7 @@ void CNPC_Hunter::StartTask( const Task_t *pTask )
 				bool bIsBuster = IsStriderBuster( GetEnemy() );
 				if ( bIsBuster )
 				{
-					AddFacingTarget( GetEnemy(), GetEnemy()->GetAbsOrigin() + GetEnemy()->GetSmoothedVelocity() * .5, 1.0, 0.8 );
+					AddFacingTarget( GetEnemy(), GetEnemy()->GetEngineObject()->GetAbsOrigin() + GetEnemy()->GetSmoothedVelocity() * .5, 1.0, 0.8 );
 				}
 
 				// Start the firing sound.
@@ -3590,7 +3590,7 @@ void CNPC_Hunter::StartTask( const Task_t *pTask )
 				Vector vecUp;
 				GetVectors( NULL, NULL, &vecUp );
 				
-				Vector vecEnemyDir = GetEnemy()->GetAbsOrigin() - GetAbsOrigin();
+				Vector vecEnemyDir = GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 				Vector vecDir = CrossProduct( vecEnemyDir, vecUp );
 				VectorNormalize( vecDir );
 
@@ -3601,7 +3601,7 @@ void CNPC_Hunter::StartTask( const Task_t *pTask )
 				}
 
 				// Start high and then trace down so that it works on uneven terrain.
-				Vector vecPos = GetAbsOrigin() + Vector( 0, 0, 64 ) + random->RandomFloat( 120, 200 ) * vecDir;
+				Vector vecPos = GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 64 ) + random->RandomFloat( 120, 200 ) * vecDir;
 				
 				// Try to find the ground at the sidestep position.
 				trace_t tr;
@@ -3694,10 +3694,10 @@ void CNPC_Hunter::RunTask( const Task_t *pTask )
 			bool bIsBuster = IsStriderBuster( GetEnemy() );
 			if ( bIsBuster )
 			{
-				Vector vFuturePosition = GetEnemy()->GetAbsOrigin() + GetEnemy()->GetSmoothedVelocity() * .3;
+				Vector vFuturePosition = GetEnemy()->GetEngineObject()->GetAbsOrigin() + GetEnemy()->GetSmoothedVelocity() * .3;
 				AddFacingTarget( GetEnemy(), vFuturePosition, 1.0, 0.8 );
 
-				Vector2D vToFuturePositon = ( vFuturePosition.AsVector2D() - GetAbsOrigin().AsVector2D() );
+				Vector2D vToFuturePositon = ( vFuturePosition.AsVector2D() - GetEngineObject()->GetAbsOrigin().AsVector2D() );
 				vToFuturePositon.NormalizeInPlace();
 				Vector2D facingDir = BodyDirection2D().AsVector2D();
 
@@ -3836,7 +3836,7 @@ void CNPC_Hunter::RunTask( const Task_t *pTask )
 				{
 					if ( GetEnemy() != NULL )
 					{
-						Vector	goalDir = ( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() );
+						Vector	goalDir = ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 						VectorNormalize( goalDir );
 
 						if ( DotProduct( BodyDirection2D(), goalDir ) < 0.25f )
@@ -3855,7 +3855,7 @@ void CNPC_Hunter::RunTask( const Task_t *pTask )
 			}
 			else
 			{
-				idealYaw = CalcIdealYaw( GetEnemy()->GetAbsOrigin() );
+				idealYaw = CalcIdealYaw( GetEnemy()->GetEngineObject()->GetAbsOrigin() );
 			}
 
 			// Add in our steering offset
@@ -3903,7 +3903,7 @@ void CNPC_Hunter::RunTask( const Task_t *pTask )
 								params.m_pflSoundDuration = NULL;
 								params.m_bWarnOnDirectWaveReference = true;
 								g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-								UTIL_ScreenShake( GetAbsOrigin(), 16.0f, 4.0f, 1.0f, 400.0f, SHAKE_START );
+								UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), 16.0f, 4.0f, 1.0f, 400.0f, SHAKE_START );
 							}
 							SetIdealActivity( ACT_HUNTER_CHARGE_CRASH );
 						}
@@ -3973,7 +3973,7 @@ bool CNPC_Hunter::EnemyIsRightInFrontOfMe( CBaseEntity **pEntity )
 
 	if ( (GetEnemy()->WorldSpaceCenter() - WorldSpaceCenter()).LengthSqr() < (156*156) )
 	{
-		Vector vecLOS = ( GetEnemy()->GetAbsOrigin() - GetAbsOrigin() );
+		Vector vecLOS = ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() );
 		vecLOS.z = 0;
 		VectorNormalize( vecLOS );
 		Vector vBodyDir = BodyDirection2D();
@@ -4044,25 +4044,25 @@ float CNPC_Hunter::ChargeSteer()
 	AngleVectors( angles, &forward );
 
 	// Probe out
-	testPos = GetAbsOrigin() + ( forward * testLength );
+	testPos = GetEngineObject()->GetAbsOrigin() + ( forward * testLength );
 
 	// Offset by step height
 	Vector testHullMins = GetHullMins();
 	testHullMins.z += (StepHeight() * 2);
 
 	// Probe
-	HunterTraceHull_SkipPhysics( GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5f );
+	HunterTraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5f );
 
 	// Debug info
 	if ( g_debug_hunter_charge.GetInt() == 1 )
 	{
 		if ( tr.fraction == 1.0f )
 		{
-  			NDebugOverlay::BoxDirection( GetAbsOrigin(), testHullMins, GetHullMaxs() + Vector(testLength,0,0), forward, 0, 255, 0, 8, 0.1f );
+  			NDebugOverlay::BoxDirection(GetEngineObject()->GetAbsOrigin(), testHullMins, GetHullMaxs() + Vector(testLength,0,0), forward, 0, 255, 0, 8, 0.1f );
    		}
    		else
    		{
-  			NDebugOverlay::BoxDirection( GetAbsOrigin(), testHullMins, GetHullMaxs() + Vector(testLength,0,0), forward, 255, 0, 0, 8, 0.1f );
+  			NDebugOverlay::BoxDirection(GetEngineObject()->GetAbsOrigin(), testHullMins, GetHullMaxs() + Vector(testLength,0,0), forward, 255, 0, 0, 8, 0.1f );
 		}
 	}
 
@@ -4074,19 +4074,19 @@ float CNPC_Hunter::ChargeSteer()
 	AngleVectors( angles, &forward );
 
 	// Probe out
-	testPos = GetAbsOrigin() + ( forward * testLength );
-	HunterTraceHull_SkipPhysics( GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5f );
+	testPos = GetEngineObject()->GetAbsOrigin() + ( forward * testLength );
+	HunterTraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), testPos, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr, VPhysicsGetObject()->GetMass() * 0.5f );
 
 	// Debug
 	if ( g_debug_hunter_charge.GetInt() == 1 )
 	{
 		if ( tr.fraction == 1.0f )
 		{
-			NDebugOverlay::BoxDirection( GetAbsOrigin(), testHullMins, GetHullMaxs() + Vector(testLength,0,0), forward, 0, 255, 0, 8, 0.1f );
+			NDebugOverlay::BoxDirection(GetEngineObject()->GetAbsOrigin(), testHullMins, GetHullMaxs() + Vector(testLength,0,0), forward, 0, 255, 0, 8, 0.1f );
 		}
 		else
 		{
-			NDebugOverlay::BoxDirection( GetAbsOrigin(), testHullMins, GetHullMaxs() + Vector(testLength,0,0), forward, 255, 0, 0, 8, 0.1f );
+			NDebugOverlay::BoxDirection(GetEngineObject()->GetAbsOrigin(), testHullMins, GetHullMaxs() + Vector(testLength,0,0), forward, 255, 0, 0, 8, 0.1f );
 		}
 	}
 
@@ -4096,11 +4096,11 @@ float CNPC_Hunter::ChargeSteer()
 	// Debug
 	if ( g_debug_hunter_charge.GetInt() == 1 )
 	{
-		NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + ( steer * 512.0f ), 255, 255, 0, true, 0.1f );
-		NDebugOverlay::Cross3D( GetAbsOrigin() + ( steer * 512.0f ), Vector(2,2,2), -Vector(2,2,2), 255, 255, 0, true, 0.1f );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + ( steer * 512.0f ), 255, 255, 0, true, 0.1f );
+		NDebugOverlay::Cross3D(GetEngineObject()->GetAbsOrigin() + ( steer * 512.0f ), Vector(2,2,2), -Vector(2,2,2), 255, 255, 0, true, 0.1f );
 
-		NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + ( BodyDirection3D() * 256.0f ), 255, 0, 255, true, 0.1f );
-		NDebugOverlay::Cross3D( GetAbsOrigin() + ( BodyDirection3D() * 256.0f ), Vector(2,2,2), -Vector(2,2,2), 255, 0, 255, true, 0.1f );
+		NDebugOverlay::Line(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + ( BodyDirection3D() * 256.0f ), 255, 0, 255, true, 0.1f );
+		NDebugOverlay::Cross3D(GetEngineObject()->GetAbsOrigin() + ( BodyDirection3D() * 256.0f ), Vector(2,2,2), -Vector(2,2,2), 255, 0, 255, true, 0.1f );
 	}
 
 	return UTIL_AngleDiff( UTIL_VecToYaw( steer ), faceYaw );
@@ -4127,7 +4127,7 @@ void CNPC_Hunter::ChargeDamage( CBaseEntity *pTarget )
 		
 		Vector vecNewVelocity = dir * 250.0f;
 		vecNewVelocity[2] += 128.0f;
-		pPlayer->SetAbsVelocity( vecNewVelocity );
+		pPlayer->GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
 		color32 red = {128,0,0,128};
 		UTIL_ScreenFade( pPlayer, red, 1.0f, 0.1f, FFADE_IN );
@@ -4273,9 +4273,9 @@ void CNPC_Hunter::Explode()
 	Vector			velocity = vec3_origin;
 	AngularImpulse	angVelocity = RandomAngularImpulse( -150, 150 );
 
-	PropBreakableCreateAll( GetModelIndex(), NULL, EyePosition(), GetAbsAngles(), velocity, angVelocity, 1.0, 150, COLLISION_GROUP_NPC, this );
+	PropBreakableCreateAll( GetModelIndex(), NULL, EyePosition(), GetEngineObject()->GetAbsAngles(), velocity, angVelocity, 1.0, 150, COLLISION_GROUP_NPC, this );
 
-	ExplosionCreate( EyePosition(), GetAbsAngles(), this, 500, 256, (SF_ENVEXPLOSION_NOPARTICLES|SF_ENVEXPLOSION_NOSPARKS|SF_ENVEXPLOSION_NODLIGHTS|SF_ENVEXPLOSION_NODAMAGE|SF_ENVEXPLOSION_NOSMOKE), false );
+	ExplosionCreate( EyePosition(), GetEngineObject()->GetAbsAngles(), this, 500, 256, (SF_ENVEXPLOSION_NOPARTICLES|SF_ENVEXPLOSION_NOSPARKS|SF_ENVEXPLOSION_NODLIGHTS|SF_ENVEXPLOSION_NODAMAGE|SF_ENVEXPLOSION_NOSMOKE), false );
 
 	// Create liquid fountain gushtacular effect here!
 	CEffectData	data;
@@ -4307,7 +4307,7 @@ Activity CNPC_Hunter::NPC_TranslateActivity( Activity baseAct )
 			Vector vecEnemyLKP = GetEnemyLKP();
 			
 			// Only start facing when we're close enough
-			if ( UTIL_DistApprox( vecEnemyLKP, GetAbsOrigin() ) < HUNTER_FACE_ENEMY_DIST )
+			if ( UTIL_DistApprox( vecEnemyLKP, GetEngineObject()->GetAbsOrigin() ) < HUNTER_FACE_ENEMY_DIST )
 			{
 				return (Activity)ACT_HUNTER_WALK_ANGRY;
 			}
@@ -4391,7 +4391,7 @@ void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_HUNTER_MELEE_ATTACK_LEFT )
 	{
 		Vector right, forward, dir;
-		AngleVectors( GetLocalAngles(), &forward, &right, NULL );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, &right, NULL );
 
 		right = right * -100;
 		forward = forward * 600;
@@ -4405,7 +4405,7 @@ void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_HUNTER_MELEE_ATTACK_RIGHT )
 	{
 		Vector right, forward,dir;
-		AngleVectors( GetLocalAngles(), &forward, &right, NULL );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, &right, NULL );
 
 		right = right * 100;
 		forward = forward * 600;
@@ -4469,7 +4469,7 @@ void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 void CNPC_Hunter::AddEntityRelationship( CBaseEntity *pEntity, Disposition_t nDisposition, int nPriority )
 {
 	if ( nDisposition ==  D_HT && pEntity->ClassMatches("npc_bullseye") )
-		UpdateEnemyMemory( pEntity, pEntity->GetAbsOrigin() );
+		UpdateEnemyMemory( pEntity, pEntity->GetEngineObject()->GetAbsOrigin() );
 	BaseClass::AddEntityRelationship( pEntity, nDisposition, nPriority );
 }
 
@@ -4727,7 +4727,7 @@ bool CNPC_Hunter::IsValidEnemy( CBaseEntity *pTarget )
 					if ( StriderBuster_NumFlechettesAttached( pTarget ) <= 2 )
 					{
 						if ( m_EscortBehavior.GetEscortTarget() && 
-							( m_EscortBehavior.GetEscortTarget()->GetAbsOrigin().AsVector2D() - pTarget->GetAbsOrigin().AsVector2D() ).LengthSqr() < Square( hunter_hate_held_striderbusters_tolerance.GetFloat() ) )
+							( m_EscortBehavior.GetEscortTarget()->GetEngineObject()->GetAbsOrigin().AsVector2D() - pTarget->GetEngineObject()->GetAbsOrigin().AsVector2D() ).LengthSqr() < Square( hunter_hate_held_striderbusters_tolerance.GetFloat() ) )
 						{
 							return true;
 						}
@@ -4742,9 +4742,9 @@ bool CNPC_Hunter::IsValidEnemy( CBaseEntity *pTarget )
 			if ( ( bThrown && !bAttached ) && hunter_hate_thrown_striderbusters.GetBool() )
 			{
 				float t;
-				float dist = CalcDistanceSqrToLineSegment2D( m_EscortBehavior.GetEscortTarget()->GetAbsOrigin().AsVector2D(), 
-					pTarget->GetAbsOrigin().AsVector2D(), 
-					pTarget->GetAbsOrigin().AsVector2D() + pTarget->GetSmoothedVelocity().AsVector2D(), &t );
+				float dist = CalcDistanceSqrToLineSegment2D( m_EscortBehavior.GetEscortTarget()->GetEngineObject()->GetAbsOrigin().AsVector2D(),
+					pTarget->GetEngineObject()->GetAbsOrigin().AsVector2D(),
+					pTarget->GetEngineObject()->GetAbsOrigin().AsVector2D() + pTarget->GetSmoothedVelocity().AsVector2D(), &t );
 
 				if ( t > 0 && dist < Square( hunter_hate_thrown_striderbusters_tolerance.GetFloat() ))
 				{
@@ -5112,7 +5112,7 @@ int CNPC_Hunter::RangeAttack2Conditions( float flDot, float flDist )
 		return COND_NOT_FACING_ATTACK;
 	}
 	
-	if ( !bIsBuster && !m_bEnableUnplantedShooting && !hunter_flechette_test.GetBool() && !CanPlantHere( GetAbsOrigin() ) )
+	if ( !bIsBuster && !m_bEnableUnplantedShooting && !hunter_flechette_test.GetBool() && !CanPlantHere(GetEngineObject()->GetAbsOrigin() ) )
 	{
 		return COND_HUNTER_CANT_PLANT;
 	}
@@ -5224,7 +5224,7 @@ CBaseEntity *CNPC_Hunter::MeleeAttack( float flDist, int iDamage, QAngle &qaView
 			pPlayer->VelocityPunch( vecVelocityPunch );
 			
 			// Shake the screen
-			UTIL_ScreenShake( pPlayer->GetAbsOrigin(), 100.0, 1.5, 1.0, 2, SHAKE_START );
+			UTIL_ScreenShake( pPlayer->GetEngineObject()->GetAbsOrigin(), 100.0, 1.5, 1.0, 2, SHAKE_START );
 
 			// Red damage indicator
 			color32 red = { 128, 0, 0, 128 };
@@ -5708,7 +5708,7 @@ void CNPC_Hunter::JostleVehicleThink()
 	Vector vecVelDir = pInflictor->GetSmoothedVelocity();
 	float flSpeed = VectorNormalize( vecVelDir );
 	Vector vecForce = CrossProduct( vecVelDir, Vector( 0, 0, 1 ) );
-	if ( DotProduct( vecForce, GetAbsOrigin() ) < DotProduct( vecForce, pInflictor->GetAbsOrigin() ) )
+	if ( DotProduct( vecForce, GetEngineObject()->GetAbsOrigin() ) < DotProduct( vecForce, pInflictor->GetEngineObject()->GetAbsOrigin() ) )
 	{
 		// We're to the left of the vehicle that's hitting us.
 		vecForce *= -1;
@@ -5906,7 +5906,7 @@ int CNPC_Hunter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			// making the Hunter's current enemy invalid for a short time.
 			if( !GetEnemy() || !GetEnemy()->IsPlayer() )
 			{
-				UpdateEnemyMemory( pAttacker, pAttacker->GetAbsOrigin(), this );
+				UpdateEnemyMemory( pAttacker, pAttacker->GetEngineObject()->GetAbsOrigin(), this );
 
 				if( GetEnemy() )
 				{
@@ -5953,7 +5953,7 @@ void CNPC_Hunter::Event_Killed( const CTakeDamageInfo &info )
 			m_EscortBehavior.GetEscortTarget()->AlertSound();
 			if ( info.GetAttacker() && info.GetAttacker()->IsPlayer() )
 			{
-				m_EscortBehavior.GetEscortTarget()->UpdateEnemyMemory( UTIL_GetLocalPlayer(), UTIL_GetLocalPlayer()->GetAbsOrigin(), this );
+				m_EscortBehavior.GetEscortTarget()->UpdateEnemyMemory( UTIL_GetLocalPlayer(), UTIL_GetLocalPlayer()->GetEngineObject()->GetAbsOrigin(), this );
 			}
 		}
 	}
@@ -6198,7 +6198,7 @@ void CNPC_Hunter::GetShootDir( Vector &vecDir, const Vector &vecSrc, CBaseEntity
 	{
 		// Shooting at Alyx, most likely (in EP2). The attack is designed to displace
 		// her, not necessarily actually harm her. So shoot at the area around her feet.
-		vecBodyTarget = pTargetEntity->GetAbsOrigin();
+		vecBodyTarget = pTargetEntity->GetEngineObject()->GetAbsOrigin();
 	}
 	else
 	{
@@ -6207,7 +6207,7 @@ void CNPC_Hunter::GetShootDir( Vector &vecDir, const Vector &vecSrc, CBaseEntity
 
 	Vector vecTarget = vecBodyTarget;
 
-	Vector vecDelta = pTargetEntity->GetAbsOrigin() - GetAbsOrigin();
+	Vector vecDelta = pTargetEntity->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 	float flDist = vecDelta.Length();
 
 	if ( !bStriderBuster )
@@ -6229,7 +6229,7 @@ void CNPC_Hunter::GetShootDir( Vector &vecDir, const Vector &vecSrc, CBaseEntity
 			{
 				// Our target is facing us, shoot the ground between us.
 				float flPerc = 0.7 + ( 0.1 * nShotNum );
-				vecTarget = GetAbsOrigin() + ( flPerc * ( pTargetEntity->GetAbsOrigin() - GetAbsOrigin() ) );
+				vecTarget = GetEngineObject()->GetAbsOrigin() + ( flPerc * ( pTargetEntity->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ) );
 			}
 			else if ( flDot > 0.8f )
 			{
@@ -6251,7 +6251,7 @@ void CNPC_Hunter::GetShootDir( Vector &vecDir, const Vector &vecSrc, CBaseEntity
 		// If we can't see them, shoot where we last saw them.
 		else if ( !HasCondition( COND_SEE_ENEMY ) )
 		{
-			Vector vecDelta = vecTarget - pTargetEntity->GetAbsOrigin();
+			Vector vecDelta = vecTarget - pTargetEntity->GetEngineObject()->GetAbsOrigin();
 			vecTarget = m_vecEnemyLastSeen + vecDelta;
 		}
 	}
@@ -6336,7 +6336,7 @@ bool CNPC_Hunter::ShouldSeekTarget( CBaseEntity *pTargetEntity, bool bStriderBus
 			else if ( hunter_seek_thrown_striderbusters_tolerance.GetFloat() > 0.0 )
 			{
 				CNPC_Strider *pEscortTarget = m_EscortBehavior.GetEscortTarget();
-				if ( pEscortTarget && ( pEscortTarget->GetAbsOrigin() - pTargetEntity->GetAbsOrigin() ).LengthSqr() < Square( hunter_seek_thrown_striderbusters_tolerance.GetFloat() ) )
+				if ( pEscortTarget && ( pEscortTarget->GetEngineObject()->GetAbsOrigin() - pTargetEntity->GetEngineObject()->GetAbsOrigin() ).LengthSqr() < Square( hunter_seek_thrown_striderbusters_tolerance.GetFloat() ) )
 				{
 					bSeek = true;
 				}
@@ -6548,28 +6548,28 @@ void CNPC_Hunter::DrawDebugGeometryOverlays()
 		if ( ( GetEntryNode( nSeq ) == gm_nPlantedNode ) && ( GetExitNode( nSeq ) == gm_nPlantedNode ) )
 		{
 			// planted - green
-			NDebugOverlay::Box( GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 0, 255, 0, 128, 0 );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 0, 255, 0, 128, 0 );
 		}
 		else if ( ( GetEntryNode( nSeq ) == gm_nUnplantedNode ) && ( GetExitNode( nSeq ) == gm_nUnplantedNode ) )
 		{
 			// unplanted - blue
-			NDebugOverlay::Box( GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 0, 0, 255, 128, 0 );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 0, 0, 255, 128, 0 );
 		}
 		else if ( ( GetEntryNode( nSeq ) == gm_nUnplantedNode ) && ( GetExitNode( nSeq ) == gm_nPlantedNode ) )
 		{
 			// planting transition - cyan
-			NDebugOverlay::Box( GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 0, 255, 255, 128, 0 );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 0, 255, 255, 128, 0 );
 		}
 		else if ( ( GetEntryNode( nSeq ) == gm_nPlantedNode ) && ( GetExitNode( nSeq ) == gm_nUnplantedNode ) ) 
 		{
 			// unplanting transition - purple
-			NDebugOverlay::Box( GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 255, 0, 255, 128, 0 );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 255, 0, 255, 128, 0 );
 		}
 		else
 		{
 			// unknown / other node - red
 			Msg( "UNKNOWN: %s\n", GetSequenceName( GetSequence() ) );
-			NDebugOverlay::Box( GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 255, 0, 0, 128, 0 );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), GetHullMins(), GetHullMaxs(), 255, 0, 0, 128, 0 );
 		}
 
 		NDebugOverlay::BoxDirection(EyePosition(), Vector(0,0,-1), Vector(200,0,1), vLeftDir, 255, 0, 0, 50, 0 );
@@ -6721,7 +6721,7 @@ void CNPC_Hunter::SetAim( const Vector &aimDir, float flInterval )
 		// clamp and dampen movement
 		newPitch = curPitch + 0.8 * UTIL_AngleDiff( UTIL_ApproachAngle( angDir.x, curPitch, 20 ), curPitch );
 
-		float flRelativeYaw = UTIL_AngleDiff( angDir.y, GetAbsAngles().y );
+		float flRelativeYaw = UTIL_AngleDiff( angDir.y, GetEngineObject()->GetAbsAngles().y );
 		newYaw = curYaw + UTIL_AngleDiff( flRelativeYaw, curYaw );
 	}
 	else
@@ -6729,7 +6729,7 @@ void CNPC_Hunter::SetAim( const Vector &aimDir, float flInterval )
 		// Sweep your weapon more slowly if you're not fighting someone
 		newPitch = curPitch + 0.6 * UTIL_AngleDiff( UTIL_ApproachAngle( angDir.x, curPitch, 20 ), curPitch );
 
-		float flRelativeYaw = UTIL_AngleDiff( angDir.y, GetAbsAngles().y );
+		float flRelativeYaw = UTIL_AngleDiff( angDir.y, GetEngineObject()->GetAbsAngles().y );
 		newYaw = curYaw + 0.6 * UTIL_AngleDiff( flRelativeYaw, curYaw );
 	}
 
@@ -6971,7 +6971,7 @@ void CAI_HunterEscortBehavior::StartTask( const Task_t *pTask )
 			{
 				if ( GetOuter()->OccupyStrategySlot( SQUAD_SLOT_RUN_SHOOT ) )
 				{
-					if ( GetOuter()->GetSquad()->GetSquadMemberNearestTo( GetEnemy()->GetAbsOrigin() ) == GetOuter() )
+					if ( GetOuter()->GetSquad()->GetSquadMemberNearestTo( GetEnemy()->GetEngineObject()->GetAbsOrigin() ) == GetOuter() )
 					{
 						GetOuter()->BeginVolley( NUM_FLECHETTE_VOLLEY_ON_FOLLOW, gpGlobals->curtime + 1.0 + random->RandomFloat( 0, .25 ) + random->RandomFloat( 0, .25 ) );
 					}
@@ -7016,7 +7016,7 @@ void CAI_HunterEscortBehavior::RunTask( const Task_t *pTask )
 					if ( HasCondition( COND_SEE_ENEMY ) )
 					{
 						float maxDist = hunter_flechette_max_range.GetFloat() * 3;
-						float distSq = ( pHunter->GetAbsOrigin() - pHunter->GetEnemy()->GetAbsOrigin() ).Length2DSqr();
+						float distSq = ( pHunter->GetEngineObject()->GetAbsOrigin() - pHunter->GetEnemy()->GetEngineObject()->GetAbsOrigin() ).Length2DSqr();
 
 						if ( distSq < Square( maxDist ) )
 						{
@@ -7026,7 +7026,7 @@ void CAI_HunterEscortBehavior::RunTask( const Task_t *pTask )
 								{
 									if ( GetOuter()->OccupyStrategySlot( SQUAD_SLOT_RUN_SHOOT ) )
 									{
-										if ( GetOuter()->GetSquad()->GetSquadMemberNearestTo( GetEnemy()->GetAbsOrigin() ) == GetOuter() )
+										if ( GetOuter()->GetSquad()->GetSquadMemberNearestTo( GetEnemy()->GetEngineObject()->GetAbsOrigin() ) == GetOuter() )
 										{
 											bHasSlot = true;
 										}
@@ -7187,16 +7187,16 @@ void CAI_HunterEscortBehavior::DrawDebugGeometryOverlays()
 	{
 		if ( gpGlobals->curtime >= m_flTimeEscortReturn )
 		{
-			NDebugOverlay::HorzArrow( GetOuter()->GetAbsOrigin(), vecFollowPos, 16.0f, 255, 0, 0, 0, true, 0 );
+			NDebugOverlay::HorzArrow( GetOuter()->GetEngineObject()->GetAbsOrigin(), vecFollowPos, 16.0f, 255, 0, 0, 0, true, 0 );
 		}
 		else
 		{
-			NDebugOverlay::HorzArrow( GetOuter()->GetAbsOrigin(), vecFollowPos, 16.0f, 255, 255, 0, 0, true, 0 );
+			NDebugOverlay::HorzArrow( GetOuter()->GetEngineObject()->GetAbsOrigin(), vecFollowPos, 16.0f, 255, 255, 0, 0, true, 0 );
 		}
 	}
 	else
 	{
-		NDebugOverlay::HorzArrow( GetOuter()->GetAbsOrigin(), vecFollowPos, 16.0f, 0, 255, 0, 0, true, 0 );
+		NDebugOverlay::HorzArrow( GetOuter()->GetEngineObject()->GetAbsOrigin(), vecFollowPos, 16.0f, 0, 255, 0, 0, true, 0 );
 	}
 }
 
@@ -7223,12 +7223,12 @@ void Hunter_StriderBusterLaunched( CBaseEntity *pBuster )
 		{
 			if ( !pNPC->GetEnemy() || !IsStriderBuster( pNPC->GetEnemy() ) )
 			{
-				Vector vecDelta = pNPC->GetAbsOrigin() - pBuster->GetAbsOrigin();
+				Vector vecDelta = pNPC->GetEngineObject()->GetAbsOrigin() - pBuster->GetEngineObject()->GetAbsOrigin();
 				if ( vecDelta.Length2DSqr() < 9437184.0f ) // 3072 * 3072
 				{
 					pNPC->SetEnemy( pBuster );
 					pNPC->SetState( NPC_STATE_COMBAT );
-					pNPC->UpdateEnemyMemory( pBuster, pBuster->GetAbsOrigin() );
+					pNPC->UpdateEnemyMemory( pBuster, pBuster->GetEngineObject()->GetAbsOrigin() );
 
 					// Stop whatever we're doing.
 					pNPC->SetCondition( COND_SCHEDULE_DONE );

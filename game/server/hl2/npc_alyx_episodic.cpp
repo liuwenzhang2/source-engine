@@ -221,8 +221,8 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 
 		int iAttachment = LookupAttachment( pEvent->options );
 		m_hEmpTool->GetEngineObject()->SetParent(this->GetEngineObject(), iAttachment);
-		m_hEmpTool->SetLocalOrigin( Vector( 0, 0, 0 ) );
-		m_hEmpTool->SetLocalAngles( QAngle( 0, 0, 0 ) );
+		m_hEmpTool->GetEngineObject()->SetLocalOrigin( Vector( 0, 0, 0 ) );
+		m_hEmpTool->GetEngineObject()->SetLocalAngles( QAngle( 0, 0, 0 ) );
 
 		if( !stricmp( pEvent->options, "Emp_Holster" ) )
 		{
@@ -498,8 +498,8 @@ void CNPC_Alyx::CreateEmpTool( void )
 		m_hEmpTool->GetEngineObject()->SetParent(this->GetEngineObject(), iAttachment);
 		m_hEmpTool->SetOwnerEntity(this);
 		m_hEmpTool->SetSolid( SOLID_NONE );
-		m_hEmpTool->SetLocalOrigin( Vector( 0, 0, 0 ) );
-		m_hEmpTool->SetLocalAngles( QAngle( 0, 0, 0 ) );
+		m_hEmpTool->GetEngineObject()->SetLocalOrigin( Vector( 0, 0, 0 ) );
+		m_hEmpTool->GetEngineObject()->SetLocalAngles( QAngle( 0, 0, 0 ) );
 		m_hEmpTool->AddSpawnFlags(SF_DYNAMICPROP_NO_VPHYSICS);
 		m_hEmpTool->AddEffects( EF_PARENT_ANIMATES );
 		m_hEmpTool->Spawn();
@@ -863,7 +863,7 @@ bool CNPC_Alyx::ShouldPlayerAvoid( void )
 		CBaseEntity *pGroundEnt = GetGroundEntity();
 		if( pGroundEnt != NULL && pGroundEnt->IsPlayer() )
 		{
-			if( GetAbsOrigin().z < pGroundEnt->EyePosition().z )
+			if(GetEngineObject()->GetAbsOrigin().z < pGroundEnt->EyePosition().z )
 				return true;
 		}
 	}
@@ -906,14 +906,14 @@ void CNPC_Alyx::AnalyzeGunfireSound( CSound *pSound )
 	if( pSoundTarget == this )
 	{
 		// The shooter is firing at me. Assume if Alyx can hear the gunfire, she can deduce its origin.
-		UpdateEnemyMemory( pSoundOriginBCC, pSoundOriginBCC->GetAbsOrigin(), this );
+		UpdateEnemyMemory( pSoundOriginBCC, pSoundOriginBCC->GetEngineObject()->GetAbsOrigin(), this );
 	}
 	else if( pSoundTarget == pPlayer )
 	{
 		// The shooter is firing at the player. Assume Alyx can deduce the origin if the player COULD see the origin, and Alyx COULD see the player.
 		if( pPlayer->FVisible(pSoundOriginBCC) && FVisible(pPlayer) )
 		{
-			UpdateEnemyMemory( pSoundOriginBCC, pSoundOriginBCC->GetAbsOrigin(), this );
+			UpdateEnemyMemory( pSoundOriginBCC, pSoundOriginBCC->GetEngineObject()->GetAbsOrigin(), this );
 		}
 	}
 }
@@ -992,7 +992,7 @@ void CNPC_Alyx::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &
 		return;
 	}
 
-	if( pVictim->GetAbsOrigin().DistTo(GetAbsOrigin()) < 96.0f )
+	if( pVictim->GetEngineObject()->GetAbsOrigin().DistTo(GetEngineObject()->GetAbsOrigin()) < 96.0f )
 	{
 		// Don't shoot at an enemy corpse that dies very near to me. This will prevent Alyx attacking
 		// Other nearby enemies.
@@ -1001,14 +1001,14 @@ void CNPC_Alyx::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &
 
 	if( !HasShotgun() )
 	{
-		CAI_BaseNPC *pTarget = CreateCustomTarget( pVictim->GetAbsOrigin(), 2.0f );
+		CAI_BaseNPC *pTarget = CreateCustomTarget( pVictim->GetEngineObject()->GetAbsOrigin(), 2.0f );
 
 		AddEntityRelationship( pTarget, IRelationType(pVictim), IRelationPriority(pVictim) );
 
 		// Update or Create a memory entry for this target and make Alyx think she's seen this target recently.
 		// This prevents the baseclass from not recognizing this target and forcing Alyx into 
 		// SCHED_WAKE_ANGRY, which wastes time and causes her to change animation sequences rapidly.
-		GetEnemies()->UpdateMemory( GetNavigator()->GetNetwork(), pTarget, pTarget->GetAbsOrigin(), 0.0f, true );
+		GetEnemies()->UpdateMemory( GetNavigator()->GetNetwork(), pTarget, pTarget->GetEngineObject()->GetAbsOrigin(), 0.0f, true );
 		AI_EnemyInfo_t *pMemory = GetEnemies()->Find( pTarget );
 
 		if( pMemory )
@@ -1075,11 +1075,11 @@ void CNPC_Alyx::DoMobbedCombatAI( void )
 
 	for ( AI_EnemyInfo_t *pEMemory = GetEnemies()->GetFirst(&iter); pEMemory != NULL; pEMemory = GetEnemies()->GetNext(&iter) )
 	{
-		if ( IRelationType( pEMemory->hEnemy ) != D_NU && IRelationType( pEMemory->hEnemy ) != D_LI && pEMemory->hEnemy->GetAbsOrigin().DistToSqr(GetAbsOrigin()) <= ALYX_MIN_CONSIDER_DIST )
+		if ( IRelationType( pEMemory->hEnemy ) != D_NU && IRelationType( pEMemory->hEnemy ) != D_LI && pEMemory->hEnemy->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin()) <= ALYX_MIN_CONSIDER_DIST )
 		{
 			if( pEMemory->hEnemy && pEMemory->hEnemy->IsAlive() && gpGlobals->curtime - pEMemory->timeLastSeen <= 0.5f && pEMemory->hEnemy->Classify() != CLASS_BULLSEYE )
 			{
-				if( pEMemory->hEnemy->GetAbsOrigin().DistToSqr(GetAbsOrigin()) <= ALYX_MIN_MOB_DIST_SQR )
+				if( pEMemory->hEnemy->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin()) <= ALYX_MIN_MOB_DIST_SQR )
 				{
 					closeEnemiesScore += 1.0f;
 				}
@@ -1101,11 +1101,11 @@ void CNPC_Alyx::DoMobbedCombatAI( void )
 			if ( pEMemory->bMobbedMe )
 				continue;
 
-			if ( IRelationType( pEMemory->hEnemy ) != D_NU && IRelationType( pEMemory->hEnemy ) != D_LI && pEMemory->hEnemy->GetAbsOrigin().DistToSqr(GetAbsOrigin()) <= ALYX_MIN_CONSIDER_DIST )
+			if ( IRelationType( pEMemory->hEnemy ) != D_NU && IRelationType( pEMemory->hEnemy ) != D_LI && pEMemory->hEnemy->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin()) <= ALYX_MIN_CONSIDER_DIST )
 			{
 				if( pEMemory->hEnemy && pEMemory->hEnemy->IsAlive() && gpGlobals->curtime - pEMemory->timeLastSeen <= 0.5f && pEMemory->hEnemy->Classify() != CLASS_BULLSEYE )
 				{
-					if( pEMemory->hEnemy->GetAbsOrigin().DistToSqr(GetAbsOrigin()) <= ALYX_MIN_MOB_DIST_SQR )
+					if( pEMemory->hEnemy->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin()) <= ALYX_MIN_MOB_DIST_SQR )
 					{
 						pEMemory->bMobbedMe = true;
 					}
@@ -1155,7 +1155,7 @@ void CNPC_Alyx::DoCustomCombatAI( void )
 	{
 		if( pEnemy )
 		{
-			if( GetAbsOrigin().DistToSqr( pEnemy->GetAbsOrigin() ) < Square( 60.0f ) )
+			if(GetEngineObject()->GetAbsOrigin().DistToSqr( pEnemy->GetEngineObject()->GetAbsOrigin() ) < Square( 60.0f ) )
 			{
 				// Don't reload if an enemy is right in my face.
 				ClearCondition( COND_LOW_PRIMARY_AMMO );
@@ -1313,7 +1313,7 @@ void CNPC_Alyx::DoCustomSpeechAI( void )
 			{
 				// Can't see the player?
 				if ( !HasCondition(COND_SEE_PLAYER) && !HasCondition( COND_TALKER_PLAYER_DEAD ) && !HasCondition( COND_SEE_ENEMY ) &&
-					( !pPlayer || pPlayer->GetAbsOrigin().DistToSqr(GetAbsOrigin()) > ALYX_DARKNESS_LOST_PLAYER_DIST ) )
+					( !pPlayer || pPlayer->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin()) > ALYX_DARKNESS_LOST_PLAYER_DIST ) )
 				{
 					// only speak if player hasn't moved.
 					if ( m_MoveMonitor.TargetMoved( AI_GetSinglePlayer() ) )
@@ -1472,7 +1472,7 @@ Disposition_t CNPC_Alyx::IRelationType( CBaseEntity *pTarget )
 		if( disposition == D_HT )
 		{
 			// If Alyx hates this antlion (default relationship), make her fear it, if it is very close.
-			if( GetAbsOrigin().DistToSqr(pTarget->GetAbsOrigin()) < ALYX_FEAR_ANTLION_DIST_SQR )
+			if(GetEngineObject()->GetAbsOrigin().DistToSqr(pTarget->GetEngineObject()->GetAbsOrigin()) < ALYX_FEAR_ANTLION_DIST_SQR )
 			{
 				disposition = D_FR;
 			}
@@ -1482,7 +1482,7 @@ Disposition_t CNPC_Alyx::IRelationType( CBaseEntity *pTarget )
 	}
 	else if( pTarget->Classify() == CLASS_ZOMBIE && disposition == D_HT && GetActiveWeapon() )
 	{
-		if( GetAbsOrigin().DistToSqr(pTarget->GetAbsOrigin()) < ALYX_FEAR_ZOMBIE_DIST_SQR )
+		if(GetEngineObject()->GetAbsOrigin().DistToSqr(pTarget->GetEngineObject()->GetAbsOrigin()) < ALYX_FEAR_ZOMBIE_DIST_SQR )
 		{
 			// Be afraid of a zombie that's near if I'm not allowed to dodge. This will make Alyx back away.
 			return D_FR;
@@ -1515,7 +1515,7 @@ int CNPC_Alyx::IRelationPriority( CBaseEntity *pTarget )
 			{
 				// I have an enemy that is not this thing. If that enemy is near, I shouldn't
 				// become distracted.
-				if( GetAbsOrigin().DistToSqr(GetEnemy()->GetAbsOrigin()) < Square(180) )
+				if(GetEngineObject()->GetAbsOrigin().DistToSqr(GetEnemy()->GetEngineObject()->GetAbsOrigin()) < Square(180) )
 				{
 					return priority;
 				}
@@ -1537,7 +1537,7 @@ bool CNPC_Alyx::FInViewCone( CBaseEntity *pEntity )
 	// large mob of enemies (usually antlions or zombies) closing in. This situation is so obvious to the 
 	// player that it doesn't make sense for Alyx to be unaware of the entire group simply because she 
 	// hasn't seen all of the enemies with her own eyes.
-	if( ( pEntity->IsNPC() || pEntity->IsPlayer() ) && pEntity->GetAbsOrigin().DistToSqr(GetAbsOrigin()) <= ALYX_360_VIEW_DIST_SQR )
+	if( ( pEntity->IsNPC() || pEntity->IsPlayer() ) && pEntity->GetEngineObject()->GetAbsOrigin().DistToSqr(GetEngineObject()->GetAbsOrigin()) <= ALYX_360_VIEW_DIST_SQR )
 	{
 		// Only see players and NPC's with 360 cone
 		// For instance, DON'T tell the eyeball/head tracking code that you can see an object that is behind you!
@@ -1939,10 +1939,10 @@ void CNPC_Alyx::StartTask( const Task_t *pTask )
 		{
 			if ( GetEnemy() && !FInAimCone( GetEnemyLKP() ) && FVisible( GetEnemyLKP() ) )
 			{
-				Vector vecToEnemy = GetEnemyLKP() - GetAbsOrigin();
+				Vector vecToEnemy = GetEnemyLKP() - GetEngineObject()->GetAbsOrigin();
 				VectorNormalize( vecToEnemy );
 
-				Vector vecMoveGoal = GetAbsOrigin() - (vecToEnemy * 24.0f);
+				Vector vecMoveGoal = GetEngineObject()->GetAbsOrigin() - (vecToEnemy * 24.0f);
 
 				if ( !GetNavigator()->SetGoal( vecMoveGoal ) )
 				{
@@ -2379,8 +2379,8 @@ bool CNPC_Alyx::HandleInteraction(int interactionType, void *data, CBaseCombatCh
 
 		if( pProp )
 		{
-			float distToProp = pProp->WorldSpaceCenter().DistTo( GetAbsOrigin() );
-			float distToPlayer = sourceEnt->WorldSpaceCenter().DistTo( GetAbsOrigin() );
+			float distToProp = pProp->WorldSpaceCenter().DistTo(GetEngineObject()->GetAbsOrigin() );
+			float distToPlayer = sourceEnt->WorldSpaceCenter().DistTo(GetEngineObject()->GetAbsOrigin() );
 
 			// Do this if the prop is within 60 feet, and is closer to me than the player is.
 			if( distToProp < (60.0f * 12.0f) && (distToProp < distToPlayer) )
@@ -2533,7 +2533,7 @@ bool CNPC_Alyx::IsValidInteractTarget( CBaseEntity *pTarget )
 		}
 	}
 
-	if( GetAbsOrigin().DistToSqr(pTarget->WorldSpaceCenter()) > (360.0f * 360.0f) )
+	if(GetEngineObject()->GetAbsOrigin().DistToSqr(pTarget->WorldSpaceCenter()) > (360.0f * 360.0f) )
 	{
 		// Too far away!
 		return false;
@@ -2760,12 +2760,12 @@ bool CNPC_Alyx::BlindedByFlare( void )
 	CFlare *pFlare = CFlare::GetActiveFlares();
 	while( pFlare != NULL )
 	{
-		vecToEyes = (vecEyes - pFlare->GetAbsOrigin());
+		vecToEyes = (vecEyes - pFlare->GetEngineObject()->GetAbsOrigin());
 		float fDist = VectorNormalize( vecToEyes ); 
 		if ( fDist < fBlindDist )
 		{
 			// Check facing to ensure we're in front of her
-			los = ( pFlare->GetAbsOrigin() - vecEyes );
+			los = ( pFlare->GetEngineObject()->GetAbsOrigin() - vecEyes );
 			los.z = 0;
 			VectorNormalize( los );
 			float flDot = DotProduct( los, facingDir );
@@ -2875,7 +2875,7 @@ void CNPC_Alyx::AimGun( void )
 		if ( GetReadinessLevel() == AIRL_STEALTH && m_hStealthLookTarget != NULL )
 		{
 			// Only aim if we're not far from the node
-			Vector vecAimDir = m_hStealthLookTarget->GetAbsOrigin() - Weapon_ShootPosition();
+			Vector vecAimDir = m_hStealthLookTarget->GetEngineObject()->GetAbsOrigin() - Weapon_ShootPosition();
 			if ( VectorNormalize( vecAimDir ) > 80 )
 			{
 				// Ignore nodes that are behind her
@@ -2931,7 +2931,7 @@ bool CNPC_Alyx::EnemyIsValidCrouchTarget( CBaseEntity *pEnemy )
 	}
 	
 	// Don't crouch to shoot enemies that are too far off my vertical plane
-	if ( fabs( pEnemy->GetAbsOrigin().z - GetAbsOrigin().z ) > 64 )
+	if ( fabs( pEnemy->GetEngineObject()->GetAbsOrigin().z - GetEngineObject()->GetAbsOrigin().z ) > 64 )
 		return false;
 
 	return true;
@@ -3066,7 +3066,7 @@ bool CNPC_Alyx::IsAllowedToInteract()
 
 	if( GetEnemy() )
 	{
-		if( GetEnemy()->GetAbsOrigin().DistTo( GetAbsOrigin() ) <= 240.0f )
+		if( GetEnemy()->GetEngineObject()->GetAbsOrigin().DistTo(GetEngineObject()->GetAbsOrigin() ) <= 240.0f )
 		{
 			// Enemy is nearby!
 			return false;

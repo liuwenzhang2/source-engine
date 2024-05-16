@@ -293,7 +293,7 @@ bool CBaseCombatCharacter::HasAlienGibs( void )
 void CBaseCombatCharacter::CorpseFade( void )
 {
 	StopAnimation();
-	SetAbsVelocity( vec3_origin );
+	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetMoveType( MOVETYPE_NONE );
 	SetLocalAngularVelocity( vec3_angle );
 	m_flAnimTime = gpGlobals->curtime;
@@ -577,14 +577,14 @@ CProp_Portal* CBaseCombatCharacter::FInViewConeThroughPortal( const Vector &vecS
 		if( pPortal->IsActivedAndLinked() && FInViewCone( pPortal ) )
 		{
 			// The facing direction is the eye to the portal to set up a proper FOV through the relatively small portal hole
-			Vector facingDir = pPortal->GetAbsOrigin() - ptEyePosition;
+			Vector facingDir = pPortal->GetEngineObject()->GetAbsOrigin() - ptEyePosition;
 
 			// If the portal isn't facing the eye, bail
 			if ( facingDir.Dot( pPortal->m_plane_Origin.normal ) > 0.0f )
 				continue;
 
 			// If the point is behind the linked portal, bail
-			if ( ( vecSpot - pPortal->m_hLinkedPortal->GetAbsOrigin() ).Dot( pPortal->m_hLinkedPortal->m_plane_Origin.normal ) < 0.0f )
+			if ( ( vecSpot - pPortal->m_hLinkedPortal->GetEngineObject()->GetAbsOrigin() ).Dot( pPortal->m_hLinkedPortal->m_plane_Origin.normal ) < 0.0f )
 				continue;
 
 			// Remove height from the equation
@@ -665,7 +665,7 @@ bool CBaseCombatCharacter::FInAimCone( CBaseEntity *pEntity )
 //=========================================================
 bool CBaseCombatCharacter::FInAimCone( const Vector &vecSpot )
 {
-	Vector los = ( vecSpot - GetAbsOrigin() );
+	Vector los = ( vecSpot - GetEngineObject()->GetAbsOrigin() );
 
 	// do this in 2D
 	los.z = 0;
@@ -932,7 +932,7 @@ Activity CBaseCombatCharacter::GetDeathActivity ( void )
 	deathActivity = ACT_DIESIMPLE;// in case we can't find any special deaths to do.
 
 	Vector forward;
-	AngleVectors( GetLocalAngles(), &forward );
+	AngleVectors(GetEngineObject()->GetLocalAngles(), &forward );
 	flDot = -DotProduct( forward, g_vecAttackDir );
 
 	switch ( m_LastHitGroup )
@@ -1098,8 +1098,8 @@ CBaseEntity *CBaseCombatCharacter::CheckTraceHullAttack( float flDist, const Vec
 {
 	// If only a length is given assume we want to trace in our facing direction
 	Vector forward;
-	AngleVectors( GetAbsAngles(), &forward );
-	Vector vStart = GetAbsOrigin();
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );
+	Vector vStart = GetEngineObject()->GetAbsOrigin();
 
 	// The ideal place to start the trace is in the center of the attacker's bounding box.
 	// however, we need to make sure there's enough clearance. Some of the smaller monsters aren't 
@@ -1252,7 +1252,7 @@ CBaseEntity *CBaseCombatCharacter::CheckTraceHullAttack( const Vector &vStart, c
 		Vector vecMins, vecMaxs;
 
 		// Do a tracehull from the top center of my bounding box.
-		vecTopCenter = GetAbsOrigin();
+		vecTopCenter = GetEngineObject()->GetAbsOrigin();
 		CollisionProp()->WorldSpaceAABB( &vecMins, &vecMaxs );
 		vecTopCenter.z = vecMaxs.z + 1.0f;
 		vecEnd = vecTopCenter;
@@ -1408,7 +1408,7 @@ Vector CBaseCombatCharacter::CalcDamageForceVector( const CTakeDamageInfo &info 
 		if( info.GetDamageType() & DMG_BLAST )
 		{
 			// exaggerate the force from explosions a little (37.5%)
-			forceVector = (GetLocalOrigin() + Vector(0, 0, WorldAlignSize().z) ) - pForce->GetLocalOrigin();
+			forceVector = (GetEngineObject()->GetLocalOrigin() + Vector(0, 0, WorldAlignSize().z) ) - pForce->GetEngineObject()->GetLocalOrigin();
 			VectorNormalize(forceVector);
 			forceVector *= 1.375f;
 		}
@@ -1439,7 +1439,7 @@ Vector CBaseCombatCharacter::CalcDamageForceVector( const CTakeDamageInfo &info 
 				}
 				else
 				{
-					forceVector = GetLocalOrigin() - pForce->GetLocalOrigin();
+					forceVector = GetEngineObject()->GetLocalOrigin() - pForce->GetEngineObject()->GetLocalOrigin();
 					VectorNormalize(forceVector);
 				}
 			}
@@ -1464,7 +1464,7 @@ void CBaseCombatCharacter::FixupBurningServerRagdoll( CBaseEntity *pRagdoll )
 	{
 		SetEffectEntity( NULL );
 		pRagdoll->AddFlag( FL_ONFIRE );
-		pFireChild->SetAbsOrigin( pRagdoll->GetAbsOrigin() );
+		pFireChild->GetEngineObject()->SetAbsOrigin( pRagdoll->GetEngineObject()->GetAbsOrigin() );
 		pFireChild->AttachToEntity( pRagdoll );
 		pFireChild->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
  		pRagdoll->SetEffectEntity( pFireChild );
@@ -1506,7 +1506,7 @@ bool CBaseCombatCharacter::BecomeRagdoll( const CTakeDamageInfo &info, const Vec
 		CTakeDamageInfo info2 = info;
 		info2.SetDamageForce( forceVector );
 		Vector pos = info2.GetDamagePosition();
-		float flAbsMinsZ = GetAbsOrigin().z + WorldAlignMins().z;
+		float flAbsMinsZ = GetEngineObject()->GetAbsOrigin().z + WorldAlignMins().z;
 		if ( (pos.z - flAbsMinsZ) < 24 )
 		{
 			// HACKHACK: Make sure the vehicle impact is at least 2ft off the ground
@@ -1623,7 +1623,7 @@ void CBaseCombatCharacter::Event_Killed( const CTakeDamageInfo &info )
 	// if flagged to drop a health kit
 	if (HasSpawnFlags(SF_NPC_DROP_HEALTHKIT))
 	{
-		CBaseEntity::Create( "item_healthvial", GetAbsOrigin(), GetAbsAngles() );
+		CBaseEntity::Create( "item_healthvial", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 	}
 	// clear the deceased's sound channels.(may have been firing or reloading when killed)
 	const char* soundname = "BaseCombatCharacter.StopWeaponSounds";
@@ -1823,8 +1823,8 @@ void CBaseCombatCharacter::DropWeaponForWeaponStrip( CBaseCombatWeapon *pWeapon,
 
 	vecThrow *= random->RandomFloat( 400.0f, 600.0f );
 
-	pWeapon->SetAbsOrigin( vecOrigin );
-	pWeapon->SetAbsAngles( vecAngles );
+	pWeapon->GetEngineObject()->SetAbsOrigin( vecOrigin );
+	pWeapon->GetEngineObject()->SetAbsAngles( vecAngles );
 	pWeapon->Drop( vecThrow );
 	pWeapon->SetRemoveable( false );
 	Weapon_Detach( pWeapon );
@@ -1959,11 +1959,11 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 			Msg("Weapon spawning in solid!\n");
 		}
 
-		pWeapon->SetAbsOrigin( vThrowPos );
+		pWeapon->GetEngineObject()->SetAbsOrigin( vThrowPos );
 
 		QAngle gunAngles;
 		VectorAngles( BodyDirection2D(), gunAngles );
-		pWeapon->SetAbsAngles( gunAngles );
+		pWeapon->GetEngineObject()->SetAbsAngles( gunAngles );
 	}
 	else
 	{
@@ -2007,8 +2007,8 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 			// find offset of root bone from origin in local space
 			// Make sure we're detached from hierarchy before doing this!!!
 			pWeapon->StopFollowingEntity();
-			pWeapon->SetAbsOrigin( Vector( 0, 0, 0 ) );
-			pWeapon->SetAbsAngles( QAngle( 0, 0, 0 ) );
+			pWeapon->GetEngineObject()->SetAbsOrigin( Vector( 0, 0, 0 ) );
+			pWeapon->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 			pWeapon->InvalidateBoneCache();
 			matrix3x4_t rootLocal;
 			pWeapon->GetBoneTransform( iWeaponBoneIndex, rootLocal );
@@ -2028,7 +2028,7 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 		{
 			Vector vFacingDir = BodyDirection2D();
 			vFacingDir = vFacingDir * 10.0; 
-			pWeapon->SetAbsOrigin( Weapon_ShootPosition() + vFacingDir );
+			pWeapon->GetEngineObject()->SetAbsOrigin( Weapon_ShootPosition() + vFacingDir );
 		}
 	}
 
@@ -2036,7 +2036,7 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 	if (pvecTarget)
 	{
 		// I've been told to throw it somewhere specific.
-		vecThrow = VecCheckToss( this, pWeapon->GetAbsOrigin(), *pvecTarget, 0.2, 1.0, false );
+		vecThrow = VecCheckToss( this, pWeapon->GetEngineObject()->GetAbsOrigin(), *pvecTarget, 0.2, 1.0, false );
 	}
 	else
 	{
@@ -2332,7 +2332,7 @@ bool CBaseCombatCharacter::Weapon_CanUse( CBaseCombatWeapon *pWeapon )
 //-----------------------------------------------------------------------------
 CBaseCombatWeapon *CBaseCombatCharacter::Weapon_Create( const char *pWeaponName )
 {
-	CBaseCombatWeapon *pWeapon = static_cast<CBaseCombatWeapon *>( Create( pWeaponName, GetLocalOrigin(), GetLocalAngles(), this ) );
+	CBaseCombatWeapon *pWeapon = static_cast<CBaseCombatWeapon *>( Create( pWeaponName, GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles(), this ) );
 
 	return pWeapon;
 }
@@ -2543,7 +2543,7 @@ int CBaseCombatCharacter::OnTakeDamage_Dead( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 QAngle CBaseCombatCharacter::BodyAngles()
 {
-	return GetAbsAngles();
+	return GetEngineObject()->GetAbsAngles();
 }
 
 
@@ -2789,9 +2789,9 @@ Vector CBaseCombatCharacter::Weapon_ShootPosition( )
 {
 	Vector forward, right, up;
 
-	AngleVectors( GetAbsAngles(), &forward, &right, &up );
+	AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, &right, &up );
 
-	Vector vecSrc = GetAbsOrigin() 
+	Vector vecSrc = GetEngineObject()->GetAbsOrigin()
 					+ forward * m_HackedGunPos.y 
 					+ right * m_HackedGunPos.x 
 					+ up * m_HackedGunPos.z;
@@ -2839,7 +2839,7 @@ bool CBaseCombatCharacter::Weapon_IsOnGround( CBaseCombatWeapon *pWeapon )
 		return false;
 	}
 
-	if( fabs(pWeapon->WorldSpaceCenter().z - GetAbsOrigin().z) >= 12.0f )
+	if( fabs(pWeapon->WorldSpaceCenter().z - GetEngineObject()->GetAbsOrigin().z) >= 12.0f )
 	{
 		return false;
 	}
@@ -2870,8 +2870,8 @@ CBaseEntity *CBaseCombatCharacter::Weapon_FindUsable( const Vector &range )
 	CBaseCombatWeapon *weaponList[64];
 	CBaseCombatWeapon *pBestWeapon = NULL;
 
-	Vector mins = GetAbsOrigin() - range;
-	Vector maxs = GetAbsOrigin() + range;
+	Vector mins = GetEngineObject()->GetAbsOrigin() - range;
+	Vector maxs = GetEngineObject()->GetAbsOrigin() + range;
 	int listCount = CBaseCombatWeapon::GetAvailableWeaponsInBox( weaponList, ARRAYSIZE(weaponList), mins, maxs );
 
 	float fBestDist = 1e6;
@@ -2910,7 +2910,7 @@ CBaseEntity *CBaseCombatCharacter::Weapon_FindUsable( const Vector &range )
 			}
 		}
 
-		float fCurDist = (pWeapon->GetLocalOrigin() - GetLocalOrigin()).Length();
+		float fCurDist = (pWeapon->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin()).Length();
 
 		// Give any reserved weapon a bonus
 		if( pWeapon->HasSpawnFlags( SF_WEAPON_NO_PLAYER_PICKUP ) )
@@ -2947,7 +2947,7 @@ CBaseEntity *CBaseCombatCharacter::Weapon_FindUsable( const Vector &range )
 			// by tracing out a human sized hull just above the weapon.  If not, reject
 			trace_t tr;
 
-			Vector	vAboveWeapon = pWeapon->GetAbsOrigin();
+			Vector	vAboveWeapon = pWeapon->GetEngineObject()->GetAbsOrigin();
 			UTIL_TraceEntity( this, vAboveWeapon, vAboveWeapon + Vector( 0, 0, 1 ), MASK_SOLID, pWeapon, COLLISION_GROUP_NONE, &tr );
 
 			if ( tr.startsolid || (tr.fraction < 1.0) )
@@ -3084,7 +3084,7 @@ void CBaseCombatCharacter::ApplyStressDamage( IPhysicsObject *pPhysics, bool bRe
 		//Msg("Stress! %.2f / %.2f\n", stressOut.exertedStress, stressOut.receivedStress );
 		CTakeDamageInfo dmgInfo( GetWorldEntity(), GetWorldEntity(), vec3_origin, vec3_origin, damage, DMG_CRUSH );
 		dmgInfo.SetDamageForce( Vector( 0, 0, -stressOut.receivedStress * GetCurrentGravity() * gpGlobals->frametime ) );
-		dmgInfo.SetDamagePosition( GetAbsOrigin() );
+		dmgInfo.SetDamagePosition(GetEngineObject()->GetAbsOrigin() );
 		TakeDamage( dmgInfo );
 	}
 }
@@ -3304,7 +3304,7 @@ CBaseEntity *CBaseCombatCharacter::FindMissTarget( void )
 	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 	CBaseEntity *pEnts[256];
 	Vector		radius( 100, 100, 100);
-	Vector		vecSource = GetAbsOrigin();
+	Vector		vecSource = GetEngineObject()->GetAbsOrigin();
 
 	int numEnts = UTIL_EntitiesInBox( pEnts, 256, vecSource-radius, vecSource+radius, 0 );
 

@@ -176,7 +176,7 @@ void CRagdollProp::Spawn( void )
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES];
 	BaseClass::SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING ); // FIXME: shouldn't this be a subset of the bones
 	// this is useless info after the initial conditions are set
-	SetAbsAngles( vec3_angle );
+	GetEngineObject()->SetAbsAngles( vec3_angle );
 	int collisionGroup = (m_spawnflags & SF_RAGDOLLPROP_DEBRIS) ? COLLISION_GROUP_DEBRIS : COLLISION_GROUP_NONE;
 	bool bWake = (m_spawnflags & SF_RAGDOLLPROP_STARTASLEEP) ? false : true;
 	InitRagdoll( vec3_origin, 0, vec3_origin, pBoneToWorld, pBoneToWorld, 0, collisionGroup, true, bWake );
@@ -717,7 +717,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 			Assert( szToken[0] );
 			if ( objectIndex >= m_ragdoll.listCount )
 			{
-				Warning("Bad ragdoll pose in entity %s, model (%s) at %s, model changed?\n", GetDebugName(), GetModelName().ToCStr(), VecToString(GetAbsOrigin()) );
+				Warning("Bad ragdoll pose in entity %s, model (%s) at %s, model changed?\n", GetDebugName(), GetModelName().ToCStr(), VecToString(GetEngineObject()->GetAbsOrigin()) );
 			}
 			else if ( szToken[0] != 0 )
 			{
@@ -735,7 +735,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 				}
 				else
 				{
-					out = GetAbsOrigin();
+					out = GetEngineObject()->GetAbsOrigin();
 				}
 				MatrixSetColumn( out, 3, pBoneToWorld[boneIndex] );
 				element.pObject->SetPositionMatrix( pBoneToWorld[boneIndex], true );
@@ -1045,8 +1045,8 @@ void CRagdollProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 		}
 	}
 
-	SetAbsOrigin( m_ragPos[0] );
-	SetAbsAngles( vec3_angle );
+	GetEngineObject()->SetAbsOrigin( m_ragPos[0] );
+	GetEngineObject()->SetAbsAngles( vec3_angle );
 	const Vector &vecOrigin = CollisionProp()->GetCollisionOrigin();
 	CollisionProp()->AddSolidFlags( FSOLID_FORCE_WORLD_ALIGNED );
 	CollisionProp()->SetSurroundingBoundsType( USE_COLLISION_BOUNDS_NEVER_VPHYSICS );
@@ -1082,7 +1082,7 @@ void CRagdollProp::UpdateNetworkDataFromVPhysics( IPhysicsObject *pPhysics, int 
 	// move/relink if root moved
 	if ( index == 0 )
 	{
-		SetAbsOrigin( m_ragPos[0] );
+		GetEngineObject()->SetAbsOrigin( m_ragPos[0] );
 		PhysicsTouchTriggers();
 	}
 }
@@ -1265,7 +1265,7 @@ static void SyncAnimatingWithPhysics( CBaseAnimating *pAnimating )
 	{
 		Vector pos;
 		pPhysics->GetShadowPosition( &pos, NULL );
-		pAnimating->SetAbsOrigin( pos );
+		pAnimating->GetEngineObject()->SetAbsOrigin( pos );
 	}
 }
 
@@ -1298,7 +1298,7 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 		// if the entity was killed by physics or a vehicle, move to the vphysics shadow position before creating the ragdoll.
 		SyncAnimatingWithPhysics( pAnimating );
 	}
-	CRagdollProp *pRagdoll = (CRagdollProp *)CBaseEntity::CreateNoSpawn( "prop_ragdoll", pAnimating->GetAbsOrigin(), vec3_angle, NULL );
+	CRagdollProp *pRagdoll = (CRagdollProp *)CBaseEntity::CreateNoSpawn( "prop_ragdoll", pAnimating->GetEngineObject()->GetAbsOrigin(), vec3_angle, NULL );
 	pRagdoll->CopyAnimationDataFrom( pAnimating );
 	pRagdoll->SetOwnerEntity( pAnimating );
 
@@ -1349,7 +1349,7 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	pAnimating->ClearBoneCacheFlags( BCF_NO_ANIMATION_SKIP );
 	pAnimating->SetBoneCacheFlags( fPrevFlags );
 
-	Vector vel = pAnimating->GetAbsVelocity();
+	Vector vel = pAnimating->GetEngineObject()->GetAbsVelocity();
 	if( ( vel.Length() == 0 ) && ( dt > 0 ) )
 	{
 		// Compute animation velocity
@@ -1463,7 +1463,7 @@ void CRagdollPropAttached::Detach()
 {
 	GetEngineObject()->SetParent(NULL);
 	SetOwnerEntity( NULL );
-	SetAbsAngles( vec3_angle );
+	GetEngineObject()->SetAbsAngles( vec3_angle );
 	SetMoveType( MOVETYPE_VPHYSICS );
 	RemoveSolidFlags( FSOLID_NOT_SOLID );
 	physenv->DestroyConstraint( m_pAttachConstraint );
@@ -1519,7 +1519,7 @@ void CRagdollPropAttached::InitRagdollAttached(
 	Vector offsetWS;
 	pAttached->LocalToWorld( &offsetWS, boneLocalOrigin );
 
-	QAngle followAng = QAngle(0, pFollow->GetAbsAngles().y, 0 );
+	QAngle followAng = QAngle(0, pFollow->GetEngineObject()->GetAbsAngles().y, 0 );
 	AngleMatrix( followAng, offsetWS, constraintToWorld );
 
 	constraint.axes[0].SetAxisFriction( -2, 2, 20 );
@@ -1574,7 +1574,7 @@ CRagdollProp *CreateServerRagdollAttached( CBaseAnimating *pAnimating, const Vec
 	if ( modelinfo->GetVCollide( pAnimating->GetModelIndex() ) == NULL )
 		return NULL;
 
-	CRagdollPropAttached *pRagdoll = (CRagdollPropAttached *)CBaseEntity::CreateNoSpawn( "prop_ragdoll_attached", pAnimating->GetAbsOrigin(), vec3_angle, NULL );
+	CRagdollPropAttached *pRagdoll = (CRagdollPropAttached *)CBaseEntity::CreateNoSpawn( "prop_ragdoll_attached", pAnimating->GetEngineObject()->GetAbsOrigin(), vec3_angle, NULL );
 	pRagdoll->CopyAnimationDataFrom( pAnimating );
 
 	pRagdoll->InitRagdollAnimation();

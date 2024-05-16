@@ -476,7 +476,7 @@ void CMultiPlayerAnimState::RunGestureSlotAnimEventsToCompletion( GestureSlot_t 
 			if ( pevent[i].cycle > pGesture->m_pAnimLayer->m_flPrevCycle &&
 				pevent[i].cycle <= pGesture->m_pAnimLayer->m_flCycle )
 			{
-				pPlayer->FireEvent( pPlayer->GetAbsOrigin(), pPlayer->GetAbsAngles(), pevent[ i ].event, pevent[ i ].pszOptions() );
+				pPlayer->FireEvent( pPlayer->GetEngineObject()->GetAbsOrigin(), pPlayer->GetEngineObject()->GetAbsAngles(), pevent[ i ].event, pevent[ i ].pszOptions() );
 			}
 		}
 	}
@@ -1602,7 +1602,7 @@ void CMultiPlayerAnimState::EstimateYaw( void )
 	// Get the player's velocity and angles.
 	Vector vecEstVelocity;
 	GetOuterAbsVelocity( vecEstVelocity );
-	QAngle angles = GetBasePlayer()->GetLocalAngles();
+	QAngle angles = GetBasePlayer()->GetEngineObject()->GetLocalAngles();
 
 	// If we are not moving, sync up the feet and eyes slowly.
 	if ( vecEstVelocity.x == 0.0f && vecEstVelocity.y == 0.0f )
@@ -1714,10 +1714,10 @@ void CMultiPlayerAnimState::ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr )
 	m_bForceAimYaw = false;
 
 #ifndef CLIENT_DLL
-	QAngle angle = GetBasePlayer()->GetAbsAngles();
+	QAngle angle = GetBasePlayer()->GetEngineObject()->GetAbsAngles();
 	angle[YAW] = m_flCurrentFeetYaw;
 
-	GetBasePlayer()->SetAbsAngles( angle );
+	GetBasePlayer()->GetEngineObject()->SetAbsAngles( angle );
 #endif
 }
 
@@ -1777,7 +1777,7 @@ void CMultiPlayerAnimState::GetOuterAbsVelocity( Vector& vel )
 #if defined( CLIENT_DLL )
 	GetBasePlayer()->GetEngineObject()->EstimateAbsVelocity( vel );
 #else
-	vel = GetBasePlayer()->GetAbsVelocity();
+	vel = GetBasePlayer()->GetEngineObject()->GetAbsVelocity();
 #endif
 }
 
@@ -2011,7 +2011,7 @@ void CMultiPlayerAnimState::DebugShowAnimState( int iStartLine )
 	// Draw a red triangle on the ground for the eye yaw.
 	float flBaseSize = 10;
 	float flHeight = 80;
-	Vector vBasePos = GetBasePlayer()->GetAbsOrigin() + Vector( 0, 0, 3 );
+	Vector vBasePos = GetBasePlayer()->GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 3 );
 	QAngle angles( 0, 0, 0 );
 	angles[YAW] = m_flEyeYaw;
 	Vector vForward, vRight, vUp;

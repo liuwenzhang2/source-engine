@@ -127,7 +127,7 @@ void CAI_FearBehavior::RunTask( const Task_t *pTask )
 				{
 					Assert( m_hMovingToHint != NULL );
 
-					AI_NavGoal_t goal(m_hMovingToHint->GetAbsOrigin());
+					AI_NavGoal_t goal(m_hMovingToHint->GetEngineObject()->GetAbsOrigin());
 					goal.pTarget = NULL;
 					if( GetNavigator()->SetGoal( goal ) == false )
 					{
@@ -149,7 +149,7 @@ void CAI_FearBehavior::RunTask( const Task_t *pTask )
 					}
 					else
 					{
-						GetNavigator()->SetArrivalDirection( m_hMovingToHint->GetAbsAngles() );
+						GetNavigator()->SetArrivalDirection( m_hMovingToHint->GetEngineObject()->GetAbsAngles() );
 					}
 				}
 				break;
@@ -290,7 +290,7 @@ void CAI_FearBehavior::GatherConditions()
 	ClearCondition( COND_FEAR_ENEMY_TOO_CLOSE );
 	if( GetEnemy() )
 	{
-		float flEnemyDistSqr = GetAbsOrigin().DistToSqr(GetEnemy()->GetAbsOrigin());
+		float flEnemyDistSqr = GetAbsOrigin().DistToSqr(GetEnemy()->GetEngineObject()->GetAbsOrigin());
 
 		if( flEnemyDistSqr < FEAR_ENEMY_TOLERANCE_TOO_CLOSE_DIST_SQR )
 		{
@@ -319,7 +319,7 @@ void CAI_FearBehavior::GatherConditions()
 	//
 	// Here's the distance check:
 	CBasePlayer *pPlayer = AI_GetSinglePlayer();
-	if( pPlayer != NULL && GetAbsOrigin().DistToSqr(pPlayer->GetAbsOrigin()) >= Square( ai_fear_player_dist.GetFloat() * 1.5f )  )
+	if( pPlayer != NULL && GetAbsOrigin().DistToSqr(pPlayer->GetEngineObject()->GetAbsOrigin()) >= Square( ai_fear_player_dist.GetFloat() * 1.5f )  )
 	{
 		SetCondition(COND_FEAR_SEPARATED_FROM_PLAYER);
 	}
@@ -457,7 +457,7 @@ CAI_Hint *CAI_FearBehavior::FindFearWithdrawalDest()
 
 	hintCriteria.AddHintType( HINT_PLAYER_ALLY_FEAR_DEST );
 	hintCriteria.SetFlag( bits_HINT_NODE_VISIBLE_TO_PLAYER | bits_HINT_NOT_CLOSE_TO_ENEMY /*| bits_HINT_NODE_IN_VIEWCONE | bits_HINT_NPC_IN_NODE_FOV*/ );
-	hintCriteria.AddIncludePosition( AI_GetSinglePlayer()->GetAbsOrigin(), ( ai_fear_player_dist.GetFloat() ) );
+	hintCriteria.AddIncludePosition( AI_GetSinglePlayer()->GetEngineObject()->GetAbsOrigin(), ( ai_fear_player_dist.GetFloat() ) );
 
 	pHint = CAI_HintManager::FindHint( pOuter, hintCriteria );
 

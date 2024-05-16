@@ -497,7 +497,7 @@ void CCombineDropshipContainer::CreateCorpse()
 
 	// Explode
 	Vector vecAbsPoint;
-	CPASFilter filter( GetAbsOrigin() );
+	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 	CollisionProp()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint);
 	te->Explosion( filter, 0.0f, &vecAbsPoint, g_sModelIndexFireball, 
 		random->RandomInt( 4, 10 ), random->RandomInt( 8, 15 ), TE_EXPLFLAG_NOPARTICLES, 100, 0 );
@@ -505,7 +505,7 @@ void CCombineDropshipContainer::CreateCorpse()
 	// Break into chunks
 	Vector angVelocity;
 	QAngleToAngularImpulse( GetLocalAngularVelocity(), angVelocity );
-	PropBreakableCreateAll( GetModelIndex(), VPhysicsGetObject(), GetAbsOrigin(), GetAbsAngles(), GetAbsVelocity(), angVelocity, 1.0, 250, COLLISION_GROUP_NPC, this );
+	PropBreakableCreateAll( GetModelIndex(), VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsVelocity(), angVelocity, 1.0, 250, COLLISION_GROUP_NPC, this );
 
 	// Create flaming gibs
 	int iChunks = random->RandomInt( 4, 6 );
@@ -533,7 +533,7 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 	CollisionProp()->WorldToNormalizedSpace( vecAbsMaxs, &vecNormalizedMaxs );
 
 	Vector vecAbsPoint;
-	CPASFilter filter( GetAbsOrigin() );
+	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 	CollisionProp()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint);
 
 	// Throw a flaming, smoking chunk.
@@ -543,8 +543,8 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 
 	QAngle vecSpawnAngles;
 	vecSpawnAngles.Random( -90, 90 );
-	pChunk->SetAbsOrigin( vecAbsPoint );
-	pChunk->SetAbsAngles( vecSpawnAngles );
+	pChunk->GetEngineObject()->SetAbsOrigin( vecAbsPoint );
+	pChunk->GetEngineObject()->SetAbsAngles( vecSpawnAngles );
 
 	int nGib = random->RandomInt( 0, DROPSHIP_CONTAINER_MAX_CHUNKS - 1 );
 	pChunk->Spawn( s_pChunkModelName[nGib] );
@@ -566,12 +566,12 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 		AngleVectors( angles, &vecVelocity );
 		
 		vecVelocity *= random->RandomFloat( 300, 900 );
-		vecVelocity += GetAbsVelocity();
+		vecVelocity += GetEngineObject()->GetAbsVelocity();
 
 		AngularImpulse angImpulse;
 		angImpulse = RandomAngularImpulse( -180, 180 );
 
-		pChunk->SetAbsVelocity( vecVelocity );
+		pChunk->GetEngineObject()->SetAbsVelocity( vecVelocity );
 		pPhysicsObject->SetVelocity(&vecVelocity, &angImpulse );
 	}
 
@@ -596,7 +596,7 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 		pSmokeTrail->m_MaxSpeed = 25;
 		pSmokeTrail->SetLifetime( pChunk->m_lifeTime );
 		pSmokeTrail->GetEngineObject()->SetParent( pChunk->GetEngineObject(), 0);
-		pSmokeTrail->SetLocalOrigin( vec3_origin );
+		pSmokeTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
 		pSmokeTrail->SetMoveType( MOVETYPE_NONE );
 	}
 }
@@ -718,17 +718,17 @@ void CCombineDropshipContainer::AddSmokeTrail( const Vector &vecPos )
 	pSmokeTrail->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
 	if ( nAttachment == 0 )
 	{
-		pSmokeTrail->SetAbsOrigin( vecPos );
+		pSmokeTrail->GetEngineObject()->SetAbsOrigin( vecPos );
 	}
 	else
 	{
-		pSmokeTrail->SetLocalOrigin( vec3_origin );
+		pSmokeTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
 	}
 
 	Vector vecForward( -1, 0, 0 );
 	QAngle angles;
 	VectorAngles( vecForward, angles );
-	pSmokeTrail->SetAbsAngles( angles );
+	pSmokeTrail->GetEngineObject()->SetAbsAngles( angles );
 	pSmokeTrail->SetMoveType( MOVETYPE_NONE );
 }
 
@@ -878,8 +878,8 @@ void CNPC_CombineDropship::Spawn( void )
 		if ( m_hContainer )
 		{
 			m_hContainer->SetName( "dropship_container" );
-			m_hContainer->SetAbsOrigin( GetAbsOrigin() );
-			m_hContainer->SetAbsAngles( GetAbsAngles() );
+			m_hContainer->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
+			m_hContainer->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 			m_hContainer->SetOwnerEntity(this);
 			m_hContainer->Spawn();
@@ -888,7 +888,7 @@ void CNPC_CombineDropship::Spawn( void )
 			if ( pPhysicsObject )
 			{
 				pPhysicsObject->SetShadow( 1e4, 1e4, false, false );
-				pPhysicsObject->UpdateShadow( m_hContainer->GetAbsOrigin(), m_hContainer->GetAbsAngles(), false, 0 );
+				pPhysicsObject->UpdateShadow( m_hContainer->GetEngineObject()->GetAbsOrigin(), m_hContainer->GetEngineObject()->GetAbsAngles(), false, 0 );
 			}
 
 			m_hContainer->SetMoveType( MOVETYPE_PUSH );
@@ -909,12 +909,12 @@ void CNPC_CombineDropship::Spawn( void )
 
 	case CRATE_STRIDER:
 		m_hContainer = (CBaseAnimating*)gEntList.CreateEntityByName( "npc_strider" );
-		m_hContainer->SetAbsOrigin( GetAbsOrigin() - Vector( 0, 0 , 100 ) );
-		m_hContainer->SetAbsAngles( GetAbsAngles() );
+		m_hContainer->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() - Vector( 0, 0 , 100 ) );
+		m_hContainer->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 		m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 		m_hContainer->SetOwnerEntity(this);
 		m_hContainer->Spawn();
-		m_hContainer->SetAbsOrigin( GetAbsOrigin() - Vector( 0, 0 , 100 ) );
+		m_hContainer->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() - Vector( 0, 0 , 100 ) );
 		break;
 
 	case CRATE_APC:
@@ -927,8 +927,8 @@ void CNPC_CombineDropship::Spawn( void )
 				break;
 			}
 
-			Vector apcPosition = GetAbsOrigin() - Vector( 0, 0 , 25 );
-			QAngle apcAngles = GetAbsAngles();
+			Vector apcPosition = GetEngineObject()->GetAbsOrigin() - Vector( 0, 0 , 25 );
+			QAngle apcAngles = GetEngineObject()->GetAbsAngles();
 			VMatrix mat, rot, result;
 			MatrixFromAngles( apcAngles, mat );
 			MatrixBuildRotateZ( rot, -90 );
@@ -960,14 +960,14 @@ void CNPC_CombineDropship::Spawn( void )
 			m_hContainer->SetModel( "models/buggy.mdl" );
 			m_hContainer->SetName( "dropship_jeep" );
 
-			m_hContainer->SetAbsOrigin( GetAbsOrigin() );//- Vector( 0, 0 , 25 ) );
-			QAngle angles = GetAbsAngles();
+			m_hContainer->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );//- Vector( 0, 0 , 25 ) );
+			QAngle angles = GetEngineObject()->GetAbsAngles();
 			VMatrix mat, rot, result;
 			MatrixFromAngles( angles, mat );
 			MatrixBuildRotateZ( rot, -90 );
 			MatrixMultiply( mat, rot, result );
 			MatrixToAngles( result, angles );
-			m_hContainer->SetAbsAngles( angles );
+			m_hContainer->GetEngineObject()->SetAbsAngles( angles );
 
 			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 			m_hContainer->SetOwnerEntity(this);
@@ -1159,24 +1159,24 @@ void CNPC_CombineDropship::Flight( void )
 	//We assume CRATE_NONE means the dropship just picked up some random phys object.
 	if ( m_hContainer != NULL && ( m_iCrateType == CRATE_SOLDIER || m_iCrateType == CRATE_NONE ) )
 	{
-		if ( m_hContainer->GetLocalOrigin() != vec3_origin )
+		if ( m_hContainer->GetEngineObject()->GetLocalOrigin() != vec3_origin )
 		{
-			Vector vCurrentLocalOrigin = m_hContainer->GetLocalOrigin();
+			Vector vCurrentLocalOrigin = m_hContainer->GetEngineObject()->GetLocalOrigin();
 			Vector vLocalOrigin;
 	
 			VectorLerp( vCurrentLocalOrigin, vec3_origin, 0.05f, vLocalOrigin );
 	
-			m_hContainer->SetLocalOrigin( vLocalOrigin );
+			m_hContainer->GetEngineObject()->SetLocalOrigin( vLocalOrigin );
 		}
 
-		if ( m_hContainer->GetLocalAngles() != vec3_angle )
+		if ( m_hContainer->GetEngineObject()->GetLocalAngles() != vec3_angle )
 		{
-			QAngle vCurrentLocalAngles = m_hContainer->GetLocalAngles();
+			QAngle vCurrentLocalAngles = m_hContainer->GetEngineObject()->GetLocalAngles();
 			QAngle vLocalAngles;
 
 			vLocalAngles = Lerp( 0.05f, vCurrentLocalAngles, vec3_angle );
 
-			m_hContainer->SetLocalAngles( vLocalAngles );
+			m_hContainer->GetEngineObject()->SetLocalAngles( vLocalAngles );
 		}
 	}
 
@@ -1201,7 +1201,7 @@ void CNPC_CombineDropship::Flight( void )
 			maxSpeed *= 5.0;
 		}
 
-		float flCurrentSpeed = GetAbsVelocity().Length();
+		float flCurrentSpeed = GetEngineObject()->GetAbsVelocity().Length();
 		float flDist = MIN( flCurrentSpeed + accelRate, maxSpeed );
 
 		Vector deltaPos;
@@ -1214,14 +1214,14 @@ void CNPC_CombineDropship::Flight( void )
 		{
 			ComputeActualTargetPosition( flDist, dt, 0.0f, &deltaPos );
 		}
-		deltaPos -= GetAbsOrigin();
+		deltaPos -= GetEngineObject()->GetAbsOrigin();
 
 		//NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + deltaPos, 0, 255, 0, true, 0.1f );
 
 		// calc goal linear accel to hit deltaPos in dt time.
-		accel.x = 2.0 * (deltaPos.x - GetAbsVelocity().x * dt) / (dt * dt);
-		accel.y = 2.0 * (deltaPos.y - GetAbsVelocity().y * dt) / (dt * dt);
-		accel.z = 2.0 * (deltaPos.z - GetAbsVelocity().z * dt + 0.5 * 384 * dt * dt) / (dt * dt);
+		accel.x = 2.0 * (deltaPos.x - GetEngineObject()->GetAbsVelocity().x * dt) / (dt * dt);
+		accel.y = 2.0 * (deltaPos.y - GetEngineObject()->GetAbsVelocity().y * dt) / (dt * dt);
+		accel.z = 2.0 * (deltaPos.z - GetEngineObject()->GetAbsVelocity().z * dt + 0.5 * 384 * dt * dt) / (dt * dt);
 		
 		float flDistFromPath = 0.0f;
 		Vector vecPoint, vecDelta;
@@ -1229,7 +1229,7 @@ void CNPC_CombineDropship::Flight( void )
 		{
 			// Also, add in a little force to get us closer to our current line segment if we can
 			ClosestPointToCurrentPath( &vecPoint );
-			VectorSubtract( vecPoint, GetAbsOrigin(), vecDelta );
+			VectorSubtract( vecPoint, GetEngineObject()->GetAbsOrigin(), vecDelta );
  			flDistFromPath = VectorNormalize( vecDelta );
 			if ( flDistFromPath > 200 )
 			{
@@ -1259,9 +1259,9 @@ void CNPC_CombineDropship::Flight( void )
 		// calc angular accel needed to hit goal pitch in dt time.
 		dt = 0.6;
 		QAngle goalAngAccel;
-		goalAngAccel.x = 2.0 * (AngleDiff( goalPitch, AngleNormalize( GetLocalAngles().x ) ) - GetLocalAngularVelocity().x * dt) / (dt * dt);
-		goalAngAccel.y = 2.0 * (AngleDiff( goalYaw, AngleNormalize( GetLocalAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
-		goalAngAccel.z = 2.0 * (AngleDiff( goalRoll, AngleNormalize( GetLocalAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
+		goalAngAccel.x = 2.0 * (AngleDiff( goalPitch, AngleNormalize(GetEngineObject()->GetLocalAngles().x ) ) - GetLocalAngularVelocity().x * dt) / (dt * dt);
+		goalAngAccel.y = 2.0 * (AngleDiff( goalYaw, AngleNormalize(GetEngineObject()->GetLocalAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
+		goalAngAccel.z = 2.0 * (AngleDiff( goalRoll, AngleNormalize(GetEngineObject()->GetLocalAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
 
 		goalAngAccel.x = clamp( goalAngAccel.x, -300, 300 );
 		//goalAngAccel.y = clamp( goalAngAccel.y, -60, 60 );
@@ -1312,7 +1312,7 @@ void CNPC_CombineDropship::Flight( void )
 		}
 
 		// Find our current velocity
-		Vector vecVelDir = GetAbsVelocity();
+		Vector vecVelDir = GetEngineObject()->GetAbsVelocity();
 
 		VectorNormalize( vecVelDir );
 
@@ -1428,7 +1428,7 @@ void CNPC_CombineDropship::UpdateFacingDirection( void )
 		{
 			// If we've seen the target recently, face the target.
 			//Msg( "Facing Target \n" );
-			m_vecDesiredFaceDir = m_vecTargetPosition - GetAbsOrigin();
+			m_vecDesiredFaceDir = m_vecTargetPosition - GetEngineObject()->GetAbsOrigin();
 		}
 		else
 		{
@@ -1438,9 +1438,9 @@ void CNPC_CombineDropship::UpdateFacingDirection( void )
 	else
 	{
 		// Face our desired position.
-		if ( GetDesiredPosition().DistToSqr( GetAbsOrigin() ) > 1 )
+		if ( GetDesiredPosition().DistToSqr(GetEngineObject()->GetAbsOrigin() ) > 1 )
 		{
-			m_vecDesiredFaceDir = GetDesiredPosition() - GetAbsOrigin();
+			m_vecDesiredFaceDir = GetDesiredPosition() - GetEngineObject()->GetAbsOrigin();
 		}
 		else
 		{
@@ -1557,7 +1557,7 @@ void CNPC_CombineDropship::UpdateRotorWashVolume()
 	CBaseEntity *pPlayer = UTIL_PlayerByIndex( 1 );
 	if (pPlayer)
 	{
-		float flDist = pPlayer->GetAbsOrigin().DistTo( GetAbsOrigin() );
+		float flDist = pPlayer->GetEngineObject()->GetAbsOrigin().DistTo(GetEngineObject()->GetAbsOrigin() );
 		flDist = clamp( flDist, DROPSHIP_NEAR_SOUND_MIN_DISTANCE, DROPSHIP_NEAR_SOUND_MAX_DISTANCE );
 		flNearFactor = RemapVal( flDist, DROPSHIP_NEAR_SOUND_MIN_DISTANCE, DROPSHIP_NEAR_SOUND_MAX_DISTANCE, 1.0f, 0.0f );
 	}
@@ -1714,15 +1714,15 @@ void CNPC_CombineDropship::InputDropStrider( inputdata_t &inputdata )
 		return;
 	}
 
-	QAngle angles = GetAbsAngles();
+	QAngle angles = GetEngineObject()->GetAbsAngles();
 
 	angles.x = 0.0;
 	angles.z = 0.0;
 
 	m_hContainer->GetEngineObject()->SetParent(NULL, 0);
 	m_hContainer->SetOwnerEntity(NULL);
-	m_hContainer->SetAbsAngles( angles );
-	m_hContainer->SetAbsVelocity( vec3_origin );
+	m_hContainer->GetEngineObject()->SetAbsAngles( angles );
+	m_hContainer->GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 	m_hContainer = NULL;
 }
@@ -1740,7 +1740,7 @@ void CNPC_CombineDropship::InputDropAPC( inputdata_t &inputdata )
 	m_hContainer->GetEngineObject()->SetParent(NULL, 0);
 //	m_hContainer->SetOwnerEntity(NULL);
 
-	Vector vecAbsVelocity = GetAbsVelocity();
+	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 	if ( vecAbsVelocity.z > 0 )
 	{
 		vecAbsVelocity.z = 0.0f;
@@ -1750,7 +1750,7 @@ void CNPC_CombineDropship::InputDropAPC( inputdata_t &inputdata )
 		vecAbsVelocity = vec3_origin;
 	}
 
-	m_hContainer->SetAbsVelocity( vecAbsVelocity );
+	m_hContainer->GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 	m_hContainer->SetMoveType( (MoveType_t)m_iContainerMoveType );
 
 	// If the container has a physics object, remove it's shadow
@@ -1777,20 +1777,20 @@ void CNPC_CombineDropship::DropSoldierContainer( )
 	m_hContainer->GetEngineObject()->SetParent(NULL, 0);
 //	m_hContainer->SetOwnerEntity(NULL);
 
-	Vector vecAbsVelocity = GetAbsVelocity();
+	Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 	if ( vecAbsVelocity.z > 0 )
 	{
 		vecAbsVelocity.z = 0.0f;
 	}
 
-	m_hContainer->SetAbsVelocity( vecAbsVelocity );
+	m_hContainer->GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 	m_hContainer->SetMoveType( MOVETYPE_VPHYSICS );
 
 	// If we have a troop in the process of exiting, kill him.
 	// We do this to avoid having to solve the AI problems resulting from it.
 	if ( m_hLastTroopToLeave )
 	{
-		CTakeDamageInfo dmgInfo( this, this, vec3_origin, m_hContainer->GetAbsOrigin(), m_hLastTroopToLeave->GetMaxHealth(), DMG_GENERIC );
+		CTakeDamageInfo dmgInfo( this, this, vec3_origin, m_hContainer->GetEngineObject()->GetAbsOrigin(), m_hLastTroopToLeave->GetMaxHealth(), DMG_GENERIC );
 		m_hLastTroopToLeave->TakeDamage( dmgInfo );
 	}
 
@@ -1863,7 +1863,7 @@ void CNPC_CombineDropship::InputPickup( inputdata_t &inputdata )
 		SetState( NPC_STATE_ALERT );
 	}
 	SetLandingState( LANDING_SWOOPING );
-	m_flLandingSpeed = GetAbsVelocity().Length();
+	m_flLandingSpeed = GetEngineObject()->GetAbsVelocity().Length();
 
 	UpdatePickupNavigation();
 }
@@ -1977,11 +1977,11 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 	case LANDING_HOVER_LEVEL_OUT:
 		{
 			// Approach the drop point
-			Vector vecToTarget = (GetDesiredPosition() - GetAbsOrigin());
+			Vector vecToTarget = (GetDesiredPosition() - GetEngineObject()->GetAbsOrigin());
 			float flDistance = vecToTarget.Length();
 
 			// Are we there yet?
-			float flSpeed = GetAbsVelocity().Length();
+			float flSpeed = GetEngineObject()->GetAbsVelocity().Length();
 			if ( flDistance < 70 && flSpeed < 100 )
 			{
 				m_flLandingSpeed = flSpeed;
@@ -1996,7 +1996,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 				}
 
 				// save off current angles so we can work them out over time
-				QAngle angles = GetLocalAngles();
+				QAngle angles = GetEngineObject()->GetLocalAngles();
 				m_existPitch = angles.x;
 				m_existRoll = angles.z;
 			}
@@ -2020,7 +2020,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 				// We're trying to hover above an arbitrary point, not above the ground. 
 				// Recompute flAltitude to indicate the vertical distance from the land 
 				// target so that touchdown is correctly detected.
-				flAltitude = GetAbsOrigin().z - m_hLandTarget->GetAbsOrigin().z;
+				flAltitude = GetEngineObject()->GetAbsOrigin().z - m_hLandTarget->GetEngineObject()->GetAbsOrigin().z;
 			}
 
 			// Orient myself to the desired direction
@@ -2029,24 +2029,24 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 			if ( m_hLandTarget )
 			{
 				// We've got a land target, so match it's orientation
-				AngleVectors( m_hLandTarget->GetAbsAngles(), &targetDir );
+				AngleVectors( m_hLandTarget->GetEngineObject()->GetAbsAngles(), &targetDir );
 			}
 			else
 			{
 				// No land target. 
-				targetDir = GetDesiredPosition() - GetAbsOrigin();
+				targetDir = GetDesiredPosition() - GetEngineObject()->GetAbsOrigin();
 			}
 
 			// Don't unload until we're facing the way the dropoff point specifies
 			float flTargetYaw = UTIL_VecToYaw( targetDir );
-			float flDeltaYaw = UTIL_AngleDiff( flTargetYaw, GetAbsAngles().y );
+			float flDeltaYaw = UTIL_AngleDiff( flTargetYaw, GetEngineObject()->GetAbsAngles().y );
 			if ( fabs(flDeltaYaw) > 5 )
 			{
 				bStillOrienting = true;
 			}
 
 			// Ensure we land on the drop point. Stop dropping if we're still turning.
-			Vector vecToTarget = (GetDesiredPosition() - GetAbsOrigin());
+			Vector vecToTarget = (GetDesiredPosition() - GetEngineObject()->GetAbsOrigin());
 			float flDistance = vecToTarget.Length();
 			float flRampedSpeed = m_flLandingSpeed * (flDistance / 70);
 			Vector vecVelocity = (flRampedSpeed / flDistance) * vecToTarget;
@@ -2060,17 +2060,17 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 
 			vecVelocity.z = flDescendVelocity;
 
-			SetAbsVelocity( vecVelocity );
+			GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 			if ( flAltitude < 72 )
 			{
-				QAngle angles = GetLocalAngles();
+				QAngle angles = GetEngineObject()->GetLocalAngles();
 
 				// Level out quickly.
 				angles.x = UTIL_Approach( 0.0, angles.x, 0.2 );
 				angles.z = UTIL_Approach( 0.0, angles.z, 0.2 );
 
-				SetLocalAngles( angles );
+				GetEngineObject()->SetLocalAngles( angles );
 			}
 			else
 			{
@@ -2079,16 +2079,16 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 				m_existPitch = UTIL_Approach( 0.0, m_existPitch, 1 );
 				m_existRoll = UTIL_Approach( 0.0, m_existRoll, 1 );
 
-				QAngle angles = GetLocalAngles();
+				QAngle angles = GetEngineObject()->GetLocalAngles();
 				angles.x = m_existPitch + ( sin( gpGlobals->curtime * 3.5f ) * DROPSHIP_MAX_LAND_TILT );
 				angles.z = m_existRoll + ( sin( gpGlobals->curtime * 3.75f ) * DROPSHIP_MAX_LAND_TILT );
-				SetLocalAngles( angles );
+				GetEngineObject()->SetLocalAngles( angles );
 			}
 
 			DoRotorWash();
 
 			// place danger sounds 1 foot above ground to get troops to scatter if they are below dropship
-			Vector vecBottom = GetAbsOrigin();
+			Vector vecBottom = GetEngineObject()->GetAbsOrigin();
 			vecBottom.z += WorldAlignMins().z;
 			Vector vecSpot = vecBottom + Vector(0, 0, -1) * (flAltitude - 12 );
 			CSoundEnt::InsertSound( SOUND_DANGER, vecSpot, 400, 0.1, this, 0 );
@@ -2118,7 +2118,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 			{
 				if( IsHovering() )
 				{
-					SetAbsVelocity( vec3_origin );
+					GetEngineObject()->SetAbsVelocity( vec3_origin );
 					SetLandingState( LANDING_HOVER_TOUCHDOWN );
 				}
 				else
@@ -2127,10 +2127,10 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 				}
 
 				// upon landing, make sure ship is flat
-				QAngle angles = GetLocalAngles();
+				QAngle angles = GetEngineObject()->GetLocalAngles();
 				angles.x = 0;
 				angles.z = 0;
-				SetLocalAngles( angles );
+				GetEngineObject()->SetLocalAngles( angles );
 
 				// TODO: Release cargo anim
 				//SetActivity( (Activity)ACT_DROPSHIP_DESCEND_IDLE );
@@ -2227,13 +2227,13 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 						m_hContainer->GetEngineObject()->SetParent(NULL);
 						m_hContainer->SetMoveType( (MoveType_t)m_iContainerMoveType );
 
-						Vector vecAbsVelocity( 0, 0, GetAbsVelocity().z );
+						Vector vecAbsVelocity( 0, 0, GetEngineObject()->GetAbsVelocity().z );
 						if ( vecAbsVelocity.z > 0 )
 						{
 							vecAbsVelocity.z = 0.0f;
 						}
 
-						m_hContainer->SetAbsVelocity( vecAbsVelocity );
+						m_hContainer->GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 
 						// If the container has a physics object, remove it's shadow
 						IPhysicsObject *pPhysicsObject = m_hContainer->VPhysicsGetObject();
@@ -2285,7 +2285,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 			else
 			{
 				// Decrease altitude and speed to hit the target point.
-				Vector vecToTarget = (GetDesiredPosition() - GetAbsOrigin());
+				Vector vecToTarget = (GetDesiredPosition() - GetEngineObject()->GetAbsOrigin());
 				float flDistance = vecToTarget.Length();
 
 				// Start cheating when we get near it
@@ -2318,7 +2318,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 						{
 							pPhysicsObject->EnableMotion( true );
 							pPhysicsObject->SetShadow( 1e4, 1e4, false, false );
-							pPhysicsObject->UpdateShadow( GetAbsOrigin(), GetAbsAngles(), false, 0 );
+							pPhysicsObject->UpdateShadow(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), false, 0 );
 						}
 
 						m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
@@ -2358,7 +2358,7 @@ void CNPC_CombineDropship::DoRotorWash( void )
 	Vector	vecForward;
 	GetVectors( &vecForward, NULL, NULL );
 
-	Vector vecRotorHub = GetAbsOrigin() + vecForward * -64;
+	Vector vecRotorHub = GetEngineObject()->GetAbsOrigin() + vecForward * -64;
 
 	DrawRotorWash( DROPSHIP_WASH_ALTITUDE, vecRotorHub );
 }
@@ -2457,8 +2457,8 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	vecSpawnAngles[PITCH] = vecSpawnAngles[ROLL] = 0;
 
 	// Move it to the container spawnpoint
-	pNPC->SetAbsOrigin( vecSpawnOrigin );
-	pNPC->SetAbsAngles( vecSpawnAngles );
+	pNPC->GetEngineObject()->SetAbsOrigin( vecSpawnOrigin );
+	pNPC->GetEngineObject()->SetAbsAngles( vecSpawnAngles );
 	DispatchSpawn( pNPC );
 	pNPC->m_NPCState = NPC_STATE_IDLE;
 	pNPC->Activate();
@@ -2469,8 +2469,8 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	pSequence->KeyValue( "m_iszPlay", "Dropship_Deploy" );
 	pSequence->KeyValue( "m_fMoveTo", "4" );	// CINE_MOVETO_TELEPORT
 	pSequence->KeyValue( "OnEndSequence", UTIL_VarArgs("%s,NPCFinishDustoff,%s,0,-1", STRING(GetEntityName()), STRING(pNPC->GetEntityName())) );
-	pSequence->SetAbsOrigin( vecSpawnOrigin );
-	pSequence->SetAbsAngles( vecSpawnAngles );
+	pSequence->GetEngineObject()->SetAbsOrigin( vecSpawnOrigin );
+	pSequence->GetEngineObject()->SetAbsAngles( vecSpawnAngles );
 	pSequence->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
 	pSequence->Spawn();
 	pSequence->Activate();
@@ -2528,8 +2528,8 @@ void CNPC_CombineDropship::InputNPCFinishDustoff( inputdata_t &inputdata )
 	CAI_BaseNPC *pNPC = pEnt->MyNPCPointer();
 	Assert( pNPC );
 
-	Vector vecOrigin = GetDropoffFinishPosition( pNPC->GetAbsOrigin(), pNPC, vec3_origin, vec3_origin );
-	pNPC->SetAbsOrigin( vecOrigin );
+	Vector vecOrigin = GetDropoffFinishPosition( pNPC->GetEngineObject()->GetAbsOrigin(), pNPC, vec3_origin, vec3_origin );
+	pNPC->GetEngineObject()->SetAbsOrigin( vecOrigin );
 
 	// Do we have a dustoff point?
 	CBaseEntity *pDustoff = NULL;
@@ -2545,19 +2545,19 @@ void CNPC_CombineDropship::InputNPCFinishDustoff( inputdata_t &inputdata )
 	if ( !pDustoff )
 	{
 		// Make a move away sound to scare the combine away from this point
-		CSoundEnt::InsertSound( SOUND_MOVE_AWAY | SOUND_CONTEXT_COMBINE_ONLY, pNPC->GetAbsOrigin(), 128, 0.1 );
+		CSoundEnt::InsertSound( SOUND_MOVE_AWAY | SOUND_CONTEXT_COMBINE_ONLY, pNPC->GetEngineObject()->GetAbsOrigin(), 128, 0.1 );
 	}
 	else
 	{
 		if ( g_debug_dropship.GetInt() == 1 )
 		{
-			NDebugOverlay::Box( pDustoff->GetAbsOrigin(), -Vector(10,10,10), Vector(10,10,10), 0,255,0, 8, 5.0 );
+			NDebugOverlay::Box( pDustoff->GetEngineObject()->GetAbsOrigin(), -Vector(10,10,10), Vector(10,10,10), 0,255,0, 8, 5.0 );
 		}
 
 		// Tell the NPC to move to the dustoff position
 		pNPC->SetState( NPC_STATE_ALERT );
 		pNPC->ScheduledMoveToGoalEntity( SCHED_DROPSHIP_DUSTOFF, pDustoff, ACT_RUN );
-		pNPC->GetNavigator()->SetArrivalDirection( pDustoff->GetAbsAngles() );
+		pNPC->GetNavigator()->SetArrivalDirection( pDustoff->GetEngineObject()->GetAbsAngles() );
 
 		// Make sure they ignore a bunch of conditions
 		static int g_Conditions[] = 
@@ -2625,7 +2625,7 @@ void CNPC_CombineDropship::InputFlyToPathTrack( inputdata_t &inputdata )
 float CNPC_CombineDropship::GetAltitude( void )
 {
 	trace_t tr;
-	Vector vecBottom = GetAbsOrigin();
+	Vector vecBottom = GetEngineObject()->GetAbsOrigin();
 
 	// Uneven terrain causes us problems, so trace our box down
 	AI_TraceEntity( this, vecBottom, vecBottom - Vector(0,0,4096), MASK_SOLID_BRUSHONLY, &tr );
@@ -2641,7 +2641,7 @@ float CNPC_CombineDropship::GetAltitude( void )
 //-----------------------------------------------------------------------------
 void CNPC_CombineDropship::DropMine( void )
 {
-	NPC_Rollermine_DropFromPoint( GetAbsOrigin(), this, STRING(m_sRollermineTemplateData) );
+	NPC_Rollermine_DropFromPoint(GetEngineObject()->GetAbsOrigin(), this, STRING(m_sRollermineTemplateData) );
 }
 
 //------------------------------------------------------------------------------
@@ -2691,7 +2691,7 @@ void CNPC_CombineDropship::Hunt( void )
 	}
 
 	// don't face player ever, only face nav points
-	Vector desiredDir = GetDesiredPosition() - GetAbsOrigin();
+	Vector desiredDir = GetDesiredPosition() - GetEngineObject()->GetAbsOrigin();
 	VectorNormalize( desiredDir ); 
 	// Face our desired position.
 	m_vecDesiredFaceDir = desiredDir;
@@ -2701,12 +2701,12 @@ void CNPC_CombineDropship::Hunt( void )
 		if ( m_hLandTarget )
 		{
 			// We've got a land target, so match it's orientation
-			AngleVectors( m_hLandTarget->GetAbsAngles(), &m_vecDesiredFaceDir );
+			AngleVectors( m_hLandTarget->GetEngineObject()->GetAbsAngles(), &m_vecDesiredFaceDir );
 		}
 		else
 		{
 			// No land target. 
-			m_vecDesiredFaceDir = GetDesiredPosition() - GetAbsOrigin();
+			m_vecDesiredFaceDir = GetDesiredPosition() - GetEngineObject()->GetAbsOrigin();
 		}
 	}
 

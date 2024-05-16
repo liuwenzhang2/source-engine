@@ -102,7 +102,7 @@ void CSatchelCharge::CreateEffects( void )
 		return;
 
 	// Create a blinking light to show we're an active SLAM
-	m_hGlowSprite = CSprite::SpriteCreate( SLAM_SPRITE, GetAbsOrigin(), false );
+	m_hGlowSprite = CSprite::SpriteCreate( SLAM_SPRITE, GetEngineObject()->GetAbsOrigin(), false );
 	m_hGlowSprite->SetAttachment( this, 0 );
 	m_hGlowSprite->SetTransparency( kRenderTransAdd, 255, 255, 255, 255, kRenderFxStrobeFast );
 	m_hGlowSprite->SetBrightness( 255, 1.0f );
@@ -117,7 +117,7 @@ void CSatchelCharge::CreateEffects( void )
 //-----------------------------------------------------------------------------
 void CSatchelCharge::InputExplode( inputdata_t &inputdata )
 {
-	ExplosionCreate( GetAbsOrigin() + Vector( 0, 0, 16 ), GetAbsAngles(), GetThrower(), GetDamage(), GetDamageRadius(), 
+	ExplosionCreate(GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 16 ), GetEngineObject()->GetAbsAngles(), GetThrower(), GetDamage(), GetDamageRadius(),
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 0.0f, this);
 
 	UTIL_Remove( this );
@@ -137,12 +137,12 @@ void CSatchelCharge::SatchelThink( void )
 	if (GetOwnerEntity())
 	{
 		trace_t tr;
-		Vector	vUpABit = GetAbsOrigin();
+		Vector	vUpABit = GetEngineObject()->GetAbsOrigin();
 		vUpABit.z += 5.0;
 
 		CBaseEntity* saveOwner	= GetOwnerEntity();
 		SetOwnerEntity( NULL );
-		UTIL_TraceEntity( this, GetAbsOrigin(), vUpABit, MASK_SOLID, &tr );
+		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vUpABit, MASK_SOLID, &tr );
 		if ( tr.startsolid || tr.fraction != 1.0 )
 		{
 			SetOwnerEntity( saveOwner );
@@ -151,9 +151,9 @@ void CSatchelCharge::SatchelThink( void )
 	
 	// Bounce movement code gets this think stuck occasionally so check if I've 
 	// succeeded in moving, otherwise kill my motions.
-	else if ((GetAbsOrigin() - m_vLastPosition).LengthSqr()<1)
+	else if ((GetEngineObject()->GetAbsOrigin() - m_vLastPosition).LengthSqr()<1)
 	{
-		SetAbsVelocity( vec3_origin );
+		GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 		QAngle angVel = GetLocalAngularVelocity();
 		angVel.y  = 0;
@@ -163,7 +163,7 @@ void CSatchelCharge::SatchelThink( void )
 		SetThink(NULL);
 		return;
 	}
-	m_vLastPosition= GetAbsOrigin();
+	m_vLastPosition= GetEngineObject()->GetAbsOrigin();
 
 	StudioFrameAdvance( );
 	SetNextThink( gpGlobals->curtime + 0.1f );

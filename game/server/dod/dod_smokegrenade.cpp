@@ -66,7 +66,7 @@ void CDODSmokeGrenade::Think_Emit( void )
 		VPhysicsGetObject()->EnableMotion( false );
 
 		// Smoke Cloud
-		DispatchParticleEffect( "smokegrenade", GetAbsOrigin(), vec3_angle );
+		DispatchParticleEffect( "smokegrenade", GetEngineObject()->GetAbsOrigin(), vec3_angle );
 
 		// Smoke Jet
 		DispatchParticleEffect( "smokegrenade_jet", PATTACH_POINT, this, "jet" );

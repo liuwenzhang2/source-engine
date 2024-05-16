@@ -118,7 +118,7 @@ CBaseEntity * CCSBot::FindEntitiesOnPath( float distance, CPushAwayEnumerator *e
 			Vector start, end;
 			if ( i == startIndex - 1 )
 			{
-				start = GetAbsOrigin();
+				start = GetEngineObject()->GetAbsOrigin();
 				end = m_path[i+1].pos;
 			}
 			else
@@ -431,7 +431,7 @@ void CCSBot::StuckCheck( void )
 	if (m_isStuck)
 	{
 		// we are stuck - see if we have moved far enough to be considered unstuck
-		Vector delta = GetAbsOrigin() - m_stuckSpot;
+		Vector delta = GetEngineObject()->GetAbsOrigin() - m_stuckSpot;
 
 		const float unstuckRange = 75.0f;
 		if (delta.IsLengthGreaterThan( unstuckRange ))
@@ -446,7 +446,7 @@ void CCSBot::StuckCheck( void )
 		// check if we are stuck
 
 		// compute average velocity over a short period (for stuck check)
-		Vector vel = GetAbsOrigin() - m_lastOrigin;
+		Vector vel = GetEngineObject()->GetAbsOrigin() - m_lastOrigin;
 
 		// if we are jumping, ignore Z
 		if (IsJumping())
@@ -483,7 +483,7 @@ void CCSBot::StuckCheck( void )
 			{
 				// we are stuck - note when and where we initially become stuck
 				m_stuckTimestamp = gpGlobals->curtime;			
-				m_stuckSpot = GetAbsOrigin();
+				m_stuckSpot = GetEngineObject()->GetAbsOrigin();
 				m_stuckJumpTimer.Start( RandomFloat( 0.3f, 0.75f ) );		// 1.0
 
 				PrintIfWatched( "STUCK\n" );
@@ -500,7 +500,7 @@ void CCSBot::StuckCheck( void )
 	}
 
 	// always need to track this
-	m_lastOrigin = GetAbsOrigin();
+	m_lastOrigin = GetEngineObject()->GetAbsOrigin();
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -677,7 +677,7 @@ void CCSBot::MoveAwayFromPosition( const Vector &pos )
 	Vector2D lat( -dir.y, dir.x );
 
 	// compute unit vector to goal position
-	Vector2D to( pos.x - GetAbsOrigin().x, pos.y - GetAbsOrigin().y );
+	Vector2D to( pos.x - GetEngineObject()->GetAbsOrigin().x, pos.y - GetEngineObject()->GetAbsOrigin().y );
 	to.NormalizeInPlace();
 
 	// move away from the position independant of our view direction
@@ -709,7 +709,7 @@ void CCSBot::StrafeAwayFromPosition( const Vector &pos )
 	Vector2D lat( -dir.y, dir.x );
 
 	// compute unit vector to goal position
-	Vector2D to( pos.x - GetAbsOrigin().x, pos.y - GetAbsOrigin().y );
+	Vector2D to( pos.x - GetEngineObject()->GetAbsOrigin().x, pos.y - GetEngineObject()->GetAbsOrigin().y );
 	to.NormalizeInPlace();
 
 	float latProj = to.x * lat.x + to.y * lat.y;
@@ -749,11 +749,11 @@ void CCSBot::Wiggle( void )
 		case LEFT:
 		{
 			// don't move left if we will fall
-			Vector pos = GetAbsOrigin() - (lookAheadRange * right);
+			Vector pos = GetEngineObject()->GetAbsOrigin() - (lookAheadRange * right);
 
 			if (GetSimpleGroundHeightWithFloor( pos, &ground ))
 			{
-				if (GetAbsOrigin().z - ground < StepHeight)
+				if (GetEngineObject()->GetAbsOrigin().z - ground < StepHeight)
 				{
 					StrafeLeft();
 				}
@@ -764,11 +764,11 @@ void CCSBot::Wiggle( void )
 		case RIGHT:
 		{
 			// don't move right if we will fall
-			Vector pos = GetAbsOrigin() + (lookAheadRange * right);
+			Vector pos = GetEngineObject()->GetAbsOrigin() + (lookAheadRange * right);
 
 			if (GetSimpleGroundHeightWithFloor( pos, &ground ))
 			{
-				if (GetAbsOrigin().z - ground < StepHeight)
+				if (GetEngineObject()->GetAbsOrigin().z - ground < StepHeight)
 				{
 					StrafeRight();
 				}
@@ -779,11 +779,11 @@ void CCSBot::Wiggle( void )
 		case FORWARD:
 		{
 			// don't move forward if we will fall
-			Vector pos = GetAbsOrigin() + (lookAheadRange * forward);
+			Vector pos = GetEngineObject()->GetAbsOrigin() + (lookAheadRange * forward);
 
 			if (GetSimpleGroundHeightWithFloor( pos, &ground ))
 			{
-				if (GetAbsOrigin().z - ground < StepHeight)
+				if (GetEngineObject()->GetAbsOrigin().z - ground < StepHeight)
 				{
 					MoveForward();
 				}
@@ -794,11 +794,11 @@ void CCSBot::Wiggle( void )
 		case BACKWARD:
 		{
 			// don't move backward if we will fall
-			Vector pos = GetAbsOrigin() - (lookAheadRange * forward);
+			Vector pos = GetEngineObject()->GetAbsOrigin() - (lookAheadRange * forward);
 
 			if (GetSimpleGroundHeightWithFloor( pos, &ground ))
 			{
-				if (GetAbsOrigin().z - ground < StepHeight)
+				if (GetEngineObject()->GetAbsOrigin().z - ground < StepHeight)
 				{
 					MoveBackward();
 				}

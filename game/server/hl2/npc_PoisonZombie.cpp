@@ -712,12 +712,12 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 
 		pCrab->Spawn();
 
-		pCrab->SetLocalAngles( GetLocalAngles() );
+		pCrab->GetEngineObject()->SetLocalAngles(GetEngineObject()->GetLocalAngles() );
 		pCrab->SetActivity( ACT_RANGE_ATTACK1 );
 		pCrab->SetNextThink( gpGlobals->curtime );
 		pCrab->PhysicsSimulate();
 
-		pCrab->GetMotor()->SetIdealYaw( GetAbsAngles().y );
+		pCrab->GetMotor()->SetIdealYaw(GetEngineObject()->GetAbsAngles().y );
 
 		if ( IsOnFire() )
 		{
@@ -744,7 +744,7 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 	{
 		Vector forward;
 		QAngle qaPunch( 45, random->RandomInt(-5, 5), random->RandomInt(-5, 5) );
-		AngleVectors( GetLocalAngles(), &forward );
+		AngleVectors(GetEngineObject()->GetLocalAngles(), &forward );
 		forward = forward * 200;
 		ClawAttack( GetClawAttackRange(), sk_zombie_poison_dmg_spit.GetFloat(), qaPunch, forward, ZOMBIE_BLOOD_BITE );
 		return;
@@ -855,7 +855,7 @@ void CNPC_PoisonZombie::PrescheduleThink( void )
 	bool bNearEnemy = false;
 	if ( GetEnemy() != NULL )
 	{
-		float flDist = (GetEnemy()->GetAbsOrigin() - GetAbsOrigin()).Length();
+		float flDist = (GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length();
 		if ( flDist < ZOMBIE_ENEMY_BREATHE_DIST )
 		{
 			bNearEnemy = true;
