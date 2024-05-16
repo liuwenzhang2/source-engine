@@ -570,8 +570,8 @@ void CBaseEntity::UpdateOnRemove(void)
 	// Need to remove references to this entity before EHANDLES go null
 	{
 		g_bDisableEhandleAccess = false;
-		CBaseEntity::PhysicsRemoveTouchedList(this);
-		CBaseEntity::PhysicsRemoveGroundList(this);
+		PhysicsRemoveTouchedList();
+		PhysicsRemoveGroundList(this);
 		SetGroundEntity(NULL); // remove us from the ground entity if we are on it
 		GetEngineObject()->DestroyAllDataObjects();
 		g_bDisableEhandleAccess = true;
@@ -623,7 +623,7 @@ const IEngineObjectServer* CBaseEntity::GetEngineObject() const {
 }
 
 void CBaseEntity::Release() {
-	CBaseEntity::PhysicsRemoveTouchedList(this);
+	PhysicsRemoveTouchedList();
 	CBaseEntity::PhysicsRemoveGroundList(this);
 	UTIL_RemoveImmediate(this);
 }

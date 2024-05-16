@@ -3175,7 +3175,7 @@ void CServerGameClients::ClientDisconnect( int pEdict )
 		}
 
 		// Make sure all Untouch()'s are called for this client leaving
-		CBaseEntity::PhysicsRemoveTouchedList( player );
+		player->PhysicsRemoveTouchedList();
 		CBaseEntity::PhysicsRemoveGroundList( player );
 
 //#if !defined( NO_ENTITY_PREDICTION )

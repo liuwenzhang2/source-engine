@@ -2113,8 +2113,8 @@ void CCollisionEvent::DispatchStartTouch( CBaseEntity *pEntity0, CBaseEntity *pE
 void CCollisionEvent::DispatchEndTouch( CBaseEntity *pEntity0, CBaseEntity *pEntity1 )
 {
 	// frees the event-driven touchlinks
-	CBaseEntity::PhysicsNotifyOtherOfUntouch( pEntity0, pEntity1 );
-	CBaseEntity::PhysicsNotifyOtherOfUntouch( pEntity1, pEntity0 );
+	pEntity1->PhysicsNotifyOtherOfUntouch( pEntity0 );
+	pEntity0->PhysicsNotifyOtherOfUntouch( pEntity1 );
 }
 
 void CCollisionEvent::UpdateTouchEvents( void )

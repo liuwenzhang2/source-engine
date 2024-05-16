@@ -841,9 +841,10 @@ public:
 	void					PhysicsStartTouch(C_BaseEntity* pentOther);
 
 	// Physics helper
-	static void				PhysicsRemoveTouchedList( C_BaseEntity *ent );
-	static void				PhysicsNotifyOtherOfUntouch( C_BaseEntity *ent, C_BaseEntity *other );
-	static void				PhysicsRemoveToucher( C_BaseEntity *other, touchlink_t *link );
+	void					PhysicsCheckForEntityUntouch(void);
+	void					PhysicsNotifyOtherOfUntouch(C_BaseEntity* ent);
+	void					PhysicsRemoveTouchedList();
+	void					PhysicsRemoveToucher(touchlink_t *link );
 
 	groundlink_t			*AddEntityToGroundList( CBaseEntity *other );
 	void					PhysicsStartGroundContact( CBaseEntity *pentOther );
@@ -882,8 +883,6 @@ public:
 	void					ResolveFlyCollisionBounce( trace_t &trace, Vector &vecVelocity, float flMinTotalElasticity = 0.0f );
 	void					ResolveFlyCollisionSlide( trace_t &trace, Vector &vecVelocity );
 	void					ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity );
-
-	void					PhysicsCheckForEntityUntouch( void );
 
 	// Creates the shadow (if it doesn't already exist) based on shadow cast type
 	void					CreateShadow();

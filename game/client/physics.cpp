@@ -650,8 +650,8 @@ void CCollisionEvent::EndTouch( IPhysicsObject *pObject1, IPhysicsObject *pObjec
 void CCollisionEvent::DispatchEndTouch( C_BaseEntity *pEntity0, C_BaseEntity *pEntity1 )
 {
 	// frees the event-driven touchlinks
-	C_BaseEntity::PhysicsNotifyOtherOfUntouch( pEntity0, pEntity1 );
-	C_BaseEntity::PhysicsNotifyOtherOfUntouch( pEntity1, pEntity0 );
+	pEntity1->PhysicsNotifyOtherOfUntouch( pEntity0 );
+	pEntity0->PhysicsNotifyOtherOfUntouch( pEntity1 );
 }
 
 void CCollisionEvent::Friction( IPhysicsObject *pObject, float energy, int surfaceProps, int surfacePropsHit, IPhysicsCollisionData *pData )

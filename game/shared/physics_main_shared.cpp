@@ -436,7 +436,7 @@ void CBaseEntity::PhysicsCheckForEntityUntouch( void )
 
 	touchlink_t* link, *nextLink;
 
-	touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
+	touchlink_t *root = ( touchlink_t * )this->GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
 	{
 #ifdef PORTAL
@@ -460,14 +460,14 @@ void CBaseEntity::PhysicsCheckForEntityUntouch( void )
 			else
 			{    
 				// check to see if the touch stamp is up to date
-				if ( link->touchStamp != GetEngineObject()->GetTouchStamp() )
+				if ( link->touchStamp != this->GetEngineObject()->GetTouchStamp() )
 				{
 					// stamp is out of data, so entities are no longer touching
 					// remove self from other entities touch list
-					PhysicsNotifyOtherOfUntouch( this, link->entityTouched );
+					link->entityTouched->PhysicsNotifyOtherOfUntouch( this );
 
 					// remove other entity from this list
-					PhysicsRemoveToucher( this, link );
+					this->PhysicsRemoveToucher( link );
 				}
 			}
 
@@ -493,14 +493,11 @@ void CBaseEntity::PhysicsCheckForEntityUntouch( void )
 // Purpose: notifies an entity than another touching entity has moved out of contact.
 // Input  : *other - the entity to be acted upon
 //-----------------------------------------------------------------------------
-void CBaseEntity::PhysicsNotifyOtherOfUntouch( CBaseEntity *ent, CBaseEntity *other )
+void CBaseEntity::PhysicsNotifyOtherOfUntouch( CBaseEntity *ent )
 {
-	if ( !other )
-		return;
-
 	// loop through ed's touch list, looking for the notifier
 	// remove and call untouch if found
-	touchlink_t *root = ( touchlink_t * )other->GetEngineObject()->GetDataObject( TOUCHLINK );
+	touchlink_t *root = ( touchlink_t * )this->GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
 	{
 		touchlink_t *link = root->nextLink;
@@ -508,14 +505,14 @@ void CBaseEntity::PhysicsNotifyOtherOfUntouch( CBaseEntity *ent, CBaseEntity *ot
 		{
 			if ( link->entityTouched == ent )
 			{
-				PhysicsRemoveToucher( other, link );
+				this->PhysicsRemoveToucher( link );
 
 				// Check for complete removal
 				if ( g_bCleanupDatObject &&
 					 root->nextLink == root && 
 					 root->prevLink == root )
 				{
-					other->GetEngineObject()->DestroyDataObject( TOUCHLINK );
+					this->GetEngineObject()->DestroyDataObject( TOUCHLINK );
 				}
 				return;
 			}
@@ -529,28 +526,27 @@ void CBaseEntity::PhysicsNotifyOtherOfUntouch( CBaseEntity *ent, CBaseEntity *ot
 // Purpose: removes a toucher from the list
 // Input  : *link - the link to remove
 //-----------------------------------------------------------------------------
-void CBaseEntity::PhysicsRemoveToucher( CBaseEntity *otherEntity, touchlink_t *link )
+void CBaseEntity::PhysicsRemoveToucher( touchlink_t *link )
 {
 	// Every start Touch gets a corresponding end touch
 	if ( (link->flags & FTOUCHLINK_START_TOUCH) && 
-		link->entityTouched != NULL &&
-		otherEntity != NULL )
+		link->entityTouched != NULL)
 	{
-		otherEntity->EndTouch( link->entityTouched );
+		this->EndTouch( link->entityTouched );
 	}
 
 	link->nextLink->prevLink = link->prevLink;
 	link->prevLink->nextLink = link->nextLink;
 
 	if ( DebugTouchlinks() )
-		Msg( "remove 0x%p: %s-%s (%d-%d) [%d in play, %d max]\n", link, link->entityTouched->GetDebugName(), otherEntity->GetDebugName(), link->entityTouched->entindex(), otherEntity->entindex(), linksallocated, g_EdictTouchLinks.PeakCount() );
+		Msg( "remove 0x%p: %s-%s (%d-%d) [%d in play, %d max]\n", link, link->entityTouched->GetDebugName(), this->GetDebugName(), link->entityTouched->entindex(), this->entindex(), linksallocated, g_EdictTouchLinks.PeakCount() );
 	FreeTouchLink( link );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Clears all touches from the list
 //-----------------------------------------------------------------------------
-void CBaseEntity::PhysicsRemoveTouchedList( CBaseEntity *ent )
+void CBaseEntity::PhysicsRemoveTouchedList()
 {
 #ifdef PORTAL
 	CPortalTouchScope scope;
@@ -558,7 +554,7 @@ void CBaseEntity::PhysicsRemoveTouchedList( CBaseEntity *ent )
 
 	touchlink_t* link, *nextLink;
 
-	touchlink_t *root = ( touchlink_t * )ent->GetEngineObject()->GetDataObject( TOUCHLINK );
+	touchlink_t *root = ( touchlink_t * )this->GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
 	{
 		link = root->nextLink;
@@ -569,20 +565,20 @@ void CBaseEntity::PhysicsRemoveTouchedList( CBaseEntity *ent )
 			nextLink = link->nextLink;
 
 			// notify the other entity that this ent has gone away
-			PhysicsNotifyOtherOfUntouch( ent, link->entityTouched );
+			link->entityTouched->PhysicsNotifyOtherOfUntouch( this );
 
 			// kill it
 			if ( DebugTouchlinks() )
-				Msg( "remove 0x%p: %s-%s (%d-%d) [%d in play, %d max]\n", link, ent->GetDebugName(), link->entityTouched->GetDebugName(), ent->entindex(), link->entityTouched->entindex(), linksallocated, g_EdictTouchLinks.PeakCount() );
+				Msg( "remove 0x%p: %s-%s (%d-%d) [%d in play, %d max]\n", link, this->GetDebugName(), link->entityTouched->GetDebugName(), this->entindex(), link->entityTouched->entindex(), linksallocated, g_EdictTouchLinks.PeakCount() );
 			FreeTouchLink( link );
 			link = nextLink;
 		}
 
 		g_bCleanupDatObject = saveCleanup;
-		ent->GetEngineObject()->DestroyDataObject( TOUCHLINK );
+		this->GetEngineObject()->DestroyDataObject( TOUCHLINK );
 	}
 
-	ent->GetEngineObject()->ClearTouchStamp();
+	this->GetEngineObject()->ClearTouchStamp();
 }
 
 //-----------------------------------------------------------------------------

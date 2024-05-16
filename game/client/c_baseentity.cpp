@@ -858,7 +858,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 
 void C_BaseEntity::Term()
 {
-	C_BaseEntity::PhysicsRemoveTouchedList( this );
+	PhysicsRemoveTouchedList();
 	C_BaseEntity::PhysicsRemoveGroundList( this );
 	GetEngineObject()->DestroyAllDataObjects();
 

@@ -1075,9 +1075,9 @@ public:
 
 	// Physics helper
 	void					PhysicsCheckForEntityUntouch(void);
-	static void				PhysicsRemoveTouchedList( CBaseEntity *ent );
-	static void				PhysicsNotifyOtherOfUntouch( CBaseEntity *ent, CBaseEntity *other );
-	static void				PhysicsRemoveToucher( CBaseEntity *other, touchlink_t *link );
+	void					PhysicsNotifyOtherOfUntouch(CBaseEntity* ent);
+	void					PhysicsRemoveTouchedList();
+	void					PhysicsRemoveToucher(touchlink_t *link );
 
 	groundlink_t			*AddEntityToGroundList( CBaseEntity *other );
 	void					PhysicsStartGroundContact( CBaseEntity *pentOther );
