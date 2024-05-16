@@ -106,21 +106,21 @@ void CPhysicsCloneArea::UpdatePosition( void )
 	Assert( m_pAttachedPortal );
 
 	//untouch everything we're touching
-	touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
+	servertouchlink_t *root = ( servertouchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
 	if( root )
 	{
 		//don't want to risk list corruption while untouching
 		CUtlVector<CBaseEntity *> TouchingEnts;
-		for( touchlink_t *link = root->nextLink; link != root; link = link->nextLink )
-			TouchingEnts.AddToTail( link->entityTouched );
+		for( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
+			TouchingEnts.AddToTail( (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched) );
 
 
 		for( int i = TouchingEnts.Count(); --i >= 0; )
 		{
 			CBaseEntity *pTouch = TouchingEnts[i];
 
-			pTouch->PhysicsNotifyOtherOfUntouch( pTouch, this );
-			PhysicsNotifyOtherOfUntouch( this, pTouch );
+			pTouch->GetEngineObject()->PhysicsNotifyOtherOfUntouch( this->GetEngineObject());
+			GetEngineObject()->PhysicsNotifyOtherOfUntouch( pTouch->GetEngineObject());
 		}
 	}
 
@@ -205,7 +205,7 @@ void CPhysicsCloneArea::CloneNearbyEntities( void )
 					ptEntityCenter, pEntCollision->GetCollisionAngles(), pEntCollision->OBBMins(), pEntCollision->OBBMaxs() ) )
 				{
 					tr.endpos = (ptOrigin + ptEntityCenter) * 0.5;
-					PhysicsMarkEntitiesAsTouching( pEntity, tr );
+					GetEngineObject()->PhysicsMarkEntitiesAsTouching( pEntity->GetEngineObject(), tr );
 					//StartTouch( pEntity );
 					
 					//pEntity->WakeRestingObjects();
@@ -220,11 +220,11 @@ void CPhysicsCloneArea::CloneTouchingEntities( void )
 {
 	if( m_pAttachedPortal && m_pAttachedPortal->m_bActivated )
 	{
-		touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
+		servertouchlink_t *root = (servertouchlink_t* )GetEngineObject()->GetDataObject( TOUCHLINK );
 		if( root )
 		{
-			for( touchlink_t *link = root->nextLink; link != root; link = link->nextLink )
-				m_pAttachedSimulator->StartCloningEntity( link->entityTouched );
+			for( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
+				m_pAttachedSimulator->StartCloningEntity( (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched) );
 		}
 	}
 }

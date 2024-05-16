@@ -1351,7 +1351,7 @@ void CPrediction::Untouch( void )
 		if ( !entity->GetEngineObject()->GetCheckUntouch() )
 			continue;
 
-		entity->PhysicsCheckForEntityUntouch();
+		entity->GetEngineObject()->PhysicsCheckForEntityUntouch();
 	}
 #endif
 }

@@ -2107,14 +2107,14 @@ void CCollisionEvent::DispatchStartTouch( CBaseEntity *pEntity0, CBaseEntity *pE
 	trace.plane.normal = normal;
 
 	// NOTE: This sets up the touch list for both entities, no call to pEntity1 is needed
-	pEntity0->PhysicsMarkEntitiesAsTouchingEventDriven( pEntity1, trace );
+	pEntity0->GetEngineObject()->PhysicsMarkEntitiesAsTouchingEventDriven( pEntity1->GetEngineObject(), trace );
 }
 
 void CCollisionEvent::DispatchEndTouch( CBaseEntity *pEntity0, CBaseEntity *pEntity1 )
 {
 	// frees the event-driven touchlinks
-	pEntity1->PhysicsNotifyOtherOfUntouch( pEntity0 );
-	pEntity0->PhysicsNotifyOtherOfUntouch( pEntity1 );
+	pEntity1->GetEngineObject()->PhysicsNotifyOtherOfUntouch( pEntity0->GetEngineObject());
+	pEntity0->GetEngineObject()->PhysicsNotifyOtherOfUntouch( pEntity1->GetEngineObject());
 }
 
 void CCollisionEvent::UpdateTouchEvents( void )

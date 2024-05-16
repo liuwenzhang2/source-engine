@@ -445,5 +445,16 @@ typedef CThreadNullMutex CSourceMutex;
 
 #define cchMapNameMost 32
 
+//-----------------------------------------------------------------------------
+// Purpose: for resolving touch/untouch pairs
+//-----------------------------------------------------------------------------
+enum touchlink_flags_t
+{
+	FTOUCHLINK_START_TOUCH = 0x00000001,
+};
+
+// means this touchlink is managed external to the main physics system
+#define TOUCHSTAMP_EVENT_DRIVEN		-1
+
 #endif
 

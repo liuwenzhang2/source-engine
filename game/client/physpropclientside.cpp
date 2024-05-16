@@ -166,7 +166,7 @@ void C_PhysPropClientside::HitSurface( C_BaseEntity *pOther )
 	if ( HasInteraction( PROPINTER_WORLD_BLOODSPLAT ) )
 	{
 		trace_t	tr;
-		tr = BaseClass::GetTouchTrace();
+		tr = GetEngineObject()->GetTouchTrace();
 		if ( tr.m_pEnt )
 		{
 			UTIL_BloodDecalTrace( &tr, BLOOD_COLOR_RED );

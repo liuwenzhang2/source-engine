@@ -5824,7 +5824,7 @@ void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 
 	VPhysicsDestroyObject();
 
-	PhysicsRemoveTouchedList();
+	GetEngineObject()->PhysicsRemoveTouchedList();
 	CBaseEntity::PhysicsRemoveGroundList( this );
 	GetEngineObject()->DestroyAllDataObjects();
 

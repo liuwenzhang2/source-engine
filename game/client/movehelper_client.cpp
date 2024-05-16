@@ -164,7 +164,7 @@ void CMoveHelperClient::ProcessImpacts( void )
 		// Use the velocity we had when we collided, so boxes will move, etc.
 		pPlayer->GetEngineObject()->SetAbsVelocity( m_TouchList[i].deltavelocity );
 
-		entity->PhysicsImpact( pPlayer, m_TouchList[i].trace );
+		entity->GetEngineObject()->PhysicsImpact( pPlayer->GetEngineObject(), m_TouchList[i].trace );
 	}
 
 	// Restore the velocity

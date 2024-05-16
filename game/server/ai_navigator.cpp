@@ -1397,7 +1397,7 @@ bool CAI_Navigator::TeleportAlongPath()
 				GetOuter()->Teleport( &vTestPoint, NULL, NULL );
 				// clear ground entity, let normal fall code reestablish what the npc is now standing on
 				GetOuter()->SetGroundEntity( NULL );
-				GetOuter()->PhysicsTouchTriggers( &vTestPoint );
+				GetOuter()->GetEngineObject()->PhysicsTouchTriggers( &vTestPoint );
 				return true;
 			}
 		}

@@ -905,7 +905,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	g_pClosecaption = cvar->FindVar("closecaption");
 	Assert(g_pClosecaption);
 
-	gEntList.AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<CBaseEntity, touchlink_t >);
+	gEntList.AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<CBaseEntity, servertouchlink_t >);
 	gEntList.AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<CBaseEntity, groundlink_t >);
 	gEntList.AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<CBaseEntity, StepSimulationData >);
 	gEntList.AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<CBaseEntity, ModelScale >);
@@ -1026,7 +1026,7 @@ bool CServerGameDLL::GameInit( void )
 	engine->ResetGlobalState();
 	engine->ServerCommand( "exec game.cfg\n" );
 	engine->ServerExecute( );
-	CBaseEntity::sm_bAccurateTriggerBboxChecks = true;
+	CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks = true;
 
 	IGameEvent *event = gameeventmanager->CreateEvent( "game_init" );
 	if ( event )
@@ -2819,7 +2819,7 @@ void CServerGameEnts::MarkEntitiesAsTouching( IServerEntity *e1, IServerEntity *
 		trace_t tr;
 		UTIL_ClearTrace( tr );
 		tr.endpos = (entity->GetEngineObject()->GetAbsOrigin() + entityTouched->GetEngineObject()->GetAbsOrigin()) * 0.5;
-		entity->PhysicsMarkEntitiesAsTouching( entityTouched, tr );
+		entity->GetEngineObject()->PhysicsMarkEntitiesAsTouching(entityTouched->GetEngineObject(), tr);
 	}
 }
 
@@ -3175,7 +3175,7 @@ void CServerGameClients::ClientDisconnect( int pEdict )
 		}
 
 		// Make sure all Untouch()'s are called for this client leaving
-		player->PhysicsRemoveTouchedList();
+		player->GetEngineObject()->PhysicsRemoveTouchedList();
 		CBaseEntity::PhysicsRemoveGroundList( player );
 
 //#if !defined( NO_ENTITY_PREDICTION )

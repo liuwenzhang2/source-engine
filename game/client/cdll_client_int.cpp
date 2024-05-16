@@ -1234,7 +1234,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	HookHapticMessages(); // Always hook the messages
 #endif
 
-	ClientEntityList().AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<C_BaseEntity, touchlink_t >);
+	ClientEntityList().AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<C_BaseEntity, clienttouchlink_t >);
 	ClientEntityList().AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<C_BaseEntity, groundlink_t >);
 	ClientEntityList().AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<C_BaseEntity, StepSimulationData >);
 	ClientEntityList().AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<C_BaseEntity, ModelScale >);

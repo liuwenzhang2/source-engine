@@ -515,7 +515,7 @@ void CCollisionProperty::CheckForUntouch()
 	if ( !IsSolid() && !IsSolidFlagSet(FSOLID_TRIGGER))
 	{
 		// If this ent's touch list isn't empty, it's transitioning to not solid
-		if ( m_pOuter->IsCurrentlyTouching() )
+		if ( m_pOuter->GetEngineObject()->IsCurrentlyTouching() )
 		{
 			// mark ent so that at the end of frame it will check to 
 			// see if it's no longer touching ents

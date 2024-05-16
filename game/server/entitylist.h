@@ -354,6 +354,25 @@ public:
 
 	// Invalidates the abs state of all children
 	void InvalidatePhysicsRecursive(int nChangeFlags);
+
+	// HACKHACK:Get the trace_t from the last physics touch call (replaces the even-hackier global trace vars)
+	const trace_t& GetTouchTrace(void);
+	// FIXME: Should be private, but I can't make em private just yet
+	void PhysicsImpact(IEngineObjectServer* other, trace_t& trace);
+	void PhysicsTouchTriggers(const Vector* pPrevAbsOrigin = NULL);
+	void PhysicsMarkEntitiesAsTouching(IEngineObjectServer* other, trace_t& trace);
+	void PhysicsMarkEntitiesAsTouchingEventDriven(IEngineObjectServer* other, trace_t& trace);
+	servertouchlink_t* PhysicsMarkEntityAsTouched(IEngineObjectServer* other);
+	void PhysicsTouch(IEngineObjectServer* pentOther);
+	void PhysicsStartTouch(IEngineObjectServer* pentOther);
+	bool IsCurrentlyTouching(void) const;
+
+	// Physics helper
+	void PhysicsCheckForEntityUntouch(void);
+	void PhysicsNotifyOtherOfUntouch(IEngineObjectServer* ent);
+	void PhysicsRemoveTouchedList();
+	void PhysicsRemoveToucher(servertouchlink_t* link);
+
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -567,6 +586,7 @@ private:
 template<class T>
 class CGlobalEntityList : public CBaseEntityList<T>, public IServerEntityList, public IEntityCallBack
 {
+	friend class CEngineObjectInternal;
 	typedef CBaseEntityList<T> BaseClass;
 public:
 	virtual const char* GetBlockName();
@@ -715,6 +735,11 @@ protected:
 
 	// Figures out save flags for the entity
 	int ComputeEntitySaveFlags(T* pEntity);
+
+public:
+	static bool				sm_bAccurateTriggerBboxChecks;	// SOLID_BBOX entities do a fully accurate trigger vs bbox check when this is set
+protected:
+	static bool				sm_bDisableTouchFuncs;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 private:
 	int m_iHighestEnt; // the topmost used array index
 	int m_iNumEnts;
@@ -2776,11 +2801,13 @@ void CGlobalEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 		}
 	}
 #endif
-	int i = handle.GetEntryIndex();
-	delete m_EngineObjectArray[i];
-	m_EngineObjectArray[i] = NULL;
+	int entnum = handle.GetEntryIndex();
+	m_EngineObjectArray[entnum]->PhysicsRemoveTouchedList();
+	m_EngineObjectArray[entnum]->DestroyAllDataObjects();
+	delete m_EngineObjectArray[entnum];
+	m_EngineObjectArray[entnum] = NULL;
 
-	CBaseEntity* pBaseEnt = (pEnt)->GetBaseEntity();
+	CBaseEntity* pBaseEnt = pEnt->GetBaseEntity();
 	if (pBaseEnt->IsNetworkable()) {
 		if (pBaseEnt->entindex() != -1)
 			m_iNumEdicts--;

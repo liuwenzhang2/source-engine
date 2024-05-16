@@ -1769,7 +1769,7 @@ void CNPC_Manhack::CheckCollisions(float flInterval)
 
 	if ( (tr.fraction != 1.0 || tr.startsolid) && tr.m_pEnt)
 	{
-		PhysicsMarkEntitiesAsTouching((CBaseEntity*)tr.m_pEnt, tr );
+		GetEngineObject()->PhysicsMarkEntitiesAsTouching(((CBaseEntity*)tr.m_pEnt)->GetEngineObject(), tr );
 		pHitEntity = (CBaseEntity*)tr.m_pEnt;
 
 		if( m_bHeld && ((CBaseEntity*)tr.m_pEnt)->MyNPCPointer() && ((CBaseEntity*)tr.m_pEnt)->MyNPCPointer()->IsPlayerAlly() )

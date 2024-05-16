@@ -19,6 +19,8 @@
 #include "datacache/imdlcache.h"
 #include "positionwatcher.h"
 #include "mapentities_shared.h"
+#include "tier1/mempool.h"
+#include "tier1/callqueue.h"
 
 #ifdef HL2_DLL
 #include "npc_playercompanion.h"
@@ -41,6 +43,95 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGlobalEntityList, IServerEntityList, VSERVERE
 // Store local pointer to interface for rest of client .dll only 
 //  (CClientEntityList instead of IClientEntityList )
 CGlobalEntityList<CBaseEntity>* sv_entitylist = &gEntList;
+
+//static servertouchlink_t *g_pNextLink = NULL;
+int linksallocated = 0;
+static CUtlMemoryPool g_EdictTouchLinks(sizeof(servertouchlink_t), MAX_EDICTS, CUtlMemoryPool::GROW_NONE, "g_EdictTouchLinks");
+#ifndef CLIENT_DLL
+ConVar debug_touchlinks("debug_touchlinks", "0", 0, "Spew touch link activity");
+#define DebugTouchlinks() debug_touchlinks.GetBool()
+#else
+#define DebugTouchlinks() false
+#endif
+bool CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
+bool CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks = true;	// set to false for legacy behavior in ep1
+
+//-----------------------------------------------------------------------------
+// Portal-specific hack designed to eliminate re-entrancy in touch functions
+//-----------------------------------------------------------------------------
+class CPortalTouchScope
+{
+public:
+	CPortalTouchScope();
+	~CPortalTouchScope();
+
+public:
+	static int m_nDepth;
+	static CCallQueue m_CallQueue;
+};
+
+int CPortalTouchScope::m_nDepth = 0;
+CCallQueue CPortalTouchScope::m_CallQueue;
+
+CCallQueue* GetPortalCallQueue()
+{
+	return (CPortalTouchScope::m_nDepth > 0) ? &CPortalTouchScope::m_CallQueue : NULL;
+}
+
+CPortalTouchScope::CPortalTouchScope()
+{
+	++m_nDepth;
+}
+
+CPortalTouchScope::~CPortalTouchScope()
+{
+	Assert(m_nDepth >= 1);
+	if (--m_nDepth == 0)
+	{
+		m_CallQueue.CallQueued();
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : inline servertouchlink_t
+//-----------------------------------------------------------------------------
+inline servertouchlink_t* AllocTouchLink(void)
+{
+	servertouchlink_t* link = (servertouchlink_t*)g_EdictTouchLinks.Alloc(sizeof(servertouchlink_t));
+	if (link)
+	{
+		++linksallocated;
+	}
+	else
+	{
+		DevWarning("AllocTouchLink: failed to allocate servertouchlink_t.\n");
+	}
+
+	return link;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *link - 
+// Output : inline void
+//-----------------------------------------------------------------------------
+inline void FreeTouchLink(servertouchlink_t* link)
+{
+	if (link)
+	{
+		//if ( link == g_pNextLink )
+		//{
+		//	g_pNextLink = link->nextLink;
+		//}
+		--linksallocated;
+		link->prevLink = link->nextLink = NULL;
+	}
+
+	// Necessary to catch crashes
+	g_EdictTouchLinks.Free(link);
+}
+
 
 BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_vecOrigin, FIELD_VECTOR),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
@@ -1786,6 +1877,410 @@ void CEngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
 	//#endif
 }
 
+static trace_t g_TouchTrace;
+static bool g_bCleanupDatObject = true;
+
+const trace_t& CEngineObjectInternal::GetTouchTrace(void)
+{
+	return g_TouchTrace;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Two entities have touched, so run their touch functions
+// Input  : *other - 
+//			*ptrace - 
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsImpact(IEngineObjectServer* other, trace_t& trace)
+{
+	if (!other)
+	{
+		return;
+	}
+
+	// If either of the entities is flagged to be deleted, 
+	//  don't call the touch functions
+	if ((m_pOuter->GetFlags() | other->GetOuter()->GetFlags()) & FL_KILLME)
+	{
+		return;
+	}
+
+	PhysicsMarkEntitiesAsTouching(other, trace);
+}
+
+void CEngineObjectInternal::PhysicsTouchTriggers(const Vector* pPrevAbsOrigin)
+{
+	if (m_pOuter->IsNetworkable() && entindex() != -1 && !m_pOuter->IsWorld())
+	{
+		Assert(CollisionProp());
+		bool isTriggerCheckSolids = m_pOuter->IsSolidFlagSet(FSOLID_TRIGGER);
+		bool isSolidCheckTriggers = m_pOuter->IsSolid() && !isTriggerCheckSolids;		// NOTE: Moving triggers (items, ammo etc) are not 
+		// checked against other triggers to reduce the number of touchlinks created
+		if (!(isSolidCheckTriggers || isTriggerCheckSolids))
+			return;
+
+		if (m_pOuter->GetSolid() == SOLID_BSP)
+		{
+			if (!m_pOuter->GetModel() && Q_strlen(STRING(m_pOuter->GetModelName())) == 0)
+			{
+				Warning("Inserted %s with no model\n", GetClassname());
+				return;
+			}
+		}
+
+		SetCheckUntouch(true);
+		if (isSolidCheckTriggers)
+		{
+			engine->SolidMoved(this->m_pOuter, m_pOuter->CollisionProp(), pPrevAbsOrigin, CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks);
+		}
+		if (isTriggerCheckSolids)
+		{
+			engine->TriggerMoved(this->m_pOuter, CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks);
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Marks the fact that two edicts are in contact
+// Input  : *other - other entity
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsMarkEntitiesAsTouching(IEngineObjectServer* other, trace_t& trace)
+{
+	g_TouchTrace = trace;
+	PhysicsMarkEntityAsTouched(other);
+	other->PhysicsMarkEntityAsTouched(this);
+}
+
+
+void CEngineObjectInternal::PhysicsMarkEntitiesAsTouchingEventDriven(IEngineObjectServer* other, trace_t& trace)
+{
+	g_TouchTrace = trace;
+	g_TouchTrace.m_pEnt = other->GetOuter();
+
+	servertouchlink_t* link;
+	link = this->PhysicsMarkEntityAsTouched(other);
+	if (link)
+	{
+		// mark these links as event driven so they aren't untouched the next frame
+		// when the physics doesn't refresh them
+		link->touchStamp = TOUCHSTAMP_EVENT_DRIVEN;
+	}
+	g_TouchTrace.m_pEnt = this->GetOuter();
+	link = other->PhysicsMarkEntityAsTouched(this);
+	if (link)
+	{
+		link->touchStamp = TOUCHSTAMP_EVENT_DRIVEN;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Marks in an entity that it is touching another entity, and calls
+//			it's Touch() function if it is a new touch.
+//			Stamps the touch link with the new time so that when we check for
+//			untouch we know things haven't changed.
+// Input  : *other - entity that it is in contact with
+//-----------------------------------------------------------------------------
+servertouchlink_t* CEngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObjectServer* other)
+{
+	servertouchlink_t* link;
+
+	if (this == other)
+		return NULL;
+
+	// Entities in hierarchy should not interact
+	if ((this->GetMoveParent() == other) || (this == other->GetMoveParent()))
+		return NULL;
+
+	// check if either entity doesn't generate touch functions
+	if ((m_pOuter->GetFlags() | other->GetOuter()->GetFlags()) & FL_DONTTOUCH)
+		return NULL;
+
+	// Pure triggers should not touch each other
+	if (m_pOuter->IsSolidFlagSet(FSOLID_TRIGGER) && other->GetOuter()->IsSolidFlagSet(FSOLID_TRIGGER))
+	{
+		if (!m_pOuter->IsSolid() && !other->GetOuter()->IsSolid())
+			return NULL;
+	}
+
+	// Don't do touching if marked for deletion
+	if (other->GetOuter()->IsMarkedForDeletion())
+	{
+		return NULL;
+	}
+
+	if (m_pOuter->IsMarkedForDeletion())
+	{
+		return NULL;
+	}
+
+#ifdef PORTAL
+	CPortalTouchScope scope;
+#endif
+
+	// check if the edict is already in the list
+	servertouchlink_t* root = (servertouchlink_t*)GetDataObject(TOUCHLINK);
+	if (root)
+	{
+		for (link = root->nextLink; link != root; link = link->nextLink)
+		{
+			if (link->entityTouched == other->GetOuter())
+			{
+				// update stamp
+				link->touchStamp = GetTouchStamp();
+
+				if (!CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs)
+				{
+					PhysicsTouch(other);
+				}
+
+				// no more to do
+				return link;
+			}
+		}
+	}
+	else
+	{
+		// Allocate the root object
+		root = (servertouchlink_t*)CreateDataObject(TOUCHLINK);
+		root->nextLink = root->prevLink = root;
+	}
+
+	// entity is not in list, so it's a new touch
+	// add it to the touched list and then call the touch function
+
+	// build new link
+	link = AllocTouchLink();
+	if (DebugTouchlinks())
+		Msg("add 0x%p: %s-%s (%d-%d) [%d in play, %d max]\n", link, m_pOuter->GetDebugName(), other->GetOuter()->GetDebugName(), entindex(), other->GetOuter()->entindex(), linksallocated, g_EdictTouchLinks.PeakCount());
+	if (!link)
+		return NULL;
+
+	link->touchStamp = GetTouchStamp();
+	link->entityTouched = other->GetOuter();
+	link->flags = 0;
+	// add it to the list
+	link->nextLink = root->nextLink;
+	link->prevLink = root;
+	link->prevLink->nextLink = link;
+	link->nextLink->prevLink = link;
+
+	// non-solid entities don't get touched
+	bool bShouldTouch = (m_pOuter->IsSolid() && !m_pOuter->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS)) || m_pOuter->IsSolidFlagSet(FSOLID_TRIGGER);
+	if (bShouldTouch && !other->GetOuter()->IsSolidFlagSet(FSOLID_TRIGGER))
+	{
+		link->flags |= FTOUCHLINK_START_TOUCH;
+		if (!CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs)
+		{
+			PhysicsStartTouch(other);
+		}
+	}
+
+	return link;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Called every frame that two entities are touching
+// Input  : *pentOther - the entity who it has touched
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsTouch(IEngineObjectServer* pentOther)
+{
+	if (pentOther)
+	{
+		if (!(m_pOuter->IsMarkedForDeletion() || pentOther->GetOuter()->IsMarkedForDeletion()))
+		{
+			m_pOuter->Touch(pentOther->GetOuter());
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Called whenever two entities come in contact
+// Input  : *pentOther - the entity who it has touched
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsStartTouch(IEngineObjectServer* pentOther)
+{
+	if (pentOther)
+	{
+		if (!(m_pOuter->IsMarkedForDeletion() || pentOther->GetOuter()->IsMarkedForDeletion()))
+		{
+			m_pOuter->StartTouch(pentOther->GetOuter());
+			m_pOuter->Touch(pentOther->GetOuter());
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::IsCurrentlyTouching(void) const
+{
+	if (HasDataObjectType(TOUCHLINK))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Checks to see if any entities that have been touching this one
+//			have stopped touching it, and notify the entity if so.
+//			Called at the end of a frame, after all the entities have run
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsCheckForEntityUntouch(void)
+{
+	//Assert( g_pNextLink == NULL );
+
+	servertouchlink_t* link, * nextLink;
+
+	servertouchlink_t* root = (servertouchlink_t*)this->GetDataObject(TOUCHLINK);
+	if (root)
+	{
+#ifdef PORTAL
+		CPortalTouchScope scope;
+#endif
+		bool saveCleanup = g_bCleanupDatObject;
+		g_bCleanupDatObject = false;
+
+		link = root->nextLink;
+		while (link && link != root)
+		{
+			nextLink = link->nextLink;
+
+			// these touchlinks are not polled.  The ents are touching due to an outside
+			// system that will add/delete them as necessary (vphysics in this case)
+			if (link->touchStamp == TOUCHSTAMP_EVENT_DRIVEN)
+			{
+				// refresh the touch call
+				PhysicsTouch(((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->GetEngineObject());
+			}
+			else
+			{
+				// check to see if the touch stamp is up to date
+				if (link->touchStamp != this->GetTouchStamp())
+				{
+					// stamp is out of data, so entities are no longer touching
+					// remove self from other entities touch list
+					((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->GetEngineObject()->PhysicsNotifyOtherOfUntouch(this);
+
+					// remove other entity from this list
+					this->PhysicsRemoveToucher(link);
+				}
+			}
+
+			link = nextLink;
+		}
+
+		g_bCleanupDatObject = saveCleanup;
+
+		// Nothing left in list, destroy root
+		if (root->nextLink == root &&
+			root->prevLink == root)
+		{
+			DestroyDataObject(TOUCHLINK);
+		}
+	}
+
+	//g_pNextLink = NULL;
+
+	SetCheckUntouch(false);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: notifies an entity than another touching entity has moved out of contact.
+// Input  : *other - the entity to be acted upon
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsNotifyOtherOfUntouch(IEngineObjectServer* ent)
+{
+	// loop through ed's touch list, looking for the notifier
+	// remove and call untouch if found
+	servertouchlink_t* root = (servertouchlink_t*)this->GetDataObject(TOUCHLINK);
+	if (root)
+	{
+		servertouchlink_t* link = root->nextLink;
+		while (link && link != root)
+		{
+			if (link->entityTouched == ent->GetOuter())
+			{
+				this->PhysicsRemoveToucher(link);
+
+				// Check for complete removal
+				if (g_bCleanupDatObject &&
+					root->nextLink == root &&
+					root->prevLink == root)
+				{
+					this->DestroyDataObject(TOUCHLINK);
+				}
+				return;
+			}
+
+			link = link->nextLink;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Clears all touches from the list
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsRemoveTouchedList()
+{
+#ifdef PORTAL
+	CPortalTouchScope scope;
+#endif
+
+	servertouchlink_t* link, * nextLink;
+
+	servertouchlink_t* root = (servertouchlink_t*)this->GetDataObject(TOUCHLINK);
+	if (root)
+	{
+		link = root->nextLink;
+		bool saveCleanup = g_bCleanupDatObject;
+		g_bCleanupDatObject = false;
+		while (link && link != root)
+		{
+			nextLink = link->nextLink;
+
+			// notify the other entity that this ent has gone away
+			((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->GetEngineObject()->PhysicsNotifyOtherOfUntouch(this);
+
+			// kill it
+			if (DebugTouchlinks())
+				Msg("remove 0x%p: %s-%s (%d-%d) [%d in play, %d max]\n", link, this->m_pOuter->GetDebugName(), ((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->GetDebugName(), this->entindex(), ((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->entindex(), linksallocated, g_EdictTouchLinks.PeakCount());
+			FreeTouchLink(link);
+			link = nextLink;
+		}
+
+		g_bCleanupDatObject = saveCleanup;
+		this->DestroyDataObject(TOUCHLINK);
+	}
+
+	this->ClearTouchStamp();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: removes a toucher from the list
+// Input  : *link - the link to remove
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsRemoveToucher(servertouchlink_t* link)
+{
+	// Every start Touch gets a corresponding end touch
+	if ((link->flags & FTOUCHLINK_START_TOUCH) &&
+		link->entityTouched != INVALID_EHANDLE_INDEX)
+	{
+		CBaseEntity* pEntity = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched);
+		this->m_pOuter->EndTouch(pEntity);
+	}
+
+	link->nextLink->prevLink = link->prevLink;
+	link->prevLink->nextLink = link->nextLink;
+
+	if (DebugTouchlinks())
+		Msg("remove 0x%p: %s-%s (%d-%d) [%d in play, %d max]\n", link, ((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->GetDebugName(), this->m_pOuter->GetDebugName(), ((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->entindex(), this->entindex(), linksallocated, g_EdictTouchLinks.PeakCount());
+	FreeTouchLink(link);
+}
+
+
 struct collidelist_t
 {
 	const CPhysCollide* pCollide;
@@ -2318,7 +2813,7 @@ void CEntityTouchManager::FrameUpdatePostEntityThink()
 			//Assert( ents[i]->GetCheckUntouch() );
 			if (ents[i]->GetEngineObject()->GetCheckUntouch())
 			{
-				ents[i]->PhysicsCheckForEntityUntouch();
+				ents[i]->GetEngineObject()->PhysicsCheckForEntityUntouch();
 			}
 		}
 		stackfree(ents);
@@ -2554,13 +3049,13 @@ CON_COMMAND(report_touchlinks, "Lists all touchlinks")
 	{
 		if (!pClassname || FClassnameIs(pEntity, pClassname))
 		{
-			touchlink_t* root = (touchlink_t*)pEntity->GetEngineObject()->GetDataObject(TOUCHLINK);
+			servertouchlink_t* root = (servertouchlink_t*)pEntity->GetEngineObject()->GetDataObject(TOUCHLINK);
 			if (root)
 			{
-				touchlink_t* link = root->nextLink;
+				servertouchlink_t* link = root->nextLink;
 				while (link && link != root)
 				{
-					list.AddEntityToList(link->entityTouched);
+					list.AddEntityToList((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched));
 					link = link->nextLink;
 				}
 			}

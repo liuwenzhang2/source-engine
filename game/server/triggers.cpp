@@ -205,7 +205,7 @@ void CBaseTrigger::Enable( void )
 	if (!IsSolidFlagSet( FSOLID_TRIGGER ))
 	{
 		AddSolidFlags( FSOLID_TRIGGER ); 
-		PhysicsTouchTriggers();
+		GetEngineObject()->PhysicsTouchTriggers();
 	}
 }
 
@@ -234,7 +234,7 @@ void CBaseTrigger::PostClientActive( void )
 
 	if ( !m_bDisabled )
 	{
-		PhysicsTouchTriggers();
+		GetEngineObject()->PhysicsTouchTriggers();
 	}
 }
 
@@ -253,7 +253,7 @@ void CBaseTrigger::Disable( void )
 	if (IsSolidFlagSet(FSOLID_TRIGGER))
 	{
 		RemoveSolidFlags( FSOLID_TRIGGER ); 
-		PhysicsTouchTriggers();
+		GetEngineObject()->PhysicsTouchTriggers();
 	}
 }
 //------------------------------------------------------------------------------
@@ -574,7 +574,7 @@ void CBaseTrigger::InputToggle( inputdata_t &inputdata )
 		AddSolidFlags(FSOLID_TRIGGER);
 	}
 
-	PhysicsTouchTriggers();
+	GetEngineObject()->PhysicsTouchTriggers();
 }
 
 
@@ -809,12 +809,12 @@ int CTriggerHurt::HurtAllTouchers( float dt )
 
 	m_hurtEntities.RemoveAll();
 
-	touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
+	servertouchlink_t *root = (servertouchlink_t* )GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
 	{
-		for ( touchlink_t *link = root->nextLink; link != root; link = link->nextLink )
+		for ( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
 		{
-			CBaseEntity *pTouch = link->entityTouched;
+			CBaseEntity *pTouch = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched);
 			if ( pTouch )
 			{
 				if ( HurtEntity( pTouch, fldmg ) )
@@ -3102,13 +3102,13 @@ void CTriggerProximity::MeasureThink( void )
 	float fMinDistance = m_fRadius + 100;
 	CBaseEntity *pNearestEntity = NULL;
 
-	touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
+	servertouchlink_t *root = (servertouchlink_t* )GetEngineObject()->GetDataObject( TOUCHLINK );
 	if ( root )
 	{
-		touchlink_t *pLink = root->nextLink;
+		servertouchlink_t *pLink = root->nextLink;
 		while (pLink && pLink != root)
 		{
-			CBaseEntity *pEntity = pLink->entityTouched;
+			CBaseEntity *pEntity = (CBaseEntity*)gEntList.GetServerEntityFromHandle(pLink->entityTouched);
 
 			// If this is an entity that we care about, check its distance.
 			if ( ( pEntity != NULL ) && PassesTriggerFilters( pEntity ) )

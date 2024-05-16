@@ -67,7 +67,6 @@ bool C_BaseEntity::s_bAbsQueriesValid = true;
 bool C_BaseEntity::s_bAbsRecomputationEnabled = true;
 bool C_BaseEntity::s_bInterpolate = true;
 
-bool C_BaseEntity::sm_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 
 static ConVar  r_drawrenderboxes( "r_drawrenderboxes", "0", FCVAR_CHEAT );  
 
@@ -858,9 +857,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 
 void C_BaseEntity::Term()
 {
-	PhysicsRemoveTouchedList();
 	C_BaseEntity::PhysicsRemoveGroundList( this );
-	GetEngineObject()->DestroyAllDataObjects();
 
 #if !defined( NO_ENTITY_PREDICTION )
 	// Remove from the predictables list

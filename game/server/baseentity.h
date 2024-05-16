@@ -390,10 +390,6 @@ protected:
 	static bool				m_bDebugPause;		// Whether entity i/o is paused for debugging.
 	static int				m_nDebugSteps;		// Number of entity outputs to fire before pausing again.
 
-	static bool				sm_bDisableTouchFuncs;	// Disables PhysicsTouch and PhysicsStartTouch function calls
-public:
-	static bool				sm_bAccurateTriggerBboxChecks;	// SOLID_BBOX entities do a fully accurate trigger vs bbox check when this is set
-
 public:
 	// If bServerOnly is true, then the ent never goes to the client. This is used
 	// by logical entities.
@@ -1060,24 +1056,6 @@ public:
 	virtual void			PhysicsSimulate( void );
 
 public:
-	// HACKHACK:Get the trace_t from the last physics touch call (replaces the even-hackier global trace vars)
-	static const trace_t &	GetTouchTrace( void );
-
-	// FIXME: Should be private, but I can't make em private just yet
-	void					PhysicsImpact( CBaseEntity *other, trace_t &trace );
-	void					PhysicsTouchTriggers(const Vector* pPrevAbsOrigin = NULL);
-	void					PhysicsMarkEntitiesAsTouching( CBaseEntity *other, trace_t &trace );
-	void					PhysicsMarkEntitiesAsTouchingEventDriven( CBaseEntity *other, trace_t &trace );
-	touchlink_t*			PhysicsMarkEntityAsTouched(CBaseEntity* other);
-	void					PhysicsTouch(CBaseEntity* pentOther);
-	void					PhysicsStartTouch(CBaseEntity* pentOther);
-	bool					IsCurrentlyTouching(void) const;
-
-	// Physics helper
-	void					PhysicsCheckForEntityUntouch(void);
-	void					PhysicsNotifyOtherOfUntouch(CBaseEntity* ent);
-	void					PhysicsRemoveTouchedList();
-	void					PhysicsRemoveToucher(touchlink_t *link );
 
 	groundlink_t			*AddEntityToGroundList( CBaseEntity *other );
 	void					PhysicsStartGroundContact( CBaseEntity *pentOther );

@@ -12409,7 +12409,7 @@ int CAI_BaseNPC::FlyMove( const Vector& pfPosition, unsigned int mask )
 			return false;	// swim monster left water
 
 		GetEngineObject()->SetAbsOrigin( trace.endpos );
-		PhysicsTouchTriggers();
+		GetEngineObject()->PhysicsTouchTriggers();
 		return true;
 	}
 
@@ -12467,7 +12467,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 		if ( GetFlags() & FL_PARTIALGROUND )
 		{
 			GetEngineObject()->SetAbsOrigin( oldorg + move );
-			PhysicsTouchTriggers();
+			GetEngineObject()->PhysicsTouchTriggers();
 			SetGroundEntity( NULL );
 			return true;
 		}
@@ -12484,7 +12484,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 		{	
 			// entity had floor mostly pulled out from underneath it
 			// and is trying to correct
-			PhysicsTouchTriggers();
+			GetEngineObject()->PhysicsTouchTriggers();
 			return true;
 		}
 
@@ -12501,7 +12501,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 
 	// the move is ok
 	SetGroundEntity((CBaseEntity*)trace.m_pEnt );
-	PhysicsTouchTriggers();
+	GetEngineObject()->PhysicsTouchTriggers();
 	return true;
 }
 

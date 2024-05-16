@@ -813,10 +813,6 @@ public:
 	virtual bool			CanBePoweredUp( void ) { return false; }
 	virtual bool			AttemptToPowerup( int iPowerup, float flTime, float flAmount = 0, C_BaseEntity *pAttacker = NULL, CDamageModifier *pDamageModifier = NULL ) { return false; }
 
-
-
-	virtual bool			IsCurrentlyTouching( void ) const;
-
 	virtual void			StartTouch( C_BaseEntity *pOther );
 	virtual void			Touch( C_BaseEntity *pOther ); 
 	virtual void			EndTouch( C_BaseEntity *pOther );
@@ -825,26 +821,7 @@ public:
 
 	void					PhysicsStep( void );
 
-protected:
-	static bool				sm_bDisableTouchFuncs;	// Disables PhysicsTouch and PhysicsStartTouch function calls
-
 public:
-	// HACKHACK:Get the trace_t from the last physics touch call (replaces the even-hackier global trace vars)
-	static const trace_t	&GetTouchTrace( void );
-
-	// FIXME: Should be private, but I can't make em private just yet
-	void					PhysicsImpact( C_BaseEntity *other, trace_t &trace );
- 	void					PhysicsMarkEntitiesAsTouching( C_BaseEntity *other, trace_t &trace );
-	void					PhysicsMarkEntitiesAsTouchingEventDriven( C_BaseEntity *other, trace_t &trace );
-	touchlink_t*			PhysicsMarkEntityAsTouched(C_BaseEntity* other);
-	void					PhysicsTouch(C_BaseEntity* pentOther);
-	void					PhysicsStartTouch(C_BaseEntity* pentOther);
-
-	// Physics helper
-	void					PhysicsCheckForEntityUntouch(void);
-	void					PhysicsNotifyOtherOfUntouch(C_BaseEntity* ent);
-	void					PhysicsRemoveTouchedList();
-	void					PhysicsRemoveToucher(touchlink_t *link );
 
 	groundlink_t			*AddEntityToGroundList( CBaseEntity *other );
 	void					PhysicsStartGroundContact( CBaseEntity *pentOther );

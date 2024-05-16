@@ -28,6 +28,15 @@ struct PVSInfo_t;
 class CCheckTransmitInfo;
 struct matrix3x4_t;
 
+struct servertouchlink_t
+{
+	CBaseHandle			entityTouched = NULL;
+	int					touchStamp = 0;
+	servertouchlink_t* nextLink = NULL;
+	servertouchlink_t* prevLink = NULL;
+	int					flags = 0;
+};
+
 class IEngineObjectServer : public IEngineObject {
 public:
 
@@ -152,6 +161,23 @@ public:
 	virtual void DestroyDataObject(int type) = 0;
 	virtual void DestroyAllDataObjects(void) = 0;
 	virtual void InvalidatePhysicsRecursive(int nChangeFlags) = 0;
+	// HACKHACK:Get the trace_t from the last physics touch call (replaces the even-hackier global trace vars)
+	virtual const trace_t& GetTouchTrace(void) = 0;
+	// FIXME: Should be private, but I can't make em private just yet
+	virtual void PhysicsImpact(IEngineObjectServer* other, trace_t& trace) = 0;
+	virtual void PhysicsTouchTriggers(const Vector* pPrevAbsOrigin = NULL) = 0;
+	virtual void PhysicsMarkEntitiesAsTouching(IEngineObjectServer* other, trace_t& trace) = 0;
+	virtual void PhysicsMarkEntitiesAsTouchingEventDriven(IEngineObjectServer* other, trace_t& trace) = 0;
+	virtual servertouchlink_t* PhysicsMarkEntityAsTouched(IEngineObjectServer* other) = 0;
+	virtual void PhysicsTouch(IEngineObjectServer* pentOther) = 0;
+	virtual void PhysicsStartTouch(IEngineObjectServer* pentOther) = 0;
+	virtual bool IsCurrentlyTouching(void) const = 0;
+
+	// Physics helper
+	virtual void PhysicsCheckForEntityUntouch(void) = 0;
+	virtual void PhysicsNotifyOtherOfUntouch(IEngineObjectServer* ent) = 0;
+	virtual void PhysicsRemoveTouchedList() = 0;
+	virtual void PhysicsRemoveToucher(servertouchlink_t* link) = 0;
 
 };
 

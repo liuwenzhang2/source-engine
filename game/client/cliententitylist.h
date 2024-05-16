@@ -374,6 +374,23 @@ public:
 	// Invalidates the abs state of all children
 	void InvalidatePhysicsRecursive(int nChangeFlags);
 
+	// HACKHACK:Get the trace_t from the last physics touch call (replaces the even-hackier global trace vars)
+	const trace_t& GetTouchTrace(void);
+	// FIXME: Should be private, but I can't make em private just yet
+	void PhysicsImpact(IEngineObjectClient* other, trace_t& trace);
+	void PhysicsMarkEntitiesAsTouching(IEngineObjectClient* other, trace_t& trace);
+	void PhysicsMarkEntitiesAsTouchingEventDriven(IEngineObjectClient* other, trace_t& trace);
+	clienttouchlink_t* PhysicsMarkEntityAsTouched(IEngineObjectClient* other);
+	void PhysicsTouch(IEngineObjectClient* pentOther);
+	void PhysicsStartTouch(IEngineObjectClient* pentOther);
+	bool IsCurrentlyTouching(void) const;
+
+	// Physics helper
+	void PhysicsCheckForEntityUntouch(void);
+	void PhysicsNotifyOtherOfUntouch(IEngineObjectClient* ent);
+	void PhysicsRemoveTouchedList();
+	void PhysicsRemoveToucher(clienttouchlink_t* link);
+
 private:
 
 	friend class C_BaseEntity;
@@ -611,9 +628,10 @@ private:
 template<class T>// = IHandleEntity
 class CClientEntityList : public CBaseEntityList<T>, public IClientEntityList, public IEntityCallBack
 {
-friend class C_BaseEntityIterator;
-//friend class C_AllBaseEntityIterator;
-typedef CBaseEntityList<T> BaseClass;
+	friend class C_BaseEntityIterator;
+	friend class C_EngineObjectInternal;
+	//friend class C_AllBaseEntityIterator;
+	typedef CBaseEntityList<T> BaseClass;
 public:
 	// Constructor, destructor
 								CClientEntityList( void );
@@ -716,8 +734,10 @@ private:
 	void AddPVSNotifier(IClientUnknown* pUnknown);
 	void RemovePVSNotifier(IClientUnknown* pUnknown);
 	void AddRestoredEntity(T* pEntity);
-private:
 
+public:
+	static bool				sm_bDisableTouchFuncs;	// Disables PhysicsTouch and PhysicsStartTouch function calls
+private:
 	// Cached info for networked entities.
 //struct EntityCacheInfo_t
 //{
@@ -1513,6 +1533,8 @@ void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 {
 	int entnum = handle.GetEntryIndex();
 
+	m_EngineObjectArray[entnum]->PhysicsRemoveTouchedList();
+	m_EngineObjectArray[entnum]->DestroyAllDataObjects();
 	delete m_EngineObjectArray[entnum];
 	m_EngineObjectArray[entnum] = NULL;
 

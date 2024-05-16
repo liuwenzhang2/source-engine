@@ -1271,7 +1271,7 @@ void CBaseEntity::VPhysicsUpdate( IPhysicsObject *pPhysics )
 			}
 
 #ifndef CLIENT_DLL 
-			PhysicsTouchTriggers( &prevOrigin );
+			GetEngineObject()->PhysicsTouchTriggers( &prevOrigin );
 			PhysicsRelinkChildren(gpGlobals->frametime);
 #endif
 		}

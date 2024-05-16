@@ -358,7 +358,7 @@ void CPhysicsPushedEntities::FinishPushers()
 		// Cause touch functions to be called
 		// FIXME: Need to make moved entities not touch triggers until we know we're ok
 		// FIXME: it'd be better for the engine to just have a touch method
-		info.m_pEntity->PhysicsTouchTriggers( &info.m_vecStartAbsOrigin );
+		info.m_pEntity->GetEngineObject()->PhysicsTouchTriggers( &info.m_vecStartAbsOrigin );
 
 		info.m_pEntity->UpdatePhysicsShadowToCurrentPosition( gpGlobals->frametime );
 	}
@@ -410,7 +410,7 @@ void CPhysicsPushedEntities::FinishPush( bool bIsRotPush, const RotatingPushMove
 
 		// Cause touch functions to be called
 		// FIXME: it'd be better for the engine to just have a touch method
-		info.m_pEntity->PhysicsTouchTriggers( &info.m_vecStartAbsOrigin );
+		info.m_pEntity->GetEngineObject()->PhysicsTouchTriggers( &info.m_vecStartAbsOrigin );
 		info.m_pEntity->UpdatePhysicsShadowToCurrentPosition( gpGlobals->frametime );
 		CAI_BaseNPC *pNPC = info.m_pEntity->MyNPCPointer();
 		if ( info.m_bPusherIsGround && pNPC )
@@ -422,7 +422,7 @@ void CPhysicsPushedEntities::FinishPush( bool bIsRotPush, const RotatingPushMove
 		// Register physics impacts...
 		if (info.m_Trace.m_pEnt)
 		{
-			pPushedEntity->PhysicsImpact((CBaseEntity*)info.m_Trace.m_pEnt, info.m_Trace );
+			pPushedEntity->GetEngineObject()->PhysicsImpact(((CBaseEntity*)info.m_Trace.m_pEnt)->GetEngineObject(), info.m_Trace );
 		}
 
 		if (bIsRotPush)
@@ -473,7 +473,7 @@ CBaseEntity *CPhysicsPushedEntities::RegisterBlockage()
 	PhysicsPushedInfo_t &info = m_rgMoved[m_nBlocker];
 	if ( info.m_Trace.m_pEnt )
 	{
-		info.m_pEntity->PhysicsImpact((CBaseEntity*)info.m_Trace.m_pEnt, info.m_Trace );
+		info.m_pEntity->GetEngineObject()->PhysicsImpact(((CBaseEntity*)info.m_Trace.m_pEnt)->GetEngineObject(), info.m_Trace );
 	}
 
 	// This is the dude 
@@ -1082,7 +1082,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 		}
 
 		// run the impact function
-		PhysicsImpact((CBaseEntity*)trace.m_pEnt, trace );
+		GetEngineObject()->PhysicsImpact(((CBaseEntity*)trace.m_pEnt)->GetEngineObject(), trace );
 		// Removed by the impact function
 		if ( IsMarkedForDeletion())// || engine->IsEdictFree(entindex()) 
 			break;		
@@ -1237,11 +1237,11 @@ void CBaseEntity::PhysicsPushEntity( const Vector& push, trace_t *pTrace )
 
 	// Passing in the previous abs origin here will cause the relinker
 	// to test the swept ray from previous to current location for trigger intersections
-	PhysicsTouchTriggers( &prevOrigin );
+	GetEngineObject()->PhysicsTouchTriggers( &prevOrigin );
 
 	if ( pTrace->m_pEnt )
 	{
-		PhysicsImpact((CBaseEntity*)pTrace->m_pEnt, *pTrace );
+		GetEngineObject()->PhysicsImpact(((CBaseEntity*)pTrace->m_pEnt)->GetEngineObject(), *pTrace );
 	}
 }
 
@@ -1755,7 +1755,7 @@ void CBaseEntity::PhysicsStep()
 		if ( updateFromVPhysics )
 		{
 			GetEngineObject()->SetAbsOrigin( position );
-			PhysicsTouchTriggers();
+			GetEngineObject()->PhysicsTouchTriggers();
 		}
 		//NDebugOverlay::Box( position, WorldAlignMins(), WorldAlignMaxs(), 255, 255, 0, 0, 0.0 );
 	}
@@ -1928,7 +1928,7 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 			PhysicsStepRecheckGround();
 		}
 
-		PhysicsTouchTriggers();
+		GetEngineObject()->PhysicsTouchTriggers();
 	}
 
 	if (!( GetFlags() & FL_ONGROUND ) && isfalling)

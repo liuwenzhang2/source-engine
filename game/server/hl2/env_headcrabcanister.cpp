@@ -1033,7 +1033,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterWorldThink( void )
 	GetEngineObject()->SetAbsOrigin( vecEndPosition );
 
 	// Touch triggers along the way
-	PhysicsTouchTriggers( &vecStartPosition );
+	GetEngineObject()->PhysicsTouchTriggers( &vecStartPosition );
 
 	SetNextThink( gpGlobals->curtime + 0.2f );
 	GetEngineObject()->SetAbsAngles( vecEndAngles );

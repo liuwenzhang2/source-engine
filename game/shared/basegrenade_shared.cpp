@@ -374,7 +374,7 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 		{
 #if !defined( CLIENT_DLL )
 			trace_t tr;
-			tr = CBaseEntity::GetTouchTrace( );
+			tr = GetEngineObject()->GetTouchTrace( );
 			ClearMultiDamage( );
 			Vector forward;
 			AngleVectors(GetEngineObject()->GetLocalAngles(), &forward, NULL, NULL );

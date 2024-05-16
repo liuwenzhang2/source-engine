@@ -762,12 +762,12 @@ void CProp_Portal::Activate( void )
 		m_PortalSimulator.MoveTo( ptCenter, qAngles );
 
 		//resimulate everything we're touching
-		touchlink_t *root = ( touchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
+		servertouchlink_t *root = ( servertouchlink_t * )GetEngineObject()->GetDataObject( TOUCHLINK );
 		if( root )
 		{
-			for( touchlink_t *link = root->nextLink; link != root; link = link->nextLink )
+			for( servertouchlink_t *link = root->nextLink; link != root; link = link->nextLink )
 			{
-				CBaseEntity *pOther = link->entityTouched;
+				CBaseEntity *pOther = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched);
 				if( CProp_Portal_Shared::IsEntityTeleportable( pOther ) )
 				{
 					CCollisionProperty *pOtherCollision = pOther->CollisionProp();
@@ -1159,8 +1159,8 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 	//untouch the portal(s), will force a touch on destination after the teleport
 	{
 		m_PortalSimulator.ReleaseOwnershipOfEntity( pOther, true );
-		this->PhysicsNotifyOtherOfUntouch( this, pOther );
-		pOther->PhysicsNotifyOtherOfUntouch( pOther, this );
+		this->GetEngineObject()->PhysicsNotifyOtherOfUntouch( pOther->GetEngineObject());
+		pOther->GetEngineObject()->PhysicsNotifyOtherOfUntouch( this->GetEngineObject());
 
 		m_hLinkedPortal->m_PortalSimulator.TakeOwnershipOfEntity( pOther );
 
@@ -1260,8 +1260,8 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		memset( &Trace, 0, sizeof(trace_t) );
 		//UTIL_TraceEntity( pOther, ptNewOrigin, ptNewOrigin, MASK_SOLID, pOther, COLLISION_GROUP_NONE, &Trace ); //fires off some asserts, and we just need a dummy anyways
 
-		pOther->PhysicsMarkEntitiesAsTouching( m_hLinkedPortal.Get(), Trace );
-		m_hLinkedPortal.Get()->PhysicsMarkEntitiesAsTouching( pOther, Trace );
+		pOther->GetEngineObject()->PhysicsMarkEntitiesAsTouching( m_hLinkedPortal.Get()->GetEngineObject(), Trace );
+		m_hLinkedPortal.Get()->GetEngineObject()->PhysicsMarkEntitiesAsTouching( pOther->GetEngineObject(), Trace );
 	}
 
 	// Notify the entity that it's being teleported

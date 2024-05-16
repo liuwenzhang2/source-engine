@@ -140,7 +140,7 @@ void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
 		return;
 
 	// We want to collide with water
-	const trace_t *pTrace = &CBaseEntity::GetTouchTrace();
+	const trace_t *pTrace = &GetEngineObject()->GetTouchTrace();
 
 	// copy out some important things about this trace, because the first TakeDamage
 	// call below may cause another trace that overwrites the one global pTrace points

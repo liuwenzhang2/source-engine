@@ -82,7 +82,7 @@ void CBaseSpriteProjectile::HandleTouch( CBaseEntity *pOther )
 	}
 
 	trace_t	tr;
-	tr = BaseClass::GetTouchTrace( );
+	tr = GetEngineObject()->GetTouchTrace( );
 
 	CTakeDamageInfo info( this, pOwner, m_iDmg, m_iDmgType );
 	GuessDamageForce( &info, (tr.endpos - tr.startpos), tr.endpos );

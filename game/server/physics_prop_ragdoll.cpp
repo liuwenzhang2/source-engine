@@ -1053,7 +1053,7 @@ void CRagdollProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	SetCollisionBounds( vecFullMins - vecOrigin, vecFullMaxs - vecOrigin );
 	CollisionProp()->MarkSurroundingBoundsDirty();
 
-	PhysicsTouchTriggers();
+	GetEngineObject()->PhysicsTouchTriggers();
 }
 
 int CRagdollProp::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
@@ -1083,7 +1083,7 @@ void CRagdollProp::UpdateNetworkDataFromVPhysics( IPhysicsObject *pPhysics, int 
 	if ( index == 0 )
 	{
 		GetEngineObject()->SetAbsOrigin( m_ragPos[0] );
-		PhysicsTouchTriggers();
+		GetEngineObject()->PhysicsTouchTriggers();
 	}
 }
 

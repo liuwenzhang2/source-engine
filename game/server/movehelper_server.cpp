@@ -214,7 +214,7 @@ void CMoveHelperServer::ProcessImpacts( void )
 
 	// Relink in order to build absorigin and absmin/max to reflect any changes
 	//  from prediction.  Relink will early out on SOLID_NOT
-	m_pHostPlayer->PhysicsTouchTriggers();
+	m_pHostPlayer->GetEngineObject()->PhysicsTouchTriggers();
 
 	// Don't bother if the player ain't solid
 	if ( m_pHostPlayer->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
@@ -247,7 +247,7 @@ void CMoveHelperServer::ProcessImpacts( void )
 		// Use the velocity we had when we collided, so boxes will move, etc.
 		m_pHostPlayer->GetEngineObject()->SetAbsVelocity( m_TouchList[i].deltavelocity );
 		
-		entity->PhysicsImpact( m_pHostPlayer, m_TouchList[i].trace );
+		entity->GetEngineObject()->PhysicsImpact( m_pHostPlayer->GetEngineObject(), m_TouchList[i].trace );
 	}
 
 	// Restore the velocity

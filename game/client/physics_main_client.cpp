@@ -100,7 +100,7 @@ void C_BaseEntity::PhysicsPushEntity( const Vector& push, trace_t *pTrace )
 
 	if ( pTrace->m_pEnt )
 	{
-		PhysicsImpact( (C_BaseEntity*)pTrace->m_pEnt, *pTrace );
+		GetEngineObject()->PhysicsImpact( ((C_BaseEntity*)pTrace->m_pEnt)->GetEngineObject(), *pTrace );
 	}
 }
 

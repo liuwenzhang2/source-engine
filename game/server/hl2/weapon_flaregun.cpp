@@ -429,7 +429,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 	{
 		// hit the world, check the material type here, see if the flare should stick.
 		trace_t tr;
-		tr = CBaseEntity::GetTouchTrace();
+		tr = GetEngineObject()->GetTouchTrace();
 
 		//Only do this on the first bounce
 		if ( m_nBounces == 0 )

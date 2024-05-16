@@ -83,8 +83,7 @@ int CBaseEntity::m_nDebugPlayer = -1;		// Player doing the selection
 
 bool CBaseEntity::m_bDebugPause = false;		// Whether entity i/o is paused.
 int CBaseEntity::m_nDebugSteps = 1;				// Number of entity outputs to fire before pausing again.
-bool CBaseEntity::sm_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
-bool CBaseEntity::sm_bAccurateTriggerBboxChecks = true;	// set to false for legacy behavior in ep1
+
 
 int CBaseEntity::m_nPredictionRandomSeed = -1;
 CBasePlayer *CBaseEntity::m_pPredictionPlayer = NULL;
@@ -570,10 +569,8 @@ void CBaseEntity::UpdateOnRemove(void)
 	// Need to remove references to this entity before EHANDLES go null
 	{
 		g_bDisableEhandleAccess = false;
-		PhysicsRemoveTouchedList();
 		PhysicsRemoveGroundList(this);
 		SetGroundEntity(NULL); // remove us from the ground entity if we are on it
-		GetEngineObject()->DestroyAllDataObjects();
 		g_bDisableEhandleAccess = true;
 
 		// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
@@ -623,8 +620,8 @@ const IEngineObjectServer* CBaseEntity::GetEngineObject() const {
 }
 
 void CBaseEntity::Release() {
-	PhysicsRemoveTouchedList();
-	CBaseEntity::PhysicsRemoveGroundList(this);
+	//GetEngineObject()->PhysicsRemoveTouchedList();
+	//CBaseEntity::PhysicsRemoveGroundList(this);
 	UTIL_RemoveImmediate(this);
 }
 
@@ -2411,7 +2408,7 @@ void CBaseEntity::PhysicsRelinkChildren( float dt )
 	{
 		if ( child->GetOuter()->IsSolid() || child->GetOuter()->IsSolidFlagSet(FSOLID_TRIGGER))
 		{
-			child->GetOuter()->PhysicsTouchTriggers();
+			child->PhysicsTouchTriggers();
 		}
 
 		//
@@ -2436,37 +2433,7 @@ void CBaseEntity::PhysicsRelinkChildren( float dt )
 	}
 }
 
-void CBaseEntity::PhysicsTouchTriggers( const Vector *pPrevAbsOrigin )
-{
-	if (IsNetworkable() && entindex()!=-1 && !IsWorld())
-	{
-		Assert(CollisionProp());
-		bool isTriggerCheckSolids = IsSolidFlagSet( FSOLID_TRIGGER );
-		bool isSolidCheckTriggers = IsSolid() && !isTriggerCheckSolids;		// NOTE: Moving triggers (items, ammo etc) are not 
-																			// checked against other triggers to reduce the number of touchlinks created
-		if ( !(isSolidCheckTriggers || isTriggerCheckSolids) )
-			return;
 
-		if ( GetSolid() == SOLID_BSP ) 
-		{
-			if ( !GetModel() && Q_strlen( STRING( GetModelName() ) ) == 0 ) 
-			{
-				Warning( "Inserted %s with no model\n", GetClassname() );
-				return;
-			}
-		}
-
-		GetEngineObject()->SetCheckUntouch( true );
-		if ( isSolidCheckTriggers )
-		{
-			engine->SolidMoved( this, CollisionProp(), pPrevAbsOrigin, sm_bAccurateTriggerBboxChecks );
-		}
-		if ( isTriggerCheckSolids )
-		{
-			engine->TriggerMoved( this, sm_bAccurateTriggerBboxChecks );
-		}
-	}
-}
 
 void CBaseEntity::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pEvent )
 {
@@ -3051,9 +3018,9 @@ void CBaseEntity::OnRestore()
 	// disable touch functions while we recreate the touch links between entities
 	// NOTE: We don't do this on transitions, because we'd miss the OnStartTouch call!
 #if !defined(HL2_DLL) || ( defined(HL2_DLL) && defined(HL2_EPISODIC) )
-	CBaseEntity::sm_bDisableTouchFuncs = ( gpGlobals->eLoadType != MapLoad_Transition );
-	PhysicsTouchTriggers();
-	CBaseEntity::sm_bDisableTouchFuncs = false;
+	CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs = ( gpGlobals->eLoadType != MapLoad_Transition );
+	GetEngineObject()->PhysicsTouchTriggers();
+	CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs = false;
 #endif // HL2_EPISODIC
 
 	//Adrian: If I'm restoring with these fields it means I've become a client side ragdoll.

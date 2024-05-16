@@ -27,8 +27,6 @@ struct string_t;
 
 class VarMapEntry_t
 {
-
-
 public:
 	unsigned short		type;
 	unsigned short		m_bNeedsToInterpolate;	// Set to false when this var doesn't
@@ -47,6 +45,15 @@ struct VarMapping_t
 	CUtlVector< VarMapEntry_t >	m_Entries;
 	int							m_nInterpolatedEntries;
 	float						m_lastInterpolationTime;
+};
+
+struct clienttouchlink_t
+{
+	C_BaseEntity* entityTouched = NULL;
+	int			touchStamp = 0;
+	clienttouchlink_t* nextLink = NULL;
+	clienttouchlink_t* prevLink = NULL;
+	int					flags = 0;
 };
 
 class IEngineObjectClient : public IEngineObject {
@@ -217,6 +224,22 @@ public:
 	virtual void DestroyDataObject(int type) = 0;
 	virtual void DestroyAllDataObjects(void) = 0;
 	virtual void InvalidatePhysicsRecursive(int nChangeFlags) = 0;
+	// HACKHACK:Get the trace_t from the last physics touch call (replaces the even-hackier global trace vars)
+	virtual const trace_t& GetTouchTrace(void) = 0;
+	// FIXME: Should be private, but I can't make em private just yet
+	virtual void PhysicsImpact(IEngineObjectClient* other, trace_t& trace) = 0;
+	virtual void PhysicsMarkEntitiesAsTouching(IEngineObjectClient* other, trace_t& trace) = 0;
+	virtual void PhysicsMarkEntitiesAsTouchingEventDriven(IEngineObjectClient* other, trace_t& trace) = 0;
+	virtual clienttouchlink_t* PhysicsMarkEntityAsTouched(IEngineObjectClient* other) = 0;
+	virtual void PhysicsTouch(IEngineObjectClient* pentOther) = 0;
+	virtual void PhysicsStartTouch(IEngineObjectClient* pentOther) = 0;
+	virtual bool IsCurrentlyTouching(void) const = 0;
+
+	// Physics helper
+	virtual void PhysicsCheckForEntityUntouch(void) = 0;
+	virtual void PhysicsNotifyOtherOfUntouch(IEngineObjectClient* ent) = 0;
+	virtual void PhysicsRemoveTouchedList() = 0;
+	virtual void PhysicsRemoveToucher(clienttouchlink_t* link) = 0;
 
 };
 

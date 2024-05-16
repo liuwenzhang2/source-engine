@@ -1203,7 +1203,7 @@ void UTIL_SetOrigin( CBaseEntity *entity, const Vector &vecOrigin, bool bFireTri
 	entity->GetEngineObject()->SetLocalOrigin( vecOrigin );
 	if ( bFireTriggers )
 	{
-		entity->PhysicsTouchTriggers();
+		entity->GetEngineObject()->PhysicsTouchTriggers();
 	}
 }
 
