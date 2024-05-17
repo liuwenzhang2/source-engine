@@ -1354,13 +1354,13 @@ static bool IsInGroundList( CBaseEntity *ent, CBaseEntity *ground )
 	if ( !ground || !ent )
 		return false;
 
-	groundlink_t *root = ( groundlink_t * )ground->GetEngineObject()->GetDataObject( GROUNDLINK );
+	servergroundlink_t *root = (servergroundlink_t* )ground->GetEngineObject()->GetDataObject( GROUNDLINK );
 	if ( root )
 	{
-		groundlink_t *link = root->nextLink;
+		servergroundlink_t *link = root->nextLink;
 		while ( link != root )
 		{
-			CBaseEntity *other = link->entity;
+			CBaseEntity *other = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entity);
 			if ( other == ent )
 				return true;
 			link = link->nextLink;
@@ -1381,13 +1381,13 @@ static int DescribeGroundList( CBaseEntity *ent )
 	Msg( "%i : %s (ground %i %s)\n", ent->entindex(), ent->GetClassname(), 
 		ent->GetGroundEntity() ? ent->GetGroundEntity()->entindex() : -1,
 		ent->GetGroundEntity() ? ent->GetGroundEntity()->GetClassname() : "NULL" );
-	groundlink_t *root = ( groundlink_t * )ent->GetEngineObject()->GetDataObject( GROUNDLINK );
+	servergroundlink_t*root = (servergroundlink_t* )ent->GetEngineObject()->GetDataObject( GROUNDLINK );
 	if ( root )
 	{
-		groundlink_t *link = root->nextLink;
+		servergroundlink_t *link = root->nextLink;
 		while ( link != root )
 		{
-			CBaseEntity *other = link->entity;
+			CBaseEntity *other = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entity);
 			if ( other )
 			{
 				Msg( "  %02i:  %i %s\n", c++, other->entindex(), other->GetClassname() );

@@ -46,14 +46,19 @@ CGlobalEntityList<CBaseEntity>* sv_entitylist = &gEntList;
 
 //static servertouchlink_t *g_pNextLink = NULL;
 int linksallocated = 0;
+int groundlinksallocated = 0;
+// memory pool for storing links between entities
 static CUtlMemoryPool g_EdictTouchLinks(sizeof(servertouchlink_t), MAX_EDICTS, CUtlMemoryPool::GROW_NONE, "g_EdictTouchLinks");
+static CUtlMemoryPool g_EntityGroundLinks(sizeof(servergroundlink_t), MAX_EDICTS, CUtlMemoryPool::GROW_NONE, "g_EntityGroundLinks");
 #ifndef CLIENT_DLL
 ConVar debug_touchlinks("debug_touchlinks", "0", 0, "Spew touch link activity");
 #define DebugTouchlinks() debug_touchlinks.GetBool()
 #else
 #define DebugTouchlinks() false
 #endif
+template<>
 bool CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
+template<>
 bool CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks = true;	// set to false for legacy behavior in ep1
 
 //-----------------------------------------------------------------------------
@@ -132,6 +137,57 @@ inline void FreeTouchLink(servertouchlink_t* link)
 	g_EdictTouchLinks.Free(link);
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : inline groundlink_t
+//-----------------------------------------------------------------------------
+inline servergroundlink_t* AllocGroundLink(void)
+{
+	servergroundlink_t* link = (servergroundlink_t*)g_EntityGroundLinks.Alloc(sizeof(servergroundlink_t));
+	if (link)
+	{
+		++groundlinksallocated;
+	}
+	else
+	{
+		DevMsg("AllocGroundLink: failed to allocate groundlink_t.!!!  groundlinksallocated=%d g_EntityGroundLinks.Count()=%d\n", groundlinksallocated, g_EntityGroundLinks.Count());
+	}
+
+#ifdef STAGING_ONLY
+#ifndef CLIENT_DLL
+	if (sv_groundlink_debug.GetBool())
+	{
+		UTIL_LogPrintf("Groundlink Alloc: %p at %d\n", link, groundlinksallocated);
+	}
+#endif
+#endif // STAGING_ONLY
+
+	return link;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *link - 
+// Output : inline void
+//-----------------------------------------------------------------------------
+inline void FreeGroundLink(servergroundlink_t* link)
+{
+#ifdef STAGING_ONLY
+#ifndef CLIENT_DLL
+	if (sv_groundlink_debug.GetBool())
+	{
+		UTIL_LogPrintf("Groundlink Free: %p at %d\n", link, groundlinksallocated);
+	}
+#endif
+#endif // STAGING_ONLY
+
+	if (link)
+	{
+		--groundlinksallocated;
+	}
+
+	g_EntityGroundLinks.Free(link);
+}
 
 BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_vecOrigin, FIELD_VECTOR),			// NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
@@ -2279,6 +2335,155 @@ void CEngineObjectInternal::PhysicsRemoveToucher(servertouchlink_t* link)
 		Msg("remove 0x%p: %s-%s (%d-%d) [%d in play, %d max]\n", link, ((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->GetDebugName(), this->m_pOuter->GetDebugName(), ((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched))->entindex(), this->entindex(), linksallocated, g_EdictTouchLinks.PeakCount());
 	FreeTouchLink(link);
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *other - 
+// Output : groundlink_t
+//-----------------------------------------------------------------------------
+servergroundlink_t* CEngineObjectInternal::AddEntityToGroundList(IEngineObjectServer* other)
+{
+	servergroundlink_t* link;
+
+	if (this == other)
+		return NULL;
+
+	// check if the edict is already in the list
+	servergroundlink_t* root = (servergroundlink_t*)GetDataObject(GROUNDLINK);
+	if (root)
+	{
+		for (link = root->nextLink; link != root; link = link->nextLink)
+		{
+			if (link->entity == other->GetOuter())
+			{
+				// no more to do
+				return link;
+			}
+		}
+	}
+	else
+	{
+		root = (servergroundlink_t*)CreateDataObject(GROUNDLINK);
+		root->prevLink = root->nextLink = root;
+	}
+
+	// entity is not in list, so it's a new touch
+	// add it to the touched list and then call the touch function
+
+	// build new link
+	link = AllocGroundLink();
+	if (!link)
+		return NULL;
+
+	link->entity = other->GetOuter();
+	// add it to the list
+	link->nextLink = root->nextLink;
+	link->prevLink = root;
+	link->prevLink->nextLink = link;
+	link->nextLink->prevLink = link;
+
+	PhysicsStartGroundContact(other);
+
+	return link;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Called whenever two entities come in contact
+// Input  : *pentOther - the entity who it has touched
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsStartGroundContact(IEngineObjectServer* pentOther)
+{
+	if (!pentOther)
+		return;
+
+	if (!(m_pOuter->IsMarkedForDeletion() || pentOther->GetOuter()->IsMarkedForDeletion()))
+	{
+		pentOther->GetOuter()->StartGroundContact(this->m_pOuter);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: notifies an entity than another touching entity has moved out of contact.
+// Input  : *other - the entity to be acted upon
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsNotifyOtherOfGroundRemoval(IEngineObjectServer* ent)
+{
+	// loop through ed's touch list, looking for the notifier
+	// remove and call untouch if found
+	servergroundlink_t* root = (servergroundlink_t*)this->GetDataObject(GROUNDLINK);
+	if (root)
+	{
+		servergroundlink_t* link = root->nextLink;
+		while (link != root)
+		{
+			if (link->entity == ent->GetOuter())
+			{
+				PhysicsRemoveGround(link);
+
+				if (root->nextLink == root &&
+					root->prevLink == root)
+				{
+					this->DestroyDataObject(GROUNDLINK);
+				}
+				return;
+			}
+
+			link = link->nextLink;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: removes a toucher from the list
+// Input  : *link - the link to remove
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsRemoveGround(servergroundlink_t* link)
+{
+	// Every start Touch gets a corresponding end touch
+	if (link->entity != INVALID_EHANDLE_INDEX)
+	{
+		CBaseEntity* linkEntity = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entity);
+		CBaseEntity* otherEntity = this->m_pOuter;
+		if (linkEntity && otherEntity)
+		{
+			linkEntity->EndGroundContact(otherEntity);
+		}
+	}
+
+	link->nextLink->prevLink = link->prevLink;
+	link->prevLink->nextLink = link->nextLink;
+	FreeGroundLink(link);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: static method to remove ground list for an entity
+// Input  : *ent - 
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::PhysicsRemoveGroundList()
+{
+	servergroundlink_t* link, * nextLink;
+
+	servergroundlink_t* root = (servergroundlink_t*)this->GetDataObject(GROUNDLINK);
+	if (root)
+	{
+		link = root->nextLink;
+		while (link && link != root)
+		{
+			nextLink = link->nextLink;
+
+			// notify the other entity that this ent has gone away
+			((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entity))->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval(this);
+
+			// kill it
+			FreeGroundLink(link);
+
+			link = nextLink;
+		}
+
+		this->DestroyDataObject(GROUNDLINK);
+	}
+}
+
 
 
 struct collidelist_t

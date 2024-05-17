@@ -906,7 +906,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	Assert(g_pClosecaption);
 
 	gEntList.AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<CBaseEntity, servertouchlink_t >);
-	gEntList.AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<CBaseEntity, groundlink_t >);
+	gEntList.AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<CBaseEntity, servergroundlink_t >);
 	gEntList.AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<CBaseEntity, StepSimulationData >);
 	gEntList.AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<CBaseEntity, ModelScale >);
 	gEntList.AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<CBaseEntity, CWatcherList >);
@@ -3176,7 +3176,7 @@ void CServerGameClients::ClientDisconnect( int pEdict )
 
 		// Make sure all Untouch()'s are called for this client leaving
 		player->GetEngineObject()->PhysicsRemoveTouchedList();
-		CBaseEntity::PhysicsRemoveGroundList( player );
+		player->GetEngineObject()->PhysicsRemoveGroundList();
 
 //#if !defined( NO_ENTITY_PREDICTION )
 //		// Make sure anything we "own" is simulated by the server from now on

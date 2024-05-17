@@ -56,6 +56,16 @@ struct clienttouchlink_t
 	int					flags = 0;
 };
 
+//-----------------------------------------------------------------------------
+// Purpose: Used for tracking many to one ground entity chains ( many ents can share a single ground entity )
+//-----------------------------------------------------------------------------
+struct clientgroundlink_t
+{
+	CBaseHandle			entity;
+	clientgroundlink_t* nextLink;
+	clientgroundlink_t* prevLink;
+};
+
 class IEngineObjectClient : public IEngineObject {
 public:
 
@@ -240,6 +250,12 @@ public:
 	virtual void PhysicsNotifyOtherOfUntouch(IEngineObjectClient* ent) = 0;
 	virtual void PhysicsRemoveTouchedList() = 0;
 	virtual void PhysicsRemoveToucher(clienttouchlink_t* link) = 0;
+
+	virtual clientgroundlink_t* AddEntityToGroundList(IEngineObjectClient* other) = 0;
+	virtual void PhysicsStartGroundContact(IEngineObjectClient* pentOther) = 0;
+	virtual void PhysicsNotifyOtherOfGroundRemoval(IEngineObjectClient* ent) = 0;
+	virtual void PhysicsRemoveGround(clientgroundlink_t* link) = 0;
+	virtual void PhysicsRemoveGroundList() = 0;
 
 };
 

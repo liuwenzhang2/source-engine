@@ -1235,7 +1235,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 #endif
 
 	ClientEntityList().AddDataAccessor(TOUCHLINK, new CEntityDataInstantiator<C_BaseEntity, clienttouchlink_t >);
-	ClientEntityList().AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<C_BaseEntity, groundlink_t >);
+	ClientEntityList().AddDataAccessor(GROUNDLINK, new CEntityDataInstantiator<C_BaseEntity, clientgroundlink_t >);
 	ClientEntityList().AddDataAccessor(STEPSIMULATION, new CEntityDataInstantiator<C_BaseEntity, StepSimulationData >);
 	ClientEntityList().AddDataAccessor(MODELSCALE, new CEntityDataInstantiator<C_BaseEntity, ModelScale >);
 	ClientEntityList().AddDataAccessor(POSITIONWATCHER, new CEntityDataInstantiator<C_BaseEntity, CWatcherList >);

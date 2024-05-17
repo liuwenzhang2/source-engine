@@ -26,8 +26,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-// memory pool for storing links between entities
-static CUtlMemoryPool g_EntityGroundLinks( sizeof( groundlink_t ), MAX_EDICTS, CUtlMemoryPool::GROW_NONE, "g_EntityGroundLinks");
 
 struct watcher_t
 {
@@ -36,9 +34,6 @@ struct watcher_t
 };
 
 static CUtlMultiList<watcher_t, unsigned short>	g_WatcherList;
-
-
-int groundlinksallocated = 0;
 
 // Prints warnings if any entity think functions take longer than this many milliseconds
 #ifdef _DEBUG
@@ -269,211 +264,6 @@ static inline float GetActualGravity( CBaseEntity *pEnt )
 ConVar sv_groundlink_debug( "sv_groundlink_debug", "0", FCVAR_NONE, "Enable logging of alloc/free operations for debugging." );
 #endif
 #endif // STAGING_ONLY
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Output : inline groundlink_t
-//-----------------------------------------------------------------------------
-inline groundlink_t *AllocGroundLink( void )
-{
-	groundlink_t *link = (groundlink_t*)g_EntityGroundLinks.Alloc( sizeof(groundlink_t) );
-	if ( link )
-	{
-		++groundlinksallocated;
-	}
-	else
-	{
-		DevMsg( "AllocGroundLink: failed to allocate groundlink_t.!!!  groundlinksallocated=%d g_EntityGroundLinks.Count()=%d\n", groundlinksallocated, g_EntityGroundLinks.Count() );
-	}
-
-#ifdef STAGING_ONLY
-#ifndef CLIENT_DLL
-	if ( sv_groundlink_debug.GetBool() )
-	{
-		UTIL_LogPrintf( "Groundlink Alloc: %p at %d\n", link, groundlinksallocated );
-	}
-#endif
-#endif // STAGING_ONLY
-
-	return link;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *link - 
-// Output : inline void
-//-----------------------------------------------------------------------------
-inline void FreeGroundLink( groundlink_t *link )
-{
-#ifdef STAGING_ONLY
-#ifndef CLIENT_DLL
-	if ( sv_groundlink_debug.GetBool() )
-	{
-		UTIL_LogPrintf( "Groundlink Free: %p at %d\n", link, groundlinksallocated );
-	}
-#endif
-#endif // STAGING_ONLY
-
-	if ( link )
-	{
-		--groundlinksallocated;
-	}
-
-	g_EntityGroundLinks.Free( link );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *other - 
-// Output : groundlink_t
-//-----------------------------------------------------------------------------
-groundlink_t *CBaseEntity::AddEntityToGroundList( CBaseEntity *other )
-{
-	groundlink_t *link;
-
-	if ( this == other )
-		return NULL;
-
-	// check if the edict is already in the list
-	groundlink_t *root = ( groundlink_t * )GetEngineObject()->GetDataObject( GROUNDLINK );
-	if ( root )
-	{
-		for ( link = root->nextLink; link != root; link = link->nextLink )
-		{
-			if ( link->entity == other )
-			{
-				// no more to do
-				return link;
-			}
-		}
-	}
-	else
-	{
-		root = ( groundlink_t * )GetEngineObject()->CreateDataObject( GROUNDLINK );
-		root->prevLink = root->nextLink = root;
-	}
-
-	// entity is not in list, so it's a new touch
-	// add it to the touched list and then call the touch function
-
-	// build new link
-	link = AllocGroundLink();
-	if ( !link )
-		return NULL;
-
-	link->entity = other;
-	// add it to the list
-	link->nextLink = root->nextLink;
-	link->prevLink = root;
-	link->prevLink->nextLink = link;
-	link->nextLink->prevLink = link;
-
-	PhysicsStartGroundContact( other );
-
-	return link;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Called whenever two entities come in contact
-// Input  : *pentOther - the entity who it has touched
-//-----------------------------------------------------------------------------
-void CBaseEntity::PhysicsStartGroundContact( CBaseEntity *pentOther )
-{
-	if ( !pentOther )
-		return;
-
-	if ( !(IsMarkedForDeletion() || pentOther->IsMarkedForDeletion()) )
-	{
-		pentOther->StartGroundContact( this );
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: notifies an entity than another touching entity has moved out of contact.
-// Input  : *other - the entity to be acted upon
-//-----------------------------------------------------------------------------
-void CBaseEntity::PhysicsNotifyOtherOfGroundRemoval( CBaseEntity *ent, CBaseEntity *other )
-{
-	if ( !other )
-		return;
-
-	// loop through ed's touch list, looking for the notifier
-	// remove and call untouch if found
-	groundlink_t *root = ( groundlink_t * )other->GetEngineObject()->GetDataObject( GROUNDLINK );
-	if ( root )
-	{
-		groundlink_t *link = root->nextLink;
-		while ( link != root )
-		{
-			if ( link->entity == ent )
-			{
-				PhysicsRemoveGround( other, link );
-
-				if ( root->nextLink == root && 
-					 root->prevLink == root )
-				{
-					other->GetEngineObject()->DestroyDataObject( GROUNDLINK );
-				}
-				return;
-			}
-
-			link = link->nextLink;
-		}
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: removes a toucher from the list
-// Input  : *link - the link to remove
-//-----------------------------------------------------------------------------
-void CBaseEntity::PhysicsRemoveGround( CBaseEntity *other, groundlink_t *link )
-{
-	// Every start Touch gets a corresponding end touch
-	if ( link->entity != NULL )
-	{
-		CBaseEntity *linkEntity = link->entity;
-		CBaseEntity *otherEntity = other;
-		if ( linkEntity && otherEntity )
-		{
-			linkEntity->EndGroundContact( otherEntity );
-		}
-	}
-
-	link->nextLink->prevLink = link->prevLink;
-	link->prevLink->nextLink = link->nextLink;
-	FreeGroundLink( link );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: static method to remove ground list for an entity
-// Input  : *ent - 
-//-----------------------------------------------------------------------------
-void CBaseEntity::PhysicsRemoveGroundList( CBaseEntity *ent )
-{
-	groundlink_t *link, *nextLink;
-
-	groundlink_t *root = ( groundlink_t * )ent->GetEngineObject()->GetDataObject( GROUNDLINK );
-	if ( root )
-	{
-		link = root->nextLink;
-		while ( link && link != root )
-		{
-			nextLink = link->nextLink;
-
-			// notify the other entity that this ent has gone away
-			PhysicsNotifyOtherOfGroundRemoval( ent, link->entity );
-
-			// kill it
-			FreeGroundLink( link );
-
-			link = nextLink;
-		}
-
-		ent->GetEngineObject()->DestroyDataObject( GROUNDLINK );
-	}
-}
-
-
 
 
 
@@ -1522,18 +1312,18 @@ void CBaseEntity::SetGroundEntity( CBaseEntity *ground )
 	// Just starting to touch
 	if ( !oldGround && ground )
 	{
-		ground->AddEntityToGroundList( this );
+		ground->GetEngineObject()->AddEntityToGroundList( this->GetEngineObject());
 	}
 	// Just stopping touching
 	else if ( oldGround && !ground )
 	{
-		PhysicsNotifyOtherOfGroundRemoval( this, oldGround );
+		oldGround->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval( this->GetEngineObject() );
 	}
 	// Changing out to new ground entity
 	else
 	{
-		PhysicsNotifyOtherOfGroundRemoval( this, oldGround );
-		ground->AddEntityToGroundList( this );
+		oldGround->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval( this->GetEngineObject());
+		ground->GetEngineObject()->AddEntityToGroundList( this->GetEngineObject());
 	}
 
 	// HACK/PARANOID:  This is redundant with the code above, but in case we get out of sync groundlist entries ever, 
@@ -1586,25 +1376,7 @@ void CBaseEntity::WakeRestingObjects()
 {
 	// Unset this as ground entity for everything resting on this object
 	//  This calls endgroundcontact for everything on the list
-	PhysicsRemoveGroundList( this );
+	GetEngineObject()->PhysicsRemoveGroundList();
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *ent - 
-//-----------------------------------------------------------------------------
-bool CBaseEntity::HasNPCsOnIt( void )
-{
-	groundlink_t *link;
-	groundlink_t *root = ( groundlink_t * )GetEngineObject()->GetDataObject( GROUNDLINK );
-	if ( root )
-	{
-		for ( link = root->nextLink; link != root; link = link->nextLink )
-		{
-			if ( link->entity && link->entity->MyNPCPointer() )
-				return true;
-		}
-	}
 
-	return false;
-}

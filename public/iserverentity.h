@@ -37,6 +37,16 @@ struct servertouchlink_t
 	int					flags = 0;
 };
 
+//-----------------------------------------------------------------------------
+// Purpose: Used for tracking many to one ground entity chains ( many ents can share a single ground entity )
+//-----------------------------------------------------------------------------
+struct servergroundlink_t
+{
+	CBaseHandle			entity;
+	servergroundlink_t* nextLink;
+	servergroundlink_t* prevLink;
+};
+
 class IEngineObjectServer : public IEngineObject {
 public:
 
@@ -178,6 +188,12 @@ public:
 	virtual void PhysicsNotifyOtherOfUntouch(IEngineObjectServer* ent) = 0;
 	virtual void PhysicsRemoveTouchedList() = 0;
 	virtual void PhysicsRemoveToucher(servertouchlink_t* link) = 0;
+
+	virtual servergroundlink_t* AddEntityToGroundList(IEngineObjectServer* other) = 0;
+	virtual void PhysicsStartGroundContact(IEngineObjectServer* pentOther) = 0;
+	virtual void PhysicsNotifyOtherOfGroundRemoval(IEngineObjectServer* ent) = 0;
+	virtual void PhysicsRemoveGround(servergroundlink_t* link) = 0;
+	virtual void PhysicsRemoveGroundList() = 0;
 
 };
 

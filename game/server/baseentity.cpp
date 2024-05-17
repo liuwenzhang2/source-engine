@@ -569,7 +569,6 @@ void CBaseEntity::UpdateOnRemove(void)
 	// Need to remove references to this entity before EHANDLES go null
 	{
 		g_bDisableEhandleAccess = false;
-		PhysicsRemoveGroundList(this);
 		SetGroundEntity(NULL); // remove us from the ground entity if we are on it
 		g_bDisableEhandleAccess = true;
 
@@ -2982,7 +2981,7 @@ int CBaseEntity::Restore( IRestore &restore )
 	// Restablish ground entity
 	if ( m_hGroundEntity != NULL )
 	{
-		m_hGroundEntity->AddEntityToGroundList( this );
+		m_hGroundEntity->GetEngineObject()->AddEntityToGroundList( this->GetEngineObject());
 	}
 
 	return status;
@@ -6665,6 +6664,25 @@ void CBaseEntity::SetCollisionBoundsFromModel()
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *ent - 
+//-----------------------------------------------------------------------------
+bool CBaseEntity::HasNPCsOnIt(void)
+{
+	servergroundlink_t* link;
+	servergroundlink_t* root = (servergroundlink_t*)GetEngineObject()->GetDataObject(GROUNDLINK);
+	if (root)
+	{
+		for (link = root->nextLink; link != root; link = link->nextLink)
+		{
+			if (gEntList.GetServerEntityFromHandle(link->entity) && ((CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entity))->MyNPCPointer())
+				return true;
+		}
+	}
+
+	return false;
+}
 
 //------------------------------------------------------------------------------
 // Purpose: Create an NPC of the given type

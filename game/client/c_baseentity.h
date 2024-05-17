@@ -823,13 +823,6 @@ public:
 
 public:
 
-	groundlink_t			*AddEntityToGroundList( CBaseEntity *other );
-	void					PhysicsStartGroundContact( CBaseEntity *pentOther );
-
-	static void				PhysicsNotifyOtherOfGroundRemoval( CBaseEntity *ent, CBaseEntity *other );
-	static void				PhysicsRemoveGround( CBaseEntity *other, groundlink_t *link );
-	static void				PhysicsRemoveGroundList( CBaseEntity *ent );
-
 	void					StartGroundContact( CBaseEntity *ground );
 	void					EndGroundContact( CBaseEntity *ground );
 

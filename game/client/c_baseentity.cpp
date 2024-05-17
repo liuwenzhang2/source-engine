@@ -857,8 +857,6 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 
 void C_BaseEntity::Term()
 {
-	C_BaseEntity::PhysicsRemoveGroundList( this );
-
 #if !defined( NO_ENTITY_PREDICTION )
 	// Remove from the predictables list
 	if ( GetPredictable() /*|| IsClientCreated()*/)
@@ -4411,7 +4409,7 @@ int C_BaseEntity::Restore( IRestore &restore )
 	// Restablish ground entity
 	if ( m_hGroundEntity != NULL )
 	{
-		m_hGroundEntity->AddEntityToGroundList( this );
+		m_hGroundEntity->GetEngineObject()->AddEntityToGroundList(this->GetEngineObject());
 	}
 
 	return status;
@@ -4685,6 +4683,26 @@ void C_BaseEntity::DontRecordInTools()
 int C_BaseEntity::GetCreationTick() const
 {
 	return m_nCreationTick;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *ent - 
+//-----------------------------------------------------------------------------
+bool C_BaseEntity::HasNPCsOnIt(void)
+{
+	clientgroundlink_t* link;
+	clientgroundlink_t* root = (clientgroundlink_t*)GetEngineObject()->GetDataObject(GROUNDLINK);
+	if (root)
+	{
+		for (link = root->nextLink; link != root; link = link->nextLink)
+		{
+			if (ClientEntityList().GetClientEntityFromHandle(link->entity) && ((C_BaseEntity*)ClientEntityList().GetClientEntityFromHandle(link->entity))->MyNPCPointer())
+				return true;
+		}
+	}
+
+	return false;
 }
 
 //------------------------------------------------------------------------------

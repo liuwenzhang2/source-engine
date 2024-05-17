@@ -391,6 +391,12 @@ public:
 	void PhysicsRemoveTouchedList();
 	void PhysicsRemoveToucher(clienttouchlink_t* link);
 
+	clientgroundlink_t* AddEntityToGroundList(IEngineObjectClient* other);
+	void PhysicsStartGroundContact(IEngineObjectClient* pentOther);
+	void PhysicsNotifyOtherOfGroundRemoval(IEngineObjectClient* ent);
+	void PhysicsRemoveGround(clientgroundlink_t* link);
+	void PhysicsRemoveGroundList();
+
 private:
 
 	friend class C_BaseEntity;
@@ -1534,6 +1540,7 @@ void CClientEntityList<T>::OnRemoveEntity(T* pEnt, CBaseHandle handle)
 	int entnum = handle.GetEntryIndex();
 
 	m_EngineObjectArray[entnum]->PhysicsRemoveTouchedList();
+	m_EngineObjectArray[entnum]->PhysicsRemoveGroundList();
 	m_EngineObjectArray[entnum]->DestroyAllDataObjects();
 	delete m_EngineObjectArray[entnum];
 	m_EngineObjectArray[entnum] = NULL;
