@@ -1585,7 +1585,7 @@ inline const CParticleProperty *C_BaseEntity::ParticleProp() const
 //-----------------------------------------------------------------------------
 inline bool C_BaseEntity::IsServerEntity( void )
 {
-	return entindex() != -1;
+	return entindex() < MAX_EDICTS;
 }
 
 

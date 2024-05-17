@@ -662,7 +662,7 @@ public:
 	virtual C_BaseEntity*		CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1);
 	virtual void				DestroyEntity(IHandleEntity* pEntity);
 
-	IEngineObjectClient* GetEngineObject(int entnum);
+	virtual IEngineObjectClient* GetEngineObject(int entnum);
 	virtual IClientNetworkable*	GetClientNetworkable( int entnum );
 	virtual IClientEntity*		GetClientEntity( int entnum );
 
@@ -1242,6 +1242,9 @@ void CClientEntityList<T>::Release(void)
 
 template<class T>
 inline IEngineObjectClient* CClientEntityList<T>::GetEngineObject(int entnum) {
+	if (entnum < 0 || entnum >= NUM_ENT_ENTRIES) {
+		return NULL;
+	}
 	return m_EngineObjectArray[entnum];
 }
 

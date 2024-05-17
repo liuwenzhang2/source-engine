@@ -1867,6 +1867,9 @@ inline void	CGlobalEntityList<T>::DestroyEntity(IHandleEntity* pEntity) {
 
 template<class T>
 inline IEngineObjectServer* CGlobalEntityList<T>::GetEngineObject(int entnum) {
+	if (entnum < 0 || entnum >= NUM_ENT_ENTRIES) {
+		return NULL;
+	}
 	return m_EngineObjectArray[entnum];
 }
 
