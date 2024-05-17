@@ -1967,7 +1967,7 @@ void CEngineObjectInternal::PhysicsTouchTriggers(const Vector* pPrevAbsOrigin)
 {
 	if (m_pOuter->IsNetworkable() && entindex() != -1 && !m_pOuter->IsWorld())
 	{
-		Assert(CollisionProp());
+		Assert(m_pOuter->CollisionProp());
 		bool isTriggerCheckSolids = m_pOuter->IsSolidFlagSet(FSOLID_TRIGGER);
 		bool isSolidCheckTriggers = m_pOuter->IsSolid() && !isTriggerCheckSolids;		// NOTE: Moving triggers (items, ammo etc) are not 
 		// checked against other triggers to reduce the number of touchlinks created
