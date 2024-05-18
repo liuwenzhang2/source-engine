@@ -1839,7 +1839,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	if ( pParent )
 	{
 		// We're doing bone merging, so do special stuff here.
-		CBoneCache *pParentCache = dynamic_cast<CBaseAnimating*>(pParent)->GetBoneCache();
+		CBoneCache *pParentCache = dynamic_cast<CBaseAnimating*>(pParent->GetOuter())->GetBoneCache();
 		if ( pParentCache )
 		{
 			BuildMatricesWithBoneMerge( 
@@ -1849,7 +1849,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 				pos, 
 				q, 
 				pBoneToWorld, 
-				dynamic_cast<CBaseAnimating*>(pParent),
+				dynamic_cast<CBaseAnimating*>(pParent->GetOuter()),
 				pParentCache );
 			
 			GetEngineObject()->RemoveEFlags( EFL_SETTING_UP_BONES );

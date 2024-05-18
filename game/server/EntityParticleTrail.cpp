@@ -163,7 +163,7 @@ void CEntityParticleTrail::DecrementRefCount()
 void CEntityParticleTrail::NotifySystemEvent( CBaseEntity *pNotify, notify_system_event_t eventType, const notify_system_event_params_t &params )
 {
 	BaseClass::NotifySystemEvent( pNotify, eventType, params );
-	Assert( pNotify == GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL);
+	Assert( pNotify == (GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL));
 	if ( eventType == NOTIFY_EVENT_DESTROY )
 	{
 		FollowEntity( NULL );
