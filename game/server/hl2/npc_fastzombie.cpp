@@ -506,15 +506,15 @@ void CFastZombie::PrescheduleThink( void )
 {
 	BaseClass::PrescheduleThink();
 
-	if( GetGroundEntity() && GetGroundEntity()->Classify() == CLASS_HEADCRAB )
+	if(GetEngineObject()->GetGroundEntity() && GetEngineObject()->GetGroundEntity()->GetOuter()->Classify() == CLASS_HEADCRAB)
 	{
 		// Kill!
 		CTakeDamageInfo info;
-		info.SetDamage( GetGroundEntity()->GetHealth() );
+		info.SetDamage(GetEngineObject()->GetGroundEntity()->GetOuter()->GetHealth());
 		info.SetAttacker( this );
 		info.SetInflictor( this );
 		info.SetDamageType( DMG_GENERIC );
-		GetGroundEntity()->TakeDamage( info );
+		GetEngineObject()->GetGroundEntity()->GetOuter()->TakeDamage(info);
 	}
 
  	if( m_pMoanSound && gpGlobals->curtime > m_flTimeUpdateSound )
@@ -1255,7 +1255,7 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
 //-----------------------------------------------------------------------------
 void CFastZombie::LeapAttack( void )
 {
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 
 	BeginAttackJump();
 
@@ -1345,7 +1345,7 @@ void CFastZombie::StartTask( const Task_t *pTask )
 		{
 			SetActivity( ACT_IDLE );
 
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 
 			BeginAttackJump();
 
@@ -1363,7 +1363,7 @@ void CFastZombie::StartTask( const Task_t *pTask )
 
 	case TASK_FASTZOMBIE_UNSTICK_JUMP:
 		{
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 
 			// Call begin attack jump. A little bit later if we fail to pathfind, we check
 			// this value to see if we just jumped. If so, we assume we've jumped 
@@ -1629,7 +1629,7 @@ void CFastZombie::ClimbTouch( CBaseEntity *pOther )
 		pOther->VelocityPunch( vecDir );
 
 		if ( GetActivity() != ACT_CLIMB_DISMOUNT || 
-			 ( pOther->GetGroundEntity() == NULL &&
+			 ( pOther->GetEngineObject()->GetGroundEntity() == NULL &&
 			   GetNavigator()->IsGoalActive() &&
 			   pOther->GetEngineObject()->GetAbsOrigin().z - GetNavigator()->GetCurWaypointPos().z < -1.0 ) )
 		{
@@ -2071,7 +2071,7 @@ void CFastZombie::VehicleLeapAttack( void )
 	UTIL_PredictedPosition( pEnemy, 1.0f, &vecEnemyPos );
 
 	// Move
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 	BeginAttackJump();
 	LeapAttackSound();
 

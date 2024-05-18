@@ -103,7 +103,7 @@ bool CheckForStandable( IHandleEntity *pHandleEntity, int contentsMask )
 	if ( !pEntity )
 		return false;
 
-	return ( pEntity->IsPlayer() && pEntity->GetGroundEntity() != NULL ) || pEntity->IsStandable();
+	return ( pEntity->IsPlayer() && pEntity->GetEngineObject()->GetGroundEntity() != NULL ) || pEntity->IsStandable();
 }
 
 
@@ -165,7 +165,7 @@ void CCSGameMovement::CheckParameters( void )
 	// maintaining auto-duck during jumps
 	if ( m_pCSPlayer->m_duckUntilOnGround )
 	{
-		if ( !player->GetGroundEntity() )
+		if ( !player->GetEngineObject()->GetGroundEntity() )
 		{
 			if ( mv->m_nButtons & IN_DUCK )
 			{
@@ -293,10 +293,10 @@ void CCSGameMovement::CheckParameters( void )
 	if ( !player->IsObserver()  && ( player->GetMoveType() != MOVETYPE_LADDER ) )
 	{
 		int nLevels = 0;
-		CBaseEntity *pCurGround = player->GetGroundEntity();
+		CBaseEntity* pCurGround = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		while ( pCurGround && pCurGround->IsPlayer() && nLevels < 1000 )
 		{
-			pCurGround = pCurGround->GetGroundEntity();
+			pCurGround = pCurGround->GetEngineObject()->GetGroundEntity() ? pCurGround->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 			++nLevels;
 		}
 		if ( nLevels == 1000 )
@@ -461,7 +461,7 @@ void CCSGameMovement::WalkMove( void )
 
 	BaseClass::WalkMove();
 
-	CheckForLadders( player->GetGroundEntity() != NULL );
+	CheckForLadders( player->GetEngineObject()->GetGroundEntity() != NULL);
 }
 
 
@@ -685,14 +685,14 @@ bool CCSGameMovement::CheckJumpButton( void )
 	}
 
 	// No more effect
- 	if (m_pCSPlayer->GetGroundEntity() == NULL)
+ 	if (m_pCSPlayer->GetEngineObject()->GetGroundEntity() == NULL)
 	{
 		mv->m_nOldButtons |= IN_JUMP;
 		return false;		// in air, so no effect
 	}
 
 	if ( (mv->m_nOldButtons & IN_JUMP) &&
-		(!cs_autojump.GetBool() && m_pCSPlayer->GetGroundEntity()) )
+		(!cs_autojump.GetBool() && m_pCSPlayer->GetEngineObject()->GetGroundEntity()) )
 	{
 		return false;		// don't pogo stick
 	}
@@ -829,7 +829,7 @@ bool CCSGameMovement::CanUnduck()
 
 	VectorCopy( mv->GetAbsOrigin(), newOrigin );
 
-	if ( player->GetGroundEntity() != NULL )
+	if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 	{
 		newOrigin += VEC_DUCK_HULL_MIN_SCALED( player ) - VEC_HULL_MIN_SCALED( player );
 	}
@@ -861,7 +861,7 @@ void CCSGameMovement::FinishUnDuck( void )
 
 	VectorCopy( mv->GetAbsOrigin(), newOrigin );
 
-	if ( player->GetGroundEntity() != NULL )
+	if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 	{
 		newOrigin += VEC_DUCK_HULL_MIN_SCALED( player ) - VEC_HULL_MIN_SCALED( player );
 	}
@@ -909,7 +909,7 @@ void CCSGameMovement::FinishDuck( void )
 	
 		Vector org = mv->GetAbsOrigin();
 
-		if ( player->GetGroundEntity() != NULL )
+		if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 		{
 			org -= VEC_DUCK_HULL_MIN_SCALED( player ) - VEC_HULL_MIN_SCALED( player );
 		}
@@ -964,7 +964,7 @@ void CCSGameMovement::Duck( void )
 	int buttonsReleased	=  buttonsChanged & mv->m_nOldButtons;		// The changed ones which were previously down are "released"
 
 	// Check to see if we are in the air.
-	bool bInAir = player->GetGroundEntity() == NULL && player->GetMoveType() != MOVETYPE_LADDER;
+	bool bInAir = player->GetEngineObject()->GetGroundEntity() == NULL && player->GetMoveType() != MOVETYPE_LADDER;
 
 	if ( mv->m_nButtons & IN_DUCK )
 	{
@@ -1056,7 +1056,7 @@ void CCSGameMovement::Duck( void )
 
 				// Finish ducking immediately if duck time is over or not on ground
 				if ( ( duckseconds > TIME_TO_DUCK ) || 
-					( player->GetGroundEntity() == NULL ) ||
+					( player->GetEngineObject()->GetGroundEntity() == NULL ) ||
 					alreadyDucked)
 				{
 					FinishDuck();
@@ -1073,7 +1073,7 @@ void CCSGameMovement::Duck( void )
 		{
 			// Try to unduck unless automovement is not allowed
 			// NOTE: When not onground, you can always unduck
-			if ( player->m_Local.m_bAllowAutoMovement || player->GetGroundEntity() == NULL )
+			if ( player->m_Local.m_bAllowAutoMovement || player->GetEngineObject()->GetGroundEntity() == NULL )
 			{
 				if ( (buttonsReleased & IN_DUCK ) && ( player->GetFlags() & FL_DUCKING ) )
 				{
@@ -1095,7 +1095,7 @@ void CCSGameMovement::Duck( void )
 
 						// Finish ducking immediately if duck time is over or not on ground
 						if ( ( duckseconds > TIME_TO_UNDUCK ) ||
-							 ( player->GetGroundEntity() == NULL ) )
+							 ( player->GetEngineObject()->GetGroundEntity() == NULL ) )
 						{
 							FinishUnDuck();
 						}

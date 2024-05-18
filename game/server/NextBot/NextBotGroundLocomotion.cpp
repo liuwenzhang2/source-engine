@@ -1022,7 +1022,7 @@ void NextBotGroundLocomotion::UpdateGroundConstraint( void )
 		if ( !IsOnGround() )
 		{
 			// just landed
-			m_nextBot->SetGroundEntity((CBaseEntity*)ground.m_pEnt );
+			m_nextBot->GetEngineObject()->SetGroundEntity((CBaseEntity*)ground.m_pEnt ? ((CBaseEntity*)ground.m_pEnt)->GetEngineObject() : NULL);
 			m_ground = (CBaseEntity*)ground.m_pEnt;
 
 			// landing stops any jump in progress
@@ -1037,7 +1037,7 @@ void NextBotGroundLocomotion::UpdateGroundConstraint( void )
 		// not on the ground
 		if ( IsOnGround() )
 		{
-			GetBot()->OnLeaveGround( m_nextBot->GetGroundEntity() );
+			GetBot()->OnLeaveGround( m_nextBot->GetEngineObject()->GetGroundEntity()->GetOuter() );
 			if ( !IsClimbingUpToLedge() && !IsJumpingAcrossGap() )
 			{
 				m_isUsingFullFeetTrace = true; // We're in the air and there's space below us, so use the full trace
@@ -1131,7 +1131,7 @@ void NextBotGroundLocomotion::JumpAcrossGap( const Vector &landingGoal, const Ve
 	m_isJumpingAcrossGap = true;
 	m_isClimbingUpToLedge = false;
 
-	GetBot()->OnLeaveGround( m_nextBot->GetGroundEntity() );
+	GetBot()->OnLeaveGround( m_nextBot->GetEngineObject()->GetGroundEntity()->GetOuter() );
 }
 
 
@@ -1160,7 +1160,7 @@ void NextBotGroundLocomotion::Jump( void )
 	m_isJumping = true;
 	m_isClimbingUpToLedge = false;
 
-	GetBot()->OnLeaveGround( m_nextBot->GetGroundEntity() );
+	GetBot()->OnLeaveGround( m_nextBot->GetEngineObject()->GetGroundEntity()->GetOuter() );
 }
 
 
@@ -1200,7 +1200,7 @@ void NextBotGroundLocomotion::Stop( void )
  */
 bool NextBotGroundLocomotion::IsOnGround( void ) const
 {
-	return (m_nextBot->GetGroundEntity() != NULL);
+	return (m_nextBot->GetEngineObject()->GetGroundEntity() != NULL);
 }
 
 
@@ -1210,7 +1210,7 @@ bool NextBotGroundLocomotion::IsOnGround( void ) const
  */
 void NextBotGroundLocomotion::OnLeaveGround( CBaseEntity *ground )
 {
-	m_nextBot->SetGroundEntity( NULL );
+	m_nextBot->GetEngineObject()->SetGroundEntity( NULL );
 	m_ground = NULL;
 
 	if ( GetBot()->IsDebugging( NEXTBOT_LOCOMOTION ) )

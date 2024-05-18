@@ -320,7 +320,7 @@ void CItem::FallThink ( void )
 			// So in the name of justice, we ask that this flag be delivered unto him.
 
 			SetMoveType( MOVETYPE_NONE );
-			SetGroundEntity( GetWorldEntity() );
+			GetEngineObject()->SetGroundEntity( GetWorldEntity()->GetEngineObject());
 		}
 	}
 	else

@@ -861,7 +861,7 @@ void CAI_PassengerBehavior::DetachFromVehicle( void )
 	GetOuter()->GetEngineObject()->SetParent(NULL);
 	GetOuter()->SetMoveType( MOVETYPE_STEP );
 	GetOuter()->AddFlag( FL_FLY );
-	GetOuter()->SetGroundEntity( NULL );
+	GetOuter()->GetEngineObject()->SetGroundEntity( NULL );
 	GetOuter()->SetCollisionGroup( COLLISION_GROUP_NPC );
 	m_hVehicle->RemovePhysicsChild( GetOuter() );
 }
@@ -875,7 +875,7 @@ void CAI_PassengerBehavior::AttachToVehicle( void )
 	GetOuter()->ClearForceCrouch();
 	GetOuter()->GetEngineObject()->SetParent( m_hVehicle?m_hVehicle->GetEngineObject():NULL );
 	GetOuter()->AddFlag( FL_FLY );
-	GetOuter()->SetGroundEntity( NULL );
+	GetOuter()->GetEngineObject()->SetGroundEntity( NULL );
 	GetOuter()->SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE );
 
 	// Turn off physical interactions while we're in the vehicle

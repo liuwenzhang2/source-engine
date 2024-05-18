@@ -1164,9 +1164,9 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 	// check ground entity first
 	// if you've got a useable ground entity, then shrink the cone of this search to 45 degrees
 	// otherwise, search out in a 90 degree cone (hemisphere)
-	if ( GetGroundEntity() && IsUseableEntity(GetGroundEntity(), FCAP_USE_ONGROUND) )
+	if (GetEngineObject()->GetGroundEntity() && IsUseableEntity(GetEngineObject()->GetGroundEntity()->GetOuter(), FCAP_USE_ONGROUND))
 	{
-		pNearest = GetGroundEntity();
+		pNearest = GetEngineObject()->GetGroundEntity()->GetOuter();
 	}
 	if ( pNearest )
 	{
@@ -1346,7 +1346,7 @@ void CBasePlayer::PlayerUse ( void )
 			}
 			else
 			{	// Start controlling the train!
-				CBaseEntity *pTrain = GetGroundEntity();
+				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
 				{
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
@@ -1454,7 +1454,7 @@ static ConVar smoothstairs( "smoothstairs", "1", FCVAR_REPLICATED, "Smooth playe
 //-----------------------------------------------------------------------------
 void CBasePlayer::SmoothViewOnStairs( Vector& eyeOrigin )
 {
-	CBaseEntity *pGroundEntity = GetGroundEntity();
+	CBaseEntity* pGroundEntity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	float flCurrentPlayerZ = GetEngineObject()->GetLocalOrigin().z;
 	float flCurrentPlayerViewOffsetZ = GetViewOffset().z;
 

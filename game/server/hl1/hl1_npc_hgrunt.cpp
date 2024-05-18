@@ -964,7 +964,7 @@ bool CNPC_HGrunt::HandleInteraction(int interactionType, void *data, CBaseCombat
 	{
 		if ( GetFlags() & FL_ONGROUND )
 		{
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 		}
 		
 		//Maybe this will break something else.

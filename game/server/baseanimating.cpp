@@ -1546,7 +1546,7 @@ void CBaseAnimating::UpdateStepOrigin()
 
 	if (m_flIKGroundContactTime > 0.2 && m_flIKGroundContactTime > gpGlobals->curtime - 0.2)
 	{
-		if ((GetFlags() & (FL_FLY | FL_SWIM)) == 0 && GetEngineObject()->GetMoveParent() == NULL && GetGroundEntity() != NULL && !GetGroundEntity()->IsMoving())
+		if ((GetFlags() & (FL_FLY | FL_SWIM)) == 0 && GetEngineObject()->GetMoveParent() == NULL && GetEngineObject()->GetGroundEntity() != NULL && !GetEngineObject()->GetGroundEntity()->GetOuter()->IsMoving())
 		{
 			Vector toAbs = GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetLocalOrigin();
 			if (toAbs.z == 0.0)

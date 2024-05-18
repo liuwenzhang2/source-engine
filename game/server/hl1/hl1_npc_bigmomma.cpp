@@ -896,7 +896,7 @@ void CNPC_BigMomma::HandleAnimEvent( animevent_t *pEvent )
 					break;
 				}
 
-				pHurt->SetGroundEntity( NULL );
+				pHurt->GetEngineObject()->SetGroundEntity( NULL );
 				g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.AttackHit" );
 			}
 		}
@@ -948,7 +948,7 @@ void CNPC_BigMomma::HandleAnimEvent( animevent_t *pEvent )
 			break;
 
 		case BIG_AE_JUMP_FORWARD:
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 			GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() + Vector ( 0 , 0 , 1) );// take him off ground so engine doesn't instantly reset onground 
 			GetEngineObject()->SetAbsVelocity(vecFwd * 200 + vecUp * 500 );
 			break;

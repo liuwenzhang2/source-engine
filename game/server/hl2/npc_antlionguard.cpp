@@ -1285,7 +1285,7 @@ int CNPC_AntlionGuard::MeleeAttack1Conditions( float flDot, float flDist )
 		return COND_NOT_FACING_ATTACK;
 
 	// If the enemy is on top of me, I'm allowed to hit the sucker
-	if ( GetEnemy()->GetGroundEntity() == this )
+	if ( GetEnemy()->GetEngineObject()->GetGroundEntity() == this->GetEngineObject())
 		return COND_CAN_MELEE_ATTACK1;
 
 	trace_t	tr;

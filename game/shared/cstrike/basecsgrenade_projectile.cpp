@@ -221,7 +221,7 @@ END_NETWORK_TABLE()
 			{
 				if ( pEntity->IsStandable() )
 				{
-					SetGroundEntity( pEntity );
+					GetEngineObject()->SetGroundEntity( pEntity->GetEngineObject() );
 				}
 
 				// Reset velocities.

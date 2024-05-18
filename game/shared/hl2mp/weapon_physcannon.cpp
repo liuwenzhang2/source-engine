@@ -2255,7 +2255,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 		return false;
 	if ( ComputeError() > flError )
 		return false;
-	if ( pPlayer->GetGroundEntity() == pEntity )
+	if ((pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pEntity)
 		return false;
 	if (!pEntity->VPhysicsGetObject() )
 		return false;    
@@ -2808,7 +2808,7 @@ bool CWeaponPhysCannon::CanPickupObject( CBaseEntity *pTarget )
 
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
 	
-	if ( pOwner && pOwner->GetGroundEntity() == pTarget )
+	if (pOwner && (pOwner->GetEngineObject()->GetGroundEntity() ? pOwner->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pTarget)
 		return false;
 
 	if ( pTarget->VPhysicsIsFlesh( ) )

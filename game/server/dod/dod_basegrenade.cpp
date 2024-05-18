@@ -200,7 +200,7 @@ void CDODBaseGrenade::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelo
 		{
 			if ( pEntity->IsStandable() )
 			{
-				SetGroundEntity( pEntity );
+				GetEngineObject()->SetGroundEntity( pEntity->GetEngineObject() );
 			}
 
 			vecAbsVelocity.z = 0.0f;
@@ -211,7 +211,7 @@ void CDODBaseGrenade::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelo
 		{
 			if ( pEntity->IsStandable() )
 			{
-				SetGroundEntity( pEntity );
+				GetEngineObject()->SetGroundEntity( pEntity->GetEngineObject() );
 			}
 
 			// Reset velocities.

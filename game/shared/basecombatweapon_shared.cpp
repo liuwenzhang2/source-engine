@@ -676,7 +676,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 	m_iState = WEAPON_NOT_CARRIED;
 	RemoveEffects( EF_NODRAW );
 	FallInit();
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 	SetThink( &CBaseCombatWeapon::SetPickupTouch );
 	SetTouch(NULL);
 

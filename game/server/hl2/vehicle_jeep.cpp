@@ -1593,7 +1593,7 @@ void CPropJeep::SpawnPerchedSeagull( void )
 		return;
 	
 	pSeagull->AddSpawnFlags( SF_NPC_FADE_CORPSE );
-	pSeagull->SetGroundEntity( this );
+	pSeagull->GetEngineObject()->SetGroundEntity( this->GetEngineObject() );
 	pSeagull->AddFlag( FL_ONGROUND );
 	pSeagull->SetOwnerEntity( this );
 	pSeagull->SetMoveType( MOVETYPE_FLY );

@@ -71,7 +71,7 @@ namespace
 	inline bool PlayerIsDucking(C_BasePlayer *pPlayer)
 	{
 		return  pPlayer->m_Local.m_bDucked &&		 // crouching 
-				pPlayer->GetGroundEntity() != NULL ; // but not jumping
+				pPlayer->GetEngineObject()->GetGroundEntity() != NULL ; // but not jumping
 	}
 }
 

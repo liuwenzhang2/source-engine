@@ -2131,7 +2131,7 @@ void CBaseFlex::DoBodyLean( void )
 		vecDelta.z = clamp( vecDelta.z, -50, 50 );
 
 		float dt = gpGlobals->curtime - GetLastThink();
-		bool bSkip = ((GetFlags() & (FL_FLY | FL_SWIM)) != 0) || (GetEngineObject()->GetMoveParent() != NULL) || (GetGroundEntity() == NULL) || (GetGroundEntity()->IsMoving());
+		bool bSkip = ((GetFlags() & (FL_FLY | FL_SWIM)) != 0) || (GetEngineObject()->GetMoveParent() != NULL) || (GetEngineObject()->GetGroundEntity() == NULL) || (GetEngineObject()->GetGroundEntity()->GetOuter()->IsMoving());
 		bSkip |= myNpc->TaskRanAutomovement() || (myNpc->GetVehicleEntity() != NULL);
 
 		if (!bSkip)

@@ -322,7 +322,7 @@ void CNPC_Houndeye::HandleAnimEvent( animevent_t *pEvent )
 				Vector v_forward;
 				GetVectors( &v_forward, NULL, NULL );
 
-				SetGroundEntity( NULL );
+				GetEngineObject()->SetGroundEntity( NULL );
 
 				Vector vecVel = v_forward * -200;
 				vecVel.z += ( 0.6 * flGravity ) * 0.5;

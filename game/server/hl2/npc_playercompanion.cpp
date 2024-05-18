@@ -810,16 +810,16 @@ int CNPC_PlayerCompanion::SelectScheduleDanger()
 //-----------------------------------------------------------------------------
 int CNPC_PlayerCompanion::SelectSchedulePriorityAction()
 {
-	if ( GetGroundEntity() && !IsInAScript() )
+	if (GetEngineObject()->GetGroundEntity() && !IsInAScript() )
 	{
-		if ( GetGroundEntity()->IsPlayer() )
+		if (GetEngineObject()->GetGroundEntity()->GetOuter()->IsPlayer())
 		{
 			return SCHED_PC_GET_OFF_COMPANION;
 		}
 
-		if ( GetGroundEntity()->IsNPC() && 
-			 IRelationType( GetGroundEntity() ) == D_LI && 
-			 WorldSpaceCenter().z - GetGroundEntity()->WorldSpaceCenter().z > GetHullHeight() * .5 )
+		if (GetEngineObject()->GetGroundEntity()->GetOuter()->IsNPC() &&
+			 IRelationType(GetEngineObject()->GetGroundEntity()->GetOuter() ) == D_LI &&
+			 WorldSpaceCenter().z - GetEngineObject()->GetGroundEntity()->GetOuter()->WorldSpaceCenter().z > GetHullHeight() * .5)
 		{
 			return SCHED_PC_GET_OFF_COMPANION;
 		}
@@ -1098,8 +1098,8 @@ void CNPC_PlayerCompanion::StartTask( const Task_t *pTask )
 
 	case TASK_PC_GET_PATH_OFF_COMPANION:
 		{
-			Assert( ( GetGroundEntity() && ( GetGroundEntity()->IsPlayer() || ( GetGroundEntity()->IsNPC() && IRelationType( GetGroundEntity() ) == D_LI ) ) ) );
-			GetNavigator()->SetAllowBigStep( GetGroundEntity() );
+			Assert( (GetEngineObject()->GetGroundEntity() && (GetEngineObject()->GetGroundEntity()->GetOuter()->IsPlayer() || (GetEngineObject()->GetGroundEntity()->GetOuter()->IsNPC() && IRelationType(GetEngineObject()->GetGroundEntity()->GetOuter()) == D_LI))));
+			GetNavigator()->SetAllowBigStep(GetEngineObject()->GetGroundEntity()->GetOuter() );
 			ChainStartTask( TASK_MOVE_AWAY_PATH, 48 );
 			
 			/*

@@ -467,7 +467,7 @@ CAI_BaseNPC *CNPC_Osprey::MakeGrunt( Vector vecSrc )
 			Vector spd = Vector( 0, 0, random->RandomFloat( -196, -128 ) );
 			pGrunt->GetEngineObject()->SetLocalVelocity( spd );
 			pGrunt->SetActivity( ACT_GLIDE );
-			pGrunt->SetGroundEntity( NULL );
+			pGrunt->GetEngineObject()->SetGroundEntity( NULL );
 
 			pGrunt->SetOwnerEntity(this);
 
@@ -1017,7 +1017,7 @@ void CBaseHelicopter::Flight( void )
 	if( GetFlags() & FL_ONGROUND )
 	{
 		//This would be really bad.
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 	}
 
 	// Generic speed up

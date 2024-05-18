@@ -2139,7 +2139,7 @@ void CNPC_CombineGunship::Flight( void )
 	if( GetFlags() & FL_ONGROUND )
 	{
 		//This would be really bad.
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 	}
 
 	if ( g_debug_gunship.GetInt() == GUNSHIP_DEBUG_PATH )

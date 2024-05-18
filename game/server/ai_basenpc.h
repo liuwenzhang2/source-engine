@@ -2951,7 +2951,7 @@ inline void CAI_Component::RemoveEntFlag( int flagsToRemove )
 //-----------------------------------------------------------------------------
 inline void	 CAI_Component::SetGroundEntity( CBaseEntity *ground )
 {
-	GetOuter()->SetGroundEntity( ground );
+	GetOuter()->GetEngineObject()->SetGroundEntity(ground ? ground->GetEngineObject() : NULL);
 }
 
 //-----------------------------------------------------------------------------

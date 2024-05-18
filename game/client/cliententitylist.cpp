@@ -216,6 +216,7 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_PRED_FIELD_TOL(m_vecNetworkOrigin, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, coordTolerance),
 	DEFINE_PRED_FIELD(m_angNetworkAngles, FIELD_VECTOR, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK),
 	DEFINE_PRED_FIELD(m_hNetworkMoveParent, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE),
+	DEFINE_PRED_FIELD(m_hGroundEntity, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE),
 END_PREDICTION_DATA()
 
 BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
@@ -280,6 +281,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropVector(RECVINFO(m_vecVelocity), 0, RecvProxy_LocalVelocity),
 	RecvPropInt(RECVINFO_NAME(m_hNetworkMoveParent, moveparent), 0, RecvProxy_IntToMoveParent),
 	RecvPropInt(RECVINFO(m_iParentAttachment)),
+	RecvPropEHandle(RECVINFO(m_hGroundEntity)),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -2718,6 +2720,47 @@ void C_EngineObjectInternal::PhysicsRemoveGroundList()
 	}
 }
 
+void C_EngineObjectInternal::SetGroundEntity(IEngineObjectClient* ground)
+{
+	if ((m_hGroundEntity.Get() ? m_hGroundEntity.Get()->GetEngineObject() : NULL) == ground)
+		return;
+
+	C_BaseEntity* oldGround = m_hGroundEntity.Get();
+	m_hGroundEntity = ground ? ground->GetOuter() : NULL;
+
+	// Just starting to touch
+	if (!oldGround && ground)
+	{
+		ground->AddEntityToGroundList(this);
+	}
+	// Just stopping touching
+	else if (oldGround && !ground)
+	{
+		oldGround->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval(this);
+	}
+	// Changing out to new ground entity
+	else
+	{
+		oldGround->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval(this);
+		ground->AddEntityToGroundList(this);
+	}
+
+	// HACK/PARANOID:  This is redundant with the code above, but in case we get out of sync groundlist entries ever, 
+	//  this will force the appropriate flags
+	if (ground)
+	{
+		m_pOuter->AddFlag(FL_ONGROUND);
+	}
+	else
+	{
+		m_pOuter->RemoveFlag(FL_ONGROUND);
+	}
+}
+
+C_EngineObjectInternal* C_EngineObjectInternal::GetGroundEntity(void)
+{
+	return m_hGroundEntity.Get() ? (C_EngineObjectInternal*)m_hGroundEntity.Get()->GetEngineObject() : NULL;
+}
 
 
 bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b )

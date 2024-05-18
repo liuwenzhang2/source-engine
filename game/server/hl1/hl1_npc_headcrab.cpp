@@ -493,7 +493,7 @@ void CNPC_Headcrab::HandleAnimEvent( animevent_t *pEvent )
 	{
 		case HC_AE_JUMPATTACK:
 		{
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 
 			//
 			// Take him off ground so engine doesn't instantly reset FL_ONGROUND.
@@ -681,7 +681,7 @@ int CNPC_BabyCrab::RangeAttack1Conditions( float flDot, float flDist )
 {
 	if ( GetFlags() & FL_ONGROUND )
 	{
-		if ( GetGroundEntity() && ( GetGroundEntity()->GetFlags() & ( FL_CLIENT | FL_NPC ) ) )
+		if (GetEngineObject()->GetGroundEntity() && (GetEngineObject()->GetGroundEntity()->GetOuter()->GetFlags() & (FL_CLIENT | FL_NPC)))
 			return COND_CAN_RANGE_ATTACK1;
 
 		// A little less accurate, but jump from closer

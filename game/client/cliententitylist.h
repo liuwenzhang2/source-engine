@@ -397,6 +397,10 @@ public:
 	void PhysicsRemoveGround(clientgroundlink_t* link);
 	void PhysicsRemoveGroundList();
 
+	void SetGroundEntity(IEngineObjectClient* ground);
+	C_EngineObjectInternal* GetGroundEntity(void);
+	C_EngineObjectInternal* GetGroundEntity(void) const { return const_cast<C_EngineObjectInternal*>(this)->GetGroundEntity(); }
+
 private:
 
 	friend class C_BaseEntity;
@@ -450,6 +454,9 @@ private:
 	// used so we know when things are no longer touching
 	int								touchStamp;
 	int								m_fDataObjectTypes;
+
+	EHANDLE							m_hGroundEntity;
+
 };
 
 //-----------------------------------------------------------------------------

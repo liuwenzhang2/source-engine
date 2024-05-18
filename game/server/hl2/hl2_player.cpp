@@ -652,7 +652,7 @@ void CHL2_Player::PreThink(void)
 	if( sv_stickysprint.GetBool() && m_bIsAutoSprinting )
 	{
 		// If we're ducked and not in the air
-		if( IsDucked() && GetGroundEntity() != NULL )
+		if( IsDucked() && GetEngineObject()->GetGroundEntity() != NULL )
 		{
 			StopSprinting();
 		}
@@ -673,7 +673,7 @@ void CHL2_Player::PreThink(void)
 	else if ( IsSprinting() )
 	{
 		// Disable sprint while ducked unless we're in the air (jumping)
-		if ( IsDucked() && ( GetGroundEntity() != NULL ) )
+		if ( IsDucked() && (GetEngineObject()->GetGroundEntity() != NULL ) )
 		{
 			StopSprinting();
 		}
@@ -744,7 +744,7 @@ void CHL2_Player::PreThink(void)
 	// Train speed control
 	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
 	{
-		CBaseEntity *pTrain = GetGroundEntity();
+		CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		float vel;
 
 		if ( pTrain )
@@ -2867,7 +2867,7 @@ void CHL2_Player::PlayerUse ( void )
 			}
 			else
 			{	// Start controlling the train!
-				CBaseEntity *pTrain = GetGroundEntity();
+				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
 				{
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
@@ -3194,7 +3194,7 @@ bool CHL2_Player::Weapon_CanSwitchTo( CBaseCombatWeapon *pWeapon )
 void CHL2_Player::PickupObject( CBaseEntity *pObject, bool bLimitMassAndSize )
 {
 	// can't pick up what you're standing on
-	if ( GetGroundEntity() == pObject )
+	if ((GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pObject)
 		return;
 	
 	if ( bLimitMassAndSize == true )

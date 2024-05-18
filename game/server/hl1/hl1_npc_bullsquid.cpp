@@ -453,7 +453,7 @@ void CNPC_Bullsquid::HandleAnimEvent( animevent_t *pEvent )
 				AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, NULL, &up );
 				pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() - (forward * 100) );
 				pHurt->GetEngineObject()->SetAbsVelocity( pHurt->GetEngineObject()->GetAbsVelocity() + (up * 100) );
-				pHurt->SetGroundEntity( NULL );
+				pHurt->GetEngineObject()->SetGroundEntity( NULL );
 			}
 		}
 		break;
@@ -489,7 +489,7 @@ void CNPC_Bullsquid::HandleAnimEvent( animevent_t *pEvent )
 			// throw the squid up into the air on this frame.
 			if ( GetFlags() & FL_ONGROUND )
 			{
-				SetGroundEntity( NULL );
+				GetEngineObject()->SetGroundEntity( NULL );
 			}
 
 			// jump into air for 0.8 (24/30) seconds

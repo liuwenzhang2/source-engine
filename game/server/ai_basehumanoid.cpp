@@ -137,7 +137,7 @@ bool CAI_BaseHumanoid::OnMoveBlocked( AIMoveResult_t *pResult )
 		float massBonus = ( IsNavigationUrgent() ) ? 40.0 : 0;
 
 		if ( pBlocker->GetMoveType() == MOVETYPE_VPHYSICS && 
-			 pBlocker != GetGroundEntity() && 
+			 pBlocker != (GetEngineObject()->GetGroundEntity()? GetEngineObject()->GetGroundEntity()->GetOuter():NULL) &&
 			 !pBlocker->IsNavIgnored() &&
 			 !dynamic_cast<CBasePropDoor *>(pBlocker) &&
 			 pBlocker->VPhysicsGetObject() && 

@@ -558,7 +558,7 @@ void CBaseEntity::ResolveFlyCollisionBounce( trace_t &trace, Vector &vecVelocity
 		{
 			if ( pEntity->IsStandable() )
 			{
-				SetGroundEntity( pEntity );
+				GetEngineObject()->SetGroundEntity( pEntity->GetEngineObject() );
 			}
 
 			// Reset velocities.
@@ -638,7 +638,7 @@ void CBaseEntity::ResolveFlyCollisionSlide( trace_t &trace, Vector &vecVelocity 
 	{
 		if ( pEntity->IsStandable() )
 		{
-			SetGroundEntity( pEntity );
+			GetEngineObject()->SetGroundEntity( pEntity->GetEngineObject());
 		}
 
 		// Reset velocities.
@@ -679,7 +679,7 @@ void CBaseEntity::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity
 
 		if ( pEntity->IsStandable() )
 		{
-			SetGroundEntity( pEntity );
+			GetEngineObject()->SetGroundEntity( pEntity->GetEngineObject() );
 		}
 	}
 }
@@ -805,9 +805,9 @@ void CBaseEntity::PhysicsToss( void )
 		return;
 
 	// Moving upward, off the ground, or  resting on a client/monster, remove FL_ONGROUND
-	if (GetEngineObject()->GetAbsVelocity()[2] > 0 || !GetGroundEntity() || !GetGroundEntity()->IsStandable() )
+	if (GetEngineObject()->GetAbsVelocity()[2] > 0 || !GetEngineObject()->GetGroundEntity() || !GetEngineObject()->GetGroundEntity()->GetOuter()->IsStandable())
 	{
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 	}
 
 	// Check to see if entity is on the ground at rest
@@ -921,7 +921,7 @@ void CBaseEntity::UpdateBaseVelocity( void )
 #if !defined( CLIENT_DLL )
 	if ( GetFlags() & FL_ONGROUND )
 	{
-		CBaseEntity	*groundentity = GetGroundEntity();
+		CBaseEntity* groundentity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if ( groundentity )
 		{
 			// On conveyor belt that's moving?
@@ -969,7 +969,7 @@ void CBaseEntity::PhysicsSimulate( void )
 	}
 
 	// If ground entity goes away, make sure FL_ONGROUND is valid
-	if ( !GetGroundEntity() )
+	if ( !GetEngineObject()->GetGroundEntity() )
 	{
 		RemoveFlag( FL_ONGROUND );
 	}
@@ -1282,65 +1282,6 @@ bool CBaseEntity::PhysicsRunSpecificThink( int nContextIndex, BASEPTR thinkFunc 
 
 	// Return whether entity is still valid
 	return ( !IsMarkedForDeletion() );
-}
-
-void CBaseEntity::SetGroundEntity( CBaseEntity *ground )
-{
-	if ( m_hGroundEntity.Get() == ground )
-		return;
-
-#ifdef GAME_DLL
-	// this can happen in-between updates to the held object controller (physcannon, +USE)
-	// so trap it here and release held objects when they become player ground
-	if ( ground && IsPlayer() && ground->GetMoveType()== MOVETYPE_VPHYSICS )
-	{
-		CBasePlayer *pPlayer = ToBasePlayer(this);
-		IPhysicsObject *pPhysGround = ground->VPhysicsGetObject();
-		if ( pPhysGround && pPlayer )
-		{
-			if ( pPhysGround->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
-			{
-				pPlayer->ForceDropOfCarriedPhysObjects( ground );
-			}
-		}
-	}
-#endif
-
-	CBaseEntity *oldGround = m_hGroundEntity;
-	m_hGroundEntity = ground;
-
-	// Just starting to touch
-	if ( !oldGround && ground )
-	{
-		ground->GetEngineObject()->AddEntityToGroundList( this->GetEngineObject());
-	}
-	// Just stopping touching
-	else if ( oldGround && !ground )
-	{
-		oldGround->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval( this->GetEngineObject() );
-	}
-	// Changing out to new ground entity
-	else
-	{
-		oldGround->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval( this->GetEngineObject());
-		ground->GetEngineObject()->AddEntityToGroundList( this->GetEngineObject());
-	}
-
-	// HACK/PARANOID:  This is redundant with the code above, but in case we get out of sync groundlist entries ever, 
-	//  this will force the appropriate flags
-	if ( ground )
-	{
-		AddFlag( FL_ONGROUND );
-	}
-	else
-	{
-		RemoveFlag( FL_ONGROUND );
-	}
-}
-
-CBaseEntity *CBaseEntity::GetGroundEntity( void )
-{
-	return m_hGroundEntity;
 }
 
 void CBaseEntity::StartGroundContact( CBaseEntity *ground )

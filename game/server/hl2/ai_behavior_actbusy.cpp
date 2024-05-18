@@ -1717,7 +1717,7 @@ void CAI_ActBusyBehavior::StartTask( const Task_t *pTask )
 				GetOuter()->AddFlag( FL_FLY );
 			}
 
-			GetOuter()->SetGroundEntity( NULL );
+			GetOuter()->GetEngineObject()->SetGroundEntity( NULL );
 
 			// Fail if we're not on the node & facing the correct way
 			// We only do this check if we're still moving to the busy. This will only
@@ -1819,7 +1819,7 @@ void CAI_ActBusyBehavior::StartTask( const Task_t *pTask )
 				GetOuter()->AddFlag( FL_FLY );
 			}
 
-			GetOuter()->SetGroundEntity( NULL );
+			GetOuter()->GetEngineObject()->SetGroundEntity( NULL );
 
 			m_bMovingToBusy = false;
 			m_bNeedsToPlayExitAnim = HasAnimForActBusy( m_iCurrentBusyAnim, BA_EXIT );

@@ -466,7 +466,7 @@ void CBaseHeadcrab::Leap( const Vector &vecVel )
 	SetTouch( &CBaseHeadcrab::LeapTouch );
 
 	SetCondition( COND_FLOATING_OFF_GROUND );
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 
 	m_flIgnoreWorldCollisionTime = gpGlobals->curtime + HEADCRAB_IGNORE_WORLD_COLLISION_TIME;
 
@@ -1056,7 +1056,7 @@ void CBaseHeadcrab::GatherConditions( void )
 
 	// See if I've landed on an NPC or player or something else illegal
 	ClearCondition( COND_HEADCRAB_ILLEGAL_GROUNDENT );
-	CBaseEntity *ground = GetGroundEntity();
+	CBaseEntity* ground = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	if( (GetFlags() & FL_ONGROUND) && ground && !ground->IsWorld() )
 	{
 		if ( IsHangingFromCeiling() == false )
@@ -1460,7 +1460,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 
 	case TASK_HEADCRAB_HOP_OFF_NPC:
 		{
-			CBaseEntity *ground = GetGroundEntity();
+		CBaseEntity* ground = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 			if( ground )
 			{
 				// If jumping off of a physics object that the player is holding, create a 
@@ -1492,7 +1492,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 
 				vecJumpDir.NormalizeInPlace();
 
-				SetGroundEntity( NULL );
+				GetEngineObject()->SetGroundEntity( NULL );
 				
 				if( HasHeadroom() )
 				{
@@ -1979,7 +1979,7 @@ int CBaseHeadcrab::SelectSchedule( void )
 	if ( HasCondition( COND_FLOATING_OFF_GROUND ) )
 	{
 		SetGravity( 1.0 );
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 		return SCHED_FALL_TO_GROUND;
 	}
 
@@ -2057,7 +2057,7 @@ void CBaseHeadcrab::TraceAttack( const CTakeDamageInfo &info, const Vector &vecD
 		}
 
 		PainSound( newInfo );
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 		ApplyAbsVelocityImpulse( puntDir );
 	}
 
@@ -2315,7 +2315,7 @@ void CBaseHeadcrab::Unburrow( void )
 	RemoveSolidFlags( FSOLID_NOT_SOLID );
 	m_takedamage = DAMAGE_YES;
 
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 
 	// If we have an enemy, come out facing them
 	if ( GetEnemy() )
@@ -2946,7 +2946,7 @@ void CFastHeadcrab::StartTask( const Task_t *pTask )
 				{
 					GetEngineObject()->SetAbsVelocity( m_vecJumpVel );// + 0.5f * Vector(0,0,GetCurrentGravity()) * flInterval;
 					SetGravity( UTIL_ScaleForGravity( 1600 ) );
-					SetGroundEntity( NULL );
+					GetEngineObject()->SetGroundEntity( NULL );
 					SetNavType( NAV_JUMP );
 
 					if( fJumpIsLeft )
@@ -3455,7 +3455,7 @@ void CBlackHeadcrab::TouchDamage( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::Eject( const QAngle &vecAngles, float flVelocityScale, CBaseEntity *pEnemy )
 {
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 	m_spawnflags |= SF_NPC_FALL_TO_GROUND;
 
 	SetIdealState( NPC_STATE_ALERT );
@@ -3538,7 +3538,7 @@ bool CBlackHeadcrab::FInViewCone( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 void CBlackHeadcrab::JumpFlinch( const Vector *pvecDir )
 {
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 
 	//
 	// Take him off ground so engine doesn't instantly reset FL_ONGROUND.

@@ -1985,7 +1985,7 @@ void CNPC_Barnacle::LostPrey( bool bRemoveRagdoll )
 
 				pVictim->GetEngineObject()->SetAbsAngles( newAngles );
 			}
-			pVictim->SetGroundEntity( NULL );
+			pVictim->GetEngineObject()->SetGroundEntity( NULL );
 		}
 		else if ( IsEnemyAPhysicsObject() )
 		{

@@ -79,7 +79,7 @@ static CTempEnts g_TempEnts;
 ITempEnts *tempents = ( ITempEnts * )&g_TempEnts;
 #endif
 
-
+static CEntityFactory<C_LocalTempEntity> g_C_LocalTempEntity_Factory("", "C_LocalTempEntity");
 
 
 C_LocalTempEntity::C_LocalTempEntity()

@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-//========= Copyright © 1996-2001, Valve LLC, All rights reserved. ============
+//========= Copyright ?1996-2001, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
@@ -83,7 +83,7 @@ bool CHL1GameMovement::CheckJumpButton( void )
 	}
 
 	// No more effect
- 	if (m_pHL1Player->GetGroundEntity() == NULL)
+ 	if (m_pHL1Player->GetEngineObject()->GetGroundEntity() == NULL)
 	{
 		mv->m_nOldButtons |= IN_JUMP;
 		return false;		// in air, so no effect
@@ -165,7 +165,7 @@ void CHL1GameMovement::Duck( void )
 	int buttonsReleased	=  buttonsChanged & mv->m_nOldButtons;		// The changed ones which were previously down are "released"
 
 	// Check to see if we are in the air.
-	bool bInAir = ( player->GetGroundEntity() == NULL );
+	bool bInAir = ( player->GetEngineObject()->GetGroundEntity() == NULL );
 	bool bInDuck = ( player->GetFlags() & FL_DUCKING ) ? true : false;
 
 	if ( mv->m_nButtons & IN_DUCK )

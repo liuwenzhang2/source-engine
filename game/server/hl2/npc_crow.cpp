@@ -228,7 +228,7 @@ void CNPC_Crow::HandleAnimEvent( animevent_t *pEvent )
 
 	if( pEvent->event == AE_CROW_HOP )
 	{
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 
 		//
 		// Take him off ground so engine doesn't instantly reset FL_ONGROUND.
@@ -675,7 +675,7 @@ void CNPC_Crow::SetFlyingState( FlyState_t eState )
 	if ( eState == FlyState_Flying )
 	{
 		// Flying
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 		AddFlag( FL_FLY );
 		SetNavType( NAV_FLY );
 		CapabilitiesRemove( bits_CAP_MOVE_GROUND );
@@ -1408,7 +1408,7 @@ bool CNPC_Crow::HandleInteraction( int interactionType, void *data, CBaseCombatC
 	{
 		if ( GetFlags() & FL_ONGROUND )
 		{
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 		}
 
 		// return ideal grab position

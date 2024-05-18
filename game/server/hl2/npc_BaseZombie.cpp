@@ -632,7 +632,7 @@ int CNPC_BaseZombie::MeleeAttack1Conditions ( float flDot, float flDist )
 
 #ifdef HL2_EPISODIC
 
-	if ( !((CBaseEntity*)tr.m_pEnt)->IsWorld() && GetEnemy() && GetEnemy()->GetGroundEntity() == tr.m_pEnt )
+	if (!((CBaseEntity*)tr.m_pEnt)->IsWorld() && GetEnemy() && (GetEnemy()->GetEngineObject()->GetGroundEntity() ? GetEnemy()->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == tr.m_pEnt)
 	{
 		//Try to swat whatever the player is standing on instead of acting like a dill.
 		return COND_CAN_MELEE_ATTACK1;
@@ -2272,7 +2272,7 @@ void CNPC_BaseZombie::BecomeTorso( const Vector &vecTorsoForce, const Vector &ve
 		origin.z += 40;
 		GetEngineObject()->SetAbsOrigin( origin );
 
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 		// assume zombie mass ~ 100 kg
 		ApplyAbsVelocityImpulse( vecTorsoForce * (1.0 / 100.0) );
 	}

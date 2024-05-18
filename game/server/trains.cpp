@@ -1672,7 +1672,7 @@ static CBaseEntity *FindPhysicsBlockerForHierarchy( CBaseEntity *pParentEntity )
 void CFuncTrackTrain::Blocked( CBaseEntity *pOther )
 {
 	// Blocker is on-ground on the train
-	if ( ( pOther->GetFlags() & FL_ONGROUND ) && pOther->GetGroundEntity() == this )
+	if ( ( pOther->GetFlags() & FL_ONGROUND ) && pOther->GetEngineObject()->GetGroundEntity() == this->GetEngineObject() )
 	{
 		DevMsg( 1, "TRAIN(%s): Blocked by %s\n", GetDebugName(), pOther->GetClassname() );
 		float deltaSpeed = fabs(m_flSpeed);

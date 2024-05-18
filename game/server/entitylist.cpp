@@ -207,6 +207,7 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_iParentAttachment, FIELD_CHARACTER),
 	DEFINE_FIELD(m_iEFlags, FIELD_INTEGER),
 	DEFINE_FIELD(touchStamp, FIELD_INTEGER),
+	DEFINE_FIELD(m_hGroundEntity, FIELD_EHANDLE),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -285,6 +286,7 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropVector(SENDINFO(m_vecVelocity), 0, SPROP_NOSCALE, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocity),
 	SendPropEHandle(SENDINFO_NAME(m_hMoveParent, moveparent), 0, SendProxy_MoveParentToInt),
 	SendPropInt(SENDINFO(m_iParentAttachment), NUM_PARENTATTACHMENT_BITS, SPROP_UNSIGNED),
+	SendPropEHandle(SENDINFO(m_hGroundEntity), SPROP_CHANGES_OFTEN),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -2484,6 +2486,62 @@ void CEngineObjectInternal::PhysicsRemoveGroundList()
 	}
 }
 
+void CEngineObjectInternal::SetGroundEntity(IEngineObjectServer* ground)
+{
+	if ((m_hGroundEntity.Get() ? m_hGroundEntity.Get()->GetEngineObject() : NULL) == ground)
+		return;
+
+	// this can happen in-between updates to the held object controller (physcannon, +USE)
+	// so trap it here and release held objects when they become player ground
+	if (ground && m_pOuter->IsPlayer() && ground->GetOuter()->GetMoveType() == MOVETYPE_VPHYSICS)
+	{
+		CBasePlayer* pPlayer = static_cast<CBasePlayer*>(this->m_pOuter);
+		IPhysicsObject* pPhysGround = ground->GetOuter()->VPhysicsGetObject();
+		if (pPhysGround && pPlayer)
+		{
+			if (pPhysGround->GetGameFlags() & FVPHYSICS_PLAYER_HELD)
+			{
+				pPlayer->ForceDropOfCarriedPhysObjects(ground->GetOuter());
+			}
+		}
+	}
+
+	CBaseEntity* oldGround = m_hGroundEntity;
+	m_hGroundEntity = ground ? ground->GetOuter() : NULL;
+
+	// Just starting to touch
+	if (!oldGround && ground)
+	{
+		ground->AddEntityToGroundList(this);
+	}
+	// Just stopping touching
+	else if (oldGround && !ground)
+	{
+		oldGround->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval(this);
+	}
+	// Changing out to new ground entity
+	else
+	{
+		oldGround->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval(this);
+		ground->AddEntityToGroundList(this);
+	}
+
+	// HACK/PARANOID:  This is redundant with the code above, but in case we get out of sync groundlist entries ever, 
+	//  this will force the appropriate flags
+	if (ground)
+	{
+		m_pOuter->AddFlag(FL_ONGROUND);
+	}
+	else
+	{
+		m_pOuter->RemoveFlag(FL_ONGROUND);
+	}
+}
+
+CEngineObjectInternal* CEngineObjectInternal::GetGroundEntity(void)
+{
+	return m_hGroundEntity.Get() ? (CEngineObjectInternal*)m_hGroundEntity.Get()->GetEngineObject() : NULL;
+}
 
 
 struct collidelist_t

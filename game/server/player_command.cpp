@@ -97,7 +97,7 @@ void CPlayerMove::CheckMovingGround( CBasePlayer *player, double frametime )
 
 	if ( player->GetFlags() & FL_ONGROUND )
 	{
-		groundentity = player->GetGroundEntity();
+		groundentity = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if ( groundentity && ( groundentity->GetFlags() & FL_CONVEYOR) )
 		{
 			Vector vecNewVelocity;

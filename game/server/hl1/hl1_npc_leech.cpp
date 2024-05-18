@@ -637,7 +637,7 @@ void CNPC_Leech::UpdateMotion( void )
 	else if ( GetMoveType() == MOVETYPE_FLYGRAVITY )
 	{
 		SetMoveType( MOVETYPE_FLY );
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 
 	//  TODO
 		RecalculateWaterlevel();
@@ -711,7 +711,7 @@ void CNPC_Leech::Event_Killed( const CTakeDamageInfo &info )
 
 		
 		SetGravity ( 0.02 );
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 		SetActivity( ACT_DIESIMPLE );
 	}
 	else

@@ -70,7 +70,7 @@ void CShower::Think( void )
 		SetNextThink( gpGlobals->curtime + 0.1f );
 	else
 		UTIL_Remove( this );
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 }
 
 

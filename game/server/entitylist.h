@@ -379,6 +379,9 @@ public:
 	void PhysicsRemoveGround(servergroundlink_t* link);
 	void PhysicsRemoveGroundList();
 
+	void SetGroundEntity(IEngineObjectServer* ground);
+	CEngineObjectInternal* GetGroundEntity(void);
+	CEngineObjectInternal* GetGroundEntity(void) const { return const_cast<CEngineObjectInternal*>(this)->GetGroundEntity(); }
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -427,6 +430,8 @@ private:
 	// used so we know when things are no longer touching
 	int		touchStamp;
 	int		m_fDataObjectTypes;
+
+	CNetworkHandle(CBaseEntity, m_hGroundEntity);
 
 
 };

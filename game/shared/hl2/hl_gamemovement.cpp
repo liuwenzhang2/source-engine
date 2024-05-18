@@ -543,7 +543,7 @@ void CHL2GameMovement::FullLadderMove()
 		mv->m_nOldButtons &= ~IN_JUMP;
 	}
 
-	player->SetGroundEntity( NULL );
+	player->GetEngineObject()->SetGroundEntity( NULL );
 
 	// Remember old positions in case we cancel this movement
 	Vector oldVelocity	= mv->m_vecVelocity;
@@ -935,7 +935,7 @@ bool CHL2GameMovement::LadderMove( void )
 		{
 			// Tracker 6625:  Don't need to be leaping to auto mount using this method...
 			// But if we are on the ground, then we must not be backing into the ladder (Tracker 12961)
-			bool onground = player->GetGroundEntity() ? true : false;
+			bool onground = player->GetEngineObject()->GetGroundEntity() ? true : false;
 			if ( !onground || ( mv->m_flForwardMove > 0.0f ) )
 			{
 				if ( CheckLadderAutoMountCone( bestLadder, bestOrigin, 15.0f, 32.0f ) )

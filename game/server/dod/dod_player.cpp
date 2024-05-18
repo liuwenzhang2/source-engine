@@ -4120,9 +4120,9 @@ CBaseEntity *CDODPlayer::FindUseEntity()
 	// check ground entity first
 	// if you've got a useable ground entity, then shrink the cone of this search to 45 degrees
 	// otherwise, search out in a 90 degree cone (hemisphere)
-	if ( GetGroundEntity() && IsUseableEntity(GetGroundEntity(), FCAP_USE_ONGROUND) )
+	if (GetEngineObject()->GetGroundEntity() && IsUseableEntity(GetEngineObject()->GetGroundEntity()->GetOuter(), FCAP_USE_ONGROUND))
 	{
-		pNearest = GetGroundEntity();
+		pNearest = GetEngineObject()->GetGroundEntity()->GetOuter();
 		nearestDot = CONE_45_DEGREES;
 	}
 

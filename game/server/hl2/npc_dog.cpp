@@ -950,7 +950,7 @@ void CNPC_Dog::PickupOrCatchObject( const char *pAttachmentName )
 		m_hPhysicsEnt->GetEngineObject()->SetLocalOrigin( vec3_origin );
 		m_hPhysicsEnt->GetEngineObject()->SetLocalAngles( vec3_angle );
 
-		m_hPhysicsEnt->SetGroundEntity( NULL );
+		m_hPhysicsEnt->GetEngineObject()->SetGroundEntity( NULL );
 		
 
 		if ( m_hPhysicsEnt->GetOwnerEntity() == NULL )

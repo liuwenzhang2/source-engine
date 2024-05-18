@@ -212,7 +212,7 @@ void CSnark::HuntThink( void )
 	//FIXME: There's a problem in this movetype that causes it to set a ground entity but never recheck to clear it
 	//		 For now, we stomp it clear and force it to revalidate -- jdw
 
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 	PhysicsStepRecheckGround();
 
 	// explode when ready
@@ -388,7 +388,7 @@ void CSnark::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity )
 	{
 		if ( pEntity->IsStandable() )
 		{
-			SetGroundEntity( pEntity );
+			GetEngineObject()->SetGroundEntity( pEntity->GetEngineObject() );
 		}
 
 		// Reset velocities.

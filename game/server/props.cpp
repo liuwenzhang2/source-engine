@@ -998,7 +998,7 @@ void CBreakableProp::BreakablePropTouch( CBaseEntity *pOther )
 		}
 	}
 
-	if ( HasSpawnFlags( SF_PHYSPROP_PRESSURE ) && pOther->GetGroundEntity() == this )
+	if ( HasSpawnFlags( SF_PHYSPROP_PRESSURE ) && pOther->GetEngineObject()->GetGroundEntity() == this->GetEngineObject() )
 	{
 		// can be broken when stood upon
 		// play creaking sound here.

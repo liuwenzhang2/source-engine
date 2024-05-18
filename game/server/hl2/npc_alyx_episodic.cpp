@@ -860,7 +860,7 @@ bool CNPC_Alyx::ShouldPlayerAvoid( void )
 #if 1
 	if( IsCurSchedule( SCHED_PC_GET_OFF_COMPANION, false) )
 	{
-		CBaseEntity *pGroundEnt = GetGroundEntity();
+		CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if( pGroundEnt != NULL && pGroundEnt->IsPlayer() )
 		{
 			if(GetEngineObject()->GetAbsOrigin().z < pGroundEnt->EyePosition().z )

@@ -4214,7 +4214,7 @@ void CNPC_AttackHelicopter::Flight( void )
 	if( GetFlags() & FL_ONGROUND )
 	{
 		// This would be really bad.
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 	}
 
 	// Determine the distances we must lie from the path

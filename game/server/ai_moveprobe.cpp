@@ -380,9 +380,9 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 			NDebugOverlay::Box( trace.endpos, WorldAlignMins(), WorldAlignMaxs(), 255, 0, 0, 0, 5 );
 
 		Assert( pResult->endPoint == args.vecStart );
-		if ( const_cast<CAI_MoveProbe *>(this)->GetOuter()->GetGroundEntity() )
+		if ( const_cast<CAI_MoveProbe *>(this)->GetOuter()->GetEngineObject()->GetGroundEntity() )
 		{
-			pResult->pBlocker = const_cast<CAI_MoveProbe *>(this)->GetOuter()->GetGroundEntity();
+			pResult->pBlocker = const_cast<CAI_MoveProbe *>(this)->GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter();
 		}
 		else
 		{
@@ -400,7 +400,7 @@ bool CAI_MoveProbe::CheckStep( const CheckStepArgs_t &args, CheckStepResult_t *p
 	// are capable of standing on. Always true ffor our current ground ent
 	// otherwise we'll be stuck forever
 	CBaseEntity *pFloor = (CBaseEntity*)trace.m_pEnt;
-	if ( pFloor != GetOuter()->GetGroundEntity() && !CanStandOn( pFloor ) )
+	if (pFloor != (GetOuter()->GetEngineObject()->GetGroundEntity() ? GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) && !CanStandOn(pFloor))
 	{
 		if ( g_bAIDebugStep )
 			NDebugOverlay::Cross3D( trace.endpos, 32, 255, 0, 0, true, 5 );

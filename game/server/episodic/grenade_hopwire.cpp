@@ -140,7 +140,7 @@ void CGravityVortexController::PullPlayersInRange( void )
 	// Make sure the player moves
 	if ( vecForce.z > 0 && ( pPlayer->GetFlags() & FL_ONGROUND) )
 	{
-		pPlayer->SetGroundEntity( NULL );
+		pPlayer->GetEngineObject()->SetGroundEntity( NULL );
 	}
 }
 

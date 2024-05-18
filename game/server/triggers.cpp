@@ -1705,7 +1705,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 
 		if ( vecAbsDir.z > 0 )
 		{
-			pOther->SetGroundEntity( NULL );
+			pOther->GetEngineObject()->SetGroundEntity( NULL );
 		}
 		UTIL_Remove( this );
 		return;
@@ -1752,7 +1752,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 			}
 			if ( vecPush.z > 0 && (pOther->GetFlags() & FL_ONGROUND) )
 			{
-				pOther->SetGroundEntity( NULL );
+				pOther->GetEngineObject()->SetGroundEntity( NULL );
 				Vector origin = pOther->GetEngineObject()->GetAbsOrigin();
 				origin.z += 1.0f;
 				pOther->GetEngineObject()->SetAbsOrigin( origin );
@@ -1852,7 +1852,7 @@ void CTriggerTeleport::Touch( CBaseEntity *pOther )
 		}
 	}
 
-	pOther->SetGroundEntity( NULL );
+	pOther->GetEngineObject()->SetGroundEntity( NULL );
 	
 	Vector tmp = pentTarget->GetEngineObject()->GetAbsOrigin();
 

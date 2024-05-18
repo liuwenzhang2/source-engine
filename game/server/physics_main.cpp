@@ -232,7 +232,7 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 
 	RelinkPusherList(pPusherHandles);
 	info.m_bPusherIsGround = false;
-	if ( pBlocker->GetGroundEntity() && pBlocker->GetGroundEntity()->GetEngineObject()->GetRootMoveParent()->GetOuter() == m_rgPusher[0].m_pEntity)
+	if ( pBlocker->GetEngineObject()->GetGroundEntity() && pBlocker->GetEngineObject()->GetGroundEntity()->GetRootMoveParent()->GetOuter() == m_rgPusher[0].m_pEntity)
 	{
 		info.m_bPusherIsGround = true;
 	}
@@ -585,7 +585,7 @@ private:
 
 	bool IsStandingOnPusher( CBaseEntity *pCheck )
 	{
-		CBaseEntity *pGroundEnt = pCheck->GetGroundEntity();
+		CBaseEntity* pGroundEnt = pCheck->GetEngineObject()->GetGroundEntity() ? pCheck->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if ( pCheck->GetFlags() & FL_ONGROUND || pGroundEnt )
 		{
 			for ( int i = m_pPushedEntities->m_rgPusher.Count(); --i >= 0; )
@@ -1066,12 +1066,12 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 			if (CanStandOn((CBaseEntity*)trace.m_pEnt ))
 			{
 				// keep track of time when changing ground entity
-				if (GetGroundEntity() != trace.m_pEnt)
+				if (!GetEngineObject()->GetGroundEntity()|| GetEngineObject()->GetGroundEntity()->GetOuter() != trace.m_pEnt)
 				{
 					SetGroundChangeTime( gpGlobals->curtime + (flTime - (1 - trace.fraction) * time_left) );
 				}
 
-				SetGroundEntity((CBaseEntity*)trace.m_pEnt );
+				GetEngineObject()->SetGroundEntity(((CBaseEntity*)trace.m_pEnt)->GetEngineObject() );
 			}
 		}
 		if (!trace.plane.normal[2])
@@ -1513,9 +1513,9 @@ void CBaseEntity::PhysicsCustom()
 		return;
 
 	// Moving upward, off the ground, or  resting on a client/monster, remove FL_ONGROUND
-	if (GetEngineObject()->GetLocalVelocity()[2] > 0 || !GetGroundEntity() || !GetGroundEntity()->IsStandable() )
+	if (GetEngineObject()->GetLocalVelocity()[2] > 0 || !GetEngineObject()->GetGroundEntity() || !GetEngineObject()->GetGroundEntity()->GetOuter()->IsStandable())
 	{
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 	}
 
 	// NOTE: The entity must set the position, angles, velocity in its custom movement
@@ -1826,7 +1826,7 @@ void CBaseEntity::PhysicsStepRecheckGround()
 
 			if ( trace.startsolid )
 			{
-				SetGroundEntity((CBaseEntity*)trace.m_pEnt );
+				GetEngineObject()->SetGroundEntity((CBaseEntity*)trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->GetEngineObject() : NULL);
 				return;
 			}
 		}
@@ -1883,7 +1883,7 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 	{
 		Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 		// apply friction
 		// let dead monsters who aren't completely onground slide
 		if ( wasonground )

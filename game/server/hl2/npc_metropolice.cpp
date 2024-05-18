@@ -5003,7 +5003,7 @@ void CNPC_MetroPolice::GatherConditions( void )
 	float distToPlayerSqr = ( pPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 	
 	// See if we're too close
-	if ( pPlayer->GetGroundEntity() == this )
+	if ( pPlayer->GetEngineObject()->GetGroundEntity() == this->GetEngineObject())
 	{
 		// Always beat a player on our head
 		m_iNumPlayerHits = 0;

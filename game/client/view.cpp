@@ -428,7 +428,7 @@ void CViewRender::DriftPitch (void)
 #if defined( REPLAY_ENABLED )
 	if ( engine->IsHLTV() || g_pEngineClientReplay->IsPlayingReplayDemo() || ( player->GetGroundEntity() == NULL ) || engine->IsPlayingDemo() )
 #else
-	if ( engine->IsHLTV() || ( player->GetGroundEntity() == NULL ) || engine->IsPlayingDemo() )
+	if ( engine->IsHLTV() || ( player->GetEngineObject()->GetGroundEntity() == NULL ) || engine->IsPlayingDemo() )
 #endif
 	{
 		m_PitchDrift.driftmove = 0;

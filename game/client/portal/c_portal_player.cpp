@@ -668,7 +668,7 @@ void C_Portal_Player::FixTeleportationRoll( void )
 	}
 
 	bool bForcePitchReorient = ( vAbsAngles[ROLL] > 175.0f && vCurrentForward.z > 0.99f );
-	bool bOnGround = ( GetGroundEntity() != NULL );
+	bool bOnGround = (GetEngineObject()->GetGroundEntity() != NULL );
 
 	if ( bForcePitchReorient )
 	{

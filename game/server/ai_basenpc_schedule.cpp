@@ -2805,7 +2805,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 			if ( HasMovement( GetSequence() ) || m_hCine->m_bIgnoreGravity )
 			{
 				AddFlag( FL_FLY );
-				SetGroundEntity( NULL );
+				GetEngineObject()->SetGroundEntity( NULL );
 			}
 
 			if (m_hCine)
@@ -4116,7 +4116,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 				if( trace.m_pEnt )
 				{
 					// Found something!
-					SetGroundEntity((CBaseEntity*)trace.m_pEnt );
+					GetEngineObject()->SetGroundEntity((CBaseEntity*)trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->GetEngineObject() : NULL);
 					TaskComplete();
 				}
 				else
@@ -4717,7 +4717,7 @@ int CAI_BaseNPC::SelectSchedule( void )
 	if ( HasCondition( COND_FLOATING_OFF_GROUND ) )
 	{
 		SetGravity( 1.0 );
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 		return SCHED_FALL_TO_GROUND;
 	}
 

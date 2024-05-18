@@ -2895,7 +2895,7 @@ int CNPC_Hunter::SelectCombatSchedule()
 		}
 	}
 
-	if ( pEnemy->GetGroundEntity() == this )
+	if ( pEnemy->GetEngineObject()->GetGroundEntity() == this->GetEngineObject() )
 	{
 		return SCHED_HUNTER_MELEE_ATTACK1;
 	}
@@ -5023,7 +5023,7 @@ int CNPC_Hunter::MeleeAttack1Conditions ( float flDot, float flDist )
 		}
 	}*/
 
-	if ( !((CBaseEntity*)tr.m_pEnt)->IsWorld() && GetEnemy() && GetEnemy()->GetGroundEntity() == tr.m_pEnt )
+	if (!((CBaseEntity*)tr.m_pEnt)->IsWorld() && GetEnemy() && (GetEnemy()->GetEngineObject()->GetGroundEntity() ? GetEnemy()->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == tr.m_pEnt)
 	{
 		// Try to swat whatever the player is standing on instead of acting like a dill.
 		return COND_CAN_MELEE_ATTACK1;

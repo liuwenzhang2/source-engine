@@ -161,7 +161,7 @@ void CDODGameMovement::SetPlayerSpeed( void )
 	}
 	else if ( m_pDODPlayer->m_Shared.IsProne() && 
 			 !m_pDODPlayer->m_Shared.IsGettingUpFromProne() &&
-			 m_pDODPlayer->GetGroundEntity() != NULL )
+			 m_pDODPlayer->GetEngineObject()->GetGroundEntity() != NULL )
 	{
 		if ( bZoomed )
 			mv->m_flClientMaxSpeed = PLAYER_SPEED_PRONE_ZOOMED;
@@ -208,7 +208,7 @@ void CDODGameMovement::SetPlayerSpeed( void )
 		}
 	}
 
-	if ( m_pDODPlayer->GetGroundEntity() != NULL )
+	if ( m_pDODPlayer->GetEngineObject()->GetGroundEntity() != NULL )
 	{
 		if( m_pDODPlayer->m_Shared.IsGoingProne() )
 		{
@@ -366,7 +366,7 @@ void CDODGameMovement::CheckParameters( void )
 void CDODGameMovement::CheckFalling( void )
 {
 	// if we landed on the ground
-	if ( player->GetGroundEntity() != NULL && !IsDead() )
+	if ( player->GetEngineObject()->GetGroundEntity() != NULL && !IsDead() )
 	{
 		if ( player->m_Local.m_flFallVelocity >= 300 )
 		{
@@ -717,7 +717,7 @@ bool CDODGameMovement::CheckJumpButton( void )
 	}
 
 	// No more effect
- 	if (m_pDODPlayer->GetGroundEntity() == NULL)
+ 	if (m_pDODPlayer->GetEngineObject()->GetGroundEntity() == NULL)
 	{
 		mv->m_nOldButtons |= IN_JUMP;
 		return false;		// in air, so no effect
@@ -854,7 +854,7 @@ bool CDODGameMovement::CanUnprone()
 		vecMaxs = VEC_HULL_MAX_SCALED( player );
 	}
 
-	if ( player->GetGroundEntity() != NULL )
+	if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 	{
 		for ( i = 0; i < 3; i++ )
 		{
@@ -905,7 +905,7 @@ void CDODGameMovement::FinishUnDuck( void )
 
 	VectorCopy( mv->GetAbsOrigin(), newOrigin );
 
-	if ( player->GetGroundEntity() != NULL )
+	if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 	{
 		for ( i = 0; i < 3; i++ )
 		{
@@ -954,7 +954,7 @@ void CDODGameMovement::FinishDuck( void )
  	{
 		Vector org = mv->GetAbsOrigin();
 
-		if ( player->GetGroundEntity() != NULL )
+		if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 		{
 			org -= VEC_DUCK_HULL_MIN_SCALED( player ) - VEC_HULL_MIN_SCALED( player );
 		}
@@ -1277,7 +1277,7 @@ void CDODGameMovement::Duck( void )
 			{
 				// Finish ducking immediately if duck time is over or not on ground
 				if ( ( duckseconds > TIME_TO_DUCK ) || 
-					( player->GetGroundEntity() == NULL ) ||
+					( player->GetEngineObject()->GetGroundEntity() == NULL ) ||
 					alreadyDucked)
 				{
 					FinishDuck();
@@ -1294,7 +1294,7 @@ void CDODGameMovement::Duck( void )
 		{
 			// Try to unduck unless automovement is not allowed
 			// NOTE: When not onground, you can always unduck
-			if ( player->m_Local.m_bAllowAutoMovement || player->GetGroundEntity() == NULL )
+			if ( player->m_Local.m_bAllowAutoMovement || player->GetEngineObject()->GetGroundEntity() == NULL )
 			{
 				if ( (buttonsReleased & IN_DUCK ) && ( player->GetFlags() & FL_DUCKING ) )
 				{
@@ -1313,7 +1313,7 @@ void CDODGameMovement::Duck( void )
 					{
 						// Finish ducking immediately if duck time is over or not on ground
 						if ( ( duckseconds > TIME_TO_UNDUCK ) ||
-							 ( player->GetGroundEntity() == NULL ) )
+							 ( player->GetEngineObject()->GetGroundEntity() == NULL ) )
 						{
 							FinishUnDuck();
 						}

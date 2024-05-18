@@ -435,7 +435,7 @@ void NextBotCombatCharacter::PerformCustomPhysics( Vector *pNewPosition, Vector 
 	if ( mover )
 	{
 		// hack to keep ground entity from being NULL'd when Z velocity is positive
-		SetGroundEntity( mover->GetGround() );
+		GetEngineObject()->SetGroundEntity(mover->GetGround() ? mover->GetGround()->GetEngineObject() : NULL);
 	}
 }
 

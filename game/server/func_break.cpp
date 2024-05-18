@@ -597,7 +597,7 @@ void CBreakable::BreakTouch( CBaseEntity *pOther )
 	}
 
 	// can I be broken when stood upon?
-	if ( HasSpawnFlags( SF_BREAK_PRESSURE ) && pOther->GetGroundEntity() == this )
+	if ( HasSpawnFlags( SF_BREAK_PRESSURE ) && pOther->GetEngineObject()->GetGroundEntity() && pOther->GetEngineObject()->GetGroundEntity()->GetOuter() == this)
 	{
 		// play creaking sound here.
 		DamageSound();
@@ -893,7 +893,7 @@ void CBreakable::ResetOnGroundFlags(void)
 	{
 		for ( int i = 0; i < count; i++ )
 		{
-			pList[i]->SetGroundEntity( (CBaseEntity *)NULL );
+			pList[i]->GetEngineObject()->SetGroundEntity( NULL );
 		}
 	}
 

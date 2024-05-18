@@ -1025,7 +1025,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 			else
 			{
 				//curl the player up into a little ball
-				pOtherAsPlayer->SetGroundEntity( NULL );
+				pOtherAsPlayer->GetEngineObject()->SetGroundEntity( NULL );
 
 				if( !pOtherAsPlayer->IsDucked() )
 				{
@@ -1181,7 +1181,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 
 	//do the actual teleportation
 	{
-		pOther->SetGroundEntity( NULL );
+		pOther->GetEngineObject()->SetGroundEntity( NULL );
 
 		if( bPlayer )
 		{

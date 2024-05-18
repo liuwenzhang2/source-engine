@@ -3878,7 +3878,7 @@ void C_BaseEntity::UpdateOnRemove( void )
 
 	Assert( !GetEngineObject()->GetMoveParent() );
 	GetEngineObject()->UnlinkFromHierarchy();
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 
 	Term();
 	ClearDataChangedEvent(m_DataChangeEventRef);
@@ -4407,9 +4407,9 @@ int C_BaseEntity::Restore( IRestore &restore )
 	GetEngineObject()->ResetRgflCoordinateFrame();
 
 	// Restablish ground entity
-	if ( m_hGroundEntity != NULL )
+	if (GetEngineObject()->GetGroundEntity() != NULL )
 	{
-		m_hGroundEntity->GetEngineObject()->AddEntityToGroundList(this->GetEngineObject());
+		GetEngineObject()->GetGroundEntity()->AddEntityToGroundList(this->GetEngineObject());
 	}
 
 	return status;

@@ -1306,12 +1306,6 @@ public:
 	// Use CDamageModifier to hook in damage modifiers on a guy.
 	virtual float			GetReceivedDamageScale( CBaseEntity *pAttacker );
 
- 
-
-	void					SetGroundEntity( CBaseEntity *ground );
-	CBaseEntity				*GetGroundEntity( void );
-	CBaseEntity				*GetGroundEntity( void ) const { return const_cast<CBaseEntity *>(this)->GetGroundEntity(); }
-
 	// Gets the velocity we impart to a player standing on us
 	virtual void			GetGroundVelocityToApply( Vector &vecGroundVel ) { vecGroundVel = vec3_origin; }
 
@@ -1692,7 +1686,6 @@ private:
 	CNetworkVarForDerived( unsigned char, m_nWaterLevel );
 	float			m_flNavIgnoreUntilTime;
 
-	CNetworkHandleForDerived( CBaseEntity, m_hGroundEntity );
 	float			m_flGroundChangeTime; // Time that the ground entity changed
 	
 	string_t		m_ModelName;

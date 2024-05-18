@@ -809,7 +809,7 @@ void CPrediction::FinishMove( C_BasePlayer *player, CUserCmd *ucmd, CMoveData *m
 	// NOTE: Don't copy this.  the movement code modifies its local copy but is not expecting to be authoritative
 	//player->m_flMaxspeed = move->m_flClientMaxSpeed;
 	
-	m_hLastGround = player->GetGroundEntity();
+	m_hLastGround = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
  
 	player->GetEngineObject()->SetLocalOrigin( move->GetAbsOrigin() );
 
@@ -1047,7 +1047,7 @@ void CPrediction::SetIdealPitch ( C_BasePlayer *player, const Vector& origin, co
 	int		steps;
 	trace_t tr;
 
-	if ( player->GetGroundEntity() == NULL )
+	if ( player->GetEngineObject()->GetGroundEntity() == NULL )
 		return;
 	
 	// Don't do this on the 360..
@@ -1595,7 +1595,7 @@ bool CPrediction::PerformPrediction( bool received_new_world_update, C_BasePlaye
 	m_bInPrediction = true;
 
 	// undo interpolation changes for entities we stand on
-	C_BaseEntity *entity = localPlayer->GetGroundEntity();
+	C_BaseEntity* entity = localPlayer->GetEngineObject()->GetGroundEntity() ? localPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 
 	while ( entity && entity->entindex() > 0)
 	{

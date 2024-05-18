@@ -279,7 +279,7 @@ bool CDODBipodWeapon::AttemptToDeploy( void )
 {
 	CDODPlayer *pPlayer = ToDODPlayer( GetPlayerOwner() );
 
-	if ( pPlayer->GetGroundEntity() == NULL )
+	if ( pPlayer->GetEngineObject()->GetGroundEntity() == NULL )
 		return false;
 
 	if ( pPlayer->m_Shared.IsGettingUpFromProne() || pPlayer->m_Shared.IsGoingProne() )

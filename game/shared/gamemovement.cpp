@@ -1496,7 +1496,7 @@ void CGameMovement::WaterMove( void )
 	}
 	else
 	{
-		if ( !player->GetGroundEntity() )
+		if ( !player->GetEngineObject()->GetGroundEntity() )
 		{
 			TryPlayerMove();
 			VectorSubtract( mv->m_vecVelocity, player->GetBaseVelocity(), mv->m_vecVelocity );
@@ -1631,7 +1631,7 @@ void CGameMovement::Friction( void )
 	drop = 0;
 
 	// apply ground friction
-	if (player->GetGroundEntity() != NULL)  // On an entity that is the ground
+	if (player->GetEngineObject()->GetGroundEntity() != NULL)  // On an entity that is the ground
 	{
 		friction = sv_friction.GetFloat() * player->m_surfaceFriction;
 
@@ -1909,7 +1909,7 @@ void CGameMovement::WalkMove( void )
 	AngleVectors (mv->m_vecViewAngles, &forward, &right, &up);  // Determine movement angles
 
 	CHandle< CBaseEntity > oldground;
-	oldground = player->GetGroundEntity();
+	oldground = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	
 	// Copy movement amounts
 	fmove = mv->m_flForwardMove;
@@ -2072,7 +2072,7 @@ void CGameMovement::FullWalkMove( )
 		CategorizePosition();
 
 		// If we are on ground, no downward velocity.
-		if ( player->GetGroundEntity() != NULL )
+		if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 		{
 			mv->m_vecVelocity[2] = 0;			
 		}
@@ -2092,7 +2092,7 @@ void CGameMovement::FullWalkMove( )
 
 		// Fricion is handled before we add in any base velocity. That way, if we are on a conveyor, 
 		//  we don't slow when standing still, relative to the conveyor.
-		if (player->GetGroundEntity() != NULL)
+		if (player->GetEngineObject()->GetGroundEntity() != NULL)
 		{
 			mv->m_vecVelocity[2] = 0.0;
 			Friction();
@@ -2101,7 +2101,7 @@ void CGameMovement::FullWalkMove( )
 		// Make sure velocity is valid.
 		CheckVelocity();
 
-		if (player->GetGroundEntity() != NULL)
+		if (player->GetEngineObject()->GetGroundEntity() != NULL)
 		{
 			WalkMove();
 		}
@@ -2123,7 +2123,7 @@ void CGameMovement::FullWalkMove( )
 		}
 
 		// If we are on ground, no downward velocity.
-		if ( player->GetGroundEntity() != NULL )
+		if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 		{
 			mv->m_vecVelocity[2] = 0;
 		}
@@ -2392,7 +2392,7 @@ bool CGameMovement::CheckJumpButton( void )
 	}
 
 	// No more effect
- 	if (player->GetGroundEntity() == NULL)
+ 	if (player->GetEngineObject()->GetGroundEntity() == NULL)
 	{
 		mv->m_nOldButtons |= IN_JUMP;
 		return false;		// in air, so no effect
@@ -2717,7 +2717,7 @@ int CGameMovement::TryPlayerMove( Vector *pFirstDest, trace_t *pFirstTrace )
 		//  and pressing forward and nobody was really using this bounce/reflection feature anyway...
 		if ( numplanes == 1 &&
 			player->GetMoveType() == MOVETYPE_WALK &&
-			player->GetGroundEntity() == NULL )	
+			player->GetEngineObject()->GetGroundEntity() == NULL )
 		{
 			for ( i = 0; i < numplanes; i++ )
 			{
@@ -2905,7 +2905,7 @@ bool CGameMovement::LadderMove( void )
 	VectorCopy( mv->GetAbsOrigin(), floor );
 	floor[2] += GetPlayerMins()[2] - 1;
 
-	if( enginetrace->GetPointContents( floor ) == CONTENTS_SOLID || player->GetGroundEntity() != NULL )
+	if( enginetrace->GetPointContents( floor ) == CONTENTS_SOLID || player->GetEngineObject()->GetGroundEntity() != NULL )
 	{
 		onFloor = true;
 	}
@@ -3592,7 +3592,7 @@ void CGameMovement::SetGroundEntity( trace_t *pm )
 {
 	CBaseEntity *newGround = pm ? (CBaseEntity*)pm->m_pEnt : NULL;
 
-	CBaseEntity *oldGround = player->GetGroundEntity();
+	CBaseEntity* oldGround = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	Vector vecBaseVelocity = player->GetBaseVelocity();
 
 	if ( !oldGround && newGround )
@@ -3609,7 +3609,7 @@ void CGameMovement::SetGroundEntity( trace_t *pm )
 	}
 
 	player->SetBaseVelocity( vecBaseVelocity );
-	player->SetGroundEntity( newGround );
+	player->GetEngineObject()->SetGroundEntity(newGround ? newGround->GetEngineObject() : NULL);
 
 	// If we are on something...
 
@@ -3821,7 +3821,7 @@ void CGameMovement::CategorizePosition( void )
 		// We need to account for standing on a moving ground object in that case in order to determine if we really 
 		//  are moving away from the object we are standing on at too rapid a speed.  Note that CheckJump already sets
 		//  ground entity to NULL, so this wouldn't have any effect unless we are moving up rapidly not from the jump button.
-		CBaseEntity *ground = player->GetGroundEntity();
+		CBaseEntity* ground = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if ( ground )
 		{
 			flGroundEntityVelZ = ground->GetEngineObject()->GetAbsVelocity().z;
@@ -3875,7 +3875,7 @@ void CGameMovement::CategorizePosition( void )
 			IPhysicsSurfaceProps *physprops = MoveHelper()->GetSurfaceProps();
 			surfacedata_t *pSurfaceProp = physprops->GetSurfaceData( pm.surface.surfaceProps );
 			char cCurrGameMaterial = pSurfaceProp->game.material;
-			if ( !player->GetGroundEntity() )
+			if ( !player->GetEngineObject()->GetGroundEntity() )
 			{
 				cCurrGameMaterial = 0;
 			}
@@ -3899,7 +3899,7 @@ void CGameMovement::CategorizePosition( void )
 void CGameMovement::CheckFalling( void )
 {
 	// this function really deals with landing, not falling, so early out otherwise
-	if ( player->GetGroundEntity() == NULL || player->m_Local.m_flFallVelocity <= 0 )
+	if ( player->GetEngineObject()->GetGroundEntity() == NULL || player->m_Local.m_flFallVelocity <= 0 )
 		return;
 
 	if ( !IsDead() && player->m_Local.m_flFallVelocity >= PLAYER_FALL_PUNCH_THRESHOLD )
@@ -3914,7 +3914,7 @@ void CGameMovement::CheckFalling( void )
 		else
 		{
 			// Scale it down if we landed on something that's floating...
-			if ( player->GetGroundEntity()->IsFloating() )
+			if ( player->GetEngineObject()->GetGroundEntity()->GetOuter()->IsFloating())
 			{
 				player->m_Local.m_flFallVelocity -= PLAYER_LAND_ON_FLOATING_OBJECT;
 			}
@@ -3922,10 +3922,10 @@ void CGameMovement::CheckFalling( void )
 			//
 			// They hit the ground.
 			//
-			if( player->GetGroundEntity()->GetEngineObject()->GetAbsVelocity().z < 0.0f )
+			if( player->GetEngineObject()->GetGroundEntity()->GetAbsVelocity().z < 0.0f )
 			{
 				// Player landed on a descending object. Subtract the velocity of the ground entity.
-				player->m_Local.m_flFallVelocity += player->GetGroundEntity()->GetEngineObject()->GetAbsVelocity().z;
+				player->m_Local.m_flFallVelocity += player->GetEngineObject()->GetGroundEntity()->GetAbsVelocity().z;
 				player->m_Local.m_flFallVelocity = MAX( 0.1f, player->m_Local.m_flFallVelocity );
 			}
 
@@ -4047,7 +4047,7 @@ bool CGameMovement::CanUnduck()
 
 	VectorCopy( mv->GetAbsOrigin(), newOrigin );
 
-	if ( player->GetGroundEntity() != NULL )
+	if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 	{
 		for ( i = 0; i < 3; i++ )
 		{
@@ -4086,7 +4086,7 @@ void CGameMovement::FinishUnDuck( void )
 
 	VectorCopy( mv->GetAbsOrigin(), newOrigin );
 
-	if ( player->GetGroundEntity() != NULL )
+	if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 	{
 		for ( i = 0; i < 3; i++ )
 		{
@@ -4200,7 +4200,7 @@ void CGameMovement::FinishDuck( void )
 	player->SetViewOffset( GetPlayerViewOffset( true ) );
 
 	// HACKHACK - Fudge for collision bug - no time to fix this properly
-	if ( player->GetGroundEntity() != NULL )
+	if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 	{
 		for ( int i = 0; i < 3; i++ )
 		{
@@ -4290,7 +4290,7 @@ void CGameMovement::SetDuckedEyeOffset( float duckFraction )
 //-----------------------------------------------------------------------------
 void CGameMovement::HandleDuckingSpeedCrop( void )
 {
-	if ( !( m_iSpeedCropped & SPEED_CROPPED_DUCK ) && ( player->GetFlags() & FL_DUCKING ) && ( player->GetGroundEntity() != NULL ) )
+	if ( !( m_iSpeedCropped & SPEED_CROPPED_DUCK ) && ( player->GetFlags() & FL_DUCKING ) && ( player->GetEngineObject()->GetGroundEntity() != NULL ) )
 	{
 		float frac = 0.33333333f;
 		mv->m_flForwardMove	*= frac;
@@ -4337,7 +4337,7 @@ void CGameMovement::Duck( void )
 	int buttonsReleased	=  buttonsChanged & mv->m_nOldButtons;		// The changed ones which were previously down are "released"
 
 	// Check to see if we are in the air.
-	bool bInAir = ( player->GetGroundEntity() == NULL );
+	bool bInAir = ( player->GetEngineObject()->GetGroundEntity() == NULL );
 	bool bInDuck = ( player->GetFlags() & FL_DUCKING ) ? true : false;
 	bool bDuckJump = ( player->m_Local.m_flJumpTime > 0.0f );
 	bool bDuckJumpTime = ( player->m_Local.m_flDuckJumpTime > 0.0f );
@@ -4597,7 +4597,7 @@ void CGameMovement::PlayerMove( void )
 	m_nOldWaterLevel = player->GetWaterLevel();
 
 	// If we are not on ground, store off how fast we are moving down
-	if ( player->GetGroundEntity() == NULL )
+	if ( player->GetEngineObject()->GetGroundEntity() == NULL )
 	{
 		player->m_Local.m_flFallVelocity = -mv->m_vecVelocity[ 2 ];
 	}
@@ -4806,7 +4806,7 @@ void CGameMovement::FullTossMove( void )
 	}
 
 	// If on ground and not moving, return.
-	if ( player->GetGroundEntity() != NULL )
+	if ( player->GetEngineObject()->GetGroundEntity() != NULL )
 	{
 		if (VectorCompare(player->GetBaseVelocity(), vec3_origin) &&
 		    VectorCompare(mv->m_vecVelocity, vec3_origin))

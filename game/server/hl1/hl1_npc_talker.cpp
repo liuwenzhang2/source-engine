@@ -382,7 +382,7 @@ bool CHL1NPCTalker::HandleInteraction(int interactionType, void *data, CBaseComb
 	{
 		if ( GetFlags() & FL_ONGROUND )
 		{
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 		}
 		
 		if ( GetState() == NPC_STATE_SCRIPT )

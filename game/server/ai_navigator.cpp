@@ -1396,7 +1396,7 @@ bool CAI_Navigator::TeleportAlongPath()
 			{
 				GetOuter()->Teleport( &vTestPoint, NULL, NULL );
 				// clear ground entity, let normal fall code reestablish what the npc is now standing on
-				GetOuter()->SetGroundEntity( NULL );
+				GetOuter()->GetEngineObject()->SetGroundEntity( NULL );
 				GetOuter()->GetEngineObject()->PhysicsTouchTriggers( &vTestPoint );
 				return true;
 			}
@@ -1780,8 +1780,9 @@ bool CAI_Navigator::OnObstructionPreSteer( AILocalMoveGoal_t *pMoveGoal, float d
 
 	if ( !m_hBigStepGroundEnt.Get() &&
 		 pMoveGoal->directTrace.pObstruction && 
+		 GetOuter()->GetEngineObject()->GetGroundEntity() &&
 		 distClear < GetHullWidth() && 
-		 pMoveGoal->directTrace.pObstruction == GetOuter()->GetGroundEntity() && 
+		 pMoveGoal->directTrace.pObstruction == GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter() &&
 		 ( pMoveGoal->directTrace.pObstruction->IsPlayer() ||
 		   dynamic_cast<CPhysicsProp *>( pMoveGoal->directTrace.pObstruction ) ) )
 	{
@@ -2030,7 +2031,7 @@ bool CAI_Navigator::DelayNavigationFailure( const AIMoveTrace_t &trace )
 				m_PeerWaitMoveTimer.Reset();
 				m_PeerWaitClearTimer.Reset();
 
-				if ( pBlocker->GetGroundEntity() == GetOuter() )
+				if ((pBlocker->GetEngineObject()->GetGroundEntity() ? pBlocker->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == GetOuter())
 				{
 					trace_t bumpTrace;
 					pBlocker->GetMoveProbe()->TraceHull( pBlocker->GetEngineObject()->GetAbsOrigin(),
@@ -2129,8 +2130,9 @@ bool CAI_Navigator::OnMoveExecuteFailed( const AILocalMoveGoal_t &move, const AI
 
 	if ( !m_hBigStepGroundEnt.Get() &&
 		 trace.pObstruction &&
+		 GetOuter()->GetEngineObject()->GetGroundEntity() &&
 		 trace.flTotalDist - trace.flDistObstructed < GetHullWidth() && 
-		 trace.pObstruction == GetOuter()->GetGroundEntity() && 
+		 trace.pObstruction == GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter() &&
 		 ( trace.pObstruction->IsPlayer() ||
 		   dynamic_cast<CPhysicsProp *>( trace.pObstruction ) ) )
 	{
@@ -2493,7 +2495,7 @@ bool CAI_Navigator::Move( float flInterval )
 						m_bCalledStartMove = true;
 					}
 
-					if ( m_hBigStepGroundEnt && m_hBigStepGroundEnt != GetOuter()->GetGroundEntity() )
+					if (m_hBigStepGroundEnt && m_hBigStepGroundEnt != (GetOuter()->GetEngineObject()->GetGroundEntity() ? GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL))
 						m_hBigStepGroundEnt = NULL;
 					
 					switch (GetPath()->CurWaypointNavType())

@@ -178,7 +178,7 @@ void CHL1_Player::PreThink(void)
 	// Train speed control
 	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
 	{
-		CBaseEntity *pTrain = GetGroundEntity();
+		CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		float vel;
 
 		if ( pTrain )
@@ -457,7 +457,7 @@ void CHL1_Player::StartPullingObject( CBaseEntity *pObject )
 		return;
 	}
 
-	if( GetGroundEntity() == pObject )
+	if ((GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pObject)
 	{
 		//Msg("Can't grab something you're standing on!\n");
 		return;
@@ -1844,7 +1844,7 @@ float CGrabController::GetSavedMass( IPhysicsObject *pObject )
 bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 {
 	CBaseEntity *pEntity = GetAttached();
-	if ( !pEntity || ComputeError() > flError || pPlayer->GetGroundEntity() == pEntity || !pEntity->VPhysicsGetObject() )
+	if (!pEntity || ComputeError() > flError || (pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pEntity || !pEntity->VPhysicsGetObject())
 	{
 		return false;
 	}

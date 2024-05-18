@@ -200,12 +200,12 @@ void CAI_RappelBehavior::StartTask( const Task_t *pTask )
 	case TASK_HIT_GROUND:
 		m_bOnGround = true;
 
-		if( GetOuter()->GetGroundEntity() != NULL && GetOuter()->GetGroundEntity()->IsNPC() && GetOuter()->GetGroundEntity()->GetEngineObject()->GetClassname() == GetOuter()->GetEngineObject()->GetClassname())
+		if( GetOuter()->GetEngineObject()->GetGroundEntity() != NULL && GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter()->IsNPC() && GetOuter()->GetEngineObject()->GetGroundEntity()->GetClassname() == GetOuter()->GetEngineObject()->GetClassname())
 		{
 			// Although I tried to get NPC's out from under me, I landed on one. Kill it, so long as it's the same type of character as me.
 			variant_t val;
 			val.SetFloat( 0 );
-			g_EventQueue.AddEvent( GetOuter()->GetGroundEntity(), "sethealth", val, 0, GetOuter(), GetOuter() );
+			g_EventQueue.AddEvent( GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter(), "sethealth", val, 0, GetOuter(), GetOuter());
 		}
 
 		TaskComplete();
@@ -245,7 +245,7 @@ void CAI_RappelBehavior::RunTask( const Task_t *pTask )
 			SetDescentSpeed();
 			if( GetOuter()->GetFlags() & FL_ONGROUND )
 			{
-				CBaseEntity *pGroundEnt = GetOuter()->GetGroundEntity();
+				CBaseEntity* pGroundEnt = GetOuter()->GetEngineObject()->GetGroundEntity() ? GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 
 				if( pGroundEnt && pGroundEnt->IsPlayer() )
 				{

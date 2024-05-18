@@ -383,7 +383,7 @@ void CNPC_HAssassin::RunTask ( const Task_t *pTask )
 
 			if( trace.DidHitWorld() )
 			{
-				SetGroundEntity((CBaseEntity*)trace.m_pEnt );
+				GetEngineObject()->SetGroundEntity((CBaseEntity*)trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->GetEngineObject() : NULL);
 			}
 			else
 			{
@@ -552,7 +552,7 @@ void CNPC_HAssassin::HandleAnimEvent( animevent_t *pEvent )
 	case ASSASSIN_AE_JUMP:
 		{
 			SetMoveType( MOVETYPE_FLYGRAVITY );
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 			GetEngineObject()->SetAbsVelocity( m_vecJumpVelocity );
 			m_flNextJump = gpGlobals->curtime + 3.0;
 		}

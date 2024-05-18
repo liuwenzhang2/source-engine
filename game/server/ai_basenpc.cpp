@@ -4530,7 +4530,7 @@ void CAI_BaseNPC::CheckOnGround( void )
 					if (trace.fraction == 1.0)
 					{
 						SetCondition( COND_FLOATING_OFF_GROUND );
-						SetGroundEntity( NULL );
+						GetEngineObject()->SetGroundEntity( NULL );
 					}
 					else
 					{
@@ -4546,9 +4546,9 @@ void CAI_BaseNPC::CheckOnGround( void )
 							}
 						}
 						// Check to see if someone changed the ground on us...
-						if ( trace.m_pEnt && trace.m_pEnt != GetGroundEntity() )
+						if (trace.m_pEnt && (!GetEngineObject()->GetGroundEntity() || trace.m_pEnt != GetEngineObject()->GetGroundEntity()->GetOuter()))
 						{
-							SetGroundEntity((CBaseEntity*)trace.m_pEnt );
+							GetEngineObject()->SetGroundEntity(((CBaseEntity*)trace.m_pEnt)->GetEngineObject());
 						}
 					}
 				}
@@ -6606,7 +6606,7 @@ void CAI_BaseNPC::CheckPhysicsContacts()
 	{
 		IPhysicsObject *pPhysics = VPhysicsGetObject();
 		IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
-		CBaseEntity *pGroundEntity = GetGroundEntity();
+		CBaseEntity* pGroundEntity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		float heightCheck = GetEngineObject()->GetAbsOrigin().z + GetHullMaxs().z;
 		Vector npcVel;
 		pPhysics->GetVelocity( &npcVel, NULL );
@@ -7327,7 +7327,7 @@ void CAI_BaseNPC::StartNPC( void )
 	}
 	else
 	{
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 	}
 
 	if ( m_target != NULL_STRING )// this npc has a target
@@ -9365,9 +9365,9 @@ void CAI_BaseNPC::ReportAIState( void )
 	DevMsg( "\n" );
 	DevMsg( "Yaw speed:%3.1f,Health: %3d\n", GetMotor()->GetYawSpeed(), m_iHealth.Get() );
 
-	if ( GetGroundEntity() )
+	if (GetEngineObject()->GetGroundEntity() )
 	{
-		DevMsg( "Groundent:%s\n\n", GetGroundEntity()->GetClassname() );
+		DevMsg( "Groundent:%s\n\n", GetEngineObject()->GetGroundEntity()->GetClassname() );
 	}
 	else
 	{
@@ -11965,7 +11965,7 @@ bool CAI_BaseNPC::CineCleanup()
 					Vector origin = GetEngineObject()->GetLocalOrigin();
 					origin.z = new_origin.z;
 					GetEngineObject()->SetLocalOrigin( origin );
-					SetGroundEntity( NULL );
+					GetEngineObject()->SetGroundEntity( NULL );
 				}
 			}
 
@@ -12468,7 +12468,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 		{
 			GetEngineObject()->SetAbsOrigin( oldorg + move );
 			GetEngineObject()->PhysicsTouchTriggers();
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 			return true;
 		}
 	
@@ -12500,7 +12500,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 	}
 
 	// the move is ok
-	SetGroundEntity((CBaseEntity*)trace.m_pEnt );
+	GetEngineObject()->SetGroundEntity((CBaseEntity*)trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->GetEngineObject() : NULL);
 	GetEngineObject()->PhysicsTouchTriggers();
 	return true;
 }

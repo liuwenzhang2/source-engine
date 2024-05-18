@@ -556,7 +556,7 @@ float CalculateObjectStress( IPhysicsObject *pObject, CBaseEntity *pInputOwnerEn
 			{
 				if ( pOther->GetMass() >= VPHYSICS_LARGE_OBJECT_MASS )
 				{
-					if ( pInputOwnerEntity->GetGroundEntity() != pOtherEntity)
+					if ((pInputOwnerEntity->GetEngineObject()->GetGroundEntity() ? pInputOwnerEntity->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) != pOtherEntity)
 					{
 						hasLargeObject = true;
 					}

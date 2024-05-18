@@ -3122,7 +3122,7 @@ void CBaseCombatCharacter::VPhysicsShadowCollision( int index, gamevcollisioneve
 	if ( !pOtherPhysics->IsMoveable() )
 		return;
 	
-	if ( pOther == GetGroundEntity() )
+	if (pOther == (GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL))
 		return;
 
 	// Player can't damage himself if he's was physics attacker *on this frame*

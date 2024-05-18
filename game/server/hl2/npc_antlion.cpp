@@ -1575,7 +1575,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 
 	case TASK_ANTLION_DISMOUNT_NPC:
 		{
-			CBaseEntity *pGroundEnt = GetGroundEntity();
+		CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 			
 			if( pGroundEnt != NULL )
 			{
@@ -1595,7 +1595,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 
 				pGroundEnt->GetVectors( &vecJumpDir, NULL, NULL );
 
-				SetGroundEntity( NULL );
+				GetEngineObject()->SetGroundEntity( NULL );
 				
 				// Bump up
 				UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() + Vector( 0, 0 , 1 ) );
@@ -1885,7 +1885,7 @@ void CNPC_Antlion::RunTask( const Task_t *pTask )
 		
 		if ( GetFlags() & FL_ONGROUND )
 		{
-			CBaseEntity *pGroundEnt = GetGroundEntity();
+			CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 
 			if ( ( pGroundEnt != NULL ) && ( ( pGroundEnt->MyNPCPointer() != NULL ) || pGroundEnt->GetSolidFlags() & FSOLID_NOT_STANDABLE ) )
 			{
@@ -1894,7 +1894,7 @@ void CNPC_Antlion::RunTask( const Task_t *pTask )
 
 				pGroundEnt->GetVectors( &vecJumpDir, NULL, NULL );
 
-				SetGroundEntity( NULL );	
+				GetEngineObject()->SetGroundEntity( NULL );
 				
 				// Bump up
 				UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() + Vector( 0, 0 , 1 ) );
@@ -2137,7 +2137,7 @@ int CNPC_Antlion::SelectFailSchedule( int failedSchedule, int failedTask, AI_Tas
 
 			vecJumpDir.NormalizeInPlace();
 
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 	
 			m_vecSavedJump = vecJumpDir * 512 + Vector( 0, 0, 256 );
 			m_bForcedStuckJump = true;
@@ -2788,7 +2788,7 @@ void CNPC_Antlion::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 			Vector vecForce = ( vecShoveDir * random->RandomInt( 500.0f, 1000.0f ) ) + Vector(0,0,64.0f);
 			CascadePush( vecForce );
 			ApplyAbsVelocityImpulse( vecForce );
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 		}
 
 		//More vulnerable when flipped
@@ -2816,7 +2816,7 @@ void CNPC_Antlion::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 
 				CascadePush( vecForce );
 				ApplyAbsVelocityImpulse( vecForce );
-				SetGroundEntity( NULL );
+				GetEngineObject()->SetGroundEntity( NULL );
 			}
 			else
 			{
@@ -2829,7 +2829,7 @@ void CNPC_Antlion::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 
 					//Get tossed!
 					ApplyAbsVelocityImpulse( ( vecShoveDir * random->RandomInt( 500.0f, 1000.0f ) ) + Vector(0,0,64.0f) );
-					SetGroundEntity( NULL );
+					GetEngineObject()->SetGroundEntity( NULL );
 				}
 			}
 		}
@@ -3180,7 +3180,7 @@ void CNPC_Antlion::StartJump( void )
 	}
 
 	//Take us off the ground
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 	GetEngineObject()->SetAbsVelocity( m_vecSavedJump );
 
 	m_bForcedStuckJump = false;
@@ -3575,7 +3575,7 @@ void CNPC_Antlion::Unburrow( void )
 	RemoveSolidFlags( FSOLID_NOT_SOLID );
 	m_takedamage	= DAMAGE_YES;
 
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 
 	//If we have an enemy, come out facing them
 	if ( GetEnemy() )
@@ -3817,7 +3817,7 @@ void CNPC_Antlion::GatherConditions( void )
 	BaseClass::GatherConditions();
 
 	// See if I've landed on an NPC!
-	CBaseEntity *pGroundEnt = GetGroundEntity();
+	CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	
 	if ( ( ( pGroundEnt != NULL ) && ( pGroundEnt->GetSolidFlags() & FSOLID_NOT_STANDABLE ) ) && ( GetFlags() & FL_ONGROUND ) && ( !IsEffectActive( EF_NODRAW ) && !pGroundEnt->IsEffectActive( EF_NODRAW ) ) )
 	{
@@ -4220,7 +4220,7 @@ void CNPC_Antlion::Touch( CBaseEntity *pOther )
 						vecTargetDir[2] = 0.0f;
 
 						ApplyAbsVelocityImpulse( ( vecTargetDir * 250.0f ) + Vector(0,0,64.0f) );
-						SetGroundEntity( NULL );
+						GetEngineObject()->SetGroundEntity( NULL );
 
 						CSoundEnt::InsertSound( SOUND_PHYSICS_DANGER, GetEngineObject()->GetAbsOrigin(), 256, 0.5f, this );
 					}

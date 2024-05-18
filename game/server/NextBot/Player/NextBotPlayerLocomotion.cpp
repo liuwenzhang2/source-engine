@@ -710,7 +710,7 @@ bool PlayerLocomotion::IsJumpingAcrossGap( void ) const
  */
 bool PlayerLocomotion::IsOnGround( void ) const
 {
-	return (m_player->GetGroundEntity() != NULL);
+	return (m_player->GetEngineObject()->GetGroundEntity() != NULL);
 }
 
 
@@ -720,7 +720,7 @@ bool PlayerLocomotion::IsOnGround( void ) const
  */
 CBaseEntity *PlayerLocomotion::GetGround( void ) const
 {
-	return m_player->GetGroundEntity();
+	return m_player->GetEngineObject()->GetGroundEntity() ? m_player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 }
 
 

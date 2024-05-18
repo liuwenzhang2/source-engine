@@ -257,6 +257,10 @@ public:
 	virtual void PhysicsRemoveGround(clientgroundlink_t* link) = 0;
 	virtual void PhysicsRemoveGroundList() = 0;
 
+	virtual void SetGroundEntity(IEngineObjectClient* ground) = 0;
+	virtual IEngineObjectClient* GetGroundEntity(void) = 0;
+	virtual IEngineObjectClient* GetGroundEntity(void) const = 0;
+
 };
 
 //-----------------------------------------------------------------------------

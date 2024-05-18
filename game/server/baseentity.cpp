@@ -553,7 +553,7 @@ void CBaseEntity::UpdateOnRemove(void)
 		}
 	}
 
-	SetGroundEntity(NULL);
+	GetEngineObject()->SetGroundEntity(NULL);
 
 	if (m_bDynamicModelPending)
 	{
@@ -569,7 +569,7 @@ void CBaseEntity::UpdateOnRemove(void)
 	// Need to remove references to this entity before EHANDLES go null
 	{
 		g_bDisableEhandleAccess = false;
-		SetGroundEntity(NULL); // remove us from the ground entity if we are on it
+		GetEngineObject()->SetGroundEntity(NULL); // remove us from the ground entity if we are on it
 		g_bDisableEhandleAccess = true;
 
 		// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
@@ -1772,7 +1772,6 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 //	DEFINE_FIELD( m_bSentLastFrame, FIELD_INTEGER ),
 
-	DEFINE_FIELD( m_hGroundEntity, FIELD_EHANDLE ),
 	DEFINE_FIELD( m_flGroundChangeTime, FIELD_TIME ),
 	DEFINE_GLOBAL_KEYFIELD( m_ModelName, FIELD_MODELNAME, "model" ),
 	
@@ -2979,9 +2978,9 @@ int CBaseEntity::Restore( IRestore &restore )
 	}
 
 	// Restablish ground entity
-	if ( m_hGroundEntity != NULL )
+	if (GetEngineObject()->GetGroundEntity() != NULL )
 	{
-		m_hGroundEntity->GetEngineObject()->AddEntityToGroundList( this->GetEngineObject());
+		GetEngineObject()->GetGroundEntity()->AddEntityToGroundList( this->GetEngineObject());
 	}
 
 	return status;

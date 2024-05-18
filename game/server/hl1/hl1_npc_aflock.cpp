@@ -212,7 +212,7 @@ void CNPC_FlockingFlyerFlock::SpawnFlock( void )
 		UTIL_SetOrigin( pBoid, vecSpot);
 		pBoid->SetMoveType( MOVETYPE_FLY );
 		pBoid->SpawnCommonCode();
-		pBoid->SetGroundEntity( NULL );
+		pBoid->GetEngineObject()->SetGroundEntity( NULL );
 		pBoid->GetEngineObject()->SetAbsVelocity( Vector ( 0, 0, 0 ) );
 		pBoid->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 		
@@ -843,11 +843,11 @@ void CNPC_FlockingFlyer::FallHack( void )
 {
 	if ( GetFlags() & FL_ONGROUND )
 	{
-		CBaseEntity *groundentity = gEntList.GetBaseEntity( GetGroundEntity()->entindex() );
+		CBaseEntity *groundentity = gEntList.GetBaseEntity(GetEngineObject()->GetGroundEntity()->GetOuter()->entindex());
 
 		if ( !FClassnameIs ( groundentity, "worldspawn" ) )
 		{
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 			SetNextThink( gpGlobals->curtime + 0.1f );
 		}
 		else

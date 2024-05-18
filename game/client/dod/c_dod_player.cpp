@@ -2637,7 +2637,7 @@ void C_DODPlayer::AvoidPlayers( CUserCmd *pCmd )
 	float flMaxPlayerSpeed = MaxSpeed();
 	float flCropFraction = 1.33333333f;
 
-	if ( ( GetFlags() & FL_DUCKING ) && ( GetGroundEntity() != NULL ) )
+	if ( ( GetFlags() & FL_DUCKING ) && (GetEngineObject()->GetGroundEntity() != NULL ) )
 	{	
 		flMaxPlayerSpeed *= flCropFraction;
 	}	

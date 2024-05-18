@@ -195,6 +195,10 @@ public:
 	virtual void PhysicsRemoveGround(servergroundlink_t* link) = 0;
 	virtual void PhysicsRemoveGroundList() = 0;
 
+	virtual void SetGroundEntity(IEngineObjectServer* ground) = 0;
+	virtual IEngineObjectServer* GetGroundEntity(void) = 0;
+	virtual IEngineObjectServer* GetGroundEntity(void) const = 0;
+
 };
 
 // This class is how the engine talks to entities in the game DLL.

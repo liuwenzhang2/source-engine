@@ -560,7 +560,7 @@ void CPortalGameMovement::CategorizePosition( void )
 		}
 
 		// If we are on something...
-		if (player->GetGroundEntity() != NULL)
+		if (player->GetEngineObject()->GetGroundEntity() != NULL)
 		{
 			// Then we are not in water jump sequence
 			player->m_flWaterJumpTime = 0;
@@ -588,7 +588,7 @@ void CPortalGameMovement::CategorizePosition( void )
 			IPhysicsSurfaceProps *physprops = MoveHelper()->GetSurfaceProps();
 			surfacedata_t *pSurfaceProp = physprops->GetSurfaceData( pm.surface.surfaceProps );
 			char cCurrGameMaterial = pSurfaceProp->game.material;
-			if ( !player->GetGroundEntity() )
+			if ( !player->GetEngineObject()->GetGroundEntity() )
 			{
 				cCurrGameMaterial = 0;
 			}
@@ -665,7 +665,7 @@ int CPortalGameMovement::CheckStuck( void )
 void CPortalGameMovement::SetGroundEntity( trace_t *pm )
 {
 #ifndef CLIENT_DLL
-	if ( !player->GetGroundEntity() && pm && pm->m_pEnt )
+	if ( !player->GetEngineObject()->GetGroundEntity() && pm && pm->m_pEnt )
 	{
 		IGameEvent *event = gameeventmanager->CreateEvent( "portal_player_touchedground" );
 		if ( event )

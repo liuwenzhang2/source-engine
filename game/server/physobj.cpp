@@ -1026,7 +1026,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 						}
 						if ( vecPush.z > 0 && (pEntity->GetFlags() & FL_ONGROUND) )
 						{
-							pEntity->SetGroundEntity( NULL );
+							pEntity->GetEngineObject()->SetGroundEntity( NULL );
 							Vector origin = pEntity->GetEngineObject()->GetAbsOrigin();
 							origin.z += 1.0f;
 							pEntity->GetEngineObject()->SetAbsOrigin( origin );
@@ -2042,7 +2042,7 @@ void CPointPush::PushEntity( CBaseEntity *pTarget )
 			}
 			if ( vecPush.z > 0 && (pTarget->GetFlags() & FL_ONGROUND) )
 			{
-				pTarget->SetGroundEntity( NULL );
+				pTarget->GetEngineObject()->SetGroundEntity( NULL );
 				Vector origin = pTarget->GetEngineObject()->GetAbsOrigin();
 				origin.z += 1.0f;
 				pTarget->GetEngineObject()->SetAbsOrigin( origin );

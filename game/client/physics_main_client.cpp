@@ -130,9 +130,9 @@ void C_BaseEntity::PhysicsCustom()
 		return;
 
 	// Moving upward, off the ground, or  resting on something that isn't ground
-	if (GetEngineObject()->GetLocalVelocity()[2] > 0 || !GetGroundEntity() || !GetGroundEntity()->IsStandable() )
+	if (GetEngineObject()->GetLocalVelocity()[2] > 0 || !GetEngineObject()->GetGroundEntity() || !GetEngineObject()->GetGroundEntity()->GetOuter()->IsStandable())
 	{
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 	}
 
 	// NOTE: The entity must set the position, angles, velocity in its custom movement

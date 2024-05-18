@@ -1748,7 +1748,7 @@ void CBasePlayer::Event_Killed( const CTakeDamageInfo &info )
 	}
 
 	SetMoveType( MOVETYPE_FLYGRAVITY );
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 
 	// clear out the suit message cache so we don't keep chattering
 	SetSuitUpdate(NULL, false, 0);
@@ -2307,7 +2307,7 @@ bool CBasePlayer::StartObserverMode(int mode)
 	// clear out the suit message cache so we don't keep chattering
     SetSuitUpdate(NULL, FALSE, 0);
 
-	SetGroundEntity( (CBaseEntity *)NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 	
 	RemoveFlag( FL_DUCKING );
 	
@@ -3789,7 +3789,7 @@ void CBasePlayer::HandleFuncTrain(void)
 		return;
 	}
 
-	CBaseEntity *pTrain = GetGroundEntity();
+	CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	float vel;
 
 	if ( pTrain )
@@ -4532,8 +4532,8 @@ bool CBasePlayer::IsRideablePhysics( IPhysicsObject *pPhysics )
 
 IPhysicsObject *CBasePlayer::GetGroundVPhysics()
 {
-	CBaseEntity *pGroundEntity = GetGroundEntity();
-	if ( pGroundEntity && pGroundEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+	CBaseEntity* pGroundEntity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
+;	if ( pGroundEntity && pGroundEntity->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		IPhysicsObject *pPhysGround = pGroundEntity->VPhysicsGetObject();
 		if ( pPhysGround && pPhysGround->IsMoveable() )
@@ -4674,7 +4674,7 @@ void CBasePlayer::PostThink()
 // handles touching physics objects
 void CBasePlayer::Touch( CBaseEntity *pOther )
 {
-	if ( pOther == GetGroundEntity() )
+	if (pOther == (GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL))
 		return;
 
 	if ( pOther->GetMoveType() != MOVETYPE_VPHYSICS || pOther->GetSolid() != SOLID_VPHYSICS || (pOther->GetSolidFlags() & FSOLID_TRIGGER) )
@@ -5187,7 +5187,7 @@ void CBasePlayer::ForceRespawn( void )
 	RemoveAllItems( true );
 
 	// Reset ground state for airwalk animations
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 
 	// Stop any firing that was taking place before respawn.
 	m_nButtons = 0;
@@ -5412,7 +5412,7 @@ bool CBasePlayer::HasWeapons( void )
 void CBasePlayer::VelocityPunch( const Vector &vecForce )
 {
 	// Clear onground and add velocity.
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 	ApplyAbsVelocityImpulse(vecForce );
 }
 
@@ -8029,7 +8029,6 @@ void SendProxy_CropFlagsToPlayerFlagBitsLength( const SendProp *pProp, const voi
 		SendPropInt			( SENDINFO( m_nNextThinkTick ) ),
 
 		SendPropEHandle		( SENDINFO( m_hLastWeapon ) ),
-		SendPropEHandle		( SENDINFO( m_hGroundEntity ), SPROP_CHANGES_OFTEN ),
 
 		//SendPropFloat		( SENDINFO_VELOCITY(m_vecVelocity[0]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityX),
 		//SendPropFloat		( SENDINFO_VELOCITY(m_vecVelocity[1]), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_LocalVelocityY),

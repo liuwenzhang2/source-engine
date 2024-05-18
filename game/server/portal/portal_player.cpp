@@ -1463,7 +1463,7 @@ void CPortal_Player::PlayerUse( void )
 			}
 			else
 			{	// Start controlling the train!
-				CBaseEntity *pTrain = GetGroundEntity();
+				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
 				{
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
@@ -1958,7 +1958,7 @@ void CPortal_Player::UnDuck( void )
 void CPortal_Player::PickupObject(CBaseEntity *pObject, bool bLimitMassAndSize )
 {
 	// can't pick up what you're standing on
-	if ( GetGroundEntity() == pObject )
+	if ((GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pObject)
 		return;
 
 	if ( bLimitMassAndSize == true )

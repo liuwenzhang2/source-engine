@@ -924,7 +924,7 @@ void CBaseHelicopter::Flight( void )
 	if( GetFlags() & FL_ONGROUND )
 	{
 		//This would be really bad.
-		SetGroundEntity( NULL );
+		GetEngineObject()->SetGroundEntity( NULL );
 	}
 
 	// Generic speed up

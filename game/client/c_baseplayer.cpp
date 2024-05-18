@@ -226,7 +226,6 @@ END_RECV_TABLE()
 		RecvPropInt			( RECVINFO( m_nNextThinkTick ) ),
 
 		RecvPropEHandle		( RECVINFO( m_hLastWeapon ) ),
-		RecvPropEHandle		( RECVINFO( m_hGroundEntity ) ),
 
  		//RecvPropFloat		(RECVINFO_INVALID(m_vecVelocity[0]), 0, RecvProxy_LocalVelocityX ),
  		//RecvPropFloat		(RECVINFO_INVALID(m_vecVelocity[1]), 0, RecvProxy_LocalVelocityY ),
@@ -387,8 +386,6 @@ BEGIN_PREDICTION_DATA( C_BasePlayer )
 	DEFINE_PRED_FIELD( m_hLastWeapon, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE ),
 
 	DEFINE_PRED_FIELD( m_nTickBase, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
-
-	DEFINE_PRED_FIELD( m_hGroundEntity, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE ),
 
 	DEFINE_PRED_ARRAY( m_hViewModel, FIELD_EHANDLE, MAX_VIEWMODELS, FTYPEDESC_INSENDTABLE ),
 

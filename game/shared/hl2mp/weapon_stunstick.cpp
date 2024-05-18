@@ -370,7 +370,7 @@ void CWeaponStunStick::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseComba
 					Vector	dir = pHurt->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin();
 
 					// If the player's on my head, don't knock him up
-					if ( pPlayer->GetGroundEntity() == pOperator )
+					if ((pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) == pOperator)
 					{
 						dir = vecDirection;
 						dir.z = 0;

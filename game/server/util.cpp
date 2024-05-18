@@ -229,7 +229,7 @@ private:
 int UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgnore )
 {
 	// Assume no ground
-	pEntity->SetGroundEntity( NULL );
+	pEntity->GetEngineObject()->SetGroundEntity( NULL );
 
 	Assert( pEntity );
 
@@ -256,7 +256,7 @@ int UTIL_DropToFloor( CBaseEntity *pEntity, unsigned int mask, CBaseEntity *pIgn
 		return 0;
 
 	pEntity->GetEngineObject()->SetAbsOrigin( trace.endpos );
-	pEntity->SetGroundEntity( (CBaseEntity*)trace.m_pEnt );
+	pEntity->GetEngineObject()->SetGroundEntity((CBaseEntity*)trace.m_pEnt ? ((CBaseEntity*)trace.m_pEnt)->GetEngineObject() : NULL);
 
 	return 1;
 }
@@ -779,7 +779,7 @@ void UTIL_ScreenShakeObject( CBaseEntity *pEnt, const Vector &center, float ampl
 		{
 			localAmplitude = amplitude;
 		}
-		else if ((pPlayer->GetFlags() & FL_ONGROUND) && (pPlayer->GetGroundEntity()->GetEngineObject()->GetRootMoveParent()->GetOuter() == pHighestParent))
+		else if ((pPlayer->GetFlags() & FL_ONGROUND) && (pPlayer->GetEngineObject()->GetGroundEntity()->GetRootMoveParent()->GetOuter() == pHighestParent))
 		{
 			// If the player is standing on the object, use maximum amplitude
 			localAmplitude = amplitude;

@@ -158,7 +158,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 		return;
 	}
 
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 
 	bool bIsSynced = bAllowAssumedSync;
 	bool bBigChanges = true; //assume there are, and be proven wrong

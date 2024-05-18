@@ -705,7 +705,7 @@ void CAI_ScriptedSequence::StartScript( void )
 			if ( m_bIgnoreGravity )
 			{
 				pTarget->AddFlag( FL_FLY );
-				pTarget->SetGroundEntity( NULL );
+				pTarget->GetEngineObject()->SetGroundEntity( NULL );
 			}
 
 			break;
@@ -737,7 +737,7 @@ void CAI_ScriptedSequence::StartScript( void )
 			if ( m_bIgnoreGravity )
 			{
 				pTarget->AddFlag( FL_FLY );
-				pTarget->SetGroundEntity( NULL );
+				pTarget->GetEngineObject()->SetGroundEntity( NULL );
 			}
 
 			// UNDONE: Add a flag to do this so people can fixup physics after teleporting NPCs

@@ -957,7 +957,7 @@ void CWeaponCSBase::Drop(const Vector &vecVelocity)
 	m_iState = WEAPON_NOT_CARRIED;
 	RemoveEffects( EF_NODRAW );
 	FallInit();
-	SetGroundEntity( NULL );
+	GetEngineObject()->SetGroundEntity( NULL );
 
 	m_bInReload = false; // stop reloading
 

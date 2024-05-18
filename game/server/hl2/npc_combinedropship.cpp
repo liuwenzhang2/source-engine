@@ -892,7 +892,7 @@ void CNPC_CombineDropship::Spawn( void )
 			}
 
 			m_hContainer->SetMoveType( MOVETYPE_PUSH );
-			m_hContainer->SetGroundEntity( NULL );
+			m_hContainer->GetEnemy()->GetEngineObject()->SetGroundEntity( NULL );
 
 			// Cache off container's attachment points
 			m_iAttachmentTroopDeploy = m_hContainer->LookupAttachment( "deploy_landpoint" );
@@ -948,7 +948,7 @@ void CNPC_CombineDropship::Spawn( void )
 			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 			m_hContainer->SetOwnerEntity(this);
 			m_hContainer->SetMoveType( MOVETYPE_PUSH );
-			m_hContainer->SetGroundEntity( NULL );
+			m_hContainer->GetEngineObject()->SetGroundEntity( NULL );
 			m_hContainer->UpdatePhysicsShadowToCurrentPosition(0);
 		}
 		break;
@@ -1185,7 +1185,7 @@ void CNPC_CombineDropship::Flight( void )
 		if( GetFlags() & FL_ONGROUND )
 		{
 			// This would be really bad.
-			SetGroundEntity( NULL );
+			GetEngineObject()->SetGroundEntity( NULL );
 		}
 
 		// calc desired acceleration
@@ -2323,7 +2323,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 
 						m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 						m_hContainer->SetMoveType( MOVETYPE_PUSH );
-						m_hContainer->SetGroundEntity( NULL );
+						m_hContainer->GetEngineObject()->SetGroundEntity( NULL );
 
 						m_OnFinishedPickup.FireOutput( this, this );
 						SetLandingState( LANDING_NO );

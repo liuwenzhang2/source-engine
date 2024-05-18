@@ -1379,8 +1379,8 @@ static int DescribeGroundList( CBaseEntity *ent )
 	int c = 1;
 
 	Msg( "%i : %s (ground %i %s)\n", ent->entindex(), ent->GetClassname(), 
-		ent->GetGroundEntity() ? ent->GetGroundEntity()->entindex() : -1,
-		ent->GetGroundEntity() ? ent->GetGroundEntity()->GetClassname() : "NULL" );
+		ent->GetEngineObject()->GetGroundEntity() ? ent->GetEngineObject()->GetGroundEntity()->GetOuter()->entindex() : -1,
+		ent->GetEngineObject()->GetGroundEntity() ? STRING(ent->GetEngineObject()->GetGroundEntity()->GetClassname()) : "NULL" );
 	servergroundlink_t*root = (servergroundlink_t* )ent->GetEngineObject()->GetDataObject( GROUNDLINK );
 	if ( root )
 	{
@@ -1392,7 +1392,7 @@ static int DescribeGroundList( CBaseEntity *ent )
 			{
 				Msg( "  %02i:  %i %s\n", c++, other->entindex(), other->GetClassname() );
 
-				if ( other->GetGroundEntity() != ent )
+				if ((other->GetEngineObject()->GetGroundEntity() ? other->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) != ent)
 				{
 					Assert( 0 );
 					Msg( "   mismatched!!!\n" );
@@ -1407,9 +1407,9 @@ static int DescribeGroundList( CBaseEntity *ent )
 		}
 	}
 
-	if ( ent->GetGroundEntity() != NULL )
+	if ( ent->GetEngineObject()->GetGroundEntity() != NULL )
 	{
-		Assert( IsInGroundList( ent, ent->GetGroundEntity() ) );
+		Assert( IsInGroundList( ent, ent->GetEngineObject()->GetGroundEntity()->GetOuter() ) );
 	}
 
 	return c - 1;
