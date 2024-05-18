@@ -851,10 +851,10 @@ void CFire::Init( const Vector &position, float scale, float attackTime, float f
 	}
 
 	Vector localOrigin = position;
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
 		EntityMatrix parentMatrix;
-		parentMatrix.InitFromEntity( GetMoveParent() );
+		parentMatrix.InitFromEntity(GetEngineObject()->GetMoveParent()->GetOuter() );
 		localOrigin = parentMatrix.WorldToLocal( position );
 	}
 	UTIL_SetOrigin( this, localOrigin );

@@ -416,15 +416,15 @@ void AddEntityToDarknessCheck( CBaseEntity *pEntity, float flLightRadius /*=DARK
 void RemoveEntityFromDarknessCheck( CBaseEntity *pEntity )
 {
 	// Find any light sources parented to this entity, and remove them
-	CBaseEntity *pChild = pEntity->FirstMoveChild();
+	IEngineObjectServer *pChild = pEntity->GetEngineObject()->FirstMoveChild();
 	while ( pChild )
 	{
-		CBaseEntity *pPrevChild = pChild;
+		IEngineObjectServer *pPrevChild = pChild;
 		pChild = pChild->NextMovePeer();
 
-		if ( dynamic_cast<CInfoDarknessLightSource*>(pPrevChild) )
+		if ( dynamic_cast<CInfoDarknessLightSource*>(pPrevChild->GetOuter()) )
 		{
-			UTIL_Remove( pPrevChild );
+			UTIL_Remove( pPrevChild->GetOuter() );
 		}
 	}
 }

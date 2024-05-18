@@ -19,8 +19,8 @@ class CBaseEntity;
 //void		TransferChildren( CEngineObject *pOldParent, CEngineObject *pNewParent );
 //void		LinkChild( CEngineObject *pParent, CEngineObject *pChild );
 //void		UnlinkAllChildren( CEngineObject *pParent );
-int			GetAllChildren( CBaseEntity *pParent, CUtlVector<CBaseEntity *> &list );
-bool		EntityIsParentOf( CBaseEntity *pParent, CBaseEntity *pEntity );
-int			GetAllInHierarchy( CBaseEntity *pParent, CUtlVector<CBaseEntity *> &list );
+int			GetAllChildren(IEngineObjectServer*pParent, CUtlVector<IEngineObjectServer*> &list );
+bool		EntityIsParentOf( IEngineObjectServer *pParent, IEngineObjectServer*pEntity );
+int			GetAllInHierarchy(IEngineObjectServer*pParent, CUtlVector<IEngineObjectServer*> &list );
 
 #endif // HIERARCHY_H

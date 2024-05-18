@@ -965,7 +965,7 @@ void CPortal_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		GetSkeleton( pStudioHdr, pos, q, boneMask );
 	}
 
-	CBaseAnimating *pParent = dynamic_cast< CBaseAnimating* >( GetMoveParent() );
+	CBaseAnimating *pParent = dynamic_cast< CBaseAnimating* >(GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter() : NULL);
 	if ( pParent )
 	{
 		// We're doing bone merging, so do special stuff here.

@@ -155,9 +155,9 @@ void CEnv_Lightrail_Endpoint::InputStop( inputdata_t &inputdata )
 
 CBaseViewModel *IsViewModelMoveParent_( CBaseEntity *pEffect )
 {
-	if ( pEffect->GetMoveParent() )
+	if ( pEffect->GetEngineObject()->GetMoveParent() )
 	{
-		CBaseViewModel *pViewModel = dynamic_cast<CBaseViewModel *>( pEffect->GetMoveParent() );
+		CBaseViewModel *pViewModel = dynamic_cast<CBaseViewModel *>( pEffect->GetEngineObject()->GetMoveParent() );
 
 		if ( pViewModel )
 		{

@@ -56,7 +56,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 bool CPointTeleport::EntityMayTeleport( CBaseEntity *pTarget )
 {
-	if ( pTarget->GetMoveParent() != NULL )
+	if ( pTarget->GetEngineObject()->GetMoveParent() != NULL )
 	{
 		// Passengers in a vehicle are allowed to teleport; their behavior handles it
 		CBaseCombatCharacter *pBCC = pTarget->MyCombatCharacterPointer();
@@ -91,7 +91,7 @@ void CPointTeleport::Activate( void )
 			}
 			else
 			{
-				Warning("ERROR: (%s) can't teleport object (%s) as it has a parent (%s)!\n",GetDebugName(),pTarget->GetDebugName(),pTarget->GetMoveParent()->GetDebugName());
+				Warning("ERROR: (%s) can't teleport object (%s) as it has a parent (%s)!\n",GetDebugName(),pTarget->GetDebugName(),(pTarget->GetEngineObject()->GetMoveParent()?pTarget->GetEngineObject()->GetMoveParent()->GetOuter()->GetDebugName():"NULL"));
 				BaseClass::Activate();
 				return;
 			}
@@ -120,7 +120,7 @@ void CPointTeleport::InputTeleport( inputdata_t &inputdata )
 	// If teleport object is in a movement hierarchy, remove it first
 	if ( EntityMayTeleport( pTarget ) == false )
 	{
-		Warning("ERROR: (%s) can't teleport object (%s) as it has a parent (%s)!\n",GetDebugName(),pTarget->GetDebugName(),pTarget->GetMoveParent()->GetDebugName());
+		Warning("ERROR: (%s) can't teleport object (%s) as it has a parent (%s)!\n",GetDebugName(),pTarget->GetDebugName(),(pTarget->GetEngineObject()->GetMoveParent()?pTarget->GetEngineObject()->GetMoveParent()->GetOuter()->GetDebugName():NULL));
 		return;
 	}
 

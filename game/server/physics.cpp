@@ -518,10 +518,10 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 			return 0;
 	}
 
-	if ( pEntity0->GetMoveParent() || pEntity1->GetMoveParent() )
+	if ( pEntity0->GetEngineObject()->GetMoveParent() || pEntity1->GetEngineObject()->GetMoveParent() )
 	{
-		CBaseEntity *pParent0 = pEntity0->GetRootMoveParent();
-		CBaseEntity *pParent1 = pEntity1->GetRootMoveParent();
+		CBaseEntity *pParent0 = pEntity0->GetEngineObject()->GetRootMoveParent()->GetOuter();
+		CBaseEntity *pParent1 = pEntity1->GetEngineObject()->GetRootMoveParent()->GetOuter();
 		
 		// NOTE: Don't let siblings/parents collide.  If you want this behavior, do it
 		// with constraints, not hierarchy!
@@ -554,19 +554,19 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 	bool aiMove0 = (movetype0==MOVETYPE_PUSH) ? true : false;
 	bool aiMove1 = (movetype1==MOVETYPE_PUSH) ? true : false;
 
-	if ( pEntity0->GetMoveParent() )
+	if ( pEntity0->GetEngineObject()->GetMoveParent() )
 	{
 		// if the object & its parent are both MOVETYPE_VPHYSICS, then this must be a special case
 		// like a prop_ragdoll_attached
-		if ( !(movetype0 == MOVETYPE_VPHYSICS && pEntity0->GetRootMoveParent()->GetMoveType() == MOVETYPE_VPHYSICS) )
+		if ( !(movetype0 == MOVETYPE_VPHYSICS && pEntity0->GetEngineObject()->GetRootMoveParent()->GetOuter()->GetMoveType() == MOVETYPE_VPHYSICS))
 		{
 			aiMove0 = true;
 		}
 	}
-	if ( pEntity1->GetMoveParent() )
+	if ( pEntity1->GetEngineObject()->GetMoveParent() )
 	{
 		// if the object & its parent are both MOVETYPE_VPHYSICS, then this must be a special case.
-		if ( !(movetype1 == MOVETYPE_VPHYSICS && pEntity1->GetRootMoveParent()->GetMoveType() == MOVETYPE_VPHYSICS) )
+		if ( !(movetype1 == MOVETYPE_VPHYSICS && pEntity1->GetEngineObject()->GetRootMoveParent()->GetOuter()->GetMoveType() == MOVETYPE_VPHYSICS))
 		{
 			aiMove1 = true;
 		}

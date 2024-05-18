@@ -286,7 +286,7 @@ END_SEND_TABLE();
 
 bool ShouldVehicleIgnoreEntity( CBaseEntity *pVehicle, CBaseEntity *pCollide )
 {
-	if ( pCollide->GetMoveParent() == pVehicle )
+	if (pCollide->GetEngineObject()->GetMoveParent() && pCollide->GetEngineObject()->GetMoveParent()->GetOuter() == pVehicle)
 		return true;
 
 	CPropVehicleChoreoGeneric *pChoreoVehicle = dynamic_cast <CPropVehicleChoreoGeneric *>( pVehicle );
@@ -300,7 +300,7 @@ bool ShouldVehicleIgnoreEntity( CBaseEntity *pVehicle, CBaseEntity *pCollide )
 	if ( pChoreoVehicle->ShouldIgnoreParent() == false )
 		return false;
 
-	if ( pChoreoVehicle->GetMoveParent() == pCollide )
+	if (pChoreoVehicle->GetEngineObject()->GetMoveParent() && pChoreoVehicle->GetEngineObject()->GetMoveParent()->GetOuter() == pCollide)
 		return true;
 		
 	return false;

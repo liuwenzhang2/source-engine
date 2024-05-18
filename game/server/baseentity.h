@@ -578,10 +578,10 @@ public:
 	virtual void Activate( void );
 
 	// Hierarchy traversal
-	CBaseEntity *GetMoveParent( void );
-	CBaseEntity *GetRootMoveParent();
-	CBaseEntity *FirstMoveChild( void );
-	CBaseEntity *NextMovePeer( void );
+	//CBaseEntity *GetMoveParent( void );
+	//CBaseEntity *GetRootMoveParent();
+	//CBaseEntity *FirstMoveChild( void );
+	//CBaseEntity *NextMovePeer( void );
 
 	//void		SetName( string_t newTarget );
 	void SetName(const char* newName)
@@ -1927,28 +1927,28 @@ inline bool CBaseEntity::Debug_ShouldStep(void)
 //-----------------------------------------------------------------------------
 // Methods relating to traversing hierarchy
 //-----------------------------------------------------------------------------
-inline CBaseEntity *CBaseEntity::GetMoveParent( void )
-{
-	return GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL;
-}
+//inline CBaseEntity *CBaseEntity::GetMoveParent( void )
+//{
+//	return GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+//}
 
-inline CBaseEntity *CBaseEntity::FirstMoveChild( void )
-{
-	return GetEngineObject()->FirstMoveChild()? GetEngineObject()->FirstMoveChild()->GetOuter():NULL;
-}
+//inline CBaseEntity *CBaseEntity::FirstMoveChild( void )
+//{
+//	return GetEngineObject()->FirstMoveChild()? GetEngineObject()->FirstMoveChild()->GetOuter():NULL;
+//}
 
-inline CBaseEntity *CBaseEntity::NextMovePeer( void )
-{
-	return GetEngineObject()->NextMovePeer()? GetEngineObject()->NextMovePeer()->GetOuter():NULL;
-}
+//inline CBaseEntity *CBaseEntity::NextMovePeer( void )
+//{
+//	return GetEngineObject()->NextMovePeer()? GetEngineObject()->NextMovePeer()->GetOuter():NULL;
+//}
 
 //-----------------------------------------------------------------------------
 // Returns the highest parent of an entity
 //-----------------------------------------------------------------------------
-inline CBaseEntity* CBaseEntity::GetRootMoveParent()
-{
-	return GetEngineObject()->GetRootMoveParent() ? GetEngineObject()->GetRootMoveParent()->GetOuter() : NULL;
-}
+//inline CBaseEntity* CBaseEntity::GetRootMoveParent()
+//{
+//	return GetEngineObject()->GetRootMoveParent() ? GetEngineObject()->GetRootMoveParent()->GetOuter() : NULL;
+//}
 
 // FIXME: Remove this! There shouldn't be a difference between moveparent + parent
 //inline CBaseEntity* CBaseEntity::GetParent()

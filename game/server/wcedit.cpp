@@ -808,7 +808,7 @@ CON_COMMAND( hammer_update_safe_entities, "Updates entities in the map that can 
 			continue;
 
 		// If we have a parent, or any children, we're not safe to update
-		if ( pEnt->GetMoveParent() || pEnt->FirstMoveChild() )
+		if ( pEnt->GetEngineObject()->GetMoveParent() || pEnt->GetEngineObject()->FirstMoveChild() )
 			continue;
 
 		IPhysicsObject *pPhysics = pEnt->VPhysicsGetObject();

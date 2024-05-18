@@ -110,7 +110,7 @@ public:
 	void	Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecTarget = NULL, const Vector *pVelocity = NULL );
 
 	void	SetEMPHolstered( bool bHolstered ) { m_bIsEMPHolstered = bHolstered; }
-	bool	IsEMPHolstered() { return (!m_hEmpTool || m_hEmpTool->GetMoveParent() != this || m_bIsEMPHolstered); }
+	bool	IsEMPHolstered() { return (!m_hEmpTool || m_hEmpTool->GetEngineObject()->GetMoveParent() != this->GetEngineObject() || m_bIsEMPHolstered); }
 
 	float	GetReadinessDecay() { return 60.0f; }
 	virtual bool	IsAllowedToAim();

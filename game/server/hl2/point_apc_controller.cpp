@@ -64,7 +64,7 @@ public:
 
 	void		UpdateMatrix( void )
 	{
-		m_parentMatrix.InitFromEntity(GetMoveParent() ? GetMoveParent() : NULL );
+		m_parentMatrix.InitFromEntity(GetEngineObject()->GetMoveParent() ? GetEngineObject()->GetMoveParent()->GetOuter() : NULL);
 	}
 	QAngle		AimBarrelAt( const Vector &parentTarget );
 

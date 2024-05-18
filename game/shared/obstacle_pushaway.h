@@ -85,8 +85,8 @@ public:
 			return ITERATION_CONTINUE;
 
 		// ignore breakables parented to doors
-		if ( pEnt->GetMoveParent() &&
-			( FClassnameIs( pEnt->GetMoveParent(), "func_door*" ) ||
+		if ( pEnt->GetEngineObject()->GetMoveParent() &&
+			( FClassnameIs( pEnt->GetEngineObject()->GetMoveParent()->GetOuter(), "func_door*") ||
 			FClassnameIs( pEnt, "prop_door*" ) ) )
 			return ITERATION_CONTINUE;
 

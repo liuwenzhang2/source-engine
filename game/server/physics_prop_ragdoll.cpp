@@ -1597,11 +1597,11 @@ void DetachAttachedRagdoll( CBaseEntity *pRagdollIn )
 
 void DetachAttachedRagdollsForEntity( CBaseEntity *pRagdollParent )
 {
-	CUtlVector<CBaseEntity *> list;
-	GetAllChildren( pRagdollParent, list );
+	CUtlVector<IEngineObjectServer *> list;
+	GetAllChildren( pRagdollParent->GetEngineObject(), list );
 	for ( int i = list.Count()-1; i >= 0; --i )
 	{
-		DetachAttachedRagdoll( list[i] );
+		DetachAttachedRagdoll( list[i]->GetOuter() );
 	}
 }
 

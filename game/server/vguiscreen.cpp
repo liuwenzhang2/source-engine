@@ -85,7 +85,7 @@ bool CVGuiScreen::KeyValue( const char *szKeyName, const char *szValue )
 	// NOTE: Have to do these separate because they set two values instead of one
 	if( FStrEq( szKeyName, "angles" ) )
 	{
-		Assert( GetMoveParent() == NULL );
+		Assert(GetEngineObject()->GetMoveParent() == NULL );
 		QAngle angles;
 		UTIL_StringToVector( angles.Base(), szValue );
 
@@ -309,7 +309,7 @@ int CVGuiScreen::UpdateTransmitState()
 		// only send to the owner, or someone spectating the owner.
 		return SetTransmitState( FL_EDICT_FULLCHECK );
 	}
-	else if ( GetMoveParent() )
+	else if (GetEngineObject()->GetMoveParent() )
 	{
 		// Let the parent object trigger the send. This is more efficient than having it call CBaseEntity::ShouldTransmit
 		// for all the vgui screens in the map.

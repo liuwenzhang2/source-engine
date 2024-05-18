@@ -600,14 +600,14 @@ int CSpriteTrail::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 
 	if ( !m_bDrawForMoveParent )
 	{
-		if ( GetMoveParent() && !GetMoveParent()->IsPlayer() )
+		if (GetEngineObject()->GetMoveParent() && !GetEngineObject()->GetMoveParent()->GetOuter()->IsPlayer())
 		{
-			if ( GetMoveParent()->GetMoveParent() == pRecipientPlayer )
+			if (GetEngineObject()->GetMoveParent()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetMoveParent()->GetOuter() == pRecipientPlayer)
 			{
 				return FL_EDICT_DONTSEND;
 			}
 		}
-		else if ( GetMoveParent() == pRecipientPlayer )
+		else if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetOuter() == pRecipientPlayer)
 		{
 				return FL_EDICT_DONTSEND;
 		}

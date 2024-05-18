@@ -1907,13 +1907,13 @@ LINK_ENTITY_TO_CLASS( env_muzzleflash, CEnvMuzzleFlash );
 //-----------------------------------------------------------------------------
 void CEnvMuzzleFlash::Spawn()
 {
-	if ( (m_iszParentAttachment != NULL_STRING) && GetMoveParent() && GetMoveParent()->GetBaseAnimating() )
+	if ( (m_iszParentAttachment != NULL_STRING) && GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating())
 	{
-		CBaseAnimating *pAnim = GetMoveParent()->GetBaseAnimating();
+		CBaseAnimating *pAnim = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
 		int nParentAttachment = pAnim->LookupAttachment( STRING(m_iszParentAttachment) );
 		if ( nParentAttachment > 0 )
 		{
-			GetEngineObject()->SetParent(GetMoveParent()->GetEngineObject(), nParentAttachment);
+			GetEngineObject()->SetParent(GetEngineObject()->GetMoveParent(), nParentAttachment);
 			GetEngineObject()->SetLocalOrigin( vec3_origin );
 			GetEngineObject()->SetLocalAngles( vec3_angle );
 		}

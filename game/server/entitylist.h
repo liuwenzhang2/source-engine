@@ -1459,7 +1459,7 @@ int CGlobalEntityList<T>::InTransitionVolume(T* pEntity, const char* pVolumeName
 		return TRANSITION_VOLUME_PASSED;
 
 	// If you're following another entity, follow it through the transition (weapons follow the player)
-	pEntity = pEntity->GetRootMoveParent();
+	pEntity = pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
 
 	int inVolume = TRANSITION_VOLUME_NOT_FOUND;	// Unless we find a trigger_transition, everything is in the volume
 

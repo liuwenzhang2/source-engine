@@ -156,10 +156,10 @@ int CMaterialModifyControl::UpdateTransmitState()
 //-----------------------------------------------------------------------------
 int CMaterialModifyControl::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 {
-	CBaseEntity *pEnt = GetMoveParent();
+	IEngineObjectServer *pEnt = GetEngineObject()->GetMoveParent();
 	if ( pEnt )
 	{
-		return pEnt->ShouldTransmit( pInfo );
+		return pEnt->GetOuter()->ShouldTransmit(pInfo);
 	}
 	
 	return FL_EDICT_DONTSEND;

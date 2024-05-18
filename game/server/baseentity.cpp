@@ -542,14 +542,14 @@ void CBaseEntity::UpdateOnRemove(void)
 	this->GetEngineObject()->UnlinkFromParent();
 
 	// Any children still connected are orphans, mark all for delete
-	CUtlVector<CBaseEntity*> childrenList;
-	GetAllChildren(this, childrenList);
+	CUtlVector<IEngineObjectServer*> childrenList;
+	GetAllChildren(this->GetEngineObject(), childrenList);
 	if (childrenList.Count())
 	{
 		DevMsg(2, "Warning: Deleting orphaned children of %s\n", GetClassname());
 		for (int i = childrenList.Count() - 1; i >= 0; --i)
 		{
-			UTIL_Remove(childrenList[i]);
+			UTIL_Remove(childrenList[i]->GetOuter());
 		}
 	}
 
@@ -2275,8 +2275,8 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 	// don't allow vphysics to block.  Assume game physics has handled it.
 	if ( GetSolid() != SOLID_BSP && pPhysics->GetShadowPosition( &origin, &angles ) )
 	{
-		CUtlVector<CBaseEntity *> list;
-		GetAllInHierarchy( this, list );
+		CUtlVector<IEngineObjectServer *> list;
+		GetAllInHierarchy( this->GetEngineObject(), list );
 		//NDebugOverlay::BoxAngles( origin, CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), angles, 255,0,0,0, gpGlobals->frametime);
 
 		physicspushlist_t *pList = NULL;
@@ -2296,9 +2296,9 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 		params.movetime = movetime;
 		for ( int i = 0; i < list.Count(); i++ )
 		{
-			if ( list[i]->IsSolid() )
+			if ( list[i]->GetOuter()->IsSolid())
 			{
-				CheckPushedEntity( list[i], params );
+				CheckPushedEntity( list[i]->GetOuter(), params);
 			}
 		}
 
@@ -3367,7 +3367,7 @@ void CBaseEntity::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 	if ( pInfo->m_pTransmitEdict->Get( index ) )
 		return;
 
-	CBaseEntity *pMoveParent = GetMoveParent();
+	IEngineObjectServer *pMoveParent = GetEngineObject()->GetMoveParent();
 
 	pInfo->m_pTransmitEdict->Set( index );
 
@@ -3393,7 +3393,7 @@ void CBaseEntity::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 	if (pMoveParent)
 	{
 		//CBaseEntity *pMoveParent = pNetworkParent->GetBaseEntity();
-		pMoveParent->SetTransmit( pInfo, bAlways );
+		pMoveParent->GetOuter()->SetTransmit(pInfo, bAlways);
 	}
 }
 

@@ -56,11 +56,11 @@ CEntityParticleTrail *CEntityParticleTrail::Create( CBaseEntity *pTarget, const 
 
 	// Look for other particle trails on the entity + copy state to the new entity
 	CEntityParticleTrail *pTrail;
-	CBaseEntity *pNext;
-	for ( CBaseEntity *pChild = pTarget->FirstMoveChild(); pChild; pChild = pNext )
+	IEngineObjectServer *pNext;
+	for ( IEngineObjectServer *pChild = pTarget->GetEngineObject()->FirstMoveChild(); pChild; pChild = pNext )
 	{
 		pNext = pChild->NextMovePeer();
-		pTrail = dynamic_cast<CEntityParticleTrail*>(pChild);
+		pTrail = dynamic_cast<CEntityParticleTrail*>(pChild->GetOuter());
 		if ( pTrail && (pTrail->m_iMaterialName == iMaterialName) )
 		{
 			// Prevent destruction if it re-enters the field
@@ -163,7 +163,7 @@ void CEntityParticleTrail::DecrementRefCount()
 void CEntityParticleTrail::NotifySystemEvent( CBaseEntity *pNotify, notify_system_event_t eventType, const notify_system_event_params_t &params )
 {
 	BaseClass::NotifySystemEvent( pNotify, eventType, params );
-	Assert( pNotify == GetMoveParent() );
+	Assert( pNotify == GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL);
 	if ( eventType == NOTIFY_EVENT_DESTROY )
 	{
 		FollowEntity( NULL );
@@ -185,11 +185,11 @@ void CEntityParticleTrail::Destroy( CBaseEntity *pTarget, const EntityParticleTr
 	int iMaterialName = g_ServerGameDLL.GetMaterialIndex( STRING(info.m_strMaterialName) );
 
 	// Look for the particle trail attached to this entity + decrease refcount
-	CBaseEntity *pNext;
-	for ( CBaseEntity *pChild = pTarget->FirstMoveChild(); pChild; pChild = pNext )
+	IEngineObjectServer *pNext;
+	for ( IEngineObjectServer *pChild = pTarget->GetEngineObject()->FirstMoveChild(); pChild; pChild = pNext )
 	{
 		pNext = pChild->NextMovePeer();
-		CEntityParticleTrail *pTrail = dynamic_cast<CEntityParticleTrail*>(pChild);
+		CEntityParticleTrail *pTrail = dynamic_cast<CEntityParticleTrail*>(pChild->GetOuter());
 		if ( !pTrail || (pTrail->m_iMaterialName != iMaterialName) )
 			continue;
 

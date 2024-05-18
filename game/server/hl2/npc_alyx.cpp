@@ -111,7 +111,7 @@ void CNPC_Alyx::Spawn()
 	BaseClass::Spawn();
 
 	// If Alyx has a parent, she's currently inside a pod. Prevent her from moving.
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
 		SetMoveType( MOVETYPE_NONE );
 		CapabilitiesClear();
@@ -208,7 +208,7 @@ void CNPC_Alyx::PrescheduleThink( void )
 	BaseClass::PrescheduleThink();
 
 	// Figure out if Alyx has just been removed from her parent
-	if ( GetMoveType() == MOVETYPE_NONE && !GetMoveParent() )
+	if ( GetMoveType() == MOVETYPE_NONE && !GetEngineObject()->GetMoveParent() )
 	{
 		SetupAlyxWithoutParent();
 		SetupVPhysicsHull();

@@ -1632,13 +1632,13 @@ void CFuncTrackTrain::Stop( void )
 
 static CBaseEntity *FindPhysicsBlockerForHierarchy( CBaseEntity *pParentEntity )
 {
-	CUtlVector<CBaseEntity *> list;
-	GetAllInHierarchy( pParentEntity, list );
+	CUtlVector<IEngineObjectServer *> list;
+	GetAllInHierarchy( pParentEntity->GetEngineObject(), list );
 	CBaseEntity *pPhysicsBlocker = NULL;
 	float maxForce = 0;
 	for ( int i = 0; i < list.Count(); i++ )
 	{
-		IPhysicsObject *pPhysics = list[i]->VPhysicsGetObject();
+		IPhysicsObject *pPhysics = list[i]->GetOuter()->VPhysicsGetObject();
 		if ( pPhysics )
 		{
 			IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
@@ -2345,7 +2345,7 @@ void CFuncTrackTrain::Next( void )
 
 	// Trains *can* work in local space, but only if all elements of the track share
 	// the same move parent as the train.
-	Assert( !pNext || (pNext->GetMoveParent() == GetMoveParent()) );
+	Assert( !pNext || (pNext->GetEngineObject()->GetMoveParent() == GetEngineObject()->GetMoveParent()) );
 
 	if ( pNext )
 	{
@@ -2774,9 +2774,9 @@ int CFuncTrackTrain::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	if ( m_bDamageChild )
 	{
-		if ( FirstMoveChild() )
+		if (GetEngineObject()->FirstMoveChild() )
 		{
-			FirstMoveChild()->TakeDamage( info );
+			GetEngineObject()->FirstMoveChild()->GetOuter()->TakeDamage(info);
 		}
 
 		return 0;

@@ -239,7 +239,7 @@ void CNPC_VehicleDriver::PrescheduleThink( void )
 	}
 
 	// If we've been picked up by something (dropship probably), abort.
-	if ( m_hVehicleEntity->GetMoveParent() )
+	if ( m_hVehicleEntity->GetEngineObject()->GetMoveParent() )
 	{
 		SetState( NPC_STATE_IDLE );
 		ClearWaypoints();
@@ -562,7 +562,7 @@ bool CNPC_VehicleDriver::OverrideMove( float flInterval )
 
 	// If we don't have a maxspeed, we've been stopped, so abort early
 	// Or we've been picked up by something (dropship probably).
-	if ( !m_flMaxSpeed || m_hVehicleEntity->GetMoveParent() )
+	if ( !m_flMaxSpeed || m_hVehicleEntity->GetEngineObject()->GetMoveParent() )
 	{
 		m_pVehicleInterface->NPC_Brake();
 		return true;

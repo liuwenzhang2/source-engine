@@ -232,12 +232,12 @@ bool CNPC_Stalker::IsValidEnemy( CBaseEntity *pEnemy )
 		}
 	}
 
-	if( enemyClass == CLASS_BULLSEYE && pEnemy->GetMoveParent() )
+	if( enemyClass == CLASS_BULLSEYE && pEnemy->GetEngineObject()->GetMoveParent() )
 	{
 		// This bullseye is in heirarchy with something. If that
 		// something is held by the physcannon, this bullseye is 
 		// NOT a valid enemy.
-		IPhysicsObject *pPhys = pEnemy->GetMoveParent()->VPhysicsGetObject();
+		IPhysicsObject *pPhys = pEnemy->GetEngineObject()->GetMoveParent()->GetOuter()->VPhysicsGetObject();
 		if( pPhys && (pPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
 		{
 			return false;

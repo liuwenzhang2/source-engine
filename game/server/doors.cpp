@@ -247,7 +247,7 @@ void CBaseDoor::Spawn()
 #ifdef HL1_DLL
 	SetSolid( SOLID_BSP );
 #else
-	if ( GetMoveParent() && GetRootMoveParent()->GetSolid() == SOLID_BSP )
+	if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetRootMoveParent()->GetOuter()->GetSolid() == SOLID_BSP)
 	{
 		SetSolid( SOLID_BSP );
 	}

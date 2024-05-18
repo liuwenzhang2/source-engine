@@ -923,19 +923,19 @@ void CNPC_CScanner::InputShouldInspect( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_CScanner::DeployMine()
 {
-	CBaseEntity *child;
+	IEngineObjectServer *child;
 	// iterate through all children
-	for ( child = FirstMoveChild(); child != NULL; child = child->NextMovePeer() )
+	for ( child = GetEngineObject()->FirstMoveChild(); child != NULL; child = child->NextMovePeer() )
 	{
-		if( FClassnameIs( child, "combine_mine" ) )
+		if( FClassnameIs( child->GetOuter(), "combine_mine"))
 		{
-			child->GetEngineObject()->SetParent( NULL );
-			child->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() );
-			child->SetOwnerEntity( this );
+			child->SetParent( NULL );
+			child->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() );
+			child->GetOuter()->SetOwnerEntity(this);
 
 			ScannerEmitSound( "DeployMine" );
 
-			IPhysicsObject *pPhysObj = child->VPhysicsGetObject();
+			IPhysicsObject *pPhysObj = child->GetOuter()->VPhysicsGetObject();
 			if( pPhysObj )
 			{
 				// Make sure the mine's awake
@@ -980,11 +980,11 @@ void CNPC_CScanner::InputDeployMine(inputdata_t &inputdata)
 //-----------------------------------------------------------------------------
 void CNPC_CScanner::InputEquipMine(inputdata_t &inputdata)
 {
-	CBaseEntity *child;
+	IEngineObjectServer *child;
 	// iterate through all children
-	for ( child = FirstMoveChild(); child != NULL; child = child->NextMovePeer() )
+	for ( child = GetEngineObject()->FirstMoveChild(); child != NULL; child = child->NextMovePeer() )
 	{
-		if( FClassnameIs( child, "combine_mine" ) )
+		if( FClassnameIs( child->GetOuter(), "combine_mine"))
 		{
 			// Already have a mine!
 			return;

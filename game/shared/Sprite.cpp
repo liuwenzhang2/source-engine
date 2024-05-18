@@ -326,7 +326,7 @@ void CSprite::SpriteInit( const char *pSpriteName, const Vector &origin )
 
 int CSprite::UpdateTransmitState( void )
 {
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
 		// we must call ShouldTransmit() if we have a move parent
 		return SetTransmitState( FL_EDICT_FULLCHECK );
@@ -344,9 +344,9 @@ int CSprite::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	// the client. Otherwise, the server will have to send big bursts of data with the entity states
 	// as they come in and out of the PVS.
 	
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
-		CBaseViewModel *pViewModel = dynamic_cast<CBaseViewModel *>( GetMoveParent() );
+		CBaseViewModel *pViewModel = dynamic_cast<CBaseViewModel *>(GetEngineObject()->GetMoveParent()->GetOuter() );
 
 		if ( pViewModel )
 		{

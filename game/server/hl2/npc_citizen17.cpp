@@ -482,7 +482,7 @@ void CNPC_Citizen::Spawn()
 	m_iHealth = sk_citizen_health.GetFloat();
 	
 	// Are we on a train? Used in trainstation to have NPCs on trains.
-	if ( GetMoveParent() && FClassnameIs( GetMoveParent(), "func_tracktrain" ) )
+	if (GetEngineObject()->GetMoveParent() && FClassnameIs(GetEngineObject()->GetMoveParent()->GetOuter(), "func_tracktrain"))
 	{
 		CapabilitiesRemove( bits_CAP_MOVE_GROUND );
 		SetMoveType( MOVETYPE_NONE );
@@ -1666,7 +1666,7 @@ void CNPC_Citizen::RunTask( const Task_t *pTask )
 		case TASK_CIT_SIT_ON_TRAIN:
 		{
 			// If we were on a train, but we're not anymore, enable movement
-			if ( !GetMoveParent() )
+			if ( !GetEngineObject()->GetMoveParent() )
 			{
 				SetMoveType( MOVETYPE_STEP );
 				CapabilitiesAdd( bits_CAP_MOVE_GROUND );

@@ -326,7 +326,7 @@ void CNPC_Alyx::Spawn()
 	BaseClass::Spawn();
 
 	// If Alyx has a parent, she's currently inside a pod. Prevent her from moving.
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
 		SetMoveType( MOVETYPE_NONE );
 		CapabilitiesClear();
@@ -610,7 +610,7 @@ void CNPC_Alyx::PrescheduleThink( void )
 	BaseClass::PrescheduleThink();
 
 	// Figure out if Alyx has just been removed from her parent
-	if ( GetMoveType() == MOVETYPE_NONE && !GetMoveParent() )
+	if ( GetMoveType() == MOVETYPE_NONE && !GetEngineObject()->GetMoveParent() )
 	{
 		// Don't confuse the passenger behavior with just removing Alyx's parent!
 		if ( m_PassengerBehavior.IsEnabled() == false )
@@ -3161,9 +3161,9 @@ PassengerState_e CNPC_Alyx::GetPassengerState( void )
 void CNPC_Alyx::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	// if I'm in the vehicle, the player is probably trying to use the vehicle
-	if ( GetPassengerState() == PASSENGER_STATE_INSIDE && pActivator->IsPlayer() && GetMoveParent() )
+	if ( GetPassengerState() == PASSENGER_STATE_INSIDE && pActivator->IsPlayer() && GetEngineObject()->GetMoveParent() )
 	{
-		GetMoveParent()->Use( pActivator, pCaller, useType, value );
+		GetEngineObject()->GetMoveParent()->GetOuter()->Use(pActivator, pCaller, useType, value);
 		return;
 	}
 	m_bDontUseSemaphore = true;

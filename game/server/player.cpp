@@ -1964,7 +1964,7 @@ WaterMove
 
 void CBasePlayer::WaterMove()
 {
-	if ( ( GetMoveType() == MOVETYPE_NOCLIP ) && !GetMoveParent() )
+	if ( ( GetMoveType() == MOVETYPE_NOCLIP ) && !GetEngineObject()->GetMoveParent() )
 	{
 		m_AirFinished = gpGlobals->curtime + AIRTIME;
 		return;
@@ -3245,10 +3245,10 @@ void CBasePlayer::PhysicsSimulate( void )
 	VPROF_BUDGET( "CBasePlayer::PhysicsSimulate", VPROF_BUDGETGROUP_PLAYER );
 
 	// If we've got a moveparent, we must simulate that first.
-	CBaseEntity *pMoveParent = GetMoveParent();
+	IEngineObjectServer *pMoveParent = GetEngineObject()->GetMoveParent();
 	if (pMoveParent)
 	{
-		pMoveParent->PhysicsSimulate();
+		pMoveParent->GetOuter()->PhysicsSimulate();
 	}
 
 	// Make sure not to simulate this guy twice per frame

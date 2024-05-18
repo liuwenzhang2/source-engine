@@ -2923,12 +2923,12 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				if ( !pEnt )
 					break;
 
-				CBaseEntity *pParent = pEnt->GetMoveParent();
+				IEngineObjectServer *pParent = pEnt->GetEngineObject()->GetMoveParent();
 				if ( !pParent )
 					break;
 
 				//pEdict = pParent->edict();
-				iEdict = pParent->entindex();
+				iEdict = pParent->GetOuter()->entindex();
 			}
 			continue;
 		}
@@ -2993,13 +2993,13 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 		// If the entity is marked "check PVS" but it's in hierarchy, walk up the hierarchy looking for the
 		//  for any parent which is also in the PVS.  If none are found, then we don't need to worry about sending ourself
 		CBaseEntity *orig = pEnt;
-		CBaseEntity *check = pEnt->GetMoveParent();
+		IEngineObjectServer *check = pEnt->GetEngineObject()->GetMoveParent();
 
 		// BUG BUG:  I think it might be better to build up a list of edict indices which "depend" on other answers and then
 		// resolve them in a second pass.  Not sure what happens if an entity has two parents who both request PVS check?
         while ( check )
 		{
-			int checkIndex = check->entindex();
+			int checkIndex = check->GetOuter()->entindex();
 
 			// Parent already being sent
 			if ( pInfo->m_pTransmitEdict->Get( checkIndex ) )
@@ -3021,7 +3021,7 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 			if ( checkFlags == FL_EDICT_FULLCHECK )
 			{
 				// do a full ShouldTransmit() check, may return FL_EDICT_CHECKPVS
-				CBaseEntity *pCheckEntity = check->GetBaseEntity();
+				CBaseEntity *pCheckEntity = check->GetOuter()->GetBaseEntity();
 				nFlags = pCheckEntity->ShouldTransmit( pInfo );
 				Assert( !(nFlags & FL_EDICT_FULLCHECK) );
 				if ( nFlags & FL_EDICT_ALWAYS )
@@ -3035,8 +3035,8 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 			if ( checkFlags & FL_EDICT_PVSCHECK )
 			{
 				// Check pvs
-				check->GetBaseEntity()->GetEngineObject()->RecomputePVSInformation();
-				bool bMoveParentInPVS = check->GetBaseEntity()->GetEngineObject()->IsInPVS( pInfo );
+				check->RecomputePVSInformation();
+				bool bMoveParentInPVS = check->IsInPVS( pInfo );
 				if ( bMoveParentInPVS )
 				{
 					orig->SetTransmit( pInfo, true );

@@ -831,7 +831,7 @@ void CTeamTrainWatcher::WatcherActivate( void )
 			for ( int i=0; i<ITriggerAreaCaptureAutoList::AutoList().Count(); ++i )
 			{
 				CTriggerAreaCapture *pArea = static_cast< CTriggerAreaCapture * >( ITriggerAreaCaptureAutoList::AutoList()[i] );
-				if ( pArea->GetMoveParent() == m_hTrain.Get() )
+				if (pArea->GetEngineObject()->GetMoveParent() && pArea->GetEngineObject()->GetMoveParent()->GetOuter() == m_hTrain.Get())
 				{
 					// this is the capture area we care about, so let it know that we want updates on the capture numbers
 					pArea->SetTrainWatcher( this );

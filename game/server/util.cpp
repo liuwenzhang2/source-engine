@@ -766,7 +766,7 @@ void UTIL_ScreenShakeObject( CBaseEntity *pEnt, const Vector &center, float ampl
 	int			i;
 	float		localAmplitude;
 
-	CBaseEntity *pHighestParent = pEnt->GetRootMoveParent();
+	CBaseEntity *pHighestParent = pEnt->GetEngineObject()->GetRootMoveParent()->GetOuter();
 	for ( i = 1; i <= gpGlobals->maxClients; i++ )
 	{
 		CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
@@ -775,11 +775,11 @@ void UTIL_ScreenShakeObject( CBaseEntity *pEnt, const Vector &center, float ampl
 
 		// Shake the object, or anything hierarchically attached to it at maximum amplitude
 		localAmplitude = 0;
-		if (pHighestParent == pPlayer->GetRootMoveParent())
+		if (pHighestParent == pPlayer->GetEngineObject()->GetRootMoveParent()->GetOuter())
 		{
 			localAmplitude = amplitude;
 		}
-		else if ((pPlayer->GetFlags() & FL_ONGROUND) && (pPlayer->GetGroundEntity()->GetRootMoveParent() == pHighestParent))
+		else if ((pPlayer->GetFlags() & FL_ONGROUND) && (pPlayer->GetGroundEntity()->GetEngineObject()->GetRootMoveParent()->GetOuter() == pHighestParent))
 		{
 			// If the player is standing on the object, use maximum amplitude
 			localAmplitude = amplitude;
@@ -1846,14 +1846,14 @@ int UTIL_EntityInSolid( CBaseEntity *ent )
 {
 	Vector	point;
 
-	CBaseEntity *pParent = ent->GetMoveParent();
+	IEngineObjectServer *pParent = ent->GetEngineObject()->GetMoveParent();
 	// HACKHACK -- If you're attached to a client, always go through
 	if ( pParent )
 	{
-		if ( pParent->IsPlayer() )
+		if ( pParent->GetOuter()->IsPlayer())
 			return 0;
 
-		ent = ent->GetRootMoveParent();
+		ent = ent->GetEngineObject()->GetRootMoveParent()->GetOuter();
 	}
 
 	point = ent->WorldSpaceCenter();
@@ -2267,7 +2267,7 @@ CBaseEntity *UTIL_EntitiesInPVS( CBaseEntity *pPVSEntity, CBaseEntity *pStarting
 		if (!pEntity->IsNetworkable() || pEntity->entindex()==-1 )
 			continue;
 
-		CBaseEntity *pParent = pEntity->GetRootMoveParent();
+		CBaseEntity *pParent = pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
 
 		Vector vecSurroundMins, vecSurroundMaxs;
 		pParent->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
@@ -2682,7 +2682,7 @@ void UTIL_ParentToWorldSpace( CBaseEntity *pEntity, Vector &vecPosition, QAngle 
 	matrix3x4_t matScratch, matResult;
 	matrix3x4_t matParentToWorld;
 	
-	if ( pEntity->GetMoveParent() != NULL )
+	if ( pEntity->GetEngineObject()->GetMoveParent() != NULL )
 	{
 		matParentToWorld = pEntity->GetEngineObject()->GetParentToWorldTransform( matScratch );
 	}
@@ -2732,7 +2732,7 @@ void UTIL_WorldToParentSpace( CBaseEntity *pEntity, Vector &vecPosition, QAngle 
 	matrix3x4_t matScratch, matResult;
 	matrix3x4_t matWorldToParent;
 	
-	if ( pEntity->GetMoveParent() != NULL )
+	if ( pEntity->GetEngineObject()->GetMoveParent() != NULL )
 	{
 		matScratch = pEntity->GetEngineObject()->GetParentToWorldTransform( matScratch );
 	}

@@ -323,7 +323,7 @@ bool CBaseTrigger::PointIsWithin( const Vector &vecPoint )
 //-----------------------------------------------------------------------------
 void CBaseTrigger::InitTrigger( )
 {
-	SetSolid(GetMoveParent() ? SOLID_VPHYSICS : SOLID_BSP );
+	SetSolid(GetEngineObject()->GetMoveParent() ? SOLID_VPHYSICS : SOLID_BSP );
 	AddSolidFlags( FSOLID_NOT_SOLID );
 	if (m_bDisabled)
 	{
@@ -1691,7 +1691,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 		return;
 
 	// FIXME: If something is hierarchically attached, should we try to push the parent?
-	if (pOther->GetMoveParent())
+	if (pOther->GetEngineObject()->GetMoveParent())
 		return;
 
 	// Transform the push dir into global space

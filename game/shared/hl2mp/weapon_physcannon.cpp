@@ -2115,7 +2115,7 @@ CWeaponPhysCannon::FindObjectResult_t CWeaponPhysCannon::FindObject( void )
 		UTIL_TraceHull( start, end, -Vector(4,4,4), Vector(4,4,4), MASK_SHOT|CONTENTS_GRATE, &filter, &tr );
 	}
 
-	CBaseEntity *pEntity = tr.m_pEnt ? ((CBaseEntity*)tr.m_pEnt)->GetRootMoveParent() : NULL;
+	CBaseEntity *pEntity = tr.m_pEnt ? ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetRootMoveParent()->GetOuter() : NULL;
 	bool	bAttach = false;
 	bool	bPull = false;
 

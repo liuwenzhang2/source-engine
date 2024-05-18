@@ -396,12 +396,12 @@ void CBreakableProp::SetEnableMotionPosition( const Vector &position, const QAng
 
 CBaseEntity	*CBreakableProp::FindEnableMotionFixup()
 {
-	CUtlVector<CBaseEntity*> list;
-	GetAllChildren( this, list );
+	CUtlVector<IEngineObjectServer*> list;
+	GetAllChildren( this->GetEngineObject(), list );
 	for ( int i = list.Count()-1; i >= 0; --i )
 	{
-		if ( FClassnameIs( list[i], "point_enable_motion_fixup" ) )
-			return list[i];
+		if ( FClassnameIs( list[i]->GetOuter(), "point_enable_motion_fixup"))
+			return list[i]->GetOuter();
 	}
 
 	return NULL;
@@ -526,11 +526,11 @@ void CBreakableProp::HandleFirstCollisionInteractions( int index, gamevcollision
 
 	if ( HasInteraction( PROPINTER_PHYSGUN_NOTIFY_CHILDREN ) )
 	{
-		CUtlVector<CBaseEntity *> children;
-		GetAllChildren( this, children );
+		CUtlVector<IEngineObjectServer *> children;
+		GetAllChildren( this->GetEngineObject(), children );
 		for (int i = 0; i < children.Count(); i++ )
 		{
-			CBaseEntity *pent = children.Element( i );
+			CBaseEntity *pent = children.Element( i )->GetOuter();
 
 			IParentPropInteraction *pPropInter = dynamic_cast<IParentPropInteraction *>( pent );
 			if ( pPropInter )
@@ -1996,7 +1996,7 @@ void CDynamicProp::AfterParentChanged( CBaseEntity *pOldParent, int iOldAttachme
 void CDynamicProp::BoneFollowerHierarchyChanged()
 {
 	// If we have bone followers and we're parented to something, we need to constantly update our bone followers
-	if ( m_BoneFollowerManager.GetNumBoneFollowers() && GetMoveParent() )
+	if ( m_BoneFollowerManager.GetNumBoneFollowers() && GetEngineObject()->GetMoveParent() )
 	{
 		//WatchPositionChanges(this, this);
 		this->AddWatcherToEntity(this, POSITIONWATCHER);
@@ -2831,11 +2831,11 @@ void CPhysicsProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 	
 	if ( HasInteraction( PROPINTER_PHYSGUN_NOTIFY_CHILDREN ) )
 	{
-		CUtlVector<CBaseEntity *> children;
-		GetAllChildren( this, children );
+		CUtlVector<IEngineObjectServer *> children;
+		GetAllChildren( this->GetEngineObject(), children );
 		for (int i = 0; i < children.Count(); i++ )
 		{
-			CBaseEntity *pent = children.Element( i );
+			CBaseEntity *pent = children.Element( i )->GetOuter();
 
 			IParentPropInteraction *pPropInter = dynamic_cast<IParentPropInteraction *>( pent );
 			if ( pPropInter )
@@ -6157,7 +6157,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	// Scale the base model as well
 	pInstance->SetModelScale( flScale );
 
-	if ( pInstance->GetMoveParent() )
+	if ( pInstance->GetEngineObject()->GetMoveParent() )
 	{
 		pNewObject->SetShadow( 1e4, 1e4, false, false );
 		pNewObject->UpdateShadow( pInstance->GetEngineObject()->GetAbsOrigin(), pInstance->GetEngineObject()->GetAbsAngles(), false, 0 );

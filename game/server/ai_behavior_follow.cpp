@@ -446,12 +446,12 @@ bool CAI_FollowBehavior::UpdateFollowPosition()
 
 	CBaseEntity *pFollowTarget = GetFollowTarget();
 
-	if ( pFollowTarget->GetMoveParent() )
+	if ( pFollowTarget->GetEngineObject()->GetMoveParent() )
 	{
-		if ( pFollowTarget->GetMoveParent()->GetServerVehicle() )
+		if ( pFollowTarget->GetEngineObject()->GetMoveParent()->GetOuter()->GetServerVehicle())
 		{
 			m_FollowNavGoal.targetMoveTolerance *= 1.5;
-			m_FollowNavGoal.range += pFollowTarget->GetMoveParent()->BoundingRadius() * 0.333;
+			m_FollowNavGoal.range += pFollowTarget->GetEngineObject()->GetMoveParent()->GetOuter()->BoundingRadius() * 0.333;
 		}
 	}
 
@@ -1647,13 +1647,13 @@ void CAI_FollowBehavior::RunTask( const Task_t *pTask )
 						vGoalPosition = GetGoalPosition();
 
 					AI_NavGoal_t goal( vGoalPosition, AIN_DEF_ACTIVITY, GetGoalTolerance() );
-					if ( !m_hFollowTarget->GetMoveParent() || !m_hFollowTarget->GetMoveParent()->GetServerVehicle() )
+					if ( !m_hFollowTarget->GetEngineObject()->GetMoveParent() || !m_hFollowTarget->GetEngineObject()->GetMoveParent()->GetOuter()->GetServerVehicle())
 					{
 						goal.pTarget = m_hFollowTarget;
 					}
 					else
 					{
-						goal.pTarget = m_hFollowTarget->GetMoveParent();
+						goal.pTarget = m_hFollowTarget->GetEngineObject()->GetMoveParent()->GetOuter();
 					}
 
 					bool bSuccess = true;

@@ -5748,11 +5748,11 @@ int CNPC_Hunter::OnTakeDamage( const CTakeDamageInfo &info )
 			// Physics objects that have flechettes stuck in them spoof
 			// a flechette hitting us so we dissolve when killed and award
 			// the achievement of killing a hunter with its flechettes.
-			CUtlVector<CBaseEntity *> children;
-			GetAllChildren( pInflictor, children );
+			CUtlVector<IEngineObjectServer *> children;
+			GetAllChildren( pInflictor->GetEngineObject(), children );
 			for (int i = 0; i < children.Count(); i++ )
 			{
-				CBaseEntity *pent = children.Element( i );
+				CBaseEntity *pent = children.Element( i )->GetOuter();
 				if ( dynamic_cast<CHunterFlechette *>( pent ) )
 				{
 					myInfo.SetInflictor( pent );

@@ -249,7 +249,7 @@ void CPointSpotlight::Activate(void)
 {
 	BaseClass::Activate();
 
-	if ( GetMoveParent() )
+	if ( GetEngineObject()->GetMoveParent() )
 	{
 		m_bEfficientSpotlight = false;
 	}
@@ -274,7 +274,7 @@ void CPointSpotlight::OnEntityEvent( EntityEvent_t event, void *pEventData )
 {
 	if ( event == ENTITY_EVENT_PARENT_CHANGED )
 	{
-		if ( GetMoveParent() )
+		if (GetEngineObject()->GetMoveParent() )
 		{
 			m_bEfficientSpotlight = false;
 			if ( m_hSpotlightTarget )
@@ -308,7 +308,7 @@ int CPointSpotlight::UpdateTransmitState()
 //-----------------------------------------------------------------------------
 void CPointSpotlight::SpotlightThink( void )
 {
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
 		SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
 	}

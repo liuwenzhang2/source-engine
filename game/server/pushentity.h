@@ -132,7 +132,7 @@ public:
 	CTraceFilterPushMove( CBaseEntity *pEntity, int nCollisionGroup ) 
 		: CTraceFilterSimple( pEntity, nCollisionGroup )
 	{
-		m_pRootParent = pEntity->GetRootMoveParent();
+		m_pRootParent = pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
 	}
 
 	bool ShouldHitEntity( IHandleEntity *pHandleEntity, int contentsMask )

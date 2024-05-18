@@ -2070,7 +2070,7 @@ void CPointPush::PushThink( void )
 			continue;
 
 		// Cannot be parented (only push parents)
-		if ( pEnts[i]->GetMoveParent() != NULL )
+		if ( pEnts[i]->GetEngineObject()->GetMoveParent() != NULL )
 			continue;
 
 		// Must be moveable

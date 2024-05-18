@@ -98,7 +98,7 @@ void CNPC_Eli::Spawn()
 	SetHullSizeNormal();
 
 	// If Eli has a parent, he's currently inside a pod. Prevent him from moving.
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
 		SetSolid( SOLID_BBOX );
 		AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -151,7 +151,7 @@ void CNPC_Eli::PrescheduleThink( void )
 	BaseClass::PrescheduleThink();
 
 	// Figure out if Eli has just been removed from his parent
-	if ( GetMoveType() == MOVETYPE_NONE && !GetMoveParent() )
+	if ( GetMoveType() == MOVETYPE_NONE && !GetEngineObject()->GetMoveParent() )
 	{
 		SetupWithoutParent();
 		SetupVPhysicsHull();

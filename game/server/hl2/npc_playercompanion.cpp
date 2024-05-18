@@ -2691,8 +2691,8 @@ bool CNPC_PlayerCompanion::IsMortar( CBaseEntity *pEntity )
 {
 	if ( !pEntity )
 		return false;
-	CBaseEntity *pEntityParent = pEntity->GetMoveParent();
-	return ( pEntityParent && pEntityParent->GetClassname() == STRING(gm_iszMortarClassname) );
+	IEngineObjectServer *pEntityParent = pEntity->GetEngineObject()->GetMoveParent();
+	return ( pEntityParent && pEntityParent->GetOuter()->GetClassname() == STRING(gm_iszMortarClassname));
 }
 
 //-----------------------------------------------------------------------------
@@ -2927,7 +2927,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 					GetLocalNavigator()->AddObstacle( pEntity->WorldSpaceCenter(), radius, AIMST_AVOID_OBJECT );
 				}
 			}
-			else if( pEntity->GetEngineObject()->GetClassname() == iszEntityFlame && pEntity->GetMoveParent() && !pEntity->GetMoveParent()->IsNPC())
+			else if( pEntity->GetEngineObject()->GetClassname() == iszEntityFlame && pEntity->GetEngineObject()->GetMoveParent() && !pEntity->GetEngineObject()->GetMoveParent()->GetOuter()->IsNPC())
 			{
 				float flDist = pEntity->WorldSpaceCenter().DistTo( WorldSpaceCenter() );
 

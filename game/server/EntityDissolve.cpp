@@ -120,7 +120,7 @@ void CEntityDissolve::Spawn()
 
 	if ( (m_nDissolveType == ENTITY_DISSOLVE_ELECTRICAL) || (m_nDissolveType == ENTITY_DISSOLVE_ELECTRICAL_LIGHT) )
 	{
-		if ( dynamic_cast< CRagdollProp* >( GetMoveParent() ) )
+		if ( dynamic_cast< CRagdollProp* >(GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL) )
 		{
 			SetContextThink( &CEntityDissolve::ElectrocuteThink, gpGlobals->curtime + 0.01f, s_pElectroThinkContext );
 		}
@@ -274,9 +274,9 @@ CEntityDissolve *CEntityDissolve::Create( CBaseEntity *pTarget, const char *pMat
 CEntityDissolve *CEntityDissolve::Create( CBaseEntity *pTarget, CBaseEntity *pSource )
 {
 	// Look for other boogies on the ragdoll + kill them
-	for ( CBaseEntity *pChild = pSource->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
+	for ( IEngineObjectServer *pChild = pSource->GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
 	{
-		CEntityDissolve *pDissolve = dynamic_cast<CEntityDissolve*>(pChild);
+		CEntityDissolve *pDissolve = dynamic_cast<CEntityDissolve*>(pChild->GetOuter());
 		if ( !pDissolve )
 			continue;
 
@@ -314,7 +314,7 @@ void CEntityDissolve::SetStartTime( float flStartTime )
 //-----------------------------------------------------------------------------
 void CEntityDissolve::DissolveThink( void )
 {
-	CBaseAnimating *pTarget = ( GetMoveParent() ) ? GetMoveParent()->GetBaseAnimating() : NULL;
+	CBaseAnimating *pTarget = (GetEngineObject()->GetMoveParent() ) ? GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating() : NULL;
 
 	if ( GetModelName() == NULL_STRING && pTarget == NULL )
 		 return;
@@ -371,7 +371,7 @@ void CEntityDissolve::DissolveThink( void )
 //-----------------------------------------------------------------------------
 void CEntityDissolve::ElectrocuteThink( void )
 {
-	CRagdollProp *pRagdoll = dynamic_cast< CRagdollProp* >( GetMoveParent() );
+	CRagdollProp *pRagdoll = dynamic_cast< CRagdollProp* >(GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL);
 	if ( !pRagdoll )
 		return;
 

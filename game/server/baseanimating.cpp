@@ -126,7 +126,7 @@ void CInfoLightingRelative::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways
 	// Force our constraint entity to be sent too.
 	if ( m_hLightingLandmark )
 	{
-		if ( m_hLightingLandmark->GetMoveParent() )
+		if ( m_hLightingLandmark->GetEngineObject()->GetMoveParent() )
 		{
 			// Set a full check because we have a move parent.
 			m_hLightingLandmark->SetTransmitState( FL_EDICT_FULLCHECK );
@@ -1546,7 +1546,7 @@ void CBaseAnimating::UpdateStepOrigin()
 
 	if (m_flIKGroundContactTime > 0.2 && m_flIKGroundContactTime > gpGlobals->curtime - 0.2)
 	{
-		if ((GetFlags() & (FL_FLY | FL_SWIM)) == 0 && GetMoveParent() == NULL && GetGroundEntity() != NULL && !GetGroundEntity()->IsMoving())
+		if ((GetFlags() & (FL_FLY | FL_SWIM)) == 0 && GetEngineObject()->GetMoveParent() == NULL && GetGroundEntity() != NULL && !GetGroundEntity()->IsMoving())
 		{
 			Vector toAbs = GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetLocalOrigin();
 			if (toAbs.z == 0.0)
@@ -1835,11 +1835,11 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		}
 	}
 	
-	CBaseAnimating *pParent = dynamic_cast< CBaseAnimating* >( GetMoveParent() );
+	IEngineObjectServer *pParent =  GetEngineObject()->GetMoveParent() ;
 	if ( pParent )
 	{
 		// We're doing bone merging, so do special stuff here.
-		CBoneCache *pParentCache = pParent->GetBoneCache();
+		CBoneCache *pParentCache = dynamic_cast<CBaseAnimating*>(pParent)->GetBoneCache();
 		if ( pParentCache )
 		{
 			BuildMatricesWithBoneMerge( 
@@ -1849,7 +1849,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 				pos, 
 				q, 
 				pBoneToWorld, 
-				pParent, 
+				dynamic_cast<CBaseAnimating*>(pParent),
 				pParentCache );
 			
 			GetEngineObject()->RemoveEFlags( EFL_SETTING_UP_BONES );

@@ -2641,7 +2641,7 @@ CWeaponPhysCannon::FindObjectResult_t CWeaponPhysCannon::FindObject( void )
 	Vector	end = start + forward * testLength;
 	trace_t tr;
 	FindObjectTrace( pPlayer, &tr );
-	CBaseEntity *pEntity = tr.m_pEnt ? ((CBaseEntity*)tr.m_pEnt)->GetRootMoveParent() : NULL;
+	CBaseEntity *pEntity = tr.m_pEnt ? ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetRootMoveParent()->GetOuter() : NULL;
 	bool	bAttach = false;
 	bool	bPull = false;
 

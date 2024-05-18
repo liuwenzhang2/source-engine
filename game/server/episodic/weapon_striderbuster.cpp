@@ -712,7 +712,7 @@ int CWeaponStriderBuster::OnTakeDamage( const CTakeDamageInfo &info )
 	bool bInflictorIsPlayer = ( pInflictor != NULL && pInflictor->IsPlayer() );
 	bool bAttackerIsPlayer = ( pAttacker != NULL && pAttacker->IsPlayer() );
 
-	if ( GetMoveParent() && GetMoveParent()->ClassMatches( g_iszVehicle ) )
+	if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->ClassMatches( g_iszVehicle ) )
 	{
 		return 0;
 	}
@@ -1123,7 +1123,7 @@ void CWeaponStriderBuster::OnFlechetteAttach( Vector &vecFlechetteVelocity )
 		VPhysicsGetObject()->ApplyForceCenter( vecForce );
 	}
 
-	if ( !GetMoveParent() || !GetMoveParent()->ClassMatches( g_iszVehicle ) )
+	if ( !GetEngineObject()->GetMoveParent() || !GetEngineObject()->GetMoveParent()->ClassMatches( g_iszVehicle ) )
 	{
 		if ( !m_bNoseDiving )
 		{

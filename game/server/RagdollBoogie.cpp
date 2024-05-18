@@ -91,10 +91,10 @@ void CRagdollBoogie::Spawn()
 //-----------------------------------------------------------------------------
 void CRagdollBoogie::ZapThink()
 {
-	if ( !GetMoveParent() )
+	if ( !GetEngineObject()->GetMoveParent() )
 		return;
 
-	CBaseAnimating *pRagdoll = GetMoveParent()->GetBaseAnimating();
+	CBaseAnimating *pRagdoll = GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating();
 	if ( !pRagdoll )
 		return;
 
@@ -112,7 +112,7 @@ void CRagdollBoogie::ZapThink()
 	{
 		CEffectData	data;
 		
-		data.m_nEntIndex = GetMoveParent()->entindex();
+		data.m_nEntIndex = GetEngineObject()->GetMoveParent()->GetOuter()->entindex();
 		data.m_flMagnitude = 4;
 		data.m_flScale = HasSpawnFlags(SF_RAGDOLL_BOOGIE_ELECTRICAL_NARROW_BEAM) ? 1.0f : 2.0f;
 
@@ -141,9 +141,9 @@ void CRagdollBoogie::ZapThink()
 void CRagdollBoogie::IncrementSuppressionCount( CBaseEntity *pTarget )
 {
 	// Look for other boogies on the ragdoll + kill them
-	for ( CBaseEntity *pChild = pTarget->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
+	for ( IEngineObjectServer *pChild = pTarget->GetEngineObject()->FirstMoveChild(); pChild; pChild = pChild->NextMovePeer() )
 	{
-		CRagdollBoogie *pBoogie = dynamic_cast<CRagdollBoogie*>(pChild);
+		CRagdollBoogie *pBoogie = dynamic_cast<CRagdollBoogie*>(pChild->GetOuter());
 		if ( !pBoogie )
 			continue;
 
@@ -154,11 +154,11 @@ void CRagdollBoogie::IncrementSuppressionCount( CBaseEntity *pTarget )
 void CRagdollBoogie::DecrementSuppressionCount( CBaseEntity *pTarget )
 {
 	// Look for other boogies on the ragdoll + kill them
-	CBaseEntity *pNext;
-	for ( CBaseEntity *pChild = pTarget->FirstMoveChild(); pChild; pChild = pNext )
+	IEngineObjectServer *pNext;
+	for ( IEngineObjectServer *pChild = pTarget->GetEngineObject()->FirstMoveChild(); pChild; pChild = pNext )
 	{
 		pNext = pChild->NextMovePeer();
-		CRagdollBoogie *pBoogie = dynamic_cast<CRagdollBoogie*>(pChild);
+		CRagdollBoogie *pBoogie = dynamic_cast<CRagdollBoogie*>(pChild->GetOuter());
 		if ( !pBoogie )
 			continue;
 
@@ -184,16 +184,16 @@ void CRagdollBoogie::AttachToEntity( CBaseEntity *pTarget )
 	m_nSuppressionCount = 0;
 
 	// Look for other boogies on the ragdoll + kill them
-	CBaseEntity *pNext;
-	for ( CBaseEntity *pChild = pTarget->FirstMoveChild(); pChild; pChild = pNext )
+	IEngineObjectServer *pNext;
+	for ( IEngineObjectServer *pChild = pTarget->GetEngineObject()->FirstMoveChild(); pChild; pChild = pNext )
 	{
 		pNext = pChild->NextMovePeer();
-		CRagdollBoogie *pBoogie = dynamic_cast<CRagdollBoogie*>(pChild);
+		CRagdollBoogie *pBoogie = dynamic_cast<CRagdollBoogie*>(pChild->GetOuter());
 		if ( !pBoogie )
 			continue;
 
 		m_nSuppressionCount = pBoogie->m_nSuppressionCount;
-		UTIL_Remove( pChild );
+		UTIL_Remove( pChild->GetOuter() );
 	}
 
 	FollowEntity( pTarget );
@@ -225,7 +225,10 @@ void CRagdollBoogie::SetMagnitude( float flMagnitude )
 //-----------------------------------------------------------------------------
 void CRagdollBoogie::BoogieThink( void )
 {
-	CRagdollProp *pRagdoll = dynamic_cast< CRagdollProp* >( GetMoveParent() );
+	if (!GetEngineObject()->GetMoveParent()) {
+		return;
+	}
+	CRagdollProp *pRagdoll = dynamic_cast< CRagdollProp* >(GetEngineObject()->GetMoveParent()->GetOuter() );
 	if ( !pRagdoll )
 	{
 		UTIL_Remove( this );

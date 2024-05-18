@@ -1173,7 +1173,7 @@ void CBaseHeadcrab::BeginClimbFromCanister()
 	Assert( GetMoveParent() );
 	// Compute a desired position or hint
 	Vector vecForward, vecActualForward;
-	AngleVectors( GetMoveParent()->GetEngineObject()->GetAbsAngles(), &vecActualForward );
+	AngleVectors(GetEngineObject()->GetMoveParent()->GetAbsAngles(), &vecActualForward );
 	vecForward = vecActualForward;
 	vecForward.z = 0.0f;
 	VectorNormalize( vecForward );
@@ -1250,7 +1250,7 @@ void CBaseHeadcrab::JumpFromCanister()
 	Assert( GetMoveParent() );
 
 	Vector vecForward, vecActualForward, vecActualRight;
-	AngleVectors( GetMoveParent()->GetEngineObject()->GetAbsAngles(), &vecActualForward, &vecActualRight, NULL );
+	AngleVectors(GetEngineObject()->GetMoveParent()->GetAbsAngles(), &vecActualForward, &vecActualRight, NULL );
 
 	switch( m_nJumpFromCanisterDir )
 	{

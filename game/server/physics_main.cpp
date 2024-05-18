@@ -82,7 +82,7 @@ static void PhysicsCheckSweep( CBaseEntity *pEntity, const Vector& vecAbsStart, 
 	// Set collision type
 	if ( !pEntity->IsSolid() || pEntity->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS) )
 	{
-		if ( pEntity->GetMoveParent() )
+		if ( pEntity->GetEngineObject()->GetMoveParent() )
 		{
 			UTIL_ClearTrace( *pTrace );
 			return;
@@ -232,7 +232,7 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 
 	RelinkPusherList(pPusherHandles);
 	info.m_bPusherIsGround = false;
-	if ( pBlocker->GetGroundEntity() && pBlocker->GetGroundEntity()->GetRootMoveParent() == m_rgPusher[0].m_pEntity )
+	if ( pBlocker->GetGroundEntity() && pBlocker->GetGroundEntity()->GetEngineObject()->GetRootMoveParent()->GetOuter() == m_rgPusher[0].m_pEntity)
 	{
 		info.m_bPusherIsGround = true;
 	}
@@ -538,7 +538,7 @@ public:
 	{
 		// All elements are part of the same hierarchy, so they all have
 		// the same root, so it doesn't matter which one we grab
-		m_pRootHighestParent = m_pPushedEntities->m_rgPusher[0].m_pEntity->GetRootMoveParent();
+		m_pRootHighestParent = m_pPushedEntities->m_rgPusher[0].m_pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
 		++s_nEnumCount;
 
 		m_collisionGroupCount = 0;
@@ -643,8 +643,8 @@ private:
 		if ( !bCollide )
 			return NULL;
 		// We're not pushing stuff we're hierarchically attached to
-		CBaseEntity *pCheckHighestParent = pCheck->GetRootMoveParent();
-		if (pCheckHighestParent == m_pRootHighestParent)
+		IEngineObjectServer *pCheckHighestParent = pCheck->GetEngineObject()->GetRootMoveParent();
+		if (pCheckHighestParent->GetOuter() == m_pRootHighestParent)
 			return NULL;
 
 		// If we're standing on the pusher or any rigidly attached child
@@ -660,7 +660,7 @@ private:
 		// NOTE: This is pretty tricky here. If a rigidly attached child comes into
 		// contact with a pusher, we *cannot* push the child. Instead, we must push
 		// the highest parent of that child.
-		return pCheckHighestParent;
+		return pCheckHighestParent->GetOuter();
 	}
 
 private:
@@ -761,10 +761,10 @@ void CPhysicsPushedEntities::SetupAllInHierarchy( CBaseEntity *pParent )
 	m_rgPusher[i].m_pEntity = pParent;
 	m_rgPusher[i].m_vecStartAbsOrigin = pParent->GetEngineObject()->GetAbsOrigin();
 
-	CBaseEntity *pChild;
-	for ( pChild = pParent->FirstMoveChild(); pChild != NULL; pChild = pChild->NextMovePeer() )
+	IEngineObjectServer *pChild;
+	for ( pChild = pParent->GetEngineObject()->FirstMoveChild(); pChild != NULL; pChild = pChild->NextMovePeer() )
 	{
-		SetupAllInHierarchy( pChild );
+		SetupAllInHierarchy( pChild->GetOuter() );
 	}
 }
 
@@ -1215,9 +1215,9 @@ void CBaseEntity::PhysicsPushEntity( const Vector& push, trace_t *pTrace )
 {
 	VPROF("CBaseEntity::PhysicsPushEntity");
 
-	if ( GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
-		Warning( "pushing entity (%s) that has parent (%s)!\n", GetDebugName(), GetMoveParent()->GetDebugName() );
+		Warning( "pushing entity (%s) that has parent (%s)!\n", GetDebugName(), GetEngineObject()->GetMoveParent()->GetOuter()->GetDebugName());
 		Assert(0);
 	}
 
@@ -1738,7 +1738,7 @@ void CBaseEntity::PhysicsStep()
 		}
 	}
 
-	if ( updateFromVPhysics && VPhysicsGetObject() && !GetMoveParent() )
+	if ( updateFromVPhysics && VPhysicsGetObject() && !GetEngineObject()->GetMoveParent() )
 	{
 		Vector position;
 		VPhysicsGetObject()->GetShadowPosition( &position, NULL );

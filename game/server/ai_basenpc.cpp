@@ -4498,7 +4498,7 @@ void CAI_BaseNPC::CheckOnGround( void )
 	if ( !bScriptedWait && !HasCondition( COND_FLOATING_OFF_GROUND ) )
 	{
 		// parented objects are never floating
-		if (GetMoveParent() != NULL)
+		if (GetEngineObject()->GetMoveParent() != NULL)
 			return;
 			
 		// NPCs in scripts with the fly flag shouldn't fall.
@@ -4558,7 +4558,7 @@ void CAI_BaseNPC::CheckOnGround( void )
 	else
 	{
 		// parented objects are never floating
-		if ( bScriptedWait || GetMoveParent() != NULL || (GetFlags() & FL_ONGROUND ) || GetNavType() != NAV_GROUND )
+		if ( bScriptedWait || GetEngineObject()->GetMoveParent() != NULL || (GetFlags() & FL_ONGROUND ) || GetNavType() != NAV_GROUND )
 		{
 			ClearCondition( COND_FLOATING_OFF_GROUND );
 		}
@@ -7310,7 +7310,7 @@ void CAI_BaseNPC::StartNPC( void )
 	// Raise npc off the floor one unit, then drop to floor
 	if ( (GetMoveType() != MOVETYPE_FLY) && (GetMoveType() != MOVETYPE_FLYGRAVITY) &&
 		 !(CapabilitiesGet() & bits_CAP_MOVE_FLY) &&
-		 !HasSpawnFlags( SF_NPC_FALL_TO_GROUND ) && !IsWaitingToRappel() && !GetMoveParent() )
+		 !HasSpawnFlags( SF_NPC_FALL_TO_GROUND ) && !IsWaitingToRappel() && !GetEngineObject()->GetMoveParent() )
 	{
 		Vector origin = GetEngineObject()->GetLocalOrigin();
 

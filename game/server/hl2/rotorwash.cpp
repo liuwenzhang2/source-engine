@@ -60,9 +60,9 @@ void CRotorWashEmitter::Precache( void )
 
 int CRotorWashEmitter::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 {
-	if (GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
-		return GetMoveParent()->ShouldTransmit( pInfo );
+		return GetEngineObject()->GetMoveParent()->GetOuter()->ShouldTransmit(pInfo);
 	}
 
 	return FL_EDICT_PVSCHECK;
@@ -70,7 +70,7 @@ int CRotorWashEmitter::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 
 int CRotorWashEmitter::UpdateTransmitState( void )
 {
-	if (GetMoveParent() )
+	if (GetEngineObject()->GetMoveParent() )
 	{
 		return SetTransmitState( FL_EDICT_FULLCHECK );
 	}

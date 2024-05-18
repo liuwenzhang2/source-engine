@@ -715,18 +715,18 @@ void CPortalSimulator::TakeOwnershipOfEntity( CBaseEntity *pEntity )
 		pObject->RecheckContactPoints();
 	}
 	
-	CUtlVector<CBaseEntity *> childrenList;
-	GetAllChildren( pEntity, childrenList );
+	CUtlVector<IEngineObjectServer *> childrenList;
+	GetAllChildren( pEntity->GetEngineObject(), childrenList );
 	for ( int i = childrenList.Count(); --i >= 0; )
 	{
-		CBaseEntity *pEnt = childrenList[i];
+		CBaseEntity *pEnt = childrenList[i]->GetOuter();
 		CPortalSimulator *pOwningSimulator = GetSimulatorThatOwnsEntity( pEnt );
 		if( pOwningSimulator != this )
 		{
 			if( pOwningSimulator != NULL )
 				pOwningSimulator->ReleaseOwnershipOfEntity( pEnt, (pOwningSimulator == m_pLinkedPortal) );
 
-			TakeOwnershipOfEntity( childrenList[i] );
+			TakeOwnershipOfEntity( childrenList[i]->GetOuter() );
 		}
 	}
 }
@@ -909,10 +909,10 @@ void CPortalSimulator::ReleaseOwnershipOfEntity( CBaseEntity *pEntity, bool bMov
 
 	m_pCallbacks->PortalSimulator_ReleasedOwnershipOfEntity( pEntity );
 
-	CUtlVector<CBaseEntity *> childrenList;
-	GetAllChildren( pEntity, childrenList );
+	CUtlVector<IEngineObjectServer *> childrenList;
+	GetAllChildren( pEntity->GetEngineObject(), childrenList );
 	for ( int i = childrenList.Count(); --i >= 0; )
-		ReleaseOwnershipOfEntity( childrenList[i] );
+		ReleaseOwnershipOfEntity( childrenList[i]->GetOuter() );
 }
 
 void CPortalSimulator::ReleaseAllEntityOwnership( void )

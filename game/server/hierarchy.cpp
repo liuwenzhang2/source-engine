@@ -13,7 +13,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-bool EntityIsParentOf( CBaseEntity *pParent, CBaseEntity *pEntity )
+bool EntityIsParentOf( IEngineObjectServer *pParent, IEngineObjectServer *pEntity )
 {
 	while ( pEntity->GetMoveParent() )
 	{
@@ -25,7 +25,7 @@ bool EntityIsParentOf( CBaseEntity *pParent, CBaseEntity *pEntity )
 	return false;
 }
 
-static void GetAllChildren_r( CBaseEntity *pEntity, CUtlVector<CBaseEntity *> &list )
+static void GetAllChildren_r( IEngineObjectServer *pEntity, CUtlVector<IEngineObjectServer *> &list )
 {
 	for ( ; pEntity != NULL; pEntity = pEntity->NextMovePeer() )
 	{
@@ -34,7 +34,7 @@ static void GetAllChildren_r( CBaseEntity *pEntity, CUtlVector<CBaseEntity *> &l
 	}
 }
 
-int GetAllChildren( CBaseEntity *pParent, CUtlVector<CBaseEntity *> &list )
+int GetAllChildren( IEngineObjectServer *pParent, CUtlVector<IEngineObjectServer *> &list )
 {
 	if ( !pParent )
 		return 0;
@@ -43,7 +43,7 @@ int GetAllChildren( CBaseEntity *pParent, CUtlVector<CBaseEntity *> &list )
 	return list.Count();
 }
 
-int	GetAllInHierarchy( CBaseEntity *pParent, CUtlVector<CBaseEntity *> &list )
+int	GetAllInHierarchy( IEngineObjectServer *pParent, CUtlVector<IEngineObjectServer *> &list )
 {
 	if (!pParent)
 		return 0;

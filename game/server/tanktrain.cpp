@@ -25,10 +25,10 @@ void UTIL_RemoveHierarchy( CBaseEntity *pDead )
 
 	if ( pDead->entindex()!=-1 )
 	{
-		CBaseEntity *pChild = pDead->FirstMoveChild();
+		IEngineObjectServer *pChild = pDead->GetEngineObject()->FirstMoveChild();
 		while ( pChild )
 		{
-			CBaseEntity *pEntity = pChild;
+			CBaseEntity *pEntity = pChild->GetOuter();
 			pChild = pChild->NextMovePeer();
 
 			UTIL_RemoveHierarchy( pEntity );
