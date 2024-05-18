@@ -1190,7 +1190,7 @@ void CNPC_ControllerHeadBall::BounceTouch( CBaseEntity *pOther )
 	VectorNormalize( vecDir );
 
 	trace_t tr;
-	tr = CBaseEntity::GetTouchTrace( );
+	tr = GetEngineObject()->GetTouchTrace( );
 
 	float n = -DotProduct(tr.plane.normal, vecDir);
 
@@ -1276,7 +1276,7 @@ void CNPC_ControllerZapBall::ExplodeTouch( CBaseEntity *pOther )
 	if (m_takedamage = DAMAGE_YES )
 	{
 		trace_t tr;
-		tr = GetTouchTrace( );
+		tr = GetEngineObject()->GetTouchTrace( );
 
 		ClearMultiDamage( );
 

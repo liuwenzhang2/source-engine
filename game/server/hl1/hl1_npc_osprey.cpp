@@ -1255,7 +1255,7 @@ void CBaseHelicopter::FlyTouch( CBaseEntity *pOther )
 	// bounce if we hit something solid
 	if ( pOther->GetSolid() == SOLID_BSP) 
 	{
-		const trace_t &tr = CBaseEntity::GetTouchTrace( );
+		const trace_t &tr = GetEngineObject()->GetTouchTrace( );
 
 		// UNDONE, do a real bounce
 		ApplyAbsVelocityImpulse( tr.plane.normal * (GetEngineObject()->GetAbsVelocity().Length() + 200) );

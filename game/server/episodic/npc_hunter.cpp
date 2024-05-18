@@ -678,7 +678,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 		return;
 
 	trace_t	tr;
-	tr = BaseClass::GetTouchTrace();
+	tr = GetEngineObject()->GetTouchTrace();
 
 	if ( pOther->m_takedamage != DAMAGE_NO )
 	{

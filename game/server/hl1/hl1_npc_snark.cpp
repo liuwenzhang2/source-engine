@@ -407,7 +407,7 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 {
 	float	flpitch;
 	trace_t tr;
-	tr = CBaseEntity::GetTouchTrace( );
+	tr = GetEngineObject()->GetTouchTrace( );
 
 	// don't hit the guy that launched this grenade
 	if ( GetOwnerEntity() && ( pOther == GetOwnerEntity() ) )

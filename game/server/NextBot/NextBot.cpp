@@ -301,7 +301,7 @@ void NextBotCombatCharacter::Touch( CBaseEntity *other )
 	{
 		// propagate touch into NextBot event responders
 		trace_t result;
-		result = GetTouchTrace();
+		result = GetEngineObject()->GetTouchTrace();
 
 		// OnContact refers to *physical* contact, not triggers or other non-physical entities
 		if ( result.DidHit() || other->MyCombatCharacterPointer() != NULL )

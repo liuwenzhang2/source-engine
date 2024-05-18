@@ -1353,7 +1353,7 @@ void CNihilanthHVR::BounceTouch( CBaseEntity *pOther )
 
 	VectorNormalize( vecDir );
 
-	const trace_t &tr = GetTouchTrace();
+	const trace_t &tr = GetEngineObject()->GetTouchTrace();
 
 	float n = -DotProduct(tr.plane.normal, vecDir);
 

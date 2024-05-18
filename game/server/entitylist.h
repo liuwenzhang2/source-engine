@@ -744,7 +744,7 @@ protected:
 
 public:
 	static bool				sm_bAccurateTriggerBboxChecks;	// SOLID_BBOX entities do a fully accurate trigger vs bbox check when this is set
-protected:
+public:
 	static bool				sm_bDisableTouchFuncs;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 private:
 	int m_iHighestEnt; // the topmost used array index

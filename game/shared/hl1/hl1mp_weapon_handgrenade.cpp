@@ -144,7 +144,7 @@ void CHandGrenade::BounceTouch( CBaseEntity *pOther )
 		if ( GetThrower() )
 		{
 			trace_t tr;
-			tr = CBaseEntity::GetTouchTrace( );
+			tr = GetEngineObject()->GetTouchTrace( );
 			ClearMultiDamage( );
 			Vector forward;
 			AngleVectors(GetEngineObject()->GetAbsAngles(), &forward );

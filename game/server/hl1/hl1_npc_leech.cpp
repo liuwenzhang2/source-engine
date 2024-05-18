@@ -237,7 +237,7 @@ void CNPC_Leech::Touch( CBaseEntity *pOther )
 	if ( !pOther->IsPlayer() )
 		 return;
 
-	if ( pOther == GetTouchTrace().m_pEnt )
+	if ( pOther == GetEngineObject()->GetTouchTrace().m_pEnt )
 	{
 		if ( pOther->GetEngineObject()->GetAbsVelocity() == vec3_origin )
 			 return;

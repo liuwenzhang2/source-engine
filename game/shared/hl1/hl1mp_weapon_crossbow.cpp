@@ -135,7 +135,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 	if ( pOther->m_takedamage != DAMAGE_NO )
 	{
 		trace_t tr, tr2;
-		tr = BaseClass::GetTouchTrace( );
+		tr = GetEngineObject()->GetTouchTrace( );
 		Vector	vecNormalizedVel = GetEngineObject()->GetAbsVelocity();
 
 		ClearMultiDamage( );

@@ -115,7 +115,7 @@ void CGrenadeMP5::Detonate(void)
 		m_flDamage );
 
 	trace_t tr;	
-	tr = CBaseEntity::GetTouchTrace();
+	tr = GetEngineObject()->GetTouchTrace();
 
 	if ( (tr.m_pEnt != GetWorldEntity()) || (tr.hitbox != 0) )
 	{

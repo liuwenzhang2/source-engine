@@ -189,7 +189,7 @@ void CDODBaseRocket::Explode( void )
 {
 	// Don't explode against the skybox. Just pretend that 
 	// the missile flies off into the distance.
-	const trace_t &tr = CBaseEntity::GetTouchTrace();
+	const trace_t &tr = GetEngineObject()->GetTouchTrace();
 	const trace_t *p = &tr;
 	trace_t *newTrace = const_cast<trace_t*>(p);
 
@@ -216,7 +216,7 @@ void CDODBaseRocket::RocketTouch( CBaseEntity *pOther )
 		return;
 
 	// if we hit the skybox, just disappear
-	const trace_t &tr = CBaseEntity::GetTouchTrace();
+	const trace_t &tr = GetEngineObject()->GetTouchTrace();
 
 	const trace_t *p = &tr;
 	trace_t *newTrace = const_cast<trace_t*>(p);
