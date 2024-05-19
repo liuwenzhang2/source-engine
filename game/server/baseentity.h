@@ -452,12 +452,21 @@ public:
 	}	
 
 	SolidType_t				GetSolid() const;
-	int			 			GetSolidFlags( void ) const;
-
+	bool					IsSolid() const;
+	void					SetSolid(SolidType_t val);
+	void					AddSolidFlags(int flags);
+	void					RemoveSolidFlags(int flags);
+	void					ClearSolidFlags(void);
+	bool					IsSolidFlagSet(int flagMask) const;
+	void				 	SetSolidFlags(int flags);
+	int			 			GetSolidFlags(void) const;
 
 	// Marks for deletion
 	void					MarkForDeletion();
+	// checks to see if the entity is marked for deletion
+	bool					IsMarkedForDeletion(void);
 	bool					IsMarkedForDeletion() const;
+
 	// Quick way to ask if we have a player entity as a child anywhere in our hierarchy.
 	void					RecalcHasPlayerChildBit();
 	bool					DoesHavePlayerChild();
@@ -664,8 +673,7 @@ public:
 
 	void		RemoveDeferred( void );	// Sets the entity invisible, and makes it remove itself on the next frame
 
-	// checks to see if the entity is marked for deletion
-	bool		IsMarkedForDeletion( void );
+
 
 	// capabilities
 	virtual int	ObjectCaps( void );
@@ -740,7 +748,6 @@ public:
 	void		 SendDebugPivotOverlay( void );
 	void		 AddTimedOverlay( const char *msg, int endTime );
 
-	void		SetSolid( SolidType_t val );
 
 	// save/restore
 	// only overload these if you have special data to serialize
@@ -1317,12 +1324,7 @@ public:
 	virtual bool			PhysicsSplash( const Vector &centerPoint, const Vector &normal, float rawSpeed, float scaledSpeed ) { return false; }
 	virtual void			Splash() {}
 
-	void					ClearSolidFlags( void );	
-	void					RemoveSolidFlags( int flags );
-	void					AddSolidFlags( int flags );
-	bool					IsSolidFlagSet( int flagMask ) const;
-	void				 	SetSolidFlags( int flags );
-	bool					IsSolid() const;
+
 	
 	// These methods return a *world-aligned* box relative to the absorigin of the entity.
 	// This is used for collision purposes and is *not* guaranteed

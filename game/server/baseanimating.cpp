@@ -931,7 +931,7 @@ bool CBaseAnimating::IsValidSequence( int iSequence )
 //=========================================================
 void CBaseAnimating::SetSequence( int nSequence )
 {
-	Assert( nSequence == 0 || IsDynamicModelLoading() || ( GetModelPtr( ) && ( nSequence < GetModelPtr( )->GetNumSeq() ) && ( GetModelPtr( )->GetNumSeq() < (1 << ANIMATION_SEQUENCE_BITS) ) ) );
+	Assert( nSequence == 0 /* || IsDynamicModelLoading()*/ || (GetModelPtr() && (nSequence < GetModelPtr()->GetNumSeq()) && (GetModelPtr()->GetNumSeq() < (1 << ANIMATION_SEQUENCE_BITS))));
 	m_nSequence = nSequence;
 }
 
