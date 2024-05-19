@@ -2900,6 +2900,7 @@ int CBaseEntity::Restore( IRestore &restore )
 	// loops through the data description list, restoring each data desc block in order
 	int status = restore.ReadEntity(this);;
 
+	m_pModel = modelinfo->GetModel(GetEngineObject()->GetModelIndex());
 	// ---------------------------------------------------------------
 	// HACKHACK: We don't know the space of these vectors until now
 	// if they are worldspace, fix them up.

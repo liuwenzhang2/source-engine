@@ -6581,7 +6581,7 @@ void CAI_BaseNPC::SetupVPhysicsHull()
 #if _DEBUG
 		else
 		{
-			DevMsg("Warning: %s has no physical mass\n", STRING(GetModelName()));
+			DevMsg("Warning: %s has no physical mass\n", STRING(GetEngineObject()->GetModelName()));
 		}
 #endif
 		IPhysicsShadowController *pController = pPhysObj->GetShadowController();

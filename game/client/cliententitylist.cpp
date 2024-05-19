@@ -2715,7 +2715,10 @@ void C_EngineObjectInternal::PhysicsRemoveGroundList()
 			nextLink = link->nextLink;
 
 			// notify the other entity that this ent has gone away
-			((CBaseEntity*)ClientEntityList().GetClientEntityFromHandle(link->entity))->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval(this);
+			C_BaseEntity* pEntity = ((C_BaseEntity*)ClientEntityList().GetClientEntityFromHandle(link->entity));
+			if (pEntity) {
+				pEntity->GetEngineObject()->PhysicsNotifyOtherOfGroundRemoval(this);
+			}
 
 			// kill it
 			FreeGroundLink(link);
