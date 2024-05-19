@@ -1091,7 +1091,7 @@ bool C_BaseEntity::ShouldDraw()
 	if ( m_nRenderMode == kRenderNone )
 		return false;
 
-	return (m_pModel != 0) && !IsEffectActive(EF_NODRAW) && (entindex() != 0);
+	return (GetModel() != 0) && !IsEffectActive(EF_NODRAW) && (entindex() != 0);
 }
 
 bool C_BaseEntity::TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trace )
@@ -1148,7 +1148,7 @@ ShadowType_t C_BaseEntity::ShadowCastType()
 	if (IsEffectActive(EF_NODRAW | EF_NOSHADOW))
 		return SHADOWS_NONE;
 
-	int modelType = modelinfo->GetModelType(m_pModel);
+	int modelType = modelinfo->GetModelType(GetModel());
 	return (modelType == mod_studio) ? SHADOWS_RENDER_TO_TEXTURE : SHADOWS_NONE;
 }
 
@@ -1219,7 +1219,7 @@ bool C_BaseEntity::ShouldReceiveProjectedTextures( int flags )
 	if ( IsEffectActive( EF_NORECEIVESHADOW ) )
 		 return false;
 
-	if (modelinfo->GetModelType(m_pModel) == mod_studio)
+	if (modelinfo->GetModelType(GetModel()) == mod_studio)
 		return false;
 
 	return true;
@@ -1315,7 +1315,7 @@ IPVSNotify* C_BaseEntity::GetPVSNotifyInterface()
 //-----------------------------------------------------------------------------
 void C_BaseEntity::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
-	int nModelType = modelinfo->GetModelType(m_pModel);
+	int nModelType = modelinfo->GetModelType(GetModel());
 	if (nModelType == mod_studio || nModelType == mod_brush)
 	{
 		modelinfo->GetModelRenderBounds( GetModel(), theMins, theMaxs );
@@ -1405,7 +1405,7 @@ void C_BaseEntity::SetMoveCollide( MoveCollide_t val )
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::IsTransparent( void )
 {
-	bool modelIsTransparent = modelinfo->IsTranslucent(m_pModel);
+	bool modelIsTransparent = modelinfo->IsTranslucent(GetModel());
 	return modelIsTransparent || (m_nRenderMode != kRenderNormal);
 }
 
@@ -1543,7 +1543,7 @@ int C_BaseEntity::DrawBrushModel( bool bDrawingTranslucency, int nFlags, bool bT
 {
 	VPROF_BUDGET( "C_BaseEntity::DrawBrushModel", VPROF_BUDGETGROUP_BRUSHMODEL_RENDERING );
 	// Identity brushes are drawn in view->DrawWorld as an optimization
-	Assert ( modelinfo->GetModelType( model ) == mod_brush );
+	Assert ( modelinfo->GetModelType(GetModel()) == mod_brush );
 
 	ERenderDepthMode DepthMode = DEPTH_MODE_NORMAL;
 	if ( ( nFlags & STUDIO_SSAODEPTHTEXTURE ) != 0 )
@@ -1557,7 +1557,7 @@ int C_BaseEntity::DrawBrushModel( bool bDrawingTranslucency, int nFlags, bool bT
 
 	if ( DepthMode != DEPTH_MODE_NORMAL )
 	{
-		render->DrawBrushModelShadowDepth( this, (model_t *)m_pModel, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), DepthMode );
+		render->DrawBrushModelShadowDepth( this, (model_t *)GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), DepthMode );
 	}
 	else
 	{
@@ -1566,7 +1566,7 @@ int C_BaseEntity::DrawBrushModel( bool bDrawingTranslucency, int nFlags, bool bT
 		{
 			mode = bDrawingTranslucency ? DBM_DRAW_TRANSLUCENT_ONLY : DBM_DRAW_OPAQUE_ONLY;
 		}
-		render->DrawBrushModelEx( this, (model_t *)m_pModel, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), mode );
+		render->DrawBrushModelEx( this, (model_t *)GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), mode);
 	}
 
 	return 1;
@@ -1582,12 +1582,12 @@ int C_BaseEntity::DrawModel( int flags )
 		return 0;
 
 	int drawn = 0;
-	if ( !m_pModel)
+	if ( !GetModel())
 	{
 		return drawn;
 	}
 
-	int modelType = modelinfo->GetModelType(m_pModel);
+	int modelType = modelinfo->GetModelType(GetModel());
 	switch ( modelType )
 	{
 	case mod_brush:
@@ -1596,7 +1596,7 @@ int C_BaseEntity::DrawModel( int flags )
 	case mod_studio:
 		// All studio models must be derived from C_BaseAnimating.  Issue warning.
 		Warning( "ERROR:  Can't draw studio model %s because %s is not derived from C_BaseAnimating\n",
-			modelinfo->GetModelName(m_pModel), GetClientClass()->m_pNetworkName ? GetClientClass()->m_pNetworkName : "unknown" );
+			modelinfo->GetModelName(GetModel()), GetClientClass()->m_pNetworkName ? GetClientClass()->m_pNetworkName : "unknown" );
 		break;
 	case mod_sprite:
 		//drawn = DrawSprite();
@@ -2217,9 +2217,9 @@ bool C_BaseEntity::Teleported( void )
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::IsSubModel( void )
 {
-	if (m_pModel &&
-		modelinfo->GetModelType(m_pModel) == mod_brush &&
-		modelinfo->GetModelName(m_pModel)[0] == '*' )
+	if (GetModel() &&
+		modelinfo->GetModelType(GetModel()) == mod_brush &&
+		modelinfo->GetModelName(GetModel())[0] == '*' )
 	{
 		return true;
 	}
@@ -2819,14 +2819,14 @@ void C_BaseEntity::GetColorModulation( float* color )
 //-----------------------------------------------------------------------------
 CollideType_t C_BaseEntity::GetCollideType( void )
 {
-	if ( !GetEngineObject()->GetModelIndex() || !m_pModel)
+	if ( !GetEngineObject()->GetModelIndex() || !GetModel())
 		return ENTITY_SHOULD_NOT_COLLIDE;
 
 	if ( !IsSolid( ) )
 		return ENTITY_SHOULD_NOT_COLLIDE;
 
 	// If the model is a bsp or studio (i.e. it can collide with the player
-	if ( ( modelinfo->GetModelType(m_pModel) != mod_brush ) && ( modelinfo->GetModelType(m_pModel) != mod_studio ) )
+	if ( ( modelinfo->GetModelType(GetModel()) != mod_brush ) && ( modelinfo->GetModelType(GetModel()) != mod_studio ) )
 		return ENTITY_SHOULD_NOT_COLLIDE;
 
 	// Don't get stuck on point sized entities ( world doesn't count )
@@ -2845,7 +2845,7 @@ CollideType_t C_BaseEntity::GetCollideType( void )
 //-----------------------------------------------------------------------------
 bool C_BaseEntity::IsBrushModel() const
 {
-	int modelType = modelinfo->GetModelType(m_pModel);
+	int modelType = modelinfo->GetModelType(GetModel());
 	return (modelType == mod_brush);
 }
 
@@ -2951,7 +2951,7 @@ void C_BaseEntity::AddBrushModelDecal( const Ray_t& ray, const Vector& decalCent
 	}
 
 	effects->DecalShoot( decalIndex, entindex(),
-		m_pModel, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0 );
+		GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0 );
 }
 
 
@@ -2968,7 +2968,7 @@ void C_BaseEntity::AddDecal( const Vector& rayStart, const Vector& rayEnd,
 	// Bloat a little bit so we get the intersection
 	ray.m_Delta *= 1.1f;
 
-	int modelType = modelinfo->GetModelType(m_pModel);
+	int modelType = modelinfo->GetModelType(GetModel());
 	switch ( modelType )
 	{
 	case mod_studio:
@@ -2997,7 +2997,7 @@ void C_BaseEntity::AddColoredDecal( const Vector& rayStart, const Vector& rayEnd
 	// Bloat a little bit so we get the intersection
 	ray.m_Delta *= 1.1f;
 
-	int modelType = modelinfo->GetModelType(m_pModel);
+	int modelType = modelinfo->GetModelType(GetModel());
 	if ( doTrace )
 	{
 		enginetrace->ClipRayToEntity( ray, MASK_SHOT, this, &tr );
@@ -3025,7 +3025,7 @@ void C_BaseEntity::AddColoredDecal( const Vector& rayStart, const Vector& rayEnd
 	case mod_brush:
 		{
 			color32 cColor32 = { (uint8)cColor.r(), (uint8)cColor.g(), (uint8)cColor.b(), (uint8)cColor.a() };
-			effects->DecalColorShoot( decalIndex, entindex(), m_pModel, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0, cColor32 );
+			effects->DecalColorShoot( decalIndex, entindex(), GetModel(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), decalCenter, 0, 0, cColor32 );
 		}
 		break;
 
@@ -3042,7 +3042,7 @@ void C_BaseEntity::AddColoredDecal( const Vector& rayStart, const Vector& rayEnd
 void C_BaseEntity::RemoveAllDecals( void )
 {
 	// For now, we only handle removing decals from studiomodels
-	if ( modelinfo->GetModelType(m_pModel) == mod_studio )
+	if ( modelinfo->GetModelType(GetModel()) == mod_studio )
 	{
 		CreateModelInstance();
 		modelrender->RemoveAllDecals( m_ModelInstance );
@@ -4120,7 +4120,7 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 		return RENDER_GROUP_OPAQUE_ENTITY;
 
 		// Figure out its RenderGroup.
-	int modelType = modelinfo->GetModelType(m_pModel);
+	int modelType = modelinfo->GetModelType(GetModel());
 	RenderGroup_t renderGroup = (modelType == mod_brush) ? RENDER_GROUP_OPAQUE_BRUSH : RENDER_GROUP_OPAQUE_ENTITY;
 	if ( ( nFXBlend != 255 ) || IsTransparent() )
 	{
@@ -4135,7 +4135,7 @@ RenderGroup_t C_BaseEntity::GetRenderGroup()
 	}
 
 	if ( ( renderGroup == RENDER_GROUP_TRANSLUCENT_ENTITY ) &&
-		 ( modelinfo->IsTranslucentTwoPass(m_pModel) ) )
+		 ( modelinfo->IsTranslucentTwoPass(GetModel()) ) )
 	{
 		renderGroup = RENDER_GROUP_TWOPASS;
 	}
