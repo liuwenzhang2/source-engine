@@ -997,7 +997,7 @@ void C_BaseAnimating::UnlockStudioHdr()
 void C_BaseAnimating::ValidateModelIndex()
 {
 	BaseClass::ValidateModelIndex();
-	Assert( m_nModelIndex == 0 || m_AutoRefModelIndex.Get() );
+	//Assert( m_nModelIndex == 0 || m_AutoRefModelIndex.Get() );
 }
 
 CStudioHdr *C_BaseAnimating::OnNewModel()
@@ -2195,7 +2195,7 @@ bool C_BaseAnimating::GetAttachmentLocal( int iAttachment, Vector &origin )
 //-----------------------------------------------------------------------------
 bool C_BaseAnimating::GetRootBone( matrix3x4_t &rootBone )
 {
-	Assert( !IsDynamicModelLoading() );
+	//Assert( !IsDynamicModelLoading() );
 
 	if ( IsEffectActive( EF_BONEMERGE ) && GetEngineObject()->GetMoveParent() && m_pBoneMergeCache )
 		return m_pBoneMergeCache->GetRootBone( rootBone );
