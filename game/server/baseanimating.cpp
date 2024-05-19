@@ -1840,11 +1840,11 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 		}
 	}
 	
-	IEngineObjectServer *pParent =  GetEngineObject()->GetMoveParent() ;
+	CBaseAnimating* pParent = GetEngineObject()->GetMoveParent() ? dynamic_cast<CBaseAnimating*>(GetEngineObject()->GetMoveParent()->GetOuter()) : NULL;
 	if ( pParent )
 	{
 		// We're doing bone merging, so do special stuff here.
-		CBoneCache *pParentCache = dynamic_cast<CBaseAnimating*>(pParent->GetOuter())->GetBoneCache();
+		CBoneCache *pParentCache = pParent->GetBoneCache();
 		if ( pParentCache )
 		{
 			BuildMatricesWithBoneMerge( 
@@ -1854,7 +1854,7 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 				pos, 
 				q, 
 				pBoneToWorld, 
-				dynamic_cast<CBaseAnimating*>(pParent->GetOuter()),
+				pParent,
 				pParentCache );
 			
 			GetEngineObject()->RemoveEFlags( EFL_SETTING_UP_BONES );

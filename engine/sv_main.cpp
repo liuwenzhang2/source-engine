@@ -500,8 +500,9 @@ void CGameServer::CreateEngineStringTables( void )
 			 m_pLightStyleTable &&
 			 m_pUserInfoTable &&
 			 m_pServerStartupTable &&
-			 m_pDownloadableFileTable &&
-			 m_pDynamicModelsTable );
+			 m_pDownloadableFileTable// &&
+			 //m_pDynamicModelsTable 
+			);
 
 	// create an empty lightstyle table with unique index names
 	for ( i = 0; i<MAX_LIGHTSTYLES; i++ )
