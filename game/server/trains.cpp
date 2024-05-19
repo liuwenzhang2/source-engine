@@ -301,7 +301,7 @@ void CFuncPlat::Setup( void )
 	SetMoveType( MOVETYPE_PUSH );
 
 	// Set size and link into world
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	m_vecPosition1 = GetEngineObject()->GetLocalOrigin();	//Top
 	m_vecPosition2 = GetEngineObject()->GetLocalOrigin();	//Bottom
@@ -1057,7 +1057,7 @@ void CFuncTrain::Spawn( void )
 	
 	SetMoveType( MOVETYPE_PUSH );
 	SetSolid( SOLID_BSP );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	if ( m_spawnflags & SF_TRACKTRAIN_PASSABLE )
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
@@ -2039,7 +2039,7 @@ void CFuncTrackTrain::UpdateTrainOrientation( CPathTrack *pPrev, CPathTrack *pNe
 
 	// Trains *can* work in local space, but only if all elements of the track share
 	// the same move parent as the train.
-	Assert( !pPrev || (pPrev->GetMoveParent() == GetMoveParent()) );
+	Assert( !pPrev || (pPrev->GetEngineObject()->GetMoveParent() == GetEngineObject()->GetMoveParent()) );
 
 	switch ( GetTrainOrientationType() )
 	{
@@ -2683,7 +2683,7 @@ void CFuncTrackTrain::Spawn( void )
 		Msg("FuncTrackTrain '%s' has no target.\n", GetDebugName());
 	}
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetMoveType( MOVETYPE_PUSH );
 
 #ifdef HL1_DLL
@@ -2839,7 +2839,7 @@ void CFuncTrainControls::Spawn( void )
 {
 	SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	AddEffects( EF_NODRAW );
 
 	Assert(GetMoveParent() && "func_traincontrols needs parent to properly align to train" );

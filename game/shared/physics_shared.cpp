@@ -105,7 +105,7 @@ CPhysCollide *PhysCreateBbox( const Vector &minsIn, const Vector &maxsIn )
 //-----------------------------------------------------------------------------
 IPhysicsObject *PhysModelCreateBox( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, const Vector &origin, bool isStatic )
 {
-	int modelIndex = pEntity->GetModelIndex();
+	int modelIndex = pEntity->GetEngineObject()->GetModelIndex();
 	const char *pSurfaceProps = "flesh";
 	solid_t solid;
 	PhysGetDefaultAABBSolid( solid );
@@ -130,7 +130,7 @@ IPhysicsObject *PhysModelCreateBox( CBaseEntity *pEntity, const Vector &mins, co
 	if ( !pCollide )
 		return NULL;
 	
-	return PhysModelCreateCustom( pEntity, pCollide, origin, vec3_angle, STRING(pEntity->GetModelName()), isStatic, &solid );
+	return PhysModelCreateCustom( pEntity, pCollide, origin, vec3_angle, STRING(pEntity->GetEngineObject()->GetModelName()), isStatic, &solid );
 }
 
 
@@ -145,7 +145,7 @@ IPhysicsObject *PhysModelCreateBox( CBaseEntity *pEntity, const Vector &mins, co
 //-----------------------------------------------------------------------------
 IPhysicsObject *PhysModelCreateOBB( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, const Vector &origin, const QAngle &angle, bool isStatic )
 {
-	int modelIndex = pEntity->GetModelIndex();
+	int modelIndex = pEntity->GetEngineObject()->GetModelIndex();
 	const char *pSurfaceProps = "flesh";
 	solid_t solid;
 	PhysGetDefaultAABBSolid( solid );
@@ -170,7 +170,7 @@ IPhysicsObject *PhysModelCreateOBB( CBaseEntity *pEntity, const Vector &mins, co
 	if ( !pCollide )
 		return NULL;
 	
-	return PhysModelCreateCustom( pEntity, pCollide, origin, angle, STRING(pEntity->GetModelName()), isStatic, &solid );
+	return PhysModelCreateCustom( pEntity, pCollide, origin, angle, STRING(pEntity->GetEngineObject()->GetModelName()), isStatic, &solid );
 }
 
 
@@ -225,7 +225,7 @@ bool PhysModelParseSolidByIndex( solid_t &solid, CBaseEntity *pEntity, int model
 	solid.params.enableCollisions = true;
 
 	solid.params.pGameData = static_cast<void *>(pEntity);
-	solid.params.pName = STRING(pEntity->GetModelName());
+	solid.params.pName = STRING(pEntity->GetEngineObject()->GetModelName());
 	return parsed;
 }
 
@@ -288,7 +288,7 @@ bool PhysModelParseSolidByIndex( solid_t &solid, CBaseEntity *pEntity, vcollide_
 	solid.params.enableCollisions = true;
 
 	solid.params.pGameData = static_cast<void *>(pEntity);
-	solid.params.pName = STRING(pEntity->GetModelName());
+	solid.params.pName = STRING(pEntity->GetEngineObject()->GetModelName());
 	return parsed;
 }
 
@@ -382,7 +382,7 @@ IPhysicsObject *PhysModelCreateUnmoveable( CBaseEntity *pEntity, int modelIndex,
 		surfaceProp = physprops->GetSurfaceIndex( solid.surfaceprop );
 	}
 	solid.params.pGameData = static_cast<void *>(pEntity);
-	solid.params.pName = STRING(pEntity->GetModelName());
+	solid.params.pName = STRING(pEntity->GetEngineObject()->GetModelName());
 	IPhysicsObject *pObject = physenv->CreatePolyObjectStatic( pCollide->solids[0], surfaceProp, origin, angles, &solid.params );
 
 	//PhysCheckAdd( pObject, STRING(pEntity->m_iClassname) );

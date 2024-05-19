@@ -373,7 +373,7 @@ void CNPC_Advisor::Spawn()
 
 	Precache();
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	m_iHealth = sk_advisor_health.GetFloat();
 	m_takedamage = DAMAGE_NO;
@@ -1551,7 +1551,7 @@ void CNPC_Advisor::Precache()
 {
 	BaseClass::Precache();
 	
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
 #if NPC_ADVISOR_HAS_BEHAVIOR
 	PrecacheModel( "sprites/lgtning.vmt" );

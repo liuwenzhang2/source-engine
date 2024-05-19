@@ -309,7 +309,7 @@ void C_ClientRagdoll::OnRestore( void )
 
 	if ( hdr == NULL )
 	{
-		const char *pModelName = STRING( GetModelName() );
+		const char *pModelName = STRING(GetEngineObject()->GetModelName() );
 		SetModel( pModelName );
 
 		hdr = GetModelPtr();
@@ -352,8 +352,8 @@ void C_ClientRagdoll::OnRestore( void )
 	pRagdollT->list[0].parentIndex = -1;
 	pRagdollT->list[0].originParentSpace.Init();
 
-	RagdollActivate( *pRagdollT, modelinfo->GetVCollide( GetModelIndex() ), GetModelIndex(), true );
-	RagdollSetupAnimatedFriction( physenv, pRagdollT, GetModelIndex() );
+	RagdollActivate( *pRagdollT, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), GetEngineObject()->GetModelIndex(), true );
+	RagdollSetupAnimatedFriction( physenv, pRagdollT, GetEngineObject()->GetModelIndex() );
 
 	m_pRagdoll->BuildRagdollBounds( this );
 
@@ -734,9 +734,9 @@ C_BaseAnimating::C_BaseAnimating() :
 
 	m_pAttachedTo = NULL;
 
-	m_bDynamicModelAllowed = false;
-	m_bDynamicModelPending = false;
-	m_bResetSequenceInfoOnLoad = false;
+	//m_bDynamicModelAllowed = false;
+	//m_bDynamicModelPending = false;
+	//m_bResetSequenceInfoOnLoad = false;
 
 	Q_memset(&m_mouth, 0, sizeof(m_mouth));
 	m_flCycle = 0;
@@ -983,16 +983,16 @@ void C_BaseAnimating::UnlockStudioHdr()
 	}
 }
 
-void C_BaseAnimating::OnModelLoadComplete( const model_t* pModel )
-{
-	Assert( m_bDynamicModelPending && pModel == GetModel() );
-	if ( m_bDynamicModelPending && pModel == GetModel() )
-	{
-		m_bDynamicModelPending = false;
-		OnNewModel();
-		UpdateVisibility();
-	}
-}
+//void C_BaseAnimating::OnModelLoadComplete( const model_t* pModel )
+//{
+//	Assert( m_bDynamicModelPending && pModel == GetModel() );
+//	if ( m_bDynamicModelPending && pModel == GetModel() )
+//	{
+//		m_bDynamicModelPending = false;
+//		OnNewModel();
+//		UpdateVisibility();
+//	}
+//}
 
 void C_BaseAnimating::ValidateModelIndex()
 {
@@ -1013,41 +1013,41 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 		m_pJiggleBones = NULL;
 	}
 
-	if ( m_bDynamicModelPending )
-	{
-		modelinfo->UnregisterModelLoadCallback( -1, this );
-		m_bDynamicModelPending = false;
-	}
+	//if ( m_bDynamicModelPending )
+	//{
+	//	modelinfo->UnregisterModelLoadCallback( -1, this );
+	//	m_bDynamicModelPending = false;
+	//}
 
-	m_AutoRefModelIndex.Clear();
+	//m_AutoRefModelIndex.Clear();
 
 	if ( !GetModel() || modelinfo->GetModelType( GetModel() ) != mod_studio )
 		return NULL;
 
 	// Reference (and thus start loading) dynamic model
-	int nNewIndex = m_nModelIndex;
-	if ( modelinfo->GetModel( nNewIndex ) != GetModel() )
-	{
-		// XXX what's authoritative? the model pointer or the model index? what a mess.
-		nNewIndex = modelinfo->GetModelIndex( modelinfo->GetModelName( GetModel() ) );
-		Assert( nNewIndex < 0 || modelinfo->GetModel( nNewIndex ) == GetModel() );
-		if ( nNewIndex < 0 )
-			nNewIndex = m_nModelIndex;
-	}
+	//int nNewIndex = m_nModelIndex;
+	//if ( modelinfo->GetModel( nNewIndex ) != GetModel() )
+	//{
+	//	// XXX what's authoritative? the model pointer or the model index? what a mess.
+	//	nNewIndex = modelinfo->GetModelIndex( modelinfo->GetModelName( GetModel() ) );
+	//	Assert( nNewIndex < 0 || modelinfo->GetModel( nNewIndex ) == GetModel() );
+	//	if ( nNewIndex < 0 )
+	//		nNewIndex = m_nModelIndex;
+	//}
 
-	m_AutoRefModelIndex = nNewIndex;
-	if ( IsDynamicModelIndex( nNewIndex ) && modelinfo->IsDynamicModelLoading( nNewIndex ) )
-	{
-		m_bDynamicModelPending = true;
-		modelinfo->RegisterModelLoadCallback( nNewIndex, this );
-	}
+	//m_AutoRefModelIndex = nNewIndex;
+	//if ( IsDynamicModelIndex( nNewIndex ) && modelinfo->IsDynamicModelLoading( nNewIndex ) )
+	//{
+	//	m_bDynamicModelPending = true;
+	//	modelinfo->RegisterModelLoadCallback( nNewIndex, this );
+	//}
 
-	if ( IsDynamicModelLoading() )
-	{
-		// Called while dynamic model still loading -> new model, clear deferred state
-		m_bResetSequenceInfoOnLoad = false;
-		return NULL;
-	}
+	//if ( IsDynamicModelLoading() )
+	//{
+	//	// Called while dynamic model still loading -> new model, clear deferred state
+	//	m_bResetSequenceInfoOnLoad = false;
+	//	return NULL;
+	//}
 
 	CStudioHdr *hdr = GetModelPtr();
 	if (hdr == NULL)
@@ -1159,11 +1159,11 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 	m_nSequence = -1;
 	SetSequence( forceSequence );
 
-	if ( m_bResetSequenceInfoOnLoad )
-	{
-		m_bResetSequenceInfoOnLoad = false;
-		ResetSequenceInfo();
-	}
+	//if ( m_bResetSequenceInfoOnLoad )
+	//{
+	//	m_bResetSequenceInfoOnLoad = false;
+	//	ResetSequenceInfo();
+	//}
 
 	UpdateRelevantInterpolatedVars();
 		
@@ -1282,7 +1282,7 @@ void C_BaseAnimating::DelayedInitModelEffects( void )
 					int iAttachType = GetAttachTypeFromString( pszAttachType );
 					if ( iAttachType == -1 )
 					{
-						Warning("Invalid attach type specified for particle effect in model '%s' keyvalues section. Trying to spawn effect '%s' with attach type of '%s'\n", GetModelName(), pszParticleEffect, pszAttachType );
+						Warning("Invalid attach type specified for particle effect in model '%s' keyvalues section. Trying to spawn effect '%s' with attach type of '%s'\n", GetEngineObject()->GetModelName(), pszParticleEffect, pszAttachType );
 						return;
 					}
 
@@ -1294,7 +1294,7 @@ void C_BaseAnimating::DelayedInitModelEffects( void )
 						iAttachment = LookupAttachment( pszAttachment );
 						if ( iAttachment <= 0 )
 						{
-							Warning("Failed to find attachment point specified for particle effect in model '%s' keyvalues section. Trying to spawn effect '%s' on attachment named '%s'\n", GetModelName(), pszParticleEffect, pszAttachment );
+							Warning("Failed to find attachment point specified for particle effect in model '%s' keyvalues section. Trying to spawn effect '%s' on attachment named '%s'\n", GetEngineObject()->GetModelName(), pszParticleEffect, pszAttachment );
 							return;
 						}
 					}
@@ -3061,7 +3061,7 @@ void C_BaseAnimating::InvalidateBoneCaches()
 
 bool C_BaseAnimating::ShouldDraw()
 {
-	return !IsDynamicModelLoading() && BaseClass::ShouldDraw();
+	return BaseClass::ShouldDraw();//!IsDynamicModelLoading() && 
 }
 
 ConVar r_drawothermodels( "r_drawothermodels", "1", FCVAR_CHEAT, "0=Off, 1=Normal, 2=Wireframe" );
@@ -3212,7 +3212,7 @@ void C_BaseAnimating::DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawM
 		}
 		else if ( IsSolid() && CollisionProp()->GetSolid() == SOLID_VPHYSICS )
 		{
-			vcollide_t *pCollide = modelinfo->GetVCollide( GetModelIndex() );
+			vcollide_t *pCollide = modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() );
 			if ( pCollide && pCollide->solidCount == 1 )
 			{
 				static color32 debugColor = {0,255,255,0};
@@ -4641,7 +4641,7 @@ C_BaseAnimating *C_BaseAnimating::CreateRagdollCopy()
 	pRagdoll->m_nForceBone = m_nForceBone;
 	pRagdoll->SetNextClientThink( CLIENT_THINK_ALWAYS );
 
-	pRagdoll->SetModelName( AllocPooledString(pModelName) );
+	pRagdoll->GetEngineObject()->SetModelName( AllocPooledString(pModelName) );
 	pRagdoll->SetModelScale( GetModelScale() );
 	return pRagdoll;
 }
@@ -4760,7 +4760,7 @@ void C_BaseAnimating::OnDataChanged( DataUpdateType_t updateType )
 
 	// UNDONE: The base class does this as well.  So this is kind of ugly
 	// but getting a model by index is pretty cheap...
-	const model_t *pModel = modelinfo->GetModel( GetModelIndex() );
+	const model_t *pModel = modelinfo->GetModel(GetEngineObject()->GetModelIndex() );
 	
 	if ( pModel != GetModel() )
 	{
@@ -5321,11 +5321,11 @@ void C_BaseAnimating::ResetSequenceInfo( void )
 		SetSequence( 0 );
 	}
 
-	if ( IsDynamicModelLoading() )
-	{
-		m_bResetSequenceInfoOnLoad = true;
-		return;
-	}
+	//if ( IsDynamicModelLoading() )
+	//{
+	//	m_bResetSequenceInfoOnLoad = true;
+	//	return;
+	//}
 
 	CStudioHdr *pStudioHdr = GetModelPtr();
 	m_flGroundSpeed = GetSequenceGroundSpeed( pStudioHdr, GetSequence() ) * GetModelScale();
@@ -5399,32 +5399,32 @@ void C_BaseAnimating::SetBodygroup( int iGroup, int iValue )
 
 int C_BaseAnimating::GetBodygroup( int iGroup )
 {
-	Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return IsDynamicModelLoading() ? 0 : ::GetBodygroup( GetModelPtr( ), m_nBody, iGroup );
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return ::GetBodygroup( GetModelPtr( ), m_nBody, iGroup );//IsDynamicModelLoading() ? 0 : 
 }
 
 const char *C_BaseAnimating::GetBodygroupName( int iGroup )
 {
-	Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return IsDynamicModelLoading() ? "" : ::GetBodygroupName( GetModelPtr( ), iGroup );
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return ::GetBodygroupName( GetModelPtr( ), iGroup );//IsDynamicModelLoading() ? "" : 
 }
 
 int C_BaseAnimating::FindBodygroupByName( const char *name )
 {
-	Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return IsDynamicModelLoading() ? -1 : ::FindBodygroupByName( GetModelPtr( ), name );
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return ::FindBodygroupByName( GetModelPtr( ), name );//IsDynamicModelLoading() ? -1 : 
 }
 
 int C_BaseAnimating::GetBodygroupCount( int iGroup )
 {
-	Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return IsDynamicModelLoading() ? 0 : ::GetBodygroupCount( GetModelPtr( ), iGroup );
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return ::GetBodygroupCount( GetModelPtr( ), iGroup );//IsDynamicModelLoading() ? 0 : 
 }
 
 int C_BaseAnimating::GetNumBodyGroups( void )
 {
-	Assert( IsDynamicModelLoading() || GetModelPtr() );
-	return IsDynamicModelLoading() ? 0 : ::GetNumBodyGroups( GetModelPtr( ) );
+	//Assert( IsDynamicModelLoading() || GetModelPtr() );
+	return ::GetNumBodyGroups( GetModelPtr( ) );//IsDynamicModelLoading() ? 0 : 
 }
 
 //-----------------------------------------------------------------------------
@@ -5433,8 +5433,8 @@ int C_BaseAnimating::GetNumBodyGroups( void )
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::SetHitboxSet( int setnum )
 {
-	if ( IsDynamicModelLoading() )
-		return;
+	//if ( IsDynamicModelLoading() )
+	//	return;
 
 #ifdef _DEBUG
 	CStudioHdr *pStudioHdr = GetModelPtr();
@@ -5463,8 +5463,8 @@ void C_BaseAnimating::SetHitboxSet( int setnum )
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::SetHitboxSetByName( const char *setname )
 {
-	if ( IsDynamicModelLoading() )
-		return;
+	//if ( IsDynamicModelLoading() )
+	//	return;
 
 	m_nHitboxSet = FindHitboxSetByName( GetModelPtr(), setname );
 }
@@ -5484,8 +5484,8 @@ int C_BaseAnimating::GetHitboxSet( void )
 //-----------------------------------------------------------------------------
 const char *C_BaseAnimating::GetHitboxSetName( void )
 {
-	if ( IsDynamicModelLoading() )
-		return "";
+	//if ( IsDynamicModelLoading() )
+	//	return "";
 
 	return ::GetHitboxSetName( GetModelPtr(), m_nHitboxSet );
 }
@@ -5496,8 +5496,8 @@ const char *C_BaseAnimating::GetHitboxSetName( void )
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::GetHitboxSetCount( void )
 {
-	if ( IsDynamicModelLoading() )
-		return 0;
+	//if ( IsDynamicModelLoading() )
+	//	return 0;
 
 	return ::GetHitboxSetCount( GetModelPtr() );
 }
@@ -5633,9 +5633,9 @@ void C_BaseAnimating::Clear( void )
 	Q_memset(&m_mouth, 0, sizeof(m_mouth));
 	m_flCycle = 0;
 	m_flOldCycle = 0;
-	m_bResetSequenceInfoOnLoad = false;
-	m_bDynamicModelPending = false;
-	m_AutoRefModelIndex.Clear();
+	//m_bResetSequenceInfoOnLoad = false;
+	//m_bDynamicModelPending = false;
+	//m_AutoRefModelIndex.Clear();
 	BaseClass::Clear();	
 }
 

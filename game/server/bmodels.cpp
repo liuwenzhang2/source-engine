@@ -48,7 +48,7 @@ void CFuncWall::Spawn( void )
 {
 	GetEngineObject()->SetLocalAngles( vec3_angle );
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	// If it can't move/go away, it's really part of the world
 	AddFlag( FL_WORLDBRUSH );
@@ -64,7 +64,7 @@ bool CFuncWall::CreateVPhysics( void )
 	IPhysicsObject *pPhys = VPhysicsInitStatic();
 	if ( pPhys )
 	{
-		int contents = modelinfo->GetModelContents( GetModelIndex() );
+		int contents = modelinfo->GetModelContents(GetEngineObject()->GetModelIndex() );
 		if ( ! (contents & (MASK_SOLID|MASK_PLAYERSOLID|MASK_NPCSOLID)) )
 		{
 			// leave the physics shadow there in case it has crap constrained to it
@@ -212,7 +212,7 @@ void CFuncVehicleClip::Spawn()
 
 	GetEngineObject()->SetLocalAngles( vec3_angle );
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	// It's part of the world
 	AddFlag( FL_WORLDBRUSH );
@@ -380,7 +380,7 @@ void CFuncIllusionary::Spawn( void )
 	GetEngineObject()->SetLocalAngles( vec3_angle );
 	SetMoveType( MOVETYPE_NONE );  
 	SetSolid( SOLID_NONE );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 }
 
 
@@ -755,7 +755,7 @@ void CFuncRotating::Spawn( )
 		SetMoveType( MOVETYPE_PUSH );
 	}
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	SetUse( &CFuncRotating::RotatingUse );
 
@@ -1463,7 +1463,7 @@ void CFuncVPhysicsClip::Spawn( void )
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	SetSolid( SOLID_VPHYSICS );
 	AddSolidFlags( FSOLID_NOT_SOLID );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	AddEffects( EF_NODRAW );
 	CreateVPhysics();
 	VPhysicsGetObject()->EnableCollisions( !m_bDisabled );

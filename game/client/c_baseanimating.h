@@ -88,7 +88,7 @@ typedef unsigned int			ClientSideAnimationListHandle_t;
 #define		INVALID_CLIENTSIDEANIMATION_LIST_HANDLE	(ClientSideAnimationListHandle_t)~0
 
 
-class C_BaseAnimating : public C_BaseEntity, private IModelLoadCallback
+class C_BaseAnimating : public C_BaseEntity//, private IModelLoadCallback
 {
 public:
 	DECLARE_CLASS( C_BaseAnimating, C_BaseEntity );
@@ -621,15 +621,15 @@ private:
 	bool							m_bInitModelEffects;
 
 	// Dynamic models
-	bool							m_bDynamicModelAllowed;
-	bool							m_bDynamicModelPending;
-	bool							m_bResetSequenceInfoOnLoad;
-	CRefCountedModelIndex			m_AutoRefModelIndex;
+	//bool							m_bDynamicModelAllowed;
+	//bool							m_bDynamicModelPending;
+	//bool							m_bResetSequenceInfoOnLoad;
+	//CRefCountedModelIndex			m_AutoRefModelIndex;
 public:
-	void							EnableDynamicModels() { m_bDynamicModelAllowed = true; }
-	bool							IsDynamicModelLoading() const { return m_bDynamicModelPending; }
-private:
-	virtual void					OnModelLoadComplete( const model_t* pModel );
+	//void							EnableDynamicModels() { m_bDynamicModelAllowed = true; }
+	//bool							IsDynamicModelLoading() const { return m_bDynamicModelPending; }
+//private:
+	//virtual void					OnModelLoadComplete( const model_t* pModel );
 
 private:
 	void							LockStudioHdr();
@@ -745,8 +745,8 @@ inline float C_BaseAnimating::GetCycle() const
 
 inline CStudioHdr *C_BaseAnimating::GetModelPtr() const
 { 
-	if ( IsDynamicModelLoading() )
-		return NULL;
+	//if ( IsDynamicModelLoading() )
+	//	return NULL;
 
 #ifdef _DEBUG
 	// GetModelPtr() is often called before OnNewModel() so go ahead and set it up first chance.

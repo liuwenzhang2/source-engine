@@ -890,8 +890,8 @@ void C_WeaponPortalgun::GetEffectParameters( EffectType_t effectID, color32 &col
 		if ( b3rdPerson )
 		{
 			pModel = this;
-			originalModelIndex = GetModelIndex();
-			SetModelIndex( GetWorldModelIndex() );
+			originalModelIndex = GetEngineObject()->GetModelIndex();
+			GetEngineObject()->SetModelIndex( GetWorldModelIndex() );
 		}
 		else
 		{
@@ -906,7 +906,7 @@ void C_WeaponPortalgun::GetEffectParameters( EffectType_t effectID, color32 &col
 		}
 		else
 		{
-			SetModelIndex( originalModelIndex );
+			GetEngineObject()->SetModelIndex( originalModelIndex );
 		}
 	}
 }

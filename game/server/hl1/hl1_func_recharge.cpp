@@ -98,7 +98,7 @@ void CRecharge::Spawn()
 	SetSolid( SOLID_BSP );
 	SetMoveType( MOVETYPE_PUSH );
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	m_iJuice = sk_suitcharger.GetFloat();
 	SetTextureFrameIndex( 0 );
 

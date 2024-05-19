@@ -116,7 +116,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 {
 #if !defined( CLIENT_DLL )
 	
-	SetModelName( NULL_STRING );//invisible
+	GetEngineObject()->SetModelName( NULL_STRING );//invisible
 	AddSolidFlags( FSOLID_NOT_SOLID );
 
 	m_takedamage = DAMAGE_NO;

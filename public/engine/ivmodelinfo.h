@@ -40,41 +40,41 @@ class IClientRenderable;
 //-----------------------------------------------------------------------------
 // Purpose: a callback class that is notified when a model has finished loading
 //-----------------------------------------------------------------------------
-abstract_class IModelLoadCallback
-{
-public:
-	virtual void OnModelLoadComplete( const model_t* pModel ) = 0;
-
-protected:
-	// Protected destructor so that nobody tries to delete via this interface.
-	// Automatically unregisters if the callback is destroyed while still pending.
-	~IModelLoadCallback();
-};
+//abstract_class IModelLoadCallback
+//{
+//public:
+//	virtual void OnModelLoadComplete( const model_t* pModel ) = 0;
+//
+//protected:
+//	// Protected destructor so that nobody tries to delete via this interface.
+//	// Automatically unregisters if the callback is destroyed while still pending.
+//	~IModelLoadCallback();
+//};
 
 
 //-----------------------------------------------------------------------------
 // Purpose: Automate refcount tracking on a model index
 //-----------------------------------------------------------------------------
-class CRefCountedModelIndex
-{
-private:
-	int m_nIndex;
-public:
-	CRefCountedModelIndex() : m_nIndex( -1 ) { }
-	~CRefCountedModelIndex() { Set( -1 ); }
-
-	CRefCountedModelIndex( const CRefCountedModelIndex& src ) : m_nIndex( -1 ) { Set( src.m_nIndex ); }
-	CRefCountedModelIndex& operator=( const CRefCountedModelIndex& src ) { Set( src.m_nIndex ); return *this; }
-
-	explicit CRefCountedModelIndex( int i ) : m_nIndex( -1 ) { Set( i ); }
-	CRefCountedModelIndex& operator=( int i ) { Set( i ); return *this; }
-
-	int Get() const { return m_nIndex; }
-	void Set( int i );
-	void Clear() { Set( -1 ); }
-
-	operator int () const { return m_nIndex; }
-};
+//class CRefCountedModelIndex
+//{
+//private:
+//	int m_nIndex;
+//public:
+//	CRefCountedModelIndex() : m_nIndex( -1 ) { }
+//	~CRefCountedModelIndex() { Set( -1 ); }
+//
+//	CRefCountedModelIndex( const CRefCountedModelIndex& src ) : m_nIndex( -1 ) { Set( src.m_nIndex ); }
+//	CRefCountedModelIndex& operator=( const CRefCountedModelIndex& src ) { Set( src.m_nIndex ); return *this; }
+//
+//	explicit CRefCountedModelIndex( int i ) : m_nIndex( -1 ) { Set( i ); }
+//	CRefCountedModelIndex& operator=( int i ) { Set( i ); return *this; }
+//
+//	int Get() const { return m_nIndex; }
+//	void Set( int i );
+//	void Clear() { Set( -1 ); }
+//
+//	operator int () const { return m_nIndex; }
+//};
 
 
 //-----------------------------------------------------------------------------
@@ -95,8 +95,8 @@ public:
 // - if the dynamic index is EVEN, then the model is NETWORKED
 //   and has a dynamic model string table index of (dynamic index)>>1
 
-inline bool IsDynamicModelIndex( int modelindex ) { return modelindex < -1; }
-inline bool IsClientOnlyModelIndex( int modelindex ) { return modelindex < -1 && (modelindex & 1); }
+//inline bool IsDynamicModelIndex( int modelindex ) { return modelindex < -1; }
+//inline bool IsClientOnlyModelIndex( int modelindex ) { return modelindex < -1 && (modelindex & 1); }
 
 abstract_class IVModelInfo
 {
@@ -169,12 +169,12 @@ public:
 
 	// Obsolete methods. These are left in to maintain binary compatibility with clients using the IVModelInfo old version.
 	virtual const model_t			*FindOrLoadModel( const char *name ) { Warning( "IVModelInfo::FindOrLoadModel is now obsolte.\n" ); return NULL; }
-	virtual void					InitDynamicModels( ) { Warning( "IVModelInfo::InitDynamicModels is now obsolte.\n" ); }
-	virtual void					ShutdownDynamicModels( ) { Warning( "IVModelInfo::ShutdownDynamicModels is now obsolte.\n" ); }
-	virtual void					AddDynamicModel( const char *name, int nModelIndex = -1 ) { Warning( "IVModelInfo::AddDynamicModel is now obsolte.\n" ); }
+	//virtual void					InitDynamicModels( ) { Warning( "IVModelInfo::InitDynamicModels is now obsolte.\n" ); }
+	//virtual void					ShutdownDynamicModels( ) { Warning( "IVModelInfo::ShutdownDynamicModels is now obsolte.\n" ); }
+	//virtual void					AddDynamicModel( const char *name, int nModelIndex = -1 ) { Warning( "IVModelInfo::AddDynamicModel is now obsolte.\n" ); }
 	virtual void					ReferenceModel( int modelindex ) { Warning( "IVModelInfo::ReferenceModel is now obsolte.\n" ); }
 	virtual void					UnreferenceModel( int modelindex ) { Warning( "IVModelInfo::UnreferenceModel is now obsolte.\n" ); }
-	virtual void					CleanupDynamicModels( bool bForce = false ) { Warning( "IVModelInfo::CleanupDynamicModels is now obsolte.\n" ); }
+	//virtual void					CleanupDynamicModels( bool bForce = false ) { Warning( "IVModelInfo::CleanupDynamicModels is now obsolte.\n" ); }
 
 	virtual MDLHandle_t				GetCacheHandle( const model_t *model ) const = 0;
 
@@ -186,20 +186,20 @@ public:
 	// Poked by engine host system
 	virtual void					OnLevelChange() = 0;
 
-	virtual int						GetModelClientSideIndex( const char *name ) const = 0;
+	//virtual int						GetModelClientSideIndex( const char *name ) const = 0;
 
 	// Returns index of model by name, dynamically registered if not already known.
-	virtual int						RegisterDynamicModel( const char *name, bool bClientSide ) = 0;
+	//virtual int						RegisterDynamicModel( const char *name, bool bClientSide ) = 0;
 
-	virtual bool					IsDynamicModelLoading( int modelIndex ) = 0;
+	//virtual bool					IsDynamicModelLoading( int modelIndex ) = 0;
 
-	virtual void					AddRefDynamicModel( int modelIndex ) = 0;
-	virtual void					ReleaseDynamicModel( int modelIndex ) = 0;
+	//virtual void					AddRefDynamicModel( int modelIndex ) = 0;
+	//virtual void					ReleaseDynamicModel( int modelIndex ) = 0;
 
 	// Registers callback for when dynamic model has finished loading.
 	// Automatically adds reference, pair with ReleaseDynamicModel.
-	virtual bool					RegisterModelLoadCallback( int modelindex, IModelLoadCallback* pCallback, bool bCallImmediatelyIfLoaded = true ) = 0;
-	virtual void					UnregisterModelLoadCallback( int modelindex, IModelLoadCallback* pCallback ) = 0;
+	//virtual bool					RegisterModelLoadCallback( int modelindex, IModelLoadCallback* pCallback, bool bCallImmediatelyIfLoaded = true ) = 0;
+	//virtual void					UnregisterModelLoadCallback( int modelindex, IModelLoadCallback* pCallback ) = 0;
 };
 
 typedef IVModelInfo IVModelInfo003;
@@ -208,7 +208,7 @@ typedef IVModelInfo IVModelInfo003;
 abstract_class IVModelInfoClient : public IVModelInfo
 {
 public:
-	virtual void OnDynamicModelsStringTableChange( int nStringIndex, const char *pString, const void *pData ) = 0;
+	//virtual void OnDynamicModelsStringTableChange( int nStringIndex, const char *pString, const void *pData ) = 0;
 
 	// For tools only!
 	virtual const model_t *FindOrLoadModel( const char *name ) = 0;
@@ -225,37 +225,37 @@ struct virtualterrainparams_t
 //-----------------------------------------------------------------------------
 // Purpose: Force removal from callback list on destruction to avoid crashes.
 //-----------------------------------------------------------------------------
-inline IModelLoadCallback::~IModelLoadCallback()
-{
-#ifdef CLIENT_DLL
-	extern IVModelInfoClient *modelinfo;
-#else
-	extern IVModelInfo *modelinfo;
-#endif
-	if ( modelinfo )
-	{
-		modelinfo->UnregisterModelLoadCallback( -1, this );
-	}
-}
+//inline IModelLoadCallback::~IModelLoadCallback()
+//{
+//#ifdef CLIENT_DLL
+//	extern IVModelInfoClient *modelinfo;
+//#else
+//	extern IVModelInfo *modelinfo;
+//#endif
+//	if ( modelinfo )
+//	{
+//		modelinfo->UnregisterModelLoadCallback( -1, this );
+//	}
+//}
 
 
 
 //-----------------------------------------------------------------------------
 // Purpose: Automate refcount tracking on a model index
 //-----------------------------------------------------------------------------
-inline void CRefCountedModelIndex::Set( int i )
-{
-#ifdef CLIENT_DLL
-	extern IVModelInfoClient *modelinfo;
-#else
-	extern IVModelInfo *modelinfo;
-#endif
-	if ( i == m_nIndex )
-		return;
-	modelinfo->AddRefDynamicModel( i );
-	modelinfo->ReleaseDynamicModel( m_nIndex );
-	m_nIndex = i;
-}
+//inline void CRefCountedModelIndex::Set( int i )
+//{
+//#ifdef CLIENT_DLL
+//	extern IVModelInfoClient *modelinfo;
+//#else
+//	extern IVModelInfo *modelinfo;
+//#endif
+//	if ( i == m_nIndex )
+//		return;
+//	modelinfo->AddRefDynamicModel( i );
+//	modelinfo->ReleaseDynamicModel( m_nIndex );
+//	m_nIndex = i;
+//}
 
 
 #endif // IVMODELINFO_H

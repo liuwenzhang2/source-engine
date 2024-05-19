@@ -453,11 +453,6 @@ public:
 
 	void							SetLocalTransform( const matrix3x4_t &localTransform );
 
-	void							SetModelName( string_t name );
-	string_t						GetModelName( void ) const;
-
-	int								GetModelIndex( void ) const;
-	void							SetModelIndex( int index );
 	virtual int						CalcOverrideModelIndex() { return -1; }
 
 	// These methods return a *world-aligned* box relative to the absorigin of the entity.
@@ -1151,7 +1146,7 @@ public:
 private:
 	
 	// Model for rendering
-	const model_t					*model;
+	const model_t					*m_pModel;
 
 public:
 	// Time animation sequence or frame was last changed
@@ -1190,8 +1185,7 @@ public:
 	int								m_nNextThinkTick;
 	int								m_nLastThinkTick;
 
-	// Object model index
-	short							m_nModelIndex;
+
 
 #ifdef TF_CLIENT_DLL
 	int								m_nModelIndexOverrides[MAX_VISION_MODES];
@@ -1417,7 +1411,6 @@ private:
 
 	IEngineObjectClient* m_hOldMoveParent = NULL;
 
-	string_t						m_ModelName;
 
 	//IEngineObjectClient* m_EngineObject;
 
@@ -1587,17 +1580,8 @@ inline bool C_BaseEntity::IsServerEntity( void )
 
 inline const model_t *C_BaseEntity::GetModel( void ) const
 {
-	return model;
+	return m_pModel;
 }
-
-inline int C_BaseEntity::GetModelIndex( void ) const
-{
-	return m_nModelIndex;
-}
-
-
-
-
 
 inline C_BaseEntity	*C_BaseEntity::Instance( IClientEntity *ent )
 {
@@ -1694,20 +1678,15 @@ inline const Vector& C_BaseEntity::WorldAlignSize( ) const
 	return CollisionProp()->OBBSize();
 }
 
-inline float CBaseEntity::BoundingRadius() const
+inline float C_BaseEntity::BoundingRadius() const
 {
 	return CollisionProp()->BoundingRadius();
 }
 
-inline bool CBaseEntity::IsPointSized() const
+inline bool C_BaseEntity::IsPointSized() const
 {
 	return CollisionProp()->BoundingRadius() == 0.0f;
 }
-
-
-
-
-
 
 inline const QAngle& C_BaseEntity::GetLocalAngularVelocity( ) const
 {
@@ -1754,7 +1733,7 @@ inline float C_BaseEntity::GetElasticity( void )	const
 	return m_flElasticity; 
 }
 
-inline const color32 CBaseEntity::GetRenderColor() const
+inline const color32 C_BaseEntity::GetRenderColor() const
 {
 	return m_clrRender.Get();
 }
@@ -1791,7 +1770,7 @@ inline void C_BaseEntity::SetRenderColorA( byte a )
 	SetRenderColor( GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, a );
 }
 
-inline RenderMode_t CBaseEntity::GetRenderMode() const
+inline RenderMode_t C_BaseEntity::GetRenderMode() const
 {
 	return (RenderMode_t)m_nRenderMode;
 }
@@ -1805,12 +1784,12 @@ inline bool C_BaseEntity::IsMarkedForDeletion( void )
 }
 
 
-inline ClientRenderHandle_t CBaseEntity::GetRenderHandle() const 
+inline ClientRenderHandle_t C_BaseEntity::GetRenderHandle() const 
 { 
 	return m_hRender; 
 }
 
-inline ClientRenderHandle_t& CBaseEntity::RenderHandle()
+inline ClientRenderHandle_t& C_BaseEntity::RenderHandle()
 {
 	return m_hRender;
 }

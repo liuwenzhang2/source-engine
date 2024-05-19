@@ -101,7 +101,7 @@ void CRagdoll::Init(
 {
 	ragdollparams_t params;
 	params.pGameData = static_cast<void *>( ent );
-	params.modelIndex = ent->GetModelIndex();
+	params.modelIndex = ent->GetEngineObject()->GetModelIndex();
 	params.pCollide = modelinfo->GetVCollide( params.modelIndex );
 	params.pStudioHdr = pstudiohdr;
 	params.forceVector = forceVector;
@@ -118,7 +118,7 @@ void CRagdoll::Init(
 	ent->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	RagdollApplyAnimationAsVelocity( m_ragdoll, pDeltaBones0, pDeltaBones1, dt );
-	RagdollActivate( m_ragdoll, params.pCollide, ent->GetModelIndex() );
+	RagdollActivate( m_ragdoll, params.pCollide, ent->GetEngineObject()->GetModelIndex() );
 
 	// It's moving now...
 	m_flLastOriginChangeTime = gpGlobals->curtime;
@@ -133,7 +133,7 @@ void CRagdoll::Init(
 
 	for ( int i = 0; i < m_ragdoll.listCount; i++ )
 	{
-		g_pPhysSaveRestoreManager->AssociateModel( m_ragdoll.list[i].pObject, ent->GetModelIndex() );
+		g_pPhysSaveRestoreManager->AssociateModel( m_ragdoll.list[i].pObject, ent->GetEngineObject()->GetModelIndex() );
 	}
 
 #if RAGDOLL_VISUALIZE
@@ -468,7 +468,7 @@ int C_ServerRagdoll::InternalDrawModel( int flags )
 	int ret = BaseClass::InternalDrawModel( flags );
 	if ( vcollide_wireframe.GetBool() )
 	{
-		vcollide_t *pCollide = modelinfo->GetVCollide( GetModelIndex() );
+		vcollide_t *pCollide = modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() );
 		IMaterial *pWireframe = materials->FindMaterial("shadertest/wireframevertexcolor", TEXTURE_GROUP_OTHER);
 
 		matrix3x4_t matrix;
@@ -490,10 +490,10 @@ CStudioHdr *C_ServerRagdoll::OnNewModel( void )
 
 	if ( !m_elementCount )
 	{
-		vcollide_t *pCollide = modelinfo->GetVCollide( GetModelIndex() );
+		vcollide_t *pCollide = modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() );
 		if ( !pCollide )
 		{
-			const char *pszName = modelinfo->GetModelName( modelinfo->GetModel( GetModelIndex() ) );
+			const char *pszName = modelinfo->GetModelName( modelinfo->GetModel(GetEngineObject()->GetModelIndex() ) );
 			Msg( "*** ERROR: C_ServerRagdoll::InitModel: %s missing vcollide data ***\n", (pszName) ? pszName : "<null>" );
 			m_elementCount = 0;
 		}

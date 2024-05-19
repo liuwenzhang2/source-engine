@@ -137,7 +137,7 @@ void CGenericNPC::Spawn()
 {
 	Precache();
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 /*
 	if ( FStrEq( STRING( GetModelName() ), "models/player.mdl" ) )
@@ -146,7 +146,7 @@ void CGenericNPC::Spawn()
 		UTIL_SetSize(this, VEC_HULL_MIN, VEC_HULL_MAX);
 */
 
-	if ( FStrEq( STRING( GetModelName() ), "models/player.mdl" ) || FStrEq( STRING( GetModelName() ), "models/holo.mdl" ) )
+	if ( FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/player.mdl" ) || FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/holo.mdl" ) )
 		UTIL_SetSize(this, VEC_HULL_MIN, VEC_HULL_MAX);
 	else
 		UTIL_SetSize(this, NAI_Hull::Mins(HULL_HUMAN), NAI_Hull::Maxs(HULL_HUMAN));
@@ -168,7 +168,7 @@ void CGenericNPC::Spawn()
 		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), MASK_SOLID, &tr );
 		if ( tr.startsolid )
 		{
-			Msg("Placed npc_generic in solid!!! (%s)\n", STRING(GetModelName()) );
+			Msg("Placed npc_generic in solid!!! (%s)\n", STRING(GetEngineObject()->GetModelName()) );
 			m_spawnflags |= SF_GENERICNPC_NOTSOLID;
 		}
 	}
@@ -188,7 +188,7 @@ void CGenericNPC::Precache()
 {
 	BaseClass::Precache();
 
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "GenericNPC.GunSound" );
 }	
@@ -257,7 +257,7 @@ void CNPC_Furniture::Spawn( )
 {
 	Precache();
 	
-	SetModel( STRING(GetModelName()) );
+	SetModel( STRING(GetEngineObject()->GetModelName()) );
 
 	SetMoveType( MOVETYPE_STEP );
 	SetSolid( SOLID_BBOX );
@@ -296,7 +296,7 @@ void CNPC_Furniture::Spawn( )
 //-----------------------------------------------------------------------------
 void CNPC_Furniture::Precache( void )
 {
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 }
 
 //-----------------------------------------------------------------------------

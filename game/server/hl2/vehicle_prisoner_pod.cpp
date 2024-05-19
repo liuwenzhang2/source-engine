@@ -241,7 +241,7 @@ void CPropVehiclePrisonerPod::Precache( void )
 void CPropVehiclePrisonerPod::Spawn( void )
 {
 	Precache();
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetCollisionGroup( COLLISION_GROUP_VEHICLE );
 
 	BaseClass::Spawn();

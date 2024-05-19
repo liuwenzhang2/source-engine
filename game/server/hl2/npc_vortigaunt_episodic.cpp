@@ -1121,11 +1121,11 @@ void CNPC_Vortigaunt::Spawn( void )
 #endif // HL2_EPISODIC
 
 	// Allow multiple models (for slaves), but default to vortigaunt.mdl
-	char *szModel = (char *)STRING( GetModelName() );
+	char *szModel = (char *)STRING(GetEngineObject()->GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = "models/vortigaunt.mdl";
-		SetModelName( AllocPooledString(szModel) );
+		GetEngineObject()->SetModelName( AllocPooledString(szModel) );
 	}
 
 	BaseClass::Spawn();
@@ -1172,7 +1172,7 @@ void CNPC_Vortigaunt::Precache()
 {
 	UTIL_PrecacheOther( "vort_charge_token" );
 
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	m_nLightningSprite = engine->PrecacheModel("sprites/lgtning.vmt");
 	engine->PrecacheModel("sprites/vortring1.vmt");

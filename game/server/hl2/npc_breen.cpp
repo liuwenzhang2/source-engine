@@ -79,11 +79,11 @@ void CNPC_Breen::Spawn()
 {
 	// Breen is allowed to use multiple models, because he has a torso version for monitors.
 	// He defaults to his normal model.
-	char *szModel = (char *)STRING( GetModelName() );
+	char *szModel = (char *)STRING(GetEngineObject()->GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = "models/breen.mdl";
-		SetModelName( AllocPooledString(szModel) );
+		GetEngineObject()->SetModelName( AllocPooledString(szModel) );
 	}
 
 	Precache();
@@ -114,7 +114,7 @@ void CNPC_Breen::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Breen::Precache()
 {
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	BaseClass::Precache();
 }	
 

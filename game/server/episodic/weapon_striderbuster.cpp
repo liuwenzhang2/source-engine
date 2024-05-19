@@ -226,7 +226,7 @@ void CWeaponStriderBuster::Precache( void )
 	PrecacheParticleSystem( "striderbuster_break" );
 	PrecacheParticleSystem( "striderbuster_flechette_attached" );
 
-	SetModelName( AllocPooledString("models/magnusson_device.mdl") );
+	GetEngineObject()->SetModelName( AllocPooledString("models/magnusson_device.mdl") );
 	BaseClass::Precache();
 }
 
@@ -235,7 +235,7 @@ void CWeaponStriderBuster::Precache( void )
 //-----------------------------------------------------------------------------
 void CWeaponStriderBuster::Spawn( void )
 {	
-	SetModelName( AllocPooledString("models/magnusson_device.mdl") );
+	GetEngineObject()->SetModelName( AllocPooledString("models/magnusson_device.mdl") );
 	BaseClass::Spawn();
 	
 	// Setup for being shot by the player

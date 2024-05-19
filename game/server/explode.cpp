@@ -239,7 +239,7 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 { 
 	trace_t tr;
 
-	SetModelName( NULL_STRING );//invisible
+	GetEngineObject()->SetModelName( NULL_STRING );//invisible
 	SetSolid( SOLID_NONE );// intangible
 
 	Vector vecSpot = GetEngineObject()->GetAbsOrigin() + Vector( 0 , 0 , 8 );

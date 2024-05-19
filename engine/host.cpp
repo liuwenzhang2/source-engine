@@ -3508,13 +3508,13 @@ void _Host_RunFrame (float time)
 			}
 #endif
 		}
-		else
-		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "modelloader->UpdateDynamicModels" );
-			VPROF( "UpdateDynamicModels" );
-			CMDLCacheCriticalSection critsec( g_pMDLCache );
-			modelloader->UpdateDynamicModels();
-		}
+		//else
+		//{
+		//	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "modelloader->UpdateDynamicModels" );
+		//	VPROF( "UpdateDynamicModels" );
+		//	CMDLCacheCriticalSection critsec( g_pMDLCache );
+		//	modelloader->UpdateDynamicModels();
+		//}
 
 		//-------------------
 		// simulation

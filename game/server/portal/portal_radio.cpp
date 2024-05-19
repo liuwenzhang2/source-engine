@@ -544,7 +544,7 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 		CPhysicsProp *pOldDinosaur	= (CPhysicsProp*)gEntList.FindEntityByClassname( NULL, "prop_physics" );
 		while ( pOldDinosaur )
 		{
-			if ( V_strcmp( STRING( pOldDinosaur->GetModelName() ), RADIO_MODEL_NAME ) == 0 )
+			if ( V_strcmp( STRING( pOldDinosaur->GetEngineObject()->GetModelName() ), RADIO_MODEL_NAME ) == 0 )
 			{
 				vSpawnPos = pOldDinosaur->GetEngineObject()->GetAbsOrigin();
 				vSpawnAng = pOldDinosaur->GetEngineObject()->GetAbsAngles();

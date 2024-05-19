@@ -439,7 +439,7 @@ void CCombineDropshipContainer::Precache()
 		engine->PrecacheModel( s_pGibModelName[i] );
 	}
 
-	PropBreakablePrecacheAll( GetModelName() );
+	PropBreakablePrecacheAll(GetEngineObject()->GetModelName() );
 }
 
 
@@ -505,7 +505,7 @@ void CCombineDropshipContainer::CreateCorpse()
 	// Break into chunks
 	Vector angVelocity;
 	QAngleToAngularImpulse( GetLocalAngularVelocity(), angVelocity );
-	PropBreakableCreateAll( GetModelIndex(), VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsVelocity(), angVelocity, 1.0, 250, COLLISION_GROUP_NPC, this );
+	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), VPhysicsGetObject(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsVelocity(), angVelocity, 1.0, 250, COLLISION_GROUP_NPC, this );
 
 	// Create flaming gibs
 	int iChunks = random->RandomInt( 4, 6 );

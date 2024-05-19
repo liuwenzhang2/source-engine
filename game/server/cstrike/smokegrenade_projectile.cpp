@@ -145,7 +145,7 @@ void CSmokeGrenadeProjectile::Think_Fade()
 	{
 		TheBots->RemoveGrenade( this );
 
-		SetModelName( NULL_STRING );//invisible
+		GetEngineObject()->SetModelName( NULL_STRING );//invisible
 		SetNextThink( gpGlobals->curtime + 20 );
 		SetThink( &CSmokeGrenadeProjectile::Think_Remove );	// Spit out smoke for 10 seconds.
 		SetSolid( SOLID_NONE );
@@ -160,7 +160,7 @@ void CSmokeGrenadeProjectile::Think_Remove()
 
 	TheBots->RemoveGrenade( this );
 
-	SetModelName( NULL_STRING );//invisible
+	GetEngineObject()->SetModelName( NULL_STRING );//invisible
 	SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 }

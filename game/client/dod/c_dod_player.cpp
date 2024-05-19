@@ -313,7 +313,7 @@ private:
 IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_DODRagdoll, DT_DODRagdoll, CDODRagdoll )
 	RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
 	RecvPropEHandle( RECVINFO( m_hPlayer ) ),
-	RecvPropInt( RECVINFO( m_nModelIndex ) ),
+	//RecvPropInt( RECVINFO( m_nModelIndex ) ),
 	RecvPropInt( RECVINFO(m_nForceBone) ),
 	RecvPropVector( RECVINFO(m_vecForce) ),
 	RecvPropVector( RECVINFO( m_vecRagdollVelocity ) )
@@ -507,7 +507,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 		
 	}
 
-	SetModelIndex( m_nModelIndex );
+	GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex() );
 	
 	// Turn it into a ragdoll.
 	if ( cl_ragdoll_physics_enable.GetInt() )
@@ -1396,7 +1396,7 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 		GetAttachment( iAttachment, vecHead, angHeadAngles );	//attachment 1 is the head attachment
 	}
 
-	pEntity->SetModelName(MAKE_STRING(modelinfo->GetModelName(model)) );
+	pEntity->GetEngineObject()->SetModelName(MAKE_STRING(modelinfo->GetModelName(model)) );
 	pEntity->GetEngineObject()->SetAbsOrigin( vecHead );
 	pEntity->GetEngineObject()->SetAbsAngles( angHeadAngles );
 	pEntity->SetPhysicsMode( PHYSICS_MULTIPLAYER_CLIENTSIDE );
@@ -1709,11 +1709,11 @@ void C_DODPlayer::ProcessMuzzleFlashEvent()
 	if ( !pWeapon )
 		return;
 
-	int nModelIndex = pWeapon->GetModelIndex();
+	int nModelIndex = pWeapon->GetEngineObject()->GetModelIndex();
 	int nWorldModelIndex = pWeapon->GetWorldModelIndex();
 	if ( bInToolRecordingMode && nModelIndex != nWorldModelIndex )
 	{
-		pWeapon->SetModelIndex( nWorldModelIndex );
+		pWeapon->GetEngineObject()->SetModelIndex( nWorldModelIndex );
 	}
 
 	Vector vecOrigin;
@@ -1810,7 +1810,7 @@ void C_DODPlayer::ProcessMuzzleFlashEvent()
 
 	if ( bInToolRecordingMode && nModelIndex != nWorldModelIndex )
 	{
-		pWeapon->SetModelIndex( nModelIndex );
+		pWeapon->GetEngineObject()->SetModelIndex( nModelIndex );
 	}
 }
 

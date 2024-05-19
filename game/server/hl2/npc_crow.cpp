@@ -95,11 +95,11 @@ void CNPC_Crow::Spawn( void )
 	AddSpawnFlags( SF_NPC_FADE_CORPSE );
 #endif // _XBOX
 
-	char *szModel = (char *)STRING( GetModelName() );
+	char *szModel = (char *)STRING(GetEngineObject()->GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = "models/crow.mdl";
-		SetModelName( AllocPooledString(szModel) );
+		GetEngineObject()->SetModelName( AllocPooledString(szModel) );
 	}
 
 	Precache();

@@ -198,6 +198,10 @@ public:
 	virtual void SetGroundEntity(IEngineObjectServer* ground) = 0;
 	virtual IEngineObjectServer* GetGroundEntity(void) = 0;
 	virtual IEngineObjectServer* GetGroundEntity(void) const = 0;
+	virtual string_t GetModelName(void) const = 0;
+	virtual void SetModelName(string_t name) = 0;
+	virtual void SetModelIndex(int index) = 0;
+	virtual int GetModelIndex(void) const = 0;
 
 };
 
@@ -210,10 +214,10 @@ public:
 	// Delete yourself.
 	virtual void			Release(void) = 0;
 // Previously in pev
-	virtual int				GetModelIndex( void ) const = 0;
- 	virtual string_t		GetModelName( void ) const = 0;
+	//virtual int			GetModelIndex( void ) const = 0;
+ 	//virtual string_t		GetModelName( void ) const = 0;
 
-	virtual void			SetModelIndex( int index ) = 0;
+	//virtual void			SetModelIndex( int index ) = 0;
 	virtual PVSInfo_t*		GetPVSInfo() = 0; // get current visibilty data
 	virtual int				AreaNum() const = 0;
 

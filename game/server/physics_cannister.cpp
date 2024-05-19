@@ -74,7 +74,7 @@ END_DATADESC()
 void CPhysicsCannister::Spawn( void )
 {
 	Precache();
-	SetModel( STRING(GetModelName()) );
+	SetModel( STRING(GetEngineObject()->GetModelName()) );
 	SetBloodColor( DONT_BLEED );
 
 	AddSolidFlags( FSOLID_CUSTOMRAYTEST );
@@ -148,7 +148,7 @@ CPhysicsCannister::~CPhysicsCannister( void )
 
 void CPhysicsCannister::Precache( void )
 {
-	PropBreakablePrecacheAll( GetModelName() );
+	PropBreakablePrecacheAll(GetEngineObject()->GetModelName() );
 	if ( m_gasSound != NULL_STRING )
 	{
 		g_pSoundEmitterSystem->PrecacheScriptSound( STRING(m_gasSound) );
@@ -363,7 +363,7 @@ void CPhysicsCannister::Explode( CBaseEntity *pAttacker )
 	IPhysicsObject *pPhysics = VPhysicsGetObject();
 
 	pPhysics->GetVelocity( &velocity, &angVelocity );
-	PropBreakableCreateAll( GetModelIndex(), pPhysics, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, angVelocity, 1.0, 20, COLLISION_GROUP_DEBRIS );
+	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, angVelocity, 1.0, 20, COLLISION_GROUP_DEBRIS );
 	ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), pAttacker, m_damage, 0, true );
 	UTIL_Remove( this );
 }

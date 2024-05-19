@@ -83,16 +83,16 @@ int C_DODBombTarget::DrawModel( int flags )
 		{
 			// draw a different model for the non-planting team
 
-			if ( GetModelIndex() != m_iUnavailableModel	)
+			if (GetEngineObject()->GetModelIndex() != m_iUnavailableModel	)
 			{
-				SetModelIndex( m_iUnavailableModel );
+				GetEngineObject()->SetModelIndex( m_iUnavailableModel );
 			}
 		}
 		else
 		{
-			if ( GetModelIndex() != m_iTargetModel	)
+			if (GetEngineObject()->GetModelIndex() != m_iTargetModel	)
 			{
-				SetModelIndex( m_iTargetModel );
+				GetEngineObject()->SetModelIndex( m_iTargetModel );
 			}
 		}
 	}

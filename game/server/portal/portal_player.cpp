@@ -118,12 +118,12 @@ public:
 LINK_ENTITY_TO_CLASS( portal_ragdoll, CPortalRagdoll );
 
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CPortalRagdoll, DT_PortalRagdoll )
-SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
-SendPropEHandle( SENDINFO( m_hPlayer ) ),
-SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
-SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
-SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
-SendPropVector( SENDINFO( m_vecRagdollVelocity ) ),
+	SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
+	SendPropEHandle( SENDINFO( m_hPlayer ) ),
+	//SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
+	SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
+	SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
+	SendPropVector( SENDINFO( m_vecRagdollVelocity ) ),
 END_SEND_TABLE()
 
 
@@ -704,7 +704,7 @@ void CPortal_Player::PlayerDeathThink(void)
 		PackDeadPlayerItems();
 	}
 
-	if (GetModelIndex() && (!IsSequenceFinished()) && (m_lifeState == LIFE_DYING))
+	if (GetEngineObject()->GetModelIndex() && (!IsSequenceFinished()) && (m_lifeState == LIFE_DYING))
 	{
 		StudioFrameAdvance( );
 

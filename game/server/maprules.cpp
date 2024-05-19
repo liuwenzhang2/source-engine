@@ -89,7 +89,7 @@ END_DATADESC()
 void CRulePointEntity::Spawn( void )
 {
 	BaseClass::Spawn();
-	SetModelName( NULL_STRING );
+	GetEngineObject()->SetModelName( NULL_STRING );
 	m_Score = 0;
 }
 
@@ -109,7 +109,7 @@ private:
 
 void CRuleBrushEntity::Spawn( void )
 {
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	BaseClass::Spawn();
 }
 

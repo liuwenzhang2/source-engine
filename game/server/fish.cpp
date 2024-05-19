@@ -98,7 +98,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CFish, DT_CFish )
 	SendPropFloat( SENDINFO(m_y), 7, 0 /*SPROP_CHANGES_OFTEN*/, -255.0f, 255.0f ),
 	SendPropFloat( SENDINFO(m_z), -1, SPROP_COORD ),								// only sent once
 
-	SendPropModelIndex( SENDINFO(m_nModelIndex) ),
+	//SendPropModelIndex( SENDINFO(m_nModelIndex) ),
 	SendPropInt( SENDINFO(m_lifeState) ),
 
 	SendPropFloat( SENDINFO(m_waterLevel) ),										// only sent once
@@ -134,7 +134,7 @@ void CFish::Initialize( CFishPool *pool, unsigned int id )
 	m_y = deltaPos.y;
 	m_z = m_poolOrigin->z;
 
-	SetModel( pool->GetModelName().ToCStr() );
+	SetModel( pool->GetEngineObject()->GetModelName().ToCStr() );
 }
 
 
@@ -622,7 +622,7 @@ bool CFishPool::KeyValue( const char *szKeyName, const char *szValue )
 	else if (FStrEq( szKeyName, "model" ))
 	{
 		engine->PrecacheModel( szValue );
-		SetModelName( AllocPooledString( szValue ) );
+		GetEngineObject()->SetModelName( AllocPooledString( szValue ) );
 	}
 
 	return BaseClass::KeyValue( szKeyName, szValue );

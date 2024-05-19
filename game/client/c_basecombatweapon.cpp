@@ -165,9 +165,9 @@ void C_BaseCombatWeapon::OnDataChanged( DataUpdateType_t updateType )
 	else // weapon carried by other player or not at all
 	{
 		int overrideModelIndex = CalcOverrideModelIndex();
-		if( overrideModelIndex != -1 && overrideModelIndex != GetModelIndex() )
+		if( overrideModelIndex != -1 && overrideModelIndex != GetEngineObject()->GetModelIndex() )
 		{
-			SetModelIndex( overrideModelIndex );
+			GetEngineObject()->SetModelIndex( overrideModelIndex );
 		}
 	}
 
@@ -531,11 +531,11 @@ void C_BaseCombatWeapon::GetToolRecordingState( KeyValues *msg )
 	if ( !ToolsEnabled() )
 		return;
 
-	int nModelIndex = GetModelIndex();
+	int nModelIndex = GetEngineObject()->GetModelIndex();
 	int nWorldModelIndex = GetWorldModelIndex();
 	if ( nModelIndex != nWorldModelIndex )
 	{
-		SetModelIndex( nWorldModelIndex );
+		GetEngineObject()->SetModelIndex( nWorldModelIndex );
 	}
 
 	BaseClass::GetToolRecordingState( msg );
@@ -557,6 +557,6 @@ void C_BaseCombatWeapon::GetToolRecordingState( KeyValues *msg )
 
 	if ( nModelIndex != nWorldModelIndex )
 	{
-		SetModelIndex( nModelIndex );
+		GetEngineObject()->SetModelIndex( nModelIndex );
 	}
 }

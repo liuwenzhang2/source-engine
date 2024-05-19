@@ -750,7 +750,7 @@ void CItem_AmmoCrate::Spawn( void )
 
 	BaseClass::Spawn();
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetMoveType( MOVETYPE_NONE );
 	SetSolid( SOLID_VPHYSICS );
 	CreateVPhysics();
@@ -781,7 +781,7 @@ bool CItem_AmmoCrate::CreateVPhysics( void )
 void CItem_AmmoCrate::Precache( void )
 {
 	SetupCrate();
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "AmmoCrate.Open" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "AmmoCrate.Close" );
@@ -792,7 +792,7 @@ void CItem_AmmoCrate::Precache( void )
 //-----------------------------------------------------------------------------
 void CItem_AmmoCrate::SetupCrate( void )
 {
-	SetModelName( AllocPooledString( m_lpzModelNames[m_nAmmoType] ) );
+	GetEngineObject()->SetModelName( AllocPooledString( m_lpzModelNames[m_nAmmoType] ) );
 	
 	m_nAmmoIndex = GetAmmoDef()->Index( m_lpzAmmoNames[m_nAmmoType] );
 }

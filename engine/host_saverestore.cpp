@@ -4609,7 +4609,7 @@ void CSaveRestore::ReapplyDecal( bool adjacent, RestoreLookupTable *table, decal
 			else
 			{
 				// This breaks client/server.  However, non-world entities are not in your PVS potentially.
-				IServerEntity* pServerEntity = serverEntitylist->GetServerEntity(entityToHit);
+				IEngineObjectServer* pServerEntity = serverEntitylist->GetEngineObject(entityToHit);
 				if (pServerEntity)
 				{
 					pModel = sv.GetModel( pServerEntity->GetModelIndex() );						

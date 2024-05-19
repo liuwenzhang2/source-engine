@@ -366,7 +366,7 @@ bool CDODBaseGrenade::CreateVPhysics()
 
 void CDODBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 {
-	SetModelName( NULL_STRING );//invisible
+	GetEngineObject()->SetModelName( NULL_STRING );//invisible
 	AddSolidFlags( FSOLID_NOT_SOLID );
 
 	m_takedamage = DAMAGE_NO;

@@ -335,7 +335,7 @@ void CBaseTrigger::InitTrigger( )
 	}
 
 	SetMoveType( MOVETYPE_NONE );
-	SetModel( STRING( GetModelName() ) );    // set size and link into world
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 	if ( showtriggers.GetInt() == 0 )
 	{
 		AddEffects( EF_NODRAW );
@@ -1247,7 +1247,7 @@ void CTriggerVolume::Spawn( void )
 	SetSolid( SOLID_BSP );
 	AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
-	SetModel( STRING( GetModelName() ) );    // set size and link into world
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 	if ( showtriggers.GetInt() == 0 )
 	{
 		AddEffects( EF_NODRAW );
@@ -3741,7 +3741,7 @@ void CBaseVPhysicsTrigger::Spawn()
 	// so just use FSOLID_NOT_SOLID
 
 	SetMoveType( MOVETYPE_NONE );
-	SetModel( STRING( GetModelName() ) );    // set size and link into world
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 	if ( showtriggers.GetInt() == 0 )
 	{
 		AddEffects( EF_NODRAW );

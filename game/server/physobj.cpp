@@ -443,7 +443,7 @@ void CPhysBox::Spawn( void )
   
 	SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetSolid( SOLID_VPHYSICS );
 	if ( HasSpawnFlags( SF_PHYSBOX_DEBRIS ) )
 	{
@@ -509,13 +509,13 @@ static bool ShouldDampRotation( const CPhysCollide *pCollide )
 bool CPhysBox::CreateVPhysics()
 {
 	solid_t tmpSolid;
-	PhysModelParseSolid( tmpSolid, this, GetModelIndex() );
+	PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() );
 	if ( m_massScale > 0 )
 	{
 		tmpSolid.params.mass *= m_massScale;
 	}
 
-	vcollide_t *pVCollide = modelinfo->GetVCollide( GetModelIndex() );
+	vcollide_t *pVCollide = modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() );
 	PhysGetMassCenterOverride( this, pVCollide, tmpSolid );
 	PhysSolidOverride( tmpSolid, m_iszOverrideScript );
 	if ( tmpSolid.params.rotdamping < 1.0f && ShouldDampRotation(pVCollide->solids[0]) )
@@ -882,7 +882,7 @@ void CPhysExplosion::Spawn( void )
 {
 	SetMoveType( MOVETYPE_NONE );
 	SetSolid( SOLID_NONE );
-	SetModelName( NULL_STRING );
+	GetEngineObject()->SetModelName( NULL_STRING );
 }
 
 float CPhysExplosion::GetRadius( void )
@@ -1121,7 +1121,7 @@ void CPhysImpact::Spawn( void )
 {
 	SetMoveType( MOVETYPE_NONE );
 	SetSolid( SOLID_NONE );
-	SetModelName( NULL_STRING );
+	GetEngineObject()->SetModelName( NULL_STRING );
 
 	//If not targetted, and no distance is set, give it a default value
 	if ( m_distance == 0 )
@@ -1238,7 +1238,7 @@ class CSimplePhysicsBrush : public CBaseEntity
 public:
 	void Spawn()
 	{
-		SetModel( STRING( GetModelName() ) );
+		SetModel( STRING(GetEngineObject()->GetModelName() ) );
 		SetMoveType( MOVETYPE_VPHYSICS );
 		SetSolid( SOLID_VPHYSICS );
 		m_takedamage = DAMAGE_EVENTS_ONLY;
@@ -1319,7 +1319,7 @@ bool TransferPhysicsObject( CBaseEntity *pFrom, CBaseEntity *pTo, bool wakeUp )
 static CBaseEntity *CreateSimplePhysicsObject( CBaseEntity *pEntity, bool createAsleep, bool createAsDebris )
 {
 	CBaseEntity *pPhysEntity = NULL;
-	int modelindex = pEntity->GetModelIndex();
+	int modelindex = pEntity->GetEngineObject()->GetModelIndex();
 	const model_t *model = modelinfo->GetModel( modelindex );
 	if ( model && modelinfo->GetModelType(model) == mod_brush )
 	{
@@ -1330,7 +1330,7 @@ static CBaseEntity *CreateSimplePhysicsObject( CBaseEntity *pEntity, bool create
 		pPhysEntity = gEntList.CreateEntityByName( "simple_physics_prop" );
 	}
 
-	pPhysEntity->KeyValue( "model", STRING(pEntity->GetModelName()) );
+	pPhysEntity->KeyValue( "model", STRING(pEntity->GetEngineObject()->GetModelName()) );
 	pPhysEntity->GetEngineObject()->SetAbsOrigin( pEntity->GetEngineObject()->GetAbsOrigin() );
 	pPhysEntity->GetEngineObject()->SetAbsAngles( pEntity->GetEngineObject()->GetAbsAngles() );
 	pPhysEntity->Spawn();
@@ -1428,7 +1428,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 		{
 			// we can't reuse this physics object, so kill it
 			pEntity->VPhysicsDestroyObject();
-			pEntity->SetModel( STRING(pSwap->GetModelName()) );
+			pEntity->SetModel( STRING(pSwap->GetEngineObject()->GetModelName()) );
 		}
 
 		// created phys object, now move hierarchy over
@@ -1563,12 +1563,12 @@ void CPhysMagnet::Spawn( void )
 
 	SetMoveType( MOVETYPE_NONE );
 	SetSolid( SOLID_VPHYSICS );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 
 	solid_t tmpSolid;
-	PhysModelParseSolid( tmpSolid, this, GetModelIndex() );
+	PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() );
 	if ( m_massScale > 0 )
 	{
 		tmpSolid.params.mass *= m_massScale;
@@ -1600,7 +1600,7 @@ void CPhysMagnet::Spawn( void )
 //-----------------------------------------------------------------------------
 void CPhysMagnet::Precache( void )
 {
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	BaseClass::Precache();
 }
 

@@ -324,18 +324,18 @@ void FX_FireBullets(
 			{
             	iEntIndex = pWeapon->entindex();
 
-				int nModelIndex = pWeapon->GetModelIndex();
+				int nModelIndex = pWeapon->GetEngineObject()->GetModelIndex();
 				int nWorldModelIndex = pWeapon->GetWorldModelIndex();
 				if ( bInToolRecordingMode && nModelIndex != nWorldModelIndex )
 				{
-					pWeapon->SetModelIndex( nWorldModelIndex );
+					pWeapon->GetEngineObject()->SetModelIndex( nWorldModelIndex );
 				}
 
 				pWeapon->GetAttachment( iAttachment, vecStart, angAttachment );
 
 				if ( bInToolRecordingMode && nModelIndex != nWorldModelIndex )
 				{
-					pWeapon->SetModelIndex( nModelIndex );
+					pWeapon->GetEngineObject()->SetModelIndex( nModelIndex );
 				}
 			}
 		}

@@ -1006,7 +1006,7 @@ Activity CBaseCombatCharacter::GetDeathActivity ( void )
 
 		if ( SelectWeightedSequence ( deathActivity ) == ACTIVITY_NOT_AVAILABLE )
 		{
-			Msg( "ERROR! %s missing ACT_DIESIMPLE\n", STRING(GetModelName()) );
+			Msg( "ERROR! %s missing ACT_DIESIMPLE\n", STRING(GetEngineObject()->GetModelName()) );
 		}
 	}
 

@@ -300,12 +300,12 @@ void SCR_UpdateScreen( void )
 	// and materials->EndFrame() is where we will synchronize anyway.
 	// Moved here to leave as much of the frame as possible to overlap threads in the case
 	// where we actually have models to load here
-	{
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "modelloader->UpdateDynamicModels" );
-		VPROF( "UpdateDynamicModels" );
-		CMDLCacheCriticalSection critsec( g_pMDLCache );
-		modelloader->UpdateDynamicModels();
-	}
+	//{
+	//	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "modelloader->UpdateDynamicModels" );
+	//	VPROF( "UpdateDynamicModels" );
+	//	CMDLCacheCriticalSection critsec( g_pMDLCache );
+	//	modelloader->UpdateDynamicModels();
+	//}
 
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "materials_EndFrame" );

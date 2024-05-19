@@ -6082,7 +6082,7 @@ void CAI_BaseNPC::ResolveActivityToSequence(Activity NewActivity, int &iSequence
 
 			if ( ( pLastWarn != this && lastWarnActivity != translatedActivity ) || gpGlobals->curtime - timeLastWarn > 5.0 )
 			{
-				DevWarning( "%s:%s:%s has no sequence for act:%s\n", GetClassname(), GetDebugName(), STRING( GetModelName() ), ActivityList_NameForIndex(translatedActivity) );
+				DevWarning( "%s:%s:%s has no sequence for act:%s\n", GetClassname(), GetDebugName(), STRING(GetEngineObject()->GetModelName() ), ActivityList_NameForIndex(translatedActivity) );
 				pLastWarn = this;
 				lastWarnActivity = translatedActivity;
 				timeLastWarn = gpGlobals->curtime;
@@ -8066,7 +8066,7 @@ void CAI_BaseNPC::SetDefaultEyeOffset ( void )
 		{
 			if ( Classify() != CLASS_NONE )
 			{
-				DevMsg( "WARNING: %s(%s) has no eye offset in .qc!\n", GetClassname(), STRING(GetModelName()) );
+				DevMsg( "WARNING: %s(%s) has no eye offset in .qc!\n", GetClassname(), STRING(GetEngineObject()->GetModelName()) );
 			}
 			VectorAdd( WorldAlignMins(), WorldAlignMaxs(), m_vDefaultEyeOffset );
 			m_vDefaultEyeOffset *= 0.75;
@@ -12813,7 +12813,7 @@ void CAI_BaseNPC::Break( CBaseEntity *pBreaker )
 
 	// no damage/damage force? set a burst of 100 for some movement
 	params.defBurstScale = 100;//pDamageInfo ? 0 : 100;
-	PropBreakableCreateAll( GetModelIndex(), pPhysics, params, this, -1, false );
+	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, params, this, -1, false );
 
 	UTIL_Remove(this);
 }

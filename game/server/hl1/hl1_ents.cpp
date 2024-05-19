@@ -446,7 +446,7 @@ void CPendulum::Spawn( void )
 		SetSolid( SOLID_BBOX );
 
 	SetMoveType( MOVETYPE_PUSH );
-	SetModel( STRING(GetModelName()) );
+	SetModel( STRING(GetEngineObject()->GetModelName()) );
 
 	if ( m_flMoveDistance != 0 )
 	{
@@ -663,7 +663,7 @@ END_DATADESC()
 void CFuncMortarField::Spawn( void )
 {
 	SetSolid( SOLID_NONE );
-	SetModel( STRING(GetModelName()) );    // set size and link into world
+	SetModel( STRING(GetEngineObject()->GetModelName()) );    // set size and link into world
 	SetMoveType( MOVETYPE_NONE );
 	AddEffects( EF_NODRAW );
 //	SetUse( FieldUse );

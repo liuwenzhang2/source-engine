@@ -325,7 +325,7 @@ void CPropVehicleChoreoGeneric::Precache( void )
 void CPropVehicleChoreoGeneric::Spawn( void )
 {
 	Precache();
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetCollisionGroup( COLLISION_GROUP_VEHICLE );
 
 	if ( GetSolid() != SOLID_NONE )

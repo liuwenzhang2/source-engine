@@ -122,7 +122,7 @@ public:
 		else if ( nModelType == mod_brush )
 		{
 			// Brushes poll their contents differently
-			int contents = modelinfo->GetModelContents( pEntity->GetModelIndex() );
+			int contents = modelinfo->GetModelContents( pEntity->GetEngineObject()->GetModelIndex() );
 			if ( contents & CONTENTS_GRATE )
 				return true;
 		}

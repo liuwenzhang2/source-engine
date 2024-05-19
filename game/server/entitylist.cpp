@@ -208,6 +208,8 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_iEFlags, FIELD_INTEGER),
 	DEFINE_FIELD(touchStamp, FIELD_INTEGER),
 	DEFINE_FIELD(m_hGroundEntity, FIELD_EHANDLE),
+	DEFINE_GLOBAL_KEYFIELD(m_ModelName, FIELD_MODELNAME, "model"),
+	DEFINE_GLOBAL_KEYFIELD(m_nModelIndex, FIELD_SHORT, "modelindex"),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -287,6 +289,7 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropEHandle(SENDINFO_NAME(m_hMoveParent, moveparent), 0, SendProxy_MoveParentToInt),
 	SendPropInt(SENDINFO(m_iParentAttachment), NUM_PARENTATTACHMENT_BITS, SPROP_UNSIGNED),
 	SendPropEHandle(SENDINFO(m_hGroundEntity), SPROP_CHANGES_OFTEN),
+	SendPropModelIndex(SENDINFO(m_nModelIndex)),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -1978,7 +1981,7 @@ void CEngineObjectInternal::PhysicsTouchTriggers(const Vector* pPrevAbsOrigin)
 
 		if (m_pOuter->GetSolid() == SOLID_BSP)
 		{
-			if (!m_pOuter->GetModel() && Q_strlen(STRING(m_pOuter->GetModelName())) == 0)
+			if (!m_pOuter->GetModel() && Q_strlen(STRING(m_pOuter->GetEngineObject()->GetModelName())) == 0)
 			{
 				Warning("Inserted %s with no model\n", GetClassname());
 				return;
@@ -2543,6 +2546,43 @@ CEngineObjectInternal* CEngineObjectInternal::GetGroundEntity(void)
 	return m_hGroundEntity.Get() ? (CEngineObjectInternal*)m_hGroundEntity.Get()->GetEngineObject() : NULL;
 }
 
+void CEngineObjectInternal::SetModelIndex(int index)
+{
+	//if ( IsDynamicModelIndex( index ) && !(GetBaseAnimating() && m_bDynamicModelAllowed) )
+	//{
+	//	AssertMsg( false, "dynamic model support not enabled on server entity" );
+	//	index = -1;
+	//}
+
+	if (index != m_nModelIndex)
+	{
+		/*if ( m_bDynamicModelPending )
+		{
+			sg_DynamicLoadHandlers.Remove( this );
+		}*/
+
+		//modelinfo->ReleaseDynamicModel( m_nModelIndex );
+		//modelinfo->AddRefDynamicModel( index );
+		m_nModelIndex = index;
+
+		//m_bDynamicModelSetBounds = false;
+
+		//if ( IsDynamicModelIndex( index ) )
+		//{
+		//	m_bDynamicModelPending = true;
+		//	sg_DynamicLoadHandlers[ sg_DynamicLoadHandlers.Insert( this ) ].Register( index );
+		//}
+		//else
+		//{
+		//	m_bDynamicModelPending = false;
+		//m_pOuter->OnNewModel();
+		const model_t* pModel = modelinfo->GetModel(m_nModelIndex);
+		m_pOuter->SetModelPointer(pModel);
+		//}
+	}
+	m_pOuter->DispatchUpdateTransmitState();
+}
+
 
 struct collidelist_t
 {
@@ -2576,7 +2616,7 @@ bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* 
 		case SOLID_BSP:
 		case SOLID_VPHYSICS:
 		{
-			CPhysCollide* pTriggerCollide = modelinfo->GetVCollide(pTrigger->GetModelIndex())->solids[0];
+			CPhysCollide* pTriggerCollide = modelinfo->GetVCollide(pTrigger->GetEngineObject()->GetModelIndex())->solids[0];
 			Assert(pTriggerCollide);
 
 			CUtlVector<collidelist_t> collideList;
@@ -2598,7 +2638,7 @@ bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* 
 			}
 			else
 			{
-				vcollide_t* pVCollide = modelinfo->GetVCollide(pEntity->GetModelIndex());
+				vcollide_t* pVCollide = modelinfo->GetVCollide(pEntity->GetEngineObject()->GetModelIndex());
 				if (pVCollide && pVCollide->solidCount)
 				{
 					collidelist_t element;

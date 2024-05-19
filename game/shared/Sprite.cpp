@@ -194,7 +194,7 @@ void CSprite::Spawn( void )
 	m_flFrame = 0;
 
 	Precache();
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	CollisionProp()->SetSurroundingBoundsType( USE_GAME_CODE );
 
 	m_flMaxFrame = (float)modelinfo->GetModelFrameCount( GetModel() ) - 1;
@@ -304,9 +304,9 @@ void CSprite::SetModel( const char *szModelName )
 //-----------------------------------------------------------------------------
 void CSprite::Precache( void )
 {
-	if (GetModelName() != NULL_STRING)
+	if (GetEngineObject()->GetModelName() != NULL_STRING)
 	{
-		engine->PrecacheModel(STRING(GetModelName()));
+		engine->PrecacheModel(STRING(GetEngineObject()->GetModelName()));
 	}
 }
 
@@ -317,7 +317,7 @@ void CSprite::Precache( void )
 //-----------------------------------------------------------------------------
 void CSprite::SpriteInit( const char *pSpriteName, const Vector &origin )
 {
-	SetModelName( MAKE_STRING(pSpriteName) );
+	GetEngineObject()->SetModelName( MAKE_STRING(pSpriteName) );
 	GetEngineObject()->SetLocalOrigin( origin );
 	Spawn();
 }

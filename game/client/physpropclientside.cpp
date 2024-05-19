@@ -102,7 +102,7 @@ bool C_PhysPropClientside::KeyValue( const char *szKeyName, const char *szValue 
 	}
 	else if (FStrEq(szKeyName, "model"))
 	{
-		SetModelName( AllocPooledString( szValue ) );
+		GetEngineObject()->SetModelName( AllocPooledString( szValue ) );
 	}
 	else if (FStrEq(szKeyName, "fademaxdist"))
 	{
@@ -244,7 +244,7 @@ int C_PhysPropClientside::ParsePropData( void )
 
 bool C_PhysPropClientside::Initialize()
 {
-	if ( InitializeAsClientEntity( STRING(GetModelName()), RENDER_GROUP_OPAQUE_ENTITY ) == false )
+	if ( InitializeAsClientEntity( STRING(GetEngineObject()->GetModelName()), RENDER_GROUP_OPAQUE_ENTITY ) == false )
 	{
 		return false;
 	}
@@ -261,9 +261,9 @@ bool C_PhysPropClientside::Initialize()
 
 	// Create the object in the physics system
 
-	if ( !PhysModelParseSolid( tmpSolid, this, GetModelIndex() ) )
+	if ( !PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() ) )
 	{
-		DevMsg("C_PhysPropClientside::Initialize: PhysModelParseSolid failed for entity %i.\n", GetModelIndex() );
+		DevMsg("C_PhysPropClientside::Initialize: PhysModelParseSolid failed for entity %i.\n", GetEngineObject()->GetModelIndex() );
 		return false;
 	}
 	else
@@ -273,7 +273,7 @@ bool C_PhysPropClientside::Initialize()
 		if ( !m_pPhysicsObject )
 		{
 			// failed to create a physics object
-		DevMsg(" C_PhysPropClientside::Initialize: VPhysicsInitNormal() failed for %s.\n", STRING(GetModelName()) );
+		DevMsg(" C_PhysPropClientside::Initialize: VPhysicsInitNormal() failed for %s.\n", STRING(GetEngineObject()->GetModelName()) );
 			return false;
 		}
 	}
@@ -353,7 +353,7 @@ void C_PhysPropClientside::Spawn()
 	BaseClass::Spawn();
 
 	// we don't really precache models here, just checking how many we have:
-	m_iNumBreakableChunks = PropBreakablePrecacheAll( GetModelIndex() );
+	m_iNumBreakableChunks = PropBreakablePrecacheAll(GetEngineObject()->GetModelIndex() );
 
 	ParsePropData();
 
@@ -486,7 +486,7 @@ void C_PhysPropClientside::Break()
 	params.defBurstScale = 100;
 
 	// spwan break chunks
-	PropBreakableCreateAll( GetModelIndex(), pPhysics, params, this, -1, false );
+	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, params, this, -1, false );
 
 	DestroyEntity(this);// Release(); // destroy object
 }
@@ -507,7 +507,7 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 	pEntity->SetDmgModClub( GetDmgModClub() );
 	pEntity->SetDmgModExplosive( GetDmgModExplosive() );
 	
-	pEntity->SetModelName( GetModelName() );
+	pEntity->GetEngineObject()->SetModelName(GetEngineObject()->GetModelName() );
 	pEntity->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
 	pEntity->GetEngineObject()->SetLocalAngles(GetEngineObject()->GetLocalAngles() );
 	pEntity->SetOwnerEntity( this );
@@ -746,7 +746,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 		pEntity->CopyFadeFrom( pBreakableOwner );
 	}
 	
-	pEntity->SetModelName( AllocPooledString( pModel->modelName ) );
+	pEntity->GetEngineObject()->SetModelName( AllocPooledString( pModel->modelName ) );
 	pEntity->GetEngineObject()->SetLocalOrigin( position );
 	pEntity->GetEngineObject()->SetLocalAngles( angles );
 	pEntity->SetOwnerEntity( pOwner );
@@ -838,7 +838,7 @@ bool C_FuncPhysicsRespawnZone::KeyValue( const char *szKeyName, const char *szVa
 {
 	if (FStrEq(szKeyName, "model"))
 	{
-		SetModelName( AllocPooledString( szValue ) );
+		GetEngineObject()->SetModelName( AllocPooledString( szValue ) );
 	}
 	else
 	{
@@ -857,7 +857,7 @@ bool C_FuncPhysicsRespawnZone::KeyValue( const char *szKeyName, const char *szVa
 //-----------------------------------------------------------------------------
 bool C_FuncPhysicsRespawnZone::Initialize( void )
 {
-	if ( InitializeAsClientEntity( STRING(GetModelName()), RENDER_GROUP_OPAQUE_ENTITY ) == false )
+	if ( InitializeAsClientEntity( STRING(GetEngineObject()->GetModelName()), RENDER_GROUP_OPAQUE_ENTITY ) == false )
 		return false;
 
 	SetSolid( SOLID_BSP );	
@@ -915,7 +915,7 @@ void C_FuncPhysicsRespawnZone::InitializePropsWithin( void )
 
 			// This is a crappy way to do this
 			int index = m_PropList.AddToTail();
-			m_PropList[index].iszModelName = pProp->GetModelName();
+			m_PropList[index].iszModelName = pProp->GetEngineObject()->GetModelName();
 			m_PropList[index].vecOrigin = pProp->GetEngineObject()->GetAbsOrigin();
 			m_PropList[index].vecAngles = pProp->GetEngineObject()->GetAbsAngles();
 			m_PropList[index].iSkin = pProp->m_nSkin;
@@ -982,7 +982,7 @@ void C_FuncPhysicsRespawnZone::RespawnProps( void )
 			if ( pEntity )
 			{
 				pEntity->m_spawnflags = m_PropList[i].iSpawnFlags;
-				pEntity->SetModelName( m_PropList[i].iszModelName );
+				pEntity->GetEngineObject()->SetModelName( m_PropList[i].iszModelName );
 				pEntity->GetEngineObject()->SetAbsOrigin( m_PropList[i].vecOrigin );
 				pEntity->GetEngineObject()->SetAbsAngles( m_PropList[i].vecAngles );
 				pEntity->SetPhysicsMode( PHYSICS_MULTIPLAYER_CLIENTSIDE );

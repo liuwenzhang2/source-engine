@@ -229,7 +229,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CCSRagdoll, DT_CSRagdoll )
 	//SendPropVector	(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
 	SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
 	SendPropEHandle( SENDINFO( m_hPlayer ) ),
-	SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
+	//SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
 	SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
 	SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
 	SendPropVector( SENDINFO( m_vecRagdollVelocity ) ),
@@ -1017,7 +1017,7 @@ void CCSPlayer::CreateRagdollEntity()
 		pRagdoll->m_hPlayer = this;
 		pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
 		pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
-		pRagdoll->m_nModelIndex = m_nModelIndex;
+		pRagdoll->GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex());
 		pRagdoll->m_nForceBone = m_nForceBone;
 		pRagdoll->m_vecForce = m_vecTotalBulletForce;
 		pRagdoll->m_iDeathPose = m_iDeathPose;

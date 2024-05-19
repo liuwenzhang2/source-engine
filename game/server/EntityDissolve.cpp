@@ -98,13 +98,13 @@ CEntityDissolve::~CEntityDissolve( void )
 //-----------------------------------------------------------------------------
 void CEntityDissolve::Precache()
 {
-	if ( NULL_STRING == GetModelName() )
+	if ( NULL_STRING == GetEngineObject()->GetModelName() )
 	{
 		engine->PrecacheModel( DISSOLVE_SPRITE_NAME );
 	}
 	else
 	{
-		engine->PrecacheModel( STRING( GetModelName() ) );
+		engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	}
 }
 
@@ -116,7 +116,7 @@ void CEntityDissolve::Spawn()
 {
 	BaseClass::Spawn();
 	Precache();
-	UTIL_SetModel( this, STRING( GetModelName() ) );
+	UTIL_SetModel( this, STRING(GetEngineObject()->GetModelName() ) );
 
 	if ( (m_nDissolveType == ENTITY_DISSOLVE_ELECTRICAL) || (m_nDissolveType == ENTITY_DISSOLVE_ELECTRICAL_LIGHT) )
 	{
@@ -247,7 +247,7 @@ CEntityDissolve *CEntityDissolve::Create( CBaseEntity *pTarget, const char *pMat
 		}
 	}
 
-	pDissolve->SetModelName( AllocPooledString(pMaterialName) );
+	pDissolve->GetEngineObject()->SetModelName( AllocPooledString(pMaterialName) );
 	pDissolve->AttachToEntity( pTarget );
 	pDissolve->SetStartTime( flStartTime );
 	pDissolve->Spawn();
@@ -280,7 +280,7 @@ CEntityDissolve *CEntityDissolve::Create( CBaseEntity *pTarget, CBaseEntity *pSo
 		if ( !pDissolve )
 			continue;
 
-		return Create( pTarget, STRING( pDissolve->GetModelName() ), pDissolve->m_flStartTime, pDissolve->m_nDissolveType );
+		return Create( pTarget, STRING( pDissolve->GetEngineObject()->GetModelName() ), pDissolve->m_flStartTime, pDissolve->m_nDissolveType );
 	}
 
 	return NULL;
@@ -316,7 +316,7 @@ void CEntityDissolve::DissolveThink( void )
 {
 	CBaseAnimating *pTarget = (GetEngineObject()->GetMoveParent() ) ? GetEngineObject()->GetMoveParent()->GetOuter()->GetBaseAnimating() : NULL;
 
-	if ( GetModelName() == NULL_STRING && pTarget == NULL )
+	if (GetEngineObject()->GetModelName() == NULL_STRING && pTarget == NULL )
 		 return;
 	
 	if ( pTarget == NULL )

@@ -209,7 +209,7 @@ public:
 	
 	void Spawn( void )
 	{
-		SetModelName( AllocPooledString("models/seagull.mdl") );
+		GetEngineObject()->SetModelName( AllocPooledString("models/seagull.mdl") );
 		BaseClass::Spawn();
 
 		m_iBirdType = BIRDTYPE_SEAGULL;
@@ -265,7 +265,7 @@ class CNPC_Pigeon : public CNPC_Crow
 public:
 	void Spawn( void )
 	{
-		SetModelName( AllocPooledString("models/pigeon.mdl") );
+		GetEngineObject()->SetModelName( AllocPooledString("models/pigeon.mdl") );
 		BaseClass::Spawn();
 
 		m_iBirdType = BIRDTYPE_PIGEON;

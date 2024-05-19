@@ -111,7 +111,7 @@ void CDODSmokeGrenade::Think_Fade()
 
 	if ( !c.a )
 	{
-		SetModelName( NULL_STRING );//invisible
+		GetEngineObject()->SetModelName( NULL_STRING );//invisible
 		SetNextThink( gpGlobals->curtime + 10 );
 		SetThink( &CDODSmokeGrenade::Think_Remove );	// Spit out smoke for 10 seconds.
 		SetSolid( SOLID_NONE );
@@ -123,7 +123,7 @@ void CDODSmokeGrenade::Think_Remove()
 	// stop all effects
 	StopParticleEffects( this );
 
-	SetModelName( NULL_STRING );//invisible
+	GetEngineObject()->SetModelName( NULL_STRING );//invisible
 	SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 

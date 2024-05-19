@@ -177,7 +177,7 @@ float GetBreakableDamage( const CTakeDamageInfo &inputInfo, IBreakableWithPropDa
 //-----------------------------------------------------------------------------
 void CBaseProp::Spawn( void )
 {
-	char *szModel = (char *)STRING( GetModelName() );
+	char *szModel = (char *)STRING(GetEngineObject()->GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		Warning( "prop at %.0f %.0f %0.f missing modelname\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
@@ -235,13 +235,13 @@ void CBaseProp::Spawn( void )
 //-----------------------------------------------------------------------------
 void CBaseProp::Precache( void )
 {
-	if ( GetModelName() == NULL_STRING )
+	if (GetEngineObject()->GetModelName() == NULL_STRING )
 	{
 		Msg( "%s at (%.3f, %.3f, %.3f) has no model name!\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-		SetModelName( AllocPooledString( "models/error.mdl" ) );
+		GetEngineObject()->SetModelName( AllocPooledString( "models/error.mdl" ) );
 	}
 
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "Metal.SawbladeStick" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "PropaneTank.Burst" );
@@ -263,7 +263,7 @@ void CBaseProp::Activate( void )
 	// Make sure mapmakers haven't used the wrong prop type.
 	if ( m_takedamage == DAMAGE_NO && m_iHealth != 0 )
 	{
-		Warning("%s has a health specified in model '%s'. Use prop_physics or prop_dynamic instead.\n", GetClassname(), STRING(GetModelName()) );
+		Warning("%s has a health specified in model '%s'. Use prop_physics or prop_dynamic instead.\n", GetClassname(), STRING(GetEngineObject()->GetModelName()) );
 	}
 }
 
@@ -1596,7 +1596,7 @@ void CBreakableProp::PlayPuntSound()
 //-----------------------------------------------------------------------------
 void CBreakableProp::Precache()
 {
-	m_iNumBreakableChunks = PropBreakablePrecacheAll( GetModelName() );
+	m_iNumBreakableChunks = PropBreakablePrecacheAll(GetEngineObject()->GetModelName() );
 
 	if( m_iszPuntSound != NULL_STRING )
 	{
@@ -1615,7 +1615,7 @@ IPhysicsObject *CBreakableProp::GetRootPhysicsObjectForBreak()
 
 void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 {
-	const char *pModelName = STRING( GetModelName() );
+	const char *pModelName = STRING(GetEngineObject()->GetModelName() );
 	if ( pModelName && Q_stristr( pModelName, "crate" ) )
 	{
 		bool bSmashed = false;
@@ -1751,7 +1751,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 	{
 		CPVSFilter filter(GetEngineObject()->GetAbsOrigin() );
 		UserMessageBegin( filter, STRING( m_iszBreakModelMessage ) );
-		WRITE_SHORT( GetModelIndex() );
+		WRITE_SHORT(GetEngineObject()->GetModelIndex() );
 		WRITE_VEC3COORD(GetEngineObject()->GetAbsOrigin() );
 		WRITE_ANGLES(GetEngineObject()->GetAbsAngles() );
 		MessageEnd();
@@ -1776,19 +1776,19 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		{
 		case MULTIPLAYER_BREAK_DEFAULT:		// default is to break client-side
 		case MULTIPLAYER_BREAK_CLIENTSIDE:
-			te->PhysicsProp( filter, -1, GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEffects() );
+			te->PhysicsProp( filter, -1, GetEngineObject()->GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEffects() );
 			break;
 		case MULTIPLAYER_BREAK_SERVERSIDE:	// server-side break
 			if ( m_PerformanceMode != PM_NO_GIBS || breakable_disable_gib_limit.GetBool() )
 			{
-				PropBreakableCreateAll( GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ), false );
+				PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ), false );
 			}
 			break;
 		case MULTIPLAYER_BREAK_BOTH:	// pieces break from both dlls
-			te->PhysicsProp( filter, -1, GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEffects() );
+			te->PhysicsProp( filter, -1, GetEngineObject()->GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEffects() );
 			if ( m_PerformanceMode != PM_NO_GIBS || breakable_disable_gib_limit.GetBool() )
 			{
-				PropBreakableCreateAll( GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ), false );
+				PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ), false );
 			}
 			break;
 		}
@@ -1796,7 +1796,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 	// no damage/damage force? set a burst of 100 for some movement
 	else if ( m_PerformanceMode != PM_NO_GIBS || breakable_disable_gib_limit.GetBool() )
 	{
-		PropBreakableCreateAll( GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ) );
+		PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ) );
 	}
 
 	if( HasInteraction( PROPINTER_PHYSGUN_BREAK_EXPLODE ) )
@@ -2086,7 +2086,7 @@ void CDynamicProp::CreateBoneFollowers()
 	// go ahead and create default bone followers for it
 	if ( m_BoneFollowerManager.GetNumBoneFollowers() == 0 )
 	{
-		vcollide_t *pCollide = modelinfo->GetVCollide( GetModelIndex() );
+		vcollide_t *pCollide = modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() );
 		if ( pCollide && pCollide->solidCount > 1 )
 		{
 			CreateBoneFollowersFromRagdoll(this, &m_BoneFollowerManager, pCollide);
@@ -2550,7 +2550,7 @@ void CPhysicsProp::Spawn( )
 
 	//Episode 1 change:
 	//Hi, since we're trying to ship this game we'll just go ahead and make all these doors not fade out instead of changing all the levels.
-	if ( Q_strcmp( STRING( GetModelName() ), "models/props_c17/door01_left.mdl" ) == 0 )
+	if ( Q_strcmp( STRING(GetEngineObject()->GetModelName() ), "models/props_c17/door01_left.mdl" ) == 0 )
 	{
 		SetFadeDistance( -1, 0 );
 		DisableAutoFade();
@@ -2563,13 +2563,13 @@ void CPhysicsProp::Spawn( )
 //-----------------------------------------------------------------------------
 void CPhysicsProp::Precache( void )
 {
-	if ( GetModelName() == NULL_STRING )
+	if (GetEngineObject()->GetModelName() == NULL_STRING )
 	{
 		Msg( "%s at (%.3f, %.3f, %.3f) has no model name!\n", GetClassname(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
 	}
 	else
 	{
-		engine->PrecacheModel( STRING( GetModelName() ) );
+		engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 		BaseClass::Precache();
 	}
 }
@@ -2584,7 +2584,7 @@ bool CPhysicsProp::CreateVPhysics()
 	bool asleep = HasSpawnFlags( SF_PHYSPROP_START_ASLEEP ) ? true : false;
 
 	solid_t tmpSolid;
-	PhysModelParseSolid( tmpSolid, this, GetModelIndex() );
+	PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() );
 	
 	if ( m_massScale > 0 )
 	{
@@ -2598,7 +2598,7 @@ bool CPhysicsProp::CreateVPhysics()
 			tmpSolid.params.inertia = 0.5;
 	}
 
-	PhysGetMassCenterOverride( this, modelinfo->GetVCollide( GetModelIndex() ), tmpSolid );
+	PhysGetMassCenterOverride( this, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), tmpSolid );
 	if ( HasSpawnFlags(SF_PHYSPROP_NO_COLLISIONS) )
 	{
 		tmpSolid.params.enableCollisions = false;
@@ -2611,7 +2611,7 @@ bool CPhysicsProp::CreateVPhysics()
 	{
 		SetSolid( SOLID_NONE );
 		SetMoveType( MOVETYPE_NONE );
-		Warning("ERROR!: Can't create physics object for %s\n", STRING( GetModelName() ) );
+		Warning("ERROR!: Can't create physics object for %s\n", STRING(GetEngineObject()->GetModelName() ) );
 	}
 	else
 	{
@@ -3300,8 +3300,8 @@ static CBreakableProp *BreakModelCreate_Prop( CBaseEntity *pOwner, breakmodel_t 
 			// Copy over the dx7 fade too
 			pEntity->CopyFadeFrom( pBreakableOwner );
 		}
-		pEntity->SetModelName( AllocPooledString( pModel->modelName ) );
-		pEntity->SetModel( STRING(pEntity->GetModelName()) );
+		pEntity->GetEngineObject()->SetModelName( AllocPooledString( pModel->modelName ) );
+		pEntity->SetModel( STRING(pEntity->GetEngineObject()->GetModelName()) );
 		pEntity->SetCollisionGroup( pModel->collisionGroup );
 
 		if ( pModel->fadeMinDist > 0 && pModel->fadeMaxDist >= pModel->fadeMinDist )
@@ -6047,7 +6047,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	bool bWasMotionDisabled = ( pObject->IsMotionEnabled() == false );
 	bool bWasStatic			= ( pObject->IsStatic() );
 
-	vcollide_t *pCollide = modelinfo->GetVCollide( pInstance->GetModelIndex() );
+	vcollide_t *pCollide = modelinfo->GetVCollide( pInstance->GetEngineObject()->GetModelIndex() );
 	if ( pCollide == NULL || pCollide->solidCount == 0 )
 		return NULL;
 
@@ -6104,7 +6104,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 
 	// Get our solid info
 	solid_t tmpSolid;
-	if ( !PhysModelParseSolidByIndex( tmpSolid, pInstance, pInstance->GetModelIndex(), -1 ) )
+	if ( !PhysModelParseSolidByIndex( tmpSolid, pInstance, pInstance->GetEngineObject()->GetModelIndex(), -1 ) )
 		return false;
 
 	// Physprops get keyvalues that effect the mass, this block is to respect those fields when we scale
@@ -6146,7 +6146,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	pInstance->VPhysicsSetObject( pNewObject );
 
 	// Increase our model bounds
-	const model_t *pModel = modelinfo->GetModel( pInstance->GetModelIndex() );
+	const model_t *pModel = modelinfo->GetModel( pInstance->GetEngineObject()->GetModelIndex() );
 	if ( pModel )
 	{
 		Vector mins, maxs;

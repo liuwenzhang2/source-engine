@@ -442,7 +442,7 @@ int CPropData::ParsePropFromBase( CBaseEntity *pProp, const char *pszPropData )
 	KeyValues *pSection = m_pKVPropData->FindKey( pszPropData );
 	if ( !pSection )
 	{
-		Warning("%s '%s' has a base specified as '%s', but there is no matching entry in propdata.txt.\n", pProp->GetClassname(), STRING( pProp->GetModelName() ), pszPropData );
+		Warning("%s '%s' has a base specified as '%s', but there is no matching entry in propdata.txt.\n", pProp->GetClassname(), STRING( pProp->GetEngineObject()->GetModelName() ), pszPropData );
 		return PARSE_FAILED_BAD_DATA;
 	}
 

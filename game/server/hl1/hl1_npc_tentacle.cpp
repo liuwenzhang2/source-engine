@@ -928,7 +928,7 @@ void CNPC_Tentacle::HitTouch( CBaseEntity *pOther )
 		return;
 
 	// only look at the ones where the player hit me
-	if( pOther == NULL || pOther->GetModelIndex() == GetModelIndex() || ( pOther->GetSolidFlags() & FSOLID_TRIGGER ) )
+	if( pOther == NULL || pOther->GetEngineObject()->GetModelIndex() == GetEngineObject()->GetModelIndex() || ( pOther->GetSolidFlags() & FSOLID_TRIGGER ) )
 		 return;
 
 	//Right now the BoneFollower will always be hit in box 0, and 

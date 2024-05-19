@@ -43,8 +43,8 @@ void C_PortalGhostRenderable::PerFrameUpdate( void )
 {
 	if( m_pGhostedRenderable )
 	{
-		SetModelName( m_pGhostedRenderable->GetModelName() );
-		SetModelIndex( m_pGhostedRenderable->GetModelIndex() );
+		GetEngineObject()->SetModelName( m_pGhostedRenderable->GetEngineObject()->GetModelName() );
+		GetEngineObject()->SetModelIndex( m_pGhostedRenderable->GetEngineObject()->GetModelIndex() );
 		SetEffects( m_pGhostedRenderable->GetEffects() | EF_NOINTERP );		
 		m_flAnimTime = m_pGhostedRenderable->m_flAnimTime;		
 
@@ -100,8 +100,8 @@ bool C_PortalGhostRenderable::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMax
 	CBaseCombatWeapon *pParent = dynamic_cast<CBaseCombatWeapon*>( m_pGhostedRenderable );
 	if ( pParent )
 	{
-		nModelIndex = pParent->GetModelIndex();
-		pParent->SetModelIndex( pParent->GetWorldModelIndex() );
+		nModelIndex = pParent->GetEngineObject()->GetModelIndex();
+		pParent->GetEngineObject()->SetModelIndex( pParent->GetWorldModelIndex() );
 	}
 
 	if( m_pGhostedRenderable->SetupBones( pBoneToWorldOut, nMaxBones, boneMask, currentTime ) )
@@ -118,7 +118,7 @@ bool C_PortalGhostRenderable::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMax
 	
 	if ( pParent )
 	{
-		pParent->SetModelIndex( nModelIndex );
+		pParent->GetEngineObject()->SetModelIndex( nModelIndex );
 	}
 
 	return false;

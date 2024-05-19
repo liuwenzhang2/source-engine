@@ -81,11 +81,11 @@ int CNPC_Magnusson::GetSoundInterests ( void )
 void CNPC_Magnusson::Spawn()
 {
 	// Allow custom model usage (mostly for monitors)
-	char *szModel = (char *)STRING( GetModelName() );
+	char *szModel = (char *)STRING(GetEngineObject()->GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = "models/magnusson.mdl";
-		SetModelName( AllocPooledString(szModel) );
+		GetEngineObject()->SetModelName( AllocPooledString(szModel) );
 	}
 
 	Precache();
@@ -117,7 +117,7 @@ void CNPC_Magnusson::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Magnusson::Precache()
 {
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	BaseClass::Precache();
 }	

@@ -479,7 +479,7 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 		if ( (gameFlags0 | gameFlags1) & FVPHYSICS_NO_SELF_COLLISIONS )
 			return 0;
 
-		IPhysicsCollisionSet *pSet = physics->FindCollisionSet( pEntity0->GetModelIndex() );
+		IPhysicsCollisionSet *pSet = physics->FindCollisionSet( pEntity0->GetEngineObject()->GetModelIndex() );
 		if ( pSet )
 			return pSet->ShouldCollide( pObj0->GetGameIndex(), pObj1->GetGameIndex() );
 
@@ -1275,7 +1275,7 @@ static void CallbackReport( CBaseEntity *pEntity )
 	const char *pName = STRING(pEntity->GetEntityName());
 	if ( !Q_strlen(pName) )
 	{
-		pName = STRING(pEntity->GetModelName());
+		pName = STRING(pEntity->GetEngineObject()->GetModelName());
 	}
 	Msg( "%s - %s\n", pEntity->GetClassname(), pName );
 }
@@ -1311,8 +1311,8 @@ CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR
 
 	if ( tr.DidHit() )
 	{
-		const model_t *pModel = modelinfo->GetModel(((CBaseEntity*)tr.m_pEnt)->GetModelIndex() );
-		const char *pModelName = STRING(((CBaseEntity*)tr.m_pEnt)->GetModelName());
+		const model_t *pModel = modelinfo->GetModel(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetModelIndex() );
+		const char *pModelName = STRING(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetModelName());
 		if ( tr.DidHitWorld() && tr.hitbox > 0 )
 		{
 			ICollideable *pCollide = staticpropmgr->GetStaticPropByIndex( tr.hitbox-1 );
@@ -1344,7 +1344,7 @@ static void OutputVPhysicsDebugInfo( CBaseEntity *pEntity )
 		g_Collisions.GetListOfPenetratingEntities( pEntity, list );
 		for ( int i = 0; i < list.Count(); i++ )
 		{
-			Msg("  penetration with entity %s (%s)\n", list[i]->GetDebugName(), STRING(list[i]->GetModelName()) );
+			Msg("  penetration with entity %s (%s)\n", list[i]->GetDebugName(), STRING(list[i]->GetEngineObject()->GetModelName()) );
 		}
 
 		IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
@@ -1484,13 +1484,13 @@ static void DebugConstraints( CBaseEntity *pEntity )
 		if ( pAttach[0] )
 		{
 			pName0 = pAttach[0]->GetClassname();
-			pModel0 = STRING(pAttach[0]->GetModelName());
+			pModel0 = STRING(pAttach[0]->GetEngineObject()->GetModelName());
 			index0 = pAttachVPhysics[0]->GetGameIndex();
 		}
 		if ( pAttach[1] )
 		{
 			pName1 = pAttach[1]->GetClassname();
-			pModel1 = STRING(pAttach[1]->GetModelName());
+			pModel1 = STRING(pAttach[1]->GetEngineObject()->GetModelName());
 			index1 = pAttachVPhysics[1]->GetGameIndex();
 		}
 		Msg("**********************\n%s connects %s(%s:%d) to %s(%s:%d)\n", constraints[i]->GetClassname(), pName0, pModel0, index0, pName1, pModel1, index1 );
@@ -2873,7 +2873,7 @@ void DebugDrawContactPoints(IPhysicsObject *pPhysics)
 		NDebugOverlay::Line( pt, pt - normal * 20, 0, 255, 0, false, 0 );
 		IPhysicsObject *pOther = pSnapshot->GetObject(1);
 		CBaseEntity *pEntity0 = static_cast<CBaseEntity *>(pOther->GetGameData());
-		CFmtStr str("%s (%s): %s [%0.2f]", pEntity0->GetClassname(), STRING(pEntity0->GetModelName()), pEntity0->GetDebugName(), pSnapshot->GetFrictionCoefficient() );
+		CFmtStr str("%s (%s): %s [%0.2f]", pEntity0->GetClassname(), STRING(pEntity0->GetEngineObject()->GetModelName()), pEntity0->GetDebugName(), pSnapshot->GetFrictionCoefficient() );
 		NDebugOverlay::Text( pt, str.Access(), false, 0 );
 		pSnapshot->NextFrictionData();
 	}

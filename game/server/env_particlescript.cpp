@@ -110,10 +110,10 @@ void CEnvParticleScript::PrecacheAnimationEventMaterials()
 void CEnvParticleScript::Precache()
 {
 	BaseClass::Precache();
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	// We need a model for its animation sequences even though we don't render it
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	PrecacheAnimationEventMaterials();
 }
@@ -128,7 +128,7 @@ void CEnvParticleScript::Spawn()
 	BaseClass::Spawn();
 	AddEffects( EF_NOSHADOW );
 	// We need a model for its animation sequences even though we don't render it
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 }
 
 

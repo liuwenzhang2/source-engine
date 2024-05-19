@@ -126,7 +126,7 @@ public:
 	INetworkStringTable *GetSoundPrecacheTable( void ) const;
 	INetworkStringTable *GetDecalPrecacheTable( void ) const;
 	
-	INetworkStringTable *GetDynamicModelsTable( void ) const { return m_pDynamicModelsTable; }
+	//INetworkStringTable *GetDynamicModelsTable( void ) const { return m_pDynamicModelsTable; }
 
 
 	// Accessors to model precaching stuff
@@ -164,7 +164,7 @@ private:
 	INetworkStringTable *m_pGenericPrecacheTable;
 	INetworkStringTable *m_pDecalPrecacheTable;
 
-	INetworkStringTable *m_pDynamicModelsTable;
+	//INetworkStringTable *m_pDynamicModelsTable;
 
 	CPureServerWhitelist *m_pPureServerWhitelist;
 	bool m_bHibernating; 	// Are we hibernating.  Hibernation makes server process consume approx 0 CPU when no clients are connected

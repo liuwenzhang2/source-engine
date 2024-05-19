@@ -260,6 +260,10 @@ public:
 	virtual void SetGroundEntity(IEngineObjectClient* ground) = 0;
 	virtual IEngineObjectClient* GetGroundEntity(void) = 0;
 	virtual IEngineObjectClient* GetGroundEntity(void) const = 0;
+	virtual void SetModelName(string_t name) = 0;
+	virtual string_t GetModelName(void) const = 0;
+	virtual int GetModelIndex(void) const = 0;
+	virtual void SetModelIndex(int index) = 0;
 
 };
 

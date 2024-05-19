@@ -261,7 +261,7 @@ void CBaseDoor::Spawn()
 	QAngle angMoveDir = QAngle( m_vecMoveDir.x, m_vecMoveDir.y, m_vecMoveDir.z );
 	AngleVectors( angMoveDir, &m_vecMoveDir );
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	m_vecPosition1	= GetEngineObject()->GetLocalOrigin();
 
 	// Subtract 2 from size because the engine expands bboxes by 1 in all directions making the size too big

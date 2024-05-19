@@ -57,7 +57,7 @@ extern Activity ACT_WALK_MARCH;
 void CNPC_CombineS::Spawn( void )
 {
 	Precache();
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	if( IsElite() )
 	{
@@ -94,7 +94,7 @@ void CNPC_CombineS::Spawn( void )
 //-----------------------------------------------------------------------------
 void CNPC_CombineS::Precache()
 {
-	const char *pModelName = STRING( GetModelName() );
+	const char *pModelName = STRING(GetEngineObject()->GetModelName() );
 
 	if( !Q_stricmp( pModelName, "models/combine_super_soldier.mdl" ) )
 	{
@@ -105,12 +105,12 @@ void CNPC_CombineS::Precache()
 		m_fIsElite = false;
 	}
 
-	if( !GetModelName() )
+	if( !GetEngineObject()->GetModelName() )
 	{
-		SetModelName( MAKE_STRING( "models/combine_soldier.mdl" ) );
+		GetEngineObject()->SetModelName( MAKE_STRING( "models/combine_soldier.mdl" ) );
 	}
 
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	UTIL_PrecacheOther( "item_healthvial" );
 	UTIL_PrecacheOther( "weapon_frag" );

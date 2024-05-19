@@ -235,7 +235,7 @@ void CPropCannon::Precache( void )
 void CPropCannon::Spawn( void )
 {
 	Precache();
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetCollisionGroup( COLLISION_GROUP_VEHICLE );
 
 	BaseClass::Spawn();

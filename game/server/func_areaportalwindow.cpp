@@ -73,7 +73,7 @@ void CFuncAreaPortalWindow::Activate()
 	CBaseEntity *pBackground = gEntList.FindEntityByName( NULL, m_iBackgroundBModelName );
 	if( pBackground )
 	{
-		m_iBackgroundModelIndex  = modelinfo->GetModelIndex( STRING( pBackground->GetModelName() ) );
+		m_iBackgroundModelIndex  = modelinfo->GetModelIndex( STRING( pBackground->GetEngineObject()->GetModelName() ) );
 		pBackground->AddEffects( EF_NODRAW ); // we will draw for it.
 	}
 
@@ -81,7 +81,7 @@ void CFuncAreaPortalWindow::Activate()
 	CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_target );
 	if( pTarget )
 	{
-		SetModel( STRING(pTarget->GetModelName()) );
+		SetModel( STRING(pTarget->GetEngineObject()->GetModelName()) );
 		GetEngineObject()->SetAbsOrigin( pTarget->GetEngineObject()->GetAbsOrigin() );
 		pTarget->AddEffects( EF_NODRAW ); // we will draw for it.
 	}

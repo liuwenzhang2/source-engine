@@ -325,11 +325,11 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 
 		SetCollisionGroup( pClonedEntity->GetCollisionGroup() );
 
-		SetModelIndex( pClonedEntity->GetModelIndex() );
-		SetModelName( pClonedEntity->GetModelName() );
+		GetEngineObject()->SetModelIndex( pClonedEntity->GetEngineObject()->GetModelIndex() );
+		GetEngineObject()->SetModelName( pClonedEntity->GetEngineObject()->GetModelName() );
 
 		if( modelinfo->GetModelType( pClonedEntity->GetModel() ) == mod_studio )
-			SetModel( STRING( pClonedEntity->GetModelName() ) );
+			SetModel( STRING( pClonedEntity->GetEngineObject()->GetModelName() ) );
 
 
 		CCollisionProperty *pClonedCollisionProp = pClonedEntity->CollisionProp();

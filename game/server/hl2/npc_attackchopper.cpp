@@ -5818,7 +5818,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CAvoidBox::Spawn( )
 {
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetSolid( SOLID_BSP );
 	AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW );
@@ -5965,7 +5965,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CBombSuppressor::Spawn( )
 {
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetSolid( SOLID_BSP );
 	AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW );

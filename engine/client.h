@@ -243,7 +243,7 @@ public:
 	INetworkStringTable *m_pUserInfoTable;
 	INetworkStringTable *m_pServerStartupTable;
 	INetworkStringTable *m_pDownloadableFileTable;
-	INetworkStringTable *m_pDynamicModelsTable;
+	//INetworkStringTable *m_pDynamicModelsTable;
 	
 	CPrecacheItem		model_precache[ MAX_MODELS ];
 	CPrecacheItem		generic_precache[ MAX_GENERIC ];

@@ -145,7 +145,7 @@ void Callback_SoundChanged( void *object, INetworkStringTable *stringTable, int 
 void Callback_DecalChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, const void *newData );
 void Callback_InstanceBaselineChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, const void *newData );
 void Callback_UserInfoChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, const void *newData );
-void Callback_DynamicModelsChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, const void *newData );
+//void Callback_DynamicModelsChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, const void *newData );
 
 void CL_InstallAndInvokeClientStringTableCallbacks();
 void CL_HookClientStringTables();

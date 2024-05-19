@@ -89,7 +89,7 @@ static ConVar mod_dynamicloadpause( "mod_dynamicloadpause", "0", FCVAR_CHEAT | F
 static ConVar mod_dynamicloadthrottle( "mod_dynamicloadthrottle", "0", FCVAR_CHEAT | FCVAR_HIDDEN | FCVAR_DONTRECORD );
 static ConVar mod_dynamicloadspew( "mod_dynamicloadspew", "0", FCVAR_HIDDEN | FCVAR_DONTRECORD );
 
-#define DynamicModelDebugMsg(...) ( mod_dynamicloadspew.GetBool() ? Msg(__VA_ARGS__) : (void)0 )
+//#define DynamicModelDebugMsg(...) ( mod_dynamicloadspew.GetBool() ? Msg(__VA_ARGS__) : (void)0 )
 
 
 bool g_bHunkAllocLightmaps;
@@ -249,33 +249,33 @@ public:
 	virtual const char	*GetActiveMapName( void );
 
 	// Called by app system once per frame to poll and update dynamic models
-	virtual void	UpdateDynamicModels() { InternalUpdateDynamicModels(false); }
+	//virtual void	UpdateDynamicModels() { InternalUpdateDynamicModels(false); }
 
 	// Called by server and client engine code to flush unreferenced dynamic models
-	virtual void	FlushDynamicModels() { InternalUpdateDynamicModels(true); }
+	//virtual void	FlushDynamicModels() { InternalUpdateDynamicModels(true); }
 
 	// Called by server and client to force-unload dynamic models regardless of refcount!
-	virtual void	ForceUnloadNonClientDynamicModels();
+	//virtual void	ForceUnloadNonClientDynamicModels();
 
 	// Called by client code to load dynamic models, instead of GetModelForName.
-	virtual model_t *GetDynamicModel( const char *name, bool bClientOnly );
+	//virtual model_t *GetDynamicModel( const char *name, bool bClientOnly );
 	
 	// Called by client code to query dynamic model state
-	virtual bool	IsDynamicModelLoading( model_t *pModel, bool bClientOnly );
+	//virtual bool	IsDynamicModelLoading( model_t *pModel, bool bClientOnly );
 
 	// Called by client code to refcount dynamic models
-	virtual void	AddRefDynamicModel( model_t *pModel, bool bClientSideRef );
-	virtual void	ReleaseDynamicModel( model_t *pModel, bool bClientSideRef );
+	//virtual void	AddRefDynamicModel( model_t *pModel, bool bClientSideRef );
+	//virtual void	ReleaseDynamicModel( model_t *pModel, bool bClientSideRef );
 
 	// Called by client code or GetDynamicModel
-	virtual bool	RegisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback, bool bCallImmediatelyIfLoaded );
+	//virtual bool	RegisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback, bool bCallImmediatelyIfLoaded );
 
 	// Called by client code or IModelLoadCallback destructor
-	virtual void	UnregisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback );
+	//virtual void	UnregisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback );
 
-	virtual void	Client_OnServerModelStateChanged( model_t *pModel, bool bServerLoaded );
+	//virtual void	Client_OnServerModelStateChanged( model_t *pModel, bool bServerLoaded );
 
-	void			DebugPrintDynamicModels();
+	//void			DebugPrintDynamicModels();
 
 // Internal types
 private:
@@ -318,14 +318,14 @@ private:
 	int			UpdateOrCreate( const char *pSourceName, char *pTargetName, int maxLen, bool bForce );
 
 	// Dynamic load queue
-	class CDynamicModelInfo;
-	void		QueueDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod );
-	bool		CancelDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod );
-	void		UpdateDynamicModelLoadQueue();
+	//class CDynamicModelInfo;
+	//void		QueueDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod );
+	//bool		CancelDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod );
+	//void		UpdateDynamicModelLoadQueue();
 
-	void		FinishDynamicModelLoadIfReady( CDynamicModelInfo *dyn, model_t *mod );
+	//void		FinishDynamicModelLoadIfReady( CDynamicModelInfo *dyn, model_t *mod );
 
-	void		InternalUpdateDynamicModels( bool bIgnoreUpdateTime );
+	//void		InternalUpdateDynamicModels( bool bIgnoreUpdateTime );
 
 	// Internal data
 private:
@@ -360,24 +360,24 @@ private:
 	char				m_szActiveMapName[64];
 
 	// Dynamic model support:
-	class CDynamicModelInfo
-	{
-	public:
-		enum { QUEUED = 0x01, LOADING = 0x02, CLIENTREADY = 0x04, SERVERLOADING = 0x08, ALLREADY = 0x10, INVALIDFLAG = 0x20 }; // flags
-		CDynamicModelInfo() : m_iRefCount(0), m_iClientRefCount(0), m_nLoadFlags(INVALIDFLAG), m_uLastTouchedMS_Div256(0) { }
-		int16 m_iRefCount;
-		int16 m_iClientRefCount; // also doublecounted in m_iRefCount
-		uint32 m_nLoadFlags : 8;
-		uint32 m_uLastTouchedMS_Div256 : 24;
-		CUtlVector< uintptr_t > m_Callbacks; // low bit = client only
-	};
+	//class CDynamicModelInfo
+	//{
+	//public:
+	//	enum { QUEUED = 0x01, LOADING = 0x02, CLIENTREADY = 0x04, SERVERLOADING = 0x08, ALLREADY = 0x10, INVALIDFLAG = 0x20 }; // flags
+	//	CDynamicModelInfo() : m_iRefCount(0), m_iClientRefCount(0), m_nLoadFlags(INVALIDFLAG), m_uLastTouchedMS_Div256(0) { }
+	//	int16 m_iRefCount;
+	//	int16 m_iClientRefCount; // also doublecounted in m_iRefCount
+	//	uint32 m_nLoadFlags : 8;
+	//	uint32 m_uLastTouchedMS_Div256 : 24;
+	//	CUtlVector< uintptr_t > m_Callbacks; // low bit = client only
+	//};
 
-	CUtlHashtable< model_t * , CDynamicModelInfo > m_DynamicModels;
-	CUtlHashtable< uintptr_t , int > m_RegisteredDynamicCallbacks;
+	//CUtlHashtable< model_t * , CDynamicModelInfo > m_DynamicModels;
+	//CUtlHashtable< uintptr_t , int > m_RegisteredDynamicCallbacks;
 
 	// Dynamic model load queue
-	CUtlVector< model_t* > m_DynamicModelLoadQueue;
-	bool m_bDynamicLoadQueueHeadActive;
+	//CUtlVector< model_t* > m_DynamicModelLoadQueue;
+	//bool m_bDynamicLoadQueueHeadActive;
 };
 
 // Expose interface
@@ -3394,7 +3394,7 @@ void CModelLoader::Shutdown( void )
 {
 	m_pWorldModel = NULL;
 
-	ForceUnloadNonClientDynamicModels();
+	//ForceUnloadNonClientDynamicModels();
 
 	UnloadAllModels( false );
 
@@ -3969,7 +3969,7 @@ void CModelLoader::PurgeUnusedModels( void )
 	}
 
 	// flush dynamic models that have no refcount
-	FlushDynamicModels();
+	//FlushDynamicModels();
 
 	// unload unreferenced models only
 	UnloadAllModels( true );
@@ -5604,479 +5604,479 @@ const char *CModelLoader::GetActiveMapName( void )
 	return m_szActiveMapName;
 }
 
-model_t *CModelLoader::GetDynamicModel( const char *name, bool bClientOnly )
-{
-	if ( !name || !name[0] )
-	{
-		name = "models/empty.mdl";
-	}
+//model_t *CModelLoader::GetDynamicModel( const char *name, bool bClientOnly )
+//{
+//	if ( !name || !name[0] )
+//	{
+//		name = "models/empty.mdl";
+//	}
+//
+//	Assert( V_strnicmp( name, "models/", 7 ) == 0 && V_strstr( name, ".mdl" ) != NULL );
+//
+//	model_t *pModel = FindModel( name );
+//	Assert( pModel );
+//
+//	CDynamicModelInfo &dyn = m_DynamicModels[ m_DynamicModels.Insert( pModel ) ]; // Insert returns existing if key is already set
+//	if ( dyn.m_nLoadFlags == CDynamicModelInfo::INVALIDFLAG )
+//	{
+//		dyn.m_nLoadFlags = 0;
+//		DynamicModelDebugMsg( "model %p [%s] registered\n", pModel, pModel->strName.String() );
+//	}
+//	dyn.m_uLastTouchedMS_Div256 = Plat_MSTime() >> 8;
+//
+//	return pModel;
+//}
 
-	Assert( V_strnicmp( name, "models/", 7 ) == 0 && V_strstr( name, ".mdl" ) != NULL );
+//void CModelLoader::UpdateDynamicModelLoadQueue()
+//{
+//	if ( mod_dynamicloadpause.GetBool() )
+//		return;
+//
+//	static double s_LastDynamicLoadTime = 0.0;
+//	if ( mod_dynamicloadthrottle.GetFloat() > 0 && Plat_FloatTime() < s_LastDynamicLoadTime + mod_dynamicloadthrottle.GetFloat() )
+//		return;
+//
+//	if ( m_bDynamicLoadQueueHeadActive )
+//	{
+//		Assert( m_DynamicModelLoadQueue.Count() >= 1 );
+//		MaterialLock_t matLock = g_pMaterialSystem->Lock(); // ASDFADFASFASEGAafliejsfjaslaslgsaigas
+//		bool bComplete = g_pQueuedLoader->CompleteDynamicLoad();
+//		g_pMaterialSystem->Unlock(matLock);
+//
+//		if ( bComplete )
+//		{
+//			model_t *pModel = m_DynamicModelLoadQueue[0];
+//			m_DynamicModelLoadQueue.Remove(0);
+//			m_bDynamicLoadQueueHeadActive = false;
+//
+//			Assert( pModel->nLoadFlags & FMODELLOADER_DYNAMIC );
+//			Assert( pModel->type == mod_bad || ( pModel->nLoadFlags & (FMODELLOADER_LOADED | FMODELLOADER_LOADED_BY_PRELOAD) ) );
+//			(void) LoadModel( pModel, NULL );
+//			Assert( pModel->type == mod_studio );
+//
+//			UtlHashHandle_t hDyn = m_DynamicModels.Find( pModel );
+//			Assert( hDyn != m_DynamicModels.InvalidHandle() );
+//			if ( hDyn != m_DynamicModels.InvalidHandle() )
+//			{
+//				CDynamicModelInfo &dyn = m_DynamicModels[hDyn];
+//				Assert( dyn.m_nLoadFlags & CDynamicModelInfo::QUEUED );
+//				Assert( dyn.m_nLoadFlags & CDynamicModelInfo::LOADING );
+//
+//				dyn.m_nLoadFlags &= ~( CDynamicModelInfo::QUEUED | CDynamicModelInfo::LOADING );
+//
+//				g_pMDLCache->LockStudioHdr( pModel->studio );
+//				dyn.m_nLoadFlags |= CDynamicModelInfo::CLIENTREADY;
+//
+//				dyn.m_uLastTouchedMS_Div256 = Plat_MSTime() >> 8;
+//
+//				FinishDynamicModelLoadIfReady( &dyn, pModel );
+//			}
+//
+//			// do the clean up after we're actually done
+//			// we keep some file cache around to make sure that LoadModel doesn't do blocking load
+//			g_pQueuedLoader->CleanupDynamicLoad();
+//			
+//			s_LastDynamicLoadTime = Plat_FloatTime();
+//		}
+//	}
+//
+//	// If we're not working, and we have work to do, and the queued loader is open for business...
+//	if ( !m_bDynamicLoadQueueHeadActive && m_DynamicModelLoadQueue.Count() > 0 && g_pQueuedLoader->IsFinished() )
+//	{
+//		model_t *pModel = m_DynamicModelLoadQueue[0];
+//		UtlHashHandle_t hDyn = m_DynamicModels.Find( pModel );
+//		Assert( hDyn != m_DynamicModels.InvalidHandle() );
+//		if ( hDyn != m_DynamicModels.InvalidHandle() )
+//		{
+//			m_bDynamicLoadQueueHeadActive = true;
+//
+//			CDynamicModelInfo &dyn = m_DynamicModels[hDyn];
+//			Assert( dyn.m_nLoadFlags & CDynamicModelInfo::QUEUED );
+//			Assert( !(dyn.m_nLoadFlags & CDynamicModelInfo::LOADING) );
+//			Assert( !(dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY) );
+//			dyn.m_nLoadFlags |= CDynamicModelInfo::LOADING;
+//
+//			// the queued loader is very ... particular about path names. it doesn't like leading "models/"
+//			const char* pName = pModel->strName;
+//			if ( V_strnicmp( pName, "models", 6 ) == 0 && ( pName[6] == '/' || pName[6] == '\\' ) )
+//			{
+//				pName += 7;
+//			}
+//
+//			MaterialLock_t matLock = g_pMaterialSystem->Lock();
+//			g_pQueuedLoader->DynamicLoadMapResource( pName, NULL, NULL, NULL );
+//			g_pMaterialSystem->Unlock(matLock);
+//		}
+//		else
+//		{
+//			m_DynamicModelLoadQueue.Remove(0);
+//		}
+//	}
+//}
 
-	model_t *pModel = FindModel( name );
-	Assert( pModel );
+//void CModelLoader::FinishDynamicModelLoadIfReady( CDynamicModelInfo *pDyn, model_t *pModel )
+//{
+//	CDynamicModelInfo &dyn = *pDyn;
+//	if ( ( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY ) )
+//	{
+//		if ( !( dyn.m_nLoadFlags & CDynamicModelInfo::SERVERLOADING ) )
+//		{
+//			// There ought to be a better way to plumb this through, but this should be ok...
+//			if ( sv.GetDynamicModelsTable() )
+//			{
+//				int netidx = sv.GetDynamicModelsTable()->FindStringIndex( pModel->strName );
+//				if ( netidx != INVALID_STRING_INDEX )
+//				{
+//					char nIsLoaded = 1;
+//					sv.GetDynamicModelsTable()->SetStringUserData( netidx, 1, &nIsLoaded );
+//				}
+//			}
+//
+//			DynamicModelDebugMsg( "model %p [%s] loaded\n", pModel, pModel->strName.String() );
+//
+//			dyn.m_nLoadFlags |= CDynamicModelInfo::ALLREADY;
+//
+//			// Reverse order; UnregisterModelLoadCallback does a FastRemove that swaps from back
+//			for ( int i = dyn.m_Callbacks.Count()-1; i >= 0; --i )
+//			{
+//				uintptr_t callbackID = dyn.m_Callbacks[ i ];
+//				bool bClientOnly = (bool)(callbackID & 1);
+//				IModelLoadCallback* pCallback = ( IModelLoadCallback* )( callbackID & ~1 );
+//				UnregisterModelLoadCallback( pModel, bClientOnly, pCallback );
+//				pCallback->OnModelLoadComplete( pModel );
+//			}
+//		}
+//		else
+//		{
+//			// Reverse order; UnregisterModelLoadCallback does a FastRemove that swaps from back
+//			for ( int i = dyn.m_Callbacks.Count()-1; i >= 0; --i )
+//			{
+//				uintptr_t callbackID = dyn.m_Callbacks[ i ];
+//				bool bClientOnly = (bool)(callbackID & 1);
+//				IModelLoadCallback* pCallback = ( IModelLoadCallback* )( callbackID & ~1 );
+//				if ( bClientOnly )
+//				{
+//					UnregisterModelLoadCallback( pModel, true, pCallback );
+//					pCallback->OnModelLoadComplete( pModel );
+//				}
+//			}
+//		}
+//	}
+//}
 
-	CDynamicModelInfo &dyn = m_DynamicModels[ m_DynamicModels.Insert( pModel ) ]; // Insert returns existing if key is already set
-	if ( dyn.m_nLoadFlags == CDynamicModelInfo::INVALIDFLAG )
-	{
-		dyn.m_nLoadFlags = 0;
-		DynamicModelDebugMsg( "model %p [%s] registered\n", pModel, pModel->strName.String() );
-	}
-	dyn.m_uLastTouchedMS_Div256 = Plat_MSTime() >> 8;
+//bool CModelLoader::RegisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback, bool bCallImmediatelyIfLoaded )
+//{
+//	UtlHashHandle_t hDyn = m_DynamicModels.Find( pModel );
+//	Assert( hDyn != m_DynamicModels.InvalidHandle() );
+//	if ( hDyn == m_DynamicModels.InvalidHandle() )
+//		return false;
+//
+//	Assert( ((uintptr_t)pCallback & 1) == 0 );
+//	uintptr_t callbackID = (uintptr_t)pCallback | (uintptr_t)bClientOnly;
+//
+//	int readyFlag = bClientOnly ? CDynamicModelInfo::CLIENTREADY : CDynamicModelInfo::ALLREADY;
+//	CDynamicModelInfo &dyn = m_DynamicModels[ hDyn ];
+//	AssertMsg( dyn.m_iRefCount > 0, "RegisterModelLoadCallback requires non-zero model refcount" );
+//	if ( dyn.m_nLoadFlags & readyFlag )
+//	{
+//		if ( !bCallImmediatelyIfLoaded )
+//			return false;
+//
+//		pCallback->OnModelLoadComplete( pModel );
+//	}
+//	else
+//	{
+//		if ( !dyn.m_Callbacks.HasElement( callbackID ) )
+//		{
+//			dyn.m_Callbacks.AddToTail( callbackID );
+//			// Set registration count for callback pointer
+//			m_RegisteredDynamicCallbacks[ m_RegisteredDynamicCallbacks.Insert( callbackID, 0 ) ]++;
+//		}
+//	}
+//
+//	return true;
+//}
 
-	return pModel;
-}
+//bool CModelLoader::IsDynamicModelLoading( model_t *pModel, bool bClientOnly )
+//{
+//	Assert( pModel->nLoadFlags & FMODELLOADER_DYNAMIC );
+//	UtlHashHandle_t hDyn = m_DynamicModels.Find( pModel );
+//	Assert( hDyn != m_DynamicModels.InvalidHandle() );
+//	if ( hDyn != m_DynamicModels.InvalidHandle() )
+//	{
+//		CDynamicModelInfo &dyn = m_DynamicModels[ hDyn ];
+//		AssertMsg( dyn.m_iRefCount > 0, "dynamic model state cannot be queried with zero refcount" );
+//		if ( dyn.m_iRefCount > 0 )
+//		{
+//			int readyFlag = bClientOnly ? CDynamicModelInfo::CLIENTREADY : CDynamicModelInfo::ALLREADY;
+//			return !( dyn.m_nLoadFlags & readyFlag );
+//		}
+//	}
+//	return false;
+//}
 
-void CModelLoader::UpdateDynamicModelLoadQueue()
-{
-	if ( mod_dynamicloadpause.GetBool() )
-		return;
+//void CModelLoader::AddRefDynamicModel( model_t *pModel, bool bClientSideRef  )
+//{
+//	extern IVModelInfo* modelinfo;
+//
+//	UtlHashHandle_t hDyn = m_DynamicModels.Insert( pModel );
+//	CDynamicModelInfo& dyn = m_DynamicModels[ hDyn ];
+//	dyn.m_iRefCount++;
+//	dyn.m_iClientRefCount += ( bClientSideRef ? 1 : 0 );
+//	Assert( dyn.m_iRefCount > 0 );
+//
+//	DynamicModelDebugMsg( "model %p [%s] addref %d (%d)\n", pModel, pModel->strName.String(), dyn.m_iRefCount, dyn.m_iClientRefCount );
+//
+//	if ( !( dyn.m_nLoadFlags & ( CDynamicModelInfo::QUEUED | CDynamicModelInfo::CLIENTREADY ) ) )
+//	{
+//		QueueDynamicModelLoad( &dyn, pModel );
+//
+//		// Try to kick it off asap if we aren't already busy.
+//		if ( !m_bDynamicLoadQueueHeadActive )
+//		{
+//			UpdateDynamicModelLoadQueue();
+//		}
+//	}
+//}
 
-	static double s_LastDynamicLoadTime = 0.0;
-	if ( mod_dynamicloadthrottle.GetFloat() > 0 && Plat_FloatTime() < s_LastDynamicLoadTime + mod_dynamicloadthrottle.GetFloat() )
-		return;
+//void CModelLoader::ReleaseDynamicModel( model_t *pModel, bool bClientSideRef )
+//{
+//	Assert( pModel->nLoadFlags & FMODELLOADER_DYNAMIC );
+//	UtlHashHandle_t hDyn = m_DynamicModels.Find( pModel );
+//	Assert( hDyn != m_DynamicModels.InvalidHandle() );
+//	if ( hDyn != m_DynamicModels.InvalidHandle() )
+//	{
+//		CDynamicModelInfo &dyn = m_DynamicModels[ hDyn ];
+//		Assert( dyn.m_iRefCount > 0 );
+//		if ( dyn.m_iRefCount > 0 )
+//		{
+//			DynamicModelDebugMsg( "model %p [%s] release %d (%dc)\n", pModel, pModel->strName.String(), dyn.m_iRefCount, dyn.m_iClientRefCount );
+//			dyn.m_iRefCount--;
+//			dyn.m_iClientRefCount -= ( bClientSideRef ? 1 : 0 );
+//			Assert( dyn.m_iClientRefCount >= 0 );
+//			if ( dyn.m_iClientRefCount < 0 )
+//				dyn.m_iClientRefCount = 0;
+//			dyn.m_uLastTouchedMS_Div256 = Plat_MSTime() >> 8;
+//		}
+//	}
+//}
 
-	if ( m_bDynamicLoadQueueHeadActive )
-	{
-		Assert( m_DynamicModelLoadQueue.Count() >= 1 );
-		MaterialLock_t matLock = g_pMaterialSystem->Lock(); // ASDFADFASFASEGAafliejsfjaslaslgsaigas
-		bool bComplete = g_pQueuedLoader->CompleteDynamicLoad();
-		g_pMaterialSystem->Unlock(matLock);
+//void CModelLoader::UnregisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback )
+//{
+//	Assert( ((uintptr_t)pCallback & 1) == 0 );
+//	uintptr_t callbackID = (uintptr_t)pCallback | (uintptr_t)bClientOnly;
+//	if ( int *pCallbackRegistrationCount = m_RegisteredDynamicCallbacks.GetPtr( callbackID ) )
+//	{
+//		if ( pModel )
+//		{
+//			UtlHashHandle_t i = m_DynamicModels.Find( pModel );
+//			if ( i != m_DynamicModels.InvalidHandle() )
+//			{
+//				CDynamicModelInfo &dyn = m_DynamicModels[ i ];
+//				if ( dyn.m_Callbacks.FindAndFastRemove( callbackID ) )
+//				{
+//					if ( dyn.m_Callbacks.Count() == 0 )
+//					{
+//						dyn.m_Callbacks.Purge();
+//					}
+//					if ( --(*pCallbackRegistrationCount) == 0 )
+//					{
+//						m_RegisteredDynamicCallbacks.Remove( callbackID );
+//						return;
+//					}
+//				}
+//			}
+//		}
+//		else
+//		{
+//			for ( UtlHashHandle_t i = m_DynamicModels.FirstHandle(); i != m_DynamicModels.InvalidHandle(); i = m_DynamicModels.NextHandle(i) )
+//			{
+//				CDynamicModelInfo &dyn = m_DynamicModels[ i ];
+//				if ( dyn.m_Callbacks.FindAndFastRemove( callbackID ) )
+//				{
+//					if ( dyn.m_Callbacks.Count() == 0 )
+//					{
+//						dyn.m_Callbacks.Purge();
+//					}
+//					if ( --(*pCallbackRegistrationCount) == 0 )
+//					{
+//						m_RegisteredDynamicCallbacks.Remove( callbackID );
+//						return;
+//					}
+//				}
+//			}
+//		}
+//	}
+//}
 
-		if ( bComplete )
-		{
-			model_t *pModel = m_DynamicModelLoadQueue[0];
-			m_DynamicModelLoadQueue.Remove(0);
-			m_bDynamicLoadQueueHeadActive = false;
+//void CModelLoader::QueueDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod )
+//{
+//	Assert( !(dyn->m_nLoadFlags & CDynamicModelInfo::QUEUED) );
+//	// Client-side entities have priority over server-side entities
+//	// because they are more likely to be used in UI elements. --henryg
+//	if ( dyn->m_iClientRefCount > 0 && m_DynamicModelLoadQueue.Count() > 1 )
+//	{
+//		m_DynamicModelLoadQueue.InsertAfter( 0, mod );
+//	}
+//	else
+//	{
+//		m_DynamicModelLoadQueue.AddToTail( mod );
+//	}
+//	dyn->m_nLoadFlags |= CDynamicModelInfo::QUEUED;
+//	mod->nLoadFlags |= ( dyn->m_iClientRefCount > 0 ? FMODELLOADER_DYNCLIENT : FMODELLOADER_DYNSERVER );
+//}
 
-			Assert( pModel->nLoadFlags & FMODELLOADER_DYNAMIC );
-			Assert( pModel->type == mod_bad || ( pModel->nLoadFlags & (FMODELLOADER_LOADED | FMODELLOADER_LOADED_BY_PRELOAD) ) );
-			(void) LoadModel( pModel, NULL );
-			Assert( pModel->type == mod_studio );
+//bool CModelLoader::CancelDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod )
+//{
+//	int i = m_DynamicModelLoadQueue.Find( mod );
+//	Assert( (i < 0) == !(dyn->m_nLoadFlags & CDynamicModelInfo::QUEUED) );
+//	if ( i >= 0 )
+//	{
+//		if ( i == 0 && m_bDynamicLoadQueueHeadActive )
+//		{
+//			Assert( dyn->m_nLoadFlags & CDynamicModelInfo::LOADING );
+//			// can't remove head of queue
+//			return false;
+//		}
+//		else
+//		{
+//			Assert( dyn->m_nLoadFlags & CDynamicModelInfo::QUEUED );
+//			Assert( !(dyn->m_nLoadFlags & CDynamicModelInfo::LOADING) );
+//			m_DynamicModelLoadQueue.Remove( i );
+//			dyn->m_nLoadFlags &= ~CDynamicModelInfo::QUEUED;
+//			mod->nLoadFlags &= ~FMODELLOADER_DYNAMIC;
+//			return true;
+//		}
+//	}
+//	return false;
+//}
 
-			UtlHashHandle_t hDyn = m_DynamicModels.Find( pModel );
-			Assert( hDyn != m_DynamicModels.InvalidHandle() );
-			if ( hDyn != m_DynamicModels.InvalidHandle() )
-			{
-				CDynamicModelInfo &dyn = m_DynamicModels[hDyn];
-				Assert( dyn.m_nLoadFlags & CDynamicModelInfo::QUEUED );
-				Assert( dyn.m_nLoadFlags & CDynamicModelInfo::LOADING );
+//void CModelLoader::InternalUpdateDynamicModels( bool bIgnoreTime )
+//{
+//	const uint now = Plat_MSTime();
+//	const uint delay = bIgnoreTime ? 0 : (int)( clamp( mod_dynamicunloadtime.GetFloat(), 1.f, 600.f ) * 1000 );
+//
+//	UpdateDynamicModelLoadQueue();
+//
+//#ifdef _DEBUG
+//	extern CNetworkStringTableContainer *networkStringTableContainerServer;
+//	bool bPrevStringTableLockState = networkStringTableContainerServer->Lock( false );
+//#endif
+//
+//	// Scan for models to unload. TODO: accelerate with a "models to potentially unload" list?
+//	UtlHashHandle_t i = m_DynamicModels.FirstHandle();
+//	while ( i != m_DynamicModels.InvalidHandle() )
+//	{
+//		model_t *pModel = m_DynamicModels.Key( i );
+//		CDynamicModelInfo& dyn = m_DynamicModels[ i ];
+//
+//		// UNLOAD THIS MODEL if zero refcount and not currently loading, and either timed out or never loaded
+//		if ( dyn.m_iRefCount <= 0 && !(dyn.m_nLoadFlags & CDynamicModelInfo::LOADING) &&
+//			 ( ( now - (dyn.m_uLastTouchedMS_Div256 << 8) ) >= delay || !( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY ) ) )
+//		{
+//			// Remove from load queue
+//			if ( dyn.m_nLoadFlags & CDynamicModelInfo::QUEUED )
+//			{
+//				if ( !CancelDynamicModelLoad( &dyn, pModel ) )
+//				{
+//					// Couldn't remove from queue, advance to next entry and do not remove
+//					i = m_DynamicModels.NextHandle(i);
+//					continue;
+//				}
+//			}
+//
+//			// Unlock studiohdr_t
+//			if ( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY )
+//			{
+//				g_pMDLCache->UnlockStudioHdr( pModel->studio );
+//			}
+//
+//			// There ought to be a better way to plumb this through, but this should be ok...
+//			if ( sv.GetDynamicModelsTable() )
+//			{
+//				int netidx = sv.GetDynamicModelsTable()->FindStringIndex( pModel->strName );
+//				if ( netidx != INVALID_STRING_INDEX )
+//				{
+//					char nIsLoaded = 0;
+//					sv.GetDynamicModelsTable()->SetStringUserData( netidx, 1, &nIsLoaded );
+//				}
+//			}
+//
+//			if ( pModel->nLoadFlags & FMODELLOADER_DYNAMIC )
+//			{
+//				pModel->nLoadFlags &= ~FMODELLOADER_DYNAMIC;
+//				// Actually unload the model if all system references are gone
+//				if ( pModel->nLoadFlags & FMODELLOADER_REFERENCEMASK )
+//				{
+//					DynamicModelDebugMsg( "model %p [%s] unload - deferred: non-dynamic reference\n", pModel, pModel->strName.String() );
+//				}
+//				else
+//				{
+//					DynamicModelDebugMsg( "model %p [%s] unload\n", pModel, pModel->strName.String() );
+//					
+//					Studio_UnloadModel( pModel );
+//
+//					if ( mod_dynamicunloadtextures.GetBool() )
+//					{
+//						materials->UncacheUnusedMaterials( false );
+//					}
+//				}
+//			}
+//
+//			// Remove from table, advance to next entry
+//			i = m_DynamicModels.RemoveAndAdvance(i);
+//			continue;
+//		}
+//
+//		// Advance to next entry in table
+//		i = m_DynamicModels.NextHandle(i);
+//	}
+//
+//#ifdef _DEBUG
+//	networkStringTableContainerServer->Lock( bPrevStringTableLockState );
+//#endif
+//}
 
-				dyn.m_nLoadFlags &= ~( CDynamicModelInfo::QUEUED | CDynamicModelInfo::LOADING );
+//void CModelLoader::Client_OnServerModelStateChanged( model_t *pModel, bool bServerLoaded )
+//{
+//#ifndef SWDS
+//	// Listen server don't distinguish between server and client ready, never use SERVERLOADING flag
+//	if ( sv.IsActive() ) 
+//		return;
+//
+//	UtlHashHandle_t i = m_DynamicModels.Find( pModel );
+//	if ( i != m_DynamicModels.InvalidHandle() )
+//	{
+//		CDynamicModelInfo &dyn = m_DynamicModels[i];
+//		if ( !bServerLoaded )
+//		{
+//			if ( dyn.m_nLoadFlags & CDynamicModelInfo::ALLREADY )
+//				DynamicModelDebugMsg( "dynamic model [%s] loaded on client but not server! is this bad? unknown...", pModel->strName.String() );
+//			dyn.m_nLoadFlags &= ~CDynamicModelInfo::ALLREADY;
+//			dyn.m_nLoadFlags |= CDynamicModelInfo::SERVERLOADING;
+//		}
+//		else
+//		{
+//			dyn.m_nLoadFlags &= ~CDynamicModelInfo::SERVERLOADING;
+//			FinishDynamicModelLoadIfReady( &dyn, pModel );
+//		}
+//	}
+//#endif
+//}
 
-				g_pMDLCache->LockStudioHdr( pModel->studio );
-				dyn.m_nLoadFlags |= CDynamicModelInfo::CLIENTREADY;
-
-				dyn.m_uLastTouchedMS_Div256 = Plat_MSTime() >> 8;
-
-				FinishDynamicModelLoadIfReady( &dyn, pModel );
-			}
-
-			// do the clean up after we're actually done
-			// we keep some file cache around to make sure that LoadModel doesn't do blocking load
-			g_pQueuedLoader->CleanupDynamicLoad();
-			
-			s_LastDynamicLoadTime = Plat_FloatTime();
-		}
-	}
-
-	// If we're not working, and we have work to do, and the queued loader is open for business...
-	if ( !m_bDynamicLoadQueueHeadActive && m_DynamicModelLoadQueue.Count() > 0 && g_pQueuedLoader->IsFinished() )
-	{
-		model_t *pModel = m_DynamicModelLoadQueue[0];
-		UtlHashHandle_t hDyn = m_DynamicModels.Find( pModel );
-		Assert( hDyn != m_DynamicModels.InvalidHandle() );
-		if ( hDyn != m_DynamicModels.InvalidHandle() )
-		{
-			m_bDynamicLoadQueueHeadActive = true;
-
-			CDynamicModelInfo &dyn = m_DynamicModels[hDyn];
-			Assert( dyn.m_nLoadFlags & CDynamicModelInfo::QUEUED );
-			Assert( !(dyn.m_nLoadFlags & CDynamicModelInfo::LOADING) );
-			Assert( !(dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY) );
-			dyn.m_nLoadFlags |= CDynamicModelInfo::LOADING;
-
-			// the queued loader is very ... particular about path names. it doesn't like leading "models/"
-			const char* pName = pModel->strName;
-			if ( V_strnicmp( pName, "models", 6 ) == 0 && ( pName[6] == '/' || pName[6] == '\\' ) )
-			{
-				pName += 7;
-			}
-
-			MaterialLock_t matLock = g_pMaterialSystem->Lock();
-			g_pQueuedLoader->DynamicLoadMapResource( pName, NULL, NULL, NULL );
-			g_pMaterialSystem->Unlock(matLock);
-		}
-		else
-		{
-			m_DynamicModelLoadQueue.Remove(0);
-		}
-	}
-}
-
-void CModelLoader::FinishDynamicModelLoadIfReady( CDynamicModelInfo *pDyn, model_t *pModel )
-{
-	CDynamicModelInfo &dyn = *pDyn;
-	if ( ( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY ) )
-	{
-		if ( !( dyn.m_nLoadFlags & CDynamicModelInfo::SERVERLOADING ) )
-		{
-			// There ought to be a better way to plumb this through, but this should be ok...
-			if ( sv.GetDynamicModelsTable() )
-			{
-				int netidx = sv.GetDynamicModelsTable()->FindStringIndex( pModel->strName );
-				if ( netidx != INVALID_STRING_INDEX )
-				{
-					char nIsLoaded = 1;
-					sv.GetDynamicModelsTable()->SetStringUserData( netidx, 1, &nIsLoaded );
-				}
-			}
-
-			DynamicModelDebugMsg( "model %p [%s] loaded\n", pModel, pModel->strName.String() );
-
-			dyn.m_nLoadFlags |= CDynamicModelInfo::ALLREADY;
-
-			// Reverse order; UnregisterModelLoadCallback does a FastRemove that swaps from back
-			for ( int i = dyn.m_Callbacks.Count()-1; i >= 0; --i )
-			{
-				uintptr_t callbackID = dyn.m_Callbacks[ i ];
-				bool bClientOnly = (bool)(callbackID & 1);
-				IModelLoadCallback* pCallback = ( IModelLoadCallback* )( callbackID & ~1 );
-				UnregisterModelLoadCallback( pModel, bClientOnly, pCallback );
-				pCallback->OnModelLoadComplete( pModel );
-			}
-		}
-		else
-		{
-			// Reverse order; UnregisterModelLoadCallback does a FastRemove that swaps from back
-			for ( int i = dyn.m_Callbacks.Count()-1; i >= 0; --i )
-			{
-				uintptr_t callbackID = dyn.m_Callbacks[ i ];
-				bool bClientOnly = (bool)(callbackID & 1);
-				IModelLoadCallback* pCallback = ( IModelLoadCallback* )( callbackID & ~1 );
-				if ( bClientOnly )
-				{
-					UnregisterModelLoadCallback( pModel, true, pCallback );
-					pCallback->OnModelLoadComplete( pModel );
-				}
-			}
-		}
-	}
-}
-
-bool CModelLoader::RegisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback, bool bCallImmediatelyIfLoaded )
-{
-	UtlHashHandle_t hDyn = m_DynamicModels.Find( pModel );
-	Assert( hDyn != m_DynamicModels.InvalidHandle() );
-	if ( hDyn == m_DynamicModels.InvalidHandle() )
-		return false;
-
-	Assert( ((uintptr_t)pCallback & 1) == 0 );
-	uintptr_t callbackID = (uintptr_t)pCallback | (uintptr_t)bClientOnly;
-
-	int readyFlag = bClientOnly ? CDynamicModelInfo::CLIENTREADY : CDynamicModelInfo::ALLREADY;
-	CDynamicModelInfo &dyn = m_DynamicModels[ hDyn ];
-	AssertMsg( dyn.m_iRefCount > 0, "RegisterModelLoadCallback requires non-zero model refcount" );
-	if ( dyn.m_nLoadFlags & readyFlag )
-	{
-		if ( !bCallImmediatelyIfLoaded )
-			return false;
-
-		pCallback->OnModelLoadComplete( pModel );
-	}
-	else
-	{
-		if ( !dyn.m_Callbacks.HasElement( callbackID ) )
-		{
-			dyn.m_Callbacks.AddToTail( callbackID );
-			// Set registration count for callback pointer
-			m_RegisteredDynamicCallbacks[ m_RegisteredDynamicCallbacks.Insert( callbackID, 0 ) ]++;
-		}
-	}
-
-	return true;
-}
-
-bool CModelLoader::IsDynamicModelLoading( model_t *pModel, bool bClientOnly )
-{
-	Assert( pModel->nLoadFlags & FMODELLOADER_DYNAMIC );
-	UtlHashHandle_t hDyn = m_DynamicModels.Find( pModel );
-	Assert( hDyn != m_DynamicModels.InvalidHandle() );
-	if ( hDyn != m_DynamicModels.InvalidHandle() )
-	{
-		CDynamicModelInfo &dyn = m_DynamicModels[ hDyn ];
-		AssertMsg( dyn.m_iRefCount > 0, "dynamic model state cannot be queried with zero refcount" );
-		if ( dyn.m_iRefCount > 0 )
-		{
-			int readyFlag = bClientOnly ? CDynamicModelInfo::CLIENTREADY : CDynamicModelInfo::ALLREADY;
-			return !( dyn.m_nLoadFlags & readyFlag );
-		}
-	}
-	return false;
-}
-
-void CModelLoader::AddRefDynamicModel( model_t *pModel, bool bClientSideRef  )
-{
-	extern IVModelInfo* modelinfo;
-
-	UtlHashHandle_t hDyn = m_DynamicModels.Insert( pModel );
-	CDynamicModelInfo& dyn = m_DynamicModels[ hDyn ];
-	dyn.m_iRefCount++;
-	dyn.m_iClientRefCount += ( bClientSideRef ? 1 : 0 );
-	Assert( dyn.m_iRefCount > 0 );
-
-	DynamicModelDebugMsg( "model %p [%s] addref %d (%d)\n", pModel, pModel->strName.String(), dyn.m_iRefCount, dyn.m_iClientRefCount );
-
-	if ( !( dyn.m_nLoadFlags & ( CDynamicModelInfo::QUEUED | CDynamicModelInfo::CLIENTREADY ) ) )
-	{
-		QueueDynamicModelLoad( &dyn, pModel );
-
-		// Try to kick it off asap if we aren't already busy.
-		if ( !m_bDynamicLoadQueueHeadActive )
-		{
-			UpdateDynamicModelLoadQueue();
-		}
-	}
-}
-
-void CModelLoader::ReleaseDynamicModel( model_t *pModel, bool bClientSideRef )
-{
-	Assert( pModel->nLoadFlags & FMODELLOADER_DYNAMIC );
-	UtlHashHandle_t hDyn = m_DynamicModels.Find( pModel );
-	Assert( hDyn != m_DynamicModels.InvalidHandle() );
-	if ( hDyn != m_DynamicModels.InvalidHandle() )
-	{
-		CDynamicModelInfo &dyn = m_DynamicModels[ hDyn ];
-		Assert( dyn.m_iRefCount > 0 );
-		if ( dyn.m_iRefCount > 0 )
-		{
-			DynamicModelDebugMsg( "model %p [%s] release %d (%dc)\n", pModel, pModel->strName.String(), dyn.m_iRefCount, dyn.m_iClientRefCount );
-			dyn.m_iRefCount--;
-			dyn.m_iClientRefCount -= ( bClientSideRef ? 1 : 0 );
-			Assert( dyn.m_iClientRefCount >= 0 );
-			if ( dyn.m_iClientRefCount < 0 )
-				dyn.m_iClientRefCount = 0;
-			dyn.m_uLastTouchedMS_Div256 = Plat_MSTime() >> 8;
-		}
-	}
-}
-
-void CModelLoader::UnregisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback )
-{
-	Assert( ((uintptr_t)pCallback & 1) == 0 );
-	uintptr_t callbackID = (uintptr_t)pCallback | (uintptr_t)bClientOnly;
-	if ( int *pCallbackRegistrationCount = m_RegisteredDynamicCallbacks.GetPtr( callbackID ) )
-	{
-		if ( pModel )
-		{
-			UtlHashHandle_t i = m_DynamicModels.Find( pModel );
-			if ( i != m_DynamicModels.InvalidHandle() )
-			{
-				CDynamicModelInfo &dyn = m_DynamicModels[ i ];
-				if ( dyn.m_Callbacks.FindAndFastRemove( callbackID ) )
-				{
-					if ( dyn.m_Callbacks.Count() == 0 )
-					{
-						dyn.m_Callbacks.Purge();
-					}
-					if ( --(*pCallbackRegistrationCount) == 0 )
-					{
-						m_RegisteredDynamicCallbacks.Remove( callbackID );
-						return;
-					}
-				}
-			}
-		}
-		else
-		{
-			for ( UtlHashHandle_t i = m_DynamicModels.FirstHandle(); i != m_DynamicModels.InvalidHandle(); i = m_DynamicModels.NextHandle(i) )
-			{
-				CDynamicModelInfo &dyn = m_DynamicModels[ i ];
-				if ( dyn.m_Callbacks.FindAndFastRemove( callbackID ) )
-				{
-					if ( dyn.m_Callbacks.Count() == 0 )
-					{
-						dyn.m_Callbacks.Purge();
-					}
-					if ( --(*pCallbackRegistrationCount) == 0 )
-					{
-						m_RegisteredDynamicCallbacks.Remove( callbackID );
-						return;
-					}
-				}
-			}
-		}
-	}
-}
-
-void CModelLoader::QueueDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod )
-{
-	Assert( !(dyn->m_nLoadFlags & CDynamicModelInfo::QUEUED) );
-	// Client-side entities have priority over server-side entities
-	// because they are more likely to be used in UI elements. --henryg
-	if ( dyn->m_iClientRefCount > 0 && m_DynamicModelLoadQueue.Count() > 1 )
-	{
-		m_DynamicModelLoadQueue.InsertAfter( 0, mod );
-	}
-	else
-	{
-		m_DynamicModelLoadQueue.AddToTail( mod );
-	}
-	dyn->m_nLoadFlags |= CDynamicModelInfo::QUEUED;
-	mod->nLoadFlags |= ( dyn->m_iClientRefCount > 0 ? FMODELLOADER_DYNCLIENT : FMODELLOADER_DYNSERVER );
-}
-
-bool CModelLoader::CancelDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod )
-{
-	int i = m_DynamicModelLoadQueue.Find( mod );
-	Assert( (i < 0) == !(dyn->m_nLoadFlags & CDynamicModelInfo::QUEUED) );
-	if ( i >= 0 )
-	{
-		if ( i == 0 && m_bDynamicLoadQueueHeadActive )
-		{
-			Assert( dyn->m_nLoadFlags & CDynamicModelInfo::LOADING );
-			// can't remove head of queue
-			return false;
-		}
-		else
-		{
-			Assert( dyn->m_nLoadFlags & CDynamicModelInfo::QUEUED );
-			Assert( !(dyn->m_nLoadFlags & CDynamicModelInfo::LOADING) );
-			m_DynamicModelLoadQueue.Remove( i );
-			dyn->m_nLoadFlags &= ~CDynamicModelInfo::QUEUED;
-			mod->nLoadFlags &= ~FMODELLOADER_DYNAMIC;
-			return true;
-		}
-	}
-	return false;
-}
-
-void CModelLoader::InternalUpdateDynamicModels( bool bIgnoreTime )
-{
-	const uint now = Plat_MSTime();
-	const uint delay = bIgnoreTime ? 0 : (int)( clamp( mod_dynamicunloadtime.GetFloat(), 1.f, 600.f ) * 1000 );
-
-	UpdateDynamicModelLoadQueue();
-
-#ifdef _DEBUG
-	extern CNetworkStringTableContainer *networkStringTableContainerServer;
-	bool bPrevStringTableLockState = networkStringTableContainerServer->Lock( false );
-#endif
-
-	// Scan for models to unload. TODO: accelerate with a "models to potentially unload" list?
-	UtlHashHandle_t i = m_DynamicModels.FirstHandle();
-	while ( i != m_DynamicModels.InvalidHandle() )
-	{
-		model_t *pModel = m_DynamicModels.Key( i );
-		CDynamicModelInfo& dyn = m_DynamicModels[ i ];
-
-		// UNLOAD THIS MODEL if zero refcount and not currently loading, and either timed out or never loaded
-		if ( dyn.m_iRefCount <= 0 && !(dyn.m_nLoadFlags & CDynamicModelInfo::LOADING) &&
-			 ( ( now - (dyn.m_uLastTouchedMS_Div256 << 8) ) >= delay || !( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY ) ) )
-		{
-			// Remove from load queue
-			if ( dyn.m_nLoadFlags & CDynamicModelInfo::QUEUED )
-			{
-				if ( !CancelDynamicModelLoad( &dyn, pModel ) )
-				{
-					// Couldn't remove from queue, advance to next entry and do not remove
-					i = m_DynamicModels.NextHandle(i);
-					continue;
-				}
-			}
-
-			// Unlock studiohdr_t
-			if ( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY )
-			{
-				g_pMDLCache->UnlockStudioHdr( pModel->studio );
-			}
-
-			// There ought to be a better way to plumb this through, but this should be ok...
-			if ( sv.GetDynamicModelsTable() )
-			{
-				int netidx = sv.GetDynamicModelsTable()->FindStringIndex( pModel->strName );
-				if ( netidx != INVALID_STRING_INDEX )
-				{
-					char nIsLoaded = 0;
-					sv.GetDynamicModelsTable()->SetStringUserData( netidx, 1, &nIsLoaded );
-				}
-			}
-
-			if ( pModel->nLoadFlags & FMODELLOADER_DYNAMIC )
-			{
-				pModel->nLoadFlags &= ~FMODELLOADER_DYNAMIC;
-				// Actually unload the model if all system references are gone
-				if ( pModel->nLoadFlags & FMODELLOADER_REFERENCEMASK )
-				{
-					DynamicModelDebugMsg( "model %p [%s] unload - deferred: non-dynamic reference\n", pModel, pModel->strName.String() );
-				}
-				else
-				{
-					DynamicModelDebugMsg( "model %p [%s] unload\n", pModel, pModel->strName.String() );
-					
-					Studio_UnloadModel( pModel );
-
-					if ( mod_dynamicunloadtextures.GetBool() )
-					{
-						materials->UncacheUnusedMaterials( false );
-					}
-				}
-			}
-
-			// Remove from table, advance to next entry
-			i = m_DynamicModels.RemoveAndAdvance(i);
-			continue;
-		}
-
-		// Advance to next entry in table
-		i = m_DynamicModels.NextHandle(i);
-	}
-
-#ifdef _DEBUG
-	networkStringTableContainerServer->Lock( bPrevStringTableLockState );
-#endif
-}
-
-void CModelLoader::Client_OnServerModelStateChanged( model_t *pModel, bool bServerLoaded )
-{
-#ifndef SWDS
-	// Listen server don't distinguish between server and client ready, never use SERVERLOADING flag
-	if ( sv.IsActive() ) 
-		return;
-
-	UtlHashHandle_t i = m_DynamicModels.Find( pModel );
-	if ( i != m_DynamicModels.InvalidHandle() )
-	{
-		CDynamicModelInfo &dyn = m_DynamicModels[i];
-		if ( !bServerLoaded )
-		{
-			if ( dyn.m_nLoadFlags & CDynamicModelInfo::ALLREADY )
-				DynamicModelDebugMsg( "dynamic model [%s] loaded on client but not server! is this bad? unknown...", pModel->strName.String() );
-			dyn.m_nLoadFlags &= ~CDynamicModelInfo::ALLREADY;
-			dyn.m_nLoadFlags |= CDynamicModelInfo::SERVERLOADING;
-		}
-		else
-		{
-			dyn.m_nLoadFlags &= ~CDynamicModelInfo::SERVERLOADING;
-			FinishDynamicModelLoadIfReady( &dyn, pModel );
-		}
-	}
-#endif
-}
-
-void CModelLoader::ForceUnloadNonClientDynamicModels()
-{
-	UtlHashHandle_t i = m_DynamicModels.FirstHandle();
-	while ( i != m_DynamicModels.InvalidHandle() )
-	{
-		CDynamicModelInfo &dyn = m_DynamicModels[i];
-		dyn.m_iRefCount = dyn.m_iClientRefCount;
-		i = m_DynamicModels.NextHandle( i );
-	}
-
-	// Flush everything
-	InternalUpdateDynamicModels( true );
-}
+//void CModelLoader::ForceUnloadNonClientDynamicModels()
+//{
+//	UtlHashHandle_t i = m_DynamicModels.FirstHandle();
+//	while ( i != m_DynamicModels.InvalidHandle() )
+//	{
+//		CDynamicModelInfo &dyn = m_DynamicModels[i];
+//		dyn.m_iRefCount = dyn.m_iClientRefCount;
+//		i = m_DynamicModels.NextHandle( i );
+//	}
+//
+//	// Flush everything
+//	InternalUpdateDynamicModels( true );
+//}
 
 
 // reconstruct the ambient lighting for a leaf at the given position in worldspace
@@ -6238,58 +6238,58 @@ CON_COMMAND_F( model_list, "Dump model list to file", FCVAR_CHEAT | FCVAR_DONTRE
 
 
 
-CON_COMMAND_F( mod_dynamicmodeldebug, "debug spew for dynamic model loading", FCVAR_HIDDEN | FCVAR_DONTRECORD )
-{
-	((CModelLoader*)modelloader)->DebugPrintDynamicModels();
-}
+//CON_COMMAND_F( mod_dynamicmodeldebug, "debug spew for dynamic model loading", FCVAR_HIDDEN | FCVAR_DONTRECORD )
+//{
+//	((CModelLoader*)modelloader)->DebugPrintDynamicModels();
+//}
 
 #include "server.h"
 #ifndef SWDS
 #include "client.h"
 #endif
-void CModelLoader::DebugPrintDynamicModels()
-{
-	Msg( "network table (server):\n" );
-	if ( sv.GetDynamicModelsTable() )
-	{
-		for ( int i = 0; i < sv.GetDynamicModelsTable()->GetNumStrings(); ++i )
-		{
-			int dummy = 0;
-			char* data = (char*) sv.GetDynamicModelsTable()->GetStringUserData( i, &dummy );
-			bool bLoadedOnServer = !(data && dummy && data[0] == 0);
-			Msg( "%3i: %c %s\n", i, bLoadedOnServer ? '*' : ' ', sv.GetDynamicModelsTable()->GetString(i) );
-		}
-	}
-
-#ifndef SWDS
-	Msg( "\nnetwork table (client):\n" );
-	if ( cl.m_pDynamicModelsTable )
-	{
-		for ( int i = 0; i < cl.m_pDynamicModelsTable->GetNumStrings(); ++i )
-		{
-			int dummy = 0;
-			char* data = (char*) cl.m_pDynamicModelsTable->GetStringUserData( i, &dummy );
-			bool bLoadedOnServer = !(data && dummy && data[0] == 0);
-			Msg( "%3i: %c %s\n", i, bLoadedOnServer ? '*' : ' ', cl.m_pDynamicModelsTable->GetString(i) );
-		}
-	}
-#endif
-
-	extern IVModelInfo *modelinfo;
-	extern IVModelInfoClient *modelinfoclient;
-	Msg( "\ndynamic models:\n" );
-	for ( UtlHashHandle_t h = m_DynamicModels.FirstHandle(); h != m_DynamicModels.InvalidHandle(); h = m_DynamicModels.NextHandle(h) )
-	{
-		CDynamicModelInfo &dyn = m_DynamicModels[h];
-		int idx = modelinfo->GetModelIndex( m_DynamicModels.Key(h)->strName );
-#ifndef SWDS
-		if ( idx == -1 ) idx = modelinfoclient->GetModelIndex( m_DynamicModels.Key(h)->strName );
-#endif
-		Msg( "%d (%d%c): %s [ref: %d (%dc)] %s%s%s%s\n", idx, ((-2 - idx) >> 1), (idx & 1) ? 'c' : 's',
-			m_DynamicModels.Key(h)->strName.String(), dyn.m_iRefCount, dyn.m_iClientRefCount,
-			(dyn.m_nLoadFlags & CDynamicModelInfo::QUEUED) ? " QUEUED" : "",
-			(dyn.m_nLoadFlags & CDynamicModelInfo::LOADING) ? " LOADING" : "",
-			(dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY) ? " CLIENTREADY" : "",
-			(dyn.m_nLoadFlags & CDynamicModelInfo::ALLREADY) ? " ALLREADY" : "" );
-	}
-}
+//void CModelLoader::DebugPrintDynamicModels()
+//{
+//	Msg( "network table (server):\n" );
+//	if ( sv.GetDynamicModelsTable() )
+//	{
+//		for ( int i = 0; i < sv.GetDynamicModelsTable()->GetNumStrings(); ++i )
+//		{
+//			int dummy = 0;
+//			char* data = (char*) sv.GetDynamicModelsTable()->GetStringUserData( i, &dummy );
+//			bool bLoadedOnServer = !(data && dummy && data[0] == 0);
+//			Msg( "%3i: %c %s\n", i, bLoadedOnServer ? '*' : ' ', sv.GetDynamicModelsTable()->GetString(i) );
+//		}
+//	}
+//
+//#ifndef SWDS
+//	Msg( "\nnetwork table (client):\n" );
+//	if ( cl.m_pDynamicModelsTable )
+//	{
+//		for ( int i = 0; i < cl.m_pDynamicModelsTable->GetNumStrings(); ++i )
+//		{
+//			int dummy = 0;
+//			char* data = (char*) cl.m_pDynamicModelsTable->GetStringUserData( i, &dummy );
+//			bool bLoadedOnServer = !(data && dummy && data[0] == 0);
+//			Msg( "%3i: %c %s\n", i, bLoadedOnServer ? '*' : ' ', cl.m_pDynamicModelsTable->GetString(i) );
+//		}
+//	}
+//#endif
+//
+//	extern IVModelInfo *modelinfo;
+//	extern IVModelInfoClient *modelinfoclient;
+//	Msg( "\ndynamic models:\n" );
+//	for ( UtlHashHandle_t h = m_DynamicModels.FirstHandle(); h != m_DynamicModels.InvalidHandle(); h = m_DynamicModels.NextHandle(h) )
+//	{
+//		CDynamicModelInfo &dyn = m_DynamicModels[h];
+//		int idx = modelinfo->GetModelIndex( m_DynamicModels.Key(h)->strName );
+//#ifndef SWDS
+//		if ( idx == -1 ) idx = modelinfoclient->GetModelIndex( m_DynamicModels.Key(h)->strName );
+//#endif
+//		Msg( "%d (%d%c): %s [ref: %d (%dc)] %s%s%s%s\n", idx, ((-2 - idx) >> 1), (idx & 1) ? 'c' : 's',
+//			m_DynamicModels.Key(h)->strName.String(), dyn.m_iRefCount, dyn.m_iClientRefCount,
+//			(dyn.m_nLoadFlags & CDynamicModelInfo::QUEUED) ? " QUEUED" : "",
+//			(dyn.m_nLoadFlags & CDynamicModelInfo::LOADING) ? " LOADING" : "",
+//			(dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY) ? " CLIENTREADY" : "",
+//			(dyn.m_nLoadFlags & CDynamicModelInfo::ALLREADY) ? " ALLREADY" : "" );
+//	}
+//}

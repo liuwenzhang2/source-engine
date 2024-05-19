@@ -722,7 +722,7 @@ void CEnvBeam::BeamUpdateVars( void )
 		Assert(0);
 	}
 
-	SetModelName( m_iszSpriteName );
+	GetEngineObject()->SetModelName( m_iszSpriteName );
 	SetTexture( m_spriteTexture );
 
 	SetType( BEAM_ENTPOINT );

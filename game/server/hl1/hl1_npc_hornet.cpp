@@ -129,7 +129,7 @@ void CNPC_Hornet::Precache()
 //=========================================================
 Disposition_t CNPC_Hornet::IRelationType( CBaseEntity *pTarget )
 {
-	if ( pTarget->GetModelIndex() == GetModelIndex() )
+	if ( pTarget->GetEngineObject()->GetModelIndex() == GetEngineObject()->GetModelIndex() )
 	{
 		return D_NU;
 	}
@@ -250,7 +250,7 @@ void CNPC_Hornet::TrackTouch ( CBaseEntity *pOther )
 		return;
 	}
 
-	if ( pOther == GetOwnerEntity() || pOther->GetModelIndex() == GetModelIndex() )
+	if ( pOther == GetOwnerEntity() || pOther->GetEngineObject()->GetModelIndex() == GetEngineObject()->GetModelIndex() )
 	{// bumped into the guy that shot it.
 		//SetSolid( SOLID_NOT );
 		return;

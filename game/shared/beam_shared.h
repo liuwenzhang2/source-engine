@@ -301,7 +301,7 @@ inline void CBeam::SetEndAttachment( int attachment )
 
 inline void CBeam::SetTexture( int spriteIndex )		
 { 
-	SetModelIndex( spriteIndex ); 
+	GetEngineObject()->SetModelIndex( spriteIndex );
 }
 
 inline void CBeam::SetHaloTexture( int spriteIndex )	
@@ -390,7 +390,7 @@ inline int CBeam::GetEndAttachment() const
 
 inline int CBeam::GetTexture( void )		
 { 
-	return GetModelIndex(); 
+	return GetEngineObject()->GetModelIndex();
 }
 
 inline float CBeam::GetWidth( void ) const		

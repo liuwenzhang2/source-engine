@@ -1445,7 +1445,7 @@ int C_RopeKeyframe::DrawModel( int flags )
 	if ( m_hStartPoint && m_hStartPoint->IsDormant() && m_hEndPoint && m_hEndPoint->IsDormant() )
 	{
 		// Check models because rope endpoints are point entities
-		if ( m_hStartPoint->GetModelIndex() && m_hEndPoint->GetModelIndex() )
+		if ( m_hStartPoint->GetEngineObject()->GetModelIndex() && m_hEndPoint->GetEngineObject()->GetModelIndex() )
 			return 0;
 	}
 

@@ -82,11 +82,11 @@ void CNPC_Eli::Spawn()
 {
 	// Eli is allowed to use multiple models, because he appears in the pod.
 	// He defaults to his normal model.
-	char *szModel = (char *)STRING( GetModelName() );
+	char *szModel = (char *)STRING(GetEngineObject()->GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = "models/eli.mdl";
-		SetModelName( AllocPooledString(szModel) );
+		GetEngineObject()->SetModelName( AllocPooledString(szModel) );
 	}
 
 	Precache();
@@ -126,7 +126,7 @@ void CNPC_Eli::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Eli::Precache()
 {
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	BaseClass::Precache();
 }	
 

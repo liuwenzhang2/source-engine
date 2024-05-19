@@ -1191,8 +1191,8 @@ void UTIL_SetModel( CBaseEntity *pEntity, const char *pModelName )
 		pAnimating->m_nForceBone = 0;
 	}
 
-	pEntity->SetModelName( AllocPooledString( pModelName ) );
-	pEntity->SetModelIndex( i ) ;
+	pEntity->GetEngineObject()->SetModelName( AllocPooledString( pModelName ) );
+	pEntity->GetEngineObject()->SetModelIndex( i ) ;
 	SetMinMaxSize(pEntity, vec3_origin, vec3_origin);
 	pEntity->SetCollisionBoundsFromModel();
 }
@@ -1665,7 +1665,7 @@ void UTIL_PrecacheOther( const char *szClassname, const char *modelName )
 	// If we have a specified model, set it before calling precache
 	if ( modelName && modelName[0] )
 	{
-		pEntity->SetModelName( AllocPooledString( modelName ) );
+		pEntity->GetEngineObject()->SetModelName( AllocPooledString( modelName ) );
 	}
 	
 	if (pEntity)

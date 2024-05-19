@@ -57,7 +57,7 @@ void CFuncPortalDetector::Spawn()
 	}
 
 	// Bind to our model, cause we need the extents for bounds checking
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetRenderMode( kRenderNone );	// Don't draw
 	SetSolid( SOLID_VPHYSICS );		// we may want slanted walls, so we'll use OBB
 	AddSolidFlags( FSOLID_NOT_SOLID );

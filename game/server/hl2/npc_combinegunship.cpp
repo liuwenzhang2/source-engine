@@ -2525,7 +2525,7 @@ void CNPC_CombineGunship::SelfDestruct( void )
 	{
 		Vector angVelocity;
 		QAngleToAngularImpulse( pBreakEnt->GetLocalAngularVelocity(), angVelocity );
-		PropBreakableCreateAll( pBreakEnt->GetModelIndex(), pBreakEnt->VPhysicsGetObject(), pBreakEnt->GetEngineObject()->GetAbsOrigin(), pBreakEnt->GetEngineObject()->GetAbsAngles(), pBreakEnt->GetEngineObject()->GetAbsVelocity(), angVelocity, 1.0, 800, COLLISION_GROUP_NPC, pBreakEnt );
+		PropBreakableCreateAll( pBreakEnt->GetEngineObject()->GetModelIndex(), pBreakEnt->VPhysicsGetObject(), pBreakEnt->GetEngineObject()->GetAbsOrigin(), pBreakEnt->GetEngineObject()->GetAbsAngles(), pBreakEnt->GetEngineObject()->GetAbsVelocity(), angVelocity, 1.0, 800, COLLISION_GROUP_NPC, pBreakEnt );
 
 		// Throw out some small chunks too
 		CPVSFilter filter(GetEngineObject()->GetAbsOrigin() );

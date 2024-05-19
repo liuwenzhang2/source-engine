@@ -110,7 +110,7 @@ bool CBoneFollowerManager::CreatePhysicsFollower( CBaseAnimating *pParentEntity,
 		int physicsBone = pBone->physicsbone;
 		if ( !pSolid )
 		{
-			if ( !PhysModelParseSolidByIndex( solidTmp, pParentEntity, pParentEntity->GetModelIndex(), physicsBone ) )
+			if ( !PhysModelParseSolidByIndex( solidTmp, pParentEntity, pParentEntity->GetEngineObject()->GetModelIndex(), physicsBone ) )
 				return false;
 			pSolid = &solidTmp;
 		}
@@ -125,7 +125,7 @@ bool CBoneFollowerManager::CreatePhysicsFollower( CBaseAnimating *pParentEntity,
 		pParentEntity->GetBoneTransform( follow.boneIndex, boneToWorld );
 		MatrixAngles( boneToWorld, boneAngles, bonePosition );
 
-		follow.hFollower = CBoneFollower::Create( pParentEntity, STRING(pParentEntity->GetModelName()), *pSolid, bonePosition, boneAngles );
+		follow.hFollower = CBoneFollower::Create( pParentEntity, STRING(pParentEntity->GetEngineObject()->GetModelName()), *pSolid, bonePosition, boneAngles );
 		follow.hFollower->SetTraceData( physicsBone, HitGroupFromPhysicsBone( pParentEntity, physicsBone ) );
 		follow.hFollower->SetBlocksLOS( pParentEntity->BlocksLOS() );
 		return true;
@@ -352,7 +352,7 @@ void CBoneFollower::VPhysicsFriction( IPhysicsObject *pObject, float energy, int
 
 bool CBoneFollower::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& trace )
 {
-	vcollide_t *pCollide = modelinfo->GetVCollide( GetModelIndex() );
+	vcollide_t *pCollide = modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() );
 	Assert( pCollide && pCollide->solidCount > m_solidIndex );
 
 	UTIL_ClearTrace( trace );
@@ -473,7 +473,7 @@ void CreateBoneFollowersFromRagdoll( CBaseAnimating *pEntity, CBoneFollowerManag
 			pParse->ParseSolid( &solid, NULL );
 			// collisions are off by default, turn them on
 			solid.params.enableCollisions = true;
-			solid.params.pName = STRING(pEntity->GetModelName());
+			solid.params.pName = STRING(pEntity->GetEngineObject()->GetModelName());
 
 			pManager->AddBoneFollower( pEntity, solid.name, &solid );
 		}

@@ -232,7 +232,7 @@ CNPC_Portal_FloorTurret::CNPC_Portal_FloorTurret( void )
 
 void CNPC_Portal_FloorTurret::Precache( void )
 {
-	SetModelName( MAKE_STRING( FLOOR_TURRET_PORTAL_MODEL ) );
+	GetEngineObject()->SetModelName( MAKE_STRING( FLOOR_TURRET_PORTAL_MODEL ) );
 
 	BaseClass::Precache();
 

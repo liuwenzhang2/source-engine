@@ -525,7 +525,7 @@ float CAI_Expresser::GetResponseDuration( AI_Response *result )
 		break;
 	case RESPONSE_SPEAK:
 		{
-			return g_pSoundEmitterSystem->GetSoundDuration( response, STRING( GetOuter()->GetModelName() ) );
+			return g_pSoundEmitterSystem->GetSoundDuration( response, STRING( GetOuter()->GetEngineObject()->GetModelName() ) );
 		}
 		break;
 	case RESPONSE_SENTENCE:

@@ -114,11 +114,11 @@ void CPropTelescopicArm::UpdateOnRemove( void )
 
 void CPropTelescopicArm::Spawn( void )
 {
-	char *szModel = (char *)STRING( GetModelName() );
+	char *szModel = (char *)STRING(GetEngineObject()->GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = TELESCOPING_ARM_MODEL_NAME;
-		SetModelName( AllocPooledString(szModel) );
+		GetEngineObject()->SetModelName( AllocPooledString(szModel) );
 	}
 
 	Precache();
@@ -185,7 +185,7 @@ void CPropTelescopicArm::Precache( void )
 {
 	BaseClass::Precache();
 
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_hit" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_ambient" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_dust" );

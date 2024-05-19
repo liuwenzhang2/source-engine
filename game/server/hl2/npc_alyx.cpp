@@ -139,7 +139,7 @@ void CNPC_Alyx::Precache()
 {
 	BaseClass::Precache();
 	g_pSoundEmitterSystem->PrecacheScriptSound( "npc_alyx.die" );
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	engine->PrecacheModel( "models/alyx_emptool_prop.mdl" );
 }	
 
@@ -150,10 +150,10 @@ void CNPC_Alyx::SelectModel()
 {
 	// Alyx is allowed to use multiple models, because she appears in the pod.
 	// She defaults to her normal model.
-	const char *szModel = STRING( GetModelName() );
+	const char *szModel = STRING(GetEngineObject()->GetModelName() );
 	if (!szModel || !*szModel)
 	{
-		SetModelName( AllocPooledString("models/alyx.mdl") );
+		GetEngineObject()->SetModelName( AllocPooledString("models/alyx.mdl") );
 	}
 }
 

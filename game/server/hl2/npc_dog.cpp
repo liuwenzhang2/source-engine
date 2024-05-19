@@ -1120,7 +1120,7 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 		Vector center = pEnt->WorldSpaceCenter();
 		flDist = UTIL_DistApprox2D(GetEngineObject()->GetAbsOrigin(), center );
 
-		vcollide_t *pCollide = modelinfo->GetVCollide( pEnt->GetModelIndex() );
+		vcollide_t *pCollide = modelinfo->GetVCollide( pEnt->GetEngineObject()->GetModelIndex() );
 
 		if ( pCollide == NULL )
 			 continue;

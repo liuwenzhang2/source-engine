@@ -278,11 +278,11 @@ void CCSPlayerAnimState::InitCS( CBaseAnimatingOverlay *pEntity, ICSPlayerAnimSt
 //--------------------------------------------------------------------------------------------------------------
 void CCSPlayerAnimState::CheckCachedSequenceValidity( void )
 {
-	if ( m_cachedModelIndex != GetOuter()->GetModelIndex() )
+	if ( m_cachedModelIndex != GetOuter()->GetEngineObject()->GetModelIndex() )
 	{
 		m_namedSequence.RemoveAll();
 
-		m_cachedModelIndex = GetOuter()->GetModelIndex();
+		m_cachedModelIndex = GetOuter()->GetEngineObject()->GetModelIndex();
 		for ( int i=0; i<=ACT_CROUCHIDLE; ++i )
 		{
 			m_sequenceCache[i] = -1;

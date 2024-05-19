@@ -164,6 +164,8 @@ public:
 		touchStamp = 0;
 		SetCheckUntouch(false);
 		m_fDataObjectTypes = 0;
+		SetModelName(NULL_STRING);
+		m_nModelIndex = 0;
 	}
 
 	void Init(C_BaseEntity* pOuter) {
@@ -369,6 +371,7 @@ public:
 			m_pIntermediateData[i] = NULL;
 			m_pOuterIntermediateData[i] = NULL;
 		}
+		m_nModelIndex = 0;
 	}
 
 	// Invalidates the abs state of all children
@@ -400,6 +403,11 @@ public:
 	void SetGroundEntity(IEngineObjectClient* ground);
 	C_EngineObjectInternal* GetGroundEntity(void);
 	C_EngineObjectInternal* GetGroundEntity(void) const { return const_cast<C_EngineObjectInternal*>(this)->GetGroundEntity(); }
+
+	void SetModelName(string_t name);
+	string_t GetModelName(void) const;
+	int GetModelIndex(void) const;
+	void SetModelIndex(int index);
 
 private:
 
@@ -456,6 +464,9 @@ private:
 	int								m_fDataObjectTypes;
 
 	EHANDLE							m_hGroundEntity;
+	string_t						m_ModelName;
+	// Object model index
+	short							m_nModelIndex;
 
 };
 
@@ -598,6 +609,11 @@ inline int	C_EngineObjectInternal::GetTouchStamp()
 inline void C_EngineObjectInternal::ClearTouchStamp()
 {
 	touchStamp = 0;
+}
+
+inline int C_EngineObjectInternal::GetModelIndex(void) const
+{
+	return m_nModelIndex;
 }
 
 
@@ -842,7 +858,7 @@ void CClientEntityList<T>::SaveEntityOnTable(T* pEntity, CSaveRestoreData* pSave
 #else
 	pEntInfo->edictindex = -1;
 #endif
-	pEntInfo->modelname = pEntity->GetModelName();
+	pEntInfo->modelname = pEntity->GetEngineObject()->GetModelName();
 	pEntInfo->restoreentityindex = -1;
 	pEntInfo->saveentityindex = pEntity && pEntity->IsNetworkable() ? pEntity->entindex() : -1;
 	pEntInfo->hEnt = pEntity->GetRefEHandle();

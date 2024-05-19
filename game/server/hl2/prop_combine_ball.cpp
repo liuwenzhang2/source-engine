@@ -1838,7 +1838,7 @@ void CFuncCombineBallSpawner::Spawn()
 	Precache();
 
 	AddEffects( EF_NODRAW );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetSolid( SOLID_BSP );
 	AddSolidFlags( FSOLID_NOT_SOLID );
 	m_nBallsRemainingInField = m_nBallCount;

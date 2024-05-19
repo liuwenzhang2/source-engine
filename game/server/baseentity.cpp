@@ -253,7 +253,6 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt			(SENDINFO(m_flSimulationTime),	SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_SimulationTime),
 
 	SendPropInt		(SENDINFO( m_ubInterpolationFrame ), NOINTERP_PARITY_MAX_BITS, SPROP_UNSIGNED ),
-	SendPropModelIndex(SENDINFO(m_nModelIndex)),
 	SendPropDataTable( SENDINFO_DT( m_Collision ), &REFERENCE_SEND_TABLE(DT_CollisionProperty) ),
 	SendPropInt		(SENDINFO(m_nRenderFX),		8, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_nRenderMode),	8, SPROP_UNSIGNED ),
@@ -287,36 +286,36 @@ END_SEND_TABLE()
 
 
 // dynamic models
-class CBaseEntityModelLoadProxy
-{
-protected:
-	class Handler : public IModelLoadCallback
-	{
-	public:
-		explicit Handler( CBaseEntity *pEntity ) : m_pEntity(pEntity) { }
-		virtual void OnModelLoadComplete( const model_t *pModel );
-		CBaseEntity* m_pEntity;
-	};
-	Handler* m_pHandler;
+//class CBaseEntityModelLoadProxy
+//{
+//protected:
+//	class Handler : public IModelLoadCallback
+//	{
+//	public:
+//		explicit Handler( CBaseEntity *pEntity ) : m_pEntity(pEntity) { }
+//		virtual void OnModelLoadComplete( const model_t *pModel );
+//		CBaseEntity* m_pEntity;
+//	};
+//	Handler* m_pHandler;
+//
+//public:
+//	explicit CBaseEntityModelLoadProxy( CBaseEntity *pEntity ) : m_pHandler( new Handler( pEntity ) ) { }
+//	~CBaseEntityModelLoadProxy() { delete m_pHandler; }
+//	void Register( int nModelIndex ) const { modelinfo->RegisterModelLoadCallback( nModelIndex, m_pHandler ); }
+//	operator CBaseEntity * () const { return m_pHandler->m_pEntity; }
+//
+//private:
+//	CBaseEntityModelLoadProxy( const CBaseEntityModelLoadProxy& );
+//	CBaseEntityModelLoadProxy& operator=( const CBaseEntityModelLoadProxy& );
+//};
 
-public:
-	explicit CBaseEntityModelLoadProxy( CBaseEntity *pEntity ) : m_pHandler( new Handler( pEntity ) ) { }
-	~CBaseEntityModelLoadProxy() { delete m_pHandler; }
-	void Register( int nModelIndex ) const { modelinfo->RegisterModelLoadCallback( nModelIndex, m_pHandler ); }
-	operator CBaseEntity * () const { return m_pHandler->m_pEntity; }
+//static CUtlHashtable< CBaseEntityModelLoadProxy, empty_t, PointerHashFunctor, PointerEqualFunctor, CBaseEntity * > sg_DynamicLoadHandlers;
 
-private:
-	CBaseEntityModelLoadProxy( const CBaseEntityModelLoadProxy& );
-	CBaseEntityModelLoadProxy& operator=( const CBaseEntityModelLoadProxy& );
-};
-
-static CUtlHashtable< CBaseEntityModelLoadProxy, empty_t, PointerHashFunctor, PointerEqualFunctor, CBaseEntity * > sg_DynamicLoadHandlers;
-
-void CBaseEntityModelLoadProxy::Handler::OnModelLoadComplete( const model_t *pModel )
-{
-	m_pEntity->OnModelLoadComplete( pModel );
-	sg_DynamicLoadHandlers.Remove( m_pEntity ); // NOTE: destroys *this!
-}
+//void CBaseEntityModelLoadProxy::Handler::OnModelLoadComplete( const model_t *pModel )
+//{
+//	m_pEntity->OnModelLoadComplete( pModel );
+//	sg_DynamicLoadHandlers.Remove( m_pEntity ); // NOTE: destroys *this!
+//}
 
 
 
@@ -365,11 +364,9 @@ CBaseEntity::CBaseEntity()
 	SetSolid( SOLID_NONE );
 	ClearSolidFlags();
 
-	m_nModelIndex = 0;
-	m_ModelName = NULL_STRING;
-	m_bDynamicModelAllowed = false;
-	m_bDynamicModelPending = false;
-	m_bDynamicModelSetBounds = false;
+	//m_bDynamicModelAllowed = false;
+	//m_bDynamicModelPending = false;
+	//m_bDynamicModelSetBounds = false;
 
 	SetMoveType( MOVETYPE_NONE );
 	SetOwnerEntity( NULL );
@@ -555,16 +552,16 @@ void CBaseEntity::UpdateOnRemove(void)
 
 	GetEngineObject()->SetGroundEntity(NULL);
 
-	if (m_bDynamicModelPending)
-	{
-		sg_DynamicLoadHandlers.Remove(this);
-	}
+	//if (m_bDynamicModelPending)
+	//{
+	//	sg_DynamicLoadHandlers.Remove(this);
+	//}
 
-	if (IsDynamicModelIndex(m_nModelIndex))
-	{
-		modelinfo->ReleaseDynamicModel(m_nModelIndex); // no-op if not dynamic
-		m_nModelIndex = -1;
-	}
+	//if (IsDynamicModelIndex(m_nModelIndex))
+	//{
+	//	modelinfo->ReleaseDynamicModel(m_nModelIndex); // no-op if not dynamic
+	//	m_nModelIndex = -1;
+	//}
 
 	// Need to remove references to this entity before EHANDLES go null
 	{
@@ -586,8 +583,8 @@ CBaseEntity::~CBaseEntity( )
 	// case where friction sounds are added between the call to UpdateOnRemove + ~CBaseEntity
 	PhysCleanupFrictionSounds( this );
 
-	Assert( !IsDynamicModelIndex( m_nModelIndex ) );
-	Verify( !sg_DynamicLoadHandlers.Remove( this ) );
+	//Assert( !IsDynamicModelIndex( m_nModelIndex ) );
+	//Verify( !sg_DynamicLoadHandlers.Remove( this ) );
 
 	// In debug make sure that we don't call delete on an entity without setting
 	//  the disable flag first!
@@ -658,41 +655,6 @@ CBaseEntity *CBaseEntity::GetFollowedEntity()
 	if (!IsFollowingEntity())
 		return NULL;
 	return GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL;
-}
-
-void CBaseEntity::SetModelIndex( int index )
-{
-	if ( IsDynamicModelIndex( index ) && !(GetBaseAnimating() && m_bDynamicModelAllowed) )
-	{
-		AssertMsg( false, "dynamic model support not enabled on server entity" );
-		index = -1;
-	}
-
-	if ( index != m_nModelIndex )
-	{
-		if ( m_bDynamicModelPending )
-		{
-			sg_DynamicLoadHandlers.Remove( this );
-		}
-		
-		modelinfo->ReleaseDynamicModel( m_nModelIndex );
-		modelinfo->AddRefDynamicModel( index );
-		m_nModelIndex = index;
-		
-		m_bDynamicModelSetBounds = false;
-
-		if ( IsDynamicModelIndex( index ) )
-		{
-			m_bDynamicModelPending = true;
-			sg_DynamicLoadHandlers[ sg_DynamicLoadHandlers.Insert( this ) ].Register( index );
-		}
-		else
-		{
-			m_bDynamicModelPending = false;
-			OnNewModel();
-		}
-	}
-	DispatchUpdateTransmitState();
 }
 
 void CBaseEntity::ClearModelIndexOverrides( void )
@@ -1061,9 +1023,9 @@ int CBaseEntity::DrawDebugTextOverlays(void)
 		EntityText( offset, tempstr, 0 );
 		offset++;
 
-		if( GetModelName() != NULL_STRING || GetBaseAnimating() )
+		if(GetEngineObject()->GetModelName() != NULL_STRING || GetBaseAnimating() )
 		{
-			Q_snprintf(tempstr, sizeof(tempstr), "Model:%s", STRING(GetModelName()) );
+			Q_snprintf(tempstr, sizeof(tempstr), "Model:%s", STRING(GetEngineObject()->GetModelName()) );
 			EntityText(offset,tempstr,0);
 			offset++;
 		}
@@ -1719,7 +1681,6 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_KEYFIELD( m_nNextThinkTick, FIELD_TICK, "nextthink" ),
 	DEFINE_KEYFIELD( m_fEffects, FIELD_INTEGER, "effects" ),
 	DEFINE_KEYFIELD( m_clrRender, FIELD_COLOR32, "rendercolor" ),
-	DEFINE_GLOBAL_KEYFIELD( m_nModelIndex, FIELD_SHORT, "modelindex" ),
 //#if !defined( NO_ENTITY_PREDICTION )
 //	DEFINE_FIELD( m_PredictableID, CPredictableId ),
 //#endif
@@ -1773,7 +1734,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 //	DEFINE_FIELD( m_bSentLastFrame, FIELD_INTEGER ),
 
 	DEFINE_FIELD( m_flGroundChangeTime, FIELD_TIME ),
-	DEFINE_GLOBAL_KEYFIELD( m_ModelName, FIELD_MODELNAME, "model" ),
+	//DEFINE_GLOBAL_KEYFIELD( m_ModelName, FIELD_MODELNAME, "model" ),
 	
 	DEFINE_KEYFIELD( m_vecBaseVelocity, FIELD_VECTOR, "basevelocity" ),
 	//DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsVelocity, engineObjectFuncs),
@@ -1898,7 +1859,7 @@ END_DATADESC()
 int CBaseEntity::ObjectCaps( void ) 
 {
 #if 1
-	model_t *pModel = GetModel();
+	const model_t *pModel = GetModel();
 	bool bIsBrush = ( pModel && modelinfo->GetModelType( pModel ) == mod_brush );
 
 	// We inherit our parent's use capabilities so that we can forward use commands
@@ -2844,7 +2805,7 @@ bool CBaseEntity::IsViewable( void )
 			return true;
 		}
 	}
-	else if (GetModelIndex() != 0)
+	else if (GetEngineObject()->GetModelIndex() != 0)
 	{
 		// check for total transparency???
 		return true;
@@ -2969,12 +2930,12 @@ int CBaseEntity::Restore( IRestore &restore )
 	GetEngineObject()->RemoveEFlags( EFL_DIRTY_SPATIAL_PARTITION );
 	CollisionProp()->MarkSurroundingBoundsDirty();
 
-	if (IsNetworkable() && entindex()!=-1 && GetModelIndex() != 0 && GetModelName() != NULL_STRING && restore.GetPrecacheMode())
+	if (IsNetworkable() && entindex()!=-1 && GetEngineObject()->GetModelIndex() != 0 && GetEngineObject()->GetModelName() != NULL_STRING && restore.GetPrecacheMode())
 	{
-		engine->PrecacheModel( STRING( GetModelName() ) );
+		engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
 		//Adrian: We should only need to do this after we precache. No point in setting the model again.
-		SetModelIndex( modelinfo->GetModelIndex( STRING(GetModelName() ) ) );
+		GetEngineObject()->SetModelIndex( modelinfo->GetModelIndex( STRING(GetEngineObject()->GetModelName() ) ) );
 	}
 
 	// Restablish ground entity
@@ -3263,14 +3224,14 @@ int CBaseEntity::UpdateTransmitState()
 
 	if ( !GetEngineObject()->IsEFlagSet( EFL_FORCE_CHECK_TRANSMIT ) )
 	{
-		if ( !GetModelIndex() || !GetModelName() )
+		if ( !GetEngineObject()->GetModelIndex() || !GetEngineObject()->GetModelName() )
 		{
 			return SetTransmitState( FL_EDICT_DONTSEND );
 		}
 	}
 
 	// Always send the world
-	if ( GetModelIndex() == 1 )
+	if (GetEngineObject()->GetModelIndex() == 1 )
 	{
 		return SetTransmitState( FL_EDICT_ALWAYS );
 	}
@@ -4034,6 +3995,14 @@ void CBaseEntity::SetModel( const char *szModelName )
 	UTIL_SetModel( this, szModelName );
 }
 
+void CBaseEntity::SetModelPointer(const model_t* pModel)
+{
+	if (m_pModel != pModel)
+	{
+		m_pModel = pModel;
+		OnNewModel();
+	}
+}
 //------------------------------------------------------------------------------
 
 CStudioHdr *CBaseEntity::OnNewModel()
@@ -5434,9 +5403,9 @@ static ConCommand ent_step("ent_step", CC_Ent_Step, "When 'ent_pause' is set thi
 
 
 
-model_t *CBaseEntity::GetModel( void )
+const model_t *CBaseEntity::GetModel( void ) const
 {
-	return (model_t *)modelinfo->GetModel( GetModelIndex() );
+	return m_pModel;
 }
 
 
@@ -6629,31 +6598,31 @@ void CBaseEntity::IncrementInterpolationFrame()
 
 //------------------------------------------------------------------------------
 
-void CBaseEntity::OnModelLoadComplete( const model_t* model )
-{
-	Assert( m_bDynamicModelPending && IsDynamicModelIndex( m_nModelIndex ) );
-	Assert( model == modelinfo->GetModel( m_nModelIndex ) );
-	
-	m_bDynamicModelPending = false;
-	
-	if ( m_bDynamicModelSetBounds )
-	{
-		m_bDynamicModelSetBounds = false;
-		SetCollisionBoundsFromModel();
-	}
-
-	OnNewModel();
-}
+//void CBaseEntity::OnModelLoadComplete( const model_t* model )
+//{
+//	Assert( m_bDynamicModelPending && IsDynamicModelIndex( m_nModelIndex ) );
+//	Assert( model == modelinfo->GetModel( m_nModelIndex ) );
+//	
+//	m_bDynamicModelPending = false;
+//	
+//	if ( m_bDynamicModelSetBounds )
+//	{
+//		m_bDynamicModelSetBounds = false;
+//		SetCollisionBoundsFromModel();
+//	}
+//
+//	OnNewModel();
+//}
 
 //------------------------------------------------------------------------------
 
 void CBaseEntity::SetCollisionBoundsFromModel()
 {
-	if ( IsDynamicModelLoading() )
-	{
-		m_bDynamicModelSetBounds = true;
-		return;
-	}
+	//if ( IsDynamicModelLoading() )
+	//{
+	//	m_bDynamicModelSetBounds = true;
+	//	return;
+	//}
 
 	if ( const model_t *pModel = GetModel() )
 	{

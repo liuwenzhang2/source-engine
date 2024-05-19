@@ -48,7 +48,7 @@ void CFuncBrush::Spawn( void )
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	if ( m_iDisabled )
 		TurnOff();
@@ -76,7 +76,7 @@ bool CFuncBrush::CreateVPhysics( void )
 	IPhysicsObject *pPhys = VPhysicsInitShadow(false, false);
 	if ( pPhys )
 	{
-		int contents = modelinfo->GetModelContents( GetModelIndex() );
+		int contents = modelinfo->GetModelContents(GetEngineObject()->GetModelIndex() );
 		if ( ! (contents & (MASK_SOLID|MASK_PLAYERSOLID|MASK_NPCSOLID)) )
 		{
 			// leave the physics shadow there in case it has crap constrained to it
@@ -280,7 +280,7 @@ void CTriggerBrush::Spawn( void )
 	AddSolidFlags( FSOLID_TRIGGER );
 	SetMoveType( MOVETYPE_NONE );
 
-	SetModel( STRING( GetModelName() ) );    // set size and link into world
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 
 	if ( !showtriggers.GetInt() )
 	{

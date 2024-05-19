@@ -181,7 +181,7 @@ void CNPC_PlayerCompanion::Precache()
 	gm_iszShotgunClassname = AllocPooledString( "weapon_shotgun" );
 	gm_iszRollerMineClassname = AllocPooledString( "npc_rollermine" );
 
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 #ifdef HL2_EPISODIC
 	// The flare we're able to pull out
@@ -199,7 +199,7 @@ void CNPC_PlayerCompanion::Spawn()
 
 	Precache();
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	SetHullType(HULL_HUMAN);
 	SetHullSizeNormal();

@@ -566,14 +566,14 @@ void CNPC_MetroPolice::Precache( void )
 {
 	if ( HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
 	{
-		SetModelName( AllocPooledString("models/police_cheaple.mdl" ) );
+		GetEngineObject()->SetModelName( AllocPooledString("models/police_cheaple.mdl" ) );
 	}
 	else
 	{
-		SetModelName( AllocPooledString("models/police.mdl") );
+		GetEngineObject()->SetModelName( AllocPooledString("models/police.mdl") );
 	}
 
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	UTIL_PrecacheOther( "npc_manhack" );
 
@@ -613,7 +613,7 @@ void CNPC_MetroPolice::Spawn( void )
 	AddSpawnFlags( SF_NPC_FADE_CORPSE );
 #endif // _XBOX
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	SetHullType(HULL_HUMAN);
 	SetHullSizeNormal();

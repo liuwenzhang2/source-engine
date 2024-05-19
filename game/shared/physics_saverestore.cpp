@@ -328,7 +328,7 @@ public:
 #if !defined( CLIENT_DLL )
 				if ( NULL_STRING != pGlobalEntity->GetEngineObject()->GetGlobalname() )
 				{
-					modelIndex = pGlobalEntity->GetModelIndex();
+					modelIndex = pGlobalEntity->GetEngineObject()->GetModelIndex();
 				}
 				else
 #endif

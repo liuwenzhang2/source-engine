@@ -386,7 +386,7 @@ void CBaseButton::Spawn( )
 
 	SetMoveType( MOVETYPE_PUSH );
 	SetSolid( SOLID_BSP );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	if (m_flSpeed == 0)
 	{
@@ -875,7 +875,7 @@ void CRotButton::Spawn( void )
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	if (m_flSpeed == 0)
 		m_flSpeed = 40;
@@ -1053,7 +1053,7 @@ void CMomentaryRotButton::Spawn( void )
 	}
 
 	SetMoveType( MOVETYPE_PUSH );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	CreateVPhysics();
 

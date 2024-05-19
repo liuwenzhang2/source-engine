@@ -425,9 +425,7 @@ public:
 
 // IServerEntity overrides.
 public:
-	virtual void			SetModelIndex( int index );
-	virtual int				GetModelIndex( void ) const;
- 	virtual string_t		GetModelName( void ) const;
+
 
 	void					ClearModelIndexOverrides( void );
 	virtual void			SetModelIndexOverride( int index, int nValue );
@@ -556,8 +554,9 @@ public:
 	virtual void Spawn( void );
 	virtual void Precache( void ) {}
 
+	const model_t* GetModel(void) const;
 	virtual void SetModel( const char *szModelName );
-
+	void SetModelPointer(const model_t* pModel);
 protected:
 	// Notification on model load. May be called multiple times for dynamic models.
 	// Implementations must call BaseClass::OnNewModel and pass return value through.
@@ -836,7 +835,6 @@ public:
 	CNetworkVar( unsigned char, m_nRenderFX );
 	// was pev->rendermode
 	CNetworkVar( unsigned char, m_nRenderMode );
-	CNetworkVar( short, m_nModelIndex );
 	
 #ifdef TF_DLL
 	CNetworkArray( int, m_nModelIndexOverrides, MAX_VISION_MODES ); // used to override the base model index on the client if necessary
@@ -851,6 +849,8 @@ public:
 	void SetRenderColorG( byte g );
 	void SetRenderColorB( byte b );
 	void SetRenderColorA( byte a );
+
+	const model_t* m_pModel;
 
 	// was pev->animtime:  consider moving to CBaseAnimating
 	float		m_flPrevAnimTime;
@@ -1324,10 +1324,6 @@ public:
 	void				 	SetSolidFlags( int flags );
 	bool					IsSolid() const;
 	
-	void					SetModelName( string_t name );
-
-	model_t					*GetModel( void );
-
 	// These methods return a *world-aligned* box relative to the absorigin of the entity.
 	// This is used for collision purposes and is *not* guaranteed
 	// to surround the entire entity's visual representation
@@ -1688,7 +1684,6 @@ private:
 
 	float			m_flGroundChangeTime; // Time that the ground entity changed
 	
-	string_t		m_ModelName;
 
 	// Velocity of the thing we're standing on (world space)
 	CNetworkVarForDerived( Vector, m_vecBaseVelocity );
@@ -1743,19 +1738,19 @@ private:
 	// was pev->view_ofs ( FIXME:  Move somewhere up the hierarch, CBaseAnimating, etc. )
 	CNetworkVectorForDerived( m_vecViewOffset );
 
-private:
+//private:
 	// dynamic model state tracking
-	bool m_bDynamicModelAllowed;
-	bool m_bDynamicModelPending;
-	bool m_bDynamicModelSetBounds;
-	void OnModelLoadComplete( const model_t* model );
-	friend class CBaseEntityModelLoadProxy;
+	//bool m_bDynamicModelAllowed;
+	//bool m_bDynamicModelPending;
+	//bool m_bDynamicModelSetBounds;
+	//void OnModelLoadComplete( const model_t* model );
+	//friend class CBaseEntityModelLoadProxy;
 
-protected:
-	void EnableDynamicModels() { m_bDynamicModelAllowed = true; }
+//protected:
+	//void EnableDynamicModels() { m_bDynamicModelAllowed = true; }
 
 public:
-	bool IsDynamicModelLoading() const { return m_bDynamicModelPending; } 
+	//bool IsDynamicModelLoading() const { return m_bDynamicModelPending; } 
 	void SetCollisionBoundsFromModel();
 
 //#if !defined( NO_ENTITY_PREDICTION )
@@ -2271,28 +2266,6 @@ inline CBaseEntity *CBaseEntity::GetBaseEntity()
 {
 	return this;
 }
-	
-
-//-----------------------------------------------------------------------------
-// Model related methods
-//-----------------------------------------------------------------------------
-inline void CBaseEntity::SetModelName( string_t name )
-{
-	m_ModelName = name;
-	DispatchUpdateTransmitState();
-}
-
-inline string_t CBaseEntity::GetModelName( void ) const
-{
-	return m_ModelName;
-}
-
-inline int CBaseEntity::GetModelIndex( void ) const
-{
-	return m_nModelIndex;
-}
-
-
 
 //-----------------------------------------------------------------------------
 // Methods relating to bounds

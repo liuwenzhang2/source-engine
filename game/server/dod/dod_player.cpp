@@ -134,7 +134,7 @@ LINK_ENTITY_TO_CLASS( dod_ragdoll, CDODRagdoll );
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CDODRagdoll, DT_DODRagdoll )
 	SendPropVector( SENDINFO(m_vecRagdollOrigin), -1,  SPROP_COORD ),
 	SendPropEHandle( SENDINFO( m_hPlayer ) ),
-	SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
+	//SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
 	SendPropInt		( SENDINFO(m_nForceBone), 8, 0 ),
 	SendPropVector	( SENDINFO(m_vecForce), -1, SPROP_NOSCALE ),
 	SendPropVector( SENDINFO( m_vecRagdollVelocity ) )
@@ -615,7 +615,7 @@ void CDODPlayer::CreateRagdollEntity()
 		pRagdoll->m_hPlayer = this;
 		pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
 		pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
-		pRagdoll->m_nModelIndex = m_nModelIndex;
+		pRagdoll->GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex());
 		pRagdoll->m_nForceBone = m_nForceBone;
 		pRagdoll->m_vecForce = m_vecTotalBulletForce;
 	}

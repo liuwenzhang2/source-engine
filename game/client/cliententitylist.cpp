@@ -217,6 +217,7 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_PRED_FIELD(m_angNetworkAngles, FIELD_VECTOR, FTYPEDESC_INSENDTABLE | FTYPEDESC_NOERRORCHECK),
 	DEFINE_PRED_FIELD(m_hNetworkMoveParent, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE),
 	DEFINE_PRED_FIELD(m_hGroundEntity, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE),
+	DEFINE_PRED_FIELD(m_nModelIndex, FIELD_SHORT, FTYPEDESC_INSENDTABLE | FTYPEDESC_MODELINDEX),
 END_PREDICTION_DATA()
 
 BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
@@ -224,7 +225,8 @@ BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
 	DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
 	DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
 	DEFINE_FIELD(m_iEFlags, FIELD_INTEGER),
-END_DATADESC()
+	DEFINE_FIELD(m_ModelName, FIELD_STRING),
+	END_DATADESC()
 
 //-----------------------------------------------------------------------------
 // Moveparent receive proxies
@@ -282,6 +284,11 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO_NAME(m_hNetworkMoveParent, moveparent), 0, RecvProxy_IntToMoveParent),
 	RecvPropInt(RECVINFO(m_iParentAttachment)),
 	RecvPropEHandle(RECVINFO(m_hGroundEntity)),
+#ifdef DEMO_BACKWARDCOMPATABILITY
+	RecvPropInt(RECVINFO(m_nModelIndex), 0, RecvProxy_IntToModelIndex16_BackCompatible),
+#else
+	RecvPropInt(RECVINFO(m_nModelIndex)),
+#endif
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -1877,7 +1884,7 @@ int C_EngineObjectInternal::RestoreData(const char* context, int slot, int type)
 	int savedEFlags = GetEFlags() & savedEFlagsMask;
 
 	// model index needs to be set manually for dynamic model refcounting purposes
-	int oldModelIndex = m_pOuter->m_nModelIndex;
+	int oldModelIndex = m_nModelIndex;
 
 	CPredictionCopy copyHelper(type, this, TD_OFFSET_NORMAL, src, TD_OFFSET_PACKED);
 	int error_count = copyHelper.TransferData(sz, m_pOuter->entindex(), this->GetPredDescMap());
@@ -1889,15 +1896,15 @@ int C_EngineObjectInternal::RestoreData(const char* context, int slot, int type)
 	AddEFlags(savedEFlags);
 
 	// restore original model index and change via SetModelIndex
-	int newModelIndex = m_pOuter->m_nModelIndex;
-	m_pOuter->m_nModelIndex = oldModelIndex;
+	int newModelIndex = m_nModelIndex;
+	m_nModelIndex = oldModelIndex;
 	int overrideModelIndex = m_pOuter->CalcOverrideModelIndex();
 	if (overrideModelIndex != -1)
 		newModelIndex = overrideModelIndex;
 	if (oldModelIndex != newModelIndex)
 	{
 		MDLCACHE_CRITICAL_SECTION(); // ???
-		m_pOuter->SetModelIndex(newModelIndex);
+		SetModelIndex(newModelIndex);
 	}
 
 	// HACK Force recomputation of origin
@@ -2760,6 +2767,35 @@ void C_EngineObjectInternal::SetGroundEntity(IEngineObjectClient* ground)
 C_EngineObjectInternal* C_EngineObjectInternal::GetGroundEntity(void)
 {
 	return m_hGroundEntity.Get() ? (C_EngineObjectInternal*)m_hGroundEntity.Get()->GetEngineObject() : NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : name - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetModelName(string_t name)
+{
+	m_ModelName = name;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Output : string_t
+//-----------------------------------------------------------------------------
+string_t C_EngineObjectInternal::GetModelName(void) const
+{
+	return m_ModelName;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : index - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetModelIndex(int index)
+{
+	m_nModelIndex = index;
+	const model_t* pModel = modelinfo->GetModel(m_nModelIndex);
+	m_pOuter->SetModelPointer(pModel);
 }
 
 

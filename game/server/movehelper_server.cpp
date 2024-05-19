@@ -149,8 +149,8 @@ char const* CMoveHelperServer::GetName( EntityHandle_t handle ) const
 		return STRING(gpGlobals->mapname);
 
 	// Is it a model?
-	if ( ent && ent->GetModelName() != NULL_STRING )
-		return STRING( ent->GetModelName() );
+	if ( ent && ent->GetEngineObject()->GetModelName() != NULL_STRING )
+		return STRING( ent->GetEngineObject()->GetModelName() );
 
 	if ( ent->GetClassname() != NULL )
 	{

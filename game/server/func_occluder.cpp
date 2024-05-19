@@ -81,7 +81,7 @@ void CFuncOccluder::Spawn( void )
     SetMoveType( MOVETYPE_NONE );
 	
 	// set size and link into world.
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 }
 
 

@@ -118,7 +118,7 @@ void CItem_ItemCrate::Spawn( void )
 	}
 
 	DisableAutoFade();
-	SetModelName( AllocPooledString( pszItemCrateModelName[m_CrateAppearance] ) );
+	GetEngineObject()->SetModelName( AllocPooledString( pszItemCrateModelName[m_CrateAppearance] ) );
 
 	if ( NULL_STRING == m_strItemClass )
 	{

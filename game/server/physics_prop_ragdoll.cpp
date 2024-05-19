@@ -161,7 +161,7 @@ void CRagdollProp::Spawn( void )
 	// NOTE: If this fires, then the assert or the datadesc is wrong!  (see DEFINE_RAGDOLL_ELEMENT above)
 	Assert( RAGDOLL_MAX_ELEMENTS == 24 );
 	Precache();
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	CStudioHdr *pStudioHdr = GetModelPtr( );
 	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_NO_FORCED_FADE )
@@ -236,7 +236,7 @@ void CRagdollProp::OnRestore()
 		return;
 
 	// JAY: Reset collision relationships
-	RagdollSetupCollisions( m_ragdoll, modelinfo->GetVCollide( GetModelIndex() ), GetModelIndex() );
+	RagdollSetupCollisions( m_ragdoll, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), GetEngineObject()->GetModelIndex() );
 	VPhysicsUpdate( VPhysicsGetObject() );
 }
 
@@ -283,7 +283,7 @@ CRagdollProp::~CRagdollProp( void )
 
 void CRagdollProp::Precache( void )
 {
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	BaseClass::Precache();
 }
 
@@ -691,7 +691,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 
 	ragdollparams_t params;
 	params.pGameData = static_cast<void *>( static_cast<CBaseEntity *>(this) );
-	params.modelIndex = GetModelIndex();
+	params.modelIndex = GetEngineObject()->GetModelIndex();
 	params.pCollide = modelinfo->GetVCollide( params.modelIndex );
 	params.pStudioHdr = GetModelPtr();
 	params.forceVector = forceVector;
@@ -717,7 +717,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 			Assert( szToken[0] );
 			if ( objectIndex >= m_ragdoll.listCount )
 			{
-				Warning("Bad ragdoll pose in entity %s, model (%s) at %s, model changed?\n", GetDebugName(), GetModelName().ToCStr(), VecToString(GetEngineObject()->GetAbsOrigin()) );
+				Warning("Bad ragdoll pose in entity %s, model (%s) at %s, model changed?\n", GetDebugName(), GetEngineObject()->GetModelName().ToCStr(), VecToString(GetEngineObject()->GetAbsOrigin()) );
 			}
 			else if ( szToken[0] != 0 )
 			{
@@ -747,13 +747,13 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 	if ( activateRagdoll )
 	{
 		MEM_ALLOC_CREDIT();
-		RagdollActivate( m_ragdoll, params.pCollide, GetModelIndex(), bWakeRagdoll );
+		RagdollActivate( m_ragdoll, params.pCollide, GetEngineObject()->GetModelIndex(), bWakeRagdoll );
 	}
 
 	for ( int i = 0; i < m_ragdoll.listCount; i++ )
 	{
 		UpdateNetworkDataFromVPhysics( m_ragdoll.list[i].pObject, i );
-		g_pPhysSaveRestoreManager->AssociateModel( m_ragdoll.list[i].pObject, GetModelIndex() );
+		g_pPhysSaveRestoreManager->AssociateModel( m_ragdoll.list[i].pObject, GetEngineObject()->GetModelIndex() );
 		physcollision->CollideGetAABB( &m_ragdollMins[i], &m_ragdollMaxs[i], m_ragdoll.list[i].pObject->GetCollide(), vec3_origin, vec3_angle );
 	}
 	VPhysicsSetObject( m_ragdoll.list[0].pObject );
@@ -1273,8 +1273,8 @@ static void SyncAnimatingWithPhysics( CBaseAnimating *pAnimating )
 CBaseAnimating *CreateServerRagdollSubmodel( CBaseAnimating *pOwner, const char *pModelName, const Vector &position, const QAngle &angles, int collisionGroup )
 {
 	CRagdollProp *pRagdoll = (CRagdollProp *)CBaseEntity::CreateNoSpawn( "prop_ragdoll", position, angles, pOwner );
-	pRagdoll->SetModelName( AllocPooledString( pModelName ) );
-	pRagdoll->SetModel( STRING(pRagdoll->GetModelName()) );
+	pRagdoll->GetEngineObject()->SetModelName( AllocPooledString( pModelName ) );
+	pRagdoll->SetModel( STRING(pRagdoll->GetEngineObject()->GetModelName()) );
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES], pBoneToWorldNext[MAXSTUDIOBONES];
 	pRagdoll->ResetSequence( 0 );
 
@@ -1547,7 +1547,7 @@ void CRagdollPropAttached::InitRagdollAttached(
 	GetEngineObject()->SetParent( pFollow->GetEngineObject() );
 	SetOwnerEntity( pFollow );
 
-	RagdollActivate( m_ragdoll, modelinfo->GetVCollide( GetModelIndex() ), GetModelIndex() );
+	RagdollActivate( m_ragdoll, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), GetEngineObject()->GetModelIndex() );
 
 	// add a bunch of dampening to the ragdoll
 	for ( int i = 0; i < m_ragdoll.listCount; i++ )
@@ -1571,7 +1571,7 @@ void CRagdollPropAttached::InitRagdollAttached(
 CRagdollProp *CreateServerRagdollAttached( CBaseAnimating *pAnimating, const Vector &vecForce, int forceBone, int collisionGroup, IPhysicsObject *pAttached, CBaseAnimating *pParentEntity, int boneAttach, const Vector &originAttached, int parentBoneAttach, const Vector &boneOrigin )
 {
 	// Return immediately if the model doesn't have a vcollide
-	if ( modelinfo->GetVCollide( pAnimating->GetModelIndex() ) == NULL )
+	if ( modelinfo->GetVCollide( pAnimating->GetEngineObject()->GetModelIndex() ) == NULL )
 		return NULL;
 
 	CRagdollPropAttached *pRagdoll = (CRagdollPropAttached *)CBaseEntity::CreateNoSpawn( "prop_ragdoll_attached", pAnimating->GetEngineObject()->GetAbsOrigin(), vec3_angle, NULL );

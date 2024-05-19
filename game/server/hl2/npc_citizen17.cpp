@@ -632,7 +632,7 @@ void CNPC_Citizen::SelectModel()
 		RemoveSpawnFlags( SF_CITIZEN_RANDOM_HEAD | SF_CITIZEN_RANDOM_HEAD_MALE | SF_CITIZEN_RANDOM_HEAD_FEMALE );
 		if( HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
 		{
-			SetModelName( AllocPooledString("models/humans/male_cheaple.mdl" ) );
+			GetEngineObject()->SetModelName( AllocPooledString("models/humans/male_cheaple.mdl" ) );
 			return;
 		}
 		else
@@ -679,7 +679,7 @@ void CNPC_Citizen::SelectModel()
 
 			m_iHead = candidates[random->RandomInt( 0, iLimit - 1 )].iHead;
 			pszModelName = g_ppszRandomHeads[m_iHead];
-			SetModelName(NULL_STRING);
+			GetEngineObject()->SetModelName(NULL_STRING);
 		}
 	}
 
@@ -714,7 +714,7 @@ void CNPC_Citizen::SelectModel()
 	// Unique citizen models are left alone
 	if ( m_Type != CT_UNIQUE )
 	{
-		SetModelName( AllocPooledString( CFmtStr( "models/Humans/%s/%s", (const char *)(CFmtStr(g_ppszModelLocs[ m_Type ], ( IsMedic() ) ? "m" : "" )), pszModelName ) ) );
+		GetEngineObject()->SetModelName( AllocPooledString( CFmtStr( "models/Humans/%s/%s", (const char *)(CFmtStr(g_ppszModelLocs[ m_Type ], ( IsMedic() ) ? "m" : "" )), pszModelName ) ) );
 	}
 }
 
@@ -795,7 +795,7 @@ void CNPC_Citizen::OnRestore()
 //-----------------------------------------------------------------------------
 string_t CNPC_Citizen::GetModelName() const
 {
-	string_t iszModelName = BaseClass::GetModelName();
+	string_t iszModelName = GetEngineObject()->GetModelName();
 
 	//
 	// If the model refers to an obsolete model, pretend it was blank

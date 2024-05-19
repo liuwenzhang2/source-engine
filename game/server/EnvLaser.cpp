@@ -39,7 +39,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CEnvLaser::Spawn( void )
 {
-	if ( !GetModelName() )
+	if ( !GetEngineObject()->GetModelName() )
 	{
 		SetThink( &CEnvLaser::SUB_Remove );
 		return;
@@ -85,7 +85,7 @@ void CEnvLaser::Spawn( void )
 //-----------------------------------------------------------------------------
 void CEnvLaser::Precache( void )
 {
-	SetModelIndex(engine->PrecacheModel( STRING( GetModelName() ) ) );
+	GetEngineObject()->SetModelIndex(engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) ) );
 	if ( m_iszSpriteName != NULL_STRING )
 		engine->PrecacheModel( STRING(m_iszSpriteName) );
 }
@@ -110,7 +110,7 @@ bool CEnvLaser::KeyValue( const char *szKeyName, const char *szValue )
 	}
 	else if (FStrEq(szKeyName, "texture"))
 	{
-		SetModelName( AllocPooledString(szValue) );
+		GetEngineObject()->SetModelName( AllocPooledString(szValue) );
 	}
 	else
 	{

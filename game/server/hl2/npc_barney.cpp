@@ -111,7 +111,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CNPC_Barney::SelectModel()
 {
-	SetModelName( AllocPooledString( BARNEY_MODEL ) );
+	GetEngineObject()->SetModelName( AllocPooledString( BARNEY_MODEL ) );
 }
 
 //-----------------------------------------------------------------------------

@@ -194,7 +194,7 @@ void CDecal::StaticDecal( void )
 		CBaseEntity *ent = (CBaseEntity*)trace.m_pEnt;
 		if ( ent )
 		{
-			modelIndex = ent->GetModelIndex();
+			modelIndex = ent->GetEngineObject()->GetModelIndex();
 			VectorITransform(GetEngineObject()->GetAbsOrigin(), ent->GetEngineObject()->EntityToWorldTransform(), position );
 
 			canDraw = ( modelIndex != 0 );
@@ -527,9 +527,9 @@ void CWorld::Spawn( void )
 	GetEngineObject()->SetLocalOrigin( vec3_origin );
 	GetEngineObject()->SetLocalAngles( vec3_angle );
 	// NOTE:  SHOULD NEVER BE ANYTHING OTHER THAN 1!!!
-	SetModelIndex( 1 );
+	GetEngineObject()->SetModelIndex( 1 );
 	// world model
-	SetModelName( AllocPooledString( modelinfo->GetModelName( GetModel() ) ) );
+	GetEngineObject()->SetModelName( AllocPooledString( modelinfo->GetModelName( GetModel() ) ) );
 	AddFlag( FL_WORLDBRUSH );
 
 	g_EventQueue.Init();
@@ -607,7 +607,7 @@ void CWorld::Precache( void )
 
 	// Only allow precaching between LevelInitPreEntity and PostEntity
 	engine->SetAllowPrecache( true );//CBaseEntity::
-	IGameSystem::LevelInitPreEntityAllSystems( STRING( GetModelName() ) );
+	IGameSystem::LevelInitPreEntityAllSystems( STRING(GetEngineObject()->GetModelName() ) );
 
 	// Create the player resource
 	g_pGameRules->CreateStandardEntities();

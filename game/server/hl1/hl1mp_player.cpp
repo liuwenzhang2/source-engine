@@ -590,7 +590,7 @@ LINK_ENTITY_TO_CLASS( hl1mp_ragdoll, CHL1MPRagdoll );
 IMPLEMENT_SERVERCLASS_ST_NOBASE( CHL1MPRagdoll, DT_HL1MPRagdoll )
 	SendPropVector    ( SENDINFO( m_vecRagdollOrigin), -1,  SPROP_COORD ),
 	SendPropEHandle   ( SENDINFO( m_hPlayer ) ),
-	SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
+	//SendPropModelIndex( SENDINFO( m_nModelIndex ) ),
 	SendPropInt		  ( SENDINFO( m_nForceBone), 8, 0 ),
 	SendPropVector	  ( SENDINFO( m_vecForce), -1, SPROP_NOSCALE ),
 	SendPropVector    ( SENDINFO( m_vecRagdollVelocity ) )
@@ -619,7 +619,7 @@ void CHL1MP_Player::CreateRagdollEntity( void )
 		pRagdoll->m_hPlayer = this;
 		pRagdoll->m_vecRagdollOrigin = GetEngineObject()->GetAbsOrigin();
 		pRagdoll->m_vecRagdollVelocity = GetEngineObject()->GetAbsVelocity();
-		pRagdoll->m_nModelIndex = m_nModelIndex;
+		pRagdoll->GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex());
 		pRagdoll->m_nForceBone = m_nForceBone;
 		//pRagdoll->m_vecForce = m_vecTotalBulletForce;
 		pRagdoll->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );

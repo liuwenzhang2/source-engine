@@ -4159,7 +4159,7 @@ bool CNPC_Antlion::CorpseGib( const CTakeDamageInfo &info )
 	params.impactEnergyScale = 1.0f;
 	params.defBurstScale = 150.0f;
 	params.defCollisionGroup = COLLISION_GROUP_DEBRIS;
-	PropBreakableCreateAll( GetModelIndex(), NULL, params, this, -1, true, true );
+	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), NULL, params, this, -1, true, true );
 
 	return true;
 }

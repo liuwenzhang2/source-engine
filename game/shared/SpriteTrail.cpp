@@ -136,13 +136,13 @@ void CSpriteTrail::Spawn( void )
 	BaseClass::Spawn();
 #else
 
-	if ( GetModelName() != NULL_STRING )
+	if (GetEngineObject()->GetModelName() != NULL_STRING )
 	{
 		BaseClass::Spawn();
 		return;
 	}
 
-	SetModelName( m_iszSpriteName );
+	GetEngineObject()->SetModelName( m_iszSpriteName );
 	BaseClass::Spawn();
 
 	SetSolid( SOLID_NONE );

@@ -57,7 +57,7 @@ void CFuncLadder::Spawn()
 	SetCollisionGroup( COLLISION_GROUP_NONE );
 	
 	//AddFlag( FL_WORLDBRUSH );
-	SetModelName( NULL_STRING );
+	GetEngineObject()->SetModelName( NULL_STRING );
 
 	// Make entity invisible
 	AddEffects( EF_NODRAW );

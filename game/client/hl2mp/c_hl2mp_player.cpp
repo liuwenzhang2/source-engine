@@ -754,7 +754,7 @@ IRagdoll* C_HL2MP_Player::GetRepresentativeRagdoll() const
 IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_HL2MPRagdoll, DT_HL2MPRagdoll, CHL2MPRagdoll )
 	RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
 	RecvPropEHandle( RECVINFO( m_hPlayer ) ),
-	RecvPropInt( RECVINFO( m_nModelIndex ) ),
+	//RecvPropInt( RECVINFO( m_nModelIndex ) ),
 	RecvPropInt( RECVINFO(m_nForceBone) ),
 	RecvPropVector( RECVINFO(m_vecForce) ),
 	RecvPropVector( RECVINFO( m_vecRagdollVelocity ) )
@@ -901,7 +901,7 @@ void C_HL2MPRagdoll::CreateHL2MPRagdoll( void )
 		
 	}
 
-	SetModelIndex( m_nModelIndex );
+	GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex() );
 
 	// Make us a ragdoll..
 	m_nRenderFX = kRenderFxRagdoll;

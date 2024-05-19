@@ -669,7 +669,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 	if ( looping )
 	{
 		DevMsg( 1, "vcd error, gesture %s of model %s is marked as STUDIO_LOOPING!\n", 
-			event->GetParameters(), STRING(GetModelName()) );
+			event->GetParameters(), STRING(GetEngineObject()->GetModelName()) );
 	}
 
 	SetLayerLooping( info->m_iLayer, false ); // force to not loop
@@ -2278,7 +2278,7 @@ class CGenericFlexCycler : public CFlexCycler
 public:
 	DECLARE_CLASS( CGenericFlexCycler, CFlexCycler );
 
-	void Spawn( void ) { GenericCyclerSpawn( (char *)STRING( GetModelName() ), Vector(-16, -16, 0), Vector(16, 16, 72) ); }
+	void Spawn( void ) { GenericCyclerSpawn( (char *)STRING(GetEngineObject()->GetModelName() ), Vector(-16, -16, 0), Vector(16, 16, 72) ); }
 };
 
 LINK_ENTITY_TO_CLASS( cycler_flex, CGenericFlexCycler );

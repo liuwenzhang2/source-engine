@@ -92,7 +92,7 @@ void CFuncSmokeVolume::Spawn()
 	memset( m_MaterialName.GetForModify(), 0, sizeof( m_MaterialName ) );
 
 	// Bind to our bmodel.
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	BaseClass::Spawn();
 }

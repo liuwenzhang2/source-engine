@@ -4273,7 +4273,7 @@ void CNPC_Hunter::Explode()
 	Vector			velocity = vec3_origin;
 	AngularImpulse	angVelocity = RandomAngularImpulse( -150, 150 );
 
-	PropBreakableCreateAll( GetModelIndex(), NULL, EyePosition(), GetEngineObject()->GetAbsAngles(), velocity, angVelocity, 1.0, 150, COLLISION_GROUP_NPC, this );
+	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), NULL, EyePosition(), GetEngineObject()->GetAbsAngles(), velocity, angVelocity, 1.0, 150, COLLISION_GROUP_NPC, this );
 
 	ExplosionCreate( EyePosition(), GetEngineObject()->GetAbsAngles(), this, 500, 256, (SF_ENVEXPLOSION_NOPARTICLES|SF_ENVEXPLOSION_NOSPARKS|SF_ENVEXPLOSION_NODLIGHTS|SF_ENVEXPLOSION_NODAMAGE|SF_ENVEXPLOSION_NOSMOKE), false );
 

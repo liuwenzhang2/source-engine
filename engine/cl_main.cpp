@@ -1047,7 +1047,7 @@ void CL_FullyConnected( void )
 	}
 
 	// flush client-side dynamic models that have no refcount
-	modelloader->FlushDynamicModels();
+	//modelloader->FlushDynamicModels();
 
 	// loading completed
 	// can NOW safely purge unused models and their data hierarchy (materials, shaders, etc)
@@ -3093,16 +3093,16 @@ void Callback_UserInfoChanged( void *object, INetworkStringTable *stringTable, i
 	}
 }
 
-void Callback_DynamicModelsChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, const void *newData )
-{
-#ifndef SWDS
-	extern IVModelInfoClient *modelinfoclient;
-	if ( modelinfoclient )
-	{
-		modelinfoclient->OnDynamicModelsStringTableChange( stringNumber, newString, newData );
-	}
-#endif
-}
+//void Callback_DynamicModelsChanged( void *object, INetworkStringTable *stringTable, int stringNumber, const char *newString, const void *newData )
+//{
+//#ifndef SWDS
+//	extern IVModelInfoClient *modelinfoclient;
+//	if ( modelinfoclient )
+//	{
+//		modelinfoclient->OnDynamicModelsStringTableChange( stringNumber, newString, newData );
+//	}
+//#endif
+//}
 
 void CL_HookClientStringTables()
 {

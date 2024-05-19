@@ -161,6 +161,8 @@ public:
 		touchStamp = 0;
 		SetCheckUntouch(false);
 		m_fDataObjectTypes = 0;
+		m_ModelName = NULL_STRING;
+		m_nModelIndex = 0;
 	}
 
 	~CEngineObjectInternal()
@@ -382,6 +384,10 @@ public:
 	void SetGroundEntity(IEngineObjectServer* ground);
 	CEngineObjectInternal* GetGroundEntity(void);
 	CEngineObjectInternal* GetGroundEntity(void) const { return const_cast<CEngineObjectInternal*>(this)->GetGroundEntity(); }
+	string_t GetModelName(void) const;
+	void SetModelName(string_t name);
+	void SetModelIndex(int index);
+	int GetModelIndex(void) const;
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -432,6 +438,9 @@ private:
 	int		m_fDataObjectTypes;
 
 	CNetworkHandle(CBaseEntity, m_hGroundEntity);
+
+	string_t		m_ModelName;
+	CNetworkVar(short, m_nModelIndex);
 
 
 };
@@ -570,6 +579,24 @@ inline void CEngineObjectInternal::ClearTouchStamp()
 	touchStamp = 0;
 }
 
+//-----------------------------------------------------------------------------
+// Model related methods
+//-----------------------------------------------------------------------------
+inline void CEngineObjectInternal::SetModelName(string_t name)
+{
+	m_ModelName = name;
+	m_pOuter->DispatchUpdateTransmitState();
+}
+
+inline string_t CEngineObjectInternal::GetModelName(void) const
+{
+	return m_ModelName;
+}
+
+inline int CEngineObjectInternal::GetModelIndex(void) const
+{
+	return m_nModelIndex;
+}
 
 //-----------------------------------------------------------------------------
 // Utilities entities can use when saving
@@ -805,7 +832,7 @@ void CGlobalEntityList<T>::SaveEntityOnTable(T* pEntity, CSaveRestoreData* pSave
 #else
 	pEntInfo->edictindex = -1;
 #endif
-	pEntInfo->modelname = pEntity->GetModelName();
+	pEntInfo->modelname = pEntity->GetEngineObject()->GetModelName();
 	pEntInfo->restoreentityindex = -1;
 	pEntInfo->saveentityindex = pEntity && pEntity->IsNetworkable() ? pEntity->entindex() : -1;
 	pEntInfo->hEnt = pEntity->GetRefEHandle();
@@ -881,7 +908,7 @@ void CGlobalEntityList<T>::Save(ISave* pSave)
 
 #if !defined( CLIENT_DLL )
 			pEntInfo->globalname = pEnt->GetEngineObject()->GetGlobalname(); // remember global name
-			pEntInfo->landmarkModelSpace = g_ServerGameDLL.ModelSpaceLandmark(pEnt->GetModelIndex());
+			pEntInfo->landmarkModelSpace = g_ServerGameDLL.ModelSpaceLandmark(pEnt->GetEngineObject()->GetModelIndex());
 			int nEntIndex = pEnt->IsNetworkable() ? pEnt->entindex() : -1;
 			bool bIsPlayer = ((nEntIndex >= 1) && (nEntIndex <= gpGlobals->maxClients)) ? true : false;
 			if (bIsPlayer)
@@ -1178,7 +1205,7 @@ int CGlobalEntityList<T>::RestoreGlobalEntity(T* pEntity, CSaveRestoreData* pSav
 				// Tell the restore code we're overlaying a global entity from another level
 		restoreHelper.SetGlobalMode(1);	// Don't overwrite global fields
 
-		pSaveData->modelSpaceOffset = pEntInfo->landmarkModelSpace - g_ServerGameDLL.ModelSpaceLandmark(pNewEntity->GetModelIndex());
+		pSaveData->modelSpaceOffset = pEntInfo->landmarkModelSpace - g_ServerGameDLL.ModelSpaceLandmark(pNewEntity->GetEngineObject()->GetModelIndex());
 
 		UTIL_Remove(pEntity);
 		pEntity = pNewEntity;// we're going to restore this data OVER the old entity
@@ -2302,10 +2329,10 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByModel(CBaseEntity* pStartEntity, 
 			continue;
 		}
 
-		if (ent->entindex()==-1 || !ent->GetModelName())
+		if (ent->entindex()==-1 || !ent->GetEngineObject()->GetModelName())
 			continue;
 
-		if (FStrEq(STRING(ent->GetModelName()), szModelName))
+		if (FStrEq(STRING(ent->GetEngineObject()->GetModelName()), szModelName))
 			return ent;
 	}
 

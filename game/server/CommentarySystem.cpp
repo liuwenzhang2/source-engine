@@ -201,7 +201,7 @@ public:
 	virtual void Spawn( void )
 	{
 		Precache();
-		SetModelName( MAKE_STRING("sprites/redglow1.vmt") );
+		GetEngineObject()->SetModelName( MAKE_STRING("sprites/redglow1.vmt") );
 
 		BaseClass::Spawn();
 
@@ -881,11 +881,11 @@ bool IsListeningToCommentary( void )
 void CPointCommentaryNode::Spawn( void )
 {
 	// No model specified?
-	char *szModel = (char *)STRING( GetModelName() );
+	char *szModel = (char *)STRING(GetEngineObject()->GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = "models/extras/info_speech.mdl";
-		SetModelName( AllocPooledString(szModel) );
+		GetEngineObject()->SetModelName( AllocPooledString(szModel) );
 	}
 
 	Precache();
@@ -939,7 +939,7 @@ void CPointCommentaryNode::Activate( void )
 //-----------------------------------------------------------------------------
 void CPointCommentaryNode::Precache()
 {
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	if ( m_iszCommentaryFile.Get() != NULL_STRING )
 	{

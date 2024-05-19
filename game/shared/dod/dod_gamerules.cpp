@@ -5282,7 +5282,7 @@ ConVar showblockerwalls( "showblockerwalls", "0", FCVAR_CHEAT, "Set to 1 to visu
 void CFuncTeamWall::Spawn( void )
 {
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	AddEffects( EF_NODRAW );
 	SetSolid( SOLID_BBOX );
 

@@ -574,7 +574,7 @@ int CBaseAnimatingOverlay::AddGesture( Activity activity, bool autokill /*= true
 	if ( seq <= 0 )
 	{
 		const char *actname = CAI_BaseNPC::GetActivityName( activity );
-		DevMsg( "CBaseAnimatingOverlay::AddGesture:  model %s missing activity %s\n", STRING(GetModelName()), actname );
+		DevMsg( "CBaseAnimatingOverlay::AddGesture:  model %s missing activity %s\n", STRING(GetEngineObject()->GetModelName()), actname );
 		return -1;
 	}
 

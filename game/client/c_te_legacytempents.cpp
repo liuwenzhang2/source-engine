@@ -1113,7 +1113,7 @@ void CTempEnts::PhysicsProp( int modelindex, int skin, const Vector& pos, const 
 		return;
 	}
 
-	pEntity->SetModelName(MAKE_STRING(modelinfo->GetModelName(model)) );
+	pEntity->GetEngineObject()->SetModelName(MAKE_STRING(modelinfo->GetModelName(model)) );
 	pEntity->m_nSkin = skin;
 	pEntity->GetEngineObject()->SetAbsOrigin( pos );
 	pEntity->GetEngineObject()->SetAbsAngles( angles );

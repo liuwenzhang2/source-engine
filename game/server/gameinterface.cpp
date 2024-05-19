@@ -578,7 +578,7 @@ void DrawAllDebugOverlays( void )
 
 			char tempstr[512];
 			Q_snprintf(tempstr, sizeof(tempstr),"%s: Mass: %.2f kg / %.2f lb (%s)", 
-				STRING( ent->GetModelName() ), ent->VPhysicsGetObject()->GetMass(), 
+				STRING( ent->GetEngineObject()->GetModelName() ), ent->VPhysicsGetObject()->GetMass(),
 				kg2lbs(ent->VPhysicsGetObject()->GetMass()), 
 				GetMassEquivalent(ent->VPhysicsGetObject()->GetMass()));
 			ent->EntityText(0, tempstr, 0);
@@ -2368,7 +2368,7 @@ void CServerGameDLL::InternalEmitCloseCaption(IRecipientFilter& filter, int enti
 		CBaseEntity* pActor = gEntList.GetBaseEntity(entindex);
 		if (pActor)
 		{
-			char const* pszActorModel = STRING(pActor->GetModelName());
+			char const* pszActorModel = STRING(pActor->GetEngineObject()->GetModelName());
 			gender_t gender = g_pSoundEmitterSystemBase->GetActorGender(pszActorModel);
 
 			if (gender == GENDER_MALE)
@@ -3615,7 +3615,7 @@ void CServerGameClients::GetBugReportInfo( char *buf, int buflen )
 				ent->entindex(),
 				ent->GetClassname(),
 				STRING( ent->GetEntityName() ),
-				STRING( ent->GetModelName() ) );
+				STRING( ent->GetEngineObject()->GetModelName() ) );
 		}
 
 		// get any sounds that were spoken by NPCs recently

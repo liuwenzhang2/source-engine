@@ -241,7 +241,7 @@ void CWallHealth::Spawn(void)
 	SetSolid( SOLID_BSP );
 	SetMoveType( MOVETYPE_PUSH );
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	m_iJuice = sk_healthcharger.GetFloat();
 

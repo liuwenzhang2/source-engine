@@ -2147,7 +2147,7 @@ void CBasePlayer::PlayerDeathThink(void)
 		PackDeadPlayerItems();
 	}
 
-	if (GetModelIndex() && (!IsSequenceFinished()) && (m_lifeState == LIFE_DYING))
+	if (GetEngineObject()->GetModelIndex() && (!IsSequenceFinished()) && (m_lifeState == LIFE_DYING))
 	{
 		StudioFrameAdvance( );
 
@@ -6276,7 +6276,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 			if ( pEntity->GetEngineObject()->GetParentName() != NULL_STRING )
 				Msg( "Parent: %s\n", STRING(pEntity->GetEngineObject()->GetParentName()) );
 
-			Msg( "Model: %s\n", STRING( pEntity->GetModelName() ) );
+			Msg( "Model: %s\n", STRING( pEntity->GetEngineObject()->GetModelName() ) );
 			if ( pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING )
 				Msg( "Globalname: %s\n", STRING(pEntity->GetEngineObject()->GetGlobalname()) );
 		}
@@ -9182,7 +9182,7 @@ const char *CPlayerInfo::GetWeaponName()
 const char *CPlayerInfo::GetModelName() 
 { 
 	Assert( m_pParent );
-	return m_pParent->GetModelName().ToCStr(); 
+	return m_pParent->GetEngineObject()->GetModelName().ToCStr();
 }
 
 const int CPlayerInfo::GetHealth() 

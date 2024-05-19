@@ -437,14 +437,14 @@ CNPC_Strider::~CNPC_Strider()
 //---------------------------------------------------------
 void CNPC_Strider::Precache()
 {
-	if ( !GetModelName() )
+	if ( !GetEngineObject()->GetModelName() )
 	{
-		SetModelName( MAKE_STRING( "models/combine_strider.mdl" ) );
+		GetEngineObject()->SetModelName( MAKE_STRING( "models/combine_strider.mdl" ) );
 	}
 
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
-	PropBreakablePrecacheAll( GetModelName() );
+	PropBreakablePrecacheAll(GetEngineObject()->GetModelName() );
 
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_Strider.StriderBusterExplode" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "explode_5" );
@@ -489,7 +489,7 @@ void CNPC_Strider::Spawn()
 
 	EnableServerIK();
 	
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	BaseClass::Spawn();
 
@@ -1821,7 +1821,7 @@ void CNPC_Strider::Explode( void )
 	params.impactEnergyScale = 1.0f;
 	params.defBurstScale = 600.0f;
 	params.defCollisionGroup = COLLISION_GROUP_NPC;
-	PropBreakableCreateAll( GetModelIndex(), NULL, params, this, -1, true, true );
+	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), NULL, params, this, -1, true, true );
 
 	// Go away
 	m_lifeState = LIFE_DEAD;
@@ -3431,7 +3431,7 @@ bool CNPC_Strider::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &for
 				CUtlVectorFixed<CRagdollProp *, 2> striderRagdolls;
 				while ( ( pRagdoll = gEntList.NextEntByClass( pRagdoll ) ) != NULL )
 				{
-					if ( pRagdoll->GetModelName() == GetModelName() && !pRagdoll->IsFading() )
+					if ( pRagdoll->GetEngineObject()->GetModelName() == GetEngineObject()->GetModelName() && !pRagdoll->IsFading() )
 					{
 						Assert( striderRagdolls.Count() < striderRagdolls.NumAllocated() );
 						if ( striderRagdolls.Count() < striderRagdolls.NumAllocated() )

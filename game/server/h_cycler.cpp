@@ -40,7 +40,7 @@ public:
 
 	void Spawn()
 	{
-		GenericCyclerSpawn( (char *)STRING( GetModelName() ), Vector(-16, -16, 0), Vector(16, 16, 72) );
+		GenericCyclerSpawn( (char *)STRING(GetEngineObject()->GetModelName() ), Vector(-16, -16, 0), Vector(16, 16, 72) );
 	}
 };
 LINK_ENTITY_TO_CLASS( cycler, CGenericCycler );
@@ -72,7 +72,7 @@ void CCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax)
 
 void CCycler::Precache()
 {
-	engine->PrecacheModel( (const char *)STRING( GetModelName() ) );
+	engine->PrecacheModel( (const char *)STRING(GetEngineObject()->GetModelName() ) );
 }
 
 
@@ -256,10 +256,10 @@ void CWeaponCycler::Spawn( )
 	AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_NONE );
 
-	engine->PrecacheModel( STRING( GetModelName() ) );
-	SetModel( STRING( GetModelName() ) );
-	m_iszModel = GetModelName();
-	m_iModel = GetModelIndex();
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
+	m_iszModel = GetEngineObject()->GetModelName();
+	m_iModel = GetEngineObject()->GetModelIndex();
 
 	UTIL_SetSize(this, Vector(-16, -16, 0), Vector(16, 16, 16));
 	SetTouch( &CWeaponCycler::DefaultTouch );
@@ -309,10 +309,10 @@ void CWeaponCycler::SecondaryAttack( void )
 	int nSequence = (GetSequence() + 1) % 8;
 
 	// BUG:  Why do we set this here and then set to zero right after?
-	SetModelIndex( m_iModel );
+	GetEngineObject()->SetModelIndex( m_iModel );
 	flFrameRate = 0.0;
 
-	SetModelIndex( 0 );
+	GetEngineObject()->SetModelIndex( 0 );
 
 	if (flFrameRate == 0.0)
 	{
@@ -362,10 +362,10 @@ void CWreckage::Spawn( void )
 	SetCycle( 0 );
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
-	if (GetModelName() != NULL_STRING)
+	if (GetEngineObject()->GetModelName() != NULL_STRING)
 	{
-		engine->PrecacheModel( STRING( GetModelName() ) );
-		SetModel( STRING( GetModelName() ) );
+		engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
+		SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	}
 
 	m_flStartTime		= gpGlobals->curtime;
@@ -373,8 +373,8 @@ void CWreckage::Spawn( void )
 
 void CWreckage::Precache( )
 {
-	if ( GetModelName() != NULL_STRING )
-		engine->PrecacheModel( STRING( GetModelName() ) );
+	if (GetEngineObject()->GetModelName() != NULL_STRING )
+		engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 }
 
 void CWreckage::Think( void )
@@ -447,7 +447,7 @@ void CBlendingCycler::Spawn( void )
 		return;
 	}
 
-	GenericCyclerSpawn( (char *)STRING( GetModelName() ), Vector(-16,-16,-16), Vector(16,16,16));
+	GenericCyclerSpawn( (char *)STRING(GetEngineObject()->GetModelName() ), Vector(-16,-16,-16), Vector(16,16,16));
 	if (!m_iBlendspeed)
 		m_iBlendspeed = 5;
 

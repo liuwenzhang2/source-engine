@@ -820,7 +820,7 @@ void CSceneEntity::UpdateOnRemove( void )
 //-----------------------------------------------------------------------------
 CChoreoScene *CSceneEntity::GenerateSceneForSound( CBaseFlex *pFlexActor, const char *soundname )
 {
-	float duration = g_pSoundEmitterSystem->GetSoundDuration( soundname, pFlexActor ? STRING( pFlexActor->GetModelName() ) : NULL );//CBaseEntity::
+	float duration = g_pSoundEmitterSystem->GetSoundDuration( soundname, pFlexActor ? STRING( pFlexActor->GetEngineObject()->GetModelName() ) : NULL );//CBaseEntity::
 	if( duration <= 0.0f )
 	{
 		Warning( "CSceneEntity::GenerateSceneForSound:  Couldn't determine duration of %s\n", soundname );
@@ -1840,7 +1840,7 @@ void CSceneEntity::DispatchStartSpeak( CChoreoScene *scene, CBaseFlex *actor, CC
 						byteflags |= CLOSE_CAPTION_FROMPLAYER;
 					}
 					*/
-					char const *pszActorModel = STRING( actor->GetModelName() );
+					char const *pszActorModel = STRING( actor->GetEngineObject()->GetModelName() );
 					gender_t gender = soundemitterbase->GetActorGender( pszActorModel );
 
 					if ( gender == GENDER_MALE )

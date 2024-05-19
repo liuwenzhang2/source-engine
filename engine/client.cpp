@@ -461,11 +461,11 @@ bool CClientState::HookClientStringTable( char const *tableName )
 		return true;
 	}
 
-	if ( !Q_strcasecmp( tableName, "DynamicModels" ) )
-	{
-		m_pDynamicModelsTable = table;
-		return true;
-	}
+	//if ( !Q_strcasecmp( tableName, "DynamicModels" ) )
+	//{
+	//	m_pDynamicModelsTable = table;
+	//	return true;
+	//}
 
 	// If engine takes a pass, allow client dll to hook in its callbacks
 	g_ClientDLL->InstallStringTableCallback( tableName );
@@ -558,12 +558,12 @@ bool CClientState::InstallEngineStringTableCallback( char const *tableName )
 		return true;
 	}
 
-	if ( !Q_strcasecmp( tableName, "DynamicModels" ) )
-	{
-		table->SetStringChangedCallback( NULL, Callback_DynamicModelsChanged );
-		m_pDynamicModelsTable = table;
-		return true;
-	}
+	//if ( !Q_strcasecmp( tableName, "DynamicModels" ) )
+	//{
+	//	table->SetStringChangedCallback( NULL, Callback_DynamicModelsChanged );
+	//	m_pDynamicModelsTable = table;
+	//	return true;
+	//}
 
 	// The the client.dll have a shot at it
 	return false;
@@ -664,7 +664,7 @@ void CClientState::Clear( void )
 	m_pLightStyleTable = NULL;
 	m_pUserInfoTable = NULL;
 	m_pServerStartupTable = NULL;
-	m_pDynamicModelsTable = NULL;
+	//m_pDynamicModelsTable = NULL;
 	m_pAreaBits = NULL;
 
 	// Clear all download vars.

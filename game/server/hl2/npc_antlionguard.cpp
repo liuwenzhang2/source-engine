@@ -892,7 +892,7 @@ void CNPC_AntlionGuard::Activate( void )
 
 		if ( g_debug_antlionguard.GetInt() == 5 )
 		{
-			Msg("Antlion Guard: Added prop with model '%s' to sense list.\n", STRING(pObject->GetModelName()) );
+			Msg("Antlion Guard: Added prop with model '%s' to sense list.\n", STRING(pObject->GetEngineObject()->GetModelName()) );
 			pObject->m_debugOverlays |= OVERLAY_BBOX_BIT;
 		}
 	}

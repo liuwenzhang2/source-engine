@@ -242,7 +242,7 @@ IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_CSRagdoll, DT_CSRagdoll, CCSRagdoll )
 	//RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 	RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
 	RecvPropEHandle( RECVINFO( m_hPlayer ) ),
-	RecvPropInt( RECVINFO( m_nModelIndex ) ),
+	//RecvPropInt( RECVINFO( m_nModelIndex ) ),
 	RecvPropInt( RECVINFO(m_nForceBone) ),
 	RecvPropVector( RECVINFO(m_vecForce) ),
 	RecvPropVector( RECVINFO( m_vecRagdollVelocity ) ),
@@ -343,7 +343,7 @@ void C_CSRagdoll::ValidateModelIndex( void )
 			int index = cl_min_ct.GetInt() - 1;
 			if ( index >= 0 && index < CTPlayerModels.Count() )
 			{
-				m_nModelIndex = modelinfo->GetModelIndex(CTPlayerModels[index]);
+				GetEngineObject()->SetModelIndex( modelinfo->GetModelIndex(CTPlayerModels[index]));
 			}
 		}
 		else if ( GetTeamNumber() == TEAM_TERRORIST )
@@ -351,7 +351,7 @@ void C_CSRagdoll::ValidateModelIndex( void )
 			int index = cl_min_t.GetInt() - 1;
 			if ( index >= 0 && index < TerroristPlayerModels.Count() )
 			{
-				m_nModelIndex = modelinfo->GetModelIndex(TerroristPlayerModels[index]);
+				GetEngineObject()->SetModelIndex( modelinfo->GetModelIndex(TerroristPlayerModels[index]));
 			}
 		}
 	}
@@ -1257,7 +1257,7 @@ void C_CSPlayer::UpdateSoundEvents()
 //-----------------------------------------------------------------------------
 void C_CSPlayer::UpdateMinModels( void )
 {
-	int modelIndex = m_nModelIndex;
+	int modelIndex = GetEngineObject()->GetModelIndex();
 
 	// cl_minmodels convar dependent on sv_allowminmodels convar
 

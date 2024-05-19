@@ -73,7 +73,7 @@ CFunc_LOD::~CFunc_LOD()
 void CFunc_LOD::Spawn()
 {
 	// Bind to our bmodel.
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetSolid( SOLID_BSP );
 	BaseClass::Spawn();
 

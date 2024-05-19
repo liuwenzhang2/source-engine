@@ -171,11 +171,11 @@ void CPropPortalStatsDisplay::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlwa
 
 void CPropPortalStatsDisplay::Spawn( void )
 {
-	char *szModel = (char *)STRING( GetModelName() );
+	char *szModel = (char *)STRING(GetEngineObject()->GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = PORTAL_STATS_DISPLAY_MODEL_NAME;
-		SetModelName( AllocPooledString(szModel) );
+		GetEngineObject()->SetModelName( AllocPooledString(szModel) );
 	}
 
 	Precache();
@@ -216,7 +216,7 @@ void CPropPortalStatsDisplay::Precache( void )
 {
 	BaseClass::Precache();
 
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	PrecacheVGuiScreen( "portal_stats_display_screen" );
 }

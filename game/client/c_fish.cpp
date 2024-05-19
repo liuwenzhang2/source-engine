@@ -99,7 +99,7 @@ IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_Fish, DT_CFish, CFish )
 
 	RecvPropFloat( RECVINFO_NAME( m_actualAngles.y, m_angle ) ),
 
-	RecvPropInt( RECVINFO(m_nModelIndex) ),
+	//RecvPropInt( RECVINFO(m_nModelIndex) ),
 	RecvPropInt( RECVINFO(m_lifeState) ),
 
 	RecvPropFloat( RECVINFO(m_waterLevel) ),		///< get this from the server in case we die when slightly out of the water due to error correction

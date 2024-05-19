@@ -436,7 +436,7 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 		if ( tr.m_pEnt == pOther )
 		{
 			// and it's not another squeakgrenade
-			if (((CBaseEntity*)tr.m_pEnt)->GetModelIndex() != GetModelIndex() )
+			if (((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetModelIndex() != GetEngineObject()->GetModelIndex() )
 			{
 				// ALERT( at_console, "hit enemy\n");
 				ClearMultiDamage();

@@ -2461,7 +2461,7 @@ void CWeaponPhysCannon::ManagePredictedObject( void )
 			if ( pPhysics == NULL )
 			{
 				solid_t tmpSolid;
-				PhysModelParseSolid( tmpSolid, m_hAttachedObject, pAttachedObject->GetModelIndex() );
+				PhysModelParseSolid( tmpSolid, m_hAttachedObject, pAttachedObject->GetEngineObject()->GetModelIndex() );
 
 				pAttachedObject->VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &tmpSolid );
 			}

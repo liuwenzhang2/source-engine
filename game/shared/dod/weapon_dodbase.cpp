@@ -534,9 +534,9 @@ bool CWeaponDODBase::Deploy()
 			SetSequence( 0 );
 		}
 
-		if ( GetModelIndex() != iDesiredModelIndex )
+		if (GetEngineObject()->GetModelIndex() != iDesiredModelIndex )
 		{
-			SetModelIndex( iDesiredModelIndex );
+			GetEngineObject()->SetModelIndex( iDesiredModelIndex );
 		}
 
 		BaseClass::PostDataUpdate( updateType );

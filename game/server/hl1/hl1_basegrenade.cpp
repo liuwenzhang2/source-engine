@@ -38,7 +38,7 @@ void CHL1BaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 {
 	float		flRndSound;// sound randomizer
 
-	SetModelName( NULL_STRING );//invisible
+	GetEngineObject()->SetModelName( NULL_STRING );//invisible
 	AddSolidFlags( FSOLID_NOT_SOLID );
 
 	m_takedamage = DAMAGE_NO;

@@ -67,7 +67,7 @@ bool IsStaticPointEntity( CBaseEntity *pEnt )
 	if ( pEnt->GetEngineObject()->GetMoveParent() )
 		return false;
 
-	if ( !pEnt->GetModelIndex() )
+	if ( !pEnt->GetEngineObject()->GetModelIndex() )
 		return 1;
 
 	if ( FClassnameIs( pEnt, "info_target" ) || FClassnameIs( pEnt, "info_landmark" ) || 
@@ -180,7 +180,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_Beam )
 	SendPropBool	(SENDINFO(m_bDrawInMainRender) ),
 	SendPropBool	(SENDINFO(m_bDrawInPortalRender) ),
 #endif
-	SendPropModelIndex(SENDINFO(m_nModelIndex) ),
+	//SendPropModelIndex(SENDINFO(m_nModelIndex) ),
 	//SendPropVector (SENDINFO_ORIGIN(m_vecOrigin), 19, SPROP_CHANGES_OFTEN,	MIN_COORD_INTEGER, MAX_COORD_INTEGER, SendProxy_Origin),
 	//SendPropEHandle(SENDINFO_MOVEPARENT(moveparent), 0, SendProxy_MoveParentToInt),
 	SendPropInt		(SENDINFO(m_nMinDXLevel),	8,	SPROP_UNSIGNED ),
@@ -221,7 +221,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CBeam, DT_Beam )
 	RecvPropBool(RECVINFO(m_bDrawInMainRender) ),
 	RecvPropBool(RECVINFO(m_bDrawInPortalRender) ),
 #endif
-	RecvPropInt(RECVINFO(m_nModelIndex)),
+	//RecvPropInt(RECVINFO(m_nModelIndex)),
 	RecvPropInt(RECVINFO(m_nMinDXLevel)),
 
 	//RecvPropVector(RECVINFO_NAME(m_vecNetworkOrigin, m_vecOrigin)),
@@ -310,7 +310,7 @@ BEGIN_PREDICTION_DATA( CBeam )
 	DEFINE_PRED_FIELD( m_bDrawInMainRender, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_bDrawInPortalRender, FIELD_BOOLEAN, FTYPEDESC_INSENDTABLE ),
 #endif
-	DEFINE_PRED_FIELD( m_nModelIndex, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_MODELINDEX ),
+	//DEFINE_PRED_FIELD( m_nModelIndex, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_MODELINDEX ),
 	//DEFINE_PRED_FIELD_TOL( m_vecOrigin, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, 0.125f ),
 	
 	//DEFINE_PRED_FIELD( m_pMoveParent, SendProxy_MoveParent ),
@@ -589,7 +589,7 @@ void CBeam::BeamInit( const char *pSpriteName, float width )
 	SetNoise( 0 );
 	SetFrame( 0 );
 	SetScrollRate( 0 );
-	SetModelName( MAKE_STRING( pSpriteName ) );
+	GetEngineObject()->SetModelName( MAKE_STRING( pSpriteName ) );
 	SetRenderMode( kRenderTransTexture );
 	SetTexture(engine->PrecacheModel( pSpriteName ) );
 	SetWidth( width );
@@ -1012,7 +1012,7 @@ void CBeam::OnDataChanged( DataUpdateType_t updateType )
 	MarkMessageReceived();
 
 	// Make sure that the correct model is referenced for this entity
-	SetModelPointer( modelinfo->GetModel( GetModelIndex() ) );
+	SetModelPointer( modelinfo->GetModel(GetEngineObject()->GetModelIndex() ) );
 
 	// Convert weapon world models to viewmodels if they're weapons being carried by the local player
 	for (int i=0;i<MAX_BEAM_ENTS;i++)

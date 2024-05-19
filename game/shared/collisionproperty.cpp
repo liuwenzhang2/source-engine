@@ -785,7 +785,7 @@ void CCollisionProperty::UseTriggerBounds( bool bEnable, float flBloat )
 //-----------------------------------------------------------------------------
 int CCollisionProperty::GetCollisionModelIndex()
 {
-	return m_pOuter->GetModelIndex();
+	return m_pOuter->GetEngineObject()->GetModelIndex();
 }
 
 const model_t* CCollisionProperty::GetCollisionModel()

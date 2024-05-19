@@ -105,7 +105,7 @@ END_DATADESC()
 void CBubbling::Spawn( void )
 {
 	Precache( );
-	SetModel( STRING( GetModelName() ) );		// Set size
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );		// Set size
 
 	// Make it invisible to client
 	SetRenderColorA( 0 );
@@ -508,7 +508,7 @@ void CGibShooter::InitPointGib( CGib *pGib, const Vector &vecShootDir, float flS
 
 		if ( m_bIsSprite == true )
 		{
-			pGib->SetSprite( CSprite::SpriteCreate( STRING( GetModelName() ), pGib->GetEngineObject()->GetAbsOrigin(), false ) );
+			pGib->SetSprite( CSprite::SpriteCreate( STRING(GetEngineObject()->GetModelName() ), pGib->GetEngineObject()->GetAbsOrigin(), false ) );
 
 			CSprite *pSprite = (CSprite*)pGib->GetSprite();
 
@@ -537,7 +537,7 @@ CBaseEntity *CGibShooter::SpawnGib( const Vector &vecShootDir, float flSpeed )
 		{
 			// UNDONE: Assume a mass of 200 for now
 			Vector force = vecShootDir * flSpeed * 200;
-			return CreateRagGib( STRING( GetModelName() ), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), force, m_flGibLife );
+			return CreateRagGib( STRING(GetEngineObject()->GetModelName() ), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), force, m_flGibLife );
 		}
 
 		case GIB_SIMULATE_PHYSICS:
@@ -683,7 +683,7 @@ bool CEnvShooter::KeyValue( const char *szKeyName, const char *szValue )
 	if (FStrEq(szKeyName, "shootmodel"))
 	{
 		m_bIsSprite = false;
-		SetModelName( AllocPooledString(szValue) );
+		GetEngineObject()->SetModelName( AllocPooledString(szValue) );
 
 		//Adrian - not pretty...
 		if ( Q_stristr( szValue, ".vmt" ) )
@@ -728,7 +728,7 @@ bool CEnvShooter::KeyValue( const char *szKeyName, const char *szValue )
 
 void CEnvShooter::Precache ( void )
 {
-	m_iGibModelIndex = engine->PrecacheModel( STRING( GetModelName() ) );
+	m_iGibModelIndex = engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 }
 
 
@@ -743,7 +743,7 @@ CGib *CEnvShooter::CreateGib ( void )
 	}
 	else
 	{
-		pGib->Spawn( STRING( GetModelName() ) );
+		pGib->Spawn( STRING(GetEngineObject()->GetModelName() ) );
 	}
 
 	int bodyPart = 0;
@@ -1526,7 +1526,7 @@ void CPrecipitation::Spawn( void )
 	Precache();
 	SetSolid( SOLID_NONE );							// Remove model & collisions
 	SetMoveType( MOVETYPE_NONE );
-	SetModel( STRING( GetModelName() ) );		// Set size
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );		// Set size
 
 	// Default to rain.
 	if ( m_nPrecipType < 0 || m_nPrecipType > NUM_PRECIPITATION_TYPES )
@@ -1706,7 +1706,7 @@ END_SEND_TABLE()
 void CEmbers::Spawn( void )
 {
 	Precache();
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	SetSolid( SOLID_NONE );
 	SetRenderColorA( 0 );

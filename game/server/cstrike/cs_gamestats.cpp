@@ -552,9 +552,9 @@ void CCSGameStats::Event_BreakProp( CCSPlayer* pPlayer, CBreakableProp *pProp )
 	if (!pPlayer)
 		return;
 
-	DevMsg("Player %s broke a %s (%i)\n", pPlayer->GetPlayerName(), pProp->GetModelName().ToCStr(), pProp->entindex());
+	DevMsg("Player %s broke a %s (%i)\n", pPlayer->GetPlayerName(), pProp->GetEngineObject()->GetModelName().ToCStr(), pProp->entindex());
 
-	int iIndex = m_PropStatTable.Find(pProp->GetModelName().ToCStr());
+	int iIndex = m_PropStatTable.Find(pProp->GetEngineObject()->GetModelName().ToCStr());
 	if (m_PropStatTable.IsValidIndex(iIndex))
 	{
 		IncrementStat(pPlayer, m_PropStatTable[iIndex], 1);

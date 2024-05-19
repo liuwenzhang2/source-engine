@@ -156,20 +156,20 @@ int CWeaponPortalBase::DrawModel( int flags )
 		return 0;
 
 	//Sometimes the return value of ShouldDrawLocalPlayer() fluctuates too often to draw the correct model all the time, so this is a quick fix if it's changed too fast
-	int iOriginalIndex = GetModelIndex();
+	int iOriginalIndex = GetEngineObject()->GetModelIndex();
 	bool bChangeModelBack = false;
 
 	int iWorldModelIndex = GetWorldModelIndex();
 	if( iOriginalIndex != iWorldModelIndex )
 	{
-		SetModelIndex( iWorldModelIndex );
+		GetEngineObject()->SetModelIndex( iWorldModelIndex );
 		bChangeModelBack = true;
 	}
 
 	int iRetVal = BaseClass::DrawModel( flags );
 
 	if( bChangeModelBack )
-		SetModelIndex( iOriginalIndex );
+		GetEngineObject()->SetModelIndex( iOriginalIndex );
 
 	return iRetVal;
 }

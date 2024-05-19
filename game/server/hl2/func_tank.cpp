@@ -746,7 +746,7 @@ void CFuncTank::Spawn( void )
 
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	SetSolid( SOLID_VPHYSICS );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 
 	if ( HasSpawnFlags(SF_TANK_NOTSOLID) )

@@ -67,7 +67,7 @@ void CFuncMoveLinear::Spawn( void )
 	AngleVectors( angMoveDir, &m_vecMoveDir );
 
 	SetMoveType( MOVETYPE_PUSH );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	// Don't allow zero or negative speeds
 	if (m_flSpeed <= 0)

@@ -824,7 +824,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CInfoAPCMissileHint::Spawn( )
 {
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetSolid( SOLID_BSP );
 	AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW );

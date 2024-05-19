@@ -204,7 +204,7 @@ int CEnvEffectsScript::UpdateTransmitState()
 void CEnvEffectsScript::Precache()
 {
 	BaseClass::Precache();
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	if ( m_iszScriptName != NULL_STRING )
 		 ParseScriptFile();
@@ -221,7 +221,7 @@ void CEnvEffectsScript::Spawn()
 	BaseClass::Spawn();
 
 	// We need a model for its animation sequences even though we don't render it
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	AddEffects( EF_NODRAW );
 

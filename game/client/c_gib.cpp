@@ -65,7 +65,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	solid_t tmpSolid;
-	PhysModelParseSolid( tmpSolid, this, GetModelIndex() );
+	PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() );
 	
 	m_pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, 0, false, &tmpSolid );
 	

@@ -1322,7 +1322,7 @@ IPhysicsObject *CBaseEntity::VPhysicsInitStatic( void )
 	}
 	else
 	{
-		pPhysicsObject = PhysModelCreateUnmoveable( this, GetModelIndex(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
+		pPhysicsObject = PhysModelCreateUnmoveable( this, GetEngineObject()->GetModelIndex(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 	}
 	VPhysicsSetObject( pPhysicsObject );
 	return pPhysicsObject;
@@ -1401,7 +1401,7 @@ IPhysicsObject *CBaseEntity::VPhysicsInitNormal( SolidType_t solidType, int nSol
 	}
 
 	// create a normal physics object
-	IPhysicsObject *pPhysicsObject = PhysModelCreate( this, GetModelIndex(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), pSolid );
+	IPhysicsObject *pPhysicsObject = PhysModelCreate( this, GetEngineObject()->GetModelIndex(), GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), pSolid );
 	if ( pPhysicsObject )
 	{
 		VPhysicsSetObject( pPhysicsObject );
@@ -1446,7 +1446,7 @@ IPhysicsObject *CBaseEntity::VPhysicsInitShadow( bool allowPhysicsMovement, bool
 	}
 	else
 	{
-		pPhysicsObject = PhysModelCreate( this, GetModelIndex(), origin, angles, pSolid );
+		pPhysicsObject = PhysModelCreate( this, GetEngineObject()->GetModelIndex(), origin, angles, pSolid );
 	}
 	if ( !pPhysicsObject )
 		return NULL;
@@ -1483,7 +1483,7 @@ bool CBaseEntity::IsBSPModel() const
 	if ( GetSolid() == SOLID_BSP )
 		return true;
 	
-	const model_t *model = modelinfo->GetModel( GetModelIndex() );
+	const model_t *model = modelinfo->GetModel(GetEngineObject()->GetModelIndex() );
 
 	if ( GetSolid() == SOLID_VPHYSICS && modelinfo->GetModelType( model ) == mod_brush )
 		return true;

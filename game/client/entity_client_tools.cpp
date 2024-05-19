@@ -495,7 +495,7 @@ int CClientTools::GetModelIndex( HTOOLHANDLE handle )
 	HToolEntry_t &entry = m_Handles[ idx ];
 	if ( entry.m_hEntity )
 	{
-		return entry.m_hEntity->GetModelIndex();
+		return entry.m_hEntity->GetEngineObject()->GetModelIndex();
 	}
 	Assert( 0 );
 	return 0;
@@ -514,7 +514,7 @@ const char* CClientTools::GetModelName( HTOOLHANDLE handle )
 	HToolEntry_t &entry = m_Handles[ idx ];
 	if ( entry.m_hEntity )
 	{
-		return STRING( entry.m_hEntity->GetModelName() );
+		return STRING( entry.m_hEntity->GetEngineObject()->GetModelName() );
 	}
 	Assert( 0 );
 	return NULL;

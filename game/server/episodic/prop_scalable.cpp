@@ -92,7 +92,7 @@ void CPropScalable::Spawn( void )
 	}
 	else
 	{
-		char *szModel = (char *)STRING( GetModelName() );
+		char *szModel = (char *)STRING(GetEngineObject()->GetModelName() );
 		if (!szModel || !*szModel)
 		{
 			Warning( "prop_scalable at %.0f %.0f %0.f missing modelname\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );

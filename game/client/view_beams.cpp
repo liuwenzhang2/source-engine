@@ -2130,7 +2130,7 @@ void CViewRenderBeams::DrawBeam( C_Beam* pbeam, ITraceFilter *pEntityBeamTraceFi
 	beamInfo.m_vecStart = pbeam->GetAbsStartPos();
 	beamInfo.m_vecEnd = pbeam->GetAbsEndPos();
 	beamInfo.m_pStartEnt = beamInfo.m_pEndEnt = NULL;
-	beamInfo.m_nModelIndex = pbeam->GetModelIndex();
+	beamInfo.m_nModelIndex = pbeam->GetEngineObject()->GetModelIndex();
 	beamInfo.m_nHaloIndex = pbeam->m_nHaloIndex;
 	beamInfo.m_flHaloScale = pbeam->m_fHaloScale;
 	beamInfo.m_flLife = 0;

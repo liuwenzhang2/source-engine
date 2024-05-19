@@ -99,7 +99,7 @@ int CParticleProperty::GetParticleAttachment( C_BaseEntity *pEntity, const char 
 	int iAttachment = pEntity->GetBaseAnimating()->LookupAttachment( pszAttachmentName );
 	if ( iAttachment == INVALID_PARTICLE_ATTACHMENT )
 	{
-		Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetBaseAnimating()->GetModelName()), pszAttachmentName, pszParticleName );
+		Warning("Model '%s' doesn't have attachment '%s' to attach particle system '%s' to.\n", STRING(pEntity->GetBaseAnimating()->GetEngineObject()->GetModelName()), pszAttachmentName, pszParticleName );
 	}
 
 	return iAttachment;

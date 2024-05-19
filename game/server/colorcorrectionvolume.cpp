@@ -145,7 +145,7 @@ void CColorCorrectionVolume::Spawn( void )
 
 	SetSolid( SOLID_BSP );
 	SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	SetThink( &CColorCorrectionVolume::ThinkFunc );
 	SetNextThink( gpGlobals->curtime + 0.01f );

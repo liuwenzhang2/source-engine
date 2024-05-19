@@ -102,7 +102,7 @@ void CGenericActor::Spawn()
 {
 	Precache();
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 /*
 	if ( FStrEq( STRING( GetModelName() ), "models/player.mdl" ) )
@@ -111,9 +111,9 @@ void CGenericActor::Spawn()
 		UTIL_SetSize(this, VEC_HULL_MIN, VEC_HULL_MAX);
 */
 
-	if ( FStrEq( STRING( GetModelName() ), "models/player.mdl" ) || 
-		 FStrEq( STRING( GetModelName() ), "models/holo.mdl" ) ||
-		 FStrEq( STRING( GetModelName() ), "models/blackout.mdl" ) )
+	if ( FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/player.mdl" ) ||
+		 FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/holo.mdl" ) ||
+		 FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/blackout.mdl" ) )
 	{
 		UTIL_SetSize(this, VEC_HULL_MIN, VEC_HULL_MAX);
 	}
@@ -122,7 +122,7 @@ void CGenericActor::Spawn()
 		UTIL_SetSize(this, NAI_Hull::Mins(HULL_HUMAN), NAI_Hull::Maxs(HULL_HUMAN));
 	}
 
-	if ( !FStrEq( STRING( GetModelName() ), "models/blackout.mdl" ) )
+	if ( !FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/blackout.mdl" ) )
 	{
 		SetSolid( SOLID_BBOX );
 		AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -164,7 +164,7 @@ void CGenericActor::Spawn()
 //=========================================================
 void CGenericActor::Precache()
 {
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 }	
 
 //=========================================================

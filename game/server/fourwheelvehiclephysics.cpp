@@ -231,7 +231,7 @@ bool CFourWheelVehiclePhysics::ParseVehicleScript( const char *pScriptName, soli
 	m_debugRadius = vehicle.axles[0].wheels.radius;
 	CalcWheelData( vehicle );
 
-	PhysModelParseSolid( solid, m_pOuter, m_pOuter->GetModelIndex() );
+	PhysModelParseSolid( solid, m_pOuter, m_pOuter->GetEngineObject()->GetModelIndex() );
 	
 	// Allow the script to shift the center of mass
 	if ( vehicle.body.massCenterOverride != vec3_origin )
@@ -310,7 +310,7 @@ void CFourWheelVehiclePhysics::CalcWheelData( vehicleparams_t &vehicle )
 	{
 		if ( m_wheelTotalHeight[i] == 0.0f )
 		{
-			DevWarning("Vehicle %s has invalid wheel attachment for %s - no movement\n", STRING(m_pOuter->GetModelName()), pWheelAttachments[i]);
+			DevWarning("Vehicle %s has invalid wheel attachment for %s - no movement\n", STRING(m_pOuter->GetEngineObject()->GetModelName()), pWheelAttachments[i]);
 			m_wheelTotalHeight[i] = 1.0f;
 		}
 	}

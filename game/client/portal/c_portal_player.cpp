@@ -120,7 +120,7 @@ private:
 IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_PortalRagdoll, DT_PortalRagdoll, CPortalRagdoll )
 RecvPropVector( RECVINFO(m_vecRagdollOrigin) ),
 RecvPropEHandle( RECVINFO( m_hPlayer ) ),
-RecvPropInt( RECVINFO( m_nModelIndex ) ),
+//RecvPropInt( RECVINFO( m_nModelIndex ) ),
 RecvPropInt( RECVINFO(m_nForceBone) ),
 RecvPropVector( RECVINFO(m_vecForce) ),
 RecvPropVector( RECVINFO( m_vecRagdollVelocity ) ),
@@ -228,7 +228,7 @@ void C_PortalRagdoll::CreatePortalRagdoll()
 		GetEngineObject()->Interp_Reset( varMap );
 
 		m_nBody = pPlayer->GetBody();
-		SetModelIndex( m_nModelIndex );	
+		GetEngineObject()->SetModelIndex(GetEngineObject()->GetModelIndex() );
 		// Make us a ragdoll..
 		m_nRenderFX = kRenderFxRagdoll;
 

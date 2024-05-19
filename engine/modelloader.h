@@ -127,31 +127,31 @@ public:
 	virtual const char *GetActiveMapName( void ) = 0;
 
 	// Called by app system once per frame to poll and update dynamic models
-	virtual void		UpdateDynamicModels() = 0;
+	//virtual void		UpdateDynamicModels() = 0;
 
 	// Called by server and client engine code to flush unreferenced dynamic models
-	virtual void		FlushDynamicModels() = 0;
+	//virtual void		FlushDynamicModels() = 0;
 
 	// Called by server and client engine code to flush unreferenced dynamic models
-	virtual void		ForceUnloadNonClientDynamicModels() = 0;
+	//virtual void		ForceUnloadNonClientDynamicModels() = 0;
 
 	// Called by client code to load dynamic models, instead of GetModelForName.
-	virtual model_t		*GetDynamicModel( const char *name, bool bClientOnly ) = 0;
+	//virtual model_t		*GetDynamicModel( const char *name, bool bClientOnly ) = 0;
 
 	// Called by client code to query dynamic model state
-	virtual bool		IsDynamicModelLoading( model_t *pModel, bool bClientOnly ) = 0;
+	//virtual bool		IsDynamicModelLoading( model_t *pModel, bool bClientOnly ) = 0;
 
 	// Called by client code to refcount dynamic models
-	virtual void		AddRefDynamicModel( model_t *pModel, bool bClientSideRef ) = 0;
-	virtual void		ReleaseDynamicModel( model_t *pModel, bool bClientSideRef ) = 0;
+	//virtual void		AddRefDynamicModel( model_t *pModel, bool bClientSideRef ) = 0;
+	//virtual void		ReleaseDynamicModel( model_t *pModel, bool bClientSideRef ) = 0;
 
 	// Called by client code
-	virtual bool		RegisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback, bool bCallImmediatelyIfLoaded = true ) = 0;
+	//virtual bool		RegisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback, bool bCallImmediatelyIfLoaded = true ) = 0;
 
 	// Called by client code or IModelLoadCallback destructor
-	virtual void		UnregisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback ) = 0;
+	//virtual void		UnregisterModelLoadCallback( model_t *pModel, bool bClientOnly, IModelLoadCallback *pCallback ) = 0;
 
-	virtual void		Client_OnServerModelStateChanged( model_t *pModel, bool bServerLoaded ) = 0;
+	//virtual void		Client_OnServerModelStateChanged( model_t *pModel, bool bServerLoaded ) = 0;
 };
 
 extern IModelLoader *modelloader;

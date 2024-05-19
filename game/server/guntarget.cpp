@@ -95,7 +95,7 @@ void CGunTarget::Spawn( void )
 	SetSolid( SOLID_BSP );
 	SetMoveType( MOVETYPE_PUSH );
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	if ( m_flSpeed == 0 )
 		m_flSpeed = 100;

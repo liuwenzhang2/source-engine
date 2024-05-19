@@ -434,7 +434,7 @@ public:
 #endif // CLIENT_DLL
 		if ( ent )
 		{
-			char const *actorModel = STRING( ent->GetModelName() );
+			char const *actorModel = STRING( ent->GetEngineObject()->GetModelName() );
 			gender = g_pSoundEmitterSystemBase->GetActorGender( actorModel );
 		}
 
@@ -1216,7 +1216,7 @@ public:
 	
 	void GenderExpandString(CBaseEntity* pEntity, char const* in, char* out, int maxlen)//CBaseEntity::
 	{
-		g_pSoundEmitterSystemBase->GenderExpandString(STRING(pEntity->GetModelName()), in, out, maxlen);
+		g_pSoundEmitterSystemBase->GenderExpandString(STRING(pEntity->GetEngineObject()->GetModelName()), in, out, maxlen);
 	}
 
 	bool GetParametersForSound(const char* soundname, CSoundParameters& params, const char* actormodel)//CBaseEntity::

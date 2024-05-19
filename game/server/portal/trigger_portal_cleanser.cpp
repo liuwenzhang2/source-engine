@@ -82,7 +82,7 @@ void CTriggerPortalCleanser::Spawn( void )
 CBaseEntity* ConvertToSimpleProp ( CBaseEntity* pEnt )
 {
 	CBaseEntity *pRetVal = NULL;
-	int modelindex = pEnt->GetModelIndex();
+	int modelindex = pEnt->GetEngineObject()->GetModelIndex();
 	const model_t *model = modelinfo->GetModel( modelindex );
 	if ( model && modelinfo->GetModelType(model) == mod_brush )
 	{
@@ -93,7 +93,7 @@ CBaseEntity* ConvertToSimpleProp ( CBaseEntity* pEnt )
 		pRetVal = gEntList.CreateEntityByName( "simple_physics_prop" );
 	}
 
-	pRetVal->KeyValue( "model", STRING(pEnt->GetModelName()) );
+	pRetVal->KeyValue( "model", STRING(pEnt->GetEngineObject()->GetModelName()) );
 	pRetVal->GetEngineObject()->SetAbsOrigin( pEnt->GetEngineObject()->GetAbsOrigin() );
 	pRetVal->GetEngineObject()->SetAbsAngles( pEnt->GetEngineObject()->GetAbsAngles() );
 	pRetVal->Spawn();

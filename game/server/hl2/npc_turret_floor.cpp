@@ -223,7 +223,7 @@ void CNPC_FloorTurret::UpdateOnRemove( void )
 //-----------------------------------------------------------------------------
 void CNPC_FloorTurret::Precache( void )
 {
-	const char *pModelName = STRING( GetModelName() );
+	const char *pModelName = STRING(GetEngineObject()->GetModelName() );
 	pModelName = ( pModelName && pModelName[ 0 ] != '\0' ) ? pModelName : FLOOR_TURRET_MODEL;
 	engine->PrecacheModel( pModelName );
 	engine->PrecacheModel( FLOOR_TURRET_GLOW_SPRITE );
@@ -271,7 +271,7 @@ void CNPC_FloorTurret::Spawn( void )
 { 
 	Precache();
 
-	const char *pModelName = STRING( GetModelName() );
+	const char *pModelName = STRING(GetEngineObject()->GetModelName() );
 	SetModel( ( pModelName && pModelName[ 0 ] != '\0' ) ? pModelName : FLOOR_TURRET_MODEL );
 	
 	// If we're a citizen turret, we use a different skin
@@ -2177,7 +2177,7 @@ void CNPC_FloorTurret::BreakThink( void )
 
 	// no damage/damage force? set a burst of 100 for some movement
 	params.defBurstScale = 100;
-	PropBreakableCreateAll( GetModelIndex(), VPhysicsGetObject(), params, this, -1, true );
+	PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), VPhysicsGetObject(), params, this, -1, true );
 
 	// Throw out some small chunks too obscure the explosion even more
 	CPVSFilter filter( vecOrigin );

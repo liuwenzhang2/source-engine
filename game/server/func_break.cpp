@@ -283,7 +283,7 @@ void CBreakable::Spawn( void )
 	m_angle = GetEngineObject()->GetLocalAngles().y;
 	GetEngineObject()->SetLocalAngles( vec3_angle );
 	
-	SetModel( STRING( GetModelName() ) );//set size and link into world.
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );//set size and link into world.
 
 	SetTouch( &CBreakable::BreakTouch );
 	if ( FBitSet( m_spawnflags, SF_BREAK_TRIGGER_ONLY ) )		// Only break on trigger
@@ -1253,7 +1253,7 @@ void CPushable::Spawn( void )
 		SetSolid( SOLID_VPHYSICS );
 
 		SetMoveType( MOVETYPE_PUSH );
-		SetModel( STRING( GetModelName() ) );
+		SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 		CreateVPhysics();
 	}

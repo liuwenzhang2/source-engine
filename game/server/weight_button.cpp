@@ -50,7 +50,7 @@ void CWeightButton::Spawn()
 	// Convert movedir from angles to a vector
 	SetMoveType( MOVETYPE_VPHYSICS );
 	SetSolid( SOLID_VPHYSICS );
- 	SetModel( STRING( GetModelName() ) );
+ 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	CreateVPhysics();
 	SetThink( &CWeightButton::TriggerThink );
 	SetNextThink( gpGlobals->curtime + TICK_INTERVAL );

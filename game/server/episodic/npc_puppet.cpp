@@ -54,7 +54,7 @@ END_SEND_TABLE()
 void CNPC_Puppet::Precache( void )
 {
 	BaseClass::Precache();
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ void CNPC_Puppet::Spawn( void )
 
 	Precache();
 
-	SetModel( STRING( GetModelName() ) );
+	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	NPCInit();
 

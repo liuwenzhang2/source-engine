@@ -88,11 +88,11 @@ END_DATADESC()
 
 void CPropThumper::Spawn( void )
 {
-	char *szModel = (char *)STRING( GetModelName() );
+	char *szModel = (char *)STRING(GetEngineObject()->GetModelName() );
 	if (!szModel || !*szModel)
 	{
 		szModel = THUMPER_MODEL_NAME;
-		SetModelName( AllocPooledString(szModel) );
+		GetEngineObject()->SetModelName( AllocPooledString(szModel) );
 	}
 
 	Precache();
@@ -147,7 +147,7 @@ void CPropThumper::Precache( void )
 {
 	BaseClass::Precache();
 
-	engine->PrecacheModel( STRING( GetModelName() ) );
+	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_hit" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_ambient" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "coast.thumper_dust" );
