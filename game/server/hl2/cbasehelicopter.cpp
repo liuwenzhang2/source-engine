@@ -199,7 +199,7 @@ void CBaseHelicopter::Spawn( void )
 
 	// Don't start up if the level designer has asked the 
 	// helicopter to start disabled.
-	if ( !(m_spawnflags & SF_AWAITINPUT) )
+	if ( !(GetEngineObject()->GetSpawnFlags() & SF_AWAITINPUT))
 	{
 		Startup();
 		SetNextThink( gpGlobals->curtime + 1.0f );
@@ -361,7 +361,7 @@ void CBaseHelicopter::DrawRotorWash( float flAltitude, const Vector &vecRotorOri
 		CRopeKeyframe::ShakeRopes(GetEngineObject()->GetAbsOrigin(), flAltitude, 128 );
 	}
 
-	if ( m_spawnflags & SF_NOROTORWASH )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NOROTORWASH)
 		return;
 
 	DoRotorPhysicsPush( vecRotorOrigin, flAltitude );
@@ -1292,7 +1292,7 @@ void CBaseHelicopter::Startup( void )
 {
 	StopRotorWash();
 
-	if ( !( m_spawnflags & SF_NOROTORWASH ) )
+	if ( !(GetEngineObject()->GetSpawnFlags() & SF_NOROTORWASH))
 	{
 		 m_hRotorWash = CreateRotorWashEmitter(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), this, BASECHOPPER_WASH_ALTITUDE );
 	}
@@ -1364,13 +1364,13 @@ void CBaseHelicopter::GibMonster( void )
 //-----------------------------------------------------------------------------
 void CBaseHelicopter::InputActivate( inputdata_t &inputdata )
 {
-	if( m_spawnflags & SF_AWAITINPUT )
+	if(GetEngineObject()->GetSpawnFlags() & SF_AWAITINPUT)
 	{
 		Startup();
 
 		// Now clear the spawnflag to protect from
 		// subsequent calls.
-		m_spawnflags &= ~SF_AWAITINPUT;
+		GetEngineObject()->RemoveSpawnFlags(SF_AWAITINPUT);
 	}
 }
 
@@ -1412,12 +1412,12 @@ void CBaseHelicopter::InputMissileOff( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CBaseHelicopter::InputEnableRotorWash( inputdata_t &inputdata )
 {
-	m_spawnflags &= ~SF_NOROTORWASH;
+	GetEngineObject()->RemoveSpawnFlags(SF_NOROTORWASH);
 }
 
 void CBaseHelicopter::InputDisableRotorWash( inputdata_t &inputdata )
 {
-	m_spawnflags |= SF_NOROTORWASH;
+	GetEngineObject()->AddSpawnFlags(SF_NOROTORWASH);
 }
 
 

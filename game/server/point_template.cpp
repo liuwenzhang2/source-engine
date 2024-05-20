@@ -143,7 +143,7 @@ void CPointTemplate::Precache()
 //-----------------------------------------------------------------------------
 bool CPointTemplate::AllowNameFixup()
 {
-	return !HasSpawnFlags( SF_POINTTEMPLATE_PRESERVE_NAMES );
+	return !GetEngineObject()->HasSpawnFlags( SF_POINTTEMPLATE_PRESERVE_NAMES );
 }
 
 //-----------------------------------------------------------------------------
@@ -220,7 +220,7 @@ void CPointTemplate::AddTemplate( CBaseEntity *pEntity, const char *pszMapData, 
 //-----------------------------------------------------------------------------
 bool CPointTemplate::ShouldRemoveTemplateEntities( void )
 {
-	return ( !(m_spawnflags & SF_POINTTEMPLATE_DONTREMOVETEMPLATEENTITIES) );
+	return ( !(GetEngineObject()->GetSpawnFlags() & SF_POINTTEMPLATE_DONTREMOVETEMPLATEENTITIES));
 }
 
 //-----------------------------------------------------------------------------

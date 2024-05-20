@@ -145,7 +145,7 @@ void CPortal_Dinosaur::Spawn()
 {
 	Precache();
 	KeyValue( "model", RADIO_MODEL_NAME );
-	m_spawnflags |= SF_PHYSPROP_START_ASLEEP;
+	GetEngineObject()->AddSpawnFlags(SF_PHYSPROP_START_ASLEEP);
 	BaseClass::Spawn();
 }
 

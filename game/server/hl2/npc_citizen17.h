@@ -211,8 +211,8 @@ public:
 	//---------------------------------
 	// Special abilities
 	//---------------------------------
-	bool 			IsMedic() 			{ return HasSpawnFlags(SF_CITIZEN_MEDIC); }
-	bool 			IsAmmoResupplier() 	{ return HasSpawnFlags(SF_CITIZEN_AMMORESUPPLIER); }
+	bool 			IsMedic() 			{ return GetEngineObject()->HasSpawnFlags(SF_CITIZEN_MEDIC); }
+	bool 			IsAmmoResupplier() 	{ return GetEngineObject()->HasSpawnFlags(SF_CITIZEN_AMMORESUPPLIER); }
 	
 	bool 			CanHeal();
 	bool 			ShouldHealTarget( CBaseEntity *pTarget, bool bActiveUse = false );

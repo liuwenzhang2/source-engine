@@ -118,7 +118,7 @@ void CLogicAuto::Think(void)
 			}
 		}
 
-		if (m_spawnflags & SF_AUTO_FIREONCE)
+		if (GetEngineObject()->GetSpawnFlags() & SF_AUTO_FIREONCE)
 		{
 			UTIL_Remove(this);
 		}

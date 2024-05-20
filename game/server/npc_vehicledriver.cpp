@@ -258,7 +258,7 @@ int CNPC_VehicleDriver::SelectSchedule( void )
 	// Vehicle driver hangs in the air inside the vehicle, so we never need to fall to ground
 	ClearCondition( COND_FLOATING_OFF_GROUND );
 
-	if ( HasSpawnFlags(SF_VEHICLEDRIVER_INACTIVE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_VEHICLEDRIVER_INACTIVE) )
 	{
 		SetState( NPC_STATE_IDLE );
 		return SCHED_VEHICLEDRIVER_INACTIVE;
@@ -949,7 +949,7 @@ void CNPC_VehicleDriver::CheckForTeleport( void )
 		return;
 
 	// Does it have the teleport flag set?
-	if ( pTrack->HasSpawnFlags( SF_PATH_TELEPORT ) )
+	if ( pTrack->GetEngineObject()->HasSpawnFlags( SF_PATH_TELEPORT ) )
 	{
 		IncrementInterpolationFrame();
 
@@ -1038,7 +1038,7 @@ void CNPC_VehicleDriver::InputSetDriversMinSpeed( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_VehicleDriver::InputStartForward( inputdata_t &inputdata )
 {
-	CLEARBITS( m_spawnflags, SF_VEHICLEDRIVER_INACTIVE );
+	GetEngineObject()->RemoveSpawnFlags(SF_VEHICLEDRIVER_INACTIVE);
 	if ( m_NPCState == NPC_STATE_IDLE )
 	{
 		SetState( NPC_STATE_ALERT );
@@ -1061,7 +1061,7 @@ void CNPC_VehicleDriver::InputStop( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_VehicleDriver::InputStartFiring( inputdata_t &inputdata )
 {
-	CLEARBITS( m_spawnflags, SF_VEHICLEDRIVER_INACTIVE );
+	GetEngineObject()->RemoveSpawnFlags(SF_VEHICLEDRIVER_INACTIVE);
 	SetCondition( COND_PROVOKED );
 
 	float flMinRange, flMaxRange;

@@ -352,7 +352,7 @@ bool CNPC_HGrunt::FOkToSpeak( void )
 	if ( gpGlobals->curtime <= m_flTalkWaitTime )
 		 return FALSE;
 
-	if ( m_spawnflags & SF_NPC_GAG )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NPC_GAG )
 	{
 		if ( m_NPCState != NPC_STATE_COMBAT )
 		{
@@ -544,7 +544,7 @@ void CNPC_HGrunt::StartNPC ( void )
 		if ( m_SquadName != NULL_STRING )
 		{
 			// if I have a groupname, I can only recruit if I'm flagged as leader
-			if ( GetSpawnFlags() & SF_GRUNT_LEADER )
+			if (GetEngineObject()->GetSpawnFlags() & SF_GRUNT_LEADER )
 			{
 				InitSquad();
 

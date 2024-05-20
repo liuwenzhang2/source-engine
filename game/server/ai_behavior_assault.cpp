@@ -407,7 +407,7 @@ void CAI_AssaultBehavior::GatherConditions( void )
 	// interrupting the NPC's schedule. This provides a more fluid movement from point to point.
 	if( IsCurSchedule( SCHED_MOVE_TO_ASSAULT_POINT ) && hl2_episodic.GetBool() )
 	{
-		if( m_hAssaultPoint && m_hAssaultPoint->HasSpawnFlags(SF_ASSAULTPOINT_CLEARONARRIVAL) && m_hAssaultPoint->m_NextAssaultPointName != NULL_STRING )
+		if( m_hAssaultPoint && m_hAssaultPoint->GetEngineObject()->HasSpawnFlags(SF_ASSAULTPOINT_CLEARONARRIVAL) && m_hAssaultPoint->m_NextAssaultPointName != NULL_STRING )
 		{
 			float flDist = GetAbsOrigin().DistTo( m_hAssaultPoint->GetEngineObject()->GetAbsOrigin() );
 
@@ -463,7 +463,7 @@ void CAI_AssaultBehavior::StartTask( const Task_t *pTask )
 		{
 			// If we're at an assault point that can never be cleared, keep waiting forever (if it's the last point in the assault)
 			if ( m_hAssaultPoint && 
-				 !m_hAssaultPoint->HasSpawnFlags( SF_ASSAULTPOINT_CLEARONARRIVAL ) &&
+				 !m_hAssaultPoint->GetEngineObject()->HasSpawnFlags( SF_ASSAULTPOINT_CLEARONARRIVAL ) &&
 				 m_hAssaultPoint->m_bNeverTimeout && 
 				 m_hAssaultPoint->m_NextAssaultPointName == NULL_STRING )
 			{
@@ -1470,7 +1470,7 @@ int CAI_AssaultBehavior::SelectSchedule()
 		return SCHED_HIDE_AND_RELOAD;
 	}
 
-	if( m_hAssaultPoint->HasSpawnFlags( SF_ASSAULTPOINT_CLEARONARRIVAL ) )
+	if( m_hAssaultPoint->GetEngineObject()->HasSpawnFlags( SF_ASSAULTPOINT_CLEARONARRIVAL ) )
 	{
 		return SCHED_CLEAR_ASSAULT_POINT;
 	}

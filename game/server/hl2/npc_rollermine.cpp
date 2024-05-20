@@ -611,7 +611,7 @@ void CNPC_RollerMine::Spawn( void )
 //-----------------------------------------------------------------------------
 unsigned int CNPC_RollerMine::PhysicsSolidMaskForEntity( void ) const 
 { 
-	if ( HasSpawnFlags( SF_ROLLERMINE_PROP_COLLISION ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_ROLLERMINE_PROP_COLLISION ) )
 		return MASK_SOLID;
 
 	return MASK_NPCSOLID;
@@ -1469,7 +1469,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			float flMaxTorque = ROLLERMINE_MAX_TORQUE_FACTOR;
 			
 			// Friendly rollermines go a little slower
-			if ( HasSpawnFlags( SF_ROLLERMINE_FRIENDLY ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_ROLLERMINE_FRIENDLY ) )
 			{
 				flMaxTorque *= 0.75;
 			}
@@ -1680,7 +1680,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 void CNPC_RollerMine::Open( void )
 {
 	// Friendly rollers cannot open
-	if ( HasSpawnFlags( SF_ROLLERMINE_FRIENDLY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_ROLLERMINE_FRIENDLY ) )
 		return;
 
 	if ( m_bIsOpen == false )
@@ -1883,7 +1883,7 @@ bool CNPC_RollerMine::IsPlayerVehicle( CBaseEntity *pEntity )
 float CNPC_RollerMine::GetAttackDamageScale( CBaseEntity *pVictim )
 {
 	// If we're friendly, don't damage players or player-friendly NPCs, even with collisions
-	if ( HasSpawnFlags( SF_ROLLERMINE_FRIENDLY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_ROLLERMINE_FRIENDLY ) )
 	{
 		if ( pVictim->IsPlayer() )
 			return 0;
@@ -2026,7 +2026,7 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 	m_flActiveTime = gpGlobals->curtime + GetStunDelay();
 
 	// If we're a 'friendly' rollermine, just push the player a bit
-	if ( HasSpawnFlags( SF_ROLLERMINE_FRIENDLY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_ROLLERMINE_FRIENDLY ) )
 	{
 		if ( pOther->IsPlayer() )
 		{

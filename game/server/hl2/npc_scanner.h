@@ -104,7 +104,7 @@ public:
 	CBaseEntity*	BestInspectTarget(void);
 	void			RequestInspectSupport(void);
 
-	bool			IsStriderScout() { return HasSpawnFlags( SF_CSCANNER_STRIDER_SCOUT ); }
+	bool			IsStriderScout() { return GetEngineObject()->HasSpawnFlags( SF_CSCANNER_STRIDER_SCOUT ); }
 
 	// ------------------------
 	//  Photographing

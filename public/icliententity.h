@@ -224,6 +224,7 @@ public:
 	virtual void AddEFlags(int nEFlagMask) = 0;
 	virtual void RemoveEFlags(int nEFlagMask) = 0;
 	virtual bool IsEFlagSet(int nEFlagMask) const = 0;
+	virtual int GetSpawnFlags(void) const = 0;
 	virtual void SetCheckUntouch(bool check) = 0;
 	virtual bool GetCheckUntouch() const = 0;
 	virtual int GetTouchStamp() = 0;

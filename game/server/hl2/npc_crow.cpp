@@ -127,7 +127,7 @@ void CNPC_Crow::Spawn( void )
 
 	CapabilitiesClear();
 
-	bool bFlying = ( ( m_spawnflags & SF_CROW_FLYING ) != 0 );
+	bool bFlying = ( (GetEngineObject()->GetSpawnFlags() & SF_CROW_FLYING) != 0);
 	SetFlyingState( bFlying ? FlyState_Flying : FlyState_Walking );
 
 	// We don't mind zombies so much. They smell good!

@@ -35,7 +35,7 @@ private:
 	int				m_nState;
 	float			m_flDuration;
 	float			m_flStartTime;
-	int				m_spawnflags;
+	//int				m_spawnflags;
 	
 	CSmartPtr<CSimpleEmitter>		m_pSimpleEmitter;
 	CSmartPtr<CParticleAttractor>	m_pAttractorEmitter;
@@ -46,7 +46,7 @@ IMPLEMENT_CLIENTCLASS_DT( C_CitadelEnergyCore, DT_CitadelEnergyCore, CCitadelEne
 	RecvPropInt( RECVINFO(m_nState) ),
 	RecvPropFloat( RECVINFO(m_flDuration) ),
 	RecvPropFloat( RECVINFO(m_flStartTime) ),
-	RecvPropInt( RECVINFO(m_spawnflags) ),
+	//RecvPropInt( RECVINFO(m_spawnflags) ),
 END_RECV_TABLE()
 
 //-----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ bool C_CitadelEnergyCore::SetupEmitters( void )
 void C_CitadelEnergyCore::UpdateIdle( float percentage )
 {
 	// Only do these particles if required
-	if ( m_spawnflags & SF_ENERGYCORE_NO_PARTICLES )
+	if (GetEngineObject()->GetSpawnFlags() & SF_ENERGYCORE_NO_PARTICLES)
 		return;
 
 	// Must be active
@@ -235,7 +235,7 @@ void C_CitadelEnergyCore::UpdateCharging( float percentage )
 	}
 
 	// Only do these particles if required
-	if ( m_spawnflags & SF_ENERGYCORE_NO_PARTICLES )
+	if (GetEngineObject()->GetSpawnFlags() & SF_ENERGYCORE_NO_PARTICLES)
 		return;
 
 	// Do the charging particles
@@ -378,7 +378,7 @@ void C_CitadelEnergyCore::UpdateDischarging( void )
 	}
 
 	// Only do these particles if required
-	if ( m_spawnflags & SF_ENERGYCORE_NO_PARTICLES )
+	if (GetEngineObject()->GetSpawnFlags() & SF_ENERGYCORE_NO_PARTICLES)
 		return;
 
 	// Do the charging particles

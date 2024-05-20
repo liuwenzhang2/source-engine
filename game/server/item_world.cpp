@@ -78,8 +78,8 @@ void CWorldItem::Spawn( void )
 	{
 		pEntity->m_target = m_target;
 		pEntity->SetName( STRING(GetEntityName()) );
-		pEntity->ClearSpawnFlags();
-		pEntity->AddSpawnFlags( m_spawnflags );
+		pEntity->GetEngineObject()->ClearSpawnFlags();
+		pEntity->GetEngineObject()->AddSpawnFlags(GetEngineObject()->GetSpawnFlags() );
 	}
 
 	UTIL_RemoveImmediate( this );
@@ -178,7 +178,7 @@ void CItem::Spawn( void )
 
 #if !defined( CLIENT_DLL )
 	// Constrained start?
-	if ( HasSpawnFlags( SF_ITEM_START_CONSTRAINED ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_ITEM_START_CONSTRAINED ) )
 	{
 		//Constrain the weapon in place
 		IPhysicsObject *pReferenceObject, *pAttachedObject;

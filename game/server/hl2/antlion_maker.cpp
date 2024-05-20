@@ -255,7 +255,7 @@ void CAntlionTemplateMaker::PrecacheTemplateEntity( CBaseEntity *pEntity )
 	// If we can spawn workers, precache the worker as well.			
 	if ( m_flWorkerSpawnRate != 0 )
 	{
-		pEntity->AddSpawnFlags( SF_ANTLION_WORKER );
+		pEntity->GetEngineObject()->AddSpawnFlags( SF_ANTLION_WORKER );
 		pEntity->Precache();
 	}
 }	
@@ -286,7 +286,7 @@ void CAntlionTemplateMaker::Activate( void )
 			SetContextThink( &CAntlionTemplateMaker::PoolRegenThink, gpGlobals->curtime + m_flPoolRegenTime, s_pPoolThinkContext );
 
 			// Start our blocked effects cycle
-			if ( hl2_episodic.GetBool() == true && HasSpawnFlags( SF_ANTLIONMAKER_DO_BLOCKEDEFFECTS ) )
+			if ( hl2_episodic.GetBool() == true && GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_DO_BLOCKEDEFFECTS ) )
 			{
 				SetContextThink( &CAntlionTemplateMaker::FindNodesCloseToPlayer, gpGlobals->curtime + 1.0f, s_pBlockedEffectsThinkContext );
 			}
@@ -465,7 +465,7 @@ void CAntlionTemplateMaker::UpdateChildren( void )
 //-----------------------------------------------------------------------------
 void CAntlionTemplateMaker::SetFightTarget( string_t strTarget, CBaseEntity *pActivator, CBaseEntity *pCaller )
 {
-	if ( HasSpawnFlags( SF_ANTLIONMAKER_RANDOM_FIGHT_TARGET ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_RANDOM_FIGHT_TARGET ) )
 	{
 		CBaseEntity *pSearch = m_hFightTarget;
 
@@ -580,7 +580,7 @@ bool CAntlionTemplateMaker::CanMakeNPC( bool bIgnoreSolidEntities )
 	if ( m_nMaxLiveChildren == 0 )
 		 return false;
 
-	if ( !HasSpawnFlags( SF_ANTLIONMAKER_SPAWN_CLOSE_TO_TARGET ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_SPAWN_CLOSE_TO_TARGET ) )
 	{
 		if ( m_strSpawnGroup == NULL_STRING )
 			 return BaseClass::CanMakeNPC( bIgnoreSolidEntities );
@@ -608,7 +608,7 @@ void CAntlionTemplateMaker::Enable( void )
 		SetContextThink( &CAntlionTemplateMaker::PoolRegenThink, gpGlobals->curtime + m_flPoolRegenTime, s_pPoolThinkContext );
 	}
 
-	if ( hl2_episodic.GetBool() == true && HasSpawnFlags( SF_ANTLIONMAKER_DO_BLOCKEDEFFECTS ) )
+	if ( hl2_episodic.GetBool() == true && GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_DO_BLOCKEDEFFECTS ) )
 	{
 		SetContextThink( &CAntlionTemplateMaker::FindNodesCloseToPlayer, gpGlobals->curtime + 1.0f, s_pBlockedEffectsThinkContext );
 	}
@@ -636,7 +636,7 @@ void CAntlionTemplateMaker::ChildPreSpawn( CAI_BaseNPC *pChild )
 
 	if ( ( m_flWorkerSpawnRate > 0 ) && ( random->RandomFloat( 0, 1 ) < m_flWorkerSpawnRate ) )
 	{
-		pChild->AddSpawnFlags( SF_ANTLION_WORKER );
+		pChild->GetEngineObject()->AddSpawnFlags( SF_ANTLION_WORKER );
 	}
 }
 
@@ -647,7 +647,7 @@ void CAntlionTemplateMaker::ChildPreSpawn( CAI_BaseNPC *pChild )
 void CAntlionTemplateMaker::MakeNPC( void )
 {
 	// If we're not restricting to hint groups, spawn as normal
-	if ( !HasSpawnFlags( SF_ANTLIONMAKER_SPAWN_CLOSE_TO_TARGET ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_SPAWN_CLOSE_TO_TARGET ) )
 	{
 		if ( m_strSpawnGroup == NULL_STRING )
 		{
@@ -676,9 +676,9 @@ void CAntlionTemplateMaker::MakeNPC( void )
 
 	CAI_Hint *pNode = NULL;
 
-	bool bRandom = HasSpawnFlags( SF_ANTLIONMAKER_RANDOM_SPAWN_NODE );
+	bool bRandom = GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_RANDOM_SPAWN_NODE );
 
-	if ( HasSpawnFlags( SF_ANTLIONMAKER_SPAWN_CLOSE_TO_TARGET ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_SPAWN_CLOSE_TO_TARGET ) )
 	{
 		if ( FindNearTargetSpawnPosition( spawnOrigin, m_flSpawnRadius, pTarget ) == false )
 			return;
@@ -714,7 +714,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 		return;
 	}
 	
-	if ( !HasSpawnFlags( SF_ANTLIONMAKER_SPAWN_CLOSE_TO_TARGET ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_SPAWN_CLOSE_TO_TARGET ) )
 	{
 		// Lock this hint node
 		pNode->Lock( pEntity );
@@ -726,7 +726,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 
 	m_OnSpawnNPC.Set( pEntity, pEntity, this );
 
-	pent->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
+	pent->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 
 	ChildPreSpawn( pent );
 
@@ -770,7 +770,7 @@ void CAntlionTemplateMaker::MakeNPC( void )
 
 	pAntlion->ClearBurrowPoint( spawnOrigin );
 
-	if (!(m_spawnflags & SF_NPCMAKER_INF_CHILD))
+	if (!(GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_INF_CHILD))
 	{
 		if ( m_iMaxPool )
 		{
@@ -1011,7 +1011,7 @@ bool CAntlionTemplateMaker::FindHintSpawnPosition( const Vector &origin, float r
 	}
 	
 	// If requested, deny nodes that can be seen by the player
-	if ( m_spawnflags & SF_NPCMAKER_HIDEFROMPLAYER )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_HIDEFROMPLAYER)
 	{
 		hintCriteria.SetFlag( bits_HINT_NODE_NOT_VISIBLE_TO_PLAYER );
 	}
@@ -1347,7 +1347,7 @@ void CAntlionTemplateMaker::ChildPostSpawn( CAI_BaseNPC *pChild )
 		}
 	}
 	// See if we need to send them on their way to a fight goal
-	if ( GetFightTarget() && !HasSpawnFlags( SF_ANTLIONMAKER_RANDOM_FIGHT_TARGET ) )
+	if ( GetFightTarget() && !GetEngineObject()->HasSpawnFlags( SF_ANTLIONMAKER_RANDOM_FIGHT_TARGET ) )
 	{
 		pAntlion->SetFightTarget( GetFightTarget() );
 	}

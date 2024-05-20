@@ -495,7 +495,7 @@ void CAI_ScriptConditions::EvaluationThink()
 		CBaseEntity *pActivator = this;
 
 #ifdef HL2_EPISODIC
-		if ( pActor && HasSpawnFlags( SF_ACTOR_AS_ACTIVATOR ) )
+		if ( pActor && GetEngineObject()->HasSpawnFlags( SF_ACTOR_AS_ACTIVATOR ) )
 		{
 			pActivator = pActor;
 		}

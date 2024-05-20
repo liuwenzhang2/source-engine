@@ -1684,7 +1684,7 @@ void CPropCombineBall::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 
 	if ( IsInField() )
 	{
-		if ( HasSpawnFlags( SF_COMBINE_BALL_BOUNCING_IN_SPAWNER ) && GetSpawner() )
+		if (GetEngineObject()->HasSpawnFlags( SF_COMBINE_BALL_BOUNCING_IN_SPAWNER ) && GetSpawner() )
 		{
 			BounceInSpawner( GetSpeed(), index, pEvent );
 			return;
@@ -1813,9 +1813,9 @@ void CFuncCombineBallSpawner::SpawnBall()
 
 	zaxis *= flSpeed;
 	pBall->GetEngineObject()->SetAbsVelocity( zaxis );
-	if ( HasSpawnFlags( SF_SPAWNER_POWER_SUPPLY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SPAWNER_POWER_SUPPLY ) )
 	{
-		pBall->AddSpawnFlags( SF_COMBINE_BALL_BOUNCING_IN_SPAWNER );
+		pBall->GetEngineObject()->AddSpawnFlags( SF_COMBINE_BALL_BOUNCING_IN_SPAWNER );
 	}
 
 	pBall->Spawn();
@@ -1868,7 +1868,7 @@ void CFuncCombineBallSpawner::Spawn()
 	}
 
 	m_bEnabled = true;
-	if ( HasSpawnFlags( SF_SPAWNER_START_DISABLED ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SPAWNER_START_DISABLED ) )
 	{
 		inputdata_t inputData;
 		InputDisable( inputData );
@@ -2007,7 +2007,7 @@ void CFuncCombineBallSpawner::BallGrabbed( CBaseEntity *pCombineBall )
 	}
 
 	// Wait for another ball to touch this to re-power it up.
-	if ( HasSpawnFlags( SF_SPAWNER_POWER_SUPPLY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SPAWNER_POWER_SUPPLY ) )
 	{
 		AddSolidFlags( FSOLID_TRIGGER );
 		SetTouch( &CFuncCombineBallSpawner::GrabBallTouch );
@@ -2053,7 +2053,7 @@ void CFuncCombineBallSpawner::GrabBallTouch( CBaseEntity *pOther )
 		return;
 
 	// Now we're bouncing in this spawner
-	pBall->AddSpawnFlags( SF_COMBINE_BALL_BOUNCING_IN_SPAWNER );
+	pBall->GetEngineObject()->AddSpawnFlags( SF_COMBINE_BALL_BOUNCING_IN_SPAWNER );
 
 	// Tell the respawner we're no longer its ball
 	pBall->NotifySpawnerOfRemoval();
@@ -2200,12 +2200,12 @@ void CPointCombineBallLauncher::SpawnBall()
 	pBall->SetState( CPropCombineBall::STATE_LAUNCHED );
 	pBall->SetMaxBounces( m_iBounces );
 
-	if ( HasSpawnFlags( SF_COMBINE_BALL_LAUNCHER_COLLIDE_PLAYER ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_COMBINE_BALL_LAUNCHER_COLLIDE_PLAYER ) )
 	{
 		pBall->SetCollisionGroup( HL2COLLISION_GROUP_COMBINE_BALL_NPC );
 	}
 
-	if( GetSpawnFlags() & SF_COMBINE_BALL_LAUNCHER_ATTACH_BULLSEYE )
+	if(GetEngineObject()->GetSpawnFlags() & SF_COMBINE_BALL_LAUNCHER_ATTACH_BULLSEYE )
 	{
 		CNPC_Bullseye *pBullseye = static_cast<CNPC_Bullseye*>(gEntList.CreateEntityByName( "npc_bullseye" ) );
 

@@ -186,10 +186,7 @@ CFuncTank::CFuncTank()
 //-----------------------------------------------------------------------------
 CFuncTank::~CFuncTank( void )
 {
-	if ( m_soundLoopRotate != NULL_STRING && ( m_spawnflags & SF_TANK_SOUNDON ) )
-	{
-		g_pSoundEmitterSystem->StopSound( entindex(), CHAN_STATIC, STRING(m_soundLoopRotate) );
-	}
+
 }
 
 
@@ -234,7 +231,7 @@ void CFuncTank::InputActivate( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CFuncTank::TankActivate( void )
 {
-	m_spawnflags |= SF_TANK_ACTIVE; 
+	GetEngineObject()->AddSpawnFlags(SF_TANK_ACTIVE);
 	SetNextThink( gpGlobals->curtime + 0.1f ); 
 	m_fireLast = gpGlobals->curtime;
 }
@@ -252,7 +249,7 @@ void CFuncTank::InputDeactivate( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CFuncTank::TankDeactivate( void )
 {
-	m_spawnflags &= ~SF_TANK_ACTIVE; 
+	GetEngineObject()->RemoveSpawnFlags(SF_TANK_ACTIVE);
 	m_fireLast = 0; 
 	StopRotSound();
 }
@@ -266,7 +263,7 @@ void CFuncTank::InputSetTargetEntityName( inputdata_t &inputdata )
 	m_hTarget = FindTarget( m_targetEntityName, inputdata.pActivator );
 
 	// No longer aim at target position if have one
-	m_spawnflags &= ~SF_TANK_AIM_AT_POS; 
+	GetEngineObject()->RemoveSpawnFlags(SF_TANK_AIM_AT_POS);
 }
 
 //-----------------------------------------------------------------------------
@@ -285,7 +282,7 @@ void CFuncTank::InputSetTargetEntity( inputdata_t &inputdata )
 	m_hTarget = inputdata.value.Entity();
 
 	// No longer aim at target position if have one
-	m_spawnflags &= ~SF_TANK_AIM_AT_POS; 
+	GetEngineObject()->RemoveSpawnFlags(SF_TANK_AIM_AT_POS);
 }
 
 //-----------------------------------------------------------------------------
@@ -297,7 +294,7 @@ void CFuncTank::InputClearTargetEntity( inputdata_t &inputdata )
 	m_hTarget = NULL;
 
 	// No longer aim at target position if have one
-	m_spawnflags &= ~SF_TANK_AIM_AT_POS; 
+	GetEngineObject()->RemoveSpawnFlags(SF_TANK_AIM_AT_POS);
 }
 
 //-----------------------------------------------------------------------------
@@ -321,7 +318,7 @@ void CFuncTank::InputSetDamage( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CFuncTank::InputSetTargetPosition( inputdata_t &inputdata )
 {
-	m_spawnflags |= SF_TANK_AIM_AT_POS; 
+	GetEngineObject()->AddSpawnFlags(SF_TANK_AIM_AT_POS);
 	m_hTarget = NULL;
 
 	inputdata.value.Vector3D( m_vTargetPosition );
@@ -332,7 +329,7 @@ void CFuncTank::InputSetTargetPosition( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CFuncTank::InputSetTargetDir( inputdata_t &inputdata )
 {
-	m_spawnflags |= SF_TANK_AIM_AT_POS; 
+	GetEngineObject()->AddSpawnFlags(SF_TANK_AIM_AT_POS);
 	m_hTarget = NULL;
 
 	Vector vecTargetDir;
@@ -574,7 +571,7 @@ int CFuncTank::DrawDebugTextOverlays(void)
 		// --------------
 		// Target Pos
 		// --------------
-		if (m_spawnflags & SF_TANK_AIM_AT_POS) 
+		if (GetEngineObject()->GetSpawnFlags() & SF_TANK_AIM_AT_POS)
 		{
 			Q_snprintf(tempstr,sizeof(tempstr),"Aim Pos: %3.0f %3.0f %3.0f",m_vTargetPosition.x,m_vTargetPosition.y,m_vTargetPosition.z);
 		}
@@ -632,7 +629,7 @@ void CFuncTank::DrawDebugGeometryOverlays(void)
 //-----------------------------------------------------------------------------
 void CFuncTank::TraceAttack( CBaseEntity *pAttacker, float flDamage, const Vector &vecDir, trace_t *ptr, int bitsDamageType)
 {
-	if (m_spawnflags & SF_TANK_DAMAGE_KICK)
+	if (GetEngineObject()->GetSpawnFlags() & SF_TANK_DAMAGE_KICK)
 	{
 		// Deflect the func_tank
 		// Only adjust yaw for now
@@ -749,7 +746,7 @@ void CFuncTank::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 
-	if ( HasSpawnFlags(SF_TANK_NOTSOLID) )
+	if (GetEngineObject()->HasSpawnFlags(SF_TANK_NOTSOLID) )
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}
@@ -836,9 +833,9 @@ void CFuncTank::Spawn( void )
 	}
 
 	// No longer aim at target position if have one
-	m_spawnflags		&= ~SF_TANK_AIM_AT_POS; 
+	GetEngineObject()->RemoveSpawnFlags(SF_TANK_AIM_AT_POS);
 
-	if (m_spawnflags & SF_TANK_DAMAGE_KICK)
+	if (GetEngineObject()->GetSpawnFlags() & SF_TANK_DAMAGE_KICK)
 	{
 		m_takedamage = DAMAGE_YES;
 	}
@@ -976,6 +973,10 @@ void CFuncTank::UpdateOnRemove( void )
 		StopControl();
 	}
 	BaseClass::UpdateOnRemove();
+	if (m_soundLoopRotate != NULL_STRING && (GetEngineObject()->GetSpawnFlags() & SF_TANK_SOUNDON))
+	{
+		g_pSoundEmitterSystem->StopSound(entindex(), CHAN_STATIC, STRING(m_soundLoopRotate));
+	}
 }
 
 
@@ -1080,14 +1081,14 @@ bool CFuncTank::StartControl( CBaseCombatCharacter *pController )
 	m_hController = pController;
 	if ( pController->IsPlayer() )
 	{
-		m_spawnflags |= SF_TANK_PLAYER; 
+		GetEngineObject()->AddSpawnFlags(SF_TANK_PLAYER);
 
 		CBasePlayer *pPlayer = static_cast<CBasePlayer*>( m_hController.Get() );
 		pPlayer->m_Local.m_iHideHUD |= HIDEHUD_WEAPONSELECTION;
 	}
 	else
 	{
-		m_spawnflags |= SF_TANK_NPC;
+		GetEngineObject()->AddSpawnFlags(SF_TANK_NPC);
 		NPC_SetInRoute( false );
 	}
 
@@ -1166,11 +1167,11 @@ void CFuncTank::StopControl()
 	// Reset the func_tank as unmanned (player/npc).
 	if ( m_hController->IsPlayer() )
 	{
-		m_spawnflags &= ~SF_TANK_PLAYER;
+		GetEngineObject()->RemoveSpawnFlags(SF_TANK_PLAYER);
 	}
 	else
 	{		
-		m_spawnflags &= ~SF_TANK_NPC;
+		GetEngineObject()->RemoveSpawnFlags(SF_TANK_NPC);
 	}
 
 	m_hController = NULL;
@@ -1221,7 +1222,7 @@ void CFuncTank::ControllerPostFrame( void )
 	
 	int bulletCount = (gpGlobals->curtime - m_fireLast) * m_fireRate;
 	
-	if( HasSpawnFlags( SF_TANK_AIM_ASSISTANCE ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_TANK_AIM_ASSISTANCE ) )
 	{
 		// Trace out a hull and if it hits something, adjust the shot to hit that thing.
 		trace_t tr;
@@ -1256,7 +1257,7 @@ void CFuncTank::ControllerPostFrame( void )
 		if( --m_iAmmoCount == 0 )
 		{
 			// Kick the player off the gun, and make myself not usable.
-			m_spawnflags &= ~SF_TANK_CANCONTROL;
+			GetEngineObject()->RemoveSpawnFlags(SF_TANK_CANCONTROL);
 			StopControl();
 			return;				
 		}
@@ -1350,7 +1351,7 @@ void CFuncTank::NPC_Fire( void )
 		}
 	}
 
-	if ( !HasSpawnFlags( SF_TANK_ALLOW_PLAYER_HITS ) && (pNPC->CapabilitiesGet() & bits_CAP_NO_HIT_PLAYER) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_TANK_ALLOW_PLAYER_HITS ) && (pNPC->CapabilitiesGet() & bits_CAP_NO_HIT_PLAYER) )
 	{
 		// Avoid shooting player.
 		if ( pNPC->PlayerInSpread( vecBarrelEnd, vecBarrelEnd + vecForward * 2048, gTankSpread[m_spread].x, 8*12 ) )
@@ -1362,7 +1363,7 @@ void CFuncTank::NPC_Fire( void )
 	bool bIgnoreSpread = false;
 
   	CBaseEntity *pEnemy = pNPC->GetEnemy();
-	if ( HasSpawnFlags( SF_TANK_HACKPLAYERHIT ) && pEnemy && pEnemy->IsPlayer() )
+	if (GetEngineObject()->HasSpawnFlags( SF_TANK_HACKPLAYERHIT ) && pEnemy && pEnemy->IsPlayer() )
 	{
 		// Every third shot should be fired directly at the player
 		if ( m_nBulletCount%2 == 0 )
@@ -1384,7 +1385,7 @@ void CFuncTank::NPC_Fire( void )
 		if( --m_iAmmoCount == 0 )
 		{
 			// Disable the func_tank.
-			m_spawnflags &= ~SF_TANK_CANCONTROL;
+			GetEngineObject()->RemoveSpawnFlags(SF_TANK_CANCONTROL);
 
 			// Remove the npc.
 			StopControl();
@@ -1982,7 +1983,7 @@ void CFuncTank::AimFuncTankAtTarget( void )
 	CBaseEntity *pTargetVehicle = NULL;
 	Vector barrelEnd = WorldBarrelPosition();
 	Vector worldTargetPosition;
-	if (m_spawnflags & SF_TANK_AIM_AT_POS)
+	if (GetEngineObject()->GetSpawnFlags() & SF_TANK_AIM_AT_POS)
 	{
 		worldTargetPosition = m_vTargetPosition;
 	}
@@ -2027,7 +2028,7 @@ void CFuncTank::AimFuncTankAtTarget( void )
 	}
 
 	Vector vecAimOrigin = m_sightOrigin;
-	if (m_spawnflags & SF_TANK_AIM_AT_POS)
+	if (GetEngineObject()->GetSpawnFlags() & SF_TANK_AIM_AT_POS)
 	{
 		bUpdateTime		= true;
 		m_sightOrigin	= m_vTargetPosition;
@@ -2035,7 +2036,7 @@ void CFuncTank::AimFuncTankAtTarget( void )
 	}
 	else
 	{
-		if ( m_spawnflags & SF_TANK_LINEOFSIGHT )
+		if (GetEngineObject()->GetSpawnFlags() & SF_TANK_LINEOFSIGHT)
 		{
 			AI_TraceLOS( barrelEnd, worldTargetPosition, this, &tr );
 		}
@@ -2095,14 +2096,14 @@ void CFuncTank::AimFuncTankAtTarget( void )
 
 	SetMoveDoneTime( 0.1 );
 
-	if ( CanFire() && ( ( (fabs(distX) <= m_pitchTolerance) && (fabs(distY) <= m_yawTolerance) ) || (m_spawnflags & SF_TANK_LINEOFSIGHT) ) )
+	if ( CanFire() && ( ( (fabs(distX) <= m_pitchTolerance) && (fabs(distY) <= m_yawTolerance) ) || (GetEngineObject()->GetSpawnFlags() & SF_TANK_LINEOFSIGHT)))
 	{
 		bool fire = false;
 		Vector forward;
 		AngleVectors(GetEngineObject()->GetLocalAngles(), &forward );
 		forward = m_parentMatrix.ApplyRotation( forward );
 
-		if ( m_spawnflags & SF_TANK_LINEOFSIGHT )
+		if (GetEngineObject()->GetSpawnFlags() & SF_TANK_LINEOFSIGHT)
 		{
 			AI_TraceLine( barrelEnd, pTarget->WorldSpaceCenter(), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
@@ -2364,9 +2365,9 @@ void CFuncTank::TankTrace( const Vector &vecStart, const Vector &vecForward, con
 	
 void CFuncTank::StartRotSound( void )
 {
-	if ( m_spawnflags & SF_TANK_SOUNDON )
+	if (GetEngineObject()->GetSpawnFlags() & SF_TANK_SOUNDON)
 		return;
-	m_spawnflags |= SF_TANK_SOUNDON;
+	GetEngineObject()->AddSpawnFlags(SF_TANK_SOUNDON);
 	
 	if ( m_soundLoopRotate != NULL_STRING )
 	{
@@ -2399,7 +2400,7 @@ void CFuncTank::StartRotSound( void )
 
 void CFuncTank::StopRotSound( void )
 {
-	if ( m_spawnflags & SF_TANK_SOUNDON )
+	if (GetEngineObject()->GetSpawnFlags() & SF_TANK_SOUNDON)
 	{
 		if ( m_soundLoopRotate != NULL_STRING )
 		{
@@ -2418,7 +2419,7 @@ void CFuncTank::StopRotSound( void )
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 		}
 	}
-	m_spawnflags &= ~SF_TANK_SOUNDON;
+	GetEngineObject()->RemoveSpawnFlags(SF_TANK_SOUNDON);
 }
 
 //-----------------------------------------------------------------------------
@@ -2430,7 +2431,7 @@ bool CFuncTank::IsEntityInViewCone( CBaseEntity *pEntity )
 	Vector vecBarrelEnd = WorldBarrelPosition();
 	float flRange2 = ( pEntity->GetEngineObject()->GetAbsOrigin() - vecBarrelEnd ).LengthSqr();
 
-	if( !(GetSpawnFlags() & SF_TANK_IGNORE_RANGE_IN_VIEWCONE) )
+	if( !(GetEngineObject()->GetSpawnFlags() & SF_TANK_IGNORE_RANGE_IN_VIEWCONE) )
 	{
 		if ( !InRange2( flRange2 ) )
 			return false;
@@ -4304,7 +4305,7 @@ void CFuncTankCombineCannon::UpdateBeamThink()
 	m_hBeam->SetStartPos( trBeam.startpos );
 	m_hBeam->SetEndPos( trBeam.endpos );
 
-	if( !(m_spawnflags & SF_TANK_AIM_AT_POS) )
+	if( !(GetEngineObject()->GetSpawnFlags() & SF_TANK_AIM_AT_POS))
 	{
 		SetTargetPosition( trBeam.endpos );
 	}
@@ -4320,7 +4321,7 @@ void CFuncTankCombineCannon::FuncTankPostThink()
 	{
 		if( gpGlobals->curtime > m_flTimeNextSweep )
 		{
-			AddSpawnFlags( SF_TANK_AIM_AT_POS );
+			GetEngineObject()->AddSpawnFlags( SF_TANK_AIM_AT_POS );
 
 			Vector vecTargetPosition = GetTargetPosition();
 			CBasePlayer *pPlayer = AI_GetSinglePlayer();
@@ -4406,7 +4407,7 @@ void CFuncTankCombineCannon::FuncTankPostThink()
 	else
 	{
 		//Msg("%d engaging: %s\n", entindex(), m_hTarget->GetClassname() );
-		RemoveSpawnFlags( SF_TANK_AIM_AT_POS );
+		GetEngineObject()->RemoveSpawnFlags( SF_TANK_AIM_AT_POS );
 	}
 }
 
@@ -4429,7 +4430,7 @@ void CFuncTankCombineCannon::FuncTankPostThink()
 void CFuncTankCombineCannon::Fire( int bulletCount, const Vector &barrelEnd, const Vector &forward, CBaseEntity *pAttacker, bool bIgnoreSpread )
 {
 	// Specifically do NOT fire in aim at pos mode. This is just for show.
-	if( HasSpawnFlags(SF_TANK_AIM_AT_POS) )
+	if(GetEngineObject()->HasSpawnFlags(SF_TANK_AIM_AT_POS) )
 		return;
 
 	Vector vecAdjustedForward = forward;

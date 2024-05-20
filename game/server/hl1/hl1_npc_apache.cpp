@@ -202,7 +202,7 @@ LINK_ENTITY_TO_CLASS ( monster_apache, CNPC_Apache );
 
 int CNPC_Apache::ObjectCaps( void ) 
 { 
-	if ( GetSpawnFlags() & SF_NOTRANSITION )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NOTRANSITION )
 	     return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; 
 	else 
 		 return BaseClass::ObjectCaps();

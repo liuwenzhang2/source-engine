@@ -63,7 +63,7 @@ public:
 	inline bool	IsActive( void ) { return m_bActive; }
 	void		AnimThink( void );
 
-	bool		PointIsVisible( void ) { return !( FBitSet( m_spawnflags, SF_CAP_POINT_HIDEFLAG ) ); }
+	bool		PointIsVisible( void ) { return !(GetEngineObject()->HasSpawnFlags(SF_CAP_POINT_HIDEFLAG) ); }
 
 	inline const char *GetName( void ) { return STRING(m_iszPrintName); }
 	int			GetCPGroup( void );

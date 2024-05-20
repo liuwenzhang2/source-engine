@@ -103,10 +103,10 @@ void CLogicNavigation::Activate()
 {
 	BaseClass::Activate();
 
-	if ( HasSpawnFlags( SF_NAV_START_ON ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NAV_START_ON ) )
 	{
 		TurnOn();
-		RemoveSpawnFlags( SF_NAV_START_ON );
+		GetEngineObject()->RemoveSpawnFlags( SF_NAV_START_ON );
 	}
 	else if ( m_isOn )
 	{

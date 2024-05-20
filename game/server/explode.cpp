@@ -195,7 +195,7 @@ void CEnvExplosion::Spawn( void )
 	flSpriteScale = ( m_iMagnitude - 50) * 0.6;
 
 	// Control the clamping of the fireball sprite
-	if( m_spawnflags & SF_ENVEXPLOSION_NOCLAMPMIN )
+	if(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NOCLAMPMIN)
 	{
 		// Don't inhibit clamping altogether. Just relax it a bit.
 		if ( flSpriteScale < 1 )
@@ -211,7 +211,7 @@ void CEnvExplosion::Spawn( void )
 		}
 	}
 
-	if( m_spawnflags & SF_ENVEXPLOSION_NOCLAMPMAX )
+	if(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NOCLAMPMAX)
 	{
 		// We may need to adjust this to suit designers' needs.
 		if ( flSpriteScale > 200 )
@@ -256,7 +256,7 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 	}
 
 	// draw decal
-	if (! ( m_spawnflags & SF_ENVEXPLOSION_NODECAL))
+	if (! (GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NODECAL))
 	{
 		UTIL_DecalTrace( &tr, "Scorch" );
 	}
@@ -267,17 +267,17 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 	// flags to pass to the temp ent.
 	int nFlags = TE_EXPLFLAG_NONE;
 
-	if( m_spawnflags & SF_ENVEXPLOSION_NOFIREBALL )
+	if(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NOFIREBALL)
 	{
 		nFlags |= TE_EXPLFLAG_NOFIREBALL;
 	}
 	
-	if( m_spawnflags & SF_ENVEXPLOSION_NOSOUND )
+	if(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NOSOUND)
 	{
 		nFlags |= TE_EXPLFLAG_NOSOUND;
 	}
 	
-	if ( m_spawnflags & SF_ENVEXPLOSION_RND_ORIENT )
+	if (GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_RND_ORIENT)
 	{
 		nFlags |= TE_EXPLFLAG_ROTATE;
 	}
@@ -291,17 +291,17 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 		nFlags |= TE_EXPLFLAG_NOADDITIVE;
 	}
 
-	if( m_spawnflags & SF_ENVEXPLOSION_NOPARTICLES )
+	if(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NOPARTICLES)
 	{
 		nFlags |= TE_EXPLFLAG_NOPARTICLES;
 	}
 
-	if( m_spawnflags & SF_ENVEXPLOSION_NODLIGHTS )
+	if(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NODLIGHTS)
 	{
 		nFlags |= TE_EXPLFLAG_NODLIGHTS;
 	}
 
-	if ( m_spawnflags & SF_ENVEXPLOSION_NOFIREBALLSMOKE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NOFIREBALLSMOKE)
 	{
 		nFlags |= TE_EXPLFLAG_NOFIREBALLSMOKE;
 	}
@@ -313,14 +313,14 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 	te->Explosion( filter, 0.0,
 		&vecExplodeOrigin, 
 		( m_sFireballSprite < 1 ) ? g_sModelIndexFireball : m_sFireballSprite,
-		!( m_spawnflags & SF_ENVEXPLOSION_NOFIREBALL ) ? ( m_spriteScale / 10.0 ) : 0.0,
+		!(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NOFIREBALL) ? (m_spriteScale / 10.0) : 0.0,
 		15,
 		nFlags,
 		iRadius,
 		m_iMagnitude );
 
 	// do damage
-	if ( !( m_spawnflags & SF_ENVEXPLOSION_NODAMAGE ) )
+	if ( !(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NODAMAGE))
 	{
 		CBaseEntity *pAttacker = GetOwnerEntity() ? GetOwnerEntity() : this;
 
@@ -328,12 +328,12 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 		int iDamageType = m_iCustomDamageType;
 		if ( iDamageType == -1 )
 		{
-			iDamageType = HasSpawnFlags( SF_ENVEXPLOSION_GENERIC_DAMAGE ) ? DMG_GENERIC : DMG_BLAST;
+			iDamageType = GetEngineObject()->HasSpawnFlags( SF_ENVEXPLOSION_GENERIC_DAMAGE ) ? DMG_GENERIC : DMG_BLAST;
 		}
 
 		CTakeDamageInfo info( m_hInflictor ? m_hInflictor : this, pAttacker, m_iMagnitude, iDamageType );
 
-		if( HasSpawnFlags( SF_ENVEXPLOSION_SURFACEONLY ) )
+		if(GetEngineObject()->HasSpawnFlags( SF_ENVEXPLOSION_SURFACEONLY ) )
 		{
 			info.AddDamageType( DMG_BLAST_SURFACE );
 		}
@@ -355,7 +355,7 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 	if ( UTIL_PointContents(GetEngineObject()->GetAbsOrigin() ) & CONTENTS_WATER )
 	{
 		// draw sparks
-		if ( !( m_spawnflags & SF_ENVEXPLOSION_NOSPARKS ) )
+		if ( !(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_NOSPARKS))
 		{
 			int sparkCount = random->RandomInt(0,3);
 
@@ -372,7 +372,7 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 
 void CEnvExplosion::Smoke( void )
 {
-	if ( !(m_spawnflags & SF_ENVEXPLOSION_REPEATABLE) )
+	if ( !(GetEngineObject()->GetSpawnFlags() & SF_ENVEXPLOSION_REPEATABLE))
 	{
 		UTIL_Remove( this );
 	}
@@ -392,7 +392,7 @@ void ExplosionCreate( const Vector &center, const QAngle &angles,
 	char *szValue = buf;
 	pExplosion->KeyValue( szKeyName, szValue );
 
-	pExplosion->AddSpawnFlags( nSpawnFlags );
+	pExplosion->GetEngineObject()->AddSpawnFlags( nSpawnFlags );
 
 	if ( radius )
 	{

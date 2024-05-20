@@ -938,7 +938,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//=========================================================
 	int CMultiplayRules::WeaponShouldRespawn( CBaseCombatWeapon *pWeapon )
 	{
-		if ( pWeapon->HasSpawnFlags( SF_NORESPAWN ) )
+		if ( pWeapon->GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) )
 		{
 			return GR_WEAPON_RESPAWN_NO;
 		}
@@ -987,7 +987,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	//=========================================================
 	int CMultiplayRules::ItemShouldRespawn( CItem *pItem )
 	{
-		if ( pItem->HasSpawnFlags( SF_NORESPAWN ) )
+		if ( pItem->GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) )
 		{
 			return GR_ITEM_RESPAWN_NO;
 		}

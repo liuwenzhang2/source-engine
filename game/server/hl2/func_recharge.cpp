@@ -156,7 +156,7 @@ int CRecharge::DrawDebugTextOverlays(void)
 //-----------------------------------------------------------------------------
 float CRecharge::MaxJuice()	const
 {
-	if ( HasSpawnFlags( SF_CITADEL_RECHARGER ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_CITADEL_RECHARGER ) )
 	{
 		return sk_suitcharger_citadel.GetFloat();
 	}
@@ -299,7 +299,7 @@ void CRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	// charge the player
 	int nMaxArmor = 100;
 	int nIncrementArmor = 1;
-	if ( HasSpawnFlags(	SF_CITADEL_RECHARGER ) )
+	if (GetEngineObject()->HasSpawnFlags(	SF_CITADEL_RECHARGER ) )
 	{
 		nMaxArmor = sk_suitcharger_citadel_maxarmor.GetInt();
 		nIncrementArmor = 10;
@@ -470,14 +470,14 @@ void CNewRecharge::Precache( void )
 
 void CNewRecharge::SetInitialCharge( void )
 {
-	if ( HasSpawnFlags( SF_KLEINER_RECHARGER ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_KLEINER_RECHARGER ) )
 	{
 		// The charger in Kleiner's lab.
 		m_iMaxJuice =  25.0f;
 		return;
 	}
 
-	if ( HasSpawnFlags( SF_CITADEL_RECHARGER ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_CITADEL_RECHARGER ) )
 	{
 		m_iMaxJuice =  sk_suitcharger_citadel.GetFloat();
 		return;
@@ -627,7 +627,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 		float flCharges = CHARGES_PER_SECOND;
 		float flCalls = CALLS_PER_SECOND;
 
-		if ( HasSpawnFlags( SF_CITADEL_RECHARGER ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_CITADEL_RECHARGER ) )
 			 flCharges = CITADEL_CHARGES_PER_SECOND;
 
 		m_flJuice -= flCharges / flCalls;		
@@ -684,7 +684,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 
 	// Get our maximum armor value
 	int nMaxArmor = 100;
-	if ( HasSpawnFlags(	SF_CITADEL_RECHARGER ) )
+	if (GetEngineObject()->HasSpawnFlags(	SF_CITADEL_RECHARGER ) )
 	{
 		nMaxArmor = sk_suitcharger_citadel_maxarmor.GetInt();
 	}
@@ -692,7 +692,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	int nIncrementArmor = 1;
 
 	// The citadel charger gives more per charge and also gives health
-	if ( HasSpawnFlags(	SF_CITADEL_RECHARGER ) )
+	if (GetEngineObject()->HasSpawnFlags(	SF_CITADEL_RECHARGER ) )
 	{
 		nIncrementArmor = 10;
 		
@@ -711,7 +711,7 @@ void CNewRecharge::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	if ( pPlayer->ArmorValue() >= nMaxArmor)
 	{
 		// Citadel charger must also be at max health
-		if ( !HasSpawnFlags(SF_CITADEL_RECHARGER) || ( HasSpawnFlags( SF_CITADEL_RECHARGER ) && pActivator->GetHealth() >= pActivator->GetMaxHealth() ) )
+		if ( !GetEngineObject()->HasSpawnFlags(SF_CITADEL_RECHARGER) || (GetEngineObject()->HasSpawnFlags( SF_CITADEL_RECHARGER ) && pActivator->GetHealth() >= pActivator->GetMaxHealth() ) )
 		{
 			// Make the user re-use me to get started drawing health.
 			pPlayer->m_afButtonPressed &= ~IN_USE;
@@ -822,7 +822,7 @@ void CNewRecharge::Off(void)
 	{
 		if ((!m_iJuice) && g_pGameRules->FlHEVChargerRechargeTime() > 0 )
 		{
-			if ( HasSpawnFlags( SF_CITADEL_RECHARGER ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_CITADEL_RECHARGER ) )
 			{
 				m_iReactivate = g_pGameRules->FlHEVChargerRechargeTime() * 2;
 			}

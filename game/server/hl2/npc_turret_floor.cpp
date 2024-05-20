@@ -316,11 +316,11 @@ void CNPC_FloorTurret::Spawn( void )
 	m_iEyeAttachment = LookupAttachment( "light" );
 
 	// FIXME: Do we ever need m_bAutoStart? (Sawyer)
-	m_spawnflags |= SF_FLOOR_TURRET_AUTOACTIVATE;
+	GetEngineObject()->AddSpawnFlags(SF_FLOOR_TURRET_AUTOACTIVATE);
 
 	//Set our autostart state
-	m_bAutoStart = !!( m_spawnflags & SF_FLOOR_TURRET_AUTOACTIVATE );
-	m_bEnabled	 = ( ( m_spawnflags & SF_FLOOR_TURRET_STARTINACTIVE ) == false );
+	m_bAutoStart = !!(GetEngineObject()->GetSpawnFlags() & SF_FLOOR_TURRET_AUTOACTIVATE);
+	m_bEnabled	 = ( (GetEngineObject()->GetSpawnFlags() & SF_FLOOR_TURRET_STARTINACTIVE) == false);
 
 	//Do we start active?
 	if ( m_bAutoStart && m_bEnabled )
@@ -796,7 +796,7 @@ void CNPC_FloorTurret::SuppressThink( void )
 		
 		SpinDown();
 
-		if ( m_spawnflags & SF_FLOOR_TURRET_FASTRETIRE )
+		if (GetEngineObject()->GetSpawnFlags() & SF_FLOOR_TURRET_FASTRETIRE)
 		{
 			// Retire quickly in this case. (The case where we saw the player, but he hid again).
 			m_flLastSight = gpGlobals->curtime + FLOOR_TURRET_SHORT_WAIT;
@@ -841,7 +841,7 @@ void CNPC_FloorTurret::SuppressThink( void )
 		//Fire the gun
 		if ( DotProduct( vecDirToEnemy, vecMuzzleDir ) >= 0.9848 ) // 10 degree slop
 		{
-			if( m_spawnflags & SF_FLOOR_TURRET_OUT_OF_AMMO )
+			if(GetEngineObject()->GetSpawnFlags() & SF_FLOOR_TURRET_OUT_OF_AMMO)
 			{
 				DryFire();
 			}
@@ -945,7 +945,7 @@ void CNPC_FloorTurret::ActiveThink( void )
 		ClearEnemyMemory();
 		SetEnemy( NULL );
 		
-		if ( m_spawnflags & SF_FLOOR_TURRET_FASTRETIRE )
+		if (GetEngineObject()->GetSpawnFlags() & SF_FLOOR_TURRET_FASTRETIRE)
 		{
 			// Retire quickly in this case. (The case where we saw the player, but he hid again).
 			m_flLastSight = gpGlobals->curtime + FLOOR_TURRET_SHORT_WAIT;
@@ -1032,7 +1032,7 @@ void CNPC_FloorTurret::ActiveThink( void )
 		{
 			float dot3d = DotProduct( vecDirToEnemy, vecMuzzleDir );
 
-			if( m_spawnflags & SF_FLOOR_TURRET_OUT_OF_AMMO )
+			if(GetEngineObject()->GetSpawnFlags() & SF_FLOOR_TURRET_OUT_OF_AMMO)
 			{
 				DryFire();
 			}
@@ -1295,7 +1295,7 @@ bool CNPC_FloorTurret::IsValidEnemy( CBaseEntity *pEnemy )
 bool CNPC_FloorTurret::CanBeAnEnemyOf( CBaseEntity *pEnemy )
 {
 	// If we're out of ammo, make friendly companions ignore us
-	if ( m_spawnflags & SF_FLOOR_TURRET_OUT_OF_AMMO )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FLOOR_TURRET_OUT_OF_AMMO)
 	{
 		if ( pEnemy->Classify() == CLASS_PLAYER_ALLY_VITAL )
 			return false;
@@ -1334,7 +1334,7 @@ void CNPC_FloorTurret::TippedThink( void )
 	{
 		if ( m_flShotTime < gpGlobals->curtime )
 		{
-			if( m_spawnflags & SF_FLOOR_TURRET_OUT_OF_AMMO )
+			if(GetEngineObject()->GetSpawnFlags() & SF_FLOOR_TURRET_OUT_OF_AMMO)
 			{
 				DryFire();
 			}
@@ -1455,7 +1455,7 @@ void CNPC_FloorTurret::InactiveThink( void )
 	if ( IsCitizenTurret() )
 	{
 		// Blink if we have ammo or our current blink is "on" and we need to turn it off again
-		if ( HasSpawnFlags( SF_FLOOR_TURRET_OUT_OF_AMMO ) == false || m_bBlinkState )
+		if (GetEngineObject()->HasSpawnFlags( SF_FLOOR_TURRET_OUT_OF_AMMO ) == false || m_bBlinkState )
 		{
 			// If we're on our side, ping and complain to the player
 			if ( m_bBlinkState == false )
@@ -1590,7 +1590,7 @@ bool CNPC_FloorTurret::PreThink( turretState_e state )
 		}
 		else
 		{
-			if ( HasSpawnFlags( SF_FLOOR_TURRET_OUT_OF_AMMO ) == false )
+			if (GetEngineObject()->HasSpawnFlags( SF_FLOOR_TURRET_OUT_OF_AMMO ) == false )
 			{
 				//Thrash around for a bit
 				m_flThrashTime = gpGlobals->curtime + random->RandomFloat( 2.0f, 2.5f );
@@ -1670,7 +1670,7 @@ void CNPC_FloorTurret::SetEyeState( eyeState_t state )
 	}
 
 	// Add the laser if it doesn't already exist
-	if ( IsCitizenTurret() && HasSpawnFlags( SF_FLOOR_TURRET_OUT_OF_AMMO ) == false && m_hLaser == NULL )
+	if ( IsCitizenTurret() && GetEngineObject()->HasSpawnFlags( SF_FLOOR_TURRET_OUT_OF_AMMO ) == false && m_hLaser == NULL )
 	{
 		m_hLaser = CBeam::BeamCreate( LASER_BEAM_SPRITE, 1.0f );
 		if ( m_hLaser == NULL )
@@ -1825,7 +1825,7 @@ void CNPC_FloorTurret::Enable( void )
 		return;
 
 	// if the turret is flagged as an autoactivate turret, re-enable its ability open self.
-	if ( m_spawnflags & SF_FLOOR_TURRET_AUTOACTIVATE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FLOOR_TURRET_AUTOACTIVATE)
 	{
 		m_bAutoStart = true;
 	}
@@ -1885,7 +1885,7 @@ void CNPC_FloorTurret::InputDisable( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_FloorTurret::InputDepleteAmmo( inputdata_t &inputdata )
 {
-	AddSpawnFlags( SF_FLOOR_TURRET_OUT_OF_AMMO );
+	GetEngineObject()->AddSpawnFlags( SF_FLOOR_TURRET_OUT_OF_AMMO );
 }
 
 //-----------------------------------------------------------------------------
@@ -1893,7 +1893,7 @@ void CNPC_FloorTurret::InputDepleteAmmo( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_FloorTurret::InputRestoreAmmo( inputdata_t &inputdata )
 {
-	RemoveSpawnFlags( SF_FLOOR_TURRET_OUT_OF_AMMO );
+	GetEngineObject()->RemoveSpawnFlags( SF_FLOOR_TURRET_OUT_OF_AMMO );
 }
 
 //-----------------------------------------------------------------------------

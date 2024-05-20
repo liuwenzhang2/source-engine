@@ -587,7 +587,7 @@ void CNPC_Combine_Cannon::Spawn( void )
 	m_flFieldOfView		= DOT_45DEGREE;
 	m_NPCState			= NPC_STATE_NONE;
 
-	if( HasSpawnFlags( SF_STARTDISABLED ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_STARTDISABLED ) )
 	{
 		m_fEnabled = false;
 	}
@@ -601,7 +601,7 @@ void CNPC_Combine_Cannon::Spawn( void )
 
 	m_HackedGunPos = Vector ( 0, 0, 0 ); 
 
-	AddSpawnFlags( SF_NPC_LONG_RANGE | SF_NPC_ALWAYSTHINK );
+	GetEngineObject()->AddSpawnFlags( SF_NPC_LONG_RANGE | SF_NPC_ALWAYSTHINK );
 
 	NPCInit();
 

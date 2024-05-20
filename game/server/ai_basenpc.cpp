@@ -3063,7 +3063,7 @@ bool CAI_BaseNPC::ShouldAlwaysThink()
 	// the PVS while navigating to the player. Perhaps should incorporate a heuristic taking into
 	// account mode, enemy, last time saw player, player range etc. For example, if enemy is player,
 	// and player is within 100 feet, and saw the player within the past 15 seconds, keep running...
-	return HasSpawnFlags(SF_NPC_ALWAYSTHINK);
+	return GetEngineObject()->HasSpawnFlags(SF_NPC_ALWAYSTHINK);
 }
 
 
@@ -3082,7 +3082,7 @@ bool CAI_BaseNPC::ShouldPlayerAvoid( void )
 	if ( IsInLockedScene() == true )
 		 return true;
 
-	if ( HasSpawnFlags( SF_NPC_ALTCOLLISION ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPC_ALTCOLLISION ) )
 		return true;
 
 	return false;
@@ -3392,7 +3392,7 @@ void CAI_BaseNPC::UpdateSleepState( bool bInPVS )
 				}
 			
 				// Should check for visible danger sounds
-				if ( (GetSoundInterests() & SOUND_DANGER) && !(HasSpawnFlags(SF_NPC_WAIT_TILL_SEEN)) )
+				if ( (GetSoundInterests() & SOUND_DANGER) && !(GetEngineObject()->HasSpawnFlags(SF_NPC_WAIT_TILL_SEEN)) )
 				{
 					int	iSound = CSoundEnt::ActiveList();
 					
@@ -5886,7 +5886,7 @@ CAI_BaseNPC *CAI_BaseNPC::CreateCustomTarget( const Vector &vecOrigin, float dur
 
 	// Build a nonsolid bullseye and place it in the desired location
 	// The bullseye must take damage or the SetHealth 0 call will not be able
-	pTarget->AddSpawnFlags( SF_BULLSEYE_NONSOLID );
+	pTarget->GetEngineObject()->AddSpawnFlags( SF_BULLSEYE_NONSOLID );
 	pTarget->GetEngineObject()->SetAbsOrigin( vecOrigin );
 	pTarget->Spawn();
 
@@ -6842,7 +6842,7 @@ void CAI_BaseNPC::NPCInit ( void )
 	m_flDistTooFar		= 1024.0;
 	SetDistLook( 2048.0 );
 
-	if ( HasSpawnFlags( SF_NPC_LONG_RANGE ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPC_LONG_RANGE ) )
 	{
 		m_flDistTooFar	= 1e9f;
 		SetDistLook( 6000.0 );
@@ -6898,7 +6898,7 @@ void CAI_BaseNPC::NPCInit ( void )
 
 	// HACKHACK: set up a pre idle animation
 	// NOTE: Must do this before CreateVPhysics() so bone followers have the correct initial positions.
-	if ( HasSpawnFlags( SF_NPC_WAIT_FOR_SCRIPT ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPC_WAIT_FOR_SCRIPT ) )
 	{
 		const char *pStartSequence = CAI_ScriptedSequence::GetSpawnPreIdleSequenceForScript( this );
 		if ( pStartSequence )
@@ -6909,7 +6909,7 @@ void CAI_BaseNPC::NPCInit ( void )
 
 	CreateVPhysics();
 
-	if ( HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
 	{
 		SetEfficiency( AIE_EFFICIENT );
 	}
@@ -7310,7 +7310,7 @@ void CAI_BaseNPC::StartNPC( void )
 	// Raise npc off the floor one unit, then drop to floor
 	if ( (GetMoveType() != MOVETYPE_FLY) && (GetMoveType() != MOVETYPE_FLYGRAVITY) &&
 		 !(CapabilitiesGet() & bits_CAP_MOVE_FLY) &&
-		 !HasSpawnFlags( SF_NPC_FALL_TO_GROUND ) && !IsWaitingToRappel() && !GetEngineObject()->GetMoveParent() )
+		 !GetEngineObject()->HasSpawnFlags( SF_NPC_FALL_TO_GROUND ) && !IsWaitingToRappel() && !GetEngineObject()->GetMoveParent() )
 	{
 		Vector origin = GetEngineObject()->GetLocalOrigin();
 
@@ -7404,7 +7404,7 @@ void CAI_BaseNPC::StartNPC( void )
 	m_ScriptArrivalActivity = AIN_DEF_ACTIVITY;
 	m_strScriptArrivalSequence = NULL_STRING;
 
-	if ( HasSpawnFlags(SF_NPC_WAIT_FOR_SCRIPT) )
+	if (GetEngineObject()->HasSpawnFlags(SF_NPC_WAIT_FOR_SCRIPT) )
 	{
 		SetState( NPC_STATE_IDLE );
 		m_Activity = m_IdealActivity;
@@ -10451,7 +10451,7 @@ bool CAI_BaseNPC::ShouldFadeOnDeath( void )
 	else
 	{
 		// if flagged to fade out
-		return HasSpawnFlags(SF_NPC_FADE_CORPSE);
+		return GetEngineObject()->HasSpawnFlags(SF_NPC_FADE_CORPSE);
 	}
 }
 
@@ -10464,7 +10464,7 @@ bool CAI_BaseNPC::ShouldFadeOnDeath( void )
 bool CAI_BaseNPC::ShouldPlayIdleSound( void )
 {
 	if ( ( m_NPCState == NPC_STATE_IDLE || m_NPCState == NPC_STATE_ALERT ) &&
-		   random->RandomInt(0,99) == 0 && !HasSpawnFlags(SF_NPC_GAG) )
+		   random->RandomInt(0,99) == 0 && !GetEngineObject()->HasSpawnFlags(SF_NPC_GAG) )
 	{
 		return true;
 	}
@@ -10507,7 +10507,7 @@ bool CAI_BaseNPC::FOkToMakeSound( int soundPriority )
 	}
 
 	// no talking outside of combat if gagged.
-	if ( HasSpawnFlags(SF_NPC_GAG) && ( m_NPCState != NPC_STATE_COMBAT ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_NPC_GAG) && ( m_NPCState != NPC_STATE_COMBAT ) )
 		return false;
 
 	return true;
@@ -11781,7 +11781,7 @@ bool CAI_BaseNPC::HandleInteraction(int interactionType, void *data, CBaseCombat
  		SetThink( NULL );
 
 		// Gag the NPC so they won't talk anymore
-		AddSpawnFlags( SF_NPC_GAG );
+		GetEngineObject()->AddSpawnFlags( SF_NPC_GAG );
 
 		// Drop any weapon they're holding
 		if ( GetActiveWeapon() )
@@ -11889,7 +11889,7 @@ bool CAI_BaseNPC::CineCleanup()
 		m_lifeState = LIFE_DEAD;
 		UTIL_SetSize( this, WorldAlignMins(), Vector(WorldAlignMaxs().x, WorldAlignMaxs().y, WorldAlignMins().z + 2) );
 
-		if ( pOldCine && pOldCine->HasSpawnFlags( SF_SCRIPT_LEAVECORPSE ) )
+		if ( pOldCine && pOldCine->GetEngineObject()->HasSpawnFlags( SF_SCRIPT_LEAVECORPSE ) )
 		{
 			SetUse( NULL );		// BUGBUG -- This doesn't call Killed()
 			SetThink( NULL );	// This will probably break some stuff
@@ -11913,7 +11913,7 @@ bool CAI_BaseNPC::CineCleanup()
 	// If we actually played a sequence
 	if ( pOldCine && pOldCine->m_iszPlay != NULL_STRING && pOldCine->PlayedSequence() )
 	{
-		if ( !pOldCine->HasSpawnFlags(SF_SCRIPT_DONT_TELEPORT_AT_END) )
+		if ( !pOldCine->GetEngineObject()->HasSpawnFlags(SF_SCRIPT_DONT_TELEPORT_AT_END) )
 		{
 			// reset position
 			Vector new_origin;
@@ -12007,7 +12007,7 @@ bool CAI_BaseNPC::CineCleanup()
 	}
 
 	//	SetAnimation( m_NPCState );
-	CLEARBITS(m_spawnflags, SF_NPC_WAIT_FOR_SCRIPT );
+	GetEngineObject()->RemoveSpawnFlags(SF_NPC_WAIT_FOR_SCRIPT);
 
 	if ( bDestroyCine )
 	{
@@ -12384,7 +12384,7 @@ void CAI_BaseNPC::OnDoorBlocked(CBasePropDoor *pDoor)
 //-----------------------------------------------------------------------------
 bool CAI_BaseNPC::IsTemplate( void )
 {
-	return HasSpawnFlags( SF_NPC_TEMPLATE );
+	return GetEngineObject()->HasSpawnFlags( SF_NPC_TEMPLATE );
 }
 
 
@@ -12712,7 +12712,7 @@ bool CAI_BaseNPC::IsWaitSet()
 
 void CAI_BaseNPC::TestPlayerPushing( CBaseEntity *pEntity )
 {
-	if ( HasSpawnFlags( SF_NPC_NO_PLAYER_PUSHAWAY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPC_NO_PLAYER_PUSHAWAY ) )
 		return;
 
 	// Heuristic for determining if the player is pushing me away
@@ -13294,10 +13294,10 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 	pMySequence->GetEngineObject()->SetAbsAngles( angDesired );
 	pMySequence->ForceSetTargetEntity( this, true );
 	pMySequence->SetName( szSSName );
- 	pMySequence->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
+ 	pMySequence->GetEngineObject()->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
 	if ((pInteraction->iFlags & SCNPC_FLAG_DONT_TELEPORT_AT_END_ME) != 0)
 	{
-	 	pMySequence->AddSpawnFlags( SF_SCRIPT_DONT_TELEPORT_AT_END );
+	 	pMySequence->GetEngineObject()->AddSpawnFlags( SF_SCRIPT_DONT_TELEPORT_AT_END );
 	}
 	pMySequence->SetLoopActionSequence( (pInteraction->iFlags & SCNPC_FLAG_LOOP_IN_ACTION) != 0 );
 	pMySequence->SetSynchPostIdles( true );
@@ -13319,10 +13319,10 @@ void CAI_BaseNPC::StartScriptedNPCInteraction( CAI_BaseNPC *pOtherNPC, ScriptedN
 		pTheirSequence->GetEngineObject()->SetAbsAngles( angOtherAngles );
 		pTheirSequence->ForceSetTargetEntity( pOtherNPC, true );
 		pTheirSequence->SetName( szSSName );
-		pTheirSequence->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
+		pTheirSequence->GetEngineObject()->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
 		if ((pInteraction->iFlags & SCNPC_FLAG_DONT_TELEPORT_AT_END_THEM) != 0) 
 		{
-			pTheirSequence->AddSpawnFlags( SF_SCRIPT_DONT_TELEPORT_AT_END );
+			pTheirSequence->GetEngineObject()->AddSpawnFlags( SF_SCRIPT_DONT_TELEPORT_AT_END );
 		}
 		pTheirSequence->SetLoopActionSequence( (pInteraction->iFlags & SCNPC_FLAG_LOOP_IN_ACTION) != 0 );
 		pTheirSequence->SetSynchPostIdles( true );

@@ -121,7 +121,7 @@ END_SEND_TABLE()
 //-----------------------------------------------------------------------------
 void PlayLockSounds(CBaseEntity *pEdict, locksound_t *pls, int flocked, int fbutton)
 {
-	if ( pEdict->HasSpawnFlags( SF_DOOR_SILENT ) )
+	if ( pEdict->GetEngineObject()->HasSpawnFlags( SF_DOOR_SILENT ) )
 	{
 		return;
 	}
@@ -271,7 +271,7 @@ void CBaseDoor::Spawn()
 
 	if ( !IsRotatingDoor() )
 	{
-		if ( ( m_eSpawnPosition == FUNC_DOOR_SPAWN_OPEN ) || HasSpawnFlags( SF_DOOR_START_OPEN_OBSOLETE ) )
+		if ( ( m_eSpawnPosition == FUNC_DOOR_SPAWN_OPEN ) || GetEngineObject()->HasSpawnFlags( SF_DOOR_START_OPEN_OBSOLETE ) )
 		{	// swap pos1 and pos2, put door at pos2
 			UTIL_SetOrigin( this, m_vecPosition2);
 			m_toggle_state = TS_AT_TOP;
@@ -282,7 +282,7 @@ void CBaseDoor::Spawn()
 		}
 	}
 
-	if (HasSpawnFlags(SF_DOOR_LOCKED))
+	if (GetEngineObject()->HasSpawnFlags(SF_DOOR_LOCKED))
 	{
 		m_bLocked = true;
 	}
@@ -298,14 +298,14 @@ void CBaseDoor::Spawn()
 
 	if ( !FClassnameIs( this, "func_water" ) )
 	{
-		if ( HasSpawnFlags(SF_DOOR_PASSABLE) )
+		if (GetEngineObject()->HasSpawnFlags(SF_DOOR_PASSABLE) )
 		{
 			//normal door
 			GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 			AddSolidFlags( FSOLID_NOT_SOLID );
 		}
 
-		if ( HasSpawnFlags( SF_DOOR_NONSOLID_TO_PLAYER ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_DOOR_NONSOLID_TO_PLAYER ) )
 		{
 			SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR );
 			// HACKHACK: Set this hoping that any children of the door that get blocked by the player
@@ -319,7 +319,7 @@ void CBaseDoor::Spawn()
 			// both of these flags want to set the collision group and 
 			// there isn't a combo group
 			Assert( !HasSpawnFlags( SF_DOOR_NONSOLID_TO_PLAYER ) );
-			if ( HasSpawnFlags( SF_DOOR_NONSOLID_TO_PLAYER ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_DOOR_NONSOLID_TO_PLAYER ) )
 			{
 				Warning("Door %s with conflicting collision settings, removing ignoredebris\n", GetDebugName() );
 			}
@@ -330,7 +330,7 @@ void CBaseDoor::Spawn()
 		}
 	}
 
-	if ( ( m_eSpawnPosition == FUNC_DOOR_SPAWN_OPEN ) && HasSpawnFlags( SF_DOOR_START_OPEN_OBSOLETE ) )
+	if ( ( m_eSpawnPosition == FUNC_DOOR_SPAWN_OPEN ) && GetEngineObject()->HasSpawnFlags( SF_DOOR_START_OPEN_OBSOLETE ) )
 	{
 		Warning("Door %s using obsolete 'Start Open' spawnflag with 'Spawn Position' set to 'Open'. Reverting to old behavior.\n", GetDebugName() );
 	}
@@ -429,7 +429,7 @@ bool CBaseDoor::CreateVPhysics( )
 	{
 		// special contents
 		AddSolidFlags( FSOLID_VOLUME_CONTENTS );
-		SETBITS( m_spawnflags, SF_DOOR_SILENT );	// water is silent for now
+		GetEngineObject()->AddSpawnFlags(SF_DOOR_SILENT);	// water is silent for now
 
 		IPhysicsObject *pPhysics = VPhysicsInitShadow( false, false );
 		fluidparams_t fluid;
@@ -625,7 +625,7 @@ void CBaseDoor::DoorTouch( CBaseEntity *pOther )
 	}
 
 	// If door is not opened by touch, do nothing.
-	if ( !HasSpawnFlags(SF_DOOR_PTOUCH) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_DOOR_PTOUCH) )
 	{
 #ifdef HL1_DLL
 		if( m_toggle_state == TS_AT_BOTTOM )
@@ -689,7 +689,7 @@ void CBaseDoor::UpdateAreaPortals( bool isOpen )
 	// cancel pending close
 	SetContextThink( NULL, gpGlobals->curtime, CLOSE_AREAPORTAL_THINK_CONTEXT );
 
-	if ( IsRotatingDoor() && HasSpawnFlags(SF_DOOR_START_OPEN_OBSOLETE) ) // logic inverted when using rot doors that start open
+	if ( IsRotatingDoor() && GetEngineObject()->HasSpawnFlags(SF_DOOR_START_OPEN_OBSOLETE) ) // logic inverted when using rot doors that start open
 		isOpen = !isOpen;
 
 	string_t name = GetEntityName();
@@ -723,7 +723,7 @@ void CBaseDoor::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 		ChainUse();
 
 	// We can't +use this if it can't be +used
-	if ( m_hActivator != NULL && m_hActivator->IsPlayer() && HasSpawnFlags( SF_DOOR_PUSE ) == false )
+	if ( m_hActivator != NULL && m_hActivator->IsPlayer() && GetEngineObject()->HasSpawnFlags( SF_DOOR_PUSE ) == false )
 	{
 		PlayLockSounds( this, &m_ls, TRUE, FALSE );
 		return;
@@ -732,20 +732,20 @@ void CBaseDoor::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 	bool bAllowUse = false;
 
 	// if not ready to be used, ignore "use" command.
-	if( HasSpawnFlags(SF_DOOR_NEW_USE_RULES) )
+	if(GetEngineObject()->HasSpawnFlags(SF_DOOR_NEW_USE_RULES) )
 	{
 		//New behavior:
 		// If not ready to be used, ignore "use" command.
 		// Allow use in these cases:
 		//		- when the door is closed/closing
 		//		- when the door is open/opening and can be manually closed
-		if ( ( m_toggle_state == TS_AT_BOTTOM || m_toggle_state == TS_GOING_DOWN ) || ( HasSpawnFlags(SF_DOOR_NO_AUTO_RETURN) && ( m_toggle_state == TS_AT_TOP || m_toggle_state == TS_GOING_UP ) ) )
+		if ( ( m_toggle_state == TS_AT_BOTTOM || m_toggle_state == TS_GOING_DOWN ) || (GetEngineObject()->HasSpawnFlags(SF_DOOR_NO_AUTO_RETURN) && ( m_toggle_state == TS_AT_TOP || m_toggle_state == TS_GOING_UP ) ) )
 			bAllowUse = true;
 	}
 	else
 	{
 		// Legacy behavior:
-		if (m_toggle_state == TS_AT_BOTTOM || (HasSpawnFlags(SF_DOOR_NO_AUTO_RETURN) && m_toggle_state == TS_AT_TOP) )
+		if (m_toggle_state == TS_AT_BOTTOM || (GetEngineObject()->HasSpawnFlags(SF_DOOR_NO_AUTO_RETURN) && m_toggle_state == TS_AT_TOP) )
 			bAllowUse = true;
 	}
 
@@ -914,7 +914,7 @@ int CBaseDoor::DoorActivate( )
 	if (!UTIL_IsMasterTriggered(m_sMaster, m_hActivator))
 		return 0;
 
-	if (HasSpawnFlags(SF_DOOR_NO_AUTO_RETURN) && m_toggle_state == TS_AT_TOP)
+	if (GetEngineObject()->HasSpawnFlags(SF_DOOR_NO_AUTO_RETURN) && m_toggle_state == TS_AT_TOP)
 	{
 		// door should close
 		DoorGoDown();
@@ -948,7 +948,7 @@ void CBaseDoor::DoorGoUp( void )
 
 	// emit door moving and stop sounds on CHAN_STATIC so that the multicast doesn't
 	// filter them out and leave a client stuck with looping door sounds!
-	if ( !HasSpawnFlags(SF_DOOR_SILENT ) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_DOOR_SILENT ) )
 	{
 		// If we're not moving already, start the moving noise
 		if ( m_toggle_state != TS_GOING_UP && m_toggle_state != TS_GOING_DOWN )
@@ -968,7 +968,7 @@ void CBaseDoor::DoorGoUp( void )
 		{
 			//pevActivator = m_hActivator->edict();
 			
-			if ( !HasSpawnFlags( SF_DOOR_ONEWAY ) && m_vecMoveAng.y ) 		// Y axis rotation, move away from the player
+			if ( !GetEngineObject()->HasSpawnFlags( SF_DOOR_ONEWAY ) && m_vecMoveAng.y ) 		// Y axis rotation, move away from the player
 			{
 				// Positive is CCW, negative is CW, so make 'sign' 1 or -1 based on which way we want to open.
 				// Important note:  All doors face East at all times, and twist their local angle to open.
@@ -1010,7 +1010,7 @@ void CBaseDoor::DoorGoUp( void )
 //-----------------------------------------------------------------------------
 void CBaseDoor::DoorHitTop( void )
 {
-	if ( !HasSpawnFlags( SF_DOOR_SILENT ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_DOOR_SILENT ) )
 	{
 		CPASAttenuationFilter filter( this );
 		filter.MakeReliable();
@@ -1029,7 +1029,7 @@ void CBaseDoor::DoorHitTop( void )
 	m_toggle_state = TS_AT_TOP;
 	
 	// toggle-doors don't come down automatically, they wait for refire.
-	if (HasSpawnFlags( SF_DOOR_NO_AUTO_RETURN))
+	if (GetEngineObject()->HasSpawnFlags( SF_DOOR_NO_AUTO_RETURN))
 	{
 		// Re-instate touch method, movement is complete
 		SetTouch( &CBaseDoor::DoorTouch );
@@ -1046,7 +1046,7 @@ void CBaseDoor::DoorHitTop( void )
 		}
 	}
 
-	if (HasSpawnFlags(SF_DOOR_START_OPEN_OBSOLETE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_DOOR_START_OPEN_OBSOLETE) )
 	{
 		m_OnFullyClosed.FireOutput(this, this);
 	}
@@ -1062,7 +1062,7 @@ void CBaseDoor::DoorHitTop( void )
 //-----------------------------------------------------------------------------
 void CBaseDoor::DoorGoDown( void )
 {
-	if ( !HasSpawnFlags( SF_DOOR_SILENT ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_DOOR_SILENT ) )
 	{
 		// If we're not moving already, start the moving noise
 		if ( m_toggle_state != TS_GOING_UP && m_toggle_state != TS_GOING_DOWN )
@@ -1092,7 +1092,7 @@ void CBaseDoor::DoorGoDown( void )
 //-----------------------------------------------------------------------------
 void CBaseDoor::DoorHitBottom( void )
 {
-	if ( !HasSpawnFlags( SF_DOOR_SILENT ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_DOOR_SILENT ) )
 	{
 		CPASAttenuationFilter filter( this );
 		filter.MakeReliable();
@@ -1117,7 +1117,7 @@ void CBaseDoor::DoorHitBottom( void )
 	// Re-instate touch method, cycle is complete
 	SetTouch( &CBaseDoor::DoorTouch );
 
-	if (HasSpawnFlags(SF_DOOR_START_OPEN_OBSOLETE))
+	if (GetEngineObject()->HasSpawnFlags(SF_DOOR_START_OPEN_OBSOLETE))
 	{
 		m_OnFullyOpen.FireOutput(m_hActivator, this);
 	}
@@ -1356,7 +1356,7 @@ void CRotDoor::Spawn( void )
 	CBaseToggle::AxisDir();
 
 	// check for clockwise rotation
-	if ( HasSpawnFlags(SF_DOOR_ROTATE_BACKWARDS) )
+	if (GetEngineObject()->HasSpawnFlags(SF_DOOR_ROTATE_BACKWARDS) )
 		m_vecMoveAng = m_vecMoveAng * -1;
 	
 	//m_flWait			= 2; who the hell did this? (sjb)
@@ -1370,7 +1370,7 @@ void CRotDoor::Spawn( void )
 	//
 	// SF_DOOR_START_OPEN_OBSOLETE is an old broken way of spawning open that has
 	// been deprecated.
-	if ( HasSpawnFlags(SF_DOOR_START_OPEN_OBSOLETE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_DOOR_START_OPEN_OBSOLETE) )
 	{	
 		// swap pos1 and pos2, put door at pos2, invert movement direction
 		QAngle vecNewAngles = m_vecAngle2;

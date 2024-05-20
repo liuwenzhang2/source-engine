@@ -100,7 +100,7 @@ void CFuncMoveLinear::Spawn( void )
 		AddSolidFlags( FSOLID_VOLUME_CONTENTS );
 	}
 
-	if ( !FClassnameIs( this, "func_water_analog" ) && FBitSet (m_spawnflags, SF_MOVELINEAR_NOTSOLID) )
+	if ( !FClassnameIs( this, "func_water_analog" ) && GetEngineObject()->HasSpawnFlags(SF_MOVELINEAR_NOTSOLID) )
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}

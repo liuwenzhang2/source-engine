@@ -154,7 +154,7 @@ void CNPC_Barney::ModifyOrAppendCriteria( AI_CriteriaSet& criteriaSet )
 {
 	BaseClass::ModifyOrAppendCriteria( criteriaSet );
 
-	bool predisaster = FBitSet( m_spawnflags, SF_NPC_PREDISASTER ) ? true : false;
+	bool predisaster = GetEngineObject()->HasSpawnFlags(SF_NPC_PREDISASTER) ? true : false;
 
 	criteriaSet.AppendCriteria( "disaster", predisaster ? "[disaster::pre]" : "[disaster::post]" );
 }
@@ -658,7 +658,7 @@ int CNPC_Barney::SelectSchedule( void )
 
 	if ( GetFollowTarget() == NULL )
 	{
-		if ( HasCondition( COND_PLAYER_PUSHING ) && !(GetSpawnFlags() & SF_NPC_PREDISASTER ) )	// Player wants me to move
+		if ( HasCondition( COND_PLAYER_PUSHING ) && !(GetEngineObject()->GetSpawnFlags() & SF_NPC_PREDISASTER ) )	// Player wants me to move
 			return SCHED_HL1TALKER_FOLLOW_MOVE_AWAY;
 	}
 

@@ -977,7 +977,7 @@ void CNPC_BaseZombie::MakeAISpookySound( float volume, float duration )
 //-----------------------------------------------------------------------------
 bool CNPC_BaseZombie::CanPlayMoanSound()
 {
-	if( HasSpawnFlags( SF_NPC_GAG ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_NPC_GAG ) )
 		return false;
 
 	// Burning zombies play their moan loop at full volume for as long as they're
@@ -1004,7 +1004,7 @@ bool CNPC_BaseZombie::CanPlayMoanSound()
 //-----------------------------------------------------------------------------
 void CNPC_BaseZombie::MoanSound( envelopePoint_t *pEnvelope, int iEnvelopeSize )
 {
-	if( HasSpawnFlags( SF_NPC_GAG ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_NPC_GAG ) )
 	{
 		// Not yet!
 		return;
@@ -1100,7 +1100,7 @@ void CNPC_BaseZombie::DieChopped( const CTakeDamageInfo &info )
 
 	float flFadeTime = 0.0;
 
-	if( HasSpawnFlags( SF_NPC_FADE_CORPSE ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_NPC_FADE_CORPSE ) )
 	{
 		flFadeTime = 5.0;
 	}
@@ -2279,7 +2279,7 @@ void CNPC_BaseZombie::BecomeTorso( const Vector &vecTorsoForce, const Vector &ve
 
 	float flFadeTime = 0.0;
 
-	if( HasSpawnFlags( SF_NPC_FADE_CORPSE ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_NPC_FADE_CORPSE ) )
 	{
 		flFadeTime = 5.0;
 	}
@@ -2477,10 +2477,10 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 		pCrab->SetSquadName( m_SquadName );
 
 		// don't pop to floor, fall
-		pCrab->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
+		pCrab->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 		
 		// add on the parent flags
-		pCrab->AddSpawnFlags( m_spawnflags & ZOMBIE_CRAB_INHERITED_SPAWNFLAGS );
+		pCrab->GetEngineObject()->AddSpawnFlags(GetEngineObject()->GetSpawnFlags() & ZOMBIE_CRAB_INHERITED_SPAWNFLAGS);
 		
 		// make me the crab's owner to avoid collision issues
 		pCrab->SetOwnerEntity( this );
@@ -2610,7 +2610,7 @@ void CNPC_BaseZombie::OnStateChange( NPC_STATE OldState, NPC_STATE NewState )
 	{
 	case NPC_STATE_COMBAT:
 		{
-			RemoveSpawnFlags( SF_NPC_GAG );
+			GetEngineObject()->RemoveSpawnFlags( SF_NPC_GAG );
 			s_iAngryZombies++;
 		}
 		break;

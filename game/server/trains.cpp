@@ -31,7 +31,7 @@ public:
 	void Precache( void );
 
 	// This is done to fix spawn flag collisions between this class and a derived class
-	virtual bool IsTogglePlat( void ) { return (m_spawnflags & SF_PLAT_TOGGLE) ? true : false; }
+	virtual bool IsTogglePlat( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_PLAT_TOGGLE) ? true : false; }
 
 	DECLARE_DATADESC();
 
@@ -803,15 +803,15 @@ void CFuncTrain::Blocked( CBaseEntity *pOther )
 void CFuncTrain::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	//If we've been waiting to be retriggered, move to the next destination
-	if ( m_spawnflags & SF_TRAIN_WAIT_RETRIGGER )
+	if (GetEngineObject()->GetSpawnFlags() & SF_TRAIN_WAIT_RETRIGGER)
 	{
 		// Move toward my target
-		m_spawnflags &= ~SF_TRAIN_WAIT_RETRIGGER;
+		GetEngineObject()->RemoveSpawnFlags(SF_TRAIN_WAIT_RETRIGGER);
 		Next();
 	}
 	else
 	{
-		m_spawnflags |= SF_TRAIN_WAIT_RETRIGGER;
+		GetEngineObject()->AddSpawnFlags(SF_TRAIN_WAIT_RETRIGGER);
 		
 		// Pop back to last target if it's available
 		if ( m_hEnemy )
@@ -844,9 +844,9 @@ void CFuncTrain::Wait( void )
 	m_hCurrentTarget->AcceptInput( "InPass", this, this, emptyVariant, 0 );
 
 	// need pointer to LAST target.
-	if ( m_hCurrentTarget->HasSpawnFlags( SF_TRAIN_WAIT_RETRIGGER ) || HasSpawnFlags( SF_TRAIN_WAIT_RETRIGGER ) )
+	if ( m_hCurrentTarget->GetEngineObject()->HasSpawnFlags( SF_TRAIN_WAIT_RETRIGGER ) || GetEngineObject()->HasSpawnFlags( SF_TRAIN_WAIT_RETRIGGER ) )
     {
-		AddSpawnFlags( SF_TRAIN_WAIT_RETRIGGER );
+		GetEngineObject()->AddSpawnFlags( SF_TRAIN_WAIT_RETRIGGER );
         
 		// Clear the sound channel.
 		StopMovingSound();
@@ -948,7 +948,7 @@ void CFuncTrain::Next( void )
     m_hEnemy = pTarg;
 
 	//Check for teleport
-	if ( m_hCurrentTarget->HasSpawnFlags( SF_CORNER_TELEPORT ) )
+	if ( m_hCurrentTarget->GetEngineObject()->HasSpawnFlags( SF_CORNER_TELEPORT ) )
 	{
 		IncrementInterpolationFrame();
 
@@ -1006,7 +1006,7 @@ void CFuncTrain::Activate( void )
 		}
 		else
 		{
-			m_spawnflags |= SF_TRAIN_WAIT_RETRIGGER;
+			GetEngineObject()->AddSpawnFlags(SF_TRAIN_WAIT_RETRIGGER);
 		}
 	}
 }
@@ -1058,7 +1058,7 @@ void CFuncTrain::Spawn( void )
 	SetMoveType( MOVETYPE_PUSH );
 	SetSolid( SOLID_BSP );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	if ( m_spawnflags & SF_TRACKTRAIN_PASSABLE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_PASSABLE)
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}
@@ -1096,7 +1096,7 @@ void CFuncTrain::OnRestore( void )
 void CFuncTrain::InputToggle( inputdata_t &data )
 {
 	//If we've been waiting to be retriggered, move to the next destination
-	if( HasSpawnFlags( SF_TRAIN_WAIT_RETRIGGER ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_TRAIN_WAIT_RETRIGGER ) )
 	{
 		Start();
 	}
@@ -1122,10 +1122,10 @@ void CFuncTrain::InputStop( inputdata_t &data )
 void CFuncTrain::Start( void )
 {
 	//start moving
-	if( HasSpawnFlags( SF_TRAIN_WAIT_RETRIGGER ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_TRAIN_WAIT_RETRIGGER ) )
 	{
 		// Move toward my target
-		RemoveSpawnFlags( SF_TRAIN_WAIT_RETRIGGER );
+		GetEngineObject()->RemoveSpawnFlags( SF_TRAIN_WAIT_RETRIGGER );
 		Next();
 	}
 }
@@ -1134,9 +1134,9 @@ void CFuncTrain::Start( void )
 void CFuncTrain::Stop( void )
 {
 	//stop moving
-	if( !HasSpawnFlags( SF_TRAIN_WAIT_RETRIGGER ) )
+	if( !GetEngineObject()->HasSpawnFlags( SF_TRAIN_WAIT_RETRIGGER ) )
 	{
-		AddSpawnFlags( SF_TRAIN_WAIT_RETRIGGER );
+		GetEngineObject()->AddSpawnFlags( SF_TRAIN_WAIT_RETRIGGER );
 		
 		// Pop back to last target if it's available
 		if ( m_hEnemy )
@@ -1451,7 +1451,7 @@ void CFuncTrackTrain::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 			delta = 1;
 		else if ( delta < -0.25 )
 			delta = -0.25;
-		if ( m_spawnflags & SF_TRACKTRAIN_FORWARDONLY )
+		if (GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_FORWARDONLY)
 		{
 			if ( delta < 0 )
 				delta = 0;
@@ -1695,7 +1695,7 @@ void CFuncTrackTrain::Blocked( CBaseEntity *pOther )
 		vecNewVelocity *= m_flBlockDamage;
 		pOther->GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 	}
-	if ( HasSpawnFlags(SF_TRACKTRAIN_UNBLOCKABLE_BY_PLAYER) )
+	if (GetEngineObject()->HasSpawnFlags(SF_TRACKTRAIN_UNBLOCKABLE_BY_PLAYER) )
 	{
 		CBaseEntity *pPhysicsBlocker = FindPhysicsBlockerForHierarchy(this);
 		if ( pPhysicsBlocker )
@@ -1799,7 +1799,7 @@ void CFuncTrackTrain::SoundUpdate( void )
 	}
 
 	float flSpeedRatio = 0;
-	if ( HasSpawnFlags( SF_TRACKTRAIN_USE_MAXSPEED_FOR_PITCH ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_USE_MAXSPEED_FOR_PITCH ) )
 	{
 		flSpeedRatio = clamp( fabs( m_flSpeed ) / m_maxSpeed, 0.f, 1.f );
 	}
@@ -1903,15 +1903,15 @@ void CFuncTrackTrain::ArriveAtNode( CPathTrack *pNode )
 	//
 	// Disable train controls if this path track says to do so.
 	//
-	if ( pNode->HasSpawnFlags( SF_PATH_DISABLE_TRAIN ) )
+	if ( pNode->GetEngineObject()->HasSpawnFlags( SF_PATH_DISABLE_TRAIN ) )
 	{
-		m_spawnflags |= SF_TRACKTRAIN_NOCONTROL;
+		GetEngineObject()->AddSpawnFlags(SF_TRACKTRAIN_NOCONTROL);
 	}
 	
 	//
 	// Don't override the train speed if it's under user control.
 	//
-	if ( m_spawnflags & SF_TRACKTRAIN_NOCONTROL )
+	if (GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_NOCONTROL)
 	{
 		//
 		// Don't copy speed from path track if it is 0 (uninitialized).
@@ -2034,7 +2034,7 @@ TrainOrientationType_t CFuncTrackTrain::GetTrainOrientationType()
 void CFuncTrackTrain::UpdateTrainOrientation( CPathTrack *pPrev, CPathTrack *pNext, const Vector &nextPos, float flInterval )
 {
 	// FIXME: old way of doing fixed orienation trains, remove!
-	if ( HasSpawnFlags( SF_TRACKTRAIN_FIXED_ORIENTATION ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_FIXED_ORIENTATION ) )
 		return;
 
 	// Trains *can* work in local space, but only if all elements of the track share
@@ -2143,7 +2143,7 @@ void CFuncTrackTrain::UpdateOrientationBlend( TrainOrientationType_t eOrientatio
 		angNext = angPrev;
 	}
 
-	if ( m_spawnflags & SF_TRACKTRAIN_NOPITCH )
+	if (GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_NOPITCH)
 	{
 		angNext[PITCH] = angPrev[PITCH];
 	}
@@ -2183,7 +2183,7 @@ void CFuncTrackTrain::UpdateOrientationBlend( TrainOrientationType_t eOrientatio
 		QuaternionAngles( qtNew, angNew );
 	}
 
-	if ( m_spawnflags & SF_TRACKTRAIN_NOPITCH )
+	if (GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_NOPITCH)
 	{
 		angNew[PITCH] = angPrev[PITCH];
 	}
@@ -2198,7 +2198,7 @@ void CFuncTrackTrain::UpdateOrientationBlend( TrainOrientationType_t eOrientatio
 void CFuncTrackTrain::DoUpdateOrientation( const QAngle &curAngles, const QAngle &angles, float flInterval )
 {
 	float vy, vx;
-	if ( !(m_spawnflags & SF_TRACKTRAIN_NOPITCH) )
+	if ( !(GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_NOPITCH))
 	{
 		vx = UTIL_AngleDistance( angles.x, curAngles.x );
 	}
@@ -2261,14 +2261,14 @@ void CFuncTrackTrain::TeleportToPathTrack( CPathTrack *pTeleport )
 	pTeleport->LookAhead( look, m_length, 0 );
 
 	QAngle nextAngles;
-	if ( HasSpawnFlags( SF_TRACKTRAIN_FIXED_ORIENTATION ) || ( look == nextPos ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_FIXED_ORIENTATION ) || ( look == nextPos ) )
 	{
 		nextAngles = GetEngineObject()->GetLocalAngles();
 	}
 	else
 	{
 		nextAngles = pTeleport->GetOrientation( IsDirForward() );
-		if ( HasSpawnFlags( SF_TRACKTRAIN_NOPITCH ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_NOPITCH ) )
 		{
 			nextAngles[PITCH] = angCur[PITCH];
 		}
@@ -2367,7 +2367,7 @@ void CFuncTrackTrain::Next( void )
 			// See if we should teleport to the next path track.
 			//
 			CPathTrack *pTeleport = pNext->GetNext();
-			if ( ( pTeleport != NULL ) && pTeleport->HasSpawnFlags( SF_PATH_TELEPORT ) )
+			if ( ( pTeleport != NULL ) && pTeleport->GetEngineObject()->HasSpawnFlags( SF_PATH_TELEPORT ) )
 			{
 				TeleportToPathTrack( pTeleport );
 			}
@@ -2498,7 +2498,7 @@ bool CFuncTrackTrain::OnControls( CBaseEntity *pTest )
 {
 	Vector offset = pTest->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin();
 
-	if ( m_spawnflags & SF_TRACKTRAIN_NOCONTROL )
+	if (GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_NOCONTROL)
 		return false;
 
 	// Transform offset into local coordinates
@@ -2549,14 +2549,14 @@ void CFuncTrackTrain::Find( void )
 	look.z += m_height;
 
 	QAngle nextAngles;
-	if ( HasSpawnFlags( SF_TRACKTRAIN_FIXED_ORIENTATION ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_FIXED_ORIENTATION ) )
 	{
 		nextAngles = GetEngineObject()->GetLocalAngles();
 	}
 	else
 	{
 		VectorAngles( look - nextPos, nextAngles );
-		if ( HasSpawnFlags( SF_TRACKTRAIN_NOPITCH ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_NOPITCH ) )
 		{
 			nextAngles.x = 0;
 		}
@@ -2690,15 +2690,15 @@ void CFuncTrackTrain::Spawn( void )
 	// BUGBUG: For now, just force this for testing.  Remove if we want to tag all of the trains in the levels
 	SetSolid( SOLID_BSP );
 #else
-	SetSolid( HasSpawnFlags( SF_TRACKTRAIN_HL1TRAIN ) ? SOLID_BSP : SOLID_VPHYSICS );
+	SetSolid(GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_HL1TRAIN ) ? SOLID_BSP : SOLID_VPHYSICS );
 	//SetSolid( SOLID_VPHYSICS );
 #endif
 
-	if ( HasSpawnFlags( SF_TRACKTRAIN_UNBLOCKABLE_BY_PLAYER ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_UNBLOCKABLE_BY_PLAYER ) )
 	{
 		AddFlag( FL_UNBLOCKABLE_BY_PLAYER );
 	}
-	if ( m_spawnflags & SF_TRACKTRAIN_PASSABLE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_PASSABLE)
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}
@@ -2927,12 +2927,12 @@ END_DATADESC()
 void CFuncTrackChange::Spawn( void )
 {
 	Setup();
-	if ( FBitSet( m_spawnflags, SF_TRACK_DONT_MOVE ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_TRACK_DONT_MOVE) )
 		m_vecPosition2.z = GetEngineObject()->GetLocalOrigin().z;
 
 	SetupRotation();
 
-	if ( FBitSet( m_spawnflags, SF_TRACK_STARTBOTTOM ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_TRACK_STARTBOTTOM) )
 	{
 		UTIL_SetOrigin( this, m_vecPosition2);
 		m_toggle_state = TS_AT_BOTTOM;
@@ -3082,7 +3082,7 @@ void CFuncTrackChange::GoDown( void )
 
 	UpdateAutoTargets( TS_GOING_DOWN );
 	// If ROTMOVE, move & rotate
-	if ( FBitSet( m_spawnflags, SF_TRACK_DONT_MOVE ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_TRACK_DONT_MOVE) )
 	{
 		SetMoveDone( &CFuncTrackChange::CallHitBottom );
 		m_toggle_state = TS_GOING_DOWN;
@@ -3120,7 +3120,7 @@ void CFuncTrackChange::GoUp( void )
 	// before you call GoUp();
 
 	UpdateAutoTargets( TS_GOING_UP );
-	if ( FBitSet( m_spawnflags, SF_TRACK_DONT_MOVE ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_TRACK_DONT_MOVE) )
 	{
 		m_toggle_state = TS_GOING_UP;
 		SetMoveDone( &CFuncTrackChange::CallHitTop );
@@ -3156,20 +3156,20 @@ void CFuncTrackChange::UpdateAutoTargets( int toggleState )
 
 	if ( toggleState == TS_AT_TOP )
 	{
-		m_trackTop->RemoveSpawnFlags( SF_PATH_DISABLED );
+		m_trackTop->GetEngineObject()->RemoveSpawnFlags( SF_PATH_DISABLED );
 	}
 	else
 	{
-		m_trackTop->AddSpawnFlags( SF_PATH_DISABLED );
+		m_trackTop->GetEngineObject()->AddSpawnFlags( SF_PATH_DISABLED );
 	}
 
 	if ( toggleState == TS_AT_BOTTOM )
 	{
-		m_trackBottom->RemoveSpawnFlags( SF_PATH_DISABLED );
+		m_trackBottom->GetEngineObject()->RemoveSpawnFlags( SF_PATH_DISABLED );
 	}
 	else
 	{
-		m_trackBottom->AddSpawnFlags( SF_PATH_DISABLED );
+		m_trackBottom->GetEngineObject()->AddSpawnFlags( SF_PATH_DISABLED );
 	}
 }
 
@@ -3291,7 +3291,7 @@ void CFuncTrackAuto::UpdateAutoTargets( int toggleState )
 	}
 	if ( pTarget )
 	{
-		pTarget->RemoveSpawnFlags( SF_PATH_DISABLED );
+		pTarget->GetEngineObject()->RemoveSpawnFlags( SF_PATH_DISABLED );
 		if ( m_code == TRAIN_FOLLOWING && m_train && m_train->m_flSpeed == 0 )
 		{
 			m_train->SetSpeed( pTarget->m_flSpeed );
@@ -3301,7 +3301,7 @@ void CFuncTrackAuto::UpdateAutoTargets( int toggleState )
 
 	if ( pNextTarget )
 	{
-		pNextTarget->AddSpawnFlags( SF_PATH_DISABLED );
+		pNextTarget->GetEngineObject()->AddSpawnFlags( SF_PATH_DISABLED );
 	}
 }
 

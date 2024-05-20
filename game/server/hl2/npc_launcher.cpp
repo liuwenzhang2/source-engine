@@ -150,12 +150,12 @@ void CNPC_Launcher::InputTurnOff( inputdata_t &inputdata )
 
 void CNPC_Launcher::InputLOSCheckOn( inputdata_t &inputdata )
 {
-	m_spawnflags |= SF_LAUNCHER_CHECK_LOS;
+	GetEngineObject()->AddSpawnFlags(SF_LAUNCHER_CHECK_LOS);
 }
 
 void CNPC_Launcher::InputLOSCheckOff( inputdata_t &inputdata )
 {
-	m_spawnflags &= ~SF_LAUNCHER_CHECK_LOS;
+	GetEngineObject()->RemoveSpawnFlags(SF_LAUNCHER_CHECK_LOS);
 }
 
 void CNPC_Launcher::InputSetEnemy( inputdata_t &inputdata )
@@ -337,7 +337,7 @@ bool CNPC_Launcher::IsValidEnemy( CBaseEntity *pTarget )
 		return false;
 	}
 
-	if (!FBitSet (m_spawnflags, SF_LAUNCHER_CHECK_LOS))
+	if (!GetEngineObject()->HasSpawnFlags(SF_LAUNCHER_CHECK_LOS))
 	{
 		return true;
 	}
@@ -405,7 +405,7 @@ int CNPC_Launcher::DrawDebugTextOverlays(void)
 		EntityText(text_offset,tempstr,0);
 		text_offset++;
 
-		Q_snprintf(tempstr,sizeof(tempstr),"LOS: %s", (FBitSet (m_spawnflags, SF_LAUNCHER_CHECK_LOS)) ? "On" : "Off" );
+		Q_snprintf(tempstr,sizeof(tempstr),"LOS: %s", (GetEngineObject()->HasSpawnFlags(SF_LAUNCHER_CHECK_LOS)) ? "On" : "Off" );
 		EntityText(text_offset,tempstr,0);
 		text_offset++;
 	}

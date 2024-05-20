@@ -80,6 +80,7 @@ public:
 
 	CItem_DynamicResupply();
 
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	void Spawn( void );
 	void Precache( void );
 	void Activate( void );
@@ -165,7 +166,6 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 CItem_DynamicResupply::CItem_DynamicResupply( void )
 {
-	AddSpawnFlags( SF_DYNAMICRESUPPLY_USE_MASTER );
 	m_version = VERSION_CURRENT;
 
 	// Setup default values
@@ -183,6 +183,10 @@ CItem_DynamicResupply::CItem_DynamicResupply( void )
 	m_flDesiredAmmo[9] = 0;		// AR2 alt-fire
 }
 
+void CItem_DynamicResupply::PostConstructor(const char* szClassname, int iForceEdictIndex) 
+{
+	GetEngineObject()->AddSpawnFlags(SF_DYNAMICRESUPPLY_USE_MASTER);
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -198,10 +202,10 @@ void CItem_DynamicResupply::Spawn( void )
 	// Don't callback to spawn
 	Precache();
 
-	m_bIsMaster = HasSpawnFlags( SF_DYNAMICRESUPPLY_IS_MASTER );
+	m_bIsMaster = GetEngineObject()->HasSpawnFlags( SF_DYNAMICRESUPPLY_IS_MASTER );
 
 	// Am I the master?
-	if ( !HasSpawnFlags( SF_DYNAMICRESUPPLY_IS_MASTER | SF_DYNAMICRESUPPLY_ALTERNATE_MASTER ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_DYNAMICRESUPPLY_IS_MASTER | SF_DYNAMICRESUPPLY_ALTERNATE_MASTER ) )
 	{
 		// Stagger the thinks a bit so they don't all think at the same time
 		SetNextThink( gpGlobals->curtime + RandomFloat(0.2f, 0.4f) );
@@ -217,7 +221,7 @@ void CItem_DynamicResupply::Activate( void )
 { 
 	BaseClass::Activate();
 
-	if ( HasSpawnFlags( SF_DYNAMICRESUPPLY_IS_MASTER ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_DYNAMICRESUPPLY_IS_MASTER ) )
 	{
 		if ( !g_MasterResupply && ( m_bIsMaster || m_version < VERSION_1_PERSISTENT_MASTER ) )
 		{
@@ -228,7 +232,7 @@ void CItem_DynamicResupply::Activate( void )
 			m_bIsMaster = false;
 		}
 	}
-	if ( !HasSpawnFlags( SF_DYNAMICRESUPPLY_ALTERNATE_MASTER ) && HasSpawnFlags( SF_DYNAMICRESUPPLY_USE_MASTER ) && gpGlobals->curtime < 1.0 )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_DYNAMICRESUPPLY_ALTERNATE_MASTER ) && GetEngineObject()->HasSpawnFlags( SF_DYNAMICRESUPPLY_USE_MASTER ) && gpGlobals->curtime < 1.0 )
 	{
 		if ( !g_MasterResupply )
 		{
@@ -318,7 +322,7 @@ void CItem_DynamicResupply::InputBecomeMaster( inputdata_t &data )
 void CItem_DynamicResupply::SpawnFullItem( CItem_DynamicResupply *pMaster, CBasePlayer *pPlayer, int iDebug )
 {
 	// Can we not actually spawn the item?
-	if ( !HasSpawnFlags(SF_DYNAMICRESUPPLY_ALWAYS_SPAWN) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_DYNAMICRESUPPLY_ALWAYS_SPAWN) )
 		return;
 
 	float flRatio[NUM_AMMO_ITEMS];
@@ -343,7 +347,7 @@ void CItem_DynamicResupply::SpawnFullItem( CItem_DynamicResupply *pMaster, CBase
 	if ( flTotalProb == 0.0f )
 	{
 		// If we're supposed to fallback to just a health vial, do that and finish.
-		if ( pMaster->HasSpawnFlags(SF_DYNAMICRESUPPLY_FALLBACK_TO_VIAL) )
+		if ( pMaster->GetEngineObject()->HasSpawnFlags(SF_DYNAMICRESUPPLY_FALLBACK_TO_VIAL) )
 		{
 			CBaseEntity::Create( "item_healthvial", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), this );
 
@@ -593,7 +597,7 @@ void CItem_DynamicResupply::SpawnDynamicItem( CBasePlayer *pPlayer )
 
 	// Use the master if we're supposed to
 	CItem_DynamicResupply *pMaster = this;
-	if ( HasSpawnFlags( SF_DYNAMICRESUPPLY_USE_MASTER ) && g_MasterResupply )
+	if (GetEngineObject()->HasSpawnFlags( SF_DYNAMICRESUPPLY_USE_MASTER ) && g_MasterResupply )
 	{
 		pMaster = g_MasterResupply;
 	}
@@ -650,7 +654,7 @@ void DynamicResupply_InitFromAlternateMaster( CBaseEntity *pTargetEnt, string_t 
 
 	CItem_DynamicResupply *pMasterResupply = assert_cast<CItem_DynamicResupply *>( pMasterEnt );
 
-	pTargetResupply->RemoveSpawnFlags( SF_DYNAMICRESUPPLY_USE_MASTER );
+	pTargetResupply->GetEngineObject()->RemoveSpawnFlags( SF_DYNAMICRESUPPLY_USE_MASTER );
 	memcpy( pTargetResupply->m_flDesiredHealth, pMasterResupply->m_flDesiredHealth, sizeof( pMasterResupply->m_flDesiredHealth ) );
 	memcpy( pTargetResupply->m_flDesiredAmmo, pMasterResupply->m_flDesiredAmmo, sizeof( pMasterResupply->m_flDesiredAmmo ) );
 

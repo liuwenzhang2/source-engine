@@ -151,7 +151,7 @@ void CNPC_Bullseye::Spawn( void )
 	m_flFieldOfView = cos( DEG2RAD(m_flFieldOfView) / 2.0 );
 
 	//Got blood?
-	if ( m_spawnflags & SF_BULLSEYE_BLEED )
+	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_BLEED)
 	{
 		SetBloodColor(BLOOD_COLOR_RED);
 	}
@@ -168,17 +168,17 @@ void CNPC_Bullseye::Spawn( void )
 
 	SetSolid( SOLID_BBOX );
 	AddSolidFlags( FSOLID_NOT_STANDABLE );
-	if( m_spawnflags & SF_BULLSEYE_NONSOLID )
+	if(GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_NONSOLID)
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 	
-	if ( m_spawnflags & SF_BULLSEYE_VPHYSICSSHADOW )
+	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_VPHYSICSSHADOW)
 	{
 		VPhysicsInitShadow( false, false );
 	}
 	
-	if( m_spawnflags & SF_BULLSEYE_NODAMAGE )
+	if(GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_NODAMAGE)
 	{
 		m_takedamage = DAMAGE_NO;
 	}
@@ -210,7 +210,7 @@ void CNPC_Bullseye::Activate( void )
 {
 	BaseClass::Activate();
 
-	if ( m_spawnflags & SF_BULLSEYE_PERFECTACC )
+	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_PERFECTACC)
 	{
 		m_bPerfectAccuracy = true;
 	}
@@ -319,7 +319,7 @@ Class_T	CNPC_Bullseye::Classify( void )
 
 void CNPC_Bullseye::OnRestore( void )
 {
-	if ( m_spawnflags & SF_BULLSEYE_VPHYSICSSHADOW )
+	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_VPHYSICSSHADOW)
 	{
 		IPhysicsObject *pObject = VPhysicsGetObject();
 
@@ -394,7 +394,7 @@ bool CNPC_Bullseye::IsLightDamage( const CTakeDamageInfo &info )
 void CNPC_Bullseye::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator )
 {
 	//If specified, we must be the enemy of the target
-	if ( m_spawnflags & SF_BULLSEYE_ENEMYDAMAGEONLY )
+	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_ENEMYDAMAGEONLY)
 	{
 		CAI_BaseNPC *pInstigator = info.GetAttacker()->MyNPCPointer();
 
@@ -406,7 +406,7 @@ void CNPC_Bullseye::TraceAttack( const CTakeDamageInfo &info, const Vector &vecD
 	}
 
 	//We can bleed if we want to, we can leave decals behind...
-	if ( ( m_spawnflags & SF_BULLSEYE_BLEED ) && ( m_takedamage == DAMAGE_NO ) )
+	if ( (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_BLEED) && (m_takedamage == DAMAGE_NO))
 	{
 		TraceBleed( info.GetDamage(), vecDir, ptr, info.GetDamageType() );
 	}
@@ -428,7 +428,7 @@ int CNPC_Bullseye::OnTakeDamage( const CTakeDamageInfo &info )
 	SetNextThink( gpGlobals->curtime );
 
 	//If specified, we must be the enemy of the target
-	if ( m_spawnflags & SF_BULLSEYE_ENEMYDAMAGEONLY )
+	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_ENEMYDAMAGEONLY)
 	{
 		CAI_BaseNPC *pInstigator = info.GetAttacker()->MyNPCPointer();
 

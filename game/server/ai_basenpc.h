@@ -887,7 +887,7 @@ public:
 	virtual void		UpdateEfficiency( bool bInPVS );
 	void				ForceDecisionThink()						{ m_flNextDecisionTime = 0; SetEfficiency( AIE_NORMAL ); }
 
-	bool				IsFlaggedEfficient() const					{ return HasSpawnFlags( SF_NPC_START_EFFICIENT ); }
+	bool				IsFlaggedEfficient() const					{ return GetEngineObject()->HasSpawnFlags( SF_NPC_START_EFFICIENT ); }
 
 	AI_SleepState_t		GetSleepState() const						{ return m_SleepState; }
 	void				SetSleepState( AI_SleepState_t sleepState )	{ m_SleepState = sleepState; }
@@ -1456,8 +1456,8 @@ public:
 	void				InputStartScripting( inputdata_t &inputdata ) { m_bInAScript = true; }
 	void				InputStopScripting( inputdata_t &inputdata ) { m_bInAScript = false; }
 
-	void				InputGagEnable( inputdata_t &inputdata ) { AddSpawnFlags(SF_NPC_GAG); }
-	void				InputGagDisable( inputdata_t &inputdata ) { RemoveSpawnFlags(SF_NPC_GAG); }
+	void				InputGagEnable( inputdata_t &inputdata ) { GetEngineObject()->AddSpawnFlags(SF_NPC_GAG); }
+	void				InputGagDisable( inputdata_t &inputdata ) { GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG); }
 
 	bool				HandleInteraction(int interactionType, void *data, CBaseCombatCharacter* sourceEnt);
 

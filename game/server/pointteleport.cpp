@@ -77,7 +77,7 @@ void CPointTeleport::Activate( void )
 	m_vSaveAngles = GetEngineObject()->GetAbsAngles();
 
 	// Save off the spawn position of the target if instructed to do so
-	if ( m_spawnflags & SF_TELEPORT_TO_SPAWN_POS )
+	if (GetEngineObject()->GetSpawnFlags() & SF_TELEPORT_TO_SPAWN_POS)
 	{
 		CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, m_target );
 		if ( pTarget )
@@ -126,7 +126,7 @@ void CPointTeleport::InputTeleport( inputdata_t &inputdata )
 
 	// in episodic, we have a special spawn flag that forces Gordon into a duck
 #ifdef HL2_EPISODIC
-	if ( (m_spawnflags & SF_TELEPORT_INTO_DUCK) && pTarget->IsPlayer() ) 
+	if ( (GetEngineObject()->GetSpawnFlags() & SF_TELEPORT_INTO_DUCK) && pTarget->IsPlayer() )
 	{
 		CBasePlayer *pPlayer = ToBasePlayer( pTarget );
 		if ( pPlayer != NULL )

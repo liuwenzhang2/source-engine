@@ -133,12 +133,12 @@ void CTeamControlPoint::Spawn( void )
 	SetThink( &CTeamControlPoint::AnimThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
-	if ( FBitSet( m_spawnflags, SF_CAP_POINT_HIDE_MODEL ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_CAP_POINT_HIDE_MODEL) )
 	{
 		AddEffects( EF_NODRAW );
 	}
 
-	if ( FBitSet( m_spawnflags, SF_CAP_POINT_HIDE_SHADOW ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_CAP_POINT_HIDE_SHADOW) )
 	{
 		AddEffects( EF_NOSHADOW );
 	}
@@ -507,7 +507,7 @@ void CTeamControlPoint::CaptureEnd( void )
 {
 	StopLoopingSounds();
 
-	if ( !FBitSet( m_spawnflags, SF_CAP_POINT_NO_CAP_SOUNDS ) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_CAP_POINT_NO_CAP_SOUNDS) )
 	{
 		const char* soundname = STRING(m_iszCaptureEndSound);
 		CPASAttenuationFilter filter(this, soundname);
@@ -528,7 +528,7 @@ void CTeamControlPoint::CaptureInterrupted( bool bBlocked )
 {
 	StopLoopingSounds();
 
-	if ( FBitSet( m_spawnflags, SF_CAP_POINT_NO_CAP_SOUNDS ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_CAP_POINT_NO_CAP_SOUNDS) )
 	{
 		return;
 	}

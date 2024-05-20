@@ -818,7 +818,7 @@ void CWeaponStriderBuster::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPi
 {
 	m_PickupTime = gpGlobals->curtime;
 	m_CarryAngles.Init( 45, 0, 0 );
-	if ( ( reason == PICKED_UP_BY_CANNON ) && ( !HasSpawnFlags( SF_DONT_WEAPON_MANAGE ) ) )
+	if ( ( reason == PICKED_UP_BY_CANNON ) && ( !GetEngineObject()->HasSpawnFlags( SF_DONT_WEAPON_MANAGE ) ) )
 	{
 		WeaponManager_RemoveManaged( this );
 	}
@@ -839,7 +839,7 @@ void CWeaponStriderBuster::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop
 	{
 		Launch( pPhysGunUser );
 	}
-	else if ( ( Reason == DROPPED_BY_CANNON ) && ( !HasSpawnFlags( SF_DONT_WEAPON_MANAGE ) ) )
+	else if ( ( Reason == DROPPED_BY_CANNON ) && ( !GetEngineObject()->HasSpawnFlags( SF_DONT_WEAPON_MANAGE ) ) )
 	{
 		// This striderbuster is now fair game for autodeletion.
 		WeaponManager_AddManaged( this );
@@ -854,7 +854,7 @@ void CWeaponStriderBuster::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop
 //-----------------------------------------------------------------------------
 void CWeaponStriderBuster::Launch( CBasePlayer *pPhysGunUser )
 {
-	if ( !HasSpawnFlags( SF_DONT_WEAPON_MANAGE ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_DONT_WEAPON_MANAGE ) )
 	{
 		WeaponManager_RemoveManaged( this );
 	}
@@ -1101,7 +1101,7 @@ void CWeaponStriderBuster::BusterPingThink()
 //-----------------------------------------------------------------------------
 void CWeaponStriderBuster::OnAddToCargoHold()
 {
-	if ( !HasSpawnFlags( SF_DONT_WEAPON_MANAGE ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_DONT_WEAPON_MANAGE ) )
 	{
 		WeaponManager_RemoveManaged( this );
 	}

@@ -112,7 +112,7 @@ void CBubbling::Spawn( void )
 
 	SetSolid( SOLID_NONE );						// Remove model & collisions
 
-	if ( !HasSpawnFlags(SF_BUBBLES_STARTOFF) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_BUBBLES_STARTOFF) )
 	{
 		SetThink( &CBubbling::FizzThink );
 		SetNextThink( gpGlobals->curtime + 2.0 );
@@ -493,7 +493,7 @@ void CGibShooter::InitPointGib( CGib *pGib, const Vector &vecShootDir, float flS
 
 		// HL1 gibs always die after a certain time, other games have to opt-in
 #ifndef HL1_DLL
-		if( HasSpawnFlags( SF_SHOOTER_STRICT_REMOVE ) )
+		if(GetEngineObject()->HasSpawnFlags( SF_SHOOTER_STRICT_REMOVE ) )
 #endif
 		{
 			pGib->SetNextThink( gpGlobals->curtime + pGib->m_lifeTime );
@@ -570,7 +570,7 @@ CBaseEntity *CGibShooter::SpawnGib( const Vector &vecShootDir, float flSpeed )
 					pPhysicsObject->ApplyTorqueCenter( torque );
 
 #ifndef HL1_DLL
-					if( HasSpawnFlags( SF_SHOOTER_STRICT_REMOVE ) )
+					if(GetEngineObject()->HasSpawnFlags( SF_SHOOTER_STRICT_REMOVE ) )
 #endif
 					{
 						pGib->m_bForceRemove = true;
@@ -625,7 +625,7 @@ void CGibShooter::ShootThink ( void )
 
 	if ( --m_iGibs <= 0 )
 	{
-		if ( HasSpawnFlags(SF_GIBSHOOTER_REPEATABLE) )
+		if (GetEngineObject()->HasSpawnFlags(SF_GIBSHOOTER_REPEATABLE) )
 		{
 			m_iGibs = m_iGibCapacity;
 			SetThink ( NULL );
@@ -766,7 +766,7 @@ CGib *CEnvShooter::CreateGib ( void )
 	pGib->SetGravity( m_flGibGravityScale );
 
 	// Spawn a flaming gib
-	if ( HasSpawnFlags( SF_SHOOTER_FLAMING ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SHOOTER_FLAMING ) )
 	{
 		// Tag an entity flame along with us
 		CEntityFlame *pFlame = CEntityFlame::Create( pGib, false );
@@ -901,7 +901,7 @@ CBaseEntity *CRotorWashShooter::DoWashPush( float flWashStartTime, const Vector 
 
 	if ( --m_iGibs <= 0 )
 	{
-		if ( HasSpawnFlags(SF_GIBSHOOTER_REPEATABLE) )
+		if (GetEngineObject()->HasSpawnFlags(SF_GIBSHOOTER_REPEATABLE) )
 		{
 			m_iGibs = m_iGibCapacity;
 		}
@@ -1112,7 +1112,7 @@ bool CBlood::KeyValue( const char *szKeyName, const char *szValue )
 
 Vector CBlood::Direction( void )
 {
-	if ( HasSpawnFlags( SF_BLOOD_RANDOM ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BLOOD_RANDOM ) )
 		return UTIL_RandomBloodVector();
 
 	return m_vecSprayDir;
@@ -1121,7 +1121,7 @@ Vector CBlood::Direction( void )
 
 Vector CBlood::BloodPosition( CBaseEntity *pActivator )
 {
-	if ( HasSpawnFlags( SF_BLOOD_PLAYER ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BLOOD_PLAYER ) )
 	{
 		CBasePlayer *player;
 
@@ -1168,7 +1168,7 @@ void UTIL_BloodSpray( const Vector &pos, const Vector &dir, int color, int amoun
 //-----------------------------------------------------------------------------
 void CBlood::InputEmitBlood( inputdata_t &inputdata )
 {
-	if ( HasSpawnFlags( SF_BLOOD_STREAM ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BLOOD_STREAM ) )
 	{
 		UTIL_BloodStream( BloodPosition(inputdata.pActivator), Direction(), Color(), BloodAmount() );
 	}
@@ -1177,7 +1177,7 @@ void CBlood::InputEmitBlood( inputdata_t &inputdata )
 		UTIL_BloodDrips( BloodPosition(inputdata.pActivator), Direction(), Color(), BloodAmount() );
 	}
 
-	if ( HasSpawnFlags( SF_BLOOD_DECAL ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BLOOD_DECAL ) )
 	{
 		Vector forward = Direction();
 		Vector start = BloodPosition( inputdata.pActivator );
@@ -1193,20 +1193,20 @@ void CBlood::InputEmitBlood( inputdata_t &inputdata )
 	//
 	// New-fangled blood effects.
 	//
-	if ( HasSpawnFlags( SF_BLOOD_CLOUD | SF_BLOOD_DROPS | SF_BLOOD_GORE ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BLOOD_CLOUD | SF_BLOOD_DROPS | SF_BLOOD_GORE ) )
 	{
 		int nFlags = 0;
-		if (HasSpawnFlags(SF_BLOOD_CLOUD))
+		if (GetEngineObject()->HasSpawnFlags(SF_BLOOD_CLOUD))
 		{
 			nFlags |= FX_BLOODSPRAY_CLOUD;
 		}
 
-		if (HasSpawnFlags(SF_BLOOD_DROPS))
+		if (GetEngineObject()->HasSpawnFlags(SF_BLOOD_DROPS))
 		{
 			nFlags |= FX_BLOODSPRAY_DROPS;
 		}
 
-		if (HasSpawnFlags(SF_BLOOD_GORE))
+		if (GetEngineObject()->HasSpawnFlags(SF_BLOOD_GORE))
 		{
 			nFlags |= FX_BLOODSPRAY_GORE;
 		}
@@ -1271,7 +1271,7 @@ void CEnvFunnel::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 {
 	CBroadcastRecipientFilter filter;
 	te->LargeFunnel( filter, 0.0,
-		&GetEngineObject()->GetAbsOrigin(), m_iSprite, HasSpawnFlags( SF_FUNNEL_REVERSE ) ? 1 : 0 );
+		&GetEngineObject()->GetAbsOrigin(), m_iSprite, GetEngineObject()->HasSpawnFlags( SF_FUNNEL_REVERSE ) ? 1 : 0 );
 
 	SetThink( &CEnvFunnel::SUB_Remove );
 	SetNextThink( gpGlobals->curtime );
@@ -1715,7 +1715,7 @@ void CEmbers::Spawn( void )
 	SetUse( &CEmbers::EmberUse );
 
 	//Start off if we're targetted (unless flagged)
-	m_bEmit = ( HasSpawnFlags( bitsSF_EMBERS_START_ON ) || ( !GetEntityName() ) );
+	m_bEmit = (GetEngineObject()->HasSpawnFlags( bitsSF_EMBERS_START_ON ) || ( !GetEntityName() ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1735,7 +1735,7 @@ void CEmbers::Precache( void )
 void CEmbers::EmberUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	//If we're not toggable, only allow one use
-	if ( !HasSpawnFlags( bitsSF_EMBERS_TOGGLE ) )
+	if ( !GetEngineObject()->HasSpawnFlags( bitsSF_EMBERS_TOGGLE ) )
 	{
 		SetUse( NULL );
 	}
@@ -1972,7 +1972,7 @@ void CEnvSplash::InputSplash( inputdata_t &inputdata )
 
 	float scale = m_flScale;
 
-	if( HasSpawnFlags( SF_ENVSPLASH_FINDWATERSURFACE ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_ENVSPLASH_FINDWATERSURFACE ) )
 	{
 		if( UTIL_PointContents(GetEngineObject()->GetAbsOrigin()) & MASK_WATER )
 		{
@@ -1996,7 +1996,7 @@ void CEnvSplash::InputSplash( inputdata_t &inputdata )
 		data.m_vOrigin = GetEngineObject()->GetAbsOrigin();
 	}
 
-	if( HasSpawnFlags( SF_ENVSPLASH_DIMINISH ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_ENVSPLASH_DIMINISH ) )
 	{
 		// Get smaller if I'm in deeper water.
 		float depth = 0.0f;
@@ -2377,7 +2377,7 @@ void CEnvViewPunch::Spawn( void )
 	SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 
-	if ( GetSpawnFlags() & SF_PUNCH_EVERYONE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_PUNCH_EVERYONE )
 	{
 		m_flRadius = 0;
 	}
@@ -2388,7 +2388,7 @@ void CEnvViewPunch::Spawn( void )
 //-----------------------------------------------------------------------------
 void CEnvViewPunch::DoViewPunch()
 {
-	bool bAir = (GetSpawnFlags() & SF_PUNCH_IN_AIR) ? true : false;
+	bool bAir = (GetEngineObject()->GetSpawnFlags() & SF_PUNCH_IN_AIR) ? true : false;
 	UTIL_ViewPunch(GetEngineObject()->GetAbsOrigin(), m_angViewPunch, m_flRadius, bAir );
 }
 

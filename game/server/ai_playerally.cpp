@@ -728,7 +728,7 @@ bool CAI_PlayerAlly::SelectQuestionAndAnswerSpeech( AISpeechSelection_t *pSelect
 
 	// if there is a friend nearby to speak to, play sentence, set friend's response time, return
 	CAI_PlayerAlly *pFriend = dynamic_cast<CAI_PlayerAlly *>(FindSpeechTarget( AIST_NPCS ));
-	if ( pFriend && !pFriend->IsMoving() && !pFriend->HasSpawnFlags(SF_NPC_GAG) )
+	if ( pFriend && !pFriend->IsMoving() && !pFriend->GetEngineObject()->HasSpawnFlags(SF_NPC_GAG) )
 		return SelectQuestionFriend( pFriend, pSelection );
 
 	return false;
@@ -1410,7 +1410,7 @@ bool CAI_PlayerAlly::IsOkToSpeak( ConceptCategory_t category, bool fRespondingTo
 	if ( !IsAlive() )
 		return false;
 
-	if ( m_spawnflags & SF_NPC_GAG )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NPC_GAG)
 		return false;
 
 	// Don't speak if playing a script.

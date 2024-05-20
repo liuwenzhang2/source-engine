@@ -340,7 +340,7 @@ void CNPC_CombineCamera::Spawn()
 	m_pEyeGlow->SetAttachment(this, 2);
 
 	// Set our enabled state
-	m_bEnabled = ((m_spawnflags & SF_COMBINE_CAMERA_STARTINACTIVE) == false);
+	m_bEnabled = ((GetEngineObject()->GetSpawnFlags() & SF_COMBINE_CAMERA_STARTINACTIVE) == false);
 
 	// Make sure the radii are sane.
 	if (m_nOuterRadius <= 0)
@@ -593,7 +593,7 @@ bool CNPC_CombineCamera::IsValidEnemy( CBaseEntity *pEnemy )
 //-----------------------------------------------------------------------------
 CBaseEntity *CNPC_CombineCamera::MaintainEnemy()
 {
-	if (HasSpawnFlags(SF_COMBINE_CAMERA_IGNOREENEMIES))
+	if (GetEngineObject()->HasSpawnFlags(SF_COMBINE_CAMERA_IGNOREENEMIES))
 		return NULL;
 
 	GetSenses()->Look(m_nOuterRadius);
@@ -669,7 +669,7 @@ void CNPC_CombineCamera::ActiveThink()
 			{
 				SetEyeState(CAMERA_EYE_FOUND_TARGET);
 
-				if (HasSpawnFlags(SF_COMBINE_CAMERA_BECOMEANGRY))
+				if (GetEngineObject()->HasSpawnFlags(SF_COMBINE_CAMERA_BECOMEANGRY))
 				{
 					SetAngry(true);
 				}
@@ -701,7 +701,7 @@ void CNPC_CombineCamera::ActiveThink()
 		else
 		{
 			// If we get angry automatically, we get un-angry automatically
-			if ( HasSpawnFlags(SF_COMBINE_CAMERA_BECOMEANGRY) && m_bAngry )
+			if (GetEngineObject()->HasSpawnFlags(SF_COMBINE_CAMERA_BECOMEANGRY) && m_bAngry )
 			{
 				SetAngry(false);
 			}

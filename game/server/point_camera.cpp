@@ -61,7 +61,7 @@ void CPointCamera::Spawn( void )
 {
 	BaseClass::Spawn();
 
-	if ( m_spawnflags & SF_CAMERA_START_OFF )
+	if (GetEngineObject()->GetSpawnFlags() & SF_CAMERA_START_OFF)
 	{
 		m_bIsOn = false;
 	}

@@ -415,7 +415,7 @@ bool FireSystem_StartFire( const Vector &position, float fireHeight, float attac
 
 	//Spawn the fire
 	// Fires not placed by a designer should be cleaned up automatically (not catch fire again)
-	fire->AddSpawnFlags( SF_FIRE_DIE_PERMANENT );
+	fire->GetEngineObject()->AddSpawnFlags( SF_FIRE_DIE_PERMANENT );
 	fire->Spawn();
 	fire->Init( testPos, fireHeight, attack, fuel, flags, type );
 	fire->Start();
@@ -466,7 +466,7 @@ bool FireSystem_StartFire( CBaseAnimating *pEntity, float fireHeight, float atta
 
 	// Spawn the fire.
 	// Fires not placed by a designer should be cleaned up automatically (not catch fire again).
-	fire->AddSpawnFlags( SF_FIRE_DIE_PERMANENT );
+	fire->GetEngineObject()->AddSpawnFlags( SF_FIRE_DIE_PERMANENT );
 	fire->Spawn();
 	fire->Init( testPos, fireHeight, attack, fuel, flags, type );
 	fire->Start();
@@ -619,7 +619,7 @@ void CFire::Precache( void )
 	{
 		UTIL_PrecacheOther("_firesmoke");
 		
-		if ( m_spawnflags & SF_FIRE_SMOKELESS )
+		if (GetEngineObject()->GetSpawnFlags() & SF_FIRE_SMOKELESS)
 		{
 			PrecacheParticleSystem( "env_fire_tiny" );
 			PrecacheParticleSystem( "env_fire_small" );
@@ -679,7 +679,7 @@ void CFire::Disable()
 //-----------------------------------------------------------------------------
 void CFire::InputExtinguish( inputdata_t &inputdata )
 {
-	m_spawnflags &= ~SF_FIRE_INFINITE;
+	GetEngineObject()->RemoveSpawnFlags(SF_FIRE_INFINITE);
 	GoOutInSeconds( inputdata.value.Float() );
 }
 
@@ -703,7 +703,7 @@ void CFire::StartFire( void )
 	// Trace down and start a fire there. Nothing fancy yet.
 	Vector vFirePos;
 	trace_t tr;
-	if ( m_spawnflags & SF_FIRE_DONT_DROP )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FIRE_DONT_DROP)
 	{
 		vFirePos = GetEngineObject()->GetAbsOrigin();
 	}
@@ -713,11 +713,11 @@ void CFire::StartFire( void )
 		vFirePos = tr.endpos;
 	}
 
-	int spawnflags = m_spawnflags;
-	m_spawnflags |= SF_FIRE_START_ON;
-	Init( vFirePos, m_flFireSize, m_flAttackTime, GetHealth(), m_spawnflags, (fireType_e) m_nFireType );
+	int spawnflags = GetEngineObject()->GetSpawnFlags();
+	GetEngineObject()->AddSpawnFlags(SF_FIRE_START_ON);
+	Init( vFirePos, m_flFireSize, m_flAttackTime, GetHealth(), GetEngineObject()->GetSpawnFlags(), (fireType_e)m_nFireType);
 	Start();
-	m_spawnflags = spawnflags;
+	GetEngineObject()->SetSpawnFlags(spawnflags);
 }
 
 //-----------------------------------------------------------------------------
@@ -738,7 +738,7 @@ void CFire::Spawn( void )
 	// set up the ignition point
 	m_flHeatAbsorb = m_flHeatLevel * 0.05;
 	m_flHeatLevel = 0;
-	Init(GetEngineObject()->GetAbsOrigin(), m_flFireSize, m_flAttackTime, m_flFuel, m_spawnflags, m_nFireType );
+	Init(GetEngineObject()->GetAbsOrigin(), m_flFireSize, m_flAttackTime, m_flFuel, GetEngineObject()->GetSpawnFlags(), m_nFireType);
 	
 	if( m_bStartDisabled )
 	{
@@ -764,7 +764,7 @@ void CFire::Activate( void )
 	BaseClass::Activate();
 	
 	//See if we should start active
-	if ( !m_bDidActivate && ( m_spawnflags & SF_FIRE_START_ON ) )
+	if ( !m_bDidActivate && (GetEngineObject()->GetSpawnFlags() & SF_FIRE_START_ON))
 	{
 		m_flHeatLevel = m_flMaxHeat;
 
@@ -786,9 +786,9 @@ void CFire::SpawnEffect( fireType_e type, float scale )
 	case FIRE_NATURAL:
 		{
 			CFireSmoke	*fireSmoke = (CFireSmoke *)gEntList.CreateEntityByName( "_firesmoke" );
-			fireSmoke->EnableSmoke( ( m_spawnflags & SF_FIRE_SMOKELESS )==false );
-			fireSmoke->EnableGlow( ( m_spawnflags & SF_FIRE_NO_GLOW )==false );
-			fireSmoke->EnableVisibleFromAbove( ( m_spawnflags & SF_FIRE_VISIBLE_FROM_ABOVE )!=false );
+			fireSmoke->EnableSmoke( (GetEngineObject()->GetSpawnFlags() & SF_FIRE_SMOKELESS) == false);
+			fireSmoke->EnableGlow( (GetEngineObject()->GetSpawnFlags() & SF_FIRE_NO_GLOW) == false);
+			fireSmoke->EnableVisibleFromAbove( (GetEngineObject()->GetSpawnFlags() & SF_FIRE_VISIBLE_FROM_ABOVE) != false);
 			
 			pEffect			= fireSmoke;
 			m_nFireType		= FIRE_NATURAL;
@@ -824,7 +824,7 @@ void CFire::SpawnEffect( fireType_e type, float scale )
 	pEffect->GetEngineObject()->SetParent( this->GetEngineObject() );
 	pEffect->Scale( m_flFireSize, m_flFireSize, 0 );
 	//Start it going
-	pEffect->Enable( ( m_spawnflags & SF_FIRE_START_ON ) );
+	pEffect->Enable( (GetEngineObject()->GetSpawnFlags() & SF_FIRE_START_ON));
 	m_hEffect = pEffect;
 }
 
@@ -837,7 +837,7 @@ void CFire::Init( const Vector &position, float scale, float attackTime, float f
 {
 	m_flAttackTime = attackTime;
 	
-	m_spawnflags = flags;
+	GetEngineObject()->SetSpawnFlags(flags);
 	m_nFireType = fireType;
 
 	if ( flags & SF_FIRE_INFINITE )
@@ -847,7 +847,7 @@ void CFire::Init( const Vector &position, float scale, float attackTime, float f
 	m_flFuel = fuel;
 	if ( m_flFuel )
 	{
-		m_spawnflags |= SF_FIRE_DIE_PERMANENT;
+		GetEngineObject()->AddSpawnFlags(SF_FIRE_DIE_PERMANENT);
 	}
 
 	Vector localOrigin = position;
@@ -863,7 +863,7 @@ void CFire::Init( const Vector &position, float scale, float attackTime, float f
 	m_flFireSize = scale;
 	m_flMaxHeat = FIRE_MAX_HEAT_LEVEL * FIRE_SCALE_FROM_SIZE(scale);
 	//See if we should start on
-	if ( m_spawnflags & SF_FIRE_START_FULL )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FIRE_START_FULL)
 	{
 		m_flHeatLevel = m_flMaxHeat;
 	}
@@ -1211,7 +1211,7 @@ bool CFire::GoOut()
 	m_flLastHeatLevel = m_flHeatLevel; 
 	SetThink(NULL);
 	SetNextThink( TICK_NEVER_THINK );
-	if ( m_spawnflags & SF_FIRE_DIE_PERMANENT )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FIRE_DIE_PERMANENT)
 	{
 		UTIL_Remove( this );
 		return true;
@@ -1265,7 +1265,7 @@ LINK_ENTITY_TO_CLASS( env_firesource, CEnvFireSource );
 
 void CEnvFireSource::Spawn()
 {
-	if ( m_spawnflags & SF_FIRESOURCE_START_ON )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FIRESOURCE_START_ON)
 	{
 		TurnOn();
 	}
@@ -1368,7 +1368,7 @@ LINK_ENTITY_TO_CLASS( env_firesensor, CEnvFireSensor );
 
 void CEnvFireSensor::Spawn()
 {
-	if ( m_spawnflags & SF_FIRESENSOR_START_ON )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FIRESENSOR_START_ON)
 	{
 		TurnOn();
 	}

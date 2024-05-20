@@ -405,7 +405,7 @@ bool CHL1NPCTalker::HandleInteraction(int interactionType, void *data, CBaseComb
 
 void CHL1NPCTalker::StartFollowing(	CBaseEntity *pLeader )
 {
-	if ( !HasSpawnFlags( SF_NPC_GAG ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_NPC_GAG ) )
 	{
 		if ( m_iszUse != NULL_STRING )
 		{
@@ -465,7 +465,7 @@ void CHL1NPCTalker::StopFollowing( void )
 {
 	if ( !(m_afMemory & bits_MEMORY_PROVOKED) )
 	{
-		if ( !HasSpawnFlags( SF_NPC_GAG ) )
+		if ( !GetEngineObject()->HasSpawnFlags( SF_NPC_GAG ) )
 		{
 			if ( m_iszUnUse != NULL_STRING )
 			{
@@ -505,7 +505,7 @@ void CHL1NPCTalker::FollowerUse( CBaseEntity *pActivator, CBaseEntity *pCaller, 
 	if ( pCaller != NULL && pCaller->IsPlayer() )
 	{
 		// Pre-disaster followers can't be used
-		if ( m_spawnflags & SF_NPC_PREDISASTER )
+		if (GetEngineObject()->GetSpawnFlags() & SF_NPC_PREDISASTER )
 		{
 			SetSpeechTarget( pCaller );
 			DeclineFollowing();
@@ -605,7 +605,7 @@ bool CHL1NPCTalker::OnObstructingDoor( AILocalMoveGoal_t *pMoveGoal, CBaseDoor *
 		if  ( IsMoveBlocked( *pResult ) && pMoveGoal->directTrace.vHitNormal != vec3_origin )
 		{
 			// Can't do anything if the door's locked
-			if ( !pDoor->m_bLocked && !pDoor->HasSpawnFlags(SF_DOOR_NONPCS) )
+			if ( !pDoor->m_bLocked && !pDoor->GetEngineObject()->HasSpawnFlags(SF_DOOR_NONPCS) )
 			{
 				// Tell the door to open
 				variant_t emptyVariant;

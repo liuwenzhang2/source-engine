@@ -41,6 +41,7 @@ public:
 
 	DECLARE_DATADESC();
 
+	void UpdateOnRemove(void);
 	void Spawn( void );
 	void Precache( void );
 	void Activate( void );

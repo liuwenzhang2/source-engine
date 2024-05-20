@@ -104,8 +104,8 @@ public:
 	virtual int ShouldTransmit( const CCheckTransmitInfo *pInfo );
 	virtual int UpdateTransmitState( void );
 	
-	void SetAsTemporary( void ) { AddSpawnFlags( SF_SPRITE_TEMPORARY ); }
-	bool IsTemporary( void ) { return ( HasSpawnFlags( SF_SPRITE_TEMPORARY ) ); }
+	void SetAsTemporary( void ) { GetEngineObject()->AddSpawnFlags( SF_SPRITE_TEMPORARY ); }
+	bool IsTemporary( void ) { return (GetEngineObject()->HasSpawnFlags( SF_SPRITE_TEMPORARY ) ); }
 	
 	int	ObjectCaps( void )
 	{ 

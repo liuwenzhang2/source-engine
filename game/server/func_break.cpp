@@ -259,7 +259,7 @@ void CBreakable::Spawn( void )
 
     Precache( );    
 
-	if ( !m_iHealth || FBitSet( m_spawnflags, SF_BREAK_TRIGGER_ONLY ) )
+	if ( !m_iHealth || GetEngineObject()->HasSpawnFlags(SF_BREAK_TRIGGER_ONLY) )
 	{
 		// This allows people to shoot at the glass (since it's penetrable)
 		if ( m_Material == matGlass )
@@ -286,7 +286,7 @@ void CBreakable::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );//set size and link into world.
 
 	SetTouch( &CBreakable::BreakTouch );
-	if ( FBitSet( m_spawnflags, SF_BREAK_TRIGGER_ONLY ) )		// Only break on trigger
+	if (GetEngineObject()->HasSpawnFlags(SF_BREAK_TRIGGER_ONLY) )		// Only break on trigger
 	{
 		SetTouch( NULL );
 	}
@@ -578,7 +578,7 @@ void CBreakable::BreakTouch( CBaseEntity *pOther )
 	}
 
 	// can I be broken when run into?
-	if ( HasSpawnFlags( SF_BREAK_TOUCH ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BREAK_TOUCH ) )
 	{
 		flDamage = pOther->GetSmoothedVelocity().Length() * 0.01;
 
@@ -597,7 +597,7 @@ void CBreakable::BreakTouch( CBaseEntity *pOther )
 	}
 
 	// can I be broken when stood upon?
-	if ( HasSpawnFlags( SF_BREAK_PRESSURE ) && pOther->GetEngineObject()->GetGroundEntity() && pOther->GetEngineObject()->GetGroundEntity()->GetOuter() == this)
+	if (GetEngineObject()->HasSpawnFlags( SF_BREAK_PRESSURE ) && pOther->GetEngineObject()->GetGroundEntity() && pOther->GetEngineObject()->GetGroundEntity()->GetOuter() == this)
 	{
 		// play creaking sound here.
 		DamageSound();
@@ -700,7 +700,7 @@ bool CBreakable::UpdateHealth( int iNewHealth, CBaseEntity *pActivator )
 		}
 		else
 		{
-			if ( FBitSet( m_spawnflags, SF_BREAK_TRIGGER_ONLY ) )
+			if (GetEngineObject()->HasSpawnFlags(SF_BREAK_TRIGGER_ONLY) )
 			{
 				m_takedamage = DAMAGE_NO;
 			}
@@ -784,7 +784,7 @@ void CBreakable::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	}
 
 	// If we're supposed to explode on collision, do so
-	if ( HasSpawnFlags( SF_BREAK_PHYSICS_BREAK_IMMEDIATELY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BREAK_PHYSICS_BREAK_IMMEDIATELY ) )
 	{
 		// We're toast
 		m_bTookPhysicsDamage = true;
@@ -798,7 +798,7 @@ void CBreakable::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		CTakeDamageInfo dmgInfo( pHitEntity, pHitEntity, damageForce, damagePos, (m_iHealth + 1), DMG_CRUSH );
 		PhysCallbackDamage( this, dmgInfo, *pEvent, index );
 	}
-	else if ( !HasSpawnFlags( SF_BREAK_DONT_TAKE_PHYSICS_DAMAGE ) )
+	else if ( !GetEngineObject()->HasSpawnFlags( SF_BREAK_DONT_TAKE_PHYSICS_DAMAGE ) )
 	{
 		int otherIndex = !index;
 		CBaseEntity *pOther = pEvent->pEntities[otherIndex];
@@ -1242,7 +1242,7 @@ LINK_ENTITY_TO_CLASS( func_pushable, CPushable );
 
 void CPushable::Spawn( void )
 {
-	if ( HasSpawnFlags( SF_PUSH_BREAKABLE ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PUSH_BREAKABLE ) )
 	{
 		BaseClass::Spawn();
 	}
@@ -1283,7 +1283,7 @@ bool CPushable::CreateVPhysics( void )
 void CPushable::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 #ifdef HL1_DLL
-	if( m_spawnflags & SF_PUSH_NO_USE )
+	if(GetEngineObject()->GetSpawnFlags() & SF_PUSH_NO_USE)
 		return;
 
 	// Allow pushables to be dragged by player
@@ -1303,7 +1303,7 @@ void CPushable::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE use
 
 int CPushable::OnTakeDamage( const CTakeDamageInfo &info )
 {
-	if ( m_spawnflags & SF_PUSH_BREAKABLE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_PUSH_BREAKABLE)
 		return BaseClass::OnTakeDamage( info );
 
 	return 1;

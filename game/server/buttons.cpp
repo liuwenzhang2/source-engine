@@ -303,7 +303,7 @@ int CBaseButton::OnTakeDamage( const CTakeDamageInfo &info )
 	m_OnDamaged.FireOutput(m_hActivator, this);
 
 	// dvsents2: remove obselete health keyvalue from func_button
-	if (!HasSpawnFlags(SF_BUTTON_DAMAGE_ACTIVATES) && (m_iHealth == 0))
+	if (!GetEngineObject()->HasSpawnFlags(SF_BUTTON_DAMAGE_ACTIVATES) && (m_iHealth == 0))
 	{
 		return(0);
 	}
@@ -374,7 +374,7 @@ void CBaseButton::Spawn( )
 
 	Precache();
 
-	if ( HasSpawnFlags( SF_BUTTON_SPARK_IF_OFF ) )// this button should spark in OFF state
+	if (GetEngineObject()->HasSpawnFlags( SF_BUTTON_SPARK_IF_OFF ) )// this button should spark in OFF state
 	{
 		SetThink ( &CBaseButton::ButtonSpark );
 		SetNextThink( gpGlobals->curtime + 0.5f );// no hurry, make sure everything else spawns
@@ -414,7 +414,7 @@ void CBaseButton::Spawn( )
 	m_vecPosition2	= m_vecPosition1 + (m_vecMoveDir * (DotProductAbs( m_vecMoveDir, vecButtonOBB ) - m_flLip));
 
 	// Is this a non-moving button?
-	if ( ((m_vecPosition2 - m_vecPosition1).Length() < 1) || HasSpawnFlags(SF_BUTTON_DONTMOVE) )
+	if ( ((m_vecPosition2 - m_vecPosition1).Length() < 1) || GetEngineObject()->HasSpawnFlags(SF_BUTTON_DONTMOVE) )
 	{
 		m_vecPosition2 = m_vecPosition1;
 	}
@@ -422,7 +422,7 @@ void CBaseButton::Spawn( )
 	m_fStayPushed = (m_flWait == -1 ? TRUE : FALSE);
 	m_fRotating = FALSE;
 
-	if (HasSpawnFlags(SF_BUTTON_LOCKED))
+	if (GetEngineObject()->HasSpawnFlags(SF_BUTTON_LOCKED))
 	{
 		m_bLocked = true;
 	}
@@ -430,7 +430,7 @@ void CBaseButton::Spawn( )
 	//
 	// If using activates the button, set its use function.
 	//
-	if (HasSpawnFlags(SF_BUTTON_USE_ACTIVATES))
+	if (GetEngineObject()->HasSpawnFlags(SF_BUTTON_USE_ACTIVATES))
 	{
 		SetUse(&CBaseButton::ButtonUse);
 	}
@@ -442,7 +442,7 @@ void CBaseButton::Spawn( )
 	//
 	// If touching activates the button, set its touch function.
 	//
-	if (HasSpawnFlags(SF_BUTTON_TOUCH_ACTIVATES))
+	if (GetEngineObject()->HasSpawnFlags(SF_BUTTON_TOUCH_ACTIVATES))
 	{
 		SetTouch( &CBaseButton::ButtonTouch );
 	}
@@ -535,7 +535,7 @@ void CBaseButton::ButtonUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 		// If it's a toggle button it can return now. Otherwise, it will either
 		// return on its own or will stay pressed indefinitely.
 		//
-		if ( HasSpawnFlags(SF_BUTTON_TOGGLE))
+		if (GetEngineObject()->HasSpawnFlags(SF_BUTTON_TOGGLE))
 		{
 			if ( m_sNoise != NULL_STRING )
 			{
@@ -574,12 +574,12 @@ CBaseButton::BUTTON_CODE CBaseButton::ButtonResponseToTouch( void )
 	// Ignore touches if button is moving, or pushed-in and waiting to auto-come-out.
 	if (m_toggle_state == TS_GOING_UP ||
 		m_toggle_state == TS_GOING_DOWN ||
-		(m_toggle_state == TS_AT_TOP && !m_fStayPushed && !HasSpawnFlags(SF_BUTTON_TOGGLE) ) )
+		(m_toggle_state == TS_AT_TOP && !m_fStayPushed && !GetEngineObject()->HasSpawnFlags(SF_BUTTON_TOGGLE) ) )
 		return BUTTON_NOTHING;
 
 	if (m_toggle_state == TS_AT_TOP)
 	{
-		if ( HasSpawnFlags(SF_BUTTON_TOGGLE) && !m_fStayPushed)
+		if (GetEngineObject()->HasSpawnFlags(SF_BUTTON_TOGGLE) && !m_fStayPushed)
 		{
 			return BUTTON_RETURN;
 		}
@@ -693,7 +693,7 @@ void CBaseButton::ButtonActivate( void )
 int	CBaseButton::ObjectCaps(void)
 {
 	return((BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) |
-			(HasSpawnFlags(SF_BUTTON_USE_ACTIVATES) ? (FCAP_IMPULSE_USE | FCAP_USE_IN_RADIUS) : 0));
+			(GetEngineObject()->HasSpawnFlags(SF_BUTTON_USE_ACTIVATES) ? (FCAP_IMPULSE_USE | FCAP_USE_IN_RADIUS) : 0));
 }
 
 
@@ -715,9 +715,9 @@ void CBaseButton::TriggerAndWait( void )
 	//
 	// Re-instate touches if the button is of the toggle variety.
 	//
-	if (m_fStayPushed || HasSpawnFlags(SF_BUTTON_TOGGLE ) )
+	if (m_fStayPushed || GetEngineObject()->HasSpawnFlags(SF_BUTTON_TOGGLE ) )
 	{
-		if (HasSpawnFlags(SF_BUTTON_TOUCH_ACTIVATES))
+		if (GetEngineObject()->HasSpawnFlags(SF_BUTTON_TOUCH_ACTIVATES))
 		{
 			SetTouch(&CBaseButton::ButtonTouch);
 		}
@@ -775,7 +775,7 @@ void CBaseButton::ButtonBackHome( void )
 	//
 	// Re-instate touch method, movement cycle is complete.
 	//
-	if (HasSpawnFlags(SF_BUTTON_TOUCH_ACTIVATES))
+	if (GetEngineObject()->HasSpawnFlags(SF_BUTTON_TOUCH_ACTIVATES))
 	{
 		SetTouch( &CBaseButton::ButtonTouch );
 	}
@@ -786,7 +786,7 @@ void CBaseButton::ButtonBackHome( void )
 	}
 
 	// reset think for a sparking button
-	if (HasSpawnFlags( SF_BUTTON_SPARK_IF_OFF ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BUTTON_SPARK_IF_OFF ) )
 	{
 		SetThink ( &CBaseButton::ButtonSpark );
 		SetNextThink( gpGlobals->curtime + 0.5f );// no hurry
@@ -857,7 +857,7 @@ void CRotButton::Spawn( void )
 	CBaseToggle::AxisDir();
 
 	// check for clockwise rotation
-	if ( HasSpawnFlags( SF_DOOR_ROTATE_BACKWARDS) )
+	if (GetEngineObject()->HasSpawnFlags( SF_DOOR_ROTATE_BACKWARDS) )
 	{
 		m_vecMoveAng = m_vecMoveAng * -1;
 	}
@@ -869,7 +869,7 @@ void CRotButton::Spawn( void )
 #else
 	SetSolid( SOLID_VPHYSICS );
 #endif
-	if ( HasSpawnFlags( SF_ROTBUTTON_NOTSOLID ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_ROTBUTTON_NOTSOLID ) )
 	{
 		GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 		AddSolidFlags( FSOLID_NOT_SOLID );
@@ -901,7 +901,7 @@ void CRotButton::Spawn( void )
 	//
 	// If touching activates the button, set its touch function.
 	//
-	if (!HasSpawnFlags(SF_BUTTON_TOUCH_ACTIVATES))
+	if (!GetEngineObject()->HasSpawnFlags(SF_BUTTON_TOUCH_ACTIVATES))
 	{
 		SetTouch ( NULL );
 	}
@@ -1020,12 +1020,12 @@ void CMomentaryRotButton::Spawn( void )
 		m_direction = 1;
 	}
 
-	if (HasSpawnFlags(SF_BUTTON_LOCKED))
+	if (GetEngineObject()->HasSpawnFlags(SF_BUTTON_LOCKED))
 	{
 		m_bLocked = true;
 	}
 
-	if ( HasSpawnFlags( SF_BUTTON_USE_ACTIVATES ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BUTTON_USE_ACTIVATES ) )
 	{
 		if ( m_sounds )
 		{
@@ -1046,7 +1046,7 @@ void CMomentaryRotButton::Spawn( void )
 #else
 	SetSolid( SOLID_VPHYSICS );
 #endif
-	if (HasSpawnFlags(SF_ROTBUTTON_NOTSOLID))
+	if (GetEngineObject()->HasSpawnFlags(SF_ROTBUTTON_NOTSOLID))
 	{
 		GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 		AddSolidFlags( FSOLID_NOT_SOLID );
@@ -1069,7 +1069,7 @@ void CMomentaryRotButton::Spawn( void )
 int	CMomentaryRotButton::ObjectCaps( void ) 
 { 
 	int flags = BaseClass::ObjectCaps();
-	if (!HasSpawnFlags(SF_BUTTON_USE_ACTIVATES))
+	if (!GetEngineObject()->HasSpawnFlags(SF_BUTTON_USE_ACTIVATES))
 	{
 		return flags;
 	}
@@ -1123,7 +1123,7 @@ float CMomentaryRotButton::GetPos( const QAngle &vecAngles )
 		flScale = -1;
 	}
 
-	float flPos = flScale * CBaseToggle::AxisDelta( m_spawnflags, vecAngles, m_start ) / m_flMoveDistance;
+	float flPos = flScale * CBaseToggle::AxisDelta(GetEngineObject()->GetSpawnFlags(), vecAngles, m_start) / m_flMoveDistance;
 	return( clamp( flPos, 0.f, 1.f ));
 }
 
@@ -1167,7 +1167,7 @@ void CMomentaryRotButton::InputSetPosition( inputdata_t &inputdata )
 	// are told to change position in very small increments.
 	//
 	QAngle vecNewAngles = m_start + m_vecMoveAng * ( m_IdealYaw * m_flMoveDistance );
-	float flAngleDelta = fabs( AxisDelta( m_spawnflags, vecNewAngles, GetEngineObject()->GetLocalAngles() ));
+	float flAngleDelta = fabs( AxisDelta(GetEngineObject()->GetSpawnFlags(), vecNewAngles, GetEngineObject()->GetLocalAngles()));
 	float dt = flAngleDelta / m_flSpeed;
 	if ( dt < TICK_INTERVAL )
 	{
@@ -1286,7 +1286,7 @@ void CMomentaryRotButton::SetPositionMoveDone(void)
 
 	// TODO: change this to use a Think function like ReturnThink.
 	QAngle vecNewAngles = m_start + m_vecMoveAng * ( m_IdealYaw * m_flMoveDistance );
-	float flAngleDelta = fabs( AxisDelta( m_spawnflags, vecNewAngles, GetEngineObject()->GetLocalAngles() ));
+	float flAngleDelta = fabs( AxisDelta(GetEngineObject()->GetSpawnFlags(), vecNewAngles, GetEngineObject()->GetLocalAngles()));
 	float dt = flAngleDelta / m_flSpeed;
 	if ( dt < TICK_INTERVAL )
 	{
@@ -1314,7 +1314,7 @@ void CMomentaryRotButton::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 
 	if (m_bLocked)
 	{
-		if ( OnUseLocked( pActivator ) && HasSpawnFlags( SF_BUTTON_JIGGLE_ON_USE_LOCKED ) )
+		if ( OnUseLocked( pActivator ) && GetEngineObject()->HasSpawnFlags( SF_BUTTON_JIGGLE_ON_USE_LOCKED ) )
 		{
 			// Jiggle two degrees.
 			float flDist = 2.0 / m_flMoveDistance;
@@ -1455,7 +1455,7 @@ void CMomentaryRotButton::UseMoveDone( void )
 
 	m_lastUsed = 0;
 
-	if ( !HasSpawnFlags( SF_BUTTON_TOGGLE ) && m_returnSpeed > 0 )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_BUTTON_TOGGLE ) && m_returnSpeed > 0 )
 	{
 		SetMoveDone( &CMomentaryRotButton::ReturnMoveDone );
 		m_direction = -1;

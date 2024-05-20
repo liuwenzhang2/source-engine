@@ -251,7 +251,7 @@ public:
 inline int CBeam::ObjectCaps( void )
 { 
 	int flags = 0;
-	if ( HasSpawnFlags( SF_BEAM_TEMPORARY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BEAM_TEMPORARY ) )
 		flags = FCAP_DONT_SAVE;
 	return (BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | flags; 
 }

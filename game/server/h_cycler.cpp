@@ -81,7 +81,7 @@ void CCycler::Spawn( )
 	InitBoneControllers();
 	
 	SetSolid( SOLID_BBOX );
-	if ( m_spawnflags & FCYCLER_NOTSOLID )
+	if (GetEngineObject()->GetSpawnFlags() & FCYCLER_NOTSOLID)
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}

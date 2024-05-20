@@ -633,7 +633,7 @@ bool CHL2MPRules::CanHavePlayerItem( CBasePlayer *pPlayer, CBaseCombatWeapon *pI
 int CHL2MPRules::WeaponShouldRespawn( CBaseCombatWeapon *pWeapon )
 {
 #ifndef CLIENT_DLL
-	if ( pWeapon->HasSpawnFlags( SF_NORESPAWN ) )
+	if ( pWeapon->GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) )
 	{
 		return GR_WEAPON_RESPAWN_NO;
 	}

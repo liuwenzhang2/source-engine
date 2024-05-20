@@ -256,7 +256,7 @@ void CBaseHeadcrab::Spawn( void )
 	m_nGibCount			= HEADCRAB_ALL_GIB_COUNT;
 
 	// Are we starting hidden?
-	if ( m_spawnflags & SF_HEADCRAB_START_HIDDEN )
+	if (GetEngineObject()->GetSpawnFlags() & SF_HEADCRAB_START_HIDDEN)
 	{
 		m_bHidden = true;
 		AddSolidFlags( FSOLID_NOT_SOLID );
@@ -292,7 +292,7 @@ void CBaseHeadcrab::HeadcrabInit()
 		SetSchedule( SCHED_HEADCRAB_BURROW_WAIT );
 	}
 
-	if ( GetSpawnFlags() & SF_HEADCRAB_START_HANGING )
+	if (GetEngineObject()->GetSpawnFlags() & SF_HEADCRAB_START_HANGING )
 	{
 		SetSchedule( SCHED_HEADCRAB_CEILING_WAIT );
 		m_flIlluminatedTime = -1;
@@ -717,7 +717,7 @@ void CBaseHeadcrab::SetBurrowed( bool bBurrowed )
 	{
 		AddEffects( EF_NODRAW );
 		AddFlag( FL_NOTARGET );
-		m_spawnflags |= SF_NPC_GAG;
+		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 		AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage = DAMAGE_NO;
 		m_flFieldOfView = HEADCRAB_BURROWED_FOV;
@@ -729,7 +729,7 @@ void CBaseHeadcrab::SetBurrowed( bool bBurrowed )
 	{
 		RemoveEffects( EF_NODRAW );
 		RemoveFlag( FL_NOTARGET );
-		m_spawnflags &= ~SF_NPC_GAG;
+		GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 		RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage = DAMAGE_YES;
 		m_flFieldOfView	= HEADCRAB_UNBURROWED_FOV;
@@ -824,7 +824,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 			// See if we can pop up
 			if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 			{
-				m_spawnflags &= ~SF_NPC_GAG;
+				GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 				RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 				TaskComplete();
@@ -1404,7 +1404,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 			m_bHangingFromCeiling = true;
 
 			//Don't need this anymore
-			RemoveSpawnFlags( SF_HEADCRAB_START_HANGING );
+			GetEngineObject()->RemoveSpawnFlags( SF_HEADCRAB_START_HANGING );
 
 			GetEngineObject()->SetAbsOrigin( tr.endpos );
 
@@ -1542,7 +1542,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 		{
 			if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 			{
-				m_spawnflags &= ~SF_NPC_GAG;
+				GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 				RemoveSolidFlags( FSOLID_NOT_SOLID );
 				TaskComplete();
 			}
@@ -1887,7 +1887,7 @@ int CBaseHeadcrab::SelectSchedule( void )
 	}
 
 	// If we're hidden or waiting until seen, don't do much at all
-	if ( m_bHidden || HasSpawnFlags(SF_NPC_WAIT_TILL_SEEN) )
+	if ( m_bHidden || GetEngineObject()->HasSpawnFlags(SF_NPC_WAIT_TILL_SEEN) )
 	{
 		if( HasCondition( COND_HEADCRAB_UNHIDE ) )
 		{
@@ -1898,7 +1898,7 @@ int CBaseHeadcrab::SelectSchedule( void )
 		return m_bBurrowed ? ( int )SCHED_HEADCRAB_BURROW_WAIT : ( int )SCHED_IDLE_STAND;
 	}
 
-	if ( GetSpawnFlags() & SF_HEADCRAB_START_HANGING && IsHangingFromCeiling() == false )
+	if (GetEngineObject()->GetSpawnFlags() & SF_HEADCRAB_START_HANGING && IsHangingFromCeiling() == false )
 	{
 		return SCHED_HEADCRAB_CEILING_WAIT;
 	}
@@ -2301,7 +2301,7 @@ bool CBaseHeadcrab::FindBurrow( const Vector &origin, float distance, bool exclu
 void CBaseHeadcrab::Burrow( void )
 {
 	// Stop us from taking damage and being solid
-	m_spawnflags |= SF_NPC_GAG;
+	GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 }
 
 
@@ -2311,7 +2311,7 @@ void CBaseHeadcrab::Burrow( void )
 void CBaseHeadcrab::Unburrow( void )
 {
 	// Become solid again and visible
-	m_spawnflags &= ~SF_NPC_GAG;
+	GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 	RemoveSolidFlags( FSOLID_NOT_SOLID );
 	m_takedamage = DAMAGE_YES;
 
@@ -2816,7 +2816,7 @@ void CFastHeadcrab::PrescheduleThink( void )
 //-----------------------------------------------------------------------------
 int	CFastHeadcrab::SelectSchedule( void )
 {
-	if ( HasSpawnFlags(SF_NPC_WAIT_TILL_SEEN) )
+	if (GetEngineObject()->HasSpawnFlags(SF_NPC_WAIT_TILL_SEEN) )
 	{
 		return SCHED_IDLE_STAND;
 	}
@@ -3375,7 +3375,7 @@ int CBlackHeadcrab::SelectSchedule( void )
 	// don't override inherited behavior when hanging from ceiling
 	if ( !IsHangingFromCeiling() )
 	{
-		if ( HasSpawnFlags(SF_NPC_WAIT_TILL_SEEN) )
+		if (GetEngineObject()->HasSpawnFlags(SF_NPC_WAIT_TILL_SEEN) )
 		{
 			return SCHED_IDLE_STAND;
 		}
@@ -3456,7 +3456,7 @@ void CBlackHeadcrab::TouchDamage( CBaseEntity *pOther )
 void CBlackHeadcrab::Eject( const QAngle &vecAngles, float flVelocityScale, CBaseEntity *pEnemy )
 {
 	GetEngineObject()->SetGroundEntity( NULL );
-	m_spawnflags |= SF_NPC_FALL_TO_GROUND;
+	GetEngineObject()->AddSpawnFlags(SF_NPC_FALL_TO_GROUND);
 
 	SetIdealState( NPC_STATE_ALERT );
 

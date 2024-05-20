@@ -120,7 +120,7 @@ void CNPC_Breen::Precache()
 
 bool CNPC_Breen::UseSemaphore( void )	
 { 
-	if ( HasSpawnFlags( SF_BREEN_BACKGROUND_TALK ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BREEN_BACKGROUND_TALK ) )
 		return false;
 
 	return BaseClass::UseSemaphore();

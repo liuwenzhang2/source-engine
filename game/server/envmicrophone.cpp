@@ -87,7 +87,7 @@ void CEnvMicrophone::Spawn(void)
 
 	for (int i = 0; i < sizeof(nFlags) / sizeof(nFlags[0]); i++)
 	{
-		if (m_spawnflags & nFlags[i][0])
+		if (GetEngineObject()->GetSpawnFlags() & nFlags[i][0])
 		{
 			m_nSoundMask |= nFlags[i][1];
 		}
@@ -296,7 +296,7 @@ bool CEnvMicrophone::CanHearSound( int entindex, soundlevel_t soundlevel, float 
 		return false;
 	}
 
-	if ( ( m_spawnflags & SF_MICROPHONE_IGNORE_NONATTENUATED ) && soundlevel == SNDLVL_NONE )
+	if ( (GetEngineObject()->GetSpawnFlags() & SF_MICROPHONE_IGNORE_NONATTENUATED) && soundlevel == SNDLVL_NONE)
 	{
 		return false;
 	}
@@ -504,7 +504,7 @@ MicrophoneResult_t CEnvMicrophone::SoundPlayed( int entindex, const char *soundn
 	}
 
 	// Do we want to allow the original sound to play?
-	if ( m_spawnflags & SF_MICROPHONE_SWALLOW_ROUTED_SOUNDS )
+	if (GetEngineObject()->GetSpawnFlags() & SF_MICROPHONE_SWALLOW_ROUTED_SOUNDS)
 	{
 		return MicrophoneResult_Swallow;
 	}

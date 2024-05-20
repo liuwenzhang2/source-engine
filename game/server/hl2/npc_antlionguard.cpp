@@ -672,7 +672,7 @@ void CNPC_AntlionGuard::Precache( void )
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Shove" );
 	g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.HitHard" );
 
-	if ( HasSpawnFlags(SF_ANTLIONGUARD_INSIDE_FOOTSTEPS) )
+	if (GetEngineObject()->HasSpawnFlags(SF_ANTLIONGUARD_INSIDE_FOOTSTEPS) )
 	{
 		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Inside.StepLight" );
 		g_pSoundEmitterSystem->PrecacheScriptSound( "NPC_AntlionGuard.Inside.StepHeavy" );
@@ -836,7 +836,7 @@ void CNPC_AntlionGuard::Spawn( void )
 		AddEffects( EF_NODRAW );
 		AddFlag( FL_NOTARGET );
 
-		m_spawnflags |= SF_NPC_GAG;
+		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 		
 		AddSolidFlags( FSOLID_NOT_SOLID );
 		
@@ -1934,7 +1934,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLIONGUARD_FOOTSTEP_LIGHT )
 	{
-		if ( HasSpawnFlags(SF_ANTLIONGUARD_INSIDE_FOOTSTEPS) )
+		if (GetEngineObject()->HasSpawnFlags(SF_ANTLIONGUARD_INSIDE_FOOTSTEPS) )
 		{
 #if HL2_EPISODIC
 			Footstep( false );
@@ -1973,7 +1973,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLIONGUARD_FOOTSTEP_HEAVY )
 	{
-		if ( HasSpawnFlags(SF_ANTLIONGUARD_INSIDE_FOOTSTEPS) )
+		if (GetEngineObject()->HasSpawnFlags(SF_ANTLIONGUARD_INSIDE_FOOTSTEPS) )
 		{
 #if HL2_EPISODIC
 			Footstep( true );
@@ -3395,8 +3395,8 @@ void CNPC_AntlionGuard::SummonAntlions( void )
 		VectorAngles( vecFacing, vecAngles );
 		pAntlion->GetEngineObject()->SetAbsAngles( vecAngles );
 
-		pAntlion->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
-		pAntlion->AddSpawnFlags( SF_NPC_FADE_CORPSE );
+		pAntlion->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
+		pAntlion->GetEngineObject()->AddSpawnFlags( SF_NPC_FADE_CORPSE );
 
 		// Make the antlion fire my input when he dies
 		pAntlion->KeyValue( "OnDeath", UTIL_VarArgs("%s,SummonedAntlionDied,,0,-1", STRING(GetEntityName())) );
@@ -3875,7 +3875,7 @@ void CNPC_AntlionGuard::InputUnburrow( inputdata_t &inputdata )
 	if ( m_bIsBurrowed == false )
 		return;
 
-	m_spawnflags &= ~SF_NPC_GAG;
+	GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 	
 	RemoveSolidFlags( FSOLID_NOT_SOLID );
 	AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -4561,7 +4561,7 @@ bool CNPC_AntlionGuard::BecomeRagdollOnClient( const Vector &force )
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Become server-side ragdoll if we're flagged to do it
-	if ( m_spawnflags & SF_ANTLIONGUARD_SERVERSIDE_RAGDOLL )
+	if (GetEngineObject()->GetSpawnFlags() & SF_ANTLIONGUARD_SERVERSIDE_RAGDOLL)
 	{
 		CTakeDamageInfo	info;
 

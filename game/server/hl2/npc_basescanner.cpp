@@ -764,7 +764,7 @@ void CNPC_BaseScanner::AttackDivebombCollide(float flInterval)
 		}
 		else
 		{
-			if (!(m_spawnflags	& SF_NPC_GAG))
+			if (!(GetEngineObject()->GetSpawnFlags() & SF_NPC_GAG))
 			{
 				// <<TEMP>> need better sound here...
 				ScannerEmitSound( "Shoot" );
@@ -1624,7 +1624,7 @@ void CNPC_BaseScanner::DeathSound( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 bool CNPC_BaseScanner::ShouldPlayIdleSound( void )
 {
-	if ( HasSpawnFlags( SF_NPC_GAG ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPC_GAG ) )
 		return false;
 
 	if ( random->RandomInt( 0, 25 ) != 0 )

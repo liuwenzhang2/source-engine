@@ -544,10 +544,10 @@ void CBreakableProp::HandleFirstCollisionInteractions( int index, gamevcollision
 
 void CBreakableProp::CheckRemoveRagdolls()
 {
-	if ( HasSpawnFlags( SF_PHYSPROP_HAS_ATTACHED_RAGDOLLS ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_HAS_ATTACHED_RAGDOLLS ) )
 	{
 		DetachAttachedRagdollsForEntity( this );
-		RemoveSpawnFlags( SF_PHYSPROP_HAS_ATTACHED_RAGDOLLS );
+		GetEngineObject()->RemoveSpawnFlags( SF_PHYSPROP_HAS_ATTACHED_RAGDOLLS );
 	}
 }
 //-----------------------------------------------------------------------------
@@ -633,7 +633,7 @@ void CPhysicsProp::HandleAnyCollisionInteractions( int index, gamevcollisioneven
 				Vector vecVelocity = pEvent->preVelocity[index] * pObj->GetMass();
 				PhysCallbackImpulse( pObj, vecVelocity, vec3_origin );
 				UTIL_Remove( pNPC );
-				AddSpawnFlags( SF_PHYSPROP_HAS_ATTACHED_RAGDOLLS );
+				GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_HAS_ATTACHED_RAGDOLLS );
 			}
 		}
 	}
@@ -658,7 +658,7 @@ void CBreakableProp::StickAtPosition( const Vector &stickPosition, const Vector 
 	SetEnableMotionPosition( savePosition, saveAngles );  // this uses hierarchy, so it must be set after teleport
 
 	VPhysicsGetObject()->EnableMotion( false );
-	AddSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON );
+	GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON );
 	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 }
 
@@ -980,7 +980,7 @@ void CBreakableProp::InputDisablePhyscannonPickup( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CBreakableProp::BreakablePropTouch( CBaseEntity *pOther )
 {
-	if ( HasSpawnFlags( SF_PHYSPROP_TOUCH ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_TOUCH ) )
 	{
 		// can be broken when run into 
 		float flDamage = pOther->GetSmoothedVelocity().Length() * 0.01;
@@ -998,7 +998,7 @@ void CBreakableProp::BreakablePropTouch( CBaseEntity *pOther )
 		}
 	}
 
-	if ( HasSpawnFlags( SF_PHYSPROP_PRESSURE ) && pOther->GetEngineObject()->GetGroundEntity() == this->GetEngineObject() )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_PRESSURE ) && pOther->GetEngineObject()->GetGroundEntity() == this->GetEngineObject() )
 	{
 		// can be broken when stood upon
 		// play creaking sound here.
@@ -1953,9 +1953,9 @@ void CDynamicProp::Spawn( )
 		CalculateBlockLOS();
 	}
 
-	m_bUseHitboxesForRenderBox = HasSpawnFlags( SF_DYNAMICPROP_USEHITBOX_FOR_RENDERBOX );
+	m_bUseHitboxesForRenderBox = GetEngineObject()->HasSpawnFlags( SF_DYNAMICPROP_USEHITBOX_FOR_RENDERBOX );
 
-	if ( HasSpawnFlags( SF_DYNAMICPROP_DISABLE_COLLISION ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_DYNAMICPROP_DISABLE_COLLISION ) )
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}
@@ -2016,7 +2016,7 @@ bool CDynamicProp::OverridePropdata( void )
 //------------------------------------------------------------------------------
 bool CDynamicProp::CreateVPhysics( void )
 {
-	if ( GetSolid() == SOLID_NONE || ((GetSolidFlags() & FSOLID_NOT_SOLID) && HasSpawnFlags(SF_DYNAMICPROP_NO_VPHYSICS)))
+	if ( GetSolid() == SOLID_NONE || ((GetSolidFlags() & FSOLID_NOT_SOLID) && GetEngineObject()->HasSpawnFlags(SF_DYNAMICPROP_NO_VPHYSICS)))
 		return true;
 
 	if ( !m_bDisableBoneFollowers )
@@ -2492,17 +2492,23 @@ bool PropIsGib( CBaseEntity *pEntity )
 	return false;
 }
 
-CPhysicsProp::~CPhysicsProp()
+void CPhysicsProp::UpdateOnRemove(void) 
 {
-	if (HasSpawnFlags(SF_PHYSPROP_IS_GIB))
+	BaseClass::UpdateOnRemove();
+	if (GetEngineObject()->HasSpawnFlags(SF_PHYSPROP_IS_GIB))
 	{
 		g_ActiveGibCount--;
 	}
 }
 
+CPhysicsProp::~CPhysicsProp()
+{
+
+}
+
 bool CPhysicsProp::IsGib()
 {
-	return (m_spawnflags & SF_PHYSPROP_IS_GIB) ? true : false;
+	return (GetEngineObject()->GetSpawnFlags() & SF_PHYSPROP_IS_GIB) ? true : false;
 }
 
 //-----------------------------------------------------------------------------
@@ -2510,7 +2516,7 @@ bool CPhysicsProp::IsGib()
 //-----------------------------------------------------------------------------
 void CPhysicsProp::Spawn( )
 {
-	if (HasSpawnFlags(SF_PHYSPROP_IS_GIB))
+	if (GetEngineObject()->HasSpawnFlags(SF_PHYSPROP_IS_GIB))
 	{
 		g_ActiveGibCount++;
 	}
@@ -2531,12 +2537,12 @@ void CPhysicsProp::Spawn( )
 		SetClassname( "prop_physics" );
 	}
 
-	if ( HasSpawnFlags( SF_PHYSPROP_DEBRIS ) || HasInteraction( PROPINTER_PHYSGUN_CREATE_FLARE ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_DEBRIS ) || HasInteraction( PROPINTER_PHYSGUN_CREATE_FLARE ) )
 	{
-		SetCollisionGroup( HasSpawnFlags( SF_PHYSPROP_FORCE_TOUCH_TRIGGERS ) ? COLLISION_GROUP_DEBRIS_TRIGGER : COLLISION_GROUP_DEBRIS );
+		SetCollisionGroup(GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_FORCE_TOUCH_TRIGGERS ) ? COLLISION_GROUP_DEBRIS_TRIGGER : COLLISION_GROUP_DEBRIS );
 	}
 
-	if ( HasSpawnFlags( SF_PHYSPROP_NO_ROTORWASH_PUSH ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_NO_ROTORWASH_PUSH ) )
 	{
 		GetEngineObject()->AddEFlags( EFL_NO_ROTORWASH_PUSH );
 	}
@@ -2581,7 +2587,7 @@ void CPhysicsProp::Precache( void )
 bool CPhysicsProp::CreateVPhysics()
 {
 	// Create the object in the physics system
-	bool asleep = HasSpawnFlags( SF_PHYSPROP_START_ASLEEP ) ? true : false;
+	bool asleep = GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_START_ASLEEP ) ? true : false;
 
 	solid_t tmpSolid;
 	PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() );
@@ -2599,7 +2605,7 @@ bool CPhysicsProp::CreateVPhysics()
 	}
 
 	PhysGetMassCenterOverride( this, modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() ), tmpSolid );
-	if ( HasSpawnFlags(SF_PHYSPROP_NO_COLLISIONS) )
+	if (GetEngineObject()->HasSpawnFlags(SF_PHYSPROP_NO_COLLISIONS) )
 	{
 		tmpSolid.params.enableCollisions = false;
 	}
@@ -2619,7 +2625,7 @@ bool CPhysicsProp::CreateVPhysics()
 		{
 			PhysSetGameFlags( pPhysicsObject, FVPHYSICS_DMG_SLICE );
 		}
-		if ( HasSpawnFlags( SF_PHYSPROP_MOTIONDISABLED ) || m_damageToEnableMotion > 0 || m_flForceToEnableMotion > 0 )
+		if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_MOTIONDISABLED ) || m_damageToEnableMotion > 0 || m_flForceToEnableMotion > 0 )
 		{
 			pPhysicsObject->EnableMotion( false );
 		}
@@ -2647,7 +2653,7 @@ bool CPhysicsProp::CreateVPhysics()
 		PhysSetGameFlags( pPhysicsObject, FVPHYSICS_NO_IMPACT_DMG );
 	}
 
-	if ( HasSpawnFlags(SF_PHYSPROP_PREVENT_PICKUP) )
+	if (GetEngineObject()->HasSpawnFlags(SF_PHYSPROP_PREVENT_PICKUP) )
 	{
 		PhysSetGameFlags(pPhysicsObject, FVPHYSICS_NO_PLAYER_PICKUP);
 	}
@@ -2661,13 +2667,13 @@ bool CPhysicsProp::CreateVPhysics()
 //-----------------------------------------------------------------------------
 bool CPhysicsProp::CanBePickedUpByPhyscannon( void )
 {
-	if ( HasSpawnFlags( SF_PHYSPROP_PREVENT_PICKUP ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_PREVENT_PICKUP ) )
 		return false;
 
 	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
 	if ( pPhysicsObject && pPhysicsObject->IsMoveable() == false )
 	{
-		if ( HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON ) == false )
+		if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON ) == false )
 			return false;
 	}
 
@@ -2768,7 +2774,7 @@ void CPhysicsProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
 	if ( pPhysicsObject && !pPhysicsObject->IsMoveable() )
 	{
-		if ( !HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON ) )
+		if ( !GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON ) )
 			return;
 
 		EnableMotion();
@@ -2899,7 +2905,7 @@ int CPhysicsProp::ObjectCaps()
 { 
 	int caps = BaseClass::ObjectCaps() | FCAP_WCEDIT_POSITION;
 
-	if ( HasSpawnFlags( SF_PHYSPROP_ENABLE_PICKUP_OUTPUT ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_ENABLE_PICKUP_OUTPUT ) )
 	{
 		caps |= FCAP_IMPULSE_USE;
 	}
@@ -2913,7 +2919,7 @@ int CPhysicsProp::ObjectCaps()
 		}
 	}
 
-	if( HasSpawnFlags( SF_PHYSPROP_RADIUS_PICKUP ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_RADIUS_PICKUP ) )
 	{
 		caps |= FCAP_USE_IN_RADIUS;
 	}
@@ -2933,7 +2939,7 @@ void CPhysicsProp::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 	if ( pPlayer )
 	{
-		if ( HasSpawnFlags( SF_PHYSPROP_ENABLE_PICKUP_OUTPUT ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_ENABLE_PICKUP_OUTPUT ) )
 		{
 			m_OnPlayerUse.FireOutput( this, this );
 		}
@@ -2951,12 +2957,12 @@ void CPhysicsProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	BaseClass::VPhysicsUpdate( pPhysics );
 	m_bAwake = !pPhysics->IsAsleep();
 	NetworkStateChanged();
-	if ( HasSpawnFlags( SF_PHYSPROP_START_ASLEEP ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_START_ASLEEP ) )
 	{
 		if ( m_bAwake )
 		{
 			m_OnAwakened.FireOutput(this, this);
-			RemoveSpawnFlags( SF_PHYSPROP_START_ASLEEP );
+			GetEngineObject()->RemoveSpawnFlags( SF_PHYSPROP_START_ASLEEP );
 		}
 	}
 
@@ -3036,7 +3042,7 @@ void CPhysicsProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		CBaseEntity *pOther = static_cast<CBaseEntity *>(pPhysObj->GetGameData());
 
 		// Don't allow the player to bump an object active if we've requested not to
-		if ( ( pOther && pOther->IsPlayer() && HasSpawnFlags( SF_PHYSPROP_PREVENT_PLAYER_TOUCH_ENABLE ) ) == false )
+		if ( ( pOther && pOther->IsPlayer() && GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_PREVENT_PLAYER_TOUCH_ENABLE ) ) == false )
 		{
 			// Large enough to enable motion?
 			float flForce = pEvent->collisionSpeed * pPhysObj->GetMass();
@@ -3060,7 +3066,7 @@ void CPhysicsProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		HandleAnyCollisionInteractions( index, pEvent );
 	}
 
-	if ( !HasSpawnFlags( SF_PHYSPROP_DONT_TAKE_PHYSICS_DAMAGE ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_DONT_TAKE_PHYSICS_DAMAGE ) )
 	{
 		int damageType = 0;
 
@@ -3283,10 +3289,10 @@ static CBreakableProp *BreakModelCreate_Prop( CBaseEntity *pOwner, breakmodel_t 
 		// UNDONE: Allow .qc to override spawnflags for child pieces
 		if ( pOwner )
 		{
-			pEntity->AddSpawnFlags( pOwner->GetSpawnFlags() );
+			pEntity->GetEngineObject()->AddSpawnFlags( pOwner->GetEngineObject()->GetSpawnFlags() );
 
 			// We never want to be motion disabled
-			pEntity->RemoveSpawnFlags( SF_PHYSPROP_MOTIONDISABLED );
+			pEntity->GetEngineObject()->RemoveSpawnFlags( SF_PHYSPROP_MOTIONDISABLED );
 		}
 		pEntity->m_impactEnergyScale = params.impactEnergyScale;	// assume the same material
 		// Inherit the base object's damage modifiers
@@ -3311,7 +3317,7 @@ static CBreakableProp *BreakModelCreate_Prop( CBaseEntity *pOwner, breakmodel_t 
 
 		if ( pModel->fadeTime != 0 )
 		{
-			pEntity->AddSpawnFlags( SF_PHYSPROP_IS_GIB );
+			pEntity->GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_IS_GIB );
 		}
 		pEntity->Spawn();
 
@@ -3631,7 +3637,7 @@ void CBasePropDoor::Spawn()
 
 	DoorTeleportToSpawnPosition();
 
-	if (HasSpawnFlags(SF_DOOR_LOCKED))
+	if (GetEngineObject()->HasSpawnFlags(SF_DOOR_LOCKED))
 	{
 		m_bLocked = true;
 	}
@@ -3650,7 +3656,7 @@ void CBasePropDoor::Spawn()
 	AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 
 	SetBodygroup( DOOR_HARDWARE_GROUP, m_nHardwareType );
-	if ((m_nHardwareType == 0) && (!HasSpawnFlags(SF_DOOR_LOCKED)))
+	if ((m_nHardwareType == 0) && (!GetEngineObject()->HasSpawnFlags(SF_DOOR_LOCKED)))
 	{
 		// Doors with no hardware must always be locked.
 		DevWarning(1, "Unlocked prop_door '%s' at (%.0f %.0f %.0f) has no hardware. All openable doors must have hardware!\n", GetDebugName(), GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z);
@@ -3673,7 +3679,7 @@ void CBasePropDoor::Spawn()
 //-----------------------------------------------------------------------------
 int	CBasePropDoor::ObjectCaps()
 {
-	return BaseClass::ObjectCaps() | ( HasSpawnFlags( SF_DOOR_IGNORE_USE ) ? 0 : (FCAP_IMPULSE_USE|FCAP_USE_IN_RADIUS) );
+	return BaseClass::ObjectCaps() | (GetEngineObject()->HasSpawnFlags( SF_DOOR_IGNORE_USE ) ? 0 : (FCAP_IMPULSE_USE|FCAP_USE_IN_RADIUS) );
 };
 
 
@@ -3937,7 +3943,7 @@ void CBasePropDoor::OnUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		return;
 	}
 
-	if (IsDoorClosed() || (IsDoorOpen() && HasSpawnFlags(SF_DOOR_USE_CLOSES)))
+	if (IsDoorClosed() || (IsDoorOpen() && GetEngineObject()->HasSpawnFlags(SF_DOOR_USE_CLOSES)))
 	{
 		// Ready to be opened or closed.
 		if (m_bLocked)
@@ -3961,7 +3967,7 @@ void CBasePropDoor::OnUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 			}
 		}
 	}
-	else if ( IsDoorOpening() && HasSpawnFlags(SF_DOOR_USE_CLOSES) )
+	else if ( IsDoorOpening() && GetEngineObject()->HasSpawnFlags(SF_DOOR_USE_CLOSES) )
 	{
 		// We've been used while opening, close.
 		m_hActivator = pActivator;
@@ -4124,7 +4130,7 @@ void CBasePropDoor::DoorOpen(CBaseEntity *pOpenAwayFrom)
 
 	// Emit door moving and stop sounds on CHAN_STATIC so that the multicast doesn't
 	// filter them out and leave a client stuck with looping door sounds!
-	if (!HasSpawnFlags(SF_DOOR_SILENT))
+	if (!GetEngineObject()->HasSpawnFlags(SF_DOOR_SILENT))
 	{
 		const char* soundname = STRING(m_SoundMoving);
 		CPASAttenuationFilter filter(this, soundname);
@@ -4136,7 +4142,7 @@ void CBasePropDoor::DoorOpen(CBaseEntity *pOpenAwayFrom)
 		params.m_bWarnOnDirectWaveReference = true;
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-		if ( m_hActivator && m_hActivator->IsPlayer() && !HasSpawnFlags( SF_DOOR_SILENT_TO_NPCS ) )
+		if ( m_hActivator && m_hActivator->IsPlayer() && !GetEngineObject()->HasSpawnFlags( SF_DOOR_SILENT_TO_NPCS ) )
 		{
 			CSoundEnt::InsertSound( SOUND_PLAYER, GetEngineObject()->GetAbsOrigin(), 512, 0.5, this );//<<TODO>>//magic number
 		}
@@ -4181,7 +4187,7 @@ void CBasePropDoor::DoorOpenMoveDone(void)
 {
 	SetDoorBlocker( NULL );
 
-	if (!HasSpawnFlags(SF_DOOR_SILENT))
+	if (!GetEngineObject()->HasSpawnFlags(SF_DOOR_SILENT))
 	{
 		const char* soundname = STRING(m_SoundOpen);
 		CPASAttenuationFilter filter(this, soundname);
@@ -4262,7 +4268,7 @@ void CBasePropDoor::DoorClose(void)
 	if ( IsDoorClosed() || IsDoorClosing() )
 		return;
 
-	if (!HasSpawnFlags(SF_DOOR_SILENT))
+	if (!GetEngineObject()->HasSpawnFlags(SF_DOOR_SILENT))
 	{
 		const char* soundname = STRING(m_SoundMoving);
 		CPASAttenuationFilter filter(this, soundname);
@@ -4318,7 +4324,7 @@ void CBasePropDoor::DoorCloseMoveDone(void)
 {
 	SetDoorBlocker( NULL );
 
-	if (!HasSpawnFlags(SF_DOOR_SILENT))
+	if (!GetEngineObject()->HasSpawnFlags(SF_DOOR_SILENT))
 	{
 		g_pSoundEmitterSystem->StopSound(this, STRING( m_SoundMoving ) );
 		const char* soundname = STRING(m_SoundClose);
@@ -4404,7 +4410,7 @@ void CBasePropDoor::OnStartBlocked( CBaseEntity *pOther )
 
 	SetDoorBlocker( pOther );
 
-	if (!HasSpawnFlags(SF_DOOR_SILENT))
+	if (!GetEngineObject()->HasSpawnFlags(SF_DOOR_SILENT))
 	{
 		g_pSoundEmitterSystem->StopSound(this, STRING( m_SoundMoving ) );
 	}
@@ -4566,7 +4572,7 @@ void CBasePropDoor::EndBlocked( void )
 
 	// Emit door moving and stop sounds on CHAN_STATIC so that the multicast doesn't
 	// filter them out and leave a client stuck with looping door sounds!
-	if (!HasSpawnFlags(SF_DOOR_SILENT))
+	if (!GetEngineObject()->HasSpawnFlags(SF_DOOR_SILENT))
 	{
 		const char* soundname = STRING(m_SoundMoving);
 		CPASAttenuationFilter filter(this, soundname);
@@ -5165,7 +5171,7 @@ void CPropDoorRotating::DoorTeleportToSpawnPosition()
 	QAngle angSpawn;
 
 	// The Start Open spawnflag trumps the choices field
-	if ( ( HasSpawnFlags( SF_DOOR_START_OPEN_OBSOLETE ) ) || ( m_eSpawnPosition == DOOR_SPAWN_OPEN_FORWARD ) )
+	if ( (GetEngineObject()->HasSpawnFlags( SF_DOOR_START_OPEN_OBSOLETE ) ) || ( m_eSpawnPosition == DOOR_SPAWN_OPEN_FORWARD ) )
 	{
 		angSpawn = m_angRotationOpenForward;
 		SetDoorState( DOOR_STATE_OPEN );
@@ -5328,7 +5334,7 @@ void CPropDoorRotating::BeginOpening(CBaseEntity *pOpenAwayFrom)
 	}
 
 	// Make respectful entities move away from our path
-	if( !HasSpawnFlags(SF_DOOR_SILENT_TO_NPCS) )
+	if( !GetEngineObject()->HasSpawnFlags(SF_DOOR_SILENT_TO_NPCS) )
 	{
 		CSoundEnt::InsertSound( SOUND_MOVE_AWAY, volumeCenter, volumeRadius, 0.5f, pOpenAwayFrom );
 	}
@@ -5615,7 +5621,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 	float	GetMass() { return m_fMass; }
 	bool	IsAsleep() { return !m_bAwake; }
 
-	bool	IsDebris( void )			{ return ( ( m_spawnflags & SF_PHYSPROP_DEBRIS ) != 0 ); }
+	bool	IsDebris( void )			{ return ( (GetEngineObject()->GetSpawnFlags() & SF_PHYSPROP_DEBRIS) != 0); }
 
 	virtual void VPhysicsUpdate( IPhysicsObject *pPhysics )
 	{
@@ -5663,7 +5669,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 		}
 
 		// check if map maker overrides physics mode to force a server-side entity
-		if ( GetSpawnFlags() & SF_PHYSPROP_FORCE_SERVER_SIDE )
+		if (GetEngineObject()->GetSpawnFlags() & SF_PHYSPROP_FORCE_SERVER_SIDE )
 		{
 			SetPhysicsMode( PHYSICS_MULTIPLAYER_NON_SOLID );
 		}

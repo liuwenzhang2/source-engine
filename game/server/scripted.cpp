@@ -208,7 +208,7 @@ void CAI_ScriptedSequence::Spawn( void )
 	// If we have no name or we are set to start immediately, find the NPC and
 	// have them move to their script position now.
 	//
-	if ( !GetEntityName() || ( m_spawnflags & SF_SCRIPT_START_ON_SPAWN ) )
+	if ( !GetEntityName() || (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_START_ON_SPAWN))
 	{
 		StartThink();
 		SetNextThink( gpGlobals->curtime + 1.0f );
@@ -224,7 +224,7 @@ void CAI_ScriptedSequence::Spawn( void )
 		}
 	}
 
-	if ( m_spawnflags & SF_SCRIPT_NOINTERRUPT )
+	if (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_NOINTERRUPT)
 	{
 		m_interruptable = false;
 	}
@@ -271,7 +271,7 @@ void CAI_ScriptedSequence::StopThink()
 //-----------------------------------------------------------------------------
 bool CAI_ScriptedSequence::FCanOverrideState( void )
 {
-	if ( m_spawnflags & SF_SCRIPT_OVERRIDESTATE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_OVERRIDESTATE)
 		return true;
 	return false;
 }
@@ -548,7 +548,7 @@ CAI_BaseNPC *CAI_ScriptedSequence::FindScriptEntity( )
 				// They can play it, but only enqueued. We'll use them as a last resort.
 				pEnqueueNPC = pNPC;
 			}
-			else if (!(m_spawnflags & SF_SCRIPT_NO_COMPLAINTS))
+			else if (!(GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_NO_COMPLAINTS))
 			{
 				// They cannot play the script.
 				DevMsg( "Found %s, but can't play!\n", STRING( m_iszEntity ));
@@ -592,7 +592,7 @@ bool CAI_ScriptedSequence::FindEntity( void )
 {
 	CAI_BaseNPC *pTarget = FindScriptEntity( );
 
-	if ( (m_spawnflags & SF_SCRIPT_SEARCH_CYCLICALLY))
+	if ( (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_SEARCH_CYCLICALLY))
 	{
 		// next time this is called, start searching from the one found last time
 		m_hLastFoundEntity = pTarget;
@@ -616,7 +616,7 @@ void CAI_ScriptedSequence::StartScript( void )
 
 	if ( pTarget )
 	{
-		pTarget->RemoveSpawnFlags( SF_NPC_WAIT_FOR_SCRIPT );
+		pTarget->GetEngineObject()->RemoveSpawnFlags( SF_NPC_WAIT_FOR_SCRIPT );
 
 		//
 		// If the NPC is in another script, just enqueue ourselves and bail out.
@@ -1019,7 +1019,7 @@ void CAI_ScriptedSequence::PostIdleDone( CAI_BaseNPC *pNPC )
 	// but allow another scripted sequence to take control of the NPC if it wants to,
 	// unless another script has stolen them from us.
 	//
-	if ( ( m_iszPostIdle != NULL_STRING ) && ( m_spawnflags & SF_SCRIPT_LOOP_IN_POST_IDLE ) && ( m_hNextCine == NULL ) )
+	if ( ( m_iszPostIdle != NULL_STRING ) && (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_LOOP_IN_POST_IDLE) && (m_hNextCine == NULL))
 	{
 		//
 		// First time we've gotten here for this script. Start playing the post idle
@@ -1035,7 +1035,7 @@ void CAI_ScriptedSequence::PostIdleDone( CAI_BaseNPC *pNPC )
 	}
 	else
 	{
-		if ( !( m_spawnflags & SF_SCRIPT_REPEATABLE ) )
+		if ( !(GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_REPEATABLE))
 		{
 			SetThink( &CAI_ScriptedSequence::SUB_Remove );
 			SetNextThink( gpGlobals->curtime + 0.1f );
@@ -1064,7 +1064,7 @@ void CAI_ScriptedSequence::PostIdleDone( CAI_BaseNPC *pNPC )
 			// Don't link ourselves in if we are going to be deleted.
 			// TODO: use EHANDLEs instead of pointers to scripts!
 			//
-			if ( ( pNextCine != this ) || ( m_spawnflags & SF_SCRIPT_REPEATABLE ) )
+			if ( ( pNextCine != this ) || (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_REPEATABLE))
 			{
 				pNextCine->SetTarget( pNPC );
 				pNextCine->StartScript();
@@ -1120,7 +1120,7 @@ void CAI_ScriptedSequence::FixFlyFlag( CAI_BaseNPC *pNPC, int iSavedCineFlags )
 //-----------------------------------------------------------------------------
 void CAI_ScriptedSequence::AllowInterrupt( bool fAllow )
 {
-	if ( m_spawnflags & SF_SCRIPT_NOINTERRUPT )
+	if (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_NOINTERRUPT)
 		return;
 	m_interruptable = fAllow;
 }
@@ -1193,7 +1193,7 @@ bool CAI_ScriptedSequence::CanEnqueueAfter( void )
 		return false;
 	}
 
-	if ( !m_hNextCine->HasSpawnFlags( SF_SCRIPT_HIGH_PRIORITY ) )
+	if ( !m_hNextCine->GetEngineObject()->HasSpawnFlags( SF_SCRIPT_HIGH_PRIORITY ) )
 	{
 		return true;
 	}
@@ -1339,7 +1339,7 @@ void CAI_ScriptedSequence::CancelScript( void )
 	// succeed in starting, in which case we should always cancel. This fixes
 	// dynamic interactions where an NPC was killed the same frame another NPC
 	// started a dynamic interaction with him.
-	bool bDontCancelOther = ((m_bDontCancelOtherSequences || HasSpawnFlags( SF_SCRIPT_ALLOW_DEATH ) )&& (m_startTime != 0));
+	bool bDontCancelOther = ((m_bDontCancelOtherSequences || GetEngineObject()->HasSpawnFlags( SF_SCRIPT_ALLOW_DEATH ) )&& (m_startTime != 0));
 	if ( bDontCancelOther || !GetEntityName() )
 	{
 		ScriptEntityCancel( this );
@@ -1657,7 +1657,7 @@ void CAI_ScriptedSchedule::ScriptThink( void )
 	
 	if ( !m_bGrabAll )
 	{
-		pTarget = FindScriptEntity( (m_spawnflags & SF_SCRIPT_SEARCH_CYCLICALLY) != 0 );
+		pTarget = FindScriptEntity( (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_SEARCH_CYCLICALLY) != 0);
 		if ( pTarget )
 		{
 			DevMsg( 2,  "scripted_schedule \"%s\" using NPC \"%s\"(%s)\n", GetDebugName(), STRING( m_iszEntity ), pTarget->GetEntityName().ToCStr() );
@@ -1803,7 +1803,7 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 
 			if (!pTarget->ScheduledMoveToGoalEntity( SCHED_IDLE_WALK, pGoalEnt, movementActivity ))
 			{
-				if (!(m_spawnflags & SF_SCRIPT_NO_COMPLAINTS))
+				if (!(GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_NO_COMPLAINTS))
 				{
 					DevMsg( 1, "ScheduledMoveToGoalEntity to goal entity %s failed\nCan't execute script %s\n", STRING(m_sGoalEnt), GetDebugName() );
 				}
@@ -1825,7 +1825,7 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 			}
 			if (!pTarget->ScheduledFollowPath( SCHED_IDLE_WALK, pGoalEnt, movementActivity ))
 			{
-				if (!(m_spawnflags & SF_SCRIPT_NO_COMPLAINTS))
+				if (!(GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_NO_COMPLAINTS))
 				{
 					DevMsg( 1, "ScheduledFollowPath to goal entity %s failed\nCan't execute script %s\n", STRING(m_sGoalEnt), GetDebugName() );
 				}
@@ -1855,7 +1855,7 @@ void CAI_ScriptedSchedule::InputStartSchedule( inputdata_t &inputdata )
 		DevMsg( 2,  "aiscripted_schedule - no schedule or state has been set!\n" );
 	}
 	
-	if ( !m_bDidFireOnce || ( m_spawnflags & SF_SCRIPT_REPEATABLE ) )
+	if ( !m_bDidFireOnce || (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_REPEATABLE))
 	{
 		// DVS TODO: Is the NPC already playing the script?
 		m_hActivator = inputdata.pActivator;
@@ -1882,7 +1882,7 @@ void CAI_ScriptedSchedule::InputStopSchedule( inputdata_t &inputdata )
 	CAI_BaseNPC *pTarget;
 	if ( !m_bGrabAll )
 	{
-		pTarget = FindScriptEntity( (m_spawnflags & SF_SCRIPT_SEARCH_CYCLICALLY) != 0 );
+		pTarget = FindScriptEntity( (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_SEARCH_CYCLICALLY) != 0);
 		if ( pTarget )
 		{
 			StopSchedule( pTarget );
@@ -2080,7 +2080,7 @@ void CAI_ScriptedSentence::FindThink( void )
 		
 		m_OnEndSentence.FireOutput(NULL, this, length + m_flRepeat);
 
-		if ( m_spawnflags & SF_SENTENCE_ONCE )
+		if (GetEngineObject()->GetSpawnFlags() & SF_SENTENCE_ONCE)
 			UTIL_Remove( this );
 		
 		float delay = m_flDelay + length + 0.1;
@@ -2124,13 +2124,13 @@ bool CAI_ScriptedSentence::AcceptableSpeaker( CAI_BaseNPC *pNPC )
 {
 	if ( pNPC )
 	{
-		if ( m_spawnflags & SF_SENTENCE_FOLLOWERS )
+		if (GetEngineObject()->GetSpawnFlags() & SF_SENTENCE_FOLLOWERS)
 		{
 			if ( pNPC->GetTarget() == NULL || !pNPC->GetTarget()->IsPlayer() )
 				return false;
 		}
 		bool override;
-		if ( m_spawnflags & SF_SENTENCE_INTERRUPT )
+		if (GetEngineObject()->GetSpawnFlags() & SF_SENTENCE_INTERRUPT)
 			override = true;
 		else
 			override = false;
@@ -2194,12 +2194,12 @@ int CAI_ScriptedSentence::StartSentence( CAI_BaseNPC *pTarget )
 	}
 
 	bool bConcurrent = false;
-	if ( !(m_spawnflags & SF_SENTENCE_CONCURRENT) )
+	if ( !(GetEngineObject()->GetSpawnFlags() & SF_SENTENCE_CONCURRENT))
 		bConcurrent = true;
 
 	CBaseEntity *pListener = NULL;
 
-	if ( m_spawnflags & SF_SENTENCE_SPEAKTOACTIVATOR )
+	if (GetEngineObject()->GetSpawnFlags() & SF_SENTENCE_SPEAKTOACTIVATOR)
 	{
 		pListener = m_pActivator;
 	}
@@ -2230,7 +2230,7 @@ const char *CAI_ScriptedSequence::GetSpawnPreIdleSequenceForScript( CBaseEntity 
 	CAI_ScriptedSequence *pScript = gEntList.NextEntByClass( (CAI_ScriptedSequence *)NULL );
 	while ( pScript )
 	{
-		if ( pScript->HasSpawnFlags( SF_SCRIPT_START_ON_SPAWN ) && pScript->m_iszEntity == pEntity->GetEntityName() )
+		if ( pScript->GetEngineObject()->HasSpawnFlags( SF_SCRIPT_START_ON_SPAWN ) && pScript->m_iszEntity == pEntity->GetEntityName() )
 		{
 			if ( pScript->m_iszPreIdle != NULL_STRING )
 			{

@@ -284,7 +284,7 @@ void CNPC_MissileDefense::Spawn( void )
 	// Hate missiles	
 	AddClassRelationship( CLASS_MISSILE, D_HT, 5 );
 
-	m_spawnflags |= SF_NPC_LONG_RANGE;
+	GetEngineObject()->AddSpawnFlags(SF_NPC_LONG_RANGE);
 
 	m_flReloadedTime = gpGlobals->curtime;
 

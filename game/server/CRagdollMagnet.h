@@ -25,7 +25,7 @@ public:
 
 	bool IsEnabled( void ) { return !m_bDisabled; }
 	
-	int IsBarMagnet( void ) { return (m_spawnflags & SF_RAGDOLLMAGNET_BAR); }
+	int IsBarMagnet( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_RAGDOLLMAGNET_BAR); }
 
 	static CRagdollMagnet *FindBestMagnet( CBaseEntity *pNPC );
 

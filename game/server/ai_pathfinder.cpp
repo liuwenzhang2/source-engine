@@ -643,7 +643,7 @@ bool CAI_Pathfinder::IsLinkUsable(CAI_Link *pLink, int startID)
 		{
 			if ( pStartHint->HintType() == HINT_JUMP_OVERRIDE && 
 				 pEndHint->HintType() == HINT_JUMP_OVERRIDE &&
-				 ( ( ( pStartHint->GetSpawnFlags() | pEndHint->GetSpawnFlags() ) & SF_ALLOW_JUMP_UP ) || pStartHint->GetEngineObject()->GetAbsOrigin().z > pEndHint->GetEngineObject()->GetAbsOrigin().z ) )
+				 ( ( ( pStartHint->GetEngineObject()->GetSpawnFlags() | pEndHint->GetEngineObject()->GetSpawnFlags() ) & SF_ALLOW_JUMP_UP ) || pStartHint->GetEngineObject()->GetAbsOrigin().z > pEndHint->GetEngineObject()->GetAbsOrigin().z ) )
 			{
 				if ( !pStartNode->IsLocked() )
 				{

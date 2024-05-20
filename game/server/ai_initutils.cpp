@@ -233,7 +233,7 @@ int CNodeEnt::Spawn( const char *pMapData )
 		{
 			m_NodeData.nNodeID = m_nNodeCount;
 			pHint = CAI_HintManager::CreateHint( &m_NodeData, pMapData );
-			pHint->AddSpawnFlags( GetSpawnFlags() );
+			pHint->GetEngineObject()->AddSpawnFlags(GetEngineObject()->GetSpawnFlags() );
 		}
 	}
 
@@ -310,7 +310,7 @@ int CNodeEnt::Spawn( const char *pMapData )
 		new_node->SetType( NODE_GROUND );
 	}
 
-	new_node->m_eNodeInfo = ( m_spawnflags << NODE_ENT_FLAGS_SHIFT );
+	new_node->m_eNodeInfo = (GetEngineObject()->GetSpawnFlags() << NODE_ENT_FLAGS_SHIFT );
 
 	// If changed as part of WC editing process note that network must be rebuilt
 	if (m_debugOverlays & OVERLAY_WC_CHANGE_ENTITY)

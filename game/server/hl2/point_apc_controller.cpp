@@ -44,7 +44,7 @@ public:
 	// Bmodels don't go across transitions
 	virtual int	ObjectCaps( void ) { return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 
-	inline bool IsActive( void ) { return (m_spawnflags & SF_TANK_ACTIVE)?TRUE:FALSE; }
+	inline bool IsActive( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_TANK_ACTIVE) ? TRUE : FALSE; }
 
 	// Input handlers.
 	void InputActivate( inputdata_t &inputdata );
@@ -167,7 +167,7 @@ void CAPCController::InputActivate( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CAPCController::ActivateRocketGuidance(void)
 {
-	m_spawnflags	|= SF_TANK_ACTIVE; 
+	GetEngineObject()->AddSpawnFlags(SF_TANK_ACTIVE);
 	SetNextThink( gpGlobals->curtime + 0.1f ); 
 }
 
@@ -186,7 +186,7 @@ void CAPCController::InputDeactivate( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CAPCController::DeactivateRocketGuidance(void)
 {
-	m_spawnflags	&= ~SF_TANK_ACTIVE; 
+	GetEngineObject()->RemoveSpawnFlags(SF_TANK_ACTIVE);
 	StopRotSound();
 }
 

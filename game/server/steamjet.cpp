@@ -23,7 +23,7 @@ IMPLEMENT_SERVERCLASS_ST(CSteamJet, DT_SteamJet)
 	SendPropInt(SENDINFO(m_bEmit), 1, SPROP_UNSIGNED),
 	SendPropInt(SENDINFO(m_bFaceLeft), 1, SPROP_UNSIGNED), // For support of legacy env_steamjet, which faced left instead of forward.
 	SendPropInt(SENDINFO(m_nType), 32, SPROP_UNSIGNED),
-	SendPropInt( SENDINFO(m_spawnflags), 8, SPROP_UNSIGNED ),
+	//SendPropInt( SENDINFO(m_spawnflags), 8, SPROP_UNSIGNED ),
 	SendPropFloat(SENDINFO(m_flRollSpeed), 0, SPROP_NOSCALE),
 END_SEND_TABLE()
 

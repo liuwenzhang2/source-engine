@@ -666,7 +666,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 	WeaponManager_AmmoMod( this );
 
 	//If it was dropped then there's no need to respawn it.
-	AddSpawnFlags( SF_NORESPAWN );
+	GetEngineObject()->AddSpawnFlags( SF_NORESPAWN );
 
 	StopAnimation();
 	StopFollowingEntity( );
@@ -682,7 +682,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 
 	if( hl2_episodic.GetBool() )
 	{
-		RemoveSpawnFlags( SF_WEAPON_NO_PLAYER_PICKUP );
+		GetEngineObject()->RemoveSpawnFlags( SF_WEAPON_NO_PLAYER_PICKUP );
 	}
 
 	IPhysicsObject *pObj = VPhysicsGetObject();
@@ -835,7 +835,7 @@ void CBaseCombatWeapon::DefaultTouch( CBaseEntity *pOther )
 		m_OnCacheInteraction.FireOutput( pOther, this );
 	}
 
-	if( HasSpawnFlags(SF_WEAPON_NO_PLAYER_PICKUP) )
+	if(GetEngineObject()->HasSpawnFlags(SF_WEAPON_NO_PLAYER_PICKUP) )
 		return;
 
 	if (pPlayer->BumpWeapon(this))
@@ -947,7 +947,7 @@ void CBaseCombatWeapon::SetPickupTouch( void )
 
 	if ( gpGlobals->maxClients > 1 )
 	{
-		if ( GetSpawnFlags() & SF_NORESPAWN )
+		if (GetEngineObject()->GetSpawnFlags() & SF_NORESPAWN )
 		{
 			SetThink( &CBaseEntity::SUB_Remove );
 			SetNextThink( gpGlobals->curtime + 30.0f );
@@ -978,7 +978,7 @@ void CBaseCombatWeapon::Equip( CBaseCombatCharacter *pOwner )
 #if !defined( CLIENT_DLL )
 	if ( m_pConstraint != NULL )
 	{
-		RemoveSpawnFlags( SF_WEAPON_START_CONSTRAINED );
+		GetEngineObject()->RemoveSpawnFlags( SF_WEAPON_START_CONSTRAINED );
 		physenv->DestroyConstraint( m_pConstraint );
 		m_pConstraint = NULL;
 	}

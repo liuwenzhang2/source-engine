@@ -213,7 +213,7 @@ void CNPC_PlayerCompanion::Spawn()
 	CapabilitiesClear();
 	CapabilitiesAdd( bits_CAP_SQUAD );
 
-	if ( !HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
 	{
 		CapabilitiesAdd( bits_CAP_ANIMATEDFACE | bits_CAP_TURN_HEAD );
 		CapabilitiesAdd( bits_CAP_USE_WEAPONS | bits_CAP_AIM_GUN | bits_CAP_MOVE_SHOOT );
@@ -236,10 +236,10 @@ void CNPC_PlayerCompanion::Spawn()
 
 #ifdef HL2_EPISODIC
 	// We strip this flag because it's been made obsolete by the StartScripting behavior
-	if ( HasSpawnFlags( SF_NPC_ALTCOLLISION ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPC_ALTCOLLISION ) )
 	{
 		Warning( "NPC %s using alternate collision! -- DISABLED\n", STRING( GetEntityName() ) );
-		RemoveSpawnFlags( SF_NPC_ALTCOLLISION );
+		GetEngineObject()->RemoveSpawnFlags( SF_NPC_ALTCOLLISION );
 	}
 
 	m_hFlare = NULL;
@@ -262,10 +262,10 @@ int CNPC_PlayerCompanion::Restore( IRestore &restore )
 
 #ifdef HL2_EPISODIC
 	// We strip this flag because it's been made obsolete by the StartScripting behavior
-	if ( HasSpawnFlags( SF_NPC_ALTCOLLISION ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPC_ALTCOLLISION ) )
 	{
 		Warning( "NPC %s using alternate collision! -- DISABLED\n", STRING( GetEntityName() ) );
-		RemoveSpawnFlags( SF_NPC_ALTCOLLISION );
+		GetEngineObject()->RemoveSpawnFlags( SF_NPC_ALTCOLLISION );
 	}
 #endif // HL2_EPISODIC
 

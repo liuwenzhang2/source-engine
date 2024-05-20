@@ -491,7 +491,7 @@ void CBaseCombatWeapon::FallInit( void )
 	{
 #if !defined( CLIENT_DLL )
 		// Constrained start?
-		if ( HasSpawnFlags( SF_WEAPON_START_CONSTRAINED ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_WEAPON_START_CONSTRAINED ) )
 		{
 			//Constrain the weapon in place
 			IPhysicsObject *pReferenceObject, *pAttachedObject;
@@ -601,7 +601,7 @@ void CBaseCombatWeapon::Materialize( void )
 		DoMuzzleFlash();
 	}
 #ifdef HL2MP
-	if ( HasSpawnFlags( SF_NORESPAWN ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
 		VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false );
 		SetMoveType( MOVETYPE_VPHYSICS );
@@ -720,7 +720,7 @@ int CBaseCombatWeapon::GetAvailableWeaponsInBox( CBaseCombatWeapon **pList, int 
 int	CBaseCombatWeapon::ObjectCaps( void )
 { 
 	int caps = BaseClass::ObjectCaps();
-	if ( !IsFollowingEntity() && !HasSpawnFlags(SF_WEAPON_NO_PLAYER_PICKUP) )
+	if ( !IsFollowingEntity() && !GetEngineObject()->HasSpawnFlags(SF_WEAPON_NO_PLAYER_PICKUP) )
 	{
 		caps |= FCAP_IMPULSE_USE;
 	}

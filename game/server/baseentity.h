@@ -654,11 +654,7 @@ public:
 
 
 public:
-	int			GetSpawnFlags( void ) const;
-	void		AddSpawnFlags( int nFlags );
-	void		RemoveSpawnFlags( int nFlags );
-	void		ClearSpawnFlags( void );
-	bool		HasSpawnFlags( int nFlags ) const;
+
 
 	int			GetEffects( void ) const;
 	void		AddEffects( int nEffects );
@@ -1644,9 +1640,6 @@ protected:
 	// Which frame did I simulate?
 	int						m_nSimulationTick;
 
-	// FIXME: Make this private! Still too many references to do so...
-	CNetworkVar( int, m_spawnflags );
-
 private:
 	// was pev->flags
 	CNetworkVarForDerived( int, m_fFlags );
@@ -1945,31 +1938,6 @@ inline bool CBaseEntity::Debug_ShouldStep(void)
 //{
 //	return m_hMoveParent.Get();
 //}
-
-
-inline int CBaseEntity::GetSpawnFlags( void ) const
-{ 
-	return m_spawnflags; 
-}
-
-inline void CBaseEntity::AddSpawnFlags( int nFlags ) 
-{ 
-	m_spawnflags |= nFlags; 
-}
-inline void CBaseEntity::RemoveSpawnFlags( int nFlags ) 
-{ 
-	m_spawnflags &= ~nFlags; 
-}
-
-inline void CBaseEntity::ClearSpawnFlags( void ) 
-{ 
-	m_spawnflags = 0; 
-}
-
-inline bool CBaseEntity::HasSpawnFlags( int nFlags ) const
-{ 
-	return (m_spawnflags & nFlags) != 0; 
-}
 
 //-----------------------------------------------------------------------------
 // checks to see if the entity is marked for deletion

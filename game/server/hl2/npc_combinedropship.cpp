@@ -1022,7 +1022,7 @@ void CNPC_CombineDropship::Spawn( void )
 
 	SetLandingState( LANDING_NO );
 
-	if ( HasSpawnFlags( SF_DROPSHIP_WAIT_FOR_DROPOFF_INPUT ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_DROPSHIP_WAIT_FOR_DROPOFF_INPUT ) )
 	{
 		m_bWaitForDropoffInput = true;
 	}
@@ -2471,7 +2471,7 @@ void CNPC_CombineDropship::SpawnTroop( void )
 	pSequence->KeyValue( "OnEndSequence", UTIL_VarArgs("%s,NPCFinishDustoff,%s,0,-1", STRING(GetEntityName()), STRING(pNPC->GetEntityName())) );
 	pSequence->GetEngineObject()->SetAbsOrigin( vecSpawnOrigin );
 	pSequence->GetEngineObject()->SetAbsAngles( vecSpawnAngles );
-	pSequence->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
+	pSequence->GetEngineObject()->AddSpawnFlags( SF_SCRIPT_NOINTERRUPT | SF_SCRIPT_HIGH_PRIORITY | SF_SCRIPT_OVERRIDESTATE );
 	pSequence->Spawn();
 	pSequence->Activate();
 	variant_t emptyVariant;

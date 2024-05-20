@@ -11,6 +11,9 @@
 #pragma once
 #endif
 
+#include "cbase.h"
+#include "baseentity.h"
+
 //!! replace this with generic start enabled/disabled
 #define SF_WALL_START_OFF		0x0001
 #define SF_IGNORE_PLAYERUSE		0x0002
@@ -28,7 +31,7 @@ public:
 	virtual void Spawn( void );
 	bool CreateVPhysics( void );
 
-	virtual int	ObjectCaps( void ) { return HasSpawnFlags(SF_IGNORE_PLAYERUSE) ? BaseClass::ObjectCaps() : BaseClass::ObjectCaps() | FCAP_IMPULSE_USE; }
+	virtual int	ObjectCaps( void ) { return GetEngineObject()->HasSpawnFlags(SF_IGNORE_PLAYERUSE) ? BaseClass::ObjectCaps() : BaseClass::ObjectCaps() | FCAP_IMPULSE_USE; }
 	virtual bool KeyValue(const char* szKeyName, const char* szValue);
 	virtual int DrawDebugTextOverlays( void );
 

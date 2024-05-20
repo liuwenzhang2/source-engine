@@ -226,7 +226,7 @@ void CEnvProjectedTexture::InputSetSpotlightTexture( inputdata_t &inputdata )
 
 void CEnvProjectedTexture::Activate( void )
 {
-	if ( GetSpawnFlags() & ENV_PROJECTEDTEXTURE_STARTON )
+	if (GetEngineObject()->GetSpawnFlags() & ENV_PROJECTEDTEXTURE_STARTON )
 	{
 		m_bState = true;
 	}

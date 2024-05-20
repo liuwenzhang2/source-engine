@@ -80,7 +80,7 @@ void CNPC_CombineS::Spawn( void )
 	BaseClass::Spawn();
 
 #if HL2_EPISODIC
-	if (m_iUseMarch && !HasSpawnFlags(SF_NPC_START_EFFICIENT))
+	if (m_iUseMarch && !GetEngineObject()->HasSpawnFlags(SF_NPC_START_EFFICIENT))
 	{
 		Msg( "Soldier %s is set to use march anim, but is not an efficient AI. The blended march anim can only be used for dead-ahead walks!\n", GetDebugName() );
 	}
@@ -304,7 +304,7 @@ void CNPC_CombineS::Event_Killed( const CTakeDamageInfo &info )
 		if( IsElite() )
 		{
 #ifdef HL2_EPISODIC
-			if ( HasSpawnFlags( SF_COMBINE_NO_AR2DROP ) == false )
+			if (GetEngineObject()->HasSpawnFlags( SF_COMBINE_NO_AR2DROP ) == false )
 #endif
 			{
 				CBaseEntity *pItem = DropItem( "item_ammo_ar2_altfire", WorldSpaceCenter()+RandomVector(-4,4), RandomAngle(0,360) );
@@ -348,7 +348,7 @@ void CNPC_CombineS::Event_Killed( const CTakeDamageInfo &info )
 			pHL2GameRules->NPC_DroppedHealth();
 		}
 		
-		if ( HasSpawnFlags( SF_COMBINE_NO_GRENADEDROP ) == false )
+		if (GetEngineObject()->HasSpawnFlags( SF_COMBINE_NO_GRENADEDROP ) == false )
 		{
 			// Attempt to drop a grenade
 			if ( pHL2GameRules->NPC_ShouldDropGrenade( pPlayer ) )

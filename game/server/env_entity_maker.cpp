@@ -119,7 +119,7 @@ void CEnvEntityMaker::Activate( void )
 	}
 
 	// Spawn an instance
-	if ( m_spawnflags & SF_ENTMAKER_AUTOSPAWN )
+	if (GetEngineObject()->GetSpawnFlags() & SF_ENTMAKER_AUTOSPAWN)
 	{
 		SpawnEntity();
 	}
@@ -189,7 +189,7 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 	m_pOutputOnSpawned.FireOutput( this, this );
 
 	// Start thinking
-	if ( m_spawnflags & SF_ENTMAKER_AUTOSPAWN )
+	if (GetEngineObject()->GetSpawnFlags() & SF_ENTMAKER_AUTOSPAWN)
 	{
 		SetThink( &CEnvEntityMaker::CheckSpawnThink );
 		SetNextThink( gpGlobals->curtime + 0.5f );
@@ -312,7 +312,7 @@ void CEnvEntityMaker::CheckSpawnThink( void )
 	if ( m_hCurrentInstance )
 	{
 		// If Wait-For-Destruction is set, abort immediately
-		if ( m_spawnflags & SF_ENTMAKER_WAITFORDESTRUCTION )
+		if (GetEngineObject()->GetSpawnFlags() & SF_ENTMAKER_WAITFORDESTRUCTION)
 			return;
 	}
 
@@ -321,7 +321,7 @@ void CEnvEntityMaker::CheckSpawnThink( void )
 		return;
 
 	// We're clear, now check to see if the player's looking
-	if ( !( HasSpawnFlags( SF_ENTMAKER_IGNOREFACING ) ) && IsPlayerLooking() )
+	if ( !(GetEngineObject()->HasSpawnFlags( SF_ENTMAKER_IGNOREFACING ) ) && IsPlayerLooking() )
 		return;
 
 	// Clear, no player watching, so spawn!
@@ -338,13 +338,13 @@ void CEnvEntityMaker::InputForceSpawn( inputdata_t &inputdata )
 	if (!pTemplate)
 		return;
 
-	if ( HasSpawnFlags( SF_ENTMAKER_CHECK_FOR_SPACE ) && !HasRoomToSpawn() )
+	if (GetEngineObject()->HasSpawnFlags( SF_ENTMAKER_CHECK_FOR_SPACE ) && !HasRoomToSpawn() )
 	{
 		m_pOutputOnFailedSpawn.FireOutput( this, this );
 		return;
 	}
 
-	if ( HasSpawnFlags( SF_ENTMAKER_CHECK_PLAYER_LOOKING ) && IsPlayerLooking() )
+	if (GetEngineObject()->HasSpawnFlags( SF_ENTMAKER_CHECK_PLAYER_LOOKING ) && IsPlayerLooking() )
 	{
 		m_pOutputOnFailedSpawn.FireOutput( this, this );
 		return;

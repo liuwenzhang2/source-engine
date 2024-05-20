@@ -209,12 +209,12 @@ public:
 			{
 				if ( pAllyNpc->GetCommandGoal() != vec3_invalid )
 				{
-					bool bHadGag = pAllyNpc->HasSpawnFlags(SF_NPC_GAG);
+					bool bHadGag = pAllyNpc->GetEngineObject()->HasSpawnFlags(SF_NPC_GAG);
 
-					pAllyNpc->AddSpawnFlags(SF_NPC_GAG);
+					pAllyNpc->GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 					pAllyNpc->TargetOrder( UTIL_GetLocalPlayer(), &pAllyNpc, 1 );
 					if ( !bHadGag )
-						pAllyNpc->RemoveSpawnFlags(SF_NPC_GAG);
+						pAllyNpc->GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 				}
 			}
 		}
@@ -527,7 +527,7 @@ void CNPC_Citizen::Spawn()
 	m_bWasInPlayerSquad = IsInPlayerSquad();
 
 	// Use render bounds instead of human hull for guys sitting in chairs, etc.
-	m_ActBusyBehavior.SetUseRenderBounds( HasSpawnFlags( SF_CITIZEN_USE_RENDER_BOUNDS ) );
+	m_ActBusyBehavior.SetUseRenderBounds(GetEngineObject()->HasSpawnFlags( SF_CITIZEN_USE_RENDER_BOUNDS ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -548,7 +548,7 @@ void CNPC_Citizen::PostNPCInit()
 	}
 	else
 	{
-		if ( ( m_spawnflags & SF_CITIZEN_FOLLOW ) && AI_IsSinglePlayer() )
+		if ( (GetEngineObject()->GetSpawnFlags() & SF_CITIZEN_FOLLOW) && AI_IsSinglePlayer())
 		{
 			m_FollowBehavior.SetFollowTarget( UTIL_GetLocalPlayer() );
 			m_FollowBehavior.SetParameters( AIF_SIMPLE );
@@ -623,14 +623,14 @@ void CNPC_Citizen::SelectModel()
 			m_Type = CT_DOWNTRODDEN;
 	}
 
-	if( HasSpawnFlags( SF_CITIZEN_RANDOM_HEAD | SF_CITIZEN_RANDOM_HEAD_MALE | SF_CITIZEN_RANDOM_HEAD_FEMALE ) || GetModelName() == NULL_STRING )
+	if(GetEngineObject()->HasSpawnFlags( SF_CITIZEN_RANDOM_HEAD | SF_CITIZEN_RANDOM_HEAD_MALE | SF_CITIZEN_RANDOM_HEAD_FEMALE ) || GetModelName() == NULL_STRING )
 	{
 		Assert( m_iHead == -1 );
-		char gender = ( HasSpawnFlags( SF_CITIZEN_RANDOM_HEAD_MALE ) ) ? 'm' : 
-					  ( HasSpawnFlags( SF_CITIZEN_RANDOM_HEAD_FEMALE ) ) ? 'f' : 0;
+		char gender = (GetEngineObject()->HasSpawnFlags( SF_CITIZEN_RANDOM_HEAD_MALE ) ) ? 'm' :
+					  (GetEngineObject()->HasSpawnFlags( SF_CITIZEN_RANDOM_HEAD_FEMALE ) ) ? 'f' : 0;
 
-		RemoveSpawnFlags( SF_CITIZEN_RANDOM_HEAD | SF_CITIZEN_RANDOM_HEAD_MALE | SF_CITIZEN_RANDOM_HEAD_FEMALE );
-		if( HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
+		GetEngineObject()->RemoveSpawnFlags( SF_CITIZEN_RANDOM_HEAD | SF_CITIZEN_RANDOM_HEAD_MALE | SF_CITIZEN_RANDOM_HEAD_FEMALE );
+		if(GetEngineObject()->HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
 		{
 			GetEngineObject()->SetModelName( AllocPooledString("models/humans/male_cheaple.mdl" ) );
 			return;
@@ -1453,7 +1453,7 @@ int CNPC_Citizen::TranslateSchedule( int scheduleType )
 
 			if( flDist < 50 * 12 )
 			{
-				AddSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE );
+				GetEngineObject()->AddSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE );
 				return SCHED_CITIZEN_MOURN_PLAYER;
 			}
 		}
@@ -2045,7 +2045,7 @@ void CNPC_Citizen::SimpleUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE
 	// First, try to speak the +USE concept
 	if ( !SelectPlayerUseSpeech() )
 	{
-		if ( HasSpawnFlags(SF_CITIZEN_NOT_COMMANDABLE) || IRelationType( pActivator ) == D_NU )
+		if (GetEngineObject()->HasSpawnFlags(SF_CITIZEN_NOT_COMMANDABLE) || IRelationType( pActivator ) == D_NU )
 		{
 			// If I'm denying commander mode because a level designer has made that decision,
 			// then fire this output in case they've hooked it to an event.
@@ -2316,7 +2316,7 @@ int CNPC_Citizen::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 bool CNPC_Citizen::IsCommandable() 
 {
-	return ( !HasSpawnFlags(SF_CITIZEN_NOT_COMMANDABLE) && IsInPlayerSquad() );
+	return ( !GetEngineObject()->HasSpawnFlags(SF_CITIZEN_NOT_COMMANDABLE) && IsInPlayerSquad() );
 }
 
 //-----------------------------------------------------------------------------
@@ -2342,7 +2342,7 @@ bool CNPC_Citizen::CanJoinPlayerSquad()
 	if ( m_NPCState == NPC_STATE_SCRIPT || m_NPCState == NPC_STATE_PRONE )
 		return false;
 
-	if ( HasSpawnFlags(SF_CITIZEN_NOT_COMMANDABLE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_CITIZEN_NOT_COMMANDABLE) )
 		return false;
 
 	if ( IsInAScript() )
@@ -2945,7 +2945,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 			// Look for second order guys
 			int initialCount = candidates.Count();
 			for ( i = 0; i < initialCount; i++ )
-				candidates[i].pCitizen->AddSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE ); // Prevents double-add
+				candidates[i].pCitizen->GetEngineObject()->AddSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE ); // Prevents double-add
 			for ( i = 0; i < initialCount; i++ )
 			{
 				if ( candidates[i].iSquadIndex == -1 )
@@ -2958,7 +2958,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 						if ( ppAIs[j]->GetClassname() != GetClassname() )
 							continue;
 
-						if ( ppAIs[j]->HasSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE ) )
+						if ( ppAIs[j]->GetEngineObject()->HasSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE ) )
 							continue; 
 
 						CNPC_Citizen *pCitizen = assert_cast<CNPC_Citizen *>(ppAIs[j]);
@@ -2982,12 +2982,12 @@ void CNPC_Citizen::UpdatePlayerSquad()
 						candidates[iNew].bIsInSquad = false;
 						candidates[iNew].distSq = distSq;
 						candidates[iNew].iSquadIndex = -1;
-						pCitizen->AddSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE ); // Prevents double-add
+						pCitizen->GetEngineObject()->AddSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE ); // Prevents double-add
 					}
 				}
 			}
 			for ( i = 0; i < candidates.Count(); i++ )
-				candidates[i].pCitizen->RemoveSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE );
+				candidates[i].pCitizen->GetEngineObject()->RemoveSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE );
 
 			if ( candidates.Count() > MAX_PLAYER_SQUAD )
 			{
@@ -3804,7 +3804,7 @@ void CNPC_Citizen::OnGivenWeapon( CBaseCombatWeapon *pNewWeapon )
 //------------------------------------------------------------------------------
 void CNPC_Citizen::InputSetCommandable( inputdata_t &inputdata )
 {
-	RemoveSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE );
+	GetEngineObject()->RemoveSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE );
 	gm_PlayerSquadEvaluateTimer.Force();
 }
 
@@ -3814,7 +3814,7 @@ void CNPC_Citizen::InputSetCommandable( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Citizen::InputSetMedicOn( inputdata_t &inputdata )
 {
-	AddSpawnFlags( SF_CITIZEN_MEDIC );
+	GetEngineObject()->AddSpawnFlags( SF_CITIZEN_MEDIC );
 }
 
 //-----------------------------------------------------------------------------
@@ -3823,7 +3823,7 @@ void CNPC_Citizen::InputSetMedicOn( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Citizen::InputSetMedicOff( inputdata_t &inputdata )
 {
-	RemoveSpawnFlags( SF_CITIZEN_MEDIC );
+	GetEngineObject()->RemoveSpawnFlags( SF_CITIZEN_MEDIC );
 }
 
 //-----------------------------------------------------------------------------
@@ -3832,7 +3832,7 @@ void CNPC_Citizen::InputSetMedicOff( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Citizen::InputSetAmmoResupplierOn( inputdata_t &inputdata )
 {
-	AddSpawnFlags( SF_CITIZEN_AMMORESUPPLIER );
+	GetEngineObject()->AddSpawnFlags( SF_CITIZEN_AMMORESUPPLIER );
 }
 
 //-----------------------------------------------------------------------------
@@ -3841,7 +3841,7 @@ void CNPC_Citizen::InputSetAmmoResupplierOn( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Citizen::InputSetAmmoResupplierOff( inputdata_t &inputdata )
 {
-	RemoveSpawnFlags( SF_CITIZEN_AMMORESUPPLIER );
+	GetEngineObject()->RemoveSpawnFlags( SF_CITIZEN_AMMORESUPPLIER );
 }
 
 //------------------------------------------------------------------------------
@@ -3882,7 +3882,7 @@ void CNPC_Citizen::FearSound( void )
 bool CNPC_Citizen::UseSemaphore( void )
 {
 	// Ignore semaphore if we're told to work outside it
-	if ( HasSpawnFlags(SF_CITIZEN_IGNORE_SEMAPHORE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_CITIZEN_IGNORE_SEMAPHORE) )
 		return false;
 
 	return BaseClass::UseSemaphore();

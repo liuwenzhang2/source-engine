@@ -168,7 +168,7 @@ CPhysForce::~CPhysForce()
 
 void CPhysForce::Spawn( void )
 {
-	if ( m_spawnflags & SF_THRUST_LOCAL_ORIENTATION )
+	if (GetEngineObject()->GetSpawnFlags() & SF_THRUST_LOCAL_ORIENTATION)
 	{
 		m_integrator.Init( IMotionEvent::SIM_LOCAL_ACCELERATION );
 	}
@@ -208,7 +208,7 @@ void CPhysForce::Activate( void )
 	// Let the derived class set up before we throw the switch
 	OnActivate();
 
-	if ( m_spawnflags & SF_THRUST_STARTACTIVE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_THRUST_STARTACTIVE)
 	{
 		ForceOn();
 	}
@@ -350,7 +350,7 @@ void CPhysThruster::OnActivate( void )
 		ConcatTransforms( worldToAttached, GetEngineObject()->EntityToWorldTransform(), thrusterToAttached );
 		MatrixGetColumn( thrusterToAttached, 3, m_localOrigin );
 
-		if ( HasSpawnFlags( SF_THRUST_LOCAL_ORIENTATION ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_THRUST_LOCAL_ORIENTATION ) )
 		{
 			QAngle angles;
 			MatrixAngles( thrusterToAttached, angles );
@@ -358,7 +358,7 @@ void CPhysThruster::OnActivate( void )
 		}
 		// maintain the local relationship with this entity
 		// it may move before the thruster is activated
-		if ( HasSpawnFlags( SF_THRUST_IGNORE_POS ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_THRUST_IGNORE_POS ) )
 		{
 			m_localOrigin.Init();
 		}
@@ -383,11 +383,11 @@ void CPhysThruster::SetupForces( IPhysicsObject *pPhys, Vector &linear, AngularI
 	thrustVector *= m_force;
 
 	// multiply the force by mass (it's actually just an acceleration)
-	if ( m_spawnflags & SF_THRUST_MASS_INDEPENDENT )
+	if (GetEngineObject()->GetSpawnFlags() & SF_THRUST_MASS_INDEPENDENT)
 	{
 		thrustVector *= pPhys->GetMass();
 	}
-	if ( m_spawnflags & SF_THRUST_LOCAL_ORIENTATION )
+	if (GetEngineObject()->GetSpawnFlags() & SF_THRUST_LOCAL_ORIENTATION)
 	{
 		CalculateVelocityOffsetLocal( pPhys, thrustVector, m_localOrigin, linear, angular );
 	}
@@ -398,13 +398,13 @@ void CPhysThruster::SetupForces( IPhysicsObject *pPhys, Vector &linear, AngularI
 		pPhys->CalculateVelocityOffset( thrustVector, position, &linear, &angular );
 	}
 
-	if ( !(m_spawnflags & SF_THRUST_FORCE) )
+	if ( !(GetEngineObject()->GetSpawnFlags() & SF_THRUST_FORCE))
 	{
 		// clear out force
 		linear.Init();
 	}
 
-	if ( !(m_spawnflags & SF_THRUST_TORQUE) )
+	if ( !(GetEngineObject()->GetSpawnFlags() & SF_THRUST_TORQUE))
 	{
 		// clear out torque
 		angular.Init();
@@ -437,8 +437,8 @@ LINK_ENTITY_TO_CLASS( phys_torque, CPhysTorque );
 void CPhysTorque::Spawn( void )
 {
 	// force spawnflags to agree with implementation of this class
-	m_spawnflags |= SF_THRUST_TORQUE | SF_THRUST_MASS_INDEPENDENT;
-	m_spawnflags &= ~SF_THRUST_FORCE;
+	GetEngineObject()->AddSpawnFlags(SF_THRUST_TORQUE | SF_THRUST_MASS_INDEPENDENT);
+	GetEngineObject()->RemoveSpawnFlags(SF_THRUST_FORCE);
 
 	m_axis -= GetEngineObject()->GetAbsOrigin();
 	VectorNormalize(m_axis);
@@ -772,7 +772,7 @@ void CPhysMotor::Activate( void )
 		IPhysicsObject *pPhys = m_attachedObject->VPhysicsGetObject();
 
 		// create a hinge constraint for this object?
-		if ( m_spawnflags & SF_MOTOR_HINGE )
+		if (GetEngineObject()->GetSpawnFlags() & SF_MOTOR_HINGE)
 		{
 			// UNDONE: Don't do this on restore?
 			if ( !m_pHinge )
@@ -788,7 +788,7 @@ void CPhysMotor::Activate( void )
 				PhysSetGameFlags(pPhys, FVPHYSICS_NO_PLAYER_PICKUP);
 			}
 
-			if ( m_spawnflags & SF_MOTOR_NOCOLLIDE )
+			if (GetEngineObject()->GetSpawnFlags() & SF_MOTOR_NOCOLLIDE)
 			{
 				PhysDisableEntityCollisions( g_PhysWorldObject, pPhys );
 			}
@@ -804,7 +804,7 @@ void CPhysMotor::Activate( void )
 			m_pController = physenv->CreateMotionController( &m_motor );
 			m_pController->AttachObject( m_attachedObject->VPhysicsGetObject(), false );
 
-			if ( m_spawnflags & SF_MOTOR_START_ON )
+			if (GetEngineObject()->GetSpawnFlags() & SF_MOTOR_START_ON)
 			{
 				TurnOn();
 			}
@@ -929,7 +929,7 @@ void CKeepUpright::Spawn()
 
 	SetMoveType( MOVETYPE_NONE );
 
-	if ( m_spawnflags & SF_KEEPUPRIGHT_START_INACTIVE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_KEEPUPRIGHT_START_INACTIVE)
 	{
 		m_bActive = false;
 	}
@@ -998,7 +998,7 @@ CBaseEntity *CreateKeepUpright( const Vector &vecOrigin, const QAngle &vecAngles
 		pKeepUpright->m_angularLimit = flAngularLimit;
 		if ( !bActive )
 		{
-			pKeepUpright->AddSpawnFlags( SF_KEEPUPRIGHT_START_INACTIVE );
+			pKeepUpright->GetEngineObject()->AddSpawnFlags( SF_KEEPUPRIGHT_START_INACTIVE );
 		}
 		pKeepUpright->Spawn();
 		pKeepUpright->Activate();

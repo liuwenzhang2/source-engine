@@ -247,7 +247,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CAmbientGeneric::Spawn( void )
 {
-	m_iSoundLevel = ComputeSoundlevel( m_radius, FBitSet( m_spawnflags, SF_AMBIENT_SOUND_EVERYWHERE )?true:false );
+	m_iSoundLevel = ComputeSoundlevel(m_radius, GetEngineObject()->HasSpawnFlags(SF_AMBIENT_SOUND_EVERYWHERE) ? true : false);
 	ComputeMaxAudibleDistance( );
 
 	char *szSoundFile = (char *)STRING( m_iszSound );
@@ -270,7 +270,7 @@ void CAmbientGeneric::Spawn( void )
 
 	m_fActive = false;
 
-	if ( FBitSet ( m_spawnflags, SF_AMBIENT_SOUND_NOT_LOOPING ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_AMBIENT_SOUND_NOT_LOOPING) )
 	{
 		m_fLooping = false;
 	}
@@ -431,7 +431,7 @@ void CAmbientGeneric::Precache( void )
 		}
 	}
 
-	if ( !FBitSet (m_spawnflags, SF_AMBIENT_SOUND_START_SILENT ) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_AMBIENT_SOUND_START_SILENT) )
 	{
 		// start the sound ASAP
 		if (m_fLooping)
@@ -467,7 +467,7 @@ void CAmbientGeneric::Activate( void )
 		}
 		else
 		{
-			if ( !FBitSet( m_spawnflags, SF_AMBIENT_SOUND_EVERYWHERE ) )
+			if ( !GetEngineObject()->HasSpawnFlags(SF_AMBIENT_SOUND_EVERYWHERE) )
 			{
 				GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 			}
@@ -530,7 +530,7 @@ void CAmbientGeneric::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 		return;
 
 	// Don't bother sending the position of the source if we have to play everywhere
-	if ( FBitSet( m_spawnflags, SF_AMBIENT_SOUND_EVERYWHERE ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_AMBIENT_SOUND_EVERYWHERE) )
 		return;
 
 	Assert( pInfo->m_pClientEnt );
@@ -958,7 +958,7 @@ void CAmbientGeneric::ToggleSound()
 			m_fActive = false;
 			
 			// HACKHACK - this makes the code in Precache() work properly after a save/restore
-			m_spawnflags |= SF_AMBIENT_SOUND_START_SILENT;
+			GetEngineObject()->AddSpawnFlags(SF_AMBIENT_SOUND_START_SILENT);
 
 			if (m_dpv.spindownsav || m_dpv.fadeoutsav)
 			{

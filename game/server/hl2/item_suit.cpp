@@ -44,7 +44,7 @@ public:
 		if ( pPlayer->IsSuitEquipped() )
 			return FALSE;
 
-		if ( m_spawnflags & SF_SUIT_SHORTLOGON )
+		if (GetEngineObject()->GetSpawnFlags() & SF_SUIT_SHORTLOGON)
 			UTIL_EmitSoundSuit(pPlayer, "!HEV_A0");		// short version of suit logon,
 		else
 			UTIL_EmitSoundSuit(pPlayer, "!HEV_AAx");	// long version of suit logon

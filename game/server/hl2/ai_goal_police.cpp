@@ -86,7 +86,7 @@ bool CAI_PoliceGoal::ShouldKnockOutTarget( const Vector &targetPos, bool bTarget
 		return true;
 
 	// Must be flagged to do it
-	if ( HasSpawnFlags( SF_POLICE_GOAL_KNOCKOUT_BEHIND ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_POLICE_GOAL_KNOCKOUT_BEHIND ) == false )
 		return false;
 
 	// If the target's not visible, we don't care about him
@@ -121,7 +121,7 @@ void CAI_PoliceGoal::KnockOutTarget( CBaseEntity *pTarget )
 //-----------------------------------------------------------------------------
 bool CAI_PoliceGoal::ShouldRemainAtPost( void )
 {
-	return HasSpawnFlags( SF_POLICE_GOAL_DO_NOT_LEAVE_POST );
+	return GetEngineObject()->HasSpawnFlags( SF_POLICE_GOAL_DO_NOT_LEAVE_POST );
 }
 
 //-----------------------------------------------------------------------------

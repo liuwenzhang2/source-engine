@@ -304,7 +304,7 @@ void CTimerEntity::FireTimer( void )
 		//
 		// Up/down timers alternate between two outputs.
 		//
-		if (m_spawnflags & SF_TIMER_UPDOWN)
+		if (GetEngineObject()->GetSpawnFlags() & SF_TIMER_UPDOWN)
 		{
 			if (m_bUpDownState)
 			{
@@ -694,14 +694,14 @@ void CMathRemap::InputValue( inputdata_t &inputdata )
 	//
 	float flClampValue = clamp(flValue, m_flInMin, m_flInMax);
 
-	if ((flClampValue == flValue) || !FBitSet(m_spawnflags, SF_MATH_REMAP_IGNORE_OUT_OF_RANGE))
+	if ((flClampValue == flValue) || !GetEngineObject()->HasSpawnFlags(SF_MATH_REMAP_IGNORE_OUT_OF_RANGE))
 	{
 		//
 		// Remap the input value to the desired output range and update the output.
 		//
 		float flRemappedValue = m_flOut1 + (((flValue - m_flInMin) * (m_flOut2 - m_flOut1)) / (m_flInMax - m_flInMin));
 
-		if ( FBitSet( m_spawnflags, SF_MATH_REMAP_CLAMP_OUTPUT_TO_RANGE ) )
+		if (GetEngineObject()->HasSpawnFlags(SF_MATH_REMAP_CLAMP_OUTPUT_TO_RANGE ) )
 		{
 			flRemappedValue = clamp( flRemappedValue, m_flOut1, m_flOut2 );
 		}
@@ -798,7 +798,7 @@ void CMathColorBlend::InputValue( inputdata_t &inputdata )
 	// Disallow out-of-range input values to avoid out-of-range output values.
 	//
 	float flClampValue = clamp(flValue, m_flInMin, m_flInMax);
-	if ((flClampValue == flValue) || !FBitSet(m_spawnflags, SF_COLOR_BLEND_IGNORE_OUT_OF_RANGE))
+	if ((flClampValue == flValue) || !GetEngineObject()->HasSpawnFlags(SF_COLOR_BLEND_IGNORE_OUT_OF_RANGE))
 	{
 		//
 		// Remap the input value to the desired output color and update the output.
@@ -924,7 +924,7 @@ void CEnvGlobal::Spawn( void )
 	}
 #endif
 
-	if ( FBitSet( m_spawnflags, SF_GLOBAL_SET ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_GLOBAL_SET) )
 	{
 		if ( !engine->GlobalEntity_IsInTable( m_globalstate ) )
 		{
@@ -1179,7 +1179,7 @@ bool CMultiSource::KeyValue( const char *szKeyName, const char *szValue )
 void CMultiSource::Spawn()
 { 
 	SetNextThink( gpGlobals->curtime + 0.1f );
-	m_spawnflags |= SF_MULTI_INIT;	// Until it's initialized
+	GetEngineObject()->AddSpawnFlags(SF_MULTI_INIT);	// Until it's initialized
 	SetThink(&CMultiSource::Register);
 }
 
@@ -1233,7 +1233,7 @@ bool CMultiSource::IsTriggered( CBaseEntity * )
 	int i = 0;
 
 	// Still initializing?
-	if ( m_spawnflags & SF_MULTI_INIT )
+	if (GetEngineObject()->GetSpawnFlags() & SF_MULTI_INIT)
 		return 0;
 
 	while (i < m_iTotal)
@@ -1287,7 +1287,7 @@ void CMultiSource::Register(void)
 		pTarget = gEntList.FindEntityByClassname( pTarget, "multi_manager" );
 	}
 
-	m_spawnflags &= ~SF_MULTI_INIT;
+	GetEngineObject()->RemoveSpawnFlags(SF_MULTI_INIT);
 }
 
 

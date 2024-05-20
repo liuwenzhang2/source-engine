@@ -339,6 +339,13 @@ public:
 	void AddEFlags(int nEFlagMask);
 	void RemoveEFlags(int nEFlagMask);
 	bool IsEFlagSet(int nEFlagMask) const;
+	int GetSpawnFlags(void) const;
+	void SetSpawnFlags(int nFlags);
+	void AddSpawnFlags(int nFlags);
+	void RemoveSpawnFlags(int nFlags);
+	void ClearSpawnFlags(void);
+	bool HasSpawnFlags(int nFlags) const;
+
 	void SetCheckUntouch(bool check);
 	bool GetCheckUntouch() const;
 	int GetTouchStamp();
@@ -433,6 +440,8 @@ private:
 	CNetworkVar(unsigned char, m_iParentAttachment); // 0 if we're relative to the parent's absorigin and absangles.
 
 	int		m_iEFlags;	// entity flags EFL_*
+	// FIXME: Make this private! Still too many references to do so...
+	CNetworkVar(int, m_spawnflags);
 	// used so we know when things are no longer touching
 	int		touchStamp;
 	int		m_fDataObjectTypes;
@@ -562,6 +571,36 @@ inline void CEngineObjectInternal::RemoveEFlags(int nEFlagMask)
 inline bool CEngineObjectInternal::IsEFlagSet(int nEFlagMask) const
 {
 	return (m_iEFlags & nEFlagMask) != 0;
+}
+
+
+inline int CEngineObjectInternal::GetSpawnFlags(void) const
+{
+	return m_spawnflags;
+}
+
+inline void CEngineObjectInternal::SetSpawnFlags(int nFlags)
+{
+	m_spawnflags = nFlags;
+}
+
+inline void CEngineObjectInternal::AddSpawnFlags(int nFlags)
+{
+	m_spawnflags |= nFlags;
+}
+inline void CEngineObjectInternal::RemoveSpawnFlags(int nFlags)
+{
+	m_spawnflags &= ~nFlags;
+}
+
+inline void CEngineObjectInternal::ClearSpawnFlags(void)
+{
+	m_spawnflags = 0;
+}
+
+inline bool CEngineObjectInternal::HasSpawnFlags(int nFlags) const
+{
+	return (m_spawnflags & nFlags) != 0;
 }
 
 inline bool CEngineObjectInternal::GetCheckUntouch() const

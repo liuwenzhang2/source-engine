@@ -134,7 +134,7 @@ CEnvShake::~CEnvShake( void )
 float CEnvShake::Radius(bool bPlayers)
 {
 	// The radius for players is zero if SF_SHAKE_EVERYONE is set
-	if ( bPlayers && HasSpawnFlags(SF_SHAKE_EVERYONE))
+	if ( bPlayers && GetEngineObject()->HasSpawnFlags(SF_SHAKE_EVERYONE))
 		return 0;
 	return m_Radius;
 }
@@ -148,12 +148,12 @@ void CEnvShake::Spawn( void )
 	SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 	
-	if ( GetSpawnFlags() & SF_SHAKE_EVERYONE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_SHAKE_EVERYONE )
 	{
 		m_Radius = 0;
 	}
 	
-	if ( HasSpawnFlags( SF_SHAKE_NO_VIEW ) && !HasSpawnFlags( SF_SHAKE_PHYSICS ) && !HasSpawnFlags( SF_SHAKE_ROPES ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SHAKE_NO_VIEW ) && !GetEngineObject()->HasSpawnFlags( SF_SHAKE_PHYSICS ) && !GetEngineObject()->HasSpawnFlags( SF_SHAKE_ROPES ) )
 	{
 		DevWarning( "env_shake %s with \"Don't shake view\" spawnflag set without \"Shake physics\" or \"Shake ropes\" spawnflags set.", GetDebugName() );
 	}
@@ -179,18 +179,18 @@ void CEnvShake::OnRestore( void )
 //-----------------------------------------------------------------------------
 void CEnvShake::ApplyShake( ShakeCommand_t command )
 {
-	if ( !HasSpawnFlags( SF_SHAKE_NO_VIEW ) || !HasSpawnFlags( SF_SHAKE_NO_RUMBLE ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_SHAKE_NO_VIEW ) || !GetEngineObject()->HasSpawnFlags( SF_SHAKE_NO_RUMBLE ) )
 	{
-		bool air = (GetSpawnFlags() & SF_SHAKE_INAIR) ? true : false;
+		bool air = (GetEngineObject()->GetSpawnFlags() & SF_SHAKE_INAIR) ? true : false;
 		UTIL_ScreenShake(GetEngineObject()->GetAbsOrigin(), Amplitude(), Frequency(), Duration(), Radius(), command, air );
 	}
 		
-	if ( GetSpawnFlags() & SF_SHAKE_ROPES )
+	if (GetEngineObject()->GetSpawnFlags() & SF_SHAKE_ROPES )
 	{
 		CRopeKeyframe::ShakeRopes(GetEngineObject()->GetAbsOrigin(), Radius(false), Frequency() );
 	}
 
-	if ( GetSpawnFlags() & SF_SHAKE_PHYSICS )
+	if (GetEngineObject()->GetSpawnFlags() & SF_SHAKE_PHYSICS )
 	{
 		if ( !m_pShakeController )
 		{
@@ -258,11 +258,11 @@ void CEnvShake::ApplyShake( ShakeCommand_t command )
 //-----------------------------------------------------------------------------
 void CEnvShake::InputStartShake( inputdata_t &inputdata )
 {
-	if ( HasSpawnFlags( SF_SHAKE_NO_RUMBLE ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SHAKE_NO_RUMBLE ) )
 	{
 		ApplyShake( SHAKE_START_NORUMBLE );
 	}
-	else if ( HasSpawnFlags( SF_SHAKE_NO_VIEW ) )
+	else if (GetEngineObject()->HasSpawnFlags( SF_SHAKE_NO_VIEW ) )
 	{
 		ApplyShake( SHAKE_START_RUMBLEONLY );
 	}

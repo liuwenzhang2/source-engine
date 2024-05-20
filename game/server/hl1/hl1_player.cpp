@@ -227,7 +227,7 @@ void CHL1_Player::PreThink(void)
 				}
 			}
 		}
-		else if ( !( GetFlags() & FL_ONGROUND ) || pTrain->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL ) || (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT) ) )
+		else if ( !( GetFlags() & FL_ONGROUND ) || pTrain->GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL ) || (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT) ) )
 		{
 			// Turn off the train if you jump, strafe, or the train controls go dead
 			m_afPhysicsFlags &= ~PFLAG_DIROVERRIDE;
@@ -421,7 +421,7 @@ CBaseEntity	*CHL1_Player::GiveNamedItem( const char *pszName, int iSubType )
 	}
 
 	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
-	pent->AddSpawnFlags( SF_NORESPAWN );
+	pent->GetEngineObject()->AddSpawnFlags( SF_NORESPAWN );
 
 	if ( iSubType )
 	{

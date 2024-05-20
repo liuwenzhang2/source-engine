@@ -5445,7 +5445,7 @@ void CFuncTeamWall::DrawThink( void )
 
 		SetCollisionGroup( DOD_COLLISIONGROUP_BLOCKERWALL );
 
-		if ( FBitSet( m_spawnflags, SF_TEAM_WALL_NO_HINT ) == false )
+		if (GetEngineObject()->HasSpawnFlags(SF_TEAM_WALL_NO_HINT) == false )
 		{
 			SetTouch( &CFuncNewTeamWall::WallTouch );
 			m_flNextHintTime = gpGlobals->curtime;

@@ -194,7 +194,7 @@ protected:
 
 	virtual bool	OnSide( void );
 
-	bool	IsCitizenTurret( void ) { return HasSpawnFlags( SF_FLOOR_TURRET_CITIZEN ); }
+	bool	IsCitizenTurret( void ) { return GetEngineObject()->HasSpawnFlags( SF_FLOOR_TURRET_CITIZEN ); }
 	bool	UpdateFacing( void );
 	void	DryFire( void );
 	void	UpdateMuzzleMatrix();

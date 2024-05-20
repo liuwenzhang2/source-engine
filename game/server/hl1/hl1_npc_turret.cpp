@@ -219,8 +219,8 @@ void CNPC_BaseTurret::Spawn()
 	AddFlag( FL_NPC );
 	SetUse( &CNPC_BaseTurret::TurretUse );
 
-	if (( m_spawnflags & SF_MONSTER_TURRET_AUTOACTIVATE ) 
-		&& !( m_spawnflags & SF_MONSTER_TURRET_STARTINACTIVE ))
+	if ((GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_AUTOACTIVATE )
+		&& !(GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_STARTINACTIVE ))
 	{
 		m_iAutoStart = true;
 	}
@@ -235,7 +235,7 @@ void CNPC_BaseTurret::Spawn()
 	m_bloodColor = DONT_BLEED;
 	m_flDamageTime = 0;
 
-	if ( GetSpawnFlags() & SF_MONSTER_TURRET_STARTINACTIVE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_STARTINACTIVE )
 	{
 		 SetTurretAnim( TURRET_ANIM_RETIRE );
 		 SetCycle( 0.0f );
@@ -1063,7 +1063,7 @@ void CNPC_BaseTurret::TurretUse( CBaseEntity *pActivator, CBaseEntity *pCaller, 
 		SetNextThink( gpGlobals->curtime + 0.1 ); // turn on delay
 
 		// if the turret is flagged as an autoactivate turret, re-enable it's ability open self.
-		if ( m_spawnflags & SF_MONSTER_TURRET_AUTOACTIVATE )
+		if (GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_AUTOACTIVATE )
 		{
 			m_iAutoStart = TRUE;
 		}
@@ -1091,7 +1091,7 @@ void CNPC_BaseTurret::InputActivate( inputdata_t &inputdata )
 		SetNextThink( gpGlobals->curtime + 0.1 ); // turn on delay
 
 		// if the turret is flagged as an autoactivate turret, re-enable it's ability open self.
-		if ( m_spawnflags & SF_MONSTER_TURRET_AUTOACTIVATE )
+		if (GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_AUTOACTIVATE )
 		{
 			m_iAutoStart = TRUE;
 		}
@@ -1323,7 +1323,7 @@ void CNPC_MiniTurret::Spawn()
 	SetThink(&CNPC_MiniTurret::Initialize);	
 	SetNextThink(gpGlobals->curtime + 0.3); 
 
-	if (( m_spawnflags & SF_MONSTER_TURRET_AUTOACTIVATE ) && !( m_spawnflags & SF_MONSTER_TURRET_STARTINACTIVE ))
+	if ((GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_AUTOACTIVATE ) && !(GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_STARTINACTIVE ))
 	{
 		m_iAutoStart = true;
 	}

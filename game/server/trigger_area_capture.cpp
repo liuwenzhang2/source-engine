@@ -89,7 +89,7 @@ void CTriggerAreaCapture::Spawn( void )
 {
 	BaseClass::Spawn();
 
-	AddSpawnFlags( SF_TRIGGER_ALLOW_CLIENTS );
+	GetEngineObject()->AddSpawnFlags( SF_TRIGGER_ALLOW_CLIENTS );
 
 	InitTrigger();
 	

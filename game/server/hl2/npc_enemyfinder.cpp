@@ -46,7 +46,7 @@ public:
 	void	GatherConditions( void );
 	bool	ShouldChooseNewEnemy();
 	bool	IsValidEnemy( CBaseEntity *pTarget );
-	bool	CanBeAnEnemyOf( CBaseEntity *pEnemy ) { return HasSpawnFlags( SF_ENEMY_FINDER_ENEMY_ALLOWED ); }
+	bool	CanBeAnEnemyOf( CBaseEntity *pEnemy ) { return GetEngineObject()->HasSpawnFlags( SF_ENEMY_FINDER_ENEMY_ALLOWED ); }
 	bool	FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **ppBlocker );
 	Class_T Classify( void );
 	bool CanBeSeenBy( CAI_BaseNPC *pNPC ) { return CanBeAnEnemyOf( pNPC ); } // allows entities to be 'invisible' to NPC senses.
@@ -200,7 +200,7 @@ void CNPC_EnemyFinder::Spawn( void )
 		SetDistLook( m_flMaxSearchDist );
 	}
 
-	if ( HasSpawnFlags( SF_ENEMY_FINDER_SHORT_MEMORY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_ENEMY_FINDER_SHORT_MEMORY ) )
 	{
 		GetEnemies()->SetEnemyDiscardTime( 0.2 );
 	}
@@ -238,10 +238,10 @@ bool CNPC_EnemyFinder::FVisible( CBaseEntity *pTarget, int traceMask, CBaseEntit
 	if ( m_flMaxSearchDist && flTargetDist > m_flMaxSearchDist)
 		return false;
 
-	if ( !FBitSet( m_spawnflags, SF_ENEMY_FINDER_CHECK_VIS) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_ENEMY_FINDER_CHECK_VIS) )
 		return true;
 
-	if ( !HasSpawnFlags(SF_ENEMY_FINDER_APC_VIS) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_ENEMY_FINDER_APC_VIS) )
 	{
 		bool bIsVisible = BaseClass::FVisible( pTarget, traceMask, ppBlocker );
 		
@@ -301,7 +301,7 @@ bool CNPC_EnemyFinder::IsValidEnemy( CBaseEntity *pTarget )
 	if ( m_flMaxSearchDist && flTargetDist > m_flMaxSearchDist)
 		return false;
 
-	if ( !FBitSet( m_spawnflags, SF_ENEMY_FINDER_CHECK_VIS) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_ENEMY_FINDER_CHECK_VIS) )
 		return true;
 
 	if ( GetSenses()->DidSeeEntity( pTarget ) )
@@ -340,7 +340,7 @@ bool CNPC_EnemyFinder::IsValidEnemy( CBaseEntity *pTarget )
 //------------------------------------------------------------------------------
 void CNPC_EnemyFinder::StartNPC ( void )
 {
-	AddSpawnFlags(SF_NPC_FALL_TO_GROUND);	// this prevents CAI_BaseNPC from slamming the finder to 
+	GetEngineObject()->AddSpawnFlags(SF_NPC_FALL_TO_GROUND);	// this prevents CAI_BaseNPC from slamming the finder to 
 											// the ground just because it's not MOVETYPE_FLY
 	BaseClass::StartNPC();
 
@@ -423,7 +423,7 @@ bool CNPC_EnemyFinder::ShouldAlwaysThink()
 
 		if ( !m_flMaxSearchDist || playerDistSqr <= Square(m_flMaxSearchDist) )
 		{
-			if ( !FBitSet( m_spawnflags, SF_ENEMY_FINDER_CHECK_VIS) )
+			if ( !GetEngineObject()->HasSpawnFlags(SF_ENEMY_FINDER_CHECK_VIS) )
 				return true;
 				
 			if ( playerDistSqr <= Square( 50 * 12 ) )

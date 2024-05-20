@@ -531,7 +531,7 @@ void CNPC_CombineGunship::Spawn( void )
 {
 	Precache( );
 
-	if ( HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 	{
 		SetModel( "models/combine_helicopter.mdl" );
 	}
@@ -603,7 +603,7 @@ void CNPC_CombineGunship::Spawn( void )
 	m_bInvulnerable		= false;
 	
 	// See if we should start being able to attack
-	m_bCanGroundAttack	= ( m_spawnflags & SF_GUNSHIP_NO_GROUND_ATTACK ) ? false : true;
+	m_bCanGroundAttack	= (GetEngineObject()->GetSpawnFlags() & SF_GUNSHIP_NO_GROUND_ATTACK) ? false : true;
 
 	m_flEndDestructTime = 0;
 
@@ -650,7 +650,7 @@ void CNPC_CombineGunship::OnRestore( void )
 //------------------------------------------------------------------------------
 void CNPC_CombineGunship::Precache( void )
 {
-	if ( HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 	{
 		engine->PrecacheModel( "models/combine_helicopter.mdl" );
 		Chopper_PrecacheChunks( this );
@@ -1272,7 +1272,7 @@ void CNPC_CombineGunship::DoCombat( void )
 			{
 				m_flNextSeeEnemySound = gpGlobals->curtime + 5.0;
 
-				if ( !HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
+				if ( !GetEngineObject()->HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 				{
 					const char* soundname = "NPC_CombineGunship.SeeEnemy";
 					CPASAttenuationFilter filter(this, soundname);
@@ -1384,7 +1384,7 @@ void CNPC_CombineGunship::DoCombat( void )
 	}
 
 	// If we're using the chopper model, align the gun towards the target
-	if ( HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 	{
 		Vector vGunPosition;
 		GetAttachment( "gun", vGunPosition );
@@ -1508,7 +1508,7 @@ void CNPC_CombineGunship::PrescheduleThink( void )
 	if( m_lifeState == LIFE_ALIVE )
 	{
 		// Chopper doesn't ping
-		if ( !HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
+		if ( !GetEngineObject()->HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 		{
 			Ping();
 		}
@@ -2030,7 +2030,7 @@ void CNPC_CombineGunship::BeginDestruct( void )
 	// Switch to damaged skin
 	m_nSkin = 1;
 
-	if ( HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 	{
 		Chopper_BecomeChunks( this );
 		SetThink( &CNPC_CombineGunship::SUB_Remove );
@@ -2985,7 +2985,7 @@ int	CNPC_CombineGunship::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	CTakeDamageInfo info = inputInfo;
 
 	// Make a pain sound
-	if ( !HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_GUNSHIP_USE_CHOPPER_MODEL ) )
 	{
 		const char* soundname = "NPC_CombineGunship.Pain";
 		CPASAttenuationFilter filter(this, soundname);

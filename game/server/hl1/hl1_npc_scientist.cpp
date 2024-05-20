@@ -105,7 +105,7 @@ void CNPC_Scientist::ModifyOrAppendCriteria( AI_CriteriaSet& criteriaSet )
 {
 	BaseClass::ModifyOrAppendCriteria( criteriaSet );
 
-	bool predisaster = FBitSet( m_spawnflags, SF_NPC_PREDISASTER ) ? true : false;
+	bool predisaster = GetEngineObject()->HasSpawnFlags(SF_NPC_PREDISASTER) ? true : false;
 
 	criteriaSet.AppendCriteria( "disaster", predisaster ? "[disaster::pre]" : "[disaster::post]" );
 }
@@ -671,7 +671,7 @@ int CNPC_Scientist::SelectSchedule( void )
 			}
 		}
 	}
-	else if ( HasCondition( COND_PLAYER_PUSHING ) && !(GetSpawnFlags() & SF_NPC_PREDISASTER ) )
+	else if ( HasCondition( COND_PLAYER_PUSHING ) && !(GetEngineObject()->GetSpawnFlags() & SF_NPC_PREDISASTER ) )
 	{		// Player wants me to move
 			return SCHED_HL1TALKER_FOLLOW_MOVE_AWAY;
 	}
@@ -1007,7 +1007,7 @@ void CNPC_SittingScientist::Spawn( )
 	CapabilitiesClear();
 	CapabilitiesAdd( bits_CAP_TURN_HEAD );
 
-	m_spawnflags |= SF_NPC_PREDISASTER; // predisaster only!
+	GetEngineObject()->AddSpawnFlags(SF_NPC_PREDISASTER); // predisaster only!
 
 	if ( m_nBody == -1 )
 	{// -1 chooses a random head

@@ -216,7 +216,7 @@ public:
 	int OnTakeDamage_Alive( const CTakeDamageInfo &info );
 	bool WeaponLOSCondition(const Vector &ownerPos, const Vector &targetPos, bool bSetConditions) {return true;}
 	int IRelationPriority( CBaseEntity *pTarget );
-	bool IsFastSniper() { return HasSpawnFlags(SF_SNIPER_FAST); }
+	bool IsFastSniper() { return GetEngineObject()->HasSpawnFlags(SF_SNIPER_FAST); }
 
 	bool QuerySeeEntity( CBaseEntity *pEntity, bool bOnlyHateOrFearIfNPC = false );
 
@@ -589,7 +589,7 @@ bool CProtoSniper::FInViewCone ( CBaseEntity *pEntity )
 
 		pPlayer = ToBasePlayer( pEntity );
 
-		if( m_spawnflags & SF_SNIPER_VIEWCONE )
+		if(GetEngineObject()->GetSpawnFlags() & SF_SNIPER_VIEWCONE)
 		{
 			// See how close this spot is to the laser.
 			Vector	vecEyes;
@@ -951,7 +951,7 @@ void CProtoSniper::Spawn( void )
 	m_flFieldOfView		= 0.2;
 	m_NPCState			= NPC_STATE_NONE;
 
-	if( HasSpawnFlags( SF_SNIPER_STARTDISABLED ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_SNIPER_STARTDISABLED ) )
 	{
 		m_fEnabled = false;
 	}
@@ -966,8 +966,8 @@ void CProtoSniper::Spawn( void )
 
 	m_HackedGunPos = Vector ( 0, 0, 0 );
 
-	m_spawnflags |= SF_NPC_LONG_RANGE;
-	m_spawnflags |= SF_NPC_ALWAYSTHINK;
+	GetEngineObject()->AddSpawnFlags(SF_NPC_LONG_RANGE);
+	GetEngineObject()->AddSpawnFlags(SF_NPC_ALWAYSTHINK);
 
 	m_pBeam = NULL;
 	m_bSweepHighestPriority = false;
@@ -976,7 +976,7 @@ void CProtoSniper::Spawn( void )
 
 	NPCInit();
 
-	if( m_spawnflags & SF_SNIPER_HIDDEN )
+	if(GetEngineObject()->GetSpawnFlags() & SF_SNIPER_HIDDEN)
 	{
 		AddEffects( EF_NODRAW );
 		AddSolidFlags( FSOLID_NOT_SOLID );
@@ -1193,7 +1193,7 @@ Class_T	CProtoSniper::Classify( void )
 //-----------------------------------------------------------------------------
 Vector CProtoSniper::GetBulletOrigin( void )
 {
-	if( m_spawnflags & SF_SNIPER_HIDDEN )
+	if(GetEngineObject()->GetSpawnFlags() & SF_SNIPER_HIDDEN)
 	{
 		return GetEngineObject()->GetAbsOrigin();
 	}
@@ -1325,7 +1325,7 @@ int CProtoSniper::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CProtoSniper::Event_Killed( const CTakeDamageInfo &info )
 {
-	if( !(m_spawnflags & SF_SNIPER_NOCORPSE) )
+	if( !(GetEngineObject()->GetSpawnFlags() & SF_SNIPER_NOCORPSE))
 	{
 		Vector vecForward;
 		
@@ -1335,7 +1335,7 @@ void CProtoSniper::Event_Killed( const CTakeDamageInfo &info )
 		
 		float flFadeTime = 0.0;
 
-		if( HasSpawnFlags( SF_NPC_FADE_CORPSE ) )
+		if(GetEngineObject()->HasSpawnFlags( SF_NPC_FADE_CORPSE ) )
 		{
 			flFadeTime = 5.0;
 		}
@@ -1463,7 +1463,7 @@ int CProtoSniper::SelectSchedule ( void )
 	if( HasCondition( COND_SNIPER_SWEEP_TARGET ) )
 	{
 		// Sweep a target. Scripted by level designers!
-		if( ( m_hSweepTarget && m_hSweepTarget->HasSpawnFlags( SF_SNIPERTARGET_NOINTERRUPT ) ) || m_bSweepHighestPriority )
+		if( ( m_hSweepTarget && m_hSweepTarget->GetEngineObject()->HasSpawnFlags( SF_SNIPERTARGET_NOINTERRUPT ) ) || m_bSweepHighestPriority )
 		{
 			return SCHED_PSNIPER_SWEEP_TARGET_NOINTERRUPT;
 		}
@@ -1841,7 +1841,7 @@ int CProtoSniper::RangeAttack1Conditions ( float flDot, float flDist )
 
 	if( fFrustration >= 2 && !m_fIsPatient )
 	{
-		if( !(m_spawnflags & SF_SNIPER_NOSWEEP) && !m_hDecoyObject && FindDecoyObject() )
+		if( !(GetEngineObject()->GetSpawnFlags() & SF_SNIPER_NOSWEEP) && !m_hDecoyObject && FindDecoyObject())
 		{
 			// If I don't have a decoy, try to find one and shoot it.
 			return COND_SNIPER_CANATTACKDECOY;
@@ -2016,7 +2016,7 @@ void CProtoSniper::StartTask( const Task_t *pTask )
 		
 		// Snap directly to this target if this spawnflag is set.
 		// Otherwise, sweep from wherever the cursor was.
-		if( m_hSweepTarget->HasSpawnFlags( SF_SNIPERTARGET_SNAPTO ) )
+		if( m_hSweepTarget->GetEngineObject()->HasSpawnFlags( SF_SNIPERTARGET_SNAPTO ) )
 		{
 			m_vecPaintCursor = m_hSweepTarget->GetEngineObject()->GetLocalOrigin();
 		}
@@ -2031,14 +2031,14 @@ void CProtoSniper::StartTask( const Task_t *pTask )
 		// If the sniper has a sweep target, clear it, unless it's flagged to resume
 		if( m_hSweepTarget != NULL )
 		{
-			if ( !m_hSweepTarget->HasSpawnFlags( SF_SNIPERTARGET_RESUME) )
+			if ( !m_hSweepTarget->GetEngineObject()->HasSpawnFlags( SF_SNIPERTARGET_RESUME) )
 			{
 				ClearTargetGroup();
 				m_hSweepTarget = NULL;
 			}
 		}
 
-		if( m_spawnflags & SF_SNIPER_VIEWCONE )
+		if(GetEngineObject()->GetSpawnFlags() & SF_SNIPER_VIEWCONE)
 		{
 			SetWait( SNIPER_FOG_PAINT_ENEMY_TIME );
 
@@ -2083,7 +2083,7 @@ void CProtoSniper::StartTask( const Task_t *pTask )
 
 			Vector vecCursor;
 
-			if ( m_spawnflags & SF_SNIPER_NOSWEEP )
+			if (GetEngineObject()->GetSpawnFlags() & SF_SNIPER_NOSWEEP)
 			{
 				LaserOn( m_vecPaintCursor, vec3_origin );
 			}
@@ -2222,7 +2222,7 @@ void CProtoSniper::RunTask( const Task_t *pTask )
 			CBaseEntity *pNext;
 			pNext = gEntList.FindEntityByName( NULL, m_hSweepTarget->m_target );
 
-			if ( m_hSweepTarget->HasSpawnFlags( SF_SNIPERTARGET_SHOOTME ) )
+			if ( m_hSweepTarget->GetEngineObject()->HasSpawnFlags( SF_SNIPERTARGET_SHOOTME ) )
 			{
 				FireBullet( m_hSweepTarget->GetEngineObject()->GetLocalOrigin(), false );
 				TaskComplete(); // Force a reload.
@@ -2272,7 +2272,7 @@ void CProtoSniper::RunTask( const Task_t *pTask )
 		}
 		else
 		{
-			if ( m_hSweepTarget->HasSpawnFlags( SF_SNIPERTARGET_SNAPSHOT ) )
+			if ( m_hSweepTarget->GetEngineObject()->HasSpawnFlags( SF_SNIPERTARGET_SNAPSHOT ) )
 			{
 				m_fSnapShot = true;
 			}
@@ -2421,7 +2421,7 @@ void CProtoSniper::PrescheduleThink( void )
 //---------------------------------------------------------
 Vector CProtoSniper::EyePosition( void )
 {
-	if( m_spawnflags & SF_SNIPER_HIDDEN )
+	if(GetEngineObject()->GetSpawnFlags() & SF_SNIPER_HIDDEN)
 	{
 		return GetEngineObject()->GetLocalOrigin();
 	}
@@ -2757,7 +2757,7 @@ bool CProtoSniper::FindFrustratedShot( float flNoise )
 #define SNIPER_TARGET_VERTICAL_OFFSET Vector( 0, 0, 5 );
 bool CProtoSniper::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **ppBlocker )
 {
-	if( m_spawnflags & SF_SNIPER_VIEWCONE )
+	if(GetEngineObject()->GetSpawnFlags() & SF_SNIPER_VIEWCONE)
 	{
 		// Viewcone snipers are blind with their laser off.
 		if( !IsLaserOn() )

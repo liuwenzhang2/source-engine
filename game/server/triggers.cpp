@@ -157,20 +157,20 @@ void CBaseTrigger::InputTouchTest( inputdata_t &inputdata )
 //------------------------------------------------------------------------------
 void CBaseTrigger::Spawn()
 {
-	if ( HasSpawnFlags( SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS ) || HasSpawnFlags( SF_TRIGGER_ONLY_NPCS_IN_VEHICLES ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS ) || GetEngineObject()->HasSpawnFlags( SF_TRIGGER_ONLY_NPCS_IN_VEHICLES ) )
 	{
 		// Automatically set this trigger to work with NPC's.
-		AddSpawnFlags( SF_TRIGGER_ALLOW_NPCS );
+		GetEngineObject()->AddSpawnFlags( SF_TRIGGER_ALLOW_NPCS );
 	}
 
-	if ( HasSpawnFlags( SF_TRIGGER_ONLY_CLIENTS_IN_VEHICLES ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_TRIGGER_ONLY_CLIENTS_IN_VEHICLES ) )
 	{
-		AddSpawnFlags( SF_TRIGGER_ALLOW_CLIENTS );
+		GetEngineObject()->AddSpawnFlags( SF_TRIGGER_ALLOW_CLIENTS );
 	}
 
-	if ( HasSpawnFlags( SF_TRIGGER_ONLY_CLIENTS_OUT_OF_VEHICLES ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_TRIGGER_ONLY_CLIENTS_OUT_OF_VEHICLES ) )
 	{
-		AddSpawnFlags( SF_TRIGGER_ALLOW_CLIENTS );
+		GetEngineObject()->AddSpawnFlags( SF_TRIGGER_ALLOW_CLIENTS );
 	}
 
 	BaseClass::Spawn();
@@ -343,7 +343,7 @@ void CBaseTrigger::InitTrigger( )
 
 	m_hTouchingEntities.Purge();
 
-	if ( HasSpawnFlags( SF_TRIG_TOUCH_DEBRIS ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_TRIG_TOUCH_DEBRIS ) )
 	{
 		CollisionProp()->AddSolidFlags( FSOLID_TRIGGER_TOUCH_DEBRIS );
 	}
@@ -357,14 +357,14 @@ void CBaseTrigger::InitTrigger( )
 bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 {
 	// First test spawn flag filters
-	if ( HasSpawnFlags(SF_TRIGGER_ALLOW_ALL) ||
-		(HasSpawnFlags(SF_TRIGGER_ALLOW_CLIENTS) && (pOther->GetFlags() & FL_CLIENT)) ||
-		(HasSpawnFlags(SF_TRIGGER_ALLOW_NPCS) && (pOther->GetFlags() & FL_NPC)) ||
-		(HasSpawnFlags(SF_TRIGGER_ALLOW_PUSHABLES) && FClassnameIs(pOther, "func_pushable")) ||
-		(HasSpawnFlags(SF_TRIGGER_ALLOW_PHYSICS) && pOther->GetMoveType() == MOVETYPE_VPHYSICS) 
+	if (GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_ALL) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_CLIENTS) && (pOther->GetFlags() & FL_CLIENT)) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_NPCS) && (pOther->GetFlags() & FL_NPC)) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PUSHABLES) && FClassnameIs(pOther, "func_pushable")) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PHYSICS) && pOther->GetMoveType() == MOVETYPE_VPHYSICS)
 #if defined( HL2_EPISODIC ) || defined( TF_DLL )		
 		||
-		(	HasSpawnFlags(SF_TRIG_TOUCH_DEBRIS) && 
+		(GetEngineObject()->HasSpawnFlags(SF_TRIG_TOUCH_DEBRIS) &&
 			(pOther->GetCollisionGroup() == COLLISION_GROUP_DEBRIS ||
 			pOther->GetCollisionGroup() == COLLISION_GROUP_DEBRIS_TRIGGER || 
 			pOther->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS)
@@ -376,7 +376,7 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 		{
 			CAI_BaseNPC *pNPC = pOther->MyNPCPointer();
 
-			if ( HasSpawnFlags( SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS ) )
 			{
 				if ( !pNPC || !pNPC->IsPlayerAlly() )
 				{
@@ -384,7 +384,7 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 				}
 			}
 
-			if ( HasSpawnFlags( SF_TRIGGER_ONLY_NPCS_IN_VEHICLES ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_TRIGGER_ONLY_NPCS_IN_VEHICLES ) )
 			{
 				if ( !pNPC || !pNPC->IsInAVehicle() )
 					return false;
@@ -399,7 +399,7 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 			if ( !pPlayer->IsAlive() )
 				return false;
 
-			if ( HasSpawnFlags(SF_TRIGGER_ONLY_CLIENTS_IN_VEHICLES) )
+			if (GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ONLY_CLIENTS_IN_VEHICLES) )
 			{
 				if ( !pPlayer->IsInAVehicle() )
 					return false;
@@ -413,13 +413,13 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 					return false;
 			}
 
-			if ( HasSpawnFlags(SF_TRIGGER_ONLY_CLIENTS_OUT_OF_VEHICLES) )
+			if (GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ONLY_CLIENTS_OUT_OF_VEHICLES) )
 			{
 				if ( pPlayer->IsInAVehicle() )
 					return false;
 			}
 
-			if ( HasSpawnFlags( SF_TRIGGER_DISALLOW_BOTS ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_TRIGGER_DISALLOW_BOTS ) )
 			{
 				if ( pPlayer->IsFakeClient() )
 					return false;
@@ -1124,7 +1124,7 @@ void CTriggerLook::Touch(CBaseEntity *pOther)
 		// Check that toucher is facing the target
 		// ----------------------------------------
 		Vector vLookDir;
-		if ( HasSpawnFlags( SF_TRIGGERLOOK_USEVELOCITY ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_TRIGGERLOOK_USEVELOCITY ) )
 		{
 			vLookDir = pOther->GetEngineObject()->GetAbsVelocity();
 			if ( vLookDir == vec3_origin )
@@ -1198,7 +1198,7 @@ void CTriggerLook::Trigger(CBaseEntity *pActivator, bool bTimeout)
 		SetNextThink( TICK_NEVER_THINK );
 	}
 
-	if (HasSpawnFlags(SF_TRIGGERLOOK_FIREONCE))
+	if (GetEngineObject()->HasSpawnFlags(SF_TRIGGERLOOK_FIREONCE))
 	{
 		SetThink(&CTriggerLook::SUB_Remove);
 		SetNextThink(gpGlobals->curtime);
@@ -1364,7 +1364,7 @@ void CChangeLevel::Spawn( void )
 
 	InitTrigger();
 	
-	if ( !HasSpawnFlags(SF_CHANGELEVEL_NOTOUCH) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_CHANGELEVEL_NOTOUCH) )
 	{
 		SetTouch( &CChangeLevel::TouchChangeLevel );
 	}
@@ -1378,7 +1378,7 @@ void CChangeLevel::Activate( void )
 
 	if ( gpGlobals->eLoadType == MapLoad_NewGame )
 	{
-		if ( HasSpawnFlags( SF_CHANGELEVEL_CHAPTER ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_CHANGELEVEL_CHAPTER ) )
 		{
 			VPhysicsInitStatic();
 			RemoveSolidFlags( FSOLID_NOT_SOLID | FSOLID_TRIGGER );
@@ -1699,7 +1699,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 	VectorRotate( m_vecPushDir, GetEngineObject()->EntityToWorldTransform(), vecAbsDir );
 
 	// Instant trigger, just transfer velocity and remove
-	if (HasSpawnFlags(SF_TRIG_PUSH_ONCE))
+	if (GetEngineObject()->HasSpawnFlags(SF_TRIG_PUSH_ONCE))
 	{
 		pOther->ApplyAbsVelocityImpulse( m_flPushSpeed * vecAbsDir );
 
@@ -1737,7 +1737,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 			if ( pOther->IsPlayer() && 
 				 pOther->GetMoveType() == MOVETYPE_LADDER )
 			{
-				if ( !HasSpawnFlags(SF_TRIG_PUSH_AFFECT_PLAYER_ON_LADDER) )
+				if ( !GetEngineObject()->HasSpawnFlags(SF_TRIG_PUSH_AFFECT_PLAYER_ON_LADDER) )
 				{
 					// Ignore the push
 					return;
@@ -1872,7 +1872,7 @@ void CTriggerTeleport::Touch( CBaseEntity *pOther )
 	Vector vecZero(0,0,0);		
 #endif
 
-	if (!pentLandmark && !HasSpawnFlags(SF_TELEPORT_PRESERVE_ANGLES) )
+	if (!pentLandmark && !GetEngineObject()->HasSpawnFlags(SF_TELEPORT_PRESERVE_ANGLES) )
 	{
 		pAngles = &pentTarget->GetEngineObject()->GetAbsAngles();
 
@@ -2498,7 +2498,7 @@ void CTriggerCamera::Enable( void )
 	m_nOldTakeDamage = m_hPlayer->m_takedamage;
 	m_hPlayer->m_takedamage = DAMAGE_NO;
 	
-	if ( HasSpawnFlags( SF_CAMERA_PLAYER_NOT_SOLID ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_CAMERA_PLAYER_NOT_SOLID ) )
 	{
 		m_hPlayer->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
@@ -2508,12 +2508,12 @@ void CTriggerCamera::Enable( void )
 	m_targetSpeed = m_initialSpeed;
 
 	// this pertains to view angles, not translation.
-	if ( HasSpawnFlags( SF_CAMERA_PLAYER_SNAP_TO ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_CAMERA_PLAYER_SNAP_TO ) )
 	{
 		m_bSnapToGoal = true;
 	}
 
-	if ( HasSpawnFlags(SF_CAMERA_PLAYER_TARGET ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_CAMERA_PLAYER_TARGET ) )
 	{
 		m_hTarget = m_hPlayer;
 	}
@@ -2543,7 +2543,7 @@ void CTriggerCamera::Enable( void )
 		}
 	}
 
-	if (HasSpawnFlags(SF_CAMERA_PLAYER_TAKECONTROL ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_CAMERA_PLAYER_TAKECONTROL ) )
 	{
 		((CBasePlayer*)m_hPlayer.Get())->EnableControl(FALSE);
 	}
@@ -2583,7 +2583,7 @@ void CTriggerCamera::Enable( void )
 	}
 	else
 #endif
-	if (HasSpawnFlags(SF_CAMERA_PLAYER_POSITION ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_CAMERA_PLAYER_POSITION ) )
 	{
 		UTIL_SetOrigin( this, m_hPlayer->EyePosition() );
 		GetEngineObject()->SetLocalAngles( QAngle( m_hPlayer->GetEngineObject()->GetLocalAngles().x, m_hPlayer->GetEngineObject()->GetLocalAngles().y, 0 ) );
@@ -2624,7 +2624,7 @@ void CTriggerCamera::Disable( void )
 {
 	if ( m_hPlayer && m_hPlayer->IsAlive() )
 	{
-		if ( HasSpawnFlags( SF_CAMERA_PLAYER_NOT_SOLID ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_CAMERA_PLAYER_NOT_SOLID ) )
 		{
 			m_hPlayer->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		}
@@ -2685,7 +2685,7 @@ void CTriggerCamera::FollowTarget( )
 		return;
 	}
 
-	if ( !HasSpawnFlags(SF_CAMERA_PLAYER_INFINITE_WAIT) && (!m_hTarget || m_flReturnTime < gpGlobals->curtime) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_CAMERA_PLAYER_INFINITE_WAIT) && (!m_hTarget || m_flReturnTime < gpGlobals->curtime) )
 	{
 		Disable();
 		return;
@@ -2748,7 +2748,7 @@ void CTriggerCamera::FollowTarget( )
 		SetLocalAngularVelocity(vecAngVel);
 	}
 
-	if (!HasSpawnFlags(SF_CAMERA_PLAYER_TAKECONTROL))	
+	if (!GetEngineObject()->HasSpawnFlags(SF_CAMERA_PLAYER_TAKECONTROL))
 	{
 		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.8 );
 		if (GetEngineObject()->GetAbsVelocity().Length( ) < 10.0)
@@ -2764,7 +2764,7 @@ void CTriggerCamera::FollowTarget( )
 
 void CTriggerCamera::Move()
 {
-	if ( HasSpawnFlags( SF_CAMERA_PLAYER_INTERRUPT ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_CAMERA_PLAYER_INTERRUPT ) )
 	{
 		if ( m_hPlayer )
 		{
@@ -3652,12 +3652,12 @@ LINK_ENTITY_TO_CLASS( trigger_playermovement, CTriggerPlayerMovement );
 //-----------------------------------------------------------------------------
 void CTriggerPlayerMovement::Spawn( void )
 {
-	if( HasSpawnFlags( SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS ) )
 	{
 		// @Note (toml 01-07-04): fix up spawn flag collision coding error. Remove at some point once all maps fixed up please!
 		DevMsg("*** trigger_playermovement using obsolete spawnflag. Remove and reset with new value for \"Disable auto player movement\"\n" );
-		RemoveSpawnFlags(SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS);
-		AddSpawnFlags(SF_TRIGGER_MOVE_AUTODISABLE);
+		GetEngineObject()->RemoveSpawnFlags(SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS);
+		GetEngineObject()->AddSpawnFlags(SF_TRIGGER_MOVE_AUTODISABLE);
 	}
 	BaseClass::Spawn();
 
@@ -3677,13 +3677,13 @@ void CTriggerPlayerMovement::StartTouch( CBaseEntity *pOther )
 	if ( !pPlayer )
 		return;
 
-	if ( HasSpawnFlags( SF_TRIGGER_AUTO_DUCK ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_TRIGGER_AUTO_DUCK ) )
 	{
 		pPlayer->ForceButtons( IN_DUCK );
 	}
 
 	// UNDONE: Currently this is the only operation this trigger can do
-	if ( HasSpawnFlags(SF_TRIGGER_MOVE_AUTODISABLE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_TRIGGER_MOVE_AUTODISABLE) )
 	{
 		pPlayer->m_Local.m_bAllowAutoMovement = false;
 	}
@@ -3699,12 +3699,12 @@ void CTriggerPlayerMovement::EndTouch( CBaseEntity *pOther )
 	if ( !pPlayer )
 		return;
 
-	if ( HasSpawnFlags( SF_TRIGGER_AUTO_DUCK ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_TRIGGER_AUTO_DUCK ) )
 	{
 		pPlayer->UnforceButtons( IN_DUCK );
 	}
 
-	if ( HasSpawnFlags(SF_TRIGGER_MOVE_AUTODISABLE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_TRIGGER_MOVE_AUTODISABLE) )
 	{
 		pPlayer->m_Local.m_bAllowAutoMovement = true;
 	}
@@ -3756,7 +3756,7 @@ void CBaseVPhysicsTrigger::Spawn()
 bool CBaseVPhysicsTrigger::CreateVPhysics()
 {
 	IPhysicsObject *pPhysics;
-	if ( !HasSpawnFlags( SF_VPHYSICS_MOTION_MOVEABLE ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_VPHYSICS_MOTION_MOVEABLE ) )
 	{
 		pPhysics = VPhysicsInitStatic();
 	}
@@ -3864,14 +3864,14 @@ bool CBaseVPhysicsTrigger::PassesTriggerFilters( CBaseEntity *pOther )
 		return false;
 
 	// First test spawn flag filters
-	if ( HasSpawnFlags(SF_TRIGGER_ALLOW_ALL) ||
-		(HasSpawnFlags(SF_TRIGGER_ALLOW_CLIENTS) && (pOther->GetFlags() & FL_CLIENT)) ||
-		(HasSpawnFlags(SF_TRIGGER_ALLOW_NPCS) && (pOther->GetFlags() & FL_NPC)) ||
-		(HasSpawnFlags(SF_TRIGGER_ALLOW_PUSHABLES) && FClassnameIs(pOther, "func_pushable")) ||
-		(HasSpawnFlags(SF_TRIGGER_ALLOW_PHYSICS) && pOther->GetMoveType() == MOVETYPE_VPHYSICS))
+	if (GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_ALL) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_CLIENTS) && (pOther->GetFlags() & FL_CLIENT)) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_NPCS) && (pOther->GetFlags() & FL_NPC)) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PUSHABLES) && FClassnameIs(pOther, "func_pushable")) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PHYSICS) && pOther->GetMoveType() == MOVETYPE_VPHYSICS))
 	{
 		bool bOtherIsPlayer = pOther->IsPlayer();
-		if( HasSpawnFlags(SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS) && !bOtherIsPlayer )
+		if(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS) && !bOtherIsPlayer )
 		{
 			CAI_BaseNPC *pNPC = pOther->MyNPCPointer();
 
@@ -3881,13 +3881,13 @@ bool CBaseVPhysicsTrigger::PassesTriggerFilters( CBaseEntity *pOther )
 			}
 		}
 
-		if ( HasSpawnFlags(SF_TRIGGER_ONLY_CLIENTS_IN_VEHICLES) && bOtherIsPlayer )
+		if (GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ONLY_CLIENTS_IN_VEHICLES) && bOtherIsPlayer )
 		{
 			if ( !((CBasePlayer*)pOther)->IsInAVehicle() )
 				return false;
 		}
 
-		if ( HasSpawnFlags(SF_TRIGGER_ONLY_CLIENTS_OUT_OF_VEHICLES) && bOtherIsPlayer )
+		if (GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ONLY_CLIENTS_OUT_OF_VEHICLES) && bOtherIsPlayer )
 		{
 			if ( ((CBasePlayer*)pOther)->IsInAVehicle() )
 				return false;

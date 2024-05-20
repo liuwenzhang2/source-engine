@@ -273,7 +273,7 @@ void CNPC_Portal_FloorTurret::Spawn( void )
 	m_fMovingTargetThreashold = 20.0f;
 
 	m_bNoAlarmSounds = true;
-	m_bOutOfAmmo = ( m_spawnflags & SF_FLOOR_TURRET_OUT_OF_AMMO ) != 0;
+	m_bOutOfAmmo = (GetEngineObject()->GetSpawnFlags() & SF_FLOOR_TURRET_OUT_OF_AMMO ) != 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -849,7 +849,7 @@ void CNPC_Portal_FloorTurret::ActiveThink( void )
 		ClearEnemyMemory();
 		SetEnemy( NULL );
 
-		if ( m_spawnflags & SF_FLOOR_TURRET_FASTRETIRE )
+		if (GetEngineObject()->GetSpawnFlags() & SF_FLOOR_TURRET_FASTRETIRE )
 		{
 			// Retire quickly in this case. (The case where we saw the player, but he hid again).
 			m_flLastSight = gpGlobals->curtime + FLOOR_TURRET_SHORT_WAIT;

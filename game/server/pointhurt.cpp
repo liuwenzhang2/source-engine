@@ -74,7 +74,7 @@ void CPointHurt::Spawn(void)
 		
 	m_pActivator = NULL;
 
-	if ( HasSpawnFlags( SF_PHURT_START_ON ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHURT_START_ON ) )
 	{
 		SetThink( &CPointHurt::HurtThink );
 	}

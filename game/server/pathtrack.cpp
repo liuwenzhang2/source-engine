@@ -181,7 +181,7 @@ void CPathTrack::ToggleAlternatePath( void )
 	// Use toggles between two paths
 	if ( m_paltpath != NULL )
 	{
-		if ( FBitSet( m_spawnflags, SF_PATH_ALTERNATE ) == false )
+		if (GetEngineObject()->HasSpawnFlags(SF_PATH_ALTERNATE) == false )
 		{
 			EnableAlternatePath();
 		}
@@ -199,7 +199,7 @@ void CPathTrack::EnableAlternatePath( void )
 {
 	if ( m_paltpath != NULL )
 	{
-		SETBITS( m_spawnflags, SF_PATH_ALTERNATE );
+		GetEngineObject()->AddSpawnFlags(SF_PATH_ALTERNATE);
 	}
 }
 
@@ -210,7 +210,7 @@ void CPathTrack::DisableAlternatePath( void )
 {
 	if ( m_paltpath != NULL )
 	{
-		CLEARBITS( m_spawnflags, SF_PATH_ALTERNATE );
+		GetEngineObject()->RemoveSpawnFlags(SF_PATH_ALTERNATE);
 	}
 }
 
@@ -247,7 +247,7 @@ void CPathTrack::InputToggleAlternatePath( inputdata_t &inputdata )
 void CPathTrack::TogglePath( void )
 {
 	// Use toggles between two paths
-	if ( FBitSet( m_spawnflags, SF_PATH_DISABLED ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_PATH_DISABLED) )
 	{
 		EnablePath();
 	}
@@ -262,7 +262,7 @@ void CPathTrack::TogglePath( void )
 //-----------------------------------------------------------------------------
 void CPathTrack::EnablePath( void )
 {
-	CLEARBITS( m_spawnflags, SF_PATH_DISABLED );
+	GetEngineObject()->RemoveSpawnFlags(SF_PATH_DISABLED);
 }
 
 //-----------------------------------------------------------------------------
@@ -270,7 +270,7 @@ void CPathTrack::EnablePath( void )
 //-----------------------------------------------------------------------------
 void CPathTrack::DisablePath( void )
 {
-	SETBITS( m_spawnflags, SF_PATH_DISABLED );
+	GetEngineObject()->AddSpawnFlags(SF_PATH_DISABLED);
 }
 
 //-----------------------------------------------------------------------------
@@ -321,7 +321,7 @@ CPathTrack	*CPathTrack::ValidPath( CPathTrack	*ppath, int testFlag )
 	if ( !ppath )
 		return NULL;
 
-	if ( testFlag && FBitSet( ppath->m_spawnflags, SF_PATH_DISABLED ) )
+	if ( testFlag && ppath->GetEngineObject()->HasSpawnFlags(SF_PATH_DISABLED) )
 		return NULL;
 
 	return ppath;
@@ -340,7 +340,7 @@ void CPathTrack::Project( CPathTrack *pstart, CPathTrack *pend, Vector &origin, 
 
 CPathTrack *CPathTrack::GetNext( void )
 {
-	if ( m_paltpath && FBitSet( m_spawnflags, SF_PATH_ALTERNATE ) && !FBitSet( m_spawnflags, SF_PATH_ALTREVERSE ) )
+	if ( m_paltpath && GetEngineObject()->HasSpawnFlags(SF_PATH_ALTERNATE) && !GetEngineObject()->HasSpawnFlags(SF_PATH_ALTREVERSE) )
 	{
 		Assert( !m_paltpath.IsValid() || m_paltpath.Get() != NULL );
 		return m_paltpath;
@@ -355,7 +355,7 @@ CPathTrack *CPathTrack::GetNext( void )
 
 CPathTrack *CPathTrack::GetPrevious( void )
 {
-	if ( m_paltpath && FBitSet( m_spawnflags, SF_PATH_ALTERNATE ) && FBitSet( m_spawnflags, SF_PATH_ALTREVERSE ) )
+	if ( m_paltpath && GetEngineObject()->HasSpawnFlags(SF_PATH_ALTERNATE) && GetEngineObject()->HasSpawnFlags(SF_PATH_ALTREVERSE) )
 	{
 		Assert( !m_paltpath.IsValid() || m_paltpath.Get() != NULL );
 		return m_paltpath;

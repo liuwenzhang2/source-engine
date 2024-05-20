@@ -67,7 +67,7 @@ public:
 	virtual int	ObjectCaps( void ) 
 	{
 		int flags = BaseClass::ObjectCaps();
-		if ( HasSpawnFlags( SF_DOOR_PUSE ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_DOOR_PUSE ) )
 			return flags | FCAP_IMPULSE_USE | FCAP_USE_IN_RADIUS;
 
 		return flags;

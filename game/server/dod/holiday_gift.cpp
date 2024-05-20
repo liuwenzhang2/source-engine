@@ -20,7 +20,7 @@ CHolidayGift* CHolidayGift::Create( const Vector &position, const QAngle &angles
 	
 	if ( pGift )
 	{
-		pGift->AddSpawnFlags( SF_NORESPAWN );
+		pGift->GetEngineObject()->AddSpawnFlags( SF_NORESPAWN );
 
 		Vector vecRight, vecUp;
 		AngleVectors( eyeAngles, NULL, &vecRight, &vecUp );

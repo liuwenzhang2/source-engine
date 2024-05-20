@@ -169,7 +169,7 @@ void CAI_Spotlight::CreateSpotlightEntities( void )
 	// Create the beam
 	m_hSpotlight = CBeam::BeamCreate( "sprites/glow_test02.vmt", SPOTLIGHT_WIDTH );
 	// Set the temporary spawnflag on the beam so it doesn't save (we'll recreate it on restore)
-	m_hSpotlight->AddSpawnFlags( SF_BEAM_TEMPORARY );
+	m_hSpotlight->GetEngineObject()->AddSpawnFlags( SF_BEAM_TEMPORARY );
 	m_hSpotlight->SetColor( 255, 255, 255 ); 
 	m_hSpotlight->SetHaloTexture( m_nHaloSprite );
 	m_hSpotlight->SetHaloScale( 32 );

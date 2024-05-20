@@ -2210,26 +2210,26 @@ float CWeaponPhysCannon::TraceLength()
 //-----------------------------------------------------------------------------
 bool CWeaponPhysCannon::EntityAllowsPunts( CBaseEntity *pEntity )
 {
-	if ( pEntity->HasSpawnFlags( SF_PHYSBOX_NEVER_PUNT ) )
+	if ( pEntity->GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_NEVER_PUNT ) )
 	{
 		CPhysBox *pPhysBox = dynamic_cast<CPhysBox*>(pEntity);
 
 		if ( pPhysBox != NULL )
 		{
-			if ( pPhysBox->HasSpawnFlags( SF_PHYSBOX_NEVER_PUNT ) )
+			if ( pPhysBox->GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_NEVER_PUNT ) )
 			{
 				return false;
 			}
 		}
 	}
 
-	if ( pEntity->HasSpawnFlags( SF_WEAPON_NO_PHYSCANNON_PUNT ) )
+	if ( pEntity->GetEngineObject()->HasSpawnFlags( SF_WEAPON_NO_PHYSCANNON_PUNT ) )
 	{
 		CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>(pEntity);
 
 		if ( pWeapon != NULL )
 		{
-			if ( pWeapon->HasSpawnFlags( SF_WEAPON_NO_PHYSCANNON_PUNT ) )
+			if ( pWeapon->GetEngineObject()->HasSpawnFlags( SF_WEAPON_NO_PHYSCANNON_PUNT ) )
 			{
 				return false;
 			}
@@ -3701,7 +3701,7 @@ bool CWeaponPhysCannon::CanPickupObject( CBaseEntity *pTarget )
 	if ( pTarget->GetBaseAnimating() && pTarget->GetBaseAnimating()->IsDissolving() )
 		return false;
 
-	if ( pTarget->HasSpawnFlags( SF_PHYSBOX_ALWAYS_PICK_UP ) || pTarget->HasSpawnFlags( SF_PHYSBOX_NEVER_PICK_UP ) )
+	if ( pTarget->GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_ALWAYS_PICK_UP ) || pTarget->GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_NEVER_PICK_UP ) )
 	{
 		// It may seem strange to check this spawnflag before we know the class of this object, since the 
 		// spawnflag only applies to func_physbox, but it can act as a filter of sorts to reduce the number 
@@ -3710,14 +3710,14 @@ bool CWeaponPhysCannon::CanPickupObject( CBaseEntity *pTarget )
 
 		if ( pPhysBox != NULL )
 		{
-			if ( pTarget->HasSpawnFlags( SF_PHYSBOX_NEVER_PICK_UP ) )
+			if ( pTarget->GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_NEVER_PICK_UP ) )
                 return false;
 			else
 				return true;
 		}
 	}
 
-	if ( pTarget->HasSpawnFlags(SF_PHYSPROP_ALWAYS_PICK_UP) )
+	if ( pTarget->GetEngineObject()->HasSpawnFlags(SF_PHYSPROP_ALWAYS_PICK_UP) )
 	{
 		// It may seem strange to check this spawnflag before we know the class of this object, since the 
 		// spawnflag only applies to func_physbox, but it can act as a filter of sorts to reduce the number 
@@ -4021,7 +4021,7 @@ void CWeaponPhysCannon::StartEffects( void )
 
 		m_hBeams[i]->FollowEntity( pBeamEnt );
 
-		m_hBeams[i]->AddSpawnFlags( SF_BEAM_TEMPORARY );	
+		m_hBeams[i]->GetEngineObject()->AddSpawnFlags( SF_BEAM_TEMPORARY );
 		m_hBeams[i]->SetStartAttachment( startAttachment );
 		m_hBeams[i]->SetEndAttachment( endAttachment );
 		m_hBeams[i]->SetNoise( random->RandomFloat( 8.0f, 16.0f ) );

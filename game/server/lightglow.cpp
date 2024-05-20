@@ -56,7 +56,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CLightGlow, DT_LightGlow )
 	SendPropInt( SENDINFO(m_nMinDist), 16, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO(m_nMaxDist), LIGHTGLOW_MAXDIST_BITS, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO(m_nOuterMaxDist), LIGHTGLOW_OUTERMAXDIST_BITS, SPROP_UNSIGNED ),
-	SendPropInt( SENDINFO(m_spawnflags), 8, SPROP_UNSIGNED ),
+	//SendPropInt( SENDINFO(m_spawnflags), 8, SPROP_UNSIGNED ),
 	//SendPropVector(SENDINFO_ORIGIN(m_vecOrigin), -1,  SPROP_COORD, 0.0f, HIGH_DEFAULT, SendProxy_Origin),
 	//SendPropQAngles	(SENDINFO_ANGELS(m_angRotation), 13, 0, SendProxy_Angles ),
 	//SendPropEHandle (SENDINFO_MOVEPARENT(moveparent), 0, SendProxy_MoveParentToInt),

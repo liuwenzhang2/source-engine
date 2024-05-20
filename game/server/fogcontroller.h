@@ -59,7 +59,7 @@ public:
 	void SetLerpValues( void );
 	void Spawn( void );
 
-	bool IsMaster( void )					{ return HasSpawnFlags( SF_FOG_MASTER ); }
+	bool IsMaster( void )					{ return GetEngineObject()->HasSpawnFlags( SF_FOG_MASTER ); }
 
 public:
 

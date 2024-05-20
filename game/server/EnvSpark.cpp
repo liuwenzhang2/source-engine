@@ -83,7 +83,7 @@ void CEnvSpark::Spawn(void)
 	SetThink( NULL );
 	SetUse( NULL );
 
-	if ( FBitSet(m_spawnflags, SF_SPARK_START_ON ) )
+	if ( GetEngineObject()->HasSpawnFlags(SF_SPARK_START_ON))
 	{
 		SetThink( &CEnvSpark::SparkThink );	// start sparking
 	}
@@ -128,16 +128,16 @@ void CEnvSpark::SparkThink(void)
 	SetNextThink( gpGlobals->curtime + 0.1 + random->RandomFloat(0, m_flDelay) );
 
 	Vector vecDir = vec3_origin;
-	if ( FBitSet( m_spawnflags, SF_SPARK_DIRECTIONAL ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_SPARK_DIRECTIONAL) )
 	{
 		AngleVectors(GetEngineObject()->GetAbsAngles(), &vecDir );
 	}
 
-	DoSpark( this, WorldSpaceCenter(), m_nMagnitude, m_nTrailLength, !( m_spawnflags & SF_SPARK_SILENT ), vecDir );
+	DoSpark( this, WorldSpaceCenter(), m_nMagnitude, m_nTrailLength, !(GetEngineObject()->GetSpawnFlags() & SF_SPARK_SILENT), vecDir);
 
 	m_OnSpark.FireOutput( this, this );
 
-	if (FBitSet(m_spawnflags, SF_SPARK_GLOW))
+	if (GetEngineObject()->HasSpawnFlags(SF_SPARK_GLOW))
 	{
 		CPVSFilter filter(GetEngineObject()->GetAbsOrigin() );
 		te->GlowSprite( filter, 0.0, &GetEngineObject()->GetAbsOrigin(), m_nGlowSpriteIndex, 0.2, 1.5, 25 );

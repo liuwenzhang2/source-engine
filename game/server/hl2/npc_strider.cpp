@@ -2566,7 +2566,7 @@ int CNPC_Strider::MeleeAttack1Conditions( float flDot, float flDist )
 		return COND_NONE;
 
 	// No more stabbing players.
-	if ( pEnemy->IsPlayer() && !HasSpawnFlags(SF_CAN_STOMP_PLAYER) )
+	if ( pEnemy->IsPlayer() && !GetEngineObject()->HasSpawnFlags(SF_CAN_STOMP_PLAYER) )
 		return COND_NONE;
 
 	if( !HasCondition( COND_SEE_ENEMY ) )
@@ -2859,7 +2859,7 @@ void CNPC_Strider::CreateFocus()
 	m_hFocus = gEntList.CreateEntityByName( "bullseye_strider_focus" );
 
 	ASSERT( m_hFocus != NULL );
-	m_hFocus->AddSpawnFlags( SF_BULLSEYE_NONSOLID | SF_BULLSEYE_NODAMAGE );
+	m_hFocus->GetEngineObject()->AddSpawnFlags( SF_BULLSEYE_NONSOLID | SF_BULLSEYE_NODAMAGE );
 	m_hFocus->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 	m_hFocus->Spawn();
 }
@@ -3164,7 +3164,7 @@ int CNPC_Strider::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 			// Default to NPC damage value
 			int damage = 20;
 
-			if( HasSpawnFlags(SF_TAKE_MINIMAL_DAMAGE_FROM_NPCS) )
+			if(GetEngineObject()->HasSpawnFlags(SF_TAKE_MINIMAL_DAMAGE_FROM_NPCS) )
 				damage = 1;
 
 			if( bPlayer )
@@ -4405,7 +4405,7 @@ void CNPC_Strider::StompHit( int followerBoneIndex )
 	CBaseEntity *pEnemy = GetEnemy();
 	CAI_BaseNPC *pNPC = pEnemy ? pEnemy->MyNPCPointer() : NULL;
 	bool bIsValidTarget = pNPC && pNPC->GetModelPtr();
-	if ( HasSpawnFlags( SF_CAN_STOMP_PLAYER ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_CAN_STOMP_PLAYER ) )
 	{
 		bIsValidTarget = bIsValidTarget || ( pEnemy && pEnemy->IsPlayer() );
 	}

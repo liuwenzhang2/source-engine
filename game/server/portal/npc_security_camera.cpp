@@ -327,8 +327,8 @@ void CNPC_SecurityCamera::Spawn( void )
 	SetPoseParameter( SECURITY_CAMERA_BC_PITCH, 0 );
 
 	//Set our autostart state
-	m_bAutoStart = !!( m_spawnflags & SF_SECURITY_CAMERA_AUTOACTIVATE );
-	m_bEnabled	 = ( ( m_spawnflags & SF_SECURITY_CAMERA_STARTINACTIVE ) == false );
+	m_bAutoStart = !!(GetEngineObject()->GetSpawnFlags() & SF_SECURITY_CAMERA_AUTOACTIVATE );
+	m_bEnabled	 = ( (GetEngineObject()->GetSpawnFlags() & SF_SECURITY_CAMERA_STARTINACTIVE ) == false );
 
 	//Do we start active?
 	if ( m_bAutoStart && m_bEnabled )
@@ -510,7 +510,7 @@ void CNPC_SecurityCamera::Deploy( void )
 //-----------------------------------------------------------------------------
 void CNPC_SecurityCamera::SetLastSightTime()
 {
-	if( HasSpawnFlags( SF_SECURITY_CAMERA_NEVERRETIRE ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_SECURITY_CAMERA_NEVERRETIRE ) )
 	{
 		m_flLastSight = FLT_MAX;
 	}
@@ -916,7 +916,7 @@ void CNPC_SecurityCamera::Enable( void )
 	m_bEnabled = true;
 
 	// if the turret is flagged as an autoactivate turret, re-enable its ability open self.
-	if ( m_spawnflags & SF_SECURITY_CAMERA_AUTOACTIVATE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_SECURITY_CAMERA_AUTOACTIVATE )
 	{
 		m_bAutoStart = true;
 	}
@@ -1099,7 +1099,7 @@ void CNPC_SecurityCamera::DeathThink( void )
 bool CNPC_SecurityCamera::CanBeAnEnemyOf( CBaseEntity *pEnemy )
 {
 	// If we're out of ammo, make friendly companions ignore us
-	if ( m_spawnflags & SF_SECURITY_CAMERA_OUT_OF_AMMO )
+	if (GetEngineObject()->GetSpawnFlags() & SF_SECURITY_CAMERA_OUT_OF_AMMO )
 	{
 		if ( pEnemy->Classify() == CLASS_PLAYER_ALLY_VITAL )
 			return false;

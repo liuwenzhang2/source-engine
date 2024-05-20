@@ -264,7 +264,7 @@ void CAI_DynamicLink::InitDynamicLinks(void)
 
 		if ( pDynamicLink->m_nSrcID != NO_NODE && pDynamicLink->m_nDestID != NO_NODE )
 		{
-			if (  ( pDynamicLink->GetSpawnFlags() & bits_HULL_BITS_MASK ) != 0 )
+			if (  ( pDynamicLink->GetEngineObject()->GetSpawnFlags() & bits_HULL_BITS_MASK ) != 0 )
 			{
 				CAI_Link *pLink = pDynamicLink->FindLink();
 				if ( !pLink )
@@ -287,7 +287,7 @@ void CAI_DynamicLink::InitDynamicLinks(void)
 				{
 					bUpdateZones = true;
 
-					int hullBits = ( pDynamicLink->GetSpawnFlags() & bits_HULL_BITS_MASK );
+					int hullBits = ( pDynamicLink->GetEngineObject()->GetSpawnFlags() & bits_HULL_BITS_MASK );
 					for ( int i = 0; i < NUM_HULLS; i++ )
 					{
 						if ( hullBits & ( 1 << i ) )

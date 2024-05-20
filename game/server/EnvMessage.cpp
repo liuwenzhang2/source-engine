@@ -93,7 +93,7 @@ void CMessage::InputShowMessage( inputdata_t &inputdata )
 {
 	CBaseEntity *pPlayer = NULL;
 
-	if ( m_spawnflags & SF_MESSAGE_ALL )
+	if (GetEngineObject()->GetSpawnFlags() & SF_MESSAGE_ALL )
 	{
 		UTIL_ShowMessageAll( STRING( m_iszMessage ) );
 	}
@@ -127,7 +127,7 @@ void CMessage::InputShowMessage( inputdata_t &inputdata )
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), ep );
 	}
 
-	if ( m_spawnflags & SF_MESSAGE_ONCE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_MESSAGE_ONCE )
 	{
 		UTIL_Remove( this );
 	}

@@ -726,7 +726,7 @@ void CNPC_BigMomma::StartTask( const Task_t *pTask )
 				else
 				{
 					Activity act = ACT_WALK;
-					if ( pTarget->GetSpawnFlags() & SF_INFOBM_RUN )
+					if ( pTarget->GetEngineObject()->GetSpawnFlags() & SF_INFOBM_RUN )
 						 act = ACT_RUN;
 
 					AI_NavGoal_t goal( GOALTYPE_TARGETENT, vec3_origin, act );
@@ -796,7 +796,7 @@ void CNPC_BigMomma::RunTask( const Task_t *pTask )
 		break;
 
 	case TASK_WAIT_NODE:
-		if ( GetTarget() != NULL && (GetTarget()->GetSpawnFlags() & SF_INFOBM_WAIT) )
+		if ( GetTarget() != NULL && (GetTarget()->GetEngineObject()->GetSpawnFlags() & SF_INFOBM_WAIT) )
 			return;
 
 		if ( gpGlobals->curtime > m_flWaitFinished )
@@ -977,7 +977,7 @@ void CNPC_BigMomma::LayHeadcrab( void )
 {
 	CBaseEntity *pChild = CBaseEntity::Create( BIG_CHILDCLASS, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), this );
 
-	pChild->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
+	pChild->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 
 	pChild->SetOwnerEntity( this );
 

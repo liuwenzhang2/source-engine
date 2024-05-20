@@ -133,8 +133,8 @@ public:
 	bool	KeyValue( const char *szKeyName, const char *szValue );
 
 	inline	int		Points( void ) { return m_Score; }
-	inline	bool	AllowNegativeScore( void ) { return m_spawnflags & SF_SCORE_NEGATIVE; }
-	inline	int		AwardToTeam( void ) { return (m_spawnflags & SF_SCORE_TEAM); }
+	inline	bool	AllowNegativeScore( void ) { return GetEngineObject()->GetSpawnFlags() & SF_SCORE_NEGATIVE; }
+	inline	int		AwardToTeam( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_SCORE_TEAM); }
 
 	inline	void	SetPoints( int points ) { m_Score = points; }
 
@@ -268,7 +268,7 @@ public:
 
 	DECLARE_DATADESC();
 
-	inline	bool	MessageToAll( void ) { return (m_spawnflags & SF_ENVTEXT_ALLPLAYERS); }
+	inline	bool	MessageToAll( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_ENVTEXT_ALLPLAYERS); }
 	inline	void	MessageSet( const char *pMessage ) { m_iszMessage = AllocPooledString(pMessage); }
 	inline	const char *MessageGet( void )	{ return STRING( m_iszMessage ); }
 
@@ -585,7 +585,7 @@ public:
 	void		Touch( CBaseEntity *pOther );
 	void		Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
-	inline bool	UseOnly( void ) { return (m_spawnflags & SF_PLAYEREQUIP_USEONLY) ? true : false; }
+	inline bool	UseOnly( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_PLAYEREQUIP_USEONLY) ? true : false; }
 
 private:
 
@@ -689,9 +689,9 @@ public:
 
 private:
 
-	inline bool RemoveOnFire( void ) { return (m_spawnflags & SF_PTEAM_FIREONCE) ? true : false; }
-	inline bool ShouldKillPlayer( void ) { return (m_spawnflags & SF_PTEAM_KILL) ? true : false; }
-	inline bool ShouldGibPlayer( void ) { return (m_spawnflags & SF_PTEAM_GIB) ? true : false; }
+	inline bool RemoveOnFire( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_PTEAM_FIREONCE) ? true : false; }
+	inline bool ShouldKillPlayer( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_PTEAM_KILL) ? true : false; }
+	inline bool ShouldGibPlayer( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_PTEAM_GIB) ? true : false; }
 	
 	const char *TargetTeamName( const char *pszTargetName, CBaseEntity *pActivator );
 };

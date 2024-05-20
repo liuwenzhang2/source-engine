@@ -564,7 +564,7 @@ bool CNPC_MetroPolice::OverrideMoveFacing( const AILocalMoveGoal_t &move, float 
 //-----------------------------------------------------------------------------
 void CNPC_MetroPolice::Precache( void )
 {
-	if ( HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
 	{
 		GetEngineObject()->SetModelName( AllocPooledString("models/police_cheaple.mdl" ) );
 	}
@@ -623,10 +623,10 @@ void CNPC_MetroPolice::Spawn( void )
 	SetMoveType( MOVETYPE_STEP );
 	SetBloodColor( BLOOD_COLOR_RED );
 	m_nIdleChatterType = METROPOLICE_CHATTER_ASK_QUESTION; 
-	m_bSimpleCops = HasSpawnFlags( SF_METROPOLICE_SIMPLE_VERSION );
-	if ( HasSpawnFlags( SF_METROPOLICE_NOCHATTER ) )
+	m_bSimpleCops = GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_SIMPLE_VERSION );
+	if (GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_NOCHATTER ) )
 	{
-		AddSpawnFlags( SF_NPC_GAG );
+		GetEngineObject()->AddSpawnFlags( SF_NPC_GAG );
 	}
 
 	if (!m_bSimpleCops)
@@ -640,7 +640,7 @@ void CNPC_MetroPolice::Spawn( void )
 
 	m_flFieldOfView		= -0.2;// indicates the width of this NPC's forward view cone ( as a dotproduct result )
 	m_NPCState			= NPC_STATE_NONE;
-	if ( !HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_NPC_START_EFFICIENT ) )
 	{
 		CapabilitiesAdd( bits_CAP_TURN_HEAD | bits_CAP_ANIMATEDFACE );
 		CapabilitiesAdd( bits_CAP_AIM_GUN | bits_CAP_MOVE_SHOOT );
@@ -659,7 +659,7 @@ void CNPC_MetroPolice::Spawn( void )
 	NPCInit();
 
 	// NOTE: This must occur *after* init, since init sets default dist look
-	if ( HasSpawnFlags( SF_METROPOLICE_MID_RANGE_ATTACK ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_MID_RANGE_ATTACK ) )
 	{
 		m_flDistTooFar = METROPOLICE_MID_RANGE_ATTACK_RANGE;
 		SetDistLook( METROPOLICE_MID_RANGE_ATTACK_RANGE );
@@ -696,12 +696,12 @@ void CNPC_MetroPolice::Spawn( void )
 	SetBurstMode( false );
 
 	// Clear out spawnflag if we're missing the smg1
-	if( HasSpawnFlags( SF_METROPOLICE_ALWAYS_STITCH ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ALWAYS_STITCH ) )
 	{
 		if ( !Weapon_OwnsThisType( "weapon_smg1" ) )
 		{
 			Warning( "Warning! Metrocop is trying to use the stitch behavior but he has no smg1!\n" );
-			RemoveSpawnFlags( SF_METROPOLICE_ALWAYS_STITCH );
+			GetEngineObject()->RemoveSpawnFlags( SF_METROPOLICE_ALWAYS_STITCH );
 		}
 	}
 
@@ -729,7 +729,7 @@ void CNPC_MetroPolice::Weapon_Equip( CBaseCombatWeapon *pWeapon )
 {
 	BaseClass::Weapon_Equip( pWeapon );
 
-	if ( HasSpawnFlags(SF_METROPOLICE_MID_RANGE_ATTACK) && GetActiveWeapon() )
+	if (GetEngineObject()->HasSpawnFlags(SF_METROPOLICE_MID_RANGE_ATTACK) && GetActiveWeapon() )
 	{
 		GetActiveWeapon()->m_fMaxRange1 = METROPOLICE_MID_RANGE_ATTACK_RANGE;
 		GetActiveWeapon()->m_fMaxRange2 = METROPOLICE_MID_RANGE_ATTACK_RANGE;
@@ -897,7 +897,7 @@ void CNPC_MetroPolice::SpeakSentence( int nSentenceType )
 			
 			// NOTE: This is a good time to check to see if the player is hurt.
 			// Have the cops notice this and call out
-			if ( pEntity && !HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) )
+			if ( pEntity && !GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) )
 			{
 				if ( pEntity->IsPlayer() && (pEntity->GetHealth() <= 20) )
 				{
@@ -941,7 +941,7 @@ void CNPC_MetroPolice::AnnounceEnemyType( CBaseEntity *pEnemy )
 		return;
 
 	// Don't announce enemies when I'm in arrest behavior
-	if ( HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) )
 		return;
 
 	if ( m_pSquad->IsLeader( this ) || ( m_pSquad->GetLeader() && m_pSquad->GetLeader()->GetEnemy() != GetEnemy() ) )
@@ -1272,7 +1272,7 @@ bool CNPC_MetroPolice::ShouldAttemptToStitch()
 	if ( !GetShootTarget() )
 		return false;
 
-	if ( HasSpawnFlags( SF_METROPOLICE_ALWAYS_STITCH ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ALWAYS_STITCH ) )
 	{
 		// Don't stitch if the player is at the same level or higher
 		if ( GetEnemy()->GetEngineObject()->GetAbsOrigin().z - GetEngineObject()->GetAbsOrigin().z > -36 )
@@ -2430,9 +2430,9 @@ bool CNPC_MetroPolice::CreateBehaviors()
 
 void CNPC_MetroPolice::InputEnableManhackToss( inputdata_t &inputdata )
 {
-	if ( HasSpawnFlags( SF_METROPOLICE_NO_MANHACK_DEPLOY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_NO_MANHACK_DEPLOY ) )
 	{
-		RemoveSpawnFlags( SF_METROPOLICE_NO_MANHACK_DEPLOY );
+		GetEngineObject()->RemoveSpawnFlags( SF_METROPOLICE_NO_MANHACK_DEPLOY );
 	}
 }
 
@@ -2535,7 +2535,7 @@ void CNPC_MetroPolice::LostEnemySound( void)
 void CNPC_MetroPolice::FoundEnemySound( void)
 {
 	// Don't announce enemies when I'm in arrest behavior
-	if ( HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) )
 		return;
 
 	m_Sentences.Speak( "METROPOLICE_REFIND_ENEMY", SENTENCE_PRIORITY_HIGH );
@@ -2784,12 +2784,12 @@ void CNPC_MetroPolice::OnAnimEventStartDeployManhack( void )
 
 	pManhack->GetEngineObject()->SetLocalOrigin( vecOrigin );
 	pManhack->GetEngineObject()->SetLocalAngles( vecAngles );
-	pManhack->AddSpawnFlags( (SF_MANHACK_PACKED_UP|SF_MANHACK_CARRIED|SF_NPC_WAIT_FOR_SCRIPT) );
+	pManhack->GetEngineObject()->AddSpawnFlags( (SF_MANHACK_PACKED_UP|SF_MANHACK_CARRIED|SF_NPC_WAIT_FOR_SCRIPT) );
 	
 	// Also fade if our parent is marked to do it
-	if ( HasSpawnFlags( SF_NPC_FADE_CORPSE ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPC_FADE_CORPSE ) )
 	{
-		pManhack->AddSpawnFlags( SF_NPC_FADE_CORPSE );
+		pManhack->GetEngineObject()->AddSpawnFlags( SF_NPC_FADE_CORPSE );
 	}
 
 	pManhack->Spawn();
@@ -3057,7 +3057,7 @@ void CNPC_MetroPolice::ReleaseManhack( void )
 	Assert( m_hManhack );
 
 	// Make us physical
-	m_hManhack->RemoveSpawnFlags( SF_MANHACK_CARRIED );
+	m_hManhack->GetEngineObject()->RemoveSpawnFlags( SF_MANHACK_CARRIED );
 	m_hManhack->CreateVPhysics();
 
 	// Release us
@@ -3066,7 +3066,7 @@ void CNPC_MetroPolice::ReleaseManhack( void )
 	m_hManhack->GetEngineObject()->SetParent( NULL );
 
 	// Make us active
-	m_hManhack->RemoveSpawnFlags( SF_NPC_WAIT_FOR_SCRIPT );
+	m_hManhack->GetEngineObject()->RemoveSpawnFlags( SF_NPC_WAIT_FOR_SCRIPT );
 	m_hManhack->ClearSchedule( "Manhack released by metropolice" );
 	
 	// Start him with knowledge of our current enemy
@@ -3141,7 +3141,7 @@ bool CNPC_MetroPolice::TryToEnterPistolSlot( int nSquadSlot )
 //-----------------------------------------------------------------------------
 int CNPC_MetroPolice::SelectRangeAttackSchedule()
 {
-	if ( HasSpawnFlags( SF_METROPOLICE_ALWAYS_STITCH ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ALWAYS_STITCH ) )
 	{
 		int nSched = SelectMoveToLedgeSchedule();
 		if ( nSched != SCHED_NONE )
@@ -3193,7 +3193,7 @@ int CNPC_MetroPolice::SquadArrestCount()
 //-----------------------------------------------------------------------------
 int CNPC_MetroPolice::SelectScheduleArrestEnemy()
 {
-	if ( !HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) || !IsInSquad() )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) || !IsInSquad() )
 		return SCHED_NONE;
 
 	if ( !HasCondition( COND_SEE_ENEMY ) )
@@ -3634,7 +3634,7 @@ int CNPC_MetroPolice::SelectStitchSchedule()
 	Vector2D vecTargetToGun2D = vecTargetToGun.AsVector2D();
 	float flDist = Vector2DNormalize( vecTargetToGun2D );
 
-	if ( HasSpawnFlags( SF_METROPOLICE_NO_FAR_STITCH ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_NO_FAR_STITCH ) )
 	{
 		if ( flDist > 6000.0f )
 			return SCHED_NONE;
@@ -3955,7 +3955,7 @@ void CNPC_MetroPolice::AdministerJustice( void )
 		return;
 
 	// If we're allowed to chase the player, do so. Otherwise, just threaten.
-	if ( !IsInAScript() && (m_NPCState != NPC_STATE_SCRIPT) && HasSpawnFlags( SF_METROPOLICE_ALLOWED_TO_RESPOND ) )
+	if ( !IsInAScript() && (m_NPCState != NPC_STATE_SCRIPT) && GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ALLOWED_TO_RESPOND ) )
 	{
 		if ( m_vecPreChaseOrigin == vec3_origin )
 		{
@@ -3986,7 +3986,7 @@ void CNPC_MetroPolice::AdministerJustice( void )
 			if ( ppAIs[i]->Classify() == CLASS_METROPOLICE && FClassnameIs( ppAIs[i], "npc_metropolice" ) )
 			{
 				CNPC_MetroPolice *pNPC = assert_cast<CNPC_MetroPolice*>(ppAIs[i]);
-				if ( pNPC->HasSpawnFlags( SF_METROPOLICE_ALLOWED_TO_RESPOND ) )
+				if ( pNPC->GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ALLOWED_TO_RESPOND ) )
 				{
 					// Is he within site & range?
 					if ( FVisible(pNPC) && pNPC->FVisible( UTIL_PlayerByIndex(1) ) && 
@@ -4321,7 +4321,7 @@ int CNPC_MetroPolice::TranslateSchedule( int scheduleType )
 //-----------------------------------------------------------------------------
 bool CNPC_MetroPolice::ShouldMoveAndShoot()
 {
-	if ( HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) )
 		return false;
 
 	if ( ShouldAttemptToStitch() )
@@ -4568,7 +4568,7 @@ void CNPC_MetroPolice::StartTask( const Task_t *pTask )
 
 	case TASK_METROPOLICE_HARASS:
 		{
-			if( !( m_spawnflags & SF_METROPOLICE_NOCHATTER ) )
+			if( !(GetEngineObject()->GetSpawnFlags() & SF_METROPOLICE_NOCHATTER))
 			{
 				if( GetEnemy() && GetEnemy()->GetWaterLevel() > 0 )
 				{
@@ -4670,7 +4670,7 @@ void CNPC_MetroPolice::EnemyResistingArrest()
 		CAI_BaseNPC *pSquadmate = m_pSquad->GetFirstMember( &iter );
 		while ( pSquadmate )
 		{
-			pSquadmate->RemoveSpawnFlags( SF_METROPOLICE_ARREST_ENEMY );
+			pSquadmate->GetEngineObject()->RemoveSpawnFlags( SF_METROPOLICE_ARREST_ENEMY );
 			pSquadmate->SetCondition( COND_METROPOLICE_ENEMY_RESISTING_ARREST );
 			pSquadmate = m_pSquad->GetNextMember( &iter );
 		}
@@ -4864,7 +4864,7 @@ int CNPC_MetroPolice::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 {
 	CTakeDamageInfo info = inputInfo;
 
-	if ( HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_ARREST_ENEMY ) )
 	{
 		EnemyResistingArrest();
 	}
@@ -4894,7 +4894,7 @@ int CNPC_MetroPolice::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 //-----------------------------------------------------------------------------
 bool CNPC_MetroPolice::CanDeployManhack( void )
 {
-	if ( HasSpawnFlags( SF_METROPOLICE_NO_MANHACK_DEPLOY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_NO_MANHACK_DEPLOY ) )
 		return false;
 
 	// Nope, already have one out.

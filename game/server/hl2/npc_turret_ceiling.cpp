@@ -309,8 +309,8 @@ void CNPC_CeilingTurret::Spawn( void )
 	m_pEyeGlow->SetAttachment( this, 2 );
 
 	//Set our autostart state
-	m_bAutoStart = !!( m_spawnflags & SF_CEILING_TURRET_AUTOACTIVATE );
-	m_bEnabled	 = ( ( m_spawnflags & SF_CEILING_TURRET_STARTINACTIVE ) == false );
+	m_bAutoStart = !!(GetEngineObject()->GetSpawnFlags() & SF_CEILING_TURRET_AUTOACTIVATE);
+	m_bEnabled	 = ( (GetEngineObject()->GetSpawnFlags() & SF_CEILING_TURRET_STARTINACTIVE) == false);
 
 	//Do we start active?
 	if ( m_bAutoStart && m_bEnabled )
@@ -499,7 +499,7 @@ void CNPC_CeilingTurret::Deploy( void )
 //-----------------------------------------------------------------------------
 void CNPC_CeilingTurret::SetLastSightTime()
 {
-	if( HasSpawnFlags( SF_CEILING_TURRET_NEVERRETIRE ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_CEILING_TURRET_NEVERRETIRE ) )
 	{
 		m_flLastSight = FLT_MAX;
 	}
@@ -695,7 +695,7 @@ void CNPC_CeilingTurret::ActiveThink( void )
 		//Fire the gun
 		if ( DotProduct( vecDirToEnemy, vecMuzzleDir ) >= 0.9848 ) // 10 degree slop
 		{
-			if ( m_spawnflags & SF_CEILING_TURRET_OUT_OF_AMMO )
+			if (GetEngineObject()->GetSpawnFlags() & SF_CEILING_TURRET_OUT_OF_AMMO)
 			{
 				SetActivity( (Activity) ACT_CEILING_TURRET_DRYFIRE );
 			}
@@ -848,7 +848,7 @@ void CNPC_CeilingTurret::AutoSearchThink( void )
 //-----------------------------------------------------------------------------
 void CNPC_CeilingTurret::Shoot( const Vector &vecSrc, const Vector &vecDirToEnemy )
 {
-	if ( m_spawnflags & SF_CEILING_TURRET_OUT_OF_AMMO )
+	if (GetEngineObject()->GetSpawnFlags() & SF_CEILING_TURRET_OUT_OF_AMMO)
 	{
 		{
 			const char* soundname = "NPC_FloorTurret.DryFire";
@@ -1053,7 +1053,7 @@ void CNPC_CeilingTurret::Enable( void )
 	m_bEnabled = true;
 
 	// if the turret is flagged as an autoactivate turret, re-enable its ability open self.
-	if ( m_spawnflags & SF_CEILING_TURRET_AUTOACTIVATE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_CEILING_TURRET_AUTOACTIVATE)
 	{
 		m_bAutoStart = true;
 	}
@@ -1201,7 +1201,7 @@ void CNPC_CeilingTurret::SetHeight( float height )
 bool CNPC_CeilingTurret::CanBeAnEnemyOf( CBaseEntity *pEnemy )
 {
 	// If we're out of ammo, make friendly companions ignore us
-	if ( m_spawnflags & SF_CEILING_TURRET_OUT_OF_AMMO )
+	if (GetEngineObject()->GetSpawnFlags() & SF_CEILING_TURRET_OUT_OF_AMMO)
 	{
 		if ( pEnemy->Classify() == CLASS_PLAYER_ALLY_VITAL )
 			return false;

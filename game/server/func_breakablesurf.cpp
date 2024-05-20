@@ -1239,7 +1239,7 @@ void CBreakableSurface::VPhysicsCollision( int index, gamevcollisionevent_t *pEv
 	{
 		int damageType = 0;
 		string_t iszDamageTable = ( ( m_nSurfaceType == SHATTERSURFACE_GLASS ) ? ( "glass" ) : ( NULL_STRING ) );
-		bool bDamageFromHeldObjects = ( ( m_spawnflags & SF_BREAKABLESURF_DAMAGE_FROM_HELD_OBJECTS ) != 0 );
+		bool bDamageFromHeldObjects = ( (GetEngineObject()->GetSpawnFlags() & SF_BREAKABLESURF_DAMAGE_FROM_HELD_OBJECTS) != 0);
 		float damage = CalculateDefaultPhysicsDamage( index, pEvent, 1.0, false, damageType, iszDamageTable, bDamageFromHeldObjects );
 
 		if ( damage > 10 )
@@ -1261,7 +1261,7 @@ void CBreakableSurface::VPhysicsCollision( int index, gamevcollisionevent_t *pEv
 		}
 		else if ( damage > 0 )
 		{
-			if ( m_spawnflags & SF_BREAKABLESURF_CRACK_DECALS )
+			if (GetEngineObject()->GetSpawnFlags() & SF_BREAKABLESURF_CRACK_DECALS)
 			{
 
 				Vector normal, damagePos;

@@ -82,7 +82,7 @@ void CAutoTrigger::Think( void )
 	{
 		m_OnTrigger.FireOutput(NULL, this);
 
-		if ( m_spawnflags & SF_AUTO_FIREONCE )
+		if (GetEngineObject()->GetSpawnFlags() & SF_AUTO_FIREONCE)
 			UTIL_Remove( this );
 	}
 }
@@ -193,7 +193,7 @@ void CTriggerRelay::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 {
 	m_OnTrigger.FireOutput(pActivator, this);
 	
-	if ( m_spawnflags & SF_RELAY_FIREONCE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_RELAY_FIREONCE)
 	{
 		UTIL_Remove( this );
 	}
@@ -440,7 +440,7 @@ void CPendulum::Spawn( void )
 
 	m_flDamp *=  0.001;
 	
-	if ( FBitSet ( m_spawnflags, SF_DOOR_PASSABLE ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_DOOR_PASSABLE) )
 		SetSolid( SOLID_NONE );
 	else
 		SetSolid( SOLID_BBOX );
@@ -458,7 +458,7 @@ void CPendulum::Spawn( void )
 		m_vStart = GetEngineObject()->GetAbsAngles();
 		m_vCenter = GetEngineObject()->GetAbsAngles() + ( m_flMoveDistance * 0.05 ) * m_vecMoveAng;
 
-		if ( FBitSet( m_spawnflags, SF_BRUSH_ROTATE_START_ON ) )
+		if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_ROTATE_START_ON) )
 		{		
 			SetThink( &CBaseEntity::SUB_CallUseToggle );
 			SetNextThink( gpGlobals->curtime + 0.1f );
@@ -471,7 +471,7 @@ void CPendulum::Spawn( void )
 		///VPhysicsGetObject()->SetPosition( GetAbsOrigin(), pev->absangles );
 	}
 
-	if ( FBitSet( m_spawnflags, SF_PENDULUM_SWING ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_PENDULUM_SWING) )
 	{
 		SetTouch ( &CPendulum::RopeTouch );
 	}
@@ -482,11 +482,11 @@ void CPendulum::PendulumUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 {
 	if ( m_flSpeed )		// Pendulum is moving, stop it and auto-return if necessary
 	{
-		if ( FBitSet( m_spawnflags, SF_BRUSH_ROTATE_START_ON ) )
+		if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_ROTATE_START_ON) )
 		{		
 			float	delta;
 
-			delta = CBaseToggle::AxisDelta( m_spawnflags, GetEngineObject()->GetAbsAngles(), m_vStart );
+			delta = CBaseToggle::AxisDelta(GetEngineObject()->GetSpawnFlags(), GetEngineObject()->GetAbsAngles(), m_vStart);
 
 			SetLocalAngularVelocity( m_flMaxSpeed * m_vecMoveAng );
 			SetNextThink( gpGlobals->curtime + delta / m_flMaxSpeed);
@@ -534,7 +534,7 @@ void CPendulum::Swing( void )
 {
 	float delta, dt;
 	
-	delta = CBaseToggle::AxisDelta( m_spawnflags, GetEngineObject()->GetAbsAngles(), m_vCenter );
+	delta = CBaseToggle::AxisDelta(GetEngineObject()->GetSpawnFlags(), GetEngineObject()->GetAbsAngles(), m_vCenter);
 	dt = gpGlobals->curtime - m_flTime;	// How much time has passed?
 	m_flTime = gpGlobals->curtime;		// Remember the last time called
 
@@ -934,13 +934,13 @@ void CRenderFxManager::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_T
 		CBaseEntity *pEntity = NULL;
 		while ( ( pEntity = gEntList.FindEntityByName( pEntity, STRING( m_target ) ) ) != NULL )
 		{
-			if ( !HasSpawnFlags( SF_RENDER_MASKFX ) )
+			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKFX ) )
 				pEntity->m_nRenderFX = m_nRenderFX;
-			if ( !HasSpawnFlags( SF_RENDER_MASKAMT ) )
+			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKAMT ) )
 				pEntity->SetRenderColorA( GetRenderColor().a );
-			if ( !HasSpawnFlags( SF_RENDER_MASKMODE ) )
+			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKMODE ) )
 				pEntity->m_nRenderMode = m_nRenderMode;
-			if ( !HasSpawnFlags( SF_RENDER_MASKCOLOR ) )
+			if ( !GetEngineObject()->HasSpawnFlags( SF_RENDER_MASKCOLOR ) )
 				pEntity->m_clrRender = m_clrRender;
 		}
 	}
@@ -1111,7 +1111,7 @@ void CXenHair::Spawn( void )
 	UTIL_SetSize( this, Vector(-4,-4,0), Vector(4,4,32));
 	SetSequence( 0 );
 	
-	if ( !HasSpawnFlags( SF_HAIR_SYNC ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_HAIR_SYNC ) )
 	{
 		SetCycle( random->RandomFloat( 0,1) );
 		m_flPlaybackRate = random->RandomFloat( 0.7, 1.4 );

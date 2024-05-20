@@ -360,7 +360,7 @@ void CRopeKeyframe::Activate()
 	{
 		SetEndPoint( pEnt );
 
-		if( m_spawnflags & SF_ROPE_RESIZE )
+		if(GetEngineObject()->GetSpawnFlags() & SF_ROPE_RESIZE)
 			m_RopeFlags |= ROPE_RESIZE;
 	}
 	else

@@ -111,7 +111,7 @@ void CPhysicsCannister::OnRestore()
 
 bool CPhysicsCannister::CreateVPhysics()
 {
-	bool asleep = HasSpawnFlags(SF_CANNISTER_ASLEEP);
+	bool asleep = GetEngineObject()->HasSpawnFlags(SF_CANNISTER_ASLEEP);
 
 	VPhysicsInitNormal( SOLID_VPHYSICS, 0, asleep );
 	return true;
@@ -472,12 +472,12 @@ void CPhysicsCannister::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	BaseClass::VPhysicsUpdate( pPhysics );
 
 	// if this is the first time we have moved, fire our target
-	if ( HasSpawnFlags( SF_CANNISTER_ASLEEP ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_CANNISTER_ASLEEP ) )
 	{
 		if ( !pPhysics->IsAsleep() )
 		{
 			m_OnAwakened.FireOutput(this, this);
-			RemoveSpawnFlags( SF_CANNISTER_ASLEEP );
+			GetEngineObject()->RemoveSpawnFlags( SF_CANNISTER_ASLEEP );
 		}
 	}
 }

@@ -275,7 +275,7 @@ void CNPC_Antlion::Spawn( void )
 	if ( IsWorker() )
 	{
 		SetModel( ANTLION_WORKER_MODEL );
-		AddSpawnFlags( SF_NPC_LONG_RANGE );
+		GetEngineObject()->AddSpawnFlags( SF_NPC_LONG_RANGE );
 		SetBloodColor( BLOOD_COLOR_ANTLION_WORKER );
 	}
 	else
@@ -326,7 +326,7 @@ void CNPC_Antlion::Spawn( void )
 	}
 
 	// JAY: Optimize these out for now
-	if ( HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == false )
 		 CapabilitiesAdd( bits_CAP_SKIP_NAV_GROUND_CHECK );
 
 	NPCInit();
@@ -347,7 +347,7 @@ void CNPC_Antlion::Spawn( void )
 	{
 		AddEffects( EF_NODRAW );
 		AddFlag( FL_NOTARGET );
-		m_spawnflags |= SF_NPC_GAG;
+		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 		AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage	= DAMAGE_NO;
 
@@ -711,7 +711,7 @@ void CNPC_Antlion::MeleeAttack( float distance, float damage, QAngle &viewPunch,
 //-----------------------------------------------------------------------------
 bool CNPC_Antlion::FindChasePosition( const Vector &targetPos, Vector &result )
 {
-	if ( HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == true )
+	if (GetEngineObject()->HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == true )
 	{
 		 result = targetPos;
 		 return true;
@@ -802,7 +802,7 @@ void CNPC_Antlion::ManageFleeCapabilities( bool bEnable )
 		//We'll enable it back again after the route has been built.
 		CapabilitiesRemove( bits_CAP_MOVE_JUMP );
 
-		if ( HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == false  )
+		if (GetEngineObject()->HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == false  )
 			 CapabilitiesRemove( bits_CAP_SKIP_NAV_GROUND_CHECK );
 	}
 	else
@@ -810,7 +810,7 @@ void CNPC_Antlion::ManageFleeCapabilities( bool bEnable )
 		if ( m_bDisableJump == false )
 			 CapabilitiesAdd( bits_CAP_MOVE_JUMP );
 
-		if ( HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == false  )
+		if (GetEngineObject()->HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == false  )
 			 CapabilitiesAdd( bits_CAP_SKIP_NAV_GROUND_CHECK );
 	}
 }
@@ -1414,7 +1414,7 @@ bool CNPC_Antlion::IsUnusableNode(int iNodeID, CAI_Hint *pHint)
 
 void CNPC_Antlion::LockJumpNode( void )
 {
-	if ( HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == false )
 		 return;
 	
 	if ( GetNavigator()->GetPath() == NULL )
@@ -1455,7 +1455,7 @@ bool CNPC_Antlion::OnObstructionPreSteer( AILocalMoveGoal_t *pMoveGoal, float di
 	if ( g_test_new_antlion_jump.GetBool() == false )
 		 return iBaseReturn;
 
-	if ( HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) == false )
 		 return iBaseReturn;
 
 	CAI_BaseNPC *pBlocker = pMoveGoal->directTrace.pObstruction->MyNPCPointer();
@@ -1700,7 +1700,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 
 		if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 		{
-			m_spawnflags &= ~SF_NPC_GAG;
+			GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 			RemoveSolidFlags( FSOLID_NOT_SOLID );
 			TaskComplete();
 		}
@@ -1758,7 +1758,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 	case TASK_ANTLION_VANISH:
 		AddEffects( EF_NODRAW );
 		AddFlag( FL_NOTARGET );
-		m_spawnflags |= SF_NPC_GAG;
+		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 		
 		// If the task parameter is non-zero, remove us when we vanish
 		if ( pTask->flTaskData )
@@ -1961,7 +1961,7 @@ void CNPC_Antlion::RunTask( const Task_t *pTask )
 		//See if we can pop up
 		if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 		{
-			m_spawnflags &= ~SF_NPC_GAG;
+			GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 			RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 			TaskComplete();
@@ -2042,7 +2042,7 @@ bool CNPC_Antlion::IsJumpLegal( const Vector &startPos, const Vector &apex, cons
 	if ( ( endPos - GetEngineObject()->GetAbsOrigin()).Length() < MIN_JUMP_DISTANCE )
 		 return false;
 
-	if ( HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) && g_test_new_antlion_jump.GetBool() == true )
+	if (GetEngineObject()->HasSpawnFlags( SF_ANTLION_USE_GROUNDCHECKS ) && g_test_new_antlion_jump.GetBool() == true )
 	{
 		trace_t	tr;
 		AI_TraceHull( endPos, endPos, GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
@@ -2405,7 +2405,7 @@ int CNPC_Antlion::SelectSchedule( void )
 	}
 
 	// If we're flagged to burrow away when eluded, do so
-	if ( ( m_spawnflags & SF_ANTLION_BURROW_ON_ELUDED ) && ( HasCondition( COND_ENEMY_UNREACHABLE ) || HasCondition( COND_ENEMY_TOO_FAR ) ) )
+	if ( (GetEngineObject()->GetSpawnFlags() & SF_ANTLION_BURROW_ON_ELUDED) && (HasCondition(COND_ENEMY_UNREACHABLE) || HasCondition(COND_ENEMY_TOO_FAR)))
 		return SCHED_ANTLION_BURROW_AWAY;
 
 	//Hear a thumper?
@@ -2930,7 +2930,7 @@ bool CNPC_Antlion::ShouldPlayIdleSound( void )
 		return false;
 
 	//Gagged monsters don't talk
-	if ( m_spawnflags & SF_NPC_GAG )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NPC_GAG)
 		return false;
 
 	//Don't cut off another sound or play again too soon
@@ -3428,7 +3428,7 @@ void CNPC_Antlion::BurrowUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE
 	SetUse( NULL );
 	
 	//Allow idle sounds again
-	m_spawnflags &= ~SF_NPC_GAG;
+	GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 
 	//If the player activated this, then take them as an enemy
 	if ( ( pCaller != NULL ) && ( pCaller->IsPlayer() ) )
@@ -3559,7 +3559,7 @@ void CNPC_Antlion::Burrow( void )
 	SetWings( false );
 
 	//Stop us from taking damage and being solid
-	m_spawnflags |= SF_NPC_GAG;
+	GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 }
 
 //-----------------------------------------------------------------------------
@@ -3571,7 +3571,7 @@ void CNPC_Antlion::Unburrow( void )
 	SetWings( false );
 
 	//Become solid again and visible
-	m_spawnflags &= ~SF_NPC_GAG;
+	GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 	RemoveSolidFlags( FSOLID_NOT_SOLID );
 	m_takedamage	= DAMAGE_YES;
 
@@ -3910,7 +3910,7 @@ void CNPC_Antlion::PrescheduleThink( void )
 		RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage	= DAMAGE_YES;
 		RemoveFlag( FL_NOTARGET );
-		m_spawnflags &= ~SF_NPC_GAG;
+		GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 	}
 
 	//New Enemy? Try to jump at him.
@@ -4059,7 +4059,7 @@ void CNPC_Antlion::GatherEnemyConditions( CBaseEntity *pEnemy )
 	BaseClass::GatherEnemyConditions( pEnemy );
 
 	// Only continue if we burrow when eluded
-	if ( ( m_spawnflags & SF_ANTLION_BURROW_ON_ELUDED ) == false )
+	if ( (GetEngineObject()->GetSpawnFlags() & SF_ANTLION_BURROW_ON_ELUDED) == false)
 		return;
 
 	// If we're not already too far away, check again
@@ -5239,7 +5239,7 @@ bool IsAntlionWorker( CBaseEntity *pEntity )
 	// Must at least be valid and an antlion
 	return ( pEntity != NULL && 
 			 pEntity->Classify() == CLASS_ANTLION && 
-			 pEntity->HasSpawnFlags( SF_ANTLION_WORKER ) &&
+			 pEntity->GetEngineObject()->HasSpawnFlags( SF_ANTLION_WORKER ) &&
 			 dynamic_cast<CNPC_Antlion *>(pEntity) != NULL );	// Save this as the last step
 }
 

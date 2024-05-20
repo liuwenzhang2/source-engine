@@ -119,9 +119,9 @@ void CBaseNPCMaker::Spawn( void )
 	Precache();
 
 	// If I can make an infinite number of NPC, force them to fade
-	if ( m_spawnflags & SF_NPCMAKER_INF_CHILD )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_INF_CHILD)
 	{
-		m_spawnflags |= SF_NPCMAKER_FADE;
+		GetEngineObject()->AddSpawnFlags(SF_NPCMAKER_FADE);
 	}
 
 	//Start on?
@@ -221,7 +221,7 @@ bool CBaseNPCMaker::CanMakeNPC( bool bIgnoreSolidEntities )
 	}
 
 	// Do we need to check to see if the player's looking?
-	if ( HasSpawnFlags( SF_NPCMAKER_HIDEFROMPLAYER ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPCMAKER_HIDEFROMPLAYER ) )
 	{
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
@@ -249,7 +249,7 @@ bool CBaseNPCMaker::CanMakeNPC( bool bIgnoreSolidEntities )
 //-----------------------------------------------------------------------------
 bool CBaseNPCMaker::IsDepleted()
 {
-	if ( (m_spawnflags & SF_NPCMAKER_INF_CHILD) || m_nMaxNumNPCs > 0 )
+	if ( (GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_INF_CHILD) || m_nMaxNumNPCs > 0)
 		return false;
 
 	return true;
@@ -442,11 +442,11 @@ void CNPCMaker::MakeNPC( void )
 	angles.z = 0.0;
 	pent->GetEngineObject()->SetAbsAngles( angles );
 
-	pent->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
+	pent->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 
-	if ( m_spawnflags & SF_NPCMAKER_FADE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_FADE)
 	{
-		pent->AddSpawnFlags( SF_NPC_FADE_CORPSE );
+		pent->GetEngineObject()->AddSpawnFlags( SF_NPC_FADE_CORPSE );
 	}
 
 	pent->m_spawnEquipment	= m_spawnEquipment;
@@ -469,7 +469,7 @@ void CNPCMaker::MakeNPC( void )
 
 	m_nLiveChildren++;// count this NPC
 
-	if (!(m_spawnflags & SF_NPCMAKER_INF_CHILD))
+	if (!(GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_INF_CHILD))
 	{
 		m_nMaxNumNPCs--;
 
@@ -544,7 +544,7 @@ void CBaseNPCMaker::DeathNotice( CBaseEntity *pVictim )
 		m_OnAllLiveChildrenDead.FireOutput( this, this );
 
 		// See if we've exhausted our supply of NPCs
-		if ( ( (m_spawnflags & SF_NPCMAKER_INF_CHILD) == false ) && IsDepleted() )
+		if ( ( (GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_INF_CHILD) == false) && IsDepleted())
 		{
 			// Signal that all our children have been spawned and are now dead
 			m_OnAllSpawnedDead.FireOutput( this, this );
@@ -778,7 +778,7 @@ CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 void CTemplateNPCMaker::MakeNPC( void )
 {
 	// If we should be using the radius spawn method instead, do so
-	if ( m_flRadius && HasSpawnFlags(SF_NPCMAKER_ALWAYSUSERADIUS) )
+	if ( m_flRadius && GetEngineObject()->HasSpawnFlags(SF_NPCMAKER_ALWAYSUSERADIUS) )
 	{
 		MakeNPCInRadius();
 		return;
@@ -837,16 +837,16 @@ void CTemplateNPCMaker::MakeNPC( void )
 
 	m_OnSpawnNPC.Set( pEntity, pEntity, this );
 
-	if ( m_spawnflags & SF_NPCMAKER_FADE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_FADE)
 	{
-		pent->AddSpawnFlags( SF_NPC_FADE_CORPSE );
+		pent->GetEngineObject()->AddSpawnFlags( SF_NPC_FADE_CORPSE );
 	}
 
-	pent->RemoveSpawnFlags( SF_NPC_TEMPLATE );
+	pent->GetEngineObject()->RemoveSpawnFlags( SF_NPC_TEMPLATE );
 
-	if ( ( m_spawnflags & SF_NPCMAKER_NO_DROP ) == false )
+	if ( (GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_NO_DROP) == false)
 	{
-		pent->RemoveSpawnFlags( SF_NPC_FALL_TO_GROUND ); // don't fall, slam
+		pent->GetEngineObject()->RemoveSpawnFlags( SF_NPC_FALL_TO_GROUND ); // don't fall, slam
 	}
 
 	ChildPreSpawn( pent );
@@ -859,7 +859,7 @@ void CTemplateNPCMaker::MakeNPC( void )
 
 	m_nLiveChildren++;// count this NPC
 
-	if (!(m_spawnflags & SF_NPCMAKER_INF_CHILD))
+	if (!(GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_INF_CHILD))
 	{
 		m_nMaxNumNPCs--;
 
@@ -899,9 +899,9 @@ void CTemplateNPCMaker::MakeNPCInLine( void )
 
 	PlaceNPCInLine( pent );
 
-	pent->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
+	pent->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 
-	pent->RemoveSpawnFlags( SF_NPC_TEMPLATE );
+	pent->GetEngineObject()->RemoveSpawnFlags( SF_NPC_TEMPLATE );
 	ChildPreSpawn( pent );
 
 	DispatchSpawn( pent );
@@ -912,7 +912,7 @@ void CTemplateNPCMaker::MakeNPCInLine( void )
 
 	m_nLiveChildren++;// count this NPC
 
-	if (!(m_spawnflags & SF_NPCMAKER_INF_CHILD))
+	if (!(GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_INF_CHILD))
 	{
 		m_nMaxNumNPCs--;
 
@@ -999,9 +999,9 @@ void CTemplateNPCMaker::MakeNPCInRadius( void )
 
 	m_OnSpawnNPC.Set( pEntity, pEntity, this );
 
-	pent->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
+	pent->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 
-	pent->RemoveSpawnFlags( SF_NPC_TEMPLATE );
+	pent->GetEngineObject()->RemoveSpawnFlags( SF_NPC_TEMPLATE );
 	ChildPreSpawn( pent );
 
 	DispatchSpawn( pent );
@@ -1013,7 +1013,7 @@ void CTemplateNPCMaker::MakeNPCInRadius( void )
 
 	m_nLiveChildren++;// count this NPC
 
-	if (!(m_spawnflags & SF_NPCMAKER_INF_CHILD))
+	if (!(GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_INF_CHILD))
 	{
 		m_nMaxNumNPCs--;
 

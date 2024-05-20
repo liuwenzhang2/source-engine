@@ -325,9 +325,9 @@ float CBaseToggle::AxisValue( int flags, const QAngle &angles )
 
 void CBaseToggle::AxisDir( void )
 {
-	if ( m_spawnflags & SF_DOOR_ROTATE_ROLL )
+	if (GetEngineObject()->GetSpawnFlags() & SF_DOOR_ROTATE_ROLL)
 		m_vecMoveAng = QAngle( 0, 0, 1 );	// angles are roll
-	else if ( m_spawnflags & SF_DOOR_ROTATE_PITCH )
+	else if (GetEngineObject()->GetSpawnFlags() & SF_DOOR_ROTATE_PITCH)
 		m_vecMoveAng = QAngle( 1, 0, 0 );	// angles are pitch
 	else
 		m_vecMoveAng = QAngle( 0, 1, 0 );		// angles are yaw

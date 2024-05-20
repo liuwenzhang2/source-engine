@@ -168,12 +168,12 @@ int CFlare::Restore( IRestore &restore )
 {
 	int result = BaseClass::Restore( restore );
 
-	if ( m_spawnflags & SF_FLARE_NO_DLIGHT )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FLARE_NO_DLIGHT)
 	{
 		m_bLight = false;
 	}
 
-	if ( m_spawnflags & SF_FLARE_NO_SMOKE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FLARE_NO_SMOKE)
 	{
 		m_bSmoke = false;
 	}
@@ -202,22 +202,22 @@ void CFlare::Spawn( void )
 
 	AddEffects( EF_NOSHADOW|EF_NORECEIVESHADOW );
 
-	if ( m_spawnflags & SF_FLARE_NO_DLIGHT )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FLARE_NO_DLIGHT)
 	{
 		m_bLight = false;
 	}
 
-	if ( m_spawnflags & SF_FLARE_NO_SMOKE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FLARE_NO_SMOKE)
 	{
 		m_bSmoke = false;
 	}
 
-	if ( m_spawnflags & SF_FLARE_INFINITE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FLARE_INFINITE)
 	{
 		m_flTimeBurnOut = -1.0f;
 	}
 
-	if ( m_spawnflags & SF_FLARE_START_OFF )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FLARE_START_OFF)
 	{
 		AddEffects( EF_NODRAW );
 	}
@@ -233,7 +233,7 @@ void CFlare::Activate( void )
 	BaseClass::Activate();
 
 	// Start the burning sound if we're already on
-	if ( ( m_spawnflags & SF_FLARE_START_OFF ) == false )
+	if ( (GetEngineObject()->GetSpawnFlags() & SF_FLARE_START_OFF) == false)
 	{
 		StartBurnSound();
 	}
@@ -557,7 +557,7 @@ void CFlare::Die( float fadeTime )
 void CFlare::Launch( const Vector &direction, float speed )
 {
 	// Make sure we're visible
-	if ( m_spawnflags & SF_FLARE_INFINITE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FLARE_INFINITE)
 	{
 		Start( -1 );
 	}

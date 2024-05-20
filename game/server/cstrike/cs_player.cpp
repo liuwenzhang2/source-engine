@@ -6744,7 +6744,7 @@ CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 	}
 
 	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
-	pent->AddSpawnFlags( SF_NORESPAWN );
+	pent->GetEngineObject()->AddSpawnFlags( SF_NORESPAWN );
 
 	CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( (CBaseEntity*)pent );
 	if ( pWeapon )

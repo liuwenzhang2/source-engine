@@ -98,7 +98,7 @@ public:
 	int					m_nMinDist;
 	int					m_nMaxDist;
 	int					m_nOuterMaxDist;
-	int					m_spawnflags;
+	//int					m_spawnflags;
 	C_LightGlowOverlay	m_Glow;
 
 	float				m_flGlowProxySize;
@@ -118,7 +118,7 @@ IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_LightGlow, DT_LightGlow, CLightGlow )
 	RecvPropInt( RECVINFO( m_nMinDist ) ),
 	RecvPropInt( RECVINFO( m_nMaxDist ) ),
 	RecvPropInt( RECVINFO( m_nOuterMaxDist ) ),
-	RecvPropInt( RECVINFO( m_spawnflags ) ),
+	//RecvPropInt( RECVINFO( m_spawnflags ) ),
 	//RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
 	//RecvPropQAngles( RECVINFO_NAME( m_angNetworkAngles, m_angRotation ) ),
 	//RecvPropInt( RECVINFO_NAME(m_hNetworkMoveParent, moveparent), 0, RecvProxy_IntToMoveParent ),
@@ -171,7 +171,7 @@ void C_LightGlow::OnDataChanged( DataUpdateType_t updateType )
 		m_Glow.SetFadeDistances( m_nMinDist, m_nMaxDist, m_nOuterMaxDist );
 		m_Glow.m_flProxyRadius = m_flGlowProxySize;
 
-		if ( m_spawnflags & SF_LIGHTGLOW_DIRECTIONAL )
+		if (GetEngineObject()->GetSpawnFlags() & SF_LIGHTGLOW_DIRECTIONAL)
 		{
 			m_Glow.SetOneSided();
 		}

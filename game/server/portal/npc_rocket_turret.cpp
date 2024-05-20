@@ -387,7 +387,7 @@ void CNPC_RocketTurret::Spawn( void )
 	CreateVPhysics();
 
 	//Set our autostart state
-	m_bEnabled	 = ( ( m_spawnflags & SF_ROCKET_TURRET_START_INACTIVE ) == false );
+	m_bEnabled	 = ( (GetEngineObject()->GetSpawnFlags() & SF_ROCKET_TURRET_START_INACTIVE ) == false );
 
 	// Set Locked sprite
 	if ( m_bEnabled )

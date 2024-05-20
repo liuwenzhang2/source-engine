@@ -358,7 +358,7 @@ void CNPC_CScanner::Gib( void )
 	}
 
 	// Add a random chance of spawning a battery...
-	if ( !HasSpawnFlags(SF_NPC_NO_WEAPON_DROP) && random->RandomFloat( 0.0f, 1.0f) < 0.3f )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_NPC_NO_WEAPON_DROP) && random->RandomFloat( 0.0f, 1.0f) < 0.3f )
 	{
 		CItem *pBattery = (CItem*)gEntList.CreateEntityByName("item_battery");
 		if ( pBattery )
@@ -1603,7 +1603,7 @@ void CNPC_CScanner::SpotlightCreate(void)
 
 	m_hSpotlight = CBeam::BeamCreate( "sprites/glow_test02.vmt", SPOTLIGHT_WIDTH );
 	// Set the temporary spawnflag on the beam so it doesn't save (we'll recreate it on restore)
-	m_hSpotlight->AddSpawnFlags( SF_BEAM_TEMPORARY );
+	m_hSpotlight->GetEngineObject()->AddSpawnFlags( SF_BEAM_TEMPORARY );
 	m_hSpotlight->SetColor( 255, 255, 255 ); 
 	m_hSpotlight->SetHaloTexture( m_nHaloSprite );
 	m_hSpotlight->SetHaloScale( 32 );

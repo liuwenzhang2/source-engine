@@ -1021,8 +1021,8 @@ int CCollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhysicsObje
 #if _DEBUG
 	if ( phys_dontprintint.GetBool() == false )
 	{
-		const char *pName1 = STRING(pEntity0->GetModelName());
-		const char *pName2 = STRING(pEntity1->GetModelName());
+		const char *pName1 = STRING(pEntity0->GetEngineObject()->GetModelName());
+		const char *pName2 = STRING(pEntity1->GetEngineObject()->GetModelName());
 		if ( pEntity0 == pEntity1 )
 		{
 			int index0 = physcollision->CollideIndex( pObj0->GetCollide() );

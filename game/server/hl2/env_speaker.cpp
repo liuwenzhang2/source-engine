@@ -85,7 +85,7 @@ void CSpeaker::Spawn( void )
 
 void CSpeaker::Precache( void )
 {
-	if ( !FBitSet (m_spawnflags, SF_SPEAKER_START_SILENT ) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_SPEAKER_START_SILENT) )
 	{
 		// set first announcement time for random n second
 		SetNextThink( gpGlobals->curtime + random->RandomFloat(5.0, 15.0) );

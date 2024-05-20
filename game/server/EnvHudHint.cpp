@@ -28,7 +28,7 @@ public:
 	void	Precache( void );
 
 private:
-	inline	bool	AllPlayers( void ) { return (m_spawnflags & SF_HUDHINT_ALLPLAYERS) != 0; }
+	inline	bool	AllPlayers( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_HUDHINT_ALLPLAYERS) != 0; }
 
 	void InputShowHudHint( inputdata_t &inputdata );
 	void InputHideHudHint( inputdata_t &inputdata );

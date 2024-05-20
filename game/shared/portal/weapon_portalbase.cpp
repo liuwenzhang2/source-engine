@@ -365,7 +365,7 @@ void CWeaponPortalBase::	Materialize( void )
 		DoMuzzleFlash();
 	}
 
-	if ( HasSpawnFlags( SF_NORESPAWN ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
 		VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false );
 		SetMoveType( MOVETYPE_VPHYSICS );
@@ -373,7 +373,7 @@ void CWeaponPortalBase::	Materialize( void )
 		//PortalRules()->AddLevelDesignerPlacedObject( this );
 	}
 
-	if ( HasSpawnFlags( SF_NORESPAWN ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
 		if ( GetOriginalSpawnOrigin() == vec3_origin )
 		{

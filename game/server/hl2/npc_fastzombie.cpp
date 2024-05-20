@@ -2030,7 +2030,7 @@ void CFastZombie::InputAttachToVehicle( inputdata_t &inputdata )
 		m_PassengerBehavior.AttachToVehicle();
 	}
 
-	RemoveSpawnFlags( SF_NPC_GAG );
+	GetEngineObject()->RemoveSpawnFlags( SF_NPC_GAG );
 }
 
 //-----------------------------------------------------------------------------

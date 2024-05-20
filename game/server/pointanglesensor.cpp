@@ -180,7 +180,7 @@ bool CPointAngleSensor::IsFacingWithinTolerance(CBaseEntity *pEntity, CBaseEntit
 
 	Vector dir;
 	// Use either our position relative to the target, or the target's raw facing
-	if ( HasSpawnFlags( SF_USE_TARGET_FACING ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_USE_TARGET_FACING ) )
 	{
 		pTarget->GetVectors(&dir, NULL, NULL);
 	}
@@ -547,7 +547,7 @@ void CPointProximitySensor::Think( void )
 		float flDist = VectorNormalize( vecTestDir );
 
 		// If we're only interested in the distance along a vector, modify the length the accomodate that
-		if ( HasSpawnFlags( SF_PROXIMITY_TEST_AGAINST_AXIS ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_PROXIMITY_TEST_AGAINST_AXIS ) )
 		{
 			Vector vecDir;
 			GetVectors( &vecDir, NULL, NULL );

@@ -32,7 +32,7 @@ IMPLEMENT_SERVERCLASS_ST( CEnv_Lightrail_Endpoint, DT_Env_Lightrail_Endpoint )
 	SendPropInt( SENDINFO(m_nState), 8, SPROP_UNSIGNED),
 	SendPropFloat( SENDINFO(m_flDuration), 0, SPROP_NOSCALE),
 	SendPropFloat( SENDINFO(m_flStartTime), 0, SPROP_NOSCALE),
-	SendPropInt( SENDINFO(m_spawnflags), 0, SPROP_UNSIGNED),
+	//SendPropInt( SENDINFO(m_spawnflags), 0, SPROP_UNSIGNED),
 END_SEND_TABLE()
 
 
@@ -56,7 +56,7 @@ void CEnv_Lightrail_Endpoint::Spawn( void )
 	UTIL_SetSize( this, Vector( -8, -8, -8 ), Vector( 8, 8, 8 ) );
 
 	// See if we start active
-	if ( HasSpawnFlags( SF_ENDPOINT_START_SMALLFX ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_ENDPOINT_START_SMALLFX ) )
 	{
 		m_nState = (int)ENDPOINT_STATE_LARGEFX;		//THIS NEEDS TO BE CHANGED TO SMALL FX STATE
 		m_flStartTime = gpGlobals->curtime;

@@ -41,7 +41,7 @@ public:
 	C_FuncSmokeVolume();
 	~C_FuncSmokeVolume();
 
-	int IsEmissive( void ) { return ( m_spawnflags & SF_EMISSIVE ); }
+	int IsEmissive( void ) { return ( GetEngineObject()->GetSpawnFlags() & SF_EMISSIVE); }
 
 private:
 	class SmokeGrenadeParticle : public Particle
@@ -139,7 +139,7 @@ private:
 	float m_RotationSpeed;
 	float m_MovementSpeed;
 	float m_Density;
-	int	  m_spawnflags;
+	//int	  m_spawnflags;
 
 private:
 	C_FuncSmokeVolume( const C_FuncSmokeVolume & );
@@ -172,7 +172,7 @@ IMPLEMENT_CLIENTCLASS_DT( C_FuncSmokeVolume, DT_FuncSmokeVolume, CFuncSmokeVolum
 	RecvPropFloat( RECVINFO( m_RotationSpeed ) ),
 	RecvPropFloat( RECVINFO( m_MovementSpeed ) ),
 	RecvPropFloat( RECVINFO( m_Density ) ),
-	RecvPropInt( RECVINFO( m_spawnflags ) ),
+	//RecvPropInt( RECVINFO( m_spawnflags ) ),
 	RecvPropDataTable( RECVINFO_DT( m_Collision ), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty) ),
 END_RECV_TABLE()
 

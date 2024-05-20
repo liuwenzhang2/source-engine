@@ -126,10 +126,10 @@ public:
 	virtual void OnStopControlled() {}
 
 	// SF Tests.
-	inline bool IsControllable( void )		{ return ( m_spawnflags & SF_TANK_CANCONTROL ) ? true : false; }
-	inline bool IsActive( void )			{ return ( m_spawnflags & SF_TANK_ACTIVE ) ? true : false; }
-	inline bool IsNPCControllable( void )	{ return ( m_spawnflags & SF_TANK_NPC_CONTROLLABLE ) ? true : false; }
-	inline bool IsNPCSetController( void )	{ return ( m_spawnflags & SF_TANK_NPC_SET_CONTROLLER ) ? true : false; }
+	inline bool IsControllable( void )		{ return (GetEngineObject()->GetSpawnFlags() & SF_TANK_CANCONTROL) ? true : false; }
+	inline bool IsActive( void )			{ return (GetEngineObject()->GetSpawnFlags() & SF_TANK_ACTIVE ) ? true : false; }
+	inline bool IsNPCControllable( void )	{ return (GetEngineObject()->GetSpawnFlags() & SF_TANK_NPC_CONTROLLABLE ) ? true : false; }
+	inline bool IsNPCSetController( void )	{ return (GetEngineObject()->GetSpawnFlags() & SF_TANK_NPC_SET_CONTROLLER ) ? true : false; }
 
 	virtual void DoMuzzleFlash( void );
 	virtual const char *GetTracerType( void );
@@ -151,8 +151,8 @@ protected:
 	void	CalcPlayerCrosshairTarget( Vector *pVecTarget );
 	void	CalcNPCEnemyTarget( Vector *pVecTarget );
 
-	inline bool IsPlayerManned( void )	{ return m_hController && m_hController->IsPlayer() && ( m_spawnflags & SF_TANK_PLAYER ); }
-	inline bool IsNPCManned( void )		{ return m_hController && m_hController->MyNPCPointer() && ( m_spawnflags & SF_TANK_NPC ); }
+	inline bool IsPlayerManned( void )	{ return m_hController && m_hController->IsPlayer() && (GetEngineObject()->GetSpawnFlags() & SF_TANK_PLAYER ); }
+	inline bool IsNPCManned( void )		{ return m_hController && m_hController->MyNPCPointer() && (GetEngineObject()->GetSpawnFlags() & SF_TANK_NPC ); }
 
 private:
 	void	TrackTarget( void );

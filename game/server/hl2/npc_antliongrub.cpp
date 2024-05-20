@@ -387,7 +387,7 @@ void CAntlionGrub::Spawn( void )
 	m_takedamage = DAMAGE_YES;
 
 	// Stick to the nearest surface
-	if ( HasSpawnFlags( SF_ANTLIONGRUB_NO_AUTO_PLACEMENT ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_ANTLIONGRUB_NO_AUTO_PLACEMENT ) == false )
 	{
 		AttachToSurface();
 	}

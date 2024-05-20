@@ -1970,7 +1970,7 @@ void CNPC_Hunter::IdleSound()
 //-----------------------------------------------------------------------------
 bool CNPC_Hunter::ShouldPlayIdleSound()
 {
-	if ( random->RandomInt(0, 99) == 0 && !HasSpawnFlags( SF_NPC_GAG ) )
+	if ( random->RandomInt(0, 99) == 0 && !GetEngineObject()->HasSpawnFlags( SF_NPC_GAG ) )
 		return true;
 	
 	return false;

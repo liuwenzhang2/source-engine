@@ -204,7 +204,7 @@ bool CNPC_APCDriver::FVisible( CBaseEntity *pTarget, int traceMask, CBaseEntity 
 //-----------------------------------------------------------------------------
 int CNPC_APCDriver::RangeAttack1Conditions( float flDot, float flDist )
 {
-	if ( HasSpawnFlags(SF_APCDRIVER_NO_GUN_ATTACK) )
+	if (GetEngineObject()->HasSpawnFlags(SF_APCDRIVER_NO_GUN_ATTACK) )
 		return COND_NONE;
 
 	if ( m_hAPC->m_lifeState != LIFE_ALIVE )
@@ -237,7 +237,7 @@ int CNPC_APCDriver::RangeAttack1Conditions( float flDot, float flDist )
 
 int CNPC_APCDriver::RangeAttack2Conditions( float flDot, float flDist )
 {
-	if ( HasSpawnFlags(SF_APCDRIVER_NO_ROCKET_ATTACK) )
+	if (GetEngineObject()->HasSpawnFlags(SF_APCDRIVER_NO_ROCKET_ATTACK) )
 		return COND_NONE;
 
 	if ( m_hAPC->m_lifeState != LIFE_ALIVE )

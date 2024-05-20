@@ -37,7 +37,7 @@ private:
 	int				m_nState;
 	float			m_flDuration;
 	float			m_flStartTime;
-	int				m_spawnflags;
+	//int				m_spawnflags;
 	
 	CSmartPtr<CSimpleEmitter>		m_pSimpleEmitter;
 	CSmartPtr<CParticleAttractor>	m_pAttractorEmitter;
@@ -49,7 +49,7 @@ IMPLEMENT_CLIENTCLASS_DT( C_Env_Lightrail_Endpoint, DT_Env_Lightrail_Endpoint, C
 	RecvPropInt( RECVINFO(m_nState) ),
 	RecvPropFloat( RECVINFO(m_flDuration) ),
 	RecvPropFloat( RECVINFO(m_flStartTime) ),
-	RecvPropInt( RECVINFO(m_spawnflags) ),
+	//RecvPropInt( RECVINFO(m_spawnflags) ),
 END_RECV_TABLE()
 
 //-----------------------------------------------------------------------------

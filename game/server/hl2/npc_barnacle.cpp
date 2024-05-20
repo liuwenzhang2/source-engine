@@ -315,7 +315,7 @@ void CNPC_Barnacle::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Barnacle::SetAltitude( float flAltitude )
 {
-	if ( HasSpawnFlags( SF_BARNACLE_AMBUSH ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BARNACLE_AMBUSH ) )
 		return;
 
 	m_flAltitude = flAltitude;
@@ -331,7 +331,7 @@ void CNPC_Barnacle::DropTongue( void )
 	m_nSpitAttachment = LookupAttachment( "StrikeHeadAttach" );
 	Assert( m_hTongueRoot && m_hTongueTip );
 
-	RemoveSpawnFlags( SF_BARNACLE_AMBUSH );
+	GetEngineObject()->RemoveSpawnFlags( SF_BARNACLE_AMBUSH );
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -340,7 +340,7 @@ void CNPC_Barnacle::Activate( void )
 {
 	BaseClass::Activate();
 
-	if ( HasSpawnFlags( SF_BARNACLE_AMBUSH ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BARNACLE_AMBUSH ) )
 		return;
 
 	// Create our tongue tips
@@ -2136,7 +2136,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 	}
 
 	// Puke gibs unless we're told to be cheap
-	bool spawnGibs = ( !HasSpawnFlags( SF_BARNACLE_CHEAP_DEATH ) || random->RandomInt( 0, 1 ) );
+	bool spawnGibs = ( !GetEngineObject()->HasSpawnFlags( SF_BARNACLE_CHEAP_DEATH ) || random->RandomInt( 0, 1 ) );
 
 	if ( spawnGibs )
 	{

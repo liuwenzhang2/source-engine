@@ -236,7 +236,7 @@ void CPropVehicle::Think()
 	// Derived classes of CPropVehicle have their own code to determine how frequently to think.
 	// But the prop_vehicle entity native to this class will only think one time, so this flag
 	// was added to allow prop_vehicle to always think without affecting the derived classes.
-	if( HasSpawnFlags(SF_PROP_VEHICLE_ALWAYSTHINK) )
+	if(GetEngineObject()->HasSpawnFlags(SF_PROP_VEHICLE_ALWAYSTHINK) )
 	{
 		SetNextThink(gpGlobals->curtime);
 	}

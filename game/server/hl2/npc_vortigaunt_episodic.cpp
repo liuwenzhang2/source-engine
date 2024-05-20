@@ -1117,7 +1117,7 @@ void CNPC_Vortigaunt::Spawn( void )
 {
 #if !defined( HL2_EPISODIC )
 	// Disable back-away
-	AddSpawnFlags( SF_NPC_NO_PLAYER_PUSHAWAY );
+	GetEngineObject()->AddSpawnFlags( SF_NPC_NO_PLAYER_PUSHAWAY );
 #endif // HL2_EPISODIC
 
 	// Allow multiple models (for slaves), but default to vortigaunt.mdl
@@ -1451,7 +1451,7 @@ bool CNPC_Vortigaunt::ShouldHealTarget( CBaseEntity *pTarget )
 		return false;
 
 	// If we're scripting or waiting to run one, we won't heal a target
-	if ( IsInAScript() || HasSpawnFlags( SF_NPC_WAIT_FOR_SCRIPT ) )
+	if ( IsInAScript() || GetEngineObject()->HasSpawnFlags( SF_NPC_WAIT_FOR_SCRIPT ) )
 		return false;
 
 	// We only heal players

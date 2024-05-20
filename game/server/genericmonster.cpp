@@ -162,18 +162,18 @@ void CGenericNPC::Spawn()
 	CapabilitiesAdd( bits_CAP_MOVE_GROUND | bits_CAP_OPEN_DOORS );
 
 	NPCInit();
-	if ( !HasSpawnFlags(SF_GENERICNPC_NOTSOLID) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_GENERICNPC_NOTSOLID) )
 	{
 		trace_t tr;
 		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(), MASK_SOLID, &tr );
 		if ( tr.startsolid )
 		{
 			Msg("Placed npc_generic in solid!!! (%s)\n", STRING(GetEngineObject()->GetModelName()) );
-			m_spawnflags |= SF_GENERICNPC_NOTSOLID;
+			GetEngineObject()->AddSpawnFlags(SF_GENERICNPC_NOTSOLID);
 		}
 	}
 
-	if ( HasSpawnFlags(SF_GENERICNPC_NOTSOLID) )
+	if (GetEngineObject()->HasSpawnFlags(SF_GENERICNPC_NOTSOLID) )
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage = DAMAGE_NO;

@@ -93,7 +93,7 @@ void CControlPoint::Spawn( void )
 	m_iAlliesRequired = 0;
 	m_iAxisRequired = 0;
 
-	if ( FBitSet( m_spawnflags, CAP_POINT_HIDE_MODEL ) )
+	if (GetEngineObject()->HasSpawnFlags(CAP_POINT_HIDE_MODEL) )
 	{
 		AddEffects( EF_NODRAW );
 	}
@@ -427,7 +427,7 @@ int CControlPoint::PointValue( void )
 
 	int value = 0;
 
-	if ( FBitSet( m_spawnflags, CAP_POINT_TICK_FOR_BOMBS_REMAINING ) )
+	if (GetEngineObject()->HasSpawnFlags(CAP_POINT_TICK_FOR_BOMBS_REMAINING) )
 	{
 		value = m_iBombsRemaining;
 	}

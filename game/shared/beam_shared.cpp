@@ -49,7 +49,7 @@ void CInfoTarget::Spawn( void )
 {
 	BaseClass::Spawn();
 
-	if ( HasSpawnFlags(0x01) )
+	if (GetEngineObject()->HasSpawnFlags(SF_WEAPON_START_CONSTRAINED) )//0x01
 	{
 		GetEngineObject()->SetEFlags( EFL_FORCE_CHECK_TRANSMIT );
 	}
@@ -753,13 +753,13 @@ CBaseEntity *CBeam::RandomTargetname( const char *szName )
 void CBeam::DoSparks( const Vector &start, const Vector &end )
 {
 #if !defined( CLIENT_DLL )
-	if ( HasSpawnFlags(SF_BEAM_SPARKSTART|SF_BEAM_SPARKEND) )
+	if (GetEngineObject()->HasSpawnFlags(SF_BEAM_SPARKSTART|SF_BEAM_SPARKEND) )
 	{
-		if ( HasSpawnFlags( SF_BEAM_SPARKSTART ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_BEAM_SPARKSTART ) )
 		{
 			g_pEffects->Sparks( start );
 		}
-		if ( HasSpawnFlags( SF_BEAM_SPARKEND ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_BEAM_SPARKEND ) )
 		{
 			g_pEffects->Sparks( end );
 		}
@@ -801,7 +801,7 @@ void CBeam::BeamDamage( trace_t *ptr )
 			CalculateMeleeDamageForce( &info, dir, ptr->endpos );
 			pHit->DispatchTraceAttack( info, dir, ptr );
 			ApplyMultiDamage();
-			if ( HasSpawnFlags( SF_BEAM_DECALS ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_BEAM_DECALS ) )
 			{
 				if ( pHit->IsBSPModel() )
 				{

@@ -89,7 +89,7 @@ LINK_ENTITY_TO_CLASS( infodecal, CDecal );
 void CDecal::Spawn( void )
 {
 	if ( m_nTexture < 0 || 
-		(gpGlobals->deathmatch && HasSpawnFlags( SF_DECAL_NOTINDEATHMATCH )) )
+		(gpGlobals->deathmatch && GetEngineObject()->HasSpawnFlags( SF_DECAL_NOTINDEATHMATCH )) )
 	{
 		UTIL_Remove( this );
 		return;
@@ -288,7 +288,7 @@ LINK_ENTITY_TO_CLASS( info_projecteddecal, CProjectedDecal );
 void CProjectedDecal::Spawn( void )
 {
 	if ( m_nTexture < 0 || 
-		(gpGlobals->deathmatch && HasSpawnFlags( SF_DECAL_NOTINDEATHMATCH )) )
+		(gpGlobals->deathmatch && GetEngineObject()->HasSpawnFlags( SF_DECAL_NOTINDEATHMATCH )) )
 	{
 		UTIL_Remove( this );
 		return;
@@ -694,7 +694,7 @@ void CWorld::Precache( void )
 			m_iszChapterTitle = NULL_STRING;
 
 			// send the message entity a play message command, delayed by 1 second
-			pMessage->AddSpawnFlags( SF_MESSAGE_ONCE );
+			pMessage->GetEngineObject()->AddSpawnFlags( SF_MESSAGE_ONCE );
 			pMessage->SetThink( &CMessage::SUB_CallUseToggle );
 			pMessage->SetNextThink( gpGlobals->curtime + 1.0f );
 		}

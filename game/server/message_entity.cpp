@@ -81,7 +81,7 @@ void CMessageEntity::Spawn( void )
 	SetNextThink( gpGlobals->curtime + 0.1f );
 	m_drawText = false;
 	m_bDeveloperOnly = false;
-	m_bEnabled = !HasSpawnFlags( SF_MESSAGE_DISABLED );
+	m_bEnabled = !GetEngineObject()->HasSpawnFlags( SF_MESSAGE_DISABLED );
 	//m_debugOverlays |= OVERLAY_TEXT_BIT;		// make sure we always show the text
 }
 

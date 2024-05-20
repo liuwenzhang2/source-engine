@@ -51,9 +51,9 @@ void CNPCMaker::Spawn( void )
 	Precache();
 
 	// If I can make an infinite number of NPC, force them to fade
-	if ( m_spawnflags & SF_NPCMAKER_INF_CHILD )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_INF_CHILD )
 	{
-		m_spawnflags |= SF_NPCMAKER_FADE;
+		GetEngineObject()->AddSpawnFlags(SF_NPCMAKER_FADE);
 	}
 
 	//Start on?
@@ -95,7 +95,7 @@ bool CNPCMaker::CanMakeNPC( void )
 	maxs.z = GetEngineObject()->GetAbsOrigin().z;
 	
 	//Only adjust for the ground if we want it
-	if ( ( m_spawnflags & SF_NPCMAKER_NO_DROP ) == false )
+	if ( (GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_NO_DROP ) == false )
 	{
 		mins.z = m_flGround;
 	}
@@ -128,7 +128,7 @@ bool CNPCMaker::CanMakeNPC( void )
 //-----------------------------------------------------------------------------
 bool CNPCMaker::IsDepleted()
 {
-	if ( (m_spawnflags & SF_NPCMAKER_INF_CHILD) || m_iMaxNumNPCs > 0 )
+	if ( (GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_INF_CHILD) || m_iMaxNumNPCs > 0 )
 		return false;
 
 	return true;
@@ -245,11 +245,11 @@ void CNPCMaker::MakeNPC( void )
 	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetAbsOrigin() );
 	pent->GetEngineObject()->SetLocalAngles(GetEngineObject()->GetAbsAngles() );
 
-	pent->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
+	pent->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 
-	if ( m_spawnflags & SF_NPCMAKER_FADE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_FADE )
 	{
-		pent->AddSpawnFlags( SF_NPC_FADE_CORPSE );
+		pent->GetEngineObject()->AddSpawnFlags( SF_NPC_FADE_CORPSE );
 	}
 
 
@@ -258,7 +258,7 @@ void CNPCMaker::MakeNPC( void )
 
 	m_cLiveChildren++;// count this NPC
 
-	if (!(m_spawnflags & SF_NPCMAKER_INF_CHILD))
+	if (!(GetEngineObject()->GetSpawnFlags() & SF_NPCMAKER_INF_CHILD))
 	{
 		m_iMaxNumNPCs--;
 

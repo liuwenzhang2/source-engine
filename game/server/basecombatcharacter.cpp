@@ -1621,7 +1621,7 @@ void CBaseCombatCharacter::Event_Killed( const CTakeDamageInfo &info )
 	}
 	
 	// if flagged to drop a health kit
-	if (HasSpawnFlags(SF_NPC_DROP_HEALTHKIT))
+	if (GetEngineObject()->HasSpawnFlags(SF_NPC_DROP_HEALTHKIT))
 	{
 		CBaseEntity::Create( "item_healthvial", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 	}
@@ -2061,7 +2061,7 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 	pWeapon->Drop( vecThrow );
 	Weapon_Detach( pWeapon );
 
-	if ( HasSpawnFlags( SF_NPC_NO_WEAPON_DROP ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_NPC_NO_WEAPON_DROP ) )
 	{
 		// Don't drop weapons when the super physgun is happening.
 		UTIL_Remove( pWeapon );
@@ -2164,7 +2164,7 @@ void CBaseCombatCharacter::Weapon_Equip( CBaseCombatWeapon *pWeapon )
 	if ( IsPlayer() == false )
 	{
 		// If SF_NPC_LONG_RANGE spawn flags is set let weapon work from any distance
-		if ( HasSpawnFlags(SF_NPC_LONG_RANGE) )
+		if (GetEngineObject()->HasSpawnFlags(SF_NPC_LONG_RANGE) )
 		{
 			m_hActiveWeapon->m_fMaxRange1 = 999999999;
 			m_hActiveWeapon->m_fMaxRange2 = 999999999;
@@ -2913,7 +2913,7 @@ CBaseEntity *CBaseCombatCharacter::Weapon_FindUsable( const Vector &range )
 		float fCurDist = (pWeapon->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->GetLocalOrigin()).Length();
 
 		// Give any reserved weapon a bonus
-		if( pWeapon->HasSpawnFlags( SF_WEAPON_NO_PLAYER_PICKUP ) )
+		if( pWeapon->GetEngineObject()->HasSpawnFlags( SF_WEAPON_NO_PLAYER_PICKUP ) )
 		{
 			fCurDist *= 0.5f;
 		}

@@ -177,20 +177,20 @@ void CRagdollProp::Spawn( void )
 	BaseClass::SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING ); // FIXME: shouldn't this be a subset of the bones
 	// this is useless info after the initial conditions are set
 	GetEngineObject()->SetAbsAngles( vec3_angle );
-	int collisionGroup = (m_spawnflags & SF_RAGDOLLPROP_DEBRIS) ? COLLISION_GROUP_DEBRIS : COLLISION_GROUP_NONE;
-	bool bWake = (m_spawnflags & SF_RAGDOLLPROP_STARTASLEEP) ? false : true;
+	int collisionGroup = (GetEngineObject()->GetSpawnFlags() & SF_RAGDOLLPROP_DEBRIS) ? COLLISION_GROUP_DEBRIS : COLLISION_GROUP_NONE;
+	bool bWake = (GetEngineObject()->GetSpawnFlags() & SF_RAGDOLLPROP_STARTASLEEP) ? false : true;
 	InitRagdoll( vec3_origin, 0, vec3_origin, pBoneToWorld, pBoneToWorld, 0, collisionGroup, true, bWake );
 	m_lastUpdateTickCount = 0;
 	m_flBlendWeight = 0.0f;
 	m_nOverlaySequence = -1;
 
 	// Unless specified, do not allow this to be dissolved
-	if ( HasSpawnFlags( SF_RAGDOLLPROP_ALLOW_DISSOLVE ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_RAGDOLLPROP_ALLOW_DISSOLVE ) == false )
 	{
 		GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 	}
 
-	if ( HasSpawnFlags(SF_RAGDOLLPROP_MOTIONDISABLED) )
+	if (GetEngineObject()->HasSpawnFlags(SF_RAGDOLLPROP_MOTIONDISABLED) )
 	{
 		DisableMotion();
 	}
@@ -371,12 +371,12 @@ void CRagdollProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 		}
 	}
 
-	if ( HasSpawnFlags( SF_RAGDOLLPROP_USE_LRU_RETIREMENT ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_RAGDOLLPROP_USE_LRU_RETIREMENT ) )
 	{
 		s_RagdollLRU.MoveToTopOfLRU( this );
 	}
 
-	if ( !HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON ) )
 		return;
 
 	ragdoll_t *pRagdollPhys = GetRagdoll( );
@@ -402,7 +402,7 @@ void CRagdollProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 		CRagdollBoogie::Create( this, 150, gpGlobals->curtime, 3.0f, SF_RAGDOLL_BOOGIE_ELECTRICAL );
 	}
 
-	if ( HasSpawnFlags( SF_RAGDOLLPROP_USE_LRU_RETIREMENT ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_RAGDOLLPROP_USE_LRU_RETIREMENT ) )
 	{
 		s_RagdollLRU.MoveToTopOfLRU( this );
 	}
@@ -699,7 +699,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 	params.forcePosition = forcePos;
 	params.pCurrentBones = pBoneToWorld;
 	params.jointFrictionScale = 1.0;
-	params.allowStretch = HasSpawnFlags(SF_RAGDOLLPROP_ALLOW_STRETCH);
+	params.allowStretch = GetEngineObject()->HasSpawnFlags(SF_RAGDOLLPROP_ALLOW_STRETCH);
 	params.fixedConstraints = false;
 	RagdollCreate( m_ragdoll, params, physenv );
 	RagdollApplyAnimationAsVelocity( m_ragdoll, pPrevBones, pBoneToWorld, dt );
@@ -1428,7 +1428,7 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	}
 	else if ( bUseLRURetirement )
 	{
-		pRagdoll->AddSpawnFlags( SF_RAGDOLLPROP_USE_LRU_RETIREMENT );
+		pRagdoll->GetEngineObject()->AddSpawnFlags( SF_RAGDOLLPROP_USE_LRU_RETIREMENT );
 		s_RagdollLRU.MoveToTopOfLRU( pRagdoll );
 	}
 

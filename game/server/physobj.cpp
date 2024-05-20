@@ -330,7 +330,7 @@ void CPhysicsSpring::Activate( void )
 		spring.startPosition = m_start;
 		spring.endPosition = m_end;
 		spring.useLocalPositions = false;
-		spring.onlyStretch = HasSpawnFlags( SF_SPRING_ONLYSTRETCH );
+		spring.onlyStretch = GetEngineObject()->HasSpawnFlags( SF_SPRING_ONLYSTRETCH );
 		m_pSpring = physenv->CreateSpring( pStart, pEnd, &spring );
 	}
 }
@@ -426,15 +426,15 @@ void CPhysBox::Spawn( void )
 
 	m_iMaxHealth = ( m_iHealth > 0 ) ? m_iHealth : 1;
 
-	if ( HasSpawnFlags( SF_BREAK_TRIGGER_ONLY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BREAK_TRIGGER_ONLY ) )
 	{
 		m_takedamage = DAMAGE_EVENTS_ONLY;
-		AddSpawnFlags( SF_BREAK_DONT_TAKE_PHYSICS_DAMAGE );
+		GetEngineObject()->AddSpawnFlags( SF_BREAK_DONT_TAKE_PHYSICS_DAMAGE );
 	}
 	else if ( m_iHealth == 0 )
 	{
 		m_takedamage = DAMAGE_EVENTS_ONLY;
-		AddSpawnFlags( SF_BREAK_DONT_TAKE_PHYSICS_DAMAGE );
+		GetEngineObject()->AddSpawnFlags( SF_BREAK_DONT_TAKE_PHYSICS_DAMAGE );
 	}
 	else
 	{
@@ -445,12 +445,12 @@ void CPhysBox::Spawn( void )
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetSolid( SOLID_VPHYSICS );
-	if ( HasSpawnFlags( SF_PHYSBOX_DEBRIS ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_DEBRIS ) )
 	{
 		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	}
 
-	if ( HasSpawnFlags( SF_PHYSBOX_NO_ROTORWASH_PUSH ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_NO_ROTORWASH_PUSH ) )
 	{
 		GetEngineObject()->AddEFlags( EFL_NO_ROTORWASH_PUSH );
 	}
@@ -464,7 +464,7 @@ void CPhysBox::Spawn( void )
 	m_hCarryingPlayer = NULL;
 
 	SetTouch( &CPhysBox::BreakTouch );
-	if ( HasSpawnFlags( SF_BREAK_TRIGGER_ONLY ) )		// Only break on trigger
+	if (GetEngineObject()->HasSpawnFlags( SF_BREAK_TRIGGER_ONLY ) )		// Only break on trigger
 	{
 		SetTouch( NULL );
 	}
@@ -530,12 +530,12 @@ bool CPhysBox::CreateVPhysics()
 	}
 
 	// Wake it up if not asleep
-	if ( !HasSpawnFlags(SF_PHYSBOX_ASLEEP) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_PHYSBOX_ASLEEP) )
 	{
 		pPhysics->Wake();
 	}
 
-	if ( HasSpawnFlags(SF_PHYSBOX_MOTIONDISABLED) || m_damageToEnableMotion > 0 || m_flForceToEnableMotion > 0 )
+	if (GetEngineObject()->HasSpawnFlags(SF_PHYSBOX_MOTIONDISABLED) || m_damageToEnableMotion > 0 || m_flForceToEnableMotion > 0 )
 	{
 		pPhysics->EnableMotion( false );
 	}
@@ -550,11 +550,11 @@ bool CPhysBox::CreateVPhysics()
 int CPhysBox::ObjectCaps() 
 { 
 	int caps = BaseClass::ObjectCaps() | FCAP_WCEDIT_POSITION;
-	if ( HasSpawnFlags( SF_PHYSBOX_ENABLE_PICKUP_OUTPUT ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_ENABLE_PICKUP_OUTPUT ) )
 	{
 		caps |= FCAP_IMPULSE_USE;
 	}
-	else if ( !HasSpawnFlags( SF_PHYSBOX_IGNOREUSE ) )
+	else if ( !GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_IGNOREUSE ) )
 	{
 		if ( CBasePlayer::CanPickupObject( this, 35, 128 ) )
 		{
@@ -573,12 +573,12 @@ void CPhysBox::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useT
 	CBasePlayer *pPlayer = ToBasePlayer( pActivator );
 	if ( pPlayer )
 	{
-		if ( HasSpawnFlags( SF_PHYSBOX_ENABLE_PICKUP_OUTPUT ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_ENABLE_PICKUP_OUTPUT ) )
 		{
 			m_OnPlayerUse.FireOutput( this, this );
 		}
 
-		if ( !HasSpawnFlags( SF_PHYSBOX_IGNOREUSE ) )
+		if ( !GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_IGNOREUSE ) )
 		{
 			pPlayer->PickupObject( this );
 		}
@@ -590,14 +590,14 @@ void CPhysBox::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useT
 //-----------------------------------------------------------------------------
 bool CPhysBox::CanBePickedUpByPhyscannon()
 {
-	if ( HasSpawnFlags( SF_PHYSBOX_NEVER_PICK_UP ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_NEVER_PICK_UP ) )
 		return false;
 
 	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
 	if ( !pPhysicsObject )
 		return false;
 		
-	if ( !pPhysicsObject->IsMotionEnabled() && !HasSpawnFlags( SF_PHYSBOX_ENABLE_ON_PHYSCANNON ) )
+	if ( !pPhysicsObject->IsMotionEnabled() && !GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_ENABLE_ON_PHYSCANNON ) )
 		return false;		
 
 	return true;
@@ -714,13 +714,13 @@ void CPhysBox::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	BaseClass::VPhysicsUpdate( pPhysics );
 
 	// if this is the first time we have moved, fire our target
-	if ( HasSpawnFlags( SF_PHYSBOX_ASLEEP ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_ASLEEP ) )
 	{
 		if ( !pPhysics->IsAsleep() )
 		{
 			m_OnAwakened.FireOutput(this, this);
 			FireTargets( STRING(m_target), this, this, USE_TOGGLE, 0 );
-			RemoveSpawnFlags( SF_PHYSBOX_ASLEEP );
+			GetEngineObject()->RemoveSpawnFlags( SF_PHYSBOX_ASLEEP );
 		}
 	}
 }
@@ -738,7 +738,7 @@ void CPhysBox::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reaso
 	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
 	if ( pPhysicsObject && !pPhysicsObject->IsMoveable() )
 	{
-		if ( !HasSpawnFlags( SF_PHYSBOX_ENABLE_ON_PHYSCANNON ) )
+		if ( !GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_ENABLE_ON_PHYSCANNON ) )
 			return;
 		EnableMotion();
 	}
@@ -783,7 +783,7 @@ void CPhysBox::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		CBaseEntity *pOther = static_cast<CBaseEntity *>(pPhysObj->GetGameData());
 
 		// Don't allow the player to bump an object active if we've requested not to
-		if ( ( pOther && pOther->IsPlayer() && HasSpawnFlags( SF_PHYSBOX_PREVENT_PLAYER_TOUCH_ENABLE ) ) == false )
+		if ( ( pOther && pOther->IsPlayer() && GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_PREVENT_PLAYER_TOUCH_ENABLE ) ) == false )
 		{
 			// Large enough to enable motion?
 			float flForce = pEvent->collisionSpeed * pEvent->pObjects[!index]->GetMass();
@@ -845,7 +845,7 @@ int CPhysBox::OnTakeDamage( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 bool CPhysBox::HasPreferredCarryAnglesForPlayer( CBasePlayer *pPlayer )
 {
-	return HasSpawnFlags( SF_PHYSBOX_USEPREFERRED );
+	return GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_USEPREFERRED );
 }
 
 
@@ -949,7 +949,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 			
 			vecSpot = pEntity->BodyTarget( vecOrigin );
 			// Squash this down to a circle
-			if ( HasSpawnFlags( SF_PHYSEXPLOSION_RADIAL ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_PHYSEXPLOSION_RADIAL ) )
 			{
 				vecOrigin[2] = vecSpot[2];
 			}
@@ -959,7 +959,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 
 			if( m_radius == 0 || flDist <= m_radius )
 			{
-				if ( HasSpawnFlags( SF_PHYSEXPLOSION_TEST_LOS ) )
+				if (GetEngineObject()->HasSpawnFlags( SF_PHYSEXPLOSION_TEST_LOS ) )
 				{
 					Vector vecStartPos = GetEngineObject()->GetAbsOrigin();
 					Vector vecEndPos = pEntity->BodyTarget( vecStartPos, false );
@@ -996,7 +996,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 				CTakeDamageInfo info( this, this, adjustedDamage, DMG_BLAST );
 				CalculateExplosiveDamageForce( &info, (vecSpot - vecOrigin), vecOrigin );
 	
-				if ( HasSpawnFlags( SF_PHYSEXPLOSION_PUSH_PLAYER ) )
+				if (GetEngineObject()->HasSpawnFlags( SF_PHYSEXPLOSION_PUSH_PLAYER ) )
 				{
 					if ( pEntity->IsPlayer() )
 					{
@@ -1005,7 +1005,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 
 						float flFalloff = RemapValClamped( dist, m_radius, m_radius*0.75f, 0.0f, 1.0f );
 
-						if ( HasSpawnFlags( SF_PHYSEXPLOSION_DISORIENT_PLAYER ) )
+						if (GetEngineObject()->HasSpawnFlags( SF_PHYSEXPLOSION_DISORIENT_PLAYER ) )
 						{
 							//Disorient the player
 							QAngle vecDeltaAngles;
@@ -1041,7 +1041,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 					}
 				}
 	
-				if ( HasSpawnFlags( SF_PHYSEXPLOSION_NODAMAGE ) )
+				if (GetEngineObject()->HasSpawnFlags( SF_PHYSEXPLOSION_NODAMAGE ) )
 				{
 					pEntity->VPhysicsTakeDamage( info );
 				}
@@ -1163,7 +1163,7 @@ void CPhysImpact::InputImpact( inputdata_t &inputdata )
 	AngleVectors(GetEngineObject()->GetAbsAngles(), &dir );
 	
 	//Setup our trace information
-	float	dist	= HasSpawnFlags( bitsPHYSIMPACT_INFINITE_LENGTH ) ? MAX_TRACE_LENGTH : m_distance;
+	float	dist	= GetEngineObject()->HasSpawnFlags( bitsPHYSIMPACT_INFINITE_LENGTH ) ? MAX_TRACE_LENGTH : m_distance;
 	Vector	start	= GetEngineObject()->GetAbsOrigin();
 	Vector	end		= start + ( dir * dist );
 
@@ -1207,10 +1207,10 @@ void CPhysImpact::InputImpact( inputdata_t &inputdata )
 			ApplyMultiDamage();
 
 			//Damage falls off unless specified or the ray's length is infinite
-			float	damage = HasSpawnFlags( bitsPHYSIMPACT_NOFALLOFF | bitsPHYSIMPACT_INFINITE_LENGTH ) ? 
+			float	damage = GetEngineObject()->HasSpawnFlags( bitsPHYSIMPACT_NOFALLOFF | bitsPHYSIMPACT_INFINITE_LENGTH ) ?
 								m_damage : (m_damage * (1.0f-trace.fraction));
 			
-			if ( HasSpawnFlags( bitsPHYSIMPACT_IGNORE_MASS ) )
+			if (GetEngineObject()->HasSpawnFlags( bitsPHYSIMPACT_IGNORE_MASS ) )
 			{
 				damage *= pPhysics->GetMass();
 			}
@@ -1221,7 +1221,7 @@ void CPhysImpact::InputImpact( inputdata_t &inputdata )
 			}
 
 			// Legacy entities applied the force along the impact normal, which yielded unpredictable results.
-			if ( !HasSpawnFlags( bitsPHYSIMPACT_IGNORE_NORMAL ) )
+			if ( !GetEngineObject()->HasSpawnFlags( bitsPHYSIMPACT_IGNORE_NORMAL ) )
 			{
 				dir = -trace.plane.normal;
 			}				
@@ -1386,8 +1386,8 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 {
-	bool createAsleep = HasSpawnFlags(SF_CONVERT_ASLEEP);
-	bool createAsDebris = HasSpawnFlags(SF_CONVERT_AS_DEBRIS);
+	bool createAsleep = GetEngineObject()->HasSpawnFlags(SF_CONVERT_ASLEEP);
+	bool createAsDebris = GetEngineObject()->HasSpawnFlags(SF_CONVERT_AS_DEBRIS);
 	// Fire output
 	m_OnConvert.FireOutput( inputdata.pActivator, this );
 
@@ -1577,12 +1577,12 @@ void CPhysMagnet::Spawn( void )
 	VPhysicsInitNormal( GetSolid(), GetSolidFlags(), true, &tmpSolid );
 
 	// Wake it up if not asleep
-	if ( !HasSpawnFlags(SF_MAGNET_ASLEEP) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_MAGNET_ASLEEP) )
 	{
 		VPhysicsGetObject()->Wake();
 	}
 
-	if ( HasSpawnFlags(SF_MAGNET_MOTIONDISABLED) )
+	if (GetEngineObject()->HasSpawnFlags(SF_MAGNET_MOTIONDISABLED) )
 	{
 		VPhysicsGetObject()->EnableMotion( false );
 	}
@@ -1636,7 +1636,7 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 
 	// This is a hack to solve players (Erik) stacking stuff on their jeeps in coast_01 
 	// and being screwed when the crane can't pick them up. We need to get rid of the object.
-	if ( HasSpawnFlags( SF_MAGNET_COAST_HACK ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_MAGNET_COAST_HACK ) )
 	{
 		// If the other isn't the jeep, we need to get rid of it
 		if ( !FClassnameIs( pOther, "prop_vehicle_jeep" ) )
@@ -1697,7 +1697,7 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		newEntityOnMagnet.hEntity = pOther;
 
 		// Use the right constraint
-		if ( HasSpawnFlags( SF_MAGNET_ALLOWROTATION ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_MAGNET_ALLOWROTATION ) )
 		{
 			constraint_ballsocketparams_t ballsocket;
 			ballsocket.Defaults();
@@ -1746,7 +1746,7 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 //-----------------------------------------------------------------------------
 void CPhysMagnet::DoMagnetSuck( CBaseEntity *pOther )
 {
-	if ( !HasSpawnFlags( SF_MAGNET_SUCK ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_MAGNET_SUCK ) )
 		return;
 
 	if ( !m_bActive )
@@ -1993,7 +1993,7 @@ void CPointPush::PushEntity( CBaseEntity *pTarget )
 {
 	Vector vecPushDir;
 	
-	if ( HasSpawnFlags( SF_PUSH_DIRECTIONAL ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_PUSH_DIRECTIONAL ) )
 	{
 		GetVectors( &vecPushDir, NULL, NULL );
 	}
@@ -2004,7 +2004,7 @@ void CPointPush::PushEntity( CBaseEntity *pTarget )
 
 	float dist = VectorNormalize( vecPushDir );
 	
-	float flFalloff = ( HasSpawnFlags( SF_PUSH_NO_FALLOFF ) ) ? 1.0f : RemapValClamped( dist, m_flRadius, m_flRadius*0.25f, 0.0f, 1.0f );
+	float flFalloff = (GetEngineObject()->HasSpawnFlags( SF_PUSH_NO_FALLOFF ) ) ? 1.0f : RemapValClamped( dist, m_flRadius, m_flRadius*0.25f, 0.0f, 1.0f );
 	
 	switch( pTarget->GetMoveType() )
 	{
@@ -2080,15 +2080,15 @@ void CPointPush::PushThink( void )
 			continue; 
 
 		// If we don't want to push players, don't
-		if ( pEnts[i]->IsPlayer() && HasSpawnFlags( SF_PUSH_PLAYER ) == false )
+		if ( pEnts[i]->IsPlayer() && GetEngineObject()->HasSpawnFlags( SF_PUSH_PLAYER ) == false )
 			continue;
 
 		// If we don't want to push physics, don't
-		if ( pEnts[i]->GetMoveType() == MOVETYPE_VPHYSICS && HasSpawnFlags( SF_PUSH_PHYSICS ) == false )
+		if ( pEnts[i]->GetMoveType() == MOVETYPE_VPHYSICS && GetEngineObject()->HasSpawnFlags( SF_PUSH_PHYSICS ) == false )
 			continue;
 
 		// Test for LOS if asked to
-		if ( HasSpawnFlags( SF_PUSH_TEST_LOS ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_PUSH_TEST_LOS ) )
 		{
 			Vector vecStartPos = GetEngineObject()->GetAbsOrigin();
 			Vector vecEndPos = pEnts[i]->BodyTarget( vecStartPos, false );

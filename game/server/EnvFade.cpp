@@ -74,7 +74,7 @@ void CEnvFade::InputFade( inputdata_t &inputdata )
 {
 	int fadeFlags = 0;
 
-	if ( m_spawnflags & SF_FADE_IN )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FADE_IN )
 	{
 		fadeFlags |= FFADE_IN;
 	}
@@ -83,17 +83,17 @@ void CEnvFade::InputFade( inputdata_t &inputdata )
 		fadeFlags |= FFADE_OUT;
 	}
 
-	if ( m_spawnflags & SF_FADE_MODULATE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FADE_MODULATE )
 	{
 		fadeFlags |= FFADE_MODULATE;
 	}
 
-	if ( m_spawnflags & SF_FADE_STAYOUT )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FADE_STAYOUT )
 	{
 		fadeFlags |= FFADE_STAYOUT;
 	}
 
-	if ( m_spawnflags & SF_FADE_ONLYONE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_FADE_ONLYONE )
 	{
 		if ( inputdata.pActivator && inputdata.pActivator->IsNetClient() )
 		{

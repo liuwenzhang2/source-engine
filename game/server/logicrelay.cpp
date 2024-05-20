@@ -80,7 +80,7 @@ void CLogicRelay::Think()
 	m_OnSpawn.FireOutput( this, this );
 
 	// We only get here if we had OnSpawn connections, so this is safe.
-	if ( m_spawnflags & SF_REMOVE_ON_FIRE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_REMOVE_ON_FIRE)
 	{
 		UTIL_Remove(this);
 	}
@@ -144,11 +144,11 @@ void CLogicRelay::InputTrigger( inputdata_t &inputdata )
 	{
 		m_OnTrigger.FireOutput( inputdata.pActivator, this );
 		
-		if (m_spawnflags & SF_REMOVE_ON_FIRE)
+		if (GetEngineObject()->GetSpawnFlags() & SF_REMOVE_ON_FIRE)
 		{
 			UTIL_Remove(this);
 		}
-		else if (!(m_spawnflags & SF_ALLOW_FAST_RETRIGGER))
+		else if (!(GetEngineObject()->GetSpawnFlags() & SF_ALLOW_FAST_RETRIGGER))
 		{
 			//
 			// Disable the relay so that it cannot be refired until after the last output

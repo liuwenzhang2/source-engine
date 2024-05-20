@@ -249,7 +249,7 @@ Disposition_t CNPC_Dog::IRelationType( CBaseEntity *pTarget )
 {
 	if ( NPC_Rollermine_IsRollermine( pTarget ) )
 	{
-		if ( pTarget->HasSpawnFlags( SF_ROLLERMINE_FRIENDLY ) )
+		if ( pTarget->GetEngineObject()->HasSpawnFlags( SF_ROLLERMINE_FRIENDLY ) )
 			 return D_LI;
 	}
 

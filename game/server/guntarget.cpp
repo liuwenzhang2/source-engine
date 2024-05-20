@@ -107,7 +107,7 @@ void CGunTarget::Spawn( void )
 	m_on = false;
 	m_iMaxHealth = m_iHealth;
 
-	if ( HasSpawnFlags(FGUNTARGET_START_ON) )
+	if (GetEngineObject()->HasSpawnFlags(FGUNTARGET_START_ON) )
 	{
 		SetMoveDone( &CGunTarget::Start );
 		SetMoveDoneTime( 0.3 );

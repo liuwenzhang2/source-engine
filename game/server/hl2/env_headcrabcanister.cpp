@@ -270,12 +270,12 @@ void CEnvHeadcrabCanister::Spawn( void )
 		m_bHasDetonated = false;
 		m_bOpened = false;
 	}
-	else if ( !HasSpawnFlags( SF_START_IMPACTED ) )
+	else if ( !GetEngineObject()->HasSpawnFlags( SF_START_IMPACTED ) )
 	{
 		// It doesn't have any real presence at first.
 		SetSolid( SOLID_NONE );
 
-		if ( !HasSpawnFlags( SF_LAND_AT_INITIAL_POSITION ) )
+		if ( !GetEngineObject()->HasSpawnFlags( SF_LAND_AT_INITIAL_POSITION ) )
 		{
 			Vector vecForward;
 			GetVectors( &vecForward, NULL, NULL );
@@ -471,7 +471,7 @@ void CEnvHeadcrabCanister::InputFireCanister( inputdata_t &inputdata )
 
 	m_bLaunched = true;
 
-	if ( HasSpawnFlags( SF_START_IMPACTED ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_START_IMPACTED ) )
 	{
 		StartSpawningHeadcrabs( 0.01f );
 		return;
@@ -480,7 +480,7 @@ void CEnvHeadcrabCanister::InputFireCanister( inputdata_t &inputdata )
 	// Play a firing sound
 	CPASAttenuationFilter filter( this, ATTN_NONE );
 
-	if ( !HasSpawnFlags( SF_NO_LAUNCH_SOUND ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_NO_LAUNCH_SOUND ) )
 	{
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HeadcrabCanister.LaunchSound" );
 	}
@@ -514,7 +514,7 @@ void CEnvHeadcrabCanister::InputFireCanister( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CEnvHeadcrabCanister::InputOpenCanister( inputdata_t &inputdata )
 {
-	if ( m_bLanded && !m_bOpened && HasSpawnFlags( SF_WAIT_FOR_INPUT_TO_OPEN ) )
+	if ( m_bLanded && !m_bOpened && GetEngineObject()->HasSpawnFlags( SF_WAIT_FOR_INPUT_TO_OPEN ) )
 	{
 		OpenCanister();
 	}
@@ -526,7 +526,7 @@ void CEnvHeadcrabCanister::InputOpenCanister( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CEnvHeadcrabCanister::InputSpawnHeadcrabs( inputdata_t &inputdata )
 {
-	if ( m_bLanded && m_bOpened && HasSpawnFlags( SF_WAIT_FOR_INPUT_TO_SPAWN_HEADCRABS ) )
+	if ( m_bLanded && m_bOpened && GetEngineObject()->HasSpawnFlags( SF_WAIT_FOR_INPUT_TO_SPAWN_HEADCRABS ) )
 	{
 		StartSpawningHeadcrabs( 0.01f );
 	}
@@ -715,7 +715,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSpawnHeadcrabThink()
 
 		// Necessary to get it to eject properly (don't allow the NPC
 		// to override the spawn position specified).
-		pHeadCrab->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
+		pHeadCrab->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 
 		// So we don't collide with the canister
 		// NOTE: Hierarchical attachment is necessary here to get the animations to work
@@ -764,9 +764,9 @@ void CEnvHeadcrabCanister::CanisterFinishedOpening( void )
 	m_bOpened = true;
 	SetContextThink( NULL, gpGlobals->curtime, s_pOpenThinkContext );
 
-	if ( !HasSpawnFlags( SF_START_IMPACTED ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_START_IMPACTED ) )
 	{
-		if ( !HasSpawnFlags( SF_WAIT_FOR_INPUT_TO_SPAWN_HEADCRABS ) )
+		if ( !GetEngineObject()->HasSpawnFlags( SF_WAIT_FOR_INPUT_TO_SPAWN_HEADCRABS ) )
 		{
 			StartSpawningHeadcrabs( 3.0f );
 		}
@@ -862,7 +862,7 @@ void CEnvHeadcrabCanister::Landed( void )
 	}
 
 	// Start smoke, unless we don't want it
-	if ( !HasSpawnFlags( SF_NO_SMOKE ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_NO_SMOKE ) )
 	{
 		// Create the smoke trail to obscure the headcrabs
 		m_hSmokeTrail = SmokeTrail::CreateSmokeTrail();
@@ -888,9 +888,9 @@ void CEnvHeadcrabCanister::Landed( void )
 
 	SetThink( NULL );
 
-	if ( !HasSpawnFlags( SF_WAIT_FOR_INPUT_TO_OPEN ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_WAIT_FOR_INPUT_TO_OPEN ) )
 	{
-		if ( HasSpawnFlags( SF_START_IMPACTED ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_START_IMPACTED ) )
 		{
 			CanisterFinishedOpening( );
 		}
@@ -910,7 +910,7 @@ void CEnvHeadcrabCanister::Detonate( )
 	// Send the impact output
 	m_OnImpacted.FireOutput( this, this, 0 );
 
-	if ( !HasSpawnFlags( SF_NO_IMPACT_SOUND ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_NO_IMPACT_SOUND ) )
 	{
 		g_pSoundEmitterSystem->StopSound(this, "HeadcrabCanister.IncomingSound" );
 
@@ -926,7 +926,7 @@ void CEnvHeadcrabCanister::Detonate( )
 	}
 
 	// If we're supposed to be removed, do that now
-	if ( HasSpawnFlags( SF_REMOVE_ON_IMPACT ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_REMOVE_ON_IMPACT ) )
 	{
 		GetEngineObject()->SetAbsOrigin( m_vecImpactPosition );
 		SetModel( ENV_HEADCRABCANISTER_BROKEN_MODEL );
@@ -948,7 +948,7 @@ void CEnvHeadcrabCanister::Detonate( )
 	TestForCollisionsAgainstWorld( m_vecImpactPosition );
 
 	// Shake the screen unless flagged otherwise
-	if ( !HasSpawnFlags( SF_NO_SHAKE ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_NO_SHAKE ) )
 	{
 		CBasePlayer *pPlayer = UTIL_PlayerByIndex( 1 );
 
@@ -959,7 +959,7 @@ void CEnvHeadcrabCanister::Detonate( )
 	}
 
 	// Do explosion effects
-	if ( !HasSpawnFlags( SF_NO_IMPACT_EFFECTS ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_NO_IMPACT_EFFECTS ) )
 	{
 		// Normal explosion
 		ExplosionCreate( m_vecImpactPosition, GetEngineObject()->GetAbsAngles(), this, 50.0f, 500.0f,
@@ -992,7 +992,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterWorldThink( void )
 	QAngle vecEndAngles;
 	m_Shared.GetPositionAtTime( flTime, vecEndPosition, vecEndAngles );
 
-	if ( !m_bIncomingSoundStarted && !HasSpawnFlags( SF_NO_IMPACT_SOUND ) )
+	if ( !m_bIncomingSoundStarted && !GetEngineObject()->HasSpawnFlags( SF_NO_IMPACT_SOUND ) )
 	{
 		float flDistSq = ENV_HEADCRABCANISTER_INCOMING_SOUND_TIME * m_Shared.m_flFlightSpeed;
 		flDistSq *= flDistSq;
@@ -1021,7 +1021,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterWorldThink( void )
 			m_bHasDetonated = true;
 		}
 		
-		if ( !HasSpawnFlags( SF_REMOVE_ON_IMPACT ) )
+		if ( !GetEngineObject()->HasSpawnFlags( SF_REMOVE_ON_IMPACT ) )
 		{
 			Landed();
 		}
@@ -1088,7 +1088,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSkyboxOnlyThink( void )
 	UTIL_SetOrigin( this, vecEndPosition );
 	GetEngineObject()->SetAbsAngles( vecEndAngles );
 
-	if ( !HasSpawnFlags( SF_NO_IMPACT_SOUND ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_NO_IMPACT_SOUND ) )
 	{	
 		CPASAttenuationFilter filter( this, ATTN_NONE );
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "HeadcrabCanister.SkyboxExplosion" );

@@ -2898,10 +2898,10 @@ bool CBasePlayer::CanPickupObject( CBaseEntity *pObject, float massLimit, float 
 		if ( !pProp && !pBox )
 			return false;
 
-		if ( pProp && !(pProp->HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON )) )
+		if ( pProp && !(pProp->GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON )) )
 			return false;
 
-		if ( pBox && !(pBox->HasSpawnFlags( SF_PHYSBOX_ENABLE_ON_PHYSCANNON )) )
+		if ( pBox && !(pBox->GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_ENABLE_ON_PHYSCANNON )) )
 			return false;
 	}
 
@@ -3837,7 +3837,7 @@ void CBasePlayer::HandleFuncTrain(void)
 			}
 		}
 	}
-	else if ( !( GetFlags() & FL_ONGROUND ) || pTrain->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL ) || (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT) ) )
+	else if ( !( GetFlags() & FL_ONGROUND ) || pTrain->GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL ) || (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT) ) )
 	{
 		// Turn off the train if you jump, strafe, or the train controls go dead
 		m_afPhysicsFlags &= ~PFLAG_DIROVERRIDE;
@@ -4818,7 +4818,7 @@ CBaseEntity *FindPlayerStart(const char *pszClassName)
 	CBaseEntity *pStartFirst = pStart;
 	while (pStart != NULL)
 	{
-		if (pStart->HasSpawnFlags(SF_PLAYER_START_MASTER))
+		if (pStart->GetEngineObject()->HasSpawnFlags(SF_PLAYER_START_MASTER))
 		{
 			return pStart;
 		}
@@ -5738,7 +5738,7 @@ CBaseEntity	*CBasePlayer::GiveNamedItem( const char *pszName, int iSubType )
 	}
 
 	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
-	pent->AddSpawnFlags( SF_NORESPAWN );
+	pent->GetEngineObject()->AddSpawnFlags( SF_NORESPAWN );
 
 	CBaseCombatWeapon *pWeapon = dynamic_cast<CBaseCombatWeapon*>( (CBaseEntity*)pent );
 	if ( pWeapon )
@@ -7852,32 +7852,32 @@ int CMovementSpeedMod::GetDisabledButtonMask( void )
 {
 	int nMask = 0;
 
-	if ( HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_JUMP ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_JUMP ) )
 	{
 		nMask |= IN_JUMP;
 	}
 	
-	if ( HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_DUCK ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_DUCK ) )
 	{
 		nMask |= IN_DUCK;
 	}
 
-	if ( HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_USE ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_USE ) )
 	{
 		nMask |= IN_USE;
 	}
 	
-	if ( HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_SPEED ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_SPEED ) )
 	{
 		nMask |= IN_SPEED;
 	}
 	
-	if ( HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_ATTACK ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_ATTACK ) )
 	{
 		nMask |= (IN_ATTACK|IN_ATTACK2);
 	}
 
-	if ( HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_ZOOM ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_ZOOM ) )
 	{
 		nMask |= IN_ZOOM;
 	}
@@ -7903,7 +7903,7 @@ void CMovementSpeedMod::InputSpeedMod(inputdata_t &data)
 		if ( data.value.Float() != 1.0f )
 		{
 			// Holster weapon immediately, to allow it to cleanup
-			if ( HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_WEAPONS ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_WEAPONS ) )
 			{
 				if ( pPlayer->GetActiveWeapon() )
 				{
@@ -7926,7 +7926,7 @@ void CMovementSpeedMod::InputSpeedMod(inputdata_t &data)
 			pPlayer->DisableButtons( GetDisabledButtonMask() );
 
 			// Hide the HUD
-			if ( HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_HUD ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_HUD ) )
 			{
 				pPlayer->m_Local.m_iHideHUD |= HIDEHUD_ALL;
 			}
@@ -7934,7 +7934,7 @@ void CMovementSpeedMod::InputSpeedMod(inputdata_t &data)
 		else
 		{
 			// Bring the weapon back
-			if  ( HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_WEAPONS ) && pPlayer->GetActiveWeapon() == NULL )
+			if  (GetEngineObject()->HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_WEAPONS ) && pPlayer->GetActiveWeapon() == NULL )
 			{
 				pPlayer->SetActiveWeapon( pPlayer->Weapon_GetLast() );
 				if ( pPlayer->GetActiveWeapon() )
@@ -7948,7 +7948,7 @@ void CMovementSpeedMod::InputSpeedMod(inputdata_t &data)
 			pPlayer->EnableButtons( GetDisabledButtonMask() );
 
 			// Restore the HUD
-			if ( HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_HUD ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_SPEED_MOD_SUPPRESS_HUD ) )
 			{
 				pPlayer->m_Local.m_iHideHUD &= ~HIDEHUD_ALL;
 			}

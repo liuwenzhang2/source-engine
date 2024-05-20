@@ -47,7 +47,7 @@ public:
 		unsigned char	m_uchEndSize;
 	};
 
-	int IsEmissive( void ) { return ( m_spawnflags & SF_EMISSIVE ); }
+	int IsEmissive( void ) { return (GetEngineObject()->GetSpawnFlags() & SF_EMISSIVE); }
 
 //C_BaseEntity
 public:
@@ -82,7 +82,7 @@ public:
 	int				m_nType;		// Type of particles to emit
 	bool			m_bFaceLeft;	// For support of legacy env_steamjet entity, which faced left instead of forward.
 
-	int				m_spawnflags;
+	//int				m_spawnflags;
 	float			m_flRollSpeed;
 
 private:
@@ -128,7 +128,7 @@ IMPLEMENT_CLIENTCLASS_DT(C_SteamJet, DT_SteamJet, CSteamJet)
 	RecvPropInt(RECVINFO(m_bEmit), 0),
 	RecvPropInt(RECVINFO(m_bFaceLeft), 0),
 	RecvPropInt(RECVINFO(m_nType), 0),
-	RecvPropInt( RECVINFO( m_spawnflags ) ),
+	//RecvPropInt( RECVINFO( m_spawnflags ) ),
 	RecvPropFloat(RECVINFO(m_flRollSpeed), 0 ),
 END_RECV_TABLE()
 

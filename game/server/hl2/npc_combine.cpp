@@ -206,7 +206,7 @@ bool CNPC_Combine::CreateComponents()
 //------------------------------------------------------------------------------
 void CNPC_Combine::InputLookOff( inputdata_t &inputdata )
 {
-	m_spawnflags |= SF_COMBINE_NO_LOOK;
+	GetEngineObject()->AddSpawnFlags(SF_COMBINE_NO_LOOK);
 }
 
 //------------------------------------------------------------------------------
@@ -214,7 +214,7 @@ void CNPC_Combine::InputLookOff( inputdata_t &inputdata )
 //------------------------------------------------------------------------------
 void CNPC_Combine::InputLookOn( inputdata_t &inputdata )
 {
-	m_spawnflags &= ~SF_COMBINE_NO_LOOK;
+	GetEngineObject()->RemoveSpawnFlags(SF_COMBINE_NO_LOOK);
 }
 
 //-----------------------------------------------------------------------------
@@ -1194,7 +1194,7 @@ Vector CNPC_Combine::BodyTarget( const Vector &posSrc, bool bNoisy )
 //------------------------------------------------------------------------------
 bool CNPC_Combine::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **ppBlocker )
 {
-	if( m_spawnflags & SF_COMBINE_NO_LOOK )
+	if(GetEngineObject()->GetSpawnFlags() & SF_COMBINE_NO_LOOK)
 	{
 		// When no look is set, if enemy has eluded the squad, 
 		// he's always invisble to me
@@ -1259,7 +1259,7 @@ void CNPC_Combine::Event_Killed( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 bool CNPC_Combine::UpdateEnemyMemory( CBaseEntity *pEnemy, const Vector &position, CBaseEntity *pInformer )
 {
-	if( m_spawnflags & SF_COMBINE_NO_LOOK )
+	if(GetEngineObject()->GetSpawnFlags() & SF_COMBINE_NO_LOOK)
 	{
 		return false;
 	}

@@ -312,7 +312,7 @@ void CTripmineGrenade::Spawn( void )
 	m_flDamage	= sk_plr_dmg_tripmine.GetFloat();
 	m_DmgRadius	= m_flDamage * 2.5;
 
-	if ( m_spawnflags & 1 )
+	if (GetEngineObject()->GetSpawnFlags() & 1 )//need check
 	{
 		// power up quickly
 		m_flPowerUp = gpGlobals->curtime + 1.0;
@@ -441,7 +441,7 @@ void CTripmineGrenade::PowerupThink( void  )
 		g_pSoundEmitterSystem->StopSound(this, "TripmineGrenade.Deploy" );
 		g_pSoundEmitterSystem->StopSound(this, "TripmineGrenade.Charge" );
 		CBaseEntity *pMine = Create( "weapon_tripmine", GetEngineObject()->GetAbsOrigin() + m_vecDir * 24, GetEngineObject()->GetAbsAngles() );
-		pMine->AddSpawnFlags( SF_NORESPAWN );
+		pMine->GetEngineObject()->AddSpawnFlags( SF_NORESPAWN );
 
 		SetThink( &CBaseEntity::SUB_Remove );
 		SetNextThink( gpGlobals->curtime + 0.1f );
@@ -502,7 +502,7 @@ void CTripmineGrenade::MakeBeam( void )
 	m_hBeam->SetColor( 0, 214, 198 );
 	m_hBeam->SetScrollRate( 25.5 );
 	m_hBeam->SetBrightness( 64 );
-	m_hBeam->AddSpawnFlags( SF_BEAM_TEMPORARY );	// so it won't save and come back to haunt us later..
+	m_hBeam->GetEngineObject()->AddSpawnFlags( SF_BEAM_TEMPORARY );	// so it won't save and come back to haunt us later..
 }
 
 

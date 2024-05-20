@@ -540,7 +540,7 @@ void CNPC_Manhack::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		return;
 
 	// Wake us up
-	if ( m_spawnflags & SF_MANHACK_PACKED_UP )
+	if (GetEngineObject()->GetSpawnFlags() & SF_MANHACK_PACKED_UP)
 	{
 		SetCondition( COND_LIGHT_DAMAGE );
 	}
@@ -625,7 +625,7 @@ void CNPC_Manhack::CrashTouch( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 void CNPC_Manhack::CreateSmokeTrail()
 {
-	if ( HasSpawnFlags( SF_MANHACK_NO_DAMAGE_EFFECTS ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_MANHACK_NO_DAMAGE_EFFECTS ) )
 		return;
 
 	if ( m_hSmokeTrail != NULL )
@@ -876,7 +876,7 @@ int	CNPC_Manhack::OnTakeDamage_Dying( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_Manhack::OnStateChange( NPC_STATE OldState, NPC_STATE NewState )
 {
-	if( m_vNoiseMod.z == MANHACK_NOISEMOD_HIDE && !(m_spawnflags & SF_NPC_WAIT_FOR_SCRIPT) && !(m_spawnflags & SF_MANHACK_PACKED_UP) )
+	if( m_vNoiseMod.z == MANHACK_NOISEMOD_HIDE && !(GetEngineObject()->GetSpawnFlags() & SF_NPC_WAIT_FOR_SCRIPT) && !(GetEngineObject()->GetSpawnFlags() & SF_MANHACK_PACKED_UP))
 	{
 		// This manhack should get a normal noisemod now.
 		float flNoiseMod = random->RandomFloat( 1.7, 2.3 );
@@ -885,9 +885,9 @@ void CNPC_Manhack::OnStateChange( NPC_STATE OldState, NPC_STATE NewState )
 		SetNoiseMod( 0, 0, flNoiseMod );
 	}
 
-	if( NewState != NPC_STATE_IDLE && (m_spawnflags & SF_NPC_GAG) && (m_nEnginePitch1 < 0) )
+	if( NewState != NPC_STATE_IDLE && (GetEngineObject()->GetSpawnFlags() & SF_NPC_GAG) && (m_nEnginePitch1 < 0))
 	{
-		m_spawnflags &= ~SF_NPC_GAG;
+		GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 		SoundInit();
 	}
 }
@@ -904,7 +904,7 @@ void CNPC_Manhack::HandleAnimEvent( animevent_t *pEvent )
 	case MANHACK_AE_START_ENGINE:
 		StartEye();
 		StartEngine( true );
-		m_spawnflags &= ~SF_MANHACK_PACKED_UP;
+		GetEngineObject()->RemoveSpawnFlags(SF_MANHACK_PACKED_UP);
 
 		// No bursts until fully unpacked!
 		m_flNextBurstTime = gpGlobals->curtime + FLT_MAX;
@@ -955,7 +955,7 @@ Activity CNPC_Manhack::NPC_TranslateActivity( Activity baseAct )
 int CNPC_Manhack::TranslateSchedule( int scheduleType ) 
 {
 	// Fail-safe for deployment if packed up and interrupted
-	if ( m_spawnflags & SF_MANHACK_PACKED_UP )
+	if (GetEngineObject()->GetSpawnFlags() & SF_MANHACK_PACKED_UP)
 	{
 		if ( scheduleType != SCHED_WAIT_FOR_SCRIPT )
 			return SCHED_MANHACK_DEPLOY;
@@ -998,7 +998,7 @@ int CNPC_Manhack::TranslateSchedule( int scheduleType )
 		}
 	case SCHED_WAKE_ANGRY:
 		{
-			if( m_spawnflags & SF_MANHACK_PACKED_UP )
+			if(GetEngineObject()->GetSpawnFlags() & SF_MANHACK_PACKED_UP)
 			{
 				return SCHED_MANHACK_DEPLOY;
 			}
@@ -1119,7 +1119,7 @@ bool CNPC_Manhack::OverrideMove( float flInterval )
 	SpinBlades( flInterval );
 		
 	// Don't execute any move code if packed up.
-	if( HasSpawnFlags(SF_MANHACK_PACKED_UP|SF_MANHACK_CARRIED) )
+	if(GetEngineObject()->HasSpawnFlags(SF_MANHACK_PACKED_UP|SF_MANHACK_CARRIED) )
 		return true;
 
 	if( IsLoitering() )
@@ -1132,7 +1132,7 @@ bool CNPC_Manhack::OverrideMove( float flInterval )
 	}
 
 	// So cops, etc. will try to avoid them
-	if ( !HasSpawnFlags( SF_MANHACK_NO_DANGER_SOUNDS ) && !m_bHeld )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_MANHACK_NO_DANGER_SOUNDS ) && !m_bHeld )
 	{
 		CSoundEnt::InsertSound( SOUND_DANGER, GetEngineObject()->GetAbsOrigin(), 75, flInterval, this );
 	}
@@ -1654,7 +1654,7 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 				VPhysicsGetObject()->ApplyTorqueCenter( torque );
 			}
 			
-			if (!(m_spawnflags	& SF_NPC_GAG))
+			if (!(GetEngineObject()->GetSpawnFlags() & SF_NPC_GAG))
 			{
 				const char* soundname = "NPC_Manhack.Grind";
 				CPASAttenuationFilter filter(this, soundname);
@@ -1816,7 +1816,7 @@ void CNPC_Manhack::PlayFlySound(void)
 		flEnemyDist = FLT_MAX;
 	}
 
-	if( m_spawnflags & SF_NPC_GAG )
+	if(GetEngineObject()->GetSpawnFlags() & SF_NPC_GAG)
 	{
 		// Quiet!
 		return;
@@ -2416,7 +2416,7 @@ void CNPC_Manhack::Spawn(void)
 	SetSolid( SOLID_BBOX );
 	AddSolidFlags( FSOLID_NOT_STANDABLE );
 
-	if ( HasSpawnFlags( SF_MANHACK_CARRIED ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_MANHACK_CARRIED ) )
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 		SetMoveType( MOVETYPE_NONE );
@@ -2431,7 +2431,7 @@ void CNPC_Manhack::Spawn(void)
 	m_flFieldOfView		= VIEW_FIELD_FULL;
 	m_NPCState			= NPC_STATE_NONE;
 
-	if ( m_spawnflags & SF_MANHACK_USE_AIR_NODES)
+	if (GetEngineObject()->GetSpawnFlags() & SF_MANHACK_USE_AIR_NODES)
 	{
 		SetNavType(NAV_FLY);
 	}
@@ -2565,7 +2565,7 @@ void CNPC_Manhack::Activate()
 void CNPC_Manhack::PostNPCInit( void )
 {
 	// SetAbsVelocity( vec3_origin ); 
-	m_bBladesActive = (m_spawnflags & (SF_MANHACK_PACKED_UP|SF_MANHACK_CARRIED)) ? false : true;
+	m_bBladesActive = (GetEngineObject()->GetSpawnFlags() & (SF_MANHACK_PACKED_UP | SF_MANHACK_CARRIED)) ? false : true;
 	BladesInit();
 }
 
@@ -2582,7 +2582,7 @@ void CNPC_Manhack::BladesInit()
 	}
 	else
 	{
-		bool engineSound = (m_spawnflags & SF_NPC_GAG) ? false : true;
+		bool engineSound = (GetEngineObject()->GetSpawnFlags() & SF_NPC_GAG) ? false : true;
 		StartEngine( engineSound );
 		SetActivity( ACT_FLY );
 	}
@@ -2605,7 +2605,7 @@ void CNPC_Manhack::StartEngine( bool fStartSound )
 	// Pop up a little if falling fast!
 	Vector vecVelocity;
 	GetVelocity( &vecVelocity, NULL );
-	if( ( m_spawnflags & SF_MANHACK_PACKED_UP ) && vecVelocity.z < 0 )
+	if( (GetEngineObject()->GetSpawnFlags() & SF_MANHACK_PACKED_UP) && vecVelocity.z < 0)
 	{
 		// DevMsg(" POP UP \n" );
 		// ApplyAbsVelocityImpulse( Vector(0,0,-vecVelocity.z*0.75) );
@@ -3023,7 +3023,7 @@ void CNPC_Manhack::InputDisableSwarm( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CNPC_Manhack::InputUnpack( inputdata_t &inputdata )
 {
-	if ( HasSpawnFlags( SF_MANHACK_PACKED_UP ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_MANHACK_PACKED_UP ) == false )
 		return;
 
 	SetCondition( COND_LIGHT_DAMAGE );
@@ -3356,7 +3356,7 @@ unsigned int CNPC_Manhack::PhysicsSolidMaskForEntity( void ) const
 //-----------------------------------------------------------------------------
 bool CNPC_Manhack::CreateVPhysics( void )
 {
-	if ( HasSpawnFlags( SF_MANHACK_CARRIED ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_MANHACK_CARRIED ) )
 		return false;
 
 	return BaseClass::CreateVPhysics();

@@ -145,7 +145,7 @@ void CFuncLadder::Spawn()
 
 	UTIL_SetSize( this, mins, maxs );
 
-	m_bFakeLadder = HasSpawnFlags(SF_LADDER_DONTGETON);
+	m_bFakeLadder = GetEngineObject()->HasSpawnFlags(SF_LADDER_DONTGETON);
 #endif
 }
 

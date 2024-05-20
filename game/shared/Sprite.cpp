@@ -205,7 +205,7 @@ void CSprite::Spawn( void )
 #endif
 
 #if !defined( CLIENT_DLL )
-	if ( GetEntityName() != NULL_STRING && !(m_spawnflags & SF_SPRITE_STARTON) )
+	if ( GetEntityName() != NULL_STRING && !(GetEngineObject()->GetSpawnFlags() & SF_SPRITE_STARTON))
 	{
 		TurnOff();
 	}
@@ -495,7 +495,7 @@ void CSprite::Animate( float frames )
 	if ( m_flFrame > m_flMaxFrame )
 	{
 #if !defined( CLIENT_DLL )
-		if ( m_spawnflags & SF_SPRITE_ONCE )
+		if (GetEngineObject()->GetSpawnFlags() & SF_SPRITE_ONCE)
 		{
 			TurnOff();
 		}
@@ -555,7 +555,7 @@ void CSprite::TurnOn( void )
 	RemoveEffects( EF_NODRAW );
 	if ( (m_flSpriteFramerate && m_flMaxFrame > 1.0)
 #if !defined( CLIENT_DLL )
-		|| (m_spawnflags & SF_SPRITE_ONCE) 
+		|| (GetEngineObject()->GetSpawnFlags() & SF_SPRITE_ONCE)
 #endif
 		)
 	{

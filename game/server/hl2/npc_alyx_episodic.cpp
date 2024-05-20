@@ -500,7 +500,7 @@ void CNPC_Alyx::CreateEmpTool( void )
 		m_hEmpTool->SetSolid( SOLID_NONE );
 		m_hEmpTool->GetEngineObject()->SetLocalOrigin( Vector( 0, 0, 0 ) );
 		m_hEmpTool->GetEngineObject()->SetLocalAngles( QAngle( 0, 0, 0 ) );
-		m_hEmpTool->AddSpawnFlags(SF_DYNAMICPROP_NO_VPHYSICS);
+		m_hEmpTool->GetEngineObject()->AddSpawnFlags(SF_DYNAMICPROP_NO_VPHYSICS);
 		m_hEmpTool->AddEffects( EF_PARENT_ANIMATES );
 		m_hEmpTool->Spawn();
 	}

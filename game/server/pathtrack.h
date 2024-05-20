@@ -89,8 +89,8 @@ public:
 	void		Visit();
 	bool		HasBeenVisited() const;
 
-	bool		IsUpHill(){ return ( FBitSet( m_spawnflags, SF_PATH_UPHILL ) ) ? true : false; }
-	bool		IsDownHill(){ return ( FBitSet( m_spawnflags, SF_PATH_DOWNHILL ) ) ? true : false; }
+	bool		IsUpHill(){ return (GetEngineObject()->HasSpawnFlags(SF_PATH_UPHILL) ) ? true : false; }
+	bool		IsDownHill(){ return (GetEngineObject()->HasSpawnFlags(SF_PATH_DOWNHILL) ) ? true : false; }
 	int	GetHillType()
 	{
 		int iRetVal = HILL_TYPE_NONE;
@@ -106,7 +106,7 @@ public:
 		return iRetVal;
 	}
 
-	bool IsDisabled( void ){ return FBitSet( m_spawnflags, SF_PATH_DISABLED ); }
+	bool IsDisabled( void ){ return GetEngineObject()->HasSpawnFlags(SF_PATH_DISABLED); }
 
 	void InputPass( inputdata_t &inputdata );
 	void InputTeleport( inputdata_t &inputdata );

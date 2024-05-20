@@ -60,7 +60,7 @@ CRagdollBoogie *CRagdollBoogie::Create( CBaseEntity *pTarget, float flMagnitude,
 	if ( pBoogie == NULL )
 		return NULL;
 
-	pBoogie->AddSpawnFlags( nSpawnFlags );
+	pBoogie->GetEngineObject()->AddSpawnFlags( nSpawnFlags );
 	pBoogie->AttachToEntity( pTarget );
 	pBoogie->SetBoogieTime( flStartTime, flLengthTime );
 	pBoogie->SetMagnitude( flMagnitude );
@@ -79,7 +79,7 @@ void CRagdollBoogie::Spawn()
 	SetThink( &CRagdollBoogie::BoogieThink );
 	SetNextThink( gpGlobals->curtime + 0.01f );
 
-	if ( HasSpawnFlags( SF_RAGDOLL_BOOGIE_ELECTRICAL ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_RAGDOLL_BOOGIE_ELECTRICAL ) )
 	{
 		SetContextThink( &CRagdollBoogie::ZapThink, gpGlobals->curtime + random->RandomFloat( 0.1f, 0.3f ), s_pZapContext ); 
 	}
@@ -114,7 +114,7 @@ void CRagdollBoogie::ZapThink()
 		
 		data.m_nEntIndex = GetEngineObject()->GetMoveParent()->GetOuter()->entindex();
 		data.m_flMagnitude = 4;
-		data.m_flScale = HasSpawnFlags(SF_RAGDOLL_BOOGIE_ELECTRICAL_NARROW_BEAM) ? 1.0f : 2.0f;
+		data.m_flScale = GetEngineObject()->HasSpawnFlags(SF_RAGDOLL_BOOGIE_ELECTRICAL_NARROW_BEAM) ? 1.0f : 2.0f;
 
 		DispatchEffect( "TeslaHitboxes", data );	
 	}

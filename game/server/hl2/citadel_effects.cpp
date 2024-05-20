@@ -29,7 +29,7 @@ IMPLEMENT_SERVERCLASS_ST( CCitadelEnergyCore, DT_CitadelEnergyCore )
 	SendPropInt( SENDINFO(m_nState), 8, SPROP_UNSIGNED),
 	SendPropFloat( SENDINFO(m_flDuration), 0, SPROP_NOSCALE),
 	SendPropFloat( SENDINFO(m_flStartTime), 0, SPROP_NOSCALE),
-	SendPropInt( SENDINFO(m_spawnflags), 0, SPROP_UNSIGNED),
+	//SendPropInt( SENDINFO(m_spawnflags), 0, SPROP_UNSIGNED),
 END_SEND_TABLE()
 
 
@@ -53,7 +53,7 @@ void CCitadelEnergyCore::Spawn( void )
 	UTIL_SetSize( this, Vector( -8, -8, -8 ), Vector( 8, 8, 8 ) );
 
 	// See if we start active
-	if ( HasSpawnFlags( SF_ENERGYCORE_START_ON ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_ENERGYCORE_START_ON ) )
 	{
 		m_nState = (int)ENERGYCORE_STATE_DISCHARGING;
 		m_flStartTime = gpGlobals->curtime;

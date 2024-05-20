@@ -107,12 +107,12 @@ LINK_ENTITY_TO_CLASS( func_lookdoor, CLookDoor );
 //------------------------------------------------------------------------------
 void CLookDoor::InputInvertOn( inputdata_t &inputdata )
 {
-	m_spawnflags |= SF_LDOOR_INVERT;
+	GetEngineObject()->AddSpawnFlags(SF_LDOOR_INVERT);
 }
 
 void CLookDoor::InputInvertOff( inputdata_t &inputdata )
 {
-	m_spawnflags &= ~SF_LDOOR_INVERT;
+	GetEngineObject()->RemoveSpawnFlags(SF_LDOOR_INVERT);
 }
 
 
@@ -163,7 +163,7 @@ void CLookDoor::MoveThink(void)
 
 	// If FROM_OPEN flag is set, door proximity is measured
 	// from the open and not the closed position
-	if (FBitSet (m_spawnflags, SF_LDOOR_FROM_OPEN))
+	if (GetEngineObject()->HasSpawnFlags(SF_LDOOR_FROM_OPEN))
 	{
 		vOrigin += m_vecPosition2;
 	}
@@ -179,7 +179,7 @@ void CLookDoor::MoveThink(void)
 
 		if (flDist < m_flProximityDistance)
 		{
-			if (FBitSet (m_spawnflags, SF_LDOOR_THRESHOLD))
+			if (GetEngineObject()->HasSpawnFlags(SF_LDOOR_THRESHOLD))
 			{
 				flProxMove = 1.0;
 			}
@@ -226,7 +226,7 @@ void CLookDoor::MoveThink(void)
 	}
 
 	// If behavior is inverted do the reverse
-	if (FBitSet (m_spawnflags, SF_LDOOR_INVERT))
+	if (GetEngineObject()->HasSpawnFlags(SF_LDOOR_INVERT))
 	{
 		flMove = 1-flMove;
 	}

@@ -65,7 +65,7 @@ void CNPC_Bloater::Spawn()
 	SetSolid( SOLID_BBOX );
 	AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_FLY );
-	m_spawnflags		|= FL_FLY;
+	GetEngineObject()->AddSpawnFlags(FL_FLY);//need check
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	m_iHealth			= 40;
 //	pev->view_ofs		= VEC_VIEW;// position of the eyes relative to monster's origin.

@@ -56,7 +56,7 @@ public:
 
 	void		SetActive( bool active );
 
-	bool		PointIsVisible( void ) { return !( FBitSet( m_spawnflags, CAP_POINT_HIDEFLAG ) ); }
+	bool		PointIsVisible( void ) { return !(GetEngineObject()->HasSpawnFlags(CAP_POINT_HIDEFLAG) ); }
 
 	void		SendCapString( int team, int iNumCappers, int *pCappingPlayers );
 

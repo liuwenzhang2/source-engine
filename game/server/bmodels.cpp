@@ -117,7 +117,7 @@ LINK_ENTITY_TO_CLASS( func_wall_toggle, CFuncWallToggle );
 void CFuncWallToggle::Spawn( void )
 {
 	BaseClass::Spawn();
-	if ( HasSpawnFlags( SF_WALL_START_OFF ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_WALL_START_OFF ) )
 		TurnOff();
 	
 	SetMoveType( MOVETYPE_PUSH );
@@ -313,11 +313,11 @@ void CFuncConveyor::Spawn( void )
 
 	BaseClass::Spawn();
 
-	if ( !HasSpawnFlags(SF_CONVEYOR_VISUAL) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_CONVEYOR_VISUAL) )
 		AddFlag( FL_CONVEYOR );
 
 	// HACKHACK - This is to allow for some special effects
-	if ( HasSpawnFlags( SF_CONVEYOR_NOTSOLID ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_CONVEYOR_NOTSOLID ) )
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 	}
@@ -690,15 +690,15 @@ void CFuncRotating::Spawn( )
 	//
 	// If the designer didn't set a sound attenuation, default to one.
 	//
-	if ( HasSpawnFlags(SF_BRUSH_ROTATE_SMALLRADIUS) )
+	if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_ROTATE_SMALLRADIUS) )
 	{
 		m_flAttenuation = ATTN_IDLE;
 	}
-	else if ( HasSpawnFlags(SF_BRUSH_ROTATE_MEDIUMRADIUS) )
+	else if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_ROTATE_MEDIUMRADIUS) )
 	{
 		m_flAttenuation = ATTN_STATIC;
 	}
-	else if ( HasSpawnFlags(SF_BRUSH_ROTATE_LARGERADIUS) )
+	else if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_ROTATE_LARGERADIUS) )
 	{
 		m_flAttenuation = ATTN_NORM;
 	}
@@ -718,11 +718,11 @@ void CFuncRotating::Spawn( )
 	//
 	// Build the axis of rotation based on spawnflags.
 	//
-	if ( HasSpawnFlags(SF_BRUSH_ROTATE_Z_AXIS) )
+	if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_ROTATE_Z_AXIS) )
 	{
 		m_vecMoveAng = QAngle(0,0,1);
 	}
-	else if ( HasSpawnFlags(SF_BRUSH_ROTATE_X_AXIS) )
+	else if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_ROTATE_X_AXIS) )
 	{
 		m_vecMoveAng = QAngle(1,0,0);
 	}
@@ -734,7 +734,7 @@ void CFuncRotating::Spawn( )
 	//
 	// Check for reverse rotation.
 	//
-	if ( HasSpawnFlags(SF_BRUSH_ROTATE_BACKWARDS) )
+	if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_ROTATE_BACKWARDS) )
 	{
 		m_vecMoveAng = m_vecMoveAng * -1;
 	}
@@ -744,7 +744,7 @@ void CFuncRotating::Spawn( )
 	//
 	// Some rotating objects like fake volumetric lights will not be solid.
 	//
-	if ( HasSpawnFlags(SF_ROTATING_NOT_SOLID) )
+	if (GetEngineObject()->HasSpawnFlags(SF_ROTATING_NOT_SOLID) )
 	{
 		AddSolidFlags( FSOLID_NOT_SOLID );
 		SetMoveType( MOVETYPE_PUSH );
@@ -772,7 +772,7 @@ void CFuncRotating::Spawn( )
 	//
 	// If the brush should be initially rotating, use it in a little while.
 	//
-	if ( HasSpawnFlags(SF_BRUSH_ROTATE_START_ON) )
+	if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_ROTATE_START_ON) )
 	{		
 		SetThink( &CFuncRotating::SUB_CallUseToggle );
 		SetNextThink( gpGlobals->curtime + .2 );	// leave a magic delay for client to start up
@@ -781,7 +781,7 @@ void CFuncRotating::Spawn( )
 	//
 	// Can this brush inflict pain?
 	//
-	if ( HasSpawnFlags(SF_BRUSH_HURT) )
+	if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_HURT) )
 	{
 		SetTouch( &CFuncRotating::HurtTouch );
 	}
@@ -1222,7 +1222,7 @@ void CFuncRotating::SetTargetSpeed( float flSpeed )
 	//
 	// If we don't accelerate, change to the new speed instantly.
 	//
-	if ( !HasSpawnFlags(SF_BRUSH_ACCDCC ) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_BRUSH_ACCDCC ) )
 	{
 		UpdateSpeed( m_flTargetSpeed );
 		SetMoveDone( &CFuncRotating::RotateMove );

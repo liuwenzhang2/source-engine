@@ -67,7 +67,7 @@ void CFuncNoPortalVolume::Spawn()
 {
 	BaseClass::Spawn();
 
-	if ( m_spawnflags & SF_START_INACTIVE )
+	if (GetEngineObject()->GetSpawnFlags() & SF_START_INACTIVE)
 	{
 		m_bActive = false;
 	}

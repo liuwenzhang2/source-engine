@@ -699,12 +699,12 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 		SetBodygroup( ZOMBIE_BODYGROUP_THROW, 0 );
 
 		CBlackHeadcrab *pCrab = (CBlackHeadcrab *)CreateNoSpawn( GetHeadcrabClassname(), EyePosition(), vec3_angle, this );
-		pCrab->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
+		pCrab->GetEngineObject()->AddSpawnFlags( SF_NPC_FALL_TO_GROUND );
 		
 		// Fade if our parent is supposed to
-		if ( HasSpawnFlags( SF_NPC_FADE_CORPSE ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_NPC_FADE_CORPSE ) )
 		{
-			pCrab->AddSpawnFlags( SF_NPC_FADE_CORPSE );
+			pCrab->GetEngineObject()->AddSpawnFlags( SF_NPC_FADE_CORPSE );
 		}
 
 		// make me the crab's owner to avoid collision issues

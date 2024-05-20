@@ -36,7 +36,7 @@ CFuncNavPrerequisite::CFuncNavPrerequisite()
 //-----------------------------------------------------------------------------
 void CFuncNavPrerequisite::Spawn( void )
 {
-	AddSpawnFlags( SF_TRIGGER_ALLOW_CLIENTS );
+	GetEngineObject()->AddSpawnFlags( SF_TRIGGER_ALLOW_CLIENTS );
 
 	BaseClass::Spawn();
 	InitTrigger();

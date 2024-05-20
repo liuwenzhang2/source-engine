@@ -123,7 +123,7 @@ Disposition_t CNPC_Vortigaunt::IRelationType ( CBaseEntity *pTarget )
 {
 	if ( (pTarget->IsPlayer()) )
 	{
-		if ( (GetSpawnFlags() & VORTIGAUNT_IGNORE_PLAYER ) && !HasMemory( bits_MEMORY_PROVOKED ) )
+		if ( (GetEngineObject()->GetSpawnFlags() & VORTIGAUNT_IGNORE_PLAYER ) && !HasMemory( bits_MEMORY_PROVOKED ) )
 			 return D_NU;
 	}
 
@@ -393,7 +393,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 				{
 					CBaseEntity *pNew = Create( "monster_alien_slave", m_hDead->GetEngineObject()->GetAbsOrigin(), m_hDead->GetEngineObject()->GetAbsAngles() );
 					
-					pNew->AddSpawnFlags( 1 );
+					pNew->GetEngineObject()->AddSpawnFlags( 1 );
 					WackBeam( -1, pNew );
 					WackBeam( 1, pNew );
 					UTIL_Remove( m_hDead );
@@ -601,7 +601,7 @@ void CNPC_Vortigaunt::ArmBeam( int side )
 
 	m_pBeam[m_iBeams]->SetBrightness( 64 );
 	m_pBeam[m_iBeams]->SetNoise( 12.8 );
-	m_pBeam[m_iBeams]->AddSpawnFlags( SF_BEAM_TEMPORARY );	
+	m_pBeam[m_iBeams]->GetEngineObject()->AddSpawnFlags( SF_BEAM_TEMPORARY );
 
 	m_iBeams++;
 }
@@ -648,7 +648,7 @@ void CNPC_Vortigaunt::WackBeam( int side, CBaseEntity *pEntity )
 	m_pBeam[m_iBeams]->SetColor( 180, 255, 96 );
 	m_pBeam[m_iBeams]->SetBrightness( 255 );
 	m_pBeam[m_iBeams]->SetNoise( 12.8 );
-	m_pBeam[m_iBeams]->AddSpawnFlags( SF_BEAM_TEMPORARY );
+	m_pBeam[m_iBeams]->GetEngineObject()->AddSpawnFlags( SF_BEAM_TEMPORARY );
 	m_iBeams++;
 }
 
@@ -682,7 +682,7 @@ void CNPC_Vortigaunt::ZapBeam( int side )
 	m_pBeam[m_iBeams]->SetColor( 180, 255, 96 );
 	m_pBeam[m_iBeams]->SetBrightness( 255 );
 	m_pBeam[m_iBeams]->SetNoise( 3.2f );
-	m_pBeam[m_iBeams]->AddSpawnFlags( SF_BEAM_TEMPORARY );
+	m_pBeam[m_iBeams]->GetEngineObject()->AddSpawnFlags( SF_BEAM_TEMPORARY );
 	m_iBeams++;
 
 	pEntity = (CBaseEntity*)tr.m_pEnt;

@@ -185,7 +185,7 @@ void CWeaponHL2MPBase::Materialize( void )
 		DoMuzzleFlash();
 	}
 
-	if ( HasSpawnFlags( SF_NORESPAWN ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
 		VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false );
 		SetMoveType( MOVETYPE_VPHYSICS );
@@ -193,7 +193,7 @@ void CWeaponHL2MPBase::Materialize( void )
 		HL2MPRules()->AddLevelDesignerPlacedObject( this );
 	}
 
-	if ( HasSpawnFlags( SF_NORESPAWN ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
 		if ( GetOriginalSpawnOrigin() == vec3_origin )
 		{
@@ -220,7 +220,7 @@ void CWeaponHL2MPBase::FallInit( void )
 	SetModel( GetWorldModel() );
 	VPhysicsDestroyObject();
 
-	if ( HasSpawnFlags( SF_NORESPAWN ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
 		SetMoveType( MOVETYPE_NONE );
 		SetSolid( SOLID_BBOX );
@@ -240,7 +240,7 @@ void CWeaponHL2MPBase::FallInit( void )
 		{
 	#if !defined( CLIENT_DLL )
 			// Constrained start?
-			if ( HasSpawnFlags( SF_WEAPON_START_CONSTRAINED ) )
+			if (GetEngineObject()->HasSpawnFlags( SF_WEAPON_START_CONSTRAINED ) )
 			{
 				//Constrain the weapon in place
 				IPhysicsObject *pReferenceObject, *pAttachedObject;
@@ -291,7 +291,7 @@ void CWeaponHL2MPBase::FallThink( void )
 	// Since Materialize() never gets called, the weapon's respawn location is never set, so if a person picks it up, it respawns forever at
 	// 0 0 0 on the map (infinite loop of fall, wait, respawn, not nice at all for performance and bandwidth!)
 
-	if( HasSpawnFlags( SF_NORESPAWN ) == false )
+	if(GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
 		if( GetOriginalSpawnOrigin() == vec3_origin )
 		{

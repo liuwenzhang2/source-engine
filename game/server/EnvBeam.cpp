@@ -57,7 +57,7 @@ public:
 
 	inline bool ServerSide( void )
 	{
-		if ( m_life == 0 && !HasSpawnFlags(SF_BEAM_RING) )
+		if ( m_life == 0 && !GetEngineObject()->HasSpawnFlags(SF_BEAM_RING) )
 			return true;
 
 		return false;
@@ -146,7 +146,7 @@ void CEnvBeam::Spawn( void )
 	m_noiseAmplitude = MIN(MAX_BEAM_NOISEAMPLITUDE, m_noiseAmplitude);
 
 	// Check for tapering
-	if ( HasSpawnFlags( SF_BEAM_TAPEROUT ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_BEAM_TAPEROUT ) )
 	{
 		SetWidth( m_boltWidth );
 		SetEndWidth( 0 );
@@ -165,7 +165,7 @@ void CEnvBeam::Spawn( void )
 
 		if ( GetEntityName() != NULL_STRING )
 		{
-			if ( !(m_spawnflags & SF_BEAM_STARTON) )
+			if ( !(GetEngineObject()->GetSpawnFlags() & SF_BEAM_STARTON))
 			{
 				AddEffects( EF_NODRAW );
 				m_active = 0;
@@ -180,7 +180,7 @@ void CEnvBeam::Spawn( void )
 	else
 	{
 		m_active = 0;
-		if ( !GetEntityName() || FBitSet(m_spawnflags, SF_BEAM_STARTON) )
+		if ( !GetEntityName() || FBitSet(GetEngineObject()->GetSpawnFlags(), SF_BEAM_STARTON) )
 		{
 			SetThink( &CEnvBeam::StrikeThink );
 			SetNextThink( gpGlobals->curtime + 1.0f );
@@ -336,7 +336,7 @@ void CEnvBeam::StrikeThink( void )
 {
 	if ( m_life != 0 )
 	{
-		if ( m_spawnflags & SF_BEAM_RANDOM )
+		if (GetEngineObject()->GetSpawnFlags() & SF_BEAM_RANDOM )
 			SetNextThink( gpGlobals->curtime + m_life + random->RandomFloat( 0, m_restrike ) );
 		else
 			SetNextThink( gpGlobals->curtime + m_life + m_restrike );
@@ -388,7 +388,7 @@ void CEnvBeam::Strike( void )
 
 	if ( pointStart || pointEnd )
 	{
-		if ( m_spawnflags & SF_BEAM_RING )
+		if (GetEngineObject()->GetSpawnFlags() & SF_BEAM_RING )
 		{
 			// don't work
 			return;
@@ -413,7 +413,7 @@ void CEnvBeam::Strike( void )
 	}
 	else
 	{
-		if ( m_spawnflags & SF_BEAM_RING)
+		if (GetEngineObject()->GetSpawnFlags() & SF_BEAM_RING)
 		{
 			te->BeamRing( filter, 0.0,
 				pStart->entindex(), 
@@ -751,11 +751,11 @@ void CEnvBeam::BeamUpdateVars( void )
 	SetNoise( MIN(MAX_BEAM_NOISEAMPLITUDE, m_noiseAmplitude) );
 	SetFrame( m_frameStart );
 	SetScrollRate( m_speed );
-	if ( m_spawnflags & SF_BEAM_SHADEIN )
+	if (GetEngineObject()->GetSpawnFlags() & SF_BEAM_SHADEIN )
 	{
 		SetBeamFlags( FBEAM_SHADEIN );
 	}
-	else if ( m_spawnflags & SF_BEAM_SHADEOUT )
+	else if (GetEngineObject()->GetSpawnFlags() & SF_BEAM_SHADEOUT )
 	{
 		SetBeamFlags( FBEAM_SHADEOUT );
 	}

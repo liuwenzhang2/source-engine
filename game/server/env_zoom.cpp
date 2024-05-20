@@ -50,7 +50,7 @@ bool CanOverrideEnvZoomOwner( CBaseEntity *pZoomOwner )
 {
 	CEnvZoom *pZoom = dynamic_cast<CEnvZoom*>(pZoomOwner );
 
-	if ( pZoom == NULL || ( pZoom && pZoom->HasSpawnFlags( ENV_ZOOM_OVERRIDE ) == false ) )
+	if ( pZoom == NULL || ( pZoom && pZoom->GetEngineObject()->HasSpawnFlags( ENV_ZOOM_OVERRIDE ) == false ) )
 		 return false;
 
 	return true;

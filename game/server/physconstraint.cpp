@@ -256,7 +256,7 @@ void CPhysConstraint::Deactivate()
 	m_pConstraint->Deactivate();
 	ClearStaticFlag( m_pConstraint->GetReferenceObject() );
 	ClearStaticFlag( m_pConstraint->GetAttachedObject() );
-	if ( m_spawnflags & SF_CONSTRAINT_DISABLE_COLLISION )
+	if (GetEngineObject()->GetSpawnFlags() & SF_CONSTRAINT_DISABLE_COLLISION)
 	{
 		// constraint may be getting deactivated because an object got deleted, so check them here.
 		IPhysicsObject *pRef = m_pConstraint->GetReferenceObject();
@@ -327,7 +327,7 @@ void CPhysConstraint::InputOnBreak( inputdata_t &inputdata )
 
 void CPhysConstraint::InputTurnOn( inputdata_t &inputdata )
 {
-	if ( HasSpawnFlags( SF_CONSTRAINT_NO_CONNECT_UNTIL_ACTIVATED ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_CONSTRAINT_NO_CONNECT_UNTIL_ACTIVATED ) )
 	{
 		ActivateConstraint();
 	}
@@ -378,7 +378,7 @@ void CPhysConstraint::GetBreakParams( constraint_breakableparams_t &params, cons
 	params.Defaults();
 	params.forceLimit = lbs2kg(m_forceLimit);
 	params.torqueLimit = lbs2kg(m_torqueLimit);
-	params.isActive = HasSpawnFlags( SF_CONSTRAINT_START_INACTIVE ) ? false : true;
+	params.isActive = GetEngineObject()->HasSpawnFlags( SF_CONSTRAINT_START_INACTIVE ) ? false : true;
 	params.bodyMassScale[0] = info.massScale[0];
 	params.bodyMassScale[1] = info.massScale[1];
 }
@@ -418,9 +418,14 @@ CPhysConstraint::CPhysConstraint( void )
 	m_minTeleportDistance = 0.0f;
 }
 
+void CPhysConstraint::UpdateOnRemove(void) 
+{
+	BaseClass::UpdateOnRemove();
+	Deactivate();
+}
+
 CPhysConstraint::~CPhysConstraint()
 {
-	Deactivate();
 	physenv->DestroyConstraint( m_pConstraint );
 }
 
@@ -528,7 +533,7 @@ void CPhysConstraint::OnConstraintSetup( hl_constraint_info_t &info )
 	{
 		SetupTeleportationHandling( info );
 	}
-	if ( m_spawnflags & SF_CONSTRAINT_DISABLE_COLLISION )
+	if (GetEngineObject()->GetSpawnFlags() & SF_CONSTRAINT_DISABLE_COLLISION)
 	{
 		PhysDisableEntityCollisions( info.pObjects[0], info.pObjects[1] );
 	}
@@ -607,7 +612,7 @@ void CPhysConstraint::Activate( void )
 {
 	BaseClass::Activate();
 
-	if ( HasSpawnFlags( SF_CONSTRAINT_NO_CONNECT_UNTIL_ACTIVATED ) == false )
+	if (GetEngineObject()->HasSpawnFlags( SF_CONSTRAINT_NO_CONNECT_UNTIL_ACTIVATED ) == false )
 	{
 		if ( !ActivateConstraint() )
 		{
@@ -727,7 +732,7 @@ public:
 		}
 		else
 		{
-			RemoveSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY );
+			GetEngineObject()->RemoveSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY );
 		}
 
 		return physenv->CreateHingeConstraint( info.pObjects[0], info.pObjects[1], pGroup, m_hinge );
@@ -780,7 +785,7 @@ public:
 
 	virtual void Deactivate()
 	{
-		if ( HasSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY ) )
 		{
 			if ( m_pConstraint && m_pConstraint->GetAttachedObject() )
 			{
@@ -912,7 +917,7 @@ void CPhysHinge::Spawn( void )
 
 	m_hinge.hingeAxis.SetAxisFriction( 0, 0, 0 );
 
-	if ( HasSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY ) )
 	{
 		masscenteroverride_t params;
 		if ( m_nameAttach1 == NULL_STRING )
@@ -927,7 +932,7 @@ void CPhysHinge::Spawn( void )
 		}
 		else
 		{
-			RemoveSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY );
+			GetEngineObject()->RemoveSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY );
 		}
 	}
 
@@ -987,7 +992,7 @@ static int GetUnitAxisIndex( const Vector &axis )
 
 bool CPhysHinge::IsWorldHinge( const hl_constraint_info_t &info, int *pAxisOut )
 {
-	if ( HasSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY ) && info.pObjects[0] == g_PhysWorldObject )
+	if (GetEngineObject()->HasSpawnFlags( SF_CONSTRAINT_ASSUME_WORLD_GEOMETRY ) && info.pObjects[0] == g_PhysWorldObject )
 	{
 		Vector localHinge;
 		info.pObjects[1]->WorldToLocalVector( &localHinge, m_hinge.worldAxisDirection );
@@ -1214,7 +1219,7 @@ IPhysicsConstraint *CPhysSlideConstraint::CreateConstraint( IPhysicsConstraintGr
 
 	sliding.InitWithCurrentObjectState( info.pObjects[0], info.pObjects[1], axisDirection );
 	sliding.friction = m_slideFriction;
-	if ( m_spawnflags & SF_SLIDE_LIMIT_ENDS )
+	if (GetEngineObject()->GetSpawnFlags() & SF_SLIDE_LIMIT_ENDS)
 	{
 		Vector position;
 		info.pObjects[1]->GetPosition( &position, NULL );
@@ -1411,7 +1416,7 @@ IPhysicsConstraint *CPhysPulley::CreateConstraint( IPhysicsConstraintGroup *pGro
 		pulley.gearRatio = m_gearRatio;
 	}
 	GetBreakParams( pulley.constraint, info );
-	if ( m_spawnflags & SF_PULLEY_RIGID )
+	if (GetEngineObject()->GetSpawnFlags() & SF_PULLEY_RIGID)
 	{
 		pulley.isRigid = true;
 	}
@@ -1503,7 +1508,7 @@ IPhysicsConstraint *CPhysLength::CreateConstraint( IPhysicsConstraintGroup *pGro
 	length.totalLength += m_addLength;
 	length.minLength = m_minLength;
 	m_totalLength = length.totalLength;
-	if ( HasSpawnFlags(SF_LENGTH_RIGID) )
+	if (GetEngineObject()->HasSpawnFlags(SF_LENGTH_RIGID) )
 	{
 		length.minLength = length.totalLength;
 	}
@@ -1585,14 +1590,14 @@ IPhysicsConstraint *CRagdollConstraint::CreateConstraint( IPhysicsConstraintGrou
 	MatrixInvert( entityToWorld, worldToEntity );
 	ConcatTransforms( worldToEntity, GetEngineObject()->EntityToWorldTransform(), ragdoll.constraintToAttached );
 
-	ragdoll.onlyAngularLimits = HasSpawnFlags( SF_RAGDOLL_FREEMOVEMENT ) ? true : false;
+	ragdoll.onlyAngularLimits = GetEngineObject()->HasSpawnFlags( SF_RAGDOLL_FREEMOVEMENT ) ? true : false;
 
 	// FIXME: Why are these friction numbers in different units from what the hinge uses?
 	ragdoll.axes[0].SetAxisFriction( m_xmin, m_xmax, m_xfriction );
 	ragdoll.axes[1].SetAxisFriction( m_ymin, m_ymax, m_yfriction );
 	ragdoll.axes[2].SetAxisFriction( m_zmin, m_zmax, m_zfriction );
 
-	if ( HasSpawnFlags( SF_CONSTRAINT_START_INACTIVE ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_CONSTRAINT_START_INACTIVE ) )
 	{
 		ragdoll.isActive = false;
 	}

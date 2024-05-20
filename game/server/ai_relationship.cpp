@@ -465,20 +465,20 @@ void CAI_Relationship::ChangeRelationships( int disposition, int iReverting, CBa
 			}
 			else if( pSubject->IRelationType(pTarget) != disposition || 
 				     pSubject->IRelationPriority(pTarget) != m_iRank || 
-					 HasSpawnFlags( SF_RELATIONSHIP_NOTIFY_SUBJECT ) ||
-					 HasSpawnFlags( SF_RELATIONSHIP_NOTIFY_TARGET ) )
+					GetEngineObject()->HasSpawnFlags( SF_RELATIONSHIP_NOTIFY_SUBJECT ) ||
+					GetEngineObject()->HasSpawnFlags( SF_RELATIONSHIP_NOTIFY_TARGET ) )
 			{
 				// Apply the relationship to the subject
 				pSubject->AddEntityRelationship( pTarget, (Disposition_t)disposition, m_iRank );
 
 				// Make the subject aware of the target
-				if ( HasSpawnFlags( SF_RELATIONSHIP_NOTIFY_SUBJECT ) )
+				if (GetEngineObject()->HasSpawnFlags( SF_RELATIONSHIP_NOTIFY_SUBJECT ) )
 				{
 					DiscloseNPCLocation( pSubject, pTarget );
 				}
 
 				// Make the target aware of the subject
-				if ( HasSpawnFlags( SF_RELATIONSHIP_NOTIFY_TARGET ) )
+				if (GetEngineObject()->HasSpawnFlags( SF_RELATIONSHIP_NOTIFY_TARGET ) )
 				{
 					DiscloseNPCLocation( pTarget, pSubject );
 				}

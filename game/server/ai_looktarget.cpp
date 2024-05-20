@@ -98,7 +98,7 @@ void CAI_LookTarget::Reserve( float flDuration )
 {
 	m_flTimeNextAvailable = gpGlobals->curtime + flDuration;
 
-	if( HasSpawnFlags( SF_LOOKTARGET_ONLYONCE ) )
+	if(GetEngineObject()->HasSpawnFlags( SF_LOOKTARGET_ONLYONCE ) )
 	{
 		// No one will look at this again.
 		Disable();

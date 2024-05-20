@@ -174,7 +174,7 @@ void CPointSpotlight::Spawn(void)
 	m_vSpotlightDir			= vec3_origin;
 	m_flSpotlightCurLength	= m_flSpotlightMaxLength;
 
-	m_bSpotlightOn = HasSpawnFlags( SF_SPOTLIGHT_START_LIGHT_ON );
+	m_bSpotlightOn = GetEngineObject()->HasSpawnFlags( SF_SPOTLIGHT_START_LIGHT_ON );
 
 	SetThink( &CPointSpotlight::SpotlightThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -209,7 +209,7 @@ void CPointSpotlight::ComputeRenderInfo()
 	m_hSpotlight->SetEndWidth(flNewWidth);
 
 	// Adjust width of light on the end.  
-	if ( FBitSet (m_spawnflags, SF_SPOTLIGHT_NO_DYNAMIC_LIGHT) )
+	if (GetEngineObject()->HasSpawnFlags(SF_SPOTLIGHT_NO_DYNAMIC_LIGHT) )
 	{
 		m_hSpotlightTarget->m_flLightScale = 0.0;
 	}
@@ -342,7 +342,7 @@ void CPointSpotlight::SpotlightCreate(void)
 	m_hSpotlightTarget->m_clrRender = m_clrRender;
 	m_hSpotlightTarget->m_Radius = m_flSpotlightMaxLength;
 
-	if ( FBitSet (m_spawnflags, SF_SPOTLIGHT_NO_DYNAMIC_LIGHT) )
+	if (GetEngineObject()->HasSpawnFlags(SF_SPOTLIGHT_NO_DYNAMIC_LIGHT) )
 	{
 		m_hSpotlightTarget->m_flLightScale = 0.0;
 	}
@@ -351,7 +351,7 @@ void CPointSpotlight::SpotlightCreate(void)
 	m_hSpotlight = CBeam::BeamCreate( "sprites/glow_test02.vmt", m_flSpotlightGoalWidth );
 	// Set the temporary spawnflag on the beam so it doesn't save (we'll recreate it on restore)
 	m_hSpotlight->SetHDRColorScale( m_flHDRColorScale );
-	m_hSpotlight->AddSpawnFlags( SF_BEAM_TEMPORARY );
+	m_hSpotlight->GetEngineObject()->AddSpawnFlags( SF_BEAM_TEMPORARY );
 	m_hSpotlight->SetColor( m_clrRender->r, m_clrRender->g, m_clrRender->b ); 
 	m_hSpotlight->SetHaloTexture(m_nHaloSprite);
 	m_hSpotlight->SetHaloScale(60);

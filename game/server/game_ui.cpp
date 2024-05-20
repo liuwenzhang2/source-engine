@@ -134,13 +134,13 @@ void CGameUI::Deactivate( CBaseEntity *pActivator )
 	if (pPlayer)
 	{
 		// Re-enable player motion
-		if ( FBitSet( m_spawnflags, SF_GAMEUI_FREEZE_PLAYER ) )
+		if (GetEngineObject()->HasSpawnFlags(SF_GAMEUI_FREEZE_PLAYER) )
 		{
 			m_player->RemoveFlag( FL_ATCONTROLS );
 		}
 
 		// Restore weapons
-		if ( FBitSet( m_spawnflags, SF_GAMEUI_HIDE_WEAPON ) )
+		if (GetEngineObject()->HasSpawnFlags(SF_GAMEUI_HIDE_WEAPON) )
 		{
 			// Turn the hud back on
 			pPlayer->m_Local.m_iHideHUD &= ~HIDEHUD_WEAPONSELECTION;
@@ -224,13 +224,13 @@ void CGameUI::InputActivate( inputdata_t &inputdata )
 	SetNextThink( gpGlobals->curtime );
 
 	// Disable player's motion
-	if ( FBitSet( m_spawnflags, SF_GAMEUI_FREEZE_PLAYER ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_GAMEUI_FREEZE_PLAYER) )
 	{
 		m_player->AddFlag( FL_ATCONTROLS );
 	}
 
 	// Store off and hide the currently held weapon
-	if ( FBitSet( m_spawnflags, SF_GAMEUI_HIDE_WEAPON ) )
+	if (GetEngineObject()->HasSpawnFlags(SF_GAMEUI_HIDE_WEAPON) )
 	{
 		m_player->m_Local.m_iHideHUD |= HIDEHUD_WEAPONSELECTION;
 
@@ -294,8 +294,8 @@ void CGameUI::Think( void )
 
 	// Deactivate if they jump or press +use.
 	// FIXME: prevent the use from going through in player.cpp
-	if ((( pPlayer->m_afButtonPressed & IN_USE ) && ( m_spawnflags & SF_GAMEUI_USE_DEACTIVATES )) ||
-		(( pPlayer->m_afButtonPressed & IN_JUMP ) && ( m_spawnflags & SF_GAMEUI_JUMP_DEACTIVATES )))
+	if ((( pPlayer->m_afButtonPressed & IN_USE ) && (GetEngineObject()->GetSpawnFlags() & SF_GAMEUI_USE_DEACTIVATES)) ||
+		(( pPlayer->m_afButtonPressed & IN_JUMP ) && (GetEngineObject()->GetSpawnFlags() & SF_GAMEUI_JUMP_DEACTIVATES)))
 	{
 		Deactivate( pPlayer );
 		return;

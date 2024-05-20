@@ -735,7 +735,7 @@ void CBaseHelicopter::Spawn( void )
 
 	// Don't start up if the level designer has asked the 
 	// helicopter to start disabled.
-	if ( !(m_spawnflags & SF_AWAITINPUT) )
+	if ( !(GetEngineObject()->GetSpawnFlags() & SF_AWAITINPUT) )
 	{
 		Startup();
 		SetNextThink( gpGlobals->curtime + 1.0f );
@@ -1491,13 +1491,13 @@ void CBaseHelicopter::InputChangePathCorner( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CBaseHelicopter::InputActivate( inputdata_t &inputdata )
 {
-	if( m_spawnflags & SF_AWAITINPUT )
+	if(GetEngineObject()->GetSpawnFlags() & SF_AWAITINPUT )
 	{
 		Startup();
 
 		// Now clear the spawnflag to protect from
 		// subsequent calls.
-		m_spawnflags &= ~SF_AWAITINPUT;
+		GetEngineObject()->RemoveSpawnFlags(SF_AWAITINPUT);
 	}
 }
 

@@ -81,7 +81,7 @@ public:
 	virtual float	InnateRange1MinRange( void ) { return 50*12; }
 	virtual float	InnateRange1MaxRange( void ) { return 250*12; }
 
-	bool		IsWorker( void ) const { return HasSpawnFlags( SF_ANTLION_WORKER ); }	// NOTE: IsAntlionWorker function must agree!
+	bool		IsWorker( void ) const { return GetEngineObject()->HasSpawnFlags( SF_ANTLION_WORKER ); }	// NOTE: IsAntlionWorker function must agree!
 
 	float		GetIdealAccel( void ) const;
 	float		MaxYawSpeed( void );

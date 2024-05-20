@@ -289,6 +289,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 #else
 	RecvPropInt(RECVINFO(m_nModelIndex)),
 #endif
+	RecvPropInt(RECVINFO(m_spawnflags)),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);

@@ -105,16 +105,16 @@ bool CAI_SentenceBase::MatchesCriteria( SentenceCriteria_t nCriteria )
 		return true;
 
 	case SENTENCE_CRITERIA_NORMAL:
-		return (GetOuter()->GetState() == NPC_STATE_COMBAT) || (GetOuter()->HasSpawnFlags( SF_NPC_GAG ) == 0);
+		return (GetOuter()->GetState() == NPC_STATE_COMBAT) || (GetOuter()->GetEngineObject()->HasSpawnFlags( SF_NPC_GAG ) == 0);
 
 	case SENTENCE_CRITERIA_IN_SQUAD:
-		if ( (GetOuter()->GetState() != NPC_STATE_COMBAT) && GetOuter()->HasSpawnFlags( SF_NPC_GAG ) )
+		if ( (GetOuter()->GetState() != NPC_STATE_COMBAT) && GetOuter()->GetEngineObject()->HasSpawnFlags( SF_NPC_GAG ) )
 			return false;
 		return GetOuter()->GetSquad() && (GetOuter()->GetSquad()->NumMembers() > 1);
 
 	case SENTENCE_CRITERIA_SQUAD_LEADER:
 		{
-			if ( (GetOuter()->GetState() != NPC_STATE_COMBAT) && GetOuter()->HasSpawnFlags( SF_NPC_GAG ) )
+			if ( (GetOuter()->GetState() != NPC_STATE_COMBAT) && GetOuter()->GetEngineObject()->HasSpawnFlags( SF_NPC_GAG ) )
 				return false;
 
 			CAI_Squad *pSquad = GetOuter()->GetSquad();

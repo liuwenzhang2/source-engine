@@ -354,7 +354,7 @@ int CPropData::ParsePropFromKV( CBaseEntity *pProp, KeyValues *pSection, KeyValu
 		// If we now have health, we're not allowed to ignore physics damage
 		if ( pProp->GetHealth() )
 		{
-			pProp->RemoveSpawnFlags( SF_PHYSPROP_DONT_TAKE_PHYSICS_DAMAGE );
+			pProp->GetEngineObject()->RemoveSpawnFlags( SF_PHYSPROP_DONT_TAKE_PHYSICS_DAMAGE );
 		}
 #endif
 	}

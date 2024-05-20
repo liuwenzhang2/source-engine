@@ -161,6 +161,7 @@ public:
 		m_iClassname = NULL_STRING;
 		m_iParentAttachment = 0;
 		m_iEFlags = 0;
+		m_spawnflags = 0;
 		touchStamp = 0;
 		SetCheckUntouch(false);
 		m_fDataObjectTypes = 0;
@@ -344,7 +345,7 @@ public:
 	void AddEFlags(int nEFlagMask);
 	void RemoveEFlags(int nEFlagMask);
 	bool IsEFlagSet(int nEFlagMask) const;
-
+	int GetSpawnFlags(void) const;
 	void SetCheckUntouch(bool check);
 	bool GetCheckUntouch() const;
 	int GetTouchStamp();
@@ -459,6 +460,7 @@ private:
 	unsigned char					m_iParentAttachment; // 0 if we're relative to the parent's absorigin and absangles.
 
 	int								m_iEFlags;	// entity flags EFL_*
+	int								m_spawnflags;
 	// used so we know when things are no longer touching
 	int								touchStamp;
 	int								m_fDataObjectTypes;
@@ -599,6 +601,11 @@ inline void C_EngineObjectInternal::RemoveEFlags(int nEFlagMask)
 inline bool C_EngineObjectInternal::IsEFlagSet(int nEFlagMask) const
 {
 	return (m_iEFlags & nEFlagMask) != 0;
+}
+
+inline int C_EngineObjectInternal::GetSpawnFlags(void) const
+{
+	return m_spawnflags;
 }
 
 inline int	C_EngineObjectInternal::GetTouchStamp()

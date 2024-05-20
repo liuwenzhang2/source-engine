@@ -195,7 +195,7 @@ int CNPC_CraneDriver::RangeAttack1Conditions( float flDot, float flDist )
 //-----------------------------------------------------------------------------
 int CNPC_CraneDriver::SelectSchedule( void )
 {
-	if ( HasSpawnFlags(SF_VEHICLEDRIVER_INACTIVE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_VEHICLEDRIVER_INACTIVE) )
 		return BaseClass::SelectSchedule();
 
 	// If we've got an object to pickup, so go get it
@@ -639,7 +639,7 @@ void CNPC_CraneDriver::InputForcePickup( inputdata_t &inputdata )
 		m_bForcedPickup = true;
 		m_bForcedDropoff = false;
 		SetCondition( COND_PROVOKED );
-		CLEARBITS( m_spawnflags, SF_VEHICLEDRIVER_INACTIVE );
+		GetEngineObject()->RemoveSpawnFlags(SF_VEHICLEDRIVER_INACTIVE);
 	}
 }
 
@@ -662,7 +662,7 @@ void CNPC_CraneDriver::InputForceDrop( inputdata_t &inputdata )
 		m_bForcedDropoff = true;
 		SetDesiredPosition( pEntity->GetEngineObject()->GetAbsOrigin() );
 		SetCondition( COND_PROVOKED );
-		CLEARBITS( m_spawnflags, SF_VEHICLEDRIVER_INACTIVE );
+		GetEngineObject()->RemoveSpawnFlags(SF_VEHICLEDRIVER_INACTIVE);
 	}
 }
 

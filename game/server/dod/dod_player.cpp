@@ -1005,7 +1005,7 @@ CBaseEntity	*CDODPlayer::GiveNamedItem( const char *pszName, int iSubType )
 	}
 
 	pent->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetLocalOrigin() );
-	pent->AddSpawnFlags( SF_NORESPAWN );
+	pent->GetEngineObject()->AddSpawnFlags( SF_NORESPAWN );
 
 	if ( iSubType )
 	{

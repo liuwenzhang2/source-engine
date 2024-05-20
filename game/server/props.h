@@ -338,6 +338,7 @@ public:
 	{
 	}
 
+	void UpdateOnRemove(void);
 	void Spawn( void );
 	void Precache();
 	bool CreateVPhysics( void );

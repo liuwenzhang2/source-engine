@@ -937,7 +937,7 @@ void CNPC_AttackHelicopter::Precache( void )
 {
 	BaseClass::Precache();
 
-	if ( !HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
 	{
 		engine->PrecacheModel( CHOPPER_MODEL_NAME );
 	}
@@ -959,7 +959,7 @@ void CNPC_AttackHelicopter::Precache( void )
 	}
 
 	g_pSoundEmitterSystem->PrecacheScriptSound("NPC_AttackHelicopter.ChargeGun");
-	if ( HasSpawnFlags( SF_HELICOPTER_LOUD_ROTOR_SOUND ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_LOUD_ROTOR_SOUND ) )
 	{
 		g_pSoundEmitterSystem->PrecacheScriptSound("NPC_AttackHelicopter.RotorsLoud");
 	}
@@ -1038,7 +1038,7 @@ void CNPC_AttackHelicopter::Spawn( void )
 	m_bBombingSuppressed = false;
 	m_bIgnorePathVisibilityTests = false;
 
-	if ( !HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
+	if ( !GetEngineObject()->HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
 	{
 		SetModel( CHOPPER_MODEL_NAME );
 	}
@@ -1053,7 +1053,7 @@ void CNPC_AttackHelicopter::Spawn( void )
 	float flLoadedSpeed = m_flMaxSpeed;
 	BaseClass::Spawn();
 
-	float flChaseDist = HasSpawnFlags( SF_HELICOPTER_AGGRESSIVE ) ? 
+	float flChaseDist = GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_AGGRESSIVE ) ?
 		CHOPPER_MIN_AGGRESSIVE_CHASE_DIST_DIFF : CHOPPER_MIN_CHASE_DIST_DIFF;
 	InitPathingData( CHOPPER_ARRIVE_DIST, flChaseDist, CHOPPER_AVOID_DIST );
 	SetFarthestPathDist( GetMaxFiringDistance() );
@@ -1128,7 +1128,7 @@ void CNPC_AttackHelicopter::Startup()
 {
 	BaseClass::Startup();
 
-	if ( HasSpawnFlags( SF_HELICOPTER_LIGHTS ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_LIGHTS ) )
 	{
 		for ( int i = 0; i < MAX_HELICOPTER_LIGHTS; ++i )
 		{
@@ -1202,7 +1202,7 @@ void CNPC_AttackHelicopter::BlinkLightsThink()
 //------------------------------------------------------------------------------
 void CNPC_AttackHelicopter::SpotlightStartup()
 {
-	if ( !HasSpawnFlags( SF_HELICOPTER_LIGHTS ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_LIGHTS ) )
 		return;
 
 	Vector vecForward;
@@ -1324,7 +1324,7 @@ void CNPC_AttackHelicopter::Activate( void )
 	m_nBombAttachment = LookupAttachment("bomb");
 	m_nSpotlightAttachment = LookupAttachment("spotlight");
 
-	if ( HasSpawnFlags( SF_HELICOPTER_LONG_SHADOW ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_LONG_SHADOW ) )
 	{
 		SetShadowCastDistance( 2048 );
 	}
@@ -1359,7 +1359,7 @@ void CNPC_AttackHelicopter::InitializeRotorSound( void )
 		CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
 		CPASAttenuationFilter filter( this );
 
-		if ( HasSpawnFlags( SF_HELICOPTER_LOUD_ROTOR_SOUND ) )
+		if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_LOUD_ROTOR_SOUND ) )
 		{
 			m_pRotorSound = controller.SoundCreate( filter, entindex(), "NPC_AttackHelicopter.RotorsLoud" );
 		}
@@ -1389,7 +1389,7 @@ void CNPC_AttackHelicopter::InitializeRotorSound( void )
 //------------------------------------------------------------------------------
 float CNPC_AttackHelicopter::GetMaxSpeed()
 {
-	if ( HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
 		return DRONE_SPEED;
 
 	if ( ( m_nAttackMode == ATTACK_MODE_BULLRUSH_VEHICLE ) && IsInSecondaryMode( BULLRUSH_MODE_DROP_BOMBS_FIXED_SPEED ) )
@@ -1403,7 +1403,7 @@ float CNPC_AttackHelicopter::GetMaxSpeed()
 
 float CNPC_AttackHelicopter::GetMaxSpeedFiring()
 {
-	if ( HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
 		return DRONE_SPEED;
 
 	if ( ( m_nAttackMode == ATTACK_MODE_BULLRUSH_VEHICLE ) && IsInSecondaryMode( BULLRUSH_MODE_DROP_BOMBS_FIXED_SPEED ) )
@@ -2361,7 +2361,7 @@ bool CNPC_AttackHelicopter::DoGunCharging( )
 
 	m_nGunState = GUN_STATE_FIRING;
 
-	if ( HasSpawnFlags( SF_HELICOPTER_AGGRESSIVE ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_AGGRESSIVE ) )
 	{
 		SetPauseState( PAUSE_AT_NEXT_LOS_POSITION );
 	}
@@ -2876,7 +2876,7 @@ void CNPC_AttackHelicopter::CreateBomb( bool bCheckForFairness, Vector *pVecVelo
 	CGrenadeHelicopter *pGrenade = SpawnBombEntity( vTipPos, vecActualVelocity );
 	if ( pGrenade && bMegaBomb )
 	{
-		pGrenade->AddSpawnFlags( SF_GRENADE_HELICOPTER_MEGABOMB );
+		pGrenade->GetEngineObject()->AddSpawnFlags( SF_GRENADE_HELICOPTER_MEGABOMB );
 	}
 }
 
@@ -3189,7 +3189,7 @@ void CNPC_AttackHelicopter::InputGunOff( inputdata_t &inputdata )
 bool CNPC_AttackHelicopter::FireGun( void )
 {
 	// Do the test electricity gun
-	if ( HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
 	{
 		FireElectricityGun( );
 		return true;
@@ -3832,7 +3832,7 @@ void CNPC_AttackHelicopter::CreateChopperHusk()
 	pCorpse->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 	pCorpse->GetEngineObject()->SetAbsAngles(GetEngineObject()->GetAbsAngles() );
 	pCorpse->SetModel( CHOPPER_MODEL_CORPSE_NAME );
-	pCorpse->AddSpawnFlags( SF_PHYSPROP_MOTIONDISABLED );
+	pCorpse->GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_MOTIONDISABLED );
 	pCorpse->Spawn();
 	pCorpse->SetMoveType( MOVETYPE_NONE );
 }
@@ -3988,7 +3988,7 @@ void CNPC_AttackHelicopter::ComputeVelocity( const Vector &vecTargetPosition,
 	}
 
 	// Apply avoidance forces
-	if ( !HasSpawnFlags( SF_HELICOPTER_IGNORE_AVOID_FORCES ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_IGNORE_AVOID_FORCES ) )
 	{
 		Vector vecAvoidForce;
 		CAvoidSphere::ComputeAvoidanceForces( this, 350.0f, 2.0f, &vecAvoidForce );
@@ -4276,7 +4276,7 @@ void CNPC_AttackHelicopter::UpdateFacingDirection( const Vector &vecActualDesire
 {
 	bool bIsBullrushing = ( m_nAttackMode == ATTACK_MODE_BULLRUSH_VEHICLE );
 
-	bool bSeenTargetRecently = HasSpawnFlags( SF_HELICOPTER_AGGRESSIVE ) || ( m_flLastSeen + 5 > gpGlobals->curtime ); 
+	bool bSeenTargetRecently = GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_AGGRESSIVE ) || ( m_flLastSeen + 5 > gpGlobals->curtime );
 	if ( GetEnemy() && !bIsBullrushing )
 	{
 		if ( !IsLeading() )
@@ -4725,7 +4725,7 @@ void CNPC_AttackHelicopter::UpdateEnemyLeading( void )
 	float flSpeed = pTarget->GetSmoothedVelocity().Length();
 
 	// Do the test electricity gun
-	if ( HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
+	if (GetEngineObject()->HasSpawnFlags(SF_HELICOPTER_ELECTRICAL_DRONE) )
 	{
 		if ( flSpeedAlongPath < 200.0f )
 		{
@@ -4826,7 +4826,7 @@ void CNPC_AttackHelicopter::Hunt( void )
 	UpdateEnemy();
 
 	// Give free knowledge of the enemy position if the chopper is "aggressive"
-	if ( HasSpawnFlags( SF_HELICOPTER_AGGRESSIVE ) && GetEnemy() )
+	if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_AGGRESSIVE ) && GetEnemy() )
 	{
 		m_vecTargetPosition = GetEnemy()->WorldSpaceCenter();
 	}
@@ -5054,12 +5054,12 @@ void CGrenadeHelicopter::Spawn( void )
 	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	SetModel( GRENADE_HELICOPTER_MODEL );
 
-	if ( HasSpawnFlags( SF_HELICOPTER_GRENADE_DUD ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_GRENADE_DUD ) )
 	{
 		m_nSkin = (int)SKIN_DUD;
 	}
 
-	if ( !HasSpawnFlags( SF_GRENADE_HELICOPTER_MEGABOMB ) )
+	if ( !GetEngineObject()->HasSpawnFlags( SF_GRENADE_HELICOPTER_MEGABOMB ) )
 	{
 		IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, GetSolidFlags(), false );
 		SetMoveType( MOVETYPE_VPHYSICS );
@@ -5151,10 +5151,10 @@ void CGrenadeHelicopter::InputExplodeIn( inputdata_t &inputdata )
 {
 	m_flLifetime = inputdata.value.Float();
 	
-	if ( HasSpawnFlags( SF_HELICOPTER_GRENADE_DUD ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_GRENADE_DUD ) )
 	{
 		// We are a dud no more!
-		RemoveSpawnFlags( SF_HELICOPTER_GRENADE_DUD );
+		GetEngineObject()->RemoveSpawnFlags( SF_HELICOPTER_GRENADE_DUD );
 		m_nSkin = (int)SKIN_REGULAR;
 	}
 
@@ -5177,13 +5177,13 @@ void CGrenadeHelicopter::BecomeActive()
 
 	m_bActivated = true;
 
-	bool bMegaBomb = HasSpawnFlags(SF_GRENADE_HELICOPTER_MEGABOMB);
+	bool bMegaBomb = GetEngineObject()->HasSpawnFlags(SF_GRENADE_HELICOPTER_MEGABOMB);
 
 	SetThink( &CGrenadeHelicopter::ExplodeThink );
 	
 	if ( hl2_episodic.GetBool() )
 	{
-		if ( HasSpawnFlags( SF_HELICOPTER_GRENADE_DUD ) == false )
+		if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_GRENADE_DUD ) == false )
 		{
 			SetNextThink( gpGlobals->curtime + GetBombLifetime() );
 		}
@@ -5681,7 +5681,7 @@ CBaseEntity *CreateHelicopterAvoidanceSphere( CBaseEntity *pParent, int nAttachm
 	pSphere->Init( flRadius );
 	if ( bAvoidBelow )
 	{
-		pSphere->AddSpawnFlags( SF_AVOIDSPHERE_AVOID_BELOW );
+		pSphere->GetEngineObject()->AddSpawnFlags( SF_AVOIDSPHERE_AVOID_BELOW );
 	}
 	pSphere->Spawn();
 	pSphere->GetEngineObject()->SetParent( pParent?pParent->GetEngineObject():NULL, nAttachment);
@@ -5767,7 +5767,7 @@ void CAvoidSphere::ComputeAvoidanceForces( CBaseEntity *pEntity, float flEntityR
 			// make the chopper always avoid *above*
 			// That means if a force would be applied to push the chopper down,
 			// figure out a new distance to travel that would push the chopper up.
-			if ( flZDist < 0.0f && !pSphere->HasSpawnFlags(SF_AVOIDSPHERE_AVOID_BELOW) )
+			if ( flZDist < 0.0f && !pSphere->GetEngineObject()->HasSpawnFlags(SF_AVOIDSPHERE_AVOID_BELOW) )
 			{
 				Vector vecExitPoint;
 				vecDir.z = -vecDir.z;
@@ -5916,7 +5916,7 @@ void CAvoidBox::ComputeAvoidanceForces( CBaseEntity *pEntity, float flEntityRadi
 			// make the chopper always avoid *above*
 			// That means if a force would be applied to push the chopper down,
 			// figure out a new distance to travel that would push the chopper up.
-			if ( flZDist < 0.0f && !pBox->HasSpawnFlags(SF_AVOIDSPHERE_AVOID_BELOW) )
+			if ( flZDist < 0.0f && !pBox->GetEngineObject()->HasSpawnFlags(SF_AVOIDSPHERE_AVOID_BELOW) )
 			{
 				Vector vecExitPoint;
 				vecDir.z = -vecDir.z;

@@ -877,7 +877,7 @@ void CZombie::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool b
 
 		if ( !UTIL_IsLowViolence() )
 		{
-			RemoveSpawnFlags( SF_NPC_GAG );
+			GetEngineObject()->RemoveSpawnFlags( SF_NPC_GAG );
 
 			MoanSound( envZombieMoanIgnited, ARRAYSIZE( envZombieMoanIgnited ) );
 

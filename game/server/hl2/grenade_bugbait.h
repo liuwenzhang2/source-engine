@@ -65,17 +65,17 @@ public:
 
 	bool SuppressCall( void )
 	{
-		return ( HasSpawnFlags( SF_BUGBAIT_SUPPRESS_CALL ) );
+		return (GetEngineObject()->HasSpawnFlags( SF_BUGBAIT_SUPPRESS_CALL ) );
 	}
 
 	bool DetectsSqueeze( void )
 	{
-		return ( !HasSpawnFlags( SF_BUGBAIT_NOT_SQUEEZE ) );
+		return ( !GetEngineObject()->HasSpawnFlags( SF_BUGBAIT_NOT_SQUEEZE ) );
 	}
 
 	bool DetectsThrown( void )
 	{
-		return ( !HasSpawnFlags( SF_BUGBAIT_NOT_THROWN ) );
+		return ( !GetEngineObject()->HasSpawnFlags( SF_BUGBAIT_NOT_THROWN ) );
 	}
 
 	float GetRadius( void ) const 

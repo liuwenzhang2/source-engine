@@ -516,7 +516,7 @@ bool CNPC_AlienGrunt::ShouldSpeak( void )
 		return FALSE;
 	}
 
-	if ( m_spawnflags & SF_NPC_GAG )
+	if (GetEngineObject()->GetSpawnFlags() & SF_NPC_GAG )
 	{
 		if ( m_NPCState != NPC_STATE_COMBAT )
 		{

@@ -428,7 +428,7 @@ bool CFilterEnemy::PassesFilterImpl( CBaseEntity *pCaller, CBaseEntity *pEntity 
 
 	// If asked to, we'll never fail to pass an already acquired enemy
 	//	This allows us to use test criteria to initially pick an enemy, then disregard the test until a new enemy comes along
-	if ( HasSpawnFlags( SF_FILTER_ENEMY_NO_LOSE_AQUIRED ) && ( pEntity == pCaller->GetEnemy() ) )
+	if (GetEngineObject()->HasSpawnFlags( SF_FILTER_ENEMY_NO_LOSE_AQUIRED ) && ( pEntity == pCaller->GetEnemy() ) )
 		return true;
 
 	// This is a little weird, but it's saying that if we're not the entity we're excluding the filter to, then just pass it throughZ

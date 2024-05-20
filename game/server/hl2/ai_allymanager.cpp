@@ -143,7 +143,7 @@ void CAI_AllyManager::CountAllies( int *pTotal, int *pMedics )
 				continue;
 
 			// They only count if I can use them.
-			if( ppAIs[i]->HasSpawnFlags(SF_CITIZEN_NOT_COMMANDABLE) )
+			if( ppAIs[i]->GetEngineObject()->HasSpawnFlags(SF_CITIZEN_NOT_COMMANDABLE) )
 				continue;
 			
 			// They only count if I can use them.
@@ -166,7 +166,7 @@ void CAI_AllyManager::CountAllies( int *pTotal, int *pMedics )
 				if ( pCitizen->WasInPlayerSquad() && !pCitizen->IsInPlayerSquad() )
 					continue;
 
-				if ( ppAIs[i]->HasSpawnFlags( SF_CITIZEN_MEDIC ) )
+				if ( ppAIs[i]->GetEngineObject()->HasSpawnFlags( SF_CITIZEN_MEDIC ) )
 					(*pMedics)++;
 			}
 
