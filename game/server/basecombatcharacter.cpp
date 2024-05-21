@@ -1288,7 +1288,7 @@ CBaseEntity *CBaseCombatCharacter::CheckTraceHullAttack( const Vector &vStart, c
 
 		// Do a tracehull from the top center of my bounding box.
 		vecTopCenter = GetAbsOrigin();
-		CollisionProp()->WorldSpaceAABB( &vecMins, &vecMaxs );
+		GetEngineObject()->WorldSpaceAABB( &vecMins, &vecMaxs );
 		vecTopCenter.z = vecMaxs.z + 1.0f;
 		vecEnd = vecTopCenter;
 		vecEnd.z += 2.0f;

@@ -2970,7 +2970,7 @@ bool CNPC_Manhack::IsInEffectiveTargetZone( CBaseEntity *pTarget )
 	// Get the enemies top and bottom point
 	pTarget->GetEngineObject()->NormalizedToWorldSpace( Vector(0.0f,0.0f,1.0f), &vecMaxPos );
 #ifdef _XBOX
-	pTarget->CollisionProp()->NormalizedToWorldSpace( Vector(0.0f,0.0f,0.5f), &vecMinPos ); // Only half the body is valid
+	pTarget->GetEngineObject()->NormalizedToWorldSpace( Vector(0.0f,0.0f,0.5f), &vecMinPos ); // Only half the body is valid
 #else
 	pTarget->GetEngineObject()->NormalizedToWorldSpace( Vector(0.0f,0.0f,0.0f), &vecMinPos );
 #endif // _XBOX

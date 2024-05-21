@@ -378,7 +378,7 @@ bool CAI_ScriptConditions::EvalPlayerBlockingActor( const EvalArgs_t &args )
 	Vector delta  = UTIL_YawToVector( args.pActor->GetAngles().y ) * testDist;
 
 	Vector vecAbsMins, vecAbsMaxs;
-	args.pActor->CollisionProp()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
+	args.pActor->GetEngineObject()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
 	bool intersect = IsBoxIntersectingRay( vecAbsMins, vecAbsMaxs, origin, delta );
 #endif
 

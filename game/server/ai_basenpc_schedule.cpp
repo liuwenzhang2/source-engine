@@ -369,7 +369,7 @@ bool CAI_BaseNPC::IsScheduleValid()
 			DevWarning( 2, "Schedule: %s Failed\n", GetCurSchedule()->GetName() );
 
 			Vector tmp;
-			CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &tmp );
+			GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &tmp );
 			tmp.z += 16;
 
 			g_pEffects->Sparks( tmp );

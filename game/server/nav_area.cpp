@@ -570,7 +570,7 @@ void CNavArea::ConnectElevators( void )
 		}
 
 		Extent elevatorExtent;
-		elevator->CollisionProp()->WorldSpaceSurroundingBounds( &elevatorExtent.lo, &elevatorExtent.hi );
+		elevator->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &elevatorExtent.lo, &elevatorExtent.hi );
 
 		if ( IsOverlapping( elevatorExtent ) )
 		{

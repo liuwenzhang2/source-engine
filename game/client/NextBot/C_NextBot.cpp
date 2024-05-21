@@ -217,7 +217,7 @@ bool C_NextBotManager::SetupInFrustumData( void )
 
 			// Are we in the view frustum?
 			Vector vecMin, vecMax;
-			pBot->CollisionProp()->WorldSpaceAABB( &vecMin, &vecMax );
+			pBot->GetEngineObject()->WorldSpaceAABB( &vecMin, &vecMax );
 			bool bInFrustum = !FrustumCache()->m_Frustums[iSlot].CullBox( vecMin, vecMax );
 		
 			if ( bInFrustum )

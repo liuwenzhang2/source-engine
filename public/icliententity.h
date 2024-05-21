@@ -24,7 +24,6 @@ class CMouthInfo;
 class IClientEntityInternal;
 struct SpatializationInfo_t;
 struct string_t;
-enum SurroundingBoundsType_t;
 
 class VarMapEntry_t
 {

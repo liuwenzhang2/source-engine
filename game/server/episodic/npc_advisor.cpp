@@ -1226,7 +1226,7 @@ void CNPC_Advisor::HurlObjectAtPlayer( CBaseEntity *pEnt, const Vector &leadVel 
 	// Lead the target accurately. This encourages hiding behind cover
 	// and/or catching the thrown physics object!
 	//
-	Vector vecObjOrigin = pEnt->CollisionProp()->WorldSpaceCenter();
+	Vector vecObjOrigin = pEnt->GetEngineObject()->WorldSpaceCenter();
 	Vector vecEnemyPos = GetEnemy()->EyePosition();
 	// disabled -- no longer compensate for gravity: // vecEnemyPos.y += 12.0f;
 
@@ -1440,7 +1440,7 @@ void CNPC_Advisor::PullObjectToStaging( CBaseEntity *pEnt, const Vector &staging
 	IPhysicsObject *pPhys = pEnt->VPhysicsGetObject();
 	Assert(pPhys);
 
-	Vector curPos = pEnt->CollisionProp()->WorldSpaceCenter();
+	Vector curPos = pEnt->GetEngineObject()->WorldSpaceCenter();
 	Vector displacement = stagingPos - curPos;
 
 	// quick and dirty -- use exponential decay to haul the object into place
@@ -1531,7 +1531,7 @@ Vector CNPC_Advisor::GetThrowFromPos( CBaseEntity *pEnt )
 {
 	Assert(pEnt);
 	Assert(pEnt->VPhysicsGetObject());
-	const CCollisionProperty *cProp = pEnt->CollisionProp();
+	const CCollisionProperty *cProp = (CCollisionProperty*)pEnt->GetEngineObject()->CollisionProp();
 	Assert(cProp);
 
 	float effecRadius = cProp->BoundingRadius(); // radius of object (important for kickout)

@@ -394,6 +394,22 @@ enum RenderFx_t
 	kRenderFxMax
 };
 
+//-----------------------------------------------------------------------------
+// Specifies how to compute the surrounding box
+//-----------------------------------------------------------------------------
+enum SurroundingBoundsType_t
+{
+	USE_OBB_COLLISION_BOUNDS = 0,
+	USE_BEST_COLLISION_BOUNDS,		// Always use the best bounds (most expensive)
+	USE_HITBOXES,
+	USE_SPECIFIED_BOUNDS,
+	USE_GAME_CODE,
+	USE_ROTATION_EXPANDED_BOUNDS,
+	USE_COLLISION_BOUNDS_NEVER_VPHYSICS,
+
+	SURROUNDING_TYPE_BIT_COUNT = 3
+};
+
 enum Collision_Group_t
 {
 	COLLISION_GROUP_NONE  = 0,

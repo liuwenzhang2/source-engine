@@ -27,7 +27,6 @@ class QAngle;
 struct PVSInfo_t;
 class CCheckTransmitInfo;
 struct matrix3x4_t;
-enum SurroundingBoundsType_t;
 
 struct servertouchlink_t
 {
