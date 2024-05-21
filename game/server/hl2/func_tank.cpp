@@ -492,7 +492,7 @@ void CFuncTank::NPC_FindController( void )
 			}
 
 			trace_t tr;
-			UTIL_TraceEntity( pNPC, vecMountPos, vecMountPos, MASK_NPCSOLID, this, pNPC->GetCollisionGroup(), &tr );
+			UTIL_TraceEntity( pNPC, vecMountPos, vecMountPos, MASK_NPCSOLID, this, pNPC->GetEngineObject()->GetCollisionGroup(), &tr );
 			if( tr.startsolid || tr.fraction < 1.0 )
 			{
 				// Don't mount the tank if someone/something is located on the control point.

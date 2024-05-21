@@ -429,12 +429,12 @@ IPhysicsObject *PhysCreateWorld( CBaseEntity *pWorld )
 static bool WheelCollidesWith( IPhysicsObject *pObj, CBaseEntity *pEntity )
 {
 #if defined( INVASION_DLL )
-	if ( pEntity->GetCollisionGroup() == TFCOLLISION_GROUP_OBJECT )
+	if ( pEntity->GetEngineObject()->GetCollisionGroup() == TFCOLLISION_GROUP_OBJECT )
 		return false;
 #endif
 
 	// Cull against interactive debris
-	if ( pEntity->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
+	if ( pEntity->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
 		return false;
 
 	// Hit physics ents
@@ -609,7 +609,7 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 		!(solid0 == SOLID_VPHYSICS || solid0 == SOLID_BSP || movetype0 == MOVETYPE_VPHYSICS) )
 		return 0;
 
-	if ( !g_pGameRules->ShouldCollide( pEntity0->GetCollisionGroup(), pEntity1->GetCollisionGroup() ) )
+	if ( !g_pGameRules->ShouldCollide( pEntity0->GetEngineObject()->GetCollisionGroup(), pEntity1->GetEngineObject()->GetCollisionGroup() ) )
 		return 0;
 
 	// check contents
@@ -680,7 +680,7 @@ bool CCollisionEvent::ShouldFreezeObject( IPhysicsObject *pObject )
 	// After doing the experiment of constraining the dynamic range of mass while solving friction
 	// contacts, I like the results of this tradeoff better.  So damage or remove the debris object
 	// wherever possible once we hit this case:
-	if ( IsDebris( pEntity->GetCollisionGroup()) && !pEntity->IsNPC() )
+	if ( IsDebris( pEntity->GetEngineObject()->GetCollisionGroup()) && !pEntity->IsNPC() )
 	{
 		IPhysicsObject *pOtherObject = NULL;
 		Vector contactPos;
@@ -882,7 +882,7 @@ void CCollisionEvent::UpdatePenetrateEvents( void )
 		{
 			if ( pEntity0 && pEntity1 )
 			{
-				if ( !IsDebris(pEntity1->GetCollisionGroup()) || pEntity1->GetMoveType() != MOVETYPE_VPHYSICS )
+				if ( !IsDebris(pEntity1->GetEngineObject()->GetCollisionGroup()) || pEntity1->GetMoveType() != MOVETYPE_VPHYSICS )
 				{
 					CBaseEntity *pTmp = pEntity0;
 					pEntity0 = pEntity1;
@@ -1010,7 +1010,7 @@ int CCollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhysicsObje
 		event.collisionState = COLLSTATE_TRYNPCSOLVER;
 	}
   
-	if ( (IsDebris( pEntity0->GetCollisionGroup() ) && !pObj1->IsStatic()) || (IsDebris( pEntity1->GetCollisionGroup() ) && !pObj0->IsStatic()) )
+	if ( (IsDebris( pEntity0->GetEngineObject()->GetCollisionGroup() ) && !pObj1->IsStatic()) || (IsDebris( pEntity1->GetEngineObject()->GetCollisionGroup() ) && !pObj0->IsStatic()) )
 	{
 		if ( eventTime > 0.5f )
 		{
@@ -1339,7 +1339,7 @@ static void OutputVPhysicsDebugInfo( CBaseEntity *pEntity )
 {
 	if ( pEntity )
 	{
-		Msg("Entity %s (%s) %s Collision Group %d\n", pEntity->GetClassname(), pEntity->GetDebugName(), pEntity->IsNavIgnored() ? "NAV IGNORE" : "", pEntity->GetCollisionGroup() );
+		Msg("Entity %s (%s) %s Collision Group %d\n", pEntity->GetClassname(), pEntity->GetDebugName(), pEntity->IsNavIgnored() ? "NAV IGNORE" : "", pEntity->GetEngineObject()->GetCollisionGroup() );
 		CUtlVector<CBaseEntity *> list;
 		g_Collisions.GetListOfPenetratingEntities( pEntity, list );
 		for ( int i = 0; i < list.Count(); i++ )

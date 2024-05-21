@@ -1067,7 +1067,7 @@ void CBounceBomb::ExplodeTouch( CBaseEntity *pOther )
 		return;
 
 	// Don't touch gibs and other debris
-	if( pOther->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
+	if( pOther->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
 	{
 		if( hl2_episodic.GetBool() )
 		{

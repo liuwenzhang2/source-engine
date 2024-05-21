@@ -80,7 +80,7 @@ void CWindowPane::Spawn( void )
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 	m_takedamage = DAMAGE_YES;
  	
-	SetCollisionGroup( COLLISION_GROUP_BREAKABLE_GLASS ); 
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_BREAKABLE_GLASS );
 
 	SetModel( "models/brokenglass_piece.mdl" );//set size and link into world.
 }
@@ -97,7 +97,7 @@ void CWindowPane::Precache( void )
 void CWindowPane::PaneTouch( CBaseEntity *pOther )
 {
 	if (pOther &&
-		pOther->GetCollisionGroup() != COLLISION_GROUP_BREAKABLE_GLASS)
+		pOther->GetEngineObject()->GetCollisionGroup() != COLLISION_GROUP_BREAKABLE_GLASS)
 	{
 		Die();
 	}
@@ -1191,7 +1191,7 @@ bool CBreakableSurface::ShatterPane(int nWidth, int nHeight, const Vector &vForc
 void CBreakableSurface::Spawn(void)
 {
 	BaseClass::Spawn();
-	SetCollisionGroup( COLLISION_GROUP_BREAKABLE_GLASS ); 
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_BREAKABLE_GLASS );
 	m_bIsBroken = false;
 
 	if (m_nQuadError == QUAD_ERR_MULT_FACES)

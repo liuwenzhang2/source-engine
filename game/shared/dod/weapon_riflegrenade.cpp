@@ -173,7 +173,7 @@ extern ConVar dod_grenadegravity;
 			vecSrc.z += 16;
 		}
 
-		SetCollisionGroup( COLLISION_GROUP_WEAPON );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
 		QAngle angles;
 		VectorAngles( -vecThrow, angles );

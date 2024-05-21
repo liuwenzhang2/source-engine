@@ -35,7 +35,7 @@ bool IsPushAwayEntity( CBaseEntity *pEnt )
 	if ( pEnt == NULL )
 		return false;
 
-	if ( pEnt->GetCollisionGroup() != COLLISION_GROUP_PUSHAWAY )
+	if ( pEnt->GetEngineObject()->GetCollisionGroup() != COLLISION_GROUP_PUSHAWAY )
 	{
 		// Try backing away from doors that are currently rotating, to prevent blocking them
 #ifndef CLIENT_DLL
@@ -83,7 +83,7 @@ bool IsPushableEntity( CBaseEntity *pEnt )
 
 	if ( sv_turbophysics.GetBool() )
 	{
-		if ( pEnt->GetCollisionGroup() == COLLISION_GROUP_NONE )
+		if ( pEnt->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_NONE )
 		{
 #ifdef CLIENT_DLL
 			if ( FClassnameIs( pEnt, "class CPhysicsPropMultiplayer" ) )
@@ -110,7 +110,7 @@ bool IsBreakableEntity( CBaseEntity *pEnt )
 	if ( pEnt->m_takedamage != DAMAGE_YES )
 		return false;
 
-	if ( pEnt->GetCollisionGroup() != COLLISION_GROUP_PUSHAWAY && pEnt->GetCollisionGroup() != COLLISION_GROUP_BREAKABLE_GLASS && pEnt->GetCollisionGroup() != COLLISION_GROUP_NONE )
+	if ( pEnt->GetEngineObject()->GetCollisionGroup() != COLLISION_GROUP_PUSHAWAY && pEnt->GetEngineObject()->GetCollisionGroup() != COLLISION_GROUP_BREAKABLE_GLASS && pEnt->GetEngineObject()->GetCollisionGroup() != COLLISION_GROUP_NONE )
 		return false;
 
 	if ( pEnt->m_iHealth > 200 )

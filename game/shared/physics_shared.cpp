@@ -780,8 +780,8 @@ void PhysDisableEntityCollisions( CBaseEntity *pEntity0, CBaseEntity *pEntity1 )
 
 	g_EntityCollisionHash->AddObjectPair( pEntity0, pEntity1 );
 #ifndef CLIENT_DLL
-	pEntity0->CollisionRulesChanged();
-	pEntity1->CollisionRulesChanged();
+	pEntity0->GetEngineObject()->CollisionRulesChanged();
+	pEntity1->GetEngineObject()->CollisionRulesChanged();
 #endif
 }
 
@@ -793,8 +793,8 @@ void PhysEnableEntityCollisions( CBaseEntity *pEntity0, CBaseEntity *pEntity1 )
 
 	g_EntityCollisionHash->RemoveObjectPair( pEntity0, pEntity1 );
 #ifndef CLIENT_DLL
-	pEntity0->CollisionRulesChanged();
-	pEntity1->CollisionRulesChanged();
+	pEntity0->GetEngineObject()->CollisionRulesChanged();
+	pEntity1->GetEngineObject()->CollisionRulesChanged();
 #endif
 }
 

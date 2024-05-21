@@ -127,7 +127,7 @@ void CPropCrane::Spawn( void )
 {
 	Precache();
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	SetCollisionGroup( COLLISION_GROUP_VEHICLE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_VEHICLE );
 
 	BaseClass::Spawn();
 

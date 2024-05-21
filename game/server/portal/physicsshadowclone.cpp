@@ -81,7 +81,7 @@ void CPhysicsShadowClone::UpdateOnRemove( void )
 	SetMoveType(MOVETYPE_NONE);
 	GetEngineObject()->SetSolid(SOLID_NONE);
 	GetEngineObject()->SetSolidFlags(0);
-	SetCollisionGroup(COLLISION_GROUP_NONE);
+	GetEngineObject()->SetCollisionGroup(COLLISION_GROUP_NONE);
 	CBaseEntity *pSource = m_hClonedEntity;
 	if( pSource )
 	{
@@ -157,7 +157,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 		SetMoveType( MOVETYPE_NONE );
 		GetEngineObject()->SetSolid( SOLID_NONE );
 		GetEngineObject()->SetSolidFlags( 0 );
-		SetCollisionGroup( COLLISION_GROUP_NONE );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 		VPhysicsDestroyObject();
 		return;
 	}
@@ -327,7 +327,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 
 		SetEffects( pClonedEntity->GetEffects() | (EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW) );
 
-		SetCollisionGroup( pClonedEntity->GetCollisionGroup() );
+		GetEngineObject()->SetCollisionGroup( pClonedEntity->GetEngineObject()->GetCollisionGroup() );
 
 		GetEngineObject()->SetModelIndex( pClonedEntity->GetEngineObject()->GetModelIndex() );
 		GetEngineObject()->SetModelName( pClonedEntity->GetEngineObject()->GetModelName() );
@@ -342,7 +342,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 	SyncEntity( true );
 
 	if( bBigChanges )
-		CollisionRulesChanged();
+		GetEngineObject()->CollisionRulesChanged();
 
 	if( sv_debug_physicsshadowclones.GetBool() )
 		DrawDebugOverlayForShadowClone( this );

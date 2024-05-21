@@ -1140,7 +1140,7 @@ bool CTraceFilterMelee::ShouldHitEntity( IHandleEntity *pHandleEntity, int conte
 		if ( !pEntity->ShouldCollide( m_collisionGroup, contentsMask ) )
 			return false;
 		
-		if ( !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetCollisionGroup() ) )
+		if ( !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetEngineObject()->GetCollisionGroup() ) )
 			return false;
 
 		if ( pEntity->m_takedamage == DAMAGE_NO )

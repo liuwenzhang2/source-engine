@@ -96,7 +96,7 @@ void CWeaponIFMBase::Spawn()
 	BaseClass::Spawn();
 
 	// Set this here to allow players to shoot dropped weapons
-	SetCollisionGroup( COLLISION_GROUP_WEAPON );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 }
 
 #endif

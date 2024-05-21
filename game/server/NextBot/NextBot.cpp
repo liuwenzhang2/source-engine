@@ -231,7 +231,7 @@ void NextBotCombatCharacter::Spawn( void )
 	
 	SetMoveType( MOVETYPE_CUSTOM );	
 	
-	SetCollisionGroup( COLLISION_GROUP_PLAYER );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	m_iMaxHealth = m_iHealth;
 	m_takedamage = DAMAGE_YES;

@@ -26,7 +26,7 @@ void CBaseGrenadeTimed::Spawn( void )
 {
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	SetModel( "models/Weapons/w_grenade.mdl" ); 
 
 	UTIL_SetSize(this, Vector( -4, -4, -4), Vector(4, 4, 4));

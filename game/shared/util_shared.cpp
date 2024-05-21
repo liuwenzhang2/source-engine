@@ -301,7 +301,7 @@ bool CTraceFilterSimple::ShouldHitEntity( IHandleEntity *pHandleEntity, int cont
 		return false;
 	if ( !pEntity->ShouldCollide( m_collisionGroup, contentsMask ) )
 		return false;
-	if ( pEntity && !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetCollisionGroup() ) )
+	if ( pEntity && !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetEngineObject()->GetCollisionGroup() ) )
 		return false;
 	if ( m_pExtraShouldHitCheckFunction &&
 		(! ( m_pExtraShouldHitCheckFunction( pHandleEntity, contentsMask ) ) ) )

@@ -2539,7 +2539,7 @@ void C_BasePlayer::LeaveVehicle( void )
 	RemoveEffects( EF_NODRAW );
 
 	SetMoveType( MOVETYPE_WALK );
-	SetCollisionGroup( COLLISION_GROUP_PLAYER );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	qAngles[ROLL] = 0;
 	SnapEyeAngles( qAngles );

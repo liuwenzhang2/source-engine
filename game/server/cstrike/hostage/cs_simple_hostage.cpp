@@ -153,7 +153,7 @@ void CHostage::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
-	SetCollisionGroup( COLLISION_GROUP_PLAYER );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	SetGravity( 1.0 );
 

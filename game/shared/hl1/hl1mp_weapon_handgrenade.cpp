@@ -136,7 +136,7 @@ void CHandGrenade::BounceTouch( CBaseEntity *pOther )
 	if ( pOther->IsPlayer() )
 	{
 		// Never hit a player again (we'll explode and fixup anyway)
-		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	}
 	// only do damage if we're moving fairly fast
 	if ( (pOther->m_takedamage != DAMAGE_NO) && (m_flNextAttack < gpGlobals->curtime && GetEngineObject()->GetAbsVelocity().Length() > 100))

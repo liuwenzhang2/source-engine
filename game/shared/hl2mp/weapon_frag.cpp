@@ -397,7 +397,7 @@ void CWeaponFrag::CheckThrowPosition( CBasePlayer *pPlayer, const Vector &vecEye
 	trace_t tr;
 
 	UTIL_TraceHull( vecEye, vecSrc, -Vector(GRENADE_RADIUS+2,GRENADE_RADIUS+2,GRENADE_RADIUS+2), Vector(GRENADE_RADIUS+2,GRENADE_RADIUS+2,GRENADE_RADIUS+2), 
-		pPlayer->PhysicsSolidMaskForEntity(), pPlayer, pPlayer->GetCollisionGroup(), &tr );
+		pPlayer->PhysicsSolidMaskForEntity(), pPlayer, pPlayer->GetEngineObject()->GetCollisionGroup(), &tr );
 	
 	if ( tr.DidHit() )
 	{

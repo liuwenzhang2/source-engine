@@ -94,7 +94,7 @@ void DOD_EjectBrassCallback( const CEffectData &data )
 
 	// ::ShouldCollide decides what this collides with
 	pTemp->flags |= FTENT_COLLISIONGROUP;
-	pTemp->SetCollisionGroup( DOD_COLLISIONGROUP_SHELLS );
+	pTemp->GetEngineObject()->SetCollisionGroup( DOD_COLLISIONGROUP_SHELLS );
 }
 
 DECLARE_CLIENT_EFFECT( "DOD_EjectBrass", DOD_EjectBrassCallback );

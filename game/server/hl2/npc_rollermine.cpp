@@ -622,7 +622,7 @@ unsigned int CNPC_RollerMine::PhysicsSolidMaskForEntity( void ) const
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::Bury( trace_t *tr )
 {
-	AI_TraceHull(GetEngineObject()->GetAbsOrigin() + Vector(0,0,64), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, MAX_TRACE_LENGTH ), Vector(-16,-16,-16), Vector(16,16,16), MASK_NPCSOLID, this, GetCollisionGroup(), tr );
+	AI_TraceHull(GetEngineObject()->GetAbsOrigin() + Vector(0,0,64), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, MAX_TRACE_LENGTH ), Vector(-16,-16,-16), Vector(16,16,16), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), tr );
 
 	//NDebugOverlay::Box( tr->startpos, Vector(-16,-16,-16), Vector(16,16,16), 255, 0, 0, 64, 10.0 );
 	//NDebugOverlay::Box( tr->endpos, Vector(-16,-16,-16), Vector(16,16,16), 0, 255, 0, 64, 10.0 );
@@ -1237,7 +1237,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 
 			// Robin: HACK: Bloat the rollermine check to catch the model switch (roller.mdl->roller_spikes.mdl)
 			trace_t	tr;
-			AI_TraceHull( vCenter, vCenter, Vector(-16,-16,-16), Vector(16,16,16), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+			AI_TraceHull( vCenter, vCenter, Vector(-16,-16,-16), Vector(16,16,16), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), &tr );
 
 			if ( tr.fraction == 1 && tr.allsolid != 1 && (tr.startsolid != 1) )
 			{

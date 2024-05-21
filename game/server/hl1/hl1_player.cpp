@@ -1997,10 +1997,10 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	}
 
 	// If the target is debris, convert it to non-debris
-	if ( pObject->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
+	if ( pObject->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
 	{
 		// Interactive debris converts back to debris when it comes to rest
-		pObject->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
+		pObject->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
 	}
 
 	// done so I'll go across level transitions with the player

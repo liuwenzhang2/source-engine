@@ -166,6 +166,7 @@ public:
 		m_nModelIndex = 0;
 		SetSolid(SOLID_NONE);
 		ClearSolidFlags();
+		m_CollisionGroup = COLLISION_GROUP_NONE;
 	}
 
 	~CEngineObjectInternal()
@@ -452,6 +453,12 @@ public:
 	bool DoesVPhysicsInvalidateSurroundingBox() const;
 	void UpdatePartition();
 	bool IsBoundsDefinedInEntitySpace() const;
+	// Do the bounding boxes of these two intersect?
+	bool Intersects(IEngineObjectServer* pOther);
+	// Collision group accessors
+	int GetCollisionGroup() const;
+	void SetCollisionGroup(int collisionGroup);
+	void CollisionRulesChanged();
 
 public:
 	// Networking related methods
@@ -512,6 +519,7 @@ private:
 	CNetworkVar(short, m_nModelIndex);
 
 	CNetworkVarEmbedded(CCollisionProperty, m_Collision);
+	CNetworkVar(int, m_CollisionGroup);		// used to cull collision tests
 
 };
 
@@ -952,6 +960,14 @@ inline void CEngineObjectInternal::UpdatePartition()
 inline bool CEngineObjectInternal::IsBoundsDefinedInEntitySpace() const
 {
 	return m_Collision.IsBoundsDefinedInEntitySpace();
+}
+
+//-----------------------------------------------------------------------------
+// Collision group accessors
+//-----------------------------------------------------------------------------
+inline int CEngineObjectInternal::GetCollisionGroup() const
+{
+	return m_CollisionGroup;
 }
 
 //-----------------------------------------------------------------------------

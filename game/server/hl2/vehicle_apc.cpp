@@ -368,7 +368,7 @@ void CPropAPC::ExplodeAndThrowChunk( const Vector &vecExplosionPos )
 	pChunk->Spawn( s_pChunkModelName[nGib] );
 	pChunk->SetOwnerEntity( this );
 	pChunk->m_lifeTime = random->RandomFloat( 6.0f, 8.0f );
-	pChunk->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	pChunk->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 	
 	// Set the velocity
@@ -456,7 +456,7 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 		pChunk->Spawn( s_pChunkModelName[nGib] );
 		pChunk->SetOwnerEntity( this );
 		pChunk->m_lifeTime = random->RandomFloat( 6.0f, 8.0f );
-		pChunk->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+		pChunk->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 		
 		// Set the velocity
@@ -912,7 +912,7 @@ void CPropAPC::CreateCorpse( )
 			{
 				pObj->AddVelocity( &vecVelocity, &angImpulse );
 			}
-			pGib->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+			pGib->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		}	
 		if( hl2_episodic.GetBool() )
 		{

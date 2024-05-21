@@ -130,7 +130,7 @@ CBasePlayer *CPropCombineBall::HasPhysicsAttacker( float dt )
 bool UTIL_IsCombineBall( CBaseEntity *pEntity )
 {
 	// Must be the correct collision group
-	if ( pEntity->GetCollisionGroup() != HL2COLLISION_GROUP_COMBINE_BALL )
+	if ( pEntity->GetEngineObject()->GetCollisionGroup() != HL2COLLISION_GROUP_COMBINE_BALL )
 		return false;
 
 	//NOTENOTE: This allows ANY combine ball to pass the test
@@ -153,7 +153,7 @@ bool UTIL_IsCombineBall( CBaseEntity *pEntity )
 bool UTIL_IsAR2CombineBall( CBaseEntity *pEntity )
 {
 	// Must be the correct collision group
-	if ( pEntity->GetCollisionGroup() != HL2COLLISION_GROUP_COMBINE_BALL )
+	if ( pEntity->GetEngineObject()->GetCollisionGroup() != HL2COLLISION_GROUP_COMBINE_BALL )
 		return false;
 
 	CPropCombineBall *pBall = dynamic_cast<CPropCombineBall *>(pEntity);
@@ -382,11 +382,11 @@ void CPropCombineBall::Spawn( void )
 	if( ShouldHitPlayer() )
 	{
 		// This allows the combine ball to hit the player.
-		SetCollisionGroup( HL2COLLISION_GROUP_COMBINE_BALL_NPC );
+		GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_COMBINE_BALL_NPC );
 	}
 	else
 	{
-		SetCollisionGroup( HL2COLLISION_GROUP_COMBINE_BALL );
+		GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_COMBINE_BALL );
 	}
 
 	CreateVPhysics();
@@ -843,7 +843,7 @@ void CPropCombineBall::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup
 		controller.Play( m_pHoldingSound, 1.0f, 100 ); 
 
 		// Don't collide with anything we may have to pull the ball through
-		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 		VPhysicsGetObject()->SetMass( 20.0f );
 		VPhysicsGetObject()->SetInertia( Vector( 100, 100, 100 ) );
@@ -912,7 +912,7 @@ void CPropCombineBall::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t R
 	SetContextThink( NULL, gpGlobals->curtime, s_pHoldDissolveContext );
 
 	// We're ready to start colliding again.
-	SetCollisionGroup( HL2COLLISION_GROUP_COMBINE_BALL );
+	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_COMBINE_BALL );
 
 	if ( m_pGlowTrail )
 	{
@@ -2030,7 +2030,7 @@ void CFuncCombineBallSpawner::GrabBallTouch( CBaseEntity *pOther )
 	if ( m_nBallsRemainingInField >= m_nBallCount )
 		return;
 
-	if ( pOther->GetCollisionGroup() != HL2COLLISION_GROUP_COMBINE_BALL )
+	if ( pOther->GetEngineObject()->GetCollisionGroup() != HL2COLLISION_GROUP_COMBINE_BALL )
 		return;
 
 	CPropCombineBall *pBall = dynamic_cast<CPropCombineBall*>( pOther );
@@ -2202,7 +2202,7 @@ void CPointCombineBallLauncher::SpawnBall()
 
 	if (GetEngineObject()->HasSpawnFlags( SF_COMBINE_BALL_LAUNCHER_COLLIDE_PLAYER ) )
 	{
-		pBall->SetCollisionGroup( HL2COLLISION_GROUP_COMBINE_BALL_NPC );
+		pBall->GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_COMBINE_BALL_NPC );
 	}
 
 	if(GetEngineObject()->GetSpawnFlags() & SF_COMBINE_BALL_LAUNCHER_ATTACH_BULLSEYE )

@@ -82,7 +82,7 @@ void CDODBaseRocket::Spawn( void )
 
 	AddFlag( FL_OBJECT );
 
-	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 
 	const char* soundname = "Weapon_Bazooka.Shoot";
 	CPASAttenuationFilter filter(this, soundname);
@@ -212,7 +212,7 @@ void CDODBaseRocket::RocketTouch( CBaseEntity *pOther )
 	if ( !pOther->GetEngineObject()->IsSolid() || pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
 		return;
 
-	if ( pOther->GetCollisionGroup() == COLLISION_GROUP_WEAPON )
+	if ( pOther->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_WEAPON )
 		return;
 
 	// if we hit the skybox, just disappear

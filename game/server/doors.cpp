@@ -307,7 +307,7 @@ void CBaseDoor::Spawn()
 
 		if (GetEngineObject()->HasSpawnFlags( SF_DOOR_NONSOLID_TO_PLAYER ) )
 		{
-			SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR );
+			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR );
 			// HACKHACK: Set this hoping that any children of the door that get blocked by the player
 			// will get fixed up by vphysics
 			// NOTE: We could decouple this as a separate behavior, but managing player collisions is already complex enough.
@@ -325,7 +325,7 @@ void CBaseDoor::Spawn()
 			}
 			else
 			{
-				SetCollisionGroup( COLLISION_GROUP_INTERACTIVE );
+				GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE );
 			}
 		}
 	}

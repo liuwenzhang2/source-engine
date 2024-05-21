@@ -572,7 +572,7 @@ void CTriggerSoundscape::PlayerUpdateThink()
 			continue;
 
 		// if the spectator is intersecting the trigger, track it, and start a touch if it is just starting to touch
-		if ( Intersects( player ) )
+		if (GetEngineObject()->Intersects( player->GetEngineObject() ) )
 		{
 			if ( !oldSpectators.HasElement( player ) )
 			{

@@ -562,7 +562,7 @@ void CNPC_CombineGunship::Spawn( void )
 	InitCustomSchedules();
 
 	SetActivity( (Activity)ACT_GUNSHIP_PATROL );
-	SetCollisionGroup( HL2COLLISION_GROUP_GUNSHIP );
+	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_GUNSHIP );
 
 	m_flMaxSpeed = GUNSHIP_MAX_SPEED;
 	m_flMaxSpeedFiring = GUNSHIP_MAX_SPEED;

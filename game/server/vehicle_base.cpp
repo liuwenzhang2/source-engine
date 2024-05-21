@@ -95,7 +95,7 @@ void CPropVehicle::Spawn( )
 
 	// NOTE: The model has to be set before we can spawn vehicle physics
 	BaseClass::Spawn();
-	SetCollisionGroup( COLLISION_GROUP_VEHICLE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_VEHICLE );
 
 	m_VehiclePhysics.Spawn();
 	if (!m_VehiclePhysics.Initialize( STRING(m_vehicleScript), m_nVehicleType ))

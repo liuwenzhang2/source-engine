@@ -68,7 +68,7 @@ void CGrenadeSpit::Spawn( void )
 	SetGravity( UTIL_ScaleForGravity( SPIT_GRAVITY ) );
 	SetFriction( 0.8f );
 
-	SetCollisionGroup( HL2COLLISION_GROUP_SPIT );
+	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_SPIT );
 
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
@@ -136,7 +136,7 @@ void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
 	}
 
 	// Don't hit other spit
-	if ( pOther->GetCollisionGroup() == HL2COLLISION_GROUP_SPIT )
+	if ( pOther->GetEngineObject()->GetCollisionGroup() == HL2COLLISION_GROUP_SPIT )
 		return;
 
 	// We want to collide with water

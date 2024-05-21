@@ -1426,7 +1426,7 @@ void CNPC_FloorTurret::TippedThink( void )
 			{
 				m_OnTipped.FireOutput( this, this );
 				SetEyeState( TURRET_EYE_DEAD );
-				SetCollisionGroup( COLLISION_GROUP_DEBRIS_TRIGGER );
+				GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS_TRIGGER );
 
 				// Start thinking slowly to see if we're ever set upright somehow
 				SetThink( &CNPC_FloorTurret::InactiveThink );
@@ -1495,7 +1495,7 @@ void CNPC_FloorTurret::ReturnToLife( void )
 	// Return to life
 	SetState( NPC_STATE_IDLE );
 	m_lifeState = LIFE_ALIVE;
-	SetCollisionGroup( COLLISION_GROUP_NONE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 
 	// Become active again
 	Enable();
@@ -1511,7 +1511,7 @@ void CNPC_FloorTurret::DisabledThink( void )
 	{
 		m_OnTipped.FireOutput( this, this );
 		SetEyeState( TURRET_EYE_DEAD );
-		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		SetThink( NULL );
 	}
 }

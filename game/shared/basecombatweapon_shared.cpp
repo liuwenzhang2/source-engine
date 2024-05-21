@@ -193,7 +193,7 @@ void CBaseCombatWeapon::Spawn( void )
 	}
 
 	FallInit();
-	SetCollisionGroup( COLLISION_GROUP_WEAPON );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 
 	SetBlocksLOS( false );

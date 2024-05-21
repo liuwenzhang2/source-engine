@@ -115,7 +115,7 @@ void CRagdoll::Init(
 	ent->VPhysicsSetObject( NULL );
 	ent->VPhysicsSetObject( m_ragdoll.list[0].pObject );
 	// Mark the ragdoll as debris.
-	ent->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	ent->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	RagdollApplyAnimationAsVelocity( m_ragdoll, pDeltaBones0, pDeltaBones1, dt );
 	RagdollActivate( m_ragdoll, params.pCollide, ent->GetEngineObject()->GetModelIndex() );

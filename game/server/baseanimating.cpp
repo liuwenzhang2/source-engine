@@ -1614,7 +1614,7 @@ void CBaseAnimating::CalculateIKLocks( float currentTime )
 	if ( m_pIk )
 	{
 		Ray_t ray;
-		CTraceFilterSkipNPCs traceFilter( this, GetCollisionGroup() );
+		CTraceFilterSkipNPCs traceFilter( this, GetEngineObject()->GetCollisionGroup() );
 		Vector up;
 		GetVectors( NULL, NULL, &up );
 		// FIXME: check number of slots?

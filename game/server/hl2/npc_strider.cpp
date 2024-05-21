@@ -510,7 +510,7 @@ void CNPC_Strider::Spawn()
 	m_flFieldOfView = 0.0; // 180 degrees
 
 	AddFlag( FL_FLY );
-	SetCollisionGroup( HL2COLLISION_GROUP_STRIDER );
+	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_STRIDER );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );

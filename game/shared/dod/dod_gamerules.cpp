@@ -5443,7 +5443,7 @@ void CFuncTeamWall::DrawThink( void )
 
 		SetActive( true );
 
-		SetCollisionGroup( DOD_COLLISIONGROUP_BLOCKERWALL );
+		GetEngineObject()->SetCollisionGroup( DOD_COLLISIONGROUP_BLOCKERWALL );
 
 		if (GetEngineObject()->HasSpawnFlags(SF_TEAM_WALL_NO_HINT) == false )
 		{

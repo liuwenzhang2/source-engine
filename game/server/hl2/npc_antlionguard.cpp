@@ -875,7 +875,7 @@ void CNPC_AntlionGuard::Activate( void )
 	while ( ( pObject = gEntList.FindEntityInSphere( pObject, WorldSpaceCenter(), 2500 ) ) != NULL )
 	{
 		// Can't throw around debris
-		if ( pObject->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
+		if ( pObject->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
 			continue;
 
 		// We can only throw a few types of things
@@ -1550,7 +1550,7 @@ public:
 			if ( !pEntity->ShouldCollide( m_collisionGroup, contentsMask ) )
 				return false;
 			
-			if ( !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetCollisionGroup() ) )
+			if ( !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetEngineObject()->GetCollisionGroup() ) )
 				return false;
 
 			if ( pEntity->m_takedamage == DAMAGE_NO )
@@ -2762,7 +2762,7 @@ public:
 			if ( !pEntity->ShouldCollide( m_collisionGroup, contentsMask ) )
 				return false;
 			
-			if ( !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetCollisionGroup() ) )
+			if ( !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetEngineObject()->GetCollisionGroup() ) )
 				return false;
 
 			// don't test small moveable physics objects (unless it's an NPC)
@@ -4574,7 +4574,7 @@ bool CNPC_AntlionGuard::BecomeRagdollOnClient( const Vector &force )
 
 		// Transfer our name to the new ragdoll
 		pRagdoll->SetName( STRING(GetEntityName()) );
-		pRagdoll->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+		pRagdoll->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		
 		// Get rid of our old body
 		UTIL_Remove(this);

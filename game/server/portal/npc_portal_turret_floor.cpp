@@ -1315,7 +1315,7 @@ void CNPC_Portal_FloorTurret::InactiveThink( void )
 	if ( !OnSide() && VPhysicsGetObject()->GetContactPoint( NULL, NULL ) && m_bEnabled )
 	{
 		// Never return to life!
-		SetCollisionGroup( COLLISION_GROUP_NONE );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 		//ReturnToLife();
 	}
 	else
@@ -1323,9 +1323,9 @@ void CNPC_Portal_FloorTurret::InactiveThink( void )
 		IPhysicsObject *pTurretPhys = VPhysicsGetObject();
 
 		if ( !(pTurretPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD) && pTurretPhys->IsAsleep() )
-			SetCollisionGroup( COLLISION_GROUP_DEBRIS_TRIGGER );
+			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS_TRIGGER );
 		else
-			SetCollisionGroup( COLLISION_GROUP_NONE );
+			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 	}
 }
 

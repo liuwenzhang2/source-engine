@@ -258,7 +258,6 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt		(SENDINFO(m_fEffects),		EF_MAX_BITS, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_clrRender),	32, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_iTeamNum),		TEAMNUM_NUM_BITS, 0),
-	SendPropInt		(SENDINFO(m_CollisionGroup), 5, SPROP_UNSIGNED),
 	SendPropFloat	(SENDINFO(m_flElasticity), 0, SPROP_COORD),
 	SendPropFloat	(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED ),
 	SendPropEHandle (SENDINFO(m_hOwnerEntity)),
@@ -333,7 +332,6 @@ CBaseEntity::CBaseEntity()
 #endif
 
 	m_bAlternateSorting = false;
-	m_CollisionGroup = COLLISION_GROUP_NONE;
 //	GetEngineObject()->Init(this);
 //#ifdef _DEBUG
 //	((Vector)GetEngineObject()->GetLocalVelocity()).Init();
@@ -625,7 +623,7 @@ void CBaseEntity::StopFollowingEntity( )
 	RemoveEffects( EF_BONEMERGE );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
-	CollisionRulesChanged();
+	GetEngineObject()->CollisionRulesChanged();
 }
 
 bool CBaseEntity::IsFollowingEntity()
@@ -1705,7 +1703,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_FIELD( m_MoveType, FIELD_CHARACTER ),
 	DEFINE_FIELD( m_MoveCollide, FIELD_CHARACTER ),
 	DEFINE_FIELD( m_hOwnerEntity, FIELD_EHANDLE ),
-	DEFINE_FIELD( m_CollisionGroup, FIELD_INTEGER ),
+	//DEFINE_FIELD( m_CollisionGroup, FIELD_INTEGER ),
 	DEFINE_PHYSPTR( m_pPhysicsObject),
 	DEFINE_FIELD( m_flElasticity, FIELD_FLOAT ),
 	DEFINE_KEYFIELD( m_flShadowCastDistance, FIELD_FLOAT, "shadowcastdist" ),
@@ -2497,16 +2495,6 @@ bool CBaseEntity::VPhysicsIsFlesh( void )
 	return false;
 }
 
-bool CBaseEntity::Intersects( CBaseEntity *pOther )
-{
-	if ( entindex()==-1 || pOther->entindex()==-1)
-		return false;
-
-	return IsOBBIntersectingOBB( 
-		GetEngineObject()->GetCollisionOrigin(), GetEngineObject()->GetCollisionAngles(), GetEngineObject()->OBBMins(), GetEngineObject()->OBBMaxs(),
-		pOther->GetEngineObject()->GetCollisionOrigin(), pOther->GetEngineObject()->GetCollisionAngles(), pOther->GetEngineObject()->OBBMins(), pOther->GetEngineObject()->OBBMaxs() );
-}
-
 extern ConVar ai_LOS_mode;
 
 //=========================================================
@@ -3060,7 +3048,7 @@ void CBaseEntity::SetOwnerEntity( CBaseEntity* pOwner )
 	{
 		m_hOwnerEntity = pOwner;
 
-		CollisionRulesChanged();
+		GetEngineObject()->CollisionRulesChanged();
 	}
 }
 
@@ -3099,7 +3087,7 @@ void CBaseEntity::SetMoveType( MoveType_t val, MoveCollide_t moveCollide )
 	m_MoveType = val;
 	m_MoveCollide = moveCollide;
 
-	CollisionRulesChanged();
+	GetEngineObject()->CollisionRulesChanged();
 
 	switch( m_MoveType )
 	{
@@ -4208,7 +4196,7 @@ void CBaseEntity::Teleport( const Vector *newPosition, const QAngle *newAngles, 
 
 	for (i = 0; i < teleportList.Count(); i++)
 	{
-		teleportList[i].pEntity->CollisionRulesChanged();
+		teleportList[i].pEntity->GetEngineObject()->CollisionRulesChanged();
 	}
 
 	if ( IsPlayer() )

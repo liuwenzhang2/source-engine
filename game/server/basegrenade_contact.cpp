@@ -31,7 +31,7 @@ void CBaseGrenadeContact::Spawn( void )
 	// point sized, solid, bouncing
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	SetModel( "models/weapons/w_grenade.mdl" );	// BUG: wrong model
 
 	UTIL_SetSize(this, vec3_origin, vec3_origin);

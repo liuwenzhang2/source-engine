@@ -206,7 +206,7 @@ public:
 
 bool CPhysicsPushedEntities::IsPushedPositionValid( CBaseEntity *pBlocker )
 {
-	CTraceFilterPushFinal pushFilter(pBlocker, pBlocker->GetCollisionGroup() );
+	CTraceFilterPushFinal pushFilter(pBlocker, pBlocker->GetEngineObject()->GetCollisionGroup() );
 
 	trace_t trace;
 	UTIL_TraceEntity( pBlocker, pBlocker->GetEngineObject()->GetAbsOrigin(), pBlocker->GetEngineObject()->GetAbsOrigin(), pBlocker->PhysicsSolidMaskForEntity(), &pushFilter, &trace );
@@ -224,7 +224,7 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 	// See if it's possible to move the entity, but disable all pushers in the hierarchy first
 	int *pPusherHandles = (int*)stackalloc( m_rgPusher.Count() * sizeof(int) );
 	UnlinkPusherList( pPusherHandles );
-	CTraceFilterPushMove pushFilter(pBlocker, pBlocker->GetCollisionGroup() );
+	CTraceFilterPushMove pushFilter(pBlocker, pBlocker->GetEngineObject()->GetCollisionGroup() );
 
 	Vector pushDestPosition = pBlocker->GetEngineObject()->GetAbsOrigin() + vecAbsPush;
 	UTIL_TraceEntity( pBlocker, pBlocker->GetEngineObject()->GetAbsOrigin(), pushDestPosition,
@@ -548,7 +548,7 @@ public:
 				continue;
 
 			m_pushersOnly.AddEntityToHit( m_pPushedEntities->m_rgPusher[i].m_pEntity );
-			int collisionGroup = m_pPushedEntities->m_rgPusher[i].m_pEntity->GetCollisionGroup();
+			int collisionGroup = m_pPushedEntities->m_rgPusher[i].m_pEntity->GetEngineObject()->GetCollisionGroup();
 			AddCollisionGroup(collisionGroup);
 		}
 
@@ -634,7 +634,7 @@ private:
 		bool bCollide = false;
 		for ( int i = 0; i < m_collisionGroupCount; i++ )
 		{
-			if ( g_pGameRules->ShouldCollide( pCheck->GetCollisionGroup(), m_collisionGroups[i] ) )
+			if ( g_pGameRules->ShouldCollide( pCheck->GetEngineObject()->GetCollisionGroup(), m_collisionGroups[i] ) )
 			{
 				bCollide = true;
 				break;

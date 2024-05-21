@@ -314,7 +314,7 @@ void CNPC_Antlion::Spawn( void )
 		CapabilitiesAdd( bits_CAP_SQUAD );
 	}
 
-	SetCollisionGroup( HL2COLLISION_GROUP_ANTLION );
+	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_ANTLION );
 
 	CapabilitiesAdd( bits_CAP_MOVE_GROUND | bits_CAP_MOVE_JUMP | bits_CAP_INNATE_MELEE_ATTACK1 | bits_CAP_INNATE_MELEE_ATTACK2 );
 	
@@ -2085,28 +2085,28 @@ bool CNPC_Antlion::IsFirmlyOnGround( void )
 	
 	Vector vOrigin = GetEngineObject()->GetAbsOrigin() + Vector( GetHullMins().x, GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
-	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), &tr );
 
 	if ( tr.fraction != 1.0f )
 		 return true;
 	
 	vOrigin = GetEngineObject()->GetAbsOrigin() - Vector( GetHullMins().x, GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
-	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), &tr );
 
 	if ( tr.fraction != 1.0f )
 		 return true;
 
 	vOrigin = GetEngineObject()->GetAbsOrigin() + Vector( GetHullMins().x, -GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
-	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), &tr );
 
 	if ( tr.fraction != 1.0f )
 		 return true;
 
 	vOrigin = GetEngineObject()->GetAbsOrigin() + Vector( -GetHullMins().x, GetHullMins().y, 0 );
 //	NDebugOverlay::Line( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), 255, 0, 0, true, 5 );
-	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceLine( vOrigin, vOrigin - Vector( 0, 0, flHeight * 0.5  ), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), &tr );
 
 	if ( tr.fraction != 1.0f )
 		 return true;

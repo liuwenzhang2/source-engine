@@ -19,7 +19,7 @@ void CHL1Item::Spawn( void )
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_TRIGGER );
 	GetEngineObject()->UseTriggerBounds( true, 24.0f );
 	
-	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	SetTouch( &CItem::ItemTouch );
 

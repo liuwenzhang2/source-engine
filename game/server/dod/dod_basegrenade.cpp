@@ -77,7 +77,7 @@ void CDODBaseGrenade::Spawn( void )
 
 	if( m_bUseVPhysics )
 	{		 
-		SetCollisionGroup( COLLISION_GROUP_WEAPON );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 		IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_BBOX, 0, false );
 
 		if ( pPhysicsObject )
@@ -423,9 +423,9 @@ public:
 
 		if ( pEntity )
 		{
-			if ( g_pGameRules->ShouldCollide( m_collisionGroupAlreadyChecked, pEntity->GetCollisionGroup() ) )
+			if ( g_pGameRules->ShouldCollide( m_collisionGroupAlreadyChecked, pEntity->GetEngineObject()->GetCollisionGroup() ) )
 				return false;
-			if ( g_pGameRules->ShouldCollide( m_newCollisionGroup, pEntity->GetCollisionGroup() ) )
+			if ( g_pGameRules->ShouldCollide( m_newCollisionGroup, pEntity->GetEngineObject()->GetCollisionGroup() ) )
 				return true;
 		}
 
@@ -450,7 +450,7 @@ void CDODBaseGrenade::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 	Vector start = GetEngineObject()->GetAbsOrigin();
 	// find all entities that my collision group wouldn't hit, but COLLISION_GROUP_NONE would and bounce off of them as a ray cast
-	CTraceFilterCollisionGroupDelta filter( this, GetCollisionGroup(), COLLISION_GROUP_NONE );
+	CTraceFilterCollisionGroupDelta filter( this, GetEngineObject()->GetCollisionGroup(), COLLISION_GROUP_NONE );
 	trace_t tr;
 
 	UTIL_TraceLine( start, start + vel * gpGlobals->frametime, CONTENTS_HITBOX|CONTENTS_MONSTER|CONTENTS_SOLID, &filter, &tr );

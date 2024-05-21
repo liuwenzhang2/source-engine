@@ -705,7 +705,7 @@ void CPortalSimulator::TakeOwnershipOfEntity( CBaseEntity *pEntity )
 	if( IsSimulatingVPhysics() )
 		TakePhysicsOwnership( pEntity );
 
-	pEntity->CollisionRulesChanged(); //absolutely necessary in single-environment mode, possibly expendable in multi-environment moder
+	pEntity->GetEngineObject()->CollisionRulesChanged(); //absolutely necessary in single-environment mode, possibly expendable in multi-environment moder
 	//pEntity->SetGroundEntity( NULL );
 	IPhysicsObject *pObject = pEntity->VPhysicsGetObject();
 	if( pObject )
@@ -826,7 +826,7 @@ void CPortalSimulator::TakePhysicsOwnership( CBaseEntity *pEntity )
 				m_pLinkedPortal->MarkAsOwned( pClone );
 				m_pLinkedPortal->m_InternalData.Simulation.Dynamic.EntFlags[pClone->entindex()] |= PSEF_OWNS_PHYSICS;
 				m_pLinkedPortal->m_InternalData.Simulation.Dynamic.EntFlags[pClone->entindex()] |= m_InternalData.Simulation.Dynamic.EntFlags[pEntity->entindex()] & PSEF_IS_IN_PORTAL_HOLE;
-				pClone->CollisionRulesChanged(); //adding the clone to the portal simulator changes how it collides
+				pClone->GetEngineObject()->CollisionRulesChanged(); //adding the clone to the portal simulator changes how it collides
 
 				if( pHeldEntity )
 				{
@@ -856,7 +856,7 @@ void RecheckEntityCollision( CBaseEntity *pEntity )
 		return;
 	}
 
-	pEntity->CollisionRulesChanged(); //absolutely necessary in single-environment mode, possibly expendable in multi-environment mode
+	pEntity->GetEngineObject()->CollisionRulesChanged(); //absolutely necessary in single-environment mode, possibly expendable in multi-environment mode
 	//pEntity->SetGroundEntity( NULL );
 	IPhysicsObject *pObject = pEntity->VPhysicsGetObject();
 	if( pObject )
@@ -1300,7 +1300,7 @@ void CPortalSimulator::CreateLocalPhysics( void )
 		TakePhysicsOwnership( m_InternalData.Simulation.Dynamic.OwnedEntities[i] );
 
 	if( m_InternalData.Simulation.pCollisionEntity )
-		m_InternalData.Simulation.pCollisionEntity->CollisionRulesChanged();
+		m_InternalData.Simulation.pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
 	
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -1392,7 +1392,7 @@ void CPortalSimulator::CreateLinkedPhysics( void )
 			MarkAsOwned( pClone );
 			m_InternalData.Simulation.Dynamic.EntFlags[pClone->entindex()] |= PSEF_OWNS_PHYSICS;
 			m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.AddToTail( pClone );
-			pClone->CollisionRulesChanged(); //adding the clone to the portal simulator changes how it collides
+			pClone->GetEngineObject()->CollisionRulesChanged(); //adding the clone to the portal simulator changes how it collides
 		}
 	}
 
@@ -1405,7 +1405,7 @@ void CPortalSimulator::CreateLinkedPhysics( void )
 	}
 
 	if( m_InternalData.Simulation.pCollisionEntity )
-		m_InternalData.Simulation.pCollisionEntity->CollisionRulesChanged();
+		m_InternalData.Simulation.pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
 
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -1532,7 +1532,7 @@ void CPortalSimulator::ClearLocalPhysics( void )
 	m_InternalData.Simulation.pPhysicsEnvironment->SetQuickDelete( false );
 
 	if( m_InternalData.Simulation.pCollisionEntity )
-		m_InternalData.Simulation.pCollisionEntity->CollisionRulesChanged();
+		m_InternalData.Simulation.pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
 
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -1606,7 +1606,7 @@ void CPortalSimulator::ClearLinkedPhysics( void )
 	m_InternalData.Simulation.pPhysicsEnvironment->SetQuickDelete( false );
 
 	if( m_InternalData.Simulation.pCollisionEntity )
-		m_InternalData.Simulation.pCollisionEntity->CollisionRulesChanged();
+		m_InternalData.Simulation.pCollisionEntity->GetEngineObject()->CollisionRulesChanged();
 
 	STOPDEBUGTIMER( functionTimer );
 	DECREMENTTABSPACING();
@@ -2451,12 +2451,12 @@ void CPortalSimulator::PrePhysFrame( void )
 
 					if( ((iExistingFlags ^ pSimulator->m_InternalData.Simulation.Dynamic.EntFlags[iEntIndex]) & PSEF_IS_IN_PORTAL_HOLE) != 0 ) //value changed
 					{
-						pEntity->CollisionRulesChanged(); //entity moved into or out of the portal hole, need to either add or remove collision with transformed geometry
+						pEntity->GetEngineObject()->CollisionRulesChanged(); //entity moved into or out of the portal hole, need to either add or remove collision with transformed geometry
 
 						CPhysicsShadowCloneLL *pClones = CPhysicsShadowClone::GetClonesOfEntity( pEntity );
 						while( pClones )
 						{
-							pClones->pClone->CollisionRulesChanged();
+							pClones->pClone->GetEngineObject()->CollisionRulesChanged();
 							pClones = pClones->pNext;
 						}
 					}
@@ -2927,7 +2927,7 @@ void CPSCollisionEntity::Spawn( void )
 	BaseClass::Spawn();
 	GetEngineObject()->SetSolid( SOLID_CUSTOM );
 	SetMoveType( MOVETYPE_NONE );
-	SetCollisionGroup( COLLISION_GROUP_NONE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 	s_PortalSimulatorCollisionEntities[entindex()] = true;
 	VPhysicsSetObject( NULL );
 	AddFlag( FL_WORLDBRUSH );
@@ -2938,7 +2938,7 @@ void CPSCollisionEntity::Spawn( void )
 void CPSCollisionEntity::Activate( void )
 {
 	BaseClass::Activate();
-	CollisionRulesChanged();
+	GetEngineObject()->CollisionRulesChanged();
 }
 
 int CPSCollisionEntity::ObjectCaps( void )

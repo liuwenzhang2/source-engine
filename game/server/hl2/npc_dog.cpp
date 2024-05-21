@@ -306,7 +306,7 @@ void CNPC_Dog::MantainBoneFollowerCollisionGroups( int iCollisionGroup )
 
 	physfollower_t* pBone = m_BoneFollowerManager.GetBoneFollower( 0 );
 
-	if ( pBone && pBone->hFollower && pBone->hFollower->GetCollisionGroup() != iCollisionGroup )
+	if ( pBone && pBone->hFollower && pBone->hFollower->GetEngineObject()->GetCollisionGroup() != iCollisionGroup )
 	{
 		for ( int i = 0; i < m_BoneFollowerManager.GetNumBoneFollowers(); i++ )
 		{
@@ -314,7 +314,7 @@ void CNPC_Dog::MantainBoneFollowerCollisionGroups( int iCollisionGroup )
 
 			if ( pBone && pBone->hFollower )
 			{
-				pBone->hFollower->SetCollisionGroup( iCollisionGroup );
+				pBone->hFollower->GetEngineObject()->SetCollisionGroup( iCollisionGroup );
 			}
 		}
 	}
@@ -392,15 +392,15 @@ void CNPC_Dog::SetPlayerAvoidState( void )
 	m_bPlayerAvoidState = ShouldPlayerAvoid();
 	m_bPerformAvoidance = bIntersectingNPCBox || bIntersectingBoneFollowers;
 
-	if ( GetCollisionGroup() == COLLISION_GROUP_NPC || GetCollisionGroup() == COLLISION_GROUP_NPC_ACTOR )
+	if (GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_NPC || GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_NPC_ACTOR )
 	{
 		if ( bIntersectingNPCBox == true )
 		{
-			SetCollisionGroup( COLLISION_GROUP_NPC_ACTOR );
+			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NPC_ACTOR );
 		}
 		else
 		{
-			SetCollisionGroup( COLLISION_GROUP_NPC );
+			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NPC );
 		}
 
 		if ( bIntersectingBoneFollowers == true )
@@ -1131,8 +1131,8 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 		if ( pPhysObj->IsMoveable() == false )
 			 continue;
 
-		if ( pEnt->GetCollisionGroup() == COLLISION_GROUP_DEBRIS || 
-			 pEnt->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
+		if ( pEnt->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS ||
+			 pEnt->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
 			 continue;
 
 		if ( center.z > EyePosition().z )

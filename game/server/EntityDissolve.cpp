@@ -326,7 +326,7 @@ void CEntityDissolve::DissolveThink( void )
 	}
 
 	// Turn them into debris
-	pTarget->SetCollisionGroup( COLLISION_GROUP_DISSOLVING );
+	pTarget->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DISSOLVING );
 
 	if ( pTarget && pTarget->GetFlags() & FL_TRANSRAGDOLL )
 	{

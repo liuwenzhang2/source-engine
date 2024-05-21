@@ -221,7 +221,7 @@ void CFuncVehicleClip::Spawn()
 
 	AddEffects( EF_NODRAW );		// make entity invisible
 
-	SetCollisionGroup( COLLISION_GROUP_VEHICLE_CLIP );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_VEHICLE_CLIP );
 }
 
 bool CFuncVehicleClip::CreateVPhysics( void )

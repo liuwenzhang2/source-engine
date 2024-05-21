@@ -513,7 +513,7 @@ void CEnergyBallLauncher::SpawnBall()
 	DispatchSpawn(pBall);
 	pBall->Activate();
 	pBall->SetState( CPropCombineBall::STATE_LAUNCHED );
-	pBall->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
+	pBall->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	pBall->m_fMinLifeAfterPortal = m_fMinBallLifeAfterPortal;
 
 	// Additional setup of the physics object for energy ball uses
@@ -606,7 +606,7 @@ static void fire_energy_ball_f( void )
 		DispatchSpawn(pBall);
 		pBall->Activate();
 		pBall->SetState( CPropCombineBall::STATE_LAUNCHED );
-		pBall->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
+		pBall->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 		pBall->m_fMinLifeAfterPortal = 5.0f;
 
 		// Additional setup of the physics object for energy ball uses

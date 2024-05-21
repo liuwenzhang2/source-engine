@@ -325,7 +325,7 @@ bool C_PhysPropClientside::Initialize()
 	}
 
 	// player can push it away
-	SetCollisionGroup( COLLISION_GROUP_PUSHAWAY );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PUSHAWAY );
 
 	UpdatePartitionListEntry();
 
@@ -474,7 +474,7 @@ void C_PhysPropClientside::Break()
 
 	breakablepropparams_t params( origin, angles, velocity, angVelocity );
 	params.impactEnergyScale = m_impactEnergyScale;
-	params.defCollisionGroup = GetCollisionGroup();
+	params.defCollisionGroup = GetEngineObject()->GetCollisionGroup();
 	if ( params.defCollisionGroup == COLLISION_GROUP_NONE )
 	{
 		// don't automatically make anything COLLISION_GROUP_NONE or it will
@@ -526,7 +526,7 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 	{
 		// if  no health, don't collide with player anymore, don't take damage
 		pEntity->m_takedamage = DAMAGE_NO;
-		pEntity->SetCollisionGroup( COLLISION_GROUP_NONE );
+		pEntity->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 	}
 	
 	IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
@@ -762,11 +762,11 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 	pEntity->m_iHealth = pModel->health;
 
 #ifdef TF_CLIENT_DLL
-	pEntity->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	pEntity->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 #endif
 
 #ifdef DOD_DLL
-	pEntity->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	pEntity->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 #endif
 
 	if ( pModel->health == 0 )
@@ -774,9 +774,9 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 		// if  no health, don't collide with player anymore, don't take damage
 		pEntity->m_takedamage = DAMAGE_NO;
 
-		if ( pEntity->GetCollisionGroup() == COLLISION_GROUP_PUSHAWAY )
+		if ( pEntity->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_PUSHAWAY )
 		{
-			pEntity->SetCollisionGroup( COLLISION_GROUP_NONE );
+			pEntity->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 		}
 	}
 	

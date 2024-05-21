@@ -92,14 +92,6 @@ inline MoveCollide_t CBaseEntity::GetMoveCollide() const
 	return (MoveCollide_t)(unsigned char)m_MoveCollide;
 }
 
-//-----------------------------------------------------------------------------
-// Collision group accessors
-//-----------------------------------------------------------------------------
-inline int CBaseEntity::GetCollisionGroup() const
-{
-	return m_CollisionGroup;
-}
-
 inline int	CBaseEntity::GetFlags( void ) const
 {
 	return m_fFlags;

@@ -132,7 +132,7 @@ void C_NPC_Portal_FloorTurret::LaserOn( void )
 		m_pBeam->SetFadeLength( 0 );
 		m_pBeam->SetHaloTexture( m_sLaserHaloSprite );
 		m_pBeam->SetHaloScale( 4.0f );
-		m_pBeam->SetCollisionGroup( COLLISION_GROUP_NONE );
+		m_pBeam->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 		m_pBeam->PointsInit( vecMuzzle + vecMuzzleDir, vecMuzzle );
 		m_pBeam->SetBeamFlag( FBEAM_REVERSED );
 		m_pBeam->SetStartEntity( this );

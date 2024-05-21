@@ -136,8 +136,8 @@ public:
 
 		if ( ( dynamic_cast<C_BaseViewModel *>( pEntity ) != NULL ) ||
 			 ( dynamic_cast<C_BasePlayer *>( pEntity ) != NULL ) ||
-			 pEntity->GetCollisionGroup() == COLLISION_GROUP_DEBRIS ||
-			 pEntity->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
+			 pEntity->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS ||
+			 pEntity->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
 		{
 			return false;
 		}

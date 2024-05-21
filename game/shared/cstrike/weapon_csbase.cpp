@@ -1534,7 +1534,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 		GetEngineObject()->UseTriggerBounds( true, 30 );
 
 		// Set this here to allow players to shoot dropped weapons
-		SetCollisionGroup( COLLISION_GROUP_WEAPON );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
 		SetExtraAmmoCount( m_iDefaultExtraAmmo );	//Start with no additional ammo
 

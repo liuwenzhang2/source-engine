@@ -95,7 +95,7 @@ void CGrenadeBugBait::Spawn( void )
 	Precache();
 
 	SetModel( GRENADE_MODEL );
-	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_DEFAULT );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 

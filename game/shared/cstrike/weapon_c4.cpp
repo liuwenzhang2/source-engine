@@ -794,7 +794,7 @@ void CC4::Spawn()
 	BaseClass::Spawn();
 
 	//Don't allow players to shoot the C4 around
-	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	//Don't be damaged / moved by explosions
 	m_takedamage = DAMAGE_NO;

@@ -945,7 +945,7 @@ void CNPC_Barnacle::PullEnemyTorwardsMouth( bool bAdjustEnemyOrigin )
 
 				// find how far we can actually transport the player
 				trace_t tr;
-				UTIL_TraceEntity( pEnemy, playerOrigin, vecNewPos, MASK_PLAYERSOLID, m_hTongueTip.Get(), pEnemy->GetCollisionGroup(), &tr );
+				UTIL_TraceEntity( pEnemy, playerOrigin, vecNewPos, MASK_PLAYERSOLID, m_hTongueTip.Get(), pEnemy->GetEngineObject()->GetCollisionGroup(), &tr );
 				pEnemy->Teleport(&tr.endpos, NULL, &desiredVelocity);
 #endif
 			}
@@ -2116,7 +2116,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 		m_hRagdoll->SetMoveType( MOVETYPE_VPHYSICS );
 		m_hRagdoll->GetEngineObject()->SetAbsOrigin( m_hTongueTip->GetEngineObject()->GetAbsOrigin() );
 		m_hRagdoll->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
-		m_hRagdoll->SetCollisionGroup( COLLISION_GROUP_DEBRIS ); 
+		m_hRagdoll->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		m_hRagdoll->RecheckCollisionFilter();
 		if ( npc_barnacle_swallow.GetBool() )
 		{

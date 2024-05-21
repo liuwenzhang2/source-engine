@@ -2815,7 +2815,7 @@ inline const Vector &CAI_Component::GetHullMaxs() const
 
 inline int CAI_Component::GetCollisionGroup() const
 {
-	return GetOuter()->GetCollisionGroup();
+	return GetOuter()->GetEngineObject()->GetCollisionGroup();
 }
 
 //-----------------------------------------------------------------------------

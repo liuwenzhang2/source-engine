@@ -316,6 +316,9 @@ public:
 	virtual bool DoesVPhysicsInvalidateSurroundingBox() const = 0;
 	virtual void UpdatePartition() = 0;
 	virtual bool IsBoundsDefinedInEntitySpace() const = 0;
+	virtual int GetCollisionGroup() const = 0;
+	virtual void SetCollisionGroup(int collisionGroup) = 0;
+	virtual void CollisionRulesChanged() = 0;
 
 };
 

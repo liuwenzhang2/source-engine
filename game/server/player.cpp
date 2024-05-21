@@ -5044,7 +5044,7 @@ void CBasePlayer::Spawn( void )
 
 	CreateViewModel();
 
-	SetCollisionGroup( COLLISION_GROUP_PLAYER );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	// if the player is locked, make sure he stays locked
 	if ( m_iPlayerLocked )
@@ -5510,7 +5510,7 @@ bool CBasePlayer::GetInVehicle( IServerVehicle *pVehicle, int nRole )
 	// Parent to the vehicle
 	GetEngineObject()->SetParent( pEnt?pEnt->GetEngineObject():NULL );
 
-	SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE );
 	
 	// We cannot be ducking -- do all this before SetPassenger because it
 	// saves our view offset for restoration when we exit the vehicle.
@@ -5588,7 +5588,7 @@ void CBasePlayer::LeaveVehicle( const Vector &vecExitPoint, const QAngle &vecExi
 	RemoveEffects( EF_NODRAW );
 
 	SetMoveType( MOVETYPE_WALK );
-	SetCollisionGroup( COLLISION_GROUP_PLAYER );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	if ( VPhysicsGetObject() )
 	{

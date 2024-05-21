@@ -62,7 +62,7 @@ void CWaterBullet::Spawn( const Vector &vecOrigin, const Vector &vecDir )
 	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
 	GetEngineObject()->SetAbsAngles( angles );
 
-	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	SetTouch( &CWaterBullet::Touch );
 
 	SetThink( &CWaterBullet::BulletThink );

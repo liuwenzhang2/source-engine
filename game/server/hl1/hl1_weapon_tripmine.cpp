@@ -300,7 +300,7 @@ void CTripmineGrenade::Spawn( void )
 	SetModel( TRIPMINE_MODEL );
 
 	// Don't collide with the player (the beam will still be tripped by one, however)
-	SetCollisionGroup( COLLISION_GROUP_WEAPON );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
 	SetCycle( 0 );
 	SetSequence( SelectWeightedSequence( ACT_TRIPMINE_WORLD ) );

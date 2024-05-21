@@ -689,11 +689,11 @@ void CAI_ScriptedSequence::StartScript( void )
 		m_saved_effects = pTarget->GetEffects() & ~EF_NODRAW;
 		pTarget->AddEffects( GetEffects() );
 		m_savedFlags = pTarget->GetFlags();
-		m_savedCollisionGroup = pTarget->GetCollisionGroup();
+		m_savedCollisionGroup = pTarget->GetEngineObject()->GetCollisionGroup();
 		
 		if ( m_bDisableNPCCollisions )
 		{
-			pTarget->SetCollisionGroup( COLLISION_GROUP_NPC_SCRIPTED );
+			pTarget->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NPC_SCRIPTED );
 		}
 
 		switch (m_fMoveTo)

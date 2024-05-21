@@ -994,7 +994,7 @@ bool CNPC_Controller::OverrideMove( float flInterval )
 		if (pMoveTarget)
 		{
 			UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vMoveTargetPos,
-				MASK_NPCSOLID_BRUSHONLY, pMoveTarget, GetCollisionGroup(), &tr);
+				MASK_NPCSOLID_BRUSHONLY, pMoveTarget, GetEngineObject()->GetCollisionGroup(), &tr);
 		}
 		else
 		{

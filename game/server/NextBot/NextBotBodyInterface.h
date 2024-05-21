@@ -8,6 +8,7 @@
 
 #include "animation.h"
 #include "NextBotComponentInterface.h"
+#include "cbase.h"
 
 class INextBot;
 struct animevent_t;

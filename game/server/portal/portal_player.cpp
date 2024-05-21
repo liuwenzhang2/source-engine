@@ -1706,7 +1706,7 @@ void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
 		mins = GetEngineObject()->OBBMins();
 		maxs = GetEngineObject()->OBBMaxs();
 		pRagdoll->GetEngineObject()->SetCollisionBounds( mins, maxs );
-		pRagdoll->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
+		pRagdoll->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
 	}
 
 	// Turn off the player.

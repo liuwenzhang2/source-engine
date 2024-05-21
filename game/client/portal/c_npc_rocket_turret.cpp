@@ -131,7 +131,7 @@ void C_NPC_RocketTurret::LaserOn( void )
 		m_pBeam->SetScrollRate( 0 );
 		m_pBeam->SetFadeLength( 0 );
 		m_pBeam->SetHaloScale( 16.0f );
-		m_pBeam->SetCollisionGroup( COLLISION_GROUP_NONE );
+		m_pBeam->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 		m_pBeam->SetBeamFlag( FBEAM_REVERSED );
 		m_pBeam->PointsInit( vecMuzzle + vecAimDir, vecMuzzle );
 		m_pBeam->SetStartEntity( this );

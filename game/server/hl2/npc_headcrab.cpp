@@ -246,7 +246,7 @@ void CBaseHeadcrab::Spawn( void )
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 
-	SetCollisionGroup( HL2COLLISION_GROUP_HEADCRAB );
+	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_HEADCRAB );
 
 	SetViewOffset( Vector(6, 0, 11) ) ;		// Position of the eyes relative to NPC's origin.
 
@@ -421,7 +421,7 @@ bool CBaseHeadcrab::IsFirmlyOnGround()
 		return false;
 
 	trace_t tr;
-	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, HEADCRAB_MAX_LEDGE_HEIGHT ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, HEADCRAB_MAX_LEDGE_HEIGHT ), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), &tr );
 	return tr.fraction != 1.0;
 }
 
@@ -918,7 +918,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 bool CBaseHeadcrab::HasHeadroom()
 {
 	trace_t tr;
-	UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 1 ), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+	UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 1 ), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), &tr );
 
 #if 0
 	if( tr.fraction == 1.0f )
@@ -1026,7 +1026,7 @@ void CBaseHeadcrab::GatherConditions( void )
 	{
 		// See if there's enough room for our hull to fit here. If so, unhide.
 		trace_t tr;
-		AI_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),GetHullMins(), GetHullMaxs(), MASK_SHOT, this, GetCollisionGroup(), &tr );
+		AI_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin(),GetHullMins(), GetHullMaxs(), MASK_SHOT, this, GetEngineObject()->GetCollisionGroup(), &tr );
 		if ( tr.fraction == 1.0 )
 		{
 			SetCondition( COND_PROVOKED );
@@ -1649,7 +1649,7 @@ int CBaseHeadcrab::RangeAttack1Conditions( float flDot, float flDist )
 			vEndHullTrace *= 8.0;
 			vEndHullTrace += GetEngineObject()->GetAbsOrigin();
 
-			AI_TraceHull( vStartHullTrace, vEndHullTrace,GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+			AI_TraceHull( vStartHullTrace, vEndHullTrace,GetHullMins(), GetHullMaxs(), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), &tr );
 
 			if ( tr.m_pEnt != NULL && tr.m_pEnt != GetEnemy() )
 			{
@@ -2222,7 +2222,7 @@ bool CBaseHeadcrab::ValidBurrowPoint( const Vector &point )
 	trace_t	tr;
 
 	AI_TraceHull( point, point+Vector(0,0,1), GetHullMins(), GetHullMaxs(), 
-		MASK_NPCSOLID, this, GetCollisionGroup(), &tr );
+		MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), &tr );
 
 	// See if we were able to get there
 	if ( ( tr.startsolid ) || ( tr.allsolid ) || ( tr.fraction < 1.0f ) )
@@ -2930,7 +2930,7 @@ void CFastHeadcrab::StartTask( const Task_t *pTask )
 
 			// This could be a problem. Since I'm adjusting the headcrab's gravity for flight, this check actually
 			// checks farther ahead than the crab will actually jump. (sjb)
-			AI_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecDir,GetHullMins(), GetHullMaxs(), MASK_SHOT, this, GetCollisionGroup(), &tr );
+			AI_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecDir,GetHullMins(), GetHullMaxs(), MASK_SHOT, this, GetEngineObject()->GetCollisionGroup(), &tr );
 
 			//NDebugOverlay::Line( tr.startpos, tr.endpos, 0, 255, 0, false, 1.0 );
 

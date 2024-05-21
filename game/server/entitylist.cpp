@@ -212,6 +212,7 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_GLOBAL_KEYFIELD(m_nModelIndex, FIELD_SHORT, "modelindex"),
 	DEFINE_KEYFIELD(m_spawnflags, FIELD_INTEGER, "spawnflags"),
 	DEFINE_EMBEDDED(m_Collision),
+	DEFINE_FIELD(m_CollisionGroup, FIELD_INTEGER),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -293,6 +294,7 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropEHandle(SENDINFO(m_hGroundEntity), SPROP_CHANGES_OFTEN),
 	SendPropModelIndex(SENDINFO(m_nModelIndex)),
 	SendPropDataTable(SENDINFO_DT(m_Collision), &REFERENCE_SEND_TABLE(DT_CollisionProperty)),
+	SendPropInt(SENDINFO(m_CollisionGroup), 5, SPROP_UNSIGNED),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -1098,7 +1100,7 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 			m_pOuter->VPhysicsInitShadow(false, false);
 		}
 	}
-	m_pOuter->CollisionRulesChanged();
+	CollisionRulesChanged();
 }
 
 
@@ -2585,7 +2587,46 @@ void CEngineObjectInternal::SetModelIndex(int index)
 	m_pOuter->DispatchUpdateTransmitState();
 }
 
+bool CEngineObjectInternal::Intersects(IEngineObjectServer* pOther)
+{
+	//if (entindex() == -1 || pOther->entindex() == -1)
+	//	return false;
+	return IsOBBIntersectingOBB(
+		this->GetCollisionOrigin(), this->GetCollisionAngles(), this->OBBMins(), this->OBBMaxs(),
+		pOther->GetCollisionOrigin(), pOther->GetCollisionAngles(), pOther->OBBMins(), pOther->OBBMaxs());
+}
 
+void CEngineObjectInternal::SetCollisionGroup(int collisionGroup)
+{
+	if ((int)m_CollisionGroup != collisionGroup)
+	{
+		m_CollisionGroup = collisionGroup;
+		CollisionRulesChanged();
+	}
+}
+
+
+void CEngineObjectInternal::CollisionRulesChanged()
+{
+	// ivp maintains state based on recent return values from the collision filter, so anything
+	// that can change the state that a collision filter will return (like m_Solid) needs to call RecheckCollisionFilter.
+	if (m_pOuter->VPhysicsGetObject())
+	{
+		extern bool PhysIsInCallback();
+		if (PhysIsInCallback())
+		{
+			Warning("Changing collision rules within a callback is likely to cause crashes!\n");
+			Assert(0);
+		}
+		IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+		int count = m_pOuter->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+		for (int i = 0; i < count; i++)
+		{
+			if (pList[i] != NULL) //this really shouldn't happen, but it does >_<
+				pList[i]->RecheckCollisionFilter();
+		}
+	}
+}
 
 struct collidelist_t
 {
@@ -2600,7 +2641,7 @@ bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngi
 {
 	Assert(pTrigger->GetSolid() == SOLID_BSP);
 
-	if (pTrigger->GetOuter()->Intersects(pEntity->GetOuter()))	// It touches one, it's in the volume
+	if (pTrigger->Intersects(pEntity))	// It touches one, it's in the volume
 	{
 		switch (pEntity->GetSolid())
 		{

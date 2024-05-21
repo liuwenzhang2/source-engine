@@ -66,7 +66,7 @@ void CSatchelCharge::Spawn( void )
 	VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
 	SetMoveType( MOVETYPE_VPHYSICS );
 
-	SetCollisionGroup( COLLISION_GROUP_WEAPON );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
 	UTIL_SetSize(this, Vector( -6, -6, -2), Vector(6, 6, 2));
 

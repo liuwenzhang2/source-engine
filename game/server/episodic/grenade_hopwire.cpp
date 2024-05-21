@@ -357,7 +357,7 @@ void CGrenadeHopwire::Spawn( void )
 	Precache();
 
 	SetModel( GRENADE_MODEL_CLOSED );
-	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	
 	CreateVPhysics();
 }

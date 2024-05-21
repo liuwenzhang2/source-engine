@@ -550,7 +550,7 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 	pChunk->Spawn( s_pChunkModelName[nGib] );
 	pChunk->SetOwnerEntity( this );
 	pChunk->m_lifeTime = random->RandomFloat( 6.0f, 8.0f );
-	pChunk->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	pChunk->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 	
 	// Set the velocity

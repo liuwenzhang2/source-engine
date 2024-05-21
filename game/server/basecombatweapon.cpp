@@ -245,7 +245,7 @@ public:
 	{
 		CBaseEntity *pEntity = (CBaseEntity *)pServerEntity;
 
-		if ( pEntity->GetCollisionGroup() == COLLISION_GROUP_WEAPON )
+		if ( pEntity->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_WEAPON )
 			return false;
 
 		// Don't collide with the tracing entity's vehicle (if it exists)

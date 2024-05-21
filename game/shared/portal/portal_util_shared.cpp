@@ -1524,7 +1524,7 @@ bool FindClosestPassableSpace( CBaseEntity *pEntity, const Vector &vIndecisivePu
 	
 	ptEntityCenter.z += 0.001f; //to satisfy m_IsSwept on first pass
 
-	int iEntityCollisionGroup = pEntity->GetCollisionGroup();
+	int iEntityCollisionGroup = pEntity->GetEngineObject()->GetCollisionGroup();
 
 	trace_t traces[2];
 	Ray_t entRay;

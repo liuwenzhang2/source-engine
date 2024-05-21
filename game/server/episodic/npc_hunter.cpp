@@ -533,7 +533,7 @@ void CHunterFlechette::Spawn()
 	UTIL_SetSize( this, -Vector(1,1,1), Vector(1,1,1) );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetGravity( 0.05f );
-	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	
 	// Make sure we're updated if we're underwater
 	UpdateWaterState();
@@ -702,7 +702,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 		ApplyMultiDamage();
 
 		// Keep going through breakable glass.
-		if ( pOther->GetCollisionGroup() == COLLISION_GROUP_BREAKABLE_GLASS )
+		if ( pOther->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_BREAKABLE_GLASS )
 			 return;
 			 
 		GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 0 ) );
@@ -1011,7 +1011,7 @@ public:
 			if ( !pEntity->ShouldCollide( m_collisionGroup, contentsMask ) )
 				return false;
 			
-			if ( !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetCollisionGroup() ) )
+			if ( !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetEngineObject()->GetCollisionGroup() ) )
 				return false;
 
 			// don't test small moveable physics objects (unless it's an NPC)
@@ -3361,7 +3361,9 @@ void CNPC_Hunter::TaskFindDodgeActivity()
 
 		// See if all is clear in that direction.
 		trace_t tr;
-		HunterTraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecDelta, testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, GetCollisionGroup(), &tr, VPhysicsGetObject()->GetMass() * 0.5f );
+		HunterTraceHull_SkipPhysics(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + vecDelta, 
+			testHullMins, GetHullMaxs(), MASK_NPCSOLID, this, GetEngineObject()->GetCollisionGroup(), 
+			&tr, VPhysicsGetObject()->GetMass() * 0.5f );
 
 		// TODO: dodge anyway if we'll make it a certain percentage of the way through the dodge?
 		if ( tr.fraction == 1.0f )

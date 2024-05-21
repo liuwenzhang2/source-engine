@@ -123,7 +123,7 @@ void CNPC_Crow::Spawn( void )
 
 	m_nMorale = random->RandomInt( 0, 12 );
 	
-	SetCollisionGroup( HL2COLLISION_GROUP_CROW );
+	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_CROW );
 
 	CapabilitiesClear();
 

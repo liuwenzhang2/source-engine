@@ -175,7 +175,7 @@ void CNPC_Leech::Spawn( void )
 	SetRenderColor( 255, 255, 255, 255 );
 
 	m_bloodColor		= DONT_BLEED;
-	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 }
 
 void CNPC_Leech::Activate( void )

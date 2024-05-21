@@ -204,7 +204,7 @@ public:
 		SetFriction( 1.0f );
 		GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 		m_takedamage = DAMAGE_NO;
-		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		GetEngineObject()->SetAbsOrigin( m_hPlayer->GetEngineObject()->GetAbsOrigin() );
 		GetEngineObject()->SetAbsVelocity( m_hPlayer->GetEngineObject()->GetAbsVelocity() );
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );

@@ -701,7 +701,7 @@ bool CBaseEntity::GetKeyValue( const char *szKeyName, char *szValue, int iMaxLen
 //-----------------------------------------------------------------------------
 bool CBaseEntity::ShouldCollide( int collisionGroup, int contentsMask ) const
 {
-	if ( m_CollisionGroup == COLLISION_GROUP_DEBRIS )
+	if (GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS)
 	{
 		if ( ! (contentsMask & CONTENTS_DEBRIS) )
 			return false;
@@ -1265,9 +1265,9 @@ void CBaseEntity::VPhysicsUpdate( IPhysicsObject *pPhysics )
 			GetEngineObject()->SetAbsAngles( angles );
 
 			// Interactive debris converts back to debris when it comes to rest
-			if ( pPhysics->IsAsleep() && GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
+			if ( pPhysics->IsAsleep() && GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
 			{
-				SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+				GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 			}
 
 #ifndef CLIENT_DLL 
@@ -1341,7 +1341,7 @@ void CBaseEntity::VPhysicsSetObject( IPhysicsObject *pPhysics )
 	m_pPhysicsObject = pPhysics;
 	if ( pPhysics && !m_pPhysicsObject )
 	{
-		CollisionRulesChanged();
+		GetEngineObject()->CollisionRulesChanged();
 	}
 }
 
@@ -2435,38 +2435,6 @@ void CBaseEntity::ApplyLocalAngularVelocityImpulse( const AngularImpulse &angImp
 			AngularImpulseToQAngle( angImpulse, vecResult );
 			VectorAdd( GetLocalAngularVelocity(), vecResult, vecResult );
 			SetLocalAngularVelocity( vecResult );
-		}
-	}
-}
-
-void CBaseEntity::SetCollisionGroup( int collisionGroup )
-{
-	if ( (int)m_CollisionGroup != collisionGroup )
-	{
-		m_CollisionGroup = collisionGroup;
-		CollisionRulesChanged();
-	}
-}
-
-
-void CBaseEntity::CollisionRulesChanged()
-{
-	// ivp maintains state based on recent return values from the collision filter, so anything
-	// that can change the state that a collision filter will return (like m_Solid) needs to call RecheckCollisionFilter.
-	if ( VPhysicsGetObject() )
-	{
-		extern bool PhysIsInCallback();
-		if ( PhysIsInCallback() )
-		{
-			Warning("Changing collision rules within a callback is likely to cause crashes!\n");
-			Assert(0);
-		}
-		IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-		int count = VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
-		for ( int i = 0; i < count; i++ )
-		{
-			if ( pList[i] != NULL ) //this really shouldn't happen, but it does >_<
-				pList[i]->RecheckCollisionFilter();
 		}
 	}
 }

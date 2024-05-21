@@ -1088,7 +1088,7 @@ static bool AdvisorCanPickObject(CBasePlayer *pPlayer, CBaseEntity *pEnt)
 		return false;
 	}
 
-	if ( pEnt->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
+	if ( pEnt->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
 	{
 		return false;
 	}

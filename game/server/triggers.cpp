@@ -365,9 +365,9 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 #if defined( HL2_EPISODIC ) || defined( TF_DLL )		
 		||
 		(GetEngineObject()->HasSpawnFlags(SF_TRIG_TOUCH_DEBRIS) &&
-			(pOther->GetCollisionGroup() == COLLISION_GROUP_DEBRIS ||
-			pOther->GetCollisionGroup() == COLLISION_GROUP_DEBRIS_TRIGGER || 
-			pOther->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS)
+			(pOther->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS ||
+			pOther->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS_TRIGGER ||
+			pOther->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS)
 		)
 #endif
 		)

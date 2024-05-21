@@ -447,7 +447,7 @@ void CPhysBox::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	if (GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_DEBRIS ) )
 	{
-		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	}
 
 	if (GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_NO_ROTORWASH_PUSH ) )
@@ -1338,7 +1338,7 @@ static CBaseEntity *CreateSimplePhysicsObject( CBaseEntity *pEntity, bool create
 	{
 		pPhysEntity->VPhysicsInitNormal( SOLID_VPHYSICS, 0, createAsleep );
 		if ( createAsDebris )
-			pPhysEntity->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+			pPhysEntity->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	}
 	return pPhysEntity;
 }

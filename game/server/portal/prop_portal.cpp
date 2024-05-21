@@ -268,7 +268,7 @@ void CProp_Portal::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_OBB );
 	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID | FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
 	SetMoveType( MOVETYPE_NONE );
-	SetCollisionGroup( COLLISION_GROUP_PLAYER );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	//VPhysicsInitNormal( SOLID_VPHYSICS, FSOLID_TRIGGER, false );
 	//CreateVPhysics();
@@ -1667,10 +1667,10 @@ void CProp_Portal::WakeNearbyEntities( void )
 						pPhysicsObject->Wake();
 
 						// If the target is debris, convert it to non-debris
-						if ( pEntity->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
+						if ( pEntity->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
 						{
 							// Interactive debris converts back to debris when it comes to rest
-							pEntity->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
+							pEntity->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
 						}
 					}
 				}

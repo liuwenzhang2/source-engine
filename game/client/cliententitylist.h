@@ -468,6 +468,10 @@ public:
 	bool DoesVPhysicsInvalidateSurroundingBox() const;
 	void UpdatePartition();
 	bool IsBoundsDefinedInEntitySpace() const;
+	// Collision group accessors
+	int GetCollisionGroup() const;
+	void SetCollisionGroup(int collisionGroup);
+	void CollisionRulesChanged();
 
 private:
 
@@ -529,7 +533,8 @@ private:
 	// Object model index
 	short							m_nModelIndex;
 	CCollisionProperty				m_Collision;
-
+	// used to cull collision tests
+	int								m_CollisionGroup;
 };
 
 //-----------------------------------------------------------------------------
@@ -932,6 +937,14 @@ inline void C_EngineObjectInternal::UpdatePartition()
 inline bool C_EngineObjectInternal::IsBoundsDefinedInEntitySpace() const
 {
 	return m_Collision.IsBoundsDefinedInEntitySpace();
+}
+
+//-----------------------------------------------------------------------------
+// Collision group accessors
+//-----------------------------------------------------------------------------
+inline int C_EngineObjectInternal::GetCollisionGroup() const
+{
+	return m_CollisionGroup;
 }
 
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.

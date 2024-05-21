@@ -408,7 +408,7 @@ void CMissile::MissileTouch( CBaseEntity *pOther )
 	Assert( pOther );
 	
 	// Don't touch triggers (but DO hit weapons)
-	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER|FSOLID_VOLUME_CONTENTS) && pOther->GetCollisionGroup() != COLLISION_GROUP_WEAPON )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER|FSOLID_VOLUME_CONTENTS) && pOther->GetEngineObject()->GetCollisionGroup() != COLLISION_GROUP_WEAPON )
 	{
 		// Some NPCs are triggers that can take damage (like antlion grubs). We should hit them.
 		if ( ( pOther->m_takedamage == DAMAGE_NO ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )

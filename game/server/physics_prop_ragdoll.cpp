@@ -408,7 +408,7 @@ void CRagdollProp::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 	}
 
 	// Make sure it's interactive debris for at most 5 seconds
-	if ( GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
+	if (GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
 	{
 		SetContextThink( &CRagdollProp::SetDebrisThink, gpGlobals->curtime + 5, s_pDebrisContext );
 	}
@@ -676,7 +676,7 @@ void CRagdollProp::SetOverlaySequence( Activity activity )
 
 void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const Vector &forcePos, matrix3x4_t *pPrevBones, matrix3x4_t *pBoneToWorld, float dt, int collisionGroup, bool activateRagdoll, bool bWakeRagdoll )
 {
-	SetCollisionGroup( collisionGroup );
+	GetEngineObject()->SetCollisionGroup( collisionGroup );
 
 	// Make sure it's interactive debris for at most 5 seconds
 	if ( collisionGroup == COLLISION_GROUP_INTERACTIVE_DEBRIS )
@@ -763,7 +763,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 
 void CRagdollProp::SetDebrisThink()
 {
-	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	RecheckCollisionFilter();
 }
 
@@ -1010,9 +1010,9 @@ void CRagdollProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	}
 	
 	// Interactive debris converts back to debris when it comes to rest
-	if ( m_allAsleep && GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
+	if ( m_allAsleep && GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_INTERACTIVE_DEBRIS )
 	{
-		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		RecheckCollisionFilter();
 		SetContextThink( NULL, gpGlobals->curtime, s_pDebrisContext );
 	}
@@ -1479,7 +1479,7 @@ void CRagdollPropAttached::Detach()
 	}
 
 	// Go non-solid
-	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	RecheckCollisionFilter();
 }
 

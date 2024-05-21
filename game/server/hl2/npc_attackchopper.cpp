@@ -3395,7 +3395,7 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 		pChunk->m_lifeTime = 5.0f;
 	}
 	
-	pChunk->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	pChunk->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	
 	// Set the velocity
 	Vector vecVelocity;
@@ -4947,7 +4947,7 @@ void CBombDropSensor::Spawn()
 	GetEngineObject()->SetSolid(SOLID_BBOX);
 
 	// Shots pass through
-	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 }
 
 // Drop a bomb at a particular location
@@ -5051,7 +5051,7 @@ void CGrenadeHelicopter::Spawn( void )
 	Precache();
 
 	// point sized, solid, bouncing
-	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	SetModel( GRENADE_HELICOPTER_MODEL );
 
 	if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_GRENADE_DUD ) )
@@ -5529,7 +5529,7 @@ void CGrenadeHelicopter::ExplodeConcussion( CBaseEntity *pOther )
 		if ( hl2_episodic.GetBool() )
 		{
 			// Don't hit anything other than vehicles
-			if ( pOther->GetCollisionGroup() != COLLISION_GROUP_VEHICLE )
+			if ( pOther->GetEngineObject()->GetCollisionGroup() != COLLISION_GROUP_VEHICLE )
 				return;
 		}
 	}
@@ -6152,7 +6152,7 @@ CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos,
 	pChunk->SetModel( pszModelName );
 
 	pChunk->m_nChunkID = chunkID;
-	pChunk->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE );
+	pChunk->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE );
 
 	IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 	

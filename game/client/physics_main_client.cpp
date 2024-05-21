@@ -30,14 +30,14 @@ static void Physics_TraceHull( C_BaseEntity* pBaseEntity, const Vector &vecStart
 	if (pBaseEntity->GetDamageType() != DMG_GENERIC)
 	{
 		GameRules()->WeaponTraceHull( vecStart, vecEnd, hullMin, hullMax, 
-			mask, pBaseEntity, pBaseEntity->GetCollisionGroup(), 
+			mask, pBaseEntity, pBaseEntity->GetEngineObject()->GetCollisionGroup(),
 			pBaseEntity, ptr );
 	}
 	else
 #endif
 	{
 		UTIL_TraceHull( vecStart, vecEnd, hullMin, hullMax, mask, 
-			pBaseEntity, pBaseEntity->GetCollisionGroup(), ptr );
+			pBaseEntity, pBaseEntity->GetEngineObject()->GetCollisionGroup(), ptr );
 	}
 }
 

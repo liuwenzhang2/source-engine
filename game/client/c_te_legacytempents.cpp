@@ -417,7 +417,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 				int collisionGroup = COLLISION_GROUP_NONE;
 				if ( flags & FTENT_COLLISIONGROUP )
 				{
-					collisionGroup = GetCollisionGroup();
+					collisionGroup = GetEngineObject()->GetCollisionGroup();
 				}
 
 				UTIL_TraceLine( vPrevOrigin, GetEngineObject()->GetLocalOrigin(), MASK_SOLID, GetOwnerEntity(), collisionGroup, &trace );

@@ -133,7 +133,7 @@ void CGrenadeHomer::Spawn( void )
 	m_flHomingDelay		= 0;
 	m_flHomingDuration	= 0;
 
-	SetCollisionGroup( HL2COLLISION_GROUP_HOMING_MISSILE ); 
+	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_HOMING_MISSILE );
 }
 
 //------------------------------------------------------------------------------

@@ -61,7 +61,7 @@ void CTripmineGrenade::Spawn( void )
 
 	IPhysicsObject *pObject = VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, true );
 	pObject->EnableMotion( false );
-	SetCollisionGroup( COLLISION_GROUP_WEAPON );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
 	SetCycle( 0.0f );
 	m_nBody			= 3;

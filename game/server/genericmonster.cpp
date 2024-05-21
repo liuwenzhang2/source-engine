@@ -367,13 +367,13 @@ bool CNPC_Furniture::CreateVPhysics( void )
 
 void CNPC_Furniture::InputDisablePlayerCollision( inputdata_t &inputdata )
 {
-	SetCollisionGroup( COLLISION_GROUP_NPC_ACTOR );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NPC_ACTOR );
 	UpdateBoneFollowerState();
 }
 
 void CNPC_Furniture::InputEnablePlayerCollision( inputdata_t &inputdata )
 {
-	SetCollisionGroup( COLLISION_GROUP_NPC );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NPC );
 	UpdateBoneFollowerState();
 }
 
@@ -383,7 +383,7 @@ void CNPC_Furniture::UpdateBoneFollowerState( void )
 	{
 		physfollower_t* pBone = m_BoneFollowerManager.GetBoneFollower( 0 );
 
-		if ( pBone && pBone->hFollower && pBone->hFollower->GetCollisionGroup() != GetCollisionGroup() )
+		if ( pBone && pBone->hFollower && pBone->hFollower->GetEngineObject()->GetCollisionGroup() != GetEngineObject()->GetCollisionGroup() )
 		{
 			for ( int i = 0; i < m_BoneFollowerManager.GetNumBoneFollowers(); i++ )
 			{
@@ -391,7 +391,7 @@ void CNPC_Furniture::UpdateBoneFollowerState( void )
 
 				if ( pBone && pBone->hFollower )
 				{
-					pBone->hFollower->SetCollisionGroup( GetCollisionGroup() );
+					pBone->hFollower->GetEngineObject()->SetCollisionGroup(GetEngineObject()->GetCollisionGroup() );
 				}
 			}
 		}

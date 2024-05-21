@@ -153,7 +153,7 @@ void CSquidSpit:: Spawn( void )
 	
 	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0) );
 
-	SetCollisionGroup( HL2COLLISION_GROUP_SPIT );
+	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_SPIT );
 }
 
 void CSquidSpit::Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVelocity )
@@ -191,7 +191,7 @@ void CSquidSpit::Touch ( CBaseEntity *pOther )
 	if ( pOther->GetEngineObject()->GetSolidFlags() & FSOLID_TRIGGER )
 		 return;
 
-	if ( pOther->GetCollisionGroup() == HL2COLLISION_GROUP_SPIT)
+	if ( pOther->GetEngineObject()->GetCollisionGroup() == HL2COLLISION_GROUP_SPIT)
 	{
 		return;
 	}

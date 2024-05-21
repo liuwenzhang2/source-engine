@@ -58,7 +58,7 @@ void CGrenadeAR2::Spawn( void )
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
 	// Hits everything but debris
-	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 
 	SetModel( "models/Weapons/ar2_grenade.mdl");
 	UTIL_SetSize(this, Vector(-3, -3, -3), Vector(3, 3, 3));

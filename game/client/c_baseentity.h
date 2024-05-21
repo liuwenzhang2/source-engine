@@ -1069,11 +1069,6 @@ public:
 	static void						SetPredictionPlayer( C_BasePlayer *player );
 	static void						CheckCLInterpChanged();
 
-	// Collision group accessors
-	int GetCollisionGroup() const;
-	void SetCollisionGroup( int collisionGroup );
-	void							CollisionRulesChanged();
-
 	static C_BaseEntity				*Instance( int iEnt );
 	// Doesn't do much, but helps with trace results
 	static C_BaseEntity				*Instance( IClientEntity *ent );
@@ -1426,8 +1421,7 @@ private:
 	// Behavior flags
 	int								m_fFlags;
 
-	// used to cull collision tests
-	int								m_CollisionGroup;
+
 
 
 

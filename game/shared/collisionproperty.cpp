@@ -456,7 +456,7 @@ IHandleEntity *CCollisionProperty::GetEntityHandle()
 //-----------------------------------------------------------------------------
 int CCollisionProperty::GetCollisionGroup() const
 {
-	return m_pOuter->GetOuter()->GetCollisionGroup();
+	return m_pOuter->GetCollisionGroup();
 }
 
 
@@ -573,7 +573,7 @@ void CCollisionProperty::SetSolid( SolidType_t val )
 	m_nSolidType = val;
 
 #ifndef CLIENT_DLL
-	m_pOuter->GetOuter()->CollisionRulesChanged();
+	m_pOuter->CollisionRulesChanged();
 
 	UpdateServerPartitionMask( );
 
@@ -609,7 +609,7 @@ void CCollisionProperty::SetSolidFlags( int flags )
 
 	if ( (oldFlags & (FSOLID_NOT_SOLID|FSOLID_TRIGGER)) != (m_usSolidFlags & (FSOLID_NOT_SOLID|FSOLID_TRIGGER)) )
 	{
-		m_pOuter->GetOuter()->CollisionRulesChanged();
+		m_pOuter->CollisionRulesChanged();
 	}
 
 #ifndef CLIENT_DLL

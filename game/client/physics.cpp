@@ -237,7 +237,7 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 	Assert(GameRules());
 	if ( GameRules() )
 	{
-		if (!GameRules()->ShouldCollide( pEntity0->GetCollisionGroup(), pEntity1->GetCollisionGroup() ))
+		if (!GameRules()->ShouldCollide( pEntity0->GetEngineObject()->GetCollisionGroup(), pEntity1->GetEngineObject()->GetCollisionGroup() ))
 			return 0;
 	}
 

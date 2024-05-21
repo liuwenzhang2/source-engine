@@ -254,7 +254,7 @@ void CGib::InitGib( CBaseEntity *pVictim, float fMinVelocity, float fMaxVelocity
 			GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 		}
 	
-		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	}
 
 	LimitVelocity();
@@ -595,7 +595,7 @@ void CGib::Spawn( const char *szGibModel )
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	SetModel( szGibModel );
 

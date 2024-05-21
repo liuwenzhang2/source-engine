@@ -551,7 +551,7 @@ CBaseEntity *CGibShooter::SpawnGib( const Vector &vecShootDir, float flSpeed )
 
 				pGib->m_lifeTime = (m_flGibLife * random->RandomFloat( 0.95, 1.05 ));	// +/- 5%
 
-				pGib->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+				pGib->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 				IPhysicsObject *pPhysicsObject = pGib->VPhysicsInitNormal( SOLID_VPHYSICS, pGib->GetEngineObject()->GetSolidFlags(), false );
 				pGib->SetMoveType( MOVETYPE_VPHYSICS );
 

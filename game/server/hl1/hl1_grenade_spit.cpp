@@ -62,7 +62,7 @@ void CGrenadeSpit::Spawn( void )
 	SetFriction( 0.8 );
 	SetSequence( 1 );
 
-	SetCollisionGroup( HL2COLLISION_GROUP_SPIT );
+	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_SPIT );
 }
 
 
@@ -99,7 +99,7 @@ void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
 	{
 		return;
 	}
-	if ( pOther->GetCollisionGroup() == HL2COLLISION_GROUP_SPIT)
+	if ( pOther->GetEngineObject()->GetCollisionGroup() == HL2COLLISION_GROUP_SPIT)
 	{
 		return;
 	}

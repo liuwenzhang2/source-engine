@@ -292,6 +292,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 #endif
 	RecvPropInt(RECVINFO(m_spawnflags)),
 	RecvPropDataTable(RECVINFO_DT(m_Collision), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty)),
+	RecvPropInt(RECVINFO(m_CollisionGroup)),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -2802,6 +2803,38 @@ void C_EngineObjectInternal::SetModelIndex(int index)
 	m_nModelIndex = index;
 	const model_t* pModel = modelinfo->GetModel(m_nModelIndex);
 	m_pOuter->SetModelPointer(pModel);
+}
+
+void C_EngineObjectInternal::SetCollisionGroup(int collisionGroup)
+{
+	if ((int)m_CollisionGroup != collisionGroup)
+	{
+		m_CollisionGroup = collisionGroup;
+		CollisionRulesChanged();
+	}
+}
+
+
+void C_EngineObjectInternal::CollisionRulesChanged()
+{
+	// ivp maintains state based on recent return values from the collision filter, so anything
+	// that can change the state that a collision filter will return (like m_Solid) needs to call RecheckCollisionFilter.
+	if (m_pOuter->VPhysicsGetObject())
+	{
+		extern bool PhysIsInCallback();
+		if (PhysIsInCallback())
+		{
+			Warning("Changing collision rules within a callback is likely to cause crashes!\n");
+			Assert(0);
+		}
+		IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
+		int count = m_pOuter->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+		for (int i = 0; i < count; i++)
+		{
+			if (pList[i] != NULL) //this really shouldn't happen, but it does >_<
+				pList[i]->RecheckCollisionFilter();
+		}
+	}
 }
 
 

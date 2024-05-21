@@ -2490,7 +2490,7 @@ void CNPC_Manhack::Spawn(void)
 	GetEnemies()->SetFreeKnowledgeDuration( 30.0 );
 	
 	// don't be an NPC, we want to collide with debris stuff
-	SetCollisionGroup( COLLISION_GROUP_NONE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 
 	m_bHeld = false;
 	m_bHackedByAlyx = false;

@@ -62,7 +62,7 @@ bool C_Gib::InitializeGib( const char *pszModelName, Vector vecOrigin, Vector ve
 	}
 
 	GetEngineObject()->SetAbsOrigin( vecOrigin );
-	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	solid_t tmpSolid;
 	PhysModelParseSolid( tmpSolid, this, GetEngineObject()->GetModelIndex() );

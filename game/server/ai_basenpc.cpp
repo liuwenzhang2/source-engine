@@ -3854,15 +3854,15 @@ void CAI_BaseNPC::SetPlayerAvoidState( void )
 	m_bPlayerAvoidState = ShouldPlayerAvoid();
 	m_bPerformAvoidance = bShouldPlayerAvoid;
 
-	if ( GetCollisionGroup() == COLLISION_GROUP_NPC || GetCollisionGroup() == COLLISION_GROUP_NPC_ACTOR )
+	if (GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_NPC || GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_NPC_ACTOR )
 	{
 		if ( m_bPerformAvoidance == true )
 		{
-			SetCollisionGroup( COLLISION_GROUP_NPC_ACTOR );
+			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NPC_ACTOR );
 		}
 		else
 		{
-			SetCollisionGroup( COLLISION_GROUP_NPC );
+			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NPC );
 		}
 	}
 }
@@ -10881,13 +10881,6 @@ BEGIN_SIMPLE_DATADESC( ScriptedNPCInteraction_t )
 END_DATADESC()
 
 //-------------------------------------
-
-void CAI_BaseNPC::PostConstructor( const char *szClassname, int iForceEdictIndex)
-{
-	BaseClass::PostConstructor( szClassname, iForceEdictIndex);
-	CreateComponents();
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -11422,7 +11415,13 @@ CAI_BaseNPC::CAI_BaseNPC(void)
 	m_iFrameBlocked = -1;
 	m_bInChoreo = true; // assume so until call to UpdateEfficiency()
 	
-	SetCollisionGroup( COLLISION_GROUP_NPC );
+}
+
+void CAI_BaseNPC::PostConstructor(const char* szClassname, int iForceEdictIndex)
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->SetCollisionGroup(COLLISION_GROUP_NPC);
+	CreateComponents();
 }
 
 //-----------------------------------------------------------------------------
@@ -11865,7 +11864,7 @@ bool CAI_BaseNPC::CineCleanup()
 		// NOTE that this will have had EF_NODRAW removed in script.dll when it's cached off
 		SetEffects( m_hCine->m_saved_effects );
 		
-		SetCollisionGroup( m_hCine->m_savedCollisionGroup );
+		GetEngineObject()->SetCollisionGroup( m_hCine->m_savedCollisionGroup );
 	}
 	else
 	{
@@ -12803,7 +12802,7 @@ void CAI_BaseNPC::Break( CBaseEntity *pBreaker )
 
 	breakablepropparams_t params(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, angVelocity );
 	params.impactEnergyScale = m_impactEnergyScale;
-	params.defCollisionGroup = GetCollisionGroup();
+	params.defCollisionGroup = GetEngineObject()->GetCollisionGroup();
 	if ( params.defCollisionGroup == COLLISION_GROUP_NONE )
 	{
 		// don't automatically make anything COLLISION_GROUP_NONE or it will

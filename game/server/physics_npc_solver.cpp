@@ -427,8 +427,8 @@ void CPhysicsEntitySolver::Spawn()
 {
 	SetNextThink( gpGlobals->curtime + m_separationDuration );
 	PhysDisableEntityCollisions( m_hMovingEntity, m_hPhysicsBlocker );
-	m_savedCollisionGroup = m_hPhysicsBlocker->GetCollisionGroup();
-	m_hPhysicsBlocker->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	m_savedCollisionGroup = m_hPhysicsBlocker->GetEngineObject()->GetCollisionGroup();
+	m_hPhysicsBlocker->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 	if ( m_hPhysicsBlocker->VPhysicsGetObject() )
 	{
 		m_hPhysicsBlocker->VPhysicsGetObject()->RecheckContactPoints();
@@ -452,7 +452,7 @@ void CPhysicsEntitySolver::UpdateOnRemove()
 	}
 	if ( pPhysics )
 	{
-		pPhysics->SetCollisionGroup( m_savedCollisionGroup );
+		pPhysics->GetEngineObject()->SetCollisionGroup( m_savedCollisionGroup );
 	}
 	BaseClass::UpdateOnRemove();
 }

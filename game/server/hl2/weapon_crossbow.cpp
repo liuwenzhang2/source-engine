@@ -252,7 +252,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		ApplyMultiDamage();
 
 		//Adrian: keep going through the glass.
-		if ( pOther->GetCollisionGroup() == COLLISION_GROUP_BREAKABLE_GLASS )
+		if ( pOther->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_BREAKABLE_GLASS )
 			 return;
 
 		if ( !pOther->IsAlive() )

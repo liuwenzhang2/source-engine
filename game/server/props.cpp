@@ -659,7 +659,7 @@ void CBreakableProp::StickAtPosition( const Vector &stickPosition, const Vector 
 
 	VPhysicsGetObject()->EnableMotion( false );
 	GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_ENABLE_ON_PHYSCANNON );
-	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 }
 
 //-----------------------------------------------------------------------------
@@ -1738,7 +1738,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 
 	breakablepropparams_t params( origin, angles, velocity, angVelocity );
 	params.impactEnergyScale = m_impactEnergyScale;
-	params.defCollisionGroup = GetCollisionGroup();
+	params.defCollisionGroup = GetEngineObject()->GetCollisionGroup();
 	if ( params.defCollisionGroup == COLLISION_GROUP_NONE )
 	{
 		// don't automatically make anything COLLISION_GROUP_NONE or it will
@@ -2539,7 +2539,7 @@ void CPhysicsProp::Spawn( )
 
 	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_DEBRIS ) || HasInteraction( PROPINTER_PHYSGUN_CREATE_FLARE ) )
 	{
-		SetCollisionGroup(GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_FORCE_TOUCH_TRIGGERS ) ? COLLISION_GROUP_DEBRIS_TRIGGER : COLLISION_GROUP_DEBRIS );
+		GetEngineObject()->SetCollisionGroup(GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_FORCE_TOUCH_TRIGGERS ) ? COLLISION_GROUP_DEBRIS_TRIGGER : COLLISION_GROUP_DEBRIS );
 	}
 
 	if (GetEngineObject()->HasSpawnFlags( SF_PHYSPROP_NO_ROTORWASH_PUSH ) )
@@ -2781,7 +2781,7 @@ void CPhysicsProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 
 		if( HasInteraction( PROPINTER_PHYSGUN_WORLD_STICK ) )
 		{
-			SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
+			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
 		}
 	}
 
@@ -3271,7 +3271,7 @@ int CPhysicsProp::DrawDebugTextOverlays(void)
 			EntityText( text_offset, tempstr, 0);
 			text_offset++;
 
-			Q_snprintf(tempstr, sizeof(tempstr),"Health: %d, collision group %d", GetHealth(), GetCollisionGroup() );
+			Q_snprintf(tempstr, sizeof(tempstr),"Health: %d, collision group %d", GetHealth(), GetEngineObject()->GetCollisionGroup() );
 			EntityText( text_offset, tempstr, 0);
 			text_offset++;
 		}
@@ -3308,7 +3308,7 @@ static CBreakableProp *BreakModelCreate_Prop( CBaseEntity *pOwner, breakmodel_t 
 		}
 		pEntity->GetEngineObject()->SetModelName( AllocPooledString( pModel->modelName ) );
 		pEntity->SetModel( STRING(pEntity->GetEngineObject()->GetModelName()) );
-		pEntity->SetCollisionGroup( pModel->collisionGroup );
+		pEntity->GetEngineObject()->SetCollisionGroup( pModel->collisionGroup );
 
 		if ( pModel->fadeMinDist > 0 && pModel->fadeMaxDist >= pModel->fadeMinDist )
 		{
@@ -4689,7 +4689,7 @@ public:
 			if ( !pEntity->ShouldCollide( m_collisionGroup, contentsMask ) )
 				return false;
 			
-			if ( !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetCollisionGroup() ) )
+			if ( !g_pGameRules->ShouldCollide( m_collisionGroup, pEntity->GetEngineObject()->GetCollisionGroup() ) )
 				return false;
 
 			// If objects are small enough and can move, close on them
@@ -5343,7 +5343,7 @@ void CPropDoorRotating::BeginOpening(CBaseEntity *pOpenAwayFrom)
 	if ( m_hDoorBlocker != NULL )
 	{
 		// Only block NPCs
-		m_hDoorBlocker->SetCollisionGroup( COLLISION_GROUP_DOOR_BLOCKER );
+		m_hDoorBlocker->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DOOR_BLOCKER );
 
 		// If we hit something while opening, just stay unsolid until we try again
 		if ( CheckDoorClear( eDirCheck ) == false )
@@ -5574,7 +5574,7 @@ public:
 	virtual void Activate()
 	{
 		BaseClass::Activate();
-		SetCollisionGroup( COLLISION_GROUP_PUSHAWAY );
+		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PUSHAWAY );
 		m_fMass = VPhysicsGetObject()->GetMass();
 	}
 };
@@ -5635,15 +5635,15 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 
 			if ( m_bAwake )
 			{
-				SetCollisionGroup( COLLISION_GROUP_PUSHAWAY );
+				GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PUSHAWAY );
 			}
 			else if ( m_iPhysicsMode == PHYSICS_MULTIPLAYER_NON_SOLID )
 			{
-				SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+				GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 			}
 			else
 			{
-				SetCollisionGroup( COLLISION_GROUP_NONE );
+				GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 			}
 		}
 	}
@@ -5690,13 +5690,13 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 			
 		}
 
-		if ( GetCollisionGroup() == COLLISION_GROUP_NONE )
-			SetCollisionGroup( COLLISION_GROUP_PUSHAWAY );
+		if (GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_NONE )
+			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PUSHAWAY );
 
 		// Items marked as debris should be set as such.
 		if ( IsDebris() )
 		{
-			SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+			GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		}
 
 		if(VPhysicsGetObject())

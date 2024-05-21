@@ -132,7 +132,7 @@ void CGrenadeFrag::Spawn( void )
 	m_iHealth		= 1;
 
 	SetSize( -Vector(4,4,4), Vector(4,4,4) );
-	SetCollisionGroup( COLLISION_GROUP_WEAPON );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 	CreateVPhysics();
 
 	BlipSound();
@@ -220,9 +220,9 @@ public:
 
 		if ( pEntity )
 		{
-			if ( g_pGameRules->ShouldCollide( m_collisionGroupAlreadyChecked, pEntity->GetCollisionGroup() ) )
+			if ( g_pGameRules->ShouldCollide( m_collisionGroupAlreadyChecked, pEntity->GetEngineObject()->GetCollisionGroup() ) )
 				return false;
-			if ( g_pGameRules->ShouldCollide( m_newCollisionGroup, pEntity->GetCollisionGroup() ) )
+			if ( g_pGameRules->ShouldCollide( m_newCollisionGroup, pEntity->GetEngineObject()->GetCollisionGroup() ) )
 				return true;
 		}
 
@@ -244,7 +244,7 @@ void CGrenadeFrag::VPhysicsUpdate( IPhysicsObject *pPhysics )
 	
 	Vector start = GetEngineObject()->GetAbsOrigin();
 	// find all entities that my collision group wouldn't hit, but COLLISION_GROUP_NONE would and bounce off of them as a ray cast
-	CTraceFilterCollisionGroupDelta filter( this, GetCollisionGroup(), COLLISION_GROUP_NONE );
+	CTraceFilterCollisionGroupDelta filter( this, GetEngineObject()->GetCollisionGroup(), COLLISION_GROUP_NONE );
 	trace_t tr;
 
 	// UNDONE: Hull won't work with hitboxes - hits outer hull.  But the whole point of this test is to hit hitboxes.

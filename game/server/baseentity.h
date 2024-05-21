@@ -1098,8 +1098,6 @@ public:
 	// Method used to deal with attacks passing through triggers
 	void TraceAttackToTriggers( const CTakeDamageInfo &info, const Vector& start, const Vector& end, const Vector& dir );
 
-	// Do the bounding boxes of these two intersect?
-	bool	Intersects( CBaseEntity *pOther );
 	virtual bool IsLockedByMaster( void ) { return false; }
 
 	// Health accessors.
@@ -1223,11 +1221,6 @@ public:
 	// creates an entity of a specified class, by name
 	static CBaseEntity *Create( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner = NULL );
 	static CBaseEntity *CreateNoSpawn( const char *szName, const Vector &vecOrigin, const QAngle &vecAngles, CBaseEntity *pOwner = NULL );
-
-	// Collision group accessors
-	int				GetCollisionGroup() const;
-	void			SetCollisionGroup( int collisionGroup );
-	void			CollisionRulesChanged();
 
 	// Damage accessors
 	virtual int		GetDamageType() const;
@@ -1645,7 +1638,6 @@ private:
 	CNetworkHandle( CBaseEntity, m_hOwnerEntity );	// only used to point to an edict it won't collide with
 	CNetworkHandle( CBaseEntity, m_hEffectEntity );	// Fire/Dissolve entity.
 
-	CNetworkVar( int, m_CollisionGroup );		// used to cull collision tests
 	IPhysicsObject	*m_pPhysicsObject;	// pointer to the entity's physics object (vphysics.dll)
 
 	CNetworkVar( float, m_flShadowCastDistance );

@@ -356,7 +356,7 @@ void CWeaponPortalBase::Spawn()
 	BaseClass::Spawn();
 
 	// Set this here to allow players to shoot dropped weapons
-	SetCollisionGroup( COLLISION_GROUP_WEAPON );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
 	// Use less bloat for the collision box for this weapon. (bug 43800)
 	GetEngineObject()->UseTriggerBounds( true, 20 );

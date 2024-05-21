@@ -2378,7 +2378,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	CBaseEntity::PushEnableAbsRecomputations( false );
 
 	Ray_t ray;
-	CTraceFilterSkipNPCsAndPlayers traceFilter( this, GetCollisionGroup() );
+	CTraceFilterSkipNPCsAndPlayers traceFilter( this, GetEngineObject()->GetCollisionGroup() );
 
 	// FIXME: trace based on gravity or trace based on angles?
 	Vector up;
@@ -6330,7 +6330,7 @@ void C_BaseAnimating::AttachEntityToBone( C_BaseAnimating* attachTarget, int bon
 	if ( !attachTarget )
 		return;
 
-	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	FollowEntity( attachTarget );
 	SetOwnerEntity( attachTarget );

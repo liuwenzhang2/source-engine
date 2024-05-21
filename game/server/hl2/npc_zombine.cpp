@@ -460,7 +460,7 @@ void CNPC_Zombine::DropGrenade( Vector vDir )
 	{
 		m_hGrenade->SetMoveType( MOVETYPE_VPHYSICS );
 		m_hGrenade->GetEngineObject()->SetSolid( SOLID_VPHYSICS );
-		m_hGrenade->SetCollisionGroup( COLLISION_GROUP_WEAPON );
+		m_hGrenade->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
 		m_hGrenade->CreateVPhysics();
 	}
@@ -552,7 +552,7 @@ void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 
 				pGrenade->SetMoveType( MOVETYPE_NONE );
 				pGrenade->GetEngineObject()->SetSolid( SOLID_NONE );
-				pGrenade->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
+				pGrenade->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 				pGrenade->GetEngineObject()->SetAbsOrigin( vecStart );
 				pGrenade->GetEngineObject()->SetAbsAngles( angles );

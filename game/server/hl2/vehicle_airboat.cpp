@@ -381,7 +381,7 @@ void CPropAirboat::Spawn( void )
 
 	// Setup vehicle as a ray-cast airboat.
 	SetVehicleType( VEHICLE_TYPE_AIRBOAT_RAYCAST );
-	SetCollisionGroup( COLLISION_GROUP_VEHICLE );
+	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_VEHICLE );
 	BaseClass::Spawn();
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -504,7 +504,7 @@ void CPropAirboat::CreatePlayerBlocker()
 		m_hPlayerBlocker->GetEngineObject()->SetParent( this->GetEngineObject() );
 		m_hPlayerBlocker->GetEngineObject()->SetLocalOrigin( vec3_origin );
 		m_hPlayerBlocker->GetEngineObject()->SetLocalAngles( vec3_angle );
-		m_hPlayerBlocker->SetCollisionGroup( COLLISION_GROUP_PLAYER );
+		m_hPlayerBlocker->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 		m_hPlayerBlocker->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 }

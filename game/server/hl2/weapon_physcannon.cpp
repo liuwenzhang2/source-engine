@@ -1031,10 +1031,10 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	}
 
 	// If the target is debris, convert it to non-debris
-	if ( pObject->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
+	if ( pObject->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
 	{
 		// Interactive debris converts back to debris when it comes to rest
-		pObject->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
+		pObject->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
 	}
 
 	// done so I'll go across level transitions with the player
@@ -1786,10 +1786,10 @@ void CWeaponPhysCannon::PuntNonVPhysics( CBaseEntity *pEntity, const Vector &for
 void CWeaponPhysCannon::Physgun_OnPhysGunPickup( CBaseEntity *pEntity, CBasePlayer *pOwner, PhysGunPickup_t reason )
 {
 	// If the target is debris, convert it to non-debris
-	if ( pEntity->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
+	if ( pEntity->GetEngineObject()->GetCollisionGroup() == COLLISION_GROUP_DEBRIS )
 	{
 		// Interactive debris converts back to debris when it comes to rest
-		pEntity->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
+		pEntity->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
 	}
 
 	float mass = 0.0f;
