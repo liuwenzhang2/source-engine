@@ -2579,8 +2579,8 @@ void CDODPlayer::State_PreThink_WELCOME()
 {
 	// Verify some state.
 	Assert( GetMoveType() == MOVETYPE_NONE );
-	Assert( IsSolidFlagSet( FSOLID_NOT_SOLID ) );
-	Assert( GetAbsVelocity().Length() == 0 );
+	Assert(GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) );
+	Assert(GetEngineObject()->GetAbsVelocity().Length() == 0 );
 
 	CheckRotateIntroCam();
 }
@@ -2807,7 +2807,7 @@ void CDODPlayer::State_PreThink_OBSERVER_MODE()
 {
 	// Make sure nobody has changed any of our state.
 	Assert( m_takedamage == DAMAGE_NO );
-	Assert( IsSolidFlagSet( FSOLID_NOT_SOLID ) );
+	Assert(GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) );
 	
 	// Must be dead.
 	Assert( m_lifeState == LIFE_DEAD );

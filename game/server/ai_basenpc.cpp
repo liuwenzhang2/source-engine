@@ -6730,7 +6730,7 @@ bool CAI_BaseNPC::SetHullSizeSmall( bool force )
 //-----------------------------------------------------------------------------
 bool CAI_BaseNPC::IsNavHullValid() const
 {
-	Assert( GetSolid() != SOLID_BSP );
+	Assert(GetEngineObject()->GetSolid() != SOLID_BSP );
 
 	Vector hullMin = GetHullMins();
 	Vector hullMax = GetHullMaxs();
@@ -6791,7 +6791,7 @@ void CAI_BaseNPC::NPCInit ( void )
 #ifdef _DEBUG
 	// Make sure that the bounding box is appropriate for the hull size...
 	// FIXME: We can't test vphysics objects because NPCInit occurs before VPhysics is set up
-	if ( GetSolid() != SOLID_VPHYSICS && !IsSolidFlagSet(FSOLID_NOT_SOLID) )
+	if (GetEngineObject()->GetSolid() != SOLID_VPHYSICS && !GetEngineObject()->IsSolidFlagSet(FSOLID_NOT_SOLID) )
 	{
 		if ( !IsNavHullValid() )
 		{

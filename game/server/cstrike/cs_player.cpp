@@ -5359,8 +5359,8 @@ void CCSPlayer::State_Enter_WELCOME()
 void CCSPlayer::State_PreThink_WELCOME()
 {
 	// Verify some state.
-	Assert( IsSolidFlagSet( FSOLID_NOT_SOLID ) );
-	Assert( GetAbsVelocity().Length() == 0 );
+	Assert(GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) );
+	Assert(GetEngineObject()->GetAbsVelocity().Length() == 0 );
 
 	// Update whatever intro camera it's at.
 	if( m_pIntroCamera && (gpGlobals->curtime >= m_fIntroCamTime) )
@@ -5551,7 +5551,7 @@ void CCSPlayer::State_PreThink_OBSERVER_MODE()
 	// Make sure nobody has changed any of our state.
 //	Assert( GetMoveType() == MOVETYPE_FLY );
 	Assert( m_takedamage == DAMAGE_NO );
-	Assert( IsSolidFlagSet( FSOLID_NOT_SOLID ) );
+	Assert(GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) );
 //	Assert( IsEffectActive( EF_NODRAW ) );
 
 	// Must be dead.
@@ -5620,7 +5620,7 @@ void CCSPlayer::State_PreThink_ACTIVE()
 //		Assert( GetMoveType() == MOVETYPE_WALK );
 	}
 
-	Assert( !IsSolidFlagSet( FSOLID_NOT_SOLID ) );
+	Assert( !GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) );
 }
 
 
