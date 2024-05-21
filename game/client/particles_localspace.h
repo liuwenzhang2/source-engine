@@ -34,7 +34,7 @@ protected:
 
 	CLocalSpaceEmitter( const char *pDebugName );
 
-	C_BaseEntity* m_hEntity;
+	EHANDLE m_hEntity;
 	int	m_nAttachment;
 	int m_fFlags;
 

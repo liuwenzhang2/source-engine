@@ -720,7 +720,7 @@ private:
 	float		m_flSpawnRate;
 	Vector		m_vecSpurtForward;
 	Vector4D	m_SpurtColor;
-	C_BaseEntity* m_hEntity;
+	EHANDLE		m_hEntity;
 	int			m_nAttachmentIndex;
 
 	CSmokeEmitter( const CSmokeEmitter & ); // not defined, not accessible

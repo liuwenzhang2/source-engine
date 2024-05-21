@@ -47,7 +47,7 @@ public:
 	QAngle m_vAngles;
 	int		m_fFlags;
 #ifdef CLIENT_DLL
-	C_BaseEntity* m_hEntity;
+	EHANDLE m_hEntity;
 #else
 	int		m_nEntIndex;
 #endif
