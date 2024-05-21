@@ -2598,7 +2598,7 @@ struct collidelist_t
 // UNDONE: Expand this to the full matrix of solid types on each side and move into enginetrace
 bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngineObjectServer* pEntity)
 {
-	Assert(pTrigger->GetEngineObject()->GetSolid() == SOLID_BSP);
+	Assert(pTrigger->GetSolid() == SOLID_BSP);
 
 	if (pTrigger->GetOuter()->Intersects(pEntity->GetOuter()))	// It touches one, it's in the volume
 	{
