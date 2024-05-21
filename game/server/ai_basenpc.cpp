@@ -5436,7 +5436,7 @@ float CAI_BaseNPC::EnemyDistance( CBaseEntity *pEnemy )
 	// NOTE: We ignore rotation for computing height.  Assume it isn't an effect
 	// we care about, so we simply use OBBSize().z for height.  
 	// Otherwise you'd do this:
-	// pEnemy->CollisionProp()->WorldSpaceSurroundingBounds( &enemyMins, &enemyMaxs );
+	// pEnemy->GetEngineObject()->WorldSpaceSurroundingBounds( &enemyMins, &enemyMaxs );
 	// float enemyHeight = enemyMaxs.z - enemyMins.z;
 
 	float enemyHeight = pEnemy->GetEngineObject()->OBBSize().z;
@@ -9394,7 +9394,7 @@ void CAI_BaseNPC::ReportOverThinkLimit( float time )
 	if (ai_think_limit_label.GetBool()) 
 	{
 		Vector tmp;
-		((CCollisionProperty*)GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &tmp );
+		GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &tmp );
 		tmp.z += 16;
 
 		float max = -1;
@@ -13805,8 +13805,8 @@ bool CAI_BaseNPC::InteractionCouldStart( CAI_BaseNPC *pOtherNPC, ScriptedNPCInte
 
 	// Do a knee-level trace to find low physics objects
 	Vector vecMyKnee, vecOtherKnee;
-	((CCollisionProperty*)GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector(0,0,0.25f), &vecMyKnee );
-	((CCollisionProperty*)pOtherNPC->GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector(0,0,0.25f), &vecOtherKnee );
+	GetEngineObject()->NormalizedToWorldSpace( Vector(0,0,0.25f), &vecMyKnee );
+	pOtherNPC->GetEngineObject()->NormalizedToWorldSpace( Vector(0,0,0.25f), &vecOtherKnee );
 	AI_TraceLine( vecMyKnee, vecOtherKnee, MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr);
 	if ( tr.fraction != 1.0 && tr.m_pEnt != pOtherNPC )
 	{

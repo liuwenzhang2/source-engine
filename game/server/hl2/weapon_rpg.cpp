@@ -892,8 +892,8 @@ CBaseEntity *CInfoAPCMissileHint::FindAimTarget( CBaseEntity *pMissile, const ch
 		VectorMultiply( vecCurrentEnemyVel, HINT_PREDICTION_TIME, vecRayDelta );
 
 		BoxTraceInfo_t trace;
-		if ( !IntersectRayWithOBB( vecCurrentEnemyPos, vecRayDelta, pHint->GetEngineObject()->CollisionProp()->CollisionToWorldTransform(),
-			pHint->GetEngineObject()->CollisionProp()->OBBMins(), pHint->GetEngineObject()->CollisionProp()->OBBMaxs(), 0.0f, &trace ))
+		if ( !IntersectRayWithOBB( vecCurrentEnemyPos, vecRayDelta, pHint->GetEngineObject()->CollisionToWorldTransform(),
+			pHint->GetEngineObject()->OBBMins(), pHint->GetEngineObject()->OBBMaxs(), 0.0f, &trace ))
 		{
 			continue;
 		}

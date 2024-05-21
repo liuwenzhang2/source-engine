@@ -1052,9 +1052,8 @@ void CBreakable::Die( void )
 	CPVSFilter filter2( vecSpot );
 
 	int iModelIndex = 0;
-	CCollisionProperty *pCollisionProp = (CCollisionProperty*)GetEngineObject()->CollisionProp();
 
-	Vector vSize = pCollisionProp->OBBSize();
+	Vector vSize = GetEngineObject()->OBBSize();
 	int iCount = ( vSize[0] * vSize[1] + vSize[1] * vSize[2] + vSize[2] * vSize[0] ) / ( 3 * 12 * 12 );
 
 	if ( iCount > func_break_max_pieces.GetInt() )
@@ -1103,7 +1102,7 @@ void CBreakable::Die( void )
 			}
 
 			te->BreakModel( filter2, 0.0, 
-				vecSpot, pCollisionProp->GetCollisionAngles(), vSize, 
+				vecSpot, GetEngineObject()->GetCollisionAngles(), vSize,
 				vecVelocity, iModelIndex, 100, 1, 2.5, cFlag | slaveFlag );
 		}
 	}
@@ -1123,12 +1122,12 @@ void CBreakable::Die( void )
 	SetNextThink( gpGlobals->curtime + 0.1f );
 	if ( m_iszSpawnObject != NULL_STRING )
 	{
-		CBaseEntity::Create( STRING(m_iszSpawnObject), vecSpot, pCollisionProp->GetCollisionAngles(), this );
+		CBaseEntity::Create( STRING(m_iszSpawnObject), vecSpot, GetEngineObject()->GetCollisionAngles(), this );
 	}
 
 	if ( Explodable() )
 	{
-		ExplosionCreate( vecSpot, pCollisionProp->GetCollisionAngles(), this, GetExplosiveDamage(), GetExplosiveRadius(), true );
+		ExplosionCreate( vecSpot, GetEngineObject()->GetCollisionAngles(), this, GetExplosiveDamage(), GetExplosiveRadius(), true );
 	}
 }
 

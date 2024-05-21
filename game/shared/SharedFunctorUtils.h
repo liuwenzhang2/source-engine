@@ -55,7 +55,7 @@ public:
 
 			start = them->GetEngineObject()->GetAbsOrigin();
 			end = start;
-			end.z += them->GetEngineObject()->CollisionProp()->OBBMaxs().z;
+			end.z += them->GetEngineObject()->OBBMaxs().z;
 			CalcClosestPointOnLineSegment( testPos, start, end, closestPos );
 			if ( m_debug )
 			{

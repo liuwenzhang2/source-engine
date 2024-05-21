@@ -1128,7 +1128,7 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 		{
 			Vector delta = tr.endpos - tr.startpos;
 			float centerZ = GetEngineObject()->WorldSpaceCenter().z;
-			delta.z = IntervalDistance( tr.endpos.z, centerZ + GetEngineObject()->CollisionProp()->OBBMins().z, centerZ + GetEngineObject()->CollisionProp()->OBBMaxs().z );
+			delta.z = IntervalDistance( tr.endpos.z, centerZ + GetEngineObject()->OBBMins().z, centerZ + GetEngineObject()->OBBMaxs().z );
 			float dist = delta.Length();
 			if ( dist < PLAYER_USE_RADIUS )
 			{

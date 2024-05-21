@@ -311,7 +311,7 @@ bool CBaseTrigger::PointIsWithin( const Vector &vecPoint )
 {
 	Ray_t ray;
 	trace_t tr;
-	ICollideable *pCollide = GetEngineObject()->CollisionProp();
+	ICollideable *pCollide = GetEngineObject()->GetCollideable();
 	ray.Init( vecPoint, vecPoint );
 	enginetrace->ClipRayToCollideable( ray, MASK_ALL, pCollide, &tr );
 	return ( tr.startsolid );
@@ -693,7 +693,7 @@ void CTriggerHurt::RadiationThink( void )
 	// check to see if a player is in pvs
 	// if not, continue	
 	Vector vecSurroundMins, vecSurroundMaxs;
-	GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+	GetEngineObject()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 	CBasePlayer *pPlayer = static_cast<CBasePlayer *>(UTIL_FindClientInPVS( vecSurroundMins, vecSurroundMaxs ));
 
 	if (pPlayer)
@@ -1516,7 +1516,7 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 		if ( pPlayer )
 		{
 			Vector vecSurroundMins, vecSurroundMaxs;
-			pPlayer->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+			pPlayer->GetEngineObject()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 			bool playerInPVS = engine->CheckBoxInPVS( vecSurroundMins, vecSurroundMaxs, pvs, sizeof( pvs ) );
 
 			//Assert( playerInPVS );

@@ -2281,7 +2281,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 
 	// Now clamp a sphere of object radius at end to the player's bbox
 	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -forward );
-	Vector player2d = pPlayer->GetEngineObject()->CollisionProp()->OBBMaxs();
+	Vector player2d = pPlayer->GetEngineObject()->OBBMaxs();
 	float playerRadius = player2d.Length2D();
 	float flDot = DotProduct( forward, radial );
 

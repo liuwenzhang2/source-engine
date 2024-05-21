@@ -482,7 +482,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		Vector mins;
 		UTIL_StringToVector( mins.Base(), szValue );
-		GetEngineObject()->SetCollisionBounds( mins, GetEngineObject()->CollisionProp()->OBBMaxs() );
+		GetEngineObject()->SetCollisionBounds( mins, GetEngineObject()->OBBMaxs() );
 		return true;
 	}
 
@@ -490,7 +490,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		Vector maxs;
 		UTIL_StringToVector( maxs.Base(), szValue );
-		GetEngineObject()->SetCollisionBounds(GetEngineObject()->CollisionProp()->OBBMins(), maxs );
+		GetEngineObject()->SetCollisionBounds(GetEngineObject()->OBBMins(), maxs );
 		return true;
 	}
 
@@ -1442,7 +1442,7 @@ IPhysicsObject *CBaseEntity::VPhysicsInitShadow( bool allowPhysicsMovement, bool
 	}
 	else if (GetEngineObject()->GetSolid() == SOLID_OBB )
 	{
-		pPhysicsObject = PhysModelCreateOBB( this, GetEngineObject()->CollisionProp()->OBBMins(), GetEngineObject()->CollisionProp()->OBBMaxs(), origin, angles, false );
+		pPhysicsObject = PhysModelCreateOBB( this, GetEngineObject()->OBBMins(), GetEngineObject()->OBBMaxs(), origin, angles, false );
 	}
 	else
 	{

@@ -47,7 +47,7 @@ public:
 		if ( tr.fraction < 1.0 )
 		{
 			ICollideable *pCollideable = enginetrace->GetCollideable( pHandleEntity );
-			IClientUnknown *pUnk = pCollideable->GetIClientUnknown();
+			IClientUnknown *pUnk =  (IClientUnknown*)pCollideable->GetEntityHandle();
 			if ( pUnk )
 			{
 				g_pStudioStatsEntity = pUnk->GetClientRenderable();

@@ -146,7 +146,7 @@ void CPhysicsPushedEntities::ComputeRotationalPushDirection( CBaseEntity *pBlock
 {
 	// calculate destination position
 	// "start" is relative to the *root* pusher, world orientation
-	Vector start = pBlocker->GetEngineObject()->CollisionProp()->GetCollisionOrigin();
+	Vector start = pBlocker->GetEngineObject()->GetCollisionOrigin();
 	if ( pRoot->GetEngineObject()->GetSolid() == SOLID_VPHYSICS )
 	{
 		// HACKHACK: Use move dir to guess which corner of the box determines contact and rotate the box so

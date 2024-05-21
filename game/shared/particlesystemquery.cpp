@@ -482,8 +482,8 @@ bool CParticleSystemQuery::IsPointInControllingObjectHitBox(
 		Vector vecBBoxMax;
 		Vector vecOrigin;
 
-		vecBBoxMin = pMoveParent->GetEngineObject()->CollisionProp()->OBBMins();
-		vecBBoxMax = pMoveParent->GetEngineObject()->CollisionProp()->OBBMaxs();
+		vecBBoxMin = pMoveParent->GetEngineObject()->OBBMins();
+		vecBBoxMax = pMoveParent->GetEngineObject()->OBBMaxs();
 
 		matrix3x4_t matOrientation;
 		matOrientation = pMoveParent->GetEngineObject()->EntityToWorldTransform();

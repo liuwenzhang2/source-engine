@@ -169,7 +169,7 @@ struct Extent
 
 	void Init( CBaseEntity *entity )
 	{
-		entity->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &lo, &hi );
+		entity->GetEngineObject()->WorldSpaceSurroundingBounds( &lo, &hi );
 	}
 
 	float SizeX( void ) const	{ return hi.x - lo.x; }

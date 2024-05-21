@@ -1013,7 +1013,7 @@ void C_FuncPhysicsRespawnZone::RespawnProps( void )
 				if ( !GetEngineObject()->IsPointInBounds( pEntity->WorldSpaceCenter() ) )
 				{
 					Vector vecMins, vecMaxs;
-					pEntity->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecMins, &vecMaxs );
+					pEntity->GetEngineObject()->WorldSpaceSurroundingBounds( &vecMins, &vecMaxs );
 					if ( !CanMovePropAt( m_PropList[i].vecOrigin, vecMins, vecMaxs ) || 
 						 !CanMovePropAt( pEntity->GetEngineObject()->GetAbsOrigin(), vecMins, vecMaxs ) )
 						continue;

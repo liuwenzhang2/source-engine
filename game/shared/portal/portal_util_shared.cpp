@@ -60,7 +60,7 @@ public:
 	virtual const model_t*	GetCollisionModel() { return m_pWrappedCollideable->GetCollisionModel(); }
 	virtual SolidType_t		GetSolid() const { return m_pWrappedCollideable->GetSolid(); }
 	virtual int				GetSolidFlags() const { return m_pWrappedCollideable->GetSolidFlags(); }
-	virtual IClientUnknown*	GetIClientUnknown() { return m_pWrappedCollideable->GetIClientUnknown(); }
+	//virtual IClientUnknown*	GetIClientUnknown() { return m_pWrappedCollideable->GetIClientUnknown(); }
 	virtual int				GetCollisionGroup() const { return m_pWrappedCollideable->GetCollisionGroup(); }
 	virtual bool			ShouldTouchTrigger( int triggerSolidFlags ) const { return m_pWrappedCollideable->ShouldTouchTrigger(triggerSolidFlags); }
 
@@ -1514,10 +1514,7 @@ bool FindClosestPassableSpace( CBaseEntity *pEntity, const Vector &vIndecisivePu
 
 	Vector vEntityMaxs;// = pEntity->WorldAlignMaxs();
 	Vector vEntityMins;// = pEntity->WorldAlignMins();
-	CCollisionProperty *pEntityCollision = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
-	pEntityCollision->WorldSpaceAABB( &vEntityMins, &vEntityMaxs );
-
-
+	pEntity->GetEngineObject()->WorldSpaceAABB( &vEntityMins, &vEntityMaxs );
 
 	Vector ptEntityCenter = ((vEntityMins + vEntityMaxs) / 2.0f);
 	vEntityMins -= ptEntityCenter;
@@ -1664,11 +1661,10 @@ bool FindClosestPassableSpace( CBaseEntity *pEntity, const Vector &vIndecisivePu
 
 bool UTIL_Portal_EntityIsInPortalHole( const CProp_Portal *pPortal, CBaseEntity *pEntity )
 {
-	CCollisionProperty *pCollisionProp = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
-	Vector vMins = pCollisionProp->OBBMins();
-	Vector vMaxs = pCollisionProp->OBBMaxs();
+	Vector vMins = pEntity->GetEngineObject()->OBBMins();
+	Vector vMaxs = pEntity->GetEngineObject()->OBBMaxs();
 	Vector vForward, vUp, vRight;
-	AngleVectors( pCollisionProp->GetCollisionAngles(), &vForward, &vRight, &vUp );
+	AngleVectors(pEntity->GetEngineObject()->GetCollisionAngles(), &vForward, &vRight, &vUp );
 	Vector ptOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
 
 	Vector ptOBBCenter = pEntity->GetEngineObject()->GetAbsOrigin() + (vMins + vMaxs * 0.5f);

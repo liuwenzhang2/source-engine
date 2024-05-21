@@ -214,7 +214,7 @@ void CDirtySpatialPartitionEntityList::OnPreQuery( SpatialPartitionListMask_t li
 					//  call to bone setup.
 					if ( !pEntity->GetEngineObject()->IsEFlagSet( EFL_SETTING_UP_BONES ) )
 					{
-						((CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp())->UpdatePartition();
+						pEntity->GetEngineObject()->UpdatePartition();
 					}
 					else
 					{
@@ -486,7 +486,7 @@ const matrix3x4_t *CCollisionProperty::GetRootParentToWorldTransform() const
 		Assert(pEntity);
 		if ( pEntity )
 		{
-			return &pEntity->CollisionProp()->CollisionToWorldTransform();
+			return &pEntity->CollisionToWorldTransform();
 		}
 	}
 	return NULL;
@@ -495,14 +495,14 @@ const matrix3x4_t *CCollisionProperty::GetRootParentToWorldTransform() const
 //-----------------------------------------------------------------------------
 // IClientUnknown
 //-----------------------------------------------------------------------------
-IClientUnknown* CCollisionProperty::GetIClientUnknown()
-{
-#ifdef CLIENT_DLL
-	return m_pOuter->GetOuter()->GetIClientUnknown();
-#else
-	return NULL;
-#endif
-}
+//IClientUnknown* CCollisionProperty::GetIClientUnknown()
+//{
+//#ifdef CLIENT_DLL
+//	return m_pOuter->GetOuter()->GetIClientUnknown();
+//#else
+//	return NULL;
+//#endif
+//}
 
 
 

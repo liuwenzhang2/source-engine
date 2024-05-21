@@ -1384,7 +1384,7 @@ bool CNPC_AntlionGuard::OverrideMove( float flInterval )
 	/*
 	if ( m_hPhysicsTarget != NULL )
 	{
-		float flWidth = m_hPhysicsTarget->CollisionProp()->BoundingRadius2D();
+		float flWidth = m_hPhysicsTarget->GetEngineObject()->BoundingRadius2D();
 		GetLocalNavigator()->AddObstacle( m_hPhysicsTarget->WorldSpaceCenter(), flWidth * 0.75f, AIMST_AVOID_OBJECT );
 		//NDebugOverlay::Sphere( m_hPhysicsTarget->WorldSpaceCenter(), vec3_angle, flWidth, 255, 255, 255, 0, true, 0.5f );
 	}

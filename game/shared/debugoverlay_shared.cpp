@@ -86,8 +86,7 @@ void NDebugOverlay::SweptBox( const Vector& start, const Vector& end, const Vect
 //-----------------------------------------------------------------------------
 void NDebugOverlay::EntityBounds( const CBaseEntity *pEntity, int r, int g, int b, int a, float flDuration )
 {
-	const CCollisionProperty *pCollide = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
-	BoxAngles( pCollide->GetCollisionOrigin(), pCollide->OBBMins(), pCollide->OBBMaxs(), pCollide->GetCollisionAngles(), r, g, b, a, flDuration );
+	BoxAngles(pEntity->GetEngineObject()->GetCollisionOrigin(), pEntity->GetEngineObject()->OBBMins(), pEntity->GetEngineObject()->OBBMaxs(), pEntity->GetEngineObject()->GetCollisionAngles(), r, g, b, a, flDuration );
 }
 
 //-----------------------------------------------------------------------------

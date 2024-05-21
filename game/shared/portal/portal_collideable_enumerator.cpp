@@ -58,14 +58,13 @@ IterationRetval_t CPortalCollideableEnumerator::EnumElement( IHandleEntity *pHan
 	else*/
 	{
 		//not a static prop, w00t
-		CCollisionProperty *pEntityCollision = (CCollisionProperty*)pEnt->GetEngineObject()->CollisionProp();
 
-		if( !pEntityCollision->IsSolid() )
+		if( !pEnt->GetEngineObject()->IsSolid() )
 			return ITERATION_CONTINUE; //not solid
 
-		Vector ptEntCenter = pEntityCollision->WorldSpaceCenter();
+		Vector ptEntCenter = pEnt->GetEngineObject()->WorldSpaceCenter();
 
-		float fBoundRadius = pEntityCollision->BoundingRadius();
+		float fBoundRadius = pEnt->GetEngineObject()->BoundingRadius();
 		float fPtPlaneDist = m_vPlaneNormal.Dot( ptEntCenter ) - m_fPlaneDist;
 
 		if( fPtPlaneDist < -fBoundRadius )
@@ -74,7 +73,7 @@ IterationRetval_t CPortalCollideableEnumerator::EnumElement( IHandleEntity *pHan
 		if( !(fPtPlaneDist > fBoundRadius) && (fPtPlaneDist > -fBoundRadius) ) //object is not wholly in front of the portal, but could be partially in front, do more checks
 		{
 			Vector ptNearest;
-			pEntityCollision->CalcNearestPoint( m_ptForward1000, &ptNearest );
+			pEnt->GetEngineObject()->CalcNearestPoint( m_ptForward1000, &ptNearest );
 			fPtPlaneDist = m_vPlaneNormal.Dot( ptNearest ) - m_fPlaneDist;
 			if( fPtPlaneDist < 0.0f )
 				return ITERATION_CONTINUE; //closest point was behind the portal plane, we don't want it

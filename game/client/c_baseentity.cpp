@@ -778,7 +778,7 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 		//cl_entitylist->AddNetworkableEntity(this, entnum, iSerialNum);//GetIClientUnknown()
 	}
 
-	((CCollisionProperty*)GetEngineObject()->CollisionProp())->CreatePartitionHandle();
+	GetEngineObject()->CreatePartitionHandle();
 
 	m_nCreationTick = gpGlobals->tickcount;
 
@@ -835,7 +835,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 	AddToLeafSystem( renderGroup );
 
 	// Add the client entity to the spatial partition. (Collidable)
-	((CCollisionProperty*)GetEngineObject()->CollisionProp())->CreatePartitionHandle();
+	GetEngineObject()->CreatePartitionHandle();
 
 	SpawnClientEntity();
 
@@ -873,7 +873,7 @@ void C_BaseEntity::Term()
 	}
 	
 	// Are we in the partition?
-	((CCollisionProperty*)GetEngineObject()->CollisionProp())->DestroyPartitionHandle();
+	GetEngineObject()->DestroyPartitionHandle();
 
 	// If Client side only entity index will be -1
 	if ( entindex() != -1 )
@@ -1321,17 +1321,17 @@ void C_BaseEntity::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 	{
 		// By default, we'll just snack on the collision bounds, transform
 		// them into entity-space, and call it a day.
-		if ( GetRenderAngles() == GetEngineObject()->CollisionProp()->GetCollisionAngles() )
+		if ( GetRenderAngles() == GetEngineObject()->GetCollisionAngles() )
 		{
-			theMins = GetEngineObject()->CollisionProp()->OBBMins();
-			theMaxs = GetEngineObject()->CollisionProp()->OBBMaxs();
+			theMins = GetEngineObject()->OBBMins();
+			theMaxs = GetEngineObject()->OBBMaxs();
 		}
 		else
 		{
-			Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
+			Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
 			if ( IsPointSized() )
 			{
-				//theMins = CollisionProp()->GetCollisionOrigin();
+				//theMins = GetEngineObject()->GetCollisionOrigin();
 				//theMaxs	= theMins;
 				theMins = theMaxs = vec3_origin;
 			}
@@ -1340,7 +1340,7 @@ void C_BaseEntity::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 				// NOTE: This shouldn't happen! Or at least, I haven't run
 				// into a valid case where it should yet.
 //				Assert(0);
-				IRotateAABB(GetEngineObject()->EntityToWorldTransform(), GetEngineObject()->CollisionProp()->OBBMins(), GetEngineObject()->CollisionProp()->OBBMaxs(), theMins, theMaxs );
+				IRotateAABB(GetEngineObject()->EntityToWorldTransform(), GetEngineObject()->OBBMins(), GetEngineObject()->OBBMaxs(), theMins, theMaxs );
 			}
 		}
 	}
@@ -1646,7 +1646,7 @@ void C_BaseEntity::UpdatePartitionListEntry()
 		list |= PARTITION_CLIENT_RESPONSIVE_EDICTS;
 
 	// add the entity to the KD tree so we will collide against it
-	partition->RemoveAndInsert( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, list, ((CCollisionProperty*)GetEngineObject()->CollisionProp())->GetPartitionHandle() );
+	partition->RemoveAndInsert( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, list, GetEngineObject()->GetPartitionHandle() );
 }
 
 
@@ -1702,7 +1702,7 @@ void C_BaseEntity::NotifyShouldTransmit( ShouldTransmitState_t state )
 			SetDormant( true );
 			
 			// remove the entity from the KD tree so we won't collide against it
-			partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, ((CCollisionProperty*)GetEngineObject()->CollisionProp())->GetPartitionHandle() );
+			partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, GetEngineObject()->GetPartitionHandle() );
 		
 		}
 		break;
@@ -3746,7 +3746,7 @@ CON_COMMAND_F( dlight_debug, "Creates a dlight in front of the player", FCVAR_CH
 //	Assert( ent->IsClientCreated() );
 //
 //	// Add the client entity to the spatial partition. (Collidable)
-//	ent->CollisionProp()->CreatePartitionHandle();
+//	ent->GetEngineObject()->CreatePartitionHandle();
 //
 //	// CLIENT ONLY FOR NOW!!!
 //	ent->index = -1;
@@ -4055,14 +4055,14 @@ void C_BaseEntity::DrawBBoxVisualizations( void )
 {
 	if ( m_fBBoxVisFlags & VISUALIZE_COLLISION_BOUNDS )
 	{
-		debugoverlay->AddBoxOverlay(GetEngineObject()->CollisionProp()->GetCollisionOrigin(), GetEngineObject()->CollisionProp()->OBBMins(),
-			GetEngineObject()->CollisionProp()->OBBMaxs(), GetEngineObject()->CollisionProp()->GetCollisionAngles(), 190, 190, 0, 0, 0.01 );
+		debugoverlay->AddBoxOverlay(GetEngineObject()->GetCollisionOrigin(), GetEngineObject()->OBBMins(),
+			GetEngineObject()->OBBMaxs(), GetEngineObject()->GetCollisionAngles(), 190, 190, 0, 0, 0.01 );
 	}
 
 	if ( m_fBBoxVisFlags & VISUALIZE_SURROUNDING_BOUNDS )
 	{
 		Vector vecSurroundMins, vecSurroundMaxs;
-		GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+		GetEngineObject()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 		debugoverlay->AddBoxOverlay( vec3_origin, vecSurroundMins,
 			vecSurroundMaxs, vec3_angle, 0, 255, 255, 0, 0.01 );
 	}
@@ -4319,7 +4319,7 @@ void C_BaseEntity::OnSave()
 void C_BaseEntity::OnRestore()
 {	
 	UpdatePartitionListEntry();
-	((CCollisionProperty*)GetEngineObject()->CollisionProp())->UpdatePartition();
+	GetEngineObject()->UpdatePartition();
 
 	UpdateVisibility();
 }

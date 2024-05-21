@@ -544,12 +544,12 @@ void C_ServerRagdoll::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
 	if( !GetEngineObject()->IsBoundsDefinedInEntitySpace() )
 	{
-		IRotateAABB(GetEngineObject()->EntityToWorldTransform(), GetEngineObject()->CollisionProp()->OBBMins(), GetEngineObject()->CollisionProp()->OBBMaxs(), theMins, theMaxs );
+		IRotateAABB(GetEngineObject()->EntityToWorldTransform(), GetEngineObject()->OBBMins(), GetEngineObject()->OBBMaxs(), theMins, theMaxs );
 	}
 	else
 	{
-		theMins = GetEngineObject()->CollisionProp()->OBBMins();
-		theMaxs = GetEngineObject()->CollisionProp()->OBBMaxs();
+		theMins = GetEngineObject()->OBBMins();
+		theMaxs = GetEngineObject()->OBBMaxs();
 	}
 }
 

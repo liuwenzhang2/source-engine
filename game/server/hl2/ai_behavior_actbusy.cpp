@@ -1560,7 +1560,7 @@ void CAI_ActBusyBehavior::CollectSafeZoneVolumes( CAI_ActBusyGoal *pActBusyGoal 
 		while( pVolume != NULL )
 		{
 			busysafezone_t newSafeZone;
-			((CCollisionProperty*)pVolume->GetEngineObject()->CollisionProp())->WorldSpaceAABB( &newSafeZone.vecMins, &newSafeZone.vecMaxs );
+			pVolume->GetEngineObject()->WorldSpaceAABB( &newSafeZone.vecMins, &newSafeZone.vecMaxs );
 			m_SafeZones.AddToTail( newSafeZone );
 			pVolume = gEntList.FindEntityByName( pVolume, pActBusyGoal->m_iszSafeZoneVolume );
 		}

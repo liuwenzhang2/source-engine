@@ -790,7 +790,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 		pPlayer->EyeVectors( &vPlayerForward );
 
 		Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -vPlayerForward );
-		Vector player2d = pPlayer->GetEngineObject()->CollisionProp()->OBBMaxs();
+		Vector player2d = pPlayer->GetEngineObject()->OBBMaxs();
 		float playerRadius = player2d.Length2D();
 		float flDot = DotProduct( vPlayerForward, radial );
 
@@ -2380,7 +2380,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 				CTakeDamageInfo info( pOwner, pOwner, 1.0f, DMG_GENERIC );
 				CBaseEntity *pRagdoll = CreateServerRagdoll( pEntity->MyNPCPointer(), 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
 				PhysSetEntityGameFlags( pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS );
-				pRagdoll->GetEngineObject()->SetCollisionBounds( pEntity->GetEngineObject()->CollisionProp()->OBBMins(), pEntity->GetEngineObject()->CollisionProp()->OBBMaxs() );
+				pRagdoll->GetEngineObject()->SetCollisionBounds( pEntity->GetEngineObject()->OBBMins(), pEntity->GetEngineObject()->OBBMaxs() );
 
 				// Necessary to cause it to do the appropriate death cleanup
 				CTakeDamageInfo ragdollInfo( pOwner, pOwner, 10000.0, DMG_PHYSGUN | DMG_REMOVENORAGDOLL );
@@ -2527,7 +2527,7 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 			CBaseEntity *pRagdoll = CreateServerRagdoll( pObject->MyNPCPointer(), 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
 			PhysSetEntityGameFlags( pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS );
 
-			pRagdoll->GetEngineObject()->SetCollisionBounds( pObject->GetEngineObject()->CollisionProp()->OBBMins(), pObject->GetEngineObject()->CollisionProp()->OBBMaxs() );
+			pRagdoll->GetEngineObject()->SetCollisionBounds( pObject->GetEngineObject()->OBBMins(), pObject->GetEngineObject()->OBBMaxs() );
 
 			// Necessary to cause it to do the appropriate death cleanup
 			CTakeDamageInfo ragdollInfo( GetOwner(), GetOwner(), 10000.0, DMG_PHYSGUN | DMG_REMOVENORAGDOLL );
@@ -2992,7 +2992,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	}
 	// Now clamp a sphere of object radius at end to the player's bbox
 	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, qEntityAngles, -forward );
-	Vector player2d = pPlayer->GetEngineObject()->CollisionProp()->OBBMaxs();
+	Vector player2d = pPlayer->GetEngineObject()->OBBMaxs();
 	float playerRadius = player2d.Length2D();
 
 	float radius = playerRadius + radial.Length();

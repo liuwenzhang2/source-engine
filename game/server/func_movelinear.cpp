@@ -138,12 +138,12 @@ bool CFuncMoveLinear::CreateVPhysics( void )
 		IPhysicsObject *pPhysics = VPhysicsInitShadow( false, false );
 		fluidparams_t fluid;
 		
-		Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
+		Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
 		fluid.damping = 0.01f;
 		fluid.surfacePlane[0] = 0;
 		fluid.surfacePlane[1] = 0;
 		fluid.surfacePlane[2] = 1;
-		fluid.surfacePlane[3] = GetEngineObject()->CollisionProp()->GetCollisionOrigin().z + GetEngineObject()->CollisionProp()->OBBMaxs().z - 1;
+		fluid.surfacePlane[3] = GetEngineObject()->GetCollisionOrigin().z + GetEngineObject()->OBBMaxs().z - 1;
 		fluid.currentVelocity.Init(0,0,0);
 		fluid.torqueFactor = 0.1f;
 		fluid.viscosityFactor = 0.01f;

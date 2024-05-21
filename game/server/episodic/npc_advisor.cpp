@@ -529,7 +529,7 @@ void CNPC_Advisor::StartLevitatingObjects()
 		if ( !pEnt )
 			continue;
 
-		//NDebugOverlay::Box( pEnt->GetAbsOrigin(), pEnt->CollisionProp()->OBBMins(), pEnt->CollisionProp()->OBBMaxs(), 0, 255, 0, 1, 0.1 );
+		//NDebugOverlay::Box( pEnt->GetEngineObject()->GetAbsOrigin(), pEnt->GetEngineObject()->OBBMins(), pEnt->GetEngineObject()->OBBMaxs(), 0, 255, 0, 1, 0.1 );
 
 		IPhysicsObject *pPhys = pEnt->VPhysicsGetObject();
 		if ( pPhys && pPhys->IsMoveable() )
@@ -850,7 +850,7 @@ void CNPC_Advisor::RunTask( const Task_t *pTask )
 				IPhysicsObject *pPhys = pEnt->VPhysicsGetObject();
 				if ( pPhys && pPhys->IsMoveable() )
 				{
-					NDebugOverlay::Box( pEnt->GetAbsOrigin(), pEnt->CollisionProp()->OBBMins(), pEnt->CollisionProp()->OBBMaxs(), 0, 255, 0, 1, 0.1 );
+					NDebugOverlay::Box( pEnt->GetEngineObject()->GetAbsOrigin(), pEnt->GetEngineObject()->OBBMins(), pEnt->GetEngineObject()->OBBMaxs(), 0, 255, 0, 1, 0.1 );
 				}
 			}*/
 
@@ -1531,10 +1531,8 @@ Vector CNPC_Advisor::GetThrowFromPos( CBaseEntity *pEnt )
 {
 	Assert(pEnt);
 	Assert(pEnt->VPhysicsGetObject());
-	const CCollisionProperty *cProp = (CCollisionProperty*)pEnt->GetEngineObject()->CollisionProp();
-	Assert(cProp);
 
-	float effecRadius = cProp->BoundingRadius(); // radius of object (important for kickout)
+	float effecRadius = pEnt->GetEngineObject()->BoundingRadius(); // radius of object (important for kickout)
 	float howFarInFront = advisor_throw_stage_distance.GetFloat() + effecRadius * 1.43f;// clamp(lenToPlayer - posDist + effecRadius,effecRadius*2,90.f + effecRadius);
 	
 	Vector fwd;

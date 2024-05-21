@@ -464,16 +464,15 @@ bool CPortalSimulator::EntityIsInPortalHole( CBaseEntity *pEntity ) const
 
 	case SOLID_BBOX:
 		{
-			Vector ptEntityPosition = pEntity->GetEngineObject()->GetAbsOrigin();
-			CCollisionProperty *pCollisionProp = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
-
-			physcollision->TraceBox( ptEntityPosition, ptEntityPosition, pCollisionProp->OBBMins(), pCollisionProp->OBBMaxs(), m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace );
+			physcollision->TraceBox(pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsOrigin(), 
+				pEntity->GetEngineObject()->OBBMins(), pEntity->GetEngineObject()->OBBMaxs(), 
+				m_InternalData.Placement.pHoleShapeCollideable, vec3_origin, vec3_angle, &Trace );
 
 #ifdef DEBUG_PORTAL_COLLISION_ENVIRONMENTS
 			if( sv_debug_dumpportalhole_nextcheck.GetBool() )
 			{
-				Vector vMins = ptEntityPosition + pCollisionProp->OBBMins();
-				Vector vMaxs = ptEntityPosition + pCollisionProp->OBBMaxs();
+				Vector vMins = pEntity->GetEngineObject()->GetAbsOrigin() + pEntity->GetEngineObject()->OBBMins();
+				Vector vMaxs = pEntity->GetEngineObject()->GetAbsOrigin() + pEntity->GetEngineObject()->OBBMaxs();
 				PortalSimulatorDumps_DumpBoxToGlView( vMins, vMaxs, 1.0f, 1.0f, 1.0f, szDumpFileName );
 
 				sv_debug_dumpportalhole_nextcheck.SetValue( false );

@@ -770,9 +770,8 @@ void CProp_Portal::Activate( void )
 				CBaseEntity *pOther = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched);
 				if( CProp_Portal_Shared::IsEntityTeleportable( pOther ) )
 				{
-					CCollisionProperty *pOtherCollision = (CCollisionProperty*)pOther->GetEngineObject()->CollisionProp();
 					Vector vWorldMins, vWorldMaxs;
-					pOtherCollision->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
+					pOther->GetEngineObject()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 					Vector ptOtherCenter = (vWorldMins + vWorldMaxs) / 2.0f;
 
 					if( m_plane_Origin.normal.Dot( ptOtherCenter ) > m_plane_Origin.dist )
@@ -1455,9 +1454,8 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 
 	if( CProp_Portal_Shared::IsEntityTeleportable( pOther ) )
 	{
-		CCollisionProperty *pOtherCollision = (CCollisionProperty*)pOther->GetEngineObject()->CollisionProp();
 		Vector vWorldMins, vWorldMaxs;
-		pOtherCollision->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
+		pOther->GetEngineObject()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 		Vector ptOtherCenter = (vWorldMins + vWorldMaxs) / 2.0f;
 
 		if( m_plane_Origin.normal.Dot( ptOtherCenter ) > m_plane_Origin.dist )
@@ -1558,9 +1556,8 @@ bool CProp_Portal::SharedEnvironmentCheck( CBaseEntity *pEntity )
 	return false;
 
 	//we're in the shared configuration, and the other portal already owns the object, see if we'd be a better caretaker (distance check
-	/*CCollisionProperty *pEntityCollision = pEntity->CollisionProp();
-	Vector vWorldMins, vWorldMaxs;
-	pEntityCollision->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
+	/*Vector vWorldMins, vWorldMaxs;
+	pEntity->GetEngineObject()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 	Vector ptEntityCenter = (vWorldMins + vWorldMaxs) / 2.0f;
 
 	Vector vEntToThis = GetAbsOrigin() - ptEntityCenter;
@@ -1617,12 +1614,11 @@ void CProp_Portal::WakeNearbyEntities( void )
 
 		if ( pEntity && (pEntity != this) )
 		{
-			CCollisionProperty *pEntCollision = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
-			Vector ptEntityCenter = pEntCollision->GetCollisionOrigin();
 
 			//double check intersection at the OBB vs OBB level, we don't want to affect large piles of physics objects if we don't have to. It gets slow
 			if( IsOBBIntersectingOBB( ptOrigin, qAngles, CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs, 
-				ptEntityCenter, pEntCollision->GetCollisionAngles(), pEntCollision->OBBMins(), pEntCollision->OBBMaxs() ) )
+				pEntity->GetEngineObject()->GetCollisionOrigin(), pEntity->GetEngineObject()->GetCollisionAngles(), 
+				pEntity->GetEngineObject()->OBBMins(), pEntity->GetEngineObject()->OBBMaxs() ) )
 			{
 				if( FClassnameIs( pEntity, "func_portal_detector" ) )
 				{
@@ -1685,9 +1681,8 @@ void CProp_Portal::WakeNearbyEntities( void )
 
 void CProp_Portal::ForceEntityToFitInPortalWall( CBaseEntity *pEntity )
 {
-	CCollisionProperty *pCollision = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
 	Vector vWorldMins, vWorldMaxs;
-	pCollision->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
+	pEntity->GetEngineObject()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 	Vector ptCenter = pEntity->WorldSpaceCenter(); //(vWorldMins + vWorldMaxs) / 2.0f;
 	Vector ptOrigin = pEntity->GetEngineObject()->GetAbsOrigin();
 	Vector vEntityCenterToOrigin = ptOrigin - ptCenter;

@@ -447,7 +447,7 @@ bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue
 	//{
 	//	Vector mins;
 	//	UTIL_StringToVector(mins.Base(), szValue);
-	//	CollisionProp()->SetCollisionBounds(mins, CollisionProp()->OBBMaxs());
+	//	m_Collision.SetCollisionBounds(mins, OBBMaxs());
 	//	return true;
 	//}
 
@@ -455,7 +455,7 @@ bool C_EngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue
 	//{
 	//	Vector maxs;
 	//	UTIL_StringToVector(maxs.Base(), szValue);
-	//	CollisionProp()->SetCollisionBounds(CollisionProp()->OBBMins(), maxs);
+	//	m_Collision.SetCollisionBounds(OBBMins(), maxs);
 	//	return true;
 	//}
 

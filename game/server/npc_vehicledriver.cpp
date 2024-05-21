@@ -955,8 +955,8 @@ void CNPC_VehicleDriver::CheckForTeleport( void )
 
 		// Teleport the vehicle to the pathcorner
 		Vector vecMins, vecMaxs;
-		vecMins = m_hVehicleEntity->GetEngineObject()->CollisionProp()->OBBMins();
-		vecMaxs = m_hVehicleEntity->GetEngineObject()->CollisionProp()->OBBMaxs();
+		vecMins = m_hVehicleEntity->GetEngineObject()->OBBMins();
+		vecMaxs = m_hVehicleEntity->GetEngineObject()->OBBMaxs();
 		Vector vecTarget = pTrack->GetEngineObject()->GetAbsOrigin() - (vecMins + vecMaxs) * 0.5;
 		vecTarget.z += ((vecMaxs.z - vecMins.z) * 0.5) + 8;	// Safety buffer
 

@@ -2150,7 +2150,7 @@ inline const CEntityNetworkProperty *CBaseEntity::NetworkProp() const
 //-----------------------------------------------------------------------------
 inline ICollideable *CBaseEntity::GetCollideable()
 {
-	return GetEngineObject()->CollisionProp();
+	return GetEngineObject()->GetCollideable();
 }
 
 inline IServerNetworkable *CBaseEntity::GetNetworkable()
@@ -2169,34 +2169,34 @@ inline CBaseEntity *CBaseEntity::GetBaseEntity()
 inline const Vector& CBaseEntity::WorldAlignMins( ) const
 {
 	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
-	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return GetEngineObject()->CollisionProp()->OBBMins();
+	Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
+	return GetEngineObject()->OBBMins();
 }
 
 inline const Vector& CBaseEntity::WorldAlignMaxs( ) const
 {
 	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
-	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return GetEngineObject()->CollisionProp()->OBBMaxs();
+	Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
+	return GetEngineObject()->OBBMaxs();
 }
 
 inline const Vector& CBaseEntity::WorldAlignSize( ) const
 {
 	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
-	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->OBBSize();
+	Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
+	return GetEngineObject()->OBBSize();
 }
 
 // Returns a radius of a sphere *centered at the world space center*
 // bounding the collision representation of the entity
 inline float CBaseEntity::BoundingRadius() const
 {
-	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->BoundingRadius();
+	return GetEngineObject()->BoundingRadius();
 }
 
 inline bool CBaseEntity::IsPointSized() const
 {
-	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->BoundingRadius() == 0.0f;
+	return GetEngineObject()->BoundingRadius() == 0.0f;
 }
 
 inline void CBaseEntity::SetRenderMode( RenderMode_t nRenderMode )

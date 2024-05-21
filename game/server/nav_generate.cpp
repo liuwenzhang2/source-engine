@@ -152,7 +152,7 @@ void CNavMesh::BuildLadders( void )
 	while( (ladder = dynamic_cast< CFuncSimpleLadder * >(gEntList.FindEntityByClassname( ladder, "func_simpleladder" ))) != NULL )
 	{
 		Vector mins, maxs;
-		ladder->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
+		ladder->GetEngineObject()->WorldSpaceSurroundingBounds( &mins, &maxs );
 		CreateLadder( mins, maxs, 0.0f );
 	}
 #endif

@@ -62,7 +62,7 @@ void CAI_DynamicLinkController::GenerateLinksFromVolume()
 
 	const Vector &origin = WorldSpaceCenter();
 	Vector vAbsMins, vAbsMaxs;
-	((CCollisionProperty*)GetEngineObject()->CollisionProp())->WorldSpaceAABB( &vAbsMins, &vAbsMaxs );
+	GetEngineObject()->WorldSpaceAABB( &vAbsMins, &vAbsMaxs );
 	vAbsMins -= Vector( 1, 1, 1 );
 	vAbsMaxs += Vector( 1, 1, 1 );
 

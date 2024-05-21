@@ -266,8 +266,9 @@ public:
 	virtual int GetModelIndex(void) const = 0;
 	virtual void SetModelIndex(int index) = 0;
 
-	virtual ICollideable* CollisionProp() = 0;
-	virtual const ICollideable* CollisionProp() const = 0;
+	//virtual ICollideable* CollisionProp() = 0;
+	//virtual const ICollideable* CollisionProp() const = 0;
+	virtual ICollideable* GetCollideable() = 0;
 	virtual void SetCollisionBounds(const Vector& mins, const Vector& maxs) = 0;
 	virtual SolidType_t GetSolid() const = 0;
 	virtual bool IsSolid() const = 0;
@@ -278,16 +279,25 @@ public:
 	virtual bool IsSolidFlagSet(int flagMask) const = 0;
 	virtual void SetSolidFlags(int flags) = 0;
 	virtual int GetSolidFlags(void) const = 0;
+	virtual const Vector& GetCollisionOrigin() const = 0;
+	virtual const QAngle& GetCollisionAngles() const = 0;
+	virtual const Vector& OBBMinsPreScaled() const = 0;
+	virtual const Vector& OBBMaxsPreScaled() const = 0;
+	virtual const Vector& OBBMins() const = 0;
+	virtual const Vector& OBBMaxs() const = 0;
 	virtual const Vector& OBBSize() const = 0;
 	virtual const Vector& OBBCenter() const = 0;
 	virtual const Vector& WorldSpaceCenter() const = 0;
 	virtual void WorldSpaceAABB(Vector* pWorldMins, Vector* pWorldMaxs) const = 0;
+	virtual void WorldSpaceSurroundingBounds(Vector* pVecMins, Vector* pVecMaxs) = 0;
+	virtual void WorldSpaceTriggerBounds(Vector* pVecWorldMins, Vector* pVecWorldMaxs) const = 0;
 	virtual const Vector& NormalizedToWorldSpace(const Vector& in, Vector* pResult) const = 0;
 	virtual const Vector& WorldToNormalizedSpace(const Vector& in, Vector* pResult) const = 0;
 	virtual const Vector& WorldToCollisionSpace(const Vector& in, Vector* pResult) const = 0;
 	virtual const Vector& CollisionToWorldSpace(const Vector& in, Vector* pResult) const = 0;
 	virtual const Vector& WorldDirectionToCollisionSpace(const Vector& in, Vector* pResult) const = 0;
 	virtual const Vector& NormalizedToCollisionSpace(const Vector& in, Vector* pResult) const = 0;
+	virtual const matrix3x4_t& CollisionToWorldTransform() const = 0;
 	virtual float BoundingRadius() const = 0;
 	virtual float BoundingRadius2D() const = 0;
 	virtual void RandomPointInBounds(const Vector& vecNormalizedMins, const Vector& vecNormalizedMaxs, Vector* pPoint) const = 0;
@@ -299,6 +309,8 @@ public:
 	virtual void MarkSurroundingBoundsDirty() = 0;
 	virtual void CalcNearestPoint(const Vector& vecWorldPt, Vector* pVecNearestWorldPt) const = 0;
 	virtual void SetSurroundingBoundsType(SurroundingBoundsType_t type, const Vector* pMins = NULL, const Vector* pMaxs = NULL) = 0;
+	virtual void CreatePartitionHandle() = 0;
+	virtual void DestroyPartitionHandle() = 0;
 	virtual unsigned short	GetPartitionHandle() const = 0;
 	virtual float CalcDistanceFromPoint(const Vector& vecWorldPt) const = 0;
 	virtual bool DoesVPhysicsInvalidateSurroundingBox() const = 0;
@@ -331,6 +343,8 @@ public:
 	}
 	virtual ClientClass* GetClientClass() = 0;
 	virtual void* GetDataTableBasePtr() { return this; }
+	// This just picks one of the routes to IClientUnknown.
+	virtual IClientUnknown* GetIClientUnknown() { return this; }
 };
 
 

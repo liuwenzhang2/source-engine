@@ -335,9 +335,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 		if( modelinfo->GetModelType( pClonedEntity->GetModel() ) == mod_studio )
 			SetModel( STRING( pClonedEntity->GetEngineObject()->GetModelName() ) );
 
-
-		CCollisionProperty *pClonedCollisionProp = (CCollisionProperty*)pClonedEntity->GetEngineObject()->CollisionProp();
-		SetSize( pClonedCollisionProp->OBBMins(), pClonedCollisionProp->OBBMaxs() );
+		SetSize(pClonedEntity->GetEngineObject()->OBBMins(), pClonedEntity->GetEngineObject()->OBBMaxs() );
 	}
 
 	FullSyncClonedPhysicsObjects( bBigChanges );

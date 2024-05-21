@@ -298,7 +298,7 @@ void CBaseProp::CalculateBlockLOS( void )
 	//		- Our other 2 dimensions are >30
 	// By default, entities block LOS, so we only need to detect non-blockage
 	bool bFoundLarge = false;
-	Vector vecSize = GetEngineObject()->CollisionProp()->OBBMaxs() - GetEngineObject()->CollisionProp()->OBBMins();
+	Vector vecSize = GetEngineObject()->OBBMaxs() - GetEngineObject()->OBBMins();
 	for ( int i = 0; i < 3; i++ )
 	{
 		if ( vecSize[i] > 40 )
@@ -5003,7 +5003,7 @@ void CPropDoorRotating::OnDoorOpened( void )
 
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMins(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMaxs(), 0, 255, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->OBBMins(), m_hDoorBlocker->GetEngineObject()->OBBMaxs(), 0, 255, 0, true, 1.0f );
 		}
 	}
 }
@@ -5020,7 +5020,7 @@ void CPropDoorRotating::OnDoorClosed( void )
 		
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMins(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMaxs(), 0, 255, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->OBBMins(), m_hDoorBlocker->GetEngineObject()->OBBMaxs(), 0, 255, 0, true, 1.0f );
 		}
 	}
 }
@@ -5147,7 +5147,7 @@ bool CPropDoorRotating::CheckDoorClear( doorCheck_e state )
 
 			if ( tr.m_pEnt )
 			{
-				NDebugOverlay::Box(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin(), ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->CollisionProp()->OBBMins(), ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->CollisionProp()->OBBMaxs(), 220, 220, 0, true, 10.0f );
+				NDebugOverlay::Box(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin(), ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->OBBMins(), ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->OBBMaxs(), 220, 220, 0, true, 10.0f );
 			}
 		}
 
@@ -5353,7 +5353,7 @@ void CPropDoorRotating::BeginOpening(CBaseEntity *pOpenAwayFrom)
 
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMins(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMaxs(), 255, 0, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->OBBMins(), m_hDoorBlocker->GetEngineObject()->OBBMaxs(), 255, 0, 0, true, 1.0f );
 		}
 	}
 
@@ -5376,7 +5376,7 @@ void CPropDoorRotating::BeginClosing( void )
 		
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMins(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMaxs(), 255, 0, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->OBBMins(), m_hDoorBlocker->GetEngineObject()->OBBMaxs(), 255, 0, 0, true, 1.0f );
 		}
 	}
 
@@ -5804,8 +5804,8 @@ void CPhysicsPropRespawnable::Spawn( void )
 	m_vOriginalSpawnOrigin = GetEngineObject()->GetAbsOrigin();
 	m_vOriginalSpawnAngles = GetEngineObject()->GetAbsAngles();
 
-	m_vOriginalMins = GetEngineObject()->CollisionProp()->OBBMins();
-	m_vOriginalMaxs = GetEngineObject()->CollisionProp()->OBBMaxs();
+	m_vOriginalMins = GetEngineObject()->OBBMins();
+	m_vOriginalMaxs = GetEngineObject()->OBBMaxs();
 
 	if ( m_flRespawnTime == 0.0f )
 	{

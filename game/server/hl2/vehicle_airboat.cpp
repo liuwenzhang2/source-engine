@@ -1127,8 +1127,8 @@ void CPropAirboat::Think(void)
 
 	// Look for water along that volume.
 	// Make a very vertically thin box and sweep it along the ray.
-	Vector vecMins = GetEngineObject()->CollisionProp()->OBBMins();
-	Vector vecMaxs = GetEngineObject()->CollisionProp()->OBBMaxs();
+	Vector vecMins = GetEngineObject()->OBBMins();
+	Vector vecMaxs = GetEngineObject()->OBBMaxs();
 	vecMins.z = -0.1f;
 	vecMaxs.z = 0.1f;
 

@@ -2734,7 +2734,7 @@ void CommandNavShowLadderBounds( void )
 	while( (ladder = dynamic_cast< CFuncSimpleLadder * >(gEntList.FindEntityByClassname( ladder, "func_simpleladder" ))) != NULL )
 	{
 		Vector mins, maxs;
-		ladder->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
+		ladder->GetEngineObject()->WorldSpaceSurroundingBounds( &mins, &maxs );
 		ladder->m_debugOverlays |= OVERLAY_TEXT_BIT | OVERLAY_ABSBOX_BIT;
 		NDebugOverlay::Box( vec3_origin, mins, maxs, 0, 255, 0, 0, 600 );
 	}

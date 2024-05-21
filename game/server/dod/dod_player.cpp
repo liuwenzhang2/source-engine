@@ -566,7 +566,7 @@ void CDODPlayer::Spawn()
 		Hints()->HintMessage( HINT_BOMB_PLANT_MAP );
 	}
 
-	//CollisionProp()->SetSurroundingBoundsType( USE_GAME_CODE );
+	//GetEngineObject()->SetSurroundingBoundsType( USE_GAME_CODE );
 
 	// Reset per-life achievement counts
 	HandleHeadshotAchievement( 0 );
@@ -1664,7 +1664,7 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 			Vector mins, maxs;
 
 			// not exactly correct bounds, we haven't rotated them to match the attachment
-			pWeapon->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
+			pWeapon->GetEngineObject()->WorldSpaceSurroundingBounds( &mins, &maxs );
 
 			UTIL_TraceHull( WorldSpaceCenter(), origin, mins, maxs, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 			
@@ -4102,7 +4102,7 @@ CBaseEntity *CDODPlayer::FindUseEntity()
 	{
 		Vector delta = tr.endpos - tr.startpos;
 		float centerZ = GetEngineObject()->WorldSpaceCenter().z;
-		delta.z = IntervalDistance( tr.endpos.z, centerZ + GetEngineObject()->CollisionProp()->OBBMins().z, centerZ + GetEngineObject()->CollisionProp()->OBBMaxs().z );
+		delta.z = IntervalDistance( tr.endpos.z, centerZ + GetEngineObject()->OBBMins().z, centerZ + GetEngineObject()->OBBMaxs().z );
 		float dist = delta.Length();
 		if ( dist < PLAYER_USE_RADIUS )
 		{

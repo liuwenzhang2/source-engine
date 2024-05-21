@@ -1484,7 +1484,7 @@ bool CBaseCombatCharacter::BecomeRagdollBoogie( CBaseEntity *pKiller, const Vect
 
 	CBaseEntity *pRagdoll = CreateServerRagdoll( this, 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
 
-	pRagdoll->GetEngineObject()->SetCollisionBounds(GetEngineObject()->CollisionProp()->OBBMins(), GetEngineObject()->CollisionProp()->OBBMaxs() );
+	pRagdoll->GetEngineObject()->SetCollisionBounds(GetEngineObject()->OBBMins(), GetEngineObject()->OBBMaxs() );
 
 	CRagdollBoogie::Create( pRagdoll, 200, gpGlobals->curtime, duration, flags );
 

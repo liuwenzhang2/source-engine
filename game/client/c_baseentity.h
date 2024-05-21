@@ -252,8 +252,7 @@ public:
 	void							operator delete( void *pMem );
 	void							operator delete( void *pMem, int nBlockUse, const char *pFileName, int nLine ) { operator delete( pMem ); }
 
-	// This just picks one of the routes to IClientUnknown.
-	IClientUnknown*					GetIClientUnknown()	{ return this; }
+
 	virtual C_BaseAnimating*		GetBaseAnimating() { return NULL; }
 
 // IClientUnknown overrides.
@@ -278,7 +277,7 @@ public:
 	bool					ShouldRecordInTools() const;
 
 	virtual void					Release();
-	virtual ICollideable*			GetCollideable()		{ return GetEngineObject()->CollisionProp(); }
+	virtual ICollideable*			GetCollideable()		{ return GetEngineObject()->GetCollideable(); }
 	virtual IClientNetworkable*		GetClientNetworkable()	{ return this; }
 	virtual IClientRenderable*		GetClientRenderable()	{ return this; }
 	virtual IClientEntity*			GetIClientEntity()		{ return this; }
@@ -1580,32 +1579,32 @@ inline const char *C_BaseEntity::GetDLLType( void )
 inline const Vector& C_BaseEntity::WorldAlignMins( ) const
 {
 	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
-	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return GetEngineObject()->CollisionProp()->OBBMins();
+	Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
+	return GetEngineObject()->OBBMins();
 }
 
 inline const Vector& C_BaseEntity::WorldAlignMaxs( ) const
 {
 	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
-	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return GetEngineObject()->CollisionProp()->OBBMaxs();
+	Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
+	return GetEngineObject()->OBBMaxs();
 }
 
 inline const Vector& C_BaseEntity::WorldAlignSize( ) const
 {
 	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
-	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->OBBSize();
+	Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
+	return GetEngineObject()->OBBSize();
 }
 
 inline float C_BaseEntity::BoundingRadius() const
 {
-	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->BoundingRadius();
+	return GetEngineObject()->BoundingRadius();
 }
 
 inline bool C_BaseEntity::IsPointSized() const
 {
-	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->BoundingRadius() == 0.0f;
+	return GetEngineObject()->BoundingRadius() == 0.0f;
 }
 
 inline const QAngle& C_BaseEntity::GetLocalAngularVelocity( ) const

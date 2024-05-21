@@ -389,18 +389,17 @@ void CPlatTrigger::SpawnInsideTrigger( CFuncPlat *pPlatform )
 	GetEngineObject()->SetLocalOrigin( pPlatform->GetEngineObject()->GetLocalOrigin() );
 
 	// Establish the trigger field's size
-	CCollisionProperty *pCollision = (CCollisionProperty*)m_pPlatform->GetEngineObject()->CollisionProp();
-	Vector vecTMin = pCollision->OBBMins() + Vector ( 25 , 25 , 0 );
-	Vector vecTMax = pCollision->OBBMaxs() + Vector ( 25 , 25 , 8 );
+	Vector vecTMin = m_pPlatform->GetEngineObject()->OBBMins() + Vector ( 25 , 25 , 0 );
+	Vector vecTMax = m_pPlatform->GetEngineObject()->OBBMaxs() + Vector ( 25 , 25 , 8 );
 	vecTMin.z = vecTMax.z - ( m_pPlatform->m_vecPosition1.z - m_pPlatform->m_vecPosition2.z + 8 );
-	if ( pCollision->OBBSize().x <= 50 )
+	if (m_pPlatform->GetEngineObject()->OBBSize().x <= 50 )
 	{
-		vecTMin.x = (pCollision->OBBMins().x + pCollision->OBBMaxs().x) / 2;
+		vecTMin.x = (m_pPlatform->GetEngineObject()->OBBMins().x + m_pPlatform->GetEngineObject()->OBBMaxs().x) / 2;
 		vecTMax.x = vecTMin.x + 1;
 	}
-	if ( pCollision->OBBSize().y <= 50 )
+	if (m_pPlatform->GetEngineObject()->OBBSize().y <= 50 )
 	{
-		vecTMin.y = (pCollision->OBBMins().y + pCollision->OBBMaxs().y) / 2;
+		vecTMin.y = (m_pPlatform->GetEngineObject()->OBBMins().y + m_pPlatform->GetEngineObject()->OBBMaxs().y) / 2;
 		vecTMax.y = vecTMin.y + 1;
 	}
 	UTIL_SetSize ( this, vecTMin, vecTMax );
@@ -2703,8 +2702,8 @@ void CFuncTrackTrain::Spawn( void )
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
-	m_controlMins = GetEngineObject()->CollisionProp()->OBBMins();
-	m_controlMaxs = GetEngineObject()->CollisionProp()->OBBMaxs();
+	m_controlMins = GetEngineObject()->OBBMins();
+	m_controlMaxs = GetEngineObject()->OBBMaxs();
 	m_controlMaxs.z += 72;
 // start trains on the next frame, to make sure their targets have had
 // a chance to spawn/activate

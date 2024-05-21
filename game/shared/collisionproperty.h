@@ -74,7 +74,7 @@ public:
 	virtual const matrix3x4_t&	CollisionToWorldTransform() const;
 	virtual SolidType_t		GetSolid() const;
 	virtual int				GetSolidFlags() const;
-	virtual IClientUnknown*	GetIClientUnknown();
+	//virtual IClientUnknown*	GetIClientUnknown();
 	virtual int				GetCollisionGroup() const;
 	virtual void			WorldSpaceSurroundingBounds( Vector *pVecMins, Vector *pVecMaxs );
 	virtual bool			ShouldTouchTrigger( int triggerSolidFlags ) const;

@@ -65,7 +65,7 @@ public:
 	virtual int				GetSolidFlags() const = 0;
 
 	// Gets at the containing class...
-	virtual IClientUnknown*	GetIClientUnknown() = 0;
+	//virtual IClientUnknown*	GetIClientUnknown() = 0;
 	
 	// We can filter out collisions based on collision group
 	virtual int				GetCollisionGroup() const = 0;

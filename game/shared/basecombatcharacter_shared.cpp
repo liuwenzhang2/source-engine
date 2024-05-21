@@ -716,7 +716,7 @@ surfacedata_t * CBaseCombatCharacter::GetGroundSurface( void ) const
 	Vector end( 0, 0, -64 );
 
 	Vector vecMins, vecMaxs;
-	CollisionProp()->WorldSpaceAABB( &vecMins, &vecMaxs );
+	GetEngineObject()->WorldSpaceAABB( &vecMins, &vecMaxs );
 
 	Ray_t ray;
 	ray.Init( start, end, vecMins, vecMaxs );

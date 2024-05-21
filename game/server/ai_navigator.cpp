@@ -3462,10 +3462,9 @@ bool CAI_Navigator::MarkCurWaypointFailedLink( void )
 			// Make sure it's a "large" object
 			//		- One dimension is >40
 			//		- Other 2 dimensions are >30
-			CCollisionProperty *pCollisionProp = (CCollisionProperty*)m_hLastBlockingEnt->GetEngineObject()->CollisionProp();
 			bool bFoundLarge = false;
 			bool bFoundSmall = false;
-			Vector vecSize = pCollisionProp->OBBMaxs() - pCollisionProp->OBBMins();
+			Vector vecSize = m_hLastBlockingEnt->GetEngineObject()->OBBMaxs() - m_hLastBlockingEnt->GetEngineObject()->OBBMins();
 			for ( int i = 0; i < 3; i++ )
 			{
 				if ( vecSize[i] > 40 )

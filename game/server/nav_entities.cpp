@@ -297,7 +297,7 @@ void CFuncNavCost::UpdateAllNavCostDecoration( void )
 
 		Ray_t ray;
 		trace_t tr;
-		ICollideable *pCollide = cost->GetEngineObject()->CollisionProp();
+		ICollideable *pCollide = cost->GetEngineObject()->GetCollideable();
 
 		for( j=0; j<overlapVector.Count(); ++j )
 		{

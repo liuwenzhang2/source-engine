@@ -1703,9 +1703,9 @@ void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
 		}
 
 		Vector mins, maxs;
-		mins = CollisionProp()->OBBMins();
-		maxs = CollisionProp()->OBBMaxs();
-		pRagdoll->CollisionProp()->SetCollisionBounds( mins, maxs );
+		mins = GetEngineObject()->OBBMins();
+		maxs = GetEngineObject()->OBBMaxs();
+		pRagdoll->GetEngineObject()->SetCollisionBounds( mins, maxs );
 		pRagdoll->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
 	}
 

@@ -2493,7 +2493,7 @@ float CNPC_Strider::StriderEnemyDistance( CBaseEntity *pEnemy )
 
 	float enemyHeight = pEnemy->GetEngineObject()->OBBSize().z;
 	Vector striderSurroundMins, striderSurroundMaxs;
-	GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &striderSurroundMins, &striderSurroundMaxs );
+	GetEngineObject()->WorldSpaceSurroundingBounds( &striderSurroundMins, &striderSurroundMaxs );
 	float myHeight = striderSurroundMaxs.z - striderSurroundMins.z;
 	
 	// max distance our centers can be apart with the boxes still overlapping

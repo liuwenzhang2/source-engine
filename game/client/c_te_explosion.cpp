@@ -55,7 +55,7 @@ CRagdollExplosionEnumerator::~CRagdollExplosionEnumerator()
 		C_BaseEntity *pEnt = m_Entities[i];
 		C_BaseAnimating *pModel = static_cast< C_BaseAnimating * >( pEnt );
 
-		Vector	position = pEnt->GetEngineObject()->CollisionProp()->GetCollisionOrigin();
+		Vector	position = pEnt->GetEngineObject()->GetCollisionOrigin();
 
 		Vector	dir		= position - m_vecOrigin;
 		float	dist	= VectorNormalize( dir );

@@ -67,11 +67,11 @@ void C_Func_LiquidPortal::ComputeLinkMatrix( void )
 		VMatrix matLocalToWorld, matLocalToWorldInv, matRemoteToWorld;
 
 		//matLocalToWorld.Identity();
-		//matLocalToWorld.SetTranslation( CollisionProp()->WorldSpaceCenter() );
+		//matLocalToWorld.SetTranslation( GetEngineObject()->WorldSpaceCenter() );
 		matLocalToWorld = GetEngineObject()->EntityToWorldTransform();
 
 		//matRemoteToWorld.Identity();
-		//matRemoteToWorld.SetTranslation( pLinkedPortal->CollisionProp()->WorldSpaceCenter() );
+		//matRemoteToWorld.SetTranslation( pLinkedPortal->GetEngineObject()->WorldSpaceCenter() );
 		matRemoteToWorld = pLinkedPortal->GetEngineObject()->EntityToWorldTransform();
 
 		MatrixInverseTR( matLocalToWorld, matLocalToWorldInv );

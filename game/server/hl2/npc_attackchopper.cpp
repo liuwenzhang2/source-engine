@@ -5878,8 +5878,8 @@ void CAvoidBox::ComputeAvoidanceForces( CBaseEntity *pEntity, float flEntityRadi
 
 		Vector vecBoxMin( -flEntityRadius, -flEntityRadius, -flEntityRadius );
 		Vector vecBoxMax( flEntityRadius, flEntityRadius, flEntityRadius );
-		vecBoxMin += pBox->GetEngineObject()->CollisionProp()->OBBMins();
-		vecBoxMax += pBox->GetEngineObject()->CollisionProp()->OBBMaxs();
+		vecBoxMin += pBox->GetEngineObject()->OBBMins();
+		vecBoxMax += pBox->GetEngineObject()->OBBMaxs();
 
 		trace_t tr;
 		if ( !IntersectRayWithBox( vecLocalCenter, vecLocalDelta, vecBoxMin, vecBoxMax, 0.0f, &tr ) )

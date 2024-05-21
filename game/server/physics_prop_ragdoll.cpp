@@ -1047,7 +1047,7 @@ void CRagdollProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 	GetEngineObject()->SetAbsOrigin( m_ragPos[0] );
 	GetEngineObject()->SetAbsAngles( vec3_angle );
-	const Vector &vecOrigin = GetEngineObject()->CollisionProp()->GetCollisionOrigin();
+	const Vector &vecOrigin = GetEngineObject()->GetCollisionOrigin();
 	GetEngineObject()->AddSolidFlags( FSOLID_FORCE_WORLD_ALIGNED );
 	GetEngineObject()->SetSurroundingBoundsType( USE_COLLISION_BOUNDS_NEVER_VPHYSICS );
 	GetEngineObject()->SetCollisionBounds( vecFullMins - vecOrigin, vecFullMaxs - vecOrigin );
@@ -1437,8 +1437,8 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	//  a zero sized hull makes the ragdoll think it should be faded/alpha'd to zero for a frame, so you get a blink where
 	//  the ragdoll doesn't draw initially.
 	Vector mins, maxs;
-	mins = pAnimating->GetEngineObject()->CollisionProp()->OBBMins();
-	maxs = pAnimating->GetEngineObject()->CollisionProp()->OBBMaxs();
+	mins = pAnimating->GetEngineObject()->OBBMins();
+	maxs = pAnimating->GetEngineObject()->OBBMaxs();
 	pRagdoll->GetEngineObject()->SetCollisionBounds( mins, maxs );
 
 	return pRagdoll;

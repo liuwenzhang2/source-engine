@@ -237,8 +237,8 @@ public:
 		// that the abs origin is at the center of the rollermine
 		// and that the OBB is actually world-aligned despite the
 		// fact that SOLID_VPHYSICS is being used
-		Vector eye = GetEngineObject()->CollisionProp()->GetCollisionOrigin();
-		eye.z += GetEngineObject()->CollisionProp()->OBBMaxs().z;
+		Vector eye = GetEngineObject()->GetCollisionOrigin();
+		eye.z += GetEngineObject()->OBBMaxs().z;
 		return eye;
 	}
 

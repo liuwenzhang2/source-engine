@@ -113,7 +113,7 @@ bool C_FuncTrackTrain::GetSoundSpatialization( SpatializationInfo_t& info )
 
 	if ( info.pAngles )
 	{
-		VectorCopy(GetEngineObject()->CollisionProp()->GetCollisionAngles(), *info.pAngles );
+		VectorCopy(GetEngineObject()->GetCollisionAngles(), *info.pAngles );
 	}
 
 	return true;

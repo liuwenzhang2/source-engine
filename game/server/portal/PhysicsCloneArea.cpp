@@ -197,14 +197,12 @@ void CPhysicsCloneArea::CloneNearbyEntities( void )
 
 			if( pPhysicsObject )
 			{
-				CCollisionProperty *pEntCollision = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
-				Vector ptEntityCenter = pEntCollision->GetCollisionOrigin();
-
 				//double check intersection at the OBB vs OBB level, we don't want to affect large piles of physics objects if we don't have to, it gets slow
 				if( IsOBBIntersectingOBB( ptOrigin, qAngles, vLocalMins, vLocalMaxs, 
-					ptEntityCenter, pEntCollision->GetCollisionAngles(), pEntCollision->OBBMins(), pEntCollision->OBBMaxs() ) )
+					pEntity->GetEngineObject()->GetCollisionOrigin(), pEntity->GetEngineObject()->GetCollisionAngles(), 
+					pEntity->GetEngineObject()->OBBMins(), pEntity->GetEngineObject()->OBBMaxs() ) )
 				{
-					tr.endpos = (ptOrigin + ptEntityCenter) * 0.5;
+					tr.endpos = (ptOrigin + pEntity->GetEngineObject()->GetCollisionOrigin()) * 0.5;
 					GetEngineObject()->PhysicsMarkEntitiesAsTouching( pEntity->GetEngineObject(), tr );
 					//StartTouch( pEntity );
 					

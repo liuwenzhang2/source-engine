@@ -2270,7 +2270,7 @@ CBaseEntity *UTIL_EntitiesInPVS( CBaseEntity *pPVSEntity, CBaseEntity *pStarting
 		CBaseEntity *pParent = pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
 
 		Vector vecSurroundMins, vecSurroundMaxs;
-		pParent->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+		pParent->GetEngineObject()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 		if ( !engine->CheckBoxInPVS( vecSurroundMins, vecSurroundMaxs, pvs, sizeof( pvs ) ) )
 			continue;
 

@@ -227,7 +227,7 @@ CEntityDissolve *CEntityDissolve::Create( CBaseEntity *pTarget, const char *pMat
 		{
 			CTakeDamageInfo info;
 			CBaseEntity *pRagdoll = CreateServerRagdoll( pTarget->MyNPCPointer(), 0, info, COLLISION_GROUP_DEBRIS, true );
-			pRagdoll->GetEngineObject()->SetCollisionBounds( pTarget->GetEngineObject()->CollisionProp()->OBBMins(), pTarget->GetEngineObject()->CollisionProp()->OBBMaxs() );
+			pRagdoll->GetEngineObject()->SetCollisionBounds( pTarget->GetEngineObject()->OBBMins(), pTarget->GetEngineObject()->OBBMaxs() );
 
 			// Necessary to cause it to do the appropriate death cleanup
 			if ( pTarget->m_lifeState == LIFE_ALIVE )

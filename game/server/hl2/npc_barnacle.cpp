@@ -583,7 +583,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 		// NOTE: Use the surrounding bounds so that we'll think often event if the tongue
 		// tip is in the PVS but the body isn't
 		Vector vecSurroundMins, vecSurroundMaxs;
-		GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+		GetEngineObject()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 		if ( !UTIL_FindClientInPVS( vecSurroundMins, vecSurroundMaxs ) )
 		{
 			SetNextThink( gpGlobals->curtime + random->RandomFloat(1,1.5) );	// Stagger a bit to keep barnacles from thinking on the same frame

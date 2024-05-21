@@ -1613,7 +1613,7 @@ void CPropJeepEpisodic::InputOutsideTransition( inputdata_t &inputdata )
 
 	// Get our bounds
 	Vector vecSurroundMins, vecSurroundMaxs;
-	GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+	GetEngineObject()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 	vecSurroundMins -= WorldSpaceCenter();
 	vecSurroundMaxs -= WorldSpaceCenter();
 

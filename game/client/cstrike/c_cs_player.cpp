@@ -961,8 +961,8 @@ void C_CSPlayer::GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType_t
 	{
 		// Don't let the render bounds change when we're using blobby shadows, or else the shadow
 		// will pop and stretch.
-		mins = GetEngineObject()->CollisionProp()->OBBMins();
-		maxs = GetEngineObject()->CollisionProp()->OBBMaxs();
+		mins = GetEngineObject()->OBBMins();
+		maxs = GetEngineObject()->OBBMaxs();
 	}
 	else
 	{

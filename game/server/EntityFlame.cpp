@@ -129,8 +129,8 @@ CEntityFlame *CEntityFlame::Create( CBaseEntity *pTarget, bool useHitboxes )
 	if ( pFlame == NULL )
 		return NULL;
 
-	float xSize = pTarget->GetEngineObject()->CollisionProp()->OBBMaxs().x - pTarget->GetEngineObject()->CollisionProp()->OBBMins().x;
-	float ySize = pTarget->GetEngineObject()->CollisionProp()->OBBMaxs().y - pTarget->GetEngineObject()->CollisionProp()->OBBMins().y;
+	float xSize = pTarget->GetEngineObject()->OBBMaxs().x - pTarget->GetEngineObject()->OBBMins().x;
+	float ySize = pTarget->GetEngineObject()->OBBMaxs().y - pTarget->GetEngineObject()->OBBMins().y;
 
 	float size = ( xSize + ySize ) * 0.5f;
 	

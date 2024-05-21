@@ -192,7 +192,7 @@ void CNPC_Apache::Spawn( void )
 	ExtractBbox(0, mins, maxs);
 	UTIL_SetSize(this, mins, maxs);
 
-	//CollisionProp()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &s_vecSurroundingMins, &s_vecSurroundingMaxs );
+	//GetEngineObject()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &s_vecSurroundingMins, &s_vecSurroundingMaxs );
 	//AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 
 	m_hSmoke = NULL;

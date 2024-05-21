@@ -715,7 +715,7 @@ void CBaseEntity::DrawBBoxOverlay( float flDuration )
 		if (GetEngineObject()->IsSolidFlagSet( FSOLID_USE_TRIGGER_BOUNDS ) )
 		{
 			Vector vecTriggerMins, vecTriggerMaxs;
-			GetEngineObject()->CollisionProp()->WorldSpaceTriggerBounds( &vecTriggerMins, &vecTriggerMaxs );
+			GetEngineObject()->WorldSpaceTriggerBounds( &vecTriggerMins, &vecTriggerMaxs );
 			Vector center = 0.5f * (vecTriggerMins + vecTriggerMaxs);
 			Vector extents = vecTriggerMaxs - center;
 			NDebugOverlay::Box(center, -extents, extents, 0, 255, 255, 0, flDuration );
@@ -739,7 +739,7 @@ void CBaseEntity::DrawAbsBoxOverlay()
 	{
 		// Surrounding boxes are axially aligned, so ignore angles
 		Vector vecSurroundMins, vecSurroundMaxs;
-		GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+		GetEngineObject()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 		Vector center = 0.5f * (vecSurroundMins + vecSurroundMaxs);
 		Vector extents = vecSurroundMaxs - center;
 		NDebugOverlay::Box(center, -extents, extents, red, green, 0, 0 ,0);
@@ -775,16 +775,16 @@ void CBaseEntity::EntityText( int text_offset, const char *text, float duration,
 	Vector origin;
 	Vector vecLocalCenter;
 
-	VectorAdd( GetEngineObject()->CollisionProp()->OBBMins(), GetEngineObject()->CollisionProp()->OBBMaxs(), vecLocalCenter );
+	VectorAdd( GetEngineObject()->OBBMins(), GetEngineObject()->OBBMaxs(), vecLocalCenter );
 	vecLocalCenter *= 0.5f;
 
-	if ( (GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle ) || ( vecLocalCenter == vec3_origin ) )
+	if ( (GetEngineObject()->GetCollisionAngles() == vec3_angle ) || ( vecLocalCenter == vec3_origin ) )
 	{
-		VectorAdd( vecLocalCenter, GetEngineObject()->CollisionProp()->GetCollisionOrigin(), origin );
+		VectorAdd( vecLocalCenter, GetEngineObject()->GetCollisionOrigin(), origin );
 	}
 	else
 	{
-		VectorTransform( vecLocalCenter, GetEngineObject()->CollisionProp()->CollisionToWorldTransform(), origin );
+		VectorTransform( vecLocalCenter, GetEngineObject()->CollisionToWorldTransform(), origin );
 	}
 
 	NDebugOverlay::EntityTextAtPosition( origin, text_offset, text, duration, r, g, b, a );
@@ -2220,7 +2220,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 	{
 		CUtlVector<IEngineObjectServer *> list;
 		GetAllInHierarchy( this->GetEngineObject(), list );
-		//NDebugOverlay::BoxAngles( origin, CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), angles, 255,0,0,0, gpGlobals->frametime);
+		//NDebugOverlay::BoxAngles( origin, GetEngineObject()->OBBMins(), GetEngineObject()->OBBMaxs(), angles, 255,0,0,0, gpGlobals->frametime);
 
 		physicspushlist_t *pList = NULL;
 		if (GetEngineObject()->HasDataObjectType(PHYSICSPUSHLIST) )
@@ -2502,12 +2502,9 @@ bool CBaseEntity::Intersects( CBaseEntity *pOther )
 	if ( entindex()==-1 || pOther->entindex()==-1)
 		return false;
 
-	ICollideable *pMyProp = GetEngineObject()->CollisionProp();
-	ICollideable *pOtherProp = pOther->GetEngineObject()->CollisionProp();
-
 	return IsOBBIntersectingOBB( 
-		pMyProp->GetCollisionOrigin(), pMyProp->GetCollisionAngles(), pMyProp->OBBMins(), pMyProp->OBBMaxs(),
-		pOtherProp->GetCollisionOrigin(), pOtherProp->GetCollisionAngles(), pOtherProp->OBBMins(), pOtherProp->OBBMaxs() );
+		GetEngineObject()->GetCollisionOrigin(), GetEngineObject()->GetCollisionAngles(), GetEngineObject()->OBBMins(), GetEngineObject()->OBBMaxs(),
+		pOther->GetEngineObject()->GetCollisionOrigin(), pOther->GetEngineObject()->GetCollisionAngles(), pOther->GetEngineObject()->OBBMins(), pOther->GetEngineObject()->OBBMaxs() );
 }
 
 extern ConVar ai_LOS_mode;
@@ -2878,7 +2875,7 @@ int CBaseEntity::Save( ISave &save )
 int CBaseEntity::Restore( IRestore &restore )
 {
 	// This is essential to getting the spatial partition info correct
-	((CCollisionProperty*)GetEngineObject()->CollisionProp())->DestroyPartitionHandle();
+	GetEngineObject()->DestroyPartitionHandle();
 
 	// loops through the data description list, restoring each data desc block in order
 	int status = restore.ReadEntity(this);;
@@ -2912,7 +2909,7 @@ int CBaseEntity::Restore( IRestore &restore )
 	// Also, twiddling with the flags here ensures it gets added to the KD tree dirty list
 	// (We don't want to use the saved version of this flag)
 	GetEngineObject()->RemoveEFlags( EFL_DIRTY_SPATIAL_PARTITION );
-	((CCollisionProperty*)GetEngineObject()->CollisionProp())->MarkSurroundingBoundsDirty();
+	GetEngineObject()->MarkSurroundingBoundsDirty();
 
 	if (IsNetworkable() && entindex()!=-1 && GetEngineObject()->GetModelIndex() != 0 && GetEngineObject()->GetModelName() != NULL_STRING && restore.GetPrecacheMode())
 	{

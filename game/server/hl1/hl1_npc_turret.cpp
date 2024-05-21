@@ -802,7 +802,7 @@ void CNPC_BaseTurret::TurretDeath(void)
 		// lots of smoke
 		Vector pos;
 		GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &pos );
-		pos.z = GetEngineObject()->CollisionProp()->GetCollisionOrigin().z;
+		pos.z = GetEngineObject()->GetCollisionOrigin().z;
 		
 		CBroadcastRecipientFilter filter;
 		te->Smoke( filter, 0.0, &pos,

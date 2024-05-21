@@ -707,7 +707,7 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 	//{
 	//	Vector mins;
 	//	UTIL_StringToVector(mins.Base(), szValue);
-	//	CollisionProp()->SetCollisionBounds(mins, CollisionProp()->OBBMaxs());
+	//	m_Collision.SetCollisionBounds(mins, OBBMaxs());
 	//	return true;
 	//}
 
@@ -715,7 +715,7 @@ bool CEngineObjectInternal::KeyValue(const char* szKeyName, const char* szValue)
 	//{
 	//	Vector maxs;
 	//	UTIL_StringToVector(maxs.Base(), szValue);
-	//	CollisionProp()->SetCollisionBounds(CollisionProp()->OBBMins(), maxs);
+	//	m_Collision.SetCollisionBounds(OBBMins(), maxs);
 	//	return true;
 	//}
 
@@ -1975,7 +1975,6 @@ void CEngineObjectInternal::PhysicsTouchTriggers(const Vector* pPrevAbsOrigin)
 {
 	if (m_pOuter->IsNetworkable() && entindex() != -1 && !m_pOuter->IsWorld())
 	{
-		Assert(m_pOuter->GetEngineObject()->CollisionProp());
 		bool isTriggerCheckSolids = IsSolidFlagSet(FSOLID_TRIGGER);
 		bool isSolidCheckTriggers = IsSolid() && !isTriggerCheckSolids;		// NOTE: Moving triggers (items, ammo etc) are not 
 		// checked against other triggers to reduce the number of touchlinks created
@@ -1994,7 +1993,7 @@ void CEngineObjectInternal::PhysicsTouchTriggers(const Vector* pPrevAbsOrigin)
 		SetCheckUntouch(true);
 		if (isSolidCheckTriggers)
 		{
-			engine->SolidMoved(this->m_pOuter, CollisionProp(), pPrevAbsOrigin, CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks);
+			engine->SolidMoved(this->m_pOuter, &m_Collision, pPrevAbsOrigin, CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks);
 		}
 		if (isTriggerCheckSolids)
 		{
@@ -2597,20 +2596,20 @@ struct collidelist_t
 
 // NOTE: This routine is relatively slow.  If you need to use it for per-frame work, consider that fact.
 // UNDONE: Expand this to the full matrix of solid types on each side and move into enginetrace
-bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* pEntity)
+bool TestEntityTriggerIntersection_Accurate(IEngineObjectServer* pTrigger, IEngineObjectServer* pEntity)
 {
 	Assert(pTrigger->GetEngineObject()->GetSolid() == SOLID_BSP);
 
-	if (pTrigger->Intersects(pEntity))	// It touches one, it's in the volume
+	if (pTrigger->GetOuter()->Intersects(pEntity->GetOuter()))	// It touches one, it's in the volume
 	{
-		switch (pEntity->GetEngineObject()->GetSolid())
+		switch (pEntity->GetSolid())
 		{
 		case SOLID_BBOX:
 		{
-			ICollideable* pCollide = pTrigger->GetEngineObject()->CollisionProp();
+			ICollideable* pCollide = pTrigger->GetCollideable();
 			Ray_t ray;
 			trace_t tr;
-			ray.Init(pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->WorldAlignMins(), pEntity->WorldAlignMaxs());
+			ray.Init(pEntity->GetAbsOrigin(), pEntity->GetAbsOrigin(), pEntity->GetOuter()->WorldAlignMins(), pEntity->GetOuter()->WorldAlignMaxs());
 			enginetrace->ClipRayToCollideable(ray, MASK_ALL, pCollide, &tr);
 
 			if (tr.startsolid)
@@ -2620,12 +2619,12 @@ bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* 
 		case SOLID_BSP:
 		case SOLID_VPHYSICS:
 		{
-			CPhysCollide* pTriggerCollide = modelinfo->GetVCollide(pTrigger->GetEngineObject()->GetModelIndex())->solids[0];
+			CPhysCollide* pTriggerCollide = modelinfo->GetVCollide(pTrigger->GetModelIndex())->solids[0];
 			Assert(pTriggerCollide);
 
 			CUtlVector<collidelist_t> collideList;
 			IPhysicsObject* pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-			int physicsCount = pEntity->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
+			int physicsCount = pEntity->GetOuter()->VPhysicsGetObjectList(pList, ARRAYSIZE(pList));
 			if (physicsCount)
 			{
 				for (int i = 0; i < physicsCount; i++)
@@ -2642,13 +2641,13 @@ bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* 
 			}
 			else
 			{
-				vcollide_t* pVCollide = modelinfo->GetVCollide(pEntity->GetEngineObject()->GetModelIndex());
+				vcollide_t* pVCollide = modelinfo->GetVCollide(pEntity->GetModelIndex());
 				if (pVCollide && pVCollide->solidCount)
 				{
 					collidelist_t element;
 					element.pCollide = pVCollide->solids[0];
-					element.origin = pEntity->GetEngineObject()->GetAbsOrigin();
-					element.angles = pEntity->GetEngineObject()->GetAbsAngles();
+					element.origin = pEntity->GetAbsOrigin();
+					element.angles = pEntity->GetAbsAngles();
 					collideList.AddToTail(element);
 				}
 			}
@@ -2656,7 +2655,7 @@ bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* 
 			{
 				const collidelist_t& element = collideList[i];
 				trace_t tr;
-				physcollision->TraceCollide(element.origin, element.origin, element.pCollide, element.angles, pTriggerCollide, pTrigger->GetEngineObject()->GetAbsOrigin(), pTrigger->GetEngineObject()->GetAbsAngles(), &tr);
+				physcollision->TraceCollide(element.origin, element.origin, element.pCollide, element.angles, pTriggerCollide, pTrigger->GetAbsOrigin(), pTrigger->GetAbsAngles(), &tr);
 				if (tr.startsolid)
 					return true;
 			}
