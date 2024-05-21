@@ -22,6 +22,14 @@ public :
 	DECLARE_NETWORKCLASS();
 	DECLARE_PREDICTABLE();
 
+#ifdef GAME_DLL
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
+#endif
+#ifdef CLIENT_DLL
+	bool Init(int entnum, int iSerialNum);
+#endif // CLIENT_DLL
+
+
 public :
 	void EjectShell( CBaseEntity *pPlayer, int iType );
 

@@ -276,13 +276,13 @@ void CNPC_Gargantua::Spawn()
 	SetModel( "models/garg.mdl" );
 
 	SetNavType(NAV_GROUND);
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 
 	Vector vecSurroundingMins( -80, -80, 0 );
 	Vector vecSurroundingMaxs( 80, 80, 214 );
-	CollisionProp()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &vecSurroundingMins, &vecSurroundingMaxs );
+	GetEngineObject()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &vecSurroundingMins, &vecSurroundingMaxs );
 
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	m_iHealth			= sk_gargantua_health.GetFloat();

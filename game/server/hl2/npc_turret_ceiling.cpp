@@ -290,8 +290,8 @@ void CNPC_CeilingTurret::Spawn( void )
 	m_iHealth		= 1000;
 	m_bloodColor	= BLOOD_COLOR_MECH;
 	
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	SetHeight( CEILING_TURRET_RETRACT_HEIGHT );
 
@@ -1146,7 +1146,7 @@ void CNPC_CeilingTurret::DeathThink( void )
 
 	// lots of smoke
 	Vector pos;
-	CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &pos );
+	GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &pos );
 	
 	CBroadcastRecipientFilter filter;
 	
@@ -1190,7 +1190,7 @@ void CNPC_CeilingTurret::SetHeight( float height )
 		V_swap( mins.z, maxs.z );
 	}
 
-	SetCollisionBounds( mins, maxs );
+	GetEngineObject()->SetCollisionBounds( mins, maxs );
 }
 
 //-----------------------------------------------------------------------------

@@ -211,6 +211,7 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_GLOBAL_KEYFIELD(m_ModelName, FIELD_MODELNAME, "model"),
 	DEFINE_GLOBAL_KEYFIELD(m_nModelIndex, FIELD_SHORT, "modelindex"),
 	DEFINE_KEYFIELD(m_spawnflags, FIELD_INTEGER, "spawnflags"),
+	DEFINE_EMBEDDED(m_Collision),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -291,6 +292,7 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropInt(SENDINFO(m_iParentAttachment), NUM_PARENTATTACHMENT_BITS, SPROP_UNSIGNED),
 	SendPropEHandle(SENDINFO(m_hGroundEntity), SPROP_CHANGES_OFTEN),
 	SendPropModelIndex(SENDINFO(m_nModelIndex)),
+	SendPropDataTable(SENDINFO_DT(m_Collision), &REFERENCE_SEND_TABLE(DT_CollisionProperty)),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -1043,17 +1045,17 @@ void CEngineObjectInternal::SetParent(IEngineObjectServer* pParentEntity, int iA
 		return;
 	}
 
-	m_pOuter->RemoveSolidFlags(FSOLID_ROOT_PARENT_ALIGNED);
-	if (const_cast<IEngineObjectServer*>(pParentEntity)->GetRootMoveParent()->GetOuter()->GetSolid() == SOLID_BSP)
+	RemoveSolidFlags(FSOLID_ROOT_PARENT_ALIGNED);
+	if (const_cast<IEngineObjectServer*>(pParentEntity)->GetRootMoveParent()->GetSolid() == SOLID_BSP)
 	{
-		m_pOuter->AddSolidFlags(FSOLID_ROOT_PARENT_ALIGNED);
+		AddSolidFlags(FSOLID_ROOT_PARENT_ALIGNED);
 	}
 	else
 	{
-		if (m_pOuter->GetSolid() == SOLID_BSP)
+		if (GetSolid() == SOLID_BSP)
 		{
 			// Must be SOLID_VPHYSICS because parent might rotate
-			m_pOuter->SetSolid(SOLID_VPHYSICS);
+			SetSolid(SOLID_VPHYSICS);
 		}
 	}
 
@@ -1974,13 +1976,13 @@ void CEngineObjectInternal::PhysicsTouchTriggers(const Vector* pPrevAbsOrigin)
 	if (m_pOuter->IsNetworkable() && entindex() != -1 && !m_pOuter->IsWorld())
 	{
 		Assert(m_pOuter->CollisionProp());
-		bool isTriggerCheckSolids = m_pOuter->IsSolidFlagSet(FSOLID_TRIGGER);
-		bool isSolidCheckTriggers = m_pOuter->IsSolid() && !isTriggerCheckSolids;		// NOTE: Moving triggers (items, ammo etc) are not 
+		bool isTriggerCheckSolids = IsSolidFlagSet(FSOLID_TRIGGER);
+		bool isSolidCheckTriggers = IsSolid() && !isTriggerCheckSolids;		// NOTE: Moving triggers (items, ammo etc) are not 
 		// checked against other triggers to reduce the number of touchlinks created
 		if (!(isSolidCheckTriggers || isTriggerCheckSolids))
 			return;
 
-		if (m_pOuter->GetSolid() == SOLID_BSP)
+		if (GetSolid() == SOLID_BSP)
 		{
 			if (!m_pOuter->GetModel() && Q_strlen(STRING(m_pOuter->GetEngineObject()->GetModelName())) == 0)
 			{
@@ -1992,7 +1994,7 @@ void CEngineObjectInternal::PhysicsTouchTriggers(const Vector* pPrevAbsOrigin)
 		SetCheckUntouch(true);
 		if (isSolidCheckTriggers)
 		{
-			engine->SolidMoved(this->m_pOuter, m_pOuter->CollisionProp(), pPrevAbsOrigin, CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks);
+			engine->SolidMoved(this->m_pOuter, CollisionProp(), pPrevAbsOrigin, CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks);
 		}
 		if (isTriggerCheckSolids)
 		{
@@ -2057,9 +2059,9 @@ servertouchlink_t* CEngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObje
 		return NULL;
 
 	// Pure triggers should not touch each other
-	if (m_pOuter->IsSolidFlagSet(FSOLID_TRIGGER) && other->GetOuter()->IsSolidFlagSet(FSOLID_TRIGGER))
+	if (IsSolidFlagSet(FSOLID_TRIGGER) && other->IsSolidFlagSet(FSOLID_TRIGGER))
 	{
-		if (!m_pOuter->IsSolid() && !other->GetOuter()->IsSolid())
+		if (!IsSolid() && !other->IsSolid())
 			return NULL;
 	}
 
@@ -2126,8 +2128,8 @@ servertouchlink_t* CEngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObje
 	link->nextLink->prevLink = link;
 
 	// non-solid entities don't get touched
-	bool bShouldTouch = (m_pOuter->IsSolid() && !m_pOuter->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS)) || m_pOuter->IsSolidFlagSet(FSOLID_TRIGGER);
-	if (bShouldTouch && !other->GetOuter()->IsSolidFlagSet(FSOLID_TRIGGER))
+	bool bShouldTouch = (IsSolid() && !IsSolidFlagSet(FSOLID_VOLUME_CONTENTS)) || IsSolidFlagSet(FSOLID_TRIGGER);
+	if (bShouldTouch && !other->IsSolidFlagSet(FSOLID_TRIGGER))
 	{
 		link->flags |= FTOUCHLINK_START_TOUCH;
 		if (!CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs)
@@ -2585,6 +2587,7 @@ void CEngineObjectInternal::SetModelIndex(int index)
 }
 
 
+
 struct collidelist_t
 {
 	const CPhysCollide* pCollide;
@@ -2600,11 +2603,11 @@ bool TestEntityTriggerIntersection_Accurate(CBaseEntity* pTrigger, CBaseEntity* 
 
 	if (pTrigger->Intersects(pEntity))	// It touches one, it's in the volume
 	{
-		switch (pEntity->GetSolid())
+		switch (pEntity->GetEngineObject()->GetSolid())
 		{
 		case SOLID_BBOX:
 		{
-			ICollideable* pCollide = pTrigger->CollisionProp();
+			ICollideable* pCollide = pTrigger->GetEngineObject()->CollisionProp();
 			Ray_t ray;
 			trace_t tr;
 			ray.Init(pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->GetEngineObject()->GetAbsOrigin(), pEntity->WorldAlignMins(), pEntity->WorldAlignMaxs());

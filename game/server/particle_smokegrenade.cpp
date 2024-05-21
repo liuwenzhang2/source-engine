@@ -55,7 +55,7 @@ int ParticleSmokeGrenade::UpdateTransmitState( void )
 void ParticleSmokeGrenade::FillVolume()
 {
 	m_CurrentStage = 1;
-	CollisionProp()->SetCollisionBounds( Vector( -50, -50, -50 ), Vector( 50, 50, 50 ) );
+	GetEngineObject()->SetCollisionBounds( Vector( -50, -50, -50 ), Vector( 50, 50, 50 ) );
 }
 
 

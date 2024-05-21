@@ -166,7 +166,7 @@ void CCrossbowBolt::Spawn( void )
 	SetModel( "models/crossbow_bolt.mdl" );
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 	UTIL_SetSize( this, -Vector(0.3f,0.3f,0.3f), Vector(0.3f,0.3f,0.3f) );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetGravity( 0.05f );
 	
 	// Make sure we're updated if we're underwater
@@ -198,7 +198,7 @@ void CCrossbowBolt::Precache( void )
 //-----------------------------------------------------------------------------
 void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 {
-	if ( pOther->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS | FSOLID_TRIGGER) )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS | FSOLID_TRIGGER) )
 	{
 		// Some NPCs are triggers that can take damage (like antlion grubs). We should hit them.
 		if ( ( pOther->m_takedamage == DAMAGE_NO ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )

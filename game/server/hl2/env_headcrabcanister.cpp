@@ -262,7 +262,7 @@ void CEnvHeadcrabCanister::Spawn( void )
 	if ( m_iszLaunchPositionName != NULL_STRING )
 	{
 		// It doesn't have any real presence at first.
-		SetSolid( SOLID_NONE );
+		GetEngineObject()->SetSolid( SOLID_NONE );
 
 		m_vecImpactPosition = GetEngineObject()->GetAbsOrigin();
 		m_bIncomingSoundStarted = false;
@@ -273,7 +273,7 @@ void CEnvHeadcrabCanister::Spawn( void )
 	else if ( !GetEngineObject()->HasSpawnFlags( SF_START_IMPACTED ) )
 	{
 		// It doesn't have any real presence at first.
-		SetSolid( SOLID_NONE );
+		GetEngineObject()->SetSolid( SOLID_NONE );
 
 		if ( !GetEngineObject()->HasSpawnFlags( SF_LAND_AT_INITIAL_POSITION ) )
 		{
@@ -334,9 +334,9 @@ void CEnvHeadcrabCanister::UpdateOnRemove()
 void CEnvHeadcrabCanister::SetupWorldModel()
 {
 	SetModel( ENV_HEADCRABCANISTER_MODEL );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
-	float flRadius = CollisionProp()->BoundingRadius();
+	float flRadius = GetEngineObject()->BoundingRadius();
 	Vector vecMins( -flRadius, -flRadius, -flRadius );
 	Vector vecMaxs( flRadius, flRadius, flRadius );
 	SetSize( vecMins, vecMaxs );
@@ -403,7 +403,7 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 		pCamera = GetEntitySkybox();
 
 		SetModel( ENV_HEADCRABCANISTER_SKYBOX_MODEL );
-		SetSolid( SOLID_NONE );
+		GetEngineObject()->SetSolid( SOLID_NONE );
 
 		Vector vecForward;
 		GetVectors( &vecForward, NULL, NULL );
@@ -431,7 +431,7 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 			if ( m_Shared.IsInSkybox() )
 			{
 				SetModel( ENV_HEADCRABCANISTER_SKYBOX_MODEL );
-				SetSolid( SOLID_NONE );
+				GetEngineObject()->SetSolid( SOLID_NONE );
 				GetEngineObject()->AddEFlags( EFL_IN_SKYBOX );
 				SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterSkyboxThink );
 				SetNextThink( gpGlobals->curtime + m_Shared.GetEnterWorldTime() );
@@ -593,7 +593,7 @@ void CEnvHeadcrabCanister::TestForCollisionsAgainstEntities( const Vector &vecEn
 //	NDebugOverlay::Box( GetAbsOrigin(), m_vecMin * 0.5f, m_vecMax * 0.5f, 255, 255, 0, 0, 5 );
 //	NDebugOverlay::Box( vecEndPosition, m_vecMin, m_vecMax, 255, 0, 0, 0, 5 );
 
-	float flRadius = CollisionProp()->BoundingRadius();
+	float flRadius = GetEngineObject()->BoundingRadius();
 	Vector vecMins( -flRadius, -flRadius, -flRadius );
 	Vector vecMaxs( flRadius, flRadius, flRadius );
 
@@ -648,7 +648,7 @@ void CEnvHeadcrabCanister::TestForCollisionsAgainstWorld( const Vector &vecEndPo
 		if ( pEntity == this )
 			continue;
 
-		if ( !pEntity->IsSolid() )
+		if ( !pEntity->GetEngineObject()->IsSolid() )
 			continue;
 
 		// Get distance to object and use it as a scale value.
@@ -829,7 +829,7 @@ void CEnvHeadcrabCanister::SetLanded( void )
 	GetEngineObject()->SetAbsOrigin( m_vecImpactPosition );
 	SetModel( ENV_HEADCRABCANISTER_BROKEN_MODEL );
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	VPhysicsInitStatic();
 	
 	IncrementInterpolationFrame();
@@ -936,7 +936,7 @@ void CEnvHeadcrabCanister::Detonate( )
 		
 		// Become invisible so our trail can finish up
 		AddEffects( EF_NODRAW );
-		SetSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 
 		SetThink( &CEnvHeadcrabCanister::SUB_Remove );
 		SetNextThink( gpGlobals->curtime + ENV_HEADCRABCANISTER_TRAIL_TIME );

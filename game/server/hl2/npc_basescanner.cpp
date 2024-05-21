@@ -94,8 +94,8 @@ void CNPC_BaseScanner::Spawn(void)
 	SetHullType( HULL_TINY_CENTERED );
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	SetMoveType( MOVETYPE_VPHYSICS );
 

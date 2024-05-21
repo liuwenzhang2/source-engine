@@ -2731,14 +2731,14 @@ inline const QAngle &CAI_Component::GetAbsAngles() const
 
 inline void CAI_Component::SetSolid( SolidType_t val )
 {
-	GetOuter()->SetSolid(val);
+	GetOuter()->GetEngineObject()->SetSolid(val);
 }
 
 //-----------------------------------------------------------------------------
 
 inline SolidType_t CAI_Component::GetSolid() const
 {
-	return GetOuter()->GetSolid();
+	return GetOuter()->GetEngineObject()->GetSolid();
 }
 
 //-----------------------------------------------------------------------------

@@ -242,8 +242,8 @@ void CRagdollProp::OnRestore()
 
 void CRagdollProp::CalcRagdollSize( void )
 {
-	CollisionProp()->SetSurroundingBoundsType( USE_HITBOXES );
-	CollisionProp()->RemoveSolidFlags( FSOLID_FORCE_WORLD_ALIGNED );
+	GetEngineObject()->SetSurroundingBoundsType( USE_HITBOXES );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_FORCE_WORLD_ALIGNED );
 }
 
 void CRagdollProp::UpdateOnRemove( void )
@@ -685,8 +685,8 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 	}
 
 	SetMoveType( MOVETYPE_VPHYSICS );
-	SetSolid( SOLID_VPHYSICS );
-	AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 
 	ragdollparams_t params;
@@ -1047,11 +1047,11 @@ void CRagdollProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 	GetEngineObject()->SetAbsOrigin( m_ragPos[0] );
 	GetEngineObject()->SetAbsAngles( vec3_angle );
-	const Vector &vecOrigin = CollisionProp()->GetCollisionOrigin();
-	CollisionProp()->AddSolidFlags( FSOLID_FORCE_WORLD_ALIGNED );
-	CollisionProp()->SetSurroundingBoundsType( USE_COLLISION_BOUNDS_NEVER_VPHYSICS );
-	SetCollisionBounds( vecFullMins - vecOrigin, vecFullMaxs - vecOrigin );
-	CollisionProp()->MarkSurroundingBoundsDirty();
+	const Vector &vecOrigin = GetEngineObject()->CollisionProp()->GetCollisionOrigin();
+	GetEngineObject()->AddSolidFlags( FSOLID_FORCE_WORLD_ALIGNED );
+	GetEngineObject()->SetSurroundingBoundsType( USE_COLLISION_BOUNDS_NEVER_VPHYSICS );
+	GetEngineObject()->SetCollisionBounds( vecFullMins - vecOrigin, vecFullMaxs - vecOrigin );
+	GetEngineObject()->MarkSurroundingBoundsDirty();
 
 	GetEngineObject()->PhysicsTouchTriggers();
 }
@@ -1437,9 +1437,9 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	//  a zero sized hull makes the ragdoll think it should be faded/alpha'd to zero for a frame, so you get a blink where
 	//  the ragdoll doesn't draw initially.
 	Vector mins, maxs;
-	mins = pAnimating->CollisionProp()->OBBMins();
-	maxs = pAnimating->CollisionProp()->OBBMaxs();
-	pRagdoll->CollisionProp()->SetCollisionBounds( mins, maxs );
+	mins = pAnimating->GetEngineObject()->CollisionProp()->OBBMins();
+	maxs = pAnimating->GetEngineObject()->CollisionProp()->OBBMaxs();
+	pRagdoll->GetEngineObject()->SetCollisionBounds( mins, maxs );
 
 	return pRagdoll;
 }
@@ -1465,7 +1465,7 @@ void CRagdollPropAttached::Detach()
 	SetOwnerEntity( NULL );
 	GetEngineObject()->SetAbsAngles( vec3_angle );
 	SetMoveType( MOVETYPE_VPHYSICS );
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	physenv->DestroyConstraint( m_pAttachConstraint );
 	m_pAttachConstraint = NULL;
 	const float dampingScale = 1.0f / ATTACHED_DAMPING_SCALE;

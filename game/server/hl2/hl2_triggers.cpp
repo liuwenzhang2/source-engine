@@ -527,7 +527,7 @@ void CWateryDeathLeech::Spawn( void )
 	Precache();
 	BaseClass::Spawn();
 
-	SetSolid ( SOLID_NONE );
+	GetEngineObject()->SetSolid ( SOLID_NONE );
 
 	SetMoveType( MOVETYPE_NONE );
 	AddEffects( EF_NOSHADOW );

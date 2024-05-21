@@ -192,8 +192,8 @@ void CFlare::Spawn( void )
 
 	UTIL_SetSize( this, Vector( -2, -2, -2 ), Vector( 2, 2, 2 ) );
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	SetMoveType( MOVETYPE_NONE );
 	SetFriction( 0.6f );
@@ -282,8 +282,8 @@ CFlare *CFlare::Create( Vector vecOrigin, QAngle vecAngles, CBaseEntity *pOwner,
 	//Burn out time
 	pFlare->m_flTimeBurnOut = gpGlobals->curtime + lifetime;
 
-	pFlare->RemoveSolidFlags( FSOLID_NOT_SOLID );
-	pFlare->AddSolidFlags( FSOLID_NOT_STANDABLE );
+	pFlare->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
+	pFlare->GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	pFlare->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
@@ -376,7 +376,7 @@ void CFlare::FlareBurnTouch( CBaseEntity *pOther )
 void CFlare::FlareTouch( CBaseEntity *pOther )
 {
 	Assert( pOther );
-	if ( !pOther->IsSolid() )
+	if ( !pOther->GetEngineObject()->IsSolid() )
 		return;
 
 	if ( ( m_nBounces < 10 ) && ( GetWaterLevel() < 1 ) )
@@ -449,8 +449,8 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 					//Do not stick to ceilings or on shallow impacts
 					if ( ( tr.plane.normal.z > -0.5f ) && ( surfDot < -0.9f ) )
 					{
-						RemoveSolidFlags( FSOLID_NOT_SOLID );
-						AddSolidFlags( FSOLID_TRIGGER );
+						GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
+						GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 						UTIL_SetOrigin( this, tr.endpos + ( tr.plane.normal * 2.0f ) );
 						GetEngineObject()->SetAbsVelocity( vec3_origin );
 						SetMoveType( MOVETYPE_NONE );
@@ -504,8 +504,8 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 		{
 			GetEngineObject()->SetAbsVelocity( vec3_origin );
 			SetMoveType( MOVETYPE_NONE );
-			RemoveSolidFlags( FSOLID_NOT_SOLID );
-			AddSolidFlags( FSOLID_TRIGGER );
+			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 			SetTouch( &CFlare::FlareBurnTouch );
 		}
 	}

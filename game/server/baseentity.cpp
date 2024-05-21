@@ -253,7 +253,6 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt			(SENDINFO(m_flSimulationTime),	SIMULATION_TIME_WINDOW_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT, SendProxy_SimulationTime),
 
 	SendPropInt		(SENDINFO( m_ubInterpolationFrame ), NOINTERP_PARITY_MAX_BITS, SPROP_UNSIGNED ),
-	SendPropDataTable( SENDINFO_DT( m_Collision ), &REFERENCE_SEND_TABLE(DT_CollisionProperty) ),
 	SendPropInt		(SENDINFO(m_nRenderFX),		8, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_nRenderMode),	8, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_fEffects),		EF_MAX_BITS, SPROP_UNSIGNED),
@@ -340,10 +339,7 @@ CBaseEntity::CBaseEntity()
 //	((Vector)GetEngineObject()->GetLocalVelocity()).Init();
 //	GetEngineObject()->GetAbsVelocity().Init();
 //#endif
-	CollisionProp()->Init( this );
 	NetworkProp()->Init( this );
-
-
 
 	// clear debug overlays
 	m_debugOverlays  = 0;
@@ -361,9 +357,6 @@ CBaseEntity::CBaseEntity()
 #endif
 	m_nWaterTouch = m_nSlimeTouch = 0;
 
-	SetSolid( SOLID_NONE );
-	ClearSolidFlags();
-
 	//m_bDynamicModelAllowed = false;
 	//m_bDynamicModelPending = false;
 	//m_bDynamicModelSetBounds = false;
@@ -372,7 +365,6 @@ CBaseEntity::CBaseEntity()
 	SetOwnerEntity( NULL );
 	m_nTransmitStateOwnedCounter = 0;
 	m_fFlags = 0;
-	SetCollisionBounds( vec3_origin, vec3_origin );
 
 	SetFriction( 1.0f );
 
@@ -451,11 +443,11 @@ void CBaseEntity::SetScaledPhysics( IPhysicsObject *pNewObject )
 {
 	if ( pNewObject )
 	{
-		AddSolidFlags( FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
+		GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
 	}
 	else
 	{
-		RemoveSolidFlags( FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
+		GetEngineObject()->RemoveSolidFlags( FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
 	}
 }
 
@@ -621,15 +613,6 @@ void CBaseEntity::Release() {
 	UTIL_RemoveImmediate(this);
 }
 
-//-----------------------------------------------------------------------------
-// Sets the collision bounds + the size
-//-----------------------------------------------------------------------------
-void CBaseEntity::SetCollisionBounds( const Vector& mins, const Vector &maxs )
-{
-	m_Collision.SetCollisionBounds( mins, maxs );
-}
-
-
 void CBaseEntity::StopFollowingEntity( )
 {
 	if( !IsFollowingEntity() )
@@ -640,7 +623,7 @@ void CBaseEntity::StopFollowingEntity( )
 
 	GetEngineObject()->SetParent( NULL );
 	RemoveEffects( EF_BONEMERGE );
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 	CollisionRulesChanged();
 }
@@ -729,10 +712,10 @@ void CBaseEntity::DrawBBoxOverlay( float flDuration )
 	{
 		NDebugOverlay::EntityBounds(this, 255, 100, 0, 0, flDuration );
 
-		if ( CollisionProp()->IsSolidFlagSet( FSOLID_USE_TRIGGER_BOUNDS ) )
+		if (GetEngineObject()->IsSolidFlagSet( FSOLID_USE_TRIGGER_BOUNDS ) )
 		{
 			Vector vecTriggerMins, vecTriggerMaxs;
-			CollisionProp()->WorldSpaceTriggerBounds( &vecTriggerMins, &vecTriggerMaxs );
+			GetEngineObject()->CollisionProp()->WorldSpaceTriggerBounds( &vecTriggerMins, &vecTriggerMaxs );
 			Vector center = 0.5f * (vecTriggerMins + vecTriggerMaxs);
 			Vector extents = vecTriggerMaxs - center;
 			NDebugOverlay::Box(center, -extents, extents, 0, 255, 255, 0, flDuration );
@@ -756,7 +739,7 @@ void CBaseEntity::DrawAbsBoxOverlay()
 	{
 		// Surrounding boxes are axially aligned, so ignore angles
 		Vector vecSurroundMins, vecSurroundMaxs;
-		CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+		GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 		Vector center = 0.5f * (vecSurroundMins + vecSurroundMaxs);
 		Vector extents = vecSurroundMaxs - center;
 		NDebugOverlay::Box(center, -extents, extents, red, green, 0, 0 ,0);
@@ -792,16 +775,16 @@ void CBaseEntity::EntityText( int text_offset, const char *text, float duration,
 	Vector origin;
 	Vector vecLocalCenter;
 
-	VectorAdd( m_Collision.OBBMins(), m_Collision.OBBMaxs(), vecLocalCenter );
+	VectorAdd( GetEngineObject()->CollisionProp()->OBBMins(), GetEngineObject()->CollisionProp()->OBBMaxs(), vecLocalCenter );
 	vecLocalCenter *= 0.5f;
 
-	if ( ( m_Collision.GetCollisionAngles() == vec3_angle ) || ( vecLocalCenter == vec3_origin ) )
+	if ( (GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle ) || ( vecLocalCenter == vec3_origin ) )
 	{
-		VectorAdd( vecLocalCenter, m_Collision.GetCollisionOrigin(), origin );
+		VectorAdd( vecLocalCenter, GetEngineObject()->CollisionProp()->GetCollisionOrigin(), origin );
 	}
 	else
 	{
-		VectorTransform( vecLocalCenter, m_Collision.CollisionToWorldTransform(), origin );
+		VectorTransform( vecLocalCenter, GetEngineObject()->CollisionProp()->CollisionToWorldTransform(), origin );
 	}
 
 	NDebugOverlay::EntityTextAtPosition( origin, text_offset, text, duration, r, g, b, a );
@@ -1305,7 +1288,7 @@ int CBaseEntity::OnTakeDamage( const CTakeDamageInfo &info )
 		else
 		{
 			if ( info.GetInflictor() && (GetMoveType() == MOVETYPE_WALK || GetMoveType() == MOVETYPE_STEP) && 
-				!info.GetAttacker()->IsSolidFlagSet(FSOLID_TRIGGER) )
+				!info.GetAttacker()->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER) )
 			{
 				Vector vecDir, vecInflictorCentroid;
 				vecDir = WorldSpaceCenter( );
@@ -1716,7 +1699,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	
 
 	//DEFINE_CUSTOM_FIELD_INVALID( m_iName, engineObjectFuncs),
-	DEFINE_EMBEDDED( m_Collision ),
+	//DEFINE_EMBEDDED( m_Collision ),
 	DEFINE_EMBEDDED( m_Network ),
 
 	DEFINE_FIELD( m_MoveType, FIELD_CHARACTER ),
@@ -2233,7 +2216,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 	// physics updated the shadow, so check to see if I got blocked
 	// NOTE: SOLID_BSP cannont compute consistent collisions wrt vphysics, so 
 	// don't allow vphysics to block.  Assume game physics has handled it.
-	if ( GetSolid() != SOLID_BSP && pPhysics->GetShadowPosition( &origin, &angles ) )
+	if (GetEngineObject()->GetSolid() != SOLID_BSP && pPhysics->GetShadowPosition( &origin, &angles ) )
 	{
 		CUtlVector<IEngineObjectServer *> list;
 		GetAllInHierarchy( this->GetEngineObject(), list );
@@ -2256,7 +2239,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 		params.movetime = movetime;
 		for ( int i = 0; i < list.Count(); i++ )
 		{
-			if ( list[i]->GetOuter()->IsSolid())
+			if ( list[i]->IsSolid())
 			{
 				CheckPushedEntity( list[i]->GetOuter(), params);
 			}
@@ -2365,7 +2348,7 @@ void CBaseEntity::PhysicsRelinkChildren( float dt )
 	// iterate through all children
 	for ( child = GetEngineObject()->FirstMoveChild(); child != NULL; child = child->NextMovePeer() )
 	{
-		if ( child->GetOuter()->IsSolid() || child->GetOuter()->IsSolidFlagSet(FSOLID_TRIGGER))
+		if ( child->IsSolid() || child->IsSolidFlagSet(FSOLID_TRIGGER))
 		{
 			child->PhysicsTouchTriggers();
 		}
@@ -2519,8 +2502,8 @@ bool CBaseEntity::Intersects( CBaseEntity *pOther )
 	if ( entindex()==-1 || pOther->entindex()==-1)
 		return false;
 
-	CCollisionProperty *pMyProp = CollisionProp();
-	CCollisionProperty *pOtherProp = pOther->CollisionProp();
+	ICollideable *pMyProp = GetEngineObject()->CollisionProp();
+	ICollideable *pOtherProp = pOther->GetEngineObject()->CollisionProp();
 
 	return IsOBBIntersectingOBB( 
 		pMyProp->GetCollisionOrigin(), pMyProp->GetCollisionAngles(), pMyProp->OBBMins(), pMyProp->OBBMaxs(),
@@ -2666,7 +2649,7 @@ void CC_AI_LOS_Debug( IConVar *var, const char *pOldString, float flOldValue )
 	int iLOSMode = ai_debug_los.GetInt();
 	for ( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt(pEntity) )
 	{
-		if ( iLOSMode == 1 && pEntity->IsSolid() )
+		if ( iLOSMode == 1 && pEntity->GetEngineObject()->IsSolid() )
 		{
 			pEntity->m_debugOverlays |= OVERLAY_SHOW_BLOCKSLOS;
 		}
@@ -2752,7 +2735,7 @@ void CBaseEntity::MakeDormant( void )
 	//SETBITS( m_iEFlags, EFL_DORMANT );
 	
 	// Don't touch
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	// Don't move
 	SetMoveType( MOVETYPE_NONE );
 	// Don't draw
@@ -2895,7 +2878,7 @@ int CBaseEntity::Save( ISave &save )
 int CBaseEntity::Restore( IRestore &restore )
 {
 	// This is essential to getting the spatial partition info correct
-	CollisionProp()->DestroyPartitionHandle();
+	((CCollisionProperty*)GetEngineObject()->CollisionProp())->DestroyPartitionHandle();
 
 	// loops through the data description list, restoring each data desc block in order
 	int status = restore.ReadEntity(this);;
@@ -2929,7 +2912,7 @@ int CBaseEntity::Restore( IRestore &restore )
 	// Also, twiddling with the flags here ensures it gets added to the KD tree dirty list
 	// (We don't want to use the saved version of this flag)
 	GetEngineObject()->RemoveEFlags( EFL_DIRTY_SPATIAL_PARTITION );
-	CollisionProp()->MarkSurroundingBoundsDirty();
+	((CCollisionProperty*)GetEngineObject()->CollisionProp())->MarkSurroundingBoundsDirty();
 
 	if (IsNetworkable() && entindex()!=-1 && GetEngineObject()->GetModelIndex() != 0 && GetEngineObject()->GetModelName() != NULL_STRING && restore.GetPrecacheMode())
 	{
@@ -4121,8 +4104,8 @@ static void TeleportEntity( CBaseEntity *pSourceEntity, TeleportListEntry_t &ent
 	Vector prevOrigin = entry.prevAbsOrigin;
 	QAngle prevAngles = entry.prevAbsAngles;
 
-	int nSolidFlags = pTeleport->GetSolidFlags();
-	pTeleport->AddSolidFlags( FSOLID_NOT_SOLID );
+	int nSolidFlags = pTeleport->GetEngineObject()->GetSolidFlags();
+	pTeleport->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	// I'm teleporting myself
 	if ( pSourceEntity == pTeleport )
@@ -4166,7 +4149,7 @@ static void TeleportEntity( CBaseEntity *pSourceEntity, TeleportListEntry_t &ent
 		}
 		const QAngle *rotAngles = &pTeleport->GetEngineObject()->GetAbsAngles();
 		// don't rotate physics on players or bbox entities
-		if (pTeleport->IsPlayer() || pTeleport->GetSolid() == SOLID_BBOX )
+		if (pTeleport->IsPlayer() || pTeleport->GetEngineObject()->GetSolid() == SOLID_BBOX )
 		{
 			rotAngles = &vec3_angle;
 		}
@@ -4180,7 +4163,7 @@ static void TeleportEntity( CBaseEntity *pSourceEntity, TeleportListEntry_t &ent
 
 	g_pNotify->ReportTeleportEvent( pTeleport, prevOrigin, prevAngles, rotatePhysics );
 
-	pTeleport->SetSolidFlags( nSolidFlags );
+	pTeleport->GetEngineObject()->SetSolidFlags( nSolidFlags );
 }
 
 
@@ -6429,7 +6412,7 @@ void CBaseEntity::RemoveDeferred( void )
 
 	// Hide us completely
 	AddEffects( EF_NODRAW );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 }
 
@@ -6451,7 +6434,7 @@ void CBaseEntity::SUB_StartFadeOut( float delay, bool notSolid )
 
 	if ( notSolid )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		SetLocalAngularVelocity( vec3_angle );
 	}
 }

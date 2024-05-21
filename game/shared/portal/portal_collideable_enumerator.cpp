@@ -58,7 +58,7 @@ IterationRetval_t CPortalCollideableEnumerator::EnumElement( IHandleEntity *pHan
 	else*/
 	{
 		//not a static prop, w00t
-		CCollisionProperty *pEntityCollision = pEnt->CollisionProp();
+		CCollisionProperty *pEntityCollision = (CCollisionProperty*)pEnt->GetEngineObject()->CollisionProp();
 
 		if( !pEntityCollision->IsSolid() )
 			return ITERATION_CONTINUE; //not solid

@@ -58,8 +58,8 @@ void CGrenadePathfollower::Spawn( void )
 	// -------------------------
 	// Inert when first spawned
 	// -------------------------
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	SetMoveType( MOVETYPE_NONE );
 	AddFlag( FL_OBJECT );	// So can be shot down
@@ -172,7 +172,7 @@ void CGrenadePathfollower::Launch( float flLaunchSpeed, string_t sPathCornerName
 	}
 
 	// Make this thing come to life
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 	RemoveEffects( EF_NODRAW );
 

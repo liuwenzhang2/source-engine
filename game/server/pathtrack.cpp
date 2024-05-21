@@ -69,7 +69,7 @@ CPathTrack::CPathTrack()
 //-----------------------------------------------------------------------------
 void CPathTrack::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	UTIL_SetSize(this, Vector(-8, -8, -8), Vector(8, 8, 8));
 }
 

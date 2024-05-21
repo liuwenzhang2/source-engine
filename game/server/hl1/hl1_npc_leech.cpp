@@ -149,11 +149,11 @@ void CNPC_Leech::Spawn( void )
 
 	Vector vecSurroundingMins(-8,-8,0);
 	Vector vecSurroundingMaxs(8,8,2);
-	CollisionProp()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &vecSurroundingMins, &vecSurroundingMaxs );
+	GetEngineObject()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &vecSurroundingMins, &vecSurroundingMaxs );
 
 	// Don't push the minz down too much or the water check will fail because this entity is really point-sized
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_FLY );
 	AddFlag( FL_SWIM );
 	m_iHealth	= sk_leech_health.GetInt();
@@ -197,7 +197,7 @@ void CNPC_Leech::DeadThink( void )
 		}
 		else if ( GetFlags() & FL_ONGROUND )
 		{
-			AddSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 			SetActivity( ACT_DIEFORWARD );
 		}
 	}

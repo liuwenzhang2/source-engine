@@ -245,15 +245,15 @@ void CBaseDoor::Spawn()
 	Precache();
 
 #ifdef HL1_DLL
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 #else
-	if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetRootMoveParent()->GetOuter()->GetSolid() == SOLID_BSP)
+	if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetRootMoveParent()->GetSolid() == SOLID_BSP)
 	{
-		SetSolid( SOLID_BSP );
+		GetEngineObject()->SetSolid( SOLID_BSP );
 	}
 	else
 	{
-		SetSolid( SOLID_VPHYSICS );
+		GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	}
 #endif
 
@@ -265,7 +265,7 @@ void CBaseDoor::Spawn()
 	m_vecPosition1	= GetEngineObject()->GetLocalOrigin();
 
 	// Subtract 2 from size because the engine expands bboxes by 1 in all directions making the size too big
-	Vector vecOBB = CollisionProp()->OBBSize();
+	Vector vecOBB = GetEngineObject()->OBBSize();
 	vecOBB -= Vector( 2, 2, 2 );
 	m_vecPosition2	= m_vecPosition1 + (m_vecMoveDir * (DotProductAbs( m_vecMoveDir, vecOBB ) - m_flLip));
 
@@ -302,7 +302,7 @@ void CBaseDoor::Spawn()
 		{
 			//normal door
 			GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
-			AddSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		}
 
 		if (GetEngineObject()->HasSpawnFlags( SF_DOOR_NONSOLID_TO_PLAYER ) )
@@ -318,7 +318,7 @@ void CBaseDoor::Spawn()
 		{
 			// both of these flags want to set the collision group and 
 			// there isn't a combo group
-			Assert( !HasSpawnFlags( SF_DOOR_NONSOLID_TO_PLAYER ) );
+			Assert( !GetEngineObject()->HasSpawnFlags( SF_DOOR_NONSOLID_TO_PLAYER ) );
 			if (GetEngineObject()->HasSpawnFlags( SF_DOOR_NONSOLID_TO_PLAYER ) )
 			{
 				Warning("Door %s with conflicting collision settings, removing ignoredebris\n", GetDebugName() );
@@ -428,18 +428,18 @@ bool CBaseDoor::CreateVPhysics( )
 	else
 	{
 		// special contents
-		AddSolidFlags( FSOLID_VOLUME_CONTENTS );
+		GetEngineObject()->AddSolidFlags( FSOLID_VOLUME_CONTENTS );
 		GetEngineObject()->AddSpawnFlags(SF_DOOR_SILENT);	// water is silent for now
 
 		IPhysicsObject *pPhysics = VPhysicsInitShadow( false, false );
 		fluidparams_t fluid;
 		
-		Assert( CollisionProp()->GetCollisionAngles() == vec3_angle );
+		Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
 		fluid.damping = 0.01f;
 		fluid.surfacePlane[0] = 0;
 		fluid.surfacePlane[1] = 0;
 		fluid.surfacePlane[2] = 1;
-		fluid.surfacePlane[3] = CollisionProp()->GetCollisionOrigin().z + CollisionProp()->OBBMaxs().z - 1;
+		fluid.surfacePlane[3] = GetEngineObject()->CollisionProp()->GetCollisionOrigin().z + GetEngineObject()->CollisionProp()->OBBMaxs().z - 1;
 		fluid.currentVelocity.Init(0,0,0);
 		fluid.torqueFactor = 0.1f;
 		fluid.viscosityFactor = 0.01f;
@@ -975,7 +975,7 @@ void CBaseDoor::DoorGoUp( void )
 				//					So you can't look at the door's facing to determine which way to open.
 
 				Vector nearestPoint;
-				CollisionProp()->CalcNearestPoint( m_hActivator->GetEngineObject()->GetAbsOrigin(), &nearestPoint );
+				GetEngineObject()->CalcNearestPoint( m_hActivator->GetEngineObject()->GetAbsOrigin(), &nearestPoint );
 				Vector activatorToNearestPoint = nearestPoint - m_hActivator->GetEngineObject()->GetAbsOrigin();
 				activatorToNearestPoint.z = 0;
 
@@ -1397,13 +1397,13 @@ void CRotDoor::Spawn( void )
 	}
 
 #ifdef HL1_DLL
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 #endif
 		
 	// Slam the object back to solid - if we really want it to be solid.
 	if ( m_bSolidBsp )
 	{
-		SetSolid( SOLID_BSP );
+		GetEngineObject()->SetSolid( SOLID_BSP );
 	}
 }
 
@@ -1411,7 +1411,7 @@ void CRotDoor::Spawn( void )
 
 bool CRotDoor::CreateVPhysics()
 {
-	if ( !IsSolidFlagSet( FSOLID_NOT_SOLID ) )
+	if ( !GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
 	{
 		VPhysicsInitShadow( false, false );
 	}

@@ -356,7 +356,7 @@ void CNPC_Dog::SetPlayerAvoidState( void )
 				pBone = m_BoneFollowerManager.GetBoneFollower( i );
 				if ( pBone && pBone->hFollower )
 				{
-					pBone->hFollower->CollisionProp()->WorldSpaceSurroundingBounds( &vMins, &vMaxs );
+					pBone->hFollower->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vMins, &vMaxs );
 					if ( IsBoxIntersectingBox( vMins, vMaxs, vPlayerMins, vPlayerMaxs ) )
 					{
 						bIntersectingBoneFollowers = true;
@@ -379,7 +379,7 @@ void CNPC_Dog::SetPlayerAvoidState( void )
 					pBone = m_BoneFollowerManager.GetBoneFollower( i );
 					if ( pBone && pBone->hFollower )
 					{
-						pBone->hFollower->CollisionProp()->WorldSpaceSurroundingBounds( &vMins, &vMaxs );
+						pBone->hFollower->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vMins, &vMaxs );
 						iRed = ( IsBoxIntersectingBox( vMins, vMaxs, vPlayerMins, vPlayerMaxs ) ) ? 255 : 0;
 
 						NDebugOverlay::Box( vec3_origin, vMins, vMaxs, iRed, 0, 255, 64, 0.1 );
@@ -460,8 +460,8 @@ void CNPC_Dog::Spawn( void )
 	SetHullType( HULL_WIDE_HUMAN );
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	SetBloodColor( BLOOD_COLOR_MECH );
 
@@ -1154,7 +1154,7 @@ bool CNPC_Dog::FindPhysicsObject( const char *pPickupName, CBaseEntity *pIgnore 
 	if ( dog_debug.GetBool() == true )
 	{
 		if ( pNearest )
-			 NDebugOverlay::Box( pNearest->WorldSpaceCenter(), pNearest->CollisionProp()->OBBMins(), pNearest->CollisionProp()->OBBMaxs(), 255, 0, 255, true, 3 );
+			 NDebugOverlay::Box( pNearest->WorldSpaceCenter(), pNearest->GetEngineObject()->CollisionProp()->OBBMins(), pNearest->GetEngineObject()->CollisionProp()->OBBMaxs(), 255, 0, 255, true, 3 );
 	}
 
 	if( m_hPhysicsEnt == NULL )

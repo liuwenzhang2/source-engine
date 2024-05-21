@@ -92,7 +92,7 @@ END_DATADESC()
 
 void CGunTarget::Spawn( void )
 {
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 	SetMoveType( MOVETYPE_PUSH );
 
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );

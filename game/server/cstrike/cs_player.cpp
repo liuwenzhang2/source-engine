@@ -199,15 +199,15 @@ public:
 
 	void Init( void )
 	{
-		SetSolid( SOLID_BBOX );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
 		SetMoveType( MOVETYPE_STEP );
 		SetFriction( 1.0f );
-		SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
+		GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 		m_takedamage = DAMAGE_NO;
 		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 		GetEngineObject()->SetAbsOrigin( m_hPlayer->GetEngineObject()->GetAbsOrigin() );
 		GetEngineObject()->SetAbsVelocity( m_hPlayer->GetEngineObject()->GetAbsVelocity() );
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		ChangeTeam( m_hPlayer->GetTeamNumber() );
 		UseClientSideAnimation();
 	}
@@ -2956,7 +2956,7 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 
 		Weapon_Drop( pWeapon, &vTossPos, NULL );
 
-		pWeapon->SetSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_TRIGGER | FSOLID_USE_TRIGGER_BOUNDS );
+		pWeapon->GetEngineObject()->SetSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_TRIGGER | FSOLID_USE_TRIGGER_BOUNDS );
 		pWeapon->SetMoveCollide( MOVECOLLIDE_FLY_BOUNCE );
 
 		CWeaponCSBase *pCSWeapon = dynamic_cast< CWeaponCSBase* >( pWeapon );
@@ -5325,7 +5325,7 @@ void CCSPlayer::State_Enter_WELCOME()
 
 	// Important to set MOVETYPE_NONE or our physics object will fall while we're sitting at one of the intro cameras.
 	SetMoveType( MOVETYPE_NONE );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	PhysObjectSleep();
 
@@ -5600,7 +5600,7 @@ void CCSPlayer::State_Enter_PICKINGCLASS()
 void CCSPlayer::State_Enter_ACTIVE()
 {
 	SetMoveType( MOVETYPE_WALK );
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	m_Local.m_iHideHUD = 0;
 	PhysObjectWake();
 }
@@ -5651,7 +5651,7 @@ void CCSPlayer::Weapon_Equip( CBaseCombatWeapon *pWeapon )
 			}
 		}
 
-		pCSWeapon->SetSolidFlags( FSOLID_NOT_SOLID );
+		pCSWeapon->GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 		pCSWeapon->SetOwnerEntity( this );
 	}
 
@@ -5680,7 +5680,7 @@ bool CCSPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 	if ( !pWeapon )
 	{
 		Assert( !pWeapon );
-		pBaseWeapon->AddSolidFlags( FSOLID_NOT_SOLID );
+		pBaseWeapon->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		pBaseWeapon->AddEffects( EF_NODRAW );
 		Weapon_Equip( pBaseWeapon );
 		return true;
@@ -5752,7 +5752,7 @@ bool CCSPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 	{
 		pWeapon->CheckRespawn();
 
-		pWeapon->AddSolidFlags( FSOLID_NOT_SOLID );
+		pWeapon->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		pWeapon->AddEffects( EF_NODRAW );
 
 		CCSPlayer* pDonor = pWeapon->GetDonor();

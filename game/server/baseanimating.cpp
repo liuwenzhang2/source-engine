@@ -826,7 +826,7 @@ bool CBaseAnimating::BecomeRagdollOnClient( const Vector &force )
 	if ( CanBecomeRagdoll() ) 
 	{
 		VPhysicsDestroyObject();
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		m_nRenderFX = kRenderFxRagdoll;
 		
 		// Have to do this dance because m_vecForce is a network vector
@@ -2669,7 +2669,7 @@ bool CBaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMask
 		return tr.DidHit();
 	}
 
-	if ( IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ))
+	if (GetEngineObject()->IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ))
 	{
 		if (!TestHitboxes( ray, fContentsMask, tr ))
 			return true;
@@ -3360,7 +3360,7 @@ void CBaseAnimating::UpdateModelScale()
 
 void CBaseAnimating::RefreshCollisionBounds( void )
 {
-	CollisionProp()->RefreshScaledCollisionBounds();
+	GetEngineObject()->RefreshScaledCollisionBounds();
 }
 
 //-----------------------------------------------------------------------------

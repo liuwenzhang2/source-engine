@@ -783,7 +783,7 @@ bool CAI_PassengerBehaviorCompanion::CanEnterVehicleImmediately( int *pResultSeq
 		return false;
 
 	Vector vecPosition = GetOuter()->WorldSpaceCenter();
-	float flRadius = GetOuter()->CollisionProp()->BoundingRadius2D();
+	float flRadius = GetOuter()->GetEngineObject()->BoundingRadius2D();
 	if ( SphereWithinPlayerFOV( pPlayer, vecPosition, flRadius ) )
 		return false;
 
@@ -1067,7 +1067,7 @@ bool CAI_PassengerBehaviorCompanion::FindPathToVehicleEntryPoint( void )
 		vecCenterPoint.z = vecEntryPoint.z;
 		bool bClockwise;
 		float flArc = GetArcToEntryPoint( vecCenterPoint, vecEntryPoint, bClockwise );
-		float flRadius = m_hVehicle->CollisionProp()->BoundingRadius2D();
+		float flRadius = m_hVehicle->GetEngineObject()->BoundingRadius2D();
 
 		// Try and set a radial route
 		if ( GetOuter()->GetNavigator()->SetRadialGoal( vecEntryPoint, vecCenterPoint, flRadius, flArc, 64.0f, bClockwise ) == false )
@@ -1182,7 +1182,7 @@ bool CAI_PassengerBehaviorCompanion::GetStuckExitPos( Vector *vecResult )
 	m_hVehicle->GetVectors( NULL, &vecVehicleRight, NULL );
 	
 	// Get the vehicle's rough horizontal bounds
-	float	flVehicleRadius = m_hVehicle->CollisionProp()->BoundingRadius2D();
+	float	flVehicleRadius = m_hVehicle->GetEngineObject()->BoundingRadius2D();
 
 	// Use the vehicle's center as our hub
 	Vector	vecCenter = m_hVehicle->WorldSpaceCenter();

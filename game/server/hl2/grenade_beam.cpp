@@ -38,7 +38,7 @@ LINK_ENTITY_TO_CLASS( grenade_beam_chaser, CGrenadeBeamChaser );
 //------------------------------------------------------------------------------
 void CGrenadeBeamChaser::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_FLY );
 	SetThink(&CGrenadeBeamChaser::ChaserThink);
 	SetNextThink( gpGlobals->curtime );
@@ -125,7 +125,7 @@ LINK_ENTITY_TO_CLASS( grenade_beam, CGrenadeBeam );
 void CGrenadeBeam::Spawn( void )
 {
 	Precache( );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	
 	//UNDONE/HACK: this model is never used but one is needed

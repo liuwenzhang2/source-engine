@@ -145,7 +145,7 @@ float CEnvShake::Radius(bool bPlayers)
 //-----------------------------------------------------------------------------
 void CEnvShake::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 	
 	if (GetEngineObject()->GetSpawnFlags() & SF_SHAKE_EVERYONE )

@@ -53,7 +53,7 @@ void C_FuncTrackTrain::OnDataChanged( DataUpdateType_t updateType )
 	{
 		// Compute the cross-sectional area and dimension and length of the line segment
 		int nIndex1, nIndex2;
-		const Vector &vecOBBSize = CollisionProp()->OBBSize();
+		const Vector &vecOBBSize = GetEngineObject()->OBBSize();
 		if ( ( vecOBBSize.x > vecOBBSize.y ) && ( vecOBBSize.x > vecOBBSize.z ) )
 		{
 			m_nLongAxis = 0;
@@ -113,7 +113,7 @@ bool C_FuncTrackTrain::GetSoundSpatialization( SpatializationInfo_t& info )
 
 	if ( info.pAngles )
 	{
-		VectorCopy( CollisionProp()->GetCollisionAngles(), *info.pAngles );
+		VectorCopy(GetEngineObject()->CollisionProp()->GetCollisionAngles(), *info.pAngles );
 	}
 
 	return true;

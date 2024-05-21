@@ -202,9 +202,9 @@ void CBaseTrigger::Enable( void )
 		VPhysicsGetObject()->EnableCollisions( true );
 	}
 
-	if (!IsSolidFlagSet( FSOLID_TRIGGER ))
+	if (!GetEngineObject()->IsSolidFlagSet( FSOLID_TRIGGER ))
 	{
-		AddSolidFlags( FSOLID_TRIGGER ); 
+		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 		GetEngineObject()->PhysicsTouchTriggers();
 	}
 }
@@ -250,9 +250,9 @@ void CBaseTrigger::Disable( void )
 		VPhysicsGetObject()->EnableCollisions( false );
 	}
 
-	if (IsSolidFlagSet(FSOLID_TRIGGER))
+	if (GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER))
 	{
-		RemoveSolidFlags( FSOLID_TRIGGER ); 
+		GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
 		GetEngineObject()->PhysicsTouchTriggers();
 	}
 }
@@ -290,7 +290,7 @@ int CBaseTrigger::DrawDebugTextOverlays(void)
 		// Print Target
 		// --------------
 		char tempstr[255];
-		if (IsSolidFlagSet(FSOLID_TRIGGER)) 
+		if (GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER))
 		{
 			Q_strncpy(tempstr,"State: Enabled",sizeof(tempstr));
 		}
@@ -311,7 +311,7 @@ bool CBaseTrigger::PointIsWithin( const Vector &vecPoint )
 {
 	Ray_t ray;
 	trace_t tr;
-	ICollideable *pCollide = CollisionProp();
+	ICollideable *pCollide = GetEngineObject()->CollisionProp();
 	ray.Init( vecPoint, vecPoint );
 	enginetrace->ClipRayToCollideable( ray, MASK_ALL, pCollide, &tr );
 	return ( tr.startsolid );
@@ -323,15 +323,15 @@ bool CBaseTrigger::PointIsWithin( const Vector &vecPoint )
 //-----------------------------------------------------------------------------
 void CBaseTrigger::InitTrigger( )
 {
-	SetSolid(GetEngineObject()->GetMoveParent() ? SOLID_VPHYSICS : SOLID_BSP );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid(GetEngineObject()->GetMoveParent() ? SOLID_VPHYSICS : SOLID_BSP );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	if (m_bDisabled)
 	{
-		RemoveSolidFlags( FSOLID_TRIGGER );	
+		GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
 	}
 	else
 	{
-		AddSolidFlags( FSOLID_TRIGGER );	
+		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 	}
 
 	SetMoveType( MOVETYPE_NONE );
@@ -345,7 +345,7 @@ void CBaseTrigger::InitTrigger( )
 
 	if (GetEngineObject()->HasSpawnFlags( SF_TRIG_TOUCH_DEBRIS ) )
 	{
-		CollisionProp()->AddSolidFlags( FSOLID_TRIGGER_TOUCH_DEBRIS );
+		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER_TOUCH_DEBRIS );
 	}
 }
 
@@ -565,13 +565,13 @@ CBaseEntity *CBaseTrigger::GetTouchedEntityOfType( const char *sClassName )
 //-----------------------------------------------------------------------------
 void CBaseTrigger::InputToggle( inputdata_t &inputdata )
 {
-	if (IsSolidFlagSet( FSOLID_TRIGGER ))
+	if (GetEngineObject()->IsSolidFlagSet( FSOLID_TRIGGER ))
 	{
-		RemoveSolidFlags(FSOLID_TRIGGER);
+		GetEngineObject()->RemoveSolidFlags(FSOLID_TRIGGER);
 	}
 	else
 	{
-		AddSolidFlags(FSOLID_TRIGGER);
+		GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER);
 	}
 
 	GetEngineObject()->PhysicsTouchTriggers();
@@ -693,13 +693,13 @@ void CTriggerHurt::RadiationThink( void )
 	// check to see if a player is in pvs
 	// if not, continue	
 	Vector vecSurroundMins, vecSurroundMaxs;
-	CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+	GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 	CBasePlayer *pPlayer = static_cast<CBasePlayer *>(UTIL_FindClientInPVS( vecSurroundMins, vecSurroundMaxs ));
 
 	if (pPlayer)
 	{
 		// get range to player;
-		float flRange = CollisionProp()->CalcDistanceFromPoint( pPlayer->WorldSpaceCenter() );
+		float flRange = GetEngineObject()->CalcDistanceFromPoint( pPlayer->WorldSpaceCenter() );
 		flRange *= 3.0f;
 		pPlayer->NotifyNearbyRadiationSource(flRange);
 	}
@@ -731,10 +731,10 @@ bool CTriggerHurt::HurtEntity( CBaseEntity *pOther, float damage )
 	{
 		// The damage position is the nearest point on the damaged entity
 		// to the trigger's center. Not perfect, but better than nothing.
-		Vector vecCenter = CollisionProp()->WorldSpaceCenter();
+		Vector vecCenter = GetEngineObject()->WorldSpaceCenter();
 
 		Vector vecDamagePos;
-		pOther->CollisionProp()->CalcNearestPoint( vecCenter, &vecDamagePos );
+		pOther->GetEngineObject()->CalcNearestPoint( vecCenter, &vecDamagePos );
 
 		CTakeDamageInfo info( this, this, damage, m_bitsDamageInflict );
 		info.SetDamagePosition( vecDamagePos );
@@ -1244,8 +1244,8 @@ LINK_ENTITY_TO_CLASS( trigger_transition, CTriggerVolume );
 // Define space that travels across a level transition
 void CTriggerVolume::Spawn( void )
 {
-	SetSolid( SOLID_BSP );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BSP );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 	if ( showtriggers.GetInt() == 0 )
@@ -1381,7 +1381,7 @@ void CChangeLevel::Activate( void )
 		if (GetEngineObject()->HasSpawnFlags( SF_CHANGELEVEL_CHAPTER ) )
 		{
 			VPhysicsInitStatic();
-			RemoveSolidFlags( FSOLID_NOT_SOLID | FSOLID_TRIGGER );
+			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID | FSOLID_TRIGGER );
 			SetTouch( NULL );
 			return;
 		}
@@ -1516,7 +1516,7 @@ void CChangeLevel::ChangeLevelNow( CBaseEntity *pActivator )
 		if ( pPlayer )
 		{
 			Vector vecSurroundMins, vecSurroundMaxs;
-			pPlayer->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+			pPlayer->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 			bool playerInPVS = engine->CheckBoxInPVS( vecSurroundMins, vecSurroundMaxs, pvs, sizeof( pvs ) );
 
 			//Assert( playerInPVS );
@@ -1684,7 +1684,7 @@ void CTriggerPush::Activate()
 //-----------------------------------------------------------------------------
 void CTriggerPush::Touch( CBaseEntity *pOther )
 {
-	if ( !pOther->IsSolid() || (pOther->GetMoveType() == MOVETYPE_PUSH || pOther->GetMoveType() == MOVETYPE_NONE ) )
+	if ( !pOther->GetEngineObject()->IsSolid() || (pOther->GetMoveType() == MOVETYPE_PUSH || pOther->GetMoveType() == MOVETYPE_NONE ) )
 		return;
 
 	if (!PassesTriggerFilters(pOther))
@@ -2361,7 +2361,7 @@ void CTriggerCamera::Spawn( void )
 	BaseClass::Spawn();
 
 	SetMoveType( MOVETYPE_NOCLIP );
-	SetSolid( SOLID_NONE );								// Remove model & collisions
+	GetEngineObject()->SetSolid( SOLID_NONE );								// Remove model & collisions
 	SetRenderColorA( 0 );								// The engine won't draw this model if this is set to 0 and blending is on
 	m_nRenderMode = kRenderTransTexture;
 
@@ -2500,7 +2500,7 @@ void CTriggerCamera::Enable( void )
 	
 	if (GetEngineObject()->HasSpawnFlags( SF_CAMERA_PLAYER_NOT_SOLID ) )
 	{
-		m_hPlayer->AddSolidFlags( FSOLID_NOT_SOLID );
+		m_hPlayer->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 	
 	m_flReturnTime = gpGlobals->curtime + m_flWait;
@@ -2626,7 +2626,7 @@ void CTriggerCamera::Disable( void )
 	{
 		if (GetEngineObject()->HasSpawnFlags( SF_CAMERA_PLAYER_NOT_SOLID ) )
 		{
-			m_hPlayer->RemoveSolidFlags( FSOLID_NOT_SOLID );
+			m_hPlayer->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		}
 
 		((CBasePlayer*)m_hPlayer.Get())->SetViewEntity( m_hPlayer );
@@ -3733,8 +3733,8 @@ void CBaseVPhysicsTrigger::Spawn()
 {
 	Precache();
 
-	SetSolid( SOLID_VPHYSICS );	
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	// NOTE: Don't make yourself FSOLID_TRIGGER here or you'll get game 
 	// collisions AND vphysics collisions.  You don't want any game collisions

@@ -622,14 +622,14 @@ bool CBaseServerVehicle::GetPassengerExitPoint( int nRole, Vector *pExitPoint, Q
 
 	// All else failed, try popping them out the top.
 	Vector vecWorldMins, vecWorldMaxs;
-	m_pVehicle->CollisionProp()->WorldSpaceAABB( &vecWorldMins, &vecWorldMaxs );
+	m_pVehicle->GetEngineObject()->WorldSpaceAABB( &vecWorldMins, &vecWorldMaxs );
 	pExitPoint->x = (vecWorldMins.x + vecWorldMaxs.x) * 0.5f;
 	pExitPoint->y = (vecWorldMins.y + vecWorldMaxs.y) * 0.5f;
 	pExitPoint->z = vecWorldMaxs.z + 50.0f;
 
 	// Make sure it's clear
 	trace_t tr;
-	UTIL_TraceHull( m_pVehicle->CollisionProp()->WorldSpaceCenter(), *pExitPoint, VEC_HULL_MIN, VEC_HULL_MAX, MASK_PLAYERSOLID, m_pVehicle, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceHull( m_pVehicle->GetEngineObject()->WorldSpaceCenter(), *pExitPoint, VEC_HULL_MIN, VEC_HULL_MAX, MASK_PLAYERSOLID, m_pVehicle, COLLISION_GROUP_NONE, &tr );
 	if ( !tr.startsolid )
 	{
 		return true;

@@ -80,14 +80,14 @@ void CCycler::Spawn( )
 {
 	InitBoneControllers();
 	
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	if (GetEngineObject()->GetSpawnFlags() & FCYCLER_NOTSOLID)
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 	else
 	{
-		AddSolidFlags( FSOLID_NOT_STANDABLE );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	}
 
 	SetMoveType( MOVETYPE_NONE );
@@ -252,8 +252,8 @@ END_DATADESC()
 
 void CWeaponCycler::Spawn( )
 {
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_NONE );
 
 	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
@@ -355,7 +355,7 @@ LINK_ENTITY_TO_CLASS( cycler_wreckage, CWreckage );
 
 void CWreckage::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 	m_takedamage		= 0;
 
@@ -396,7 +396,7 @@ void CWreckage::Think( void )
 	}
 	
 	Vector vecSrc;
-	CollisionProp()->RandomPointInBounds( vec3_origin, Vector(1, 1, 1), &vecSrc );	
+	GetEngineObject()->RandomPointInBounds( vec3_origin, Vector(1, 1, 1), &vecSrc );
 	CPVSFilter filter( vecSrc );
 	te->Smoke( filter, 0.0, 
 		&vecSrc, g_sModelIndexSmoke,

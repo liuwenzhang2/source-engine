@@ -369,7 +369,7 @@ void CPropEnergyBall::ExplodeThink( )
 	// Turn us off and wait because we need our trails to finish up properly
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetMoveType( MOVETYPE_NONE );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	SetEmitState( false );
 

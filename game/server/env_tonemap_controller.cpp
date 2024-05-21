@@ -101,7 +101,7 @@ END_SEND_TABLE()
 //-----------------------------------------------------------------------------
 void CEnvTonemapController::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 }
 

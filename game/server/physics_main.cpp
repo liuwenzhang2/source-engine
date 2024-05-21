@@ -80,7 +80,7 @@ static void PhysicsCheckSweep( CBaseEntity *pEntity, const Vector& vecAbsStart, 
 	VectorAdd( vecAbsStart, vecAbsDelta, vecAbsEnd );
 
 	// Set collision type
-	if ( !pEntity->IsSolid() || pEntity->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS) )
+	if ( !pEntity->GetEngineObject()->IsSolid() || pEntity->GetEngineObject()->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS) )
 	{
 		if ( pEntity->GetEngineObject()->GetMoveParent() )
 		{
@@ -126,7 +126,7 @@ void CPhysicsPushedEntities::UnlinkPusherList( int *pPusherHandles )
 {
 	for ( int i = m_rgPusher.Count(); --i >= 0; )
 	{
-		pPusherHandles[i] = partition->HideElement( m_rgPusher[i].m_pEntity->CollisionProp()->GetPartitionHandle() );
+		pPusherHandles[i] = partition->HideElement( m_rgPusher[i].m_pEntity->GetEngineObject()->GetPartitionHandle() );
 	}
 }
 
@@ -134,7 +134,7 @@ void CPhysicsPushedEntities::RelinkPusherList( int *pPusherHandles )
 {
 	for ( int i = m_rgPusher.Count(); --i >= 0; )
 	{
-		partition->UnhideElement( m_rgPusher[i].m_pEntity->CollisionProp()->GetPartitionHandle(), pPusherHandles[i] );
+		partition->UnhideElement( m_rgPusher[i].m_pEntity->GetEngineObject()->GetPartitionHandle(), pPusherHandles[i] );
 	}
 }
 
@@ -146,14 +146,14 @@ void CPhysicsPushedEntities::ComputeRotationalPushDirection( CBaseEntity *pBlock
 {
 	// calculate destination position
 	// "start" is relative to the *root* pusher, world orientation
-	Vector start = pBlocker->CollisionProp()->GetCollisionOrigin();
-	if ( pRoot->GetSolid() == SOLID_VPHYSICS )
+	Vector start = pBlocker->GetEngineObject()->CollisionProp()->GetCollisionOrigin();
+	if ( pRoot->GetEngineObject()->GetSolid() == SOLID_VPHYSICS )
 	{
 		// HACKHACK: Use move dir to guess which corner of the box determines contact and rotate the box so
 		// that corner remains in the same local position.
 		// BUGBUG: This will break, but not as badly as the previous solution!!!
 		Vector vecAbsMins, vecAbsMaxs;
-		pBlocker->CollisionProp()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
+		pBlocker->GetEngineObject()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
 		start.x = (pMove->x < 0) ? vecAbsMaxs.x : vecAbsMins.x;
 		start.y = (pMove->y < 0) ? vecAbsMaxs.y : vecAbsMins.y;
 		start.z = (pMove->z < 0) ? vecAbsMaxs.z : vecAbsMins.z;
@@ -251,8 +251,8 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 		}
 
 		// We're not blocked if the blocker is point-sized or non-solid
-		if ( pBlocker->IsPointSized() || !pBlocker->IsSolid() || 
-			pBlocker->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS ) )
+		if ( pBlocker->IsPointSized() || !pBlocker->GetEngineObject()->IsSolid() ||
+			pBlocker->GetEngineObject()->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS ) )
 		{
 			return true;
 		}
@@ -544,7 +544,7 @@ public:
 		m_collisionGroupCount = 0;
 		for ( int i = m_pPushedEntities->m_rgPusher.Count(); --i >= 0; )
 		{
-			if ( !m_pPushedEntities->m_rgPusher[i].m_pEntity->IsSolid() )
+			if ( !m_pPushedEntities->m_rgPusher[i].m_pEntity->GetEngineObject()->IsSolid() )
 				continue;
 
 			m_pushersOnly.AddEntityToHit( m_pPushedEntities->m_rgPusher[i].m_pEntity );
@@ -620,7 +620,7 @@ private:
 		if (pCheck->m_nPushEnumCount == s_nEnumCount)
 			return NULL;
 
-		if ( !pCheck->IsSolid() )
+		if ( !pCheck->GetEngineObject()->IsSolid() )
 			return NULL;
 
 		if ( pCheck->GetMoveType() == MOVETYPE_PUSH || 
@@ -689,13 +689,13 @@ void CPhysicsPushedEntities::GenerateBlockingEntityList()
 		CBaseEntity *pPusher = m_rgPusher[i].m_pEntity;
 
 		// Don't bother if the pusher isn't solid
-		if ( !pPusher->IsSolid() || pPusher->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS ) )
+		if ( !pPusher->GetEngineObject()->IsSolid() || pPusher->GetEngineObject()->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS ) )
 		{
 			continue;
 		}
 
 		Vector vecAbsMins, vecAbsMaxs;
-		pPusher->CollisionProp()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
+		pPusher->GetEngineObject()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
 		partition->EnumerateElementsInBox( PARTITION_ENGINE_NON_STATIC_EDICTS, vecAbsMins, vecAbsMaxs, false, &blockerEnum );
 
 		//Go back throught the generated list.
@@ -717,13 +717,13 @@ void CPhysicsPushedEntities::GenerateBlockingEntityListAddBox( const Vector &vec
 		CBaseEntity *pPusher = m_rgPusher[i].m_pEntity;
 
 		// Don't bother if the pusher isn't solid
-		if ( !pPusher->IsSolid() || pPusher->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS ) )
+		if ( !pPusher->GetEngineObject()->IsSolid() || pPusher->GetEngineObject()->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS ) )
 		{
 			continue;
 		}
 
 		Vector vecAbsMins, vecAbsMaxs;
-		pPusher->CollisionProp()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
+		pPusher->GetEngineObject()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
 		for ( int iAxis = 0; iAxis < 3; ++iAxis )
 		{
 			if ( vecMoved[iAxis] >= 0.0f )
@@ -1412,7 +1412,7 @@ void CBaseEntity::PerformPush( float movetime )
 	{
 		// store the list of moved entities for later
 		// if you actually did an unblocked push that moved entities, and you're using physics (which may block later)
-		if ( movetime > 0 && !m_pBlocker && GetSolid() == SOLID_VPHYSICS && g_pPushedEntities->CountMovedEntities() > 0 )
+		if ( movetime > 0 && !m_pBlocker && GetEngineObject()->GetSolid() == SOLID_VPHYSICS && g_pPushedEntities->CountMovedEntities() > 0 )
 		{
 			// UNDONE: Any reason to want to call this twice before physics runs?
 			// If so, maybe just append to the list?

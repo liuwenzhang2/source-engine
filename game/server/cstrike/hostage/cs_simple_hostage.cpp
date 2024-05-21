@@ -150,8 +150,8 @@ void CHostage::Spawn( void )
 
 	SetHullType( HULL_HUMAN );
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
@@ -408,8 +408,8 @@ void CHostage::HostageRescueZoneTouch( inputdata_t &inputdata )
 		m_isRescued = true;
 		m_lastLeaderID = 0;
 
-		SetSolid( SOLID_NONE );
-		SetSolidFlags( 0 );
+		GetEngineObject()->SetSolid( SOLID_NONE );
+		GetEngineObject()->SetSolidFlags( 0 );
 
 		// start fading out
 		m_disappearTime = gpGlobals->curtime + 3.0f;
@@ -843,7 +843,7 @@ void CHostage::HostageThink( void )
 		m_isAdjusted = true;
 
 		// HACK - figure out why the default bbox is 6 units too low
-		SetCollisionBounds( HOSTAGE_BBOX_VEC_MIN, HOSTAGE_BBOX_VEC_MAX );
+		GetEngineObject()->SetCollisionBounds( HOSTAGE_BBOX_VEC_MIN, HOSTAGE_BBOX_VEC_MAX );
 	}
 
 	const float deltaT = HOSTAGE_THINK_INTERVAL;
@@ -894,8 +894,8 @@ void CHostage::HostageThink( void )
 		// finished fading - remove us completely
 		AddEffects( EF_NODRAW );
 
-		SetSolid( SOLID_NONE );
-		SetSolidFlags( 0 );
+		GetEngineObject()->SetSolid( SOLID_NONE );
+		GetEngineObject()->SetSolidFlags( 0 );
 		m_disappearTime = 0.0f;
 	}
 }

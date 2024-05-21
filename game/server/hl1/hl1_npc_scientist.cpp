@@ -155,8 +155,8 @@ void CNPC_Scientist::Spawn( void )
 	SetHullType(HULL_HUMAN);
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
 	ClearEffects();
@@ -277,7 +277,7 @@ void CNPC_Scientist::SUB_StartLVFadeOut( float delay, bool notSolid )
 
 	if ( notSolid )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		SetLocalAngularVelocity( vec3_angle );
 	}
 }
@@ -994,8 +994,8 @@ void CNPC_SittingScientist::Spawn( )
 	SetHullType(HULL_HUMAN);
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_iHealth			= 50;
 	

@@ -44,7 +44,7 @@ public:
 	virtual void ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs )
 	{
 		// Extend our bounding box downwards the length of the tongue
-		CollisionProp()->WorldSpaceAABB( pVecWorldMins, pVecWorldMaxs );
+		GetEngineObject()->WorldSpaceAABB( pVecWorldMins, pVecWorldMaxs );
 
 		// We really care about the tongue tip. The altitude is not really relevant.
 		VectorMin( *pVecWorldMins, m_vecTip, *pVecWorldMins );
@@ -146,7 +146,7 @@ void C_NPC_Barnacle::SetVecTip( const float *pPosition )
 	if ( vecNewTip != m_vecTip )
 	{
 		m_vecTip = vecNewTip;
-		CollisionProp()->MarkSurroundingBoundsDirty();
+		GetEngineObject()->MarkSurroundingBoundsDirty();
 	}
 }
 

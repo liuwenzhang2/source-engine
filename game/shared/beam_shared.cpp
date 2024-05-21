@@ -368,7 +368,7 @@ void CBeam::SetModel( const char *szModelName )
 void CBeam::Spawn( void )
 {
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_NONE );							// Remove model & collisions
+	GetEngineObject()->SetSolid( SOLID_NONE );							// Remove model & collisions
 	SetRenderMode( kRenderTransTexture );
 
 	// Opt out of all shadow routines
@@ -726,7 +726,7 @@ void CBeam::RelinkBeam( void )
 		VectorMax( vecBeamMax, vecAbsExtra2, vecBeamMax );
 	}
 
-	SetCollisionBounds( vecBeamMin - GetEngineObject()->GetAbsOrigin(), vecBeamMax - GetEngineObject()->GetAbsOrigin() );
+	GetEngineObject()->SetCollisionBounds( vecBeamMin - GetEngineObject()->GetAbsOrigin(), vecBeamMax - GetEngineObject()->GetAbsOrigin() );
 }
 
 
@@ -1039,7 +1039,7 @@ void CBeam::OnDataChanged( DataUpdateType_t updateType )
 	// Compute the bounds here...
 	Vector mins, maxs;
 	ComputeBounds( mins, maxs );
-	SetCollisionBounds( mins, maxs );
+	GetEngineObject()->SetCollisionBounds( mins, maxs );
 }
 
 bool CBeam::IsTransparent( void )
@@ -1075,7 +1075,7 @@ void CBeam::AddEntity( void )
 		// Compute the bounds here...
 		Vector mins, maxs;
 		ComputeBounds( mins, maxs );
-		SetCollisionBounds( mins, maxs );
+		GetEngineObject()->SetCollisionBounds( mins, maxs );
 	}
 
 	MoveToLastReceivedPosition();

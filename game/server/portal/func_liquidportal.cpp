@@ -55,8 +55,8 @@ void CFunc_LiquidPortal::Spawn( void )
 {
 	BaseClass::Spawn();
 
-	SetSolid( SOLID_VPHYSICS );
-	SetSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
@@ -70,8 +70,8 @@ void CFunc_LiquidPortal::Activate( void )
 {
 	BaseClass::Activate();
 
-	SetSolid( SOLID_VPHYSICS );
-	SetSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 

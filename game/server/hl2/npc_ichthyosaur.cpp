@@ -270,8 +270,8 @@ void CNPC_Ichthyosaur::Spawn( void )
 	m_flFieldOfView			= -0.707;	// 270 degrees
 	SetDistLook( 1024 );
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	AddFlag( FL_FLY | FL_STEPMOVEMENT );
 
@@ -1277,7 +1277,7 @@ void CNPC_Ichthyosaur::EnsnareVictim( CBaseEntity *pVictim )
 		}
 	
 		m_pVictim = pVictim;
-		m_pVictim->AddSolidFlags( FSOLID_NOT_SOLID );
+		m_pVictim->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 		SetSchedule( SCHED_ICH_DROWN_VICTIM );
 	}
@@ -1292,7 +1292,7 @@ void CNPC_Ichthyosaur::ReleaseVictim( void )
 
 	pBCC->DispatchInteraction( g_interactionBarnacleVictimReleased, NULL, this );
 
-	m_pVictim->RemoveSolidFlags( FSOLID_NOT_SOLID );
+	m_pVictim->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 	m_pVictim			= NULL;
 	m_flNextBiteTime	= gpGlobals->curtime + 8.0f;

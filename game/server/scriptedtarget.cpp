@@ -104,7 +104,7 @@ void CScriptedTarget::Spawn( void )
 		g_interactionScriptedTarget			= CBaseCombatCharacter::GetInteractionID();
 	}
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	m_vLastPosition = GetEngineObject()->GetAbsOrigin();
 

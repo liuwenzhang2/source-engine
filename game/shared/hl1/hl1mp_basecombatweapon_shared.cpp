@@ -31,8 +31,23 @@ END_PREDICTION_DATA()
 CBaseHL1MPCombatWeapon::CBaseHL1MPCombatWeapon()
 {
 	//SetPredictionEligible( true );
-	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 }
+
+#ifdef GAME_DLL
+void CBaseHL1MPCombatWeapon::PostConstructor(const char* szClassname, int iForceEdictIndex) 
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+}
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+bool CBaseHL1MPCombatWeapon::Init(int entnum, int iSerialNum) 
+{
+	bool bRet = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+	return bRet;
+}
+#endif // CLIENT_DLL
 
 
 void CBaseHL1MPCombatWeapon::EjectShell( CBaseEntity *pPlayer, int iType )

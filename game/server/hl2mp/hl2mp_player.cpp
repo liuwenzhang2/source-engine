@@ -297,7 +297,7 @@ void CHL2MP_Player::Spawn(void)
 	if ( !IsObserver() )
 	{
 		pl.deadflag = false;
-		RemoveSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 		RemoveEffects( EF_NODRAW );
 		
@@ -562,7 +562,7 @@ void CHL2MP_Player::PostThink( void )
 	
 	if ( GetFlags() & FL_DUCKING )
 	{
-		SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
+		GetEngineObject()->SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
 	}
 
 	m_PlayerAnimState.Update();

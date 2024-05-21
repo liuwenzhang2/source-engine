@@ -2281,7 +2281,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 
 	// Now clamp a sphere of object radius at end to the player's bbox
 	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -forward );
-	Vector player2d = pPlayer->CollisionProp()->OBBMaxs();
+	Vector player2d = pPlayer->GetEngineObject()->CollisionProp()->OBBMaxs();
 	float playerRadius = player2d.Length2D();
 	float flDot = DotProduct( forward, radial );
 
@@ -2308,8 +2308,8 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	}
 
 	Vector playerMins, playerMaxs, nearest;
-	pPlayer->CollisionProp()->WorldSpaceAABB( &playerMins, &playerMaxs );
-	Vector playerLine = pPlayer->CollisionProp()->WorldSpaceCenter();
+	pPlayer->GetEngineObject()->WorldSpaceAABB( &playerMins, &playerMaxs );
+	Vector playerLine = pPlayer->GetEngineObject()->WorldSpaceCenter();
 	CalcClosestPointOnLine( end, playerLine+Vector(0,0,playerMins.z), playerLine+Vector(0,0,playerMaxs.z), nearest, NULL );
 
 	Vector delta = end - nearest;

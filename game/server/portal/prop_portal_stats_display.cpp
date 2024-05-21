@@ -181,7 +181,7 @@ void CPropPortalStatsDisplay::Spawn( void )
 	Precache();
 	SetModel( szModel );
 
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	VPhysicsInitStatic();
 
 	BaseClass::Spawn();

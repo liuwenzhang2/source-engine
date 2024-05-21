@@ -1396,7 +1396,7 @@ void CCSBotManager::ExtractScenarioData( void )
 			if (m_zoneCount < MAX_ZONES)
 			{
 				Vector absmin, absmax;
-				entity->CollisionProp()->WorldSpaceAABB( &absmin, &absmax );
+				entity->GetEngineObject()->WorldSpaceAABB( &absmin, &absmax );
 
 				m_zone[ m_zoneCount ].m_isBlocked = false;
 				m_zone[ m_zoneCount ].m_center = (isLegacy) ? entity->GetEngineObject()->GetAbsOrigin() : (absmin + absmax)/2.0f;
@@ -1454,7 +1454,7 @@ void CCSBotManager::ExtractScenarioData( void )
 		else
 		{
 			Vector absmin, absmax;
-			zone->m_entity->CollisionProp()->WorldSpaceAABB( &absmin, &absmax );
+			zone->m_entity->GetEngineObject()->WorldSpaceAABB( &absmin, &absmax );
 
 			zone->m_extent.lo = absmin;
 			zone->m_extent.hi = absmax;

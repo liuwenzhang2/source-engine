@@ -171,7 +171,7 @@ void CNPC_EnemyFinder::Spawn( void )
 	
 	AddFlag( FL_NPC );
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	m_bEnemyStatus = false;
 

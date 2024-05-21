@@ -110,7 +110,7 @@ void CNPC_Crow::Spawn( void )
 	SetHullType(HULL_TINY);
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_STEP );
 
 	m_flFieldOfView = VIEW_FIELD_FULL;

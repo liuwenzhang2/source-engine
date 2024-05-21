@@ -71,7 +71,7 @@ void CDODBaseGrenade::Spawn( void )
 
 	BaseClass::Spawn();
 	
-	SetSolid( SOLID_BBOX );	// So it will collide with physics props!
+	GetEngineObject()->SetSolid( SOLID_BBOX );	// So it will collide with physics props!
 
 	UTIL_SetSize( this, Vector(-4,-4,-4), Vector(4,4,4) );
 
@@ -96,7 +96,7 @@ void CDODBaseGrenade::Spawn( void )
 		m_takedamage	= DAMAGE_NO;
 	}
 
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	m_iHealth		= 1;
 	
@@ -367,7 +367,7 @@ bool CDODBaseGrenade::CreateVPhysics()
 void CDODBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 {
 	GetEngineObject()->SetModelName( NULL_STRING );//invisible
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	m_takedamage = DAMAGE_NO;
 

@@ -54,7 +54,7 @@ LINK_ENTITY_TO_CLASS( grenade_ar2, CGrenadeAR2 );
 void CGrenadeAR2::Spawn( void )
 {
 	Precache( );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
 	// Hits everything but debris
@@ -167,7 +167,7 @@ void CGrenadeAR2::Event_Killed( const CTakeDamageInfo &info )
 void CGrenadeAR2::GrenadeAR2Touch( CBaseEntity *pOther )
 {
 	Assert( pOther );
-	if ( !pOther->IsSolid() )
+	if ( !pOther->GetEngineObject()->IsSolid() )
 		return;
 
 	// If I'm live go ahead and blow up

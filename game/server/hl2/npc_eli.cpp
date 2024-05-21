@@ -100,8 +100,8 @@ void CNPC_Eli::Spawn()
 	// If Eli has a parent, he's currently inside a pod. Prevent him from moving.
 	if (GetEngineObject()->GetMoveParent() )
 	{
-		SetSolid( SOLID_BBOX );
-		AddSolidFlags( FSOLID_NOT_STANDABLE );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 		SetMoveType( MOVETYPE_NONE );
 
 		CapabilitiesAdd( bits_CAP_ANIMATEDFACE | bits_CAP_TURN_HEAD );
@@ -135,8 +135,8 @@ void CNPC_Eli::Precache()
 //-----------------------------------------------------------------------------
 void CNPC_Eli::SetupWithoutParent( void )
 {
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 
 	CapabilitiesAdd( bits_CAP_MOVE_GROUND | bits_CAP_OPEN_DOORS | bits_CAP_ANIMATEDFACE | bits_CAP_TURN_HEAD );

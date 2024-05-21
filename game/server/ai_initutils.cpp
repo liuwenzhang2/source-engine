@@ -67,8 +67,8 @@ void CAI_TestHull::Spawn(void)
 	SetHullType(HULL_HUMAN);
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	SetMoveType( MOVETYPE_STEP );
 	m_iHealth			= 50;
@@ -99,7 +99,7 @@ CAI_TestHull* CAI_TestHull::GetTestHull(void)
 		Assert( 0 );
 	}
 
-	CAI_TestHull::pTestHull->RemoveSolidFlags( FSOLID_NOT_SOLID );
+	CAI_TestHull::pTestHull->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	CAI_TestHull::pTestHull->bInUse = true;
 
 	return CAI_TestHull::pTestHull;
@@ -113,7 +113,7 @@ CAI_TestHull* CAI_TestHull::GetTestHull(void)
 void CAI_TestHull::ReturnTestHull(void)
 {
 	CAI_TestHull::pTestHull->bInUse = false;
-	CAI_TestHull::pTestHull->AddSolidFlags( FSOLID_NOT_SOLID );
+	CAI_TestHull::pTestHull->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	UTIL_SetSize(CAI_TestHull::pTestHull, vec3_origin, vec3_origin);
 
 	UTIL_RemoveImmediate( pTestHull );

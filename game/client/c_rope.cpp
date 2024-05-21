@@ -1319,7 +1319,7 @@ void C_RopeKeyframe::FinishInit( const char *pMaterialName )
 	m_nSegments = clamp( m_nSegments, 2, ROPE_MAX_SEGMENTS );
 	m_RopePhysics.SetNumNodes( m_nSegments );
 
-	SetCollisionBounds( Vector( -10, -10, -10 ), Vector( 10, 10, 10 ) );
+	GetEngineObject()->SetCollisionBounds( Vector( -10, -10, -10 ), Vector( 10, 10, 10 ) );
 
 	// We want to think every frame.
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
@@ -1842,7 +1842,7 @@ void C_RopeKeyframe::UpdateBBox()
 	
 	mins -= GetEngineObject()->GetAbsOrigin();
 	maxs -= GetEngineObject()->GetAbsOrigin();
-	SetCollisionBounds( mins, maxs );
+	GetEngineObject()->SetCollisionBounds( mins, maxs );
 }
 
 

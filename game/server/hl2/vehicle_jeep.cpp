@@ -235,7 +235,7 @@ void CPropJeep::Spawn( void )
 		SetBodygroup( 1, false );
 	}
 
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 }
 
 //-----------------------------------------------------------------------------

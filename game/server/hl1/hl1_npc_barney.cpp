@@ -109,8 +109,8 @@ void CNPC_Barney::Spawn()
 	SetHullType(HULL_HUMAN);
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
 	m_iHealth			= sk_barney_health.GetFloat();
@@ -479,7 +479,7 @@ void CNPC_Barney::SUB_StartLVFadeOut( float delay, bool notSolid )
 
 	if ( notSolid )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		SetLocalAngularVelocity( vec3_angle );
 	}
 }

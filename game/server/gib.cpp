@@ -106,8 +106,8 @@ void CGib::SpawnStickyGibs( CBaseEntity *pVictim, Vector vecOrigin, int cGibs )
 			pGib->GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 			
 			pGib->SetMoveType( MOVETYPE_FLYGRAVITY );
-			pGib->RemoveSolidFlags( FSOLID_NOT_SOLID );
-			pGib->SetCollisionBounds( vec3_origin, vec3_origin );
+			pGib->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
+			pGib->GetEngineObject()->SetCollisionBounds( vec3_origin, vec3_origin );
 			pGib->SetTouch ( &CGib::StickyGibTouch );
 			pGib->SetThink (NULL);
 		}
@@ -212,7 +212,7 @@ void CGib::InitGib( CBaseEntity *pVictim, float fMinVelocity, float fMaxVelocity
 	{
 		// Find a random position within the bounding box (add 1 to Z to get it out of the ground)
 		Vector vecOrigin;
-		pVictim->CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &vecOrigin );
+		pVictim->GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &vecOrigin );
 		vecOrigin.z += 1.0f;
 		GetEngineObject()->SetAbsOrigin( vecOrigin );
 
@@ -249,8 +249,8 @@ void CGib::InitGib( CBaseEntity *pVictim, float fMinVelocity, float fMaxVelocity
 		}
 		else
 		{
-			SetSolid( SOLID_BBOX );
-			SetCollisionBounds( vec3_origin, vec3_origin );
+			GetEngineObject()->SetSolid( SOLID_BBOX );
+			GetEngineObject()->SetCollisionBounds( vec3_origin, vec3_origin );
 			GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 		}
 	
@@ -346,7 +346,7 @@ void CGib::WaitTillLand ( void )
 		m_nRenderMode = kRenderTransTexture;
 		if ( GetMoveType() != MOVETYPE_VPHYSICS )
 		{
-			AddSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		}
 		SetLocalAngularVelocity( vec3_angle );
 
@@ -593,8 +593,8 @@ void CGib::Spawn( const char *szGibModel )
 	
 	// hopefully this will fix the VELOCITY TOO LOW crap
 	m_takedamage = DAMAGE_EVENTS_ONLY;
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
 	SetModel( szGibModel );
@@ -660,15 +660,15 @@ CBaseEntity *CreateRagGib( const char *szModel, const Vector &vecOrigin, const Q
 
 void CRagGib::Spawn( const char *szModel, const Vector &vecOrigin, const Vector &vecForce, float flFadeTime = 0.0 )
 {
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetModel( szModel );
 	UTIL_SetSize(this, vec3_origin, vec3_origin);
 	UTIL_SetOrigin( this, vecOrigin );
 	if ( !BecomeRagdollOnClient( vecForce ) )
 	{
-		AddSolidFlags( FSOLID_NOT_STANDABLE );
-		RemoveSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
+		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		if( flFadeTime > 0.0 )
 		{
 			SUB_StartFadeOut( flFadeTime );

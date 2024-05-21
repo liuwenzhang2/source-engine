@@ -156,7 +156,7 @@ void CMissile::Spawn( void )
 {
 	Precache();
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetModel("models/weapons/w_missile_launch.mdl");
 	UTIL_SetSize( this, -Vector(4,4,4), Vector(4,4,4) );
 
@@ -257,7 +257,7 @@ void CMissile::SetGracePeriod( float flGracePeriod )
 	m_flGracePeriodEndsAt = gpGlobals->curtime + flGracePeriod;
 
 	// Go non-solid until the grace period ends
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 }
 
 //---------------------------------------------------------
@@ -377,7 +377,7 @@ void CMissile::Explode( void )
 	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + forward * 16, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 
 	m_takedamage = DAMAGE_NO;
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	if( tr.fraction == 1.0 || !(tr.surface.flags & SURF_SKY) )
 	{
 		DoExplosion();
@@ -408,7 +408,7 @@ void CMissile::MissileTouch( CBaseEntity *pOther )
 	Assert( pOther );
 	
 	// Don't touch triggers (but DO hit weapons)
-	if ( pOther->IsSolidFlagSet(FSOLID_TRIGGER|FSOLID_VOLUME_CONTENTS) && pOther->GetCollisionGroup() != COLLISION_GROUP_WEAPON )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER|FSOLID_VOLUME_CONTENTS) && pOther->GetCollisionGroup() != COLLISION_GROUP_WEAPON )
 	{
 		// Some NPCs are triggers that can take damage (like antlion grubs). We should hit them.
 		if ( ( pOther->m_takedamage == DAMAGE_NO ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )
@@ -454,7 +454,7 @@ void CMissile::IgniteThink( void )
 	SetMoveType( MOVETYPE_FLY );
 	SetModel("models/weapons/w_missile.mdl");
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
- 	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 	//TODO: Play opening sound
 
@@ -574,7 +574,7 @@ void CMissile::SeekThink( void )
 	{
 		if ( m_flGracePeriodEndsAt < gpGlobals->curtime )
 		{
-			RemoveSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 			m_flGracePeriodEndsAt = 0;
 		}
 	}
@@ -618,7 +618,7 @@ void CMissile::SeekThink( void )
 			}
 			else
 			{
-				const Vector &vPos = detonator.hEntity->CollisionProp()->WorldSpaceCenter();
+				const Vector &vPos = detonator.hEntity->GetEngineObject()->WorldSpaceCenter();
 				if ( detonator.halfHeight > 0 )
 				{
 					if ( fabsf( vPos.z - GetEngineObject()->GetAbsOrigin().z ) < detonator.halfHeight )
@@ -825,8 +825,8 @@ END_DATADESC()
 void CInfoAPCMissileHint::Spawn( )
 {
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	SetSolid( SOLID_BSP );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BSP );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW );
 }
 
@@ -892,8 +892,8 @@ CBaseEntity *CInfoAPCMissileHint::FindAimTarget( CBaseEntity *pMissile, const ch
 		VectorMultiply( vecCurrentEnemyVel, HINT_PREDICTION_TIME, vecRayDelta );
 
 		BoxTraceInfo_t trace;
-		if ( !IntersectRayWithOBB( vecCurrentEnemyPos, vecRayDelta, pHint->CollisionProp()->CollisionToWorldTransform(),
-			pHint->CollisionProp()->OBBMins(), pHint->CollisionProp()->OBBMaxs(), 0.0f, &trace ))
+		if ( !IntersectRayWithOBB( vecCurrentEnemyPos, vecRayDelta, pHint->GetEngineObject()->CollisionProp()->CollisionToWorldTransform(),
+			pHint->GetEngineObject()->CollisionProp()->OBBMins(), pHint->GetEngineObject()->CollisionProp()->OBBMaxs(), 0.0f, &trace ))
 		{
 			continue;
 		}
@@ -929,7 +929,7 @@ CAPCMissile *FindAPCMissileInCone( const Vector &vecOrigin, const Vector &vecDir
 	float flCosAngle = cos( DEG2RAD( flAngle ) );
 	for( CAPCMissile *pEnt = GetAPCMissileList(); pEnt != NULL; pEnt = pEnt->m_pNext )
 	{
-		if ( !pEnt->IsSolid() )
+		if ( !pEnt->GetEngineObject()->IsSolid() )
 			continue;
 
 		Vector vecDelta;
@@ -1045,7 +1045,7 @@ void CAPCMissile::AimAtSpecificTarget( CBaseEntity *pTarget )
 void CAPCMissile::APCMissileTouch( CBaseEntity *pOther )
 {
 	Assert( pOther );
-	if ( !pOther->IsSolid() && !pOther->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
+	if ( !pOther->GetEngineObject()->IsSolid() && !pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
 		return;
 
 	Explode();
@@ -1062,7 +1062,7 @@ void CAPCMissile::IgniteDelay( void )
 	SetThink( &CAPCMissile::BeginSeekThink );
 	SetNextThink( m_flIgnitionTime );
 	Init();
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 }
 
 void CAPCMissile::AugerDelay( float flDelay )
@@ -1097,7 +1097,7 @@ void CAPCMissile::ExplodeDelay( float flDelay )
 
 void CAPCMissile::BeginSeekThink( void )
 {
- 	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	SetThink( &CAPCMissile::APCSeekThink );
 	SetNextThink( gpGlobals->curtime );
 }
@@ -2308,7 +2308,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 
 	pLaserDot->m_bVisibleLaserDot = bVisibleDot;
 	pLaserDot->SetMoveType( MOVETYPE_NONE );
-	pLaserDot->AddSolidFlags( FSOLID_NOT_SOLID );
+	pLaserDot->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	pLaserDot->AddEffects( EF_NOSHADOW );
 	UTIL_SetSize( pLaserDot, vec3_origin, vec3_origin );
 

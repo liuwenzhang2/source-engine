@@ -232,13 +232,13 @@ void AvoidPushawayProps( CBaseCombatCharacter *pPlayer, CUserCmd *pCmd )
 
 		// Push away from the collision point. The closer our center is to the collision point,
 		// the harder we push away.
-		props[i]->CollisionProp()->CalcNearestPoint( ourCenter, &nearestPropPoint );
-		pPlayer->CollisionProp()->CalcNearestPoint( nearestPropPoint, &nearestPlayerPoint );
+		props[i]->GetEngineObject()->CalcNearestPoint( ourCenter, &nearestPropPoint );
+		pPlayer->GetEngineObject()->CalcNearestPoint( nearestPropPoint, &nearestPlayerPoint );
 		Vector vPushAway = (nearestPlayerPoint - nearestPropPoint);
 		float flDist = VectorNormalize( vPushAway );
 
 		const float MaxPushawayDistance = 5.0f;
-		if ( flDist > MaxPushawayDistance && !pPlayer->CollisionProp()->IsPointInBounds( nearestPropPoint ) )
+		if ( flDist > MaxPushawayDistance && !pPlayer->GetEngineObject()->IsPointInBounds( nearestPropPoint ) )
 		{
 			continue;
 		}

@@ -1127,8 +1127,8 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 		if ( bUsable )
 		{
 			Vector delta = tr.endpos - tr.startpos;
-			float centerZ = CollisionProp()->WorldSpaceCenter().z;
-			delta.z = IntervalDistance( tr.endpos.z, centerZ + CollisionProp()->OBBMins().z, centerZ + CollisionProp()->OBBMaxs().z );
+			float centerZ = GetEngineObject()->WorldSpaceCenter().z;
+			delta.z = IntervalDistance( tr.endpos.z, centerZ + GetEngineObject()->CollisionProp()->OBBMins().z, centerZ + GetEngineObject()->CollisionProp()->OBBMaxs().z );
 			float dist = delta.Length();
 			if ( dist < PLAYER_USE_RADIUS )
 			{
@@ -1172,7 +1172,7 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 	{
 		// estimate nearest object by distance from the view vector
 		Vector point;
-		pNearest->CollisionProp()->CalcNearestPoint( searchCenter, &point );
+		pNearest->GetEngineObject()->CalcNearestPoint( searchCenter, &point );
 		nearestDist = CalcDistanceToLine( point, searchCenter, forward );
 		if ( sv_debug_player_use.GetBool() )
 		{
@@ -1190,7 +1190,7 @@ CBaseEntity *CBasePlayer::FindUseEntity()
 
 		// see if it's more roughly in front of the player than previous guess
 		Vector point;
-		pObject->CollisionProp()->CalcNearestPoint( searchCenter, &point );
+		pObject->GetEngineObject()->CalcNearestPoint( searchCenter, &point );
 
 		Vector dir = point - searchCenter;
 		VectorNormalize(dir);
@@ -1828,8 +1828,8 @@ void CBasePlayer::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int
 void CBasePlayer::SharedSpawn()
 {
 	SetMoveType( MOVETYPE_WALK );
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetFriction( 1.0f );
 
 	pl.deadflag	= false;
@@ -1849,9 +1849,9 @@ void CBasePlayer::SharedSpawn()
 	SetSequence( SelectWeightedSequence( ACT_IDLE ) );
 
 	if ( GetFlags() & FL_DUCKING ) 
-		SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
+		GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 	else
-		SetCollisionBounds( VEC_HULL_MIN, VEC_HULL_MAX );
+		GetEngineObject()->SetCollisionBounds( VEC_HULL_MIN, VEC_HULL_MAX );
 
 	// dont let uninitialized value here hurt the player
 	m_Local.m_flFallVelocity = 0;

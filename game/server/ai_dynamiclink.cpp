@@ -62,7 +62,7 @@ void CAI_DynamicLinkController::GenerateLinksFromVolume()
 
 	const Vector &origin = WorldSpaceCenter();
 	Vector vAbsMins, vAbsMaxs;
-	CollisionProp()->WorldSpaceAABB( &vAbsMins, &vAbsMaxs );
+	((CCollisionProperty*)GetEngineObject()->CollisionProp())->WorldSpaceAABB( &vAbsMins, &vAbsMaxs );
 	vAbsMins -= Vector( 1, 1, 1 );
 	vAbsMaxs += Vector( 1, 1, 1 );
 
@@ -593,7 +593,7 @@ END_DATADESC()
 //---------------------------------------------------------
 void CAI_RadialLinkController::Spawn()
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 }
 

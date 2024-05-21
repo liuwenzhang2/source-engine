@@ -66,7 +66,7 @@ void CDODBaseRocket::Spawn( void )
 {
 	Precache();
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	Assert( GetModel() );	//derived classes must have set model
 
@@ -209,7 +209,7 @@ void CDODBaseRocket::Explode( void )
 void CDODBaseRocket::RocketTouch( CBaseEntity *pOther )
 {
 	Assert( pOther );
-	if ( !pOther->IsSolid() || pOther->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
+	if ( !pOther->GetEngineObject()->IsSolid() || pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
 		return;
 
 	if ( pOther->GetCollisionGroup() == COLLISION_GROUP_WEAPON )

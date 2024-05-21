@@ -47,7 +47,7 @@ void CThrownGrenade::Spawn( void )
 {
 	// point sized, solid, bouncing
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	UTIL_SetSize(this, vec3_origin, vec3_origin);
 
 	// Movement

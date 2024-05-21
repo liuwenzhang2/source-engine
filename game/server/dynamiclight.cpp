@@ -157,7 +157,7 @@ void CDynamicLight::InputToggle( inputdata_t &inputdata )
 void CDynamicLight::Spawn( void )
 {
 	Precache();
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	m_On = true;
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );

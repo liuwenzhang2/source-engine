@@ -276,7 +276,7 @@ void CBreakable::Spawn( void )
 
 	m_iMaxHealth = ( m_iHealth > 0 ) ? m_iHealth : 1;
   
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
     SetMoveType( MOVETYPE_PUSH );
 	
 	// this is a hack to shoot the gibs in a specific yaw/direction
@@ -882,7 +882,7 @@ void CBreakable::ResetOnGroundFlags(void)
 	// !!! HACK  This should work!
 	// Build a box above the entity that looks like an 9 inch high sheet
 	Vector mins, maxs;
-	CollisionProp()->WorldSpaceAABB( &mins, &maxs );
+	GetEngineObject()->WorldSpaceAABB( &mins, &maxs );
 	mins.z -= 1;
 	maxs.z += 8;
 
@@ -904,7 +904,7 @@ void CBreakable::ResetOnGroundFlags(void)
 	if( iPortalCount != 0 )
 	{
 		Vector vMin, vMax;
-		CollisionProp()->WorldSpaceAABB( &vMin, &vMax );
+		GetEngineObject()->WorldSpaceAABB( &vMin, &vMax );
 
 		Vector vBoxCenter = ( vMin + vMax ) * 0.5f;
 		Vector vBoxExtents = ( vMax - vMin ) * 0.5f;
@@ -1052,7 +1052,7 @@ void CBreakable::Die( void )
 	CPVSFilter filter2( vecSpot );
 
 	int iModelIndex = 0;
-	CCollisionProperty *pCollisionProp = CollisionProp();
+	CCollisionProperty *pCollisionProp = (CCollisionProperty*)GetEngineObject()->CollisionProp();
 
 	Vector vSize = pCollisionProp->OBBSize();
 	int iCount = ( vSize[0] * vSize[1] + vSize[1] * vSize[2] + vSize[2] * vSize[0] ) / ( 3 * 12 * 12 );
@@ -1113,7 +1113,7 @@ void CBreakable::Die( void )
 	// Don't fire something that could fire myself
 	SetName( "");
 
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	
 	// Fire targets on break
 	m_OnBreak.FireOutput( m_hBreaker, this );
@@ -1250,7 +1250,7 @@ void CPushable::Spawn( void )
 	{
 		Precache();
 
-		SetSolid( SOLID_VPHYSICS );
+		GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 
 		SetMoveType( MOVETYPE_PUSH );
 		SetModel( STRING(GetEngineObject()->GetModelName() ) );

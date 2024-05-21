@@ -131,8 +131,8 @@ void CPropCrane::Spawn( void )
 
 	BaseClass::Spawn();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NOCLIP );
 
 	m_takedamage = DAMAGE_EVENTS_ONLY;
@@ -1034,8 +1034,8 @@ void CCraneTip::Spawn( void )
 	AddEffects( EF_NODRAW );
 
 	// We don't want this to be solid, because we don't want it to collide with the hydra.
-	SetSolid( SOLID_VPHYSICS );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	VPhysicsInitShadow( false, false );
 
 	// Disable movement on this sucker, we're going to move him manually

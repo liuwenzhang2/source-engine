@@ -133,7 +133,7 @@ bool CShadowControl::KeyValue( const char *szKeyName, const char *szValue )
 void CShadowControl::Spawn( void )
 {
 	Precache();
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 }
 
 //------------------------------------------------------------------------------

@@ -237,8 +237,8 @@ public:
 		// that the abs origin is at the center of the rollermine
 		// and that the OBB is actually world-aligned despite the
 		// fact that SOLID_VPHYSICS is being used
-		Vector eye = CollisionProp()->GetCollisionOrigin();
-		eye.z += CollisionProp()->OBBMaxs().z;
+		Vector eye = GetEngineObject()->CollisionProp()->GetCollisionOrigin();
+		eye.z += GetEngineObject()->CollisionProp()->OBBMaxs().z;
 		return eye;
 	}
 
@@ -538,8 +538,8 @@ void CNPC_RollerMine::Spawn( void )
 {
 	Precache();
 
-	SetSolid( SOLID_VPHYSICS );
-	AddSolidFlags( FSOLID_FORCE_WORLD_ALIGNED | FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->AddSolidFlags( FSOLID_FORCE_WORLD_ALIGNED | FSOLID_NOT_STANDABLE );
 
 	BaseClass::Spawn();
 
@@ -769,10 +769,10 @@ bool CNPC_RollerMine::BecomePhysical( void )
 {
 	VPhysicsDestroyObject();
 
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 	//Setup the physics controller on the roller
-	IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, GetSolidFlags() , false );
+	IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, GetEngineObject()->GetSolidFlags() , false );
 
 	if ( pPhysicsObject == NULL )
 		return false;
@@ -1068,7 +1068,7 @@ void CNPC_RollerMine::StartTask( const Task_t *pTask )
 	case TASK_ROLLERMINE_UNBURROW:
 		
 		{
-			AddSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 			SetMoveType( MOVETYPE_NOCLIP );
 			GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 256 ) );
 			Open();
@@ -1799,7 +1799,7 @@ void CNPC_RollerMine::SpikeTouch( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::CloseTouch( CBaseEntity *pOther )
 {
-	if ( pOther->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
 		return;
 
 	if ( IsShocking() )
@@ -1827,7 +1827,7 @@ void CNPC_RollerMine::CloseTouch( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::EmbedTouch( CBaseEntity *pOther )
 {
-	if ( pOther->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
 		return;
 
 	m_bEmbedOnGroundImpact = false;
@@ -1997,7 +1997,7 @@ void CNPC_RollerMine::NotifyInteraction( CAI_BaseNPC *pUser )
 //-----------------------------------------------------------------------------
 void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 {
-	if ( pOther->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
 		return;
 
 	if ( m_bHeld || m_hVehicleStuckTo || gpGlobals->curtime < m_flShockTime )
@@ -2056,7 +2056,7 @@ void CNPC_RollerMine::ShockTouch( CBaseEntity *pOther )
 
 	// Calculate physics force
 	Vector out;
-	pOther->CollisionProp()->CalcNearestPoint( WorldSpaceCenter(), &out );
+	pOther->GetEngineObject()->CalcNearestPoint( WorldSpaceCenter(), &out );
 
 	Vector vecForce = ( -impulse * pPhysics->GetMass() * 10 );
 	CTakeDamageInfo	info( this, this, vecForce, out, sk_rollermine_shock.GetFloat(), DMG_SHOCK );

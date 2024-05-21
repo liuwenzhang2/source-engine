@@ -206,7 +206,7 @@ public:
 		BaseClass::Spawn();
 
 		SetMoveType( MOVETYPE_NONE );
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		AddEffects( EF_NOSHADOW );
 		UTIL_SetSize( this, vec3_origin, vec3_origin );
 	}
@@ -891,8 +891,8 @@ void CPointCommentaryNode::Spawn( void )
 	Precache();
 	SetModel( szModel );
 	UTIL_SetSize( this, -Vector(16,16,16), Vector(16,16,16) );
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 	AddEffects( EF_NOSHADOW );
 
 	// Setup for animation

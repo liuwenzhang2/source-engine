@@ -88,7 +88,7 @@ void CEnvAR2Explosion::Spawn( void )
 { 
 	Precache();
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 
 	SetMoveType( MOVETYPE_NONE );

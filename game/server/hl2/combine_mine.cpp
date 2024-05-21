@@ -141,7 +141,7 @@ void CBounceBomb::Spawn()
 
 	SetModel("models/props_combine/combine_mine01.mdl");
 
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 
 	m_hSprite.Set( NULL );
 	m_takedamage = DAMAGE_EVENTS_ONLY;
@@ -1063,7 +1063,7 @@ void CBounceBomb::ExplodeTouch( CBaseEntity *pOther )
 		return;
 
 	// Don't touch triggers.
-	if( pOther->IsSolidFlagSet(FSOLID_TRIGGER) )
+	if( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER) )
 		return;
 
 	// Don't touch gibs and other debris
@@ -1098,7 +1098,7 @@ void CBounceBomb::ExplodeTouch( CBaseEntity *pOther )
 //---------------------------------------------------------
 void CBounceBomb::ExplodeThink()
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	// Don't catch self in own explosion!
 	m_takedamage = DAMAGE_NO;

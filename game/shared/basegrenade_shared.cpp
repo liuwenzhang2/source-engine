@@ -117,7 +117,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 #if !defined( CLIENT_DLL )
 	
 	GetEngineObject()->SetModelName( NULL_STRING );//invisible
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	m_takedamage = DAMAGE_NO;
 
@@ -191,7 +191,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 
 	SetThink( &CBaseGrenade::SUB_Remove );
 	SetTouch( NULL );
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	
 	AddEffects( EF_NODRAW );
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
@@ -325,7 +325,7 @@ void CBaseGrenade::ExplodeTouch( CBaseEntity *pOther )
 	Vector		vecSpot;// trace starts here!
 
 	Assert( pOther );
-	if ( !pOther->IsSolid() )
+	if ( !pOther->GetEngineObject()->IsSolid() )
 		return;
 
 	Vector velDir = GetEngineObject()->GetAbsVelocity();
@@ -360,7 +360,7 @@ void CBaseGrenade::DangerSoundThink( void )
 
 void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 {
-	if ( pOther->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
 		return;
 
 	// don't hit the guy that launched this grenade

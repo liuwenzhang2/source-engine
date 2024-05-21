@@ -159,7 +159,7 @@ void CBaseHelicopter::Spawn( void )
 {
 	Precache( );
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_STEP );
 	AddFlag( FL_FLY );
 	SetState( NPC_STATE_IDLE );
@@ -213,8 +213,8 @@ void CBaseHelicopter::Spawn( void )
 
 	// Setup collision hull
 	ExpandBBox( m_cullBoxMins, m_cullBoxMaxs );
-	CollisionProp()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &m_cullBoxMins, &m_cullBoxMaxs );
-	AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
+	GetEngineObject()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &m_cullBoxMins, &m_cullBoxMaxs );
+	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 	m_flRandomOffsetTime = -1.0f;
 	m_vecRandomOffset.Init( 0, 0, 0 );
 }
@@ -1196,7 +1196,7 @@ void CBaseHelicopter::UpdateRotorSoundPitch( int iPitch )
 void CBaseHelicopter::FlyTouch( CBaseEntity *pOther )
 {
 	// bounce if we hit something solid
-	if ( pOther->GetSolid() == SOLID_BSP) 
+	if ( pOther->GetEngineObject()->GetSolid() == SOLID_BSP)
 	{
 //		trace_t tr;
 //		tr = CBaseEntity::GetTouchTrace();
@@ -1216,7 +1216,7 @@ void CBaseHelicopter::FlyTouch( CBaseEntity *pOther )
 void CBaseHelicopter::CrashTouch( CBaseEntity *pOther )
 {
 	// only crash if we hit something solid
-	if ( pOther->GetSolid() == SOLID_BSP) 
+	if ( pOther->GetEngineObject()->GetSolid() == SOLID_BSP)
 	{
 		SetTouch( NULL );
 		SetNextThink( gpGlobals->curtime );

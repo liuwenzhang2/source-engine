@@ -242,8 +242,8 @@ void CBaseHeadcrab::Spawn( void )
 	SetHullType(HULL_TINY);
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 
 	SetCollisionGroup( HL2COLLISION_GROUP_HEADCRAB );
@@ -259,7 +259,7 @@ void CBaseHeadcrab::Spawn( void )
 	if (GetEngineObject()->GetSpawnFlags() & SF_HEADCRAB_START_HIDDEN)
 	{
 		m_bHidden = true;
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		SetRenderColorA( 0 );
 		m_nRenderMode = kRenderTransTexture;
 		AddEffects( EF_NODRAW );
@@ -718,7 +718,7 @@ void CBaseHeadcrab::SetBurrowed( bool bBurrowed )
 		AddEffects( EF_NODRAW );
 		AddFlag( FL_NOTARGET );
 		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage = DAMAGE_NO;
 		m_flFieldOfView = HEADCRAB_BURROWED_FOV;
 
@@ -730,7 +730,7 @@ void CBaseHeadcrab::SetBurrowed( bool bBurrowed )
 		RemoveEffects( EF_NODRAW );
 		RemoveFlag( FL_NOTARGET );
 		GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
-		RemoveSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage = DAMAGE_YES;
 		m_flFieldOfView	= HEADCRAB_UNBURROWED_FOV;
 	}
@@ -825,7 +825,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 			if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 			{
 				GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
-				RemoveSolidFlags( FSOLID_NOT_SOLID );
+				GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 				TaskComplete();
 				return;
@@ -886,7 +886,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 				
 				if ( tr.startsolid == true || GetFlags() & FL_ONGROUND )
 				{
-					RemoveSolidFlags( FSOLID_NOT_SOLID );
+					GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 					TaskComplete();
 				}
 			}
@@ -896,7 +896,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 			{
 				if ( IsActivityFinished() )
 				{
-					RemoveSolidFlags( FSOLID_NOT_SOLID ); //double-dog verify that we're solid.
+					GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID ); //double-dog verify that we're solid.
 					TaskComplete();
 					m_bHangingFromCeiling = false;
 				}
@@ -968,7 +968,7 @@ void CBaseHeadcrab::LeapTouch( CBaseEntity *pOther )
 	else if( !(GetFlags() & FL_ONGROUND) )
 	{
 		// Still in the air...
-		if( !pOther->IsSolid() )
+		if( !pOther->GetEngineObject()->IsSolid() )
 		{
 			// Touching a trigger or something.
 			return;
@@ -1531,7 +1531,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 		case TASK_HEADCRAB_UNHIDE:
 		{
 			m_bHidden = false;
-			RemoveSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 			RemoveEffects( EF_NODRAW );
 
 			TaskComplete();
@@ -1543,7 +1543,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 			if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 			{
 				GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
-				RemoveSolidFlags( FSOLID_NOT_SOLID );
+				GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 				TaskComplete();
 			}
 			break;
@@ -2200,7 +2200,7 @@ void CBaseHeadcrab::ClearBurrowPoint( const Vector &origin )
 			flDist = VectorNormalize( vecForce );
 
 			//float mass = pEntity->VPhysicsGetObject()->GetMass();
-			CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1.0f, 1.0f, 1.0f ), &vecCenter );
+			GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1.0f, 1.0f, 1.0f ), &vecCenter );
 
 			if ( flDist <= 128.0f )
 			{
@@ -2312,7 +2312,7 @@ void CBaseHeadcrab::Unburrow( void )
 {
 	// Become solid again and visible
 	GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	m_takedamage = DAMAGE_YES;
 
 	GetEngineObject()->SetGroundEntity( NULL );

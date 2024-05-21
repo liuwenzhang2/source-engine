@@ -230,8 +230,8 @@ void CNPC_HGrunt::Spawn()
 	SetHullType(HULL_HUMAN);
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
 	ClearEffects();
@@ -690,7 +690,7 @@ int CNPC_HGrunt::GetGrenadeConditions( float flDot, float flDist  )
 		if ( random->RandomInt( 0,1 ) )
 		{
 			// magically know where they are
-			pEnemy->CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &vecTarget );
+			pEnemy->GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &vecTarget );
 		}
 		else
 		{
@@ -1881,7 +1881,7 @@ END_DATADESC()
 void CNPC_HGruntRepel::Spawn( void )
 {
 	Precache( );
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	SetUse( &CNPC_HGruntRepel::RepelUse );
 }

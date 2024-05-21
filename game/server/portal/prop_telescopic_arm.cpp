@@ -124,7 +124,7 @@ void CPropTelescopicArm::Spawn( void )
 	Precache();
 	SetModel( szModel );
 
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	SetMoveType( MOVETYPE_PUSH );
 	VPhysicsInitStatic();
 

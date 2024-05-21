@@ -47,7 +47,7 @@ LINK_ENTITY_TO_CLASS( npc_satchel, CSatchelCharge );
 //=========================================================
 void CSatchelCharge::Deactivate( void )
 {
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	UTIL_Remove( this );
 
 	if ( m_hGlowSprite != NULL )
@@ -63,7 +63,7 @@ void CSatchelCharge::Spawn( void )
 	Precache( );
 	SetModel( "models/Weapons/w_slam.mdl" );
 
-	VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false );
+	VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
 	SetMoveType( MOVETYPE_VPHYSICS );
 
 	SetCollisionGroup( COLLISION_GROUP_WEAPON );

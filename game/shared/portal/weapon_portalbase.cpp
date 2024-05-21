@@ -96,7 +96,6 @@ LINK_ENTITY_TO_CLASS( weapon_portal_base, CWeaponPortalBase );
 CWeaponPortalBase::CWeaponPortalBase()
 {
 	//SetPredictionEligible( true );
-	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 
 	m_flNextResetCheckTime = 0.0f;
 }
@@ -106,6 +105,23 @@ bool CWeaponPortalBase::IsPredicted() const
 { 
 	return false;
 }
+
+#ifdef GAME_DLL
+void CWeaponPortalBase::PostConstructor(const char* szClassname, int iForceEdictIndex)
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+}
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+bool CWeaponPortalBase::Init(int entnum, int iSerialNum)
+{
+	bool bRet = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+	return bRet;
+}
+#endif // CLIENT_DLL
+
 
 void CWeaponPortalBase::WeaponSound( WeaponSound_t sound_type, float soundtime /* = 0.0f */ )
 {
@@ -343,7 +359,7 @@ void CWeaponPortalBase::Spawn()
 	SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
 	// Use less bloat for the collision box for this weapon. (bug 43800)
-	CollisionProp()->UseTriggerBounds( true, 20 );
+	GetEngineObject()->UseTriggerBounds( true, 20 );
 }
 
 void CWeaponPortalBase::	Materialize( void )
@@ -367,7 +383,7 @@ void CWeaponPortalBase::	Materialize( void )
 
 	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
-		VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false );
+		VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
 		SetMoveType( MOVETYPE_VPHYSICS );
 
 		//PortalRules()->AddLevelDesignerPlacedObject( this );

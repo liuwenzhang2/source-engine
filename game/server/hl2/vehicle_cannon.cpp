@@ -240,8 +240,8 @@ void CPropCannon::Spawn( void )
 
 	BaseClass::Spawn();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NOCLIP );
 
 	m_takedamage = DAMAGE_EVENTS_ONLY;

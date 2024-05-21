@@ -481,11 +481,11 @@ void CBaseCombatWeapon::FallInit( void )
 	SetModel( GetWorldModel() );
 	VPhysicsDestroyObject();
 
-	if ( !VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false ) )
+	if ( !VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false ) )
 	{
 		SetMoveType( MOVETYPE_FLYGRAVITY );
-		SetSolid( SOLID_BBOX );
-		AddSolidFlags( FSOLID_TRIGGER );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
+		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 	}
 	else
 	{
@@ -603,14 +603,14 @@ void CBaseCombatWeapon::Materialize( void )
 #ifdef HL2MP
 	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
-		VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false );
+		VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
 		SetMoveType( MOVETYPE_VPHYSICS );
 
 		HL2MPRules()->AddLevelDesignerPlacedObject( this );
 	}
 #else
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_TRIGGER );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 #endif
 
 	SetPickupTouch();

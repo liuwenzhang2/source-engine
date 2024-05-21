@@ -102,8 +102,8 @@ void CNPC_Roach::Spawn()
 	SetModel( "models/roach.mdl" );
 	UTIL_SetSize( this, Vector( -1, -1, 0 ), Vector( 1, 1, 2 ) );
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_YELLOW;
 	ClearEffects();
@@ -447,7 +447,7 @@ void CNPC_Roach::Touch ( CBaseEntity *pOther )
 
 void CNPC_Roach::Event_Killed( const CTakeDamageInfo &info )
 {
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	
 	CPASAttenuationFilter filter( this );
 	

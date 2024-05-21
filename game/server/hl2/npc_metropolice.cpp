@@ -413,7 +413,7 @@ CBaseEntity *CNPC_MetroPolice::CheckTraceHullAttack( const Vector &vStart, const
 
 		// Do a tracehull from the top center of my bounding box.
 		vecTopCenter = GetEngineObject()->GetAbsOrigin();
-		CollisionProp()->WorldSpaceAABB( &vecMins, &vecMaxs );
+		GetEngineObject()->WorldSpaceAABB( &vecMins, &vecMaxs );
 		vecTopCenter.z = vecMaxs.z + 1.0f;
 		vecEnd = vecTopCenter;
 		vecEnd.z += 2.0f;
@@ -618,8 +618,8 @@ void CNPC_MetroPolice::Spawn( void )
 	SetHullType(HULL_HUMAN);
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	SetBloodColor( BLOOD_COLOR_RED );
 	m_nIdleChatterType = METROPOLICE_CHATTER_ASK_QUESTION; 
@@ -1299,7 +1299,7 @@ Vector CNPC_MetroPolice::StitchAimTarget( const Vector &posSrc, bool bNoisy )
 		Vector vecBodyTarget;
 		if ( ( GetEnemy()->GetWaterLevel() == 0 ) && ( GetEnemy()->GetFlags() & FL_ONGROUND ) )
 		{
-			GetEnemy()->CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.08f ), &vecBodyTarget );
+			GetEnemy()->GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.08f ), &vecBodyTarget );
 			return vecBodyTarget;
 		}
 
@@ -1309,7 +1309,7 @@ Vector CNPC_MetroPolice::StitchAimTarget( const Vector &posSrc, bool bNoisy )
 
 		// Trace down...
 		trace_t	trace;
-		GetEnemy()->CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &vecBodyTarget );
+		GetEnemy()->GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &vecBodyTarget );
 		float flHeight = GetEnemy()->WorldAlignSize().z;
 		UTIL_TraceLine( vecBodyTarget, vecBodyTarget + Vector( 0, 0, -flHeight -80 ), 
 			(MASK_SOLID_BRUSHONLY | MASK_WATER), NULL, COLLISION_GROUP_NONE, &trace );
@@ -1321,11 +1321,11 @@ Vector CNPC_MetroPolice::StitchAimTarget( const Vector &posSrc, bool bNoisy )
 	Vector vecBodyTarget;
 	if ( !bNoisy )
 	{
-		GetShootTarget()->CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.08f ), &vecBodyTarget );
+		GetShootTarget()->GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.08f ), &vecBodyTarget );
 	}
 	else
 	{
-		GetShootTarget()->CollisionProp()->RandomPointInBounds( Vector( 0.25f, 0.25f, 0.08f ), Vector( 0.75f, 0.75f, 0.08f ), &vecBodyTarget );
+		GetShootTarget()->GetEngineObject()->RandomPointInBounds( Vector( 0.25f, 0.25f, 0.08f ), Vector( 0.75f, 0.75f, 0.08f ), &vecBodyTarget );
 	}
 
 	return vecBodyTarget;
@@ -2208,7 +2208,7 @@ Vector CNPC_MetroPolice::ComputeBurstTrajectory( const Vector &shootOrigin )
 	if ( bIsPlayerOnFoot )
 	{
 		Vector vecNormalizedPt;
-		pEnemy->CollisionProp()->WorldToNormalizedSpace( vecPos, &vecNormalizedPt );
+		pEnemy->GetEngineObject()->WorldToNormalizedSpace( vecPos, &vecNormalizedPt );
 		if ( (vecNormalizedPt.x >= -0.1f) && (vecNormalizedPt.x <= 1.1f) &&
 			(vecNormalizedPt.y >= -0.1f) && (vecNormalizedPt.y <= 1.1f) &&
 			(vecNormalizedPt.z >= -0.7f) && (vecNormalizedPt.z < 1.1f) )
@@ -2253,7 +2253,7 @@ Vector CNPC_MetroPolice::ComputeBurstTrajectory( const Vector &shootOrigin )
 Vector CNPC_MetroPolice::AimCloseToTargetButMiss( CBaseEntity *pTarget, const Vector &shootOrigin )
 {
 	Vector vecNormalizedSpace;
-	pTarget->CollisionProp()->WorldToNormalizedSpace( shootOrigin, &vecNormalizedSpace );
+	pTarget->GetEngineObject()->WorldToNormalizedSpace( shootOrigin, &vecNormalizedSpace );
 	vecNormalizedSpace -= Vector( 0.5f, 0.5f, 0.5f );
 	float flDist = VectorNormalize( vecNormalizedSpace );
 	float flMinRadius = flDist * sqrt(3.0) / sqrt( flDist * flDist - 3 );
@@ -2269,7 +2269,7 @@ Vector CNPC_MetroPolice::AimCloseToTargetButMiss( CBaseEntity *pTarget, const Ve
 	vecRandomDir += Vector( 0.5f, 0.5f, 0.5f );
 
 	Vector vecBodyTarget;
-	pTarget->CollisionProp()->NormalizedToWorldSpace( vecRandomDir, &vecBodyTarget );
+	pTarget->GetEngineObject()->NormalizedToWorldSpace( vecRandomDir, &vecBodyTarget );
 	vecBodyTarget -= shootOrigin;
 	return vecBodyTarget;
 }
@@ -2308,7 +2308,7 @@ Vector CNPC_MetroPolice::ComputeTightBurstTrajectory( const Vector &shootOrigin 
 	// Aim randomly at the player. Since body target uses the vehicle body target,
 	// we instead are going to not use it
 	Vector vecBodyTarget;
-	pEnemy->CollisionProp()->RandomPointInBounds( Vector( flMin, flMin, flMin ), Vector( flMax, flMax, flMax * 0.75f ), &vecBodyTarget );
+	pEnemy->GetEngineObject()->RandomPointInBounds( Vector( flMin, flMin, flMin ), Vector( flMax, flMax, flMax * 0.75f ), &vecBodyTarget );
 	vecBodyTarget -= shootOrigin;
 	return vecBodyTarget;
 }
@@ -2331,7 +2331,7 @@ Vector CNPC_MetroPolice::GetActualShootTrajectory( const Vector &shootOrigin )
 		}
 
 		// Start shooting over the head of the enemy
-		GetShootTarget()->CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &m_vecBurstTargetPos );
+		GetShootTarget()->GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &m_vecBurstTargetPos );
 		m_nBurstMode = BURST_DELIBERATELY_MISS;
 		// NOTE: Fall through to BURST_DELIBERATELY_MISS!!
 
@@ -2340,7 +2340,7 @@ Vector CNPC_MetroPolice::GetActualShootTrajectory( const Vector &shootOrigin )
 
 	case BURST_LOCK_ON_AFTER_HIT:
 		// See if our target is within the bounds of the enemy
-		if ( GetShootTarget()->CollisionProp()->IsPointInBounds( m_vecBurstTargetPos ) )
+		if ( GetShootTarget()->GetEngineObject()->IsPointInBounds( m_vecBurstTargetPos ) )
 		{
 			// Now raytrace against only the world + (good for cops on bridges)
 			trace_t tr;
@@ -3061,7 +3061,7 @@ void CNPC_MetroPolice::ReleaseManhack( void )
 	m_hManhack->CreateVPhysics();
 
 	// Release us
-	m_hManhack->RemoveSolidFlags( FSOLID_NOT_SOLID );
+	m_hManhack->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	m_hManhack->SetMoveType( MOVETYPE_VPHYSICS );
 	m_hManhack->GetEngineObject()->SetParent( NULL );
 

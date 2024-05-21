@@ -280,10 +280,10 @@ void CNPC_Tentacle::Spawn( )
 {
 	Precache( );
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	//Necessary for TestCollision to be called for hitbox ray hits
-	AddSolidFlags( FSOLID_CUSTOMRAYTEST );
+	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST );
 
 	SetMoveType( MOVETYPE_NONE );
 	ClearEffects();
@@ -294,7 +294,7 @@ void CNPC_Tentacle::Spawn( )
 	UTIL_SetSize( this, Vector( -32, -32, 0 ), Vector( 32, 32, 64 ) );
 
 	// Use our hitboxes to determine our render bounds
-	CollisionProp()->SetSurroundingBoundsType( USE_HITBOXES );
+	GetEngineObject()->SetSurroundingBoundsType( USE_HITBOXES );
 
 	m_takedamage		= DAMAGE_AIM;
 	AddFlag( FL_NPC );
@@ -928,7 +928,7 @@ void CNPC_Tentacle::HitTouch( CBaseEntity *pOther )
 		return;
 
 	// only look at the ones where the player hit me
-	if( pOther == NULL || pOther->GetEngineObject()->GetModelIndex() == GetEngineObject()->GetModelIndex() || ( pOther->GetSolidFlags() & FSOLID_TRIGGER ) )
+	if( pOther == NULL || pOther->GetEngineObject()->GetModelIndex() == GetEngineObject()->GetModelIndex() || ( pOther->GetEngineObject()->GetSolidFlags() & FSOLID_TRIGGER ) )
 		 return;
 
 	//Right now the BoneFollower will always be hit in box 0, and 

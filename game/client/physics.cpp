@@ -460,9 +460,9 @@ void CPhysicsSystem::PhysicsSimulate()
 				C_BaseEntity *pEntity = reinterpret_cast<C_BaseEntity *>(pActiveList[i]->GetGameData());
 				if ( pEntity )
 				{
-					if ( pEntity->CollisionProp()->DoesVPhysicsInvalidateSurroundingBox() )
+					if ( pEntity->GetEngineObject()->DoesVPhysicsInvalidateSurroundingBox() )
 					{
-						pEntity->CollisionProp()->MarkSurroundingBoundsDirty();
+						pEntity->GetEngineObject()->MarkSurroundingBoundsDirty();
 					}
 					pEntity->VPhysicsUpdate( pActiveList[i] );
 				}

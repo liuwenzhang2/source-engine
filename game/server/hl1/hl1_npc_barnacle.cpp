@@ -106,8 +106,8 @@ void CNPC_Barnacle::Spawn()
 	SetModel( "models/barnacle.mdl" );
 	UTIL_SetSize( this, Vector(-16, -16, -32), Vector(16, 16, 0) );
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( BLOOD_COLOR_GREEN );
 	m_iHealth			= sk_barnacle_health.GetFloat();
@@ -396,7 +396,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 //-----------------------------------------------------------------------------
 void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 {
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	m_takedamage		= DAMAGE_NO;
 	m_lifeState			= LIFE_DEAD;
 	if ( GetEnemy() != NULL )

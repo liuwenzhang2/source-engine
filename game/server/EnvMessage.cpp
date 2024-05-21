@@ -42,7 +42,7 @@ void CMessage::Spawn( void )
 {
 	Precache();
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 
 	switch( m_MessageAttenuation )
@@ -185,7 +185,7 @@ END_DATADESC()
 
 void CCredits::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 }
 

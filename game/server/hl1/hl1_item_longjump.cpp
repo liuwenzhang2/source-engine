@@ -24,7 +24,7 @@ public:
 		SetModel( "models/w_longjump.mdl" );
 		BaseClass::Spawn( );
 
-		CollisionProp()->UseTriggerBounds( true, 16.0f );
+		GetEngineObject()->UseTriggerBounds( true, 16.0f );
 	}
 	void Precache( void )
 	{

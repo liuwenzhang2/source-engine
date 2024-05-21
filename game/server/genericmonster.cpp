@@ -151,8 +151,8 @@ void CGenericNPC::Spawn()
 	else
 		UTIL_SetSize(this, NAI_Hull::Mins(HULL_HUMAN), NAI_Hull::Maxs(HULL_HUMAN));
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
 	m_iHealth			= 8;
@@ -175,7 +175,7 @@ void CGenericNPC::Spawn()
 
 	if (GetEngineObject()->HasSpawnFlags(SF_GENERICNPC_NOTSOLID) )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage = DAMAGE_NO;
 		VPhysicsDestroyObject();
 	}
@@ -260,10 +260,10 @@ void CNPC_Furniture::Spawn( )
 	SetModel( STRING(GetEngineObject()->GetModelName()) );
 
 	SetMoveType( MOVETYPE_STEP );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	// Our collision, if needed, will be done through bone followers
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	SetBloodColor( DONT_BLEED );
 	m_iHealth = TOO_MUCH_HEALTH_TO_DIE; //wow

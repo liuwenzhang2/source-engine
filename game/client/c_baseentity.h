@@ -278,7 +278,7 @@ public:
 	bool					ShouldRecordInTools() const;
 
 	virtual void					Release();
-	virtual ICollideable*			GetCollideable()		{ return &m_Collision; }
+	virtual ICollideable*			GetCollideable()		{ return GetEngineObject()->CollisionProp(); }
 	virtual IClientNetworkable*		GetClientNetworkable()	{ return this; }
 	virtual IClientRenderable*		GetClientRenderable()	{ return this; }
 	virtual IClientEntity*			GetIClientEntity()		{ return this; }
@@ -375,9 +375,7 @@ public:
 
 
 public:
-	// An inline version the game code can use
-	CCollisionProperty		*CollisionProp();
-	const CCollisionProperty*CollisionProp() const;
+
 	CParticleProperty		*ParticleProp();
 	const CParticleProperty *ParticleProp() const;
 
@@ -463,12 +461,7 @@ public:
 	virtual const Vector&			WorldAlignMins( ) const;
 	virtual const Vector&			WorldAlignMaxs( ) const;
 
-	// This defines collision bounds *in whatever space is currently defined by the solid type*
-	//	SOLID_BBOX:		World Align
-	//	SOLID_OBB:		Entity space
-	//	SOLID_BSP:		Entity space
-	//	SOLID_VPHYSICS	Not used
-	void							SetCollisionBounds( const Vector& mins, const Vector &maxs );
+	
 
 	// NOTE: These use the collision OBB to compute a reasonable center point for the entity
 	virtual const Vector&			WorldSpaceCenter( ) const;
@@ -493,14 +486,6 @@ public:
 
 	MoveType_t						GetMoveType( void ) const;
 	MoveCollide_t					GetMoveCollide( void ) const;
-	virtual SolidType_t				GetSolid( void ) const;
-
-	virtual int			 			GetSolidFlags( void ) const;
-	bool							IsSolidFlagSet( int flagMask ) const;
-	void							SetSolidFlags( int nFlags );
-	void							AddSolidFlags( int nFlags );
-	void							RemoveSolidFlags( int nFlags );
-	bool							IsSolid() const;
 
 	virtual class CMouthInfo		*GetMouth( void );
 
@@ -924,7 +909,6 @@ public:
 	// Access movetype and solid.
 	void				SetMoveType( MoveType_t val, MoveCollide_t moveCollide = MOVECOLLIDE_DEFAULT );	// Set to one of the MOVETYPE_ defines.
 	void				SetMoveCollide( MoveCollide_t val );	// Set to one of the MOVECOLLIDE_ defines.
-	void				SetSolid( SolidType_t val );	// Set to one of the SOLID_ defines.
 
 	//friend class C_EngineObject;
 
@@ -1414,7 +1398,6 @@ private:
 
 	//IEngineObjectClient* m_EngineObject;
 
-	CNetworkVarEmbedded( CCollisionProperty, m_Collision );
 	CNetworkVarEmbedded( CParticleProperty, m_Particles );
 
 	// Physics state
@@ -1542,20 +1525,6 @@ inline bool FClassnameIs( C_BaseEntity *pEntity, const char *szClassname )
 
 #endif
 
-
-//-----------------------------------------------------------------------------
-// An inline version the game code can use
-//-----------------------------------------------------------------------------
-inline CCollisionProperty *C_BaseEntity::CollisionProp()
-{
-	return &m_Collision;
-}
-
-inline const CCollisionProperty *C_BaseEntity::CollisionProp() const
-{
-	return &m_Collision;
-}
-
 //-----------------------------------------------------------------------------
 // An inline version the game code can use
 //-----------------------------------------------------------------------------
@@ -1606,86 +1575,37 @@ inline const char *C_BaseEntity::GetDLLType( void )
 
 
 //-----------------------------------------------------------------------------
-// Methods relating to solid type + flags
-//-----------------------------------------------------------------------------
-inline void C_BaseEntity::SetSolidFlags( int nFlags )
-{
-	CollisionProp()->SetSolidFlags( nFlags );
-}
-
-inline bool C_BaseEntity::IsSolidFlagSet( int flagMask ) const
-{
-	return CollisionProp()->IsSolidFlagSet( flagMask );
-}
-
-inline int	C_BaseEntity::GetSolidFlags( void ) const
-{
-	return CollisionProp()->GetSolidFlags( );
-}
-
-inline void C_BaseEntity::AddSolidFlags( int nFlags )
-{
-	CollisionProp()->AddSolidFlags( nFlags );
-}
-
-inline void C_BaseEntity::RemoveSolidFlags( int nFlags )
-{
-	CollisionProp()->RemoveSolidFlags( nFlags );
-}
-
-inline bool C_BaseEntity::IsSolid() const
-{
-	return CollisionProp()->IsSolid( );
-}
-
-inline void C_BaseEntity::SetSolid( SolidType_t val )
-{
-	CollisionProp()->SetSolid( val );
-}
-
-inline SolidType_t C_BaseEntity::GetSolid( ) const
-{
-	return CollisionProp()->GetSolid( );
-}
-
-inline void C_BaseEntity::SetCollisionBounds( const Vector& mins, const Vector &maxs )
-{
-	CollisionProp()->SetCollisionBounds( mins, maxs );
-}
-
-
-//-----------------------------------------------------------------------------
 // Methods relating to bounds
 //-----------------------------------------------------------------------------
 inline const Vector& C_BaseEntity::WorldAlignMins( ) const
 {
-	Assert( !CollisionProp()->IsBoundsDefinedInEntitySpace() );
-	Assert( CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return CollisionProp()->OBBMins();
+	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
+	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
+	return GetEngineObject()->CollisionProp()->OBBMins();
 }
 
 inline const Vector& C_BaseEntity::WorldAlignMaxs( ) const
 {
-	Assert( !CollisionProp()->IsBoundsDefinedInEntitySpace() );
-	Assert( CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return CollisionProp()->OBBMaxs();
+	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
+	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
+	return GetEngineObject()->CollisionProp()->OBBMaxs();
 }
 
 inline const Vector& C_BaseEntity::WorldAlignSize( ) const
 {
-	Assert( !CollisionProp()->IsBoundsDefinedInEntitySpace() );
-	Assert( CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return CollisionProp()->OBBSize();
+	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
+	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
+	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->OBBSize();
 }
 
 inline float C_BaseEntity::BoundingRadius() const
 {
-	return CollisionProp()->BoundingRadius();
+	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->BoundingRadius();
 }
 
 inline bool C_BaseEntity::IsPointSized() const
 {
-	return CollisionProp()->BoundingRadius() == 0.0f;
+	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->BoundingRadius() == 0.0f;
 }
 
 inline const QAngle& C_BaseEntity::GetLocalAngularVelocity( ) const

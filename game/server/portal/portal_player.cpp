@@ -403,7 +403,7 @@ void CPortal_Player::Spawn(void)
 	CreateSounds();
 
 	pl.deadflag = false;
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 	RemoveEffects( EF_NODRAW );
 	StopObserverMode();
@@ -777,7 +777,7 @@ void CPortal_Player::UpdatePortalPlaneSounds( void )
 		if ( !vVelocity.IsZero() )
 		{
 			Vector vMin, vMax;
-			CollisionProp()->WorldSpaceAABB( &vMin, &vMax );
+			GetEngineObject()->WorldSpaceAABB( &vMin, &vMax );
 
 			Vector vEarCenter = ( vMax + vMin ) / 2.0f;
 			Vector vDiagonal = vMax - vMin;
@@ -1649,7 +1649,7 @@ void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
 	}
 
 #if PORTAL_HIDE_PLAYER_RAGDOLL
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW | EF_NOSHADOW );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 #endif // PORTAL_HIDE_PLAYER_RAGDOLL
@@ -1885,7 +1885,7 @@ int CPortal_Player::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	}
 
 	if ( info.GetInflictor() && (GetMoveType() == MOVETYPE_WALK) && 
-		( !attacker->IsSolidFlagSet(FSOLID_TRIGGER)) )
+		( !attacker->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER)) )
 	{
 		Vector force = vecDir;// * -DamageForce( WorldAlignSize(), info.GetBaseDamage() );
 		if ( force.z > 250.0f )

@@ -250,8 +250,8 @@ void CNPC_FlockingFlyer::SpawnCommonCode( )
 {
 	m_lifeState		= LIFE_ALIVE;
 	SetClassname( "monster_flyer" );
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_FLY );
 	m_takedamage	= DAMAGE_NO;
 	m_iHealth		= 1;

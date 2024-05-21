@@ -254,7 +254,7 @@ bool C_PhysPropClientside::Initialize()
 	{
 		Vector mins, maxs;
 		modelinfo->GetModelBounds( mod, mins, maxs );
-		SetCollisionBounds( mins, maxs );
+		GetEngineObject()->SetCollisionBounds( mins, maxs );
 	}
 
 	solid_t tmpSolid;
@@ -292,7 +292,7 @@ bool C_PhysPropClientside::Initialize()
 	if ( m_iPhysicsMode == PHYSICS_MULTIPLAYER_AUTODETECT )
 	{
 		m_iPhysicsMode = GetAutoMultiplayerPhysicsMode( 
-			CollisionProp()->OBBSize(), m_pPhysicsObject->GetMass() );
+			GetEngineObject()->OBBSize(), m_pPhysicsObject->GetMass() );
 	}
 
 	if 	( m_spawnflags & SF_PHYSPROP_FORCE_SERVER_SIDE )
@@ -329,7 +329,7 @@ bool C_PhysPropClientside::Initialize()
 
 	UpdatePartitionListEntry();
 
-	CollisionProp()->UpdatePartition();
+	GetEngineObject()->UpdatePartition();
 
 	SetBlocksLOS( false ); // this should be a small object
 
@@ -456,7 +456,7 @@ void C_PhysPropClientside::Break()
 	AngularImpulse angVelocity;
 	Vector origin;
 	QAngle angles;
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	if ( pPhysics )
 	{
@@ -860,9 +860,9 @@ bool C_FuncPhysicsRespawnZone::Initialize( void )
 	if ( InitializeAsClientEntity( STRING(GetEngineObject()->GetModelName()), RENDER_GROUP_OPAQUE_ENTITY ) == false )
 		return false;
 
-	SetSolid( SOLID_BSP );	
-	AddSolidFlags( FSOLID_NOT_SOLID );
-	AddSolidFlags( FSOLID_TRIGGER );	
+	GetEngineObject()->SetSolid( SOLID_BSP );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 	SetMoveType( MOVETYPE_NONE );
 
 	const model_t *mod = GetModel();
@@ -870,7 +870,7 @@ bool C_FuncPhysicsRespawnZone::Initialize( void )
 	{
 		Vector mins, maxs;
 		modelinfo->GetModelBounds( mod, mins, maxs );
-		SetCollisionBounds( mins, maxs );
+		GetEngineObject()->SetCollisionBounds( mins, maxs );
 	}
 
 	Spawn();
@@ -879,7 +879,7 @@ bool C_FuncPhysicsRespawnZone::Initialize( void )
 
 	UpdatePartitionListEntry();
 
-	CollisionProp()->UpdatePartition();
+	GetEngineObject()->UpdatePartition();
 
 	UpdateVisibility();
 
@@ -909,7 +909,7 @@ void C_FuncPhysicsRespawnZone::InitializePropsWithin( void )
 	for ( int i = 0; i < s_PhysPropList.Count(); i++ )
 	{
 		C_PhysPropClientside *pProp = s_PhysPropList[i];
-		if ( CollisionProp()->IsPointInBounds( pProp->WorldSpaceCenter() ) )
+		if (GetEngineObject()->IsPointInBounds( pProp->WorldSpaceCenter() ) )
 		{
 			pProp->SetRespawnZone( this );
 
@@ -1010,10 +1010,10 @@ void C_FuncPhysicsRespawnZone::RespawnProps( void )
 			C_BaseEntity *pEntity = ClientEntityList().GetBaseEntityFromHandle( m_PropList[i].hClientEntity );
 			if ( pEntity )
 			{
-				if ( !CollisionProp()->IsPointInBounds( pEntity->WorldSpaceCenter() ) )
+				if ( !GetEngineObject()->IsPointInBounds( pEntity->WorldSpaceCenter() ) )
 				{
 					Vector vecMins, vecMaxs;
-					pEntity->CollisionProp()->WorldSpaceSurroundingBounds( &vecMins, &vecMaxs );
+					pEntity->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecMins, &vecMaxs );
 					if ( !CanMovePropAt( m_PropList[i].vecOrigin, vecMins, vecMaxs ) || 
 						 !CanMovePropAt( pEntity->GetEngineObject()->GetAbsOrigin(), vecMins, vecMaxs ) )
 						continue;

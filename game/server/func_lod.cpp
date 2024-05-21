@@ -74,7 +74,7 @@ void CFunc_LOD::Spawn()
 {
 	// Bind to our bmodel.
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 	BaseClass::Spawn();
 
 	CreateVPhysics();
@@ -102,7 +102,7 @@ bool CFunc_LOD::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		if (atoi(szValue) != 0)
 		{
-			AddSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		}
 	}
 	else

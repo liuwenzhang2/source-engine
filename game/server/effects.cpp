@@ -110,7 +110,7 @@ void CBubbling::Spawn( void )
 	// Make it invisible to client
 	SetRenderColorA( 0 );
 
-	SetSolid( SOLID_NONE );						// Remove model & collisions
+	GetEngineObject()->SetSolid( SOLID_NONE );						// Remove model & collisions
 
 	if ( !GetEngineObject()->HasSpawnFlags(SF_BUBBLES_STARTOFF) )
 	{
@@ -275,7 +275,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CEnvTracer::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 
 	if (!m_flDelay)
@@ -432,7 +432,7 @@ void CGibShooter::Spawn( void )
 {
 	Precache();
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 
 	if ( m_flDelay < 0 )
@@ -552,7 +552,7 @@ CBaseEntity *CGibShooter::SpawnGib( const Vector &vecShootDir, float flSpeed )
 				pGib->m_lifeTime = (m_flGibLife * random->RandomFloat( 0.95, 1.05 ));	// +/- 5%
 
 				pGib->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-				IPhysicsObject *pPhysicsObject = pGib->VPhysicsInitNormal( SOLID_VPHYSICS, pGib->GetSolidFlags(), false );
+				IPhysicsObject *pPhysicsObject = pGib->VPhysicsInitNormal( SOLID_VPHYSICS, pGib->GetEngineObject()->GetSolidFlags(), false );
 				pGib->SetMoveType( MOVETYPE_VPHYSICS );
 
 				if ( pPhysicsObject )
@@ -1075,7 +1075,7 @@ void CBlood::Spawn( void )
 	QAngle angSprayDir = QAngle( m_vecSprayDir.x, m_vecSprayDir.y, m_vecSprayDir.z );
 	AngleVectors( angSprayDir, &m_vecSprayDir );
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 	SetColor( BLOOD_COLOR_RED );
 }
@@ -1280,7 +1280,7 @@ void CEnvFunnel::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 void CEnvFunnel::Spawn( void )
 {
 	Precache();
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 }
 
@@ -1372,7 +1372,7 @@ void CEnvBeverage::InputActivate( inputdata_t &inputdata )
 void CEnvBeverage::Spawn( void )
 {
 	Precache();
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 	m_CanInDispenser = false;
 
@@ -1419,7 +1419,7 @@ void CItemSoda::Precache ( void )
 void CItemSoda::Spawn( void )
 {
 	Precache();
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 
 	SetModel ( "models/can.mdl" );
@@ -1441,8 +1441,8 @@ void CItemSoda::CanThink ( void )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_TRIGGER );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 
 #ifdef HL1_DLL
 	UTIL_SetSize(this, Vector(-16, -16, 0), Vector(16, 16, 16));
@@ -1472,7 +1472,7 @@ void CItemSoda::CanTouch ( CBaseEntity *pOther )
 		bev->m_CanInDispenser = false;
 	}
 
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 	AddEffects( EF_NODRAW );
 	SetTouch ( NULL );
@@ -1524,7 +1524,7 @@ void CPrecipitation::Spawn( void )
 	g_ServerGameDLL.PrecacheMaterial( "effects/ember_swirling001" );
 
 	Precache();
-	SetSolid( SOLID_NONE );							// Remove model & collisions
+	GetEngineObject()->SetSolid( SOLID_NONE );							// Remove model & collisions
 	SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );		// Set size
 
@@ -1626,7 +1626,7 @@ void CEnvWind::Precache ( void )
 void CEnvWind::Spawn( void )
 {
 	Precache();
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 
 	m_EnvWindShared.Init( entindex(), 0, gpGlobals->frametime, GetEngineObject()->GetLocalAngles().y, 0 );
@@ -1708,7 +1708,7 @@ void CEmbers::Spawn( void )
 	Precache();
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetRenderColorA( 0 );
 	m_nRenderMode	= kRenderTransTexture;
 
@@ -2374,7 +2374,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CEnvViewPunch::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 
 	if (GetEngineObject()->GetSpawnFlags() & SF_PUNCH_EVERYONE )

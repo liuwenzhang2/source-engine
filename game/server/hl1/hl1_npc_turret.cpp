@@ -211,8 +211,8 @@ void CNPC_BaseTurret::Spawn()
 	SetMoveType( MOVETYPE_FLY );
 	SetSequence( 0 );
 	SetCycle( 0 );
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	m_takedamage		= DAMAGE_YES;
 	AddFlag( FL_AIMTARGET );
 
@@ -801,8 +801,8 @@ void CNPC_BaseTurret::TurretDeath(void)
 	{
 		// lots of smoke
 		Vector pos;
-		CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &pos );
-		pos.z = CollisionProp()->GetCollisionOrigin().z;
+		GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &pos );
+		pos.z = GetEngineObject()->CollisionProp()->GetCollisionOrigin().z;
 		
 		CBroadcastRecipientFilter filter;
 		te->Smoke( filter, 0.0, &pos,
@@ -814,7 +814,7 @@ void CNPC_BaseTurret::TurretDeath(void)
 	if (m_flDamageTime + random->RandomFloat( 0, 5 ) > gpGlobals->curtime)
 	{
 		Vector vecSrc;
-		CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &vecSrc );
+		GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &vecSrc );
 		g_pEffects->Sparks( vecSrc );
 	}
 
@@ -851,7 +851,7 @@ void CNPC_BaseTurret::Deploy(void)
 		curmaxs.z = m_iDeployHeight;
 		curmins.z = -m_iDeployHeight;
 
-		SetCollisionBounds( curmins, curmaxs );
+		GetEngineObject()->SetCollisionBounds( curmins, curmaxs );
 
 		m_vecCurAngles.x = 0;
 
@@ -916,7 +916,7 @@ void CNPC_BaseTurret::Retire(void)
 			curmaxs.z = m_iRetractHeight;
 			curmins.z = -m_iRetractHeight;
 
-			SetCollisionBounds( curmins, curmaxs );
+			GetEngineObject()->SetCollisionBounds( curmins, curmaxs );
 			if (m_iAutoStart)
 			{
 				SetThink(&CNPC_BaseTurret::AutoSearchThink);	
@@ -1476,7 +1476,7 @@ void CNPC_Sentry::Event_Killed( const CTakeDamageInfo &info )
 
 	g_pSoundEmitterSystem->StopSound( entindex(), "Turret.Spinup" );
 
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	Vector vecSrc;
 	QAngle vecAng;

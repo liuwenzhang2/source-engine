@@ -41,8 +41,8 @@ CEntityBlocker *CEntityBlocker::Create( const Vector &origin, const Vector &mins
 //-----------------------------------------------------------------------------
 void CEntityBlocker::Spawn( void )
 {
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_CUSTOMRAYTEST );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST );
 }
 
 //-----------------------------------------------------------------------------

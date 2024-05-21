@@ -68,7 +68,7 @@ void CSpeaker::Spawn( void )
 		SetThink( &CSpeaker::SUB_Remove );
 		return;
 	}
-    SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
     SetMoveType( MOVETYPE_NONE );
 
 	

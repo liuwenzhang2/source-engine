@@ -111,7 +111,7 @@ void CAI_BaseHumanoid::BuildScheduleTestBits( )
 
 static bool IsSmall( CBaseEntity *pBlocker )
 {
-	CCollisionProperty *pCollisionProp = pBlocker->CollisionProp();
+	ICollideable *pCollisionProp = pBlocker->GetEngineObject()->CollisionProp();
 	int  nSmaller = 0;
 	Vector vecSize = pCollisionProp->OBBMaxs() - pCollisionProp->OBBMins();
 	for ( int i = 0; i < 3; i++ )

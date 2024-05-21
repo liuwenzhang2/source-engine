@@ -302,8 +302,8 @@ void CNPC_Antlion::Spawn( void )
 	m_iHealth	= sk_antlion_health.GetFloat();
 #endif // _DEBUG
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	
 	SetMoveType( MOVETYPE_STEP );
@@ -348,7 +348,7 @@ void CNPC_Antlion::Spawn( void )
 		AddEffects( EF_NODRAW );
 		AddFlag( FL_NOTARGET );
 		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage	= DAMAGE_NO;
 
 		SetState( NPC_STATE_IDLE );
@@ -1222,7 +1222,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ANTLION_VANISH )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage	= DAMAGE_NO;
 		AddEffects( EF_NODRAW );
 		SetWings( false );
@@ -1701,7 +1701,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 		if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 		{
 			GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
-			RemoveSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 			TaskComplete();
 		}
 
@@ -1887,7 +1887,7 @@ void CNPC_Antlion::RunTask( const Task_t *pTask )
 		{
 			CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 
-			if ( ( pGroundEnt != NULL ) && ( ( pGroundEnt->MyNPCPointer() != NULL ) || pGroundEnt->GetSolidFlags() & FSOLID_NOT_STANDABLE ) )
+			if ( ( pGroundEnt != NULL ) && ( ( pGroundEnt->MyNPCPointer() != NULL ) || pGroundEnt->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_STANDABLE ) )
 			{
 				// Jump behind the other NPC so I don't block their path.
 				Vector vecJumpDir; 
@@ -1962,7 +1962,7 @@ void CNPC_Antlion::RunTask( const Task_t *pTask )
 		if ( ValidBurrowPoint(GetEngineObject()->GetAbsOrigin() ) )
 		{
 			GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
-			RemoveSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 			TaskComplete();
 			return;
@@ -3247,7 +3247,7 @@ void CNPC_Antlion::ClearBurrowPoint( const Vector &origin )
 			flDist = VectorNormalize( vecForce );
 
 			//float mass = pEntity->VPhysicsGetObject()->GetMass();
-			CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1.0f, 1.0f, 1.0f ), &vecCenter );
+			GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1.0f, 1.0f, 1.0f ), &vecCenter );
 
 			if ( flDist <= 128.0f )
 			{
@@ -3572,7 +3572,7 @@ void CNPC_Antlion::Unburrow( void )
 
 	//Become solid again and visible
 	GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	m_takedamage	= DAMAGE_YES;
 
 	GetEngineObject()->SetGroundEntity( NULL );
@@ -3819,7 +3819,7 @@ void CNPC_Antlion::GatherConditions( void )
 	// See if I've landed on an NPC!
 	CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	
-	if ( ( ( pGroundEnt != NULL ) && ( pGroundEnt->GetSolidFlags() & FSOLID_NOT_STANDABLE ) ) && ( GetFlags() & FL_ONGROUND ) && ( !IsEffectActive( EF_NODRAW ) && !pGroundEnt->IsEffectActive( EF_NODRAW ) ) )
+	if ( ( ( pGroundEnt != NULL ) && ( pGroundEnt->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_STANDABLE ) ) && ( GetFlags() & FL_ONGROUND ) && ( !IsEffectActive( EF_NODRAW ) && !pGroundEnt->IsEffectActive( EF_NODRAW ) ) )
 	{
 		SetCondition( COND_ANTLION_ON_NPC );
 	}
@@ -3907,7 +3907,7 @@ void CNPC_Antlion::PrescheduleThink( void )
 		DevMsg( "Antlion failed to unburrow properly!\n" );
 		Assert( 0 );
 		RemoveEffects( EF_NODRAW );
-		RemoveSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage	= DAMAGE_YES;
 		RemoveFlag( FL_NOTARGET );
 		GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);

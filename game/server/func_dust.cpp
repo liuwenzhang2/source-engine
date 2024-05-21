@@ -96,7 +96,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CFunc_Dust, DT_Func_Dust )
 
 	//SendPropModelIndex( SENDINFO(m_nModelIndex) ),
 	SendPropFloat( SENDINFO(m_FallSpeed), 0, SPROP_NOSCALE ),
-	SendPropDataTable( SENDINFO_DT( m_Collision ), &REFERENCE_SEND_TABLE(DT_CollisionProperty) ),
+	//SendPropDataTable( SENDINFO_DT( m_Collision ), &REFERENCE_SEND_TABLE(DT_CollisionProperty) ),
 END_SEND_TABLE()
 
 
@@ -159,7 +159,7 @@ void CFunc_Dust::Spawn()
 	// Bind to our bmodel.
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	//AddSolidFlags( FSOLID_NOT_SOLID );
-	AddSolidFlags( FSOLID_VOLUME_CONTENTS );
+	GetEngineObject()->AddSolidFlags( FSOLID_VOLUME_CONTENTS );
 
 	//Since keyvalues can arrive in any order, and UTIL_StringToColor32 stomps alpha,
 	//install the alpha value here.

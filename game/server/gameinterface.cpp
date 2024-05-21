@@ -3165,7 +3165,7 @@ void CServerGameClients::ClientDisconnect( int pEdict )
 			player->RemoveFlag( FL_AIMTARGET ); // don't attract autoaim
 			player->AddFlag( FL_DONTTOUCH );	// stop it touching anything
 			player->AddFlag( FL_NOTARGET );	// stop NPCs noticing it
-			player->AddSolidFlags( FSOLID_NOT_SOLID );		// nonsolid
+			player->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );		// nonsolid
 
 			if ( g_pGameRules )
 			{

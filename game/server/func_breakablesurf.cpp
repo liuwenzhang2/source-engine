@@ -76,7 +76,7 @@ void CWindowPane::Spawn( void )
 {
     Precache( );    
   
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 	m_takedamage = DAMAGE_YES;
  	
@@ -269,7 +269,7 @@ void CBreakableSurface::SurfaceTouch( CBaseEntity *pOther )
 
 	// Find nearest point on plane for max
 	Vector vecAbsMins, vecAbsMaxs;
-	pOther->CollisionProp()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
+	pOther->GetEngineObject()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
 	Vector vToPlane		= (vecAbsMaxs - m_vCorner);
 	float  vDistToPlane = DotProduct(m_vNormal,vToPlane);
 	Vector vTouchPos	= vecAbsMaxs + vDistToPlane*m_vNormal;
@@ -710,8 +710,8 @@ void CBreakableSurface::Die( CBaseEntity *pBreaker, const Vector &vAttackDir )
 	ResetOnGroundFlags();
 
 	VPhysicsDestroyObject();
-	AddSolidFlags( FSOLID_TRIGGER );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetTouch(&CBreakableSurface::SurfaceTouch);
 }
 

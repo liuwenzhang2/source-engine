@@ -316,7 +316,7 @@ const Vector& CBaseEntity::GetViewOffset() const
 //-----------------------------------------------------------------------------
 const Vector &CBaseEntity::WorldSpaceCenter( ) const 
 {
-	return CollisionProp()->WorldSpaceCenter();
+	return GetEngineObject()->WorldSpaceCenter();
 }
 
 #if !defined( CLIENT_DLL )
@@ -482,7 +482,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		Vector mins;
 		UTIL_StringToVector( mins.Base(), szValue );
-		CollisionProp()->SetCollisionBounds( mins, CollisionProp()->OBBMaxs() );
+		GetEngineObject()->SetCollisionBounds( mins, GetEngineObject()->CollisionProp()->OBBMaxs() );
 		return true;
 	}
 
@@ -490,7 +490,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		Vector maxs;
 		UTIL_StringToVector( maxs.Base(), szValue );
-		CollisionProp()->SetCollisionBounds( CollisionProp()->OBBMins(), maxs );
+		GetEngineObject()->SetCollisionBounds(GetEngineObject()->CollisionProp()->OBBMins(), maxs );
 		return true;
 	}
 
@@ -1301,9 +1301,9 @@ IPhysicsObject *CBaseEntity::VPhysicsInitStatic( void )
 	if (GetEngineObject()->GetMoveParent() )
 	{
 		// must be SOLID_VPHYSICS if in hierarchy to solve collisions correctly
-		if ( GetSolid() == SOLID_BSP && GetEngineObject()->GetRootMoveParent()->GetOuter()->GetSolid() != SOLID_BSP)
+		if (GetEngineObject()->GetSolid() == SOLID_BSP && GetEngineObject()->GetRootMoveParent()->GetSolid() != SOLID_BSP)
 		{
-			SetSolid( SOLID_VPHYSICS );
+			GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 		}
 
 		return VPhysicsInitShadow( false, false );
@@ -1311,12 +1311,12 @@ IPhysicsObject *CBaseEntity::VPhysicsInitStatic( void )
 #endif
 
 	// No physics
-	if ( GetSolid() == SOLID_NONE )
+	if (GetEngineObject()->GetSolid() == SOLID_NONE )
 		return NULL;
 
 	// create a static physics objct
 	IPhysicsObject *pPhysicsObject = NULL;
-	if ( GetSolid() == SOLID_BBOX )
+	if (GetEngineObject()->GetSolid() == SOLID_BBOX )
 	{
 		pPhysicsObject = PhysModelCreateBox( this, WorldAlignMins(), WorldAlignMaxs(), GetEngineObject()->GetAbsOrigin(), true );
 	}
@@ -1391,8 +1391,8 @@ IPhysicsObject *CBaseEntity::VPhysicsInitNormal( SolidType_t solidType, int nSol
 
 	// NOTE: This has to occur before PhysModelCreate because that call will
 	// call back into ShouldCollide(), which uses solidtype for rules.
-	SetSolid( solidType );
-	SetSolidFlags( nSolidFlags );
+	GetEngineObject()->SetSolid( solidType );
+	GetEngineObject()->SetSolidFlags( nSolidFlags );
 
 	// No physics
 	if ( solidType == SOLID_NONE )
@@ -1423,14 +1423,14 @@ IPhysicsObject *CBaseEntity::VPhysicsInitShadow( bool allowPhysicsMovement, bool
 		return NULL;
 
 	// No physics
-	if ( GetSolid() == SOLID_NONE )
+	if (GetEngineObject()->GetSolid() == SOLID_NONE )
 		return NULL;
 
 	const Vector &origin = GetEngineObject()->GetAbsOrigin();
 	QAngle angles = GetEngineObject()->GetAbsAngles();
 	IPhysicsObject *pPhysicsObject = NULL;
 
-	if ( GetSolid() == SOLID_BBOX )
+	if (GetEngineObject()->GetSolid() == SOLID_BBOX )
 	{
 		// adjust these so the game tracing epsilons match the physics minimum separation distance
 		// this will shrink the vphysics version of the model by the difference in epsilons
@@ -1440,9 +1440,9 @@ IPhysicsObject *CBaseEntity::VPhysicsInitShadow( bool allowPhysicsMovement, bool
 		pPhysicsObject = PhysModelCreateBox( this, mins, maxs, origin, false );
 		angles = vec3_angle;
 	}
-	else if ( GetSolid() == SOLID_OBB )
+	else if (GetEngineObject()->GetSolid() == SOLID_OBB )
 	{
-		pPhysicsObject = PhysModelCreateOBB( this, CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), origin, angles, false );
+		pPhysicsObject = PhysModelCreateOBB( this, GetEngineObject()->CollisionProp()->OBBMins(), GetEngineObject()->CollisionProp()->OBBMaxs(), origin, angles, false );
 	}
 	else
 	{
@@ -1469,10 +1469,10 @@ bool CBaseEntity::CreateVPhysics()
 
 bool CBaseEntity::IsStandable() const
 {
-	if (GetSolidFlags() & FSOLID_NOT_STANDABLE) 
+	if (GetEngineObject()->GetSolidFlags() & FSOLID_NOT_STANDABLE)
 		return false;
 
-	if ( GetSolid() == SOLID_BSP || GetSolid() == SOLID_VPHYSICS || GetSolid() == SOLID_BBOX )
+	if (GetEngineObject()->GetSolid() == SOLID_BSP || GetEngineObject()->GetSolid() == SOLID_VPHYSICS || GetEngineObject()->GetSolid() == SOLID_BBOX )
 		return true;
 
 	return IsBSPModel( ); 
@@ -1480,12 +1480,12 @@ bool CBaseEntity::IsStandable() const
 
 bool CBaseEntity::IsBSPModel() const
 {
-	if ( GetSolid() == SOLID_BSP )
+	if (GetEngineObject()->GetSolid() == SOLID_BSP )
 		return true;
 	
 	const model_t *model = modelinfo->GetModel(GetEngineObject()->GetModelIndex() );
 
-	if ( GetSolid() == SOLID_VPHYSICS && modelinfo->GetModelType( model ) == mod_brush )
+	if (GetEngineObject()->GetSolid() == SOLID_VPHYSICS && modelinfo->GetModelType( model ) == mod_brush )
 		return true;
 
 	return false;
@@ -1494,15 +1494,15 @@ bool CBaseEntity::IsBSPModel() const
 
 void CBaseEntity::OnPositionChenged() {
 	// NOTE: This will also mark shadow projection + client leaf dirty
-	CollisionProp()->MarkPartitionHandleDirty();
+	GetEngineObject()->MarkPartitionHandleDirty();
 }
 
 void CBaseEntity::OnAnglesChanged() {
-	if (CollisionProp()->DoesRotationInvalidateSurroundingBox())
+	if (GetEngineObject()->DoesRotationInvalidateSurroundingBox())
 	{
 		// NOTE: This will handle the KD-tree, surrounding bounds, PVS
 		// render-to-texture shadow, shadow projection, and client leaf dirty
-		CollisionProp()->MarkSurroundingBoundsDirty();
+		GetEngineObject()->MarkSurroundingBoundsDirty();
 	}
 	else
 	{
@@ -1542,8 +1542,8 @@ public:
 			CBaseEntity *pEntity = EntityFromEntityHandle( pHandleEntity );
 			CBaseEntity *pPassEntity = EntityFromEntityHandle( m_PassEntities[0] );
 			if ( pEntity && pPassEntity && pEntity->GetOwnerEntity() == pPassEntity && 
-				pPassEntity->IsSolidFlagSet(FSOLID_NOT_SOLID) && pPassEntity->IsSolidFlagSet( FSOLID_CUSTOMBOXTEST ) && 
-				pPassEntity->IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ) )
+				pPassEntity->GetEngineObject()->IsSolidFlagSet(FSOLID_NOT_SOLID) && pPassEntity->GetEngineObject()->IsSolidFlagSet( FSOLID_CUSTOMBOXTEST ) &&
+				pPassEntity->GetEngineObject()->IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ) )
 			{
 				// It's a bone follower of the entity to ignore (toml 8/3/2007)
 				return false;
@@ -2316,7 +2316,7 @@ void CBaseEntity::FollowEntity( CBaseEntity *pBaseEntity, bool bBoneMerge )
 		if ( bBoneMerge )
 			AddEffects( EF_BONEMERGE );
 
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		GetEngineObject()->SetLocalOrigin( vec3_origin );
 		GetEngineObject()->SetLocalAngles( vec3_angle );
 	}

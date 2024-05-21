@@ -17,7 +17,7 @@
 // Landmark class
 void CPointEntity::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 //	UTIL_SetSize(this, vec3_origin, vec3_origin);
 }
 

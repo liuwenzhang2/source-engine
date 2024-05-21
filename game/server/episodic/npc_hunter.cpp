@@ -531,7 +531,7 @@ void CHunterFlechette::Spawn()
 	SetModel( HUNTER_FLECHETTE_MODEL );
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 	UTIL_SetSize( this, -Vector(1,1,1), Vector(1,1,1) );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetGravity( 0.05f );
 	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	
@@ -604,8 +604,8 @@ void CHunterFlechette::StickTo( CBaseEntity *pOther, trace_t &tr )
 	if ( !pOther->IsWorld() )
 	{
 		GetEngineObject()->SetParent( pOther->GetEngineObject() );
-		SetSolid( SOLID_NONE );
-		SetSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->SetSolid( SOLID_NONE );
+		GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	// Do an impact effect.
@@ -667,7 +667,7 @@ void CHunterFlechette::StickTo( CBaseEntity *pOther, trace_t &tr )
 //-----------------------------------------------------------------------------
 void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 {
-	if ( pOther->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS | FSOLID_TRIGGER) )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS | FSOLID_TRIGGER) )
 	{
 		// Some NPCs are triggers that can take damage (like antlion grubs). We should hit them.
 		if ( ( pOther->m_takedamage == DAMAGE_NO ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )
@@ -924,7 +924,7 @@ void CHunterFlechette::ExplodeThink()
 //-----------------------------------------------------------------------------
 void CHunterFlechette::Explode()
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	// Don't catch self in own explosion!
 	m_takedamage = DAMAGE_NO;
@@ -1020,7 +1020,7 @@ public:
 				float entMass = PhysGetEntityMass( pEntity ) ;
 				if ( entMass < m_minMass )
 				{
-					if ( entMass < m_minMass * 0.666f || pEntity->CollisionProp()->BoundingRadius() < (assert_cast<const CAI_BaseNPC *>(EntityFromEntityHandle( m_pPassEnt )))->GetHullHeight() )
+					if ( entMass < m_minMass * 0.666f || pEntity->GetEngineObject()->BoundingRadius() < (assert_cast<const CAI_BaseNPC *>(EntityFromEntityHandle( m_pPassEnt )))->GetHullHeight() )
 					{
 						return false;
 					}
@@ -1797,8 +1797,8 @@ void CNPC_Hunter::Spawn()
 
 	m_flFieldOfView = HUNTER_FOV_DOT;
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 
 	SetupGlobalModelData();
@@ -1900,7 +1900,7 @@ void CNPC_Hunter::SetupGlobalModelData()
 	nSequence = SelectWeightedSequence( ACT_RANGE_ATTACK2 );
 	gm_nPlantedNode = GetEntryNode( nSequence );
 
-	CollisionProp()->SetSurroundingBoundsType( USE_HITBOXES );
+	GetEngineObject()->SetSurroundingBoundsType( USE_HITBOXES );
 }
 
 
@@ -4243,7 +4243,7 @@ bool CNPC_Hunter::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEntity )
 			float minMass = VPhysicsGetObject()->GetMass() * 0.5f;
 			if ( entMass < minMass )
 			{
-				if ( entMass < minMass * 0.666f || pEntity->CollisionProp()->BoundingRadius() < GetHullHeight() )
+				if ( entMass < minMass * 0.666f || pEntity->GetEngineObject()->BoundingRadius() < GetHullHeight() )
 				{
 					if ( pEntity->GetHealth() > 0 )
 					{

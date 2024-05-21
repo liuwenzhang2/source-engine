@@ -752,7 +752,7 @@ void CItem_AmmoCrate::Spawn( void )
 
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	CreateVPhysics();
 
 	ResetSequence( LookupSequence( "Idle" ) );
@@ -832,7 +832,7 @@ void CItem_AmmoCrate::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 		Vector mins, maxs;
 		trace_t tr;
 
-		CollisionProp()->WorldSpaceAABB( &mins, &maxs );
+		GetEngineObject()->WorldSpaceAABB( &mins, &maxs );
 
 		Vector vOrigin = GetEngineObject()->GetAbsOrigin();
 		vOrigin.z += ( maxs.z - mins.z );

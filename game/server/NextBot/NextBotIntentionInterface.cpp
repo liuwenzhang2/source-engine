@@ -34,7 +34,7 @@ Vector IIntention::SelectTargetPoint( const INextBot *me, const CBaseCombatChara
 
 	// no answer, use a reasonable position
 	Vector threatMins, threatMaxs;
-	subject->CollisionProp()->WorldSpaceAABB( &threatMins, &threatMaxs );
+	subject->GetEngineObject()->WorldSpaceAABB( &threatMins, &threatMaxs );
 	Vector targetPoint = subject->GetEngineObject()->GetAbsOrigin();
 	targetPoint.z += 0.7f * ( threatMaxs.z - threatMins.z );
 

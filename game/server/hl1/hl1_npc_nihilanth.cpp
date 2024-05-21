@@ -289,7 +289,7 @@ void CNPC_Nihilanth::Spawn( void )
 	Precache( );
 	// motor
 	SetMoveType( MOVETYPE_FLY );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	SetModel( "models/nihilanth.mdl" );
 	//UTIL_SetSize( this, Vector( -300, -300, 0), Vector(300, 300, 512));
@@ -299,7 +299,7 @@ void CNPC_Nihilanth::Spawn( void )
 	
 	Vector vecSurroundingMins( -16 * N_SCALE, -16 * N_SCALE, -48 * N_SCALE );
 	Vector vecSurroundingMaxs( 16 * N_SCALE, 16 * N_SCALE, 28 * N_SCALE );
-	CollisionProp()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &vecSurroundingMins, &vecSurroundingMaxs );
+	GetEngineObject()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &vecSurroundingMins, &vecSurroundingMaxs );
 
 	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 64 ) );
 
@@ -1295,7 +1295,7 @@ void CNihilanthHVR::Precache( void )
 void CNihilanthHVR::CircleInit( CBaseEntity *pTarget )
 {
 	SetMoveType( MOVETYPE_FLY );
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0));
 	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() );
@@ -1435,7 +1435,7 @@ bool CNihilanthHVR::CircleTarget( Vector vecTarget )
 void CNihilanthHVR::ZapInit( CBaseEntity *pEnemy )
 {
 	SetMoveType( MOVETYPE_FLY );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	
 	CSprite *pSprite = SpriteInit( "sprites/nhth1.vmt", this );
 	
@@ -1603,7 +1603,7 @@ void CNihilanthHVR::DissipateThink( void  )
 void CNihilanthHVR::TeleportInit( CNPC_Nihilanth *pOwner, CBaseEntity *pEnemy, CBaseEntity *pTarget, CBaseEntity *pTouch )
 {
 	SetMoveType( MOVETYPE_FLY );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	SetModel( "" );
 
@@ -1722,7 +1722,7 @@ void CNihilanthHVR::TeleportTouch( CBaseEntity *pOther )
 void CNihilanthHVR::GreenBallInit( )
 {
 	SetMoveType( MOVETYPE_FLY );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	SetModel( "" );
 

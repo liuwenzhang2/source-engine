@@ -142,6 +142,7 @@ public:
 	CEngineObjectInternal() {
 		SetIdentityMatrix(m_rgflCoordinateFrame);
 		m_Network.Init(this);
+		CollisionProp()->Init(this);
 		testNetwork = 9999;
 		m_vecOrigin = Vector(0, 0, 0);
 		m_angRotation = QAngle(0, 0, 0);
@@ -163,6 +164,8 @@ public:
 		m_fDataObjectTypes = 0;
 		m_ModelName = NULL_STRING;
 		m_nModelIndex = 0;
+		SetSolid(SOLID_NONE);
+		ClearSolidFlags();
 	}
 
 	~CEngineObjectInternal()
@@ -178,6 +181,7 @@ public:
 		m_vecVelocity.Init();
 		m_vecAbsVelocity.Init();
 #endif
+		SetCollisionBounds(vec3_origin, vec3_origin);
 	}
 
 	CBaseEntity* GetOuter() {
@@ -395,6 +399,48 @@ public:
 	void SetModelName(string_t name);
 	void SetModelIndex(int index);
 	int GetModelIndex(void) const;
+
+	// An inline version the game code can use
+	CCollisionProperty* CollisionProp();
+	const CCollisionProperty* CollisionProp() const;
+	// This defines collision bounds in OBB space
+	void SetCollisionBounds(const Vector& mins, const Vector& maxs);
+	SolidType_t GetSolid() const;
+	bool IsSolid() const;
+	void SetSolid(SolidType_t val);
+	void AddSolidFlags(int flags);
+	void RemoveSolidFlags(int flags);
+	void ClearSolidFlags(void);
+	bool IsSolidFlagSet(int flagMask) const;
+	void SetSolidFlags(int flags);
+	int GetSolidFlags(void) const;
+	const Vector& OBBSize() const;
+	const Vector& OBBCenter() const;
+	const Vector& WorldSpaceCenter() const;
+	void WorldSpaceAABB(Vector* pWorldMins, Vector* pWorldMaxs) const;
+	const Vector& NormalizedToWorldSpace(const Vector& in, Vector* pResult) const;
+	const Vector& WorldToNormalizedSpace(const Vector& in, Vector* pResult) const;
+	const Vector& WorldToCollisionSpace(const Vector& in, Vector* pResult) const;
+	const Vector& CollisionToWorldSpace(const Vector& in, Vector* pResult) const;
+	const Vector& WorldDirectionToCollisionSpace(const Vector& in, Vector* pResult) const;
+	const Vector& NormalizedToCollisionSpace(const Vector& in, Vector* pResult) const;
+	float BoundingRadius() const;
+	float BoundingRadius2D() const;
+	void RandomPointInBounds(const Vector& vecNormalizedMins, const Vector& vecNormalizedMaxs, Vector* pPoint) const;
+	bool IsPointInBounds(const Vector& vecWorldPt) const;
+	void UseTriggerBounds(bool bEnable, float flBloat = 0.0f);
+	void RefreshScaledCollisionBounds(void);
+	void MarkPartitionHandleDirty();
+	bool DoesRotationInvalidateSurroundingBox() const;
+	void MarkSurroundingBoundsDirty();
+	void CalcNearestPoint(const Vector& vecWorldPt, Vector* pVecNearestWorldPt) const;
+	void SetSurroundingBoundsType(SurroundingBoundsType_t type, const Vector* pMins = NULL, const Vector* pMaxs = NULL);
+	unsigned short	GetPartitionHandle() const;
+	float CalcDistanceFromPoint(const Vector& vecWorldPt) const;
+	bool DoesVPhysicsInvalidateSurroundingBox() const;
+	void UpdatePartition();
+	bool IsBoundsDefinedInEntitySpace() const;
+
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -406,6 +452,8 @@ private:
 private:
 
 	friend class CBaseEntity;
+	friend class CCollisionProperty;
+
 	CNetworkVector(m_vecOrigin);
 	CNetworkQAngle(m_angRotation);
 	CNetworkVector(m_vecVelocity);
@@ -451,6 +499,7 @@ private:
 	string_t		m_ModelName;
 	CNetworkVar(short, m_nModelIndex);
 
+	CNetworkVarEmbedded(CCollisionProperty, m_Collision);
 
 };
 
@@ -635,6 +684,202 @@ inline string_t CEngineObjectInternal::GetModelName(void) const
 inline int CEngineObjectInternal::GetModelIndex(void) const
 {
 	return m_nModelIndex;
+}
+
+//-----------------------------------------------------------------------------
+// An inline version the game code can use
+//-----------------------------------------------------------------------------
+inline CCollisionProperty* CEngineObjectInternal::CollisionProp()
+{
+	return &m_Collision;
+}
+
+inline const CCollisionProperty* CEngineObjectInternal::CollisionProp() const
+{
+	return &m_Collision;
+}
+
+inline void CEngineObjectInternal::ClearSolidFlags(void)
+{
+	CollisionProp()->ClearSolidFlags();
+}
+
+inline void CEngineObjectInternal::RemoveSolidFlags(int flags)
+{
+	CollisionProp()->RemoveSolidFlags(flags);
+}
+
+inline void CEngineObjectInternal::AddSolidFlags(int flags)
+{
+	CollisionProp()->AddSolidFlags(flags);
+}
+
+inline int CEngineObjectInternal::GetSolidFlags(void) const
+{
+	return CollisionProp()->GetSolidFlags();
+}
+
+inline bool CEngineObjectInternal::IsSolidFlagSet(int flagMask) const
+{
+	return CollisionProp()->IsSolidFlagSet(flagMask);
+}
+
+inline bool CEngineObjectInternal::IsSolid() const
+{
+	return CollisionProp()->IsSolid();
+}
+
+inline void CEngineObjectInternal::SetSolid(SolidType_t val)
+{
+	CollisionProp()->SetSolid(val);
+}
+
+inline void CEngineObjectInternal::SetSolidFlags(int flags)
+{
+	CollisionProp()->SetSolidFlags(flags);
+}
+
+inline SolidType_t CEngineObjectInternal::GetSolid() const
+{
+	return CollisionProp()->GetSolid();
+}
+
+//-----------------------------------------------------------------------------
+// Sets the collision bounds + the size
+//-----------------------------------------------------------------------------
+inline void CEngineObjectInternal::SetCollisionBounds(const Vector& mins, const Vector& maxs)
+{
+	CollisionProp()->SetCollisionBounds(mins, maxs);
+}
+
+inline const Vector& CEngineObjectInternal::OBBSize() const 
+{
+	return CollisionProp()->OBBSize();
+}
+
+inline const Vector& CEngineObjectInternal::OBBCenter() const 
+{
+	return CollisionProp()->OBBCenter();
+}
+
+inline const Vector& CEngineObjectInternal::WorldSpaceCenter() const
+{
+	return CollisionProp()->WorldSpaceCenter();
+}
+
+inline void CEngineObjectInternal::WorldSpaceAABB(Vector* pWorldMins, Vector* pWorldMaxs) const
+{
+	CollisionProp()->WorldSpaceAABB(pWorldMins, pWorldMaxs);
+}
+
+inline const Vector& CEngineObjectInternal::NormalizedToWorldSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->NormalizedToWorldSpace(in, pResult);
+}
+
+inline const Vector& CEngineObjectInternal::WorldToNormalizedSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->WorldToNormalizedSpace(in, pResult);
+}
+
+inline const Vector& CEngineObjectInternal::WorldToCollisionSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->WorldToCollisionSpace(in, pResult);
+}
+
+inline const Vector& CEngineObjectInternal::CollisionToWorldSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->CollisionToWorldSpace(in, pResult);
+}
+
+inline const Vector& CEngineObjectInternal::WorldDirectionToCollisionSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->WorldDirectionToCollisionSpace(in, pResult);
+}
+
+inline const Vector& CEngineObjectInternal::NormalizedToCollisionSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->NormalizedToCollisionSpace(in, pResult);
+}
+
+inline float CEngineObjectInternal::BoundingRadius() const
+{
+	return CollisionProp()->BoundingRadius();
+}
+
+inline float CEngineObjectInternal::BoundingRadius2D() const
+{
+	return CollisionProp()->BoundingRadius2D();
+}
+
+inline void CEngineObjectInternal::RandomPointInBounds(const Vector& vecNormalizedMins, const Vector& vecNormalizedMaxs, Vector* pPoint) const
+{
+	CollisionProp()->RandomPointInBounds(vecNormalizedMins, vecNormalizedMaxs, pPoint);
+}
+
+inline bool CEngineObjectInternal::IsPointInBounds(const Vector& vecWorldPt) const
+{
+	return CollisionProp()->IsPointInBounds(vecWorldPt);
+}
+
+inline void CEngineObjectInternal::UseTriggerBounds(bool bEnable, float flBloat)
+{
+	CollisionProp()->UseTriggerBounds(bEnable, flBloat);
+}
+
+inline void CEngineObjectInternal::RefreshScaledCollisionBounds(void)
+{
+	CollisionProp()->RefreshScaledCollisionBounds();
+}
+
+inline void CEngineObjectInternal::MarkPartitionHandleDirty()
+{
+	CollisionProp()->MarkPartitionHandleDirty();
+}
+
+inline bool CEngineObjectInternal::DoesRotationInvalidateSurroundingBox() const
+{
+	return CollisionProp()->DoesRotationInvalidateSurroundingBox();
+}
+
+inline void CEngineObjectInternal::MarkSurroundingBoundsDirty()
+{
+	CollisionProp()->MarkSurroundingBoundsDirty();
+}
+
+inline void CEngineObjectInternal::CalcNearestPoint(const Vector& vecWorldPt, Vector* pVecNearestWorldPt) const
+{
+	CollisionProp()->CalcNearestPoint(vecWorldPt, pVecNearestWorldPt);
+}
+
+inline void CEngineObjectInternal::SetSurroundingBoundsType(SurroundingBoundsType_t type, const Vector* pMins, const Vector* pMaxs)
+{
+	CollisionProp()->SetSurroundingBoundsType(type, pMins, pMaxs);
+}
+
+inline unsigned short CEngineObjectInternal::GetPartitionHandle() const
+{
+	return CollisionProp()->GetPartitionHandle();
+}
+
+inline float CEngineObjectInternal::CalcDistanceFromPoint(const Vector& vecWorldPt) const
+{
+	return CollisionProp()->CalcDistanceFromPoint(vecWorldPt);
+}
+
+inline bool CEngineObjectInternal::DoesVPhysicsInvalidateSurroundingBox() const
+{
+	return CollisionProp()->DoesVPhysicsInvalidateSurroundingBox();
+}
+
+inline void CEngineObjectInternal::UpdatePartition()
+{
+	CollisionProp()->UpdatePartition();
+}
+
+inline bool CEngineObjectInternal::IsBoundsDefinedInEntitySpace() const
+{
+	return CollisionProp()->IsBoundsDefinedInEntitySpace();
 }
 
 //-----------------------------------------------------------------------------
@@ -1573,7 +1818,7 @@ bool CGlobalEntityList<T>::IsEntityInTransition(T* pEntity, const char* pLandmar
 	int clusterIndex = engine->GetClusterForOrigin(pLandmark->GetEngineObject()->GetAbsOrigin());
 	engine->GetPVSForCluster(clusterIndex, sizeof(pvs), pvs);
 	Vector vecSurroundMins, vecSurroundMaxs;
-	pEntity->CollisionProp()->WorldSpaceSurroundingBounds(&vecSurroundMins, &vecSurroundMaxs);
+	pEntity->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds(&vecSurroundMins, &vecSurroundMaxs);
 
 	return engine->CheckBoxInPVS(vecSurroundMins, vecSurroundMaxs, pvs, sizeof(pvs));
 }
@@ -2434,8 +2679,8 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityInSphere(CBaseEntity* pStartEntity,
 			continue;
 
 		Vector vecRelativeCenter;
-		ent->CollisionProp()->WorldToCollisionSpace(vecCenter, &vecRelativeCenter);
-		if (!IsBoxIntersectingSphere(ent->CollisionProp()->OBBMins(), ent->CollisionProp()->OBBMaxs(), vecRelativeCenter, flRadius))
+		ent->GetEngineObject()->WorldToCollisionSpace(vecCenter, &vecRelativeCenter);
+		if (!IsBoxIntersectingSphere(ent->GetEngineObject()->CollisionProp()->OBBMins(), ent->GetEngineObject()->CollisionProp()->OBBMaxs(), vecRelativeCenter, flRadius))
 			continue;
 
 		return ent;
@@ -2634,7 +2879,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityByClassnameWithin(CBaseEntity* pSta
 
 		// check if the aabb intersects the search aabb.
 		Vector entMins, entMaxs;
-		pEntity->CollisionProp()->WorldSpaceAABB(&entMins, &entMaxs);
+		pEntity->GetEngineObject()->WorldSpaceAABB(&entMins, &entMaxs);
 		if (IsBoxIntersectingBox(vecMins, vecMaxs, entMins, entMaxs))
 		{
 			return pEntity;

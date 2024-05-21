@@ -46,7 +46,7 @@ LINK_ENTITY_TO_CLASS( monstermaker, CNPCMaker );
 //-----------------------------------------------------------------------------
 void CNPCMaker::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	m_cLiveChildren		= 0;
 	Precache();
 
@@ -113,7 +113,7 @@ bool CNPCMaker::CanMakeNPC( void )
 				continue;
 
 			//If one of the entities is solid, then we can't spawn now
-			if ( ( pList[i]->GetSolidFlags() & FSOLID_NOT_SOLID ) == false )
+			if ( ( pList[i]->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_SOLID ) == false )
 				return false;
 		}
 	}

@@ -373,13 +373,13 @@ void CAntlionGrub::Spawn( void )
 	// FIXME: This is a big perf hit with the number of grubs we're using! - jdw
 	CreateGlow();
 
-	SetSolid( SOLID_BBOX );
-	SetSolidFlags( FSOLID_TRIGGER );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER );
 	SetMoveType( MOVETYPE_NONE );
 	SetCollisionGroup( COLLISION_GROUP_NONE );
 	AddEffects( EF_NOSHADOW );
 
-	CollisionProp()->UseTriggerBounds(true,1);
+	GetEngineObject()->UseTriggerBounds(true,1);
 
 	SetTouch( &CAntlionGrub::GrubTouch );
 
@@ -394,7 +394,7 @@ void CAntlionGrub::Spawn( void )
 
 	// At this point, alter our bounds to make sure we're within them
 	Vector vecMins, vecMaxs;
-	RotateAABB(GetEngineObject()->EntityToWorldTransform(), CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), vecMins, vecMaxs );
+	RotateAABB(GetEngineObject()->EntityToWorldTransform(), GetEngineObject()->CollisionProp()->OBBMins(), GetEngineObject()->CollisionProp()->OBBMaxs(), vecMins, vecMaxs );
 
 	UTIL_SetSize( this, vecMins, vecMaxs );
 
@@ -769,7 +769,7 @@ void CAntlionGrub::Squash( CBaseEntity *pOther, bool bDealDamage, bool bSpawnBlo
 	SpawnSquashedGrub();
 
 	AddEffects( EF_NODRAW );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	
 	// Stop being attached to us
 	if ( m_hGlowSprite )

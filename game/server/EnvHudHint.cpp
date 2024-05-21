@@ -55,7 +55,7 @@ void CEnvHudHint::Spawn( void )
 {
 	Precache();
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 }
 

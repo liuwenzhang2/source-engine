@@ -95,11 +95,25 @@ LINK_ENTITY_TO_CLASS( weapon_hl2mp_base, CWeaponHL2MPBase );
 CWeaponHL2MPBase::CWeaponHL2MPBase()
 {
 	//SetPredictionEligible( true );
-	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 
 	m_flNextResetCheckTime = 0.0f;
 }
 
+#ifdef GAME_DLL
+void CWeaponHL2MPBase::PostConstructor(const char* szClassname, int iForceEdictIndex)
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+}
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+bool CWeaponHL2MPBase::Init(int entnum, int iSerialNum)
+{
+	bool bRet = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+	return bRet;
+}
+#endif // CLIENT_DLL
 
 bool CWeaponHL2MPBase::IsPredicted() const
 { 
@@ -187,7 +201,7 @@ void CWeaponHL2MPBase::Materialize( void )
 
 	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
-		VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false );
+		VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
 		SetMoveType( MOVETYPE_VPHYSICS );
 
 		HL2MPRules()->AddLevelDesignerPlacedObject( this );
@@ -223,18 +237,18 @@ void CWeaponHL2MPBase::FallInit( void )
 	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
 		SetMoveType( MOVETYPE_NONE );
-		SetSolid( SOLID_BBOX );
-		AddSolidFlags( FSOLID_TRIGGER );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
+		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 
 		UTIL_DropToFloor( this, MASK_SOLID );
 	}
 	else
 	{
-		if ( !VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false ) )
+		if ( !VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false ) )
 		{
 			SetMoveType( MOVETYPE_NONE );
-			SetSolid( SOLID_BBOX );
-			AddSolidFlags( FSOLID_TRIGGER );
+			GetEngineObject()->SetSolid( SOLID_BBOX );
+			GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 		}
 		else
 		{

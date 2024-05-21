@@ -50,8 +50,8 @@ END_DATADESC()
 void CHandGrenade::Spawn( void )
 {
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	SetModel( HANDGRENADE_MODEL ); 
 
@@ -125,7 +125,7 @@ void CHandGrenade ::BounceSound( void )
 
 void CHandGrenade::BounceTouch( CBaseEntity *pOther )
 {
-	if ( pOther->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) )
 		return;
 
 	// don't hit the guy that launched this grenade

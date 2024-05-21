@@ -306,7 +306,7 @@ bool CMultiManager::KeyValue( const char *szKeyName, const char *szValue )
 
 void CMultiManager::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetUse ( &CMultiManager::ManagerUse );
 	SetThink ( &CMultiManager::ManagerThink);
 
@@ -441,9 +441,9 @@ void CPendulum::Spawn( void )
 	m_flDamp *=  0.001;
 	
 	if (GetEngineObject()->HasSpawnFlags(SF_DOOR_PASSABLE) )
-		SetSolid( SOLID_NONE );
+		GetEngineObject()->SetSolid( SOLID_NONE );
 	else
-		SetSolid( SOLID_BBOX );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	SetMoveType( MOVETYPE_PUSH );
 	SetModel( STRING(GetEngineObject()->GetModelName()) );
@@ -662,7 +662,7 @@ END_DATADESC()
 // Drop bombs from above
 void CFuncMortarField::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName()) );    // set size and link into world
 	SetMoveType( MOVETYPE_NONE );
 	AddEffects( EF_NODRAW );
@@ -681,7 +681,7 @@ void CFuncMortarField::Precache( void )
 void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 {
 	Vector vecStart;
-	CollisionProp()->RandomPointInBounds( Vector( 0, 0, 1 ), Vector( 1, 1, 1 ), &vecStart );
+	GetEngineObject()->RandomPointInBounds( Vector( 0, 0, 1 ), Vector( 1, 1, 1 ), &vecStart );
 
 	switch( m_fControl )
 	{
@@ -708,7 +708,7 @@ void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 						CMomentaryRotButton *pXController = static_cast<CMomentaryRotButton*>( pController );
 						Vector vecNormalizedPos( pXController->GetPos( pXController->GetEngineObject()->GetLocalAngles() ), 0.0f, 0.0f );
 						Vector vecWorldSpace;
-						CollisionProp()->NormalizedToWorldSpace( vecNormalizedPos, &vecWorldSpace );
+						GetEngineObject()->NormalizedToWorldSpace( vecNormalizedPos, &vecWorldSpace );
 						vecStart.x = vecWorldSpace.x;
 					}
 					else
@@ -727,7 +727,7 @@ void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 						CMomentaryRotButton *pYController = static_cast<CMomentaryRotButton*>( pController );
 						Vector vecNormalizedPos( 0.0f, pYController->GetPos( pYController->GetEngineObject()->GetLocalAngles() ), 0.0f );
 						Vector vecWorldSpace;
-						CollisionProp()->NormalizedToWorldSpace( vecNormalizedPos, &vecWorldSpace );
+						GetEngineObject()->NormalizedToWorldSpace( vecNormalizedPos, &vecWorldSpace );
 						vecStart.y = vecWorldSpace.y;
 					}
 					else
@@ -789,7 +789,7 @@ LINK_ENTITY_TO_CLASS( monster_mortar, CMortar );
 void CMortar::Spawn( )
 {
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	SetDamage( 200 );
 	SetDamageRadius( GetDamage() * 2.5 );
@@ -921,7 +921,7 @@ LINK_ENTITY_TO_CLASS( env_render, CRenderFxManager );
 
 void CRenderFxManager::Spawn( void )
 {
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 	AddEffects( EF_NODRAW );
 }
@@ -1002,8 +1002,8 @@ void CXenPLight::Spawn( void )
 	SetModel( "models/light.mdl" );
 
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
 
 	UTIL_SetSize( this, Vector(-80,-80,0), Vector(80,80,32));
 	SetActivity( ACT_IDLE );
@@ -1118,7 +1118,7 @@ void CXenHair::Spawn( void )
 	}
 	ResetSequenceInfo( );
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 	SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1, 0.4 ) );	// Load balance these a bit
 }
@@ -1150,8 +1150,8 @@ CXenTreeTrigger *CXenTreeTrigger::TriggerCreate( CBaseEntity *pOwner, const Vect
 	CXenTreeTrigger *pTrigger = (CXenTreeTrigger*)gEntList.CreateEntityByName( "xen_ttrigger" );
 	pTrigger->GetEngineObject()->SetAbsOrigin( position );
 
-	pTrigger->SetSolid( SOLID_BBOX );
-	pTrigger->AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
+	pTrigger->GetEngineObject()->SetSolid( SOLID_BBOX );
+	pTrigger->GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
 	pTrigger->SetMoveType( MOVETYPE_NONE );
 	pTrigger->SetOwnerEntity( pOwner );
 
@@ -1200,7 +1200,7 @@ void CXenTree::Spawn( void )
 
 	SetModel( "models/tree.mdl" );
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid ( SOLID_BBOX );
+	GetEngineObject()->SetSolid ( SOLID_BBOX );
 
 	m_takedamage = DAMAGE_YES;
 
@@ -1362,7 +1362,7 @@ CXenHull *CXenHull::CreateHull( CBaseEntity *source, const Vector &mins, const V
 	CXenHull *pHull = (CXenHull*)gEntList.CreateEntityByName( "xen_hull" );
 
 	UTIL_SetOrigin( pHull, source->GetEngineObject()->GetAbsOrigin() + offset );
-	pHull->SetSolid( SOLID_BBOX );
+	pHull->GetEngineObject()->SetSolid( SOLID_BBOX );
 	pHull->SetMoveType( MOVETYPE_NONE );
 	pHull->SetOwnerEntity( source );
 	UTIL_SetSize( pHull, mins, maxs );
@@ -1424,7 +1424,7 @@ void CXenSpore::Spawn( void )
 
 	SetModel( pModelNames[m_nSkin] );
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	m_takedamage = DAMAGE_NO;
 
 //	SetActivity( ACT_IDLE );
@@ -1578,8 +1578,8 @@ void CHL1Gib::Spawn( const char *szGibModel )
 	SetRenderColorA( 255 );
 	m_nRenderMode = kRenderNormal;
 	m_nRenderFX = kRenderFxNone;
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetClassname( "gib" );
 
 	SetModel( szGibModel );

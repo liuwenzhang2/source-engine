@@ -4120,7 +4120,7 @@ void CCitizenResponseSystem::Spawn()
 	g_pCitizenResponseSystem = this;
 
 	// Invisible, non solid.
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW );
 	SetThink( &CCitizenResponseSystem::ResponseThink );
 
@@ -4267,7 +4267,7 @@ void CSquadInsignia::Spawn()
 	}
 
 	SetModel( INSIGNIA_MODEL );
-	SetSolid( SOLID_NONE );	
+	GetEngineObject()->SetSolid( SOLID_NONE );
 }
 
 //-----------------------------------------------------------------------------

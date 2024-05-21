@@ -1267,11 +1267,11 @@ AI_Waypoint_t *CAI_Pathfinder::BuildOBBAvoidanceRoute(	const Vector &vStart, con
 
 	// If the point we're navigating to is within our OBB, then fail
 	// TODO: We could potentially also just try to get as near as possible
-	if ( pObstruction->CollisionProp()->IsPointInBounds( vEnd ) )
+	if (((CCollisionProperty*)pObstruction->GetEngineObject()->CollisionProp())->IsPointInBounds( vEnd ) )
 		return NULL;
 
 	// Find out how much we'll need to inflate the collision bounds to let us move past
-	Vector vecSize = pObstruction->CollisionProp()->OBBSize();
+	Vector vecSize = pObstruction->GetEngineObject()->OBBSize();
 	float flWidth = GetOuter()->GetHullWidth() * 0.5f;
 
 	float flWidthPercX = ( flWidth / vecSize.x );
@@ -1280,10 +1280,10 @@ AI_Waypoint_t *CAI_Pathfinder::BuildOBBAvoidanceRoute(	const Vector &vStart, con
 	// Find the points around the object, bloating it by our hull width
 	// The ordering of these corners wind clockwise around the object, starting at the top left
 	Vector vecPoints[4];
-	pObstruction->CollisionProp()->NormalizedToWorldSpace( Vector(  -flWidthPercX, 1+flWidthPercY, 0.25f ), &vecPoints[0] );
-	pObstruction->CollisionProp()->NormalizedToWorldSpace( Vector( 1+flWidthPercX, 1+flWidthPercY, 0.25f ), &vecPoints[1] );
-	pObstruction->CollisionProp()->NormalizedToWorldSpace( Vector( 1+flWidthPercX,  -flWidthPercY, 0.25f ), &vecPoints[2] );
-	pObstruction->CollisionProp()->NormalizedToWorldSpace( Vector(  -flWidthPercX,  -flWidthPercY, 0.25f ), &vecPoints[3] );
+	((CCollisionProperty*)pObstruction->GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector(  -flWidthPercX, 1+flWidthPercY, 0.25f ), &vecPoints[0] );
+	((CCollisionProperty*)pObstruction->GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector( 1+flWidthPercX, 1+flWidthPercY, 0.25f ), &vecPoints[1] );
+	((CCollisionProperty*)pObstruction->GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector( 1+flWidthPercX,  -flWidthPercY, 0.25f ), &vecPoints[2] );
+	((CCollisionProperty*)pObstruction->GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector(  -flWidthPercX,  -flWidthPercY, 0.25f ), &vecPoints[3] );
 
 	// Find the two points nearest our goals
 	int nStartPoint = ClosestPointToPosition( vStart, vecPoints, ARRAYSIZE( vecPoints ) );

@@ -207,6 +207,7 @@ int addVarCount = 0;
 const float coordTolerance = 2.0f / (float)(1 << COORD_FRACTIONAL_BITS);
 
 BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
+	DEFINE_PRED_TYPEDESCRIPTION(m_Collision, CCollisionProperty),
 	DEFINE_FIELD(m_vecAbsVelocity, FIELD_VECTOR),
 	DEFINE_PRED_FIELD_TOL(m_vecVelocity, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, 0.5f),
 	DEFINE_FIELD(m_vecAbsOrigin, FIELD_VECTOR),
@@ -290,6 +291,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO(m_nModelIndex)),
 #endif
 	RecvPropInt(RECVINFO(m_spawnflags)),
+	RecvPropDataTable(RECVINFO_DT(m_Collision), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty)),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -2297,9 +2299,9 @@ clienttouchlink_t* C_EngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObj
 		return NULL;
 
 	// Pure triggers should not touch each other
-	if (m_pOuter->IsSolidFlagSet(FSOLID_TRIGGER) && other->GetOuter()->IsSolidFlagSet(FSOLID_TRIGGER))
+	if (IsSolidFlagSet(FSOLID_TRIGGER) && other->IsSolidFlagSet(FSOLID_TRIGGER))
 	{
-		if (!m_pOuter->IsSolid() && !other->GetOuter()->IsSolid())
+		if (!IsSolid() && !other->IsSolid())
 			return NULL;
 	}
 
@@ -2366,8 +2368,8 @@ clienttouchlink_t* C_EngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObj
 	link->nextLink->prevLink = link;
 
 	// non-solid entities don't get touched
-	bool bShouldTouch = (m_pOuter->IsSolid() && !m_pOuter->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS)) || m_pOuter->IsSolidFlagSet(FSOLID_TRIGGER);
-	if (bShouldTouch && !other->GetOuter()->IsSolidFlagSet(FSOLID_TRIGGER))
+	bool bShouldTouch = (IsSolid() && !IsSolidFlagSet(FSOLID_VOLUME_CONTENTS)) || IsSolidFlagSet(FSOLID_TRIGGER);
+	if (bShouldTouch && !other->IsSolidFlagSet(FSOLID_TRIGGER))
 	{
 		link->flags |= FTOUCHLINK_START_TOUCH;
 		if (!CClientEntityList<C_BaseEntity>::sm_bDisableTouchFuncs)

@@ -1158,7 +1158,7 @@ static void SetMinMaxSize (CBaseEntity *pEnt, const Vector& mins, const Vector& 
 
 	Assert( pEnt );
 
-	pEnt->SetCollisionBounds( mins, maxs );
+	pEnt->GetEngineObject()->SetCollisionBounds( mins, maxs );
 }
 
 
@@ -1460,7 +1460,7 @@ public:
 			return false;
 
 		// Only impact water stuff...
-		if ( pCollide->GetSolidFlags() & FSOLID_VOLUME_CONTENTS )
+		if ( pCollide->GetEngineObject()->GetSolidFlags() & FSOLID_VOLUME_CONTENTS )
 			return true;
 
 		return false;
@@ -2270,7 +2270,7 @@ CBaseEntity *UTIL_EntitiesInPVS( CBaseEntity *pPVSEntity, CBaseEntity *pStarting
 		CBaseEntity *pParent = pEntity->GetEngineObject()->GetRootMoveParent()->GetOuter();
 
 		Vector vecSurroundMins, vecSurroundMaxs;
-		pParent->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+		pParent->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 		if ( !engine->CheckBoxInPVS( vecSurroundMins, vecSurroundMaxs, pvs, sizeof( pvs ) ) )
 			continue;
 

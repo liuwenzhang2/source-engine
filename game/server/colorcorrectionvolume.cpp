@@ -143,8 +143,8 @@ void CColorCorrectionVolume::Spawn( void )
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT | EFL_DIRTY_ABSTRANSFORM );
 	Precache();
 
-	SetSolid( SOLID_BSP );
-	SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	SetThink( &CColorCorrectionVolume::ThinkFunc );

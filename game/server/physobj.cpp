@@ -338,7 +338,7 @@ void CPhysicsSpring::Activate( void )
 
 void CPhysicsSpring::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	m_start = GetEngineObject()->GetAbsOrigin();
 	if ( m_tempLength <= 0 )
 	{
@@ -444,7 +444,7 @@ void CPhysBox::Spawn( void )
 	SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	if (GetEngineObject()->HasSpawnFlags( SF_PHYSBOX_DEBRIS ) )
 	{
 		SetCollisionGroup( COLLISION_GROUP_DEBRIS );
@@ -457,7 +457,7 @@ void CPhysBox::Spawn( void )
 
 	if ( m_bNotSolidToWorld )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 	CreateVPhysics();
 
@@ -522,7 +522,7 @@ bool CPhysBox::CreateVPhysics()
 	{
 		tmpSolid.params.rotdamping = 1.0f;
 	}
-	IPhysicsObject *pPhysics = VPhysicsInitNormal( GetSolid(), GetSolidFlags(), true, &tmpSolid );
+	IPhysicsObject *pPhysics = VPhysicsInitNormal(GetEngineObject()->GetSolid(), GetEngineObject()->GetSolidFlags(), true, &tmpSolid );
 
 	if ( m_damageType == 1 )
 	{
@@ -881,7 +881,7 @@ END_DATADESC()
 void CPhysExplosion::Spawn( void )
 {
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	GetEngineObject()->SetModelName( NULL_STRING );
 }
 
@@ -1120,7 +1120,7 @@ void CPhysImpact::Activate( void )
 void CPhysImpact::Spawn( void )
 {
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	GetEngineObject()->SetModelName( NULL_STRING );
 
 	//If not targetted, and no distance is set, give it a default value
@@ -1240,7 +1240,7 @@ public:
 	{
 		SetModel( STRING(GetEngineObject()->GetModelName() ) );
 		SetMoveType( MOVETYPE_VPHYSICS );
-		SetSolid( SOLID_VPHYSICS );
+		GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 		m_takedamage = DAMAGE_EVENTS_ONLY;
 	}
 };
@@ -1256,7 +1256,7 @@ public:
 	{
 		BaseClass::Spawn();
 		SetMoveType( MOVETYPE_VPHYSICS );
-		SetSolid( SOLID_VPHYSICS );
+		GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 		m_takedamage = DAMAGE_EVENTS_ONLY;
 	}
 
@@ -1448,7 +1448,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 			pPhys->SetName( STRING(pEntity->GetEntityName()) );
 			UTIL_TransferPoseParameters( pEntity, pPhys );
 			pEntity->GetEngineObject()->TransferChildren(pPhys->GetEngineObject());
-			pEntity->AddSolidFlags( FSOLID_NOT_SOLID );
+			pEntity->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 			pEntity->AddEffects( EF_NODRAW );
 			UTIL_Remove( pEntity );
 		}
@@ -1562,7 +1562,7 @@ void CPhysMagnet::Spawn( void )
 	Precache();
 
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	m_takedamage = DAMAGE_EVENTS_ONLY;
@@ -1574,7 +1574,7 @@ void CPhysMagnet::Spawn( void )
 		tmpSolid.params.mass *= m_massScale;
 	}
 	PhysSolidOverride( tmpSolid, m_iszOverrideScript );
-	VPhysicsInitNormal( GetSolid(), GetSolidFlags(), true, &tmpSolid );
+	VPhysicsInitNormal(GetEngineObject()->GetSolid(), GetEngineObject()->GetSolidFlags(), true, &tmpSolid );
 
 	// Wake it up if not asleep
 	if ( !GetEngineObject()->HasSpawnFlags(SF_MAGNET_ASLEEP) )
@@ -1620,7 +1620,7 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	CBaseEntity *pOther = pEvent->pEntities[otherIndex];
 
 	// Ignore triggers
-	if ( pOther->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
 		return;
 
 	m_bHasHitSomething = true;
@@ -2066,7 +2066,7 @@ void CPointPush::PushThink( void )
 	for ( int i = 0; i < numEnts; i++ )
 	{
 		// Must be solid
-		if ( pEnts[i]->IsSolid() == false )
+		if ( pEnts[i]->GetEngineObject()->IsSolid() == false )
 			continue;
 
 		// Cannot be parented (only push parents)

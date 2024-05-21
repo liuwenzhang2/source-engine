@@ -77,7 +77,7 @@ void CFuncOccluder::Spawn( void )
     Precache( );    
 
 	m_takedamage	= DAMAGE_NO;
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
     SetMoveType( MOVETYPE_NONE );
 	
 	// set size and link into world.

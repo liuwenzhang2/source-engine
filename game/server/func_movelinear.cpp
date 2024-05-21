@@ -79,7 +79,7 @@ void CFuncMoveLinear::Spawn( void )
 	// brush to determine the size of the move distance
 	if (m_flMoveDistance <= 0)
 	{
-		Vector vecOBB = CollisionProp()->OBBSize();
+		Vector vecOBB = GetEngineObject()->OBBSize();
 		vecOBB -= Vector( 2, 2, 2 );
 		m_flMoveDistance = DotProductAbs( m_vecMoveDir, vecOBB ) - m_flLip;
 	}
@@ -93,16 +93,16 @@ void CFuncMoveLinear::Spawn( void )
 	Precache();
 
 	// It is solid?
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 
 	if ( FClassnameIs( this, "func_water_analog" ) )
 	{
-		AddSolidFlags( FSOLID_VOLUME_CONTENTS );
+		GetEngineObject()->AddSolidFlags( FSOLID_VOLUME_CONTENTS );
 	}
 
 	if ( !FClassnameIs( this, "func_water_analog" ) && GetEngineObject()->HasSpawnFlags(SF_MOVELINEAR_NOTSOLID) )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	CreateVPhysics();
@@ -124,7 +124,7 @@ bool CFuncMoveLinear::CreateVPhysics( void )
 	if ( !FClassnameIs( this, "func_water_analog" ) )
 	{
 		//normal door
-		if ( !IsSolidFlagSet( FSOLID_NOT_SOLID ) )
+		if ( !GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
 		{
 			VPhysicsInitShadow( false, false );
 		}
@@ -132,18 +132,18 @@ bool CFuncMoveLinear::CreateVPhysics( void )
 	else
 	{
 		// special contents
-		AddSolidFlags( FSOLID_VOLUME_CONTENTS );
+		GetEngineObject()->AddSolidFlags( FSOLID_VOLUME_CONTENTS );
 		//SETBITS( m_spawnflags, SF_DOOR_SILENT );	// water is silent for now
 
 		IPhysicsObject *pPhysics = VPhysicsInitShadow( false, false );
 		fluidparams_t fluid;
 		
-		Assert( CollisionProp()->GetCollisionAngles() == vec3_angle );
+		Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
 		fluid.damping = 0.01f;
 		fluid.surfacePlane[0] = 0;
 		fluid.surfacePlane[1] = 0;
 		fluid.surfacePlane[2] = 1;
-		fluid.surfacePlane[3] = CollisionProp()->GetCollisionOrigin().z + CollisionProp()->OBBMaxs().z - 1;
+		fluid.surfacePlane[3] = GetEngineObject()->CollisionProp()->GetCollisionOrigin().z + GetEngineObject()->CollisionProp()->OBBMaxs().z - 1;
 		fluid.currentVelocity.Init(0,0,0);
 		fluid.torqueFactor = 0.1f;
 		fluid.viscosityFactor = 0.01f;

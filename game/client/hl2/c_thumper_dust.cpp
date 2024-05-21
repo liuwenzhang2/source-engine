@@ -87,7 +87,7 @@ void FX_ThumperDust( const CEffectData &data )
 	if ( pEnt )
 	{
 		Vector vWorldMins, vWorldMaxs;
-		float scale = pEnt->CollisionProp()->BoundingRadius();
+		float scale = pEnt->GetEngineObject()->BoundingRadius();
 		vWorldMins[0] = data.m_vOrigin[0] - scale;
 		vWorldMins[1] = data.m_vOrigin[1] - scale;
 		vWorldMins[2] = data.m_vOrigin[2] - scale;

@@ -385,7 +385,7 @@ void CBaseButton::Spawn( )
 	AngleVectors( angMoveDir, &m_vecMoveDir );
 
 	SetMoveType( MOVETYPE_PUSH );
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	if (m_flSpeed == 0)
@@ -409,7 +409,7 @@ void CBaseButton::Spawn( )
 	m_vecPosition1 = GetEngineObject()->GetLocalOrigin();
 
 	// Subtract 2 from size because the engine expands bboxes by 1 in all directions making the size too big
-	Vector vecButtonOBB = CollisionProp()->OBBSize();
+	Vector vecButtonOBB = GetEngineObject()->OBBSize();
 	vecButtonOBB -= Vector( 2, 2, 2 );
 	m_vecPosition2	= m_vecPosition1 + (m_vecMoveDir * (DotProductAbs( m_vecMoveDir, vecButtonOBB ) - m_flLip));
 
@@ -865,14 +865,14 @@ void CRotButton::Spawn( void )
 	SetMoveType( MOVETYPE_PUSH );
 	
 #ifdef HL1_DLL
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 #else
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 #endif
 	if (GetEngineObject()->HasSpawnFlags( SF_ROTBUTTON_NOTSOLID ) )
 	{
 		GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
@@ -1042,14 +1042,14 @@ void CMomentaryRotButton::Spawn( void )
 	}
 
 #ifdef HL1_DLL
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 #else
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 #endif
 	if (GetEngineObject()->HasSpawnFlags(SF_ROTBUTTON_NOTSOLID))
 	{
 		GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	SetMoveType( MOVETYPE_PUSH );
@@ -1060,7 +1060,7 @@ void CMomentaryRotButton::Spawn( void )
 	// Slam the object back to solid - if we really want it to be solid.
 	if ( m_bSolidBsp )
 	{
-		SetSolid( SOLID_BSP );
+		GetEngineObject()->SetSolid( SOLID_BSP );
 	}
 
 	m_bDisabled = false;

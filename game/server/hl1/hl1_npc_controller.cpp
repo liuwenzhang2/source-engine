@@ -238,8 +238,8 @@ void CNPC_Controller::Spawn()
 	SetModel( "models/controller.mdl" );
 	UTIL_SetSize( this, Vector( -32, -32, 0 ), Vector( 32, 32, 64 ));
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	SetMoveType( MOVETYPE_STEP );
 	SetGravity(0.001);
@@ -1066,7 +1066,7 @@ void CNPC_ControllerHeadBall::Spawn( void )
 	Precache( );
 	// motor
 	SetMoveType( MOVETYPE_FLY );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetSize( vec3_origin, vec3_origin );
 
 	m_pSprite = CSprite::SpriteCreate( "sprites/xspark4.vmt", GetEngineObject()->GetAbsOrigin(), FALSE );
@@ -1230,7 +1230,7 @@ void CNPC_ControllerZapBall::Spawn( void )
 	// motor
 	SetMoveType( MOVETYPE_FLY );
 //	SetSolid( SOLID_CUSTOM );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetSize( vec3_origin, vec3_origin );
 
 	m_pSprite = CSprite::SpriteCreate( "sprites/xspark4.vmt", GetEngineObject()->GetAbsOrigin(), FALSE );

@@ -52,7 +52,7 @@ void CShower::Spawn( void )
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	SetGravity( UTIL_ScaleForGravity( 400 ) ); // fall a bit more slowly than normal
 	SetNextThink( gpGlobals->curtime + 0.1f );
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	UTIL_SetSize(this, vec3_origin, vec3_origin );
 	AddEffects( EF_NODRAW );
 	m_flSpeed = random->RandomFloat( 0.5, 1.5 );
@@ -180,7 +180,7 @@ void CEnvExplosion::Spawn( void )
 { 
 	Precache();
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 
 	SetMoveType( MOVETYPE_NONE );
@@ -240,7 +240,7 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 	trace_t tr;
 
 	GetEngineObject()->SetModelName( NULL_STRING );//invisible
-	SetSolid( SOLID_NONE );// intangible
+	GetEngineObject()->SetSolid( SOLID_NONE );// intangible
 
 	Vector vecSpot = GetEngineObject()->GetAbsOrigin() + Vector( 0 , 0 , 8 );
 	UTIL_TraceLine( vecSpot, vecSpot + Vector( 0, 0, -40 ), (MASK_SOLID_BRUSHONLY | MASK_WATER), this, COLLISION_GROUP_NONE, &tr );

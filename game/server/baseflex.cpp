@@ -2330,8 +2330,8 @@ void CFlexCycler::Spawn( )
 	}
 	*/
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	SetMoveType( MOVETYPE_NONE );
 	m_takedamage		= DAMAGE_YES;

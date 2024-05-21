@@ -238,15 +238,15 @@ static void RecvProxy_MoveCollide( const CRecvProxyData *pData, void *pStruct, v
 	((C_BaseEntity*)pStruct)->SetMoveCollide( (MoveCollide_t)(pData->m_Value.m_Int) );
 }
 
-static void RecvProxy_Solid( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	((C_BaseEntity*)pStruct)->SetSolid( (SolidType_t)pData->m_Value.m_Int );
-}
+//static void RecvProxy_Solid( const CRecvProxyData *pData, void *pStruct, void *pOut )
+//{
+//	((C_BaseEntity*)pStruct)->SetSolid( (SolidType_t)pData->m_Value.m_Int );
+//}
 
-static void RecvProxy_SolidFlags( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	((C_BaseEntity*)pStruct)->SetSolidFlags( pData->m_Value.m_Int );
-}
+//static void RecvProxy_SolidFlags( const CRecvProxyData *pData, void *pStruct, void *pOut )
+//{
+//	((C_BaseEntity*)pStruct)->SetSolidFlags( pData->m_Value.m_Int );
+//}
 
 void RecvProxy_EffectFlags( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
@@ -284,7 +284,7 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 
 	RecvPropInt( "movetype", 0, SIZEOF_IGNORE, 0, RecvProxy_MoveType ),
 	RecvPropInt( "movecollide", 0, SIZEOF_IGNORE, 0, RecvProxy_MoveCollide ),
-	RecvPropDataTable( RECVINFO_DT( m_Collision ), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty) ),
+	//RecvPropDataTable( RECVINFO_DT( m_Collision ), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty) ),
 	
 	RecvPropInt( RECVINFO ( m_iTextureFrameIndex ) ),
 //#if !defined( NO_ENTITY_PREDICTION )
@@ -305,7 +305,7 @@ END_RECV_TABLE()
 BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 
 	// These have a special proxy to handle send/receive
-	DEFINE_PRED_TYPEDESCRIPTION( m_Collision, CCollisionProperty ),
+	//DEFINE_PRED_TYPEDESCRIPTION( m_Collision, CCollisionProperty ),
 
 	DEFINE_PRED_FIELD( m_MoveType, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_MoveCollide, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
@@ -693,7 +693,6 @@ void C_BaseEntity::Clear( void )
 	m_AimEntsListHandle = INVALID_AIMENTS_LIST_HANDLE;
 
 	//index = -1;
-	m_Collision.Init( this );
 	m_pModel = NULL;
 	if (entindex() >= 0) {
 		GetEngineObject()->SetLocalOrigin(vec3_origin);
@@ -705,8 +704,6 @@ void C_BaseEntity::Clear( void )
 	m_vecBaseVelocity.Init();
 	m_flAnimTime = 0;
 	m_flSimulationTime = 0;
-	SetSolid( SOLID_NONE );
-	SetSolidFlags( 0 );
 	SetMoveCollide( MOVECOLLIDE_DEFAULT );
 	SetMoveType( MOVETYPE_NONE );
 
@@ -781,7 +778,7 @@ bool C_BaseEntity::Init( int entnum, int iSerialNum )
 		//cl_entitylist->AddNetworkableEntity(this, entnum, iSerialNum);//GetIClientUnknown()
 	}
 
-	CollisionProp()->CreatePartitionHandle();
+	((CCollisionProperty*)GetEngineObject()->CollisionProp())->CreatePartitionHandle();
 
 	m_nCreationTick = gpGlobals->tickcount;
 
@@ -838,7 +835,7 @@ bool C_BaseEntity::InitializeAsClientEntityByIndex( int iIndex, RenderGroup_t re
 	AddToLeafSystem( renderGroup );
 
 	// Add the client entity to the spatial partition. (Collidable)
-	CollisionProp()->CreatePartitionHandle();
+	((CCollisionProperty*)GetEngineObject()->CollisionProp())->CreatePartitionHandle();
 
 	SpawnClientEntity();
 
@@ -876,7 +873,7 @@ void C_BaseEntity::Term()
 	}
 	
 	// Are we in the partition?
-	CollisionProp()->DestroyPartitionHandle();
+	((CCollisionProperty*)GetEngineObject()->CollisionProp())->DestroyPartitionHandle();
 
 	// If Client side only entity index will be -1
 	if ( entindex() != -1 )
@@ -1324,14 +1321,14 @@ void C_BaseEntity::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 	{
 		// By default, we'll just snack on the collision bounds, transform
 		// them into entity-space, and call it a day.
-		if ( GetRenderAngles() == CollisionProp()->GetCollisionAngles() )
+		if ( GetRenderAngles() == GetEngineObject()->CollisionProp()->GetCollisionAngles() )
 		{
-			theMins = CollisionProp()->OBBMins();
-			theMaxs = CollisionProp()->OBBMaxs();
+			theMins = GetEngineObject()->CollisionProp()->OBBMins();
+			theMaxs = GetEngineObject()->CollisionProp()->OBBMaxs();
 		}
 		else
 		{
-			Assert( CollisionProp()->GetCollisionAngles() == vec3_angle );
+			Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
 			if ( IsPointSized() )
 			{
 				//theMins = CollisionProp()->GetCollisionOrigin();
@@ -1343,7 +1340,7 @@ void C_BaseEntity::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 				// NOTE: This shouldn't happen! Or at least, I haven't run
 				// into a valid case where it should yet.
 //				Assert(0);
-				IRotateAABB(GetEngineObject()->EntityToWorldTransform(), CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), theMins, theMaxs );
+				IRotateAABB(GetEngineObject()->EntityToWorldTransform(), GetEngineObject()->CollisionProp()->OBBMins(), GetEngineObject()->CollisionProp()->OBBMaxs(), theMins, theMaxs );
 			}
 		}
 	}
@@ -1649,14 +1646,14 @@ void C_BaseEntity::UpdatePartitionListEntry()
 		list |= PARTITION_CLIENT_RESPONSIVE_EDICTS;
 
 	// add the entity to the KD tree so we will collide against it
-	partition->RemoveAndInsert( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, list, CollisionProp()->GetPartitionHandle() );
+	partition->RemoveAndInsert( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, list, ((CCollisionProperty*)GetEngineObject()->CollisionProp())->GetPartitionHandle() );
 }
 
 
 void C_BaseEntity::NotifyShouldTransmit( ShouldTransmitState_t state )
 {
 	// Init should have been called before we get in here.
-	Assert( CollisionProp()->GetPartitionHandle() != PARTITION_INVALID_HANDLE );
+	Assert(GetEngineObject()->GetPartitionHandle() != PARTITION_INVALID_HANDLE );
 	if ( entindex() < 0 )
 		return;
 	
@@ -1705,7 +1702,7 @@ void C_BaseEntity::NotifyShouldTransmit( ShouldTransmitState_t state )
 			SetDormant( true );
 			
 			// remove the entity from the KD tree so we won't collide against it
-			partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, CollisionProp()->GetPartitionHandle() );
+			partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, ((CCollisionProperty*)GetEngineObject()->CollisionProp())->GetPartitionHandle() );
 		
 		}
 		break;
@@ -1971,7 +1968,7 @@ void C_BaseEntity::PostDataUpdate( DataUpdateType_t updateType )
 	if (entindex() == 0 )
 	{
 		GetEngineObject()->SetModelIndex(1);
-		SetSolid( SOLID_BSP );
+		GetEngineObject()->SetSolid( SOLID_BSP );
 
 		// FIXME: Should these be assertions?
 		GetEngineObject()->SetAbsOrigin( vec3_origin );
@@ -2409,7 +2406,7 @@ void C_BaseEntity::StopFollowingEntity( )
 
 	GetEngineObject()->SetParent( NULL );
 	RemoveEffects( EF_BONEMERGE );
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 }
 
@@ -2822,7 +2819,7 @@ CollideType_t C_BaseEntity::GetCollideType( void )
 	if ( !GetEngineObject()->GetModelIndex() || !GetModel())
 		return ENTITY_SHOULD_NOT_COLLIDE;
 
-	if ( !IsSolid( ) )
+	if ( !GetEngineObject()->IsSolid() )
 		return ENTITY_SHOULD_NOT_COLLIDE;
 
 	// If the model is a bsp or studio (i.e. it can collide with the player
@@ -2878,7 +2875,7 @@ void C_BaseEntity::AddStudioDecal( const Ray_t& ray, int hitbox, int decalIndex,
 	// FIXME: Pass in decal up?
 	Vector up(0, 0, 1);
 
-	if (doTrace && (GetSolid() == SOLID_VPHYSICS) && !tr.startsolid && !tr.allsolid)
+	if (doTrace && (GetEngineObject()->GetSolid() == SOLID_VPHYSICS) && !tr.startsolid && !tr.allsolid)
 	{
 		// Choose a more accurate normal direction
 		// Also, since we have more accurate info, we can avoid pokethru
@@ -2920,7 +2917,7 @@ void C_BaseEntity::AddColoredStudioDecal( const Ray_t& ray, int hitbox, int deca
 	// FIXME: Pass in decal up?
 	Vector up(0, 0, 1);
 
-	if (doTrace && (GetSolid() == SOLID_VPHYSICS) && !tr.startsolid && !tr.allsolid)
+	if (doTrace && (GetEngineObject()->GetSolid() == SOLID_VPHYSICS) && !tr.startsolid && !tr.allsolid)
 	{
 		// Choose a more accurate normal direction
 		// Also, since we have more accurate info, we can avoid pokethru
@@ -3498,7 +3495,7 @@ bool C_BaseEntity::GetPredictable( void ) const
 // Stuff implemented for weapon prediction code
 void C_BaseEntity::SetSize( const Vector &vecMin, const Vector &vecMax )
 {
-	SetCollisionBounds( vecMin, vecMax );
+	GetEngineObject()->SetCollisionBounds( vecMin, vecMax );
 }
 
 //-----------------------------------------------------------------------------
@@ -3521,7 +3518,7 @@ void C_BaseEntity::Remove( )
 	if ( GetPredictable() /*|| IsClientCreated()*/)
 	{
 		// Make it solid
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		SetMoveType( MOVETYPE_NONE );
 
 		GetEngineObject()->AddEFlags( EFL_KILLME );	// Make sure to ignore further calls into here or UTIL_Remove.
@@ -4058,14 +4055,14 @@ void C_BaseEntity::DrawBBoxVisualizations( void )
 {
 	if ( m_fBBoxVisFlags & VISUALIZE_COLLISION_BOUNDS )
 	{
-		debugoverlay->AddBoxOverlay( CollisionProp()->GetCollisionOrigin(), CollisionProp()->OBBMins(),
-			CollisionProp()->OBBMaxs(), CollisionProp()->GetCollisionAngles(), 190, 190, 0, 0, 0.01 );
+		debugoverlay->AddBoxOverlay(GetEngineObject()->CollisionProp()->GetCollisionOrigin(), GetEngineObject()->CollisionProp()->OBBMins(),
+			GetEngineObject()->CollisionProp()->OBBMaxs(), GetEngineObject()->CollisionProp()->GetCollisionAngles(), 190, 190, 0, 0, 0.01 );
 	}
 
 	if ( m_fBBoxVisFlags & VISUALIZE_SURROUNDING_BOUNDS )
 	{
 		Vector vecSurroundMins, vecSurroundMaxs;
-		CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+		GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 		debugoverlay->AddBoxOverlay( vec3_origin, vecSurroundMins,
 			vecSurroundMaxs, vec3_angle, 0, 255, 255, 0, 0.01 );
 	}
@@ -4322,7 +4319,7 @@ void C_BaseEntity::OnSave()
 void C_BaseEntity::OnRestore()
 {	
 	UpdatePartitionListEntry();
-	CollisionProp()->UpdatePartition();
+	((CCollisionProperty*)GetEngineObject()->CollisionProp())->UpdatePartition();
 
 	UpdateVisibility();
 }

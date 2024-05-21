@@ -269,7 +269,7 @@ float CPropAPC::PassengerDamageModifier( const CTakeDamageInfo &info )
 Vector CPropAPC::EyePosition( )
 {
 	Vector vecEyePosition;
-	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5, 0.5, 1.0 ), &vecEyePosition );
+	GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5, 0.5, 1.0 ), &vecEyePosition );
 	return vecEyePosition;
 }
 
@@ -369,7 +369,7 @@ void CPropAPC::ExplodeAndThrowChunk( const Vector &vecExplosionPos )
 	pChunk->SetOwnerEntity( this );
 	pChunk->m_lifeTime = random->RandomFloat( 6.0f, 8.0f );
 	pChunk->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-	IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetSolidFlags(), false );
+	IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 	
 	// Set the velocity
 	if ( pPhysicsObject )
@@ -420,17 +420,17 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 	m_OnDeath.FireOutput( info.GetAttacker(), this );
 
 	Vector vecAbsMins, vecAbsMaxs;
-	CollisionProp()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
+	GetEngineObject()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
 
 	Vector vecNormalizedMins, vecNormalizedMaxs;
-	CollisionProp()->WorldToNormalizedSpace( vecAbsMins, &vecNormalizedMins );
-	CollisionProp()->WorldToNormalizedSpace( vecAbsMaxs, &vecNormalizedMaxs );
+	GetEngineObject()->WorldToNormalizedSpace( vecAbsMins, &vecNormalizedMins );
+	GetEngineObject()->WorldToNormalizedSpace( vecAbsMaxs, &vecNormalizedMaxs );
 
 	Vector vecAbsPoint;
 	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 	for (int i = 0; i < 5; i++)
 	{
-		CollisionProp()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint );
+		GetEngineObject()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint );
 		te->Explosion( filter, random->RandomFloat( 0.0, 1.0 ),	&vecAbsPoint, 
 			g_sModelIndexFireball, random->RandomInt( 4, 10 ), 
 			random->RandomInt( 8, 15 ), 
@@ -457,7 +457,7 @@ void CPropAPC::Event_Killed( const CTakeDamageInfo &info )
 		pChunk->SetOwnerEntity( this );
 		pChunk->m_lifeTime = random->RandomFloat( 6.0f, 8.0f );
 		pChunk->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-		IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetSolidFlags(), false );
+		IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 		
 		// Set the velocity
 		if ( pPhysicsObject )
@@ -925,7 +925,7 @@ void CPropAPC::CreateCorpse( )
 		}
 	}
 
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW );
 	UTIL_Remove( this );
 }

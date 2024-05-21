@@ -101,7 +101,7 @@ bool CWaterLODControl::KeyValue( const char *szKeyName, const char *szValue )
 void CWaterLODControl::Spawn( void )
 {
 	Precache();
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 }
 
 //------------------------------------------------------------------------------

@@ -55,7 +55,7 @@ void C_BaseEntity::PhysicsCheckSweep( const Vector& vecAbsStart, const Vector &v
 	VectorAdd( vecAbsStart, vecAbsDelta, vecAbsEnd );
 
 	// Set collision type
-	if ( !IsSolid() || IsSolidFlagSet( FSOLID_VOLUME_CONTENTS ) )
+	if ( !GetEngineObject()->IsSolid() || GetEngineObject()->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS ) )
 	{
 		// don't collide with monsters
 		mask &= ~CONTENTS_MONSTER;

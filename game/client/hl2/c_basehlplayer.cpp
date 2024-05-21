@@ -328,7 +328,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 		
 		// Figure out a 2D radius for the object
 		Vector vecWorldMins, vecWorldMaxs;
-		obj->CollisionProp()->WorldSpaceAABB( &vecWorldMins, &vecWorldMaxs );
+		obj->GetEngineObject()->WorldSpaceAABB( &vecWorldMins, &vecWorldMaxs );
 		Vector objSize = vecWorldMaxs - vecWorldMins;
 
 		float objectradius = 0.5f * sqrt( objSize.x * objSize.x + objSize.y * objSize.y );

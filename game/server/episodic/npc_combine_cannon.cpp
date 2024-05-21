@@ -579,8 +579,8 @@ void CNPC_Combine_Cannon::Spawn( void )
 
 	UTIL_SetSize( this, Vector( -16, -16 , 0 ), Vector( 16, 16, 64 ) );
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_FLY );
 	m_bloodColor		= DONT_BLEED;
 	m_iHealth			= 10;
@@ -609,7 +609,7 @@ void CNPC_Combine_Cannon::Spawn( void )
 	SetDistLook( m_flSightDist );
 
 	AddEffects( EF_NODRAW );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	// Point the cursor straight ahead so that the sniper's
 	// first sweep of the laser doesn't look weird.

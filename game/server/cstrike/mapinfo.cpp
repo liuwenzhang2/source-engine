@@ -66,7 +66,7 @@ bool CMapInfo::KeyValue( const char *szKeyName, const char *szValue )
 void CMapInfo::Spawn( void )
 { 
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 }
 

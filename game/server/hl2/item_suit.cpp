@@ -33,7 +33,7 @@ public:
 		SetModel( "models/items/hevsuit.mdl" );
 		BaseClass::Spawn( );
 		
-		CollisionProp()->UseTriggerBounds( false, 0 );
+		GetEngineObject()->UseTriggerBounds( false, 0 );
 	}
 	void Precache( void )
 	{

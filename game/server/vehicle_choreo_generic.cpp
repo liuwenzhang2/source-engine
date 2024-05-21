@@ -142,7 +142,7 @@ public:
 
 	bool CreateVPhysics()
 	{
-		SetSolid(SOLID_VPHYSICS);
+		GetEngineObject()->SetSolid(SOLID_VPHYSICS);
 		SetMoveType(MOVETYPE_NONE);
 		return true;
 	}
@@ -328,7 +328,7 @@ void CPropVehicleChoreoGeneric::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetCollisionGroup( COLLISION_GROUP_VEHICLE );
 
-	if ( GetSolid() != SOLID_NONE )
+	if (GetEngineObject()->GetSolid() != SOLID_NONE )
 	{
 		BaseClass::Spawn();
 	}

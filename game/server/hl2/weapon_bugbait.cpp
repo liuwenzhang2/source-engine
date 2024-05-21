@@ -106,7 +106,7 @@ void CWeaponBugBait::Spawn( void )
 	// Increase the bugbait's pickup volume. It spawns inside the antlion guard's body,
 	// and playtesters seem to be wary about moving into the body.
 	SetSize( Vector( -4, -4, -4), Vector(4, 4, 4) );
-	CollisionProp()->UseTriggerBounds( true, 100 );
+	GetEngineObject()->UseTriggerBounds( true, 100 );
 }
 
 //-----------------------------------------------------------------------------
@@ -120,8 +120,8 @@ void CWeaponBugBait::FallInit( void )
 
 	VPhysicsDestroyObject();
 	SetMoveType( MOVETYPE_FLYGRAVITY );
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_TRIGGER );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 
 	SetPickupTouch();
 	

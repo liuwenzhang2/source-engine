@@ -115,7 +115,7 @@ void CGrenadeHomer::Spawn( void )
 {
 	Precache( );
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_FLY );
 
 	UTIL_SetSize(this, Vector(0, 0, 0), Vector(0, 0, 0));
@@ -351,7 +351,7 @@ void CGrenadeHomer::GrenadeHomerTouch( CBaseEntity *pOther )
 	Assert( pOther );
 
 	// Don't take damage from other homing grenades so can shoot in vollies
-	if (FClassnameIs( pOther, "grenade_homer") || !pOther->IsSolid() )
+	if (FClassnameIs( pOther, "grenade_homer") || !pOther->GetEngineObject()->IsSolid() )
 	{
 		return;
 	}

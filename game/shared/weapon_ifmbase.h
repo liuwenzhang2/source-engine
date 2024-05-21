@@ -43,9 +43,11 @@ public:
 	
 public:
 #if defined( CLIENT_DLL )
+	bool			Init(int entnum, int iSerialNum);
 	virtual bool	ShouldPredict();
 	virtual void	OnDataChanged( DataUpdateType_t type );
 #else
+	void PostConstructor(const char* szClassname, int iForceEdictIndex);
 	virtual void	Spawn();
 
 	// FIXME: How should this work? This is a hack to get things working

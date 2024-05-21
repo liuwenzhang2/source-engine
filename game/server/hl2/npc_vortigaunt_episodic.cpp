@@ -3180,8 +3180,8 @@ void CVortigauntChargeToken::Spawn( void )
 	UTIL_SetSize( this, -Vector(1,1,1), Vector(1,1,1) );
 
 	SetMoveType( MOVETYPE_FLY );
-	SetSolid( SOLID_BBOX );
-	SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
 	SetGravity( 0.0f );
 
 	// No model but we still need to force this!
@@ -3309,7 +3309,7 @@ void CVortigauntChargeToken::SeekTouch( CBaseEntity	*pOther )
 	}
 
 	// Stay attached to the thing we hit as we fade away
-	SetSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetParent( pOther->GetEngineObject() );
 
@@ -3382,8 +3382,8 @@ void CVortigauntEffectDispel::Spawn( void )
 
 	UTIL_SetSize( this, Vector( -8, -8, -8 ), Vector( 8, 8, 8 ) );
 
-	SetSolid( SOLID_BBOX );
-	SetSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 
 	// No model but we still need to force this!
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );

@@ -45,7 +45,7 @@ void CEnvLaser::Spawn( void )
 		return;
 	}
 
-	SetSolid( SOLID_NONE );							// Remove model & collisions
+	GetEngineObject()->SetSolid( SOLID_NONE );							// Remove model & collisions
 	SetThink( &CEnvLaser::StrikeThink );
 
 	SetEndWidth( GetWidth() );				// Note: EndWidth is not scaled

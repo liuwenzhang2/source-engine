@@ -380,7 +380,7 @@ int CPropData::ParsePropFromKV( CBaseEntity *pProp, KeyValues *pSection, KeyValu
 	pBreakableInterface->SetBreakableCount( pSection->GetInt( "breakable_count", pBreakableInterface->GetBreakableCount() ) );
 
 	// Calculate the maximum size of the breakables this breakable will produce
-	Vector vecSize = pProp->CollisionProp()->OBBSize();
+	Vector vecSize = pProp->GetEngineObject()->OBBSize();
 	// Throw away the smallest coord
 	int iSmallest = SmallestAxis(vecSize);
 	vecSize[iSmallest] = 1;
@@ -1146,7 +1146,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 				breakModel.placementName[0] = 0;
 				breakModel.placementIsBone = false;
 
-				Vector vecObbSize = pEntity->CollisionProp()->OBBSize();
+				Vector vecObbSize = pEntity->GetEngineObject()->OBBSize();
 
 				// Find a random point on the plane of the original's two largest axis
 				int smallestAxis = SmallestAxis( vecObbSize );
@@ -1154,7 +1154,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 				Vector vecMaxs(1,1,1);
 				vecMins[smallestAxis] = 0.5;
 				vecMaxs[smallestAxis] = 0.5;
-				pEntity->CollisionProp()->RandomPointInBounds( vecMins, vecMaxs, &breakModel.offset );
+				pEntity->GetEngineObject()->RandomPointInBounds( vecMins, vecMaxs, &breakModel.offset );
 
 				// Push all chunks away from the center
 				Vector vecBurstDir = breakModel.offset - params.origin;
@@ -1185,7 +1185,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 						GetGibManager()->AddGibToLRU( pBreakable->GetBaseAnimating() );
 					}
 #endif
-					Vector vecBreakableObbSize = pBreakable->CollisionProp()->OBBSize();
+					Vector vecBreakableObbSize = pBreakable->GetEngineObject()->OBBSize();
 
 					// Try to align the gibs along the original axis 
 					static matrix3x4_t matrix;
@@ -1558,7 +1558,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 				breakModel.placementName[0] = 0;
 				breakModel.placementIsBone = false;
 
-				Vector vecObbSize = pEntity->CollisionProp()->OBBSize();
+				Vector vecObbSize = pEntity->GetEngineObject()->OBBSize();
 
 				// Find a random point on the plane of the original's two largest axis
 				int smallestAxis = SmallestAxis( vecObbSize );
@@ -1566,7 +1566,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 				Vector vecMaxs(1,1,1);
 				vecMins[smallestAxis] = 0.5;
 				vecMaxs[smallestAxis] = 0.5;
-				pEntity->CollisionProp()->RandomPointInBounds( vecMins, vecMaxs, &breakModel.offset );
+				pEntity->GetEngineObject()->RandomPointInBounds( vecMins, vecMaxs, &breakModel.offset );
 
 				// Push all chunks away from the center
 				Vector vecBurstDir = breakModel.offset - params.origin;
@@ -1593,7 +1593,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 						GetGibManager()->AddGibToLRU( pBreakable->GetBaseAnimating() );
 					}
 #endif
-					Vector vecBreakableObbSize = pBreakable->CollisionProp()->OBBSize();
+					Vector vecBreakableObbSize = pBreakable->GetEngineObject()->OBBSize();
 
 					// Try to align the gibs along the original axis 
 					static matrix3x4_t matrix;

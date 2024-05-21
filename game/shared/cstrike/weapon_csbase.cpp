@@ -369,7 +369,6 @@ CWeaponCSBase::CWeaponCSBase()
 	m_bDelayFire = true;
 	m_nextPrevOwnerTouchTime = 0.0;
 	m_prevOwner = NULL;
-	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 
 #ifdef CLIENT_DLL
 	m_iCrosshairTextureID = 0;
@@ -384,6 +383,13 @@ CWeaponCSBase::CWeaponCSBase()
 
 
 #ifndef CLIENT_DLL
+
+void CWeaponCSBase::PostConstructor(const char* szClassname, int iForceEdictIndex) 
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+}
+
 bool CWeaponCSBase::KeyValue( const char *szKeyName, const char *szValue )
 {
 	if ( !BaseClass::KeyValue( szKeyName, szValue ) )
@@ -401,6 +407,13 @@ bool CWeaponCSBase::KeyValue( const char *szKeyName, const char *szValue )
 	}
 
 	return false;
+}
+#else
+bool CWeaponCSBase::Init(int entnum, int iSerialNum)
+{
+	bool bRet = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+	return bRet;
 }
 #endif
 
@@ -1419,7 +1432,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 			DoMuzzleFlash();
 		}
 
-		AddSolidFlags( FSOLID_TRIGGER );
+		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 
 		//SetTouch( &CWeaponCSBase::DefaultTouch );
 
@@ -1518,7 +1531,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 		// Override the bloat that our base class sets as it's a little bit bigger than we want.
 		// If it's too big, you drop a weapon and its box is so big that you're still touching it
 		// when it falls and you pick it up again right away.
-		CollisionProp()->UseTriggerBounds( true, 30 );
+		GetEngineObject()->UseTriggerBounds( true, 30 );
 
 		// Set this here to allow players to shoot dropped weapons
 		SetCollisionGroup( COLLISION_GROUP_WEAPON );

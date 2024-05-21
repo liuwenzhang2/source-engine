@@ -78,6 +78,10 @@ CPhysicsShadowClone::~CPhysicsShadowClone( void )
 
 void CPhysicsShadowClone::UpdateOnRemove( void )
 {
+	SetMoveType(MOVETYPE_NONE);
+	GetEngineObject()->SetSolid(SOLID_NONE);
+	GetEngineObject()->SetSolidFlags(0);
+	SetCollisionGroup(COLLISION_GROUP_NONE);
 	CBaseEntity *pSource = m_hClonedEntity;
 	if( pSource )
 	{
@@ -151,8 +155,8 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 	{
 		AssertMsg( VPhysicsGetObject() != NULL, "Been linkless for more than this update, something should have killed this clone." );
 		SetMoveType( MOVETYPE_NONE );
-		SetSolid( SOLID_NONE );
-		SetSolidFlags( 0 );
+		GetEngineObject()->SetSolid( SOLID_NONE );
+		GetEngineObject()->SetSolidFlags( 0 );
 		SetCollisionGroup( COLLISION_GROUP_NONE );
 		VPhysicsDestroyObject();
 		return;
@@ -295,11 +299,11 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 			//}
 		}
 
-		SolidType_t sourceSolidType = pClonedEntity->GetSolid();
+		SolidType_t sourceSolidType = pClonedEntity->GetEngineObject()->GetSolid();
 		if( sourceSolidType == SOLID_BBOX )
-			SetSolid( SOLID_VPHYSICS );
+			GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 		else
-			SetSolid( sourceSolidType );
+			GetEngineObject()->SetSolid( sourceSolidType );
 		//SetSolid( SOLID_VPHYSICS );
 
 		SetElasticity( pClonedEntity->GetElasticity() );
@@ -307,7 +311,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 
 
 		
-		int iSolidFlags = pClonedEntity->GetSolidFlags() | FSOLID_CUSTOMRAYTEST;
+		int iSolidFlags = pClonedEntity->GetEngineObject()->GetSolidFlags() | FSOLID_CUSTOMRAYTEST;
 		if( m_bShadowTransformIsIdentity )
 			iSolidFlags |= FSOLID_CUSTOMBOXTEST; //need this at least for the player or they get stuck in themselves
 		else
@@ -317,7 +321,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 			iSolidFlags |= FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST;
 		}*/
 
-		SetSolidFlags( iSolidFlags );
+		GetEngineObject()->SetSolidFlags( iSolidFlags );
 
 
 
@@ -332,7 +336,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 			SetModel( STRING( pClonedEntity->GetEngineObject()->GetModelName() ) );
 
 
-		CCollisionProperty *pClonedCollisionProp = pClonedEntity->CollisionProp();
+		CCollisionProperty *pClonedCollisionProp = (CCollisionProperty*)pClonedEntity->GetEngineObject()->CollisionProp();
 		SetSize( pClonedCollisionProp->OBBMins(), pClonedCollisionProp->OBBMaxs() );
 	}
 
@@ -786,11 +790,6 @@ void CPhysicsShadowClone::VPhysicsDestroyObject( void )
 	}
 	m_CloneLinks.RemoveAll();
 
-	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_NONE );
-	SetSolidFlags( 0 );
-	SetCollisionGroup( COLLISION_GROUP_NONE );
-
 	BaseClass::VPhysicsDestroyObject();
 }
 
@@ -944,10 +943,10 @@ CPhysicsShadowClone *CPhysicsShadowClone::CreateShadowClone( IPhysicsEnvironment
 	if( pPhysics->IsStatic() )
 		return NULL;
 
-	if( pClonedEntity->GetSolid() == SOLID_BSP )
+	if( pClonedEntity->GetEngineObject()->GetSolid() == SOLID_BSP )
 		return NULL;
 
-	if( pClonedEntity->GetSolidFlags() & (FSOLID_NOT_SOLID | FSOLID_TRIGGER) )
+	if( pClonedEntity->GetEngineObject()->GetSolidFlags() & (FSOLID_NOT_SOLID | FSOLID_TRIGGER) )
 		return NULL;
 
 	if( pClonedEntity->GetFlags() & (FL_WORLDBRUSH | FL_STATICPROP) )

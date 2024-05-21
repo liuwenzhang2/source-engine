@@ -40,12 +40,12 @@ void CFuncBrush::Spawn( void )
 {
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 
 	if ( m_iSolidity == BRUSHSOLID_NEVER )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
@@ -62,7 +62,7 @@ void CFuncBrush::Spawn( void )
 	// Slam the object back to solid - if we really want it to be solid.
 	if ( m_bSolidBsp )
 	{
-		SetSolid( SOLID_BSP );
+		GetEngineObject()->SetSolid( SOLID_BSP );
 	}
 }
 
@@ -170,7 +170,7 @@ void CFuncBrush::TurnOff( void )
 
 	if ( m_iSolidity != BRUSHSOLID_ALWAYS )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	AddEffects( EF_NODRAW );
@@ -188,7 +188,7 @@ void CFuncBrush::TurnOn( void )
 
 	if ( m_iSolidity != BRUSHSOLID_NEVER )
 	{
-		RemoveSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	RemoveEffects( EF_NODRAW );
@@ -276,8 +276,8 @@ END_DATADESC()
 
 void CTriggerBrush::Spawn( void )
 {
-	SetSolid( SOLID_BSP );
-	AddSolidFlags( FSOLID_TRIGGER );
+	GetEngineObject()->SetSolid( SOLID_BSP );
+	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 	SetMoveType( MOVETYPE_NONE );
 
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world

@@ -245,7 +245,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 			UTIL_TransferPoseParameters( pBaseAnimating, pDisolvingObj );
 			pBaseAnimating->GetEngineObject()->TransferChildren(pDisolvingObj->GetEngineObject());
 			pDisolvingObj->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE_DEBRIS );
-			pBaseAnimating->AddSolidFlags( FSOLID_NOT_SOLID );
+			pBaseAnimating->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 			pBaseAnimating->AddEffects( EF_NODRAW );
 
 			IPhysicsObject* pPhys = pDisolvingObj->VPhysicsGetObject();

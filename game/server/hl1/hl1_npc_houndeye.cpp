@@ -113,8 +113,8 @@ void CNPC_Houndeye::Spawn()
 	SetHullType(HULL_TINY);
 	SetHullSizeNormal();
 	
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_YELLOW;
 	ClearEffects();

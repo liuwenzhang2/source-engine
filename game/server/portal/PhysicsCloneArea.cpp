@@ -82,8 +82,8 @@ void CPhysicsCloneArea::Spawn( void )
 
 	AddEffects( EF_NORECEIVESHADOW | EF_NOSHADOW | EF_NODRAW );
 
-	SetSolid( SOLID_OBB );
-	SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_OBB );
+	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 	SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
@@ -197,7 +197,7 @@ void CPhysicsCloneArea::CloneNearbyEntities( void )
 
 			if( pPhysicsObject )
 			{
-				CCollisionProperty *pEntCollision = pEntity->CollisionProp();
+				CCollisionProperty *pEntCollision = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
 				Vector ptEntityCenter = pEntCollision->GetCollisionOrigin();
 
 				//double check intersection at the OBB vs OBB level, we don't want to affect large piles of physics objects if we don't have to, it gets slow

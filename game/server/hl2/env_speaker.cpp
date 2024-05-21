@@ -71,7 +71,7 @@ void CSpeaker::Spawn( void )
 //		Warning( "'speaker' entity using rule set %s with empty concept string\n", soundfile );
 //	}
 
-    SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
     SetMoveType( MOVETYPE_NONE );
 	
 	SetThink(&CSpeaker::SpeakerThink);

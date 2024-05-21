@@ -328,7 +328,7 @@ void CAI_PlaneSolver::GenerateObstacleNpcs( const AILocalMoveGoal_t &goal, float
 	{
 		CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
 		Vector minsSelf, maxsSelf;
-		m_pNpc->CollisionProp()->WorldSpaceSurroundingBounds( &minsSelf, &maxsSelf );
+		m_pNpc->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &minsSelf, &maxsSelf );
 		float radiusSelf = (minsSelf.AsVector2D() - maxsSelf.AsVector2D()).Length() * 0.5;
 
 		for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
@@ -338,7 +338,7 @@ void CAI_PlaneSolver::GenerateObstacleNpcs( const AILocalMoveGoal_t &goal, float
 			{
 				Vector mins, maxs;
 				
-				pAI->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
+				pAI->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
 				if ( mins.z < maxsSelf.z + 12.0 && maxs.z > minsSelf.z - 12.0 )
 				{
 					float radius = (mins.AsVector2D() - maxs.AsVector2D()).Length() * 0.5;
@@ -356,7 +356,7 @@ void CAI_PlaneSolver::GenerateObstacleNpcs( const AILocalMoveGoal_t &goal, float
 		{
 			Vector mins, maxs;
 			
-			pPlayer->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
+			pPlayer->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
 			if ( mins.z < maxsSelf.z + 12.0 && maxs.z > minsSelf.z - 12.0 )
 			{
 				float radius = (mins.AsVector2D() - maxs.AsVector2D()).Length();
@@ -746,7 +746,7 @@ bool CAI_PlaneSolver::GenerateCircleObstacleSuggestions( const AILocalMoveGoal_t
 	Vector npcLoc = m_pNpc->WorldSpaceCenter();
 	Vector mins, maxs;
 
-	m_pNpc->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
+	m_pNpc->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
 	float radiusNpc = (mins.AsVector2D() - maxs.AsVector2D()).Length() * 0.5;
 	
 	for ( int i = 0; i < m_Obstacles.Count(); i++ )
@@ -754,7 +754,7 @@ bool CAI_PlaneSolver::GenerateCircleObstacleSuggestions( const AILocalMoveGoal_t
 		CBaseEntity *pObstacleEntity = NULL;
 
 		float zDistTooFar;
-		if ( m_Obstacles[i].hEntity && m_Obstacles[i].hEntity->CollisionProp() )
+		if ( m_Obstacles[i].hEntity && m_Obstacles[i].hEntity->GetEngineObject()->CollisionProp() )
 		{
 			pObstacleEntity = m_Obstacles[i].hEntity.Get();
 
@@ -764,7 +764,7 @@ bool CAI_PlaneSolver::GenerateCircleObstacleSuggestions( const AILocalMoveGoal_t
 				continue;
 			}
 
-			pObstacleEntity->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
+			pObstacleEntity->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
 			zDistTooFar = ( maxs.z - mins.z ) * 0.5 + GetNpc()->GetHullHeight() * 0.5;
 		}
 		else

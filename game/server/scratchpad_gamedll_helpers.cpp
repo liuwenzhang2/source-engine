@@ -58,7 +58,7 @@ void ScratchPad_DrawEntityToScratchPad(
 {
 	// Draw the entity's bbox [todo: draw OBBs here too].
 	Vector mins, maxs;
-	pEnt->CollisionProp()->WorldSpaceAABB( &mins, &maxs );
+	pEnt->GetEngineObject()->WorldSpaceAABB( &mins, &maxs );
 
 	pPad->DrawWireframeBox( mins, maxs, vColor );
 

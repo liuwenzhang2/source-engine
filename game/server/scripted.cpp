@@ -202,7 +202,7 @@ void CAI_ScriptedSequence::ScriptEntityCancel( CBaseEntity *pentCine, bool bPret
 //-----------------------------------------------------------------------------
 void CAI_ScriptedSequence::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	//
 	// If we have no name or we are set to start immediately, find the NPC and
@@ -2030,7 +2030,7 @@ void CAI_ScriptedSentence::InputBeginSentence( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CAI_ScriptedSentence::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	
 	m_active = true;
 	// if no targetname, start now

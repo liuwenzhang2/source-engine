@@ -114,7 +114,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CBaseNPCMaker::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	m_nLiveChildren		= 0;
 	Precache();
 
@@ -197,7 +197,7 @@ bool CBaseNPCMaker::CanMakeNPC( bool bIgnoreSolidEntities )
 					continue;
 
 				//If one of the entities is solid, then we may not be able to spawn now
-				if ( ( pList[i]->GetSolidFlags() & FSOLID_NOT_SOLID ) == false )
+				if ( ( pList[i]->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_SOLID ) == false )
 				{
 					// Since the outer method doesn't work well around striders on account of their huge bounding box.
 					// Find the ground under me and see if a human hull would fit there.
@@ -502,7 +502,7 @@ void CBaseNPCMaker::ChildPostSpawn( CAI_BaseNPC *pChild )
 			if ( FClassnameIs((CBaseEntity*)tr.m_pEnt, "prop_physics" ) )
 			{
 				// Set to non-solid so this loop doesn't keep finding it
-				((CBaseEntity*)tr.m_pEnt)->AddSolidFlags( FSOLID_NOT_SOLID );
+				((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 				UTIL_RemoveImmediate((CBaseEntity*)tr.m_pEnt );
 				continue;
 			}

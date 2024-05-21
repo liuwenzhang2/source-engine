@@ -5040,7 +5040,7 @@ void CNavArea::UpdateAvoidanceObstacles( void )
 
 		// check if the aabb intersects the search aabb.
 		Vector vecSurroundMins, vecSurroundMaxs;
-		obstructingEntity->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+		obstructingEntity->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 		if ( !IsBoxIntersectingBox( mins, maxs, vecSurroundMins, vecSurroundMaxs ) )
 			continue;
 

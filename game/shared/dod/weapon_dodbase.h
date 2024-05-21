@@ -226,6 +226,7 @@ public:
 	#ifdef GAME_DLL
 		DECLARE_DATADESC();
 
+		void PostConstructor(const char* szClassname, int iForceEdictIndex);
 		virtual void CheckRespawn();
 		virtual CBaseEntity* Respawn();
 		
@@ -300,6 +301,7 @@ public:
 public:
 	#if defined( CLIENT_DLL )
 
+		bool			Init(int entnum, int iSerialNum);
 		virtual void	ProcessMuzzleFlashEvent();
 		virtual bool	ShouldPredict();
 

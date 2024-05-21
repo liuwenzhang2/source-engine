@@ -49,9 +49,9 @@ CGrenadeSpit::CGrenadeSpit( void ) : m_bPlaySound( true ), m_pHissSound( NULL )
 void CGrenadeSpit::Spawn( void )
 {
 	Precache( );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_FLYGRAVITY );
-	SetSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolidFlags( FSOLID_NOT_STANDABLE );
 
 	SetModel( "models/spitball_large.mdl" );
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
@@ -128,7 +128,7 @@ void CGrenadeSpit::Event_Killed( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CGrenadeSpit::GrenadeSpitTouch( CBaseEntity *pOther )
 {
-	if ( pOther->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS | FSOLID_TRIGGER) )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS | FSOLID_TRIGGER) )
 	{
 		// Some NPCs are triggers that can take damage (like antlion grubs). We should hit them.
 		if ( ( pOther->m_takedamage == DAMAGE_NO ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )

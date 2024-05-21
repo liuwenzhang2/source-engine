@@ -325,7 +325,7 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 
 	// magically know where they are
 	Vector vecZombieKnees;
-	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.25f ), &vecZombieKnees );
+	GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.25f ), &vecZombieKnees );
 
 	for( i = 0 ; i < count ; i++ )
 	{
@@ -1105,7 +1105,7 @@ void CNPC_BaseZombie::DieChopped( const CTakeDamageInfo &info )
 		flFadeTime = 5.0;
 	}
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 
 	Vector vecLegsForce;
@@ -1708,7 +1708,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 //-----------------------------------------------------------------------------
 void CNPC_BaseZombie::Spawn( void )
 {
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_STEP );
 
 #ifdef _XBOX

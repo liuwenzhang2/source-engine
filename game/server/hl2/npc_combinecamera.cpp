@@ -322,8 +322,8 @@ void CNPC_CombineCamera::Spawn()
 	m_iHealth		= 50;
 	m_bloodColor	= BLOOD_COLOR_MECH;
 	
-	SetSolid(SOLID_BBOX);
-	AddSolidFlags(FSOLID_NOT_STANDABLE);
+	GetEngineObject()->SetSolid(SOLID_BBOX);
+	GetEngineObject()->AddSolidFlags(FSOLID_NOT_STANDABLE);
 
 	SetHeight(COMBINE_CAMERA_RETRACT_HEIGHT);
 
@@ -1146,7 +1146,7 @@ void CNPC_CombineCamera::DeathThink()
 
 		// lots of smoke
 		Vector pos;
-		CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &pos );
+		GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &pos );
 		
 		CBroadcastRecipientFilter filter;
 		
@@ -1196,7 +1196,7 @@ void CNPC_CombineCamera::SetHeight(float height)
 		V_swap(mins.z, maxs.z);
 	}
 
-	SetCollisionBounds(mins, maxs);
+	GetEngineObject()->SetCollisionBounds(mins, maxs);
 
 	UTIL_SetSize(this, mins, maxs);
 }

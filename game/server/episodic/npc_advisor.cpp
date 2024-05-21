@@ -381,7 +381,7 @@ void CNPC_Advisor::Spawn()
 	SetHullType( HULL_LARGE_CENTERED );
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	// AddSolidFlags( FSOLID_NOT_SOLID );
 
 	SetMoveType( MOVETYPE_FLY );

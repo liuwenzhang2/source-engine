@@ -94,7 +94,7 @@ void CRadarTarget::Spawn()
 	
 	AddEffects( EF_NODRAW );
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 }
 
 //-----------------------------------------------------------------------------
@@ -193,7 +193,7 @@ public:
 
 		// Stop colliding with things
 		pOther->VPhysicsDestroyObject();
-		pOther->SetSolidFlags( FSOLID_NOT_SOLID );
+		pOther->GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 		pOther->SetMoveType( MOVETYPE_NONE );
 
 		// Parent the object to our owner
@@ -218,8 +218,8 @@ public:
 	{
 		BaseClass::Spawn();
 
-		SetSolid( SOLID_BBOX );
-		SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
+		GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
 
 		SetTouch( &CVehicleCargoTrigger::CargoTouch );
 	}
@@ -227,7 +227,7 @@ public:
 	void Activate()
 	{
 		BaseClass::Activate();
-		SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID ); // Fixes up old savegames
+		GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID ); // Fixes up old savegames
 	}
 
 	//
@@ -1054,14 +1054,14 @@ void CPropJeepEpisodic::CreateAvoidanceZone( void )
 	if ( m_VehiclePhysics.GetSpeed() > 5.0f )
 		return;
 
-	float flHullRadius = CollisionProp()->BoundingRadius2D();
+	float flHullRadius = GetEngineObject()->BoundingRadius2D();
 	
 	Vector	vecPos;
-	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.33f, 0.25f ), &vecPos );
+	GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.33f, 0.25f ), &vecPos );
 	CSoundEnt::InsertSound( SOUND_MOVE_AWAY, vecPos, (flHullRadius*0.4f), VEHICLE_AVOID_BROADCAST_RATE, this );
 	// NDebugOverlay::Sphere( vecPos, vec3_angle, flHullRadius*0.4f, 255, 0, 0, 0, true, VEHICLE_AVOID_BROADCAST_RATE );
 
-	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.66f, 0.25f ), &vecPos );
+	GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.66f, 0.25f ), &vecPos );
 	CSoundEnt::InsertSound( SOUND_MOVE_AWAY, vecPos, (flHullRadius*0.4f), VEHICLE_AVOID_BROADCAST_RATE, this );
 	// NDebugOverlay::Sphere( vecPos, vec3_angle, flHullRadius*0.4f, 255, 0, 0, 0, true, VEHICLE_AVOID_BROADCAST_RATE );
 
@@ -1613,7 +1613,7 @@ void CPropJeepEpisodic::InputOutsideTransition( inputdata_t &inputdata )
 
 	// Get our bounds
 	Vector vecSurroundMins, vecSurroundMaxs;
-	CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+	GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 	vecSurroundMins -= WorldSpaceCenter();
 	vecSurroundMaxs -= WorldSpaceCenter();
 

@@ -97,7 +97,7 @@ void CGrenadeBugBait::Spawn( void )
 	SetModel( GRENADE_MODEL );
 	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_DEFAULT );
-	SetSolid( SOLID_BBOX ); 
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	UTIL_SetSize( this, Vector( -2, -2, -2), Vector( 2, 2, 2 ) );
 
@@ -142,7 +142,7 @@ void CGrenadeBugBait::BugBaitTouch( CBaseEntity *pOther )
 {
 	// Don't hit triggers or water
 	Assert( pOther );
-	if ( pOther->IsSolidFlagSet(FSOLID_TRIGGER|FSOLID_VOLUME_CONTENTS) )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER|FSOLID_VOLUME_CONTENTS) )
 		return;
 
 	if ( m_pSporeTrail != NULL )
@@ -285,7 +285,7 @@ bool CGrenadeBugBait::ActivateBugbaitTargets( CBaseEntity *pOwner, Vector vecOri
 void CGrenadeBugBait::ThinkBecomeSolid( void )
 {
 	SetThink( NULL );
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 }
 
 //-----------------------------------------------------------------------------
@@ -298,7 +298,7 @@ void CGrenadeBugBait::SetGracePeriod( float duration )
 	SetNextThink( gpGlobals->curtime + duration );
 
 	// Become unsolid	
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 }
 
 //-----------------------------------------------------------------------------

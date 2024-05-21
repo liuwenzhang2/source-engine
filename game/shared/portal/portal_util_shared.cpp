@@ -1050,7 +1050,7 @@ void UTIL_Portal_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, c
 						for( int i = 0; i != iEntCount; ++i )
 						{
 							CBaseEntity *pRemoteEntity = pEnts[i];
-							if( pRemoteEntity->GetSolid() == SOLID_NONE )
+							if( pRemoteEntity->GetEngineObject()->GetSolid() == SOLID_NONE )
 								continue;
 
 							transformedCollideable.m_pWrappedCollideable = pRemoteEntity->GetCollideable();
@@ -1455,7 +1455,7 @@ CProp_Portal *UTIL_IntersectEntityExtentsWithPortal( const CBaseEntity *pEntity 
 		return NULL;
 
 	Vector vMin, vMax;
-	pEntity->CollisionProp()->WorldSpaceAABB( &vMin, &vMax );
+	pEntity->GetEngineObject()->WorldSpaceAABB( &vMin, &vMax );
 	Vector ptCenter = ( vMin + vMax ) * 0.5f;
 	Vector vExtents = ( vMax - vMin ) * 0.5f;
 
@@ -1514,7 +1514,7 @@ bool FindClosestPassableSpace( CBaseEntity *pEntity, const Vector &vIndecisivePu
 
 	Vector vEntityMaxs;// = pEntity->WorldAlignMaxs();
 	Vector vEntityMins;// = pEntity->WorldAlignMins();
-	CCollisionProperty *pEntityCollision = pEntity->CollisionProp();
+	CCollisionProperty *pEntityCollision = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
 	pEntityCollision->WorldSpaceAABB( &vEntityMins, &vEntityMaxs );
 
 
@@ -1664,7 +1664,7 @@ bool FindClosestPassableSpace( CBaseEntity *pEntity, const Vector &vIndecisivePu
 
 bool UTIL_Portal_EntityIsInPortalHole( const CProp_Portal *pPortal, CBaseEntity *pEntity )
 {
-	CCollisionProperty *pCollisionProp = pEntity->CollisionProp();
+	CCollisionProperty *pCollisionProp = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
 	Vector vMins = pCollisionProp->OBBMins();
 	Vector vMaxs = pCollisionProp->OBBMaxs();
 	Vector vForward, vUp, vRight;

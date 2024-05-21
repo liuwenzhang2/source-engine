@@ -55,7 +55,7 @@ public:
 
 			start = them->GetEngineObject()->GetAbsOrigin();
 			end = start;
-			end.z += them->CollisionProp()->OBBMaxs().z;
+			end.z += them->GetEngineObject()->CollisionProp()->OBBMaxs().z;
 			CalcClosestPointOnLineSegment( testPos, start, end, closestPos );
 			if ( m_debug )
 			{
@@ -67,8 +67,8 @@ public:
 			to.NormalizeInPlace();
 
 			Vector meRangePoint, themRangePoint;
-			m_me->CollisionProp()->CalcNearestPoint( closestPos, &meRangePoint );
-			them->CollisionProp()->CalcNearestPoint( meRangePoint, &themRangePoint );
+			m_me->GetEngineObject()->CalcNearestPoint( closestPos, &meRangePoint );
+			them->GetEngineObject()->CalcNearestPoint( meRangePoint, &themRangePoint );
 			float range = meRangePoint.DistTo( themRangePoint );
 
 			if ( range > m_maxRange )

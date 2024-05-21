@@ -731,7 +731,7 @@ void CFire::Spawn( void )
 
 	m_takedamage = DAMAGE_NO;
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 	SetToOutSize();
 
@@ -859,7 +859,7 @@ void CFire::Init( const Vector &position, float scale, float attackTime, float f
 	}
 	UTIL_SetOrigin( this, localOrigin );
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	m_flFireSize = scale;
 	m_flMaxHeat = FIRE_MAX_HEAT_LEVEL * FIRE_SCALE_FROM_SIZE(scale);
 	//See if we should start on
@@ -1028,7 +1028,7 @@ void CFire::Update( float simTime )
 			if ( FIRE_SPREAD_DAMAGE_MULTIPLIER != 1.0 && !pOther->IsPlayer() ) // if set to 1.0, optimizer will remove this code
 			{
 				Vector otherMins, otherMaxs;
-				pOther->CollisionProp()->WorldSpaceAABB( &otherMins, &otherMaxs );
+				pOther->GetEngineObject()->WorldSpaceAABB( &otherMins, &otherMaxs );
 				bDoDamage = IsBoxIntersectingBox( otherMins, otherMaxs, 
 												  fireEntityDamageMins, fireEntityDamageMaxs );
 

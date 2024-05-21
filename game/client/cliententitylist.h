@@ -167,6 +167,9 @@ public:
 		m_fDataObjectTypes = 0;
 		SetModelName(NULL_STRING);
 		m_nModelIndex = 0;
+		m_Collision.Init(this);
+		SetSolid(SOLID_NONE);
+		SetSolidFlags(0);
 	}
 
 	void Init(C_BaseEntity* pOuter) {
@@ -410,6 +413,50 @@ public:
 	int GetModelIndex(void) const;
 	void SetModelIndex(int index);
 
+	// An inline version the game code can use
+	CCollisionProperty* CollisionProp();
+	const CCollisionProperty* CollisionProp() const;
+	// This defines collision bounds *in whatever space is currently defined by the solid type*
+	//	SOLID_BBOX:		World Align
+	//	SOLID_OBB:		Entity space
+	//	SOLID_BSP:		Entity space
+	//	SOLID_VPHYSICS	Not used
+	void SetCollisionBounds(const Vector& mins, const Vector& maxs);
+	SolidType_t GetSolid(void) const;
+	bool IsSolid() const;
+	void SetSolid(SolidType_t val);	// Set to one of the SOLID_ defines.
+	void AddSolidFlags(int nFlags);
+	void RemoveSolidFlags(int nFlags);
+	bool IsSolidFlagSet(int flagMask) const;
+	void SetSolidFlags(int nFlags);
+	int GetSolidFlags(void) const;
+	const Vector& OBBSize() const;
+	const Vector& OBBCenter() const;
+	const Vector& WorldSpaceCenter() const;
+	void WorldSpaceAABB(Vector* pWorldMins, Vector* pWorldMaxs) const;
+	const Vector& NormalizedToWorldSpace(const Vector& in, Vector* pResult) const;
+	const Vector& WorldToNormalizedSpace(const Vector& in, Vector* pResult) const;
+	const Vector& WorldToCollisionSpace(const Vector& in, Vector* pResult) const;
+	const Vector& CollisionToWorldSpace(const Vector& in, Vector* pResult) const;
+	const Vector& WorldDirectionToCollisionSpace(const Vector& in, Vector* pResult) const;
+	const Vector& NormalizedToCollisionSpace(const Vector& in, Vector* pResult) const;
+	float BoundingRadius() const;
+	float BoundingRadius2D() const;
+	void RandomPointInBounds(const Vector& vecNormalizedMins, const Vector& vecNormalizedMaxs, Vector* pPoint) const;
+	bool IsPointInBounds(const Vector& vecWorldPt) const;
+	void UseTriggerBounds(bool bEnable, float flBloat = 0.0f);
+	void RefreshScaledCollisionBounds(void);
+	void MarkPartitionHandleDirty();
+	bool DoesRotationInvalidateSurroundingBox() const;
+	void MarkSurroundingBoundsDirty();
+	void CalcNearestPoint(const Vector& vecWorldPt, Vector* pVecNearestWorldPt) const;
+	void SetSurroundingBoundsType(SurroundingBoundsType_t type, const Vector* pMins = NULL, const Vector* pMaxs = NULL);
+	unsigned short	GetPartitionHandle() const;
+	float CalcDistanceFromPoint(const Vector& vecWorldPt) const;
+	bool DoesVPhysicsInvalidateSurroundingBox() const;
+	void UpdatePartition();
+	bool IsBoundsDefinedInEntitySpace() const;
+
 private:
 
 	friend class C_BaseEntity;
@@ -469,6 +516,7 @@ private:
 	string_t						m_ModelName;
 	// Object model index
 	short							m_nModelIndex;
+	CCollisionProperty				m_Collision;
 
 };
 
@@ -623,6 +671,197 @@ inline int C_EngineObjectInternal::GetModelIndex(void) const
 	return m_nModelIndex;
 }
 
+//-----------------------------------------------------------------------------
+// An inline version the game code can use
+//-----------------------------------------------------------------------------
+inline CCollisionProperty* C_EngineObjectInternal::CollisionProp()
+{
+	return &m_Collision;
+}
+
+inline const CCollisionProperty* C_EngineObjectInternal::CollisionProp() const
+{
+	return &m_Collision;
+}
+
+//-----------------------------------------------------------------------------
+// Methods relating to solid type + flags
+//-----------------------------------------------------------------------------
+inline void C_EngineObjectInternal::SetSolidFlags(int nFlags)
+{
+	CollisionProp()->SetSolidFlags(nFlags);
+}
+
+inline bool C_EngineObjectInternal::IsSolidFlagSet(int flagMask) const
+{
+	return CollisionProp()->IsSolidFlagSet(flagMask);
+}
+
+inline int	C_EngineObjectInternal::GetSolidFlags(void) const
+{
+	return CollisionProp()->GetSolidFlags();
+}
+
+inline void C_EngineObjectInternal::AddSolidFlags(int nFlags)
+{
+	CollisionProp()->AddSolidFlags(nFlags);
+}
+
+inline void C_EngineObjectInternal::RemoveSolidFlags(int nFlags)
+{
+	CollisionProp()->RemoveSolidFlags(nFlags);
+}
+
+inline bool C_EngineObjectInternal::IsSolid() const
+{
+	return CollisionProp()->IsSolid();
+}
+
+inline void C_EngineObjectInternal::SetSolid(SolidType_t val)
+{
+	CollisionProp()->SetSolid(val);
+}
+
+inline SolidType_t C_EngineObjectInternal::GetSolid() const
+{
+	return CollisionProp()->GetSolid();
+}
+
+inline void C_EngineObjectInternal::SetCollisionBounds(const Vector& mins, const Vector& maxs)
+{
+	CollisionProp()->SetCollisionBounds(mins, maxs);
+}
+
+inline const Vector& C_EngineObjectInternal::OBBSize() const
+{
+	return CollisionProp()->OBBSize();
+}
+
+
+inline const Vector& C_EngineObjectInternal::OBBCenter() const
+{
+	return CollisionProp()->OBBCenter();
+}
+
+inline const Vector& C_EngineObjectInternal::WorldSpaceCenter() const
+{
+	return CollisionProp()->WorldSpaceCenter();
+}
+
+inline void C_EngineObjectInternal::WorldSpaceAABB(Vector* pWorldMins, Vector* pWorldMaxs) const
+{
+	CollisionProp()->WorldSpaceAABB(pWorldMins, pWorldMaxs);
+}
+
+inline const Vector& C_EngineObjectInternal::NormalizedToWorldSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->NormalizedToWorldSpace(in, pResult);
+}
+
+inline const Vector& C_EngineObjectInternal::WorldToNormalizedSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->WorldToNormalizedSpace(in, pResult);
+}
+
+inline const Vector& C_EngineObjectInternal::WorldToCollisionSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->WorldToCollisionSpace(in, pResult);
+}
+
+inline const Vector& C_EngineObjectInternal::CollisionToWorldSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->CollisionToWorldSpace(in, pResult);
+}
+
+inline const Vector& C_EngineObjectInternal::WorldDirectionToCollisionSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->WorldDirectionToCollisionSpace(in, pResult);
+}
+
+inline const Vector& C_EngineObjectInternal::NormalizedToCollisionSpace(const Vector& in, Vector* pResult) const
+{
+	return CollisionProp()->NormalizedToCollisionSpace(in, pResult);
+}
+
+inline float C_EngineObjectInternal::BoundingRadius() const
+{
+	return CollisionProp()->BoundingRadius();
+}
+
+inline float C_EngineObjectInternal::BoundingRadius2D() const
+{
+	return CollisionProp()->BoundingRadius2D();
+}
+
+inline void C_EngineObjectInternal::RandomPointInBounds(const Vector& vecNormalizedMins, const Vector& vecNormalizedMaxs, Vector* pPoint) const
+{
+	CollisionProp()->RandomPointInBounds(vecNormalizedMins, vecNormalizedMaxs, pPoint);
+}
+
+inline bool C_EngineObjectInternal::IsPointInBounds(const Vector& vecWorldPt) const
+{
+	return CollisionProp()->IsPointInBounds(vecWorldPt);
+}
+
+inline void C_EngineObjectInternal::UseTriggerBounds(bool bEnable, float flBloat)
+{
+	CollisionProp()->UseTriggerBounds(bEnable, flBloat);
+}
+
+inline void C_EngineObjectInternal::RefreshScaledCollisionBounds(void)
+{
+	CollisionProp()->RefreshScaledCollisionBounds();
+}
+
+inline void C_EngineObjectInternal::MarkPartitionHandleDirty()
+{
+	CollisionProp()->MarkPartitionHandleDirty();
+}
+
+inline bool C_EngineObjectInternal::DoesRotationInvalidateSurroundingBox() const
+{
+	return CollisionProp()->DoesRotationInvalidateSurroundingBox();
+}
+
+inline void C_EngineObjectInternal::MarkSurroundingBoundsDirty()
+{
+	CollisionProp()->MarkSurroundingBoundsDirty();
+}
+
+inline void C_EngineObjectInternal::CalcNearestPoint(const Vector& vecWorldPt, Vector* pVecNearestWorldPt) const
+{
+	CollisionProp()->CalcNearestPoint(vecWorldPt, pVecNearestWorldPt);
+}
+
+inline void C_EngineObjectInternal::SetSurroundingBoundsType(SurroundingBoundsType_t type, const Vector* pMins, const Vector* pMaxs)
+{
+	CollisionProp()->SetSurroundingBoundsType(type, pMins, pMaxs);
+}
+
+inline unsigned short C_EngineObjectInternal::GetPartitionHandle() const
+{
+	return CollisionProp()->GetPartitionHandle();
+}
+
+inline float C_EngineObjectInternal::CalcDistanceFromPoint(const Vector& vecWorldPt) const
+{
+	return CollisionProp()->CalcDistanceFromPoint(vecWorldPt);
+}
+
+inline bool C_EngineObjectInternal::DoesVPhysicsInvalidateSurroundingBox() const
+{
+	return CollisionProp()->DoesVPhysicsInvalidateSurroundingBox();
+}
+
+inline void C_EngineObjectInternal::UpdatePartition()
+{
+	CollisionProp()->UpdatePartition();
+}
+
+inline bool C_EngineObjectInternal::IsBoundsDefinedInEntitySpace() const
+{
+	return CollisionProp()->IsBoundsDefinedInEntitySpace();
+}
 
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.
 //class C_AllBaseEntityIterator

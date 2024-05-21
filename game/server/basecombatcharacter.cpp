@@ -1253,7 +1253,7 @@ CBaseEntity *CBaseCombatCharacter::CheckTraceHullAttack( const Vector &vStart, c
 
 		// Do a tracehull from the top center of my bounding box.
 		vecTopCenter = GetEngineObject()->GetAbsOrigin();
-		CollisionProp()->WorldSpaceAABB( &vecMins, &vecMaxs );
+		GetEngineObject()->WorldSpaceAABB( &vecMins, &vecMaxs );
 		vecTopCenter.z = vecMaxs.z + 1.0f;
 		vecEnd = vecTopCenter;
 		vecEnd.z += 2.0f;
@@ -1350,7 +1350,7 @@ bool  CBaseCombatCharacter::Event_Gibbed( const CTakeDamageInfo &info )
 	}
 
 	m_takedamage	= DAMAGE_NO;
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	m_lifeState		= LIFE_DEAD;
 
 	if ( fade )
@@ -1484,7 +1484,7 @@ bool CBaseCombatCharacter::BecomeRagdollBoogie( CBaseEntity *pKiller, const Vect
 
 	CBaseEntity *pRagdoll = CreateServerRagdoll( this, 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
 
-	pRagdoll->SetCollisionBounds( CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs() );
+	pRagdoll->GetEngineObject()->SetCollisionBounds(GetEngineObject()->CollisionProp()->OBBMins(), GetEngineObject()->CollisionProp()->OBBMaxs() );
 
 	CRagdollBoogie::Create( pRagdoll, 200, gpGlobals->curtime, duration, flags );
 
@@ -1802,7 +1802,7 @@ void CBaseCombatCharacter::DropWeaponForWeaponStrip( CBaseCombatWeapon *pWeapon,
 	const Vector &vecForward, const QAngle &vecAngles, float flDiameter )
 {
 	Vector vecOrigin;
-	CollisionProp()->RandomPointInBounds( Vector( 0.5f, 0.5f, 0.5f ), Vector( 0.5f, 0.5f, 1.0f ), &vecOrigin );
+	GetEngineObject()->RandomPointInBounds( Vector( 0.5f, 0.5f, 0.5f ), Vector( 0.5f, 0.5f, 1.0f ), &vecOrigin );
 
 	// Nowhere in particular; just drop it.
 	Vector vecThrow;
@@ -1856,8 +1856,8 @@ void CBaseCombatCharacter::Weapon_DropAll( bool bDisallowWeaponPickup )
 	Vector vecForward;
 	AngleVectors( gunAngles, &vecForward, NULL, NULL );
 
-	float flDiameter = sqrt( CollisionProp()->OBBSize().x * CollisionProp()->OBBSize().x +
-		CollisionProp()->OBBSize().y * CollisionProp()->OBBSize().y );
+	float flDiameter = sqrt(GetEngineObject()->OBBSize().x * GetEngineObject()->OBBSize().x +
+		GetEngineObject()->OBBSize().y * GetEngineObject()->OBBSize().y );
 
 	CBaseCombatWeapon *pActiveWeapon = GetActiveWeapon();
 	for (int i=0; i<MAX_WEAPONS; ++i) 
@@ -1878,7 +1878,7 @@ void CBaseCombatCharacter::Weapon_DropAll( bool bDisallowWeaponPickup )
 		// to collide with triggers. 
 		if ( bDisallowWeaponPickup )
 		{
-			pWeapon->RemoveSolidFlags( FSOLID_TRIGGER );
+			pWeapon->GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
 			
 			IPhysicsObject *pObj = pWeapon->VPhysicsGetObject();
 			
@@ -1908,7 +1908,7 @@ void CBaseCombatCharacter::Weapon_DropAll( bool bDisallowWeaponPickup )
 		// to collide with triggers. 
 		if ( bDisallowWeaponPickup )
 		{
-			pActiveWeapon->RemoveSolidFlags( FSOLID_TRIGGER );
+			pActiveWeapon->GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
 		}
 	}
 }

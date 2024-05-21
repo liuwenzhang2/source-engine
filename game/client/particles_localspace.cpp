@@ -143,7 +143,7 @@ void CLocalSpaceEmitter::SetupTransformMatrix( void )
 		if ( pEnt )
 		{
 			Vector vWorldMins, vWorldMaxs;
-			float scale = pEnt->CollisionProp()->BoundingRadius();
+			float scale = pEnt->GetEngineObject()->BoundingRadius();
 			vWorldMins[0] = origin[0] - scale;
 			vWorldMins[1] = origin[1] - scale;
 			vWorldMins[2] = origin[2] - scale;

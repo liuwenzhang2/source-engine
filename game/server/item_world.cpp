@@ -121,7 +121,7 @@ CItem::CItem()
 bool CItem::CreateItemVPhysicsObject( void )
 {
 	// Create the object in the physics system
-	int nSolidFlags = GetSolidFlags() | FSOLID_NOT_STANDABLE;
+	int nSolidFlags = GetEngineObject()->GetSolidFlags() | FSOLID_NOT_STANDABLE;
 	if ( !m_bActivateWhenAtRest )
 	{
 		nSolidFlags |= FSOLID_TRIGGER;
@@ -129,8 +129,8 @@ bool CItem::CreateItemVPhysicsObject( void )
 
 	if ( VPhysicsInitNormal( SOLID_VPHYSICS, nSolidFlags, false ) == NULL )
 	{
-		SetSolid( SOLID_BBOX );
-		AddSolidFlags( nSolidFlags );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
+		GetEngineObject()->AddSolidFlags( nSolidFlags );
 
 		// If it's not physical, drop it to the floor
 		if (UTIL_DropToFloor(this, MASK_SOLID) == 0)
@@ -156,7 +156,7 @@ void CItem::Spawn( void )
 	}
 
 	SetMoveType( MOVETYPE_FLYGRAVITY );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetBlocksLOS( false );
 	GetEngineObject()->AddEFlags( EFL_NO_ROTORWASH_PUSH );
 	
@@ -168,7 +168,7 @@ void CItem::Spawn( void )
 	// This will make them not collide with the player, but will collide
 	// against other items + weapons
 	SetCollisionGroup( COLLISION_GROUP_WEAPON );
-	CollisionProp()->UseTriggerBounds( true, ITEM_PICKUP_BOX_BLOAT );
+	GetEngineObject()->UseTriggerBounds( true, ITEM_PICKUP_BOX_BLOAT );
 	SetTouch(&CItem::ItemTouch);
 
 	if ( CreateItemVPhysicsObject() == false )
@@ -231,7 +231,7 @@ extern int gEvilImpulse101;
 //-----------------------------------------------------------------------------
 void CItem::ActivateWhenAtRest( float flTime /* = 0.5f */ )
 {
-	RemoveSolidFlags( FSOLID_TRIGGER );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
 	m_bActivateWhenAtRest = true;
 	SetThink( &CItem::ComeToRest );
 	SetNextThink( gpGlobals->curtime + flTime );
@@ -267,7 +267,7 @@ void CItem::ComeToRest( void )
 	if ( m_bActivateWhenAtRest )
 	{
 		m_bActivateWhenAtRest = false;
-		AddSolidFlags( FSOLID_TRIGGER );
+		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 		SetThink( NULL );
 	}
 }
@@ -360,7 +360,7 @@ bool UTIL_ItemCanBeTouchedByPlayer( CBaseEntity *pItem, CBasePlayer *pPlayer )
 	else
 	{
 		// Use the generic bbox center
-		vecStartPos = pItem->CollisionProp()->WorldSpaceCenter();
+		vecStartPos = pItem->GetEngineObject()->WorldSpaceCenter();
 	}
 
 	Vector vecEndPos = pPlayer->EyePosition();
@@ -466,8 +466,8 @@ CBaseEntity* CItem::Respawn( void )
 	VPhysicsDestroyObject();
 
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_TRIGGER );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 
 	UTIL_SetOrigin( this, g_pGameRules->VecItemRespawnSpot( this ) );// blip to whereever you should respawn.
 	GetEngineObject()->SetAbsAngles( g_pGameRules->VecItemRespawnAngles( this ) );// set the angles.
@@ -541,7 +541,7 @@ void CItem::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason )
 	if ( reason == PICKED_UP_BY_CANNON )
 	{
 		// Expand the pickup box
-		CollisionProp()->UseTriggerBounds( true, ITEM_PICKUP_BOX_BLOAT * 2 );
+		GetEngineObject()->UseTriggerBounds( true, ITEM_PICKUP_BOX_BLOAT * 2 );
 
 		if( m_pConstraint != NULL )
 		{
@@ -559,5 +559,5 @@ void CItem::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason )
 void CItem::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t reason )
 {
 	// Restore the pickup box to the original
-	CollisionProp()->UseTriggerBounds( true, ITEM_PICKUP_BOX_BLOAT );
+	GetEngineObject()->UseTriggerBounds( true, ITEM_PICKUP_BOX_BLOAT );
 }

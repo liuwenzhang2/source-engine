@@ -238,7 +238,7 @@ void CWallHealth::Spawn(void)
 {
 	Precache( );
 
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 	SetMoveType( MOVETYPE_PUSH );
 
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
@@ -536,7 +536,7 @@ void CNewWallHealth::Spawn(void)
 	Precache( );
 
 	SetMoveType( MOVETYPE_NONE );
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	CreateVPhysics();
 
 	SetModel( HEALTH_CHARGER_MODEL_NAME );

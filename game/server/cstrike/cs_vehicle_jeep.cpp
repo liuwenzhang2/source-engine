@@ -336,7 +336,7 @@ void CPropJeep::Spawn( void )
 	m_aimYaw = 0;
 	m_aimPitch = 0;
 
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	CAmmoDef *pAmmoDef = GetAmmoDef();
 	m_nAmmoType = pAmmoDef->Index("GaussEnergy");

@@ -204,8 +204,8 @@ void CNPC_PlayerCompanion::Spawn()
 	SetHullType(HULL_HUMAN);
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetBloodColor( BLOOD_COLOR_RED );
 	m_flFieldOfView		= 0.02;
 	m_NPCState		= NPC_STATE_NONE;
@@ -2923,7 +2923,7 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 				UTIL_TraceLine( WorldSpaceCenter(), pEntity->WorldSpaceCenter(), MASK_BLOCKLOS, pEntity, COLLISION_GROUP_NONE, &tr );
 				if (tr.fraction == 1.0 && !tr.startsolid)
 				{
-					float radius = 1.4 * pEntity->CollisionProp()->BoundingRadius2D(); 
+					float radius = 1.4 * pEntity->GetEngineObject()->BoundingRadius2D();
 					GetLocalNavigator()->AddObstacle( pEntity->WorldSpaceCenter(), radius, AIMST_AVOID_OBJECT );
 				}
 			}

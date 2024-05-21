@@ -38,7 +38,7 @@ LINK_ENTITY_TO_CLASS( grenade_mp5, CGrenadeMP5 );
 void CGrenadeMP5::Spawn( void )
 {
 	Precache( );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_FLY );
 	AddFlag( FL_GRENADE );
 
@@ -73,7 +73,7 @@ void CGrenadeMP5::Event_Killed( CBaseEntity *pInflictor, CBaseEntity *pAttacker,
 
 void CGrenadeMP5::GrenadeMP5Touch( CBaseEntity *pOther )
 {
-	if ( !pOther->IsSolid() )
+	if ( !pOther->GetEngineObject()->IsSolid() )
 		return;
 
 	// If I'm live go ahead and blow up

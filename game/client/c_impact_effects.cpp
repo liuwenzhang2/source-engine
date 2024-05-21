@@ -710,7 +710,7 @@ void FX_AntlionImpact( const Vector &pos, trace_t *trace )
 	Vector vWorldMins, vWorldMaxs;
 	if ( trace->m_pEnt )
 	{
-		float scale = ((C_BaseEntity*)trace->m_pEnt)->CollisionProp()->BoundingRadius();
+		float scale = ((C_BaseEntity*)trace->m_pEnt)->GetEngineObject()->BoundingRadius();
 		vWorldMins[0] = spawnOffset[0] - scale;
 		vWorldMins[1] = spawnOffset[1] - scale;
 		vWorldMins[2] = spawnOffset[2] - scale;

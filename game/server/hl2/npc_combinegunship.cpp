@@ -1535,11 +1535,11 @@ void CNPC_CombineGunship::PrescheduleThink( void )
 			Vector explodePoint;
 			if ( m_hRagdoll )
 			{
-				m_hRagdoll->CollisionProp()->RandomPointInBounds( Vector(0.25,0.25,0.25), Vector(0.75,0.75,0.75), &explodePoint );
+				m_hRagdoll->GetEngineObject()->RandomPointInBounds( Vector(0.25,0.25,0.25), Vector(0.75,0.75,0.75), &explodePoint );
 			}
 			else
 			{
-				CollisionProp()->RandomPointInBounds( Vector(0.25,0.25,0.25), Vector(0.75,0.75,0.75), &explodePoint );
+				GetEngineObject()->RandomPointInBounds( Vector(0.25,0.25,0.25), Vector(0.75,0.75,0.75), &explodePoint );
 
 				// Knock the gunship a little, but not if we're trying to fly to a point
 				if ( !m_hCrashTarget )
@@ -2078,7 +2078,7 @@ void CNPC_CombineGunship::BeginDestruct( void )
 
 	// Hide myself, because the ragdoll's now taken my place
 	AddEffects( EF_NODRAW );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 }
 
 //-----------------------------------------------------------------------------

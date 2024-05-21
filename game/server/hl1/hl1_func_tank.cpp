@@ -564,7 +564,7 @@ void CFuncTank::Spawn( void )
 	Precache();
 
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	m_yawCenter			= GetEngineObject()->GetLocalAngles().y;

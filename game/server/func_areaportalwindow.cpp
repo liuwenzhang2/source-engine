@@ -90,7 +90,7 @@ void CFuncAreaPortalWindow::Activate()
 
 bool CFuncAreaPortalWindow::IsWindowOpen( const Vector &vOrigin, float fovDistanceAdjustFactor )
 {
-	float flDist = CollisionProp()->CalcDistanceFromPoint( vOrigin );
+	float flDist = GetEngineObject()->CalcDistanceFromPoint( vOrigin );
 	flDist *= fovDistanceAdjustFactor;
 	return ( flDist <= (m_flFadeDist + FADE_DIST_BUFFER) );
 }

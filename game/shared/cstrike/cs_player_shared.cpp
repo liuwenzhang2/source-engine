@@ -928,7 +928,7 @@ surfacedata_t * CCSPlayer::GetFootstepSurface( const Vector &origin, const char 
 
 		if ( FStrEq( control->m_source, surfaceName ) )
 		{
-			if ( control->CollisionProp()->IsPointInBounds( origin ) )
+			if ( control->GetEngineObject()->IsPointInBounds( origin ) )
 			{
 				return physprops->GetSurfaceData( physprops->GetSurfaceIndex( control->m_destination ) );
 			}

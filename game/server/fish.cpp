@@ -143,8 +143,8 @@ void CFish::Spawn( void )
 {
 	Precache();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_NOT_SOLID | FSOLID_TRIGGER );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_NOT_SOLID | FSOLID_TRIGGER );
 	SetMoveType( MOVETYPE_FLY );
 
 	m_angle = RandomFloat( 0.0f, 360.0f );

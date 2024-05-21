@@ -169,7 +169,7 @@ void CBaseCombatWeapon::Spawn( void )
 
 	BaseClass::Spawn();
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	m_flNextEmptySoundTime = 0.0f;
 
 	// Weapons won't show up in trace calls if they are being carried...
@@ -206,7 +206,7 @@ void CBaseCombatWeapon::Spawn( void )
 #endif
 
 	// Bloat the box for player pickup
-	CollisionProp()->UseTriggerBounds( true, 36 );
+	GetEngineObject()->UseTriggerBounds( true, 36 );
 
 	// Use more efficient bbox culling on the client. Otherwise, it'll setup bones for most
 	// characters even when they're not in the frustum.
@@ -967,7 +967,7 @@ void CBaseCombatWeapon::Equip( CBaseCombatCharacter *pOwner )
 {
 	// Attach the weapon to an owner
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
-	RemoveSolidFlags( FSOLID_TRIGGER );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
 	FollowEntity( pOwner );
 	SetOwner( pOwner );
 	SetOwnerEntity( pOwner );

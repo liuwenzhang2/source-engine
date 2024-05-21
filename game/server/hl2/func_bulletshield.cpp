@@ -41,8 +41,8 @@ void CFuncBulletShield::Spawn( void )
 {
 	BaseClass::Spawn();
 
-	AddSolidFlags( FSOLID_CUSTOMRAYTEST );
-	AddSolidFlags( FSOLID_CUSTOMBOXTEST );
+	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST );
+	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMBOXTEST );
 	// SetSolid(SOLID_CUSTOM);
 
 	VPhysicsDestroyObject();

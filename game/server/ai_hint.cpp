@@ -931,7 +931,7 @@ void CAI_Hint::Spawn( void )
 		m_nodeFOV = cos( DEG2RAD(m_nodeFOV/2) );
 	}
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 }
 
 void CAI_Hint::Activate()

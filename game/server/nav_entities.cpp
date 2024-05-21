@@ -71,8 +71,8 @@ void CFuncNavCost::Spawn( void )
 	gm_masterCostVector.AddToTail( this );
 	gm_dirtyTimer.Start( UPDATE_DIRTY_TIME );
 
-	SetSolid( SOLID_BSP );	
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BSP );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
@@ -297,7 +297,7 @@ void CFuncNavCost::UpdateAllNavCostDecoration( void )
 
 		Ray_t ray;
 		trace_t tr;
-		ICollideable *pCollide = cost->CollisionProp();
+		ICollideable *pCollide = cost->GetEngineObject()->CollisionProp();
 
 		for( j=0; j<overlapVector.Count(); ++j )
 		{
@@ -447,9 +447,9 @@ void CFuncNavBlocker::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	AddEffects( EF_NODRAW );
 	SetCollisionGroup( COLLISION_GROUP_NONE );
-	SetSolid( SOLID_NONE );
-	AddSolidFlags( FSOLID_NOT_SOLID );
-	CollisionProp()->WorldSpaceAABB( &m_CachedMins, &m_CachedMaxs );
+	GetEngineObject()->SetSolid( SOLID_NONE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->WorldSpaceAABB( &m_CachedMins, &m_CachedMaxs );
 
 	if ( m_bDisabled )
 	{
@@ -660,8 +660,8 @@ void CFuncNavObstruction::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	AddEffects( EF_NODRAW );
 	SetCollisionGroup( COLLISION_GROUP_NONE );
-	SetSolid( SOLID_NONE );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_NONE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	if ( !m_bDisabled )
 	{

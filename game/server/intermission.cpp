@@ -26,7 +26,7 @@ public:
 
 void CInfoIntermission::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	AddEffects( EF_NODRAW );
 	GetEngineObject()->SetLocalAngles( vec3_angle );
 	SetNextThink( gpGlobals->curtime + 2 );// let targets spawn !

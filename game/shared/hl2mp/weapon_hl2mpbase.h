@@ -41,6 +41,7 @@ public:
 	#ifdef GAME_DLL
 		DECLARE_DATADESC();
 
+		void PostConstructor(const char* szClassname, int iForceEdictIndex);
 		void SendReloadSoundEvent( void );
 
 		void Materialize( void );
@@ -65,6 +66,7 @@ public:
 public:
 	#if defined( CLIENT_DLL )
 		
+		bool			Init(int entnum, int iSerialNum);
 		virtual bool	ShouldPredict();
 		virtual void	OnDataChanged( DataUpdateType_t type );
 

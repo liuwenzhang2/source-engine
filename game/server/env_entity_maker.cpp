@@ -180,7 +180,7 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 	// Store off the mins & maxs the first time we spawn
 	if ( m_vecEntityMins == vec3_origin )
 	{
-		m_hCurrentInstance->CollisionProp()->WorldSpaceAABB( &m_vecEntityMins, &m_vecEntityMaxs );
+		m_hCurrentInstance->GetEngineObject()->WorldSpaceAABB( &m_vecEntityMins, &m_vecEntityMaxs );
 		m_vecEntityMins -= m_hCurrentInstance->GetEngineObject()->GetAbsOrigin();
 		m_vecEntityMaxs -= m_hCurrentInstance->GetEngineObject()->GetAbsOrigin();
 	}

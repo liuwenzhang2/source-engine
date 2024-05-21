@@ -1084,7 +1084,7 @@ void CDODPlayer::PostThink()
 
 	if( m_Shared.IsProne() )
 	{
-		SetCollisionBounds( VEC_PRONE_HULL_MIN, VEC_PRONE_HULL_MAX );
+		GetEngineObject()->SetCollisionBounds( VEC_PRONE_HULL_MIN, VEC_PRONE_HULL_MAX );
 	}
 
 	if ( gpGlobals->curtime > m_fHandleSignalsTime )
@@ -1572,7 +1572,7 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 
 		Weapon_Drop( pWeapon, &vTossPos, NULL );
 			
-		pWeapon->SetSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_TRIGGER | FSOLID_USE_TRIGGER_BOUNDS );
+		pWeapon->GetEngineObject()->SetSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_TRIGGER | FSOLID_USE_TRIGGER_BOUNDS );
 		pWeapon->SetMoveCollide( MOVECOLLIDE_FLY_BOUNCE );
 
 		CWeaponDODBase *pDODWeapon = dynamic_cast< CWeaponDODBase* >( pWeapon );
@@ -1664,7 +1664,7 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 			Vector mins, maxs;
 
 			// not exactly correct bounds, we haven't rotated them to match the attachment
-			pWeapon->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
+			pWeapon->GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
 
 			UTIL_TraceHull( WorldSpaceCenter(), origin, mins, maxs, MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 			
@@ -1812,7 +1812,7 @@ bool CDODPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 
 	pWeapon->CheckRespawn();
 
-	pWeapon->AddSolidFlags( FSOLID_NOT_SOLID );
+	pWeapon->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	pWeapon->AddEffects( EF_NODRAW );
 
 	Weapon_Equip( pWeapon );
@@ -2544,7 +2544,7 @@ void CDODPlayer::PhysObjectWake()
 void CDODPlayer::State_Enter_WELCOME()
 {
 	SetMoveType( MOVETYPE_NONE );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	PhysObjectSleep();
 	
@@ -2834,7 +2834,7 @@ void CDODPlayer::State_Enter_PICKINGCLASS()
 void CDODPlayer::State_Enter_ACTIVE()
 {
 	SetMoveType( MOVETYPE_WALK );
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
     m_Local.m_iHideHUD = 0;
 	PhysObjectWake();
 }
@@ -4101,8 +4101,8 @@ CBaseEntity *CDODPlayer::FindUseEntity()
 	if ( IsUseableEntity(pObject, 0) )
 	{
 		Vector delta = tr.endpos - tr.startpos;
-		float centerZ = CollisionProp()->WorldSpaceCenter().z;
-		delta.z = IntervalDistance( tr.endpos.z, centerZ + CollisionProp()->OBBMins().z, centerZ + CollisionProp()->OBBMaxs().z );
+		float centerZ = GetEngineObject()->WorldSpaceCenter().z;
+		delta.z = IntervalDistance( tr.endpos.z, centerZ + GetEngineObject()->CollisionProp()->OBBMins().z, centerZ + GetEngineObject()->CollisionProp()->OBBMaxs().z );
 		float dist = delta.Length();
 		if ( dist < PLAYER_USE_RADIUS )
 		{
@@ -4138,7 +4138,7 @@ CBaseEntity *CDODPlayer::FindUseEntity()
 
 		// see if it's more roughly in front of the player than previous guess
 		Vector point;
-		pObject->CollisionProp()->CalcNearestPoint( searchCenter, &point );
+		pObject->GetEngineObject()->CalcNearestPoint( searchCenter, &point );
 
 		Vector dir = point - searchCenter;
 		VectorNormalize(dir);

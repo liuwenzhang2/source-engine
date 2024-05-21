@@ -173,7 +173,7 @@ IMPLEMENT_CLIENTCLASS_DT( C_FuncSmokeVolume, DT_FuncSmokeVolume, CFuncSmokeVolum
 	RecvPropFloat( RECVINFO( m_MovementSpeed ) ),
 	RecvPropFloat( RECVINFO( m_Density ) ),
 	//RecvPropInt( RECVINFO( m_spawnflags ) ),
-	RecvPropDataTable( RECVINFO_DT( m_Collision ), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty) ),
+	//RecvPropDataTable( RECVINFO_DT( m_Collision ), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty) ),
 END_RECV_TABLE()
 
 // Helpers.
@@ -336,7 +336,7 @@ void C_FuncSmokeVolume::Update( float fTimeDelta )
 		m_vLastOrigin = curOrigin;
 
 		Vector vWorldMins, vWorldMaxs;
-		CollisionProp()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
+		GetEngineObject()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 		vWorldMins -= Vector( m_ParticleRadius, m_ParticleRadius, m_ParticleRadius );
 		vWorldMaxs += Vector( m_ParticleRadius, m_ParticleRadius, m_ParticleRadius );
 

@@ -30,7 +30,7 @@ IMPLEMENT_CLIENTCLASS_DT_NOBASE( C_Func_Dust, DT_Func_Dust, CFunc_Dust )
 	RecvPropInt( RECVINFO(m_DistMax) ),
 	//RecvPropInt( RECVINFO( m_nModelIndex ) ),
 	RecvPropFloat( RECVINFO( m_FallSpeed ) ),
-	RecvPropDataTable( RECVINFO_DT( m_Collision ), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty) ),
+	//RecvPropDataTable( RECVINFO_DT( m_Collision ), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty) ),
 END_RECV_TABLE()
 
 
@@ -195,7 +195,7 @@ void C_Func_Dust::ClientThink()
 
 	// Tell the particle manager our bbox.
 	Vector vWorldMins, vWorldMaxs;
-	CollisionProp()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
+	GetEngineObject()->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 	vWorldMins -= Vector( m_flSizeMax, m_flSizeMax, m_flSizeMax );
 	vWorldMaxs += Vector( m_flSizeMax, m_flSizeMax, m_flSizeMax );
 	m_Effect.GetBinding().SetBBox( vWorldMins, vWorldMaxs );

@@ -16,11 +16,15 @@
 #include "mathlib/vector.h"
 #include "ispatialpartition.h"
 
+#ifdef CLIENT_DLL
+#define CEngineObjectInternal C_EngineObjectInternal
+#endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
 class CBaseEntity;
+class CEngineObjectInternal;
 class IHandleEntity;
 class QAngle;
 class Vector;
@@ -33,22 +37,6 @@ class IPhysicsObject;
 //-----------------------------------------------------------------------------
 void UpdateDirtySpatialPartitionEntities();
 
-
-//-----------------------------------------------------------------------------
-// Specifies how to compute the surrounding box
-//-----------------------------------------------------------------------------
-enum SurroundingBoundsType_t
-{
-	USE_OBB_COLLISION_BOUNDS = 0,
-	USE_BEST_COLLISION_BOUNDS,		// Always use the best bounds (most expensive)
-	USE_HITBOXES,
-	USE_SPECIFIED_BOUNDS,
-	USE_GAME_CODE,
-	USE_ROTATION_EXPANDED_BOUNDS,
-	USE_COLLISION_BOUNDS_NEVER_VPHYSICS,
-
-	SURROUNDING_TYPE_BIT_COUNT = 3
-};
 
 
 //-----------------------------------------------------------------------------
@@ -68,7 +56,7 @@ public:
 	CCollisionProperty();
 	~CCollisionProperty();
 
-	void Init( CBaseEntity *pEntity );
+	void Init( CEngineObjectInternal *pEntity );
 
 	// Methods of ICollideable
 	virtual IHandleEntity	*GetEntityHandle();
@@ -233,11 +221,11 @@ private:
 	void UpdateServerPartitionMask( );
 
 	// Outer
-	CBaseEntity *GetOuter();
-	const CBaseEntity *GetOuter() const;
+	CEngineObjectInternal *GetOuter();
+	const CEngineObjectInternal *GetOuter() const;
 
 private:
-	CBaseEntity *m_pOuter;
+	CEngineObjectInternal *m_pOuter;
 
 	CNetworkVector( m_vecMinsPreScaled );
 	CNetworkVector( m_vecMaxsPreScaled );
@@ -275,7 +263,7 @@ private:
 	// pointer to the entity's physics object (vphysics.dll)
 	//IPhysicsObject	*m_pPhysicsObject;
 	
-	friend class CBaseEntity;
+	friend class CEngineObjectInternal;
 };
 
 
@@ -292,12 +280,12 @@ EXTERN_SEND_TABLE( DT_CollisionProperty );
 //-----------------------------------------------------------------------------
 // Inline methods
 //-----------------------------------------------------------------------------
-inline CBaseEntity *CCollisionProperty::GetOuter()
+inline CEngineObjectInternal *CCollisionProperty::GetOuter()
 {
 	return m_pOuter;
 }
 
-inline const CBaseEntity *CCollisionProperty::GetOuter() const
+inline const CEngineObjectInternal *CCollisionProperty::GetOuter() const
 {
 	return m_pOuter;
 }

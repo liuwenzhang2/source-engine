@@ -245,9 +245,9 @@ bool CBoneFollower::Init( CBaseEntity *pOwner, const char *pModelName, solid_t &
 	GetEngineObject()->SetAbsOrigin( position );
 	GetEngineObject()->SetAbsAngles( orientation );
 	SetMoveType( MOVETYPE_PUSH );
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	SetCollisionGroup( pOwner->GetCollisionGroup() );
-	AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
+	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 	solid.params.pGameData = (void *)this;
 	IPhysicsObject *pPhysics = VPhysicsInitShadow( false, false, &solid );
 	if ( !pPhysics )
@@ -257,7 +257,7 @@ bool CBoneFollower::Init( CBaseEntity *pOwner, const char *pModelName, solid_t &
 	// so compute the OBB of the physics model and use that.
 	Vector mins, maxs;
 	physcollision->CollideGetAABB( &mins, &maxs, pPhysics->GetCollide(), vec3_origin, vec3_angle );
-	SetCollisionBounds( mins, maxs );
+	GetEngineObject()->SetCollisionBounds( mins, maxs );
 
 	pPhysics->SetCallbackFlags( pPhysics->GetCallbackFlags() | CALLBACK_GLOBAL_TOUCH );
 	pPhysics->EnableGravity( false );

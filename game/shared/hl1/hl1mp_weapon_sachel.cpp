@@ -452,7 +452,7 @@ LINK_ENTITY_TO_CLASS( monster_satchel, CSatchelCharge );
 //=========================================================
 void CSatchelCharge::Deactivate( void )
 {
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	UTIL_Remove( this );
 }
 
@@ -462,7 +462,7 @@ void CSatchelCharge::Spawn( void )
 	Precache( );
 	// motor
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_SLIDE );
-	SetSolid( SOLID_BBOX ); 
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	SetModel( SATCHEL_CHARGE_MODEL );
 
@@ -507,7 +507,7 @@ void CSatchelCharge::SatchelUse( CBaseEntity *pActivator, CBaseEntity *pCaller, 
 void CSatchelCharge::SatchelTouch( CBaseEntity *pOther )
 {
 	Assert( pOther );
-	if ( pOther->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) || GetWaterLevel() > 0 )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER | FSOLID_VOLUME_CONTENTS) || GetWaterLevel() > 0 )
 		return;
 
 	StudioFrameAdvance( );

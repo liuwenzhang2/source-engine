@@ -105,7 +105,7 @@ void CCrossbowBolt::Spawn( )
 	SetModel( BOLT_MODEL );
 	UTIL_SetSize( this, -Vector(1, 1, 1), Vector(1, 1, 1) );
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	SetGravity( UTIL_ScaleForGravity( 40 ) );	// use a really low gravity (40 in/s^2)
 
@@ -126,7 +126,7 @@ void CCrossbowBolt::Precache( )
 
 void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 {
-	if ( !pOther->IsSolid() || pOther->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
+	if ( !pOther->GetEngineObject()->IsSolid() || pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
 		return;
 
 	SetTouch( NULL );

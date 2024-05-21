@@ -315,10 +315,10 @@ void CNPC_SecurityCamera::Spawn( void )
 	m_iHealth		= 1000;
 	m_bloodColor	= BLOOD_COLOR_MECH;
 	
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
-	SetCollisionBounds( Vector( -16.0f, -16.0f, -16.0f ), Vector( 16.0f, 16.0f, 16.0f ) );
+	GetEngineObject()->SetCollisionBounds( Vector( -16.0f, -16.0f, -16.0f ), Vector( 16.0f, 16.0f, 16.0f ) );
 
 	RemoveFlag( FL_AIMTARGET );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
@@ -1076,7 +1076,7 @@ void CNPC_SecurityCamera::DeathThink( void )
 
 	// lots of smoke
 	Vector pos;
-	CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &pos );
+	GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &pos );
 	
 	CBroadcastRecipientFilter filter;
 	

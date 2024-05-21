@@ -201,7 +201,7 @@ CAI_Squad::~CAI_Squad(void)
 
 bool CAI_Squad::IsSilentMember( const CAI_BaseNPC *pNPC )
 {
-	if ( !pNPC || ( pNPC->GetMoveType() == MOVETYPE_NONE && pNPC->GetSolid() == SOLID_NONE ) ) // a.k.a., enemy finder
+	if ( !pNPC || ( pNPC->GetMoveType() == MOVETYPE_NONE && pNPC->GetEngineObject()->GetSolid() == SOLID_NONE ) ) // a.k.a., enemy finder
 		return true;
 	return pNPC->IsSilentSquadMember();
 }

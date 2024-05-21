@@ -119,7 +119,7 @@ CMaterialModifyControl::CMaterialModifyControl()
 void CMaterialModifyControl::Spawn( void )
 {
 	Precache();
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 }
 
 //------------------------------------------------------------------------------

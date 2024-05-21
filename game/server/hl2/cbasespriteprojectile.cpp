@@ -40,7 +40,7 @@ void CBaseSpriteProjectile::Spawn(	char *pszModel,
 {
 	Precache();
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetModel( pszModel );
 
 	UTIL_SetSize( this, vec3_origin, vec3_origin );

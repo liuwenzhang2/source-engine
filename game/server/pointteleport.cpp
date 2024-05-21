@@ -137,7 +137,7 @@ void CPointTeleport::InputTeleport( inputdata_t &inputdata )
 			pPlayer->m_Local.m_bDucking = true;
 			pPlayer->m_Local.m_flDucktime = 0.0f;
 			pPlayer->SetViewOffset( VEC_DUCK_VIEW_SCALED( pPlayer ) );
-			pPlayer->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
+			pPlayer->GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 		}
 	}		
 #endif

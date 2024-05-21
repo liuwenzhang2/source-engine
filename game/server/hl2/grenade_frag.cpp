@@ -138,7 +138,7 @@ void CGrenadeFrag::Spawn( void )
 	BlipSound();
 	m_flNextBlipTime = gpGlobals->curtime + FRAG_GRENADE_BLIP_FREQUENCY;
 
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	m_combineSpawned	= false;
 	m_punted			= false;

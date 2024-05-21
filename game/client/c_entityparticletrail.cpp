@@ -200,7 +200,7 @@ void C_EntityParticleTrail::Update( float fTimeDelta )
 trailNoHitboxes:
 	while ( m_teParticleSpawn.NextEvent( tempDelta ) )
 	{
-		AddParticle( tempDelta, pMoveParent->GetOuter()->CollisionProp()->OBBMins(), pMoveParent->GetOuter()->CollisionProp()->OBBMaxs(), pMoveParent->EntityToWorldTransform() );
+		AddParticle( tempDelta, pMoveParent->GetOuter()->GetEngineObject()->CollisionProp()->OBBMins(), pMoveParent->GetOuter()->GetEngineObject()->CollisionProp()->OBBMaxs(), pMoveParent->EntityToWorldTransform() );
 	}
 }
 

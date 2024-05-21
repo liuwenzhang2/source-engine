@@ -1643,8 +1643,8 @@ void C_DODPlayer::GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType_
 	{
 		// Don't let the render bounds change when we're using blobby shadows, or else the shadow
 		// will pop and stretch.
-		mins = CollisionProp()->OBBMins();
-		maxs = CollisionProp()->OBBMaxs();
+		mins = GetEngineObject()->CollisionProp()->OBBMins();
+		maxs = GetEngineObject()->CollisionProp()->OBBMaxs();
 	}
 	else
 	{
@@ -2554,7 +2554,7 @@ void C_DODPlayer::AvoidPlayers( CUserCmd *pCmd )
 			continue;
 
 		// Is the avoid player solid?
-		if ( pAvoidPlayer->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
+		if ( pAvoidPlayer->GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
 			continue;
 
 		Vector t1, t2;

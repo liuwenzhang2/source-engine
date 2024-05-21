@@ -143,7 +143,7 @@ void CSquidSpit:: Spawn( void )
 	SetMoveType ( MOVETYPE_FLY );
 	SetClassname( "squidspit" );
 	
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	m_nRenderMode = kRenderTransAlpha;
 	SetRenderColorA( 255 );
@@ -188,7 +188,7 @@ void CSquidSpit::Touch ( CBaseEntity *pOther )
 	trace_t tr;
 	int		iPitch;
 
-	if ( pOther->GetSolidFlags() & FSOLID_TRIGGER )
+	if ( pOther->GetEngineObject()->GetSolidFlags() & FSOLID_TRIGGER )
 		 return;
 
 	if ( pOther->GetCollisionGroup() == HL2COLLISION_GROUP_SPIT)
@@ -274,8 +274,8 @@ void CNPC_Bullsquid::Spawn()
 	SetHullType(HULL_WIDE_SHORT);
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	

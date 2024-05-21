@@ -145,10 +145,10 @@ void CSpriteTrail::Spawn( void )
 	GetEngineObject()->SetModelName( m_iszSpriteName );
 	BaseClass::Spawn();
 
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NOCLIP );
 
-	SetCollisionBounds( vec3_origin, vec3_origin );
+	GetEngineObject()->SetCollisionBounds( vec3_origin, vec3_origin );
 	TurnOn();
 
 #endif
@@ -573,7 +573,7 @@ CSpriteTrail *CSpriteTrail::SpriteTrailCreate( const char *pSpriteName, const Ve
 	CSpriteTrail *pSprite = (CSpriteTrail*)gEntList.CreateEntityByName( "env_spritetrail" );
 
 	pSprite->SpriteInit( pSpriteName, origin );
-	pSprite->SetSolid( SOLID_NONE );
+	pSprite->GetEngineObject()->SetSolid( SOLID_NONE );
 	pSprite->SetMoveType( MOVETYPE_NOCLIP );
 	
 	UTIL_SetSize( pSprite, vec3_origin, vec3_origin );

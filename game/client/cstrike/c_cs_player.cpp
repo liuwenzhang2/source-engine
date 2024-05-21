@@ -961,8 +961,8 @@ void C_CSPlayer::GetShadowRenderBounds( Vector &mins, Vector &maxs, ShadowType_t
 	{
 		// Don't let the render bounds change when we're using blobby shadows, or else the shadow
 		// will pop and stretch.
-		mins = CollisionProp()->OBBMins();
-		maxs = CollisionProp()->OBBMaxs();
+		mins = GetEngineObject()->CollisionProp()->OBBMins();
+		maxs = GetEngineObject()->CollisionProp()->OBBMaxs();
 	}
 	else
 	{
@@ -1140,7 +1140,7 @@ void C_CSPlayer::CreateAddonModel( int i )
 	pEnt->GetEngineObject()->SetLocalAngles( QAngle( 0, 0, 0 ) );
 	if ( IsLocalPlayer() )
 	{
-		pEnt->SetSolid( SOLID_NONE );
+		pEnt->GetEngineObject()->SetSolid( SOLID_NONE );
 		pEnt->GetEngineObject()->RemoveEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 	}
 }

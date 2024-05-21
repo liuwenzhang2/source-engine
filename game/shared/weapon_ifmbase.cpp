@@ -45,8 +45,23 @@ END_DATADESC()
 CWeaponIFMBase::CWeaponIFMBase()
 {
 	//SetPredictionEligible( true );
-	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 }
+
+#ifdef GAME_DLL
+void CWeaponIFMBase::PostConstructor(const char* szClassname, int iForceEdictIndex)
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+}
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+bool CWeaponIFMBase::Init(int entnum, int iSerialNum)
+{
+	bool bRet = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+	return bRet;
+}
+#endif // CLIENT_DLL
 
 bool CWeaponIFMBase::IsPredicted() const
 { 

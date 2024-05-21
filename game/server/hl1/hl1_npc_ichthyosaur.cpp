@@ -200,13 +200,13 @@ void CNPC_Ichthyosaur::Spawn( void )
 	SetDefaultEyeOffset();
 
 	// Use our hitboxes to determine our render bounds
-	CollisionProp()->SetSurroundingBoundsType( USE_HITBOXES );
+	GetEngineObject()->SetSurroundingBoundsType( USE_HITBOXES );
 
 	SetNavType( NAV_FLY );
 	m_NPCState			= NPC_STATE_NONE;
 	
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	AddFlag( FL_FLY | FL_STEPMOVEMENT );
 

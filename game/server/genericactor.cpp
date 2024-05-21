@@ -124,12 +124,12 @@ void CGenericActor::Spawn()
 
 	if ( !FStrEq( STRING(GetEngineObject()->GetModelName() ), "models/blackout.mdl" ) )
 	{
-		SetSolid( SOLID_BBOX );
-		AddSolidFlags( FSOLID_NOT_STANDABLE );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	}
 	else
 	{
-		SetSolid( SOLID_NONE );
+		GetEngineObject()->SetSolid( SOLID_NONE );
 	}
 
 	SetMoveType( MOVETYPE_STEP );

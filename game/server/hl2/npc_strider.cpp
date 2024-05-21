@@ -511,8 +511,8 @@ void CNPC_Strider::Spawn()
 
 	AddFlag( FL_FLY );
 	SetCollisionGroup( HL2COLLISION_GROUP_STRIDER );
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE | EFL_NO_MEGAPHYSCANNON_RAGDOLL );
 
@@ -522,7 +522,7 @@ void CNPC_Strider::Spawn()
 	m_iszHunterClassname   = AllocPooledString( "npc_hunter" );
 
 	// BMCD: Force collision hooks
-	AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
+	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 	SetupGlobalModelData();
 	
 	CapabilitiesAdd( bits_CAP_MOVE_FLY | bits_CAP_INNATE_RANGE_ATTACK2 | bits_CAP_INNATE_MELEE_ATTACK1 | bits_CAP_INNATE_MELEE_ATTACK2 | bits_CAP_SQUAD );
@@ -577,7 +577,7 @@ void CNPC_Strider::SetupGlobalModelData()
 	CNPC_Strider::gm_strideLength = (maxs.x - mins.x) * 0.5;
 
 	// UNDONE: use crouch when crouched
-	CollisionProp()->SetSurroundingBoundsType( USE_HITBOXES );
+	GetEngineObject()->SetSurroundingBoundsType( USE_HITBOXES );
 }
 
 void CNPC_Strider::OnRestore()
@@ -1902,7 +1902,7 @@ void CNPC_Strider::HandleAnimEvent( animevent_t *pEvent )
 		CBaseEntity *pTarget = gEntList.FindEntityGeneric( NULL, pEvent->options, this, this );
 		if ( pTarget )
 		{
-			Vector vecTarget = pTarget->CollisionProp()->WorldSpaceCenter();
+			Vector vecTarget = pTarget->GetEngineObject()->WorldSpaceCenter();
 			ShootMinigun( &vecTarget, 0 );
 		}
 		break;
@@ -2491,9 +2491,9 @@ float CNPC_Strider::StriderEnemyDistance( CBaseEntity *pEnemy )
 	// Otherwise you'd do this:
 	// float enemyHeight = enemyMaxs.z - enemyMins.z;
 
-	float enemyHeight = pEnemy->CollisionProp()->OBBSize().z;
+	float enemyHeight = pEnemy->GetEngineObject()->OBBSize().z;
 	Vector striderSurroundMins, striderSurroundMaxs;
-	CollisionProp()->WorldSpaceSurroundingBounds( &striderSurroundMins, &striderSurroundMaxs );
+	GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &striderSurroundMins, &striderSurroundMaxs );
 	float myHeight = striderSurroundMaxs.z - striderSurroundMins.z;
 	
 	// max distance our centers can be apart with the boxes still overlapping
@@ -4279,7 +4279,7 @@ void CNPC_Strider::CarriedThink()
 
 	if( !CarriedByDropship() )
 	{
-		SetSolid( SOLID_BBOX );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
 		SetThink ( &CAI_BaseNPC::CallNPCThink );
 	}
 }
@@ -4447,7 +4447,7 @@ void CNPC_Strider::StompHit( int followerBoneIndex )
 	if ( pRagdoll )
 	{
 		// the strider might drag this through the world
-		pRagdoll->AddSolidFlags( FSOLID_NOT_SOLID );
+		pRagdoll->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 		m_hRagdoll = pRagdoll;
 		m_ragdollTime = gpGlobals->curtime + 10;
@@ -5480,7 +5480,7 @@ void CSparkTrail::Spawn()
 
 	UTIL_SetSize( this, Vector( 0, 0, 0 ), Vector( 0, 0, 0 ) );
 	SetMoveType( MOVETYPE_FLYGRAVITY );
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	if( random->RandomInt( 0, 2 ) == 0 )
 	{

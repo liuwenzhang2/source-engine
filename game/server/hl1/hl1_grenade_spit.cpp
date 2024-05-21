@@ -36,7 +36,7 @@ LINK_ENTITY_TO_CLASS( grenade_spit, CGrenadeSpit );
 void CGrenadeSpit::Spawn( void )
 {
 	Precache( );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 
 	// FIXME, if these is a sprite, then we need a base class derived from CSprite rather than

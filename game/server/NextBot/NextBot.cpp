@@ -226,8 +226,8 @@ void NextBotCombatCharacter::Spawn( void )
 	// reset bot components
 	Reset();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	
 	SetMoveType( MOVETYPE_CUSTOM );	
 	

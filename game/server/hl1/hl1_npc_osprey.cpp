@@ -448,7 +448,7 @@ CAI_BaseNPC *CNPC_Osprey::MakeGrunt( Vector vecSrc )
 	trace_t tr;
 	UTIL_TraceLine( vecSrc, vecSrc + Vector( 0, 0, -4096.0), MASK_NPCSOLID,  this, COLLISION_GROUP_NONE, &tr);
 	
-	if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->GetSolid() != SOLID_BSP) 
+	if ( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetSolid() != SOLID_BSP)
 		return NULL;
 
 	for (int i = 0; i < m_iUnits; i++)
@@ -711,7 +711,7 @@ void CBaseHelicopter::Spawn( void )
 {
 	Precache( );
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_STEP );
 	AddFlag( FL_FLY );
 
@@ -1253,7 +1253,7 @@ void CBaseHelicopter::UpdateRotorSoundPitch( int iPitch )
 void CBaseHelicopter::FlyTouch( CBaseEntity *pOther )
 {
 	// bounce if we hit something solid
-	if ( pOther->GetSolid() == SOLID_BSP) 
+	if ( pOther->GetEngineObject()->GetSolid() == SOLID_BSP)
 	{
 		const trace_t &tr = GetEngineObject()->GetTouchTrace( );
 
@@ -1271,7 +1271,7 @@ void CBaseHelicopter::FlyTouch( CBaseEntity *pOther )
 void CBaseHelicopter::CrashTouch( CBaseEntity *pOther )
 {
 	// only crash if we hit something solid
-	if ( pOther->GetSolid() == SOLID_BSP) 
+	if ( pOther->GetEngineObject()->GetSolid() == SOLID_BSP)
 	{
 		SetTouch( NULL );
 		SetNextThink( gpGlobals->curtime );

@@ -438,9 +438,7 @@ public:
 
 	// non-virtual methods. Don't override these!
 public:
-	// An inline version the game code can use
-	CCollisionProperty		*CollisionProp();
-	const CCollisionProperty*CollisionProp() const;
+
 	CEntityNetworkProperty *NetworkProp();
 	const CEntityNetworkProperty *NetworkProp() const;
 
@@ -450,16 +448,6 @@ public:
 	int				AreaNum() const {
 		return GetEngineObject()->AreaNum();
 	}	
-
-	SolidType_t				GetSolid() const;
-	bool					IsSolid() const;
-	void					SetSolid(SolidType_t val);
-	void					AddSolidFlags(int flags);
-	void					RemoveSolidFlags(int flags);
-	void					ClearSolidFlags(void);
-	bool					IsSolidFlagSet(int flagMask) const;
-	void				 	SetSolidFlags(int flags);
-	int			 			GetSolidFlags(void) const;
 
 	// Marks for deletion
 	void					MarkForDeletion();
@@ -1330,8 +1318,7 @@ public:
 	const Vector&			WorldAlignMins( ) const;
 	const Vector&			WorldAlignMaxs( ) const;
 
-	// This defines collision bounds in OBB space
-	void					SetCollisionBounds( const Vector& mins, const Vector &maxs );
+
 
 	// NOTE: The world space center *may* move when the entity rotates.
 	virtual const Vector&	WorldSpaceCenter( ) const;
@@ -1653,9 +1640,7 @@ private:
 	CNetworkVar( unsigned char, m_MoveType );		// One of the MOVETYPE_ defines.
 	CNetworkVar( unsigned char, m_MoveCollide );
 
-	friend class CCollisionProperty;
 	friend class CServerNetworkProperty;
-	CNetworkVarEmbedded( CCollisionProperty, m_Collision );
 
 	CNetworkHandle( CBaseEntity, m_hOwnerEntity );	// only used to point to an edict it won't collide with
 	CNetworkHandle( CBaseEntity, m_hEffectEntity );	// Fire/Dissolve entity.
@@ -2150,19 +2135,6 @@ inline void CBaseEntity::SetTextureFrameIndex( int iIndex )
 	m_iTextureFrameIndex = iIndex;
 }
 
-//-----------------------------------------------------------------------------
-// An inline version the game code can use
-//-----------------------------------------------------------------------------
-inline CCollisionProperty *CBaseEntity::CollisionProp()
-{
-	return &m_Collision;
-}
-
-inline const CCollisionProperty *CBaseEntity::CollisionProp() const
-{
-	return &m_Collision;
-}
-
 inline CEntityNetworkProperty *CBaseEntity::NetworkProp()
 {
 	return &m_Network;
@@ -2172,59 +2144,13 @@ inline const CEntityNetworkProperty *CBaseEntity::NetworkProp() const
 {
 	return &m_Network;
 }
-
-inline void CBaseEntity::ClearSolidFlags( void )
-{
-	CollisionProp()->ClearSolidFlags();
-}
-
-inline void CBaseEntity::RemoveSolidFlags( int flags )
-{
-	CollisionProp()->RemoveSolidFlags( flags );
-}
-
-inline void CBaseEntity::AddSolidFlags( int flags )
-{
-	CollisionProp()->AddSolidFlags( flags );
-}
-
-inline int CBaseEntity::GetSolidFlags( void ) const
-{
-	return CollisionProp()->GetSolidFlags();
-}
-
-inline bool CBaseEntity::IsSolidFlagSet( int flagMask ) const
-{
-	return CollisionProp()->IsSolidFlagSet( flagMask );
-}
-
-inline bool CBaseEntity::IsSolid() const
-{
-	return CollisionProp()->IsSolid( );
-}
-
-inline void CBaseEntity::SetSolid( SolidType_t val )
-{
-	CollisionProp()->SetSolid( val );
-}
-
-inline void CBaseEntity::SetSolidFlags( int flags )
-{
-	CollisionProp()->SetSolidFlags( flags );
-}
-
-inline SolidType_t CBaseEntity::GetSolid() const
-{
-	return CollisionProp()->GetSolid();
-}
-
-		 	 			 
+ 	 			 
 //-----------------------------------------------------------------------------
 // Methods related to IServerUnknown
 //-----------------------------------------------------------------------------
 inline ICollideable *CBaseEntity::GetCollideable()
 {
-	return &m_Collision;
+	return GetEngineObject()->CollisionProp();
 }
 
 inline IServerNetworkable *CBaseEntity::GetNetworkable()
@@ -2242,35 +2168,35 @@ inline CBaseEntity *CBaseEntity::GetBaseEntity()
 //-----------------------------------------------------------------------------
 inline const Vector& CBaseEntity::WorldAlignMins( ) const
 {
-	Assert( !CollisionProp()->IsBoundsDefinedInEntitySpace() );
-	Assert( CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return CollisionProp()->OBBMins();
+	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
+	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
+	return GetEngineObject()->CollisionProp()->OBBMins();
 }
 
 inline const Vector& CBaseEntity::WorldAlignMaxs( ) const
 {
-	Assert( !CollisionProp()->IsBoundsDefinedInEntitySpace() );
-	Assert( CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return CollisionProp()->OBBMaxs();
+	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
+	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
+	return GetEngineObject()->CollisionProp()->OBBMaxs();
 }
 
 inline const Vector& CBaseEntity::WorldAlignSize( ) const
 {
-	Assert( !CollisionProp()->IsBoundsDefinedInEntitySpace() );
-	Assert( CollisionProp()->GetCollisionAngles() == vec3_angle );
-	return CollisionProp()->OBBSize();
+	Assert( !GetEngineObject()->IsBoundsDefinedInEntitySpace() );
+	Assert(GetEngineObject()->CollisionProp()->GetCollisionAngles() == vec3_angle );
+	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->OBBSize();
 }
 
 // Returns a radius of a sphere *centered at the world space center*
 // bounding the collision representation of the entity
 inline float CBaseEntity::BoundingRadius() const
 {
-	return CollisionProp()->BoundingRadius();
+	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->BoundingRadius();
 }
 
 inline bool CBaseEntity::IsPointSized() const
 {
-	return CollisionProp()->BoundingRadius() == 0.0f;
+	return ((CCollisionProperty*)GetEngineObject()->CollisionProp())->BoundingRadius() == 0.0f;
 }
 
 inline void CBaseEntity::SetRenderMode( RenderMode_t nRenderMode )

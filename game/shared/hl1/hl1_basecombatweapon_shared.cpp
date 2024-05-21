@@ -24,7 +24,7 @@ void CBaseHL1CombatWeapon::Spawn( void )
 {
 	Precache();
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	m_flNextEmptySoundTime = 0.0f;
 
 	// Weapons won't show up in trace calls if they are being carried...
@@ -74,11 +74,11 @@ void CBaseHL1CombatWeapon::Spawn( void )
 	//Make weapons easier to pick up in MP.
 	if ( g_pGameRules->IsMultiplayer() )
 	{
-		CollisionProp()->UseTriggerBounds( true, 36 );
+		GetEngineObject()->UseTriggerBounds( true, 36 );
 	}
 	else
 	{
-		CollisionProp()->UseTriggerBounds( true, 24 );
+		GetEngineObject()->UseTriggerBounds( true, 24 );
 	}
 
 	// Use more efficient bbox culling on the client. Otherwise, it'll setup bones for most

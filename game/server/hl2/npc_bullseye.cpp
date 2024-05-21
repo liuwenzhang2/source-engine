@@ -166,11 +166,11 @@ void CNPC_Bullseye::Spawn( void )
 	SetThink( &CNPC_Bullseye::BullseyeThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	if(GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_NONSOLID)
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 	
 	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_VPHYSICSSHADOW)
@@ -246,7 +246,7 @@ void CNPC_Bullseye::Event_Killed( const CTakeDamageInfo &info )
 	}
 
 	SetMoveType( MOVETYPE_NONE );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	UTIL_SetSize(this, vec3_origin, vec3_origin );
 
 	SetNextThink( gpGlobals->curtime + 0.1f );

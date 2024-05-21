@@ -2018,11 +2018,11 @@ void C_BasePlayer::PostThink( void )
 		// Need to do this on the client to avoid prediction errors
 		if ( GetFlags() & FL_DUCKING )
 		{
-			SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
+			GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 		}
 		else
 		{
-			SetCollisionBounds( VEC_HULL_MIN, VEC_HULL_MAX );
+			GetEngineObject()->SetCollisionBounds( VEC_HULL_MIN, VEC_HULL_MAX );
 		}
 		
 		if ( !CommentaryModeShouldSwallowInput( this ) )

@@ -25,7 +25,7 @@ LINK_ENTITY_TO_CLASS( npc_handgrenade, CBaseGrenadeTimed );
 void CBaseGrenadeTimed::Spawn( void )
 {
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	SetModel( "models/Weapons/w_grenade.mdl" ); 
 

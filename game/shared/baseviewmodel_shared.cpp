@@ -83,7 +83,7 @@ void CBaseViewModel::Spawn( void )
 {
 	Precache( );
 	SetSize( Vector( -8, -4, -2), Vector(8, 4, 2) );
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 }
 
 

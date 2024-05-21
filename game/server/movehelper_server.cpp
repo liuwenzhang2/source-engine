@@ -217,7 +217,7 @@ void CMoveHelperServer::ProcessImpacts( void )
 	m_pHostPlayer->GetEngineObject()->PhysicsTouchTriggers();
 
 	// Don't bother if the player ain't solid
-	if ( m_pHostPlayer->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
+	if ( m_pHostPlayer->GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
 		return;
 
 	// Save off the velocity, cause we need to temporarily reset it

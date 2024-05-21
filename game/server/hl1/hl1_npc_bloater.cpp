@@ -62,8 +62,8 @@ void CNPC_Bloater::Spawn()
 	SetModel( "models/floater.mdl");
 //	UTIL_SetSize( this, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX );
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->AddSpawnFlags(FL_FLY);//need check
 	m_bloodColor		= BLOOD_COLOR_GREEN;

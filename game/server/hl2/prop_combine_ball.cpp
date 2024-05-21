@@ -331,11 +331,11 @@ void CPropCombineBall::SetRadius( float flRadius )
 //-----------------------------------------------------------------------------
 bool CPropCombineBall::CreateVPhysics()
 {
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	float flSize = m_flRadius;
 
-	SetCollisionBounds( Vector(-flSize, -flSize, -flSize), Vector(flSize, flSize, flSize) );
+	GetEngineObject()->SetCollisionBounds( Vector(-flSize, -flSize, -flSize), Vector(flSize, flSize, flSize) );
 	objectparams_t params = g_PhysDefaultObjectParams;
 	params.pGameData = static_cast<void *>(this);
 	int nMaterialIndex = physprops->GetSurfaceIndex("metal_bouncy");
@@ -676,7 +676,7 @@ void CPropCombineBall::DieThink()
 //-----------------------------------------------------------------------------
 void CPropCombineBall::FadeOut( float flDuration )
 {
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	// Start up the eye trail
 	if ( m_pGlowTrail != NULL )
@@ -1142,7 +1142,7 @@ void CPropCombineBall::DoExplosion( )
 	// Turn us off and wait because we need our trails to finish up properly
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetMoveType( MOVETYPE_NONE );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	m_bEmit = false;
 
@@ -1839,12 +1839,12 @@ void CFuncCombineBallSpawner::Spawn()
 
 	AddEffects( EF_NODRAW );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	SetSolid( SOLID_BSP );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BSP );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	m_nBallsRemainingInField = m_nBallCount;
 
-	float flWidth = CollisionProp()->OBBSize().x;
-	float flHeight = CollisionProp()->OBBSize().y;
+	float flWidth = GetEngineObject()->OBBSize().x;
+	float flHeight = GetEngineObject()->OBBSize().y;
 	m_flRadius = MIN( flWidth, flHeight ) * 0.5f;
 	if ( m_flRadius <= 0.0f && m_bShooter == false )
 	{
@@ -1857,7 +1857,7 @@ void CFuncCombineBallSpawner::Spawn()
 	float flDeltaT = 1.0f;
 	if ( !( m_flMinSpeed == 0 && m_flMaxSpeed == 0 ) )
 	{
-		flDeltaT = (CollisionProp()->OBBSize().z - 2 * m_flBallRadius) / ((m_flMinSpeed + m_flMaxSpeed) * 0.5f);
+		flDeltaT = (GetEngineObject()->OBBSize().z - 2 * m_flBallRadius) / ((m_flMinSpeed + m_flMaxSpeed) * 0.5f);
 		flDeltaT /= m_nBallCount;
 	}
 
@@ -1923,8 +1923,8 @@ void CFuncCombineBallSpawner::InputDisable( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CFuncCombineBallSpawner::ChoosePointInBox( Vector *pVecPoint )
 {
-	float flXBoundary = ( CollisionProp()->OBBSize().x != 0 ) ? m_flBallRadius / CollisionProp()->OBBSize().x : 0.0f;
-	float flYBoundary = ( CollisionProp()->OBBSize().y != 0 ) ? m_flBallRadius / CollisionProp()->OBBSize().y : 0.0f;
+	float flXBoundary = (GetEngineObject()->OBBSize().x != 0 ) ? m_flBallRadius / GetEngineObject()->OBBSize().x : 0.0f;
+	float flYBoundary = (GetEngineObject()->OBBSize().y != 0 ) ? m_flBallRadius / GetEngineObject()->OBBSize().y : 0.0f;
 	if ( flXBoundary > 0.5f )
 	{
 		flXBoundary = 0.5f;
@@ -1934,7 +1934,7 @@ void CFuncCombineBallSpawner::ChoosePointInBox( Vector *pVecPoint )
 		flYBoundary = 0.5f;
 	}
 
-	CollisionProp()->RandomPointInBounds( 
+	GetEngineObject()->RandomPointInBounds(
 		Vector( flXBoundary, flYBoundary, 0.0f ), Vector( 1.0f - flXBoundary, 1.0f - flYBoundary, 0.0f ), pVecPoint );
 }
 
@@ -1944,18 +1944,18 @@ void CFuncCombineBallSpawner::ChoosePointInBox( Vector *pVecPoint )
 //-----------------------------------------------------------------------------
 void CFuncCombineBallSpawner::ChoosePointInCylinder( Vector *pVecPoint )
 {
-	float flXRange = m_flRadius / CollisionProp()->OBBSize().x;
-	float flYRange = m_flRadius / CollisionProp()->OBBSize().y;
+	float flXRange = m_flRadius / GetEngineObject()->OBBSize().x;
+	float flYRange = m_flRadius / GetEngineObject()->OBBSize().y;
 
 	Vector vecEndPoint1, vecEndPoint2;
-	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &vecEndPoint1 ); 
-	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &vecEndPoint2 ); 
+	GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &vecEndPoint1 );
+	GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &vecEndPoint2 );
 
 	// Choose a point inside the cylinder
 	float flDistSq;
 	do
 	{
-		CollisionProp()->RandomPointInBounds( 
+		GetEngineObject()->RandomPointInBounds(
 			Vector( 0.5f - flXRange, 0.5f - flYRange, 0.0f ),
 			Vector( 0.5f + flXRange, 0.5f + flYRange, 0.0f ),
 			pVecPoint );
@@ -1989,7 +1989,7 @@ void CFuncCombineBallSpawner::GetTargetEndpoint( bool bForward, Vector *pVecEndP
 {
 	float flZValue = bForward ? 1.0f : 0.0f;
 
-	CollisionProp()->RandomPointInBounds( 
+	GetEngineObject()->RandomPointInBounds(
 		Vector( 0.0f, 0.0f, flZValue ), Vector( 1.0f, 1.0f, flZValue ), pVecEndPoint );
 }
 
@@ -2009,7 +2009,7 @@ void CFuncCombineBallSpawner::BallGrabbed( CBaseEntity *pCombineBall )
 	// Wait for another ball to touch this to re-power it up.
 	if (GetEngineObject()->HasSpawnFlags( SF_SPAWNER_POWER_SUPPLY ) )
 	{
-		AddSolidFlags( FSOLID_TRIGGER );
+		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 		SetTouch( &CFuncCombineBallSpawner::GrabBallTouch );
 	}
 
@@ -2045,7 +2045,7 @@ void CFuncCombineBallSpawner::GrabBallTouch( CBaseEntity *pOther )
 		return;
 
 	// Don't grab fading out balls...
-	if ( !pBall->IsSolid() )
+	if ( !pBall->GetEngineObject()->IsSolid() )
 		return;
 
 	// Don't capture balls that were very recently in the field (breaks punting)
@@ -2066,7 +2066,7 @@ void CFuncCombineBallSpawner::GrabBallTouch( CBaseEntity *pOther )
 
 	if ( m_nBallsRemainingInField >= m_nBallCount )
 	{
-		RemoveSolidFlags( FSOLID_TRIGGER );
+		GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
 		SetTouch( NULL );
 	}
 

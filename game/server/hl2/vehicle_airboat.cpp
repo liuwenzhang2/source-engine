@@ -384,7 +384,7 @@ void CPropAirboat::Spawn( void )
 	SetCollisionGroup( COLLISION_GROUP_VEHICLE );
 	BaseClass::Spawn();
 
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetAnimatedEveryTick( true );
 
 	// Handbrake data.
@@ -505,7 +505,7 @@ void CPropAirboat::CreatePlayerBlocker()
 		m_hPlayerBlocker->GetEngineObject()->SetLocalOrigin( vec3_origin );
 		m_hPlayerBlocker->GetEngineObject()->SetLocalAngles( vec3_angle );
 		m_hPlayerBlocker->SetCollisionGroup( COLLISION_GROUP_PLAYER );
-		m_hPlayerBlocker->AddSolidFlags( FSOLID_NOT_SOLID );
+		m_hPlayerBlocker->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 }
 
@@ -534,11 +534,11 @@ void CPropAirboat::EnablePlayerBlocker( bool bEnable )
 	{
 		if ( bEnable )
 		{
-			m_hPlayerBlocker->RemoveSolidFlags( FSOLID_NOT_SOLID );
+			m_hPlayerBlocker->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		}
 		else
 		{
-			m_hPlayerBlocker->AddSolidFlags( FSOLID_NOT_SOLID );
+			m_hPlayerBlocker->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		}
 	}
 }
@@ -1122,13 +1122,13 @@ void CPropAirboat::Think(void)
 
 	// Find the vertical extents of the boat
 	Vector startPos, endPos;
-	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &startPos );
-	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &endPos );
+	GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &startPos );
+	GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &endPos );
 
 	// Look for water along that volume.
 	// Make a very vertically thin box and sweep it along the ray.
-	Vector vecMins = CollisionProp()->OBBMins();
-	Vector vecMaxs = CollisionProp()->OBBMaxs();
+	Vector vecMins = GetEngineObject()->CollisionProp()->OBBMins();
+	Vector vecMaxs = GetEngineObject()->CollisionProp()->OBBMaxs();
 	vecMins.z = -0.1f;
 	vecMaxs.z = 0.1f;
 

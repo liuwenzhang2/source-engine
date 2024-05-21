@@ -100,7 +100,7 @@ void CScriptIntro::Spawn( void )
 	m_iNextBlendMode = -1;
 	m_iQueuedBlendMode = -1;
 	m_iQueuedNextBlendMode = -1;
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetSize( -Vector(5,5,5), Vector(5,5,5) );
 	m_bActive = false;
 	m_iNextFOV = 0;

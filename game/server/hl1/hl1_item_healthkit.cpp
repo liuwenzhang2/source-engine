@@ -226,7 +226,7 @@ void CWallHealth::Spawn(void)
 {
 	Precache( );
 
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 	SetMoveType( MOVETYPE_PUSH );
 
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );

@@ -1373,7 +1373,7 @@ public:
 		CBaseEntity *pEnt = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
 
 		// Done to avoid hitting an entity that's both solid & a trigger.
-		if ( pEnt->IsSolid() )
+		if ( pEnt->GetEngineObject()->IsSolid() )
 			return true;
 
 		enginetrace->ClipRayToEntity( *m_pRay, m_ContentsMask, pHandleEntity, &tr );
@@ -5439,8 +5439,8 @@ float CAI_BaseNPC::EnemyDistance( CBaseEntity *pEnemy )
 	// pEnemy->CollisionProp()->WorldSpaceSurroundingBounds( &enemyMins, &enemyMaxs );
 	// float enemyHeight = enemyMaxs.z - enemyMins.z;
 
-	float enemyHeight = pEnemy->CollisionProp()->OBBSize().z;
-	float myHeight = CollisionProp()->OBBSize().z;
+	float enemyHeight = pEnemy->GetEngineObject()->OBBSize().z;
+	float myHeight = GetEngineObject()->OBBSize().z;
 	
 	// max distance our centers can be apart with the boxes still overlapping
 	float flMaxZDist = ( enemyHeight + myHeight ) * 0.5f;
@@ -6735,12 +6735,12 @@ bool CAI_BaseNPC::IsNavHullValid() const
 	Vector hullMin = GetHullMins();
 	Vector hullMax = GetHullMaxs();
 	Vector vecMins, vecMaxs;
-	if ( GetSolid() == SOLID_BBOX )
+	if (GetEngineObject()->GetSolid() == SOLID_BBOX )
 	{
 		vecMins = WorldAlignMins();
 		vecMaxs = WorldAlignMaxs();
 	}
-	else if ( GetSolid() == SOLID_VPHYSICS )
+	else if (GetEngineObject()->GetSolid() == SOLID_VPHYSICS )
 	{
 		Assert( VPhysicsGetObject() );
 		const CPhysCollide *pPhysCollide = VPhysicsGetObject()->GetCollide();
@@ -6803,7 +6803,7 @@ void CAI_BaseNPC::NPCInit ( void )
 
 	// Set fields common to all npcs
 	AddFlag( FL_AIMTARGET | FL_NPC );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	m_flOriginalYaw = GetEngineObject()->GetAbsAngles().y;
 
@@ -9394,7 +9394,7 @@ void CAI_BaseNPC::ReportOverThinkLimit( float time )
 	if (ai_think_limit_label.GetBool()) 
 	{
 		Vector tmp;
-		CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &tmp );
+		((CCollisionProperty*)GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 1.0f ), &tmp );
 		tmp.z += 16;
 
 		float max = -1;
@@ -10030,7 +10030,7 @@ void CAI_BaseNPC::NPCInitDead( void )
 {
 	InitBoneControllers();
 
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 	// so he'll fall to ground
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
@@ -11870,7 +11870,7 @@ bool CAI_BaseNPC::CineCleanup()
 	else
 	{
 		// arg, punt
-		AddSolidFlags( FSOLID_NOT_STANDABLE );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	}
 	
 	m_hCine = NULL;
@@ -11884,7 +11884,7 @@ bool CAI_BaseNPC::CineCleanup()
 			m_iHealth = 0;
 		}
 		
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		SetState( NPC_STATE_DEAD );
 		m_lifeState = LIFE_DEAD;
 		UTIL_SetSize( this, WorldAlignMins(), Vector(WorldAlignMaxs().x, WorldAlignMaxs().y, WorldAlignMins().z + 2) );
@@ -12786,7 +12786,7 @@ void CAI_BaseNPC::Break( CBaseEntity *pBreaker )
 	IPhysicsObject *pPhysics = VPhysicsGetObject();
 	Vector origin;
 	QAngle angles;
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	if ( pPhysics )
 	{
 		pPhysics->GetVelocity( &velocity, &angVelocity );
@@ -13805,8 +13805,8 @@ bool CAI_BaseNPC::InteractionCouldStart( CAI_BaseNPC *pOtherNPC, ScriptedNPCInte
 
 	// Do a knee-level trace to find low physics objects
 	Vector vecMyKnee, vecOtherKnee;
-	CollisionProp()->NormalizedToWorldSpace( Vector(0,0,0.25f), &vecMyKnee );
-	pOtherNPC->CollisionProp()->NormalizedToWorldSpace( Vector(0,0,0.25f), &vecOtherKnee );
+	((CCollisionProperty*)GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector(0,0,0.25f), &vecMyKnee );
+	((CCollisionProperty*)pOtherNPC->GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector(0,0,0.25f), &vecOtherKnee );
 	AI_TraceLine( vecMyKnee, vecOtherKnee, MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr);
 	if ( tr.fraction != 1.0 && tr.m_pEnt != pOtherNPC )
 	{

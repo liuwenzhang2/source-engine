@@ -635,7 +635,7 @@ void C_ClientRagdoll::Release( void )
 	}
 	//ClientEntityList().RemoveEntity( this );
 
-	partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, CollisionProp()->GetPartitionHandle() );
+	partition->Remove( PARTITION_CLIENT_SOLID_EDICTS | PARTITION_CLIENT_RESPONSIVE_EDICTS | PARTITION_CLIENT_NON_STATIC_EDICTS, GetEngineObject()->GetPartitionHandle() );
 	RemoveFromLeafSystem();
 
 	BaseClass::Release();
@@ -3210,7 +3210,7 @@ void C_BaseAnimating::DoInternalDrawModel( ClientModelRenderInfo_t *pInfo, DrawM
 		{
 			m_pRagdoll->DrawWireframe();
 		}
-		else if ( IsSolid() && CollisionProp()->GetSolid() == SOLID_VPHYSICS )
+		else if (GetEngineObject()->IsSolid() && GetEngineObject()->CollisionProp()->GetSolid() == SOLID_VPHYSICS )
 		{
 			vcollide_t *pCollide = modelinfo->GetVCollide(GetEngineObject()->GetModelIndex() );
 			if ( pCollide && pCollide->solidCount == 1 )
@@ -4404,7 +4404,7 @@ void C_BaseAnimating::RagdollMoved( void )
 
 	Vector mins, maxs;
 	m_pRagdoll->GetRagdollBounds( mins, maxs );
-	SetCollisionBounds( mins, maxs );
+	GetEngineObject()->SetCollisionBounds( mins, maxs );
 
 	// If the ragdoll moves, its render-to-texture shadow is dirty
 	GetEngineObject()->InvalidatePhysicsRecursive( ANIMATION_CHANGED );
@@ -4945,7 +4945,7 @@ void C_BaseAnimating::Simulate()
 
 bool C_BaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
-	if ( ray.m_IsRay && IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ))
+	if ( ray.m_IsRay && GetEngineObject()->IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ))
 	{
 		if (!TestHitboxes( ray, fContentsMask, tr ))
 			return true;
@@ -4953,7 +4953,7 @@ bool C_BaseAnimating::TestCollision( const Ray_t &ray, unsigned int fContentsMas
 		return tr.DidHit();
 	}
 
-	if ( !ray.m_IsRay && IsSolidFlagSet( FSOLID_CUSTOMBOXTEST ))
+	if ( !ray.m_IsRay && GetEngineObject()->IsSolidFlagSet( FSOLID_CUSTOMBOXTEST ))
 	{
 		if (!TestHitboxes( ray, fContentsMask, tr ))
 			return true;
@@ -5665,7 +5665,7 @@ void C_BaseAnimating::ClearRagdoll()
 		// If we have ragdoll mins/maxs, we've just come out of ragdoll, so restore them
 		if ( m_vecPreRagdollMins != vec3_origin || m_vecPreRagdollMaxs != vec3_origin )
 		{
-			SetCollisionBounds( m_vecPreRagdollMins, m_vecPreRagdollMaxs );
+			GetEngineObject()->SetCollisionBounds( m_vecPreRagdollMins, m_vecPreRagdollMaxs );
 		}
 
 #if defined( REPLAY_ENABLED )
@@ -5938,7 +5938,7 @@ void C_BaseAnimating::UpdateModelScale()
 
 void C_BaseAnimating::RefreshCollisionBounds( void )
 {
-	CollisionProp()->RefreshScaledCollisionBounds();
+	GetEngineObject()->RefreshScaledCollisionBounds();
 }
 
 //-----------------------------------------------------------------------------

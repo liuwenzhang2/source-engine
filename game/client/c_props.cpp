@@ -40,7 +40,7 @@ bool C_DynamicProp::TestBoneFollowers( const Ray_t &ray, unsigned int fContentsM
 	// preferable.
 	CBaseEntity	*pList[128];
 	Vector mins, maxs;
-	CollisionProp()->WorldSpaceAABB( &mins, &maxs );
+	GetEngineObject()->WorldSpaceAABB( &mins, &maxs );
 	int count = UTIL_EntitiesInBox( pList, ARRAYSIZE(pList), mins, maxs, 0, PARTITION_CLIENT_SOLID_EDICTS );
 	for ( int i = 0; i < count; i++ )
 	{
@@ -57,10 +57,10 @@ bool C_DynamicProp::TestBoneFollowers( const Ray_t &ray, unsigned int fContentsM
 
 bool C_DynamicProp::TestCollision( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr )
 {
-	if ( IsSolidFlagSet(FSOLID_NOT_SOLID) )
+	if (GetEngineObject()->IsSolidFlagSet(FSOLID_NOT_SOLID) )
 	{
 		// if this entity is marked non-solid and custom test it must have bone followers
-		if ( IsSolidFlagSet( FSOLID_CUSTOMBOXTEST ) && IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ))
+		if (GetEngineObject()->IsSolidFlagSet( FSOLID_CUSTOMBOXTEST ) && GetEngineObject()->IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ))
 		{
 			return TestBoneFollowers( ray, fContentsMask, tr );
 		}
@@ -153,7 +153,7 @@ void C_BasePropDoor::OnDataChanged( DataUpdateType_t type )
 
 	if ( type == DATA_UPDATE_CREATED )
 	{
-		SetSolid(SOLID_VPHYSICS);
+		GetEngineObject()->SetSolid(SOLID_VPHYSICS);
 		VPhysicsInitShadow( false, false );
 	}
 	else if ( VPhysicsGetObject() )

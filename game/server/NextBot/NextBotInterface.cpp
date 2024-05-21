@@ -231,8 +231,8 @@ bool INextBot::IsRangeLessThan( CBaseEntity *subject, float range ) const
 	if ( !bot || !subject )
 		return 0.0f;
 
-	bot->CollisionProp()->CalcNearestPoint( subject->WorldSpaceCenter(), &botPos );
-	float computedRange = subject->CollisionProp()->CalcDistanceFromPoint( botPos );
+	bot->GetEngineObject()->CalcNearestPoint( subject->WorldSpaceCenter(), &botPos );
+	float computedRange = subject->GetEngineObject()->CalcDistanceFromPoint( botPos );
 	return computedRange < range;
 }
 
@@ -253,8 +253,8 @@ bool INextBot::IsRangeGreaterThan( CBaseEntity *subject, float range ) const
 	if ( !bot || !subject )
 		return true;
 
-	bot->CollisionProp()->CalcNearestPoint( subject->WorldSpaceCenter(), &botPos );
-	float computedRange = subject->CollisionProp()->CalcDistanceFromPoint( botPos );
+	bot->GetEngineObject()->CalcNearestPoint( subject->WorldSpaceCenter(), &botPos );
+	float computedRange = subject->GetEngineObject()->CalcDistanceFromPoint( botPos );
 	return computedRange > range;
 }
 
@@ -275,8 +275,8 @@ float INextBot::GetRangeTo( CBaseEntity *subject ) const
 	if ( !bot || !subject )
 		return 0.0f;
 
-	bot->CollisionProp()->CalcNearestPoint( subject->WorldSpaceCenter(), &botPos );
-	float computedRange = subject->CollisionProp()->CalcDistanceFromPoint( botPos );
+	bot->GetEngineObject()->CalcNearestPoint( subject->WorldSpaceCenter(), &botPos );
+	float computedRange = subject->GetEngineObject()->CalcDistanceFromPoint( botPos );
 	return computedRange;
 }
 
@@ -297,8 +297,8 @@ float INextBot::GetRangeSquaredTo( CBaseEntity *subject ) const
 	if ( !bot || !subject )
 		return 0.0f;
 
-	bot->CollisionProp()->CalcNearestPoint( subject->WorldSpaceCenter(), &botPos );
-	float computedRange = subject->CollisionProp()->CalcDistanceFromPoint( botPos );
+	bot->GetEngineObject()->CalcNearestPoint( subject->WorldSpaceCenter(), &botPos );
+	float computedRange = subject->GetEngineObject()->CalcDistanceFromPoint( botPos );
 	return computedRange * computedRange;
 }
 

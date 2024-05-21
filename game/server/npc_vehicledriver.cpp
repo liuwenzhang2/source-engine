@@ -105,8 +105,8 @@ void CNPC_VehicleDriver::Spawn( void )
 	m_iMaxHealth = m_iHealth = 1;
 	m_flFieldOfView	= VIEW_FIELD_FULL;
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 	AddEffects( EF_NODRAW );
 
@@ -721,7 +721,7 @@ bool CNPC_VehicleDriver::OverridePathMove( float flInterval )
 
 	// Have we reached our target? See if we've passed the current waypoint's plane.
 	Vector vecAbsMins, vecAbsMaxs;
-	CollisionProp()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
+	GetEngineObject()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
 	if ( BoxOnPlaneSide( vecAbsMins, vecAbsMaxs, &m_pCurrentWaypoint->planeWaypoint ) == 3 )
 	{
 		if ( WaypointReached() )
@@ -955,8 +955,8 @@ void CNPC_VehicleDriver::CheckForTeleport( void )
 
 		// Teleport the vehicle to the pathcorner
 		Vector vecMins, vecMaxs;
-		vecMins = m_hVehicleEntity->CollisionProp()->OBBMins();
-		vecMaxs = m_hVehicleEntity->CollisionProp()->OBBMaxs();
+		vecMins = m_hVehicleEntity->GetEngineObject()->CollisionProp()->OBBMins();
+		vecMaxs = m_hVehicleEntity->GetEngineObject()->CollisionProp()->OBBMaxs();
 		Vector vecTarget = pTrack->GetEngineObject()->GetAbsOrigin() - (vecMins + vecMaxs) * 0.5;
 		vecTarget.z += ((vecMaxs.z - vecMins.z) * 0.5) + 8;	// Safety buffer
 

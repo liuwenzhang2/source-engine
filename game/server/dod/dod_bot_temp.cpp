@@ -228,7 +228,7 @@ void Bot_Think( CDODPlayer *pBot )
 		pBot->HandleCommand_JoinClass( botdata->m_WantedClass );
 		pBot->DODRespawn();
 	}
-	else if ( pBot->IsAlive() && (pBot->GetSolid() == SOLID_BBOX) )
+	else if ( pBot->IsAlive() && (pBot->GetEngineObject()->GetSolid() == SOLID_BBOX) )
 	{
 		trace_t trace;
 

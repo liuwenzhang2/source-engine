@@ -1585,7 +1585,7 @@ Activity CFastZombie::NPC_TranslateActivity( Activity baseAct )
 //---------------------------------------------------------
 void CFastZombie::LeapAttackTouch( CBaseEntity *pOther )
 {
-	if ( !pOther->IsSolid() )
+	if ( !pOther->GetEngineObject()->IsSolid() )
 	{
 		// Touching a trigger or something.
 		return;

@@ -258,7 +258,7 @@ void CAmbientGeneric::Spawn( void )
 		return;
 	}
 
-    SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
     SetMoveType( MOVETYPE_NONE );
 
 	// Set up think function for dynamic modification 

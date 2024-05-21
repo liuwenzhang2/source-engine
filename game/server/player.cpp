@@ -1645,7 +1645,7 @@ int CBasePlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	}
 
 	if ( info.GetInflictor() && (GetMoveType() == MOVETYPE_WALK) && 
-		( !attacker->IsSolidFlagSet(FSOLID_TRIGGER)) )
+		( !attacker->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER)) )
 	{
 		Vector force = vecDir * -DamageForce( WorldAlignSize(), info.GetBaseDamage() );
 		if ( force.z > 250.0f )
@@ -1738,7 +1738,7 @@ void CBasePlayer::Event_Killed( const CTakeDamageInfo &info )
 	m_lifeState		= LIFE_DYING;
 
 	pl.deadflag = true;
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	// force contact points to get flushed if no longer valid
 	// UNDONE: Always do this on RecheckCollisionFilter() ?
 	IPhysicsObject *pObject = VPhysicsGetObject();
@@ -2311,7 +2311,7 @@ bool CBasePlayer::StartObserverMode(int mode)
 	
 	RemoveFlag( FL_DUCKING );
 	
-    AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	SetObserverMode( mode );
 
@@ -2907,7 +2907,7 @@ bool CBasePlayer::CanPickupObject( CBaseEntity *pObject, float massLimit, float 
 
 	if ( sizeLimit > 0 )
 	{
-		const Vector &size = pObject->CollisionProp()->OBBSize();
+		const Vector &size = pObject->GetEngineObject()->OBBSize();
 		if ( size.x > sizeLimit || size.y > sizeLimit || size.z > sizeLimit )
 			return false;
 	}
@@ -4567,11 +4567,11 @@ void CBasePlayer::PostThink()
 			VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-Bounds" );
 			if ( GetFlags() & FL_DUCKING )
 			{
-				SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
+				GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 			}
 			else
 			{
-				SetCollisionBounds( VEC_HULL_MIN, VEC_HULL_MAX );
+				GetEngineObject()->SetCollisionBounds( VEC_HULL_MIN, VEC_HULL_MAX );
 			}
 			VPROF_SCOPE_END();
 
@@ -4677,7 +4677,7 @@ void CBasePlayer::Touch( CBaseEntity *pOther )
 	if (pOther == (GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL))
 		return;
 
-	if ( pOther->GetMoveType() != MOVETYPE_VPHYSICS || pOther->GetSolid() != SOLID_VPHYSICS || (pOther->GetSolidFlags() & FSOLID_TRIGGER) )
+	if ( pOther->GetMoveType() != MOVETYPE_VPHYSICS || pOther->GetEngineObject()->GetSolid() != SOLID_VPHYSICS || (pOther->GetEngineObject()->GetSolidFlags() & FSOLID_TRIGGER) )
 		return;
 
 	IPhysicsObject *pPhys = pOther->VPhysicsGetObject();
@@ -6677,7 +6677,7 @@ bool CBasePlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	{
 		pWeapon->CheckRespawn();
 
-		pWeapon->AddSolidFlags( FSOLID_NOT_SOLID );
+		pWeapon->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		pWeapon->AddEffects( EF_NODRAW );
 
 		Weapon_Equip( pWeapon );

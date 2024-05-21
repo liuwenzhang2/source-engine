@@ -374,7 +374,7 @@ void CNPC_RocketTurret::Spawn( void )
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
 	SetModel( ROCKET_TURRET_MODEL_NAME );
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 
 	m_iMuzzleAttachment = LookupAttachment ( "barrel" );
 	m_iLightAttachment = LookupAttachment ( "eye" );
@@ -1287,7 +1287,7 @@ void CRocket_Turret_Projectile::MissileTouch( CBaseEntity *pOther )
 		SetLocalAngularVelocity ( QAngle ( 180, 90, 45 ) );
 		UTIL_Remove ( m_hRocketTrail );
 
-		SetSolid ( SOLID_NONE );
+		GetEngineObject()->SetSolid ( SOLID_NONE );
 
 		if( m_hRocketTrail )
 		{
@@ -1299,7 +1299,7 @@ void CRocket_Turret_Projectile::MissileTouch( CBaseEntity *pOther )
 	}
 
 	// Don't touch triggers (but DO hit weapons)
-	if ( pOther->IsSolidFlagSet(FSOLID_TRIGGER|FSOLID_VOLUME_CONTENTS) && pOther->GetCollisionGroup() != COLLISION_GROUP_WEAPON )
+	if ( pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER|FSOLID_VOLUME_CONTENTS) && pOther->GetCollisionGroup() != COLLISION_GROUP_WEAPON )
 		return;
 
 	Explode();

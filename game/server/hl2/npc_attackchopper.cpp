@@ -1860,7 +1860,7 @@ void CNPC_AttackHelicopter::ShootAtPlayer( const Vector &vBasePos, const Vector 
 		if ( nActualTargets > nNearbyTargetCount )
 		{
 			// FIXME: Constrain to the firing cone?
-			ppNearbyTargets[nNearbyTargetCount]->CollisionProp()->RandomPointInBounds( Vector(.25, .25, .25), Vector(.75, .75, .75), &info.m_vecDirShooting );
+			ppNearbyTargets[nNearbyTargetCount]->GetEngineObject()->RandomPointInBounds( Vector(.25, .25, .25), Vector(.75, .75, .75), &info.m_vecDirShooting );
 			info.m_vecDirShooting -= vBasePos;
 			VectorNormalize( info.m_vecDirShooting );
 			info.m_vecSpread = VECTOR_CONE_PRECALCULATED;
@@ -1875,7 +1875,7 @@ void CNPC_AttackHelicopter::ShootAtPlayer( const Vector &vBasePos, const Vector 
 
 		if ( GetEnemy() && ( nPlayerShotCount < nDesiredHitCount ))
 		{
-			GetEnemy()->CollisionProp()->RandomPointInBounds( Vector(0, 0, 0), Vector(1, 1, 1), &info.m_vecDirShooting );
+			GetEnemy()->GetEngineObject()->RandomPointInBounds( Vector(0, 0, 0), Vector(1, 1, 1), &info.m_vecDirShooting );
 			info.m_vecDirShooting -= vBasePos;
 			VectorNormalize( info.m_vecDirShooting );
 			info.m_vecSpread = VECTOR_CONE_PRECALCULATED;
@@ -2133,7 +2133,7 @@ void CNPC_AttackHelicopter::ShootAtVehicle( const Vector &vBasePos, const Vector
 		if ( nActualTargets > i )
 		{
 			Vector vecFireDirection;
-			ppNearbyTargets[i]->CollisionProp()->RandomPointInBounds( Vector(.25, .25, .25), Vector(.75, .75, .75), &vecFireDirection );
+			ppNearbyTargets[i]->GetEngineObject()->RandomPointInBounds( Vector(.25, .25, .25), Vector(.75, .75, .75), &vecFireDirection );
 			vecFireDirection -= vBasePos;
 			VectorNormalize( vecFireDirection );
 
@@ -2509,7 +2509,7 @@ bool CNPC_AttackHelicopter::IsValidZapTarget( CBaseEntity *pTarget )
 	if ( pTarget == this )
 		return false;
 
-	if ( !pTarget->IsSolid() )
+	if ( !pTarget->GetEngineObject()->IsSolid() )
 		return false;
 
 	Assert( pTarget );
@@ -2628,7 +2628,7 @@ void CNPC_AttackHelicopter::FireElectricityGun( )
 			--nCandidateCount;
 
 			Vector vecTarget;
-			ppCandidates[nCandidateCount]->CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &vecTarget );
+			ppCandidates[nCandidateCount]->GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &vecTarget );
 			CreateZapBeam( vecTarget );
 			CreateEntityZapEffect( ppCandidates[nCandidateCount] );
 		}
@@ -2656,7 +2656,7 @@ void CNPC_AttackHelicopter::FireElectricityGun( )
 		if ( GetEnemyVehicle() )
 		{
 			Vector vecTarget;
-			GetEnemyVehicle()->CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &vecTarget );
+			GetEnemyVehicle()->GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &vecTarget );
 			CreateZapBeam( vecTarget );
 			CreateEntityZapEffect( GetEnemyVehicle() );
 
@@ -2666,7 +2666,7 @@ void CNPC_AttackHelicopter::FireElectricityGun( )
 		else if ( GetEnemy() )
 		{
 			Vector vecTarget;
-			GetEnemy()->CollisionProp()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &vecTarget );
+			GetEnemy()->GetEngineObject()->RandomPointInBounds( vec3_origin, Vector( 1, 1, 1 ), &vecTarget );
 			CreateZapBeam( vecTarget );
 
 			CTakeDamageInfo info( this, this, 5, DMG_SHOCK );
@@ -3385,8 +3385,8 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 	if ( bSmall )
 	{
 		pChunk->m_lifeTime = random->RandomFloat( 0.5f, 1.0f );
-		pChunk->SetSolidFlags( FSOLID_NOT_SOLID );
-		pChunk->SetSolid( SOLID_BBOX );
+		pChunk->GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
+		pChunk->GetEngineObject()->SetSolid( SOLID_BBOX );
 		pChunk->AddEffects( EF_NODRAW );
 		pChunk->SetGravity( UTIL_ScaleForGravity( 400 ) );
 	}
@@ -3416,7 +3416,7 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 
 	if ( bSmall == false )
 	{
-		IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetSolidFlags(), false );
+		IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 		
 		if ( pPhysicsObject )
 		{
@@ -3860,7 +3860,7 @@ void CNPC_AttackHelicopter::PrescheduleThink( void )
 			if ( random->RandomInt( 0, 4 ) == 0 )
 			{
 				Vector	explodePoint;		
-				CollisionProp()->RandomPointInBounds( Vector(0.25,0.25,0.25), Vector(0.75,0.75,0.75), &explodePoint );
+				GetEngineObject()->RandomPointInBounds( Vector(0.25,0.25,0.25), Vector(0.75,0.75,0.75), &explodePoint );
 				
 				ExplodeAndThrowChunk( explodePoint );
 			}
@@ -4944,7 +4944,7 @@ void CBombDropSensor::Spawn()
 {
 	BaseClass::Spawn();
 	UTIL_SetSize(this, Vector(-30,-30,-30), Vector(30,30,30) );
-	SetSolid(SOLID_BBOX);
+	GetEngineObject()->SetSolid(SOLID_BBOX);
 
 	// Shots pass through
 	SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
@@ -5061,7 +5061,7 @@ void CGrenadeHelicopter::Spawn( void )
 
 	if ( !GetEngineObject()->HasSpawnFlags( SF_GRENADE_HELICOPTER_MEGABOMB ) )
 	{
-		IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, GetSolidFlags(), false );
+		IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, GetEngineObject()->GetSolidFlags(), false );
 		SetMoveType( MOVETYPE_VPHYSICS );
 
 		Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
@@ -5069,8 +5069,8 @@ void CGrenadeHelicopter::Spawn( void )
 	}
 	else
 	{
-		SetSolid( SOLID_BBOX );
-		SetCollisionBounds( Vector( -12.5, -12.5, -12.5 ), Vector( 12.5, 12.5, 12.5 ) );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
+		GetEngineObject()->SetCollisionBounds( Vector( -12.5, -12.5, -12.5 ), Vector( 12.5, 12.5, 12.5 ) );
 		VPhysicsInitShadow( false, false );
 		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 		SetElasticity( 0.5f );
@@ -5518,7 +5518,7 @@ void CGrenadeHelicopter::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecV
 //------------------------------------------------------------------------------
 void CGrenadeHelicopter::ExplodeConcussion( CBaseEntity *pOther )
 {
-	if ( !pOther->IsSolid() )
+	if ( !pOther->GetEngineObject()->IsSolid() )
 		return;
 
 	if ( !m_bExplodeOnContact )
@@ -5819,8 +5819,8 @@ END_DATADESC()
 void CAvoidBox::Spawn( )
 {
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	SetSolid( SOLID_BSP );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BSP );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW );
 }
 
@@ -5873,13 +5873,13 @@ void CAvoidBox::ComputeAvoidanceForces( CBaseEntity *pEntity, float flEntityRadi
 
 		// Unlike the avoid spheres, we also need to make sure the ray intersects the box
 		Vector vecLocalCenter, vecLocalDelta;
-		pBox->CollisionProp()->WorldToCollisionSpace( vecEntityCenter, &vecLocalCenter );
-		pBox->CollisionProp()->WorldDirectionToCollisionSpace( vecEntityDelta, &vecLocalDelta );
+		pBox->GetEngineObject()->WorldToCollisionSpace( vecEntityCenter, &vecLocalCenter );
+		pBox->GetEngineObject()->WorldDirectionToCollisionSpace( vecEntityDelta, &vecLocalDelta );
 
 		Vector vecBoxMin( -flEntityRadius, -flEntityRadius, -flEntityRadius );
 		Vector vecBoxMax( flEntityRadius, flEntityRadius, flEntityRadius );
-		vecBoxMin += pBox->CollisionProp()->OBBMins();
-		vecBoxMax += pBox->CollisionProp()->OBBMaxs();
+		vecBoxMin += pBox->GetEngineObject()->CollisionProp()->OBBMins();
+		vecBoxMax += pBox->GetEngineObject()->CollisionProp()->OBBMaxs();
 
 		trace_t tr;
 		if ( !IntersectRayWithBox( vecLocalCenter, vecLocalDelta, vecBoxMin, vecBoxMax, 0.0f, &tr ) )
@@ -5966,8 +5966,8 @@ END_DATADESC()
 void CBombSuppressor::Spawn( )
 {
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	SetSolid( SOLID_BSP );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BSP );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW );
 }
 
@@ -5992,7 +5992,7 @@ bool CBombSuppressor::CanBomb( const Vector &vecPosition )
 	for ( int i = s_BombSuppressors.Count(); --i >= 0; )
 	{
 		CBombSuppressor *pBox = s_BombSuppressors[i].Get();
-		if ( pBox->CollisionProp()->IsPointInBounds( vecPosition ) )
+		if ( pBox->GetEngineObject()->IsPointInBounds( vecPosition ) )
 			return false;
 	}
 
@@ -6154,7 +6154,7 @@ CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos,
 	pChunk->m_nChunkID = chunkID;
 	pChunk->SetCollisionGroup( COLLISION_GROUP_INTERACTIVE );
 
-	IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetSolidFlags(), false );
+	IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 	
 	// Set the velocity
 	if ( pPhysicsObject )

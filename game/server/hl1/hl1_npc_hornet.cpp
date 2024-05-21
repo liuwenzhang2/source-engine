@@ -61,7 +61,7 @@ void CNPC_Hornet::Spawn( void )
 	Precache();
 
 	SetMoveType( MOVETYPE_FLY );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	m_takedamage	= DAMAGE_YES;
 	AddFlag( FL_NPC );
 	m_iHealth		= 1;// weak!
@@ -166,7 +166,7 @@ void CNPC_Hornet::StartDart ( void )
 
 void CNPC_Hornet::DieTouch ( CBaseEntity *pOther )
 {
-	if ( !pOther || !pOther->IsSolid() || pOther->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
+	if ( !pOther || !pOther->GetEngineObject()->IsSolid() || pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
 	{
 		return;
 	}
@@ -182,7 +182,7 @@ void CNPC_Hornet::DieTouch ( CBaseEntity *pOther )
 
 	AddEffects( EF_NODRAW );
 
-	AddSolidFlags( FSOLID_NOT_SOLID );// intangible
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );// intangible
 
 	UTIL_Remove( this );
 	SetTouch( NULL );
@@ -245,7 +245,7 @@ unsigned int CNPC_Hornet::PhysicsSolidMaskForEntity( void ) const
 //=========================================================
 void CNPC_Hornet::TrackTouch ( CBaseEntity *pOther )
 {
-	if ( !pOther->IsSolid() || pOther->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
+	if ( !pOther->GetEngineObject()->IsSolid() || pOther->GetEngineObject()->IsSolidFlagSet(FSOLID_VOLUME_CONTENTS) )
 	{
 		return;
 	}
@@ -373,7 +373,7 @@ void CNPC_Hornet::TrackTarget ( void )
 	VectorAngles(GetEngineObject()->GetAbsVelocity(), angNewAngles );
 	GetEngineObject()->SetAbsAngles( angNewAngles );
 	
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	// if hornet is close to the enemy, jet in a straight line for a half second.
 	// (only in the single player game)

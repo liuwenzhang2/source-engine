@@ -742,13 +742,13 @@ void CFuncTank::Spawn( void )
 #endif // HL2_EPISODIC
 
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 
 	if (GetEngineObject()->HasSpawnFlags(SF_TANK_NOTSOLID) )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	m_hControlVolume	= NULL;
@@ -792,7 +792,7 @@ void CFuncTank::Spawn( void )
 			AddEffects( EF_NODRAW );
 			QAngle localAngles( m_flPitchPoseCenter, m_flYawPoseCenter, 0 );
 			GetEngineObject()->SetLocalAngles( localAngles );
-			SetSolid( SOLID_NONE );
+			GetEngineObject()->SetSolid( SOLID_NONE );
 			SetMoveType( MOVETYPE_NOCLIP );
 
 			// If our parent is a prop_dynamic, make it use hitboxes for renderbox
@@ -842,7 +842,7 @@ void CFuncTank::Spawn( void )
 
 	// UNDONE: Do this?
 	//m_targetEntityName = m_target;
-	if ( GetSolid() != SOLID_NONE )
+	if (GetEngineObject()->GetSolid() != SOLID_NONE )
 	{
 		CreateVPhysics();
 	}
@@ -913,7 +913,7 @@ void CFuncTank::Activate( void )
 			AddEffects( EF_NODRAW );
 			QAngle localAngles( m_flPitchPoseCenter, m_flYawPoseCenter, 0 );
 			GetEngineObject()->SetLocalAngles( localAngles );
-			SetSolid( SOLID_NONE );
+			GetEngineObject()->SetSolid( SOLID_NONE );
 			SetMoveType( MOVETYPE_NOCLIP );
 
 			// If our parent is a prop_dynamic, make it use hitboxes for renderbox
@@ -3179,7 +3179,7 @@ void CFuncTankAPCRocket::Spawn( void )
 	m_bDying = false;
 	m_hLaserDot = CreateLaserDot(GetEngineObject()->GetAbsOrigin(), this, false );
 	m_nBulletCount = m_nBurstCount;
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	GetEngineObject()->SetLocalVelocity( vec3_origin );
 }
 
@@ -3546,7 +3546,7 @@ void CMortarShell::Spawn()
 	Precache();
 
 	AddEffects( EF_NODRAW );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	Vector mins( -MORTAR_BLAST_RADIUS, -MORTAR_BLAST_RADIUS, -MORTAR_BLAST_RADIUS );
 	Vector maxs(  MORTAR_BLAST_RADIUS,  MORTAR_BLAST_RADIUS,  MORTAR_BLAST_RADIUS );

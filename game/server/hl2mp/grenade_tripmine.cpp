@@ -56,10 +56,10 @@ void CTripmineGrenade::Spawn( void )
 	Precache( );
 	// motor
 	SetMoveType( MOVETYPE_FLY );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetModel( "models/Weapons/w_slam.mdl" );
 
-	IPhysicsObject *pObject = VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, true );
+	IPhysicsObject *pObject = VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, true );
 	pObject->EnableMotion( false );
 	SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
@@ -124,7 +124,7 @@ void CTripmineGrenade::PowerupThink( void  )
 	if (gpGlobals->curtime > m_flPowerUp)
 	{
 		MakeBeam( );
-		RemoveSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_bIsLive			= true;
 
 		// play enabled sound
@@ -201,7 +201,7 @@ void CTripmineGrenade::MakeBeam( void )
 void CTripmineGrenade::BeamBreakThink( void  )
 {
 	// See if I can go solid yet (has dropper moved out of way?)
-	if (IsSolidFlagSet( FSOLID_NOT_SOLID ))
+	if (GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ))
 	{
 		trace_t tr;
 		Vector	vUpBit = GetEngineObject()->GetAbsOrigin();
@@ -210,7 +210,7 @@ void CTripmineGrenade::BeamBreakThink( void  )
 		UTIL_TraceEntity( this, GetEngineObject()->GetAbsOrigin(), vUpBit, MASK_SHOT, &tr );
 		if ( !tr.startsolid && (tr.fraction == 1.0) )
 		{
-			RemoveSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		}
 	}
 

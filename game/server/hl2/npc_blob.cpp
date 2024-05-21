@@ -166,9 +166,9 @@ void CBlobElement::Spawn()
 {
 	Precache();
 	
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_FLY );
-	AddSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_NOT_SOLID );
 
 	SetModel( GetBlobModelName() );
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
@@ -531,8 +531,8 @@ void CNPC_Blob::Spawn( void )
 	SetHullType(HULL_TINY);
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_NONE );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	SetBloodColor( BLOOD_COLOR_RED );
 	m_iHealth			= INT_MAX;

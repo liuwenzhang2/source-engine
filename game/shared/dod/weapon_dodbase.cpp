@@ -159,11 +159,25 @@ CWeaponDODBase::CWeaponDODBase()
 	//SetPredictionEligible( true );
 	m_bInAttack = false;
 	m_iAltFireHint = 0;
-	AddSolidFlags( FSOLID_TRIGGER ); // Nothing collides with these but it gets touches.
 
 	m_flNextPrimaryAttack = 0;
 }
 
+#ifdef GAME_DLL
+void CWeaponDODBase::PostConstructor(const char* szClassname, int iForceEdictIndex)
+{
+	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+}
+#endif // GAME_DLL
+#ifdef CLIENT_DLL
+bool CWeaponDODBase::Init(int entnum, int iSerialNum)
+{
+	bool bRet = BaseClass::Init(entnum, iSerialNum);
+	GetEngineObject()->AddSolidFlags(FSOLID_TRIGGER); // Nothing collides with these but it gets touches.
+	return bRet;
+}
+#endif // CLIENT_DLL
 
 bool CWeaponDODBase::IsPredicted() const
 { 
@@ -664,7 +678,7 @@ bool CWeaponDODBase::Deploy()
 			DoMuzzleFlash();
 		}
 
-		AddSolidFlags( FSOLID_TRIGGER );
+		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 
 		SetThink (&CWeaponDODBase::SUB_Remove);
 		SetNextThink( gpGlobals->curtime + 1 );
@@ -742,7 +756,7 @@ bool CWeaponDODBase::Deploy()
 		
 		SetExtraAmmoCount(0);	//Start with no additional ammo
 
-		CollisionProp()->UseTriggerBounds( true, 10.0f );
+		GetEngineObject()->UseTriggerBounds( true, 10.0f );
 	}
 	
 	void CWeaponDODBase::SetDieThink( bool bDie )

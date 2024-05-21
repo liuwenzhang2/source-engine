@@ -207,7 +207,7 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 
 		// Give a little randomness...
 		Vector vecOrigin;
-		CollisionProp()->RandomPointInBounds( Vector(0.25, 0.25, 0.25), Vector( 0.75, 0.75, 0.75 ), &vecOrigin );
+		GetEngineObject()->RandomPointInBounds( Vector(0.25, 0.25, 0.25), Vector( 0.75, 0.75, 0.75 ), &vecOrigin );
 		pSpawn->GetEngineObject()->SetAbsOrigin( vecOrigin );
 
 		QAngle vecAngles;

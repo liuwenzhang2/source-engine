@@ -60,7 +60,7 @@ void CFuncWall::Spawn( void )
 
 bool CFuncWall::CreateVPhysics( void )
 {
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 	IPhysicsObject *pPhys = VPhysicsInitStatic();
 	if ( pPhys )
 	{
@@ -131,7 +131,7 @@ void CFuncWallToggle::TurnOff( void )
 	{
 		pPhys->EnableCollisions( false );
 	}
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW );
 }
 
@@ -143,14 +143,14 @@ void CFuncWallToggle::TurnOn( void )
 	{
 		pPhys->EnableCollisions( true );
 	}
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	RemoveEffects( EF_NODRAW );
 }
 
 
 bool CFuncWallToggle::IsOn( void )
 {
-	if ( IsSolidFlagSet( FSOLID_NOT_SOLID ) )
+	if (GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) )
 		return false;
 	return true;
 }
@@ -226,7 +226,7 @@ void CFuncVehicleClip::Spawn()
 
 bool CFuncVehicleClip::CreateVPhysics( void )
 {
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 	VPhysicsInitStatic();
 
 	return true;
@@ -239,7 +239,7 @@ void CFuncVehicleClip::InputEnable( inputdata_t &data )
 	{
 		pPhys->EnableCollisions( true );
 	}
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 }
 
 void CFuncVehicleClip::InputDisable( inputdata_t &data )
@@ -249,7 +249,7 @@ void CFuncVehicleClip::InputDisable( inputdata_t &data )
 	{
 		pPhys->EnableCollisions( false );
 	}
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 }
 
 //============================= FUNC_CONVEYOR =======================================
@@ -319,7 +319,7 @@ void CFuncConveyor::Spawn( void )
 	// HACKHACK - This is to allow for some special effects
 	if (GetEngineObject()->HasSpawnFlags( SF_CONVEYOR_NOTSOLID ) )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	if ( m_flSpeed == 0 )
@@ -379,7 +379,7 @@ void CFuncIllusionary::Spawn( void )
 {
 	GetEngineObject()->SetLocalAngles( vec3_angle );
 	SetMoveType( MOVETYPE_NONE );  
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 }
 
@@ -739,19 +739,19 @@ void CFuncRotating::Spawn( )
 		m_vecMoveAng = m_vecMoveAng * -1;
 	}
 
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 
 	//
 	// Some rotating objects like fake volumetric lights will not be solid.
 	//
 	if (GetEngineObject()->HasSpawnFlags(SF_ROTATING_NOT_SOLID) )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		SetMoveType( MOVETYPE_PUSH );
 	}
 	else
 	{
-		RemoveSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		SetMoveType( MOVETYPE_PUSH );
 	}
 
@@ -799,7 +799,7 @@ void CFuncRotating::Spawn( )
 	// Slam the object back to solid - if we really want it to be solid.
 	if ( m_bSolidBsp )
 	{
-		SetSolid( SOLID_BSP );
+		GetEngineObject()->SetSolid( SOLID_BSP );
 	}
 
 #ifdef TF_DLL
@@ -816,7 +816,7 @@ void CFuncRotating::Spawn( )
 //-----------------------------------------------------------------------------
 bool CFuncRotating::CreateVPhysics( void )
 {
-	if ( !IsSolidFlagSet( FSOLID_NOT_SOLID ))
+	if ( !GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ))
 	{
 		VPhysicsInitShadow( false, false );
 	}
@@ -1461,8 +1461,8 @@ LINK_ENTITY_TO_CLASS( func_clip_vphysics, CFuncVPhysicsClip );
 void CFuncVPhysicsClip::Spawn( void )
 {
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
-	SetSolid( SOLID_VPHYSICS );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	AddEffects( EF_NODRAW );
 	CreateVPhysics();

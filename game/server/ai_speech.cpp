@@ -467,7 +467,7 @@ bool CAI_Expresser::SpeakDispatchResponse( AIConcept_t concept, AI_Response *res
 			if ( g_pDeveloper->GetInt() > 0 )
 			{
 				Vector vPrintPos;
-				GetOuter()->CollisionProp()->NormalizedToWorldSpace( Vector(0.5,0.5,1.0f), &vPrintPos );
+				((CCollisionProperty*)GetOuter()->GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector(0.5,0.5,1.0f), &vPrintPos );
 				NDebugOverlay::Text( vPrintPos, response, true, 1.5 );
 				spoke = true;
 			}
@@ -481,7 +481,7 @@ bool CAI_Expresser::SpeakDispatchResponse( AIConcept_t concept, AI_Response *res
 		if ( DebuggingSpeech() && g_pDeveloper->GetInt() > 0 && response && result->GetType() != RESPONSE_PRINT )
 		{
 			Vector vPrintPos;
-			GetOuter()->CollisionProp()->NormalizedToWorldSpace( Vector(0.5,0.5,1.0f), &vPrintPos );
+			((CCollisionProperty*)GetOuter()->GetEngineObject()->CollisionProp())->NormalizedToWorldSpace( Vector(0.5,0.5,1.0f), &vPrintPos );
 			NDebugOverlay::Text( vPrintPos, CFmtStr( "%s: %s", concept, response ), true, 1.5 );
 		}
 

@@ -450,7 +450,7 @@ void CCombineDropshipContainer::Spawn()
 {
 	// NOTE: Model must be set before spawn
 	SetModel( DROPSHIP_CONTAINER_MODEL );
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 
 	BaseClass::Spawn();
 
@@ -491,14 +491,14 @@ void CCombineDropshipContainer::CreateCorpse()
 
 	Vector vecNormalizedMins, vecNormalizedMaxs;
 	Vector vecAbsMins, vecAbsMaxs;
-	CollisionProp()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
-	CollisionProp()->WorldToNormalizedSpace( vecAbsMins, &vecNormalizedMins );
-	CollisionProp()->WorldToNormalizedSpace( vecAbsMaxs, &vecNormalizedMaxs );
+	GetEngineObject()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
+	GetEngineObject()->WorldToNormalizedSpace( vecAbsMins, &vecNormalizedMins );
+	GetEngineObject()->WorldToNormalizedSpace( vecAbsMaxs, &vecNormalizedMaxs );
 
 	// Explode
 	Vector vecAbsPoint;
 	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
-	CollisionProp()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint);
+	GetEngineObject()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint);
 	te->Explosion( filter, 0.0f, &vecAbsPoint, g_sModelIndexFireball, 
 		random->RandomInt( 4, 10 ), random->RandomInt( 8, 15 ), TE_EXPLFLAG_NOPARTICLES, 100, 0 );
 
@@ -514,7 +514,7 @@ void CCombineDropshipContainer::CreateCorpse()
 		ThrowFlamingGib();
 	}
 
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW );
 	UTIL_Remove( this );
 }
@@ -526,15 +526,15 @@ void CCombineDropshipContainer::CreateCorpse()
 void CCombineDropshipContainer::ThrowFlamingGib( void )
 {
 	Vector vecAbsMins, vecAbsMaxs;
-	CollisionProp()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
+	GetEngineObject()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
 
 	Vector vecNormalizedMins, vecNormalizedMaxs;
-	CollisionProp()->WorldToNormalizedSpace( vecAbsMins, &vecNormalizedMins );
-	CollisionProp()->WorldToNormalizedSpace( vecAbsMaxs, &vecNormalizedMaxs );
+	GetEngineObject()->WorldToNormalizedSpace( vecAbsMins, &vecNormalizedMins );
+	GetEngineObject()->WorldToNormalizedSpace( vecAbsMaxs, &vecNormalizedMaxs );
 
 	Vector vecAbsPoint;
 	CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
-	CollisionProp()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint);
+	GetEngineObject()->RandomPointInBounds( vecNormalizedMins, vecNormalizedMaxs, &vecAbsPoint);
 
 	// Throw a flaming, smoking chunk.
 	CGib *pChunk = (CGib*)gEntList.CreateEntityByName( "gib" );
@@ -551,7 +551,7 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 	pChunk->SetOwnerEntity( this );
 	pChunk->m_lifeTime = random->RandomFloat( 6.0f, 8.0f );
 	pChunk->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
-	IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetSolidFlags(), false );
+	IPhysicsObject *pPhysicsObject = pChunk->VPhysicsInitNormal( SOLID_VPHYSICS, pChunk->GetEngineObject()->GetSolidFlags(), false );
 	
 	// Set the velocity
 	if ( pPhysicsObject )
@@ -971,7 +971,7 @@ void CNPC_CombineDropship::Spawn( void )
 
 			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 			m_hContainer->SetOwnerEntity(this);
-			m_hContainer->SetSolid( SOLID_VPHYSICS );
+			m_hContainer->GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 			m_hContainer->Spawn();
 		}
 		break;
@@ -2651,7 +2651,7 @@ void CNPC_CombineDropship::UpdatePickupNavigation( void )
 {
 	// Try and touch the top of the object
 	Vector vecPickup = m_hPickupTarget->WorldSpaceCenter();
-	vecPickup.z += (m_hPickupTarget->CollisionProp()->OBBSize().z * 0.5);
+	vecPickup.z += (m_hPickupTarget->GetEngineObject()->OBBSize().z * 0.5);
 	SetDesiredPosition( vecPickup );
 
 	//NDebugOverlay::Cross3D( GetDesiredPosition(), -Vector(32,32,32), Vector(32,32,32), 0, 255, 255, true, 0.1f );

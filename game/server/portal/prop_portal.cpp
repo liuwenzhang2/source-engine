@@ -265,8 +265,8 @@ void CProp_Portal::Spawn( void )
 	
 	AddEffects( EF_NORECEIVESHADOW | EF_NOSHADOW );
 
-	SetSolid( SOLID_OBB );
-	SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID | FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
+	GetEngineObject()->SetSolid( SOLID_OBB );
+	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID | FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
 	SetMoveType( MOVETYPE_NONE );
 	SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
@@ -451,8 +451,8 @@ void CProp_Portal::ResetModel( void )
 
 	SetSize( CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs );
 
-	SetSolid( SOLID_OBB );
-	SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID | FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
+	GetEngineObject()->SetSolid( SOLID_OBB );
+	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID | FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
 }
 
 void CProp_Portal::DoFizzleEffect( int iEffect, bool bDelayedPos /*= true*/ )
@@ -770,7 +770,7 @@ void CProp_Portal::Activate( void )
 				CBaseEntity *pOther = (CBaseEntity*)gEntList.GetServerEntityFromHandle(link->entityTouched);
 				if( CProp_Portal_Shared::IsEntityTeleportable( pOther ) )
 				{
-					CCollisionProperty *pOtherCollision = pOther->CollisionProp();
+					CCollisionProperty *pOtherCollision = (CCollisionProperty*)pOther->GetEngineObject()->CollisionProp();
 					Vector vWorldMins, vWorldMaxs;
 					pOtherCollision->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 					Vector ptOtherCenter = (vWorldMins + vWorldMaxs) / 2.0f;
@@ -1455,7 +1455,7 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 
 	if( CProp_Portal_Shared::IsEntityTeleportable( pOther ) )
 	{
-		CCollisionProperty *pOtherCollision = pOther->CollisionProp();
+		CCollisionProperty *pOtherCollision = (CCollisionProperty*)pOther->GetEngineObject()->CollisionProp();
 		Vector vWorldMins, vWorldMaxs;
 		pOtherCollision->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 		Vector ptOtherCenter = (vWorldMins + vWorldMaxs) / 2.0f;
@@ -1617,7 +1617,7 @@ void CProp_Portal::WakeNearbyEntities( void )
 
 		if ( pEntity && (pEntity != this) )
 		{
-			CCollisionProperty *pEntCollision = pEntity->CollisionProp();
+			CCollisionProperty *pEntCollision = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
 			Vector ptEntityCenter = pEntCollision->GetCollisionOrigin();
 
 			//double check intersection at the OBB vs OBB level, we don't want to affect large piles of physics objects if we don't have to. It gets slow
@@ -1633,7 +1633,7 @@ void CProp_Portal::WakeNearbyEntities( void )
 					{
 						// It's detecting this portal's group
 						Vector vMin, vMax;
-						pPortalDetector->CollisionProp()->WorldSpaceAABB( &vMin, &vMax );
+						pPortalDetector->GetEngineObject()->WorldSpaceAABB( &vMin, &vMax );
 
 						Vector vBoxCenter = ( vMin + vMax ) * 0.5f;
 						Vector vBoxExtents = ( vMax - vMin ) * 0.5f;
@@ -1685,7 +1685,7 @@ void CProp_Portal::WakeNearbyEntities( void )
 
 void CProp_Portal::ForceEntityToFitInPortalWall( CBaseEntity *pEntity )
 {
-	CCollisionProperty *pCollision = pEntity->CollisionProp();
+	CCollisionProperty *pCollision = (CCollisionProperty*)pEntity->GetEngineObject()->CollisionProp();
 	Vector vWorldMins, vWorldMaxs;
 	pCollision->WorldSpaceAABB( &vWorldMins, &vWorldMaxs );
 	Vector ptCenter = pEntity->WorldSpaceCenter(); //(vWorldMins + vWorldMaxs) / 2.0f;

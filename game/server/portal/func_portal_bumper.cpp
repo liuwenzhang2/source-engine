@@ -82,8 +82,8 @@ void CFuncPortalBumper::Spawn()
 	// Bind to our model, cause we need the extents for bounds checking
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetRenderMode( kRenderNone );	// Don't draw
-	SetSolid( SOLID_VPHYSICS );	// we may want slanted walls, so we'll use OBB
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );	// we may want slanted walls, so we'll use OBB
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 }
 
 void CFuncPortalBumper::InputActivate( inputdata_t &inputdata )

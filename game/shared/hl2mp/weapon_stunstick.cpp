@@ -190,7 +190,7 @@ void CWeaponStunStick::Spawn()
 	Precache();
 
 	BaseClass::Spawn();
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 }
 
 void CWeaponStunStick::Precache()

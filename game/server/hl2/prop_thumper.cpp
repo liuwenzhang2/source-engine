@@ -98,7 +98,7 @@ void CPropThumper::Spawn( void )
 	Precache();
 	SetModel( szModel );
 
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	SetMoveType( MOVETYPE_NONE );
 	VPhysicsInitStatic();
 

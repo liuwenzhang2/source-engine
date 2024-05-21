@@ -45,7 +45,7 @@ CEnvPlayerSurfaceTrigger::~CEnvPlayerSurfaceTrigger( void )
 //-----------------------------------------------------------------------------
 void CEnvPlayerSurfaceTrigger::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 
 	m_iCurrentGameMaterial = 0;

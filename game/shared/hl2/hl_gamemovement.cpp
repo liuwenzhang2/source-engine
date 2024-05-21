@@ -126,7 +126,7 @@ void CReservePlayerSpot::Spawn()
 {
 	BaseClass::Spawn();
 
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_NONE );
 	// Make entity invisible
 	AddEffects( EF_NODRAW );
@@ -211,7 +211,7 @@ void CHL2GameMovement::StartForcedMove( bool mounting, float transit_speed, cons
 	// Don't get stuck during this traversal since we'll just be slamming the player origin
 	player->SetMoveType( MOVETYPE_NONE );
 	player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
-	player->SetSolid( SOLID_NONE );
+	player->GetEngineObject()->SetSolid( SOLID_NONE );
 	SetLadder( ladder );
 
 	// Debounce the use key
@@ -260,7 +260,7 @@ bool CHL2GameMovement::ContinueForcedMove()
 	// If finished moving, reset player to correct movetype (or put them on the ladder)
 	if ( !lm->m_bForceLadderMove )
 	{
-		player->SetSolid( SOLID_BBOX );
+		player->GetEngineObject()->SetSolid( SOLID_BBOX );
 		player->SetMoveType( MOVETYPE_WALK );
 
 		if ( lm->m_bForceMount && lm->m_hForceLadder != NULL )
@@ -357,7 +357,7 @@ void CHL2GameMovement::Findladder( float maxdist, CFuncLadder **ppLadder, Vector
 			if ( tr.fraction != 1.0f &&
 				 tr.m_pEnt &&
 				 tr.m_pEnt != ladder &&
-				 !((CBaseEntity*)tr.m_pEnt)->IsSolidFlagSet( FSOLID_TRIGGER ) )
+				 !((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->IsSolidFlagSet( FSOLID_TRIGGER ) )
 			{
 				continue;
 			}

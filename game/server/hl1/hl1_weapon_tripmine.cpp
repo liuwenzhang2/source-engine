@@ -295,8 +295,8 @@ void CTripmineGrenade::Spawn( void )
 	Precache( );
 	// motor
 	SetMoveType( MOVETYPE_FLY );
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetModel( TRIPMINE_MODEL );
 
 	// Don't collide with the player (the beam will still be tripped by one, however)
@@ -452,7 +452,7 @@ void CTripmineGrenade::PowerupThink( void  )
 	if ( gpGlobals->curtime > m_flPowerUp )
 	{
 		MakeBeam( );
-		RemoveSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 		m_bIsLive = true;
 

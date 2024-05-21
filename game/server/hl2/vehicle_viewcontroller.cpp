@@ -50,7 +50,7 @@ LINK_ENTITY_TO_CLASS( vehicle_viewcontroller, CPropVehicleViewController );
 void CPropVehicleViewController::Spawn( void )
 {
 	BaseClass::Spawn();
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 }
 
 //-----------------------------------------------------------------------------

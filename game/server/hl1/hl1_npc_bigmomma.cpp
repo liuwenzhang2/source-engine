@@ -400,11 +400,11 @@ void CNPC_BigMomma::Spawn()
 
 	Vector vecSurroundingMins( -95, -95, 0 );
 	Vector vecSurroundingMaxs( 95, 95, 190 );
-	CollisionProp()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &vecSurroundingMins, &vecSurroundingMaxs );
+	GetEngineObject()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &vecSurroundingMins, &vecSurroundingMaxs );
 
 	SetNavType( NAV_GROUND );
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	
 	m_bloodColor = BLOOD_COLOR_GREEN;
@@ -1149,7 +1149,7 @@ void CBMortar:: Spawn( void )
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 	SetClassname( "bmortar" );
 	
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	pSprite = CSprite::SpriteCreate( "sprites/mommaspit.vmt", GetEngineObject()->GetAbsOrigin(), true );
 

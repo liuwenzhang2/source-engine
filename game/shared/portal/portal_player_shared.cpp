@@ -203,8 +203,8 @@ CBaseEntity *CPortal_Player::FindUseEntity()
 	if ( IsUseableEntity(pObject, 0) )
 	{
 		Vector delta = tr.endpos - tr.startpos;
-		float centerZ = CollisionProp()->WorldSpaceCenter().z;
-		delta.z = IntervalDistance( tr.endpos.z, centerZ + CollisionProp()->OBBMins().z, centerZ + CollisionProp()->OBBMaxs().z );
+		float centerZ = GetEngineObject()->WorldSpaceCenter().z;
+		delta.z = IntervalDistance( tr.endpos.z, centerZ + GetEngineObject()->CollisionProp()->OBBMins().z, centerZ + GetEngineObject()->CollisionProp()->OBBMaxs().z );
 		float dist = delta.Length();
 		if ( dist < PLAYER_USE_RADIUS )
 		{
@@ -253,7 +253,7 @@ CBaseEntity *CPortal_Player::FindUseEntity()
 
 		// see if it's more roughly in front of the player than previous guess
 		Vector point;
-		pObject->CollisionProp()->CalcNearestPoint( searchCenter, &point );
+		pObject->GetEngineObject()->CalcNearestPoint( searchCenter, &point );
 
 		Vector dir = point - searchCenter;
 		VectorNormalize(dir);
@@ -371,8 +371,8 @@ CBaseEntity* CPortal_Player::FindUseEntityThroughPortal( void )
 	if ( IsUseableEntity(pObject, 0) )
 	{
 		Vector delta = tr.endpos - tr.startpos;
-		float centerZ = CollisionProp()->WorldSpaceCenter().z;
-		delta.z = IntervalDistance( tr.endpos.z, centerZ + CollisionProp()->OBBMins().z, centerZ + CollisionProp()->OBBMaxs().z );
+		float centerZ = GetEngineObject()->WorldSpaceCenter().z;
+		delta.z = IntervalDistance( tr.endpos.z, centerZ + GetEngineObject()->CollisionProp()->OBBMins().z, centerZ + GetEngineObject()->CollisionProp()->OBBMaxs().z );
 		float dist = delta.Length();
 		if ( dist < PLAYER_USE_RADIUS )
 		{
@@ -409,7 +409,7 @@ CBaseEntity* CPortal_Player::FindUseEntityThroughPortal( void )
 
 		// see if it's more roughly in front of the player than previous guess
 		Vector point;
-		pObject->CollisionProp()->CalcNearestPoint( vTransformedSearchCenter, &point );
+		pObject->GetEngineObject()->CalcNearestPoint( vTransformedSearchCenter, &point );
 
 		Vector dir = point - vTransformedSearchCenter;
 		VectorNormalize(dir);

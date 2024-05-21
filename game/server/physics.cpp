@@ -540,10 +540,10 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 		}
 	}
 
-	int solid0 = pEntity0->GetSolid();
-	int solid1 = pEntity1->GetSolid();
-	int nSolidFlags0 = pEntity0->GetSolidFlags();
-	int nSolidFlags1 = pEntity1->GetSolidFlags();
+	int solid0 = pEntity0->GetEngineObject()->GetSolid();
+	int solid1 = pEntity1->GetEngineObject()->GetSolid();
+	int nSolidFlags0 = pEntity0->GetEngineObject()->GetSolidFlags();
+	int nSolidFlags1 = pEntity1->GetEngineObject()->GetSolidFlags();
 
 	int movetype0 = pEntity0->GetMoveType();
 	int movetype1 = pEntity1->GetMoveType();
@@ -1725,9 +1725,9 @@ void PhysFrame( float deltaTime )
 			CBaseEntity *pEntity = reinterpret_cast<CBaseEntity *>(pActiveList[i]->GetGameData());
 			if ( pEntity )
 			{
-				if ( pEntity->CollisionProp()->DoesVPhysicsInvalidateSurroundingBox() )
+				if ( pEntity->GetEngineObject()->DoesVPhysicsInvalidateSurroundingBox() )
 				{
-					pEntity->CollisionProp()->MarkSurroundingBoundsDirty();
+					pEntity->GetEngineObject()->MarkSurroundingBoundsDirty();
 				}
 				pEntity->VPhysicsUpdate( pActiveList[i] );
 			}
@@ -2164,7 +2164,7 @@ void CCollisionEvent::UpdateDamageEvents( void )
 		// Track changes in the entity's life state
 		int iEntBits = event.pEntity->IsAlive() ? 0x0001 : 0;
 		iEntBits |= event.pEntity->IsMarkedForDeletion() ? 0x0002 : 0;
-		iEntBits |= (event.pEntity->GetSolidFlags() & FSOLID_NOT_SOLID) ? 0x0004 : 0;
+		iEntBits |= (event.pEntity->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_SOLID) ? 0x0004 : 0;
 #if 0
 		// Go ahead and compute the current static stress when hit by a large object (with a force high enough to do damage).  
 		// That way you die from the impact rather than the stress of the object resting on you whenever possible. 
@@ -2183,7 +2183,7 @@ void CCollisionEvent::UpdateDamageEvents( void )
 		event.pEntity->TakeDamage( event.info );
 		int iEntBits2 = event.pEntity->IsAlive() ? 0x0001 : 0;
 		iEntBits2 |= event.pEntity->IsMarkedForDeletion() ? 0x0002 : 0;
-		iEntBits2 |= (event.pEntity->GetSolidFlags() & FSOLID_NOT_SOLID) ? 0x0004 : 0;
+		iEntBits2 |= (event.pEntity->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_SOLID) ? 0x0004 : 0;
 
 		if ( event.bRestoreVelocity && iEntBits != iEntBits2 )
 		{

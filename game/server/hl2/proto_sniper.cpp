@@ -943,8 +943,8 @@ void CProtoSniper::Spawn( void )
 
 	UTIL_SetSize( this, Vector( -16, -16 , 0 ), Vector( 16, 16, 64 ) );
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_FLY );
 	m_bloodColor		= DONT_BLEED;
 	m_iHealth			= 10;
@@ -979,7 +979,7 @@ void CProtoSniper::Spawn( void )
 	if(GetEngineObject()->GetSpawnFlags() & SF_SNIPER_HIDDEN)
 	{
 		AddEffects( EF_NODRAW );
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	// Point the cursor straight ahead so that the sniper's
@@ -1692,7 +1692,7 @@ bool CProtoSniper::FindDecoyObject( void )
 		Vector vecBulletOrigin;
 
 		vecBulletOrigin = GetBulletOrigin();
-		pProspect->CollisionProp()->RandomPointInBounds( Vector( .1, .1, .1 ), Vector( .6, .6, .6 ), &vecDecoyTarget );
+		pProspect->GetEngineObject()->RandomPointInBounds( Vector( .1, .1, .1 ), Vector( .6, .6, .6 ), &vecDecoyTarget );
 
 		// When trying to trace to an object using its absmin + some fraction of its size, it's best 
 		// to lengthen the trace a little beyond the object's bounding box in case it's a more complex
@@ -1714,7 +1714,7 @@ bool CProtoSniper::FindDecoyObject( void )
 
 			// Throw some noise in, don't always hit the center.
 			Vector vecNoise;
-			pProspect->CollisionProp()->RandomPointInBounds( Vector( 0.25, 0.25, 0.25 ), Vector( 0.75, 0.75, 0.75 ), &vecNoise );
+			pProspect->GetEngineObject()->RandomPointInBounds( Vector( 0.25, 0.25, 0.25 ), Vector( 0.75, 0.75, 0.75 ), &vecNoise );
 			m_vecDecoyObjectTarget += vecNoise - pProspect->GetEngineObject()->GetAbsOrigin();
 			return true;
 		}

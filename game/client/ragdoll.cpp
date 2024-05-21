@@ -542,14 +542,14 @@ void C_ServerRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWe
 
 void C_ServerRagdoll::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 {
-	if( !CollisionProp()->IsBoundsDefinedInEntitySpace() )
+	if( !GetEngineObject()->IsBoundsDefinedInEntitySpace() )
 	{
-		IRotateAABB(GetEngineObject()->EntityToWorldTransform(), CollisionProp()->OBBMins(), CollisionProp()->OBBMaxs(), theMins, theMaxs );
+		IRotateAABB(GetEngineObject()->EntityToWorldTransform(), GetEngineObject()->CollisionProp()->OBBMins(), GetEngineObject()->CollisionProp()->OBBMaxs(), theMins, theMaxs );
 	}
 	else
 	{
-		theMins = CollisionProp()->OBBMins();
-		theMaxs = CollisionProp()->OBBMaxs();
+		theMins = GetEngineObject()->CollisionProp()->OBBMins();
+		theMaxs = GetEngineObject()->CollisionProp()->OBBMaxs();
 	}
 }
 

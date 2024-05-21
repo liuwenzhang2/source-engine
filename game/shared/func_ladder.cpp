@@ -52,7 +52,7 @@ void CFuncLadder::Spawn()
 	BaseClass::Spawn();
 
 	// Entity is symbolid
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 	SetCollisionGroup( COLLISION_GROUP_NONE );
 	

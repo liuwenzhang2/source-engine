@@ -296,8 +296,8 @@ void CLagCompensationManager::FrameUpdatePostEntityThink()
 		record.m_flSimulationTime	= pPlayer->GetSimulationTime();
 		record.m_vecAngles			= pPlayer->GetEngineObject()->GetLocalAngles();
 		record.m_vecOrigin			= pPlayer->GetEngineObject()->GetLocalOrigin();
-		record.m_vecMinsPreScaled	= pPlayer->CollisionProp()->OBBMinsPreScaled();
-		record.m_vecMaxsPreScaled	= pPlayer->CollisionProp()->OBBMaxsPreScaled();
+		record.m_vecMinsPreScaled	= pPlayer->GetEngineObject()->CollisionProp()->OBBMinsPreScaled();
+		record.m_vecMaxsPreScaled	= pPlayer->GetEngineObject()->CollisionProp()->OBBMaxsPreScaled();
 
 		int layerCount = pPlayer->GetNumAnimOverlays();
 		for( int layerIndex = 0; layerIndex < layerCount; ++layerIndex )
@@ -590,12 +590,12 @@ void CLagCompensationManager::BacktrackPlayer( CBasePlayer *pPlayer, float flTar
 	}
 
 	// Use absolute equality here
-	if ( minsPreScaled != pPlayer->CollisionProp()->OBBMinsPreScaled() || maxsPreScaled != pPlayer->CollisionProp()->OBBMaxsPreScaled() )
+	if ( minsPreScaled != pPlayer->GetEngineObject()->CollisionProp()->OBBMinsPreScaled() || maxsPreScaled != pPlayer->GetEngineObject()->CollisionProp()->OBBMaxsPreScaled() )
 	{
 		flags |= LC_SIZE_CHANGED;
 
-		restore->m_vecMinsPreScaled = pPlayer->CollisionProp()->OBBMinsPreScaled();
-		restore->m_vecMaxsPreScaled = pPlayer->CollisionProp()->OBBMaxsPreScaled();
+		restore->m_vecMinsPreScaled = pPlayer->GetEngineObject()->CollisionProp()->OBBMinsPreScaled();
+		restore->m_vecMaxsPreScaled = pPlayer->GetEngineObject()->CollisionProp()->OBBMaxsPreScaled();
 		
 		pPlayer->SetSize( minsPreScaled, maxsPreScaled );
 		
@@ -764,8 +764,8 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 	
 			// see if simulation made any changes, if no, then do the restore, otherwise,
 			//  leave new values in
-			if ( pPlayer->CollisionProp()->OBBMinsPreScaled() == change->m_vecMinsPreScaled &&
-				pPlayer->CollisionProp()->OBBMaxsPreScaled() == change->m_vecMaxsPreScaled )
+			if ( pPlayer->GetEngineObject()->CollisionProp()->OBBMinsPreScaled() == change->m_vecMinsPreScaled &&
+				pPlayer->GetEngineObject()->CollisionProp()->OBBMaxsPreScaled() == change->m_vecMaxsPreScaled )
 			{
 				// Restore it
 				pPlayer->SetSize( restore->m_vecMinsPreScaled, restore->m_vecMaxsPreScaled );

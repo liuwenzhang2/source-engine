@@ -112,7 +112,7 @@ void NWCEdit::CreateAINode( CBasePlayer *pPlayer )
 	if ( !IsWCVersionValid() || !pPlayer )
 		return;
 
-	pPlayer->AddSolidFlags( FSOLID_NOT_SOLID );
+	pPlayer->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	int hullType = g_pAINetworkManager->GetEditOps()->m_iHullDrawNum;
 
@@ -256,7 +256,7 @@ DoneCreate:
 	}
 
 	// Restore player collidability
-	pPlayer->SetSolid( SOLID_BBOX );
+	pPlayer->GetEngineObject()->SetSolid( SOLID_BBOX );
 }
 
 //-----------------------------------------------------------------------------

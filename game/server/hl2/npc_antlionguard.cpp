@@ -789,8 +789,8 @@ void CNPC_AntlionGuard::Spawn( void )
 	SetHullSizeNormal();
 	SetDefaultEyeOffset();
 	
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 
 	SetNavType( NAV_GROUND );
@@ -838,7 +838,7 @@ void CNPC_AntlionGuard::Spawn( void )
 
 		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 		
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		
 		m_takedamage = DAMAGE_NO;
 
@@ -860,7 +860,7 @@ void CNPC_AntlionGuard::Spawn( void )
 	Vector absMin = -Vector(100,100,0);
 	Vector absMax = Vector(100,100,128);
 
-	CollisionProp()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &absMin, &absMax );
+	GetEngineObject()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &absMin, &absMax );
 }
 
 //-----------------------------------------------------------------------------
@@ -1798,7 +1798,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 					VectorRotate( Vector( 0.0f, flCos, flSin ), vecAngles, vecArc );
 
 					// Find the radius by which to avoid the player
-					float flOffsetRadius = ( m_hPhysicsTarget->CollisionProp()->BoundingRadius() + GetEnemy()->CollisionProp()->BoundingRadius() ) * 1.5f;
+					float flOffsetRadius = ( m_hPhysicsTarget->GetEngineObject()->BoundingRadius() + GetEnemy()->GetEngineObject()->BoundingRadius() ) * 1.5f;
 
 					// Add this to our velocity to offset it
 					vecShoveVel += ( vecArc * flOffsetRadius );
@@ -1885,7 +1885,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		Vector	startPos = GetEngineObject()->GetAbsOrigin();
-		float	checkSize = ( CollisionProp()->BoundingRadius() + 8.0f );
+		float	checkSize = (GetEngineObject()->BoundingRadius() + 8.0f );
 		Vector	endPos = startPos + ( BodyDirection3D() * checkSize );
 
 		CTraceFilterCharge traceFilter( this, COLLISION_GROUP_NONE, this );
@@ -3877,8 +3877,8 @@ void CNPC_AntlionGuard::InputUnburrow( inputdata_t &inputdata )
 
 	GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 	
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	
 	m_takedamage = DAMAGE_YES;
 
@@ -3939,7 +3939,7 @@ Vector CNPC_AntlionGuard::GetPhysicsHitPosition( CBaseEntity *pObject, CBaseEnti
 	// Get the distance we want to be from the object when we hit it
 	IPhysicsObject *pPhys = pObject->VPhysicsGetObject();
 	Vector extent = physcollision->CollideGetExtent( pPhys->GetCollide(), pObject->GetEngineObject()->GetAbsOrigin(), pObject->GetEngineObject()->GetAbsAngles(), -vecToTarget );
-	float flDist = ( extent - pObject->WorldSpaceCenter() ).Length() + CollisionProp()->BoundingRadius() + 32.0f;
+	float flDist = ( extent - pObject->WorldSpaceCenter() ).Length() + GetEngineObject()->BoundingRadius() + 32.0f;
 	
 	if ( vecTrajectory != NULL )
 	{
@@ -4118,7 +4118,7 @@ CBaseEntity *CNPC_AntlionGuard::FindPhysicsObjectTarget( const PhysicsObjectCrit
 			continue;
 
 		// Ignore things less than half a foot in diameter
-		if ( pObject->CollisionProp()->BoundingRadius() < 6.0f )
+		if ( pObject->GetEngineObject()->BoundingRadius() < 6.0f )
 			continue;
 
 		IPhysicsObject *pPhysObj = pObject->VPhysicsGetObject();

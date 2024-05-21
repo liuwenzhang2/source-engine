@@ -91,7 +91,7 @@ void CNPC_GroundTurret::Spawn( void )
 	UTIL_SetModel( this, "models/combine_turrets/ground_turret.mdl" );
 
 	SetNavType( NAV_FLY );
-	SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 
 	SetBloodColor( DONT_BLEED );
 	m_iHealth			= 125;

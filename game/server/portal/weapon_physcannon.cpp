@@ -790,7 +790,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 		pPlayer->EyeVectors( &vPlayerForward );
 
 		Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, pEntity->GetEngineObject()->GetAbsAngles(), -vPlayerForward );
-		Vector player2d = pPlayer->CollisionProp()->OBBMaxs();
+		Vector player2d = pPlayer->GetEngineObject()->CollisionProp()->OBBMaxs();
 		float playerRadius = player2d.Length2D();
 		float flDot = DotProduct( vPlayerForward, radial );
 
@@ -1667,7 +1667,7 @@ void CWeaponPhysCannon::Spawn( void )
 	BaseClass::Spawn();
 
 	// Need to get close to pick it up
-	CollisionProp()->UseTriggerBounds( false );
+	GetEngineObject()->UseTriggerBounds( false );
 
 	m_bPhyscannonState = IsMegaPhysCannon();
 
@@ -1729,7 +1729,7 @@ bool CWeaponPhysCannon::Deploy( void )
 	// Unbloat our bounds
 	if ( IsMegaPhysCannon() )
 	{
-		CollisionProp()->UseTriggerBounds( false );
+		GetEngineObject()->UseTriggerBounds( false );
 	}
 
 	m_flTimeNextObjectPurge = gpGlobals->curtime;
@@ -2380,7 +2380,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 				CTakeDamageInfo info( pOwner, pOwner, 1.0f, DMG_GENERIC );
 				CBaseEntity *pRagdoll = CreateServerRagdoll( pEntity->MyNPCPointer(), 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
 				PhysSetEntityGameFlags( pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS );
-				pRagdoll->SetCollisionBounds( pEntity->CollisionProp()->OBBMins(), pEntity->CollisionProp()->OBBMaxs() );
+				pRagdoll->GetEngineObject()->SetCollisionBounds( pEntity->GetEngineObject()->CollisionProp()->OBBMins(), pEntity->GetEngineObject()->CollisionProp()->OBBMaxs() );
 
 				// Necessary to cause it to do the appropriate death cleanup
 				CTakeDamageInfo ragdollInfo( pOwner, pOwner, 10000.0, DMG_PHYSGUN | DMG_REMOVENORAGDOLL );
@@ -2527,7 +2527,7 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 			CBaseEntity *pRagdoll = CreateServerRagdoll( pObject->MyNPCPointer(), 0, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
 			PhysSetEntityGameFlags( pRagdoll, FVPHYSICS_NO_SELF_COLLISIONS );
 
-			pRagdoll->SetCollisionBounds( pObject->CollisionProp()->OBBMins(), pObject->CollisionProp()->OBBMaxs() );
+			pRagdoll->GetEngineObject()->SetCollisionBounds( pObject->GetEngineObject()->CollisionProp()->OBBMins(), pObject->GetEngineObject()->CollisionProp()->OBBMaxs() );
 
 			// Necessary to cause it to do the appropriate death cleanup
 			CTakeDamageInfo ragdollInfo( GetOwner(), GetOwner(), 10000.0, DMG_PHYSGUN | DMG_REMOVENORAGDOLL );
@@ -2992,7 +2992,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	}
 	// Now clamp a sphere of object radius at end to the player's bbox
 	Vector radial = physcollision->CollideGetExtent( pPhys->GetCollide(), vec3_origin, qEntityAngles, -forward );
-	Vector player2d = pPlayer->CollisionProp()->OBBMaxs();
+	Vector player2d = pPlayer->GetEngineObject()->CollisionProp()->OBBMaxs();
 	float playerRadius = player2d.Length2D();
 
 	float radius = playerRadius + radial.Length();
@@ -3020,8 +3020,8 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 		end = start + forward * ( distance - radius );
 	}
 	Vector playerMins, playerMaxs, nearest;
-	pPlayer->CollisionProp()->WorldSpaceAABB( &playerMins, &playerMaxs );
-	Vector playerLine = pPlayer->CollisionProp()->WorldSpaceCenter();
+	pPlayer->GetEngineObject()->WorldSpaceAABB( &playerMins, &playerMaxs );
+	Vector playerLine = pPlayer->GetEngineObject()->WorldSpaceCenter();
 	CalcClosestPointOnLine( end, playerLine+Vector(0,0,playerMins.z), playerLine+Vector(0,0,playerMaxs.z), nearest, NULL );
 
 	if( !m_bAllowObjectOverhead )
@@ -3285,7 +3285,7 @@ void CWeaponPhysCannon::BeginUpgrade()
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	// Bloat our bounds
-	CollisionProp()->UseTriggerBounds( true, 32.0f );
+	GetEngineObject()->UseTriggerBounds( true, 32.0f );
 
 	// Turn on the new skin
 	m_nSkin = MEGACANNON_SKIN;
@@ -3330,7 +3330,7 @@ void CWeaponPhysCannon::WaitForUpgradeThink()
 	g_pSoundEmitterSystem->StopSound(this, "WeaponDissolve.Charge" );
 
 	// Re-enable weapon pickup
-	AddSolidFlags( FSOLID_TRIGGER );
+	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 
 	SetContextThink( NULL, gpGlobals->curtime, s_pWaitForUpgradeContext );
 }

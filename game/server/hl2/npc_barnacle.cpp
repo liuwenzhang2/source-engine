@@ -214,7 +214,7 @@ Class_T	CNPC_Barnacle::Classify ( void )
 void CNPC_Barnacle::ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs )
 {
 	// Extend our bounding box downwards the length of the tongue
-	CollisionProp()->WorldSpaceAABB( pVecWorldMins, pVecWorldMaxs );
+	GetEngineObject()->WorldSpaceAABB( pVecWorldMins, pVecWorldMaxs );
 
 	// We really care about the tongue tip. The altitude is not really relevant.
 	VectorMin( *pVecWorldMins, m_vecTip, *pVecWorldMins );
@@ -260,9 +260,9 @@ void CNPC_Barnacle::Spawn()
 	SetModel( "models/barnacle.mdl" );
 	UTIL_SetSize( this, Vector(-16, -16, -40), Vector(16, 16, 0) );
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
-	CollisionProp()->SetSurroundingBoundsType( USE_GAME_CODE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSurroundingBoundsType( USE_GAME_CODE );
 #if HL2_EPISODIC // the episodic barnacle is solid, so it can be sawbladed.
 	SetMoveType( MOVETYPE_PUSH );
 #else
@@ -426,7 +426,7 @@ void CNPC_Barnacle::InitTonguePosition( void )
 	float flTongueAdj = origin.z - GetEngineObject()->GetAbsOrigin().z;
 	m_vecRoot = origin - Vector(0,0,flTongueAdj);
 	m_vecTip.Set( m_vecRoot.Get() - Vector(0,0,(float)m_flAltitude) );
-	CollisionProp()->MarkSurroundingBoundsDirty();
+	GetEngineObject()->MarkSurroundingBoundsDirty();
 }
 
 //-----------------------------------------------------------------------------
@@ -583,7 +583,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 		// NOTE: Use the surrounding bounds so that we'll think often event if the tongue
 		// tip is in the PVS but the body isn't
 		Vector vecSurroundMins, vecSurroundMaxs;
-		CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
+		GetEngineObject()->CollisionProp()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 		if ( !UTIL_FindClientInPVS( vecSurroundMins, vecSurroundMaxs ) )
 		{
 			SetNextThink( gpGlobals->curtime + random->RandomFloat(1,1.5) );	// Stagger a bit to keep barnacles from thinking on the same frame
@@ -1049,7 +1049,7 @@ void CNPC_Barnacle::LiftNPC( float flBiteZOffset )
 	{
 		m_bLiftingPrey = false;
 
-		const Vector &vecSize = GetEnemy()->CollisionProp()->OBBSize();
+		const Vector &vecSize = GetEnemy()->GetEngineObject()->OBBSize();
 		if ( vecSize.z < 40 )
 		{
 			// Start the bite animation. The anim event in it will finish the job.
@@ -1103,7 +1103,7 @@ void CNPC_Barnacle::LiftRagdoll( float flBiteZOffset )
 
 		m_bLiftingPrey = false;
 
-		const Vector &vecSize = GetEnemy()->CollisionProp()->OBBSize();
+		const Vector &vecSize = GetEnemy()->GetEngineObject()->OBBSize();
 		if ( vecSize.z < 40 )
 		{
 			// Start the bite animation. The anim event in it will finish the job.
@@ -1558,7 +1558,7 @@ You can use this stanza to try to counterplace the constraint on the player's he
 	pAnimating->InvalidateBoneCache();
 
 	// Make a ragdoll for the guy, and hide him.
-	pTouchEnt->AddSolidFlags( FSOLID_NOT_SOLID );
+	pTouchEnt->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
   	m_hRagdoll = AttachRagdollToTongue( pAnimating );
 	m_hRagdoll->SetDamageEntity( pAnimating );
@@ -1739,7 +1739,7 @@ void CNPC_Barnacle::BitePrey( void )
 
 		// Create some blood to hide the vanishing headcrab
 		Vector vecBloodPos;
-		CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &vecBloodPos );
+		GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &vecBloodPos );
 		UTIL_BloodSpray( vecBloodPos, Vector(0,0,-1), GetEnemy()->BloodColor(), 8, FX_BLOODSPRAY_ALL );
 		
 		m_flDigestFinish = gpGlobals->curtime + 10.0;
@@ -1812,7 +1812,7 @@ void CNPC_Barnacle::BitePrey( void )
 #ifndef _XBOX
 	m_nBloodColor = pVictim->BloodColor(); 
 #endif
-	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &m_vecBloodPos );
+	GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &m_vecBloodPos );
 
 	// m_hRagdoll->SetOverlaySequence( ACT_DIE_BARNACLE_SWALLOW );
 	m_hRagdoll->SetBlendWeight( 0.0f );
@@ -1943,7 +1943,7 @@ void CNPC_Barnacle::RemoveRagdoll( bool bDestroyRagdoll )
 		if ( GetEnemy() )
 		{
 			GetEnemy()->RemoveEffects( EF_NODRAW );
-			GetEnemy()->RemoveSolidFlags( FSOLID_NOT_SOLID );
+			GetEnemy()->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		}
 	}
 }
@@ -2039,7 +2039,7 @@ void CNPC_Barnacle::OnTongueTipUpdated()
 	if ( vecNewTip != m_vecTip )
 	{
 		m_vecTip = vecNewTip;
-		CollisionProp()->MarkSurroundingBoundsDirty();
+		GetEngineObject()->MarkSurroundingBoundsDirty();
 	}
 }
 
@@ -2097,7 +2097,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 	m_OnDeath.FireOutput( info.GetAttacker(), this );
 	SendOnKilledGameEvent( info );
 
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	m_takedamage = DAMAGE_NO;
 	m_lifeState	= LIFE_DYING;
 
@@ -2115,7 +2115,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 		m_hRagdoll->StopFollowingEntity();
 		m_hRagdoll->SetMoveType( MOVETYPE_VPHYSICS );
 		m_hRagdoll->GetEngineObject()->SetAbsOrigin( m_hTongueTip->GetEngineObject()->GetAbsOrigin() );
-		m_hRagdoll->RemoveSolidFlags( FSOLID_NOT_SOLID );
+		m_hRagdoll->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_hRagdoll->SetCollisionGroup( COLLISION_GROUP_DEBRIS ); 
 		m_hRagdoll->RecheckCollisionFilter();
 		if ( npc_barnacle_swallow.GetBool() )
@@ -2590,7 +2590,7 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 			{
 				// If this is an item, make sure it's near the tongue before lifting it.
 				// Weapons and other items have very large bounding boxes.
-				if( pTest->GetSolidFlags() & FSOLID_TRIGGER )
+				if( pTest->GetEngineObject()->GetSolidFlags() & FSOLID_TRIGGER )
 				{
 					if( UTIL_DistApprox2D( WorldSpaceCenter(), pTest->WorldSpaceCenter() ) > 16 )
 					{
@@ -2667,8 +2667,8 @@ void CBarnacleTongueTip::Spawn( void )
 	AddEffects( EF_NODRAW );
 
 	// We don't want this to be solid, because we don't want it to collide with the barnacle.
-	SetSolid( SOLID_VPHYSICS );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	BaseClass::Spawn();
 
 	m_pSpring = NULL;
@@ -2755,7 +2755,7 @@ CBarnacleTongueTip *CBarnacleTongueTip::CreateTongueTip( CNPC_Barnacle *pBarnacl
 	if ( !pTip )
 		return NULL;
 
-	pTip->VPhysicsInitNormal( pTip->GetSolid(), pTip->GetSolidFlags(), false );
+	pTip->VPhysicsInitNormal( pTip->GetEngineObject()->GetSolid(), pTip->GetEngineObject()->GetSolidFlags(), false );
 	if ( !pTip->CreateSpring( pTongueRoot ) )
 		return NULL;
 
@@ -2780,7 +2780,7 @@ CBarnacleTongueTip *CBarnacleTongueTip::CreateTongueRoot( const Vector &vecOrigi
 	if ( !pTip )
 		return NULL;
 
-	pTip->AddSolidFlags( FSOLID_NOT_SOLID );
+	pTip->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	// Disable movement on the root, we'll move this thing manually.
 	pTip->VPhysicsInitShadow( false, false );

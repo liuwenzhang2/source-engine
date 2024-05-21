@@ -77,7 +77,7 @@ void CPhysicsCannister::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName()) );
 	SetBloodColor( DONT_BLEED );
 
-	AddSolidFlags( FSOLID_CUSTOMRAYTEST );
+	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST );
 	m_takedamage = DAMAGE_YES;
 	SetNextThink( TICK_NEVER_THINK );
 
@@ -120,7 +120,7 @@ bool CPhysicsCannister::CreateVPhysics()
 bool CPhysicsCannister::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& trace )
 {
 	Vector vecAbsMins, vecAbsMaxs;
-	CollisionProp()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
+	GetEngineObject()->WorldSpaceAABB( &vecAbsMins, &vecAbsMaxs );
 
 	if ( !IsBoxIntersectingRay( vecAbsMins, vecAbsMaxs, ray.m_Start, ray.m_Delta ) )
 		return false;

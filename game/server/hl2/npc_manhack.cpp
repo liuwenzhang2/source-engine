@@ -1745,7 +1745,7 @@ void CNPC_Manhack::CheckCollisions(float flInterval)
 		CBasePlayer *pCarrier = HasPhysicsAttacker( FLT_MAX );
 		if ( pCarrier )
 		{
-			if ( pCarrier->CollisionProp()->CalcDistanceFromPoint( WorldSpaceCenter() ) < 30 )
+			if ( pCarrier->GetEngineObject()->CalcDistanceFromPoint( WorldSpaceCenter() ) < 30 )
 			{
 				AngleVectors( pCarrier->EyeAngles(), &vecTraceDir, NULL, NULL );
 				vecTraceDir *= 40.0f;
@@ -2413,12 +2413,12 @@ void CNPC_Manhack::Spawn(void)
 	SetHullType(HULL_TINY_CENTERED); 
 	SetHullSizeNormal();
 
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	if (GetEngineObject()->HasSpawnFlags( SF_MANHACK_CARRIED ) )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		SetMoveType( MOVETYPE_NONE );
 	}
 	else
@@ -2958,8 +2958,8 @@ bool CNPC_Manhack::IsInEffectiveTargetZone( CBaseEntity *pTarget )
 	if ( pTarget && pTarget->IsPlayer() && assert_cast< CBasePlayer * >(pTarget)->IsInAVehicle() )
 	{
 		CBaseEntity *pVehicle = assert_cast< CBasePlayer * >(pTarget)->GetVehicleEntity();
-		pVehicle->CollisionProp()->NormalizedToWorldSpace( Vector(0.0f,0.0f,1.0f), &vecMaxPos );
-		pVehicle->CollisionProp()->NormalizedToWorldSpace( Vector(0.0f,0.0f,0.0f), &vecMinPos );
+		pVehicle->GetEngineObject()->NormalizedToWorldSpace( Vector(0.0f,0.0f,1.0f), &vecMaxPos );
+		pVehicle->GetEngineObject()->NormalizedToWorldSpace( Vector(0.0f,0.0f,0.0f), &vecMinPos );
 	
 		if ( ourHeight > vecMinPos.z && ourHeight < vecMaxPos.z )
 			return true;
@@ -2968,11 +2968,11 @@ bool CNPC_Manhack::IsInEffectiveTargetZone( CBaseEntity *pTarget )
 	}
 	
 	// Get the enemies top and bottom point
-	pTarget->CollisionProp()->NormalizedToWorldSpace( Vector(0.0f,0.0f,1.0f), &vecMaxPos );
+	pTarget->GetEngineObject()->NormalizedToWorldSpace( Vector(0.0f,0.0f,1.0f), &vecMaxPos );
 #ifdef _XBOX
 	pTarget->CollisionProp()->NormalizedToWorldSpace( Vector(0.0f,0.0f,0.5f), &vecMinPos ); // Only half the body is valid
 #else
-	pTarget->CollisionProp()->NormalizedToWorldSpace( Vector(0.0f,0.0f,0.0f), &vecMinPos );
+	pTarget->GetEngineObject()->NormalizedToWorldSpace( Vector(0.0f,0.0f,0.0f), &vecMinPos );
 #endif // _XBOX
 	// See if we're within that range
 	if ( ourHeight > vecMinPos.z && ourHeight < vecMaxPos.z )
@@ -2993,13 +2993,13 @@ void CNPC_Manhack::TranslateNavGoal( CBaseEntity *pEnemy, Vector &chasePosition 
 	{
 		Vector vecNewPos;
 		CBaseEntity *pVehicle = assert_cast< CBasePlayer * >(pEnemy)->GetVehicleEntity();
-		pVehicle->CollisionProp()->NormalizedToWorldSpace( Vector(0.5,0.5,0.5f), &vecNewPos );
+		pVehicle->GetEngineObject()->NormalizedToWorldSpace( Vector(0.5,0.5,0.5f), &vecNewPos );
 		chasePosition.z = vecNewPos.z;
 	}
 	else
 	{
 		Vector vecTarget;
-		pEnemy->CollisionProp()->NormalizedToCollisionSpace( Vector(0,0,0.75f), &vecTarget );
+		pEnemy->GetEngineObject()->NormalizedToCollisionSpace( Vector(0,0,0.75f), &vecTarget );
 		chasePosition.z += vecTarget.z;
 	}
 }

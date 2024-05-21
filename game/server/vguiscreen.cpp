@@ -130,8 +130,8 @@ void CVGuiScreen::Spawn()
 	// This has no model, but we want it to transmit if it's in the PVS anyways
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 	m_nAttachmentIndex = 0;
-	SetSolid( SOLID_OBB );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->SetSolid( SOLID_OBB );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetActualSize( m_flWidth, m_flHeight );
 	m_fScreenFlags.Set( VGUI_SCREEN_ACTIVE );
 

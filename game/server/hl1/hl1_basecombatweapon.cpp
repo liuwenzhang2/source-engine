@@ -25,7 +25,7 @@ void CBaseHL1CombatWeapon::Precache()
 
 bool CBaseHL1CombatWeapon::CreateVPhysics( void )
 {
-	VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false );
+	VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
 	IPhysicsObject *pPhysObj = VPhysicsGetObject();
         if ( pPhysObj )
 	{
@@ -46,10 +46,10 @@ void CBaseHL1CombatWeapon::FallInit( void )
 
 	if( !CreateVPhysics() )
 	{
-		SetSolid( SOLID_BBOX );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
 		SetMoveType( MOVETYPE_FLYGRAVITY );
-                SetSolid( SOLID_BBOX );
-                AddSolidFlags( FSOLID_TRIGGER );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
+		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 	}
 
 	SetPickupTouch();

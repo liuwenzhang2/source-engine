@@ -162,8 +162,8 @@ void CNPC_Alyx::SelectModel()
 //-----------------------------------------------------------------------------
 void CNPC_Alyx::SetupAlyxWithoutParent( void )
 {
-	SetSolid( SOLID_BBOX );
-	AddSolidFlags( FSOLID_NOT_STANDABLE );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 
 	CapabilitiesAdd( bits_CAP_MOVE_GROUND | bits_CAP_DOORS_GROUP | bits_CAP_TURN_HEAD | bits_CAP_DUCK | bits_CAP_SQUAD );
@@ -190,7 +190,7 @@ void CNPC_Alyx::CreateEmpTool( void )
 		int iAttachment = LookupAttachment( "Emp_Holster" );
 		m_hEmpTool->GetEngineObject()->SetParent(this->GetEngineObject(), iAttachment);
 		m_hEmpTool->SetOwnerEntity(this);
-		m_hEmpTool->SetSolid( SOLID_NONE );
+		m_hEmpTool->GetEngineObject()->SetSolid( SOLID_NONE );
 		m_hEmpTool->GetEngineObject()->SetLocalOrigin( Vector( 0, 0, 0 ) );
 		m_hEmpTool->GetEngineObject()->SetLocalAngles( QAngle( 0, 0, 0 ) );
 		m_hEmpTool->Spawn();

@@ -288,7 +288,7 @@ void CBaseEntity::UpdateWaterState()
 
 	// Compute the point to check for water state
 	Vector	point;
-	CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &point );
+	GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &point );
 
 	SetWaterLevel( 0 );
 	SetWaterType( CONTENTS_EMPTY );
@@ -903,7 +903,7 @@ void CBaseEntity::PhysicsRigidChild( void )
 	// We have to do this regardless owing to hierarchy
 	if ( VPhysicsGetObject() )
 	{
-		int solidType = GetSolid();
+		int solidType = GetEngineObject()->GetSolid();
 		bool bAxisAligned = ( solidType == SOLID_BBOX || solidType == SOLID_NONE ) ? true : false;
 		VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), bAxisAligned ? vec3_angle : GetEngineObject()->GetAbsAngles(), true, gpGlobals->frametime );
 	}

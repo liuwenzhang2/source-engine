@@ -472,7 +472,7 @@ void CWorld::PostConstructor(const char* szClassname, int iForceEdictIndex)
 {
 	GetEngineObject()->AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES);
 	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
-	SetSolid(SOLID_BSP);
+	GetEngineObject()->SetSolid(SOLID_BSP);
 }
 
 CWorld::~CWorld( )

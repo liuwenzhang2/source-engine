@@ -27,6 +27,7 @@ class QAngle;
 struct PVSInfo_t;
 class CCheckTransmitInfo;
 struct matrix3x4_t;
+enum SurroundingBoundsType_t;
 
 struct servertouchlink_t
 {
@@ -208,6 +209,46 @@ public:
 	virtual void SetModelName(string_t name) = 0;
 	virtual void SetModelIndex(int index) = 0;
 	virtual int GetModelIndex(void) const = 0;
+
+	virtual ICollideable* CollisionProp() = 0;
+	virtual const ICollideable* CollisionProp() const = 0;
+	// This defines collision bounds in OBB space
+	virtual void SetCollisionBounds(const Vector& mins, const Vector& maxs) = 0;
+	virtual SolidType_t GetSolid() const = 0;
+	virtual bool IsSolid() const = 0;
+	virtual void SetSolid(SolidType_t val) = 0;
+	virtual void AddSolidFlags(int flags) = 0;
+	virtual void RemoveSolidFlags(int flags) = 0;
+	virtual void ClearSolidFlags(void) = 0;
+	virtual bool IsSolidFlagSet(int flagMask) const = 0;
+	virtual void SetSolidFlags(int flags) = 0;
+	virtual int GetSolidFlags(void) const = 0;
+	virtual const Vector& OBBSize() const = 0;
+	virtual const Vector& OBBCenter() const = 0;
+	virtual const Vector& WorldSpaceCenter() const = 0;
+	virtual void WorldSpaceAABB(Vector* pWorldMins, Vector* pWorldMaxs) const = 0;
+	virtual const Vector& NormalizedToWorldSpace(const Vector& in, Vector* pResult) const = 0;
+	virtual const Vector& WorldToNormalizedSpace(const Vector& in, Vector* pResult) const = 0;
+	virtual const Vector& WorldToCollisionSpace(const Vector& in, Vector* pResult) const = 0;
+	virtual const Vector& CollisionToWorldSpace(const Vector& in, Vector* pResult) const = 0;
+	virtual const Vector& WorldDirectionToCollisionSpace(const Vector& in, Vector* pResult) const = 0;
+	virtual const Vector& NormalizedToCollisionSpace(const Vector& in, Vector* pResult) const = 0;
+	virtual float BoundingRadius() const = 0;
+	virtual float BoundingRadius2D() const = 0;
+	virtual void RandomPointInBounds(const Vector& vecNormalizedMins, const Vector& vecNormalizedMaxs, Vector* pPoint) const = 0;
+	virtual bool IsPointInBounds(const Vector& vecWorldPt) const = 0;
+	virtual void UseTriggerBounds(bool bEnable, float flBloat = 0.0f) = 0;
+	virtual void RefreshScaledCollisionBounds(void) = 0;
+	virtual void MarkPartitionHandleDirty() = 0;
+	virtual bool DoesRotationInvalidateSurroundingBox() const = 0;
+	virtual void MarkSurroundingBoundsDirty() = 0;
+	virtual void CalcNearestPoint(const Vector& vecWorldPt, Vector* pVecNearestWorldPt) const = 0;
+	virtual void SetSurroundingBoundsType(SurroundingBoundsType_t type, const Vector* pMins = NULL, const Vector* pMaxs = NULL) = 0;
+	virtual unsigned short	GetPartitionHandle() const = 0;
+	virtual float CalcDistanceFromPoint(const Vector& vecWorldPt) const = 0;
+	virtual bool DoesVPhysicsInvalidateSurroundingBox() const = 0;
+	virtual void UpdatePartition() = 0;
+	virtual bool IsBoundsDefinedInEntitySpace() const = 0;
 
 };
 

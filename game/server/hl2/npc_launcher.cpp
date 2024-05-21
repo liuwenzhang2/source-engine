@@ -232,7 +232,7 @@ void CNPC_Launcher::Spawn( void )
 		Warning("WARNING: NPC_Launcher Homing Strength must be between 0 and 100\n");
 	}
 	
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( DONT_BLEED );
 	AddEffects( EF_NODRAW );

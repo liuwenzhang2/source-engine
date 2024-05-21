@@ -552,7 +552,7 @@ bool CItem_DynamicResupply::SpawnItemFromRatio( int nCount, DynamicResupplyItems
 
 	// Move the entity up so that it doesn't go below the spawn origin
 	Vector vecWorldMins, vecWorldMaxs;
-	pEnt->CollisionProp()->WorldSpaceAABB( &vecWorldMins, &vecWorldMaxs );
+	pEnt->GetEngineObject()->WorldSpaceAABB( &vecWorldMins, &vecWorldMaxs );
 	if ( vecWorldMins.z < pVecSpawnOrigin->z )
 	{
 		float dz = pVecSpawnOrigin->z - vecWorldMins.z;

@@ -33,7 +33,7 @@ public:
 		SetModel( SUIT_MODEL );
 		BaseClass::Spawn( );
 
-		CollisionProp()->UseTriggerBounds( true, 12.0f );
+		GetEngineObject()->UseTriggerBounds( true, 12.0f );
 	}
 	void Precache( void )
 	{

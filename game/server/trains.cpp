@@ -297,7 +297,7 @@ void CFuncPlat::Setup( void )
 	}
 	
 	GetEngineObject()->SetLocalAngles( vec3_angle );
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 	SetMoveType( MOVETYPE_PUSH );
 
 	// Set size and link into world
@@ -313,7 +313,7 @@ void CFuncPlat::Setup( void )
 	else
 	{
 		// NOTE: This works because the angles were set to vec3_angle above
-		m_vecPosition2.z = GetEngineObject()->GetLocalOrigin().z - CollisionProp()->OBBSize().z + 8;
+		m_vecPosition2.z = GetEngineObject()->GetLocalOrigin().z - GetEngineObject()->OBBSize().z + 8;
 	}
 
 	if (m_flSpeed == 0)
@@ -383,13 +383,13 @@ void CPlatTrigger::SpawnInsideTrigger( CFuncPlat *pPlatform )
 {
 	m_pPlatform = pPlatform;
 	// Create trigger entity, "point" it at the owning platform, give it a touch method
-	SetSolid( SOLID_BSP );
-	AddSolidFlags( FSOLID_TRIGGER );
+	GetEngineObject()->SetSolid( SOLID_BSP );
+	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 	SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetLocalOrigin( pPlatform->GetEngineObject()->GetLocalOrigin() );
 
 	// Establish the trigger field's size
-	CCollisionProperty *pCollision = m_pPlatform->CollisionProp();
+	CCollisionProperty *pCollision = (CCollisionProperty*)m_pPlatform->GetEngineObject()->CollisionProp();
 	Vector vecTMin = pCollision->OBBMins() + Vector ( 25 , 25 , 0 );
 	Vector vecTMax = pCollision->OBBMaxs() + Vector ( 25 , 25 , 8 );
 	vecTMin.z = vecTMax.z - ( m_pPlatform->m_vecPosition1.z - m_pPlatform->m_vecPosition2.z + 8 );
@@ -954,7 +954,7 @@ void CFuncTrain::Next( void )
 
 		// This is supposed to place the center of the func_train at the target's origin.
 		// FIXME: This is totally busted! It's using the wrong space for the computation...
-		UTIL_SetOrigin( this, pTarg->GetEngineObject()->GetLocalOrigin() - CollisionProp()->OBBCenter() );
+		UTIL_SetOrigin( this, pTarg->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->OBBCenter() );
 		
 		// Get on with doing the next path corner.
 		Wait(); 
@@ -968,7 +968,7 @@ void CFuncTrain::Next( void )
 
 		// This is supposed to place the center of the func_train at the target's origin.
 		// FIXME: This is totally busted! It's using the wrong space for the computation...
-		LinearMove ( pTarg->GetEngineObject()->GetLocalOrigin() - CollisionProp()->OBBCenter(), m_flSpeed );
+		LinearMove ( pTarg->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->OBBCenter(), m_flSpeed );
 	}
 }
 
@@ -992,8 +992,8 @@ void CFuncTrain::Activate( void )
 
 		// This is supposed to place the center of the func_train at the target's origin.
 		// FIXME: This is totally busted! It's using the wrong space for the computation...
-		UTIL_SetOrigin( this, m_hCurrentTarget->GetEngineObject()->GetLocalOrigin() - CollisionProp()->OBBCenter() );
-		if ( GetSolid() == SOLID_BSP )
+		UTIL_SetOrigin( this, m_hCurrentTarget->GetEngineObject()->GetLocalOrigin() - GetEngineObject()->OBBCenter() );
+		if (GetEngineObject()->GetSolid() == SOLID_BSP )
 		{
 			VPhysicsInitShadow( false, false );
 		}
@@ -1056,11 +1056,11 @@ void CFuncTrain::Spawn( void )
 	}
 	
 	SetMoveType( MOVETYPE_PUSH );
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	if (GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_PASSABLE)
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	m_activated = false;
@@ -2688,9 +2688,9 @@ void CFuncTrackTrain::Spawn( void )
 
 #ifdef HL1_DLL
 	// BUGBUG: For now, just force this for testing.  Remove if we want to tag all of the trains in the levels
-	SetSolid( SOLID_BSP );
+	GetEngineObject()->SetSolid( SOLID_BSP );
 #else
-	SetSolid(GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_HL1TRAIN ) ? SOLID_BSP : SOLID_VPHYSICS );
+	GetEngineObject()->SetSolid(GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_HL1TRAIN ) ? SOLID_BSP : SOLID_VPHYSICS );
 	//SetSolid( SOLID_VPHYSICS );
 #endif
 
@@ -2700,11 +2700,11 @@ void CFuncTrackTrain::Spawn( void )
 	}
 	if (GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_PASSABLE)
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
-	m_controlMins = CollisionProp()->OBBMins();
-	m_controlMaxs = CollisionProp()->OBBMaxs();
+	m_controlMins = GetEngineObject()->CollisionProp()->OBBMins();
+	m_controlMaxs = GetEngineObject()->CollisionProp()->OBBMaxs();
 	m_controlMaxs.z += 72;
 // start trains on the next frame, to make sure their targets have had
 // a chance to spawn/activate
@@ -2837,7 +2837,7 @@ void CFuncTrainControls::Find( void )
 
 void CFuncTrainControls::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	AddEffects( EF_NODRAW );

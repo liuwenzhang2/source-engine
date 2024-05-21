@@ -298,7 +298,7 @@ void CBaseProp::CalculateBlockLOS( void )
 	//		- Our other 2 dimensions are >30
 	// By default, entities block LOS, so we only need to detect non-blockage
 	bool bFoundLarge = false;
-	Vector vecSize = CollisionProp()->OBBMaxs() - CollisionProp()->OBBMins();
+	Vector vecSize = GetEngineObject()->CollisionProp()->OBBMaxs() - GetEngineObject()->CollisionProp()->OBBMins();
 	for ( int i = 0; i < 3; i++ )
 	{
 		if ( vecSize[i] > 40 )
@@ -1496,7 +1496,7 @@ void CBreakableProp::CreateFlare( float flLifetime )
 		GetAttachment( iAttachment, vOrigin );
 
 		pFlare->SetMoveType( MOVETYPE_NONE );
-		pFlare->SetSolid( SOLID_NONE );
+		pFlare->GetEngineObject()->SetSolid( SOLID_NONE );
 		pFlare->SetRenderMode( kRenderTransAlpha );
 		pFlare->SetRenderColorA( 1 );
 		pFlare->GetEngineObject()->SetLocalOrigin( vOrigin );
@@ -1667,7 +1667,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 
 	Vector origin;
 	QAngle angles;
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	if ( pPhysics )
 	{
 		pPhysics->GetVelocity( &velocity, &angVelocity );
@@ -1904,10 +1904,10 @@ void CDynamicProp::Spawn( )
 	// If the prop is not-solid, the bounding box needs to be 
 	// OBB to correctly surround the prop as it rotates.
 	// Check the classname so we don't mess with doors & other derived classes.
-	if ( GetSolid() == SOLID_NONE && FClassnameIs( this, "prop_dynamic" ) )
+	if (GetEngineObject()->GetSolid() == SOLID_NONE && FClassnameIs( this, "prop_dynamic" ) )
 	{
-		SetSolid( SOLID_OBB );
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->SetSolid( SOLID_OBB );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	BaseClass::Spawn();
@@ -1957,7 +1957,7 @@ void CDynamicProp::Spawn( )
 
 	if (GetEngineObject()->HasSpawnFlags( SF_DYNAMICPROP_DISABLE_COLLISION ) )
 	{
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
 	//m_debugOverlays |= OVERLAY_ABSBOX_BIT;
@@ -2016,7 +2016,7 @@ bool CDynamicProp::OverridePropdata( void )
 //------------------------------------------------------------------------------
 bool CDynamicProp::CreateVPhysics( void )
 {
-	if ( GetSolid() == SOLID_NONE || ((GetSolidFlags() & FSOLID_NOT_SOLID) && GetEngineObject()->HasSpawnFlags(SF_DYNAMICPROP_NO_VPHYSICS)))
+	if (GetEngineObject()->GetSolid() == SOLID_NONE || ((GetEngineObject()->GetSolidFlags() & FSOLID_NOT_SOLID) && GetEngineObject()->HasSpawnFlags(SF_DYNAMICPROP_NO_VPHYSICS)))
 		return true;
 
 	if ( !m_bDisableBoneFollowers )
@@ -2026,7 +2026,7 @@ bool CDynamicProp::CreateVPhysics( void )
 
 	if ( m_BoneFollowerManager.GetNumBoneFollowers() )
 	{
-		if ( GetSolidFlags() & FSOLID_NOT_SOLID )
+		if (GetEngineObject()->GetSolidFlags() & FSOLID_NOT_SOLID )
 		{
 			// Already non-solid?  Must need bone followers for some other reason
 			// like needing to attach constraints to this object
@@ -2035,16 +2035,16 @@ bool CDynamicProp::CreateVPhysics( void )
 				CBaseEntity *pFollower = m_BoneFollowerManager.GetBoneFollower(i)->hFollower;
 				if ( pFollower )
 				{
-					pFollower->AddSolidFlags(FSOLID_NOT_SOLID);
+					pFollower->GetEngineObject()->AddSolidFlags(FSOLID_NOT_SOLID);
 				}
 			}
 
 		}
 		// If our collision is through bone followers, we want to be non-solid
-		AddSolidFlags( FSOLID_NOT_SOLID );
+		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		// add these for the client, FSOLID_NOT_SOLID should keep it out of the testCollision code
 		// except in the case of TraceEntity() which the client does for impact effects
-		AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
+		GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 		return true;
 	}
 	else
@@ -2097,10 +2097,10 @@ void CDynamicProp::CreateBoneFollowers()
 
 bool CDynamicProp::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& trace )
 {
-	if ( IsSolidFlagSet(FSOLID_NOT_SOLID) )
+	if (GetEngineObject()->IsSolidFlagSet(FSOLID_NOT_SOLID) )
 	{
 		// if this entity is marked non-solid and custom test it must have bone followers
-		if ( IsSolidFlagSet( FSOLID_CUSTOMBOXTEST ) && IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ))
+		if (GetEngineObject()->IsSolidFlagSet( FSOLID_CUSTOMBOXTEST ) && GetEngineObject()->IsSolidFlagSet( FSOLID_CUSTOMRAYTEST ))
 		{
 			for ( int i = 0; i < m_BoneFollowerManager.GetNumBoneFollowers(); i++ )
 			{
@@ -2349,12 +2349,12 @@ void CDynamicProp::InputTurnOff( inputdata_t &inputdata )
 
 void CDynamicProp::InputDisableCollision( inputdata_t &inputdata )
 {
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 }
 
 void CDynamicProp::InputEnableCollision( inputdata_t &inputdata )
 {
-	RemoveSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 }
 
 //-----------------------------------------------------------------------------
@@ -2399,7 +2399,7 @@ void COrnamentProp::Spawn()
 void COrnamentProp::DetachFromOwner()
 {
 	SetOwnerEntity( NULL );
-	AddSolidFlags( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 	AddEffects( EF_NODRAW );
 }
@@ -2615,7 +2615,7 @@ bool CPhysicsProp::CreateVPhysics()
 
 	if ( !pPhysicsObject )
 	{
-		SetSolid( SOLID_NONE );
+		GetEngineObject()->SetSolid( SOLID_NONE );
 		SetMoveType( MOVETYPE_NONE );
 		Warning("ERROR!: Can't create physics object for %s\n", STRING(GetEngineObject()->GetModelName() ) );
 	}
@@ -3651,9 +3651,9 @@ void CBasePropDoor::Spawn()
 	
 	RemoveFlag(FL_STATICPROP);
 
-	SetSolid(SOLID_VPHYSICS);
+	GetEngineObject()->SetSolid(SOLID_VPHYSICS);
 	VPhysicsInitShadow(false, false);
-	AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
+	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 
 	SetBodygroup( DOOR_HARDWARE_GROUP, m_nHardwareType );
 	if ((m_nHardwareType == 0) && (!GetEngineObject()->HasSpawnFlags(SF_DOOR_LOCKED)))
@@ -4951,7 +4951,7 @@ bool CPropDoorRotating::IsHingeOnLeft()
 	//
 	Vector vecMins;
 	Vector vecMaxs;
-	CollisionProp()->WorldSpaceAABB( &vecMins, &vecMaxs );
+	GetEngineObject()->WorldSpaceAABB( &vecMins, &vecMaxs );
 
 	vecMins -= GetEngineObject()->GetAbsOrigin();
 	vecMaxs -= GetEngineObject()->GetAbsOrigin();
@@ -4999,11 +4999,11 @@ void CPropDoorRotating::OnDoorOpened( void )
 	if ( m_hDoorBlocker != NULL )
 	{
 		// Allow passage through this blocker while open
-		m_hDoorBlocker->AddSolidFlags( FSOLID_NOT_SOLID );
+		m_hDoorBlocker->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 0, 255, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMins(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMaxs(), 0, 255, 0, true, 1.0f );
 		}
 	}
 }
@@ -5020,7 +5020,7 @@ void CPropDoorRotating::OnDoorClosed( void )
 		
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 0, 255, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMins(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMaxs(), 0, 255, 0, true, 1.0f );
 		}
 	}
 }
@@ -5076,13 +5076,13 @@ void CPropDoorRotating::CalculateDoorVolume( QAngle closedAngles, QAngle openAng
 
 	// Find our AABB at the closed state
 	Vector	closedMins, closedMaxs;
-	CollisionProp()->WorldSpaceAABB( &closedMins, &closedMaxs );
+	GetEngineObject()->WorldSpaceAABB( &closedMins, &closedMaxs );
 	
 	GetEngineObject()->SetLocalAngles( openAngles );
 
 	// Find our AABB at the open state
 	Vector	openMins, openMaxs;
-	CollisionProp()->WorldSpaceAABB( &openMins, &openMaxs );
+	GetEngineObject()->WorldSpaceAABB( &openMins, &openMaxs );
 
 	// Reset our angles to our starting angles
 	GetEngineObject()->SetLocalAngles( saveAngles );
@@ -5147,7 +5147,7 @@ bool CPropDoorRotating::CheckDoorClear( doorCheck_e state )
 
 			if ( tr.m_pEnt )
 			{
-				NDebugOverlay::Box(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin(), ((CBaseEntity*)tr.m_pEnt)->CollisionProp()->OBBMins(), ((CBaseEntity*)tr.m_pEnt)->CollisionProp()->OBBMaxs(), 220, 220, 0, true, 10.0f );
+				NDebugOverlay::Box(((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetAbsOrigin(), ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->CollisionProp()->OBBMins(), ((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->CollisionProp()->OBBMaxs(), 220, 220, 0, true, 10.0f );
 			}
 		}
 
@@ -5348,12 +5348,12 @@ void CPropDoorRotating::BeginOpening(CBaseEntity *pOpenAwayFrom)
 		// If we hit something while opening, just stay unsolid until we try again
 		if ( CheckDoorClear( eDirCheck ) == false )
 		{
-			m_hDoorBlocker->AddSolidFlags( FSOLID_NOT_SOLID );
+			m_hDoorBlocker->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		}
 
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 255, 0, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMins(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMaxs(), 255, 0, 0, true, 1.0f );
 		}
 	}
 
@@ -5371,12 +5371,12 @@ void CPropDoorRotating::BeginClosing( void )
 		// Become solid again unless we're already being blocked
 		if ( CheckDoorClear( GetOpenState() )  )
 		{
-			m_hDoorBlocker->RemoveSolidFlags( FSOLID_NOT_SOLID );
+			m_hDoorBlocker->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		}
 		
 		if ( g_debug_doors.GetBool() )
 		{
-			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->CollisionProp()->OBBMins(), m_hDoorBlocker->CollisionProp()->OBBMaxs(), 255, 0, 0, true, 1.0f );
+			NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMins(), m_hDoorBlocker->GetEngineObject()->CollisionProp()->OBBMaxs(), 255, 0, 0, true, 1.0f );
 		}
 	}
 
@@ -5515,8 +5515,8 @@ public:
 	virtual bool OverridePropdata() { return true; }
 	bool CreateVPhysics()
 	{
-		SetSolid( SOLID_BBOX );
-		SetCollisionBounds( -Vector(12,12,12), Vector(12,12,12) );
+		GetEngineObject()->SetSolid( SOLID_BBOX );
+		GetEngineObject()->SetCollisionBounds( -Vector(12,12,12), Vector(12,12,12) );
 		objectparams_t params = g_PhysDefaultObjectParams;
 		params.pGameData = static_cast<void *>(this);
 		IPhysicsObject *pPhysicsObject = physenv->CreateSphereObject( 12, 0, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), &params, false );
@@ -5659,7 +5659,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 			if ( VPhysicsGetObject() )
 			{
 				m_iPhysicsMode = GetAutoMultiplayerPhysicsMode( 
-					CollisionProp()->OBBSize(), VPhysicsGetObject()->GetMass() );
+					GetEngineObject()->OBBSize(), VPhysicsGetObject()->GetMass() );
 			}
 			else
 			{
@@ -5708,13 +5708,13 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 		// can end up larger than the CollisionProp() would have calculated on its own, but it'll be
 		// identical on the client and the server.
 		m_usingCustomCollisionBounds = false;
-		if ( ( GetSolid() == SOLID_VPHYSICS ) && ( GetMoveType() == MOVETYPE_VPHYSICS ) )
+		if ( (GetEngineObject()->GetSolid() == SOLID_VPHYSICS ) && ( GetMoveType() == MOVETYPE_VPHYSICS ) )
 		{
 			IPhysicsObject *pPhysics = VPhysicsGetObject();
 			if ( pPhysics && pPhysics->GetCollide() )
 			{
 				physcollision->CollideGetAABB( &m_collisionMins.GetForModify(), &m_collisionMaxs.GetForModify(), pPhysics->GetCollide(), vec3_origin, vec3_angle );
-				CollisionProp()->SetSurroundingBoundsType( USE_GAME_CODE );
+				GetEngineObject()->SetSurroundingBoundsType( USE_GAME_CODE );
 				m_usingCustomCollisionBounds = true;
 			}
 		}
@@ -5804,8 +5804,8 @@ void CPhysicsPropRespawnable::Spawn( void )
 	m_vOriginalSpawnOrigin = GetEngineObject()->GetAbsOrigin();
 	m_vOriginalSpawnAngles = GetEngineObject()->GetAbsAngles();
 
-	m_vOriginalMins = CollisionProp()->OBBMins();
-	m_vOriginalMaxs = CollisionProp()->OBBMaxs();
+	m_vOriginalMins = GetEngineObject()->CollisionProp()->OBBMins();
+	m_vOriginalMaxs = GetEngineObject()->CollisionProp()->OBBMaxs();
 
 	if ( m_flRespawnTime == 0.0f )
 	{
@@ -6157,7 +6157,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	{
 		Vector mins, maxs;
 		modelinfo->GetModelBounds( pModel, mins, maxs );
-		pInstance->SetCollisionBounds( mins*flScale, maxs*flScale );
+		pInstance->GetEngineObject()->SetCollisionBounds( mins*flScale, maxs*flScale );
 	}
 
 	// Scale the base model as well

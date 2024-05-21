@@ -474,7 +474,7 @@ void CWeaponHopwire::RollGrenade( CBasePlayer *pPlayer )
 {
 	// BUGBUG: Hardcoded grenade width of 4 - better not change the model :)
 	Vector vecSrc;
-	pPlayer->CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &vecSrc );
+	pPlayer->GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &vecSrc );
 	vecSrc.z += GRENADE_RADIUS;
 
 	Vector vecFacing = pPlayer->BodyDirection2D( );

@@ -236,7 +236,7 @@ CSoundEnt::~CSoundEnt()
 //=========================================================
 void CSoundEnt::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	Initialize();
 
 	SetNextThink( gpGlobals->curtime + 1 );

@@ -465,7 +465,7 @@ ConVar cl_autohelp(
 		//
 			 
 		Vector mins, maxs;
-		pMainEnt->CollisionProp()->WorldSpaceAABB( &mins, &maxs );
+		pMainEnt->GetEngineObject()->WorldSpaceAABB( &mins, &maxs );
 		mins -= pMainEnt->GetEngineObject()->GetAbsOrigin();
 		maxs -= pMainEnt->GetEngineObject()->GetAbsOrigin();
 
@@ -2602,7 +2602,7 @@ ConVar cl_autohelp(
 			// tricky, make players non solid while moving to their spawn points
 			if ( (pPlayer->GetTeamNumber() == TEAM_CT) || (pPlayer->GetTeamNumber() == TEAM_TERRORIST) )
 			{
-				pPlayer->AddSolidFlags( FSOLID_NOT_SOLID );
+				pPlayer->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 			}
 		}
         

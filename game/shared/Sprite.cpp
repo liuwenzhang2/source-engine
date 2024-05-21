@@ -189,13 +189,13 @@ CSprite::CSprite() : BaseClass()
 //-----------------------------------------------------------------------------
 void CSprite::Spawn( void )
 {
-	SetSolid( SOLID_NONE );
+	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 	m_flFrame = 0;
 
 	Precache();
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	CollisionProp()->SetSurroundingBoundsType( USE_GAME_CODE );
+	GetEngineObject()->SetSurroundingBoundsType( USE_GAME_CODE );
 
 	m_flMaxFrame = (float)modelinfo->GetModelFrameCount( GetModel() ) - 1;
 	AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
@@ -388,7 +388,7 @@ CSprite *CSprite::SpriteCreate( const char *pSpriteName, const Vector &origin, b
 {
 	CSprite *pSprite = (CSprite*)gEntList.CreateEntityByName( "env_sprite" );
 	pSprite->SpriteInit( pSpriteName, origin );
-	pSprite->SetSolid( SOLID_NONE );
+	pSprite->GetEngineObject()->SetSolid( SOLID_NONE );
 	UTIL_SetSize( pSprite, vec3_origin, vec3_origin );
 	pSprite->SetMoveType( MOVETYPE_NONE );
 	if ( animate )
@@ -526,7 +526,7 @@ void CSprite::SetSpriteScale( float scale )
 	{
 		m_flSpriteScale		= scale;	//Take our current position as our new starting position
 		// The surrounding box is based on sprite scale... it changes, box is dirty
-		CollisionProp()->MarkSurroundingBoundsDirty();
+		GetEngineObject()->MarkSurroundingBoundsDirty();
 	}
 }
 

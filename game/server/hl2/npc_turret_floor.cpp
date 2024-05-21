@@ -914,7 +914,7 @@ void CNPC_FloorTurret::ActiveThink( void )
 	{
 		trace_t tr;
 		Vector vecCenter;
-		CollisionProp()->CollisionToWorldSpace( Vector(0,0,52), &vecCenter );
+		GetEngineObject()->CollisionToWorldSpace( Vector(0,0,52), &vecCenter );
 		UTIL_TraceLine( vecCenter, vecMid, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 		if ( tr.fraction != 1.0 )
 		{

@@ -2022,7 +2022,7 @@ static CDODViewVectors g_DODViewVectors(
 		//
 			 
 		Vector mins, maxs;
-		pMainEnt->CollisionProp()->WorldSpaceAABB( &mins, &maxs );
+		pMainEnt->GetEngineObject()->WorldSpaceAABB( &mins, &maxs );
 		mins -= pMainEnt->GetEngineObject()->GetAbsOrigin();
 		maxs -= pMainEnt->GetEngineObject()->GetAbsOrigin();
 
@@ -4519,7 +4519,7 @@ const CDODViewVectors *CDODGameRules::GetDODViewVectors() const
 
 	void CDODDetect::Spawn( void )
 	{
-		SetSolid( SOLID_NONE );
+		GetEngineObject()->SetSolid( SOLID_NONE );
 
 		BaseClass::Spawn();	
 	}
@@ -5284,17 +5284,17 @@ void CFuncTeamWall::Spawn( void )
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	AddEffects( EF_NODRAW );
-	SetSolid( SOLID_BBOX );
+	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	// set our custom collision if we declared this ent through the .ent file
 	if ( m_vecMins != vec3_origin && m_vecMaxs != vec3_origin )
 	{
-		SetCollisionBounds( m_vecMins, m_vecMaxs );
+		GetEngineObject()->SetCollisionBounds( m_vecMins, m_vecMaxs );
 
 		// If we delcared an angle in the .ent file, make us OBB
 		if (GetEngineObject()->GetAbsAngles() != vec3_angle )
 		{
-			SetSolid( SOLID_OBB );
+			GetEngineObject()->SetSolid( SOLID_OBB );
 		}
 	}	
 
@@ -5477,13 +5477,13 @@ void CFuncTeamWall::DrawThink( void )
 		{
 			// We're a trigger, but we want to be solid. Out ShouldCollide() will make
 			// us non-solid to members of the team that spawns here.
-			RemoveSolidFlags( FSOLID_TRIGGER );
-			RemoveSolidFlags( FSOLID_NOT_SOLID );	
+			GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
+			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		}
 		else
 		{
-			AddSolidFlags( FSOLID_NOT_SOLID );
-			AddSolidFlags( FSOLID_TRIGGER );	
+			GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
+			GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 		}
 	}
 
