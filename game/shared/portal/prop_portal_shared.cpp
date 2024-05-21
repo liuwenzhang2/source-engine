@@ -68,8 +68,8 @@ bool CProp_Portal_Shared::IsEntityTeleportable( CBaseEntity *pEntity )
 
 #endif
 
-		Assert( pEntity != pEntity->GetMoveParent() );
-		pEntity = pEntity->GetEngineObject()->GetMoveParent() ? pEntity->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+		Assert( pEntity->GetEngineObject() != pEntity->GetEngineObject()->GetMoveParent() );
+		pEntity = pEntity->GetEngineObject()->GetMoveParent() ? pEntity->GetEngineObject()->GetMoveParent()->GetOuter() : NULL;
 	} while( pEntity );
 
 	return true;

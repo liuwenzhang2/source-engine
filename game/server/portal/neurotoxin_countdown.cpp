@@ -114,7 +114,7 @@ bool CNeurotoxinCountdown::KeyValue( const char *szKeyName, const char *szValue 
 	// NOTE: Have to do these separate because they set two values instead of one
 	if( FStrEq( szKeyName, "angles" ) )
 	{
-		Assert( GetMoveParent() == NULL );
+		Assert(GetEngineObject()->GetMoveParent() == NULL );
 		QAngle angles;
 		UTIL_StringToVector( angles.Base(), szValue );
 

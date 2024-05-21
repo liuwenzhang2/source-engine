@@ -1170,7 +1170,7 @@ void CBaseHeadcrab::EliminateRollAndPitch()
 //-----------------------------------------------------------------------------
 void CBaseHeadcrab::BeginClimbFromCanister()
 {
-	Assert( GetMoveParent() );
+	Assert(GetEngineObject()->GetMoveParent() );
 	// Compute a desired position or hint
 	Vector vecForward, vecActualForward;
 	AngleVectors(GetEngineObject()->GetMoveParent()->GetAbsAngles(), &vecActualForward );
@@ -1247,7 +1247,7 @@ void CBaseHeadcrab::BeginClimbFromCanister()
 
 void CBaseHeadcrab::JumpFromCanister()
 {
-	Assert( GetMoveParent() );
+	Assert(GetEngineObject()->GetMoveParent() );
 
 	Vector vecForward, vecActualForward, vecActualRight;
 	AngleVectors(GetEngineObject()->GetMoveParent()->GetAbsAngles(), &vecActualForward, &vecActualRight, NULL );

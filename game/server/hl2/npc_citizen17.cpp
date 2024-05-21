@@ -1170,7 +1170,7 @@ int CNPC_Citizen::SelectSchedule()
 	{
 		// For now, we're only ever parented to trains. If you hit this assert, you've parented a citizen
 		// to something else, and now we need to figure out a better system.
-		Assert( GetMoveParent() && FClassnameIs( GetMoveParent(), "func_tracktrain" ) );
+		Assert(GetEngineObject()->GetMoveParent() && FClassnameIs(GetEngineObject()->GetMoveParent(), "func_tracktrain" ) );
 		return SCHED_CITIZEN_SIT_ON_TRAIN;
 	}
 
