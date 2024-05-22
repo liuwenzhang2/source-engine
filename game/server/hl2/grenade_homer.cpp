@@ -125,8 +125,8 @@ void CGrenadeHomer::Spawn( void )
 	m_takedamage	= DAMAGE_YES;
 	m_iHealth		= 1;
 
-	SetGravity( 1.0 );
-	SetFriction( 0.8 );
+	GetEngineObject()->SetGravity( 1.0 );
+	GetEngineObject()->SetFriction( 0.8 );
 	SetSequence( 1 );
 
 	m_flHomingStrength	= 0;
@@ -303,7 +303,7 @@ void CGrenadeHomer::Launch( CBaseEntity*		pOwner,
 	m_hTarget					= pTarget;
 	GetEngineObject()->SetAbsVelocity( vInitVelocity );
 	m_flHomingSpeed				= flHomingSpeed;
-	SetGravity( flGravity );
+	GetEngineObject()->SetGravity( flGravity );
 	m_nRocketTrailType			= nRocketTrailType;
 
 	// ----------------------------
@@ -628,7 +628,7 @@ void CGrenadeHomer::AimThink( void )
 	}
 
 	// Add in gravity
-	vecImpulse.z -= GetGravity() * GetCurrentGravity() * gpGlobals->frametime;
+	vecImpulse.z -= GetEngineObject()->GetGravity() * GetCurrentGravity() * gpGlobals->frametime;
 	ApplyAbsVelocityImpulse( vecImpulse );
 
 	QAngle angles;

@@ -196,8 +196,8 @@ void CFlare::Spawn( void )
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	SetMoveType( MOVETYPE_NONE );
-	SetFriction( 0.6f );
-	SetGravity( UTIL_ScaleForGravity( 400 ) );
+	GetEngineObject()->SetFriction( 0.6f );
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) );
 	m_flTimeBurnOut = gpGlobals->curtime + 30;
 
 	GetEngineObject()->AddEffects( EF_NOSHADOW|EF_NORECEIVESHADOW );
@@ -418,7 +418,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 		GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
 		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
-		SetGravity(1.0f);
+		GetEngineObject()->SetGravity(1.0f);
 
 
 		Die( 0.5 );
@@ -486,7 +486,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 
 		// Change our flight characteristics
 		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
-		SetGravity( UTIL_ScaleForGravity( 640 ) );
+		GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 640 ) );
 		
 		m_nBounces++;
 
@@ -571,7 +571,7 @@ void CFlare::Launch( const Vector &direction, float speed )
 	// Punch our velocity towards our facing
 	GetEngineObject()->SetAbsVelocity( direction * speed );
 
-	SetGravity( 1.0f );
+	GetEngineObject()->SetGravity( 1.0f );
 }
 
 //-----------------------------------------------------------------------------
@@ -745,8 +745,8 @@ void CFlaregun::SecondaryAttack( void )
 	pOwner->EyeVectors( &forward );
 
 	pFlare->SetAbsVelocity( forward * 500 );
-	pFlare->SetGravity(1.0f);
-	pFlare->SetFriction( 0.85f );
+	pFlare->GetEngineObject()->SetGravity(1.0f);
+	pFlare->GetEngineObject()->SetFriction( 0.85f );
 	pFlare->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
 	WeaponSound( SINGLE );

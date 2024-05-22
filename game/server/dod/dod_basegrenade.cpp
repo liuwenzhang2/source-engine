@@ -65,12 +65,15 @@ CDODBaseGrenade::~CDODBaseGrenade( void )
 	}
 }
 
+const float GRENADE_COEFFICIENT_OF_RESTITUTION = 0.2f;
+
 void CDODBaseGrenade::Spawn( void )
 {
 	m_bUseVPhysics = true;
 
 	BaseClass::Spawn();
 	
+	GetEngineObject()->SetElasticity(GRENADE_COEFFICIENT_OF_RESTITUTION);
 	GetEngineObject()->SetSolid( SOLID_BBOX );	// So it will collide with physics props!
 
 	UTIL_SetSize( this, Vector(-4,-4,-4), Vector(4,4,4) );
@@ -100,8 +103,8 @@ void CDODBaseGrenade::Spawn( void )
 
 	m_iHealth		= 1;
 	
-	SetFriction( GetGrenadeFriction() );
-	SetElasticity( GetGrenadeElasticity() );
+	GetEngineObject()->SetFriction( GetGrenadeFriction() );
+	GetEngineObject()->SetElasticity( GetGrenadeElasticity() );
 
 	// Remember our owner's team
 	ChangeTeam( GetThrower()->GetTeamNumber() );
@@ -176,7 +179,7 @@ void CDODBaseGrenade::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelo
 		flSurfaceElasticity = 0.3;
 	}
 	
-	float flTotalElasticity = GetElasticity() * flSurfaceElasticity;
+	float flTotalElasticity = GetEngineObject()->GetElasticity() * flSurfaceElasticity;
 	flTotalElasticity = clamp( flTotalElasticity, 0.0f, 0.9f );
 
 	// NOTE: A backoff of 2.0f is a reflection
@@ -439,7 +442,6 @@ protected:
 };
 
 
-const float GRENADE_COEFFICIENT_OF_RESTITUTION = 0.2f;
 
 void CDODBaseGrenade::VPhysicsUpdate( IPhysicsObject *pPhysics )
 {
@@ -497,15 +499,10 @@ void CDODBaseGrenade::VPhysicsUpdate( IPhysicsObject *pPhysics )
 		vel = -2.0f * tr.plane.normal * DotProduct(vel,tr.plane.normal) + vel;
 
 		// absorb 80% in impact
-		vel *= GetElasticity();
+		vel *= GetEngineObject()->GetElasticity();
 		angVel *= -0.5f;
 		pPhysics->SetVelocity( &vel, &angVel );
 	}
-}
-
-float CDODBaseGrenade::GetElasticity( void )
-{
-	return GRENADE_COEFFICIENT_OF_RESTITUTION;
 }
 
 const float DOD_GRENADE_WINDOW_BREAK_DAMPING_AMOUNT = 0.5f;

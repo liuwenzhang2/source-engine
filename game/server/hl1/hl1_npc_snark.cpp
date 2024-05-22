@@ -80,7 +80,7 @@ void CSnark::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
-	SetFriction(1.0);	
+	GetEngineObject()->SetFriction(1.0);
 
 	SetModel( "models/w_squeak2.mdl" );
 	UTIL_SetSize( this, Vector( -4, -4, 0 ), Vector( 4, 4, 8 ) );
@@ -101,8 +101,8 @@ void CSnark::Spawn( void )
 	m_iHealth		= sk_snark_health.GetFloat();
 	m_iMaxHealth	= m_iHealth;
 
-	SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for snarks
-	SetFriction( 0.5 );
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for snarks
+	GetEngineObject()->SetFriction( 0.5 );
 
 	SetDamage( sk_snark_dmg_pop.GetFloat() );
 

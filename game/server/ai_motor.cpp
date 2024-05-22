@@ -385,7 +385,7 @@ AIMoveResult_t CAI_Motor::MoveJumpStop()
 
 	if (GetOuter()->GetActivity() == ACT_GLIDE)
 	{
-		float flTime = GetOuter()->GetGroundChangeTime();
+		float flTime = GetOuter()->GetEngineObject()->GetGroundChangeTime();
 		GetOuter()->AddStepDiscontinuity( flTime, GetAbsOrigin(), GetAbsAngles() );
 
 		if ( SelectWeightedSequence( ACT_LAND ) == ACT_INVALID )

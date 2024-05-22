@@ -39,8 +39,6 @@ public:
 
 	virtual char *GetExplodingClassname();
 
-	virtual float GetElasticity() { return 0.05; }
-
 private:
 	float m_flDetonateTime;
 };

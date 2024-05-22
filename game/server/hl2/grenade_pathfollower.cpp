@@ -72,8 +72,8 @@ void CGrenadePathfollower::Spawn( void )
 	m_takedamage	= DAMAGE_YES;
 	m_iHealth		= 200;
 
-	SetGravity( 0.00001 );
-	SetFriction( 0.8 );
+	GetEngineObject()->SetGravity( 0.00001 );
+	GetEngineObject()->SetFriction( 0.8 );
 	SetSequence( 1 );
 }
 
@@ -245,7 +245,7 @@ void CGrenadePathfollower::AimThink( void )
 			m_pPathTarget = gEntList.FindEntityByName( NULL, m_pPathTarget->m_target );
 			if (!m_pPathTarget)
 			{	
-				SetGravity( 1.0 );
+				GetEngineObject()->SetGravity( 1.0 );
 			}
 		}
 	}

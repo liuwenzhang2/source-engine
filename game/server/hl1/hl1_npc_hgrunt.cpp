@@ -1476,7 +1476,7 @@ int CNPC_HGrunt::SelectSchedule( void )
 		{
 			// just landed
 			SetMoveType( MOVETYPE_STEP );
-			SetGravity( 1.0 );
+			GetEngineObject()->SetGravity( 1.0 );
 			return SCHED_GRUNT_REPEL_LAND;
 		}
 		else
@@ -1900,7 +1900,7 @@ void CNPC_HGruntRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller,
 	CBaseEntity *pEntity = Create( "monster_human_grunt", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 	CAI_BaseNPC *pGrunt = pEntity->MyNPCPointer( );
 	pGrunt->SetMoveType( MOVETYPE_FLYGRAVITY );
-	pGrunt->SetGravity( 0.001 );
+	pGrunt->GetEngineObject()->SetGravity( 0.001 );
 	pGrunt->GetEngineObject()->SetAbsVelocity( Vector( 0, 0, random->RandomFloat( -196, -128 ) ) );
 	pGrunt->SetActivity( ACT_GLIDE );
 	// UNDONE: position?

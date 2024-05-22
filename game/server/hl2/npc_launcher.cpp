@@ -108,7 +108,7 @@ BEGIN_DATADESC( CNPC_Launcher )
 	DEFINE_KEYFIELD( m_flHomingRampUp,			FIELD_FLOAT,	"HomingRampUp" ),
 	DEFINE_KEYFIELD( m_flHomingDuration,			FIELD_FLOAT,	"HomingDuration" ),
 	DEFINE_KEYFIELD( m_flHomingRampDown,			FIELD_FLOAT,	"HomingRampDown" ),
-	DEFINE_KEYFIELD( m_flGravity,				FIELD_FLOAT,	"Gravity" ),
+	//DEFINE_KEYFIELD( m_flGravity,				FIELD_FLOAT,	"Gravity" ),
 	DEFINE_KEYFIELD( m_flMinAttackDist,			FIELD_FLOAT,	"MinRange" ),
 	DEFINE_KEYFIELD( m_flMaxAttackDist,			FIELD_FLOAT,	"MaxRange" ),
 	DEFINE_KEYFIELD( m_flSpinMagnitude,			FIELD_FLOAT,	"SpinMagnitude" ),
@@ -291,7 +291,7 @@ void CNPC_Launcher::LaunchGrenade( CBaseEntity* pEnemy )
 		pGrenade->SetHoming((0.01*m_nHomingStrength),m_flHomingDelay,m_flHomingRampUp,m_flHomingDuration,m_flHomingRampDown);
 		pGrenade->SetDamage(m_flDamage);
 		pGrenade->SetDamageRadius(m_flDamageRadius);
-		pGrenade->Launch(this,pEnemy,vLaunchVelocity,m_flHomingSpeed,GetGravity(),m_nSmokeTrail);
+		pGrenade->Launch(this,pEnemy,vLaunchVelocity,m_flHomingSpeed, GetEngineObject()->GetGravity(),m_nSmokeTrail);
 	}
 
 	CPASAttenuationFilter filter( this, 0.3 );

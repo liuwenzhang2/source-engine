@@ -146,7 +146,7 @@ void CNPC_Bullseye::Spawn( void )
 	SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( BLOOD_COLOR_RED );
 	GetEngineObject()->ClearEffects();
-	SetGravity( 0.0 );
+	GetEngineObject()->SetGravity( 0.0 );
 
 	m_flFieldOfView = cos( DEG2RAD(m_flFieldOfView) / 2.0 );
 

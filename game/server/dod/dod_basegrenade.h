@@ -71,8 +71,6 @@ public:
 
 	virtual void OnPickedUp( void ) {}
 
-	virtual float GetElasticity();
-
 	virtual DODWeaponID GetEmitterWeaponID() { return m_EmitterWeaponID; }
 
 protected:

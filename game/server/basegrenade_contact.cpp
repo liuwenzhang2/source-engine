@@ -37,7 +37,7 @@ void CBaseGrenadeContact::Spawn( void )
 	UTIL_SetSize(this, vec3_origin, vec3_origin);
 
 	// contact grenades arc lower
-	SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for grenades to make them easier to see
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for grenades to make them easier to see
 
 	QAngle angles;
 	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles);

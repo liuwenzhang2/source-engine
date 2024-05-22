@@ -1560,7 +1560,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 	case TASK_ANTLION_DROWN:
 	{
 		// Set the gravity really low here! Sink slowly
-		SetGravity( 0 );
+		GetEngineObject()->SetGravity( 0 );
 		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		m_flTimeDrownSplash = gpGlobals->curtime + random->RandomFloat( 0, 0.5 );
 		m_flTimeDrown = gpGlobals->curtime + 4;
@@ -3453,7 +3453,7 @@ bool CNPC_Antlion::CheckLanding( void )
 
 	//Roughly looks one second into the future
 	testPos = GetEngineObject()->GetAbsOrigin() + (GetEngineObject()->GetAbsVelocity() * timeStep );
-	testPos[2] -= ( 0.5 * GetCurrentGravity() * GetGravity() * timeStep * timeStep);
+	testPos[2] -= ( 0.5 * GetCurrentGravity() * GetEngineObject()->GetGravity() * timeStep * timeStep);
 
 	if ( g_debug_antlion.GetInt() == 2 )
 	{

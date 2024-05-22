@@ -201,7 +201,7 @@ public:
 	{
 		GetEngineObject()->SetSolid( SOLID_BBOX );
 		SetMoveType( MOVETYPE_STEP );
-		SetFriction( 1.0f );
+		GetEngineObject()->SetFriction( 1.0f );
 		GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 		m_takedamage = DAMAGE_NO;
 		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );

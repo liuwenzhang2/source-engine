@@ -583,7 +583,7 @@ void CGib::StickyGibTouch ( CBaseEntity *pOther )
 void CGib::Spawn( const char *szGibModel )
 {
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
-	SetFriction(0.55); // deading the bounce a bit
+	GetEngineObject()->SetFriction(0.55); // deading the bounce a bit
 	
 	// sometimes an entity inherits the edict from a former piece of glass,
 	// and will spawn using the same render FX or m_nRenderMode! bad!
@@ -600,7 +600,7 @@ void CGib::Spawn( const char *szGibModel )
 	SetModel( szGibModel );
 
 #ifdef HL1_DLL
-	SetElasticity( 1.0 );
+	GetEngineObject()->SetElasticity( 1.0 );
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
 #endif//HL1_DLL
 

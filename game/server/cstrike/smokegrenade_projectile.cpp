@@ -41,16 +41,16 @@ CSmokeGrenadeProjectile* CSmokeGrenadeProjectile::Create(
 	pGrenade->GetEngineObject()->SetAbsVelocity( velocity );
 	pGrenade->SetupInitialTransmittedGrenadeVelocity( velocity );
 	pGrenade->SetThrower( pOwner );
-	pGrenade->SetGravity( 0.55 );
-	pGrenade->SetFriction( 0.7 );
+	pGrenade->GetEngineObject()->SetGravity( 0.55 );
+	pGrenade->GetEngineObject()->SetFriction( 0.7 );
 	pGrenade->m_flDamage = 100;
 	pGrenade->ChangeTeam( pOwner->GetTeamNumber() );
 	pGrenade->ApplyLocalAngularVelocityImpulse( angVelocity );	
 	pGrenade->SetTouch( &CBaseGrenade::BounceTouch );
 
-	pGrenade->SetGravity( BaseClass::GetGrenadeGravity() );
-	pGrenade->SetFriction( BaseClass::GetGrenadeFriction() );
-	pGrenade->SetElasticity( BaseClass::GetGrenadeElasticity() );
+	pGrenade->GetEngineObject()->SetGravity( BaseClass::GetGrenadeGravity() );
+	pGrenade->GetEngineObject()->SetFriction( BaseClass::GetGrenadeFriction() );
+	pGrenade->GetEngineObject()->SetElasticity( BaseClass::GetGrenadeElasticity() );
 	pGrenade->m_bDidSmokeEffect = false;
 
 	pGrenade->m_pWeaponInfo = GetWeaponInfo( WEAPON_SMOKEGRENADE );

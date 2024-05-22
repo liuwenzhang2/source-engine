@@ -168,6 +168,8 @@ public:
 		SetSolid(SOLID_NONE);
 		ClearSolidFlags();
 		m_CollisionGroup = COLLISION_GROUP_NONE;
+		m_flElasticity = 1.0f;
+		SetFriction(1.0f);
 	}
 
 	~CEngineObjectInternal()
@@ -407,6 +409,9 @@ public:
 	void SetGroundEntity(IEngineObjectServer* ground);
 	CEngineObjectInternal* GetGroundEntity(void);
 	CEngineObjectInternal* GetGroundEntity(void) const { return const_cast<CEngineObjectInternal*>(this)->GetGroundEntity(); }
+	void SetGroundChangeTime(float flTime);
+	float GetGroundChangeTime(void);
+	
 	string_t GetModelName(void) const;
 	void SetModelName(string_t name);
 	void SetModelIndex(int index);
@@ -478,6 +483,13 @@ public:
 	void SetEffects(int nEffects);
 	bool IsEffectActive(int nEffects) const;
 
+	float GetGravity(void) const;
+	void SetGravity(float gravity);
+	float GetFriction(void) const;
+	void SetFriction(float flFriction);
+	void SetElasticity(float flElasticity);
+	float GetElasticity(void) const;
+
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -498,7 +510,7 @@ private:
 	QAngle			m_angAbsRotation = QAngle(0, 0, 0);
 	// Global velocity
 	Vector			m_vecAbsVelocity = Vector(0, 0, 0);
-	CBaseEntity* m_pOuter = NULL;
+	CBaseEntity*	m_pOuter = NULL;
 
 	// Our immediate parent in the movement hierarchy.
 	// FIXME: clarify m_pParent vs. m_pMoveParent
@@ -508,7 +520,7 @@ private:
 	// generated from m_pMoveParent
 	CBaseHandle m_hMovePeer = NULL;
 	// local coordinate frame of entity
-	matrix3x4_t		m_rgflCoordinateFrame;
+	matrix3x4_t m_rgflCoordinateFrame;
 
 	PVSInfo_t m_PVSInfo;
 	bool m_bPVSInfoDirty = false;
@@ -534,6 +546,7 @@ private:
 	int		m_fDataObjectTypes;
 
 	CNetworkHandle(CBaseEntity, m_hGroundEntity);
+	float			m_flGroundChangeTime; // Time that the ground entity changed
 
 	string_t		m_ModelName;
 	CNetworkVar(short, m_nModelIndex);
@@ -543,6 +556,11 @@ private:
 	// was pev->effects
 	CNetworkVar(int, m_fEffects);
 
+	// was pev->gravity;
+	float			m_flGravity;  // rename to m_flGravityScale;
+	// was pev->friction
+	CNetworkVarForDerived(float, m_flFriction);
+	CNetworkVar(float, m_flElasticity);
 };
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()
@@ -1081,6 +1099,46 @@ inline void CEngineObjectInternal::ClearEffects(void)
 inline bool CEngineObjectInternal::IsEffectActive(int nEffects) const
 {
 	return (m_fEffects & nEffects) != 0;
+}
+
+void CEngineObjectInternal::SetGroundChangeTime(float flTime)
+{
+	m_flGroundChangeTime = flTime;
+}
+
+float CEngineObjectInternal::GetGroundChangeTime(void)
+{
+	return m_flGroundChangeTime;
+}
+
+inline float CEngineObjectInternal::GetGravity(void) const
+{
+	return m_flGravity;
+}
+
+inline void CEngineObjectInternal::SetGravity(float gravity)
+{
+	m_flGravity = gravity;
+}
+
+inline float CEngineObjectInternal::GetFriction(void) const
+{
+	return m_flFriction;
+}
+
+inline void CEngineObjectInternal::SetFriction(float flFriction)
+{
+	m_flFriction = flFriction;
+}
+
+inline void	CEngineObjectInternal::SetElasticity(float flElasticity)
+{
+	m_flElasticity = flElasticity;
+}
+
+inline float CEngineObjectInternal::GetElasticity(void)	const
+{
+	return m_flElasticity;
 }
 
 //-----------------------------------------------------------------------------

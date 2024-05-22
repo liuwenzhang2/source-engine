@@ -56,6 +56,7 @@ void CDODRifleGrenadeUS::Spawn()
 {
 	SetModel( GRENADE_MODEL );
 	BaseClass::Spawn();
+	GetEngineObject()->SetElasticity(0.05);
 }
 
 void CDODRifleGrenadeUS::Precache()

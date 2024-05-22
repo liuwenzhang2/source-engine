@@ -3400,7 +3400,7 @@ void CTempEnts::CSEjectBrass( const Vector &vecPosition, const QAngle &angVeloci
 
 	pTemp->hitSound = hitsound;
 
-	pTemp->SetGravity( 0.4 );
+	pTemp->GetEngineObject()->SetGravity( 0.4 );
 
 	pTemp->m_nBody	= 0;
 	pTemp->flags = FTENT_FADEOUT | FTENT_GRAVITY | FTENT_COLLIDEALL | FTENT_HITSOUND | FTENT_ROTATE | FTENT_CHANGERENDERONCOLLIDE;

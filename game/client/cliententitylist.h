@@ -170,6 +170,8 @@ public:
 		m_Collision.Init(this);
 		SetSolid(SOLID_NONE);
 		SetSolidFlags(0);
+		m_flFriction = 0.0f;
+		m_flGravity = 0.0f;
 	}
 
 	void Init(C_BaseEntity* pOuter) {
@@ -416,6 +418,8 @@ public:
 	void SetGroundEntity(IEngineObjectClient* ground);
 	C_EngineObjectInternal* GetGroundEntity(void);
 	C_EngineObjectInternal* GetGroundEntity(void) const { return const_cast<C_EngineObjectInternal*>(this)->GetGroundEntity(); }
+	void SetGroundChangeTime(float flTime);
+	float GetGroundChangeTime(void);
 
 	void SetModelName(string_t name);
 	string_t GetModelName(void) const;
@@ -490,6 +494,13 @@ public:
 	void ClearEffects(void);
 	void SetEffects(int nEffects);
 
+	void SetGravity(float flGravity);
+	float GetGravity(void) const;
+	// Sets physics parameters
+	void SetFriction(float flFriction);
+	float GetElasticity(void) const;
+
+
 private:
 
 	friend class C_BaseEntity;
@@ -548,6 +559,8 @@ private:
 	int								m_fDataObjectTypes;
 
 	EHANDLE							m_hGroundEntity;
+	float							m_flGroundChangeTime;
+
 	string_t						m_ModelName;
 	// Object model index
 	short							m_nModelIndex;
@@ -557,6 +570,12 @@ private:
 	// Effects to apply
 	int								m_fEffects;
 
+	// Gravity multiplier
+	float							m_flGravity;
+	// Friction.
+	float							m_flFriction;
+	// Physics state
+	float							m_flElasticity;
 };
 
 //-----------------------------------------------------------------------------
@@ -1011,6 +1030,36 @@ inline void C_EngineObjectInternal::ClearEffects(void)
 inline bool C_EngineObjectInternal::IsEffectActive(int nEffects) const
 {
 	return (m_fEffects & nEffects) != 0;
+}
+
+void C_EngineObjectInternal::SetGroundChangeTime(float flTime)
+{
+	m_flGroundChangeTime = flTime;
+}
+
+float C_EngineObjectInternal::GetGroundChangeTime(void)
+{
+	return m_flGroundChangeTime;
+}
+
+inline void C_EngineObjectInternal::SetGravity(float flGravity)
+{
+	m_flGravity = flGravity;
+}
+
+inline float C_EngineObjectInternal::GetGravity(void) const
+{
+	return m_flGravity;
+}
+
+inline void C_EngineObjectInternal::SetFriction(float flFriction)
+{
+	m_flFriction = flFriction;
+}
+
+inline float C_EngineObjectInternal::GetElasticity(void)	const
+{
+	return m_flElasticity;
 }
 
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.

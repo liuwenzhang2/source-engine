@@ -209,12 +209,16 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_FIELD(m_iEFlags, FIELD_INTEGER),
 	DEFINE_FIELD(touchStamp, FIELD_INTEGER),
 	DEFINE_FIELD(m_hGroundEntity, FIELD_EHANDLE),
+	DEFINE_FIELD(m_flGroundChangeTime, FIELD_TIME),
 	DEFINE_GLOBAL_KEYFIELD(m_ModelName, FIELD_MODELNAME, "model"),
 	DEFINE_GLOBAL_KEYFIELD(m_nModelIndex, FIELD_SHORT, "modelindex"),
 	DEFINE_KEYFIELD(m_spawnflags, FIELD_INTEGER, "spawnflags"),
 	DEFINE_EMBEDDED(m_Collision),
 	DEFINE_FIELD(m_CollisionGroup, FIELD_INTEGER),
 	DEFINE_KEYFIELD(m_fEffects, FIELD_INTEGER, "effects"),
+	DEFINE_KEYFIELD(m_flGravity, FIELD_FLOAT, "gravity"),
+	DEFINE_KEYFIELD(m_flFriction, FIELD_FLOAT, "friction"),
+	DEFINE_FIELD(m_flElasticity, FIELD_FLOAT),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -307,6 +311,8 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropInt(SENDINFO(m_CollisionGroup), 5, SPROP_UNSIGNED),
 	SendPropInt(SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED | SPROP_CHANGES_OFTEN, SendProxy_CropFlagsToPlayerFlagBitsLength),
 	SendPropInt(SENDINFO(m_fEffects), EF_MAX_BITS, SPROP_UNSIGNED),
+	SendPropFloat(SENDINFO(m_flFriction), 8, SPROP_ROUNDDOWN, 0.0f, 4.0f),
+	SendPropFloat(SENDINFO(m_flElasticity), 0, SPROP_COORD),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)

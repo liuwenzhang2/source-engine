@@ -672,7 +672,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 	StopFollowingEntity( );
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 	// clear follow stuff, setup for collision
-	SetGravity(1.0);
+	GetEngineObject()->SetGravity(1.0);
 	m_iState = WEAPON_NOT_CARRIED;
 	GetEngineObject()->RemoveEffects( EF_NODRAW );
 	FallInit();

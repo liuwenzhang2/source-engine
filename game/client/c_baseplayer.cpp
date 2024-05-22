@@ -216,7 +216,6 @@ END_RECV_TABLE()
 		RecvPropFloat		( RECVINFO(m_vecViewOffset[0]) ),
 		RecvPropFloat		( RECVINFO(m_vecViewOffset[1]) ),
 		RecvPropFloat		( RECVINFO(m_vecViewOffset[2]) ),
-		RecvPropFloat		( RECVINFO(m_flFriction) ),
 
 		RecvPropArray3		( RECVINFO_ARRAY(m_iAmmo), RecvPropInt( RECVINFO(m_iAmmo[0])) ),
 		

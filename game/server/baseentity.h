@@ -1031,8 +1031,7 @@ public:
 	void					StartGroundContact( CBaseEntity *ground );
 	void					EndGroundContact( CBaseEntity *ground );
 
-	void					SetGroundChangeTime( float flTime );
-	float					GetGroundChangeTime( void );
+
 
 	// Remove this as ground entity for all object resting on this object
 	void					WakeRestingObjects();
@@ -1253,10 +1252,8 @@ public:
 	// FIXME: Figure out what to do about this
 	virtual void	GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity = NULL);
 
-	float			GetGravity( void ) const;
-	void			SetGravity( float gravity );
-	float			GetFriction( void ) const;
-	void			SetFriction( float flFriction );
+
+
 
 	virtual	bool FVisible ( CBaseEntity *pEntity, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL );
 	virtual bool FVisible( const Vector &vecTarget, int traceMask = MASK_BLOCKLOS, CBaseEntity **ppBlocker = NULL );
@@ -1304,8 +1301,7 @@ public:
 
 	
 
-	void					SetElasticity( float flElasticity );
-	float					GetElasticity( void ) const;
+
 
 	void					SetShadowCastDistance( float flDistance );
 	float					GetShadowCastDistance( void ) const;
@@ -1626,9 +1622,6 @@ private:
 	CNetworkVarForDerived( unsigned char, m_nWaterLevel );
 	float			m_flNavIgnoreUntilTime;
 
-	float			m_flGroundChangeTime; // Time that the ground entity changed
-	
-
 	// Velocity of the thing we're standing on (world space)
 	CNetworkVarForDerived( Vector, m_vecBaseVelocity );
 
@@ -1644,12 +1637,6 @@ private:
 
 	// Physics state
 	EHANDLE			m_pBlocker;
-
-	// was pev->gravity;
-	float			m_flGravity;  // rename to m_flGravityScale;
-	// was pev->friction
-	CNetworkVarForDerived( float, m_flFriction );
-	CNetworkVar( float, m_flElasticity );
 
 	// was pev->ltime
 	float			m_flLocalTime;
@@ -1958,35 +1945,6 @@ inline void CBaseEntity::SetBaseVelocity( const Vector& v )
 	m_vecBaseVelocity = v; 
 }
 
-inline float CBaseEntity::GetGravity( void ) const
-{ 
-	return m_flGravity; 
-}
-
-inline void CBaseEntity::SetGravity( float gravity )
-{ 
-	m_flGravity = gravity; 
-}
-
-inline float CBaseEntity::GetFriction( void ) const
-{ 
-	return m_flFriction; 
-}
-
-inline void CBaseEntity::SetFriction( float flFriction )
-{ 
-	m_flFriction = flFriction; 
-}
-
-inline void	CBaseEntity::SetElasticity( float flElasticity )
-{ 
-	m_flElasticity = flElasticity; 
-}
-
-inline float CBaseEntity::GetElasticity( void )	const			
-{ 
-	return m_flElasticity; 
-}
 
 inline void	CBaseEntity::SetShadowCastDistance( float flDistance )
 { 

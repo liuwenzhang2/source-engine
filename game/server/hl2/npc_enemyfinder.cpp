@@ -166,7 +166,7 @@ void CNPC_EnemyFinder::Spawn( void )
 
 	SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( DONT_BLEED );
-	SetGravity( 0.0 );
+	GetEngineObject()->SetGravity( 0.0 );
 	m_iHealth			= 1;
 	
 	GetEngineObject()->AddFlag( FL_NPC );

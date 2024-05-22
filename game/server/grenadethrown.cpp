@@ -51,8 +51,8 @@ void CThrownGrenade::Spawn( void )
 	UTIL_SetSize(this, vec3_origin, vec3_origin);
 
 	// Movement
-	SetGravity( UTIL_ScaleForGravity( 648 ) );
-	SetFriction(0.6);
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 648 ) );
+	GetEngineObject()->SetFriction(0.6);
 	QAngle angles;
 	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
 	GetEngineObject()->SetLocalAngles( angles );

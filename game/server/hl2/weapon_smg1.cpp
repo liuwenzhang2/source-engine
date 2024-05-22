@@ -256,7 +256,7 @@ void CWeaponSMG1::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseCombatChar
 
 			pGrenade->SetThrower(GetOwner());
 
-			pGrenade->SetGravity(0.5); // lower gravity since grenade is aerodynamic and engine doesn't know it.
+			pGrenade->GetEngineObject()->SetGravity(0.5); // lower gravity since grenade is aerodynamic and engine doesn't know it.
 
 			pGrenade->SetDamage( sk_plr_dmg_smg1_grenade.GetFloat() );
 

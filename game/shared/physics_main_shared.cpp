@@ -250,7 +250,7 @@ void SpewLinks()
 //-----------------------------------------------------------------------------
 static inline float GetActualGravity( CBaseEntity *pEnt )
 {
-	float ent_gravity = pEnt->GetGravity();
+	float ent_gravity = pEnt->GetEngineObject()->GetGravity();
 	if ( ent_gravity == 0.0f )
 	{
 		ent_gravity = 1.0f;
@@ -519,7 +519,7 @@ void CBaseEntity::ResolveFlyCollisionBounce( trace_t &trace, Vector &vecVelocity
 	float flSurfaceElasticity;
 	physprops->GetPhysicsProperties( trace.surface.surfaceProps, NULL, NULL, NULL, &flSurfaceElasticity );
 	
-	float flTotalElasticity = GetElasticity() * flSurfaceElasticity;
+	float flTotalElasticity = GetEngineObject()->GetElasticity() * flSurfaceElasticity;
 	if ( flMinTotalElasticity > 0.9f )
 	{
 		flMinTotalElasticity = 0.9f;
@@ -1297,15 +1297,7 @@ void CBaseEntity::EndGroundContact( CBaseEntity *ground )
 }
 
 
-void CBaseEntity::SetGroundChangeTime( float flTime )
-{
-	m_flGroundChangeTime = flTime;
-}
 
-float CBaseEntity::GetGroundChangeTime( void )
-{
-	return m_flGroundChangeTime;
-}
 
 
 

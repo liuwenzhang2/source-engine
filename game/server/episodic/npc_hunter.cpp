@@ -532,7 +532,7 @@ void CHunterFlechette::Spawn()
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 	UTIL_SetSize( this, -Vector(1,1,1), Vector(1,1,1) );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetGravity( 0.05f );
+	GetEngineObject()->SetGravity( 0.05f );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	
 	// Make sure we're updated if we're underwater

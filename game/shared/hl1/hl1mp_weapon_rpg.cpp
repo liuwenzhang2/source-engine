@@ -165,7 +165,7 @@ void CRpgRocket::Spawn( void )
 	AngleVectors( angAngs, &vecFwd );
 	GetEngineObject()->SetAbsVelocity( vecFwd * 250 );
 
-	SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for rockets
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for rockets
 
 	m_flDamage	= sk_plr_dmg_rpg.GetFloat();
 	m_DmgRadius	= m_flDamage * 2.5;

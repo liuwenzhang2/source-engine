@@ -981,7 +981,7 @@ bool CHL2GameMovement::LadderMove( void )
 	player->SetMoveType( MOVETYPE_LADDER );
 	player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 
-	player->SetGravity( 0.0f );
+	player->GetEngineObject()->SetGravity( 0.0f );
 	
 	float forwardSpeed = 0.0f;
 	float rightSpeed = 0.0f;

@@ -478,8 +478,8 @@ void CSatchelCharge::Spawn( void )
 	m_takedamage	= DAMAGE_NO;
 	m_iHealth		= 1;
 
-	SetGravity( UTIL_ScaleForGravity( 560 ) );	// slightly lower gravity
-	SetFriction( 0.97 );	//used in SatchelTouch to slow us when sliding
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 560 ) );	// slightly lower gravity
+	GetEngineObject()->SetFriction( 0.97 );	//used in SatchelTouch to slow us when sliding
 	SetSequence( LookupSequence( "onback" ) );
 
 	m_bInAir				= false;
@@ -521,8 +521,8 @@ void CSatchelCharge::SatchelTouch( CBaseEntity *pOther )
 	}
 
 	// add a bit of static friction
-	GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * GetFriction() );
-	SetLocalAngularVelocity( GetLocalAngularVelocity() * GetFriction() );
+	GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * GetEngineObject()->GetFriction() );
+	SetLocalAngularVelocity( GetLocalAngularVelocity() * GetEngineObject()->GetFriction() );
 }
 
 void CSatchelCharge::UpdateSlideSound( void )
@@ -559,13 +559,13 @@ void CSatchelCharge::SatchelThink( void )
 		SetLocalAngularVelocity( GetLocalAngularVelocity() * 0.9 );
 
 		vecNewVel.z = 0;
-		SetGravity( -0.2 );
+		GetEngineObject()->SetGravity( -0.2 );
 	}
 	else if ( GetWaterLevel() == 0 )
 	{
 		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_SLIDE );
 
-		SetGravity( 1.0 );
+		GetEngineObject()->SetGravity( 1.0 );
 	}
 
 	GetEngineObject()->SetAbsVelocity( vecNewVel );

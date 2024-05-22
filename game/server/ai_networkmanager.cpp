@@ -3126,7 +3126,7 @@ int CAI_NetworkBuilder::ComputeConnection( CAI_Node *pSrcNode, CAI_Node *pDestNo
 				CAI_MoveProbe *pMoveProbe = m_pTestHull->GetMoveProbe();
 
 				bool fJumpLegal = false;
-				m_pTestHull->SetGravity(1.0);
+				m_pTestHull->GetEngineObject()->SetGravity(1.0);
 
 				AIMoveTrace_t moveTrace;
 				pMoveProbe->MoveLimit( NAV_JUMP, srcPos,destPos, MASK_NPCWORLDSTATIC, NULL, &moveTrace);

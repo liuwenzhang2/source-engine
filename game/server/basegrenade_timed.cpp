@@ -55,8 +55,8 @@ void CBaseGrenadeTimed::Spawn( void )
 
 	// Tumble through the air
 	// pGrenade->m_vecAngVelocity.x = -400;
-	SetGravity(1.0);  // Don't change or throw calculations will be off!
-	SetFriction(0.8);
+	GetEngineObject()->SetGravity(1.0);  // Don't change or throw calculations will be off!
+	GetEngineObject()->SetFriction(0.8);
 
 	m_flDamage = 100;	// ????
 

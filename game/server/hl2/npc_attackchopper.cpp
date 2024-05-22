@@ -3388,7 +3388,7 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 		pChunk->GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 		pChunk->GetEngineObject()->SetSolid( SOLID_BBOX );
 		pChunk->GetEngineObject()->AddEffects( EF_NODRAW );
-		pChunk->SetGravity( UTIL_ScaleForGravity( 400 ) );
+		pChunk->GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) );
 	}
 	else
 	{
@@ -5073,7 +5073,7 @@ void CGrenadeHelicopter::Spawn( void )
 		GetEngineObject()->SetCollisionBounds( Vector( -12.5, -12.5, -12.5 ), Vector( 12.5, 12.5, 12.5 ) );
 		VPhysicsInitShadow( false, false );
 		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
-		SetElasticity( 0.5f );
+		GetEngineObject()->SetElasticity( 0.5f );
 		GetEngineObject()->AddEffects( EF_NOSHADOW );
 	}
 
@@ -5096,7 +5096,7 @@ void CGrenadeHelicopter::Spawn( void )
 	SetTouch( &CGrenadeHelicopter::ExplodeConcussion );
 
 	// use a lower gravity for grenades to make them easier to see
-	SetGravity( UTIL_ScaleForGravity( 400 ) );
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) );
 
 #ifdef HL2_EPISODIC
 	m_bPickedUp = false;

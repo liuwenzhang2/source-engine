@@ -1830,7 +1830,7 @@ void CBasePlayer::SharedSpawn()
 	SetMoveType( MOVETYPE_WALK );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetFriction( 1.0f );
+	GetEngineObject()->SetFriction( 1.0f );
 
 	pl.deadflag	= false;
 	m_lifeState	= LIFE_ALIVE;

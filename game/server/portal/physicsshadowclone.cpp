@@ -306,8 +306,8 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 			GetEngineObject()->SetSolid( sourceSolidType );
 		//SetSolid( SOLID_VPHYSICS );
 
-		SetElasticity( pClonedEntity->GetElasticity() );
-		SetFriction( pClonedEntity->GetFriction() );
+		GetEngineObject()->SetElasticity( pClonedEntity->GetEngineObject()->GetElasticity() );
+		GetEngineObject()->SetFriction( pClonedEntity->GetEngineObject()->GetFriction() );
 
 
 		

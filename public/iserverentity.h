@@ -212,6 +212,9 @@ public:
 	virtual void SetGroundEntity(IEngineObjectServer* ground) = 0;
 	virtual IEngineObjectServer* GetGroundEntity(void) = 0;
 	virtual IEngineObjectServer* GetGroundEntity(void) const = 0;
+	virtual void SetGroundChangeTime(float flTime) = 0;
+	virtual float GetGroundChangeTime(void) = 0;
+
 	virtual string_t GetModelName(void) const = 0;
 	virtual void SetModelName(string_t name) = 0;
 	virtual void SetModelIndex(int index) = 0;
@@ -279,6 +282,12 @@ public:
 	virtual void ClearEffects(void) = 0;
 	virtual void SetEffects(int nEffects) = 0;
 	virtual bool IsEffectActive(int nEffects) const = 0;
+	virtual float GetGravity(void) const = 0;
+	virtual void SetGravity(float gravity) = 0;
+	virtual float GetFriction(void) const = 0;
+	virtual void SetFriction(float flFriction) = 0;
+	virtual void SetElasticity(float flElasticity) = 0;
+	virtual float GetElasticity(void) const = 0;
 
 };
 

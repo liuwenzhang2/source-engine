@@ -763,7 +763,7 @@ CGib *CEnvShooter::CreateGib ( void )
 	pGib->m_nSkin = m_nSkin;
 	pGib->m_lifeTime = gpGlobals->curtime + m_flGibLife;
 
-	pGib->SetGravity( m_flGibGravityScale );
+	pGib->GetEngineObject()->SetGravity( m_flGibGravityScale );
 
 	// Spawn a flaming gib
 	if (GetEngineObject()->HasSpawnFlags( SF_SHOOTER_FLAMING ) )

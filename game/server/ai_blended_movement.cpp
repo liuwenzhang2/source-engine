@@ -1193,7 +1193,7 @@ void CAI_BlendedMotor::BuildVelocityScript( const AILocalMoveGoal_t &move )
 				{
 					float minJumpHeight = 0;
 					float maxHorzVel = MAX( GetCurSpeed(), 100 );
-					float gravity = GetCurrentGravity() * GetOuter()->GetGravity();
+					float gravity = GetCurrentGravity() * GetOuter()->GetEngineObject()->GetGravity();
 					Vector vecApex;
 					Vector rawJumpVel = GetMoveProbe()->CalcJumpLaunchVelocity(script.vecLocation, pNext->vecLocation, gravity, &minJumpHeight, maxHorzVel, &vecApex );
 

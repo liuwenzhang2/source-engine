@@ -1249,8 +1249,8 @@ void CGameMovement::StartGravity( void )
 {
 	float ent_gravity;
 	
-	if (player->GetGravity())
-		ent_gravity = player->GetGravity();
+	if (player->GetEngineObject()->GetGravity())
+		ent_gravity = player->GetEngineObject()->GetGravity();
 	else
 		ent_gravity = 1.0;
 
@@ -1688,8 +1688,8 @@ void CGameMovement::FinishGravity( void )
 	if ( player->m_flWaterJumpTime )
 		return;
 
-	if ( player->GetGravity() )
-		ent_gravity = player->GetGravity();
+	if ( player->GetEngineObject()->GetGravity() )
+		ent_gravity = player->GetEngineObject()->GetGravity();
 	else
 		ent_gravity = 1.0;
 
@@ -2914,7 +2914,7 @@ bool CGameMovement::LadderMove( void )
 		onFloor = false;
 	}
 
-	player->SetGravity( 0 );
+	player->GetEngineObject()->SetGravity( 0 );
 
 	float climbSpeed = ClimbSpeed();
 
@@ -3096,8 +3096,8 @@ void CGameMovement::AddGravity( void )
 	if ( player->m_flWaterJumpTime )
 		return;
 
-	if (player->GetGravity())
-		ent_gravity = player->GetGravity();
+	if (player->GetEngineObject()->GetGravity())
+		ent_gravity = player->GetEngineObject()->GetGravity();
 	else
 		ent_gravity = 1.0;
 

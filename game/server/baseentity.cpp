@@ -257,7 +257,6 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt		(SENDINFO(m_nRenderMode),	8, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_clrRender),	32, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_iTeamNum),		TEAMNUM_NUM_BITS, 0),
-	SendPropFloat	(SENDINFO(m_flElasticity), 0, SPROP_COORD),
 	SendPropFloat	(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED ),
 	SendPropEHandle (SENDINFO(m_hOwnerEntity)),
 	SendPropEHandle (SENDINFO(m_hEffectEntity)),
@@ -342,7 +341,6 @@ CBaseEntity::CBaseEntity()
 	m_debugOverlays  = 0;
 	m_pTimedOverlay  = NULL;
 	m_pPhysicsObject = NULL;
-	m_flElasticity   = 1.0f;
 	m_flShadowCastDistance = m_flDesiredShadowCastDistance = 0;
 	SetRenderColor( 255, 255, 255, 255 );
 	m_iTeamNum = m_iInitialTeamNum = TEAM_UNASSIGNED;
@@ -362,7 +360,6 @@ CBaseEntity::CBaseEntity()
 	SetOwnerEntity( NULL );
 	m_nTransmitStateOwnedCounter = 0;
 
-	SetFriction( 1.0f );
 
 	//if ( bServerOnly )
 	//{
@@ -1703,7 +1700,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_FIELD( m_hOwnerEntity, FIELD_EHANDLE ),
 	//DEFINE_FIELD( m_CollisionGroup, FIELD_INTEGER ),
 	DEFINE_PHYSPTR( m_pPhysicsObject),
-	DEFINE_FIELD( m_flElasticity, FIELD_FLOAT ),
+	//DEFINE_FIELD( m_flElasticity, FIELD_FLOAT ),
 	DEFINE_KEYFIELD( m_flShadowCastDistance, FIELD_FLOAT, "shadowcastdist" ),
 	DEFINE_FIELD( m_flDesiredShadowCastDistance, FIELD_FLOAT ),
 
@@ -1712,7 +1709,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 //	DEFINE_FIELD( m_bSentLastFrame, FIELD_INTEGER ),
 
-	DEFINE_FIELD( m_flGroundChangeTime, FIELD_TIME ),
+	//DEFINE_FIELD( m_flGroundChangeTime, FIELD_TIME ),
 	//DEFINE_GLOBAL_KEYFIELD( m_ModelName, FIELD_MODELNAME, "model" ),
 	
 	DEFINE_KEYFIELD( m_vecBaseVelocity, FIELD_VECTOR, "basevelocity" ),
@@ -1724,8 +1721,8 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_FIELD( m_nWaterType, FIELD_CHARACTER ),
 	DEFINE_FIELD( m_pBlocker, FIELD_EHANDLE ),
 
-	DEFINE_KEYFIELD( m_flGravity, FIELD_FLOAT, "gravity" ),
-	DEFINE_KEYFIELD( m_flFriction, FIELD_FLOAT, "friction" ),
+	//DEFINE_KEYFIELD( m_flGravity, FIELD_FLOAT, "gravity" ),
+	//DEFINE_KEYFIELD( m_flFriction, FIELD_FLOAT, "friction" ),
 
 	// Local time is local to each object.  It doesn't need to be re-based if the clock
 	// changes.  Therefore it is saved as a FIELD_FLOAT, not a FIELD_TIME

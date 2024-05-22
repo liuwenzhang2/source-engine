@@ -1513,7 +1513,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 		case TASK_HEADCRAB_DROWN:
 		{
 			// Set the gravity really low here! Sink slowly
-			SetGravity( UTIL_ScaleForGravity( 80 ) );
+			GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 80 ) );
 			m_flTimeDrown = gpGlobals->curtime + 4;
 			break;
 		}
@@ -1978,7 +1978,7 @@ int CBaseHeadcrab::SelectSchedule( void )
 
 	if ( HasCondition( COND_FLOATING_OFF_GROUND ) )
 	{
-		SetGravity( 1.0 );
+		GetEngineObject()->SetGravity( 1.0 );
 		GetEngineObject()->SetGroundEntity( NULL );
 		return SCHED_FALL_TO_GROUND;
 	}
@@ -2882,7 +2882,7 @@ void CFastHeadcrab::RunTask( const Task_t *pTask )
 
 		if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
-			SetGravity(1.0);
+			GetEngineObject()->SetGravity(1.0);
 			SetMoveType( MOVETYPE_STEP );
 
 			if( GetEnemy() && ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length() > HEADCRAB_MAX_JUMP_DIST )
@@ -2945,7 +2945,7 @@ void CFastHeadcrab::StartTask( const Task_t *pTask )
 				if( !IsMoveBlocked( moveTrace ) )
 				{
 					GetEngineObject()->SetAbsVelocity( m_vecJumpVel );// + 0.5f * Vector(0,0,GetCurrentGravity()) * flInterval;
-					SetGravity( UTIL_ScaleForGravity( 1600 ) );
+					GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 1600 ) );
 					GetEngineObject()->SetGroundEntity( NULL );
 					SetNavType( NAV_JUMP );
 

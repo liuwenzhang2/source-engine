@@ -1068,7 +1068,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 				// keep track of time when changing ground entity
 				if (!GetEngineObject()->GetGroundEntity()|| GetEngineObject()->GetGroundEntity()->GetOuter() != trace.m_pEnt)
 				{
-					SetGroundChangeTime( gpGlobals->curtime + (flTime - (1 - trace.fraction) * time_left) );
+					GetEngineObject()->SetGroundChangeTime( gpGlobals->curtime + (flTime - (1 - trace.fraction) * time_left) );
 				}
 
 				GetEngineObject()->SetGroundEntity(((CBaseEntity*)trace.m_pEnt)->GetEngineObject() );
@@ -1100,7 +1100,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 		numplanes++;
 
 		// modify original_velocity so it parallels all of the clip planes
-		if ( GetMoveType() == MOVETYPE_WALK && (!(GetEngineObject()->GetFlags() & FL_ONGROUND) || GetFriction()!=1) )	// relfect player velocity
+		if ( GetMoveType() == MOVETYPE_WALK && (!(GetEngineObject()->GetFlags() & FL_ONGROUND) || GetEngineObject()->GetFriction()!=1) )	// relfect player velocity
 		{
 			for ( i = 0; i < numplanes; i++ )
 			{
@@ -1111,7 +1111,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 				}
 				else
 				{
-					PhysicsClipVelocity( original_velocity, planes[i], new_velocity, 1.0 + sv_bounce.GetFloat() * (1-GetFriction()) );
+					PhysicsClipVelocity( original_velocity, planes[i], new_velocity, 1.0 + sv_bounce.GetFloat() * (1- GetEngineObject()->GetFriction()) );
 				}
 			}
 
@@ -1182,9 +1182,9 @@ void CBaseEntity::PhysicsAddHalfGravity( float timestep )
 	VPROF("CBaseEntity::PhysicsAddHalfGravity");
 	float	ent_gravity;
 
-	if ( GetGravity() )
+	if (GetEngineObject()->GetGravity() )
 	{
-		ent_gravity = GetGravity();
+		ent_gravity = GetEngineObject()->GetGravity();
 	}
 	else
 	{
@@ -1891,7 +1891,7 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 			speed = VectorLength( vecAbsVelocity );
 			if (speed)
 			{
-				friction = sv_friction.GetFloat() * GetFriction();
+				friction = sv_friction.GetFloat() * GetEngineObject()->GetFriction();
 
 				control = speed < sv_stopspeed.GetFloat() ? sv_stopspeed.GetFloat() : speed;
 				newspeed = speed - timestep*control*friction;

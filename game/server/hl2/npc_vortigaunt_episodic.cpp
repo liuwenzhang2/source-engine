@@ -3182,7 +3182,7 @@ void CVortigauntChargeToken::Spawn( void )
 	SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
-	SetGravity( 0.0f );
+	GetEngineObject()->SetGravity( 0.0f );
 
 	// No model but we still need to force this!
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );

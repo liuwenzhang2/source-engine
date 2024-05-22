@@ -298,7 +298,7 @@ END_PREDICTION_DATA()
 
 		m_bStartDefuse = false;
 		m_bBombTicking = true;
-		SetFriction( 0.9 );
+		GetEngineObject()->SetFriction( 0.9 );
 
 		m_flDefuseLength = 0.0f;
 		

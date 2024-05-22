@@ -2087,7 +2087,7 @@ void CTriggerGravity::GravityTouch( CBaseEntity *pOther )
 	if ( !pOther->IsPlayer() )
 		return;
 
-	pOther->SetGravity( GetGravity() );
+	pOther->GetEngineObject()->SetGravity(GetEngineObject()->GetGravity() );
 }
 
 
@@ -4355,7 +4355,7 @@ void CFrictionModifier::StartTouch( CBaseEntity *pOther )
 {
 	if ( !pOther->IsPlayer() )		// ignore player
 	{
-		pOther->SetFriction( m_frictionFraction );
+		pOther->GetEngineObject()->SetFriction( m_frictionFraction );
 	}
 }
 
@@ -4363,7 +4363,7 @@ void CFrictionModifier::EndTouch( CBaseEntity *pOther )
 {
 	if ( !pOther->IsPlayer() )		// ignore player
 	{
-		pOther->SetFriction( 1.0f );
+		pOther->GetEngineObject()->SetFriction( 1.0f );
 	}
 }
 

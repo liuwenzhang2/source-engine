@@ -101,8 +101,8 @@ void CHandGrenade::ShootTimed( CBaseCombatCharacter *pOwner, Vector vecVelocity,
 	angImpulse[2] = random->RandomInt( -100, 100 );
 	ApplyLocalAngularVelocityImpulse( angImpulse );	
 
-	SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for grenades to make them easier to see
-	SetFriction( 0.8 );
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for grenades to make them easier to see
+	GetEngineObject()->SetFriction( 0.8 );
 
 	SetDamage( sk_plr_dmg_grenade.GetFloat() );
 	SetDamageRadius( GetDamage() * 2.5 );

@@ -462,7 +462,7 @@ CAI_BaseNPC *CNPC_Osprey::MakeGrunt( Vector vecSrc )
 			pEntity = Create( "monster_human_grunt", vecSrc, GetEngineObject()->GetAbsAngles() );
 			pGrunt = pEntity->MyNPCPointer( );
 			pGrunt->SetMoveType( MOVETYPE_FLYGRAVITY );
-			pGrunt->SetGravity( 0.0001 );
+			pGrunt->GetEngineObject()->SetGravity( 0.0001 );
 
 			Vector spd = Vector( 0, 0, random->RandomFloat( -196, -128 ) );
 			pGrunt->GetEngineObject()->SetLocalVelocity( spd );
@@ -1411,7 +1411,7 @@ void CBaseHelicopter::Event_Killed( const CTakeDamageInfo &info )
 	m_lifeState			= LIFE_DYING;
 
 	SetMoveType( MOVETYPE_FLYGRAVITY );
-	SetGravity( UTIL_ScaleForGravity( 240 ) );	// use a lower gravity
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 240 ) );	// use a lower gravity
 
 	// Kill the rotor sound.
 

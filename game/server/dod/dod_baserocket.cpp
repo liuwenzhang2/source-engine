@@ -77,7 +77,7 @@ void CDODBaseRocket::Spawn( void )
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 	
 	m_takedamage = DAMAGE_NO;
-	SetGravity( 0.1 );
+	GetEngineObject()->SetGravity( 0.1 );
 	SetDamage( mp_rocketdamage.GetFloat() );	
 
 	GetEngineObject()->AddFlag( FL_OBJECT );

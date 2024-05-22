@@ -6809,7 +6809,7 @@ void CAI_BaseNPC::NPCInit ( void )
 
 	SetBlocksLOS( false );
 
-	SetGravity(1.0);	// Don't change
+	GetEngineObject()->SetGravity(1.0);	// Don't change
 	m_takedamage		= DAMAGE_YES;
 	GetMotor()->SetIdealYaw(GetEngineObject()->GetLocalAngles().y );
 	m_iMaxHealth		= m_iHealth;
@@ -11293,7 +11293,7 @@ void CAI_BaseNPC::ToggleFreeze(void)
 		// Freeze them.
 		SetCondition(COND_NPC_FREEZE);
 		SetMoveType(MOVETYPE_NONE);
-		SetGravity(0);
+		GetEngineObject()->SetGravity(0);
 		SetLocalAngularVelocity(vec3_angle);
 		GetEngineObject()->SetAbsVelocity( vec3_origin );
 	}
@@ -11307,7 +11307,7 @@ void CAI_BaseNPC::ToggleFreeze(void)
 		SetMoveType( MOVETYPE_STEP );
 
 		// Doesn't restore gravity to the original value, but who cares?
-		SetGravity(1);
+		GetEngineObject()->SetGravity(1);
 	}
 }
 

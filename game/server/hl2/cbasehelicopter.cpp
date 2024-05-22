@@ -1326,7 +1326,7 @@ void CBaseHelicopter::Event_Killed( const CTakeDamageInfo &info )
 	m_lifeState			= LIFE_DYING;
 
 	SetMoveType( MOVETYPE_FLYGRAVITY );
-	SetGravity( UTIL_ScaleForGravity( 240 ) );	// use a lower gravity
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 240 ) );	// use a lower gravity
 
 	StopLoopingSounds();
 

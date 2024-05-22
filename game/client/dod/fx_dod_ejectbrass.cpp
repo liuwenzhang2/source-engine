@@ -79,7 +79,7 @@ void DOD_EjectBrassCallback( const CEffectData &data )
 
 	pTemp->hitSound = hitsound;
 
-	pTemp->SetGravity( 0.4 );
+	pTemp->GetEngineObject()->SetGravity( 0.4 );
 
 	pTemp->m_flSpriteScale = 10;
 

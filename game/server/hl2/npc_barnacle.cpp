@@ -958,7 +958,7 @@ void CNPC_Barnacle::PullEnemyTorwardsMouth( bool bAdjustEnemyOrigin )
 		if( pEnemy->GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			// Try to fight OnGround
-			pEnemy->SetGravity( 0 );
+			pEnemy->GetEngineObject()->SetGravity( 0 );
 			pEnemy->GetEngineObject()->RemoveFlag( FL_ONGROUND );
 		}
 	}

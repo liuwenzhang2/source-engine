@@ -2576,7 +2576,7 @@ void CNPC_Manhack::BladesInit()
 		// manhack is packed up, so has no power of its own. 
 		// don't start the engine sounds.
 		// make us fall a little slower than we should, for visual's sake
-		SetGravity( UTIL_ScaleForGravity( 400 ) );
+		GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) );
 
 		SetActivity( ACT_IDLE );
 	}

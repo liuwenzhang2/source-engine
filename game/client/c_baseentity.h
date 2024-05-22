@@ -793,8 +793,7 @@ public:
 	void					StartGroundContact( CBaseEntity *ground );
 	void					EndGroundContact( CBaseEntity *ground );
 
-	void					SetGroundChangeTime( float flTime );
-	float					GetGroundChangeTime( void );
+
 
 	// Remove this as ground entity for all object resting on this object
 	void					WakeRestingObjects();
@@ -877,11 +876,9 @@ public:
 	// Called by physics to see if we should avoid a collision test....
 	virtual bool		ShouldCollide( int collisionGroup, int contentsMask ) const;
 
-	// Sets physics parameters
-	void				SetFriction( float flFriction );
 
-	void				SetGravity( float flGravity );
-	float				GetGravity( void ) const;
+
+
 
 	// Sets the model from a model index 
 	void				SetModelByIndex( int nModelIndex );
@@ -1182,7 +1179,6 @@ public:
 	int								GetWaterType() const;
 	void							SetWaterType( int nType );
 
-	float							GetElasticity( void ) const;
 
 	int								GetTextureFrameIndex( void );
 	void							SetTextureFrameIndex( int iIndex );
@@ -1337,8 +1333,7 @@ private:
 	// Base velocity
 	Vector							m_vecBaseVelocity;
 	
-	// Gravity multiplier
-	float							m_flGravity;
+
 
 	// Model instance data..
 	ModelInstanceHandle_t			m_ModelInstance;
@@ -1374,17 +1369,14 @@ private:
 
 	CNetworkVarEmbedded( CParticleProperty, m_Particles );
 
-	// Physics state
-	float							m_flElasticity;
+
 
 	float							m_flShadowCastDistance;
 	EHANDLE							m_ShadowDirUseOtherEntity;
 
-	float							m_flGroundChangeTime;
 
 
-	// Friction.
-	float							m_flFriction;       
+    
 
 	Vector							m_vecOldOrigin;
 	QAngle							m_vecOldAngRotation;
@@ -1575,20 +1567,6 @@ inline void	C_BaseEntity::SetBaseVelocity( const Vector& v )
 	m_vecBaseVelocity = v; 
 }
 
-inline void C_BaseEntity::SetFriction( float flFriction ) 
-{ 
-	m_flFriction = flFriction; 
-}
-
-inline void C_BaseEntity::SetGravity( float flGravity ) 
-{ 
-	m_flGravity = flGravity; 
-}
-
-inline float C_BaseEntity::GetGravity( void ) const 
-{ 
-	return m_flGravity; 
-}
 
 inline int C_BaseEntity::GetWaterLevel() const
 {
@@ -1600,10 +1578,7 @@ inline void C_BaseEntity::SetWaterLevel( int nLevel )
 	m_nWaterLevel = nLevel;
 }
 
-inline float C_BaseEntity::GetElasticity( void )	const			
-{ 
-	return m_flElasticity; 
-}
+
 
 inline const color32 C_BaseEntity::GetRenderColor() const
 {

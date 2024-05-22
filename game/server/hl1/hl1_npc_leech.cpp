@@ -710,7 +710,7 @@ void CNPC_Leech::Event_Killed( const CTakeDamageInfo &info )
 		GetEngineObject()->SetAbsOrigin( vOrigin );
 
 		
-		SetGravity ( 0.02 );
+		GetEngineObject()->SetGravity ( 0.02 );
 		GetEngineObject()->SetGroundEntity( NULL );
 		SetActivity( ACT_DIESIMPLE );
 	}

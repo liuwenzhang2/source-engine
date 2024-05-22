@@ -53,7 +53,7 @@ void CWaterBullet::Spawn( const Vector &vecOrigin, const Vector &vecDir )
 
 	SetMoveType( MOVETYPE_FLY );
 
-	SetGravity( 0.0 );
+	GetEngineObject()->SetGravity( 0.0 );
 
 	QAngle angles;
 	GetEngineObject()->SetAbsOrigin( vecOrigin );

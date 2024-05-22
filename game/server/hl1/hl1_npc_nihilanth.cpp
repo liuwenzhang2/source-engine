@@ -1014,7 +1014,7 @@ void CNPC_Nihilanth::DyingThink( void )
 			CBaseEntity *pTrigger = NULL;
 
 			GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 0 ) );
-			SetGravity( 0 );
+			GetEngineObject()->SetGravity( 0 );
 
 			while( ( pTrigger = gEntList.FindEntityByName( pTrigger, m_szDeadUse ) ) != NULL )
 			{

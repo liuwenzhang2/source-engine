@@ -76,8 +76,8 @@ void CSatchelCharge::Spawn( void )
 	m_takedamage	= DAMAGE_YES;
 	m_iHealth		= 1;
 
-	SetGravity( UTIL_ScaleForGravity( 560 ) );	// slightly lower gravity
-	SetFriction( 1.0 );
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 560 ) );	// slightly lower gravity
+	GetEngineObject()->SetFriction( 1.0 );
 	SetSequence( 1 );
 	SetDamage( sk_plr_dmg_satchel.GetFloat() );
 	SetDamageRadius( sk_satchel_radius.GetFloat() );

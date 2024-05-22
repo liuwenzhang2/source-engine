@@ -35,9 +35,9 @@ CHEGrenadeProjectile* CHEGrenadeProjectile::Create(
 	pGrenade->SetupInitialTransmittedGrenadeVelocity( velocity );
 	pGrenade->SetThrower( pOwner ); 
 
-	pGrenade->SetGravity( BaseClass::GetGrenadeGravity() );
-	pGrenade->SetFriction( BaseClass::GetGrenadeFriction() );
-	pGrenade->SetElasticity( BaseClass::GetGrenadeElasticity() );
+	pGrenade->GetEngineObject()->SetGravity( BaseClass::GetGrenadeGravity() );
+	pGrenade->GetEngineObject()->SetFriction( BaseClass::GetGrenadeFriction() );
+	pGrenade->GetEngineObject()->SetElasticity( BaseClass::GetGrenadeElasticity() );
 
 	pGrenade->m_flDamage = 100;
 	pGrenade->m_DmgRadius = pGrenade->m_flDamage * 3.5f;

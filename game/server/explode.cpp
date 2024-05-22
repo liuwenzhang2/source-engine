@@ -50,7 +50,7 @@ void CShower::Spawn( void )
 	GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
-	SetGravity( UTIL_ScaleForGravity( 400 ) ); // fall a bit more slowly than normal
+	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) ); // fall a bit more slowly than normal
 	SetNextThink( gpGlobals->curtime + 0.1f );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	UTIL_SetSize(this, vec3_origin, vec3_origin );

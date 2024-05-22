@@ -2773,14 +2773,14 @@ inline Vector CAI_Component::WorldSpaceCenter() const
 
 inline float CAI_Component::GetGravity() const
 {
-	return GetOuter()->GetGravity();
+	return GetOuter()->GetEngineObject()->GetGravity();
 }
 
 //-----------------------------------------------------------------------------
 
 inline void CAI_Component::SetGravity( float flGravity )
 {
-	GetOuter()->SetGravity( flGravity );
+	GetOuter()->GetEngineObject()->SetGravity( flGravity );
 }
 
 //-----------------------------------------------------------------------------

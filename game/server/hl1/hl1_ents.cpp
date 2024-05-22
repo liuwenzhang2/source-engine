@@ -1571,7 +1571,7 @@ void CHL1Gib::Spawn( const char *szGibModel )
 {
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
-	SetFriction( 0.55 ); // deading the bounce a bit
+	GetEngineObject()->SetFriction( 0.55 ); // deading the bounce a bit
 	
 	// sometimes an entity inherits the edict from a former piece of glass,
 	// and will spawn using the same render FX or rendermode! bad!

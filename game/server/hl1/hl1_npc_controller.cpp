@@ -242,7 +242,7 @@ void CNPC_Controller::Spawn()
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	SetMoveType( MOVETYPE_STEP );
-	SetGravity(0.001);
+	GetEngineObject()->SetGravity(0.001);
 
 
 	m_bloodColor		= BLOOD_COLOR_GREEN;

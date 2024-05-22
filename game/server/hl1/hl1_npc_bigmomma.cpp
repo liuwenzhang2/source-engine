@@ -1029,7 +1029,7 @@ void CNPC_BigMomma::LaunchMortar( void )
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "BigMomma.LaunchMortar" );
 
 	CBMortar *pBomb = CBMortar::Shoot( this, startPos, m_vTossDir );
-	pBomb->SetGravity( 1.0 );
+	pBomb->GetEngineObject()->SetGravity( 1.0 );
 	MortarSpray( startPos, Vector(0,0,10), gSpitSprite, 24 );
 }
 

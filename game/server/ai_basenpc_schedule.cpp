@@ -4716,7 +4716,7 @@ int CAI_BaseNPC::SelectSchedule( void )
 {
 	if ( HasCondition( COND_FLOATING_OFF_GROUND ) )
 	{
-		SetGravity( 1.0 );
+		GetEngineObject()->SetGravity( 1.0 );
 		GetEngineObject()->SetGroundEntity( NULL );
 		return SCHED_FALL_TO_GROUND;
 	}

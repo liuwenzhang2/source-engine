@@ -155,7 +155,7 @@ void CHostage::Spawn( void )
 	SetMoveType( MOVETYPE_STEP );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
-	SetGravity( 1.0 );
+	GetEngineObject()->SetGravity( 1.0 );
 
 	m_iHealth = 100;	
 	m_iMaxHealth = m_iHealth;

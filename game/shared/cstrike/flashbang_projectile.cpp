@@ -260,9 +260,9 @@ CFlashbangProjectile* CFlashbangProjectile::Create(
 
 	pGrenade->ApplyLocalAngularVelocityImpulse( angVelocity );
 
-	pGrenade->SetGravity( BaseClass::GetGrenadeGravity() );
-	pGrenade->SetFriction( BaseClass::GetGrenadeFriction() );
-	pGrenade->SetElasticity( BaseClass::GetGrenadeElasticity() );
+	pGrenade->GetEngineObject()->SetGravity( BaseClass::GetGrenadeGravity() );
+	pGrenade->GetEngineObject()->SetFriction( BaseClass::GetGrenadeFriction() );
+	pGrenade->GetEngineObject()->SetElasticity( BaseClass::GetGrenadeElasticity() );
 
 	pGrenade->m_pWeaponInfo = GetWeaponInfo( WEAPON_FLASHBANG );
 
