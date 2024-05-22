@@ -1032,12 +1032,12 @@ inline bool C_EngineObjectInternal::IsEffectActive(int nEffects) const
 	return (m_fEffects & nEffects) != 0;
 }
 
-void C_EngineObjectInternal::SetGroundChangeTime(float flTime)
+inline void C_EngineObjectInternal::SetGroundChangeTime(float flTime)
 {
 	m_flGroundChangeTime = flTime;
 }
 
-float C_EngineObjectInternal::GetGroundChangeTime(void)
+inline float C_EngineObjectInternal::GetGroundChangeTime(void)
 {
 	return m_flGroundChangeTime;
 }
