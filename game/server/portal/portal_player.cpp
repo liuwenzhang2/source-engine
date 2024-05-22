@@ -2144,7 +2144,7 @@ void PortalSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *pvs, 
 		{
 			if ( pPortal->GetEngineObject()->IsInPVS( pPlayer, pvs, pvssize ) )
 			{
-				if ( engine->CheckAreasConnected( area, pPortal->AreaNum() ) )
+				if ( engine->CheckAreasConnected( area, pPortal->GetEngineObject()->AreaNum() ) )
 				{
 					CProp_Portal *pLinkedPortal = static_cast<CProp_Portal*>( pPortal->m_hLinkedPortal.Get() );
 					if ( pLinkedPortal )
@@ -2161,7 +2161,7 @@ void CPortal_Player::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *p
 {
 	BaseClass::SetupVisibility( pViewEntity, pvs, pvssize );
 
-	int area = pViewEntity ? pViewEntity->AreaNum() : AreaNum();
+	int area = pViewEntity ? pViewEntity->GetEngineObject()->AreaNum() : GetEngineObject()->AreaNum();
 
 	// At this point the EyePosition has been added as a view origin, but if we are currently stuck
 	// in a portal, our EyePosition may return a point in solid. Find the reflected eye position

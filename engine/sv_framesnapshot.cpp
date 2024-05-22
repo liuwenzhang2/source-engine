@@ -311,14 +311,15 @@ void CFrameSnapshotManager::PackEntities_NetworkBackDoor(
 }
 
 // in HLTV mode we ALWAYS have to store position and PVS info, even if entity didnt change
-void SV_FillHLTVData(CFrameSnapshot* pSnapshot, IServerEntity* edict, int iValidEdict)
+void SV_FillHLTVData(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity, int iValidEdict)
 {
 #if !defined( _XBOX )
-	if (pSnapshot->m_pHLTVEntityData && edict)
+	if (pSnapshot->m_pHLTVEntityData && pServerEntity)
 	{
+		IEngineObjectServer* engineObject = serverEntitylist->GetEngineObject(pServerEntity->entindex());
 		CHLTVEntityData* pHLTVData = &pSnapshot->m_pHLTVEntityData[iValidEdict];
 
-		PVSInfo_t* pvsInfo = edict->GetPVSInfo();
+		PVSInfo_t* pvsInfo = engineObject->GetPVSInfo();
 
 		if (pvsInfo->m_nClusterCount == 1)
 		{
@@ -340,14 +341,15 @@ void SV_FillHLTVData(CFrameSnapshot* pSnapshot, IServerEntity* edict, int iValid
 }
 
 // in Replay mode we ALWAYS have to store position and PVS info, even if entity didnt change
-void SV_FillReplayData(CFrameSnapshot* pSnapshot, IServerEntity* edict, int iValidEdict)
+void SV_FillReplayData(CFrameSnapshot* pSnapshot, IServerEntity* pServerEntity, int iValidEdict)
 {
 #if !defined( _XBOX )
-	if (pSnapshot->m_pReplayEntityData && edict)
+	if (pSnapshot->m_pReplayEntityData && pServerEntity)
 	{
+		IEngineObjectServer* engineObject = serverEntitylist->GetEngineObject(pServerEntity->entindex());
 		CReplayEntityData* pReplayData = &pSnapshot->m_pReplayEntityData[iValidEdict];
 
-		PVSInfo_t* pvsInfo = edict->GetPVSInfo();
+		PVSInfo_t* pvsInfo = engineObject->GetPVSInfo();
 
 		if (pvsInfo->m_nClusterCount == 1)
 		{

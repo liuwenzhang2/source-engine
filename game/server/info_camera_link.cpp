@@ -169,7 +169,7 @@ void PointCameraSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *
 		if ( !pTargetEnt->GetEngineObject()->IsInPVS(pPlayer, pvs, pvssize))
 			continue;
 
-		if ( engine->CheckAreasConnected( area, pTargetEnt->AreaNum() ) )
+		if ( engine->CheckAreasConnected( area, pTargetEnt->GetEngineObject()->AreaNum() ) )
 		{
 			CPointCamera *pCameraEnt = g_InfoCameraLinkList[i]->m_hCamera;
 			if ( pCameraEnt )

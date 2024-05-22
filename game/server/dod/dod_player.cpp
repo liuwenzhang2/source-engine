@@ -983,7 +983,7 @@ void CDODPlayer::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *pvs, 
 {
 	BaseClass::SetupVisibility( pViewEntity, pvs, pvssize );
 
-	int area = pViewEntity ? pViewEntity->AreaNum() : AreaNum();
+	int area = pViewEntity ? pViewEntity->GetEngineObject()->AreaNum() : GetEngineObject()->AreaNum();
 	PointCameraSetupVisibility( this, area, pvs, pvssize );
 }
 

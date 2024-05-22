@@ -1774,7 +1774,7 @@ void CHL2_Player::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *pvs,
 {
 	BaseClass::SetupVisibility( pViewEntity, pvs, pvssize );
 
-	int area = pViewEntity ? pViewEntity->AreaNum() : AreaNum();
+	int area = pViewEntity ? pViewEntity->GetEngineObject()->AreaNum() : GetEngineObject()->AreaNum();
 	PointCameraSetupVisibility( this, area, pvs, pvssize );
 
 	// If the intro script is playing, we want to get it's visibility points

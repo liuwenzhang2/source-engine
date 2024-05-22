@@ -442,13 +442,6 @@ public:
 	CEntityNetworkProperty *NetworkProp();
 	const CEntityNetworkProperty *NetworkProp() const;
 
-	PVSInfo_t* GetPVSInfo() {
-		return GetEngineObject()->GetPVSInfo();
-	}
-	int				AreaNum() const {
-		return GetEngineObject()->AreaNum();
-	}	
-
 	// Quick way to ask if we have a player entity as a child anywhere in our hierarchy.
 	void					RecalcHasPlayerChildBit();
 	bool					DoesHavePlayerChild();

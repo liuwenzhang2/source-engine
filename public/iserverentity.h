@@ -295,8 +295,8 @@ public:
  	//virtual string_t		GetModelName( void ) const = 0;
 
 	//virtual void			SetModelIndex( int index ) = 0;
-	virtual PVSInfo_t*		GetPVSInfo() = 0; // get current visibilty data
-	virtual int				AreaNum() const = 0;
+	//virtual PVSInfo_t*		GetPVSInfo() = 0; // get current visibilty data
+	//virtual int				AreaNum() const = 0;
 
 };
 
