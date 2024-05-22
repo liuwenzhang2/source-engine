@@ -130,7 +130,7 @@ void CGrenadeBeam::Spawn( void )
 	
 	//UNDONE/HACK: this model is never used but one is needed
 	SetModel( "Models/weapons/flare.mdl" );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	SetTouch( &CGrenadeBeam::GrenadeBeamTouch );
 	SetNextThink( gpGlobals->curtime );

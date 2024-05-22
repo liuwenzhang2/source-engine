@@ -95,7 +95,7 @@ void CControlPoint::Spawn( void )
 
 	if (GetEngineObject()->HasSpawnFlags(CAP_POINT_HIDE_MODEL) )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
 	m_iBombsRemaining = m_iBombsRequired;
@@ -156,12 +156,12 @@ void CControlPoint::SetOwner( int owner, bool bMakeSound, int iNumCappers, int *
 
 void CControlPoint::InputShowModel( inputdata_t &input )
 {
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 }
 
 void CControlPoint::InputHideModel( inputdata_t &input )
 {
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 int CControlPoint::GetCurrentHudIconIndex( void )
@@ -585,11 +585,11 @@ void CControlPoint::SetActive( bool active )
 	
 	if( active )
 	{
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 	}
 	else
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 }
 

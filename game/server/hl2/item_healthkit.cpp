@@ -540,7 +540,7 @@ void CNewWallHealth::Spawn(void)
 	CreateVPhysics();
 
 	SetModel( HEALTH_CHARGER_MODEL_NAME );
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	ResetSequence( LookupSequence( "idle" ) );
 

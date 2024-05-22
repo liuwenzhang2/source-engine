@@ -877,7 +877,7 @@ float CBounceBomb::FindNearestNPC()
 		if( pNPC->IsAlive() )
 		{
 			// ignore hidden objects
-			if ( pNPC->IsEffectActive( EF_NODRAW ) )
+			if ( pNPC->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 				continue;
 
 			// Don't bother with NPC's that are below me.
@@ -1157,7 +1157,7 @@ void CBounceBomb::OpenHooks( bool bSilent )
 	SetPoseParameter( m_iAllHooks, BOUNCEBOMB_HOOK_RANGE );
 
 #ifdef _XBOX 
-	RemoveEffects( EF_NOSHADOW );
+	GetEngineObject()->RemoveEffects( EF_NOSHADOW );
 #endif
 
 }
@@ -1196,7 +1196,7 @@ void CBounceBomb::CloseHooks()
 	m_iFlipAttempts = 0;
 
 #ifdef _XBOX 
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 #endif
 }
 

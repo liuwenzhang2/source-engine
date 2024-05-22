@@ -2441,7 +2441,7 @@ void CNPC_Manhack::Spawn(void)
 	}
 		 
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE | EFL_NO_MEGAPHYSCANNON_RAGDOLL );
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	SetBloodColor( DONT_BLEED );
 	SetCurrentVelocity( vec3_origin );

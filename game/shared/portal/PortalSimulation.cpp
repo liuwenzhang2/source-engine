@@ -2931,7 +2931,7 @@ void CPSCollisionEntity::Spawn( void )
 	s_PortalSimulatorCollisionEntities[entindex()] = true;
 	VPhysicsSetObject( NULL );
 	GetEngineObject()->AddFlag( FL_WORLDBRUSH );
-	AddEffects( EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW );
+	GetEngineObject()->AddEffects( EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW );
 	IncrementInterpolationFrame();
 }
 

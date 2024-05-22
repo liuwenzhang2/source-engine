@@ -920,7 +920,7 @@ void CNPC_DeadBarney::Spawn( void )
 	engine->PrecacheModel("models/barney.mdl");
 	SetModel( "models/barney.mdl");
 
-	ClearEffects();
+	GetEngineObject()->ClearEffects();
 	SetSequence( 0 );
 	m_bloodColor		= BLOOD_COLOR_RED;
 

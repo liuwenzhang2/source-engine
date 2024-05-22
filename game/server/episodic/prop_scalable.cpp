@@ -108,7 +108,7 @@ void CPropScalable::Spawn( void )
 
 	BaseClass::Spawn();
 
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	SetSequence( 0 );
 	SetPlaybackRate( 1.0f );

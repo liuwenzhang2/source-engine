@@ -957,7 +957,7 @@ void CHunterFlechette::Explode()
 
 	RadiusDamage( CTakeDamageInfo( this, GetOwnerEntity(), sk_hunter_flechette_explode_dmg.GetFloat(), nDamageType ), GetEngineObject()->GetAbsOrigin(), sk_hunter_flechette_explode_radius.GetFloat(), CLASS_NONE, NULL );
 		
-    AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	SetThink( &CBaseEntity::SUB_Remove );
 	SetNextThink( gpGlobals->curtime + 0.1f );
@@ -4294,7 +4294,7 @@ void CNPC_Hunter::Explode()
 	SetThink( &CNPC_Hunter::SUB_Remove );
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 
@@ -5053,7 +5053,7 @@ bool CNPC_Hunter::IsCorporealEnemy( CBaseEntity *pEnemy )
 		return false;
 
 	// Generally speaking, don't melee attack anything the player can't see.
-	if( pEnemy->IsEffectActive( EF_NODRAW ) )
+	if( pEnemy->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		return false;
 
 	// Don't flank, melee attack striderbusters.
@@ -6421,7 +6421,7 @@ bool CNPC_Hunter::ShootFlechette( CBaseEntity *pTargetEntity, bool bSingleShot )
 
 	CHunterFlechette *pFlechette = CHunterFlechette::FlechetteCreate( vecSrc, angShoot, this );
 
-	pFlechette->AddEffects( EF_NOSHADOW );
+	pFlechette->GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	vecShoot *= hunter_flechette_speed.GetFloat();
 

@@ -383,6 +383,8 @@ public:
 			m_pOuterIntermediateData[i] = NULL;
 		}
 		m_nModelIndex = 0;
+		ClearFlags();
+		ClearEffects();
 	}
 
 	// Invalidates the abs state of all children
@@ -459,6 +461,7 @@ public:
 	const matrix3x4_t& CollisionToWorldTransform() const;
 	float BoundingRadius() const;
 	float BoundingRadius2D() const;
+	bool IsPointSized() const;
 	void RandomPointInBounds(const Vector& vecNormalizedMins, const Vector& vecNormalizedMaxs, Vector* pPoint) const;
 	bool IsPointInBounds(const Vector& vecWorldPt) const;
 	void UseTriggerBounds(bool bEnable, float flBloat = 0.0f);
@@ -479,6 +482,13 @@ public:
 	int GetCollisionGroup() const;
 	void SetCollisionGroup(int collisionGroup);
 	void CollisionRulesChanged();
+	// Effects...
+	bool IsEffectActive(int nEffectMask) const;
+	void AddEffects(int nEffects);
+	void RemoveEffects(int nEffects);
+	int GetEffects(void) const;
+	void ClearEffects(void);
+	void SetEffects(int nEffects);
 
 private:
 
@@ -544,6 +554,9 @@ private:
 	CCollisionProperty				m_Collision;
 	// used to cull collision tests
 	int								m_CollisionGroup;
+	// Effects to apply
+	int								m_fEffects;
+
 };
 
 //-----------------------------------------------------------------------------
@@ -881,6 +894,11 @@ inline float C_EngineObjectInternal::BoundingRadius2D() const
 	return m_Collision.BoundingRadius2D();
 }
 
+inline bool C_EngineObjectInternal::IsPointSized() const
+{
+	return BoundingRadius() == 0.0f;
+}
+
 inline void C_EngineObjectInternal::RandomPointInBounds(const Vector& vecNormalizedMins, const Vector& vecNormalizedMaxs, Vector* pPoint) const
 {
 	m_Collision.RandomPointInBounds(vecNormalizedMins, vecNormalizedMaxs, pPoint);
@@ -967,6 +985,32 @@ inline bool C_EngineObjectInternal::IsBoundsDefinedInEntitySpace() const
 inline int C_EngineObjectInternal::GetCollisionGroup() const
 {
 	return m_CollisionGroup;
+}
+
+inline int C_EngineObjectInternal::GetEffects(void) const
+{
+	return m_fEffects;
+}
+
+inline void C_EngineObjectInternal::RemoveEffects(int nEffects)
+{
+	m_pOuter->OnRemoveEffects(nEffects);
+	m_fEffects &= ~nEffects;
+	if (nEffects & EF_NODRAW)
+	{
+		m_pOuter->UpdateVisibility();
+	}
+}
+
+inline void C_EngineObjectInternal::ClearEffects(void)
+{
+	m_fEffects = 0;
+	m_pOuter->UpdateVisibility();
+}
+
+inline bool C_EngineObjectInternal::IsEffectActive(int nEffects) const
+{
+	return (m_fEffects & nEffects) != 0;
 }
 
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.

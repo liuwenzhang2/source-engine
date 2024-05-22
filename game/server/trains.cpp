@@ -2839,7 +2839,7 @@ void CFuncTrainControls::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	Assert(GetEngineObject()->GetMoveParent() && "func_traincontrols needs parent to properly align to train" );
 	

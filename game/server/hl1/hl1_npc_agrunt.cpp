@@ -192,7 +192,7 @@ void CNPC_AlienGrunt::Spawn()
 
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_GREEN;
-	ClearEffects();
+	GetEngineObject()->ClearEffects();
 	m_iHealth			= sk_agrunt_health.GetFloat();
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_NPCState			= NPC_STATE_NONE;

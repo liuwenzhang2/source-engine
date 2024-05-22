@@ -189,7 +189,7 @@ void CBaseCombatWeapon::Spawn( void )
 #if !defined( CLIENT_DLL )
 	if( IsX360() )
 	{
-		AddEffects( EF_ITEM_BLINK );
+		GetEngineObject()->AddEffects( EF_ITEM_BLINK );
 	}
 
 	FallInit();
@@ -210,7 +210,7 @@ void CBaseCombatWeapon::Spawn( void )
 
 	// Use more efficient bbox culling on the client. Otherwise, it'll setup bones for most
 	// characters even when they're not in the frustum.
-	AddEffects( EF_BONEMERGE_FASTCULL );
+	GetEngineObject()->AddEffects( EF_BONEMERGE_FASTCULL );
 
 	m_iReloadHudHintCount = 0;
 	m_iAltFireHudHintCount = 0;
@@ -674,7 +674,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 	// clear follow stuff, setup for collision
 	SetGravity(1.0);
 	m_iState = WEAPON_NOT_CARRIED;
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 	FallInit();
 	GetEngineObject()->SetGroundEntity( NULL );
 	SetThink( &CBaseCombatWeapon::SetPickupTouch );
@@ -723,7 +723,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 void CBaseCombatWeapon::OnPickedUp( CBaseCombatCharacter *pNewOwner )
 {
 #if !defined( CLIENT_DLL )
-	RemoveEffects( EF_ITEM_BLINK );
+	GetEngineObject()->RemoveEffects( EF_ITEM_BLINK );
 
 	if( pNewOwner->IsPlayer() )
 	{
@@ -973,7 +973,7 @@ void CBaseCombatWeapon::Equip( CBaseCombatCharacter *pOwner )
 	SetOwnerEntity( pOwner );
 
 	// Break any constraint I might have to the world.
-	RemoveEffects( EF_ITEM_BLINK );
+	GetEngineObject()->RemoveEffects( EF_ITEM_BLINK );
 
 #if !defined( CLIENT_DLL )
 	if ( m_pConstraint != NULL )
@@ -1304,18 +1304,18 @@ void CBaseCombatWeapon::SetWeaponVisible( bool visible )
 
 	if ( visible )
 	{
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		if ( vm )
 		{
-			vm->RemoveEffects( EF_NODRAW );
+			vm->GetEngineObject()->RemoveEffects( EF_NODRAW );
 		}
 	}
 	else
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 		if ( vm )
 		{
-			vm->AddEffects( EF_NODRAW );
+			vm->GetEngineObject()->AddEffects( EF_NODRAW );
 		}
 	}
 }
@@ -1331,7 +1331,7 @@ bool CBaseCombatWeapon::IsWeaponVisible( void )
 	{
 		vm = pOwner->GetViewModel( m_nViewModelIndex );
 		if ( vm )
-			return ( !vm->IsEffectActive(EF_NODRAW) );
+			return ( !vm->GetEngineObject()->IsEffectActive(EF_NODRAW) );
 	}
 
 	return false;

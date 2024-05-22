@@ -166,7 +166,7 @@ void CNPC_HAssassin::Spawn()
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
-    ClearEffects();
+	GetEngineObject()->ClearEffects();
 	m_iHealth			= sk_hassassin_health.GetFloat();
 	m_flFieldOfView		= VIEW_FIELD_WIDE; // indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_NPCState			= NPC_STATE_NONE;

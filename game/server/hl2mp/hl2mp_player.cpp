@@ -299,7 +299,7 @@ void CHL2MP_Player::Spawn(void)
 		pl.deadflag = false;
 		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		
 		GiveDefaultItems();
 	}
@@ -1152,7 +1152,7 @@ void CHL2MP_Player::CreateRagdollEntity( void )
 //-----------------------------------------------------------------------------
 int CHL2MP_Player::FlashlightIsOn( void )
 {
-	return IsEffectActive( EF_DIMLIGHT );
+	return GetEngineObject()->IsEffectActive( EF_DIMLIGHT );
 }
 
 extern ConVar flashlight;
@@ -1163,7 +1163,7 @@ void CHL2MP_Player::FlashlightTurnOn( void )
 {
 	if( flashlight.GetInt() > 0 && IsAlive() )
 	{
-		AddEffects( EF_DIMLIGHT );
+		GetEngineObject()->AddEffects( EF_DIMLIGHT );
 		const char* soundname = "HL2Player.FlashlightOn";
 		CPASAttenuationFilter filter(this, soundname);
 
@@ -1181,7 +1181,7 @@ void CHL2MP_Player::FlashlightTurnOn( void )
 //-----------------------------------------------------------------------------
 void CHL2MP_Player::FlashlightTurnOff( void )
 {
-	RemoveEffects( EF_DIMLIGHT );
+	GetEngineObject()->RemoveEffects( EF_DIMLIGHT );
 	
 	if( IsAlive() )
 	{
@@ -1285,7 +1285,7 @@ void CHL2MP_Player::Event_Killed( const CTakeDamageInfo &info )
 
 	m_lifeState = LIFE_DEAD;
 
-	RemoveEffects( EF_NODRAW );	// still draw player body
+	GetEngineObject()->RemoveEffects( EF_NODRAW );	// still draw player body
 	StopZooming();
 }
 

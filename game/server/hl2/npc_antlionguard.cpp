@@ -833,7 +833,7 @@ void CNPC_AntlionGuard::Spawn( void )
 	//See if we're supposed to start burrowed
 	if ( m_bIsBurrowed )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 		GetEngineObject()->AddFlag( FL_NOTARGET );
 
 		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
@@ -2192,7 +2192,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 		//Throw dust up
 		UTIL_CreateAntlionDust(GetEngineObject()->GetAbsOrigin() + Vector(0,0,24), GetEngineObject()->GetLocalAngles() );
 
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		GetEngineObject()->RemoveFlag( FL_NOTARGET );
 
 		if ( m_bCavernBreed )

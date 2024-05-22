@@ -98,7 +98,7 @@ void CTripmineGrenade::Spawn( void )
 	AngleVectors( angles, &m_vecDir );
 	m_vecEnd = GetEngineObject()->GetAbsOrigin() + m_vecDir * 2048;
 
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 }
 
 

@@ -594,7 +594,7 @@ END_DATADESC()
 void CAI_RadialLinkController::Spawn()
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 //---------------------------------------------------------

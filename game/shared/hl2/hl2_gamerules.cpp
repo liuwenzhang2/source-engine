@@ -330,7 +330,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 	//-----------------------------------------------------------------------------
 	void CopyToBodyQue( CBaseAnimating *pCorpse ) 
 	{
-		if ( pCorpse->IsEffectActive( EF_NODRAW ) )
+		if ( pCorpse->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 			return;
 
 		CCorpse *pHead	= g_pBodyQueueHead;

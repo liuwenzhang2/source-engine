@@ -69,8 +69,8 @@ public:
 
 	virtual CBaseEntity *GetOwner( void ) { return m_hOwner; };
 
-	virtual void			AddEffects( int nEffects );
-	virtual void			RemoveEffects( int nEffects );
+	virtual void OnAddEffects(int nEffects);
+	virtual void OnRemoveEffects(int nEffects);
 
 	void					SpawnControlPanels();
 	void					DestroyControlPanels();

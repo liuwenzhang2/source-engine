@@ -665,7 +665,7 @@ void CFuncMortarField::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName()) );    // set size and link into world
 	SetMoveType( MOVETYPE_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 //	SetUse( FieldUse );
 	Precache();
 }
@@ -863,7 +863,7 @@ void CNPC_DeadHEV::Spawn( void )
 	engine->PrecacheModel("models/player.mdl");
 	SetModel( "models/player.mdl" );
 
-	ClearEffects();
+	GetEngineObject()->ClearEffects();
 	SetSequence( 0 );
 	m_nBody				= 1;
 	m_bloodColor		= BLOOD_COLOR_RED;
@@ -874,8 +874,8 @@ void CNPC_DeadHEV::Spawn( void )
 	{
 		Msg ( "Dead hevsuit with bad pose\n" );
 		SetSequence( 0 );
-		ClearEffects();
-		AddEffects( EF_BRIGHTLIGHT );
+		GetEngineObject()->ClearEffects();
+		GetEngineObject()->AddEffects( EF_BRIGHTLIGHT );
 	}
 
 	// Corpses have less health
@@ -923,7 +923,7 @@ void CRenderFxManager::Spawn( void )
 {
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 
@@ -1077,7 +1077,7 @@ void CXenPLight::LightOn( void )
 	g_EventQueue.AddEvent( STRING( m_target ), "TurnOn", Value, 0, this, this );
 
 	if ( m_pGlow )
-	     m_pGlow->RemoveEffects( EF_NODRAW );
+	     m_pGlow->GetEngineObject()->RemoveEffects( EF_NODRAW );
 }
 
 
@@ -1087,7 +1087,7 @@ void CXenPLight::LightOff( void )
 	g_EventQueue.AddEvent( STRING( m_target ), "TurnOff", Value, 0, this, this );
 
 	if ( m_pGlow )
-		 m_pGlow->AddEffects( EF_NODRAW );
+		 m_pGlow->GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 

@@ -126,7 +126,7 @@ bool CEnvLaser::KeyValue( const char *szKeyName, const char *szValue )
 //-----------------------------------------------------------------------------
 int CEnvLaser::IsOn( void )
 {
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		return 0;
 	return 1;
 }
@@ -177,7 +177,7 @@ void CEnvLaser::InputToggle( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CEnvLaser::TurnOff( void )
 {
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	if ( m_pSprite )
 		m_pSprite->TurnOff();
 
@@ -191,7 +191,7 @@ void CEnvLaser::TurnOff( void )
 //-----------------------------------------------------------------------------
 void CEnvLaser::TurnOn( void )
 {
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 	if ( m_pSprite )
 		m_pSprite->TurnOn();
 

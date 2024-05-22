@@ -198,7 +198,7 @@ void CSprite::Spawn( void )
 	GetEngineObject()->SetSurroundingBoundsType( USE_GAME_CODE );
 
 	m_flMaxFrame = (float)modelinfo->GetModelFrameCount( GetModel() ) - 1;
-	AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
 
 #if defined( CLIENT_DLL )
 	SetNextClientThink( CLIENT_THINK_ALWAYS );
@@ -543,7 +543,7 @@ void CSprite::SetScale( float scale, float time )
 //-----------------------------------------------------------------------------
 void CSprite::TurnOff( void )
 {
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	SetNextThink( TICK_NEVER_THINK );
 }
 
@@ -552,7 +552,7 @@ void CSprite::TurnOff( void )
 //-----------------------------------------------------------------------------
 void CSprite::TurnOn( void )
 {
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 	if ( (m_flSpriteFramerate && m_flMaxFrame > 1.0)
 #if !defined( CLIENT_DLL )
 		|| (GetEngineObject()->GetSpawnFlags() & SF_SPRITE_ONCE)
@@ -570,7 +570,7 @@ void CSprite::TurnOn( void )
 // DVS TODO: Obsolete Use handler
 void CSprite::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-	int on = !IsEffectActive( EF_NODRAW );
+	int on = !GetEngineObject()->IsEffectActive( EF_NODRAW );
 	if ( ShouldToggle( useType, on ) )
 	{
 		if ( on )
@@ -624,7 +624,7 @@ void CSprite::InputColorBlueValue( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 void CSprite::InputToggleSprite( inputdata_t &inputdata )
 {
-	if ( !IsEffectActive( EF_NODRAW ) )
+	if ( !GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 	{
 		TurnOff();
 	}

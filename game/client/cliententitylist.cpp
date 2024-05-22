@@ -220,6 +220,7 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_PRED_FIELD(m_hGroundEntity, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE),
 	DEFINE_PRED_FIELD(m_nModelIndex, FIELD_SHORT, FTYPEDESC_INSENDTABLE | FTYPEDESC_MODELINDEX),
 	DEFINE_PRED_FIELD(m_fFlags, FIELD_INTEGER, FTYPEDESC_INSENDTABLE),
+	DEFINE_PRED_FIELD(m_fEffects, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_OVERRIDE),
 END_PREDICTION_DATA()
 
 BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
@@ -275,6 +276,11 @@ void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *
 	pEnt->SetLocalVelocity( vecVelocity );
 }
 
+void RecvProxy_EffectFlags(const CRecvProxyData* pData, void* pStruct, void* pOut)
+{
+	((C_EngineObjectInternal*)pStruct)->SetEffects(pData->m_Value.m_Int);
+}
+
 BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO(testNetwork)),
 	RecvPropVector(RECVINFO_NAME(m_vecNetworkOrigin, m_vecOrigin)),
@@ -296,6 +302,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropDataTable(RECVINFO_DT(m_Collision), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty)),
 	RecvPropInt(RECVINFO(m_CollisionGroup)),
 	RecvPropInt(RECVINFO(m_fFlags)),
+	RecvPropInt(RECVINFO(m_fEffects), 0, RecvProxy_EffectFlags),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -1361,7 +1368,7 @@ void C_EngineObjectInternal::CalcAbsolutePosition()
 		return;
 	}
 
-	if (m_pOuter->IsEffectActive(EF_BONEMERGE))
+	if (IsEffectActive(EF_BONEMERGE))
 	{
 		m_pOuter->MoveToAimEnt();
 		return;
@@ -2865,6 +2872,24 @@ void C_EngineObjectInternal::ToggleFlag(int flagToToggle)
 	CHANGE_FLAGS(m_fFlags, m_fFlags ^ flagToToggle);
 }
 
+void C_EngineObjectInternal::SetEffects(int nEffects)
+{
+	if (nEffects != m_fEffects)
+	{
+		m_fEffects = nEffects;
+		m_pOuter->UpdateVisibility();
+	}
+}
+
+void C_EngineObjectInternal::AddEffects(int nEffects)
+{
+	m_pOuter->OnAddEffects(nEffects);
+	m_fEffects |= nEffects;
+	if (nEffects & EF_NODRAW)
+	{
+		m_pOuter->UpdateVisibility();
+	}
+}
 
 bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b )
 {

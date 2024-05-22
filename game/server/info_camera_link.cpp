@@ -163,7 +163,7 @@ void PointCameraSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *
 		}
 
 		// Don't bother if it's not visible
-		if ( pTargetEnt->IsEffectActive( EF_NODRAW ) )
+		if ( pTargetEnt->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 			continue;
 
 		if ( !pTargetEnt->GetEngineObject()->IsInPVS(pPlayer, pvs, pvssize))

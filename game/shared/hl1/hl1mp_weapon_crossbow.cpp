@@ -285,7 +285,7 @@ void CCrossbowBolt::ExplodeThink( void )
     SetThink( &CCrossbowBolt::SUB_Remove );
     SetNextThink( gpGlobals->curtime );
     
-    AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 void CCrossbowBolt::BubbleThink( void )

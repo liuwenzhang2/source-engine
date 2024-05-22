@@ -74,7 +74,7 @@ LINK_ENTITY_TO_CLASS( te_tester, CTempEntTester );
 void CTempEntTester::Spawn( void )
 {
 	// Not a physical thing...
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	m_pCurrent = CBaseTempEntity::GetList();
 	while ( m_pCurrent )

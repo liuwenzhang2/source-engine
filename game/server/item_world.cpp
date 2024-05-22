@@ -162,7 +162,7 @@ void CItem::Spawn( void )
 	
 	if( IsX360() )
 	{
-		AddEffects( EF_ITEM_BLINK );
+		GetEngineObject()->AddEffects( EF_ITEM_BLINK );
 	}
 
 	// This will make them not collide with the player, but will collide
@@ -461,7 +461,7 @@ void CItem::ItemTouch( CBaseEntity *pOther )
 CBaseEntity* CItem::Respawn( void )
 {
 	SetTouch( NULL );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	VPhysicsDestroyObject();
 
@@ -487,7 +487,7 @@ void CItem::Materialize( void )
 {
 	CreateItemVPhysicsObject();
 
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 	{
 		// changing from invisible state to visible.
 
@@ -512,7 +512,7 @@ void CItem::Materialize( void )
 		params.m_bWarnOnDirectWaveReference = true;
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 #endif
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		DoMuzzleFlash();
 	}
 

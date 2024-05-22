@@ -321,7 +321,7 @@ void CAntlionGrub::Event_Killed( const CTakeDamageInfo &info )
 int CAntlionGrub::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	// Animate a flinch of pain if we're dying
-	bool bSquashed = ( ( GetEffects() & EF_NODRAW ) != 0 );
+	bool bSquashed = ( (GetEngineObject()->GetEffects() & EF_NODRAW ) != 0 );
 	if ( bSquashed == false )
 	{
 		SetSequence( SelectWeightedSequence( ACT_SMALL_FLINCH ) );
@@ -377,7 +377,7 @@ void CAntlionGrub::Spawn( void )
 	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER );
 	SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	GetEngineObject()->UseTriggerBounds(true,1);
 
@@ -718,7 +718,7 @@ void CAntlionGrub::InputSquash( inputdata_t &data )
 void CAntlionGrub::SpawnSquashedGrub( void )
 {
 	// If we're already invisible, we're done
-	if ( GetEffects() & EF_NODRAW )
+	if (GetEngineObject()->GetEffects() & EF_NODRAW )
 		return;
 
 	Vector vecUp;
@@ -726,7 +726,7 @@ void CAntlionGrub::SpawnSquashedGrub( void )
 	CBaseEntity *pGib = CreateRagGib( ANTLIONGRUB_SQUASHED_MODEL, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), vecUp * 16.0f );
 	if ( pGib )
 	{
-		pGib->AddEffects( EF_NOSHADOW );
+		pGib->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	}
 }
 
@@ -763,12 +763,12 @@ void CAntlionGrub::MakeSquashDecals( const Vector &vecOrigin )
 void CAntlionGrub::Squash( CBaseEntity *pOther, bool bDealDamage, bool bSpawnBlood )
 {
 	// If we're already squashed, then don't bother doing it again!
-	if ( GetEffects() & EF_NODRAW )
+	if (GetEngineObject()->GetEffects() & EF_NODRAW )
 		return;
 
 	SpawnSquashedGrub();
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	
 	// Stop being attached to us
@@ -893,7 +893,7 @@ void CGrubNugget::Spawn( void )
 	}
 
 	// We're self-illuminating, so we don't take or give shadows
-	AddEffects( EF_NOSHADOW|EF_NORECEIVESHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW|EF_NORECEIVESHADOW );
 
 	m_iHealth = 1;
 
@@ -1006,7 +1006,7 @@ void CGrubNugget::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 //-----------------------------------------------------------------------------
 void CGrubNugget::Event_Killed( const CTakeDamageInfo &info )
 {
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	DispatchParticleEffect( "antlion_spit_player", GetEngineObject()->GetAbsOrigin(), QAngle( -90, 0, 0 ) );
 	const char* soundname = "NPC_Antlion_Grub.Explode";
 	CPASAttenuationFilter filter(this, soundname);

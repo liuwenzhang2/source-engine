@@ -255,7 +255,6 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt		(SENDINFO( m_ubInterpolationFrame ), NOINTERP_PARITY_MAX_BITS, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_nRenderFX),		8, SPROP_UNSIGNED ),
 	SendPropInt		(SENDINFO(m_nRenderMode),	8, SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO(m_fEffects),		EF_MAX_BITS, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_clrRender),	32, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_iTeamNum),		TEAMNUM_NUM_BITS, 0),
 	SendPropFloat	(SENDINFO(m_flElasticity), 0, SPROP_COORD),
@@ -520,7 +519,7 @@ void CBaseEntity::UpdateOnRemove(void)
 
 	// This is only here to allow the MOVETYPE_NONE to be set without the
 	// assertion triggering. Why do we bother setting the MOVETYPE to none here?
-	RemoveEffects(EF_BONEMERGE);
+	GetEngineObject()->RemoveEffects(EF_BONEMERGE);
 	SetMoveType(MOVETYPE_NONE);
 
 	// If we have a parent, unlink from it.
@@ -614,12 +613,12 @@ void CBaseEntity::StopFollowingEntity( )
 {
 	if( !IsFollowingEntity() )
 	{
-//		Assert( IsEffectActive( EF_BONEMERGE ) == 0 );
+//		Assert( GetEngineObject()->IsEffectActive( EF_BONEMERGE ) == 0 );
 		return;
 	}
 
 	GetEngineObject()->SetParent( NULL );
-	RemoveEffects( EF_BONEMERGE );
+	GetEngineObject()->RemoveEffects( EF_BONEMERGE );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->CollisionRulesChanged();
@@ -627,7 +626,7 @@ void CBaseEntity::StopFollowingEntity( )
 
 bool CBaseEntity::IsFollowingEntity()
 {
-	return IsEffectActive( EF_BONEMERGE ) && (GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
+	return GetEngineObject()->IsEffectActive( EF_BONEMERGE ) && (GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
 }
 
 CBaseEntity *CBaseEntity::GetFollowedEntity()
@@ -1659,7 +1658,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_FIELD( m_nLastThinkTick, FIELD_TICK ),
 
 	DEFINE_KEYFIELD( m_nNextThinkTick, FIELD_TICK, "nextthink" ),
-	DEFINE_KEYFIELD( m_fEffects, FIELD_INTEGER, "effects" ),
+	//DEFINE_KEYFIELD( m_fEffects, FIELD_INTEGER, "effects" ),
 	DEFINE_KEYFIELD( m_clrRender, FIELD_COLOR32, "rendercolor" ),
 //#if !defined( NO_ENTITY_PREDICTION )
 //	DEFINE_FIELD( m_PredictableID, CPredictableId ),
@@ -2723,7 +2722,7 @@ void CBaseEntity::MakeDormant( void )
 	// Don't move
 	SetMoveType( MOVETYPE_NONE );
 	// Don't draw
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	// Don't think
 	SetNextThink( TICK_NEVER_THINK );
 }
@@ -2760,7 +2759,7 @@ bool CBaseEntity::IsInWorld( void ) const
 
 bool CBaseEntity::IsViewable( void )
 {
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 	{
 		return false;
 	}
@@ -2955,7 +2954,7 @@ void CBaseEntity::OnRestore()
 	if (GetEngineObject()->GetFlags() & FL_TRANSRAGDOLL )
 	{
 		m_nRenderFX = kRenderFxNone;
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 		GetEngineObject()->RemoveFlag( FL_DISSOLVING | FL_ONFIRE );
 	}
 
@@ -3082,7 +3081,7 @@ void CBaseEntity::SetMoveType( MoveType_t val, MoveCollide_t moveCollide )
 	// This is needed to the removal of MOVETYPE_FOLLOW:
 	// We can't transition from follow to a different movetype directly
 	// or the leaf code will break.
-	Assert( !IsEffectActive( EF_BONEMERGE ) );
+	Assert( !GetEngineObject()->IsEffectActive( EF_BONEMERGE ) );
 	m_MoveType = val;
 	m_MoveCollide = moveCollide;
 
@@ -3185,7 +3184,7 @@ int CBaseEntity::UpdateTransmitState()
 	
 	// If an object is the moveparent of something else, don't skip it just because it's marked EF_NODRAW or else
 	//  the client won't have a proper origin for the child since the hierarchy won't be correctly transmitted down
-	if ( IsEffectActive( EF_NODRAW ) && !GetEngineObject()->FirstMoveChild())
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) && !GetEngineObject()->FirstMoveChild())
 	{
 		return SetTransmitState( FL_EDICT_DONTSEND );
 	}
@@ -5923,14 +5922,14 @@ void CBaseEntity::InputDispatchResponse( inputdata_t& inputdata )
 //-----------------------------------------------------------------------------
 void CBaseEntity::InputDisableShadow( inputdata_t &inputdata )
 {
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 }
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CBaseEntity::InputEnableShadow( inputdata_t &inputdata )
 {
-	RemoveEffects( EF_NOSHADOW );
+	GetEngineObject()->RemoveEffects( EF_NOSHADOW );
 }
 
 //-----------------------------------------------------------------------------
@@ -6395,7 +6394,7 @@ void CBaseEntity::RemoveDeferred( void )
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Hide us completely
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 }

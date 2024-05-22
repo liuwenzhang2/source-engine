@@ -926,7 +926,7 @@ void CPropAPC::CreateCorpse( )
 	}
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	UTIL_Remove( this );
 }
 

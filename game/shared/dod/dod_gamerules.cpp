@@ -5283,7 +5283,7 @@ void CFuncTeamWall::Spawn( void )
 {
 	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	// set our custom collision if we declared this ent through the .ent file

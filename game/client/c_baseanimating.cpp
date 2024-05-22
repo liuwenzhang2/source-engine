@@ -819,7 +819,7 @@ ShadowType_t C_BaseAnimating::ShadowCastType()
 	if ( !pStudioHdr || !pStudioHdr->SequencesAvailable() )
 		return SHADOWS_NONE;
 
-	if ( IsEffectActive(EF_NODRAW | EF_NOSHADOW) )
+	if (GetEngineObject()->IsEffectActive(EF_NODRAW | EF_NOSHADOW) )
 		return SHADOWS_NONE;
 
 	if (pStudioHdr->GetNumSeq() == 0)
@@ -1464,7 +1464,7 @@ void C_BaseAnimating::BuildTransformations( CStudioHdr *hdr, Vector *pos, Quater
 	}
 
 	// For EF_BONEMERGE entities, copy the bone matrices for any bones that have matching names.
-	bool boneMerge = IsEffectActive(EF_BONEMERGE);
+	bool boneMerge = GetEngineObject()->IsEffectActive(EF_BONEMERGE);
 	if ( boneMerge || m_pBoneMergeCache )
 	{
 		if ( boneMerge )
@@ -1882,7 +1882,7 @@ void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float curre
 			CStudioHdr *pChildHdr = pChildAnimating->GetModelPtr();
 
 			// FIXME: needs a new type of EF_BONEMERGE (EF_CHILDMERGE?)
-			if ( pChildHdr && pChild->GetOuter()->IsEffectActive( EF_BONEMERGE ) && pChildHdr->SequencesAvailable() && pChildAnimating->m_pBoneMergeCache )
+			if ( pChildHdr && pChild->IsEffectActive( EF_BONEMERGE ) && pChildHdr->SequencesAvailable() && pChildAnimating->m_pBoneMergeCache )
 			{
 				// FIXME: these should Inherit from the parent
 				GetPoseParameters( pChildHdr, childPoseparam );
@@ -2197,7 +2197,7 @@ bool C_BaseAnimating::GetRootBone( matrix3x4_t &rootBone )
 {
 	//Assert( !IsDynamicModelLoading() );
 
-	if ( IsEffectActive( EF_BONEMERGE ) && GetEngineObject()->GetMoveParent() && m_pBoneMergeCache )
+	if (GetEngineObject()->IsEffectActive( EF_BONEMERGE ) && GetEngineObject()->GetMoveParent() && m_pBoneMergeCache )
 		return m_pBoneMergeCache->GetRootBone( rootBone );
 
 	GetBoneTransform( 0, rootBone );
@@ -3256,7 +3256,7 @@ int C_BaseAnimating::InternalDrawModel( int flags )
 
 	UpdateBoneAttachments( );
 
-	if ( IsEffectActive( EF_ITEM_BLINK ) )
+	if (GetEngineObject()->IsEffectActive( EF_ITEM_BLINK ) )
 	{
 		flags |= STUDIO_ITEM_BLINK;
 	}
@@ -4624,11 +4624,11 @@ C_BaseAnimating *C_BaseAnimating::CreateRagdollCopy()
 	}
 
 	m_builtRagdoll = true;
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
-	if ( IsEffectActive( EF_NOSHADOW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NOSHADOW ) )
 	{
-		pRagdoll->AddEffects( EF_NOSHADOW );
+		pRagdoll->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	}
 
 	pRagdoll->m_nRenderFX = kRenderFxRagdoll;
@@ -4805,7 +4805,7 @@ void C_BaseAnimating::OnDataChanged( DataUpdateType_t updateType )
 	if ( m_nRenderFX == kRenderFxRagdoll && m_builtRagdoll == true )
 	{
 		if ( m_pRagdoll == NULL )
-			 AddEffects( EF_NODRAW );
+			GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
 	if ( m_pRagdoll && m_nRenderFX != kRenderFxRagdoll )
@@ -5732,7 +5732,7 @@ float C_BaseAnimating::SetBoneController ( int iController, float flValue )
 void C_BaseAnimating::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pAbsOrigin, QAngle *pAbsAngles )
 {
 	IEngineObjectClient *pMoveParent;
-	if ( IsEffectActive( EF_BONEMERGE ) && IsEffectActive( EF_BONEMERGE_FASTCULL ) && (pMoveParent = GetEngineObject()->GetMoveParent()) != NULL )
+	if (GetEngineObject()->IsEffectActive( EF_BONEMERGE ) && GetEngineObject()->IsEffectActive( EF_BONEMERGE_FASTCULL ) && (pMoveParent = GetEngineObject()->GetMoveParent()) != NULL )
 	{
 		// Doing this saves a lot of CPU.
 		*pAbsOrigin = pMoveParent->GetOuter()->WorldSpaceCenter();
@@ -6373,12 +6373,12 @@ void C_BaseAnimating::NotifyBoneAttached( C_BaseAnimating* attachTarget )
 	{
 		if ( !C_BasePlayer::ShouldDrawLocalPlayer() )
 		{
-			AddEffects( EF_NODRAW );
+			GetEngineObject()->AddEffects( EF_NODRAW );
 		}
 	}
 	else
 	{
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 	}
 }
 

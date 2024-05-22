@@ -252,6 +252,7 @@ public:
 	virtual const matrix3x4_t& CollisionToWorldTransform() const = 0;
 	virtual float BoundingRadius() const = 0;
 	virtual float BoundingRadius2D() const = 0;
+	virtual bool IsPointSized() const = 0;
 	virtual void RandomPointInBounds(const Vector& vecNormalizedMins, const Vector& vecNormalizedMaxs, Vector* pPoint) const = 0;
 	virtual bool IsPointInBounds(const Vector& vecWorldPt) const = 0;
 	virtual void UseTriggerBounds(bool bEnable, float flBloat = 0.0f) = 0;
@@ -272,6 +273,12 @@ public:
 	virtual int GetCollisionGroup() const = 0;
 	virtual void SetCollisionGroup(int collisionGroup) = 0;
 	virtual void CollisionRulesChanged() = 0;
+	virtual int GetEffects(void) const = 0;
+	virtual void AddEffects(int nEffects) = 0;
+	virtual void RemoveEffects(int nEffects) = 0;
+	virtual void ClearEffects(void) = 0;
+	virtual void SetEffects(int nEffects) = 0;
+	virtual bool IsEffectActive(int nEffects) const = 0;
 
 };
 

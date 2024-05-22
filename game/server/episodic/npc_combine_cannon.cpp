@@ -608,7 +608,7 @@ void CNPC_Combine_Cannon::Spawn( void )
 	// Limit our look distance
 	SetDistLook( m_flSightDist );
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	// Point the cursor straight ahead so that the sniper's

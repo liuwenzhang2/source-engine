@@ -159,7 +159,7 @@ void CNPC_Scientist::Spawn( void )
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
-	ClearEffects();
+	GetEngineObject()->ClearEffects();
 	m_iHealth			= sk_scientist_health.GetFloat();
 	m_flFieldOfView		= VIEW_FIELD_WIDE;
 	m_NPCState			= NPC_STATE_NONE;
@@ -914,7 +914,7 @@ void CNPC_DeadScientist::Spawn( void )
 	engine->PrecacheModel("models/scientist.mdl");
 	SetModel( "models/scientist.mdl" );
 	
-	ClearEffects();
+	GetEngineObject()->ClearEffects();
 	SetSequence( 0 );
 	m_bloodColor		= BLOOD_COLOR_RED;
 

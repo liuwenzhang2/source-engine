@@ -4415,7 +4415,7 @@ void CAI_BaseNPC::Wake( bool bFireOutput )
 	{
 		m_nWakeTick = gpGlobals->tickcount;
 		SetSleepState( AISS_AWAKE );
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		if ( bFireOutput )
 			m_OnWake.FireOutput( this, this );
 
@@ -4440,7 +4440,7 @@ void CAI_BaseNPC::Wake( bool bFireOutput )
 void CAI_BaseNPC::Sleep()
 {
 	// Don't render.
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	if( GetState() == NPC_STATE_SCRIPT )
 	{
@@ -6868,10 +6868,10 @@ void CAI_BaseNPC::NPCInit ( void )
 					pWeapon->SetName( UTIL_VarArgs("%s_weapon", STRING(GetEntityName())) );
 				}
 
-				if ( GetEffects() & EF_NOSHADOW )
+				if (GetEngineObject()->GetEffects() & EF_NOSHADOW )
 				{
 					// BUGBUG: if this NPC drops this weapon it will forevermore have no shadow
-					pWeapon->AddEffects( EF_NOSHADOW );
+					pWeapon->GetEngineObject()->AddEffects( EF_NOSHADOW );
 				}
 
 				Weapon_Equip( pWeapon );
@@ -7107,7 +7107,7 @@ bool CAI_BaseNPC::IsWeaponHolstered( void )
 	if( !GetActiveWeapon() )
 		return true;
 
-	if( GetActiveWeapon()->IsEffectActive(EF_NODRAW) )
+	if( GetActiveWeapon()->GetEngineObject()->IsEffectActive(EF_NODRAW) )
 		return true;
 
 	return false;
@@ -11862,7 +11862,7 @@ bool CAI_BaseNPC::CineCleanup()
 		// okay, reset me to what it thought I was before
 		m_hCine->SetTarget( NULL );
 		// NOTE that this will have had EF_NODRAW removed in script.dll when it's cached off
-		SetEffects( m_hCine->m_saved_effects );
+		GetEngineObject()->SetEffects( m_hCine->m_saved_effects );
 		
 		GetEngineObject()->SetCollisionGroup( m_hCine->m_savedCollisionGroup );
 	}

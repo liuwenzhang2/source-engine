@@ -263,7 +263,7 @@ void CProp_Portal::Spawn( void )
 
 	m_matrixThisToLinked.Identity(); //don't accidentally teleport objects to zero space
 	
-	AddEffects( EF_NORECEIVESHADOW | EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NORECEIVESHADOW | EF_NOSHADOW );
 
 	GetEngineObject()->SetSolid( SOLID_OBB );
 	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID | FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
@@ -753,7 +753,7 @@ void CProp_Portal::Activate( void )
 
 	CreateSounds();
 
-	AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
 
 	if( m_bActivated && (m_hLinkedPortal.Get() != NULL) )
 	{

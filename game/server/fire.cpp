@@ -732,7 +732,7 @@ void CFire::Spawn( void )
 	m_takedamage = DAMAGE_NO;
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	SetToOutSize();
 
 	// set up the ignition point

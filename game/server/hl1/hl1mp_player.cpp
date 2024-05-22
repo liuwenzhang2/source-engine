@@ -132,7 +132,7 @@ void CHL1MP_Player::Spawn( void )
 {
 	if ( !IsObserver() )
 	{
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		SetMoveType( MOVETYPE_WALK );
 		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
@@ -212,7 +212,7 @@ void CHL1MP_Player::Event_Killed( const CTakeDamageInfo &info )
 	BaseClass::Event_Killed( info );
 
 	m_lifeState = LIFE_DEAD;
-	RemoveEffects( EF_NODRAW );	// still draw player body
+	GetEngineObject()->RemoveEffects( EF_NODRAW );	// still draw player body
 }
 
 

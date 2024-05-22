@@ -83,7 +83,7 @@ void CBaseHL1CombatWeapon::Spawn( void )
 
 	// Use more efficient bbox culling on the client. Otherwise, it'll setup bones for most
 	// characters even when they're not in the frustum.
-	AddEffects( EF_BONEMERGE_FASTCULL );
+	GetEngineObject()->AddEffects( EF_BONEMERGE_FASTCULL );
 }
 
 #if defined( CLIENT_DLL )

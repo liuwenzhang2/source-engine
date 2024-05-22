@@ -54,7 +54,7 @@ void CShower::Spawn( void )
 	SetNextThink( gpGlobals->curtime + 0.1f );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	UTIL_SetSize(this, vec3_origin, vec3_origin );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	m_flSpeed = random->RandomFloat( 0.5, 1.5 );
 
 	GetEngineObject()->SetLocalAngles( vec3_angle );
@@ -181,7 +181,7 @@ void CEnvExplosion::Spawn( void )
 	Precache();
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	SetMoveType( MOVETYPE_NONE );
 	/*

@@ -286,7 +286,7 @@ void CNPC_Tentacle::Spawn( )
 	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST );
 
 	SetMoveType( MOVETYPE_NONE );
-	ClearEffects();
+	GetEngineObject()->ClearEffects();
 	m_iHealth			= 75;
 	SetSequence( 0 );
 
@@ -326,7 +326,7 @@ void CNPC_Tentacle::Spawn( )
 
 	CreateVPhysics();
 
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 }
 
 void CNPC_Tentacle::UpdateOnRemove( void )

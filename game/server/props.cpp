@@ -442,7 +442,7 @@ void CBreakableProp::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize,
 
 	if ( g_pGameRules->ShouldBurningPropsEmitLight() )
 	{
-		GetEffectEntity()->AddEffects( EF_DIMLIGHT );
+		GetEffectEntity()->GetEngineObject()->AddEffects( EF_DIMLIGHT );
 	}
 
 	// Frighten AIs, just in case this is an exploding thing.
@@ -1511,7 +1511,7 @@ void CBreakableProp::CreateFlare( float flLifetime )
 
 		AddEntityToDarknessCheck( pFlare );
 
-		AddEffects( EF_NOSHADOW );
+		GetEngineObject()->AddEffects( EF_NOSHADOW );
 	}
 }
 #endif // HL2_EPISODIC
@@ -1776,7 +1776,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 		{
 		case MULTIPLAYER_BREAK_DEFAULT:		// default is to break client-side
 		case MULTIPLAYER_BREAK_CLIENTSIDE:
-			te->PhysicsProp( filter, -1, GetEngineObject()->GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEffects() );
+			te->PhysicsProp( filter, -1, GetEngineObject()->GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEngineObject()->GetEffects() );
 			break;
 		case MULTIPLAYER_BREAK_SERVERSIDE:	// server-side break
 			if ( m_PerformanceMode != PM_NO_GIBS || breakable_disable_gib_limit.GetBool() )
@@ -1785,7 +1785,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 			}
 			break;
 		case MULTIPLAYER_BREAK_BOTH:	// pieces break from both dlls
-			te->PhysicsProp( filter, -1, GetEngineObject()->GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEffects() );
+			te->PhysicsProp( filter, -1, GetEngineObject()->GetModelIndex(), m_nSkin, GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), velocity, true, GetEngineObject()->GetEffects() );
 			if ( m_PerformanceMode != PM_NO_GIBS || breakable_disable_gib_limit.GetBool() )
 			{
 				PropBreakableCreateAll(GetEngineObject()->GetModelIndex(), pPhysics, params, this, -1, ( m_PerformanceMode == PM_FULL_GIBS ), false );
@@ -1945,7 +1945,7 @@ void CDynamicProp::Spawn( )
 
 	if( m_bStartDisabled )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
 	if ( !PropDataOverrodeBlockLOS() )
@@ -2339,12 +2339,12 @@ void CDynamicProp::PropSetSequence( int nSequence )
 // NOTE: To avoid risk, currently these do nothing about collisions, only visually on/off
 void CDynamicProp::InputTurnOn( inputdata_t &inputdata )
 {
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 }
 
 void CDynamicProp::InputTurnOff( inputdata_t &inputdata )
 {
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 void CDynamicProp::InputDisableCollision( inputdata_t &inputdata )
@@ -2401,7 +2401,7 @@ void COrnamentProp::DetachFromOwner()
 	SetOwnerEntity( NULL );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 void COrnamentProp::Activate()
@@ -2425,7 +2425,7 @@ void COrnamentProp::AttachTo( const char *pAttachName, CBaseEntity *pActivator, 
 	CBaseEntity *pAttach = gEntList.FindEntityByName( NULL, pAttachName, NULL, pActivator, pCaller );
 	if ( pAttach )
 	{
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		FollowEntity( pAttach );
 	}
 }
@@ -5834,7 +5834,7 @@ void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 	GetEngineObject()->PhysicsRemoveGroundList();
 	GetEngineObject()->DestroyAllDataObjects();
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	if ( IsOnFire() || IsDissolving() )
 	{
@@ -5861,7 +5861,7 @@ void CPhysicsPropRespawnable::Materialize( void )
 		return;
 	}
 
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 	Spawn();
 }
 

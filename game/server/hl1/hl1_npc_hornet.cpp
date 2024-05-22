@@ -180,7 +180,7 @@ void CNPC_Hornet::DieTouch ( CBaseEntity *pOther )
 
 	m_takedamage	= DAMAGE_NO;
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );// intangible
 

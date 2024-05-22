@@ -193,7 +193,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	SetTouch( NULL );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 #if HL2_EPISODIC

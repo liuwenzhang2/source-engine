@@ -1118,7 +1118,7 @@ void CTempEnts::PhysicsProp( int modelindex, int skin, const Vector& pos, const 
 	pEntity->GetEngineObject()->SetAbsOrigin( pos );
 	pEntity->GetEngineObject()->SetAbsAngles( angles );
 	pEntity->SetPhysicsMode( PHYSICS_MULTIPLAYER_CLIENTSIDE );
-	pEntity->SetEffects( effects );
+	pEntity->GetEngineObject()->SetEffects( effects );
 
 	if ( !pEntity->Initialize() )
 	{

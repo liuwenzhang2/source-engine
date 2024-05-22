@@ -88,7 +88,7 @@ void CNPC_BaseScanner::Spawn(void)
 #ifdef _XBOX
 	// Always fade the corpse
 	AddSpawnFlags( SF_NPC_FADE_CORPSE );
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 #endif // _XBOX
 
 	SetHullType( HULL_TINY_CENTERED );

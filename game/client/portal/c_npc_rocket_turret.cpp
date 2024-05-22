@@ -100,7 +100,7 @@ ITraceFilter* C_NPC_RocketTurret::GetBeamTraceFilter( void )
 void C_NPC_RocketTurret::LaserOff( void )
 {
 	if( m_pBeam )
-		m_pBeam->AddEffects( EF_NODRAW );
+		m_pBeam->GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 void C_NPC_RocketTurret::LaserOn( void )
@@ -138,7 +138,7 @@ void C_NPC_RocketTurret::LaserOn( void )
 	}
 	else
 	{
-		m_pBeam->RemoveEffects( EF_NODRAW );
+		m_pBeam->GetEngineObject()->RemoveEffects( EF_NODRAW );
 	}
 
 	if ( m_iLaserState == 2 )

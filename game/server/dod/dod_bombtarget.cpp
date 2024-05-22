@@ -203,7 +203,7 @@ CDODBombTargetStateInfo* CDODBombTarget::State_LookupInfo( BombTargetState state
 void CDODBombTarget::State_Enter_INACTIVE( void )
 {
 	// go invisible
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	m_OnBecomeInactive.FireOutput( this, this );
 }
@@ -213,7 +213,7 @@ void CDODBombTarget::State_Enter_INACTIVE( void )
 //-----------------------------------------------------------------------------
 void CDODBombTarget::State_Enter_ACTIVE( void )
 {
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 
 	// set transparent model
 	SetModel( DOD_BOMB_TARGET_MODEL_TARGET );
@@ -226,7 +226,7 @@ void CDODBombTarget::State_Enter_ACTIVE( void )
 //-----------------------------------------------------------------------------
 void CDODBombTarget::State_Enter_ARMED( void )
 {
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 
 	// set solid model
 	SetModel( DOD_BOMB_TARGET_MODEL_ARMED );

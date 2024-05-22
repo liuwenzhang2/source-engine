@@ -234,7 +234,7 @@ void CNPC_HGrunt::Spawn()
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
-	ClearEffects();
+	GetEngineObject()->ClearEffects();
 	m_iHealth			= sk_hgrunt_health.GetFloat();
 	m_flFieldOfView		= 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_NPCState			= NPC_STATE_NONE;
@@ -2597,7 +2597,7 @@ void CNPC_DeadHGrunt::Spawn( void )
 	engine->PrecacheModel("models/hgrunt.mdl");
 	SetModel( "models/hgrunt.mdl" );
 
-	ClearEffects();
+	GetEngineObject()->ClearEffects();
 	SetSequence( 0 );
 	m_bloodColor		= BLOOD_COLOR_RED;
 

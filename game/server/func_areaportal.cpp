@@ -77,7 +77,7 @@ CAreaPortal::CAreaPortal()
 
 void CAreaPortal::Spawn( void )
 {
-	AddEffects( EF_NORECEIVESHADOW | EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NORECEIVESHADOW | EF_NOSHADOW );
 	Precache();
 }
 

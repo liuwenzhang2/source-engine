@@ -129,7 +129,7 @@ void CNPC_Barnacle::Spawn()
 	SetThink ( &CNPC_Barnacle::BarnacleThink );
 	SetNextThink( gpGlobals->curtime + 0.5f );
 	//Do not have a shadow
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	m_flIgnoreTouchesUntil = gpGlobals->curtime;
 }

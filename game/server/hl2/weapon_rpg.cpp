@@ -740,7 +740,7 @@ CMissile *CMissile::Create( const Vector &vecOrigin, const QAngle &vecAngles, CB
 	CMissile *pMissile = (CMissile *) CBaseEntity::Create( "rpg_missile", vecOrigin, vecAngles, pentOwner );
 	pMissile->SetOwnerEntity( pentOwner );
 	pMissile->Spawn();
-	pMissile->AddEffects( EF_NOSHADOW );
+	pMissile->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	
 	Vector vecForward;
 	AngleVectors( vecAngles, &vecForward );
@@ -827,7 +827,7 @@ void CInfoAPCMissileHint::Spawn( )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->SetSolid( SOLID_BSP );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 void CInfoAPCMissileHint::Activate( )
@@ -989,7 +989,7 @@ CAPCMissile *CAPCMissile::Create( const Vector &vecOrigin, const QAngle &vecAngl
 	pMissile->Spawn();
 	pMissile->GetEngineObject()->SetAbsVelocity( vecVelocity );
 	pMissile->GetEngineObject()->AddFlag( FL_NOTARGET );
-	pMissile->AddEffects( EF_NOSHADOW );
+	pMissile->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	return pMissile;
 }
 
@@ -2309,7 +2309,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 	pLaserDot->m_bVisibleLaserDot = bVisibleDot;
 	pLaserDot->SetMoveType( MOVETYPE_NONE );
 	pLaserDot->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	pLaserDot->AddEffects( EF_NOSHADOW );
+	pLaserDot->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	UTIL_SetSize( pLaserDot, vec3_origin, vec3_origin );
 
 	//Create the graphic

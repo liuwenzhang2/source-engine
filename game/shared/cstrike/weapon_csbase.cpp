@@ -968,7 +968,7 @@ void CWeaponCSBase::Drop(const Vector &vecVelocity)
 	// clear follow stuff, setup for collision
 	SetGravity(1.0);
 	m_iState = WEAPON_NOT_CARRIED;
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 	FallInit();
 	GetEngineObject()->SetGroundEntity( NULL );
 
@@ -1425,10 +1425,10 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 	//=========================================================
 	void CWeaponCSBase::Materialize()
 	{
-		if ( IsEffectActive( EF_NODRAW ) )
+		if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		{
 			// changing from invisible state to visible.
-			RemoveEffects( EF_NODRAW );
+			GetEngineObject()->RemoveEffects( EF_NODRAW );
 			DoMuzzleFlash();
 		}
 
@@ -1480,7 +1480,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 
 		if ( pNewWeapon )
 		{
-			pNewWeapon->AddEffects( EF_NODRAW );// invisible for now
+			pNewWeapon->GetEngineObject()->AddEffects( EF_NODRAW );// invisible for now
 			pNewWeapon->SetTouch( NULL );// no touch
 			pNewWeapon->SetThink( &CWeaponCSBase::AttemptToMaterialize );
 
@@ -1802,7 +1802,7 @@ bool CWeaponCSBase::PhysicsSplash( const Vector &centerPoint, const Vector &norm
 void CWeaponCSBase::OnPickedUp( CBaseCombatCharacter *pNewOwner )
 {
 #if !defined( CLIENT_DLL )
-	RemoveEffects( EF_ITEM_BLINK );
+	GetEngineObject()->RemoveEffects( EF_ITEM_BLINK );
 
 	if( pNewOwner->IsPlayer() && pNewOwner->IsAlive() )
 	{

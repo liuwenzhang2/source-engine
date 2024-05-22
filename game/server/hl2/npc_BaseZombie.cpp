@@ -352,7 +352,7 @@ bool CNPC_BaseZombie::FindNearestPhysicsObject( int iMaxMass )
 
 		// don't swat things where the highest point is under my knees
 		// NOTE: This is a rough test; a more exact test is going to occur below
-		if ( (center.z + pList[i]->BoundingRadius()) < vecZombieKnees.z )
+		if ( (center.z + pList[i]->GetEngineObject()->BoundingRadius()) < vecZombieKnees.z )
 			continue;
 
 		// don't swat things that are over my head.
@@ -1106,7 +1106,7 @@ void CNPC_BaseZombie::DieChopped( const CTakeDamageInfo &info )
 	}
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	Vector vecLegsForce;
 	vecLegsForce.x = random->RandomFloat( -400, 400 );
@@ -1226,7 +1226,7 @@ void CNPC_BaseZombie::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize
 #ifdef HL2_EPISODIC
 	if ( HL2GameRules()->IsAlyxInDarknessMode() == true && GetEffectEntity() != NULL )
 	{
-		GetEffectEntity()->AddEffects( EF_DIMLIGHT );
+		GetEffectEntity()->GetEngineObject()->AddEffects( EF_DIMLIGHT );
 	}
 #endif // HL2_EPISODIC
 

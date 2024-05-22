@@ -24,7 +24,7 @@ C_PhysBox::C_PhysBox()
 //-----------------------------------------------------------------------------
 ShadowType_t C_PhysBox::ShadowCastType()
 {
-	if (IsEffectActive(EF_NODRAW | EF_NOSHADOW))
+	if (GetEngineObject()->IsEffectActive(EF_NODRAW | EF_NOSHADOW))
 		return SHADOWS_NONE;
 	return SHADOWS_RENDER_TO_TEXTURE;
 }

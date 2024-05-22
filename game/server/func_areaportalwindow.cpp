@@ -74,7 +74,7 @@ void CFuncAreaPortalWindow::Activate()
 	if( pBackground )
 	{
 		m_iBackgroundModelIndex  = modelinfo->GetModelIndex( STRING( pBackground->GetEngineObject()->GetModelName() ) );
-		pBackground->AddEffects( EF_NODRAW ); // we will draw for it.
+		pBackground->GetEngineObject()->AddEffects( EF_NODRAW ); // we will draw for it.
 	}
 
 	// Find our target and steal its bmodel.
@@ -83,7 +83,7 @@ void CFuncAreaPortalWindow::Activate()
 	{
 		SetModel( STRING(pTarget->GetEngineObject()->GetModelName()) );
 		GetEngineObject()->SetAbsOrigin( pTarget->GetEngineObject()->GetAbsOrigin() );
-		pTarget->AddEffects( EF_NODRAW ); // we will draw for it.
+		pTarget->GetEngineObject()->AddEffects( EF_NODRAW ); // we will draw for it.
 	}
 }
 

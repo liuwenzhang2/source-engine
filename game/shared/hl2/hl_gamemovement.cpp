@@ -129,7 +129,7 @@ void CReservePlayerSpot::Spawn()
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_NONE );
 	// Make entity invisible
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 LINK_ENTITY_TO_CLASS( reserved_spot, CReservePlayerSpot );

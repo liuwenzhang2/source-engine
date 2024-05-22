@@ -680,7 +680,7 @@ void CNPC_MetroPolice::Spawn( void )
 		
 		if( !m_fWeaponDrawn ) 
 		{
-			GetActiveWeapon()->AddEffects( EF_NODRAW );
+			GetActiveWeapon()->GetEngineObject()->AddEffects( EF_NODRAW );
 		}
 	}
 
@@ -2949,7 +2949,7 @@ void CNPC_MetroPolice::HandleAnimEvent( animevent_t *pEvent )
 		m_fWeaponDrawn = true;
 		if( GetActiveWeapon() )
 		{
-			GetActiveWeapon()->RemoveEffects( EF_NODRAW );
+			GetActiveWeapon()->GetEngineObject()->RemoveEffects( EF_NODRAW );
 		}
 		return;
 	}

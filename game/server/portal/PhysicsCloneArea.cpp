@@ -80,7 +80,7 @@ void CPhysicsCloneArea::Spawn( void )
 
 	Assert( m_pAttachedPortal );
 
-	AddEffects( EF_NORECEIVESHADOW | EF_NOSHADOW | EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NORECEIVESHADOW | EF_NOSHADOW | EF_NODRAW );
 
 	GetEngineObject()->SetSolid( SOLID_OBB );
 	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );

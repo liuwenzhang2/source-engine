@@ -715,7 +715,7 @@ int CBasePlayer::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	// Transmit for a short time after death and our death anim finishes so ragdolls can access reliable player data.
 	// Note that if m_flDeathAnimTime is never set, as long as m_lifeState is set to LIFE_DEAD after dying, this
 	// test will act as if the death anim is finished.
-	if ( IsEffectActive( EF_NODRAW ) || ( IsObserver() && ( gpGlobals->curtime - m_flDeathTime > 0.5 ) && 
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) || ( IsObserver() && ( gpGlobals->curtime - m_flDeathTime > 0.5 ) &&
 		( m_lifeState == LIFE_DEAD ) && ( gpGlobals->curtime - m_flDeathAnimTime > 0.5 ) ) )
 	{
 		return FL_EDICT_DONTSEND;
@@ -2325,7 +2325,7 @@ bool CBasePlayer::StartObserverMode(int mode)
 	m_takedamage = DAMAGE_NO;		
 
 	// Become invisible
-	AddEffects( EF_NODRAW );		
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	m_iHealth = 1;
 	m_lifeState = LIFE_DEAD; // Can't be dead, otherwise movement doesn't work right.
@@ -2724,7 +2724,7 @@ bool CBasePlayer::IsValidObserverTarget(CBaseEntity * target)
 	if( player == this )
 		return false; // We can't observe ourselves.
 
-	if ( player->IsEffectActive( EF_NODRAW ) ) // don't watch invisible players
+	if ( player->GetEngineObject()->IsEffectActive( EF_NODRAW ) ) // don't watch invisible players
 		return false;
 
 	if ( player->m_lifeState == LIFE_RESPAWNABLE ) // target is dead, waiting for respawn
@@ -4581,7 +4581,7 @@ void CBasePlayer::PostThink()
 			{ 
 				// if they've moved too far from the gun, or deployed another weapon, unuse the gun
 				if ( m_hUseEntity->OnControls( this ) && 
-					( !GetActiveWeapon() || GetActiveWeapon()->IsEffectActive( EF_NODRAW ) ||
+					( !GetActiveWeapon() || GetActiveWeapon()->GetEngineObject()->IsEffectActive( EF_NODRAW ) ||
 					( GetActiveWeapon()->GetActivity() == ACT_VM_HOLSTER ) 
 	#ifdef PORTAL // Portalgun view model stays up when holding an object -Jeep
 					|| FClassnameIs( GetActiveWeapon(), "weapon_portalgun" ) 
@@ -4976,8 +4976,8 @@ void CBasePlayer::Spawn( void )
 	m_nDrownDmgRate	= DROWNING_DAMAGE_INITIAL;
 	
  // only preserve the shadow flag
-	int effects = GetEffects() & EF_NOSHADOW;
-	SetEffects( effects );
+	int effects = GetEngineObject()->GetEffects() & EF_NOSHADOW;
+	GetEngineObject()->SetEffects( effects );
 
 	IncrementInterpolationFrame();
 
@@ -5483,7 +5483,7 @@ bool CBasePlayer::GetInVehicle( IServerVehicle *pVehicle, int nRole )
 
 	if ( !pVehicle->IsPassengerVisible( nRole ) )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
 	// Put us in the vehicle
@@ -5585,7 +5585,7 @@ void CBasePlayer::LeaveVehicle( const Vector &vecExitPoint, const QAngle &vecExi
 
 	m_Local.m_iHideHUD &= ~HIDEHUD_INVEHICLE;
 
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 
 	SetMoveType( MOVETYPE_WALK );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
@@ -5958,7 +5958,7 @@ void CBasePlayer::ImpulseCommands( )
 
 			pWeapon = GetActiveWeapon();
 			
-			if( pWeapon->IsEffectActive( EF_NODRAW ) )
+			if( pWeapon->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 			{
 				pWeapon->Deploy();
 			}
@@ -6678,7 +6678,7 @@ bool CBasePlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
 		pWeapon->CheckRespawn();
 
 		pWeapon->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		pWeapon->AddEffects( EF_NODRAW );
+		pWeapon->GetEngineObject()->AddEffects( EF_NODRAW );
 
 		Weapon_Equip( pWeapon );
 		if ( IsInAVehicle() )
@@ -7356,7 +7356,7 @@ void CBasePlayer::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector *pvecTar
 			CBaseViewModel *vm = GetViewModel();
 			if ( vm )
 			{
-				vm->AddEffects( EF_NODRAW );
+				vm->GetEngineObject()->AddEffects( EF_NODRAW );
 			}
 		}
 	}

@@ -282,27 +282,27 @@ int CBaseViewModel::ViewModelIndex( ) const
 //-----------------------------------------------------------------------------
 // Purpose: Pass our visibility on to our child screens
 //-----------------------------------------------------------------------------
-void CBaseViewModel::AddEffects( int nEffects )
+void CBaseViewModel::OnAddEffects( int nEffects )
 {
 	if ( nEffects & EF_NODRAW )
 	{
 		SetControlPanelsActive( false );
 	}
 
-	BaseClass::AddEffects( nEffects );
+	//BaseClass::AddEffects( nEffects );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Pass our visibility on to our child screens
 //-----------------------------------------------------------------------------
-void CBaseViewModel::RemoveEffects( int nEffects )
+void CBaseViewModel::OnRemoveEffects( int nEffects )
 {
 	if ( nEffects & EF_NODRAW )
 	{
 		SetControlPanelsActive( true );
 	}
 
-	BaseClass::RemoveEffects( nEffects );
+	//BaseClass::RemoveEffects( nEffects );
 }
 
 //-----------------------------------------------------------------------------
@@ -563,7 +563,7 @@ BEGIN_NETWORK_TABLE_NOBASE(CBaseViewModel, DT_BaseViewModel)
 	SendPropInt		(SENDINFO(m_nSequence),	8, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_nViewModelIndex), VIEWMODEL_INDEX_BITS, SPROP_UNSIGNED),
 	SendPropFloat	(SENDINFO(m_flPlaybackRate),	8,	SPROP_ROUNDUP,	-4.0,	12.0f),
-	SendPropInt		(SENDINFO(m_fEffects),		10, SPROP_UNSIGNED),
+	//SendPropInt		(SENDINFO(m_fEffects),		10, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_nAnimationParity), 3, SPROP_UNSIGNED ),
 	SendPropEHandle (SENDINFO(m_hWeapon)),
 	SendPropEHandle (SENDINFO(m_hOwner)),
@@ -582,7 +582,7 @@ BEGIN_NETWORK_TABLE_NOBASE(CBaseViewModel, DT_BaseViewModel)
 	RecvPropInt		(RECVINFO(m_nSequence), 0, RecvProxy_SequenceNum ),
 	RecvPropInt		(RECVINFO(m_nViewModelIndex)),
 	RecvPropFloat	(RECVINFO(m_flPlaybackRate)),
-	RecvPropInt		(RECVINFO(m_fEffects), 0, RecvProxy_EffectFlags ),
+	//RecvPropInt		(RECVINFO(m_fEffects), 0, RecvProxy_EffectFlags ),
 	RecvPropInt		(RECVINFO(m_nAnimationParity)),
 	RecvPropEHandle (RECVINFO(m_hWeapon), RecvProxy_Weapon ),
 	RecvPropEHandle (RECVINFO(m_hOwner)),
@@ -608,7 +608,7 @@ BEGIN_PREDICTION_DATA( CBaseViewModel )
 	DEFINE_PRED_FIELD( m_nSequence, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_nViewModelIndex, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD_TOL( m_flPlaybackRate, FIELD_FLOAT, FTYPEDESC_INSENDTABLE, 0.125f ),
-	DEFINE_PRED_FIELD( m_fEffects, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_OVERRIDE ),
+	//DEFINE_PRED_FIELD( m_fEffects, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_OVERRIDE ),
 	DEFINE_PRED_FIELD( m_nAnimationParity, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_hWeapon, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD( m_flAnimTime, FIELD_FLOAT, 0 ),

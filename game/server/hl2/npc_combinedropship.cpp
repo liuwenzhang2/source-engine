@@ -455,7 +455,7 @@ void CCombineDropshipContainer::Spawn()
 	BaseClass::Spawn();
 
 #ifdef _XBOX
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 #endif //_XBOX
 
 	m_iHealth = m_iMaxHealth = sk_dropship_container_health.GetFloat();
@@ -515,7 +515,7 @@ void CCombineDropshipContainer::CreateCorpse()
 	}
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	UTIL_Remove( this );
 }
 
@@ -851,7 +851,7 @@ void CNPC_CombineDropship::Spawn( void )
 	SetModel( "models/combine_dropship.mdl" );
 
 #ifdef _XBOX
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 #endif //_XBOX
 
 	InitPathingData( DROPSHIP_ARRIVE_DIST, DROPSHIP_MIN_CHASE_DIST_DIFF, DROPSHIP_AVOID_DIST );

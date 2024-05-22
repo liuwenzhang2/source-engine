@@ -200,7 +200,7 @@ void CFlare::Spawn( void )
 	SetGravity( UTIL_ScaleForGravity( 400 ) );
 	m_flTimeBurnOut = gpGlobals->curtime + 30;
 
-	AddEffects( EF_NOSHADOW|EF_NORECEIVESHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW|EF_NORECEIVESHADOW );
 
 	if (GetEngineObject()->GetSpawnFlags() & SF_FLARE_NO_DLIGHT)
 	{
@@ -219,7 +219,7 @@ void CFlare::Spawn( void )
 
 	if (GetEngineObject()->GetSpawnFlags() & SF_FLARE_START_OFF)
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
 	GetEngineObject()->AddFlag( FL_OBJECT );
@@ -534,7 +534,7 @@ void CFlare::Start( float lifeTime )
 		m_flTimeBurnOut = -1.0f;
 	}
 
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 
 	SetThink( &CFlare::FlareThink );
 	SetNextThink( gpGlobals->curtime + 0.1f );

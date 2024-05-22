@@ -398,7 +398,7 @@ void CDODBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	SetThink( &CBaseGrenade::SUB_Remove );
 	SetTouch( NULL );
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetNextThink( gpGlobals->curtime );
 }

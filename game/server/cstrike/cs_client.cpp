@@ -51,7 +51,7 @@ void FinishClientPutInServer( CCSPlayer *pPlayer )
 		pPlayer->m_takedamage = DAMAGE_NO;
 		pPlayer->pl.deadflag = true;
 		pPlayer->m_lifeState = LIFE_DEAD;
-		pPlayer->AddEffects( EF_NODRAW );
+		pPlayer->GetEngineObject()->AddEffects( EF_NODRAW );
 		pPlayer->ChangeTeam( TEAM_UNASSIGNED );
 		pPlayer->SetThink( NULL );
 		pPlayer->AddAccount( CSGameRules()->GetStartMoney() );

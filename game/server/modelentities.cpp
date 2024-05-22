@@ -173,7 +173,7 @@ void CFuncBrush::TurnOff( void )
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	m_iDisabled = TRUE;
 }
 
@@ -191,13 +191,13 @@ void CFuncBrush::TurnOn( void )
 		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	}
 
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 }
 
 
 bool CFuncBrush::IsOn( void )
 {
-	return !IsEffectActive( EF_NODRAW );
+	return !GetEngineObject()->IsEffectActive( EF_NODRAW );
 }
 
 
@@ -284,7 +284,7 @@ void CTriggerBrush::Spawn( void )
 
 	if ( !showtriggers.GetInt() )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 }
 

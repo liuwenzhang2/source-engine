@@ -134,7 +134,7 @@ void CPhysicsShadowClone::UpdateOnRemove( void )
 void CPhysicsShadowClone::Spawn( void )
 {
 	GetEngineObject()->AddFlag( FL_DONTTOUCH );
-	AddEffects( EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW );
+	GetEngineObject()->AddEffects( EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW );
 
 	FullSync( false );
 	m_bInAssumedSyncState = false;
@@ -325,7 +325,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 
 
 
-		SetEffects( pClonedEntity->GetEffects() | (EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW) );
+		GetEngineObject()->SetEffects( pClonedEntity->GetEngineObject()->GetEffects() | (EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW) );
 
 		GetEngineObject()->SetCollisionGroup( pClonedEntity->GetEngineObject()->GetCollisionGroup() );
 

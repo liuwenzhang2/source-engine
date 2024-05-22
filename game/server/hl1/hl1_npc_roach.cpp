@@ -106,7 +106,7 @@ void CNPC_Roach::Spawn()
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_YELLOW;
-	ClearEffects();
+	GetEngineObject()->ClearEffects();
 	m_iHealth			= 1;
 	m_flFieldOfView		= 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_NPCState			= NPC_STATE_NONE;
@@ -123,7 +123,7 @@ void CNPC_Roach::Spawn()
 	m_iMode				= ROACH_IDLE;
 	m_flNextSmellTime	= gpGlobals->curtime;
 
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 }
 
 //=========================================================

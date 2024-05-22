@@ -175,66 +175,6 @@ inline void CBaseEntity::SetSimulationTime( float st )
 	m_flSimulationTime = st;
 }
 
-inline int CBaseEntity::GetEffects( void ) const
-{ 
-	return m_fEffects; 
-}
-
-inline void CBaseEntity::RemoveEffects( int nEffects ) 
-{ 
-#if !defined( CLIENT_DLL )
-#ifdef HL2_EPISODIC
-	if ( nEffects & (EF_BRIGHTLIGHT|EF_DIMLIGHT) )
-	{
-		// Hack for now, to avoid player emitting radius with his flashlight
-		if ( !IsPlayer() )
-		{
-			RemoveEntityFromDarknessCheck( this );
-		}
-	}
-#endif // HL2_EPISODIC
-#endif // !CLIENT_DLL
-
-	m_fEffects &= ~nEffects;
-	if ( nEffects & EF_NODRAW )
-	{
-#ifndef CLIENT_DLL
-		GetEngineObject()->MarkPVSInformationDirty();//NetworkProp()->
-		DispatchUpdateTransmitState();
-#else
-		UpdateVisibility();
-#endif
-	}
-}
-
-inline void CBaseEntity::ClearEffects( void ) 
-{ 
-#if !defined( CLIENT_DLL )
-#ifdef HL2_EPISODIC
-	if ( m_fEffects & (EF_BRIGHTLIGHT|EF_DIMLIGHT) )
-	{
-		// Hack for now, to avoid player emitting radius with his flashlight
-		if ( !IsPlayer() )
-		{
-			RemoveEntityFromDarknessCheck( this );
-		}
-	}
-#endif // HL2_EPISODIC
-#endif // !CLIENT_DLL
-
-	m_fEffects = 0;
-#ifndef CLIENT_DLL
-		DispatchUpdateTransmitState();
-#else
-		UpdateVisibility();
-#endif
-}
-
-inline bool CBaseEntity::IsEffectActive( int nEffects ) const
-{ 
-	return (m_fEffects & nEffects) != 0; 
-}
-
 // Shared EntityMessage between game and client .dlls
 #define BASEENTITY_MSG_REMOVE_DECALS	1
 

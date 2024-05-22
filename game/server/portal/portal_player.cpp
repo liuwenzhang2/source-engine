@@ -405,7 +405,7 @@ void CPortal_Player::Spawn(void)
 	pl.deadflag = false;
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 	StopObserverMode();
 
 	GiveDefaultItems();
@@ -1650,7 +1650,7 @@ void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
 
 #if PORTAL_HIDE_PLAYER_RAGDOLL
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	AddEffects( EF_NODRAW | EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NODRAW | EF_NOSHADOW );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 #endif // PORTAL_HIDE_PLAYER_RAGDOLL
 	CBaseEntity *pRagdoll = CreateServerRagdoll( this, m_nForceBone, info, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );

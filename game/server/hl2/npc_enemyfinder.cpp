@@ -191,7 +191,7 @@ void CNPC_EnemyFinder::Spawn( void )
 
 	// Set this after NPCInit()
 	m_takedamage	= DAMAGE_NO;
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	m_NPCState		= NPC_STATE_ALERT;	// always alert
 
 	SetViewOffset( vec3_origin );
@@ -223,7 +223,7 @@ void CNPC_EnemyFinder::Wake( bool bFireOutput )
 	BaseClass::Wake( bFireOutput );
 
 	//Enemy finder is not allowed to become visible.
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 //------------------------------------------------------------------------------

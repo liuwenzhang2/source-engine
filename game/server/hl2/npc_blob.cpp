@@ -177,7 +177,7 @@ void CBlobElement::Spawn()
 	angles.y = random->RandomFloat( 0, 180 );
 	GetEngineObject()->SetAbsAngles( angles );
 
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	ReconfigureRandomParams();
 }
@@ -546,7 +546,7 @@ void CNPC_Blob::Spawn( void )
 
 	NPCInit();
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	m_flMinElementDist = blob_mindist.GetFloat();
 }

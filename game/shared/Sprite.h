@@ -151,7 +151,7 @@ public:
 
 	void TurnOff( void );
 	void TurnOn( void );
-	bool IsOn() { return !IsEffectActive( EF_NODRAW ); }
+	bool IsOn() { return !GetEngineObject()->IsEffectActive( EF_NODRAW ); }
 
 	inline float Frames( void ) { return m_flMaxFrame; }
 	inline void SetTransparency( int rendermode, int r, int g, int b, int a, int fx )

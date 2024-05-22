@@ -207,7 +207,7 @@ public:
 
 		SetMoveType( MOVETYPE_NONE );
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		AddEffects( EF_NOSHADOW );
+		GetEngineObject()->AddEffects( EF_NOSHADOW );
 		UTIL_SetSize( this, vec3_origin, vec3_origin );
 	}
 
@@ -893,7 +893,7 @@ void CPointCommentaryNode::Spawn( void )
 	UTIL_SetSize( this, -Vector(16,16,16), Vector(16,16,16) );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	// Setup for animation
 	ResetSequence( LookupSequence("idle") );
@@ -1438,11 +1438,11 @@ void CPointCommentaryNode::SetDisabled( bool bDisabled )
 
 	if ( m_bDisabled )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 	else
 	{
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 	}
 }
 

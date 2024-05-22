@@ -372,7 +372,7 @@ void CBeam::Spawn( void )
 	SetRenderMode( kRenderTransTexture );
 
 	// Opt out of all shadow routines
-	AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
 
 	Precache( );
 }
@@ -819,7 +819,7 @@ void CBeam::BeamDamage( trace_t *ptr )
 //-----------------------------------------------------------------------------
 void CBeam::TurnOn( void )
 {
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 //-----------------------------------------------------------------------------
@@ -827,7 +827,7 @@ void CBeam::TurnOn( void )
 //-----------------------------------------------------------------------------
 void CBeam::TurnOff( void )
 {
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 }
 
 #if !defined( CLIENT_DLL )
@@ -894,7 +894,7 @@ void CBeam::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways )
 
 int CBeam::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 {
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		return FL_EDICT_DONTSEND;
 
 	// Transmit us with the same rules as our move parent

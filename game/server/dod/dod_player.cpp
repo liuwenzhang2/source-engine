@@ -1032,7 +1032,7 @@ extern ConVar flashlight;
 //-----------------------------------------------------------------------------
 int CDODPlayer::FlashlightIsOn( void )
 {
-	return IsEffectActive( EF_DIMLIGHT );
+	return GetEngineObject()->IsEffectActive( EF_DIMLIGHT );
 }
 
 //-----------------------------------------------------------------------------
@@ -1041,7 +1041,7 @@ void CDODPlayer::FlashlightTurnOn( void )
 {
 	if( flashlight.GetInt() > 0 && IsAlive() )
 	{
-		AddEffects( EF_DIMLIGHT );
+		GetEngineObject()->AddEffects( EF_DIMLIGHT );
 		const char* soundname = "Player.FlashlightOn";
 		CPASAttenuationFilter filter(this, soundname);
 
@@ -1058,9 +1058,9 @@ void CDODPlayer::FlashlightTurnOn( void )
 //-----------------------------------------------------------------------------
 void CDODPlayer::FlashlightTurnOff( void )
 {
-	if( IsEffectActive(EF_DIMLIGHT) )
+	if(GetEngineObject()->IsEffectActive(EF_DIMLIGHT) )
 	{
-		RemoveEffects( EF_DIMLIGHT );
+		GetEngineObject()->RemoveEffects( EF_DIMLIGHT );
 
 		if( m_iHealth > 0 )
 		{
@@ -1813,7 +1813,7 @@ bool CDODPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 	pWeapon->CheckRespawn();
 
 	pWeapon->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	pWeapon->AddEffects( EF_NODRAW );
+	pWeapon->GetEngineObject()->AddEffects( EF_NODRAW );
 
 	Weapon_Equip( pWeapon );
 
@@ -2611,7 +2611,7 @@ void CDODPlayer::State_Enter_DEATH_ANIM()
 
 	StartObserverMode( OBS_MODE_DEATHCAM );	// go to observer mode
 
-	RemoveEffects( EF_NODRAW );	// still draw player body
+	GetEngineObject()->RemoveEffects( EF_NODRAW );	// still draw player body
 
 	DODGameRules()->CreateOrJoinRespawnWave( this );
 

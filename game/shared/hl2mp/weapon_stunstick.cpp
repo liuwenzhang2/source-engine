@@ -611,7 +611,7 @@ void C_WeaponStunStick::ClientThink( void )
 	// Remember if we were swinging last frame
 	m_bSwungLastFrame = InSwing();
 
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		return;
 
 	if ( ShouldDrawUsingViewModel() )

@@ -274,9 +274,9 @@ void CSlideshowDisplay::ScreenVisible( bool bVisible )
 	{
 		CVGuiScreen *pScreen = m_hScreens[ iScreen ].Get();
 		if ( bVisible )
-			pScreen->RemoveEffects( EF_NODRAW );
+			pScreen->GetEngineObject()->RemoveEffects( EF_NODRAW );
 		else
-			pScreen->AddEffects( EF_NODRAW );
+			pScreen->GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 }
 

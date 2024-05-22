@@ -1360,7 +1360,7 @@ bool  CBaseCombatCharacter::Event_Gibbed( const CTakeDamageInfo &info )
 	}
 	else
 	{
-		AddEffects( EF_NODRAW ); // make the model invisible.
+		GetEngineObject()->AddEffects( EF_NODRAW ); // make the model invisible.
 		return CorpseGib( info );
 	}
 }
@@ -1946,7 +1946,7 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 
 		if ( IsXbox() )
 		{
-			pWeapon->AddEffects( EF_ITEM_BLINK );
+			pWeapon->GetEngineObject()->AddEffects( EF_ITEM_BLINK );
 		}
 	}
 
@@ -2153,10 +2153,10 @@ void CBaseCombatCharacter::Weapon_Equip( CBaseCombatWeapon *pWeapon )
 		{
 			m_hActiveWeapon->Holster();
 			// FIXME: isn't this handeled by the weapon?
-			m_hActiveWeapon->AddEffects( EF_NODRAW );
+			m_hActiveWeapon->GetEngineObject()->AddEffects( EF_NODRAW );
 		}
 		SetActiveWeapon( pWeapon );
-		m_hActiveWeapon->RemoveEffects( EF_NODRAW );
+		m_hActiveWeapon->GetEngineObject()->RemoveEffects( EF_NODRAW );
 
 	}
 	
@@ -2593,7 +2593,7 @@ void CBaseCombatCharacter::SetTransmit( CCheckTransmitInfo *pInfo, bool bAlways 
 	{
 		// The check for EF_NODRAW is useless because the weapon will be networked anyway. In CBaseCombatWeapon::
 		// UpdateTransmitState all weapons with owners will transmit to clients in the PVS.
-		if ( m_hActiveWeapon && !m_hActiveWeapon->IsEffectActive( EF_NODRAW ) )
+		if ( m_hActiveWeapon && !m_hActiveWeapon->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 			m_hActiveWeapon->SetTransmit( pInfo, bAlways );
 	}
 }

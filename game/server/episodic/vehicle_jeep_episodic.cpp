@@ -92,7 +92,7 @@ void CRadarTarget::Spawn()
 {
 	BaseClass::Spawn();
 	
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 }

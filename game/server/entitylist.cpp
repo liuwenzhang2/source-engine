@@ -214,6 +214,7 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_KEYFIELD(m_spawnflags, FIELD_INTEGER, "spawnflags"),
 	DEFINE_EMBEDDED(m_Collision),
 	DEFINE_FIELD(m_CollisionGroup, FIELD_INTEGER),
+	DEFINE_KEYFIELD(m_fEffects, FIELD_INTEGER, "effects"),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -305,6 +306,7 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropDataTable(SENDINFO_DT(m_Collision), &REFERENCE_SEND_TABLE(DT_CollisionProperty)),
 	SendPropInt(SENDINFO(m_CollisionGroup), 5, SPROP_UNSIGNED),
 	SendPropInt(SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED | SPROP_CHANGES_OFTEN, SendProxy_CropFlagsToPlayerFlagBitsLength),
+	SendPropInt(SENDINFO(m_fEffects), EF_MAX_BITS, SPROP_UNSIGNED),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -2662,6 +2664,49 @@ void CEngineObjectInternal::ClearFlags(void)
 void CEngineObjectInternal::ToggleFlag(int flagToToggle)
 {
 	CHANGE_FLAGS(m_fFlags, m_fFlags ^ flagToToggle);
+}
+
+void CEngineObjectInternal::SetEffects(int nEffects)
+{
+	if (nEffects != m_fEffects)
+	{
+#ifdef HL2_EPISODIC
+		// Hack for now, to avoid player emitting radius with his flashlight
+		if (!m_pOuter->IsPlayer())
+		{
+			if ((nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)) && !(m_fEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)))
+			{
+				AddEntityToDarknessCheck(this->m_pOuter);
+			}
+			else if (!(nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)) && (m_fEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)))
+			{
+				RemoveEntityFromDarknessCheck(this->m_pOuter);
+			}
+		}
+#endif // HL2_EPISODIC
+		m_fEffects = nEffects;
+		m_pOuter->DispatchUpdateTransmitState();
+	}
+}
+
+void CEngineObjectInternal::AddEffects(int nEffects)
+{
+	m_pOuter->OnAddEffects(nEffects);
+#ifdef HL2_EPISODIC
+	if ((nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)) && !(m_fEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT)))
+	{
+		// Hack for now, to avoid player emitting radius with his flashlight
+		if (!m_pOuter->IsPlayer())
+		{
+			AddEntityToDarknessCheck(this->m_pOuter);
+		}
+	}
+#endif // HL2_EPISODIC
+	m_fEffects |= nEffects;
+	if (nEffects & EF_NODRAW)
+	{
+		m_pOuter->DispatchUpdateTransmitState();
+	}
 }
 
 struct collidelist_t

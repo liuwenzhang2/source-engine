@@ -597,7 +597,7 @@ int	C_VGuiScreen::DrawModel( int flags )
 
 bool C_VGuiScreen::ShouldDraw( void )
 {
-	return !IsEffectActive(EF_NODRAW);
+	return !GetEngineObject()->IsEffectActive(EF_NODRAW);
 }
 
 

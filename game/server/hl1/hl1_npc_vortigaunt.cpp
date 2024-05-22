@@ -77,7 +77,7 @@ void CNPC_Vortigaunt::Spawn()
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_GREEN;
-	ClearEffects();
+	GetEngineObject()->ClearEffects();
     m_iHealth			= sk_islave_health.GetFloat();
 	//pev->view_ofs		= VEC_VIEW;// position of the eyes relative to monster's origin.
 	m_flFieldOfView		= VIEW_FIELD_WIDE;

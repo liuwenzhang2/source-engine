@@ -46,7 +46,7 @@ void CRuleEntity::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 

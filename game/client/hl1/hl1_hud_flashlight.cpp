@@ -82,7 +82,7 @@ void CHudFlashlight::Paint( void )
 		return;
 	}
 
-	bIsOn = pPlayer->IsEffectActive( EF_DIMLIGHT );
+	bIsOn = pPlayer->GetEngineObject()->IsEffectActive( EF_DIMLIGHT );
 
 	if ( bIsOn )
 		a = 225;

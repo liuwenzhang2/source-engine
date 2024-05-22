@@ -60,7 +60,7 @@ void CFuncLadder::Spawn()
 	GetEngineObject()->SetModelName( NULL_STRING );
 
 	// Make entity invisible
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	// No model but should still network
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 

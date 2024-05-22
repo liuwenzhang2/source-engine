@@ -35,7 +35,7 @@ END_RECV_TABLE()
 void C_RpgRocket::CreateLightEffects( void )
 {
 	dlight_t *dl;
-	if ( IsEffectActive(EF_DIMLIGHT) )
+	if (GetEngineObject()->IsEffectActive(EF_DIMLIGHT) )
 	{			
 		dl = effects->CL_AllocDlight (entindex());
 		dl->origin = GetEngineObject()->GetAbsOrigin();

@@ -672,9 +672,9 @@ bool CWeaponDODBase::Deploy()
 	//=========================================================
 	void CWeaponDODBase::Materialize()
 	{
-		if ( IsEffectActive( EF_NODRAW ) )
+		if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		{
-			RemoveEffects( EF_NODRAW );
+			GetEngineObject()->RemoveEffects( EF_NODRAW );
 			DoMuzzleFlash();
 		}
 
@@ -724,7 +724,7 @@ bool CWeaponDODBase::Deploy()
 
 		if ( pNewWeapon )
 		{
-			pNewWeapon->AddEffects( EF_NODRAW );// invisible for now
+			pNewWeapon->GetEngineObject()->AddEffects( EF_NODRAW );// invisible for now
 			pNewWeapon->SetTouch( NULL );// no touch
 			pNewWeapon->SetThink( &CWeaponDODBase::AttemptToMaterialize );
 

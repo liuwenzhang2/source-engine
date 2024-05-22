@@ -946,11 +946,11 @@ void CNPC_Gargantua::EyeUpdate( void )
 		m_pEyeGlow->SetBrightness( UTIL_Approach( m_eyeBrightness, m_pEyeGlow->GetBrightness(), 26 ), 0.5f );
 		if ( m_pEyeGlow->GetBrightness() == 0 )
 		{
-			m_pEyeGlow->AddEffects( EF_NODRAW );
+			m_pEyeGlow->GetEngineObject()->AddEffects( EF_NODRAW );
 		}
 		else
 		{
-			m_pEyeGlow->RemoveEffects( EF_NODRAW );
+			m_pEyeGlow->GetEngineObject()->RemoveEffects( EF_NODRAW );
 		}
 	}
 }

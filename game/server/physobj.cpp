@@ -1449,7 +1449,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 			UTIL_TransferPoseParameters( pEntity, pPhys );
 			pEntity->GetEngineObject()->TransferChildren(pPhys->GetEngineObject());
 			pEntity->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-			pEntity->AddEffects( EF_NODRAW );
+			pEntity->GetEngineObject()->AddEffects( EF_NODRAW );
 			UTIL_Remove( pEntity );
 		}
 	}

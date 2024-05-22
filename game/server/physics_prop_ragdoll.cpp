@@ -197,7 +197,7 @@ void CRagdollProp::Spawn( void )
 
 	if( m_bStartDisabled )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 }
 
@@ -1685,12 +1685,12 @@ void CRagdollProp::InputDisableMotion( inputdata_t &inputdata )
 
 void CRagdollProp::InputTurnOn( inputdata_t &inputdata )
 {
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 }
 
 void CRagdollProp::InputTurnOff( inputdata_t &inputdata )
 {
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 void CRagdollProp::InputFadeAndRemove( inputdata_t &inputdata )

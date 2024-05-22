@@ -319,64 +319,6 @@ const Vector &CBaseEntity::WorldSpaceCenter( ) const
 	return GetEngineObject()->WorldSpaceCenter();
 }
 
-void CBaseEntity::SetEffects( int nEffects )
-{
-	if ( nEffects != m_fEffects )
-	{
-#if !defined( CLIENT_DLL )
-#ifdef HL2_EPISODIC
-		// Hack for now, to avoid player emitting radius with his flashlight
-		if ( !IsPlayer() )
-		{
-			if ( (nEffects & (EF_BRIGHTLIGHT|EF_DIMLIGHT)) && !(m_fEffects & (EF_BRIGHTLIGHT|EF_DIMLIGHT)) )
-			{
-				AddEntityToDarknessCheck( this );
-			}
-			else if ( !(nEffects & (EF_BRIGHTLIGHT|EF_DIMLIGHT)) && (m_fEffects & (EF_BRIGHTLIGHT|EF_DIMLIGHT)) )
-			{
-				RemoveEntityFromDarknessCheck( this );
-			}
-		}
-#endif // HL2_EPISODIC
-#endif // !CLIENT_DLL
-
-		m_fEffects = nEffects;
-
-#ifndef CLIENT_DLL
-		DispatchUpdateTransmitState();
-#else
-		UpdateVisibility();
-#endif
-	}
-}
-
-void CBaseEntity::AddEffects( int nEffects ) 
-{ 
-#if !defined( CLIENT_DLL )
-#ifdef HL2_EPISODIC
-	if ( (nEffects & (EF_BRIGHTLIGHT|EF_DIMLIGHT)) && !(m_fEffects & (EF_BRIGHTLIGHT|EF_DIMLIGHT)) )
-	{
-		// Hack for now, to avoid player emitting radius with his flashlight
-		if ( !IsPlayer() )
-		{
-			AddEntityToDarknessCheck( this );
-		}
-	}
-#endif // HL2_EPISODIC
-#endif // !CLIENT_DLL
-
-	m_fEffects |= nEffects; 
-
-	if ( nEffects & EF_NODRAW)
-	{
-#ifndef CLIENT_DLL
-		DispatchUpdateTransmitState();
-#else
-		UpdateVisibility();
-#endif
-	}
-}
-
 void CBaseEntity::SetBlocksLOS( bool bBlocksLOS )
 {
 	if ( bBlocksLOS )
@@ -447,7 +389,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 		int val = atoi( szValue );
 		if (val)
 		{
-			AddEffects( EF_NOSHADOW );
+			GetEngineObject()->AddEffects( EF_NOSHADOW );
 		}
 		return true;
 	}
@@ -473,7 +415,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 		int val = atoi( szValue );
 		if (val)
 		{
-			AddEffects( EF_NORECEIVESHADOW );
+			GetEngineObject()->AddEffects( EF_NORECEIVESHADOW );
 		}
 		return true;
 	}
@@ -594,7 +536,7 @@ bool CBaseEntity::GetKeyValue( const char *szKeyName, char *szValue, int iMaxLen
 
 	if ( FStrEq( szKeyName, "disableshadows" ))
 	{
-		Q_snprintf( szValue, iMaxLen, "%d", IsEffectActive( EF_NOSHADOW ) );
+		Q_snprintf( szValue, iMaxLen, "%d", GetEngineObject()->IsEffectActive( EF_NOSHADOW ) );
 		return true;
 	}
 
@@ -612,13 +554,13 @@ bool CBaseEntity::GetKeyValue( const char *szKeyName, char *szValue, int iMaxLen
 
 	if ( FStrEq( szKeyName, "disablereceiveshadows" ))
 	{
-		Q_snprintf( szValue, iMaxLen, "%d", IsEffectActive( EF_NORECEIVESHADOW ) );
+		Q_snprintf( szValue, iMaxLen, "%d", GetEngineObject()->IsEffectActive( EF_NORECEIVESHADOW ) );
 		return true;
 	}
 
 	if ( FStrEq( szKeyName, "nodamageforces" ))
 	{
-		Q_snprintf( szValue, iMaxLen, "%d", IsEffectActive( EFL_NO_DAMAGE_FORCES ) );
+		Q_snprintf( szValue, iMaxLen, "%d", GetEngineObject()->IsEffectActive( EFL_NO_DAMAGE_FORCES ) );
 		return true;
 	}
 
@@ -2288,7 +2230,7 @@ void CBaseEntity::FollowEntity( CBaseEntity *pBaseEntity, bool bBoneMerge )
 		SetMoveType( MOVETYPE_NONE );
 		
 		if ( bBoneMerge )
-			AddEffects( EF_BONEMERGE );
+			GetEngineObject()->AddEffects( EF_BONEMERGE );
 
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		GetEngineObject()->SetLocalOrigin( vec3_origin );

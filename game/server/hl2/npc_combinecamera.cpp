@@ -369,7 +369,7 @@ void CNPC_CombineCamera::Spawn()
 	}
 
 	//Adrian: No shadows on these guys.
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	// Stagger our starting times
 	SetNextThink( gpGlobals->curtime + random->RandomFloat(0.1f, 0.3f) );

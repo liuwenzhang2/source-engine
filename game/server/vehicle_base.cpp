@@ -912,7 +912,7 @@ void CPropVehicleDriveable::VPhysicsCollision( int index, gamevcollisionevent_t 
 	BaseClass::VPhysicsCollision( index, pEvent );
 
 	// if this is a bone follower, promote to the owner entity
-	if ( pHitEntity->GetOwnerEntity() && (pHitEntity->GetEffects() & EF_NODRAW) )
+	if ( pHitEntity->GetOwnerEntity() && (pHitEntity->GetEngineObject()->GetEffects() & EF_NODRAW) )
 	{
 		CBaseEntity *pOwner = pHitEntity->GetOwnerEntity();
 		// no friendly bone follower damage

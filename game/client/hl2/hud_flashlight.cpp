@@ -116,7 +116,7 @@ void CHudFlashlight::Paint()
 		return;
 	}
 
-	bool bIsOn = pPlayer->IsEffectActive( EF_DIMLIGHT );
+	bool bIsOn = pPlayer->GetEngineObject()->IsEffectActive( EF_DIMLIGHT );
 	SetFlashlightState( bIsOn );
 
 	// get bar chunks

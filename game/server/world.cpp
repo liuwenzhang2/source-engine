@@ -165,7 +165,7 @@ void CDecal::StaticDecal( void )
 			CBaseEntity *pEntity = EntityFromEntityHandle( pServerEntity );
 
 			// Tracker 15335:  Never impact decals against entities which are not rendering, either.
-			if ( pEntity->IsEffectActive( EF_NODRAW ) )
+			if ( pEntity->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 				return false;
 
 			for ( int i = 0; i < ARRAYSIZE(ppszIgnoredClasses); i++ )

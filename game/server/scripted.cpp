@@ -165,7 +165,7 @@ void CAI_ScriptedSequence::ScriptEntityCancel( CBaseEntity *pentCine, bool bPret
 				// Robin HACK: If a script is started and then cancelled before an NPC gets to
 				//		 think, we have to manually clear it out of scripted state, or it'll never recover.
 				pCineTarget->SetTarget( NULL );
-				pTarget->SetEffects( pCineTarget->m_saved_effects );
+				pTarget->GetEngineObject()->SetEffects( pCineTarget->m_saved_effects );
 				pTarget->m_hCine = NULL;
 				pTarget->SetTarget( NULL );
 				pTarget->SetGoalEnt( NULL );
@@ -680,14 +680,14 @@ void CAI_ScriptedSequence::StartScript( void )
 				m_bTargetWasAsleep = true;
 
 				// Even if awakened this frame, temporarily keep the entity hidden for now
-				pTarget->AddEffects( EF_NODRAW );
+				pTarget->GetEngineObject()->AddEffects( EF_NODRAW );
 			}
 		}
 
 		// If the entity was asleep at the start, make sure we don't make it invisible
 		// AFTER the script finishes (can't think of a case where you'd want that to happen)
-		m_saved_effects = pTarget->GetEffects() & ~EF_NODRAW;
-		pTarget->AddEffects( GetEffects() );
+		m_saved_effects = pTarget->GetEngineObject()->GetEffects() & ~EF_NODRAW;
+		pTarget->GetEngineObject()->AddEffects(GetEngineObject()->GetEffects() );
 		m_savedFlags = pTarget->GetEngineObject()->GetFlags();
 		m_savedCollisionGroup = pTarget->GetEngineObject()->GetCollisionGroup();
 		
@@ -837,7 +837,7 @@ bool CAI_ScriptedSequence::StartSequence( CAI_BaseNPC *pTarget, string_t iszSeq,
 	{
 		m_bTargetWasAsleep = false;
 		// Show it
-		pTarget->RemoveEffects( EF_NODRAW );
+		pTarget->GetEngineObject()->RemoveEffects( EF_NODRAW );
 		// Don't blend...
 		pTarget->IncrementInterpolationFrame();
 	}

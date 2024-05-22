@@ -422,7 +422,7 @@ void CNPC_Alyx::Activate( void )
 	// cleanup savegames that may not have this set
 	if (m_hEmpTool)
 	{
-		m_hEmpTool->AddEffects( EF_PARENT_ANIMATES );
+		m_hEmpTool->GetEngineObject()->AddEffects( EF_PARENT_ANIMATES );
 	}
 
 	m_WeaponType = ComputeWeaponType();
@@ -501,7 +501,7 @@ void CNPC_Alyx::CreateEmpTool( void )
 		m_hEmpTool->GetEngineObject()->SetLocalOrigin( Vector( 0, 0, 0 ) );
 		m_hEmpTool->GetEngineObject()->SetLocalAngles( QAngle( 0, 0, 0 ) );
 		m_hEmpTool->GetEngineObject()->AddSpawnFlags(SF_DYNAMICPROP_NO_VPHYSICS);
-		m_hEmpTool->AddEffects( EF_PARENT_ANIMATES );
+		m_hEmpTool->GetEngineObject()->AddEffects( EF_PARENT_ANIMATES );
 		m_hEmpTool->Spawn();
 	}
 }
@@ -2406,7 +2406,7 @@ void CNPC_Alyx::HolsterPistol()
 {
 	if( GetActiveWeapon() )
 	{
-		GetActiveWeapon()->AddEffects(EF_NODRAW);
+		GetActiveWeapon()->GetEngineObject()->AddEffects(EF_NODRAW);
 	}
 }
 
@@ -2416,7 +2416,7 @@ void CNPC_Alyx::DrawPistol()
 {
 	if( GetActiveWeapon() )
 	{
-		GetActiveWeapon()->RemoveEffects(EF_NODRAW);
+		GetActiveWeapon()->GetEngineObject()->RemoveEffects(EF_NODRAW);
 	}
 }
 

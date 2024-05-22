@@ -167,7 +167,7 @@ void CEnvBeam::Spawn( void )
 		{
 			if ( !(GetEngineObject()->GetSpawnFlags() & SF_BEAM_STARTON))
 			{
-				AddEffects( EF_NODRAW );
+				GetEngineObject()->AddEffects( EF_NODRAW );
 				m_active = 0;
 				SetNextThink( TICK_NEVER_THINK );
 			}
@@ -297,7 +297,7 @@ void CEnvBeam::TurnOn( void )
 
 	if ( ServerSide() )
 	{
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		DoSparks( GetAbsStartPos(), GetAbsEndPos() );
 
 		SetThink( &CEnvBeam::UpdateThink );
@@ -321,7 +321,7 @@ void CEnvBeam::TurnOff( void )
 
 	if ( ServerSide() )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
 	SetNextThink( TICK_NEVER_THINK );

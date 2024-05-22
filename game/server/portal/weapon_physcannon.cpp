@@ -3217,7 +3217,7 @@ void CWeaponPhysCannon::CheckForTarget( void )
 		return;
 
 	// holstered
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		return;
 
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
@@ -3340,7 +3340,7 @@ void CWeaponPhysCannon::WaitForUpgradeThink()
 //-----------------------------------------------------------------------------
 void CWeaponPhysCannon::DoEffectIdle( void )
 {
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 	{
 		StopEffects();
 		return;

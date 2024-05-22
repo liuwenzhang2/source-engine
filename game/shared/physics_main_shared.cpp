@@ -301,7 +301,7 @@ void CBaseEntity::UpdateWaterState()
 	SetWaterLevel( 1 );
 
 	// point sized entities are always fully submerged
-	if ( IsPointSized() )
+	if (GetEngineObject()->IsPointSized() )
 	{
 		SetWaterLevel( 3 );
 	}

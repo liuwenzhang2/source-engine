@@ -211,7 +211,7 @@ void C_PlantedC4::ClientThink( void )
 void C_PlantedC4::Explode( void )
 {
 	m_pC4Explosion = ParticleProp()->Create( "bomb_explosion_huge", PATTACH_ABSORIGIN );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	SetDormant( true );
 }
 //=============================================================================

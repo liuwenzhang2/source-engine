@@ -262,7 +262,7 @@ void CBaseHeadcrab::Spawn( void )
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		SetRenderColorA( 0 );
 		m_nRenderMode = kRenderTransTexture;
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 	else
 	{
@@ -715,7 +715,7 @@ void CBaseHeadcrab::SetBurrowed( bool bBurrowed )
 {
 	if ( bBurrowed )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 		GetEngineObject()->AddFlag( FL_NOTARGET );
 		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
@@ -727,7 +727,7 @@ void CBaseHeadcrab::SetBurrowed( bool bBurrowed )
 	}
 	else
 	{
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		GetEngineObject()->RemoveFlag( FL_NOTARGET );
 		GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
@@ -1532,7 +1532,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 		{
 			m_bHidden = false;
 			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
-			RemoveEffects( EF_NODRAW );
+			GetEngineObject()->RemoveEffects( EF_NODRAW );
 
 			TaskComplete();
 			break;
@@ -2091,7 +2091,7 @@ void CBaseHeadcrab::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, 
 #ifdef HL2_EPISODIC
 		if ( HL2GameRules()->IsAlyxInDarknessMode() == true )
 		{
-			GetEffectEntity()->AddEffects( EF_DIMLIGHT );
+			GetEffectEntity()->GetEngineObject()->AddEffects( EF_DIMLIGHT );
 		}
 #endif // HL2_EPISODIC
 

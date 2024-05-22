@@ -62,7 +62,7 @@ void CBaseViewModel::OnRestore() {
 
 int CBaseViewModel::UpdateTransmitState()
 {
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 	{
 		return SetTransmitState( FL_EDICT_DONTSEND );
 	}

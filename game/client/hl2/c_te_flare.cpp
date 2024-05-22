@@ -91,11 +91,11 @@ void C_Flare::NotifyShouldTransmit( ShouldTransmitState_t state )
 {
 	if ( state == SHOULDTRANSMIT_END )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 	else if ( state == SHOULDTRANSMIT_START )
 	{
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 	}
 
 	BaseClass::NotifyShouldTransmit( state );

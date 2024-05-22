@@ -1031,7 +1031,7 @@ void CCraneTip::Spawn( void )
 {
 	Precache();
 	SetModel( "models/props_junk/cardboard_box001a.mdl" );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	// We don't want this to be solid, because we don't want it to collide with the hydra.
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );

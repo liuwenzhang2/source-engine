@@ -235,7 +235,7 @@ void CNPC_Launcher::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( DONT_BLEED );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	GetEngineObject()->AddFlag( FL_NPC );
 

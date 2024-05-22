@@ -978,7 +978,7 @@ void CProtoSniper::Spawn( void )
 
 	if(GetEngineObject()->GetSpawnFlags() & SF_SNIPER_HIDDEN)
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 

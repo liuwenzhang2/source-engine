@@ -448,6 +448,7 @@ public:
 	const matrix3x4_t& CollisionToWorldTransform() const;
 	float BoundingRadius() const;
 	float BoundingRadius2D() const;
+	bool IsPointSized() const;
 	void RandomPointInBounds(const Vector& vecNormalizedMins, const Vector& vecNormalizedMaxs, Vector* pPoint) const;
 	bool IsPointInBounds(const Vector& vecWorldPt) const;
 	void UseTriggerBounds(bool bEnable, float flBloat = 0.0f);
@@ -470,6 +471,12 @@ public:
 	int GetCollisionGroup() const;
 	void SetCollisionGroup(int collisionGroup);
 	void CollisionRulesChanged();
+	int GetEffects(void) const;
+	void AddEffects(int nEffects);
+	void RemoveEffects(int nEffects);
+	void ClearEffects(void);
+	void SetEffects(int nEffects);
+	bool IsEffectActive(int nEffects) const;
 
 public:
 	// Networking related methods
@@ -533,6 +540,8 @@ private:
 
 	CNetworkVarEmbedded(CCollisionProperty, m_Collision);
 	CNetworkVar(int, m_CollisionGroup);		// used to cull collision tests
+	// was pev->effects
+	CNetworkVar(int, m_fEffects);
 
 };
 
@@ -920,6 +929,11 @@ inline float CEngineObjectInternal::BoundingRadius2D() const
 	return m_Collision.BoundingRadius2D();
 }
 
+inline bool CEngineObjectInternal::IsPointSized() const
+{
+	return BoundingRadius() == 0.0f;
+}
+
 inline void CEngineObjectInternal::RandomPointInBounds(const Vector& vecNormalizedMins, const Vector& vecNormalizedMaxs, Vector* pPoint) const
 {
 	m_Collision.RandomPointInBounds(vecNormalizedMins, vecNormalizedMaxs, pPoint);
@@ -1006,6 +1020,67 @@ inline bool CEngineObjectInternal::IsBoundsDefinedInEntitySpace() const
 inline int CEngineObjectInternal::GetCollisionGroup() const
 {
 	return m_CollisionGroup;
+}
+
+inline int CEngineObjectInternal::GetEffects(void) const
+{
+	return m_fEffects;
+}
+
+inline void CEngineObjectInternal::RemoveEffects(int nEffects)
+{
+	m_pOuter->OnRemoveEffects(nEffects);
+#if !defined( CLIENT_DLL )
+#ifdef HL2_EPISODIC
+	if (nEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT))
+	{
+		// Hack for now, to avoid player emitting radius with his flashlight
+		if (!m_pOuter->IsPlayer())
+		{
+			RemoveEntityFromDarknessCheck(this->m_pOuter);
+		}
+	}
+#endif // HL2_EPISODIC
+#endif // !CLIENT_DLL
+
+	m_fEffects &= ~nEffects;
+	if (nEffects & EF_NODRAW)
+	{
+#ifndef CLIENT_DLL
+		MarkPVSInformationDirty();//NetworkProp()->
+		m_pOuter->DispatchUpdateTransmitState();
+#else
+		UpdateVisibility();
+#endif
+	}
+}
+
+inline void CEngineObjectInternal::ClearEffects(void)
+{
+#if !defined( CLIENT_DLL )
+#ifdef HL2_EPISODIC
+	if (m_fEffects & (EF_BRIGHTLIGHT | EF_DIMLIGHT))
+	{
+		// Hack for now, to avoid player emitting radius with his flashlight
+		if (!m_pOuter->IsPlayer())
+		{
+			RemoveEntityFromDarknessCheck(this->m_pOuter);
+		}
+	}
+#endif // HL2_EPISODIC
+#endif // !CLIENT_DLL
+
+	m_fEffects = 0;
+#ifndef CLIENT_DLL
+	m_pOuter->DispatchUpdateTransmitState();
+#else
+	UpdateVisibility();
+#endif
+}
+
+inline bool CEngineObjectInternal::IsEffectActive(int nEffects) const
+{
+	return (m_fEffects & nEffects) != 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -3123,7 +3198,7 @@ CBaseEntity* CGlobalEntityList<T>::FindEntityClassNearestFacing(const Vector& or
 		}
 
 		// FIXME: why is this skipping pointsize entities?
-		if (ent->IsPointSized())
+		if (ent->GetEngineObject()->IsPointSized())
 			continue;
 
 		// Make vector to entity

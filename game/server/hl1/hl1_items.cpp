@@ -25,7 +25,7 @@ void CHL1Item::Spawn( void )
 
 #ifdef HL1_DLL
     if ( g_pGameRules->IsMultiplayer() )
-        AddEffects( EF_NOSHADOW );
+		GetEngineObject()->AddEffects( EF_NOSHADOW );
 #endif
 
 

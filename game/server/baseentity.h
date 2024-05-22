@@ -637,14 +637,8 @@ public:
 
 public:
 
-
-	int			GetEffects( void ) const;
-	void		AddEffects( int nEffects );
-	void		RemoveEffects( int nEffects );
-	void		ClearEffects( void );
-	void		SetEffects( int nEffects );
-	bool		IsEffectActive( int nEffects ) const;
-
+	virtual void OnAddEffects(int nEffects) {}
+	virtual void OnRemoveEffects(int nEffects) {}
 	// makes the entity inactive
 	void		MakeDormant( void );
 	int			IsDormant( void );
@@ -896,8 +890,7 @@ private:
 
 	// was pev->nextthink
 	CNetworkVarForDerived( int, m_nNextThinkTick );
-	// was pev->effects
-	CNetworkVar( int, m_fEffects );
+
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -1314,8 +1307,7 @@ public:
 	// Returns a radius of a sphere 
 	// *centered at the world space center* bounding the collision representation 
 	// of the entity. NOTE: The world space center *may* move when the entity rotates.
-	float					BoundingRadius() const;
-	bool					IsPointSized() const;
+	//float					BoundingRadius() const;
 
 	
 
@@ -2147,15 +2139,12 @@ inline const Vector& CBaseEntity::WorldAlignSize( ) const
 
 // Returns a radius of a sphere *centered at the world space center*
 // bounding the collision representation of the entity
-inline float CBaseEntity::BoundingRadius() const
-{
-	return GetEngineObject()->BoundingRadius();
-}
+//inline float CBaseEntity::BoundingRadius() const
+//{
+//	return GetEngineObject()->BoundingRadius();
+//}
 
-inline bool CBaseEntity::IsPointSized() const
-{
-	return GetEngineObject()->BoundingRadius() == 0.0f;
-}
+
 
 inline void CBaseEntity::SetRenderMode( RenderMode_t nRenderMode )
 {

@@ -462,12 +462,11 @@ public:
 
 	// FIXME: Do we want this?
 	const Vector&					WorldAlignSize( ) const;
-	bool							IsPointSized() const;
 
 	// Returns a radius of a sphere 
 	// *centered at the world space center* bounding the collision representation 
 	// of the entity. NOTE: The world space center *may* move when the entity rotates.
-	float							BoundingRadius() const;
+	//float							BoundingRadius() const;
 
 	// Used when the collision prop is told to ask game code for the world-space surrounding box
 	virtual void					ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs );	
@@ -941,15 +940,8 @@ public:
 
 	void				SetRemovalFlag( bool bRemove );
 
-	// Effects...
-	bool				IsEffectActive( int nEffectMask ) const;
-	void				AddEffects( int nEffects );
-	void				RemoveEffects( int nEffects );
-	int					GetEffects( void ) const;
-	void				ClearEffects( void );
-	void				SetEffects( int nEffects );
-
-
+	virtual void OnAddEffects(int nEffects) {}
+	virtual void OnRemoveEffects(int nEffects) {}
 
 	// These methods encapsulate MOVETYPE_FOLLOW, which became obsolete
 	void				FollowEntity( CBaseEntity *pBaseEntity, bool bBoneMerge = true );
@@ -1129,8 +1121,7 @@ public:
 	byte							m_ubOldInterpolationFrame;
 
 private:
-	// Effects to apply
-	int								m_fEffects;
+
 	unsigned char 					m_nRenderMode;
 	unsigned char 					m_nOldRenderMode;
 
@@ -1564,15 +1555,10 @@ inline const Vector& C_BaseEntity::WorldAlignSize( ) const
 	return GetEngineObject()->OBBSize();
 }
 
-inline float C_BaseEntity::BoundingRadius() const
-{
-	return GetEngineObject()->BoundingRadius();
-}
-
-inline bool C_BaseEntity::IsPointSized() const
-{
-	return GetEngineObject()->BoundingRadius() == 0.0f;
-}
+//inline float C_BaseEntity::BoundingRadius() const
+//{
+//	return GetEngineObject()->BoundingRadius();
+//}
 
 inline const QAngle& C_BaseEntity::GetLocalAngularVelocity( ) const
 {

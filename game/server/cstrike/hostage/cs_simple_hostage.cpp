@@ -892,7 +892,7 @@ void CHostage::HostageThink( void )
 	if ( m_disappearTime && m_disappearTime < gpGlobals->curtime )
 	{
 		// finished fading - remove us completely
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 
 		GetEngineObject()->SetSolid( SOLID_NONE );
 		GetEngineObject()->SetSolidFlags( 0 );

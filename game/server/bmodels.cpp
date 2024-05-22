@@ -132,7 +132,7 @@ void CFuncWallToggle::TurnOff( void )
 		pPhys->EnableCollisions( false );
 	}
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 
@@ -144,7 +144,7 @@ void CFuncWallToggle::TurnOn( void )
 		pPhys->EnableCollisions( true );
 	}
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 }
 
 
@@ -219,7 +219,7 @@ void CFuncVehicleClip::Spawn()
 
 	CreateVPhysics();
 
-	AddEffects( EF_NODRAW );		// make entity invisible
+	GetEngineObject()->AddEffects( EF_NODRAW );		// make entity invisible
 
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_VEHICLE_CLIP );
 }
@@ -1464,7 +1464,7 @@ void CFuncVPhysicsClip::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	CreateVPhysics();
 	VPhysicsGetObject()->EnableCollisions( !m_bDisabled );
 }

@@ -190,7 +190,7 @@ void CDarknessLightSourcesSystem::RemoveLightSource( CInfoDarknessLightSource *p
 //-----------------------------------------------------------------------------
 bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker, CBaseEntity *pTarget )
 {
-	if ( pTarget->IsEffectActive( EF_BRIGHTLIGHT ) || pTarget->IsEffectActive( EF_DIMLIGHT ) )
+	if ( pTarget->GetEngineObject()->IsEffectActive( EF_BRIGHTLIGHT ) || pTarget->GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		return true;
 
 	bool bDebug = g_debug_darkness.GetBool();

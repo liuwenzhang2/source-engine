@@ -464,8 +464,8 @@ void C_BasePlayer::Spawn( void )
 	GetEngineObject()->ClearFlags();
 	GetEngineObject()->AddFlag( FL_CLIENT );
 
-	int effects = GetEffects() & EF_NOSHADOW;
-	SetEffects( effects );
+	int effects = GetEngineObject()->GetEffects() & EF_NOSHADOW;
+	GetEngineObject()->SetEffects( effects );
 
 	m_iFOV	= 0;	// init field of view.
 
@@ -511,7 +511,7 @@ bool C_BasePlayer::IsReplay() const
 #endif
 }
 
-CBaseEntity	*C_BasePlayer::GetObserverTarget() const	// returns players target or NULL
+C_BaseEntity	*C_BasePlayer::GetObserverTarget() const	// returns players target or NULL
 {
 #ifndef _XBOX
 	if ( IsHLTV() )
@@ -1204,7 +1204,7 @@ void C_BasePlayer::TeamChange( int iNewTeam )
 void C_BasePlayer::UpdateFlashlight()
 {
 	// The dim light is the flashlight.
-	if ( IsEffectActive( EF_DIMLIGHT ) )
+	if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 	{
 		if (!m_pFlashlight)
 		{
@@ -1846,11 +1846,11 @@ void C_BasePlayer::ThirdPersonSwitch( bool bThirdperson )
 			{
 				if ( bShouldDrawLocalPlayer )
 				{
-					pBoneAttachment->RemoveEffects( EF_NODRAW );
+					pBoneAttachment->GetEngineObject()->RemoveEffects( EF_NODRAW );
 				}
 				else
 				{
-					pBoneAttachment->AddEffects( EF_NODRAW );
+					pBoneAttachment->GetEngineObject()->AddEffects( EF_NODRAW );
 				}
 			}
 		}
@@ -2535,7 +2535,7 @@ void C_BasePlayer::LeaveVehicle( void )
 	SetAbsAngles( qAngles );
 
 	m_Local.m_iHideHUD &= ~HIDEHUD_WEAPONSELECTION;
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 
 	SetMoveType( MOVETYPE_WALK );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );

@@ -2035,7 +2035,7 @@ void CNPC_CombineGunship::BeginDestruct( void )
 		Chopper_BecomeChunks( this );
 		SetThink( &CNPC_CombineGunship::SUB_Remove );
 		SetNextThink( gpGlobals->curtime + 0.1f );
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 		return;
 	}
 
@@ -2077,7 +2077,7 @@ void CNPC_CombineGunship::BeginDestruct( void )
 	*/
 
 	// Hide myself, because the ragdoll's now taken my place
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 }
 

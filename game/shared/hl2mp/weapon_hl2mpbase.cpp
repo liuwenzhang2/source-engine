@@ -182,7 +182,7 @@ void CWeaponHL2MPBase::Spawn()
 
 void CWeaponHL2MPBase::Materialize( void )
 {
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 	{
 		// changing from invisible state to visible.
 		const char* soundname = "AlyxEmp.Charge";
@@ -195,7 +195,7 @@ void CWeaponHL2MPBase::Materialize( void )
 		params.m_bWarnOnDirectWaveReference = true;
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		DoMuzzleFlash();
 	}
 

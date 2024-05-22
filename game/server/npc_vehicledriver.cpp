@@ -108,7 +108,7 @@ void CNPC_VehicleDriver::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	m_lifeState	= LIFE_ALIVE;
 	SetCycle( 0 );

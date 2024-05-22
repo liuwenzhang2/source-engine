@@ -3220,7 +3220,7 @@ void CBaseAnimating::CopyAnimationDataFrom( CBaseAnimating *pSource )
 	this->GetEngineObject()->SetModelName( pSource->GetEngineObject()->GetModelName() );
 	this->GetEngineObject()->SetModelIndex( pSource->GetEngineObject()->GetModelIndex() );
 	this->SetCycle( pSource->GetCycle() );
-	this->SetEffects( pSource->GetEffects() );
+	this->GetEngineObject()->SetEffects( pSource->GetEngineObject()->GetEffects() );
 	this->IncrementInterpolationFrame();
 	this->SetSequence( pSource->GetSequence() );
 	this->m_flAnimTime = pSource->m_flAnimTime;

@@ -789,7 +789,7 @@ void CFuncTank::Spawn( void )
 		if ( m_bUsePoseParameters )
 		{
 			// In this case, we're relying on the parent to have the gun model
-			AddEffects( EF_NODRAW );
+			GetEngineObject()->AddEffects( EF_NODRAW );
 			QAngle localAngles( m_flPitchPoseCenter, m_flYawPoseCenter, 0 );
 			GetEngineObject()->SetLocalAngles( localAngles );
 			GetEngineObject()->SetSolid( SOLID_NONE );
@@ -910,7 +910,7 @@ void CFuncTank::Activate( void )
 		if ( m_bUsePoseParameters )
 		{
 			// In this case, we're relying on the parent to have the gun model
-			AddEffects( EF_NODRAW );
+			GetEngineObject()->AddEffects( EF_NODRAW );
 			QAngle localAngles( m_flPitchPoseCenter, m_flYawPoseCenter, 0 );
 			GetEngineObject()->SetLocalAngles( localAngles );
 			GetEngineObject()->SetSolid( SOLID_NONE );
@@ -3174,7 +3174,7 @@ void CFuncTankAPCRocket::Precache( void )
 void CFuncTankAPCRocket::Spawn( void )
 {
 	BaseClass::Spawn();
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	m_nSide = 0;
 	m_bDying = false;
 	m_hLaserDot = CreateLaserDot(GetEngineObject()->GetAbsOrigin(), this, false );
@@ -3545,7 +3545,7 @@ void CMortarShell::Spawn()
 {
 	Precache();
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	Vector mins( -MORTAR_BLAST_RADIUS, -MORTAR_BLAST_RADIUS, -MORTAR_BLAST_RADIUS );

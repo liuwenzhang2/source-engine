@@ -730,7 +730,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 	// Inherit the base object's damage modifiers
 	if ( pBreakableOwner )
 	{
-		pEntity->SetEffects( pBreakableOwner->GetEffects() );
+		pEntity->GetEngineObject()->SetEffects( pBreakableOwner->GetEngineObject()->GetEffects() );
 
 		pEntity->m_spawnflags = pBreakableOwner->m_spawnflags;
 
@@ -875,7 +875,7 @@ bool C_FuncPhysicsRespawnZone::Initialize( void )
 
 	Spawn();
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	UpdatePartitionListEntry();
 

@@ -203,7 +203,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 	//-----------------------------------------------------------------------------
 	void CopyToBodyQue( CBaseAnimating *pCorpse ) 
 	{
-		if ( pCorpse->IsEffectActive( EF_NODRAW ) )
+		if ( pCorpse->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 			return;
 
 		CCorpse *pHead	= g_pBodyQueueHead;

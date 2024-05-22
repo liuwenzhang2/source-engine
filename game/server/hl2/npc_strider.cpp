@@ -1829,7 +1829,7 @@ void CNPC_Strider::Explode( void )
 	SetThink( &CNPC_Strider::SUB_Remove );
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	
 	StopSmoking();
 

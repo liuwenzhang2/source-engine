@@ -177,7 +177,7 @@ ShadowType_t C_PropVehicleDriveable::ShadowCastType()
 	if ( !pStudioHdr )
 		return SHADOWS_NONE;
 
-	if ( IsEffectActive(EF_NODRAW | EF_NOSHADOW) )
+	if (GetEngineObject()->IsEffectActive(EF_NODRAW | EF_NOSHADOW) )
 		return SHADOWS_NONE;
 
 	// Always use render-to-texture. We'll always the dirty bits in our think function

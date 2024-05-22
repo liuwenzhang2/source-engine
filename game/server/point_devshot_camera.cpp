@@ -126,7 +126,7 @@ void CPointDevShotCamera::DevShotThink_Setup( void )
 	// Hide the player's viewmodel
 	if ( pPlayer->GetActiveWeapon() )
 	{
-		pPlayer->GetActiveWeapon()->AddEffects( EF_NODRAW );
+		pPlayer->GetActiveWeapon()->GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
 	DispatchUpdateTransmitState();

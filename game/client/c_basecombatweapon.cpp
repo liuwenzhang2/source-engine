@@ -202,7 +202,7 @@ bool C_BaseCombatWeapon::IsCarrierAlive() const
 //-----------------------------------------------------------------------------
 ShadowType_t C_BaseCombatWeapon::ShadowCastType()
 {
-	if ( IsEffectActive( /*EF_NODRAW |*/ EF_NOSHADOW ) )
+	if (GetEngineObject()->IsEffectActive( /*EF_NODRAW |*/ EF_NOSHADOW ) )
 		return SHADOWS_NONE;
 
 	if (!IsBeingCarried())
@@ -409,7 +409,7 @@ bool C_BaseCombatWeapon::ShouldDraw( void )
 	// FIXME: All weapons with owners are set to transmit in CBaseCombatWeapon::UpdateTransmitState,
 	// even if they have EF_NODRAW set, so we have to check this here. Ideally they would never
 	// transmit except for the weapons owned by the local player.
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		return false;
 
 	C_BaseCombatCharacter *pOwner = GetOwner();

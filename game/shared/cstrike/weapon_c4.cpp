@@ -1190,7 +1190,7 @@ void CC4::UpdateShieldState( void )
 
 		if ( pVM )
 		{
-			pVM->AddEffects( EF_NODRAW );
+			pVM->GetEngineObject()->AddEffects( EF_NODRAW );
 		}
 			//pPlayer->SetHitBoxSet( 3 );
 	}

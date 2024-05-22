@@ -935,7 +935,7 @@ void CEnvHeadcrabCanister::Detonate( )
 		m_bLanded = true;
 		
 		// Become invisible so our trail can finish up
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 		GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 
 		SetThink( &CEnvHeadcrabCanister::SUB_Remove );
@@ -1040,7 +1040,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterWorldThink( void )
 
 	if ( !m_bHasDetonated )
 	{
-		if ( vecEndPosition.DistToSqr( m_vecImpactPosition ) < BoundingRadius() * BoundingRadius() )
+		if ( vecEndPosition.DistToSqr( m_vecImpactPosition ) < GetEngineObject()->BoundingRadius() * GetEngineObject()->BoundingRadius() )
 		{
 			Detonate();
 			m_bHasDetonated = true;

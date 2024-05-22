@@ -2644,7 +2644,7 @@ void CCSPlayer::GiveShield( void )
 	if ( pVM )
 	{
 		ShowViewModel( true );
-		pVM->RemoveEffects( EF_NODRAW );
+		pVM->GetEngineObject()->RemoveEffects( EF_NODRAW );
 		pVM->SetWeaponModel( SHIELD_VIEW_MODEL, GetActiveWeapon() );
 		pVM->SendViewModelMatchingSequence( 1 );
 	}
@@ -2660,7 +2660,7 @@ void CCSPlayer::RemoveShield( void )
 
 	if ( pVM )
 	{
-		pVM->AddEffects( EF_NODRAW );
+		pVM->GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 #endif
 }
@@ -4421,7 +4421,7 @@ bool CCSPlayer::ClientCommand( const CCommand &args )
 		{
 			CCommand botArgs( args.ArgC() - 2, &args.ArgV()[2] );
 			pPlayer->ClientCommand( botArgs );
-			pPlayer->RemoveEffects( EF_NODRAW );
+			pPlayer->GetEngineObject()->RemoveEffects( EF_NODRAW );
 		}
 		return true;
 	}
@@ -5393,7 +5393,7 @@ void CCSPlayer::State_Enter_DEATH_ANIM()
 	m_bAbortFreezeCam = false;
 
 	StartObserverMode( OBS_MODE_DEATHCAM );	// go to observer mode
-	RemoveEffects( EF_NODRAW );	// still draw player body
+	GetEngineObject()->RemoveEffects( EF_NODRAW );	// still draw player body
 
 	if ( mp_fadetoblack.GetBool() )
 	{
@@ -5681,7 +5681,7 @@ bool CCSPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 	{
 		Assert( !pWeapon );
 		pBaseWeapon->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		pBaseWeapon->AddEffects( EF_NODRAW );
+		pBaseWeapon->GetEngineObject()->AddEffects( EF_NODRAW );
 		Weapon_Equip( pBaseWeapon );
 		return true;
 	}
@@ -5753,7 +5753,7 @@ bool CCSPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 		pWeapon->CheckRespawn();
 
 		pWeapon->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		pWeapon->AddEffects( EF_NODRAW );
+		pWeapon->GetEngineObject()->AddEffects( EF_NODRAW );
 
 		CCSPlayer* pDonor = pWeapon->GetDonor();
 		if ( pDonor && pDonor != this && pWeapon->GetCSWpnData().GetWeaponPrice() > m_iAccount )
@@ -6790,7 +6790,7 @@ void CCSPlayer::DoAnimationEvent( PlayerAnimEvent_t event, int nData )
 //-----------------------------------------------------------------------------
 int CCSPlayer::FlashlightIsOn( void )
 {
-	return IsEffectActive( EF_DIMLIGHT );
+	return GetEngineObject()->IsEffectActive( EF_DIMLIGHT );
 }
 
 extern ConVar flashlight;
@@ -6801,7 +6801,7 @@ void CCSPlayer::FlashlightTurnOn( void )
 {
 	if( flashlight.GetInt() > 0 && IsAlive() )
 	{
-		AddEffects( EF_DIMLIGHT );
+		GetEngineObject()->AddEffects( EF_DIMLIGHT );
 		const char* soundname = "Player.FlashlightOn";
 		CPASAttenuationFilter filter(this, soundname);
 
@@ -6819,7 +6819,7 @@ void CCSPlayer::FlashlightTurnOn( void )
 //-----------------------------------------------------------------------------
 void CCSPlayer::FlashlightTurnOff( void )
 {
-	RemoveEffects( EF_DIMLIGHT );
+	GetEngineObject()->RemoveEffects( EF_DIMLIGHT );
 
 	if( IsAlive() )
 	{

@@ -45,7 +45,7 @@ ParticleSmokeGrenade::ParticleSmokeGrenade()
 // enters the PVS late will see the smoke start billowing from then, allowing better vision.
 int ParticleSmokeGrenade::UpdateTransmitState( void )
 {
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		return SetTransmitState( FL_EDICT_DONTSEND );
 
 	return SetTransmitState( FL_EDICT_ALWAYS );

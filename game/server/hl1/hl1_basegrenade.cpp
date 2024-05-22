@@ -106,7 +106,7 @@ void CHL1BaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 
 	SetTouch( NULL );
 	
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 	SetThink( &CBaseGrenade::Smoke );

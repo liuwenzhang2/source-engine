@@ -384,7 +384,7 @@ void C_EntityFlame::Simulate( void )
 
 #ifdef HL2_EPISODIC 
 
-	if ( IsEffectActive(EF_BRIGHTLIGHT) || IsEffectActive(EF_DIMLIGHT) )
+	if (GetEngineObject()->IsEffectActive(EF_BRIGHTLIGHT) || GetEngineObject()->IsEffectActive(EF_DIMLIGHT) )
 	{
 		dlight_t *dl = effects->CL_AllocDlight (entindex());
 		dl->origin = GetEngineObject()->GetAbsOrigin();

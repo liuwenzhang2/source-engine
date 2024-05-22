@@ -74,13 +74,13 @@ void Cmd_ShowtriggersToggle_f( const CCommand &args )
 				}
 			}
 
-			if ( pEntity->IsEffectActive( EF_NODRAW ) )
+			if ( pEntity->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 			{
-				pEntity->RemoveEffects( EF_NODRAW );
+				pEntity->GetEngineObject()->RemoveEffects( EF_NODRAW );
 			}
 			else
 			{
-				pEntity->AddEffects( EF_NODRAW );
+				pEntity->GetEngineObject()->AddEffects( EF_NODRAW );
 			}
 		}
 
@@ -338,7 +338,7 @@ void CBaseTrigger::InitTrigger( )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 	if ( showtriggers.GetInt() == 0 )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
 	m_hTouchingEntities.Purge();
@@ -1250,7 +1250,7 @@ void CTriggerVolume::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 	if ( showtriggers.GetInt() == 0 )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 }
 
@@ -2600,7 +2600,7 @@ void CTriggerCamera::Enable( void )
 	// Hide the player's viewmodel
 	if ( pPlayer->GetActiveWeapon() )
 	{
-		pPlayer->GetActiveWeapon()->AddEffects( EF_NODRAW );
+		pPlayer->GetActiveWeapon()->GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
 	// Only track if we have a target
@@ -2635,7 +2635,7 @@ void CTriggerCamera::Disable( void )
 		// Restore the player's viewmodel
 		if ( ((CBasePlayer*)m_hPlayer.Get())->GetActiveWeapon() )
 		{
-			((CBasePlayer*)m_hPlayer.Get())->GetActiveWeapon()->RemoveEffects( EF_NODRAW );
+			((CBasePlayer*)m_hPlayer.Get())->GetActiveWeapon()->GetEngineObject()->RemoveEffects( EF_NODRAW );
 		}
 		//return the player to previous takedamage state
 		m_hPlayer->m_takedamage = m_nOldTakeDamage;
@@ -3744,7 +3744,7 @@ void CBaseVPhysicsTrigger::Spawn()
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 	if ( showtriggers.GetInt() == 0 )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
 	CreateVPhysics();

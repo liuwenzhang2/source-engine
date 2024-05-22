@@ -73,7 +73,7 @@ void CGrenadeSpit::Spawn( void )
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	// We're self-illuminating, so we don't take or give shadows
-	AddEffects( EF_NOSHADOW|EF_NORECEIVESHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW|EF_NORECEIVESHADOW );
 
 	// Create the dust effect in place
 	m_hSpitEffect = (CParticleSystem *)gEntList.CreateEntityByName( "info_particle_system" );

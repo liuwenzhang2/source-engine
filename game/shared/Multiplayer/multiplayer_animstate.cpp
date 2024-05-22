@@ -1320,7 +1320,7 @@ void CMultiPlayerAnimState::Update( float eyeYaw, float eyePitch )
 bool CMultiPlayerAnimState::ShouldUpdateAnimState()
 {
 	// Don't update anim state if we're not visible
-	if ( GetBasePlayer()->IsEffectActive( EF_NODRAW ) )
+	if ( GetBasePlayer()->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		return false;
 
 	// By default, don't update their animation state when they're dead because they're

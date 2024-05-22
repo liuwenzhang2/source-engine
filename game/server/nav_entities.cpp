@@ -76,7 +76,7 @@ void CFuncNavCost::Spawn( void )
 
 	SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 
 	VPhysicsInitShadow( false, false );
@@ -445,7 +445,7 @@ void CFuncNavBlocker::Spawn( void )
 
 	SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
@@ -658,7 +658,7 @@ void CFuncNavObstruction::Spawn( void )
 {
 	SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );

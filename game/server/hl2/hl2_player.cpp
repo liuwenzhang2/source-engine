@@ -2033,7 +2033,7 @@ bool CHL2_Player::ApplyBattery( float powerMultiplier )
 //-----------------------------------------------------------------------------
 int CHL2_Player::FlashlightIsOn( void )
 {
-	return IsEffectActive( EF_DIMLIGHT );
+	return GetEngineObject()->IsEffectActive( EF_DIMLIGHT );
 }
 
 
@@ -2054,7 +2054,7 @@ void CHL2_Player::FlashlightTurnOn( void )
 		return;
 #endif
 
-	AddEffects( EF_DIMLIGHT );
+	GetEngineObject()->AddEffects( EF_DIMLIGHT );
 
 	const char* soundname = "HL2Player.FlashLightOn";
 	CPASAttenuationFilter filter(this, soundname);
@@ -2082,7 +2082,7 @@ void CHL2_Player::FlashlightTurnOff( void )
 			return;
 	}
 
-	RemoveEffects( EF_DIMLIGHT );
+	GetEngineObject()->RemoveEffects( EF_DIMLIGHT );
 
 	const char* soundname = "HL2Player.FlashLightOff";
 	CPASAttenuationFilter filter(this, soundname);
@@ -2789,7 +2789,7 @@ bool CHL2_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 		pWeapon->CheckRespawn();
 
 		pWeapon->AddSolidFlags( FSOLID_NOT_SOLID );
-		pWeapon->AddEffects( EF_NODRAW );
+		pWeapon->GetEngineObject()->AddEffects( EF_NODRAW );
 
 		Weapon_Equip( pWeapon );
 

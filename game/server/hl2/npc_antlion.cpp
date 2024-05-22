@@ -345,7 +345,7 @@ void CNPC_Antlion::Spawn( void )
 	//See if we're supposed to start burrowed
 	if ( m_bStartBurrowed )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 		GetEngineObject()->AddFlag( FL_NOTARGET );
 		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
@@ -1224,7 +1224,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 	{
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage	= DAMAGE_NO;
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 		SetWings( false );
 
 		return;
@@ -1275,7 +1275,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 		//Throw dust up
 		CreateDust();
 
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		GetEngineObject()->RemoveFlag( FL_NOTARGET );
 
 		return;
@@ -1756,7 +1756,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 		break;
 
 	case TASK_ANTLION_VANISH:
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 		GetEngineObject()->AddFlag( FL_NOTARGET );
 		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 		
@@ -3518,7 +3518,7 @@ bool CNPC_Antlion::CheckLanding( void )
 bool CNPC_Antlion::QuerySeeEntity( CBaseEntity *pEntity, bool bOnlyHateOrFearIfNPC )
 {
 	//If we're under the ground, don't look at enemies
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		return false;
 
 	return BaseClass::QuerySeeEntity(pEntity, bOnlyHateOrFearIfNPC);
@@ -3819,7 +3819,7 @@ void CNPC_Antlion::GatherConditions( void )
 	// See if I've landed on an NPC!
 	CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	
-	if ( ( ( pGroundEnt != NULL ) && ( pGroundEnt->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_STANDABLE ) ) && (GetEngineObject()->GetFlags() & FL_ONGROUND ) && ( !IsEffectActive( EF_NODRAW ) && !pGroundEnt->IsEffectActive( EF_NODRAW ) ) )
+	if ( ( ( pGroundEnt != NULL ) && ( pGroundEnt->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_STANDABLE ) ) && (GetEngineObject()->GetFlags() & FL_ONGROUND ) && ( !GetEngineObject()->IsEffectActive( EF_NODRAW ) && !pGroundEnt->GetEngineObject()->IsEffectActive( EF_NODRAW ) ) )
 	{
 		SetCondition( COND_ANTLION_ON_NPC );
 	}
@@ -3847,7 +3847,7 @@ void CNPC_Antlion::GatherConditions( void )
 		 IsCurSchedule(SCHED_ANTLION_BURROW_IN) == false && 
 		 IsCurSchedule(SCHED_ANTLION_BURROW_OUT) == false && 
 		 IsCurSchedule(SCHED_FALL_TO_GROUND ) == false &&
-		 IsEffectActive( EF_NODRAW ) == false )
+		 GetEngineObject()->IsEffectActive( EF_NODRAW ) == false )
 	{
 		if( m_lifeState == LIFE_ALIVE && GetWaterLevel() > 1 )
 		{
@@ -3899,14 +3899,14 @@ void CNPC_Antlion::PrescheduleThink( void )
 	}
 
 	// Make sure we've turned off our burrow state if we're not in it
-	if ( IsEffectActive( EF_NODRAW ) &&
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) &&
 		 ( eActivity != ACT_ANTLION_BURROW_IDLE ) &&
 		 ( eActivity != ACT_ANTLION_BURROW_OUT ) &&
 		 ( eActivity != ACT_ANTLION_BURROW_IN) )
 	{
 		DevMsg( "Antlion failed to unburrow properly!\n" );
 		Assert( 0 );
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage	= DAMAGE_YES;
 		GetEngineObject()->RemoveFlag( FL_NOTARGET );

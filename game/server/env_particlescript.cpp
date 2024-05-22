@@ -126,7 +126,7 @@ void CEnvParticleScript::Spawn()
 {
 	Precache();
 	BaseClass::Spawn();
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 	// We need a model for its animation sequences even though we don't render it
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 }
@@ -164,7 +164,7 @@ void CEnvParticleScript::Activate()
 //-----------------------------------------------------------------------------
 int CEnvParticleScript::UpdateTransmitState()
 {
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 	{
 		return SetTransmitState( FL_EDICT_DONTSEND );
 	}

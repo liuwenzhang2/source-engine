@@ -76,7 +76,7 @@ void CAI_TestHull::Spawn(void)
 	bInUse				= false;
 
 	// Make this invisible
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 //-----------------------------------------------------------------------------

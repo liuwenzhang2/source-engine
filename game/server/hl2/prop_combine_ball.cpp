@@ -401,7 +401,7 @@ void CPropCombineBall::Spawn( void )
 	m_bCaptureInProgress = false;
 
 	// No shadow!
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	// Start up the eye trail
 	m_pGlowTrail = CSpriteTrail::SpriteTrailCreate( PROP_COMBINE_BALL_SPRITE_TRAIL, GetEngineObject()->GetAbsOrigin(), false );
@@ -1837,7 +1837,7 @@ void CFuncCombineBallSpawner::Spawn()
 
 	Precache();
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->SetSolid( SOLID_BSP );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );

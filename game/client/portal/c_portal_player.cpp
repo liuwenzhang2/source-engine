@@ -856,7 +856,7 @@ bool C_Portal_Player::ShouldReceiveProjectedTextures( int flags )
 {
 	Assert( flags & SHADOW_FLAGS_PROJECTED_TEXTURE_TYPE_MASK );
 
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		return false;
 
 	if( flags & SHADOW_FLAGS_FLASHLIGHT )
@@ -921,7 +921,7 @@ void C_Portal_Player::AddEntity( void )
 
 	if( this != C_BasePlayer::GetLocalPlayer() )
 	{
-		if ( IsEffectActive( EF_DIMLIGHT ) )
+		if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		{
 			int iAttachment = LookupAttachment( "anim_attachment_RH" );
 

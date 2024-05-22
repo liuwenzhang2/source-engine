@@ -53,7 +53,7 @@ CBaseParticleEntity::~CBaseParticleEntity( void )
 #if !defined( CLIENT_DLL )
 int CBaseParticleEntity::UpdateTransmitState( void )
 {
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		return SetTransmitState( FL_EDICT_DONTSEND );
 
 	if (GetEngineObject()->IsEFlagSet( EFL_IN_SKYBOX ) )

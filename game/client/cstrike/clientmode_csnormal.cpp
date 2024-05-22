@@ -822,7 +822,7 @@ void UpdateClassImageEntity(
 
 		pPlayerModel = (C_BaseAnimatingOverlay*)cl_entitylist->CreateEntityByName( "C_BaseAnimatingOverlay" );
 		pPlayerModel->InitializeAsClientEntity( pModelName, RENDER_GROUP_OPAQUE_ENTITY );
-		pPlayerModel->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
+		pPlayerModel->GetEngineObject()->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 
 		// let player walk ahead
 		pPlayerModel->SetSequence( pPlayerModel->LookupSequence( "walk_lower" ) );
@@ -846,7 +846,7 @@ void UpdateClassImageEntity(
 
 		pWeaponModel = (C_BaseAnimating*)cl_entitylist->CreateEntityByName( "C_BaseAnimating" );
 		pWeaponModel->InitializeAsClientEntity( pWeaponName, RENDER_GROUP_OPAQUE_ENTITY );
-		pWeaponModel->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
+		pWeaponModel->GetEngineObject()->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
 		pWeaponModel->FollowEntity( pPlayerModel ); // attach to player model
 		pWeaponModel->m_flAnimTime = gpGlobals->curtime;
 		g_ClassImageWeapon = pWeaponModel;

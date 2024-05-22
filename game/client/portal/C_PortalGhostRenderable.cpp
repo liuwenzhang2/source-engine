@@ -45,7 +45,7 @@ void C_PortalGhostRenderable::PerFrameUpdate( void )
 	{
 		GetEngineObject()->SetModelName( m_pGhostedRenderable->GetEngineObject()->GetModelName() );
 		GetEngineObject()->SetModelIndex( m_pGhostedRenderable->GetEngineObject()->GetModelIndex() );
-		SetEffects( m_pGhostedRenderable->GetEffects() | EF_NOINTERP );		
+		GetEngineObject()->SetEffects( m_pGhostedRenderable->GetEngineObject()->GetEffects() | EF_NOINTERP );
 		m_flAnimTime = m_pGhostedRenderable->m_flAnimTime;		
 
 		if( m_bSourceIsBaseAnimating )
@@ -66,7 +66,7 @@ void C_PortalGhostRenderable::PerFrameUpdate( void )
 	GetEngineObject()->SetAbsOrigin( ptNewOrigin );
 	GetEngineObject()->SetAbsAngles( qNewAngles );
 
-	AddEffects( EF_NOINTERP );
+	GetEngineObject()->AddEffects( EF_NOINTERP );
 
 	RemoveFromInterpolationList();
 

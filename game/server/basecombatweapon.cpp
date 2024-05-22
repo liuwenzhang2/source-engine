@@ -203,7 +203,7 @@ CBaseEntity* CBaseCombatWeapon::Respawn( void )
 
 	if ( pNewWeapon )
 	{
-		pNewWeapon->AddEffects( EF_NODRAW );// invisible for now
+		pNewWeapon->GetEngineObject()->AddEffects( EF_NODRAW );// invisible for now
 		pNewWeapon->SetTouch( NULL );// no touch
 		pNewWeapon->SetThink( &CBaseCombatWeapon::AttemptToMaterialize );
 
@@ -572,7 +572,7 @@ void CBaseCombatWeapon::FallThink ( void )
 //-----------------------------------------------------------------------------// 
 void CBaseCombatWeapon::Materialize( void )
 {
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 	{
 		// changing from invisible state to visible.
 #ifdef HL2MP
@@ -597,7 +597,7 @@ void CBaseCombatWeapon::Materialize( void )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 #endif
 		
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 		DoMuzzleFlash();
 	}
 #ifdef HL2MP

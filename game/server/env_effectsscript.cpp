@@ -223,7 +223,7 @@ void CEnvEffectsScript::Spawn()
 	// We need a model for its animation sequences even though we don't render it
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	SetThink( &CEnvEffectsScript::Think );
 	SetNextThink( gpGlobals->curtime + 0.1f );

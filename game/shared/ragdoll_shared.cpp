@@ -1144,13 +1144,13 @@ C_EntityFlame *FireEffect( C_BaseAnimating *pTarget, C_BaseEntity *pServerFire, 
 #ifdef HL2_EPISODIC
 		if ( pServerFire )
 		{
-			if ( pServerFire->IsEffectActive(EF_DIMLIGHT) )
+			if ( pServerFire->GetEngineObject()->IsEffectActive(EF_DIMLIGHT) )
 			{
-				pFire->AddEffects( EF_DIMLIGHT );
+				pFire->GetEngineObject()->AddEffects( EF_DIMLIGHT );
 			}
-			if ( pServerFire->IsEffectActive(EF_BRIGHTLIGHT) )
+			if ( pServerFire->GetEngineObject()->IsEffectActive(EF_BRIGHTLIGHT) )
 			{
-				pFire->AddEffects( EF_BRIGHTLIGHT );
+				pFire->GetEngineObject()->AddEffects( EF_BRIGHTLIGHT );
 			}
 		}
 #endif

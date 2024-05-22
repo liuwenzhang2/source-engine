@@ -4121,7 +4121,7 @@ void CCitizenResponseSystem::Spawn()
 
 	// Invisible, non solid.
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	SetThink( &CCitizenResponseSystem::ResponseThink );
 
 	m_flNextResponseTime = 0;

@@ -238,7 +238,7 @@ bool CBoneFollower::Init( CBaseEntity *pOwner, const char *pModelName, solid_t &
 	SetOwnerEntity( pOwner );
 	UTIL_SetModel( this, pModelName );
 
-	AddEffects( EF_NODRAW ); // invisible
+	GetEngineObject()->AddEffects( EF_NODRAW ); // invisible
 
 	m_modelIndex = modelinfo->GetModelIndex( pModelName );
 	m_solidIndex = solid.index;

@@ -337,9 +337,9 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 		if ( !obj->IsMoving() && flDist > objectradius )
 			  continue;
 
-		if ( flDist > objectradius && obj->IsEffectActive( EF_NODRAW ) )
+		if ( flDist > objectradius && obj->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		{
-			obj->RemoveEffects( EF_NODRAW );
+			obj->GetEngineObject()->RemoveEffects( EF_NODRAW );
 		}
 
 		Vector vecNPCVelocity;
@@ -420,7 +420,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 
 				if ( flDist < objectradius )
 				{
-					obj->AddEffects( EF_NODRAW );
+					obj->GetEngineObject()->AddEffects( EF_NODRAW );
 				}
 
 				//Msg( "PUSH AWAY FACE fwd=%f, rt=%f\n", fwd, rt );
@@ -440,7 +440,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 
 				if ( flDist < objectradius )
 				{
-					obj->AddEffects( EF_NODRAW );
+					obj->GetEngineObject()->AddEffects( EF_NODRAW );
 				}
 
 				//Msg( "PUSH ALONG fwd=%f, rt=%f\n", fwd, rt );
@@ -471,7 +471,7 @@ void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUse
 
 			if ( flDist < objectradius )
 			{
-				obj->AddEffects( EF_NODRAW );
+				obj->GetEngineObject()->AddEffects( EF_NODRAW );
 			}
 
 			//Msg( "PUSH THROUGH fwd=%f, rt=%f\n", fwd, rt );

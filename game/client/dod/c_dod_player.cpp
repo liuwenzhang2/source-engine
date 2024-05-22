@@ -607,7 +607,7 @@ void C_DODRagdoll::ClientThink( void )
 		if ( iAlpha == 0 )
 		{
 			//Release();
-			AddEffects( EF_NODRAW );
+			GetEngineObject()->AddEffects( EF_NODRAW );
 		}
 
 		return;
@@ -656,7 +656,7 @@ void C_DODRagdoll::ClientThink( void )
 		return;
 
 	//Release(); // Die
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 void C_DODRagdoll::StartFadeOut( float fDelay )
@@ -1000,7 +1000,7 @@ void C_DODPlayer::GetToolRecordingState( KeyValues *msg )
 	if ( IsLocalPlayer() )
 	{
 		pBaseEntityState->m_bVisible = !IsDormant() && IsAlive() && ( GetTeamNumber() != TEAM_SPECTATOR ) &&
-			( GetRenderMode() != kRenderNone ) && (GetObserverMode() != OBS_MODE_DEATHCAM) && !IsEffectActive(EF_NODRAW);
+			( GetRenderMode() != kRenderNone ) && (GetObserverMode() != OBS_MODE_DEATHCAM) && !GetEngineObject()->IsEffectActive(EF_NODRAW);
 	}
 #endif
 }
@@ -1832,7 +1832,7 @@ void C_DODPlayer::Simulate( void )
 {
 	if( this != C_BasePlayer::GetLocalPlayer() )
 	{
-		if ( IsEffectActive( EF_DIMLIGHT ) )
+		if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		{
 			QAngle eyeAngles = m_angEyeAngles;
 			Vector vForward;

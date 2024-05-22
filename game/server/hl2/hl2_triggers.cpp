@@ -530,7 +530,7 @@ void CWateryDeathLeech::Spawn( void )
 	GetEngineObject()->SetSolid ( SOLID_NONE );
 
 	SetMoveType( MOVETYPE_NONE );
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 	
 	SetModel( "models/leech.mdl" );
 
@@ -590,11 +590,11 @@ void CWateryDeathLeech::LeechThink( void )
 	{
 		if ( GetOwnerEntity()->GetWaterLevel() < 3 )
 		{
-			AddEffects( EF_NODRAW );
+			GetEngineObject()->AddEffects( EF_NODRAW );
 		}
 		else
 		{
-			RemoveEffects( EF_NODRAW );
+			GetEngineObject()->RemoveEffects( EF_NODRAW );
 		}
 
 		GetEngineObject()->SetAbsOrigin( GetOwnerEntity()->GetEngineObject()->GetAbsOrigin() + GetOwnerEntity()->GetViewOffset() );

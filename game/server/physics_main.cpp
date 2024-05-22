@@ -251,7 +251,7 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 		}
 
 		// We're not blocked if the blocker is point-sized or non-solid
-		if ( pBlocker->IsPointSized() || !pBlocker->GetEngineObject()->IsSolid() ||
+		if ( pBlocker->GetEngineObject()->IsPointSized() || !pBlocker->GetEngineObject()->IsSolid() ||
 			pBlocker->GetEngineObject()->IsSolidFlagSet( FSOLID_VOLUME_CONTENTS ) )
 		{
 			return true;

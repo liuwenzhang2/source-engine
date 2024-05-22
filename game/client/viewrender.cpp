@@ -2070,7 +2070,7 @@ void CViewRender::RenderView( const CViewSetup &view, int nClearFlags, int whatT
 				C_BasePlayer *pLocal = C_BasePlayer::GetLocalPlayer();
 				if ( pLocal )
 				{
-					bFlashlightIsOn = pLocal->IsEffectActive( EF_DIMLIGHT );
+					bFlashlightIsOn = pLocal->GetEngineObject()->IsEffectActive( EF_DIMLIGHT );
 				}
 				DoEnginePostProcessing( view.x, view.y, view.width, view.height, bFlashlightIsOn );
 			}

@@ -55,7 +55,7 @@ void CAlyxEmpEffect::Spawn( void )
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
 	// No shadows
-	AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW | EF_NORECEIVESHADOW );
 }
 
 //-----------------------------------------------------------------------------

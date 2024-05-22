@@ -67,7 +67,7 @@ void CMapInfo::Spawn( void )
 { 
 	SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 void CMapInfo::InputFireWinCondition(inputdata_t &inputdata )

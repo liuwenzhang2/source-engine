@@ -248,10 +248,7 @@ static void RecvProxy_MoveCollide( const CRecvProxyData *pData, void *pStruct, v
 //	((C_BaseEntity*)pStruct)->SetSolidFlags( pData->m_Value.m_Int );
 //}
 
-void RecvProxy_EffectFlags( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	((C_BaseEntity*)pStruct)->SetEffects( pData->m_Value.m_Int );
-}
+
 
 
 BEGIN_RECV_TABLE_NOBASE( C_BaseEntity, DT_AnimTimeMustBeFirst )
@@ -271,7 +268,6 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 	RecvPropDataTable( "AnimTimeMustBeFirst", 0, 0, &REFERENCE_RECV_TABLE(DT_AnimTimeMustBeFirst) ),
 	RecvPropInt( RECVINFO(m_flSimulationTime), 0, RecvProxy_SimulationTime ),
 	RecvPropInt( RECVINFO( m_ubInterpolationFrame ) ),
-	RecvPropInt(RECVINFO(m_fEffects), 0, RecvProxy_EffectFlags ),
 	RecvPropInt(RECVINFO(m_nRenderMode)),
 	RecvPropInt(RECVINFO(m_nRenderFX)),
 	RecvPropInt(RECVINFO(m_clrRender)),
@@ -697,7 +693,6 @@ void C_BaseEntity::Clear( void )
 		GetEngineObject()->SetLocalOrigin(vec3_origin);
 		GetEngineObject()->SetLocalAngles(vec3_angle);
 		GetEngineObject()->Clear();
-		GetEngineObject()->ClearFlags();
 	}
 	m_vecViewOffset.Init();
 	m_vecBaseVelocity.Init();
@@ -706,7 +701,6 @@ void C_BaseEntity::Clear( void )
 	SetMoveCollide( MOVECOLLIDE_DEFAULT );
 	SetMoveType( MOVETYPE_NONE );
 
-	ClearEffects();
 	m_nRenderMode = 0;
 	m_nOldRenderMode = 0;
 	SetRenderColor( 255, 255, 255, 255 );
@@ -1087,7 +1081,7 @@ bool C_BaseEntity::ShouldDraw()
 	if ( m_nRenderMode == kRenderNone )
 		return false;
 
-	return (GetModel() != 0) && !IsEffectActive(EF_NODRAW) && (entindex() != 0);
+	return (GetModel() != 0) && !GetEngineObject()->IsEffectActive(EF_NODRAW) && (entindex() != 0);
 }
 
 bool C_BaseEntity::TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trace )
@@ -1141,7 +1135,7 @@ void C_BaseEntity::ReceiveMessage( int classID, bf_read &msg )
 //-----------------------------------------------------------------------------
 ShadowType_t C_BaseEntity::ShadowCastType()
 {
-	if (IsEffectActive(EF_NODRAW | EF_NOSHADOW))
+	if (GetEngineObject()->IsEffectActive(EF_NODRAW | EF_NOSHADOW))
 		return SHADOWS_NONE;
 
 	int modelType = modelinfo->GetModelType(GetModel());
@@ -1199,7 +1193,7 @@ bool C_BaseEntity::ShouldReceiveProjectedTextures( int flags )
 {
 	Assert( flags & SHADOW_FLAGS_PROJECTED_TEXTURE_TYPE_MASK );
 
-	if ( IsEffectActive( EF_NODRAW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 		 return false;
 
 	if( flags & SHADOW_FLAGS_FLASHLIGHT )
@@ -1212,7 +1206,7 @@ bool C_BaseEntity::ShouldReceiveProjectedTextures( int flags )
 
 	Assert( flags & SHADOW_FLAGS_SHADOW );
 
-	if ( IsEffectActive( EF_NORECEIVESHADOW ) )
+	if (GetEngineObject()->IsEffectActive( EF_NORECEIVESHADOW ) )
 		 return false;
 
 	if (modelinfo->GetModelType(GetModel()) == mod_studio)
@@ -1328,7 +1322,7 @@ void C_BaseEntity::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 		else
 		{
 			Assert(GetEngineObject()->GetCollisionAngles() == vec3_angle );
-			if ( IsPointSized() )
+			if (GetEngineObject()->IsPointSized() )
 			{
 				//theMins = GetEngineObject()->GetCollisionOrigin();
 				//theMaxs	= theMins;
@@ -1815,7 +1809,7 @@ void C_BaseEntity::MarkAimEntsDirty()
 	{
 		C_BaseEntity *pEnt = g_AimEntsList[ i ];
 		Assert( pEnt && pEnt->GetEngineObject()->GetMoveParent() );
-		if ( pEnt->IsEffectActive(EF_BONEMERGE | EF_PARENT_ANIMATES) )
+		if ( pEnt->GetEngineObject()->IsEffectActive(EF_BONEMERGE | EF_PARENT_ANIMATES) )
 		{
 			pEnt->GetEngineObject()->AddEFlags( EFL_DIRTY_ABSTRANSFORM );
 		}
@@ -1833,7 +1827,7 @@ void C_BaseEntity::CalcAimEntPositions()
 		C_BaseEntity *pEnt = g_AimEntsList[ i ];
 		Assert( pEnt );
 		Assert( pEnt->GetEngineObject()->GetMoveParent() );
-		if ( pEnt->IsEffectActive(EF_BONEMERGE) )
+		if ( pEnt->GetEngineObject()->IsEffectActive(EF_BONEMERGE) )
 		{
 			pEnt->GetEngineObject()->CalcAbsolutePosition( );
 		}
@@ -2234,7 +2228,7 @@ void C_BaseEntity::CreateLightEffects( void )
 	if (entindex() == render->GetViewEntity() )
 		return;
 
-	if (IsEffectActive(EF_BRIGHTLIGHT))
+	if (GetEngineObject()->IsEffectActive(EF_BRIGHTLIGHT))
 	{
 		dl = effects->CL_AllocDlight (entindex());
 		dl->origin = GetEngineObject()->GetAbsOrigin();
@@ -2243,7 +2237,7 @@ void C_BaseEntity::CreateLightEffects( void )
 		dl->radius = random->RandomFloat(400,431);
 		dl->die = gpGlobals->curtime + 0.001;
 	}
-	if (IsEffectActive(EF_DIMLIGHT))
+	if (GetEngineObject()->IsEffectActive(EF_DIMLIGHT))
 	{			
 		dl = effects->CL_AllocDlight (entindex());
 		dl->origin = GetEngineObject()->GetAbsOrigin();
@@ -2404,14 +2398,14 @@ void C_BaseEntity::StopFollowingEntity( )
 	Assert( IsFollowingEntity() );
 
 	GetEngineObject()->SetParent( NULL );
-	RemoveEffects( EF_BONEMERGE );
+	GetEngineObject()->RemoveEffects( EF_BONEMERGE );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
 }
 
 bool C_BaseEntity::IsFollowingEntity()
 {
-	return IsEffectActive(EF_BONEMERGE) && (GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
+	return GetEngineObject()->IsEffectActive(EF_BONEMERGE) && (GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
 }
 
 C_BaseEntity *CBaseEntity::GetFollowedEntity()
@@ -2828,7 +2822,7 @@ CollideType_t C_BaseEntity::GetCollideType( void )
 	// Don't get stuck on point sized entities ( world doesn't count )
 	if (GetEngineObject()->GetModelIndex() != 1 )
 	{
-		if ( IsPointSized() )
+		if (GetEngineObject()->IsPointSized() )
 			return ENTITY_SHOULD_NOT_COLLIDE;
 	}
 
@@ -4455,7 +4449,7 @@ void C_BaseEntity::GetToolRecordingState( KeyValues *msg )
 	state.m_flTime = gpGlobals->curtime;
 	state.m_pModelName = modelinfo->GetModelName( GetModel() );
 	state.m_nOwner = pOwner ? pOwner->entindex() : -1;
-	state.m_nEffects = m_fEffects;
+	state.m_nEffects = GetEngineObject()->GetEffects();
 	state.m_bVisible = ShouldDraw() && !IsDormant();
 	state.m_bRecordFinalVisibleSample = false;
 	state.m_vecRenderOrigin = GetRenderOrigin();

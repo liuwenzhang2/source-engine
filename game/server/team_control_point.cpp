@@ -135,12 +135,12 @@ void CTeamControlPoint::Spawn( void )
 
 	if (GetEngineObject()->HasSpawnFlags(SF_CAP_POINT_HIDE_MODEL) )
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
 	if (GetEngineObject()->HasSpawnFlags(SF_CAP_POINT_HIDE_SHADOW) )
 	{
-		AddEffects( EF_NOSHADOW );
+		GetEngineObject()->AddEffects( EF_NOSHADOW );
 	}
 
 	m_flLastContestedAt = -1;
@@ -365,7 +365,7 @@ void CTeamControlPoint::InputSetOwner( inputdata_t &input )
 //-----------------------------------------------------------------------------
 void CTeamControlPoint::InputShowModel( inputdata_t &input )
 {
-	RemoveEffects( EF_NODRAW );
+	GetEngineObject()->RemoveEffects( EF_NODRAW );
 }
 
 //-----------------------------------------------------------------------------
@@ -373,7 +373,7 @@ void CTeamControlPoint::InputShowModel( inputdata_t &input )
 //-----------------------------------------------------------------------------
 void CTeamControlPoint::InputHideModel( inputdata_t &input )
 {
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 //-----------------------------------------------------------------------------
@@ -814,11 +814,11 @@ void CTeamControlPoint::SetActive( bool active )
 	
 	if( active )
 	{
-		RemoveEffects( EF_NODRAW );
+		GetEngineObject()->RemoveEffects( EF_NODRAW );
 	}
 	else
 	{
-		AddEffects( EF_NODRAW );
+		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 }
 

@@ -187,7 +187,7 @@ void CNPCEventResponseSystemEntity::Spawn( void )
 {
 	// Invisible, non solid.
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 //-----------------------------------------------------------------------------

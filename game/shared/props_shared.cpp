@@ -1086,9 +1086,9 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 					GetGibManager()->AddGibToLRU( pBreakable->GetBaseAnimating() );
 				}
 #endif
-				if ( pOwnerEntity && pOwnerEntity->IsEffectActive( EF_NOSHADOW ) )
+				if ( pOwnerEntity && pOwnerEntity->GetEngineObject()->IsEffectActive( EF_NOSHADOW ) )
 				{
-					pBreakable->AddEffects( EF_NOSHADOW );
+					pBreakable->GetEngineObject()->AddEffects( EF_NOSHADOW );
 				}
 
 				// If burst scale is set, this piece should 'burst' away from
@@ -1202,9 +1202,9 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 
 					pBreakable->GetEngineObject()->SetAbsAngles( vecAngles );
 
-					if ( pOwnerEntity->IsEffectActive( EF_NOSHADOW ) )
+					if ( pOwnerEntity->GetEngineObject()->IsEffectActive( EF_NOSHADOW ) )
 					{
-						pBreakable->AddEffects( EF_NOSHADOW );
+						pBreakable->GetEngineObject()->AddEffects( EF_NOSHADOW );
 					}
 				}
 			}
@@ -1488,9 +1488,9 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 					pBreakable->ParticleProp()->Create( "burninggibs", PATTACH_POINT_FOLLOW, "bloodpoint" );
 				}
 #endif
-				if ( pOwnerEntity && pOwnerEntity->IsEffectActive( EF_NOSHADOW ) )
+				if ( pOwnerEntity && pOwnerEntity->GetEngineObject()->IsEffectActive( EF_NOSHADOW ) )
 				{
-					pBreakable->AddEffects( EF_NOSHADOW );
+					pBreakable->GetEngineObject()->AddEffects( EF_NOSHADOW );
 				}
 
 				// If burst scale is set, this piece should 'burst' away from
@@ -1610,9 +1610,9 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 
 					pBreakable->GetEngineObject()->SetAbsAngles( vecAngles );
 
-					if ( pOwnerEntity->IsEffectActive( EF_NOSHADOW ) )
+					if ( pOwnerEntity->GetEngineObject()->IsEffectActive( EF_NOSHADOW ) )
 					{
-						pBreakable->AddEffects( EF_NOSHADOW );
+						pBreakable->GetEngineObject()->AddEffects( EF_NOSHADOW );
 					}
 
 					if ( !pFirstBreakable )

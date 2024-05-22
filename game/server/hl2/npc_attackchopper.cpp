@@ -1926,7 +1926,7 @@ void CNPC_AttackHelicopter::AimCloseToTargetButMiss( CBaseEntity *pTarget, float
 	Vector vecDirection;
 	VectorSubtract( pTarget->WorldSpaceCenter(), shootOrigin, vecDirection );
 	float flDist = VectorNormalize( vecDirection );
-	float flRadius = pTarget->BoundingRadius() + random->RandomFloat( flMinDist, flMaxDist );
+	float flRadius = pTarget->GetEngineObject()->BoundingRadius() + random->RandomFloat( flMinDist, flMaxDist );
 
 	float flMinRadius = flRadius;
 	if ( flDist > flRadius )
@@ -3387,7 +3387,7 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 		pChunk->m_lifeTime = random->RandomFloat( 0.5f, 1.0f );
 		pChunk->GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 		pChunk->GetEngineObject()->SetSolid( SOLID_BBOX );
-		pChunk->AddEffects( EF_NODRAW );
+		pChunk->GetEngineObject()->AddEffects( EF_NODRAW );
 		pChunk->SetGravity( UTIL_ScaleForGravity( 400 ) );
 	}
 	else
@@ -3811,7 +3811,7 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 	SetThink( &CNPC_AttackHelicopter::SUB_Remove );
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	// Makes the slower rotors fade back in
 	SetStartupTime( gpGlobals->curtime + 99.0f );
@@ -5074,7 +5074,7 @@ void CGrenadeHelicopter::Spawn( void )
 		VPhysicsInitShadow( false, false );
 		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 		SetElasticity( 0.5f );
-		AddEffects( EF_NOSHADOW );
+		GetEngineObject()->AddEffects( EF_NOSHADOW );
 	}
 
 	// We're always being dropped beneath the helicopter; need to not
@@ -5821,7 +5821,7 @@ void CAvoidBox::Spawn( )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->SetSolid( SOLID_BSP );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 void CAvoidBox::Activate( )
@@ -5860,7 +5860,7 @@ void CAvoidBox::ComputeAvoidanceForces( CBaseEntity *pEntity, float flEntityRadi
 
 		// NOTE: This test can be thought of sweeping a sphere through space
 		// and seeing if it intersects the avoidance box
-		float flTotalRadius = flEntityRadius + pBox->BoundingRadius();
+		float flTotalRadius = flEntityRadius + pBox->GetEngineObject()->BoundingRadius();
 		float t1, t2;
 		if ( !IntersectInfiniteRayWithSphere( vecEntityCenter, vecEntityDelta, 
 				vecAvoidCenter, flTotalRadius, &t1, &t2 ) )
@@ -5968,7 +5968,7 @@ void CBombSuppressor::Spawn( )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->SetSolid( SOLID_BSP );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 void CBombSuppressor::Activate( )

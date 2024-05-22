@@ -304,7 +304,7 @@ void CNPC_Barnacle::Spawn()
 	m_flBarnaclePullSpeed = BARNACLE_PULL_SPEED;
 
 	//Do not have a shadow
-	AddEffects( EF_NOSHADOW );
+	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	GetEngineObject()->AddFlag( FL_AIMTARGET );
 }
@@ -1589,7 +1589,7 @@ You can use this stanza to try to counterplace the constraint on the player's he
 	}
 
 	// Now hide the actual enemy
-	pTouchEnt->AddEffects( EF_NODRAW );
+	pTouchEnt->GetEngineObject()->AddEffects( EF_NODRAW );
 
 	// Increase the tongue's spring constant while lifting 
 	m_hTongueTip->m_pSpring->SetSpringConstant( BARNACLE_TONGUE_SPRING_CONSTANT_LIFTING );
@@ -1942,7 +1942,7 @@ void CNPC_Barnacle::RemoveRagdoll( bool bDestroyRagdoll )
 		// Unhide the enemy
 		if ( GetEnemy() )
 		{
-			GetEnemy()->RemoveEffects( EF_NODRAW );
+			GetEnemy()->GetEngineObject()->RemoveEffects( EF_NODRAW );
 			GetEnemy()->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		}
 	}
@@ -2664,7 +2664,7 @@ void CBarnacleTongueTip::Spawn( void )
 {
 	Precache();
 	SetModel( "models/props_junk/rock001a.mdl" );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	// We don't want this to be solid, because we don't want it to collide with the barnacle.
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );

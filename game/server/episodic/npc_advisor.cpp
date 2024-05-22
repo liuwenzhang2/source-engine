@@ -1270,7 +1270,7 @@ void CNPC_Advisor::PreHurlClearTheWay( CBaseEntity *pThrowable, const Vector &to
 	Ray_t ray;
 
 	
-	float boundingRadius = pThrowable->BoundingRadius();
+	float boundingRadius = pThrowable->GetEngineObject()->BoundingRadius();
 	
 	ray.Init( pThrowable->GetAbsOrigin(), toPos,
 			  Vector(-boundingRadius,-boundingRadius,-boundingRadius),

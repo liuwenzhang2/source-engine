@@ -125,10 +125,10 @@ void Test_RandomizeInPVS( const CCommand &args )
 		{
 			if ( RandomInt( 0, 100 ) < percent )
 			{
-				if ( pEnt->IsEffectActive( EF_NODRAW ) )
-					pEnt->RemoveEffects( EF_NODRAW );
+				if ( pEnt->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
+					pEnt->GetEngineObject()->RemoveEffects( EF_NODRAW );
 				else
-					pEnt->AddEffects( EF_NODRAW );
+					pEnt->GetEngineObject()->AddEffects( EF_NODRAW );
 			}
 		}
 	}

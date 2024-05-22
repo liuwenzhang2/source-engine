@@ -74,7 +74,7 @@ public:
 	virtual RenderGroup_t	GetRenderGroup( void ) { return RENDER_GROUP_TRANSLUCENT_ENTITY; }
 	virtual int				DrawModel( int flags );
 	virtual void			OnDataChanged( DataUpdateType_t updateType );
-	virtual bool			ShouldDraw( void ) { return (IsEffectActive(EF_NODRAW)==false); }
+	virtual bool			ShouldDraw( void ) { return (GetEngineObject()->IsEffectActive(EF_NODRAW)==false); }
 
 	CMaterialReference	m_hSpriteMaterial;
 #endif
@@ -197,7 +197,7 @@ void CRpgRocket::IgniteThink( void )
 {
 	SetMoveType( MOVETYPE_FLY );
 
-	AddEffects( EF_DIMLIGHT );
+	GetEngineObject()->AddEffects( EF_DIMLIGHT );
 
 	{
 		const char* soundname = "Weapon_RPG.RocketIgnite";
@@ -307,9 +307,9 @@ void CRpgRocket::SeekThink( void )
 	}
 	else
 	{
-		if ( IsEffectActive( EF_DIMLIGHT ) )
+		if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		{
-			ClearEffects();
+			GetEngineObject()->ClearEffects();
 		}
 
 		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.2 + vecTarget * flSpeed * 0.798 );
@@ -449,7 +449,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 	pLaserDot->m_bVisibleLaserDot = bVisibleDot;
 	pLaserDot->SetMoveType( MOVETYPE_NONE );
 	pLaserDot->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	pLaserDot->AddEffects( EF_NOSHADOW );
+	pLaserDot->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	UTIL_SetSize( pLaserDot, -Vector(6,6,6), Vector(6,6,6) );
 
 	pLaserDot->SetOwnerEntity( pOwner );
@@ -484,7 +484,7 @@ Vector CLaserDot::GetChasePosition()
 void CLaserDot::TurnOn( void )
 {
 	m_bIsOn = true;
-	RemoveEffects(EF_NODRAW);
+	GetEngineObject()->RemoveEffects(EF_NODRAW);
 
 	if ( m_bVisibleLaserDot )
 	{
@@ -499,7 +499,7 @@ void CLaserDot::TurnOn( void )
 void CLaserDot::TurnOff( void )
 {
 	m_bIsOn = false;
-	AddEffects(EF_NODRAW);
+	GetEngineObject()->AddEffects(EF_NODRAW);
 	if ( m_bVisibleLaserDot )
 	{
 		//BaseClass::TurnOff();

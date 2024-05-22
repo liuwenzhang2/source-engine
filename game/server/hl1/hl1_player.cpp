@@ -1129,7 +1129,7 @@ bool CHL1_Player::GetMissPosition( Vector *position )
 //-----------------------------------------------------------------------------
 int CHL1_Player::FlashlightIsOn( void )
 {
-	return IsEffectActive( EF_DIMLIGHT);
+	return GetEngineObject()->IsEffectActive( EF_DIMLIGHT);
 }
 
 
@@ -1139,7 +1139,7 @@ void CHL1_Player::FlashlightTurnOn( void )
 {
 	if ( IsSuitEquipped() )
 	{
-		AddEffects( EF_DIMLIGHT );
+		GetEngineObject()->AddEffects( EF_DIMLIGHT );
 		CPASAttenuationFilter filter( this );
 		g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Player.FlashlightOn" );
 
@@ -1152,7 +1152,7 @@ void CHL1_Player::FlashlightTurnOn( void )
 //-----------------------------------------------------------------------------
 void CHL1_Player::FlashlightTurnOff( void )
 {
-	RemoveEffects( EF_DIMLIGHT );
+	GetEngineObject()->RemoveEffects( EF_DIMLIGHT );
 	CPASAttenuationFilter filter( this );
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Player.FlashlightOff" );
 	m_flFlashLightTime = FLASH_CHARGE_TIME + gpGlobals->curtime;

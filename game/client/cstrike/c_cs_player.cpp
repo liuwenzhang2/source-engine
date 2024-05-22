@@ -2217,7 +2217,7 @@ void C_CSPlayer::Simulate( void )
 {
 	if( this != C_BasePlayer::GetLocalPlayer() )
 	{
-		if ( IsEffectActive( EF_DIMLIGHT ) )
+		if (GetEngineObject()->IsEffectActive( EF_DIMLIGHT ) )
 		{
 			QAngle eyeAngles = EyeAngles();
 			Vector vForward;

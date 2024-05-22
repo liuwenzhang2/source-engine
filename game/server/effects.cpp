@@ -433,7 +433,7 @@ void CGibShooter::Spawn( void )
 	Precache();
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	if ( m_flDelay < 0 )
 	{
@@ -785,7 +785,7 @@ CGib *CEnvShooter::CreateGib ( void )
 
 	if( m_bNoGibShadows )
 	{
-		pGib->AddEffects( EF_NOSHADOW );
+		pGib->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	}
 
 #if HL2_EPISODIC
@@ -1281,7 +1281,7 @@ void CEnvFunnel::Spawn( void )
 {
 	Precache();
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
 //=========================================================
@@ -1373,7 +1373,7 @@ void CEnvBeverage::Spawn( void )
 {
 	Precache();
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	m_CanInDispenser = false;
 
 	if ( m_iHealth == 0 )
@@ -1474,7 +1474,7 @@ void CItemSoda::CanTouch ( CBaseEntity *pOther )
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetMoveType( MOVETYPE_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 	SetTouch ( NULL );
 	SetThink ( &CItemSoda::SUB_Remove );
 	SetNextThink( gpGlobals->curtime );
@@ -1627,7 +1627,7 @@ void CEnvWind::Spawn( void )
 {
 	Precache();
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	m_EnvWindShared.Init( entindex(), 0, gpGlobals->frametime, GetEngineObject()->GetLocalAngles().y, 0 );
 

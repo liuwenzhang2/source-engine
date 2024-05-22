@@ -145,7 +145,7 @@ void CNPC_Bullseye::Spawn( void )
 
 	SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( BLOOD_COLOR_RED );
-	ClearEffects();
+	GetEngineObject()->ClearEffects();
 	SetGravity( 0.0 );
 
 	m_flFieldOfView = cos( DEG2RAD(m_flFieldOfView) / 2.0 );
@@ -186,7 +186,7 @@ void CNPC_Bullseye::Spawn( void )
 	{
 		m_takedamage = DAMAGE_YES;
 	}
-	AddEffects( EF_NODRAW );
+	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	//Check our water level
 	PhysicsCheckWater();

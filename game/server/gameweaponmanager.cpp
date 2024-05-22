@@ -198,7 +198,7 @@ void CGameWeaponManager::Think()
 
 		while( pWeapon )
 		{
-			if( !pWeapon->IsEffectActive( EF_NODRAW ) && pWeapon->IsRemoveable() )
+			if( !pWeapon->GetEngineObject()->IsEffectActive( EF_NODRAW ) && pWeapon->IsRemoveable() )
 			{
 				candidates.AddToTail( pWeapon );
 			}
@@ -214,7 +214,7 @@ void CGameWeaponManager::Think()
 			if ( pEntity )
 			{
 				Assert( pEntity->GetEngineObject()->GetClassname() == m_iszWeaponName);
-				if ( !pEntity->IsEffectActive( EF_NODRAW ) )
+				if ( !pEntity->GetEngineObject()->IsEffectActive( EF_NODRAW ) )
 				{
 					candidates.AddToTail( pEntity );
 				}
@@ -237,7 +237,7 @@ void CGameWeaponManager::Think()
 		bool fRemovedOne = false;
 
 		pCandidate = candidates[i];
-		Assert( !pCandidate->IsEffectActive( EF_NODRAW ) );
+		Assert( !pCandidate->GetEngineObject()->IsEffectActive( EF_NODRAW ) );
 
 		if ( gpGlobals->maxClients == 1 )
 		{
@@ -266,7 +266,7 @@ void CGameWeaponManager::Think()
 
 		if( fRemovedOne )
 		{
-			pCandidate->AddEffects( EF_NODRAW );
+			pCandidate->GetEngineObject()->AddEffects( EF_NODRAW );
 			UTIL_Remove( pCandidate );
 
 			DevMsg( 2, "Surplus %s removed\n", pszWeaponName);
