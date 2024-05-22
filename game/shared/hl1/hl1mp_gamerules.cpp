@@ -326,7 +326,7 @@ void CHL1MPRules::GoToIntermission()
 			continue;
 
 		pPlayer->ShowViewPortPanel( PANEL_SCOREBOARD );
-		pPlayer->AddFlag( FL_FROZEN );
+		pPlayer->GetEngineObject()->AddFlag( FL_FROZEN );
 	}
 #endif
 }

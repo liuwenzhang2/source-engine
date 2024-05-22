@@ -972,13 +972,13 @@ void CAI_ActBusyBehavior::HandleAnimEvent( animevent_t *pEvent )
 //-----------------------------------------------------------------------------
 void CAI_ActBusyBehavior::CheckAndCleanupOnExit( void )
 {
-	if ( m_bNeedsToPlayExitAnim && !GetOuter()->IsMarkedForDeletion() && GetOuter()->IsAlive() )
+	if ( m_bNeedsToPlayExitAnim && !GetOuter()->GetEngineObject()->IsMarkedForDeletion() && GetOuter()->IsAlive() )
 	{
 		Warning("NPC %s(%s) left actbusy without playing exit anim.\n", GetOuter()->GetDebugName(), GetOuter()->GetClassname() );
 		m_bNeedsToPlayExitAnim = false;
 	}
 
-	GetOuter()->RemoveFlag( FL_FLY );
+	GetOuter()->GetEngineObject()->RemoveFlag( FL_FLY );
 
 	// If we're supposed to use render bounds while inside the busy anim, restore normal now
 	if ( m_bUseRenderBoundsForCollision )
@@ -1097,7 +1097,7 @@ int	CAI_ActBusyBehavior::SelectScheduleForLeaving( void )
 			// Are we near it? If so, we're done. If not, move to it.
 			if ( UTIL_DistApprox( GetHintNode()->GetEngineObject()->GetAbsOrigin(), GetAbsOrigin() ) < 64 )
 			{
-				if ( !GetOuter()->IsMarkedForDeletion() )
+				if ( !GetOuter()->GetEngineObject()->IsMarkedForDeletion() )
 				{
 					CBaseEntity *pOwner = GetOuter()->GetOwnerEntity();
 					if ( pOwner )
@@ -1353,7 +1353,7 @@ int CAI_ActBusyBehavior::SelectSchedule()
 	bool bShouldNotBeBusy = (!m_bEnabled || HasCondition( COND_PLAYER_ADDED_TO_SQUAD ) || HasCondition( COND_RECEIVED_ORDERS ) );
 	if ( bShouldNotBeBusy )
 	{
-		if ( !GetOuter()->IsMarkedForDeletion() && GetOuter()->IsAlive() )
+		if ( !GetOuter()->GetEngineObject()->IsMarkedForDeletion() && GetOuter()->IsAlive() )
 			return SCHED_ACTBUSY_STOP_BUSYING;
 	}
 	else
@@ -1714,7 +1714,7 @@ void CAI_ActBusyBehavior::StartTask( const Task_t *pTask )
 			// designer has us sitting on a chair, etc.
 			if( !pBusyAnim || !pBusyAnim->bUseAutomovement )
 			{
-				GetOuter()->AddFlag( FL_FLY );
+				GetOuter()->GetEngineObject()->AddFlag( FL_FLY );
 			}
 
 			GetOuter()->GetEngineObject()->SetGroundEntity( NULL );
@@ -1816,7 +1816,7 @@ void CAI_ActBusyBehavior::StartTask( const Task_t *pTask )
 			// designer has us sitting on a chair, etc.
 			if( !pBusyAnim || !pBusyAnim->bUseAutomovement )
 			{
-				GetOuter()->AddFlag( FL_FLY );
+				GetOuter()->GetEngineObject()->AddFlag( FL_FLY );
 			}
 
 			GetOuter()->GetEngineObject()->SetGroundEntity( NULL );
@@ -1883,7 +1883,7 @@ void CAI_ActBusyBehavior::StartTask( const Task_t *pTask )
 			if ( !PlayAnimForActBusy( BA_EXIT ) )
 			{
 				m_bNeedsToPlayExitAnim = false;
-				GetOuter()->RemoveFlag( FL_FLY );
+				GetOuter()->GetEngineObject()->RemoveFlag( FL_FLY );
 				NotifyBusyEnding();
 				TaskComplete();
 			}
@@ -2118,7 +2118,7 @@ void CAI_ActBusyBehavior::RunTask( const Task_t *pTask )
 			if ( GetOuter()->IsSequenceFinished() )
 			{
 				m_bNeedsToPlayExitAnim = false;
-				GetOuter()->RemoveFlag( FL_FLY );
+				GetOuter()->GetEngineObject()->RemoveFlag( FL_FLY );
 				NotifyBusyEnding();
 				TaskComplete();
 			}

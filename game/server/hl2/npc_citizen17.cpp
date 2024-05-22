@@ -2863,7 +2863,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 	const float UNCONDITIONAL_JOIN_PLAYER_XY_TOLERANCE_SQ = Square(12*12);
 	const float UNCONDITIONAL_JOIN_PLAYER_Z_TOLERANCE = 5*12;
 	const float SECOND_TIER_JOIN_DIST_SQ = Square(48*12);
-	if ( pPlayer && ShouldAutosquad() && !(pPlayer->GetFlags() & FL_NOTARGET ) && pPlayer->IsAlive() )
+	if ( pPlayer && ShouldAutosquad() && !(pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET ) && pPlayer->IsAlive() )
 	{
 		CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
 		CUtlVector<SquadCandidate_t> candidates;

@@ -187,7 +187,7 @@ public:
 	virtual float		GetIdleTime( void ) const { return ( m_flIdleTime - m_flMoveTime ); }
 	virtual float		GetMoveTime( void ) const { return ( m_flMoveTime - m_flIdleTime ); }
 	virtual float		GetLastDamageTime( void ) const { return m_flLastDamageTime; }
-	virtual bool		IsDucking( void ) const { return !!( GetFlags() & FL_DUCKING ); }
+	virtual bool		IsDucking( void ) const { return !!(GetEngineObject()->GetFlags() & FL_DUCKING ); }
 
 	virtual bool		PassesDamageFilter( const CTakeDamageInfo &info );
 	void				InputIgnoreFallDamage( inputdata_t &inputdata );

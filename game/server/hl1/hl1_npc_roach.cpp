@@ -346,9 +346,9 @@ void CNPC_Roach::Look ( int iDistance )
 	for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), iDistance ); ( pSightEnt = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 	{
 		// only consider ents that can be damaged. !!!temporarily only considering other monsters and clients
-		if (  pSightEnt->IsPlayer() || FBitSet ( pSightEnt->GetFlags(), FL_NPC ) )
+		if (  pSightEnt->IsPlayer() || FBitSet ( pSightEnt->GetEngineObject()->GetFlags(), FL_NPC ) )
 		{
-			if ( /*FVisible( pSightEnt ) &&*/ !FBitSet( pSightEnt->GetFlags(), FL_NOTARGET ) && pSightEnt->m_iHealth > 0 )
+			if ( /*FVisible( pSightEnt ) &&*/ !FBitSet( pSightEnt->GetEngineObject()->GetFlags(), FL_NOTARGET ) && pSightEnt->m_iHealth > 0 )
 			{
 				// don't add the Enemy's relationship to the conditions. We only want to worry about conditions when
 				// we see monsters other than the Enemy.

@@ -880,7 +880,7 @@ void CFuncTank::TrackTarget( void )
 		else
 		{
 			CBaseEntity *pEntity = (CBaseEntity *)m_hTarget;
-			if ( !pEntity || ( pEntity->GetFlags() & FL_NOTARGET ) )
+			if ( !pEntity || ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET ) )
 			{
 				if ( m_targetEntityName != NULL_STRING )	// New HL2 behavior
 				{

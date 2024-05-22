@@ -421,7 +421,7 @@ bool CDODBombTarget::CanPlayerStartDefuse( CDODPlayer *pPlayer )
 		return false;
 	}
 
-	if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+	if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 	{
 		// they are not on the ground, remove them
 		pPlayer->HintMessage( HINT_BOMB_DEFUSE_ONGROUND );
@@ -554,7 +554,7 @@ void CDODBombTarget::State_Use_ACTIVE( CBaseEntity *pActivator, CBaseEntity *pCa
 		return;
 	}
 
-	if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+	if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 	{
 		pPlayer->HintMessage( HINT_BOMB_DEFUSE_ONGROUND, true );
 		return;

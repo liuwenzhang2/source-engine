@@ -3481,7 +3481,7 @@ void CClientShadowMgr::AddShadowToReceiver( ClientShadowHandle_t handle,
 			// Also don't add them unless an NPC or player casts them..
 			// They are wickedly expensive!!!
 			C_BaseEntity *pEnt = pSourceRenderable->GetIClientUnknown()->GetBaseEntity();
-			if ( pEnt && ( pEnt->GetFlags() & (FL_NPC | FL_CLIENT)) )
+			if ( pEnt && ( pEnt->GetEngineObject()->GetFlags() & (FL_NPC | FL_CLIENT)) )
 			{
 				staticpropmgr->AddShadowToStaticProp( shadow.m_ShadowHandle, pRenderable );
 			}

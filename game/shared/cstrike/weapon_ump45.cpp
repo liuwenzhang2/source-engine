@@ -96,7 +96,7 @@ float CWeaponUMP45::GetInaccuracy() const
 		if ( !pPlayer )
 			return 0.0f;
 	
-		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+		if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 			return 0.24f * m_flAccuracy;
 		else
 			return 0.04f * m_flAccuracy;
@@ -120,11 +120,11 @@ void CWeaponUMP45::PrimaryAttack()
 		return;
 
 	// Kick the gun based on the state of the player.
-	if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+	if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 		pPlayer->KickBack (0.125, 0.65, 0.55, 0.0475, 5.5, 4, 10);
 	else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 		pPlayer->KickBack (0.55, 0.3, 0.225, 0.03, 3.5, 2.5, 10);
-	else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
+	else if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING ) )
 		pPlayer->KickBack (0.25, 0.175, 0.125, 0.02, 2.25, 1.25, 10);
 	else
 		pPlayer->KickBack (0.275, 0.2, 0.15, 0.0225, 2.5, 1.5, 10);

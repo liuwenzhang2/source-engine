@@ -115,7 +115,7 @@ void FireTargets( const char *targetName, CBaseEntity *pActivator, CBaseEntity *
 		if ( !pTarget )
 			break;
 
-		if (!pTarget->IsMarkedForDeletion() )	// Don't use dying ents
+		if (!pTarget->GetEngineObject()->IsMarkedForDeletion() )	// Don't use dying ents
 		{
 			DevMsg( 2, "[%03d] Found: %s, firing (%s)\n", gpGlobals->tickcount%1000, pTarget->GetDebugName(), targetName );
 			pTarget->Use( pActivator, pCaller, useType, value );

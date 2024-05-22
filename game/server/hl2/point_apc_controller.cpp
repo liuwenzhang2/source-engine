@@ -345,7 +345,7 @@ void CAPCController::TrackTarget( void )
 	barrelEnd = WorldBarrelPosition();
 	Vector worldTargetPosition;
 	CBaseEntity *pEntity = (CBaseEntity *)m_hTarget;
-	if ( !pEntity || ( pEntity->GetFlags() & FL_NOTARGET ) )
+	if ( !pEntity || ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET ) )
 	{
 		m_hTarget = FindTarget( m_targetEntityName, NULL );
 		if ( IsActive() )

@@ -231,7 +231,7 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 
 	speed = GetEngineObject()->GetAbsVelocity().Length2D();
 
-	if (GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
+	if (GetEngineObject()->GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
 	{
 		speed = 0;
 		playerAnim = PLAYER_IDLE;
@@ -284,7 +284,7 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 	}
 	else if (playerAnim == PLAYER_IDLE || playerAnim == PLAYER_WALK)
 	{
-		if ( !( GetFlags() & FL_ONGROUND ) && (GetActivity() == ACT_HOP || GetActivity() == ACT_LEAP) )	// Still jumping
+		if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) && (GetActivity() == ACT_HOP || GetActivity() == ACT_LEAP) )	// Still jumping
 		{
 			idealActivity = GetActivity();
 		}
@@ -308,7 +308,7 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 
 	if (idealActivity == ACT_RANGE_ATTACK1)
 	{
-		if ( GetFlags() & FL_DUCKING )	// crouching
+		if (GetEngineObject()->GetFlags() & FL_DUCKING )	// crouching
 		{
 			Q_strncpy( szAnim, "crouch_shoot_" ,sizeof(szAnim));
 		}
@@ -337,7 +337,7 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 	}
 	else if (idealActivity == ACT_IDLE)
 	{
-		if ( GetFlags() & FL_DUCKING )
+		if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			animDesired = LookupSequence( "crouch_idle" );
 		}
@@ -352,7 +352,7 @@ void CHL1MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 	}
 	else if ( idealActivity == ACT_WALK )
 	{
-		if ( GetFlags() & FL_DUCKING )
+		if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			animDesired = SelectWeightedSequence( ACT_CROUCH );
 			SetActivity( ACT_CROUCH );
@@ -429,12 +429,12 @@ bool CHL1MP_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	}
 
 	// Don't let the player fetch weapons through walls (use MASK_SOLID so that you can't pickup through windows)
-	if( !pWeapon->FVisible( this, MASK_SOLID ) && !(GetFlags() & FL_NOTARGET) )
+	if( !pWeapon->FVisible( this, MASK_SOLID ) && !(GetEngineObject()->GetFlags() & FL_NOTARGET) )
 	{
         if ( sv_debugweaponpickup.GetBool() && !FVisible( this, MASK_SOLID ) )
             Msg("sv_debugweaponpickup: Can't fetch weapon through a wall\n");
 
-        if ( sv_debugweaponpickup.GetBool() && !(GetFlags() & FL_NOTARGET) )
+        if ( sv_debugweaponpickup.GetBool() && !(GetEngineObject()->GetFlags() & FL_NOTARGET) )
             Msg("sv_debugweaponpickup: NoTarget\n");
         
 		return false;

@@ -100,7 +100,7 @@ float CWeaponAug::GetInaccuracy() const
 		if ( !pPlayer )
 			return 0.0f;
 	
-		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+		if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 			return 0.035f + 0.4f * m_flAccuracy;
 	
 		else if ( pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 140 )
@@ -136,10 +136,10 @@ void CWeaponAug::PrimaryAttack()
 	if ( pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5 )
 		 pPlayer->KickBack ( 1, 0.45, 0.275, 0.05, 4, 2.5, 7 );
 	
-	else if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+	else if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 		pPlayer->KickBack ( 1.25, 0.45, 0.22, 0.18, 5.5, 4, 5 );
 	
-	else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
+	else if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING ) )
 		pPlayer->KickBack ( 0.575, 0.325, 0.2, 0.011, 3.25, 2, 8 );
 	
 	else

@@ -139,7 +139,7 @@ void CPortalPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t event, int nDat
 			if ( pWpn )
 			{
 				// Weapon primary fire.
-				if ( GetBasePlayer()->GetFlags() & FL_DUCKING )
+				if ( GetBasePlayer()->GetEngineObject()->GetFlags() & FL_DUCKING )
 				{
 					RestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_MP_ATTACK_CROUCH_PRIMARYFIRE );
 				}
@@ -259,7 +259,7 @@ bool CPortalPlayerAnimState::HandleJumping( Activity &idealActivity )
 	if ( ( vecVelocity.z > 300.0f || m_bInAirWalk ) )
 	{
 		// Check to see if we were in an airwalk and now we are basically on the ground.
-		if ( GetBasePlayer()->GetFlags() & FL_ONGROUND )
+		if ( GetBasePlayer()->GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{				
 			m_bInAirWalk = false;
 			RestartMainSequence();
@@ -287,7 +287,7 @@ bool CPortalPlayerAnimState::HandleJumping( Activity &idealActivity )
 			// on-ground flag set right when the message comes in.
 			else if ( gpGlobals->curtime - m_flJumpStartTime > 0.2f )
 			{
-				if ( GetBasePlayer()->GetFlags() & FL_ONGROUND )
+				if ( GetBasePlayer()->GetEngineObject()->GetFlags() & FL_ONGROUND )
 				{
 					m_bJumping = false;
 					RestartMainSequence();

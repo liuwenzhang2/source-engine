@@ -205,7 +205,7 @@ bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker,
 	for ( int i = m_LightSources.Count() - 1; i >= 0; i-- )
 	{
 		// Removed?
-		if ( m_LightSources[i].hEntity == NULL || m_LightSources[i].hEntity->IsMarkedForDeletion() )
+		if ( m_LightSources[i].hEntity == NULL || m_LightSources[i].hEntity->GetEngineObject()->IsMarkedForDeletion() )
 		{
 			m_LightSources.FastRemove( i );
 			continue;
@@ -316,7 +316,7 @@ bool CDarknessLightSourcesSystem::AreThereLightSourcesWithinRadius( CBaseEntity 
 	for ( int i = m_LightSources.Count() - 1; i >= 0; i-- )
 	{
 		// Removed?
-		if ( m_LightSources[i].hEntity == NULL || m_LightSources[i].hEntity->IsMarkedForDeletion() )
+		if ( m_LightSources[i].hEntity == NULL || m_LightSources[i].hEntity->GetEngineObject()->IsMarkedForDeletion() )
 		{
 			m_LightSources.FastRemove( i );
 			continue;

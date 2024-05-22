@@ -745,7 +745,7 @@ void CPrediction::SetupMove( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper *
 
 
 	// Ingore buttons for movement if at controls
-	if (player->GetFlags() & FL_ATCONTROLS)
+	if (player->GetEngineObject()->GetFlags() & FL_ATCONTROLS)
 	{
 		move->m_flForwardMove		= 0;
 		move->m_flSideMove			= 0;
@@ -1292,7 +1292,7 @@ void CPrediction::RunSimulation( int current_command, float curtime, CUserCmd *c
 		}
 
 		// Player can't be this so cull other entities here
-		if ( entity->GetFlags() & FL_STATICPROP )
+		if ( entity->GetEngineObject()->GetFlags() & FL_STATICPROP )
 		{
 			continue;
 		}

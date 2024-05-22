@@ -51,7 +51,7 @@ void CFuncWall::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	// If it can't move/go away, it's really part of the world
-	AddFlag( FL_WORLDBRUSH );
+	GetEngineObject()->AddFlag( FL_WORLDBRUSH );
 
 	// set manual mode
 	CreateVPhysics();
@@ -215,7 +215,7 @@ void CFuncVehicleClip::Spawn()
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	// It's part of the world
-	AddFlag( FL_WORLDBRUSH );
+	GetEngineObject()->AddFlag( FL_WORLDBRUSH );
 
 	CreateVPhysics();
 
@@ -314,7 +314,7 @@ void CFuncConveyor::Spawn( void )
 	BaseClass::Spawn();
 
 	if ( !GetEngineObject()->HasSpawnFlags(SF_CONVEYOR_VISUAL) )
-		AddFlag( FL_CONVEYOR );
+		GetEngineObject()->AddFlag( FL_CONVEYOR );
 
 	// HACKHACK - This is to allow for some special effects
 	if (GetEngineObject()->HasSpawnFlags( SF_CONVEYOR_NOTSOLID ) )

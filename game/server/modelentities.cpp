@@ -55,7 +55,7 @@ void CFuncBrush::Spawn( void )
 	
 	// If it can't move/go away, it's really part of the world
 	if ( !GetEntityName() || !GetEngineObject()->GetParentName() )
-		AddFlag( FL_WORLDBRUSH );
+		GetEngineObject()->AddFlag( FL_WORLDBRUSH );
 
 	CreateVPhysics();
 
@@ -236,13 +236,13 @@ public:
 	// input functions
 	void InputEnable( inputdata_t &inputdata )
 	{
-		RemoveFlag( FL_DONTTOUCH );
+		GetEngineObject()->RemoveFlag( FL_DONTTOUCH );
 	}
 
 	void InputDisable( inputdata_t &inputdata )
 	{
 		// this ensures that all the remaining EndTouch() calls still get passed through
-		AddFlag( FL_DONTTOUCH );
+		GetEngineObject()->AddFlag( FL_DONTTOUCH );
 	}
 
 	// outputs
@@ -356,7 +356,7 @@ bool CTriggerBrush::PassesInputFilter( CBaseEntity *pOther, int filter )
 		return false;
 
 	// NPCs
-	if ( (filter & TRIGGER_IGNORENPCS) && pOther->entindex()!=-1 && (pOther->GetFlags() & FL_NPC) )
+	if ( (filter & TRIGGER_IGNORENPCS) && pOther->entindex()!=-1 && (pOther->GetEngineObject()->GetFlags() & FL_NPC) )
 		return false;
 
 	// pushables

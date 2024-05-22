@@ -1429,7 +1429,7 @@ static CDODViewVectors g_DODViewVectors(
 
 			if ( pPlayer )
 			{
-				pPlayer->AddFlag( FL_FROZEN );
+				pPlayer->GetEngineObject()->AddFlag( FL_FROZEN );
 
 				pPlayer->StatEvent_UploadStats();
 			}

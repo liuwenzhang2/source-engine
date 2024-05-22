@@ -2614,7 +2614,7 @@ void CNPC_Manhack::StartEngine( bool fStartSound )
 	// Under powered flight now.
 	// SetMoveType( MOVETYPE_STEP );
 	// SetGravity( MANHACK_GRAVITY );
-	AddFlag( FL_FLY );
+	GetEngineObject()->AddFlag( FL_FLY );
 }
 
 

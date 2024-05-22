@@ -281,7 +281,7 @@ int CNPC_HAssassin::RangeAttack1Conditions ( float flDot, float flDist )
 int CNPC_HAssassin::RangeAttack2Conditions ( float flDot, float flDist )
 {
 	m_fThrowGrenade = false;
-	if ( !FBitSet ( GetEnemy()->GetFlags(), FL_ONGROUND ) )
+	if ( !FBitSet ( GetEnemy()->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 	{
 		// don't throw grenades at anything that isn't on the ground!
 		return COND_NONE;
@@ -371,7 +371,7 @@ void CNPC_HAssassin::RunTask ( const Task_t *pTask )
 			ResetSequenceInfo( );
 		}
 
-		if ( GetFlags() & FL_ONGROUND)
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 		{
 			TaskComplete( );
 		}
@@ -434,7 +434,7 @@ int CNPC_HAssassin::SelectSchedule ( void )
 			// flying?
 			if ( GetMoveType() == MOVETYPE_FLYGRAVITY )
 			{
-				if ( GetFlags() & FL_ONGROUND )
+				if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 				{
 					//Msg( "landed\n" );
 					// just landed
@@ -647,7 +647,7 @@ int CNPC_HAssassin::TranslateSchedule ( int scheduleType )
 
 	case SCHED_MELEE_ATTACK1:
 
-		if ( GetFlags() & FL_ONGROUND)
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 		{
 			if (m_flNextJump > gpGlobals->curtime)
 			{
@@ -677,7 +677,7 @@ void CNPC_HAssassin::RunAI( void )
 
 	// always visible if moving
 	// always visible is not on hard
-	if (g_iSkillLevel != SKILL_HARD || GetEnemy() == NULL || m_lifeState == LIFE_DEAD || GetActivity() == ACT_RUN || GetActivity() == ACT_WALK || !(GetFlags() & FL_ONGROUND))
+	if (g_iSkillLevel != SKILL_HARD || GetEnemy() == NULL || m_lifeState == LIFE_DEAD || GetActivity() == ACT_RUN || GetActivity() == ACT_WALK || !(GetEngineObject()->GetFlags() & FL_ONGROUND))
 		m_iTargetRanderamt = 255;
 	else
 		m_iTargetRanderamt = 20;

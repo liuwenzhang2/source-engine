@@ -378,7 +378,7 @@ END_PREDICTION_DATA()
 			//if the defusing process has not ended yet
 			if ( m_flDefuseCountDown > gpGlobals->curtime)
 			{
-				int iOnGround = FBitSet( m_pBombDefuser->GetFlags(), FL_ONGROUND );
+				int iOnGround = FBitSet( m_pBombDefuser->GetEngineObject()->GetFlags(), FL_ONGROUND );
 
 				//if the bomb defuser has stopped defusing the bomb
 				if( m_flNextDefuse < gpGlobals->curtime || !iOnGround )
@@ -907,7 +907,7 @@ void CC4::PrimaryAttack()
 	if ( !pPlayer )
 		return;
 
-	int onGround = FBitSet( pPlayer->GetFlags(), FL_ONGROUND );
+	int onGround = FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND );
 	CBaseEntity* groundEntity = (onGround) ? (pPlayer->GetEngineObject()->GetGroundEntity() ? pPlayer->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL) : NULL;
 	if ( groundEntity )
 	{

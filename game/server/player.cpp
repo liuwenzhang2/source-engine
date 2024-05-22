@@ -1123,7 +1123,7 @@ int CBasePlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 			return 0;
 	}
 
-	if ( GetFlags() & FL_GODMODE )
+	if (GetEngineObject()->GetFlags() & FL_GODMODE )
 		return 0;
 
 	if ( m_debugOverlays & OVERLAY_BUDDHA_MODE ) 
@@ -1803,7 +1803,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 
 	speed = GetEngineObject()->GetAbsVelocity().Length2D();
 
-	if (GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
+	if (GetEngineObject()->GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
 	{
 		speed = 0;
 		playerAnim = PLAYER_IDLE;
@@ -1844,7 +1844,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 	}
 	else if (playerAnim == PLAYER_IDLE || playerAnim == PLAYER_WALK)
 	{
-		if ( !( GetFlags() & FL_ONGROUND ) && (m_Activity == ACT_HOP || m_Activity == ACT_LEAP) )	// Still jumping
+		if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) && (m_Activity == ACT_HOP || m_Activity == ACT_LEAP) )	// Still jumping
 		{
 			idealActivity = m_Activity;
 		}
@@ -1864,7 +1864,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 	
 	if (idealActivity == ACT_RANGE_ATTACK1)
 	{
-		if ( GetFlags() & FL_DUCKING )	// crouching
+		if (GetEngineObject()->GetFlags() & FL_DUCKING )	// crouching
 		{
 			Q_strncpy( szAnim, "crouch_shoot_" ,sizeof(szAnim));
 		}
@@ -1895,7 +1895,7 @@ void CBasePlayer::SetAnimation( PLAYER_ANIM playerAnim )
 	{
 		if (GetActivity() != ACT_RANGE_ATTACK1 || IsActivityFinished())
 		{
-			if ( GetFlags() & FL_DUCKING )	// crouching
+			if (GetEngineObject()->GetFlags() & FL_DUCKING )	// crouching
 			{
 				Q_strncpy( szAnim, "crouch_aim_" ,sizeof(szAnim));
 			}
@@ -2025,7 +2025,7 @@ void CBasePlayer::WaterMove()
 		m_bitsDamageType &= ~DMG_DROWNRECOVER;
 		m_rgbTimeBasedDamage[itbd_DrownRecover] = 0;
 
-		if (m_AirFinished < gpGlobals->curtime && !(GetFlags() & FL_GODMODE) )		// drown!
+		if (m_AirFinished < gpGlobals->curtime && !(GetEngineObject()->GetFlags() & FL_GODMODE) )		// drown!
 		{
 			if (m_PainFinished < gpGlobals->curtime)
 			{
@@ -2122,7 +2122,7 @@ void CBasePlayer::PlayerDeathThink(void)
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
-	if (GetFlags() & FL_ONGROUND)
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 	{
 		flForward = GetEngineObject()->GetAbsVelocity().Length() - 20;
 		if (flForward <= 0)
@@ -2309,7 +2309,7 @@ bool CBasePlayer::StartObserverMode(int mode)
 
 	GetEngineObject()->SetGroundEntity( NULL );
 	
-	RemoveFlag( FL_DUCKING );
+	GetEngineObject()->RemoveFlag( FL_DUCKING );
 	
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
@@ -2479,13 +2479,13 @@ void CBasePlayer::CheckObserverSettings()
 		{
 			int flagMask =	FL_ONGROUND | FL_DUCKING ;
 
-			int flags = target->GetFlags() & flagMask;
+			int flags = target->GetEngineObject()->GetFlags() & flagMask;
 
-			if ( (GetFlags() & flagMask) != flags )
+			if ( (GetEngineObject()->GetFlags() & flagMask) != flags )
 			{
-				flags |= GetFlags() & (~flagMask); // keep other flags
-				ClearFlags();
-				AddFlag( flags );
+				flags |= GetEngineObject()->GetFlags() & (~flagMask); // keep other flags
+				GetEngineObject()->ClearFlags();
+				GetEngineObject()->AddFlag( flags );
 			}
 
 			if ( target->GetViewOffset() != GetViewOffset()	)
@@ -3707,7 +3707,7 @@ void CBasePlayer::PlayerRunCommand(CUserCmd *ucmd, IMoveHelper *moveHelper)
 
 	// Handle FL_FROZEN.
 	// Prevent player moving for some seconds after New Game, so that they pick up everything
-	if( GetFlags() & FL_FROZEN || 
+	if(GetEngineObject()->GetFlags() & FL_FROZEN ||
 		(developer.GetInt() == 0 && gpGlobals->eLoadType == MapLoad_NewGame && gpGlobals->curtime < 3.0 ) )
 	{
 		ucmd->forwardmove = 0;
@@ -3775,9 +3775,9 @@ void CBasePlayer::UnforceButtons( int nButtons )
 void CBasePlayer::HandleFuncTrain(void)
 {
 	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
-		AddFlag( FL_ONTRAIN );
+		GetEngineObject()->AddFlag( FL_ONTRAIN );
 	else 
-		RemoveFlag( FL_ONTRAIN );
+		GetEngineObject()->RemoveFlag( FL_ONTRAIN );
 
 	// Train speed control
 	if (( m_afPhysicsFlags & PFLAG_DIROVERRIDE ) == 0)
@@ -3837,7 +3837,7 @@ void CBasePlayer::HandleFuncTrain(void)
 			}
 		}
 	}
-	else if ( !( GetFlags() & FL_ONGROUND ) || pTrain->GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL ) || (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT) ) )
+	else if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) || pTrain->GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL ) || (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT) ) )
 	{
 		// Turn off the train if you jump, strafe, or the train controls go dead
 		m_afPhysicsFlags &= ~PFLAG_DIROVERRIDE;
@@ -3913,13 +3913,13 @@ void CBasePlayer::PreThink(void)
 	}
 
 	// If trying to duck, already ducked, or in the process of ducking
-	if ((m_nButtons & IN_DUCK) || (GetFlags() & FL_DUCKING) || (m_afPhysicsFlags & PFLAG_DUCKING) )
+	if ((m_nButtons & IN_DUCK) || (GetEngineObject()->GetFlags() & FL_DUCKING) || (m_afPhysicsFlags & PFLAG_DUCKING) )
 		Duck();
 
 	//
 	// If we're not on the ground, we're falling. Update our falling velocity.
 	//
-	if ( !( GetFlags() & FL_ONGROUND ) )
+	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
 		m_Local.m_flFallVelocity = -GetEngineObject()->GetAbsVelocity().z;
 	}
@@ -4407,14 +4407,14 @@ void CBasePlayer::UpdatePlayerSound ( void )
 		return;
 	}
 
-	if (GetFlags() & FL_NOTARGET)
+	if (GetEngineObject()->GetFlags() & FL_NOTARGET)
 	{
 		pSound->m_iVolume = 0;
 		return;
 	}
 
 	// now figure out how loud the player's movement is.
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{	
 		iBodyVolume = GetEngineObject()->GetAbsVelocity().Length();
 
@@ -4565,7 +4565,7 @@ void CBasePlayer::PostThink()
 		{
 			// set correct collision bounds (may have changed in player movement code)
 			VPROF_SCOPE_BEGIN( "CBasePlayer::PostThink-Bounds" );
-			if ( GetFlags() & FL_DUCKING )
+			if (GetEngineObject()->GetFlags() & FL_DUCKING )
 			{
 				GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 			}
@@ -4603,7 +4603,7 @@ void CBasePlayer::PostThink()
 			ItemPostFrame();
 			VPROF_SCOPE_END();
 
-			if ( GetFlags() & FL_ONGROUND )
+			if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 			{		
 				if (m_Local.m_flFallVelocity > 64 && !g_pGameRules->IsMultiplayer())
 				{
@@ -4620,7 +4620,7 @@ void CBasePlayer::PostThink()
 				SetAnimation( PLAYER_IN_VEHICLE );
 			else if (!GetEngineObject()->GetAbsVelocity().x && !GetEngineObject()->GetAbsVelocity().y)
 				SetAnimation( PLAYER_IDLE );
-			else if ((GetEngineObject()->GetAbsVelocity().x || GetEngineObject()->GetAbsVelocity().y) && ( GetFlags() & FL_ONGROUND ))
+			else if ((GetEngineObject()->GetAbsVelocity().x || GetEngineObject()->GetAbsVelocity().y) && (GetEngineObject()->GetFlags() & FL_ONGROUND ))
 				SetAnimation( PLAYER_WALK );
 			else if (GetWaterLevel() > 1)
 				SetAnimation( PLAYER_WALK );
@@ -4703,7 +4703,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 
 	IPhysicsObject *pPhysGround = GetGroundVPhysics();
 
-	if ( !pPhysGround && m_touchedPhysObject && g_pMoveData->m_outStepHeight <= 0.f && (GetFlags() & FL_ONGROUND) )
+	if ( !pPhysGround && m_touchedPhysObject && g_pMoveData->m_outStepHeight <= 0.f && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
 	{
 		newPosition = m_oldOrigin + frametime * g_pMoveData->m_outWishVel;
 		newPosition = (GetEngineObject()->GetAbsOrigin() * 0.5f) + (newPosition * 0.5f);
@@ -4714,7 +4714,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 	{
 		collisionState = VPHYS_NOCLIP;
 	}
-	else if ( GetFlags() & FL_DUCKING )
+	else if (GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		collisionState = VPHYS_CROUCH;
 	}
@@ -4766,7 +4766,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 
 void CBasePlayer::UpdateVPhysicsPosition( const Vector &position, const Vector &velocity, float secondsToArrival )
 {
-	bool onground = (GetFlags() & FL_ONGROUND) ? true : false;
+	bool onground = (GetEngineObject()->GetFlags() & FL_ONGROUND) ? true : false;
 	IPhysicsObject *pPhysGround = GetGroundVPhysics();
 	
 	// if the object is much heavier than the player, treat it as a local coordinate system
@@ -4959,18 +4959,18 @@ void CBasePlayer::Spawn( void )
 	m_iMaxHealth		= m_iHealth;
 
 	// Clear all flags except for FL_FULLEDICT
-	if ( GetFlags() & FL_FAKECLIENT )
+	if (GetEngineObject()->GetFlags() & FL_FAKECLIENT )
 	{
-		ClearFlags();
-		AddFlag( FL_CLIENT | FL_FAKECLIENT );
+		GetEngineObject()->ClearFlags();
+		GetEngineObject()->AddFlag( FL_CLIENT | FL_FAKECLIENT );
 	}
 	else
 	{
-		ClearFlags();
-		AddFlag( FL_CLIENT );
+		GetEngineObject()->ClearFlags();
+		GetEngineObject()->AddFlag( FL_CLIENT );
 	}
 
-	AddFlag( FL_AIMTARGET );
+	GetEngineObject()->AddFlag( FL_AIMTARGET );
 
 	m_AirFinished	= gpGlobals->curtime + AIRTIME;
 	m_nDrownDmgRate	= DROWNING_DAMAGE_INITIAL;
@@ -5250,7 +5250,7 @@ int CBasePlayer::Restore( IRestore &restore )
 	// clear this - it will get reset by touching the trigger again
 	m_afPhysicsFlags &= ~PFLAG_VPHYSICS_MOTIONCONTROLLER;
 
-	if ( GetFlags() & FL_DUCKING ) 
+	if (GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		// Use the crouch HACK
 		FixPlayerCrouchStuck( this );
@@ -5514,7 +5514,7 @@ bool CBasePlayer::GetInVehicle( IServerVehicle *pVehicle, int nRole )
 	
 	// We cannot be ducking -- do all this before SetPassenger because it
 	// saves our view offset for restoration when we exit the vehicle.
-	RemoveFlag( FL_DUCKING );
+	GetEngineObject()->RemoveFlag( FL_DUCKING );
 	SetViewOffset( VEC_VIEW_SCALED( this ) );
 	m_Local.m_bDucked = false;
 	m_Local.m_bDucking  = false;
@@ -5748,7 +5748,7 @@ CBaseEntity	*CBasePlayer::GiveNamedItem( const char *pszName, int iSubType )
 
 	DispatchSpawn( pent );
 
-	if ( pent != NULL && !(pent->IsMarkedForDeletion()) ) 
+	if ( pent != NULL && !(pent->GetEngineObject()->IsMarkedForDeletion()) )
 	{
 		pent->Touch( this );
 	}
@@ -6647,7 +6647,7 @@ bool CBasePlayer::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	else
 	{
 		// Don't let the player fetch weapons through walls (use MASK_SOLID so that you can't pickup through windows)
-		if( pWeapon->FVisible( this, MASK_SOLID ) == false && !(GetFlags() & FL_NOTARGET) )
+		if( pWeapon->FVisible( this, MASK_SOLID ) == false && !(GetEngineObject()->GetFlags() & FL_NOTARGET) )
 			return false;
 	}
 	
@@ -6925,9 +6925,9 @@ void CBasePlayer::RumbleEffect( unsigned char index, unsigned char rumbleData, u
 void CBasePlayer::EnableControl(bool fControl)
 {
 	if (!fControl)
-		AddFlag( FL_FROZEN );
+		GetEngineObject()->AddFlag( FL_FROZEN );
 	else
-		RemoveFlag( FL_FROZEN );
+		GetEngineObject()->RemoveFlag( FL_FROZEN );
 
 }
 
@@ -7154,7 +7154,7 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 
 				if( bAimAtThis )
 				{
-					if ( pEntHit->GetFlags() & FL_AIMTARGET )
+					if ( pEntHit->GetEngineObject()->GetFlags() & FL_AIMTARGET )
 					{
 						m_fOnTarget = true;
 					}
@@ -7234,7 +7234,7 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 			if( dot < 0 )
 				continue;
 
-			if( !(pEntity->GetFlags() & FL_FLY) )
+			if( !(pEntity->GetEngineObject()->GetFlags() & FL_FLY) )
 			{
 				// Refuse to take wild shots at targets far from reticle.
 				if( GetActiveWeapon() != NULL && dot < GetActiveWeapon()->GetMaxAutoAimDeflection() )
@@ -7571,7 +7571,7 @@ void CBasePlayer::LockPlayerInPlace( void )
 	if ( m_iPlayerLocked )
 		return;
 
-	AddFlag( FL_GODMODE | FL_FROZEN );
+	GetEngineObject()->AddFlag( FL_GODMODE | FL_FROZEN );
 	SetMoveType( MOVETYPE_NONE );
 	m_iPlayerLocked = true;
 
@@ -7588,7 +7588,7 @@ void CBasePlayer::UnlockPlayer( void )
 	if ( !m_iPlayerLocked )
 		return;
 
-	RemoveFlag( FL_GODMODE | FL_FROZEN );
+	GetEngineObject()->RemoveFlag( FL_GODMODE | FL_FROZEN );
 	SetMoveType( MOVETYPE_WALK );
 	m_iPlayerLocked = false;
 }
@@ -7763,7 +7763,7 @@ void CRevertSaved::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	{
 		//Adrian: Setting this flag so we can't move or save a game.
 		pPlayer->pl.deadflag = true;
-		pPlayer->AddFlag( (FL_NOTARGET|FL_FROZEN) );
+		pPlayer->GetEngineObject()->AddFlag( (FL_NOTARGET|FL_FROZEN) );
 
 		// clear any pending autosavedangerous
 		g_ServerGameDLL.m_fAutoSaveDangerousTime = 0.0f;
@@ -7789,7 +7789,7 @@ void CRevertSaved::InputReload( inputdata_t &inputdata )
 	{
 		//Adrian: Setting this flag so we can't move or save a game.
 		pPlayer->pl.deadflag = true;
-		pPlayer->AddFlag( (FL_NOTARGET|FL_FROZEN) );
+		pPlayer->GetEngineObject()->AddFlag( (FL_NOTARGET|FL_FROZEN) );
 
 		// clear any pending autosavedangerous
 		g_ServerGameDLL.m_fAutoSaveDangerousTime = 0.0f;
@@ -7958,14 +7958,6 @@ void CMovementSpeedMod::InputSpeedMod(inputdata_t &data)
 	}
 }
 
-
-void SendProxy_CropFlagsToPlayerFlagBitsLength( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID)
-{
-	int mask = (1<<PLAYER_FLAG_BITS) - 1;
-	int data = *(int *)pVarData;
-
-	pOut->m_Int = ( data & mask );
-}
 // -------------------------------------------------------------------------------- //
 // SendTable for CPlayerState.
 // -------------------------------------------------------------------------------- //
@@ -8077,7 +8069,6 @@ void SendProxy_CropFlagsToPlayerFlagBitsLength( const SendProp *pProp, const voi
 		SendPropInt		(SENDINFO(m_iBonusProgress), 15 ),
 		SendPropInt		(SENDINFO(m_iBonusChallenge), 4 ),
 		SendPropFloat	(SENDINFO(m_flMaxspeed), 12, SPROP_ROUNDDOWN, 0.0f, 2048.0f ),  // CL
-		SendPropInt		(SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED|SPROP_CHANGES_OFTEN, SendProxy_CropFlagsToPlayerFlagBitsLength ),
 		SendPropInt		(SENDINFO(m_iObserverMode), 3, SPROP_UNSIGNED ),
 		SendPropEHandle	(SENDINFO(m_hObserverTarget) ),
 		SendPropInt		(SENDINFO(m_iFOV), 8, SPROP_UNSIGNED ),
@@ -8133,7 +8124,7 @@ void CBasePlayer::SetupVPhysicsShadow( const Vector &vecAbsOrigin, const Vector 
 	UpdatePhysicsShadowToPosition( vecAbsOrigin );
 
 	// init state
-	if ( GetFlags() & FL_DUCKING )
+	if (GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		SetVCollisionState( vecAbsOrigin, vecAbsVelocity, VPHYS_CROUCH );
 	}
@@ -8260,7 +8251,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 	}
 
 	Vector tmp = GetEngineObject()->GetAbsOrigin() - newPosition;
-	if ( !m_touchedPhysObject && !(GetFlags() & FL_ONGROUND) )
+	if ( !m_touchedPhysObject && !(GetEngineObject()->GetFlags() & FL_ONGROUND) )
 	{
 		tmp.z *= 0.5f;	// don't care about z delta as much
 	}
@@ -8689,12 +8680,12 @@ CBaseEntity *CBasePlayer::DoubleCheckUseNPC( CBaseEntity *pNPC, const Vector &ve
 
 bool CBasePlayer::IsBot() const
 {
-	return (GetFlags() & FL_FAKECLIENT) != 0;
+	return (GetEngineObject()->GetFlags() & FL_FAKECLIENT) != 0;
 }
 
 bool CBasePlayer::IsFakeClient() const
 {
-	return (GetFlags() & FL_FAKECLIENT) != 0;
+	return (GetEngineObject()->GetFlags() & FL_FAKECLIENT) != 0;
 }
 
 void CBasePlayer::EquipSuit( bool bPlayEffects )

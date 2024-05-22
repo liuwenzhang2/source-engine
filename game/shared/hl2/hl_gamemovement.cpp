@@ -167,8 +167,8 @@ void CHL2GameMovement::StartForcedMove( bool mounting, float transit_speed, cons
 	lm->m_hReservedSpot = CReservePlayerSpot::ReserveSpot( 
 		player, 
 		goalpos, 
-		GetPlayerMins( ( player->GetFlags() & FL_DUCKING ) ? true : false ), 
-		GetPlayerMaxs( ( player->GetFlags() & FL_DUCKING ) ? true : false ), 
+		GetPlayerMins( ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) ? true : false ),
+		GetPlayerMaxs( ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) ? true : false ),
 		valid );
 	if ( !valid )
 	{
@@ -447,8 +447,8 @@ bool CHL2GameMovement::ExitLadderViaDismountNode( CFuncLadder *ladder, bool stri
 		UTIL_TraceHull(
 			org, 
 			org, 
-			GetPlayerMins( ( player->GetFlags() & FL_DUCKING ) ? true : false ),
-			GetPlayerMaxs( ( player->GetFlags() & FL_DUCKING ) ? true : false ),
+			GetPlayerMins( ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) ? true : false ),
+			GetPlayerMaxs( ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) ? true : false ),
 			MASK_PLAYERSOLID,
 			player,
 			COLLISION_GROUP_PLAYER_MOVEMENT,

@@ -78,7 +78,7 @@ void CShower::Touch( CBaseEntity *pOther )
 {
 	Vector vecNewVelocity = GetEngineObject()->GetAbsVelocity();
 
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		vecNewVelocity *= 0.1;
 	else
 		vecNewVelocity *= 0.6;

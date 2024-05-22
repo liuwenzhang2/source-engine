@@ -316,7 +316,7 @@ void CBaseHeadcrab::CrawlFromCanister()
 {
 	// This is necessary to prevent ground computations, etc. from happening
 	// while the crawling animation is occuring
-	AddFlag( FL_FLY );
+	GetEngineObject()->AddFlag( FL_FLY );
 	m_bCrawlFromCanister = true;
 	SetNextThink( gpGlobals->curtime );
 }
@@ -417,7 +417,7 @@ float CBaseHeadcrab::MaxYawSpeed( void )
 #define HEADCRAB_MAX_LEDGE_HEIGHT	12.0f
 bool CBaseHeadcrab::IsFirmlyOnGround()
 {
-	if( !(GetFlags()&FL_ONGROUND) )
+	if( !(GetEngineObject()->GetFlags()&FL_ONGROUND) )
 		return false;
 
 	trace_t tr;
@@ -496,7 +496,7 @@ void CBaseHeadcrab::ThrowThink( void )
 		m_flNextNPCThink = gpGlobals->curtime + 0.1;
 	}
 
-	if( GetFlags() & FL_ONGROUND )
+	if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		SetThink( &CBaseHeadcrab::CallNPCThink );
 		SetNextThink( gpGlobals->curtime + 0.1 );
@@ -634,8 +634,8 @@ void CBaseHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_HEADCRAB_CEILING_DETACH )
 	{
 		SetMoveType( MOVETYPE_STEP );
-		RemoveFlag( FL_ONGROUND );
-		RemoveFlag( FL_FLY );
+		GetEngineObject()->RemoveFlag( FL_ONGROUND );
+		GetEngineObject()->RemoveFlag( FL_FLY );
 
 		GetEngineObject()->SetAbsVelocity( Vector ( 0, 0, -128 ) );
 		return;
@@ -716,7 +716,7 @@ void CBaseHeadcrab::SetBurrowed( bool bBurrowed )
 	if ( bBurrowed )
 	{
 		AddEffects( EF_NODRAW );
-		AddFlag( FL_NOTARGET );
+		GetEngineObject()->AddFlag( FL_NOTARGET );
 		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage = DAMAGE_NO;
@@ -728,7 +728,7 @@ void CBaseHeadcrab::SetBurrowed( bool bBurrowed )
 	else
 	{
 		RemoveEffects( EF_NODRAW );
-		RemoveFlag( FL_NOTARGET );
+		GetEngineObject()->RemoveFlag( FL_NOTARGET );
 		GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage = DAMAGE_YES;
@@ -773,7 +773,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 			break;
 
 		case TASK_HEADCRAB_HOP_OFF_NPC:
-			if( GetFlags() & FL_ONGROUND )
+			if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 			{
 				TaskComplete();
 			}
@@ -869,7 +869,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 				if ( IsActivityFinished() )
 				{
 					ClearCondition( COND_CAN_RANGE_ATTACK1 );
-					RemoveFlag(FL_FLY);
+					GetEngineObject()->RemoveFlag(FL_FLY);
 					TaskComplete();
 				}
 			}
@@ -884,7 +884,7 @@ void CBaseHeadcrab::RunTask( const Task_t *pTask )
 				vecPrPos = GetEngineObject()->GetAbsOrigin() + (GetEngineObject()->GetAbsVelocity() * 0.25f );
 				UTIL_TraceHull( vecPrPos, vecPrPos, GetHullMins(), GetHullMaxs(), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 				
-				if ( tr.startsolid == true || GetFlags() & FL_ONGROUND )
+				if ( tr.startsolid == true || GetEngineObject()->GetFlags() & FL_ONGROUND )
 				{
 					GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 					TaskComplete();
@@ -945,7 +945,7 @@ void CBaseHeadcrab::LeapTouch( CBaseEntity *pOther )
 	if ( IRelationType( pOther ) == D_HT )
 	{
 		// Don't hit if back on ground
-		if ( !( GetFlags() & FL_ONGROUND ) )
+		if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 		{
 	 		if ( pOther->m_takedamage != DAMAGE_NO )
 			{
@@ -965,7 +965,7 @@ void CBaseHeadcrab::LeapTouch( CBaseEntity *pOther )
 			ImpactSound();
 		}
 	}
-	else if( !(GetFlags() & FL_ONGROUND) )
+	else if( !(GetEngineObject()->GetFlags() & FL_ONGROUND) )
 	{
 		// Still in the air...
 		if( !pOther->GetEngineObject()->IsSolid() )
@@ -1057,7 +1057,7 @@ void CBaseHeadcrab::GatherConditions( void )
 	// See if I've landed on an NPC or player or something else illegal
 	ClearCondition( COND_HEADCRAB_ILLEGAL_GROUNDENT );
 	CBaseEntity* ground = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
-	if( (GetFlags() & FL_ONGROUND) && ground && !ground->IsWorld() )
+	if( (GetEngineObject()->GetFlags() & FL_ONGROUND) && ground && !ground->IsWorld() )
 	{
 		if ( IsHangingFromCeiling() == false )
 		{
@@ -1273,7 +1273,7 @@ void CBaseHeadcrab::JumpFromCanister()
 	SetActivity( ACT_RANGE_ATTACK1 );
 	StudioFrameAdvanceManual( 0.0 );
 	GetEngineObject()->SetParent( NULL );
-	RemoveFlag( FL_FLY );
+	GetEngineObject()->RemoveFlag( FL_FLY );
 	IncrementInterpolationFrame();
 
 	GetMotor()->SetIdealYaw( headCrabAngles.y );
@@ -1400,7 +1400,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 			UTIL_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 512 ), NAI_Hull::Mins( GetHullType() ), NAI_Hull::Maxs( GetHullType() ), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
 			// SetMoveType( MOVETYPE_NONE );
-			AddFlag(FL_FLY);
+			GetEngineObject()->AddFlag(FL_FLY);
 			m_bHangingFromCeiling = true;
 
 			//Don't need this anymore
@@ -1604,7 +1604,7 @@ int CBaseHeadcrab::RangeAttack1Conditions( float flDot, float flDist )
 	if ( gpGlobals->curtime < m_flNextAttack )
 		return 0;
 
-	if ( ( GetFlags() & FL_ONGROUND ) == false )
+	if ( (GetEngineObject()->GetFlags() & FL_ONGROUND ) == false )
 		return 0;
 
 	// When we're burrowed ignore facing, because when we unburrow we'll cheat and face our enemy.
@@ -2880,7 +2880,7 @@ void CFastHeadcrab::RunTask( const Task_t *pTask )
 		if ( GetEnemy() )
 			GetMotor()->SetIdealYawAndUpdate( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin(), AI_KEEP_YAW_SPEED );
 
-		if( GetFlags() & FL_ONGROUND )
+		if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			SetGravity(1.0);
 			SetMoveType( MOVETYPE_STEP );
@@ -3488,7 +3488,7 @@ void CBlackHeadcrab::Eject( const QAngle &vecAngles, float flVelocityScale, CBas
 void CBlackHeadcrab::EjectTouch( CBaseEntity *pOther )
 {
 	LeapTouch( pOther );
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		// Keep trying to take cover for at least a few seconds.
 		Panic( random->RandomFloat( 2, 8 ) );
@@ -3802,7 +3802,7 @@ void CBlackHeadcrab::ImpactSound( void )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
-	if ( !( GetFlags() & FL_ONGROUND ) )
+	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
 		// Hit a wall - make a pissed off sound.
 		const char* soundname = "NPC_BlackHeadcrab.ImpactAngry";

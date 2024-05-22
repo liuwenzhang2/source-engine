@@ -136,7 +136,7 @@ void CBaseHudWeaponSelection::OnThink( void )
 {
 	// Don't allow weapon selection if we're frozen in place
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
-	if ( pPlayer->GetFlags() & FL_FROZEN || pPlayer->IsPlayerDead() )
+	if ( pPlayer->GetEngineObject()->GetFlags() & FL_FROZEN || pPlayer->IsPlayerDead() )
 	{
 		if ( IsInSelectionMode() )
 		{
@@ -391,7 +391,7 @@ bool CBaseHudWeaponSelection::IsHudMenuPreventingWeaponSelection()
 {
 	// Don't allow weapon selection if we're frozen in place
 	C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
-	if ( pPlayer->GetFlags() & FL_FROZEN || pPlayer->IsPlayerDead() )
+	if ( pPlayer->GetEngineObject()->GetFlags() & FL_FROZEN || pPlayer->IsPlayerDead() )
 		return true;
 
 	return IsHudMenuTakingInput();

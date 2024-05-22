@@ -505,7 +505,7 @@ void CDODPlayer::Spawn()
 	SetModel( DOD_PLAYERMODEL_US_RIFLEMAN );	//temporarily
 	BaseClass::Spawn();
 	
-	AddFlag( FL_ONGROUND ); // set the player on the ground at the start of the round.
+	GetEngineObject()->AddFlag( FL_ONGROUND ); // set the player on the ground at the start of the round.
 
 	m_Shared.SetStamina( 100 );
 	m_bTeamChanged	= false;
@@ -1018,7 +1018,7 @@ CBaseEntity	*CDODPlayer::GiveNamedItem( const char *pszName, int iSubType )
 
 	DispatchSpawn( pent );
 
-	if ( pent != NULL && !(pent->IsMarkedForDeletion()) ) 
+	if ( pent != NULL && !(pent->GetEngineObject()->IsMarkedForDeletion()) )
 	{
 		pent->Touch( this );
 	}
@@ -1770,7 +1770,7 @@ bool CDODPlayer::BumpWeapon( CBaseCombatWeapon *pBaseWeapon )
 	}
 
 	// Don't let the player fetch weapons through walls
-	if( !pWeapon->FVisible( this ) && !(GetFlags() & FL_NOTARGET) )
+	if( !pWeapon->FVisible( this ) && !(GetEngineObject()->GetFlags() & FL_NOTARGET) )
 	{
 		return false;
 	}
@@ -2627,7 +2627,7 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 {
 	// If the anim is done playing, go to the next state (waiting for a keypress to 
 	// either respawn the guy or put him into observer mode).
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		float flForward = GetEngineObject()->GetAbsVelocity().Length() - 20;
 		if (flForward <= 0)
@@ -2693,7 +2693,7 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 
 					IncrementInterpolationFrame();
 
-					if ( GetMoveType() != MOVETYPE_NONE && (GetFlags() & FL_ONGROUND) )
+					if ( GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
 						SetMoveType( MOVETYPE_NONE );
 
 					State_Transition( STATE_OBSERVER_MODE );
@@ -2711,7 +2711,7 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 
 				IncrementInterpolationFrame();
 
-				if ( GetMoveType() != MOVETYPE_NONE && (GetFlags() & FL_ONGROUND) )
+				if ( GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
 					SetMoveType( MOVETYPE_NONE );
 
 				State_Transition( STATE_OBSERVER_MODE );
@@ -2728,7 +2728,7 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 
 			IncrementInterpolationFrame();
 
-			if ( GetMoveType() != MOVETYPE_NONE && (GetFlags() & FL_ONGROUND) )
+			if ( GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
 				SetMoveType( MOVETYPE_NONE );
 
 			// Disabled death cam!

@@ -974,7 +974,7 @@ int CBeam::DrawModel( int flags )
 	if ( !m_bReadyToDraw )
 		return 0;
 
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return 0;
 
 	if ( CurrentViewID() == VIEW_SHADOW_DEPTH_TEXTURE )

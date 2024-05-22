@@ -184,7 +184,7 @@ float CWeaponAWP::GetInaccuracy() const
 	
 		float fSpread = 0.0f;
 	
-		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+		if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 			fSpread = 0.85f;
 	
 		else if ( pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 140 )
@@ -193,7 +193,7 @@ float CWeaponAWP::GetInaccuracy() const
 		else if ( pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 10 )
 			fSpread = 0.10f;
 	
-		else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
+		else if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING ) )
 			fSpread = 0.0f;
 	
 		else

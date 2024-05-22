@@ -172,7 +172,7 @@ void C_ReplayCamera::CalcChaseCamView( Vector& eyeOrigin, QAngle& eyeAngles, flo
 	{
 		targetOrigin1 += VEC_DEAD_VIEWHEIGHT;
 	}
-	else if ( target1->GetFlags() & FL_DUCKING )
+	else if ( target1->GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		targetOrigin1 += VEC_DUCK_VIEW;
 	}
@@ -200,7 +200,7 @@ void C_ReplayCamera::CalcChaseCamView( Vector& eyeOrigin, QAngle& eyeAngles, flo
 			{
 				targetOrigin2 += VEC_DEAD_VIEWHEIGHT;
 			}
-			else if ( target2->GetFlags() & FL_DUCKING )
+			else if ( target2->GetEngineObject()->GetFlags() & FL_DUCKING )
 			{
 				targetOrigin2 += VEC_DUCK_VIEW;
 			}
@@ -338,7 +338,7 @@ void C_ReplayCamera::CalcInEyeCamView( Vector& eyeOrigin, QAngle& eyeAngles, flo
 	m_vCamOrigin = pPlayer->GetAbsOrigin();
 	m_flFOV = pPlayer->GetFOV();
 
-	if ( pPlayer->GetFlags() & FL_DUCKING )
+	if ( pPlayer->GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		m_vCamOrigin += VEC_DUCK_VIEW;
 	}

@@ -1362,7 +1362,7 @@ CBaseEntity *CNPC_BaseZombie::ClawAttack( float flDist, int iDamage, QAngle &qaV
 
 		CBasePlayer *pPlayer = ToBasePlayer( pHurt );
 
-		if ( pPlayer != NULL && !(pPlayer->GetFlags() & FL_GODMODE ) )
+		if ( pPlayer != NULL && !(pPlayer->GetEngineObject()->GetFlags() & FL_GODMODE ) )
 		{
 			pPlayer->ViewPunch( qaViewPunch );
 			
@@ -2326,7 +2326,7 @@ bool CNPC_BaseZombie::BecomeRagdoll( const CTakeDamageInfo &info, const Vector &
 		return BaseClass::BecomeRagdoll( info, forceVector );
 	}
 
-	if( !(GetFlags()&FL_TRANSRAGDOLL) )
+	if( !(GetEngineObject()->GetFlags()&FL_TRANSRAGDOLL) )
 	{
 		RemoveDeferred();
 	}

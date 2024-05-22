@@ -990,7 +990,7 @@ void C_CSPlayer::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 
 	// If we're ducking, we should reduce the render height by the difference in standing and ducking heights.
 	// This prevents shadows from drawing above ducking players etc.
-	if ( GetFlags() & FL_DUCKING )
+	if (GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		theMaxs.z -= 18.5f;
 	}

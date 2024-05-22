@@ -308,8 +308,8 @@ void CDODGameMovement::CheckParameters( void )
 	}
 
 
-	if ( player->GetFlags() & FL_FROZEN ||
-		 player->GetFlags() & FL_ONTRAIN || 
+	if ( player->GetEngineObject()->GetFlags() & FL_FROZEN ||
+		 player->GetEngineObject()->GetFlags() & FL_ONTRAIN ||
 		 IsDead() )
 	{
 		mv->m_flForwardMove = 0;
@@ -637,9 +637,9 @@ void CDODGameMovement::ReduceTimers( void )
 		{
 			flStamina += 60 * gpGlobals->frametime;
 		}
-		else if ( ( m_pDODPlayer->GetFlags() & FL_ONGROUND ) && 
+		else if ( ( m_pDODPlayer->GetEngineObject()->GetFlags() & FL_ONGROUND ) &&
 					( mv->m_nButtons & IN_DUCK ) &&
-					( m_pDODPlayer->GetFlags() & FL_DUCKING ) )
+					( m_pDODPlayer->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 		{
 			flStamina += 50 * gpGlobals->frametime;
 		}
@@ -782,7 +782,7 @@ bool CDODGameMovement::CheckJumpButton( void )
 	// Accelerate upward
 	// If we are ducking...
 	float startz = mv->m_vecVelocity[2];
-	if ( (  m_pDODPlayer->m_Local.m_bDucking ) || (  m_pDODPlayer->GetFlags() & FL_DUCKING ) )
+	if ( (  m_pDODPlayer->m_Local.m_bDucking ) || (  m_pDODPlayer->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 	{
 		// d = 0.5 * g * t^2		- distance traveled with linear accel
 		// t = sqrt(2.0 * 45 / g)	- how long to fall 45 units
@@ -822,7 +822,7 @@ void CDODGameMovement::HandleDuckingSpeedCrop()
 {
 	if ( !( m_iSpeedCropped & SPEED_CROPPED_DUCK ) )
 	{
-		if ( ( mv->m_nButtons & IN_DUCK ) || ( player->m_Local.m_bDucking ) || ( player->GetFlags() & FL_DUCKING ) )
+		if ( ( mv->m_nButtons & IN_DUCK ) || ( player->m_Local.m_bDucking ) || ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 		{
 			float frac = 0.33333333f;
 			mv->m_flForwardMove	*= frac;
@@ -925,7 +925,7 @@ void CDODGameMovement::FinishUnDuck( void )
 	}
 
 	player->m_Local.m_bDucked = false;
-	player->RemoveFlag( FL_DUCKING );
+	player->GetEngineObject()->RemoveFlag( FL_DUCKING );
 	player->m_Local.m_bDucking  = false;
 	SetViewOffset( GetPlayerViewOffset( false ) );
 	player->m_Local.m_flDucktime = 0;
@@ -947,7 +947,7 @@ void CDODGameMovement::FinishDuck( void )
 	Vector viewDelta = 0.5f * ( hullSizeNormal - hullSizeCrouch );
 
 	SetViewOffset( GetPlayerViewOffset( true ) );
-	player->AddFlag( FL_DUCKING );
+	player->GetEngineObject()->AddFlag( FL_DUCKING );
 	player->m_Local.m_bDucking = false;
 
 	if ( !player->m_Local.m_bDucked )
@@ -1017,7 +1017,7 @@ void CDODGameMovement::SetDeployedEyeOffset( void )
 		if ( flTimeSinceDeployChange >= TIME_TO_DEPLOY )
 		{
 			player->m_Local.m_bDucked = false;
-			player->RemoveFlag( FL_DUCKING );
+			player->GetEngineObject()->RemoveFlag( FL_DUCKING );
 			player->m_Local.m_bDucking  = false;
 			player->m_Local.m_flDucktime = 0;
 		}
@@ -1073,7 +1073,7 @@ void CDODGameMovement::FinishUnProne( void )
 	{
 		CategorizePosition();
 
-		if ( mv->m_nButtons & IN_DUCK && !( player->GetFlags() & FL_DUCKING ) )
+		if ( mv->m_nButtons & IN_DUCK && !( player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 		{
 			// Use 1 second so super long jump will work
 			player->m_Local.m_flDucktime = 1000;
@@ -1226,7 +1226,7 @@ void CDODGameMovement::Duck( void )
 			VIEW_ANIM_EXPONENTIAL_Z_ONLY );
 
 		// simulate a duck that was pressed while we were prone
-		player->AddFlag( FL_DUCKING );
+		player->GetEngineObject()->AddFlag( FL_DUCKING );
 		player->m_Local.m_bDucked = true;
 		player->m_Local.m_flDucktime = 1000;
 		player->m_Local.m_bDucking    = true;
@@ -1242,7 +1242,7 @@ void CDODGameMovement::Duck( void )
 
 	HandleDuckingSpeedCrop();
 
-	if ( !( player->GetFlags() & FL_DUCKING ) && ( player->m_Local.m_bDucked ) )
+	if ( !( player->GetEngineObject()->GetFlags() & FL_DUCKING ) && ( player->m_Local.m_bDucked ) )
 	{
 		player->m_Local.m_bDucked = false;
 	}
@@ -1255,13 +1255,13 @@ void CDODGameMovement::Duck( void )
 		( player->GetFlags() & FL_DUCKING ) ? "set" : "not set" );*/
 	
 	// Holding duck, in process of ducking or fully ducked?
-	if ( ( mv->m_nButtons & IN_DUCK ) || ( player->m_Local.m_bDucking ) || ( player->GetFlags() & FL_DUCKING ) )
+	if ( ( mv->m_nButtons & IN_DUCK ) || ( player->m_Local.m_bDucking ) || ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 	{
 		if ( mv->m_nButtons & IN_DUCK )
 		{
-			bool alreadyDucked = ( player->GetFlags() & FL_DUCKING ) ? true : false;
+			bool alreadyDucked = ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) ? true : false;
 
-			if ( (buttonsPressed & IN_DUCK ) && !( player->GetFlags() & FL_DUCKING ) )
+			if ( (buttonsPressed & IN_DUCK ) && !( player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 			{
 				// Use 1 second so super long jump will work
 				player->m_Local.m_flDucktime = 1000;
@@ -1296,7 +1296,7 @@ void CDODGameMovement::Duck( void )
 			// NOTE: When not onground, you can always unduck
 			if ( player->m_Local.m_bAllowAutoMovement || player->GetEngineObject()->GetGroundEntity() == NULL )
 			{
-				if ( (buttonsReleased & IN_DUCK ) && ( player->GetFlags() & FL_DUCKING ) )
+				if ( (buttonsReleased & IN_DUCK ) && ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 				{
 					// Use 1 second so super long jump will work
 					player->m_Local.m_flDucktime = 1000;

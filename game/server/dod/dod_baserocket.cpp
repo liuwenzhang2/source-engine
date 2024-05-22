@@ -80,7 +80,7 @@ void CDODBaseRocket::Spawn( void )
 	SetGravity( 0.1 );
 	SetDamage( mp_rocketdamage.GetFloat() );	
 
-	AddFlag( FL_OBJECT );
+	GetEngineObject()->AddFlag( FL_OBJECT );
 
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 

@@ -1182,7 +1182,7 @@ void CNPC_CombineDropship::Flight( void )
 
 	if ( bRunFlight )
 	{
-		if( GetFlags() & FL_ONGROUND )
+		if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			// This would be really bad.
 			GetEngineObject()->SetGroundEntity( NULL );

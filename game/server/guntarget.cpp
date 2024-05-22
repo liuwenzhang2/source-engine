@@ -102,7 +102,7 @@ void CGunTarget::Spawn( void )
 
 	// Don't take damage until "on"
 	m_takedamage = DAMAGE_NO;
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 
 	m_on = false;
 	m_iMaxHealth = m_iHealth;
@@ -141,7 +141,7 @@ void CGunTarget::Activate( void )
 void CGunTarget::Start( void )
 {
 	m_takedamage = DAMAGE_YES;
-	AddFlag( FL_AIMTARGET );
+	GetEngineObject()->AddFlag( FL_AIMTARGET );
 	m_hTargetEnt = GetNextTarget();
 	if ( m_hTargetEnt == NULL )
 		return;

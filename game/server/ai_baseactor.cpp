@@ -1266,7 +1266,7 @@ bool CAI_BaseActor::PickRandomLookTarget( AILookTargetArgs_t *pArgs )
 			continue;
 		}
 
-		if ( pArgs->bExcludePlayers && pEntity->GetFlags() & FL_CLIENT )
+		if ( pArgs->bExcludePlayers && pEntity->GetEngineObject()->GetFlags() & FL_CLIENT )
 		{
 			// Don't look at any players.
 			continue;
@@ -1312,7 +1312,7 @@ bool CAI_BaseActor::PickRandomLookTarget( AILookTargetArgs_t *pArgs )
 		// keep track of number of interesting things
 		iConsidered++;
 
-		if ((pEntity->GetFlags() & FL_CLIENT) && (pEntity->IsMoving() || random->RandomInt( 0, 2) == 0))
+		if ((pEntity->GetEngineObject()->GetFlags() & FL_CLIENT) && (pEntity->IsMoving() || random->RandomInt( 0, 2) == 0))
 		{
 			if (FVisible( pEntity ) && ValidHeadTarget(pEntity->EyePosition()))
 			{

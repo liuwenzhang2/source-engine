@@ -430,7 +430,7 @@ bool CAI_BaseNPC::AutoMovement( float flInterval, CBaseEntity *pTarget, AIMoveTr
 
 		if (GetMoveType() == MOVETYPE_STEP)
 		{
-			if (!(GetFlags() & FL_FLY))
+			if (!(GetEngineObject()->GetFlags() & FL_FLY))
 			{
 				if ( !pTarget )
 				{

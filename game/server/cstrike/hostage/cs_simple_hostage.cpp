@@ -933,7 +933,7 @@ bool CHostage::IsRescued( void ) const
 //-----------------------------------------------------------------------------------------------------
 bool CHostage::IsOnGround( void ) const
 {
-	return (GetFlags() & FL_ONGROUND);
+	return (GetEngineObject()->GetFlags() & FL_ONGROUND);
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -1323,7 +1323,7 @@ void CHostage::TrackPath( const Vector &pathGoal, float deltaT )
 	// face in the direction of our motion
 	FaceTowards(GetEngineObject()->GetAbsOrigin() + 10.0f * m_vel, deltaT );
 
-	if (GetFlags() & FL_ONGROUND)
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 	{
 		// on the ground - move towards pathGoal
 		Vector to = pathGoal - GetFeet();

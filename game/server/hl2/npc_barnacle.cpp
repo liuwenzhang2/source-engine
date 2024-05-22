@@ -306,7 +306,7 @@ void CNPC_Barnacle::Spawn()
 	//Do not have a shadow
 	AddEffects( EF_NOSHADOW );
 
-	AddFlag( FL_AIMTARGET );
+	GetEngineObject()->AddFlag( FL_AIMTARGET );
 }
 
 
@@ -955,11 +955,11 @@ void CNPC_Barnacle::PullEnemyTorwardsMouth( bool bAdjustEnemyOrigin )
 
 		// GetEnemy()->Teleport( &vecNewPos, NULL, NULL );
 
-		if( pEnemy->GetFlags() & FL_ONGROUND )
+		if( pEnemy->GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			// Try to fight OnGround
 			pEnemy->SetGravity( 0 );
-			pEnemy->RemoveFlag( FL_ONGROUND );
+			pEnemy->GetEngineObject()->RemoveFlag( FL_ONGROUND );
 		}
 	}
 }
@@ -971,7 +971,7 @@ void CNPC_Barnacle::UpdatePlayerConstraint( void )
 {
 	// Check to see if the player's standing/ducking state has changed.
 	CBasePlayer *pPlayer = static_cast<CBasePlayer*>( GetEnemy() );
-	bool bStanding = ( ( pPlayer->GetFlags() & FL_DUCKING ) == 0 );
+	bool bStanding = ( ( pPlayer->GetEngineObject()->GetFlags() & FL_DUCKING ) == 0 );
 	if ( bStanding == m_bPlayerWasStanding )
 		return;
 
@@ -1452,7 +1452,7 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 			}
 		}
 
-		m_bPlayerWasStanding = ( ( pPlayer->GetFlags() & FL_DUCKING ) == 0 );
+		m_bPlayerWasStanding = ( ( pPlayer->GetEngineObject()->GetFlags() & FL_DUCKING ) == 0 );
 	}
 
 	SetEnemy( pTouchEnt );
@@ -2623,7 +2623,7 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 			 IRelationType( pTest ) == D_HT && 
 			 pVictim->m_lifeState != LIFE_DEAD &&
 			 pVictim->m_lifeState != LIFE_DYING &&
-			 !( pVictim->GetFlags() & FL_NOTARGET )	)	
+			 !( pVictim->GetEngineObject()->GetFlags() & FL_NOTARGET )	)
 		{
 
 			// Allow the barnacles to grab stuff while their tongue is lowering

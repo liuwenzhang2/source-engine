@@ -303,7 +303,7 @@ void CNPC_Nihilanth::Spawn( void )
 
 	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 64 ) );
 
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 	m_takedamage		= DAMAGE_AIM;
 	m_iHealth			= sk_nihilanth_health.GetFloat();
 	SetViewOffset ( Vector( 0, 0, 300 ) );

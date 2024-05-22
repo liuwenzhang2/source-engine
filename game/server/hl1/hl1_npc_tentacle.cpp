@@ -297,7 +297,7 @@ void CNPC_Tentacle::Spawn( )
 	GetEngineObject()->SetSurroundingBoundsType( USE_HITBOXES );
 
 	m_takedamage		= DAMAGE_AIM;
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 	
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 

@@ -124,7 +124,7 @@ IterationRetval_t CFlaggedEntitiesEnum::EnumElement( IHandleEntity *pHandleEntit
 	CBaseEntity *pEntity = gEntList.GetBaseEntity( pHandleEntity->GetRefEHandle() );
 	if ( pEntity )
 	{
-		if ( m_flagMask && !(pEntity->GetFlags() & m_flagMask) )	// Does it meet the criteria?
+		if ( m_flagMask && !(pEntity->GetEngineObject()->GetFlags() & m_flagMask) )	// Does it meet the criteria?
 			return ITERATION_CONTINUE;
 
 		if ( !AddToList( pEntity ) )
@@ -352,7 +352,7 @@ bool g_bReceivedChainedUpdateOnRemove = false;
 void UTIL_Remove( CBaseEntity *oldObj )
 {
 	//CServerNetworkProperty* pProp = static_cast<CServerNetworkProperty*>(oldObj);
-	if (!oldObj || oldObj->IsMarkedForDeletion())
+	if (!oldObj || oldObj->GetEngineObject()->IsMarkedForDeletion())
 		return;
 
 	if (PhysIsInCallback())
@@ -369,7 +369,7 @@ void UTIL_Remove( CBaseEntity *oldObj )
 	}
 
 	// mark it for deletion	
-	oldObj->MarkForDeletion();
+	oldObj->GetEngineObject()->MarkForDeletion();
 
 	CBaseEntity* pBaseEnt = oldObj->GetBaseEntity();
 	if (pBaseEnt)
@@ -741,7 +741,7 @@ void UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, f
 		//
 		// Only start shakes for players that are on the ground unless doing an air shake.
 		//
-		if ( !pPlayer || (!bAirShake && (eCommand == SHAKE_START) && !(pPlayer->GetFlags() & FL_ONGROUND)) )
+		if ( !pPlayer || (!bAirShake && (eCommand == SHAKE_START) && !(pPlayer->GetEngineObject()->GetFlags() & FL_ONGROUND)) )
 		{
 			continue;
 		}
@@ -779,7 +779,7 @@ void UTIL_ScreenShakeObject( CBaseEntity *pEnt, const Vector &center, float ampl
 		{
 			localAmplitude = amplitude;
 		}
-		else if ((pPlayer->GetFlags() & FL_ONGROUND) && (pPlayer->GetEngineObject()->GetGroundEntity()->GetRootMoveParent()->GetOuter() == pHighestParent))
+		else if ((pPlayer->GetEngineObject()->GetFlags() & FL_ONGROUND) && (pPlayer->GetEngineObject()->GetGroundEntity()->GetRootMoveParent()->GetOuter() == pHighestParent))
 		{
 			// If the player is standing on the object, use maximum amplitude
 			localAmplitude = amplitude;
@@ -787,7 +787,7 @@ void UTIL_ScreenShakeObject( CBaseEntity *pEnt, const Vector &center, float ampl
 		else
 		{
 			// Only shake players that are on the ground.
-			if ( !bAirShake && !(pPlayer->GetFlags() & FL_ONGROUND) )
+			if ( !bAirShake && !(pPlayer->GetEngineObject()->GetFlags() & FL_ONGROUND) )
 			{
 				continue;
 			}
@@ -829,7 +829,7 @@ void UTIL_ViewPunch( const Vector &center, QAngle angPunch, float radius, bool b
 		//
 		// Only apply the punch to players that are on the ground unless doing an air punch.
 		//
-		if ( !pPlayer || (!bInAir && !(pPlayer->GetFlags() & FL_ONGROUND)) )
+		if ( !pPlayer || (!bInAir && !(pPlayer->GetEngineObject()->GetFlags() & FL_ONGROUND)) )
 		{
 			continue;
 		}
@@ -1805,7 +1805,7 @@ int DispatchSpawn( CBaseEntity *pEntity )
 		// UNDONE: Spawn() should really return a code to ask that the entity be deleted, but
 		// that would touch too much code for me to do that right now.
 
-		if ( pEntSafe == NULL || pEntity->IsMarkedForDeletion() )
+		if ( pEntSafe == NULL || pEntity->GetEngineObject()->IsMarkedForDeletion() )
 			return -1;
 
 		if ( pEntity->GetEngineObject()->GetGlobalname() != NULL_STRING )
@@ -2036,7 +2036,7 @@ static int UTIL_GetNewCheckClient( int check )
 		if ( !entity )
 			continue;
 
-		if ( entity->GetFlags() & FL_NOTARGET )
+		if ( entity->GetEngineObject()->GetFlags() & FL_NOTARGET )
 			continue;
 
 		// anything that is a client, or has a client as an enemy
@@ -2188,7 +2188,7 @@ static CBaseEntity *UTIL_FindClientInPVSGuts(CBaseEntity *pEdict, unsigned char 
 	}
 
 	CBaseEntity *pPlayerEntity = (CBaseEntity*)ent;
-	if( (!pPlayerEntity || (pPlayerEntity->GetFlags() & FL_NOTARGET)) && sv_strict_notarget.GetBool() )
+	if( (!pPlayerEntity || (pPlayerEntity->GetEngineObject()->GetFlags() & FL_NOTARGET)) && sv_strict_notarget.GetBool() )
 	{
 		return NULL;
 	}

@@ -496,7 +496,7 @@ void CNPC_Gargantua::HandleAnimEvent( animevent_t *pEvent )
 
 			if (pHurt)
 			{
-				if ( pHurt->GetFlags() & ( FL_NPC | FL_CLIENT ) )
+				if ( pHurt->GetEngineObject()->GetFlags() & ( FL_NPC | FL_CLIENT ) )
 				{
 					pHurt->ViewPunch( QAngle( -30, -30, 30 ) );
 

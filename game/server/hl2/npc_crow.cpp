@@ -676,7 +676,7 @@ void CNPC_Crow::SetFlyingState( FlyState_t eState )
 	{
 		// Flying
 		GetEngineObject()->SetGroundEntity( NULL );
-		AddFlag( FL_FLY );
+		GetEngineObject()->AddFlag( FL_FLY );
 		SetNavType( NAV_FLY );
 		CapabilitiesRemove( bits_CAP_MOVE_GROUND );
 		CapabilitiesAdd( bits_CAP_MOVE_FLY );
@@ -693,7 +693,7 @@ void CNPC_Crow::SetFlyingState( FlyState_t eState )
 		angles[ROLL] = 0.0f;
 		GetEngineObject()->SetAbsAngles( angles );
 
-		RemoveFlag( FL_FLY );
+		GetEngineObject()->RemoveFlag( FL_FLY );
 		SetNavType( NAV_GROUND );
 		CapabilitiesRemove( bits_CAP_MOVE_FLY );
 		CapabilitiesAdd( bits_CAP_MOVE_GROUND );
@@ -704,7 +704,7 @@ void CNPC_Crow::SetFlyingState( FlyState_t eState )
 	else
 	{
 		// Falling
-		RemoveFlag( FL_FLY );
+		GetEngineObject()->RemoveFlag( FL_FLY );
 		SetNavType( NAV_GROUND );
 		CapabilitiesRemove( bits_CAP_MOVE_FLY );
 		CapabilitiesAdd( bits_CAP_MOVE_GROUND );
@@ -998,7 +998,7 @@ void CNPC_Crow::RunTask( const Task_t *pTask )
 				SetIdealActivity( ACT_IDLE );
 			}
 
-			if ( (GetEngineObject()->GetAbsOrigin().z < m_flHopStartZ ) && ( !( GetFlags() & FL_ONGROUND ) ) )
+			if ( (GetEngineObject()->GetAbsOrigin().z < m_flHopStartZ ) && ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) ) )
 			{
 				//
 				// We've hopped off of something! See if we're going to fall very far.
@@ -1037,7 +1037,7 @@ void CNPC_Crow::RunTask( const Task_t *pTask )
 
 		case TASK_CROW_FALL_TO_GROUND:
 		{
-			if ( GetFlags() & FL_ONGROUND )
+			if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 			{
 				SetFlyingState( FlyState_Walking );
 				TaskComplete();
@@ -1186,7 +1186,7 @@ int CNPC_Crow::SelectSchedule( void )
 	// Maybe we hopped off of something? Don't do this immediately upon
 	// because we may be falling to the ground on spawn.
 	//
-	if ( !( GetFlags() & FL_ONGROUND ) && ( gpGlobals->curtime > 2.0 ) && m_bOnJeep == false )
+	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) && ( gpGlobals->curtime > 2.0 ) && m_bOnJeep == false )
 	{
 		return SCHED_CROW_FLY_AWAY;
 	}
@@ -1406,7 +1406,7 @@ bool CNPC_Crow::HandleInteraction( int interactionType, void *data, CBaseCombatC
 	}
 	else if ( interactionType == g_interactionBarnacleVictimGrab )
 	{
-		if ( GetFlags() & FL_ONGROUND )
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			GetEngineObject()->SetGroundEntity( NULL );
 		}

@@ -84,7 +84,7 @@ void CWeaponBox::Precache( void )
 
 void CWeaponBox::BoxTouch( CBaseEntity *pOther )
 {
-	if ( !( GetFlags() & FL_ONGROUND ) )
+	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
 		return;
 	}

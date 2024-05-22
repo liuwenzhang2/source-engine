@@ -479,7 +479,7 @@ void CGamePlayerZone::InputCountPlayersInZone( inputdata_t &inputdata )
 			Hull_t		hullType;
 
 			hullType = HULL_HUMAN;
-			if ( pPlayer->GetFlags() & FL_DUCKING )
+			if ( pPlayer->GetEngineObject()->GetFlags() & FL_DUCKING )
 			{
 				hullType = HULL_SMALL_CENTERED;
 			}

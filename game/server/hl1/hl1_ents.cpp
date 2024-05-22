@@ -1500,7 +1500,7 @@ void CHL1Gib::BounceGibTouch ( CBaseEntity *pOther )
 	Vector	vecSpot;
 	trace_t	tr;
 	
-	if ( GetFlags() & FL_ONGROUND)
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 	{
 		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.9 );
 

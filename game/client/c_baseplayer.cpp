@@ -282,7 +282,6 @@ END_RECV_TABLE()
 		RecvPropInt		(RECVINFO(m_iBonusChallenge)),
 
 		RecvPropFloat	(RECVINFO(m_flMaxspeed)),
-		RecvPropInt		(RECVINFO(m_fFlags)),
 
 
 		RecvPropInt		(RECVINFO(m_iObserverMode), 0, RecvProxy_ObserverMode ),
@@ -462,8 +461,8 @@ C_BasePlayer::~C_BasePlayer()
 void C_BasePlayer::Spawn( void )
 {
 	// Clear all flags except for FL_FULLEDICT
-	ClearFlags();
-	AddFlag( FL_CLIENT );
+	GetEngineObject()->ClearFlags();
+	GetEngineObject()->AddFlag( FL_CLIENT );
 
 	int effects = GetEffects() & EF_NOSHADOW;
 	SetEffects( effects );
@@ -1162,7 +1161,7 @@ bool C_BasePlayer::CreateMove( float flInputSampleTime, CUserCmd *pCmd )
 	}
 
 	// If the frozen flag is set, prevent view movement (server prevents the rest of the movement)
-	if ( GetFlags() & FL_FROZEN )
+	if (GetEngineObject()->GetFlags() & FL_FROZEN )
 	{
 		// Don't stomp the first time we get frozen
 		if ( m_bWasFrozen )
@@ -1413,7 +1412,7 @@ Vector C_BasePlayer::GetChaseCamViewOffset( CBaseEntity *target )
 	{
 		if ( player->IsAlive() )
 		{
-			if ( player->GetFlags() & FL_DUCKING )
+			if ( player->GetEngineObject()->GetFlags() & FL_DUCKING )
 			{
 				return VEC_DUCK_VIEW_SCALED( player );
 			}
@@ -1712,7 +1711,7 @@ void C_BasePlayer::CalcInEyeCamView(Vector& eyeOrigin, QAngle& eyeAngles, float&
 #endif
 	{
 		C_BaseAnimating *pTargetAnimating = target->GetBaseAnimating();
-		if ( target->GetFlags() & FL_DUCKING )
+		if ( target->GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			eyeOrigin += pTargetAnimating ? VEC_DUCK_VIEW_SCALED( pTargetAnimating ) : VEC_DUCK_VIEW;
 		}
@@ -2001,7 +2000,7 @@ void C_BasePlayer::PreThink( void )
 	//
 	// If we're not on the ground, we're falling. Update our falling velocity.
 	//
-	if ( !( GetFlags() & FL_ONGROUND ) )
+	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
 		m_Local.m_flFallVelocity = -GetEngineObject()->GetAbsVelocity().z;
 	}
@@ -2016,7 +2015,7 @@ void C_BasePlayer::PostThink( void )
 	if ( IsAlive())
 	{
 		// Need to do this on the client to avoid prediction errors
-		if ( GetFlags() & FL_DUCKING )
+		if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 		}
@@ -2031,7 +2030,7 @@ void C_BasePlayer::PostThink( void )
 			ItemPostFrame();
 		}
 
-		if ( GetFlags() & FL_ONGROUND )
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{		
 			m_Local.m_flFallVelocity = 0;
 		}
@@ -2300,7 +2299,7 @@ void C_BasePlayer::PhysicsSimulate( void )
 	ctx->needsprocessing = false;
 
 	// Handle FL_FROZEN.
-	if(GetFlags() & FL_FROZEN)
+	if(GetEngineObject()->GetFlags() & FL_FROZEN)
 	{
 		ctx->cmd.forwardmove = 0;
 		ctx->cmd.sidemove = 0;

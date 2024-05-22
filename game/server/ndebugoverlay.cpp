@@ -127,7 +127,7 @@ float GetLongFloorZ(const Vector &origin)
 		if ( trEnt.m_pEnt )
 		{
 			CBaseEntity *e = (CBaseEntity*)trEnt.m_pEnt;
-			if ( e && (e->GetFlags() & FL_WORLDBRUSH) )
+			if ( e && (e->GetEngineObject()->GetFlags() & FL_WORLDBRUSH) )
 			{
 				tr.endpos = trEnt.endpos;
 			}

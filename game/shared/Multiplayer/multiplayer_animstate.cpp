@@ -170,7 +170,7 @@ void CMultiPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t event, int nData
 	case PLAYERANIMEVENT_RELOAD:
 		{
 			// Weapon reload.
-			if ( GetBasePlayer()->GetFlags() & FL_DUCKING )
+			if ( GetBasePlayer()->GetEngineObject()->GetFlags() & FL_DUCKING )
 			{
 				RestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_MP_RELOAD_CROUCH );
 			}
@@ -198,7 +198,7 @@ void CMultiPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t event, int nData
 	case PLAYERANIMEVENT_RELOAD_LOOP:
 		{
 			// Weapon reload.
-			if ( GetBasePlayer()->GetFlags() & FL_DUCKING )
+			if ( GetBasePlayer()->GetEngineObject()->GetFlags() & FL_DUCKING )
 			{
 				RestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_MP_RELOAD_CROUCH_LOOP );
 			}
@@ -225,7 +225,7 @@ void CMultiPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t event, int nData
 	case PLAYERANIMEVENT_RELOAD_END:
 		{
 			// Weapon reload.
-			if ( GetBasePlayer()->GetFlags() & FL_DUCKING )
+			if ( GetBasePlayer()->GetEngineObject()->GetFlags() & FL_DUCKING )
 			{
 				RestartGesture( GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_MP_RELOAD_CROUCH_END );
 			}
@@ -783,7 +783,7 @@ bool CMultiPlayerAnimState::HandleJumping( Activity &idealActivity )
 		// on-ground flag set right when the message comes in.
 		else if ( gpGlobals->curtime - m_flJumpStartTime > 0.2f )
 		{
-			if ( GetBasePlayer()->GetFlags() & FL_ONGROUND )
+			if ( GetBasePlayer()->GetEngineObject()->GetFlags() & FL_ONGROUND )
 			{
 				m_bJumping = false;
 				RestartMainSequence();
@@ -808,7 +808,7 @@ bool CMultiPlayerAnimState::HandleJumping( Activity &idealActivity )
 //-----------------------------------------------------------------------------
 bool CMultiPlayerAnimState::HandleDucking( Activity &idealActivity )
 {
-	if ( GetBasePlayer()->GetFlags() & FL_DUCKING )
+	if ( GetBasePlayer()->GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		if ( GetOuterXYSpeed() > MOVING_MINIMUM_SPEED )
 		{
@@ -1497,7 +1497,7 @@ void CMultiPlayerAnimState::GetMovementFlags( CStudioHdr *pStudioHdr )
 	}
 
 	// skip tests if it's not a movement animation
-	if ( m_nMovementSequence < 0 || !( GetBasePlayer()->GetFlags() & FL_ONGROUND ) || pStudioHdr->pSeqdesc( m_nMovementSequence ).groupsize[0] == 1 )
+	if ( m_nMovementSequence < 0 || !( GetBasePlayer()->GetEngineObject()->GetFlags() & FL_ONGROUND ) || pStudioHdr->pSeqdesc( m_nMovementSequence ).groupsize[0] == 1 )
 	{
 		return;
 	}

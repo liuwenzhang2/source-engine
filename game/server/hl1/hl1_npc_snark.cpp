@@ -95,7 +95,7 @@ void CSnark::Spawn( void )
 	m_flNextHunt			= gpGlobals->curtime + 1E6;
 	m_flNextBounceSoundTime	= gpGlobals->curtime;
 
-	AddFlag( FL_AIMTARGET | FL_NPC );
+	GetEngineObject()->AddFlag( FL_AIMTARGET | FL_NPC );
 	m_takedamage = DAMAGE_YES;
 
 	m_iHealth		= sk_snark_health.GetFloat();
@@ -295,7 +295,7 @@ void CSnark::HuntThink( void )
 		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * flAdj + (m_vecTarget * 300) );
 	}
 
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		SetLocalAngularVelocity( QAngle( 0, 0, 0 ) );
 	}
@@ -494,7 +494,7 @@ void CSnark::SuperBounceTouch( CBaseEntity *pOther )
 		}
 	}
 
-	if ( !( GetFlags() & FL_ONGROUND ) )
+	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
 		// play bounce sound
 		CPASAttenuationFilter filter2( this );

@@ -1055,7 +1055,7 @@ Vector CNPC_Combine_Cannon::DesiredBodyTarget( CBaseEntity *pTarget )
 
 	float flTimeSinceLastMiss = gpGlobals->curtime - m_flTimeLastShotMissed;
 
-	if( pTarget->GetFlags() & FL_CLIENT )
+	if( pTarget->GetEngineObject()->GetFlags() & FL_CLIENT )
 	{
 		if( !BaseClass::FVisible( vecTarget ) )
 		{
@@ -1157,7 +1157,7 @@ bool CNPC_Combine_Cannon::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEn
 	if ( pEntity->IsPlayer() == false )
 		return BaseClass::FVisible( pEntity, traceMask, ppBlocker );
 
-	if ( pEntity->GetFlags() & FL_NOTARGET )
+	if ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET )
 		return false;
 
 	Vector	vecVerticalOffset;
@@ -1226,7 +1226,7 @@ bool CNPC_Combine_Cannon::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEn
 
 	pPlayer = ToBasePlayer( pEntity );
 
-	if( (pPlayer->GetFlags() & FL_DUCKING) && pPlayer->MuzzleFlashTime() > gpGlobals->curtime )
+	if( (pPlayer->GetEngineObject()->GetFlags() & FL_DUCKING) && pPlayer->MuzzleFlashTime() > gpGlobals->curtime )
 	{
 		vecEye = pPlayer->EyePosition() + Vector( 0, 0, 32 );
 		UTIL_TraceLine( EyePosition(), vecEye, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );

@@ -129,7 +129,7 @@ void CDODBaseBombWeapon::PrimaryAttack()
 			// if we're too far away, cancel
 			CancelPlanting();			
 		}
-		else if ( IsLookingAtBombTarget( pPlayer, pTarget ) == false || ( pPlayer->GetFlags() & FL_ONGROUND ) == 0 )
+		else if ( IsLookingAtBombTarget( pPlayer, pTarget ) == false || ( pPlayer->GetEngineObject()->GetFlags() & FL_ONGROUND ) == 0 )
 		{
 			// not looking at the target anymore
 			CancelPlanting();
@@ -173,7 +173,7 @@ void CDODBaseBombWeapon::PrimaryAttack()
 		if ( flDist < flBestDist &&
 			flDist < DOD_BOMB_PLANT_RADIUS &&
 			IsLookingAtBombTarget( pPlayer, pTarget ) &&
-			( pPlayer->GetFlags() & FL_ONGROUND ) )
+			( pPlayer->GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 		{
 			flBestDist = flDist;
 			pBestTarget = pTarget;

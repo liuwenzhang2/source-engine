@@ -586,7 +586,7 @@ private:
 	bool IsStandingOnPusher( CBaseEntity *pCheck )
 	{
 		CBaseEntity* pGroundEnt = pCheck->GetEngineObject()->GetGroundEntity() ? pCheck->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
-		if ( pCheck->GetFlags() & FL_ONGROUND || pGroundEnt )
+		if ( pCheck->GetEngineObject()->GetFlags() & FL_ONGROUND || pGroundEnt )
 		{
 			for ( int i = m_pPushedEntities->m_rgPusher.Count(); --i >= 0; )
 			{
@@ -801,7 +801,7 @@ CBaseEntity *CPhysicsPushedEntities::PerformRotatePush( CBaseEntity *pRoot, floa
 {
 	VPROF("CPhysicsPushedEntities::PerformRotatePush");
 
-	m_bIsUnblockableByPlayer = (pRoot->GetFlags() & FL_UNBLOCKABLE_BY_PLAYER) ? true : false;
+	m_bIsUnblockableByPlayer = (pRoot->GetEngineObject()->GetFlags() & FL_UNBLOCKABLE_BY_PLAYER) ? true : false;
 	// Build a list of this entity + all its children because we're going to try to move them all
 	// This will also make sure each entity is linked in the appropriate place
 	// with correct absboxes
@@ -861,7 +861,7 @@ CBaseEntity *CPhysicsPushedEntities::PerformLinearPush( CBaseEntity *pRoot, floa
 
 	m_flMoveTime = movetime;
 
-	m_bIsUnblockableByPlayer = (pRoot->GetFlags() & FL_UNBLOCKABLE_BY_PLAYER) ? true : false;
+	m_bIsUnblockableByPlayer = (pRoot->GetEngineObject()->GetFlags() & FL_UNBLOCKABLE_BY_PLAYER) ? true : false;
 	// Build a list of this entity + all its children because we're going to try to move them all
 	// This will also make sure each entity is linked in the appropriate place
 	// with correct absboxes
@@ -1084,7 +1084,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 		// run the impact function
 		GetEngineObject()->PhysicsImpact(((CBaseEntity*)trace.m_pEnt)->GetEngineObject(), trace );
 		// Removed by the impact function
-		if ( IsMarkedForDeletion())// || engine->IsEdictFree(entindex()) 
+		if (GetEngineObject()->IsMarkedForDeletion())// || engine->IsEdictFree(entindex()) 
 			break;		
 	
 		time_left -= time_left * trace.fraction;
@@ -1100,7 +1100,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 		numplanes++;
 
 		// modify original_velocity so it parallels all of the clip planes
-		if ( GetMoveType() == MOVETYPE_WALK && (!(GetFlags() & FL_ONGROUND) || GetFriction()!=1) )	// relfect player velocity
+		if ( GetMoveType() == MOVETYPE_WALK && (!(GetEngineObject()->GetFlags() & FL_ONGROUND) || GetFriction()!=1) )	// relfect player velocity
 		{
 			for ( i = 0; i < numplanes; i++ )
 			{
@@ -1549,7 +1549,7 @@ void CBaseEntity::PhysicsCustom()
 		return;
 	}
 	
-	if (IsMarkedForDeletion())//engine->IsEdictFree(entindex())
+	if (GetEngineObject()->IsMarkedForDeletion())//engine->IsEdictFree(entindex())
 		return;
 
 	// check for in water
@@ -1784,7 +1784,7 @@ void CBaseEntity::PhysicsStep()
 	{
 		if ( !VectorCompare( oldOrigin, GetEngineObject()->GetAbsOrigin() ) )
 		{
-			VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), vec3_angle, (GetFlags() & FL_FLY) ? true : false, dt );
+			VPhysicsGetObject()->UpdateShadow(GetEngineObject()->GetAbsOrigin(), vec3_angle, (GetEngineObject()->GetFlags() & FL_FLY) ? true : false, dt );
 		}
 	}
 	PhysicsRelinkChildren(dt);
@@ -1848,7 +1848,7 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 
 	PhysicsCheckVelocity();
 
-	wasonground = ( GetFlags() & FL_ONGROUND ) ? true : false;
+	wasonground = (GetEngineObject()->GetFlags() & FL_ONGROUND ) ? true : false;
 
 	// add gravity except:
 	//   flying monsters
@@ -1859,9 +1859,9 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 
 	if ( !wasonground )
 	{
-		if ( !( GetFlags() & FL_FLY ) )
+		if ( !(GetEngineObject()->GetFlags() & FL_FLY ) )
 		{
-			if ( !( ( GetFlags() & FL_SWIM ) && ( GetWaterLevel() > 0 ) ) )
+			if ( !( (GetEngineObject()->GetFlags() & FL_SWIM ) && ( GetWaterLevel() > 0 ) ) )
 			{
 				if (GetEngineObject()->GetAbsVelocity()[2] < ( GetCurrentGravity() * -0.1 ) )
 				{
@@ -1877,7 +1877,7 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 		}
 	}
 
-	if ( !(GetFlags() & FL_STEPMOVEMENT) &&
+	if ( !(GetEngineObject()->GetFlags() & FL_STEPMOVEMENT) &&
 		(!VectorCompare(GetEngineObject()->GetAbsVelocity(), vec3_origin) ||
 		 !VectorCompare(GetBaseVelocity(), vec3_origin)))
 	{
@@ -1923,7 +1923,7 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 
 		PhysicsCheckVelocity();
 
-		if ( !(GetFlags() & FL_ONGROUND) )
+		if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND) )
 		{
 			PhysicsStepRecheckGround();
 		}
@@ -1931,7 +1931,7 @@ void CBaseEntity::PhysicsStepRunTimestep( float timestep )
 		GetEngineObject()->PhysicsTouchTriggers();
 	}
 
-	if (!( GetFlags() & FL_ONGROUND ) && isfalling)
+	if (!(GetEngineObject()->GetFlags() & FL_ONGROUND ) && isfalling)
 	{
 		PhysicsAddHalfGravity( timestep );
 	}

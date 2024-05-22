@@ -5220,7 +5220,7 @@ CBaseEntity *CNPC_Hunter::MeleeAttack( float flDist, int iDamage, QAngle &qaView
 
 		CBasePlayer *pPlayer = ToBasePlayer( pHurt );
 
-		if ( pPlayer != NULL && !(pPlayer->GetFlags() & FL_GODMODE ) )
+		if ( pPlayer != NULL && !(pPlayer->GetEngineObject()->GetFlags() & FL_GODMODE ) )
 		{
 			pPlayer->ViewPunch( qaViewPunch );
 			pPlayer->VelocityPunch( vecVelocityPunch );

@@ -338,7 +338,7 @@ bool CDODPlayerAnimState::HandleJumping( Activity *idealActivity )
 		// on-ground flag set right when the message comes in.
 		if ( gpGlobals->curtime - m_flJumpStartTime > 0.2f )
 		{
-			if ( m_pOuter->GetFlags() & FL_ONGROUND )
+			if ( m_pOuter->GetEngineObject()->GetFlags() & FL_ONGROUND )
 			{
 				m_bJumping = false;
 				RestartMainSequence();
@@ -375,7 +375,7 @@ bool CDODPlayerAnimState::HandleProneDown( CDODPlayer *pPlayer, Activity *idealA
 	else
 	{
 		*idealActivity = ACT_GET_DOWN_STAND;
-		if ( pPlayer->GetFlags() & FL_DUCKING )
+		if ( pPlayer->GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			*idealActivity = ACT_GET_DOWN_CROUCH;
 		}
@@ -398,7 +398,7 @@ bool CDODPlayerAnimState::HandleProneUp( CDODPlayer *pPlayer, Activity *idealAct
 	}
 
 	*idealActivity = ACT_GET_UP_STAND;
-	if ( pPlayer->GetFlags() & FL_DUCKING )
+	if ( pPlayer->GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		*idealActivity = ACT_GET_UP_CROUCH;
 	}
@@ -461,7 +461,7 @@ bool CDODPlayerAnimState::HandleProne( Activity *idealActivity )
 
 bool CDODPlayerAnimState::HandleDucked( Activity *idealActivity )
 {
-	if ( m_pOuter->GetFlags() & FL_DUCKING )
+	if ( m_pOuter->GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		if ( GetOuterXYSpeed() > MOVING_MINIMUM_SPEED )
 			*idealActivity = ACT_RUN_CROUCH;
@@ -666,7 +666,7 @@ Activity CDODPlayerAnimState::TranslateActivity( Activity actDesired )
 			break;
 		}
 	}
-	else if ( m_pOuter->GetFlags() & FL_DUCKING )
+	else if ( m_pOuter->GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		switch( idealActivity )
 		{

@@ -133,7 +133,7 @@ void CPhysicsShadowClone::UpdateOnRemove( void )
 
 void CPhysicsShadowClone::Spawn( void )
 {
-	AddFlag( FL_DONTTOUCH );
+	GetEngineObject()->AddFlag( FL_DONTTOUCH );
 	AddEffects( EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW );
 
 	FullSync( false );
@@ -147,7 +147,7 @@ void CPhysicsShadowClone::Spawn( void )
 
 void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 {
-	Assert( IsMarkedForDeletion() == false );
+	Assert(GetEngineObject()->IsMarkedForDeletion() == false );
 
 	CBaseEntity *pClonedEntity = m_hClonedEntity.Get();
 
@@ -927,7 +927,7 @@ CPhysicsShadowClone *CPhysicsShadowClone::CreateShadowClone( IPhysicsEnvironment
 
 	AssertMsg( IsShadowClone( pClonedEntity ) == false, "Shouldn't attempt to clone clones" );
 
-	if( pClonedEntity->IsMarkedForDeletion() )
+	if( pClonedEntity->GetEngineObject()->IsMarkedForDeletion() )
 		return NULL;
 
 	//if( pClonedEntity->IsPlayer() )
@@ -947,7 +947,7 @@ CPhysicsShadowClone *CPhysicsShadowClone::CreateShadowClone( IPhysicsEnvironment
 	if( pClonedEntity->GetEngineObject()->GetSolidFlags() & (FSOLID_NOT_SOLID | FSOLID_TRIGGER) )
 		return NULL;
 
-	if( pClonedEntity->GetFlags() & (FL_WORLDBRUSH | FL_STATICPROP) )
+	if( pClonedEntity->GetEngineObject()->GetFlags() & (FL_WORLDBRUSH | FL_STATICPROP) )
 		return NULL;
 
 	/*if( FClassnameIs( pClonedEntity, "func_door" ) )

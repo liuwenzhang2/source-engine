@@ -284,7 +284,7 @@ void NextBotCombatCharacter::DoThink( void )
 		UpdateLastKnownArea();	
 
 		// update bot components
-		if ( !NextBotStop.GetBool() && (GetFlags() & FL_FROZEN) == 0 )
+		if ( !NextBotStop.GetBool() && (GetEngineObject()->GetFlags() & FL_FROZEN) == 0 )
 		{
 			Update();
 		}
@@ -346,7 +346,7 @@ void NextBotCombatCharacter::Ignite( float flFlameLifetime, CBaseEntity *pAttack
 	if ( pFlame )
 	{
 		pFlame->SetLifetime( flFlameLifetime );
-		AddFlag( FL_ONFIRE );
+		GetEngineObject()->AddFlag( FL_ONFIRE );
 
 		SetEffectEntity( pFlame );
 	}

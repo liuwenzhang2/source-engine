@@ -339,7 +339,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 
 		pHead->SetMoveType( MOVETYPE_FLYGRAVITY );
 		pHead->GetEngineObject()->SetAbsVelocity( pCorpse->GetEngineObject()->GetAbsVelocity() );
-		pHead->ClearFlags();
+		pHead->GetEngineObject()->ClearFlags();
 		pHead->m_nReferencePlayer	= ( pCorpse )->entindex();
 
 		pHead->GetEngineObject()->SetLocalAngles( pCorpse->GetEngineObject()->GetAbsAngles() );

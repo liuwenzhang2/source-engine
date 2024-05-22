@@ -79,7 +79,7 @@ void CHL2MP_Player::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, f
 		return;
 #endif
 
-	if ( GetFlags() & FL_DUCKING )
+	if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		return;
 
 	m_Local.m_nStepside = !m_Local.m_nStepside;

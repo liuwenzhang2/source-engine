@@ -550,7 +550,7 @@ void CWateryDeathLeech::Spawn( void )
 
 void CWateryDeathLeech::LeechThink( void )
 {
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		 return;
 
 	StudioFrameAdvance();
@@ -834,7 +834,7 @@ void CTriggerWateryDeath::EndTouch( CBaseEntity *pOther )
 			//		  soundpatch fade the sound out since we'll hit a nasty assert
 			//        cause it'll try to fade out a sound using an entity that might
 			//        be gone since we're shutting down the server.
-			if ( !(pHL2Player->GetFlags() & FL_DONTTOUCH ) )
+			if ( !(pHL2Player->GetEngineObject()->GetFlags() & FL_DONTTOUCH ) )
 				  pHL2Player->StopWaterDeathSounds();
 		}
 	}

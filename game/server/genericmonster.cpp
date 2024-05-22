@@ -271,7 +271,7 @@ void CNPC_Furniture::Spawn( )
 	SetSequence( 0 );
 	SetCycle( 0 );
 	SetNavType( NAV_FLY );
-	AddFlag( FL_FLY );
+	GetEngineObject()->AddFlag( FL_FLY );
 
 	CapabilitiesAdd( bits_CAP_MOVE_FLY | bits_CAP_TURN_HEAD | bits_CAP_ANIMATEDFACE );
 

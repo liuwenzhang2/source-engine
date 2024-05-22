@@ -84,8 +84,8 @@ CBasePlayer *BotPutInServer( bool bFrozen, int iTeam, int iClass )
 	// Allocate a CBasePlayer for the bot, and call spawn
 	//ClientPutInServer( pEdict, botname );
 	CDODPlayer *pPlayer = ((CDODPlayer *)CBaseEntity::Instance( pEdict ));
-	pPlayer->ClearFlags();
-	pPlayer->AddFlag( FL_CLIENT | FL_FAKECLIENT );
+	pPlayer->GetEngineObject()->ClearFlags();
+	pPlayer->GetEngineObject()->AddFlag( FL_CLIENT | FL_FAKECLIENT );
 
 	if ( bFrozen )
 		pPlayer->GetEngineObject()->AddEFlags( EFL_BOT_FROZEN );
@@ -108,7 +108,7 @@ void Bot_RunAll( void )
 	{
 		CDODPlayer *pPlayer = ToDODPlayer( UTIL_PlayerByIndex( i ) );
 
-		if ( pPlayer && (pPlayer->GetFlags() & FL_FAKECLIENT) )
+		if ( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FAKECLIENT) )
 		{
 			Bot_Think( pPlayer );
 		}
@@ -202,7 +202,7 @@ static void RunPlayerMove( CDODPlayer *fakeclient, const QAngle& viewangles, flo
 void Bot_Think( CDODPlayer *pBot )
 {
 	// Make sure we stay being a bot
-	pBot->AddFlag( FL_FAKECLIENT );
+	pBot->GetEngineObject()->AddFlag( FL_FAKECLIENT );
 
 	botdata_t *botdata = &g_BotData[ pBot->entindex() - 1 ];
 

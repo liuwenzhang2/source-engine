@@ -483,7 +483,7 @@ void CNPC_RocketTurret::UpdateAimPoint ( void )
 	VectorAngles( m_vecDirToEnemy, m_vecAnglesToEnemy );
 
 	bool bEnemyVisible = false;
-	if ( !(GetEnemy()->GetFlags() & FL_NOTARGET) )
+	if ( !(GetEnemy()->GetEngineObject()->GetFlags() & FL_NOTARGET) )
 	{
 		bool bEnemyVisibleInWorld = FVisible( GetEnemy() );
 

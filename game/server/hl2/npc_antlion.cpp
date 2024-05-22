@@ -346,7 +346,7 @@ void CNPC_Antlion::Spawn( void )
 	if ( m_bStartBurrowed )
 	{
 		AddEffects( EF_NODRAW );
-		AddFlag( FL_NOTARGET );
+		GetEngineObject()->AddFlag( FL_NOTARGET );
 		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage	= DAMAGE_NO;
@@ -670,7 +670,7 @@ void CNPC_Antlion::MeleeAttack( float distance, float damage, QAngle &viewPunch,
 		if ( pPlayer != NULL )
 		{
 			//Kick the player angles
-			if ( !(pPlayer->GetFlags() & FL_GODMODE ) && pPlayer->GetMoveType() != MOVETYPE_NOCLIP )
+			if ( !(pPlayer->GetEngineObject()->GetFlags() & FL_GODMODE ) && pPlayer->GetMoveType() != MOVETYPE_NOCLIP )
 			{
 				pPlayer->ViewPunch( viewPunch );
 
@@ -1276,7 +1276,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 		CreateDust();
 
 		RemoveEffects( EF_NODRAW );
-		RemoveFlag( FL_NOTARGET );
+		GetEngineObject()->RemoveFlag( FL_NOTARGET );
 
 		return;
 	}
@@ -1757,7 +1757,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 
 	case TASK_ANTLION_VANISH:
 		AddEffects( EF_NODRAW );
-		AddFlag( FL_NOTARGET );
+		GetEngineObject()->AddFlag( FL_NOTARGET );
 		GetEngineObject()->AddSpawnFlags(SF_NPC_GAG);
 		
 		// If the task parameter is non-zero, remove us when we vanish
@@ -1824,7 +1824,7 @@ void CNPC_Antlion::RunTask( const Task_t *pTask )
 {
 	// some state that needs be set each frame
 #if HL2_EPISODIC
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		m_bHasDoneAirAttack = false;
 	}
@@ -1883,7 +1883,7 @@ void CNPC_Antlion::RunTask( const Task_t *pTask )
 
 	case TASK_ANTLION_DISMOUNT_NPC:
 		
-		if ( GetFlags() & FL_ONGROUND )
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 
@@ -2076,7 +2076,7 @@ bool CNPC_Antlion::IsJumpLegal( const Vector &startPos, const Vector &apex, cons
 
 bool CNPC_Antlion::IsFirmlyOnGround( void )
 {
-	if( !( GetFlags()&FL_ONGROUND ) )
+	if( !(GetEngineObject()->GetFlags()&FL_ONGROUND ) )
 		return false;
 
 	trace_t tr;
@@ -2167,7 +2167,7 @@ bool CNPC_Antlion::ShouldJump( void )
 		return false;
 
 	// only jump if you're on the ground
-  	if (!(GetFlags() & FL_ONGROUND) || GetNavType() == NAV_JUMP )
+  	if (!(GetEngineObject()->GetFlags() & FL_ONGROUND) || GetNavType() == NAV_JUMP )
 		return false;
 
 	// Don't jump if I'm not allowed
@@ -2806,7 +2806,7 @@ void CNPC_Antlion::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 			{
 				PainSound( newInfo );
 
-				if( GetFlags() & FL_ONGROUND )
+				if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 				{
 					// Only flip if on the ground.
 					SetCondition( COND_ANTLION_FLIPPED );
@@ -2821,7 +2821,7 @@ void CNPC_Antlion::TraceAttack( const CTakeDamageInfo &info, const Vector &vecDi
 			else
 			{
 				//Don't flip off the deck
-				if ( GetFlags() & FL_ONGROUND )
+				if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 				{
 					PainSound( newInfo );
 
@@ -3175,7 +3175,7 @@ void CNPC_Antlion::StartJump( void )
 		//	return;
 
 		//Don't jump if we're not on the ground
-		if ( ( GetFlags() & FL_ONGROUND ) == false )
+		if ( (GetEngineObject()->GetFlags() & FL_ONGROUND ) == false )
 			return;
 	}
 
@@ -3465,7 +3465,7 @@ bool CNPC_Antlion::CheckLanding( void )
 	AI_TraceHull(GetEngineObject()->GetAbsOrigin(), testPos, NAI_Hull::Mins( GetHullType() ), NAI_Hull::Maxs( GetHullType() ), MASK_NPCSOLID, this, COLLISION_GROUP_NONE, &tr );
 
 	//See if we're about to contact, or have already contacted the ground
-	if ( ( tr.fraction != 1.0f ) || ( GetFlags() & FL_ONGROUND ) )
+	if ( ( tr.fraction != 1.0f ) || (GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
 		int	sequence = SelectWeightedSequence( (Activity)ACT_ANTLION_LAND );
 
@@ -3742,7 +3742,7 @@ void CNPC_Antlion::BuildScheduleTestBits( void )
 		!IsCurSchedule(SCHED_ANTLION_JUMP)					&&
 		!IsCurSchedule(SCHED_ANTLION_FLIP)					&&
 		!IsCurSchedule(SCHED_ANTLION_DISMOUNT_NPC)			&& 
-		( GetFlags() & FL_ONGROUND ) )
+		(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
 		// Only do these if not jumping as well
 		if (!IsCurSchedule(SCHED_ANTLION_JUMP))
@@ -3819,7 +3819,7 @@ void CNPC_Antlion::GatherConditions( void )
 	// See if I've landed on an NPC!
 	CBaseEntity* pGroundEnt = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 	
-	if ( ( ( pGroundEnt != NULL ) && ( pGroundEnt->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_STANDABLE ) ) && ( GetFlags() & FL_ONGROUND ) && ( !IsEffectActive( EF_NODRAW ) && !pGroundEnt->IsEffectActive( EF_NODRAW ) ) )
+	if ( ( ( pGroundEnt != NULL ) && ( pGroundEnt->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_STANDABLE ) ) && (GetEngineObject()->GetFlags() & FL_ONGROUND ) && ( !IsEffectActive( EF_NODRAW ) && !pGroundEnt->IsEffectActive( EF_NODRAW ) ) )
 	{
 		SetCondition( COND_ANTLION_ON_NPC );
 	}
@@ -3909,7 +3909,7 @@ void CNPC_Antlion::PrescheduleThink( void )
 		RemoveEffects( EF_NODRAW );
 		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_takedamage	= DAMAGE_YES;
-		RemoveFlag( FL_NOTARGET );
+		GetEngineObject()->RemoveFlag( FL_NOTARGET );
 		GetEngineObject()->RemoveSpawnFlags(SF_NPC_GAG);
 	}
 
@@ -4243,7 +4243,7 @@ void CNPC_Antlion::Touch( CBaseEntity *pOther )
 
 		//Kick the player angles
 		bool bIsPlayer = pOther->IsPlayer();
-		if ( bIsPlayer && !(pOther->GetFlags() & FL_GODMODE ) && pOther->GetMoveType() != MOVETYPE_NOCLIP )
+		if ( bIsPlayer && !(pOther->GetEngineObject()->GetFlags() & FL_GODMODE ) && pOther->GetMoveType() != MOVETYPE_NOCLIP )
 		{
 			pOther->ViewPunch( QAngle( 4.0f, 0.0f, 0.0f ) );
 		}
@@ -4466,7 +4466,7 @@ void CNPC_Antlion::Flip( bool bZapped /*= false*/ )
 		return;
 
 	// Must be on the ground
-	if ( ( GetFlags() & FL_ONGROUND ) == false ) 
+	if ( (GetEngineObject()->GetFlags() & FL_ONGROUND ) == false )
 		return;
 
 	// Can't be in a dynamic interation

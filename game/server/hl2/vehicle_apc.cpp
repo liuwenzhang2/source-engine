@@ -161,7 +161,7 @@ void CPropAPC::Spawn( void )
 
 	if( g_pGameRules->GetAutoAimMode() == AUTOAIM_ON_CONSOLE )
 	{
-		AddFlag( FL_AIMTARGET );
+		GetEngineObject()->AddFlag( FL_AIMTARGET );
 	}
 }
 

@@ -331,11 +331,11 @@ void C_ClientRagdoll::OnRestore( void )
 		return;
 	}
 
-	if ( GetFlags() & FL_DISSOLVING )
+	if (GetEngineObject()->GetFlags() & FL_DISSOLVING )
 	{
 		DissolveEffect( this, m_flEffectTime );
 	}
-	else if ( GetFlags() & FL_ONFIRE )
+	else if (GetEngineObject()->GetFlags() & FL_ONFIRE )
 	{
 		C_EntityFlame *pFireChild = dynamic_cast<C_EntityFlame *>( GetEffectEntity() );
 		C_EntityFlame *pNewFireChild = FireEffect( this, pFireChild, m_flScaleEnd, m_flScaleTimeStart, m_flScaleTimeEnd );
@@ -624,7 +624,7 @@ void C_ClientRagdoll::Release( void )
 {
 	C_BaseEntity *pChild = GetEffectEntity();
 
-	if ( pChild && pChild->IsMarkedForDeletion() == false )
+	if ( pChild && pChild->GetEngineObject()->IsMarkedForDeletion() == false )
 	{
 		DestroyEntity(pChild);// ->Release();
 	}
@@ -2860,7 +2860,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 			// since we're right in the middle of setting up our new transforms. 
 			//
 			// Setting this flag forces move children to keep their abs transform invalidated.
-			AddFlag( EFL_SETTING_UP_BONES );
+			GetEngineObject()->AddFlag( EFL_SETTING_UP_BONES );
 
 			// NOTE: For model scaling, we need to opt out of IK because it will mark the bones as already being calculated
 			if ( !IsModelScaled() )
@@ -2919,7 +2919,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 
 			BuildTransformations( hdr, pos, q, parentTransform, bonesMaskNeedRecalc, boneComputed );
 			
-			RemoveFlag( EFL_SETTING_UP_BONES );
+			GetEngineObject()->RemoveFlag( EFL_SETTING_UP_BONES );
 			ControlMouth( hdr );
 		}
 		

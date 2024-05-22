@@ -63,7 +63,7 @@ void CNPC_Hornet::Spawn( void )
 	SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	m_takedamage	= DAMAGE_YES;
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 	m_iHealth		= 1;// weak!
 	m_bloodColor	= DONT_BLEED;
 	
@@ -96,7 +96,7 @@ void CNPC_Hornet::Spawn( void )
 	SetTouch( &CNPC_Hornet::DieTouch );
 	SetThink( &CNPC_Hornet::StartTrack );
 
-	if ( GetOwnerEntity() && (GetOwnerEntity()->GetFlags() & FL_CLIENT) )
+	if ( GetOwnerEntity() && (GetOwnerEntity()->GetEngineObject()->GetFlags() & FL_CLIENT) )
 	{
 		m_flDamage = sk_plr_dmg_hornet.GetFloat();
 	}
@@ -142,7 +142,7 @@ Disposition_t CNPC_Hornet::IRelationType( CBaseEntity *pTarget )
 //=========================================================
 Class_T CNPC_Hornet::Classify ( void )
 {
-	if ( GetOwnerEntity() && (GetOwnerEntity()->GetFlags() & FL_CLIENT) )
+	if ( GetOwnerEntity() && (GetOwnerEntity()->GetEngineObject()->GetFlags() & FL_CLIENT) )
 	{
 		return CLASS_PLAYER_BIOWEAPON;
 	}
@@ -346,7 +346,7 @@ void CNPC_Hornet::TrackTarget ( void )
 	Vector vecVel = vecFlightDir + vecDirToEnemy;
 	VectorNormalize( vecVel );
 
-	if ( GetOwnerEntity() && (GetOwnerEntity()->GetFlags() & FL_NPC) )
+	if ( GetOwnerEntity() && (GetOwnerEntity()->GetEngineObject()->GetFlags() & FL_NPC) )
 	{
 		// random pattern only applies to hornets fired by monsters, not players. 
 

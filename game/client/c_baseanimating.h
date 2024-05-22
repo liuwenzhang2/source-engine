@@ -309,7 +309,7 @@ public:
 	virtual int GetBody()			{ return m_nBody; }
 	virtual int GetSkin()			{ return m_nSkin; }
 
-	bool IsOnFire() { return ( (GetFlags() & FL_ONFIRE) != 0 ); }
+	bool IsOnFire() { return ( (GetEngineObject()->GetFlags() & FL_ONFIRE) != 0 ); }
 
 	inline float					GetPlaybackRate();
 	inline void						SetPlaybackRate( float rate );

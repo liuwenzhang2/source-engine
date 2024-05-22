@@ -160,7 +160,7 @@ void CNPC_Bullseye::Spawn( void )
 		SetBloodColor(DONT_BLEED);
 	}
 
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
 	SetThink( &CNPC_Bullseye::BullseyeThink );
@@ -198,7 +198,7 @@ void CNPC_Bullseye::Spawn( void )
 	if( m_fAutoaimRadius > 0.0f )
 	{
 		// Make this an aimtarget, since it has some autoaim influence.
-		AddFlag(FL_AIMTARGET);
+		GetEngineObject()->AddFlag(FL_AIMTARGET);
 	}
 }
 

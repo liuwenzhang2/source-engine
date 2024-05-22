@@ -327,7 +327,7 @@ void CNPC_CombineCamera::Spawn()
 
 	SetHeight(COMBINE_CAMERA_RETRACT_HEIGHT);
 
-	AddFlag(FL_AIMTARGET);
+	GetEngineObject()->AddFlag(FL_AIMTARGET);
 
 	SetPoseParameter(COMBINE_CAMERA_BC_YAW, 0);
 	SetPoseParameter(COMBINE_CAMERA_BC_PITCH, 0);
@@ -411,7 +411,7 @@ int CNPC_CombineCamera::OnTakeDamage(const CTakeDamageInfo &inputInfo)
 		m_iHealth = 0;
 		m_takedamage = DAMAGE_NO;
 
-		RemoveFlag(FL_NPC); // why are they set in the first place???
+		GetEngineObject()->RemoveFlag(FL_NPC); // why are they set in the first place???
 
 		// FIXME: This needs to throw a ragdoll gib or something other than animating the retraction -- jdw
 

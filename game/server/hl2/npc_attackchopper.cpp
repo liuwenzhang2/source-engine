@@ -1105,7 +1105,7 @@ void CNPC_AttackHelicopter::Spawn( void )
 	m_hSensor->GetEngineObject()->SetLocalAngles( vec3_angle );
 	m_hSensor->SetOwnerEntity( this );
 
-	AddFlag( FL_AIMTARGET );
+	GetEngineObject()->AddFlag( FL_AIMTARGET );
 
 	m_hCrashPoint.Set( NULL );
 }
@@ -1703,7 +1703,7 @@ CBaseEntity *CNPC_AttackHelicopter::FindTrackBlocker( const Vector &vecViewPoint
 //-----------------------------------------------------------------------------
 bool CNPC_AttackHelicopter::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **ppBlocker )
 {
-	if ( pEntity->GetFlags() & FL_NOTARGET )
+	if ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET )
 		return false;
 
 #if 0
@@ -4211,7 +4211,7 @@ void CNPC_AttackHelicopter::FlightDirectlyOverhead( void )
 //-----------------------------------------------------------------------------
 void CNPC_AttackHelicopter::Flight( void )
 {
-	if( GetFlags() & FL_ONGROUND )
+	if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		// This would be really bad.
 		GetEngineObject()->SetGroundEntity( NULL );
@@ -5172,7 +5172,7 @@ void CGrenadeHelicopter::BecomeActive()
 	if ( m_bActivated )
 		return;
 
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
 	m_bActivated = true;

@@ -75,7 +75,7 @@ bool CHudPortalCrosshair::ShouldDraw()
 			!engine->IsDrawingLoadingImage() &&
 			!engine->IsPaused() && 
 			g_pClientMode->ShouldDrawCrosshair() &&
-			!( pPlayer->GetFlags() & FL_FROZEN ) &&
+			!( pPlayer->GetEngineObject()->GetFlags() & FL_FROZEN ) &&
 			( pPlayer->entindex() == render->GetViewEntity() ) &&
 			!pPlayer->IsInVGuiInputMode() &&
 			( pPlayer->IsAlive() ||	( pPlayer->GetObserverMode() == OBS_MODE_IN_EYE ) || ( cl_observercrosshair.GetBool() && pPlayer->GetObserverMode() == OBS_MODE_ROAMING ) );

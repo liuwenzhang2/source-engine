@@ -319,32 +319,6 @@ const Vector &CBaseEntity::WorldSpaceCenter( ) const
 	return GetEngineObject()->WorldSpaceCenter();
 }
 
-#if !defined( CLIENT_DLL )
-#define CHANGE_FLAGS(flags,newFlags) { unsigned int old = flags; flags = (newFlags); gEntList.ReportEntityFlagsChanged( this, old, flags ); }
-#else
-#define CHANGE_FLAGS(flags,newFlags) (flags = (newFlags))
-#endif
-
-void CBaseEntity::AddFlag( int flags )
-{
-	CHANGE_FLAGS( m_fFlags, m_fFlags | flags );
-}
-
-void CBaseEntity::RemoveFlag( int flagsToRemove )
-{
-	CHANGE_FLAGS( m_fFlags, m_fFlags & ~flagsToRemove );
-}
-
-void CBaseEntity::ClearFlags( void )
-{
-	CHANGE_FLAGS( m_fFlags, 0 );
-}
-
-void CBaseEntity::ToggleFlag( int flagToToggle )
-{
-	CHANGE_FLAGS( m_fFlags, m_fFlags ^ flagToToggle );
-}
-
 void CBaseEntity::SetEffects( int nEffects )
 {
 	if ( nEffects != m_fEffects )
@@ -1367,7 +1341,7 @@ bool CBaseEntity::VPhysicsInitSetup()
 {
 #ifndef CLIENT_DLL
 	// don't support logical ents
-	if ( entindex()==-1 || IsMarkedForDeletion() )
+	if ( entindex()==-1 || GetEngineObject()->IsMarkedForDeletion() )
 		return false;
 #endif
 

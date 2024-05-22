@@ -1040,8 +1040,8 @@ void CGameMovement::CheckParameters( void )
 		}
 	}
 
-	if ( player->GetFlags() & FL_FROZEN ||
-		 player->GetFlags() & FL_ONTRAIN || 
+	if ( player->GetEngineObject()->GetFlags() & FL_FROZEN ||
+		 player->GetEngineObject()->GetFlags() & FL_ONTRAIN ||
 		 IsDead() )
 	{
 		mv->m_flForwardMove = 0;
@@ -1337,7 +1337,7 @@ void CGameMovement::CheckWaterJump( void )
 			{
 				mv->m_vecVelocity[2] = 256.0f;			// Push up
 				mv->m_nOldButtons |= IN_JUMP;		// Don't jump again until released
-				player->AddFlag( FL_WATERJUMP );
+				player->GetEngineObject()->AddFlag( FL_WATERJUMP );
 				player->m_flWaterJumpTime = 2000.0f;	// Do this for 2 seconds
 			}
 		}
@@ -1360,7 +1360,7 @@ void CGameMovement::WaterJump( void )
 	if (player->m_flWaterJumpTime <= 0 || !player->GetWaterLevel())
 	{
 		player->m_flWaterJumpTime = 0;
-		player->RemoveFlag( FL_WATERJUMP );
+		player->GetEngineObject()->RemoveFlag( FL_WATERJUMP );
 	}
 	
 	mv->m_vecVelocity[0] = player->m_vecWaterJumpVel[0];
@@ -2408,7 +2408,7 @@ bool CGameMovement::CheckJumpButton( void )
 		return false;		// don't pogo stick
 
 	// Cannot jump will in the unduck transition.
-	if ( player->m_Local.m_bDucking && (  player->GetFlags() & FL_DUCKING ) )
+	if ( player->m_Local.m_bDucking && (  player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 		return false;
 
 	// Still updating the eye position.
@@ -2449,7 +2449,7 @@ bool CGameMovement::CheckJumpButton( void )
 	// Acclerate upward
 	// If we are ducking...
 	float startz = mv->m_vecVelocity[2];
-	if ( (  player->m_Local.m_bDucking ) || (  player->GetFlags() & FL_DUCKING ) )
+	if ( (  player->m_Local.m_bDucking ) || (  player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 	{
 		// d = 0.5 * g * t^2		- distance traveled with linear accel
 		// t = sqrt(2.0 * 45 / g)	- how long to fall 45 units
@@ -4105,7 +4105,7 @@ void CGameMovement::FinishUnDuck( void )
 	}
 
 	player->m_Local.m_bDucked = false;
-	player->RemoveFlag( FL_DUCKING );
+	player->GetEngineObject()->RemoveFlag( FL_DUCKING );
 	player->m_Local.m_bDucking  = false;
 	player->m_Local.m_bInDuckJump  = false;
 	player->SetViewOffset( GetPlayerViewOffset( false ) );
@@ -4167,7 +4167,7 @@ void CGameMovement::FinishUnDuckJump( trace_t &trace )
 	viewDelta.z *= trace.fraction;
 	flDeltaZ -= viewDelta.z;
 
-	player->RemoveFlag( FL_DUCKING );
+	player->GetEngineObject()->RemoveFlag( FL_DUCKING );
 	player->m_Local.m_bDucked = false;
 	player->m_Local.m_bDucking  = false;
 	player->m_Local.m_bInDuckJump = false;
@@ -4193,7 +4193,7 @@ void CGameMovement::FinishDuck( void )
 {
 	// if ( player->GetFlags() & FL_DUCKING ) return;
 
-	player->AddFlag( FL_DUCKING );
+	player->GetEngineObject()->AddFlag( FL_DUCKING );
 	player->m_Local.m_bDucked = true;
 	player->m_Local.m_bDucking = false;
 
@@ -4242,7 +4242,7 @@ void CGameMovement::FinishDuck( void )
 //-----------------------------------------------------------------------------
 void CGameMovement::StartUnDuckJump( void )
 {
-	player->AddFlag( FL_DUCKING );
+	player->GetEngineObject()->AddFlag( FL_DUCKING );
 	player->m_Local.m_bDucked = true;
 	player->m_Local.m_bDucking = false;
 
@@ -4290,7 +4290,7 @@ void CGameMovement::SetDuckedEyeOffset( float duckFraction )
 //-----------------------------------------------------------------------------
 void CGameMovement::HandleDuckingSpeedCrop( void )
 {
-	if ( !( m_iSpeedCropped & SPEED_CROPPED_DUCK ) && ( player->GetFlags() & FL_DUCKING ) && ( player->GetEngineObject()->GetGroundEntity() != NULL ) )
+	if ( !( m_iSpeedCropped & SPEED_CROPPED_DUCK ) && ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) && ( player->GetEngineObject()->GetGroundEntity() != NULL ) )
 	{
 		float frac = 0.33333333f;
 		mv->m_flForwardMove	*= frac;
@@ -4338,7 +4338,7 @@ void CGameMovement::Duck( void )
 
 	// Check to see if we are in the air.
 	bool bInAir = ( player->GetEngineObject()->GetGroundEntity() == NULL );
-	bool bInDuck = ( player->GetFlags() & FL_DUCKING ) ? true : false;
+	bool bInDuck = ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) ? true : false;
 	bool bDuckJump = ( player->m_Local.m_flJumpTime > 0.0f );
 	bool bDuckJumpTime = ( player->m_Local.m_flDuckJumpTime > 0.0f );
 
@@ -4511,7 +4511,7 @@ void CGameMovement::Duck( void )
 						player->m_Local.m_flDucktime = GAMEMOVEMENT_DUCK_TIME;
 						player->m_Local.m_bDucked = true;
 						player->m_Local.m_bDucking = false;
-						player->AddFlag( FL_DUCKING );
+						player->GetEngineObject()->AddFlag( FL_DUCKING );
 					}
 				}
 			}
@@ -4610,7 +4610,7 @@ void CGameMovement::PlayerMove( void )
 	Duck();
 
 	// Don't run ladder code if dead on on a train
-	if ( !player->pl.deadflag && !(player->GetFlags() & FL_ONTRAIN) )
+	if ( !player->pl.deadflag && !(player->GetEngineObject()->GetFlags() & FL_ONTRAIN) )
 	{
 		// If was not on a ladder now, but was on one before, 
 		//  get off of the ladder

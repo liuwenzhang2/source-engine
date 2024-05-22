@@ -299,7 +299,7 @@ Activity CNPCSimpleTalker::NPC_TranslateActivity( Activity eNewActivity )
 void CNPCSimpleTalker::Event_Killed( const CTakeDamageInfo &info )
 {
 	AlertFriends( info.GetAttacker() );
-	if ( info.GetAttacker()->GetFlags() & FL_CLIENT )
+	if ( info.GetAttacker()->GetEngineObject()->GetFlags() & FL_CLIENT )
 	{
 		LimitFollowers( info.GetAttacker(), 0 );
 	}
@@ -361,7 +361,7 @@ void CNPCSimpleTalker::AlertFriends( CBaseEntity *pKiller )
 			if ( pNPC->IsAlive() )
 			{
 				// If a client killed me, make everyone else mad/afraid of him
-				if ( pKiller->GetFlags() & FL_CLIENT )
+				if ( pKiller->GetEngineObject()->GetFlags() & FL_CLIENT )
 				{
 					CNPCSimpleTalker*pTalkNPC = (CNPCSimpleTalker *)pFriend;
 
@@ -791,7 +791,7 @@ int CNPCSimpleTalker::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	CTakeDamageInfo subInfo = info;
 
 	// if player damaged this entity, have other friends talk about it.
-	if (subInfo.GetAttacker() && (subInfo.GetAttacker()->GetFlags() & FL_CLIENT) && subInfo.GetDamage() < GetHealth() )
+	if (subInfo.GetAttacker() && (subInfo.GetAttacker()->GetEngineObject()->GetFlags() & FL_CLIENT) && subInfo.GetDamage() < GetHealth() )
 	{
 		CBaseEntity *pFriend = FindNearestFriend(false);
 

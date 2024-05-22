@@ -281,7 +281,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 			CPASAttenuationFilter filter( this );
 			if ( pHurt )
 			{
-				if ( pHurt->GetFlags() & ( FL_NPC | FL_CLIENT ) )
+				if ( pHurt->GetEngineObject()->GetFlags() & ( FL_NPC | FL_CLIENT ) )
 					 pHurt->ViewPunch( QAngle( 5, 0, -18 ) );
 			
 				// Play a random attack hit sound
@@ -315,7 +315,7 @@ void CNPC_Vortigaunt::HandleAnimEvent( animevent_t *pEvent )
 			CPASAttenuationFilter filter2( this );
 			if ( pHurt )
 			{
-				if ( pHurt->GetFlags() & ( FL_NPC | FL_CLIENT ) )
+				if ( pHurt->GetEngineObject()->GetFlags() & ( FL_NPC | FL_CLIENT ) )
 					 pHurt->ViewPunch( QAngle( 5, 0, 18 ) );
 
 				CSoundParameters params;

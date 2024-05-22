@@ -509,7 +509,7 @@ void CNPC_Strider::Spawn()
 
 	m_flFieldOfView = 0.0; // 180 degrees
 
-	AddFlag( FL_FLY );
+	GetEngineObject()->AddFlag( FL_FLY );
 	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_STRIDER );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -650,7 +650,7 @@ void CNPC_Strider::PostNPCInit()
 		SetMoveType( MOVETYPE_NONE );
 		SetActivity( (Activity)ACT_STRIDER_CARRIED );
 		SetThink( &CNPC_Strider::CarriedThink );
-		RemoveFlag( FL_FLY );
+		GetEngineObject()->RemoveFlag( FL_FLY );
 	}
 
 	m_PlayerFreePass.SetPassTarget( UTIL_PlayerByIndex(1) );
@@ -1761,8 +1761,8 @@ void CNPC_Strider::RunTask( const Task_t *pTask )
 		if ( IsActivityFinished() )
 		{
 			// UNDONE: Fix this bug!
-			//Assert(!IsMarkedForDeletion());
-			if ( !IsMarkedForDeletion() )
+			//Assert(!GetEngineObject()->IsMarkedForDeletion());
+			if ( !GetEngineObject()->IsMarkedForDeletion() )
 			{
 				CTakeDamageInfo info;
 				CreateServerRagdoll( this, 0, info, COLLISION_GROUP_NONE );
@@ -3728,7 +3728,7 @@ void CNPC_Strider::TranslateNavGoal( CBaseEntity *pEnemy, Vector &chasePosition 
 {
 	if ( pEnemy )
 	{
-		if ( ! (pEnemy->GetFlags() & FL_ONGROUND) )
+		if ( ! (pEnemy->GetEngineObject()->GetFlags() & FL_ONGROUND) )
 		{
 			MoveToGround( &chasePosition, pEnemy, pEnemy->WorldAlignMins(), pEnemy->WorldAlignMaxs() );
 		}

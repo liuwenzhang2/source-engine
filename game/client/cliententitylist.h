@@ -343,11 +343,18 @@ public:
 		return m_iParentAttachment;
 	}
 
+	void AddFlag(int flags);
+	void RemoveFlag(int flagsToRemove);
+	void ToggleFlag(int flagToToggle);
+	int GetFlags(void) const;
+	void ClearFlags();
 	int GetEFlags() const;
 	void SetEFlags(int iEFlags);
 	void AddEFlags(int nEFlagMask);
 	void RemoveEFlags(int nEFlagMask);
 	bool IsEFlagSet(int nEFlagMask) const;
+	// checks to see if the entity is marked for deletion
+	bool IsMarkedForDeletion(void);
 	int GetSpawnFlags(void) const;
 	void SetCheckUntouch(bool check);
 	bool GetCheckUntouch() const;
@@ -522,6 +529,8 @@ private:
 	CHandle<C_BaseEntity>			m_hNetworkMoveParent = NULL;
 	unsigned char					m_iParentAttachment; // 0 if we're relative to the parent's absorigin and absangles.
 
+	// Behavior flags
+	int								m_fFlags;
 	int								m_iEFlags;	// entity flags EFL_*
 	int								m_spawnflags;
 	// used so we know when things are no longer touching
@@ -640,6 +649,11 @@ inline unsigned char C_EngineObjectInternal::GetParentAttachment() const
 	return m_iParentAttachment;
 }
 
+inline int	C_EngineObjectInternal::GetFlags(void) const
+{
+	return m_fFlags;
+}
+
 //-----------------------------------------------------------------------------
 // EFlags.. 
 //-----------------------------------------------------------------------------
@@ -666,6 +680,14 @@ inline void C_EngineObjectInternal::RemoveEFlags(int nEFlagMask)
 inline bool C_EngineObjectInternal::IsEFlagSet(int nEFlagMask) const
 {
 	return (m_iEFlags & nEFlagMask) != 0;
+}
+
+//-----------------------------------------------------------------------------
+// checks to see if the entity is marked for deletion
+//-----------------------------------------------------------------------------
+inline bool C_EngineObjectInternal::IsMarkedForDeletion(void)
+{
+	return (GetEFlags() & EFL_KILLME);
 }
 
 inline int C_EngineObjectInternal::GetSpawnFlags(void) const

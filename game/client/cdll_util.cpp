@@ -641,7 +641,7 @@ IterationRetval_t CFlaggedEntitiesEnum::EnumElement( IHandleEntity *pHandleEntit
 	C_BaseEntity *pEntity = pClientEntity ? pClientEntity->GetBaseEntity() : NULL;
 	if ( pEntity )
 	{
-		if ( m_flagMask && !(pEntity->GetFlags() & m_flagMask) )	// Does it meet the criteria?
+		if ( m_flagMask && !(pEntity->GetEngineObject()->GetFlags() & m_flagMask) )	// Does it meet the criteria?
 			return ITERATION_CONTINUE;
 
 		if ( !AddToList( pEntity ) )

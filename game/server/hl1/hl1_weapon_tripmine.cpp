@@ -134,7 +134,7 @@ void CWeaponTripMine::PrimaryAttack( void )
 	if ( tr.fraction < 1.0 )
 	{
 		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
-		if ( pEntity && !( pEntity->GetFlags() & FL_CONVEYOR ) )
+		if ( pEntity && !( pEntity->GetEngineObject()->GetFlags() & FL_CONVEYOR ) )
 		{
 			QAngle angles;
 			VectorAngles( tr.plane.normal, angles );
@@ -579,7 +579,7 @@ void CTripmineGrenade::Event_Killed( const CTakeDamageInfo &info )
 {
 	m_takedamage = DAMAGE_NO;
 
-	if ( info.GetAttacker() && ( info.GetAttacker()->GetFlags() & FL_CLIENT ) )
+	if ( info.GetAttacker() && ( info.GetAttacker()->GetEngineObject()->GetFlags() & FL_CLIENT ) )
 	{
 		// some client has destroyed this mine, he'll get credit for any kills
 		SetOwnerEntity( info.GetAttacker() );

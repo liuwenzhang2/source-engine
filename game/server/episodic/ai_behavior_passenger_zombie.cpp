@@ -535,7 +535,7 @@ void CAI_PassengerBehaviorZombie::RunTask( const Task_t *pTask )
 			GetOuter()->GetMotor()->SetIdealYawToTarget( vecAttachPoint );
 
 			// All done when you touch the ground
-			if ( GetOuter()->GetFlags() & FL_ONGROUND )
+			if ( GetOuter()->GetEngineObject()->GetFlags() & FL_ONGROUND )
 			{
 				m_flNextLeapTime = gpGlobals->curtime + 2.0f;
 				TaskComplete();

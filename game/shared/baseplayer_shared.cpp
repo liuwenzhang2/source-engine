@@ -369,7 +369,7 @@ const Vector CBasePlayer::GetPlayerMins( void ) const
 	}
 	else
 	{
-		if ( GetFlags() & FL_DUCKING )
+		if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			return VEC_DUCK_HULL_MIN_SCALED( this );
 		}
@@ -393,7 +393,7 @@ const Vector CBasePlayer::GetPlayerMaxs( void ) const
 	}
 	else
 	{
-		if ( GetFlags() & FL_DUCKING )
+		if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			return VEC_DUCK_HULL_MAX_SCALED( this );
 		}
@@ -527,7 +527,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 	if ( m_flStepSoundTime > 0 )
 		return;
 
-	if ( GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
+	if (GetEngineObject()->GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
 		return;
 
 	if ( GetMoveType() == MOVETYPE_NOCLIP || GetMoveType() == MOVETYPE_OBSERVER )
@@ -544,7 +544,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 
 	GetStepSoundVelocities( &velwalk, &velrun );
 
-	bool onground = ( GetFlags() & FL_ONGROUND );
+	bool onground = (GetEngineObject()->GetFlags() & FL_ONGROUND );
 	bool movingalongground = ( groundspeed > 0.0001f );
 	bool moving_fast_enough =  ( speed >= velwalk );
 
@@ -651,7 +651,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 	
 	// play the sound
 	// 65% volume if ducking
-	if ( GetFlags() & FL_DUCKING )
+	if (GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		fvol *= 0.65;
 	}
@@ -771,7 +771,7 @@ void CBasePlayer::UpdateButtonState( int nUserCmdButtonMask )
 void CBasePlayer::GetStepSoundVelocities( float *velwalk, float *velrun )
 {
 	// UNDONE: need defined numbers for run, walk, crouch, crouch run velocities!!!!	
-	if ( ( GetFlags() & FL_DUCKING) || ( GetMoveType() == MOVETYPE_LADDER ) )
+	if ( (GetEngineObject()->GetFlags() & FL_DUCKING) || ( GetMoveType() == MOVETYPE_LADDER ) )
 	{
 		*velwalk = 60;		// These constants should be based on cl_movespeedkey * cl_forwardspeed somehow
 		*velrun = 80;		
@@ -809,7 +809,7 @@ void CBasePlayer::SetStepSoundTime( stepsoundtimes_t iStepSoundTime, bool bWalki
 	}
 
 	// UNDONE: need defined numbers for run, walk, crouch, crouch run velocities!!!!	
-	if ( ( GetFlags() & FL_DUCKING) || ( GetMoveType() == MOVETYPE_LADDER ) )
+	if ( (GetEngineObject()->GetFlags() & FL_DUCKING) || ( GetMoveType() == MOVETYPE_LADDER ) )
 	{
 		m_flStepSoundTime += 100;
 	}
@@ -1347,7 +1347,7 @@ void CBasePlayer::PlayerUse ( void )
 			else
 			{	// Start controlling the train!
 				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
-				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
+				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetEngineObject()->GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
 				{
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
 					m_iTrain = TrainSpeed(pTrain->m_flSpeed, ((CFuncTrackTrain*)pTrain)->GetMaxSpeed());
@@ -1848,7 +1848,7 @@ void CBasePlayer::SharedSpawn()
 	MDLCACHE_CRITICAL_SECTION();
 	SetSequence( SelectWeightedSequence( ACT_IDLE ) );
 
-	if ( GetFlags() & FL_DUCKING ) 
+	if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 	else
 		GetEngineObject()->SetCollisionBounds( VEC_HULL_MIN, VEC_HULL_MAX );
@@ -2006,7 +2006,7 @@ void CBasePlayer::UpdateUnderwaterState( void )
 
 	if ( GetWaterLevel() == 0 )
 	{
-		if ( GetFlags() & FL_INWATER )
+		if (GetEngineObject()->GetFlags() & FL_INWATER )
 		{
 #ifndef CLIENT_DLL
 			if ( m_iHealth > 0 && IsAlive() )
@@ -2022,10 +2022,10 @@ void CBasePlayer::UpdateUnderwaterState( void )
 				g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 			}
 #endif
-			RemoveFlag( FL_INWATER );
+			GetEngineObject()->RemoveFlag( FL_INWATER );
 		}
 	}
-	else if ( !(GetFlags() & FL_INWATER) )
+	else if ( !(GetEngineObject()->GetFlags() & FL_INWATER) )
 	{
 #ifndef CLIENT_DLL
 		// player enter water sound
@@ -2043,7 +2043,7 @@ void CBasePlayer::UpdateUnderwaterState( void )
 		}
 #endif
 
-		AddFlag( FL_INWATER );
+		GetEngineObject()->AddFlag( FL_INWATER );
 	}
 }
 

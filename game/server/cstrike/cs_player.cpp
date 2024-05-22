@@ -834,7 +834,7 @@ void CCSPlayer::Spawn()
 	// HPE_END
 	//=============================================================================
 
-	AddFlag(FL_ONGROUND); // set the player on the ground at the start of the round.
+	GetEngineObject()->AddFlag(FL_ONGROUND); // set the player on the ground at the start of the round.
 
 	// Override what CBasePlayer set for the view offset.
 	SetViewOffset( VEC_VIEW_SCALED( this ) );
@@ -1726,7 +1726,7 @@ bool CCSPlayer::Weapon_CanSwitchTo( CBaseCombatWeapon *pWeapon )
 
 bool CCSPlayer::ShouldDoLargeFlinch( int nHitGroup, CBaseEntity *pAttacker )
 {
-	if ( FBitSet( GetFlags(), FL_DUCKING ) )
+	if ( FBitSet(GetEngineObject()->GetFlags(), FL_DUCKING ) )
 		return FALSE;
 
 	if ( nHitGroup == HITGROUP_LEFTLEG )
@@ -4417,7 +4417,7 @@ bool CCSPlayer::ClientCommand( const CCommand &args )
 	if ( FStrEq( pcmd, "bot_cmd" ) )
 	{
 		CCSPlayer *pPlayer = dynamic_cast< CCSPlayer* >( UTIL_PlayerByIndex( atoi( args[1] ) ) );
-		if ( pPlayer && pPlayer != this && ( pPlayer->GetFlags() & FL_FAKECLIENT ) )
+		if ( pPlayer && pPlayer != this && ( pPlayer->GetEngineObject()->GetFlags() & FL_FAKECLIENT ) )
 		{
 			CCommand botArgs( args.ArgC() - 2, &args.ArgV()[2] );
 			pPlayer->ClientCommand( botArgs );
@@ -5414,7 +5414,7 @@ void CCSPlayer::State_PreThink_DEATH_ANIM()
 {
 	// If the anim is done playing, go to the next state (waiting for a keypress to
 	// either respawn the guy or put him into observer mode).
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		float flForward = GetEngineObject()->GetAbsVelocity().Length() - 20;
 		if (flForward <= 0)
@@ -5483,7 +5483,7 @@ void CCSPlayer::State_PreThink_DEATH_WAIT_FOR_KEY()
 {
 	// once we're done animating our death and we're on the ground, we want to set movetype to None so our dead body won't do collisions and stuff anymore
 	// this prevents a bug where the dead body would go to a player's head if he walked over it while the dead player was clicking their button to respawn
-	if ( GetMoveType() != MOVETYPE_NONE && (GetFlags() & FL_ONGROUND) )
+	if ( GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
 		SetMoveType( MOVETYPE_NONE );
 
 	// if the player has been dead for one second longer than allowed by forcerespawn,
@@ -6758,7 +6758,7 @@ CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 	DispatchSpawn( pent );
 
 	m_bIsBeingGivenItem = true;
-	if ( pent != NULL && !(pent->IsMarkedForDeletion()) )
+	if ( pent != NULL && !(pent->GetEngineObject()->IsMarkedForDeletion()) )
 	{
 		pent->Touch( this );
 	}

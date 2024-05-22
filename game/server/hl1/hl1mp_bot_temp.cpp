@@ -88,7 +88,7 @@ CBasePlayer *BotPutInServer( bool bFrozen, int iTeam )
 	//ClientPutInServer( pEdict, botname );
 	CHL1MP_Player *pPlayer = ((CHL1MP_Player *)CBaseEntity::Instance( pEdict ));
 	pPlayer->ClearFlags();
-	pPlayer->AddFlag( FL_CLIENT | FL_FAKECLIENT );
+	pPlayer->GetEngineObject()->AddFlag( FL_CLIENT | FL_FAKECLIENT );
 
 	if ( bFrozen )
 		pPlayer->GetEngineObject()->AddEFlags( EFL_BOT_FROZEN );
@@ -115,7 +115,7 @@ void Bot_RunAll( void )
 	{
 		CHL1MP_Player *pPlayer = ToHL1MPPlayer( UTIL_PlayerByIndex( i ) );
 
-		if ( pPlayer && (pPlayer->GetFlags() & FL_FAKECLIENT) )
+		if ( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FAKECLIENT) )
 		{
 			Bot_Think( pPlayer );
 		}
@@ -209,7 +209,7 @@ static void RunPlayerMove( CHL1MP_Player *fakeclient, const QAngle& viewangles, 
 void Bot_Think( CHL1MP_Player *pBot )
 {
 	// Make sure we stay being a bot
-	pBot->AddFlag( FL_FAKECLIENT );
+	pBot->GetEngineObject()->AddFlag( FL_FAKECLIENT );
 
 	botdata_t *botdata = &g_BotData[ ( pBot->entindex() ) - 1 ];
 

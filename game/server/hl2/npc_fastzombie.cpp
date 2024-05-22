@@ -816,7 +816,7 @@ int CFastZombie::MeleeAttack1Conditions( float flDot, float flDist )
 		return COND_NONE;
 	}
 
-	if( !(GetFlags() & FL_ONGROUND) )
+	if( !(GetEngineObject()->GetFlags() & FL_ONGROUND) )
 	{
 		// Have to be on the ground!
 		return COND_NONE;
@@ -1053,7 +1053,7 @@ int CFastZombie::RangeAttack1Conditions( float flDot, float flDist )
 		return( COND_NONE );
 	}
 
-	if( !(GetFlags() & FL_ONGROUND) )
+	if( !(GetEngineObject()->GetFlags() & FL_ONGROUND) )
 	{
 		return COND_NONE;
 	}
@@ -1469,14 +1469,14 @@ void CFastZombie::RunTask( const Task_t *pTask )
 	{
 	case TASK_FASTZOMBIE_JUMP_BACK:
 	case TASK_FASTZOMBIE_UNSTICK_JUMP:
-		if( GetFlags() & FL_ONGROUND )
+		if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			TaskComplete();
 		}
 		break;
 
 	case TASK_RANGE_ATTACK1:
-		if( ( GetFlags() & FL_ONGROUND ) || ( m_pfnTouch == NULL ) )
+		if( (GetEngineObject()->GetFlags() & FL_ONGROUND ) || ( m_pfnTouch == NULL ) )
 		{
 			// All done when you touch the ground, or if our touch function has somehow cleared.
 			TaskComplete();

@@ -843,10 +843,10 @@ void CNPC_Alyx::GatherConditions()
 
 	// ROBIN: This was here to solve a problem in a playtest. We've since found what we think was the cause.
 	// It's a useful piece of debug to have lying there, so I've left it in.
-	if ( (GetFlags() & FL_FLY) && m_NPCState != NPC_STATE_SCRIPT && !m_ActBusyBehavior.IsActive() && !m_PassengerBehavior.IsEnabled() )
+	if ( (GetEngineObject()->GetFlags() & FL_FLY) && m_NPCState != NPC_STATE_SCRIPT && !m_ActBusyBehavior.IsActive() && !m_PassengerBehavior.IsEnabled() )
 	{
 		Warning( "Removed FL_FLY from Alyx, who wasn't running a script or actbusy. Time %.2f, map %s.\n", gpGlobals->curtime, STRING(gpGlobals->mapname) );
-		RemoveFlag( FL_FLY );
+		GetEngineObject()->RemoveFlag( FL_FLY );
 	}
 }
 
@@ -986,7 +986,7 @@ void CNPC_Alyx::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &
 
 	// Alyx builds a proxy for the dead enemy so she has something to shoot at for a short time after
 	// the enemy ragdolls.
-	if( !(pVictim->GetFlags() & FL_ONGROUND) || pVictim->GetMoveType() != MOVETYPE_STEP )
+	if( !(pVictim->GetEngineObject()->GetFlags() & FL_ONGROUND) || pVictim->GetMoveType() != MOVETYPE_STEP )
 	{
 		// Don't fire up in the air, since the dead enemy will have fallen.
 		return;
@@ -1830,7 +1830,7 @@ int CNPC_Alyx::TranslateSchedule( int scheduleType )
 					if ( pEnemy->GetHealth() > ALYX_MIN_ENEMY_HEALTH_TO_CROUCH )
 					{
 						// And are they far enough away? Expand the min dist so we don't crouch & stand immediately.
-						if ( EnemyDistance( pEnemy ) > (ALYX_MIN_ENEMY_DIST_TO_CROUCH * 1.5) && (pEnemy->GetFlags() & FL_ONGROUND) )
+						if ( EnemyDistance( pEnemy ) > (ALYX_MIN_ENEMY_DIST_TO_CROUCH * 1.5) && (pEnemy->GetEngineObject()->GetFlags() & FL_ONGROUND) )
 						{
 							//Warning("CROUCH: Desiring due to enemy far away.\n" );
 							DesireCrouch();
@@ -2197,7 +2197,7 @@ void CNPC_Alyx::RunTask( const Task_t *pTask )
 		break;
 
 	case TASK_ALYX_FALL_TO_GROUND:
-		if ( GetFlags() & FL_ONGROUND )
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			TaskComplete();
 		}
@@ -2913,7 +2913,7 @@ Vector CNPC_Alyx::GetActualShootPosition( const Vector &shootOrigin )
 bool CNPC_Alyx::EnemyIsValidCrouchTarget( CBaseEntity *pEnemy )
 {
 	// Don't crouch to shoot flying enemies (or jumping antlions)
-	if ( !(pEnemy->GetFlags() & FL_ONGROUND) )
+	if ( !(pEnemy->GetEngineObject()->GetFlags() & FL_ONGROUND) )
 		return false;
 
 	// Don't crouch to shoot if we couldn't see them while crouching

@@ -414,11 +414,11 @@ void CPortal_Player::Spawn(void)
 
 	m_Local.m_iHideHUD = 0;
 
-	AddFlag(FL_ONGROUND); // set the player on the ground at the start of the round.
+	GetEngineObject()->AddFlag(FL_ONGROUND); // set the player on the ground at the start of the round.
 
 	m_impactEnergyScale = PORTALPLAYER_PHYSDAMAGE_SCALE;
 
-	RemoveFlag( FL_FROZEN );
+	GetEngineObject()->RemoveFlag( FL_FROZEN );
 
 	m_iSpawnInterpCounter = (m_iSpawnInterpCounter + 1) % 8;
 
@@ -679,7 +679,7 @@ void CPortal_Player::PlayerDeathThink(void)
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
-	if (GetFlags() & FL_ONGROUND)
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 	{
 		flForward = GetEngineObject()->GetAbsVelocity().Length() - 20;
 		if (flForward <= 0)
@@ -1060,7 +1060,7 @@ bool CPortal_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	}
 
 	// Don't let the player fetch weapons through walls (use MASK_SOLID so that you can't pickup through windows)
-	if( !pWeapon->FVisible( this, MASK_SOLID ) && !(GetFlags() & FL_NOTARGET) )
+	if( !pWeapon->FVisible( this, MASK_SOLID ) && !(GetEngineObject()->GetFlags() & FL_NOTARGET) )
 	{
 		return false;
 	}
@@ -1199,7 +1199,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 
 
 	Vector tmp = GetEngineObject()->GetAbsOrigin() - newPosition;
-	if ( !m_touchedPhysObject && !(GetFlags() & FL_ONGROUND) )
+	if ( !m_touchedPhysObject && !(GetEngineObject()->GetFlags() & FL_ONGROUND) )
 	{
 		tmp.z *= 0.5f;	// don't care about z delta as much
 	}
@@ -1464,7 +1464,7 @@ void CPortal_Player::PlayerUse( void )
 			else
 			{	// Start controlling the train!
 				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
-				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
+				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetEngineObject()->GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
 				{
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
 					m_iTrain = TrainSpeed(pTrain->m_flSpeed, ((CFuncTrackTrain*)pTrain)->GetMaxSpeed());
@@ -1934,7 +1934,7 @@ void CPortal_Player::ForceDuckThisFrame( void )
 		//m_Local.m_bDucking = false;
 		m_Local.m_bDucked = true;
 		ForceButtons( IN_DUCK );
-		AddFlag( FL_DUCKING );
+		GetEngineObject()->AddFlag( FL_DUCKING );
 		SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_CROUCH );
 	}
 }
@@ -1945,7 +1945,7 @@ void CPortal_Player::UnDuck( void )
 	{
 		m_Local.m_bDucked = false;
 		UnforceButtons( IN_DUCK );
-		RemoveFlag( FL_DUCKING );
+		GetEngineObject()->RemoveFlag( FL_DUCKING );
 		SetVCollisionState(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsVelocity(), VPHYS_WALK );
 	}
 }

@@ -594,7 +594,7 @@ void CAI_BaseNPC::Event_Killed( const CTakeDamageInfo &info )
 	StopLoopingSounds();
 	DeathSound( info );
 
-	if ( ( GetFlags() & FL_NPC ) && ( ShouldGib( info ) == false ) )
+	if ( (GetEngineObject()->GetFlags() & FL_NPC ) && ( ShouldGib( info ) == false ) )
 	{
 		SetTouch( NULL );
 	}
@@ -800,11 +800,11 @@ int CAI_BaseNPC::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 	}
 
 	// react to the damage (get mad)
-	if ( ( (GetFlags() & FL_NPC) == 0 ) || !info.GetAttacker() )
+	if ( ( (GetEngineObject()->GetFlags() & FL_NPC) == 0 ) || !info.GetAttacker() )
 		return 1;
 
 	// If the attacker was an NPC or client update my position memory
-	if ( info.GetAttacker()->GetFlags() & (FL_NPC | FL_CLIENT) )
+	if ( info.GetAttacker()->GetEngineObject()->GetFlags() & (FL_NPC | FL_CLIENT) )
 	{
 		// ------------------------------------------------------------------
 		//				DO NOT CHANGE THIS CODE W/O CONSULTING
@@ -2550,7 +2550,7 @@ CBaseEntity *CAI_BaseNPC::EyeLookTarget( void )
 				continue;
 			}
 			CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
-			if (pNPC || (pEntity->GetFlags() & FL_CLIENT))
+			if (pNPC || (pEntity->GetEngineObject()->GetFlags() & FL_CLIENT))
 			{
 				fTestDist = (GetEngineObject()->GetAbsOrigin() - pEntity->EyePosition()).Length();
 				if (fTestDist < fBestDist)
@@ -3368,7 +3368,7 @@ void CAI_BaseNPC::UpdateSleepState( bool bInPVS )
 			return;
 		}
 
-		if ( m_flWakeRadius > .1 && !(pLocalPlayer->GetFlags() & FL_NOTARGET) && ( pLocalPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).LengthSqr() <= Square(m_flWakeRadius) )
+		if ( m_flWakeRadius > .1 && !(pLocalPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET) && ( pLocalPlayer->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).LengthSqr() <= Square(m_flWakeRadius) )
 			Wake();
 		else if ( GetSleepState() == AISS_WAITING_FOR_PVS )
 		{
@@ -3386,7 +3386,7 @@ void CAI_BaseNPC::UpdateSleepState( bool bInPVS )
 					for (int i = 1; i <= gpGlobals->maxClients; i++ )
 					{
 						CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
-						if ( pPlayer && !(pPlayer->GetFlags() & FL_NOTARGET) && pPlayer->FVisible( this ) )
+						if ( pPlayer && !(pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET) && pPlayer->FVisible( this ) )
 							Wake();
 					}
 				}
@@ -4142,7 +4142,7 @@ int CAI_BaseNPC::MeleeAttack1Conditions ( float flDot, float flDist )
 	}
 
 	// Decent fix to keep folks from kicking/punching hornets and snarks is to check the onground flag(sjb)
-	if ( GetEnemy()->GetFlags() & FL_ONGROUND )
+	if ( GetEnemy()->GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		return COND_CAN_MELEE_ATTACK1;
 	}
@@ -4503,7 +4503,7 @@ void CAI_BaseNPC::CheckOnGround( void )
 			
 		// NPCs in scripts with the fly flag shouldn't fall.
 		// FIXME: should NPCS with FL_FLY ever fall? Doesn't seem like they should.
-		if ( ( GetState() == NPC_STATE_SCRIPT ) && ( GetFlags() & FL_FLY ) )
+		if ( ( GetState() == NPC_STATE_SCRIPT ) && (GetEngineObject()->GetFlags() & FL_FLY ) )
 			return;
 
 		if ( ( GetNavType() == NAV_GROUND ) && ( GetMoveType() != MOVETYPE_VPHYSICS ) && ( GetMoveType() != MOVETYPE_NONE ) )
@@ -4558,7 +4558,7 @@ void CAI_BaseNPC::CheckOnGround( void )
 	else
 	{
 		// parented objects are never floating
-		if ( bScriptedWait || GetEngineObject()->GetMoveParent() != NULL || (GetFlags() & FL_ONGROUND ) || GetNavType() != NAV_GROUND )
+		if ( bScriptedWait || GetEngineObject()->GetMoveParent() != NULL || (GetEngineObject()->GetFlags() & FL_ONGROUND ) || GetNavType() != NAV_GROUND )
 		{
 			ClearCondition( COND_FLOATING_OFF_GROUND );
 		}
@@ -6785,7 +6785,7 @@ void CAI_BaseNPC::NPCInit ( void )
 	{
 		// If this guy's supposed to rappel, keep him from
 		// falling to the ground when he spawns.
-		AddFlag( FL_FLY );
+		GetEngineObject()->AddFlag( FL_FLY );
 	}
 
 #ifdef _DEBUG
@@ -6802,7 +6802,7 @@ void CAI_BaseNPC::NPCInit ( void )
 #endif
 
 	// Set fields common to all npcs
-	AddFlag( FL_AIMTARGET | FL_NPC );
+	GetEngineObject()->AddFlag( FL_AIMTARGET | FL_NPC );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	m_flOriginalYaw = GetEngineObject()->GetAbsAngles().y;
@@ -7714,7 +7714,7 @@ CBaseEntity *CAI_BaseNPC::BestEnemy( void )
 			continue;
 		}
 		
-		if ( (pEnemy->GetFlags() & FL_NOTARGET) )
+		if ( (pEnemy->GetEngineObject()->GetFlags() & FL_NOTARGET) )
 		{
 			DbgEnemyMsg( this, "    %s rejected: no target\n", pEnemy->GetDebugName() );
 			continue;
@@ -8229,7 +8229,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 		break;
 
 	case NPC_EVENT_BODYDROP_HEAVY:
-		if ( GetFlags() & FL_ONGROUND )
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			const char* soundname = "AI_BaseNPC.BodyDrop_Heavy";
 			CPASAttenuationFilter filter(this, soundname);
@@ -8244,7 +8244,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 		break;
 
 	case NPC_EVENT_BODYDROP_LIGHT:
-		if ( GetFlags() & FL_ONGROUND )
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			const char* soundname = "AI_BaseNPC.BodyDrop_Light";
 			CPASAttenuationFilter filter(this, soundname);
@@ -8517,7 +8517,7 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 			}
 			else if ( pEvent->event == AE_NPC_BODYDROP_HEAVY )
 			{
-				if ( GetFlags() & FL_ONGROUND )
+				if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 				{
 					const char* soundname = "AI_BaseNPC.BodyDrop_Heavy";
 					CPASAttenuationFilter filter(this, soundname);
@@ -9187,7 +9187,7 @@ int CAI_BaseNPC::DrawDebugTextOverlays(void)
 			}
 		}
 
-		if ( GetFlags() & FL_FLY )
+		if (GetEngineObject()->GetFlags() & FL_FLY )
 		{
 			EntityText(text_offset,"HAS FL_FLY",0);
 			text_offset++;
@@ -10013,7 +10013,7 @@ CBaseEntity *CAI_BaseNPC::FindNamedEntity( const char *name, IEntityFindFilter *
 
 void CAI_BaseNPC::CorpseFallThink( void )
 {
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		SetThink ( NULL );
 
@@ -11831,7 +11831,7 @@ ConVar sv_test_scripted_sequences( "sv_test_scripted_sequences", "0", FCVAR_NONE
 bool CAI_BaseNPC::CineCleanup()
 {
 	CAI_ScriptedSequence *pOldCine = m_hCine;
-	int nSavedFlags = ( m_hCine ? m_hCine->m_savedFlags : GetFlags() );
+	int nSavedFlags = ( m_hCine ? m_hCine->m_savedFlags : GetEngineObject()->GetFlags() );
 
  	bool bDestroyCine = false;
 	if ( IsRunningDynamicInteraction() )
@@ -12404,7 +12404,7 @@ int CAI_BaseNPC::FlyMove( const Vector& pfPosition, unsigned int mask )
 	UTIL_TraceEntity( this, oldorg, neworg, mask, &trace );				
 	if (trace.fraction == 1)
 	{
-		if ( (GetFlags() & FL_SWIM) && enginetrace->GetPointContents(trace.endpos) == CONTENTS_EMPTY )
+		if ( (GetEngineObject()->GetFlags() & FL_SWIM) && enginetrace->GetPointContents(trace.endpos) == CONTENTS_EMPTY )
 			return false;	// swim monster left water
 
 		GetEngineObject()->SetAbsOrigin( trace.endpos );
@@ -12426,12 +12426,12 @@ int CAI_BaseNPC::FlyMove( const Vector& pfPosition, unsigned int mask )
 //-----------------------------------------------------------------------------
 int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 {	
-	if ( GetFlags() & (FL_FLY | FL_SWIM) )
+	if (GetEngineObject()->GetFlags() & (FL_FLY | FL_SWIM) )
 	{
 		return FlyMove( vecPosition, mask );
 	}
 
-	if ( (GetFlags() & FL_ONGROUND) == 0 )
+	if ( (GetEngineObject()->GetFlags() & FL_ONGROUND) == 0 )
 	{
 		return 0;
 	}
@@ -12463,7 +12463,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 	if (trace.fraction == 1)
 	{
 		// if monster had the ground pulled out, go ahead and fall
-		if ( GetFlags() & FL_PARTIALGROUND )
+		if (GetEngineObject()->GetFlags() & FL_PARTIALGROUND )
 		{
 			GetEngineObject()->SetAbsOrigin( oldorg + move );
 			GetEngineObject()->PhysicsTouchTriggers();
@@ -12479,7 +12479,7 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 
 	if (UTIL_CheckBottom( this, NULL, flStepSize ) == 0)
 	{
-		if ( GetFlags() & FL_PARTIALGROUND )
+		if (GetEngineObject()->GetFlags() & FL_PARTIALGROUND )
 		{	
 			// entity had floor mostly pulled out from underneath it
 			// and is trying to correct
@@ -12492,10 +12492,10 @@ int CAI_BaseNPC::WalkMove( const Vector& vecPosition, unsigned int mask )
 		return false;
 	}
 
-	if ( GetFlags() & FL_PARTIALGROUND )
+	if (GetEngineObject()->GetFlags() & FL_PARTIALGROUND )
 	{
 		// Con_Printf ("back on ground\n"); 
-		RemoveFlag( FL_PARTIALGROUND );
+		GetEngineObject()->RemoveFlag( FL_PARTIALGROUND );
 	}
 
 	// the move is ok
@@ -12716,7 +12716,7 @@ void CAI_BaseNPC::TestPlayerPushing( CBaseEntity *pEntity )
 
 	// Heuristic for determining if the player is pushing me away
 	CBasePlayer *pPlayer = ToBasePlayer( pEntity );
-	if ( pPlayer && !( pPlayer->GetFlags() & FL_NOTARGET ) )
+	if ( pPlayer && !( pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET ) )
 	{
 		if ( (pPlayer->m_nButtons & (IN_FORWARD|IN_BACK|IN_MOVELEFT|IN_MOVERIGHT)) || 
 			 pPlayer->GetEngineObject()->GetAbsVelocity().AsVector2D().LengthSqr() > 50*50 )

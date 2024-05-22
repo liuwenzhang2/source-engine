@@ -119,8 +119,8 @@ int CPluginBotManager::CreateBot( const char *botname )
 	// Allocate a player entity for the bot, and call spawn
 	CBasePlayer *pPlayer = ((CBasePlayer*)gEntList.GetBaseEntity( pEdict ));
 
-	pPlayer->ClearFlags();
-	pPlayer->AddFlag( FL_CLIENT | FL_FAKECLIENT );
+	pPlayer->GetEngineObject()->ClearFlags();
+	pPlayer->GetEngineObject()->AddFlag( FL_CLIENT | FL_FAKECLIENT );
 
 	pPlayer->ChangeTeam( TEAM_UNASSIGNED );
 	pPlayer->RemoveAllItems( true );

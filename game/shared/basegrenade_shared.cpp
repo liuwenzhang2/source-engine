@@ -71,7 +71,7 @@ BEGIN_NETWORK_TABLE( CBaseGrenade, DT_BaseGrenade )
 	SendPropEHandle( SENDINFO( m_hThrower ) ),
 
 	// HACK: Use same flag bits as player for now
-	SendPropInt			( SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED, SendProxy_CropFlagsToPlayerFlagBitsLength ),
+	//SendPropInt			( SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED, SendProxy_CropFlagsToPlayerFlagBitsLength ),
 #else
 	RecvPropFloat( RECVINFO( m_flDamage ) ),
 	RecvPropFloat( RECVINFO( m_DmgRadius ) ),
@@ -82,7 +82,7 @@ BEGIN_NETWORK_TABLE( CBaseGrenade, DT_BaseGrenade )
 	// Need velocity from grenades to make animation system work correctly when running
 	//RecvPropVector( RECVINFO_INVALID(m_vecVelocity), 0, RecvProxy_LocalVelocity ),
 
-	RecvPropInt( RECVINFO( m_fFlags ) ),
+	//RecvPropInt( RECVINFO( m_fFlags ) ),
 #endif
 END_NETWORK_TABLE()
 
@@ -408,7 +408,7 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 		m_bHasWarnedAI = true;
 	}
 
-	if (GetFlags() & FL_ONGROUND)
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 	{
 		// add a bit of static friction
 //		SetAbsVelocity( GetAbsVelocity() * 0.8 );
@@ -438,7 +438,7 @@ void CBaseGrenade::SlideTouch( CBaseEntity *pOther )
 
 	// m_vecAngVelocity = Vector (300, 300, 300);
 
-	if (GetFlags() & FL_ONGROUND)
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 	{
 		// add a bit of static friction
 //		SetAbsVelocity( GetAbsVelocity() * 0.95 );  

@@ -243,7 +243,7 @@ void CAI_RappelBehavior::RunTask( const Task_t *pTask )
 			}
 
 			SetDescentSpeed();
-			if( GetOuter()->GetFlags() & FL_ONGROUND )
+			if( GetOuter()->GetEngineObject()->GetFlags() & FL_ONGROUND )
 			{
 				CBaseEntity* pGroundEnt = GetOuter()->GetEngineObject()->GetGroundEntity() ? GetOuter()->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 
@@ -257,7 +257,7 @@ void CAI_RappelBehavior::RunTask( const Task_t *pTask )
 				}
 
 				GetOuter()->m_OnRappelTouchdown.FireOutput( GetOuter(), GetOuter(), 0 );
-				GetOuter()->RemoveFlag( FL_FLY );
+				GetOuter()->GetEngineObject()->RemoveFlag( FL_FLY );
 				
 				CutZipline();
 

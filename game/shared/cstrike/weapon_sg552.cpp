@@ -103,7 +103,7 @@ float CWeaponSG552::GetInaccuracy() const
 		if ( !pPlayer )
 			return 0.0f;
 	
-		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+		if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 			return 0.035f + 0.45f * m_flAccuracy;
 		else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 140)
 			return 0.035f + 0.075f * m_flAccuracy;
@@ -137,9 +137,9 @@ void CWeaponSG552::PrimaryAttack()
 
 	if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 		pPlayer->KickBack (1, 0.45, 0.28, 0.04, 4.25, 2.5, 7);
-	else if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+	else if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 		pPlayer->KickBack (1.25, 0.45, 0.22, 0.18, 6, 4, 5);
-	else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
+	else if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING ) )
 		pPlayer->KickBack (0.6, 0.35, 0.2, 0.0125, 3.7, 2, 10);
 	else
 		pPlayer->KickBack (0.625, 0.375, 0.25, 0.0125, 4, 2.25, 9);

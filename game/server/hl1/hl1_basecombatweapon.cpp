@@ -91,7 +91,7 @@ void CBaseHL1CombatWeapon::FallThink ( void )
 	}
 	else
 	{
-		shouldMaterialize = (GetFlags() & FL_ONGROUND) ? true : false;
+		shouldMaterialize = (GetEngineObject()->GetFlags() & FL_ONGROUND) ? true : false;
 		if( shouldMaterialize )
 			SetSize( Vector( -24, -24, 0 ), Vector( 24, 24, 16 ) );
 	}

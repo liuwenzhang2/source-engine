@@ -320,7 +320,7 @@ void CNPC_SecurityCamera::Spawn( void )
 
 	GetEngineObject()->SetCollisionBounds( Vector( -16.0f, -16.0f, -16.0f ), Vector( 16.0f, 16.0f, 16.0f ) );
 
-	RemoveFlag( FL_AIMTARGET );
+	GetEngineObject()->RemoveFlag( FL_AIMTARGET );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
 	SetPoseParameter( SECURITY_CAMERA_BC_YAW, 0 );
@@ -419,7 +419,7 @@ int CNPC_SecurityCamera::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		m_iHealth = 0;
 		m_takedamage = DAMAGE_NO;
 
-		RemoveFlag( FL_NPC ); // why are they set in the first place???
+		GetEngineObject()->RemoveFlag( FL_NPC ); // why are they set in the first place???
 
 		ExplosionCreate(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetLocalAngles(), this, 100, 100, false );
 		SetThink( &CNPC_SecurityCamera::DeathThink );

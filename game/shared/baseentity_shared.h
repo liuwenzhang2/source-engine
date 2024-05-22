@@ -92,11 +92,6 @@ inline MoveCollide_t CBaseEntity::GetMoveCollide() const
 	return (MoveCollide_t)(unsigned char)m_MoveCollide;
 }
 
-inline int	CBaseEntity::GetFlags( void ) const
-{
-	return m_fFlags;
-}
-
 inline bool CBaseEntity::IsAlive( void )
 {
 	return m_lifeState == LIFE_ALIVE; 

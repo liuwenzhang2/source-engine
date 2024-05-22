@@ -136,7 +136,7 @@ void CVGuiScreen::Spawn()
 	m_fScreenFlags.Set( VGUI_SCREEN_ACTIVE );
 
 	m_takedamage = DAMAGE_NO;
-	AddFlag( FL_NOTARGET );
+	GetEngineObject()->AddFlag( FL_NOTARGET );
 }
 
 //-----------------------------------------------------------------------------

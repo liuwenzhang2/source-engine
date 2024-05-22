@@ -167,7 +167,7 @@ void CBaseCSGrenade::SecondaryAttack()
 		return;
 
 	//See if we're ducking
-	if ( pPlayer->GetFlags() & FL_DUCKING )
+	if ( pPlayer->GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		//Send the weapon animation
 		SendWeaponAnim( ACT_VM_SECONDARYATTACK );

@@ -72,8 +72,8 @@ T * NextBotCreatePlayerBot( const char *name, bool bReportFakeClient = true )
 	bot->SetPlayerName( name );
 
 	// flag this as a fakeclient (bot)
-	bot->ClearFlags();
-	bot->AddFlag( FL_CLIENT | FL_FAKECLIENT );
+	bot->GetEngineObject()->ClearFlags();
+	bot->GetEngineObject()->AddFlag( FL_CLIENT | FL_FAKECLIENT );
 
 	return bot;
 }

@@ -371,7 +371,7 @@ void CWeapon_SLAM::TripmineAttach( void )
 	if (tr.fraction < 1.0)
 	{
 		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
-		if (pEntity && !(pEntity->GetFlags() & FL_CONVEYOR))
+		if (pEntity && !(pEntity->GetEngineObject()->GetFlags() & FL_CONVEYOR))
 		{
 
 #ifndef CLIENT_DLL
@@ -424,7 +424,7 @@ void CWeapon_SLAM::StartTripmineAttach( void )
 		// ALERT( at_console, "hit %f\n", tr.flFraction );
 
 		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
-		if (pEntity && !(pEntity->GetFlags() & FL_CONVEYOR))
+		if (pEntity && !(pEntity->GetEngineObject()->GetFlags() & FL_CONVEYOR))
 		{
 			// player "shoot" animation
 			pPlayer->SetAnimation( PLAYER_ATTACK1 );
@@ -573,7 +573,7 @@ void CWeapon_SLAM::SatchelAttach( void )
 	if (tr.fraction < 1.0)
 	{
 		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
-		if (pEntity && !(pEntity->GetFlags() & FL_CONVEYOR))
+		if (pEntity && !(pEntity->GetEngineObject()->GetFlags() & FL_CONVEYOR))
 		{
 			QAngle angles;
 			VectorAngles(tr.plane.normal, angles);
@@ -619,7 +619,7 @@ void CWeapon_SLAM::StartSatchelAttach( void )
 	if (tr.fraction < 1.0)
 	{
 		CBaseEntity *pEntity = (CBaseEntity*)tr.m_pEnt;
-		if (pEntity && !(pEntity->GetFlags() & FL_CONVEYOR))
+		if (pEntity && !(pEntity->GetEngineObject()->GetFlags() & FL_CONVEYOR))
 		{
 			// Only the player fires this way so we can cast
 			CBasePlayer *pPlayer = ToBasePlayer( pOwner );

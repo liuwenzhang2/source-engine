@@ -198,7 +198,7 @@ CBaseEntity* CScriptedTarget::FindEntity( void )
 	//	First try to find the entity by name
 	// ---------------------------------------------------
 	CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, m_iszEntity );
-	if (pEntity && pEntity->GetFlags() & FL_NPC)
+	if (pEntity && pEntity->GetEngineObject()->GetFlags() & FL_NPC)
 	{
 		CAI_BaseNPC* pNPC	= pEntity->MyNPCPointer();
 		if (pNPC->DispatchInteraction( g_interactionScriptedTarget, NULL, this ))
@@ -217,7 +217,7 @@ CBaseEntity* CScriptedTarget::FindEntity( void )
 
 	for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), m_flRadius ); ( pTestEnt = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 	{
-		if (pTestEnt->GetFlags() & FL_NPC)
+		if (pTestEnt->GetEngineObject()->GetFlags() & FL_NPC)
 		{
 			if (FClassnameIs( pTestEnt, STRING(m_iszEntity)))
 			{

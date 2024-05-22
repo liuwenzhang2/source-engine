@@ -510,7 +510,7 @@ void CGib::BounceGibTouch ( CBaseEntity *pOther )
 	
 	//if ( random->RandomInt(0,1) )
 	//	return;// don't bleed everytime
-	if (GetFlags() & FL_ONGROUND)
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 	{
 		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.9 );
 		QAngle angles = GetEngineObject()->GetLocalAngles();

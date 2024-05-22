@@ -253,7 +253,7 @@ void CC_ToggleDuck( void )
 		return;
 
 	// Cannot be frozen
-	if ( pPlayer->GetFlags() & FL_FROZEN )
+	if ( pPlayer->GetEngineObject()->GetFlags() & FL_FROZEN )
 		return;
 
 	static bool		bChecked = false;
@@ -602,7 +602,7 @@ void CHL2_Player::PreThink(void)
 
 	// This is an experiment of mine- autojumping! 
 	// only affects you if sv_autojump is nonzero.
-	if( (GetFlags() & FL_ONGROUND) && sv_autojump.GetFloat() != 0 )
+	if( (GetEngineObject()->GetFlags() & FL_ONGROUND) && sv_autojump.GetFloat() != 0 )
 	{
 		VPROF( "CHL2_Player::PreThink-Autojump" );
 		// check autojump
@@ -737,9 +737,9 @@ void CHL2_Player::PreThink(void)
 	// So the correct flags get sent to client asap.
 	//
 	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
-		AddFlag( FL_ONTRAIN );
+		GetEngineObject()->AddFlag( FL_ONTRAIN );
 	else 
-		RemoveFlag( FL_ONTRAIN );
+		GetEngineObject()->RemoveFlag( FL_ONTRAIN );
 
 	// Train speed control
 	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
@@ -793,7 +793,7 @@ void CHL2_Player::PreThink(void)
 				}
 			}
 		}
-		else if ( !( GetFlags() & FL_ONGROUND ) || pTrain->GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL ) || (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT) ) )
+		else if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) || pTrain->GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL ) || (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT) ) )
 		{
 			// Turn off the train if you jump, strafe, or the train controls go dead
 			m_afPhysicsFlags &= ~PFLAG_DIROVERRIDE;
@@ -829,7 +829,7 @@ void CHL2_Player::PreThink(void)
 	//
 	// If we're not on the ground, we're falling. Update our falling velocity.
 	//
-	if ( !( GetFlags() & FL_ONGROUND ) )
+	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
 		m_Local.m_flFallVelocity = -GetEngineObject()->GetAbsVelocity().z;
 	}
@@ -2868,7 +2868,7 @@ void CHL2_Player::PlayerUse ( void )
 			else
 			{	// Start controlling the train!
 				CBaseEntity* pTrain = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
-				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
+				if ( pTrain && !(m_nButtons & IN_JUMP) && (GetEngineObject()->GetFlags() & FL_ONGROUND) && (pTrain->ObjectCaps() & FCAP_DIRECTIONAL_USE) && pTrain->OnControls(this) )
 				{
 					m_afPhysicsFlags |= PFLAG_DIROVERRIDE;
 					m_iTrain = TrainSpeed(pTrain->m_flSpeed, ((CFuncTrackTrain*)pTrain)->GetMaxSpeed());

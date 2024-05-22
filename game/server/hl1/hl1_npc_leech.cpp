@@ -155,7 +155,7 @@ void CNPC_Leech::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_FLY );
-	AddFlag( FL_SWIM );
+	GetEngineObject()->AddFlag( FL_SWIM );
 	m_iHealth	= sk_leech_health.GetInt();
 
 	m_flFieldOfView		= -0.5;	// 180 degree FOV
@@ -195,7 +195,7 @@ void CNPC_Leech::DeadThink( void )
 			StopAnimation();
 			return;
 		}
-		else if ( GetFlags() & FL_ONGROUND )
+		else if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 			SetActivity( ACT_DIEFORWARD );
@@ -243,7 +243,7 @@ void CNPC_Leech::Touch( CBaseEntity *pOther )
 			 return;
 
 		SetBaseVelocity( pOther->GetEngineObject()->GetAbsVelocity() );
-		AddFlag( FL_BASEVELOCITY );
+		GetEngineObject()->AddFlag( FL_BASEVELOCITY );
 	}
 }
 

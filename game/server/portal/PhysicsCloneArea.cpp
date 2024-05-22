@@ -37,7 +37,7 @@ void CPhysicsCloneArea::StartTouch( CBaseEntity *pOther )
 		DevMsg( "PortalCloneArea %i Start Touch: %s : %f\n", ((m_pAttachedPortal->m_bIsPortal2)?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
 	}
 #if !defined( DISABLE_DEBUG_HISTORY )
-	if ( !IsMarkedForDeletion() )
+	if ( !GetEngineObject()->IsMarkedForDeletion() )
 	{
 		ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "PortalCloneArea %i Start Touch: %s : %f\n", ((m_pAttachedPortal->m_bIsPortal2)?(2):(1)), pOther->GetClassname(), gpGlobals->curtime  ) );
 	}
@@ -65,7 +65,7 @@ void CPhysicsCloneArea::EndTouch( CBaseEntity *pOther )
 		DevMsg( "PortalCloneArea %i End Touch: %s : %f\n", ((m_pAttachedPortal->m_bIsPortal2)?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
 	}
 #if !defined( DISABLE_DEBUG_HISTORY )
-	if ( !IsMarkedForDeletion() )
+	if ( !GetEngineObject()->IsMarkedForDeletion() )
 	{
 		ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "PortalCloneArea %i End Touch: %s : %f\n", ((m_pAttachedPortal->m_bIsPortal2)?(2):(1)), pOther->GetClassname(), gpGlobals->curtime ) );
 	}

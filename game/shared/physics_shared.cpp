@@ -495,7 +495,7 @@ void PhysDestroyObject( IPhysicsObject *pObject, CBaseEntity *pEntity )
 		pObject->SetGameData( NULL );
 
 	g_EntityCollisionHash->RemoveAllPairsForObject( pObject );
-	if ( pEntity && pEntity->IsMarkedForDeletion() )
+	if ( pEntity && pEntity->GetEngineObject()->IsMarkedForDeletion() )
 	{
 		g_EntityCollisionHash->RemoveAllPairsForObject( pEntity );
 	}

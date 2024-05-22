@@ -202,7 +202,7 @@ Activity CCSHostageAnimState::CalcMainActivity()
 		// if we have no leader, hang out
 		Activity idealActivity = me->GetLeader() ? ACT_IDLE : ACT_BUSY_QUEUE;
 
-		if ( m_pOuter->GetFlags() & FL_DUCKING )
+		if ( m_pOuter->GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			if ( flOuterSpeed > MOVING_MINIMUM_SPEED )
 				idealActivity = ACT_RUN_CROUCH;
@@ -954,7 +954,7 @@ bool CCSPlayerAnimState::HandleJumping()
 		// on-ground flag set right when the message comes in.
 		if ( gpGlobals->curtime - m_flJumpStartTime > 0.2f )
 		{
-			if ( m_pOuter->GetFlags() & FL_ONGROUND )
+			if ( m_pOuter->GetEngineObject()->GetFlags() & FL_ONGROUND )
 			{
 				m_bJumping = false;
 				RestartMainSequence();	// Reset the animation.
@@ -979,7 +979,7 @@ Activity CCSPlayerAnimState::CalcMainActivity()
 	{
 		Activity idealActivity = ACT_IDLE;
 
-		if ( m_pOuter->GetFlags() & FL_ANIMDUCKING )
+		if ( m_pOuter->GetEngineObject()->GetFlags() & FL_ANIMDUCKING )
 		{
 			if ( flOuterSpeed > MOVING_MINIMUM_SPEED )
 				idealActivity = ACT_RUN_CROUCH;

@@ -165,7 +165,7 @@ void CWeaponM3::PrimaryAttack()
 	// Update punch angles.
 	QAngle angle = pPlayer->GetPunchAngle();
 
-	if ( pPlayer->GetFlags() & FL_ONGROUND )
+	if ( pPlayer->GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		angle.x -= SharedRandomInt( "M3PunchAngleGround", 4, 6 );
 	}

@@ -358,8 +358,8 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 {
 	// First test spawn flag filters
 	if (GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_ALL) ||
-		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_CLIENTS) && (pOther->GetFlags() & FL_CLIENT)) ||
-		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_NPCS) && (pOther->GetFlags() & FL_NPC)) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_CLIENTS) && (pOther->GetEngineObject()->GetFlags() & FL_CLIENT)) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_NPCS) && (pOther->GetEngineObject()->GetFlags() & FL_NPC)) ||
 		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PUSHABLES) && FClassnameIs(pOther, "func_pushable")) ||
 		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PHYSICS) && pOther->GetMoveType() == MOVETYPE_VPHYSICS)
 #if defined( HL2_EPISODIC ) || defined( TF_DLL )		
@@ -372,7 +372,7 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 #endif
 		)
 	{
-		if ( pOther->GetFlags() & FL_NPC )
+		if ( pOther->GetEngineObject()->GetFlags() & FL_NPC )
 		{
 			CAI_BaseNPC *pNPC = pOther->MyNPCPointer();
 
@@ -1586,7 +1586,7 @@ void CChangeLevel::TouchChangeLevel( CBaseEntity *pOther )
 		vecVelocity.x *= 0.5f;
 		vecVelocity.y *= 0.5f;
 		pPlayer->GetEngineObject()->SetAbsVelocity( vecVelocity );
-		pPlayer->AddFlag( FL_FROZEN );
+		pPlayer->GetEngineObject()->AddFlag( FL_FROZEN );
 		return;
 	}
 
@@ -1746,11 +1746,11 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 #endif
 
 			Vector vecPush = (m_flPushSpeed * vecAbsDir);
-			if ( pOther->GetFlags() & FL_BASEVELOCITY )
+			if ( pOther->GetEngineObject()->GetFlags() & FL_BASEVELOCITY )
 			{
 				vecPush = vecPush + pOther->GetBaseVelocity();
 			}
-			if ( vecPush.z > 0 && (pOther->GetFlags() & FL_ONGROUND) )
+			if ( vecPush.z > 0 && (pOther->GetEngineObject()->GetFlags() & FL_ONGROUND) )
 			{
 				pOther->GetEngineObject()->SetGroundEntity( NULL );
 				Vector origin = pOther->GetEngineObject()->GetAbsOrigin();
@@ -1769,7 +1769,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 #endif			
 
 			pOther->SetBaseVelocity( vecPush );
-			pOther->AddFlag( FL_BASEVELOCITY );
+			pOther->GetEngineObject()->AddFlag( FL_BASEVELOCITY );
 		}
 		break;
 	}
@@ -3865,8 +3865,8 @@ bool CBaseVPhysicsTrigger::PassesTriggerFilters( CBaseEntity *pOther )
 
 	// First test spawn flag filters
 	if (GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_ALL) ||
-		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_CLIENTS) && (pOther->GetFlags() & FL_CLIENT)) ||
-		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_NPCS) && (pOther->GetFlags() & FL_NPC)) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_CLIENTS) && (pOther->GetEngineObject()->GetFlags() & FL_CLIENT)) ||
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_NPCS) && (pOther->GetEngineObject()->GetFlags() & FL_NPC)) ||
 		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PUSHABLES) && FClassnameIs(pOther, "func_pushable")) ||
 		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PHYSICS) && pOther->GetMoveType() == MOVETYPE_VPHYSICS))
 	{

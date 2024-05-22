@@ -249,7 +249,7 @@ void CPropVehicle::Think()
 //-----------------------------------------------------------------------------
 void CPropVehicle::VPhysicsUpdate( IPhysicsObject *pPhysics )
 {
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
 	Vector	velocity;

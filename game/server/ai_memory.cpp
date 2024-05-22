@@ -295,7 +295,7 @@ void CAI_Enemies::RefreshMemories(void)
 			if ( gpGlobals->curtime <= pMemory->timeLastSeen + m_flFreeKnowledgeDuration )
 			{
 				// Free knowledge is ignored if the target has notarget on
-				if ( !(pMemory->hEnemy->GetFlags() & FL_NOTARGET) )
+				if ( !(pMemory->hEnemy->GetEngineObject()->GetFlags() & FL_NOTARGET) )
 				{
 					pMemory->vLastKnownLocation = pMemory->hEnemy->GetEngineObject()->GetAbsOrigin();
 				}

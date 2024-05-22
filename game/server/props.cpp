@@ -844,12 +844,12 @@ void CBreakableProp::Spawn()
 	//jmd: I am guessing that the call to Spawn will set any flags that should be set anyway; this
 	//clears flags we don't want (specifically the FL_ONFIRE for explosive barrels in HL2MP)]
 #ifdef HL2MP
-	ClearFlags();
+	GetEngineObject()->ClearFlags();
 #endif 
 
 	BaseClass::Spawn();
 	
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
 	CStudioHdr *pStudioHdr = GetModelPtr( );
@@ -894,7 +894,7 @@ void CBreakableProp::Spawn()
 				HasInteraction( PROPINTER_FIRE_IGNITE_HALFHEALTH ) )
 			{
 				// Exploding barrels, exploding gas cans
-				AddFlag( FL_AIMTARGET );	
+				GetEngineObject()->AddFlag( FL_AIMTARGET );
 			}
 		}
 	}
@@ -1912,7 +1912,7 @@ void CDynamicProp::Spawn( )
 
 	BaseClass::Spawn();
 
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
 	// Now condense all classnames to one
@@ -1921,11 +1921,11 @@ void CDynamicProp::Spawn( )
 		SetClassname("prop_dynamic");
 	}
 
-	AddFlag( FL_STATICPROP );
+	GetEngineObject()->AddFlag( FL_STATICPROP );
 
 	if ( m_bRandomAnimator || ( m_iszDefaultAnim != NULL_STRING ) )
 	{
-		RemoveFlag( FL_STATICPROP );
+		GetEngineObject()->RemoveFlag( FL_STATICPROP );
 
 		if ( m_bRandomAnimator )
 		{
@@ -2306,7 +2306,7 @@ void CDynamicProp::FinishSetSequence( int nSequence )
 	m_flAnimTime = gpGlobals->curtime;
 	ResetSequence( nSequence );
 	ResetClientsideFrame();
-	RemoveFlag( FL_STATICPROP );
+	GetEngineObject()->RemoveFlag( FL_STATICPROP );
 	SetPlaybackRate( m_iTransitionDirection > 0 ? 1.0f : -1.0f );
 	SetCycle( m_iTransitionDirection > 0 ? 0.0f : 0.999f );
 }
@@ -2528,7 +2528,7 @@ void CPhysicsProp::Spawn( )
 
 	BaseClass::Spawn();
 
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
 	// Now condense all classnames to one
@@ -3649,7 +3649,7 @@ void CBasePropDoor::Spawn()
 		m_flSpeed = 100;
 	}
 	
-	RemoveFlag(FL_STATICPROP);
+	GetEngineObject()->RemoveFlag(FL_STATICPROP);
 
 	GetEngineObject()->SetSolid(SOLID_VPHYSICS);
 	VPhysicsInitShadow(false, false);

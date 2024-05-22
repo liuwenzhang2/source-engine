@@ -244,7 +244,7 @@ void CWeaponStriderBuster::Spawn( void )
 	// Ignore touches until launched.
 	SetTouch ( NULL );
 
-	AddFlag( FL_AIMTARGET|FL_OBJECT );
+	GetEngineObject()->AddFlag( FL_AIMTARGET|FL_OBJECT );
 
 	m_hParticleEffect = gEntList.CreateEntityByName( "info_particle_system" );
 	if ( m_hParticleEffect )

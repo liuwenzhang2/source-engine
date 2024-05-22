@@ -287,7 +287,7 @@ void CAI_PassengerBehavior::FinishExitVehicle( void )
 	// To do this, we need to be very sure we're in a good spot
 	GetOuter()->SetCondition( COND_PROVOKED );
 	GetOuter()->SetMoveType( MOVETYPE_STEP );
-	GetOuter()->RemoveFlag( FL_FLY );
+	GetOuter()->GetEngineObject()->RemoveFlag( FL_FLY );
 	GetOuter()->GetMotor()->SetYawLocked( false );
 
 	// Re-enable the physical collisions for this NPC
@@ -860,7 +860,7 @@ void CAI_PassengerBehavior::DetachFromVehicle( void )
 	// Detach from the parent
 	GetOuter()->GetEngineObject()->SetParent(NULL);
 	GetOuter()->SetMoveType( MOVETYPE_STEP );
-	GetOuter()->AddFlag( FL_FLY );
+	GetOuter()->GetEngineObject()->AddFlag( FL_FLY );
 	GetOuter()->GetEngineObject()->SetGroundEntity( NULL );
 	GetOuter()->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NPC );
 	m_hVehicle->RemovePhysicsChild( GetOuter() );
@@ -874,7 +874,7 @@ void CAI_PassengerBehavior::AttachToVehicle( void )
 	// Parent to the vehicle
 	GetOuter()->ClearForceCrouch();
 	GetOuter()->GetEngineObject()->SetParent( m_hVehicle?m_hVehicle->GetEngineObject():NULL );
-	GetOuter()->AddFlag( FL_FLY );
+	GetOuter()->GetEngineObject()->AddFlag( FL_FLY );
 	GetOuter()->GetEngineObject()->SetGroundEntity( NULL );
 	GetOuter()->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE );
 

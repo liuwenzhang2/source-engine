@@ -800,7 +800,7 @@ void CPhysBox::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 //-----------------------------------------------------------------------------
 int CPhysBox::OnTakeDamage( const CTakeDamageInfo &info )
 {
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return 0;
 
 	// note: if motion is disabled, OnTakeDamage can't apply physics force
@@ -1020,11 +1020,11 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 						}
 
 						Vector vecPush = (vecPushDir*m_damage*flFalloff*2.0f);
-						if ( pEntity->GetFlags() & FL_BASEVELOCITY )
+						if ( pEntity->GetEngineObject()->GetFlags() & FL_BASEVELOCITY )
 						{
 							vecPush = vecPush + pEntity->GetBaseVelocity();
 						}
-						if ( vecPush.z > 0 && (pEntity->GetFlags() & FL_ONGROUND) )
+						if ( vecPush.z > 0 && (pEntity->GetEngineObject()->GetFlags() & FL_ONGROUND) )
 						{
 							pEntity->GetEngineObject()->SetGroundEntity( NULL );
 							Vector origin = pEntity->GetEngineObject()->GetAbsOrigin();
@@ -1033,7 +1033,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 						}
 
 						pEntity->SetBaseVelocity( vecPush );
-						pEntity->AddFlag( FL_BASEVELOCITY );
+						pEntity->GetEngineObject()->AddFlag( FL_BASEVELOCITY );
 
 						// Fire an output that the player has been pushed
 						m_OnPushedPlayer.FireOutput( this, this );
@@ -2036,11 +2036,11 @@ void CPointPush::PushEntity( CBaseEntity *pTarget )
 	default:
 		{
 			Vector vecPush = (m_flMagnitude * vecPushDir * flFalloff);
-			if ( pTarget->GetFlags() & FL_BASEVELOCITY )
+			if ( pTarget->GetEngineObject()->GetFlags() & FL_BASEVELOCITY )
 			{
 				vecPush = vecPush + pTarget->GetBaseVelocity();
 			}
-			if ( vecPush.z > 0 && (pTarget->GetFlags() & FL_ONGROUND) )
+			if ( vecPush.z > 0 && (pTarget->GetEngineObject()->GetFlags() & FL_ONGROUND) )
 			{
 				pTarget->GetEngineObject()->SetGroundEntity( NULL );
 				Vector origin = pTarget->GetEngineObject()->GetAbsOrigin();
@@ -2049,7 +2049,7 @@ void CPointPush::PushEntity( CBaseEntity *pTarget )
 			}
 
 			pTarget->SetBaseVelocity( vecPush );
-			pTarget->AddFlag( FL_BASEVELOCITY );
+			pTarget->GetEngineObject()->AddFlag( FL_BASEVELOCITY );
 		}
 		break;
 	}

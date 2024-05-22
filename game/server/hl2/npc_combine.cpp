@@ -1183,7 +1183,7 @@ Vector CNPC_Combine::BodyTarget( const Vector &posSrc, bool bNoisy )
 
 	// @TODO (toml 02-02-04): this seems wrong. Isn't this already be accounted for 
 	// with the eye position used in the base BodyTarget()
-	if ( GetFlags() & FL_DUCKING )
+	if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		result -= Vector(0,0,24);
 
 	return result;
@@ -1645,7 +1645,7 @@ int CNPC_Combine::SelectCombatSchedule()
 		Stand();
 		DesireStand();
 
-		if( GetEnemy() && !(GetEnemy()->GetFlags() & FL_NOTARGET) && OccupyStrategySlotRange( SQUAD_SLOT_ATTACK1, SQUAD_SLOT_ATTACK2 ) )
+		if( GetEnemy() && !(GetEnemy()->GetEngineObject()->GetFlags() & FL_NOTARGET) && OccupyStrategySlotRange( SQUAD_SLOT_ATTACK1, SQUAD_SLOT_ATTACK2 ) )
 		{
 			// Charge in and break the enemy's cover!
 			return SCHED_ESTABLISH_LINE_OF_FIRE;
@@ -2619,7 +2619,7 @@ void CNPC_Combine::SpeakSentence( int sentenceType )
 void CNPC_Combine::PainSound ( const CTakeDamageInfo &damageinfo )
 {
 	// NOTE: The response system deals with this at the moment
-	if ( GetFlags() & FL_DISSOLVING )
+	if (GetEngineObject()->GetFlags() & FL_DISSOLVING )
 		return;
 
 	if ( gpGlobals->curtime > m_flNextPainSoundTime )
@@ -2722,7 +2722,7 @@ void CNPC_Combine::NotifyDeadFriend ( CBaseEntity* pFriend )
 void CNPC_Combine::DeathSound ( void )
 {
 	// NOTE: The response system deals with this at the moment
-	if ( GetFlags() & FL_DISSOLVING )
+	if (GetEngineObject()->GetFlags() & FL_DISSOLVING )
 		return;
 
 	m_Sentences.Speak( "COMBINE_DIE", SENTENCE_PRIORITY_INVALID, SENTENCE_CRITERIA_ALWAYS );
@@ -2833,7 +2833,7 @@ bool CNPC_Combine::CanThrowGrenade( const Vector &vecTarget )
 
 #if 0
 	Vector vecEnemyLKP = GetEnemyLKP();
-	if ( !( GetEnemy()->GetFlags() & FL_ONGROUND ) && GetEnemy()->GetWaterLevel() == 0 && vecEnemyLKP.z > (GetAbsOrigin().z + WorldAlignMaxs().z)  )
+	if ( !( GetEnemy()->GetEngineObject()->GetFlags() & FL_ONGROUND ) && GetEnemy()->GetWaterLevel() == 0 && vecEnemyLKP.z > (GetAbsOrigin().z + WorldAlignMaxs().z)  )
 	{
 		//!!!BUGBUG - we should make this check movetype and make sure it isn't FLY? Players who jump a lot are unlikely to 
 		// be grenaded.

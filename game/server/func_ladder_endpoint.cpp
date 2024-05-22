@@ -30,7 +30,7 @@ void CFuncLadderEndPoint::Activate()
 {
 	BaseClass::Activate();
 
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
 	Validate();

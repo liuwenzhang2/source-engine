@@ -362,7 +362,6 @@ CBaseEntity::CBaseEntity()
 	SetMoveType( MOVETYPE_NONE );
 	SetOwnerEntity( NULL );
 	m_nTransmitStateOwnedCounter = 0;
-	m_fFlags = 0;
 
 	SetFriction( 1.0f );
 
@@ -489,10 +488,10 @@ void CBaseEntity::UpdateOnRemove(void)
 	gEntList.NotifyRemoveEntity(this);
 
 	GetEngineObject()->AddEFlags(EFL_KILLME);
-	AddFlag(FL_KILLME);
+	GetEngineObject()->AddFlag(FL_KILLME);
 	if (!IsNetworkable() || entindex() != -1)
 	{
-		if (GetFlags() & FL_GRAPHED)
+		if (GetEngineObject()->GetFlags() & FL_GRAPHED)
 		{
 			/*	<<TODO>>
 			// this entity was a LinkEnt in the world node graph, so we must remove it from
@@ -925,7 +924,7 @@ void CBaseEntity::DrawDebugGeometryOverlays(void)
 			NDebugOverlay::EntityBounds(this, 255, 255, 255, 0, 0 );
 		}
 	}
-	if ( m_debugOverlays & OVERLAY_AUTOAIM_BIT && (GetFlags()&FL_AIMTARGET) && AI_GetSinglePlayer() != NULL )
+	if ( m_debugOverlays & OVERLAY_AUTOAIM_BIT && (GetEngineObject()->GetFlags()&FL_AIMTARGET) && AI_GetSinglePlayer() != NULL )
 	{
 		// Crude, but it gets the point across.
 		Vector vecCenter = GetAutoAimCenter();
@@ -1751,7 +1750,7 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 	DEFINE_KEYFIELD( m_vecViewOffset, FIELD_VECTOR, "view_ofs" ),
 
-	DEFINE_FIELD( m_fFlags, FIELD_INTEGER ),
+	//DEFINE_FIELD( m_fFlags, FIELD_INTEGER ),
 //#if !defined( NO_ENTITY_PREDICTION )
 //	DEFINE_FIELD( m_bIsPlayerSimulated, FIELD_INTEGER ),
 //	DEFINE_FIELD( m_hPlayerSimulationOwner, FIELD_EHANDLE ),
@@ -2505,7 +2504,7 @@ bool CBaseEntity::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **p
 {
 	VPROF( "CBaseEntity::FVisible" );
 
-	if ( pEntity->GetFlags() & FL_NOTARGET )
+	if ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET )
 		return false;
 
 #if HL1_DLL
@@ -2933,7 +2932,7 @@ void CBaseEntity::OnRestore()
 #if defined( PORTAL ) || defined( HL2_EPISODIC ) || defined ( HL2_DLL ) || defined( HL2_LOSTCOAST )
 	// We had a short period during the 2013 beta where the FL_* flags had a bogus value near the top, so detect
 	// these bad saves and just give up. Only saves from the short beta period should have been effected.
-	if ( GetFlags() & FL_FAKECLIENT )
+	if (GetEngineObject()->GetFlags() & FL_FAKECLIENT )
 	{
 		char szMsg[256];
 		V_snprintf( szMsg, sizeof(szMsg), "\nInvalid save, unable to load. Please run \"map %s\" to restart this level manually\n\n", gpGlobals->mapname.ToCStr() );
@@ -2953,11 +2952,11 @@ void CBaseEntity::OnRestore()
 
 	//Adrian: If I'm restoring with these fields it means I've become a client side ragdoll.
 	//Don't create another one, just wait until is my time of being removed.
-	if ( GetFlags() & FL_TRANSRAGDOLL )
+	if (GetEngineObject()->GetFlags() & FL_TRANSRAGDOLL )
 	{
 		m_nRenderFX = kRenderFxNone;
 		AddEffects( EF_NODRAW );
-		RemoveFlag( FL_DISSOLVING | FL_ONFIRE );
+		GetEngineObject()->RemoveFlag( FL_DISSOLVING | FL_ONFIRE );
 	}
 
 }
@@ -4640,7 +4639,7 @@ void ConsoleFireTargets( CBasePlayer *pPlayer, const char *name)
 	if (FStrEq(name,"")) 
 	{
 		CBaseEntity *pEntity = FindPickerEntity( pPlayer );
-		if ( pEntity && !pEntity->IsMarkedForDeletion())
+		if ( pEntity && !pEntity->GetEngineObject()->IsMarkedForDeletion())
 		{
 			Msg( "[%03d] Found: %s, firing\n", gpGlobals->tickcount%1000, pEntity->GetDebugName());
 			pEntity->Use( pPlayer, pPlayer, USE_TOGGLE, 0 );

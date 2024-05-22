@@ -231,7 +231,7 @@ bool CBaseNPCMaker::CanMakeNPC( bool bIgnoreSolidEntities )
 				// Only spawn if the player's looking away from me
 				if( pPlayer->FInViewCone(GetEngineObject()->GetAbsOrigin() ) && pPlayer->FVisible(GetEngineObject()->GetAbsOrigin() ) )
 				{
-					if ( !(pPlayer->GetFlags() & FL_NOTARGET) )
+					if ( !(pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET) )
 						return false;
 					DevMsg( 2, "Spawner %s spawning even though seen due to notarget\n", STRING( GetEntityName() ) );
 				}
@@ -682,7 +682,7 @@ CNPCSpawnDestination *CTemplateNPCMaker::FindSpawnDestination()
 				{
 					if( fVisible )
 					{
-						if ( !(pPlayer->GetFlags() & FL_NOTARGET) )
+						if ( !(pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET) )
 							fValid = false;
 						else
 							DevMsg( 2, "Spawner %s spawning even though seen due to notarget\n", STRING( GetEntityName() ) );

@@ -217,7 +217,7 @@ bool CPlayerAnimState::HandleJumping()
 		// on-ground flag set right when the message comes in.
 		if ( gpGlobals->curtime - m_flJumpStartTime > 0.2f )
 		{
-			if ( m_pOuter->GetFlags() & FL_ONGROUND )
+			if ( m_pOuter->GetEngineObject()->GetFlags() & FL_ONGROUND )
 			{
 				m_bJumping = false;
 				RestartMainSequence();	// Reset the animation.
@@ -267,7 +267,7 @@ Activity CPlayerAnimState::CalcMainActivity()
 		Activity idealActivity = ACT_IDLE;
 		float flOuterSpeed = GetOuterXYSpeed();
 
-		if ( m_pOuter->GetFlags() & FL_DUCKING )
+		if ( m_pOuter->GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			if ( flOuterSpeed > 0.1f )
 				idealActivity = ACT_RUN_CROUCH;

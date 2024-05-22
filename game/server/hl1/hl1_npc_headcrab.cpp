@@ -355,7 +355,7 @@ int CNPC_Headcrab::RangeAttack1Conditions ( float flDot, float flDist )
 		return( 0 );
 	}
 
-	if ( !(GetFlags() & FL_ONGROUND) )
+	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND) )
 	{
 		return( 0 );
 	}
@@ -453,7 +453,7 @@ void CNPC_Headcrab::LeapTouch( CBaseEntity *pOther )
 	}
 
 	// Don't hit if back on ground
-	if ( !(GetFlags() & FL_ONGROUND) && ( pOther->IsNPC() || pOther->IsPlayer() ) )
+	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND) && ( pOther->IsNPC() || pOther->IsPlayer() ) )
 	{
 		BiteSound();
 		TouchDamage( pOther );
@@ -679,9 +679,9 @@ void CNPC_BabyCrab::Precache( void )
 
 int CNPC_BabyCrab::RangeAttack1Conditions( float flDot, float flDist )
 {
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
-		if (GetEngineObject()->GetGroundEntity() && (GetEngineObject()->GetGroundEntity()->GetOuter()->GetFlags() & (FL_CLIENT | FL_NPC)))
+		if (GetEngineObject()->GetGroundEntity() && (GetEngineObject()->GetGroundEntity()->GetOuter()->GetEngineObject()->GetFlags() & (FL_CLIENT | FL_NPC)))
 			return COND_CAN_RANGE_ATTACK1;
 
 		// A little less accurate, but jump from closer

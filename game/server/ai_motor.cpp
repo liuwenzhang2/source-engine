@@ -158,7 +158,7 @@ AIMotorMoveResult_t CAI_Motor::MoveGroundStep( const Vector &newPos, CBaseEntity
 		// NOTE: This is to detect changes in ground entity as the movement code has optimized out
 		// ground checks.  So now we have to do a simple recheck to make sure we detect when we've 
 		// stepped onto a new entity.
-		if ( GetOuter()->GetFlags() & FL_ONGROUND )
+		if ( GetOuter()->GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			GetOuter()->PhysicsStepRecheckGround();
 		}
@@ -254,7 +254,7 @@ void CAI_Motor::MoveClimbStart(  const Vector &climbDest, const Vector &climbDir
 		m_vecDismount.Init();
 	}
 
-	GetOuter()->AddFlag( FL_FLY );		// No gravity
+	GetOuter()->GetEngineObject()->AddFlag( FL_FLY );		// No gravity
 	SetSolid( SOLID_BBOX );
 	SetGravity( 0.0 );
 	SetGroundEntity( NULL );
@@ -340,7 +340,7 @@ void CAI_Motor::MoveClimbStop()
 	else
 		SetActivity( ACT_IDLE );
 
-	GetOuter()->RemoveFlag( FL_FLY );
+	GetOuter()->GetEngineObject()->RemoveFlag( FL_FLY );
 	SetSmoothedVelocity( vec3_origin );
 	SetGravity( 1.0 );
 }

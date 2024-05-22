@@ -95,11 +95,11 @@ float CWeaponP228::GetInaccuracy() const
 		if ( !pPlayer )
 			return 0.0f;
 
-		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+		if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 			return 1.5f * (1 - m_flAccuracy);
 		else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 			return 0.255f * (1 - m_flAccuracy);
-		else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
+		else if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING ) )
 			return 0.075f * (1 - m_flAccuracy);
 		else
 			return 0.15f * (1 - m_flAccuracy);

@@ -709,7 +709,7 @@ void CTeamplayRoundBasedRules::GoToIntermission( void )
 
 		if ( pPlayer )
 		{
-			pPlayer->AddFlag( FL_FROZEN );
+			pPlayer->GetEngineObject()->AddFlag( FL_FROZEN );
 		}
 	}
 
@@ -1777,7 +1777,7 @@ void CTeamplayRoundBasedRules::State_Think_TEAM_WIN( void )
 							if ( !pPlayer )
 								continue;
 
-							pPlayer->AddFlag( FL_FROZEN );
+							pPlayer->GetEngineObject()->AddFlag( FL_FROZEN );
 							pPlayer->ShowViewPortPanel( PANEL_SCOREBOARD );
 						}
 

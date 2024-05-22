@@ -2972,11 +2972,11 @@ int CAI_NetworkBuilder::ComputeConnection( CAI_Node *pSrcNode, CAI_Node *pDestNo
 		m_pTestHull->SetHullSizeNormal( true );
 	}
 
-	if ( !( m_pTestHull->GetFlags() & FL_ONGROUND ) )
+	if ( !( m_pTestHull->GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
 		DevWarning( 2, "OFFGROUND!\n" );
 	}
-	m_pTestHull->AddFlag( FL_ONGROUND );
+	m_pTestHull->GetEngineObject()->AddFlag( FL_ONGROUND );
 
 	// ==============================================================
 	// FIRST CHECK IF HULL CAN EVEN FIT AT THESE NODES

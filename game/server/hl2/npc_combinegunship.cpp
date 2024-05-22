@@ -628,7 +628,7 @@ void CNPC_CombineGunship::Spawn( void )
 	// Allows autoaim to help attack the gunship.
 	if( g_pGameRules->GetAutoAimMode() == AUTOAIM_ON_CONSOLE )
 	{
-		AddFlag( FL_AIMTARGET );
+		GetEngineObject()->AddFlag( FL_AIMTARGET );
 	}
 }
 
@@ -2136,7 +2136,7 @@ void CNPC_CombineGunship::ApplyGeneralDrag( void )
 
 void CNPC_CombineGunship::Flight( void )
 {
-	if( GetFlags() & FL_ONGROUND )
+	if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		//This would be really bad.
 		GetEngineObject()->SetGroundEntity( NULL );

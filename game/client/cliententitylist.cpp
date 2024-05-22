@@ -219,15 +219,17 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_PRED_FIELD(m_hNetworkMoveParent, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE),
 	DEFINE_PRED_FIELD(m_hGroundEntity, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE),
 	DEFINE_PRED_FIELD(m_nModelIndex, FIELD_SHORT, FTYPEDESC_INSENDTABLE | FTYPEDESC_MODELINDEX),
+	DEFINE_PRED_FIELD(m_fFlags, FIELD_INTEGER, FTYPEDESC_INSENDTABLE),
 END_PREDICTION_DATA()
 
 BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
 	DEFINE_FIELD(m_vecAbsOrigin, FIELD_POSITION_VECTOR),
 	DEFINE_FIELD(m_angAbsRotation, FIELD_VECTOR),
 	DEFINE_ARRAY( m_rgflCoordinateFrame, FIELD_FLOAT, 12 ), // NOTE: MUST BE IN LOCAL SPACE, NOT POSITION_VECTOR!!! (see CBaseEntity::Restore)
+	DEFINE_FIELD(m_fFlags, FIELD_INTEGER),
 	DEFINE_FIELD(m_iEFlags, FIELD_INTEGER),
 	DEFINE_FIELD(m_ModelName, FIELD_STRING),
-	END_DATADESC()
+END_DATADESC()
 
 //-----------------------------------------------------------------------------
 // Moveparent receive proxies
@@ -293,6 +295,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO(m_spawnflags)),
 	RecvPropDataTable(RECVINFO_DT(m_Collision), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty)),
 	RecvPropInt(RECVINFO(m_CollisionGroup)),
+	RecvPropInt(RECVINFO(m_fFlags)),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -2237,7 +2240,7 @@ void C_EngineObjectInternal::PhysicsImpact(IEngineObjectClient* other, trace_t& 
 
 	// If either of the entities is flagged to be deleted, 
 	//  don't call the touch functions
-	if ((m_pOuter->GetFlags() | other->GetOuter()->GetFlags()) & FL_KILLME)
+	if ((GetFlags() | other->GetFlags()) & FL_KILLME)
 	{
 		return;
 	}
@@ -2296,7 +2299,7 @@ clienttouchlink_t* C_EngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObj
 		return NULL;
 
 	// check if either entity doesn't generate touch functions
-	if ((m_pOuter->GetFlags() | other->GetOuter()->GetFlags()) & FL_DONTTOUCH)
+	if ((GetFlags() | other->GetFlags()) & FL_DONTTOUCH)
 		return NULL;
 
 	// Pure triggers should not touch each other
@@ -2307,12 +2310,12 @@ clienttouchlink_t* C_EngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObj
 	}
 
 	// Don't do touching if marked for deletion
-	if (other->GetOuter()->IsMarkedForDeletion())
+	if (other->IsMarkedForDeletion())
 	{
 		return NULL;
 	}
 
-	if (m_pOuter->IsMarkedForDeletion())
+	if (IsMarkedForDeletion())
 	{
 		return NULL;
 	}
@@ -2390,7 +2393,7 @@ void C_EngineObjectInternal::PhysicsTouch(IEngineObjectClient* pentOther)
 {
 	if (pentOther)
 	{
-		if (!(m_pOuter->IsMarkedForDeletion() || pentOther->GetOuter()->IsMarkedForDeletion()))
+		if (!(IsMarkedForDeletion() || pentOther->IsMarkedForDeletion()))
 		{
 			m_pOuter->Touch(pentOther->GetOuter());
 		}
@@ -2405,7 +2408,7 @@ void C_EngineObjectInternal::PhysicsStartTouch(IEngineObjectClient* pentOther)
 {
 	if (pentOther)
 	{
-		if (!(m_pOuter->IsMarkedForDeletion() || pentOther->GetOuter()->IsMarkedForDeletion()))
+		if (!(IsMarkedForDeletion() || pentOther->IsMarkedForDeletion()))
 		{
 			m_pOuter->StartTouch(pentOther->GetOuter());
 			m_pOuter->Touch(pentOther->GetOuter());
@@ -2643,7 +2646,7 @@ void C_EngineObjectInternal::PhysicsStartGroundContact(IEngineObjectClient* pent
 	if (!pentOther)
 		return;
 
-	if (!(m_pOuter->IsMarkedForDeletion() || pentOther->GetOuter()->IsMarkedForDeletion()))
+	if (!(IsMarkedForDeletion() || pentOther->IsMarkedForDeletion()))
 	{
 		pentOther->GetOuter()->StartGroundContact(this->m_pOuter);
 	}
@@ -2763,11 +2766,11 @@ void C_EngineObjectInternal::SetGroundEntity(IEngineObjectClient* ground)
 	//  this will force the appropriate flags
 	if (ground)
 	{
-		m_pOuter->AddFlag(FL_ONGROUND);
+		AddFlag(FL_ONGROUND);
 	}
 	else
 	{
-		m_pOuter->RemoveFlag(FL_ONGROUND);
+		RemoveFlag(FL_ONGROUND);
 	}
 }
 
@@ -2814,7 +2817,6 @@ void C_EngineObjectInternal::SetCollisionGroup(int collisionGroup)
 	}
 }
 
-
 void C_EngineObjectInternal::CollisionRulesChanged()
 {
 	// ivp maintains state based on recent return values from the collision filter, so anything
@@ -2835,6 +2837,32 @@ void C_EngineObjectInternal::CollisionRulesChanged()
 				pList[i]->RecheckCollisionFilter();
 		}
 	}
+}
+
+#if !defined( CLIENT_DLL )
+#define CHANGE_FLAGS(flags,newFlags) { unsigned int old = flags; flags = (newFlags); gEntList.ReportEntityFlagsChanged( this, old, flags ); }
+#else
+#define CHANGE_FLAGS(flags,newFlags) (flags = (newFlags))
+#endif
+
+void C_EngineObjectInternal::AddFlag(int flags)
+{
+	CHANGE_FLAGS(m_fFlags, m_fFlags | flags);
+}
+
+void C_EngineObjectInternal::RemoveFlag(int flagsToRemove)
+{
+	CHANGE_FLAGS(m_fFlags, m_fFlags & ~flagsToRemove);
+}
+
+void C_EngineObjectInternal::ClearFlags(void)
+{
+	CHANGE_FLAGS(m_fFlags, 0);
+}
+
+void C_EngineObjectInternal::ToggleFlag(int flagToToggle)
+{
+	CHANGE_FLAGS(m_fFlags, m_fFlags ^ flagToToggle);
 }
 
 

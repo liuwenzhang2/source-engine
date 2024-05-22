@@ -95,30 +95,30 @@ void CPlayerMove::CheckMovingGround( CBasePlayer *player, double frametime )
 
 	CBaseEntity	    *groundentity;
 
-	if ( player->GetFlags() & FL_ONGROUND )
+	if ( player->GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		groundentity = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
-		if ( groundentity && ( groundentity->GetFlags() & FL_CONVEYOR) )
+		if ( groundentity && ( groundentity->GetEngineObject()->GetFlags() & FL_CONVEYOR) )
 		{
 			Vector vecNewVelocity;
 			groundentity->GetGroundVelocityToApply( vecNewVelocity );
-			if ( player->GetFlags() & FL_BASEVELOCITY )
+			if ( player->GetEngineObject()->GetFlags() & FL_BASEVELOCITY )
 			{
 				vecNewVelocity += player->GetBaseVelocity();
 			}
 			player->SetBaseVelocity( vecNewVelocity );
-			player->AddFlag( FL_BASEVELOCITY );
+			player->GetEngineObject()->AddFlag( FL_BASEVELOCITY );
 		}
 	}
 
-	if ( !( player->GetFlags() & FL_BASEVELOCITY ) )
+	if ( !( player->GetEngineObject()->GetFlags() & FL_BASEVELOCITY ) )
 	{
 		// Apply momentum (add in half of the previous frame of velocity first)
 		player->ApplyAbsVelocityImpulse( (1.0 + ( frametime * 0.5 )) * player->GetBaseVelocity() );
 		player->SetBaseVelocity( vec3_origin );
 	}
 
-	player->RemoveFlag( FL_BASEVELOCITY );
+	player->GetEngineObject()->RemoveFlag( FL_BASEVELOCITY );
 }
 
 //-----------------------------------------------------------------------------
@@ -161,7 +161,7 @@ void CPlayerMove::SetupMove( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper *p
 	move->m_nButtons			= ucmd->buttons;
 
 	// Ingore buttons for movement if at controls
-	if ( player->GetFlags() & FL_ATCONTROLS )
+	if ( player->GetEngineObject()->GetFlags() & FL_ATCONTROLS )
 	{
 		move->m_flForwardMove		= 0;
 		move->m_flSideMove			= 0;

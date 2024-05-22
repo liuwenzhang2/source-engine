@@ -255,7 +255,7 @@ void CNPC_Controller::Spawn()
 
 	CapabilitiesClear();
 
-	AddFlag( FL_FLY );
+	GetEngineObject()->AddFlag( FL_FLY );
 	SetNavType( NAV_FLY );
 
 	CapabilitiesAdd( bits_CAP_MOVE_FLY | bits_CAP_INNATE_RANGE_ATTACK1 | bits_CAP_INNATE_RANGE_ATTACK2 | bits_CAP_MOVE_SHOOT);

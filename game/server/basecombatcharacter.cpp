@@ -446,7 +446,7 @@ bool CBaseCombatCharacter::FVisibleThroughPortal( const CProp_Portal *pPortal, C
 {
 	VPROF( "CBaseCombatCharacter::FVisible" );
 
-	if ( pEntity->GetFlags() & FL_NOTARGET )
+	if ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET )
 		return false;
 
 #if HL1_DLL
@@ -1463,7 +1463,7 @@ void CBaseCombatCharacter::FixupBurningServerRagdoll( CBaseEntity *pRagdoll )
 	if ( pFireChild )
 	{
 		SetEffectEntity( NULL );
-		pRagdoll->AddFlag( FL_ONFIRE );
+		pRagdoll->GetEngineObject()->AddFlag( FL_ONFIRE );
 		pFireChild->GetEngineObject()->SetAbsOrigin( pRagdoll->GetEngineObject()->GetAbsOrigin() );
 		pFireChild->AttachToEntity( pRagdoll );
 		pFireChild->GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
@@ -1837,7 +1837,7 @@ void CBaseCombatCharacter::DropWeaponForWeaponStrip( CBaseCombatWeapon *pWeapon,
 //-----------------------------------------------------------------------------
 void CBaseCombatCharacter::Weapon_DropAll( bool bDisallowWeaponPickup )
 {
-	if ( GetFlags() & FL_NPC )
+	if (GetEngineObject()->GetFlags() & FL_NPC )
 	{
 		for (int i=0; i<MAX_WEAPONS; ++i) 
 		{
@@ -1925,7 +1925,7 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 		return;
 
 	// If I'm an NPC, fill the weapon with ammo before I drop it.
-	if ( GetFlags() & FL_NPC )
+	if (GetEngineObject()->GetFlags() & FL_NPC )
 	{
 		if ( pWeapon->UsesClipsForAmmo1() )
 		{

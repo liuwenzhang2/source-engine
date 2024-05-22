@@ -189,7 +189,7 @@ void CNPC_Osprey::Spawn( void )
 	UTIL_SetSize( this, mins, maxs ); 
 	UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() );
 
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 	m_takedamage		= DAMAGE_YES;
 	m_flRightHealth		= 200;
 	m_flLeftHealth		= 200;
@@ -713,7 +713,7 @@ void CBaseHelicopter::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_STEP );
-	AddFlag( FL_FLY );
+	GetEngineObject()->AddFlag( FL_FLY );
 
 	m_lifeState			= LIFE_ALIVE;
 
@@ -727,7 +727,7 @@ void CBaseHelicopter::Spawn( void )
 	SetCycle( 0 );
 	ResetSequenceInfo();
 
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 
 	m_flMaxSpeed = BASECHOPPER_MAX_SPEED;
 	m_flMaxSpeedFiring = BASECHOPPER_MAX_FIRING_SPEED;
@@ -1014,7 +1014,7 @@ void CBaseHelicopter::UpdatePlayerDopplerShift( )
 //------------------------------------------------------------------------------
 void CBaseHelicopter::Flight( void )
 {
-	if( GetFlags() & FL_ONGROUND )
+	if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		//This would be really bad.
 		GetEngineObject()->SetGroundEntity( NULL );

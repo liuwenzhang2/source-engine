@@ -1114,7 +1114,7 @@ bool CCSBot::IsNoticable( const CCSPlayer *player, unsigned char visParts ) cons
 
 
 	// harder to notice when crouched
-	bool isCrouching = (player->GetFlags() & FL_DUCKING);
+	bool isCrouching = (player->GetEngineObject()->GetFlags() & FL_DUCKING);
 
 
 	// moving players are easier to spot

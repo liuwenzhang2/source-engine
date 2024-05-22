@@ -837,7 +837,7 @@ bool CBaseAnimating::BecomeRagdollOnClient( const Vector &force )
 
 		GetEngineObject()->SetParent( NULL );
 
-		AddFlag( FL_TRANSRAGDOLL );
+		GetEngineObject()->AddFlag( FL_TRANSRAGDOLL );
 
 		SetMoveType( MOVETYPE_NONE );
 		//UTIL_SetSize( this, vec3_origin, vec3_origin );
@@ -874,7 +874,7 @@ bool CBaseAnimating::CanBecomeRagdoll( void )
 	if ( ragdollSequence == ACTIVITY_NOT_AVAILABLE )
 		 return false;
 	
-	if ( GetFlags() & FL_TRANSRAGDOLL )
+	if (GetEngineObject()->GetFlags() & FL_TRANSRAGDOLL )
 		 return false;
 
 	return true;
@@ -1551,7 +1551,7 @@ void CBaseAnimating::UpdateStepOrigin()
 
 	if (m_flIKGroundContactTime > 0.2 && m_flIKGroundContactTime > gpGlobals->curtime - 0.2)
 	{
-		if ((GetFlags() & (FL_FLY | FL_SWIM)) == 0 && GetEngineObject()->GetMoveParent() == NULL && GetEngineObject()->GetGroundEntity() != NULL && !GetEngineObject()->GetGroundEntity()->GetOuter()->IsMoving())
+		if ((GetEngineObject()->GetFlags() & (FL_FLY | FL_SWIM)) == 0 && GetEngineObject()->GetMoveParent() == NULL && GetEngineObject()->GetGroundEntity() != NULL && !GetEngineObject()->GetGroundEntity()->GetOuter()->IsMoving())
 		{
 			Vector toAbs = GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetLocalOrigin();
 			if (toAbs.z == 0.0)
@@ -2786,7 +2786,7 @@ void CBaseAnimating::GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity
 	{
 		BaseClass::GetVelocity(vVelocity,vAngVelocity);
 	}
-	else if ( !(GetFlags() & FL_ONGROUND) )
+	else if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND) )
 	{
 		BaseClass::GetVelocity(vVelocity,vAngVelocity);
 	}
@@ -3390,7 +3390,7 @@ void CBaseAnimating::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize,
 	if (pFlame)
 	{
 		pFlame->SetLifetime( flFlameLifetime );
-		AddFlag( FL_ONFIRE );
+		GetEngineObject()->AddFlag( FL_ONFIRE );
 
 		SetEffectEntity( pFlame );
 
@@ -3448,7 +3448,7 @@ void CBaseAnimating::IgniteHitboxFireScale( float flHitboxFireScale )
 bool CBaseAnimating::Dissolve( const char *pMaterialName, float flStartTime, bool bNPCOnly, int nDissolveType, Vector vDissolverOrigin, int iMagnitude )
 {
 	// Right now this prevents stuff we don't want to catch on fire from catching on fire.
-	if( bNPCOnly && !(GetFlags() & FL_NPC) )
+	if( bNPCOnly && !(GetEngineObject()->GetFlags() & FL_NPC) )
 		return false;
 
 	// Can't dissolve twice
@@ -3461,7 +3461,7 @@ bool CBaseAnimating::Dissolve( const char *pMaterialName, float flStartTime, boo
 	{
 		SetEffectEntity( pDissolve );
 
-		AddFlag( FL_DISSOLVING );
+		GetEngineObject()->AddFlag( FL_DISSOLVING );
 		m_flDissolveStartTime = flStartTime;
 		pDissolve->SetDissolverOrigin( vDissolverOrigin );
 		pDissolve->SetMagnitude( iMagnitude );

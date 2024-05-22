@@ -449,12 +449,6 @@ public:
 		return GetEngineObject()->AreaNum();
 	}	
 
-	// Marks for deletion
-	void					MarkForDeletion();
-	// checks to see if the entity is marked for deletion
-	bool					IsMarkedForDeletion(void);
-	bool					IsMarkedForDeletion() const;
-
 	// Quick way to ask if we have a player entity as a child anywhere in our hierarchy.
 	void					RecalcHasPlayerChildBit();
 	bool					DoesHavePlayerChild();
@@ -920,7 +914,7 @@ public:
 // still realize that they are teammates. (overridden for NPCs that form groups)
 	virtual Class_T Classify ( void );
 	virtual void	DeathNotice ( CBaseEntity *pVictim ) {}// NPC maker children use this to tell the NPC maker that they have died.
-	virtual bool	ShouldAttractAutoAim( CBaseEntity *pAimingEnt ) { return ((GetFlags() & FL_AIMTARGET) != 0); }
+	virtual bool	ShouldAttractAutoAim( CBaseEntity *pAimingEnt ) { return ((GetEngineObject()->GetFlags() & FL_AIMTARGET) != 0); }
 	virtual float	GetAutoAimRadius();
 	virtual Vector	GetAutoAimCenter() { return WorldSpaceCenter(); }
 
@@ -1345,12 +1339,6 @@ public:
 	// When OBBs get in, this can probably go away.
 	virtual Vector			GetSoundEmissionOrigin() const;
 
-	void					AddFlag( int flags );
-	void					RemoveFlag( int flagsToRemove );
-	void					ToggleFlag( int flagToToggle );
-	int						GetFlags( void ) const;
-	void					ClearFlags( void );
-
 	// Sets the local position from a transform
 	void					SetLocalTransform( const matrix3x4_t &localTransform );
 
@@ -1621,8 +1609,7 @@ protected:
 	int						m_nSimulationTick;
 
 private:
-	// was pev->flags
-	CNetworkVarForDerived( int, m_fFlags );
+
 
 	// Damage modifiers
 	friend class CDamageModifier;
@@ -1915,27 +1902,6 @@ inline bool CBaseEntity::Debug_ShouldStep(void)
 //{
 //	return m_hMoveParent.Get();
 //}
-
-//-----------------------------------------------------------------------------
-// checks to see if the entity is marked for deletion
-//-----------------------------------------------------------------------------
-inline bool CBaseEntity::IsMarkedForDeletion( void ) 
-{ 
-	return (GetEngineObject()->GetEFlags() & EFL_KILLME);
-}
-
-//-----------------------------------------------------------------------------
-// Marks for deletion
-//-----------------------------------------------------------------------------
-inline void CBaseEntity::MarkForDeletion()
-{
-	GetEngineObject()->AddEFlags(EFL_KILLME);
-}
-
-inline bool CBaseEntity::IsMarkedForDeletion() const
-{
-	return (GetEngineObject()->GetEFlags() & EFL_KILLME) != 0;
-}
 
 inline void	CBaseEntity::SetNavIgnore( float duration )
 {

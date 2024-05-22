@@ -1806,7 +1806,7 @@ void CNPC_RollerMine::CloseTouch( CBaseEntity *pOther )
 		return;
 
 	bool bOtherIsDead = ( pOther->MyNPCPointer() && !pOther->MyNPCPointer()->IsAlive() );
-	bool bOtherIsNotarget = ( ( pOther->GetFlags() & FL_NOTARGET ) != 0 );
+	bool bOtherIsNotarget = ( ( pOther->GetEngineObject()->GetFlags() & FL_NOTARGET ) != 0 );
 
 	if ( !bOtherIsDead && !bOtherIsNotarget )
 	{

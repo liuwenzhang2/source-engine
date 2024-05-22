@@ -662,7 +662,7 @@ void C_HL2MP_Player::StopWalking( void )
 
 void C_HL2MP_Player::ItemPreFrame( void )
 {
-	if ( GetFlags() & FL_FROZEN )
+	if (GetEngineObject()->GetFlags() & FL_FROZEN )
 		 return;
 
 	// Disallow shooting while zooming
@@ -678,7 +678,7 @@ void C_HL2MP_Player::ItemPreFrame( void )
 	
 void C_HL2MP_Player::ItemPostFrame( void )
 {
-	if ( GetFlags() & FL_FROZEN )
+	if (GetEngineObject()->GetFlags() & FL_FROZEN )
 		 return;
 
 	BaseClass::ItemPostFrame();

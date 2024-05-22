@@ -336,7 +336,7 @@ int CNPC_CScanner::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 //------------------------------------------------------------------------------
 void CNPC_CScanner::Gib( void )
 {
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
 	// Spawn all gibs
@@ -686,7 +686,7 @@ CBaseEntity* CNPC_CScanner::BestInspectTarget(void)
 		if ( !pPlayer )
 			return NULL;
 
-		if ( !pPlayer->IsAlive() || (pPlayer->GetFlags() & FL_NOTARGET) )
+		if ( !pPlayer->IsAlive() || (pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET) )
 			return NULL;
 
 		return WorldSpaceCenter().DistToSqr( pPlayer->EyePosition() ) <= (fSearchDist * fSearchDist) ? pPlayer : NULL;
@@ -733,7 +733,7 @@ CBaseEntity* CNPC_CScanner::BestInspectTarget(void)
 		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
 		if ( ( pNPC && pNPC->Classify() == CLASS_CITIZEN_PASSIVE ) || pEntity->IsPlayer() )
 		{
-			if ( pEntity->GetFlags() & FL_NOTARGET )
+			if ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET )
 				continue;
 
 			if ( pEntity->IsAlive() == false )
@@ -870,7 +870,7 @@ Vector CNPC_CScanner::InspectTargetPosition(void)
 		Vector	vEyePos = GetTarget()->EyePosition();
 
 		// If in spotlight mode, aim for ground below target unless is client
-		if ( m_nFlyMode == SCANNER_FLY_SPOT && !(GetTarget()->GetFlags() & FL_CLIENT) )
+		if ( m_nFlyMode == SCANNER_FLY_SPOT && !(GetTarget()->GetEngineObject()->GetFlags() & FL_CLIENT) )
 		{
 			Vector vInspectPos;
 			vInspectPos.x	= vEyePos.x;
@@ -1634,7 +1634,7 @@ Vector CNPC_CScanner::SpotlightTargetPos(void)
 		if (HasCondition(COND_SEE_ENEMY))
 		{
 			// If its client aim for his eyes
-			if (GetEnemy()->GetFlags() & FL_CLIENT)
+			if (GetEnemy()->GetEngineObject()->GetFlags() & FL_CLIENT)
 			{
 				m_vSpotlightTargetPos = GetEnemy()->EyePosition();
 			}

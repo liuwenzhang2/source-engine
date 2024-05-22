@@ -548,7 +548,7 @@ ConVar cl_autohelp(
 				if ( FStrEq( entity->GetPlayerName(), "" ) )
 					continue;
 
-				if ( FBitSet( entity->GetFlags(), FL_FAKECLIENT ) )
+				if ( FBitSet( entity->GetEngineObject()->GetFlags(), FL_FAKECLIENT ) )
 					continue;
 
 				if ( ignoreSpectators && entity->GetTeamNumber() != TEAM_TERRORIST && entity->GetTeamNumber() != TEAM_CT )
@@ -3334,7 +3334,7 @@ ConVar cl_autohelp(
 
 			if ( pPlayer )
 			{
-				pPlayer->AddFlag( FL_FROZEN );
+				pPlayer->GetEngineObject()->AddFlag( FL_FROZEN );
 			}
 		}
 

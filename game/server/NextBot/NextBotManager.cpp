@@ -285,7 +285,7 @@ inline bool IsDead( INextBot *pBot )
 			return true;
 		}
 			
-		if ( pEntity->IsMarkedForDeletion() )
+		if ( pEntity->GetEngineObject()->IsMarkedForDeletion() )
 		{
 			return true;
 		}

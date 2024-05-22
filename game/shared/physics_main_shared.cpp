@@ -439,7 +439,7 @@ void CBaseEntity::PhysicsAddGravityMove( Vector &move )
 	move.x = (vecAbsVelocity.x + GetBaseVelocity().x ) * gpGlobals->frametime;
 	move.y = (vecAbsVelocity.y + GetBaseVelocity().y ) * gpGlobals->frametime;
 
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		move.z = GetBaseVelocity().z * gpGlobals->frametime;
 		return;
@@ -811,7 +811,7 @@ void CBaseEntity::PhysicsToss( void )
 	}
 
 	// Check to see if entity is on the ground at rest
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		if ( VectorCompare(GetEngineObject()->GetAbsVelocity(), vec3_origin ) )
 		{
@@ -825,7 +825,7 @@ void CBaseEntity::PhysicsToss( void )
 	PhysicsCheckVelocity();
 
 	// add gravity
-	if ( GetMoveType() == MOVETYPE_FLYGRAVITY && !(GetFlags() & FL_FLY) )
+	if ( GetMoveType() == MOVETYPE_FLYGRAVITY && !(GetEngineObject()->GetFlags() & FL_FLY) )
 	{
 		PhysicsAddGravityMove( move );
 	}
@@ -864,7 +864,7 @@ void CBaseEntity::PhysicsToss( void )
 	}
 	
 #if !defined( CLIENT_DLL )
-	if (IsMarkedForDeletion())//engine->IsEdictFree(entindex())
+	if (GetEngineObject()->IsMarkedForDeletion())//engine->IsEdictFree(entindex())
 		return;
 #endif
 
@@ -919,21 +919,21 @@ void CBaseEntity::PhysicsRigidChild( void )
 void CBaseEntity::UpdateBaseVelocity( void )
 {
 #if !defined( CLIENT_DLL )
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		CBaseEntity* groundentity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
 		if ( groundentity )
 		{
 			// On conveyor belt that's moving?
-			if ( groundentity->GetFlags() & FL_CONVEYOR )
+			if ( groundentity->GetEngineObject()->GetFlags() & FL_CONVEYOR )
 			{
 				Vector vecNewBaseVelocity;
 				groundentity->GetGroundVelocityToApply( vecNewBaseVelocity );
-				if ( GetFlags() & FL_BASEVELOCITY )
+				if (GetEngineObject()->GetFlags() & FL_BASEVELOCITY )
 				{
 					vecNewBaseVelocity += GetBaseVelocity();
 				}
-				AddFlag( FL_BASEVELOCITY );
+				GetEngineObject()->AddFlag( FL_BASEVELOCITY );
 				SetBaseVelocity( vecNewBaseVelocity );
 			}
 		}
@@ -971,7 +971,7 @@ void CBaseEntity::PhysicsSimulate( void )
 	// If ground entity goes away, make sure FL_ONGROUND is valid
 	if ( !GetEngineObject()->GetGroundEntity() )
 	{
-		RemoveFlag( FL_ONGROUND );
+		GetEngineObject()->RemoveFlag( FL_ONGROUND );
 	}
 
 	if (pMoveParent)
@@ -985,7 +985,7 @@ void CBaseEntity::PhysicsSimulate( void )
 
 		UpdateBaseVelocity();
 
-		if ( ((GetFlags() & FL_BASEVELOCITY) == 0) && (GetBaseVelocity() != vec3_origin) )
+		if ( ((GetEngineObject()->GetFlags() & FL_BASEVELOCITY) == 0) && (GetBaseVelocity() != vec3_origin) )
 		{
 			// Apply momentum (add in half of the previous frame of velocity first)
 			// BUGBUG: This will break with PhysicsStep() because of the timestep difference
@@ -994,7 +994,7 @@ void CBaseEntity::PhysicsSimulate( void )
 			GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
 			SetBaseVelocity( vec3_origin );
 		}
-		RemoveFlag( FL_BASEVELOCITY );
+		GetEngineObject()->RemoveFlag( FL_BASEVELOCITY );
 	}
 
 	switch( GetMoveType() )
@@ -1281,18 +1281,18 @@ bool CBaseEntity::PhysicsRunSpecificThink( int nContextIndex, BASEPTR thinkFunc 
 	SetLastThink( nContextIndex, gpGlobals->curtime );
 
 	// Return whether entity is still valid
-	return ( !IsMarkedForDeletion() );
+	return ( !GetEngineObject()->IsMarkedForDeletion() );
 }
 
 void CBaseEntity::StartGroundContact( CBaseEntity *ground )
 {
-	AddFlag( FL_ONGROUND );
+	GetEngineObject()->AddFlag( FL_ONGROUND );
 //	Msg( "+++ %s starting contact with ground %s\n", GetClassname(), ground->GetClassname() );
 }
 
 void CBaseEntity::EndGroundContact( CBaseEntity *ground )
 {
-	RemoveFlag( FL_ONGROUND );
+	GetEngineObject()->RemoveFlag( FL_ONGROUND );
 //	Msg( "--- %s ending contact with ground %s\n", GetClassname(), ground->GetClassname() );
 }
 

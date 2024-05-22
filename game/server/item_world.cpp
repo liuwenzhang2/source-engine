@@ -293,7 +293,7 @@ void CItem::FallThink ( void )
 	}
 	else
 	{
-		shouldMaterialize = (GetFlags() & FL_ONGROUND) ? true : false;
+		shouldMaterialize = (GetEngineObject()->GetFlags() & FL_ONGROUND) ? true : false;
 	}
 
 	if ( shouldMaterialize )
@@ -310,7 +310,7 @@ void CItem::FallThink ( void )
 #if defined( TF_DLL )
 	// We only come here if ActivateWhenAtRest() is never called,
 	// which is the case when creating currencypacks in MvM
-	if ( !( GetFlags() & FL_ONGROUND ) )
+	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
 		if ( !GetAbsVelocity().Length() && GetMoveType() == MOVETYPE_FLYGRAVITY )
 		{

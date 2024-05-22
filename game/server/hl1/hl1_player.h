@@ -85,7 +85,7 @@ public:
 	float		GetIdleTime( void ) const { return ( m_flIdleTime - m_flMoveTime ); }
 	float		GetMoveTime( void ) const { return ( m_flMoveTime - m_flIdleTime ); }
 	float		GetLastDamageTime( void ) const { return m_flLastDamageTime; }
-	bool		IsDucking( void ) const { return !!( GetFlags() & FL_DUCKING ); }
+	bool		IsDucking( void ) const { return !!(GetEngineObject()->GetFlags() & FL_DUCKING ); }
 
 	int			OnTakeDamage( const CTakeDamageInfo &info );
 	int			OnTakeDamage_Alive( const CTakeDamageInfo &info );

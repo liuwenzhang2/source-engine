@@ -1149,8 +1149,8 @@ void CC_God_f (void)
 		return;
 #endif
 
-	pPlayer->ToggleFlag( FL_GODMODE );
-	if (!(pPlayer->GetFlags() & FL_GODMODE ) )
+	pPlayer->GetEngineObject()->ToggleFlag( FL_GODMODE );
+	if (!(pPlayer->GetEngineObject()->GetFlags() & FL_GODMODE ) )
 		ClientPrint( pPlayer, HUD_PRINTCONSOLE, "godmode OFF\n");
 	else
 		ClientPrint( pPlayer, HUD_PRINTCONSOLE, "godmode ON\n");
@@ -1317,8 +1317,8 @@ void CC_Notarget_f (void)
 	if ( gpGlobals->deathmatch )
 		return;
 
-	pPlayer->ToggleFlag( FL_NOTARGET );
-	if ( !(pPlayer->GetFlags() & FL_NOTARGET ) )
+	pPlayer->GetEngineObject()->ToggleFlag( FL_NOTARGET );
+	if ( !(pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET ) )
 		ClientPrint( pPlayer, HUD_PRINTCONSOLE, "notarget OFF\n");
 	else
 		ClientPrint( pPlayer, HUD_PRINTCONSOLE, "notarget ON\n");

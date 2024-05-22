@@ -214,9 +214,9 @@ void CNPC_BaseTurret::Spawn()
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	m_takedamage		= DAMAGE_YES;
-	AddFlag( FL_AIMTARGET );
+	GetEngineObject()->AddFlag( FL_AIMTARGET );
 
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 	SetUse( &CNPC_BaseTurret::TurretUse );
 
 	if ((GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_AUTOACTIVATE )
@@ -1496,7 +1496,7 @@ void CNPC_Sentry::Event_Killed( const CTakeDamageInfo &info )
 void CNPC_Sentry::SentryTouch( CBaseEntity *pOther )
 {
 	//trigger the sentry to turn on if a monster or player touches it
-	if ( pOther && (pOther->IsPlayer() || FBitSet ( pOther->GetFlags(), FL_NPC )) )
+	if ( pOther && (pOther->IsPlayer() || FBitSet ( pOther->GetEngineObject()->GetFlags(), FL_NPC )) )
 	{
 		CTakeDamageInfo info;
 		info.SetAttacker( pOther );

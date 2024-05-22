@@ -62,7 +62,7 @@ void CGrenadePathfollower::Spawn( void )
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	SetMoveType( MOVETYPE_NONE );
-	AddFlag( FL_OBJECT );	// So can be shot down
+	GetEngineObject()->AddFlag( FL_OBJECT );	// So can be shot down
 	AddEffects( EF_NODRAW );
 
 	UTIL_SetSize(this, Vector(0, 0, 0), Vector(0, 0, 0));

@@ -897,7 +897,7 @@ void NextBotGroundLocomotion::UpdatePosition( const Vector &newPos )
 {
 	VPROF_BUDGET( "NextBotGroundLocomotion::UpdatePosition", "NextBot" );
 
-	if ( NextBotStop.GetBool() || (m_nextBot->GetFlags() & FL_FROZEN) != 0 || newPos == m_nextBot->GetPosition() )
+	if ( NextBotStop.GetBool() || (m_nextBot->GetEngineObject()->GetFlags() & FL_FROZEN) != 0 || newPos == m_nextBot->GetPosition() )
 	{
 		return;
 	}

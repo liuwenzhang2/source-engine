@@ -489,7 +489,7 @@ void CNPC_Scientist::RunTask( const Task_t *pTask )
 int CNPC_Scientist::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 {
 
-	if ( inputInfo.GetInflictor() && inputInfo.GetInflictor()->GetFlags() & FL_CLIENT )
+	if ( inputInfo.GetInflictor() && inputInfo.GetInflictor()->GetEngineObject()->GetFlags() & FL_CLIENT )
 	{
 		Remember( bits_MEMORY_PROVOKED );
 		StopFollowing();

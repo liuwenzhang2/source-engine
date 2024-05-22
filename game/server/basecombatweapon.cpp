@@ -541,7 +541,7 @@ void CBaseCombatWeapon::FallThink ( void )
 	}
 	else
 	{
-		shouldMaterialize = (GetFlags() & FL_ONGROUND) ? true : false;
+		shouldMaterialize = (GetEngineObject()->GetFlags() & FL_ONGROUND) ? true : false;
 	}
 
 	if ( shouldMaterialize )

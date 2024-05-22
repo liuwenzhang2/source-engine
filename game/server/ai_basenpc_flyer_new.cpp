@@ -36,7 +36,7 @@ CAI_BaseNPCFlyerNew::CAI_BaseNPCFlyerNew()
 void CAI_BaseNPCFlyerNew::SpawnFlyer()
 {
 	SetNavType( NAV_FLY );
-	AddFlag(  FL_FLY );
+	GetEngineObject()->AddFlag(  FL_FLY );
 	SetMoveType( MOVETYPE_STEP );			
 	CapabilitiesAdd( bits_CAP_MOVE_FLY );
 }

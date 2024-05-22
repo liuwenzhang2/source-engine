@@ -149,10 +149,10 @@ void FX_FireBullets(
 		if ( pPlayer->GetMoveType() == MOVETYPE_LADDER )
 			V_strcat(szFlags, "LADDER ", sizeof(szFlags));
 
-		if ( FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+		if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 			V_strcat(szFlags, "GROUND ", sizeof(szFlags));
 
-		if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING) )
+		if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING) )
 			V_strcat(szFlags, "DUCKING ", sizeof(szFlags));
 
 		float fVelocity = pPlayer->GetEngineObject()->GetAbsVelocity().Length2D();

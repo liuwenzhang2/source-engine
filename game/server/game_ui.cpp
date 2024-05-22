@@ -136,7 +136,7 @@ void CGameUI::Deactivate( CBaseEntity *pActivator )
 		// Re-enable player motion
 		if (GetEngineObject()->HasSpawnFlags(SF_GAMEUI_FREEZE_PLAYER) )
 		{
-			m_player->RemoveFlag( FL_ATCONTROLS );
+			m_player->GetEngineObject()->RemoveFlag( FL_ATCONTROLS );
 		}
 
 		// Restore weapons
@@ -226,7 +226,7 @@ void CGameUI::InputActivate( inputdata_t &inputdata )
 	// Disable player's motion
 	if (GetEngineObject()->HasSpawnFlags(SF_GAMEUI_FREEZE_PLAYER) )
 	{
-		m_player->AddFlag( FL_ATCONTROLS );
+		m_player->GetEngineObject()->AddFlag( FL_ATCONTROLS );
 	}
 
 	// Store off and hide the currently held weapon
@@ -289,7 +289,7 @@ void CGameUI::Think( void )
 		}
 	}
 
-	pPlayer->AddFlag( FL_ONTRAIN );
+	pPlayer->GetEngineObject()->AddFlag( FL_ONTRAIN );
 	SetNextThink( gpGlobals->curtime );
 
 	// Deactivate if they jump or press +use.

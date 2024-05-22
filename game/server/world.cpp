@@ -530,7 +530,7 @@ void CWorld::Spawn( void )
 	GetEngineObject()->SetModelIndex( 1 );
 	// world model
 	GetEngineObject()->SetModelName( AllocPooledString( modelinfo->GetModelName( GetModel() ) ) );
-	AddFlag( FL_WORLDBRUSH );
+	GetEngineObject()->AddFlag( FL_WORLDBRUSH );
 
 	g_EventQueue.Init();
 	Precache( );

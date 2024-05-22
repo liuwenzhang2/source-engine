@@ -2804,7 +2804,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 
 			if ( HasMovement( GetSequence() ) || m_hCine->m_bIgnoreGravity )
 			{
-				AddFlag( FL_FLY );
+				GetEngineObject()->AddFlag( FL_FLY );
 				GetEngineObject()->SetGroundEntity( NULL );
 			}
 
@@ -3270,7 +3270,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 				// if they're jumping, wait until they land
 				if (GetNavType() == NAV_JUMP)
 				{
-					if (GetFlags() & FL_ONGROUND)
+					if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 					{
 						DbgNavMsg( this, "Jump landed\n" );
 						SetNavType( NAV_GROUND ); // this assumes that NAV_JUMP only happens with npcs that use NAV_GROUND as base movement
@@ -4089,14 +4089,14 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 		break;
 
 	case TASK_FALL_TO_GROUND:
-		if ( GetFlags() & FL_ONGROUND )
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			TaskComplete();
 		}
-		else if( GetFlags() & FL_FLY )
+		else if(GetEngineObject()->GetFlags() & FL_FLY )
 		{
 			// We're never going to fall if we're FL_FLY.
-			RemoveFlag( FL_FLY );
+			GetEngineObject()->RemoveFlag( FL_FLY );
 		}
 		else
 		{
@@ -4356,7 +4356,7 @@ bool CAI_BaseNPC::IsInterruptable()
 				return false;
 
 			// are the in an script FL_FLY state?
-			if ((GetFlags() & FL_FLY ) && !(m_hCine->m_savedFlags & FL_FLY))
+			if ((GetEngineObject()->GetFlags() & FL_FLY ) && !(m_hCine->m_savedFlags & FL_FLY))
 			{
 				return false;
 			}

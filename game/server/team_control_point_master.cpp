@@ -196,7 +196,7 @@ bool CTeamControlPointMaster::FindControlPoints( void )
 	{
 		CTeamControlPoint *pPoint = assert_cast<CTeamControlPoint *>(pEnt);
 
-		if( pPoint->IsActive() && !pPoint->IsMarkedForDeletion() )
+		if( pPoint->IsActive() && !pPoint->GetEngineObject()->IsMarkedForDeletion() )
 		{
 			int index = pPoint->GetPointIndex();
 

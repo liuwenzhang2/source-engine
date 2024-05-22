@@ -1128,9 +1128,9 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 				// legacy dynamic crosshair
 				if ( cl_dynamiccrosshair.GetInt() == 2 )
 				{
-					if ( !( pPlayer->GetFlags() & FL_ONGROUND ) )
+					if ( !( pPlayer->GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 						fCrosshairDistanceGoal *= 2.0f;
-					else if ( pPlayer->GetFlags() & FL_DUCKING )
+					else if ( pPlayer->GetEngineObject()->GetFlags() & FL_DUCKING )
 						fCrosshairDistanceGoal *= 0.5f;
 					else if ( pPlayer->GetEngineObject()->GetAbsVelocity().Length() > 100 )
 						fCrosshairDistanceGoal *= 1.5f;
@@ -1851,11 +1851,11 @@ void CWeaponCSBase::UpdateAccuracyPenalty()
 		fNewPenalty += weaponInfo.m_fInaccuracyStand[m_weaponMode] + weaponInfo.m_fInaccuracyLadder[m_weaponMode];
 	}
 	// in the air?
-// 	else if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+// 	else if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 // 	{
 // 		fNewPenalty += weaponInfo.m_fInaccuracyStand[m_weaponMode] + weaponInfo.m_fInaccuracyJump[m_weaponMode];
 // 	}
-	else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING) )
+	else if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING) )
 	{
 		fNewPenalty += weaponInfo.m_fInaccuracyCrouch[m_weaponMode];
 	}
@@ -1881,13 +1881,13 @@ void CWeaponCSBase::UpdateAccuracyPenalty()
 		{
 			fDecayFactor = logf(10.0f) / weaponInfo.m_fRecoveryTimeStand;
 		}
-		else if ( !FBitSet(pPlayer->GetFlags(), FL_ONGROUND) )	// in air
+		else if ( !FBitSet(pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND) )	// in air
 		{
 			// enforce a large recovery speed penalty (300%) for players in the air; this helps to provide
 			// comparable in-air accuracy to the old weapon model
 			fDecayFactor = logf(10.0f) / (weaponInfo.m_fRecoveryTimeCrouch * 3.0f);
 		}
-		else if ( FBitSet(pPlayer->GetFlags(), FL_DUCKING) )
+		else if ( FBitSet(pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING) )
 		{
 			fDecayFactor = logf(10.0f) / weaponInfo.m_fRecoveryTimeCrouch;
 		}

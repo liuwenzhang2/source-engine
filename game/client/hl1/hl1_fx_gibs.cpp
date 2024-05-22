@@ -84,7 +84,7 @@ public:
 		}
 
 
-		if ( GetFlags() & FL_ONGROUND )
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			QAngle vAngles = GetEngineObject()->GetAbsAngles();
 			QAngle vAngularVelocity = GetLocalAngularVelocity();

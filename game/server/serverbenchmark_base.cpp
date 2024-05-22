@@ -215,7 +215,7 @@ public:
 				for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 				{
 					CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
-					if ( pPlayer && (pPlayer->GetFlags() & FL_FAKECLIENT) )
+					if ( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FAKECLIENT) )
 					{
 						curPlayers.AddToTail( pPlayer );
 					}
@@ -345,7 +345,7 @@ public:
 		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
 			CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
-			if ( pPlayer && (pPlayer->GetFlags() & FL_FAKECLIENT) )
+			if ( pPlayer && (pPlayer->GetEngineObject()->GetFlags() & FL_FAKECLIENT) )
 			{
 				crc += pPlayer->GetTeamNumber();
 				crc += (int)pPlayer->GetEngineObject()->GetAbsOrigin().x;

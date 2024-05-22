@@ -311,17 +311,17 @@ void CHL2MP_Player::Spawn(void)
 
 	m_Local.m_iHideHUD = 0;
 	
-	AddFlag(FL_ONGROUND); // set the player on the ground at the start of the round.
+	GetEngineObject()->AddFlag(FL_ONGROUND); // set the player on the ground at the start of the round.
 
 	m_impactEnergyScale = HL2MPPLAYER_PHYSDAMAGE_SCALE;
 
 	if ( HL2MPRules()->IsIntermission() )
 	{
-		AddFlag( FL_FROZEN );
+		GetEngineObject()->AddFlag( FL_FROZEN );
 	}
 	else
 	{
-		RemoveFlag( FL_FROZEN );
+		GetEngineObject()->RemoveFlag( FL_FROZEN );
 	}
 
 	m_iSpawnInterpCounter = (m_iSpawnInterpCounter + 1) % 8;
@@ -514,7 +514,7 @@ void CHL2MP_Player::ResetAnimation( void )
 
 		if (!GetEngineObject()->GetAbsVelocity().x && !GetEngineObject()->GetAbsVelocity().y)
 			SetAnimation( PLAYER_IDLE );
-		else if ((GetEngineObject()->GetAbsVelocity().x || GetEngineObject()->GetAbsVelocity().y) && ( GetFlags() & FL_ONGROUND ))
+		else if ((GetEngineObject()->GetAbsVelocity().x || GetEngineObject()->GetAbsVelocity().y) && (GetEngineObject()->GetFlags() & FL_ONGROUND ))
 			SetAnimation( PLAYER_WALK );
 		else if (GetWaterLevel() > 1)
 			SetAnimation( PLAYER_WALK );
@@ -560,7 +560,7 @@ void CHL2MP_Player::PostThink( void )
 {
 	BaseClass::PostThink();
 	
-	if ( GetFlags() & FL_DUCKING )
+	if (GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		GetEngineObject()->SetCollisionBounds( VEC_CROUCH_TRACE_MIN, VEC_CROUCH_TRACE_MAX );
 	}
@@ -692,7 +692,7 @@ void CHL2MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 		}
 	}*/
 
-	if ( GetFlags() & ( FL_FROZEN | FL_ATCONTROLS ) )
+	if (GetEngineObject()->GetFlags() & ( FL_FROZEN | FL_ATCONTROLS ) )
 	{
 		speed = 0;
 		playerAnim = PLAYER_IDLE;
@@ -733,7 +733,7 @@ void CHL2MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 	}
 	else if ( playerAnim == PLAYER_IDLE || playerAnim == PLAYER_WALK )
 	{
-		if ( !( GetFlags() & FL_ONGROUND ) && GetActivity( ) == ACT_HL2MP_JUMP )	// Still jumping
+		if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) && GetActivity( ) == ACT_HL2MP_JUMP )	// Still jumping
 		{
 			idealActivity = GetActivity( );
 		}
@@ -748,7 +748,7 @@ void CHL2MP_Player::SetAnimation( PLAYER_ANIM playerAnim )
 		*/
 		else
 		{
-			if ( GetFlags() & FL_DUCKING )
+			if (GetEngineObject()->GetFlags() & FL_DUCKING )
 			{
 				if ( speed > 0 )
 				{
@@ -859,7 +859,7 @@ bool CHL2MP_Player::BumpWeapon( CBaseCombatWeapon *pWeapon )
 	}
 
 	// Don't let the player fetch weapons through walls (use MASK_SOLID so that you can't pickup through windows)
-	if( !pWeapon->FVisible( this, MASK_SOLID ) && !(GetFlags() & FL_NOTARGET) )
+	if( !pWeapon->FVisible( this, MASK_SOLID ) && !(GetEngineObject()->GetFlags() & FL_NOTARGET) )
 	{
 		return false;
 	}

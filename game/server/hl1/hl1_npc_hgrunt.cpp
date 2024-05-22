@@ -674,7 +674,7 @@ int CNPC_HGrunt::GetGrenadeConditions( float flDot, float flDist  )
 		return COND_NONE;
 	
 	Vector flEnemyLKP = GetEnemyLKP();
-	if ( !(pEnemy->GetFlags() & FL_ONGROUND) && pEnemy->GetWaterLevel() == 0 && flEnemyLKP.z > (GetEngineObject()->GetAbsOrigin().z + WorldAlignMaxs().z)  )
+	if ( !(pEnemy->GetEngineObject()->GetFlags() & FL_ONGROUND) && pEnemy->GetWaterLevel() == 0 && flEnemyLKP.z > (GetEngineObject()->GetAbsOrigin().z + WorldAlignMaxs().z)  )
 	{
 		//!!!BUGBUG - we should make this check movetype and make sure it isn't FLY? Players who jump a lot are unlikely to 
 		// be grenaded.
@@ -962,7 +962,7 @@ bool CNPC_HGrunt::HandleInteraction(int interactionType, void *data, CBaseCombat
 	}
 	else if ( interactionType == g_interactionBarnacleVictimGrab )
 	{
-		if ( GetFlags() & FL_ONGROUND )
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			GetEngineObject()->SetGroundEntity( NULL );
 		}
@@ -1174,7 +1174,7 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 				Vector forward, up;
 				AngleVectors(GetEngineObject()->GetAbsAngles(), &forward, NULL, &up );
 
-				if ( pHurt->GetFlags() & ( FL_NPC | FL_CLIENT ) )
+				if ( pHurt->GetEngineObject()->GetFlags() & ( FL_NPC | FL_CLIENT ) )
 					 pHurt->ViewPunch( QAngle( 15, 0, 0) );
 
 				// Don't give velocity or damage to the world
@@ -1472,7 +1472,7 @@ int CNPC_HGrunt::SelectSchedule( void )
 	// flying? If PRONE, barnacle has me. IF not, it's assumed I am rapelling. 
 	if ( GetMoveType() == MOVETYPE_FLYGRAVITY && m_NPCState != NPC_STATE_PRONE )
 	{
-		if (GetFlags() & FL_ONGROUND)
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 		{
 			// just landed
 			SetMoveType( MOVETYPE_STEP );

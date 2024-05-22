@@ -161,7 +161,7 @@ void CBaseHelicopter::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_STEP );
-	AddFlag( FL_FLY );
+	GetEngineObject()->AddFlag( FL_FLY );
 	SetState( NPC_STATE_IDLE );
 
 	m_lifeState			= LIFE_ALIVE;
@@ -191,7 +191,7 @@ void CBaseHelicopter::Spawn( void )
 	SetCycle( 0 );
 	ResetSequenceInfo();
 
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 
 	m_flMaxSpeed = BASECHOPPER_MAX_SPEED;
 	m_flMaxSpeedFiring = BASECHOPPER_MAX_FIRING_SPEED;
@@ -306,7 +306,7 @@ void CBaseHelicopter::HelicopterThink( void )
 
 	PrescheduleThink();
 
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
 	ShowDamage( );
@@ -325,7 +325,7 @@ void CBaseHelicopter::HelicopterThink( void )
 	Hunt();
 
 	// Finally, forget dead enemies, or ones we've been told to ignore.
-	if( GetEnemy() != NULL && (!GetEnemy()->IsAlive() || GetEnemy()->GetFlags() & FL_NOTARGET || IRelationType( GetEnemy() ) == D_NU ) )
+	if( GetEnemy() != NULL && (!GetEnemy()->IsAlive() || GetEnemy()->GetEngineObject()->GetFlags() & FL_NOTARGET || IRelationType( GetEnemy() ) == D_NU ) )
 	{
 		SetEnemy( NULL );
 	}
@@ -921,7 +921,7 @@ void CBaseHelicopter::ComputeActualTargetPosition( float flSpeed, float flTime, 
 //------------------------------------------------------------------------------
 void CBaseHelicopter::Flight( void )
 {
-	if( GetFlags() & FL_ONGROUND )
+	if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		//This would be really bad.
 		GetEngineObject()->SetGroundEntity( NULL );

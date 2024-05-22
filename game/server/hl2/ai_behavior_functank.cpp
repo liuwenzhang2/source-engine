@@ -166,7 +166,7 @@ void CAI_FuncTankBehavior::Dismount( void )
 	{
 		GetOuter()->SpeakSentence( FUNCTANK_SENTENCE_DISMOUNTING );
 
-		Assert( m_hFuncTank->IsMarkedForDeletion() || m_hFuncTank->GetController() == GetOuter() );
+		Assert( m_hFuncTank->GetEngineObject()->IsMarkedForDeletion() || m_hFuncTank->GetController() == GetOuter() );
 		
 		m_hFuncTank->NPC_SetInRoute( false );
 		if ( m_hFuncTank->GetController() == GetOuter() )
@@ -610,7 +610,7 @@ CBaseEntity *CAI_FuncTankBehavior::BestEnemy( void )
 			continue;
 		
 		// UNDONE: Move relationship checks into IsValidEnemy?
-		if ( ( pEnemy->GetFlags() & FL_NOTARGET ) || 
+		if ( ( pEnemy->GetEngineObject()->GetFlags() & FL_NOTARGET ) ||
 			 ( pNPC->IRelationType( pEnemy ) != D_HT && pNPC->IRelationType( pEnemy ) != D_FR ) ||
 			 !IsValidEnemy( pEnemy ) )
 			continue;

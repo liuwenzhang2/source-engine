@@ -1239,7 +1239,7 @@ void CPropCombineBall::OnHitEntity( CBaseEntity *pHitEntity, float flSpeed, int 
 
 	CTakeDamageInfo info( this, GetOwnerEntity(), GetEngineObject()->GetAbsVelocity(), GetEngineObject()->GetAbsOrigin(), sk_npc_dmg_combineball.GetFloat(), DMG_DISSOLVE );
 
-	bool bIsDissolving = (pHitEntity->GetFlags() & FL_DISSOLVING) != 0;
+	bool bIsDissolving = (pHitEntity->GetEngineObject()->GetFlags() & FL_DISSOLVING) != 0;
 	bool bShouldHit = pHitEntity->PassesDamageFilter( info );
 
 	//One more check
@@ -1405,7 +1405,7 @@ bool CPropCombineBall::IsAttractiveTarget( CBaseEntity *pEntity )
 	if ( !pEntity->IsAlive() )
 		return false;
 
-	if ( pEntity->GetFlags() & EF_NODRAW )
+	if ( pEntity->GetEngineObject()->GetFlags() & EF_NODRAW )
 		return false;
 
 	// Don't guide toward striders

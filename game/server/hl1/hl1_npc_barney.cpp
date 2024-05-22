@@ -341,7 +341,7 @@ int CNPC_Barney::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	if ( !IsAlive() || m_lifeState == LIFE_DYING )
 		  return ret;
 
-	if ( m_NPCState != NPC_STATE_PRONE && ( inputInfo.GetAttacker()->GetFlags() & FL_CLIENT ) )
+	if ( m_NPCState != NPC_STATE_PRONE && ( inputInfo.GetAttacker()->GetEngineObject()->GetFlags() & FL_CLIENT ) )
 	{
 		// This is a heurstic to determine if the player intended to harm me
 		// If I have an enemy, we can't establish intent (may just be crossfire)

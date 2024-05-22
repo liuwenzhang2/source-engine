@@ -800,7 +800,7 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 	if( !m_PortalSimulator.OwnsEntity( pOther ) ) //can't teleport an entity we don't own
 	{
 #if !defined ( DISABLE_DEBUG_HISTORY )
-		if ( !IsMarkedForDeletion() )
+		if ( !GetEngineObject()->IsMarkedForDeletion() )
 		{
 			ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "Portal %i not teleporting %s because it's not simulated by this portal.\n", ((m_bIsPortal2)?(2):(1)), pOther->GetDebugName() ) );
 		}
@@ -818,7 +818,7 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 	if( m_hLinkedPortal.Get() == NULL )
 	{
 #if !defined ( DISABLE_DEBUG_HISTORY )
-		if ( !IsMarkedForDeletion() )
+		if ( !GetEngineObject()->IsMarkedForDeletion() )
 		{
 			ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "Portal %i not teleporting %s because it has no linked partner portal.\n", ((m_bIsPortal2)?(2):(1)), pOther->GetDebugName() ) );
 		}
@@ -905,7 +905,7 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 		else
 		{
 #if !defined ( DISABLE_DEBUG_HISTORY )
-			if ( !IsMarkedForDeletion() )
+			if ( !GetEngineObject()->IsMarkedForDeletion() )
 			{
 				ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "Portal %i not teleporting %s because it was not in the portal hole.\n", ((m_bIsPortal2)?(2):(1)), pOther->GetDebugName() ) );
 			}
@@ -1172,7 +1172,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		DevMsg( "PORTAL %i TELEPORTING: %s\n", ((m_bIsPortal2)?(2):(1)), pOther->GetClassname() );
 	}
 #if !defined ( DISABLE_DEBUG_HISTORY )
-	if ( !IsMarkedForDeletion() )
+	if ( !GetEngineObject()->IsMarkedForDeletion() )
 	{
 		ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "PORTAL %i TELEPORTING: %s\n", ((m_bIsPortal2)?(2):(1)), pOther->GetClassname() ) );
 	}
@@ -1407,7 +1407,7 @@ void CProp_Portal::Touch( CBaseEntity *pOther )
 					DevMsg( "Portal %i took control of shared object: %s\n", ((m_bIsPortal2)?(2):(1)), pOther->GetClassname() );
 				}
 #if !defined ( DISABLE_DEBUG_HISTORY )
-				if ( !IsMarkedForDeletion() )
+				if ( !GetEngineObject()->IsMarkedForDeletion() )
 				{
 					ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "Portal %i took control of shared object: %s\n", ((m_bIsPortal2)?(2):(1)), pOther->GetClassname() ) );
 				}
@@ -1443,7 +1443,7 @@ void CProp_Portal::StartTouch( CBaseEntity *pOther )
 		DevMsg( "Portal %i StartTouch: %s : %f\n", ((m_bIsPortal2)?(2):(1)), pOther->GetClassname(), gpGlobals->curtime );
 	}
 #if !defined ( DISABLE_DEBUG_HISTORY )
-	if ( !IsMarkedForDeletion() )
+	if ( !GetEngineObject()->IsMarkedForDeletion() )
 	{
 		ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "Portal %i StartTouch: %s : %f\n", ((m_bIsPortal2)?(2):(1)), pOther->GetClassname(), gpGlobals->curtime ) );
 	}
@@ -1510,7 +1510,7 @@ void CProp_Portal::EndTouch( CBaseEntity *pOther )
 	}
 
 #if !defined( DISABLE_DEBUG_HISTORY )
-	if ( !IsMarkedForDeletion() )
+	if ( !GetEngineObject()->IsMarkedForDeletion() )
 	{
 		ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "Portal %i EndTouch: %s : %f\n", ((m_bIsPortal2)?(2):(1)), pOther->GetClassname(), gpGlobals->curtime ) );
 	}
@@ -1743,7 +1743,7 @@ void CProp_Portal::ForceEntityToFitInPortalWall( CBaseEntity *pEntity )
 			pEntity->Teleport( &ptNewPos, NULL, NULL );
 			pEntity->IncrementInterpolationFrame();
 #if !defined ( DISABLE_DEBUG_HISTORY )
-			if ( !IsMarkedForDeletion() )
+			if ( !GetEngineObject()->IsMarkedForDeletion() )
 			{
 				ADD_DEBUG_HISTORY( HISTORY_PLAYER_DAMAGE, UTIL_VarArgs( "Teleporting %s inside 'ForceEntityToFitInPortalWall'\n", pEntity->GetDebugName() ) );
 			}

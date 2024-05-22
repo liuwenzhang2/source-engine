@@ -171,9 +171,9 @@ void CHL1_Player::PreThink(void)
 	// So the correct flags get sent to client asap.
 	//
 	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
-		AddFlag( FL_ONTRAIN );
+		GetEngineObject()->AddFlag( FL_ONTRAIN );
 	else 
-		RemoveFlag( FL_ONTRAIN );
+		GetEngineObject()->RemoveFlag( FL_ONTRAIN );
 
 	// Train speed control
 	if ( m_afPhysicsFlags & PFLAG_DIROVERRIDE )
@@ -227,7 +227,7 @@ void CHL1_Player::PreThink(void)
 				}
 			}
 		}
-		else if ( !( GetFlags() & FL_ONGROUND ) || pTrain->GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL ) || (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT) ) )
+		else if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) || pTrain->GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_NOCONTROL ) || (m_nButtons & (IN_MOVELEFT|IN_MOVERIGHT) ) )
 		{
 			// Turn off the train if you jump, strafe, or the train controls go dead
 			m_afPhysicsFlags &= ~PFLAG_DIROVERRIDE;
@@ -279,13 +279,13 @@ void CHL1_Player::PreThink(void)
 	}
 
 	// If trying to duck, already ducked, or in the process of ducking
-	if ((m_nButtons & IN_DUCK) || (GetFlags() & FL_DUCKING) || (m_afPhysicsFlags & PFLAG_DUCKING) )
+	if ((m_nButtons & IN_DUCK) || (GetEngineObject()->GetFlags() & FL_DUCKING) || (m_afPhysicsFlags & PFLAG_DUCKING) )
 		Duck();
 
 	//
 	// If we're not on the ground, we're falling. Update our falling velocity.
 	//
-	if ( !( GetFlags() & FL_ONGROUND ) )
+	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
 		m_Local.m_flFallVelocity = -GetEngineObject()->GetAbsVelocity().z;
 	}
@@ -434,7 +434,7 @@ CBaseEntity	*CHL1_Player::GiveNamedItem( const char *pszName, int iSubType )
 
 	DispatchSpawn( pent );
 
-	if ( pent != NULL && !(pent->IsMarkedForDeletion()) ) 
+	if ( pent != NULL && !(pent->GetEngineObject()->IsMarkedForDeletion()) )
 	{
 		pent->Touch( this );
 	}
@@ -451,7 +451,7 @@ void CHL1_Player::StartPullingObject( CBaseEntity *pObject )
 		 return;
 	}
 
-	if( !(GetFlags()&FL_ONGROUND) )
+	if( !(GetEngineObject()->GetFlags()&FL_ONGROUND) )
 	{
 		//Msg("Can't grab in air!\n");
 		return;
@@ -803,7 +803,7 @@ int	CHL1_Player::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	// Armor. 
 	if ( ArmorValue() && 
 		!(info.GetDamageType() & (DMG_FALL | DMG_DROWN | DMG_POISON)) &&	// armor doesn't protect against fall or drown damage!
-		!(GetFlags() & FL_GODMODE) )
+		!(GetEngineObject()->GetFlags() & FL_GODMODE) )
 	{
 		float flNew = info.GetDamage() * flRatio;
 
@@ -1056,7 +1056,7 @@ int CHL1_Player::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 
 	nRet = BaseClass::OnTakeDamage_Alive( info );
 
-	if ( GetFlags() & FL_GODMODE )
+	if (GetEngineObject()->GetFlags() & FL_GODMODE )
 	{
 		m_iHealth = nSavedHealth;
 	}

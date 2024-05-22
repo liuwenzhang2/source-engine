@@ -288,7 +288,7 @@ bool CHL1NPCTalker::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
 			return false;
 
 		// Ignore no-target entities
-		if ( pEntity->GetFlags() & FL_NOTARGET )
+		if ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET )
 			return false;
 
 		CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
@@ -380,7 +380,7 @@ bool CHL1NPCTalker::HandleInteraction(int interactionType, void *data, CBaseComb
 	}
 	else if ( interactionType == g_interactionBarnacleVictimGrab )
 	{
-		if ( GetFlags() & FL_ONGROUND )
+		if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			GetEngineObject()->SetGroundEntity( NULL );
 		}

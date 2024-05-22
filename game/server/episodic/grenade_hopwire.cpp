@@ -135,10 +135,10 @@ void CGravityVortexController::PullPlayersInRange( void )
 	vecForce[2] *= 0.025f;
 	
 	pPlayer->SetBaseVelocity( vecForce );
-	pPlayer->AddFlag( FL_BASEVELOCITY );
+	pPlayer->GetEngineObject()->AddFlag( FL_BASEVELOCITY );
 	
 	// Make sure the player moves
-	if ( vecForce.z > 0 && ( pPlayer->GetFlags() & FL_ONGROUND) )
+	if ( vecForce.z > 0 && ( pPlayer->GetEngineObject()->GetFlags() & FL_ONGROUND) )
 	{
 		pPlayer->GetEngineObject()->SetGroundEntity( NULL );
 	}
@@ -481,7 +481,7 @@ void CGrenadeHopwire::CombatThink( void )
 {
 	// Stop the grenade from moving
 	GetEngineObject()->AddEFlags( EF_NODRAW );
-	AddFlag( FSOLID_NOT_SOLID );
+	GetEngineObject()->AddFlag( FSOLID_NOT_SOLID );
 	VPhysicsDestroyObject();
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetMoveType( MOVETYPE_NONE );

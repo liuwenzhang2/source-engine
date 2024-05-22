@@ -2163,7 +2163,7 @@ void CCollisionEvent::UpdateDamageEvents( void )
 
 		// Track changes in the entity's life state
 		int iEntBits = event.pEntity->IsAlive() ? 0x0001 : 0;
-		iEntBits |= event.pEntity->IsMarkedForDeletion() ? 0x0002 : 0;
+		iEntBits |= event.pEntity->GetEngineObject()->IsMarkedForDeletion() ? 0x0002 : 0;
 		iEntBits |= (event.pEntity->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_SOLID) ? 0x0004 : 0;
 #if 0
 		// Go ahead and compute the current static stress when hit by a large object (with a force high enough to do damage).  
@@ -2182,7 +2182,7 @@ void CCollisionEvent::UpdateDamageEvents( void )
 
 		event.pEntity->TakeDamage( event.info );
 		int iEntBits2 = event.pEntity->IsAlive() ? 0x0001 : 0;
-		iEntBits2 |= event.pEntity->IsMarkedForDeletion() ? 0x0002 : 0;
+		iEntBits2 |= event.pEntity->GetEngineObject()->IsMarkedForDeletion() ? 0x0002 : 0;
 		iEntBits2 |= (event.pEntity->GetEngineObject()->GetSolidFlags() & FSOLID_NOT_SOLID) ? 0x0004 : 0;
 
 		if ( event.bRestoreVelocity && iEntBits != iEntBits2 )
@@ -2290,7 +2290,7 @@ void CCollisionEvent::AddTouchEvent( CBaseEntity *pEntity0, CBaseEntity *pEntity
 
 void CCollisionEvent::AddDamageEvent( CBaseEntity *pEntity, const CTakeDamageInfo &info, IPhysicsObject *pInflictorPhysics, bool bRestoreVelocity, const Vector &savedVel, const AngularImpulse &savedAngVel )
 {
-	if ( pEntity->IsMarkedForDeletion() )
+	if ( pEntity->GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
 	int iTimeBasedDamage = g_pGameRules->Damage_GetTimeBased();

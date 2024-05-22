@@ -155,7 +155,7 @@ int	CNPC_Stalker::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 	int ret = BaseClass::OnTakeDamage_Alive( info );
 
 	// If player shot me make sure I'm mad at him even if I wasn't earlier
-	if ( (info.GetAttacker()->GetFlags() & FL_CLIENT) )
+	if ( (info.GetAttacker()->GetEngineObject()->GetFlags() & FL_CLIENT) )
 	{
 		AddClassRelationship( CLASS_PLAYER, D_HT, 0 );
 	}
@@ -1323,7 +1323,7 @@ void CNPC_Stalker::HandleAnimEvent( animevent_t *pEvent )
 
 			if ( pHurt )
 			{
-				if ( pHurt->GetFlags() & (FL_NPC|FL_CLIENT) )
+				if ( pHurt->GetEngineObject()->GetFlags() & (FL_NPC|FL_CLIENT) )
 				{
 					pHurt->ViewPunch( QAngle( 5, 0, random->RandomInt(-10,10)) );
 				}

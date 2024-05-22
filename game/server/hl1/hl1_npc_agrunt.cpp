@@ -380,7 +380,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 			
 			if ( pHurt )
 			{
-				if ( pHurt->GetFlags() & ( FL_NPC | FL_CLIENT ) )
+				if ( pHurt->GetEngineObject()->GetFlags() & ( FL_NPC | FL_CLIENT ) )
 					 pHurt->ViewPunch( QAngle( -25, 8, 0) );
 
 				Vector vRight;
@@ -420,7 +420,7 @@ void CNPC_AlienGrunt::HandleAnimEvent( animevent_t *pEvent )
 				
 			if ( pHurt )
 			{
-				if ( pHurt->GetFlags() & ( FL_NPC | FL_CLIENT ) )
+				if ( pHurt->GetEngineObject()->GetFlags() & ( FL_NPC | FL_CLIENT ) )
 					 pHurt->ViewPunch( QAngle( 25, 8, 0) );
 
 				// OK to use gpGlobals without calling MakeVectors, cause CheckTraceHullAttack called it above.

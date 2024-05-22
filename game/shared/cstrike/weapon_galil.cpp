@@ -68,7 +68,7 @@ float CWeaponGalil::GetInaccuracy() const
 		if ( !pPlayer )
 			return 0.0f;
 	
-		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+		if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 			return 0.04f + 0.3f * m_flAccuracy;
 		else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 140)
 			return 0.04f + 0.07f * m_flAccuracy;
@@ -103,9 +103,9 @@ void CWeaponGalil::PrimaryAttack()
 
 	if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 		pPlayer->KickBack (1.0, 0.45, 0.28, 0.045, 3.75, 3, 7);
-	else if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+	else if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 		pPlayer->KickBack (1.2, 0.5, 0.23, 0.15, 5.5, 3.5, 6);
-	else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
+	else if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING ) )
 		pPlayer->KickBack (0.6, 0.3, 0.2, 0.0125, 3.25, 2, 7);
 	else
 		pPlayer->KickBack (0.65, 0.35, 0.25, 0.015, 3.5, 2.25, 7);

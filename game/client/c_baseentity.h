@@ -345,11 +345,6 @@ public:
 	// an uncompressed update that's caused it to destroy all entities & recreate them.
 	virtual void					SetDestroyedOnRecreateEntities( void );
 
-
-
-	// checks to see if the entity is marked for deletion
-	bool							IsMarkedForDeletion( void );
-
 	//virtual int						entindex( void ) const;
 	
 	// This works for client-only entities and returns the GetEntryIndex() of the entity's handle,
@@ -476,12 +471,6 @@ public:
 
 	// Used when the collision prop is told to ask game code for the world-space surrounding box
 	virtual void					ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs );	
-
-	void							AddFlag( int flags );
-	void							RemoveFlag( int flagsToRemove );
-	void							ToggleFlag( int flagToToggle );
-	int								GetFlags( void ) const;
-	void							ClearFlags();
 
 	MoveType_t						GetMoveType( void ) const;
 	MoveCollide_t					GetMoveCollide( void ) const;
@@ -1406,24 +1395,8 @@ private:
 	// Friction.
 	float							m_flFriction;       
 
-
-	
-
 	Vector							m_vecOldOrigin;
 	QAngle							m_vecOldAngRotation;
-
-	
-
-	
-
-
-
-	// Behavior flags
-	int								m_fFlags;
-
-
-
-
 
 	CNetworkVar( bool, m_bSimulatedEveryTick );
 	CNetworkVar( bool, m_bAnimatedEveryTick );
@@ -1686,14 +1659,6 @@ inline void C_BaseEntity::SetRenderColorA( byte a )
 inline RenderMode_t C_BaseEntity::GetRenderMode() const
 {
 	return (RenderMode_t)m_nRenderMode;
-}
-
-//-----------------------------------------------------------------------------
-// checks to see if the entity is marked for deletion
-//-----------------------------------------------------------------------------
-inline bool C_BaseEntity::IsMarkedForDeletion( void ) 
-{ 
-	return (GetEngineObject()->GetEFlags() & EFL_KILLME);
 }
 
 

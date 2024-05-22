@@ -1671,7 +1671,7 @@ static CBaseEntity *FindPhysicsBlockerForHierarchy( CBaseEntity *pParentEntity )
 void CFuncTrackTrain::Blocked( CBaseEntity *pOther )
 {
 	// Blocker is on-ground on the train
-	if ( ( pOther->GetFlags() & FL_ONGROUND ) && pOther->GetEngineObject()->GetGroundEntity() == this->GetEngineObject() )
+	if ( ( pOther->GetEngineObject()->GetFlags() & FL_ONGROUND ) && pOther->GetEngineObject()->GetGroundEntity() == this->GetEngineObject() )
 	{
 		DevMsg( 1, "TRAIN(%s): Blocked by %s\n", GetDebugName(), pOther->GetClassname() );
 		float deltaSpeed = fabs(m_flSpeed);
@@ -2585,7 +2585,7 @@ void CFuncTrackTrain::NearestPath( void )
 	for ( CEntitySphereQuery sphere(GetEngineObject()->GetAbsOrigin(), 1024 ); ( pTrack = sphere.GetCurrentEntity() ) != NULL; sphere.NextEntity() )
 	{
 		// filter out non-tracks
-		if ( !(pTrack->GetFlags() & (FL_CLIENT|FL_NPC)) && FClassnameIs( pTrack, "path_track" ) )
+		if ( !(pTrack->GetEngineObject()->GetFlags() & (FL_CLIENT|FL_NPC)) && FClassnameIs( pTrack, "path_track" ) )
 		{
 			dist = (GetEngineObject()->GetAbsOrigin() - pTrack->GetEngineObject()->GetAbsOrigin()).Length();
 			if ( dist < closest )
@@ -2695,7 +2695,7 @@ void CFuncTrackTrain::Spawn( void )
 
 	if (GetEngineObject()->HasSpawnFlags( SF_TRACKTRAIN_UNBLOCKABLE_BY_PLAYER ) )
 	{
-		AddFlag( FL_UNBLOCKABLE_BY_PLAYER );
+		GetEngineObject()->AddFlag( FL_UNBLOCKABLE_BY_PLAYER );
 	}
 	if (GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_PASSABLE)
 	{

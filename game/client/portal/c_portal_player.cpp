@@ -1271,7 +1271,7 @@ void C_Portal_Player::HandleSpeedChanges( void )
 
 void C_Portal_Player::ItemPreFrame( void )
 {
-	if ( GetFlags() & FL_FROZEN )
+	if (GetEngineObject()->GetFlags() & FL_FROZEN )
 		return;
 
 	// Disallow shooting while zooming
@@ -1287,7 +1287,7 @@ void C_Portal_Player::ItemPreFrame( void )
 
 void C_Portal_Player::ItemPostFrame( void )
 {
-	if ( GetFlags() & FL_FROZEN )
+	if (GetEngineObject()->GetFlags() & FL_FROZEN )
 		return;
 
 	BaseClass::ItemPostFrame();

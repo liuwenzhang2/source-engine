@@ -170,10 +170,10 @@ void CNPC_Apache::Spawn( void )
 
 	BaseClass::Spawn();
 
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetMoveType( MOVETYPE_STEP );
-	AddFlag( FL_FLY );
+	GetEngineObject()->AddFlag( FL_FLY );
 
 
 	m_iHealth			=  sk_apache_health.GetFloat();

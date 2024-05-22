@@ -192,7 +192,7 @@ void CMissile::Spawn( void )
 	m_bloodColor = DONT_BLEED;
 	m_flGracePeriodEndsAt = 0;
 
-	AddFlag( FL_OBJECT );
+	GetEngineObject()->AddFlag( FL_OBJECT );
 }
 
 
@@ -910,7 +910,7 @@ CAPCMissile *CAPCMissile::Create( const Vector &vecOrigin, const QAngle &vecAngl
 	pMissile->SetOwnerEntity( pOwner );
 	pMissile->Spawn();
 	pMissile->GetEngineObject()->SetAbsVelocity( vecVelocity );
-	pMissile->AddFlag( FL_NOTARGET );
+	pMissile->GetEngineObject()->AddFlag( FL_NOTARGET );
 	pMissile->AddEffects( EF_NOSHADOW );
 	return pMissile;
 }

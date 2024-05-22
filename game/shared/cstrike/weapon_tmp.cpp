@@ -67,7 +67,7 @@ float CWeaponTMP::GetInaccuracy() const
 		if ( !pPlayer )
 			return 0.0f;
 	
-		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+		if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 			return 0.25f * m_flAccuracy;
 		else
 			return 0.03f * m_flAccuracy;
@@ -90,11 +90,11 @@ void CWeaponTMP::PrimaryAttack( void )
 	if ( !pPlayer )
 		return;
 
-	if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+	if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 		pPlayer->KickBack (1.1, 0.5, 0.35, 0.045, 4.5, 3.5, 6);
 	else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 		pPlayer->KickBack (0.8, 0.4, 0.2, 0.03, 3, 2.5, 7);
-	else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
+	else if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING ) )
 		pPlayer->KickBack (0.7, 0.35, 0.125, 0.025, 2.5, 2, 10);
 	else
 		pPlayer->KickBack (0.725, 0.375, 0.15, 0.025, 2.75, 2.25, 9);

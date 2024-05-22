@@ -108,7 +108,7 @@ bool CHL1GameMovement::CheckJumpButton( void )
 	// Acclerate upward
 	// If we are ducking...
 	float startz = mv->m_vecVelocity[2];
-	if ( (  m_pHL1Player->m_Local.m_bDucking ) || (  m_pHL1Player->GetFlags() & FL_DUCKING ) )
+	if ( (  m_pHL1Player->m_Local.m_bDucking ) || (  m_pHL1Player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 	{
 		// d = 0.5 * g * t^2		- distance traveled with linear accel
 		// t = sqrt(2.0 * 45 / g)	- how long to fall 45 units
@@ -166,7 +166,7 @@ void CHL1GameMovement::Duck( void )
 
 	// Check to see if we are in the air.
 	bool bInAir = ( player->GetEngineObject()->GetGroundEntity() == NULL );
-	bool bInDuck = ( player->GetFlags() & FL_DUCKING ) ? true : false;
+	bool bInDuck = ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) ? true : false;
 
 	if ( mv->m_nButtons & IN_DUCK )
 	{
@@ -273,7 +273,7 @@ void CHL1GameMovement::HandleDuckingSpeedCrop()
 {
 	if ( !( m_iSpeedCropped & SPEED_CROPPED_DUCK ) )
 	{
-		if ( player->GetFlags() & FL_DUCKING )
+		if ( player->GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			float frac = 0.33333333f;
 			mv->m_flForwardMove	*= frac;

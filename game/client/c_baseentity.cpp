@@ -316,7 +316,7 @@ BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 	DEFINE_PRED_FIELD( m_nRenderFX, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
 //	DEFINE_PRED_FIELD( m_flAnimTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
 //	DEFINE_PRED_FIELD( m_flSimulationTime, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_fFlags, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_fFlags, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	DEFINE_PRED_FIELD_TOL( m_vecViewOffset, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, 0.25f ),
 //	DEFINE_PRED_FIELD( m_nModelIndex, FIELD_SHORT, FTYPEDESC_INSENDTABLE | FTYPEDESC_MODELINDEX ),
 	DEFINE_PRED_FIELD( m_flFriction, FIELD_FLOAT, FTYPEDESC_INSENDTABLE ),
@@ -697,8 +697,8 @@ void C_BaseEntity::Clear( void )
 		GetEngineObject()->SetLocalOrigin(vec3_origin);
 		GetEngineObject()->SetLocalAngles(vec3_angle);
 		GetEngineObject()->Clear();
+		GetEngineObject()->ClearFlags();
 	}
-	ClearFlags();
 	m_vecViewOffset.Init();
 	m_vecBaseVelocity.Init();
 	m_flAnimTime = 0;
@@ -4291,7 +4291,7 @@ BEGIN_DATADESC_NO_BASE( C_BaseEntity )
 	//DEFINE_FIELD( m_ModelName, FIELD_STRING ),
 	//DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsOrigin, engineObjectFuncs),
 	//DEFINE_CUSTOM_FIELD_INVALID( m_angAbsRotation, engineObjectFuncs),
-	DEFINE_FIELD( m_fFlags, FIELD_INTEGER ),
+	//DEFINE_FIELD( m_fFlags, FIELD_INTEGER ),
 END_DATADESC()
 
 //-----------------------------------------------------------------------------

@@ -3162,9 +3162,9 @@ void CServerGameClients::ClientDisconnect( int pEdict )
 			}
 
 		// since the edict doesn't get deleted, fix it so it doesn't interfere.
-			player->RemoveFlag( FL_AIMTARGET ); // don't attract autoaim
-			player->AddFlag( FL_DONTTOUCH );	// stop it touching anything
-			player->AddFlag( FL_NOTARGET );	// stop NPCs noticing it
+			player->GetEngineObject()->RemoveFlag( FL_AIMTARGET ); // don't attract autoaim
+			player->GetEngineObject()->AddFlag( FL_DONTTOUCH );	// stop it touching anything
+			player->GetEngineObject()->AddFlag( FL_NOTARGET );	// stop NPCs noticing it
 			player->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );		// nonsolid
 
 			if ( g_pGameRules )

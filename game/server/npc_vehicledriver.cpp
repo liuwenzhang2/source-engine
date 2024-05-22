@@ -114,7 +114,7 @@ void CNPC_VehicleDriver::Spawn( void )
 	SetCycle( 0 );
 	ResetSequenceInfo();
 
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 
 	m_flMaxSpeed = 0;
 	m_flGoalSpeed = m_flInitialSpeed;

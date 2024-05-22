@@ -208,7 +208,7 @@ void CNPC_Ichthyosaur::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
-	AddFlag( FL_FLY | FL_STEPMOVEMENT );
+	GetEngineObject()->AddFlag( FL_FLY | FL_STEPMOVEMENT );
 
 	m_flGroundSpeed			= ICH_SWIM_SPEED_RUN;
 
@@ -217,7 +217,7 @@ void CNPC_Ichthyosaur::Spawn( void )
 	m_iMaxHealth		= m_iHealth;
 	m_flFieldOfView		= -0.707;	// 270 degrees
 	
-	AddFlag( FL_SWIM );
+	GetEngineObject()->AddFlag( FL_SWIM );
 
 	m_flFlyingSpeed		= ICHTHYOSAUR_SPEED;
 

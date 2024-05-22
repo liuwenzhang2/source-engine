@@ -1464,7 +1464,7 @@ bool CNPC_Vortigaunt::ShouldHealTarget( CBaseEntity *pTarget )
 		return false;
 
 	// Don't heal a target we can't see..?
-	if ( pPlayer->GetFlags() & FL_NOTARGET )
+	if ( pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET )
 		return false;
 
 	// See if the player needs armor
@@ -2272,7 +2272,7 @@ void CNPC_Vortigaunt::InputChargeTarget( inputdata_t &data )
 
 	int playerArmor = (pTarget->IsPlayer()) ? ((CBasePlayer *)pTarget)->ArmorValue() : 0;
 
-	if ( playerArmor >= 100 || ( pTarget->GetFlags() & FL_NOTARGET ) )
+	if ( playerArmor >= 100 || ( pTarget->GetEngineObject()->GetFlags() & FL_NOTARGET ) )
 	{
 		m_OnFinishedChargingTarget.FireOutput( this, this );
 		return;

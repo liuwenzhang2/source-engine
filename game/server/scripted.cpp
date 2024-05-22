@@ -688,7 +688,7 @@ void CAI_ScriptedSequence::StartScript( void )
 		// AFTER the script finishes (can't think of a case where you'd want that to happen)
 		m_saved_effects = pTarget->GetEffects() & ~EF_NODRAW;
 		pTarget->AddEffects( GetEffects() );
-		m_savedFlags = pTarget->GetFlags();
+		m_savedFlags = pTarget->GetEngineObject()->GetFlags();
 		m_savedCollisionGroup = pTarget->GetEngineObject()->GetCollisionGroup();
 		
 		if ( m_bDisableNPCCollisions )
@@ -704,7 +704,7 @@ void CAI_ScriptedSequence::StartScript( void )
 
 			if ( m_bIgnoreGravity )
 			{
-				pTarget->AddFlag( FL_FLY );
+				pTarget->GetEngineObject()->AddFlag( FL_FLY );
 				pTarget->GetEngineObject()->SetGroundEntity( NULL );
 			}
 
@@ -736,7 +736,7 @@ void CAI_ScriptedSequence::StartScript( void )
 
 			if ( m_bIgnoreGravity )
 			{
-				pTarget->AddFlag( FL_FLY );
+				pTarget->GetEngineObject()->AddFlag( FL_FLY );
 				pTarget->GetEngineObject()->SetGroundEntity( NULL );
 			}
 
@@ -1105,9 +1105,9 @@ void CAI_ScriptedSequence::FixFlyFlag( CAI_BaseNPC *pNPC, int iSavedCineFlags )
 	{
 		if ( !(iSavedCineFlags & FL_FLY) )
 		{
-			if ( pNPC->GetFlags() & FL_FLY )
+			if ( pNPC->GetEngineObject()->GetFlags() & FL_FLY )
 			{
-				 pNPC->RemoveFlag( FL_FLY );
+				 pNPC->GetEngineObject()->RemoveFlag( FL_FLY );
 			}
 		}
 	}

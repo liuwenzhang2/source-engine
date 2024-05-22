@@ -339,7 +339,7 @@ void CClientThinkList::AddToDeleteList( ClientEntityHandle_t hEnt )
 	if ( pEntity )
 	{
 		// Check to see if the entity is already being removed!
-		if ( pEntity->IsMarkedForDeletion() )
+		if ( pEntity->GetEngineObject()->IsMarkedForDeletion() )
 			return;
 
 		// Don't add networkable entities to delete list -- the server should

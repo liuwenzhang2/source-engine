@@ -94,7 +94,7 @@ float CWeaponMP5Navy::GetInaccuracy() const
 		if ( !pPlayer )
 			return 0.0f;
 	
-		if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+		if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 			return 0.2f * m_flAccuracy;
 		else
 			return 0.04f * m_flAccuracy;
@@ -118,11 +118,11 @@ void CWeaponMP5Navy::PrimaryAttack( void )
 		return;
 
 	// Kick the gun based on the state of the player.
-	if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+	if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 		pPlayer->KickBack (0.9, 0.475, 0.35, 0.0425, 5, 3, 6);	
 	else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 		pPlayer->KickBack (0.5, 0.275, 0.2, 0.03, 3, 2, 10);
-	else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
+	else if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING ) )
 		pPlayer->KickBack (0.225, 0.15, 0.1, 0.015, 2, 1, 10);
 	else
 		pPlayer->KickBack (0.25, 0.175, 0.125, 0.02, 2.25, 1.25, 10);

@@ -394,7 +394,7 @@ void CHL2MPRules::GoToIntermission( void )
 			continue;
 
 		pPlayer->ShowViewPortPanel( PANEL_SCOREBOARD );
-		pPlayer->AddFlag( FL_FROZEN );
+		pPlayer->GetEngineObject()->AddFlag( FL_FROZEN );
 	}
 #endif
 	
@@ -530,7 +530,7 @@ void CHL2MPRules::ManageObjectRelocation( void )
 						}
 						else
 						{
-							shouldReset = (pEntity->GetFlags() & FL_ONGROUND) ? true : false;
+							shouldReset = (pEntity->GetEngineObject()->GetFlags() & FL_ONGROUND) ? true : false;
 						}
 
 						if ( shouldReset )

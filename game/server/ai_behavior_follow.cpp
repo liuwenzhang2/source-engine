@@ -822,7 +822,7 @@ bool CAI_FollowBehavior::ShouldFollow()
 	if ( !GetFollowTarget() )
 		return false;
 
-	if ( GetFollowTarget()->GetFlags() & FL_NOTARGET )
+	if ( GetFollowTarget()->GetEngineObject()->GetFlags() & FL_NOTARGET )
 		return false;
 
 	// If we recently failed to build a follow path, wait a while to

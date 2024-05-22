@@ -360,7 +360,7 @@ void CWeaponStunStick::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseComba
 				bool bFlashed = false;
 				
 				// Punch angles
-				if ( pPlayer != NULL && !(pPlayer->GetFlags() & FL_GODMODE) )
+				if ( pPlayer != NULL && !(pPlayer->GetEngineObject()->GetFlags() & FL_GODMODE) )
 				{
 					float yawKick = random->RandomFloat( -48, -24 );
 
@@ -381,7 +381,7 @@ void CWeaponStunStick::Operator_HandleAnimEvent( animevent_t *pEvent, CBaseComba
 					dir *= 500.0f;
 
 					//If not on ground, then don't make them fly!
-					if ( !(pPlayer->GetFlags() & FL_ONGROUND ) )
+					if ( !(pPlayer->GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 						 dir.z = 0.0f;
 
 					//Push the target back

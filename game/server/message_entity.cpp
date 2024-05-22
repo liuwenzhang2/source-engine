@@ -121,7 +121,7 @@ void CMessageEntity::Think( void )
 	// check for player distance
 	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 
-	if ( !pPlayer || ( pPlayer->GetFlags() & FL_NOTARGET ) )
+	if ( !pPlayer || ( pPlayer->GetEngineObject()->GetFlags() & FL_NOTARGET ) )
 		return;
 
 	Vector worldTargetPosition = pPlayer->EyePosition();

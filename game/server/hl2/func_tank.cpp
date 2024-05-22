@@ -1231,7 +1231,7 @@ void CFuncTank::ControllerPostFrame( void )
 		
 		UTIL_TraceHull( start, start + forward * 8192, -Vector(8,8,8), Vector(8,8,8), MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 		
-		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_NO && (((CBaseEntity*)tr.m_pEnt)->GetFlags() & FL_AIMTARGET) )
+		if( tr.m_pEnt && ((CBaseEntity*)tr.m_pEnt)->m_takedamage != DAMAGE_NO && (((CBaseEntity*)tr.m_pEnt)->GetEngineObject()->GetFlags() & FL_AIMTARGET) )
 		{
 			forward = ((CBaseEntity*)tr.m_pEnt)->WorldSpaceCenter() - start;
 			VectorNormalize( forward );
@@ -1990,7 +1990,7 @@ void CFuncTank::AimFuncTankAtTarget( void )
 	else
 	{
 		CBaseEntity *pEntity = (CBaseEntity *)m_hTarget;
-		if ( !pEntity || ( pEntity->GetFlags() & FL_NOTARGET ) )
+		if ( !pEntity || ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET ) )
 		{
 			if( m_targetEntityName != NULL_STRING )
 			{

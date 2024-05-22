@@ -290,8 +290,8 @@ public:
 	virtual void IgniteLifetime( float flFlameLifetime );
 	virtual void IgniteNumHitboxFires( int iNumHitBoxFires );
 	virtual void IgniteHitboxFireScale( float flHitboxFireScale );
-	virtual void Extinguish() { RemoveFlag( FL_ONFIRE ); }
-	bool IsOnFire() { return ( (GetFlags() & FL_ONFIRE) != 0 ); }
+	virtual void Extinguish() { GetEngineObject()->RemoveFlag( FL_ONFIRE ); }
+	bool IsOnFire() { return ( (GetEngineObject()->GetFlags() & FL_ONFIRE) != 0 ); }
 	void Scorch( int rate, int floor );
 	void InputIgnite( inputdata_t &inputdata );
 	void InputIgniteLifetime( inputdata_t &inputdata );
@@ -301,7 +301,7 @@ public:
 
 	// Dissolve, returns true if the ragdoll has been created
 	bool Dissolve( const char *pMaterialName, float flStartTime, bool bNPCOnly = true, int nDissolveType = 0, Vector vDissolverOrigin = vec3_origin, int iMagnitude = 0 );
-	bool IsDissolving() { return ( (GetFlags() & FL_DISSOLVING) != 0 ); }
+	bool IsDissolving() { return ( (GetEngineObject()->GetFlags() & FL_DISSOLVING) != 0 ); }
 	void TransferDissolveFrom( CBaseAnimating *pAnim );
 
 	// animation needs

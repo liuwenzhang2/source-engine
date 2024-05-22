@@ -150,7 +150,7 @@ bool CAI_Senses::ShouldSeeEntity( CBaseEntity *pSightEnt )
 	if ( pSightEnt == GetOuter() || !pSightEnt->IsAlive() )
 		return false;
 
-	if ( pSightEnt->IsPlayer() && ( pSightEnt->GetFlags() & FL_NOTARGET ) )
+	if ( pSightEnt->IsPlayer() && ( pSightEnt->GetEngineObject()->GetFlags() & FL_NOTARGET ) )
 		return false;
 
 	// don't notice anyone waiting to be seen by the player
@@ -523,7 +523,7 @@ int CAI_Senses::LookForObjects( int iDistance )
 		CBaseEntity *pEnt = g_AI_SensedObjectsManager.GetFirst( &iter );
 		while ( pEnt )
 		{
-			if ( pEnt->GetFlags() & BOX_QUERY_MASK )
+			if ( pEnt->GetEngineObject()->GetFlags() & BOX_QUERY_MASK )
 			{
 				if ( origin.DistToSqr(pEnt->GetEngineObject()->GetAbsOrigin()) < distSq && Look( pEnt) )
 				{
@@ -721,7 +721,7 @@ CBaseEntity *CAI_SensedObjectsManager::GetNext( int *pIter )
 
 void CAI_SensedObjectsManager::OnEntitySpawned( CBaseEntity *pEntity )
 {
-	if ( ( pEntity->GetFlags() & FL_OBJECT ) && !pEntity->IsPlayer() && !pEntity->IsNPC() )
+	if ( ( pEntity->GetEngineObject()->GetFlags() & FL_OBJECT ) && !pEntity->IsPlayer() && !pEntity->IsNPC() )
 	{
 		m_SensedObjects.AddToTail( pEntity );
 	}
@@ -731,7 +731,7 @@ void CAI_SensedObjectsManager::OnEntitySpawned( CBaseEntity *pEntity )
 
 void CAI_SensedObjectsManager::OnEntityDeleted( CBaseEntity *pEntity )
 {
-	if ( ( pEntity->GetFlags() & FL_OBJECT ) && !pEntity->IsPlayer() && !pEntity->IsNPC() )
+	if ( ( pEntity->GetEngineObject()->GetFlags() & FL_OBJECT ) && !pEntity->IsPlayer() && !pEntity->IsNPC() )
 	{
 		int i = m_SensedObjects.Find( pEntity );
 		if ( i != m_SensedObjects.InvalidIndex() )
@@ -748,7 +748,7 @@ void CAI_SensedObjectsManager::AddEntity( CBaseEntity *pEntity )
 	Assert( !pEntity->IsPlayer() && !pEntity->IsNPC() );
 
 	// Add the object flag so it gets removed when it dies
-	pEntity->AddFlag( FL_OBJECT );
+	pEntity->GetEngineObject()->AddFlag( FL_OBJECT );
 	m_SensedObjects.AddToTail( pEntity );
 }
 

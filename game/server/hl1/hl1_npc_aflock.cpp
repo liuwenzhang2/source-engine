@@ -576,7 +576,7 @@ void CNPC_FlockingFlyer::FlockLeaderThink( void )
 	}
 
 	// maybe it did, though.
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		UTIL_SetOrigin( this, GetEngineObject()->GetAbsOrigin() + Vector ( 0 , 0 , 1 ) );
 		Vector vecVel = GetEngineObject()->GetAbsVelocity();
@@ -841,7 +841,7 @@ void CNPC_FlockingFlyer::Event_Killed( const CTakeDamageInfo &info )
 
 void CNPC_FlockingFlyer::FallHack( void )
 {
-	if ( GetFlags() & FL_ONGROUND )
+	if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		CBaseEntity *groundentity = gEntList.GetBaseEntity(GetEngineObject()->GetGroundEntity()->GetOuter()->entindex());
 

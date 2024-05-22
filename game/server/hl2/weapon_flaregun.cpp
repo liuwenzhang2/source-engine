@@ -222,7 +222,7 @@ void CFlare::Spawn( void )
 		AddEffects( EF_NODRAW );
 	}
 
-	AddFlag( FL_OBJECT );
+	GetEngineObject()->AddFlag( FL_OBJECT );
 }
 
 //-----------------------------------------------------------------------------

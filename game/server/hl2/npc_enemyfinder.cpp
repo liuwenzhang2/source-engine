@@ -169,7 +169,7 @@ void CNPC_EnemyFinder::Spawn( void )
 	SetGravity( 0.0 );
 	m_iHealth			= 1;
 	
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
 

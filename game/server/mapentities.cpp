@@ -279,7 +279,7 @@ void SpawnAllEntities( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bAct
 				for ( int i = nEntity+1; i < nEntities; i++ )
 				{
 					// this is a child object that will be deleted now
-					if ( pSpawnList[i].m_pEntity && pSpawnList[i].m_pEntity->IsMarkedForDeletion() )
+					if ( pSpawnList[i].m_pEntity && pSpawnList[i].m_pEntity->GetEngineObject()->IsMarkedForDeletion() )
 					{
 						pSpawnList[i].m_pEntity = NULL;
 					}

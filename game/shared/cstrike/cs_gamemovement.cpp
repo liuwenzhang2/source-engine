@@ -209,7 +209,7 @@ void CCSGameMovement::CheckParameters( void )
 			flSpeedFactor = flConstraintSpeedFactor;
 
 		// Take the player's velocity modifier into account
-		if ( FBitSet( m_pCSPlayer->GetFlags(), FL_ONGROUND ) )
+		if ( FBitSet( m_pCSPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 		{
 			flSpeedFactor *= m_pCSPlayer->m_flVelocityModifier;
 		}
@@ -242,8 +242,8 @@ void CCSGameMovement::CheckParameters( void )
 	}
 
 
-	if ( player->GetFlags() & FL_FROZEN ||
-		 player->GetFlags() & FL_ONTRAIN || 
+	if ( player->GetEngineObject()->GetFlags() & FL_FROZEN ||
+		 player->GetEngineObject()->GetFlags() & FL_ONTRAIN ||
 		 IsDead() )
 	{
 		mv->m_flForwardMove = 0;
@@ -354,7 +354,7 @@ void CCSGameMovement::PlayerMove()
 
 	BaseClass::PlayerMove();
 
-	if ( FBitSet( m_pCSPlayer->GetFlags(), FL_ONGROUND ) )
+	if ( FBitSet( m_pCSPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 	{
 		if ( m_pCSPlayer->m_flVelocityModifier < 1.0 )
 		{
@@ -399,7 +399,7 @@ void CCSGameMovement::PlayerMove()
 		if ( trace.fraction < 1.0f )
 		{
 			float est = start.z + trace.fraction * (end.z - start.z) - player->GetEngineObject()->GetAbsOrigin().z - eyeClearance;
-			if ( ( player->GetFlags() & FL_DUCKING ) == 0 && !player->m_Local.m_bDucking && !player->m_Local.m_bDucked )
+			if ( ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) == 0 && !player->m_Local.m_bDucking && !player->m_Local.m_bDucked )
 			{
 				offset.z = est;
 			}
@@ -411,7 +411,7 @@ void CCSGameMovement::PlayerMove()
 		}
 		else
 		{
-			if ( ( player->GetFlags() & FL_DUCKING ) == 0 && !player->m_Local.m_bDucking && !player->m_Local.m_bDucked )
+			if ( ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) == 0 && !player->m_Local.m_bDucking && !player->m_Local.m_bDucked )
 			{
 
 				player->SetViewOffset( VEC_VIEW_SCALED( player ) );
@@ -726,7 +726,7 @@ bool CCSGameMovement::CheckJumpButton( void )
 	// Acclerate upward
 	// If we are ducking...
 	float startz = mv->m_vecVelocity[2];
-	if ( m_pCSPlayer->m_duckUntilOnGround || (  m_pCSPlayer->m_Local.m_bDucking ) || (  m_pCSPlayer->GetFlags() & FL_DUCKING ) )
+	if ( m_pCSPlayer->m_duckUntilOnGround || (  m_pCSPlayer->m_Local.m_bDucking ) || (  m_pCSPlayer->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 	{
 		// d = 0.5 * g * t^2		- distance traveled with linear accel
 		// t = sqrt(2.0 * 45 / g)	- how long to fall 45 units
@@ -812,7 +812,7 @@ void CCSGameMovement::HandleDuckingSpeedCrop()
 
 	if ( !( m_iSpeedCropped & SPEED_CROPPED_DUCK ) )
 	{
-		if ( ( mv->m_nButtons & IN_DUCK ) || ( player->m_Local.m_bDucking ) || ( player->GetFlags() & FL_DUCKING ) )
+		if ( ( mv->m_nButtons & IN_DUCK ) || ( player->m_Local.m_bDucking ) || ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 		{
 			mv->m_flForwardMove	*= CS_PLAYER_SPEED_DUCK_MODIFIER;
 			mv->m_flSideMove	*= CS_PLAYER_SPEED_DUCK_MODIFIER;
@@ -878,7 +878,7 @@ void CCSGameMovement::FinishUnDuck( void )
 	}
 
 	player->m_Local.m_bDucked = false;
-	player->RemoveFlag( FL_DUCKING );
+	player->GetEngineObject()->RemoveFlag( FL_DUCKING );
 	player->m_Local.m_bDucking  = false;
 	player->SetViewOffset( GetPlayerViewOffset( false ) );
 	player->m_Local.m_flDucktime = 0;
@@ -901,7 +901,7 @@ void CCSGameMovement::FinishDuck( void )
 	Vector viewDelta = 0.5f * ( hullSizeNormal - hullSizeCrouch );
 
 	player->SetViewOffset( GetPlayerViewOffset( true ) );
-	player->AddFlag( FL_DUCKING );
+	player->GetEngineObject()->AddFlag( FL_DUCKING );
 	player->m_Local.m_bDucking = false;
 
 	if ( !player->m_Local.m_bDucked )
@@ -937,7 +937,7 @@ void CCSGameMovement::Duck( void )
 
 	// Fix taken from zblock for rapid crouch/stand not showing stand on other clients
 
-	if ( player->GetFlags() & FL_ONGROUND )
+	if ( player->GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		// if prevent crouch
 		if ( !( mv->m_nButtons & IN_DUCK ) && ( mv->m_nOldButtons & IN_DUCK ) )
@@ -948,7 +948,7 @@ void CCSGameMovement::Duck( void )
 		else if ( ( mv->m_nButtons & IN_DUCK ) && !( mv->m_nOldButtons & IN_DUCK ) )
 		{
 			// Crouch from standing
-			if ( ( player->GetFlags() & FL_DUCKING )
+			if ( ( player->GetEngineObject()->GetFlags() & FL_DUCKING )
 				&& ( m_fTimeLastUnducked > (gpGlobals->curtime - sv_timebetweenducks.GetFloat() ) ) )
 			{
 				// if the server thinks the player is still crouched
@@ -978,7 +978,7 @@ void CCSGameMovement::Duck( void )
 	if ( IsDead() )
 	{
 		// Unduck
-		if ( player->GetFlags() & FL_DUCKING )
+		if ( player->GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			FinishUnDuck();
 		}
@@ -1031,13 +1031,13 @@ void CCSGameMovement::Duck( void )
 	}
 
 	// Holding duck, in process of ducking or fully ducked?
-	if ( ( mv->m_nButtons & IN_DUCK ) || ( player->m_Local.m_bDucking ) || ( player->GetFlags() & FL_DUCKING ) )
+	if ( ( mv->m_nButtons & IN_DUCK ) || ( player->m_Local.m_bDucking ) || ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 	{
 		if ( mv->m_nButtons & IN_DUCK )
 		{
-			bool alreadyDucked = ( player->GetFlags() & FL_DUCKING ) ? true : false;
+			bool alreadyDucked = ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) ? true : false;
 
-			if ( (buttonsPressed & IN_DUCK ) && !( player->GetFlags() & FL_DUCKING ) )
+			if ( (buttonsPressed & IN_DUCK ) && !( player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 			{
 				// Use 1 second so super long jump will work
 				player->m_Local.m_flDucktime = 1000;
@@ -1051,8 +1051,8 @@ void CCSGameMovement::Duck( void )
 			
 			if ( player->m_Local.m_bDucking )
 			{
-				if ( !( player->GetFlags() & FL_ANIMDUCKING ) )
-					player->AddFlag( FL_ANIMDUCKING );
+				if ( !( player->GetEngineObject()->GetFlags() & FL_ANIMDUCKING ) )
+					player->GetEngineObject()->AddFlag( FL_ANIMDUCKING );
 
 				// Finish ducking immediately if duck time is over or not on ground
 				if ( ( duckseconds > TIME_TO_DUCK ) || 
@@ -1075,7 +1075,7 @@ void CCSGameMovement::Duck( void )
 			// NOTE: When not onground, you can always unduck
 			if ( player->m_Local.m_bAllowAutoMovement || player->GetEngineObject()->GetGroundEntity() == NULL )
 			{
-				if ( (buttonsReleased & IN_DUCK ) && ( player->GetFlags() & FL_DUCKING ) )
+				if ( (buttonsReleased & IN_DUCK ) && ( player->GetEngineObject()->GetFlags() & FL_DUCKING ) )
 				{
 					// Use 1 second so super long jump will work
 					player->m_Local.m_flDucktime = 1000;
@@ -1090,8 +1090,8 @@ void CCSGameMovement::Duck( void )
 					if ( player->m_Local.m_bDucking || 
 						 player->m_Local.m_bDucked ) // or unducking
 					{
-						if ( player->GetFlags() & FL_ANIMDUCKING )
-							player->RemoveFlag( FL_ANIMDUCKING );
+						if ( player->GetEngineObject()->GetFlags() & FL_ANIMDUCKING )
+							player->GetEngineObject()->RemoveFlag( FL_ANIMDUCKING );
 
 						// Finish ducking immediately if duck time is over or not on ground
 						if ( ( duckseconds > TIME_TO_UNDUCK ) ||

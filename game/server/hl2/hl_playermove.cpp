@@ -157,7 +157,7 @@ void CHLPlayerMove::FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *
 		}
 	}
 
-	bool bGodMode = ( player->GetFlags() & FL_GODMODE ) ? true : false;
+	bool bGodMode = ( player->GetEngineObject()->GetFlags() & FL_GODMODE ) ? true : false;
 	if ( m_bInGodMode != bGodMode )
 	{
 		m_bInGodMode = bGodMode;

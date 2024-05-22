@@ -2435,7 +2435,7 @@ void CPortalSimulator::PrePhysFrame( void )
 					if( CPhysicsShadowClone::IsShadowClone( pEntity ) )
 						continue;
 
-					Assert( (pEntity != NULL) && (pEntity->IsMarkedForDeletion() == false) );
+					Assert( (pEntity != NULL) && (pEntity->GetEngineObject()->IsMarkedForDeletion() == false) );
 					IPhysicsObject *pPhysObject = pEntity->VPhysicsGetObject();
 					if( (pPhysObject == NULL) || pPhysObject->IsAsleep() )
 						continue;
@@ -2930,7 +2930,7 @@ void CPSCollisionEntity::Spawn( void )
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 	s_PortalSimulatorCollisionEntities[entindex()] = true;
 	VPhysicsSetObject( NULL );
-	AddFlag( FL_WORLDBRUSH );
+	GetEngineObject()->AddFlag( FL_WORLDBRUSH );
 	AddEffects( EF_NODRAW | EF_NOSHADOW | EF_NORECEIVESHADOW );
 	IncrementInterpolationFrame();
 }

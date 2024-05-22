@@ -219,11 +219,17 @@ public:
 	virtual void SetNetworkAngles(const QAngle& ang) = 0;
 	virtual void SetNetworkMoveParent(IEngineObjectClient* pMoveParent) = 0;
 	virtual unsigned char GetParentAttachment() const = 0;
+	virtual void AddFlag(int flags) = 0;
+	virtual void RemoveFlag(int flagsToRemove) = 0;
+	virtual void ToggleFlag(int flagToToggle) = 0;
+	virtual int GetFlags(void) const = 0;
+	virtual void ClearFlags() = 0;
 	virtual int	GetEFlags() const = 0;
 	virtual void SetEFlags(int iEFlags) = 0;
 	virtual void AddEFlags(int nEFlagMask) = 0;
 	virtual void RemoveEFlags(int nEFlagMask) = 0;
 	virtual bool IsEFlagSet(int nEFlagMask) const = 0;
+	virtual bool IsMarkedForDeletion(void) = 0;
 	virtual int GetSpawnFlags(void) const = 0;
 	virtual void SetCheckUntouch(bool check) = 0;
 	virtual bool GetCheckUntouch() const = 0;

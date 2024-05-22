@@ -106,7 +106,7 @@ void CNPC_BaseScanner::Spawn(void)
 
 	SetNavType( NAV_FLY );
 
-	AddFlag( FL_FLY );
+	GetEngineObject()->AddFlag( FL_FLY );
 
 	// This entity cannot be dissolved by the combine balls,
 	// nor does it get killed by the mega physcannon.
@@ -541,7 +541,7 @@ void CNPC_BaseScanner::VPhysicsCollision( int index, gamevcollisionevent_t *pEve
 //------------------------------------------------------------------------------
 void CNPC_BaseScanner::Gib( void )
 {
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
 	// Sparks
@@ -791,7 +791,7 @@ void CNPC_BaseScanner::AttackDivebombCollide(float flInterval)
 //-----------------------------------------------------------------------------
 void CNPC_BaseScanner::PlayFlySound(void)
 {
-	if ( IsMarkedForDeletion() )
+	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
 	CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();

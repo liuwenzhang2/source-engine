@@ -115,8 +115,8 @@ template < class T > T * CreateBot( const BotProfile *profile, int team )
 		return NULL;
 	}
 
-	bot->ClearFlags();
-	bot->AddFlag( FL_CLIENT | FL_FAKECLIENT );
+	bot->GetEngineObject()->ClearFlags();
+	bot->GetEngineObject()->AddFlag( FL_CLIENT | FL_FAKECLIENT );
 
 	return bot;
 }
@@ -462,7 +462,7 @@ inline void CBot< PlayerType >::Spawn( void )
 	PlayerType::Spawn();
 
 	// Make sure everyone knows we are a bot
-	this->AddFlag( FL_CLIENT | FL_FAKECLIENT );
+	this->GetEngineObject()->AddFlag( FL_CLIENT | FL_FAKECLIENT );
 
 	// Bots use their own thinking mechanism
 	this->SetThink( NULL );
@@ -600,7 +600,7 @@ inline bool CBot< PlayerType >::IsJumping( void )
 		return true;
 
 	// a little after our jump, we're jumping until we hit the ground
-	if (FBitSet( this->GetFlags(), FL_ONGROUND ))
+	if (FBitSet( this->GetEngineObject()->GetFlags(), FL_ONGROUND ))
 		return false;
 
 	return true;

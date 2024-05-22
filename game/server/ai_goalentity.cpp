@@ -83,7 +83,7 @@ void CAI_GoalEntity::PruneActors()
 {
 	for ( int i = m_actors.Count() - 1; i >= 0; i-- )
 	{
-		if ( m_actors[i] == NULL || m_actors[i]->IsMarkedForDeletion() || m_actors[i]->GetState() == NPC_STATE_DEAD )
+		if ( m_actors[i] == NULL || m_actors[i]->GetEngineObject()->IsMarkedForDeletion() || m_actors[i]->GetState() == NPC_STATE_DEAD )
 			m_actors.FastRemove( i );
 	}
 }

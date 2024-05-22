@@ -533,7 +533,7 @@ const Vector CDODPlayer::GetPlayerMins( void ) const
 	}
 	else
 	{
-		if ( GetFlags() & FL_DUCKING )
+		if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			return VEC_DUCK_HULL_MIN;
 		}
@@ -561,7 +561,7 @@ const Vector CDODPlayer::GetPlayerMaxs( void ) const
 	}
 	else
 	{
-		if ( GetFlags() & FL_DUCKING )
+		if (GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			return VEC_DUCK_HULL_MAX_SCALED( this );
 		}
@@ -643,7 +643,7 @@ void CDODPlayerShared::Init( CDODPlayer *pPlayer )
 
 bool CDODPlayerShared::IsDucking( void ) const
 {
-	return !!( m_pOuter->GetFlags() & FL_DUCKING );
+	return !!( m_pOuter->GetEngineObject()->GetFlags() & FL_DUCKING );
 }
 
 bool CDODPlayerShared::IsProne() const
@@ -984,7 +984,7 @@ void CDODPlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOrig
 	if ( m_flStepSoundTime > 0 )
 		return;
 
-	if ( GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
+	if (GetEngineObject()->GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
 		return;
 
 	if ( GetMoveType() == MOVETYPE_NOCLIP || GetMoveType() == MOVETYPE_OBSERVER )
@@ -1001,7 +1001,7 @@ void CDODPlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOrig
 
 	float flDuck;
 
-	if ( ( GetFlags() & FL_DUCKING) || fLadder )
+	if ( (GetEngineObject()->GetFlags() & FL_DUCKING) || fLadder )
 	{
 		flDuck = 100;
 	}
@@ -1014,7 +1014,7 @@ void CDODPlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOrig
 	static float flMinSpeed = 70.0f;
 	static float flRunSpeed = 110.0f;
 
-	bool onground = ( GetFlags() & FL_ONGROUND );
+	bool onground = (GetEngineObject()->GetFlags() & FL_ONGROUND );
 	bool movingalongground = ( groundspeed > 0.0f );
 	bool moving_fast_enough =  ( speed >= flMinSpeed );
 
@@ -1133,7 +1133,7 @@ void CDODPlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOrig
 
 	m_flStepSoundTime += flDuck; // slower step time if ducking
 
-	if ( GetFlags() & FL_DUCKING )
+	if (GetEngineObject()->GetFlags() & FL_DUCKING )
 	{
 		flVol *= 0.65;
 	}

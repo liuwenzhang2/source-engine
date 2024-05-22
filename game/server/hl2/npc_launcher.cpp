@@ -237,7 +237,7 @@ void CNPC_Launcher::Spawn( void )
 	SetBloodColor( DONT_BLEED );
 	AddEffects( EF_NODRAW );
 
-	AddFlag( FL_NPC );
+	GetEngineObject()->AddFlag( FL_NPC );
 
 	CapabilitiesAdd( bits_CAP_SQUAD );
 

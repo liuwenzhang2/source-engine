@@ -153,6 +153,7 @@ public:
 		m_iParent = NULL_STRING;
 		m_iName = NULL_STRING;
 		m_iParentAttachment = 0;
+		m_fFlags = 0;
 		m_iEFlags = 0;
 		// NOTE: THIS MUST APPEAR BEFORE ANY SetMoveType() or SetNextThink() calls
 		AddEFlags(EFL_NO_THINK_FUNCTION | EFL_NO_GAME_PHYSICS_SIMULATION | EFL_USE_PARTITION_WHEN_NOT_SOLID);
@@ -339,11 +340,21 @@ public:
 	int	 GetParentAttachment();
 	void ClearParentAttachment();
 
+	void AddFlag(int flags);
+	void RemoveFlag(int flagsToRemove);
+	void ToggleFlag(int flagToToggle);
+	int GetFlags(void) const;
+	void ClearFlags(void);
 	int GetEFlags() const;
 	void SetEFlags(int iEFlags);
 	void AddEFlags(int nEFlagMask);
 	void RemoveEFlags(int nEFlagMask);
 	bool IsEFlagSet(int nEFlagMask) const;
+	// Marks for deletion
+	void MarkForDeletion();
+	// checks to see if the entity is marked for deletion
+	bool IsMarkedForDeletion(void);
+	bool IsMarkedForDeletion() const;
 	int GetSpawnFlags(void) const;
 	void SetSpawnFlags(int nFlags);
 	void AddSpawnFlags(int nFlags);
@@ -506,6 +517,8 @@ private:
 	CNetworkVar(unsigned int, testNetwork);
 	CNetworkVar(unsigned char, m_iParentAttachment); // 0 if we're relative to the parent's absorigin and absangles.
 
+	// was pev->flags
+	CNetworkVarForDerived(int, m_fFlags);
 	int		m_iEFlags;	// entity flags EFL_*
 	// FIXME: Make this private! Still too many references to do so...
 	CNetworkVar(int, m_spawnflags);
@@ -601,6 +614,11 @@ inline void	CEngineObjectInternal::ClearParentAttachment() {
 	m_iParentAttachment = 0;
 }
 
+inline int	CEngineObjectInternal::GetFlags(void) const
+{
+	return m_fFlags;
+}
+
 //-----------------------------------------------------------------------------
 // EFlags
 //-----------------------------------------------------------------------------
@@ -642,6 +660,26 @@ inline bool CEngineObjectInternal::IsEFlagSet(int nEFlagMask) const
 	return (m_iEFlags & nEFlagMask) != 0;
 }
 
+//-----------------------------------------------------------------------------
+// checks to see if the entity is marked for deletion
+//-----------------------------------------------------------------------------
+inline bool CEngineObjectInternal::IsMarkedForDeletion(void)
+{
+	return (GetEFlags() & EFL_KILLME);
+}
+
+//-----------------------------------------------------------------------------
+// Marks for deletion
+//-----------------------------------------------------------------------------
+inline void CEngineObjectInternal::MarkForDeletion()
+{
+	AddEFlags(EFL_KILLME);
+}
+
+inline bool CEngineObjectInternal::IsMarkedForDeletion() const
+{
+	return (GetEFlags() & EFL_KILLME) != 0;
+}
 
 inline int CEngineObjectInternal::GetSpawnFlags(void) const
 {
@@ -2495,7 +2533,7 @@ extern CAimTargetManager g_AimManager;
 template<class T>
 void CGlobalEntityList<T>::ReportEntityFlagsChanged(CBaseEntity* pEntity, unsigned int flagsOld, unsigned int flagsNow)
 {
-	if (pEntity->IsMarkedForDeletion())
+	if (pEntity->GetEngineObject()->IsMarkedForDeletion())
 		return;
 	// UNDONE: Move this into IEntityListener instead?
 	unsigned int flagsChanged = flagsOld ^ flagsNow;

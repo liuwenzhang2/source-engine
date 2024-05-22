@@ -240,22 +240,22 @@ float CWeaponUSP::GetInaccuracy() const
 
 		if ( m_bSilencerOn )
 		{
-			if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+			if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 				return 1.3f * (1 - m_flAccuracy);
 			else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 				return 0.25f * (1 - m_flAccuracy);
-			else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
+			else if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING ) )
 				return 0.125f * (1 - m_flAccuracy);
 			else
 				return 0.15f * (1 - m_flAccuracy);
 		}
 		else
 		{
-			if ( !FBitSet( pPlayer->GetFlags(), FL_ONGROUND ) )
+			if ( !FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )
 				return 1.2f * (1 - m_flAccuracy );
 			else if (pPlayer->GetEngineObject()->GetAbsVelocity().Length2D() > 5)
 				return 0.225f * (1 - m_flAccuracy);
-			else if ( FBitSet( pPlayer->GetFlags(), FL_DUCKING ) )
+			else if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_DUCKING ) )
 				return 0.08f * (1 - m_flAccuracy);
 			else
 				return 0.1f * (1 - m_flAccuracy);

@@ -2927,21 +2927,21 @@ inline int CAI_Component::GetSequence()
 
 inline int CAI_Component::GetEntFlags() const
 {
-	return GetOuter()->GetFlags();
+	return GetOuter()->GetEngineObject()->GetFlags();
 }
 
 //-----------------------------------------------------------------------------
 
 inline void CAI_Component::AddEntFlag( int flags )
 {
-	GetOuter()->AddFlag( flags );
+	GetOuter()->GetEngineObject()->AddFlag( flags );
 }
 
 //-----------------------------------------------------------------------------
 
 inline void CAI_Component::RemoveEntFlag( int flagsToRemove )
 {
-	GetOuter()->RemoveFlag( flagsToRemove );
+	GetOuter()->GetEngineObject()->RemoveFlag( flagsToRemove );
 }
 
 //-----------------------------------------------------------------------------
@@ -2958,7 +2958,7 @@ inline void	 CAI_Component::SetGroundEntity( CBaseEntity *ground )
 
 inline void CAI_Component::ToggleEntFlag( int flagToToggle )
 {
-	GetOuter()->ToggleFlag( flagToToggle );
+	GetOuter()->GetEngineObject()->ToggleFlag( flagToToggle );
 }
 
 //-----------------------------------------------------------------------------

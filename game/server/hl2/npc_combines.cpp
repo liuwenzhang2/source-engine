@@ -123,7 +123,7 @@ void CNPC_CombineS::Precache()
 void CNPC_CombineS::DeathSound( const CTakeDamageInfo &info )
 {
 	// NOTE: The response system deals with this at the moment
-	if ( GetFlags() & FL_DISSOLVING )
+	if (GetEngineObject()->GetFlags() & FL_DISSOLVING )
 		return;
 
 	GetSentences()->Speak( "COMBINE_DIE", SENTENCE_PRIORITY_INVALID, SENTENCE_CRITERIA_ALWAYS ); 

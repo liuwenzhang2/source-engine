@@ -1272,7 +1272,7 @@ bool CAI_PlayerAlly::IsValidSpeechTarget( int flags, CBaseEntity *pEntity )
 		return false;
 
 	// Ignore no-target entities
-	if ( pEntity->GetFlags() & FL_NOTARGET )
+	if ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET )
 		return false;
 
 	CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();

@@ -205,6 +205,7 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_KEYFIELD(m_iParent, FIELD_STRING, "parentname"),
 	DEFINE_FIELD(m_iName, FIELD_STRING),
 	DEFINE_FIELD(m_iParentAttachment, FIELD_CHARACTER),
+	DEFINE_FIELD(m_fFlags, FIELD_INTEGER),
 	DEFINE_FIELD(m_iEFlags, FIELD_INTEGER),
 	DEFINE_FIELD(touchStamp, FIELD_INTEGER),
 	DEFINE_FIELD(m_hGroundEntity, FIELD_EHANDLE),
@@ -276,6 +277,14 @@ void SendProxy_MoveParentToInt(const SendProp* pProp, const void* pStruct, const
 	SendProxy_EHandleToInt(pProp, pStruct, &pHandle, pOut, iElement, objectID);
 }
 
+void SendProxy_CropFlagsToPlayerFlagBitsLength(const SendProp* pProp, const void* pStruct, const void* pVarData, DVariant* pOut, int iElement, int objectID)
+{
+	int mask = (1 << PLAYER_FLAG_BITS) - 1;
+	int data = *(int*)pVarData;
+
+	pOut->m_Int = (data & mask);
+}
+
 BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropInt(SENDINFO(testNetwork), 32, SPROP_UNSIGNED),
 #if PREDICTION_ERROR_CHECK_LEVEL > 1 
@@ -295,6 +304,7 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropModelIndex(SENDINFO(m_nModelIndex)),
 	SendPropDataTable(SENDINFO_DT(m_Collision), &REFERENCE_SEND_TABLE(DT_CollisionProperty)),
 	SendPropInt(SENDINFO(m_CollisionGroup), 5, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_fFlags), PLAYER_FLAG_BITS, SPROP_UNSIGNED | SPROP_CHANGES_OFTEN, SendProxy_CropFlagsToPlayerFlagBitsLength),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -1965,7 +1975,7 @@ void CEngineObjectInternal::PhysicsImpact(IEngineObjectServer* other, trace_t& t
 
 	// If either of the entities is flagged to be deleted, 
 	//  don't call the touch functions
-	if ((m_pOuter->GetFlags() | other->GetOuter()->GetFlags()) & FL_KILLME)
+	if ((GetFlags() | other->GetFlags()) & FL_KILLME)
 	{
 		return;
 	}
@@ -2056,7 +2066,7 @@ servertouchlink_t* CEngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObje
 		return NULL;
 
 	// check if either entity doesn't generate touch functions
-	if ((m_pOuter->GetFlags() | other->GetOuter()->GetFlags()) & FL_DONTTOUCH)
+	if ((GetFlags() | other->GetFlags()) & FL_DONTTOUCH)
 		return NULL;
 
 	// Pure triggers should not touch each other
@@ -2067,12 +2077,12 @@ servertouchlink_t* CEngineObjectInternal::PhysicsMarkEntityAsTouched(IEngineObje
 	}
 
 	// Don't do touching if marked for deletion
-	if (other->GetOuter()->IsMarkedForDeletion())
+	if (other->IsMarkedForDeletion())
 	{
 		return NULL;
 	}
 
-	if (m_pOuter->IsMarkedForDeletion())
+	if (IsMarkedForDeletion())
 	{
 		return NULL;
 	}
@@ -2151,7 +2161,7 @@ void CEngineObjectInternal::PhysicsTouch(IEngineObjectServer* pentOther)
 {
 	if (pentOther)
 	{
-		if (!(m_pOuter->IsMarkedForDeletion() || pentOther->GetOuter()->IsMarkedForDeletion()))
+		if (!(IsMarkedForDeletion() || pentOther->IsMarkedForDeletion()))
 		{
 			m_pOuter->Touch(pentOther->GetOuter());
 		}
@@ -2166,7 +2176,7 @@ void CEngineObjectInternal::PhysicsStartTouch(IEngineObjectServer* pentOther)
 {
 	if (pentOther)
 	{
-		if (!(m_pOuter->IsMarkedForDeletion() || pentOther->GetOuter()->IsMarkedForDeletion()))
+		if (!(IsMarkedForDeletion() || pentOther->IsMarkedForDeletion()))
 		{
 			m_pOuter->StartTouch(pentOther->GetOuter());
 			m_pOuter->Touch(pentOther->GetOuter());
@@ -2405,7 +2415,7 @@ void CEngineObjectInternal::PhysicsStartGroundContact(IEngineObjectServer* pentO
 	if (!pentOther)
 		return;
 
-	if (!(m_pOuter->IsMarkedForDeletion() || pentOther->GetOuter()->IsMarkedForDeletion()))
+	if (!(IsMarkedForDeletion() || pentOther->IsMarkedForDeletion()))
 	{
 		pentOther->GetOuter()->StartGroundContact(this->m_pOuter);
 	}
@@ -2537,11 +2547,11 @@ void CEngineObjectInternal::SetGroundEntity(IEngineObjectServer* ground)
 	//  this will force the appropriate flags
 	if (ground)
 	{
-		m_pOuter->AddFlag(FL_ONGROUND);
+		AddFlag(FL_ONGROUND);
 	}
 	else
 	{
-		m_pOuter->RemoveFlag(FL_ONGROUND);
+		RemoveFlag(FL_ONGROUND);
 	}
 }
 
@@ -2626,6 +2636,32 @@ void CEngineObjectInternal::CollisionRulesChanged()
 				pList[i]->RecheckCollisionFilter();
 		}
 	}
+}
+
+#if !defined( CLIENT_DLL )
+#define CHANGE_FLAGS(flags,newFlags) { unsigned int old = flags; flags = (newFlags); gEntList.ReportEntityFlagsChanged( this->m_pOuter, old, flags ); }
+#else
+#define CHANGE_FLAGS(flags,newFlags) (flags = (newFlags))
+#endif
+
+void CEngineObjectInternal::AddFlag(int flags)
+{
+	CHANGE_FLAGS(m_fFlags, m_fFlags | flags);
+}
+
+void CEngineObjectInternal::RemoveFlag(int flagsToRemove)
+{
+	CHANGE_FLAGS(m_fFlags, m_fFlags & ~flagsToRemove);
+}
+
+void CEngineObjectInternal::ClearFlags(void)
+{
+	CHANGE_FLAGS(m_fFlags, 0);
+}
+
+void CEngineObjectInternal::ToggleFlag(int flagToToggle)
+{
+	CHANGE_FLAGS(m_fFlags, m_fFlags ^ flagToToggle);
 }
 
 struct collidelist_t
@@ -2744,20 +2780,20 @@ void CAimTargetManager::ForceRepopulateList()
 
 bool CAimTargetManager::ShouldAddEntity(CBaseEntity* pEntity)
 {
-	return ((pEntity->GetFlags() & FL_AIMTARGET) != 0);
+	return ((pEntity->GetEngineObject()->GetFlags() & FL_AIMTARGET) != 0);
 }
 
 // IEntityListener
 void CAimTargetManager::OnEntityCreated(CBaseEntity* pEntity) {}
 void CAimTargetManager::OnEntityDeleted(CBaseEntity* pEntity)
 {
-	if (!(pEntity->GetFlags() & FL_AIMTARGET))
+	if (!(pEntity->GetEngineObject()->GetFlags() & FL_AIMTARGET))
 		return;
 	RemoveEntity(pEntity);
 }
 void CAimTargetManager::AddEntity(CBaseEntity* pEntity)
 {
-	if (pEntity->IsMarkedForDeletion())
+	if (pEntity->GetEngineObject()->IsMarkedForDeletion())
 		return;
 	m_targetList.AddToTail(pEntity);
 }
@@ -2885,7 +2921,7 @@ public:
 	void EntityChanged(CBaseEntity* pEntity)
 	{
 		// might change after deletion, don't put back into the list
-		if (pEntity->IsMarkedForDeletion())
+		if (pEntity->GetEngineObject()->IsMarkedForDeletion())
 			return;
 
 		const CBaseHandle& eh = pEntity->GetRefEHandle();
@@ -3123,7 +3159,7 @@ public:
 	}
 	void AddEntity(CBaseEntity* pEntity)
 	{
-		if (pEntity->IsMarkedForDeletion())
+		if (pEntity->GetEngineObject()->IsMarkedForDeletion())
 			return;
 		m_updateList.AddToTail(pEntity);
 	}

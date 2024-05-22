@@ -263,7 +263,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 				pPhys->SetVelocity( &vVel, &vAng );
 			}
 
-			pBaseAnimating->AddFlag( FL_DISSOLVING );
+			pBaseAnimating->GetEngineObject()->AddFlag( FL_DISSOLVING );
 			UTIL_Remove( pBaseAnimating );
 		}
 		

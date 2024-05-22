@@ -319,7 +319,7 @@ public:
 			CTakeDamageInfo info = (*m_dmgInfo);				
 			CalculateMeleeDamageForce( &info, attackDir, info.GetAttacker()->WorldSpaceCenter(), m_flForceScale );
 
-			if( !(pEntity->GetFlags() & FL_ONGROUND) )
+			if( !(pEntity->GetEngineObject()->GetFlags() & FL_ONGROUND) )
 			{
 				// Don't hit airborne entities so hard. They fly farther since
 				// there's no friction with the ground.
@@ -1297,7 +1297,7 @@ Vector CNPC_MetroPolice::StitchAimTarget( const Vector &posSrc, bool bNoisy )
 	if ( !IsEnemyInAnAirboat() )
 	{
 		Vector vecBodyTarget;
-		if ( ( GetEnemy()->GetWaterLevel() == 0 ) && ( GetEnemy()->GetFlags() & FL_ONGROUND ) )
+		if ( ( GetEnemy()->GetWaterLevel() == 0 ) && ( GetEnemy()->GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 		{
 			GetEnemy()->GetEngineObject()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.08f ), &vecBodyTarget );
 			return vecBodyTarget;
@@ -1409,7 +1409,7 @@ void CNPC_MetroPolice::PredictShootTargetPosition( float flDeltaTime, float flMi
 	Vector vecSmoothedVel = pShootTarget->GetSmoothedVelocity();
 
 	// When we're in the air, don't predict vertical motion
-	if( (pShootTarget->GetFlags() & FL_ONGROUND) == 0 )
+	if( (pShootTarget->GetEngineObject()->GetFlags() & FL_ONGROUND) == 0 )
 	{
 		vecSmoothedVel.z = 0.0f;
 	}
@@ -1784,7 +1784,7 @@ void CNPC_MetroPolice::AimBurstAtEnemy( float flReactionTime )
 	{
 		// Make longer stitches if the enemy is going faster
 		Vector vecEnemyVelocity = GetShootTarget()->GetSmoothedVelocity();
-		if( (GetShootTarget()->GetFlags() & FL_ONGROUND) == 0 )
+		if( (GetShootTarget()->GetEngineObject()->GetFlags() & FL_ONGROUND) == 0 )
 		{
 			vecEnemyVelocity.z = 0.0f;
 		}
@@ -2855,7 +2855,7 @@ void CNPC_MetroPolice::OnAnimEventShove( void )
 			AngleVectors( angles, &forward, &right, NULL );
 
 			//If not on ground, then don't make them fly!
-			if ( !(pHurt->GetFlags() & FL_ONGROUND ) )
+			if ( !(pHurt->GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 				  forward.z = 0.0f;
 
 			//Push the target back
@@ -3383,7 +3383,7 @@ int CNPC_MetroPolice::SelectCombatSchedule()
 
 	if (HasCondition(COND_ENEMY_OCCLUDED))
 	{
-		if ( GetEnemy() && !(GetEnemy()->GetFlags() & FL_NOTARGET) )
+		if ( GetEnemy() && !(GetEnemy()->GetEngineObject()->GetFlags() & FL_NOTARGET) )
 		{
 			// Charge in and break the enemy's cover!
 			return SCHED_ESTABLISH_LINE_OF_FIRE;

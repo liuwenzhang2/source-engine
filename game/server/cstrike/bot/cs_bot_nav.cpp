@@ -510,7 +510,7 @@ void CCSBot::StuckCheck( void )
 bool CCSBot::DiscontinuityJump( float ground, bool onlyJumpDown, bool mustJump )
 {
 	// Don't try to jump if in the air.
-	if( !(GetFlags() & FL_ONGROUND) )
+	if( !(GetEngineObject()->GetFlags() & FL_ONGROUND) )
 	{
 		return false;
 	}

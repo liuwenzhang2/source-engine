@@ -1991,7 +1991,7 @@ void C_DODPlayer::CalcDODDeathCamView(Vector& eyeOrigin, QAngle& eyeAngles, floa
 			{
 				VectorAdd( vecKiller, VEC_PRONE_VIEW_SCALED( this ), vecKiller );
 			}
-			else if( player->GetFlags() & FL_DUCKING )
+			else if( player->GetEngineObject()->GetFlags() & FL_DUCKING )
 			{
 				VectorAdd( vecKiller, VEC_DUCK_VIEW_SCALED( this ), vecKiller );
 			}
@@ -2052,7 +2052,7 @@ void C_DODPlayer::CalcChaseCamView(Vector& eyeOrigin, QAngle& eyeAngles, float& 
 		{
 			VectorAdd( origin, VEC_PRONE_VIEW_SCALED( this ), origin );
 		}
-		else if( player->GetFlags() & FL_DUCKING )
+		else if( player->GetEngineObject()->GetFlags() & FL_DUCKING )
 		{
 			VectorAdd( origin, VEC_DUCK_VIEW_SCALED( this ), origin );
 		}
@@ -2637,7 +2637,7 @@ void C_DODPlayer::AvoidPlayers( CUserCmd *pCmd )
 	float flMaxPlayerSpeed = MaxSpeed();
 	float flCropFraction = 1.33333333f;
 
-	if ( ( GetFlags() & FL_DUCKING ) && (GetEngineObject()->GetGroundEntity() != NULL ) )
+	if ( (GetEngineObject()->GetFlags() & FL_DUCKING ) && (GetEngineObject()->GetGroundEntity() != NULL ) )
 	{	
 		flMaxPlayerSpeed *= flCropFraction;
 	}	

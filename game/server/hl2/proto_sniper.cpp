@@ -583,7 +583,7 @@ bool CProtoSniper::QuerySeeEntity( CBaseEntity *pEntity, bool bOnlyHateOrFearIfN
 //-----------------------------------------------------------------------------
 bool CProtoSniper::FInViewCone ( CBaseEntity *pEntity )
 {
-	if( pEntity->GetFlags() & FL_CLIENT )
+	if( pEntity->GetEngineObject()->GetFlags() & FL_CLIENT )
 	{
 		CBasePlayer *pPlayer;
 
@@ -2440,7 +2440,7 @@ Vector CProtoSniper::DesiredBodyTarget( CBaseEntity *pTarget )
 
 	float flTimeSinceLastMiss = gpGlobals->curtime - m_flTimeLastShotMissed;
 
-	if( pTarget->GetFlags() & FL_CLIENT )
+	if( pTarget->GetEngineObject()->GetFlags() & FL_CLIENT )
 	{
 		if( !BaseClass::FVisible( vecTarget ) )
 		{
@@ -2536,7 +2536,7 @@ Vector CProtoSniper::LeadTarget( CBaseEntity *pTarget )
 		// lead a jumping player by firing several feet above his head.
 		// THIS may affect the sniper hitting a player that's ascending/descending
 		// ladders. If so, we'll have to check for the player's ladder flag.
-		if( pTarget->GetFlags() & FL_CLIENT )
+		if( pTarget->GetEngineObject()->GetFlags() & FL_CLIENT )
 		{
 			vecVelocity.z *= 0.25;
 		}
@@ -2772,7 +2772,7 @@ bool CProtoSniper::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **
 		return BaseClass::FVisible( pEntity, traceMask, ppBlocker );
 	}
 
-	if ( pEntity->GetFlags() & FL_NOTARGET )
+	if ( pEntity->GetEngineObject()->GetFlags() & FL_NOTARGET )
 	{
 		return false;
 	}
@@ -2843,7 +2843,7 @@ bool CProtoSniper::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **
 
 	pPlayer = ToBasePlayer( pEntity );
 
-	if( (pPlayer->GetFlags() & FL_DUCKING) && pPlayer->MuzzleFlashTime() > gpGlobals->curtime )
+	if( (pPlayer->GetEngineObject()->GetFlags() & FL_DUCKING) && pPlayer->MuzzleFlashTime() > gpGlobals->curtime )
 	{
 		vecEye = pPlayer->EyePosition() + Vector( 0, 0, 32 );
 		UTIL_TraceLine( EyePosition(), vecEye, MASK_BLOCKLOS, this, COLLISION_GROUP_NONE, &tr );
