@@ -86,7 +86,7 @@ void CAreaCapture::Spawn( void )
 	m_nOwningTeam = TEAM_UNASSIGNED;
 	m_fTimeRemaining = 0.0f;
 	
-	SetNextThink( gpGlobals->curtime + AREA_THINK_TIME );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + AREA_THINK_TIME );
 
 	if( m_nAlliesNumCap < 1 )
 		m_nAlliesNumCap = 1;
@@ -180,7 +180,7 @@ ConVar dod_simulatemultiplecappers( "dod_simulatemultiplecappers", "1", FCVAR_CH
 
 void CAreaCapture::Think( void )
 {
-	SetNextThink( gpGlobals->curtime + AREA_THINK_TIME );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + AREA_THINK_TIME );
 
 	if( DODGameRules()->State_Get() != STATE_RND_RUNNING )
 	{

@@ -318,7 +318,7 @@ void CBaseHeadcrab::CrawlFromCanister()
 	// while the crawling animation is occuring
 	GetEngineObject()->AddFlag( FL_FLY );
 	m_bCrawlFromCanister = true;
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -481,7 +481,7 @@ void CBaseHeadcrab::Leap( const Vector &vecVel )
 	// Think every frame so the player sees the headcrab where he actually is...
 	m_bMidJump = true;
 	SetThink( &CBaseHeadcrab::ThrowThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -499,11 +499,11 @@ void CBaseHeadcrab::ThrowThink( void )
 	if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 	{
 		SetThink( &CBaseHeadcrab::CallNPCThink );
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 		return;
 	}
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -3468,7 +3468,7 @@ void CBlackHeadcrab::Eject( const QAngle &vecAngles, float flVelocityScale, CBas
 
 	SetActivity( ACT_RANGE_ATTACK1 );
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	PhysicsSimulate();
 
 	GetMotor()->SetIdealYaw( vecAngles.y );

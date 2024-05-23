@@ -3809,7 +3809,7 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	SetThink( &CNPC_AttackHelicopter::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	GetEngineObject()->AddEffects( EF_NODRAW );
 
@@ -3907,7 +3907,7 @@ float CNPC_AttackHelicopter::UpdatePerpPathDistance( float flMaxPathOffset )
 		flNewPathOffset = flMaxPathOffset;
 	}
 
-	float flMaxChange = 1000.0f * (gpGlobals->curtime - GetLastThink());
+	float flMaxChange = 1000.0f * (gpGlobals->curtime - GetEngineObject()->GetLastThink());
 	if ( fabs( flNewPathOffset - m_flCurrPathOffset ) < flMaxChange )
 	{
 		m_flCurrPathOffset = flNewPathOffset;
@@ -4338,7 +4338,7 @@ void CNPC_AttackHelicopter::UpdateFacingDirection( const Vector &vecActualDesire
 #define ENEMY_CREEP_RATE	400
 float CNPC_AttackHelicopter::CreepTowardEnemy( float flSpeed, float flMinSpeed, float flMaxSpeed, float flMinDist, float flMaxDist )
 {
-	float dt = gpGlobals->curtime - GetLastThink();
+	float dt = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 	float flEnemyCreepDist = ENEMY_CREEP_RATE * dt;
 
 	// When the player is slow, creep toward him within a second or two
@@ -5185,7 +5185,7 @@ void CGrenadeHelicopter::BecomeActive()
 	{
 		if (GetEngineObject()->HasSpawnFlags( SF_HELICOPTER_GRENADE_DUD ) == false )
 		{
-			SetNextThink( gpGlobals->curtime + GetBombLifetime() );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + GetBombLifetime() );
 		}
 		else
 		{
@@ -5196,7 +5196,7 @@ void CGrenadeHelicopter::BecomeActive()
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + GetBombLifetime() );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + GetBombLifetime() );
 	}
 
 	if ( !bMegaBomb )
@@ -5587,7 +5587,7 @@ void CGrenadeHelicopter::OnPhysGunPickup(CBasePlayer *pPhysGunUser, PhysGunPicku
 
 			// Reset our counter so the player has more time
 			SetThink( &CGrenadeHelicopter::ExplodeThink );
-			SetNextThink( gpGlobals->curtime + GetBombLifetime() );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + GetBombLifetime() );
 
 			SetContextThink( &CGrenadeHelicopter::WarningBlinkerThink, gpGlobals->curtime + GetBombLifetime() - 2.0f, s_pWarningBlinkerContext );
 
@@ -6048,7 +6048,7 @@ void CHelicopterChunk::FallThink( void )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -6170,7 +6170,7 @@ CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos,
 	}
 	
 	pChunk->SetThink( &CHelicopterChunk::FallThink );
-	pChunk->SetNextThink( gpGlobals->curtime + 0.1f );
+	pChunk->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	pChunk->m_bLanded = false;
 

@@ -202,7 +202,7 @@ void CBaseHelicopter::Spawn( void )
 	if ( !(GetEngineObject()->GetSpawnFlags() & SF_AWAITINPUT))
 	{
 		Startup();
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 	}
 	else
 	{
@@ -295,7 +295,7 @@ void CBaseHelicopter::HelicopterThink( void )
 {
 	CheckPVSCondition();
 
-	SetNextThink( gpGlobals->curtime + HELICOPTER_THINK_INTERVAL );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + HELICOPTER_THINK_INTERVAL );
 
 	// Don't keep this around for more than one frame.
 	ClearCondition( COND_ENEMY_DEAD );
@@ -318,7 +318,7 @@ void CBaseHelicopter::HelicopterThink( void )
 	{
 		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		SetLocalAngularVelocity( vec3_angle );
-		SetNextThink( gpGlobals->curtime + HELICOPTER_THINK_INTERVAL );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + HELICOPTER_THINK_INTERVAL );
 		return;
 	}
 
@@ -1219,7 +1219,7 @@ void CBaseHelicopter::CrashTouch( CBaseEntity *pOther )
 	if ( pOther->GetEngineObject()->GetSolid() == SOLID_BSP)
 	{
 		SetTouch( NULL );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -1232,7 +1232,7 @@ void CBaseHelicopter::CrashTouch( CBaseEntity *pOther )
 void CBaseHelicopter::DyingThink( void )
 {
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	SetLocalAngularVelocity( GetLocalAngularVelocity() * 1.02 );
 }
@@ -1245,7 +1245,7 @@ void CBaseHelicopter::DyingThink( void )
 //-----------------------------------------------------------------------------
 void CBaseHelicopter::DrawDebugGeometryOverlays(void) 
 {
-	if (m_pfnThink!= NULL)
+	if (GetEngineObject()->GetPfnThink()!= NULL)
 	{
 		// ------------------------------
 		// Draw route if requested
@@ -1284,7 +1284,7 @@ void CBaseHelicopter::TraceAttack( const CTakeDamageInfo &info, const Vector &ve
 void CBaseHelicopter::NullThink( void )
 {
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 }
 
 
@@ -1303,7 +1303,7 @@ void CBaseHelicopter::Startup( void )
 	m_flGoalSpeed = m_flInitialSpeed;
 	SetThink( &CBaseHelicopter::HelicopterThink );
 	SetTouch( &CBaseHelicopter::FlyTouch );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	m_flRotorWashEntitySearchTime = gpGlobals->curtime;
 	SetContextThink( &CBaseHelicopter::RotorWashThink, gpGlobals->curtime, s_pRotorWashThinkContext );
@@ -1334,7 +1334,7 @@ void CBaseHelicopter::Event_Killed( const CTakeDamageInfo &info )
 	SetThink( &CBaseHelicopter::CallDyingThink );
 	SetTouch( &CBaseHelicopter::CrashTouch );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	m_iHealth = 0;
 	m_takedamage = DAMAGE_NO;
 

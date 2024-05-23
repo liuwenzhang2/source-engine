@@ -574,7 +574,7 @@ private:
 
 public:
 
-	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_nNextThinkTick );
+	//IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_nNextThinkTick );
 
 	int						WeaponState() const { return m_iState; }
 

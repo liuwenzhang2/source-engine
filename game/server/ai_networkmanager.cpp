@@ -150,11 +150,11 @@ void CAI_NetworkManager::RebuildThink( void )
 
 void CAI_NetworkManager::RebuildNetworkGraph( void )
 {
-	if (m_pfnThink != (void (CBaseEntity::*)())&CAI_NetworkManager::RebuildThink)
+	if (GetEngineObject()->GetPfnThink() != (void (CBaseEntity::*)())&CAI_NetworkManager::RebuildThink)
 	{
 		UTIL_CenterPrintAll( "Doing partial rebuild of Node Graph...\n" );
 		SetThink(&CAI_NetworkManager::RebuildThink);
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 
@@ -949,7 +949,7 @@ void CAI_NetworkManager::InitializeAINetworks()
 	CNodeEnt::m_nNodeCount = 0;
 
 	pNetwork->SetThink( &CAI_NetworkManager::DelayedInit );
-	pNetwork->SetNextThink( gpGlobals->curtime );
+	pNetwork->GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 // UNDONE: Where should this be defined?
@@ -1112,7 +1112,7 @@ void CAI_NetworkManager::DelayedInit( void )
 			DevMsg( "Node Graph out of Date. Rebuilding... (%d, %d, %d)\n", (int)m_bDontSaveGraph, (int)!CAI_NetworkManager::NetworksLoaded(), (int) engine->IsInEditMode() );
 			UTIL_CenterPrintAll( "Node Graph out of Date. Rebuilding...\n" );
 			m_bNeedGraphRebuild = true;
-			g_pAINetworkManager->SetNextThink( gpGlobals->curtime + 1 );
+			g_pAINetworkManager->GetEngineObject()->SetNextThink( gpGlobals->curtime + 1 );
 			return;
 		}	
 

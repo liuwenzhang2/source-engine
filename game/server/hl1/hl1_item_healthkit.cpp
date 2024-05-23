@@ -331,7 +331,7 @@ void CWallHealth::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 		return;
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.25 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.25 );
 	SetThink(&CWallHealth::Off);
 
 	// Time to recharge yet?
@@ -407,7 +407,7 @@ void CWallHealth::Off(void)
 
 	if ((!m_iJuice) &&  ( ( m_iReactivate = g_pGameRules->FlHealthChargerRechargeTime() ) > 0) )
 	{
-		SetNextThink( gpGlobals->curtime + m_iReactivate );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_iReactivate );
 		SetThink(&CWallHealth::Recharge);
 	}
 	else

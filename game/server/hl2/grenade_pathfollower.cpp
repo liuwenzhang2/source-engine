@@ -180,7 +180,7 @@ void CGrenadePathfollower::Launch( float flLaunchSpeed, string_t sPathCornerName
 	SetTouch( &CGrenadePathfollower::GrenadeTouch );
 	SetThink( &CGrenadePathfollower::AimThink );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Make the trail
 	m_hRocketTrail = RocketTrail::CreateRocketTrail();
@@ -274,7 +274,7 @@ void CGrenadePathfollower::AimThink( void )
 	QAngle angles;
 	VectorAngles(GetEngineObject()->GetAbsVelocity(), angles );
 	GetEngineObject()->SetLocalAngles( angles );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //------------------------------------------------------------------------------

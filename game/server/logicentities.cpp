@@ -256,7 +256,7 @@ void CTimerEntity::ResetTimer( void )
 		m_flRefireTime = random->RandomFloat( m_flLowerRandomBound, m_flUpperRandomBound );
 	}
 
-	SetNextThink( gpGlobals->curtime + m_flRefireTime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flRefireTime );
 }
 
 
@@ -276,7 +276,7 @@ void CTimerEntity::Enable( void )
 void CTimerEntity::Disable( void )
 {
 	m_iDisabled = TRUE;
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 //-----------------------------------------------------------------------------
@@ -408,8 +408,8 @@ void CTimerEntity::InputAddToTimer( inputdata_t &inputdata )
 		return;
 	
 	// Add time to timer
- 	float flNextThink = GetNextThink();	
-	SetNextThink( flNextThink += inputdata.value.Float() );
+ 	float flNextThink = GetEngineObject()->GetNextThink();
+	GetEngineObject()->SetNextThink( flNextThink += inputdata.value.Float() );
 }
 
 //-----------------------------------------------------------------------------
@@ -423,14 +423,14 @@ void CTimerEntity::InputSubtractFromTimer( inputdata_t &inputdata )
 		return;
 
 	// Subtract time from the timer but don't let the timer go negative
-	float flNextThink = GetNextThink();
+	float flNextThink = GetEngineObject()->GetNextThink();
 	if ( ( flNextThink - gpGlobals->curtime ) <= inputdata.value.Float() )
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 	else
 	{
-		SetNextThink( flNextThink -= inputdata.value.Float() );
+		GetEngineObject()->SetNextThink( flNextThink -= inputdata.value.Float() );
 	}
 }
 
@@ -454,7 +454,7 @@ int CTimerEntity::DrawDebugTextOverlays( void )
 		// print seconds to next fire
 		if ( !m_iDisabled )
 		{
-			float flNextThink = GetNextThink();
+			float flNextThink = GetEngineObject()->GetNextThink();
 			Q_snprintf( tempstr, sizeof( tempstr ), "      firing in: %.2f sec", flNextThink - gpGlobals->curtime );
 			EntityText( text_offset, tempstr, 0);
 			text_offset++;
@@ -555,7 +555,7 @@ void CLogicLineToEntity::Activate(void)
 //-----------------------------------------------------------------------------
 void CLogicLineToEntity::Spawn(void)
 {
-	SetNextThink( gpGlobals->curtime + 0.01f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 }
 
 
@@ -570,7 +570,7 @@ void CLogicLineToEntity::Think(void)
 	{
 		// Can sleep for a long time, no more lines.
 		m_Line.Set( vec3_origin, this, this );
-		SetNextThink( gpGlobals->curtime + 10 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 10 );
 		return;
 	}
 
@@ -578,7 +578,7 @@ void CLogicLineToEntity::Think(void)
 	VectorSubtract( pDest->GetEngineObject()->GetAbsOrigin(), pSrc->GetEngineObject()->GetAbsOrigin(), delta );
 	m_Line.Set(delta, this, this);
 
-	SetNextThink( gpGlobals->curtime + 0.01f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 }
 
 
@@ -1178,7 +1178,7 @@ bool CMultiSource::KeyValue( const char *szKeyName, const char *szValue )
 //-----------------------------------------------------------------------------
 void CMultiSource::Spawn()
 { 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	GetEngineObject()->AddSpawnFlags(SF_MULTI_INIT);	// Until it's initialized
 	SetThink(&CMultiSource::Register);
 }
@@ -2344,7 +2344,7 @@ class CLogicActiveAutosave : public CLogicAutosave
 	{
 		m_flStartTime = -1;
 		SetThink( &CLogicActiveAutosave::SaveThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 
 	void InputDisable( inputdata_t &inputdata )
@@ -2389,7 +2389,7 @@ class CLogicActiveAutosave : public CLogicAutosave
 		}
 
 		float thinkInterval = ( m_flStartTime < 0 ) ? 1.0 : 0.5;
-		SetNextThink( gpGlobals->curtime + thinkInterval );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + thinkInterval );
 	}
 
 	DECLARE_DATADESC();

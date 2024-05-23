@@ -111,7 +111,6 @@ struct serialentity_t;
 
 typedef CHandle<C_BaseEntity> EHANDLE; // The client's version of EHANDLE.
 
-typedef void (C_BaseEntity::*BASEPTR)(void);
 typedef void (C_BaseEntity::*ENTITYFUNCPTR)(C_BaseEntity *pOther );
 
 // For entity creation on the client
@@ -146,16 +145,7 @@ typedef C_BaseEntity* (*DISPATCHFUNCTION)( void );
 //};
 //#endif
 
-//-----------------------------------------------------------------------------
-// Purpose: think contexts
-//-----------------------------------------------------------------------------
-struct thinkfunc_t
-{
-	BASEPTR		m_pfnThink;
-	string_t	m_iszContext;
-	int			m_nNextThinkTick;
-	int			m_nLastThinkTick;
-};
+
 
 //#define CREATE_PREDICTED_ENTITY( className )	\
 //	C_BaseEntity::CreatePredictedEntityByName( className, __FILE__, __LINE__ );
@@ -725,19 +715,17 @@ public:
 	virtual void					ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName );
 
 	virtual bool					ShouldPredict( void ) { return false; };
-	// interface function pointers
-	void							(C_BaseEntity::*m_pfnThink)(void);
+
 	virtual void					Think( void )
 	{
-		AssertMsg( m_pfnThink != &C_BaseEntity::Think, "Infinite recursion is infinitely bad." );
+		AssertMsg( GetEngineObject()->GetPfnThink() != &C_BaseEntity::Think, "Infinite recursion is infinitely bad." );
 
-		if ( m_pfnThink )
+		if (GetEngineObject()->GetPfnThink() )
 		{
-			( this->*m_pfnThink )();
+			( this->*GetEngineObject()->GetPfnThink())();
 		}
 	}
 
-	void							PhysicsDispatchThink( BASEPTR thinkFunc );
 	
 	// Toggle the visualization of the entity's abs/bbox
 	enum
@@ -823,20 +811,7 @@ public:
 	// Destroys the shadow; causes its type to be recomputed if the entity doesn't go away immediately.
 	void					DestroyShadow();
 
-protected:
-		// think function handling
-	enum thinkmethods_t
-	{
-		THINK_FIRE_ALL_FUNCTIONS,
-		THINK_FIRE_BASE_ONLY,
-		THINK_FIRE_ALL_BUT_BASE,
-	};
 public:
-
-	
-
-	bool					PhysicsRunThink( thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS );
-	bool					PhysicsRunSpecificThink( int nContextIndex, BASEPTR thinkFunc );
 
 	virtual void					PhysicsSimulate( void );
 	virtual bool					IsAlive( void );
@@ -957,21 +932,11 @@ public:
 	void	NetworkStateSetUpdateInterval( float N )	{ }
 	void	NetworkStateForceUpdate()					{ }
 
-	// Think functions with contexts
-	int		RegisterThinkContext( const char *szContext );
-	BASEPTR	ThinkSet( BASEPTR func, float flNextThinkTime = 0, const char *szContext = NULL );
-	void	SetNextThink( float nextThinkTime, const char *szContext = NULL );
-	float	GetNextThink( const char *szContext = NULL );
-	float	GetLastThink( const char *szContext = NULL );
-	int		GetNextThinkTick( const char *szContext = NULL );
-	int		GetLastThinkTick( const char *szContext = NULL );
+	
 	
 	// These set entity flags (EFL_*) to help optimize queries
-	void	CheckHasThinkFunction( bool isThinkingHint = false );
 	void	CheckHasGamePhysicsSimulation();
-	bool	WillThink();
 	bool	WillSimulateGamePhysics();
-	int		GetFirstThinkTick();	// get first tick thinking on any context
 
 	float	GetAnimTime() const;
 	void	SetAnimTime( float at );
@@ -1136,9 +1101,7 @@ public:
 	// Should we interpolate this tick?  (Used to be EF_NOINTERP)
 	bool							IsNoInterpolationFrame();
 
-	// 
-	int								m_nNextThinkTick;
-	int								m_nLastThinkTick;
+
 
 
 
@@ -1227,10 +1190,7 @@ protected:
 
 	int								m_nSimulationTick;
 
-	// Think contexts
-	int								GetIndexForThinkContext( const char *pszContext );
-	CUtlVector< thinkfunc_t >		m_aThinkFunctions;
-	int								m_iCurrentThinkContext;
+
 
 	// Object eye position
 	Vector							m_vecViewOffset;
@@ -1301,15 +1261,6 @@ public:
 	// FIXME: REMOVE!!!
 	void MoveToAimEnt( );
 private:
-	
-	// Sets/Gets the next think based on context index
-	void SetNextThink( int nContextIndex, float thinkTime );
-	void SetLastThink( int nContextIndex, float thinkTime );
-	float GetNextThink( int nContextIndex ) const;
-	int	GetNextThinkTick( int nContextIndex ) const;
-
-	
-
 
 	// was pev->avelocity
 	QAngle							m_vecAngVelocity;
@@ -1463,8 +1414,8 @@ inline bool FClassnameIs( C_BaseEntity *pEntity, const char *szClassname )
 	return !strcmp( pEntity->GetClassname(), szClassname ) ? true : false; 
 }
 
-#define SetThink( a ) ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), 0, NULL )
-#define SetContextThink( a, b, context ) ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), (b), context )
+#define SetThink( a ) GetEngineObject()->ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), 0, NULL )
+#define SetContextThink( a, b, context ) GetEngineObject()->ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), (b), context )
 
 #ifdef _DEBUG
 #define SetTouch( a ) TouchSet( static_cast <void (C_BaseEntity::*)(C_BaseEntity *)> (a), #a )

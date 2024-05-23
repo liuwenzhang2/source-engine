@@ -411,7 +411,7 @@ void CNPC_RocketTurret::Spawn( void )
 		SetThink( &CNPC_RocketTurret::FollowThink );
 	}
 	
-	SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
 }
 
 bool CNPC_RocketTurret::CreateVPhysics( void )
@@ -468,7 +468,7 @@ void CNPC_RocketTurret::UpdateAimPoint ( void )
 	if ( ( m_bEnabled == false ) || ( GetEnemy() == NULL ) )
 	{
 		SetEnemy( NULL );
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 		return;
 	}
@@ -543,7 +543,7 @@ void CNPC_RocketTurret::SearchThink()
 	UpdateAimPoint();
 
 	//Update our think time
-	SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
 
 	// Still can't see enemy, zip around frantically
 	if ( !m_bHasSightOfEnemy )
@@ -577,7 +577,7 @@ void CNPC_RocketTurret::SearchThink()
 	{
 		// Found target, go back to following it
 		SetThink( &CNPC_RocketTurret::FollowThink );
-		SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
 	}
 
 	// Move beam towards goal angles
@@ -602,7 +602,7 @@ void CNPC_RocketTurret::FollowThink( void )
 		return;
 	}
 	//Update our think time
-	SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
 
 	UpdateAimPoint();
 
@@ -662,7 +662,7 @@ void CNPC_RocketTurret::LockingThink( void )
 
 	//Turn to face
 	UpdateFacing();
-	SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
 
     if ( m_flTimeLocking == 0.0f )
 	{
@@ -731,7 +731,7 @@ void CNPC_RocketTurret::FiringThink( void )
 	if ( PreThink() )
 		return;
 
-	SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
 	CRocket_Turret_Projectile* pRocket = dynamic_cast<CRocket_Turret_Projectile*>(m_hCurRocket.Get());
 
 	if ( pRocket )
@@ -833,11 +833,11 @@ void CNPC_RocketTurret::DyingThink( void )
 
 		m_OnDeath.FireOutput( this, this );
 		SetThink( &CNPC_RocketTurret::DeathThink );
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 		m_flTimeSpentDying = 0.0f;
 	}
 
-	SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
 	m_flTimeSpentDying += ROCKET_TURRET_THINK_RATE;
 }
 
@@ -855,7 +855,7 @@ void CNPC_RocketTurret::DeathThink( void )
 	g_pEffects->Sparks( EyePosition(), 1, 1, &vForward );
 	g_pEffects->Smoke( EyePosition(), 0, 6.0f, 20 );
 
-	SetNextThink( gpGlobals->curtime + RandomFloat( 2.0f, 8.0f ) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + RandomFloat( 2.0f, 8.0f ) );
 }
 
 void CNPC_RocketTurret::UpdateMuzzleMatrix()
@@ -889,7 +889,7 @@ void CNPC_RocketTurret::OpeningThink()
 		SetThink( &CNPC_RocketTurret::FollowThink );
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -910,14 +910,14 @@ void CNPC_RocketTurret::ClosingThink()
 		StudioFrameAdvance();
 	}
 
-	SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + ROCKET_TURRET_THINK_RATE );
 
 	// Start following player after we're fully opened
 	float flCurProgress = GetCycle();
 	if ( flCurProgress >= 0.99f )
 	{
 		SetThink( NULL );
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	}
 }
 
@@ -1175,7 +1175,7 @@ void CNPC_RocketTurret::Enable( void )
 	ResetSequence( LookupSequence("open") );
 
 	SetThink( &CNPC_RocketTurret::OpeningThink );
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 }
 
 //-----------------------------------------------------------------------------
@@ -1192,7 +1192,7 @@ void CNPC_RocketTurret::Disable( void )
 	ResetSequence(LookupSequence("close"));
 
 	SetThink( &CNPC_RocketTurret::ClosingThink );
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 	SetEnemy( NULL );
 }
 
@@ -1212,7 +1212,7 @@ void CNPC_RocketTurret::SetTarget( CBaseEntity* pTarget )
 void CNPC_RocketTurret::Destroy( void )
 {
 	SetThink( &CNPC_RocketTurret::DyingThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------

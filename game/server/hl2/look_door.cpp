@@ -74,7 +74,7 @@ void CLookDoorThinker::LookThink(void)
 	if (m_hLookDoor)
 	{
 		((CLookDoor*)(CBaseEntity*)m_hLookDoor)->MoveThink();
-		SetNextThink( gpGlobals->curtime + 0.01f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 	}
 	else
 	{
@@ -133,7 +133,7 @@ void CLookDoor::Spawn(void)
 	{
 		pLookThinker->SetThink(&CLookDoorThinker::LookThink);
 		pLookThinker->m_hLookDoor = this;
-		pLookThinker->SetNextThink( gpGlobals->curtime + 0.1f );
+		pLookThinker->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 

@@ -286,7 +286,7 @@ void CWeaponHL2MPBase::FallInit( void )
 
 	SetThink( &CWeaponHL2MPBase::FallThink );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 #endif
 }

@@ -169,7 +169,7 @@ void CNPC_FlockingFlyerFlock::Spawn( void )
 
 
 	SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //=========================================================
@@ -218,7 +218,7 @@ void CNPC_FlockingFlyerFlock::SpawnFlock( void )
 		
 		pBoid->SetCycle( 0 );
 		pBoid->SetThink( &CNPC_FlockingFlyer::IdleThink );
-		pBoid->SetNextThink( gpGlobals->curtime + 0.2 );
+		pBoid->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
 		if ( pBoid != pLeader ) 
 		{
@@ -240,7 +240,7 @@ void CNPC_FlockingFlyer::Spawn( )
 	SpawnCommonCode();
 	
 	SetCycle( 0 );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	SetThink( &CNPC_FlockingFlyer::IdleThink );
 }
 
@@ -283,14 +283,14 @@ void CNPC_FlockingFlyer::Precache( )
 //=========================================================
 void CNPC_FlockingFlyer::IdleThink( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
 	// see if there's a client in the same pvs as the monster
 	CBaseEntity* pEnt = UTIL_FindClientInPVS(this);
 	if (pEnt&& pEnt->entindex()>0)
 	{
 		SetThink( &CNPC_FlockingFlyer::Start );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 
@@ -423,7 +423,7 @@ void CNPC_FlockingFlyer::SquadDisband( void )
 //=========================================================
 void CNPC_FlockingFlyer::Start( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if ( IsLeader() )
 	{
@@ -481,7 +481,7 @@ void CNPC_FlockingFlyer::FlockLeaderThink( void )
 	Vector			vForward, vRight, vUp;
 	
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	
 	AngleVectors (GetEngineObject()->GetAbsAngles(), &vForward, &vRight, &vUp );
 
@@ -737,7 +737,7 @@ void CNPC_FlockingFlyer::FlockFollowerThink( void )
 	Vector			vecDirToLeader;
 	float			flDistToLeader;
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if ( IsLeader() || !InSquad() )
 	{
@@ -836,7 +836,7 @@ void CNPC_FlockingFlyer::Event_Killed( const CTakeDamageInfo &info )
 	SetMoveType( MOVETYPE_FLYGRAVITY );
 
 	SetThink ( &CNPC_FlockingFlyer::FallHack );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void CNPC_FlockingFlyer::FallHack( void )
@@ -848,7 +848,7 @@ void CNPC_FlockingFlyer::FallHack( void )
 		if ( !FClassnameIs ( groundentity, "worldspawn" ) )
 		{
 			GetEngineObject()->SetGroundEntity( NULL );
-			SetNextThink( gpGlobals->curtime + 0.1f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		}
 		else
 		{

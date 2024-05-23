@@ -165,11 +165,11 @@ void CNPC_Roach::NPCThink( void  )
 {
 	CBaseEntity* pEnt = UTIL_FindClientInPVS(this);
 	if (pEnt==NULL||pEnt->entindex()<=0)
-		SetNextThink( gpGlobals->curtime + random->RandomFloat( 1.0f , 1.5f ) );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 1.0f , 1.5f ) );
 	else
-		SetNextThink( gpGlobals->curtime + 0.1f );// keep monster thinking
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );// keep monster thinking
 
-	float flInterval = gpGlobals->curtime - GetLastThink();
+	float flInterval = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 
 	StudioFrameAdvance( ); // animate
 
@@ -177,7 +177,7 @@ void CNPC_Roach::NPCThink( void  )
 	{
 		// if light value hasn't been collection for the first time yet, 
 		// suspend the creature for a second so the world finishes spawning, then we'll collect the light level.
-		SetNextThink( gpGlobals->curtime + 1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1 );
 		m_fLightHacked = TRUE;
 		return;
 	}

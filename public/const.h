@@ -472,5 +472,13 @@ enum touchlink_flags_t
 // means this touchlink is managed external to the main physics system
 #define TOUCHSTAMP_EVENT_DRIVEN		-1
 
+	// think function handling
+enum thinkmethods_t
+{
+	THINK_FIRE_ALL_FUNCTIONS,
+	THINK_FIRE_BASE_ONLY,
+	THINK_FIRE_ALL_BUT_BASE,
+};
+
 #endif
 

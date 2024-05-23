@@ -266,7 +266,7 @@ void CAmbientGeneric::Spawn( void )
 	// start thinking yet.
 
 	SetThink(&CAmbientGeneric::RampThink);
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 	m_fActive = false;
 
@@ -395,7 +395,7 @@ void CAmbientGeneric::InputFadeIn( inputdata_t &inputdata )
 	if (m_dpv.fadein > 0)
 		m_dpv.fadein = ( 100 << 8 ) / ( m_dpv.fadein * AMBIENT_GENERIC_UPDATE_RATE );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -416,7 +416,7 @@ void CAmbientGeneric::InputFadeOut( inputdata_t &inputdata )
 	if (m_dpv.fadeout > 0)
 		m_dpv.fadeout = ( 100 << 8 ) / ( m_dpv.fadeout * AMBIENT_GENERIC_UPDATE_RATE );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -514,7 +514,7 @@ void CAmbientGeneric::Activate( void )
 			SendSound( (SoundFlags_t)flags );
 		}
 
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 
@@ -762,7 +762,7 @@ void CAmbientGeneric::RampThink( void )
 	}
 
 	// update ramps at 5hz
-	SetNextThink( gpGlobals->curtime + AMBIENT_GENERIC_THINK_DELAY );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + AMBIENT_GENERIC_THINK_DELAY );
 	return;
 }
 
@@ -949,7 +949,7 @@ void CAmbientGeneric::ToggleSound()
 				m_dpv.pitchrun = m_dpv.pitchstart + pitchinc * m_dpv.cspincount;
 				if (m_dpv.pitchrun > 255) m_dpv.pitchrun = 255;
 
-				SetNextThink( gpGlobals->curtime + 0.1f );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 			}
 			
 		}
@@ -968,7 +968,7 @@ void CAmbientGeneric::ToggleSound()
 
 				m_dpv.fadeout = m_dpv.fadeoutsav;
 				m_dpv.fadein = 0;
-				SetNextThink( gpGlobals->curtime + 0.1f );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 			}
 			else
 			{
@@ -998,7 +998,7 @@ void CAmbientGeneric::ToggleSound()
 
 		SendSound( SND_NOFLAGS ); // send sound
 
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	} 
 }

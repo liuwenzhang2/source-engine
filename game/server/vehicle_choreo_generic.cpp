@@ -335,7 +335,7 @@ void CPropVehicleChoreoGeneric::Spawn( void )
 
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	ParseViewParams( STRING(m_vehicleScript) );
 }
@@ -408,7 +408,7 @@ Vector CPropVehicleChoreoGeneric::BodyTarget( const Vector &posSrc, bool bNoisy 
 //-----------------------------------------------------------------------------
 void CPropVehicleChoreoGeneric::Think(void)
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if ( GetDriver() )
 	{

@@ -164,7 +164,7 @@ void CNPC_Bullseye::Spawn( void )
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE );
 
 	SetThink( &CNPC_Bullseye::BullseyeThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
@@ -249,7 +249,7 @@ void CNPC_Bullseye::Event_Killed( const CTakeDamageInfo &info )
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	UTIL_SetSize(this, vec3_origin, vec3_origin );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	SetThink( &CBaseEntity::SUB_Remove );
 }
 
@@ -425,7 +425,7 @@ void CNPC_Bullseye::TraceAttack( const CTakeDamageInfo &info, const Vector &vecD
 //-----------------------------------------------------------------------------
 int CNPC_Bullseye::OnTakeDamage( const CTakeDamageInfo &info )
 {
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	//If specified, we must be the enemy of the target
 	if (GetEngineObject()->GetSpawnFlags() & SF_BULLSEYE_ENEMYDAMAGEONLY)

@@ -620,7 +620,7 @@ CON_COMMAND(npc_thinknow, "Trigger NPC to think")
 		if (pNPC)
 		{
 			pNPC->SetThink( &CAI_BaseNPC::CallNPCThink );
-			pNPC->SetNextThink( gpGlobals->curtime );
+			pNPC->GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		}
 	}
 }

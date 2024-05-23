@@ -5299,7 +5299,7 @@ void CFuncTeamWall::Spawn( void )
 	}	
 
 	SetThink( &CFuncTeamWall::DrawThink );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	SetTouch( &CFuncTeamWall::WallTouch );
 	m_flNextHintTime = gpGlobals->curtime;
@@ -5388,7 +5388,7 @@ void CFuncTeamWall::DrawThink( void )
 		NDebugOverlay::EntityBounds( this, 255, 0, 0, 0, 0.2 );
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 #endif

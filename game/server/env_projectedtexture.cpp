@@ -232,7 +232,7 @@ void CEnvProjectedTexture::Activate( void )
 	}
 
 	SetThink( &CEnvProjectedTexture::InitialThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	BaseClass::Activate();
 }

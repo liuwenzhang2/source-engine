@@ -2130,7 +2130,7 @@ void CBaseFlex::DoBodyLean( void )
 		vecDelta.y = clamp( vecDelta.y, -50, 50 );
 		vecDelta.z = clamp( vecDelta.z, -50, 50 );
 
-		float dt = gpGlobals->curtime - GetLastThink();
+		float dt = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 		bool bSkip = ((GetEngineObject()->GetFlags() & (FL_FLY | FL_SWIM)) != 0) || (GetEngineObject()->GetMoveParent() != NULL) || (GetEngineObject()->GetGroundEntity() == NULL) || (GetEngineObject()->GetGroundEntity()->GetOuter()->IsMoving());
 		bSkip |= myNpc->TaskRanAutomovement() || (myNpc->GetVehicleEntity() != NULL);
 
@@ -2341,7 +2341,7 @@ void CFlexCycler::Spawn( )
 	m_flGroundSpeed		= 0;
 
 
-	SetNextThink( gpGlobals->curtime + 1.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
 	ResetSequenceInfo( );
 
@@ -2456,7 +2456,7 @@ LocalFlexController_t CFlexCycler::LookupFlex( const char *szTarget  )
 
 void CFlexCycler::Think( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	StudioFrameAdvance ( );
 

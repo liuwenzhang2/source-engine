@@ -109,7 +109,7 @@ void CEnvMicrophone::Spawn(void)
 
 	if (!m_bDisabled)
 	{
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 
@@ -201,7 +201,7 @@ void CEnvMicrophone::InputEnable( inputdata_t &inputdata )
 	if (m_bDisabled)
 	{
 		m_bDisabled = false;
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 		ActivateSpeaker();
 	}
@@ -222,7 +222,7 @@ void CEnvMicrophone::InputDisable( inputdata_t &inputdata )
 		// Remove ourselves from the list of active mics
 		s_Microphones.FindAndRemove( this );
 	}
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 //-----------------------------------------------------------------------------
@@ -429,7 +429,7 @@ void CEnvMicrophone::Think(void)
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------

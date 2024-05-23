@@ -862,7 +862,7 @@ int	CSave::WriteRootFields(const char* pname, IHandleEntity* pHandleEntity, data
 		if (!ShouldSaveField(pOutputData, pTest))
 			continue;
 
-		if (!WriteField(pname, pOutputData, pEngineObjectDataMap, pTest))
+		if (!WriteField(pname, pOutputData, pRootMap, pTest))
 			break;
 		count++;
 	}
@@ -1889,7 +1889,7 @@ int CRestore::ReadRootFields(const char* pname, IHandleEntity* pHandleEntity, da
 		pField = FindField(pFieldName, pEngineObjectDataMap->dataDesc, pEngineObjectDataMap->dataNumFields, &searchCookie);
 		if (pField) {
 			if ( ShouldReadField(pField)) {
-				ReadField(header, ((char*)pEngineObject + pField->fieldOffset[TD_OFFSET_NORMAL]), pEngineObjectDataMap, pField);
+				ReadField(header, ((char*)pEngineObject + pField->fieldOffset[TD_OFFSET_NORMAL]), pRootMap, pField);
 			}
 			else {
 				BufferSkipBytes(header.size);			// Advance to next field

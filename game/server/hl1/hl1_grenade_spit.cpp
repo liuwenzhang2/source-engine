@@ -51,7 +51,7 @@ void CGrenadeSpit::Spawn( void )
 	SetThink( &CGrenadeSpit::SpitThink );
 	SetUse( &CBaseGrenade::DetonateUse ); 
 	SetTouch( &CGrenadeSpit::GrenadeSpitTouch );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	m_flDamage		= sk_bullsquid_dmg_spit.GetFloat();
 	m_DmgRadius		= 60.0f;
@@ -131,7 +131,7 @@ void CGrenadeSpit::SpitThink( void )
 	{
 		UTIL_Remove( this );
 	}
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void CGrenadeSpit::Detonate(void)

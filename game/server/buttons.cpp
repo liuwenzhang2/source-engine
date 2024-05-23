@@ -377,7 +377,7 @@ void CBaseButton::Spawn( )
 	if (GetEngineObject()->HasSpawnFlags( SF_BUTTON_SPARK_IF_OFF ) )// this button should spark in OFF state
 	{
 		SetThink ( &CBaseButton::ButtonSpark );
-		SetNextThink( gpGlobals->curtime + 0.5f );// no hurry, make sure everything else spawns
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );// no hurry, make sure everything else spawns
 	}
 
 	// Convert movedir from angles to a vector
@@ -483,7 +483,7 @@ string_t MakeButtonSound( int sound )
 void CBaseButton::ButtonSpark ( void )
 {
 	SetThink ( &CBaseButton::ButtonSpark );
-	SetNextThink( gpGlobals->curtime + 0.1 + random->RandomFloat ( 0, 1.5 ) );// spark again at random interval
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 + random->RandomFloat ( 0, 1.5 ) );// spark again at random interval
 
 	DoSpark( this, WorldSpaceCenter(), 1, 1, true, vec3_origin );
 }
@@ -733,7 +733,7 @@ void CBaseButton::TriggerAndWait( void )
 	//
 	else
 	{
-		SetNextThink( gpGlobals->curtime + m_flWait );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flWait );
 		SetThink( &CBaseButton::ButtonReturn );
 	}
 	
@@ -789,7 +789,7 @@ void CBaseButton::ButtonBackHome( void )
 	if (GetEngineObject()->HasSpawnFlags( SF_BUTTON_SPARK_IF_OFF ) )
 	{
 		SetThink ( &CBaseButton::ButtonSpark );
-		SetNextThink( gpGlobals->curtime + 0.5f );// no hurry
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );// no hurry
 	}
 }
 
@@ -1159,7 +1159,7 @@ void CMomentaryRotButton::InputSetPosition( inputdata_t &inputdata )
 	SetMoveDone( &CMomentaryRotButton::SetPositionMoveDone );
 
 	SetThink( &CMomentaryRotButton::UpdateThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	//
 	// Think again in 0.1 seconds or the time that it will take us to reach our movement goal,
@@ -1223,7 +1223,7 @@ void CMomentaryRotButton::Lock()
 	SetMoveDoneTime( -1 );
 	SetMoveDone( NULL );
 
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	SetThink( NULL );
 }
 
@@ -1277,7 +1277,7 @@ void CMomentaryRotButton::SetPositionMoveDone(void)
 		SetLocalAngularVelocity( vec3_angle );
 		// BUGBUG: Won't this get the player stuck?
 		GetEngineObject()->SetLocalAngles( m_start + m_vecMoveAng * ( m_IdealYaw * m_flMoveDistance ) );
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		SetMoveDoneTime( -1 );
 		UpdateTarget( m_IdealYaw, this );
 		OutputMovementComplete();
@@ -1368,10 +1368,10 @@ void CMomentaryRotButton::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 	// This works around an issue with host_thread_mode > 0 when the player's
 	// clock runs ahead of the server.
 	//
-	if ( !m_pfnThink )
+	if ( !GetEngineObject()->GetPfnThink() )
 	{
 		SetThink( &CMomentaryRotButton::UpdateThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -1490,7 +1490,7 @@ void CMomentaryRotButton::ReturnMoveDone( void )
 		SetMoveDoneTime( -1 );
 		SetMoveDone( NULL );
 
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		SetThink( NULL );
 	}
 	else
@@ -1499,7 +1499,7 @@ void CMomentaryRotButton::ReturnMoveDone( void )
 		SetMoveDoneTime( 0.1f );
 
 		SetThink( &CMomentaryRotButton::UpdateThink );
-		SetNextThink( gpGlobals->curtime + 0.01f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 	}
 }
 
@@ -1511,7 +1511,7 @@ void CMomentaryRotButton::UpdateThink( void )
 {
 	float value = GetPos(GetEngineObject()->GetLocalAngles() );
 	UpdateTarget( value, NULL );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 

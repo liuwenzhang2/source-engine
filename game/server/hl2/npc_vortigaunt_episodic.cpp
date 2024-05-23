@@ -1781,7 +1781,7 @@ void CNPC_Vortigaunt::MaintainHealSchedule( void )
 			// NOTENOTE: It's better if the vort give up than ignore things around him to try and continue -- jdw
 
 			// Increment a counter to let us know how long we've failed
-			m_flHealHinderedTime += gpGlobals->curtime - GetLastThink();
+			m_flHealHinderedTime += gpGlobals->curtime - GetEngineObject()->GetLastThink();
 			
 			if ( m_flHealHinderedTime > 2.0f )
 			{
@@ -3187,7 +3187,7 @@ void CVortigauntChargeToken::Spawn( void )
 	// No model but we still need to force this!
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 
 	m_flLifetime = gpGlobals->curtime + VORTIGAUNT_CURE_LIFESPAN;
 
@@ -3252,7 +3252,7 @@ void CVortigauntChargeToken::SeekThink( void )
 	VectorNormalize( vecDir );
 
 	float flSpeed = GetEngineObject()->GetAbsVelocity().Length();
-	float flDelta = gpGlobals->curtime - GetLastThink();
+	float flDelta = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 
 	if ( flSpeed < VTOKEN_MAX_SPEED )
 	{
@@ -3274,7 +3274,7 @@ void CVortigauntChargeToken::SeekThink( void )
 	vecOffset += GetSteerVector( vecDir );
 
 	GetEngineObject()->SetAbsVelocity( ( vecDir * flSpeed ) + vecOffset );
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 //-----------------------------------------------------------------------------
@@ -3329,7 +3329,7 @@ void CVortigauntChargeToken::FadeAndDie( void )
 
 	m_bFadeOut = true;
 	SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 2.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
 }
 
 //=============================================================================
@@ -3399,7 +3399,7 @@ void CVortigauntEffectDispel::FadeAndDie( void )
 {
 	m_bFadeOut = true;
 	SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 2.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
 }
 
 

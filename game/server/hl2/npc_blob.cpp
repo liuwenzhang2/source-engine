@@ -658,7 +658,7 @@ void CNPC_Blob::RunAI()
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime + npc_blob_think_interval.GetFloat() );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + npc_blob_think_interval.GetFloat() );
 }
 
 //-----------------------------------------------------------------------------
@@ -711,7 +711,7 @@ void CNPC_Blob::ComputeCentroid()
 //-----------------------------------------------------------------------------
 void CNPC_Blob::DoBlobBatchedAI( int iStart, int iEnd )
 {
-	float flInterval = gpGlobals->curtime - GetLastThink();
+	float flInterval = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 
 	// Local fields for sin-wave movement variance
 	float flMySine;

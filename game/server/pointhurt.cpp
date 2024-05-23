@@ -79,7 +79,7 @@ void CPointHurt::Spawn(void)
 		SetThink( &CPointHurt::HurtThink );
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	
 	if ( m_flRadius <= 0.0f )
 	{
@@ -128,7 +128,7 @@ void CPointHurt::HurtThink( void )
 		RadiusDamage( CTakeDamageInfo( this, this, m_nDamage, m_bitsDamageType ), GetEngineObject()->GetAbsOrigin(), m_flRadius, CLASS_NONE, NULL );
 	}
 
-	SetNextThink( gpGlobals->curtime + m_flDelay );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flDelay );
 }
 
 //-----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ void CPointHurt::InputTurnOn( inputdata_t &data )
 {
 	SetThink( &CPointHurt::HurtThink );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	m_pActivator = data.pActivator;
 }
@@ -160,7 +160,7 @@ void CPointHurt::InputToggle( inputdata_t &data )
 {
 	m_pActivator = data.pActivator;
 
-	if ( m_pfnThink == (void (CBaseEntity::*)())&CPointHurt::HurtThink )
+	if (GetEngineObject()->GetPfnThink() == (void (CBaseEntity::*)()) & CPointHurt::HurtThink)
 	{
 		SetThink( NULL );
 	}

@@ -176,7 +176,7 @@ void CAntlionGrub::CreateGlow( void )
 	
 	// Don't uselessly animate, we're a static sprite!
 	m_hGlowSprite->SetThink( NULL );
-	m_hGlowSprite->SetNextThink( TICK_NEVER_THINK );
+	m_hGlowSprite->GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 //-----------------------------------------------------------------------------
@@ -309,7 +309,7 @@ void CAntlionGrub::Event_Killed( const CTakeDamageInfo &info )
 
 	// Go away
 	SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// we deliberately do not call BaseClass::EventKilled
 }
@@ -328,7 +328,7 @@ int CAntlionGrub::OnTakeDamage( const CTakeDamageInfo &info )
 		m_flFlinchTime = gpGlobals->curtime + random->RandomFloat( 0.5f, 1.0f );
 
 		SetThink( &CAntlionGrub::FlinchThink );
-		SetNextThink( gpGlobals->curtime + 0.05f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 	}
 
 	return BaseClass::OnTakeDamage( info );
@@ -350,14 +350,14 @@ void CAntlionGrub::SetNextThinkByDistance( void )
 	CBasePlayer *pPlayer = AI_GetSinglePlayer();
 	if ( pPlayer == NULL )
 	{
-		SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.5f, 3.0f ) );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.5f, 3.0f ) );
 		return;
 	}
 
 	float flDistToPlayerSqr = (GetEngineObject()->GetAbsOrigin() - pPlayer->GetEngineObject()->GetAbsOrigin() ).LengthSqr();
 	float scale = RemapValClamped( flDistToPlayerSqr, Square( 400 ), Square( 5000 ), 1.0f, 5.0f );
 	float time = random->RandomFloat( 1.0f, 3.0f );
-	SetNextThink( gpGlobals->curtime + ( time * scale ) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + ( time * scale ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -647,7 +647,7 @@ void CAntlionGrub::IdleThink( void )
 	// Idle normally
 	StudioFrameAdvance();
 	MakeIdleSounds();
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -656,7 +656,7 @@ void CAntlionGrub::IdleThink( void )
 void CAntlionGrub::FlinchThink( void )
 {
 	StudioFrameAdvance();
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// See if we're done
 	if ( m_flFlinchTime < gpGlobals->curtime )
@@ -863,7 +863,7 @@ void CAntlionGrub::InputAgitate( inputdata_t &inputdata )
 
 	m_flFlinchTime = gpGlobals->curtime + inputdata.value.Float();
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 // =====================================================================

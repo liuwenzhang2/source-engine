@@ -808,7 +808,7 @@ public:
 		if ( bAwake )
 		{
 			// Did something wake up when I was not thinking?
-			if ( GetNextThink() == TICK_NEVER_THINK )
+			if (GetEngineObject()->GetNextThink() == TICK_NEVER_THINK )
 			{
 				m_soundInfo.StartThinking(this, 
 					VelocitySampler::GetRelativeAngularVelocity(m_pConstraint->GetAttachedObject(), m_pConstraint->GetReferenceObject()) ,
@@ -816,18 +816,18 @@ public:
 					);
 
 				SetThink(&CPhysHinge::SoundThink);
-				SetNextThink(gpGlobals->curtime + m_soundInfo.getThinkRate());
+				GetEngineObject()->SetNextThink(gpGlobals->curtime + m_soundInfo.getThinkRate());
 			}
 		}
 		else
 		{
 			// Is everything asleep? If so, stop thinking.
-			if ( GetNextThink() != TICK_NEVER_THINK				&&
+			if (GetEngineObject()->GetNextThink() != TICK_NEVER_THINK				&&
 				m_pConstraint->GetAttachedObject()->IsAsleep() &&
 				m_pConstraint->GetReferenceObject()->IsAsleep() )
 			{
 				m_soundInfo.StopThinking(this);
-				SetNextThink(TICK_NEVER_THINK);
+				GetEngineObject()->SetNextThink(TICK_NEVER_THINK);
 			}
 		}
 #endif
@@ -953,7 +953,7 @@ void CPhysHinge::Activate( void )
 			);
 
 		SetThink(&CPhysHinge::SoundThink);
-		SetNextThink( gpGlobals->curtime + m_soundInfo.getThinkRate() );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_soundInfo.getThinkRate() );
 	}
 }
 
@@ -1026,7 +1026,7 @@ void CPhysHinge::SoundThink( void )
 		}
 		m_soundInfo.OnThink( this, relativeVel );
 
-		SetNextThink(gpGlobals->curtime + m_soundInfo.getThinkRate());
+		GetEngineObject()->SetNextThink(gpGlobals->curtime + m_soundInfo.getThinkRate());
 	}
 }
 #endif
@@ -1112,7 +1112,7 @@ public:
 		if ( bAwake )
 		{
 			// Did something wake up when I was not thinking?
-			if ( GetNextThink() == TICK_NEVER_THINK )
+			if (GetEngineObject()->GetNextThink() == TICK_NEVER_THINK )
 			{
 				Vector axisDirection = m_axisEnd - GetEngineObject()->GetAbsOrigin();
 				VectorNormalize( axisDirection );
@@ -1123,18 +1123,18 @@ public:
 					axisDirection
 					);
 				SetThink(&CPhysSlideConstraint::SoundThink);
-				SetNextThink(gpGlobals->curtime + m_soundInfo.getThinkRate());
+				GetEngineObject()->SetNextThink(gpGlobals->curtime + m_soundInfo.getThinkRate());
 			}
 		}
 		else
 		{
 			// Is everything asleep? If so, stop thinking.
-			if ( GetNextThink() != TICK_NEVER_THINK				&&
+			if (GetEngineObject()->GetNextThink() != TICK_NEVER_THINK				&&
 				 m_pConstraint->GetAttachedObject()->IsAsleep() &&
 				 m_pConstraint->GetReferenceObject()->IsAsleep() )
 			{
 				m_soundInfo.StopThinking(this);
-				SetNextThink(TICK_NEVER_THINK);
+				GetEngineObject()->SetNextThink(TICK_NEVER_THINK);
 			}
 		}
 #endif
@@ -1269,7 +1269,7 @@ void CPhysSlideConstraint::SoundThink( void )
 
 		m_soundInfo.OnThink( this, relativeVel );
 
-		SetNextThink(gpGlobals->curtime + m_soundInfo.getThinkRate());
+		GetEngineObject()->SetNextThink(gpGlobals->curtime + m_soundInfo.getThinkRate());
 	}
 
 }
@@ -1289,7 +1289,7 @@ void CPhysSlideConstraint::Activate( void )
 		);
 
 	SetThink(&CPhysSlideConstraint::SoundThink);
-	SetNextThink(gpGlobals->curtime + m_soundInfo.getThinkRate());
+	GetEngineObject()->SetNextThink(gpGlobals->curtime + m_soundInfo.getThinkRate());
 }
 
 void CPhysSlideConstraint::Precache()
@@ -1765,7 +1765,7 @@ void ConstraintSoundInfo::OnActivate( CPhysConstraint *pOuter )
 
 	/*
 	SetThink(&CPhysSlideConstraint::SoundThink);
-	SetNextThink(gpGlobals->curtime + m_vSampler.getSampleRate());
+	GetEngineObject()->SetNextThink(gpGlobals->curtime + m_vSampler.getSampleRate());
 	*/
 }
 

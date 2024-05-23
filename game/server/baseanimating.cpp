@@ -843,7 +843,7 @@ bool CBaseAnimating::BecomeRagdollOnClient( const Vector &force )
 		//UTIL_SetSize( this, vec3_origin, vec3_origin );
 		SetThink( NULL );
 	
-		SetNextThink( gpGlobals->curtime + 2.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
 		//If we're here, then we can vanish safely
 		SetThink( &CBaseEntity::SUB_Remove );
 
@@ -852,7 +852,7 @@ bool CBaseAnimating::BecomeRagdollOnClient( const Vector &force )
 		if ( pFireChild )
 		{
 			pFireChild->SetThink( &CBaseEntity::SUB_Remove );
-			pFireChild->SetNextThink( gpGlobals->curtime + 0.1f );
+			pFireChild->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		}
 
 		return true;

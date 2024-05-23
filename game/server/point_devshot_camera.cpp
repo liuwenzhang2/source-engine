@@ -87,7 +87,7 @@ void CPointDevShotCamera::Spawn( void )
 
 	// Take a screenshot when it's my turn
 	SetThink( &CPointDevShotCamera::DevShotThink_Setup );
-	SetNextThink( gpGlobals->curtime + DEVSHOT_INITIAL_WAIT + (g_iDevShotCameraCount * DEVSHOT_INTERVAL) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + DEVSHOT_INITIAL_WAIT + (g_iDevShotCameraCount * DEVSHOT_INTERVAL) );
 
 	g_iDevShotCameraCount++;
 }
@@ -133,7 +133,7 @@ void CPointDevShotCamera::DevShotThink_Setup( void )
 
 	// Now take the shot next frame
 	SetThink( &CPointDevShotCamera::DevShotThink_TakeShot );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //-----------------------------------------------------------------------------
@@ -150,7 +150,7 @@ void CPointDevShotCamera::DevShotThink_TakeShot( void )
 
 	// Now take the shot next frame
 	SetThink( &CPointDevShotCamera::DevShotThink_PostShot );
-	SetNextThink( gpGlobals->curtime + (DEVSHOT_INTERVAL - 1) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + (DEVSHOT_INTERVAL - 1) );
 }
 
 //-----------------------------------------------------------------------------

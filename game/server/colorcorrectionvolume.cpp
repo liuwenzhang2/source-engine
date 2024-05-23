@@ -148,7 +148,7 @@ void CColorCorrectionVolume::Spawn( void )
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	SetThink( &CColorCorrectionVolume::ThinkFunc );
-	SetNextThink( gpGlobals->curtime + 0.01f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 
 	if( m_bStartDisabled )
 	{
@@ -218,7 +218,7 @@ void CColorCorrectionVolume::ThinkFunc( )
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.01f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 }
 
 

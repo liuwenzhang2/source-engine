@@ -106,7 +106,7 @@ void CNPC_Hornet::Spawn( void )
 		m_flDamage = sk_npc_dmg_hornet.GetFloat();
 	}
 	
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	ResetSequenceInfo();
 
 	m_vecEnemyLKP = vec3_origin;
@@ -160,7 +160,7 @@ void CNPC_Hornet::StartDart ( void )
 	SetTouch( &CNPC_Hornet::DartTouch );
 
 	SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 4 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 4 );
 }
 
 
@@ -199,7 +199,7 @@ void CNPC_Hornet:: StartTrack ( void )
 	SetTouch( &CNPC_Hornet::TrackTouch );
 	SetThink( &CNPC_Hornet::TrackTarget );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void TE_BeamFollow( IRecipientFilter& filter, float delay,
@@ -296,7 +296,7 @@ void CNPC_Hornet::TrackTarget ( void )
 	{
 		SetTouch( NULL );
 		SetThink( &CBaseEntity::SUB_Remove );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		return;
 	}
 
@@ -359,13 +359,13 @@ void CNPC_Hornet::TrackTarget ( void )
 	{
 		case HORNET_TYPE_RED:
 			GetEngineObject()->SetAbsVelocity( vecVel * ( m_flFlySpeed * flDelta ) );// scale the dir by the ( speed * width of turn )
-			SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1, 0.3 ) );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1, 0.3 ) );
 			break;
 		default:
 			Assert( false );	//fall through if release
 		case HORNET_TYPE_ORANGE:
 			GetEngineObject()->SetAbsVelocity( vecVel * m_flFlySpeed );// do not have to slow down to turn.
-			SetNextThink( gpGlobals->curtime + 0.1f );// fixed think time
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );// fixed think time
 			break;
 	}
 
@@ -392,7 +392,7 @@ void CNPC_Hornet::TrackTarget ( void )
 			CPASAttenuationFilter filter2( this );
 			g_pSoundEmitterSystem->EmitSound( filter2, entindex(), "Hornet.Buzz" );
 			GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 2 );
-			SetNextThink( gpGlobals->curtime + 1.0f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 			// don't attack again
 			m_flStopAttack = gpGlobals->curtime;
 		}

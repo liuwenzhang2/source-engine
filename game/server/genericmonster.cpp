@@ -318,7 +318,7 @@ int	CNPC_Furniture::ObjectCaps( void )
 void CNPC_Furniture::Die( void )
 {
 	SetThink ( &CNPC_Furniture::SUB_Remove );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //-----------------------------------------------------------------------------

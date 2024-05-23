@@ -178,7 +178,7 @@ public:
 		SetBrightness( 0, duration );
 		SetThink(&CSprite::AnimateUntilDead); 
 		m_flDieTime = gpGlobals->curtime + duration; 
-		SetNextThink( gpGlobals->curtime );  
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 
 	inline void AnimateAndDie( float framerate ) 
@@ -186,7 +186,7 @@ public:
 		SetThink(&CSprite::AnimateUntilDead); 
 		m_flSpriteFramerate = framerate;
 		m_flDieTime = gpGlobals->curtime + (m_flMaxFrame / m_flSpriteFramerate); 
-		SetNextThink( gpGlobals->curtime ); 
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 
 	inline void AnimateForTime( float framerate, float time ) 
@@ -194,7 +194,7 @@ public:
 		SetThink(&CSprite::AnimateUntilDead); 
 		m_flSpriteFramerate = framerate;
 		m_flDieTime = gpGlobals->curtime + time;
-		SetNextThink( gpGlobals->curtime ); 
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 
 	// FIXME: This completely blows.
@@ -202,7 +202,7 @@ public:
 	void FadeOutFromSpawn( )
 	{
 		SetThink(&CSprite::BeginFadeOutThink); 
-		SetNextThink( gpGlobals->curtime + 0.01f ); 
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 	}
 
 	void BeginFadeOutThink( )

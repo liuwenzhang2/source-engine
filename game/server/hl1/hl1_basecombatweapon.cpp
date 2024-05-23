@@ -56,7 +56,7 @@ void CBaseHL1CombatWeapon::FallInit( void )
 
 	SetThink( &CBaseHL1CombatWeapon::FallThink );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// HACKHACK - On ground isn't always set, so look for ground underneath
 	trace_t tr;
@@ -81,7 +81,7 @@ void CBaseHL1CombatWeapon::FallInit( void )
 //-----------------------------------------------------------------------------
 void CBaseHL1CombatWeapon::FallThink ( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	bool shouldMaterialize = false;
 	IPhysicsObject *pPhysics = VPhysicsGetObject();

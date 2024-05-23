@@ -198,7 +198,7 @@ void C_WeaponPortalgun::Spawn( void )
 	BaseClass::Spawn();
 
 	//SetThink( &C_BaseEntity::Think );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 //-----------------------------------------------------------------------------

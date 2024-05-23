@@ -60,7 +60,7 @@ void CNPCMaker::Spawn( void )
 	if ( m_bDisabled == false )
 	{
 		SetThink ( &CNPCMaker::MakerThink );
-		SetNextThink( gpGlobals->curtime + m_flSpawnFrequency );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flSpawnFrequency );
 	}
 	else
 	{
@@ -162,7 +162,7 @@ void CNPCMaker::Enable( void )
 
 	m_bDisabled = false;
 	SetThink ( &CNPCMaker::MakerThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -277,7 +277,7 @@ void CNPCMaker::MakeNPC( void )
 //-----------------------------------------------------------------------------
 void CNPCMaker::MakerThink ( void )
 {
-	SetNextThink( gpGlobals->curtime + m_flSpawnFrequency );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flSpawnFrequency );
 
 	MakeNPC();
 }

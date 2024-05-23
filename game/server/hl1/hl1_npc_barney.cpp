@@ -473,7 +473,7 @@ void CNPC_Barney::Event_Killed( const CTakeDamageInfo &info )
 void CNPC_Barney::SUB_StartLVFadeOut( float delay, bool notSolid )
 {
 	SetThink( &CNPC_Barney::SUB_LVFadeOut );
-	SetNextThink( gpGlobals->curtime + delay );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + delay );
 	SetRenderColorA( 255 );
 	m_nRenderMode = kRenderNormal;
 
@@ -491,7 +491,7 @@ void CNPC_Barney::SUB_LVFadeOut( void  )
 		if( VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD || GetEngineObject()->GetEFlags() & EFL_IS_BEING_LIFTED_BY_BARNACLE )
 		{
 			// Try again in a few seconds.
-			SetNextThink( gpGlobals->curtime + 5 );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 5 );
 			SetRenderColorA( 255 );
 			return;
 		}
@@ -513,7 +513,7 @@ void CNPC_Barney::SUB_LVFadeOut( void  )
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 

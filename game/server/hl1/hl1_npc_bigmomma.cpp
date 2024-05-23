@@ -1174,7 +1174,7 @@ void CBMortar:: Spawn( void )
 
 void CBMortar::Animate( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	Vector vVelocity = GetEngineObject()->GetAbsVelocity();
 
@@ -1203,7 +1203,7 @@ CBMortar *CBMortar::Shoot( CBaseEntity *pOwner, Vector vecStart, Vector vecVeloc
 	pSpit->GetEngineObject()->SetAbsVelocity( vecVelocity );
 	pSpit->SetOwnerEntity( pOwner );
 	pSpit->SetThink ( &CBMortar::Animate );
-	pSpit->SetNextThink( gpGlobals->curtime + 0.1 );
+	pSpit->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	return pSpit;
 }

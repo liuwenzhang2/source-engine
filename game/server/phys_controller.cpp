@@ -253,7 +253,7 @@ void CPhysForce::ForceOn( void )
 	ActivateForce();
 	if ( m_forceTime )
 	{
-		SetNextThink( gpGlobals->curtime + m_forceTime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_forceTime );
 		SetThink( &CPhysForce::ForceOff );
 	}
 }
@@ -291,7 +291,7 @@ void CPhysForce::ForceOff( void )
 	physenv->DestroyMotionController( m_pController );
 	m_pController = NULL;
 	SetThink( NULL );
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	IPhysicsObject *pPhys = NULL;
 	if ( m_attachedObject )
 	{
@@ -664,7 +664,7 @@ void CPhysMotor::InputSetTargetSpeed( inputdata_t &inputdata )
 
 void CPhysMotor::TargetSpeedChanged( void )
 {
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	m_lastTime = gpGlobals->curtime;
 	m_pController->WakeObjects();
 }
@@ -685,7 +685,7 @@ void CPhysMotor::InputTurnOn( inputdata_t &inputdata )
 void CPhysMotor::InputTurnOff( inputdata_t &inputdata )
 {
 	m_motor.m_speed = 0;
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 
@@ -719,7 +719,7 @@ void CPhysMotor::Spawn( void )
 		Warning("phys_motor %s does not have a valid axis helper, and self-destructed!\n", GetDebugName());
 
 		m_motor.m_speed = 0;
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 		UTIL_Remove(this);
 	}
@@ -832,7 +832,7 @@ void CPhysMotor::Think( void )
 	m_lastTime = gpGlobals->curtime;
 	if ( m_motor.m_speed != m_flSpeed )
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 

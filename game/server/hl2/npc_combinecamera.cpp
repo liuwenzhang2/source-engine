@@ -372,7 +372,7 @@ void CNPC_CombineCamera::Spawn()
 	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
 	// Stagger our starting times
-	SetNextThink( gpGlobals->curtime + random->RandomFloat(0.1f, 0.3f) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat(0.1f, 0.3f) );
 
 	// Don't allow us to skip animation setup because our attachments are critical to us!
 	SetBoneCacheFlags( BCF_NO_ANIMATION_SKIP );
@@ -422,7 +422,7 @@ int CNPC_CombineCamera::OnTakeDamage(const CTakeDamageInfo &inputInfo)
 
 		m_OnDamaged.FireOutput(info.GetInflictor(), this);
 
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 		return 0;
 	}
@@ -438,7 +438,7 @@ void CNPC_CombineCamera::Deploy()
 {
 	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	SetEyeState(CAMERA_EYE_IDLE);
 	m_bActive = true;
@@ -651,7 +651,7 @@ void CNPC_CombineCamera::ActiveThink()
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		SetAngry(false);
 		SetThink(&CNPC_CombineCamera::SearchThink);
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		return;
 	}
 
@@ -713,7 +713,7 @@ void CNPC_CombineCamera::ActiveThink()
 	}
 
 	// Update our think time
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	TrackTarget(pTarget);
 	MaintainEye();
@@ -813,7 +813,7 @@ void CNPC_CombineCamera::SearchThink()
 	if (PreThink(CAMERA_SEARCHING))
 		return;
 
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 
 	SetIdealActivity((Activity) ACT_COMBINE_CAMERA_OPEN_IDLE);
 
@@ -853,7 +853,7 @@ bool CNPC_CombineCamera::PreThink(cameraState_e state)
 	if ( !m_bEnabled )
 	{
 		SetIdealActivity((Activity) ACT_COMBINE_CAMERA_CLOSED_IDLE);
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		return true;
 	}
 
@@ -1024,7 +1024,7 @@ void CNPC_CombineCamera::Enable()
 {
 	m_bEnabled = true;
 	SetThink(&CNPC_CombineCamera::Deploy);
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 
@@ -1035,7 +1035,7 @@ void CNPC_CombineCamera::Disable()
 {
 	m_bEnabled = false;
 	m_hEnemyTarget = NULL;
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -1126,7 +1126,7 @@ void CNPC_CombineCamera::DeathThink()
 
 	// Level out our angles
 	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if (m_lifeState != LIFE_DEAD)
 	{

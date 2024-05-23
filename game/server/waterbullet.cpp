@@ -66,7 +66,7 @@ void CWaterBullet::Spawn( const Vector &vecOrigin, const Vector &vecDir )
 	SetTouch( &CWaterBullet::Touch );
 
 	SetThink( &CWaterBullet::BulletThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //-----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ void CWaterBullet::Spawn( const Vector &vecOrigin, const Vector &vecDir )
 void CWaterBullet::BulletThink()
 {
 	//NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() - GetAbsVelocity() * 0.1, 255, 255, 255, false, 1 );
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 
 /*
 	QAngle angles = GetAbsAngles();

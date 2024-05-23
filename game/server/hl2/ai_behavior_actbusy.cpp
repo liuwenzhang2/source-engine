@@ -1106,7 +1106,7 @@ int	CAI_ActBusyBehavior::SelectScheduleForLeaving( void )
 						GetOuter()->SetOwnerEntity( NULL );
 					}
 					GetOuter()->SetThink( &CBaseEntity::SUB_Remove); //SUB_Remove) ; //GetOuter()->SUB_Remove );
-					GetOuter()->SetNextThink( gpGlobals->curtime + 0.1 );
+					GetOuter()->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 					if ( m_hActBusyGoal )
 					{
@@ -2714,7 +2714,7 @@ void CAI_ActBusyQueueGoal::Spawn( void )
 {
 	BaseClass::Spawn();
 
-	RegisterThinkContext( QUEUE_MOVEUP_THINK_CONTEXT );
+	GetEngineObject()->RegisterThinkContext( QUEUE_MOVEUP_THINK_CONTEXT );
 }
 
 //-----------------------------------------------------------------------------
@@ -3008,7 +3008,7 @@ void CAI_ActBusyQueueGoal::NPCStartedBusy( CAI_BaseNPC *pNPC )
 void CAI_ActBusyQueueGoal::MoveQueueUp( void )
 {
 	// Find the node the NPC has arrived at, and tell the guy behind him to move forward
-	if ( GetNextThink( QUEUE_MOVEUP_THINK_CONTEXT ) < gpGlobals->curtime )
+	if (GetEngineObject()->GetNextThink( QUEUE_MOVEUP_THINK_CONTEXT ) < gpGlobals->curtime )
 	{
 		float flTime = gpGlobals->curtime + RandomFloat( 0.3, 0.5 );
 		SetContextThink( &CAI_ActBusyQueueGoal::MoveQueueUpThink, flTime, QUEUE_MOVEUP_THINK_CONTEXT );

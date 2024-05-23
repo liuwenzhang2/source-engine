@@ -139,7 +139,7 @@ void CPointAngularVelocitySensor::Activate(void)
 
 	if (m_hTargetEntity)
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -193,7 +193,7 @@ float CPointAngularVelocitySensor::SampleAngularVelocity(CBaseEntity *pEntity)
 			QAngle angles;
 			pPhys->GetPosition( NULL, &angles );
 
-			float dt = gpGlobals->curtime - GetLastThink();
+			float dt = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 			if ( dt == 0 )
 				dt = 0.1;
 
@@ -319,7 +319,7 @@ void CPointAngularVelocitySensor::Think(void)
 			m_flFireTime = 0;
 		}
 
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -335,7 +335,7 @@ void CPointAngularVelocitySensor::InputTestWithInterval( inputdata_t &inputdata 
 		m_nLastFireResult = AVELOCITY_SENSOR_NO_LAST_RESULT;
 		m_nLastCompareResult = CompareToThreshold(m_hTargetEntity, m_flThreshold, true);
 
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -449,7 +449,7 @@ void CPointVelocitySensor::Activate( void )
 	
 	if ( m_bEnabled && m_hTargetEntity )
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -466,7 +466,7 @@ void CPointVelocitySensor::InputEnable( inputdata_t &inputdata )
 	
 	if ( m_hTargetEntity )
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -486,7 +486,7 @@ void CPointVelocitySensor::Think( void )
 	if ( m_hTargetEntity != NULL && m_bEnabled )
 	{
 		SampleVelocity();
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 

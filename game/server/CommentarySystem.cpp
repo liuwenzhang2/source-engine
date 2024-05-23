@@ -898,7 +898,7 @@ void CPointCommentaryNode::Spawn( void )
 	// Setup for animation
 	ResetSequence( LookupSequence("idle") );
 	SetThink( &CPointCommentaryNode::SpinThink );
-	SetNextThink( gpGlobals->curtime + 0.1f ); 
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	m_iNodeNumber = 0;
 	m_iNodeNumberMax = 0;
@@ -1014,7 +1014,7 @@ void CPointCommentaryNode::SpinThink( void )
 		DispatchAnimEvents(this);
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //------------------------------------------------------------------------------
@@ -1223,7 +1223,7 @@ void CPointCommentaryNode::UpdateViewThink( void )
 			pPlayer->SnapEyeAngles( angCurrent );
 		}
 
-		SetNextThink( gpGlobals->curtime, s_pCommentaryUpdateViewThink );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime, s_pCommentaryUpdateViewThink );
 	}
 
  	if ( m_hViewPosition.Get() )
@@ -1251,7 +1251,7 @@ void CPointCommentaryNode::UpdateViewThink( void )
 		VectorLerp( pPlayer->EyePosition(), m_hViewPosition.Get()->GetEngineObject()->GetAbsOrigin(), flBlendPerc, vecCurEye );
 		m_hViewPositionMover->GetEngineObject()->SetAbsOrigin( vecCurEye );
 
-		SetNextThink( gpGlobals->curtime, s_pCommentaryUpdateViewThink );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime, s_pCommentaryUpdateViewThink );
 	}
 }
 
@@ -1295,7 +1295,7 @@ void CPointCommentaryNode::UpdateViewPostThink( void )
 				m_hViewPositionMover->GetEngineObject()->SetAbsAngles( angCurrent );
 			}
 
-			SetNextThink( gpGlobals->curtime, s_pCommentaryUpdateViewThink );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime, s_pCommentaryUpdateViewThink );
 			return;
 		}
 
@@ -1615,7 +1615,7 @@ END_DATADESC()
 void CCommentaryAuto::Spawn(void)
 {
 	BaseClass::Spawn();
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 //-----------------------------------------------------------------------------

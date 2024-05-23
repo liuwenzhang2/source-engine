@@ -63,7 +63,7 @@ void CLogicRelay::Activate()
 	
 	if ( m_OnSpawn.NumberOfElements() > 0)
 	{
-		SetNextThink( gpGlobals->curtime + 0.01 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01 );
 	}
 }
 

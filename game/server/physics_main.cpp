@@ -7,15 +7,7 @@
 
 
 #include "cbase.h"
-#ifdef _WIN32
-#include "typeinfo"
-// BUGBUG: typeinfo stomps some of the warning settings (in yvals.h)
-#pragma warning(disable:4244)
-#elif POSIX
-#include <typeinfo>
-#else
-#error "need typeinfo defined"
-#endif
+
 
 #include "player.h"
 #include "ai_basenpc.h"
@@ -37,7 +29,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern ConVar think_limit;
 #ifdef _XBOX
 ConVar vprof_think_limit( "vprof_think_limit", "0" );
 #endif
@@ -902,77 +893,7 @@ CBaseEntity *CPhysicsPushedEntities::PerformLinearPush( CBaseEntity *pRoot, floa
 //
 //-----------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
-// Purpose: Called when it's time for a physically moved objects (plats, doors, etc)
-//			to run it's game code.
-//			All other entity thinking is done during worldspawn's think
-//-----------------------------------------------------------------------------
-void CBaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
-{
-	VPROF_ENTER_SCOPE( ( !vprof_scope_entity_thinks.GetBool() ) ? 
-						"CBaseEntity::PhysicsDispatchThink" : 
-						EntityFactoryDictionary()->GetCannonicalName( GetClassname() ) );
 
-	float thinkLimit = think_limit.GetFloat();
-	
-	// The thinkLimit stuff makes a LOT of calls to Sys_FloatTime, which winds up calling into
-	// VCR mode so much that the framerate becomes unusable.
-	if ( VCRGetMode() != VCR_Disabled )
-		thinkLimit = 0;
-
-	float startTime = 0.0;
-
-	if ( IsDormant() )
-	{
-		Warning( "Dormant entity %s (%s) is thinking!!\n", GetClassname(), GetDebugName() );
-		Assert(0);
-	}
-
-	if ( thinkLimit )
-	{
-		startTime = engine->Time();
-	}
-	
-	if ( thinkFunc )
-	{
-		MDLCACHE_CRITICAL_SECTION();
-		(this->*thinkFunc)();
-	}
-
-	if ( thinkLimit )
-	{
-		// calculate running time of the AI in milliseconds
-		float time = ( engine->Time() - startTime ) * 1000.0f;
-		if ( time > thinkLimit )
-		{
-#if defined( _XBOX ) && !defined( _RETAIL )
-			if ( vprof_think_limit.GetBool() )
-			{
-				extern bool g_VProfSignalSpike;
-				g_VProfSignalSpike = true;
-			}
-#endif
-			// If its an NPC print out the shedule/task that took so long
-			CAI_BaseNPC *pNPC = MyNPCPointer();
-			if (pNPC && pNPC->GetCurSchedule())
-			{
-				pNPC->ReportOverThinkLimit( time );
-			}
-			else
-			{
-#ifdef _WIN32
-				Msg( "%s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(this).raw_name(), time );
-#elif POSIX
-				Msg( "%s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(this).name(), time );
-#else
-#error "typeinfo"
-#endif
-			}
-		}
-	}
-
-	VPROF_EXIT_SCOPE();
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Does not change the entities velocity at all
@@ -1443,7 +1364,7 @@ void CBaseEntity::PhysicsPusher( void )
 	VPROF("CBaseEntity::PhysicsPusher");
 
 	// regular thinking
-	if ( !PhysicsRunThink() )
+	if ( !GetEngineObject()->PhysicsRunThink() )
 		return;
 
 	m_flVPhysicsUpdateLocalTime = m_flLocalTime;
@@ -1467,7 +1388,7 @@ void CBaseEntity::PhysicsNone( void )
 	VPROF("CBaseEntity::PhysicsNone");
 
 	// regular thinking
-	PhysicsRunThink();
+	GetEngineObject()->PhysicsRunThink();
 }
 
 
@@ -1479,7 +1400,7 @@ void CBaseEntity::PhysicsNoclip( void )
 	VPROF("CBaseEntity::PhysicsNoclip");
 
 	// regular thinking
-	if ( !PhysicsRunThink() )
+	if ( !GetEngineObject()->PhysicsRunThink() )
 	{
 		return;
 	}
@@ -1509,7 +1430,7 @@ void CBaseEntity::PhysicsCustom()
 	PhysicsCheckWater();
 
 	// regular thinking
-	if ( !PhysicsRunThink() )
+	if ( !GetEngineObject()->PhysicsRunThink() )
 		return;
 
 	// Moving upward, off the ground, or  resting on a client/monster, remove FL_ONGROUND
@@ -1605,7 +1526,7 @@ void CBaseEntity::StepSimulationThink( float dt )
 		PhysicsStepRunTimestep( dt );
 
 		// Just call the think function directly
-		PhysicsRunThink( THINK_FIRE_BASE_ONLY );
+		GetEngineObject()->PhysicsRunThink( THINK_FIRE_BASE_ONLY );
 	}
 	else
 	{
@@ -1631,7 +1552,7 @@ void CBaseEntity::StepSimulationThink( float dt )
 		PhysicsStepRunTimestep( dt );
 
 		// Call the actual think function...
-		PhysicsRunThink( THINK_FIRE_BASE_ONLY );
+		GetEngineObject()->PhysicsRunThink( THINK_FIRE_BASE_ONLY );
 
 		// do any local processing that's needed
 		if (GetBaseAnimating() != NULL)
@@ -1645,7 +1566,7 @@ void CBaseEntity::StepSimulationThink( float dt )
 		AngleQuaternion( stepAngles, step->m_Next.qRotation );
 		// Also store of non-Quaternion version for simple comparisons
 		step->m_angNextRotation = GetStepAngles();
-		step->m_Next.nTickCount = GetNextThinkTick();
+		step->m_Next.nTickCount = GetEngineObject()->GetNextThinkTick();
 
 		// Hack:  Add a tick if we are simulating every other tick
 		if ( CBaseEntity::IsSimulatingOnAlternateTicks() )
@@ -1695,9 +1616,9 @@ void CBaseEntity::PhysicsStep()
 	SetSimulationTime( gpGlobals->curtime );
 	
 	// Run all but the base think function
-	PhysicsRunThink( THINK_FIRE_ALL_BUT_BASE );
+	GetEngineObject()->PhysicsRunThink( THINK_FIRE_ALL_BUT_BASE );
 
-	int thinktick = GetNextThinkTick();
+	int thinktick = GetEngineObject()->GetNextThinkTick();
 	float thinktime = thinktick * TICK_INTERVAL;
 
 	// Is the next think too far out, or non-existent?
@@ -1712,7 +1633,7 @@ void CBaseEntity::PhysicsStep()
 	{
 		PhysicsStepRunTimestep( gpGlobals->frametime );
 		PhysicsCheckWaterTransition();
-		SetLastThink( -1, gpGlobals->curtime );
+		GetEngineObject()->SetLastThinkTick( TIME_TO_TICKS(gpGlobals->curtime) );
 		UpdatePhysicsShadowToCurrentPosition(gpGlobals->frametime);
 		PhysicsRelinkChildren(gpGlobals->frametime);
 		return;
@@ -1773,7 +1694,7 @@ void CBaseEntity::PhysicsStep()
 	}
 
 	// simulate over the timestep
-	float dt = thinktime - GetLastThink();
+	float dt = thinktime - GetEngineObject()->GetLastThink();
 
 	// Now run step simulator
 	StepSimulationThink( dt );
@@ -2011,7 +1932,7 @@ void Physics_SimulateEntity( CBaseEntity *pEntity )
 	}
 	else
 	{
-		pEntity->PhysicsRunThink();
+		pEntity->GetEngineObject()->PhysicsRunThink();
 	}
 }
 //-----------------------------------------------------------------------------

@@ -16,6 +16,7 @@
 #include "iclientnetworkable.h"
 #include "iclientthinkable.h"
 #include "client_class.h"
+#include "isaverestore.h"
 
 struct Ray_t;
 class CGameTrace;
@@ -64,6 +65,19 @@ struct clientgroundlink_t
 	CBaseHandle			entity;
 	clientgroundlink_t* nextLink;
 	clientgroundlink_t* prevLink;
+};
+
+typedef void (C_BaseEntity::* CBASEPTR)(void);
+
+//-----------------------------------------------------------------------------
+// Purpose: think contexts
+//-----------------------------------------------------------------------------
+struct clientthinkfunc_t
+{
+	CBASEPTR	m_pfnThink;
+	string_t	m_iszContext;
+	int			m_nNextThinkTick;
+	int			m_nLastThinkTick;
 };
 
 class IEngineObjectClient : public IEngineObject {
@@ -341,6 +355,22 @@ public:
 	virtual void SetFriction(float flFriction) = 0;
 	virtual float GetElasticity(void) const = 0;
 
+	virtual CBASEPTR GetPfnThink() = 0;
+	virtual void SetPfnThink(CBASEPTR pfnThink) = 0;
+	virtual int GetIndexForThinkContext(const char* pszContext) = 0;
+	virtual int RegisterThinkContext(const char* szContext) = 0;
+	virtual CBASEPTR ThinkSet(CBASEPTR func, float flNextThinkTime = 0, const char* szContext = NULL) = 0;
+	virtual void SetNextThink(float nextThinkTime, const char* szContext = NULL) = 0;
+	virtual float GetNextThink(const char* szContext = NULL) = 0;
+	virtual int GetNextThinkTick(const char* szContext = NULL) = 0;
+	virtual float GetLastThink(const char* szContext = NULL) = 0;
+	virtual int GetLastThinkTick(const char* szContext = NULL) = 0;
+	virtual void SetLastThinkTick(int iThinkTick) = 0;
+	virtual bool WillThink() = 0;
+	virtual int GetFirstThinkTick() = 0;	// get first tick thinking on any context
+	virtual bool PhysicsRunThink(thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS) = 0;
+	virtual bool PhysicsRunSpecificThink(int nContextIndex, CBASEPTR thinkFunc) = 0;
+
 };
 
 //-----------------------------------------------------------------------------
@@ -371,5 +401,52 @@ public:
 	virtual IClientUnknown* GetIClientUnknown() { return this; }
 };
 
+//-----------------------------------------------------------------------------
+// Purpose: Exposes IClientEntity's to engine
+//-----------------------------------------------------------------------------
+abstract_class IClientEntityList : public IEntityList, public ISaveRestoreBlockHandler
+{
+public:
+
+	virtual const char* GetBlockName() = 0;
+
+	virtual void			PreSave(CSaveRestoreData* pSaveData) = 0;
+	virtual void			Save(ISave* pSave) = 0;
+	virtual void			WriteSaveHeaders(ISave* pSave) = 0;
+	virtual void			PostSave() = 0;
+
+	virtual void			PreRestore() = 0;
+	virtual void			ReadRestoreHeaders(IRestore* pRestore) = 0;
+	virtual void			Restore(IRestore* pRestore, bool createPlayers) = 0;
+	virtual void			PostRestore() = 0;
+
+	virtual IClientEntity* CreateEntityByName(const char* className, int iForceEdictIndex = -1, int iSerialNum = -1) = 0;
+	virtual void				DestroyEntity(IHandleEntity* pEntity) = 0;
+
+	// Get IClientNetworkable interface for specified entity
+	virtual IEngineObjectClient* GetEngineObject(int entnum) = 0;
+	virtual IClientNetworkable* GetClientNetworkable(int entnum) = 0;
+	virtual IClientNetworkable* GetClientNetworkableFromHandle(CBaseHandle hEnt) = 0;
+	virtual IClientUnknown* GetClientUnknownFromHandle(CBaseHandle hEnt) = 0;
+
+	// NOTE: This function is only a convenience wrapper.
+	// It returns GetClientNetworkable( entnum )->GetIClientEntity().
+	virtual IClientEntity* GetClientEntity(int entnum) = 0;
+	virtual IClientEntity* GetClientEntityFromHandle(CBaseHandle hEnt) = 0;
+
+	// Returns number of entities currently in use
+	virtual int					NumberOfEntities(bool bIncludeNonNetworkable) = 0;
+
+	// Returns highest index actually used
+	virtual int					GetHighestEntityIndex(void) = 0;
+
+	// Sizes entity list to specified size
+	virtual void				SetMaxEntities(int maxents) = 0;
+	virtual int					GetMaxEntities() = 0;
+};
+
+extern IClientEntityList* entitylist;
+
+#define VCLIENTENTITYLIST_INTERFACE_VERSION	"VClientEntityList003"
 
 #endif // ICLIENTENTITY_H

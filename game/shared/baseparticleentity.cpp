@@ -88,9 +88,9 @@ void CBaseParticleEntity::FollowEntity(CBaseEntity *pEntity)
 void CBaseParticleEntity::SetLifetime(float lifetime)
 {
 	if(lifetime == -1)
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	else
-		SetNextThink( gpGlobals->curtime + lifetime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + lifetime );
 }
 
 #if defined( CLIENT_DLL )

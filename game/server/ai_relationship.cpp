@@ -194,7 +194,7 @@ void CAI_Relationship::ApplyRelationship( CBaseEntity *pActivator, CBaseEntity *
 	if ( AI_IsSinglePlayer() && !UTIL_GetLocalPlayer() )
 	{
 		SetThink( &CAI_Relationship::ApplyRelationshipThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 
 	if ( !m_bIsActive )

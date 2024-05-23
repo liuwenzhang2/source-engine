@@ -155,7 +155,7 @@ void CRpgRocket::Spawn( void )
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	SetThink( &CRpgRocket::IgniteThink );
 	
-	SetNextThink( gpGlobals->curtime + 0.4f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.4f );
 
 	QAngle angAngs;
 	Vector vecFwd;
@@ -212,7 +212,7 @@ void CRpgRocket::IgniteThink( void )
 	}
 
 	SetThink( &CRpgRocket::SeekThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	CBroadcastRecipientFilter filter;
 	TE_BeamFollow( filter, 0.0,
@@ -320,7 +320,7 @@ void CRpgRocket::SeekThink( void )
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void CRpgRocket::Detonate( void )

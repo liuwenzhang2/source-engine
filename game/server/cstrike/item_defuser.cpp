@@ -40,7 +40,7 @@ void CItemDefuser::Spawn( void )
 	SetModel( "models/weapons/w_defuser.mdl" );
 	BaseClass::Spawn();
 
-	SetNextThink( gpGlobals->curtime + 0.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 	SetThink( &CItemDefuser::ActivateThink );
 
 	SetTouch( NULL );

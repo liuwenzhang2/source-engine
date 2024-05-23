@@ -181,7 +181,7 @@ void CEnvLaser::TurnOff( void )
 	if ( m_pSprite )
 		m_pSprite->TurnOff();
 
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	SetThink( NULL );
 }
 
@@ -244,7 +244,7 @@ void CEnvLaser::StrikeThink( void )
 
 	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), vecFireAt, MASK_SOLID, NULL, COLLISION_GROUP_NONE, &tr );
 	FireAtPoint( tr );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 

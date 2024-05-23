@@ -271,7 +271,7 @@ bool CNPC_Scientist::ShouldGib( const CTakeDamageInfo &info )
 void CNPC_Scientist::SUB_StartLVFadeOut( float delay, bool notSolid )
 {
 	SetThink( &CNPC_Scientist::SUB_LVFadeOut );
-	SetNextThink( gpGlobals->curtime + delay );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + delay );
 	SetRenderColorA( 255 );
 	m_nRenderMode = kRenderNormal;
 
@@ -289,7 +289,7 @@ void CNPC_Scientist::SUB_LVFadeOut( void  )
 		if( VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD || GetEngineObject()->GetEFlags() & EFL_IS_BEING_LIFTED_BY_BARNACLE )
 		{
 			// Try again in a few seconds.
-			SetNextThink( gpGlobals->curtime + 5 );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 5 );
 			SetRenderColorA( 255 );
 			return;
 		}
@@ -311,7 +311,7 @@ void CNPC_Scientist::SUB_LVFadeOut( void  )
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -1022,7 +1022,7 @@ void CNPC_SittingScientist::Spawn( )
 	NPCInit();
 
 	SetThink (&CNPC_SittingScientist::SittingThink);
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	m_baseSequence = LookupSequence( "sitlookleft" );
 	SetSequence( m_baseSequence + random->RandomInt(0,4) );
@@ -1147,7 +1147,7 @@ void CNPC_SittingScientist::SittingThink( void )
 		SetBoneController( 0, m_iHeadTurn );
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 // prepare sitting scientist to answer a question

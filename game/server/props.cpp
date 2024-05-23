@@ -223,7 +223,7 @@ void CBaseProp::Spawn( void )
 
 	SetMoveType( MOVETYPE_PUSH );
 	m_takedamage = DAMAGE_NO;
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 	m_flAnimTime = gpGlobals->curtime;
 	m_flPlaybackRate = 0.0;
@@ -950,7 +950,7 @@ void CBreakableProp::CopyFadeFrom( CBreakableProp *pSource )
 	m_flFadeScale = pSource->m_flFadeScale;
 	if ( m_flFadeScale != m_flDefaultFadeScale )
 	{
-		float flNextThink = pSource->GetNextThink( s_pFadeScaleThink );
+		float flNextThink = pSource->GetEngineObject()->GetNextThink( s_pFadeScaleThink );
 		if ( flNextThink < gpGlobals->curtime + TICK_INTERVAL )
 		{
 			flNextThink = gpGlobals->curtime + TICK_INTERVAL;
@@ -1006,13 +1006,13 @@ void CBreakableProp::BreakablePropTouch( CBaseEntity *pOther )
 
 		m_hBreaker = pOther;
 
-		if ( m_pfnThink != (void (CBaseEntity::*)())&CBreakableProp::BreakThink )
+		if (GetEngineObject()->GetPfnThink() != (void (CBaseEntity::*)())&CBreakableProp::BreakThink )
 		{
 			SetThink( &CBreakableProp::BreakThink );
 			//SetTouch( NULL );
 		
 			// Add optional delay 
-			SetNextThink( gpGlobals->curtime + m_flPressureDelay );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flPressureDelay );
 		}
 	}
 
@@ -1373,7 +1373,7 @@ void CBreakableProp::AnimateThink( void )
 	{
 		StudioFrameAdvanceManual( 0.1 );
 		DispatchAnimEvents( this );
-		SetNextThink( gpGlobals->curtime + 0.1, s_pPropAnimateThink );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1, s_pPropAnimateThink );
 
 		if ( IsActivityFinished() )
 		{
@@ -1505,7 +1505,7 @@ void CBreakableProp::CreateFlare( float flLifetime )
 		m_hFlareEnt = pFlare;
 
 		SetThink( &CBreakable::SUB_FadeOut );
-		SetNextThink( gpGlobals->curtime + flLifetime + 5.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + flLifetime + 5.0f );
 
 		m_nSkin = 1;
 
@@ -1931,7 +1931,7 @@ void CDynamicProp::Spawn( )
 		{
 			SetThink( &CDynamicProp::AnimThink );
 			m_flNextRandAnim = gpGlobals->curtime + random->RandomFloat( m_flMinRandAnimTime, m_flMaxRandAnimTime );
-			SetNextThink( gpGlobals->curtime + m_flNextRandAnim + 0.1 );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flNextRandAnim + 0.1 );
 		}
 		else
 		{
@@ -2222,7 +2222,7 @@ void CDynamicProp::AnimThink( void )
 			// If I'm a random animator, think again when it's time to change sequence
 			if ( m_bRandomAnimator )
 			{
-				SetNextThink( gpGlobals->curtime + m_flNextRandAnim + 0.1 );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flNextRandAnim + 0.1 );
 			}
 			else 
 			{
@@ -2235,7 +2235,7 @@ void CDynamicProp::AnimThink( void )
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 
 	StudioFrameAdvance();
@@ -2331,8 +2331,8 @@ void CDynamicProp::PropSetSequence( int nSequence )
 	}
 
 	SetThink( &CDynamicProp::AnimThink );
-	if ( GetNextThink() <= gpGlobals->curtime )
-		SetNextThink( gpGlobals->curtime + flInterval );
+	if (GetEngineObject()->GetNextThink() <= gpGlobals->curtime )
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + flInterval );
 }
 
 
@@ -3117,7 +3117,7 @@ void CPhysicsProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 		m_bFirstCollisionAfterLaunch = false;
 
 		// Setup the think function to remove the flags
-		RegisterThinkContext( "PROP_CLEARFLAGS" );
+		GetEngineObject()->RegisterThinkContext( "PROP_CLEARFLAGS" );
 		SetContextThink( &CPhysicsProp::ClearFlagsThink, gpGlobals->curtime, "PROP_CLEARFLAGS" );
 	}
 }
@@ -4211,7 +4211,7 @@ void CBasePropDoor::DoorOpenMoveDone(void)
 
 		if (m_flAutoReturnDelay == -1)
 		{
-			SetNextThink( TICK_NEVER_THINK );
+			GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		}
 	}
 
@@ -4243,7 +4243,7 @@ void CBasePropDoor::DoorAutoCloseThink(void)
 	{
 		if (m_flAutoReturnDelay == -1)
 		{
-			SetNextThink( TICK_NEVER_THINK );
+			GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		}
 		else
 		{
@@ -5846,7 +5846,7 @@ void CPhysicsPropRespawnable::Event_Killed( const CTakeDamageInfo &info )
 	SetContextThink( NULL, 0, "PROP_CLEARFLAGS" );
 
 	SetThink( &CPhysicsPropRespawnable::Materialize );
-	SetNextThink( gpGlobals->curtime + m_flRespawnTime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flRespawnTime );
 }
 
 void CPhysicsPropRespawnable::Materialize( void )
@@ -5857,7 +5857,7 @@ void CPhysicsPropRespawnable::Materialize( void )
 	if ( tr.startsolid || tr.allsolid )
 	{
 		//Try again in a second.
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 		return;
 	}
 

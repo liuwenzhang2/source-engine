@@ -192,7 +192,7 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 	if (GetEngineObject()->GetSpawnFlags() & SF_ENTMAKER_AUTOSPAWN)
 	{
 		SetThink( &CEnvEntityMaker::CheckSpawnThink );
-		SetNextThink( gpGlobals->curtime + 0.5f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 	}
 
 	// If we have a specified post spawn speed, apply it to all spawned entities
@@ -306,7 +306,7 @@ bool CEnvEntityMaker::IsPlayerLooking()
 //-----------------------------------------------------------------------------
 void CEnvEntityMaker::CheckSpawnThink( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 
 	// Do we have an instance?
 	if ( m_hCurrentInstance )

@@ -1042,7 +1042,7 @@ void CBaseDoor::DoorHitTop( void )
 
 		if ( m_flWait == -1 )
 		{
-			SetNextThink( TICK_NEVER_THINK );
+			GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		}
 	}
 

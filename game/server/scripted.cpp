@@ -211,7 +211,7 @@ void CAI_ScriptedSequence::Spawn( void )
 	if ( !GetEntityName() || (GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_START_ON_SPAWN))
 	{
 		StartThink();
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
 		//
 		// If we have a name, wait for a BeginSequence input to play the
@@ -327,7 +327,7 @@ void CAI_ScriptedSequence::InputMoveToPosition( inputdata_t &inputdata )
 		// No, grab the NPC but make them wait until BeginSequence is fired. They'll play
 		// their pre-action idle animation until BeginSequence is fired.
 		StartThink();
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		m_bWaitForBeginSequence = true;
 	}
 }
@@ -388,7 +388,7 @@ void CAI_ScriptedSequence::InputBeginSequence( inputdata_t &inputdata )
 		// The changes here are to track what tick we "awoke" on and get rid of the lag between Wake and
 		// ScriptThink by actually calling ScriptThink directly on the same frame and checking for the
 		//  zombie having woken up and been instructed to play a sequence in the same frame.
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		ScriptThink();
 	}
 
@@ -655,7 +655,7 @@ void CAI_ScriptedSequence::StartScript( void )
 		}
 
 		// UNDONE: Do this to sync up multi-entity scripts?
-		//pTarget->SetNextThink( gpGlobals->curtime );
+		//pTarget->GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 		pTarget->SetGoalEnt( this );
 		pTarget->ForceDecisionThink();
@@ -754,10 +754,10 @@ void CAI_ScriptedSequence::StartScript( void )
 		pTarget->SetIdealState(NPC_STATE_SCRIPT);
 
 		// FIXME: not sure why this is happening, or what to do about truely dormant NPCs
-		if ( pTarget->GetEngineObject()->IsEFlagSet( EFL_NO_THINK_FUNCTION ) && pTarget->GetNextThink() != TICK_NEVER_THINK )
+		if ( pTarget->GetEngineObject()->IsEFlagSet( EFL_NO_THINK_FUNCTION ) && pTarget->GetEngineObject()->GetNextThink() != TICK_NEVER_THINK )
 		{
-			DevWarning( "scripted_sequence %d:%s - restarting dormant entity %d:%s : %.1f:%.1f\n", entindex(), GetDebugName(), pTarget->entindex(), pTarget->GetDebugName(), gpGlobals->curtime, pTarget->GetNextThink() );
-			pTarget->SetNextThink( gpGlobals->curtime );
+			DevWarning( "scripted_sequence %d:%s - restarting dormant entity %d:%s : %.1f:%.1f\n", entindex(), GetDebugName(), pTarget->entindex(), pTarget->GetDebugName(), gpGlobals->curtime, pTarget->GetEngineObject()->GetNextThink() );
+			pTarget->GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		}
 	}
 }
@@ -770,7 +770,7 @@ void CAI_ScriptedSequence::ScriptThink( void )
 {
 	if ( g_pAINetworkManager && !g_pAINetworkManager->IsInitialized() )
 	{
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 	else if (FindEntity())
 	{
@@ -783,7 +783,7 @@ void CAI_ScriptedSequence::ScriptThink( void )
 		DevMsg( 2,  "scripted_sequence %d:\"%s\" can't find NPC \"%s\"\n", entindex(), GetDebugName(), STRING( m_iszEntity ) );
 		// FIXME: just trying again is bad.  This should fire an output instead.
 		// FIXME: Think about puting output triggers in both StartScript() and CancelScript().
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 	}
 }
 
@@ -1038,7 +1038,7 @@ void CAI_ScriptedSequence::PostIdleDone( CAI_BaseNPC *pNPC )
 		if ( !(GetEngineObject()->GetSpawnFlags() & SF_SCRIPT_REPEATABLE))
 		{
 			SetThink( &CAI_ScriptedSequence::SUB_Remove );
-			SetNextThink( gpGlobals->curtime + 0.1f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 			m_bThinking = false;
 			m_bInitiatedSelfDelete = true;
 		}
@@ -1682,7 +1682,7 @@ void CAI_ScriptedSchedule::ScriptThink( void )
 		// FIXME: just trying again is bad.  This should fire an output instead.
 		// FIXME: Think about puting output triggers on success true and sucess false
 		// FIXME: also needs to check the result of StartSchedule(), which can fail and not complain
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 	}
 	else
 	{
@@ -1860,7 +1860,7 @@ void CAI_ScriptedSchedule::InputStartSchedule( inputdata_t &inputdata )
 		// DVS TODO: Is the NPC already playing the script?
 		m_hActivator = inputdata.pActivator;
 		SetThink( &CAI_ScriptedSchedule::ScriptThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 	else
 	{
@@ -2021,7 +2021,7 @@ void CAI_ScriptedSentence::InputBeginSentence( inputdata_t &inputdata )
 
 	//Msg( "Firing sentence: %s\n", STRING( m_iszSentence ));
 	SetThink( &CAI_ScriptedSentence::FindThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -2037,7 +2037,7 @@ void CAI_ScriptedSentence::Spawn( void )
 	if ( !GetEntityName() )
 	{
 		SetThink( &CAI_ScriptedSentence::FindThink );
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 	}
 
 	switch( m_TempAttenuation )
@@ -2091,14 +2091,14 @@ void CAI_ScriptedSentence::FindThink( void )
 		// calculate delay dynamically because this could play a sentence group
 		// rather than a single sentence.
 		// add 0.1 because the sound engine mixes ahead -- the sentence will actually start ~0.1 secs from now
-		SetNextThink( gpGlobals->curtime + delay + m_flRepeat );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + delay + m_flRepeat );
 		m_active = false;
 		//Msg( "%s: found NPC %s\n", STRING(m_iszSentence), STRING(m_iszEntity) );
 	}
 	else
 	{
 		//Msg( "%s: can't find NPC %s\n", STRING(m_iszSentence), STRING(m_iszEntity) );
-		SetNextThink( gpGlobals->curtime + m_flRepeat + 0.5 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flRepeat + 0.5 );
 	}
 }
 
@@ -2110,7 +2110,7 @@ void CAI_ScriptedSentence::DelayThink( void )
 {
 	m_active = true;
 	if ( !GetEntityName() )
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	SetThink( &CAI_ScriptedSentence::FindThink );
 }
 

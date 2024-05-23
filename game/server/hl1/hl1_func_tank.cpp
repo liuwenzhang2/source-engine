@@ -310,7 +310,7 @@ void CFuncTank::InputActivate( inputdata_t &inputdata )
 void CFuncTank::TankActivate(void)
 {
 	GetEngineObject()->AddSpawnFlags(SF_TANK_ACTIVE);
-	SetNextThink( gpGlobals->curtime + 0.1f ); 
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	m_fireLast		= 0;
 }
 
@@ -572,7 +572,7 @@ void CFuncTank::Spawn( void )
 	m_vTargetPosition	= vec3_origin;
 
 	if ( IsActive() )
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
 	UpdateMatrix();
 
@@ -683,7 +683,7 @@ bool CFuncTank::StartControl( CBasePlayer *pController )
 	m_pController->m_Local.m_iHideHUD |= HIDEHUD_WEAPONSELECTION;
 	m_vecControllerUsePos = m_pController->GetEngineObject()->GetLocalOrigin();
 	
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	
 	return TRUE;
 }
@@ -698,11 +698,11 @@ void CFuncTank::StopControl()
 		m_pController->GetActiveWeapon()->Deploy();
 
 	m_pController->m_Local.m_iHideHUD &= ~HIDEHUD_WEAPONSELECTION;
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	m_pController = NULL;
 
 	if ( IsActive() )
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 }
 
 // Called each frame by the player's ItemPostFrame
@@ -855,13 +855,13 @@ void CFuncTank::TrackTarget( void )
 	{
 		// Tanks attempt to mirror the player's angles
 		angles = m_pController->EyeAngles();
-		SetNextThink( gpGlobals->curtime + 0.05 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 	}
 	else
 	{
 		if ( IsActive() )
 		{
-			SetNextThink( gpGlobals->curtime + 0.1f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		}
 		else
 		{
@@ -893,13 +893,13 @@ void CFuncTank::TrackTarget( void )
 
 				if ( m_hTarget != NULL )
 				{
-					SetNextThink( gpGlobals->curtime );	// Think again immediately
+					GetEngineObject()->SetNextThink( gpGlobals->curtime );	// Think again immediately
 				}
 				else
 				{
 					if ( IsActive() )
 					{
-						SetNextThink( gpGlobals->curtime + 2 );	// Wait 2 secs
+						GetEngineObject()->SetNextThink( gpGlobals->curtime + 2 );	// Wait 2 secs
 					}
 
 					if ( m_fireLast !=0 )
@@ -1442,7 +1442,7 @@ void CFuncTankLaser::Fire( int bulletCount, const Vector &barrelEnd, const Vecto
 			m_pLaser->TurnOn();
 			m_pLaser->SetFireTime( gpGlobals->curtime - 1.0 );
 			m_pLaser->FireAtPoint( tr );
-			m_pLaser->SetNextThink( TICK_NEVER_THINK );
+			m_pLaser->GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		}
 		CFuncTank::Fire( bulletCount, barrelEnd, forward, this );
 	}

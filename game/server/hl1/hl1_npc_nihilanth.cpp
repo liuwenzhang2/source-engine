@@ -316,7 +316,7 @@ void CNPC_Nihilanth::Spawn( void )
 	InitBoneControllers();
 
 	SetThink( &CNPC_Nihilanth::StartupThink );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	m_vecDesired = Vector( 1, 0, 0 );
 	m_posDesired = Vector(GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, 512 );
@@ -467,7 +467,7 @@ bool CNPC_Nihilanth::EmitSphere( void )
 void CNPC_Nihilanth::NullThink( void )
 {
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.5 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 }
 
 void CNPC_Nihilanth::StartupThink( void )
@@ -502,7 +502,7 @@ void CNPC_Nihilanth::StartupThink( void )
 	SetUse( NULL );
 	SetThink( &CNPC_Nihilanth::HuntThink);
 	
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 void CNPC_Nihilanth::InputTurnBabyOn( inputdata_t &inputdata )
@@ -539,7 +539,7 @@ bool CNPC_Nihilanth::AbsorbSphere( void )
 
 void CNPC_Nihilanth::HuntThink( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	DispatchAnimEvents( this );
 	StudioFrameAdvance( );
 
@@ -986,7 +986,7 @@ void CNPC_Nihilanth::FloatSequence( void )
 
 void CNPC_Nihilanth::DyingThink( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	DispatchAnimEvents( this );
 	StudioFrameAdvance( );
 
@@ -1302,7 +1302,7 @@ void CNihilanthHVR::CircleInit( CBaseEntity *pTarget )
 
 	SetThink( &CNihilanthHVR::HoverThink );
 	SetTouch( &CNihilanthHVR::BounceTouch );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	CSprite *pSprite = SpriteInit( "sprites/muzzleflash3.vmt", this );
 	
@@ -1334,7 +1334,7 @@ CSprite *CNihilanthHVR::SpriteInit( const char *pSpriteName, CNihilanthHVR *pOwn
 
 void CNihilanthHVR::HoverThink( void  )
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if ( GetTarget() != NULL )
 	{
@@ -1454,7 +1454,7 @@ void CNihilanthHVR::ZapInit( CBaseEntity *pEnemy )
 	SetEnemy( pEnemy );
 	SetThink( &CNihilanthHVR::ZapThink );
 	SetTouch( &CNihilanthHVR::ZapTouch );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	CPASAttenuationFilter filter( this );
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NihilanthHVR.Zap" );
@@ -1462,7 +1462,7 @@ void CNihilanthHVR::ZapInit( CBaseEntity *pEnemy )
 
 void CNihilanthHVR::ZapThink( void  )
 {
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 
 	// check world boundaries
 	if ( GetEnemy() == NULL || GetEngineObject()->GetAbsOrigin().x < -4096 || GetEngineObject()->GetAbsOrigin().x > 4096 || GetEngineObject()->GetAbsOrigin().y < -4096 || GetEngineObject()->GetAbsOrigin().y > 4096 || GetEngineObject()->GetAbsOrigin().z < -4096 || GetEngineObject()->GetAbsOrigin().z > 4096)
@@ -1512,8 +1512,8 @@ void CNihilanthHVR::ZapThink( void  )
 		SetTouch( NULL );
 		GetSprite()->SetThink( &CBaseEntity::SUB_Remove );
 		SetThink( &CBaseEntity::SUB_Remove );
-		SetNextThink( gpGlobals->curtime + 0.2 );
-		GetSprite()->SetNextThink( gpGlobals->curtime + 0.2 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
+		GetSprite()->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 		return;
 	}
 
@@ -1532,7 +1532,7 @@ void CNihilanthHVR::ZapTouch( CBaseEntity *pOther )
 	SetTouch( NULL );
 	UTIL_Remove( GetSprite() );
 	UTIL_Remove( this );
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 }
 
 void CNihilanthHVR::AbsorbInit( void  )
@@ -1560,7 +1560,7 @@ void CNihilanthHVR::DissipateThink( void  )
 {
 	CSprite *pSprite = (CSprite*)GetSprite();
 
-	SetNextThink ( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink ( gpGlobals->curtime + 0.1 );
 
 	if ( m_flBallScale > 5.0)
 	{
@@ -1624,7 +1624,7 @@ void CNihilanthHVR::TeleportInit( CNPC_Nihilanth *pOwner, CBaseEntity *pEnemy, C
 
 	SetThink( &CNihilanthHVR::TeleportThink );
 	SetTouch( &CNihilanthHVR::TeleportTouch );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	CPASAttenuationFilter filter( this );
 	g_pSoundEmitterSystem->EmitSound( filter, entindex(), "NihilanthHVR.TeleAttack" );
@@ -1655,7 +1655,7 @@ void CNihilanthHVR::MovetoTarget( Vector vecTarget )
 
 void CNihilanthHVR::TeleportThink( void  )
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	// check world boundaries
 	if ( GetEnemy() == NULL || !GetEnemy()->IsAlive() || GetEngineObject()->GetAbsOrigin().x < -4096 || GetEngineObject()->GetAbsOrigin().x > 4096 || GetEngineObject()->GetAbsOrigin().y < -4096 || GetEngineObject()->GetAbsOrigin().y > 4096 || GetEngineObject()->GetAbsOrigin().z < -4096 || GetEngineObject()->GetAbsOrigin().z > 4096)

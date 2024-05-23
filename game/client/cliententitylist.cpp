@@ -44,6 +44,7 @@ void cc_cl_interp_all_changed(IConVar* pConVar, const char* pOldString, float fl
 
 static ConVar  cl_interp_all("cl_interp_all", "0", 0, "Disable interpolation list optimizations.", 0, 0, 0, 0, cc_cl_interp_all_changed);
 extern ConVar	cl_showerror;
+extern ConVar think_limit;
 
 // Create interface
 static CClientEntityList<C_BaseEntity> s_EntityList;
@@ -223,6 +224,7 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_PRED_FIELD(m_fEffects, FIELD_INTEGER, FTYPEDESC_INSENDTABLE | FTYPEDESC_OVERRIDE),
 	DEFINE_FIELD(m_flGravity, FIELD_FLOAT),
 	DEFINE_PRED_FIELD(m_flFriction, FIELD_FLOAT, FTYPEDESC_INSENDTABLE),
+	DEFINE_PRED_FIELD(m_nNextThinkTick, FIELD_INTEGER, FTYPEDESC_INSENDTABLE),
 END_PREDICTION_DATA()
 
 BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
@@ -307,6 +309,7 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO(m_fEffects), 0, RecvProxy_EffectFlags),
 	RecvPropFloat(RECVINFO(m_flFriction)),
 	RecvPropFloat(RECVINFO(m_flElasticity)),
+	RecvPropInt(RECVINFO(m_nNextThinkTick)),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -2894,6 +2897,506 @@ void C_EngineObjectInternal::AddEffects(int nEffects)
 		m_pOuter->UpdateVisibility();
 	}
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int	C_EngineObjectInternal::GetIndexForThinkContext(const char* pszContext)
+{
+	for (int i = 0; i < m_aThinkFunctions.Size(); i++)
+	{
+		if (!Q_strncmp(STRING(m_aThinkFunctions[i].m_iszContext), pszContext, MAX_CONTEXT_LENGTH))
+			return i;
+	}
+
+	return NO_THINK_CONTEXT;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Get a fresh think context for this entity
+//-----------------------------------------------------------------------------
+int C_EngineObjectInternal::RegisterThinkContext(const char* szContext)
+{
+	int iIndex = GetIndexForThinkContext(szContext);
+	if (iIndex != NO_THINK_CONTEXT)
+		return iIndex;
+
+	typedef clientthinkfunc_t thinkfunc_t;
+
+	// Make a new think func
+	thinkfunc_t sNewFunc;
+	Q_memset(&sNewFunc, 0, sizeof(sNewFunc));
+	sNewFunc.m_pfnThink = NULL;
+	sNewFunc.m_nNextThinkTick = 0;
+	sNewFunc.m_iszContext = AllocPooledString(szContext);
+
+	// Insert it into our list
+	return m_aThinkFunctions.AddToTail(sNewFunc);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CBASEPTR C_EngineObjectInternal::ThinkSet(CBASEPTR func, float thinkTime, const char* szContext)
+{
+#if !defined( CLIENT_DLL )
+#ifdef _DEBUG
+#ifdef PLATFORM_64BITS
+#ifdef GNUC
+	COMPILE_TIME_ASSERT(sizeof(func) == 16);
+#else
+	COMPILE_TIME_ASSERT(sizeof(func) == 8);
+#endif
+#else
+#ifdef GNUC
+	COMPILE_TIME_ASSERT(sizeof(func) == 8);
+#else
+	COMPILE_TIME_ASSERT(sizeof(func) == 4);
+#endif
+#endif
+#endif
+#endif
+
+	// Old system?
+	if (!szContext)
+	{
+		m_pfnThink = func;
+#if !defined( CLIENT_DLL )
+#ifdef _DEBUG
+		FunctionCheck(*(reinterpret_cast<void**>(&m_pfnThink)), "BaseThinkFunc");
+#endif
+#endif
+		return m_pfnThink;
+	}
+
+	// Find the think function in our list, and if we couldn't find it, register it
+	int iIndex = GetIndexForThinkContext(szContext);
+	if (iIndex == NO_THINK_CONTEXT)
+	{
+		iIndex = RegisterThinkContext(szContext);
+	}
+
+	m_aThinkFunctions[iIndex].m_pfnThink = func;
+#if !defined( CLIENT_DLL )
+#ifdef _DEBUG
+	FunctionCheck(*(reinterpret_cast<void**>(&m_aThinkFunctions[iIndex].m_pfnThink)), szContext);
+#endif
+#endif
+
+	if (thinkTime != 0)
+	{
+		int thinkTick = (thinkTime == TICK_NEVER_THINK) ? TICK_NEVER_THINK : TIME_TO_TICKS(thinkTime);
+		m_aThinkFunctions[iIndex].m_nNextThinkTick = thinkTick;
+		CheckHasThinkFunction(thinkTick == TICK_NEVER_THINK ? false : true);
+	}
+	return func;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetNextThink(float thinkTime, const char* szContext)
+{
+	int thinkTick = (thinkTime == TICK_NEVER_THINK) ? TICK_NEVER_THINK : TIME_TO_TICKS(thinkTime);
+
+	// Are we currently in a think function with a context?
+	int iIndex = 0;
+	if (!szContext)
+	{
+#ifdef _DEBUG
+		if (m_iCurrentThinkContext != NO_THINK_CONTEXT)
+		{
+			Msg("Warning: Setting base think function within think context %s\n", STRING(m_aThinkFunctions[m_iCurrentThinkContext].m_iszContext));
+		}
+#endif
+
+		// Old system
+		m_nNextThinkTick = thinkTick;
+		CheckHasThinkFunction(thinkTick == TICK_NEVER_THINK ? false : true);
+		return;
+	}
+	else
+	{
+		// Find the think function in our list, and if we couldn't find it, register it
+		iIndex = GetIndexForThinkContext(szContext);
+		if (iIndex == NO_THINK_CONTEXT)
+		{
+			iIndex = RegisterThinkContext(szContext);
+		}
+	}
+
+	// Old system
+	m_aThinkFunctions[iIndex].m_nNextThinkTick = thinkTick;
+	CheckHasThinkFunction(thinkTick == TICK_NEVER_THINK ? false : true);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+float C_EngineObjectInternal::GetNextThink(const char* szContext)
+{
+	// Are we currently in a think function with a context?
+	int iIndex = 0;
+	if (!szContext)
+	{
+#ifdef _DEBUG
+		if (m_iCurrentThinkContext != NO_THINK_CONTEXT)
+		{
+			Msg("Warning: Getting base nextthink time within think context %s\n", STRING(m_aThinkFunctions[m_iCurrentThinkContext].m_iszContext));
+		}
+#endif
+
+		if (m_nNextThinkTick == TICK_NEVER_THINK)
+			return TICK_NEVER_THINK;
+
+		// Old system
+		return TICK_INTERVAL * (m_nNextThinkTick);
+	}
+	else
+	{
+		// Find the think function in our list
+		iIndex = GetIndexForThinkContext(szContext);
+	}
+
+	if (iIndex == m_aThinkFunctions.InvalidIndex())
+		return TICK_NEVER_THINK;
+
+	if (m_aThinkFunctions[iIndex].m_nNextThinkTick == TICK_NEVER_THINK)
+	{
+		return TICK_NEVER_THINK;
+	}
+	return TICK_INTERVAL * (m_aThinkFunctions[iIndex].m_nNextThinkTick);
+}
+
+int	C_EngineObjectInternal::GetNextThinkTick(const char* szContext /*= NULL*/)
+{
+	// Are we currently in a think function with a context?
+	int iIndex = 0;
+	if (!szContext)
+	{
+#ifdef _DEBUG
+		if (m_iCurrentThinkContext != NO_THINK_CONTEXT)
+		{
+			Msg("Warning: Getting base nextthink time within think context %s\n", STRING(m_aThinkFunctions[m_iCurrentThinkContext].m_iszContext));
+		}
+#endif
+
+		if (m_nNextThinkTick == TICK_NEVER_THINK)
+			return TICK_NEVER_THINK;
+
+		// Old system
+		return m_nNextThinkTick;
+	}
+	else
+	{
+		// Find the think function in our list
+		iIndex = GetIndexForThinkContext(szContext);
+
+		// Looking up an invalid think context!
+		Assert(iIndex != -1);
+	}
+
+	if ((iIndex == -1) || (m_aThinkFunctions[iIndex].m_nNextThinkTick == TICK_NEVER_THINK))
+	{
+		return TICK_NEVER_THINK;
+	}
+
+	return m_aThinkFunctions[iIndex].m_nNextThinkTick;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+float C_EngineObjectInternal::GetLastThink(const char* szContext)
+{
+	// Are we currently in a think function with a context?
+	int iIndex = 0;
+	if (!szContext)
+	{
+#ifdef _DEBUG
+		if (m_iCurrentThinkContext != NO_THINK_CONTEXT)
+		{
+			Msg("Warning: Getting base lastthink time within think context %s\n", STRING(m_aThinkFunctions[m_iCurrentThinkContext].m_iszContext));
+		}
+#endif
+		// Old system
+		return m_nLastThinkTick * TICK_INTERVAL;
+	}
+	else
+	{
+		// Find the think function in our list
+		iIndex = GetIndexForThinkContext(szContext);
+	}
+
+	return m_aThinkFunctions[iIndex].m_nLastThinkTick * TICK_INTERVAL;
+}
+
+int C_EngineObjectInternal::GetLastThinkTick(const char* szContext /*= NULL*/)
+{
+	// Are we currently in a think function with a context?
+	int iIndex = 0;
+	if (!szContext)
+	{
+#ifdef _DEBUG
+		if (m_iCurrentThinkContext != NO_THINK_CONTEXT)
+		{
+			Msg("Warning: Getting base lastthink time within think context %s\n", STRING(m_aThinkFunctions[m_iCurrentThinkContext].m_iszContext));
+		}
+#endif
+		// Old system
+		return m_nLastThinkTick;
+	}
+	else
+	{
+		// Find the think function in our list
+		iIndex = GetIndexForThinkContext(szContext);
+	}
+
+	return m_aThinkFunctions[iIndex].m_nLastThinkTick;
+}
+
+void C_EngineObjectInternal::SetLastThinkTick(int iThinkTick)
+{
+	m_nLastThinkTick = iThinkTick;
+}
+
+bool C_EngineObjectInternal::WillThink()
+{
+	if (m_nNextThinkTick > 0)
+		return true;
+
+	for (int i = 0; i < m_aThinkFunctions.Count(); i++)
+	{
+		if (m_aThinkFunctions[i].m_nNextThinkTick > 0)
+			return true;
+	}
+
+	return false;
+}
+
+// returns the first tick the entity will run any think function
+// returns TICK_NEVER_THINK if no think functions are scheduled
+int C_EngineObjectInternal::GetFirstThinkTick()
+{
+	int minTick = TICK_NEVER_THINK;
+	if (m_nNextThinkTick > 0)
+	{
+		minTick = m_nNextThinkTick;
+	}
+
+	for (int i = 0; i < m_aThinkFunctions.Count(); i++)
+	{
+		int next = m_aThinkFunctions[i].m_nNextThinkTick;
+		if (next > 0)
+		{
+			if (next < minTick || minTick == TICK_NEVER_THINK)
+			{
+				minTick = next;
+			}
+		}
+	}
+	return minTick;
+}
+
+//-----------------------------------------------------------------------------
+// Sets/Gets the next think based on context index
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetNextThink(int nContextIndex, float thinkTime)
+{
+	int thinkTick = (thinkTime == TICK_NEVER_THINK) ? TICK_NEVER_THINK : TIME_TO_TICKS(thinkTime);
+
+	if (nContextIndex < 0)
+	{
+		SetNextThink(thinkTime);
+	}
+	else
+	{
+		m_aThinkFunctions[nContextIndex].m_nNextThinkTick = thinkTick;
+	}
+	CheckHasThinkFunction(thinkTick == TICK_NEVER_THINK ? false : true);
+}
+
+void C_EngineObjectInternal::SetLastThink(int nContextIndex, float thinkTime)
+{
+	int thinkTick = (thinkTime == TICK_NEVER_THINK) ? TICK_NEVER_THINK : TIME_TO_TICKS(thinkTime);
+
+	if (nContextIndex < 0)
+	{
+		m_nLastThinkTick = thinkTick;
+	}
+	else
+	{
+		m_aThinkFunctions[nContextIndex].m_nLastThinkTick = thinkTick;
+	}
+}
+
+float C_EngineObjectInternal::GetNextThink(int nContextIndex) const
+{
+	if (nContextIndex < 0)
+		return m_nNextThinkTick * TICK_INTERVAL;
+
+	return m_aThinkFunctions[nContextIndex].m_nNextThinkTick * TICK_INTERVAL;
+}
+
+int	C_EngineObjectInternal::GetNextThinkTick(int nContextIndex) const
+{
+	if (nContextIndex < 0)
+		return m_nNextThinkTick;
+
+	return m_aThinkFunctions[nContextIndex].m_nNextThinkTick;
+}
+
+// NOTE: pass in the isThinking hint so we have to search the think functions less
+void C_EngineObjectInternal::CheckHasThinkFunction(bool isThinking)
+{
+	if (IsEFlagSet(EFL_NO_THINK_FUNCTION) && isThinking)
+	{
+		RemoveEFlags(EFL_NO_THINK_FUNCTION);
+	}
+	else if (!isThinking && !IsEFlagSet(EFL_NO_THINK_FUNCTION) && !WillThink())
+	{
+		AddEFlags(EFL_NO_THINK_FUNCTION);
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Runs thinking code if time.  There is some play in the exact time the think
+//  function will be called, because it is called before any movement is done
+//  in a frame.  Not used for pushmove objects, because they must be exact.
+//  Returns false if the entity removed itself.
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::PhysicsRunThink(thinkmethods_t thinkMethod)
+{
+	if (IsEFlagSet(EFL_NO_THINK_FUNCTION))
+		return true;
+
+	bool bAlive = true;
+
+	// Don't fire the base if we're avoiding it
+	if (thinkMethod != THINK_FIRE_ALL_BUT_BASE)
+	{
+		bAlive = PhysicsRunSpecificThink(-1, &CBaseEntity::Think);
+		if (!bAlive)
+			return false;
+	}
+
+	// Are we just firing the base think?
+	if (thinkMethod == THINK_FIRE_BASE_ONLY)
+		return bAlive;
+
+	// Fire the rest of 'em
+	for (int i = 0; i < m_aThinkFunctions.Count(); i++)
+	{
+#ifdef _DEBUG
+		// Set the context
+		m_iCurrentThinkContext = i;
+#endif
+
+		bAlive = PhysicsRunSpecificThink(i, m_aThinkFunctions[i].m_pfnThink);
+
+#ifdef _DEBUG
+		// Clear our context
+		m_iCurrentThinkContext = NO_THINK_CONTEXT;
+#endif
+
+		if (!bAlive)
+			return false;
+	}
+
+	return bAlive;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool C_EngineObjectInternal::PhysicsRunSpecificThink(int nContextIndex, CBASEPTR thinkFunc)
+{
+	int thinktick = GetNextThinkTick(nContextIndex);
+
+	if (thinktick <= 0 || thinktick > gpGlobals->tickcount)
+		return true;
+
+	float thinktime = thinktick * TICK_INTERVAL;
+
+	// Don't let things stay in the past.
+	//  it is possible to start that way
+	//  by a trigger with a local time.
+	if (thinktime < gpGlobals->curtime)
+	{
+		thinktime = gpGlobals->curtime;
+	}
+
+	// Only do this on the game server
+#if !defined( CLIENT_DLL )
+	g_ThinkChecker.EntityThinking(gpGlobals->tickcount, this, thinktime, m_nNextThinkTick);
+#endif
+
+	SetNextThink(nContextIndex, TICK_NEVER_THINK);
+
+	PhysicsDispatchThink(thinkFunc);
+
+	SetLastThink(nContextIndex, gpGlobals->curtime);
+
+	// Return whether entity is still valid
+	return (!IsMarkedForDeletion());
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Called when it's time for a physically moved objects (plats, doors, etc)
+//			to run it's game code.
+//			All other entity thinking is done during worldspawn's think
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::PhysicsDispatchThink(CBASEPTR thinkFunc)
+{
+	float thinkLimit = think_limit.GetFloat();
+	float startTime = 0.0;
+
+	/*
+	// This doesn't apply on the client, really
+	if ( IsDormant() )
+	{
+		Warning( "Dormant entity %s is thinking!!\n", GetClassname() );
+		Assert(0);
+	}
+	*/
+
+	if (thinkLimit)
+	{
+		startTime = engine->Time();
+	}
+
+	if (thinkFunc)
+	{
+		(m_pOuter->*thinkFunc)();
+	}
+
+	if (thinkLimit)
+	{
+		// calculate running time of the AI in milliseconds
+		float time = (engine->Time() - startTime) * 1000.0f;
+		if (time > thinkLimit)
+		{
+#if 0
+			// If its an NPC print out the shedule/task that took so long
+			CAI_BaseNPC* pNPC = MyNPCPointer();
+			if (pNPC && pNPC->GetCurSchedule())
+			{
+				pNPC->ReportOverThinkLimit(time);
+			}
+			else
+#endif
+			{
+#ifdef WIN32
+				Msg("CLIENT:  %s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(m_pOuter).raw_name(), time);
+#else
+				Msg("CLIENT:  %s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(m_pOuter).name(), time);
+#endif
+			}
+		}
+	}
+}
+
 
 bool PVSNotifierMap_LessFunc( IClientUnknown* const &a, IClientUnknown* const &b )
 {

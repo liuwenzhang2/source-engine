@@ -168,7 +168,7 @@ void CAPCController::InputActivate( inputdata_t &inputdata )
 void CAPCController::ActivateRocketGuidance(void)
 {
 	GetEngineObject()->AddSpawnFlags(SF_TANK_ACTIVE);
-	SetNextThink( gpGlobals->curtime + 0.1f ); 
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -238,7 +238,7 @@ void CAPCController::Spawn( void )
 
 	if ( IsActive() )
 	{
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 	}
 
 	UpdateMatrix();
@@ -332,7 +332,7 @@ void CAPCController::TrackTarget( void )
 
 	if ( IsActive() )
 	{
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 	else
 	{
@@ -350,7 +350,7 @@ void CAPCController::TrackTarget( void )
 		m_hTarget = FindTarget( m_targetEntityName, NULL );
 		if ( IsActive() )
 		{
-			SetNextThink( gpGlobals->curtime + 2 );	// Wait 2 sec s
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 2 );	// Wait 2 sec s
 		}
 
 		return;

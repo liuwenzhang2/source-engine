@@ -98,7 +98,7 @@ void CEnvPlayerSurfaceTrigger::PlayerSurfaceChanged( CBasePlayer *pPlayer, char 
 		m_iCurrentGameMaterial = (int)gameMaterial;
 
 		SetThink( &CEnvPlayerSurfaceTrigger::UpdateMaterialThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 

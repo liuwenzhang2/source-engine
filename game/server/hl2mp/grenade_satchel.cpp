@@ -71,7 +71,7 @@ void CSatchelCharge::Spawn( void )
 	UTIL_SetSize(this, Vector( -6, -6, -2), Vector(6, 6, 2));
 
 	SetThink( &CSatchelCharge::SatchelThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	m_takedamage	= DAMAGE_YES;
 	m_iHealth		= 1;
@@ -166,7 +166,7 @@ void CSatchelCharge::SatchelThink( void )
 	m_vLastPosition= GetEngineObject()->GetAbsOrigin();
 
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if (!IsInWorld())
 	{

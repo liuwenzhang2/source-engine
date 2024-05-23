@@ -113,7 +113,7 @@ public:
 	virtual void			Spawn()
 	{
 		BaseClass::Spawn();
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 
 	virtual int				ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_DONT_SAVE; }
@@ -4864,8 +4864,8 @@ void CSceneManager::Think()
 	g_bClientFlex = scene_clientflex.GetBool();
 
 	// The manager is always thinking at 20 hz
-	SetNextThink( gpGlobals->curtime + SCENE_THINK_INTERVAL );
-	float frameTime = ( gpGlobals->curtime - GetLastThink() );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + SCENE_THINK_INTERVAL );
+	float frameTime = ( gpGlobals->curtime - GetEngineObject()->GetLastThink() );
 	frameTime = MIN( 0.1, frameTime );
 
 	// stop if AI is diabled

@@ -44,7 +44,7 @@ END_DATADESC()
 void CAI_GoalEntity::Spawn()
 {
 	SetThink( &CAI_GoalEntity::DelayedRefresh );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -249,7 +249,7 @@ void CAI_GoalEntity::OnEntityCreated( CBaseEntity *pEntity )
 	if ( pEntity->MyNPCPointer() )
 	{
 		SetThink( &CAI_GoalEntity::DelayedRefresh );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 	
 }

@@ -305,7 +305,7 @@ void CNPC_Tentacle::Spawn( )
 	m_iDir = 1;
 
 	SetThink( &CNPC_Tentacle::Start );
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
 	SetTouch( &CNPC_Tentacle::HitTouch );
 
@@ -464,7 +464,7 @@ void CNPC_Tentacle::Start( void )
 		g_fSquirmSound = TRUE;
 	}
 	
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 bool CNPC_Tentacle::HeardAnything( void )
@@ -483,7 +483,7 @@ void CNPC_Tentacle::Cycle( void )
 	//NDebugOverlay::Cross3D( EarPosition(), 32, 255, 0, 0, false, 0.1 );
 
 	// ALERT( at_console, "%s %.2f %d %d\n", STRING( pev->targetname ), pev->origin.z, m_MonsterState, m_IdealMonsterState );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	// ALERT( at_console, "%s %d %d %d %f %f\n", STRING( pev->targetname ), pev->sequence, m_iGoalAnim, m_iDir, pev->framerate, pev->health );
 

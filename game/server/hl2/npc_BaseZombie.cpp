@@ -2512,7 +2512,7 @@ void CNPC_BaseZombie::ReleaseHeadcrab( const Vector &vecOrigin, const Vector &ve
 		}
 
 		pCrab->SetActivity( ACT_IDLE );
-		pCrab->SetNextThink( gpGlobals->curtime );
+		pCrab->GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		pCrab->PhysicsSimulate();
 		pCrab->GetEngineObject()->SetAbsVelocity( vecVelocity );
 

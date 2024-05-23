@@ -673,12 +673,12 @@ void CTriggerHurt::Spawn( void )
 
 	m_flOriginalDamage = m_flDamage;
 
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	SetThink( NULL );
 	if (m_bitsDamageInflict & DMG_RADIATION)
 	{
 		SetThink ( &CTriggerHurt::RadiationThink );
-		SetNextThink( gpGlobals->curtime + random->RandomFloat(0.0, 0.5) );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat(0.0, 0.5) );
 	}
 }
 
@@ -710,7 +710,7 @@ void CTriggerHurt::RadiationThink( void )
 		HurtAllTouchers( dt );
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.25 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.25 );
 }
 
 
@@ -772,7 +772,7 @@ void CTriggerHurt::HurtThink()
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + 0.5f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 	}
 }
 
@@ -860,10 +860,10 @@ int CTriggerHurt::HurtAllTouchers( float dt )
 
 void CTriggerHurt::Touch( CBaseEntity *pOther )
 {
-	if ( m_pfnThink == NULL )
+	if (GetEngineObject()->GetPfnThink() == NULL)
 	{
 		SetThink( &CTriggerHurt::HurtThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -925,7 +925,7 @@ void CTriggerMultiple::MultiTouch(CBaseEntity *pOther)
 //-----------------------------------------------------------------------------
 void CTriggerMultiple::ActivateMultiTrigger(CBaseEntity *pActivator)
 {
-	if (GetNextThink() > gpGlobals->curtime)
+	if (GetEngineObject()->GetNextThink() > gpGlobals->curtime)
 		return;         // still waiting for reset time
 
 	m_hActivator = pActivator;
@@ -935,14 +935,14 @@ void CTriggerMultiple::ActivateMultiTrigger(CBaseEntity *pActivator)
 	if (m_flWait > 0)
 	{
 		SetThink( &CTriggerMultiple::MultiWaitOver );
-		SetNextThink( gpGlobals->curtime + m_flWait );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flWait );
 	}
 	else
 	{
 		// we can't just remove (self) here, because this is a touch function
 		// called while C code is looping through area links...
 		SetTouch( NULL );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		SetThink(  &CTriggerMultiple::SUB_Remove );
 	}
 }
@@ -1063,7 +1063,7 @@ void CTriggerLook::StartTouch(CBaseEntity *pOther)
 		m_bTimeoutFired = false;
 		m_hActivator = pOther;
 		SetThink(&CTriggerLook::TimeoutThink);
-		SetNextThink(gpGlobals->curtime + m_flTimeoutDuration);
+		GetEngineObject()->SetNextThink(gpGlobals->curtime + m_flTimeoutDuration);
 	}
 }
 
@@ -1087,7 +1087,7 @@ void CTriggerLook::EndTouch(CBaseEntity *pOther)
 	if (pOther->IsPlayer())
 	{
 		SetThink(NULL);
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 		m_flLookTimeTotal = -1;
 	}
@@ -1195,13 +1195,13 @@ void CTriggerLook::Trigger(CBaseEntity *pActivator, bool bTimeout)
 
 		// Cancel the timeout think.
 		SetThink(NULL);
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	}
 
 	if (GetEngineObject()->HasSpawnFlags(SF_TRIGGERLOOK_FIREONCE))
 	{
 		SetThink(&CTriggerLook::SUB_Remove);
-		SetNextThink(gpGlobals->curtime);
+		GetEngineObject()->SetNextThink(gpGlobals->curtime);
 	}
 }
 
@@ -2608,7 +2608,7 @@ void CTriggerCamera::Enable( void )
 	{
 		// follow the player down
 		SetThink( &CTriggerCamera::FollowTarget );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 
 	m_moveDistance = 0;
@@ -2757,7 +2757,7 @@ void CTriggerCamera::FollowTarget( )
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	Move();
 }
@@ -3054,7 +3054,7 @@ void CTriggerProximity::StartTouch(CBaseEntity *pOther)
 		m_nTouchers++;	
 
 		SetThink( &CTriggerProximity::MeasureThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -3075,7 +3075,7 @@ void CTriggerProximity::EndTouch(CBaseEntity *pOther)
 		if ( m_nTouchers == 0 )
 		{
 			SetThink( NULL );
-			SetNextThink( TICK_NEVER_THINK );
+			GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		}
 	}
 }
@@ -3091,7 +3091,7 @@ void CTriggerProximity::MeasureThink( void )
 	if ( ( m_hMeasureTarget == NULL ) || ( m_hMeasureTarget->entindex() == -1 ) )
 	{
 		SetThink(NULL);
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		return;
 	}
 
@@ -3135,7 +3135,7 @@ void CTriggerProximity::MeasureThink( void )
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -3561,7 +3561,7 @@ void CTriggerImpact::InputImpact( inputdata_t &inputdata )
 
 	// Enable long enough to throw objects inside me
 	Enable();
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	SetThink(&CTriggerImpact::Disable);
 }
 

@@ -76,6 +76,6 @@ void CThrownGrenade::Thrown( Vector vecOrigin, Vector vecVelocity, float flExplo
 
 	// Explode in 3 seconds
 	SetThink( &CThrownGrenade::Detonate );
-	SetNextThink( gpGlobals->curtime + flExplodeTime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + flExplodeTime );
 }
 

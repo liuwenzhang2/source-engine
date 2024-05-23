@@ -395,7 +395,7 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 			m_Shared.InitInWorld( gpGlobals->curtime, pLaunchPos->GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(),
 				vecImpactDirection, m_vecImpactPosition, true );
 			SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterWorldThink );
-			SetNextThink( gpGlobals->curtime );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		}
 	}
 	else if ( DetectInSkybox() )
@@ -413,7 +413,7 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 			m_vecImpactPosition, pCamera->m_skyboxData.origin, pCamera->m_skyboxData.scale );
 		GetEngineObject()->AddEFlags( EFL_IN_SKYBOX );
 		SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterSkyboxOnlyThink );
-		SetNextThink( gpGlobals->curtime + m_Shared.GetEnterWorldTime() + TICK_INTERVAL );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_Shared.GetEnterWorldTime() + TICK_INTERVAL );
 	}
 	else
 	{
@@ -434,12 +434,12 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 				GetEngineObject()->SetSolid( SOLID_NONE );
 				GetEngineObject()->AddEFlags( EFL_IN_SKYBOX );
 				SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterSkyboxThink );
-				SetNextThink( gpGlobals->curtime + m_Shared.GetEnterWorldTime() );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + m_Shared.GetEnterWorldTime() );
 			}
 			else
 			{
 				SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterWorldThink );
-				SetNextThink( gpGlobals->curtime );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime );
 			}
 		}
 		else
@@ -447,7 +447,7 @@ CSkyCamera *CEnvHeadcrabCanister::PlaceCanisterInWorld()
 			m_Shared.InitInWorld( gpGlobals->curtime, vecStartPosition, vecStartAngles, 
 				vecDirection, m_vecImpactPosition );
 			SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterWorldThink );
-			SetNextThink( gpGlobals->curtime );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		}
 	}
 
@@ -939,7 +939,7 @@ void CEnvHeadcrabCanister::Detonate( )
 		GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
 
 		SetThink( &CEnvHeadcrabCanister::SUB_Remove );
-		SetNextThink( gpGlobals->curtime + ENV_HEADCRABCANISTER_TRAIL_TIME );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + ENV_HEADCRABCANISTER_TRAIL_TIME );
 
 		return;
 	}
@@ -1035,7 +1035,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterWorldThink( void )
 	// Touch triggers along the way
 	GetEngineObject()->PhysicsTouchTriggers( &vecStartPosition );
 
-	SetNextThink( gpGlobals->curtime + 0.2f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2f );
 	GetEngineObject()->SetAbsAngles( vecEndAngles );
 
 	if ( !m_bHasDetonated )
@@ -1073,7 +1073,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSkyboxThink( void )
 
 	// Now we start looking for collisions
 	SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterWorldThink );
-	SetNextThink( gpGlobals->curtime + 0.01f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 }
 
 
@@ -1105,7 +1105,7 @@ void CEnvHeadcrabCanister::HeadcrabCanisterSkyboxOnlyThink( void )
 
 	float flRefireTime = random->RandomFloat( m_flMinRefireTime, m_flMaxRefireTime ) + ENV_HEADCRABCANISTER_TRAIL_TIME;
 	SetThink( &CEnvHeadcrabCanister::HeadcrabCanisterSkyboxRestartThink );
-	SetNextThink( gpGlobals->curtime + flRefireTime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + flRefireTime );
 }
 
 

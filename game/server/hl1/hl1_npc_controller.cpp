@@ -1082,7 +1082,7 @@ void CNPC_ControllerHeadBall::Spawn( void )
 
 //	m_vecIdeal = vec3_origin;	//(0,0,0)
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	m_hOwner = GetOwnerEntity();
 
@@ -1099,7 +1099,7 @@ extern short		g_sModelIndexLaser;
 
 void CNPC_ControllerHeadBall::HuntThink( void  )
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if( !m_pSprite )
 	{
@@ -1117,7 +1117,7 @@ void CNPC_ControllerHeadBall::HuntThink( void  )
 	{
 		SetTouch( NULL );
 		SetThink( &CNPC_ControllerHeadBall::KillThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		return;
 	}
 
@@ -1158,7 +1158,7 @@ void CNPC_ControllerHeadBall::HuntThink( void  )
 		SetNextAttack( gpGlobals->curtime + 3.0 );
 
 		SetThink( &CNPC_ControllerHeadBall::KillThink );
-		SetNextThink( gpGlobals->curtime + 0.3 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.3 );
 	}
 }
 
@@ -1247,7 +1247,7 @@ void CNPC_ControllerZapBall::Spawn( void )
 	m_hOwner = GetOwnerEntity();
 
 	m_flSpawnTime = gpGlobals->curtime; // keep track of when ball spawned
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 
@@ -1259,7 +1259,7 @@ void CNPC_ControllerZapBall::Precache( void )
 
 void CNPC_ControllerZapBall::AnimateThink( void  )
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	
 	SetCycle( ((int)GetCycle() + 1) % 11 );
 

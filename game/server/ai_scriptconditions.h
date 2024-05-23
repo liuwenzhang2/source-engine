@@ -125,7 +125,7 @@ private:
 	void Enable();
 	void Disable();
 
-	void SetThinkTime()			{ SetNextThink( gpGlobals->curtime + 0.250 ); }
+	void SetThinkTime()			{ GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.250 ); }
 
 	// Evaluators
 	struct EvalArgs_t

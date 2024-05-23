@@ -1495,7 +1495,7 @@ void CNPC_CombineGunship::MoveHead( void )
 //-----------------------------------------------------------------------------
 void CNPC_CombineGunship::PrescheduleThink( void )
 {
-	m_flDeltaT = gpGlobals->curtime - GetLastThink();
+	m_flDeltaT = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 
 	// Are we crashing?
 	if ( m_flEndDestructTime && gpGlobals->curtime > m_flEndDestructTime )
@@ -2034,7 +2034,7 @@ void CNPC_CombineGunship::BeginDestruct( void )
 	{
 		Chopper_BecomeChunks( this );
 		SetThink( &CNPC_CombineGunship::SUB_Remove );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		GetEngineObject()->AddEffects( EF_NODRAW );
 		return;
 	}

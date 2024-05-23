@@ -105,7 +105,7 @@ void CPointPlayerMoveConstraint::InputTurnOn( inputdata_t &inputdata )
 	if ( m_hConstrainedPlayers.Count() )
 	{
 		SetThink( &CPointPlayerMoveConstraint::ConstraintThink );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 
@@ -156,6 +156,6 @@ void CPointPlayerMoveConstraint::ConstraintThink( void )
 	// Only keep thinking if we any left
 	if ( m_hConstrainedPlayers.Count() )
 	{
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }

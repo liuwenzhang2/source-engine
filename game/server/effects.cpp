@@ -115,7 +115,7 @@ void CBubbling::Spawn( void )
 	if ( !GetEngineObject()->HasSpawnFlags(SF_BUBBLES_STARTOFF) )
 	{
 		SetThink( &CBubbling::FizzThink );
-		SetNextThink( gpGlobals->curtime + 2.0 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0 );
 		m_state = 1;
 	}
 	else
@@ -147,14 +147,14 @@ void CBubbling::TurnOn()
 {
 	m_state = 1;
 	SetThink( &CBubbling::FizzThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void CBubbling::TurnOff()
 {
 	m_state = 0;
 	SetThink( NULL );
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 //-----------------------------------------------------------------------------
@@ -212,11 +212,11 @@ void CBubbling::InputSetFrequency( inputdata_t &inputdata )
 	{
 		if ( m_frequency > 19 )
 		{
-			SetNextThink( gpGlobals->curtime + 0.5f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 		}
 		else
 		{
-			SetNextThink( gpGlobals->curtime + 2.5 - (0.1 * m_frequency) );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.5 - (0.1 * m_frequency) );
 		}
 	}
 }
@@ -229,11 +229,11 @@ void CBubbling::FizzThink( void )
 
 	if ( m_frequency > 19 )
 	{
-		SetNextThink( gpGlobals->curtime + 0.5f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + 2.5 - (0.1 * m_frequency) );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.5 - (0.1 * m_frequency) );
 	}
 }
 
@@ -295,7 +295,7 @@ void CEnvTracer::Activate( void )
 	{
 		m_vecEnd = pEnd->GetEngineObject()->GetLocalOrigin();
 		SetThink( &CEnvTracer::TracerThink );
-		SetNextThink( gpGlobals->curtime + m_flDelay );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flDelay );
 	}
 	else
 	{
@@ -308,7 +308,7 @@ void CEnvTracer::TracerThink( void )
 {
 	UTIL_Tracer(GetEngineObject()->GetAbsOrigin(), m_vecEnd );
 
-	SetNextThink( gpGlobals->curtime + m_flDelay );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flDelay );
 }
 
 
@@ -414,7 +414,7 @@ void CGibShooter::Precache ( void )
 void CGibShooter::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	SetThink( &CGibShooter::ShootThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -424,7 +424,7 @@ void CGibShooter::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 void CGibShooter::InputShoot( inputdata_t &inputdata )
 {
 	SetThink( &CGibShooter::ShootThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -487,7 +487,7 @@ void CGibShooter::InitPointGib( CGib *pGib, const Vector &vecShootDir, float flS
 		QAngle angVel( random->RandomFloat ( 100, 200 ), random->RandomFloat ( 100, 300 ), 0 );
 		pGib->SetLocalAngularVelocity( angVel );
 
-		float thinkTime = ( pGib->GetNextThink() - gpGlobals->curtime );
+		float thinkTime = ( pGib->GetEngineObject()->GetNextThink() - gpGlobals->curtime );
 
 		pGib->m_lifeTime = (m_flGibLife * random->RandomFloat( 0.95, 1.05 ));	// +/- 5%
 
@@ -496,13 +496,13 @@ void CGibShooter::InitPointGib( CGib *pGib, const Vector &vecShootDir, float flS
 		if(GetEngineObject()->HasSpawnFlags( SF_SHOOTER_STRICT_REMOVE ) )
 #endif
 		{
-			pGib->SetNextThink( gpGlobals->curtime + pGib->m_lifeTime );
+			pGib->GetEngineObject()->SetNextThink( gpGlobals->curtime + pGib->m_lifeTime );
 			pGib->SetThink ( &CGib::DieThink );
 		}
 
 		if ( pGib->m_lifeTime < thinkTime )
 		{
-			pGib->SetNextThink( gpGlobals->curtime + pGib->m_lifeTime );
+			pGib->GetEngineObject()->SetNextThink( gpGlobals->curtime + pGib->m_lifeTime );
 			pGib->m_lifeTime = 0;
 		}
 
@@ -574,7 +574,7 @@ CBaseEntity *CGibShooter::SpawnGib( const Vector &vecShootDir, float flSpeed )
 #endif
 					{
 						pGib->m_bForceRemove = true;
-						pGib->SetNextThink( gpGlobals->curtime + pGib->m_lifeTime );
+						pGib->GetEngineObject()->SetNextThink( gpGlobals->curtime + pGib->m_lifeTime );
 						pGib->SetThink ( &CGib::DieThink );
 					}
 
@@ -610,7 +610,7 @@ CBaseEntity *CGibShooter::SpawnGib( const Vector &vecShootDir, float flSpeed )
 //-----------------------------------------------------------------------------
 void CGibShooter::ShootThink ( void )
 {
-	SetNextThink( gpGlobals->curtime + m_flDelay );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flDelay );
 
 	Vector vecShootDir, vForward,vRight,vUp;
 	AngleVectors(GetEngineObject()->GetAbsAngles(), &vForward, &vRight, &vUp );
@@ -629,12 +629,12 @@ void CGibShooter::ShootThink ( void )
 		{
 			m_iGibs = m_iGibCapacity;
 			SetThink ( NULL );
-			SetNextThink( gpGlobals->curtime );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		}
 		else
 		{
 			SetThink ( &CGibShooter::SUB_Remove );
-			SetNextThink( gpGlobals->curtime );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		}
 	}
 }
@@ -908,7 +908,7 @@ CBaseEntity *CRotorWashShooter::DoWashPush( float flWashStartTime, const Vector 
 		else
 		{
 			SetThink ( &CGibShooter::SUB_Remove );
-			SetNextThink( gpGlobals->curtime );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		}
 	}
 
@@ -992,7 +992,7 @@ void CTestEffect::Think( void )
 			m_pBeam[i]->SetBrightness( 255 * t );
 			// m_pBeam[i]->SetScrollRate( 20 * t );
 		}
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 	else
 	{
@@ -1002,14 +1002,14 @@ void CTestEffect::Think( void )
 		}
 		m_flStartTime = gpGlobals->curtime;
 		m_iBeam = 0;
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	}
 }
 
 
 void CTestEffect::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	m_flStartTime = gpGlobals->curtime;
 }
 
@@ -1274,7 +1274,7 @@ void CEnvFunnel::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 		&GetEngineObject()->GetAbsOrigin(), m_iSprite, GetEngineObject()->HasSpawnFlags( SF_FUNNEL_REVERSE ) ? 1 : 0 );
 
 	SetThink( &CEnvFunnel::SUB_Remove );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 void CEnvFunnel::Spawn( void )
@@ -1426,7 +1426,7 @@ void CItemSoda::Spawn( void )
 	UTIL_SetSize ( this, Vector ( 0, 0, 0 ), Vector ( 0, 0, 0 ) );
 
 	SetThink (&CItemSoda::CanThink);
-	SetNextThink( gpGlobals->curtime + 0.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 }
 
 void CItemSoda::CanThink ( void )
@@ -1477,7 +1477,7 @@ void CItemSoda::CanTouch ( CBaseEntity *pOther )
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	SetTouch ( NULL );
 	SetThink ( &CItemSoda::SUB_Remove );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 #ifndef _XBOX
@@ -1632,7 +1632,7 @@ void CEnvWind::Spawn( void )
 	m_EnvWindShared.Init( entindex(), 0, gpGlobals->frametime, GetEngineObject()->GetLocalAngles().y, 0 );
 
 	SetThink( &CEnvWind::WindThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 int CEnvWind::UpdateTransmitState()
@@ -1642,7 +1642,7 @@ int CEnvWind::UpdateTransmitState()
 
 void CEnvWind::WindThink( void )
 {
-	SetNextThink( m_EnvWindShared.WindThink( gpGlobals->curtime ) );
+	GetEngineObject()->SetNextThink( m_EnvWindShared.WindThink( gpGlobals->curtime ) );
 }
 
 
@@ -2169,7 +2169,7 @@ void CEnvGunfire::StartShooting()
 	m_iShotsRemaining = random->RandomInt( m_iMinBurstSize, m_iMaxBurstSize );
 
 	SetThink( &CEnvGunfire::ShootThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //-----------------------------------------------------------------------------
@@ -2204,7 +2204,7 @@ void CEnvGunfire::ShootThink()
 		StopShooting();
 	}
 
-	SetNextThink( gpGlobals->curtime + m_flRateOfFire );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flRateOfFire );
 
 	UpdateTarget();
 
@@ -2259,7 +2259,7 @@ void CEnvGunfire::ShootThink()
 	if( m_iShotsRemaining == 0 )
 	{
 		StartShooting();
-		SetNextThink( gpGlobals->curtime + random->RandomFloat( m_flMinBurstDelay, m_flMaxBurstDelay ) );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( m_flMinBurstDelay, m_flMaxBurstDelay ) );
 	}
 }
 

@@ -134,7 +134,7 @@ void CPropTelescopicArm::Spawn( void )
 	m_bCanSeeTarget = false;
 
 	SetThink( &CPropTelescopicArm::DisabledThink );
-	SetNextThink( gpGlobals->curtime + 1.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
 	int iSequence = SelectHeaviestSequence ( ACT_IDLE );
 
@@ -201,7 +201,7 @@ void CPropTelescopicArm::Activate( void )
 
 void CPropTelescopicArm::DisabledThink( void )
 {
-	SetNextThink( gpGlobals->curtime + 1.0 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0 );
 }
 
 void CPropTelescopicArm::EnabledThink( void )
@@ -283,7 +283,7 @@ void CPropTelescopicArm::EnabledThink( void )
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 //-----------------------------------------------------------------------------
@@ -468,7 +468,7 @@ void CPropTelescopicArm::InputDisable( inputdata_t &inputdata )
 		}
 
 		SetThink( &CPropTelescopicArm::DisabledThink );
-		SetNextThink( gpGlobals->curtime + TELESCOPE_DISABLE_TIME );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + TELESCOPE_DISABLE_TIME );
 	}
 }
 
@@ -498,7 +498,7 @@ void CPropTelescopicArm::InputEnable( inputdata_t &inputdata )
 		}
 
 		SetThink( &CPropTelescopicArm::EnabledThink );
-		SetNextThink( gpGlobals->curtime + TELESCOPE_ENABLE_TIME );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + TELESCOPE_ENABLE_TIME );
 	}
 }
 

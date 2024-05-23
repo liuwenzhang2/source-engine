@@ -254,7 +254,7 @@ CFlashbangProjectile* CFlashbangProjectile::Create(
 	pGrenade->SetTouch( &CBaseGrenade::BounceTouch );
 
 	pGrenade->SetThink( &CBaseCSGrenadeProjectile::DangerSoundThink );
-	pGrenade->SetNextThink( gpGlobals->curtime );
+	pGrenade->GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	pGrenade->SetDetonateTimerLength( 1.5 );
 

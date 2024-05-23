@@ -535,7 +535,7 @@ void CWateryDeathLeech::Spawn( void )
 	SetModel( "models/leech.mdl" );
 
 	SetThink( &CWateryDeathLeech::LeechThink );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	m_flPlaybackRate = random->RandomFloat( 0.5, 1.5 );
 	SetCycle( random->RandomFloat( 0.0f, 0.9f ) );
@@ -554,7 +554,7 @@ void CWateryDeathLeech::LeechThink( void )
 		 return;
 
 	StudioFrameAdvance();
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if ( m_iFadeState != 0 )
 	{
@@ -581,7 +581,7 @@ void CWateryDeathLeech::LeechThink( void )
 		}
 		else
 		{
-			SetNextThink( gpGlobals->curtime );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		}
 	}
 

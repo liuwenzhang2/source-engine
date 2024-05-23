@@ -97,7 +97,7 @@ void CTriggerAreaCapture::Spawn( void )
 
 	SetTouch ( &CTriggerAreaCaptureShim::Touch );		
 	SetThink( &CTriggerAreaCapture::CaptureThink );
-	SetNextThink( gpGlobals->curtime + AREA_THINK_TIME );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + AREA_THINK_TIME );
 
 	for ( int i = 0; i < m_TeamData.Count(); i++ )
 	{
@@ -303,7 +303,7 @@ ConVar mp_simulatemultiplecappers( "mp_simulatemultiplecappers", "1", FCVAR_CHEA
 //-----------------------------------------------------------------------------
 void CTriggerAreaCapture::CaptureThink( void )
 {
-	SetNextThink( gpGlobals->curtime + AREA_THINK_TIME );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + AREA_THINK_TIME );
 
 	// make sure this point is in the round being played (if we're playing one)
 	CTeamControlPointMaster *pMaster = g_hControlPointMasters.Count() ? g_hControlPointMasters[0] : NULL;

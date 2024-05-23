@@ -775,7 +775,7 @@ void CFuncRotating::Spawn( )
 	if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_ROTATE_START_ON) )
 	{		
 		SetThink( &CFuncRotating::SUB_CallUseToggle );
-		SetNextThink( gpGlobals->curtime + .2 );	// leave a magic delay for client to start up
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + .2 );	// leave a magic delay for client to start up
 	}
 
 	//

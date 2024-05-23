@@ -5,6 +5,7 @@
 //===========================================================================//
 
 #include "cbase.h"
+#include "baseentity.h"
 #include "entitylist.h"
 #include "globalstate.h"
 #include "isaverestore.h"
@@ -12,11 +13,9 @@
 #include "decals.h"
 #include "gamerules.h"
 #include "entityapi.h"
-#include "entitylist.h"
 #include "eventqueue.h"
 #include "hierarchy.h"
 #include "basecombatweapon.h"
-#include "const.h"
 #include "player.h"		// For debug draw sending
 #include "ndebugoverlay.h"
 #include "physics.h"
@@ -25,7 +24,6 @@
 #include "sendproxy.h"
 #include "IEffects.h"
 #include "vstdlib/random.h"
-#include "baseentity.h"
 #include "collisionutils.h"
 #include "coordsize.h"
 #include "animation.h"
@@ -344,12 +342,9 @@ CBaseEntity::CBaseEntity()
 	m_flShadowCastDistance = m_flDesiredShadowCastDistance = 0;
 	SetRenderColor( 255, 255, 255, 255 );
 	m_iTeamNum = m_iInitialTeamNum = TEAM_UNASSIGNED;
-	m_nLastThinkTick = gpGlobals->tickcount;
 	m_nSimulationTick = -1;
 	m_pBlocker = NULL;
-#if _DEBUG
-	m_iCurrentThinkContext = NO_THINK_CONTEXT;
-#endif
+
 	m_nWaterTouch = m_nSlimeTouch = 0;
 
 	//m_bDynamicModelAllowed = false;
@@ -424,7 +419,7 @@ void CBaseEntity::PostConstructor(const char* szClassname, int iForceEdictIndex)
 	//	//}
 	//}
 
-	CheckHasThinkFunction(false);
+	GetEngineObject()->CheckHasThinkFunction(false);
 	CheckHasGamePhysicsSimulation();
 }
 
@@ -1535,98 +1530,7 @@ CBaseEntity *CBaseEntity::GetNextTarget( void )
 	return gEntList.FindEntityByName( NULL, m_target );
 }
 
-class CThinkContextsSaveDataOps : public CDefSaveRestoreOps
-{
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
-	{
-		AssertMsg( fieldInfo.pTypeDesc->fieldSize == 1, "CThinkContextsSaveDataOps does not support arrays");
 
-		// Write out the vector
-		CUtlVector< thinkfunc_t > *pUtlVector = (CUtlVector< thinkfunc_t > *)fieldInfo.pField;
-		SaveUtlVector( pSave, pUtlVector, FIELD_EMBEDDED );
-
-		// Get our owner
-		CBaseEntity *pOwner = (CBaseEntity*)fieldInfo.pOwner;
-
-		pSave->StartBlock();
-		// Now write out all the functions
-		for ( int i = 0; i < pUtlVector->Size(); i++ )
-		{
-#ifdef WIN32
-			void **ppV = (void**)&((*pUtlVector)[i].m_pfnThink);
-#else
-			BASEPTR *ppV = &((*pUtlVector)[i].m_pfnThink);
-#endif
-			bool bHasFunc = (*ppV != NULL);
-			pSave->WriteBool( &bHasFunc, 1 );
-			if ( bHasFunc )
-			{
-				pSave->WriteFunction( pOwner->GetDataDescMap(), "m_pfnThink", (inputfunc_t **)ppV, 1 );
-			}
-		}
-		pSave->EndBlock();
-	}
-
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore )
-	{
-		AssertMsg( fieldInfo.pTypeDesc->fieldSize == 1, "CThinkContextsSaveDataOps does not support arrays");
-
-		// Read in the vector
-		CUtlVector< thinkfunc_t > *pUtlVector = (CUtlVector< thinkfunc_t > *)fieldInfo.pField;
-		RestoreUtlVector( pRestore, pUtlVector, FIELD_EMBEDDED );
-
-		// Get our owner
-		CBaseEntity *pOwner = (CBaseEntity*)fieldInfo.pOwner;
-
-		pRestore->StartBlock();
-		// Now read in all the functions
-		for ( int i = 0; i < pUtlVector->Size(); i++ )
-		{
-			bool bHasFunc;
-			pRestore->ReadBool( &bHasFunc, 1 );
-#ifdef WIN32
-			void **ppV = (void**)&((*pUtlVector)[i].m_pfnThink);
-#else
-			BASEPTR *ppV = &((*pUtlVector)[i].m_pfnThink);
-			Q_memset( (void *)ppV, 0x0, sizeof(inputfunc_t) );
-#endif
-			if ( bHasFunc )
-			{
-				SaveRestoreRecordHeader_t header;
-				pRestore->ReadHeader( &header );
-				pRestore->ReadFunction( pOwner->GetDataDescMap(), (inputfunc_t **)ppV, 1, header.size );
-			}
-			else
-			{
-				*ppV = NULL;
-			}
-		}
-		pRestore->EndBlock();
-	}
-
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
-	{
-		CUtlVector< thinkfunc_t > *pUtlVector = (CUtlVector< thinkfunc_t > *)fieldInfo.pField;
-		return ( pUtlVector->Count() == 0 );
-	}
-
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo )
-	{
-		BASEPTR pFunc = *((BASEPTR*)fieldInfo.pField);
-		pFunc = NULL;
-	}
-};
-CThinkContextsSaveDataOps g_ThinkContextsSaveDataOps;
-ISaveRestoreOps *thinkcontextFuncs = &g_ThinkContextsSaveDataOps;
-
-BEGIN_SIMPLE_DATADESC( thinkfunc_t )
-
-	DEFINE_FIELD( m_iszContext,	FIELD_STRING ),
-	// DEFINE_FIELD( m_pfnThink,		FIELD_FUNCTION ),		// Manually written
-	DEFINE_FIELD( m_nNextThinkTick,	FIELD_TICK	),
-	DEFINE_FIELD( m_nLastThinkTick,	FIELD_TICK	),
-
-END_DATADESC()
 
 BEGIN_SIMPLE_DATADESC( ResponseContext_t )
 
@@ -1652,21 +1556,21 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	DEFINE_FIELD( m_flPrevAnimTime, FIELD_TIME ),
 	DEFINE_FIELD( m_flAnimTime, FIELD_TIME ),
 	DEFINE_FIELD( m_flSimulationTime, FIELD_TIME ),
-	DEFINE_FIELD( m_nLastThinkTick, FIELD_TICK ),
+	//DEFINE_FIELD( m_nLastThinkTick, FIELD_TICK ),
 
-	DEFINE_KEYFIELD( m_nNextThinkTick, FIELD_TICK, "nextthink" ),
+	//DEFINE_KEYFIELD( m_nNextThinkTick, FIELD_TICK, "nextthink" ),
 	//DEFINE_KEYFIELD( m_fEffects, FIELD_INTEGER, "effects" ),
 	DEFINE_KEYFIELD( m_clrRender, FIELD_COLOR32, "rendercolor" ),
 //#if !defined( NO_ENTITY_PREDICTION )
 //	DEFINE_FIELD( m_PredictableID, CPredictableId ),
 //#endif
-	DEFINE_CUSTOM_FIELD( m_aThinkFunctions, thinkcontextFuncs ),
+	//DEFINE_CUSTOM_FIELD( m_aThinkFunctions, thinkcontextFuncs ),
 	//								m_iCurrentThinkContext (not saved, debug field only, and think transient to boot)
 
 	DEFINE_UTLVECTOR(m_ResponseContexts,		FIELD_EMBEDDED),
 	DEFINE_KEYFIELD( m_iszResponseContext, FIELD_STRING, "ResponseContext" ),
 
-	DEFINE_FIELD( m_pfnThink, FIELD_FUNCTION ),
+	//DEFINE_FIELD( m_pfnThink, FIELD_FUNCTION ),
 	DEFINE_FIELD( m_pfnTouch, FIELD_FUNCTION ),
 	DEFINE_FIELD( m_pfnUse, FIELD_FUNCTION ),
 	DEFINE_FIELD( m_pfnBlocked, FIELD_FUNCTION ),
@@ -2721,7 +2625,7 @@ void CBaseEntity::MakeDormant( void )
 	// Don't draw
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	// Don't think
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 int CBaseEntity::IsDormant( void )
@@ -6388,7 +6292,7 @@ void CBaseEntity::RemoveDeferred( void )
 {
 	// Set our next think to remove us
 	SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Hide us completely
 	GetEngineObject()->AddEffects( EF_NODRAW );
@@ -6408,7 +6312,7 @@ void CBaseEntity::RemoveDeferred( void )
 void CBaseEntity::SUB_StartFadeOut( float delay, bool notSolid )
 {
 	SetThink( &CBaseEntity::SUB_FadeOut );
-	SetNextThink( gpGlobals->curtime + delay );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + delay );
 	SetRenderColorA( 255 );
 	m_nRenderMode = kRenderNormal;
 
@@ -6430,7 +6334,7 @@ void CBaseEntity::SUB_StartFadeOutInstant()
 void CBaseEntity::SUB_Vanish( void )
 {
 	//Always think again next frame
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	CBasePlayer *pPlayer;
 
@@ -6506,7 +6410,7 @@ void CBaseEntity::SUB_FadeOut( void  )
 {
 	if ( SUB_AllowedToFade() == false )
 	{
-		SetNextThink( gpGlobals->curtime + 1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1 );
 		SetRenderColorA( 255 );
 		return;
 	}
@@ -6519,7 +6423,7 @@ void CBaseEntity::SUB_FadeOut( void  )
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 

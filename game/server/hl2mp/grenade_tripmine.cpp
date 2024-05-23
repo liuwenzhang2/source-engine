@@ -73,7 +73,7 @@ void CTripmineGrenade::Spawn( void )
 	m_flPowerUp = gpGlobals->curtime + 2.0;
 
 	SetThink( &CTripmineGrenade::PowerupThink );
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
 	m_takedamage		= DAMAGE_YES;
 
@@ -115,7 +115,7 @@ void CTripmineGrenade::WarningThink( void  )
 {
 	// set to power up
 	SetThink( &CTripmineGrenade::PowerupThink );
-	SetNextThink( gpGlobals->curtime + 1.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 }
 
 
@@ -138,7 +138,7 @@ void CTripmineGrenade::PowerupThink( void  )
 		params.m_bWarnOnDirectWaveReference = true;
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	}
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -183,7 +183,7 @@ void CTripmineGrenade::MakeBeam( void )
 
 	// Delay first think slightly so beam has time
 	// to appear if person right in front of it
-	SetNextThink( gpGlobals->curtime + 1.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
 	Vector vecTmpEnd = GetEngineObject()->GetLocalOrigin() + m_vecDir * 2048 * drawLength;
 
@@ -240,7 +240,7 @@ void CTripmineGrenade::BeamBreakThink( void  )
 		return;
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 #if 0 // FIXME: OnTakeDamage_Alive() is no longer called now that base grenade derives from CBaseAnimating
@@ -251,7 +251,7 @@ int CTripmineGrenade::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		// disable
 		// Create( "weapon_tripmine", GetLocalOrigin() + m_vecDir * 24, GetAngles() );
 		SetThink( &CTripmineGrenade::SUB_Remove );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		KillBeam();
 		return FALSE;
 	}
@@ -269,7 +269,7 @@ void CTripmineGrenade::Event_Killed( const CTakeDamageInfo &info )
 	m_takedamage		= DAMAGE_NO;
 
 	SetThink( &CTripmineGrenade::DelayDeathThink );
-	SetNextThink( gpGlobals->curtime + 0.25 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.25 );
 
 	const char* soundname = "TripmineGrenade.StopSound";
 	CPASAttenuationFilter filter(this, soundname);

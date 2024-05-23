@@ -63,7 +63,7 @@ void CPlayerResource::Spawn( void )
 	}
 
 	SetThink( &CPlayerResource::ResourceThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	m_nUpdateCounter = 0;
 }
 
@@ -85,7 +85,7 @@ void CPlayerResource::ResourceThink( void )
 
 	UpdatePlayerData();
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------

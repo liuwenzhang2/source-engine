@@ -184,7 +184,7 @@ void respawn( CBaseEntity *pEdict, bool fCopyCorpse )
 		}
 		else
 		{
-			pPlayer->SetNextThink( gpGlobals->curtime + 0.1f );
+			pPlayer->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		}
 	}
 }

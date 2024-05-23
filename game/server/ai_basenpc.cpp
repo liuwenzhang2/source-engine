@@ -3496,7 +3496,7 @@ int __cdecl ThinkRebalanceCompare( const AIRebalanceInfo_t *pLeft, const AIRebal
 
 inline bool CAI_BaseNPC::CanThinkRebalance()
 {
-	if ( m_pfnThink != (BASEPTR)&CAI_BaseNPC::CallNPCThink )
+	if (GetEngineObject()->GetPfnThink() != (BASEPTR)&CAI_BaseNPC::CallNPCThink )
 	{
 		return false;
 	}
@@ -3574,13 +3574,13 @@ void CAI_BaseNPC::RebalanceThinks()
 		{
 			CAI_BaseNPC *pCandidate = g_AI_Manager.AccessAIs()[i];
 			if ( pCandidate->CanThinkRebalance() &&
-				( pCandidate->GetNextThinkTick() >= iMinTickRebalance && 
-				pCandidate->GetNextThinkTick() < iMaxTickRebalance ) )
+				( pCandidate->GetEngineObject()->GetNextThinkTick() >= iMinTickRebalance &&
+				pCandidate->GetEngineObject()->GetNextThinkTick() < iMaxTickRebalance ) )
 			{
 				int iInfo = rebalanceCandidates.AddToTail();
 
 				rebalanceCandidates[iInfo].pNPC = pCandidate;
-				rebalanceCandidates[iInfo].iNextThinkTick = pCandidate->GetNextThinkTick();
+				rebalanceCandidates[iInfo].iNextThinkTick = pCandidate->GetEngineObject()->GetNextThinkTick();
 
 				if ( pCandidate->IsFlaggedEfficient() )
 				{
@@ -3601,7 +3601,7 @@ void CAI_BaseNPC::RebalanceThinks()
 				}
 			}
 			else if ( bDebugThinkTicks )
-				DevMsg( "   Ignoring %d\n", pCandidate->GetNextThinkTick() );
+				DevMsg( "   Ignoring %d\n", pCandidate->GetEngineObject()->GetNextThinkTick() );
 		}
 
 		if ( rebalanceCandidates.Count() )
@@ -3640,16 +3640,16 @@ void CAI_BaseNPC::RebalanceThinks()
 					iRemainingThinksToDistribute = iMaxThinkersPerTick;
 				}
 
-				if ( rebalanceCandidates[i].pNPC->GetNextThinkTick() != iCurTickDistributing )
+				if ( rebalanceCandidates[i].pNPC->GetEngineObject()->GetNextThinkTick() != iCurTickDistributing )
 				{
 					if ( bDebugThinkTicks )
-						DevMsg( "      Bumping %d to %d\n", rebalanceCandidates[i].pNPC->GetNextThinkTick(), iCurTickDistributing );
+						DevMsg( "      Bumping %d to %d\n", rebalanceCandidates[i].pNPC->GetEngineObject()->GetNextThinkTick(), iCurTickDistributing );
 
-					rebalanceCandidates[i].pNPC->SetNextThink( TICKS_TO_TIME( iCurTickDistributing ) );
+					rebalanceCandidates[i].pNPC->GetEngineObject()->SetNextThink( TICKS_TO_TIME( iCurTickDistributing ) );
 				}
 				else if ( bDebugThinkTicks )
 				{
-					DevMsg( "      Leaving %d\n", rebalanceCandidates[i].pNPC->GetNextThinkTick() );
+					DevMsg( "      Leaving %d\n", rebalanceCandidates[i].pNPC->GetEngineObject()->GetNextThinkTick() );
 				}
 
 				iRemainingThinksToDistribute--;
@@ -3663,11 +3663,11 @@ void CAI_BaseNPC::RebalanceThinks()
 			DevMsg( "New distribution is:\n");
 			for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
 			{
-				DevMsg( "   %d\n", g_AI_Manager.AccessAIs()[i]->GetNextThinkTick() );
+				DevMsg( "   %d\n", g_AI_Manager.AccessAIs()[i]->GetEngineObject()->GetNextThinkTick() );
 			}
 		}
 
-		Assert( GetNextThinkTick() == TICK_NEVER_THINK ); // never change this objects tick
+		Assert(GetEngineObject()->GetNextThinkTick() == TICK_NEVER_THINK ); // never change this objects tick
 	}
 }
 
@@ -3700,7 +3700,7 @@ bool CAI_BaseNPC::PreNPCThink()
 		if ( m_iFrameBlocked == gpGlobals->framecount )
 		{
 			DbgFrameLimitMsg( "Stalled %d (%d)\n", this, gpGlobals->framecount );
-			SetNextThink( gpGlobals->curtime );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime );
 			return false;
 		}
 		else if ( gpGlobals->framecount != iPrevFrame )
@@ -3724,7 +3724,7 @@ bool CAI_BaseNPC::PreNPCThink()
 				{
 					DbgFrameLimitMsg( "Bumped %d (%d)\n", this, gpGlobals->framecount );
 					m_iFrameBlocked = gpGlobals->framecount;
-					SetNextThink( gpGlobals->curtime );
+					GetEngineObject()->SetNextThink( gpGlobals->curtime );
 					return false;
 				}
 				else
@@ -3738,7 +3738,7 @@ bool CAI_BaseNPC::PreNPCThink()
 		g_StartTimeCurThink = engine->Time();
 
 		m_iFrameBlocked = -1;
-		m_nLastThinkTick = TIME_TO_TICKS( m_flLastRealThinkTime );
+		GetEngineObject()->SetLastThinkTick(TIME_TO_TICKS( m_flLastRealThinkTime ));
 	}
 
 	return true;
@@ -3909,7 +3909,7 @@ void CAI_BaseNPC::NPCThink( void )
 
 	//---------------------------------
 
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 	//---------------------------------
 
@@ -3997,7 +3997,7 @@ void CAI_BaseNPC::NPCThink( void )
 		}
 	}
 
-	m_bUsingStandardThinkTime = ( GetNextThinkTick() == TICK_NEVER_THINK );
+	m_bUsingStandardThinkTime = (GetEngineObject()->GetNextThinkTick() == TICK_NEVER_THINK );
 
 	UpdateEfficiency( bInPVS );
 
@@ -4036,11 +4036,11 @@ void CAI_BaseNPC::NPCThink( void )
 
 		if ( GetMoveEfficiency() == AIME_NORMAL || GetEfficiency() == AIE_NORMAL )
 		{
-			SetNextThink( gpGlobals->curtime + .1 );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + .1 );
 		}
 		else
 		{
-			SetNextThink( gpGlobals->curtime + .2 );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + .2 );
 		}
 	}
 	else
@@ -4653,7 +4653,7 @@ void CAI_BaseNPC::GatherConditions( void )
 		bool bForcedGather = m_bForceConditionsGather;
 		m_bForceConditionsGather = false;
 
-		if ( m_pfnThink != (BASEPTR)&CAI_BaseNPC::CallNPCThink )
+		if (GetEngineObject()->GetPfnThink() != (BASEPTR)&CAI_BaseNPC::CallNPCThink )
 		{
 			if ( UTIL_FindClientInPVS( this ) != NULL )
 				SetCondition( COND_IN_PVS );
@@ -6892,7 +6892,7 @@ void CAI_BaseNPC::NPCInit ( void )
 	// until we're sure everything else has had a chance to spawn. Otherwise
 	// we may try to reference entities that haven't spawned yet.(sjb)
 	SetThink( &CAI_BaseNPC::NPCInitThink );
-	SetNextThink( gpGlobals->curtime + 0.01f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 
 	ForceGatherConditions();
 
@@ -7395,7 +7395,7 @@ void CAI_BaseNPC::StartNPC( void )
 		.0, .150, .075, .225, .030, .180, .120, .270, .045, .210, .105, .255, .015, .165, .090, .240, .135, .060, .195, .285
 	};
 
-	SetNextThink( gpGlobals->curtime + nextThinkTimes[gm_nSpawnedThisFrame % 20] );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + nextThinkTimes[gm_nSpawnedThisFrame % 20] );
 
 	gm_nSpawnedThisFrame++;
 
@@ -10021,7 +10021,7 @@ void CAI_BaseNPC::CorpseFallThink( void )
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 
@@ -10048,7 +10048,7 @@ void CAI_BaseNPC::NPCInitDead( void )
 	// Setup health counters, etc.
 	SetThink( &CAI_BaseNPC::CorpseFallThink );
 
-	SetNextThink( gpGlobals->curtime + 0.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 }
 
 //=========================================================

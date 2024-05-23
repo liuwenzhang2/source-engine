@@ -403,7 +403,7 @@ void CNPC_MissileDefense::RunAI( void )
 
 	AimGun();
 	FireCannons();
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 }
 
 //------------------------------------------------------------------------------

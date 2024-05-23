@@ -281,7 +281,7 @@ void CBounceBomb::SetMineState( int iState )
 
 			UpdateLight( true, 0, 0, 255, 190 );
 			SetThink( &CBounceBomb::CaptiveThink );
-			SetNextThink( gpGlobals->curtime + 0.1f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 			SetTouch( NULL );
 		}
 		break;
@@ -291,13 +291,13 @@ void CBounceBomb::SetMineState( int iState )
 		UpdateLight( true, 0, 0, 255, 190 );
 		SetThink( &CBounceBomb::SettleThink );
 		SetTouch( NULL );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		break;
 
 	case MINE_STATE_ARMED:
 		UpdateLight( false, 0, 0, 0, 0 );
 		SetThink( &CBounceBomb::SearchThink );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		break;
 
 	case MINE_STATE_TRIGGERED:
@@ -346,12 +346,12 @@ void CBounceBomb::SetMineState( int iState )
 			if (m_iModification == MINE_MODIFICATION_CAVERN)
 			{
 				SetThink ( &CBounceBomb::CavernBounceThink );
-				SetNextThink( gpGlobals->curtime + 0.15 );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.15 );
 			}
 			else
 			{
 				SetThink( &CBounceBomb::BounceThink );
-				SetNextThink( gpGlobals->curtime + 0.5 );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 			}
 		}
 		break;
@@ -360,7 +360,7 @@ void CBounceBomb::SetMineState( int iState )
 		{
 			UpdateLight( true, 255, 0, 0, 190 );
 			SetThink( NULL );
-			SetNextThink( gpGlobals->curtime + 0.5 );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 
 			SetTouch( &CBounceBomb::ExplodeTouch );
 			unsigned int flags = VPhysicsGetObject()->GetCallbackFlags();
@@ -470,7 +470,7 @@ bool CBounceBomb::IsValidLocation()
 //---------------------------------------------------------
 void CBounceBomb::BounceThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	StudioFrameAdvance();
 
 	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
@@ -540,7 +540,7 @@ void CBounceBomb::BounceThink()
 //---------------------------------------------------------
 void CBounceBomb::CavernBounceThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	StudioFrameAdvance();
 
 	IPhysicsObject *pPhysicsObject = VPhysicsGetObject();
@@ -600,7 +600,7 @@ void CBounceBomb::CavernBounceThink()
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		SetThink( &CBounceBomb::ExplodeThink );
-		SetNextThink( gpGlobals->curtime + 0.33f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.33f );
 	}
 }
 
@@ -608,7 +608,7 @@ void CBounceBomb::CavernBounceThink()
 //---------------------------------------------------------
 void CBounceBomb::CaptiveThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 	StudioFrameAdvance();
 
 	float phase = fabs( sin( gpGlobals->curtime * 4.0f ) );
@@ -621,7 +621,7 @@ void CBounceBomb::CaptiveThink()
 //---------------------------------------------------------
 void CBounceBomb::SettleThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 	StudioFrameAdvance();
 
 	if(GetEngineObject()->GetMoveParent() )
@@ -995,7 +995,7 @@ void CBounceBomb::SearchThink()
 	if( !UTIL_FindClientInPVS(this) )
 	{
 		// Sleep!
-		SetNextThink( gpGlobals->curtime + 0.5 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 		return;
 	}
 
@@ -1006,11 +1006,11 @@ void CBounceBomb::SearchThink()
 			Wake(false);
 		}
 
-		SetNextThink( gpGlobals->curtime + 0.5 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 		return;
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	StudioFrameAdvance();
 
 	if( m_pConstraint && gpGlobals->curtime - m_flTimeGrabbed >= 1.0f )
@@ -1049,7 +1049,7 @@ void CBounceBomb::SearchThink()
 		{
 			// Don't pop up in the air, just explode if the NPC gets closer than explode radius.
 			SetThink( &CBounceBomb::ExplodeThink );
-			SetNextThink( gpGlobals->curtime + m_flExplosionDelay );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flExplosionDelay );
 		}
 	}
 }
@@ -1321,7 +1321,7 @@ void CBounceBomb::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t re
 		m_bPlacedByPlayer = true;
 		SetTouch( NULL );
 		SetThink( &CBounceBomb::SettleThink );
-		SetNextThink( gpGlobals->curtime + 0.1);
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1);
 
 		// Since being punted causes the mine to flip, sometimes it 'catches an edge'
 		// and ends up touching the ground from whence it came, exploding instantly. 

@@ -112,7 +112,7 @@ void CAlyxEmpEffect::ActivateAutomatic( CBaseEntity *pAlyx, CBaseEntity *pTarget
 	m_iState = ALYXEMP_STATE_OFF;
 	SetTargetEntity( pTarget );
 	SetThink( &CAlyxEmpEffect::AutomaticThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	m_bAutomated = true;
 }
@@ -183,7 +183,7 @@ void CAlyxEmpEffect::StartCharge( float flDuration )
 
 	if( m_bAutomated )
 	{
-		SetNextThink( gpGlobals->curtime + m_flDuration );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flDuration );
 	}
 }
 
@@ -240,7 +240,7 @@ void CAlyxEmpEffect::StartDischarge()
 
 	if( m_bAutomated )
 	{
-		SetNextThink( gpGlobals->curtime + 0.5f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 	}
 }
 
@@ -282,7 +282,7 @@ void CAlyxEmpEffect::Stop( float flDuration )
 	if( m_bAutomated )
 	{
 		SetThink( &CAlyxEmpEffect::SUB_Remove );
-		SetNextThink( gpGlobals->curtime + flDuration + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + flDuration + 1.0f );
 	}
 }
 

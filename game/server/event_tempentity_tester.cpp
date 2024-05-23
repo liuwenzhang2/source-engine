@@ -98,7 +98,7 @@ void CTempEntTester::Spawn( void )
 	}
 
 	// Think right away
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //-----------------------------------------------------------------------------
@@ -114,7 +114,7 @@ void CTempEntTester::Think( void )
 	}
 
 	m_pCurrent->Test(GetEngineObject()->GetLocalOrigin(), GetEngineObject()->GetLocalAngles() );
-	SetNextThink( gpGlobals->curtime + TEMPENT_TEST_GAP );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + TEMPENT_TEST_GAP );
 
 	// Time to destroy?
 	if ( gpGlobals->curtime >= m_fLifeTime )

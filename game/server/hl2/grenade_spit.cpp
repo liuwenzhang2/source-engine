@@ -58,7 +58,7 @@ void CGrenadeSpit::Spawn( void )
 
 	SetUse( &CBaseGrenade::DetonateUse );
 	SetTouch( &CGrenadeSpit::GrenadeSpitTouch );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	m_flDamage		= sk_antlion_worker_spit_grenade_dmg.GetFloat();
 	m_DmgRadius		= sk_antlion_worker_spit_grenade_radius.GetFloat();
@@ -274,7 +274,7 @@ void CGrenadeSpit::Think( void )
 	}
 
 	// Set us up to think again shortly
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 void CGrenadeSpit::Precache( void )

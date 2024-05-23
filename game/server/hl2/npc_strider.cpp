@@ -1827,7 +1827,7 @@ void CNPC_Strider::Explode( void )
 	m_lifeState = LIFE_DEAD;
 
 	SetThink( &CNPC_Strider::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	
@@ -4131,7 +4131,7 @@ void CNPC_Strider::FireCannon()
 		return;
 	}
 
-	if ( GetNextThink( "CANNON_HIT" ) > gpGlobals->curtime )
+	if (GetEngineObject()->GetNextThink( "CANNON_HIT" ) > gpGlobals->curtime )
 	{
 		DevMsg( "Strider refiring cannon?\n" );
 		return;
@@ -4271,7 +4271,7 @@ bool CNPC_Strider::CarriedByDropship()
 //---------------------------------------------------------
 void CNPC_Strider::CarriedThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 	StudioFrameAdvance();
 
 	Vector vecGround = GetEngineObject()->GetAbsOrigin();
@@ -5492,12 +5492,12 @@ void CSparkTrail::Spawn()
 	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 	SetThink( &CSparkTrail::SparkThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 void CSparkTrail::SparkThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 
 	g_pEffects->Sparks(GetEngineObject()->GetAbsOrigin() );
 

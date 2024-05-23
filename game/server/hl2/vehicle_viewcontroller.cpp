@@ -61,7 +61,7 @@ void CPropVehicleViewController::Think(void)
 	BaseClass::Think();
 
 	SetSimulationTime( gpGlobals->curtime );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	SetAnimatedEveryTick( true );
 
 	StudioFrameAdvance();
@@ -100,7 +100,7 @@ void CPropVehicleViewController::EnterVehicle( CBasePlayer *pPlayer )
 	m_playerOn.FireOutput( pPlayer, this, 0 );
 
 	// Start Thinking
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	m_VehiclePhysics.GetVehicle()->OnVehicleEnter();
 

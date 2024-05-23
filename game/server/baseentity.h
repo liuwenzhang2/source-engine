@@ -246,7 +246,6 @@ enum notify_system_event_t
 
 //-----------------------------------------------------------------------------
 
-typedef void (CBaseEntity::*BASEPTR)(void);
 typedef void (CBaseEntity::*ENTITYFUNCPTR)(CBaseEntity *pOther );
 typedef void (CBaseEntity::*USEPTR)( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
@@ -333,18 +332,7 @@ extern CServerGameDLL g_ServerGameDLL;
 
 //inline CBaseEntity *GetContainingEntity( edict_t *pent );
 
-//-----------------------------------------------------------------------------
-// Purpose: think contexts
-//-----------------------------------------------------------------------------
-struct thinkfunc_t
-{
-	BASEPTR		m_pfnThink;
-	string_t	m_iszContext;
-	int			m_nNextThinkTick;
-	int			m_nLastThinkTick;
 
-	DECLARE_SIMPLE_DATADESC();
-};
 
 struct EmitSound_t;
 struct rotatingpushmove_t;
@@ -770,18 +758,13 @@ public:
 	//static CBaseEntity *Instance( edict_t *pent );
 	static CBaseEntity* Instance( int iEnt );
 
-	// Think function handling
-	void (CBaseEntity::*m_pfnThink)(void);
-	virtual void Think( void ) { if (m_pfnThink) (this->*m_pfnThink)();};
+	
+	virtual void Think( void ) { 
+		if (GetEngineObject()->GetPfnThink()) 
+			(this->*GetEngineObject()->GetPfnThink())();
+	};
 
-	// Think functions with contexts
-	int		RegisterThinkContext( const char *szContext );
-	BASEPTR	ThinkSet( BASEPTR func, float flNextThinkTime = 0, const char *szContext = NULL );
-	void	SetNextThink( float nextThinkTime, const char *szContext = NULL );
-	float	GetNextThink( const char *szContext = NULL );
-	float	GetLastThink( const char *szContext = NULL );
-	int		GetNextThinkTick( const char *szContext = NULL );
-	int		GetLastThinkTick( const char *szContext = NULL );
+
 
 	float				GetAnimTime() const;
 	void				SetAnimTime( float at );
@@ -833,7 +816,6 @@ public:
 
 	CNetworkVar( int, m_ubInterpolationFrame );
 
-	int				m_nLastThinkTick;
 
 //#if !defined( NO_ENTITY_PREDICTION )
 //	// Certain entities (projectiles) can be created on the client and thus need a matching id number
@@ -844,19 +826,7 @@ public:
 
 protected:
 
-	// think function handling
-	enum thinkmethods_t
-	{
-		THINK_FIRE_ALL_FUNCTIONS,
-		THINK_FIRE_BASE_ONLY,
-		THINK_FIRE_ALL_BUT_BASE,
-	};
-	int		GetIndexForThinkContext( const char *pszContext );
-	CUtlVector< thinkfunc_t >	m_aThinkFunctions;
 
-#ifdef _DEBUG
-	int							m_iCurrentThinkContext;
-#endif
 
 	void RemoveExpiredConcepts( void );
 	int	GetContextCount() const;						// Call RemoveExpiredConcepts to clean out expired concepts
@@ -881,8 +851,7 @@ private:
 	friend class CGlobalEntityList;
 	friend class CThinkSyncTester;
 
-	// was pev->nextthink
-	CNetworkVarForDerived( int, m_nNextThinkTick );
+	
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1435,8 +1404,7 @@ public:
 //	CBasePlayer				*GetSimulatingPlayer( void );
 //#endif
 	// FIXME: Make these private!
- 	bool					PhysicsRunThink( thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS );
-	bool					PhysicsRunSpecificThink( int nContextIndex, BASEPTR thinkFunc );
+
 	bool					PhysicsTestEntityPosition( CBaseEntity **ppEntity = NULL );
 	void					PhysicsPushEntity( const Vector& push, trace_t *pTrace );
 	bool					PhysicsCheckWater( void );
@@ -1499,9 +1467,6 @@ private:
 	// Implement this if you use MOVETYPE_CUSTOM
 	virtual void			PerformCustomPhysics( Vector *pNewPosition, Vector *pNewVelocity, QAngle *pNewAngles, QAngle *pNewAngVelocity );
 
-	void					PhysicsDispatchThink( BASEPTR thinkFunc );
-
-
 
 	CBaseEntity				*PhysicsPushMove( float movetime );
 	CBaseEntity				*PhysicsPushRotate( float movetime );
@@ -1537,25 +1502,18 @@ public:
 public:
 	// Add a discontinuity to a step
 	bool					AddStepDiscontinuity( float flTime, const Vector &vecOrigin, const QAngle &vecAngles );
-	int						GetFirstThinkTick();	// get first tick thinking on any context
 private:
 	// origin and angles to use in step calculations
 	virtual	Vector			GetStepOrigin( void ) const;
 	virtual	QAngle			GetStepAngles( void ) const;
 	
 	// These set entity flags (EFL_*) to help optimize queries
-	void					CheckHasThinkFunction( bool isThinkingHint = false );
 	void					CheckHasGamePhysicsSimulation();
-	bool					WillThink();
 	bool					WillSimulateGamePhysics();
 
 	friend class CPushBlockerEnum;
 
-	// Sets/Gets the next think based on context index
-	void SetNextThink( int nContextIndex, float thinkTime );
-	void SetLastThink( int nContextIndex, float thinkTime );
-	float GetNextThink( int nContextIndex ) const;
-	int	GetNextThinkTick( int nContextIndex ) const;
+	
 
 	// Shot statistics
 	void UpdateShotStatistics( const trace_t &tr );
@@ -2213,8 +2171,8 @@ inline void CBaseEntity::FireBullets( int cShots, const Vector &vecSrc,
 // Normally it's illegal to cast a pointer to a member function of a derived class to a pointer to a 
 // member function of a base class.  static_cast is a sleezy way around that problem.
 
-#define SetThink( a ) ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), 0, NULL )
-#define SetContextThink( a, b, context ) ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), (b), context )
+#define SetThink( a ) GetEngineObject()->ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), 0, NULL )
+#define SetContextThink( a, b, context ) GetEngineObject()->ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), (b), context )
 
 #ifdef _DEBUG
 #define SetMoveDone( a ) \

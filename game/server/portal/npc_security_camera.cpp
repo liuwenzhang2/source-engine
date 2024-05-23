@@ -337,7 +337,7 @@ void CNPC_SecurityCamera::Spawn( void )
 	}
 
 	//Stagger our starting times
-	SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1f, 0.3f ) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1f, 0.3f ) );
 
 	CreateVPhysics();
 }
@@ -428,7 +428,7 @@ int CNPC_SecurityCamera::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 		m_OnDamaged.FireOutput( info.GetInflictor(), this );
 
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 		return 0;
 	}
@@ -463,7 +463,7 @@ void CNPC_SecurityCamera::Retire( void )
 
 	//Level out the turret
 	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	//Set ourselves to close
 	if ( m_bActive )
@@ -488,7 +488,7 @@ void CNPC_SecurityCamera::Deploy( void )
 
 	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	if ( !m_bActive )
 	{
@@ -635,7 +635,7 @@ void CNPC_SecurityCamera::ActiveThink( void )
 		return;
 
 	//Update our think time
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	CBaseEntity *pEnemy = GetEnemy();
 
@@ -793,7 +793,7 @@ void CNPC_SecurityCamera::SearchThink( void )
 	if ( PreThink( TURRET_SEARCHING ) )
 		return;
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	//If our enemy has died, pick a new enemy
 	if ( ( GetEnemy() != NULL ) && ( GetEnemy()->IsAlive() == false ) )
@@ -922,7 +922,7 @@ void CNPC_SecurityCamera::Enable( void )
 	}
 
 	SetThink( &CNPC_SecurityCamera::Deploy );
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 //-----------------------------------------------------------------------------
@@ -935,7 +935,7 @@ void CNPC_SecurityCamera::Disable( void )
 
 	SetEnemy( NULL );
 	SetThink( &CNPC_SecurityCamera::Retire );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void CNPC_SecurityCamera::RopesOn( void )
@@ -1065,7 +1065,7 @@ void CNPC_SecurityCamera::DeathThink( void )
 	// Level out our angles
 	m_vecGoalAngles.x = 120.0f;
 	m_vecGoalAngles.y = 0.0f;
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if ( m_lifeState != LIFE_DEAD )
 	{

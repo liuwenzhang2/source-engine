@@ -85,7 +85,7 @@ void CWeaponPortalgun::Spawn( void )
 	BaseClass::Spawn();
 
 	SetThink( &CWeaponPortalgun::Think );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if( GameRules()->IsMultiplayer() )
 	{
@@ -189,7 +189,7 @@ void CWeaponPortalgun::Think( void )
 	if ( PreThink() )
 		return;
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	CPortal_Player *pPlayer = ToPortalPlayer( GetOwner() );
 

@@ -207,7 +207,7 @@ void CNPC_Launcher::Precache( void )
 void CNPC_Launcher::LauncherTurnOn(void)
 {
 	SetThink(&CNPC_Launcher::LauncherThink);
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	m_flNextAttack = 0;
 }
 
@@ -387,7 +387,7 @@ void CNPC_Launcher::LauncherThink( void )
 			}
 		}
 	}
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -401,7 +401,7 @@ int CNPC_Launcher::DrawDebugTextOverlays(void)
 	if (m_debugOverlays & OVERLAY_TEXT_BIT) 
 	{
 		char tempstr[512];
-		Q_snprintf(tempstr,sizeof(tempstr),"State: %s", (m_pfnThink) ? "On" : "Off" );
+		Q_snprintf(tempstr,sizeof(tempstr),"State: %s", (GetEngineObject()->GetPfnThink()) ? "On" : "Off" );
 		EntityText(text_offset,tempstr,0);
 		text_offset++;
 

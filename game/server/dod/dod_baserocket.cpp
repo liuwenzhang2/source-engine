@@ -98,7 +98,7 @@ void CDODBaseRocket::Spawn( void )
 	m_bCollideWithTeammates = false;
 
 	SetThink( &CDODBaseRocket::FlyThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 unsigned int CDODBaseRocket::PhysicsSolidMaskForEntity( void ) const
@@ -269,7 +269,7 @@ void CDODBaseRocket::FlyThink( void )
 		m_bCollideWithTeammates = true;
 	}
 	
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 	

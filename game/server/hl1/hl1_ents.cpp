@@ -69,7 +69,7 @@ void CAutoTrigger::Spawn( void )
 
 void CAutoTrigger::Precache( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -185,7 +185,7 @@ void CTriggerRelay::RefireThink( void )
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + m_flRefireInterval );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flRefireInterval );
 	}
 }
 
@@ -206,7 +206,7 @@ void CTriggerRelay::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 
 		m_flTimeRefireDone = gpGlobals->curtime + m_flRefireDuration;
 		SetThink( &CTriggerRelay::RefireThink );
-		SetNextThink( gpGlobals->curtime + m_flRefireInterval );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flRefireInterval );
 	}
 }
 
@@ -366,7 +366,7 @@ void CMultiManager::ManagerThink ( void )
 	}
 	else
 	{
-		SetNextThink( m_startTime + m_flTargetDelay[ m_index ] );
+		GetEngineObject()->SetNextThink( m_startTime + m_flTargetDelay[ m_index ] );
 	}
 }
 
@@ -387,7 +387,7 @@ void CMultiManager::ManagerUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, 
 	SetUse( NULL );// disable use until all targets have fired
 
 	SetThink ( &CMultiManager::ManagerThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -461,7 +461,7 @@ void CPendulum::Spawn( void )
 		if (GetEngineObject()->HasSpawnFlags(SF_BRUSH_ROTATE_START_ON) )
 		{		
 			SetThink( &CBaseEntity::SUB_CallUseToggle );
-			SetNextThink( gpGlobals->curtime + 0.1f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		}
 
 		m_flSpeed = 0;
@@ -489,7 +489,7 @@ void CPendulum::PendulumUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 			delta = CBaseToggle::AxisDelta(GetEngineObject()->GetSpawnFlags(), GetEngineObject()->GetAbsAngles(), m_vStart);
 
 			SetLocalAngularVelocity( m_flMaxSpeed * m_vecMoveAng );
-			SetNextThink( gpGlobals->curtime + delta / m_flMaxSpeed);
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + delta / m_flMaxSpeed);
 			SetThink( &CPendulum::Stop );
 		}
 		else
@@ -501,7 +501,7 @@ void CPendulum::PendulumUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + 0.1f );		// Start the pendulum moving
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );		// Start the pendulum moving
 		m_flTime = gpGlobals->curtime;		// Save time to calculate dt
 		SetThink( &CPendulum::Swing );
 		m_flDampSpeed = m_flMaxSpeed;
@@ -510,7 +510,7 @@ void CPendulum::PendulumUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 
 void CPendulum::InputActivate( inputdata_t &inputdata )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );		// Start the pendulum moving
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );		// Start the pendulum moving
 	m_flTime = gpGlobals->curtime;				// Save time to calculate dt
 	SetThink( &CPendulum::Swing );
 	m_flDampSpeed = m_flMaxSpeed;
@@ -552,7 +552,7 @@ void CPendulum::Swing( void )
 	SetLocalAngularVelocity( m_flSpeed * m_vecMoveAng );
 
 	// Call this again
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	SetMoveDoneTime( 0.1 );
 	
 	if ( m_flDamp )
@@ -754,7 +754,7 @@ void CFuncMortarField::InputTrigger( inputdata_t &inputdata )
 		UTIL_TraceLine( vecSpot, vecSpot + Vector( 0, 0, -1 ) * MAX_TRACE_LENGTH, MASK_SOLID_BRUSHONLY, this,  COLLISION_GROUP_NONE, &tr );
 
 		CBaseEntity *pMortar = Create( "monster_mortar", tr.endpos, QAngle( 0, 0, 0 ), inputdata.pActivator );
-		pMortar->SetNextThink( gpGlobals->curtime + t );
+		pMortar->GetEngineObject()->SetNextThink( gpGlobals->curtime + t );
 		t += random->RandomFloat( 0.2, 0.5 );
 
 		if (i == 0)
@@ -795,7 +795,7 @@ void CMortar::Spawn( )
 	SetDamageRadius( GetDamage() * 2.5 );
 
 	SetThink( &CMortar::MortarExplode );
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 	Precache( );
 }
@@ -1007,7 +1007,7 @@ void CXenPLight::Spawn( void )
 
 	UTIL_SetSize( this, Vector(-80,-80,0), Vector(80,80,32));
 	SetActivity( ACT_IDLE );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	SetCycle( random->RandomFloat(0,1) );
 
 	m_pGlow = CSprite::SpriteCreate( XEN_PLANT_GLOW_SPRITE, GetEngineObject()->GetLocalOrigin() + Vector(0,0,(WorldAlignMins().z+WorldAlignMaxs().z)*0.5), FALSE );
@@ -1026,7 +1026,7 @@ void CXenPLight::Precache( void )
 void CXenPLight::Think( void )
 {
 	StudioFrameAdvance();
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	switch( GetActivity() )
 	{
@@ -1120,14 +1120,14 @@ void CXenHair::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_NONE );
-	SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1, 0.4 ) );	// Load balance these a bit
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1, 0.4 ) );	// Load balance these a bit
 }
 
 
 void CXenHair::Think( void )
 {
 	StudioFrameAdvance();
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 
@@ -1206,7 +1206,7 @@ void CXenTree::Spawn( void )
 
 	UTIL_SetSize( this, Vector(-30,-30,0), Vector(30,30,188));
 	SetActivity( ACT_IDLE );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	SetCycle( random->RandomFloat( 0,1 ) );
 	m_flPlaybackRate = random->RandomFloat( 0.7, 1.4 );
 
@@ -1295,7 +1295,7 @@ void CXenTree::HandleAnimEvent( animevent_t *pEvent )
 void CXenTree::Think( void )
 {
 	StudioFrameAdvance();
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	DispatchAnimEvents( this );
 
 	switch( GetActivity() )
@@ -1432,7 +1432,7 @@ void CXenSpore::Spawn( void )
 	SetCycle( random->RandomFloat( 0.0f, 1.0f ) );
 	m_flPlaybackRate = random->RandomFloat( 0.7f, 1.4f );
 	ResetSequenceInfo( );
-	SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1f, 0.4f ) );	// Load balance these a bit
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1f, 0.4f ) );	// Load balance these a bit
 }
 
 const char *CXenSpore::pModelNames[] = 
@@ -1475,7 +1475,7 @@ void CHL1Gib::WaitTillLand ( void )
 		m_nRenderMode = kRenderTransTexture;
 		AddSolidFlags( FSOLID_NOT_SOLID );*/
 		
-		SetNextThink( gpGlobals->curtime + m_lifeTime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_lifeTime );
 		SetThink ( &CBaseEntity::SUB_FadeOut );
 
 		// If you bleed, you stink!
@@ -1488,7 +1488,7 @@ void CHL1Gib::WaitTillLand ( void )
 	else
 	{
 		// wait and check again in another half second.
-		SetNextThink( gpGlobals->curtime + 0.5 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 	}
 }
 
@@ -1540,11 +1540,11 @@ void CHL1Gib::StickyGibTouch ( CBaseEntity *pOther )
 	trace_t	tr;
 	
 	SetThink ( &CHL1Gib::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 10 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 10 );
 
 	if ( !FClassnameIs( pOther, "worldspawn" ) )
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		return;
 	}
 
@@ -1585,7 +1585,7 @@ void CHL1Gib::Spawn( const char *szGibModel )
 	SetModel( szGibModel );
 	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0));
 
-	SetNextThink( gpGlobals->curtime + 4 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 4 );
 
 	m_lifeTime = 250;
 

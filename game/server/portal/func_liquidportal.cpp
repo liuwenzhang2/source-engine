@@ -175,7 +175,7 @@ void CFunc_LiquidPortal::InputStartFilling( inputdata_t &inputdata )
 	m_hLeftToTeleportThisFill.RemoveAll();
 	m_hLeftToTeleportThisFill.AddVectorToTail( m_hTeleportList );
 
-	SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
 }
 
 void CFunc_LiquidPortal::InputAddActivatorToTeleportList( inputdata_t &inputdata )
@@ -323,7 +323,7 @@ void CFunc_LiquidPortal::Think( void )
 				}
 			}
 
-			SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
 		}
 		else
 		{

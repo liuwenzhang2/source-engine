@@ -207,7 +207,7 @@ END_DATADESC()
 void CNPC_BaseTurret::Spawn()
 { 
 	Precache( );
-	SetNextThink( gpGlobals->curtime + 1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1 );
 	SetMoveType( MOVETYPE_FLY );
 	SetSequence( 0 );
 	SetCycle( 0 );
@@ -314,7 +314,7 @@ int CNPC_BaseTurret::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 
 		SetUse(NULL);
 		SetThink(&CNPC_BaseTurret::TurretDeath);
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 		m_OnDeactivate.FireOutput(this, this);
 
@@ -476,7 +476,7 @@ void CNPC_BaseTurret::Initialize(void)
 		m_flLastSight = gpGlobals->curtime + m_flMaxWait;
 		SetThink(&CNPC_BaseTurret::AutoSearchThink);
 
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	}
 	else
 	{
@@ -491,7 +491,7 @@ void CNPC_BaseTurret::ActiveThink(void)
 {
 	int fAttack = 0;
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	StudioFrameAdvance( );
 
 	if ( (!m_iOn) || (GetEnemy() == NULL) )
@@ -664,7 +664,7 @@ void CNPC_BaseTurret::SearchThink(void)
 	// ensure rethink
 	SetTurretAnim(TURRET_ANIM_SPIN);
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if (m_flSpinUpTime == 0 && m_flMaxSpin)
 		m_flSpinUpTime = gpGlobals->curtime + m_flMaxSpin;
@@ -731,7 +731,7 @@ void CNPC_BaseTurret::AutoSearchThink(void)
 {
 	// ensure rethink
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.3 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.3 );
 
 	// If we have a target and we're still healthy
 
@@ -774,7 +774,7 @@ extern short g_sModelIndexSmoke;
 void CNPC_BaseTurret::TurretDeath(void)
 {
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if (m_lifeState != LIFE_DEAD)
 	{
@@ -830,7 +830,7 @@ void CNPC_BaseTurret::TurretDeath(void)
 //=========================================================
 void CNPC_BaseTurret::Deploy(void)
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	StudioFrameAdvance( );
 
 	if (GetSequence() != TURRET_ANIM_DEPLOY)
@@ -883,7 +883,7 @@ void CNPC_BaseTurret::Retire(void)
 	m_vecGoalAngles.x = 0;
 	m_vecGoalAngles.y = m_flStartYaw;
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	StudioFrameAdvance( );
 
@@ -920,7 +920,7 @@ void CNPC_BaseTurret::Retire(void)
 			if (m_iAutoStart)
 			{
 				SetThink(&CNPC_BaseTurret::AutoSearchThink);	
-				SetNextThink( gpGlobals->curtime + 0.1 );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 			}
 			else
 			{
@@ -1053,14 +1053,14 @@ void CNPC_BaseTurret::TurretUse( CBaseEntity *pActivator, CBaseEntity *pCaller, 
 	if (m_iOn)
 	{
 		SetEnemy( NULL );
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 		m_iAutoStart = FALSE;// switching off a turret disables autostart
 		//!!!! this should spin down first!!BUGBUG
 		SetThink(&CNPC_BaseTurret::Retire);
 	}
 	else 
 	{
-		SetNextThink( gpGlobals->curtime + 0.1 ); // turn on delay
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 ); // turn on delay
 
 		// if the turret is flagged as an autoactivate turret, re-enable it's ability open self.
 		if (GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_AUTOACTIVATE )
@@ -1077,7 +1077,7 @@ void CNPC_BaseTurret::InputDeactivate( inputdata_t &inputdata )
 	if( m_iOn && m_lifeState == LIFE_ALIVE )
 	{
 		SetEnemy( NULL );
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 		m_iAutoStart = FALSE;// switching off a turret disables autostart
 		//!!!! this should spin down first!!BUGBUG
 		SetThink(&CNPC_BaseTurret::Retire);
@@ -1088,7 +1088,7 @@ void CNPC_BaseTurret::InputActivate( inputdata_t &inputdata )
 {
 	if( !m_iOn && m_lifeState == LIFE_ALIVE )
 	{
-		SetNextThink( gpGlobals->curtime + 0.1 ); // turn on delay
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 ); // turn on delay
 
 		// if the turret is flagged as an autoactivate turret, re-enable it's ability open self.
 		if (GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_AUTOACTIVATE )
@@ -1210,7 +1210,7 @@ void CNPC_Turret::Spawn()
 
 	m_eyeBrightness = 0;
 
-	SetNextThink( gpGlobals->curtime + 0.3 ); 
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.3 );
 }
 
 void CNPC_Turret::Precache()
@@ -1243,7 +1243,7 @@ void CNPC_Turret::Shoot(Vector &vecSrc, Vector &vecDirToEnemy)
 void CNPC_Turret::SpinUpCall(void)
 {
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	// Are we already spun up? If not start the two stage process.
 	if (!m_iSpin)
@@ -1252,7 +1252,7 @@ void CNPC_Turret::SpinUpCall(void)
 		// for the first pass, spin up the the barrel
 		if (!m_iStartSpin)
 		{
-			SetNextThink( gpGlobals->curtime + 1.0 );	//spinup delay
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0 );	//spinup delay
 			CPASAttenuationFilter filter( this );
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.SpinUpCall" );
 			m_iStartSpin = 1;
@@ -1261,7 +1261,7 @@ void CNPC_Turret::SpinUpCall(void)
 		// after the barrel is spun up, turn on the hum
 		else if (m_flPlaybackRate >= 1.0)
 		{
-			SetNextThink( gpGlobals->curtime + 0.1 );// retarget delay
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );// retarget delay
 			CPASAttenuationFilter filter( this );
 			g_pSoundEmitterSystem->EmitSound( filter, entindex(), "Turret.Spinup" );
 			SetThink(&CNPC_BaseTurret::ActiveThink);
@@ -1321,7 +1321,7 @@ void CNPC_MiniTurret::Spawn()
 	UTIL_SetSize(this, Vector(-16, -16, -m_iRetractHeight), Vector(16, 16, m_iRetractHeight));
 
 	SetThink(&CNPC_MiniTurret::Initialize);	
-	SetNextThink(gpGlobals->curtime + 0.3); 
+	GetEngineObject()->SetNextThink(gpGlobals->curtime + 0.3);
 
 	if ((GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_AUTOACTIVATE ) && !(GetEngineObject()->GetSpawnFlags() & SF_MONSTER_TURRET_STARTINACTIVE ))
 	{
@@ -1422,7 +1422,7 @@ void CNPC_Sentry::Spawn()
 	SetTouch(&CNPC_Sentry::SentryTouch);
 	SetThink(&CNPC_Sentry::Initialize);	
 
-	SetNextThink(gpGlobals->curtime + 0.3); 
+	GetEngineObject()->SetNextThink(gpGlobals->curtime + 0.3);
 
 	m_bStartedDeploy = false;
 }
@@ -1447,7 +1447,7 @@ int CNPC_Sentry::OnTakeDamage_Alive(const CTakeDamageInfo &info)
 		m_bStartedDeploy = true;
 		SetThink( &CNPC_Sentry::Deploy );
 		SetUse( NULL );
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	}
 
 	m_iHealth -= info.GetDamage();
@@ -1459,7 +1459,7 @@ int CNPC_Sentry::OnTakeDamage_Alive(const CTakeDamageInfo &info)
 
 		SetUse(NULL);
 		SetThink(&CNPC_BaseTurret::TurretDeath);		//should be SentryDeath ?
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 		m_OnDeactivate.FireOutput(this, this);
 

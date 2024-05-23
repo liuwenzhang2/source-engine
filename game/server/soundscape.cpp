@@ -540,7 +540,7 @@ void CTriggerSoundscape::Spawn()
 	InitTrigger();
 
 	SetThink( &CTriggerSoundscape::PlayerUpdateThink );
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 }
 
 
@@ -555,7 +555,7 @@ void CTriggerSoundscape::Activate()
 void CTriggerSoundscape::PlayerUpdateThink()
 {
 	int i;
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
 	CUtlVector<CBasePlayerHandle> oldSpectators;
 	oldSpectators = m_spectators;

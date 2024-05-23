@@ -3039,7 +3039,7 @@ inline const QAngle &CAI_Component::GetLocalAngles( void ) const
 
 inline float CAI_Component::GetLastThink( const char *szContext )
 {
-	return GetOuter()->GetLastThink( szContext );
+	return GetOuter()->GetEngineObject()->GetLastThink( szContext );
 }
 
 // ============================================================================

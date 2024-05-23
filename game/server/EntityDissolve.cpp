@@ -157,7 +157,7 @@ void CEntityDissolve::Spawn()
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + 0.01f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 	}
 }
 
@@ -337,7 +337,7 @@ void CEntityDissolve::DissolveThink( void )
 
 	if ( dt < m_flFadeInStart )
 	{
-		SetNextThink( m_flStartTime + m_flFadeInStart );
+		GetEngineObject()->SetNextThink( m_flStartTime + m_flFadeInStart );
 		return;
 	}
 
@@ -362,7 +362,7 @@ void CEntityDissolve::DissolveThink( void )
 		return;
 	}
 
-	SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
 }
 
 

@@ -1003,7 +1003,7 @@ void CBreakableSurface::BreakThink(void)
 					{
 						ShatterPane(w,h,vec3_origin,vec3_origin);
 					}
-					SetNextThink( gpGlobals->curtime );
+					GetEngineObject()->SetNextThink( gpGlobals->curtime );
 				}
 			}
 		}
@@ -1068,7 +1068,7 @@ void CBreakableSurface::BreakPane(int nWidth, int nHeight)
 	SetSupport( nWidth, nHeight, WINDOW_PANE_BROKEN );
 
 	SetThink(&CBreakableSurface::BreakThink);
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //------------------------------------------------------------------------------

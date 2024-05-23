@@ -67,7 +67,7 @@ void CGrenadeAR2::Spawn( void )
 	SetUse( &CGrenadeAR2::DetonateUse );
 	SetTouch( &CGrenadeAR2::GrenadeAR2Touch );
 	SetThink( &CGrenadeAR2::GrenadeAR2Think );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if( GetOwnerEntity() && GetOwnerEntity()->IsPlayer() )
 	{
@@ -126,7 +126,7 @@ void CGrenadeAR2::Spawn( void )
 //-----------------------------------------------------------------------------
 void CGrenadeAR2::GrenadeAR2Think( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 
 	if (!m_bIsLive)
 	{

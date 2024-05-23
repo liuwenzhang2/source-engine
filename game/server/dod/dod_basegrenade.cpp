@@ -117,7 +117,7 @@ void CDODBaseGrenade::Spawn( void )
 	m_bCollideWithTeammates = false;
 
 	SetThink( &CDODBaseGrenade::DetonateThink );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 void CDODBaseGrenade::Precache( void )
@@ -159,7 +159,7 @@ void CDODBaseGrenade::DetonateThink( void )
 		GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() * 0.5 );
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 }
 
 //Sets the time at which the grenade will explode
@@ -403,7 +403,7 @@ void CDODBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 // this will hit only things that are in newCollisionGroup, but NOT in collisionGroupAlreadyChecked

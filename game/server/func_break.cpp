@@ -608,7 +608,7 @@ void CBreakable::BreakTouch( CBaseEntity *pOther )
 		SetTouch( NULL );
 		
 		// Add optional delay 
-		SetNextThink( gpGlobals->curtime + m_flPressureDelay );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flPressureDelay );
 
 	}
 }
@@ -1119,7 +1119,7 @@ void CBreakable::Die( void )
 
 	VPhysicsDestroyObject();
 	SetThink( &CBreakable::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	if ( m_iszSpawnObject != NULL_STRING )
 	{
 		CBaseEntity::Create( STRING(m_iszSpawnObject), vecSpot, GetEngineObject()->GetCollisionAngles(), this );

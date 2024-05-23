@@ -639,7 +639,7 @@ void CPropAPC::Think( void )
 {
 	BaseClass::Think();
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	if ( !m_bInitialHandbrake )	// after initial timer expires, set the handbrake
 	{

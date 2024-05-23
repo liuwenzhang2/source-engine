@@ -818,7 +818,7 @@ void CFuncTrain::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 			m_target = m_hEnemy->GetEntityName();
 		}
 
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		GetEngineObject()->SetLocalVelocity( vec3_origin );
 		
 		if ( m_NoiseArrived != NULL_STRING )
@@ -1143,7 +1143,7 @@ void CFuncTrain::Stop( void )
 			m_target = m_hEnemy->GetEntityName();
 		}
 
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		
 		if ( m_NoiseArrived != NULL_STRING )
@@ -2376,7 +2376,7 @@ void CFuncTrackTrain::Next( void )
 
 		SetThink( &CFuncTrackTrain::Next );
 		SetMoveDoneTime( 0.5 );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		SetMoveDone( NULL );
 	}
 	else
@@ -2401,7 +2401,7 @@ void CFuncTrackTrain::Next( void )
 			float flTime = distance / fabs( m_oldSpeed );
 			GetEngineObject()->SetLocalVelocity(GetEngineObject()->GetLocalVelocity() * (m_oldSpeed / distance) );
 			SetMoveDone( &CFuncTrackTrain::DeadEnd );
-			SetNextThink( TICK_NEVER_THINK );
+			GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 			SetMoveDoneTime( flTime );
 		}
 		else
@@ -2567,7 +2567,7 @@ void CFuncTrackTrain::Find( void )
 
 	if ( m_flSpeed != 0 )
 	{
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		SetThink( &CFuncTrackTrain::Next );
 		SoundUpdate();
 	}
@@ -2708,7 +2708,7 @@ void CFuncTrackTrain::Spawn( void )
 // start trains on the next frame, to make sure their targets have had
 // a chance to spawn/activate
 	SetThink( &CFuncTrackTrain::Find );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	Precache();
 
 	CreateVPhysics();
@@ -2844,7 +2844,7 @@ void CFuncTrainControls::Spawn( void )
 	Assert(GetEngineObject()->GetMoveParent() && "func_traincontrols needs parent to properly align to train" );
 	
 	SetThink( &CFuncTrainControls::Find );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -2948,7 +2948,7 @@ void CFuncTrackChange::Spawn( void )
 
 	EnableUse();
 	SetThink( &CFuncTrackChange::Find );
-	SetNextThink( gpGlobals->curtime + 2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 2 );
 	Precache();
 }
 

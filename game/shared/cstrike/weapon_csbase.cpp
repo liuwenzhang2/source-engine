@@ -991,7 +991,7 @@ void CWeaponCSBase::Drop(const Vector &vecVelocity)
 		GetEngineObject()->SetAbsVelocity( vecVelocity );
 	}
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	SetOwnerEntity( NULL );
 	SetOwner( NULL );
@@ -1454,7 +1454,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 			return;
 		}
 
-		SetNextThink( gpGlobals->curtime + time );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + time );
 	}
 
 	//=========================================================
@@ -1488,7 +1488,7 @@ void CWeaponCSBase::DefaultTouch(CBaseEntity *pOther)
 
 			// not a typo! We want to know when the weapon the player just picked up should respawn! This new entity we created is the replacement,
 			// but when it should respawn is based on conditions belonging to the weapon that was taken.
-			pNewWeapon->SetNextThink( gpGlobals->curtime + g_pGameRules->FlWeaponRespawnTime( this ) );
+			pNewWeapon->GetEngineObject()->SetNextThink( gpGlobals->curtime + g_pGameRules->FlWeaponRespawnTime( this ) );
 		}
 		else
 		{

@@ -258,7 +258,7 @@ void CPropCannon::Spawn( void )
 	SetPoseParameter( "armextensionpose", m_flExtension );
 
 	CreateVPhysics();
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //-----------------------------------------------------------------------------
@@ -509,7 +509,7 @@ void CPropCannon::ProjectileExplosion( void )
 //-----------------------------------------------------------------------------
 void CPropCannon::Think( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if ( GetDriver() )
 	{

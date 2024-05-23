@@ -206,7 +206,7 @@ void CBaseTeamObjectiveResource::Spawn( void )
 	}
 
 	SetThink( &CBaseTeamObjectiveResource::ObjectiveThink );
-	SetNextThink( gpGlobals->curtime + LAZY_UPDATE_TIME );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + LAZY_UPDATE_TIME );
 }
 
 //-----------------------------------------------------------------------------
@@ -214,7 +214,7 @@ void CBaseTeamObjectiveResource::Spawn( void )
 //-----------------------------------------------------------------------------
 void CBaseTeamObjectiveResource::ObjectiveThink( void )
 {
-	SetNextThink( gpGlobals->curtime + LAZY_UPDATE_TIME );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + LAZY_UPDATE_TIME );
 
 	for ( int i = 0; i < m_iNumControlPoints; i++ )
 	{

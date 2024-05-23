@@ -208,7 +208,7 @@ void CItem_DynamicResupply::Spawn( void )
 	if ( !GetEngineObject()->HasSpawnFlags( SF_DYNAMICRESUPPLY_IS_MASTER | SF_DYNAMICRESUPPLY_ALTERNATE_MASTER ) )
 	{
 		// Stagger the thinks a bit so they don't all think at the same time
-		SetNextThink( gpGlobals->curtime + RandomFloat(0.2f, 0.4f) );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + RandomFloat(0.2f, 0.4f) );
 		SetThink( &CItem_DynamicResupply::CheckPVSThink );
 	}
 }
@@ -277,7 +277,7 @@ void CItem_DynamicResupply::CheckPVSThink( void )
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime + DYNAMIC_ITEM_THINK );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + DYNAMIC_ITEM_THINK );
 }
 
 //-----------------------------------------------------------------------------

@@ -360,7 +360,7 @@ bool CWeaponSatchel::Holster( CBaseCombatWeapon *pSwitchingTo )
 		{
 #ifndef CLIENT_DLL
 			SetThink( &CWeaponSatchel::DestroyItem );
-			SetNextThink( gpGlobals->curtime + 0.1 );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 #endif
 		}
 	}
@@ -471,7 +471,7 @@ void CSatchelCharge::Spawn( void )
 	SetTouch( &CSatchelCharge::SatchelTouch );
 	SetUse( &CSatchelCharge::SatchelUse );
 	SetThink( &CSatchelCharge::SatchelThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	m_flDamage		= sk_plr_dmg_satchel.GetFloat();
 	m_DmgRadius		= m_flDamage * 2.5;
@@ -496,7 +496,7 @@ void CSatchelCharge::Spawn( void )
 void CSatchelCharge::SatchelUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	SetThink( &CBaseGrenade::Detonate );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //-----------------------------------------------------------------------------
@@ -542,7 +542,7 @@ void CSatchelCharge::SatchelThink( void )
 	UpdateSlideSound();
 
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if (!IsInWorld())
 	{

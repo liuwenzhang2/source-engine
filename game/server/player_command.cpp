@@ -248,8 +248,8 @@ void CPlayerMove::RunPreThink( CBasePlayer *player )
 	VPROF( "CPlayerMove::RunPreThink" );
 
 	// Run think functions on the player
-	VPROF_SCOPE_BEGIN( "player->PhysicsRunThink()" );
-	if ( !player->PhysicsRunThink() )
+	VPROF_SCOPE_BEGIN( "player->GetEngineObject()->PhysicsRunThink()" );
+	if ( !player->GetEngineObject()->PhysicsRunThink() )
 		return;
 	VPROF_SCOPE_END();
 
@@ -276,13 +276,13 @@ void CPlayerMove::RunPreThink( CBasePlayer *player )
 void CPlayerMove::RunThink (CBasePlayer *player, double frametime )
 {
 	VPROF( "CPlayerMove::RunThink" );
-	int thinktick = player->GetNextThinkTick();
+	int thinktick = player->GetEngineObject()->GetNextThinkTick();
 
 	if ( thinktick <= 0 || thinktick > player->m_nTickBase )
 		return;
 		
 	//gpGlobals->curtime = thinktime;
-	player->SetNextThink( TICK_NEVER_THINK );
+	player->GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 	// Think
 	player->Think();

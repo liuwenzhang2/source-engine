@@ -73,7 +73,7 @@ void CScriptedTarget::TurnOn( void )
 	m_vLastPosition = GetEngineObject()->GetAbsOrigin();
 	SetThink( &CScriptedTarget::ScriptThink );
 	m_iDisabled		= false;
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -258,7 +258,7 @@ void CScriptedTarget::ScriptThink( void )
 		m_flPauseDoneTime		= 0;
 		SetTarget( FindEntity() );
 	}
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 

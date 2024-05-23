@@ -295,7 +295,7 @@ void CGrenadeBugBait::ThinkBecomeSolid( void )
 void CGrenadeBugBait::SetGracePeriod( float duration )
 {
 	SetThink( &CGrenadeBugBait::ThinkBecomeSolid );
-	SetNextThink( gpGlobals->curtime + duration );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + duration );
 
 	// Become unsolid	
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );

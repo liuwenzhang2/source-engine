@@ -137,7 +137,7 @@ END_NETWORK_TABLE()
 
 		CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 0.5, GetEngineObject()->GetAbsVelocity().Length( ), 0.2 );
 
-		SetNextThink( gpGlobals->curtime + 0.2 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
 		if (GetWaterLevel() != 0)
 		{

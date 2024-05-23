@@ -1702,7 +1702,7 @@ void CCSPlayer::PushawayThink()
 {
 	// Push physics props out of our way.
 	PerformObstaclePushaway( this );
-	SetNextThink( gpGlobals->curtime + PUSHAWAY_THINK_INTERVAL, CS_PUSHAWAY_THINK_CONTEXT );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + PUSHAWAY_THINK_INTERVAL, CS_PUSHAWAY_THINK_CONTEXT );
 }
 
 
@@ -2726,7 +2726,7 @@ void CCSPlayer::RoundRespawn()
 		State_Transition( STATE_ACTIVE );
 		respawn( this, false );
 		m_nButtons = 0;
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	}
 
 	m_receivesMoneyNextRound = true; // reset this variable so they can receive their cash next round.

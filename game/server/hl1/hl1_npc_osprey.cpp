@@ -477,7 +477,7 @@ CAI_BaseNPC *CNPC_Osprey::MakeGrunt( Vector vecSrc )
 			pBeam->SetBeamFlags( FBEAM_SOLID );
 			pBeam->SetColor( 255, 255, 255 );
 			pBeam->SetThink( &CBaseEntity::SUB_Remove );
-			pBeam->SetNextThink( gpGlobals->curtime + -4096.0 * tr.fraction / pGrunt->GetEngineObject()->GetAbsVelocity().z + 0.5 );
+			pBeam->GetEngineObject()->SetNextThink( gpGlobals->curtime + -4096.0 * tr.fraction / pGrunt->GetEngineObject()->GetAbsVelocity().z + 0.5 );
 			
 
 			// ALERT( at_console, "%d at %.0f %.0f %.0f\n", i, m_vecOrigin[i].x, m_vecOrigin[i].y, m_vecOrigin[i].z );  
@@ -547,7 +547,7 @@ void CNPC_Osprey::PrescheduleThink( void )
 void CNPC_Osprey::DyingThink( void )
 {
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if( gpGlobals->curtime > m_flNextCrashExplosion )
 	{
@@ -738,7 +738,7 @@ void CBaseHelicopter::Spawn( void )
 	if ( !(GetEngineObject()->GetSpawnFlags() & SF_AWAITINPUT) )
 	{
 		Startup();
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 	}
 
 }
@@ -762,7 +762,7 @@ bool CBaseHelicopter::FireGun( void )
 //------------------------------------------------------------------------------
 void CBaseHelicopter::HelicopterThink( void )
 {
-	SetNextThink( gpGlobals->curtime + HELICOPTER_THINK_INTERVAL );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + HELICOPTER_THINK_INTERVAL );
 
 	// Don't keep this around for more than one frame.
 	ClearCondition( COND_ENEMY_DEAD );
@@ -781,7 +781,7 @@ void CBaseHelicopter::HelicopterThink( void )
 	{
 		GetEngineObject()->SetAbsVelocity( vec3_origin );
 		SetLocalAngularVelocity( vec3_angle );
-		SetNextThink( gpGlobals->curtime + HELICOPTER_THINK_INTERVAL );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + HELICOPTER_THINK_INTERVAL );
 		return;
 	}
 
@@ -1274,7 +1274,7 @@ void CBaseHelicopter::CrashTouch( CBaseEntity *pOther )
 	if ( pOther->GetEngineObject()->GetSolid() == SOLID_BSP)
 	{
 		SetTouch( NULL );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 		CPASFilter filter(GetEngineObject()->GetAbsOrigin() );
 		for (int i = 0; i < 5; i++)
@@ -1300,7 +1300,7 @@ void CBaseHelicopter::CrashTouch( CBaseEntity *pOther )
 void CBaseHelicopter::DyingThink( void )
 {
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	SetLocalAngularVelocity( GetLocalAngularVelocity() * 1.02 );
 }
@@ -1338,7 +1338,7 @@ int CBaseHelicopter::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CBaseHelicopter::DrawDebugGeometryOverlays(void) 
 {
-	if (m_pfnThink!= NULL)
+	if (GetEngineObject()->GetPfnThink()!= NULL)
 	{
 		// ------------------------------
 		// Draw route if requested
@@ -1393,7 +1393,7 @@ void CBaseHelicopter::TraceAttack( const CTakeDamageInfo &info, const Vector &ve
 void CBaseHelicopter::NullThink( void )
 {
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 }
 
 
@@ -1402,7 +1402,7 @@ void CBaseHelicopter::Startup( void )
 	m_flGoalSpeed = m_flInitialSpeed;
 	SetThink( &CBaseHelicopter::HelicopterThink );
 	SetTouch( &CBaseHelicopter::FlyTouch );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -1421,7 +1421,7 @@ void CBaseHelicopter::Event_Killed( const CTakeDamageInfo &info )
 
 	m_flNextCrashExplosion = gpGlobals->curtime + 0.0f;
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	m_iHealth = 0;
 	m_takedamage = DAMAGE_NO;
 

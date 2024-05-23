@@ -758,7 +758,7 @@ void CNPC_AntlionGuard::CreateGlow( CSprite **pSprite, const char *pAttachName )
 
 	// Don't uselessly animate, we're a static sprite!
 	(*pSprite)->SetThink( NULL );
-	(*pSprite)->SetNextThink( TICK_NEVER_THINK );
+	(*pSprite)->GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 //-----------------------------------------------------------------------------
@@ -2363,7 +2363,7 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 					pParticle->Activate();
 				
 				pParticle->SetThink( &CBaseEntity::SUB_Remove );
-				pParticle->SetNextThink( gpGlobals->curtime + random->RandomFloat( 2.0f, 3.0f ) );
+				pParticle->GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 2.0f, 3.0f ) );
 			}
 		}
 		*/

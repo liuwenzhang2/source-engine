@@ -83,7 +83,7 @@ void CPoseController::Spawn( void )
 
 	// Think to refresh the list of models
 	SetThink( &CPoseController::Think );
-	SetNextThink( gpGlobals->curtime + 1.0 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0 );
 }
 
 void CPoseController::Think( void )
@@ -97,7 +97,7 @@ void CPoseController::Think( void )
 
 		m_bDisablePropLookup = true;
 
-		SetNextThink( gpGlobals->curtime + 1.0 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0 );
 	}
 }
 
@@ -140,7 +140,7 @@ void CPoseController::BuildPropList( void )
 		++iPropNum;
 	}
 
-	SetNextThink( gpGlobals->curtime + 1.0 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0 );
 }
 
 void CPoseController::BuildPoseIndexList( void )

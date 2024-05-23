@@ -4144,7 +4144,7 @@ void CCitizenResponseSystem::AddResponseTrigger( citizenresponses_t	iTrigger )
 {
 	m_flResponseAddedTime[ iTrigger ] = gpGlobals->curtime;
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 //-----------------------------------------------------------------------------
@@ -4210,7 +4210,7 @@ void CCitizenResponseSystem::ResponseThink()
 	// Do we need to keep thinking?
 	if ( bStayActive )
 	{
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	}
 }
 

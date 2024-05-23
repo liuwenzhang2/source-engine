@@ -515,7 +515,7 @@ void CNPC_CScanner::NPCThink(void)
 	{
 		SetActivity((Activity)ACT_SCANNER_RETRACT_PRONGS);
 		StudioFrameAdvance( );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 	else
 	{

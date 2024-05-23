@@ -262,7 +262,7 @@ void CWeaponStriderBuster::Spawn( void )
 
 	SetHealth( striderbuster_health.GetFloat() );
 	
-	SetNextThink(gpGlobals->curtime + 0.01f);
+	GetEngineObject()->SetNextThink(gpGlobals->curtime + 0.01f);
 }
 
 //-----------------------------------------------------------------------------
@@ -763,7 +763,7 @@ int CWeaponStriderBuster::OnTakeDamage( const CTakeDamageInfo &info )
 					SetContextThink( NULL, gpGlobals->curtime, s_pBusterPingThinkContext );
 
 					SetThink( &CWeaponStriderBuster::BusterDetachThink );
-					SetNextThink( gpGlobals->curtime );
+					GetEngineObject()->SetNextThink( gpGlobals->curtime );
 					m_iBusterFlags |= STRIDERBUSTER_FLAG_KNOCKED_OFF_STRIDER;
 
 					return 0;
@@ -888,7 +888,7 @@ void CWeaponStriderBuster::Launch( CBasePlayer *pPhysGunUser )
 	SetTouch ( &CWeaponStriderBuster::BusterTouch );
 
 	SetThink( &CWeaponStriderBuster::BusterFlyThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	gamestats->Event_WeaponFired( pPhysGunUser, true, GetClassname() );
 }
@@ -947,7 +947,7 @@ void CWeaponStriderBuster::BusterFlyThink()
 	{
 		if ( VPhysicsGetObject() )
 			VPhysicsGetObject()->ApplyForceCenter( Vector( 0, 0, striderbuster_dive_force.GetFloat() ) );
-		SetNextThink(gpGlobals->curtime + 0.01f);
+		GetEngineObject()->SetNextThink(gpGlobals->curtime + 0.01f);
 		return;
 	}
 
@@ -1045,7 +1045,7 @@ void CWeaponStriderBuster::BusterFlyThink()
 			}
 		}
 
-		SetNextThink(gpGlobals->curtime + 0.01f);
+		GetEngineObject()->SetNextThink(gpGlobals->curtime + 0.01f);
 	}
 }
 
@@ -1053,7 +1053,7 @@ void CWeaponStriderBuster::BusterFlyThink()
 //-----------------------------------------------------------------------------
 void CWeaponStriderBuster::BusterDetachThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	trace_t tr;
 	UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector( 0, 0, 1200), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );

@@ -88,7 +88,7 @@ void CEnvSpark::Spawn(void)
 		SetThink( &CEnvSpark::SparkThink );	// start sparking
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1 + random->RandomFloat( 0, 1.5 ) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 + random->RandomFloat( 0, 1.5 ) );
 
 	// Negative delays are not allowed
 	if ( m_flDelay < 0 )
@@ -125,7 +125,7 @@ extern ConVar phys_pushscale;
 //-----------------------------------------------------------------------------
 void CEnvSpark::SparkThink(void)
 {
-	SetNextThink( gpGlobals->curtime + 0.1 + random->RandomFloat(0, m_flDelay) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 + random->RandomFloat(0, m_flDelay) );
 
 	Vector vecDir = vec3_origin;
 	if (GetEngineObject()->HasSpawnFlags(SF_SPARK_DIRECTIONAL) )
@@ -158,7 +158,7 @@ void CEnvSpark::InputStartSpark( inputdata_t &inputdata )
 void CEnvSpark::StartSpark( void )
 {
 	SetThink( &CEnvSpark::SparkThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //-----------------------------------------------------------------------------
@@ -167,7 +167,7 @@ void CEnvSpark::StartSpark( void )
 void CEnvSpark::InputSparkOnce( inputdata_t &inputdata )
 {
 	SparkThink();
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 //-----------------------------------------------------------------------------
@@ -191,7 +191,7 @@ void CEnvSpark::StopSpark( void )
 //-----------------------------------------------------------------------------
 void CEnvSpark::InputToggleSpark( inputdata_t &inputdata )
 {
-	if ( GetNextThink() == TICK_NEVER_THINK )
+	if (GetEngineObject()->GetNextThink() == TICK_NEVER_THINK )
 	{
 		InputStartSpark( inputdata );
 	}

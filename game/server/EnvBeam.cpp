@@ -160,7 +160,7 @@ void CEnvBeam::Spawn( void )
 	if ( ServerSide() )
 	{
 		SetThink( &CEnvBeam::UpdateThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		SetFireTime( gpGlobals->curtime );
 
 		if ( GetEntityName() != NULL_STRING )
@@ -169,7 +169,7 @@ void CEnvBeam::Spawn( void )
 			{
 				GetEngineObject()->AddEffects( EF_NODRAW );
 				m_active = 0;
-				SetNextThink( TICK_NEVER_THINK );
+				GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 			}
 			else
 			{
@@ -183,7 +183,7 @@ void CEnvBeam::Spawn( void )
 		if ( !GetEntityName() || FBitSet(GetEngineObject()->GetSpawnFlags(), SF_BEAM_STARTON) )
 		{
 			SetThink( &CEnvBeam::StrikeThink );
-			SetNextThink( gpGlobals->curtime + 1.0f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 		}
 	}
 
@@ -301,13 +301,13 @@ void CEnvBeam::TurnOn( void )
 		DoSparks( GetAbsStartPos(), GetAbsEndPos() );
 
 		SetThink( &CEnvBeam::UpdateThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		SetFireTime( gpGlobals->curtime );
 	}
 	else
 	{
 		SetThink( &CEnvBeam::StrikeThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -324,7 +324,7 @@ void CEnvBeam::TurnOff( void )
 		GetEngineObject()->AddEffects( EF_NODRAW );
 	}
 
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	SetThink( NULL );
 }
 
@@ -337,9 +337,9 @@ void CEnvBeam::StrikeThink( void )
 	if ( m_life != 0 )
 	{
 		if (GetEngineObject()->GetSpawnFlags() & SF_BEAM_RANDOM )
-			SetNextThink( gpGlobals->curtime + m_life + random->RandomFloat( 0, m_restrike ) );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + m_life + random->RandomFloat( 0, m_restrike ) );
 		else
-			SetNextThink( gpGlobals->curtime + m_life + m_restrike );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + m_life + m_restrike );
 	}
 	m_active = 1;
 
@@ -588,7 +588,7 @@ void CEnvBeam::UpdateThink( void )
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 

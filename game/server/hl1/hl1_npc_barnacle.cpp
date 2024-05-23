@@ -127,7 +127,7 @@ void CNPC_Barnacle::Spawn()
 	SetActivity ( ACT_IDLE );
 
 	SetThink ( &CNPC_Barnacle::BarnacleThink );
-	SetNextThink( gpGlobals->curtime + 0.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 	//Do not have a shadow
 	GetEngineObject()->AddEffects( EF_NOSHADOW );
 
@@ -179,7 +179,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 	CBaseEntity *pTouchEnt;
 	float flLength;
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if (CAI_BaseNPC::m_nDebugBits & bits_debugDisableAI)
 	{
@@ -313,7 +313,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 
 				if( vecDist.Length2DSqr() >= Square(600.0f) )
 				{
-					SetNextThink( gpGlobals->curtime + 1.5f );
+					GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.5f );
 				}
 			}
 		}
@@ -419,7 +419,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 
 	StudioFrameAdvance();
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	SetThink ( &CNPC_Barnacle::WaitTillDead );
 }
 
@@ -428,7 +428,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_Barnacle::WaitTillDead ( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	StudioFrameAdvance();
 	DispatchAnimEvents ( this );

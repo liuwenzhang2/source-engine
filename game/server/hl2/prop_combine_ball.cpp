@@ -685,7 +685,7 @@ void CPropCombineBall::FadeOut( float flDuration )
 	}
 
 	SetThink( &CPropCombineBall::DieThink );
-	SetNextThink( gpGlobals->curtime + flDuration );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + flDuration );
 }
 
 //-----------------------------------------------------------------------------
@@ -1876,7 +1876,7 @@ void CFuncCombineBallSpawner::Spawn()
 	else
 	{
 		SetThink( &CFuncCombineBallSpawner::BallThink );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 
@@ -1898,7 +1898,7 @@ void CFuncCombineBallSpawner::InputEnable( inputdata_t &inputdata )
 	}
 
 	SetThink( &CFuncCombineBallSpawner::BallThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void CFuncCombineBallSpawner::InputDisable( inputdata_t &inputdata )
@@ -2130,7 +2130,7 @@ void CFuncCombineBallSpawner::BallThink()
 	}
 
 	// There are no more to respawn
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 BEGIN_DATADESC( CPointCombineBallLauncher )

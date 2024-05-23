@@ -60,7 +60,7 @@ void CSpeaker::Spawn( void )
 	if ( Q_strlen( soundfile ) < 1 )
 	{
 		Warning( "'speaker' entity with no Level/Sentence! at: %f, %f, %f\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		SetThink( &CSpeaker::SUB_Remove );
 		return;
 	}
@@ -75,7 +75,7 @@ void CSpeaker::Spawn( void )
     SetMoveType( MOVETYPE_NONE );
 	
 	SetThink(&CSpeaker::SpeakerThink);
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 	// allow on/off switching via 'use' function.
 
@@ -88,7 +88,7 @@ void CSpeaker::Precache( void )
 	if ( !GetEngineObject()->HasSpawnFlags(SF_SPEAKER_START_SILENT) )
 	{
 		// set first announcement time for random n second
-		SetNextThink( gpGlobals->curtime + random->RandomFloat(5.0, 15.0) );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat(5.0, 15.0) );
 	}
 
 	if ( !m_pInstancedResponseSystem && Q_strlen( STRING(m_iszRuleScriptFile) ) > 0 )
@@ -168,13 +168,13 @@ void CSpeaker::SpeakerThink( void )
 		float releaseTime = MAX( g_AIFriendliesTalkSemaphore.GetReleaseTime(), g_AIFoesTalkSemaphore.GetReleaseTime() );
 		// Add some slop (only up to one second)
 		releaseTime += random->RandomFloat( 0, 1 );
-		SetNextThink( releaseTime );
+		GetEngineObject()->SetNextThink( releaseTime );
 		return;
 	}
 	
 	DispatchResponse( m_iszConcept.ToCStr() );
 
-	SetNextThink( gpGlobals->curtime + random->RandomFloat(m_delayMin, m_delayMax) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat(m_delayMin, m_delayMax) );
 
 	// time delay until it's ok to speak: used so that two NPCs don't talk at once
 	g_AIFriendliesTalkSemaphore.Acquire( 5, this );		
@@ -185,14 +185,14 @@ void CSpeaker::SpeakerThink( void )
 void CSpeaker::InputTurnOn( inputdata_t &inputdata )
 {
 	// turn on announcements
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 
 void CSpeaker::InputTurnOff( inputdata_t &inputdata )
 {
 	// turn off announcements
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 
@@ -201,17 +201,17 @@ void CSpeaker::InputTurnOff( inputdata_t &inputdata )
 //
 void CSpeaker::InputToggle( inputdata_t &inputdata )
 {
-	int fActive = (GetNextThink() > 0.0 );
+	int fActive = (GetEngineObject()->GetNextThink() > 0.0 );
 
 	// fActive is true only if an announcement is pending
 	if ( fActive )
 	{
 		// turn off announcements
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	}
 	else 
 	{
 		// turn on announcements
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	} 
 }

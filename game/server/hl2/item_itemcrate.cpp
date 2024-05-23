@@ -246,7 +246,7 @@ void CItem_ItemCrate::OnBreak( const Vector &vecVelocity, const AngularImpulse &
 			{
 				pSpawn->GetEngineObject()->AddSpawnFlags( SF_DYNAMICRESUPPLY_ALWAYS_SPAWN );
 			}
-			pSpawn->SetNextThink( gpGlobals->curtime );
+			pSpawn->GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		}
 	}
 }

@@ -245,7 +245,7 @@ void CNPC_Combine_Cannon::LaserOff( void )
 		m_pAncillaryBeams[i]->TurnOn();
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -380,7 +380,7 @@ void CNPC_Combine_Cannon::CreateLaser( void )
 	m_pBeam->SetHaloScale( 16.0f );
 
 	// Think faster while painting
-	SetNextThink( gpGlobals->curtime + 0.02f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.02f );
 }
 
 //-----------------------------------------------------------------------------
@@ -1016,11 +1016,11 @@ void CNPC_Combine_Cannon::PrescheduleThink( void )
 	// Think faster if the beam is on, this gives the beam higher resolution.
 	if( m_pBeam )
 	{
-		SetNextThink( gpGlobals->curtime + 0.03 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.03 );
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 
 	// If the enemy has just stepped into view, or we've acquired a new enemy,

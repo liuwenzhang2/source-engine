@@ -46,7 +46,7 @@ CHEGrenadeProjectile* CHEGrenadeProjectile::Create(
 
 	// make NPCs afaid of it while in the air
 	pGrenade->SetThink( &CHEGrenadeProjectile::DangerSoundThink );
-	pGrenade->SetNextThink( gpGlobals->curtime );
+	pGrenade->GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	pGrenade->m_pWeaponInfo = GetWeaponInfo( WEAPON_HEGRENADE );
 

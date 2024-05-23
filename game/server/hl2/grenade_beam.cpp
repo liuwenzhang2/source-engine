@@ -41,7 +41,7 @@ void CGrenadeBeamChaser::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetMoveType( MOVETYPE_FLY );
 	SetThink(&CGrenadeBeamChaser::ChaserThink);
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ void CGrenadeBeamChaser::ChaserThink( void )
 		VectorNormalize(vTargetDir);
 		GetEngineObject()->SetAbsVelocity( vTargetDir * m_pTarget->m_flBeamSpeed );
 	}
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ void CGrenadeBeam::Spawn( void )
 	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	SetTouch( &CGrenadeBeam::GrenadeBeamTouch );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	m_takedamage	= DAMAGE_NO;
 	m_iHealth		= 1;
@@ -179,7 +179,7 @@ void CGrenadeBeam::Format(color32 clrColor, float flWidth)
 void CGrenadeBeam::Shoot(Vector vDirection, float flSpeed, float flLifetime, float flLag, float flDamage )
 {
 	SetThink ( &CGrenadeBeam::KillBeam );
-	SetNextThink( gpGlobals->curtime + flLifetime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + flLifetime );
 	m_hBeamChaser		= CGrenadeBeamChaser::ChaserCreate(this);
 	m_flBeamSpeed		= flSpeed;
 	GetEngineObject()->SetAbsVelocity( vDirection * flSpeed );

@@ -110,7 +110,7 @@ void CHL1BaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 	SetThink( &CBaseGrenade::Smoke );
-	SetNextThink( gpGlobals->curtime + 0.3);
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.3);
 
 	if ( GetWaterLevel() == 0 )
 	{

@@ -203,9 +203,9 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	// intermittent bugs with env_microphones who are listening for explosions. They will 'randomly' not
 	// hear explosion sounds when the grenade is removed and the SoundEnt thinks (and removes the sound)
 	// before the env_microphone thinks and hears the sound.
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 #else
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 #endif//HL2_EPISODIC
 
 #if defined( HL2_DLL )
@@ -239,7 +239,7 @@ void CBaseGrenade::Smoke( void )
 #if !defined( CLIENT_DLL )
 	SetThink ( &CBaseGrenade::SUB_Remove );
 #endif
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 void CBaseGrenade::Event_Killed( const CTakeDamageInfo &info )
@@ -275,7 +275,7 @@ void CBaseGrenade::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 void CBaseGrenade::DetonateUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	SetThink( &CBaseGrenade::Detonate );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 void CBaseGrenade::PreDetonate( void )
@@ -285,7 +285,7 @@ void CBaseGrenade::PreDetonate( void )
 #endif
 
 	SetThink( &CBaseGrenade::Detonate );
-	SetNextThink( gpGlobals->curtime + 1.5 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.5 );
 }
 
 
@@ -349,7 +349,7 @@ void CBaseGrenade::DangerSoundThink( void )
 	CSoundEnt::InsertSound ( SOUND_DANGER, GetEngineObject()->GetAbsOrigin() + GetEngineObject()->GetAbsVelocity() * 0.5, GetEngineObject()->GetAbsVelocity().Length( ), 0.2, this );
 #endif
 
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
 	if (GetWaterLevel() != 0)
 	{
@@ -468,7 +468,7 @@ void CBaseGrenade ::TumbleThink( void )
 	}
 
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	//
 	// Emit a danger sound one second before exploding.

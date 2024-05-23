@@ -301,7 +301,7 @@ void CGrenadeFrag::SetTimer( float detonateDelay, float warnDelay )
 	m_flDetonateTime = gpGlobals->curtime + detonateDelay;
 	m_flWarnAITime = gpGlobals->curtime + warnDelay;
 	SetThink( &CGrenadeFrag::DelayThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	CreateEffects();
 }
@@ -363,7 +363,7 @@ void CGrenadeFrag::DelayThink()
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 void CGrenadeFrag::SetVelocity( const Vector &velocity, const AngularImpulse &angVelocity )

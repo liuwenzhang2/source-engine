@@ -247,7 +247,7 @@ void CPropGladosCore::StartPanic( void )
 {
 	ResetSequence( LookupSequence( STRING(m_iszLookAnimationName) ) );
 	SetThink( &CPropGladosCore::PanicThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -259,7 +259,7 @@ void CPropGladosCore::PanicThink ( void )
 	if ( m_speechEvents.Count() <= 0 || !m_speechEvents.IsValidIndex( m_iSpeechIter ) || m_iszPanicSoundScriptName == NULL_STRING )
 	{
 		SetThink ( NULL );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		return;
 	}
 
@@ -276,7 +276,7 @@ void CPropGladosCore::PanicThink ( void )
 	float flCurDuration = g_pSoundEmitterSystem->GetSoundDuration(  m_iszPanicSoundScriptName.ToCStr(), GLADOS_CORE_MODEL_NAME );
 
 	SetThink( &CPropGladosCore::TalkingThink );
-	SetNextThink( gpGlobals->curtime + m_flBetweenVOPadding + flCurDuration );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flBetweenVOPadding + flCurDuration );
 }
 
 //-----------------------------------------------------------------------------
@@ -297,7 +297,7 @@ void CPropGladosCore::StartTalking( float flDelay )
 
 	m_iSpeechIter = 0;
 	SetThink( &CPropGladosCore::TalkingThink );
-	SetNextThink( gpGlobals->curtime + m_flBetweenVOPadding + flDelay );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flBetweenVOPadding + flDelay );
 }
 
 //-----------------------------------------------------------------------------
@@ -308,7 +308,7 @@ void CPropGladosCore::TalkingThink( void )
 	if ( m_speechEvents.Count() <= 0 || !m_speechEvents.IsValidIndex( m_iSpeechIter ) )
 	{
 		SetThink ( NULL );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		return;
 	}
 
@@ -337,7 +337,7 @@ void CPropGladosCore::TalkingThink( void )
 	params.m_pflSoundDuration = NULL;
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
-	SetNextThink( gpGlobals->curtime + m_flBetweenVOPadding + flCurDuration );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flBetweenVOPadding + flCurDuration );
 
 	// wrap if we hit the end of the list
 	m_iSpeechIter = (m_iSpeechIter+1)%m_speechEvents.Count();

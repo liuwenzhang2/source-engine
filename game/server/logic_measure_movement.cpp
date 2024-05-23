@@ -103,7 +103,7 @@ void CLogicMeasureMovement::Activate()
 	SetTargetReference( STRING(m_strTargetReference) );
 	
 	SetThink( &CLogicMeasureMovement::MeasureThink );
-	SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
 }
 
 
@@ -203,7 +203,7 @@ void CLogicMeasureMovement::MeasureThink( )
 		m_hTarget->GetEngineObject()->SetAbsAngles( vecNewAngles );
 	}
 
-	SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
 }
 
 
@@ -213,7 +213,7 @@ void CLogicMeasureMovement::MeasureThink( )
 void CLogicMeasureMovement::InputEnable( inputdata_t &inputdata )
 {
 	SetThink( &CLogicMeasureMovement::MeasureThink );
-	SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + TICK_INTERVAL );
 }
 
 void CLogicMeasureMovement::InputDisable( inputdata_t &inputdata )

@@ -594,7 +594,7 @@ void CNPC_BaseScanner::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup
 	{
 		// There's about to be a massive change in velocity. 
 		// Think immediately to handle changes in m_vCurrentVelocity;
-		SetNextThink( gpGlobals->curtime + 0.01f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 
 		m_flEngineStallTime = gpGlobals->curtime + 2.0f;
 		ScannerEmitSound( "DiveBomb" );
@@ -625,7 +625,7 @@ void CNPC_BaseScanner::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t R
 
 		// There's about to be a massive change in velocity. 
 		// Think immediately to handle changes in m_vCurrentVelocity;
-		SetNextThink( gpGlobals->curtime + 0.01f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 		ScannerEmitSound( "DiveBomb" );
 	}
 }

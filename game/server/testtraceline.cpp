@@ -84,7 +84,7 @@ END_DATADESC()
 void	CTestTraceline::Spawn( void )
 {
 	SetRenderColor( 255, 255, 255, 255 );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	SetThink( &CTestTraceline::Spin );
 }
@@ -104,7 +104,7 @@ void	CTestTraceline::Spin( void )
 		GetEngineObject()->SetLocalAngles( angles );
 
 	}
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 int CTestTraceline::UpdateTransmitState()

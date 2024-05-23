@@ -79,7 +79,7 @@ void CPhysicsCannister::Spawn( void )
 
 	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST );
 	m_takedamage = DAMAGE_YES;
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 	if ( m_iHealth <= 0 )
 		m_iHealth = 25;
@@ -231,7 +231,7 @@ void CPhysicsCannister::CannisterActivate( CBaseEntity *pActivator, const Vector
 
 	m_active = true;
 	m_activateTime = gpGlobals->curtime;
-	SetNextThink( gpGlobals->curtime + m_thrustTime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_thrustTime );
 	SetThink( &CPhysicsCannister::BeginShutdownThink );
 
 	QAngle angles;
@@ -335,7 +335,7 @@ void CPhysicsCannister::Deactivate(void)
 	m_pController->DetachObject( VPhysicsGetObject() );
 	physenv->DestroyMotionController( m_pController );
 	m_pController = NULL;
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	m_thrustTime = 0;
 	m_active = false;
 	if ( m_pJet )
@@ -412,7 +412,7 @@ void CPhysicsCannister::ShutdownJet( void )
 	m_pJet->m_bEmit = false;
 	m_pJet->m_Rate = 0;
 	m_pJet = NULL;
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 //-----------------------------------------------------------------------------

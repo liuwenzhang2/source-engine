@@ -130,7 +130,7 @@ void CWeaponIFMBase::FallInit( void )
 	
 	SetThink( &CBaseCombatWeapon::FallThink );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 #endif
 }

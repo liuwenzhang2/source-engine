@@ -638,7 +638,7 @@ void CHunterFlechette::StickTo( CBaseEntity *pOther, trace_t &tr )
 	if ( !bAttachedToBuster )
 	{
 		SetThink( &CHunterFlechette::DangerSoundThink );
-		SetNextThink( gpGlobals->curtime + (hunter_flechette_explode_delay.GetFloat() - HUNTER_FLECHETTE_WARN_TIME) );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + (hunter_flechette_explode_delay.GetFloat() - HUNTER_FLECHETTE_WARN_TIME) );
 	}
 	else
 	{
@@ -819,7 +819,7 @@ void CHunterFlechette::SeekThink()
 		Vector vecVelocity = vecDelta * flSpeed;
 		Teleport( &vecClosest, &angShoot, &vecVelocity );
 
-		SetNextThink( gpGlobals->curtime, s_szHunterFlechetteSeekThink );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime, s_szHunterFlechetteSeekThink );
 	}
 }
 
@@ -856,7 +856,7 @@ void CHunterFlechette::DopplerThink()
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -866,7 +866,7 @@ void CHunterFlechette::DopplerThink()
 //-----------------------------------------------------------------------------
 void CHunterFlechette::BubbleThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.1f, s_szHunterFlechetteBubbles );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f, s_szHunterFlechetteBubbles );
 
 	if ( GetWaterLevel()  == 0 )
 		return;
@@ -886,7 +886,7 @@ void CHunterFlechette::Shoot( Vector &vecVelocity, bool bBrightFX )
 	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 	SetThink( &CHunterFlechette::DopplerThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	SetContextThink( &CHunterFlechette::BubbleThink, gpGlobals->curtime + 0.1, s_szHunterFlechetteBubbles );
 }
@@ -908,7 +908,7 @@ void CHunterFlechette::DangerSoundThink()
 
 	CSoundEnt::InsertSound( SOUND_DANGER|SOUND_CONTEXT_EXCLUDE_COMBINE, GetEngineObject()->GetAbsOrigin(), 150.0f, 0.5, this );
 	SetThink( &CHunterFlechette::ExplodeThink );
-	SetNextThink( gpGlobals->curtime + HUNTER_FLECHETTE_WARN_TIME );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + HUNTER_FLECHETTE_WARN_TIME );
 }
 
 
@@ -960,7 +960,7 @@ void CHunterFlechette::Explode()
 	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -4292,7 +4292,7 @@ void CNPC_Hunter::Explode()
 	m_lifeState = LIFE_DEAD;
 
 	SetThink( &CNPC_Hunter::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	GetEngineObject()->AddEffects( EF_NODRAW );
 }
@@ -5609,7 +5609,7 @@ void CNPC_Hunter::BleedThink()
 	vecDir *= gm_flHeadRadius;
 	DispatchParticleEffect( "blood_spurt_synth_01", vecOrigin + vecDir, angDir );
 
-	SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.6, 1.5 ), HUNTER_BLEED_THINK );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.6, 1.5 ), HUNTER_BLEED_THINK );
 }
 
 

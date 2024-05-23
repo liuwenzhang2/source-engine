@@ -89,7 +89,7 @@ void CSnark::Spawn( void )
 
 	SetTouch( &CSnark::SuperBounceTouch );
 	SetThink( &CSnark::HuntThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	m_flNextHit				= gpGlobals->curtime;
 	m_flNextHunt			= gpGlobals->curtime + 1E6;
@@ -151,7 +151,7 @@ void CSnark::Event_Killed( const CTakeDamageInfo &inputInfo )
 {
 //	pev->model = iStringNull;// make invisible
 	SetThink( &CSnark::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	SetTouch( NULL );
 
 	// since squeak grenades never leave a body behind, clear out their takedamage now.
@@ -207,7 +207,7 @@ void CSnark::HuntThink( void )
 	}
 	
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	
 	//FIXME: There's a problem in this movetype that causes it to set a ground entity but never recheck to clear it
 	//		 For now, we stomp it clear and force it to revalidate -- jdw

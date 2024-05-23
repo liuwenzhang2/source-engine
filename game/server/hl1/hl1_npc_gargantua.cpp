@@ -184,7 +184,7 @@ void CStomp::Spawn( void )
 {
 	Precache();
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	SetClassname( "garg_stomp" );
 	m_flDmgTime = gpGlobals->curtime;
 
@@ -203,7 +203,7 @@ void CStomp::Think( void )
 {
 	trace_t tr;
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	// Do damage for this frame
 	Vector vecStart = GetEngineObject()->GetAbsOrigin();
@@ -242,7 +242,7 @@ void CStomp::Think( void )
 				UTIL_TraceLine(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() - Vector(0,0,500), MASK_SOLID, this, COLLISION_GROUP_NONE, &tr );
 				pSprite->GetEngineObject()->SetAbsOrigin( tr.endpos );
 //				pSprite->pev->velocity = Vector(RandomFloat(-200,200),RandomFloat(-200,200),175);
-				pSprite->SetNextThink( gpGlobals->curtime + 0.3 );
+				pSprite->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.3 );
 				pSprite->SetThink( &CSprite::SUB_Remove );
 				pSprite->SetTransparency( kRenderTransAdd, 255, 255, 255, 255, kRenderFxFadeFast );
 			}
@@ -619,7 +619,7 @@ void CNPC_Gargantua::RunTask( const Task_t *pTask )
 			m_nRenderFX = kRenderFxExplode;
 			SetRenderColor( 255, 0, 0 , 255 );
 			StopAnimation();
-			SetNextThink( gpGlobals->curtime + 0.15 );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.15 );
 			SetThink( &CBaseEntity::SUB_Remove );
 
 			int i;
@@ -643,7 +643,7 @@ void CNPC_Gargantua::RunTask( const Task_t *pTask )
 				pGib->GetEngineObject()->SetAbsOrigin(GetEngineObject()->GetAbsOrigin() );
 				pGib->GetEngineObject()->SetAbsVelocity( UTIL_RandomBloodVector() * random->RandomFloat( 300, 500 ) );
 	
-				pGib->SetNextThink( gpGlobals->curtime + 1.25 );
+				pGib->GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.25 );
 				pGib->SetThink( &CBaseEntity::SUB_FadeOut );
 			}
 	

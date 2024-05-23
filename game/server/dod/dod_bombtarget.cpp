@@ -61,7 +61,7 @@ void CDODBombTarget::Spawn( void )
 	SetTouch( NULL );
 	SetUse( &CDODBombTarget::State_Use );
 	SetThink( &CDODBombTarget::State_Think );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	m_pCurStateInfo = NULL;
 	if ( m_bStartDisabled )
@@ -162,7 +162,7 @@ void CDODBombTarget::State_Think()
 		(this->*m_pCurStateInfo->pfnThink)();
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 //-----------------------------------------------------------------------------

@@ -65,7 +65,7 @@ void CRopeAnchor::Spawn()
 	ASSERT( m_hRope != NULL );
 
 	SetThink( &CRopeAnchor::FallThink );
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 }
 
 //---------------------------------------------------------
@@ -82,7 +82,7 @@ void CRopeAnchor::FallThink()
 	GetEngineObject()->SetAbsVelocity( vecVelocity );
 
 	SetThink( &CRopeAnchor::RemoveThink );
-	SetNextThink( gpGlobals->curtime + 3.0 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 3.0 );
 }
 
 //---------------------------------------------------------
@@ -91,7 +91,7 @@ void CRopeAnchor::RemoveThink()
 {
 	UTIL_Remove( m_hRope );	
 	SetThink( &CRopeAnchor::SUB_Remove );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //=========================================================

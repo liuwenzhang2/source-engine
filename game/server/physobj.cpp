@@ -1979,7 +1979,7 @@ void CPointPush::Activate( void )
 	if ( m_bEnabled )
 	{
 		SetThink( &CPointPush::PushThink );
-		SetNextThink( gpGlobals->curtime + 0.05f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 	}
 
 	BaseClass::Activate();
@@ -2119,7 +2119,7 @@ void CPointPush::PushThink( void )
 	}
 
 	// Set us up for the next think
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 //-----------------------------------------------------------------------------
@@ -2129,7 +2129,7 @@ void CPointPush::InputEnable( inputdata_t &inputdata )
 {
 	m_bEnabled = true;
 	SetThink( &CPointPush::PushThink );
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 //-----------------------------------------------------------------------------
@@ -2139,5 +2139,5 @@ void CPointPush::InputDisable( inputdata_t &inputdata )
 {
 	m_bEnabled = false;
 	SetThink( NULL );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }

@@ -226,7 +226,7 @@ void CEnvEffectsScript::Spawn()
 	GetEngineObject()->AddEffects( EF_NODRAW );
 
 	SetThink( &CEnvEffectsScript::Think );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void CEnvEffectsScript::Think( void )
@@ -234,7 +234,7 @@ void CEnvEffectsScript::Think( void )
 	StudioFrameAdvance();
 	DispatchAnimEvents( this );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void CEnvEffectsScript::TrailEffectEvent( CEffectScriptElement *pEffect )

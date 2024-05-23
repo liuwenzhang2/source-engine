@@ -58,7 +58,7 @@ void CBaseSpriteProjectile::Spawn(	char *pszModel,
 	m_hIntendedTarget.Set( pIntendedTarget );
 
 	// Call think for free the first time. It's up to derived classes to rethink.
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //---------------------------------------------------------

@@ -147,6 +147,7 @@ public:
 		//	m_vecAbsAngVelocity.Init();
 		m_vecVelocity.Init();
 		m_vecAbsVelocity.Init();
+		m_iCurrentThinkContext = NO_THINK_CONTEXT;
 #endif
 		// Removing this until we figure out why velocity introduces view hitching.
 		// One possible fix is removing the player->ResetLatched() call in CGameMovement::FinishDuck(), 
@@ -387,6 +388,7 @@ public:
 		m_nModelIndex = 0;
 		ClearFlags();
 		ClearEffects();
+		m_nLastThinkTick = gpGlobals->tickcount;
 	}
 
 	// Invalidates the abs state of all children
@@ -500,6 +502,31 @@ public:
 	void SetFriction(float flFriction);
 	float GetElasticity(void) const;
 
+	CBASEPTR GetPfnThink();
+	void SetPfnThink(CBASEPTR pfnThink);
+	// Think contexts
+	int GetIndexForThinkContext(const char* pszContext);
+	// Think functions with contexts
+	int RegisterThinkContext(const char* szContext);
+	CBASEPTR ThinkSet(CBASEPTR func, float flNextThinkTime = 0, const char* szContext = NULL);
+	void SetNextThink(float nextThinkTime, const char* szContext = NULL);
+	float GetNextThink(const char* szContext = NULL);
+	int GetNextThinkTick(const char* szContext = NULL);
+	float GetLastThink(const char* szContext = NULL);
+	int GetLastThinkTick(const char* szContext = NULL);
+	void SetLastThinkTick(int iThinkTick);
+	bool WillThink();
+	int GetFirstThinkTick();	// get first tick thinking on any context
+	// Sets/Gets the next think based on context index
+	void SetNextThink(int nContextIndex, float thinkTime);
+	void SetLastThink(int nContextIndex, float thinkTime);
+	float GetNextThink(int nContextIndex) const;
+	int	GetNextThinkTick(int nContextIndex) const;
+	void CheckHasThinkFunction(bool isThinkingHint = false);
+	bool PhysicsRunThink(thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS);
+	bool PhysicsRunSpecificThink(int nContextIndex, CBASEPTR thinkFunc);
+	void PhysicsDispatchThink(CBASEPTR thinkFunc);
+
 
 private:
 
@@ -576,6 +603,13 @@ private:
 	float							m_flFriction;
 	// Physics state
 	float							m_flElasticity;
+	// interface function pointers
+	CBASEPTR						m_pfnThink;
+	int								m_nNextThinkTick;
+	int								m_nLastThinkTick;
+	CUtlVector< clientthinkfunc_t >		m_aThinkFunctions;
+	int								m_iCurrentThinkContext;
+
 };
 
 //-----------------------------------------------------------------------------
@@ -1060,6 +1094,15 @@ inline void C_EngineObjectInternal::SetFriction(float flFriction)
 inline float C_EngineObjectInternal::GetElasticity(void)	const
 {
 	return m_flElasticity;
+}
+
+inline CBASEPTR C_EngineObjectInternal::GetPfnThink()
+{
+	return m_pfnThink;
+}
+inline void C_EngineObjectInternal::SetPfnThink(CBASEPTR pfnThink)
+{
+	m_pfnThink = pfnThink;
 }
 
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.

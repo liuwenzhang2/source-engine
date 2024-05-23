@@ -3163,7 +3163,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 				g_EventQueue.AddEvent( pCore, "Stop", variant, 1, pOwner, pOwner );
 
 				pCore->SetThink ( &CCitadelEnergyCore::SUB_Remove );
-				pCore->SetNextThink( gpGlobals->curtime + 10.0f );
+				pCore->GetEngineObject()->SetNextThink( gpGlobals->curtime + 10.0f );
 
 				m_nSkin = 0;
 			}

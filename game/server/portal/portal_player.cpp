@@ -677,7 +677,7 @@ void CPortal_Player::PlayerDeathThink(void)
 {
 	float flForward;
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 	{
@@ -763,7 +763,7 @@ void CPortal_Player::PlayerDeathThink(void)
 	//Msg( "Respawn\n");
 
 	respawn( this, !IsObserver() );// don't copy a corpse if we're in deathcam.
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 void CPortal_Player::UpdatePortalPlaneSounds( void )

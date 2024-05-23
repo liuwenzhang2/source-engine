@@ -64,7 +64,7 @@ void CSpeaker::Spawn( void )
 	if ( !m_preset && ( m_iszMessage == NULL_STRING || strlen( szSoundFile ) < 1 ) )
 	{
 		Msg( "SPEAKER with no Level/Sentence! at: %f, %f, %f\n", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z );
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 		SetThink( &CSpeaker::SUB_Remove );
 		return;
 	}
@@ -73,7 +73,7 @@ void CSpeaker::Spawn( void )
 
 	
 	SetThink(&CSpeaker::SpeakerThink);
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 	// allow on/off switching via 'use' function.
 	SetUse ( &CSpeaker::ToggleUse );
@@ -88,7 +88,7 @@ void CSpeaker::Precache( void )
 {
 	if ( !GetEngineObject()->HasSpawnFlags(SPEAKER_START_SILENT) )
 		// set first announcement time for random n second
-		SetNextThink( gpGlobals->curtime + random->RandomFloat( 5.0, 15.0 ) );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 5.0, 15.0 ) );
 }
 void CSpeaker::SpeakerThink( void )
 {
@@ -102,7 +102,7 @@ void CSpeaker::SpeakerThink( void )
 	if ( !g_AIFriendliesTalkSemaphore.IsAvailable( this ) || !g_AIFoesTalkSemaphore.IsAvailable( this ) )
 	{
 		float releaseTime = MAX( g_AIFriendliesTalkSemaphore.GetReleaseTime(), g_AIFoesTalkSemaphore.GetReleaseTime() );
-		SetNextThink( gpGlobals->curtime + releaseTime + random->RandomFloat( 5, 10 ) );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + releaseTime + random->RandomFloat( 5, 10 ) );
 		return;
 	}
 	
@@ -134,7 +134,7 @@ void CSpeaker::SpeakerThink( void )
 			flvolume, SNDLVL_120dB, flags, pitch);
 
 		// shut off and reset
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	}
 	else
 	{
@@ -144,7 +144,7 @@ void CSpeaker::SpeakerThink( void )
 			 Msg(  "Level Design Error!\nSPEAKER has bad sentence group name: %s\n",szSoundFile); 
 
 		// set next announcement time for random 5 to 10 minute delay
-		SetNextThink ( gpGlobals->curtime + 
+		GetEngineObject()->SetNextThink ( gpGlobals->curtime +
 						random->RandomFloat( ANNOUNCE_MINUTES_MIN * 60.0, ANNOUNCE_MINUTES_MAX * 60.0 ) );
 
 		// time delay until it's ok to speak: used so that two NPCs don't talk at once
@@ -161,7 +161,7 @@ void CSpeaker::SpeakerThink( void )
 //
 void CSpeaker::ToggleUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-	int fActive = (GetNextThink() > 0.0);
+	int fActive = (GetEngineObject()->GetNextThink() > 0.0);
 
 	// fActive is TRUE only if an announcement is pending
 	
@@ -176,14 +176,14 @@ void CSpeaker::ToggleUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 	if ( useType == USE_ON )
 	{
 		// turn on announcements
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 		return;
 	}
 
 	if ( useType == USE_OFF )
 	{
 		// turn off announcements
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		return;
 	
 	}
@@ -194,12 +194,12 @@ void CSpeaker::ToggleUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 	if ( fActive )
 	{
 		// turn off announcements
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	}
 	else 
 	{
 		// turn on announcements
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	} 
 }
 

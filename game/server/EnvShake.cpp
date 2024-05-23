@@ -206,7 +206,7 @@ void CEnvShake::ApplyShake( ShakeCommand_t command )
 				m_stopTime = gpGlobals->curtime + Duration();
 				m_nextShake = 0;
 				m_pShakeController->ClearObjects();
-				SetNextThink( gpGlobals->curtime );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime );
 				m_currentAmp = Amplitude();
 				CBaseEntity *list[1024];
 				float radius = Radius(false);
@@ -355,7 +355,7 @@ void CEnvShake::Think( void )
 
 	// Drop amplitude a bit, less for higher frequency shakes
 	m_currentAmp -= m_currentAmp * ( gpGlobals->frametime / (Duration() * Frequency()) );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 

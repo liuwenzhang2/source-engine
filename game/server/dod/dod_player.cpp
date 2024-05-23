@@ -940,7 +940,7 @@ void CDODPlayer::PushawayThink()
 {
 	// Push physics props out of our way.
 	PerformObstaclePushaway( this );
-	SetNextThink( gpGlobals->curtime + PUSHAWAY_THINK_INTERVAL, DOD_PUSHAWAY_THINK_CONTEXT );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + PUSHAWAY_THINK_INTERVAL, DOD_PUSHAWAY_THINK_CONTEXT );
 }
 
 void CDODPlayer::CheatImpulseCommands( int iImpulse )
@@ -2993,7 +2993,7 @@ CBaseEntity *CDODPlayer::SelectSpawnSpot( CUtlVector<EHANDLE> *pSpawnPoints, int
 
 				// delete it in a while so we don't accumulate entities
 				pSpot->SetThink( &CBaseEntity::SUB_Remove );
-				pSpot->SetNextThink( gpGlobals->curtime + 0.5 );
+				pSpot->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 
 				Assert( pSpot );
 				
@@ -3120,7 +3120,7 @@ void CDODPlayer::DODRespawn( void )
 	State_Transition( STATE_ACTIVE );
 	Spawn();
 	m_nButtons = 0;
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 	OutputDamageGiven();
 	OutputDamageTaken();

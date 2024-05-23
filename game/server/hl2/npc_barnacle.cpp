@@ -299,7 +299,7 @@ void CNPC_Barnacle::Spawn()
 	SetPlaybackRate( random->RandomFloat( 0.8f, 1.2f ) );
 
 	SetThink ( &CNPC_Barnacle::BarnacleThink );
-	SetNextThink( gpGlobals->curtime + 0.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 
 	m_flBarnaclePullSpeed = BARNACLE_PULL_SPEED;
 
@@ -441,7 +441,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 	CBaseEntity *pTouchEnt;
 	float flLength;
 
- 	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	UpdateTongue();
 
@@ -586,7 +586,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 		GetEngineObject()->WorldSpaceSurroundingBounds( &vecSurroundMins, &vecSurroundMaxs );
 		if ( !UTIL_FindClientInPVS( vecSurroundMins, vecSurroundMaxs ) )
 		{
-			SetNextThink( gpGlobals->curtime + random->RandomFloat(1,1.5) );	// Stagger a bit to keep barnacles from thinking on the same frame
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat(1,1.5) );	// Stagger a bit to keep barnacles from thinking on the same frame
 		}
 
 		if ( IsActivityFinished() && GetActivity() != ACT_IDLE )
@@ -620,7 +620,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 		// If there's something under us, lower the tongue down so we can grab it
 		if ( m_flAltitude < flLength )
 		{
-			float dt = gpGlobals->curtime - GetLastThink();
+			float dt = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 			SetAltitude( m_flAltitude + m_flBarnaclePullSpeed * dt );
 		}
 
@@ -853,7 +853,7 @@ void CNPC_Barnacle::PullEnemyTorwardsMouth( bool bAdjustEnemyOrigin )
 	}
 
 	// Pull the victim towards the mouth
-	float dt = gpGlobals->curtime - GetLastThink();
+	float dt = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 
 	// Assumes constant frame rate :|
 	m_flLocalTimer += dt;
@@ -2177,7 +2177,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 
 	StudioFrameAdvance();
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	SetThink ( &CNPC_Barnacle::WaitTillDead );
 
 	// we deliberately do not call BaseClass::EventKilled
@@ -2188,7 +2188,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 //-----------------------------------------------------------------------------
 void CNPC_Barnacle::WaitTillDead ( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	StudioFrameAdvance();
 	DispatchAnimEvents ( this );
@@ -2230,7 +2230,7 @@ void CNPC_Barnacle::WaitTillDead ( void )
 	if ( fabs(flDist - goalAltitude) > 20.0f )	
 	{
 		float flNewAltitude;
-		float dt = gpGlobals->curtime - GetLastThink();
+		float dt = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 		if ( m_flAltitude >= goalAltitude )
 		{
 			flNewAltitude = MAX( goalAltitude, m_flAltitude - m_flBarnaclePullSpeed * dt );

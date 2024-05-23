@@ -150,7 +150,7 @@ void CPropCrane::Spawn( void )
 	SetPoseParameter( "armextensionpose", m_flExtension );
 
 	CreateVPhysics();
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 //-----------------------------------------------------------------------------
@@ -317,7 +317,7 @@ Vector CPropCrane::BodyTarget( const Vector &posSrc, bool bNoisy )
 //-----------------------------------------------------------------------------
 void CPropCrane::Think(void)
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if ( GetDriver() )
 	{

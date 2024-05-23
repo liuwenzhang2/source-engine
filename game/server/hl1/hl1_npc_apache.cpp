@@ -657,7 +657,7 @@ void CNPC_Apache::LaunchRocket( Vector &viewDir, int damage, int radius, Vector 
 void CNPC_Apache::DyingThink( void )
 {
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if( gpGlobals->curtime > m_flNextCrashExplosion )
 	{

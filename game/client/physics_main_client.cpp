@@ -126,7 +126,7 @@ void C_BaseEntity::PhysicsCustom()
 	PhysicsCheckWater();
 
 	// regular thinking
-	if ( !PhysicsRunThink() )
+	if ( !GetEngineObject()->PhysicsRunThink() )
 		return;
 
 	// Moving upward, off the ground, or  resting on something that isn't ground
@@ -190,15 +190,15 @@ void C_BaseEntity::PhysicsCustom()
 void C_BaseEntity::PhysicsStep()
 {
 	// Run all but the base think function
-	PhysicsRunThink( THINK_FIRE_ALL_BUT_BASE );
-	PhysicsRunThink( THINK_FIRE_BASE_ONLY );
+	GetEngineObject()->PhysicsRunThink( THINK_FIRE_ALL_BUT_BASE );
+	GetEngineObject()->PhysicsRunThink( THINK_FIRE_BASE_ONLY );
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void C_BaseEntity::PhysicsNoclip( void )
 {
-	PhysicsRunThink();
+	GetEngineObject()->PhysicsRunThink();
 }
 
 //-----------------------------------------------------------------------------
@@ -206,21 +206,21 @@ void C_BaseEntity::PhysicsNoclip( void )
 //-----------------------------------------------------------------------------
 void C_BaseEntity::PhysicsNone( void )
 {
-	PhysicsRunThink();
+	GetEngineObject()->PhysicsRunThink();
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void C_BaseEntity::PhysicsPusher( void )
 {
-	PhysicsRunThink();
+	GetEngineObject()->PhysicsRunThink();
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void C_BaseEntity::PhysicsParent( void )
 {
-	PhysicsRunThink();
+	GetEngineObject()->PhysicsRunThink();
 }
 
 //-----------------------------------------------------------------------------
@@ -263,59 +263,4 @@ void C_BaseEntity::EndTouch( C_BaseEntity *pOther )
 
 
 
-extern ConVar think_limit;
 
-//-----------------------------------------------------------------------------
-// Purpose: Called when it's time for a physically moved objects (plats, doors, etc)
-//			to run it's game code.
-//			All other entity thinking is done during worldspawn's think
-//-----------------------------------------------------------------------------
-void C_BaseEntity::PhysicsDispatchThink( BASEPTR thinkFunc )
-{
-	float thinkLimit = think_limit.GetFloat();
-	float startTime = 0.0;
-
-	/*
-	// This doesn't apply on the client, really
-	if ( IsDormant() )
-	{
-		Warning( "Dormant entity %s is thinking!!\n", GetClassname() );
-		Assert(0);
-	}
-	*/
-
-	if ( thinkLimit )
-	{
-		startTime = engine->Time();
-	}
-	
-	if ( thinkFunc )
-	{
-		(this->*thinkFunc)();
-	}
-
-	if ( thinkLimit )
-	{
-		// calculate running time of the AI in milliseconds
-		float time = ( engine->Time() - startTime ) * 1000.0f;
-		if ( time > thinkLimit )
-		{
-#if 0
-			// If its an NPC print out the shedule/task that took so long
-			CAI_BaseNPC *pNPC = MyNPCPointer();
-			if (pNPC && pNPC->GetCurSchedule())
-			{
-				pNPC->ReportOverThinkLimit( time );
-			}
-			else
-#endif
-			{
-#ifdef WIN32
-				Msg( "CLIENT:  %s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(this).raw_name(), time );
-#else
-				Msg( "CLIENT:  %s(%s) thinking for %.02f ms!!!\n", GetClassname(), typeid(this).name(), time );				
-#endif
-			}
-		}
-	}
-}

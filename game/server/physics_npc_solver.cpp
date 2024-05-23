@@ -121,7 +121,7 @@ void CPhysicsNPCSolver::Init( CAI_BaseNPC *pNPC, CBaseEntity *pPhysicsObject, bo
 void CPhysicsNPCSolver::ResetCancelTime()
 {
 	m_cancelTime = gpGlobals->curtime + m_separationDuration;
-	SetNextThink( m_cancelTime );
+	GetEngineObject()->SetNextThink( m_cancelTime );
 }
 
 void CPhysicsNPCSolver::BecomePenetrationSolver()
@@ -425,7 +425,7 @@ void CPhysicsEntitySolver::Init( CBaseEntity *pMovingEntity, CBaseEntity *pPhysi
 
 void CPhysicsEntitySolver::Spawn()
 {
-	SetNextThink( gpGlobals->curtime + m_separationDuration );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_separationDuration );
 	PhysDisableEntityCollisions( m_hMovingEntity, m_hPhysicsBlocker );
 	m_savedCollisionGroup = m_hPhysicsBlocker->GetEngineObject()->GetCollisionGroup();
 	m_hPhysicsBlocker->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );

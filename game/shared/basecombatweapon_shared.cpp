@@ -698,7 +698,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 
 	CBaseEntity *pOwner = GetOwnerEntity();
 
-	SetNextThink( gpGlobals->curtime + 1.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 	SetOwnerEntity( NULL );
 	SetOwner( NULL );
 
@@ -950,7 +950,7 @@ void CBaseCombatWeapon::SetPickupTouch( void )
 		if (GetEngineObject()->GetSpawnFlags() & SF_NORESPAWN )
 		{
 			SetThink( &CBaseEntity::SUB_Remove );
-			SetNextThink( gpGlobals->curtime + 30.0f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 30.0f );
 		}
 	}
 
@@ -2519,7 +2519,7 @@ void CDmgAccumulator::Process( void )
 
 BEGIN_PREDICTION_DATA( CBaseCombatWeapon )
 
-	DEFINE_PRED_FIELD( m_nNextThinkTick, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_nNextThinkTick, FIELD_INTEGER, FTYPEDESC_INSENDTABLE ),
 	// Networked
 	DEFINE_PRED_FIELD( m_hOwner, FIELD_EHANDLE, FTYPEDESC_INSENDTABLE ),
 	// DEFINE_FIELD( m_hWeaponFileInfo, FIELD_SHORT ),
@@ -2741,7 +2741,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CBaseCombatWeapon, DT_LocalActiveWeaponData )
 #if !defined( CLIENT_DLL )
 	SendPropTime( SENDINFO( m_flNextPrimaryAttack ) ),
 	SendPropTime( SENDINFO( m_flNextSecondaryAttack ) ),
-	SendPropInt( SENDINFO( m_nNextThinkTick ) ),
+	//SendPropInt( SENDINFO( m_nNextThinkTick ) ),
 	SendPropTime( SENDINFO( m_flTimeWeaponIdle ) ),
 
 #if defined( TF_DLL )
@@ -2751,7 +2751,7 @@ BEGIN_NETWORK_TABLE_NOBASE( CBaseCombatWeapon, DT_LocalActiveWeaponData )
 #else
 	RecvPropTime( RECVINFO( m_flNextPrimaryAttack ) ),
 	RecvPropTime( RECVINFO( m_flNextSecondaryAttack ) ),
-	RecvPropInt( RECVINFO( m_nNextThinkTick ) ),
+	//RecvPropInt( RECVINFO( m_nNextThinkTick ) ),
 	RecvPropTime( RECVINFO( m_flTimeWeaponIdle ) ),
 #endif
 END_NETWORK_TABLE()

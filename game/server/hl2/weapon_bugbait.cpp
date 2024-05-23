@@ -127,7 +127,7 @@ void CWeaponBugBait::FallInit( void )
 	
 	SetThink( &CBaseCombatWeapon::FallThink );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -151,7 +151,7 @@ void CWeaponBugBait::Drop( const Vector &vecVelocity )
 	BaseClass::Drop( vecVelocity );
 
 	// On touch, stick & stop moving. Increase our thinktime a bit so we don't stomp the touch for a bit
-	SetNextThink( gpGlobals->curtime + 3.0 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 3.0 );
 	SetTouch( &CWeaponBugBait::BugbaitStickyTouch );
 
 	m_hSporeTrail = SporeExplosion::CreateSporeExplosion();

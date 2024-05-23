@@ -289,7 +289,7 @@ END_PREDICTION_DATA()
 		// Detonate in "time" seconds
 		SetThink( &CPlantedC4::C4Think );
 
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		
 		m_flTimerLength = mp_c4timer.GetInt();
 
@@ -321,7 +321,7 @@ END_PREDICTION_DATA()
 		}
 				
 
-		SetNextThink( gpGlobals->curtime + 0.12 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.12 );
 
 #ifndef CLIENT_DLL
 		// let the bots hear the bomb beeping

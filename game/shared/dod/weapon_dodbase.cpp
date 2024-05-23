@@ -681,7 +681,7 @@ bool CWeaponDODBase::Deploy()
 		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 
 		SetThink (&CWeaponDODBase::SUB_Remove);
-		SetNextThink( gpGlobals->curtime + 1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1 );
 	}
 
 	//=========================================================
@@ -698,7 +698,7 @@ bool CWeaponDODBase::Deploy()
 			return;
 		}
 
-		SetNextThink( gpGlobals->curtime + time );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + time );
 	}
 
 	//=========================================================
@@ -732,7 +732,7 @@ bool CWeaponDODBase::Deploy()
 
 			// not a typo! We want to know when the weapon the player just picked up should respawn! This new entity we created is the replacement,
 			// but when it should respawn is based on conditions belonging to the weapon that was taken.
-			pNewWeapon->SetNextThink( gpGlobals->curtime + g_pGameRules->FlWeaponRespawnTime( this ) );
+			pNewWeapon->GetEngineObject()->SetNextThink( gpGlobals->curtime + g_pGameRules->FlWeaponRespawnTime( this ) );
 		}
 		else
 		{

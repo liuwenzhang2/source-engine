@@ -82,10 +82,10 @@ void CHandGrenade::ShootTimed( CBaseCombatCharacter *pOwner, Vector vecVelocity,
 
 	m_flDetonateTime = gpGlobals->curtime + flTime;
 	SetThink( &CBaseGrenade::TumbleThink );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	if ( flTime < 0.1 )
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		GetEngineObject()->SetAbsVelocity( vec3_origin );
 	}
 
@@ -454,7 +454,7 @@ bool CWeaponHandGrenade::Holster( CBaseCombatWeapon *pSwitchingTo )
 	{
 #ifndef CLIENT_DLL
 		SetThink( &CWeaponHandGrenade::DestroyItem );
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 #endif
 	}
 

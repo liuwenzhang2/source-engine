@@ -342,7 +342,7 @@ void CNPC_FloorTurret::Spawn( void )
 	}
 
 	//Stagger our starting times
-	SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1f, 0.3f ) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1f, 0.3f ) );
 
 	SetUse( &CNPC_FloorTurret::ToggleUse );
 
@@ -400,7 +400,7 @@ void CNPC_FloorTurret::Retire( void )
 
 	//Level out the turret
 	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 
 	//Set ourselves to close
 	if ( GetActivity() != ACT_FLOOR_TURRET_CLOSE )
@@ -439,7 +439,7 @@ void CNPC_FloorTurret::Retire( void )
 		if ( m_bAutoStart )
 		{
 			SetThink( &CNPC_FloorTurret::AutoSearchThink );
-			SetNextThink( gpGlobals->curtime + 0.05f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 		}
 		else
 		{
@@ -460,7 +460,7 @@ void CNPC_FloorTurret::Deploy( void )
 
 	m_vecGoalAngles = GetEngineObject()->GetAbsAngles();
 
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 
 	//Show we've seen a target
 	SetEyeState( TURRET_EYE_SEE_TARGET );
@@ -773,7 +773,7 @@ void CNPC_FloorTurret::SuppressThink( void )
 		return;
 
 	//Update our think time
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Look for a new enemy
 	HackFindEnemy();
@@ -882,7 +882,7 @@ void CNPC_FloorTurret::ActiveThink( void )
 	HackFindEnemy();
 	
 	//Update our think time
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	//If we've become inactive, go back to searching
 	if ( ( m_bActive == false ) || ( GetEnemy() == NULL ) )
@@ -1083,7 +1083,7 @@ void CNPC_FloorTurret::SearchThink( void )
 	if ( PreThink( TURRET_SEARCHING ) )
 		return;
 
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 
 	SetActivity( (Activity) ACT_FLOOR_TURRET_OPEN_IDLE );
 
@@ -1162,7 +1162,7 @@ void CNPC_FloorTurret::AutoSearchThink( void )
 		return; 
 
 	//Spread out our thinking
-	SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.2f, 0.4f ) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.2f, 0.4f ) );
 
 	//If the enemy is dead, find a new one
 	if ( ( GetEnemy() != NULL ) && ( GetEnemy()->IsAlive() == false ) )
@@ -1319,7 +1319,7 @@ void CNPC_FloorTurret::TippedThink( void )
 	//Animate
 	StudioFrameAdvance();
 
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 	SetEnemy( NULL );
 
 	// If we're not on side anymore, stop thrashing
@@ -1430,7 +1430,7 @@ void CNPC_FloorTurret::TippedThink( void )
 
 				// Start thinking slowly to see if we're ever set upright somehow
 				SetThink( &CNPC_FloorTurret::InactiveThink );
-				SetNextThink( gpGlobals->curtime + 1.0f );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 			}
 		}
 	}
@@ -1473,12 +1473,12 @@ void CNPC_FloorTurret::InactiveThink( void )
 			}
 
 			SetEyeState( TURRET_EYE_ALARM );
-			SetNextThink( gpGlobals->curtime + 0.25f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.25f );
 		}
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 	}
 }
 
@@ -1506,7 +1506,7 @@ void CNPC_FloorTurret::ReturnToLife( void )
 //-----------------------------------------------------------------------------
 void CNPC_FloorTurret::DisabledThink( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.5 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 	if ( OnSide() )
 	{
 		m_OnTipped.FireOutput( this, this );
@@ -1552,7 +1552,7 @@ bool CNPC_FloorTurret::PreThink( turretState_e state )
 	if ( CAI_BaseNPC::m_nDebugBits & bits_debugDisableAI )
 	{
 		// Push our think out into the future
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		return true;
 	}
  
@@ -1594,7 +1594,7 @@ bool CNPC_FloorTurret::PreThink( turretState_e state )
 			{
 				//Thrash around for a bit
 				m_flThrashTime = gpGlobals->curtime + random->RandomFloat( 2.0f, 2.5f );
-				SetNextThink( gpGlobals->curtime + 0.05f );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 
 				SetThink( &CNPC_FloorTurret::TippedThink );
 				SetEyeState( TURRET_EYE_SEE_TARGET );
@@ -1831,7 +1831,7 @@ void CNPC_FloorTurret::Enable( void )
 	}
 
 	SetThink( &CNPC_FloorTurret::Deploy );
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 //-----------------------------------------------------------------------------
@@ -1850,7 +1850,7 @@ void CNPC_FloorTurret::Disable( void )
 
 		SetEnemy( NULL );
 		SetThink( &CNPC_FloorTurret::Retire );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 	else
 		SetThink( &CNPC_FloorTurret::DisabledThink );
@@ -2204,7 +2204,7 @@ void CNPC_FloorTurret::SelfDestructThink( void )
 	if ( ( gpGlobals->curtime - m_flDestructStartTime ) >= SELF_DESTRUCT_DURATION )
 	{
 		SetThink( &CNPC_FloorTurret::BreakThink );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		UTIL_Remove( m_hFizzleEffect );
 		m_hFizzleEffect = NULL;
 		return;
@@ -2246,7 +2246,7 @@ void CNPC_FloorTurret::SelfDestructThink( void )
 	UpdateFacing();
 
 	// Think again!
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 //-----------------------------------------------------------------------------
@@ -2260,7 +2260,7 @@ void CNPC_FloorTurret::InputSelfDestruct( inputdata_t &inputdata )
 	m_bSelfDestructing = true;
 
 	SetThink( &CNPC_FloorTurret::SelfDestructThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Create the dust effect in place
 	m_hFizzleEffect = (CParticleSystem *)gEntList.CreateEntityByName( "info_particle_system" );

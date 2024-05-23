@@ -610,7 +610,7 @@ void CAI_RadialLinkController::Activate()
 	SetThink( &CAI_RadialLinkController::PollMotionThink );
 
 	// Spread think times out.
-	SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.0f, 1.0f) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.0f, 1.0f) );
 
 	if(GetEngineObject()->GetMoveParent() != NULL )
 	{
@@ -629,7 +629,7 @@ void CAI_RadialLinkController::Activate()
 //---------------------------------------------------------
 void CAI_RadialLinkController::PollMotionThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 
 	IEngineObjectServer *pParent = GetEngineObject()->GetMoveParent();
 

@@ -323,7 +323,7 @@ void CGrenadeHomer::Launch( CBaseEntity*		pOwner,
 	SetTouch( &CGrenadeHomer::GrenadeHomerTouch );
 	SetThink( &CGrenadeHomer::AimThink );
 	AimThink();
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	// Issue danger!
 	if ( pTarget )
@@ -664,7 +664,7 @@ void CGrenadeHomer::AimThink( void )
 	}
 #endif // BUBBLE
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //------------------------------------------------------------------------------

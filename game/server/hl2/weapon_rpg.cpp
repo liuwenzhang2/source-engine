@@ -165,7 +165,7 @@ void CMissile::Spawn( void )
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	SetThink( &CMissile::IgniteThink );
 	
-	SetNextThink( gpGlobals->curtime + 0.3f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.3f );
 	SetDamage( 200.0f );
 
 	m_takedamage = DAMAGE_YES;
@@ -283,7 +283,7 @@ void CMissile::AccelerateThink( void )
 	GetEngineObject()->SetAbsVelocity( vecForward * RPG_SPEED );
 
 	SetThink( &CMissile::SeekThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 #define AUGER_YDEVIANCE 20.0f
@@ -319,7 +319,7 @@ void CMissile::AugerThink( void )
 	
 	GetEngineObject()->SetAbsVelocity( vecForward * 1000.0f );
 
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 //-----------------------------------------------------------------------------
@@ -338,7 +338,7 @@ void CMissile::ShotDown( void )
 	}
 
 	SetThink( &CMissile::AugerThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	m_flAugerTime = gpGlobals->curtime + 1.5f;
 	m_flMarkDeadTime = gpGlobals->curtime + 0.75;
 
@@ -474,7 +474,7 @@ void CMissile::IgniteThink( void )
 	GetEngineObject()->SetAbsVelocity( vecForward * RPG_SPEED );
 
 	SetThink( &CMissile::SeekThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	if ( m_hOwner && m_hOwner->GetOwner() )
 	{
@@ -646,7 +646,7 @@ void CMissile::SeekThink( void )
 	if ( pBestDot == NULL )
 	{
 		//Think as soon as possible
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		return;
 	}
 
@@ -710,7 +710,7 @@ void CMissile::SeekThink( void )
 	}
 
 	// Think as soon as possible
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 #ifdef HL2_EPISODIC
 
@@ -1060,7 +1060,7 @@ void CAPCMissile::IgniteDelay( void )
 	m_flIgnitionTime = gpGlobals->curtime + 0.3f;
 
 	SetThink( &CAPCMissile::BeginSeekThink );
-	SetNextThink( m_flIgnitionTime );
+	GetEngineObject()->SetNextThink( m_flIgnitionTime );
 	Init();
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 }
@@ -1069,7 +1069,7 @@ void CAPCMissile::AugerDelay( float flDelay )
 {
 	m_flIgnitionTime = gpGlobals->curtime;
 	SetThink( &CAPCMissile::AugerStartThink );
-	SetNextThink( gpGlobals->curtime + flDelay );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + flDelay );
 	Init();
 	DisableGuiding();
 }
@@ -1082,14 +1082,14 @@ void CAPCMissile::AugerStartThink()
 	}
 	m_flAugerTime = gpGlobals->curtime + random->RandomFloat( 1.0f, 2.0f );
 	SetThink( &CAPCMissile::AugerThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 void CAPCMissile::ExplodeDelay( float flDelay )
 {
 	m_flIgnitionTime = gpGlobals->curtime;
 	SetThink( &CAPCMissile::ExplodeThink );
-	SetNextThink( gpGlobals->curtime + flDelay );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + flDelay );
 	Init();
 	DisableGuiding();
 }
@@ -1099,7 +1099,7 @@ void CAPCMissile::BeginSeekThink( void )
 {
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	SetThink( &CAPCMissile::APCSeekThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 void CAPCMissile::APCSeekThink( void )
@@ -2338,7 +2338,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 //-----------------------------------------------------------------------------
 void CLaserDot::LaserThink( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.05f, g_pLaserDotThink );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f, g_pLaserDotThink );
 
 	if ( GetOwnerEntity() == NULL )
 		return;

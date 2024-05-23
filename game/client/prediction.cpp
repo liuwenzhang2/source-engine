@@ -874,7 +874,7 @@ void CPrediction::RunPreThink( C_BasePlayer *player )
 	VPROF( "CPrediction::RunPreThink" );
 
 	// Run think functions on the player
-	if ( !player->PhysicsRunThink() )
+	if ( !player->GetEngineObject()->PhysicsRunThink() )
 		return;
 
 	// Called every frame to let game rules do any specific think logic for the player
@@ -900,12 +900,12 @@ void CPrediction::RunThink (C_BasePlayer *player, double frametime )
 #if !defined( NO_ENTITY_PREDICTION )
 	VPROF( "CPrediction::RunThink" );
 
-	int thinktick = player->GetNextThinkTick();
+	int thinktick = player->GetEngineObject()->GetNextThinkTick();
 
 	if ( thinktick <= 0 || thinktick > player->m_nTickBase )
 		return;
 	
-	player->SetNextThink( TICK_NEVER_THINK );
+	player->GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
 	// Think
 	player->Think();

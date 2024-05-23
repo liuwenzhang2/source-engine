@@ -140,7 +140,7 @@ void WeaponManager_RemoveManaged( CBaseEntity *pWeapon )
 void CGameWeaponManager::Spawn()
 {
 	SetThink( &CGameWeaponManager::Think );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	CBaseEntity *pEntity = gEntList.CreateEntityByName( STRING(m_iszWeaponName) );
 	if ( !pEntity )
 	{
@@ -183,7 +183,7 @@ void CGameWeaponManager::Think()
 	int i;
 
 	// Don't have to think all that often. 
-	SetNextThink( gpGlobals->curtime + 2.0 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0 );
 
 	const char *pszWeaponName = STRING( m_iszWeaponName );
 

@@ -82,7 +82,7 @@ void CFuncNavCost::Spawn( void )
 	VPhysicsInitShadow( false, false );
 
 	SetThink( &CFuncNavCost::CostThink );
-	SetNextThink( gpGlobals->curtime + UPDATE_DIRTY_TIME );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + UPDATE_DIRTY_TIME );
 
 	m_tags.RemoveAll();
 
@@ -133,7 +133,7 @@ void CFuncNavCost::InputDisable( inputdata_t &inputdata )
 //--------------------------------------------------------------------------------------------------------
 void CFuncNavCost::CostThink( void )
 {
-	SetNextThink( gpGlobals->curtime + UPDATE_DIRTY_TIME );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + UPDATE_DIRTY_TIME );
 
 	if ( gm_dirtyTimer.HasStarted() && gm_dirtyTimer.IsElapsed() )
 	{

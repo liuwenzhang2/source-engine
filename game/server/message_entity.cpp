@@ -78,7 +78,7 @@ static CUtlVector< CHandle< CMessageEntity > >	g_MessageEntities;
 //-----------------------------------------
 void CMessageEntity::Spawn( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	m_drawText = false;
 	m_bDeveloperOnly = false;
 	m_bEnabled = !GetEngineObject()->HasSpawnFlags( SF_MESSAGE_DISABLED );
@@ -116,7 +116,7 @@ void CMessageEntity::UpdateOnRemove()
 //-----------------------------------------
 void CMessageEntity::Think( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// check for player distance
 	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();

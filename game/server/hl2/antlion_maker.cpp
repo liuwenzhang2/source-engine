@@ -1033,8 +1033,8 @@ bool CAntlionTemplateMaker::FindHintSpawnPosition( const Vector &origin, float r
 
 		if ( AllHintsFromClusterBlocked( pChosenHint, bChosenHintBlocked ) )
 		{
-			if ( ( GetIndexForThinkContext( s_pBlockedCheckContext ) == NO_THINK_CONTEXT ) ||
-				( GetNextThinkTick( s_pBlockedCheckContext ) == TICK_NEVER_THINK ) )
+			if ( (GetEngineObject()->GetIndexForThinkContext( s_pBlockedCheckContext ) == NO_THINK_CONTEXT ) ||
+				(GetEngineObject()->GetNextThinkTick( s_pBlockedCheckContext ) == TICK_NEVER_THINK ) )
 			{
 				SetContextThink( &CAntlionTemplateMaker::BlockedCheckFunc, gpGlobals->curtime + 2.0f, s_pBlockedCheckContext );
 			}
@@ -1666,7 +1666,7 @@ int CAntlionTemplateMaker::DrawDebugTextOverlays( void )
 			EntityText( text_offset, tempstr, 0 );
 			text_offset++;
 
-			float flTimeRemaining = GetNextThink( s_pPoolThinkContext ) - gpGlobals->curtime;
+			float flTimeRemaining = GetEngineObject()->GetNextThink( s_pPoolThinkContext ) - gpGlobals->curtime;
 
 			if ( flTimeRemaining < 0.0f )
 			{

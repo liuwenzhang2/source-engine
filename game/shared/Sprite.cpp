@@ -428,7 +428,7 @@ void CSprite::AnimateThink( void )
 {
 	Animate( m_flSpriteFramerate * (gpGlobals->curtime - m_flLastTime) );
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	m_flLastTime			= gpGlobals->curtime;
 }
 
@@ -444,7 +444,7 @@ void CSprite::AnimateUntilDead( void )
 	else
 	{
 		AnimateThink();
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -459,7 +459,7 @@ void CSprite::Expand( float scaleSpeed, float fadeSpeed )
 	m_iHealth = fadeSpeed;
 	SetThink( &CSprite::ExpandThink );
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	m_flLastTime	= gpGlobals->curtime;
 }
 
@@ -480,7 +480,7 @@ void CSprite::ExpandThink( void )
 	else
 	{
 		SetRenderColorA( m_clrRender->a - sub );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		m_flLastTime		= gpGlobals->curtime;
 	}
 }
@@ -544,7 +544,7 @@ void CSprite::SetScale( float scale, float time )
 void CSprite::TurnOff( void )
 {
 	GetEngineObject()->AddEffects( EF_NODRAW );
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 //-----------------------------------------------------------------------------
@@ -560,7 +560,7 @@ void CSprite::TurnOn( void )
 		)
 	{
 		SetThink( &CSprite::AnimateThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		m_flLastTime = gpGlobals->curtime;
 	}
 	m_flFrame = 0;

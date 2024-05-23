@@ -290,7 +290,7 @@ inline bool IsDead( INextBot *pBot )
 			return true;
 		}
 
-		if ( pEntity->m_pfnThink == &CBaseEntity::SUB_Remove )
+		if ( pEntity->GetEngineObject()->GetPfnThink() == &CBaseEntity::SUB_Remove)
 		{
 			return true;
 		}

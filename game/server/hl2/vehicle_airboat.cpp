@@ -1111,7 +1111,7 @@ void CPropAirboat::Think(void)
 	// set handbrake after physics sim settles down
 //	if ( gpGlobals->curtime < m_flHandbrakeTime )
 //	{
-//		SetNextThink( gpGlobals->curtime );
+//		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 //	}
 //	else if ( !m_bInitialHandbrake )	// after initial timer expires, set the handbrake
 //	{

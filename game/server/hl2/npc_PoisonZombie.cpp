@@ -714,7 +714,7 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 
 		pCrab->GetEngineObject()->SetLocalAngles(GetEngineObject()->GetLocalAngles() );
 		pCrab->SetActivity( ACT_RANGE_ATTACK1 );
-		pCrab->SetNextThink( gpGlobals->curtime );
+		pCrab->GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		pCrab->PhysicsSimulate();
 
 		pCrab->GetMotor()->SetIdealYaw(GetEngineObject()->GetAbsAngles().y );

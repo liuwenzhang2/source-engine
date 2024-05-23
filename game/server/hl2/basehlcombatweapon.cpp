@@ -349,7 +349,7 @@ void CHLSelectFireMachineGun::PrimaryAttack( void )
 		m_flNextSecondaryAttack = gpGlobals->curtime + GetBurstCycleRate();
 
 		// Pick up the rest of the burst through the think function.
-		SetNextThink( gpGlobals->curtime + GetFireRate() );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + GetFireRate() );
 		break;
 	}
 
@@ -418,7 +418,7 @@ void CHLSelectFireMachineGun::BurstThink( void )
 		return;
 	}
 
-	SetNextThink( gpGlobals->curtime + GetFireRate() );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + GetFireRate() );
 }
 
 //-----------------------------------------------------------------------------

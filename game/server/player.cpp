@@ -1788,7 +1788,7 @@ void CBasePlayer::Event_Dying( const CTakeDamageInfo& info )
 	GetEngineObject()->SetLocalAngles( angles );
 
 	SetThink(&CBasePlayer::PlayerDeathThink);
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	BaseClass::Event_Dying( info );
 }
 
@@ -2120,7 +2120,7 @@ void CBasePlayer::PlayerDeathThink(void)
 {
 	float flForward;
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 	{
@@ -2209,7 +2209,7 @@ void CBasePlayer::PlayerDeathThink(void)
 	//Msg( "Respawn\n");
 
 	respawn( this, !IsObserver() );// don't copy a corpse if we're in deathcam.
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 /*
@@ -5638,7 +5638,7 @@ void CSprayCan::Spawn ( CBasePlayer *pOwner )
 	GetEngineObject()->SetLocalOrigin( pOwner->WorldSpaceCenter() + Vector ( 0 , 0 , 32 ) );
 	GetEngineObject()->SetLocalAngles( pOwner->EyeAngles() );
 	SetOwnerEntity( pOwner );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	const char* soundname = "SprayCan.Paint";
 	CPASAttenuationFilter filter(this, soundname);
 
@@ -5693,7 +5693,7 @@ void CBloodSplat::Spawn ( CBaseEntity *pOwner )
 	GetEngineObject()->SetLocalAngles( pOwner->GetEngineObject()->GetLocalAngles() );
 	SetOwnerEntity( pOwner );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void CBloodSplat::Think( void )
@@ -6720,7 +6720,7 @@ bool CBasePlayer::RemovePlayerItem( CBaseCombatWeapon *pItem )
 	{
 		ResetAutoaim( );
 		pItem->Holster( );
-		pItem->SetNextThink( TICK_NEVER_THINK );; // crowbar may be trying to swing again, etc
+		pItem->GetEngineObject()->SetNextThink( TICK_NEVER_THINK );; // crowbar may be trying to swing again, etc
 		pItem->SetThink( NULL );
 	}
 
@@ -7754,7 +7754,7 @@ CBaseEntity *CreatePlayerLoadSave( Vector vOrigin, float flDuration, float flHol
 void CRevertSaved::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
 	UTIL_ScreenFadeAll( m_clrRender, Duration(), HoldTime(), FFADE_OUT );
-	SetNextThink( gpGlobals->curtime + LoadTime() );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + LoadTime() );
 	SetThink( &CRevertSaved::LoadThink );
 
 	CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
@@ -7776,10 +7776,10 @@ void CRevertSaved::InputReload( inputdata_t &inputdata )
 	UTIL_ScreenFadeAll( m_clrRender, Duration(), HoldTime(), FFADE_OUT );
 
 #ifdef HL1_DLL
-	SetNextThink( gpGlobals->curtime + MessageTime() );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + MessageTime() );
 	SetThink( &CRevertSaved::MessageThink );
 #else
-	SetNextThink( gpGlobals->curtime + LoadTime() );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + LoadTime() );
 	SetThink( &CRevertSaved::LoadThink );
 #endif
 
@@ -7804,7 +7804,7 @@ void CRevertSaved::MessageThink( void )
 	float nextThink = LoadTime() - MessageTime();
 	if ( nextThink > 0 ) 
 	{
-		SetNextThink( gpGlobals->curtime + nextThink );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + nextThink );
 		SetThink( &CRevertSaved::LoadThink );
 	}
 	else
@@ -8017,7 +8017,6 @@ void CMovementSpeedMod::InputSpeedMod(inputdata_t &data)
 		SendPropInt			( SENDINFO( m_fOnTarget ), 2, SPROP_UNSIGNED ),
 
 		SendPropInt			( SENDINFO( m_nTickBase ), -1, SPROP_CHANGES_OFTEN ),
-		SendPropInt			( SENDINFO( m_nNextThinkTick ) ),
 
 		SendPropEHandle		( SENDINFO( m_hLastWeapon ) ),
 
@@ -9023,7 +9022,7 @@ void CBasePlayer::HandleAnimEvent( animevent_t *pEvent )
  
 			// Force the player to start death thinking
 			SetThink(&CBasePlayer::PlayerDeathThink);
-			SetNextThink( gpGlobals->curtime + 0.1f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 			return;
 		}
 	}

@@ -186,7 +186,7 @@ void CColorCorrection::FadeIn ( void )
 	m_bEnabled = true;
 	m_flTimeStartFadeIn = gpGlobals->curtime;
 	m_flStartFadeInWeight = m_flCurWeight;
-	SetNextThink ( gpGlobals->curtime + COLOR_CORRECTION_ENT_THINK_RATE, s_pFadeInContextThink );
+	GetEngineObject()->SetNextThink ( gpGlobals->curtime + COLOR_CORRECTION_ENT_THINK_RATE, s_pFadeInContextThink );
 }
 
 //-----------------------------------------------------------------------------
@@ -197,7 +197,7 @@ void CColorCorrection::FadeOut ( void )
 	m_bEnabled = false;
 	m_flTimeStartFadeOut = gpGlobals->curtime;
 	m_flStartFadeOutWeight = m_flCurWeight;
-	SetNextThink ( gpGlobals->curtime + COLOR_CORRECTION_ENT_THINK_RATE, s_pFadeOutContextThink );
+	GetEngineObject()->SetNextThink ( gpGlobals->curtime + COLOR_CORRECTION_ENT_THINK_RATE, s_pFadeOutContextThink );
 }
 
 //-----------------------------------------------------------------------------
@@ -212,7 +212,7 @@ void CColorCorrection::FadeInThink( void )
 				  m_flMaxWeight == 0.0f ||  // min==max
   m_flStartFadeInWeight >= m_flMaxWeight )  // already at max weight
 	{
-		SetNextThink ( TICK_NEVER_THINK, s_pFadeInContextThink );
+		GetEngineObject()->SetNextThink ( TICK_NEVER_THINK, s_pFadeInContextThink );
 		return;
 	}
 	
@@ -232,7 +232,7 @@ void CColorCorrection::FadeInThink( void )
 
 	m_flCurWeight = Lerp( flFadeRatio, m_flStartFadeInWeight, m_flMaxWeight );
 
-	SetNextThink( gpGlobals->curtime + COLOR_CORRECTION_ENT_THINK_RATE, s_pFadeInContextThink );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + COLOR_CORRECTION_ENT_THINK_RATE, s_pFadeInContextThink );
 }
 
 //-----------------------------------------------------------------------------
@@ -247,7 +247,7 @@ void CColorCorrection::FadeOutThink( void )
 		   m_flMaxWeight == 0.0f  || // min==max
 	 m_flStartFadeOutWeight <= 0.0f )// already at min weight
 	{
-		SetNextThink ( TICK_NEVER_THINK, s_pFadeOutContextThink );
+		GetEngineObject()->SetNextThink ( TICK_NEVER_THINK, s_pFadeOutContextThink );
 		return;
 	}
 
@@ -267,7 +267,7 @@ void CColorCorrection::FadeOutThink( void )
 
 	m_flCurWeight = Lerp( 1.0f - flFadeRatio, 0.0f, m_flStartFadeOutWeight );
 
-	SetNextThink( gpGlobals->curtime + COLOR_CORRECTION_ENT_THINK_RATE, s_pFadeOutContextThink );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + COLOR_CORRECTION_ENT_THINK_RATE, s_pFadeOutContextThink );
 }
 
 //------------------------------------------------------------------------------

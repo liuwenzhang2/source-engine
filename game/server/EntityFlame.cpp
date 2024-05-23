@@ -143,7 +143,7 @@ CEntityFlame *CEntityFlame::Create( CBaseEntity *pTarget, bool useHitboxes )
 
 	pFlame->m_flSize = size;
 	pFlame->SetThink( &CEntityFlame::FlameThink );
-	pFlame->SetNextThink( gpGlobals->curtime + 0.1f );
+	pFlame->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	pFlame->AttachToEntity( pTarget );
 	pFlame->SetLifetime( 2.0f );
@@ -255,7 +255,7 @@ float CEntityFlame::GetHitboxFireScale( void )
 void CEntityFlame::FlameThink( void )
 {
 	// Assure that this function will be ticked again even if we early-out in the if below.
-	SetNextThink( gpGlobals->curtime + FLAME_DAMAGE_INTERVAL );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + FLAME_DAMAGE_INTERVAL );
 
 	if ( m_hEntAttached )
 	{
@@ -312,7 +312,7 @@ void CEntityFlame::FlameThink( void )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 		m_bPlayingSound = false;
 		SetThink( &CEntityFlame::SUB_Remove );
-		SetNextThink( gpGlobals->curtime + 0.5f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 
 		// Notify anything we're attached to
 		if ( m_hEntAttached )

@@ -436,7 +436,7 @@ void CRopeKeyframe::RecalculateLength( void )
 void CRopeKeyframe::DieAtNextRest( void )
 {
 	SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 1.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 }
 
 

@@ -248,7 +248,7 @@ void CPropVehiclePrisonerPod::Spawn( void )
 
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -322,7 +322,7 @@ Vector CPropVehiclePrisonerPod::BodyTarget( const Vector &posSrc, bool bNoisy )
 //-----------------------------------------------------------------------------
 void CPropVehiclePrisonerPod::Think(void)
 {
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if ( GetDriver() )
 	{

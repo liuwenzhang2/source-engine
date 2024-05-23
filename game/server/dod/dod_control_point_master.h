@@ -150,7 +150,7 @@ public:
 		m_iRemainingPoints = m_iNumPointGives * m_iPointsToGive;
 
 		SetThink( &CDODCustomScoring::PointsThink );
-		SetNextThink( gpGlobals->curtime + m_iTickLength );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_iTickLength );
 	}
 
 	// Give this team all the points that they would have gotten had we continued
@@ -209,7 +209,7 @@ private:
 	{
 		GivePoints( m_iPointsToGive );
 
-		SetNextThink( gpGlobals->curtime + m_iTickLength );	
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + m_iTickLength );
 	}
 
 	int m_iPointTeam;			// team to give points to

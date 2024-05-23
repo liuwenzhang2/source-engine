@@ -22,7 +22,7 @@ void CAmmoBox::Spawn( void )
 	SetModel( "models/ammo/ammo_us.mdl" );
 	BaseClass::Spawn();
 
-	SetNextThink( gpGlobals->curtime + 0.75f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.75f );
 	SetThink( &CAmmoBox::FlyThink );
 
 	SetTouch( &CAmmoBox::BoxTouch );

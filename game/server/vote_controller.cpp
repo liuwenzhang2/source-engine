@@ -180,7 +180,7 @@ void CVoteController::Spawn( void )
 	BaseClass::Spawn();
 
 	SetThink( &CVoteController::VoteControllerThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	SetDefLessFunc( m_VoteCallers );
 
@@ -539,7 +539,7 @@ void CVoteController::VoteControllerThink( void )
 {
 	if ( !m_potentialIssues.IsValidIndex( m_iActiveIssueIndex ) )
 	{
-		SetNextThink( gpGlobals->curtime + 0.5f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 
 		return;
 	}
@@ -642,7 +642,7 @@ void CVoteController::VoteControllerThink( void )
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 }
 
 //-----------------------------------------------------------------------------

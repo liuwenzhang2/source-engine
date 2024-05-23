@@ -168,7 +168,7 @@ void CHostage::Spawn( void )
 
 
 	// set up think callback
-	SetNextThink( gpGlobals->curtime + HOSTAGE_THINK_INTERVAL );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + HOSTAGE_THINK_INTERVAL );
 	SetThink( &CHostage::HostageThink );
 
 	SetContextThink( &CHostage::PushawayThink, gpGlobals->curtime + PUSHAWAY_THINK_INTERVAL, HOSTAGE_PUSHAWAY_THINK_CONTEXT );
@@ -816,7 +816,7 @@ void CHostage::AvoidPhysicsProps( void )
 void CHostage::PushawayThink( void )
 {
 	PerformObstaclePushaway( this );
-	SetNextThink( gpGlobals->curtime + PUSHAWAY_THINK_INTERVAL, HOSTAGE_PUSHAWAY_THINK_CONTEXT );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + PUSHAWAY_THINK_INTERVAL, HOSTAGE_PUSHAWAY_THINK_CONTEXT );
 }
 
 //-----------------------------------------------------------------------------------------------------
@@ -847,7 +847,7 @@ void CHostage::HostageThink( void )
 	}
 
 	const float deltaT = HOSTAGE_THINK_INTERVAL;
-	SetNextThink( gpGlobals->curtime + deltaT );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + deltaT );
 
 	// keep track of which Navigation Area we are in (or were in, if we're "off the mesh" right now)
 	CNavArea *area = TheNavMesh->GetNavArea(GetEngineObject()->GetAbsOrigin() );

@@ -70,7 +70,7 @@ public:
 		if ( m_fActive )
 		{
 			SetThink(&CAI_BattleLine::MovementThink);
-			SetNextThink( gpGlobals->curtime + AIBL_THINK_INTERVAL );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + AIBL_THINK_INTERVAL );
 			m_SelfMoveMonitor.SetMark( this, 60 );
 		}
 	}
@@ -83,7 +83,7 @@ public:
 			NotifyChangeTacticalConstraints(); 
 
 			SetThink(&CAI_BattleLine::MovementThink);
-			SetNextThink( gpGlobals->curtime + AIBL_THINK_INTERVAL );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + AIBL_THINK_INTERVAL );
 			m_SelfMoveMonitor.SetMark( this, 60 );
 		}
 	}
@@ -129,7 +129,7 @@ public:
 			NotifyChangeTacticalConstraints();
 			m_SelfMoveMonitor.SetMark( this, 60 );
 		}
-		SetNextThink( gpGlobals->curtime + AIBL_THINK_INTERVAL );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + AIBL_THINK_INTERVAL );
 	}
 
 private:

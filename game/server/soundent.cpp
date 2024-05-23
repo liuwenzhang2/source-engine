@@ -239,7 +239,7 @@ void CSoundEnt::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	Initialize();
 
-	SetNextThink( gpGlobals->curtime + 1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1 );
 }
 
 void CSoundEnt::OnRestore()
@@ -266,7 +266,7 @@ void CSoundEnt::Think ( void )
 	int iSound;
 	int iPreviousSound;
 
-	SetNextThink( gpGlobals->curtime + 0.1 );// how often to check the sound list.
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );// how often to check the sound list.
 
 	iPreviousSound = SOUNDLIST_EMPTY;
 	iSound = m_iActiveSound; 

@@ -115,7 +115,7 @@ void KillFlare( CBaseEntity *pOwnerEntity, CBaseEntity *pEntity, float flKillTim
 		if ( flDieTime > 1.0f )
 		{
 			pFlare->Die( flDieTime );
-			pOwnerEntity->SetNextThink( gpGlobals->curtime + flDieTime + 3.0f );
+			pOwnerEntity->GetEngineObject()->SetNextThink( gpGlobals->curtime + flDieTime + 3.0f );
 		}
 	}
 }
@@ -277,7 +277,7 @@ CFlare *CFlare::Create( Vector vecOrigin, QAngle vecAngles, CBaseEntity *pOwner,
 	pFlare->Start( lifetime );
 
 	//Don't start sparking immediately
-	pFlare->SetNextThink( gpGlobals->curtime + 0.5f );
+	pFlare->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 
 	//Burn out time
 	pFlare->m_flTimeBurnOut = gpGlobals->curtime + lifetime;
@@ -353,7 +353,7 @@ void CFlare::FlareThink( void )
 	}
 
 	//Next update
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -537,7 +537,7 @@ void CFlare::Start( float lifeTime )
 	GetEngineObject()->RemoveEffects( EF_NODRAW );
 
 	SetThink( &CFlare::FlareThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -548,7 +548,7 @@ void CFlare::Die( float fadeTime )
 	m_flTimeBurnOut = gpGlobals->curtime + fadeTime;
 
 	SetThink( &CFlare::FlareThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------

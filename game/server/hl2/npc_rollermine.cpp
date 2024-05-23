@@ -1659,7 +1659,7 @@ void CNPC_RollerMine::RunTask( const Task_t *pTask )
 			if ( m_flPowerDownDetonateTime <= gpGlobals->curtime )
 			{
 				SetThink( &CNPC_RollerMine::PreDetonate );
-				SetNextThink( gpGlobals->curtime + 0.5f );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 			}
 
 			// No TaskComplete() here, because the task will never complete. The rollermine will explode.
@@ -2547,7 +2547,7 @@ int CNPC_RollerMine::OnTakeDamage( const CTakeDamageInfo &info )
 		if ( info.GetAttacker() && info.GetAttacker()->GetEngineObject()->GetClassname() != GetEngineObject()->GetClassname() )
 		{
 			SetThink( &CNPC_RollerMine::PreDetonate );
-			SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1f, 0.5f ) );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1f, 0.5f ) );
 		}
 		else
 		{
@@ -2591,7 +2591,7 @@ void CNPC_RollerMine::PreDetonate( void )
 
 	SetTouch( NULL );
 	SetThink( &CNPC_RollerMine::Explode );
-	SetNextThink( gpGlobals->curtime + 0.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 
 	const char* soundname = "NPC_RollerMine.Hurt";
 	CPASAttenuationFilter filter(this, soundname);
@@ -2640,7 +2640,7 @@ void CNPC_RollerMine::Explode( void )
 
 	// Remove myself a frame from now to avoid doing it in the middle of running AI
 	SetThink( &CNPC_RollerMine::SUB_Remove );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 const float MAX_ROLLING_SPEED = 720;

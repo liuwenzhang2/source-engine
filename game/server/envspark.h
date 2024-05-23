@@ -31,7 +31,7 @@ public:
 	void InputToggleSpark( inputdata_t &inputdata );
 	void InputSparkOnce( inputdata_t &inputdata );
 
-	bool IsSparking( void ){ return ( GetNextThink() != TICK_NEVER_THINK ); }
+	bool IsSparking( void ){ return (GetEngineObject()->GetNextThink() != TICK_NEVER_THINK ); }
 	
 	DECLARE_DATADESC();
 

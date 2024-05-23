@@ -290,7 +290,7 @@ void CPropEnergyBall::NotifySystemEvent(CBaseEntity *pNotify, notify_system_even
 		}
 
 		// If an energy ball passes a portal (teleports), add a make sure its life is >= sk_energy_ball_min_life_after_portal
-		float fCurTimeTillDeath = GetNextThink( "ExplodeTimerContext" );
+		float fCurTimeTillDeath = GetEngineObject()->GetNextThink( "ExplodeTimerContext" );
 		// If we are set to die, then refresh that time if it is below a set threshold
 		if ( fCurTimeTillDeath > 0 )
 		{
@@ -313,8 +313,8 @@ void CPropEnergyBall::Think()
 	// Finite life energy balls send the time till death down to the client for display purposes
 	if ( !m_bIsInfiniteLife )
 	{
-		m_fTimeTillDeath = GetNextThink( "ExplodeTimerContext" ) - gpGlobals->curtime;
-		SetNextThink ( gpGlobals->curtime + 0.5f );
+		m_fTimeTillDeath = GetEngineObject()->GetNextThink( "ExplodeTimerContext" ) - gpGlobals->curtime;
+		GetEngineObject()->SetNextThink ( gpGlobals->curtime + 0.5f );
 	}
 
 	// Force our movement to be at desired speed
@@ -334,7 +334,7 @@ void CPropEnergyBall::Think()
 		}
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 
@@ -549,7 +549,7 @@ void CEnergyBallLauncher::SpawnBall()
 	}
 
 	// Think function, used to update time till death and avoid sleeping
-	pBall->SetNextThink ( gpGlobals->curtime + 0.1f );
+	pBall->GetEngineObject()->SetNextThink ( gpGlobals->curtime + 0.1f );
 
 	const char* soundname = "EnergyBall.Launch";
 	CPASAttenuationFilter filter(this, soundname);
@@ -634,7 +634,7 @@ static void fire_energy_ball_f( void )
 		pBall->m_bIsInfiniteLife = false;
 
 		// Think function, used to update time till death and avoid sleeping
-		pBall->SetNextThink ( gpGlobals->curtime + 0.1f );
+		pBall->GetEngineObject()->SetNextThink ( gpGlobals->curtime + 0.1f );
 
 	}
 

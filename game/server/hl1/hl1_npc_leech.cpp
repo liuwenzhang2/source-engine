@@ -202,7 +202,7 @@ void CNPC_Leech::DeadThink( void )
 		}
 	}
 	StudioFrameAdvance();
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	// Apply damage velocity, but keep out of the walls
 	if (GetEngineObject()->GetAbsVelocity().x != 0 || GetEngineObject()->GetAbsVelocity().y != 0 )
@@ -388,7 +388,7 @@ void CNPC_Leech::SwimThink( void )
 		return;
 	}
 	else*/
-		SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	targetSpeed = LEECH_SWIM_SPEED;
 

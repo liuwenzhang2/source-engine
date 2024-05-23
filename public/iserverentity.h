@@ -27,6 +27,8 @@ class QAngle;
 struct PVSInfo_t;
 class CCheckTransmitInfo;
 struct matrix3x4_t;
+class CGameTrace;
+typedef CGameTrace trace_t;
 
 struct servertouchlink_t
 {
@@ -45,6 +47,21 @@ struct servergroundlink_t
 	CBaseHandle			entity;
 	servergroundlink_t* nextLink;
 	servergroundlink_t* prevLink;
+};
+
+typedef void (CBaseEntity::* BASEPTR)(void);
+
+//-----------------------------------------------------------------------------
+// Purpose: think contexts
+//-----------------------------------------------------------------------------
+struct thinkfunc_t
+{
+	BASEPTR		m_pfnThink;
+	string_t	m_iszContext;
+	int			m_nNextThinkTick;
+	int			m_nLastThinkTick;
+
+	DECLARE_SIMPLE_DATADESC();
 };
 
 class IEngineObjectServer : public IEngineObject {
@@ -289,6 +306,23 @@ public:
 	virtual void SetElasticity(float flElasticity) = 0;
 	virtual float GetElasticity(void) const = 0;
 
+	virtual BASEPTR GetPfnThink() = 0;
+	virtual void SetPfnThink(BASEPTR pfnThink) = 0;
+	virtual int GetIndexForThinkContext(const char* pszContext) = 0;
+	virtual int RegisterThinkContext(const char* szContext) = 0;
+	virtual BASEPTR	ThinkSet(BASEPTR func, float flNextThinkTime = 0, const char* szContext = NULL) = 0;
+	virtual void SetNextThink(float nextThinkTime, const char* szContext = NULL) = 0;
+	virtual float GetNextThink(const char* szContext = NULL) = 0;
+	virtual int GetNextThinkTick(const char* szContext = NULL) = 0;
+	virtual float GetLastThink(const char* szContext = NULL) = 0;
+	virtual int GetLastThinkTick(const char* szContext = NULL) = 0;
+	virtual void SetLastThinkTick(int iThinkTick) = 0;
+	virtual bool WillThink() = 0;
+	virtual int GetFirstThinkTick() = 0;	// get first tick thinking on any context
+	virtual bool PhysicsRunThink(thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS) = 0;
+	virtual bool PhysicsRunSpecificThink(int nContextIndex, BASEPTR thinkFunc) = 0;
+	virtual void CheckHasThinkFunction(bool isThinkingHint = false) = 0;
+
 };
 
 // This class is how the engine talks to entities in the game DLL.
@@ -308,7 +342,6 @@ public:
 	//virtual int				AreaNum() const = 0;
 
 };
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Exposes IClientEntity's to engine

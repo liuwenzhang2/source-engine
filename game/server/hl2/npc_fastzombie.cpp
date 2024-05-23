@@ -564,7 +564,7 @@ void CFastZombie::PrescheduleThink( void )
 	{
 		// Think more frequently when flying quickly through the 
 		// air, to update the server's location more often.
-		SetNextThink(gpGlobals->curtime);
+		GetEngineObject()->SetNextThink(gpGlobals->curtime);
 	}
 }
 

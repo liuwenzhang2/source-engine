@@ -26,7 +26,7 @@ void CDODSmokeGrenade::Spawn()
 	BaseClass::Spawn();
 
 	SetThink( &CDODSmokeGrenade::Think_Emit );
-	SetNextThink( gpGlobals->curtime + 0.5 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 
 	m_bInitialSmoke = false;
 	m_flRemoveTime = -1;
@@ -95,7 +95,7 @@ void CDODSmokeGrenade::Think_Emit( void )
 		SetThink( &CDODSmokeGrenade::Think_Fade );
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 }
 
 // Fade the projectile out over time before making it disappear
@@ -103,7 +103,7 @@ void CDODSmokeGrenade::Think_Fade()
 {
 	m_bFading = true;
 
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	color32 c = GetRenderColor();
 	c.a -= 1;
@@ -112,7 +112,7 @@ void CDODSmokeGrenade::Think_Fade()
 	if ( !c.a )
 	{
 		GetEngineObject()->SetModelName( NULL_STRING );//invisible
-		SetNextThink( gpGlobals->curtime + 10 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 10 );
 		SetThink( &CDODSmokeGrenade::Think_Remove );	// Spit out smoke for 10 seconds.
 		GetEngineObject()->SetSolid( SOLID_NONE );
 	}

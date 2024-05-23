@@ -967,8 +967,8 @@ void CNPC_Stalker::StartAttackBeam( void )
 
 	SetThink( &CNPC_Stalker::StalkerThink );
 
-	m_flNextNPCThink = GetNextThink();
-	SetNextThink( gpGlobals->curtime + g_StalkerBeamThinkTime );
+	m_flNextNPCThink = GetEngineObject()->GetNextThink();
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + g_StalkerBeamThinkTime );
 	m_fBeamEndTime = gpGlobals->curtime + STALKER_LASER_DURATION;
 }
 
@@ -984,12 +984,12 @@ void CNPC_Stalker::StalkerThink(void)
 	if (gpGlobals->curtime >= m_flNextNPCThink)
 	{
 		NPCThink();
-		m_flNextNPCThink = GetNextThink();
+		m_flNextNPCThink = GetEngineObject()->GetNextThink();
 	}
 
 	if ( m_pBeam )
 	{
-		SetNextThink( gpGlobals->curtime + g_StalkerBeamThinkTime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + g_StalkerBeamThinkTime );
 		
 		// sanity check?!
 		const Task_t *pTask = GetTask();
@@ -1001,7 +1001,7 @@ void CNPC_Stalker::StalkerThink(void)
 	else
 	{
 		DevMsg( 2, "In StalkerThink() but no stalker beam found?\n" );
-		SetNextThink( m_flNextNPCThink );
+		GetEngineObject()->SetNextThink( m_flNextNPCThink );
 	}
 }
 
@@ -1169,7 +1169,7 @@ void CNPC_Stalker::KillAttackBeam(void)
 	SetThink(&CNPC_Stalker::CallNPCThink);
 	if ( m_flNextNPCThink > gpGlobals->curtime )
 	{
-		SetNextThink( m_flNextNPCThink );
+		GetEngineObject()->SetNextThink( m_flNextNPCThink );
 	}
 
 	// Beam has to recharge

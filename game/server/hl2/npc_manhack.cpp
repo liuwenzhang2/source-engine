@@ -3047,7 +3047,7 @@ void CNPC_Manhack::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 
 		// There's about to be a massive change in velocity. 
 		// Think immediately so we can do our slice traces, etc.
-		SetNextThink( gpGlobals->curtime + 0.01f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 
 		// Stall our engine for awhile
 		m_flEngineStallTime = gpGlobals->curtime + 2.0f;
@@ -3086,7 +3086,7 @@ void CNPC_Manhack::OnPhysGunDrop( CBasePlayer *pPhysGunUser, PhysGunDrop_t Reaso
 
 		// There's about to be a massive change in velocity. 
 		// Think immediately so we can do our slice traces, etc.
-		SetNextThink( gpGlobals->curtime + 0.01f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.01f );
 
 		// Stall our engine for awhile
 		m_flEngineStallTime = gpGlobals->curtime + 2.0f;

@@ -199,7 +199,7 @@ bool CWeaponSnark::Holster( CBaseCombatWeapon *pSwitchingTo )
 	if ( pPlayer->GetAmmoCount( m_iPrimaryAmmoType ) <= 0 )
 	{
 		SetThink( &CWeaponSnark::DestroyItem );
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 	}
 
 	pPlayer->SetNextAttack( gpGlobals->curtime + 0.5 );

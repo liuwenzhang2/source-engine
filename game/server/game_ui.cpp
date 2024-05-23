@@ -174,7 +174,7 @@ void CGameUI::Deactivate( CBaseEntity *pActivator )
 	}
 	
 	// Stop thinking
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 
 
@@ -221,7 +221,7 @@ void CGameUI::InputActivate( inputdata_t &inputdata )
 	m_playerOn.FireOutput( pPlayer, this, 0 );
 
 	// Turn the hud off
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	// Disable player's motion
 	if (GetEngineObject()->HasSpawnFlags(SF_GAMEUI_FREEZE_PLAYER) )
@@ -260,7 +260,7 @@ void CGameUI::Think( void )
 	// If player is gone, stop thinking
 	if (pPlayer == NULL)
 	{
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		return;
 	}
 
@@ -290,7 +290,7 @@ void CGameUI::Think( void )
 	}
 
 	pPlayer->GetEngineObject()->AddFlag( FL_ONTRAIN );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	// Deactivate if they jump or press +use.
 	// FIXME: prevent the use from going through in player.cpp

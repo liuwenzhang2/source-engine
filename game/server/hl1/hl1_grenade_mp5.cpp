@@ -48,7 +48,7 @@ void CGrenadeMP5::Spawn( void )
 
 	SetUse( &CBaseGrenade::DetonateUse );
 	SetTouch( &CGrenadeMP5::GrenadeMP5Touch );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	m_flDamage		= sk_plr_dmg_mp5_grenade.GetFloat();
 	m_DmgRadius		= sk_mp5_grenade_radius.GetFloat();

@@ -765,7 +765,7 @@ void CNPC_Portal_FloorTurret::ActiveThink( void )
 	HackFindEnemy();
 
 	//Update our think time
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	CBaseEntity *pEnemy = GetEnemy();
 
@@ -994,7 +994,7 @@ void CNPC_Portal_FloorTurret::SearchThink( void )
 	if ( PreThink( TURRET_SEARCHING ) )
 		return;
 
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 
 	SetActivity( (Activity) ACT_FLOOR_TURRET_OPEN_IDLE );
 
@@ -1122,7 +1122,7 @@ void CNPC_Portal_FloorTurret::TippedThink( void )
 {
 	PreThink( TURRET_TIPPED );
 
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 	SetEnemy( NULL );
 
 	StudioFrameAdvance();
@@ -1247,7 +1247,7 @@ void CNPC_Portal_FloorTurret::TippedThink( void )
 
 				// Start thinking slowly to see if we're ever set upright somehow
 				SetThink( &CNPC_FloorTurret::InactiveThink );
-				SetNextThink( gpGlobals->curtime + 1.0f );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 				RopesOff();
 			}
 		}
@@ -1261,7 +1261,7 @@ void CNPC_Portal_FloorTurret::HeldThink( void )
 {
 	PreThink( (turretState_e)PORTAL_TURRET_PICKUP );
 
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 	SetEnemy( NULL );
 
 	StudioFrameAdvance();
@@ -1309,7 +1309,7 @@ void CNPC_Portal_FloorTurret::InactiveThink( void )
 	// Update our PVS state
 	CheckPVSCondition();
 
-	SetNextThink( gpGlobals->curtime + 1.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
 	// Wake up if we're not on our side
 	if ( !OnSide() && VPhysicsGetObject()->GetContactPoint( NULL, NULL ) && m_bEnabled )
@@ -1344,7 +1344,7 @@ void CNPC_Portal_FloorTurret::DisabledThink( void )
 	LaserOff();
 	RopesOff();
 
-	SetNextThink( gpGlobals->curtime + 0.5 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 	if ( OnSide() )
 	{
 		m_OnTipped.FireOutput( this, this );

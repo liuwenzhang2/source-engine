@@ -204,7 +204,7 @@ void CItem::Spawn( void )
 
 #if defined( HL2MP ) || defined( TF_DLL )
 	SetThink( &CItem::FallThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 #endif
 }
 
@@ -234,7 +234,7 @@ void CItem::ActivateWhenAtRest( float flTime /* = 0.5f */ )
 	GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
 	m_bActivateWhenAtRest = true;
 	SetThink( &CItem::ComeToRest );
-	SetNextThink( gpGlobals->curtime + flTime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + flTime );
 }
 
 
@@ -252,7 +252,7 @@ void CItem::OnEntityEvent( EntityEvent_t event, void *pEventData )
 			// Delay rest for a sec, to avoid changing collision 
 			// properties inside a collision callback.
 			SetThink( &CItem::ComeToRest );
-			SetNextThink( gpGlobals->curtime + 0.1f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		}
 		break;
 	}
@@ -282,7 +282,7 @@ void CItem::ComeToRest( void )
 //-----------------------------------------------------------------------------
 void CItem::FallThink ( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 #if defined( HL2MP )
 	bool shouldMaterialize = false;
@@ -479,7 +479,7 @@ CBaseEntity* CItem::Respawn( void )
 	RemoveAllDecals(); //remove any decals
 
 	SetThink ( &CItem::Materialize );
-	SetNextThink( gpGlobals->curtime + g_pGameRules->FlItemRespawnTime( this ) );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + g_pGameRules->FlItemRespawnTime( this ) );
 	return this;
 }
 

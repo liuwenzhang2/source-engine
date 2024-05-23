@@ -311,7 +311,7 @@ void CFogController::InputStartFogTransition(inputdata_t &data)
 	SetThink( &CFogController::SetLerpValues );
 
 	m_fog.lerptime = gpGlobals->curtime + m_fog.duration + 0.1;
-    SetNextThink( gpGlobals->curtime + m_fog.duration );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_fog.duration );
 }
 
 void CFogController::SetLerpValues( void )

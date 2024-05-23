@@ -436,7 +436,7 @@ inline float CBeam::GetHDRColorScale( void ) const
 inline void CBeam::LiveForTime( float time ) 
 { 
 	SetThink(&CBeam::SUB_Remove); 
-	SetNextThink( gpGlobals->curtime + time ); 
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + time );
 }
 
 inline void	CBeam::BeamDamageInstant( trace_t *ptr, float damage ) 

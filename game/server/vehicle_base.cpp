@@ -100,7 +100,7 @@ void CPropVehicle::Spawn( )
 	m_VehiclePhysics.Spawn();
 	if (!m_VehiclePhysics.Initialize( STRING(m_vehicleScript), m_nVehicleType ))
 		return;
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	m_vecSmoothedVelocity.Init();
 }
@@ -238,7 +238,7 @@ void CPropVehicle::Think()
 	// was added to allow prop_vehicle to always think without affecting the derived classes.
 	if(GetEngineObject()->HasSpawnFlags(SF_PROP_VEHICLE_ALWAYSTHINK) )
 	{
-		SetNextThink(gpGlobals->curtime);
+		GetEngineObject()->SetNextThink(gpGlobals->curtime);
 	}
 }
 
@@ -452,7 +452,7 @@ void CPropVehicleDriveable::Spawn( void )
 	{
 		Warning( "Vehicle (%s) unable to properly initialize due to script error in (%s)!\n", GetEntityName().ToCStr(), STRING( m_vehicleScript ) );
 		SetThink( &CBaseEntity::SUB_Remove );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 		return;
 	}
 
@@ -599,7 +599,7 @@ void CPropVehicleDriveable::EnterVehicle( CBaseCombatCharacter *pPassenger )
 		}
 
 		// Start Thinking
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 		Vector vecViewOffset = m_pServerVehicle->GetSavedViewOffset();
 
@@ -737,7 +737,7 @@ void CPropVehicleDriveable::Think()
 
 	if ( ShouldThink() )
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 
 	// If we have an NPC Driver, tell him to drive
@@ -749,7 +749,7 @@ void CPropVehicleDriveable::Think()
 	// Keep thinking while we're waiting to turn off the keep upright
 	if ( m_flTurnOffKeepUpright )
 	{
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 		// Time up?
 		if ( m_hKeepUpright != NULL && m_flTurnOffKeepUpright < gpGlobals->curtime )
@@ -989,7 +989,7 @@ void CPropVehicleDriveable::TraceAttack( const CTakeDamageInfo &info, const Vect
 
 			// Turn off the keepupright after a short time
 			m_flTurnOffKeepUpright = gpGlobals->curtime + GetUprightTime();
-			SetNextThink( gpGlobals->curtime );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime );
 		}
 
 #ifdef HL2_EPISODIC
@@ -1252,7 +1252,7 @@ void CFourWheelServerVehicle::NPC_SetDriver( CNPC_VehicleDriver *pDriver )
 		GetFourWheelVehicle()->SetOwnerEntity( pDriver );
 
 		// Start Thinking
-		GetFourWheelVehicle()->SetNextThink( gpGlobals->curtime );
+		GetFourWheelVehicle()->GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 	else
 	{

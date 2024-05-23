@@ -129,7 +129,7 @@ void CNPC_EnemyFinder::InitCustomSchedules( void )
 void CNPC_EnemyFinder::InputTurnOn( inputdata_t &inputdata )
 {
 	SetThink( &CNPC_EnemyFinder::CallNPCThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 

@@ -51,7 +51,7 @@ void CShower::Spawn( void )
 
 	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) ); // fall a bit more slowly than normal
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	UTIL_SetSize(this, vec3_origin, vec3_origin );
 	GetEngineObject()->AddEffects( EF_NODRAW );
@@ -67,7 +67,7 @@ void CShower::Think( void )
 
 	m_flSpeed -= 0.1;
 	if ( m_flSpeed > 0 )
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	else
 		UTIL_Remove( this );
 	GetEngineObject()->SetGroundEntity( NULL );
@@ -349,7 +349,7 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 	}
 
 	SetThink( &CEnvExplosion::Smoke );
-	SetNextThink( gpGlobals->curtime + 0.3 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.3 );
 
 	// Only do these effects if we're not submerged
 	if ( UTIL_PointContents(GetEngineObject()->GetAbsOrigin() ) & CONTENTS_WATER )

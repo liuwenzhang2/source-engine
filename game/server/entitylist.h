@@ -170,6 +170,7 @@ public:
 		m_CollisionGroup = COLLISION_GROUP_NONE;
 		m_flElasticity = 1.0f;
 		SetFriction(1.0f);
+		m_nLastThinkTick = gpGlobals->tickcount;
 	}
 
 	~CEngineObjectInternal()
@@ -184,6 +185,7 @@ public:
 #ifdef _DEBUG
 		m_vecVelocity.Init();
 		m_vecAbsVelocity.Init();
+		m_iCurrentThinkContext = NO_THINK_CONTEXT;
 #endif
 		SetCollisionBounds(vec3_origin, vec3_origin);
 	}
@@ -490,6 +492,30 @@ public:
 	void SetElasticity(float flElasticity);
 	float GetElasticity(void) const;
 
+	BASEPTR GetPfnThink();
+	void SetPfnThink(BASEPTR pfnThink);
+	int GetIndexForThinkContext(const char* pszContext);
+	// Think functions with contexts
+	int RegisterThinkContext(const char* szContext);
+	BASEPTR	ThinkSet(BASEPTR func, float flNextThinkTime = 0, const char* szContext = NULL);
+	void SetNextThink(float nextThinkTime, const char* szContext = NULL);
+	float GetNextThink(const char* szContext = NULL);
+	int GetNextThinkTick(const char* szContext = NULL);
+	float GetLastThink(const char* szContext = NULL);
+	int GetLastThinkTick(const char* szContext = NULL);
+	void SetLastThinkTick(int iThinkTick);
+	bool WillThink();
+	int GetFirstThinkTick();	// get first tick thinking on any context
+	// Sets/Gets the next think based on context index
+	void SetNextThink(int nContextIndex, float thinkTime);
+	void SetLastThink(int nContextIndex, float thinkTime);
+	float GetNextThink(int nContextIndex) const;
+	int	GetNextThinkTick(int nContextIndex) const;
+	void CheckHasThinkFunction(bool isThinkingHint = false);
+	bool PhysicsRunThink(thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS);
+	bool PhysicsRunSpecificThink(int nContextIndex, BASEPTR thinkFunc);
+	void PhysicsDispatchThink(BASEPTR thinkFunc);
+
 public:
 	// Networking related methods
 	void NetworkStateChanged();
@@ -561,6 +587,16 @@ private:
 	// was pev->friction
 	CNetworkVarForDerived(float, m_flFriction);
 	CNetworkVar(float, m_flElasticity);
+	// Think function handling
+	BASEPTR						m_pfnThink;
+	// was pev->nextthink
+	CNetworkVarForDerived(int, m_nNextThinkTick);
+	int							m_nLastThinkTick;
+	CUtlVector< thinkfunc_t >	m_aThinkFunctions;
+#ifdef _DEBUG
+	int							m_iCurrentThinkContext;
+#endif
+
 };
 
 inline PVSInfo_t* CEngineObjectInternal::GetPVSInfo()
@@ -1139,6 +1175,15 @@ inline void	CEngineObjectInternal::SetElasticity(float flElasticity)
 inline float CEngineObjectInternal::GetElasticity(void)	const
 {
 	return m_flElasticity;
+}
+
+inline BASEPTR CEngineObjectInternal::GetPfnThink()
+{
+	return m_pfnThink;
+}
+inline void CEngineObjectInternal::SetPfnThink(BASEPTR pfnThink)
+{
+	m_pfnThink = pfnThink;
 }
 
 //-----------------------------------------------------------------------------

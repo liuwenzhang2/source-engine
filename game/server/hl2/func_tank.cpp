@@ -232,7 +232,7 @@ void CFuncTank::InputActivate( inputdata_t &inputdata )
 void CFuncTank::TankActivate( void )
 {
 	GetEngineObject()->AddSpawnFlags(SF_TANK_ACTIVE);
-	SetNextThink( gpGlobals->curtime + 0.1f ); 
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	m_fireLast = gpGlobals->curtime;
 }
 
@@ -819,7 +819,7 @@ void CFuncTank::Spawn( void )
 	if ( IsActive() || (IsControllable() && !HasController()) )
 	{
 		// Think to find controllers.
-		SetNextThink( gpGlobals->curtime + 1.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 		m_flNextControllerSearch = gpGlobals->curtime + 1.0f;
 	}
 
@@ -1111,7 +1111,7 @@ bool CFuncTank::StartControl( CBaseCombatCharacter *pController )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 	
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	
 	// Let the map maker know a controller has been found
 	if ( m_hController->IsPlayer() )
@@ -1152,7 +1152,7 @@ void CFuncTank::StopControl()
 	}
 
 	// Stop thinking.
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	
 	// Let the map maker know a controller has been lost.
 	if ( m_hController->IsPlayer() )
@@ -1186,7 +1186,7 @@ void CFuncTank::StopControl()
 		m_flNextControllerSearch = gpGlobals->curtime + 5.0f;
 #endif//FUNCTANK_AUTOUSE
 
-		SetNextThink( m_flNextControllerSearch );
+		GetEngineObject()->SetNextThink( m_flNextControllerSearch );
 	}
 
 	SetLocalAngularVelocity( vec3_angle );
@@ -1451,7 +1451,7 @@ void CFuncTank::NPC_InterruptRoute( void )
 	if ( !HasController() )
 	{
 		// Start thinking to find controllers again
-		SetNextThink( m_flNextControllerSearch );
+		GetEngineObject()->SetNextThink( m_flNextControllerSearch );
 	}
 }
 
@@ -1666,11 +1666,11 @@ void CFuncTank::Think( void )
 		{
 			if( bThinkFast )
 			{
-				SetNextThink( gpGlobals->curtime + 0.1f );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 			}
 			else
 			{
-				SetNextThink( gpGlobals->curtime + 2.0f );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
 			}
 		}
 
@@ -1686,7 +1686,7 @@ void CFuncTank::Think( void )
 		// Keep thinking, in case they turn NPC finding back on
 		if ( !HasController() )
 		{
-			SetNextThink( gpGlobals->curtime + 2.0f );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
 		}
 
 		m_flNextControllerSearch = gpGlobals->curtime + 2.0f;
@@ -2154,7 +2154,7 @@ void CFuncTank::TrackTarget( void )
 	{
 		AimBarrelAtPlayerCrosshair( &angles );
 		RotateTankToAngles( angles );
-		SetNextThink( gpGlobals->curtime + 0.05f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 		SetMoveDoneTime( 0.1 );
 		return;
 	}
@@ -2163,7 +2163,7 @@ void CFuncTank::TrackTarget( void )
 	{
 		AimBarrelAtNPCEnemy( &angles );
 		RotateTankToAngles( angles );
-		SetNextThink( gpGlobals->curtime + 0.05f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 		SetMoveDoneTime( 0.1 );
 		return;
 	}
@@ -2174,13 +2174,13 @@ void CFuncTank::TrackTarget( void )
 		if ( IsControllable() && !HasController() )
 		{
 			// Think to find controllers.
-			SetNextThink( m_flNextControllerSearch );
+			GetEngineObject()->SetNextThink( m_flNextControllerSearch );
 		}
 		return;
 	}
 
 	// Clean room for unnecessarily complicated old code
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	AimFuncTankAtTarget();
 }
 
@@ -2773,7 +2773,7 @@ void CFuncTankLaser::Fire( int bulletCount, const Vector &barrelEnd, const Vecto
 			m_pLaser->TurnOn();
 			m_pLaser->SetFireTime( gpGlobals->curtime - 1.0 );
 			m_pLaser->FireAtPoint( tr );
-			m_pLaser->SetNextThink( TICK_NEVER_THINK );
+			m_pLaser->GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 		}
 		CFuncTank::Fire( bulletCount, barrelEnd, forward, this, bIgnoreSpread );
 	}
@@ -2813,7 +2813,7 @@ void CFuncTankRocket::Fire( int bulletCount, const Vector &barrelEnd, const Vect
 	CMissile *pRocket = (CMissile *) CBaseEntity::Create( "rpg_missile", barrelEnd, GetEngineObject()->GetAbsAngles(), this );
 	
 	pRocket->DumbFire();
-	pRocket->SetNextThink( gpGlobals->curtime + 0.1f );
+	pRocket->GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	pRocket->GetEngineObject()->SetAbsVelocity( forward * m_flRocketSpeed );
 	if ( GetController() && GetController()->IsPlayer() )
 	{
@@ -3280,7 +3280,7 @@ void CFuncTankAPCRocket::Think()
 	// Inert if we're carried...
 	if (GetEngineObject()->GetMoveParent() && GetEngineObject()->GetMoveParent()->GetMoveParent() )
 	{
-		SetNextThink( gpGlobals->curtime + 0.5f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5f );
 		return;
 	}
 
@@ -3559,7 +3559,7 @@ void CMortarShell::Spawn()
 	m_flSpawnedTime = gpGlobals->curtime;
 
 	SetThink( &CMortarShell::FlyThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	// No model but we still need to force this!
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
@@ -3636,7 +3636,7 @@ void UTIL_VisualizeCurve( int type, int steps, float bias )
 //---------------------------------------------------------
 void CMortarShell::FlyThink()
 {
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 
 	if ( gpGlobals->curtime > m_flNPCWarnTime )
 	{
@@ -3799,7 +3799,7 @@ void CMortarShell::Impact( void )
 	m_flFadeTime = gpGlobals->curtime;
 
 	SetThink( &CMortarShell::FadeThink );
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 #define	MORTAR_FADE_LENGTH 1.0f
@@ -3809,7 +3809,7 @@ void CMortarShell::Impact( void )
 //-----------------------------------------------------------------------------
 void CMortarShell::FadeThink( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.05f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05f );
 
 	float lifePerc = 1.0f - ( ( gpGlobals->curtime - m_flFadeTime  ) / MORTAR_FADE_LENGTH );
 

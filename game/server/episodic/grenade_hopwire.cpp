@@ -284,7 +284,7 @@ void CGravityVortexController::PullThink( void )
 	if ( m_flEndTime > gpGlobals->curtime )
 	{
 		SetThink( &CGravityVortexController::PullThink );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 	else
 	{
@@ -304,7 +304,7 @@ void CGravityVortexController::StartPull( const Vector &origin, float radius, fl
 	m_flStrength= strength;
 
 	SetThink( &CGravityVortexController::PullThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -397,7 +397,7 @@ void CGrenadeHopwire::Precache( void )
 void CGrenadeHopwire::SetTimer( float timer )
 {
 	SetThink( &CBaseGrenade::PreDetonate );
-	SetNextThink( gpGlobals->curtime + timer );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + timer );
 }
 
 #define	MAX_STRIDER_KILL_DISTANCE_HORZ	(hopwire_strider_kill_dist_h.GetFloat())		// Distance a Strider will be killed if within
@@ -471,7 +471,7 @@ void CGrenadeHopwire::EndThink( void )
 	}
 
 	SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 1.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 }
 
 //-----------------------------------------------------------------------------
@@ -510,13 +510,13 @@ void CGrenadeHopwire::CombatThink( void )
 		
 		// Begin to stop in two seconds
 		SetThink( &CGrenadeHopwire::EndThink );
-		SetNextThink( gpGlobals->curtime + 2.0f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
 	}
 	else
 	{
 		// Remove us immediately
 		SetThink( &CBaseEntity::SUB_Remove );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 
@@ -558,7 +558,7 @@ void CGrenadeHopwire::Detonate( void )
 
 	// Explode at the apex
 	SetThink( &CGrenadeHopwire::CombatThink );
-	SetNextThink( gpGlobals->curtime + apexTime);
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + apexTime);
 }
 
 //-----------------------------------------------------------------------------

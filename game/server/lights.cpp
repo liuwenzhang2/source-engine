@@ -186,7 +186,7 @@ void CLight::InputFadeToPattern( inputdata_t &inputdata )
 	m_iTargetFade	= inputdata.value.String()[0];
 	m_iszPattern	= inputdata.value.StringID();
 	SetThink(&CLight::FadeThink);
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	// Light is on if pattern is set
 	GetEngineObject()->RemoveSpawnFlags(SF_LIGHT_START_OFF);
@@ -211,7 +211,7 @@ void CLight::FadeThink(void)
 	if (m_iCurrentFade == m_iTargetFade)
 	{
 		engine->LightStyle(m_iStyle, (char *)STRING( m_iszPattern ));
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	}
 	// Otherwise instantiate our current fade value and keep thinking
 	else
@@ -222,7 +222,7 @@ void CLight::FadeThink(void)
 		engine->LightStyle(m_iStyle, sCurString);
 
 		// UNDONE: Consider making this settable war to control fade speed
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 

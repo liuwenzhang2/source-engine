@@ -618,9 +618,6 @@ C_BaseEntity::C_BaseEntity()
 #ifdef _DEBUG
 	m_vecViewOffset.Init();
 	m_vecBaseVelocity.Init();
-
-	m_iCurrentThinkContext = NO_THINK_CONTEXT;
-
 #endif
 
 	m_nSimulationTick = -1;
@@ -707,7 +704,6 @@ void C_BaseEntity::Clear( void )
 
 	m_ShadowDirUseOtherEntity = NULL;
 
-	m_nLastThinkTick = gpGlobals->tickcount;
 
 #if defined(SIXENSE)
 	m_vecEyeOffset.Init();

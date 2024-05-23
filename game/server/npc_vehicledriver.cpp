@@ -759,7 +759,7 @@ bool CNPC_VehicleDriver::OverridePathMove( float flInterval )
 
 	pVehiclePhysics->GetVelocity( &vecVelocity, &angVel );
 	float flSpeed = vecVelocity.Length();
-	float flIncTime = gpGlobals->curtime - GetLastThink();
+	float flIncTime = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 	float flIncrement = flIncTime * (flSpeed / pCurrentSplineBeingTraversed->GetLength());
 
 	// Now advance our point along the spline

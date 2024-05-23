@@ -110,11 +110,11 @@ void CTesla::SetupForNextArc()
 	if (m_bOn)
 	{
 		float flTimeToNext = RandomFloat( m_flArcInterval[0], m_flArcInterval[1] );
-		SetNextThink( gpGlobals->curtime + flTimeToNext );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + flTimeToNext );
 	}
 	else
 	{
-		SetNextThink( TICK_NEVER_THINK );
+		GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	}
 }
 

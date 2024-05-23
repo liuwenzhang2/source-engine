@@ -1078,7 +1078,7 @@ void CFire::DestroyEffect()
 //-----------------------------------------------------------------------------
 void CFire::BurnThink( void )
 {
-	SetNextThink( gpGlobals->curtime + FIRE_THINK_INTERVAL );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + FIRE_THINK_INTERVAL );
 
 	Update( FIRE_THINK_INTERVAL );
 }
@@ -1093,7 +1093,7 @@ void CFire::GoOutInSeconds( float seconds )
 	Scale( 0.0f, seconds );
 	
 	SetThink( &CFire::GoOutThink );
-	SetNextThink( gpGlobals->curtime + seconds );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + seconds );
 }
 
 //------------------------------------------------------------------------------
@@ -1210,7 +1210,7 @@ bool CFire::GoOut()
 
 	m_flLastHeatLevel = m_flHeatLevel; 
 	SetThink(NULL);
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	if (GetEngineObject()->GetSpawnFlags() & SF_FIRE_DIE_PERMANENT)
 	{
 		UTIL_Remove( this );
@@ -1279,7 +1279,7 @@ void CEnvFireSource::Think()
 {
 	if ( !m_bEnabled )
 		return;
-	SetNextThink( gpGlobals->curtime + FIRESOURCE_THINK_TIME );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + FIRESOURCE_THINK_TIME );
 
 	CFire *pFires[128];
 	int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), false, GetEngineObject()->GetAbsOrigin(), m_radius );
@@ -1296,7 +1296,7 @@ void CEnvFireSource::TurnOn()
 		return;
 
 	m_bEnabled = true;
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 void CEnvFireSource::TurnOff()
@@ -1305,7 +1305,7 @@ void CEnvFireSource::TurnOff()
 		return;
 
 	m_bEnabled = false;
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 }
 void CEnvFireSource::InputEnable( inputdata_t &inputdata )
 {
@@ -1388,7 +1388,7 @@ void CEnvFireSensor::Think()
 	{
 		time = 0.1;
 	}
-	SetNextThink( gpGlobals->curtime + time );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + time );
 
 	float heat = 0;
 	CFire *pFires[128];
@@ -1427,7 +1427,7 @@ void CEnvFireSensor::TurnOn()
 		return;
 
 	m_bEnabled = true;
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	m_bHeatAtLevel = false;
 	m_levelTime = 0;
 }
@@ -1438,7 +1438,7 @@ void CEnvFireSensor::TurnOff()
 		return;
 
 	m_bEnabled = false;
-	SetNextThink( TICK_NEVER_THINK );
+	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 	if ( m_bHeatAtLevel )
 	{
 		m_bHeatAtLevel = false;

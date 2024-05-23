@@ -856,7 +856,7 @@ void CItem_AmmoCrate::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TY
 
 		// Start thinking to make it return
 		SetThink( &CItem_AmmoCrate::CrateThink );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 
 	// Don't close again for two seconds
@@ -950,7 +950,7 @@ void CItem_AmmoCrate::CrateThink( void )
 	StudioFrameAdvance();
 	DispatchAnimEvents( this );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Start closing if we're not already
 	if ( GetSequence() != LookupSequence( "Close" ) )

@@ -73,7 +73,7 @@ END_DATADESC()
 void CLogicAuto::Activate(void)
 {
 	BaseClass::Activate();
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 }
 
 

@@ -632,7 +632,7 @@ void CProtoSniper::LaserOff( void )
 		m_pBeam = NULL;
 	}
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 
@@ -685,7 +685,7 @@ void CProtoSniper::LaserOn( const Vector &vecTarget, const Vector &vecDeviance )
 
 	// Think faster whilst painting. Higher resolution on the 
 	// beam movement.
-	SetNextThink( gpGlobals->curtime + 0.02 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.02 );
 }
 
 //-----------------------------------------------------------------------------
@@ -2388,11 +2388,11 @@ void CProtoSniper::PrescheduleThink( void )
 	// Think faster if the beam is on, this gives the beam higher resolution.
 	if( m_pBeam )
 	{
-		SetNextThink( gpGlobals->curtime + 0.03 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.03 );
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 
 	// If the enemy has just stepped into view, or we've acquired a new enemy,
@@ -3196,7 +3196,7 @@ void CSniperBullet::Precache()
 void CSniperBullet::BulletThink( void )
 {
 	// Set the bullet up to think again.
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.05 );
 
 	if( !GetOwnerEntity() )
 	{
@@ -3238,7 +3238,7 @@ void CSniperBullet::BulletThink( void )
 	Vector vecEnd;
 	float flInterval;
 
-	flInterval = gpGlobals->curtime - GetLastThink();
+	flInterval = gpGlobals->curtime - GetEngineObject()->GetLastThink();
 	vecStart = GetEngineObject()->GetAbsOrigin();
 	vecEnd = vecStart + ( m_vecDir * (m_Speed * flInterval) );
 	float flDist = (vecStart - vecEnd).Length();
@@ -3371,7 +3371,7 @@ bool CSniperBullet::Start( const Vector &vecOrigin, const Vector &vecTarget, CBa
 	m_SoundTime = gpGlobals->curtime + flElapsedTime * 0.5;
 	
 	SetThink( &CSniperBullet::BulletThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	m_fActive = true;
 	m_bDirectShot = bDirectShot;
 	return true;
@@ -3496,7 +3496,7 @@ void CSniperBullet::Stop( void )
 	// in the world that is relying on the bullet's position as a react origin.
 	// So stick around for another second or so.
 	SetThink( &CBaseEntity::SUB_Remove );
-	SetNextThink( gpGlobals->curtime + 1.0 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0 );
 }
 
 

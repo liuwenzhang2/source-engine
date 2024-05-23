@@ -1774,7 +1774,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 			// NOTE: We can't UTIL_Remove here, because we're in the middle of running our AI, and
 			//		 we'll crash later in the bowels of the AI. Remove ourselves next frame.
 			SetThink( &CNPC_Antlion::SUB_Remove );
-			SetNextThink( gpGlobals->curtime + 0.1 );
+			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 		}
 
 		TaskComplete();

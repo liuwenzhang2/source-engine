@@ -107,7 +107,7 @@ void CPropThumper::Spawn( void )
 	m_bEnabled = true;
 
 	SetThink( &CPropThumper::Think );
-	SetNextThink( gpGlobals->curtime + 1.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
 	int iSequence = SelectHeaviestSequence ( ACT_IDLE );
 
@@ -185,7 +185,7 @@ void CPropThumper::Think( void )
 {
 	StudioFrameAdvance();
 	DispatchAnimEvents( this );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 	if ( m_sndMotor == NULL )
 		 InitMotorSound();

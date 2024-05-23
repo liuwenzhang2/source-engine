@@ -99,7 +99,7 @@ void CCycler::Spawn( )
 	m_flPlaybackRate	= 1.0;
 	m_flGroundSpeed		= 0;
 
-	SetNextThink( gpGlobals->curtime + 1.0f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.0f );
 
 	ResetSequenceInfo( );
 
@@ -126,7 +126,7 @@ void CCycler::Spawn( )
 //
 void CCycler::Think( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if (m_animate)
 	{
@@ -360,7 +360,7 @@ void CWreckage::Spawn( void )
 	m_takedamage		= 0;
 
 	SetCycle( 0 );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if (GetEngineObject()->GetModelName() != NULL_STRING)
 	{
@@ -380,7 +380,7 @@ void CWreckage::Precache( )
 void CWreckage::Think( void )
 {
 	StudioFrameAdvance( );
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
 	if (m_flDieTime)
 	{
@@ -487,7 +487,7 @@ bool CBlendingCycler::KeyValue( const char *szKeyName, const char *szValue )
 // Blending Cycler think
 void CBlendingCycler::Think( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	// Move
 	m_iCurrent += m_iBlendspeed;

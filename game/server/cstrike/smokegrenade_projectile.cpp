@@ -62,7 +62,7 @@ CSmokeGrenadeProjectile* CSmokeGrenadeProjectile::Create(
 void CSmokeGrenadeProjectile::SetTimer( float timer )
 {
 	SetThink( &CSmokeGrenadeProjectile::Think_Detonate );
-	SetNextThink( gpGlobals->curtime + timer );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + timer );
 
 	TheBots->SetGrenadeRadius( this, 0.0f );
 }
@@ -72,7 +72,7 @@ void CSmokeGrenadeProjectile::Think_Detonate()
 	if (GetEngineObject()->GetAbsVelocity().Length() > 0.1 )
 	{
 		// Still moving. Don't detonate yet.
-		SetNextThink( gpGlobals->curtime + 0.2 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 		return;
 	}
 
@@ -127,7 +127,7 @@ void CSmokeGrenadeProjectile::Think_Detonate()
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 	m_nRenderMode = kRenderTransColor;
-	SetNextThink( gpGlobals->curtime + 5 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 5 );
 	SetThink( &CSmokeGrenadeProjectile::Think_Fade );
 }
 
@@ -135,7 +135,7 @@ void CSmokeGrenadeProjectile::Think_Detonate()
 // Fade the projectile out over time before making it disappear
 void CSmokeGrenadeProjectile::Think_Fade()
 {
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 
 	color32 c = GetRenderColor();
 	c.a -= 1;
@@ -146,7 +146,7 @@ void CSmokeGrenadeProjectile::Think_Fade()
 		TheBots->RemoveGrenade( this );
 
 		GetEngineObject()->SetModelName( NULL_STRING );//invisible
-		SetNextThink( gpGlobals->curtime + 20 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 20 );
 		SetThink( &CSmokeGrenadeProjectile::Think_Remove );	// Spit out smoke for 10 seconds.
 		GetEngineObject()->SetSolid( SOLID_NONE );
 	}

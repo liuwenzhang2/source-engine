@@ -131,7 +131,7 @@ void CTeamControlPoint::Spawn( void )
 
 	SetPlaybackRate( 1.0 );
 	SetThink( &CTeamControlPoint::AnimThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if (GetEngineObject()->HasSpawnFlags(SF_CAP_POINT_HIDE_MODEL) )
 	{
@@ -280,7 +280,7 @@ void CTeamControlPoint::AnimThink( void )
 {
 	StudioFrameAdvance();
 	DispatchAnimEvents(this);
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------

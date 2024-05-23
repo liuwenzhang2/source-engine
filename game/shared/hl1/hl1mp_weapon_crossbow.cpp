@@ -112,7 +112,7 @@ void CCrossbowBolt::Spawn( )
 	SetTouch( &CCrossbowBolt::BoltTouch );
 
 	SetThink( &CCrossbowBolt::BubbleThink );
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.2 );
 
     m_bExplode = true;
 }
@@ -214,7 +214,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
 		SetThink( &CCrossbowBolt::SUB_Remove );
-		SetNextThink( gpGlobals->curtime );// this will get changed below if the bolt is allowed to stick in what it hit.
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );// this will get changed below if the bolt is allowed to stick in what it hit.
 
 		if ( m_bExplode == false )
 		{
@@ -241,7 +241,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 	if ( g_pGameRules->IsMultiplayer() && m_bExplode )
 	{
         SetThink( &CCrossbowBolt::ExplodeThink );
-        SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 
@@ -283,7 +283,7 @@ void CCrossbowBolt::ExplodeThink( void )
 
     
     SetThink( &CCrossbowBolt::SUB_Remove );
-    SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
     
 	GetEngineObject()->AddEffects( EF_NODRAW );
 }
@@ -295,7 +295,7 @@ void CCrossbowBolt::BubbleThink( void )
 	VectorAngles(GetEngineObject()->GetAbsVelocity(), angNewAngles );
 	GetEngineObject()->SetAbsAngles( angNewAngles );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if ( GetWaterLevel()  == 0 )
 		return;

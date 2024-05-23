@@ -128,7 +128,7 @@ void CBaseNPCMaker::Spawn( void )
 	if ( m_bDisabled == false )
 	{
 		SetThink ( &CBaseNPCMaker::MakerThink );
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 	else
 	{
@@ -283,7 +283,7 @@ void CBaseNPCMaker::Enable( void )
 
 	m_bDisabled = false;
 	SetThink ( &CBaseNPCMaker::MakerThink );
-	SetNextThink( gpGlobals->curtime );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
 
 
@@ -521,7 +521,7 @@ void CBaseNPCMaker::ChildPostSpawn( CAI_BaseNPC *pChild )
 //-----------------------------------------------------------------------------
 void CBaseNPCMaker::MakerThink ( void )
 {
-	SetNextThink( gpGlobals->curtime + m_flSpawnFrequency );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + m_flSpawnFrequency );
 
 	MakeNPC();
 }

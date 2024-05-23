@@ -135,7 +135,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 					}
 
 					// Cancel portals that are still mid flight
-					if ( pPortal && pPortal->GetNextThink( s_pDelayedPlacementContext ) > gpGlobals->curtime )
+					if ( pPortal && pPortal->GetEngineObject()->GetNextThink( s_pDelayedPlacementContext ) > gpGlobals->curtime )
 					{
 						pPortal->SetContextThink( NULL, gpGlobals->curtime, s_pDelayedPlacementContext ); 
 						pPortalgun->m_fEffectsMaxSize2 = 50.0f;
@@ -158,7 +158,7 @@ void CTriggerPortalCleanser::Touch( CBaseEntity *pOther )
 					}
 					
 					// Cancel portals that are still mid flight
-					if ( pPortal && pPortal->GetNextThink( s_pDelayedPlacementContext ) > gpGlobals->curtime )
+					if ( pPortal && pPortal->GetEngineObject()->GetNextThink( s_pDelayedPlacementContext ) > gpGlobals->curtime )
 					{
 						pPortal->SetContextThink( NULL, gpGlobals->curtime, s_pDelayedPlacementContext ); 
 						pPortalgun->m_fEffectsMaxSize2 = 50.0f;

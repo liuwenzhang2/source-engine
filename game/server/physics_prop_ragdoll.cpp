@@ -528,7 +528,7 @@ void CRagdollProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	{
 		// Setup the think function to remove the flags
 		SetThink( &CRagdollProp::ClearFlagsThink );
-		SetNextThink( gpGlobals->curtime );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
 
@@ -1107,7 +1107,7 @@ void CRagdollProp::FadeOut( float flDelay, float fadeTime )
 
 bool CRagdollProp::IsFading()
 {
-	return ( GetNextThink( s_pFadeOutContext ) >= gpGlobals->curtime );
+	return (GetEngineObject()->GetNextThink( s_pFadeOutContext ) >= gpGlobals->curtime );
 }
 
 void CRagdollProp::FadeOutThink(void) 

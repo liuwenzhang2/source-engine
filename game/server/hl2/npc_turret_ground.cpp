@@ -169,11 +169,11 @@ void CNPC_GroundTurret::PrescheduleThink()
 {
 	if( UTIL_FindClientInPVS(this) )
 	{
-		SetNextThink( gpGlobals->curtime + 0.03f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.03f );
 	}
 	else
 	{
-		SetNextThink( gpGlobals->curtime + 0.1f );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 
@@ -259,7 +259,7 @@ void CNPC_GroundTurret::Event_Killed( const CTakeDamageInfo &info )
 	m_iDeathSparks = random->RandomInt( 6, 12 );
 
 	SetThink( &CNPC_GroundTurret::DeathEffects );
-	SetNextThink( gpGlobals->curtime + 1.5f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1.5f );
 }
 
 //---------------------------------------------------------
@@ -272,7 +272,7 @@ void CNPC_GroundTurret::DeathEffects()
 		CTakeDamageInfo info;
 		DeathSound( info );
 		m_bHasExploded = true;
-		SetNextThink( gpGlobals->curtime + 0.5 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.5 );
 	}
 	else
 	{
@@ -294,7 +294,7 @@ void CNPC_GroundTurret::DeathEffects()
 			return;
 		}
 
-		SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.5, 2.5 ) );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.5, 2.5 ) );
 	}
 }
 

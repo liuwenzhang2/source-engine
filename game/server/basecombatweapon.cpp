@@ -211,7 +211,7 @@ CBaseEntity* CBaseCombatWeapon::Respawn( void )
 
 		// not a typo! We want to know when the weapon the player just picked up should respawn! This new entity we created is the replacement,
 		// but when it should respawn is based on conditions belonging to the weapon that was taken.
-		pNewWeapon->SetNextThink( gpGlobals->curtime + g_pGameRules->FlWeaponRespawnTime( this ) );
+		pNewWeapon->GetEngineObject()->SetNextThink( gpGlobals->curtime + g_pGameRules->FlWeaponRespawnTime( this ) );
 	}
 	else
 	{
@@ -445,7 +445,7 @@ void CBaseCombatWeapon::Delete( void )
 	SetTouch( NULL );
 	// FIXME: why doesn't this just remove itself now?
 	SetThink(&CBaseCombatWeapon::SUB_Remove);
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 void CBaseCombatWeapon::DestroyItem( void )
@@ -467,7 +467,7 @@ void CBaseCombatWeapon::Kill( void )
 	// FIXME: why doesn't this just remove itself now?
 	// FIXME: how is this different than Delete(), and why do they have the same code in them?
 	SetThink(&CBaseCombatWeapon::SUB_Remove);
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //====================================================================================
@@ -520,7 +520,7 @@ void CBaseCombatWeapon::FallInit( void )
 	
 	SetThink( &CBaseCombatWeapon::FallThink );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------
@@ -531,7 +531,7 @@ void CBaseCombatWeapon::FallInit( void )
 //-----------------------------------------------------------------------------
 void CBaseCombatWeapon::FallThink ( void )
 {
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	bool shouldMaterialize = false;
 	IPhysicsObject *pPhysics = VPhysicsGetObject();
@@ -631,7 +631,7 @@ void CBaseCombatWeapon::AttemptToMaterialize( void )
 		return;
 	}
 
-	SetNextThink( gpGlobals->curtime + time );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + time );
 }
 
 //-----------------------------------------------------------------------------

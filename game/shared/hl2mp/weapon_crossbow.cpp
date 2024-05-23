@@ -175,7 +175,7 @@ void CCrossbowBolt::Spawn( void )
 	SetTouch( &CCrossbowBolt::BoltTouch );
 
 	SetThink( &CCrossbowBolt::BubbleThink );
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	
 	CreateSprites();
 
@@ -319,7 +319,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 			else
 			{
 				SetThink( &CCrossbowBolt::SUB_Remove );
-				SetNextThink( gpGlobals->curtime + 2.0f );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
 				
 				//FIXME: We actually want to stick (with hierarchy) to what we've hit
 				SetMoveType( MOVETYPE_NONE );
@@ -342,7 +342,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 				GetEngineObject()->AddEffects( EF_NODRAW );
 				SetTouch( NULL );
 				SetThink( &CCrossbowBolt::SUB_Remove );
-				SetNextThink( gpGlobals->curtime + 2.0f );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
 
 				if ( m_pGlowSprite != NULL )
 				{
@@ -372,7 +372,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 	if ( g_pGameRules->IsMultiplayer() )
 	{
 //		SetThink( &CCrossbowBolt::ExplodeThink );
-//		SetNextThink( gpGlobals->curtime + 0.1f );
+//		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	}
 }
 
@@ -386,7 +386,7 @@ void CCrossbowBolt::BubbleThink( void )
 	VectorAngles(GetEngineObject()->GetAbsVelocity(), angNewAngles );
 	GetEngineObject()->SetAbsAngles( angNewAngles );
 
-	SetNextThink( gpGlobals->curtime + 0.1f );
+	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if ( GetWaterLevel()  == 0 )
 		return;

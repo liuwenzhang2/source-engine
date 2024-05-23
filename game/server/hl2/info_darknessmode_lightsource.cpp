@@ -62,7 +62,7 @@ public:
 			if ( g_debug_darkness.GetBool() )
 			{
 				SetThink( &CInfoDarknessLightSource::DebugThink );
-				SetNextThink( gpGlobals->curtime );
+				GetEngineObject()->SetNextThink( gpGlobals->curtime );
 			}
 		}
 
@@ -95,7 +95,7 @@ public:
 		Vector vecRadius( m_flLightRadius, m_flLightRadius, m_flLightRadius );
 		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), -vecRadius, vecRadius, 255,255,255, 8, 0.1 );
 		NDebugOverlay::Box(GetEngineObject()->GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255,0,0, 8, 0.1 );
-		SetNextThink( gpGlobals->curtime + 0.1 );
+		GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1 );
 
 		int textoffset = 0;
 		EntityText( textoffset, UTIL_VarArgs("Org: %.2f %.2f %.2f", GetEngineObject()->GetAbsOrigin().x, GetEngineObject()->GetAbsOrigin().y, GetEngineObject()->GetAbsOrigin().z ), 0.1 );
@@ -365,7 +365,7 @@ void CDarknessLightSourcesSystem::SetDebug( bool bDebug )
 			if ( bDebug )
 			{
 				pLightSource->SetThink( &CInfoDarknessLightSource::DebugThink );
-				pLightSource->SetNextThink( gpGlobals->curtime );
+				pLightSource->GetEngineObject()->SetNextThink( gpGlobals->curtime );
 			}
 			else
 			{
