@@ -2894,7 +2894,7 @@ BASEPTR	CEngineObjectInternal::ThinkSet(BASEPTR func, float thinkTime, const cha
 		m_pfnThink = func;
 #if !defined( CLIENT_DLL )
 #ifdef _DEBUG
-		FunctionCheck(*(reinterpret_cast<void**>(&m_pfnThink)), "BaseThinkFunc");
+		m_pOuter->FunctionCheck(*(reinterpret_cast<void**>(&m_pfnThink)), "BaseThinkFunc");
 #endif
 #endif
 		return m_pfnThink;
@@ -2910,7 +2910,7 @@ BASEPTR	CEngineObjectInternal::ThinkSet(BASEPTR func, float thinkTime, const cha
 	m_aThinkFunctions[iIndex].m_pfnThink = func;
 #if !defined( CLIENT_DLL )
 #ifdef _DEBUG
-	FunctionCheck(*(reinterpret_cast<void**>(&m_aThinkFunctions[iIndex].m_pfnThink)), szContext);
+	m_pOuter->FunctionCheck(*(reinterpret_cast<void**>(&m_aThinkFunctions[iIndex].m_pfnThink)), szContext);
 #endif
 #endif
 
@@ -3734,7 +3734,7 @@ public:
 				int entinfoIndex = m_simThinkList[i].entEntry;
 				const CEntInfo<CBaseEntity>* pInfo = gEntList.GetEntInfoPtrByIndex(entinfoIndex);
 				pList[out] = (CBaseEntity*)pInfo->m_pEntity;
-				Assert(m_simThinkList[i].nextThinkTick == 0 || pList[out]->GetFirstThinkTick() == m_simThinkList[i].nextThinkTick);
+				Assert(m_simThinkList[i].nextThinkTick == 0 || pList[out]->GetEngineObject()->GetFirstThinkTick() == m_simThinkList[i].nextThinkTick);
 				Assert(gEntList.IsEntityPtr(pList[out]));
 				out++;
 			}

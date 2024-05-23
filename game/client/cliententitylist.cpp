@@ -2963,7 +2963,7 @@ CBASEPTR C_EngineObjectInternal::ThinkSet(CBASEPTR func, float thinkTime, const 
 		m_pfnThink = func;
 #if !defined( CLIENT_DLL )
 #ifdef _DEBUG
-		FunctionCheck(*(reinterpret_cast<void**>(&m_pfnThink)), "BaseThinkFunc");
+		m_pOuter->FunctionCheck(*(reinterpret_cast<void**>(&m_pfnThink)), "BaseThinkFunc");
 #endif
 #endif
 		return m_pfnThink;
@@ -2979,7 +2979,7 @@ CBASEPTR C_EngineObjectInternal::ThinkSet(CBASEPTR func, float thinkTime, const 
 	m_aThinkFunctions[iIndex].m_pfnThink = func;
 #if !defined( CLIENT_DLL )
 #ifdef _DEBUG
-	FunctionCheck(*(reinterpret_cast<void**>(&m_aThinkFunctions[iIndex].m_pfnThink)), szContext);
+	m_pOuter->FunctionCheck(*(reinterpret_cast<void**>(&m_aThinkFunctions[iIndex].m_pfnThink)), szContext);
 #endif
 #endif
 
