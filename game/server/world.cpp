@@ -461,10 +461,6 @@ CWorld::CWorld( )
 	//NetworkProp()->AttachEdict( RequiredEdictIndex() );
 	ActivityList_Init();
 	EventList_Init();
-	
-	//SetSolid( SOLID_BSP );
-	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
-
 	m_bColdWorld = false;
 }
 
@@ -473,6 +469,7 @@ void CWorld::PostConstructor(const char* szClassname, int iForceEdictIndex)
 	GetEngineObject()->AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES);
 	BaseClass::PostConstructor(szClassname, iForceEdictIndex);
 	GetEngineObject()->SetSolid(SOLID_BSP);
+	GetEngineObject()->SetMoveType(MOVETYPE_NONE);
 }
 
 CWorld::~CWorld( )
