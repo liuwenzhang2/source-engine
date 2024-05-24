@@ -597,7 +597,7 @@ void CCombineDropshipContainer::ThrowFlamingGib( void )
 		pSmokeTrail->SetLifetime( pChunk->m_lifeTime );
 		pSmokeTrail->GetEngineObject()->SetParent( pChunk->GetEngineObject(), 0);
 		pSmokeTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
-		pSmokeTrail->SetMoveType( MOVETYPE_NONE );
+		pSmokeTrail->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	}
 }
 
@@ -729,7 +729,7 @@ void CCombineDropshipContainer::AddSmokeTrail( const Vector &vecPos )
 	QAngle angles;
 	VectorAngles( vecForward, angles );
 	pSmokeTrail->GetEngineObject()->SetAbsAngles( angles );
-	pSmokeTrail->SetMoveType( MOVETYPE_NONE );
+	pSmokeTrail->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 
@@ -891,7 +891,7 @@ void CNPC_CombineDropship::Spawn( void )
 				pPhysicsObject->UpdateShadow( m_hContainer->GetEngineObject()->GetAbsOrigin(), m_hContainer->GetEngineObject()->GetAbsAngles(), false, 0 );
 			}
 
-			m_hContainer->SetMoveType( MOVETYPE_PUSH );
+			m_hContainer->GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 			m_hContainer->GetEnemy()->GetEngineObject()->SetGroundEntity( NULL );
 
 			// Cache off container's attachment points
@@ -937,7 +937,7 @@ void CNPC_CombineDropship::Spawn( void )
 
 			m_hContainer->Teleport( &apcPosition, &apcAngles, NULL );
 
-			m_iContainerMoveType = m_hContainer->GetMoveType();
+			m_iContainerMoveType = m_hContainer->GetEngineObject()->GetMoveType();
 
 			IPhysicsObject *pPhysicsObject = m_hContainer->VPhysicsGetObject();
 			if ( pPhysicsObject )
@@ -947,7 +947,7 @@ void CNPC_CombineDropship::Spawn( void )
 
 			m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
 			m_hContainer->SetOwnerEntity(this);
-			m_hContainer->SetMoveType( MOVETYPE_PUSH );
+			m_hContainer->GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 			m_hContainer->GetEngineObject()->SetGroundEntity( NULL );
 			m_hContainer->UpdatePhysicsShadowToCurrentPosition(0);
 		}
@@ -1751,7 +1751,7 @@ void CNPC_CombineDropship::InputDropAPC( inputdata_t &inputdata )
 	}
 
 	m_hContainer->GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
-	m_hContainer->SetMoveType( (MoveType_t)m_iContainerMoveType );
+	m_hContainer->GetEngineObject()->SetMoveType( (MoveType_t)m_iContainerMoveType );
 
 	// If the container has a physics object, remove it's shadow
 	IPhysicsObject *pPhysicsObject = m_hContainer->VPhysicsGetObject();
@@ -1784,7 +1784,7 @@ void CNPC_CombineDropship::DropSoldierContainer( )
 	}
 
 	m_hContainer->GetEngineObject()->SetAbsVelocity( vecAbsVelocity );
-	m_hContainer->SetMoveType( MOVETYPE_VPHYSICS );
+	m_hContainer->GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 
 	// If we have a troop in the process of exiting, kill him.
 	// We do this to avoid having to solve the AI problems resulting from it.
@@ -2225,7 +2225,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 					if ( m_hContainer && m_leaveCrate )
 					{
 						m_hContainer->GetEngineObject()->SetParent(NULL);
-						m_hContainer->SetMoveType( (MoveType_t)m_iContainerMoveType );
+						m_hContainer->GetEngineObject()->SetMoveType( (MoveType_t)m_iContainerMoveType );
 
 						Vector vecAbsVelocity( 0, 0, GetEngineObject()->GetAbsVelocity().z );
 						if ( vecAbsVelocity.z > 0 )
@@ -2306,7 +2306,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 						// Grab the target
 						m_hContainer = m_hPickupTarget;
 						m_hPickupTarget = NULL;
-						m_iContainerMoveType = m_hContainer->GetMoveType();
+						m_iContainerMoveType = m_hContainer->GetEngineObject()->GetMoveType();
 						if ( m_bInvulnerable && m_hContainer )
 						{
 							m_hContainer->m_takedamage = DAMAGE_NO;
@@ -2322,7 +2322,7 @@ void CNPC_CombineDropship::PrescheduleThink( void )
 						}
 
 						m_hContainer->GetEngineObject()->SetParent(this->GetEngineObject(), 0);
-						m_hContainer->SetMoveType( MOVETYPE_PUSH );
+						m_hContainer->GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 						m_hContainer->GetEngineObject()->SetGroundEntity( NULL );
 
 						m_OnFinishedPickup.FireOutput( this, this );

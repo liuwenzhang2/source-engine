@@ -55,7 +55,7 @@ void CTripmineGrenade::Spawn( void )
 {
 	Precache( );
 	// motor
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetModel( "models/Weapons/w_slam.mdl" );
 

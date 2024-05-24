@@ -308,7 +308,7 @@ void CNPC_Combine::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	SetBloodColor( BLOOD_COLOR_RED );
 	m_flFieldOfView			= -0.2;// indicates the width of this NPC's forward view cone ( as a dotproduct result )
 	m_NPCState				= NPC_STATE_NONE;
@@ -945,7 +945,7 @@ void CNPC_Combine::StartTask( const Task_t *pTask )
 			}
 
 			BaseClass::StartTask( pTask );
-			bool bIsFlying = (GetMoveType() == MOVETYPE_FLY) || (GetMoveType() == MOVETYPE_FLYGRAVITY);
+			bool bIsFlying = (GetEngineObject()->GetMoveType() == MOVETYPE_FLY) || (GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY);
 			if (bIsFlying)
 			{
 				SetIdealActivity( ACT_GLIDE );

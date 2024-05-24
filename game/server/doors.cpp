@@ -287,7 +287,7 @@ void CBaseDoor::Spawn()
 		m_bLocked = true;
 	}
 
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	
 	if (m_flSpeed == 0)
 	{
@@ -1196,7 +1196,7 @@ void CBaseDoor::Blocked( CBaseEntity *pOther )
 		// push/damage the object.
 		// If block damage is set, but this object is a physics prop that can't be damaged, just
 		// give up and disable collisions
-		if ( (m_bForceClosed || m_flWait < 0) && pOther->GetMoveType() == MOVETYPE_VPHYSICS && 
+		if ( (m_bForceClosed || m_flWait < 0) && pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
 		   (pOther->m_takedamage == DAMAGE_NO || pOther->m_takedamage == DAMAGE_EVENTS_ONLY) )
 		{
 			EntityPhysics_CreateSolver( this, pOther, true, 4.0f );

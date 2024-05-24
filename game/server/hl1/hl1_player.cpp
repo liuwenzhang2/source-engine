@@ -338,7 +338,7 @@ bool CHL1_Player::HandleInteraction(int interactionType, void *data, CBaseCombat
 	if (interactionType ==	g_interactionBarnacleVictimReleased)
 	{
 		m_afPhysicsFlags &= ~PFLAG_ONBARNACLE;
-		SetMoveType( MOVETYPE_WALK );
+		GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 		return true;
 	}
 	else if (interactionType ==	g_interactionBarnacleVictimGrab)

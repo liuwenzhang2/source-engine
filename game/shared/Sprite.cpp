@@ -190,7 +190,7 @@ CSprite::CSprite() : BaseClass()
 void CSprite::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	m_flFrame = 0;
 
 	Precache();
@@ -390,7 +390,7 @@ CSprite *CSprite::SpriteCreate( const char *pSpriteName, const Vector &origin, b
 	pSprite->SpriteInit( pSpriteName, origin );
 	pSprite->GetEngineObject()->SetSolid( SOLID_NONE );
 	UTIL_SetSize( pSprite, vec3_origin, vec3_origin );
-	pSprite->SetMoveType( MOVETYPE_NONE );
+	pSprite->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	if ( animate )
 		pSprite->TurnOn();
 
@@ -413,7 +413,7 @@ CSprite *CSprite::SpriteCreate( const char *pSpriteName, const Vector &origin, b
 //		pSprite->SpriteInit( pSpriteName, origin );
 //		pSprite->SetSolid( SOLID_NONE );
 //		pSprite->SetSize( vec3_origin, vec3_origin );
-//		pSprite->SetMoveType( MOVETYPE_NONE );
+//		pSprite->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 //		if ( animate )
 //			pSprite->TurnOn();
 //	}

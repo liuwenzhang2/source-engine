@@ -84,10 +84,10 @@ bool PlayerLocomotion::TraverseLadder( void )
 	default:
 		m_ladderInfo = NULL;
 
-		if ( GetBot()->GetEntity()->GetMoveType() == MOVETYPE_LADDER )
+		if ( GetBot()->GetEntity()->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 		{
 			// on ladder and don't want to be
-			GetBot()->GetEntity()->SetMoveType( MOVETYPE_WALK );
+			GetBot()->GetEntity()->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 		}
 		return false;
 	}
@@ -125,7 +125,7 @@ PlayerLocomotion::LadderState PlayerLocomotion::ApproachAscendingLadder( void )
 	// it is important to approach precisely, so use a very large weight to wash out all other Approaches
 	Approach( m_ladderInfo->m_bottom, 9999999.9f );
 
-	if ( GetBot()->GetEntity()->GetMoveType() == MOVETYPE_LADDER )
+	if ( GetBot()->GetEntity()->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 	{
 		// we're on the ladder
 		return ASCENDING_LADDER;
@@ -203,7 +203,7 @@ PlayerLocomotion::LadderState PlayerLocomotion::ApproachDescendingLadder( void )
 	// it is important to approach precisely, so use a very large weight to wash out all other Approaches
 	Approach( moveGoal, 9999999.9f );
 
-	if ( GetBot()->GetEntity()->GetMoveType() == MOVETYPE_LADDER )
+	if ( GetBot()->GetEntity()->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 	{
 		// we're on the ladder
 		return DESCENDING_LADDER;
@@ -226,7 +226,7 @@ PlayerLocomotion::LadderState PlayerLocomotion::AscendLadder( void )
 		return NO_LADDER;
 	}
 
-	if ( GetBot()->GetEntity()->GetMoveType() != MOVETYPE_LADDER )
+	if ( GetBot()->GetEntity()->GetEngineObject()->GetMoveType() != MOVETYPE_LADDER )
 	{
 		// slipped off ladder
 		m_ladderInfo = NULL;
@@ -265,7 +265,7 @@ PlayerLocomotion::LadderState PlayerLocomotion::DescendLadder( void )
 		return NO_LADDER;
 	}
 
-	if ( GetBot()->GetEntity()->GetMoveType() != MOVETYPE_LADDER )
+	if ( GetBot()->GetEntity()->GetEngineObject()->GetMoveType() != MOVETYPE_LADDER )
 	{
 		// slipped off ladder
 		m_ladderInfo = NULL;
@@ -344,10 +344,10 @@ PlayerLocomotion::LadderState PlayerLocomotion::DismountLadderBottom( void )
 		return NO_LADDER;
 	}
 
-	if ( GetBot()->GetEntity()->GetMoveType() == MOVETYPE_LADDER )
+	if ( GetBot()->GetEntity()->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 	{
 		// near the bottom - just let go
-		GetBot()->GetEntity()->SetMoveType( MOVETYPE_WALK );
+		GetBot()->GetEntity()->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 		m_ladderInfo = NULL;
 	}
 

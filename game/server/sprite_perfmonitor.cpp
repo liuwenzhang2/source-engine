@@ -60,7 +60,7 @@ END_SEND_TABLE()
 void CParticlePerformanceMonitor::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	m_bDisplayPerf = false;
 	m_bMeasurePerf = false;
 }

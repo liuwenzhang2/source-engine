@@ -114,18 +114,7 @@ RecvProp RecvPropBool(
 }
 
 
-void RecvProxy_InterpolationAmountChanged( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	// m_bSimulatedEveryTick & m_bAnimatedEveryTick are boolean
-	if ( *((bool*)pOut) != (pData->m_Value.m_Int != 0) )
-	{
-		// Have the regular proxy store the data.
-		RecvProxy_Int32ToInt8( pData, pStruct, pOut );
 
-		C_BaseEntity *pEntity = (C_BaseEntity *) pStruct;
-		pEntity->GetEngineObject()->Interp_UpdateInterpolationAmounts( pEntity->GetEngineObject()->GetVarMapping() );
-	}
-}
 
 
 //-----------------------------------------------------------------------------

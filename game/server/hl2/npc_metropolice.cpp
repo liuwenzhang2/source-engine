@@ -620,7 +620,7 @@ void CNPC_MetroPolice::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	SetBloodColor( BLOOD_COLOR_RED );
 	m_nIdleChatterType = METROPOLICE_CHATTER_ASK_QUESTION; 
 	m_bSimpleCops = GetEngineObject()->HasSpawnFlags( SF_METROPOLICE_SIMPLE_VERSION );
@@ -3062,7 +3062,7 @@ void CNPC_MetroPolice::ReleaseManhack( void )
 
 	// Release us
 	m_hManhack->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
-	m_hManhack->SetMoveType( MOVETYPE_VPHYSICS );
+	m_hManhack->GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 	m_hManhack->GetEngineObject()->SetParent( NULL );
 
 	// Make us active

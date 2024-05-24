@@ -76,6 +76,9 @@ template<>
 bool CGlobalEntityList<CBaseEntity>::sm_bDisableTouchFuncs = false;	// Disables PhysicsTouch and PhysicsStartTouch function calls
 template<>
 bool CGlobalEntityList<CBaseEntity>::sm_bAccurateTriggerBboxChecks = true;	// set to false for legacy behavior in ep1
+bool g_bTestMoveTypeStepSimulation = true;
+ConVar sv_teststepsimulation("sv_teststepsimulation", "1", 0);
+ConVar step_spline("step_spline", "0");
 
 //-----------------------------------------------------------------------------
 // Portal-specific hack designed to eliminate re-entrancy in touch functions
@@ -334,6 +337,10 @@ BEGIN_DATADESC_NO_BASE(CEngineObjectInternal)
 	DEFINE_KEYFIELD(m_nNextThinkTick, FIELD_TICK, "nextthink"),
 	DEFINE_FIELD(m_nLastThinkTick, FIELD_TICK),
 	DEFINE_CUSTOM_FIELD(m_aThinkFunctions, thinkcontextFuncs),
+	DEFINE_FIELD(m_MoveType, FIELD_CHARACTER),
+	DEFINE_FIELD(m_MoveCollide, FIELD_CHARACTER),
+	DEFINE_FIELD(m_bSimulatedEveryTick, FIELD_BOOLEAN),
+	DEFINE_FIELD(m_bAnimatedEveryTick, FIELD_BOOLEAN),
 END_DATADESC()
 
 void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
@@ -342,10 +349,10 @@ void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pD
 	Assert(entity);
 
 	const Vector* v;
-	if (entity->GetOuter()->entindex() == 1) {
+	if (entity->entindex() == 1) {
 		int aaa = 0;
 	}
-	if (!entity->GetOuter()->UseStepSimulationNetworkOrigin(&v))
+	if (!entity->UseStepSimulationNetworkOrigin(&v))
 	{
 		v = &entity->GetLocalOrigin();
 	}
@@ -355,6 +362,43 @@ void SendProxy_Origin(const SendProp* pProp, const void* pStruct, const void* pD
 	pOut->m_Vector[2] = v->z;
 }
 
+//--------------------------------------------------------------------------------------------------------
+// Used when breaking up origin, note we still have to deal with StepSimulation
+//--------------------------------------------------------------------------------------------------------
+void SendProxy_OriginXY(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
+{
+	CEngineObjectInternal* entity = (CEngineObjectInternal*)pStruct;
+	Assert(entity);
+
+	const Vector* v;
+
+	if (!entity->UseStepSimulationNetworkOrigin(&v))
+	{
+		v = &entity->GetLocalOrigin();
+	}
+
+	pOut->m_Vector[0] = v->x;
+	pOut->m_Vector[1] = v->y;
+}
+
+//--------------------------------------------------------------------------------------------------------
+// Used when breaking up origin, note we still have to deal with StepSimulation
+//--------------------------------------------------------------------------------------------------------
+void SendProxy_OriginZ(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
+{
+	CEngineObjectInternal* entity = (CEngineObjectInternal*)pStruct;
+	Assert(entity);
+
+	const Vector* v;
+
+	if (!entity->UseStepSimulationNetworkOrigin(&v))
+	{
+		v = &entity->GetLocalOrigin();
+	}
+
+	pOut->m_Float = v->z;
+}
+
 void SendProxy_Angles(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID)
 {
 	CEngineObjectInternal* entity = (CEngineObjectInternal*)pStruct;
@@ -362,7 +406,7 @@ void SendProxy_Angles(const SendProp* pProp, const void* pStruct, const void* pD
 
 	const QAngle* a;
 
-	if (!entity->GetOuter()->UseStepSimulationNetworkAngles(&a))
+	if (!entity->UseStepSimulationNetworkAngles(&a))
 	{
 		a = &entity->GetLocalAngles();
 	}
@@ -429,6 +473,10 @@ BEGIN_SEND_TABLE_NOBASE(CEngineObjectInternal, DT_EngineObject)
 	SendPropFloat(SENDINFO(m_flFriction), 8, SPROP_ROUNDDOWN, 0.0f, 4.0f),
 	SendPropFloat(SENDINFO(m_flElasticity), 0, SPROP_COORD),
 	SendPropInt(SENDINFO(m_nNextThinkTick)),
+	SendPropInt(SENDINFO_NAME(m_MoveType, movetype), MOVETYPE_MAX_BITS, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO_NAME(m_MoveCollide, movecollide), MOVECOLLIDE_MAX_BITS, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_bSimulatedEveryTick), 1, SPROP_UNSIGNED),
+	SendPropInt(SENDINFO(m_bAnimatedEveryTick), 1, SPROP_UNSIGNED),
 END_SEND_TABLE()
 
 IMPLEMENT_SERVERCLASS(CEngineObjectInternal, DT_EngineObject)
@@ -2634,7 +2682,7 @@ void CEngineObjectInternal::SetGroundEntity(IEngineObjectServer* ground)
 
 	// this can happen in-between updates to the held object controller (physcannon, +USE)
 	// so trap it here and release held objects when they become player ground
-	if (ground && m_pOuter->IsPlayer() && ground->GetOuter()->GetMoveType() == MOVETYPE_VPHYSICS)
+	if (ground && m_pOuter->IsPlayer() && ground->GetMoveType() == MOVETYPE_VPHYSICS)
 	{
 		CBasePlayer* pPlayer = static_cast<CBasePlayer*>(this->m_pOuter);
 		IPhysicsObject* pPhysGround = ground->GetOuter()->VPhysicsGetObject();
@@ -3488,6 +3536,328 @@ void CEngineObjectInternal::PhysicsDispatchThink(BASEPTR thinkFunc)
 
 	VPROF_EXIT_SCOPE();
 }
+
+void CEngineObjectInternal::SetMoveType(MoveType_t val, MoveCollide_t moveCollide)
+{
+#ifdef _DEBUG
+	// Make sure the move type + move collide are compatible...
+	if ((val != MOVETYPE_FLY) && (val != MOVETYPE_FLYGRAVITY))
+	{
+		Assert(moveCollide == MOVECOLLIDE_DEFAULT);
+	}
+
+	if (m_MoveType == MOVETYPE_VPHYSICS && val != m_MoveType)
+	{
+		if (m_pOuter->VPhysicsGetObject() && val != MOVETYPE_NONE)
+		{
+			// What am I supposed to do with the physics object if
+			// you're changing away from MOVETYPE_VPHYSICS without making the object 
+			// shadow?  This isn't likely to work, assert.
+			// You probably meant to call VPhysicsInitShadow() instead of VPhysicsInitNormal()!
+			Assert(m_pOuter->VPhysicsGetObject()->GetShadowController());
+		}
+	}
+#endif
+
+	if (m_MoveType == val)
+	{
+		m_MoveCollide = moveCollide;
+		return;
+	}
+
+	// This is needed to the removal of MOVETYPE_FOLLOW:
+	// We can't transition from follow to a different movetype directly
+	// or the leaf code will break.
+	Assert(!IsEffectActive(EF_BONEMERGE));
+	m_MoveType = val;
+	m_MoveCollide = moveCollide;
+
+	CollisionRulesChanged();
+
+	switch (m_MoveType)
+	{
+	case MOVETYPE_WALK:
+	{
+		SetSimulatedEveryTick(true);
+		SetAnimatedEveryTick(true);
+	}
+	break;
+	case MOVETYPE_STEP:
+	{
+		// This will probably go away once I remove the cvar that controls the test code
+		SetSimulatedEveryTick(g_bTestMoveTypeStepSimulation ? true : false);
+		SetAnimatedEveryTick(false);
+	}
+	break;
+	case MOVETYPE_FLY:
+	case MOVETYPE_FLYGRAVITY:
+	{
+		// Initialize our water state, because these movetypes care about transitions in/out of water
+		m_pOuter->UpdateWaterState();
+	}
+	break;
+	default:
+	{
+		SetSimulatedEveryTick(true);
+		SetAnimatedEveryTick(false);
+	}
+	}
+
+	// This will probably go away or be handled in a better way once I remove the cvar that controls the test code
+	CheckStepSimulationChanged();
+	CheckHasGamePhysicsSimulation();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Until we remove the above cvar, we need to have the entities able
+//  to dynamically deal with changing their simulation stuff here.
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::CheckStepSimulationChanged()
+{
+	if (g_bTestMoveTypeStepSimulation != IsSimulatedEveryTick())
+	{
+		SetSimulatedEveryTick(g_bTestMoveTypeStepSimulation);
+	}
+
+	bool hadobject = HasDataObjectType(STEPSIMULATION);
+
+	if (g_bTestMoveTypeStepSimulation)
+	{
+		if (!hadobject)
+		{
+			CreateDataObject(STEPSIMULATION);
+		}
+	}
+	else
+	{
+		if (hadobject)
+		{
+			DestroyDataObject(STEPSIMULATION);
+		}
+	}
+}
+
+bool CEngineObjectInternal::WillSimulateGamePhysics()
+{
+	// players always simulate game physics
+	if (!m_pOuter->IsPlayer())
+	{
+		MoveType_t movetype = GetMoveType();
+
+		if (movetype == MOVETYPE_NONE || movetype == MOVETYPE_VPHYSICS)
+			return false;
+
+#if !defined( CLIENT_DLL )
+		// MOVETYPE_PUSH not supported on the client
+		if (movetype == MOVETYPE_PUSH && m_pOuter->GetMoveDoneTime() <= 0)
+			return false;
+#endif
+	}
+
+	return true;
+}
+
+void CEngineObjectInternal::CheckHasGamePhysicsSimulation()
+{
+	bool isSimulating = WillSimulateGamePhysics();
+	if (isSimulating != IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
+		return;
+	if (isSimulating)
+	{
+		RemoveEFlags(EFL_NO_GAME_PHYSICS_SIMULATION);
+	}
+	else
+	{
+		AddEFlags(EFL_NO_GAME_PHYSICS_SIMULATION);
+	}
+#if !defined( CLIENT_DLL )
+	SimThink_EntityChanged(this->m_pOuter);
+#endif
+}
+
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::UseStepSimulationNetworkOrigin(const Vector** out_v)
+{
+	Assert(out_v);
+
+
+	if (g_bTestMoveTypeStepSimulation &&
+		GetMoveType() == MOVETYPE_STEP &&
+		HasDataObjectType(STEPSIMULATION))
+	{
+		StepSimulationData* step = (StepSimulationData*)GetDataObject(STEPSIMULATION);
+		ComputeStepSimulationNetwork(step);
+		*out_v = &step->m_vecNetworkOrigin;
+
+		return step->m_bOriginActive;
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+bool CEngineObjectInternal::UseStepSimulationNetworkAngles(const QAngle** out_a)
+{
+	Assert(out_a);
+
+	if (g_bTestMoveTypeStepSimulation &&
+		GetMoveType() == MOVETYPE_STEP &&
+		HasDataObjectType(STEPSIMULATION))
+	{
+		StepSimulationData* step = (StepSimulationData*)GetDataObject(STEPSIMULATION);
+		ComputeStepSimulationNetwork(step);
+		*out_a = &step->m_angNetworkAngles;
+		return step->m_bAnglesActive;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Run one tick's worth of faked simulation
+// Input  : *step - 
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::ComputeStepSimulationNetwork(StepSimulationData* step)
+{
+	if (!step)
+	{
+		Assert(!"ComputeStepSimulationNetworkOriginAndAngles with NULL step\n");
+		return;
+	}
+
+	// Don't run again if we've already calculated this tick
+	if (step->m_nLastProcessTickCount == gpGlobals->tickcount)
+	{
+		return;
+	}
+
+	step->m_nLastProcessTickCount = gpGlobals->tickcount;
+
+	// Origin
+	// It's inactive
+	if (step->m_bOriginActive)
+	{
+		// First see if any external code moved the entity
+		if (m_pOuter->GetStepOrigin() != step->m_Next.vecOrigin)
+		{
+			step->m_bOriginActive = false;
+		}
+		else
+		{
+			// Compute interpolated info based on tick interval
+			float frac = 1.0f;
+			int tickdelta = step->m_Next.nTickCount - step->m_Previous.nTickCount;
+			if (tickdelta > 0)
+			{
+				frac = (float)(gpGlobals->tickcount - step->m_Previous.nTickCount) / (float)tickdelta;
+				frac = clamp(frac, 0.0f, 1.0f);
+			}
+
+			if (step->m_Previous2.nTickCount == 0 || step->m_Previous2.nTickCount >= step->m_Previous.nTickCount)
+			{
+				Vector delta = step->m_Next.vecOrigin - step->m_Previous.vecOrigin;
+				VectorMA(step->m_Previous.vecOrigin, frac, delta, step->m_vecNetworkOrigin);
+			}
+			else if (!step_spline.GetBool())
+			{
+				StepSimulationStep* pOlder = &step->m_Previous;
+				StepSimulationStep* pNewer = &step->m_Next;
+
+				if (step->m_Discontinuity.nTickCount > step->m_Previous.nTickCount)
+				{
+					if (gpGlobals->tickcount > step->m_Discontinuity.nTickCount)
+					{
+						pOlder = &step->m_Discontinuity;
+					}
+					else
+					{
+						pNewer = &step->m_Discontinuity;
+					}
+
+					tickdelta = pNewer->nTickCount - pOlder->nTickCount;
+					if (tickdelta > 0)
+					{
+						frac = (float)(gpGlobals->tickcount - pOlder->nTickCount) / (float)tickdelta;
+						frac = clamp(frac, 0.0f, 1.0f);
+					}
+				}
+
+				Vector delta = pNewer->vecOrigin - pOlder->vecOrigin;
+				VectorMA(pOlder->vecOrigin, frac, delta, step->m_vecNetworkOrigin);
+			}
+			else
+			{
+				Hermite_Spline(step->m_Previous2.vecOrigin, step->m_Previous.vecOrigin, step->m_Next.vecOrigin, frac, step->m_vecNetworkOrigin);
+			}
+		}
+	}
+
+	// Angles
+	if (step->m_bAnglesActive)
+	{
+		// See if external code changed the orientation of the entity
+		if (m_pOuter->GetStepAngles() != step->m_angNextRotation)
+		{
+			step->m_bAnglesActive = false;
+		}
+		else
+		{
+			// Compute interpolated info based on tick interval
+			float frac = 1.0f;
+			int tickdelta = step->m_Next.nTickCount - step->m_Previous.nTickCount;
+			if (tickdelta > 0)
+			{
+				frac = (float)(gpGlobals->tickcount - step->m_Previous.nTickCount) / (float)tickdelta;
+				frac = clamp(frac, 0.0f, 1.0f);
+			}
+
+			if (step->m_Previous2.nTickCount == 0 || step->m_Previous2.nTickCount >= step->m_Previous.nTickCount)
+			{
+				// Pure blend between start/end orientations
+				Quaternion outangles;
+				QuaternionBlend(step->m_Previous.qRotation, step->m_Next.qRotation, frac, outangles);
+				QuaternionAngles(outangles, step->m_angNetworkAngles);
+			}
+			else if (!step_spline.GetBool())
+			{
+				StepSimulationStep* pOlder = &step->m_Previous;
+				StepSimulationStep* pNewer = &step->m_Next;
+
+				if (step->m_Discontinuity.nTickCount > step->m_Previous.nTickCount)
+				{
+					if (gpGlobals->tickcount > step->m_Discontinuity.nTickCount)
+					{
+						pOlder = &step->m_Discontinuity;
+					}
+					else
+					{
+						pNewer = &step->m_Discontinuity;
+					}
+
+					tickdelta = pNewer->nTickCount - pOlder->nTickCount;
+					if (tickdelta > 0)
+					{
+						frac = (float)(gpGlobals->tickcount - pOlder->nTickCount) / (float)tickdelta;
+						frac = clamp(frac, 0.0f, 1.0f);
+					}
+				}
+
+				// Pure blend between start/end orientations
+				Quaternion outangles;
+				QuaternionBlend(pOlder->qRotation, pNewer->qRotation, frac, outangles);
+				QuaternionAngles(outangles, step->m_angNetworkAngles);
+			}
+			else
+			{
+				// FIXME: enable spline interpolation when turning is debounced.
+				Quaternion outangles;
+				Hermite_Spline(step->m_Previous2.qRotation, step->m_Previous.qRotation, step->m_Next.qRotation, frac, outangles);
+				QuaternionAngles(outangles, step->m_angNetworkAngles);
+			}
+		}
+	}
+
+}
+
 
 struct collidelist_t
 {

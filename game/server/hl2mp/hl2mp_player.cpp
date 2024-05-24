@@ -1611,7 +1611,7 @@ void CHL2MP_Player::State_Enter_OBSERVER_MODE()
 void CHL2MP_Player::State_PreThink_OBSERVER_MODE()
 {
 	// Make sure nobody has changed any of our state.
-	//	Assert( GetMoveType() == MOVETYPE_FLY );
+	//	Assert( GetEngineObject()->GetMoveType() == MOVETYPE_FLY );
 	Assert( m_takedamage == DAMAGE_NO );
 	Assert(GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) );
 	//	Assert( IsEffectActive( EF_NODRAW ) );
@@ -1624,7 +1624,7 @@ void CHL2MP_Player::State_PreThink_OBSERVER_MODE()
 
 void CHL2MP_Player::State_Enter_ACTIVE()
 {
-	SetMoveType( MOVETYPE_WALK );
+	GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 	
 	// md 8/15/07 - They'll get set back to solid when they actually respawn. If we set them solid now and mp_forcerespawn
 	// is false, then they'll be spectating but blocking live players from moving.

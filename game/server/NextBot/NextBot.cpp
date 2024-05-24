@@ -229,7 +229,7 @@ void NextBotCombatCharacter::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	
-	SetMoveType( MOVETYPE_CUSTOM );	
+	GetEngineObject()->SetMoveType( MOVETYPE_CUSTOM );
 	
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 

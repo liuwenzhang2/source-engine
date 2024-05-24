@@ -60,7 +60,7 @@ END_DATADESC()
 void CPortalCredits::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 static void CreditsDone_f( void )

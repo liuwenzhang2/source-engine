@@ -146,7 +146,7 @@ void CSpriteTrail::Spawn( void )
 	BaseClass::Spawn();
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NOCLIP );
+	GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 
 	GetEngineObject()->SetCollisionBounds( vec3_origin, vec3_origin );
 	TurnOn();
@@ -574,7 +574,7 @@ CSpriteTrail *CSpriteTrail::SpriteTrailCreate( const char *pSpriteName, const Ve
 
 	pSprite->SpriteInit( pSpriteName, origin );
 	pSprite->GetEngineObject()->SetSolid( SOLID_NONE );
-	pSprite->SetMoveType( MOVETYPE_NOCLIP );
+	pSprite->GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 	
 	UTIL_SetSize( pSprite, vec3_origin, vec3_origin );
 

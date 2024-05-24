@@ -5281,7 +5281,7 @@ ConVar showblockerwalls( "showblockerwalls", "0", FCVAR_CHEAT, "Set to 1 to visu
 
 void CFuncTeamWall::Spawn( void )
 {
-	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetSolid( SOLID_BBOX );

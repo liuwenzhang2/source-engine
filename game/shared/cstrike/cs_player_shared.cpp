@@ -135,7 +135,7 @@ void DispatchEffect( const char *pName, const CEffectData &data );
 
 float CCSPlayer::GetPlayerMaxSpeed()
 {
-	if ( GetMoveType() == MOVETYPE_NONE )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
 	{
 		return CS_PLAYER_SPEED_STOPPED;
 	}
@@ -742,7 +742,7 @@ bool CCSPlayer::CanMove() const
 {
 	// When we're in intro camera mode, it's important to return false here
 	// so our physics object doesn't fall out of the world.
-	if ( GetMoveType() == MOVETYPE_NONE )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
 		return false;
 
 	if ( IsObserver() )

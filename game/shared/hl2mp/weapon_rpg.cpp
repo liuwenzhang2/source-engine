@@ -182,7 +182,7 @@ void CMissile::Spawn( void )
 
 	SetTouch( &CMissile::MissileTouch );
 
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	SetThink( &CMissile::IgniteThink );
 	
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.3f );
@@ -249,7 +249,7 @@ int CMissile::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 void CMissile::DumbFire( void )
 {
 	SetThink( NULL );
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 
 	SetModel("models/weapons/w_missile.mdl");
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
@@ -471,7 +471,7 @@ void CMissile::CreateSmokeTrail( void )
 //-----------------------------------------------------------------------------
 void CMissile::IgniteThink( void )
 {
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	SetModel("models/weapons/w_missile.mdl");
 	//UTIL_SetSize( this, vec3_origin, vec3_origin ); //This cause weird no damage dealing on stairs
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
@@ -935,7 +935,7 @@ CAPCMissile::~CAPCMissile()
 //-----------------------------------------------------------------------------
 void CAPCMissile::Init()
 {
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	SetModel("models/weapons/w_missile.mdl");
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
 	CreateSmokeTrail();
@@ -2177,7 +2177,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 		return NULL;
 
 	pLaserDot->m_bVisibleLaserDot = bVisibleDot;
-	pLaserDot->SetMoveType( MOVETYPE_NONE );
+	pLaserDot->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	pLaserDot->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	pLaserDot->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	UTIL_SetSize( pLaserDot, -Vector(4,4,4), Vector(4,4,4) );

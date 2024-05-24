@@ -173,6 +173,8 @@ public:
 		SetSolidFlags(0);
 		m_flFriction = 0.0f;
 		m_flGravity = 0.0f;
+		m_bSimulatedEveryTick = false;
+		m_bAnimatedEveryTick = false;
 	}
 
 	void Init(C_BaseEntity* pOuter) {
@@ -389,6 +391,8 @@ public:
 		ClearFlags();
 		ClearEffects();
 		m_nLastThinkTick = gpGlobals->tickcount;
+		SetMoveCollide(MOVECOLLIDE_DEFAULT);
+		SetMoveType(MOVETYPE_NONE);
 	}
 
 	// Invalidates the abs state of all children
@@ -527,6 +531,19 @@ public:
 	bool PhysicsRunSpecificThink(int nContextIndex, CBASEPTR thinkFunc);
 	void PhysicsDispatchThink(CBASEPTR thinkFunc);
 
+	MoveType_t GetMoveType(void) const;
+	MoveCollide_t GetMoveCollide(void) const;
+	// Access movetype and solid.
+	void SetMoveType(MoveType_t val, MoveCollide_t moveCollide = MOVECOLLIDE_DEFAULT);	// Set to one of the MOVETYPE_ defines.
+	void SetMoveCollide(MoveCollide_t val);	// Set to one of the MOVECOLLIDE_ defines.
+
+	bool IsSimulatedEveryTick() const;
+	void SetSimulatedEveryTick(bool sim);
+	bool IsAnimatedEveryTick() const;
+	void SetAnimatedEveryTick(bool anim);
+	// These set entity flags (EFL_*) to help optimize queries
+	void CheckHasGamePhysicsSimulation();
+	bool WillSimulateGamePhysics();
 
 private:
 
@@ -609,6 +626,12 @@ private:
 	int								m_nLastThinkTick;
 	CUtlVector< clientthinkfunc_t >		m_aThinkFunctions;
 	int								m_iCurrentThinkContext;
+	// Object movetype
+	unsigned char					m_MoveType;
+	unsigned char					m_MoveCollide;
+
+	bool					m_bSimulatedEveryTick;
+	bool					m_bAnimatedEveryTick;
 
 };
 
@@ -1103,6 +1126,48 @@ inline CBASEPTR C_EngineObjectInternal::GetPfnThink()
 inline void C_EngineObjectInternal::SetPfnThink(CBASEPTR pfnThink)
 {
 	m_pfnThink = pfnThink;
+}
+
+inline MoveType_t C_EngineObjectInternal::GetMoveType() const
+{
+	return (MoveType_t)(unsigned char)m_MoveType;
+}
+
+inline MoveCollide_t C_EngineObjectInternal::GetMoveCollide() const
+{
+	return (MoveCollide_t)(unsigned char)m_MoveCollide;
+}
+
+inline bool C_EngineObjectInternal::IsSimulatedEveryTick() const
+{
+	return m_bSimulatedEveryTick;
+}
+
+inline void C_EngineObjectInternal::SetSimulatedEveryTick(bool sim)
+{
+	if (m_bSimulatedEveryTick != sim)
+	{
+		m_bSimulatedEveryTick = sim;
+#ifdef CLIENT_DLL
+		Interp_UpdateInterpolationAmounts(GetVarMapping());
+#endif
+	}
+}
+
+inline bool C_EngineObjectInternal::IsAnimatedEveryTick() const
+{
+	return m_bAnimatedEveryTick;
+}
+
+inline void C_EngineObjectInternal::SetAnimatedEveryTick(bool anim)
+{
+	if (m_bAnimatedEveryTick != anim)
+	{
+		m_bAnimatedEveryTick = anim;
+#ifdef CLIENT_DLL
+		Interp_UpdateInterpolationAmounts(GetVarMapping());
+#endif
+	}
 }
 
 // Use this to iterate over *all* (even dormant) the C_BaseEntities in the client entity list.

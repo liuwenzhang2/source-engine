@@ -1427,7 +1427,7 @@ void CNPC_Portal_FloorTurret::StartTouch( CBaseEntity *pOther )
 
 		IPhysicsObject *pTurretPhys = VPhysicsGetObject();
 
-		if ( !pOther->IsPlayer() && pOther->GetMoveType() == MOVETYPE_VPHYSICS && !(pTurretPhys && ((pTurretPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD) != 0)) )
+		if ( !pOther->IsPlayer() && pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && !(pTurretPhys && ((pTurretPhys->GetGameFlags() & FVPHYSICS_PLAYER_HELD) != 0)) )
 		{
 			// Get a lateral impulse
 			Vector vVelocityImpulse = GetEngineObject()->GetAbsOrigin() - pOther->GetEngineObject()->GetAbsOrigin();

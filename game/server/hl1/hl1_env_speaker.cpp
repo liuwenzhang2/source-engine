@@ -69,7 +69,7 @@ void CSpeaker::Spawn( void )
 		return;
 	}
 	GetEngineObject()->SetSolid( SOLID_NONE );
-    SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	
 	SetThink(&CSpeaker::SpeakerThink);

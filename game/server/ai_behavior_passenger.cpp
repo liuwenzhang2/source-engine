@@ -253,7 +253,7 @@ void CAI_PassengerBehavior::FinishEnterVehicle( void )
 	// Make sure we're exactly where we need to be
 	GetOuter()->GetEngineObject()->SetLocalOrigin( vecFinalPos );
 	GetOuter()->GetEngineObject()->SetLocalAngles( vecFinalAngles );
-	GetOuter()->SetMoveType( MOVETYPE_NONE );
+	GetOuter()->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetOuter()->GetMotor()->SetYawLocked( true );
 
 	// We're now riding inside the vehicle
@@ -286,7 +286,7 @@ void CAI_PassengerBehavior::FinishExitVehicle( void )
 
 	// To do this, we need to be very sure we're in a good spot
 	GetOuter()->SetCondition( COND_PROVOKED );
-	GetOuter()->SetMoveType( MOVETYPE_STEP );
+	GetOuter()->GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetOuter()->GetEngineObject()->RemoveFlag( FL_FLY );
 	GetOuter()->GetMotor()->SetYawLocked( false );
 
@@ -859,7 +859,7 @@ void CAI_PassengerBehavior::DetachFromVehicle( void )
 {
 	// Detach from the parent
 	GetOuter()->GetEngineObject()->SetParent(NULL);
-	GetOuter()->SetMoveType( MOVETYPE_STEP );
+	GetOuter()->GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetOuter()->GetEngineObject()->AddFlag( FL_FLY );
 	GetOuter()->GetEngineObject()->SetGroundEntity( NULL );
 	GetOuter()->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NPC );

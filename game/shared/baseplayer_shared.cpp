@@ -530,7 +530,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 	if (GetEngineObject()->GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
 		return;
 
-	if ( GetMoveType() == MOVETYPE_NOCLIP || GetMoveType() == MOVETYPE_OBSERVER )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP || GetEngineObject()->GetMoveType() == MOVETYPE_OBSERVER )
 		return;
 
 	if ( !sv_footsteps.GetFloat() )
@@ -540,7 +540,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 	float groundspeed = Vector2DLength( vecVelocity.AsVector2D() );
 
 	// determine if we are on a ladder
-	fLadder = ( GetMoveType() == MOVETYPE_LADDER );
+	fLadder = (GetEngineObject()->GetMoveType() == MOVETYPE_LADDER );
 
 	GetStepSoundVelocities( &velwalk, &velrun );
 
@@ -771,7 +771,7 @@ void CBasePlayer::UpdateButtonState( int nUserCmdButtonMask )
 void CBasePlayer::GetStepSoundVelocities( float *velwalk, float *velrun )
 {
 	// UNDONE: need defined numbers for run, walk, crouch, crouch run velocities!!!!	
-	if ( (GetEngineObject()->GetFlags() & FL_DUCKING) || ( GetMoveType() == MOVETYPE_LADDER ) )
+	if ( (GetEngineObject()->GetFlags() & FL_DUCKING) || (GetEngineObject()->GetMoveType() == MOVETYPE_LADDER ) )
 	{
 		*velwalk = 60;		// These constants should be based on cl_movespeedkey * cl_forwardspeed somehow
 		*velrun = 80;		
@@ -809,7 +809,7 @@ void CBasePlayer::SetStepSoundTime( stepsoundtimes_t iStepSoundTime, bool bWalki
 	}
 
 	// UNDONE: need defined numbers for run, walk, crouch, crouch run velocities!!!!	
-	if ( (GetEngineObject()->GetFlags() & FL_DUCKING) || ( GetMoveType() == MOVETYPE_LADDER ) )
+	if ( (GetEngineObject()->GetFlags() & FL_DUCKING) || (GetEngineObject()->GetMoveType() == MOVETYPE_LADDER ) )
 	{
 		m_flStepSoundTime += 100;
 	}
@@ -1460,7 +1460,7 @@ void CBasePlayer::SmoothViewOnStairs( Vector& eyeOrigin )
 
 	// Smooth out stair step ups
 	// NOTE: Don't want to do this when the ground entity is moving the player
-	if ( ( pGroundEntity != NULL && pGroundEntity->GetMoveType() == MOVETYPE_NONE ) && ( flCurrentPlayerZ != m_flOldPlayerZ ) && smoothstairs.GetBool() &&
+	if ( ( pGroundEntity != NULL && pGroundEntity->GetEngineObject()->GetMoveType() == MOVETYPE_NONE ) && ( flCurrentPlayerZ != m_flOldPlayerZ ) && smoothstairs.GetBool() &&
 		 m_flOldPlayerViewOffsetZ == flCurrentPlayerViewOffsetZ )
 	{
 		int dir = ( flCurrentPlayerZ > m_flOldPlayerZ ) ? 1 : -1;
@@ -1768,7 +1768,7 @@ float CBasePlayer::CalcRoll (const QAngle& angles, const Vector& velocity, float
 //-----------------------------------------------------------------------------
 void CBasePlayer::CalcViewRoll( QAngle& eyeAngles )
 {
-	if ( GetMoveType() == MOVETYPE_NOCLIP )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP )
 		return;
 
 	float side = CalcRoll(GetEngineObject()->GetAbsAngles(), GetEngineObject()->GetAbsVelocity(), sv_rollangle.GetFloat(), sv_rollspeed.GetFloat() );
@@ -1827,7 +1827,7 @@ void CBasePlayer::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int
 
 void CBasePlayer::SharedSpawn()
 {
-	SetMoveType( MOVETYPE_WALK );
+	GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	GetEngineObject()->SetFriction( 1.0f );
@@ -1894,7 +1894,7 @@ void CBasePlayer::AvoidPhysicsProps( CUserCmd *pCmd )
 {
 #ifndef _XBOX
 	// Don't avoid if noclipping or in movetype none
-	switch ( GetMoveType() )
+	switch (GetEngineObject()->GetMoveType() )
 	{
 	case MOVETYPE_NOCLIP:
 	case MOVETYPE_NONE:

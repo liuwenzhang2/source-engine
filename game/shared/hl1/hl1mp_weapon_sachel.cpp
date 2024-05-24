@@ -461,7 +461,7 @@ void CSatchelCharge::Spawn( void )
 {
 	Precache( );
 	// motor
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_SLIDE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_SLIDE );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	SetModel( SATCHEL_CHARGE_MODEL );
@@ -554,7 +554,7 @@ void CSatchelCharge::SatchelThink( void )
 	
 	if ( GetWaterLevel() > 0 )
 	{
-		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 		vecNewVel *= 0.8;
 		SetLocalAngularVelocity( GetLocalAngularVelocity() * 0.9 );
 
@@ -563,7 +563,7 @@ void CSatchelCharge::SatchelThink( void )
 	}
 	else if ( GetWaterLevel() == 0 )
 	{
-		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_SLIDE );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_SLIDE );
 
 		GetEngineObject()->SetGravity( 1.0 );
 	}

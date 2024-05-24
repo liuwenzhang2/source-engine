@@ -164,7 +164,7 @@ void CNPC_EnemyFinder::Spawn( void )
 	// This is a dummy model that is never used!
 	UTIL_SetSize(this, vec3_origin, vec3_origin);
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( DONT_BLEED );
 	GetEngineObject()->SetGravity( 0.0 );
 	m_iHealth			= 1;

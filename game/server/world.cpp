@@ -463,7 +463,7 @@ CWorld::CWorld( )
 	EventList_Init();
 	
 	//SetSolid( SOLID_BSP );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	m_bColdWorld = false;
 }

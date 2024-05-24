@@ -171,6 +171,7 @@ public:
 		m_flElasticity = 1.0f;
 		SetFriction(1.0f);
 		m_nLastThinkTick = gpGlobals->tickcount;
+		SetMoveType(MOVETYPE_NONE);
 	}
 
 	~CEngineObjectInternal()
@@ -515,6 +516,24 @@ public:
 	bool PhysicsRunThink(thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS);
 	bool PhysicsRunSpecificThink(int nContextIndex, BASEPTR thinkFunc);
 	void PhysicsDispatchThink(BASEPTR thinkFunc);
+	// Move type / move collide
+	MoveType_t GetMoveType() const;
+	MoveCollide_t GetMoveCollide() const;
+	void SetMoveType(MoveType_t val, MoveCollide_t moveCollide = MOVECOLLIDE_DEFAULT);
+	void SetMoveCollide(MoveCollide_t val);
+
+	void CheckStepSimulationChanged();
+	bool IsSimulatedEveryTick() const;
+	void SetSimulatedEveryTick(bool sim);
+	bool IsAnimatedEveryTick() const;
+	void SetAnimatedEveryTick(bool anim);
+	// These set entity flags (EFL_*) to help optimize queries
+	void CheckHasGamePhysicsSimulation();
+	bool WillSimulateGamePhysics();
+	bool UseStepSimulationNetworkOrigin(const Vector** out_v);
+	bool UseStepSimulationNetworkAngles(const QAngle** out_a);
+	// Compute network origin
+	void ComputeStepSimulationNetwork(StepSimulationData* step);
 
 public:
 	// Networking related methods
@@ -596,6 +615,12 @@ private:
 #ifdef _DEBUG
 	int							m_iCurrentThinkContext;
 #endif
+	CNetworkVar(unsigned char, m_MoveType);		// One of the MOVETYPE_ defines.
+	CNetworkVar(unsigned char, m_MoveCollide);
+
+	CNetworkVar(bool, m_bSimulatedEveryTick);
+	CNetworkVar(bool, m_bAnimatedEveryTick);
+
 
 };
 
@@ -1184,6 +1209,47 @@ inline BASEPTR CEngineObjectInternal::GetPfnThink()
 inline void CEngineObjectInternal::SetPfnThink(BASEPTR pfnThink)
 {
 	m_pfnThink = pfnThink;
+}
+
+inline void CEngineObjectInternal::SetMoveCollide(MoveCollide_t val)
+{
+	m_MoveCollide = val;
+}
+
+inline MoveType_t CEngineObjectInternal::GetMoveType() const
+{
+	return (MoveType_t)(unsigned char)m_MoveType;
+}
+
+inline MoveCollide_t CEngineObjectInternal::GetMoveCollide() const
+{
+	return (MoveCollide_t)(unsigned char)m_MoveCollide;
+}
+
+inline bool CEngineObjectInternal::IsSimulatedEveryTick() const
+{
+	return m_bSimulatedEveryTick;
+}
+
+inline void CEngineObjectInternal::SetSimulatedEveryTick(bool sim)
+{
+	if (m_bSimulatedEveryTick != sim)
+	{
+		m_bSimulatedEveryTick = sim;
+	}
+}
+
+inline bool CEngineObjectInternal::IsAnimatedEveryTick() const
+{
+	return m_bAnimatedEveryTick;
+}
+
+inline void CEngineObjectInternal::SetAnimatedEveryTick(bool anim)
+{
+	if (m_bAnimatedEveryTick != anim)
+	{
+		m_bAnimatedEveryTick = anim;
+	}
 }
 
 //-----------------------------------------------------------------------------

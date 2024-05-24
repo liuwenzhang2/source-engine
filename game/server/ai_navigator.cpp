@@ -3454,7 +3454,7 @@ bool CAI_Navigator::MarkCurWaypointFailedLink( void )
 
 		if ( m_hLastBlockingEnt != NULL && 
 			 !m_hLastBlockingEnt->IsPlayer() && !m_hLastBlockingEnt->IsNPC() &&
-			 m_hLastBlockingEnt->GetMoveType() == MOVETYPE_VPHYSICS && 
+			 m_hLastBlockingEnt->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
 			 m_hLastBlockingEnt->VPhysicsGetObject() && 
 			 ( !m_hLastBlockingEnt->VPhysicsGetObject()->IsMoveable() || 
 			   m_hLastBlockingEnt->VPhysicsGetObject()->GetMass() > 200 ) )

@@ -1031,7 +1031,7 @@ bool CAI_NetworkManager::IsAIFileCurrent ( const char *szMapName )
 void CAI_NetworkManager::Spawn ( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 //------------------------------------------------------------------------------

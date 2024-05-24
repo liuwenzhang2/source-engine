@@ -241,7 +241,7 @@ void CNPC_Controller::Spawn()
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetEngineObject()->SetGravity(0.001);
 
 
@@ -1065,7 +1065,7 @@ void CNPC_ControllerHeadBall::Spawn( void )
 {
 	Precache( );
 	// motor
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetSize( vec3_origin, vec3_origin );
 
@@ -1228,7 +1228,7 @@ void CNPC_ControllerZapBall::Spawn( void )
 {
 	Precache( );
 	// motor
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 //	SetSolid( SOLID_CUSTOM );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetSize( vec3_origin, vec3_origin );

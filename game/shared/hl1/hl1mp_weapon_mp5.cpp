@@ -178,7 +178,7 @@ void CWeaponMP5::SecondaryAttack( void )
 	CGrenadeMP5 * m_pMyGrenade = (CGrenadeMP5*)Create( "grenade_mp5", vecSrc, angGrenAngle, GetOwner() );
 	m_pMyGrenade->GetEngineObject()->SetAbsVelocity( vecThrow );
 	m_pMyGrenade->SetLocalAngularVelocity( QAngle( random->RandomFloat( -100, -500 ), 0, 0 ) );
-	m_pMyGrenade->SetMoveType( MOVETYPE_FLYGRAVITY ); 
+	m_pMyGrenade->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	m_pMyGrenade->SetThrower( GetOwner() );
 	m_pMyGrenade->SetDamage( sk_plr_dmg_mp5_grenade.GetFloat() * g_pGameRules->GetDamageMultiplier() );
 #endif

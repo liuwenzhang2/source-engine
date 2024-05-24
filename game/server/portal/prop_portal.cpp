@@ -267,7 +267,7 @@ void CProp_Portal::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_OBB );
 	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID | FSOLID_CUSTOMBOXTEST | FSOLID_CUSTOMRAYTEST );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	//VPhysicsInitNormal( SOLID_VPHYSICS, FSOLID_TRIGGER, false );
@@ -859,7 +859,7 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 		else
 		{
 			//old style of velocity grabbing, which uses implicit velocity as a last resort
-			if( pOther->GetMoveType() == MOVETYPE_VPHYSICS )
+			if( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 			{
 				if( pOtherPhysObject && (pOtherPhysObject->GetShadowController() == NULL) )
 					pOtherPhysObject->GetVelocity( &vOtherVelocity, NULL );
@@ -961,7 +961,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 	//grab current velocity
 	{
 		IPhysicsObject *pOtherPhysObject = pOther->VPhysicsGetObject();
-		if( pOther->GetMoveType() == MOVETYPE_VPHYSICS )
+		if( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			if( pOtherPhysObject && (pOtherPhysObject->GetShadowController() == NULL) )
 				pOtherPhysObject->GetVelocity( &vOtherVelocity, NULL );
@@ -1658,7 +1658,7 @@ void CProp_Portal::WakeNearbyEntities( void )
 				pEntity->WakeRestingObjects();
 				//pEntity->SetGroundEntity( NULL );
 
-				if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+				if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 				{
 					IPhysicsObject *pPhysicsObject = pEntity->VPhysicsGetObject();
 

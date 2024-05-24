@@ -210,7 +210,7 @@ int	CHalfLife1::Damage_GetShowOnHud( void )
 
 		pHead->CopyAnimationDataFrom( pCorpse );
 
-		pHead->SetMoveType( MOVETYPE_FLYGRAVITY );
+		pHead->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 		pHead->GetEngineObject()->SetAbsVelocity( pCorpse->GetEngineObject()->GetAbsVelocity() );
 		pHead->GetEngineObject()->ClearFlags();
 		pHead->m_nReferencePlayer	= ( pCorpse )->entindex();

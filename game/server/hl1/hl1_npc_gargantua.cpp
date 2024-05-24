@@ -278,7 +278,7 @@ void CNPC_Gargantua::Spawn()
 	SetNavType(NAV_GROUND);
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 	Vector vecSurroundingMins( -80, -80, 0 );
 	Vector vecSurroundingMaxs( 80, 80, 214 );

@@ -157,7 +157,7 @@ void CNPC_Scientist::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
 	GetEngineObject()->ClearEffects();
 	m_iHealth			= sk_scientist_health.GetFloat();
@@ -996,7 +996,7 @@ void CNPC_SittingScientist::Spawn( )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_iHealth			= 50;
 	
 	m_bloodColor		= BLOOD_COLOR_RED;

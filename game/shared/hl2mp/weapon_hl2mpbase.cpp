@@ -202,7 +202,7 @@ void CWeaponHL2MPBase::Materialize( void )
 	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
 		VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
-		SetMoveType( MOVETYPE_VPHYSICS );
+		GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 
 		HL2MPRules()->AddLevelDesignerPlacedObject( this );
 	}
@@ -236,7 +236,7 @@ void CWeaponHL2MPBase::FallInit( void )
 
 	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		GetEngineObject()->SetSolid( SOLID_BBOX );
 		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 
@@ -246,7 +246,7 @@ void CWeaponHL2MPBase::FallInit( void )
 	{
 		if ( !VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false ) )
 		{
-			SetMoveType( MOVETYPE_NONE );
+			GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 			GetEngineObject()->SetSolid( SOLID_BBOX );
 			GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 		}

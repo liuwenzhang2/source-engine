@@ -47,7 +47,7 @@ END_DATADESC()
 void CFuncWall::Spawn( void )
 {
 	GetEngineObject()->SetLocalAngles( vec3_angle );
-	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	// If it can't move/go away, it's really part of the world
@@ -120,7 +120,7 @@ void CFuncWallToggle::Spawn( void )
 	if (GetEngineObject()->HasSpawnFlags( SF_WALL_START_OFF ) )
 		TurnOff();
 	
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 }
 
 
@@ -211,7 +211,7 @@ void CFuncVehicleClip::Spawn()
 {
 
 	GetEngineObject()->SetLocalAngles( vec3_angle );
-	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	// It's part of the world
@@ -378,7 +378,7 @@ LINK_ENTITY_TO_CLASS( func_illusionary, CFuncIllusionary );
 void CFuncIllusionary::Spawn( void )
 {
 	GetEngineObject()->SetLocalAngles( vec3_angle );
-	SetMoveType( MOVETYPE_NONE );  
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 }
@@ -747,12 +747,12 @@ void CFuncRotating::Spawn( )
 	if (GetEngineObject()->HasSpawnFlags(SF_ROTATING_NOT_SOLID) )
 	{
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		SetMoveType( MOVETYPE_PUSH );
+		GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	}
 	else
 	{
 		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
-		SetMoveType( MOVETYPE_PUSH );
+		GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	}
 
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
@@ -1460,7 +1460,7 @@ LINK_ENTITY_TO_CLASS( func_clip_vphysics, CFuncVPhysicsClip );
 
 void CFuncVPhysicsClip::Spawn( void )
 {
-	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
@@ -1494,7 +1494,7 @@ bool CFuncVPhysicsClip::EntityPassesFilter( CBaseEntity *pOther )
 	if ( pFilter )
 		return pFilter->PassesFilter( this, pOther );
 
-	if ( pOther->GetMoveType() == MOVETYPE_VPHYSICS && pOther->VPhysicsGetObject()->IsMoveable() )
+	if ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pOther->VPhysicsGetObject()->IsMoveable() )
 		return true;
 	
 	return false;

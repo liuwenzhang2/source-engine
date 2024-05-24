@@ -143,7 +143,7 @@ void CNPC_Bullseye::Spawn( void )
 	// This is a dummy model that is never used!
 	UTIL_SetSize(this, Vector(-16,-16,-16), Vector(16,16,16));
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( BLOOD_COLOR_RED );
 	GetEngineObject()->ClearEffects();
 	GetEngineObject()->SetGravity( 0.0 );
@@ -245,7 +245,7 @@ void CNPC_Bullseye::Event_Killed( const CTakeDamageInfo &info )
 		}
 	}
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	UTIL_SetSize(this, vec3_origin, vec3_origin );
 

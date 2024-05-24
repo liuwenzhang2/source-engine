@@ -485,7 +485,7 @@ void CNPC_Citizen::Spawn()
 	if (GetEngineObject()->GetMoveParent() && FClassnameIs(GetEngineObject()->GetMoveParent()->GetOuter(), "func_tracktrain"))
 	{
 		CapabilitiesRemove( bits_CAP_MOVE_GROUND );
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		if ( NameMatches("citizen_train_2") )
 		{
 			SetSequenceByName( "d1_t01_TrainRide_Sit_Idle" );
@@ -1166,7 +1166,7 @@ int CNPC_Citizen::SelectFailSchedule( int failedSchedule, int failedTask, AI_Tas
 int CNPC_Citizen::SelectSchedule()
 {
 	// If we can't move, we're on a train, and should be sitting.
-	if ( GetMoveType() == MOVETYPE_NONE )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
 	{
 		// For now, we're only ever parented to trains. If you hit this assert, you've parented a citizen
 		// to something else, and now we need to figure out a better system.
@@ -1668,7 +1668,7 @@ void CNPC_Citizen::RunTask( const Task_t *pTask )
 			// If we were on a train, but we're not anymore, enable movement
 			if ( !GetEngineObject()->GetMoveParent() )
 			{
-				SetMoveType( MOVETYPE_STEP );
+				GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 				CapabilitiesAdd( bits_CAP_MOVE_GROUND );
 				TaskComplete();
 			}

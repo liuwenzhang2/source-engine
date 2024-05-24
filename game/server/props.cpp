@@ -221,7 +221,7 @@ void CBaseProp::Spawn( void )
 		}
 	}
 
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	m_takedamage = DAMAGE_NO;
 	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );
 
@@ -1495,7 +1495,7 @@ void CBreakableProp::CreateFlare( float flLifetime )
 		Vector vOrigin;
 		GetAttachment( iAttachment, vOrigin );
 
-		pFlare->SetMoveType( MOVETYPE_NONE );
+		pFlare->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		pFlare->GetEngineObject()->SetSolid( SOLID_NONE );
 		pFlare->SetRenderMode( kRenderTransAlpha );
 		pFlare->SetRenderColorA( 1 );
@@ -2400,7 +2400,7 @@ void COrnamentProp::DetachFromOwner()
 {
 	SetOwnerEntity( NULL );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
@@ -2616,7 +2616,7 @@ bool CPhysicsProp::CreateVPhysics()
 	if ( !pPhysicsObject )
 	{
 		GetEngineObject()->SetSolid( SOLID_NONE );
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		Warning("ERROR!: Can't create physics object for %s\n", STRING(GetEngineObject()->GetModelName() ) );
 	}
 	else
@@ -3642,7 +3642,7 @@ void CBasePropDoor::Spawn()
 		m_bLocked = true;
 	}
 
-	SetMoveType(MOVETYPE_PUSH);
+	GetEngineObject()->SetMoveType(MOVETYPE_PUSH);
 	
 	if (m_flSpeed == 0)
 	{
@@ -4460,12 +4460,12 @@ void CBasePropDoor::Blocked(CBaseEntity *pOther)
 	//	pOther->TakeDamage(CTakeDamageInfo(this, this, m_flBlockDamage, DMG_CRUSH));
 	//}
 
-	if ( m_bForceClosed && ( pOther->GetMoveType() == MOVETYPE_VPHYSICS ) &&
+	if ( m_bForceClosed && ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) &&
 		 ( pOther->m_takedamage == DAMAGE_NO || pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) )
 	{
 		EntityPhysics_CreateSolver( this, pOther, true, 4.0f );
 	}
-	else if ( m_bForceClosed && ( pOther->GetMoveType() == MOVETYPE_VPHYSICS ) && ( pOther->m_takedamage == DAMAGE_YES ) )
+	else if ( m_bForceClosed && ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) && ( pOther->m_takedamage == DAMAGE_YES ) )
 	{
 		pOther->TakeDamage( CTakeDamageInfo( this, this, pOther->GetHealth(), DMG_CRUSH ) );
 	}
@@ -4693,7 +4693,7 @@ public:
 				return false;
 
 			// If objects are small enough and can move, close on them
-			if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+			if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 			{
 				IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
 				Assert(pPhysics);
@@ -5523,7 +5523,7 @@ public:
 		if ( pPhysicsObject )
 		{
 			VPhysicsSetObject( pPhysicsObject );
-			SetMoveType( MOVETYPE_VPHYSICS );
+			GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 			pPhysicsObject->Wake();
 		}
 	
@@ -5708,7 +5708,7 @@ class CPhysicsPropMultiplayer : public CPhysicsProp, public IMultiplayerPhysics
 		// can end up larger than the CollisionProp() would have calculated on its own, but it'll be
 		// identical on the client and the server.
 		m_usingCustomCollisionBounds = false;
-		if ( (GetEngineObject()->GetSolid() == SOLID_VPHYSICS ) && ( GetMoveType() == MOVETYPE_VPHYSICS ) )
+		if ( (GetEngineObject()->GetSolid() == SOLID_VPHYSICS ) && (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) )
 		{
 			IPhysicsObject *pPhysics = VPhysicsGetObject();
 			if ( pPhysics && pPhysics->GetCollide() )

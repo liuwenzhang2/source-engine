@@ -684,7 +684,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 		SetContextThink( &CRagdollProp::SetDebrisThink, gpGlobals->curtime + 5, s_pDebrisContext );
 	}
 
-	SetMoveType( MOVETYPE_VPHYSICS );
+	GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
 	m_takedamage = DAMAGE_EVENTS_ONLY;
@@ -1464,7 +1464,7 @@ void CRagdollPropAttached::Detach()
 	GetEngineObject()->SetParent(NULL);
 	SetOwnerEntity( NULL );
 	GetEngineObject()->SetAbsAngles( vec3_angle );
-	SetMoveType( MOVETYPE_VPHYSICS );
+	GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	physenv->DestroyConstraint( m_pAttachConstraint );
 	m_pAttachConstraint = NULL;

@@ -964,7 +964,7 @@ void CWeaponCSBase::Drop(const Vector &vecVelocity)
 
 	StopAnimation();
 	StopFollowingEntity( );
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	// clear follow stuff, setup for collision
 	GetEngineObject()->SetGravity(1.0);
 	m_iState = WEAPON_NOT_CARRIED;
@@ -1846,7 +1846,7 @@ void CWeaponCSBase::UpdateAccuracyPenalty()
 	float fNewPenalty = 0.0f;
 
 	// on ladder?
-	if ( pPlayer->GetMoveType() == MOVETYPE_LADDER )
+	if ( pPlayer->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 	{
 		fNewPenalty += weaponInfo.m_fInaccuracyStand[m_weaponMode] + weaponInfo.m_fInaccuracyLadder[m_weaponMode];
 	}
@@ -1877,7 +1877,7 @@ void CWeaponCSBase::UpdateAccuracyPenalty()
 	{
 		float fDecayFactor;
 
-		if ( pPlayer->GetMoveType() == MOVETYPE_LADDER )
+		if ( pPlayer->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 		{
 			fDecayFactor = logf(10.0f) / weaponInfo.m_fRecoveryTimeStand;
 		}

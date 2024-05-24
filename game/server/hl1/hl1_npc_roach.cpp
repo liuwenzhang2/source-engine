@@ -104,7 +104,7 @@ void CNPC_Roach::Spawn()
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_YELLOW;
 	GetEngineObject()->ClearEffects();
 	m_iHealth			= 1;

@@ -569,7 +569,7 @@ bool C_HL1MP_Player::ShouldPredict( void )
 	{
 #if 0
 		// Disable prediction when player hops onto a moving train or elevator :-/
-		if ( GetGroundEntity() && GetGroundEntity()->GetMoveType() == MOVETYPE_PUSH )
+		if ( GetGroundEntity() && GetGroundEntity()->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH )
 		{
 			Vector vel = GetGroundEntity()->GetLocalVelocity();
 			if ( vel.Length() > 0.002f )

@@ -4506,7 +4506,7 @@ void CAI_BaseNPC::CheckOnGround( void )
 		if ( ( GetState() == NPC_STATE_SCRIPT ) && (GetEngineObject()->GetFlags() & FL_FLY ) )
 			return;
 
-		if ( ( GetNavType() == NAV_GROUND ) && ( GetMoveType() != MOVETYPE_VPHYSICS ) && ( GetMoveType() != MOVETYPE_NONE ) )
+		if ( ( GetNavType() == NAV_GROUND ) && (GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS ) && (GetEngineObject()->GetMoveType() != MOVETYPE_NONE ) )
 		{
 			if ( m_CheckOnGroundTimer.Expired() )
 			{
@@ -4534,7 +4534,7 @@ void CAI_BaseNPC::CheckOnGround( void )
 					}
 					else
 					{
-						if ( trace.startsolid && ((CBaseEntity*)trace.m_pEnt)->GetMoveType() == MOVETYPE_VPHYSICS &&
+						if ( trace.startsolid && ((CBaseEntity*)trace.m_pEnt)->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
 							((CBaseEntity*)trace.m_pEnt)->VPhysicsGetObject() && ((CBaseEntity*)trace.m_pEnt)->VPhysicsGetObject()->GetMass() < VPHYSICS_LARGE_OBJECT_MASS )
 						{
 							// stuck inside a small physics object?  
@@ -6560,7 +6560,7 @@ float CAI_BaseNPC::ThrowLimit(	const Vector &vecStart,
 //-----------------------------------------------------------------------------
 void CAI_BaseNPC::SetupVPhysicsHull()
 {
-	if ( GetMoveType() == MOVETYPE_VPHYSICS || GetMoveType() == MOVETYPE_NONE )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
 		return;
 
 	if ( VPhysicsGetObject() )
@@ -6602,7 +6602,7 @@ void CAI_BaseNPC::CheckPhysicsContacts()
 		return;
 
 	m_bCheckContacts = false;
-	if ( GetMoveType() == MOVETYPE_STEP && VPhysicsGetObject())
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_STEP && VPhysicsGetObject())
 	{
 		IPhysicsObject *pPhysics = VPhysicsGetObject();
 		IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
@@ -6622,7 +6622,7 @@ void CAI_BaseNPC::CheckPhysicsContacts()
 			{
 				float otherMass = PhysGetEntityMass(pOtherEntity);
 
-				if ( pOtherEntity->GetMoveType() == MOVETYPE_VPHYSICS &&  pOther->IsMoveable() && 
+				if ( pOtherEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&  pOther->IsMoveable() &&
 					otherMass < VPHYSICS_LARGE_OBJECT_MASS  && !pOtherEntity->GetServerVehicle() )
 				{
 					m_bCheckContacts = true;
@@ -6674,7 +6674,7 @@ void CAI_BaseNPC::StartTouch( CBaseEntity *pOther )
 {
 	BaseClass::StartTouch(pOther);
 
-	if ( pOther->GetMoveType() == MOVETYPE_VPHYSICS )
+	if ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		m_bCheckContacts = true;
 	}
@@ -7308,7 +7308,7 @@ void CAI_BaseNPC::NPCInitThink ( void )
 void CAI_BaseNPC::StartNPC( void )
 {
 	// Raise npc off the floor one unit, then drop to floor
-	if ( (GetMoveType() != MOVETYPE_FLY) && (GetMoveType() != MOVETYPE_FLYGRAVITY) &&
+	if ( (GetEngineObject()->GetMoveType() != MOVETYPE_FLY) && (GetEngineObject()->GetMoveType() != MOVETYPE_FLYGRAVITY) &&
 		 !(CapabilitiesGet() & bits_CAP_MOVE_FLY) &&
 		 !GetEngineObject()->HasSpawnFlags( SF_NPC_FALL_TO_GROUND ) && !IsWaitingToRappel() && !GetEngineObject()->GetMoveParent() )
 	{
@@ -7422,7 +7422,7 @@ void CAI_BaseNPC::StartTargetHandling( CBaseEntity *pTargetEnt )
 	// JAYJAY
 
 	// NPC will start turning towards his destination
-	bool bIsFlying = (GetMoveType() == MOVETYPE_FLY) || (GetMoveType() == MOVETYPE_FLYGRAVITY);
+	bool bIsFlying = (GetEngineObject()->GetMoveType() == MOVETYPE_FLY) || (GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY);
 	AI_NavGoal_t goal( GOALTYPE_PATHCORNER, pTargetEnt->GetEngineObject()->GetAbsOrigin(),
 					   bIsFlying ? ACT_FLY : ACT_WALK,
 					   AIN_DEF_TOLERANCE, AIN_YAW_TO_DEST);
@@ -10033,7 +10033,7 @@ void CAI_BaseNPC::NPCInitDead( void )
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 	// so he'll fall to ground
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
 	SetCycle( 0 );
 	ResetSequenceInfo( );
@@ -11292,7 +11292,7 @@ void CAI_BaseNPC::ToggleFreeze(void)
 	{
 		// Freeze them.
 		SetCondition(COND_NPC_FREEZE);
-		SetMoveType(MOVETYPE_NONE);
+		GetEngineObject()->SetMoveType(MOVETYPE_NONE);
 		GetEngineObject()->SetGravity(0);
 		SetLocalAngularVelocity(vec3_angle);
 		GetEngineObject()->SetAbsVelocity( vec3_origin );
@@ -11304,7 +11304,7 @@ void CAI_BaseNPC::ToggleFreeze(void)
 		m_Activity = ACT_RESET;
 
 		// BUGBUG: this might not be the correct movetype!
-		SetMoveType( MOVETYPE_STEP );
+		GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 		// Doesn't restore gravity to the original value, but who cares?
 		GetEngineObject()->SetGravity(1);
@@ -11905,7 +11905,7 @@ bool CAI_BaseNPC::CineCleanup()
 			IncrementInterpolationFrame(); // Don't interpolate either, assume the corpse is positioned in its final resting place
 		}
 
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		return false;
 	}
 
@@ -14120,7 +14120,7 @@ Vector CAI_BaseNPC::Weapon_ShootPosition( void )
 //-----------------------------------------------------------------------------
 bool CAI_BaseNPC::ShouldProbeCollideAgainstEntity( CBaseEntity *pEntity )
 {
-	if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		if ( ai_test_moveprobe_ignoresmall.GetBool() && IsNavigationUrgent() )
 		{

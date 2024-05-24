@@ -384,7 +384,7 @@ void CBaseButton::Spawn( )
 	QAngle angMoveDir = QAngle( m_vecMoveDir.x, m_vecMoveDir.y, m_vecMoveDir.z );
 	AngleVectors( angMoveDir, &m_vecMoveDir );
 
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	GetEngineObject()->SetSolid( SOLID_BSP );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
@@ -862,7 +862,7 @@ void CRotButton::Spawn( void )
 		m_vecMoveAng = m_vecMoveAng * -1;
 	}
 
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	
 #ifdef HL1_DLL
 	GetEngineObject()->SetSolid( SOLID_BSP );
@@ -1052,7 +1052,7 @@ void CMomentaryRotButton::Spawn( void )
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	}
 
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	CreateVPhysics();

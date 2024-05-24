@@ -210,7 +210,7 @@ void CNPC_FlockingFlyerFlock::SpawnFlock( void )
 		vecSpot = GetEngineObject()->GetAbsOrigin() + vecSpot;
 
 		UTIL_SetOrigin( pBoid, vecSpot);
-		pBoid->SetMoveType( MOVETYPE_FLY );
+		pBoid->GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 		pBoid->SpawnCommonCode();
 		pBoid->GetEngineObject()->SetGroundEntity( NULL );
 		pBoid->GetEngineObject()->SetAbsVelocity( Vector ( 0, 0, 0 ) );
@@ -252,7 +252,7 @@ void CNPC_FlockingFlyer::SpawnCommonCode( )
 	SetClassname( "monster_flyer" );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	m_takedamage	= DAMAGE_NO;
 	m_iHealth		= 1;
 
@@ -833,7 +833,7 @@ void CNPC_FlockingFlyer::Event_Killed( const CTakeDamageInfo &info )
 	IncrementInterpolationFrame();
 
 	UTIL_SetSize( this, Vector(0,0,0), Vector(0,0,0) );
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 
 	SetThink ( &CNPC_FlockingFlyer::FallHack );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );

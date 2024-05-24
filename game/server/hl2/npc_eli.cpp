@@ -102,7 +102,7 @@ void CNPC_Eli::Spawn()
 	{
 		GetEngineObject()->SetSolid( SOLID_BBOX );
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 		CapabilitiesAdd( bits_CAP_ANIMATEDFACE | bits_CAP_TURN_HEAD );
 		CapabilitiesAdd( bits_CAP_FRIENDLY_DMG_IMMUNE );
@@ -137,7 +137,7 @@ void CNPC_Eli::SetupWithoutParent( void )
 {
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 	CapabilitiesAdd( bits_CAP_MOVE_GROUND | bits_CAP_OPEN_DOORS | bits_CAP_ANIMATEDFACE | bits_CAP_TURN_HEAD );
 	CapabilitiesAdd( bits_CAP_FRIENDLY_DMG_IMMUNE );
@@ -151,7 +151,7 @@ void CNPC_Eli::PrescheduleThink( void )
 	BaseClass::PrescheduleThink();
 
 	// Figure out if Eli has just been removed from his parent
-	if ( GetMoveType() == MOVETYPE_NONE && !GetEngineObject()->GetMoveParent() )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NONE && !GetEngineObject()->GetMoveParent() )
 	{
 		SetupWithoutParent();
 		SetupVPhysicsHull();

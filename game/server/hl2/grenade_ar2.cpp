@@ -55,7 +55,7 @@ void CGrenadeAR2::Spawn( void )
 {
 	Precache( );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
 	// Hits everything but debris
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );

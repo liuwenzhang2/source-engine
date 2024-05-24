@@ -93,7 +93,7 @@ void CRadarTarget::Spawn()
 	BaseClass::Spawn();
 	
 	GetEngineObject()->AddEffects( EF_NODRAW );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 }
 
@@ -194,7 +194,7 @@ public:
 		// Stop colliding with things
 		pOther->VPhysicsDestroyObject();
 		pOther->GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
-		pOther->SetMoveType( MOVETYPE_NONE );
+		pOther->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 		// Parent the object to our owner
 		pOther->GetEngineObject()->SetParent( GetOwnerEntity()?GetOwnerEntity()->GetEngineObject():NULL );
@@ -1197,7 +1197,7 @@ static void SolveBlockingProps( CPropJeepEpisodic *pVehicleEntity, IPhysicsObjec
 		float otherMass = pOther->GetMass();
 		CBaseEntity *pOtherEntity = static_cast<CBaseEntity *>(pOther->GetGameData());
 		Assert(pOtherEntity);
-		if ( pOtherEntity && pOtherEntity->GetMoveType() == MOVETYPE_VPHYSICS && pOther->IsMoveable() && (otherMass*4.0f) < vehicleMass )
+		if ( pOtherEntity && pOtherEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pOther->IsMoveable() && (otherMass*4.0f) < vehicleMass )
 		{
 			Vector normal;
 			pSnapshot->GetSurfaceNormal(normal);
@@ -1269,7 +1269,7 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 			if ( index < 0 )
 			{
 				vphysicsupdateai_t *pUpdate = NULL;
-				if ( pNPC->VPhysicsGetObject() && pNPC->VPhysicsGetObject()->GetShadowController() && pNPC->GetMoveType() == MOVETYPE_STEP )
+				if ( pNPC->VPhysicsGetObject() && pNPC->VPhysicsGetObject()->GetShadowController() && pNPC->GetEngineObject()->GetMoveType() == MOVETYPE_STEP )
 				{
 					if ( pNPC->GetEngineObject()->HasDataObjectType(VPHYSICSUPDATEAI) )
 					{

@@ -48,7 +48,7 @@ void CBaseSpriteProjectile::Spawn(	char *pszModel,
 	m_iDmg = iDamage;
 	m_iDmgType = iDamageType;
 
-	SetMoveType( iMovetype, nMoveCollide );
+	GetEngineObject()->SetMoveType( iMovetype, nMoveCollide );
 
 	UTIL_SetOrigin( this, vecOrigin );
 	GetEngineObject()->SetAbsVelocity( vecVelocity );

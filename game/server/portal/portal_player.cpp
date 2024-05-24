@@ -1157,7 +1157,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		{
 			// filter out anything that isn't simulated by vphysics
 			// UNDONE: Filter out motion disabled objects?
-			if ( list[i]->GetMoveType() == MOVETYPE_VPHYSICS )
+			if ( list[i]->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 			{
 				// I'm currently stuck inside a moving object, so allow vphysics to 
 				// apply velocity to the player in order to separate these objects
@@ -1176,7 +1176,7 @@ void CPortal_Player::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		m_touchedPhysObject = true;
 	}
 
-	if ( GetMoveType() == MOVETYPE_NOCLIP )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP )
 	{
 		m_oldOrigin = GetEngineObject()->GetAbsOrigin();
 		return;
@@ -1484,7 +1484,7 @@ void CPortal_Player::PlayerUse( void )
 		}
 
 		// Tracker 3926:  We can't +USE something if we're climbing a ladder
-		if ( GetMoveType() == MOVETYPE_LADDER )
+		if (GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 		{
 			return;
 		}
@@ -1695,7 +1695,7 @@ void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
 		SetCycle( fCurCycle );
 
 		pRagdoll->InitRagdoll( info.GetDamageForce(), m_nForceBone, info.GetDamagePosition(), pBoneToWorld, pBoneToWorldNext, 0.1f, COLLISION_GROUP_INTERACTIVE_DEBRIS, true );
-		pRagdoll->SetMoveType( MOVETYPE_VPHYSICS );
+		pRagdoll->GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 		pRagdoll->SetSolid( SOLID_VPHYSICS );
 		if ( IsDissolving() )
 		{
@@ -1712,7 +1712,7 @@ void CPortal_Player::CreateRagdollEntity( const CTakeDamageInfo &info )
 	// Turn off the player.
 	AddSolidFlags( FSOLID_NOT_SOLID );
 	AddEffects( EF_NODRAW | EF_NOSHADOW );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	// Save ragdoll handle.
 	m_hRagdoll = pRagdoll;
@@ -1884,7 +1884,7 @@ int CPortal_Player::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		VectorNormalize( vecDir );
 	}
 
-	if ( info.GetInflictor() && (GetMoveType() == MOVETYPE_WALK) && 
+	if ( info.GetInflictor() && (GetEngineObject()->GetMoveType() == MOVETYPE_WALK) &&
 		( !attacker->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER)) )
 	{
 		Vector force = vecDir;// * -DamageForce( WorldAlignSize(), info.GetBaseDamage() );

@@ -2532,7 +2532,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 	
 	case TASK_WALK_PATH:
 		{
-			bool bIsFlying = (GetMoveType() == MOVETYPE_FLY) || (GetMoveType() == MOVETYPE_FLYGRAVITY);
+			bool bIsFlying = (GetEngineObject()->GetMoveType() == MOVETYPE_FLY) || (GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY);
 			if ( bIsFlying && ( TranslateActivity( ACT_FLY ) != ACT_INVALID) )
 			{
 				GetNavigator()->SetMovementActivity(ACT_FLY);

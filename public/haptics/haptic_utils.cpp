@@ -264,7 +264,7 @@ void UpdateAvatarEffect(void)
 	vel.y = -vel.y;
 	vel.z = -vel.z;
 	
-	switch(pPlayer->GetMoveType()) {
+	switch(pPlayer->GetEngineObject()->GetMoveType()) {
 		case MOVETYPE_NOCLIP:
 			vel *= hap_noclip_avatar_scale.GetFloat();
 			break;

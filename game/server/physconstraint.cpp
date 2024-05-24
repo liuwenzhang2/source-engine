@@ -168,7 +168,7 @@ void PhysTeleportConstrainedEntity( CBaseEntity *pTeleportSource, IPhysicsObject
 	}
 
 	// constraint doesn't move this entity
-	if ( pFixup->GetMoveType() != MOVETYPE_VPHYSICS )
+	if ( pFixup->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 		return;
 
 	if ( !pFixup->VPhysicsGetObject() || !pFixup->VPhysicsGetObject()->IsMoveable() )

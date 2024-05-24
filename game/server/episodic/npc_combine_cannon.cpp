@@ -581,7 +581,7 @@ void CNPC_Combine_Cannon::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	m_bloodColor		= DONT_BLEED;
 	m_iHealth			= 10;
 	m_flFieldOfView		= DOT_45DEGREE;

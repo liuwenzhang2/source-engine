@@ -582,7 +582,7 @@ void CWeapon_SLAM::SatchelAttach( void )
 			tr.endpos.z -= 6.0f;
 					
 			CSatchelCharge *pSatchel	= (CSatchelCharge*)CBaseEntity::Create( "npc_satchel", tr.endpos + tr.plane.normal * 3, angles, NULL );
-			pSatchel->SetMoveType( MOVETYPE_FLY ); // no gravity
+			pSatchel->GetEngineObject()->SetMoveType( MOVETYPE_FLY ); // no gravity
 			pSatchel->m_bIsAttached		= true;
 			pSatchel->m_bIsLive			= true;
 			pSatchel->SetThrower( GetOwner() );

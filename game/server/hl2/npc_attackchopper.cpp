@@ -1149,7 +1149,7 @@ void CNPC_AttackHelicopter::Startup()
 			m_hLights[i]->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
 			m_hLights[i]->GetEngineObject()->SetLocalOrigin( vec3_origin );
 			m_hLights[i]->GetEngineObject()->SetLocalVelocity( vec3_origin );
-			m_hLights[i]->SetMoveType( MOVETYPE_NONE );
+			m_hLights[i]->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 			m_hLights[i]->SetTransparency( kRenderTransAdd, 255, 255, 255, 200, kRenderFxNone );
 			m_hLights[i]->SetScale( 1.0f );
 			m_hLights[i]->TurnOn();
@@ -3323,7 +3323,7 @@ void CNPC_AttackHelicopter::AddSmokeTrail( const Vector &vecPos )
 		pFireTrail->FollowEntity( this, UTIL_VarArgs( "damage%d", m_nSmokeTrailCount ) );
 		pFireTrail->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
 		pFireTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
-		pFireTrail->SetMoveType( MOVETYPE_NONE );
+		pFireTrail->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		pFireTrail->SetLifetime( -1 );
 	}
 	else
@@ -3347,7 +3347,7 @@ void CNPC_AttackHelicopter::AddSmokeTrail( const Vector &vecPos )
 		pSmokeTrail->SetLifetime(-1);
 		pSmokeTrail->GetEngineObject()->SetParent( this->GetEngineObject(), nAttachment);
 		pSmokeTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
-		pSmokeTrail->SetMoveType( MOVETYPE_NONE );
+		pSmokeTrail->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	}
 
 	m_nSmokeTrailCount++;
@@ -3433,7 +3433,7 @@ void Chopper_CreateChunk( CBaseEntity *pChopper, const Vector &vecChunkPos, cons
 	pFireTrail->FollowEntity( pChunk, "" );
 	pFireTrail->GetEngineObject()->SetParent( pChunk->GetEngineObject(), 0);
 	pFireTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
-	pFireTrail->SetMoveType( MOVETYPE_NONE );
+	pFireTrail->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	pFireTrail->SetLifetime( pChunk->m_lifeTime );
 }
 
@@ -3834,7 +3834,7 @@ void CNPC_AttackHelicopter::CreateChopperHusk()
 	pCorpse->SetModel( CHOPPER_MODEL_CORPSE_NAME );
 	pCorpse->GetEngineObject()->AddSpawnFlags( SF_PHYSPROP_MOTIONDISABLED );
 	pCorpse->Spawn();
-	pCorpse->SetMoveType( MOVETYPE_NONE );
+	pCorpse->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 //-----------------------------------------------------------------------------
@@ -5062,7 +5062,7 @@ void CGrenadeHelicopter::Spawn( void )
 	if ( !GetEngineObject()->HasSpawnFlags( SF_GRENADE_HELICOPTER_MEGABOMB ) )
 	{
 		IPhysicsObject *pPhysicsObject = VPhysicsInitNormal( SOLID_VPHYSICS, GetEngineObject()->GetSolidFlags(), false );
-		SetMoveType( MOVETYPE_VPHYSICS );
+		GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 
 		Vector vecAbsVelocity = GetEngineObject()->GetAbsVelocity();
 		pPhysicsObject->AddVelocity( &vecAbsVelocity, NULL );
@@ -5072,7 +5072,7 @@ void CGrenadeHelicopter::Spawn( void )
 		GetEngineObject()->SetSolid( SOLID_BBOX );
 		GetEngineObject()->SetCollisionBounds( Vector( -12.5, -12.5, -12.5 ), Vector( 12.5, 12.5, 12.5 ) );
 		VPhysicsInitShadow( false, false );
-		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 		GetEngineObject()->SetElasticity( 0.5f );
 		GetEngineObject()->AddEffects( EF_NOSHADOW );
 	}
@@ -5336,12 +5336,12 @@ void CGrenadeHelicopter::PhysicsSimulate( void )
 	
 	BaseClass::PhysicsSimulate();
 
-	if (!m_bActivated && (GetMoveType() != MOVETYPE_VPHYSICS))
+	if (!m_bActivated && (GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS))
 	{
 		if ( GetWaterLevel() > 1 )
 		{
 			GetEngineObject()->SetAbsVelocity( vec3_origin );
-			SetMoveType( MOVETYPE_NONE );
+			GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 			BecomeActive();
 		}
 
@@ -5349,7 +5349,7 @@ void CGrenadeHelicopter::PhysicsSimulate( void )
 		if ( vecPrevPosition == GetEngineObject()->GetAbsOrigin() )
 		{
 			GetEngineObject()->SetAbsVelocity( vec3_origin );
-			SetMoveType( MOVETYPE_NONE );
+			GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 			BecomeActive();
 		}
 	}
@@ -6198,7 +6198,7 @@ CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos,
 	pFireTrail->FollowEntity( pChunk, "damage" );
 	pFireTrail->GetEngineObject()->SetParent( pChunk->GetEngineObject(), 1);
 	pFireTrail->GetEngineObject()->SetLocalOrigin( vec3_origin );
-	pFireTrail->SetMoveType( MOVETYPE_NONE );
+	pFireTrail->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	pFireTrail->SetLifetime( 10.0f );
 
 	return pChunk;

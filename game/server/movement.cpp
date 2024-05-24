@@ -329,7 +329,7 @@ void CBaseMoveBehavior::Spawn( void )
 {
 	m_pCurrentKeyFrame = this;
 	m_flTimeIntoFrame = 0;
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 
 	// a move behavior is also it's first keyframe
 	m_Origin = GetEngineObject()->GetLocalOrigin();

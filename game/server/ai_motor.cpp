@@ -1026,7 +1026,7 @@ bool CAI_Motor::HasPoseParameter( int iSequence, int iParameter )
 
 void CAI_Motor::SetMoveType( MoveType_t val, MoveCollide_t moveCollide )
 {
-	GetOuter()->SetMoveType( val, moveCollide );
+	GetOuter()->GetEngineObject()->SetMoveType( val, moveCollide );
 }
 
 //=============================================================================

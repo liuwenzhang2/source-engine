@@ -146,7 +146,7 @@ void FX_FireBullets(
 // 		V_strcat(szFlags, "SERVER ", sizeof(szFlags));
 // #endif
 // 
-		if ( pPlayer->GetMoveType() == MOVETYPE_LADDER )
+		if ( pPlayer->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 			V_strcat(szFlags, "LADDER ", sizeof(szFlags));
 
 		if ( FBitSet( pPlayer->GetEngineObject()->GetFlags(), FL_ONGROUND ) )

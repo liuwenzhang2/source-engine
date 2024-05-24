@@ -205,7 +205,7 @@ public:
 
 		BaseClass::Spawn();
 
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		GetEngineObject()->AddEffects( EF_NOSHADOW );
 		UTIL_SetSize( this, vec3_origin, vec3_origin );

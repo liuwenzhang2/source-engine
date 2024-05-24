@@ -62,7 +62,7 @@ void CPropVehicleViewController::Think(void)
 
 	SetSimulationTime( gpGlobals->curtime );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
-	SetAnimatedEveryTick( true );
+	GetEngineObject()->SetAnimatedEveryTick( true );
 
 	StudioFrameAdvance();
 

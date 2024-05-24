@@ -60,7 +60,7 @@ void CNPC_Hornet::Spawn( void )
 {
 	Precache();
 
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	m_takedamage	= DAMAGE_YES;
 	GetEngineObject()->AddFlag( FL_NPC );

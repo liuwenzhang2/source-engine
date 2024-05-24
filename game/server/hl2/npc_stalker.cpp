@@ -285,7 +285,7 @@ void CNPC_Stalker::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= DONT_BLEED;
 	m_iHealth			= sk_stalker_health.GetFloat();
 	m_flFieldOfView		= 0.1;// indicates the width of this NPC's forward view cone ( as a dotproduct result )

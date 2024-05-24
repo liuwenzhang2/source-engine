@@ -259,7 +259,7 @@ void CAmbientGeneric::Spawn( void )
 	}
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
-    SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	// Set up think function for dynamic modification 
 	// of ambient sound's pitch or volume. Don't

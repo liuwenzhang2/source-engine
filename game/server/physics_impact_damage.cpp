@@ -488,7 +488,7 @@ float CalculateDefaultPhysicsDamage( int index, gamevcollisionevent_t *pEvent, f
 static bool IsPhysicallyControlled( CBaseEntity *pEntity, IPhysicsObject *pPhysics )
 {
 	bool isPhysical = false;
-	if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		isPhysical = true;
 	}
@@ -581,7 +581,7 @@ float CalculateObjectStress( IPhysicsObject *pObject, CBaseEntity *pInputOwnerEn
 				}
 			}
 
-			if ( outIndex != 0 && pInputOwnerEntity->GetMoveType() != MOVETYPE_VPHYSICS && !IsPhysicallyControlled(pOtherEntity, pOther) )
+			if ( outIndex != 0 && pInputOwnerEntity->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS && !IsPhysicallyControlled(pOtherEntity, pOther) )
 			{
 				// UNDONE: Test this!  This is to remove any shadow/shadow stress.  The game should handle this with blocked/damage
 				force = 0.0f;
@@ -645,7 +645,7 @@ float CalculateObjectStress( IPhysicsObject *pObject, CBaseEntity *pInputOwnerEn
 	Vector gravVector;
 	physenv->GetGravity( &gravVector );
 	float gravity = gravVector.Length();
-	if ( pInputOwnerEntity->GetMoveType() != MOVETYPE_VPHYSICS && pObject->IsMoveable() )
+	if ( pInputOwnerEntity->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS && pObject->IsMoveable() )
 	{
 		Vector lastVel;
 		lastVel.Init();

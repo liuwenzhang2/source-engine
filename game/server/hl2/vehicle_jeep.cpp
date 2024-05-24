@@ -705,7 +705,7 @@ void CPropJeep::Think( void )
 	SetSimulationTime( gpGlobals->curtime );
 	
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
-	SetAnimatedEveryTick( true );
+	GetEngineObject()->SetAnimatedEveryTick( true );
 
     if ( !m_bInitialHandbrake )	// after initial timer expires, set the handbrake
 	{
@@ -1596,7 +1596,7 @@ void CPropJeep::SpawnPerchedSeagull( void )
 	pSeagull->GetEngineObject()->SetGroundEntity( this->GetEngineObject() );
 	pSeagull->GetEngineObject()->AddFlag( FL_ONGROUND );
 	pSeagull->SetOwnerEntity( this );
-	pSeagull->SetMoveType( MOVETYPE_FLY );
+	pSeagull->GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	pSeagull->m_bOnJeep = true;
 	
 	m_hSeagull = pSeagull;

@@ -308,7 +308,7 @@ void C_Prop_Portal::Simulate()
 			//unmoveables and doors can never get halfway in the portal
 			while ( pMoveEntity )
 			{
-				moveType = pMoveEntity->GetMoveType();
+				moveType = pMoveEntity->GetEngineObject()->GetMoveType();
 
 				if ( !( moveType == MOVETYPE_NONE || moveType == MOVETYPE_PUSH ) )
 				{
@@ -322,7 +322,7 @@ void C_Prop_Portal::Simulate()
 			if ( !bIsMovable )
 				continue;
 
-			Assert( dynamic_cast<C_Prop_Portal *>(pEntity) == NULL ); //should have been killed with (pEntity->GetMoveType() == MOVETYPE_NONE) check. Infinite recursion is infinitely bad.
+			Assert( dynamic_cast<C_Prop_Portal *>(pEntity) == NULL ); //should have been killed with (pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_NONE) check. Infinite recursion is infinitely bad.
 
 			if( pEntity == pLocalPlayerViewModel )
 				continue; //avoid ghosting view models

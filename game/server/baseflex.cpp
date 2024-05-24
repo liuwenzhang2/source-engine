@@ -2333,7 +2333,7 @@ void CFlexCycler::Spawn( )
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	m_takedamage		= DAMAGE_YES;
 	m_iHealth			= 80000;// no cycler should die
 	

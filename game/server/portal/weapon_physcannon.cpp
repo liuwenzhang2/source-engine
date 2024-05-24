@@ -2306,7 +2306,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	{
 		bValid = false;
 	}
-	else if ( (pEntity->GetMoveType() != MOVETYPE_VPHYSICS) && ( pEntity->m_takedamage == DAMAGE_NO ) )
+	else if ( (pEntity->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS) && ( pEntity->m_takedamage == DAMAGE_NO ) )
 	{
 		bValid = false;
 	}
@@ -2355,7 +2355,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	}
 
 	// See if we hit something
-	if ( pEntity->GetMoveType() != MOVETYPE_VPHYSICS )
+	if ( pEntity->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 	{
 		if ( pEntity->m_takedamage == DAMAGE_NO )
 		{
@@ -3238,7 +3238,7 @@ void CWeaponPhysCannon::CheckForTarget( void )
 		{
 			// FIXME: Try just having the elements always open when pointed at a physics object
 			if ( CanPickupObject((CBaseEntity*)tr.m_pEnt ) || Pickup_ForcePhysGunOpen((CBaseEntity*)tr.m_pEnt, pOwner ) )
-			// if ( ( tr.m_pEnt->VPhysicsGetObject() != NULL ) && ( tr.m_pEnt->GetMoveType() == MOVETYPE_VPHYSICS ) )
+			// if ( ( tr.m_pEnt->VPhysicsGetObject() != NULL ) && ( tr.m_pEnt->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) )
 			{
 				m_nChangeState = ELEMENT_STATE_NONE;
 				OpenElements();

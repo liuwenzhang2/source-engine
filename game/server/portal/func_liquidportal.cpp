@@ -57,7 +57,7 @@ void CFunc_LiquidPortal::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	CBaseEntity *pBaseEnt = gEntList.FindEntityByName( NULL, STRING(m_strInitialLinkedPortal) );
@@ -72,7 +72,7 @@ void CFunc_LiquidPortal::Activate( void )
 
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->SetSolidFlags( FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 	ComputeLinkMatrix(); //collision origin may have changed during activation

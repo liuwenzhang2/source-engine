@@ -428,7 +428,7 @@ bool CAI_BaseNPC::AutoMovement( float flInterval, CBaseEntity *pTarget, AIMoveTr
 			m_hCine->ModifyScriptedAutoMovement( &newPos );
 		}
 
-		if (GetMoveType() == MOVETYPE_STEP)
+		if (GetEngineObject()->GetMoveType() == MOVETYPE_STEP)
 		{
 			if (!(GetEngineObject()->GetFlags() & FL_FLY))
 			{
@@ -450,7 +450,7 @@ bool CAI_BaseNPC::AutoMovement( float flInterval, CBaseEntity *pTarget, AIMoveTr
 				return true;
 			}
 		}
-		else if (GetMoveType() == MOVETYPE_FLY)
+		else if (GetEngineObject()->GetMoveType() == MOVETYPE_FLY)
 		{
 			Vector dist = newPos - GetEngineObject()->GetLocalOrigin();
 

@@ -88,7 +88,7 @@ void CBaseGrenadeConcussion::ExplodeConcussion( CBaseEntity *pOther )
 void CBaseGrenadeConcussion::Spawn( void )
 {
 	// point sized, solid, bouncing
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PROJECTILE );
 	SetModel( "models/weapons/w_grenade.mdl" );	// BUG: wrong model

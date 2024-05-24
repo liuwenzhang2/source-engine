@@ -553,7 +553,7 @@ CBaseGrenade::CBaseGrenade(void)
 
 #ifdef CLIENT_DLL
 bool CBaseGrenade::Init(int entnum, int iSerialNum) {
-	SetSimulatedEveryTick(true);
+	GetEngineObject()->SetSimulatedEveryTick(true);
 	return BaseClass::Init(entnum, iSerialNum);
 }
 #endif // CLIENT_DLL

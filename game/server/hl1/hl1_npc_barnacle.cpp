@@ -108,7 +108,7 @@ void CNPC_Barnacle::Spawn()
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( BLOOD_COLOR_GREEN );
 	m_iHealth			= sk_barnacle_health.GetFloat();
 	m_flFieldOfView		= 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
@@ -354,7 +354,7 @@ void CNPC_Barnacle::BarnacleThink ( void )
 
 				SetEnemy( pTouchEnt );
 
-				pTouchEnt->SetMoveType( MOVETYPE_FLY );
+				pTouchEnt->GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 				pTouchEnt->GetEngineObject()->SetAbsVelocity( vec3_origin );
 				pTouchEnt->SetBaseVelocity( vec3_origin );
 				Vector origin = GetEngineObject()->GetAbsOrigin();

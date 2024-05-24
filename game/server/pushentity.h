@@ -143,7 +143,7 @@ public:
 		if ( UTIL_EntityHasMatchingRootParent( m_pRootParent, pTestEntity ) )
 			return false;
 
-		if ( pTestEntity->GetMoveType() == MOVETYPE_VPHYSICS && 
+		if ( pTestEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
 			pTestEntity->VPhysicsGetObject() && pTestEntity->VPhysicsGetObject()->IsMoveable() )
 			return false;
 

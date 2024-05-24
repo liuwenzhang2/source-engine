@@ -155,7 +155,7 @@ void CItem::Spawn( void )
 		return;
 	}
 
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	SetBlocksLOS( false );
 	GetEngineObject()->AddEFlags( EFL_NO_ROTORWASH_PUSH );
@@ -312,14 +312,14 @@ void CItem::FallThink ( void )
 	// which is the case when creating currencypacks in MvM
 	if ( !(GetEngineObject()->GetFlags() & FL_ONGROUND ) )
 	{
-		if ( !GetAbsVelocity().Length() && GetMoveType() == MOVETYPE_FLYGRAVITY )
+		if ( !GetAbsVelocity().Length() && GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY )
 		{
 			// Mr. Game, meet Mr. Hammer.  Mr. Hammer, meet the uncooperative Mr. Physics.
 			// Mr. Physics really doesn't want to give our friend the FL_ONGROUND flag.
 			// This means our wonderfully helpful radius currency collection code will be sad.
 			// So in the name of justice, we ask that this flag be delivered unto him.
 
-			SetMoveType( MOVETYPE_NONE );
+			GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 			GetEngineObject()->SetGroundEntity( GetWorldEntity()->GetEngineObject());
 		}
 	}
@@ -465,7 +465,7 @@ CBaseEntity* CItem::Respawn( void )
 
 	VPhysicsDestroyObject();
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 

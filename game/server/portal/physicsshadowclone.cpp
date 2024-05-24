@@ -78,7 +78,7 @@ CPhysicsShadowClone::~CPhysicsShadowClone( void )
 
 void CPhysicsShadowClone::UpdateOnRemove( void )
 {
-	SetMoveType(MOVETYPE_NONE);
+	GetEngineObject()->SetMoveType(MOVETYPE_NONE);
 	GetEngineObject()->SetSolid(SOLID_NONE);
 	GetEngineObject()->SetSolidFlags(0);
 	GetEngineObject()->SetCollisionGroup(COLLISION_GROUP_NONE);
@@ -154,7 +154,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 	if( pClonedEntity == NULL )
 	{
 		AssertMsg( VPhysicsGetObject() != NULL, "Been linkless for more than this update, something should have killed this clone." );
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		GetEngineObject()->SetSolid( SOLID_NONE );
 		GetEngineObject()->SetSolidFlags( 0 );
 		GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
@@ -262,7 +262,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 
 	if( bBigChanges )
 	{
-		MoveType_t sourceMoveType = pClonedEntity->GetMoveType();
+		MoveType_t sourceMoveType = pClonedEntity->GetEngineObject()->GetMoveType();
 
 			
 		IPhysicsObject *pPhysObject = pClonedEntity->VPhysicsGetObject();
@@ -278,24 +278,24 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 		  )
 		{
 //#ifdef _DEBUG
-			SetMoveType( MOVETYPE_NONE ); //to kill an assert
+			GetEngineObject()->SetMoveType( MOVETYPE_NONE ); //to kill an assert
 //#endif
 			//PUSH should be used sparingly, you can't stand on a MOVETYPE_PUSH object :/
-			SetMoveType( MOVETYPE_VPHYSICS, pClonedEntity->GetMoveCollide() ); //either an unclonable movetype, or a shadow/held object
+			GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS, pClonedEntity->GetEngineObject()->GetMoveCollide() ); //either an unclonable movetype, or a shadow/held object
 		}
 		/*else if(sourceMoveType == MOVETYPE_STEP)
 		{
-			//SetMoveType( MOVETYPE_NONE ); //to kill an assert
-			SetMoveType( MOVETYPE_VPHYSICS, pClonedEntity->GetMoveCollide() );
+			//GetEngineObject()->SetMoveType( MOVETYPE_NONE ); //to kill an assert
+			GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS, pClonedEntity->GetMoveCollide() );
 		}*/
 		else
 		{
 			//if( m_bShadowTransformIsIdentity )
-				SetMoveType( sourceMoveType, pClonedEntity->GetMoveCollide() );
+			GetEngineObject()->SetMoveType( sourceMoveType, pClonedEntity->GetEngineObject()->GetMoveCollide() );
 			//else
 			//{
-			//	SetMoveType( MOVETYPE_NONE ); //to kill an assert
-			//	SetMoveType( MOVETYPE_PUSH, pClonedEntity->GetMoveCollide() );
+			//	GetEngineObject()->SetMoveType( MOVETYPE_NONE ); //to kill an assert
+			//	GetEngineObject()->SetMoveType( MOVETYPE_PUSH, pClonedEntity->GetMoveCollide() );
 			//}
 		}
 

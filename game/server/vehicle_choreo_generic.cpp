@@ -143,7 +143,7 @@ public:
 	bool CreateVPhysics()
 	{
 		GetEngineObject()->SetSolid(SOLID_VPHYSICS);
-		SetMoveType(MOVETYPE_NONE);
+		GetEngineObject()->SetMoveType(MOVETYPE_NONE);
 		return true;
 	}
 	bool ShouldForceExit() { return m_bForcedExit; }

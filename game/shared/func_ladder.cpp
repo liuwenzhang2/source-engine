@@ -53,7 +53,7 @@ void CFuncLadder::Spawn()
 
 	// Entity is symbolid
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 	
 	//AddFlag( FL_WORLDBRUSH );

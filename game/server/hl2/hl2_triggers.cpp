@@ -529,7 +529,7 @@ void CWateryDeathLeech::Spawn( void )
 
 	GetEngineObject()->SetSolid ( SOLID_NONE );
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->AddEffects( EF_NOSHADOW );
 	
 	SetModel( "models/leech.mdl" );

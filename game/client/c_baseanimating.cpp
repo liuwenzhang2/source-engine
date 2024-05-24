@@ -2417,7 +2417,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 				ray.Init( p1, p2, Vector(-r,-r,0), Vector(r,r,r*2) );
 				enginetrace->TraceRay( ray, PhysicsSolidMaskForEntity(), &traceFilter, &trace );
 
-				if ( trace.m_pEnt != NULL && ((C_BaseEntity*)trace.m_pEnt)->GetMoveType() == MOVETYPE_PUSH )
+				if ( trace.m_pEnt != NULL && ((C_BaseEntity*)trace.m_pEnt)->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH )
 				{
 					pTarget->SetOwner(((C_BaseEntity*)trace.m_pEnt)->entindex(), ((C_BaseEntity*)trace.m_pEnt)->GetEngineObject()->GetAbsOrigin(), ((C_BaseEntity*)trace.m_pEnt)->GetEngineObject()->GetAbsAngles() );
 				}
@@ -4210,7 +4210,7 @@ bool C_BaseAnimating::IsSelfAnimating()
 		return true;
 
 	// Yes, we use animtime.
-	int iMoveType = GetMoveType();
+	int iMoveType = GetEngineObject()->GetMoveType();
 	if ( iMoveType != MOVETYPE_STEP && 
 		  iMoveType != MOVETYPE_NONE && 
 		  iMoveType != MOVETYPE_WALK &&
@@ -4675,8 +4675,8 @@ bool C_BaseAnimating::InitAsClientRagdoll( const matrix3x4_t *pDeltaBones0, cons
 
 
 	// Force MOVETYPE_STEP interpolation
-	MoveType_t savedMovetype = GetMoveType();
-	SetMoveType( MOVETYPE_STEP );
+	MoveType_t savedMovetype = GetEngineObject()->GetMoveType();
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 	// HACKHACK: force time to last interpolation position
 	m_flPlaybackRate = 1;
@@ -4699,7 +4699,7 @@ bool C_BaseAnimating::InitAsClientRagdoll( const matrix3x4_t *pDeltaBones0, cons
 		SaveRagdollInfo( hdr->numbones(), parentTransform, m_BoneAccessor );
 	}
 	
-	SetMoveType( savedMovetype );
+	GetEngineObject()->SetMoveType( savedMovetype );
 
 	// Now set the dieragdoll sequence to get transforms for all
 	// non-simulated bones

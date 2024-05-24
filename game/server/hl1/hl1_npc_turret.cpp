@@ -208,7 +208,7 @@ void CNPC_BaseTurret::Spawn()
 { 
 	Precache( );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 1 );
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	SetSequence( 0 );
 	SetCycle( 0 );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
@@ -1135,7 +1135,7 @@ void CNPC_BaseTurret::Event_Killed( const CTakeDamageInfo &info )
 {
 	BaseClass::Event_Killed( info );
 
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 }
 
 //===

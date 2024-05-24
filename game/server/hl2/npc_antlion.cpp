@@ -306,7 +306,7 @@ void CNPC_Antlion::Spawn( void )
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
 	
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 	//Only do this if a squadname appears in the entity
 	if ( m_SquadName != NULL_STRING )
@@ -670,7 +670,7 @@ void CNPC_Antlion::MeleeAttack( float distance, float damage, QAngle &viewPunch,
 		if ( pPlayer != NULL )
 		{
 			//Kick the player angles
-			if ( !(pPlayer->GetEngineObject()->GetFlags() & FL_GODMODE ) && pPlayer->GetMoveType() != MOVETYPE_NOCLIP )
+			if ( !(pPlayer->GetEngineObject()->GetFlags() & FL_GODMODE ) && pPlayer->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP )
 			{
 				pPlayer->ViewPunch( viewPunch );
 
@@ -4243,7 +4243,7 @@ void CNPC_Antlion::Touch( CBaseEntity *pOther )
 
 		//Kick the player angles
 		bool bIsPlayer = pOther->IsPlayer();
-		if ( bIsPlayer && !(pOther->GetEngineObject()->GetFlags() & FL_GODMODE ) && pOther->GetMoveType() != MOVETYPE_NOCLIP )
+		if ( bIsPlayer && !(pOther->GetEngineObject()->GetFlags() & FL_GODMODE ) && pOther->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP )
 		{
 			pOther->ViewPunch( QAngle( 4.0f, 0.0f, 0.0f ) );
 		}

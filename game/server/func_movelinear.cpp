@@ -66,7 +66,7 @@ void CFuncMoveLinear::Spawn( void )
 	QAngle angMoveDir = QAngle( m_vecMoveDir.x, m_vecMoveDir.y, m_vecMoveDir.z );
 	AngleVectors( angMoveDir, &m_vecMoveDir );
 
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	
 	// Don't allow zero or negative speeds

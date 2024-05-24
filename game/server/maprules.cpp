@@ -45,7 +45,7 @@ END_DATADESC()
 void CRuleEntity::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 

@@ -106,7 +106,7 @@ void CCrossbowBolt::Spawn( )
 	UTIL_SetSize( this, -Vector(1, 1, 1), Vector(1, 1, 1) );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 40 ) );	// use a really low gravity (40 in/s^2)
 
 	SetTouch( &CCrossbowBolt::BoltTouch );

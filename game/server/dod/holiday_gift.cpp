@@ -40,7 +40,7 @@ CHolidayGift* CHolidayGift::Create( const Vector &position, const QAngle &angles
 			VectorScale( vecImpulse, 300.0 / flSpeed, vecImpulse );
 		}
 
-		pGift->SetMoveType( MOVETYPE_FLYGRAVITY );
+		pGift->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 		pGift->GetEngineObject()->SetAbsVelocity( vecImpulse * 2.f + Vector(0,0,200) );
 		pGift->GetEngineObject()->SetAbsAngles( QAngle(0,0,0) );
 		pGift->UseClientSideAnimation();

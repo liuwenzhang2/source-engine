@@ -127,7 +127,7 @@ void CReservePlayerSpot::Spawn()
 	BaseClass::Spawn();
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	// Make entity invisible
 	GetEngineObject()->AddEffects( EF_NODRAW );
 }
@@ -209,8 +209,8 @@ void CHL2GameMovement::StartForcedMove( bool mounting, float transit_speed, cons
 	lm->m_hForceLadder		= ladder;
 
 	// Don't get stuck during this traversal since we'll just be slamming the player origin
-	player->SetMoveType( MOVETYPE_NONE );
-	player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+	player->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
+	player->GetEngineObject()->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 	player->GetEngineObject()->SetSolid( SOLID_NONE );
 	SetLadder( ladder );
 
@@ -261,11 +261,11 @@ bool CHL2GameMovement::ContinueForcedMove()
 	if ( !lm->m_bForceLadderMove )
 	{
 		player->GetEngineObject()->SetSolid( SOLID_BBOX );
-		player->SetMoveType( MOVETYPE_WALK );
+		player->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 
 		if ( lm->m_bForceMount && lm->m_hForceLadder != NULL )
 		{
-			player->SetMoveType( MOVETYPE_LADDER );
+			player->GetEngineObject()->SetMoveType( MOVETYPE_LADDER );
 			SetLadder( lm->m_hForceLadder );
 		}
 
@@ -658,8 +658,8 @@ void CHL2GameMovement::FullLadderMove()
 				return;
 			}
 
-			player->SetMoveType( MOVETYPE_WALK );
-			player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+			player->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
+			player->GetEngineObject()->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 			SetLadder( NULL );
 			GetHL2Player()->m_bPlayUseDenySound = false;
 
@@ -687,8 +687,8 @@ void CHL2GameMovement::FullLadderMove()
 		// Otherwise, if the move would leave the ladder, disallow it.
 		if ( pressed_use )
 		{
-			player->SetMoveType( MOVETYPE_WALK );
-			player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+			player->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
+			player->GetEngineObject()->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 			SetLadder( NULL );
 
 			// Dismount with a bit of velocity in facing direction
@@ -884,7 +884,7 @@ bool CHL2GameMovement::CheckLadderAutoMount( CFuncLadder *ladder, const Vector& 
 bool CHL2GameMovement::LadderMove( void )
 {
 
-	if ( player->GetMoveType() == MOVETYPE_NOCLIP )
+	if ( player->GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP )
 	{
 		SetLadder( NULL );
 		return false;
@@ -978,8 +978,8 @@ bool CHL2GameMovement::LadderMove( void )
 	}
 
 	// Make sure we are on the ladder
-	player->SetMoveType( MOVETYPE_LADDER );
-	player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+	player->GetEngineObject()->SetMoveType( MOVETYPE_LADDER );
+	player->GetEngineObject()->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 
 	player->GetEngineObject()->SetGravity( 0.0f );
 	
@@ -1011,7 +1011,7 @@ bool CHL2GameMovement::LadderMove( void )
 	
 	if ( mv->m_nButtons & IN_JUMP )
 	{
-		player->SetMoveType( MOVETYPE_WALK );
+		player->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 		// Remove from ladder
 		SetLadder( NULL );
 
@@ -1061,7 +1061,7 @@ bool CHL2GameMovement::LadderMove( void )
 		if ( distFromLadderSqr > 36.0f )
 		{
 			// Uh oh, we fell off zee ladder...
-			player->SetMoveType( MOVETYPE_WALK );
+			player->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 			// Remove from ladder
 			SetLadder( NULL );
 			return false;

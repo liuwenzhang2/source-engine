@@ -244,7 +244,7 @@ bool CBoneFollower::Init( CBaseEntity *pOwner, const char *pModelName, solid_t &
 	m_solidIndex = solid.index;
 	GetEngineObject()->SetAbsOrigin( position );
 	GetEngineObject()->SetAbsAngles( orientation );
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->SetCollisionGroup( pOwner->GetEngineObject()->GetCollisionGroup() );
 	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );

@@ -186,7 +186,7 @@ public:
 		CBaseEntity *pTestEntity = static_cast<CBaseEntity*>(pHandleEntity);
 
 		// UNDONE: This should really filter to just the pushing entities
-		if ( pTestEntity->GetMoveType() == MOVETYPE_VPHYSICS && 
+		if ( pTestEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
 			pTestEntity->VPhysicsGetObject() && pTestEntity->VPhysicsGetObject()->IsMoveable() )
 			return false;
 
@@ -614,10 +614,10 @@ private:
 		if ( !pCheck->GetEngineObject()->IsSolid() )
 			return NULL;
 
-		if ( pCheck->GetMoveType() == MOVETYPE_PUSH || 
-			 pCheck->GetMoveType() == MOVETYPE_NONE || 
-			 pCheck->GetMoveType() == MOVETYPE_VPHYSICS ||
-			 pCheck->GetMoveType() == MOVETYPE_NOCLIP )
+		if ( pCheck->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH ||
+			 pCheck->GetEngineObject()->GetMoveType() == MOVETYPE_NONE ||
+			 pCheck->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ||
+			 pCheck->GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP )
 		{
 			return NULL;
 		}
@@ -1021,7 +1021,7 @@ int CBaseEntity::PhysicsTryMove( float flTime, trace_t *steptrace )
 		numplanes++;
 
 		// modify original_velocity so it parallels all of the clip planes
-		if ( GetMoveType() == MOVETYPE_WALK && (!(GetEngineObject()->GetFlags() & FL_ONGROUND) || GetEngineObject()->GetFriction()!=1) )	// relfect player velocity
+		if (GetEngineObject()->GetMoveType() == MOVETYPE_WALK && (!(GetEngineObject()->GetFlags() & FL_ONGROUND) || GetEngineObject()->GetFriction()!=1) )	// relfect player velocity
 		{
 			for ( i = 0; i < numplanes; i++ )
 			{
@@ -1477,37 +1477,9 @@ void CBaseEntity::PhysicsCustom()
 	PhysicsCheckWaterTransition();
 }
 
-bool g_bTestMoveTypeStepSimulation = true;
-ConVar sv_teststepsimulation( "sv_teststepsimulation", "1", 0 );
 
-//-----------------------------------------------------------------------------
-// Purpose: Until we remove the above cvar, we need to have the entities able
-//  to dynamically deal with changing their simulation stuff here.
-//-----------------------------------------------------------------------------
-void CBaseEntity::CheckStepSimulationChanged()
-{
-	if ( g_bTestMoveTypeStepSimulation != IsSimulatedEveryTick() )
-	{
-		SetSimulatedEveryTick( g_bTestMoveTypeStepSimulation );
-	}
 
-	bool hadobject = GetEngineObject()->HasDataObjectType( STEPSIMULATION );
 
-	if ( g_bTestMoveTypeStepSimulation )
-	{
-		if ( !hadobject )
-		{
-			GetEngineObject()->CreateDataObject( STEPSIMULATION );
-		}
-	}
-	else
-	{
-		if ( hadobject )
-		{
-			GetEngineObject()->DestroyDataObject( STEPSIMULATION );
-		}
-	}
-}
 
 
 #define STEP_TELPORTATION_VEL_SQ	( 4096.0f * 4096.0f )
@@ -1518,7 +1490,7 @@ void CBaseEntity::CheckStepSimulationChanged()
 void CBaseEntity::StepSimulationThink( float dt )
 {
 	// See if we need to allocate, deallocate step simulation object
-	CheckStepSimulationChanged();
+	GetEngineObject()->CheckStepSimulationChanged();
 
 	StepSimulationData *step = ( StepSimulationData * )GetEngineObject()->GetDataObject( STEPSIMULATION );
 	if ( !step )
@@ -1935,6 +1907,9 @@ void Physics_SimulateEntity( CBaseEntity *pEntity )
 		pEntity->GetEngineObject()->PhysicsRunThink();
 	}
 }
+
+extern bool g_bTestMoveTypeStepSimulation;
+extern ConVar sv_teststepsimulation;
 //-----------------------------------------------------------------------------
 // Purpose: Runs the main physics simulation loop against all entities ( except players )
 //-----------------------------------------------------------------------------

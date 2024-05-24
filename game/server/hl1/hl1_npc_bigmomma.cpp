@@ -405,7 +405,7 @@ void CNPC_BigMomma::Spawn()
 	SetNavType( NAV_GROUND );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	
 	m_bloodColor = BLOOD_COLOR_GREEN;
 	m_iHealth = 150 * sk_bigmomma_health_factor.GetFloat();
@@ -1146,7 +1146,7 @@ void MortarSpray( const Vector &position, const Vector &direction, int spriteMod
 // UNDONE: right now this is pretty much a copy of the squid spit with minor changes to the way it does damage
 void CBMortar:: Spawn( void )
 {
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	SetClassname( "bmortar" );
 	
 	GetEngineObject()->SetSolid( SOLID_BBOX );

@@ -2328,7 +2328,7 @@ void CTurretTipController::Spawn( void )
 	m_angularLimit	= 25;
 	m_flSuspendTime	= 0;
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 //-----------------------------------------------------------------------------

@@ -283,7 +283,7 @@ bool PathFollower::LadderUpdate( INextBot *bot )
 		// This happens for players, who run off ledges and the gamemovement sticks them onto ladders.  We only care about
 		// tall down-ladders, because up ladders work without this, and short ladders aren't dangerous to miss and drop down
 		// instead of climbing down.
-		if ( bot->GetEntity()->GetMoveType() == MOVETYPE_LADDER )
+		if ( bot->GetEntity()->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 		{
 			// 'current' is the segment we are on/just passed over
 			const Segment *current = PriorSegment( m_goal );
@@ -434,7 +434,7 @@ bool PathFollower::LadderUpdate( INextBot *bot )
 			float range = to.NormalizeInPlace();
 
 			// Approach the top of the ladder.  If we're already on the ladder, start descending.
-			if ( range < mountRange || bot->GetEntity()->GetMoveType() == MOVETYPE_LADDER )
+			if ( range < mountRange || bot->GetEntity()->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 			{
 				// go down ladder
 				mover->DescendLadder( m_goal->ladder, m_goal->area );

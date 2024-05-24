@@ -529,7 +529,7 @@ void CHunterFlechette::Spawn()
 	Precache( );
 
 	SetModel( HUNTER_FLECHETTE_MODEL );
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 	UTIL_SetSize( this, -Vector(1,1,1), Vector(1,1,1) );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->SetGravity( 0.05f );
@@ -599,7 +599,7 @@ void CHunterFlechette::StickTo( CBaseEntity *pOther, trace_t &tr )
 	params.m_bWarnOnDirectWaveReference = true;
 	g_pSoundEmitterSystem->EmitSound(filter, this->entindex(), params);
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	
 	if ( !pOther->IsWorld() )
 	{
@@ -732,7 +732,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 			//NDebugOverlay::Box( tr2.endpos, Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 255, 0, 0, 10 );
 			//NDebugOverlay::Box( GetAbsOrigin(), Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 0, 255, 0, 10 );
 
-			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && ((CBaseEntity*)tr2.m_pEnt)->GetMoveType() == MOVETYPE_NONE ) )
+			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && ((CBaseEntity*)tr2.m_pEnt)->GetEngineObject()->GetMoveType() == MOVETYPE_NONE ) )
 			{
 				CEffectData	data;
 
@@ -744,7 +744,7 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 			}
 		}
 
-		if ( ( ( pOther->GetMoveType() == MOVETYPE_VPHYSICS ) || ( pOther->GetMoveType() == MOVETYPE_PUSH ) ) && ( ( pOther->GetHealth() > 0 ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) ) )
+		if ( ( ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) || ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH ) ) && ( ( pOther->GetHealth() > 0 ) || ( pOther->m_takedamage == DAMAGE_EVENTS_ONLY ) ) )
 		{
 			CPhysicsProp *pProp = dynamic_cast<CPhysicsProp *>( pOther );
 			if ( pProp )
@@ -767,12 +767,12 @@ void CHunterFlechette::FlechetteTouch( CBaseEntity *pOther )
 	else
 	{
 		// See if we struck the world
-		if ( pOther->GetMoveType() == MOVETYPE_NONE && !( tr.surface.flags & SURF_SKY ) )
+		if ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_NONE && !( tr.surface.flags & SURF_SKY ) )
 		{
 			// We hit a physics object that survived the impact. Stick to it.
 			StickTo( pOther, tr );
 		}
-		else if( pOther->GetMoveType() == MOVETYPE_PUSH && FClassnameIs(pOther, "func_breakable") )
+		else if( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH && FClassnameIs(pOther, "func_breakable") )
 		{
 			// We hit a func_breakable, stick to it.
 			// The MOVETYPE_PUSH is a micro-optimization to cut down on the classname checks.
@@ -1015,7 +1015,7 @@ public:
 				return false;
 
 			// don't test small moveable physics objects (unless it's an NPC)
-			if ( !pEntity->IsNPC() && pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+			if ( !pEntity->IsNPC() && pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 			{
 				float entMass = PhysGetEntityMass( pEntity ) ;
 				if ( entMass < m_minMass )
@@ -1799,7 +1799,7 @@ void CNPC_Hunter::Spawn()
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 	SetupGlobalModelData();
 	
@@ -2660,7 +2660,7 @@ void CNPC_Hunter::BuildScheduleTestBits()
 //-----------------------------------------------------------------------------
 static bool IsMovablePhysicsObject( CBaseEntity *pEntity )
 {
-	return pEntity && pEntity->GetMoveType() == MOVETYPE_VPHYSICS && pEntity->VPhysicsGetObject() && pEntity->VPhysicsGetObject()->IsMoveable();
+	return pEntity && pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pEntity->VPhysicsGetObject() && pEntity->VPhysicsGetObject()->IsMoveable();
 }
 
 
@@ -2765,7 +2765,7 @@ bool CNPC_Hunter::ShouldCharge( const Vector &startPos, const Vector &endPos, bo
 				return true;
 
 			// Hit things that will move
-			if ( moveTrace.pObstruction->GetMoveType() == MOVETYPE_VPHYSICS )
+			if ( moveTrace.pObstruction->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 				return true;
 		}
 
@@ -4215,7 +4215,7 @@ bool CNPC_Hunter::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEntity )
 	}
 
 	// Hit something we don't hate. If it's not moveable, crash into it.
-	if ( pEntity->GetMoveType() == MOVETYPE_NONE || pEntity->GetMoveType() == MOVETYPE_PUSH )
+	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_NONE || pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH )
 	{		
 		CBreakable *pBreakable = dynamic_cast<CBreakable *>(pEntity);
 		if ( pBreakable  && pBreakable->IsBreakable() && pBreakable->m_takedamage == DAMAGE_YES && pBreakable->GetHealth() > 0 )
@@ -4226,7 +4226,7 @@ bool CNPC_Hunter::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEntity )
 	}
 
 	// If it's a vphysics object that's too heavy, crash into it too.
-	if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
 		if ( pPhysics )
@@ -6096,7 +6096,7 @@ bool CNPC_Hunter::ShouldProbeCollideAgainstEntity( CBaseEntity *pEntity )
 	if ( s_iszPhysPropClassname != pEntity->GetEngineObject()->GetClassname() )
 		return BaseClass::ShouldProbeCollideAgainstEntity( pEntity );
 
-	if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		IPhysicsObject *pPhysObj = pEntity->VPhysicsGetObject();
 

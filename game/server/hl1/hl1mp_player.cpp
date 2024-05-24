@@ -133,7 +133,7 @@ void CHL1MP_Player::Spawn( void )
 	if ( !IsObserver() )
 	{
 		GetEngineObject()->RemoveEffects( EF_NODRAW );
-		SetMoveType( MOVETYPE_WALK );
+		GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 		GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 
 		// if no model, force one

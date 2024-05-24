@@ -384,7 +384,7 @@ void CNPC_CraneDriver::StartTask( const Task_t *pTask )
 
 				// Get the VPhysics object
 				IPhysicsObject *pPhysics = pList[i]->VPhysicsGetObject();
-				if ( pPhysics && pList[i]->GetMoveType() == MOVETYPE_VPHYSICS )
+				if ( pPhysics && pList[i]->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 				{
 					float flMass = pPhysics->GetMass();
 					if ( flMass > flLargestMass && (flMass < MAXIMUM_CRANE_PICKUP_MASS) && (flMass > MINIMUM_CRANE_PICKUP_MASS) )

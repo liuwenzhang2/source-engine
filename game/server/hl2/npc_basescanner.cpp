@@ -97,7 +97,7 @@ void CNPC_BaseScanner::Spawn(void)
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
-	SetMoveType( MOVETYPE_VPHYSICS );
+	GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 
 	m_bloodColor		= DONT_BLEED;
 	SetViewOffset( Vector(0, 0, 10) );		// Position of the eyes relative to NPC's origin.

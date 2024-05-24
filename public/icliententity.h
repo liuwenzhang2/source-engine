@@ -371,6 +371,16 @@ public:
 	virtual bool PhysicsRunThink(thinkmethods_t thinkMethod = THINK_FIRE_ALL_FUNCTIONS) = 0;
 	virtual bool PhysicsRunSpecificThink(int nContextIndex, CBASEPTR thinkFunc) = 0;
 
+	virtual MoveType_t GetMoveType(void) const = 0;
+	virtual MoveCollide_t GetMoveCollide(void) const = 0;
+	virtual void SetMoveType(MoveType_t val, MoveCollide_t moveCollide = MOVECOLLIDE_DEFAULT) = 0;	// Set to one of the MOVETYPE_ defines.
+	virtual void SetMoveCollide(MoveCollide_t val) = 0;	// Set to one of the MOVECOLLIDE_ defines.
+
+	virtual bool IsSimulatedEveryTick() const = 0;
+	virtual bool IsAnimatedEveryTick() const = 0;
+	virtual void SetSimulatedEveryTick(bool sim) = 0;
+	virtual void SetAnimatedEveryTick(bool anim) = 0;
+
 };
 
 //-----------------------------------------------------------------------------

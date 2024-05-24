@@ -63,7 +63,7 @@ public:
 	virtual bool OnLadder( trace_t &trace );
 	virtual float LadderDistance( void ) const
 	{
-		if ( player->GetMoveType() == MOVETYPE_LADDER )
+		if ( player->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 			return 10.0f;
 		return 2.0f;
 	}
@@ -185,9 +185,9 @@ void CCSGameMovement::CheckParameters( void )
 		mv->m_flMaxSpeed *= CS_PLAYER_SPEED_WALK_MODIFIER;
 	}
 
-	if ( player->GetMoveType() != MOVETYPE_ISOMETRIC &&
-		 player->GetMoveType() != MOVETYPE_NOCLIP &&
-		 player->GetMoveType() != MOVETYPE_OBSERVER	)
+	if ( player->GetEngineObject()->GetMoveType() != MOVETYPE_ISOMETRIC &&
+		 player->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP &&
+		 player->GetEngineObject()->GetMoveType() != MOVETYPE_OBSERVER	)
 	{
 		float spd;
 
@@ -260,8 +260,8 @@ void CCSGameMovement::CheckParameters( void )
 		v_angle = v_angle + player->m_Local.m_vecPunchAngle;
 
 		// Now adjust roll angle
-		if ( player->GetMoveType() != MOVETYPE_ISOMETRIC  &&
-			 player->GetMoveType() != MOVETYPE_NOCLIP )
+		if ( player->GetEngineObject()->GetMoveType() != MOVETYPE_ISOMETRIC  &&
+			 player->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP )
 		{
 			mv->m_vecAngles[ROLL]  = CalcRoll( v_angle, mv->m_vecVelocity, sv_rollangle.GetFloat(), sv_rollspeed.GetFloat() );
 		}
@@ -290,7 +290,7 @@ void CCSGameMovement::CheckParameters( void )
 	}
 
 	// If we're standing on a player, then force them off.
-	if ( !player->IsObserver()  && ( player->GetMoveType() != MOVETYPE_LADDER ) )
+	if ( !player->IsObserver()  && ( player->GetEngineObject()->GetMoveType() != MOVETYPE_LADDER ) )
 	{
 		int nLevels = 0;
 		CBaseEntity* pCurGround = player->GetEngineObject()->GetGroundEntity() ? player->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
@@ -571,8 +571,8 @@ void CCSGameMovement::CheckForLadders( bool wasOnGround )
 		{
 			if ( m_pCSPlayer->CanGrabLadder( trace.endpos, trace.plane.normal ) )
 			{
-				player->SetMoveType( MOVETYPE_LADDER );
-				player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+				player->GetEngineObject()->SetMoveType( MOVETYPE_LADDER );
+				player->GetEngineObject()->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 
 				player->SetLadderNormal( trace.plane.normal );
 				mv->m_vecVelocity.Init();
@@ -964,7 +964,7 @@ void CCSGameMovement::Duck( void )
 	int buttonsReleased	=  buttonsChanged & mv->m_nOldButtons;		// The changed ones which were previously down are "released"
 
 	// Check to see if we are in the air.
-	bool bInAir = player->GetEngineObject()->GetGroundEntity() == NULL && player->GetMoveType() != MOVETYPE_LADDER;
+	bool bInAir = player->GetEngineObject()->GetGroundEntity() == NULL && player->GetEngineObject()->GetMoveType() != MOVETYPE_LADDER;
 
 	if ( mv->m_nButtons & IN_DUCK )
 	{

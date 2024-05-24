@@ -72,7 +72,7 @@ void CRopeAnchor::Spawn()
 //---------------------------------------------------------
 void CRopeAnchor::FallThink()
 {
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 
 	Vector vecVelocity = GetEngineObject()->GetAbsVelocity();
 

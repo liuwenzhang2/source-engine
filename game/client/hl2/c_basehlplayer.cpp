@@ -177,11 +177,11 @@ int C_BaseHLPlayer::DrawModel( int flags )
 //-----------------------------------------------------------------------------
 void C_BaseHLPlayer::ExitLadder()
 {
-	if ( MOVETYPE_LADDER != GetMoveType() )
+	if ( MOVETYPE_LADDER != GetEngineObject()->GetMoveType() )
 		return;
 	
-	SetMoveType( MOVETYPE_WALK );
-	SetMoveCollide( MOVECOLLIDE_DEFAULT );
+	GetEngineObject()->SetMoveType( MOVETYPE_WALK );
+	GetEngineObject()->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 	// Remove from ladder
 	m_HL2Local.m_hLadder = NULL;
 }
@@ -246,7 +246,7 @@ bool C_BaseHLPlayer::TestMove( const Vector &pos, float fVertDist, float radius,
 void C_BaseHLPlayer::PerformClientSideObstacleAvoidance( float flFrameTime, CUserCmd *pCmd )
 {
 	// Don't avoid if noclipping or in movetype none
-	switch ( GetMoveType() )
+	switch (GetEngineObject()->GetMoveType() )
 	{
 	case MOVETYPE_NOCLIP:
 	case MOVETYPE_NONE:

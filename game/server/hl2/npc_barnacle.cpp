@@ -264,9 +264,9 @@ void CNPC_Barnacle::Spawn()
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	GetEngineObject()->SetSurroundingBoundsType( USE_GAME_CODE );
 #if HL2_EPISODIC // the episodic barnacle is solid, so it can be sawbladed.
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 #else
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 #endif
 	SetBloodColor( BLOOD_COLOR_GREEN );
 	m_iHealth			= sk_barnacle_health.GetFloat();
@@ -846,7 +846,7 @@ void CNPC_Barnacle::PlayLiftingScream( float flBiteZOffset )
 void CNPC_Barnacle::PullEnemyTorwardsMouth( bool bAdjustEnemyOrigin )
 {
 	CBaseEntity *pEnemy = GetEnemy();
-	if ( pEnemy->IsPlayer() && pEnemy->GetMoveType() == MOVETYPE_NOCLIP )
+	if ( pEnemy->IsPlayer() && pEnemy->GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP )
 	{
 		LostPrey( false );
 		return;
@@ -976,7 +976,7 @@ void CNPC_Barnacle::UpdatePlayerConstraint( void )
 		return;
 
 	// if player is on the ladder, disengage him
-	if ( pPlayer->GetMoveType() == MOVETYPE_LADDER )
+	if ( pPlayer->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 	{
 		pPlayer->ExitLadder();
 	}
@@ -1653,7 +1653,7 @@ void CNPC_Barnacle::BitePrey( void )
 				// Switch the tongue tip to shadow and drag it up
 				pTonguePhys->SetShadow( 1e4, 1e4, false, false );
 				pTonguePhys->UpdateShadow( m_hTongueTip->GetEngineObject()->GetAbsOrigin(), m_hTongueTip->GetEngineObject()->GetAbsAngles(), false, 0 );
-				m_hTongueTip->SetMoveType( MOVETYPE_NOCLIP );
+				m_hTongueTip->GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 				m_hTongueTip->GetEngineObject()->SetAbsVelocity( Vector(0,0,32) );
 				
 
@@ -1797,7 +1797,7 @@ void CNPC_Barnacle::BitePrey( void )
 	// Switch the tongue tip to shadow and drag it up
 	pTonguePhys->SetShadow( 1e4, 1e4, false, false );
 	pTonguePhys->UpdateShadow( m_hTongueTip->GetEngineObject()->GetAbsOrigin(), m_hTongueTip->GetEngineObject()->GetAbsAngles(), false, 0 );
-	m_hTongueTip->SetMoveType( MOVETYPE_NOCLIP );
+	m_hTongueTip->GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 	m_hTongueTip->GetEngineObject()->SetAbsVelocity( Vector(0,0,32) );
 
 	SetAltitude( (GetEngineObject()->GetAbsOrigin().z - m_hTongueTip->GetEngineObject()->GetAbsOrigin().z) );
@@ -2020,7 +2020,7 @@ void CNPC_Barnacle::LostPrey( bool bRemoveRagdoll )
 
 			// Start colliding with the world again
 			pPhysicsObject->RemoveShadowController();
-			m_hTongueTip->SetMoveType( MOVETYPE_VPHYSICS );
+			m_hTongueTip->GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 			pPhysicsObject->EnableMotion( true );
 			pPhysicsObject->EnableGravity( true );
 			pPhysicsObject->RecheckCollisionFilter();
@@ -2113,7 +2113,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 		m_hTongueTip->GetEngineObject()->SetAbsVelocity( vec3_origin );
 
 		m_hRagdoll->StopFollowingEntity();
-		m_hRagdoll->SetMoveType( MOVETYPE_VPHYSICS );
+		m_hRagdoll->GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 		m_hRagdoll->GetEngineObject()->SetAbsOrigin( m_hTongueTip->GetEngineObject()->GetAbsOrigin() );
 		m_hRagdoll->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 		m_hRagdoll->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
@@ -2583,7 +2583,7 @@ CBaseEntity *CNPC_Barnacle::TongueTouchEnt ( float *pflLength )
 		}
 
 		// Deal with physics objects
-		if ( pTest->GetMoveType() == MOVETYPE_VPHYSICS )
+		if ( pTest->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			IPhysicsObject *pObject = pTest->VPhysicsGetObject();
 			if ( pObject && pObject->GetMass() <= BARNACLE_TONGUE_MAX_LIFT_MASS )
@@ -2784,7 +2784,7 @@ CBarnacleTongueTip *CBarnacleTongueTip::CreateTongueRoot( const Vector &vecOrigi
 
 	// Disable movement on the root, we'll move this thing manually.
 	pTip->VPhysicsInitShadow( false, false );
-	pTip->SetMoveType( MOVETYPE_NONE );
+	pTip->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	return pTip;
 }
 

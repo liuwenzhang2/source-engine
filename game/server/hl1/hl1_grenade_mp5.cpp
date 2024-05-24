@@ -39,7 +39,7 @@ void CGrenadeMP5::Spawn( void )
 {
 	Precache( );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->AddFlag( FL_GRENADE );
 
 	SetModel( "models/grenade.mdl" );

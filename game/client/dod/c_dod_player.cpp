@@ -1564,7 +1564,7 @@ void C_DODPlayer::RaiseWeapon( void )
 
 bool C_DODPlayer::IsWeaponLowered( void )
 {
-	if ( GetMoveType() == MOVETYPE_LADDER )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 		return true;
 
 	CWeaponDODBase *pWeapon = GetActiveDODWeapon();

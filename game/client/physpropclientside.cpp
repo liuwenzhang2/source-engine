@@ -863,7 +863,7 @@ bool C_FuncPhysicsRespawnZone::Initialize( void )
 	GetEngineObject()->SetSolid( SOLID_BSP );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	const model_t *mod = GetModel();
 	if ( mod )

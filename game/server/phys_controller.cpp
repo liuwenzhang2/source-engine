@@ -752,7 +752,7 @@ void CPhysMotor::Activate( void )
 	if ( m_attachedObject == NULL )
 	{
 		CBaseEntity *pAttach = gEntList.FindEntityByName( NULL, m_nameAttach );
-		if ( pAttach && pAttach->GetMoveType() == MOVETYPE_VPHYSICS )
+		if ( pAttach && pAttach->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			m_attachedObject = pAttach;
 			IPhysicsObject *pPhys = m_attachedObject->VPhysicsGetObject();
@@ -927,7 +927,7 @@ void CKeepUpright::Spawn()
 	// Use our Up axis so mapmakers can orient us arbitrarily
 	GetVectors( NULL, NULL, &m_worldGoalAxis );
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	if (GetEngineObject()->GetSpawnFlags() & SF_KEEPUPRIGHT_START_INACTIVE)
 	{

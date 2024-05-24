@@ -227,7 +227,7 @@ inline bool CNPC_Barnacle::IsEnemyARagdoll()
 inline bool CNPC_Barnacle::IsEnemyAPhysicsObject()
 {
 	return !m_hRagdoll && GetEnemy() && !GetEnemy()->IsPlayer() && 
-		!GetEnemy()->MyNPCPointer() && (GetEnemy()->GetMoveType() == MOVETYPE_VPHYSICS);
+		!GetEnemy()->MyNPCPointer() && (GetEnemy()->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS);
 }
 
 inline bool CNPC_Barnacle::IsEnemyAnNPC()

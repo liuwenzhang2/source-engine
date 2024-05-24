@@ -233,7 +233,7 @@ void CNPC_Launcher::Spawn( void )
 	}
 	
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetBloodColor( DONT_BLEED );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 

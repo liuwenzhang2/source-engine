@@ -484,7 +484,7 @@ void CGrenadeHopwire::CombatThink( void )
 	GetEngineObject()->AddFlag( FSOLID_NOT_SOLID );
 	VPhysicsDestroyObject();
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	// Do special behaviors if there are any striders in the area
 	KillStriders();

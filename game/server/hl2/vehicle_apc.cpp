@@ -340,7 +340,7 @@ void CPropAPC::AddSmokeTrail( const Vector &vecPos )
 		pSmokeTrail->GetEngineObject()->SetLocalAngles( angles );
 	}
 
-	pSmokeTrail->SetMoveType( MOVETYPE_NONE );
+	pSmokeTrail->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 
@@ -890,7 +890,7 @@ void CPropAPC::CreateCorpse( )
 		pGib->GetEngineObject()->SetAbsVelocity(GetEngineObject()->GetAbsVelocity() );
 		pGib->SetModel( s_pGibModelName[i] );
 		pGib->Spawn();
-		pGib->SetMoveType( MOVETYPE_VPHYSICS );
+		pGib->GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 
 		float flMass = pGib->GetMass();
 		if ( flMass < 200 )

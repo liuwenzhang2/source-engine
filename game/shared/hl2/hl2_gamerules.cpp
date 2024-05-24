@@ -337,7 +337,7 @@ ConVar  alyx_darkness_force( "alyx_darkness_force", "0", FCVAR_CHEAT | FCVAR_REP
 
 		pHead->CopyAnimationDataFrom( pCorpse );
 
-		pHead->SetMoveType( MOVETYPE_FLYGRAVITY );
+		pHead->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 		pHead->GetEngineObject()->SetAbsVelocity( pCorpse->GetEngineObject()->GetAbsVelocity() );
 		pHead->GetEngineObject()->ClearFlags();
 		pHead->m_nReferencePlayer	= ( pCorpse )->entindex();

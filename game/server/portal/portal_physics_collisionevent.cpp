@@ -309,7 +309,7 @@ static void ModifyWeight_PreCollision( vcollisionevent_t *pEvent )
 		// One is a combine ball, if the other is a movable brush, reduce the combine ball mass
 		if ( dynamic_cast<CPropCombineBall *>(pUnshadowedEntities[j]) != NULL && pUnshadowedEntities[i] != NULL )
 		{
-			if ( pUnshadowedEntities[i]->GetMoveType() == MOVETYPE_PUSH )
+			if ( pUnshadowedEntities[i]->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH )
 			{
 				s_bChangedMass[j] = true;
 				s_fSavedMass[j] = pUnshadowedObjects[j]->GetMass();

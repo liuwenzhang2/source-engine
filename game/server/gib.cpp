@@ -105,7 +105,7 @@ void CGib::SpawnStickyGibs( CBaseEntity *pVictim, Vector vecOrigin, int cGibs )
 			pGib->AdjustVelocityBasedOnHealth( pVictim->m_iHealth, vecNewVelocity );
 			pGib->GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 			
-			pGib->SetMoveType( MOVETYPE_FLYGRAVITY );
+			pGib->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 			pGib->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 			pGib->GetEngineObject()->SetCollisionBounds( vec3_origin, vec3_origin );
 			pGib->SetTouch ( &CGib::StickyGibTouch );
@@ -344,7 +344,7 @@ void CGib::WaitTillLand ( void )
 	{
 		SetRenderColorA( 255 );
 		m_nRenderMode = kRenderTransTexture;
-		if ( GetMoveType() != MOVETYPE_VPHYSICS )
+		if (GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 		{
 			GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 		}
@@ -574,7 +574,7 @@ void CGib::StickyGibTouch ( CBaseEntity *pOther )
 	GetEngineObject()->SetLocalAngles( angles );
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetLocalAngularVelocity( vec3_angle );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 //
@@ -582,7 +582,7 @@ void CGib::StickyGibTouch ( CBaseEntity *pOther )
 //
 void CGib::Spawn( const char *szGibModel )
 {
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	GetEngineObject()->SetFriction(0.55); // deading the bounce a bit
 	
 	// sometimes an entity inherits the edict from a former piece of glass,

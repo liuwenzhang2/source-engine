@@ -268,7 +268,7 @@ void CNPC_Monk::Spawn()
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	SetBloodColor( BLOOD_COLOR_RED );
 	m_iHealth			= 100;
 	m_flFieldOfView		= m_flFieldOfView = -0.707; // 270`

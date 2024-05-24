@@ -119,7 +119,7 @@ void CWeaponBugBait::FallInit( void )
 	SetModel( GetWorldModel() );
 
 	VPhysicsDestroyObject();
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 
@@ -187,7 +187,7 @@ void CWeaponBugBait::BugbaitStickyTouch( CBaseEntity *pOther )
 		return;
 
 	// Stop moving, wait for pickup
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetThink( NULL );
 	SetPickupTouch();
 }

@@ -1595,7 +1595,7 @@ void CNPC_CScanner::SpotlightCreate(void)
 	m_hSpotlightTarget->GetEngineObject()->SetLocalOrigin( tr.endpos );
 	m_hSpotlightTarget->SetOwnerEntity( this );
 	// YWB:  Because the scanner only moves the target during think, make sure we interpolate over 0.1 sec instead of every tick!!!
-	m_hSpotlightTarget->SetSimulatedEveryTick( false );
+	m_hSpotlightTarget->GetEngineObject()->SetSimulatedEveryTick( false );
 
 	// Using the same color as the beam...
 	m_hSpotlightTarget->SetRenderColor( 255, 255, 255 );

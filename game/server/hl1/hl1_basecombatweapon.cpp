@@ -47,7 +47,7 @@ void CBaseHL1CombatWeapon::FallInit( void )
 	if( !CreateVPhysics() )
 	{
 		GetEngineObject()->SetSolid( SOLID_BBOX );
-		SetMoveType( MOVETYPE_FLYGRAVITY );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 		GetEngineObject()->SetSolid( SOLID_BBOX );
 		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 	}

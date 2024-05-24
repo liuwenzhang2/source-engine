@@ -84,7 +84,7 @@ void CPhysicsCloneArea::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_OBB );
 	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	SetSize( vLocalMins, vLocalMaxs );

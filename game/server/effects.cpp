@@ -276,7 +276,7 @@ END_DATADESC()
 void CEnvTracer::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	if (!m_flDelay)
 		m_flDelay = 1;
@@ -553,7 +553,7 @@ CBaseEntity *CGibShooter::SpawnGib( const Vector &vecShootDir, float flSpeed )
 
 				pGib->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 				IPhysicsObject *pPhysicsObject = pGib->VPhysicsInitNormal( SOLID_VPHYSICS, pGib->GetEngineObject()->GetSolidFlags(), false );
-				pGib->SetMoveType( MOVETYPE_VPHYSICS );
+				pGib->GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 
 				if ( pPhysicsObject )
 				{
@@ -1076,7 +1076,7 @@ void CBlood::Spawn( void )
 	AngleVectors( angSprayDir, &m_vecSprayDir );
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetColor( BLOOD_COLOR_RED );
 }
 
@@ -1420,7 +1420,7 @@ void CItemSoda::Spawn( void )
 {
 	Precache();
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 
 	SetModel ( "models/can.mdl" );
 	UTIL_SetSize ( this, Vector ( 0, 0, 0 ), Vector ( 0, 0, 0 ) );
@@ -1473,7 +1473,7 @@ void CItemSoda::CanTouch ( CBaseEntity *pOther )
 	}
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	SetTouch ( NULL );
 	SetThink ( &CItemSoda::SUB_Remove );
@@ -1525,7 +1525,7 @@ void CPrecipitation::Spawn( void )
 
 	Precache();
 	GetEngineObject()->SetSolid( SOLID_NONE );							// Remove model & collisions
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );		// Set size
 
 	// Default to rain.
@@ -2375,7 +2375,7 @@ END_DATADESC()
 void CEnvViewPunch::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	if (GetEngineObject()->GetSpawnFlags() & SF_PUNCH_EVERYONE )
 	{

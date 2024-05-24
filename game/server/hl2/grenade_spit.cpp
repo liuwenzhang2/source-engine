@@ -50,7 +50,7 @@ void CGrenadeSpit::Spawn( void )
 {
 	Precache( );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	GetEngineObject()->SetSolidFlags( FSOLID_NOT_STANDABLE );
 
 	SetModel( "models/spitball_large.mdl" );

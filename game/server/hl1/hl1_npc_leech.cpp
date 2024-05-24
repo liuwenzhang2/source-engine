@@ -154,7 +154,7 @@ void CNPC_Leech::Spawn( void )
 	// Don't push the minz down too much or the water check will fail because this entity is really point-sized
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->AddFlag( FL_SWIM );
 	m_iHealth	= sk_leech_health.GetInt();
 
@@ -624,7 +624,7 @@ void CNPC_Leech::UpdateMotion( void )
 	// Out of water check
 	if ( !GetWaterLevel() )
 	{
-		SetMoveType( MOVETYPE_FLYGRAVITY );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 		SetIdealActivity( ACT_HOP );
 		GetEngineObject()->SetAbsVelocity( vec3_origin );
 
@@ -634,9 +634,9 @@ void CNPC_Leech::UpdateMotion( void )
 
 		m_flPlaybackRate = random->RandomFloat( 0.8, 1.2 );
 	}
-	else if ( GetMoveType() == MOVETYPE_FLYGRAVITY )
+	else if (GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY )
 	{
-		SetMoveType( MOVETYPE_FLY );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 		GetEngineObject()->SetGroundEntity( NULL );
 
 	//  TODO
@@ -717,7 +717,7 @@ void CNPC_Leech::Event_Killed( const CTakeDamageInfo &info )
 	else
 		SetActivity( ACT_DIEFORWARD );
 	
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	m_takedamage = DAMAGE_NO;
 	
 	SetThink( &CNPC_Leech::DeadThink );

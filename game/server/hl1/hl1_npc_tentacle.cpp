@@ -285,7 +285,7 @@ void CNPC_Tentacle::Spawn( )
 	//Necessary for TestCollision to be called for hitbox ray hits
 	GetEngineObject()->AddSolidFlags( FSOLID_CUSTOMRAYTEST );
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->ClearEffects();
 	m_iHealth			= 75;
 	SetSequence( 0 );

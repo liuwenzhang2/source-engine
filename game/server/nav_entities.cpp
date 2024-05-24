@@ -74,7 +74,7 @@ void CFuncNavCost::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_BSP );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
@@ -443,7 +443,7 @@ void CFuncNavBlocker::Spawn( void )
 	if ( !m_blockedTeamNumber )
 		m_blockedTeamNumber = TEAM_ANY;
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
@@ -656,7 +656,7 @@ void CFuncNavObstruction::UpdateOnRemove( void )
 //--------------------------------------------------------------------------------------------------------
 void CFuncNavObstruction::Spawn( void )
 {
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );

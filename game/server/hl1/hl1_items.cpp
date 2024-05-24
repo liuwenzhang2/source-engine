@@ -14,7 +14,7 @@
 
 void CHL1Item::Spawn( void )
 {
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_TRIGGER );
 	GetEngineObject()->UseTriggerBounds( true, 24.0f );

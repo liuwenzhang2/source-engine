@@ -51,7 +51,7 @@ void CWaterBullet::Spawn( const Vector &vecOrigin, const Vector &vecDir )
 	SetModel( "models/weapons/w_bullet.mdl" );
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
 
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 
 	GetEngineObject()->SetGravity( 0.0 );
 

@@ -384,7 +384,7 @@ void CNPC_Advisor::Spawn()
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	// AddSolidFlags( FSOLID_NOT_SOLID );
 
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 
 	m_flFieldOfView = VIEW_FIELD_FULL;
 	SetViewOffset( Vector( 0, 0, 80 ) );		// Position of the eyes relative to NPC's origin.
@@ -652,7 +652,7 @@ void CNPC_Advisor::StartTask( const Task_t *pTask )
 					CBaseEntity *pTouch = link->entityTouched;
 					if ( CanLevitateEntity( pTouch, 10, 220 ) )
 					{
-						if ( pTouch->GetMoveType() == MOVETYPE_VPHYSICS )
+						if ( pTouch->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 						{
 							//Msg( "   %d added %s\n", m_physicsObjects.Count(), STRING( list[i]->GetModelName() ) );
 							m_physicsObjects.AddToTail( pTouch );
@@ -704,7 +704,7 @@ void CNPC_Advisor::StartTask( const Task_t *pTask )
 				for ( int i = 0; i < nCount; i++ )
 				{
 					//Msg( "%d found %s\n", m_physicsObjects.Count(), STRING( list[i]->GetModelName() ) );
-					if ( list[i]->GetMoveType() == MOVETYPE_VPHYSICS )
+					if ( list[i]->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 					{
 						//Msg( "   %d added %s\n", m_physicsObjects.Count(), STRING( list[i]->GetModelName() ) );
 						m_physicsObjects.AddToTail( list[i] );
@@ -1017,7 +1017,7 @@ void CNPC_Advisor::RunTask( const Task_t *pTask )
 			if (!pPinEnt)
 			{
 				GetEnemy()->SetGravity(1.0f);
-				GetEnemy()->SetMoveType( MOVETYPE_WALK );
+				GetEnemy()->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 				TaskComplete();
 				break;
 			}
@@ -1026,7 +1026,7 @@ void CNPC_Advisor::RunTask( const Task_t *pTask )
 			if ( gpGlobals->curtime > m_playerPinFailsafeTime )
 			{
 				GetEnemy()->SetGravity(1.0f);
-				GetEnemy()->SetMoveType( MOVETYPE_WALK );
+				GetEnemy()->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 				Warning( "Advisor did not leave PIN PLAYER mode. Aborting due to ten second failsafe!\n" );
 				TaskFail("Advisor did not leave PIN PLAYER mode. Aborting due to ten second failsafe!\n");
 				break;
@@ -1036,12 +1036,12 @@ void CNPC_Advisor::RunTask( const Task_t *pTask )
 			if ( !GetEnemy()->IsPlayer() )
 			{
 				GetEnemy()->SetGravity(1.0f);
-				GetEnemy()->SetMoveType( MOVETYPE_WALK );
+				GetEnemy()->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 				TaskFail( "Player is not the enemy?!" );
 				break;
 			}
 
-			GetEnemy()->SetMoveType( MOVETYPE_FLY );
+			GetEnemy()->GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 			GetEnemy()->SetGravity(0);
 
 			// use exponential falloff to peg the player to the pin point

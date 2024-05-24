@@ -779,7 +779,7 @@ void CPropJeep::Think(void)
 	SetSimulationTime( gpGlobals->curtime );
 	
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
-	SetAnimatedEveryTick( true );
+	GetEngineObject()->SetAnimatedEveryTick( true );
 
     if ( !m_bInitialHandbrake )	// after initial timer expires, set the handbrake
 	{

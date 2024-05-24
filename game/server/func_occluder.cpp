@@ -78,7 +78,7 @@ void CFuncOccluder::Spawn( void )
 
 	m_takedamage	= DAMAGE_NO;
 	GetEngineObject()->SetSolid( SOLID_NONE );
-    SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	
 	// set size and link into world.
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );

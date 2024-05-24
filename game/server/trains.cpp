@@ -298,7 +298,7 @@ void CFuncPlat::Setup( void )
 	
 	GetEngineObject()->SetLocalAngles( vec3_angle );
 	GetEngineObject()->SetSolid( SOLID_BSP );
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 
 	// Set size and link into world
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
@@ -385,7 +385,7 @@ void CPlatTrigger::SpawnInsideTrigger( CFuncPlat *pPlatform )
 	// Create trigger entity, "point" it at the owning platform, give it a touch method
 	GetEngineObject()->SetSolid( SOLID_BSP );
 	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetLocalOrigin( pPlatform->GetEngineObject()->GetLocalOrigin() );
 
 	// Establish the trigger field's size
@@ -1054,7 +1054,7 @@ void CFuncTrain::Spawn( void )
 		m_flBlockDamage = 2;
 	}
 	
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	GetEngineObject()->SetSolid( SOLID_BSP );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	if (GetEngineObject()->GetSpawnFlags() & SF_TRACKTRAIN_PASSABLE)
@@ -1645,7 +1645,7 @@ static CBaseEntity *FindPhysicsBlockerForHierarchy( CBaseEntity *pParentEntity )
 			{
 				IPhysicsObject *pOther = pSnapshot->GetObject(1);
 				CBaseEntity *pOtherEntity = static_cast<CBaseEntity *>(pOther->GetGameData());
-				if ( pOtherEntity && pOtherEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+				if ( pOtherEntity && pOtherEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 				{
 					Vector normal;
 					pSnapshot->GetSurfaceNormal(normal);
@@ -2683,7 +2683,7 @@ void CFuncTrackTrain::Spawn( void )
 	}
 
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 
 #ifdef HL1_DLL
 	// BUGBUG: For now, just force this for testing.  Remove if we want to tag all of the trains in the levels
@@ -2837,7 +2837,7 @@ void CFuncTrainControls::Find( void )
 void CFuncTrainControls::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 

@@ -49,7 +49,7 @@ void CShower::Spawn( void )
 		vecNewVelocity.z -= 200;
 	GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) ); // fall a bit more slowly than normal
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );
 	GetEngineObject()->SetSolid( SOLID_NONE );
@@ -183,7 +183,7 @@ void CEnvExplosion::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	/*
 	if ( m_iMagnitude > 250 )
 	{

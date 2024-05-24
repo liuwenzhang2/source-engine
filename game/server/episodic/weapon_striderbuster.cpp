@@ -954,7 +954,7 @@ void CWeaponStriderBuster::BusterFlyThink()
 	// seek?	
 	const float magradius = 38.0 * sk_striderbuster_magnet_multiplier.GetFloat(); // radius of strider hull times multiplier
 	if (magradius > 0 &&
-		GetMoveType() == MOVETYPE_VPHYSICS &&
+		GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS &&
 		VPhysicsGetObject()
 		)
 	{

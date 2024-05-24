@@ -1883,7 +1883,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	{
 		bValid = false;
 	}
-	else if ( (pEntity->GetMoveType() != MOVETYPE_VPHYSICS) && ( pEntity->m_takedamage == DAMAGE_NO ) )
+	else if ( (pEntity->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS) && ( pEntity->m_takedamage == DAMAGE_NO ) )
 	{
 		bValid = false;
 	}
@@ -1903,7 +1903,7 @@ void CWeaponPhysCannon::PrimaryAttack( void )
 	}
 
 	// See if we hit something
-	if ( pEntity->GetMoveType() != MOVETYPE_VPHYSICS )
+	if ( pEntity->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 	{
 		if ( pEntity->m_takedamage == DAMAGE_NO )
 		{

@@ -741,7 +741,7 @@ void CFuncTank::Spawn( void )
 	m_iLargeAmmoType	= GetAmmoDef()->Index("AR2");
 #endif // HL2_EPISODIC
 
-	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
@@ -793,7 +793,7 @@ void CFuncTank::Spawn( void )
 			QAngle localAngles( m_flPitchPoseCenter, m_flYawPoseCenter, 0 );
 			GetEngineObject()->SetLocalAngles( localAngles );
 			GetEngineObject()->SetSolid( SOLID_NONE );
-			SetMoveType( MOVETYPE_NOCLIP );
+			GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 
 			// If our parent is a prop_dynamic, make it use hitboxes for renderbox
 			CDynamicProp *pProp = dynamic_cast<CDynamicProp*>(GetEngineObject()->GetMoveParent()->GetOuter());
@@ -914,7 +914,7 @@ void CFuncTank::Activate( void )
 			QAngle localAngles( m_flPitchPoseCenter, m_flYawPoseCenter, 0 );
 			GetEngineObject()->SetLocalAngles( localAngles );
 			GetEngineObject()->SetSolid( SOLID_NONE );
-			SetMoveType( MOVETYPE_NOCLIP );
+			GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 
 			// If our parent is a prop_dynamic, make it use hitboxes for renderbox
 			CDynamicProp *pProp = dynamic_cast<CDynamicProp*>(GetEngineObject()->GetMoveParent()->GetOuter());

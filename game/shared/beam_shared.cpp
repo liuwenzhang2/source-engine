@@ -367,7 +367,7 @@ void CBeam::SetModel( const char *szModelName )
 
 void CBeam::Spawn( void )
 {
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_NONE );							// Remove model & collisions
 	SetRenderMode( kRenderTransTexture );
 

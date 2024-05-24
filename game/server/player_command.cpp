@@ -353,7 +353,7 @@ void CPlayerMove::RunCommand ( CBasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 	{
 		// If no clipping and cheats enabled and noclipduring game enabled, then leave
 		//  forwardmove and angles stuff in usercmd
-		if ( player->GetMoveType() == MOVETYPE_NOCLIP &&
+		if ( player->GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP &&
 			 sv_cheats->GetBool() && 
 			 sv_noclipduringpause.GetBool() )
 		{

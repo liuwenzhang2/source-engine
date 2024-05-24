@@ -201,7 +201,7 @@ void CEnvEntityMaker::SpawnEntity( Vector vecAlternateOrigin, QAngle vecAlternat
 		for ( int i = 0; i < hNewEntities.Count(); i++ )
 		{
 			CBaseEntity *pEntity = hNewEntities[i];
-			if ( pEntity->GetMoveType() == MOVETYPE_NONE )
+			if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
 				continue;
 
 			// Calculate a velocity for this entity

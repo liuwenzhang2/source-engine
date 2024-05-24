@@ -523,7 +523,7 @@ void CPortalGameMovement::CategorizePosition( void )
 	// On ladder moving up, so not on ground either
 	// NOTE: 145 is a jump.
 	if ( mv->m_vecVelocity[2] > 140 || 
-		( mv->m_vecVelocity[2] > 0.0f && player->GetMoveType() == MOVETYPE_LADDER ) )   
+		( mv->m_vecVelocity[2] > 0.0f && player->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER ) )
 	{
 		SetGroundEntity( NULL );
 	}
@@ -544,7 +544,7 @@ void CPortalGameMovement::CategorizePosition( void )
 
 				SetGroundEntity( NULL );	// too steep
 				// probably want to add a check for a +z velocity too!
-				if ( ( mv->m_vecVelocity.z > 0.0f ) && ( player->GetMoveType() != MOVETYPE_NOCLIP ) )
+				if ( ( mv->m_vecVelocity.z > 0.0f ) && ( player->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP ) )
 				{
 					player->m_surfaceFriction = 0.25f;
 				}

@@ -441,7 +441,7 @@ void CPhysBox::Spawn( void )
 		m_takedamage = DAMAGE_YES;
 	}
   
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
@@ -880,7 +880,7 @@ END_DATADESC()
 
 void CPhysExplosion::Spawn( void )
 {
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	GetEngineObject()->SetModelName( NULL_STRING );
 }
@@ -943,7 +943,7 @@ void CPhysExplosion::Explode( CBaseEntity *pActivator, CBaseEntity *pCaller )
 	while ((pEntity = FindEntity( pEntity, pActivator, pCaller )) != NULL)
 	{
 		// UNDONE: Ask the object if it should get force if it's not MOVETYPE_VPHYSICS?
-		if ( pEntity->m_takedamage != DAMAGE_NO && (pEntity->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() /*&& !pEntity->IsPlayer()*/)) )
+		if ( pEntity->m_takedamage != DAMAGE_NO && (pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() /*&& !pEntity->IsPlayer()*/)) )
 		{
 			vecOrigin = GetEngineObject()->GetAbsOrigin();
 			
@@ -1119,7 +1119,7 @@ void CPhysImpact::Activate( void )
 //-----------------------------------------------------------------------------
 void CPhysImpact::Spawn( void )
 {
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	GetEngineObject()->SetModelName( NULL_STRING );
 
@@ -1239,7 +1239,7 @@ public:
 	void Spawn()
 	{
 		SetModel( STRING(GetEngineObject()->GetModelName() ) );
-		SetMoveType( MOVETYPE_VPHYSICS );
+		GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 		GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 		m_takedamage = DAMAGE_EVENTS_ONLY;
 	}
@@ -1255,7 +1255,7 @@ public:
 	void Spawn()
 	{
 		BaseClass::Spawn();
-		SetMoveType( MOVETYPE_VPHYSICS );
+		GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 		GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 		m_takedamage = DAMAGE_EVENTS_ONLY;
 	}
@@ -1416,7 +1416,7 @@ void CPhysConvert::InputConvertTarget( inputdata_t &inputdata )
 		pEntity = entlist[i];
 
 		// don't convert something that is already physics based
-		if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+		if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			Msg( "ERROR phys_convert %s ! Already MOVETYPE_VPHYSICS\n", STRING(pEntity->GetEngineObject()->GetClassname()) );
 			continue;
@@ -1561,7 +1561,7 @@ void CPhysMagnet::Spawn( void )
 {
 	Precache();
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
@@ -1676,7 +1676,7 @@ void CPhysMagnet::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	}
 
 	IPhysicsObject *pPhysics = pOther->VPhysicsGetObject();
-	if ( pPhysics && pOther->GetMoveType() == MOVETYPE_VPHYSICS && pPhysics->IsMoveable() )
+	if ( pPhysics && pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pPhysics->IsMoveable() )
 	{
 		// Make sure we haven't already got this sucker on the magnet
 		int iCount = m_MagnettedEntities.Count();
@@ -1770,7 +1770,7 @@ void CPhysMagnet::DoMagnetSuck( CBaseEntity *pOther )
 			continue;
 
 		IPhysicsObject *pPhys = pEntity->VPhysicsGetObject();
-		if ( pPhys && pEntity->GetMoveType() == MOVETYPE_VPHYSICS && pPhys->GetMass() < 5000 )
+		if ( pPhys && pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pPhys->GetMass() < 5000 )
 		{
 			// Do we have line of sight to it?
 			trace_t tr;
@@ -2006,7 +2006,7 @@ void CPointPush::PushEntity( CBaseEntity *pTarget )
 	
 	float flFalloff = (GetEngineObject()->HasSpawnFlags( SF_PUSH_NO_FALLOFF ) ) ? 1.0f : RemapValClamped( dist, m_flRadius, m_flRadius*0.25f, 0.0f, 1.0f );
 	
-	switch( pTarget->GetMoveType() )
+	switch( pTarget->GetEngineObject()->GetMoveType() )
 	{
 	case MOVETYPE_NONE:
 	case MOVETYPE_PUSH:
@@ -2074,9 +2074,9 @@ void CPointPush::PushThink( void )
 			continue;
 
 		// Must be moveable
-		if ( pEnts[i]->GetMoveType() != MOVETYPE_VPHYSICS && 
-			 pEnts[i]->GetMoveType() != MOVETYPE_WALK && 
-			 pEnts[i]->GetMoveType() != MOVETYPE_STEP )
+		if ( pEnts[i]->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS &&
+			 pEnts[i]->GetEngineObject()->GetMoveType() != MOVETYPE_WALK &&
+			 pEnts[i]->GetEngineObject()->GetMoveType() != MOVETYPE_STEP )
 			continue; 
 
 		// If we don't want to push players, don't
@@ -2084,7 +2084,7 @@ void CPointPush::PushThink( void )
 			continue;
 
 		// If we don't want to push physics, don't
-		if ( pEnts[i]->GetMoveType() == MOVETYPE_VPHYSICS && GetEngineObject()->HasSpawnFlags( SF_PUSH_PHYSICS ) == false )
+		if ( pEnts[i]->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && GetEngineObject()->HasSpawnFlags( SF_PUSH_PHYSICS ) == false )
 			continue;
 
 		// Test for LOS if asked to

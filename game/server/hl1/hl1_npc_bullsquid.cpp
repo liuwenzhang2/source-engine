@@ -140,7 +140,7 @@ void CSquidSpit:: Spawn( void )
 {
 	Precache();
 
-	SetMoveType ( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType ( MOVETYPE_FLY );
 	SetClassname( "squidspit" );
 	
 	GetEngineObject()->SetSolid( SOLID_BBOX );
@@ -276,7 +276,7 @@ void CNPC_Bullsquid::Spawn()
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	
 	SetRenderColor( 255, 255, 255, 255 );

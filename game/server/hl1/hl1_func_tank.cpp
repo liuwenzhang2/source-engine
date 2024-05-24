@@ -563,7 +563,7 @@ void CFuncTank::Spawn( void )
 {
 	Precache();
 
-	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 

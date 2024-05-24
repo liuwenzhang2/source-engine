@@ -462,7 +462,7 @@ void CNPC_Dog::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	SetBloodColor( BLOOD_COLOR_MECH );
 
 	m_iHealth			= 999;
@@ -675,7 +675,7 @@ void CNPC_Dog::CleanCatchAndThrow( bool bClearTimers )
 				Warning( "CleanCatchAndThrow:   m_hPhysicsEnt->VPhysicsGetObject == NULL!\n" );
 			}
 
-			m_hPhysicsEnt->SetMoveType( (MoveType_t)m_iContainerMoveType );
+			m_hPhysicsEnt->GetEngineObject()->SetMoveType( (MoveType_t)m_iContainerMoveType );
 
 			if ( pPhysObj )
 			{
@@ -821,7 +821,7 @@ void CNPC_Dog::ThrowObject( const char *pAttachmentName )
 			if ( pPhysObj->GetShadowController() )
 			{
 				m_hPhysicsEnt->GetEngineObject()->SetParent( NULL );
-				m_hPhysicsEnt->SetMoveType( (MoveType_t)m_iContainerMoveType );
+				m_hPhysicsEnt->GetEngineObject()->SetMoveType( (MoveType_t)m_iContainerMoveType );
 				m_hPhysicsEnt->SetOwnerEntity( this );
 
 				pPhysObj->RemoveShadowController();
@@ -942,8 +942,8 @@ void CNPC_Dog::PickupOrCatchObject( const char *pAttachmentName )
 			pPhysicsObject->UpdateShadow(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles(), false, 0 );
 		}
 		
-		m_iContainerMoveType = m_hPhysicsEnt->GetMoveType();
-		m_hPhysicsEnt->SetMoveType( MOVETYPE_NONE );
+		m_iContainerMoveType = m_hPhysicsEnt->GetEngineObject()->GetMoveType();
+		m_hPhysicsEnt->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		
 		m_hPhysicsEnt->GetEngineObject()->SetParent( this->GetEngineObject(), iAttachment);
 	

@@ -114,7 +114,7 @@ END_NETWORK_TABLE()
 		BaseClass::Spawn();
 
 		GetEngineObject()->SetSolidFlags( FSOLID_NOT_STANDABLE );
-		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 		GetEngineObject()->SetSolid( SOLID_BBOX );	// So it will collide with physics props!
 
 		// smaller, cube bounding box so we rest on the ground

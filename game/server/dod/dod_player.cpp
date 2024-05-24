@@ -1573,7 +1573,7 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 		Weapon_Drop( pWeapon, &vTossPos, NULL );
 			
 		pWeapon->GetEngineObject()->SetSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_TRIGGER | FSOLID_USE_TRIGGER_BOUNDS );
-		pWeapon->SetMoveCollide( MOVECOLLIDE_FLY_BOUNCE );
+		pWeapon->GetEngineObject()->SetMoveCollide( MOVECOLLIDE_FLY_BOUNCE );
 
 		CWeaponDODBase *pDODWeapon = dynamic_cast< CWeaponDODBase* >( pWeapon );
 
@@ -2543,7 +2543,7 @@ void CDODPlayer::PhysObjectWake()
 
 void CDODPlayer::State_Enter_WELCOME()
 {
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	PhysObjectSleep();
@@ -2578,7 +2578,7 @@ void CDODPlayer::State_Enter_WELCOME()
 void CDODPlayer::State_PreThink_WELCOME()
 {
 	// Verify some state.
-	Assert( GetMoveType() == MOVETYPE_NONE );
+	Assert(GetEngineObject()->GetMoveType() == MOVETYPE_NONE );
 	Assert(GetEngineObject()->IsSolidFlagSet( FSOLID_NOT_SOLID ) );
 	Assert(GetEngineObject()->GetAbsVelocity().Length() == 0 );
 
@@ -2693,8 +2693,8 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 
 					IncrementInterpolationFrame();
 
-					if ( GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
-						SetMoveType( MOVETYPE_NONE );
+					if (GetEngineObject()->GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
+						GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 					State_Transition( STATE_OBSERVER_MODE );
 				}
@@ -2711,8 +2711,8 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 
 				IncrementInterpolationFrame();
 
-				if ( GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
-					SetMoveType( MOVETYPE_NONE );
+				if (GetEngineObject()->GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
+					GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 				State_Transition( STATE_OBSERVER_MODE );
 			}
@@ -2728,8 +2728,8 @@ void CDODPlayer::State_PreThink_DEATH_ANIM()
 
 			IncrementInterpolationFrame();
 
-			if ( GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
-				SetMoveType( MOVETYPE_NONE );
+			if (GetEngineObject()->GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
+				GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 			// Disabled death cam!
 			//StartReplayMode( 8, 8, entindex() );
@@ -2833,7 +2833,7 @@ void CDODPlayer::State_Enter_PICKINGCLASS()
 
 void CDODPlayer::State_Enter_ACTIVE()
 {
-	SetMoveType( MOVETYPE_WALK );
+	GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
     m_Local.m_iHideHUD = 0;
 	PhysObjectWake();
@@ -3096,7 +3096,7 @@ void CDODPlayer::ChangeTeam( int iTeamNum )
 		}
 
 		if( iOldTeam == TEAM_SPECTATOR )
-			SetMoveType( MOVETYPE_NONE );
+			GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 		// Put up the class selection menu.
 		State_Transition( STATE_PICKINGCLASS );
@@ -3348,7 +3348,7 @@ int CDODPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	if ( !pInflictor )
 		return 0;
 
-	if ( GetMoveType() == MOVETYPE_NOCLIP )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP )
 		return 0;
 
 	// if the player's team does not match the inflictor's team
@@ -3784,21 +3784,21 @@ bool CDODPlayer::SetObserverMode(int mode)
 	case OBS_MODE_DEATHCAM :
 		SetFOV( this, 0 );	// Reset FOV
 		SetViewOffset( vec3_origin );
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		break;
 
 	case OBS_MODE_CHASE :
 	case OBS_MODE_IN_EYE :	
 		// udpate FOV and viewmodels
 		SetObserverTarget( m_hObserverTarget );	
-		SetMoveType( MOVETYPE_OBSERVER );
+		GetEngineObject()->SetMoveType( MOVETYPE_OBSERVER );
 		break;
 
 	case OBS_MODE_ROAMING :
 		SetFOV( this, 0 );	// Reset FOV
 		SetObserverTarget( m_hObserverTarget );
 		SetViewOffset( vec3_origin );
-		SetMoveType( MOVETYPE_OBSERVER );
+		GetEngineObject()->SetMoveType( MOVETYPE_OBSERVER );
 		break;
 
 	}

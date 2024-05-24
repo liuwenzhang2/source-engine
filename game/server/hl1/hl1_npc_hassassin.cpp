@@ -164,7 +164,7 @@ void CNPC_HAssassin::Spawn()
 	SetNavType ( NAV_GROUND );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
 	GetEngineObject()->ClearEffects();
 	m_iHealth			= sk_hassassin_health.GetFloat();
@@ -432,13 +432,13 @@ int CNPC_HAssassin::SelectSchedule ( void )
 			}
 
 			// flying?
-			if ( GetMoveType() == MOVETYPE_FLYGRAVITY )
+			if (GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY )
 			{
 				if (GetEngineObject()->GetFlags() & FL_ONGROUND )
 				{
 					//Msg( "landed\n" );
 					// just landed
-					SetMoveType( MOVETYPE_STEP );
+					GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 					return SCHED_ASSASSIN_JUMP_LAND;
 				}
 				else
@@ -551,7 +551,7 @@ void CNPC_HAssassin::HandleAnimEvent( animevent_t *pEvent )
 		break;
 	case ASSASSIN_AE_JUMP:
 		{
-			SetMoveType( MOVETYPE_FLYGRAVITY );
+			GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 			GetEngineObject()->SetGroundEntity( NULL );
 			GetEngineObject()->SetAbsVelocity( m_vecJumpVelocity );
 			m_flNextJump = gpGlobals->curtime + 3.0;

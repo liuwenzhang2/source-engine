@@ -334,7 +334,7 @@ void CBaseTrigger::InitTrigger( )
 		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 	}
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 	if ( showtriggers.GetInt() == 0 )
 	{
@@ -361,7 +361,7 @@ bool CBaseTrigger::PassesTriggerFilters(CBaseEntity *pOther)
 		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_CLIENTS) && (pOther->GetEngineObject()->GetFlags() & FL_CLIENT)) ||
 		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_NPCS) && (pOther->GetEngineObject()->GetFlags() & FL_NPC)) ||
 		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PUSHABLES) && FClassnameIs(pOther, "func_pushable")) ||
-		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PHYSICS) && pOther->GetMoveType() == MOVETYPE_VPHYSICS)
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PHYSICS) && pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS)
 #if defined( HL2_EPISODIC ) || defined( TF_DLL )		
 		||
 		(GetEngineObject()->HasSpawnFlags(SF_TRIG_TOUCH_DEBRIS) &&
@@ -1246,7 +1246,7 @@ void CTriggerVolume::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_BSP );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 	if ( showtriggers.GetInt() == 0 )
 	{
@@ -1590,7 +1590,7 @@ void CChangeLevel::TouchChangeLevel( CBaseEntity *pOther )
 		return;
 	}
 
-	if ( !pPlayer->IsInAVehicle() && pPlayer->GetMoveType() == MOVETYPE_NOCLIP )
+	if ( !pPlayer->IsInAVehicle() && pPlayer->GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP )
 	{
 		DevMsg("In level transition: %s %s\n", m_szMapName, m_szLandmarkName);//st_szNextMap, st_szNextSpot
 		return;
@@ -1684,7 +1684,7 @@ void CTriggerPush::Activate()
 //-----------------------------------------------------------------------------
 void CTriggerPush::Touch( CBaseEntity *pOther )
 {
-	if ( !pOther->GetEngineObject()->IsSolid() || (pOther->GetMoveType() == MOVETYPE_PUSH || pOther->GetMoveType() == MOVETYPE_NONE ) )
+	if ( !pOther->GetEngineObject()->IsSolid() || (pOther->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH || pOther->GetEngineObject()->GetMoveType() == MOVETYPE_NONE ) )
 		return;
 
 	if (!PassesTriggerFilters(pOther))
@@ -1711,7 +1711,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 		return;
 	}
 
-	switch( pOther->GetMoveType() )
+	switch( pOther->GetEngineObject()->GetMoveType() )
 	{
 	case MOVETYPE_NONE:
 	case MOVETYPE_PUSH:
@@ -1735,7 +1735,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 #if defined( HL2_DLL )
 			// HACK HACK  HL2 players on ladders will only be disengaged if the sf is set, otherwise no push occurs.
 			if ( pOther->IsPlayer() && 
-				 pOther->GetMoveType() == MOVETYPE_LADDER )
+				 pOther->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 			{
 				if ( !GetEngineObject()->HasSpawnFlags(SF_TRIG_PUSH_AFFECT_PLAYER_ON_LADDER) )
 				{
@@ -2360,7 +2360,7 @@ void CTriggerCamera::Spawn( void )
 {
 	BaseClass::Spawn();
 
-	SetMoveType( MOVETYPE_NOCLIP );
+	GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 	GetEngineObject()->SetSolid( SOLID_NONE );								// Remove model & collisions
 	SetRenderColorA( 0 );								// The engine won't draw this model if this is set to 0 and blending is on
 	m_nRenderMode = kRenderTransTexture;
@@ -3740,7 +3740,7 @@ void CBaseVPhysicsTrigger::Spawn()
 	// collisions AND vphysics collisions.  You don't want any game collisions
 	// so just use FSOLID_NOT_SOLID
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 	if ( showtriggers.GetInt() == 0 )
 	{
@@ -3860,7 +3860,7 @@ void CBaseVPhysicsTrigger::EndTouch( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 bool CBaseVPhysicsTrigger::PassesTriggerFilters( CBaseEntity *pOther )
 {
-	if ( pOther->GetMoveType() != MOVETYPE_VPHYSICS && !pOther->IsPlayer() )
+	if ( pOther->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS && !pOther->IsPlayer() )
 		return false;
 
 	// First test spawn flag filters
@@ -3868,7 +3868,7 @@ bool CBaseVPhysicsTrigger::PassesTriggerFilters( CBaseEntity *pOther )
 		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_CLIENTS) && (pOther->GetEngineObject()->GetFlags() & FL_CLIENT)) ||
 		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_NPCS) && (pOther->GetEngineObject()->GetFlags() & FL_NPC)) ||
 		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PUSHABLES) && FClassnameIs(pOther, "func_pushable")) ||
-		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PHYSICS) && pOther->GetMoveType() == MOVETYPE_VPHYSICS))
+		(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ALLOW_PHYSICS) && pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS))
 	{
 		bool bOtherIsPlayer = pOther->IsPlayer();
 		if(GetEngineObject()->HasSpawnFlags(SF_TRIGGER_ONLY_PLAYER_ALLY_NPCS) && !bOtherIsPlayer )

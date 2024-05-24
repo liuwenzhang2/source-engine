@@ -102,7 +102,7 @@ END_SEND_TABLE()
 void CEnvTonemapController::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 //-----------------------------------------------------------------------------

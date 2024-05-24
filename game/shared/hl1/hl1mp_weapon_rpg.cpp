@@ -152,7 +152,7 @@ void CRpgRocket::Spawn( void )
 
 	SetTouch( &CRpgRocket::RocketTouch );
 
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	SetThink( &CRpgRocket::IgniteThink );
 	
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.4f );
@@ -195,7 +195,7 @@ void CRpgRocket::RocketTouch( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 void CRpgRocket::IgniteThink( void )
 {
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 
 	GetEngineObject()->AddEffects( EF_DIMLIGHT );
 
@@ -447,7 +447,7 @@ CLaserDot *CLaserDot::Create( const Vector &origin, CBaseEntity *pOwner, bool bV
 		return NULL;
 
 	pLaserDot->m_bVisibleLaserDot = bVisibleDot;
-	pLaserDot->SetMoveType( MOVETYPE_NONE );
+	pLaserDot->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	pLaserDot->GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	pLaserDot->GetEngineObject()->AddEffects( EF_NOSHADOW );
 	UTIL_SetSize( pLaserDot, -Vector(6,6,6), Vector(6,6,6) );

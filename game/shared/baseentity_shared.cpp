@@ -712,47 +712,6 @@ char const *CBaseEntity::DamageDecal( int bitsDamageType, int gameMaterial )
 	return "Impact.Concrete";
 }
 
-
-
-bool CBaseEntity::WillSimulateGamePhysics()
-{
-	// players always simulate game physics
-	if ( !IsPlayer() )
-	{
-		MoveType_t movetype = GetMoveType();
-		
-		if ( movetype == MOVETYPE_NONE || movetype == MOVETYPE_VPHYSICS )
-			return false;
-
-#if !defined( CLIENT_DLL )
-		// MOVETYPE_PUSH not supported on the client
-		if ( movetype == MOVETYPE_PUSH && GetMoveDoneTime() <= 0 )
-			return false;
-#endif
-	}
-
-	return true;
-}
-
-void CBaseEntity::CheckHasGamePhysicsSimulation()
-{
-	bool isSimulating = WillSimulateGamePhysics();
-	if ( isSimulating != GetEngineObject()->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION) )
-		return;
-	if ( isSimulating )
-	{
-		GetEngineObject()->RemoveEFlags( EFL_NO_GAME_PHYSICS_SIMULATION );
-	}
-	else
-	{
-		GetEngineObject()->AddEFlags( EFL_NO_GAME_PHYSICS_SIMULATION );
-	}
-#if !defined( CLIENT_DLL )
-	SimThink_EntityChanged( this );
-#endif
-}
-
-
 int CheckEntityVelocity( Vector &v )
 {
 	float r = k_flMaxEntitySpeed;
@@ -781,7 +740,7 @@ int CheckEntityVelocity( Vector &v )
 //-----------------------------------------------------------------------------
 void CBaseEntity::VPhysicsUpdate( IPhysicsObject *pPhysics )
 {
-	switch( GetMoveType() )
+	switch(GetEngineObject()->GetMoveType() )
 	{
 	case MOVETYPE_VPHYSICS:
 		{
@@ -966,7 +925,7 @@ IPhysicsObject *CBaseEntity::VPhysicsInitNormal( SolidType_t solidType, int nSol
 	if ( pPhysicsObject )
 	{
 		VPhysicsSetObject( pPhysicsObject );
-		SetMoveType( MOVETYPE_VPHYSICS );
+		GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 
 		if ( !createAsleep )
 		{
@@ -1872,7 +1831,7 @@ void CBaseEntity::FollowEntity( CBaseEntity *pBaseEntity, bool bBoneMerge )
 #ifdef CLIENT_DLL
 		GetEngineObject()->SetParent(pBaseEntity->GetEngineObject());
 #endif // CLIENT_DLL
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		
 		if ( bBoneMerge )
 			GetEngineObject()->AddEffects( EF_BONEMERGE );
@@ -1919,7 +1878,7 @@ void CBaseEntity::ApplyLocalVelocityImpulse( const Vector &inVecImpulse )
 				break;
 		}
 
-		if ( GetMoveType() == MOVETYPE_VPHYSICS )
+		if (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			Vector worldVel;
 			VPhysicsGetObject()->LocalToWorld( &worldVel, vecImpulse );
@@ -1960,7 +1919,7 @@ void CBaseEntity::ApplyAbsVelocityImpulse( const Vector &inVecImpulse )
 				break;
 		}
 
-		if ( GetMoveType() == MOVETYPE_VPHYSICS )
+		if (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			VPhysicsGetObject()->AddVelocity( &vecImpulse, NULL );
 		}
@@ -1986,7 +1945,7 @@ void CBaseEntity::ApplyLocalAngularVelocityImpulse( const AngularImpulse &angImp
 			return;
 		}
 
-		if ( GetMoveType() == MOVETYPE_VPHYSICS )
+		if (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			VPhysicsGetObject()->AddVelocity( NULL, &angImpulse );
 		}

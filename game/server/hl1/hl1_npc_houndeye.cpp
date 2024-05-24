@@ -115,7 +115,7 @@ void CNPC_Houndeye::Spawn()
 	
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_YELLOW;
 	GetEngineObject()->ClearEffects();
 	m_iHealth			= sk_houndeye_health.GetFloat();
@@ -469,7 +469,7 @@ void CNPC_Houndeye::SonicAttack ( void )
 
 					if ( (pEntity->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin()).Length2D() <= HOUNDEYE_MAX_ATTACK_RADIUS )
 					{
-						if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() && !pEntity->IsPlayer()) ) 
+						if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() && !pEntity->IsPlayer()) )
 						{
 							IPhysicsObject *pPhysObject = pEntity->VPhysicsGetObject();
 

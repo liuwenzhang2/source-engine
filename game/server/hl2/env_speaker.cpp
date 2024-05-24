@@ -72,7 +72,7 @@ void CSpeaker::Spawn( void )
 //	}
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
-    SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	
 	SetThink(&CSpeaker::SpeakerThink);
 	GetEngineObject()->SetNextThink( TICK_NEVER_THINK );

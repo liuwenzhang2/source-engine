@@ -35,7 +35,7 @@ END_DATADESC()
 //------------------------------------------------------------------------------
 void CAI_BasePhysicsFlyingBot::GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity)
 {
-	Assert( GetMoveType() == MOVETYPE_VPHYSICS );
+	Assert(GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS );
 	if ( VPhysicsGetObject() )
 	{
 		VPhysicsGetObject()->GetVelocity( vVelocity, vAngVelocity );

@@ -116,7 +116,7 @@ void CGrenadeHomer::Spawn( void )
 	Precache( );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 
 	UTIL_SetSize(this, Vector(0, 0, 0), Vector(0, 0, 0));
 

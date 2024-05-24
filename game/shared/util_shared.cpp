@@ -261,7 +261,7 @@ bool StandardFilterRules( IHandleEntity *pHandleEntity, int fContentsMask )
 	// be flagged as monsters
 	// FIXME: the FL_WORLDBRUSH looked promising, but it needs to be set on 
 	// everything that's actually a worldbrush and it currently isn't
-	if ( !(fContentsMask & CONTENTS_MOVEABLE) && (pCollide->GetMoveType() == MOVETYPE_PUSH))// !(touch->flags & FL_WORLDBRUSH) )
+	if ( !(fContentsMask & CONTENTS_MOVEABLE) && (pCollide->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH))// !(touch->flags & FL_WORLDBRUSH) )
 		return false;
 
 	return true;

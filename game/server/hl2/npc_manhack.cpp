@@ -600,7 +600,7 @@ void CNPC_Manhack::VPhysicsShadowCollision( int index, gamevcollisionevent_t *pE
 	int otherIndex = !index;
 	CBaseEntity *pOther = pEvent->pEntities[otherIndex];
 
-	if ( pOther->GetMoveType() == MOVETYPE_VPHYSICS )
+	if ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		HitPhysicsObject( pOther );
 	}
@@ -1591,7 +1591,7 @@ void CNPC_Manhack::Bump( CBaseEntity *pHitEntity, float flInterval, trace_t &tr 
 	if ( m_flBumpSuppressTime > gpGlobals->curtime )
 		return;
 
-	if ( pHitEntity->GetMoveType() == MOVETYPE_VPHYSICS && pHitEntity->Classify()!=CLASS_MANHACK )
+	if ( pHitEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS && pHitEntity->Classify()!=CLASS_MANHACK )
 	{
 		HitPhysicsObject( pHitEntity );
 	}
@@ -2419,11 +2419,11 @@ void CNPC_Manhack::Spawn(void)
 	if (GetEngineObject()->HasSpawnFlags( SF_MANHACK_CARRIED ) )
 	{
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	}
 	else
 	{
-		SetMoveType( MOVETYPE_VPHYSICS );
+		GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 	}
 
 	m_iHealth			= sk_manhack_health.GetFloat();
@@ -2612,7 +2612,7 @@ void CNPC_Manhack::StartEngine( bool fStartSound )
 	}
 
 	// Under powered flight now.
-	// SetMoveType( MOVETYPE_STEP );
+	// GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	// SetGravity( MANHACK_GRAVITY );
 	GetEngineObject()->AddFlag( FL_FLY );
 }

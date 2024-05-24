@@ -301,7 +301,7 @@ bool IsExplosionTraceBlocked( trace_t *ptr )
 	if( ptr->m_pEnt == NULL )
 		return false;
 
-	if(((CBaseEntity*)ptr->m_pEnt)->GetMoveType() == MOVETYPE_PUSH )
+	if(((CBaseEntity*)ptr->m_pEnt)->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH )
 	{
 		// All doors are push, but not all things that push are doors. This 
 		// narrows the search before we start to do classname compares.

@@ -207,7 +207,7 @@ void CNPC_Ichthyosaur::Spawn( void )
 	
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetEngineObject()->AddFlag( FL_FLY | FL_STEPMOVEMENT );
 
 	m_flGroundSpeed			= ICH_SWIM_SPEED_RUN;

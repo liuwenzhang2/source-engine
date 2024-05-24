@@ -294,7 +294,7 @@ void CBaseCombatCharacter::CorpseFade( void )
 {
 	StopAnimation();
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	SetLocalAngularVelocity( vec3_angle );
 	m_flAnimTime = gpGlobals->curtime;
 	IncrementInterpolationFrame();
@@ -1426,7 +1426,7 @@ Vector CBaseCombatCharacter::CalcDamageForceVector( const CTakeDamageInfo &info 
 			{
 				// UNDONE: Collision forces are baked in to CTakeDamageInfo now
 				// UNDONE: Is this MOVETYPE_VPHYSICS code still necessary?
-				if ( pForce->GetMoveType() == MOVETYPE_VPHYSICS )
+				if ( pForce->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 				{
 					// killed by a physics object
 					IPhysicsObject *pPhysics = VPhysicsGetObject();
@@ -3116,7 +3116,7 @@ void CBaseCombatCharacter::VPhysicsShadowCollision( int index, gamevcollisioneve
 	if ( pOther->m_lifeState == LIFE_DYING )
 		return;
 
-	if ( pOther->GetMoveType() != MOVETYPE_VPHYSICS )
+	if ( pOther->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 		return;
 	
 	if ( !pOtherPhysics->IsMoveable() )

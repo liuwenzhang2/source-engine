@@ -751,7 +751,7 @@ void CItem_AmmoCrate::Spawn( void )
 	BaseClass::Spawn();
 
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	CreateVPhysics();
 

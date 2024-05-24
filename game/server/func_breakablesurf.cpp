@@ -77,7 +77,7 @@ void CWindowPane::Spawn( void )
     Precache( );    
   
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	m_takedamage = DAMAGE_YES;
  	
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_BREAKABLE_GLASS );

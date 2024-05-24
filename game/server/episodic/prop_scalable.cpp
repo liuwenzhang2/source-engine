@@ -104,7 +104,7 @@ void CPropScalable::Spawn( void )
 		SetModel( szModel );
 	}
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	BaseClass::Spawn();
 

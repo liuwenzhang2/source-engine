@@ -294,7 +294,7 @@ void CTripmineGrenade::Spawn( void )
 {
 	Precache( );
 	// motor
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	SetModel( TRIPMINE_MODEL );

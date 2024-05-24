@@ -167,7 +167,7 @@ void CBlobElement::Spawn()
 	Precache();
 	
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_NOT_SOLID );
 
 	SetModel( GetBlobModelName() );
@@ -533,7 +533,7 @@ void CNPC_Blob::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	SetBloodColor( BLOOD_COLOR_RED );
 	m_iHealth			= INT_MAX;
 	m_flFieldOfView		= -1.0f;

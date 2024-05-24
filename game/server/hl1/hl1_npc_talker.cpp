@@ -375,7 +375,7 @@ bool CHL1NPCTalker::HandleInteraction(int interactionType, void *data, CBaseComb
 
 		m_bInBarnacleMouth	= false;
 		GetEngineObject()->SetAbsVelocity( vec3_origin );
-		SetMoveType( MOVETYPE_STEP );
+		GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 		return true;
 	}
 	else if ( interactionType == g_interactionBarnacleVictimGrab )

@@ -328,7 +328,7 @@ void CNPC_Alyx::Spawn()
 	// If Alyx has a parent, she's currently inside a pod. Prevent her from moving.
 	if (GetEngineObject()->GetMoveParent() )
 	{
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		CapabilitiesClear();
 
 		CapabilitiesAdd( bits_CAP_ANIMATEDFACE | bits_CAP_TURN_HEAD );
@@ -468,7 +468,7 @@ void CNPC_Alyx::SetupAlyxWithoutParent( void )
 {
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 	CapabilitiesAdd( bits_CAP_MOVE_GROUND | bits_CAP_DOORS_GROUP | bits_CAP_TURN_HEAD | bits_CAP_DUCK | bits_CAP_SQUAD );
 	CapabilitiesAdd( bits_CAP_USE_WEAPONS );
@@ -610,7 +610,7 @@ void CNPC_Alyx::PrescheduleThink( void )
 	BaseClass::PrescheduleThink();
 
 	// Figure out if Alyx has just been removed from her parent
-	if ( GetMoveType() == MOVETYPE_NONE && !GetEngineObject()->GetMoveParent() )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NONE && !GetEngineObject()->GetMoveParent() )
 	{
 		// Don't confuse the passenger behavior with just removing Alyx's parent!
 		if ( m_PassengerBehavior.IsEnabled() == false )
@@ -986,7 +986,7 @@ void CNPC_Alyx::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &
 
 	// Alyx builds a proxy for the dead enemy so she has something to shoot at for a short time after
 	// the enemy ragdolls.
-	if( !(pVictim->GetEngineObject()->GetFlags() & FL_ONGROUND) || pVictim->GetMoveType() != MOVETYPE_STEP )
+	if( !(pVictim->GetEngineObject()->GetFlags() & FL_ONGROUND) || pVictim->GetEngineObject()->GetMoveType() != MOVETYPE_STEP )
 	{
 		// Don't fire up in the air, since the dead enemy will have fallen.
 		return;

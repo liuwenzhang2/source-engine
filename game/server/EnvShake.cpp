@@ -146,7 +146,7 @@ float CEnvShake::Radius(bool bPlayers)
 void CEnvShake::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	
 	if (GetEngineObject()->GetSpawnFlags() & SF_SHAKE_EVERYONE )
 	{
@@ -228,7 +228,7 @@ void CEnvShake::ApplyShake( ShakeCommand_t command )
 					// Only shake physics entities that players can see. This is one frame out of date
 					// so it's possible that we could miss objects if a player changed PVS this frame.
 					//
-					if ( ( list[i]->GetMoveType() == MOVETYPE_VPHYSICS ) )
+					if ( ( list[i]->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) )
 					{
 						IPhysicsObject *pPhys = list[i]->VPhysicsGetObject();
 						if ( pPhys && pPhys->IsMoveable() )

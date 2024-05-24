@@ -153,7 +153,7 @@ void CGenericNPC::Spawn()
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
 	m_iHealth			= 8;
 	m_flFieldOfView		= 0.5;// indicates the width of this NPC's forward view cone ( as a dotproduct result )
@@ -259,7 +259,7 @@ void CNPC_Furniture::Spawn( )
 	
 	SetModel( STRING(GetEngineObject()->GetModelName()) );
 
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	// Our collision, if needed, will be done through bone followers

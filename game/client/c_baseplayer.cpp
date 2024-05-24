@@ -810,11 +810,11 @@ void C_BasePlayer::PostDataUpdate( DataUpdateType_t updateType )
 
 	if ( IsLocalPlayer() )
 	{
-		SetSimulatedEveryTick( true );
+		GetEngineObject()->SetSimulatedEveryTick( true );
 	}
 	else
 	{
-		SetSimulatedEveryTick( false );
+		GetEngineObject()->SetSimulatedEveryTick( false );
 
 		// estimate velocity for non local players
 		float flTimeDelta = m_flSimulationTime - m_flOldSimulationTime;
@@ -2535,7 +2535,7 @@ void C_BasePlayer::LeaveVehicle( void )
 	m_Local.m_iHideHUD &= ~HIDEHUD_WEAPONSELECTION;
 	GetEngineObject()->RemoveEffects( EF_NODRAW );
 
-	SetMoveType( MOVETYPE_WALK );
+	GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	qAngles[ROLL] = 0;

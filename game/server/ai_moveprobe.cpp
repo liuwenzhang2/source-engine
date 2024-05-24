@@ -554,7 +554,7 @@ bool CAI_MoveProbe::TestGroundMove( const Vector &vecActualStart, const Vector &
 			if ( !bTryNavIgnore || !checkStepResult.pBlocker || !checkStepResult.fStartSolid )
 				break;
 
-			if ( checkStepResult.pBlocker->GetMoveType() != MOVETYPE_VPHYSICS && !checkStepResult.pBlocker->IsNPC() )
+			if ( checkStepResult.pBlocker->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS && !checkStepResult.pBlocker->IsNPC() )
 				break;
 
 			// Only permit pass through of objects initially embedded in
@@ -565,7 +565,7 @@ bool CAI_MoveProbe::TestGroundMove( const Vector &vecActualStart, const Vector &
 			}
 
 			// Only allow move away from physics objects
-			if ( checkStepResult.pBlocker->GetMoveType() == MOVETYPE_VPHYSICS )
+			if ( checkStepResult.pBlocker->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 			{
 				Vector vMoveDir = vecDesiredEnd - vecActualStart;
 				VectorNormalize( vMoveDir );
@@ -1326,7 +1326,7 @@ bool CAI_MoveProbe::FloorPoint( const Vector &vecStart, unsigned int collisionMa
 	if (trace.startsolid)
 	{
 		if ( trace.m_pEnt && 
-			 (((CBaseEntity*)trace.m_pEnt)->GetMoveType() == MOVETYPE_VPHYSICS || ((CBaseEntity*)trace.m_pEnt)->IsNPC() ) &&
+			 (((CBaseEntity*)trace.m_pEnt)->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || ((CBaseEntity*)trace.m_pEnt)->IsNPC() ) &&
 			 ( vecStart - GetLocalOrigin() ).Length() < 0.1 )
 		{
 			fStartedInObject = true;

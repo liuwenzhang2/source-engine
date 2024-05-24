@@ -60,7 +60,7 @@ Vector CPortal_Player::GetAttackSpread( CBaseCombatWeapon *pWeapon, CBaseEntity 
 void CPortal_Player::GetStepSoundVelocities( float *velwalk, float *velrun )
 {
 	// UNDONE: need defined numbers for run, walk, crouch, crouch run velocities!!!!	
-	if ( (GetEngineObject()->GetFlags() & FL_DUCKING ) || ( GetMoveType() == MOVETYPE_LADDER ) )
+	if ( (GetEngineObject()->GetFlags() & FL_DUCKING ) || (GetEngineObject()->GetMoveType() == MOVETYPE_LADDER ) )
 	{
 		*velwalk = 10;		// These constants should be based on cl_movespeedkey * cl_forwardspeed somehow
 		*velrun = 60;		

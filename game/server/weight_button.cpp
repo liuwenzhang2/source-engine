@@ -48,7 +48,7 @@ void CWeightButton::Spawn()
 	BaseClass::Spawn();
 
 	// Convert movedir from angles to a vector
-	SetMoveType( MOVETYPE_VPHYSICS );
+	GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
  	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 	CreateVPhysics();

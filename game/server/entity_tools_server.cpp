@@ -185,7 +185,7 @@ bool CServerTools::IsInNoClipMode( IClientEntity *pClientPlayer )
 	if ( pPlayer == NULL )
 		return true;
 
-	return pPlayer->GetMoveType() == MOVETYPE_NOCLIP;
+	return pPlayer->GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP;
 }
 
 CBaseEntity *CServerTools::FirstEntity( void )
@@ -319,12 +319,12 @@ IEntityFactoryDictionary *CServerTools::GetEntityFactoryDictionary( void )
 
 void CServerTools::SetMoveType( CBaseEntity *pEntity, int val )
 {
-	pEntity->SetMoveType( (MoveType_t)val );
+	pEntity->GetEngineObject()->SetMoveType( (MoveType_t)val );
 }
 
 void CServerTools::SetMoveType( CBaseEntity *pEntity, int val, int moveCollide )
 {
-	pEntity->SetMoveType( (MoveType_t)val, (MoveCollide_t)moveCollide );
+	pEntity->GetEngineObject()->SetMoveType( (MoveType_t)val, (MoveCollide_t)moveCollide );
 }
 
 void CServerTools::ResetSequence( CBaseAnimating *pEntity, int nSequence )

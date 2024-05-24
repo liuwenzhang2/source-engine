@@ -1709,7 +1709,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 void CNPC_BaseZombie::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 #ifdef _XBOX
 	// Always fade the corpse

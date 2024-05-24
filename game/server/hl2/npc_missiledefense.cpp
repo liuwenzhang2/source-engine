@@ -272,7 +272,7 @@ void CNPC_MissileDefense::Spawn( void )
 	UTIL_SetSize( this, Vector( -36, -36 , 0 ), Vector( 36, 36, 64 ) );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	m_takedamage		= DAMAGE_YES;
 	SetBloodColor( DONT_BLEED );
 	m_iHealth			= 10;

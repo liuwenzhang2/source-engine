@@ -110,7 +110,7 @@ void CWeaponIFMBase::FallInit( void )
 
 	if ( HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		SetSolid( SOLID_BBOX );
 		AddSolidFlags( FSOLID_TRIGGER );
 
@@ -120,7 +120,7 @@ void CWeaponIFMBase::FallInit( void )
 	{
 		if ( !VPhysicsInitNormal( SOLID_BBOX, GetSolidFlags() | FSOLID_TRIGGER, false ) )
 		{
-			SetMoveType( MOVETYPE_NONE );
+			GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 			SetSolid( SOLID_BBOX );
 			AddSolidFlags( FSOLID_TRIGGER );
 		}

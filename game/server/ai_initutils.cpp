@@ -70,7 +70,7 @@ void CAI_TestHull::Spawn(void)
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_iHealth			= 50;
 
 	bInUse				= false;

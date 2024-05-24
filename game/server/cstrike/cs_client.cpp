@@ -58,7 +58,7 @@ void FinishClientPutInServer( CCSPlayer *pPlayer )
 
 		// Move them to the first intro camera.
 		pPlayer->MoveToNextIntroCamera();
-		pPlayer->SetMoveType( MOVETYPE_NONE );
+		pPlayer->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	}
 
 

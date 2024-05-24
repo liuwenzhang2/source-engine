@@ -791,7 +791,7 @@ void CNPC_AntlionGuard::Spawn( void )
 	
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 	SetNavType( NAV_GROUND );
 	SetBloodColor( BLOOD_COLOR_YELLOW );
@@ -1151,7 +1151,7 @@ bool CNPC_AntlionGuard::ShouldCharge( const Vector &startPos, const Vector &endP
 				return true;
 
 			// Hit things that will move
-			if ( moveTrace.pObstruction->GetMoveType() == MOVETYPE_VPHYSICS )
+			if ( moveTrace.pObstruction->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 				return true;
 		}
 
@@ -2766,7 +2766,7 @@ public:
 				return false;
 
 			// don't test small moveable physics objects (unless it's an NPC)
-			if ( !pEntity->IsNPC() && pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+			if ( !pEntity->IsNPC() && pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 			{
 				IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
 				Assert(pPhysics);
@@ -2921,11 +2921,11 @@ bool CNPC_AntlionGuard::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEnti
 	}
 
 	// Hit something we don't hate. If it's not moveable, crash into it.
-	if ( pEntity->GetMoveType() == MOVETYPE_NONE || pEntity->GetMoveType() == MOVETYPE_PUSH )
+	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_NONE || pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH )
 		return true;
 
 	// If it's a vphysics object that's too heavy, crash into it too.
-	if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		IPhysicsObject *pPhysics = pEntity->VPhysicsGetObject();
 		if ( pPhysics )
@@ -2953,7 +2953,7 @@ bool CNPC_AntlionGuard::HandleChargeImpact( Vector vecImpact, CBaseEntity *pEnti
 	{
 		// If we hit a physics prop, smack the crap out of it. (large rocks)
 		// Factor the object mass into it, because we want to move it no matter how heavy it is.
-		if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+		if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			CTakeDamageInfo info( this, this, 250, DMG_BLAST );
 			info.SetDamagePosition( vecImpact );
@@ -3697,7 +3697,7 @@ bool CNPC_AntlionGuard::ShouldProbeCollideAgainstEntity( CBaseEntity *pEntity )
 	if ( m_hPhysicsTarget == pEntity )
 		return false;
 
-	if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+	if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		IPhysicsObject *pPhysObj = pEntity->VPhysicsGetObject();
 
@@ -4284,7 +4284,7 @@ void CNPC_AntlionGuard::ImpactShock( const Vector &origin, float radius, float m
 			continue;
 
 		// UNDONE: Ask the object if it should get force if it's not MOVETYPE_VPHYSICS?
-		if ( pEntity->GetMoveType() == MOVETYPE_VPHYSICS || ( pEntity->VPhysicsGetObject() && pEntity->IsPlayer() == false ) )
+		if ( pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || ( pEntity->VPhysicsGetObject() && pEntity->IsPlayer() == false ) )
 		{
 			vecSpot = pEntity->BodyTarget(GetEngineObject()->GetAbsOrigin() );
 			

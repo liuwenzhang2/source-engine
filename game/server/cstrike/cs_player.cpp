@@ -200,7 +200,7 @@ public:
 	void Init( void )
 	{
 		GetEngineObject()->SetSolid( SOLID_BBOX );
-		SetMoveType( MOVETYPE_STEP );
+		GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 		GetEngineObject()->SetFriction( 1.0f );
 		GetEngineObject()->SetCollisionBounds( VEC_DUCK_HULL_MIN, VEC_DUCK_HULL_MAX );
 		m_takedamage = DAMAGE_NO;
@@ -1855,7 +1855,7 @@ int CCSPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	if ( !pInflictor )
 		return 0;
 
-	if ( GetMoveType() == MOVETYPE_NOCLIP || GetMoveType() == MOVETYPE_OBSERVER )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP || GetEngineObject()->GetMoveType() == MOVETYPE_OBSERVER )
 		return 0;
 
 	const float flArmorBonus = 0.5f;
@@ -2957,7 +2957,7 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 		Weapon_Drop( pWeapon, &vTossPos, NULL );
 
 		pWeapon->GetEngineObject()->SetSolidFlags( FSOLID_NOT_STANDABLE | FSOLID_TRIGGER | FSOLID_USE_TRIGGER_BOUNDS );
-		pWeapon->SetMoveCollide( MOVECOLLIDE_FLY_BOUNCE );
+		pWeapon->GetEngineObject()->SetMoveCollide( MOVECOLLIDE_FLY_BOUNCE );
 
 		CWeaponCSBase *pCSWeapon = dynamic_cast< CWeaponCSBase* >( pWeapon );
 
@@ -5324,7 +5324,7 @@ void CCSPlayer::State_Enter_WELCOME()
 	StartObserverMode( OBS_MODE_ROAMING );
 
 	// Important to set MOVETYPE_NONE or our physics object will fall while we're sitting at one of the intro cameras.
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	PhysObjectSleep();
@@ -5483,8 +5483,8 @@ void CCSPlayer::State_PreThink_DEATH_WAIT_FOR_KEY()
 {
 	// once we're done animating our death and we're on the ground, we want to set movetype to None so our dead body won't do collisions and stuff anymore
 	// this prevents a bug where the dead body would go to a player's head if he walked over it while the dead player was clicking their button to respawn
-	if ( GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
-		SetMoveType( MOVETYPE_NONE );
+	if (GetEngineObject()->GetMoveType() != MOVETYPE_NONE && (GetEngineObject()->GetFlags() & FL_ONGROUND) )
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	// if the player has been dead for one second longer than allowed by forcerespawn,
 	// forcerespawn isn't on. Send the player off to an intermission camera until they
@@ -5599,7 +5599,7 @@ void CCSPlayer::State_Enter_PICKINGCLASS()
 
 void CCSPlayer::State_Enter_ACTIVE()
 {
-	SetMoveType( MOVETYPE_WALK );
+	GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	m_Local.m_iHideHUD = 0;
 	PhysObjectWake();
@@ -7899,8 +7899,8 @@ void CCSPlayer::ProcessPlayerDeathAchievements( CCSPlayer *pAttacker, CCSPlayer 
 		}
 
 		//[tj] See if the attacker or defender are in the air [sbodenbender] dont include ladders
-		bool attackerInAir = pAttacker->GetMoveType() != MOVETYPE_LADDER && pAttacker->GetNearestSurfaceBelow(AchievementConsts::KillInAir_MinimumHeight) == NULL;
-		bool victimInAir = pVictim->GetMoveType() != MOVETYPE_LADDER && pVictim->GetNearestSurfaceBelow(AchievementConsts::KillInAir_MinimumHeight) == NULL;
+		bool attackerInAir = pAttacker->GetEngineObject()->GetMoveType() != MOVETYPE_LADDER && pAttacker->GetNearestSurfaceBelow(AchievementConsts::KillInAir_MinimumHeight) == NULL;
+		bool victimInAir = pVictim->GetEngineObject()->GetMoveType() != MOVETYPE_LADDER && pVictim->GetNearestSurfaceBelow(AchievementConsts::KillInAir_MinimumHeight) == NULL;
 
 		if (attackerInAir)
 		{

@@ -513,7 +513,7 @@ void CNPC_Strider::Spawn()
 	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_STRIDER );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetEngineObject()->AddEFlags( EFL_NO_DISSOLVE | EFL_NO_MEGAPHYSCANNON_RAGDOLL );
 
 	// Cached for quick comparisons
@@ -647,7 +647,7 @@ void CNPC_Strider::PostNPCInit()
 
 	if( CarriedByDropship() )
 	{
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		SetActivity( (Activity)ACT_STRIDER_CARRIED );
 		SetThink( &CNPC_Strider::CarriedThink );
 		GetEngineObject()->RemoveFlag( FL_FLY );
@@ -1304,10 +1304,10 @@ void CNPC_Strider::BuildScheduleTestBits()
 int CNPC_Strider::SelectSchedule()
 {
 /*
-	if( GetMoveType() != MOVETYPE_FLY )
+	if( GetEngineObject()->GetMoveType() != MOVETYPE_FLY )
 	{
 		// Dropship just released me.
-		SetMoveType( MOVETYPE_FLY );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 		return SCHED_STRIDER_FALL_TO_GROUND;
 	}
 */
@@ -5479,14 +5479,14 @@ void CSparkTrail::Spawn()
 		vecVelocity.y *= -1;
 
 	UTIL_SetSize( this, Vector( 0, 0, 0 ), Vector( 0, 0, 0 ) );
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	if( random->RandomInt( 0, 2 ) == 0 )
 	{
 		vecVelocity *= 2.0;
 		m_iHealth /= 2;
-		SetMoveType( MOVETYPE_FLY );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	}
 
 	GetEngineObject()->SetAbsVelocity( vecVelocity );

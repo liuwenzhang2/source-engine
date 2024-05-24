@@ -689,7 +689,7 @@ void CBaseEntity::ResolveFlyCollisionCustom( trace_t &trace, Vector &vecVelocity
 //-----------------------------------------------------------------------------
 void CBaseEntity::PerformFlyCollisionResolution( trace_t &trace, Vector &move )
 {
-	switch( GetMoveCollide() )
+	switch(GetEngineObject()->GetMoveCollide() )
 	{
 	case MOVECOLLIDE_FLY_CUSTOM:
 		{
@@ -825,7 +825,7 @@ void CBaseEntity::PhysicsToss( void )
 	PhysicsCheckVelocity();
 
 	// add gravity
-	if ( GetMoveType() == MOVETYPE_FLYGRAVITY && !(GetEngineObject()->GetFlags() & FL_FLY) )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY && !(GetEngineObject()->GetFlags() & FL_FLY) )
 	{
 		PhysicsAddGravityMove( move );
 	}
@@ -962,7 +962,7 @@ void CBaseEntity::PhysicsSimulate( void )
 	// If we've got a moveparent, we must simulate that first.
 	CBaseEntity *pMoveParent = GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
 
-	if ( (GetMoveType() == MOVETYPE_NONE && !pMoveParent) || (GetMoveType() == MOVETYPE_VPHYSICS ) )
+	if ( (GetEngineObject()->GetMoveType() == MOVETYPE_NONE && !pMoveParent) || (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) )
 	{
 		PhysicsNone();
 		return;
@@ -997,7 +997,7 @@ void CBaseEntity::PhysicsSimulate( void )
 		GetEngineObject()->RemoveFlag( FL_BASEVELOCITY );
 	}
 
-	switch( GetMoveType() )
+	switch(GetEngineObject()->GetMoveType() )
 	{
 	case MOVETYPE_PUSH:
 		{
@@ -1050,7 +1050,7 @@ void CBaseEntity::PhysicsSimulate( void )
 		break;
 
 	default:
-		Warning( "PhysicsSimulate: %s bad movetype %d", GetClassname(), GetMoveType() );
+		Warning( "PhysicsSimulate: %s bad movetype %d", GetClassname(), GetEngineObject()->GetMoveType() );
 		Assert(0);
 		break;
 	}

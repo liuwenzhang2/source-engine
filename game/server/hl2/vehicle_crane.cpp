@@ -133,7 +133,7 @@ void CPropCrane::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NOCLIP );
+	GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 
 	m_takedamage = DAMAGE_EVENTS_ONLY;
 	m_flTurn = 0;
@@ -968,12 +968,12 @@ void CCraneServerVehicle::NPC_SetDriver( CNPC_VehicleDriver *pDriver )
 	if ( pDriver )
 	{
 		SetVehicleVolume( 1.0 );	// Vehicles driven by NPCs are louder
-		GetCrane()->SetSimulatedEveryTick( false );
+		GetCrane()->GetEngineObject()->SetSimulatedEveryTick( false );
 	}
 	else
 	{
 		SetVehicleVolume( 0.5 );
-		GetCrane()->SetSimulatedEveryTick( true );
+		GetCrane()->GetEngineObject()->SetSimulatedEveryTick( true );
 	}
 }
 
@@ -1039,7 +1039,7 @@ void CCraneTip::Spawn( void )
 	VPhysicsInitShadow( false, false );
 
 	// Disable movement on this sucker, we're going to move him manually
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	
 	BaseClass::Spawn();
 

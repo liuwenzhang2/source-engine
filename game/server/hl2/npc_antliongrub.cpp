@@ -375,7 +375,7 @@ void CAntlionGrub::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->SetSolidFlags( FSOLID_TRIGGER );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 	GetEngineObject()->AddEffects( EF_NOSHADOW );
 

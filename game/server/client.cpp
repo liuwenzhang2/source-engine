@@ -1064,7 +1064,7 @@ void EnableNoClip( CBasePlayer *pPlayer )
 {
 	// Disengage from hierarchy
 	pPlayer->GetEngineObject()->SetParent( NULL );
-	pPlayer->SetMoveType( MOVETYPE_NOCLIP );
+	pPlayer->GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 	ClientPrint( pPlayer, HUD_PRINTCONSOLE, "noclip ON\n");
 	pPlayer->GetEngineObject()->AddEFlags( EFL_NOCLIP_ACTIVE );
 }
@@ -1081,14 +1081,14 @@ void CC_Player_NoClip( void )
 	CPlayerState *pl = pPlayer->PlayerData();
 	Assert( pl );
 
-	if (pPlayer->GetMoveType() != MOVETYPE_NOCLIP)
+	if (pPlayer->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP)
 	{
 		EnableNoClip( pPlayer );
 		return;
 	}
 
 	pPlayer->GetEngineObject()->RemoveEFlags( EFL_NOCLIP_ACTIVE );
-	pPlayer->SetMoveType( MOVETYPE_WALK );
+	pPlayer->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 
 	Vector oldorigin = pPlayer->GetEngineObject()->GetAbsOrigin();
 	ClientPrint( pPlayer, HUD_PRINTCONSOLE, "noclip OFF\n");
@@ -1263,7 +1263,7 @@ CON_COMMAND_F( setpos_exact, "Move player to an exact specified origin (must hav
 
 	if ( !TestEntityPosition( pPlayer ) )
 	{
-		if ( pPlayer->GetMoveType() != MOVETYPE_NOCLIP )
+		if ( pPlayer->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP )
 		{
 			EnableNoClip( pPlayer );
 			return;

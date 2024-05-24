@@ -166,7 +166,7 @@ void CHLPlayerMove::FinishMove( CBasePlayer *player, CUserCmd *ucmd, CMoveData *
 			gamestats->Event_PlayerEnteredGodMode( player );
 		}
 	}
-	bool bNoClip = ( player->GetMoveType() == MOVETYPE_NOCLIP );
+	bool bNoClip = ( player->GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP );
 	if ( m_bInNoClip != bNoClip )
 	{
 		m_bInNoClip = bNoClip;

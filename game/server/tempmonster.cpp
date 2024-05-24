@@ -80,8 +80,8 @@ void CMyNPC::Spawn()
 	engine.SetModel(edict(), "models/mymodel.mdl");
 	UTIL_SetSize( this, Vector( -12, -12, 0 ), Vector( 12, 12, 24 ) );
 
-	SetSolid( SOLID_SLIDEBOX );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetSolid( SOLID_SLIDEBOX );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	m_iHealth			= 8;
 	m_vecViewOffset		= Vector ( 0, 0, 0 );// position of the eyes relative to NPC's origin.

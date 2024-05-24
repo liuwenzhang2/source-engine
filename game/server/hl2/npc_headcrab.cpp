@@ -244,7 +244,7 @@ void CBaseHeadcrab::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 	GetEngineObject()->SetCollisionGroup( HL2COLLISION_GROUP_HEADCRAB );
 
@@ -633,7 +633,7 @@ void CBaseHeadcrab::HandleAnimEvent( animevent_t *pEvent )
 	
 	if ( pEvent->event == AE_HEADCRAB_CEILING_DETACH )
 	{
-		SetMoveType( MOVETYPE_STEP );
+		GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 		GetEngineObject()->RemoveFlag( FL_ONGROUND );
 		GetEngineObject()->RemoveFlag( FL_FLY );
 
@@ -1399,7 +1399,7 @@ void CBaseHeadcrab::StartTask( const Task_t *pTask )
 			trace_t tr;
 			UTIL_TraceHull(GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsOrigin() + Vector( 0, 0, 512 ), NAI_Hull::Mins( GetHullType() ), NAI_Hull::Maxs( GetHullType() ), MASK_SOLID_BRUSHONLY, this, COLLISION_GROUP_NONE, &tr );
 
-			// SetMoveType( MOVETYPE_NONE );
+			// GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 			GetEngineObject()->AddFlag(FL_FLY);
 			m_bHangingFromCeiling = true;
 
@@ -2883,7 +2883,7 @@ void CFastHeadcrab::RunTask( const Task_t *pTask )
 		if(GetEngineObject()->GetFlags() & FL_ONGROUND )
 		{
 			GetEngineObject()->SetGravity(1.0);
-			SetMoveType( MOVETYPE_STEP );
+			GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 			if( GetEnemy() && ( GetEnemy()->GetEngineObject()->GetAbsOrigin() - GetEngineObject()->GetAbsOrigin() ).Length() > HEADCRAB_MAX_JUMP_DIST )
 			{

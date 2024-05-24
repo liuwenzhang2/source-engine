@@ -46,7 +46,7 @@ void CSpotlightEnd::Spawn( void )
 	Precache();
 	m_flLightScale  = 100;
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
 	GetEngineObject()->AddEFlags( EFL_FORCE_CHECK_TRANSMIT );
 }

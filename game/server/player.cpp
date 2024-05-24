@@ -1644,7 +1644,7 @@ int CBasePlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		VectorNormalize( vecDir );
 	}
 
-	if ( info.GetInflictor() && (GetMoveType() == MOVETYPE_WALK) && 
+	if ( info.GetInflictor() && (GetEngineObject()->GetMoveType() == MOVETYPE_WALK) &&
 		( !attacker->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER)) )
 	{
 		Vector force = vecDir * -DamageForce( WorldAlignSize(), info.GetBaseDamage() );
@@ -1747,7 +1747,7 @@ void CBasePlayer::Event_Killed( const CTakeDamageInfo &info )
 		pObject->RecheckContactPoints();
 	}
 
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	GetEngineObject()->SetGroundEntity( NULL );
 
 	// clear out the suit message cache so we don't keep chattering
@@ -1964,7 +1964,7 @@ WaterMove
 
 void CBasePlayer::WaterMove()
 {
-	if ( ( GetMoveType() == MOVETYPE_NOCLIP ) && !GetEngineObject()->GetMoveParent() )
+	if ( (GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP ) && !GetEngineObject()->GetMoveParent() )
 	{
 		m_AirFinished = gpGlobals->curtime + AIRTIME;
 		return;
@@ -2057,7 +2057,7 @@ void CBasePlayer::WaterMove()
 // true if the player is attached to a ladder
 bool CBasePlayer::IsOnLadder( void )
 { 
-	return (GetMoveType() == MOVETYPE_LADDER);
+	return (GetEngineObject()->GetMoveType() == MOVETYPE_LADDER);
 }
 
 
@@ -2367,14 +2367,14 @@ bool CBasePlayer::SetObserverMode(int mode )
 		case OBS_MODE_DEATHCAM :
 			SetFOV( this, 0 );	// Reset FOV
 			SetViewOffset( vec3_origin );
-			SetMoveType( MOVETYPE_NONE );
+			GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 			break;
 
 		case OBS_MODE_CHASE :
 		case OBS_MODE_IN_EYE :	
 			// udpate FOV and viewmodels
 			SetObserverTarget( m_hObserverTarget );	
-			SetMoveType( MOVETYPE_OBSERVER );
+			GetEngineObject()->SetMoveType( MOVETYPE_OBSERVER );
 			break;
 
 		//=============================================================================
@@ -2387,7 +2387,7 @@ bool CBasePlayer::SetObserverMode(int mode )
 			SetFOV( this, 0 );	// Reset FOV
 			SetObserverTarget( m_hObserverTarget );
 			SetViewOffset( vec3_origin );
-			SetMoveType( MOVETYPE_OBSERVER );
+			GetEngineObject()->SetMoveType( MOVETYPE_OBSERVER );
 			break;
 
 		//=============================================================================
@@ -2853,7 +2853,7 @@ bool CBasePlayer::CanPickupObject( CBaseEntity *pObject, float massLimit, float 
 		return false;
 
 	//Must move with physics
-	if ( pObject->GetMoveType() != MOVETYPE_VPHYSICS )
+	if ( pObject->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 		return false;
 
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
@@ -3506,7 +3506,7 @@ void CBasePlayer::ProcessUsercmds( CUserCmd *cmds, int numcmds, int totalcmds,
 		bool clear_angles = true;
 
 		// If no clipping and cheats enabled and sv_noclipduringpause enabled, then don't zero out movement part of CUserCmd
-		if ( GetMoveType() == MOVETYPE_NOCLIP &&
+		if (GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP &&
 			sv_cheats->GetBool() && 
 			sv_noclipduringpause.GetBool() )
 		{
@@ -4533,7 +4533,7 @@ bool CBasePlayer::IsRideablePhysics( IPhysicsObject *pPhysics )
 IPhysicsObject *CBasePlayer::GetGroundVPhysics()
 {
 	CBaseEntity* pGroundEntity = GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
-;	if ( pGroundEntity && pGroundEntity->GetMoveType() == MOVETYPE_VPHYSICS )
+;	if ( pGroundEntity && pGroundEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		IPhysicsObject *pPhysGround = pGroundEntity->VPhysicsGetObject();
 		if ( pPhysGround && pPhysGround->IsMoveable() )
@@ -4677,7 +4677,7 @@ void CBasePlayer::Touch( CBaseEntity *pOther )
 	if (pOther == (GetEngineObject()->GetGroundEntity() ? GetEngineObject()->GetGroundEntity()->GetOuter() : NULL))
 		return;
 
-	if ( pOther->GetMoveType() != MOVETYPE_VPHYSICS || pOther->GetEngineObject()->GetSolid() != SOLID_VPHYSICS || (pOther->GetEngineObject()->GetSolidFlags() & FSOLID_TRIGGER) )
+	if ( pOther->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS || pOther->GetEngineObject()->GetSolid() != SOLID_VPHYSICS || (pOther->GetEngineObject()->GetSolidFlags() & FSOLID_TRIGGER) )
 		return;
 
 	IPhysicsObject *pPhys = pOther->VPhysicsGetObject();
@@ -4710,7 +4710,7 @@ void CBasePlayer::PostThinkVPhysics( void )
 	}
 
 	int collisionState = VPHYS_WALK;
-	if ( GetMoveType() == MOVETYPE_NOCLIP || GetMoveType() == MOVETYPE_OBSERVER )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP || GetEngineObject()->GetMoveType() == MOVETYPE_OBSERVER )
 	{
 		collisionState = VPHYS_NOCLIP;
 	}
@@ -4951,8 +4951,8 @@ void CBasePlayer::Spawn( void )
 	// Shared spawning code..
 	SharedSpawn();
 	
-	SetSimulatedEveryTick( true );
-	SetAnimatedEveryTick( true );
+	GetEngineObject()->SetSimulatedEveryTick( true );
+	GetEngineObject()->SetAnimatedEveryTick( true );
 
 	m_ArmorValue		= SpawnArmorValue();
 	SetBlocksLOS( false );
@@ -5493,7 +5493,7 @@ bool CBasePlayer::GetInVehicle( IServerVehicle *pVehicle, int nRole )
 
 	// Setting the velocity to 0 will cause the IDLE animation to play
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
-	SetMoveType( MOVETYPE_NOCLIP );
+	GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 
 	// This is a hack to fixup the player's stats since they really didn't "cheat" and enter noclip from the console
 	gamestats->Event_DecrementPlayerEnteredNoClip( this );
@@ -5587,7 +5587,7 @@ void CBasePlayer::LeaveVehicle( const Vector &vecExitPoint, const QAngle &vecExi
 
 	GetEngineObject()->RemoveEffects( EF_NODRAW );
 
-	SetMoveType( MOVETYPE_WALK );
+	GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_PLAYER );
 
 	if ( VPhysicsGetObject() )
@@ -7572,7 +7572,7 @@ void CBasePlayer::LockPlayerInPlace( void )
 		return;
 
 	GetEngineObject()->AddFlag( FL_GODMODE | FL_FROZEN );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	m_iPlayerLocked = true;
 
 	// force a client data update, so that anything that has been done to
@@ -7589,7 +7589,7 @@ void CBasePlayer::UnlockPlayer( void )
 		return;
 
 	GetEngineObject()->RemoveFlag( FL_GODMODE | FL_FROZEN );
-	SetMoveType( MOVETYPE_WALK );
+	GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 	m_iPlayerLocked = false;
 }
 
@@ -8187,7 +8187,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		{
 			// filter out anything that isn't simulated by vphysics
 			// UNDONE: Filter out motion disabled objects?
-			if ( list[i]->GetMoveType() == MOVETYPE_VPHYSICS )
+			if ( list[i]->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 			{
 				// I'm currently stuck inside a moving object, so allow vphysics to 
 				// apply velocity to the player in order to separate these objects
@@ -8219,7 +8219,7 @@ void CBasePlayer::VPhysicsShadowUpdate( IPhysicsObject *pPhysics )
 		m_touchedPhysObject = true;
 	}
 
-	if ( GetMoveType() == MOVETYPE_NOCLIP || pl.deadflag )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP || pl.deadflag )
 	{
 		m_oldOrigin = GetEngineObject()->GetAbsOrigin();
 		return;

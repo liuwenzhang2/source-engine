@@ -164,7 +164,7 @@ void CCrossbowBolt::Spawn( void )
 	Precache( );
 
 	SetModel( "models/crossbow_bolt.mdl" );
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 	UTIL_SetSize( this, -Vector(1,1,1), Vector(1,1,1) );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->SetGravity( 0.05f );
@@ -259,7 +259,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 //			NDebugOverlay::Box( tr2.endpos, Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 255, 0, 0, 10 );
 //			NDebugOverlay::Box( GetAbsOrigin(), Vector( -16, -16, -16 ), Vector( 16, 16, 16 ), 0, 0, 255, 0, 10 );
 
-			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && ((CBaseEntity*)tr2.m_pEnt)->GetMoveType() == MOVETYPE_NONE ) )
+			if ( tr2.m_pEnt == NULL || ( tr2.m_pEnt && ((CBaseEntity*)tr2.m_pEnt)->GetEngineObject()->GetMoveType() == MOVETYPE_NONE ) )
 			{
 				CEffectData	data;
 
@@ -282,7 +282,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 		tr = GetEngineObject()->GetTouchTrace();
 
 		// See if we struck the world
-		if ( pOther->GetMoveType() == MOVETYPE_NONE && !( tr.surface.flags & SURF_SKY ) )
+		if ( pOther->GetEngineObject()->GetMoveType() == MOVETYPE_NONE && !( tr.surface.flags & SURF_SKY ) )
 		{
 			const char* soundname = "Weapon_Crossbow.BoltHitWorld";
 			CPASAttenuationFilter filter(this, soundname);
@@ -322,7 +322,7 @@ void CCrossbowBolt::BoltTouch( CBaseEntity *pOther )
 				GetEngineObject()->SetNextThink( gpGlobals->curtime + 2.0f );
 				
 				//FIXME: We actually want to stick (with hierarchy) to what we've hit
-				SetMoveType( MOVETYPE_NONE );
+				GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 			
 				Vector vForward;
 

@@ -125,7 +125,7 @@ void CDODSmokeGrenade::Think_Remove()
 
 	GetEngineObject()->SetModelName( NULL_STRING );//invisible
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	UTIL_Remove( this );
 }

@@ -91,7 +91,7 @@ void CMoveData::SetAbsOrigin( const Vector &vec )
 	if ( gm && gm->GetMoveData() &&
 		 gm->player && 
 		 gm->player->entindex() == 1 && 
-		 gm->player->GetMoveType() == MOVETYPE_WALK )
+		 gm->player->GetEngineObject()->GetMoveType() == MOVETYPE_WALK )
 	{
 		trace_t pm;
 		gm->TracePlayerBBox( vec, vec, gm->PlayerSolidMask(), COLLISION_GROUP_PLAYER_MOVEMENT, pm );
@@ -985,9 +985,9 @@ void CGameMovement::CheckParameters( void )
 {
 	QAngle	v_angle;
 
-	if ( player->GetMoveType() != MOVETYPE_ISOMETRIC &&
-		 player->GetMoveType() != MOVETYPE_NOCLIP &&
-		 player->GetMoveType() != MOVETYPE_OBSERVER )
+	if ( player->GetEngineObject()->GetMoveType() != MOVETYPE_ISOMETRIC &&
+		 player->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP &&
+		 player->GetEngineObject()->GetMoveType() != MOVETYPE_OBSERVER )
 	{
 		float spd;
 		float maxspeed;
@@ -1058,8 +1058,8 @@ void CGameMovement::CheckParameters( void )
 		v_angle = v_angle + player->m_Local.m_vecPunchAngle;
 
 		// Now adjust roll angle
-		if ( player->GetMoveType() != MOVETYPE_ISOMETRIC  &&
-			 player->GetMoveType() != MOVETYPE_NOCLIP )
+		if ( player->GetEngineObject()->GetMoveType() != MOVETYPE_ISOMETRIC  &&
+			 player->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP )
 		{
 			mv->m_vecAngles[ROLL]  = CalcRoll( v_angle, mv->m_vecVelocity, sv_rollangle.GetFloat(), sv_rollspeed.GetFloat() );
 		}
@@ -2716,7 +2716,7 @@ int CGameMovement::TryPlayerMove( Vector *pFirstDest, trace_t *pFirstTrace )
 		// Only give this a try for first impact plane because you can get yourself stuck in an acute corner by jumping in place
 		//  and pressing forward and nobody was really using this bounce/reflection feature anyway...
 		if ( numplanes == 1 &&
-			player->GetMoveType() == MOVETYPE_WALK &&
+			player->GetEngineObject()->GetMoveType() == MOVETYPE_WALK &&
 			player->GetEngineObject()->GetGroundEntity() == NULL )
 		{
 			for ( i = 0; i < numplanes; i++ )
@@ -2859,14 +2859,14 @@ bool CGameMovement::LadderMove( void )
 	Vector wishdir;
 	Vector end;
 
-	if ( player->GetMoveType() == MOVETYPE_NOCLIP )
+	if ( player->GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP )
 		return false;
 
 	if ( !GameHasLadders() )
 		return false;
 
 	// If I'm already moving on a ladder, use the previous ladder direction
-	if ( player->GetMoveType() == MOVETYPE_LADDER )
+	if ( player->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 	{
 		wishdir = -player->m_vecLadderNormal;
 	}
@@ -2895,8 +2895,8 @@ bool CGameMovement::LadderMove( void )
 	if ( pm.fraction == 1.0f || !OnLadder( pm ) )
 		return false;
 
-	player->SetMoveType( MOVETYPE_LADDER );
-	player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+	player->GetEngineObject()->SetMoveType( MOVETYPE_LADDER );
+	player->GetEngineObject()->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 
 	player->m_vecLadderNormal = pm.plane.normal;
 
@@ -2933,8 +2933,8 @@ bool CGameMovement::LadderMove( void )
 
 	if ( mv->m_nButtons & IN_JUMP )
 	{
-		player->SetMoveType( MOVETYPE_WALK );
-		player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+		player->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
+		player->GetEngineObject()->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 
 		VectorScale( pm.plane.normal, 270, mv->m_vecVelocity );
 	}
@@ -3831,7 +3831,7 @@ void CGameMovement::CategorizePosition( void )
 
 	// Was on ground, but now suddenly am not
 	if ( bMovingUpRapidly || 
-		( bMovingUp && player->GetMoveType() == MOVETYPE_LADDER ) )   
+		( bMovingUp && player->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER ) )
 	{
 		SetGroundEntity( NULL );
 	}
@@ -3851,7 +3851,7 @@ void CGameMovement::CategorizePosition( void )
 				SetGroundEntity( NULL );
 				// probably want to add a check for a +z velocity too!
 				if ( ( mv->m_vecVelocity.z > 0.0f ) && 
-					( player->GetMoveType() != MOVETYPE_NOCLIP ) )
+					( player->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP ) )
 				{
 					player->m_surfaceFriction = 0.25f;
 				}
@@ -4562,10 +4562,10 @@ void CGameMovement::PlayerMove( void )
 	AngleVectors (mv->m_vecViewAngles, &m_vecForward, &m_vecRight, &m_vecUp );  // Determine movement angles
 
 	// Always try and unstick us unless we are using a couple of the movement modes
-	if ( player->GetMoveType() != MOVETYPE_NOCLIP && 
-		 player->GetMoveType() != MOVETYPE_NONE && 		 
-		 player->GetMoveType() != MOVETYPE_ISOMETRIC && 
-		 player->GetMoveType() != MOVETYPE_OBSERVER && 
+	if ( player->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP &&
+		 player->GetEngineObject()->GetMoveType() != MOVETYPE_NONE &&
+		 player->GetEngineObject()->GetMoveType() != MOVETYPE_ISOMETRIC &&
+		 player->GetEngineObject()->GetMoveType() != MOVETYPE_OBSERVER &&
 		 !player->pl.deadflag )
 	{
 		if ( CheckInterval( STUCK ) )
@@ -4579,7 +4579,7 @@ void CGameMovement::PlayerMove( void )
 	}
 
 	// Now that we are "unstuck", see where we are (player->GetWaterLevel() and type, player->GetGroundEntity()).
-	if ( player->GetMoveType() != MOVETYPE_WALK ||
+	if ( player->GetEngineObject()->GetMoveType() != MOVETYPE_WALK ||
 		mv->m_bGameCodeMovedPlayer || 
 		!sv_optimizedmovement.GetBool()  )
 	{
@@ -4617,15 +4617,15 @@ void CGameMovement::PlayerMove( void )
 		
 		// TODO: this causes lots of weirdness.
 		//bool bCheckLadder = CheckInterval( LADDER );
-		//if ( bCheckLadder || player->GetMoveType() == MOVETYPE_LADDER )
+		//if ( bCheckLadder || player->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 		{
 			if ( !LadderMove() && 
-				( player->GetMoveType() == MOVETYPE_LADDER ) )
+				( player->GetEngineObject()->GetMoveType() == MOVETYPE_LADDER ) )
 			{
 				// Clear ladder stuff unless player is dead or riding a train
 				// It will be reset immediately again next frame if necessary
-				player->SetMoveType( MOVETYPE_WALK );
-				player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+				player->GetEngineObject()->SetMoveType( MOVETYPE_WALK );
+				player->GetEngineObject()->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 			}
 		}
 	}
@@ -4636,14 +4636,14 @@ void CGameMovement::PlayerMove( void )
 		player->m_nTickBase,
 		player->IsServer() ? "SERVER" : "CLIENT", 
 		player, 
-		player->GetMoveType(),
+		player->GetEngineObject()->GetMoveType(),
 		player->GetGroundEntity(), 
 		mv->m_vecVelocity[0], mv->m_vecVelocity[1], mv->m_vecVelocity[2]);
 
 #endif
 
 	// Handle movement modes.
-	switch (player->GetMoveType())
+	switch (player->GetEngineObject()->GetMoveType())
 	{
 		case MOVETYPE_NONE:
 			break;
@@ -4676,7 +4676,7 @@ void CGameMovement::PlayerMove( void )
 			break;
 
 		default:
-			DevMsg( 1, "Bogus pmove player movetype %i on (%i) 0=cl 1=sv\n", player->GetMoveType(), player->IsServer());
+			DevMsg( 1, "Bogus pmove player movetype %i on (%i) 0=cl 1=sv\n", player->GetEngineObject()->GetMoveType(), player->IsServer());
 			break;
 	}
 }
@@ -4691,7 +4691,7 @@ void CGameMovement::PerformFlyCollisionResolution( trace_t &pm, Vector &move )
 	float vel;
 	float backoff;
 
-	switch (player->GetMoveCollide())
+	switch (player->GetEngineObject()->GetMoveCollide())
 	{
 	case MOVECOLLIDE_FLY_CUSTOM:
 		// Do nothing; the velocity should have been modified by touch
@@ -4706,7 +4706,7 @@ void CGameMovement::PerformFlyCollisionResolution( trace_t &pm, Vector &move )
 	case MOVECOLLIDE_FLY_BOUNCE:	
 	case MOVECOLLIDE_DEFAULT:
 		{
-			if (player->GetMoveCollide() == MOVECOLLIDE_FLY_BOUNCE)
+			if (player->GetEngineObject()->GetMoveCollide() == MOVECOLLIDE_FLY_BOUNCE)
 				backoff = 2.0 - player->m_surfaceFriction;
 			else
 				backoff = 1;
@@ -4736,7 +4736,7 @@ void CGameMovement::PerformFlyCollisionResolution( trace_t &pm, Vector &move )
 
 		// Con_DPrintf("%f %f: %.0f %.0f %.0f\n", vel, trace.fraction, ent->velocity[0], ent->velocity[1], ent->velocity[2] );
 
-		if (vel < (30 * 30) || (player->GetMoveCollide() != MOVECOLLIDE_FLY_BOUNCE))
+		if (vel < (30 * 30) || (player->GetEngineObject()->GetMoveCollide() != MOVECOLLIDE_FLY_BOUNCE))
 		{
 			SetGroundEntity( &pm ); 
 			mv->m_vecVelocity.Init();
@@ -4816,7 +4816,7 @@ void CGameMovement::FullTossMove( void )
 	CheckVelocity();
 
 	// add gravity
-	if ( player->GetMoveType() == MOVETYPE_FLYGRAVITY )
+	if ( player->GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY )
 	{
 		AddGravity();
 	}

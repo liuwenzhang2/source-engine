@@ -472,7 +472,7 @@ bool CDODPlayer::CanAttack( void )
 	if ( IsSprinting() ) 
 		return false;
 
-	if ( GetMoveType() == MOVETYPE_LADDER )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 		return false;
 
 	if ( m_Shared.IsJumping() )
@@ -987,7 +987,7 @@ void CDODPlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOrig
 	if (GetEngineObject()->GetFlags() & (FL_FROZEN|FL_ATCONTROLS))
 		return;
 
-	if ( GetMoveType() == MOVETYPE_NOCLIP || GetMoveType() == MOVETYPE_OBSERVER )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NOCLIP || GetEngineObject()->GetMoveType() == MOVETYPE_OBSERVER )
 		return;
 
 	if ( !sv_footsteps.GetFloat() )
@@ -997,7 +997,7 @@ void CDODPlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOrig
 	float groundspeed = Vector2DLength( vecVelocity.AsVector2D() );
 
 	// determine if we are on a ladder
-	fLadder = ( GetMoveType() == MOVETYPE_LADDER );
+	fLadder = (GetEngineObject()->GetMoveType() == MOVETYPE_LADDER );
 
 	float flDuck;
 

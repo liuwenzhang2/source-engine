@@ -228,15 +228,7 @@ void RecvProxy_ToolRecording( const CRecvProxyData *pData, void *pStruct, void *
 // Expose it to the engine.
 IMPLEMENT_CLIENTCLASS(C_BaseEntity, DT_BaseEntity, CBaseEntity);
 
-static void RecvProxy_MoveType( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	((C_BaseEntity*)pStruct)->SetMoveType( (MoveType_t)(pData->m_Value.m_Int) );
-}
 
-static void RecvProxy_MoveCollide( const CRecvProxyData *pData, void *pStruct, void *pOut )
-{
-	((C_BaseEntity*)pStruct)->SetMoveCollide( (MoveCollide_t)(pData->m_Value.m_Int) );
-}
 
 //static void RecvProxy_Solid( const CRecvProxyData *pData, void *pStruct, void *pOut )
 //{
@@ -276,8 +268,7 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 	RecvPropEHandle( RECVINFO(m_hOwnerEntity) ),
 	RecvPropEHandle( RECVINFO(m_hEffectEntity) ),
 
-	RecvPropInt( "movetype", 0, SIZEOF_IGNORE, 0, RecvProxy_MoveType ),
-	RecvPropInt( "movecollide", 0, SIZEOF_IGNORE, 0, RecvProxy_MoveCollide ),
+
 	//RecvPropDataTable( RECVINFO_DT( m_Collision ), 0, &REFERENCE_RECV_TABLE(DT_CollisionProperty) ),
 	
 	RecvPropInt( RECVINFO ( m_iTextureFrameIndex ) ),
@@ -285,8 +276,7 @@ BEGIN_RECV_TABLE_NOBASE(C_BaseEntity, DT_BaseEntity)
 //	RecvPropDataTable( "predictable_id", 0, 0, &REFERENCE_RECV_TABLE( DT_PredictableId ) ),
 //#endif
 
-	RecvPropInt		( RECVINFO( m_bSimulatedEveryTick ), 0, RecvProxy_InterpolationAmountChanged ),
-	RecvPropInt		( RECVINFO( m_bAnimatedEveryTick ), 0, RecvProxy_InterpolationAmountChanged ),
+
 	RecvPropBool	( RECVINFO( m_bAlternateSorting ) ),
 
 #ifdef TF_CLIENT_DLL
@@ -301,8 +291,8 @@ BEGIN_PREDICTION_DATA_NO_BASE( C_BaseEntity )
 	// These have a special proxy to handle send/receive
 	//DEFINE_PRED_TYPEDESCRIPTION( m_Collision, CCollisionProperty ),
 
-	DEFINE_PRED_FIELD( m_MoveType, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
-	DEFINE_PRED_FIELD( m_MoveCollide, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_MoveType, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
+	//DEFINE_PRED_FIELD( m_MoveCollide, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE ),
 
 	//DEFINE_FIELD( m_vecAbsVelocity, FIELD_VECTOR ),
 	//DEFINE_PRED_FIELD_TOL( m_vecVelocity, FIELD_VECTOR, FTYPEDESC_INSENDTABLE, 0.5f ),
@@ -611,8 +601,7 @@ C_BaseEntity::C_BaseEntity()
 	//SetPredictionEligible( false );
 	m_bPredictable = false;
 
-	m_bSimulatedEveryTick = false;
-	m_bAnimatedEveryTick = false;
+
 	m_pPhysicsObject = NULL;
 	//GetEngineObject()->Init(this);
 #ifdef _DEBUG
@@ -694,8 +683,7 @@ void C_BaseEntity::Clear( void )
 	m_vecBaseVelocity.Init();
 	m_flAnimTime = 0;
 	m_flSimulationTime = 0;
-	SetMoveCollide( MOVECOLLIDE_DEFAULT );
-	SetMoveType( MOVETYPE_NONE );
+
 
 	m_nRenderMode = 0;
 	m_nOldRenderMode = 0;
@@ -1357,31 +1345,6 @@ void C_BaseEntity::SetModelPointer( const model_t *pModel )
 		UpdateVisibility();
 	}
 }
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : val - 
-//			moveCollide - 
-//-----------------------------------------------------------------------------
-void C_BaseEntity::SetMoveType( MoveType_t val, MoveCollide_t moveCollide /*= MOVECOLLIDE_DEFAULT*/ )
-{
-	// Make sure the move type + move collide are compatible...
-#ifdef _DEBUG
-	if ((val != MOVETYPE_FLY) && (val != MOVETYPE_FLYGRAVITY))
-	{
-		Assert( moveCollide == MOVECOLLIDE_DEFAULT );
-	}
-#endif
-
- 	m_MoveType = val;
-	SetMoveCollide( moveCollide );
-}
-
-void C_BaseEntity::SetMoveCollide( MoveCollide_t val )
-{
-	m_MoveCollide = val;
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: Get rendermode
@@ -2394,12 +2357,12 @@ void C_BaseEntity::StopFollowingEntity( )
 	GetEngineObject()->SetParent( NULL );
 	GetEngineObject()->RemoveEffects( EF_BONEMERGE );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 bool C_BaseEntity::IsFollowingEntity()
 {
-	return GetEngineObject()->IsEffectActive(EF_BONEMERGE) && (GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
+	return GetEngineObject()->IsEffectActive(EF_BONEMERGE) && (GetEngineObject()->GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
 }
 
 C_BaseEntity *CBaseEntity::GetFollowedEntity()
@@ -3506,7 +3469,7 @@ void C_BaseEntity::Remove( )
 	{
 		// Make it solid
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 		GetEngineObject()->AddEFlags( EFL_KILLME );	// Make sure to ignore further calls into here or UTIL_Remove.
 	}
@@ -4214,16 +4177,16 @@ float C_BaseEntity::GetInterpolationAmount( int flags )
 		expandedServerTickMultiple += g_nThreadModeTicks;
 	}
 
-	if ( IsAnimatedEveryTick() && IsSimulatedEveryTick() )
+	if ( GetEngineObject()->IsAnimatedEveryTick() && GetEngineObject()->IsSimulatedEveryTick() )
 	{
 		return TICK_INTERVAL * expandedServerTickMultiple;
 	}
 
-	if ( ( flags & LATCH_ANIMATION_VAR ) && IsAnimatedEveryTick() )
+	if ( ( flags & LATCH_ANIMATION_VAR ) && GetEngineObject()->IsAnimatedEveryTick() )
 	{
 		return TICK_INTERVAL * expandedServerTickMultiple;
 	}
-	if ( ( flags & LATCH_SIMULATION_VAR ) && IsSimulatedEveryTick() )
+	if ( ( flags & LATCH_SIMULATION_VAR ) && GetEngineObject()->IsSimulatedEveryTick() )
 	{
 		return TICK_INTERVAL * expandedServerTickMultiple;
 	}

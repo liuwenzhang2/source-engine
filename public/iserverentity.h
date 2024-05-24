@@ -323,6 +323,17 @@ public:
 	virtual bool PhysicsRunSpecificThink(int nContextIndex, BASEPTR thinkFunc) = 0;
 	virtual void CheckHasThinkFunction(bool isThinkingHint = false) = 0;
 
+	virtual MoveType_t GetMoveType() const = 0;
+	virtual MoveCollide_t GetMoveCollide() const = 0;
+	virtual void SetMoveType(MoveType_t val, MoveCollide_t moveCollide = MOVECOLLIDE_DEFAULT) = 0;
+	virtual void SetMoveCollide(MoveCollide_t val) = 0;
+	virtual void CheckStepSimulationChanged() = 0;
+	virtual void CheckHasGamePhysicsSimulation() = 0;
+	virtual bool IsSimulatedEveryTick() const = 0;
+	virtual void SetSimulatedEveryTick(bool sim) = 0;
+	virtual bool IsAnimatedEveryTick() const = 0;
+	virtual void SetAnimatedEveryTick(bool anim) = 0;
+
 };
 
 // This class is how the engine talks to entities in the game DLL.

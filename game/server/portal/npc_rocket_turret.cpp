@@ -782,7 +782,7 @@ void CNPC_RocketTurret::FireRocket ( void )
 	ResetSequence(LookupSequence("fire"));
 
 	pRocket->SetThink( NULL );
-	pRocket->SetMoveType( MOVETYPE_FLY );
+	pRocket->GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 
 	pRocket->CreateSmokeTrail();
 
@@ -1439,7 +1439,7 @@ static void fire_rocket_projectile_f( void )
 		return;
 
 	pRocket->SetThink( NULL );
-	pRocket->SetMoveType( MOVETYPE_FLY );
+	pRocket->GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 
 	pRocket->SetModel( ROCKET_TURRET_PROJECTILE_NAME );
 	UTIL_SetSize( pRocket, vec3_origin, vec3_origin );

@@ -160,7 +160,7 @@ void CBaseHelicopter::Spawn( void )
 	Precache( );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetEngineObject()->AddFlag( FL_FLY );
 	SetState( NPC_STATE_IDLE );
 
@@ -565,7 +565,7 @@ void CBaseHelicopter::DoRotorPhysicsPush( const Vector &vecRotorOrigin, float fl
 		if ( pEntity->GetEngineObject()->IsEFlagSet( EFL_NO_ROTORWASH_PUSH ))
 			continue;
 
-		if ( pShooter || pEntity->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() && !pEntity->IsPlayer()) ) 
+		if ( pShooter || pEntity->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS || (pEntity->VPhysicsGetObject() && !pEntity->IsPlayer()) )
 		{
 			// Make sure it's not already in our wash
 			bool bAlreadyPushing = false;
@@ -1325,7 +1325,7 @@ void CBaseHelicopter::Event_Killed( const CTakeDamageInfo &info )
 {
 	m_lifeState			= LIFE_DYING;
 
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 240 ) );	// use a lower gravity
 
 	StopLoopingSounds();

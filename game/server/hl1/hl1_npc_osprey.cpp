@@ -424,7 +424,7 @@ void CNPC_Osprey::HoverThink( void )
 	{
 		CBaseEntity *pRepel = (CBaseEntity*)m_hRepel[i];
 
-		if ( pRepel != NULL && pRepel->m_iHealth > 0 && pRepel->GetMoveType() == MOVETYPE_FLYGRAVITY )
+		if ( pRepel != NULL && pRepel->m_iHealth > 0 && pRepel->GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY )
 		{
 			break;
 		}
@@ -461,7 +461,7 @@ CAI_BaseNPC *CNPC_Osprey::MakeGrunt( Vector vecSrc )
 			}
 			pEntity = Create( "monster_human_grunt", vecSrc, GetEngineObject()->GetAbsAngles() );
 			pGrunt = pEntity->MyNPCPointer( );
-			pGrunt->SetMoveType( MOVETYPE_FLYGRAVITY );
+			pGrunt->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 			pGrunt->GetEngineObject()->SetGravity( 0.0001 );
 
 			Vector spd = Vector( 0, 0, random->RandomFloat( -196, -128 ) );
@@ -712,7 +712,7 @@ void CBaseHelicopter::Spawn( void )
 	Precache( );
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetEngineObject()->AddFlag( FL_FLY );
 
 	m_lifeState			= LIFE_ALIVE;
@@ -1410,7 +1410,7 @@ void CBaseHelicopter::Event_Killed( const CTakeDamageInfo &info )
 {
 	m_lifeState			= LIFE_DYING;
 
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 240 ) );	// use a lower gravity
 
 	// Kill the rotor sound.

@@ -195,7 +195,7 @@ void CFlare::Spawn( void )
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetFriction( 0.6f );
 	GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 400 ) );
 	m_flTimeBurnOut = gpGlobals->curtime + 30;
@@ -285,7 +285,7 @@ CFlare *CFlare::Create( Vector vecOrigin, QAngle vecAngles, CBaseEntity *pOwner,
 	pFlare->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 	pFlare->GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 
-	pFlare->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	pFlare->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
 	pFlare->SetOwnerEntity( pOwner );
 	pFlare->m_pOwner	= pOwner;
@@ -417,7 +417,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 		vecNewVelocity	*= 0.1f;
 		GetEngineObject()->SetAbsVelocity( vecNewVelocity );
 
-		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 		GetEngineObject()->SetGravity(1.0f);
 
 
@@ -453,7 +453,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 						GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 						UTIL_SetOrigin( this, tr.endpos + ( tr.plane.normal * 2.0f ) );
 						GetEngineObject()->SetAbsVelocity( vec3_origin );
-						SetMoveType( MOVETYPE_NONE );
+						GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 						
 						SetTouch( &CFlare::FlareBurnTouch );
 						
@@ -485,7 +485,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 		}
 
 		// Change our flight characteristics
-		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 		GetEngineObject()->SetGravity( UTIL_ScaleForGravity( 640 ) );
 		
 		m_nBounces++;
@@ -503,7 +503,7 @@ void CFlare::FlareTouch( CBaseEntity *pOther )
 		if (GetEngineObject()->GetAbsVelocity().Length() < 64.0f )
 		{
 			GetEngineObject()->SetAbsVelocity( vec3_origin );
-			SetMoveType( MOVETYPE_NONE );
+			GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 			GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
 			GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 			SetTouch( &CFlare::FlareBurnTouch );
@@ -566,7 +566,7 @@ void CFlare::Launch( const Vector &direction, float speed )
 		Start( 8.0f );
 	}
 
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
 	// Punch our velocity towards our facing
 	GetEngineObject()->SetAbsVelocity( direction * speed );
@@ -747,7 +747,7 @@ void CFlaregun::SecondaryAttack( void )
 	pFlare->SetAbsVelocity( forward * 500 );
 	pFlare->GetEngineObject()->SetGravity(1.0f);
 	pFlare->GetEngineObject()->SetFriction( 0.85f );
-	pFlare->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	pFlare->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
 	WeaponSound( SINGLE );
 }

@@ -445,7 +445,7 @@ void CPendulum::Spawn( void )
 	else
 		GetEngineObject()->SetSolid( SOLID_BBOX );
 
-	SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	SetModel( STRING(GetEngineObject()->GetModelName()) );
 
 	if ( m_flMoveDistance != 0 )
@@ -609,7 +609,7 @@ void CPendulum::RopeTouch ( CBaseEntity *pOther )
 	
 	m_hEnemy = pOther;
 	pOther->GetEngineObject()->SetAbsVelocity( Vector ( 0, 0, 0 ) );
-	pOther->SetMoveType( MOVETYPE_NONE );
+	pOther->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 
@@ -664,7 +664,7 @@ void CFuncMortarField::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
 	SetModel( STRING(GetEngineObject()->GetModelName()) );    // set size and link into world
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 //	SetUse( FieldUse );
 	Precache();
@@ -788,7 +788,7 @@ LINK_ENTITY_TO_CLASS( monster_mortar, CMortar );
 
 void CMortar::Spawn( )
 {
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	SetDamage( 200 );
@@ -922,7 +922,7 @@ LINK_ENTITY_TO_CLASS( env_render, CRenderFxManager );
 void CRenderFxManager::Spawn( void )
 {
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->AddEffects( EF_NODRAW );
 }
 
@@ -1001,7 +1001,7 @@ void CXenPLight::Spawn( void )
 
 	SetModel( "models/light.mdl" );
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
 
@@ -1119,7 +1119,7 @@ void CXenHair::Spawn( void )
 	ResetSequenceInfo( );
 
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetNextThink( gpGlobals->curtime + random->RandomFloat( 0.1, 0.4 ) );	// Load balance these a bit
 }
 
@@ -1152,7 +1152,7 @@ CXenTreeTrigger *CXenTreeTrigger::TriggerCreate( CBaseEntity *pOwner, const Vect
 
 	pTrigger->GetEngineObject()->SetSolid( SOLID_BBOX );
 	pTrigger->GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER | FSOLID_NOT_SOLID );
-	pTrigger->SetMoveType( MOVETYPE_NONE );
+	pTrigger->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	pTrigger->SetOwnerEntity( pOwner );
 
 	return pTrigger;
@@ -1199,7 +1199,7 @@ void CXenTree::Spawn( void )
 	Precache();
 
 	SetModel( "models/tree.mdl" );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid ( SOLID_BBOX );
 
 	m_takedamage = DAMAGE_YES;
@@ -1363,7 +1363,7 @@ CXenHull *CXenHull::CreateHull( CBaseEntity *source, const Vector &mins, const V
 
 	UTIL_SetOrigin( pHull, source->GetEngineObject()->GetAbsOrigin() + offset );
 	pHull->GetEngineObject()->SetSolid( SOLID_BBOX );
-	pHull->SetMoveType( MOVETYPE_NONE );
+	pHull->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	pHull->SetOwnerEntity( source );
 	UTIL_SetSize( pHull, mins, maxs );
 	pHull->SetRenderColorA( 0 );
@@ -1423,7 +1423,7 @@ void CXenSpore::Spawn( void )
 	Precache();
 
 	SetModel( pModelNames[m_nSkin] );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	m_takedamage = DAMAGE_NO;
 
@@ -1561,7 +1561,7 @@ void CHL1Gib::StickyGibTouch ( CBaseEntity *pOther )
 
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	SetLocalAngularVelocity( QAngle( 0, 0, 0 ) );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 //
@@ -1569,7 +1569,7 @@ void CHL1Gib::StickyGibTouch ( CBaseEntity *pOther )
 //
 void CHL1Gib::Spawn( const char *szGibModel )
 {
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 
 	GetEngineObject()->SetFriction( 0.55 ); // deading the bounce a bit
 	

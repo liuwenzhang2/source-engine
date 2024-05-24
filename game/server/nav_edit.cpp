@@ -151,7 +151,7 @@ void CNavMesh::GetEditVectors( Vector *pos, Vector *forward )
 #ifdef DOTA_SERVER_DLL
 	CDOTAPlayer *pDOTAPlayer = ToDOTAPlayer( player );
 
-	if ( pDOTAPlayer && pDOTAPlayer->GetMoveType() != MOVETYPE_NOCLIP )
+	if ( pDOTAPlayer && pDOTAPlayer->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP )
 	{
 		Vector dir = pDOTAPlayer->GetCrosshairTracePos() - player->EyePosition();
 		VectorNormalize( dir );

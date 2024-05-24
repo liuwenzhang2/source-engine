@@ -38,7 +38,7 @@ END_DATADESC()
 
 void CFuncBrush::Spawn( void )
 {
-	SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );  // so it doesn't get pushed by anything
 
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	GetEngineObject()->AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
@@ -278,7 +278,7 @@ void CTriggerBrush::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_BSP );
 	GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );    // set size and link into world
 

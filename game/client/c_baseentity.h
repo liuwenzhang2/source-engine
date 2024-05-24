@@ -461,8 +461,7 @@ public:
 	// Used when the collision prop is told to ask game code for the world-space surrounding box
 	virtual void					ComputeWorldSpaceSurroundingBox( Vector *pVecWorldMins, Vector *pVecWorldMaxs );	
 
-	MoveType_t						GetMoveType( void ) const;
-	MoveCollide_t					GetMoveCollide( void ) const;
+
 
 	virtual class CMouthInfo		*GetMouth( void );
 
@@ -604,10 +603,7 @@ public:
 	virtual CStudioHdr				*OnNewModel();
 	virtual void					OnNewParticleEffect( const char *pszParticleName, CNewParticleEffect *pNewParticleEffect );
 
-	bool							IsSimulatedEveryTick() const;
-	bool							IsAnimatedEveryTick() const;
-	void							SetSimulatedEveryTick( bool sim );
-	void							SetAnimatedEveryTick( bool anim );
+
 
 	virtual void					ResetLatched();
 	
@@ -865,9 +861,7 @@ public:
 	void				SetModelPointer( const model_t *pModel );
 
 
-	// Access movetype and solid.
-	void				SetMoveType( MoveType_t val, MoveCollide_t moveCollide = MOVECOLLIDE_DEFAULT );	// Set to one of the MOVETYPE_ defines.
-	void				SetMoveCollide( MoveCollide_t val );	// Set to one of the MOVECOLLIDE_ defines.
+
 
 	//friend class C_EngineObject;
 
@@ -931,12 +925,6 @@ public:
 	void	NetworkStateChanged( void *pVar )			{ }
 	void	NetworkStateSetUpdateInterval( float N )	{ }
 	void	NetworkStateForceUpdate()					{ }
-
-	
-	
-	// These set entity flags (EFL_*) to help optimize queries
-	void	CheckHasGamePhysicsSimulation();
-	bool	WillSimulateGamePhysics();
 
 	float	GetAnimTime() const;
 	void	SetAnimTime( float at );
@@ -1300,9 +1288,7 @@ private:
 
 private:
 
-	// Object movetype
-	unsigned char					m_MoveType;
-	unsigned char					m_MoveCollide;
+
 	unsigned char					m_iOldParentAttachment;
 
 	unsigned char					m_nWaterLevel;
@@ -1332,8 +1318,6 @@ private:
 	Vector							m_vecOldOrigin;
 	QAngle							m_vecOldAngRotation;
 
-	CNetworkVar( bool, m_bSimulatedEveryTick );
-	CNetworkVar( bool, m_bAnimatedEveryTick );
 	CNetworkVar( bool, m_bAlternateSorting );
 
 	//Adrian

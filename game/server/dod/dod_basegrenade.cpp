@@ -95,7 +95,7 @@ void CDODBaseGrenade::Spawn( void )
 	}
 	else
 	{
-		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 		m_takedamage	= DAMAGE_NO;
 	}
 

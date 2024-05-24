@@ -1674,7 +1674,7 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 	{
 		Vector absVel = m_hLookTarget->GetEngineObject()->GetAbsVelocity();
 		CBaseEntity* ground = m_hLookTarget->GetEngineObject()->GetGroundEntity() ? m_hLookTarget->GetEngineObject()->GetGroundEntity()->GetOuter() : NULL;
-		if ( ground && ground->GetMoveType() == MOVETYPE_PUSH)
+		if ( ground && ground->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH)
 		{
 			absVel = absVel + ground->GetEngineObject()->GetAbsVelocity();
 		}

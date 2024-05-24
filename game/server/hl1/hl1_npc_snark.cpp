@@ -79,7 +79,7 @@ void CSnark::Spawn( void )
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 	GetEngineObject()->SetFriction(1.0);
 
 	SetModel( "models/w_squeak2.mdl" );
@@ -229,9 +229,9 @@ void CSnark::HuntThink( void )
 	// float
 	if ( GetWaterLevel() != 0)
 	{
-		if ( GetMoveType() == MOVETYPE_FLYGRAVITY )
+		if (GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY )
 		{
-			SetMoveType( MOVETYPE_FLY, MOVECOLLIDE_FLY_CUSTOM );
+			GetEngineObject()->SetMoveType( MOVETYPE_FLY, MOVECOLLIDE_FLY_CUSTOM );
 		}
 
 		Vector vecVel = GetEngineObject()->GetAbsVelocity();
@@ -239,9 +239,9 @@ void CSnark::HuntThink( void )
 		vecVel.z += 8.0;
 		GetEngineObject()->SetAbsVelocity( vecVel );
 	}
-	else if ( GetMoveType() == MOVETYPE_FLY )
+	else if (GetEngineObject()->GetMoveType() == MOVETYPE_FLY )
 	{
-		SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_CUSTOM );
 	}
 
 	// return if not time to hunt

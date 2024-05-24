@@ -1795,7 +1795,7 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 		case SCHED_SCRIPT_ENEMY_IS_GOAL_AND_RUN_TO_GOAL:
 		{
 			Activity movementActivity = ( m_nSchedule == SCHED_SCRIPT_WALK_TO_GOAL ) ? ACT_WALK : ACT_RUN;
-			bool bIsFlying = (pTarget->GetMoveType() == MOVETYPE_FLY) || (pTarget->GetMoveType() == MOVETYPE_FLYGRAVITY);
+			bool bIsFlying = (pTarget->GetEngineObject()->GetMoveType() == MOVETYPE_FLY) || (pTarget->GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY);
 			if ( bIsFlying )
 			{
 				movementActivity = ACT_FLY;
@@ -1818,7 +1818,7 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 		case SCHED_SCRIPT_RUN_PATH_GOAL:
 		{
 			Activity movementActivity = ( m_nSchedule == SCHED_SCRIPT_WALK_PATH_GOAL ) ? ACT_WALK : ACT_RUN;
-			bool bIsFlying = (pTarget->GetMoveType() == MOVETYPE_FLY) || (pTarget->GetMoveType() == MOVETYPE_FLYGRAVITY);
+			bool bIsFlying = (pTarget->GetEngineObject()->GetMoveType() == MOVETYPE_FLY) || (pTarget->GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY);
 			if ( bIsFlying )
 			{
 				movementActivity = ACT_FLY;

@@ -1108,7 +1108,7 @@ void CCollisionProperty::ComputeSurroundingBox( Vector *pVecWorldMins, Vector *p
 		{
 			Assert( GetSolid() != SOLID_CUSTOM );
 			bool bUseVPhysics = false;
-			if ( ( GetSolid() == SOLID_VPHYSICS ) && ( GetOuter()->GetOuter()->GetMoveType() == MOVETYPE_VPHYSICS))
+			if ( ( GetSolid() == SOLID_VPHYSICS ) && ( GetOuter()->GetOuter()->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS))
 			{
 				// UNDONE: This may not be necessary any more.
 				IPhysicsObject *pPhysics = GetOuter()->GetOuter()->VPhysicsGetObject();
@@ -1245,7 +1245,7 @@ bool CCollisionProperty::DoesVPhysicsInvalidateSurroundingBox( ) const
 		return true;
 
 	case USE_OBB_COLLISION_BOUNDS:
-		return (GetSolid() == SOLID_VPHYSICS) && (m_pOuter->GetOuter()->GetMoveType() == MOVETYPE_VPHYSICS) && m_pOuter->GetOuter()->VPhysicsGetObject();
+		return (GetSolid() == SOLID_VPHYSICS) && (m_pOuter->GetOuter()->GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS) && m_pOuter->GetOuter()->VPhysicsGetObject();
 
 	// In the case of game code, we don't really know, so we have to assume it does
 	case USE_GAME_CODE:

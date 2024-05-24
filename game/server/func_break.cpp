@@ -277,7 +277,7 @@ void CBreakable::Spawn( void )
 	m_iMaxHealth = ( m_iHealth > 0 ) ? m_iHealth : 1;
   
 	GetEngineObject()->SetSolid( SOLID_BSP );
-    SetMoveType( MOVETYPE_PUSH );
+	GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 	
 	// this is a hack to shoot the gibs in a specific yaw/direction
 	m_angle = GetEngineObject()->GetLocalAngles().y;
@@ -1251,7 +1251,7 @@ void CPushable::Spawn( void )
 
 		GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 
-		SetMoveType( MOVETYPE_PUSH );
+		GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
 		SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
 		CreateVPhysics();

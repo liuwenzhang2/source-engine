@@ -82,16 +82,6 @@ enum InvalidatePhysicsBits_t
 //}
 //#endif
 
-inline MoveType_t CBaseEntity::GetMoveType() const
-{
-	return (MoveType_t)(unsigned char)m_MoveType;
-}
-
-inline MoveCollide_t CBaseEntity::GetMoveCollide() const
-{
-	return (MoveCollide_t)(unsigned char)m_MoveCollide;
-}
-
 inline bool CBaseEntity::IsAlive( void )
 {
 	return m_lifeState == LIFE_ALIVE; 
@@ -120,39 +110,6 @@ inline CBasePlayer *CBaseEntity::GetPredictionPlayer( void )
 inline void CBaseEntity::SetPredictionPlayer( CBasePlayer *player )
 {
 	m_pPredictionPlayer = player;
-}
-
-
-inline bool CBaseEntity::IsSimulatedEveryTick() const
-{
-	return m_bSimulatedEveryTick;
-}
-
-inline bool CBaseEntity::IsAnimatedEveryTick() const
-{
-	return m_bAnimatedEveryTick;
-}
-
-inline void CBaseEntity::SetSimulatedEveryTick( bool sim )
-{
-	if ( m_bSimulatedEveryTick != sim )
-	{
-		m_bSimulatedEveryTick = sim;
-#ifdef CLIENT_DLL
-		GetEngineObject()->Interp_UpdateInterpolationAmounts(GetEngineObject()->GetVarMapping() );
-#endif
-	}
-}
-
-inline void CBaseEntity::SetAnimatedEveryTick( bool anim )
-{
-	if ( m_bAnimatedEveryTick != anim )
-	{
-		m_bAnimatedEveryTick = anim;
-#ifdef CLIENT_DLL
-		GetEngineObject()->Interp_UpdateInterpolationAmounts(GetEngineObject()->GetVarMapping() );
-#endif
-	}
 }
 
 inline float CBaseEntity::GetAnimTime() const

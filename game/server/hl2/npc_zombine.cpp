@@ -458,7 +458,7 @@ void CNPC_Zombine::DropGrenade( Vector vDir )
 
 	if ( pPhysObj == NULL )
 	{
-		m_hGrenade->SetMoveType( MOVETYPE_VPHYSICS );
+		m_hGrenade->GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 		m_hGrenade->GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 		m_hGrenade->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_WEAPON );
 
@@ -550,7 +550,7 @@ void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 
 				int iAttachment = LookupAttachment( "grenade_attachment");
 
-				pGrenade->SetMoveType( MOVETYPE_NONE );
+				pGrenade->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 				pGrenade->GetEngineObject()->SetSolid( SOLID_NONE );
 				pGrenade->GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 

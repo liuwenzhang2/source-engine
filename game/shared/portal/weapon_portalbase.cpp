@@ -384,7 +384,7 @@ void CWeaponPortalBase::	Materialize( void )
 	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
 		VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
-		SetMoveType( MOVETYPE_VPHYSICS );
+		GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 
 		//PortalRules()->AddLevelDesignerPlacedObject( this );
 	}

@@ -385,7 +385,7 @@ void CPropAirboat::Spawn( void )
 	BaseClass::Spawn();
 
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetAnimatedEveryTick( true );
+	GetEngineObject()->SetAnimatedEveryTick( true );
 
 	// Handbrake data.
 	//m_flHandbrakeTime = gpGlobals->curtime + 0.1;

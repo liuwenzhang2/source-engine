@@ -162,7 +162,7 @@ void CSmokeGrenadeProjectile::Think_Remove()
 
 	GetEngineObject()->SetModelName( NULL_STRING );//invisible
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 //Implement this so we never call the base class,

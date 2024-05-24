@@ -172,7 +172,7 @@ void CNPC_Apache::Spawn( void )
 
 	GetEngineObject()->AddFlag( FL_NPC );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetEngineObject()->AddFlag( FL_FLY );
 
 

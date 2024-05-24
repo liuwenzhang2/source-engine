@@ -420,7 +420,7 @@ void CAI_PassengerBehaviorZombie::StartDismount( void )
 
 	// Detach from the parent
 	GetOuter()->GetEngineObject()->SetParent( NULL );
-	GetOuter()->SetMoveType( MOVETYPE_STEP );
+	GetOuter()->GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	GetMotor()->SetYawLocked( false );
 
 	QAngle vecAngles = GetAbsAngles();

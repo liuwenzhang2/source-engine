@@ -37,7 +37,7 @@ void CGrenadeSpit::Spawn( void )
 {
 	Precache( );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 
 	// FIXME, if these is a sprite, then we need a base class derived from CSprite rather than
 	// CBaseAnimating.  pev->scale becomes m_flSpriteScale in that case.

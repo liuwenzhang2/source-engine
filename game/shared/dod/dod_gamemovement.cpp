@@ -252,9 +252,9 @@ void CDODGameMovement::CheckParameters( void )
 
 	SetPlayerSpeed();
 
-	if ( player->GetMoveType() != MOVETYPE_ISOMETRIC &&
-		 player->GetMoveType() != MOVETYPE_NOCLIP &&
-		 player->GetMoveType() != MOVETYPE_OBSERVER	)
+	if ( player->GetEngineObject()->GetMoveType() != MOVETYPE_ISOMETRIC &&
+		 player->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP &&
+		 player->GetEngineObject()->GetMoveType() != MOVETYPE_OBSERVER	)
 	{
 		float spd;
 		float maxspeed;
@@ -326,8 +326,8 @@ void CDODGameMovement::CheckParameters( void )
 		v_angle = v_angle + player->m_Local.m_vecPunchAngle;
 
 		// Now adjust roll angle
-		if ( player->GetMoveType() != MOVETYPE_ISOMETRIC  &&
-			 player->GetMoveType() != MOVETYPE_NOCLIP )
+		if ( player->GetEngineObject()->GetMoveType() != MOVETYPE_ISOMETRIC  &&
+			 player->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP )
 		{
 			mv->m_vecAngles[ROLL]  = CalcRoll( v_angle, mv->m_vecVelocity, sv_rollangle.GetFloat(), sv_rollspeed.GetFloat() );
 		}
@@ -423,9 +423,9 @@ void CDODGameMovement::PlayerMove()
 {
 	BaseClass::PlayerMove();
 
-	if ( player->GetMoveType() != MOVETYPE_ISOMETRIC &&
-		 player->GetMoveType() != MOVETYPE_NOCLIP &&
-		 player->GetMoveType() != MOVETYPE_OBSERVER	)
+	if ( player->GetEngineObject()->GetMoveType() != MOVETYPE_ISOMETRIC &&
+		 player->GetEngineObject()->GetMoveType() != MOVETYPE_NOCLIP &&
+		 player->GetEngineObject()->GetMoveType() != MOVETYPE_OBSERVER	)
 	{
 
 		// Cap actual player speed, fix wall running
@@ -525,8 +525,8 @@ void CDODGameMovement::CheckForLadders( bool wasOnGround )
 					org -= vel*5;
 					mv->SetAbsOrigin( org );
 				}
-				player->SetMoveType( MOVETYPE_LADDER );
-				player->SetMoveCollide( MOVECOLLIDE_DEFAULT );
+				player->GetEngineObject()->SetMoveType( MOVETYPE_LADDER );
+				player->GetEngineObject()->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 
 				player->SetLadderNormal( trace.plane.normal );
 				mv->m_vecVelocity.Init();

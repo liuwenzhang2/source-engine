@@ -344,7 +344,7 @@ bool CPropCombineBall::CreateVPhysics()
 		return false;
 
 	VPhysicsSetObject( pPhysicsObject );
-	SetMoveType( MOVETYPE_VPHYSICS );
+	GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 	pPhysicsObject->Wake();
 
 	pPhysicsObject->SetMass( 750.0f );
@@ -1020,7 +1020,7 @@ float CPropCombineBall::GetBallHoldSoundRampTime()
 void CPropCombineBall::DoExplosion( )
 {
 	// don't do this twice
-	if ( GetMoveType() == MOVETYPE_NONE )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
 		return;
 
 	if ( PhysIsInCallback() )
@@ -1141,7 +1141,7 @@ void CPropCombineBall::DoExplosion( )
 
 	// Turn us off and wait because we need our trails to finish up properly
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 
 	m_bEmit = false;
@@ -1605,7 +1605,7 @@ bool CPropCombineBall::IsHittableEntity( CBaseEntity *pHitEntity )
 	if ( pHitEntity->IsWorld() )
 		return false;
 
-	if ( pHitEntity->GetMoveType() == MOVETYPE_PUSH )
+	if ( pHitEntity->GetEngineObject()->GetMoveType() == MOVETYPE_PUSH )
 	{
 		if( pHitEntity->GetOwnerEntity() && FClassnameIs(pHitEntity->GetOwnerEntity(), "npc_strider") )
 		{

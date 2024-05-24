@@ -670,7 +670,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 
 	StopAnimation();
 	StopFollowingEntity( );
-	SetMoveType( MOVETYPE_FLYGRAVITY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	// clear follow stuff, setup for collision
 	GetEngineObject()->SetGravity(1.0);
 	m_iState = WEAPON_NOT_CARRIED;

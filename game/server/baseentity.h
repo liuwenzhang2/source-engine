@@ -446,11 +446,7 @@ public:
 	// Called by physics to see if we should avoid a collision test....
 	virtual	bool			ShouldCollide( int collisionGroup, int contentsMask ) const;
 
-	// Move type / move collide
-	MoveType_t				GetMoveType() const;
-	MoveCollide_t			GetMoveCollide() const;
-	void					SetMoveType( MoveType_t val, MoveCollide_t moveCollide = MOVECOLLIDE_DEFAULT );
-	void					SetMoveCollide( MoveCollide_t val );
+
 
 public:
 	void SetScaledPhysics( IPhysicsObject *pNewObject );
@@ -493,10 +489,7 @@ public:
 	// Returns which skybox the entity is in
 	CSkyCamera				*GetEntitySkybox();
 
-	bool					IsSimulatedEveryTick() const;
-	bool					IsAnimatedEveryTick() const;
-	void					SetSimulatedEveryTick( bool sim );
-	void					SetAnimatedEveryTick( bool anim );
+
 
 public:
 
@@ -1487,29 +1480,19 @@ private:
 	// Computes new angles based on the angular velocity
 	void					SimulateAngles( float flFrameTime );
 
-	void					CheckStepSimulationChanged();
 	// Run regular think and latch off angle/origin changes so we can interpolate them on the server to fake simulation
 	void					StepSimulationThink( float dt );
-
-	// Compute network origin
-private:
-	void					ComputeStepSimulationNetwork( StepSimulationData *step );
-
-public:
-	bool					UseStepSimulationNetworkOrigin( const Vector **out_v );
-	bool					UseStepSimulationNetworkAngles( const QAngle **out_a );
 
 public:
 	// Add a discontinuity to a step
 	bool					AddStepDiscontinuity( float flTime, const Vector &vecOrigin, const QAngle &vecAngles );
-private:
 	// origin and angles to use in step calculations
-	virtual	Vector			GetStepOrigin( void ) const;
-	virtual	QAngle			GetStepAngles( void ) const;
+	virtual	Vector			GetStepOrigin(void) const;
+	virtual	QAngle			GetStepAngles(void) const;
+private:
+
 	
-	// These set entity flags (EFL_*) to help optimize queries
-	void					CheckHasGamePhysicsSimulation();
-	bool					WillSimulateGamePhysics();
+
 
 	friend class CPushBlockerEnum;
 
@@ -1556,8 +1539,7 @@ private:
 
 	//EHANDLE m_pParent;  // for movement hierarchy
 	byte	m_nTransmitStateOwnedCounter;
-	CNetworkVar( unsigned char, m_MoveType );		// One of the MOVETYPE_ defines.
-	CNetworkVar( unsigned char, m_MoveCollide );
+
 
 	friend class CServerNetworkProperty;
 
@@ -1610,8 +1592,6 @@ private:
 	//Adrian
 	CNetworkVar( unsigned char, m_iTextureFrameIndex );
 	
-	CNetworkVar( bool, m_bSimulatedEveryTick );
-	CNetworkVar( bool, m_bAnimatedEveryTick );
 	CNetworkVar( bool, m_bAlternateSorting );
 
 	// User outputs. Fired when the "FireInputX" input is triggered.
@@ -1974,11 +1954,6 @@ inline void CBaseEntity::SetRenderColorA( byte a )
 	m_clrRender.SetA( a );
 }
 
-inline void CBaseEntity::SetMoveCollide( MoveCollide_t val )
-{ 
-	m_MoveCollide = val; 
-}
-
 inline bool CBaseEntity::IsTransparent() const
 {
 	return m_nRenderMode != kRenderNormal;
@@ -2237,8 +2212,8 @@ public:
 // Network proxy functions
 
 //void SendProxy_Origin( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
-void SendProxy_OriginXY( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
-void SendProxy_OriginZ( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
+//void SendProxy_OriginXY( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
+//void SendProxy_OriginZ( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID );
 //void SendProxy_Angles(const SendProp* pProp, const void* pStruct, const void* pData, DVariant* pOut, int iElement, int objectID);
 
 #endif // BASEENTITY_H

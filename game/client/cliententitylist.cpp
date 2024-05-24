@@ -225,6 +225,8 @@ BEGIN_PREDICTION_DATA_NO_BASE(C_EngineObjectInternal)
 	DEFINE_FIELD(m_flGravity, FIELD_FLOAT),
 	DEFINE_PRED_FIELD(m_flFriction, FIELD_FLOAT, FTYPEDESC_INSENDTABLE),
 	DEFINE_PRED_FIELD(m_nNextThinkTick, FIELD_INTEGER, FTYPEDESC_INSENDTABLE),
+	DEFINE_PRED_FIELD(m_MoveType, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
+	DEFINE_PRED_FIELD(m_MoveCollide, FIELD_CHARACTER, FTYPEDESC_INSENDTABLE),
 END_PREDICTION_DATA()
 
 BEGIN_DATADESC_NO_BASE(C_EngineObjectInternal)
@@ -285,6 +287,29 @@ void RecvProxy_EffectFlags(const CRecvProxyData* pData, void* pStruct, void* pOu
 	((C_EngineObjectInternal*)pStruct)->SetEffects(pData->m_Value.m_Int);
 }
 
+static void RecvProxy_MoveType(const CRecvProxyData* pData, void* pStruct, void* pOut)
+{
+	((C_EngineObjectInternal*)pStruct)->SetMoveType((MoveType_t)(pData->m_Value.m_Int));
+}
+
+static void RecvProxy_MoveCollide(const CRecvProxyData* pData, void* pStruct, void* pOut)
+{
+	((C_EngineObjectInternal*)pStruct)->SetMoveCollide((MoveCollide_t)(pData->m_Value.m_Int));
+}
+
+void RecvProxy_InterpolationAmountChanged(const CRecvProxyData* pData, void* pStruct, void* pOut)
+{
+	// m_bSimulatedEveryTick & m_bAnimatedEveryTick are boolean
+	if (*((bool*)pOut) != (pData->m_Value.m_Int != 0))
+	{
+		// Have the regular proxy store the data.
+		RecvProxy_Int32ToInt8(pData, pStruct, pOut);
+
+		C_EngineObjectInternal* pEntity = (C_EngineObjectInternal*)pStruct;
+		pEntity->Interp_UpdateInterpolationAmounts(pEntity->GetVarMapping());
+}
+}
+
 BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropInt(RECVINFO(testNetwork)),
 	RecvPropVector(RECVINFO_NAME(m_vecNetworkOrigin, m_vecOrigin)),
@@ -310,6 +335,10 @@ BEGIN_RECV_TABLE_NOBASE(C_EngineObjectInternal, DT_EngineObject)
 	RecvPropFloat(RECVINFO(m_flFriction)),
 	RecvPropFloat(RECVINFO(m_flElasticity)),
 	RecvPropInt(RECVINFO(m_nNextThinkTick)),
+	RecvPropInt("movetype", 0, SIZEOF_IGNORE, 0, RecvProxy_MoveType),
+	RecvPropInt("movecollide", 0, SIZEOF_IGNORE, 0, RecvProxy_MoveCollide),
+	RecvPropInt(RECVINFO(m_bSimulatedEveryTick), 0, RecvProxy_InterpolationAmountChanged),
+	RecvPropInt(RECVINFO(m_bAnimatedEveryTick), 0, RecvProxy_InterpolationAmountChanged),
 END_RECV_TABLE()
 
 IMPLEMENT_CLIENTCLASS_NO_FACTORY(C_EngineObjectInternal, DT_EngineObject, CEngineObjectInternal);
@@ -3394,6 +3423,60 @@ void C_EngineObjectInternal::PhysicsDispatchThink(CBASEPTR thinkFunc)
 #endif
 			}
 		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : val - 
+//			moveCollide - 
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::SetMoveType(MoveType_t val, MoveCollide_t moveCollide /*= MOVECOLLIDE_DEFAULT*/)
+{
+	// Make sure the move type + move collide are compatible...
+#ifdef _DEBUG
+	if ((val != MOVETYPE_FLY) && (val != MOVETYPE_FLYGRAVITY))
+	{
+		Assert(moveCollide == MOVECOLLIDE_DEFAULT);
+	}
+#endif
+
+	m_MoveType = val;
+	SetMoveCollide(moveCollide);
+}
+
+void C_EngineObjectInternal::SetMoveCollide(MoveCollide_t val)
+{
+	m_MoveCollide = val;
+}
+
+bool C_EngineObjectInternal::WillSimulateGamePhysics()
+{
+	// players always simulate game physics
+	if (!m_pOuter->IsPlayer())
+	{
+		MoveType_t movetype = GetMoveType();
+
+		if (movetype == MOVETYPE_NONE || movetype == MOVETYPE_VPHYSICS)
+			return false;
+
+	}
+
+	return true;
+}
+
+void C_EngineObjectInternal::CheckHasGamePhysicsSimulation()
+{
+	bool isSimulating = WillSimulateGamePhysics();
+	if (isSimulating != IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION))
+		return;
+	if (isSimulating)
+	{
+		RemoveEFlags(EFL_NO_GAME_PHYSICS_SIMULATION);
+	}
+	else
+	{
+		AddEFlags(EFL_NO_GAME_PHYSICS_SIMULATION);
 	}
 }
 

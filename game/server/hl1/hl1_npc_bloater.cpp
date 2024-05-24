@@ -64,7 +64,7 @@ void CNPC_Bloater::Spawn()
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->AddSpawnFlags(FL_FLY);//need check
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	m_iHealth			= 40;

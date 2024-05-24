@@ -288,7 +288,7 @@ void CNPC_Nihilanth::Spawn( void )
 {
 	Precache( );
 	// motor
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	SetModel( "models/nihilanth.mdl" );
@@ -1294,7 +1294,7 @@ void CNihilanthHVR::Precache( void )
 
 void CNihilanthHVR::CircleInit( CBaseEntity *pTarget )
 {
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_NONE );
 
 	UTIL_SetSize( this, Vector( 0, 0, 0), Vector(0, 0, 0));
@@ -1434,7 +1434,7 @@ bool CNihilanthHVR::CircleTarget( Vector vecTarget )
 
 void CNihilanthHVR::ZapInit( CBaseEntity *pEnemy )
 {
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	
 	CSprite *pSprite = SpriteInit( "sprites/nhth1.vmt", this );
@@ -1602,7 +1602,7 @@ void CNihilanthHVR::DissipateThink( void  )
 
 void CNihilanthHVR::TeleportInit( CNPC_Nihilanth *pOwner, CBaseEntity *pEnemy, CBaseEntity *pTarget, CBaseEntity *pTouch )
 {
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	SetModel( "" );
@@ -1721,7 +1721,7 @@ void CNihilanthHVR::TeleportTouch( CBaseEntity *pOther )
 
 void CNihilanthHVR::GreenBallInit( )
 {
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 
 	SetModel( "" );

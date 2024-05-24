@@ -258,14 +258,14 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 		return 0;
 
 #if 0
-	int solid0 = pEntity0->GetSolid();
-	int solid1 = pEntity1->GetSolid();
-	int nSolidFlags0 = pEntity0->GetSolidFlags();
-	int nSolidFlags1 = pEntity1->GetSolidFlags();
+	int solid0 = pEntity0->GetEngineObject()->GetSolid();
+	int solid1 = pEntity1->GetEngineObject()->GetSolid();
+	int nSolidFlags0 = pEntity0->GetEngineObject()->GetSolidFlags();
+	int nSolidFlags1 = pEntity1->GetEngineObject()->GetSolidFlags();
 #endif
 
-	int movetype0 = pEntity0->GetMoveType();
-	int movetype1 = pEntity1->GetMoveType();
+	int movetype0 = pEntity0->GetEngineObject()->GetMoveType();
+	int movetype1 = pEntity1->GetEngineObject()->GetMoveType();
 
 	// entities with non-physical move parents or entities with MOVETYPE_PUSH
 	// are considered as "AI movers".  They are unchanged by collision; they exert
@@ -277,7 +277,7 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 	{
 		// if the object & its parent are both MOVETYPE_VPHYSICS, then this must be a special case
 		// like a prop_ragdoll_attached
-		if ( !(movetype0 == MOVETYPE_VPHYSICS && pEntity0->GetEngineObject()->GetRootMoveParent()->GetOuter()->GetMoveType() == MOVETYPE_VPHYSICS))
+		if ( !(movetype0 == MOVETYPE_VPHYSICS && pEntity0->GetEngineObject()->GetRootMoveParent()->GetMoveType() == MOVETYPE_VPHYSICS))
 		{
 			aiMove0 = true;
 		}
@@ -285,7 +285,7 @@ int CCollisionEvent::ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pOb
 	if ( pEntity1->GetEngineObject()->GetMoveParent() )
 	{
 		// if the object & its parent are both MOVETYPE_VPHYSICS, then this must be a special case.
-		if ( !(movetype1 == MOVETYPE_VPHYSICS && pEntity1->GetEngineObject()->GetRootMoveParent()->GetOuter()->GetMoveType() == MOVETYPE_VPHYSICS))
+		if ( !(movetype1 == MOVETYPE_VPHYSICS && pEntity1->GetEngineObject()->GetRootMoveParent()->GetMoveType() == MOVETYPE_VPHYSICS))
 		{
 			aiMove1 = true;
 		}

@@ -839,7 +839,7 @@ bool CBaseAnimating::BecomeRagdollOnClient( const Vector &force )
 
 		GetEngineObject()->AddFlag( FL_TRANSRAGDOLL );
 
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		//UTIL_SetSize( this, vec3_origin, vec3_origin );
 		SetThink( NULL );
 	
@@ -2782,7 +2782,7 @@ float CBaseAnimating::GetBoneController ( int iController )
 //------------------------------------------------------------------------------
 void CBaseAnimating::GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity) 
 {
-	if ( GetMoveType() == MOVETYPE_VPHYSICS )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		BaseClass::GetVelocity(vVelocity,vAngVelocity);
 	}

@@ -111,7 +111,7 @@ void CNPC_Barney::Spawn()
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
 	m_iHealth			= sk_barney_health.GetFloat();
 	SetViewOffset( Vector ( 0, 0, 100 ) );// position of the eyes relative to monster's origin.

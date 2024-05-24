@@ -232,7 +232,7 @@ void CNPC_HGrunt::Spawn()
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_RED;
 	GetEngineObject()->ClearEffects();
 	m_iHealth			= sk_hgrunt_health.GetFloat();
@@ -957,7 +957,7 @@ bool CNPC_HGrunt::HandleInteraction(int interactionType, void *data, CBaseCombat
 		SetState ( NPC_STATE_IDLE );
 		m_bInBarnacleMouth	= false;
 		GetEngineObject()->SetAbsVelocity( vec3_origin );
-		SetMoveType( MOVETYPE_STEP );
+		GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 		return true;
 	}
 	else if ( interactionType == g_interactionBarnacleVictimGrab )
@@ -1109,7 +1109,7 @@ void CNPC_HGrunt::HandleAnimEvent( animevent_t *pEvent )
 			CGrenadeMP5 * m_pMyGrenade = (CGrenadeMP5*)Create( "grenade_mp5", vecSrc, angAngles, this );
 			m_pMyGrenade->GetEngineObject()->SetAbsVelocity( m_vecTossVelocity );
 			m_pMyGrenade->SetLocalAngularVelocity( QAngle( random->RandomFloat( -100, -500 ), 0, 0 ) );
-			m_pMyGrenade->SetMoveType( MOVETYPE_FLYGRAVITY ); 
+			m_pMyGrenade->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 			m_pMyGrenade->SetThrower( this );
 			m_pMyGrenade->SetDamage( sk_plr_dmg_mp5_grenade.GetFloat() );
 
@@ -1304,7 +1304,7 @@ void CNPC_HGrunt::StartTask ( const Task_t *pTask )
 	case TASK_FACE_IDEAL:
 	case TASK_FACE_ENEMY:
 		BaseClass::StartTask( pTask );
-		if (GetMoveType() == MOVETYPE_FLYGRAVITY)
+		if (GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY)
 		{
 			SetIdealActivity( ACT_GLIDE );
 		}
@@ -1470,12 +1470,12 @@ int CNPC_HGrunt::SelectSchedule( void )
 	m_iSentence = HGRUNT_SENT_NONE;
 
 	// flying? If PRONE, barnacle has me. IF not, it's assumed I am rapelling. 
-	if ( GetMoveType() == MOVETYPE_FLYGRAVITY && m_NPCState != NPC_STATE_PRONE )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_FLYGRAVITY && m_NPCState != NPC_STATE_PRONE )
 	{
 		if (GetEngineObject()->GetFlags() & FL_ONGROUND)
 		{
 			// just landed
-			SetMoveType( MOVETYPE_STEP );
+			GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 			GetEngineObject()->SetGravity( 1.0 );
 			return SCHED_GRUNT_REPEL_LAND;
 		}
@@ -1899,7 +1899,7 @@ void CNPC_HGruntRepel::RepelUse ( CBaseEntity *pActivator, CBaseEntity *pCaller,
 	
 	CBaseEntity *pEntity = Create( "monster_human_grunt", GetEngineObject()->GetAbsOrigin(), GetEngineObject()->GetAbsAngles() );
 	CAI_BaseNPC *pGrunt = pEntity->MyNPCPointer( );
-	pGrunt->SetMoveType( MOVETYPE_FLYGRAVITY );
+	pGrunt->GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	pGrunt->GetEngineObject()->SetGravity( 0.001 );
 	pGrunt->GetEngineObject()->SetAbsVelocity( Vector( 0, 0, random->RandomFloat( -196, -128 ) ) );
 	pGrunt->SetActivity( ACT_GLIDE );

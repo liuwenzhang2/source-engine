@@ -143,7 +143,7 @@ void CPointSpotlight::Spawn(void)
 
 	UTIL_SetSize( this,vec3_origin,vec3_origin );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	m_bEfficientSpotlight = true;
 
 	// Check for user error
@@ -235,7 +235,7 @@ void CPointSpotlight::CreateEfficientSpotlight()
 	m_hSpotlightTarget->m_vSpotlightOrg = GetEngineObject()->GetAbsOrigin();
 	VectorSubtract( m_hSpotlightTarget->GetEngineObject()->GetAbsOrigin(), m_hSpotlightTarget->m_vSpotlightOrg, m_hSpotlightTarget->m_vSpotlightDir );
 	m_flSpotlightCurLength = VectorNormalize( m_hSpotlightTarget->m_vSpotlightDir );
-	m_hSpotlightTarget->SetMoveType( MOVETYPE_NONE );
+	m_hSpotlightTarget->GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	ComputeRenderInfo();
 
 	m_OnOn.FireOutput( this, this );
@@ -279,7 +279,7 @@ void CPointSpotlight::OnEntityEvent( EntityEvent_t event, void *pEventData )
 			m_bEfficientSpotlight = false;
 			if ( m_hSpotlightTarget )
 			{
-				m_hSpotlightTarget->SetMoveType( MOVETYPE_FLY );
+				m_hSpotlightTarget->GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 			}
 			SetThink( &CPointSpotlight::SpotlightThink );
 			GetEngineObject()->SetNextThink( gpGlobals->curtime + 0.1f );

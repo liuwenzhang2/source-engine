@@ -630,7 +630,7 @@ void CNPC_RollerMine::Bury( trace_t *tr )
 	// Move into the ground layer
 	Vector buriedPos = tr->endpos - Vector( 0, 0, GetHullHeight() * 0.5 );
 	Teleport( &buriedPos, NULL, &vec3_origin );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	SetSchedule( SCHED_ROLLERMINE_BURIED_WAIT );
 }
@@ -780,7 +780,7 @@ bool CNPC_RollerMine::BecomePhysical( void )
 	m_pMotionController = physenv->CreateMotionController( &m_RollerController );
 	m_pMotionController->AttachObject( pPhysicsObject, true );
 
-	SetMoveType( MOVETYPE_VPHYSICS );
+	GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 
 	return true;
 }
@@ -1069,7 +1069,7 @@ void CNPC_RollerMine::StartTask( const Task_t *pTask )
 		
 		{
 			GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-			SetMoveType( MOVETYPE_NOCLIP );
+			GetEngineObject()->SetMoveType( MOVETYPE_NOCLIP );
 			GetEngineObject()->SetAbsVelocity( Vector( 0, 0, 256 ) );
 			Open();
 
@@ -2530,7 +2530,7 @@ int CNPC_RollerMine::OnTakeDamage( const CTakeDamageInfo &info )
 {
 	if ( !(info.GetDamageType() & DMG_BURN) )
 	{
-		if ( GetMoveType() == MOVETYPE_VPHYSICS )
+		if (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 		{
 			AngularImpulse	angVel;
 			angVel.Random( -400.0f, 400.0f );
@@ -2569,7 +2569,7 @@ void CNPC_RollerMine::Hop( float height )
 	if ( m_flNextHop > gpGlobals->curtime )
 		return;
 
-	if ( GetMoveType() == MOVETYPE_VPHYSICS )
+	if (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS )
 	{
 		IPhysicsObject *pPhysObj = VPhysicsGetObject();
 		pPhysObj->ApplyForceCenter( Vector(0,0,1) * height * pPhysObj->GetMass() );
@@ -2863,7 +2863,7 @@ bool CNPC_RollerMine::IsValidEnemy( CBaseEntity *pEnemy )
 			return false;
 
 		// Don't attack flying things.
-		if ( pEnemy->GetMoveType() == MOVETYPE_FLY )
+		if ( pEnemy->GetEngineObject()->GetMoveType() == MOVETYPE_FLY )
 			return false;
 	}
 

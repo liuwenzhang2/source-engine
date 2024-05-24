@@ -2505,7 +2505,7 @@ int CPortalSimulator::GetMoveableOwnedEntities( CBaseEntity **pEntsOut, int iEnt
 		if( CPSCollisionEntity::IsPortalSimulatorCollisionEntity( pEnt ) )
 			continue;
 
-		if( pEnt->GetMoveType() == MOVETYPE_NONE )
+		if( pEnt->GetEngineObject()->GetMoveType() == MOVETYPE_NONE )
 			continue;
 
         pEntsOut[iOutputCount] = pEnt;
@@ -2926,7 +2926,7 @@ void CPSCollisionEntity::Spawn( void )
 {
 	BaseClass::Spawn();
 	GetEngineObject()->SetSolid( SOLID_CUSTOM );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_NONE );
 	s_PortalSimulatorCollisionEntities[entindex()] = true;
 	VPhysicsSetObject( NULL );

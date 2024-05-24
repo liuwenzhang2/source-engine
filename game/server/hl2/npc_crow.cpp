@@ -111,7 +111,7 @@ void CNPC_Crow::Spawn( void )
 	SetHullSizeNormal();
 
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 
 	m_flFieldOfView = VIEW_FIELD_FULL;
 	SetViewOffset( Vector(6, 0, 11) );		// Position of the eyes relative to NPC's origin.
@@ -680,7 +680,7 @@ void CNPC_Crow::SetFlyingState( FlyState_t eState )
 		SetNavType( NAV_FLY );
 		CapabilitiesRemove( bits_CAP_MOVE_GROUND );
 		CapabilitiesAdd( bits_CAP_MOVE_FLY );
-		SetMoveType( MOVETYPE_STEP );
+		GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 		m_vLastStoredOrigin = GetEngineObject()->GetAbsOrigin();
 		m_flLastStuckCheck = gpGlobals->curtime + 3.0f;
 		m_flGroundIdleMoveTime = gpGlobals->curtime + random->RandomFloat( 5.0f, 10.0f );
@@ -697,7 +697,7 @@ void CNPC_Crow::SetFlyingState( FlyState_t eState )
 		SetNavType( NAV_GROUND );
 		CapabilitiesRemove( bits_CAP_MOVE_FLY );
 		CapabilitiesAdd( bits_CAP_MOVE_GROUND );
-		SetMoveType( MOVETYPE_STEP );
+		GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 		m_vLastStoredOrigin = vec3_origin;
 		m_flGroundIdleMoveTime = gpGlobals->curtime + random->RandomFloat( 5.0f, 10.0f );
 	}
@@ -708,7 +708,7 @@ void CNPC_Crow::SetFlyingState( FlyState_t eState )
 		SetNavType( NAV_GROUND );
 		CapabilitiesRemove( bits_CAP_MOVE_FLY );
 		CapabilitiesAdd( bits_CAP_MOVE_GROUND );
-		SetMoveType( MOVETYPE_STEP );
+		GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 		m_flGroundIdleMoveTime = gpGlobals->curtime + random->RandomFloat( 5.0f, 10.0f );
 	}
 }

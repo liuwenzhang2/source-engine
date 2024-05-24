@@ -263,7 +263,7 @@ END_PREDICTION_DATA()
 
 	void CPlantedC4::Init( CCSPlayer *pevOwner, Vector vecStart, QAngle vecAngles )
 	{
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		GetEngineObject()->SetSolid( SOLID_NONE );
 
 		SetModel( PLANTED_C4_MODEL );	// Change this to c4 model

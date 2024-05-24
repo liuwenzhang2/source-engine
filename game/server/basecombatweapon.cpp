@@ -483,7 +483,7 @@ void CBaseCombatWeapon::FallInit( void )
 
 	if ( !VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false ) )
 	{
-		SetMoveType( MOVETYPE_FLYGRAVITY );
+		GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 		GetEngineObject()->SetSolid( SOLID_BBOX );
 		GetEngineObject()->AddSolidFlags( FSOLID_TRIGGER );
 	}
@@ -604,7 +604,7 @@ void CBaseCombatWeapon::Materialize( void )
 	if (GetEngineObject()->HasSpawnFlags( SF_NORESPAWN ) == false )
 	{
 		VPhysicsInitNormal( SOLID_BBOX, GetEngineObject()->GetSolidFlags() | FSOLID_TRIGGER, false );
-		SetMoveType( MOVETYPE_VPHYSICS );
+		GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 
 		HL2MPRules()->AddLevelDesignerPlacedObject( this );
 	}

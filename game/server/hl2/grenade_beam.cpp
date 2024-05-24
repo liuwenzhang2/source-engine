@@ -39,7 +39,7 @@ LINK_ENTITY_TO_CLASS( grenade_beam_chaser, CGrenadeBeamChaser );
 void CGrenadeBeamChaser::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_FLY );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLY );
 	SetThink(&CGrenadeBeamChaser::ChaserThink);
 	GetEngineObject()->SetNextThink( gpGlobals->curtime );
 }
@@ -126,7 +126,7 @@ void CGrenadeBeam::Spawn( void )
 {
 	Precache( );
 	GetEngineObject()->SetSolid( SOLID_BBOX );
-	SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
+	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY, MOVECOLLIDE_FLY_BOUNCE );
 	
 	//UNDONE/HACK: this model is never used but one is needed
 	SetModel( "Models/weapons/flare.mdl" );

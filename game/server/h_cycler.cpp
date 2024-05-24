@@ -90,7 +90,7 @@ void CCycler::Spawn( )
 		GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
 	}
 
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	m_takedamage		= DAMAGE_YES;
 	m_iHealth			= 80000;// no cycler should die
 	GetMotor()->SetIdealYaw(GetEngineObject()->GetLocalAngles().y );
@@ -254,7 +254,7 @@ void CWeaponCycler::Spawn( )
 {
 	GetEngineObject()->SetSolid( SOLID_BBOX );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_STANDABLE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	engine->PrecacheModel( STRING(GetEngineObject()->GetModelName() ) );
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
@@ -356,7 +356,7 @@ LINK_ENTITY_TO_CLASS( cycler_wreckage, CWreckage );
 void CWreckage::Spawn( void )
 {
 	GetEngineObject()->SetSolid( SOLID_NONE );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	m_takedamage		= 0;
 
 	SetCycle( 0 );

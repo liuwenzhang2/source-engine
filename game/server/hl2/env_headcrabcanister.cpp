@@ -828,7 +828,7 @@ void CEnvHeadcrabCanister::SetLanded( void )
 {
 	GetEngineObject()->SetAbsOrigin( m_vecImpactPosition );
 	SetModel( ENV_HEADCRABCANISTER_BROKEN_MODEL );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->SetSolid( SOLID_VPHYSICS );
 	VPhysicsInitStatic();
 	
@@ -930,7 +930,7 @@ void CEnvHeadcrabCanister::Detonate( )
 	{
 		GetEngineObject()->SetAbsOrigin( m_vecImpactPosition );
 		SetModel( ENV_HEADCRABCANISTER_BROKEN_MODEL );
-		SetMoveType( MOVETYPE_NONE );
+		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 		IncrementInterpolationFrame();
 		m_bLanded = true;
 		

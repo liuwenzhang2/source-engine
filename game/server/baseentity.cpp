@@ -69,7 +69,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern bool g_bTestMoveTypeStepSimulation;
 extern ConVar sv_vehicle_autoaim_scale;
 
 // Init static class variables
@@ -205,42 +204,7 @@ END_SEND_TABLE()
 
 
 
-//--------------------------------------------------------------------------------------------------------
-// Used when breaking up origin, note we still have to deal with StepSimulation
-//--------------------------------------------------------------------------------------------------------
-void SendProxy_OriginXY( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
-{
-	CBaseEntity *entity = (CBaseEntity*)pStruct;
-	Assert( entity );
 
-	const Vector *v;
-
-	if ( !entity->UseStepSimulationNetworkOrigin( &v ) )
-	{
-		v = &entity->GetEngineObject()->GetLocalOrigin();
-	}
-
-	pOut->m_Vector[ 0 ] = v->x;
-	pOut->m_Vector[ 1 ] = v->y;
-}
-
-//--------------------------------------------------------------------------------------------------------
-// Used when breaking up origin, note we still have to deal with StepSimulation
-//--------------------------------------------------------------------------------------------------------
-void SendProxy_OriginZ( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
-{
-	CBaseEntity *entity = (CBaseEntity*)pStruct;
-	Assert( entity );
-
-	const Vector *v;
-
-	if ( !entity->UseStepSimulationNetworkOrigin( &v ) )
-	{
-		v = &entity->GetEngineObject()->GetLocalOrigin();
-	}
-
-	pOut->m_Float = v->z;
-}
 
 
 
@@ -258,8 +222,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropFloat	(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED ),
 	SendPropEHandle (SENDINFO(m_hOwnerEntity)),
 	SendPropEHandle (SENDINFO(m_hEffectEntity)),
-	SendPropInt		(SENDINFO_NAME( m_MoveType, movetype ), MOVETYPE_MAX_BITS, SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO_NAME( m_MoveCollide, movecollide ), MOVECOLLIDE_MAX_BITS, SPROP_UNSIGNED ),
+
 
 	SendPropInt		( SENDINFO( m_iTextureFrameIndex ),		8, SPROP_UNSIGNED ),
 
@@ -268,8 +231,7 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 //#endif
 
 	// FIXME: Collapse into another flag field?
-	SendPropInt		(SENDINFO(m_bSimulatedEveryTick),		1, SPROP_UNSIGNED ),
-	SendPropInt		(SENDINFO(m_bAnimatedEveryTick),		1, SPROP_UNSIGNED ),
+
 	SendPropBool( SENDINFO( m_bAlternateSorting )),
 
 #ifdef TF_DLL
@@ -351,7 +313,6 @@ CBaseEntity::CBaseEntity()
 	//m_bDynamicModelPending = false;
 	//m_bDynamicModelSetBounds = false;
 
-	SetMoveType( MOVETYPE_NONE );
 	SetOwnerEntity( NULL );
 	m_nTransmitStateOwnedCounter = 0;
 
@@ -420,7 +381,7 @@ void CBaseEntity::PostConstructor(const char* szClassname, int iForceEdictIndex)
 	//}
 
 	GetEngineObject()->CheckHasThinkFunction(false);
-	CheckHasGamePhysicsSimulation();
+	GetEngineObject()->CheckHasGamePhysicsSimulation();
 }
 
 //-----------------------------------------------------------------------------
@@ -512,7 +473,7 @@ void CBaseEntity::UpdateOnRemove(void)
 	// This is only here to allow the MOVETYPE_NONE to be set without the
 	// assertion triggering. Why do we bother setting the MOVETYPE to none here?
 	GetEngineObject()->RemoveEffects(EF_BONEMERGE);
-	SetMoveType(MOVETYPE_NONE);
+	GetEngineObject()->SetMoveType(MOVETYPE_NONE);
 
 	// If we have a parent, unlink from it.
 	this->BeforeParentChanged(NULL);
@@ -612,13 +573,13 @@ void CBaseEntity::StopFollowingEntity( )
 	GetEngineObject()->SetParent( NULL );
 	GetEngineObject()->RemoveEffects( EF_BONEMERGE );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	GetEngineObject()->CollisionRulesChanged();
 }
 
 bool CBaseEntity::IsFollowingEntity()
 {
-	return GetEngineObject()->IsEffectActive( EF_BONEMERGE ) && (GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
+	return GetEngineObject()->IsEffectActive( EF_BONEMERGE ) && (GetEngineObject()->GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
 }
 
 CBaseEntity *CBaseEntity::GetFollowedEntity()
@@ -889,7 +850,7 @@ void CBaseEntity::DrawDebugGeometryOverlays(void)
 			VPhysicsGetObject()->LocalToWorld( &worldPos, massCenter );
 			NDebugOverlay::Cross3D( worldPos, 12, 255, 0, 0, false, 0 );
 			DebugDrawContactPoints(VPhysicsGetObject());
-			if ( GetMoveType() != MOVETYPE_VPHYSICS )
+			if (GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 			{
 				Vector pos;
 				QAngle angles;
@@ -1269,13 +1230,13 @@ int CBaseEntity::OnTakeDamage( const CTakeDamageInfo &info )
 	// physics objects have their own calcs for this: (don't let fire move things around!)
 	if ( !GetEngineObject()->IsEFlagSet( EFL_NO_DAMAGE_FORCES ) )
 	{
-		if ( ( GetMoveType() == MOVETYPE_VPHYSICS ) )
+		if ( (GetEngineObject()->GetMoveType() == MOVETYPE_VPHYSICS ) )
 		{
 			VPhysicsTakeDamage( info );
 		}
 		else
 		{
-			if ( info.GetInflictor() && (GetMoveType() == MOVETYPE_WALK || GetMoveType() == MOVETYPE_STEP) && 
+			if ( info.GetInflictor() && (GetEngineObject()->GetMoveType() == MOVETYPE_WALK || GetEngineObject()->GetMoveType() == MOVETYPE_STEP) &&
 				!info.GetAttacker()->GetEngineObject()->IsSolidFlagSet(FSOLID_TRIGGER) )
 			{
 				Vector vecDir, vecInflictorCentroid;
@@ -1599,8 +1560,8 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	//DEFINE_EMBEDDED( m_Collision ),
 	DEFINE_EMBEDDED( m_Network ),
 
-	DEFINE_FIELD( m_MoveType, FIELD_CHARACTER ),
-	DEFINE_FIELD( m_MoveCollide, FIELD_CHARACTER ),
+	//DEFINE_FIELD( m_MoveType, FIELD_CHARACTER ),
+	//DEFINE_FIELD( m_MoveCollide, FIELD_CHARACTER ),
 	DEFINE_FIELD( m_hOwnerEntity, FIELD_EHANDLE ),
 	//DEFINE_FIELD( m_CollisionGroup, FIELD_INTEGER ),
 	DEFINE_PHYSPTR( m_pPhysicsObject),
@@ -1639,8 +1600,8 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 	//DEFINE_CUSTOM_FIELD_INVALID( m_vecAbsOrigin, engineObjectFuncs),
 	//DEFINE_CUSTOM_KEYFIELD_INVALID( m_vecVelocity, engineObjectFuncs, "velocity" ),
 	DEFINE_KEYFIELD( m_iTextureFrameIndex, FIELD_CHARACTER, "texframeindex" ),
-	DEFINE_FIELD( m_bSimulatedEveryTick, FIELD_BOOLEAN ),
-	DEFINE_FIELD( m_bAnimatedEveryTick, FIELD_BOOLEAN ),
+	//DEFINE_FIELD( m_bSimulatedEveryTick, FIELD_BOOLEAN ),
+	//DEFINE_FIELD( m_bAnimatedEveryTick, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bAlternateSorting, FIELD_BOOLEAN ),
 	//DEFINE_KEYFIELD( m_spawnflags, FIELD_INTEGER, "spawnflags" ),
 	DEFINE_FIELD( m_nTransmitStateOwnedCounter, FIELD_CHARACTER ),
@@ -2232,7 +2193,7 @@ void CBaseEntity::SetMoveDoneTime( float flDelay )
 	{
 		m_flMoveDoneTime = -1;
 	}
-	CheckHasGamePhysicsSimulation();
+	GetEngineObject()->CheckHasGamePhysicsSimulation();
 }
 
 //-----------------------------------------------------------------------------
@@ -2254,7 +2215,7 @@ void CBaseEntity::PhysicsRelinkChildren( float dt )
 		// Update their physics shadows. We should never have any children of
 		// movetype VPHYSICS.
 		//
-		if ( child->GetOuter()->GetMoveType() != MOVETYPE_VPHYSICS )
+		if ( child->GetMoveType() != MOVETYPE_VPHYSICS )
 		{
 			child->GetOuter()->UpdatePhysicsShadowToCurrentPosition( dt );
 		}
@@ -2290,7 +2251,7 @@ void CBaseEntity::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 
 	// Don't make sounds / effects if neither entity is MOVETYPE_VPHYSICS.  The game
 	// physics should have done so.
-	if ( GetMoveType() != MOVETYPE_VPHYSICS && pHitEntity->GetMoveType() != MOVETYPE_VPHYSICS )
+	if (GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS && pHitEntity->GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 		return;
 
 	if ( pEvent->deltaCollisionTime < 0.5 && (pHitEntity == this) )
@@ -2351,7 +2312,7 @@ void CBaseEntity::VPhysicsSwapObject( IPhysicsObject *pSwap )
 // Tells the physics shadow to update it's target to the current position
 void CBaseEntity::UpdatePhysicsShadowToCurrentPosition( float deltaTime )
 {
-	if ( GetMoveType() != MOVETYPE_VPHYSICS )
+	if (GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 	{
 		IPhysicsObject *pPhys = VPhysicsGetObject();
 		if ( pPhys )
@@ -2621,7 +2582,7 @@ void CBaseEntity::MakeDormant( void )
 	// Don't touch
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
 	// Don't move
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 	// Don't draw
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	// Don't think
@@ -2667,7 +2628,7 @@ bool CBaseEntity::IsViewable( void )
 
 	if (IsBSPModel())
 	{
-		if (GetMoveType() != MOVETYPE_NONE)
+		if (GetEngineObject()->GetMoveType() != MOVETYPE_NONE)
 		{
 			return true;
 		}
@@ -2951,76 +2912,7 @@ void CBaseEntity::SetOwnerEntity( CBaseEntity* pOwner )
 	}
 }
 
-void CBaseEntity::SetMoveType( MoveType_t val, MoveCollide_t moveCollide )
-{
-#ifdef _DEBUG
-	// Make sure the move type + move collide are compatible...
-	if ((val != MOVETYPE_FLY) && (val != MOVETYPE_FLYGRAVITY))
-	{
-		Assert( moveCollide == MOVECOLLIDE_DEFAULT );
-	}
 
-	if ( m_MoveType == MOVETYPE_VPHYSICS && val != m_MoveType )
-	{
-		if ( VPhysicsGetObject() && val != MOVETYPE_NONE )
-		{
-			// What am I supposed to do with the physics object if
-			// you're changing away from MOVETYPE_VPHYSICS without making the object 
-			// shadow?  This isn't likely to work, assert.
-			// You probably meant to call VPhysicsInitShadow() instead of VPhysicsInitNormal()!
-			Assert( VPhysicsGetObject()->GetShadowController() );
-		}
-	}
-#endif
-
-	if ( m_MoveType == val )
-	{
-		m_MoveCollide = moveCollide;
-		return;
-	}
-
-	// This is needed to the removal of MOVETYPE_FOLLOW:
-	// We can't transition from follow to a different movetype directly
-	// or the leaf code will break.
-	Assert( !GetEngineObject()->IsEffectActive( EF_BONEMERGE ) );
-	m_MoveType = val;
-	m_MoveCollide = moveCollide;
-
-	GetEngineObject()->CollisionRulesChanged();
-
-	switch( m_MoveType )
-	{
-	case MOVETYPE_WALK:
-		{
-			SetSimulatedEveryTick( true );
-			SetAnimatedEveryTick( true );
-		}
-		break;
-	case MOVETYPE_STEP:
-		{
-			// This will probably go away once I remove the cvar that controls the test code
-			SetSimulatedEveryTick( g_bTestMoveTypeStepSimulation ? true : false );
-			SetAnimatedEveryTick( false );
-		}
-		break;
-	case MOVETYPE_FLY:
-	case MOVETYPE_FLYGRAVITY:
-		{
-			// Initialize our water state, because these movetypes care about transitions in/out of water
-			UpdateWaterState();
-		}
-		break;
-	default:
-		{
-			SetSimulatedEveryTick( true );
-			SetAnimatedEveryTick( false );
-		}
-	}
-
-	// This will probably go away or be handled in a better way once I remove the cvar that controls the test code
-	CheckStepSimulationChanged();
-	CheckHasGamePhysicsSimulation();
-}
 
 void CBaseEntity::Spawn( void ) 
 {
@@ -3395,7 +3287,7 @@ void CBaseEntity::OnEntityEvent( EntityEvent_t event, void *pEventData )
 	}
 
 	// Only do this for vphysics objects
-	if ( GetMoveType() != MOVETYPE_VPHYSICS )
+	if (GetEngineObject()->GetMoveType() != MOVETYPE_VPHYSICS )
 		return;
 
 	int nNewContents = 0;
@@ -3752,7 +3644,7 @@ void CBaseEntity::SetParentAttachment( const char *szInputName, const char *szAt
 	GetEngineObject()->SetParent(GetEngineObject()->GetMoveParent(), iAttachment);
 
 	// Now move myself directly onto the attachment point
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 
 	if ( !bMaintainOffset )
 	{
@@ -3794,7 +3686,7 @@ void CBaseEntity::InputClearParent( inputdata_t &inputdata )
 //------------------------------------------------------------------------------
 void CBaseEntity::GetVelocity(Vector *vVelocity, AngularImpulse *vAngVelocity)
 {
-	if (GetMoveType()==MOVETYPE_VPHYSICS && m_pPhysicsObject)
+	if (GetEngineObject()->GetMoveType()==MOVETYPE_VPHYSICS && m_pPhysicsObject)
 	{
 		m_pPhysicsObject->GetVelocity(vVelocity,vAngVelocity);
 	}
@@ -5993,199 +5885,13 @@ CAI_BaseNPC	*CBaseEntity::MyNPCPointer( void )
 	return NULL;
 }
 
-ConVar step_spline( "step_spline", "0" );
-
-//-----------------------------------------------------------------------------
-// Purpose: Run one tick's worth of faked simulation
-// Input  : *step - 
-//-----------------------------------------------------------------------------
-void CBaseEntity::ComputeStepSimulationNetwork( StepSimulationData *step )
-{
-	if ( !step )
-	{
-		Assert( !"ComputeStepSimulationNetworkOriginAndAngles with NULL step\n" );
-		return;
-	}
-
-	// Don't run again if we've already calculated this tick
-	if ( step->m_nLastProcessTickCount == gpGlobals->tickcount )
-	{
-		return;
-	}
-
-	step->m_nLastProcessTickCount = gpGlobals->tickcount;
-
-	// Origin
-	// It's inactive
-	if ( step->m_bOriginActive )
-	{
-		// First see if any external code moved the entity
-		if ( GetStepOrigin() != step->m_Next.vecOrigin )
-		{
-			step->m_bOriginActive = false;
-		}
-		else
-		{
-			// Compute interpolated info based on tick interval
-			float frac = 1.0f;
-			int tickdelta = step->m_Next.nTickCount - step->m_Previous.nTickCount;
-			if ( tickdelta > 0 )
-			{
-				frac = (float)( gpGlobals->tickcount - step->m_Previous.nTickCount ) / (float) tickdelta;
-				frac = clamp( frac, 0.0f, 1.0f );
-			}
-		
-			if (step->m_Previous2.nTickCount == 0 || step->m_Previous2.nTickCount >= step->m_Previous.nTickCount)
-			{
-				Vector delta = step->m_Next.vecOrigin - step->m_Previous.vecOrigin;
-				VectorMA( step->m_Previous.vecOrigin, frac, delta, step->m_vecNetworkOrigin );
-			}
-			else if (!step_spline.GetBool())
-			{
-				StepSimulationStep *pOlder = &step->m_Previous;
-				StepSimulationStep *pNewer = &step->m_Next;
-		
-				if (step->m_Discontinuity.nTickCount > step->m_Previous.nTickCount)
-				{
-					if (gpGlobals->tickcount > step->m_Discontinuity.nTickCount)
-					{
-						pOlder = &step->m_Discontinuity;
-					}
-					else
-					{
-						pNewer = &step->m_Discontinuity;
-					}
-		
-					tickdelta = pNewer->nTickCount - pOlder->nTickCount;
-					if ( tickdelta > 0 )
-					{
-						frac = (float)( gpGlobals->tickcount - pOlder->nTickCount ) / (float) tickdelta;
-						frac = clamp( frac, 0.0f, 1.0f );
-					}
-				}
-		
-				Vector delta = pNewer->vecOrigin - pOlder->vecOrigin;
-				VectorMA( pOlder->vecOrigin, frac, delta, step->m_vecNetworkOrigin );
-			}
-			else
-			{
-				Hermite_Spline( step->m_Previous2.vecOrigin, step->m_Previous.vecOrigin, step->m_Next.vecOrigin, frac, step->m_vecNetworkOrigin );
-			}
-		}
-	}
-
-	// Angles
-	if ( step->m_bAnglesActive )
-	{
-		// See if external code changed the orientation of the entity
-		if ( GetStepAngles() != step->m_angNextRotation )
-		{
-			step->m_bAnglesActive = false;
-		}
-		else
-		{
-			// Compute interpolated info based on tick interval
-			float frac = 1.0f;
-			int tickdelta = step->m_Next.nTickCount - step->m_Previous.nTickCount;
-			if ( tickdelta > 0 )
-			{
-				frac = (float)( gpGlobals->tickcount - step->m_Previous.nTickCount ) / (float) tickdelta;
-				frac = clamp( frac, 0.0f, 1.0f );
-			}
-		
-			if (step->m_Previous2.nTickCount == 0 || step->m_Previous2.nTickCount >= step->m_Previous.nTickCount)
-			{
-				// Pure blend between start/end orientations
-				Quaternion outangles;
-				QuaternionBlend( step->m_Previous.qRotation, step->m_Next.qRotation, frac, outangles );
-				QuaternionAngles( outangles, step->m_angNetworkAngles );
-			}
-			else if (!step_spline.GetBool())
-			{
-				StepSimulationStep *pOlder = &step->m_Previous;
-				StepSimulationStep *pNewer = &step->m_Next;
-		
-				if (step->m_Discontinuity.nTickCount > step->m_Previous.nTickCount)
-				{
-					if (gpGlobals->tickcount > step->m_Discontinuity.nTickCount)
-					{
-						pOlder = &step->m_Discontinuity;
-					}
-					else
-					{
-						pNewer = &step->m_Discontinuity;
-					}
-		
-					tickdelta = pNewer->nTickCount - pOlder->nTickCount;
-					if ( tickdelta > 0 )
-					{
-						frac = (float)( gpGlobals->tickcount - pOlder->nTickCount ) / (float) tickdelta;
-						frac = clamp( frac, 0.0f, 1.0f );
-					}
-				}
-		
-				// Pure blend between start/end orientations
-				Quaternion outangles;
-				QuaternionBlend( pOlder->qRotation, pNewer->qRotation, frac, outangles );
-				QuaternionAngles( outangles, step->m_angNetworkAngles );
-			}
-			else
-			{
-				// FIXME: enable spline interpolation when turning is debounced.
-				Quaternion outangles;
-				Hermite_Spline( step->m_Previous2.qRotation, step->m_Previous.qRotation, step->m_Next.qRotation, frac, outangles );
-				QuaternionAngles( outangles, step->m_angNetworkAngles );
-			}
-		}
-	}
-
-}
-
-
-//-----------------------------------------------------------------------------
-bool CBaseEntity::UseStepSimulationNetworkOrigin( const Vector **out_v )
-{
-	Assert( out_v );
-
-
-	if ( g_bTestMoveTypeStepSimulation &&
-		GetMoveType() == MOVETYPE_STEP &&
-		GetEngineObject()->HasDataObjectType( STEPSIMULATION ) )
-	{
-		StepSimulationData *step = ( StepSimulationData * )GetEngineObject()->GetDataObject( STEPSIMULATION );
-		ComputeStepSimulationNetwork( step );
-		*out_v = &step->m_vecNetworkOrigin;
-
-		return step->m_bOriginActive;
-	}
-
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-bool CBaseEntity::UseStepSimulationNetworkAngles( const QAngle **out_a )
-{
-	Assert( out_a );
-
-	if ( g_bTestMoveTypeStepSimulation &&
-		GetMoveType() == MOVETYPE_STEP &&
-		GetEngineObject()->HasDataObjectType( STEPSIMULATION ) )
-	{
-		StepSimulationData *step = ( StepSimulationData * )GetEngineObject()->GetDataObject( STEPSIMULATION );
-		ComputeStepSimulationNetwork( step );
-		*out_a = &step->m_angNetworkAngles;
-		return step->m_bAnglesActive;
-	}
-	return false;
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 
 bool CBaseEntity::AddStepDiscontinuity( float flTime, const Vector &vecOrigin, const QAngle &vecAngles )
 {
-	if ((GetMoveType() != MOVETYPE_STEP ) || !GetEngineObject()->HasDataObjectType( STEPSIMULATION ) )
+	if ((GetEngineObject()->GetMoveType() != MOVETYPE_STEP ) || !GetEngineObject()->HasDataObjectType( STEPSIMULATION ) )
 	{
 		return false;
 	}
@@ -6297,7 +6003,7 @@ void CBaseEntity::RemoveDeferred( void )
 	// Hide us completely
 	GetEngineObject()->AddEffects( EF_NODRAW );
 	GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-	SetMoveType( MOVETYPE_NONE );
+	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
 }
 
 #define MIN_CORPSE_FADE_TIME		10.0

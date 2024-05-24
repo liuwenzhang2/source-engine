@@ -190,7 +190,7 @@ void CNPC_AlienGrunt::Spawn()
 	Vector vecSurroundingMaxs( 32, 32, 85 );
 	GetEngineObject()->SetSurroundingBoundsType( USE_SPECIFIED_BOUNDS, &vecSurroundingMins, &vecSurroundingMaxs );
 
-	SetMoveType( MOVETYPE_STEP );
+	GetEngineObject()->SetMoveType( MOVETYPE_STEP );
 	m_bloodColor		= BLOOD_COLOR_GREEN;
 	GetEngineObject()->ClearEffects();
 	m_iHealth			= sk_agrunt_health.GetFloat();

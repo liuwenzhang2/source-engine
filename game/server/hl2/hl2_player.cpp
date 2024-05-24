@@ -1022,7 +1022,7 @@ bool CHL2_Player::HandleInteraction(int interactionType, void *data, CBaseCombat
 	if (interactionType ==	g_interactionBarnacleVictimReleased)
 	{
 		m_afPhysicsFlags &= ~PFLAG_ONBARNACLE;
-		SetMoveType( MOVETYPE_WALK );
+		GetEngineObject()->SetMoveType( MOVETYPE_WALK );
 		return true;
 	}
 	else if (interactionType ==	g_interactionBarnacleVictimGrab)
@@ -2889,7 +2889,7 @@ void CHL2_Player::PlayerUse ( void )
 		}
 
 		// Tracker 3926:  We can't +USE something if we're climbing a ladder
-		if ( GetMoveType() == MOVETYPE_LADDER )
+		if (GetEngineObject()->GetMoveType() == MOVETYPE_LADDER )
 		{
 			return;
 		}
@@ -3627,11 +3627,11 @@ void CHL2_Player::DrawDebugGeometryOverlays(void)
 //-----------------------------------------------------------------------------
 void CHL2_Player::ExitLadder()
 {
-	if ( MOVETYPE_LADDER != GetMoveType() )
+	if ( MOVETYPE_LADDER != GetEngineObject()->GetMoveType() )
 		return;
 	
-	SetMoveType( MOVETYPE_WALK );
-	SetMoveCollide( MOVECOLLIDE_DEFAULT );
+	GetEngineObject()->SetMoveType( MOVETYPE_WALK );
+	GetEngineObject()->SetMoveCollide( MOVECOLLIDE_DEFAULT );
 	// Remove from ladder
 	m_HL2Local.m_hLadder.Set( NULL );
 }
