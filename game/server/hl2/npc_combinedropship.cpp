@@ -892,7 +892,7 @@ void CNPC_CombineDropship::Spawn( void )
 			}
 
 			m_hContainer->GetEngineObject()->SetMoveType( MOVETYPE_PUSH );
-			m_hContainer->GetEnemy()->GetEngineObject()->SetGroundEntity( NULL );
+			m_hContainer->GetEngineObject()->SetGroundEntity( NULL );
 
 			// Cache off container's attachment points
 			m_iAttachmentTroopDeploy = m_hContainer->LookupAttachment( "deploy_landpoint" );
