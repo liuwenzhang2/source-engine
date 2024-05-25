@@ -135,14 +135,14 @@ inline bool CBaseHandle::operator ==( const CBaseHandle &other ) const
 	return m_Index == other.m_Index;
 }
 
-inline bool CBaseHandle::operator ==( const IHandleEntity* pEnt ) const
+inline bool CBaseHandle::operator ==( const IHandleEntity* pEntity) const
 {
-	return operator==( pEnt->GetRefEHandle());
+	return operator==(pEntity ? pEntity->GetRefEHandle() : INVALID_EHANDLE_INDEX);
 }
 
-inline bool CBaseHandle::operator !=( const IHandleEntity* pEnt ) const
+inline bool CBaseHandle::operator !=( const IHandleEntity* pEntity) const
 {
-	return operator!=(pEnt->GetRefEHandle());
+	return operator!=(pEntity ? pEntity->GetRefEHandle() : INVALID_EHANDLE_INDEX);
 }
 
 inline bool CBaseHandle::operator <( const CBaseHandle &other ) const

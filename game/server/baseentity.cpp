@@ -996,7 +996,7 @@ void CBaseEntity::SetParent( string_t newParent, CBaseEntity *pActivator, int iA
 		{
 			Msg( "Entity %s(%s) has ambigious parent %s\n", STRING(GetEngineObject()->GetClassname()), GetDebugName(), STRING(newParent) );
 		}
-		GetEngineObject()->SetParent( pParent->GetEngineObject(), iAttachment);
+		GetEngineObject()->SetParent(pParent ? pParent->GetEngineObject() : NULL, iAttachment);
 	}
 }
 
