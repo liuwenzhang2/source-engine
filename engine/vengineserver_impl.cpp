@@ -654,6 +654,11 @@ public:
 	
 	virtual int PrecacheModel( const char *s, bool preload /*= false*/, bool bCallback /*= true*/)
 	{
+		if (!s || !*s)
+		{
+			Msg("Attempting to precache model, but model name is NULL\n");
+			return -1;
+		}
 		if (!IsPrecacheAllowed())//CBaseEntity::
 		{
 			if (!IsModelPrecached(s))
