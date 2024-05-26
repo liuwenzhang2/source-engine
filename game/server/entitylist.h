@@ -2074,7 +2074,7 @@ int	CGlobalEntityList<T>::CreateEntityTransitionList(CSaveRestoreData* s, int a)
 
 	GetPhysSaveRestoreBlockHandler()->PostRestore();
 	GetAISaveRestoreBlockHandler()->PostRestore();
-
+	this->PostRestore();
 	return movedCount;
 }
 
