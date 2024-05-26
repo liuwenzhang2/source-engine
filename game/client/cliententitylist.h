@@ -252,7 +252,7 @@ public:
 	C_EngineObjectInternal* MovePrevPeer(void) const;
 	void SetMovePrevPeer(IEngineObjectClient* pMovePrevPeer);
 
-	virtual void ResetRgflCoordinateFrame();
+	void ResetRgflCoordinateFrame();
 	// Returns the entity-to-world transform
 	matrix3x4_t& EntityToWorldTransform();
 	const matrix3x4_t& EntityToWorldTransform() const;

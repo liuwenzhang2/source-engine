@@ -282,8 +282,8 @@ public:
 	void UnlinkFromParent();
 	void TransferChildren(IEngineObjectServer* pNewParent);
 
-	virtual int AreaNum() const;
-	virtual PVSInfo_t* GetPVSInfo();
+	int AreaNum() const;
+	PVSInfo_t* GetPVSInfo();
 
 	// This version does a PVS check which also checks for connected areas
 	bool IsInPVS(const CCheckTransmitInfo* pInfo);
