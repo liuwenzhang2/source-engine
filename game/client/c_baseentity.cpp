@@ -1346,16 +1346,6 @@ void C_BaseEntity::SetModelPointer( const model_t *pModel )
 	}
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Get rendermode
-// Output : int - the render mode
-//-----------------------------------------------------------------------------
-bool C_BaseEntity::IsTransparent( void )
-{
-	bool modelIsTransparent = modelinfo->IsTranslucent(GetModel());
-	return modelIsTransparent || (m_nRenderMode != kRenderNormal);
-}
-
 bool C_BaseEntity::IsTwoPass( void )
 {
 	return modelinfo->IsTranslucentTwoPass( GetModel() );
@@ -1369,11 +1359,6 @@ bool C_BaseEntity::UsesPowerOfTwoFrameBufferTexture()
 bool C_BaseEntity::UsesFullFrameBufferTexture()
 {
 	return false;
-}
-
-bool C_BaseEntity::IgnoresZBuffer( void ) const
-{
-	return m_nRenderMode == kRenderGlow || m_nRenderMode == kRenderWorldGlow;
 }
 
 //-----------------------------------------------------------------------------
@@ -2348,30 +2333,6 @@ void C_BaseEntity::GetAimEntOrigin( IClientEntity *pAttachedTo, Vector *pOrigin,
 	*pOrigin = ((C_BaseEntity*)pAttachedTo)->GetEngineObject()->GetAbsOrigin();
 	*pAngles = ((C_BaseEntity*)pAttachedTo)->GetEngineObject()->GetAbsAngles();
 }
-
-
-void C_BaseEntity::StopFollowingEntity( )
-{
-	Assert( IsFollowingEntity() );
-
-	GetEngineObject()->SetParent( NULL );
-	GetEngineObject()->RemoveEffects( EF_BONEMERGE );
-	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
-	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
-}
-
-bool C_BaseEntity::IsFollowingEntity()
-{
-	return GetEngineObject()->IsEffectActive(EF_BONEMERGE) && (GetEngineObject()->GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
-}
-
-C_BaseEntity *CBaseEntity::GetFollowedEntity()
-{
-	if (!IsFollowingEntity())
-		return NULL;
-	return GetEngineObject()->GetMoveParent()?GetEngineObject()->GetMoveParent()->GetOuter():NULL;
-}
-
 
 //-----------------------------------------------------------------------------
 // Default implementation for GetTextureAnimationStartTime
@@ -4026,6 +3987,26 @@ void C_BaseEntity::DrawBBoxVisualizations( void )
 	}
 }
 
+
+//-----------------------------------------------------------------------------
+// Purpose: Get rendermode
+// Output : int - the render mode
+//-----------------------------------------------------------------------------
+bool C_BaseEntity::IsTransparent(void)
+{
+	bool modelIsTransparent = modelinfo->IsTranslucent(GetModel());
+	return modelIsTransparent || (m_nRenderMode != kRenderNormal);
+}
+
+bool C_BaseEntity::IgnoresZBuffer(void) const
+{
+	return m_nRenderMode == kRenderGlow || m_nRenderMode == kRenderWorldGlow;
+}
+
+RenderMode_t C_BaseEntity::GetRenderMode() const
+{
+	return (RenderMode_t)m_nRenderMode;
+}
 
 //-----------------------------------------------------------------------------
 // Sets the render mode

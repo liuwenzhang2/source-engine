@@ -2151,7 +2151,7 @@ void CWeaponRPG::StartLaserEffects( void )
 		int	startAttachment = LookupAttachment( "laser" );
 		int endAttachment	= LookupAttachment( "laser_end" );
 
-		m_hLaserBeam->FollowEntity( pBeamEnt );
+		m_hLaserBeam->GetEngineObject()->FollowEntity( pBeamEnt->GetEngineObject());
 		m_hLaserBeam->SetStartAttachment( startAttachment );
 		m_hLaserBeam->SetEndAttachment( endAttachment );
 		m_hLaserBeam->SetNoise( 0 );

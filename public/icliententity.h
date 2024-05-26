@@ -381,6 +381,11 @@ public:
 	virtual void SetSimulatedEveryTick(bool sim) = 0;
 	virtual void SetAnimatedEveryTick(bool anim) = 0;
 
+	virtual void FollowEntity(IEngineObjectClient* pBaseEntity, bool bBoneMerge = true) = 0;
+	virtual void StopFollowingEntity() = 0;	// will also change to MOVETYPE_NONE
+	virtual bool IsFollowingEntity() = 0;
+	virtual IEngineObjectClient* GetFollowedEntity() = 0;
+
 };
 
 //-----------------------------------------------------------------------------

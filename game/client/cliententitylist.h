@@ -545,6 +545,12 @@ public:
 	void CheckHasGamePhysicsSimulation();
 	bool WillSimulateGamePhysics();
 
+	// These methods encapsulate MOVETYPE_FOLLOW, which became obsolete
+	void FollowEntity(IEngineObjectClient* pBaseEntity, bool bBoneMerge = true);
+	void StopFollowingEntity();	// will also change to MOVETYPE_NONE
+	bool IsFollowingEntity();
+	IEngineObjectClient* GetFollowedEntity();
+
 private:
 
 	friend class C_BaseEntity;

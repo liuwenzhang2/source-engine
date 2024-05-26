@@ -1818,33 +1818,7 @@ const char* CBaseEntity::GetTracerType()
 	return NULL;
 }
 
-//-----------------------------------------------------------------------------
-// These methods encapsulate MOVETYPE_FOLLOW, which became obsolete
-//-----------------------------------------------------------------------------
-void CBaseEntity::FollowEntity( CBaseEntity *pBaseEntity, bool bBoneMerge )
-{
-	if (pBaseEntity)
-	{
-#ifdef GAME_DLL
-		GetEngineObject()->SetParent(pBaseEntity->GetEngineObject());
-#endif // GAME_DLL
-#ifdef CLIENT_DLL
-		GetEngineObject()->SetParent(pBaseEntity->GetEngineObject());
-#endif // CLIENT_DLL
-		GetEngineObject()->SetMoveType( MOVETYPE_NONE );
-		
-		if ( bBoneMerge )
-			GetEngineObject()->AddEffects( EF_BONEMERGE );
 
-		GetEngineObject()->AddSolidFlags( FSOLID_NOT_SOLID );
-		GetEngineObject()->SetLocalOrigin( vec3_origin );
-		GetEngineObject()->SetLocalAngles( vec3_angle );
-	}
-	else
-	{
-		StopFollowingEntity();
-	}
-}
 
 void CBaseEntity::SetEffectEntity( CBaseEntity *pEffectEnt )
 {

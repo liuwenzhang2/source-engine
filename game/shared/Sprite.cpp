@@ -365,9 +365,9 @@ void CSprite::OnRestore()
 	BaseClass::OnRestore();
 
 	// Reset attachment after save/restore
-	if ( GetFollowedEntity() )
+	if (GetEngineObject()->GetFollowedEntity() )
 	{
-		SetAttachment( GetFollowedEntity(), m_nAttachment );
+		SetAttachment(GetEngineObject()->GetFollowedEntity()->GetOuter(), m_nAttachment);
 	}
 	else
 	{

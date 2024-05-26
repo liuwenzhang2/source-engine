@@ -1630,7 +1630,7 @@ void CPortal_Player::CreateViewModel( int index /*=0*/ )
 		vm->SetOwner( this );
 		vm->SetIndex( index );
 		DispatchSpawn( vm );
-		vm->FollowEntity( this, false );
+		vm->GetEngineObject()->FollowEntity( this->GetEngineObject(), false );
 		m_hViewModel.Set( index, vm );
 	}
 }

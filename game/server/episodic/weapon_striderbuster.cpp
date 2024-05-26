@@ -869,7 +869,7 @@ void CWeaponStriderBuster::Launch( CBasePlayer *pPhysGunUser )
 
 	if ( m_hMainGlow != NULL )
 	{
-		m_hMainGlow->FollowEntity( this );
+		m_hMainGlow->GetEngineObject()->FollowEntity( this->GetEngineObject());
 		m_hMainGlow->SetTransparency( kRenderGlow, 255, 255, 255, 140, kRenderFxNoDissipation );
 		m_hMainGlow->SetScale( 2.0f );
 		m_hMainGlow->SetGlowProxySize( 8.0f );

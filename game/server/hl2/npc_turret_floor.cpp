@@ -1677,7 +1677,7 @@ void CNPC_FloorTurret::SetEyeState( eyeState_t state )
 			return;
 
 		m_hLaser->EntsInit( this, this );
-		m_hLaser->FollowEntity( this );
+		m_hLaser->GetEngineObject()->FollowEntity( this->GetEngineObject());
 		m_hLaser->SetStartAttachment( LookupAttachment( "laser_start" ) );
 		m_hLaser->SetEndAttachment( LookupAttachment( "laser_end" ) );
 		m_hLaser->SetNoise( 0 );

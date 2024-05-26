@@ -2426,7 +2426,7 @@ void COrnamentProp::AttachTo( const char *pAttachName, CBaseEntity *pActivator, 
 	if ( pAttach )
 	{
 		GetEngineObject()->RemoveEffects( EF_NODRAW );
-		FollowEntity( pAttach );
+		GetEngineObject()->FollowEntity( pAttach->GetEngineObject());
 	}
 }
 

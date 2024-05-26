@@ -334,6 +334,13 @@ public:
 	virtual bool IsAnimatedEveryTick() const = 0;
 	virtual void SetAnimatedEveryTick(bool anim) = 0;
 
+	virtual bool DoesHavePlayerChild() = 0;
+
+	virtual void FollowEntity(IEngineObjectServer* pBaseEntity, bool bBoneMerge = true) = 0;
+	virtual void StopFollowingEntity() = 0;	// will also change to MOVETYPE_NONE
+	virtual bool IsFollowingEntity() = 0;
+	virtual IEngineObjectServer* GetFollowedEntity() = 0;
+
 };
 
 // This class is how the engine talks to entities in the game DLL.

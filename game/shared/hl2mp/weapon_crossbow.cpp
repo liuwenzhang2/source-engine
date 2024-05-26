@@ -147,7 +147,7 @@ bool CCrossbowBolt::CreateSprites( void )
 
 	if ( m_pGlowSprite != NULL )
 	{
-		m_pGlowSprite->FollowEntity( this );
+		m_pGlowSprite->GetEngineObject()->FollowEntity(this->GetEngineObject());
 		m_pGlowSprite->SetTransparency( kRenderGlow, 255, 255, 255, 128, kRenderFxNoDissipation );
 		m_pGlowSprite->SetScale( 0.2f );
 		m_pGlowSprite->TurnOff();

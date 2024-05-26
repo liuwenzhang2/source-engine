@@ -196,7 +196,7 @@ void CRagdollBoogie::AttachToEntity( CBaseEntity *pTarget )
 		UTIL_Remove( pChild->GetOuter() );
 	}
 
-	FollowEntity( pTarget );
+	GetEngineObject()->FollowEntity( pTarget->GetEngineObject());
 }
 
 

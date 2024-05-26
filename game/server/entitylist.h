@@ -534,6 +534,15 @@ public:
 	bool UseStepSimulationNetworkAngles(const QAngle** out_a);
 	// Compute network origin
 	void ComputeStepSimulationNetwork(StepSimulationData* step);
+	// Quick way to ask if we have a player entity as a child anywhere in our hierarchy.
+	void RecalcHasPlayerChildBit();
+	bool DoesHavePlayerChild();
+
+	// These methods encapsulate MOVETYPE_FOLLOW, which became obsolete
+	void FollowEntity(IEngineObjectServer* pBaseEntity, bool bBoneMerge = true);
+	void StopFollowingEntity();	// will also change to MOVETYPE_NONE
+	bool IsFollowingEntity();
+	IEngineObjectServer* GetFollowedEntity();
 
 public:
 	// Networking related methods

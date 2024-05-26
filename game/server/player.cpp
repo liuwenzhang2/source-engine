@@ -505,7 +505,7 @@ void CBasePlayer::CreateViewModel( int index /*=0*/ )
 		vm->SetOwner( this );
 		vm->SetIndex( index );
 		DispatchSpawn( vm );
-		vm->FollowEntity( this );
+		vm->GetEngineObject()->FollowEntity( this->GetEngineObject());
 		m_hViewModel.Set( index, vm );
 	}
 }

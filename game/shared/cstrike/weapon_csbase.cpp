@@ -963,7 +963,7 @@ void CWeaponCSBase::Drop(const Vector &vecVelocity)
 	SetRemoveable( true );
 
 	StopAnimation();
-	StopFollowingEntity( );
+	GetEngineObject()->StopFollowingEntity( );
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	// clear follow stuff, setup for collision
 	GetEngineObject()->SetGravity(1.0);

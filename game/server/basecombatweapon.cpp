@@ -720,7 +720,7 @@ int CBaseCombatWeapon::GetAvailableWeaponsInBox( CBaseCombatWeapon **pList, int 
 int	CBaseCombatWeapon::ObjectCaps( void )
 { 
 	int caps = BaseClass::ObjectCaps();
-	if ( !IsFollowingEntity() && !GetEngineObject()->HasSpawnFlags(SF_WEAPON_NO_PLAYER_PICKUP) )
+	if ( !GetEngineObject()->IsFollowingEntity() && !GetEngineObject()->HasSpawnFlags(SF_WEAPON_NO_PLAYER_PICKUP) )
 	{
 		caps |= FCAP_IMPULSE_USE;
 	}

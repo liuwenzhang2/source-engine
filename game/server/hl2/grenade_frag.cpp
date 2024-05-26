@@ -171,7 +171,7 @@ void CGrenadeFrag::CreateEffects( void )
 
 	if ( m_pMainGlow != NULL )
 	{
-		m_pMainGlow->FollowEntity( this );
+		m_pMainGlow->GetEngineObject()->FollowEntity( this->GetEngineObject());
 		m_pMainGlow->SetAttachment( this, nAttachment );
 		m_pMainGlow->SetTransparency( kRenderGlow, 255, 255, 255, 200, kRenderFxNoDissipation );
 		m_pMainGlow->SetScale( 0.2f );
@@ -184,7 +184,7 @@ void CGrenadeFrag::CreateEffects( void )
 
 	if ( m_pGlowTrail != NULL )
 	{
-		m_pGlowTrail->FollowEntity( this );
+		m_pGlowTrail->GetEngineObject()->FollowEntity( this->GetEngineObject());
 		m_pGlowTrail->SetAttachment( this, nAttachment );
 		m_pGlowTrail->SetTransparency( kRenderTransAdd, 255, 0, 0, 255, kRenderFxNone );
 		m_pGlowTrail->SetStartWidth( 8.0f );

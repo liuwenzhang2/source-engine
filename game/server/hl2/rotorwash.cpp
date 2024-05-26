@@ -95,7 +95,7 @@ CBaseEntity *CreateRotorWashEmitter( const Vector &localOrigin, const QAngle &lo
 
 	pEmitter->GetEngineObject()->SetAbsOrigin( localOrigin );
 	pEmitter->GetEngineObject()->SetAbsAngles( localAngles );
-	pEmitter->FollowEntity( pOwner );
+	pEmitter->GetEngineObject()->FollowEntity(pOwner ? pOwner->GetEngineObject() : NULL);
 
 	pEmitter->SetAltitude( flAltitude );
 	pEmitter->SetEmit( false );

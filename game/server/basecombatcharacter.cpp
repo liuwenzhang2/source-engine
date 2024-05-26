@@ -2006,7 +2006,7 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 
 			// find offset of root bone from origin in local space
 			// Make sure we're detached from hierarchy before doing this!!!
-			pWeapon->StopFollowingEntity();
+			pWeapon->GetEngineObject()->StopFollowingEntity();
 			pWeapon->GetEngineObject()->SetAbsOrigin( Vector( 0, 0, 0 ) );
 			pWeapon->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 			pWeapon->InvalidateBoneCache();

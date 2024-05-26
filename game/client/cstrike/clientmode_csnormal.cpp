@@ -847,7 +847,7 @@ void UpdateClassImageEntity(
 		pWeaponModel = (C_BaseAnimating*)cl_entitylist->CreateEntityByName( "C_BaseAnimating" );
 		pWeaponModel->InitializeAsClientEntity( pWeaponName, RENDER_GROUP_OPAQUE_ENTITY );
 		pWeaponModel->GetEngineObject()->AddEffects( EF_NODRAW ); // don't let the renderer draw the model normally
-		pWeaponModel->FollowEntity( pPlayerModel ); // attach to player model
+		pWeaponModel->GetEngineObject()->FollowEntity( pPlayerModel->GetEngineObject()); // attach to player model
 		pWeaponModel->m_flAnimTime = gpGlobals->curtime;
 		g_ClassImageWeapon = pWeaponModel;
 	}

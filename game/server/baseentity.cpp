@@ -562,33 +562,6 @@ void CBaseEntity::Release() {
 	UTIL_RemoveImmediate(this);
 }
 
-void CBaseEntity::StopFollowingEntity( )
-{
-	if( !IsFollowingEntity() )
-	{
-//		Assert( GetEngineObject()->IsEffectActive( EF_BONEMERGE ) == 0 );
-		return;
-	}
-
-	GetEngineObject()->SetParent( NULL );
-	GetEngineObject()->RemoveEffects( EF_BONEMERGE );
-	GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );
-	GetEngineObject()->SetMoveType( MOVETYPE_NONE );
-	GetEngineObject()->CollisionRulesChanged();
-}
-
-bool CBaseEntity::IsFollowingEntity()
-{
-	return GetEngineObject()->IsEffectActive( EF_BONEMERGE ) && (GetEngineObject()->GetMoveType() == MOVETYPE_NONE) && GetEngineObject()->GetMoveParent();
-}
-
-CBaseEntity *CBaseEntity::GetFollowedEntity()
-{
-	if (!IsFollowingEntity())
-		return NULL;
-	return GetEngineObject()->GetMoveParent()? GetEngineObject()->GetMoveParent()->GetOuter():NULL;
-}
-
 void CBaseEntity::ClearModelIndexOverrides( void )
 {
 #ifdef TF_DLL
@@ -6132,37 +6105,6 @@ void CBaseEntity::SUB_FadeOut( void  )
 		GetEngineObject()->SetNextThink( gpGlobals->curtime );
 	}
 }
-
-
-inline bool AnyPlayersInHierarchy_R( IEngineObjectServer *pEnt )
-{
-	if ( pEnt->GetOuter()->IsPlayer())
-		return true;
-
-	for ( IEngineObjectServer *pCur = pEnt->FirstMoveChild(); pCur; pCur = pCur->NextMovePeer())
-	{
-		if ( AnyPlayersInHierarchy_R( pCur ) )
-			return true;
-	}
-	
-	return false;	
-}
-
-
-void CBaseEntity::RecalcHasPlayerChildBit()
-{
-	if ( AnyPlayersInHierarchy_R( this->GetEngineObject() ) )
-		GetEngineObject()->AddEFlags( EFL_HAS_PLAYER_CHILD );
-	else
-		GetEngineObject()->RemoveEFlags( EFL_HAS_PLAYER_CHILD );
-}
-
-
-bool CBaseEntity::DoesHavePlayerChild()
-{
-	return GetEngineObject()->IsEFlagSet( EFL_HAS_PLAYER_CHILD );
-}
-
 
 //------------------------------------------------------------------------------
 void CBaseEntity::IncrementInterpolationFrame()

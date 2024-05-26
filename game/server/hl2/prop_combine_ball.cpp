@@ -408,7 +408,7 @@ void CPropCombineBall::Spawn( void )
 	
 	if ( m_pGlowTrail != NULL )
 	{
-		m_pGlowTrail->FollowEntity( this );
+		m_pGlowTrail->GetEngineObject()->FollowEntity( this->GetEngineObject());
 		m_pGlowTrail->SetTransparency( kRenderTransAdd, 0, 0, 0, 255, kRenderFxNone );
 		m_pGlowTrail->SetStartWidth( m_flRadius );
 		m_pGlowTrail->SetEndWidth( 0 );

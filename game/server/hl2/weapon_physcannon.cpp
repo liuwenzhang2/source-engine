@@ -3768,7 +3768,7 @@ void CWeaponPhysCannon::StartEffects( void )
 		int	startAttachment = LookupAttachment( beamAttachNames[i] );
 		int endAttachment	= 1;
 
-		m_hBeams[i]->FollowEntity( pBeamEnt );
+		m_hBeams[i]->GetEngineObject()->FollowEntity( pBeamEnt->GetEngineObject());
 
 		m_hBeams[i]->GetEngineObject()->AddSpawnFlags( SF_BEAM_TEMPORARY );
 		m_hBeams[i]->SetStartAttachment( startAttachment );

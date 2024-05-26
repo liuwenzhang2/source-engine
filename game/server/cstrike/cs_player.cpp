@@ -3045,7 +3045,7 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 
 			// find offset of root bone from origin in local space
 			// Make sure we're detached from hierarchy before doing this!!!
-			pWeapon->StopFollowingEntity();
+			pWeapon->GetEngineObject()->StopFollowingEntity();
 			pWeapon->GetEngineObject()->SetAbsOrigin( Vector( 0, 0, 0 ) );
 			pWeapon->GetEngineObject()->SetAbsAngles( QAngle( 0, 0, 0 ) );
 			pWeapon->InvalidateBoneCache();
@@ -7311,7 +7311,7 @@ void CCSPlayer::CreateViewModel( int index /*=0*/ )
 		vm->SetOwner( this );
 		vm->SetIndex( index );
 		DispatchSpawn( vm );
-		vm->FollowEntity( this, false );
+		vm->GetEngineObject()->FollowEntity( this->GetEngineObject(), false );
 		m_hViewModel.Set( index, vm );
 	}
 }

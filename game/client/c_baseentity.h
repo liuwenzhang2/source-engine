@@ -282,11 +282,9 @@ public:
 	virtual const QAngle&			GetRenderAngles( void );
 	virtual Vector					GetObserverCamOrigin( void ) { return GetRenderOrigin(); }	// Return the origin for player observers tracking this target
 	virtual const matrix3x4_t &		RenderableToWorldTransform();
-	virtual bool					IsTransparent( void );
 	virtual bool					IsTwoPass( void );
 	virtual bool					UsesPowerOfTwoFrameBufferTexture();
 	virtual bool					UsesFullFrameBufferTexture();
-	virtual bool					IgnoresZBuffer( void ) const;
 	virtual const model_t			*GetModel( void ) const;
 	virtual int						DrawModel( int flags );
 	virtual void					ComputeFxBlend( void );
@@ -909,12 +907,6 @@ public:
 	virtual void OnAddEffects(int nEffects) {}
 	virtual void OnRemoveEffects(int nEffects) {}
 
-	// These methods encapsulate MOVETYPE_FOLLOW, which became obsolete
-	void				FollowEntity( CBaseEntity *pBaseEntity, bool bBoneMerge = true );
-	void				StopFollowingEntity( );	// will also change to MOVETYPE_NONE
-	bool				IsFollowingEntity();
-	CBaseEntity			*GetFollowedEntity();
-
 	// For shadows rendering the correct body + sequence...
 	virtual int GetBody() { return 0; }
 	virtual int GetSkin() { return 0; }
@@ -1035,6 +1027,8 @@ public:
 	void SetRenderColorB( byte b );
 	void SetRenderColorA( byte a );
 
+	virtual bool IsTransparent(void);
+	virtual bool IgnoresZBuffer(void) const;
 	void SetRenderMode( RenderMode_t nRenderMode, bool bForceUpdate = false );
 	RenderMode_t GetRenderMode() const;
 
@@ -1551,12 +1545,6 @@ inline void C_BaseEntity::SetRenderColorA( byte a )
 {
 	SetRenderColor( GetRenderColor().r, GetRenderColor().g, GetRenderColor().b, a );
 }
-
-inline RenderMode_t C_BaseEntity::GetRenderMode() const
-{
-	return (RenderMode_t)m_nRenderMode;
-}
-
 
 inline ClientRenderHandle_t C_BaseEntity::GetRenderHandle() const 
 { 

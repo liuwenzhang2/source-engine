@@ -1776,7 +1776,7 @@ inline bool CBaseAnimating::CanSkipAnimation( void )
 	{
 		// If we have a player as a child, then we better setup our bones. If we don't,
 		// the PVS will be screwy. 
-		return !DoesHavePlayerChild();
+		return !GetEngineObject()->DoesHavePlayerChild();
 	}
 	else
 	{	

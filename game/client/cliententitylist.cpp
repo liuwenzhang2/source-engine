@@ -1040,7 +1040,7 @@ int C_EngineObjectInternal::BaseInterpolatePart1(float& currentTime, Vector& old
 
 
 	// These get moved to the parent position automatically
-	if (m_pOuter->IsFollowingEntity() || !m_pOuter->IsInterpolationEnabled())
+	if (IsFollowingEntity() || !m_pOuter->IsInterpolationEnabled())
 	{
 		// Assume current origin ( no interpolation )
 		m_pOuter->MoveToLastReceivedPosition();
@@ -2234,7 +2234,7 @@ void C_EngineObjectInternal::InvalidatePhysicsRecursive(int nChangeFlags)
 		// Entities that are following also access attachments points on parents and must be invalidated.
 		if (bOnlyDueToAttachment)
 		{
-			if ((pChild->GetParentAttachment() == 0) && !pChild->m_pOuter->IsFollowingEntity())
+			if ((pChild->GetParentAttachment() == 0) && !pChild->IsFollowingEntity())
 				continue;
 		}
 		pChild->InvalidatePhysicsRecursive(nChangeFlags);
@@ -3478,6 +3478,51 @@ void C_EngineObjectInternal::CheckHasGamePhysicsSimulation()
 	{
 		AddEFlags(EFL_NO_GAME_PHYSICS_SIMULATION);
 	}
+}
+
+//-----------------------------------------------------------------------------
+// These methods encapsulate MOVETYPE_FOLLOW, which became obsolete
+//-----------------------------------------------------------------------------
+void C_EngineObjectInternal::FollowEntity(IEngineObjectClient* pBaseEntity, bool bBoneMerge)
+{
+	if (pBaseEntity)
+	{
+		SetParent(pBaseEntity);
+		SetMoveType(MOVETYPE_NONE);
+
+		if (bBoneMerge)
+			AddEffects(EF_BONEMERGE);
+
+		AddSolidFlags(FSOLID_NOT_SOLID);
+		SetLocalOrigin(vec3_origin);
+		SetLocalAngles(vec3_angle);
+	}
+	else
+	{
+		StopFollowingEntity();
+	}
+}
+
+void C_EngineObjectInternal::StopFollowingEntity()
+{
+	Assert(IsFollowingEntity());
+
+	SetParent(NULL);
+	RemoveEffects(EF_BONEMERGE);
+	RemoveSolidFlags(FSOLID_NOT_SOLID);
+	SetMoveType(MOVETYPE_NONE);
+}
+
+bool C_EngineObjectInternal::IsFollowingEntity()
+{
+	return IsEffectActive(EF_BONEMERGE) && (GetMoveType() == MOVETYPE_NONE) && GetMoveParent();
+}
+
+IEngineObjectClient* C_EngineObjectInternal::GetFollowedEntity()
+{
+	if (!IsFollowingEntity())
+		return NULL;
+	return GetMoveParent();
 }
 
 

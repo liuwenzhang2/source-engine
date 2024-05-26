@@ -344,13 +344,13 @@ void DefaultRenderBoundsWorldspace( IClientRenderable *pRenderable, Vector &absM
 	// Tracker 37433:  This fixes a bug where if the stunstick is being wielded by a combine soldier, the fact that the stick was
 	//  attached to the soldier's hand would move it such that it would get frustum culled near the edge of the screen.
 	C_BaseEntity *pEnt = pRenderable->GetIClientUnknown()->GetBaseEntity();
-	if ( pEnt && pEnt->IsFollowingEntity() )
+	if ( pEnt && pEnt->GetEngineObject()->IsFollowingEntity() )
 	{
-		C_BaseEntity *pParent = pEnt->GetFollowedEntity();
+		IEngineObjectClient *pParent = pEnt->GetEngineObject()->GetFollowedEntity();
 		if ( pParent )
 		{
 			// Get the parent's abs space world bounds.
-			CalcRenderableWorldSpaceAABB_Fast( pParent, absMins, absMaxs );
+			CalcRenderableWorldSpaceAABB_Fast( pParent->GetOuter(), absMins, absMaxs);
 
 			// Add the maximum of our local render bounds. This is making the assumption that we can be at any
 			// point and at any angle within the parent's world space bounds.
@@ -404,13 +404,13 @@ inline void CalcRenderableWorldSpaceAABB(
 void CalcRenderableWorldSpaceAABB_Fast( IClientRenderable *pRenderable, Vector &absMin, Vector &absMax )
 {
 	C_BaseEntity *pEnt = pRenderable->GetIClientUnknown()->GetBaseEntity();
-	if ( pEnt && pEnt->IsFollowingEntity() )
+	if ( pEnt && pEnt->GetEngineObject()->IsFollowingEntity() )
 	{
-		C_BaseEntity *pParent = pEnt->GetEngineObject()->GetMoveParent()?pEnt->GetEngineObject()->GetMoveParent()->GetOuter():NULL;
+		IEngineObjectClient *pParent = pEnt->GetEngineObject()->GetMoveParent();
 		Assert( pParent );
 
 		// Get the parent's abs space world bounds.
-		CalcRenderableWorldSpaceAABB_Fast( pParent, absMin, absMax );
+		CalcRenderableWorldSpaceAABB_Fast( pParent->GetOuter(), absMin, absMax);
 
 		// Add the maximum of our local render bounds. This is making the assumption that we can be at any
 		// point and at any angle within the parent's world space bounds.

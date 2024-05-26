@@ -145,7 +145,7 @@ public:
 		{
 			m_hAttachedToEntity = pEntity;
 			m_nAttachment = attachment;
-			FollowEntity( pEntity );
+			GetEngineObject()->FollowEntity( pEntity->GetEngineObject());
 		}
 	}
 

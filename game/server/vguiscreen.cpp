@@ -404,7 +404,7 @@ CVGuiScreen *CreateVGuiScreen( const char *pScreenClassname, const char *pScreen
 	CVGuiScreen *pScreen = (CVGuiScreen *)CBaseEntity::Create( pScreenClassname, vec3_origin, vec3_angle, pAttachedTo );
 
 	pScreen->SetPanelName( pScreenType );
-	pScreen->FollowEntity( pAttachedTo );
+	pScreen->GetEngineObject()->FollowEntity( pAttachedTo->GetEngineObject());
 	pScreen->SetOwnerEntity( pOwner );
 	pScreen->SetAttachmentIndex( nAttachmentIndex );
 

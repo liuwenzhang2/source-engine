@@ -411,7 +411,7 @@ bool CWeaponBugBait::Deploy( void )
 		
 		if ( vm != NULL )
 		{
-			m_hSporeTrail->FollowEntity( vm );
+			m_hSporeTrail->GetEngineObject()->FollowEntity( vm->GetEngineObject() );
 		}
 	}
 	*/

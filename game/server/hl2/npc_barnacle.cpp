@@ -2112,7 +2112,7 @@ void CNPC_Barnacle::Event_Killed( const CTakeDamageInfo &info )
 		// We're swallowing a body. Make it stick inside us.
 		m_hTongueTip->GetEngineObject()->SetAbsVelocity( vec3_origin );
 
-		m_hRagdoll->StopFollowingEntity();
+		m_hRagdoll->GetEngineObject()->StopFollowingEntity();
 		m_hRagdoll->GetEngineObject()->SetMoveType( MOVETYPE_VPHYSICS );
 		m_hRagdoll->GetEngineObject()->SetAbsOrigin( m_hTongueTip->GetEngineObject()->GetAbsOrigin() );
 		m_hRagdoll->GetEngineObject()->RemoveSolidFlags( FSOLID_NOT_SOLID );

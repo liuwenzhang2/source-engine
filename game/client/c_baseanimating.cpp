@@ -2950,30 +2950,30 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 
 C_BaseAnimating* C_BaseAnimating::FindFollowedEntity()
 {
-	C_BaseEntity *follow = GetFollowedEntity();
+	IEngineObjectClient *follow = GetEngineObject()->GetFollowedEntity();
 
 	if ( !follow )
 		return NULL;
 
-	if ( follow->IsDormant() )
+	if ( follow->GetOuter()->IsDormant())
 		return NULL;
 
-	if ( !follow->GetModel() )
+	if ( !follow->GetOuter()->GetModel())
 	{
 		Warning( "mod_studio: MOVETYPE_FOLLOW with no model.\n" );
 		return NULL;
 	}
 
-	if ( modelinfo->GetModelType( follow->GetModel() ) != mod_studio )
+	if ( modelinfo->GetModelType( follow->GetOuter()->GetModel()) != mod_studio)
 	{
 		Warning( "Attached %s (mod_studio) to %s (%d)\n", 
 			modelinfo->GetModelName( GetModel() ), 
-			modelinfo->GetModelName( follow->GetModel() ), 
-			modelinfo->GetModelType( follow->GetModel() ) );
+			modelinfo->GetModelName( follow->GetOuter()->GetModel()),
+			modelinfo->GetModelType( follow->GetOuter()->GetModel()));
 		return NULL;
 	}
 
-	return assert_cast< C_BaseAnimating* >( follow );
+	return assert_cast< C_BaseAnimating* >( follow->GetOuter() );
 }
 
 
@@ -3111,7 +3111,7 @@ int C_BaseAnimating::DrawModel( int flags )
 		// Necessary for lighting blending
 		CreateModelInstance();
 
-		if ( !IsFollowingEntity() )
+		if ( !GetEngineObject()->IsFollowingEntity() )
 		{
 			drawn = InternalDrawModel( flags|extraFlags );
 		}
@@ -6332,7 +6332,7 @@ void C_BaseAnimating::AttachEntityToBone( C_BaseAnimating* attachTarget, int bon
 
 	GetEngineObject()->SetCollisionGroup( COLLISION_GROUP_DEBRIS );
 
-	FollowEntity( attachTarget );
+	GetEngineObject()->FollowEntity( attachTarget->GetEngineObject());
 	SetOwnerEntity( attachTarget );
 
 //	Assert( boneIndexAttached >= 0 );		// We should be attaching to a bone.

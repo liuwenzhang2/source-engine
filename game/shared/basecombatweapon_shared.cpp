@@ -669,7 +669,7 @@ void CBaseCombatWeapon::Drop( const Vector &vecVelocity )
 	GetEngineObject()->AddSpawnFlags( SF_NORESPAWN );
 
 	StopAnimation();
-	StopFollowingEntity( );
+	GetEngineObject()->StopFollowingEntity( );
 	GetEngineObject()->SetMoveType( MOVETYPE_FLYGRAVITY );
 	// clear follow stuff, setup for collision
 	GetEngineObject()->SetGravity(1.0);
@@ -968,7 +968,7 @@ void CBaseCombatWeapon::Equip( CBaseCombatCharacter *pOwner )
 	// Attach the weapon to an owner
 	GetEngineObject()->SetAbsVelocity( vec3_origin );
 	GetEngineObject()->RemoveSolidFlags( FSOLID_TRIGGER );
-	FollowEntity( pOwner );
+	GetEngineObject()->FollowEntity(pOwner->GetEngineObject());
 	SetOwner( pOwner );
 	SetOwnerEntity( pOwner );
 

@@ -1316,7 +1316,7 @@ void CEngineObjectInternal::UnlinkChild(IEngineObjectServer* pChild)
 			pChild->GetOuter()->DispatchUpdateTransmitState();
 			pChild->GetOuter()->OnEntityEvent(ENTITY_EVENT_PARENT_CHANGED, NULL);
 
-			this->GetOuter()->RecalcHasPlayerChildBit();
+			this->RecalcHasPlayerChildBit();
 			return;
 		}
 		else
@@ -1340,7 +1340,7 @@ void CEngineObjectInternal::LinkChild(IEngineObjectServer* pChild)
 	//pChild->GetOuter()->NetworkProp()->SetNetworkParent(pParent->GetOuter());
 	pChild->GetOuter()->DispatchUpdateTransmitState();
 	pChild->GetOuter()->OnEntityEvent(ENTITY_EVENT_PARENT_CHANGED, NULL);
-	this->GetOuter()->RecalcHasPlayerChildBit();
+	this->RecalcHasPlayerChildBit();
 }
 
 void CEngineObjectInternal::TransferChildren(IEngineObjectServer* pNewParent)
@@ -3856,6 +3856,83 @@ void CEngineObjectInternal::ComputeStepSimulationNetwork(StepSimulationData* ste
 		}
 	}
 
+}
+
+inline bool AnyPlayersInHierarchy_R(IEngineObjectServer* pEnt)
+{
+	if (pEnt->GetOuter()->IsPlayer())
+		return true;
+
+	for (IEngineObjectServer* pCur = pEnt->FirstMoveChild(); pCur; pCur = pCur->NextMovePeer())
+	{
+		if (AnyPlayersInHierarchy_R(pCur))
+			return true;
+	}
+
+	return false;
+}
+
+void CEngineObjectInternal::RecalcHasPlayerChildBit()
+{
+	if (AnyPlayersInHierarchy_R(this))
+		AddEFlags(EFL_HAS_PLAYER_CHILD);
+	else
+		RemoveEFlags(EFL_HAS_PLAYER_CHILD);
+}
+
+bool CEngineObjectInternal::DoesHavePlayerChild()
+{
+	return IsEFlagSet(EFL_HAS_PLAYER_CHILD);
+}
+
+//-----------------------------------------------------------------------------
+// These methods encapsulate MOVETYPE_FOLLOW, which became obsolete
+//-----------------------------------------------------------------------------
+void CEngineObjectInternal::FollowEntity(IEngineObjectServer* pBaseEntity, bool bBoneMerge)
+{
+	if (pBaseEntity)
+	{
+		SetParent(pBaseEntity);
+		SetMoveType(MOVETYPE_NONE);
+
+		if (bBoneMerge)
+			AddEffects(EF_BONEMERGE);
+
+		AddSolidFlags(FSOLID_NOT_SOLID);
+		SetLocalOrigin(vec3_origin);
+		SetLocalAngles(vec3_angle);
+	}
+	else
+	{
+		StopFollowingEntity();
+	}
+}
+
+void CEngineObjectInternal::StopFollowingEntity()
+{
+	if (!IsFollowingEntity())
+	{
+		//		Assert( GetEngineObject()->IsEffectActive( EF_BONEMERGE ) == 0 );
+		return;
+	}
+
+	SetParent(NULL);
+	RemoveEffects(EF_BONEMERGE);
+	RemoveSolidFlags(FSOLID_NOT_SOLID);
+	SetMoveType(MOVETYPE_NONE);
+	CollisionRulesChanged();
+}
+
+bool CEngineObjectInternal::IsFollowingEntity()
+{
+	return IsEffectActive(EF_BONEMERGE) && (GetMoveType() == MOVETYPE_NONE) && GetMoveParent();
+}
+
+IEngineObjectServer* CEngineObjectInternal::GetFollowedEntity()
+{
+	if (!IsFollowingEntity())
+		return NULL;
+	return GetMoveParent();
 }
 
 

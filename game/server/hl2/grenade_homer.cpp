@@ -215,7 +215,7 @@ void CGrenadeHomer::StartRocketTrail(void)
 		pRocketTrail->m_MinSpeed = 15;
 		pRocketTrail->m_MaxSpeed = 25;
 		pRocketTrail->SetLifetime(120);
-		pRocketTrail->FollowEntity(this);
+		pRocketTrail->GetEngineObject()->FollowEntity(this->GetEngineObject());
 
 		m_hRocketTrail[1] = pRocketTrail;
 	}
@@ -239,7 +239,7 @@ void CGrenadeHomer::StartRocketTrail(void)
 		pRocketTrail->m_MinSpeed = 15;
 		pRocketTrail->m_MaxSpeed = 25;
 		pRocketTrail->SetLifetime(120);
-		pRocketTrail->FollowEntity(this);
+		pRocketTrail->GetEngineObject()->FollowEntity(this->GetEngineObject());
 
 		m_hRocketTrail[2] = pRocketTrail;
 	}

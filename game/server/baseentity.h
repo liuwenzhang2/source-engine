@@ -420,36 +420,21 @@ public:
 
 public:
 	// virtual methods for derived classes to override
+		// Called by physics to see if we should avoid a collision test....
+	virtual	bool			ShouldCollide(int collisionGroup, int contentsMask) const;
 	virtual bool			TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trace );
 	virtual	bool			TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, trace_t& tr );
 	virtual void			ComputeWorldSpaceSurroundingBox( Vector *pWorldMins, Vector *pWorldMaxs );
 
-	// non-virtual methods. Don't override these!
 public:
 
 	CEntityNetworkProperty *NetworkProp();
 	const CEntityNetworkProperty *NetworkProp() const;
 
-	// Quick way to ask if we have a player entity as a child anywhere in our hierarchy.
-	void					RecalcHasPlayerChildBit();
-	bool					DoesHavePlayerChild();
-
-	bool					IsTransparent() const;
-
 	void					SetNavIgnore( float duration = FLT_MAX );
 	void					ClearNavIgnore();
 	bool					IsNavIgnored() const;
 
-	// Is the entity floating?
-	bool					IsFloating();
-
-	// Called by physics to see if we should avoid a collision test....
-	virtual	bool			ShouldCollide( int collisionGroup, int contentsMask ) const;
-
-
-
-public:
-	void SetScaledPhysics( IPhysicsObject *pNewObject );
 
 	// virtual methods; you can override these
 public:
@@ -507,13 +492,6 @@ public:
 	//		return Handle.GetEntryIndex();
 	//	}
 	//};
-	inline int				GetSoundSourceIndex() const		{ return entindex(); }
-
-	// These methods encapsulate MOVETYPE_FOLLOW, which became obsolete
-	void FollowEntity( CBaseEntity *pBaseEntity, bool bBoneMerge = true );
-	void StopFollowingEntity( );	// will also change to MOVETYPE_NONE
-	bool IsFollowingEntity();
-	CBaseEntity *GetFollowedEntity();
 
 	// initialization
 	virtual void Spawn( void );
@@ -765,6 +743,7 @@ public:
 	float				GetSimulationTime() const;
 	void				SetSimulationTime( float st );
 
+	bool				IsTransparent() const;
 	void				SetRenderMode( RenderMode_t nRenderMode );
 	RenderMode_t		GetRenderMode() const;
 
@@ -1281,6 +1260,7 @@ public:
 	//
 	// When OBBs get in, this can probably go away.
 	virtual Vector			GetSoundEmissionOrigin() const;
+	inline int				GetSoundSourceIndex() const { return entindex(); }
 
 	// Sets the local position from a transform
 	void					SetLocalTransform( const matrix3x4_t &localTransform );
@@ -1387,7 +1367,9 @@ public:
 	virtual int		VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
 	virtual bool	VPhysicsIsFlesh( void );
 	// --------------------------------------------------------------------
-
+		// Is the entity floating?
+	bool					IsFloating();
+	void SetScaledPhysics(IPhysicsObject* pNewObject);
 public:
 //#if !defined( NO_ENTITY_PREDICTION )
 //	// The player drives simulation of this entity
@@ -1954,11 +1936,6 @@ inline void CBaseEntity::SetRenderColorA( byte a )
 	m_clrRender.SetA( a );
 }
 
-inline bool CBaseEntity::IsTransparent() const
-{
-	return m_nRenderMode != kRenderNormal;
-}
-
 inline int	CBaseEntity::GetTextureFrameIndex( void )
 {
 	return m_iTextureFrameIndex;
@@ -2028,7 +2005,10 @@ inline const Vector& CBaseEntity::WorldAlignSize( ) const
 //	return GetEngineObject()->BoundingRadius();
 //}
 
-
+inline bool CBaseEntity::IsTransparent() const
+{
+	return m_nRenderMode != kRenderNormal;
+}
 
 inline void CBaseEntity::SetRenderMode( RenderMode_t nRenderMode )
 {

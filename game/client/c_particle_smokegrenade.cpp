@@ -431,7 +431,7 @@ void C_ParticleSmokeGrenade::ClientThink()
 
 void C_ParticleSmokeGrenade::UpdateSmokeTrail( float fTimeDelta )
 {
-	C_BaseEntity *pAimEnt = GetFollowedEntity();
+	IEngineObjectClient *pAimEnt = GetEngineObject()->GetFollowedEntity();
 	if ( pAimEnt )
 	{
 		Vector forward, right, up;
@@ -444,7 +444,7 @@ void C_ParticleSmokeGrenade::UpdateSmokeTrail( float fTimeDelta )
 		}
 
 		// Spin the smoke trail.
-		AngleVectors(pAimEnt->GetEngineObject()->GetAbsAngles(), &forward, &right, &up);
+		AngleVectors(pAimEnt->GetAbsAngles(), &forward, &right, &up);
 		m_pSmokeTrail->m_VelocityOffset = forward * 30 + GetEngineObject()->GetAbsVelocity();
 
 		m_pSmokeTrail->GetEngineObject()->SetLocalOrigin(GetEngineObject()->GetAbsOrigin() );
