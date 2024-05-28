@@ -220,11 +220,12 @@ void CMDL::Draw( const matrix3x4_t& rootToWorld, const matrix3x4_t *pBoneToWorld
 	const int nFlexDescCount = info.m_pStudioHdr->numflexdesc;
 	if ( nFlexDescCount )
 	{
-		CStudioHdr cStudioHdr( info.m_pStudioHdr, g_pMDLCache );
+		IStudioHdr* cStudioHdr = g_pMDLCache->GetIStudioHdr( info.m_pStudioHdr );
 
 		g_pStudioRender->LockFlexWeights( info.m_pStudioHdr->numflexdesc, &pFlexWeights );
-		cStudioHdr.RunFlexRules( m_pFlexControls, pFlexWeights );
+		cStudioHdr->RunFlexRules( m_pFlexControls, pFlexWeights );
 		g_pStudioRender->UnlockFlexWeights();
+		delete cStudioHdr;
 	}
 
 	Vector vecModelOrigin;
@@ -253,7 +254,7 @@ void CMDL::Draw( const matrix3x4_t &rootToWorld )
 
 void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix3x4_t *pBoneToWorld, const float *pPoseParameters, MDLSquenceLayer_t *pSequenceLayers, int nNumSequenceLayers )
 {
-	CStudioHdr studioHdr( g_pMDLCache->GetStudioHdr( m_MDLHandle ), g_pMDLCache );
+	IStudioHdr* studioHdr = g_pMDLCache->GetIStudioHdr( m_MDLHandle );
 
 	float pPoseParameter[MAXSTUDIOPOSEPARAM];
 	if ( pPoseParameters )
@@ -263,13 +264,13 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 	else
 	{
 		// Default to middle of the pose parameter range
-		int nPoseCount = studioHdr.GetNumPoseParameters();
+		int nPoseCount = studioHdr->GetNumPoseParameters();
 		for ( int i = 0; i < MAXSTUDIOPOSEPARAM; ++i )
 		{
 			pPoseParameter[i] = 0.5f;
 			if ( i < nPoseCount )
 			{
-				const mstudioposeparamdesc_t &Pose = studioHdr.pPoseParameter( i );
+				const mstudioposeparamdesc_t &Pose = studioHdr->pPoseParameter( i );
 
 				// Want to try for a zero state.  If one doesn't exist set it to .5 by default.
 				if ( Pose.start < 0.0f && Pose.end > 0.0f )
@@ -281,7 +282,7 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 		}
 	}
 
-	int nFrameCount = Studio_MaxFrame( &studioHdr, m_nSequence, pPoseParameter );
+	int nFrameCount = Studio_MaxFrame( studioHdr, m_nSequence, pPoseParameter );
 	if ( nFrameCount == 0 )
 	{
 		nFrameCount = 1;
@@ -294,14 +295,14 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 	Vector		pos[MAXSTUDIOBONES];
 	Quaternion	q[MAXSTUDIOBONES];
 
-	IBoneSetup boneSetup( &studioHdr, BONE_USED_BY_ANYTHING_AT_LOD( m_nLOD ), pPoseParameter, NULL );
+	IBoneSetup boneSetup( studioHdr, BONE_USED_BY_ANYTHING_AT_LOD( m_nLOD ), pPoseParameter, NULL );
 	boneSetup.InitPose( pos, q );
 	boneSetup.AccumulatePose( pos, q, m_nSequence, flCycle, 1.0f, m_flTime, NULL );
 
 	// Accumulate the additional layers if specified.
 	if ( pSequenceLayers )
 	{
-		int nNumSeq = studioHdr.GetNumSeq();
+		int nNumSeq = studioHdr->GetNumSeq();
 		for ( int i = 0; i < nNumSequenceLayers; ++i )
 		{
 			int nSeqIndex = pSequenceLayers[ i ].m_nSequenceIndex;
@@ -310,7 +311,7 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 				float flWeight = pSequenceLayers[ i ].m_flWeight;
 
 				float flLayerCycle;
-				int nLayerFrameCount = MAX( 1, Studio_MaxFrame( &studioHdr, nSeqIndex, pPoseParameter ) );
+				int nLayerFrameCount = MAX( 1, Studio_MaxFrame( studioHdr, nSeqIndex, pPoseParameter ) );
 
 				if ( pSequenceLayers[i].m_bNoLoop )
 				{
@@ -344,9 +345,9 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 
 	matrix3x4_t temp;
 
-	if ( nMaxBoneCount > studioHdr.numbones() )
+	if ( nMaxBoneCount > studioHdr->numbones() )
 	{
-		nMaxBoneCount = studioHdr.numbones();
+		nMaxBoneCount = studioHdr->numbones();
 	}
 
 	for ( int i = 0; i < nMaxBoneCount; i++ ) 
@@ -371,23 +372,24 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 		QuaternionMatrix( q[i], boneMatrix );
 		MatrixSetColumn( pos[i], 3, boneMatrix );
 
-		if ( studioHdr.pBone(i)->parent == -1 ) 
+		if ( studioHdr->pBone(i)->parent == -1 ) 
 		{
 			ConcatTransforms( rootToWorld, boneMatrix, pBoneToWorld[i] );
 		} 
 		else 
 		{
-			ConcatTransforms( pBoneToWorld[ studioHdr.pBone(i)->parent ], boneMatrix, pBoneToWorld[i] );
+			ConcatTransforms( pBoneToWorld[ studioHdr->pBone(i)->parent ], boneMatrix, pBoneToWorld[i] );
 		}
 	}
-	Studio_RunBoneFlexDrivers( m_pFlexControls, &studioHdr, pos, pBoneToWorld, rootToWorld );
+	Studio_RunBoneFlexDrivers( m_pFlexControls, studioHdr, pos, pBoneToWorld, rootToWorld );
+	delete studioHdr;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CMDL::SetupBonesWithBoneMerge( const CStudioHdr *pMergeHdr, matrix3x4_t *pMergeBoneToWorld, 
-								    const CStudioHdr *pFollow, const matrix3x4_t *pFollowBoneToWorld,
+void CMDL::SetupBonesWithBoneMerge( const IStudioHdr *pMergeHdr, matrix3x4_t *pMergeBoneToWorld, 
+								    const IStudioHdr *pFollow, const matrix3x4_t *pFollowBoneToWorld,
 									const matrix3x4_t &matModelToWorld )
 {
 	// Default to middle of the pose parameter range
@@ -398,7 +400,7 @@ void CMDL::SetupBonesWithBoneMerge( const CStudioHdr *pMergeHdr, matrix3x4_t *pM
 		pPoseParameter[i] = 0.5f;
 		if ( i < nPoseCount )
 		{
-			const mstudioposeparamdesc_t &Pose = ((CStudioHdr *)pMergeHdr)->pPoseParameter( i );
+			const mstudioposeparamdesc_t &Pose = ((IStudioHdr*)pMergeHdr)->pPoseParameter( i );
 
 			// Want to try for a zero state.  If one doesn't exist set it to .5 by default.
 			if ( Pose.start < 0.0f && Pose.end > 0.0f )

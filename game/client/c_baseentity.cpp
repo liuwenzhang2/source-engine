@@ -2108,7 +2108,7 @@ bool C_BaseEntity::Interpolate( float currentTime )
 	return true;
 }
 
-CStudioHdr *C_BaseEntity::OnNewModel()
+IStudioHdr *C_BaseEntity::OnNewModel()
 {
 #ifdef TF_CLIENT_DLL
 	m_bValidatedOwner = false;

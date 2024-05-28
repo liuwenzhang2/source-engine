@@ -140,8 +140,8 @@ public:
 
 	// base model functionality
 	float		  ClampCycle( float cycle, bool isLooping );
-	virtual void GetPoseParameters( CStudioHdr *pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM] );
-	virtual void BuildTransformations( CStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
+	virtual void GetPoseParameters( IStudioHdr *pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM] );
+	virtual void BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
 	virtual void ApplyBoneMatrixTransform( matrix3x4_t& transform );
  	virtual int	VPhysicsGetObjectList( IPhysicsObject **pList, int listMax );
 
@@ -158,10 +158,10 @@ public:
 
 	//
 	virtual CMouthInfo *GetMouth();
-	virtual void	ControlMouth( CStudioHdr *pStudioHdr );
+	virtual void	ControlMouth( IStudioHdr *pStudioHdr );
 	
 	// override in sub-classes
-	virtual void DoAnimationEvents( CStudioHdr *pStudio );
+	virtual void DoAnimationEvents( IStudioHdr *pStudio );
 	virtual void FireEvent( const Vector& origin, const QAngle& angles, int event, const char *options );
 	virtual void FireObsoleteEvent( const Vector& origin, const QAngle& angles, int event, const char *options );
 	virtual const char* ModifyEventParticles( const char* token ) { return token; }
@@ -173,8 +173,8 @@ public:
 	// virtual	void FreeMaterials( void );
 
 	virtual void ValidateModelIndex( void );
-	virtual CStudioHdr *OnNewModel( void );
-	CStudioHdr	*GetModelPtr() const;
+	virtual IStudioHdr *OnNewModel( void );
+	IStudioHdr	*GetModelPtr() const;
 	void InvalidateMdlCache();
 	
 	virtual void SetPredictable( bool state );
@@ -182,8 +182,8 @@ public:
 
 	// C_BaseClientShader **p_ClientShaders;
 
-	virtual	void StandardBlendingRules( CStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
-	void UnragdollBlend( CStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime );
+	virtual	void StandardBlendingRules( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
+	void UnragdollBlend( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime );
 
 	void MaintainSequenceTransitions( IBoneSetup &boneSetup, float flCycle, Vector pos[], Quaternion q[] );
 	virtual void AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime );
@@ -194,12 +194,12 @@ public:
 	int		LookupAttachment( const char *pAttachmentName );
 	int		LookupRandomAttachment( const char *pAttachmentNameSubstring );
 
-	int		LookupPoseParameter( CStudioHdr *pStudioHdr, const char *szName );
+	int		LookupPoseParameter( IStudioHdr *pStudioHdr, const char *szName );
 	inline int LookupPoseParameter( const char *szName ) { return LookupPoseParameter(GetModelPtr(), szName); }
 
-	float	SetPoseParameter( CStudioHdr *pStudioHdr, const char *szName, float flValue );
+	float	SetPoseParameter( IStudioHdr *pStudioHdr, const char *szName, float flValue );
 	inline float SetPoseParameter( const char *szName, float flValue ) { return SetPoseParameter( GetModelPtr(), szName, flValue ); }
-	float	SetPoseParameter( CStudioHdr *pStudioHdr, int iParameter, float flValue );
+	float	SetPoseParameter( IStudioHdr *pStudioHdr, int iParameter, float flValue );
 	inline float SetPoseParameter( int iParameter, float flValue ) { return SetPoseParameter( GetModelPtr(), iParameter, flValue ); }
 
 	float	GetPoseParameter( int iPoseParameter );
@@ -324,11 +324,11 @@ public:
 	int								GetSequence();
 	virtual void					SetSequence(int nSequence);
 	inline void						ResetSequence(int nSequence);
-	float							GetSequenceGroundSpeed( CStudioHdr *pStudioHdr, int iSequence );
+	float							GetSequenceGroundSpeed( IStudioHdr *pStudioHdr, int iSequence );
 	inline float					GetSequenceGroundSpeed( int iSequence ) { return GetSequenceGroundSpeed(GetModelPtr(), iSequence); }
-	bool							IsSequenceLooping( CStudioHdr *pStudioHdr, int iSequence );
+	bool							IsSequenceLooping( IStudioHdr *pStudioHdr, int iSequence );
 	inline bool						IsSequenceLooping( int iSequence ) { return IsSequenceLooping(GetModelPtr(),iSequence); }
-	float							GetSequenceMoveDist( CStudioHdr *pStudioHdr, int iSequence );
+	float							GetSequenceMoveDist( IStudioHdr *pStudioHdr, int iSequence );
 	void							GetSequenceLinearMotion( int iSequence, Vector *pVec );
 	void							GetBlendedLinearVelocity( Vector *pVec );
 	int								LookupSequence ( const char *label );
@@ -341,7 +341,7 @@ public:
 
 	// Clientside animation
 	virtual float					FrameAdvance( float flInterval = 0.0f );
-	virtual float					GetSequenceCycleRate( CStudioHdr *pStudioHdr, int iSequence );
+	virtual float					GetSequenceCycleRate( IStudioHdr *pStudioHdr, int iSequence );
 	virtual void					UpdateClientSideAnimation();
 	void							ClientSideAnimationChanged();
 	virtual unsigned int			ComputeClientSideAnimationFlags();
@@ -359,7 +359,7 @@ public:
 	int GetBodygroupCount( int iGroup );
 	int GetNumBodyGroups( void );
 
-	class CBoneCache				*GetBoneCache( CStudioHdr *pStudioHdr );
+	class CBoneCache				*GetBoneCache( IStudioHdr *pStudioHdr );
 	void							SetHitboxSet( int setnum );
 	void							SetHitboxSetByName( const char *setname );
 	int								GetHitboxSet( void );
@@ -435,7 +435,7 @@ public:
 	int								SelectWeightedSequence ( int activity );
 	void							ResetSequenceInfo( void );
 	float							SequenceDuration( void );
-	float							SequenceDuration( CStudioHdr *pStudioHdr, int iSequence );
+	float							SequenceDuration( IStudioHdr *pStudioHdr, int iSequence );
 	inline float					SequenceDuration( int iSequence ) { return SequenceDuration(GetModelPtr(), iSequence); }
 	int								FindTransitionSequence( int iCurrentSequence, int iGoalSequence, int *piDir );
 
@@ -471,7 +471,7 @@ private:
 	// This method should return true if the bones have changed + SetupBones needs to be called
 	virtual float					LastBoneChangedTime() { return FLT_MAX; }
 
-	CBoneList*						RecordBones( CStudioHdr *hdr, matrix3x4_t *pBoneState );
+	CBoneList*						RecordBones( IStudioHdr *hdr, matrix3x4_t *pBoneState );
 
 	bool							PutAttachment( int number, const matrix3x4_t &attachmentToWorld );
 	void							TermRopes();
@@ -609,7 +609,7 @@ private:
 	// Calculated attachment points
 	CUtlVector<CAttachmentData>		m_Attachments;
 
-	void							SetupBones_AttachmentHelper( CStudioHdr *pStudioHdr );
+	void							SetupBones_AttachmentHelper( IStudioHdr *pStudioHdr );
 
 	EHANDLE							m_hLightingOrigin;
 	EHANDLE							m_hLightingOriginRelative;
@@ -634,7 +634,7 @@ public:
 private:
 	void							LockStudioHdr();
 	void							UnlockStudioHdr();
-	mutable CStudioHdr				*m_pStudioHdr;
+	mutable IStudioHdr				*m_pStudioHdr;
 	mutable MDLHandle_t				m_hStudioHdr;
 	CThreadFastMutex				m_StudioHdrInitLock;
 };
@@ -743,7 +743,7 @@ inline float C_BaseAnimating::GetCycle() const
 // Purpose: return a pointer to an updated studiomdl cache cache
 //-----------------------------------------------------------------------------
 
-inline CStudioHdr *C_BaseAnimating::GetModelPtr() const
+inline IStudioHdr *C_BaseAnimating::GetModelPtr() const
 { 
 	//if ( IsDynamicModelLoading() )
 	//	return NULL;

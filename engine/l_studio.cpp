@@ -823,7 +823,7 @@ public:
 					const matrix3x4_t* pModelToWorld,
 					const matrix3x4_t *pLightingOffset );
 
-	virtual void  SetViewTarget( const CStudioHdr *pStudioHdr, int nBodyIndex, const Vector& target );
+	virtual void  SetViewTarget( const IStudioHdr *pStudioHdr, int nBodyIndex, const Vector& target );
 
 	// Creates, destroys instance data to be associated with the model
 	virtual ModelInstanceHandle_t CreateInstance( IClientRenderable *pRenderable, LightCacheHandle_t* pHandle );
@@ -3285,7 +3285,7 @@ void CModelRender::DrawModelShadow( IClientRenderable *pRenderable, const DrawMo
 #endif
 }
 
-void  CModelRender::SetViewTarget( const CStudioHdr *pStudioHdr, int nBodyIndex, const Vector& target )
+void  CModelRender::SetViewTarget( const IStudioHdr *pStudioHdr, int nBodyIndex, const Vector& target )
 {
 	g_pStudioRender->SetEyeViewTarget( pStudioHdr->GetRenderHdr(), nBodyIndex, target );
 }

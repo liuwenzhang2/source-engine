@@ -365,7 +365,7 @@ void CAnimationLayer::DispatchAnimEvents( CBaseAnimating *eventHandler, CBaseAni
 {
   	animevent_t	event;
 
-	CStudioHdr *pstudiohdr = pOwner->GetModelPtr( );
+	IStudioHdr *pstudiohdr = pOwner->GetModelPtr( );
 
 	if ( !pstudiohdr )
 	{
@@ -434,7 +434,7 @@ void CAnimationLayer::DispatchAnimEvents( CBaseAnimating *eventHandler, CBaseAni
 
 
 
-void CBaseAnimatingOverlay::GetSkeleton( CStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], int boneMask )
+void CBaseAnimatingOverlay::GetSkeleton( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], int boneMask )
 {
 	if(!pStudioHdr)
 	{

@@ -145,7 +145,7 @@ void C_BaseViewModel::FireEvent( const Vector& origin, const QAngle& angles, int
 
 bool C_BaseViewModel::Interpolate( float currentTime )
 {
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	// Make sure we reset our animation information if we've switch sequences
 	UpdateAnimationParity();
 

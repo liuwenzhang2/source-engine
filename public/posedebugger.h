@@ -18,10 +18,10 @@ class IClientEntity;
 abstract_class IPoseDebugger
 {
 public:
-	virtual void StartBlending( IClientEntity *pEntity, const CStudioHdr *pStudioHdr ) = 0;
+	virtual void StartBlending( IClientEntity *pEntity, const IStudioHdr *pStudioHdr ) = 0;
 	
 	virtual void AccumulatePose(
-		const CStudioHdr *pStudioHdr,
+		const IStudioHdr *pStudioHdr,
 		CIKContext *pIKContext,
 		Vector pos[], 
 		Quaternion q[], 

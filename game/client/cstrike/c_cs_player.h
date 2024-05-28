@@ -111,7 +111,7 @@ public:
 	CUtlVector< C_BaseParticleEntity* > m_SmokeGrenades;
 
 	virtual bool ShouldDraw( void );
-	virtual void BuildTransformations( CStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
+	virtual void BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
 
 	virtual C_BaseAnimating * BecomeRagdollOnClient();
 	virtual IRagdoll* GetRepresentativeRagdoll() const;

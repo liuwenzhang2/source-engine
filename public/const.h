@@ -480,5 +480,7 @@ enum thinkmethods_t
 	THINK_FIRE_ALL_BUT_BASE,
 };
 
+#define ACTIVITY_NOT_AVAILABLE		-1
+
 #endif
 

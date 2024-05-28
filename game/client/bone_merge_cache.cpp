@@ -39,7 +39,7 @@ void CBoneMergeCache::Init( C_BaseAnimating *pOwner )
 
 void CBoneMergeCache::UpdateCache()
 {
-	CStudioHdr *pOwnerHdr = m_pOwner ? m_pOwner->GetModelPtr() : NULL;
+	IStudioHdr *pOwnerHdr = m_pOwner ? m_pOwner->GetModelPtr() : NULL;
 	if ( !pOwnerHdr )
 	{
 		if ( m_pOwnerHdr )
@@ -57,7 +57,7 @@ void CBoneMergeCache::UpdateCache()
 	}
 
 	C_BaseAnimating *pTestFollow = m_pOwner->FindFollowedEntity();
-	CStudioHdr *pTestHdr = (pTestFollow ? pTestFollow->GetModelPtr() : NULL);
+	IStudioHdr *pTestHdr = (pTestFollow ? pTestFollow->GetModelPtr() : NULL);
 	const studiohdr_t *pTestStudioHDR = (pTestHdr ? pTestHdr->GetRenderHdr() : NULL);
 	if ( pTestFollow != m_pFollow || pTestHdr != m_pFollowHdr || pTestStudioHDR != m_pFollowRenderHdr || pOwnerHdr != m_pOwnerHdr )
 	{

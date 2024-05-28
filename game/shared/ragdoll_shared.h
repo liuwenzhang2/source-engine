@@ -20,7 +20,7 @@ struct matrix3x4_t;
 
 struct vcollide_t;
 struct studiohdr_t;
-class CStudioHdr;
+class IStudioHdr;
 class CBoneAccessor;
 
 #include "mathlib/vector.h"
@@ -68,7 +68,7 @@ struct ragdollparams_t
 {
 	void		*pGameData;
 	vcollide_t	*pCollide;
-	CStudioHdr	*pStudioHdr;
+	IStudioHdr	*pStudioHdr;
 	int			modelIndex;
 	Vector		forcePosition;
 	Vector		forceVector;
@@ -142,7 +142,7 @@ bool RagdollGetBoneMatrix( const ragdoll_t &ragdoll, CBoneAccessor &pBoneToWorld
 
 // Parse the ragdoll and obtain the mapping from each physics element index to a bone index
 // returns num phys elements
-int RagdollExtractBoneIndices( int *boneIndexOut, CStudioHdr *pStudioHdr, vcollide_t *pCollide );
+int RagdollExtractBoneIndices( int *boneIndexOut, IStudioHdr *pStudioHdr, vcollide_t *pCollide );
 
 // computes an exact bbox of the ragdoll's physics objects
 void RagdollComputeExactBbox( const ragdoll_t &ragdoll, const Vector &origin, Vector &outMins, Vector &outMaxs );

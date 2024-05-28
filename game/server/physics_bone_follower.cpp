@@ -73,7 +73,7 @@ void CBoneFollowerManager::AddBoneFollower( CBaseAnimating *pParentEntity, const
 // return the hitgroup of that box
 static int HitGroupFromPhysicsBone( CBaseAnimating *pAnim, int physicsBone )
 {
-	CStudioHdr *pStudioHdr = pAnim->GetModelPtr( );
+	IStudioHdr *pStudioHdr = pAnim->GetModelPtr( );
 	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnim->m_nHitboxSet );
 	for ( int i = 0; i < set->numhitboxes; i++ )
 	{
@@ -94,7 +94,7 @@ static int HitGroupFromPhysicsBone( CBaseAnimating *pAnim, int physicsBone )
 //-----------------------------------------------------------------------------
 bool CBoneFollowerManager::CreatePhysicsFollower( CBaseAnimating *pParentEntity, physfollower_t &follow, const char *pBoneName, solid_t *pSolid )
 {
-	CStudioHdr *pStudioHdr = pParentEntity->GetModelPtr();
+	IStudioHdr *pStudioHdr = pParentEntity->GetModelPtr();
 	matrix3x4_t boneToWorld;
 	solid_t solidTmp;
 

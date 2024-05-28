@@ -94,7 +94,7 @@ class IRestore;
 struct animevent_t;
 
 struct studiohdr_t;
-class CStudioHdr;
+class IStudioHdr;
 
 extern void FireTargets( const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 

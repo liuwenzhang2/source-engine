@@ -14,7 +14,7 @@
 	{
 		if ( m_pAnimating )
 		{
-			CStudioHdr *pHdr = m_pAnimating->GetModelPtr();
+			IStudioHdr *pHdr = m_pAnimating->GetModelPtr();
 			if ( pHdr )
 			{
 				mstudiobone_t *pBone = pHdr->pBone( iBone );

@@ -22,7 +22,7 @@ public:
 
 	// model specific
 	virtual bool	Interpolate( float currentTime );
-	virtual	void	StandardBlendingRules( CStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
+	virtual	void	StandardBlendingRules( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
 
 	float				m_recanimtime[3];
 	AnimationLayer_t	m_Layer[4][3];
@@ -74,7 +74,7 @@ END_RECV_TABLE()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_AI_BaseHumanoid::StandardBlendingRules( CStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
+void C_AI_BaseHumanoid::StandardBlendingRules( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
 {
 	VPROF( "C_AI_BaseHumanoid::StandardBlendingRules" );
 

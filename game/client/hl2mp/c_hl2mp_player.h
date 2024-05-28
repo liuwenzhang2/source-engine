@@ -49,7 +49,7 @@ public:
 	virtual bool ShouldDraw( void );
 	virtual void OnDataChanged( DataUpdateType_t type );
 	virtual float GetFOV( void );
-	virtual CStudioHdr *OnNewModel( void );
+	virtual IStudioHdr *OnNewModel( void );
 	virtual void TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr, CDmgAccumulator *pAccumulator );
 	virtual void ItemPreFrame( void );
 	virtual void ItemPostFrame( void );

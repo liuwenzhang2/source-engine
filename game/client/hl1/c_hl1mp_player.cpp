@@ -524,7 +524,7 @@ void C_HL1MPRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWei
 	static float destweight[128];
 	static bool bIsInited = false;
 
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 		return;
 

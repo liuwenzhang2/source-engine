@@ -117,11 +117,12 @@ IPhysicsObject *PhysModelCreateBox( CBaseEntity *pEntity, const Vector &mins, co
 		const model_t *model = modelinfo->GetModel( modelIndex );
 		if ( model )
 		{
-			CStudioHdr studioHdr( modelinfo->GetStudiomodel( model ), mdlcache );
-			if ( studioHdr.IsValid() )
+			IStudioHdr* studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( model ) );
+			if ( studioHdr->IsValid() )
 			{
-				pSurfaceProps = Studio_GetDefaultSurfaceProps( &studioHdr );
+				pSurfaceProps = Studio_GetDefaultSurfaceProps( studioHdr );
 			}
+			delete studioHdr;
 		}
 	}
 	Q_strncpy( solid.surfaceprop, pSurfaceProps, sizeof( solid.surfaceprop ) );
@@ -157,11 +158,12 @@ IPhysicsObject *PhysModelCreateOBB( CBaseEntity *pEntity, const Vector &mins, co
 		const model_t *model = modelinfo->GetModel( modelIndex );
 		if ( model )
 		{
-			CStudioHdr studioHdr( modelinfo->GetStudiomodel( model ), mdlcache );
-			if (studioHdr.IsValid()) 
+			IStudioHdr* studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( model ) );
+			if (studioHdr->IsValid()) 
 			{
-				pSurfaceProps = Studio_GetDefaultSurfaceProps( &studioHdr );
+				pSurfaceProps = Studio_GetDefaultSurfaceProps( studioHdr );
 			}
+			delete studioHdr;
 		}
 	}
 	Q_strncpy( solid.surfaceprop, pSurfaceProps, sizeof( solid.surfaceprop ) );

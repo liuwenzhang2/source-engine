@@ -1419,7 +1419,7 @@ void CClientEntityList<T>::SaveEntityOnTable(T* pEntity, CSaveRestoreData* pSave
 #endif
 	pEntInfo->modelname = pEntity->GetEngineObject()->GetModelName();
 	pEntInfo->restoreentityindex = -1;
-	pEntInfo->saveentityindex = pEntity && pEntity->IsNetworkable() ? pEntity->entindex() : -1;
+	pEntInfo->saveentityindex = pEntity ? pEntity->entindex() : -1;
 	pEntInfo->hEnt = pEntity->GetRefEHandle();
 	pEntInfo->flags = 0;
 	pEntInfo->location = 0;

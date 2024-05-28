@@ -2846,7 +2846,7 @@ void C_BasePlayer::UpdateWearables( void )
 // Purpose: In meathook mode, fix the bone transforms to hang the user's own
 //			avatar under the camera.
 //-----------------------------------------------------------------------------
-void C_BasePlayer::BuildFirstPersonMeathookTransformations( CStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed, const char *pchHeadBoneName )
+void C_BasePlayer::BuildFirstPersonMeathookTransformations( IStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed, const char *pchHeadBoneName )
 {
 	// Handle meathook mode. If we aren't rendering, just use last frame's transforms
 	if ( !InFirstPersonView() )

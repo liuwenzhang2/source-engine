@@ -143,7 +143,7 @@ public:
 
 	virtual void	StudioFrameAdvance();
 	virtual	void	DispatchAnimEvents ( CBaseAnimating *eventHandler );
-	virtual void	GetSkeleton( CStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], int boneMask );
+	virtual void	GetSkeleton( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], int boneMask );
 
 	int		AddGestureSequence( int sequence, bool autokill = true );
 	int		AddGestureSequence( int sequence, float flDuration, bool autokill = true );

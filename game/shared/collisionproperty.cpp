@@ -1363,7 +1363,7 @@ void CCollisionProperty::UpdateServerPartitionMask( )
 void CCollisionProperty::MarkPartitionHandleDirty()
 {
 	// don't bother with the world
-	if (!m_pOuter->GetOuter()->IsNetworkable() || m_pOuter->entindex() == 0)
+	if (!m_pOuter->GetOuter() || m_pOuter->entindex() == 0)//->IsNetworkable()
 		return;
 	
 	if ( !m_pOuter->IsEFlagSet( EFL_DIRTY_SPATIAL_PARTITION ) )

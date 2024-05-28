@@ -76,7 +76,7 @@ private:
 	CountdownTimer m_blinkTimer;
 
 	Vector m_lookAt;		// point in space we are looking at
-	void UpdateLookAt( CStudioHdr *pStudioHdr );	// orient head and eyes towards m_lookAt
+	void UpdateLookAt( IStudioHdr *pStudioHdr );	// orient head and eyes towards m_lookAt
 	void LookAround( void );										// look around at various interesting things
 	CountdownTimer m_lookAroundTimer;
 

@@ -71,7 +71,7 @@ public:
 	virtual float GetCurrentMaxGroundSpeed();
 	virtual Activity CalcMainActivity();
 	virtual void DebugShowAnimState( int iStartLine );
-	virtual void ComputeSequences( CStudioHdr *pStudioHdr );
+	virtual void ComputeSequences( IStudioHdr *pStudioHdr );
 	virtual void ClearAnimationLayers();
 	virtual int SelectWeightedSequence( Activity activity );
 
@@ -80,13 +80,13 @@ public:
 protected:
 
 	int CalcFireLayerSequence(PlayerAnimEvent_t event);
-	void ComputeFireSequence( CStudioHdr *pStudioHdr );
+	void ComputeFireSequence( IStudioHdr *pStudioHdr );
 
-	void ComputeReloadSequence( CStudioHdr *pStudioHdr );
+	void ComputeReloadSequence( IStudioHdr *pStudioHdr );
 	int CalcReloadLayerSequence( PlayerAnimEvent_t event );
 
 	bool IsOuterGrenadePrimed();
-	void ComputeGrenadeSequence( CStudioHdr *pStudioHdr );
+	void ComputeGrenadeSequence( IStudioHdr *pStudioHdr );
 	int CalcGrenadePrimeSequence();
 	int CalcGrenadeThrowSequence();
 	int GetOuterGrenadeThrowCounter();
@@ -94,7 +94,7 @@ protected:
 	const char* GetWeaponSuffix();
 	bool HandleJumping();
 
-	void UpdateLayerSequenceGeneric( CStudioHdr *pStudioHdr, int iLayer, bool &bEnabled, float &flCurCycle, int &iSequence, bool bWaitAtEnd );
+	void UpdateLayerSequenceGeneric( IStudioHdr *pStudioHdr, int iLayer, bool &bEnabled, float &flCurCycle, int &iSequence, bool bWaitAtEnd );
 
 	virtual int CalcSequenceIndex( const char *pBaseName, ... );
 
@@ -613,7 +613,7 @@ int CCSPlayerAnimState::CalcReloadLayerSequence( PlayerAnimEvent_t event )
 	return -1;
 }
 
-	void CCSPlayerAnimState::UpdateLayerSequenceGeneric( CStudioHdr *pStudioHdr, int iLayer, bool &bEnabled, float &flCurCycle, int &iSequence, bool bWaitAtEnd )
+	void CCSPlayerAnimState::UpdateLayerSequenceGeneric( IStudioHdr *pStudioHdr, int iLayer, bool &bEnabled, float &flCurCycle, int &iSequence, bool bWaitAtEnd )
 {
 	if ( !bEnabled || iSequence < 0 )
 		return;
@@ -664,7 +664,7 @@ bool CCSPlayerAnimState::IsOuterGrenadePrimed()
 }
 
 
-void CCSPlayerAnimState::ComputeGrenadeSequence( CStudioHdr *pStudioHdr )
+void CCSPlayerAnimState::ComputeGrenadeSequence( IStudioHdr *pStudioHdr )
 {
 	VPROF( "CCSPlayerAnimState::ComputeGrenadeSequence" );
 
@@ -756,7 +756,7 @@ int CCSPlayerAnimState::GetOuterGrenadeThrowCounter()
 }
 
 
-void CCSPlayerAnimState::ComputeReloadSequence( CStudioHdr *pStudioHdr )
+void CCSPlayerAnimState::ComputeReloadSequence( IStudioHdr *pStudioHdr )
 {
 	VPROF( "CCSPlayerAnimState::ComputeReloadSequence" );
 	bool hold = m_flReloadHoldEndTime > gpGlobals->curtime;
@@ -1014,7 +1014,7 @@ void CCSPlayerAnimState::DebugShowAnimState( int iStartLine )
 }
 
 
-void CCSPlayerAnimState::ComputeSequences( CStudioHdr *pStudioHdr )
+void CCSPlayerAnimState::ComputeSequences( IStudioHdr *pStudioHdr )
 {
 	BaseClass::ComputeSequences( pStudioHdr );
 
@@ -1043,7 +1043,7 @@ void CCSPlayerAnimState::ClearAnimationLayers()
 }
 
 
-void CCSPlayerAnimState::ComputeFireSequence( CStudioHdr *pStudioHdr )
+void CCSPlayerAnimState::ComputeFireSequence( IStudioHdr *pStudioHdr )
 {
 	VPROF( "CCSPlayerAnimState::ComputeFireSequence" );
 

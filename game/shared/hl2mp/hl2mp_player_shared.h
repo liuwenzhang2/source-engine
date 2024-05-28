@@ -52,7 +52,7 @@ public:
 
 	const QAngle&		GetRenderAngles();
 				
-	void				GetPoseParameters( CStudioHdr *pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM] );
+	void				GetPoseParameters( IStudioHdr *pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM] );
 
 	CHL2MP_Player		*GetOuter();
 
@@ -63,7 +63,7 @@ private:
 
 	void				EstimateYaw( void );
 	void				ComputePoseParam_BodyYaw( void );
-	void				ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr );
+	void				ComputePoseParam_BodyPitch( IStudioHdr *pStudioHdr );
 	void				ComputePoseParam_BodyLookYaw( void );
 
 	void				ComputePlaybackRate();

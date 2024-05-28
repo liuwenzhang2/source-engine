@@ -10,7 +10,10 @@
 #include "datacache/idatacache.h"
 #include "datacache/imdlcache.h"
 #include "convar.h"
-
+#include "const.h"
+#if defined(CLIENT_DLL) || defined(GAME_DLL)
+#include "cbase.h"
+#endif
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -1615,7 +1618,7 @@ void CStudioHdr::RunFlexRules( const float *src, float *dest )
 
 CUtlSymbolTable g_ActivityModifiersTable;
 
-extern void SetActivityForSequence( CStudioHdr *pstudiohdr, int i );
+extern void SetActivityForSequence( IStudioHdr *pstudiohdr, int i );
 void CStudioHdr::CActivityToSequenceMapping::Initialize( CStudioHdr * __restrict pstudiohdr )
 {
 	// Algorithm: walk through every sequence in the model, determine to which activity
@@ -1858,4 +1861,72 @@ void CStudioHdr::CActivityToSequenceMapping::SetValidationPair( const CStudioHdr
 {
 	m_expectedPStudioHdr = pstudiohdr->GetRenderHdr();
 	m_expectedVModel = pstudiohdr->GetVirtualModel();
+}
+
+// Pick a sequence for the given activity. If the current sequence is appropriate for the 
+// current activity, and its stored weight is negative (whatever that means), always select
+// it. Otherwise perform a weighted selection -- imagine a large roulette wheel, with each
+// sequence having a number of spaces corresponding to its weight.
+int CStudioHdr::CActivityToSequenceMapping::SelectWeightedSequence(CStudioHdr* pstudiohdr, int activity, int curSequence)
+{
+	if (!ValidateAgainst(pstudiohdr))
+	{
+		AssertMsg1(false, "IStudioHdr %s has changed its vmodel pointer without reinitializing its activity mapping! Now performing emergency reinitialization.", pstudiohdr->pszName());
+		ExecuteOnce(DebuggerBreakIfDebugging());
+		Reinitialize(pstudiohdr);
+	}
+
+	// a null m_pSequenceTuples just means that this studio header has no activities.
+	if (!m_pSequenceTuples)
+		return ACTIVITY_NOT_AVAILABLE;
+
+	// is the current sequence appropriate?
+	if (curSequence >= 0)
+	{
+		mstudioseqdesc_t& seqdesc = pstudiohdr->pSeqdesc(curSequence);
+
+		if (seqdesc.activity == activity && seqdesc.actweight < 0)
+			return curSequence;
+	}
+
+	// get the data for the given activity
+	HashValueType dummy(activity, 0, 0, 0);
+	UtlHashHandle_t handle = m_ActToSeqHash.Find(dummy);
+	if (!m_ActToSeqHash.IsValidHandle(handle))
+	{
+		return ACTIVITY_NOT_AVAILABLE;
+	}
+	const HashValueType* __restrict actData = &m_ActToSeqHash[handle];
+
+	int weighttotal = actData->totalWeight;
+	// generate a random number from 0 to the total weight
+	int randomValue;
+#if defined(CLIENT_DLL) || defined(GAME_DLL)
+	if (CBaseEntity::GetPredictionPlayer() != NULL)
+	{
+		randomValue = SharedRandomInt("SelectWeightedSequence", 0, weighttotal - 1);
+	}
+	else
+#endif // CLIENT_DLL
+	{
+		randomValue = RandomInt(0, weighttotal - 1);
+	}
+
+	// chug through the entries in the list (they are sequential therefore cache-coherent)
+	// until we run out of random juice
+	SequenceTuple* __restrict sequenceInfo = m_pSequenceTuples + actData->startingIdx;
+
+	const SequenceTuple* const stopHere = sequenceInfo + actData->count; // this is a backup 
+	// in case the weights are somehow miscalculated -- we don't read or write through
+	// it (because it aliases the restricted pointer above); it's only here for 
+	// the comparison.
+
+	while (randomValue >= sequenceInfo->weight && sequenceInfo < stopHere)
+	{
+		randomValue -= sequenceInfo->weight;
+		++sequenceInfo;
+	}
+
+	return sequenceInfo->seqnum;
+
 }

@@ -230,8 +230,8 @@ protected:
 	bool	IsGestureSlotPlaying( int iGestureSlot, Activity iGestureActivity );
 	void	AddToGestureSlot( int iGestureSlot, Activity iGestureActivity, bool bAutoKill );
 	virtual void RestartGesture( int iGestureSlot, Activity iGestureActivity, bool bAutoKill = true );
-	void	ComputeGestureSequence( CStudioHdr *pStudioHdr );
-	void	UpdateGestureLayer( CStudioHdr *pStudioHdr, GestureSlot_t *pGesture );
+	void	ComputeGestureSequence( IStudioHdr *pStudioHdr );
+	void	UpdateGestureLayer( IStudioHdr *pStudioHdr, GestureSlot_t *pGesture );
 	void	DebugGestureInfo( void );
 	virtual float	GetGesturePlaybackRate( void ) { return 1.0f; }
 
@@ -244,21 +244,21 @@ protected:
 	virtual float CalcMovementSpeed( bool *bIsMoving );
 	virtual float CalcMovementPlaybackRate( bool *bIsMoving );
 
-	void DoMovementTest( CStudioHdr *pStudioHdr, float flX, float flY );
-	void DoMovementTest( CStudioHdr *pStudioHdr );
-	void GetMovementFlags( CStudioHdr *pStudioHdr );
+	void DoMovementTest( IStudioHdr *pStudioHdr, float flX, float flY );
+	void DoMovementTest( IStudioHdr *pStudioHdr );
+	void GetMovementFlags( IStudioHdr *pStudioHdr );
 
 	// Pose parameters.
-	bool				SetupPoseParameters( CStudioHdr *pStudioHdr );
-	virtual void		ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr );
-	virtual void		ComputePoseParam_AimPitch( CStudioHdr *pStudioHdr );
-	virtual void		ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr );
-	void				ComputePoseParam_BodyHeight( CStudioHdr *pStudioHdr );
+	bool				SetupPoseParameters( IStudioHdr *pStudioHdr );
+	virtual void		ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr );
+	virtual void		ComputePoseParam_AimPitch( IStudioHdr *pStudioHdr );
+	virtual void		ComputePoseParam_AimYaw( IStudioHdr *pStudioHdr );
+	void				ComputePoseParam_BodyHeight( IStudioHdr *pStudioHdr );
 	virtual void		EstimateYaw( void );
 	void				ConvergeYawAngles( float flGoalYaw, float flYawRate, float flDeltaTime, float &flCurrentYaw );
 
 	virtual float GetCurrentMaxGroundSpeed();
-	virtual void ComputeSequences( CStudioHdr *pStudioHdr );
+	virtual void ComputeSequences( IStudioHdr *pStudioHdr );
 	void ComputeMainSequence();
 	void UpdateInterpolators();
 	void ResetGroundSpeed( void );

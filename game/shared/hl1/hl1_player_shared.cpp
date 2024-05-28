@@ -49,7 +49,7 @@ public:
 
 	float CalcMovementPlaybackRate( bool *bIsMoving );
 
-	virtual void		ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr );
+	virtual void		ComputePoseParam_BodyPitch( IStudioHdr *pStudioHdr );
 
 
 private:
@@ -350,7 +350,7 @@ float CPlayerAnimState::CalcMovementPlaybackRate( bool *bIsMoving )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPlayerAnimState::ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr )
+void CPlayerAnimState::ComputePoseParam_BodyPitch( IStudioHdr *pStudioHdr )
 {
 	VPROF( "CBasePlayerAnimState::ComputePoseParam_BodyPitch" );
 

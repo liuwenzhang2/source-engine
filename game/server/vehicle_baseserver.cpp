@@ -788,7 +788,7 @@ void CBaseServerVehicle::ParseNPCRoles( KeyValues *pkvPassengerList )
 		return;
 
 	// For attachment polling
-	CStudioHdr *pStudioHdr = pAnimating->GetModelPtr();
+	IStudioHdr *pStudioHdr = pAnimating->GetModelPtr();
 	Assert( pStudioHdr != NULL );
 	if ( pStudioHdr == NULL )
 		return;
@@ -1188,7 +1188,7 @@ int CBaseServerVehicle::GetEntryAnimForPoint( const Vector &vecEyePoint )
 	if ( !pAnimating )
 		return 0;
 
-	CStudioHdr *pStudioHdr = pAnimating->GetModelPtr();
+	IStudioHdr *pStudioHdr = pAnimating->GetModelPtr();
 	if (!pStudioHdr)
 		return 0;
 	int iHitboxSet = FindHitboxSetByName( pStudioHdr, "entryboxes" );
@@ -1257,7 +1257,7 @@ int CBaseServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAll
 	if ( !pAnimating )
 		return ACTIVITY_NOT_AVAILABLE;
 
-	CStudioHdr *pStudioHdr = pAnimating->GetModelPtr();
+	IStudioHdr *pStudioHdr = pAnimating->GetModelPtr();
 	if (!pStudioHdr)
 		return ACTIVITY_NOT_AVAILABLE;
 

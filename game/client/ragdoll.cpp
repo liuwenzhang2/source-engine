@@ -90,7 +90,7 @@ void CRagdoll::BuildRagdollBounds( C_BaseEntity *ent )
 
 void CRagdoll::Init( 
 	C_BaseEntity *ent, 
-	CStudioHdr *pstudiohdr, 
+	IStudioHdr *pstudiohdr, 
 	const Vector &forceVector, 
 	int forceBone, 
 	const matrix3x4_t *pDeltaBones0, 
@@ -346,7 +346,7 @@ void CRagdoll::DrawWireframe()
 
 CRagdoll *CreateRagdoll( 
 	C_BaseEntity *ent, 
-	CStudioHdr *pstudiohdr, 
+	IStudioHdr *pstudiohdr, 
 	const Vector &forceVector, 
 	int forceBone, 
 	const matrix3x4_t *pDeltaBones0, 
@@ -384,14 +384,14 @@ public:
 	virtual void PostDataUpdate( DataUpdateType_t updateType );
 
 	virtual int InternalDrawModel( int flags );
-	virtual CStudioHdr *OnNewModel( void );
+	virtual IStudioHdr *OnNewModel( void );
 	virtual unsigned char GetClientSideFade();
 	virtual void	SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights );
 
 	void GetRenderBounds( Vector& theMins, Vector& theMaxs );
 	virtual void AddEntity( void );
 	virtual void AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime );
-	virtual void BuildTransformations( CStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t &cameraTransform, int boneMask, CBoneBitList &boneComputed );
+	virtual void BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t &cameraTransform, int boneMask, CBoneBitList &boneComputed );
 	IPhysicsObject *GetElement( int elementNum );
 	virtual void UpdateOnRemove();
 	virtual float LastBoneChangedTime();
@@ -484,9 +484,9 @@ int C_ServerRagdoll::InternalDrawModel( int flags )
 }
 
 
-CStudioHdr *C_ServerRagdoll::OnNewModel( void )
+IStudioHdr *C_ServerRagdoll::OnNewModel( void )
 {
-	CStudioHdr *hdr = BaseClass::OnNewModel();
+	IStudioHdr *hdr = BaseClass::OnNewModel();
 
 	if ( !m_elementCount )
 	{
@@ -515,7 +515,7 @@ void C_ServerRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWe
 {
 	BaseClass::SetupWeights( pBoneToWorld, nFlexWeightCount, pFlexWeights, pFlexDelayedWeights );
 
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 		return;
 
@@ -571,7 +571,7 @@ void C_ServerRagdoll::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Qua
 	}
 }
 
-void C_ServerRagdoll::BuildTransformations( CStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t &cameraTransform, int boneMask, CBoneBitList &boneComputed )
+void C_ServerRagdoll::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t &cameraTransform, int boneMask, CBoneBitList &boneComputed )
 {
 	if ( !hdr )
 		return;
@@ -720,7 +720,7 @@ public:
 		return BaseClass::SetupBones( pBoneToWorldOut, nMaxBones, boneMask, currentTime );
 	}
 
-	virtual void BuildTransformations( CStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
+	virtual void BuildTransformations( IStudioHdr *hdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
 	{
 		VPROF_BUDGET( "C_ServerRagdollAttached::SetupBones", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
 

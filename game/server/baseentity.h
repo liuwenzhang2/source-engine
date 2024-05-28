@@ -31,7 +31,7 @@ class AI_CriteriaSet;
 class IResponseSystem;
 class IEntitySaveUtils;
 class CRecipientFilter;
-class CStudioHdr;
+class IStudioHdr;
 template<class T>
 class CGlobalEntityList;
 class CServerGameDLL;
@@ -503,7 +503,7 @@ public:
 protected:
 	// Notification on model load. May be called multiple times for dynamic models.
 	// Implementations must call BaseClass::OnNewModel and pass return value through.
-	virtual CStudioHdr *OnNewModel();
+	virtual IStudioHdr *OnNewModel();
 
 public:
 	virtual void PostConstructor( const char *szClassname, int iForceEdictIndex);

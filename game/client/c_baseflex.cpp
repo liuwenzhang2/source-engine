@@ -192,9 +192,9 @@ void C_BaseFlex::SetupMappings( char const *pchFileRoot )
 // Purpose: initialize fast lookups when model changes
 //-----------------------------------------------------------------------------
 
-CStudioHdr *C_BaseFlex::OnNewModel()
+IStudioHdr *C_BaseFlex::OnNewModel()
 {
-	CStudioHdr *hdr = BaseClass::OnNewModel();
+	IStudioHdr *hdr = BaseClass::OnNewModel();
 	
 	// init to invalid setting
 	m_iBlink = -1;
@@ -227,7 +227,7 @@ CStudioHdr *C_BaseFlex::OnNewModel()
 }
 
 
-void C_BaseFlex::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
+void C_BaseFlex::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
 {
 	BaseClass::StandardBlendingRules( hdr, pos, q, currentTime, boneMask );
 
@@ -317,7 +317,7 @@ bool C_BaseFlex::GetSoundSpatialization( SpatializationInfo_t& info )
 // Purpose: run the interpreted FAC's expressions, converting global flex_controller 
 //			values into FAC weights
 //-----------------------------------------------------------------------------
-void C_BaseFlex::RunFlexRules( CStudioHdr *hdr, float *dest )
+void C_BaseFlex::RunFlexRules( IStudioHdr *hdr, float *dest )
 {
 	if ( !g_CV_FlexRules.GetInt() )
 		return;
@@ -550,7 +550,7 @@ void *C_BaseFlex::FindSceneFile( const char *filename )
 //-----------------------------------------------------------------------------
 // Purpose: make sure the eyes are within 30 degrees of forward
 //-----------------------------------------------------------------------------
-Vector C_BaseFlex::SetViewTarget( CStudioHdr *pStudioHdr )
+Vector C_BaseFlex::SetViewTarget( IStudioHdr *pStudioHdr )
 {
   	if ( !pStudioHdr )
   		return Vector( 0, 0, 0);
@@ -831,7 +831,7 @@ bool C_BaseFlex::SetupEmphasisBlend( Emphasized_Phoneme *classes, int phoneme )
 ConVar g_CV_PhonemeSnap("phonemesnap", "2", 0, "Lod at level at which visemes stops always considering two phonemes, regardless of duration." );
 void C_BaseFlex::AddVisemesForSentence( Emphasized_Phoneme *classes, float emphasis_intensity, CSentence *sentence, float t, float dt, bool juststarted )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 	{
 		return;
@@ -989,7 +989,7 @@ void C_BaseFlex::GetToolRecordingState( KeyValues *msg )
 
 	BaseClass::GetToolRecordingState( msg );
 
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 		return;
 
@@ -1112,7 +1112,7 @@ void C_BaseFlex::OnThreadedDrawSetup()
 	if (m_iEyeAttachment < 0)
 		return;
 
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 	{
 		return;
@@ -1133,7 +1133,7 @@ bool C_BaseFlex::UsesFlexDelayedWeights()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_BaseFlex::LinkToGlobalFlexControllers( CStudioHdr *hdr )
+void C_BaseFlex::LinkToGlobalFlexControllers( IStudioHdr *hdr )
 {
 	if ( hdr && hdr->pFlexcontroller( LocalFlexController_t(0) )->localToGlobal == -1 )
 	{
@@ -1165,7 +1165,7 @@ void C_BaseFlex::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightC
 // Purpose: Use the local bone positions to set flex control weights
 //          via boneflexdrivers specified in the model
 //-----------------------------------------------------------------------------
-void C_BaseFlex::BuildTransformations( CStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
+void C_BaseFlex::BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
 {
 	const int nBoneFlexDriverCount = pStudioHdr->BoneFlexDriverCount();
 
@@ -1193,7 +1193,7 @@ void C_BaseFlex::BuildTransformations( CStudioHdr *pStudioHdr, Vector *pos, Quat
 //-----------------------------------------------------------------------------
 bool C_BaseFlex::SetupGlobalWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 		return false;
 
@@ -1289,7 +1289,7 @@ void C_BaseFlex::RunFlexDelay( int nFlexWeightCount, float *pFlexWeights, float 
 //-----------------------------------------------------------------------------
 void C_BaseFlex::SetupLocalWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 		return;
 
@@ -1639,7 +1639,7 @@ void C_BaseFlex::SetFlexWeight( LocalFlexController_t index, float value )
 {
 	if (index >= 0 && index < GetNumFlexControllers())
 	{
-		CStudioHdr *pstudiohdr = GetModelPtr( );
+		IStudioHdr *pstudiohdr = GetModelPtr( );
 		if (! pstudiohdr)
 			return;
 
@@ -1659,7 +1659,7 @@ float C_BaseFlex::GetFlexWeight( LocalFlexController_t index )
 {
 	if (index >= 0 && index < GetNumFlexControllers())
 	{
-		CStudioHdr *pstudiohdr = GetModelPtr( );
+		IStudioHdr *pstudiohdr = GetModelPtr( );
 		if (! pstudiohdr)
 			return 0;
 
@@ -1694,7 +1694,7 @@ LocalFlexController_t C_BaseFlex::FindFlexController( const char *szName )
 //-----------------------------------------------------------------------------
 void C_BaseFlex::ProcessSceneEvents( bool bFlexEvents )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 	{
 		return;

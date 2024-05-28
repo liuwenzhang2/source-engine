@@ -2068,7 +2068,7 @@ const char *GetModelName( CBaseEntity *pBaseEntity )
 	CBaseAnimating *pBaseAnimating = dynamic_cast<CBaseAnimating *>( pBaseEntity );
 	if ( pBaseAnimating )
 	{
-		CStudioHdr *pStudioHdr = pBaseAnimating->GetModelPtr();
+		IStudioHdr *pStudioHdr = pBaseAnimating->GetModelPtr();
 		if ( pStudioHdr )
 		{
 			return pStudioHdr->pszName();

@@ -178,7 +178,7 @@ void C_BaseAnimatingOverlay::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 
 	if ( !IsRagdoll() )
 	{
-		CStudioHdr *pStudioHdr = GetModelPtr();
+		IStudioHdr *pStudioHdr = GetModelPtr();
 		if ( !pStudioHdr || !pStudioHdr->SequencesAvailable() )
 			return;
 
@@ -204,7 +204,7 @@ void C_BaseAnimatingOverlay::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 
 
 
-void C_BaseAnimatingOverlay::CheckForLayerChanges( CStudioHdr *hdr, float currentTime )
+void C_BaseAnimatingOverlay::CheckForLayerChanges( IStudioHdr *hdr, float currentTime )
 {
 	CDisableRangeChecks disableRangeChecks;
 
@@ -427,7 +427,7 @@ void C_BaseAnimatingOverlay::AccumulateLayers( IBoneSetup &boneSetup, Vector pos
 	}
 }
 
-void C_BaseAnimatingOverlay::DoAnimationEvents( CStudioHdr *pStudioHdr )
+void C_BaseAnimatingOverlay::DoAnimationEvents( IStudioHdr *pStudioHdr )
 {
 	if ( !pStudioHdr || !pStudioHdr->SequencesAvailable() )
 		return;
@@ -553,9 +553,9 @@ void C_BaseAnimatingOverlay::DoAnimationEvents( CStudioHdr *pStudioHdr )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CStudioHdr *C_BaseAnimatingOverlay::OnNewModel()
+IStudioHdr *C_BaseAnimatingOverlay::OnNewModel()
 {
-	CStudioHdr *hdr = BaseClass::OnNewModel();
+	IStudioHdr *hdr = BaseClass::OnNewModel();
 
 	// Clear out animation layers
 	for ( int i=0; i < m_AnimOverlay.Count(); i++ )

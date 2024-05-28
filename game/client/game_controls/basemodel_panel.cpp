@@ -219,7 +219,7 @@ int CBaseModelPanel::FindAnimByName( const char *pszName )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CBaseModelPanel::FindSequenceFromActivity( CStudioHdr *pStudioHdr, const char *pszActivity )
+int CBaseModelPanel::FindSequenceFromActivity( IStudioHdr *pStudioHdr, const char *pszActivity )
 {
 	if ( !pStudioHdr )
 		return -1;
@@ -252,23 +252,24 @@ void CBaseModelPanel::SetModelAnim( int iAnim )
 	if ( !pStudioHdr )
 		return;
 
-	CStudioHdr studioHdr( pStudioHdr, g_pMDLCache );
+	IStudioHdr* studioHdr = g_pMDLCache->GetIStudioHdr( pStudioHdr );
 
 	// Do we have an activity or a sequence?
 	int iSequence = ACT_INVALID;
 	if ( m_BMPResData.m_aAnimations[iAnim].m_pszActivity && m_BMPResData.m_aAnimations[iAnim].m_pszActivity[0] )
 	{
-		iSequence = FindSequenceFromActivity( &studioHdr, m_BMPResData.m_aAnimations[iAnim].m_pszActivity );
+		iSequence = FindSequenceFromActivity( studioHdr, m_BMPResData.m_aAnimations[iAnim].m_pszActivity );
 	}
 	else if ( m_BMPResData.m_aAnimations[iAnim].m_pszSequence && m_BMPResData.m_aAnimations[iAnim].m_pszSequence[0] )
 	{
-		iSequence = LookupSequence( &studioHdr, m_BMPResData.m_aAnimations[iAnim].m_pszSequence );
+		iSequence = LookupSequence( studioHdr, m_BMPResData.m_aAnimations[iAnim].m_pszSequence );
 	}
-
+	
 	if ( iSequence != ACT_INVALID )
 	{
 		SetSequence( iSequence, true );
 	}
+	delete studioHdr;
 }
 
 //-----------------------------------------------------------------------------
@@ -283,15 +284,16 @@ void CBaseModelPanel::SetMDL( MDLHandle_t handle, void *pProxyData )
 	{
 		// SetMDL will cause the base CMdl code to set our localtoglobal indices if they aren't set.
 		// We set them up here so that they're left alone by that code.
-		CStudioHdr studioHdr( pHdr, g_pMDLCache );
-		if (studioHdr.numflexcontrollers() > 0 && studioHdr.pFlexcontroller( LocalFlexController_t(0) )->localToGlobal == -1)
+		IStudioHdr* studioHdr = g_pMDLCache->GetIStudioHdr( pHdr);
+		if (studioHdr->numflexcontrollers() > 0 && studioHdr->pFlexcontroller( LocalFlexController_t(0) )->localToGlobal == -1)
 		{
-			for (LocalFlexController_t i = LocalFlexController_t(0); i < studioHdr.numflexcontrollers(); i++)
+			for (LocalFlexController_t i = LocalFlexController_t(0); i < studioHdr->numflexcontrollers(); i++)
 			{
-				int j = C_BaseFlex::AddGlobalFlexController( studioHdr.pFlexcontroller( i )->pszName() );
-				studioHdr.pFlexcontroller( i )->localToGlobal = j;
+				int j = C_BaseFlex::AddGlobalFlexController( studioHdr->pFlexcontroller( i )->pszName() );
+				studioHdr->pFlexcontroller( i )->localToGlobal = j;
 			}
 		}
+		delete studioHdr;
 	}
 	else 
 	{
@@ -590,14 +592,15 @@ QAngle CBaseModelPanel::GetPlayerAngles() const
 //-----------------------------------------------------------------------------
 void CBaseModelPanel::PlaySequence( const char *pszSequenceName )
 {
-	CStudioHdr studioHDR( GetStudioHdr(), g_pMDLCache );
-	int iSeq = ::LookupSequence( &studioHDR, pszSequenceName );
+	IStudioHdr* studioHDR = g_pMDLCache->GetIStudioHdr( GetStudioHdr());
+	int iSeq = ::LookupSequence( studioHDR, pszSequenceName );
 	if ( iSeq != ACT_INVALID )
 	{
 		m_nActiveSequence = iSeq;
-		m_flActiveSequenceDuration = Studio_Duration( &studioHDR, iSeq, NULL );
+		m_flActiveSequenceDuration = Studio_Duration( studioHDR, iSeq, NULL );
 		SetSequence( m_nActiveSequence, true );
 	}
+	delete studioHDR;
 }
 
 //-----------------------------------------------------------------------------
@@ -753,7 +756,7 @@ CBaseModelPanel::particle_data_t::~particle_data_t()
 //-----------------------------------------------------------------------------
 // Purpose: Allocate particle data
 //-----------------------------------------------------------------------------
-void CBaseModelPanel::particle_data_t::UpdateControlPoints( CStudioHdr *pStudioHdr, matrix3x4_t *pWorldMatrix, const CUtlVector< int >& vecAttachments, int iDefaultBone /*= 0*/, const Vector& vecParticleOffset /*= vec3_origin*/ )
+void CBaseModelPanel::particle_data_t::UpdateControlPoints( IStudioHdr *pStudioHdr, matrix3x4_t *pWorldMatrix, const CUtlVector< int >& vecAttachments, int iDefaultBone /*= 0*/, const Vector& vecParticleOffset /*= vec3_origin*/ )
 {
 	if ( m_pParticleSystem )
 	{

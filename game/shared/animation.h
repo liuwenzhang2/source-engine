@@ -8,58 +8,56 @@
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
-#define ACTIVITY_NOT_AVAILABLE		-1
-
 struct animevent_t;
 struct studiohdr_t;
-class CStudioHdr;
+class IStudioHdr;
 struct mstudioseqdesc_t;
 
-int ExtractBbox( CStudioHdr *pstudiohdr, int sequence, Vector& mins, Vector& maxs );
+int ExtractBbox( IStudioHdr *pstudiohdr, int sequence, Vector& mins, Vector& maxs );
 
-void IndexModelSequences( CStudioHdr *pstudiohdr );
-void ResetActivityIndexes( CStudioHdr *pstudiohdr );
-void VerifySequenceIndex( CStudioHdr *pstudiohdr );
-int SelectWeightedSequence( CStudioHdr *pstudiohdr, int activity, int curSequence = -1 );
-int SelectHeaviestSequence( CStudioHdr *pstudiohdr, int activity );
+void IndexModelSequences( IStudioHdr *pstudiohdr );
+void ResetActivityIndexes( IStudioHdr *pstudiohdr );
+void VerifySequenceIndex( IStudioHdr *pstudiohdr );
+int SelectWeightedSequence( IStudioHdr *pstudiohdr, int activity, int curSequence = -1 );
+int SelectHeaviestSequence( IStudioHdr *pstudiohdr, int activity );
 void SetEventIndexForSequence( mstudioseqdesc_t &seqdesc );
-void BuildAllAnimationEventIndexes( CStudioHdr *pstudiohdr );
-void ResetEventIndexes( CStudioHdr *pstudiohdr );
+void BuildAllAnimationEventIndexes( IStudioHdr *pstudiohdr );
+void ResetEventIndexes( IStudioHdr *pstudiohdr );
 
-void GetEyePosition( CStudioHdr *pstudiohdr, Vector &vecEyePosition );
+void GetEyePosition( IStudioHdr *pstudiohdr, Vector &vecEyePosition );
 
-int LookupActivity( CStudioHdr *pstudiohdr, const char *label );
-int LookupSequence( CStudioHdr *pstudiohdr, const char *label );
+int LookupActivity( IStudioHdr *pstudiohdr, const char *label );
+int LookupSequence( IStudioHdr *pstudiohdr, const char *label );
 
 #define NOMOTION 99999
-void GetSequenceLinearMotion( CStudioHdr *pstudiohdr, int iSequence, const float poseParameter[], Vector *pVec );
+void GetSequenceLinearMotion( IStudioHdr *pstudiohdr, int iSequence, const float poseParameter[], Vector *pVec );
 
-const char *GetSequenceName( CStudioHdr *pstudiohdr, int sequence );
-const char *GetSequenceActivityName( CStudioHdr *pstudiohdr, int iSequence );
+const char *GetSequenceName( IStudioHdr *pstudiohdr, int sequence );
+const char *GetSequenceActivityName( IStudioHdr *pstudiohdr, int iSequence );
 
-int GetSequenceFlags( CStudioHdr *pstudiohdr, int sequence );
-int GetAnimationEvent( CStudioHdr *pstudiohdr, int sequence, animevent_t *pNPCEvent, float flStart, float flEnd, int index );
-bool HasAnimationEventOfType( CStudioHdr *pstudiohdr, int sequence, int type );
+int GetSequenceFlags( IStudioHdr *pstudiohdr, int sequence );
+int GetAnimationEvent( IStudioHdr *pstudiohdr, int sequence, animevent_t *pNPCEvent, float flStart, float flEnd, int index );
+bool HasAnimationEventOfType( IStudioHdr *pstudiohdr, int sequence, int type );
 
-int FindTransitionSequence( CStudioHdr *pstudiohdr, int iCurrentSequence, int iGoalSequence, int *piDir );
-bool GotoSequence( CStudioHdr *pstudiohdr, int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int &nNextSequence, float &flNextCycle, int &iNextDir );
+int FindTransitionSequence( IStudioHdr *pstudiohdr, int iCurrentSequence, int iGoalSequence, int *piDir );
+bool GotoSequence( IStudioHdr *pstudiohdr, int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int &nNextSequence, float &flNextCycle, int &iNextDir );
 
-void SetBodygroup( CStudioHdr *pstudiohdr, int& body, int iGroup, int iValue );
-int GetBodygroup( CStudioHdr *pstudiohdr, int body, int iGroup );
+void SetBodygroup( IStudioHdr *pstudiohdr, int& body, int iGroup, int iValue );
+int GetBodygroup( IStudioHdr *pstudiohdr, int body, int iGroup );
 
-const char *GetBodygroupName( CStudioHdr *pstudiohdr, int iGroup );
-int FindBodygroupByName( CStudioHdr *pstudiohdr, const char *name );
-int GetBodygroupCount( CStudioHdr *pstudiohdr, int iGroup );
-int GetNumBodyGroups( CStudioHdr *pstudiohdr );
+const char *GetBodygroupName( IStudioHdr *pstudiohdr, int iGroup );
+int FindBodygroupByName( IStudioHdr *pstudiohdr, const char *name );
+int GetBodygroupCount( IStudioHdr *pstudiohdr, int iGroup );
+int GetNumBodyGroups( IStudioHdr *pstudiohdr );
 
-int GetSequenceActivity( CStudioHdr *pstudiohdr, int sequence, int *pweight = NULL );
+int GetSequenceActivity( IStudioHdr *pstudiohdr, int sequence, int *pweight = NULL );
 
-void GetAttachmentLocalSpace( CStudioHdr *pstudiohdr, int attachIndex, matrix3x4_t &pLocalToWorld );
+void GetAttachmentLocalSpace( IStudioHdr *pstudiohdr, int attachIndex, matrix3x4_t &pLocalToWorld );
 
-float SetBlending( CStudioHdr *pstudiohdr, int sequence, int *pblendings, int iBlender, float flValue );
+float SetBlending( IStudioHdr *pstudiohdr, int sequence, int *pblendings, int iBlender, float flValue );
 
-int FindHitboxSetByName( CStudioHdr *pstudiohdr, const char *name );
-const char *GetHitboxSetName( CStudioHdr *pstudiohdr, int setnumber );
-int GetHitboxSetCount( CStudioHdr *pstudiohdr );
+int FindHitboxSetByName( IStudioHdr *pstudiohdr, const char *name );
+const char *GetHitboxSetName( IStudioHdr *pstudiohdr, int setnumber );
+int GetHitboxSetCount( IStudioHdr *pstudiohdr );
 
 #endif	//ANIMATION_H

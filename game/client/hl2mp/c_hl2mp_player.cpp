@@ -154,16 +154,16 @@ void C_HL2MP_Player::Initialize( void )
 	m_headPitchPoseParam = LookupPoseParameter( "head_pitch" );
 	GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
 
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	for ( int i = 0; i < hdr->GetNumPoseParameters() ; i++ )
 	{
 		SetPoseParameter( hdr, i, 0.0 );
 	}
 }
 
-CStudioHdr *C_HL2MP_Player::OnNewModel( void )
+IStudioHdr *C_HL2MP_Player::OnNewModel( void )
 {
-	CStudioHdr *hdr = BaseClass::OnNewModel();
+	IStudioHdr *hdr = BaseClass::OnNewModel();
 	
 	Initialize( );
 
@@ -956,7 +956,7 @@ void C_HL2MPRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWei
 	static float destweight[128];
 	static bool bIsInited = false;
 
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 		return;
 

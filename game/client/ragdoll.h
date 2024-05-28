@@ -19,7 +19,7 @@
 #define RAGDOLL_VISUALIZE	0
 
 class C_BaseEntity;
-class CStudioHdr;
+class IStudioHdr;
 struct mstudiobone_t;
 class Vector;
 class IPhysicsObject;
@@ -50,7 +50,7 @@ public:
 	
 	void Init( 
 		C_BaseEntity *ent, 
-		CStudioHdr *pstudiohdr, 
+		IStudioHdr *pstudiohdr, 
 		const Vector &forceVector, 
 		int forceBone, 
 		const matrix3x4_t *pDeltaBones0, 
@@ -81,7 +81,7 @@ public:
 	//=============================================================================
 	
 
-	void	SetInitialBonePosition( CStudioHdr *pstudiohdr, const CBoneAccessor &pDesiredBonePosition );
+	//void	SetInitialBonePosition( IStudioHdr *pstudiohdr, const CBoneAccessor &pDesiredBonePosition );
 
 	bool IsValid() { return m_ragdoll.listCount > 0; }
 
@@ -116,7 +116,7 @@ public:
 
 CRagdoll *CreateRagdoll( 
 	C_BaseEntity *ent, 
-	CStudioHdr *pstudiohdr, 
+	IStudioHdr *pstudiohdr, 
 	const Vector &forceVector, 
 	int forceBone, 
 	const matrix3x4_t *pDeltaBones0, 

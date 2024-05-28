@@ -12,16 +12,16 @@
 
 extern ISoundEmitterSystemBase *soundemitterbase;
 
-CStudioHdr *ModelSoundsCache_LoadModel( char const *filename );
+IStudioHdr *ModelSoundsCache_LoadModel( char const *filename );
 void ModelSoundsCache_PrecacheScriptSound( const char *soundname );
-void ModelSoundsCache_FinishModel( CStudioHdr *hdr );
+void ModelSoundsCache_FinishModel( IStudioHdr *hdr );
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *hdr - 
 // Output : static void
 //-----------------------------------------------------------------------------
 
-void VerifySequenceIndex( CStudioHdr *pstudiohdr );
+void VerifySequenceIndex( IStudioHdr *pstudiohdr );
 
 // HACK:  This must match the #define in cl_animevent.h in the client .dll code!!!
 #define CL_EVENT_SOUND				5004
@@ -82,7 +82,7 @@ void CModelSoundsCache::Rebuild( char const *filename )
 {
 	sounds.RemoveAll();
 
-	CStudioHdr *hdr = ModelSoundsCache_LoadModel( filename );
+	IStudioHdr *hdr = ModelSoundsCache_LoadModel( filename );
 
 	if ( hdr )
 	{
@@ -124,7 +124,7 @@ void CModelSoundsCache::FindOrAddScriptSound( CUtlVector< unsigned short >& soun
 // Input  : *hdr - 
 //			sounds - 
 //-----------------------------------------------------------------------------
-void CModelSoundsCache::BuildAnimationEventSoundList( CStudioHdr *hdr, CUtlVector< unsigned short >& sounds )
+void CModelSoundsCache::BuildAnimationEventSoundList( IStudioHdr *hdr, CUtlVector< unsigned short >& sounds )
 {
 	Assert( hdr );
 	

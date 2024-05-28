@@ -1100,7 +1100,7 @@ void CAI_PassengerBehavior::GetTransitionAnimationIdeal( float flCycle, const Ve
 //-----------------------------------------------------------------------------
 bool CAI_PassengerBehavior::LocalIntervalMovement( float flInterval, bool &bMoveSeqFinished, Vector &newPosition, QAngle &newAngles )
 {
-	CStudioHdr *pstudiohdr = GetOuter()->GetModelPtr();
+	IStudioHdr *pstudiohdr = GetOuter()->GetModelPtr();
 	if ( pstudiohdr == NULL )
 		return false;
 

@@ -28,7 +28,7 @@
 #pragma warning( disable : 4244 )
 #define iabs(i) (( (i) >= 0 ) ? (i) : -(i) )
 
-int ExtractBbox( CStudioHdr *pstudiohdr, int sequence, Vector& mins, Vector& maxs )
+int ExtractBbox( IStudioHdr *pstudiohdr, int sequence, Vector& mins, Vector& maxs )
 {
 	if (! pstudiohdr)
 		return 0;
@@ -104,7 +104,7 @@ mstudioevent_t *GetEventIndexForSequence( mstudioseqdesc_t &seqdesc )
 }
 
 
-void BuildAllAnimationEventIndexes( CStudioHdr *pstudiohdr )
+void BuildAllAnimationEventIndexes( IStudioHdr *pstudiohdr )
 {
 	if ( !pstudiohdr )
 		return;
@@ -125,7 +125,7 @@ void BuildAllAnimationEventIndexes( CStudioHdr *pstudiohdr )
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-void ResetEventIndexes( CStudioHdr *pstudiohdr )
+void ResetEventIndexes( IStudioHdr *pstudiohdr )
 {	
 	if (! pstudiohdr)
 		return;
@@ -137,7 +137,7 @@ void ResetEventIndexes( CStudioHdr *pstudiohdr )
 // Purpose: 
 //-----------------------------------------------------------------------------
 
-void SetActivityForSequence( CStudioHdr *pstudiohdr, int i )
+void SetActivityForSequence( IStudioHdr *pstudiohdr, int i )
 {
 	int iActivityIndex;
 	const char *pszActivityName;
@@ -174,7 +174,7 @@ void SetActivityForSequence( CStudioHdr *pstudiohdr, int i )
 // sequences that have them.
 //=========================================================
 
-void IndexModelSequences( CStudioHdr *pstudiohdr )
+void IndexModelSequences( IStudioHdr *pstudiohdr )
 {
 	int i;
 
@@ -198,7 +198,7 @@ void IndexModelSequences( CStudioHdr *pstudiohdr )
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-void ResetActivityIndexes( CStudioHdr *pstudiohdr )
+void ResetActivityIndexes( IStudioHdr *pstudiohdr )
 {	
 	if (! pstudiohdr)
 		return;
@@ -206,7 +206,7 @@ void ResetActivityIndexes( CStudioHdr *pstudiohdr )
 	pstudiohdr->SetActivityListVersion( g_nActivityListVersion - 1 );
 }
 
-void VerifySequenceIndex( CStudioHdr *pstudiohdr )
+void VerifySequenceIndex( IStudioHdr *pstudiohdr )
 {
 	if ( !pstudiohdr )
 	{
@@ -226,7 +226,7 @@ bool IsInPrediction()
 	return CBaseEntity::GetPredictionPlayer() != NULL;
 }
 
-int SelectWeightedSequence( CStudioHdr *pstudiohdr, int activity, int curSequence )
+int SelectWeightedSequence( IStudioHdr *pstudiohdr, int activity, int curSequence )
 {
 	VPROF( "SelectWeightedSequence" );
 
@@ -273,76 +273,12 @@ int SelectWeightedSequence( CStudioHdr *pstudiohdr, int activity, int curSequenc
 }
 
 
-// Pick a sequence for the given activity. If the current sequence is appropriate for the 
-// current activity, and its stored weight is negative (whatever that means), always select
-// it. Otherwise perform a weighted selection -- imagine a large roulette wheel, with each
-// sequence having a number of spaces corresponding to its weight.
-int CStudioHdr::CActivityToSequenceMapping::SelectWeightedSequence( CStudioHdr *pstudiohdr, int activity, int curSequence )
-{
-	if (!ValidateAgainst(pstudiohdr))
-	{
-		AssertMsg1(false, "CStudioHdr %s has changed its vmodel pointer without reinitializing its activity mapping! Now performing emergency reinitialization.", pstudiohdr->pszName());
-		ExecuteOnce(DebuggerBreakIfDebugging());
-		Reinitialize(pstudiohdr);
-	}
 
-	// a null m_pSequenceTuples just means that this studio header has no activities.
-	if (!m_pSequenceTuples)
-		return ACTIVITY_NOT_AVAILABLE;
-
-	// is the current sequence appropriate?
-	if (curSequence >= 0)
-	{
-		mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( curSequence );
-
-		if (seqdesc.activity == activity && seqdesc.actweight < 0)
-			return curSequence;
-	}
-
-	// get the data for the given activity
-	HashValueType dummy( activity, 0, 0, 0 );
-	UtlHashHandle_t handle = m_ActToSeqHash.Find(dummy);
-	if (!m_ActToSeqHash.IsValidHandle(handle))
-	{
-		return ACTIVITY_NOT_AVAILABLE;
-	}
-	const HashValueType * __restrict actData = &m_ActToSeqHash[handle];
-
-	int weighttotal = actData->totalWeight;
-	// generate a random number from 0 to the total weight
-	int randomValue;
-	if ( IsInPrediction() )
-	{
-		randomValue = SharedRandomInt( "SelectWeightedSequence", 0, weighttotal - 1 );
-	}
-	else
-	{
-		randomValue = RandomInt( 0, weighttotal - 1 );
-	}
-
-	// chug through the entries in the list (they are sequential therefore cache-coherent)
-	// until we run out of random juice
-	SequenceTuple * __restrict sequenceInfo = m_pSequenceTuples + actData->startingIdx;
-
-	const SequenceTuple *const stopHere = sequenceInfo + actData->count; // this is a backup 
-		// in case the weights are somehow miscalculated -- we don't read or write through
-		// it (because it aliases the restricted pointer above); it's only here for 
-		// the comparison.
-
-	while (randomValue >= sequenceInfo->weight && sequenceInfo < stopHere)
-	{
-		randomValue -= sequenceInfo->weight;
-		++sequenceInfo;
-	}
-
-	return sequenceInfo->seqnum;
-
-}
 
 
 #endif
 
-int SelectHeaviestSequence( CStudioHdr *pstudiohdr, int activity )
+int SelectHeaviestSequence( IStudioHdr *pstudiohdr, int activity )
 {
 	if ( !pstudiohdr )
 		return 0;
@@ -368,7 +304,7 @@ int SelectHeaviestSequence( CStudioHdr *pstudiohdr, int activity )
 	return seq;
 }
 
-void GetEyePosition ( CStudioHdr *pstudiohdr, Vector &vecEyePosition )
+void GetEyePosition ( IStudioHdr *pstudiohdr, Vector &vecEyePosition )
 {
 	if ( !pstudiohdr )
 	{
@@ -385,7 +321,7 @@ void GetEyePosition ( CStudioHdr *pstudiohdr, Vector &vecEyePosition )
 // Input  : label - Name of the activity to look up, ie "ACT_IDLE"
 // Output : Activity index or ACT_INVALID if not found.
 //-----------------------------------------------------------------------------
-int LookupActivity( CStudioHdr *pstudiohdr, const char *label )
+int LookupActivity( IStudioHdr *pstudiohdr, const char *label )
 {
 	VPROF( "LookupActivity" );
 
@@ -412,7 +348,7 @@ int LookupActivity( CStudioHdr *pstudiohdr, const char *label )
 // Input  : label - The sequence name or activity name to look up.
 // Output : Returns the sequence index of the matching sequence, or ACT_INVALID.
 //-----------------------------------------------------------------------------
-int LookupSequence( CStudioHdr *pstudiohdr, const char *label )
+int LookupSequence( IStudioHdr *pstudiohdr, const char *label )
 {
 	VPROF( "LookupSequence" );
 
@@ -444,7 +380,7 @@ int LookupSequence( CStudioHdr *pstudiohdr, const char *label )
 	return ACT_INVALID;
 }
 
-void GetSequenceLinearMotion( CStudioHdr *pstudiohdr, int iSequence, const float poseParameter[], Vector *pVec )
+void GetSequenceLinearMotion( IStudioHdr *pstudiohdr, int iSequence, const float poseParameter[], Vector *pVec )
 {
 	if (! pstudiohdr)
 	{
@@ -475,7 +411,7 @@ void GetSequenceLinearMotion( CStudioHdr *pstudiohdr, int iSequence, const float
 }
 #endif
 
-const char *GetSequenceName( CStudioHdr *pstudiohdr, int iSequence )
+const char *GetSequenceName( IStudioHdr *pstudiohdr, int iSequence )
 {
 	if( !pstudiohdr || iSequence < 0 || iSequence >= pstudiohdr->GetNumSeq() )
 	{
@@ -490,7 +426,7 @@ const char *GetSequenceName( CStudioHdr *pstudiohdr, int iSequence )
 	return seqdesc.pszLabel();
 }
 
-const char *GetSequenceActivityName( CStudioHdr *pstudiohdr, int iSequence )
+const char *GetSequenceActivityName( IStudioHdr *pstudiohdr, int iSequence )
 {
 	if( !pstudiohdr || iSequence < 0 || iSequence >= pstudiohdr->GetNumSeq() )
 	{
@@ -505,7 +441,7 @@ const char *GetSequenceActivityName( CStudioHdr *pstudiohdr, int iSequence )
 	return seqdesc.pszActivityName( );
 }
 
-int GetSequenceFlags( CStudioHdr *pstudiohdr, int sequence )
+int GetSequenceFlags( IStudioHdr *pstudiohdr, int sequence )
 {
 	if ( !pstudiohdr || 
 		 !pstudiohdr->SequencesAvailable() ||
@@ -527,7 +463,7 @@ int GetSequenceFlags( CStudioHdr *pstudiohdr, int sequence )
 //			type - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool HasAnimationEventOfType( CStudioHdr *pstudiohdr, int sequence, int type )
+bool HasAnimationEventOfType( IStudioHdr *pstudiohdr, int sequence, int type )
 {
 	if ( !pstudiohdr || sequence >= pstudiohdr->GetNumSeq() )
 		return false;
@@ -555,7 +491,7 @@ bool HasAnimationEventOfType( CStudioHdr *pstudiohdr, int sequence, int type )
 	return false;
 }
 
-int GetAnimationEvent( CStudioHdr *pstudiohdr, int sequence, animevent_t *pNPCEvent, float flStart, float flEnd, int index )
+int GetAnimationEvent( IStudioHdr *pstudiohdr, int sequence, animevent_t *pNPCEvent, float flStart, float flEnd, int index )
 {
 	if ( !pstudiohdr || sequence >= pstudiohdr->GetNumSeq() || !pNPCEvent )
 		return 0;
@@ -612,7 +548,7 @@ int GetAnimationEvent( CStudioHdr *pstudiohdr, int sequence, animevent_t *pNPCEv
 
 
 
-int FindTransitionSequence( CStudioHdr *pstudiohdr, int iCurrentSequence, int iGoalSequence, int *piDir )
+int FindTransitionSequence( IStudioHdr *pstudiohdr, int iCurrentSequence, int iGoalSequence, int *piDir )
 {
 	if ( !pstudiohdr )
 		return iGoalSequence;
@@ -698,7 +634,7 @@ int FindTransitionSequence( CStudioHdr *pstudiohdr, int iCurrentSequence, int iG
 
 
 
-bool GotoSequence( CStudioHdr *pstudiohdr, int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int &nNextSequence, float &flNextCycle, int &iNextDir )
+bool GotoSequence( IStudioHdr *pstudiohdr, int iCurrentSequence, float flCurrentCycle, float flCurrentRate, int iGoalSequence, int &nNextSequence, float &flNextCycle, int &iNextDir )
 {
 	if ( !pstudiohdr )
 		return false;
@@ -798,7 +734,7 @@ bool GotoSequence( CStudioHdr *pstudiohdr, int iCurrentSequence, float flCurrent
 	return false;
 }
 
-void SetBodygroup( CStudioHdr *pstudiohdr, int& body, int iGroup, int iValue )
+void SetBodygroup( IStudioHdr *pstudiohdr, int& body, int iGroup, int iValue )
 {
 	if (! pstudiohdr)
 		return;
@@ -817,7 +753,7 @@ void SetBodygroup( CStudioHdr *pstudiohdr, int& body, int iGroup, int iValue )
 }
 
 
-int GetBodygroup( CStudioHdr *pstudiohdr, int body, int iGroup )
+int GetBodygroup( IStudioHdr *pstudiohdr, int body, int iGroup )
 {
 	if (! pstudiohdr)
 		return 0;
@@ -835,7 +771,7 @@ int GetBodygroup( CStudioHdr *pstudiohdr, int body, int iGroup )
 	return iCurrent;
 }
 
-const char *GetBodygroupName( CStudioHdr *pstudiohdr, int iGroup )
+const char *GetBodygroupName( IStudioHdr *pstudiohdr, int iGroup )
 {
 	if ( !pstudiohdr)
 		return "";
@@ -847,7 +783,7 @@ const char *GetBodygroupName( CStudioHdr *pstudiohdr, int iGroup )
 	return pbodypart->pszName();
 }
 
-int FindBodygroupByName( CStudioHdr *pstudiohdr, const char *name )
+int FindBodygroupByName( IStudioHdr *pstudiohdr, const char *name )
 {
 	if ( !pstudiohdr )
 		return -1;
@@ -865,7 +801,7 @@ int FindBodygroupByName( CStudioHdr *pstudiohdr, const char *name )
 	return -1;
 }
 
-int GetBodygroupCount( CStudioHdr *pstudiohdr, int iGroup )
+int GetBodygroupCount( IStudioHdr *pstudiohdr, int iGroup )
 {
 	if ( !pstudiohdr )
 		return 0;
@@ -877,7 +813,7 @@ int GetBodygroupCount( CStudioHdr *pstudiohdr, int iGroup )
 	return pbodypart->nummodels;
 }
 
-int GetNumBodyGroups( CStudioHdr *pstudiohdr )
+int GetNumBodyGroups( IStudioHdr *pstudiohdr )
 {
 	if ( !pstudiohdr )
 		return 0;
@@ -885,7 +821,7 @@ int GetNumBodyGroups( CStudioHdr *pstudiohdr )
 	return pstudiohdr->numbodyparts();
 }
 
-int GetSequenceActivity( CStudioHdr *pstudiohdr, int sequence, int *pweight )
+int GetSequenceActivity( IStudioHdr *pstudiohdr, int sequence, int *pweight )
 {
 	if (!pstudiohdr || !pstudiohdr->SequencesAvailable() )
 	{
@@ -906,7 +842,7 @@ int GetSequenceActivity( CStudioHdr *pstudiohdr, int sequence, int *pweight )
 }
 
 
-void GetAttachmentLocalSpace( CStudioHdr *pstudiohdr, int attachIndex, matrix3x4_t &pLocalToWorld )
+void GetAttachmentLocalSpace( IStudioHdr *pstudiohdr, int attachIndex, matrix3x4_t &pLocalToWorld )
 {
 	if ( attachIndex >= 0 )
 	{
@@ -921,7 +857,7 @@ void GetAttachmentLocalSpace( CStudioHdr *pstudiohdr, int attachIndex, matrix3x4
 //			*name - 
 // Output : int
 //-----------------------------------------------------------------------------
-int FindHitboxSetByName( CStudioHdr *pstudiohdr, const char *name )
+int FindHitboxSetByName( IStudioHdr *pstudiohdr, const char *name )
 {
 	if ( !pstudiohdr )
 		return -1;
@@ -945,7 +881,7 @@ int FindHitboxSetByName( CStudioHdr *pstudiohdr, const char *name )
 //			setnumber - 
 // Output : char const
 //-----------------------------------------------------------------------------
-const char *GetHitboxSetName( CStudioHdr *pstudiohdr, int setnumber )
+const char *GetHitboxSetName( IStudioHdr *pstudiohdr, int setnumber )
 {
 	if ( !pstudiohdr )
 		return "";
@@ -962,7 +898,7 @@ const char *GetHitboxSetName( CStudioHdr *pstudiohdr, int setnumber )
 // Input  : *pstudiohdr - 
 // Output : int
 //-----------------------------------------------------------------------------
-int GetHitboxSetCount( CStudioHdr *pstudiohdr )
+int GetHitboxSetCount( IStudioHdr *pstudiohdr )
 {
 	if ( !pstudiohdr )
 		return 0;

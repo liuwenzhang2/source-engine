@@ -2237,8 +2237,8 @@ struct studiohdr_t
 	mutable int			activitylistversion;	// initialization flag - have the sequences been indexed?
 	mutable int			eventsindexed;
 //public:
-	int					GetSequenceActivity( int iSequence );
-	void				SetSequenceActivity( int iSequence, int iActivity );
+	//int					GetSequenceActivity( int iSequence );
+	//void				SetSequenceActivity( int iSequence, int iActivity );
 	int					GetActivityListVersion( void );
 	void				SetActivityListVersion( int version ) const;
 	int					GetEventListVersion( void );
@@ -2442,7 +2442,151 @@ private:
 class IDataCache;
 class IMDLCache;
 
-class CStudioHdr
+class IStudioHdr {
+public:
+	virtual ~IStudioHdr(){}
+	virtual void Init(const studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL) = 0;
+	virtual void Term() = 0;
+
+	virtual bool IsVirtual(void) = 0;
+	virtual bool IsValid(void) = 0;
+	virtual bool IsReadyForAccess(void) const = 0;
+	virtual virtualmodel_t* GetVirtualModel(void) const = 0;
+	virtual const studiohdr_t* GetRenderHdr(void) const = 0;
+	virtual const studiohdr_t* pSeqStudioHdr(int sequence) = 0;
+	virtual const studiohdr_t* pAnimStudioHdr(int animation) = 0;
+
+	virtual int			numbones(void) const = 0;
+	virtual mstudiobone_t* pBone(int i) const = 0;
+	virtual int					RemapAnimBone(int iAnim, int iLocalBone) const = 0;		// maps local animations bone to global bone
+	virtual int					RemapSeqBone(int iSequence, int iLocalBone) const = 0;	// maps local sequence bone to global bone
+
+	virtual bool				SequencesAvailable() const = 0;
+	virtual int					GetNumSeq(void) const = 0;
+	virtual mstudioanimdesc_t& pAnimdesc(int i) = 0;
+	virtual mstudioseqdesc_t& pSeqdesc(int iSequence) = 0;
+	virtual int					iRelativeAnim(int baseseq, int relanim) const = 0;	// maps seq local anim reference to global anim index
+	virtual int					iRelativeSeq(int baseseq, int relseq) const = 0;		// maps seq local seq reference to global seq index
+
+	//virtual int					GetSequenceActivity(int iSequence) = 0;
+	//virtual void				SetSequenceActivity(int iSequence, int iActivity) = 0;
+	virtual int					GetActivityListVersion(void) = 0;
+	virtual void				SetActivityListVersion(int version) = 0;
+	virtual int					GetEventListVersion(void) = 0;
+	virtual void				SetEventListVersion(int version) = 0;
+
+	virtual int					GetNumAttachments(void) const = 0;
+	virtual const mstudioattachment_t& pAttachment(int i) = 0;
+	virtual int					GetAttachmentBone(int i) = 0;
+	// used on my tools in hlmv, not persistant
+	virtual void				SetAttachmentBone(int iAttachment, int iBone) = 0;
+
+	virtual int					EntryNode(int iSequence) = 0;
+	virtual int					ExitNode(int iSequence) = 0;
+	virtual char*				pszNodeName(int iNode) = 0;
+	// FIXME: where should this one be?
+	virtual int					GetTransition(int iFrom, int iTo) const = 0;
+
+	virtual int					GetNumPoseParameters(void) const = 0;
+	virtual const mstudioposeparamdesc_t& pPoseParameter(int i) = 0;
+	virtual int					GetSharedPoseParameter(int iSequence, int iLocalPose) const = 0;
+
+	virtual int					GetNumIKAutoplayLocks(void) const = 0;
+	virtual const mstudioiklock_t& pIKAutoplayLock(int i) = 0;
+
+	virtual int			CountAutoplaySequences() const = 0;
+	virtual int			CopyAutoplaySequences(unsigned short* pOut, int outCount) const = 0;
+	virtual int			GetAutoplayList(unsigned short** pOut) const = 0;
+
+	virtual int			GetNumBoneControllers(void) const = 0;
+	virtual mstudiobonecontroller_t* pBonecontroller(int i) const = 0;
+
+	virtual int			numikchains() const = 0;
+	virtual int			GetNumIKChains(void) const = 0;
+	virtual mstudioikchain_t* pIKChain(int i) const = 0;
+
+	virtual int			numflexrules() const = 0;
+	virtual mstudioflexrule_t* pFlexRule(int i) const = 0;
+
+	virtual int			numflexdesc() const = 0;
+	virtual mstudioflexdesc_t* pFlexdesc(int i) const = 0;
+
+	virtual LocalFlexController_t			numflexcontrollers() const = 0;
+	virtual mstudioflexcontroller_t* pFlexcontroller(LocalFlexController_t i) const = 0;
+
+	virtual int			numflexcontrollerui() const = 0;
+	virtual mstudioflexcontrollerui_t* pFlexcontrollerUI(int i) const = 0;
+
+	//inline const char	*name() const { return m_pStudioHdr->name; }; // deprecated -- remove after full xbox merge
+	virtual const char* pszName() const = 0;
+
+	virtual int			numbonecontrollers() const = 0;
+
+	virtual int			numhitboxsets() const = 0;
+	virtual mstudiohitboxset_t* pHitboxSet(int i) const = 0;
+
+	virtual mstudiobbox_t* pHitbox(int i, int set) const = 0;
+	virtual int			iHitboxCount(int set) const = 0;
+
+	virtual int			numbodyparts() const = 0;
+	virtual mstudiobodyparts_t* pBodypart(int i) const = 0;
+
+	virtual int			numskinfamilies() const = 0;
+
+	virtual Vector		eyeposition() const = 0;
+
+	virtual int			flags() const = 0;
+
+	virtual char* const pszSurfaceProp(void) const = 0;
+
+	virtual float		mass() const = 0;
+	virtual int			contents() const = 0;
+
+	virtual const byte* GetBoneTableSortedByName() const = 0;
+
+	virtual Vector		illumposition() const = 0;
+
+	virtual Vector		hull_min() const = 0;		// ideal movement hull size
+	virtual Vector		hull_max() const = 0;
+
+	virtual Vector		view_bbmin() const = 0;		// clipping bounding box
+	virtual Vector		view_bbmax() const = 0;
+
+	virtual int			numtextures() const = 0;
+
+	virtual int			IllumPositionAttachmentIndex() const = 0;
+
+	virtual float		MaxEyeDeflection() const = 0;
+
+	virtual mstudiolinearbone_t* pLinearBones() const = 0;
+
+	virtual int			BoneFlexDriverCount() const = 0;
+	virtual const mstudioboneflexdriver_t* BoneFlexDriver(int i) const = 0;
+
+	virtual float		VertAnimFixedPointScale() const = 0;
+
+public:
+	//virtual int IsSequenceLooping(int iSequence) = 0;
+	//virtual float GetSequenceCycleRate(int iSequence) = 0;
+
+	virtual void				RunFlexRules(const float* src, float* dest) = 0;
+
+
+public:
+	virtual int boneFlags(int iBone) const = 0;
+	virtual int boneParent(int iBone) const = 0;
+
+	virtual void IncPerfAnimationLayers(void) const = 0;
+	virtual void IncPerfAnimatedBones(void) const = 0;
+	virtual void IncPerfUsedBones(void) const = 0;
+	virtual void ClearPerfCounters(void) = 0;
+
+	virtual bool HaveSequenceForActivity(int activity) = 0;
+	virtual int SelectWeightedSequence(int activity, int curSequence) = 0;
+
+};
+
+class CStudioHdr : public IStudioHdr
 {
 public:
 	CStudioHdr( void );
@@ -2486,8 +2630,8 @@ public:
 	int					iRelativeAnim( int baseseq, int relanim ) const;	// maps seq local anim reference to global anim index
 	int					iRelativeSeq( int baseseq, int relseq ) const;		// maps seq local seq reference to global seq index
 
-	int					GetSequenceActivity( int iSequence );
-	void				SetSequenceActivity( int iSequence, int iActivity );
+	//int					GetSequenceActivity( int iSequence );
+	//void				SetSequenceActivity( int iSequence, int iActivity );
 	int					GetActivityListVersion( void );
 	void				SetActivityListVersion( int version );
 	int					GetEventListVersion( void );
@@ -2584,8 +2728,8 @@ public:
 	inline float		VertAnimFixedPointScale() const { return m_pStudioHdr->VertAnimFixedPointScale(); }
 
 public:
-	int IsSequenceLooping( int iSequence );
-	float GetSequenceCycleRate( int iSequence );
+	//int IsSequenceLooping( int iSequence );
+	//float GetSequenceCycleRate( int iSequence );
 
 	void				RunFlexRules( const float *src, float *dest );
 
@@ -2726,7 +2870,7 @@ public:
 		int SelectWeightedSequence( CStudioHdr *pstudiohdr, int activity, int curSequence );
 
 		// selects the sequence with the most matching modifiers
-		int SelectWeightedSequenceFromModifiers( CStudioHdr *pstudiohdr, int activity, CUtlSymbol *pActivityModifiers, int iModifierCount );
+		//int SelectWeightedSequenceFromModifiers( CStudioHdr *pstudiohdr, int activity, CUtlSymbol *pActivityModifiers, int iModifierCount );
 
 		// Actually a big array, into which the hash values index.
 		SequenceTuple *m_pSequenceTuples;
@@ -2772,18 +2916,18 @@ public:
 		return m_ActivityToSequence.SelectWeightedSequence( this, activity, curSequence );
 	}
 
-	inline int SelectWeightedSequenceFromModifiers( int activity, CUtlSymbol *pActivityModifiers, int iModifierCount )
-	{
-#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
-		// We lazy-initialize the header on demand here, because CStudioHdr::Init() is
-		// called from the constructor, at which time the this pointer is illegitimate.
-		if ( !m_ActivityToSequence.IsInitialized() )
-		{
-			m_ActivityToSequence.Initialize( this );
-		}
-#endif
-		return m_ActivityToSequence.SelectWeightedSequenceFromModifiers( this, activity, pActivityModifiers, iModifierCount );
-	}
+//	inline int SelectWeightedSequenceFromModifiers( int activity, CUtlSymbol *pActivityModifiers, int iModifierCount )
+//	{
+//#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
+//		// We lazy-initialize the header on demand here, because CStudioHdr::Init() is
+//		// called from the constructor, at which time the this pointer is illegitimate.
+//		if ( !m_ActivityToSequence.IsInitialized() )
+//		{
+//			m_ActivityToSequence.Initialize( this );
+//		}
+//#endif
+//		return m_ActivityToSequence.SelectWeightedSequenceFromModifiers( this, activity, pActivityModifiers, iModifierCount );
+//	}
 
 	/// True iff there is at least one sequence for the given activity.
 	inline bool HaveSequenceForActivity( int activity )	
@@ -2805,6 +2949,15 @@ public:
 
 #ifdef STUDIO_ENABLE_PERF_COUNTERS
 public:
+	void IncPerfAnimationLayers(void) const{
+		m_nPerfAnimationLayers++;
+	}
+	void IncPerfAnimatedBones(void) const {
+		m_nPerfAnimatedBones++;
+	}
+	void IncPerfUsedBones(void) const {
+		m_nPerfUsedBones++;
+	}
 	inline void			ClearPerfCounters( void )
 	{
 		m_nPerfAnimatedBones = 0;

@@ -272,7 +272,7 @@ void CWeaponPortalBase::DrawCrosshair()
 	}
 }
 
-void CWeaponPortalBase::DoAnimationEvents( CStudioHdr *pStudioHdr )
+void CWeaponPortalBase::DoAnimationEvents( IStudioHdr *pStudioHdr )
 {
 	// HACK: Because this model renders view and world models in the same frame 
 	// it's using the wrong studio model when checking the sequences.
@@ -300,7 +300,7 @@ void CWeaponPortalBase::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 	}
 	else if ( GetModel() )
 	{
-		CStudioHdr *pStudioHdr = NULL;
+		IStudioHdr *pStudioHdr = NULL;
 
 		// HACK: Because this model renders view and world models in the same frame 
 		// it's using the wrong studio model when checking the sequences.

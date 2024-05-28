@@ -105,7 +105,7 @@ public:
 		virtual void	OnDataChanged( DataUpdateType_t type );
 		virtual void	DrawCrosshair();
 
-		virtual void	DoAnimationEvents( CStudioHdr *pStudio );
+		virtual void	DoAnimationEvents( IStudioHdr *pStudio );
 		virtual void	GetRenderBounds( Vector& theMins, Vector& theMaxs );
 
 		virtual bool	OnFireEvent( C_BaseViewModel *pViewModel, const Vector& origin, const QAngle& angles, int event, const char *options );

@@ -196,7 +196,7 @@ public:
 	// Set to true if external code has set a specific camera position that shouldn't be clobbered by layout
 	void SetForcedCameraPosition( bool bForcedCameraPosition ) { m_bForcedCameraPosition = bForcedCameraPosition; }
 
-	int FindSequenceFromActivity( CStudioHdr *pStudioHdr, const char *pszActivity );
+	int FindSequenceFromActivity( IStudioHdr *pStudioHdr, const char *pszActivity );
 
 protected:
 
@@ -235,7 +235,7 @@ protected:
 	{
 		~particle_data_t();
 
-		void UpdateControlPoints( CStudioHdr *pStudioHdr, matrix3x4_t *pWorldMatrix, const CUtlVector< int >& vecAttachments, int iDefaultBone = 0, const Vector& vecParticleOffset = vec3_origin );
+		void UpdateControlPoints( IStudioHdr *pStudioHdr, matrix3x4_t *pWorldMatrix, const CUtlVector< int >& vecAttachments, int iDefaultBone = 0, const Vector& vecParticleOffset = vec3_origin );
 
 		bool				m_bIsUpdateToDate;
 		CParticleCollection	*m_pParticleSystem;

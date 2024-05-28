@@ -465,7 +465,7 @@ void CCSBot::ComputePartPositions( CCSPlayer *player )
 
 	// get bone positions for interesting points on the player
 	MDLCACHE_CRITICAL_SECTION();
-	CStudioHdr *studioHdr = player->GetModelPtr();
+	IStudioHdr *studioHdr = player->GetModelPtr();
 	if (studioHdr)
 	{
 		mstudiohitboxset_t *set = studioHdr->pHitboxSet( player->GetHitboxSet() );

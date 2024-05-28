@@ -105,7 +105,7 @@ unsigned int C_DynamicProp::ComputeClientSideAnimationFlags()
 {
 	if ( GetSequence() != -1 )
 	{
-		CStudioHdr *pStudioHdr = GetModelPtr();
+		IStudioHdr *pStudioHdr = GetModelPtr();
 		if ( GetSequenceCycleRate(pStudioHdr, GetSequence()) != 0.0f )
 		{
 			return BaseClass::ComputeClientSideAnimationFlags();
@@ -167,7 +167,7 @@ bool C_BasePropDoor::TestCollision( const Ray_t &ray, unsigned int mask, trace_t
 	if ( !VPhysicsGetObject() )
 		return false;
 
-	CStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetModelPtr( );
 	if (!pStudioHdr)
 		return false;
 

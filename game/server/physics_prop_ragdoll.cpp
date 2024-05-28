@@ -163,7 +163,7 @@ void CRagdollProp::Spawn( void )
 	Precache();
 	SetModel( STRING(GetEngineObject()->GetModelName() ) );
 
-	CStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetModelPtr( );
 	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_NO_FORCED_FADE )
 	{
 		DisableAutoFade();
@@ -835,7 +835,7 @@ void CRagdollProp::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	UpdateModelScale();
 
 	MDLCACHE_CRITICAL_SECTION();
-	CStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetModelPtr( );
 	bool sim[MAXSTUDIOBONES];
 	memset( sim, 0, pStudioHdr->numbones() );
 
@@ -879,7 +879,7 @@ bool CRagdollProp::TestCollision( const Ray_t &ray, unsigned int mask, trace_t& 
 	}
 #endif
 
-	CStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetModelPtr( );
 	if (!pStudioHdr)
 		return false;
 
@@ -1353,7 +1353,7 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 	if( ( vel.Length() == 0 ) && ( dt > 0 ) )
 	{
 		// Compute animation velocity
-		CStudioHdr *pstudiohdr = pAnimating->GetModelPtr();
+		IStudioHdr *pstudiohdr = pAnimating->GetModelPtr();
 		if ( pstudiohdr )
 		{
 			Vector deltaPos;
@@ -1500,7 +1500,7 @@ void CRagdollPropAttached::InitRagdollAttached(
 	int ragdollAttachedIndex = 0;
 	if ( parentBoneAttach > 0 )
 	{
-		CStudioHdr *pStudioHdr = GetModelPtr();
+		IStudioHdr *pStudioHdr = GetModelPtr();
 		mstudiobone_t *pBone = pStudioHdr->pBone( parentBoneAttach );
 		ragdollAttachedIndex = pBone->physicsbone;
 	}

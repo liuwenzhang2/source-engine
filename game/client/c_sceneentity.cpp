@@ -159,7 +159,7 @@ void C_SceneEntity::ResetActorFlexesForScene()
 		if ( !pFlexActor )
 			continue;
 
-		CStudioHdr *pStudioHdr = pFlexActor->GetModelPtr();
+		IStudioHdr *pStudioHdr = pFlexActor->GetModelPtr();
 		if ( !pStudioHdr )
 			continue;
 
@@ -1155,7 +1155,7 @@ void C_SceneEntity::PrefetchAnimBlocks( CChoreoScene *pScene )
 						int iSequence = pFlex->LookupSequence( pEvent->GetParameters() );
 						if ( iSequence >= 0 )
 						{
-							CStudioHdr *pStudioHdr = pFlex->GetModelPtr();
+							IStudioHdr *pStudioHdr = pFlex->GetModelPtr();
 							if ( pStudioHdr )
 							{
 								// Now look up the animblock

@@ -372,6 +372,9 @@ public:
 	virtual int GetRef( MDLHandle_t handle );
 	virtual void MarkAsLoaded(MDLHandle_t handle);
 
+	virtual IStudioHdr* GetIStudioHdr(MDLHandle_t handle);
+	virtual IStudioHdr* GetIStudioHdr(const studiohdr_t* pStudioHdr);
+
 	virtual studiohdr_t *GetStudioHdr( MDLHandle_t handle );
 	virtual studiohwdata_t *GetHardwareData( MDLHandle_t handle );
 	virtual vcollide_t *GetVCollide( MDLHandle_t handle ) { return GetVCollideEx( handle, true); }
@@ -2186,6 +2189,15 @@ void CMDLCache::UnlockStudioHdr( MDLHandle_t handle )
 	// @TODO (toml 9/12/2006) need this?: Release( handle );
 }
 
+IStudioHdr* CMDLCache::GetIStudioHdr(MDLHandle_t handle) 
+{
+	return new CStudioHdr(GetStudioHdr(handle), this);
+}
+
+IStudioHdr* CMDLCache::GetIStudioHdr(const studiohdr_t* pStudioHdr)
+{
+	return new CStudioHdr(pStudioHdr, this);
+}
 //-----------------------------------------------------------------------------
 // Loading the data in
 //-----------------------------------------------------------------------------

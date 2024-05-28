@@ -67,7 +67,7 @@ public:
 	virtual int CalcAimLayerSequence( float *flCyle, float *flAimSequenceWeight, bool bForceIdle ) { return 0; }
 
 	virtual float GetCurrentMaxGroundSpeed();
-	virtual void ComputeSequences( CStudioHdr *pStudioHdr );
+	virtual void ComputeSequences( IStudioHdr *pStudioHdr );
 	virtual void ClearAnimationLayers();
 
 	virtual void RestartMainSequence();
@@ -79,22 +79,22 @@ public:
 protected:
 
 	// Pose paramters.
-	bool				SetupPoseParameters( CStudioHdr *pStudioHdr );
-	virtual void		ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr );
-	virtual void		ComputePoseParam_AimPitch( CStudioHdr *pStudioHdr );
-	virtual void		ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr );
-	void				ComputePoseParam_BodyHeight( CStudioHdr *pStudioHdr );
+	bool				SetupPoseParameters( IStudioHdr *pStudioHdr );
+	virtual void		ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr );
+	virtual void		ComputePoseParam_AimPitch( IStudioHdr *pStudioHdr );
+	virtual void		ComputePoseParam_AimYaw( IStudioHdr *pStudioHdr );
+	void				ComputePoseParam_BodyHeight( IStudioHdr *pStudioHdr );
 	virtual void		EstimateYaw( void );
 	void				ConvergeYawAngles( float flGoalYaw, float flYawRate, float flDeltaTime, float &flCurrentYaw );
 
 	void ComputeFireSequence();
 	void ComputeDeployedSequence();
 
-	void ComputeGestureSequence( CStudioHdr *pStudioHdr );
+	void ComputeGestureSequence( IStudioHdr *pStudioHdr );
 
 	void RestartGesture( int iGestureType, Activity act, bool bAutoKill = true );
 
-	void UpdateLayerSequenceGeneric( CStudioHdr *pStudioHdr, int iLayer, bool &bEnabled, float &flCurCycle, int &iSequence, bool bWaitAtEnd, float flWeight = 1.0 );
+	void UpdateLayerSequenceGeneric( IStudioHdr *pStudioHdr, int iLayer, bool &bEnabled, float &flCurCycle, int &iSequence, bool bWaitAtEnd, float flWeight = 1.0 );
 
 	void				DebugShowAnimStateForPlayer( bool bIsServer );
 	void				DebugShowEyeYaw( void );
@@ -746,7 +746,7 @@ void CDODPlayerAnimState::DebugShowAnimState( int iStartLine )
 	BaseClass::DebugShowAnimState( iStartLine );
 }
 
-void CDODPlayerAnimState::ComputeSequences( CStudioHdr *pStudioHdr )
+void CDODPlayerAnimState::ComputeSequences( IStudioHdr *pStudioHdr )
 {
 	// Reset some things if we're changed weapons
 	// do this before ComputeSequences
@@ -838,12 +838,12 @@ void CDODPlayerAnimState::ComputeFireSequence( void )
 	}
 }
 
-void CDODPlayerAnimState::ComputeGestureSequence( CStudioHdr *pStudioHdr )
+void CDODPlayerAnimState::ComputeGestureSequence( IStudioHdr *pStudioHdr )
 {
 	UpdateLayerSequenceGeneric( pStudioHdr, GESTURE_LAYER, m_bPlayingGesture, m_flGestureCycle, m_iGestureSequence, !m_bAutokillGesture );
 }
 
-void CDODPlayerAnimState::UpdateLayerSequenceGeneric( CStudioHdr *pStudioHdr, int iLayer, bool &bEnabled, float &flCurCycle, int &iSequence, bool bWaitAtEnd, float flWeight /* = 1.0 */ )
+void CDODPlayerAnimState::UpdateLayerSequenceGeneric( IStudioHdr *pStudioHdr, int iLayer, bool &bEnabled, float &flCurCycle, int &iSequence, bool bWaitAtEnd, float flWeight /* = 1.0 */ )
 {
 	if ( !bEnabled )
 		return;
@@ -891,7 +891,7 @@ void CDODPlayerAnimState::Update( float eyeYaw, float eyePitch )
 	VPROF( "CDODPlayerAnimState::Update" );
 
 	// Get the studio header for the player.
-	CStudioHdr *pStudioHdr = GetOuterDOD()->GetModelPtr();
+	IStudioHdr *pStudioHdr = GetOuterDOD()->GetModelPtr();
 	if ( !pStudioHdr )
 		return;
 
@@ -931,7 +931,7 @@ void CDODPlayerAnimState::Update( float eyeYaw, float eyePitch )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CDODPlayerAnimState::SetupPoseParameters( CStudioHdr *pStudioHdr )
+bool CDODPlayerAnimState::SetupPoseParameters( IStudioHdr *pStudioHdr )
 {
 	// Check to see if this has already been done.
 	if ( m_bPoseParameterInit )
@@ -972,7 +972,7 @@ bool CDODPlayerAnimState::SetupPoseParameters( CStudioHdr *pStudioHdr )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CDODPlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
+void CDODPlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 {
 	// Check to see if we are deployed or prone.
 	if( GetOuterDOD()->m_Shared.IsInMGDeploy() || GetOuterDOD()->m_Shared.IsProne() )
@@ -1151,7 +1151,7 @@ void CDODPlayerAnimState::EstimateYaw( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CDODPlayerAnimState::ComputePoseParam_AimPitch( CStudioHdr *pStudioHdr )
+void CDODPlayerAnimState::ComputePoseParam_AimPitch( IStudioHdr *pStudioHdr )
 {
 	// Get the view pitch.
 	float flAimPitch = m_flEyePitch;
@@ -1175,7 +1175,7 @@ void CDODPlayerAnimState::ComputePoseParam_AimPitch( CStudioHdr *pStudioHdr )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CDODPlayerAnimState::ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr )
+void CDODPlayerAnimState::ComputePoseParam_AimYaw( IStudioHdr *pStudioHdr )
 {
 	// Get the movement velocity.
 	Vector vecVelocity;
@@ -1285,7 +1285,7 @@ void CDODPlayerAnimState::ConvergeYawAngles( float flGoalYaw, float flYawRate, f
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CDODPlayerAnimState::ComputePoseParam_BodyHeight( CStudioHdr *pStudioHdr )
+void CDODPlayerAnimState::ComputePoseParam_BodyHeight( IStudioHdr *pStudioHdr )
 {
 	if( m_pOuterDOD->m_Shared.IsSandbagDeployed() )
 	{

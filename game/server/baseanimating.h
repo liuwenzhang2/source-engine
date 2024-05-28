@@ -55,10 +55,10 @@ public:
 	virtual int	 Restore( IRestore &restore );
 	virtual void OnRestore();
 
-	CStudioHdr *GetModelPtr( void );
+	IStudioHdr *GetModelPtr( void );
 	void InvalidateMdlCache();
 
-	virtual CStudioHdr *OnNewModel();
+	virtual IStudioHdr *OnNewModel();
 
 	virtual CBaseAnimating*	GetBaseAnimating() { return this; }
 
@@ -95,15 +95,15 @@ public:
 	virtual bool IsActivityFinished( void ) { return m_bSequenceFinished; }
 	inline bool IsSequenceFinished( void ) { return m_bSequenceFinished; }
 	inline bool SequenceLoops( void ) { return m_bSequenceLoops; }
-	bool		 IsSequenceLooping( CStudioHdr *pStudioHdr, int iSequence );
+	bool		 IsSequenceLooping( IStudioHdr *pStudioHdr, int iSequence );
 	inline bool	 IsSequenceLooping( int iSequence ) { return IsSequenceLooping(GetModelPtr(),iSequence); }
 	inline float SequenceDuration( void ) { return SequenceDuration( m_nSequence ); }
-	float	SequenceDuration( CStudioHdr *pStudioHdr, int iSequence );
+	float	SequenceDuration( IStudioHdr *pStudioHdr, int iSequence );
 	inline float SequenceDuration( int iSequence ) { return SequenceDuration(GetModelPtr(), iSequence); }
-	float	GetSequenceCycleRate( CStudioHdr *pStudioHdr, int iSequence );
+	float	GetSequenceCycleRate( IStudioHdr *pStudioHdr, int iSequence );
 	inline float	GetSequenceCycleRate( int iSequence ) { return GetSequenceCycleRate(GetModelPtr(),iSequence); }
-	float	GetLastVisibleCycle( CStudioHdr *pStudioHdr, int iSequence );
-	virtual float	GetSequenceGroundSpeed( CStudioHdr *pStudioHdr, int iSequence );
+	float	GetLastVisibleCycle( IStudioHdr *pStudioHdr, int iSequence );
+	virtual float	GetSequenceGroundSpeed( IStudioHdr *pStudioHdr, int iSequence );
 	inline float GetSequenceGroundSpeed( int iSequence ) { return GetSequenceGroundSpeed(GetModelPtr(), iSequence); }
 	void	ResetActivityIndexes ( void );
 	void    ResetEventIndexes ( void );
@@ -115,7 +115,7 @@ public:
 	KeyValues *GetSequenceKeyValues( int iSequence );
 
 	float GetSequenceMoveYaw( int iSequence );
-	float GetSequenceMoveDist( CStudioHdr *pStudioHdr, int iSequence );
+	float GetSequenceMoveDist( IStudioHdr *pStudioHdr, int iSequence );
 	inline float GetSequenceMoveDist( int iSequence ) { return GetSequenceMoveDist(GetModelPtr(),iSequence);}
 	void  GetSequenceLinearMotion( int iSequence, Vector *pVec );
 	const char *GetSequenceName( int iSequence );
@@ -131,7 +131,7 @@ public:
 	virtual bool IsRagdoll();
 	virtual bool CanBecomeRagdoll( void ); //Check if this entity will ragdoll when dead.
 
-	virtual	void GetSkeleton( CStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], int boneMask );
+	virtual	void GetSkeleton( IStudioHdr *pStudioHdr, Vector pos[], Quaternion q[], int boneMask );
 
 	virtual void GetBoneTransform( int iBone, matrix3x4_t &pBoneToWorld );
 	virtual void SetupBones( matrix3x4_t *pBoneToWorld, int boneMask );
@@ -142,12 +142,12 @@ public:
 	virtual	void DispatchAnimEvents ( CBaseAnimating *eventHandler ); // Handle events that have happend since last time called up until X seconds into the future
 	virtual void HandleAnimEvent( animevent_t *pEvent );
 
-	int		LookupPoseParameter( CStudioHdr *pStudioHdr, const char *szName );
+	int		LookupPoseParameter( IStudioHdr *pStudioHdr, const char *szName );
 	inline int	LookupPoseParameter( const char *szName ) { return LookupPoseParameter(GetModelPtr(), szName); }
 
-	float	SetPoseParameter( CStudioHdr *pStudioHdr, const char *szName, float flValue );
+	float	SetPoseParameter( IStudioHdr *pStudioHdr, const char *szName, float flValue );
 	inline float SetPoseParameter( const char *szName, float flValue ) { return SetPoseParameter( GetModelPtr(), szName, flValue ); }
-	float	SetPoseParameter( CStudioHdr *pStudioHdr, int iParameter, float flValue );
+	float	SetPoseParameter( IStudioHdr *pStudioHdr, int iParameter, float flValue );
 	inline float SetPoseParameter( int iParameter, float flValue ) { return SetPoseParameter( GetModelPtr(), iParameter, flValue ); }
 
 	float	GetPoseParameter( const char *szName );
@@ -319,7 +319,7 @@ public:
 	const float* GetPoseParameterArray() { return m_flPoseParameter.Base(); }
 	const float* GetEncodedControllerArray() { return m_flEncodedController.Base(); }
 
-	void BuildMatricesWithBoneMerge( const CStudioHdr *pStudioHdr, const QAngle& angles, 
+	void BuildMatricesWithBoneMerge( const IStudioHdr *pStudioHdr, const QAngle& angles, 
 		const Vector& origin, const Vector pos[MAXSTUDIOBONES],
 		const Quaternion q[MAXSTUDIOBONES], matrix3x4_t bonetoworld[MAXSTUDIOBONES],
 		CBaseAnimating *pParent, CBoneCache *pParentCache );
@@ -336,7 +336,7 @@ private:
 	void LockStudioHdr();
 	void UnlockStudioHdr();
 
-	void StudioFrameAdvanceInternal( CStudioHdr *pStudioHdr, float flInterval );
+	void StudioFrameAdvanceInternal( IStudioHdr *pStudioHdr, float flInterval );
 	void InputSetLightingOriginRelative( inputdata_t &inputdata );
 	void InputSetLightingOrigin( inputdata_t &inputdata );
 	void InputSetModelScale( inputdata_t &inputdata );
@@ -418,7 +418,7 @@ public:
 	COutputEvent m_OnIgnite;
 
 private:
-	CStudioHdr			*m_pStudioHdr;
+	IStudioHdr			*m_pStudioHdr;
 	CThreadFastMutex	m_StudioHdrInitLock;
 	CThreadFastMutex	m_BoneSetupMutex;
 
@@ -431,7 +431,7 @@ friend class CBlendingCycler;
 //-----------------------------------------------------------------------------
 // Purpose: return a pointer to an updated studiomdl cache cache
 //-----------------------------------------------------------------------------
-inline CStudioHdr *CBaseAnimating::GetModelPtr( void ) 
+inline IStudioHdr *CBaseAnimating::GetModelPtr( void ) 
 { 
 	//if ( IsDynamicModelLoading() )
 	//	return NULL;

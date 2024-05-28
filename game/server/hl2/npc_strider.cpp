@@ -3822,7 +3822,7 @@ void CNPC_Strider::OnMovementComplete()
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-float CNPC_Strider::GetSequenceGroundSpeed( CStudioHdr *pStudioHdr, int iSequence )
+float CNPC_Strider::GetSequenceGroundSpeed( IStudioHdr *pStudioHdr, int iSequence )
 {
 	return ( BaseClass::GetSequenceGroundSpeed( pStudioHdr, iSequence ) * m_flSpeedScale );
 }
@@ -4363,7 +4363,7 @@ Vector CNPC_Strider::BackFootHit( float eventtime )
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-static Vector GetAttachmentPositionInSpaceOfBone( CStudioHdr *pStudioHdr, const char *pAttachmentName, int outputBoneIndex )
+static Vector GetAttachmentPositionInSpaceOfBone( IStudioHdr *pStudioHdr, const char *pAttachmentName, int outputBoneIndex )
 {
 	int attachment = Studio_FindAttachment( pStudioHdr, pAttachmentName );
 
@@ -4385,7 +4385,7 @@ static Vector GetAttachmentPositionInSpaceOfBone( CStudioHdr *pStudioHdr, const 
 
 void CNPC_Strider::StompHit( int followerBoneIndex )
 {
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	physfollower_t *bone = m_BoneFollowerManager.GetBoneFollower( followerBoneIndex );
 	if ( !bone )
 		return;

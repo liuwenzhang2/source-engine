@@ -104,7 +104,7 @@ public:
 	// This is called near the start of each frame.
 	// The base class figures out the main sequence and the aim sequence, and derived
 	// classes can overlay whatever other animations they want.
-	virtual void ComputeSequences( CStudioHdr *pStudioHdr );
+	virtual void ComputeSequences( IStudioHdr *pStudioHdr );
 
 	// This is called to figure out what the main activity is. The mod-specific class 
 	// overrides this to handle events like jumping, firing, etc.
@@ -156,7 +156,7 @@ public:
 
 public:
 	
-	void				GetPoseParameters( CStudioHdr *pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM] );
+	void				GetPoseParameters( IStudioHdr *pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM] );
 
 	CBaseAnimatingOverlay	*GetOuter() const;
 
@@ -187,8 +187,8 @@ protected:
 
 protected:
 	int					ConvergeAngles( float goal,float maxrate, float maxgap, float dt, float& current );
-	virtual void		ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr );
-	virtual void		ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr );
+	virtual void		ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr );
+	virtual void		ComputePoseParam_BodyPitch( IStudioHdr *pStudioHdr );
 	virtual void		ComputePoseParam_BodyYaw();
 
 	virtual void		ResetGroundSpeed( void );

@@ -531,7 +531,7 @@ void RagdollDestroy( ragdoll_t &ragdoll )
 
 // Parse the ragdoll and obtain the mapping from each physics element index to a bone index
 // returns num phys elements
-int RagdollExtractBoneIndices( int *boneIndexOut, CStudioHdr *pStudioHdr, vcollide_t *pCollide )
+int RagdollExtractBoneIndices( int *boneIndexOut, IStudioHdr *pStudioHdr, vcollide_t *pCollide )
 {
 	int elementCount = 0;
 

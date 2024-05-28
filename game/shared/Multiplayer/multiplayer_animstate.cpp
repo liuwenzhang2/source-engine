@@ -453,7 +453,7 @@ void CMultiPlayerAnimState::RunGestureSlotAnimEventsToCompletion( GestureSlot_t 
 		return;
 
 	// Get the studio header for the player.
-	CStudioHdr *pStudioHdr = pPlayer->GetModelPtr();
+	IStudioHdr *pStudioHdr = pPlayer->GetModelPtr();
 	if ( !pStudioHdr )
 		return;
 
@@ -972,7 +972,7 @@ Activity CMultiPlayerAnimState::TranslateActivity( Activity actDesired )
 //-----------------------------------------------------------------------------
 float CMultiPlayerAnimState::GetCurrentMaxGroundSpeed()
 {
-	CStudioHdr *pStudioHdr = GetBasePlayer()->GetModelPtr();
+	IStudioHdr *pStudioHdr = GetBasePlayer()->GetModelPtr();
 
 	if ( pStudioHdr == NULL )
 		return 1.0f;
@@ -1068,7 +1068,7 @@ float CMultiPlayerAnimState::GetInterpolatedGroundSpeed( void )
 // Purpose: 
 // Input  : *pStudioHdr - 
 //-----------------------------------------------------------------------------
-void CMultiPlayerAnimState::ComputeSequences( CStudioHdr *pStudioHdr )
+void CMultiPlayerAnimState::ComputeSequences( IStudioHdr *pStudioHdr )
 {
 	VPROF( "CBasePlayerAnimState::ComputeSequences" );
 
@@ -1193,7 +1193,7 @@ void CMultiPlayerAnimState::ComputeFireSequence( void )
 // Purpose: 
 // Input  : *pStudioHdr - 
 //-----------------------------------------------------------------------------
-void CMultiPlayerAnimState::ComputeGestureSequence( CStudioHdr *pStudioHdr )
+void CMultiPlayerAnimState::ComputeGestureSequence( IStudioHdr *pStudioHdr )
 {
 	// Update all active gesture layers.
 	for ( int iGesture = 0; iGesture < GESTURE_SLOT_COUNT; ++iGesture )
@@ -1211,7 +1211,7 @@ void CMultiPlayerAnimState::ComputeGestureSequence( CStudioHdr *pStudioHdr )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CMultiPlayerAnimState::UpdateGestureLayer( CStudioHdr *pStudioHdr, GestureSlot_t *pGesture )
+void CMultiPlayerAnimState::UpdateGestureLayer( IStudioHdr *pStudioHdr, GestureSlot_t *pGesture )
 {
 	// Sanity check.
 	if ( !pStudioHdr || !pGesture )
@@ -1269,7 +1269,7 @@ void CMultiPlayerAnimState::Update( float eyeYaw, float eyePitch )
 	VPROF( "CMultiPlayerAnimState::Update" );
 
 	// Get the studio header for the player.
-	CStudioHdr *pStudioHdr = GetBasePlayer()->GetModelPtr();
+	IStudioHdr *pStudioHdr = GetBasePlayer()->GetModelPtr();
 	if ( !pStudioHdr )
 		return;
 
@@ -1336,7 +1336,7 @@ bool CMultiPlayerAnimState::ShouldUpdateAnimState()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CMultiPlayerAnimState::SetupPoseParameters( CStudioHdr *pStudioHdr )
+bool CMultiPlayerAnimState::SetupPoseParameters( IStudioHdr *pStudioHdr )
 {
 	// Check to see if this has already been done.
 	if ( m_bPoseParameterInit )
@@ -1416,7 +1416,7 @@ float SnapYawTo( float flValue )
 //-----------------------------------------------------------------------------
 // Purpose: double check that the movement animations actually have movement
 //-----------------------------------------------------------------------------
-void CMultiPlayerAnimState::DoMovementTest( CStudioHdr *pStudioHdr, float flX, float flY )
+void CMultiPlayerAnimState::DoMovementTest( IStudioHdr *pStudioHdr, float flX, float flY )
 {
 	GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveX, flX );
 	GetBasePlayer()->SetPoseParameter( pStudioHdr, m_PoseParameterData.m_iMoveY, flY );
@@ -1455,7 +1455,7 @@ void CMultiPlayerAnimState::DoMovementTest( CStudioHdr *pStudioHdr, float flX, f
 }
 
 
-void CMultiPlayerAnimState::DoMovementTest( CStudioHdr *pStudioHdr )
+void CMultiPlayerAnimState::DoMovementTest( IStudioHdr *pStudioHdr )
 {
 	if ( m_LegAnimType == LEGANIM_9WAY )
 	{
@@ -1470,7 +1470,7 @@ void CMultiPlayerAnimState::DoMovementTest( CStudioHdr *pStudioHdr )
 	}
 }
 
-void CMultiPlayerAnimState::GetMovementFlags( CStudioHdr *pStudioHdr )
+void CMultiPlayerAnimState::GetMovementFlags( IStudioHdr *pStudioHdr )
 {
 	if ( m_nMovementSequence == GetBasePlayer()->GetSequence() )
 	{
@@ -1509,7 +1509,7 @@ void CMultiPlayerAnimState::GetMovementFlags( CStudioHdr *pStudioHdr )
 // Purpose: 
 // Input  : *pStudioHdr - 
 //-----------------------------------------------------------------------------
-void CMultiPlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
+void CMultiPlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 {
 	// Get the estimated movement yaw.
 	EstimateYaw();
@@ -1632,7 +1632,7 @@ void CMultiPlayerAnimState::EstimateYaw( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CMultiPlayerAnimState::ComputePoseParam_AimPitch( CStudioHdr *pStudioHdr )
+void CMultiPlayerAnimState::ComputePoseParam_AimPitch( IStudioHdr *pStudioHdr )
 {
 	// Get the view pitch.
 	float flAimPitch = m_flEyePitch;
@@ -1645,7 +1645,7 @@ void CMultiPlayerAnimState::ComputePoseParam_AimPitch( CStudioHdr *pStudioHdr )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CMultiPlayerAnimState::ComputePoseParam_AimYaw( CStudioHdr *pStudioHdr )
+void CMultiPlayerAnimState::ComputePoseParam_AimYaw( IStudioHdr *pStudioHdr )
 {
 	// Get the movement velocity.
 	Vector vecVelocity;

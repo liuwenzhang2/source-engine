@@ -72,7 +72,7 @@ public:
 	virtual void			OnDataChanged( DataUpdateType_t type );
 	bool					DetectAndHandlePortalTeleportation( void ); //detects if the player has portalled and fixes views
 	virtual float			GetFOV( void );
-	virtual CStudioHdr*		OnNewModel( void );
+	virtual IStudioHdr*		OnNewModel( void );
 	virtual void			TraceAttack( const CTakeDamageInfo &info, const Vector &vecDir, trace_t *ptr );
 	virtual void			ItemPreFrame( void );
 	virtual void			ItemPostFrame( void );

@@ -415,16 +415,16 @@ void C_Portal_Player::Initialize( void )
 	m_headPitchPoseParam = LookupPoseParameter( "head_pitch" );
 	GetPoseParameterRange( m_headPitchPoseParam, m_headPitchMin, m_headPitchMax );
 
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	for ( int i = 0; i < hdr->GetNumPoseParameters() ; i++ )
 	{
 		SetPoseParameter( hdr, i, 0.0 );
 	}
 }
 
-CStudioHdr *C_Portal_Player::OnNewModel( void )
+IStudioHdr *C_Portal_Player::OnNewModel( void )
 {
-	CStudioHdr *hdr = BaseClass::OnNewModel();
+	IStudioHdr *hdr = BaseClass::OnNewModel();
 
 	Initialize( );
 

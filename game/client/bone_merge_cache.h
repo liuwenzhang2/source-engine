@@ -12,7 +12,7 @@
 
 
 class C_BaseAnimating;
-class CStudioHdr;
+class IStudioHdr;
 
 
 #include "mathlib/vector.h"
@@ -53,9 +53,9 @@ private:
 	// All the cache data is based off these. When they change, the cache data is regenerated.
 	// These are either all valid pointers or all NULL.
 	C_BaseAnimating *m_pFollow;
-	CStudioHdr		*m_pFollowHdr;
+	IStudioHdr		*m_pFollowHdr;
 	const studiohdr_t	*m_pFollowRenderHdr;
-	CStudioHdr		*m_pOwnerHdr;
+	IStudioHdr		*m_pOwnerHdr;
 
 	// This is the mask we need to use to set up bones on the followed entity to do the bone merge
 	int				m_nFollowBoneSetupMask;

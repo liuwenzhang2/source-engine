@@ -1900,7 +1900,7 @@ int C_EngineObjectInternal::SaveData(const char* context, int slot, int type)
 //-----------------------------------------------------------------------------
 int C_EngineObjectInternal::RestoreData(const char* context, int slot, int type)
 {
-	CStudioHdr* pHdr = ((C_BaseAnimating*)m_pOuter)->GetModelPtr();
+	IStudioHdr* pHdr = ((C_BaseAnimating*)m_pOuter)->GetModelPtr();
 #if !defined( NO_ENTITY_PREDICTION )
 	VPROF("C_BaseEntity::RestoreData");
 

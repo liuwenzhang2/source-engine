@@ -940,7 +940,7 @@ void CPortal_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 
 	// Get the studio header.
 	Assert( GetModelPtr() );
-	CStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetModelPtr( );
 
 	Vector pos[MAXSTUDIOBONES];
 	Quaternion q[MAXSTUDIOBONES];

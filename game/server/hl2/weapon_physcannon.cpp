@@ -111,7 +111,7 @@ public:
 			CBaseAnimating *pAnim = dynamic_cast<CBaseAnimating *>(pEntity);
 			if ( pAnim != NULL )
 			{
-				CStudioHdr *pStudioHdr = pAnim->GetModelPtr();
+				IStudioHdr *pStudioHdr = pAnim->GetModelPtr();
 				if ( pStudioHdr != NULL && (pStudioHdr->contents() & CONTENTS_GRATE) )
 					return true;
 			}

@@ -650,7 +650,7 @@ void CPlayerAnimState::ComputePoseParam_BodyYaw( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPlayerAnimState::ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr )
+void CPlayerAnimState::ComputePoseParam_BodyPitch( IStudioHdr *pStudioHdr )
 {
 	// Get pitch from v_angle
 	float flPitch = GetOuter()->GetLocalAngles()[ PITCH ];

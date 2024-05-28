@@ -19,7 +19,7 @@ class CSequenceTransitioner
 public:
 	void CheckForSequenceChange( 
 		// Describe the current animation state with these parameters.
-		CStudioHdr *hdr,
+		IStudioHdr *hdr,
 		int nCurSequence, 
 
 		// Even if the sequence hasn't changed, you can force it to interpolate from the previous
@@ -32,7 +32,7 @@ public:
 
 	void UpdateCurrent( 
 		// Describe the current animation state with these parameters.
-		CStudioHdr *hdr,
+		IStudioHdr *hdr,
 		int nCurSequence, 
 		float flCurCycle,
 		float flCurPlaybackRate,

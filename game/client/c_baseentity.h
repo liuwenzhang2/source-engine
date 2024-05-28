@@ -43,7 +43,7 @@ class IClientVehicle;
 class CPredictionCopy;
 class C_BasePlayer;
 struct studiohdr_t;
-class CStudioHdr;
+class IStudioHdr;
 class CDamageModifier;
 class IRecipientFilter;
 class CUserCmd;
@@ -183,9 +183,7 @@ public:
 									C_BaseEntity();
 	virtual							~C_BaseEntity();
 
-	static int RequiredEdictIndexStatic(void) { return -1; }
-	static bool IsNetworkableStatic(void) { return true; }
-	virtual bool IsNetworkable(void) { return C_BaseEntity::IsNetworkableStatic(); }
+	virtual bool IsNetworkable(void) { return C_BaseEntity::IsServerEntity(); }
 	//static C_BaseEntity				*CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist = false );
 	
 	// FireBullets uses shared code for prediction.
@@ -598,7 +596,7 @@ public:
 
 
 	// Initialize things given a new model.
-	virtual CStudioHdr				*OnNewModel();
+	virtual IStudioHdr				*OnNewModel();
 	virtual void					OnNewParticleEffect( const char *pszParticleName, CNewParticleEffect *pNewParticleEffect );
 
 
@@ -1421,7 +1419,7 @@ inline const CParticleProperty *C_BaseEntity::ParticleProp() const
 //-----------------------------------------------------------------------------
 inline bool C_BaseEntity::IsServerEntity( void )
 {
-	return entindex() < MAX_EDICTS;
+	return entindex() >= 0 && entindex() < MAX_EDICTS;
 }
 
 

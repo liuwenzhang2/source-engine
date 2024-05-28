@@ -1605,7 +1605,7 @@ bool CDODPlayer::DODWeaponDrop( CBaseCombatWeapon *pWeapon, bool bThrowForward )
 		int iBIndex = -1;
 		int iWeaponBoneIndex = -1;
 
-		CStudioHdr *hdr = pWeapon->GetModelPtr();
+		IStudioHdr *hdr = pWeapon->GetModelPtr();
 		// If I have a hand, set the weapon position to my hand bone position.
 		if ( hdr && hdr->numbones() > 0 )
 		{
@@ -3966,7 +3966,7 @@ void CDODPlayer::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 
 	// Get the studio header.
 	Assert( GetModelPtr() );
-	CStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetModelPtr( );
 
 	Vector pos[MAXSTUDIOBONES];
 	Quaternion q[MAXSTUDIOBONES];

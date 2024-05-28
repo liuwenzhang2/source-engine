@@ -1970,7 +1970,7 @@ void CBaseCombatCharacter::Weapon_Drop( CBaseCombatWeapon *pWeapon, const Vector
 		int iBIndex = -1;
 		int iWeaponBoneIndex = -1;
 
-		CStudioHdr *hdr = pWeapon->GetModelPtr();
+		IStudioHdr *hdr = pWeapon->GetModelPtr();
 		// If I have a hand, set the weapon position to my hand bone position.
 		if ( hdr && hdr->numbones() > 0 )
 		{

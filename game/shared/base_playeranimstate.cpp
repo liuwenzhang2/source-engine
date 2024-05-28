@@ -133,7 +133,7 @@ void CBasePlayerAnimState::Update( float eyeYaw, float eyePitch )
 	}
 	
 	
-	CStudioHdr *pStudioHdr = GetOuter()->GetModelPtr();
+	IStudioHdr *pStudioHdr = GetOuter()->GetModelPtr();
 	// Store these. All the calculations are based on them.
 	m_flEyeYaw = AngleNormalize( eyeYaw );
 	m_flEyePitch = AngleNormalize( eyePitch );
@@ -231,7 +231,7 @@ void CBasePlayerAnimState::RestartMainSequence()
 }
 
 
-void CBasePlayerAnimState::ComputeSequences( CStudioHdr *pStudioHdr )
+void CBasePlayerAnimState::ComputeSequences( IStudioHdr *pStudioHdr )
 {
 	VPROF( "CBasePlayerAnimState::ComputeSequences" );
 
@@ -584,7 +584,7 @@ void CBasePlayerAnimState::EstimateYaw()
 // Purpose: Override for backpeddling
 // Input  : dt - 
 //-----------------------------------------------------------------------------
-void CBasePlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
+void CBasePlayerAnimState::ComputePoseParam_MoveYaw( IStudioHdr *pStudioHdr )
 {
 	VPROF( "CBasePlayerAnimState::ComputePoseParam_MoveYaw" );
 
@@ -711,7 +711,7 @@ void CBasePlayerAnimState::ComputePoseParam_MoveYaw( CStudioHdr *pStudioHdr )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBasePlayerAnimState::ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr )
+void CBasePlayerAnimState::ComputePoseParam_BodyPitch( IStudioHdr *pStudioHdr )
 {
 	VPROF( "CBasePlayerAnimState::ComputePoseParam_BodyPitch" );
 

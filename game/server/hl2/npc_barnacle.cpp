@@ -779,7 +779,7 @@ bool CNPC_Barnacle::WaitForRagdollToSettle( float flBiteZOffset )
 	}
 
 	// Get the velocity of the bone we've grabbed, and only bite when it's not moving much
-	CStudioHdr *pStudioHdr = m_hRagdoll->GetModelPtr();
+	IStudioHdr *pStudioHdr = m_hRagdoll->GetModelPtr();
 	mstudiobone_t *pBone = pStudioHdr->pBone( m_iGrabbedBoneIndex );
 	int iBoneIndex = pBone->physicsbone;
 	ragdoll_t *pRagdoll = m_hRagdoll->GetRagdoll();
@@ -1302,7 +1302,7 @@ CRagdollProp *CNPC_Barnacle::AttachRagdollToTongue( CBaseAnimating *pAnimating )
 		vecNeckOffset = (pAnimating->EyePosition() - m_hTongueTip->GetEngineObject()->GetAbsOrigin());
 	}
 
-	CStudioHdr *pHdr = pAnimating->GetModelPtr();
+	IStudioHdr *pHdr = pAnimating->GetModelPtr();
 	if ( pHdr )
 	{
 		int set = pAnimating->GetHitboxSet();

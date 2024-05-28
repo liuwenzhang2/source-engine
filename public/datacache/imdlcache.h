@@ -29,6 +29,7 @@ struct studiohwdata_t;
 struct vcollide_t;
 struct virtualmodel_t;
 struct vertexFileHeader_t;
+class IStudioHdr;
 
 namespace OptimizedModel
 {
@@ -193,6 +194,9 @@ public:
 	virtual int AddRef( MDLHandle_t handle ) = 0;
 	virtual int Release( MDLHandle_t handle ) = 0;
 	virtual int GetRef( MDLHandle_t handle ) = 0;
+
+	virtual IStudioHdr* GetIStudioHdr(MDLHandle_t handle) = 0;
+	virtual IStudioHdr* GetIStudioHdr(const studiohdr_t* pStudioHdr) = 0;
 
 	// Gets at the various data associated with a MDL
 	virtual studiohdr_t *GetStudioHdr( MDLHandle_t handle ) = 0;

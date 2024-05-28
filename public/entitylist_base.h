@@ -1219,11 +1219,19 @@ public:
 	}
 
 	virtual int RequiredEdictIndex() {
+#ifdef GAME_DLL
 		return T::RequiredEdictIndexStatic();
+#else
+		return -1;
+#endif // GAME_DLL
 	}
 
 	virtual bool IsNetworkable() {
+#ifdef GAME_DLL
 		return T::IsNetworkableStatic();
+#else
+		return true;
+#endif // GAME_DLL
 	}
 
 private:

@@ -138,7 +138,7 @@ void CBaseFlex::SetFlexWeight( LocalFlexController_t index, float value )
 {
 	if (index >= 0 && index < GetNumFlexControllers())
 	{
-		CStudioHdr *pstudiohdr = GetModelPtr( );
+		IStudioHdr *pstudiohdr = GetModelPtr( );
 		if (! pstudiohdr)
 			return;
 
@@ -158,7 +158,7 @@ float CBaseFlex::GetFlexWeight( LocalFlexController_t index )
 {
 	if (index >= 0 && index < GetNumFlexControllers())
 	{
-		CStudioHdr *pstudiohdr = GetModelPtr( );
+		IStudioHdr *pstudiohdr = GetModelPtr( );
 		if (! pstudiohdr)
 			return 0;
 
@@ -601,7 +601,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 
 		if ( pkvAllFaceposer )
 		{
-			CStudioHdr *pstudiohdr = GetModelPtr();
+			IStudioHdr *pstudiohdr = GetModelPtr();
 			
 			mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( info->m_nSequence );
 			mstudioanimdesc_t &animdesc = pstudiohdr->pAnimdesc( pstudiohdr->iRelativeAnim( info->m_nSequence, seqdesc.anim(0,0) ) );

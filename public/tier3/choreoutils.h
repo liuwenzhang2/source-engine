@@ -17,22 +17,22 @@
 //-----------------------------------------------------------------------------
 class CChoreoScene;
 class CChoreoEvent;
-class CStudioHdr;
+class IStudioHdr;
 
 
 //-----------------------------------------------------------------------------
 // Finds sound files associated with events
 //-----------------------------------------------------------------------------
-const char *GetSoundForEvent( CChoreoEvent *pEvent, CStudioHdr *pStudioHdr );
+const char *GetSoundForEvent( CChoreoEvent *pEvent, IStudioHdr *pStudioHdr );
 
 
 //-----------------------------------------------------------------------------
 // Fixes up the duration of a choreo scene based on wav files + animations
 // Returns true if a change needed to be made
 //-----------------------------------------------------------------------------
-bool AutoAddGestureKeys( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPoseParameters, bool bCheckOnly );
-bool UpdateGestureLength( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPoseParameters, bool bCheckOnly );
-bool UpdateSequenceLength( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPoseParameters, bool bCheckOnly, bool bVerbose );
+bool AutoAddGestureKeys( CChoreoEvent *e, IStudioHdr *pStudioHdr, float *pPoseParameters, bool bCheckOnly );
+bool UpdateGestureLength( CChoreoEvent *e, IStudioHdr *pStudioHdr, float *pPoseParameters, bool bCheckOnly );
+bool UpdateSequenceLength( CChoreoEvent *e, IStudioHdr *pStudioHdr, float *pPoseParameters, bool bCheckOnly, bool bVerbose );
 
 
 #endif // CHOREOUTILS_H

@@ -53,8 +53,8 @@ public:
 
 
 	void SetUpBones( const matrix3x4_t& shapeToWorld, int nMaxBoneCount, matrix3x4_t *pOutputMatrices, const float *pPoseParameters = NULL, MDLSquenceLayer_t *pSequenceLayers = NULL, int nNumSequenceLayers = 0 );
-	void SetupBonesWithBoneMerge( const CStudioHdr *pMergeHdr, matrix3x4_t *pMergeBoneToWorld, 
-		const CStudioHdr *pFollow, const matrix3x4_t *pFollowBoneToWorld, const matrix3x4_t &matModelToWorld );
+	void SetupBonesWithBoneMerge( const IStudioHdr *pMergeHdr, matrix3x4_t *pMergeBoneToWorld, 
+		const IStudioHdr *pFollow, const matrix3x4_t *pFollowBoneToWorld, const matrix3x4_t &matModelToWorld );
 	
 	studiohdr_t *GetStudioHdr();
 

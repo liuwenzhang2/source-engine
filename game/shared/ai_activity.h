@@ -11,7 +11,6 @@
 #pragma once
 #endif
 
-#define ACTIVITY_NOT_AVAILABLE		-1
 
 typedef enum
 {

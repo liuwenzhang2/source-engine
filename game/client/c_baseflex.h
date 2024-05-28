@@ -142,24 +142,24 @@ public:
 
 	void		SetupMappings( char const *pchFileRoot );
 
-	virtual CStudioHdr *OnNewModel( void );
+	virtual IStudioHdr *OnNewModel( void );
 
-	virtual void	StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
+	virtual void	StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask );
 
 	virtual void OnThreadedDrawSetup();
 
 	// model specific
-	virtual void BuildTransformations( CStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
-	static void		LinkToGlobalFlexControllers( CStudioHdr *hdr );
+	virtual void BuildTransformations( IStudioHdr *pStudioHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed );
+	static void		LinkToGlobalFlexControllers( IStudioHdr *hdr );
 	virtual	void	SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights );
 	virtual	bool	SetupGlobalWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights );
 	static void		RunFlexDelay( int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights, float &flFlexDelayTime );
 	virtual	void	SetupLocalWeights( const matrix3x4_t *pBoneToWorld, int nFlexWeightCount, float *pFlexWeights, float *pFlexDelayedWeights );
 	virtual bool	UsesFlexDelayedWeights();
 
-	static	void	RunFlexRules( CStudioHdr *pStudioHdr, float *dest );
+	static	void	RunFlexRules( IStudioHdr *pStudioHdr, float *dest );
 
-	virtual Vector	SetViewTarget( CStudioHdr *pStudioHdr );
+	virtual Vector	SetViewTarget( IStudioHdr *pStudioHdr );
 
 	virtual bool	GetSoundSpatialization( SpatializationInfo_t& info );
 

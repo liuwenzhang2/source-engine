@@ -27,7 +27,7 @@ class IClientRenderable;
 class Vector;
 struct studiohdr_t;
 class IMaterial;
-class CStudioHdr;
+class IStudioHdr;
 
 FORWARD_DECLARE_HANDLE( LightCacheHandle_t ); 
 
@@ -116,7 +116,7 @@ public:
 	// of the materials the model was compiled with
 	virtual void	ForcedMaterialOverride( IMaterial *newMaterial, OverrideType_t nOverrideType = OVERRIDE_NORMAL ) = 0;
 
-	virtual void	SetViewTarget( const CStudioHdr *pStudioHdr, int nBodyIndex, const Vector& target ) = 0;
+	virtual void	SetViewTarget( const IStudioHdr *pStudioHdr, int nBodyIndex, const Vector& target ) = 0;
 
 	// Creates, destroys instance data to be associated with the model
 	virtual ModelInstanceHandle_t CreateInstance( IClientRenderable *pRenderable, LightCacheHandle_t *pCache = NULL ) = 0;

@@ -78,7 +78,7 @@ CEnvParticleScript::CEnvParticleScript()
 
 void CEnvParticleScript::PrecacheAnimationEventMaterials()
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( hdr )
 	{
 		int numseq = hdr->GetNumSeq();

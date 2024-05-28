@@ -173,7 +173,7 @@ void C_PropVehicleDriveable::OnDataChanged( DataUpdateType_t updateType )
 //-----------------------------------------------------------------------------
 ShadowType_t C_PropVehicleDriveable::ShadowCastType()
 {
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	if ( !pStudioHdr )
 		return SHADOWS_NONE;
 

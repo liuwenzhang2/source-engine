@@ -1860,7 +1860,7 @@ bool FindWeaponAttachmentBone( C_BaseCombatWeapon *pWeapon, int &iWeaponBone )
 	if ( !pWeapon )
 		return false;
 
-	CStudioHdr *pHdr = pWeapon->GetModelPtr();
+	IStudioHdr *pHdr = pWeapon->GetModelPtr();
 	if ( !pHdr )
 		return false;
 
@@ -1874,7 +1874,7 @@ bool FindWeaponAttachmentBone( C_BaseCombatWeapon *pWeapon, int &iWeaponBone )
 }
 
 
-bool FindMyAttachmentBone( C_BaseAnimating *pModel, int &iBone, CStudioHdr *pHdr )
+bool FindMyAttachmentBone( C_BaseAnimating *pModel, int &iBone, IStudioHdr *pHdr )
 {
 	if ( !pHdr )
 		return false;
@@ -1889,7 +1889,7 @@ bool FindMyAttachmentBone( C_BaseAnimating *pModel, int &iBone, CStudioHdr *pHdr
 }
 
 
-inline bool IsBoneChildOf( CStudioHdr *pHdr, int iBone, int iParent )
+inline bool IsBoneChildOf( IStudioHdr *pHdr, int iBone, int iParent )
 {
 	if ( iBone == iParent )
 		return false;
@@ -1910,7 +1910,7 @@ void ApplyDifferenceTransformToChildren(
 	const matrix3x4_t &mDest,
 	int iParentBone )
 {
-	CStudioHdr *pHdr = pModel->GetModelPtr();
+	IStudioHdr *pHdr = pModel->GetModelPtr();
 	if ( !pHdr )
 		return;
 
@@ -1972,7 +1972,7 @@ void GetCorrectionMatrices(
 }
 
 
-void C_CSPlayer::BuildTransformations( CStudioHdr *pHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
+void C_CSPlayer::BuildTransformations( IStudioHdr *pHdr, Vector *pos, Quaternion q[], const matrix3x4_t& cameraTransform, int boneMask, CBoneBitList &boneComputed )
 {
 	// First, setup our model's transformations like normal.
 	BaseClass::BuildTransformations( pHdr, pos, q, cameraTransform, boneMask, boneComputed );
@@ -2076,20 +2076,20 @@ void C_CSPlayer::PlayReloadEffect()
 	const model_t *pModel = modelinfo->GetModel( modelinfo->GetModelIndex( info.szViewModel ) );
 	if ( !pModel )
 		return;
-	CStudioHdr studioHdr( modelinfo->GetStudiomodel( pModel ), mdlcache );
-	if ( !studioHdr.IsValid() )
+	IStudioHdr* studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( pModel ));
+	if ( !studioHdr->IsValid() )
 		return;
 
 	// Find the reload animation.
-	for ( int iSeq=0; iSeq < studioHdr.GetNumSeq(); iSeq++ )
+	for ( int iSeq=0; iSeq < studioHdr->GetNumSeq(); iSeq++ )
 	{
-		mstudioseqdesc_t *pSeq = &studioHdr.pSeqdesc( iSeq );
+		mstudioseqdesc_t *pSeq = &studioHdr->pSeqdesc( iSeq );
 
 		if ( pSeq->activity == ACT_VM_RELOAD )
 		{
 			float poseParameters[MAXSTUDIOPOSEPARAM];
 			memset( poseParameters, 0, sizeof( poseParameters ) );
-			float cyclesPerSecond = Studio_CPS( &studioHdr, *pSeq, iSeq, poseParameters );
+			float cyclesPerSecond = Studio_CPS( studioHdr, *pSeq, iSeq, poseParameters );
 
 			// Now read out all the sound events with their timing
 			for ( int iEvent=0; iEvent < pSeq->numevents; iEvent++ )
@@ -2108,6 +2108,7 @@ void C_CSPlayer::PlayReloadEffect()
 			break;
 		}
 	}
+	delete studioHdr;
 }
 
 void C_CSPlayer::DoAnimationEvent( PlayerAnimEvent_t event, int nData )

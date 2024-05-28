@@ -15,7 +15,7 @@
 
 #define MODELSOUNDSCACHE_VERSION		5
 
-class CStudioHdr;
+class IStudioHdr;
 
 #pragma pack(1)
 class CModelSoundsCache : public IBaseCacheInfo
@@ -33,7 +33,7 @@ public:
 	virtual void Rebuild( char const *filename );
 
 	static void FindOrAddScriptSound( CUtlVector< unsigned short >& sounds, char const *soundname );
-	static void BuildAnimationEventSoundList( CStudioHdr *hdr, CUtlVector< unsigned short >& sounds );
+	static void BuildAnimationEventSoundList( IStudioHdr *hdr, CUtlVector< unsigned short >& sounds );
 private:
 	char const *GetSoundName( int index );
 };

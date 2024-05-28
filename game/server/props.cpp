@@ -852,7 +852,7 @@ void CBreakableProp::Spawn()
 	if (GetEngineObject()->IsMarkedForDeletion() )
 		return;
 
-	CStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetModelPtr( );
 	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_NO_FORCED_FADE )
 	{
 		DisableAutoFade();
@@ -4635,7 +4635,7 @@ bool CBasePropDoor::TestCollision( const Ray_t &ray, unsigned int mask, trace_t&
 	if ( !VPhysicsGetObject() )
 		return false;
 
-	CStudioHdr *pStudioHdr = GetModelPtr( );
+	IStudioHdr *pStudioHdr = GetModelPtr( );
 	if (!pStudioHdr)
 		return false;
 

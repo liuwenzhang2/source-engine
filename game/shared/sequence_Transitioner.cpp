@@ -15,7 +15,7 @@
 // -----------------------------------------------------------------------------
 
 void CSequenceTransitioner::CheckForSequenceChange( 
-	CStudioHdr *hdr,
+	IStudioHdr *hdr,
 	int nCurSequence, 
 	bool bForceNewSequence,
 	bool bInterpolate )
@@ -73,7 +73,7 @@ void CSequenceTransitioner::CheckForSequenceChange(
 
 
 void CSequenceTransitioner::UpdateCurrent( 
-	CStudioHdr *hdr,
+	IStudioHdr *hdr,
 	int nCurSequence, 
 	float flCurCycle,
 	float flCurPlaybackRate,

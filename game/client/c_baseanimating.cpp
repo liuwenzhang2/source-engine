@@ -305,7 +305,7 @@ void C_ClientRagdoll::OnSave( void )
 
 void C_ClientRagdoll::OnRestore( void )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 
 	if ( hdr == NULL )
 	{
@@ -596,7 +596,7 @@ void C_ClientRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWe
 {
 	BaseClass::SetupWeights( pBoneToWorld, nFlexWeightCount, pFlexWeights, pFlexDelayedWeights );
 
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 		return;
 
@@ -815,7 +815,7 @@ int C_BaseAnimating::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax 
 //-----------------------------------------------------------------------------
 ShadowType_t C_BaseAnimating::ShadowCastType()
 {
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	if ( !pStudioHdr || !pStudioHdr->SequencesAvailable() )
 		return SHADOWS_NONE;
 
@@ -936,8 +936,8 @@ void C_BaseAnimating::LockStudioHdr()
 		return;
 	}
 
-	CStudioHdr *pNewWrapper = new CStudioHdr;
-	pNewWrapper->Init( pStudioHdr, mdlcache );
+	IStudioHdr *pNewWrapper = mdlcache->GetIStudioHdr(pStudioHdr);
+	//pNewWrapper->Init( pStudioHdr, mdlcache );
 	Assert( pNewWrapper->IsValid() );
 	
 	if ( pNewWrapper->GetVirtualModel() )
@@ -1000,7 +1000,7 @@ void C_BaseAnimating::ValidateModelIndex()
 	//Assert( m_nModelIndex == 0 || m_AutoRefModelIndex.Get() );
 }
 
-CStudioHdr *C_BaseAnimating::OnNewModel()
+IStudioHdr *C_BaseAnimating::OnNewModel()
 {
 	InvalidateMdlCache();
 
@@ -1049,7 +1049,7 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 	//	return NULL;
 	//}
 
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if (hdr == NULL)
 		return NULL;
 
@@ -1217,7 +1217,7 @@ void C_BaseAnimating::GetBoneTransform( int iBone, matrix3x4_t &pBoneToWorld )
 
 int C_BaseAnimating::GetHitboxBone( int hitboxIndex )
 {
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	if ( pStudioHdr )
 	{
 		mstudiohitboxset_t *set =pStudioHdr->pHitboxSet( m_nHitboxSet );
@@ -1354,7 +1354,7 @@ void C_BaseAnimating::GetBoneControllers(float controllers[MAXSTUDIOBONECTRLS])
 
 float C_BaseAnimating::GetPoseParameter( int iPoseParameter )
 {
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 
 	if ( pStudioHdr == NULL )
 		return 0.0f;
@@ -1369,7 +1369,7 @@ float C_BaseAnimating::GetPoseParameter( int iPoseParameter )
 }
 
 // FIXME: redundant?
-void C_BaseAnimating::GetPoseParameters( CStudioHdr *pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM])
+void C_BaseAnimating::GetPoseParameters( IStudioHdr *pStudioHdr, float poseParameter[MAXSTUDIOPOSEPARAM])
 {
 	if ( !pStudioHdr )
 		return;
@@ -1427,7 +1427,7 @@ void C_BaseAnimating::GetCachedBoneMatrix( int boneIndex, matrix3x4_t &out )
 //-----------------------------------------------------------------------------
 // Purpose:	move position and rotation transforms into global matrices
 //-----------------------------------------------------------------------------
-void C_BaseAnimating::BuildTransformations( CStudioHdr *hdr, Vector *pos, Quaternion *q, const matrix3x4_t &cameraTransform, int boneMask, CBoneBitList &boneComputed )
+void C_BaseAnimating::BuildTransformations( IStudioHdr *hdr, Vector *pos, Quaternion *q, const matrix3x4_t &cameraTransform, int boneMask, CBoneBitList &boneComputed )
 {
 	VPROF_BUDGET( "C_BaseAnimating::BuildTransformations", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
 
@@ -1630,7 +1630,7 @@ void C_BaseAnimating::ApplyBoneMatrixTransform( matrix3x4_t& transform )
 
 void C_BaseAnimating::CreateUnragdollInfo( C_BaseAnimating *pRagdoll )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 	{
 		return;
@@ -1696,7 +1696,7 @@ void C_BaseAnimating::CreateUnragdollInfo( C_BaseAnimating *pRagdoll )
 
 void C_BaseAnimating::SaveRagdollInfo( int numbones, const matrix3x4_t &cameraTransform, CBoneAccessor &pBoneToWorld )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 	{
 		return;
@@ -1830,7 +1830,7 @@ void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float 
 //			pos[] - 
 //			q[] - 
 //-----------------------------------------------------------------------------
-void C_BaseAnimating::UnragdollBlend( CStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime )
+void C_BaseAnimating::UnragdollBlend( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime )
 {
 	if ( !hdr )
 	{
@@ -1879,7 +1879,7 @@ void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float curre
 
 		if ( pChildAnimating )
 		{
-			CStudioHdr *pChildHdr = pChildAnimating->GetModelPtr();
+			IStudioHdr *pChildHdr = pChildAnimating->GetModelPtr();
 
 			// FIXME: needs a new type of EF_BONEMERGE (EF_CHILDMERGE?)
 			if ( pChildHdr && pChild->IsEffectActive( EF_BONEMERGE ) && pChildHdr->SequencesAvailable() && pChildAnimating->m_pBoneMergeCache )
@@ -1910,7 +1910,7 @@ void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float curre
 //-----------------------------------------------------------------------------
 // Purpose: Do the default sequence blending rules as done in HL1
 //-----------------------------------------------------------------------------
-void C_BaseAnimating::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
+void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quaternion q[], float currentTime, int boneMask )
 {
 	VPROF( "C_BaseAnimating::StandardBlendingRules" );
 
@@ -2012,7 +2012,7 @@ bool C_BaseAnimating::PutAttachment( int number, const matrix3x4_t &attachmentTo
 }
 
 
-void C_BaseAnimating::SetupBones_AttachmentHelper( CStudioHdr *hdr )
+void C_BaseAnimating::SetupBones_AttachmentHelper( IStudioHdr *hdr )
 {
 	if ( !hdr || !hdr->GetNumAttachments() )
 		return;
@@ -2243,7 +2243,7 @@ bool C_BaseAnimating::IsMenuModel() const
 }
 
 // UNDONE: Seems kind of silly to have this when we also have the cached bones in C_BaseAnimating
-CBoneCache *C_BaseAnimating::GetBoneCache( CStudioHdr *pStudioHdr )
+CBoneCache *C_BaseAnimating::GetBoneCache( IStudioHdr *pStudioHdr )
 {
 	int boneMask = BONE_USED_BY_HITBOX;
 	CBoneCache *pcache = Studio_GetBoneCache( m_hitboxBoneCacheHandle );
@@ -2599,7 +2599,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 
 bool C_BaseAnimating::GetPoseParameterRange( int index, float &minValue, float &maxValue )
 {
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 
 	if (pStudioHdr)
 	{
@@ -2620,7 +2620,7 @@ bool C_BaseAnimating::GetPoseParameterRange( int index, float &minValue, float &
 //-----------------------------------------------------------------------------
 // Purpose: Do HL1 style lipsynch
 //-----------------------------------------------------------------------------
-void C_BaseAnimating::ControlMouth( CStudioHdr *pstudiohdr )
+void C_BaseAnimating::ControlMouth( IStudioHdr *pstudiohdr )
 {
 	if ( !MouthInfo().NeedsEnvelope() )
 		return;
@@ -2804,7 +2804,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 		m_iAccumulatedBoneMask = 0;
 
 #ifdef STUDIO_ENABLE_PERF_COUNTERS
-		CStudioHdr *hdr = GetModelPtr();
+		IStudioHdr *hdr = GetModelPtr();
 		if (hdr)
 		{
 			hdr->ClearPerfCounters();
@@ -2831,7 +2831,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 	{
 		MDLCACHE_CRITICAL_SECTION();
 
-		CStudioHdr *hdr = GetModelPtr();
+		IStudioHdr *hdr = GetModelPtr();
 		if ( !hdr || !hdr->SequencesAvailable() )
 			return false;
 
@@ -3151,7 +3151,7 @@ bool C_BaseAnimating::HitboxToWorldTransforms( matrix3x4_t *pHitboxToWorld[MAXST
 	if ( !GetModel() )
 		return false;
 
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	if (!pStudioHdr)
 		return false;
 
@@ -3298,7 +3298,7 @@ int C_BaseAnimating::InternalDrawModel( int flags )
 	// Scale the base transform if we don't have a bone hierarchy
 	if ( IsModelScaled() )
 	{
-		CStudioHdr *pHdr = GetModelPtr();
+		IStudioHdr *pHdr = GetModelPtr();
 		if ( pHdr && pBoneToWorld && pHdr->numbones() == 1 )
 		{
 			// Scale the bone to world at this point
@@ -3347,7 +3347,7 @@ void C_BaseAnimating::ProcessMuzzleFlashEvent()
 //-----------------------------------------------------------------------------
 // Internal routine to process animation events for studiomodels
 //-----------------------------------------------------------------------------
-void C_BaseAnimating::DoAnimationEvents( CStudioHdr *pStudioHdr )
+void C_BaseAnimating::DoAnimationEvents( IStudioHdr *pStudioHdr )
 {
 	if ( !pStudioHdr )
 		return;
@@ -4310,7 +4310,7 @@ void C_BaseAnimating::OnPostRestoreData()// const char *context, int slot, int t
 {
 	//int retVal = BaseClass::RestoreData( context, slot, type );
 	BaseClass::OnPostRestoreData();
-	CStudioHdr *pHdr = GetModelPtr();
+	IStudioHdr *pHdr = GetModelPtr();
 	if( pHdr && m_nSequence >= pHdr->GetNumSeq() )
 	{
 		// Don't let a network update give us an invalid sequence
@@ -4332,7 +4332,7 @@ void C_BaseAnimating::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 	}
 	else if ( GetModel() )
 	{
-		CStudioHdr *pStudioHdr = GetModelPtr();
+		IStudioHdr *pStudioHdr = GetModelPtr();
 		if ( !pStudioHdr|| !pStudioHdr->SequencesAvailable() || GetSequence() == -1 )
 		{
 			theMins = vec3_origin;
@@ -4535,7 +4535,7 @@ void C_BaseAnimating::PostDataUpdate( DataUpdateType_t updateType )
 		// Reset(), then the entity will stay in the interpolated entities list
 		// forever, wasting CPU.
 		MDLCACHE_CRITICAL_SECTION();
-		CStudioHdr *hdr = GetModelPtr();
+		IStudioHdr *hdr = GetModelPtr();
 		if ( hdr && !( hdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP ) )
 		{
 			m_iv_flCycle.Reset();
@@ -4663,7 +4663,7 @@ C_BaseAnimating *C_BaseAnimating::BecomeRagdollOnClient()
 
 bool C_BaseAnimating::InitAsClientRagdoll( const matrix3x4_t *pDeltaBones0, const matrix3x4_t *pDeltaBones1, const matrix3x4_t *pCurrentBonePosition, float boneDt, bool bFixedConstraints )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr || m_pRagdoll || m_builtRagdoll )
 		return false;
 
@@ -4845,7 +4845,7 @@ void C_BaseAnimating::AddEntity( void )
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::LookupAttachment( const char *pAttachmentName )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 	{
 		return -1;
@@ -4862,7 +4862,7 @@ int C_BaseAnimating::LookupAttachment( const char *pAttachmentName )
 //-----------------------------------------------------------------------------
 int C_BaseAnimating::LookupRandomAttachment( const char *pAttachmentNameSubstring )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 	{
 		return -1;
@@ -4977,7 +4977,7 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 
 	MDLCACHE_CRITICAL_SECTION();
 
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	if (!pStudioHdr)
 		return false;
 
@@ -5023,7 +5023,7 @@ bool C_BaseAnimating::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask
 // Input  : iSequence - 
 // Output : float
 //-----------------------------------------------------------------------------
-float C_BaseAnimating::GetSequenceCycleRate( CStudioHdr *pStudioHdr, int iSequence )
+float C_BaseAnimating::GetSequenceCycleRate( IStudioHdr *pStudioHdr, int iSequence )
 {
 	if ( !pStudioHdr )
 		return 0.0f;
@@ -5060,7 +5060,7 @@ void C_BaseAnimating::SetSequence( int nSequence )
 	if ( m_nSequence != nSequence )
 	{
 		/*
-		CStudioHdr *hdr = GetModelPtr();
+		IStudioHdr *hdr = GetModelPtr();
 		// Assert( hdr );
 		if ( hdr )
 		{
@@ -5086,7 +5086,7 @@ void C_BaseAnimating::StudioFrameAdvance()
 	if ( m_bClientSideAnimation )
 		return;
 
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 		return;
 
@@ -5153,7 +5153,7 @@ void C_BaseAnimating::StudioFrameAdvance()
 	}
 }
 
-float C_BaseAnimating::GetSequenceGroundSpeed( CStudioHdr *pStudioHdr, int iSequence )
+float C_BaseAnimating::GetSequenceGroundSpeed( IStudioHdr *pStudioHdr, int iSequence )
 {
 	float t = SequenceDuration( pStudioHdr, iSequence );
 
@@ -5174,7 +5174,7 @@ float C_BaseAnimating::GetSequenceGroundSpeed( CStudioHdr *pStudioHdr, int iSequ
 //
 // Output : float
 //-----------------------------------------------------------------------------
-float C_BaseAnimating::GetSequenceMoveDist( CStudioHdr *pStudioHdr, int iSequence )
+float C_BaseAnimating::GetSequenceMoveDist( IStudioHdr *pStudioHdr, int iSequence )
 {
 	Vector				vecReturn;
 	
@@ -5228,7 +5228,7 @@ void C_BaseAnimating::GetBlendedLinearVelocity( Vector *pVec )
 //-----------------------------------------------------------------------------
 float C_BaseAnimating::FrameAdvance( float flInterval )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 		return 0.0f;
 
@@ -5327,7 +5327,7 @@ void C_BaseAnimating::ResetSequenceInfo( void )
 	//	return;
 	//}
 
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	m_flGroundSpeed = GetSequenceGroundSpeed( pStudioHdr, GetSequence() ) * GetModelScale();
 	m_bSequenceLoops = ((GetSequenceFlags( pStudioHdr, GetSequence() ) & STUDIO_LOOPING) != 0);
 	// m_flAnimTime = gpGlobals->time;
@@ -5345,12 +5345,12 @@ void C_BaseAnimating::ResetSequenceInfo( void )
 //=========================================================
 //=========================================================
 
-bool C_BaseAnimating::IsSequenceLooping( CStudioHdr *pStudioHdr, int iSequence )
+bool C_BaseAnimating::IsSequenceLooping( IStudioHdr *pStudioHdr, int iSequence )
 {
 	return (::GetSequenceFlags( pStudioHdr, iSequence ) & STUDIO_LOOPING) != 0;
 }
 
-float C_BaseAnimating::SequenceDuration( CStudioHdr *pStudioHdr, int iSequence )
+float C_BaseAnimating::SequenceDuration( IStudioHdr *pStudioHdr, int iSequence )
 {
 	if ( !pStudioHdr )
 	{
@@ -5369,7 +5369,7 @@ float C_BaseAnimating::SequenceDuration( CStudioHdr *pStudioHdr, int iSequence )
 
 int C_BaseAnimating::FindTransitionSequence( int iCurrentSequence, int iGoalSequence, int *piDir )
 {
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	if ( !hdr )
 	{
 		return -1;
@@ -5437,7 +5437,7 @@ void C_BaseAnimating::SetHitboxSet( int setnum )
 	//	return;
 
 #ifdef _DEBUG
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	if ( !pStudioHdr )
 		return;
 
@@ -5519,7 +5519,7 @@ static Vector	hullcolor[8] =
 //-----------------------------------------------------------------------------
 void C_BaseAnimating::DrawClientHitboxes( float duration /*= 0.0f*/, bool monocolor /*= false*/  )
 {
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	if ( !pStudioHdr )
 		return;
 
@@ -5568,7 +5568,7 @@ int C_BaseAnimating::SelectWeightedSequence ( int activity )
 
 //=========================================================
 //=========================================================
-int C_BaseAnimating::LookupPoseParameter( CStudioHdr *pstudiohdr, const char *szName )
+int C_BaseAnimating::LookupPoseParameter( IStudioHdr *pstudiohdr, const char *szName )
 {
 	if ( !pstudiohdr )
 		return 0;
@@ -5587,12 +5587,12 @@ int C_BaseAnimating::LookupPoseParameter( CStudioHdr *pstudiohdr, const char *sz
 
 //=========================================================
 //=========================================================
-float C_BaseAnimating::SetPoseParameter( CStudioHdr *pStudioHdr, const char *szName, float flValue )
+float C_BaseAnimating::SetPoseParameter( IStudioHdr *pStudioHdr, const char *szName, float flValue )
 {
 	return SetPoseParameter( pStudioHdr, LookupPoseParameter( pStudioHdr, szName ), flValue );
 }
 
-float C_BaseAnimating::SetPoseParameter( CStudioHdr *pStudioHdr, int iParameter, float flValue )
+float C_BaseAnimating::SetPoseParameter( IStudioHdr *pStudioHdr, int iParameter, float flValue )
 {
 	if ( !pStudioHdr )
 	{
@@ -5718,7 +5718,7 @@ float C_BaseAnimating::SetBoneController ( int iController, float flValue )
 {
 	Assert( GetModelPtr() );
 
-	CStudioHdr *pmodel = GetModelPtr();
+	IStudioHdr *pmodel = GetModelPtr();
 
 	Assert(iController >= 0 && iController < NUM_BONECTRLS);
 
@@ -5810,7 +5810,7 @@ bool C_BaseAnimating::ComputeHitboxSurroundingBox( Vector *pVecWorldMins, Vector
 	// which causes IK to trigger, which causes raycasts against the other entities to occur,
 	// which is illegal to do while in the computeabsposition phase.
 
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	if (!pStudioHdr)
 		return false;
 
@@ -5848,7 +5848,7 @@ bool C_BaseAnimating::ComputeEntitySpaceHitboxSurroundingBox( Vector *pVecWorldM
 	// which causes IK to trigger, which causes raycasts against the other entities to occur,
 	// which is illegal to do while in the computeabsposition phase.
 
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	if (!pStudioHdr)
 		return false;
 
@@ -6123,7 +6123,7 @@ void C_BaseAnimating::UpdateClientSideAnimations()
 	}
 }
 
-CBoneList *C_BaseAnimating::RecordBones( CStudioHdr *hdr, matrix3x4_t *pBoneState )
+CBoneList *C_BaseAnimating::RecordBones( IStudioHdr *hdr, matrix3x4_t *pBoneState )
 {
 	if ( !ToolsEnabled() )
 		return NULL;
@@ -6185,7 +6185,7 @@ void C_BaseAnimating::GetToolRecordingState( KeyValues *msg )
 	VPROF_BUDGET( "C_BaseAnimating::GetToolRecordingState", VPROF_BUDGETGROUP_TOOLS );
 
 	// Force the animation to drive bones
-	CStudioHdr *hdr = GetModelPtr();
+	IStudioHdr *hdr = GetModelPtr();
 	matrix3x4_t *pBones = (matrix3x4_t*)_alloca( ( hdr ? hdr->numbones() : 1 ) * sizeof(matrix3x4_t) );
 	if ( hdr )
 	{
@@ -6228,7 +6228,7 @@ void C_BaseAnimating::CleanupToolRecordingState( KeyValues *msg )
 
 LocalFlexController_t C_BaseAnimating::GetNumFlexControllers( void )
 {
-	CStudioHdr *pstudiohdr = GetModelPtr( );
+	IStudioHdr *pstudiohdr = GetModelPtr( );
 	if (! pstudiohdr)
 		return LocalFlexController_t(0);
 
@@ -6237,7 +6237,7 @@ LocalFlexController_t C_BaseAnimating::GetNumFlexControllers( void )
 
 const char *C_BaseAnimating::GetFlexDescFacs( int iFlexDesc )
 {
-	CStudioHdr *pstudiohdr = GetModelPtr( );
+	IStudioHdr *pstudiohdr = GetModelPtr( );
 	if (! pstudiohdr)
 		return 0;
 
@@ -6248,7 +6248,7 @@ const char *C_BaseAnimating::GetFlexDescFacs( int iFlexDesc )
 
 const char *C_BaseAnimating::GetFlexControllerName( LocalFlexController_t iFlexController )
 {
-	CStudioHdr *pstudiohdr = GetModelPtr( );
+	IStudioHdr *pstudiohdr = GetModelPtr( );
 	if (! pstudiohdr)
 		return 0;
 
@@ -6259,7 +6259,7 @@ const char *C_BaseAnimating::GetFlexControllerName( LocalFlexController_t iFlexC
 
 const char *C_BaseAnimating::GetFlexControllerType( LocalFlexController_t iFlexController )
 {
-	CStudioHdr *pstudiohdr = GetModelPtr( );
+	IStudioHdr *pstudiohdr = GetModelPtr( );
 	if (! pstudiohdr)
 		return 0;
 

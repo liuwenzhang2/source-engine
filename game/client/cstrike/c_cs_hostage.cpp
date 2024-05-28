@@ -126,7 +126,7 @@ bool C_LowViolenceHostageDeathModel::SetupLowViolenceModel( C_CHostage *pHostage
 		GetEngineObject()->SetAbsAngles( pHostage->GetRenderAngles() );
 		GetEngineObject()->SetNetworkAngles( pHostage->GetRenderAngles() );
 
-		CStudioHdr *pStudioHdr = GetModelPtr();
+		IStudioHdr *pStudioHdr = GetModelPtr();
 
 		// update pose parameters
 		float poseParameter[MAXSTUDIOPOSEPARAM];
@@ -346,7 +346,7 @@ bool C_CHostage::CSAnim_CanMove()
 /**
  * Orient head and eyes towards m_lookAt.
  */
-void C_CHostage::UpdateLookAt( CStudioHdr *pStudioHdr )
+void C_CHostage::UpdateLookAt( IStudioHdr *pStudioHdr )
 {
 	if (!m_isInit)
 	{
@@ -448,7 +448,7 @@ void C_CHostage::UpdateClientSideAnimation()
 		"spine_yaw",
 		"head_roll"
 	};
-	CStudioHdr *pStudioHdr = GetModelPtr();
+	IStudioHdr *pStudioHdr = GetModelPtr();
 	for ( int i=0; i < ARRAYSIZE( setToZero ); i++ )
 	{
 		int index = LookupPoseParameter( pStudioHdr, setToZero[i] );

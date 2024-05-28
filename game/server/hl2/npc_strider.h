@@ -288,7 +288,7 @@ public:
 	void			SetTargetPath();
 	float			GetDefaultNavGoalTolerance();
 	void			OnMovementComplete();
-	float			GetSequenceGroundSpeed( CStudioHdr *pStudioHdr, int iSequence );
+	float			GetSequenceGroundSpeed( IStudioHdr *pStudioHdr, int iSequence );
 
 	float			MaxYawSpeed();
 

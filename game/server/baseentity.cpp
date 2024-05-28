@@ -3738,7 +3738,7 @@ void CBaseEntity::SetModelPointer(const model_t* pModel)
 }
 //------------------------------------------------------------------------------
 
-CStudioHdr *CBaseEntity::OnNewModel()
+IStudioHdr *CBaseEntity::OnNewModel()
 {
 	// Do nothing.
 	return NULL;
@@ -3991,7 +3991,7 @@ void CBaseEntity::SetSize( const Vector &vecMin, const Vector &vecMax )
 	UTIL_SetSize( this, vecMin, vecMax );
 }
 
-CStudioHdr *ModelSoundsCache_LoadModel( const char *filename )
+IStudioHdr *ModelSoundsCache_LoadModel( const char *filename )
 {
 	// Load the file
 	int idx = engine->PrecacheModel( filename, true ,false);
@@ -4000,7 +4000,7 @@ CStudioHdr *ModelSoundsCache_LoadModel( const char *filename )
 		model_t *mdl = (model_t *)modelinfo->GetModel( idx );
 		if ( mdl )
 		{
-			CStudioHdr *studioHdr = new CStudioHdr( modelinfo->GetStudiomodel( mdl ), mdlcache ); 
+			IStudioHdr *studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( mdl ) );
 			if ( studioHdr->IsValid() )
 			{
 				return studioHdr;
@@ -4010,7 +4010,7 @@ CStudioHdr *ModelSoundsCache_LoadModel( const char *filename )
 	return NULL;
 }
 
-void ModelSoundsCache_FinishModel( CStudioHdr *hdr )
+void ModelSoundsCache_FinishModel( IStudioHdr *hdr )
 {
 	Assert( hdr );
 	delete hdr;
@@ -4239,16 +4239,16 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 	// model anim event owned components
 	{
 		// Check animevents for particle events
-		CStudioHdr studioHdr( modelinfo->GetStudiomodel( pModel ), mdlcache ); 
-		if ( studioHdr.IsValid() )
+		IStudioHdr* studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( pModel ) );
+		if ( studioHdr->IsValid() )
 		{
 			// force animation event resolution!!!
-			VerifySequenceIndex( &studioHdr );
+			VerifySequenceIndex( studioHdr );
 
-			int nSeqCount = studioHdr.GetNumSeq();
+			int nSeqCount = studioHdr->GetNumSeq();
 			for ( int i = 0; i < nSeqCount; ++i )
 			{
-				mstudioseqdesc_t &seq = studioHdr.pSeqdesc( i );
+				mstudioseqdesc_t &seq = studioHdr->pSeqdesc( i );
 				int nEventCount = seq.numevents;
 				for ( int j = 0; j < nEventCount; ++j )
 				{
@@ -4317,7 +4317,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 								else
 								{
 									Warning( "-- Error --:  empty soundname, .qc error on AE_CL_PLAYSOUND in model %s, sequence %s, animevent # %i\n", 
-										studioHdr.GetRenderHdr()->pszName(), seq.pszLabel(), j+1 );
+										studioHdr->GetRenderHdr()->pszName(), seq.pszLabel(), j+1 );
 								}
 							}
 							break;
@@ -4333,6 +4333,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 				}
 			}
 		}
+		delete studioHdr;
 	}
 }
 

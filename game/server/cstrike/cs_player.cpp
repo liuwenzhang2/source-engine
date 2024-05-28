@@ -3006,7 +3006,7 @@ bool CCSPlayer::CSWeaponDrop( CBaseCombatWeapon *pWeapon, bool bDropShield, bool
 		int iWeaponBoneIndex = -1;
 
 		MDLCACHE_CRITICAL_SECTION();
-		CStudioHdr *hdr = pWeapon->GetModelPtr();
+		IStudioHdr *hdr = pWeapon->GetModelPtr();
 		// If I have a hand, set the weapon position to my hand bone position.
 		if ( hdr && hdr->numbones() > 0 )
 		{

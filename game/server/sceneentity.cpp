@@ -2428,7 +2428,7 @@ void CSceneEntity::PrefetchAnimBlocks( CChoreoScene *scene )
 						int seq = pActor->LookupSequence( event->GetParameters() );
 						if ( seq >= 0 )
 						{
-							CStudioHdr *pStudioHdr = pActor->GetModelPtr();
+							IStudioHdr *pStudioHdr = pActor->GetModelPtr();
 							if ( pStudioHdr )
 							{
 								// Now look up the animblock

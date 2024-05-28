@@ -3578,7 +3578,7 @@ bool CHL2_Player::TestHitboxes( const Ray_t &ray, unsigned int fContentsMask, tr
 		if ( IntersectRayWithAACylinder( ray, WorldSpaceCenter(), maxs.x * PLAYER_HULL_REDUCTION, maxs.z - mins.z, &tr ) )
 		{
 			tr.hitbox = 0;
-			CStudioHdr *pStudioHdr = GetModelPtr( );
+			IStudioHdr *pStudioHdr = GetModelPtr( );
 			if (!pStudioHdr)
 				return false;
 

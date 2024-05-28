@@ -49,9 +49,9 @@ static ConVar ui_posedebug_fade_out_time( "ui_posedebug_fade_out_time", "0.8",
 class CPoseDebuggerStub : public IPoseDebugger
 {
 public:
-	virtual void StartBlending( IClientEntity *pEntity, const CStudioHdr *pStudioHdr ) { }
+	virtual void StartBlending( IClientEntity *pEntity, const IStudioHdr *pStudioHdr ) { }
 	virtual void AccumulatePose(
-		const CStudioHdr *pStudioHdr,
+		const IStudioHdr *pStudioHdr,
 		CIKContext *pIKContext,
 		Vector pos[], 
 		Quaternion q[], 
@@ -319,9 +319,9 @@ public:
 	bool IsModelShown( int iEntNum ) const;
 
 public:
-	virtual void StartBlending( IClientEntity *pEntity, const CStudioHdr *pStudioHdr );
+	virtual void StartBlending( IClientEntity *pEntity, const IStudioHdr *pStudioHdr );
 	virtual void AccumulatePose(
-		const CStudioHdr *pStudioHdr,
+		const IStudioHdr *pStudioHdr,
 		CIKContext *pIKContext,
 		Vector pos[], 
 		Quaternion q[], 
@@ -334,13 +334,13 @@ public:
 		);
 
 protected:
-	typedef CUtlMap< CStudioHdr const *, ModelPoseDebugInfo > MapModel;
+	typedef CUtlMap< IStudioHdr const *, ModelPoseDebugInfo > MapModel;
 	MapModel m_mapModel, m_mapModelOld;
 	int m_nPosPrint;
 
 	CBitVec< MAX_EDICTS > m_uiMaskShowModels;
 
-	CStudioHdr const *m_pLastModel;
+	IStudioHdr const *m_pLastModel;
 };
 
 static CPoseDebuggerImpl s_PoseDebuggerImpl;
@@ -353,8 +353,8 @@ static CPoseDebuggerImpl s_PoseDebuggerImpl;
 //////////////////////////////////////////////////////////////////////////
 
 CPoseDebuggerImpl::CPoseDebuggerImpl() :
-	m_mapModel( DefLessFunc( CStudioHdr const * ) ),
-	m_mapModelOld( DefLessFunc( CStudioHdr const * ) ),
+	m_mapModel( DefLessFunc( IStudioHdr const * ) ),
+	m_mapModelOld( DefLessFunc( IStudioHdr const * ) ),
 	m_nPosPrint( 0 ),
 	m_pLastModel( NULL )
 {
@@ -387,7 +387,7 @@ bool CPoseDebuggerImpl::IsModelShown( int iEntNum ) const
 		return false;
 }
 
-void CPoseDebuggerImpl::StartBlending( IClientEntity *pEntity, const CStudioHdr *pStudioHdr )
+void CPoseDebuggerImpl::StartBlending( IClientEntity *pEntity, const IStudioHdr *pStudioHdr )
 {
 //	virtualmodel_t const *pVMdl = pStudioHdr->GetVirtualModel();
 // 	if ( !pVMdl )
@@ -462,7 +462,7 @@ void CPoseDebuggerImpl::StartBlending( IClientEntity *pEntity, const CStudioHdr 
 	m_nPosPrint += 3;
 }
 
-void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext *pIKContext,
+void CPoseDebuggerImpl::AccumulatePose( const IStudioHdr *pStudioHdr, CIKContext *pIKContext,
 									    Vector pos[], Quaternion q[], int sequence, float cycle,
 										const float poseParameter[], int boneMask,
 										float flWeight, float flTime )
@@ -496,12 +496,12 @@ void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext
 	// Actual processing
 	//
 
-	mstudioseqdesc_t	&seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( sequence );
+	mstudioseqdesc_t	&seqdesc = ((IStudioHdr*)pStudioHdr)->pSeqdesc( sequence );
 
 	if ( sequence >= pStudioHdr->GetNumSeq() )
 	{
 		sequence = 0;
-		seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( sequence );
+		seqdesc = ((IStudioHdr*)pStudioHdr)->pSeqdesc( sequence );
 	}
 
 	enum
@@ -547,9 +547,9 @@ void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext
 		7,
 		pOldTxt ? pOldTxt->m_flTimeAlive : 0.f,
 		5,
-		cycle * ( ((CStudioHdr *)pStudioHdr)->pAnimdesc( seqdesc.anim( 0, 0 ) ).numframes - 1 ),
+		cycle * ( ((IStudioHdr*)pStudioHdr)->pAnimdesc( seqdesc.anim( 0, 0 ) ).numframes - 1 ),
 		3,
-		((CStudioHdr *)pStudioHdr)->pAnimdesc( seqdesc.anim( 0, 0 ) ).numframes,
+		((IStudioHdr*)pStudioHdr)->pAnimdesc( seqdesc.anim( 0, 0 ) ).numframes,
 		widthPercent,
 		flWeight * 100.0f
 		);
