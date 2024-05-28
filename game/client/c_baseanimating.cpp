@@ -1970,7 +1970,7 @@ void C_BaseAnimating::StandardBlendingRules( IStudioHdr *hdr, Vector pos[], Quat
 #if _DEBUG
 	if (Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL)
 	{
-		DevMsgRT( "layers %4d : bones %4d : animated %4d\n", hdr->m_nPerfAnimationLayers, hdr->m_nPerfUsedBones, hdr->m_nPerfAnimatedBones );
+		DevMsgRT( "layers %4d : bones %4d : animated %4d\n", hdr->GetPerfAnimationLayers(), hdr->GetPerfUsedBones(), hdr->GetPerfAnimatedBones());
 	}
 #endif
 #endif

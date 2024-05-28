@@ -2578,6 +2578,9 @@ public:
 	virtual int boneFlags(int iBone) const = 0;
 	virtual int boneParent(int iBone) const = 0;
 
+	virtual int GetPerfAnimationLayers() const = 0;
+	virtual int GetPerfAnimatedBones() const = 0;
+	virtual int GetPerfUsedBones() const = 0;
 	virtual void IncPerfAnimationLayers(void) const = 0;
 	virtual void IncPerfAnimatedBones(void) const = 0;
 	virtual void IncPerfUsedBones(void) const = 0;
@@ -2951,6 +2954,17 @@ public:
 
 #ifdef STUDIO_ENABLE_PERF_COUNTERS
 public:
+
+	int GetPerfAnimationLayers() const {
+		return m_nPerfAnimationLayers;
+	}
+	int GetPerfAnimatedBones() const {
+		return m_nPerfAnimatedBones;
+	}
+	int GetPerfUsedBones() const {
+		return m_nPerfUsedBones;
+	}
+
 	void IncPerfAnimationLayers(void) const{
 		m_nPerfAnimationLayers++;
 	}
@@ -2960,7 +2974,7 @@ public:
 	void IncPerfUsedBones(void) const {
 		m_nPerfUsedBones++;
 	}
-	inline void			ClearPerfCounters( void )
+	inline void ClearPerfCounters( void )
 	{
 		m_nPerfAnimatedBones = 0;
 		m_nPerfUsedBones = 0;
