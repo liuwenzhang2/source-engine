@@ -157,7 +157,7 @@ public:
 	// Maybe through modelcache???
 	virtual model_t		*GetModel( HTOOLHANDLE hEntity ) = 0;
 	// Get the .mdl file used by entity (if it's a cbaseanimating)
-	virtual studiohdr_t *GetStudioModel( HTOOLHANDLE hEntity ) = 0;
+	virtual IStudioHdr *GetStudioModel( HTOOLHANDLE hEntity ) = 0;
 
 	// SINGLE PLAYER/LISTEN SERVER ONLY (just matching the client .dll api for this)
 	// Prints the formatted string to the notification area of the screen ( down the right hand edge

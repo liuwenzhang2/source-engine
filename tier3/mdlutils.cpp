@@ -111,11 +111,11 @@ void CMDL::SetMDL( MDLHandle_t h )
 	{
 		g_pMDLCache->AddRef( m_MDLHandle );
 		
-		studiohdr_t *pHdr = g_pMDLCache->LockStudioHdr( m_MDLHandle );
+		IStudioHdr *pHdr = g_pMDLCache->LockStudioHdr( m_MDLHandle );
 
 		if ( pHdr )
 		{
-			for ( LocalFlexController_t i = LocalFlexController_t(0); i < pHdr->numflexcontrollers; ++i )
+			for ( LocalFlexController_t i = LocalFlexController_t(0); i < pHdr->numflexcontrollers(); ++i )
 			{
 				if ( pHdr->pFlexcontroller( i )->localToGlobal == -1 )
 				{
@@ -190,7 +190,7 @@ void CMDL::Draw( const matrix3x4_t& rootToWorld, const matrix3x4_t *pBoneToWorld
 	g_pStudioRender->SetAlphaModulation( m_Color.a() / 255.0f );
 
 	DrawModelInfo_t info;
-	info.m_pStudioHdr = g_pMDLCache->GetStudioHdr( m_MDLHandle );
+	info.m_pStudioHdr = g_pMDLCache->GetIStudioHdr( m_MDLHandle );
 	info.m_pHardwareData = g_pMDLCache->GetHardwareData( m_MDLHandle );
 	info.m_Decals = STUDIORENDER_DECAL_INVALID;
 	info.m_Skin = m_nSkin;
@@ -217,15 +217,15 @@ void CMDL::Draw( const matrix3x4_t& rootToWorld, const matrix3x4_t *pBoneToWorld
 
 	// Set default flex values
 	float *pFlexWeights = NULL;
-	const int nFlexDescCount = info.m_pStudioHdr->numflexdesc;
+	const int nFlexDescCount = info.m_pStudioHdr->numflexdesc();
 	if ( nFlexDescCount )
 	{
-		IStudioHdr* cStudioHdr = g_pMDLCache->GetIStudioHdr( info.m_pStudioHdr );
+		//IStudioHdr* cStudioHdr = g_pMDLCache->GetIStudioHdr( info.m_pStudioHdr );
 
-		g_pStudioRender->LockFlexWeights( info.m_pStudioHdr->numflexdesc, &pFlexWeights );
-		cStudioHdr->RunFlexRules( m_pFlexControls, pFlexWeights );
+		g_pStudioRender->LockFlexWeights( info.m_pStudioHdr->numflexdesc(), &pFlexWeights);
+		info.m_pStudioHdr->RunFlexRules( m_pFlexControls, pFlexWeights );
 		g_pStudioRender->UnlockFlexWeights();
-		delete cStudioHdr;
+		//delete cStudioHdr;
 	}
 
 	Vector vecModelOrigin;

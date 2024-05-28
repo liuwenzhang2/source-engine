@@ -57,8 +57,8 @@ namespace OptimizedModel
 //-----------------------------------------------------------------------------
 // FIXME: Remove
 //-----------------------------------------------------------------------------
-class IStudioDataCache;
-extern IStudioDataCache *g_pStudioDataCache;
+//class IStudioDataCache;
+//extern IStudioDataCache *g_pStudioDataCache;
 
 
 //-----------------------------------------------------------------------------
@@ -120,7 +120,7 @@ private:
 #pragma pack(1)
 struct DecalVertex_t
 {
-	mstudiomesh_t *GetMesh( studiohdr_t *pHdr )
+	mstudiomesh_t *GetMesh( IStudioHdr *pHdr )
 	{
 		if ((m_Body == 0xFFFF) || (m_Model == 0xFFFF) || (m_Mesh == 0xFFFF))
 			return NULL;
@@ -130,7 +130,7 @@ struct DecalVertex_t
 		return pModel->pMesh( m_Mesh );
 	}
 
-	IMorph *GetMorph( studiohdr_t *pHdr, studiomeshdata_t *pStudioMeshes )
+	IMorph *GetMorph( IStudioHdr *pHdr, studiomeshdata_t *pStudioMeshes )
 	{
 		if ( (m_Body == 0xFFFF) || (m_Model == 0xFFFF) || (m_Mesh == 0xFFFF) || (m_Group == 0xFFFF) )
 			return NULL;
@@ -237,7 +237,7 @@ public:
 	void DestroyDecalList( StudioDecalHandle_t handle );
 
 	// Add decals to a decal list by doing a planar projection along the ray
-	void AddDecal( StudioDecalHandle_t handle, const StudioRenderContext_t& rc, matrix3x4_t *pBoneToWorld, studiohdr_t *pStudioHdr, 
+	void AddDecal( StudioDecalHandle_t handle, const StudioRenderContext_t& rc, matrix3x4_t *pBoneToWorld, IStudioHdr *pStudioHdr, 
 			const Ray_t & ray, const Vector& decalUp, IMaterial* pDecalMaterial, 
 			float radius, int body, bool noPokethru, int maxLODToDecal = ADDDECAL_TO_ALL_LODS );
 
@@ -337,7 +337,7 @@ private:
 	struct DecalBuildInfo_t
 	{
 		IMaterial						**m_ppMaterials;
-		studiohdr_t						*m_pStudioHdr;
+		IStudioHdr						*m_pStudioHdr;
 		mstudiomesh_t					*m_pMesh;
 		studiomeshdata_t				*m_pMeshData;
 		DecalMaterial_t					*m_pDecalMaterial;
@@ -538,10 +538,10 @@ private:
 
 	// Helper methods related to drawing decals
 	void DrawSingleBoneDecals( CMeshBuilder& meshBuilder, DecalMaterial_t& decalMaterial );
-	bool DrawMultiBoneDecals( CMeshBuilder& meshBuilder, DecalMaterial_t& decalMaterial, studiohdr_t *pStudioHdr );
+	bool DrawMultiBoneDecals( CMeshBuilder& meshBuilder, DecalMaterial_t& decalMaterial, IStudioHdr *pStudioHdr );
 	void DrawSingleBoneFlexedDecals( IMatRenderContext *pRenderContext, CMeshBuilder& meshBuilder, DecalMaterial_t& decalMaterial );
-	bool DrawMultiBoneFlexedDecals( IMatRenderContext *pRenderContext, CMeshBuilder& meshBuilder, DecalMaterial_t& decalMaterial, studiohdr_t *pStudioHdr, studioloddata_t *pStudioLOD );
-	void DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalMaterial_t& decalMaterial, studiohdr_t *pStudioHdr, studioloddata_t *pStudioLOD );
+	bool DrawMultiBoneFlexedDecals( IMatRenderContext *pRenderContext, CMeshBuilder& meshBuilder, DecalMaterial_t& decalMaterial, IStudioHdr *pStudioHdr, studioloddata_t *pStudioLOD );
+	void DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalMaterial_t& decalMaterial, IStudioHdr *pStudioHdr, studioloddata_t *pStudioLOD );
 	void DrawDecal( const DrawModelInfo_t &drawInfo, int lod, int body );
 	bool PreDrawDecal( IMatRenderContext *pRenderContext, const DrawModelInfo_t &drawInfo );
 	
@@ -600,7 +600,7 @@ private:
 	float *m_pFlexWeights;
 	float *m_pFlexDelayedWeights;
 
-	studiohdr_t *m_pStudioHdr;
+	IStudioHdr *m_pStudioHdr;
 	mstudiomodel_t *m_pSubModel;
 	studiomeshdata_t *m_pStudioMeshes;
 
@@ -909,10 +909,10 @@ inline void CStudioRender::R_StudioEyeballNormal( mstudioeyeball_t const* peyeba
 //-----------------------------------------------------------------------------
 
 // Computes the submodel for a specified body + bodypart
-int R_StudioSetupModel( int nBodyPart, int nBody, mstudiomodel_t **pSubModel, const studiohdr_t *pStudioHdr );
+int R_StudioSetupModel( int nBodyPart, int nBody, mstudiomodel_t **pSubModel, const IStudioHdr *pStudioHdr );
 
 // Computes PoseToWorld from BoneToWorld
-void ComputePoseToWorld( matrix3x4_t *pPoseToWorld, studiohdr_t *pStudioHdr, int boneMask, const Vector& vecViewOrigin, const matrix3x4_t *pBoneToWorld );
+void ComputePoseToWorld( matrix3x4_t *pPoseToWorld, IStudioHdr *pStudioHdr, int boneMask, const Vector& vecViewOrigin, const matrix3x4_t *pBoneToWorld );
 
 // Computes the model LOD
 inline int ComputeModelLODAndMetric( studiohwdata_t *pHardwareData, float flUnitSphereSize, float *pMetric )

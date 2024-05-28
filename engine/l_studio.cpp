@@ -333,18 +333,18 @@ static void R_SetNonAmbientLightingState( int numLights, dworldlight_t *locallig
 //-----------------------------------------------------------------------------
 // Computes the center of the studio model for illumination purposes
 //-----------------------------------------------------------------------------
-void R_ComputeLightingOrigin( IClientRenderable *pRenderable, studiohdr_t* pStudioHdr, const matrix3x4_t &matrix, Vector& center )
+void R_ComputeLightingOrigin( IClientRenderable *pRenderable, IStudioHdr* pStudioHdr, const matrix3x4_t &matrix, Vector& center )
 {
 	int nAttachmentIndex = pStudioHdr->IllumPositionAttachmentIndex();
 	if ( nAttachmentIndex <= 0 )
 	{
-		VectorTransform( pStudioHdr->illumposition, matrix, center );
+		VectorTransform( pStudioHdr->illumposition(), matrix, center);
 	}
 	else
 	{
 		matrix3x4_t attachment;
 		pRenderable->GetAttachment( nAttachmentIndex, attachment );
-		VectorTransform( pStudioHdr->illumposition, attachment, center );
+		VectorTransform( pStudioHdr->illumposition(), attachment, center);
 	}
 }
 
@@ -872,7 +872,7 @@ public:
 	virtual void SetupLighting( const Vector &vecCenter );
 	virtual void SuppressEngineLighting( bool bSuppress );
 
-	inline vertexFileHeader_t *CacheVertexData() { return g_pMDLCache->GetVertexData( VoidPtrToMDLHandle( m_pStudioHdr->VirtualModel() ) ); }
+	inline vertexFileHeader_t *CacheVertexData() { return m_pStudioHdr->CacheVertexData(); }
 
 	bool Init();
 	void Shutdown();
@@ -993,7 +993,7 @@ private:
 	CUtlLinkedList< ModelInstance_t, ModelInstanceHandle_t > m_ModelInstances; 
 
 	// current active model
-	studiohdr_t *m_pStudioHdr;
+	IStudioHdr *m_pStudioHdr;
 
 	bool m_bSuppressEngineLighting;
 
@@ -1917,7 +1917,7 @@ void DrawModelDebugOverlay( const DrawModelInfo_t& info, const DrawModelResults_
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
 	Q_snprintf( buf, sizeof( buf ), "num batches: %d\n",  results.m_NumBatches );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
-	Q_snprintf( buf, sizeof( buf ), "has shadow lod: %s\n", ( info.m_pStudioHdr->flags & STUDIOHDR_FLAGS_HASSHADOWLOD ) ? "true" : "false" );
+	Q_snprintf( buf, sizeof( buf ), "has shadow lod: %s\n", ( info.m_pStudioHdr->flags() & STUDIOHDR_FLAGS_HASSHADOWLOD) ? "true" : "false");
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
 	Q_snprintf( buf, sizeof( buf ), "num materials: %d\n", results.m_NumMaterials );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
@@ -2040,45 +2040,45 @@ void CModelRender::DebugDrawLightingOrigin( const DrawModelState_t& state, const
 
 	// draw lines from the light origin to the hull boundaries to identify model
 	Vector pt;
-	pt0.x = state.m_pStudioHdr->hull_min.x;
-	pt0.y = state.m_pStudioHdr->hull_min.y;
-	pt0.z = state.m_pStudioHdr->hull_min.z;
+	pt0.x = state.m_pStudioHdr->hull_min().x;
+	pt0.y = state.m_pStudioHdr->hull_min().y;
+	pt0.z = state.m_pStudioHdr->hull_min().z;
 	VectorTransform( pt0, *state.m_pModelToWorld, pt1 );
 	CDebugOverlay::AddLineOverlay( lightOrigin, pt1, 100, 100, 150, 255, true, 0.0f  );
-	pt0.x = state.m_pStudioHdr->hull_min.x;
-	pt0.y = state.m_pStudioHdr->hull_max.y;
-	pt0.z = state.m_pStudioHdr->hull_min.z;
+	pt0.x = state.m_pStudioHdr->hull_min().x;
+	pt0.y = state.m_pStudioHdr->hull_max().y;
+	pt0.z = state.m_pStudioHdr->hull_min().z;
 	VectorTransform( pt0, *state.m_pModelToWorld, pt1 );
 	CDebugOverlay::AddLineOverlay( lightOrigin, pt1, 100, 100, 150, 255, true, 0.0f  );
-	pt0.x = state.m_pStudioHdr->hull_max.x;
-	pt0.y = state.m_pStudioHdr->hull_max.y;
-	pt0.z = state.m_pStudioHdr->hull_min.z;
+	pt0.x = state.m_pStudioHdr->hull_max().x;
+	pt0.y = state.m_pStudioHdr->hull_max().y;
+	pt0.z = state.m_pStudioHdr->hull_min().z;
 	VectorTransform( pt0, *state.m_pModelToWorld, pt1 );
 	CDebugOverlay::AddLineOverlay( lightOrigin, pt1, 100, 100, 150, 255, true, 0.0f  );
-	pt0.x = state.m_pStudioHdr->hull_max.x;
-	pt0.y = state.m_pStudioHdr->hull_min.y;
-	pt0.z = state.m_pStudioHdr->hull_min.z;
+	pt0.x = state.m_pStudioHdr->hull_max().x;
+	pt0.y = state.m_pStudioHdr->hull_min().y;
+	pt0.z = state.m_pStudioHdr->hull_min().z;
 	VectorTransform( pt0, *state.m_pModelToWorld, pt1 );
 	CDebugOverlay::AddLineOverlay( lightOrigin, pt1, 100, 100, 150, 255, true, 0.0f  );
 
-	pt0.x = state.m_pStudioHdr->hull_min.x;
-	pt0.y = state.m_pStudioHdr->hull_min.y;
-	pt0.z = state.m_pStudioHdr->hull_max.z;
+	pt0.x = state.m_pStudioHdr->hull_min().x;
+	pt0.y = state.m_pStudioHdr->hull_min().y;
+	pt0.z = state.m_pStudioHdr->hull_max().z;
 	VectorTransform( pt0, *state.m_pModelToWorld, pt1 );
 	CDebugOverlay::AddLineOverlay( lightOrigin, pt1, 100, 100, 150, 255, true, 0.0f  );
-	pt0.x = state.m_pStudioHdr->hull_min.x;
-	pt0.y = state.m_pStudioHdr->hull_max.y;
-	pt0.z = state.m_pStudioHdr->hull_max.z;
+	pt0.x = state.m_pStudioHdr->hull_min().x;
+	pt0.y = state.m_pStudioHdr->hull_max().y;
+	pt0.z = state.m_pStudioHdr->hull_max().z;
 	VectorTransform( pt0, *state.m_pModelToWorld, pt1 );
 	CDebugOverlay::AddLineOverlay( lightOrigin, pt1, 100, 100, 150, 255, true, 0.0f  );
-	pt0.x = state.m_pStudioHdr->hull_max.x;
-	pt0.y = state.m_pStudioHdr->hull_max.y;
-	pt0.z = state.m_pStudioHdr->hull_max.z;
+	pt0.x = state.m_pStudioHdr->hull_max().x;
+	pt0.y = state.m_pStudioHdr->hull_max().y;
+	pt0.z = state.m_pStudioHdr->hull_max().z;
 	VectorTransform( pt0, *state.m_pModelToWorld, pt1 );
 	CDebugOverlay::AddLineOverlay( lightOrigin, pt1, 100, 100, 150, 255, true, 0.0f  );
-	pt0.x = state.m_pStudioHdr->hull_max.x;
-	pt0.y = state.m_pStudioHdr->hull_min.y;
-	pt0.z = state.m_pStudioHdr->hull_max.z;
+	pt0.x = state.m_pStudioHdr->hull_max().x;
+	pt0.y = state.m_pStudioHdr->hull_min().y;
+	pt0.z = state.m_pStudioHdr->hull_max().z;
 	VectorTransform( pt0, *state.m_pModelToWorld, pt1 );
 	CDebugOverlay::AddLineOverlay( lightOrigin, pt1, 100, 100, 150, 255, true, 0.0f  );	
 #endif
@@ -2105,7 +2105,7 @@ void CModelRender::DrawModelExecute( const DrawModelState_t &state, const ModelR
 	// Sets up flexes
 	float *pFlexWeights = NULL;
 	float *pFlexDelayedWeights = NULL;
-	int nFlexCount = state.m_pStudioHdr->numflexdesc;
+	int nFlexCount = state.m_pStudioHdr->numflexdesc();
 	if ( nFlexCount > 0 )
 	{
 		// Does setup for flexes
@@ -2120,7 +2120,7 @@ void CModelRender::DrawModelExecute( const DrawModelState_t &state, const ModelR
 	bool bUsesBumpmapping = ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 80 ) && ( pInfo.pModel->flags & MODELFLAG_STUDIOHDR_USES_BUMPMAPPING );
 
 	bool bStaticLighting = ( state.m_drawFlags & STUDIORENDER_DRAW_STATIC_LIGHTING ) &&
-								( state.m_pStudioHdr->flags & STUDIOHDR_FLAGS_STATIC_PROP ) && 
+								( state.m_pStudioHdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP) &&
 								( !bUsesBumpmapping ) && 
 								( pInfo.instance != MODEL_INSTANCE_INVALID ) &&
 								g_pMaterialSystemHardwareConfig->SupportsColorOnSecondStream();
@@ -2376,7 +2376,7 @@ bool CModelRender::DrawModelSetup( ModelRenderInfo_t &pInfo, DrawModelState_t *p
 	Assert( modelloader->IsLoaded( pInfo.pModel ) );
 
 	DrawModelState_t &state = *pState;
-	state.m_pStudioHdr = g_pMDLCache->GetStudioHdr( pInfo.pModel->studio );
+	state.m_pStudioHdr = g_pMDLCache->GetIStudioHdr( pInfo.pModel->studio );
 	state.m_pRenderable = pInfo.pRenderable;
 
 	// Quick exit if we're just supposed to draw a specific model...
@@ -2384,7 +2384,7 @@ bool CModelRender::DrawModelSetup( ModelRenderInfo_t &pInfo, DrawModelState_t *p
 		return false;
 
 	// quick exit
-	if (state.m_pStudioHdr->numbodyparts == 0)
+	if (state.m_pStudioHdr->numbodyparts() == 0)
 		return false;
 
 	if ( !pInfo.pModelToWorld )
@@ -2413,7 +2413,7 @@ bool CModelRender::DrawModelSetup( ModelRenderInfo_t &pInfo, DrawModelState_t *p
 		return bOk;
 	}
 
-	int nBoneCount = state.m_pStudioHdr->numbones;
+	int nBoneCount = state.m_pStudioHdr->numbones();
 	matrix3x4_t *pBoneToWorld = pCustomBoneToWorld;
 	if ( !pCustomBoneToWorld )
 	{
@@ -2528,11 +2528,11 @@ int	CModelRender::DrawModelExStaticProp( ModelRenderInfo_t &pInfo )
 	Assert( modelloader->IsLoaded( pInfo.pModel ) );
 
 	DrawModelState_t state;
-	state.m_pStudioHdr = g_pMDLCache->GetStudioHdr( pInfo.pModel->studio );
+	state.m_pStudioHdr = g_pMDLCache->GetIStudioHdr( pInfo.pModel->studio );
 	state.m_pRenderable = pInfo.pRenderable;
 
 	// quick exit
-	if ( state.m_pStudioHdr->numbodyparts == 0 || g_bTextMode )
+	if ( state.m_pStudioHdr->numbodyparts() == 0 || g_bTextMode)
 		return 1;
 
 	state.m_pStudioHWData = g_pMDLCache->GetHardwareData( pInfo.pModel->studio );
@@ -2591,7 +2591,7 @@ int	CModelRender::DrawModelExStaticProp( ModelRenderInfo_t &pInfo )
 	bool bUsesBumpmapping = ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 80 ) && ( pInfo.pModel->flags & MODELFLAG_STUDIOHDR_USES_BUMPMAPPING );
 
 	bool bStaticLighting = (( drawFlags & STUDIORENDER_DRAW_STATIC_LIGHTING ) &&
-		( state.m_pStudioHdr->flags & STUDIOHDR_FLAGS_STATIC_PROP ) && 
+		( state.m_pStudioHdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP) &&
 		( !bUsesBumpmapping ) && 
 		( pInfo.instance != MODEL_INSTANCE_INVALID ) &&
 		g_pMaterialSystemHardwareConfig->SupportsColorOnSecondStream() );
@@ -2722,7 +2722,7 @@ struct robject_t
 struct rmodel_t
 {
 	const model_t *			pModel;
-	studiohdr_t*			pStudioHdr;
+	IStudioHdr*			pStudioHdr;
 	studiohwdata_t*			pStudioHWData;
 	float					maxArea;
 	short					lodStart;
@@ -2857,12 +2857,12 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 		const model_t *pModel = modelList[i].pModel;
 		Assert( modelloader->IsLoaded( pModel ) );
 		unsigned int flags = pModel->flags;
-		modelList[i].pStudioHdr = g_pMDLCache->GetStudioHdr( pModel->studio );
+		modelList[i].pStudioHdr = g_pMDLCache->GetIStudioHdr( pModel->studio );
 		modelList[i].maxArea = 1.0f;
 		modelList[i].lodStart = lodStart;
 		modelList[i].lodCount = modelList[i].pStudioHWData ? modelList[i].pStudioHWData->m_NumLODs : 0;
 		bool bBumpMapped = (flags & MODELFLAG_STUDIOHDR_USES_BUMPMAPPING) != 0;
-		modelList[i].bStaticLighting = (( modelList[i].pStudioHdr->flags & STUDIOHDR_FLAGS_STATIC_PROP ) != 0) && !bBumpMapped;
+		modelList[i].bStaticLighting = (( modelList[i].pStudioHdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP) != 0) && !bBumpMapped;
 		modelList[i].bVertexLit = ( flags & MODELFLAG_VERTEXLIT ) != 0;
 		modelList[i].bNeedsCubemap = ( flags & MODELFLAG_STUDIOHDR_USES_ENV_CUBEMAP ) != 0;
 
@@ -3199,11 +3199,11 @@ matrix3x4_t* CModelRender::DrawModelShadowSetup( IClientRenderable *pRenderable,
 
 	Assert( modelloader->IsLoaded( pModel ) && ( pModel->type == mod_studio ) );
 
-	info.m_pStudioHdr = g_pMDLCache->GetStudioHdr( pModel->studio );
+	info.m_pStudioHdr = g_pMDLCache->GetIStudioHdr( pModel->studio );
 	info.m_pColorMeshes = NULL;
 
 	// quick exit
-	if (info.m_pStudioHdr->numbodyparts == 0)
+	if (info.m_pStudioHdr->numbodyparts() == 0)
 		return NULL;
 
 	Assert ( pRenderable );
@@ -3219,7 +3219,7 @@ matrix3x4_t* CModelRender::DrawModelShadowSetup( IClientRenderable *pRenderable,
 
 	info.m_Lod = r_shadowlod.GetInt();
 	// If the .mdl has a shadowlod, force the use of that one instead
-	if ( info.m_pStudioHdr->flags & STUDIOHDR_FLAGS_HASSHADOWLOD )
+	if ( info.m_pStudioHdr->flags() & STUDIOHDR_FLAGS_HASSHADOWLOD)
 	{
 		info.m_Lod = info.m_pHardwareData->m_NumLODs-1;
 	}
@@ -3251,9 +3251,9 @@ matrix3x4_t* CModelRender::DrawModelShadowSetup( IClientRenderable *pRenderable,
 	matrix3x4_t *pBoneToWorld = pCustomBoneToWorld;
 	if ( !pBoneToWorld )
 	{
-		pBoneToWorld = g_pStudioRender->LockBoneMatrices( info.m_pStudioHdr->numbones );
+		pBoneToWorld = g_pStudioRender->LockBoneMatrices( info.m_pStudioHdr->numbones() );
 	}
-	const bool bOk = pRenderable->SetupBones( pBoneToWorld, info.m_pStudioHdr->numbones, BONE_USED_BY_VERTEX_AT_LOD(info.m_Lod), cl.GetTime() );
+	const bool bOk = pRenderable->SetupBones( pBoneToWorld, info.m_pStudioHdr->numbones(), BONE_USED_BY_VERTEX_AT_LOD(info.m_Lod), cl.GetTime());
 	g_pStudioRender->UnlockBoneMatrices();
 	if ( !bOk )
 		return NULL;
@@ -3274,7 +3274,7 @@ void CModelRender::DrawModelShadow( IClientRenderable *pRenderable, const DrawMo
 	g_pStudioRender->SetColorModulation( white.Base() );
 	g_pStudioRender->SetAlphaModulation( 1.0f );
 
-	if ((info.m_pStudioHdr->flags & STUDIOHDR_FLAGS_USE_SHADOWLOD_MATERIALS) == 0)
+	if ((info.m_pStudioHdr->flags() & STUDIOHDR_FLAGS_USE_SHADOWLOD_MATERIALS) == 0)
 	{
 		g_pStudioRender->ForcedMaterialOverride( g_pMaterialShadowBuild, OVERRIDE_BUILD_SHADOWS );
 	}
@@ -3287,7 +3287,7 @@ void CModelRender::DrawModelShadow( IClientRenderable *pRenderable, const DrawMo
 
 void  CModelRender::SetViewTarget( const IStudioHdr *pStudioHdr, int nBodyIndex, const Vector& target )
 {
-	g_pStudioRender->SetEyeViewTarget( pStudioHdr->GetRenderHdr(), nBodyIndex, target );
+	g_pStudioRender->SetEyeViewTarget( pStudioHdr, nBodyIndex, target );//->GetRenderHdr()
 }
 
 void CModelRender::InitColormeshParams( ModelInstance_t &instance, studiohwdata_t *pStudioHWData, colormeshparams_t *pColorMeshParams )
@@ -4096,7 +4096,7 @@ bool CModelRender::UpdateStaticPropColorData( IHandleEntity *pProp, ModelInstanc
 		bDebugColor = true;
 	}
 
-	studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( inst.m_pModel->studio );
+	IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( inst.m_pModel->studio );
 	studiohwdata_t *pStudioHWData = g_pMDLCache->GetHardwareData( inst.m_pModel->studio );
 	Assert( pStudioHdr && pStudioHWData );
 
@@ -4121,7 +4121,7 @@ bool CModelRender::UpdateStaticPropColorData( IHandleEntity *pProp, ModelInstanc
 	if ( !bDebugColor )
 	{
 		// vertexes must be available for lighting calculation
-		vertexFileHeader_t *pVertexHdr = g_pMDLCache->GetVertexData( VoidPtrToMDLHandle( pStudioHdr->VirtualModel() ) );
+		vertexFileHeader_t *pVertexHdr = g_pMDLCache->GetVertexData(inst.m_pModel->studio);//VoidPtrToMDLHandle( pStudioHdr->VirtualModel() )
 		if ( !pVertexHdr )
 		{
 			// data not available yet
@@ -4165,16 +4165,16 @@ bool CModelRender::UpdateStaticPropColorData( IHandleEntity *pProp, ModelInstanc
 	// the surface normal plays no part in determining light intensity
 	bool bUseConstDirLighting = false;
 	float flConstDirLightingAmount = 0.0;
-	if ( pStudioHdr->flags & STUDIOHDR_FLAGS_CONSTANT_DIRECTIONAL_LIGHT_DOT )
+	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_CONSTANT_DIRECTIONAL_LIGHT_DOT)
 	{
 		bUseConstDirLighting = true;
-		flConstDirLightingAmount =  (float)( pStudioHdr->constdirectionallightdot ) / 255.0;
+		flConstDirLightingAmount =  (float)( pStudioHdr->constdirectionallightdot() ) / 255.0;
 	}
 
 	CUtlMemory< color24 > tmpLightingMem; 
 	
 	// Iterate over every body part...
-	for ( int bodyPartID = 0; bodyPartID < pStudioHdr->numbodyparts; ++bodyPartID )
+	for ( int bodyPartID = 0; bodyPartID < pStudioHdr->numbodyparts(); ++bodyPartID )
 	{
 		mstudiobodyparts_t* pBodyPart = pStudioHdr->pBodypart( bodyPartID );
 
@@ -4724,7 +4724,7 @@ void CModelRender::AddDecalInternal( ModelInstanceHandle_t handle, Ray_t const& 
 	}
 
 	matrix3x4_t *pBoneToWorld = SetupModelState( inst.m_pRenderable );
-	g_pStudioRender->AddDecal( inst.m_DecalHandle, g_pMDLCache->GetStudioHdr( inst.m_pModel->studio ),
+	g_pStudioRender->AddDecal( inst.m_DecalHandle, g_pMDLCache->GetIStudioHdr( inst.m_pModel->studio ),
 		pBoneToWorld, ray, decalUp, pDecalMaterial, radius, body, noPokeThru, maxLODToDecal );
 }
 

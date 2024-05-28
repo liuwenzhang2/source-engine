@@ -345,10 +345,424 @@ struct CleanupModelParts_t
 	CUtlVector< IMaterial* > Materials;
 };
 
+class CStudioHdr : public IStudioHdr
+{
+public:
+	CStudioHdr(void);
+	CStudioHdr(studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL);
+	~CStudioHdr() { Term(); }
+
+	void Init(studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL);
+	void Term();
+
+public:
+	inline bool IsVirtual(void) { return (m_pVModel != NULL); };
+	inline bool IsValid(void) { return (m_pStudioHdr != NULL); };
+	inline bool IsReadyForAccess(void) const { return (m_pStudioHdr != NULL); };
+	inline virtualmodel_t* GetVirtualModel(void) const { return m_pVModel; };
+	inline const studiohdr_t* GetRenderHdr(void) const { return m_pStudioHdr; };
+	const studiohdr_t* pSeqStudioHdr(int sequence);
+	const studiohdr_t* pAnimStudioHdr(int animation);
+
+private:
+	mutable studiohdr_t* m_pStudioHdr;
+	mutable virtualmodel_t* m_pVModel;
+
+	const virtualmodel_t* ResetVModel(const virtualmodel_t* pVModel) const;
+	const studiohdr_t* GroupStudioHdr(int group);
+	mutable CUtlVector< const studiohdr_t* > m_pStudioHdrCache;
+
+	mutable int			m_nFrameUnlockCounter;
+	int* m_pFrameUnlockCounter;
+	CThreadFastMutex	m_FrameUnlockCounterMutex;
+
+public:
+	inline int			numbones(void) const { return m_pStudioHdr->numbones; };
+	inline mstudiobone_t* pBone(int i) const { return m_pStudioHdr->pBone(i); };
+	int					RemapAnimBone(int iAnim, int iLocalBone) const;		// maps local animations bone to global bone
+	int					RemapSeqBone(int iSequence, int iLocalBone) const;	// maps local sequence bone to global bone
+
+	bool				SequencesAvailable() const;
+	int					GetNumSeq(void) const;
+	mstudioanimdesc_t& pAnimdesc(int i);
+	mstudioseqdesc_t& pSeqdesc(int iSequence);
+	int					iRelativeAnim(int baseseq, int relanim) const;	// maps seq local anim reference to global anim index
+	int					iRelativeSeq(int baseseq, int relseq) const;		// maps seq local seq reference to global seq index
+
+	//int					GetSequenceActivity( int iSequence );
+	//void				SetSequenceActivity( int iSequence, int iActivity );
+	int					GetActivityListVersion(void);
+	void				SetActivityListVersion(int version);
+	int					GetEventListVersion(void);
+	void				SetEventListVersion(int version);
+
+	int					GetNumAttachments(void) const;
+	const mstudioattachment_t& pAttachment(int i);
+	int					GetAttachmentBone(int i);
+	// used on my tools in hlmv, not persistant
+	void				SetAttachmentBone(int iAttachment, int iBone);
+
+	int					EntryNode(int iSequence);
+	int					ExitNode(int iSequence);
+	char* pszNodeName(int iNode);
+	// FIXME: where should this one be?
+	int					GetTransition(int iFrom, int iTo) const;
+
+	int					GetNumPoseParameters(void) const;
+	const mstudioposeparamdesc_t& pPoseParameter(int i);
+	int					GetSharedPoseParameter(int iSequence, int iLocalPose) const;
+
+	int					GetNumIKAutoplayLocks(void) const;
+	const mstudioiklock_t& pIKAutoplayLock(int i);
+
+	inline int			CountAutoplaySequences() const { return m_pStudioHdr->CountAutoplaySequences(); };
+	inline int			CopyAutoplaySequences(unsigned short* pOut, int outCount) const { return m_pStudioHdr->CopyAutoplaySequences(pOut, outCount); };
+	inline int			GetAutoplayList(unsigned short** pOut) const { return m_pStudioHdr->GetAutoplayList(pOut); };
+
+	inline int			GetNumBoneControllers(void) const { return m_pStudioHdr->numbonecontrollers; };
+	inline mstudiobonecontroller_t* pBonecontroller(int i) const { return m_pStudioHdr->pBonecontroller(i); };
+
+	inline int			numikchains() const { return m_pStudioHdr->numikchains; };
+	inline int			GetNumIKChains(void) const { return m_pStudioHdr->numikchains; };
+	inline mstudioikchain_t* pIKChain(int i) const { return m_pStudioHdr->pIKChain(i); };
+
+	inline int			numflexrules() const { return m_pStudioHdr->numflexrules; };
+	inline mstudioflexrule_t* pFlexRule(int i) const { return m_pStudioHdr->pFlexRule(i); };
+
+	inline int			numflexdesc() const { return m_pStudioHdr->numflexdesc; };
+	inline mstudioflexdesc_t* pFlexdesc(int i) const { return m_pStudioHdr->pFlexdesc(i); };
+
+	inline LocalFlexController_t			numflexcontrollers() const { return (LocalFlexController_t)m_pStudioHdr->numflexcontrollers; };
+	inline mstudioflexcontroller_t* pFlexcontroller(LocalFlexController_t i) const { return m_pStudioHdr->pFlexcontroller(i); };
+
+	inline int			numflexcontrollerui() const { return m_pStudioHdr->numflexcontrollerui; };
+	inline mstudioflexcontrollerui_t* pFlexcontrollerUI(int i) const { return m_pStudioHdr->pFlexControllerUI(i); };
+
+	//inline const char	*name() const { return m_pStudioHdr->name; }; // deprecated -- remove after full xbox merge
+	inline const char* pszName() const { return m_pStudioHdr->pszName(); };
+
+	inline int			numbonecontrollers() const { return m_pStudioHdr->numbonecontrollers; };
+
+	inline int			numhitboxsets() const { return m_pStudioHdr->numhitboxsets; };
+	inline mstudiohitboxset_t* pHitboxSet(int i) const { return m_pStudioHdr->pHitboxSet(i); };
+
+	inline mstudiobbox_t* pHitbox(int i, int set) const { return m_pStudioHdr->pHitbox(i, set); };
+	inline int			iHitboxCount(int set) const { return m_pStudioHdr->iHitboxCount(set); };
+
+	inline int			numbodyparts() const { return m_pStudioHdr->numbodyparts; };
+	inline mstudiobodyparts_t* pBodypart(int i) const { return m_pStudioHdr->pBodypart(i); };
+
+	inline int			numskinfamilies() const { return m_pStudioHdr->numskinfamilies; }
+
+	inline Vector		eyeposition() const { return m_pStudioHdr->eyeposition; };
+
+	inline int&			flags() { return m_pStudioHdr->flags; };
+
+	inline char* const pszSurfaceProp(void) const { return m_pStudioHdr->pszSurfaceProp(); };
+
+	inline float		mass() const { return m_pStudioHdr->mass; };
+	inline int			contents() const { return m_pStudioHdr->contents; }
+
+	inline const byte* GetBoneTableSortedByName() const { return m_pStudioHdr->GetBoneTableSortedByName(); };
+
+	inline Vector		illumposition() const { return m_pStudioHdr->illumposition; };
+
+	inline Vector		hull_min() const { return m_pStudioHdr->hull_min; };		// ideal movement hull size
+	inline Vector		hull_max() const { return m_pStudioHdr->hull_max; };
+
+	inline Vector		view_bbmin() const { return m_pStudioHdr->view_bbmin; };		// clipping bounding box
+	inline Vector		view_bbmax() const { return m_pStudioHdr->view_bbmax; };
+
+	inline int			numtextures() const { return m_pStudioHdr->numtextures; };
+
+	inline int			IllumPositionAttachmentIndex() const { return m_pStudioHdr->IllumPositionAttachmentIndex(); }
+
+	inline float		MaxEyeDeflection() const { return m_pStudioHdr->MaxEyeDeflection(); }
+
+	inline mstudiolinearbone_t* pLinearBones() const { return m_pStudioHdr->pLinearBones(); }
+
+	inline int			BoneFlexDriverCount() const { return m_pStudioHdr->BoneFlexDriverCount(); }
+	inline const mstudioboneflexdriver_t* BoneFlexDriver(int i) const { return m_pStudioHdr->BoneFlexDriver(i); }
+
+	inline float		VertAnimFixedPointScale() const { return m_pStudioHdr->VertAnimFixedPointScale(); }
+
+public:
+	//int IsSequenceLooping( int iSequence );
+	//float GetSequenceCycleRate( int iSequence );
+
+	void				RunFlexRules(const float* src, float* dest);
+
+	int nummouths() { return m_pStudioHdr->nummouths; }
+	int numskinref() const { return m_pStudioHdr->numskinref; }
+	short* pSkinref(int i) const { return  m_pStudioHdr->pSkinref(i); }
+	byte constdirectionallightdot() { return m_pStudioHdr->constdirectionallightdot; }
+	vertexFileHeader_t* CacheVertexData() { return g_pMDLCache->GetVertexData(VoidPtrToMDLHandle(m_pStudioHdr->VirtualModel())); }
+	mstudiomouth_t* pMouth(int i) const { return m_pStudioHdr->pMouth(i); }
+	int checksum() { return m_pStudioHdr->checksum; }
+	byte rootLOD() { return m_pStudioHdr->rootLOD; }
+	int numcdtextures() { return m_pStudioHdr->numcdtextures; }
+	int textureindex() { return m_pStudioHdr->textureindex; }
+	char* pCdtexture(int i) const { return m_pStudioHdr->pCdtexture(i); }
+	mstudiotexture_t* pTexture(int i) const { return m_pStudioHdr->pTexture(i); }
+
+public:
+	inline int boneFlags(int iBone) const { return m_boneFlags[iBone]; }
+	inline int boneParent(int iBone) const { return m_boneParent[iBone]; }
+
+private:
+	CUtlVector< int >  m_boneFlags;
+	CUtlVector< int >  m_boneParent;
+
+public:
+
+	// This class maps an activity to sequences allowed for that activity, accelerating the resolution
+	// of SelectWeightedSequence(), especially on PowerPC. Iterating through every sequence
+	// attached to a model turned out to be a very destructive cache access pattern on 360.
+	// 
+	// I've encapsulated this behavior inside a nested class for organizational reasons; there is
+	// no particular programmatic or efficiency benefit to it. It just makes clearer what particular
+	// code in the otherwise very complicated StudioHdr class has to do with this particular
+	// optimization, and it lets you collapse the whole definition down to a single line in Visual
+	// Studio.
+	class CActivityToSequenceMapping /* final */
+	{
+	public:
+		// A tuple of a sequence and its corresponding weight. Lists of these correspond to activities.
+		struct SequenceTuple
+		{
+			short		seqnum;
+			short		weight; // the absolute value of the weight from the sequence header
+			CUtlSymbol* pActivityModifiers;		// list of activity modifier symbols
+			int			iNumActivityModifiers;
+		};
+
+		// The type of the hash's stored data, a composite of both key and value
+		// (because that's how CUtlHash works):
+		// key: an int, the activity #
+		// values: an index into the m_pSequenceTuples array, a count of the
+		// total sequences present for an activity, and the sum of their
+		// weights.
+		// Note this struct is 128-bits wide, exactly coincident to a PowerPC 
+		// cache line and VMX register. Please consider very carefully the
+		// performance implications before adding any additional fields to this.
+		// You could probably do away with totalWeight if you really had to.
+		struct HashValueType
+		{
+			// KEY (hashed)
+			int activityIdx;
+
+			// VALUE (not hashed)
+			int startingIdx;
+			int count;
+			int totalWeight;
+
+			HashValueType(int _actIdx, int _stIdx, int _ct, int _tW) :
+				activityIdx(_actIdx), startingIdx(_stIdx), count(_ct), totalWeight(_tW) {}
+
+			// default constructor (ought not to be actually used)
+			HashValueType() : activityIdx(-1), startingIdx(-1), count(-1), totalWeight(-1)
+			{
+				AssertMsg(false, "Don't use default HashValueType()!");
+			}
+
+
+			class HashFuncs
+			{
+			public:
+				// dummy constructor (gndn)
+				HashFuncs(int) {}
+
+				// COMPARE
+				// compare two entries for uniqueness. We should never have two different
+				// entries for the same activity, so we only compare the activity index;
+				// this allows us to use the utlhash as a dict by constructing dummy entries
+				// as hash lookup keys.
+				bool operator()(const HashValueType& lhs, const HashValueType& rhs) const
+				{
+					return lhs.activityIdx == rhs.activityIdx;
+				}
+
+				// HASH
+				// We only hash on the activity index; everything else is data.
+				unsigned int operator()(const HashValueType& item) const
+				{
+					return HashInt(item.activityIdx);
+				}
+			};
+		};
+
+		typedef CUtlHash<HashValueType, HashValueType::HashFuncs, HashValueType::HashFuncs> ActivityToValueIdxHash;
+
+		// These must be here because IFM does not compile/link studio.cpp (?!?)
+
+		// ctor
+		CActivityToSequenceMapping(void)
+			: m_pSequenceTuples(NULL), m_iSequenceTuplesCount(0), m_ActToSeqHash(8, 0, 0), m_expectedPStudioHdr(NULL), m_expectedVModel(NULL)
+#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
+			, m_bIsInitialized(false)
+#endif
+		{};
+
+		// dtor -- not virtual because this class has no inheritors
+		~CActivityToSequenceMapping()
+		{
+			if (m_pSequenceTuples != NULL)
+			{
+				if (m_pSequenceTuples->pActivityModifiers != NULL)
+				{
+					delete[] m_pSequenceTuples->pActivityModifiers;
+				}
+				delete[] m_pSequenceTuples;
+			}
+		}
+
+		/// Get the list of sequences for an activity. Returns the pointer to the
+		/// first sequence tuple. Output parameters are a count of sequences present,
+		/// and the total weight of all the sequences. (it would be more LHS-friendly
+		/// to return these on registers, if only C++ offered more than one return 
+		/// value....)
+		const SequenceTuple* GetSequences(int forActivity, int* outSequenceCount, int* outTotalWeight);
+
+		/// The number of sequences available for an activity.
+		int NumSequencesForActivity(int forActivity);
+
+#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
+		inline bool IsInitialized(void) { return m_bIsInitialized; }
+#endif
+
+	private:
+
+		/// Allocate my internal array. (It is freed in the destructor.) Also,
+		/// build the hash of activities to sequences and populate m_pSequenceTuples.
+		void Initialize(CStudioHdr* pstudiohdr);
+
+		/// Force Initialize() to occur again, even if it has already occured.
+		void Reinitialize(CStudioHdr* pstudiohdr);
+
+		/// A more efficient version of the old SelectWeightedSequence() function in animation.cpp. 
+		int SelectWeightedSequence(CStudioHdr* pstudiohdr, int activity, int curSequence, RandomWeightFunc pRandomWeightFunc);
+
+		// selects the sequence with the most matching modifiers
+		//int SelectWeightedSequenceFromModifiers( CStudioHdr *pstudiohdr, int activity, CUtlSymbol *pActivityModifiers, int iModifierCount );
+
+		// Actually a big array, into which the hash values index.
+		SequenceTuple* m_pSequenceTuples;
+		unsigned int m_iSequenceTuplesCount; // (size of the whole array)
+#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
+		bool m_bIsInitialized;
+#endif
+
+		// we don't store an outer pointer because we can't initialize it at construction time
+		// (warning c4355) -- there are ways around this but it's easier to just pass in a 
+		// pointer to the CStudioHdr when we need it, since this class isn't supposed to 
+		// export its interface outside the studio header anyway.
+		// CStudioHdr * const m_pOuter;
+
+		ActivityToValueIdxHash m_ActToSeqHash;
+
+		// we store these so we can know if the contents of the studiohdr have changed
+		// from underneath our feet (this is an emergency data integrity check)
+		const void* m_expectedPStudioHdr;
+		const void* m_expectedVModel;
+
+		// double-check that the data I point to hasn't changed
+		bool ValidateAgainst(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT;
+		void SetValidationPair(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT;
+
+		friend class CStudioHdr;
+	};
+
+	CActivityToSequenceMapping m_ActivityToSequence;
+
+	/// A more efficient version of the old SelectWeightedSequence() function in animation.cpp. 
+	/// Returns -1 on failure to find a sequence
+	inline int SelectWeightedSequence(int activity, int curSequence, RandomWeightFunc pRandomWeightFunc)
+	{
+#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
+		// We lazy-initialize the header on demand here, because CStudioHdr::Init() is
+		// called from the constructor, at which time the this pointer is illegitimate.
+		if (!m_ActivityToSequence.IsInitialized())
+		{
+			m_ActivityToSequence.Initialize(this);
+		}
+#endif
+		return m_ActivityToSequence.SelectWeightedSequence(this, activity, curSequence, pRandomWeightFunc);
+	}
+
+	//	inline int SelectWeightedSequenceFromModifiers( int activity, CUtlSymbol *pActivityModifiers, int iModifierCount )
+	//	{
+	//#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
+	//		// We lazy-initialize the header on demand here, because CStudioHdr::Init() is
+	//		// called from the constructor, at which time the this pointer is illegitimate.
+	//		if ( !m_ActivityToSequence.IsInitialized() )
+	//		{
+	//			m_ActivityToSequence.Initialize( this );
+	//		}
+	//#endif
+	//		return m_ActivityToSequence.SelectWeightedSequenceFromModifiers( this, activity, pActivityModifiers, iModifierCount );
+	//	}
+
+		/// True iff there is at least one sequence for the given activity.
+	inline bool HaveSequenceForActivity(int activity)
+	{
+#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
+		if (!m_ActivityToSequence.IsInitialized())
+		{
+			m_ActivityToSequence.Initialize(this);
+		}
+#endif
+		return (m_ActivityToSequence.NumSequencesForActivity(activity) > 0);
+	}
+
+	// Force this CStudioHdr's activity-to-sequence mapping to be reinitialized
+	inline void ReinitializeSequenceMapping(void)
+	{
+		m_ActivityToSequence.Reinitialize(this);
+	}
+
+#ifdef STUDIO_ENABLE_PERF_COUNTERS
+public:
+
+	int GetPerfAnimationLayers() const {
+		return m_nPerfAnimationLayers;
+	}
+	int GetPerfAnimatedBones() const {
+		return m_nPerfAnimatedBones;
+	}
+	int GetPerfUsedBones() const {
+		return m_nPerfUsedBones;
+	}
+
+	void IncPerfAnimationLayers(void) const {
+		m_nPerfAnimationLayers++;
+	}
+	void IncPerfAnimatedBones(void) const {
+		m_nPerfAnimatedBones++;
+	}
+	void IncPerfUsedBones(void) const {
+		m_nPerfUsedBones++;
+	}
+	inline void ClearPerfCounters(void)
+	{
+		m_nPerfAnimatedBones = 0;
+		m_nPerfUsedBones = 0;
+		m_nPerfAnimationLayers = 0;
+	};
+
+	// timing info
+	mutable	int			m_nPerfAnimatedBones;
+	mutable	int			m_nPerfUsedBones;
+	mutable	int			m_nPerfAnimationLayers;
+#endif
+
+
+};
+
+
 //-----------------------------------------------------------------------------
 // Implementation of the simple studio data cache (no caching)
 //-----------------------------------------------------------------------------
-class CMDLCache : public CTier3AppSystem< IMDLCache >, public IStudioDataCache, public CDefaultDataCacheClient
+class CMDLCache : public CTier3AppSystem< IMDLCache >, public CDefaultDataCacheClient//public IStudioDataCache, 
 {
 	typedef CTier3AppSystem< IMDLCache > BaseClass;
 
@@ -374,7 +788,7 @@ public:
 	virtual void MarkAsLoaded(MDLHandle_t handle);
 
 	virtual IStudioHdr* GetIStudioHdr(MDLHandle_t handle);
-	virtual IStudioHdr* GetIStudioHdr(const studiohdr_t* pStudioHdr);
+	virtual IStudioHdr* GetIStudioHdr(studiohdr_t* pStudioHdr);
 
 	virtual studiohdr_t *GetStudioHdr( MDLHandle_t handle );
 	virtual studiohwdata_t *GetHardwareData( MDLHandle_t handle );
@@ -442,7 +856,7 @@ public:
 
 	virtual bool IsDataLoaded( MDLHandle_t handle, MDLCacheDataType_t type );
 
-	virtual studiohdr_t *LockStudioHdr( MDLHandle_t handle );
+	virtual IStudioHdr *LockStudioHdr( MDLHandle_t handle );
 	virtual void UnlockStudioHdr( MDLHandle_t handle );
 
 	virtual bool PreloadModel( MDLHandle_t handle );
@@ -565,7 +979,7 @@ private:
 //-----------------------------------------------------------------------------
 static CMDLCache g_MDLCache;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CMDLCache, IMDLCache, MDLCACHE_INTERFACE_VERSION, g_MDLCache );
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CMDLCache, IStudioDataCache, STUDIO_DATA_CACHE_INTERFACE_VERSION, g_MDLCache );
+//EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CMDLCache, IStudioDataCache, STUDIO_DATA_CACHE_INTERFACE_VERSION, g_MDLCache );
 
 
 //-----------------------------------------------------------------------------
@@ -643,8 +1057,8 @@ void CMDLCache::Disconnect()
 //-----------------------------------------------------------------------------
 void *CMDLCache::QueryInterface( const char *pInterfaceName )
 {
-	if (!Q_strncmp(	pInterfaceName, STUDIO_DATA_CACHE_INTERFACE_VERSION, Q_strlen(STUDIO_DATA_CACHE_INTERFACE_VERSION) + 1))
-		return (IStudioDataCache*)this;
+	//if (!Q_strncmp(	pInterfaceName, STUDIO_DATA_CACHE_INTERFACE_VERSION, Q_strlen(STUDIO_DATA_CACHE_INTERFACE_VERSION) + 1))
+	//	return (IStudioDataCache*)this;
 
 	if (!Q_strncmp(	pInterfaceName, MDLCACHE_INTERFACE_VERSION, Q_strlen(MDLCACHE_INTERFACE_VERSION) + 1))
 		return (IMDLCache*)this;
@@ -1715,7 +2129,8 @@ bool CMDLCache::BuildHardwareData( MDLHandle_t handle, studiodata_t *pStudioData
 	}
 
 	BeginLock();
-	bool bLoaded = g_pStudioRender->LoadModel( pStudioHdr, pVtxHdr, &pStudioData->m_HardwareData );
+	CStudioHdr studioHdr(pStudioHdr, this);
+	bool bLoaded = g_pStudioRender->LoadModel( &studioHdr, pVtxHdr, &pStudioData->m_HardwareData );
 	EndLock();
 
 	if ( bLoaded )
@@ -2155,7 +2570,7 @@ bool CMDLCache::ReadMDLFile( MDLHandle_t handle, const char *pMDLFileName, CUtlB
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-studiohdr_t *CMDLCache::LockStudioHdr( MDLHandle_t handle )
+IStudioHdr *CMDLCache::LockStudioHdr( MDLHandle_t handle )
 {
 	if ( handle == MDLHANDLE_INVALID )
 	{
@@ -2171,7 +2586,7 @@ studiohdr_t *CMDLCache::LockStudioHdr( MDLHandle_t handle )
 	}
 
 	GetCacheSection( MDLCACHE_STUDIOHDR )->Lock( m_MDLDict[handle]->m_MDLCache );
-	return pStdioHdr;
+	return new CStudioHdr(pStdioHdr, this);
 }
 
 void CMDLCache::UnlockStudioHdr( MDLHandle_t handle )
@@ -2190,407 +2605,6 @@ void CMDLCache::UnlockStudioHdr( MDLHandle_t handle )
 	// @TODO (toml 9/12/2006) need this?: Release( handle );
 }
 
-class CStudioHdr : public IStudioHdr
-{
-public:
-	CStudioHdr(void);
-	CStudioHdr(const studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL);
-	~CStudioHdr() { Term(); }
-
-	void Init(const studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL);
-	void Term();
-
-public:
-	inline bool IsVirtual(void) { return (m_pVModel != NULL); };
-	inline bool IsValid(void) { return (m_pStudioHdr != NULL); };
-	inline bool IsReadyForAccess(void) const { return (m_pStudioHdr != NULL); };
-	inline virtualmodel_t* GetVirtualModel(void) const { return m_pVModel; };
-	inline const studiohdr_t* GetRenderHdr(void) const { return m_pStudioHdr; };
-	const studiohdr_t* pSeqStudioHdr(int sequence);
-	const studiohdr_t* pAnimStudioHdr(int animation);
-
-private:
-	mutable const studiohdr_t* m_pStudioHdr;
-	mutable virtualmodel_t* m_pVModel;
-
-	const virtualmodel_t* ResetVModel(const virtualmodel_t* pVModel) const;
-	const studiohdr_t* GroupStudioHdr(int group);
-	mutable CUtlVector< const studiohdr_t* > m_pStudioHdrCache;
-
-	mutable int			m_nFrameUnlockCounter;
-	int* m_pFrameUnlockCounter;
-	CThreadFastMutex	m_FrameUnlockCounterMutex;
-
-public:
-	inline int			numbones(void) const { return m_pStudioHdr->numbones; };
-	inline mstudiobone_t* pBone(int i) const { return m_pStudioHdr->pBone(i); };
-	int					RemapAnimBone(int iAnim, int iLocalBone) const;		// maps local animations bone to global bone
-	int					RemapSeqBone(int iSequence, int iLocalBone) const;	// maps local sequence bone to global bone
-
-	bool				SequencesAvailable() const;
-	int					GetNumSeq(void) const;
-	mstudioanimdesc_t& pAnimdesc(int i);
-	mstudioseqdesc_t& pSeqdesc(int iSequence);
-	int					iRelativeAnim(int baseseq, int relanim) const;	// maps seq local anim reference to global anim index
-	int					iRelativeSeq(int baseseq, int relseq) const;		// maps seq local seq reference to global seq index
-
-	//int					GetSequenceActivity( int iSequence );
-	//void				SetSequenceActivity( int iSequence, int iActivity );
-	int					GetActivityListVersion(void);
-	void				SetActivityListVersion(int version);
-	int					GetEventListVersion(void);
-	void				SetEventListVersion(int version);
-
-	int					GetNumAttachments(void) const;
-	const mstudioattachment_t& pAttachment(int i);
-	int					GetAttachmentBone(int i);
-	// used on my tools in hlmv, not persistant
-	void				SetAttachmentBone(int iAttachment, int iBone);
-
-	int					EntryNode(int iSequence);
-	int					ExitNode(int iSequence);
-	char* pszNodeName(int iNode);
-	// FIXME: where should this one be?
-	int					GetTransition(int iFrom, int iTo) const;
-
-	int					GetNumPoseParameters(void) const;
-	const mstudioposeparamdesc_t& pPoseParameter(int i);
-	int					GetSharedPoseParameter(int iSequence, int iLocalPose) const;
-
-	int					GetNumIKAutoplayLocks(void) const;
-	const mstudioiklock_t& pIKAutoplayLock(int i);
-
-	inline int			CountAutoplaySequences() const { return m_pStudioHdr->CountAutoplaySequences(); };
-	inline int			CopyAutoplaySequences(unsigned short* pOut, int outCount) const { return m_pStudioHdr->CopyAutoplaySequences(pOut, outCount); };
-	inline int			GetAutoplayList(unsigned short** pOut) const { return m_pStudioHdr->GetAutoplayList(pOut); };
-
-	inline int			GetNumBoneControllers(void) const { return m_pStudioHdr->numbonecontrollers; };
-	inline mstudiobonecontroller_t* pBonecontroller(int i) const { return m_pStudioHdr->pBonecontroller(i); };
-
-	inline int			numikchains() const { return m_pStudioHdr->numikchains; };
-	inline int			GetNumIKChains(void) const { return m_pStudioHdr->numikchains; };
-	inline mstudioikchain_t* pIKChain(int i) const { return m_pStudioHdr->pIKChain(i); };
-
-	inline int			numflexrules() const { return m_pStudioHdr->numflexrules; };
-	inline mstudioflexrule_t* pFlexRule(int i) const { return m_pStudioHdr->pFlexRule(i); };
-
-	inline int			numflexdesc() const { return m_pStudioHdr->numflexdesc; };
-	inline mstudioflexdesc_t* pFlexdesc(int i) const { return m_pStudioHdr->pFlexdesc(i); };
-
-	inline LocalFlexController_t			numflexcontrollers() const { return (LocalFlexController_t)m_pStudioHdr->numflexcontrollers; };
-	inline mstudioflexcontroller_t* pFlexcontroller(LocalFlexController_t i) const { return m_pStudioHdr->pFlexcontroller(i); };
-
-	inline int			numflexcontrollerui() const { return m_pStudioHdr->numflexcontrollerui; };
-	inline mstudioflexcontrollerui_t* pFlexcontrollerUI(int i) const { return m_pStudioHdr->pFlexControllerUI(i); };
-
-	//inline const char	*name() const { return m_pStudioHdr->name; }; // deprecated -- remove after full xbox merge
-	inline const char* pszName() const { return m_pStudioHdr->pszName(); };
-
-	inline int			numbonecontrollers() const { return m_pStudioHdr->numbonecontrollers; };
-
-	inline int			numhitboxsets() const { return m_pStudioHdr->numhitboxsets; };
-	inline mstudiohitboxset_t* pHitboxSet(int i) const { return m_pStudioHdr->pHitboxSet(i); };
-
-	inline mstudiobbox_t* pHitbox(int i, int set) const { return m_pStudioHdr->pHitbox(i, set); };
-	inline int			iHitboxCount(int set) const { return m_pStudioHdr->iHitboxCount(set); };
-
-	inline int			numbodyparts() const { return m_pStudioHdr->numbodyparts; };
-	inline mstudiobodyparts_t* pBodypart(int i) const { return m_pStudioHdr->pBodypart(i); };
-
-	inline int			numskinfamilies() const { return m_pStudioHdr->numskinfamilies; }
-
-	inline Vector		eyeposition() const { return m_pStudioHdr->eyeposition; };
-
-	inline int			flags() const { return m_pStudioHdr->flags; };
-
-	inline char* const pszSurfaceProp(void) const { return m_pStudioHdr->pszSurfaceProp(); };
-
-	inline float		mass() const { return m_pStudioHdr->mass; };
-	inline int			contents() const { return m_pStudioHdr->contents; }
-
-	inline const byte* GetBoneTableSortedByName() const { return m_pStudioHdr->GetBoneTableSortedByName(); };
-
-	inline Vector		illumposition() const { return m_pStudioHdr->illumposition; };
-
-	inline Vector		hull_min() const { return m_pStudioHdr->hull_min; };		// ideal movement hull size
-	inline Vector		hull_max() const { return m_pStudioHdr->hull_max; };
-
-	inline Vector		view_bbmin() const { return m_pStudioHdr->view_bbmin; };		// clipping bounding box
-	inline Vector		view_bbmax() const { return m_pStudioHdr->view_bbmax; };
-
-	inline int			numtextures() const { return m_pStudioHdr->numtextures; };
-
-	inline int			IllumPositionAttachmentIndex() const { return m_pStudioHdr->IllumPositionAttachmentIndex(); }
-
-	inline float		MaxEyeDeflection() const { return m_pStudioHdr->MaxEyeDeflection(); }
-
-	inline mstudiolinearbone_t* pLinearBones() const { return m_pStudioHdr->pLinearBones(); }
-
-	inline int			BoneFlexDriverCount() const { return m_pStudioHdr->BoneFlexDriverCount(); }
-	inline const mstudioboneflexdriver_t* BoneFlexDriver(int i) const { return m_pStudioHdr->BoneFlexDriver(i); }
-
-	inline float		VertAnimFixedPointScale() const { return m_pStudioHdr->VertAnimFixedPointScale(); }
-
-public:
-	//int IsSequenceLooping( int iSequence );
-	//float GetSequenceCycleRate( int iSequence );
-
-	void				RunFlexRules(const float* src, float* dest);
-
-
-public:
-	inline int boneFlags(int iBone) const { return m_boneFlags[iBone]; }
-	inline int boneParent(int iBone) const { return m_boneParent[iBone]; }
-
-private:
-	CUtlVector< int >  m_boneFlags;
-	CUtlVector< int >  m_boneParent;
-
-public:
-
-	// This class maps an activity to sequences allowed for that activity, accelerating the resolution
-	// of SelectWeightedSequence(), especially on PowerPC. Iterating through every sequence
-	// attached to a model turned out to be a very destructive cache access pattern on 360.
-	// 
-	// I've encapsulated this behavior inside a nested class for organizational reasons; there is
-	// no particular programmatic or efficiency benefit to it. It just makes clearer what particular
-	// code in the otherwise very complicated StudioHdr class has to do with this particular
-	// optimization, and it lets you collapse the whole definition down to a single line in Visual
-	// Studio.
-	class CActivityToSequenceMapping /* final */
-	{
-	public:
-		// A tuple of a sequence and its corresponding weight. Lists of these correspond to activities.
-		struct SequenceTuple
-		{
-			short		seqnum;
-			short		weight; // the absolute value of the weight from the sequence header
-			CUtlSymbol* pActivityModifiers;		// list of activity modifier symbols
-			int			iNumActivityModifiers;
-		};
-
-		// The type of the hash's stored data, a composite of both key and value
-		// (because that's how CUtlHash works):
-		// key: an int, the activity #
-		// values: an index into the m_pSequenceTuples array, a count of the
-		// total sequences present for an activity, and the sum of their
-		// weights.
-		// Note this struct is 128-bits wide, exactly coincident to a PowerPC 
-		// cache line and VMX register. Please consider very carefully the
-		// performance implications before adding any additional fields to this.
-		// You could probably do away with totalWeight if you really had to.
-		struct HashValueType
-		{
-			// KEY (hashed)
-			int activityIdx;
-
-			// VALUE (not hashed)
-			int startingIdx;
-			int count;
-			int totalWeight;
-
-			HashValueType(int _actIdx, int _stIdx, int _ct, int _tW) :
-				activityIdx(_actIdx), startingIdx(_stIdx), count(_ct), totalWeight(_tW) {}
-
-			// default constructor (ought not to be actually used)
-			HashValueType() : activityIdx(-1), startingIdx(-1), count(-1), totalWeight(-1)
-			{
-				AssertMsg(false, "Don't use default HashValueType()!");
-			}
-
-
-			class HashFuncs
-			{
-			public:
-				// dummy constructor (gndn)
-				HashFuncs(int) {}
-
-				// COMPARE
-				// compare two entries for uniqueness. We should never have two different
-				// entries for the same activity, so we only compare the activity index;
-				// this allows us to use the utlhash as a dict by constructing dummy entries
-				// as hash lookup keys.
-				bool operator()(const HashValueType& lhs, const HashValueType& rhs) const
-				{
-					return lhs.activityIdx == rhs.activityIdx;
-				}
-
-				// HASH
-				// We only hash on the activity index; everything else is data.
-				unsigned int operator()(const HashValueType& item) const
-				{
-					return HashInt(item.activityIdx);
-				}
-			};
-		};
-
-		typedef CUtlHash<HashValueType, HashValueType::HashFuncs, HashValueType::HashFuncs> ActivityToValueIdxHash;
-
-		// These must be here because IFM does not compile/link studio.cpp (?!?)
-
-		// ctor
-		CActivityToSequenceMapping(void)
-			: m_pSequenceTuples(NULL), m_iSequenceTuplesCount(0), m_ActToSeqHash(8, 0, 0), m_expectedPStudioHdr(NULL), m_expectedVModel(NULL)
-#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
-			, m_bIsInitialized(false)
-#endif
-		{};
-
-		// dtor -- not virtual because this class has no inheritors
-		~CActivityToSequenceMapping()
-		{
-			if (m_pSequenceTuples != NULL)
-			{
-				if (m_pSequenceTuples->pActivityModifiers != NULL)
-				{
-					delete[] m_pSequenceTuples->pActivityModifiers;
-				}
-				delete[] m_pSequenceTuples;
-			}
-		}
-
-		/// Get the list of sequences for an activity. Returns the pointer to the
-		/// first sequence tuple. Output parameters are a count of sequences present,
-		/// and the total weight of all the sequences. (it would be more LHS-friendly
-		/// to return these on registers, if only C++ offered more than one return 
-		/// value....)
-		const SequenceTuple* GetSequences(int forActivity, int* outSequenceCount, int* outTotalWeight);
-
-		/// The number of sequences available for an activity.
-		int NumSequencesForActivity(int forActivity);
-
-#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
-		inline bool IsInitialized(void) { return m_bIsInitialized; }
-#endif
-
-	private:
-
-		/// Allocate my internal array. (It is freed in the destructor.) Also,
-		/// build the hash of activities to sequences and populate m_pSequenceTuples.
-		void Initialize(CStudioHdr* pstudiohdr);
-
-		/// Force Initialize() to occur again, even if it has already occured.
-		void Reinitialize(CStudioHdr* pstudiohdr);
-
-		/// A more efficient version of the old SelectWeightedSequence() function in animation.cpp. 
-		int SelectWeightedSequence(CStudioHdr* pstudiohdr, int activity, int curSequence, RandomWeightFunc pRandomWeightFunc);
-
-		// selects the sequence with the most matching modifiers
-		//int SelectWeightedSequenceFromModifiers( CStudioHdr *pstudiohdr, int activity, CUtlSymbol *pActivityModifiers, int iModifierCount );
-
-		// Actually a big array, into which the hash values index.
-		SequenceTuple* m_pSequenceTuples;
-		unsigned int m_iSequenceTuplesCount; // (size of the whole array)
-#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
-		bool m_bIsInitialized;
-#endif
-
-		// we don't store an outer pointer because we can't initialize it at construction time
-		// (warning c4355) -- there are ways around this but it's easier to just pass in a 
-		// pointer to the CStudioHdr when we need it, since this class isn't supposed to 
-		// export its interface outside the studio header anyway.
-		// CStudioHdr * const m_pOuter;
-
-		ActivityToValueIdxHash m_ActToSeqHash;
-
-		// we store these so we can know if the contents of the studiohdr have changed
-		// from underneath our feet (this is an emergency data integrity check)
-		const void* m_expectedPStudioHdr;
-		const void* m_expectedVModel;
-
-		// double-check that the data I point to hasn't changed
-		bool ValidateAgainst(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT;
-		void SetValidationPair(const CStudioHdr* RESTRICT pstudiohdr) RESTRICT;
-
-		friend class CStudioHdr;
-	};
-
-	CActivityToSequenceMapping m_ActivityToSequence;
-
-	/// A more efficient version of the old SelectWeightedSequence() function in animation.cpp. 
-	/// Returns -1 on failure to find a sequence
-	inline int SelectWeightedSequence(int activity, int curSequence, RandomWeightFunc pRandomWeightFunc)
-	{
-#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
-		// We lazy-initialize the header on demand here, because CStudioHdr::Init() is
-		// called from the constructor, at which time the this pointer is illegitimate.
-		if (!m_ActivityToSequence.IsInitialized())
-		{
-			m_ActivityToSequence.Initialize(this);
-		}
-#endif
-		return m_ActivityToSequence.SelectWeightedSequence(this, activity, curSequence, pRandomWeightFunc);
-	}
-
-	//	inline int SelectWeightedSequenceFromModifiers( int activity, CUtlSymbol *pActivityModifiers, int iModifierCount )
-	//	{
-	//#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
-	//		// We lazy-initialize the header on demand here, because CStudioHdr::Init() is
-	//		// called from the constructor, at which time the this pointer is illegitimate.
-	//		if ( !m_ActivityToSequence.IsInitialized() )
-	//		{
-	//			m_ActivityToSequence.Initialize( this );
-	//		}
-	//#endif
-	//		return m_ActivityToSequence.SelectWeightedSequenceFromModifiers( this, activity, pActivityModifiers, iModifierCount );
-	//	}
-
-		/// True iff there is at least one sequence for the given activity.
-	inline bool HaveSequenceForActivity(int activity)
-	{
-#if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
-		if (!m_ActivityToSequence.IsInitialized())
-		{
-			m_ActivityToSequence.Initialize(this);
-		}
-#endif
-		return (m_ActivityToSequence.NumSequencesForActivity(activity) > 0);
-	}
-
-	// Force this CStudioHdr's activity-to-sequence mapping to be reinitialized
-	inline void ReinitializeSequenceMapping(void)
-	{
-		m_ActivityToSequence.Reinitialize(this);
-	}
-
-#ifdef STUDIO_ENABLE_PERF_COUNTERS
-public:
-
-	int GetPerfAnimationLayers() const {
-		return m_nPerfAnimationLayers;
-	}
-	int GetPerfAnimatedBones() const {
-		return m_nPerfAnimatedBones;
-	}
-	int GetPerfUsedBones() const {
-		return m_nPerfUsedBones;
-	}
-
-	void IncPerfAnimationLayers(void) const {
-		m_nPerfAnimationLayers++;
-	}
-	void IncPerfAnimatedBones(void) const {
-		m_nPerfAnimatedBones++;
-	}
-	void IncPerfUsedBones(void) const {
-		m_nPerfUsedBones++;
-	}
-	inline void ClearPerfCounters(void)
-	{
-		m_nPerfAnimatedBones = 0;
-		m_nPerfUsedBones = 0;
-		m_nPerfAnimationLayers = 0;
-	};
-
-	// timing info
-	mutable	int			m_nPerfAnimatedBones;
-	mutable	int			m_nPerfUsedBones;
-	mutable	int			m_nPerfAnimationLayers;
-#endif
-
-
-};
-
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -2604,7 +2618,7 @@ CStudioHdr::CStudioHdr(void)
 	Init(NULL);
 }
 
-CStudioHdr::CStudioHdr(const studiohdr_t* pStudioHdr, IMDLCache* mdlcache)
+CStudioHdr::CStudioHdr(studiohdr_t* pStudioHdr, IMDLCache* mdlcache)
 {
 	// preset pointer to bogus value (it may be overwritten with legitimate data later)
 	m_nFrameUnlockCounter = 0;
@@ -2615,7 +2629,7 @@ CStudioHdr::CStudioHdr(const studiohdr_t* pStudioHdr, IMDLCache* mdlcache)
 
 // extern IDataCache *g_pDataCache;
 
-void CStudioHdr::Init(const studiohdr_t* pStudioHdr, IMDLCache* mdlcache)
+void CStudioHdr::Init(studiohdr_t* pStudioHdr, IMDLCache* mdlcache)
 {
 	m_pStudioHdr = pStudioHdr;
 
@@ -3819,7 +3833,7 @@ IStudioHdr* CMDLCache::GetIStudioHdr(MDLHandle_t handle)
 	return new CStudioHdr(GetStudioHdr(handle), this);
 }
 
-IStudioHdr* CMDLCache::GetIStudioHdr(const studiohdr_t* pStudioHdr)
+IStudioHdr* CMDLCache::GetIStudioHdr(studiohdr_t* pStudioHdr)
 {
 	return new CStudioHdr(pStudioHdr, this);
 }

@@ -138,7 +138,7 @@ public:
 	// Maybe through modelcache???
 	virtual model_t		*GetModel( HTOOLHANDLE hEntity );
 	// Get the .mdl file used by entity (if it's a cbaseanimating)
-	virtual studiohdr_t *GetStudioModel( HTOOLHANDLE hEntity );
+	virtual IStudioHdr *GetStudioModel( HTOOLHANDLE hEntity );
 
 	// SINGLE PLAYER/LISTEN SERVER ONLY (just matching the client .dll api for this)
 	// Prints the formatted string to the notification area of the screen ( down the right hand edge
@@ -538,7 +538,7 @@ model_t *CEngineTool::GetModel( HTOOLHANDLE hEntity )
 	return NULL;
 }
 
-studiohdr_t *CEngineTool::GetStudioModel( HTOOLHANDLE hEntity )
+IStudioHdr *CEngineTool::GetStudioModel( HTOOLHANDLE hEntity )
 {
 	Assert( 0 );
 	return NULL;

@@ -229,8 +229,8 @@ void CStudioRender::R_StudioFlexVerts( mstudiomesh_t *pmesh, int lod )
 	}
 
 	// The flex data should have been converted to the new (fixed-point) format on load:
-	Assert( m_pStudioHdr->flags & STUDIOHDR_FLAGS_FLEXES_CONVERTED );
-	if ( ( m_pStudioHdr->flags & STUDIOHDR_FLAGS_FLEXES_CONVERTED ) == 0 )
+	Assert( m_pStudioHdr->flags() & STUDIOHDR_FLAGS_FLEXES_CONVERTED);
+	if ( ( m_pStudioHdr->flags() & STUDIOHDR_FLAGS_FLEXES_CONVERTED) == 0)
 	{
 		static unsigned int flexConversionTimesWarned = 0;
 		if ( flexConversionTimesWarned++ < 6 )

@@ -118,11 +118,11 @@ public:
 	CachedPosNorm_t* CreateWorldVertex( int vertex );
 
 	template< class T >
-	void ComputeFlexedVertex_StreamOffset( studiohdr_t *pStudioHdr, mstudioflex_t *pflex, T *pvanim, int vertCount, float w1, float w2, float w3, float w4 );
+	void ComputeFlexedVertex_StreamOffset( IStudioHdr *pStudioHdr, mstudioflex_t *pflex, T *pvanim, int vertCount, float w1, float w2, float w3, float w4 );
 
 #ifdef PLATFORM_WINDOWS
-	void ComputeFlexedVertex_StreamOffset_Optimized( studiohdr_t *pStudioHdr, mstudioflex_t *pflex, mstudiovertanim_t *pvanim, int vertCount, float w1, float w2, float w3, float w4);
-	void ComputeFlexedVertexWrinkle_StreamOffset_Optimized( studiohdr_t *pStudioHdr, mstudioflex_t *pflex, mstudiovertanim_wrinkle_t *pvanim, int vertCount, float w1, float w2, float w3, float w4);
+	void ComputeFlexedVertex_StreamOffset_Optimized( IStudioHdr *pStudioHdr, mstudioflex_t *pflex, mstudiovertanim_t *pvanim, int vertCount, float w1, float w2, float w3, float w4);
+	void ComputeFlexedVertexWrinkle_StreamOffset_Optimized( IStudioHdr *pStudioHdr, mstudioflex_t *pflex, mstudiovertanim_wrinkle_t *pvanim, int vertCount, float w1, float w2, float w3, float w4);
 #endif // PLATFORM_WINDOWS
 
 private:
@@ -284,7 +284,7 @@ inline void CCachedRenderData::SetBodyModelMesh( int body, int model, int mesh)
 // Output : none
 //-----------------------------------------------------------------------------
 template< class T > 
-void CCachedRenderData::ComputeFlexedVertex_StreamOffset( studiohdr_t *pStudioHdr, mstudioflex_t *pflex, 
+void CCachedRenderData::ComputeFlexedVertex_StreamOffset( IStudioHdr *pStudioHdr, mstudioflex_t *pflex, 
 	T *pvanim, int vertCount, float w1, float w2, float w3, float w4 )
 {
 	float w12 = w1 - w2;

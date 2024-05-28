@@ -2447,7 +2447,7 @@ typedef int (*RandomWeightFunc)(int iMinVal, int iMaxVal);
 class IStudioHdr {
 public:
 	virtual ~IStudioHdr(){}
-	virtual void Init(const studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL) = 0;
+	virtual void Init(studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL) = 0;
 	virtual void Term() = 0;
 
 	virtual bool IsVirtual(void) = 0;
@@ -2537,7 +2537,7 @@ public:
 
 	virtual Vector		eyeposition() const = 0;
 
-	virtual int			flags() const = 0;
+	virtual int&		flags() = 0;
 
 	virtual char* const pszSurfaceProp(void) const = 0;
 
@@ -2588,6 +2588,19 @@ public:
 
 	virtual bool HaveSequenceForActivity(int activity) = 0;
 	virtual int SelectWeightedSequence(int activity, int curSequence, RandomWeightFunc pRandomWeightFunc) = 0;
+
+	virtual int nummouths() = 0;
+	virtual int	numskinref() const = 0;
+	virtual short* pSkinref(int i) const = 0;
+	virtual byte constdirectionallightdot() = 0;
+	virtual vertexFileHeader_t* CacheVertexData() = 0;
+	virtual mstudiomouth_t* pMouth(int i) const = 0;
+	virtual int checksum() = 0;
+	virtual byte rootLOD() = 0;
+	virtual int textureindex() = 0;
+	virtual int numcdtextures() = 0;
+	virtual char* pCdtexture(int i) const = 0;
+	virtual mstudiotexture_t* pTexture(int i) const = 0;
 
 };
 

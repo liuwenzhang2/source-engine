@@ -21,14 +21,14 @@
 //-----------------------------------------------------------------------------
 // Foward declarations
 //-----------------------------------------------------------------------------
-class IStudioDataCache;
+//class IStudioDataCache;
 class CStudioRender;
 
 
 //-----------------------------------------------------------------------------
 // Global interfaces
 //-----------------------------------------------------------------------------
-extern IStudioDataCache *g_pStudioDataCache;
+//extern IStudioDataCache *g_pStudioDataCache;
 extern CStudioRender *g_pStudioRenderImp;
 
 IMaterial* GetModelSpecificDecalMaterial( IMaterial* pDecalMaterial );
@@ -121,10 +121,10 @@ public:
 	virtual void Mat_Stub( IMaterialSystem *pMatSys );
 	virtual void UpdateConfig( const StudioRenderConfig_t& config );
 	virtual void GetCurrentConfig( StudioRenderConfig_t& config );
-	virtual bool LoadModel(studiohdr_t *pStudioHdr, void *pVtxData, studiohwdata_t *pHardwareData);
+	virtual bool LoadModel(IStudioHdr *pStudioHdr, void *pVtxData, studiohwdata_t *pHardwareData);
 	virtual void UnloadModel( studiohwdata_t *pHardwareData );
-	virtual void RefreshStudioHdr( studiohdr_t* pStudioHdr, studiohwdata_t* pHardwareData );
-	virtual void SetEyeViewTarget( const studiohdr_t *pStudioHdr, int nBodyIndex, const Vector& worldPosition );
+	virtual void RefreshStudioHdr( IStudioHdr* pStudioHdr, studiohwdata_t* pHardwareData );
+	virtual void SetEyeViewTarget( const IStudioHdr *pStudioHdr, int nBodyIndex, const Vector& worldPosition );
 	virtual void SetAmbientLightColors( const Vector *pAmbientOnlyColors );
 	virtual void SetAmbientLightColors( const Vector4D *pAmbientOnlyColors );
 	virtual void SetLocalLights( int numLights, const LightDesc_t *pLights );
@@ -144,7 +144,7 @@ public:
 	virtual void ForcedMaterialOverride( IMaterial *newMaterial, OverrideType_t nOverrideType = OVERRIDE_NORMAL );
 	DELEGATE_TO_OBJECT_1( StudioDecalHandle_t, CreateDecalList, studiohwdata_t *, g_pStudioRenderImp );
 	virtual void DestroyDecalList( StudioDecalHandle_t handle );
-	virtual void AddDecal( StudioDecalHandle_t handle, studiohdr_t *pStudioHdr, matrix3x4_t *pBoneToWorld, const Ray_t & ray, const Vector& decalUp, IMaterial* pDecalMaterial, float radius, int body, bool noPokethru, int maxLODToDecal = ADDDECAL_TO_ALL_LODS );
+	virtual void AddDecal( StudioDecalHandle_t handle, IStudioHdr *pStudioHdr, matrix3x4_t *pBoneToWorld, const Ray_t & ray, const Vector& decalUp, IMaterial* pDecalMaterial, float radius, int body, bool noPokethru, int maxLODToDecal = ADDDECAL_TO_ALL_LODS );
 	virtual void ComputeLighting( const Vector* pAmbient, int lightCount, LightDesc_t* pLights, const Vector& pt, const Vector& normal, Vector& lighting );
 	virtual void ComputeLightingConstDirectional( const Vector* pAmbient, int lightCount, LightDesc_t* pLights, const Vector& pt, const Vector& normal, Vector& lighting, float flDirectionalAmount );
 	virtual void AddShadow( IMaterial* pMaterial, void* pProxyData, FlashlightState_t *pFlashlightState, VMatrix *pWorldToTexture, ITexture *pFlashlightDepthTexture );
@@ -152,7 +152,7 @@ public:
 	virtual int ComputeModelLod( studiohwdata_t* pHardwareData, float flUnitSphereSize, float *pMetric = NULL );
 	virtual void GetPerfStats( DrawModelResults_t *pResults, const DrawModelInfo_t &info, CUtlBuffer *pSpewBuf = NULL ) const;
 	virtual void GetTriangles( const DrawModelInfo_t& info, matrix3x4_t *pBoneToWorld, GetTriangles_Output_t &out );
-	virtual int GetMaterialList( studiohdr_t *pStudioHdr, int count, IMaterial** ppMaterials );
+	virtual int GetMaterialList( IStudioHdr *pStudioHdr, int count, IMaterial** ppMaterials );
 	virtual int GetMaterialListFromBodyAndSkin( MDLHandle_t studio, int nSkin, int nBody, int nCountOutputMaterials, IMaterial** ppOutputMaterials );
 	virtual matrix3x4_t* LockBoneMatrices( int nCount );
 	virtual void UnlockBoneMatrices();
@@ -167,15 +167,15 @@ public:
 
 private:
 	// Load, unload materials
-	void LoadMaterials( studiohdr_t *phdr, OptimizedModel::FileHeader_t *, studioloddata_t &lodData, int lodID );
+	void LoadMaterials( IStudioHdr *phdr, OptimizedModel::FileHeader_t *, studioloddata_t &lodData, int lodID );
 
 	// Determines material flags
-	void ComputeMaterialFlags( studiohdr_t *phdr, studioloddata_t &lodData, IMaterial *pMaterial );
+	void ComputeMaterialFlags( IStudioHdr *phdr, studioloddata_t &lodData, IMaterial *pMaterial );
 
 	// Creates, destroys static meshes
-	void R_StudioCreateStaticMeshes( studiohdr_t *pStudioHdr, OptimizedModel::FileHeader_t* pVtxHdr,
+	void R_StudioCreateStaticMeshes( IStudioHdr *pStudioHdr, OptimizedModel::FileHeader_t* pVtxHdr,
 		studiohwdata_t *pStudioHWData, int lodID, int *pColorMeshID );
-	void R_StudioCreateSingleMesh( studiohdr_t *pStudioHdr, studioloddata_t *pStudioLodData, 
+	void R_StudioCreateSingleMesh( IStudioHdr *pStudioHdr, studioloddata_t *pStudioLodData, 
 		mstudiomesh_t* pMesh, OptimizedModel::MeshHeader_t* pVtxMesh, int numBones, 
 		studiomeshdata_t* pMeshData, int *pColorMeshID );
 	void R_StudioDestroyStaticMeshes( int numStudioMeshes, studiomeshdata_t **ppStudioMeshes );
@@ -190,21 +190,21 @@ private:
 	int CountFlexedVertices( mstudiomesh_t* pMesh, OptimizedModel::StripGroupHeader_t* pStripGroup );
 
 	// Builds morph data
-	void R_StudioBuildMorph( studiohdr_t *pStudioHdr, studiomeshgroup_t* pMeshGroup,	mstudiomesh_t* pMesh,
+	void R_StudioBuildMorph( IStudioHdr *pStudioHdr, studiomeshgroup_t* pMeshGroup,	mstudiomesh_t* pMesh,
 		OptimizedModel::StripGroupHeader_t *pStripGroup );
 
 	// Builds the decal bone remap for a particular mesh
-	void ComputeHWMorphDecalBoneRemap( studiohdr_t *pStudioHdr, OptimizedModel::FileHeader_t *pVtxHdr, studiohwdata_t *pStudioHWData, int nLOD );
-	void BuildDecalBoneMap( studiohdr_t *pStudioHdr, int *pUsedBones, int *pBoneRemap, int *pMaxBoneCount, mstudiomesh_t* pMesh, OptimizedModel::StripGroupHeader_t* pStripGroup );
+	void ComputeHWMorphDecalBoneRemap( IStudioHdr *pStudioHdr, OptimizedModel::FileHeader_t *pVtxHdr, studiohwdata_t *pStudioHWData, int nLOD );
+	void BuildDecalBoneMap( IStudioHdr *pStudioHdr, int *pUsedBones, int *pBoneRemap, int *pMaxBoneCount, mstudiomesh_t* pMesh, OptimizedModel::StripGroupHeader_t* pStripGroup );
 
 	// Helper methods used to construct static meshes
 	int GetNumBoneWeights( const OptimizedModel::StripGroupHeader_t *pGroup );
-	VertexFormat_t CalculateVertexFormat( const studiohdr_t *pStudioHdr, const studioloddata_t *pStudioLodData,
+	VertexFormat_t CalculateVertexFormat( const IStudioHdr *pStudioHdr, const studioloddata_t *pStudioLodData,
 																const mstudiomesh_t* pMesh, OptimizedModel::StripGroupHeader_t *pGroup, bool bIsHwSkinned );
-	bool MeshNeedsTangentSpace( studiohdr_t *pStudioHdr, studioloddata_t *pStudioLodData, mstudiomesh_t* pMesh );
+	bool MeshNeedsTangentSpace( IStudioHdr *pStudioHdr, studioloddata_t *pStudioLodData, mstudiomesh_t* pMesh );
 	void R_StudioBuildMeshGroup( const char *pModelName, bool bNeedsTangentSpace, studiomeshgroup_t* pMeshGroup,
 		OptimizedModel::StripGroupHeader_t *pStripGroup, mstudiomesh_t* pMesh,
-		studiohdr_t *pStudioHdr, VertexFormat_t vertexFormat );
+		IStudioHdr *pStudioHdr, VertexFormat_t vertexFormat );
 	void R_StudioBuildMeshStrips( studiomeshgroup_t* pMeshGroup,
 		OptimizedModel::StripGroupHeader_t *pStripGroup );
 	template <VertexCompressionType_t T> bool R_AddVertexToMesh( const char *pModelName, bool bNeedsTangentSpace, CMeshBuilder& meshBuilder, 

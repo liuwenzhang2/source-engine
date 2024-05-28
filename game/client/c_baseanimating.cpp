@@ -929,32 +929,32 @@ void C_BaseAnimating::LockStudioHdr()
 	if ( m_hStudioHdr == MDLHANDLE_INVALID )
 		return;
 
-	const studiohdr_t *pStudioHdr = mdlcache->LockStudioHdr( m_hStudioHdr );
+	IStudioHdr *pStudioHdr = mdlcache->LockStudioHdr( m_hStudioHdr );
 	if ( !pStudioHdr )
 	{
 		m_hStudioHdr = MDLHANDLE_INVALID;
 		return;
 	}
 
-	IStudioHdr *pNewWrapper = mdlcache->GetIStudioHdr(pStudioHdr);
+	//IStudioHdr *pNewWrapper = mdlcache->GetIStudioHdr(pStudioHdr);
 	//pNewWrapper->Init( pStudioHdr, mdlcache );
-	Assert( pNewWrapper->IsValid() );
+	Assert(pStudioHdr->IsValid() );
 	
-	if ( pNewWrapper->GetVirtualModel() )
-	{
-		MDLHandle_t hVirtualModel = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
-		mdlcache->LockStudioHdr( hVirtualModel );
-	}
+	//if ( pStudioHdr->GetVirtualModel() )
+	//{
+	//	MDLHandle_t hVirtualModel = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
+	//	mdlcache->LockStudioHdr( hVirtualModel );
+	//}
 
-	m_pStudioHdr = pNewWrapper; // must be last to ensure virtual model correctly set up
+	m_pStudioHdr = pStudioHdr;// pNewWrapper; // must be last to ensure virtual model correctly set up
 }
 
 void C_BaseAnimating::UnlockStudioHdr()
 {
 	if ( m_hStudioHdr != MDLHANDLE_INVALID )
 	{
-		studiohdr_t *pStudioHdr = mdlcache->GetStudioHdr( m_hStudioHdr );
-		Assert( m_pStudioHdr && m_pStudioHdr->GetRenderHdr() == pStudioHdr );
+		//studiohdr_t *pStudioHdr = mdlcache->GetStudioHdr( m_hStudioHdr );
+		//Assert( m_pStudioHdr && m_pStudioHdr->GetRenderHdr() == pStudioHdr );
 
 #if 0
 		// XXX need to figure out where to flush the queue on map change to not crash
@@ -972,14 +972,16 @@ void C_BaseAnimating::UnlockStudioHdr()
 #endif
 		{
 			// Immediate-mode rendering, can unlock immediately
-			if ( pStudioHdr->GetVirtualModel() )
-			{
-				MDLHandle_t hVirtualModel = VoidPtrToMDLHandle( m_pStudioHdr->GetRenderHdr()->VirtualModel() );
-				mdlcache->UnlockStudioHdr( hVirtualModel );
-			}
+			//if ( pStudioHdr->GetVirtualModel() )
+			//{
+			//	MDLHandle_t hVirtualModel = VoidPtrToMDLHandle( m_pStudioHdr->GetRenderHdr()->VirtualModel() );
+			//	mdlcache->UnlockStudioHdr( hVirtualModel );
+			//}
 			mdlcache->UnlockStudioHdr( m_hStudioHdr );
 		}
 		m_hStudioHdr = MDLHANDLE_INVALID;
+		delete m_pStudioHdr;
+		m_pStudioHdr = NULL;
 	}
 }
 

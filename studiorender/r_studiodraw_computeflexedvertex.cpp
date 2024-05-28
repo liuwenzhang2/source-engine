@@ -1386,14 +1386,14 @@ void AlwaysAssert(bool mustBeTrue)
 #endif
 
 template
-void CCachedRenderData::ComputeFlexedVertex_StreamOffset<mstudiovertanim_t>( studiohdr_t *pStudioHdr, mstudioflex_t *pflex, 
+void CCachedRenderData::ComputeFlexedVertex_StreamOffset<mstudiovertanim_t>( IStudioHdr *pStudioHdr, mstudioflex_t *pflex, 
 														 mstudiovertanim_t *pvanim, int vertCount, float w1, float w2, float w3, float w4 );
 template
-void CCachedRenderData::ComputeFlexedVertex_StreamOffset<mstudiovertanim_wrinkle_t>( studiohdr_t *pStudioHdr, mstudioflex_t *pflex, 
+void CCachedRenderData::ComputeFlexedVertex_StreamOffset<mstudiovertanim_wrinkle_t>( IStudioHdr *pStudioHdr, mstudioflex_t *pflex, 
 														 mstudiovertanim_wrinkle_t *pvanim, int vertCount, float w1, float w2, float w3, float w4 );
 
 // vectorized
-void CCachedRenderData::ComputeFlexedVertex_StreamOffset_Optimized( studiohdr_t *pStudioHdr, mstudioflex_t *pflex, mstudiovertanim_t *pvanim, int vertCount, float w1, float w2, float w3, float w4 )
+void CCachedRenderData::ComputeFlexedVertex_StreamOffset_Optimized( IStudioHdr *pStudioHdr, mstudioflex_t *pflex, mstudiovertanim_t *pvanim, int vertCount, float w1, float w2, float w3, float w4 )
 {
 #if PROFILE_THIS_FILE
 	CMiniProfilerGuard mpguard(&g_mp_morph);
@@ -1514,7 +1514,7 @@ void CCachedRenderData::ComputeFlexedVertex_StreamOffset_Optimized( studiohdr_t 
 }
 
 
-void CCachedRenderData::ComputeFlexedVertexWrinkle_StreamOffset_Optimized( studiohdr_t *pStudioHdr, mstudioflex_t *pflex, mstudiovertanim_wrinkle_t *pvanim, int vertCount, float w1, float w2, float w3, float w4)
+void CCachedRenderData::ComputeFlexedVertexWrinkle_StreamOffset_Optimized( IStudioHdr *pStudioHdr, mstudioflex_t *pflex, mstudiovertanim_wrinkle_t *pvanim, int vertCount, float w1, float w2, float w3, float w4)
 {
 #if PROFILE_THIS_FILE
 	CMiniProfilerGuard mpguard(&g_mp_morph);

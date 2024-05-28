@@ -44,11 +44,11 @@ void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_
 	}
 
 	int nSkin = info.m_Skin;
-	if ( nSkin >= info.m_pStudioHdr->numskinfamilies )
+	if ( nSkin >= info.m_pStudioHdr->numskinfamilies() )
 	{
 		nSkin = 0;
 	}
-	short *pSkinRef	= info.m_pStudioHdr->pSkinref( nSkin * info.m_pStudioHdr->numskinref );
+	short *pSkinRef	= info.m_pStudioHdr->pSkinref( nSkin * info.m_pStudioHdr->numskinref() );
 
 	studiomeshdata_t *pStudioMeshes = info.m_pHardwareData->m_pLODs[lod].m_pMeshData;
 	IMaterial **ppMaterials = info.m_pHardwareData->m_pLODs[lod].ppMaterials;
@@ -58,7 +58,7 @@ void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_
 	ComputePoseToWorld( out.m_PoseToWorld, info.m_pStudioHdr, boneMask, m_RC.m_ViewOrigin, pBoneToWorld );
 
 	int i;
-	for (i=0 ; i < info.m_pStudioHdr->numbodyparts ; i++) 
+	for (i=0 ; i < info.m_pStudioHdr->numbodyparts() ; i++) 
 	{
 		mstudiomodel_t *pModel = NULL;
 		R_StudioSetupModel( i, info.m_Body, &pModel, info.m_pStudioHdr );

@@ -628,17 +628,17 @@ void CStudioRender::DrawModelArray( const DrawModelInfo_t &drawInfo, const Studi
 	studiomeshdata_t *pMeshDataBase = drawInfo.m_pHardwareData->m_pLODs[drawInfo.m_Lod].m_pMeshData;
 	IMaterial **ppMaterials = drawInfo.m_pHardwareData->m_pLODs[drawInfo.m_Lod].ppMaterials;
 	int *pMaterialFlags = drawInfo.m_pHardwareData->m_pLODs[drawInfo.m_Lod].pMaterialFlags;
-	studiohdr_t *pStudioHdr = drawInfo.m_pStudioHdr;
+	IStudioHdr *pStudioHdr = drawInfo.m_pStudioHdr;
 	m_bDrawTranslucentSubModels = false;
 
 	int skin = drawInfo.m_Skin;
 	short *pskinref	= pStudioHdr->pSkinref( 0 );
-	if ( skin > 0 && skin < pStudioHdr->numskinfamilies )
+	if ( skin > 0 && skin < pStudioHdr->numskinfamilies() )
 	{
-		pskinref += ( skin * pStudioHdr->numskinref );
+		pskinref += ( skin * pStudioHdr->numskinref() );
 	}
 
-	for ( int body = 0; body < pStudioHdr->numbodyparts; ++body ) 
+	for ( int body = 0; body < pStudioHdr->numbodyparts(); ++body ) 
 	{
 		mstudiobodyparts_t  *pbodypart = pStudioHdr->pBodypart( body );
 
@@ -698,7 +698,7 @@ void CStudioRender::DrawModelArray( const DrawModelInfo_t &drawInfo, const Studi
 
 				MaterialPrimitiveType_t stripType = MATERIAL_TRIANGLES;
 				pMesh->SetPrimitiveType(stripType);
-				if ( pStudioHdr->numbones > 1 )
+				if ( pStudioHdr->numbones() > 1)
 				{
 					byte *pData = (byte *)pInstanceData;
 					for ( int i = 0;i < arrayCount; i++, pData += instanceStride )

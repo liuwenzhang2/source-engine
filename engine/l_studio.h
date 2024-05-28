@@ -38,7 +38,7 @@ bool WorldLightToMaterialLight( dworldlight_t* worldlight, LightDesc_t& light );
 //-----------------------------------------------------------------------------
 // Computes the center of the studio model for illumination purposes
 //-----------------------------------------------------------------------------
-void R_ComputeLightingOrigin( IClientRenderable *pRenderable, studiohdr_t* pStudioHdr, const matrix3x4_t &matrix, Vector& center );
+void R_ComputeLightingOrigin( IClientRenderable *pRenderable, IStudioHdr* pStudioHdr, const matrix3x4_t &matrix, Vector& center );
 
 void DrawSavedModelDebugOverlays( void );
 

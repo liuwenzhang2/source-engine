@@ -12,7 +12,7 @@
 typedef struct tagMSG MSG;
 
 
-class IStudioDataCache;
+//class IStudioDataCache;
 
 
 //-----------------------------------------------------------------------------

@@ -202,7 +202,7 @@ struct ColorMeshInfo_t
 
 struct DrawModelInfo_t
 {
-	studiohdr_t		*m_pStudioHdr;
+	IStudioHdr		*m_pStudioHdr;
 	studiohwdata_t	*m_pHardwareData;
 	StudioDecalHandle_t m_Decals;
 	int				m_Skin;
@@ -256,14 +256,14 @@ struct model_array_instance_t
 // code expectes data to be dynamic and invokes cache callback prior to iterative access.
 // virtualModel is member passed in via studiohdr_t and passed back for model identification.
 //-----------------------------------------------------------------------------
-#define STUDIO_DATA_CACHE_INTERFACE_VERSION "VStudioDataCache005"
+//#define STUDIO_DATA_CACHE_INTERFACE_VERSION "VStudioDataCache005"
  
-abstract_class IStudioDataCache : public IAppSystem
-{
-public:
-	virtual bool VerifyHeaders( studiohdr_t *pStudioHdr ) = 0;
-	virtual vertexFileHeader_t *CacheVertexData( studiohdr_t *pStudioHdr ) = 0;
-};
+//abstract_class IStudioDataCache : public IAppSystem
+//{
+//public:
+//	virtual bool VerifyHeaders( studiohdr_t *pStudioHdr ) = 0;
+//	virtual vertexFileHeader_t *CacheVertexData( studiohdr_t *pStudioHdr ) = 0;
+//};
 
 
 //-----------------------------------------------------------------------------
@@ -285,14 +285,14 @@ public:
 	virtual void GetCurrentConfig( StudioRenderConfig_t& config ) = 0;
 
 	// Load, unload model data
-	virtual bool LoadModel( studiohdr_t *pStudioHdr, void *pVtxData, studiohwdata_t	*pHardwareData ) = 0;
+	virtual bool LoadModel( IStudioHdr *pStudioHdr, void *pVtxData, studiohwdata_t	*pHardwareData ) = 0;
 	virtual void UnloadModel( studiohwdata_t *pHardwareData ) = 0;
 
 	// Refresh the studiohdr since it was lost...
-	virtual void RefreshStudioHdr( studiohdr_t* pStudioHdr, studiohwdata_t* pHardwareData ) = 0;
+	virtual void RefreshStudioHdr( IStudioHdr* pStudioHdr, studiohwdata_t* pHardwareData ) = 0;
 
 	// This is needed to do eyeglint and calculate the correct texcoords for the eyes.
-	virtual void SetEyeViewTarget( const studiohdr_t *pStudioHdr, int nBodyIndex, const Vector& worldPosition ) = 0;
+	virtual void SetEyeViewTarget( const IStudioHdr *pStudioHdr, int nBodyIndex, const Vector& worldPosition ) = 0;
 		
 	// Methods related to lighting state
 	// NOTE: SetAmbientLightColors assumes that the arraysize is the same as 
@@ -343,7 +343,7 @@ public:
 
 	// Add decals to a decal list by doing a planar projection along the ray
 	// The BoneToWorld matrices must be set before this is called
-	virtual void AddDecal( StudioDecalHandle_t handle, studiohdr_t *pStudioHdr, matrix3x4_t *pBoneToWorld, 
+	virtual void AddDecal( StudioDecalHandle_t handle, IStudioHdr *pStudioHdr, matrix3x4_t *pBoneToWorld, 
 		const Ray_t & ray, const Vector& decalUp, IMaterial* pDecalMaterial, float radius, int body, bool noPokethru = false, int maxLODToDecal = ADDDECAL_TO_ALL_LODS ) = 0;
 
 	// Compute the lighting at a point and normal
@@ -372,7 +372,7 @@ public:
 	virtual void GetTriangles( const DrawModelInfo_t& info, matrix3x4_t *pBoneToWorld, GetTriangles_Output_t &out ) = 0;
 
 	// Returns materials used by a particular model
-	virtual int GetMaterialList( studiohdr_t *pStudioHdr, int count, IMaterial** ppMaterials ) = 0;
+	virtual int GetMaterialList( IStudioHdr *pStudioHdr, int count, IMaterial** ppMaterials ) = 0;
 	virtual int GetMaterialListFromBodyAndSkin( MDLHandle_t studio, int nSkin, int nBody, int nCountOutputMaterials, IMaterial** ppOutputMaterials ) = 0;
 	// draw an array of models with the same state
 	virtual void DrawModelArray( const DrawModelInfo_t &drawInfo, int arrayCount, model_array_instance_t *pInstanceData, int instanceStride, int flags = STUDIORENDER_DRAW_ENTIRE_MODEL ) = 0;

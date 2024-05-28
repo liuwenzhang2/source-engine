@@ -3870,7 +3870,7 @@ void CModelLoader::ReloadFilesInList( IFileList *pFilesToReload )
 		{
 			if ( g_pMDLCache->IsDataLoaded( pModel->studio, MDLCACHE_STUDIOHWDATA ) )
 			{
-				studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( pModel->studio );
+				IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( pModel->studio );
 				if ( pStudioHdr )
 				{
 					// Ok, we didn't have to do a full reload, but if any of our materials changed, flush out the studiohwdata because the
@@ -3890,6 +3890,7 @@ void CModelLoader::ReloadFilesInList( IFileList *pFilesToReload )
 						}
 					}
 				}
+				delete pStudioHdr;
 			}
 		}
 	}
@@ -4165,7 +4166,7 @@ int Mod_GetMaterialCount( model_t* mod )
 //-----------------------------------------------------------------------------
 int Mod_GetModelMaterials( model_t* pModel, int count, IMaterial** ppMaterials )
 {
-	studiohdr_t *pStudioHdr;
+	IStudioHdr *pStudioHdr = NULL;
 	int found = 0; 
 	int	i;
 
@@ -4209,7 +4210,7 @@ int Mod_GetModelMaterials( model_t* pModel, int count, IMaterial** ppMaterials )
 		else
 		{
 			// Get the studiohdr into the cache
-			pStudioHdr = g_pMDLCache->GetStudioHdr( pModel->studio );
+			pStudioHdr = g_pMDLCache->GetIStudioHdr( pModel->studio );
 			// Get the list of materials
 			found = g_pStudioRender->GetMaterialList( pStudioHdr, count, ppMaterials );
 		}
@@ -4220,7 +4221,7 @@ int Mod_GetModelMaterials( model_t* pModel, int count, IMaterial** ppMaterials )
 		Assert( 0 );
 		break;
 	}
-
+	delete pStudioHdr;
 	return found;
 }
 

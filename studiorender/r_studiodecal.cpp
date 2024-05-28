@@ -853,7 +853,7 @@ bool CStudioRender::ComputePoseToDecal( const Ray_t& ray, const Vector& up )
 	worldToDecal[2][3] = -DotProduct( ray.m_Start.Base(), worldToDecal[2] );
 
 	// Compute transforms from pose space to decal plane space
-	for ( int i = 0; i < m_pStudioHdr->numbones; i++)
+	for ( int i = 0; i < m_pStudioHdr->numbones(); i++)
 	{
 		ConcatTransforms( worldToDecal, m_PoseToWorld[i], m_PoseToDecal[i] );
 	}
@@ -1016,7 +1016,7 @@ int CStudioRender::AddDecalToMaterialList( DecalMaterial_t* pMaterial )
 int CStudioRender::ComputeTotalMeshCount( int iRootLOD, int iMaxLOD, int body ) const
 {
 	int nMeshCount = 0;
-	for ( int k=0 ; k < m_pStudioHdr->numbodyparts ; k++) 
+	for ( int k=0 ; k < m_pStudioHdr->numbodyparts() ; k++) 
 	{
 		mstudiomodel_t *pSubModel;
 		R_StudioSetupModel( k, body, &pSubModel, m_pStudioHdr );
@@ -1034,7 +1034,7 @@ int CStudioRender::ComputeTotalMeshCount( int iRootLOD, int iMaxLOD, int body ) 
 //-----------------------------------------------------------------------------
 int CStudioRender::ComputeVertexAllocation( int iMaxLOD, int body, studiohwdata_t *pHardwareData, MeshVertexInfo_t *pMeshVertices )
 {
-	bool bSuppressTlucDecal = (m_pStudioHdr->flags & STUDIOHDR_FLAGS_TRANSLUCENT_TWOPASS) != 0;
+	bool bSuppressTlucDecal = (m_pStudioHdr->flags() & STUDIOHDR_FLAGS_TRANSLUCENT_TWOPASS) != 0;
 
 	int nCurrMesh = 0;
 	int nVertexCount = 0;
@@ -1042,7 +1042,7 @@ int CStudioRender::ComputeVertexAllocation( int iMaxLOD, int body, studiohwdata_
 	{
 		IMaterial **ppMaterials = pHardwareData->m_pLODs[i].ppMaterials;
 
-		for ( int k=0 ; k < m_pStudioHdr->numbodyparts ; k++) 
+		for ( int k=0 ; k < m_pStudioHdr->numbodyparts() ; k++) 
 		{
 			mstudiomodel_t *pSubModel;
 			R_StudioSetupModel( k, body, &pSubModel, m_pStudioHdr );
@@ -1121,7 +1121,7 @@ void CStudioRender::ProjectDecalsOntoMeshes( DecalBuildInfo_t& build, int nMeshC
 // Add decals to a decal list by doing a planar projection along the ray
 //-----------------------------------------------------------------------------
 void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderContext_t& rc, matrix3x4_t *pBoneToWorld, 
-	studiohdr_t *pStudioHdr, const Ray_t& ray, const Vector& decalUp, IMaterial* pDecalMaterial, 
+	IStudioHdr *pStudioHdr, const Ray_t& ray, const Vector& decalUp, IMaterial* pDecalMaterial, 
 	float radius, int body, bool noPokethru, int maxLODToDecal )
 {
 	VPROF( "CStudioRender::AddDecal" );
@@ -1163,7 +1163,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 	buildInfo.m_Radius = radius;
 	buildInfo.m_NoPokeThru = noPokethru;
 	buildInfo.m_pStudioHdr = pStudioHdr;
- 	buildInfo.m_UseClipVert = ( m_pStudioHdr->numbones <= 1 ) && ( m_pStudioHdr->numflexdesc == 0 );
+ 	buildInfo.m_UseClipVert = ( m_pStudioHdr->numbones() <= 1 ) && ( m_pStudioHdr->numflexdesc() == 0);
 	buildInfo.m_nGlobalMeshIndex = 0;
 	buildInfo.m_pMeshVertexData = NULL;
 
@@ -1279,7 +1279,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 
 		// Step over all body parts + add decals to em all!
 		int k;
-		for ( k=0 ; k < m_pStudioHdr->numbodyparts ; k++) 
+		for ( k=0 ; k < m_pStudioHdr->numbodyparts() ; k++) 
 		{
 			// Grab the model for this body part
 			int model = R_StudioSetupModel( k, body, &m_pSubModel, m_pStudioHdr );
@@ -1289,7 +1289,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 				break;
 		}
 
-		if ( k != m_pStudioHdr->numbodyparts )
+		if ( k != m_pStudioHdr->numbodyparts() )
 			continue;
 
 		// Add this to the list of decals in this material
@@ -1467,7 +1467,7 @@ void CStudioRender::DrawSingleBoneFlexedDecals( IMatRenderContext *pRenderContex
 //-----------------------------------------------------------------------------
 // Inner loop for rendering decals that have multiple bones
 //-----------------------------------------------------------------------------
-bool CStudioRender::DrawMultiBoneDecals( CMeshBuilder& meshBuilder, DecalMaterial_t& decalMaterial, studiohdr_t *pStudioHdr )
+bool CStudioRender::DrawMultiBoneDecals( CMeshBuilder& meshBuilder, DecalMaterial_t& decalMaterial, IStudioHdr *pStudioHdr )
 {
 	const thinModelVertices_t		*thinVertData	= NULL;
 	const mstudio_meshvertexdata_t	*vertData		= NULL;
@@ -1582,7 +1582,7 @@ bool CStudioRender::DrawMultiBoneDecals( CMeshBuilder& meshBuilder, DecalMateria
 }
 
 bool CStudioRender::DrawMultiBoneFlexedDecals( IMatRenderContext *pRenderContext, CMeshBuilder& meshBuilder, 
-	DecalMaterial_t& decalMaterial, studiohdr_t *pStudioHdr, studioloddata_t *pStudioLOD )
+	DecalMaterial_t& decalMaterial, IStudioHdr *pStudioHdr, studioloddata_t *pStudioLOD )
 {
 	int *pBoneRemap = pStudioLOD ? pStudioLOD->m_pHWMorphDecalBoneRemap : NULL;
 
@@ -1717,7 +1717,7 @@ bool CStudioRender::DrawMultiBoneFlexedDecals( IMatRenderContext *pRenderContext
 //-----------------------------------------------------------------------------
 // Draws all the decals using a particular material
 //-----------------------------------------------------------------------------
-void CStudioRender::DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalMaterial_t& decalMaterial, studiohdr_t *pStudioHdr, studioloddata_t *pStudioLOD )
+void CStudioRender::DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalMaterial_t& decalMaterial, IStudioHdr *pStudioHdr, studioloddata_t *pStudioLOD )
 {
 	// Performance analysis.
 //	VPROF_BUDGET( "Decals", "Decals" );
@@ -1763,9 +1763,9 @@ void CStudioRender::DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalM
 	// Two possibilities: no/one bones, we let the hardware do all transformation
 	// or, more than one bone, we do software skinning.
 	bool bDraw = true;
-	if ( m_pStudioHdr->numbones <= 1 )
+	if ( m_pStudioHdr->numbones() <= 1 )
 	{
-		if ( m_pStudioHdr->numflexdesc != 0 )
+		if ( m_pStudioHdr->numflexdesc() != 0 )
 		{
 			DrawSingleBoneFlexedDecals( pRenderContext, meshBuilder, decalMaterial );
 		}
@@ -1776,7 +1776,7 @@ void CStudioRender::DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalM
 	}
 	else
 	{
-		if ( m_pStudioHdr->numflexdesc != 0 )
+		if ( m_pStudioHdr->numflexdesc() != 0 )
 		{
 			if ( !DrawMultiBoneFlexedDecals( pRenderContext, meshBuilder, decalMaterial, pStudioHdr, pStudioLOD ) )
 			{
@@ -1907,9 +1907,9 @@ void CStudioRender::DrawDecal( const DrawModelInfo_t &drawInfo, int lod, int bod
 
 	// Add this fix after I fix the other problem.
 	studioloddata_t *pStudioLOD = NULL;
-	if ( m_pStudioHdr->numbones <= 1 )
+	if ( m_pStudioHdr->numbones() <= 1 )
 	{
-		pRenderContext->SetNumBoneWeights( m_pStudioHdr->numbones );
+		pRenderContext->SetNumBoneWeights( m_pStudioHdr->numbones() );
 		pRenderContext->MatrixMode( MATERIAL_MODEL );
 		pRenderContext->LoadMatrix( m_PoseToWorld[0] );
 	}
@@ -1933,7 +1933,7 @@ void CStudioRender::DrawDecal( const DrawModelInfo_t &drawInfo, int lod, int bod
 			pRenderContext->LoadBoneMatrix( 0, identity );
 
 			// Set up the bone state from the mapping computed in ComputeHWMorphDecalBoneRemap
-			for ( int i = 0; i < m_pStudioHdr->numbones; ++i )
+			for ( int i = 0; i < m_pStudioHdr->numbones(); ++i )
 			{
 				int nHWBone = pStudioLOD->m_pHWMorphDecalBoneRemap[i];
 				if ( nHWBone <= 0 )

@@ -37,7 +37,7 @@ FORWARD_DECLARE_HANDLE( LightCacheHandle_t );
 //-----------------------------------------------------------------------------
 struct DrawModelState_t
 {
-	studiohdr_t*			m_pStudioHdr;
+	IStudioHdr*			m_pStudioHdr;
 	studiohwdata_t*			m_pStudioHWData;
 	IClientRenderable*		m_pRenderable;
 	const matrix3x4_t		*m_pModelToWorld;

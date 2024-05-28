@@ -38,7 +38,7 @@
 //-----------------------------------------------------------------------------
 // Gets the lighting center
 //-----------------------------------------------------------------------------
-static void R_StudioGetLightingCenter( IClientRenderable *pRenderable, studiohdr_t* pStudioHdr, const Vector& origin,
+static void R_StudioGetLightingCenter( IClientRenderable *pRenderable, IStudioHdr* pStudioHdr, const Vector& origin,
 								const QAngle &angles, Vector* pLightingOrigin )
 {
 	Assert( pLightingOrigin );
@@ -698,7 +698,7 @@ void CModelInfo::GetIlluminationPoint( const model_t *model, IClientRenderable *
 	const QAngle& angles, Vector* pLightingOrigin )
 {
 	Assert( model->type == mod_studio );
-	studiohdr_t* pStudioHdr = (studiohdr_t*)GetModelExtraData(model);
+	IStudioHdr* pStudioHdr = g_pMDLCache->GetIStudioHdr(model->studio);//(studiohdr_t*)GetModelExtraData(model);
 	if (pStudioHdr)
 	{
 		R_StudioGetLightingCenter( pRenderable, pStudioHdr, origin, angles, pLightingOrigin );

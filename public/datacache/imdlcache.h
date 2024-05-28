@@ -198,7 +198,7 @@ public:
 	virtual int GetRef( MDLHandle_t handle ) = 0;
 
 	virtual IStudioHdr* GetIStudioHdr(MDLHandle_t handle) = 0;
-	virtual IStudioHdr* GetIStudioHdr(const studiohdr_t* pStudioHdr) = 0;
+	virtual IStudioHdr* GetIStudioHdr(studiohdr_t* pStudioHdr) = 0;
 
 	// Gets at the various data associated with a MDL
 	virtual studiohdr_t *GetStudioHdr( MDLHandle_t handle ) = 0;
@@ -261,7 +261,7 @@ public:
 
 	virtual int *GetFrameUnlockCounterPtr( MDLCacheDataType_t type ) = 0;
 
-	virtual studiohdr_t *LockStudioHdr( MDLHandle_t handle ) = 0;
+	virtual IStudioHdr *LockStudioHdr( MDLHandle_t handle ) = 0;
 	virtual void UnlockStudioHdr( MDLHandle_t handle ) = 0;
 
 	virtual bool PreloadModel( MDLHandle_t handle ) = 0;

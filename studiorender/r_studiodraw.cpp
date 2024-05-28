@@ -159,7 +159,7 @@ void CStudioRender::R_StudioDrawBones (void)
 
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 
-	for (i = 0; i < m_pStudioHdr->numbones; i++)
+	for (i = 0; i < m_pStudioHdr->numbones(); i++)
 	{
 		if (pbones[i].parent == -1)
 			continue;
@@ -294,8 +294,8 @@ int CStudioRender::R_StudioRenderModel( IMatRenderContext *pRenderContext, int s
 	}
 
 	// Build list of submodels
-	BodyPartInfo_t *pBodyPartInfo = (BodyPartInfo_t*)_alloca( m_pStudioHdr->numbodyparts * sizeof(BodyPartInfo_t) );
-	for ( int i=0 ; i < m_pStudioHdr->numbodyparts; ++i ) 
+	BodyPartInfo_t *pBodyPartInfo = (BodyPartInfo_t*)_alloca( m_pStudioHdr->numbodyparts() * sizeof(BodyPartInfo_t) );
+	for ( int i=0 ; i < m_pStudioHdr->numbodyparts(); ++i ) 
 	{
 		pBodyPartInfo[i].m_nSubModelIndex = R_StudioSetupModel( i, body, &pBodyPartInfo[i].m_pSubModel, m_pStudioHdr );
 	}
@@ -306,7 +306,7 @@ int CStudioRender::R_StudioRenderModel( IMatRenderContext *pRenderContext, int s
 		// we're going to render the opaque meshes, so these will get counted in that pass
 		m_bSkippedMeshes = false;
 		m_bDrawTranslucentSubModels = false;
-		numTrianglesRendered += R_StudioRenderFinal( pRenderContext, skin, m_pStudioHdr->numbodyparts, pBodyPartInfo, 
+		numTrianglesRendered += R_StudioRenderFinal( pRenderContext, skin, m_pStudioHdr->numbodyparts(), pBodyPartInfo,
 			pEntity, ppMaterials, pMaterialFlags, boneMask, lod, pColorMeshes );
 	}
 	else
@@ -317,7 +317,7 @@ int CStudioRender::R_StudioRenderModel( IMatRenderContext *pRenderContext, int s
 	if ( m_bSkippedMeshes && nDrawGroup != STUDIORENDER_DRAW_OPAQUE_ONLY )
 	{
 		m_bDrawTranslucentSubModels = true;
-		numTrianglesRendered += R_StudioRenderFinal( pRenderContext, skin, m_pStudioHdr->numbodyparts, pBodyPartInfo, 
+		numTrianglesRendered += R_StudioRenderFinal( pRenderContext, skin, m_pStudioHdr->numbodyparts(), pBodyPartInfo,
 			pEntity, ppMaterials, pMaterialFlags, boneMask, lod, pColorMeshes );
 	}
 	return numTrianglesRendered;
@@ -1658,7 +1658,7 @@ static SoftwareProcessMeshFunc_t g_SoftwareProcessMeshFunc[] =
 	ProcessMesh111M8_t::R_StudioSoftwareProcessMesh,
 };
 
-inline const mstudio_meshvertexdata_t * GetFatVertexData( mstudiomesh_t * pMesh, studiohdr_t * pStudioHdr )
+inline const mstudio_meshvertexdata_t * GetFatVertexData( mstudiomesh_t * pMesh, IStudioHdr * pStudioHdr )
 {
 	if ( !pMesh->pModel()->CacheVertexData( pStudioHdr ) )
 	{
@@ -1857,7 +1857,7 @@ void CStudioRender::R_StudioSoftwareProcessMesh_Normals( mstudiomesh_t* pmesh, C
 
 
 template
-void CCachedRenderData::ComputeFlexedVertex_StreamOffset<mstudiovertanim_t>( studiohdr_t *pStudioHdr, mstudioflex_t *pflex, 
+void CCachedRenderData::ComputeFlexedVertex_StreamOffset<mstudiovertanim_t>( IStudioHdr *pStudioHdr, mstudioflex_t *pflex, 
 														 mstudiovertanim_t *pvanim, int vertCount, float w1, float w2, float w3, float w4 );
 
 
@@ -2151,7 +2151,7 @@ int CStudioRender::R_StudioDrawGroupHWSkin( IMatRenderContext *pRenderContext, s
 	PIXEVENT( pRenderContext, szPIXEventName );
 #endif
 
-	if ( m_pStudioHdr->numbones == 1 )
+	if ( m_pStudioHdr->numbones() == 1)
 	{
 		pRenderContext->MatrixMode( MATERIAL_MODEL );
 		pRenderContext->LoadMatrix( m_PoseToWorld[0] );
@@ -2171,7 +2171,7 @@ int CStudioRender::R_StudioDrawGroupHWSkin( IMatRenderContext *pRenderContext, s
 	{
 		OptimizedModel::StripHeader_t* pStrip = &pGroup->m_pStripData[j];
 
-		if ( m_pStudioHdr->numbones > 1 )
+		if ( m_pStudioHdr->numbones() > 1)
 		{
 			// Reset bone state if we're hardware skinning
 			pRenderContext->SetNumBoneWeights( pStrip->numBones );
@@ -2924,7 +2924,7 @@ int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int sk
 	if ( m_pRC->m_Config.skin )
 	{
 		skin = m_pRC->m_Config.skin;
-		if ( skin >= m_pStudioHdr->numskinfamilies )
+		if ( skin >= m_pStudioHdr->numskinfamilies() )
 		{
 			skin = 0;
 		}
@@ -2932,9 +2932,9 @@ int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int sk
 
 	// get skinref array
 	short *pskinref	= m_pStudioHdr->pSkinref( 0 );
-	if ( skin > 0 && skin < m_pStudioHdr->numskinfamilies )
+	if ( skin > 0 && skin < m_pStudioHdr->numskinfamilies() )
 	{
-		pskinref += ( skin * m_pStudioHdr->numskinref );
+		pskinref += ( skin * m_pStudioHdr->numskinref() );
 	}
 
 	// FIXME: Activate sorting on a mesh level

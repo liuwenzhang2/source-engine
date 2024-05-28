@@ -34,7 +34,7 @@ FORCEINLINE StudioModelLighting_t CStudioRender::R_StudioComputeLighting( IMater
 	// test if it's vertex lit
 
 	Assert( pMaterial );
-	bool doMouthLighting = materialFlags && (m_pStudioHdr->nummouths >= 1);
+	bool doMouthLighting = materialFlags && (m_pStudioHdr->nummouths() >= 1);
 
 	if ( IsX360() )
 	{
@@ -264,12 +264,12 @@ outputs:
 =================
 */
 int R_StudioSetupModel( int bodypart, int entity_body, mstudiomodel_t **ppSubModel, 
-	const studiohdr_t *pStudioHdr )
+	const IStudioHdr *pStudioHdr )
 {
 	int index;
 	mstudiobodyparts_t   *pbodypart;
 
-	if (bodypart > pStudioHdr->numbodyparts)
+	if (bodypart > pStudioHdr->numbodyparts())
 	{
 		ConDMsg ("R_StudioSetupModel: no such bodypart %d\n", bodypart);
 		bodypart = 0;
@@ -339,9 +339,9 @@ static void ScreenAlignBone( matrix3x4_t *pPoseToWorld, mstudiobone_t *pCurBone,
 //-----------------------------------------------------------------------------
 // Computes PoseToWorld from BoneToWorld
 //-----------------------------------------------------------------------------
-void ComputePoseToWorld( matrix3x4_t *pPoseToWorld, studiohdr_t *pStudioHdr, int boneMask, const Vector& vecViewOrigin, const matrix3x4_t *pBoneToWorld )
+void ComputePoseToWorld( matrix3x4_t *pPoseToWorld, IStudioHdr *pStudioHdr, int boneMask, const Vector& vecViewOrigin, const matrix3x4_t *pBoneToWorld )
 { 
-	if ( pStudioHdr->flags & STUDIOHDR_FLAGS_STATIC_PROP )
+	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP)
 	{
 		// by definition, these always have an identity poseToBone transform
 		MatrixCopy( pBoneToWorld[ 0 ], pPoseToWorld[ 0 ] );
@@ -351,7 +351,7 @@ void ComputePoseToWorld( matrix3x4_t *pPoseToWorld, studiohdr_t *pStudioHdr, int
 	if ( !pStudioHdr->pLinearBones() )
 	{
 		// convert bone to world transformations into pose to world transformations
-		for (int i = 0; i < pStudioHdr->numbones; i++)
+		for (int i = 0; i < pStudioHdr->numbones(); i++)
 		{
 			mstudiobone_t *pCurBone = pStudioHdr->pBone( i );
 			if ( !(pCurBone->flags & boneMask) )
@@ -365,7 +365,7 @@ void ComputePoseToWorld( matrix3x4_t *pPoseToWorld, studiohdr_t *pStudioHdr, int
 		mstudiolinearbone_t *pLinearBones = pStudioHdr->pLinearBones();
 
 		// convert bone to world transformations into pose to world transformations
-		for (int i = 0; i < pStudioHdr->numbones; i++)
+		for (int i = 0; i < pStudioHdr->numbones(); i++)
 		{
 			if ( !(pLinearBones->flags(i) & boneMask) )
 				continue;
