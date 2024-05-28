@@ -1867,7 +1867,7 @@ void CStudioHdr::CActivityToSequenceMapping::SetValidationPair( const CStudioHdr
 // current activity, and its stored weight is negative (whatever that means), always select
 // it. Otherwise perform a weighted selection -- imagine a large roulette wheel, with each
 // sequence having a number of spaces corresponding to its weight.
-int CStudioHdr::CActivityToSequenceMapping::SelectWeightedSequence(CStudioHdr* pstudiohdr, int activity, int curSequence)
+int CStudioHdr::CActivityToSequenceMapping::SelectWeightedSequence(CStudioHdr* pstudiohdr, int activity, int curSequence, RandomWeightFunc pRandomWeightFunc)
 {
 	if (!ValidateAgainst(pstudiohdr))
 	{
@@ -1901,15 +1901,10 @@ int CStudioHdr::CActivityToSequenceMapping::SelectWeightedSequence(CStudioHdr* p
 	int weighttotal = actData->totalWeight;
 	// generate a random number from 0 to the total weight
 	int randomValue;
-#if defined(CLIENT_DLL) || defined(GAME_DLL)
-	if (CBaseEntity::GetPredictionPlayer() != NULL)
-	{
-		randomValue = SharedRandomInt("SelectWeightedSequence", 0, weighttotal - 1);
-	}
-	else
-#endif // CLIENT_DLL
-	{
-		randomValue = RandomInt(0, weighttotal - 1);
+	if (pRandomWeightFunc) {
+		randomValue = (*pRandomWeightFunc)(0, weighttotal - 1);
+	}else{
+		Error("pRandomWeightFunc must not been NULL");
 	}
 
 	// chug through the entries in the list (they are sequential therefore cache-coherent)

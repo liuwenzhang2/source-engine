@@ -226,6 +226,17 @@ bool IsInPrediction()
 	return CBaseEntity::GetPredictionPlayer() != NULL;
 }
 
+int SharedRandomSelect(int iMinVal, int iMaxVal) {
+	if (CBaseEntity::GetPredictionPlayer() != NULL)
+	{
+		return SharedRandomInt("SelectWeightedSequence", iMinVal, iMaxVal);
+	}
+	else
+	{
+		return RandomInt(iMinVal, iMaxVal);
+	}
+}
+
 int SelectWeightedSequence( IStudioHdr *pstudiohdr, int activity, int curSequence )
 {
 	VPROF( "SelectWeightedSequence" );
@@ -268,7 +279,7 @@ int SelectWeightedSequence( IStudioHdr *pstudiohdr, int activity, int curSequenc
 
 	return seq;
 #else
-	return pstudiohdr->SelectWeightedSequence( activity, curSequence );
+	return pstudiohdr->SelectWeightedSequence( activity, curSequence ,&SharedRandomSelect);
 #endif
 }
 

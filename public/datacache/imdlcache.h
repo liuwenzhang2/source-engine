@@ -20,16 +20,18 @@
 #endif
 
 #include "appframework/IAppSystem.h"
+#include "studio.h"
+#include "vcollide.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
-struct studiohdr_t;
-struct studiohwdata_t;
-struct vcollide_t;
-struct virtualmodel_t;
-struct vertexFileHeader_t;
-class IStudioHdr;
+//struct studiohdr_t;
+//struct studiohwdata_t;
+//struct vcollide_t;
+//struct virtualmodel_t;
+//struct vertexFileHeader_t;
+//class IStudioHdr;
 
 namespace OptimizedModel
 {

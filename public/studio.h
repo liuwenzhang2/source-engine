@@ -2442,6 +2442,8 @@ private:
 class IDataCache;
 class IMDLCache;
 
+typedef int (*RandomWeightFunc)(int iMinVal, int iMaxVal);
+
 class IStudioHdr {
 public:
 	virtual ~IStudioHdr(){}
@@ -2582,7 +2584,7 @@ public:
 	virtual void ClearPerfCounters(void) = 0;
 
 	virtual bool HaveSequenceForActivity(int activity) = 0;
-	virtual int SelectWeightedSequence(int activity, int curSequence) = 0;
+	virtual int SelectWeightedSequence(int activity, int curSequence, RandomWeightFunc pRandomWeightFunc) = 0;
 
 };
 
@@ -2867,7 +2869,7 @@ public:
 		void Reinitialize( CStudioHdr *pstudiohdr );
 
 		/// A more efficient version of the old SelectWeightedSequence() function in animation.cpp. 
-		int SelectWeightedSequence( CStudioHdr *pstudiohdr, int activity, int curSequence );
+		int SelectWeightedSequence( CStudioHdr *pstudiohdr, int activity, int curSequence, RandomWeightFunc pRandomWeightFunc);
 
 		// selects the sequence with the most matching modifiers
 		//int SelectWeightedSequenceFromModifiers( CStudioHdr *pstudiohdr, int activity, CUtlSymbol *pActivityModifiers, int iModifierCount );
@@ -2903,7 +2905,7 @@ public:
 
 	/// A more efficient version of the old SelectWeightedSequence() function in animation.cpp. 
 	/// Returns -1 on failure to find a sequence
-	inline int SelectWeightedSequence( int activity, int curSequence )
+	inline int SelectWeightedSequence( int activity, int curSequence, RandomWeightFunc pRandomWeightFunc)
 	{
 #if STUDIO_SEQUENCE_ACTIVITY_LAZY_INITIALIZE
 		// We lazy-initialize the header on demand here, because CStudioHdr::Init() is
@@ -2913,7 +2915,7 @@ public:
 			m_ActivityToSequence.Initialize(this);
 		}
 #endif
-		return m_ActivityToSequence.SelectWeightedSequence( this, activity, curSequence );
+		return m_ActivityToSequence.SelectWeightedSequence( this, activity, curSequence, pRandomWeightFunc);
 	}
 
 //	inline int SelectWeightedSequenceFromModifiers( int activity, CUtlSymbol *pActivityModifiers, int iModifierCount )
