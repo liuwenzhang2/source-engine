@@ -267,7 +267,7 @@ bool CSys::LoadModules( CDedicatedAppSystemGroup *pAppSystemGroup )
 		{ "vphysics" DLL_EXT_STRING,			VPHYSICS_INTERFACE_VERSION },
 		{ "datacache" DLL_EXT_STRING,			DATACACHE_INTERFACE_VERSION },
 		{ "datacache" DLL_EXT_STRING,			MDLCACHE_INTERFACE_VERSION },
-		{ "datacache" DLL_EXT_STRING,			STUDIO_DATA_CACHE_INTERFACE_VERSION },
+		//{ "datacache" DLL_EXT_STRING,			STUDIO_DATA_CACHE_INTERFACE_VERSION },
 		{ "dedicated" DLL_EXT_STRING,			QUEUEDLOADER_INTERFACE_VERSION },
 		{ "engine" DLL_EXT_STRING,				VENGINE_HLDS_API_VERSION },
 		{ "", "" }	// Required to terminate the list

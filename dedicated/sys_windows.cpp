@@ -271,7 +271,7 @@ bool CSys::LoadModules( CDedicatedAppSystemGroup *pAppSystemGroup )
 		{ "vphysics.dll",			VPHYSICS_INTERFACE_VERSION },
 		{ "datacache.dll",			DATACACHE_INTERFACE_VERSION },
 		{ "datacache.dll",			MDLCACHE_INTERFACE_VERSION },
-		{ "datacache.dll",			STUDIO_DATA_CACHE_INTERFACE_VERSION },
+		//{ "datacache.dll",			STUDIO_DATA_CACHE_INTERFACE_VERSION },
 		{ "vgui2.dll",				VGUI_IVGUI_INTERFACE_VERSION },
 		{ "engine.dll",				VENGINE_HLDS_API_VERSION },
 		{ "dedicated.dll",			QUEUEDLOADER_INTERFACE_VERSION },
