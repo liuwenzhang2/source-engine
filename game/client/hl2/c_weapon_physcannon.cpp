@@ -239,14 +239,16 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 		if ( !pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 			return 0;
 
-		studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
+		IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
 		if (!pStudioHdr)
 			return false;
 
 		mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
-		if ( !set )
+		if (!set) {
+			delete pStudioHdr;
 			return false;
-
+		}
+		delete pStudioHdr;
 		int i;
 
 		float fadePerc = 1.0f;
