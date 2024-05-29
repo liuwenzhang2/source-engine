@@ -233,7 +233,7 @@ bool ComputeBeamEntPosition( C_BaseEntity *pEnt, int nAttachment, bool bInterpre
 		C_BaseAnimating *pAnimating = pEnt->GetBaseAnimating();
 		if ( pAnimating )
 		{
-			studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
+			IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
 			if (pStudioHdr)
 			{
 				mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
@@ -253,10 +253,12 @@ bool ComputeBeamEntPosition( C_BaseEntity *pEnt, int nAttachment, bool bInterpre
 						VectorTransform( vecLocalClosestPt, *hitboxbones[ pHitbox->bone ], pt );
 
 //						MatrixGetColumn( *hitboxbones[ pHitbox->bone ], 3, pt );
+						delete pStudioHdr;
 						return true;
 					}
 				}
 			}
+			delete pStudioHdr;
 		}
 	}
 

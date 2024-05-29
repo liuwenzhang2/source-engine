@@ -4000,7 +4000,7 @@ IStudioHdr *ModelSoundsCache_LoadModel( const char *filename )
 		model_t *mdl = (model_t *)modelinfo->GetModel( idx );
 		if ( mdl )
 		{
-			IStudioHdr *studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( mdl ) );
+			IStudioHdr *studioHdr = modelinfo->GetStudiomodel( mdl );
 			if ( studioHdr->IsValid() )
 			{
 				return studioHdr;
@@ -4239,7 +4239,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 	// model anim event owned components
 	{
 		// Check animevents for particle events
-		IStudioHdr* studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( pModel ) );
+		IStudioHdr* studioHdr = modelinfo->GetStudiomodel( pModel );
 		if ( studioHdr->IsValid() )
 		{
 			// force animation event resolution!!!

@@ -26,14 +26,14 @@ mstudioanimdesc_t &studiohdr_t::pAnimdesc( int i ) const
 		return *pLocalAnimdesc( i );
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_anim[i].group ];
-	const studiohdr_t *pStudioHdr = pGroup->GetStudioHdr();
+	virtualgroup_t* pGroup = pVModel->pAnimGroup(i);// &pVModel->m_group[pVModel->m_anim[i].group];
+	const studiohdr_t *pStudioHdr = pGroup->GetGroupStudioHdr();
 	Assert( pStudioHdr );
 
-	return *pStudioHdr->pLocalAnimdesc( pVModel->m_anim[i].index );
+	return *pStudioHdr->pLocalAnimdesc( pVModel->pAnimIndex(i) );//m_anim[i].index
 }
 
 //-----------------------------------------------------------------------------
@@ -249,9 +249,9 @@ int studiohdr_t::GetNumSeq( void ) const
 		return numlocalseq;
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
-	return pVModel->m_seq.Count();
+	return pVModel->NumSeq();// m_seq.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -265,7 +265,7 @@ mstudioseqdesc_t &studiohdr_t::pSeqdesc( int i ) const
 		return *pLocalSeqdesc( i );
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
 	if ( !pVModel )
@@ -273,11 +273,11 @@ mstudioseqdesc_t &studiohdr_t::pSeqdesc( int i ) const
 		return *pLocalSeqdesc( i );
 	}
 
-	virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_seq[i].group ];
-	const studiohdr_t *pStudioHdr = pGroup->GetStudioHdr();
+	virtualgroup_t* pGroup = pVModel->pSeqGroup(i);// &pVModel->m_group[pVModel->m_seq[i].group];
+	const studiohdr_t *pStudioHdr = pGroup->GetGroupStudioHdr();
 	Assert( pStudioHdr );
 
-	return *pStudioHdr->pLocalSeqdesc( pVModel->m_seq[i].index );
+	return *pStudioHdr->pLocalSeqdesc( pVModel->pSeqIndex(i) );// m_seq[i].index
 }
 
 //-----------------------------------------------------------------------------
@@ -291,10 +291,10 @@ int studiohdr_t::iRelativeAnim( int baseseq, int relanim ) const
 		return relanim;
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_seq[baseseq].group ];
+	virtualgroup_t* pGroup = pVModel->pSeqGroup(baseseq);// & pVModel->m_group[pVModel->m_seq[baseseq].group];
 
 	return pGroup->masterAnim[ relanim ];
 }
@@ -310,10 +310,10 @@ int studiohdr_t::iRelativeSeq( int baseseq, int relseq ) const
 		return relseq;
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_seq[baseseq].group ];
+	virtualgroup_t* pGroup = pVModel->pSeqGroup(baseseq);// &pVModel->m_group[pVModel->m_seq[baseseq].group];
 
 	return pGroup->masterSeq[ relseq ];
 }
@@ -330,10 +330,10 @@ int	studiohdr_t::GetNumPoseParameters( void ) const
 		return numlocalposeparameters;
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	return pVModel->m_pose.Count();
+	return pVModel->NumPose();// m_pose.Count();
 }
 
 
@@ -349,18 +349,18 @@ const mstudioposeparamdesc_t &studiohdr_t::pPoseParameter( int i )
 		return *pLocalPoseParameter( i );
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	if ( pVModel->m_pose[i].group == 0)
-		return *pLocalPoseParameter( pVModel->m_pose[i].index );
+	if ( pVModel->nPoseGroup(i) == 0)// m_pose[i].group
+		return *pLocalPoseParameter( pVModel->pPoseIndex(i) );// m_pose[i].index
 
-	virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_pose[i].group ];
+	virtualgroup_t* pGroup = pVModel->pPoseGroup(i);// &pVModel->m_group[pVModel->m_pose[i].group];
 
-	const studiohdr_t *pStudioHdr = pGroup->GetStudioHdr();
+	const studiohdr_t *pStudioHdr = pGroup->GetGroupStudioHdr();
 	Assert( pStudioHdr );
 
-	return *pStudioHdr->pLocalPoseParameter( pVModel->m_pose[i].index );
+	return *pStudioHdr->pLocalPoseParameter( pVModel->pPoseIndex(i) );// m_pose[i].index
 }
 
 
@@ -378,10 +378,10 @@ int studiohdr_t::GetSharedPoseParameter( int iSequence, int iLocalPose ) const
 	if (iLocalPose == -1)
 		return iLocalPose;
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_seq[iSequence].group ];
+	virtualgroup_t* pGroup = pVModel->pSeqGroup(iSequence);// &pVModel->m_group[pVModel->m_seq[iSequence].group];
 
 	return pGroup->masterPose[iLocalPose];
 }
@@ -400,10 +400,10 @@ int studiohdr_t::EntryNode( int iSequence )
 		return seqdesc.localentrynode;
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_seq[iSequence].group ];
+	virtualgroup_t* pGroup = pVModel->pSeqGroup(iSequence);// &pVModel->m_group[pVModel->m_seq[iSequence].group];
 
 	return pGroup->masterNode[seqdesc.localentrynode-1]+1;
 }
@@ -423,10 +423,10 @@ int studiohdr_t::ExitNode( int iSequence )
 		return seqdesc.localexitnode;
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_seq[iSequence].group ];
+	virtualgroup_t* pGroup = pVModel->pSeqGroup(iSequence);// &pVModel->m_group[pVModel->m_seq[iSequence].group];
 
 	return pGroup->masterNode[seqdesc.localexitnode-1]+1;
 }
@@ -443,10 +443,10 @@ int	studiohdr_t::GetNumAttachments( void ) const
 		return numlocalattachments;
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	return pVModel->m_attachment.Count();
+	return pVModel->NumAttachment();// m_attachment.Count();
 }
 
 
@@ -462,14 +462,14 @@ const mstudioattachment_t &studiohdr_t::pAttachment( int i ) const
 		return *pLocalAttachment( i );
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_attachment[i].group ];
-	const studiohdr_t *pStudioHdr = pGroup->GetStudioHdr();
+	virtualgroup_t* pGroup = pVModel->pAttachmentGroup(i);// &pVModel->m_group[pVModel->m_attachment[i].group];
+	const studiohdr_t *pStudioHdr = pGroup->GetGroupStudioHdr();
 	Assert( pStudioHdr );
 
-	return *pStudioHdr->pLocalAttachment( pVModel->m_attachment[i].index );
+	return *pStudioHdr->pLocalAttachment( pVModel->pAttachmentIndex(i) );// m_attachment[i].index
 }
 
 //-----------------------------------------------------------------------------
@@ -481,10 +481,10 @@ int	studiohdr_t::GetAttachmentBone( int i )
 	const mstudioattachment_t &attachment = pAttachment( i );
 
 	// remap bone
-	virtualmodel_t *pVModel = GetVirtualModel();
+	IVirtualModel *pVModel = GetVirtualModel();
 	if (pVModel)
 	{
-		virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_attachment[i].group ];
+		virtualgroup_t* pGroup = pVModel->pAttachmentGroup(i);// &pVModel->m_group[pVModel->m_attachment[i].group];
 		int iBone = pGroup->masterBone[attachment.localbone];
 		if (iBone == -1)
 			return 0;
@@ -503,10 +503,10 @@ void studiohdr_t::SetAttachmentBone( int iAttachment, int iBone )
 	mstudioattachment_t &attachment = (mstudioattachment_t &)pAttachment( iAttachment );
 
 	// remap bone
-	virtualmodel_t *pVModel = GetVirtualModel();
+	IVirtualModel *pVModel = GetVirtualModel();
 	if (pVModel)
 	{
-		virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_attachment[iAttachment].group ];
+		virtualgroup_t* pGroup = pVModel->pAttachmentGroup(iAttachment);// &pVModel->m_group[pVModel->m_attachment[iAttachment].group];
 		iBone = pGroup->boneMap[iBone];
 	}
 	attachment.localbone = iBone;
@@ -523,13 +523,13 @@ char *studiohdr_t::pszNodeName( int iNode )
 		return pszLocalNodeName( iNode );
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	if ( pVModel->m_node.Count() <= iNode-1 )
+	if ( pVModel->NumNode() <= iNode-1 )// m_node.Count()
 		return "Invalid node";
-
-	return pVModel->m_group[ pVModel->m_node[iNode-1].group ].GetStudioHdr()->pszLocalNodeName( pVModel->m_node[iNode-1].index );
+	//pVModel->m_group[ pVModel->m_node[iNode-1].group ]
+	return pVModel->pNodeGroup(iNode - 1)->GetGroupStudioHdr()->pszLocalNodeName(pVModel->pNodeIndex(iNode - 1));// m_node[iNode - 1].index
 }
 
 
@@ -547,7 +547,7 @@ int studiohdr_t::GetTransition( int iFrom, int iTo ) const
 	return iTo;
 	/*
 	FIXME: not connected
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
 	return pVModel->m_transition.Element( iFrom ).Element( iTo );
@@ -562,16 +562,16 @@ int	studiohdr_t::GetActivityListVersion( void )
 		return activitylistversion;
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
 	int ActVersion = activitylistversion;
 
 	int i;
-	for (i = 1; i < pVModel->m_group.Count(); i++)
+	for (i = 1; i < pVModel->NumGroup(); i++)//m_group.Count()
 	{
-		virtualgroup_t *pGroup = &pVModel->m_group[ i ];
-		const studiohdr_t *pStudioHdr = pGroup->GetStudioHdr();
+		virtualgroup_t* pGroup = pVModel->pGroup(i);// &pVModel->m_group[i];
+		const studiohdr_t *pStudioHdr = pGroup->GetGroupStudioHdr();
 
 		Assert( pStudioHdr );
 
@@ -590,14 +590,14 @@ void studiohdr_t::SetActivityListVersion( int ActVersion ) const
 		return;
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
 	int i;
-	for (i = 1; i < pVModel->m_group.Count(); i++)
+	for (i = 1; i < pVModel->NumGroup(); i++)//m_group.Count()
 	{
-		virtualgroup_t *pGroup = &pVModel->m_group[ i ];
-		const studiohdr_t *pStudioHdr = pGroup->GetStudioHdr();
+		virtualgroup_t* pGroup = pVModel->pGroup(i);// &pVModel->m_group[i];
+		const studiohdr_t *pStudioHdr = pGroup->GetGroupStudioHdr();
 
 		Assert( pStudioHdr );
 
@@ -618,10 +618,10 @@ int studiohdr_t::GetNumIKAutoplayLocks( void ) const
 		return numlocalikautoplaylocks;
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	return pVModel->m_iklock.Count();
+	return pVModel->NumIKlock();// m_iklock.Count();
 }
 
 const mstudioiklock_t &studiohdr_t::pIKAutoplayLock( int i )
@@ -631,14 +631,14 @@ const mstudioiklock_t &studiohdr_t::pIKAutoplayLock( int i )
 		return *pLocalIKAutoplayLock( i );
 	}
 
-	virtualmodel_t *pVModel = (virtualmodel_t *)GetVirtualModel();
+	IVirtualModel *pVModel = (IVirtualModel *)GetVirtualModel();
 	Assert( pVModel );
 
-	virtualgroup_t *pGroup = &pVModel->m_group[ pVModel->m_iklock[i].group ];
-	const studiohdr_t *pStudioHdr = pGroup->GetStudioHdr();
+	virtualgroup_t* pGroup = pVModel->pIKlockGroup(i);// &pVModel->m_group[pVModel->m_iklock[i].group];
+	const studiohdr_t *pStudioHdr = pGroup->GetGroupStudioHdr();
 	Assert( pStudioHdr );
 
-	return *pStudioHdr->pLocalIKAutoplayLock( pVModel->m_iklock[i].index );
+	return *pStudioHdr->pLocalIKAutoplayLock( pVModel->pIKlockIndex(i) );// m_iklock[i].index
 }
 
 int	studiohdr_t::CountAutoplaySequences() const
@@ -677,7 +677,7 @@ int	studiohdr_t::CopyAutoplaySequences( unsigned short *pOut, int outCount ) con
 int	studiohdr_t::RemapSeqBone( int iSequence, int iLocalBone ) const	
 {
 	// remap bone
-	virtualmodel_t *pVModel = GetVirtualModel();
+	IVirtualModel *pVModel = GetVirtualModel();
 	if (pVModel)
 	{
 		const virtualgroup_t *pSeqGroup = pVModel->pSeqGroup( iSequence );
@@ -689,7 +689,7 @@ int	studiohdr_t::RemapSeqBone( int iSequence, int iLocalBone ) const
 int	studiohdr_t::RemapAnimBone( int iAnim, int iLocalBone ) const
 {
 	// remap bone
-	virtualmodel_t *pVModel = GetVirtualModel();
+	IVirtualModel *pVModel = GetVirtualModel();
 	if (pVModel)
 	{
 		const virtualgroup_t *pAnimGroup = pVModel->pAnimGroup( iAnim );

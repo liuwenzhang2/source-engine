@@ -1842,8 +1842,8 @@ matrix3x4_t* CModelRender::SetupModelState( IClientRenderable *pRenderable )
 	if ( !pModel )
 		return NULL;
 
-	studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( const_cast<model_t*>(pModel) );
-	if ( pStudioHdr->numbodyparts == 0 )
+	IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( pModel->studio );
+	if ( pStudioHdr->numbodyparts() == 0)
 		return NULL;
 
 	matrix3x4_t *pBoneMatrices = NULL;
@@ -1851,13 +1851,13 @@ matrix3x4_t* CModelRender::SetupModelState( IClientRenderable *pRenderable )
 	// Set up skinning state
 	Assert ( pRenderable );
 	{
-		int nBoneCount = pStudioHdr->numbones;
-		pBoneMatrices = g_pStudioRender->LockBoneMatrices( pStudioHdr->numbones );
+		int nBoneCount = pStudioHdr->numbones();
+		pBoneMatrices = g_pStudioRender->LockBoneMatrices( pStudioHdr->numbones() );
 		pRenderable->SetupBones( pBoneMatrices, nBoneCount, BONE_USED_BY_ANYTHING, cl.GetTime() ); // hack hack
 		g_pStudioRender->UnlockBoneMatrices();
 	}
 #endif
-
+	delete pStudioHdr;
 	return pBoneMatrices;
 }
 
@@ -3665,19 +3665,20 @@ void CModelRender::ValidateStaticPropColorData( ModelInstanceHandle_t handle )
 		return;
 	}
 
-	studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( pInstance->m_pModel->studio );
+	IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( pInstance->m_pModel->studio );
 
 	HardwareVerts::FileHeader_t *pVhvHdr = (HardwareVerts::FileHeader_t *)utlBuf.Base();
 	if ( pVhvHdr->m_nVersion != VHV_VERSION || 
-		pVhvHdr->m_nChecksum != (unsigned int)pStudioHdr->checksum || 
+		pVhvHdr->m_nChecksum != (unsigned int)pStudioHdr->checksum() ||
 		pVhvHdr->m_nVertexSize != 4 )
 	{
 		// out of sync
 		// mark for debug visualization
 		pInstance->m_nFlags |= MODEL_INSTANCE_DISKCOMPILED_COLOR_BAD;
+		delete pStudioHdr;
 		return;
 	}
-
+	delete pStudioHdr;
 	// async callback can safely stream data into targets
 	pInstance->m_nFlags &= ~MODEL_INSTANCE_DISKCOMPILED_COLOR_BAD;
 	pInstance->m_nFlags |= MODEL_INSTANCE_HAS_DISKCOMPILED_COLOR;
@@ -4440,14 +4441,14 @@ bool CModelRender::RecomputeStaticLighting( ModelInstanceHandle_t handle )
 	Assert( modelloader->IsLoaded( instance.m_pModel ) && ( instance.m_pModel->type == mod_studio ) );
 
 	// get data, possibly delayed due to async
-	studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( instance.m_pModel->studio );
+	IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( instance.m_pModel->studio );
 	if ( !pStudioHdr )
 	{
 		// data not available
 		return false;
 	}
 
-	if ( pStudioHdr->flags & STUDIOHDR_FLAGS_STATIC_PROP )
+	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP)
 	{
 		// get data, possibly delayed due to async
 		studiohwdata_t *pStudioHWData = g_pMDLCache->GetHardwareData( instance.m_pModel->studio );
@@ -4464,7 +4465,7 @@ bool CModelRender::RecomputeStaticLighting( ModelInstanceHandle_t handle )
 
 		return UpdateStaticPropColorData( instance.m_pRenderable->GetIClientUnknown(), handle );
 	}
-
+	delete pStudioHdr;
 #endif
 	// success
 	return true;

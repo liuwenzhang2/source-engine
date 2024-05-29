@@ -77,14 +77,15 @@ void C_DynamicProp::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 	{
 		if ( GetModel() )
 		{
-			studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( GetModel() );
+			IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( GetModel() );
 			if ( !pStudioHdr || GetSequence() == -1 )
 			{
 				theMins = vec3_origin;
 				theMaxs = vec3_origin;
+				delete pStudioHdr;
 				return;
 			}
-
+			delete pStudioHdr;
 			// Only recompute if it's a new frame
 			if ( gpGlobals->framecount != m_iCachedFrameCount )
 			{

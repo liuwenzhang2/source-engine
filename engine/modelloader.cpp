@@ -2906,7 +2906,7 @@ void Mod_TouchAllData( model_t *pModel, int nServerCount )
 
 	MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
 
-	virtualmodel_t *pVirtualModel = g_pMDLCache->GetVirtualModel( pModel->studio );
+	IVirtualModel *pVirtualModel = g_pMDLCache->GetVirtualModel( pModel->studio );
 
 	double t2 = Plat_FloatTime();
 	g_flAccumulatedModelLoadTimeVirtualModel += ( t2 - t1 );
@@ -2916,10 +2916,10 @@ void Mod_TouchAllData( model_t *pModel, int nServerCount )
 		// ensure all sub models get current count to avoid purge
 		// mark first to prevent re-entrant issues during possible reload
 		// skip self, start at children
-		for ( int i=1; i<pVirtualModel->m_group.Count(); ++i )
+		for ( int i=1; i<pVirtualModel->NumGroup(); ++i )//m_group.Count()
 		{
-			MDLHandle_t childHandle = (MDLHandle_t)(intp)pVirtualModel->m_group[i].cache&0xffff;
-			model_t *pChildModel = (model_t *)g_pMDLCache->GetUserData( childHandle );
+			//MDLHandle_t childHandle = (MDLHandle_t)(intp)pVirtualModel->m_group[i].cache&0xffff;
+			model_t *pChildModel = (model_t *)pVirtualModel->GetUserData(i);
 			if ( pChildModel )
 			{
 				// child inherits parent reference
@@ -2960,40 +2960,40 @@ static CMDLCacheNotify s_MDLCacheNotify;
 //-----------------------------------------------------------------------------
 void CMDLCacheNotify::ComputeModelFlags( model_t* pModel, MDLHandle_t handle )
 {
-	studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( handle );
+	IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( handle );
 
 	// Clear out those flags we set...
 	pModel->flags &= ~(MODELFLAG_TRANSLUCENT_TWOPASS | MODELFLAG_VERTEXLIT | 
 		MODELFLAG_TRANSLUCENT | MODELFLAG_MATERIALPROXY | MODELFLAG_FRAMEBUFFER_TEXTURE |
 		MODELFLAG_STUDIOHDR_USES_FB_TEXTURE | MODELFLAG_STUDIOHDR_USES_BUMPMAPPING | MODELFLAG_STUDIOHDR_USES_ENV_CUBEMAP );
 
-	bool bForceOpaque = (pStudioHdr->flags & STUDIOHDR_FLAGS_FORCE_OPAQUE) != 0;
+	bool bForceOpaque = (pStudioHdr->flags() & STUDIOHDR_FLAGS_FORCE_OPAQUE) != 0;
 
-	if ( pStudioHdr->flags & STUDIOHDR_FLAGS_TRANSLUCENT_TWOPASS )
+	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_TRANSLUCENT_TWOPASS)
 	{
 		pModel->flags |= MODELFLAG_TRANSLUCENT_TWOPASS;
 	}
-	if ( pStudioHdr->flags & STUDIOHDR_FLAGS_USES_FB_TEXTURE )
+	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_USES_FB_TEXTURE)
 	{
 		pModel->flags |= MODELFLAG_STUDIOHDR_USES_FB_TEXTURE;
 	}
-	if ( pStudioHdr->flags & STUDIOHDR_FLAGS_USES_BUMPMAPPING )
+	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_USES_BUMPMAPPING)
 	{
 		pModel->flags |= MODELFLAG_STUDIOHDR_USES_BUMPMAPPING;
 	}
-	if ( pStudioHdr->flags & STUDIOHDR_FLAGS_USES_ENV_CUBEMAP )
+	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_USES_ENV_CUBEMAP)
 	{
 		pModel->flags |= MODELFLAG_STUDIOHDR_USES_ENV_CUBEMAP;
 	}
-	if ( pStudioHdr->flags & STUDIOHDR_FLAGS_AMBIENT_BOOST )
+	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_AMBIENT_BOOST)
 	{
 		pModel->flags |= MODELFLAG_STUDIOHDR_AMBIENT_BOOST;
 	}
-	if ( pStudioHdr->flags & STUDIOHDR_FLAGS_DO_NOT_CAST_SHADOWS )
+	if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_DO_NOT_CAST_SHADOWS)
 	{
 		pModel->flags |= MODELFLAG_STUDIOHDR_DO_NOT_CAST_SHADOWS;
 	}
-
+	delete pStudioHdr;
 	IMaterial *pMaterials[ 128 ];
 	int materialCount = Mod_GetModelMaterials( pModel, ARRAYSIZE( pMaterials ), pMaterials );
 
@@ -3031,9 +3031,10 @@ void CMDLCacheNotify::ComputeModelFlags( model_t* pModel, MDLHandle_t handle )
 //-----------------------------------------------------------------------------
 void CMDLCacheNotify::SetBoundsFromStudioHdr( model_t *pModel, MDLHandle_t handle )
 {
-	studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( handle );
-	VectorCopy( pStudioHdr->hull_min, pModel->mins );
-	VectorCopy( pStudioHdr->hull_max, pModel->maxs );
+	IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( handle );
+	VectorCopy( pStudioHdr->hull_min(), pModel->mins);
+	VectorCopy( pStudioHdr->hull_max(), pModel->maxs);
+	delete pStudioHdr;
 	pModel->radius = 0.0f;
 	for ( int i = 0; i < 3; i++ )
 	{
@@ -4086,10 +4087,12 @@ void Mod_RecomputeTranslucency( model_t* mod, int nSkin, int nBody, void /*IClie
 
 	case mod_studio:
 		{
-			studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( mod->studio );
-			if ( pStudioHdr->flags & STUDIOHDR_FLAGS_FORCE_OPAQUE )
+			IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( mod->studio );
+			if (pStudioHdr->flags() & STUDIOHDR_FLAGS_FORCE_OPAQUE) {
+				delete pStudioHdr;
 				return;
-
+			}
+			delete pStudioHdr;
 			IMaterial *pMaterials[ 128 ];
 			int materialCount = g_pStudioRender->GetMaterialListFromBodyAndSkin( mod->studio, nSkin, nBody, ARRAYSIZE( pMaterials ), pMaterials );
 			for ( int i = 0; i < materialCount; i++ )
@@ -5070,8 +5073,9 @@ void CModelLoader::Studio_LoadModel( model_t *pModel, bool bTouchAllData )
 	}
 
 	// Get the studiohdr into the cache
-	studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( pModel->studio );
+	IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( pModel->studio );
 	(void) pStudioHdr;
+	delete pStudioHdr;
 
 	// a preloaded model alrady has its physics data resident
 	if ( bLoadPhysics && !bPreLoaded )
@@ -6220,11 +6224,11 @@ CON_COMMAND_F( model_list, "Dump model list to file", FCVAR_CHEAT | FCVAR_DONTRE
 						dataSizeLod0 = ComputeSize( hwData, &numVertsLod0, &nTriCountLod0, true );
 					}
 
-					studiohdr_t *pStudioHdr = (studiohdr_t *)modelloader->GetExtraData( model );
-					dataSize += pStudioHdr->length; // Size of MDL file
-					numBones = pStudioHdr->numbones;
-					numParts = pStudioHdr->numbodyparts;
-
+					IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( model->studio );
+					dataSize += pStudioHdr->length(); // Size of MDL file
+					numBones = pStudioHdr->numbones();
+					numParts = pStudioHdr->numbodyparts();
+					delete pStudioHdr;
 					g_pFileSystem->FPrintf( fileHandle, "%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
 						name, dataSize, numVerts, nTriCount, dataSizeLod0, numVertsLod0, nTriCountLod0, numBones, numParts, numLODs, numMeshes );
 				}

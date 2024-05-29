@@ -601,14 +601,16 @@ int C_EntityDissolve::DrawModel( int flags )
 	if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) == false )
 		return 0;
 
-	studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
+	IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
 	if ( pStudioHdr == NULL )
 		return false;
 
 	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
-	if ( set == NULL )
+	if (set == NULL) {
+		delete pStudioHdr;
 		return false;
-
+	}
+	delete pStudioHdr;
 	// Make sure the emitter is setup properly
 	SetupEmitter();
 	

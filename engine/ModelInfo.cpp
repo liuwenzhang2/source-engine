@@ -47,7 +47,7 @@ static void R_StudioGetLightingCenter( IClientRenderable *pRenderable, IStudioHd
 	R_ComputeLightingOrigin( pRenderable, pStudioHdr, matrix, *pLightingOrigin );
 }
 
-static int R_StudioBodyVariations( studiohdr_t *pstudiohdr )
+static int R_StudioBodyVariations( IStudioHdr *pstudiohdr )
 {
 	mstudiobodyparts_t *pbodypart;
 	int i, count;
@@ -60,7 +60,7 @@ static int R_StudioBodyVariations( studiohdr_t *pstudiohdr )
 
 	// Each body part has nummodels variations so there are as many total variations as there
 	// are in a matrix of each part by each other part
-	for ( i = 0; i < pstudiohdr->numbodyparts; i++ )
+	for ( i = 0; i < pstudiohdr->numbodyparts(); i++ )
 	{
 		count = count * pbodypart[i].nummodels;
 	}
@@ -80,7 +80,7 @@ static int ModelFrameCount( model_t *model )
 	}
 	else if ( model->type == mod_studio )
 	{
-		count = R_StudioBodyVariations( ( studiohdr_t * )modelloader->GetExtraData( model ) );
+		count = R_StudioBodyVariations( g_pMDLCache->GetIStudioHdr( model->studio ) );
 	}
 
 	if ( count < 1 )
@@ -143,16 +143,16 @@ public:
 	virtual const char *GetModelKeyValueText( const model_t *model );
 	virtual bool GetModelKeyValue( const model_t *model, CUtlBuffer &buf );
 	virtual float GetModelRadius( const model_t *model );
-	virtual studiohdr_t *GetStudiomodel( const model_t *mod );
+	virtual IStudioHdr *GetStudiomodel( const model_t *mod );
 	virtual int GetModelSpriteWidth( const model_t *model ) const;
 	virtual int GetModelSpriteHeight( const model_t *model ) const;
 
-	virtual const studiohdr_t *FindModel( const studiohdr_t *pStudioHdr, void **cache, char const *modelname ) const;
-	virtual const studiohdr_t *FindModel( void *cache ) const;
-	virtual virtualmodel_t *GetVirtualModel( const studiohdr_t *pStudioHdr ) const;
-	virtual byte *GetAnimBlock( const studiohdr_t *pStudioHdr, int iBlock ) const;
+	virtual const IStudioHdr *FindModel( void **cache, char const *modelname ) const;
+	virtual const IStudioHdr *FindModel( void *cache ) const;
+	virtual IVirtualModel *GetVirtualModel( const studiohdr_t *pStudioHdr ) const;
+	virtual byte *GetAnimBlock( const IStudioHdr *pStudioHdr, int iBlock ) const;
 
-	byte *LoadAnimBlock( model_t *model, const studiohdr_t *pStudioHdr, int iBlock, cache_user_t *cache ) const;
+	byte *LoadAnimBlock( model_t *model, const IStudioHdr *pStudioHdr, int iBlock, cache_user_t *cache ) const;
 
 	// NOTE: These aren't in the server version, but putting them here makes this code easier to write
 	// Sets/gets a map-specified fade range
@@ -166,7 +166,7 @@ public:
 	virtual unsigned char			ComputeLevelScreenFade( const Vector &vecAbsOrigin, float flRadius, float flFadeScale ) const { return 0; }
 	virtual unsigned char			ComputeViewScreenFade( const Vector &vecAbsOrigin, float flRadius, float flFadeScale ) const { return 0; }
 
-	int GetAutoplayList( const studiohdr_t *pStudioHdr, unsigned short **pAutoplayList ) const;
+	int GetAutoplayList( const IStudioHdr *pStudioHdr, unsigned short **pAutoplayList ) const;
 	CPhysCollide *GetCollideForVirtualTerrain( int index );
 	virtual int GetSurfacepropsForVirtualTerrain( int index ) { return CM_SurfacepropsForDisp(index); }
 
@@ -424,22 +424,23 @@ void CModelInfo::GetModelRenderBounds( const model_t *model, Vector& mins, Vecto
 	{
 	case mod_studio:
 		{
-			studiohdr_t *pStudioHdr = ( studiohdr_t * )modelloader->GetExtraData( (model_t*)model );
+			IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( model->studio );
 			Assert( pStudioHdr );
 
 			// NOTE: We're not looking at the sequence box here, although we could
-			if (!VectorCompare( vec3_origin, pStudioHdr->view_bbmin ) || !VectorCompare( vec3_origin, pStudioHdr->view_bbmax ))
+			if (!VectorCompare( vec3_origin, pStudioHdr->view_bbmin() ) || !VectorCompare( vec3_origin, pStudioHdr->view_bbmax() ))
 			{
 				// clipping bounding box
-				VectorCopy ( pStudioHdr->view_bbmin, mins);
-				VectorCopy ( pStudioHdr->view_bbmax, maxs);
+				VectorCopy ( pStudioHdr->view_bbmin(), mins);
+				VectorCopy ( pStudioHdr->view_bbmax(), maxs);
 			}
 			else
 			{
 				// movement bounding box
-				VectorCopy ( pStudioHdr->hull_min, mins);
-				VectorCopy ( pStudioHdr->hull_max, maxs);
+				VectorCopy ( pStudioHdr->hull_min(), mins);
+				VectorCopy ( pStudioHdr->hull_max(), maxs);
 			}
+			delete pStudioHdr;
 		}
 		break;
 
@@ -513,7 +514,7 @@ void *CModelInfo::GetModelExtraData( const model_t *model )
 //-----------------------------------------------------------------------------
 // Purpose: Translate "cache" pointer into model_t, or lookup model by name
 //-----------------------------------------------------------------------------
-const studiohdr_t *CModelInfo::FindModel( const studiohdr_t *pStudioHdr, void **cache, char const *modelname ) const
+const IStudioHdr *CModelInfo::FindModel( void **cache, char const *modelname ) const
 {
 	const model_t *model = (model_t *)*cache;
 
@@ -524,23 +525,23 @@ const studiohdr_t *CModelInfo::FindModel( const studiohdr_t *pStudioHdr, void **
 		*cache = (void *)model;
 	}
 
-	return (const studiohdr_t *)modelloader->GetExtraData( (model_t *)model );
+	return g_pMDLCache->GetIStudioHdr( model->studio );
 }
 
 
 //-----------------------------------------------------------------------------
 // Purpose: Translate "cache" pointer into model_t
 //-----------------------------------------------------------------------------
-const studiohdr_t *CModelInfo::FindModel( void *cache ) const
+const IStudioHdr *CModelInfo::FindModel( void *cache ) const
 {
-	return g_pMDLCache->GetStudioHdr( VoidPtrToMDLHandle( cache ) );
+	return g_pMDLCache->GetIStudioHdr( VoidPtrToMDLHandle( cache ) );
 }
 
 
 //-----------------------------------------------------------------------------
 // Purpose: Return virtualmodel_t block associated with model_t
 //-----------------------------------------------------------------------------
-virtualmodel_t *CModelInfo::GetVirtualModel( const studiohdr_t *pStudioHdr ) const
+IVirtualModel *CModelInfo::GetVirtualModel( const studiohdr_t *pStudioHdr ) const
 {
 	MDLHandle_t handle = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
 	return g_pMDLCache->GetVirtualModelFast( pStudioHdr, handle );
@@ -549,16 +550,15 @@ virtualmodel_t *CModelInfo::GetVirtualModel( const studiohdr_t *pStudioHdr ) con
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-byte *CModelInfo::GetAnimBlock( const studiohdr_t *pStudioHdr, int nBlock ) const
+byte *CModelInfo::GetAnimBlock( const IStudioHdr *pStudioHdr, int nBlock ) const
 {
-	MDLHandle_t handle = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
-	return g_pMDLCache->GetAnimBlock( handle, nBlock );
+	//MDLHandle_t handle = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
+	return pStudioHdr->GetAnimBlock( nBlock );
 }
 
-int CModelInfo::GetAutoplayList( const studiohdr_t *pStudioHdr, unsigned short **pAutoplayList ) const
+int CModelInfo::GetAutoplayList( const IStudioHdr *pStudioHdr, unsigned short **pAutoplayList ) const
 {
-	MDLHandle_t handle = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
-	return g_pMDLCache->GetAutoplayList( handle, pAutoplayList );
+	return pStudioHdr->GetAutoplayList( pAutoplayList );
 }
 
 
@@ -573,7 +573,7 @@ const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName 
 	return g_pMDLCache->GetStudioHdr( handle );
 }
 
-virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
+IVirtualModel *studiohdr_t::GetVirtualModel( void ) const
 {
 	if ( numincludemodels == 0 )
 		return NULL;
@@ -585,12 +585,12 @@ byte *studiohdr_t::GetAnimBlock( int i ) const
 	return g_pMDLCache->GetAnimBlock( VoidPtrToMDLHandle( VirtualModel() ), i );
 }
 
-int	studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
-{
-	return g_pMDLCache->GetAutoplayList( VoidPtrToMDLHandle( VirtualModel() ), pOut );
-}
+//int	studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
+//{
+//	return g_pMDLCache->GetAutoplayList( VoidPtrToMDLHandle( VirtualModel() ), pOut );
+//}
 
-const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
+const studiohdr_t *virtualgroup_t::GetGroupStudioHdr( void ) const
 {
 	return g_pMDLCache->GetStudioHdr( VoidPtrToMDLHandle( cache ) );
 }
@@ -802,11 +802,13 @@ const char *CModelInfo::GetModelKeyValueText( const model_t *model )
 	if (!model || model->type != mod_studio)
 		return NULL;
 
-	studiohdr_t* pStudioHdr = g_pMDLCache->GetStudioHdr( model->studio );
+	IStudioHdr* pStudioHdr = g_pMDLCache->GetIStudioHdr( model->studio );
 	if (!pStudioHdr)
 		return NULL;
 
-	return pStudioHdr->KeyValueText();
+	const char* pRet = pStudioHdr->KeyValueText();
+	delete pStudioHdr;
+	return pRet;
 }
 
 
@@ -816,27 +818,28 @@ bool CModelInfo::GetModelKeyValue( const model_t *model, CUtlBuffer &buf )
 	if (!model || model->type != mod_studio)
 		return false;
 
-	studiohdr_t* pStudioHdr = g_pMDLCache->GetStudioHdr( model->studio );
+	IStudioHdr* pStudioHdr = g_pMDLCache->GetIStudioHdr( model->studio );
 	if (!pStudioHdr)
 		return false;
 
-	if ( pStudioHdr->numincludemodels == 0)
+	if ( pStudioHdr->numincludemodels() == 0)
 	{
 		buf.PutString( pStudioHdr->KeyValueText() );
 		return true;
 	}
 
-	virtualmodel_t *pVM = GetVirtualModel( pStudioHdr );
+	IVirtualModel *pVM = pStudioHdr->GetVirtualModel();
 
 	if (pVM)
 	{
-		for (int i = 0; i < pVM->m_group.Count(); i++)
+		for (int i = 0; i < pVM->NumGroup(); i++)//m_group.Count()
 		{
-			const studiohdr_t* pSubStudioHdr = pVM->m_group[i].GetStudioHdr();
+			const IStudioHdr* pSubStudioHdr = pVM->GetIStudioHdr(i);// g_pMDLCache->GetIStudioHdr(VoidPtrToMDLHandle(pVM->m_group[i].cache));
 			if (pSubStudioHdr && pSubStudioHdr->KeyValueText())
 			{
 				buf.PutString( pSubStudioHdr->KeyValueText() );
 			}
+			delete pSubStudioHdr;
 		}
 	}
 	return true;
@@ -859,10 +862,10 @@ float CModelInfo::GetModelRadius( const model_t *model )
 //-----------------------------------------------------------------------------
 // Lovely studiohdrs
 //-----------------------------------------------------------------------------
-studiohdr_t *CModelInfo::GetStudiomodel( const model_t *model )
+IStudioHdr *CModelInfo::GetStudiomodel( const model_t *model )
 {
 	if ( model->type == mod_studio )
-		return g_pMDLCache->GetStudioHdr( model->studio );
+		return g_pMDLCache->GetIStudioHdr( model->studio );
 
 	return NULL;
 }

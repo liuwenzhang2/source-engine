@@ -143,7 +143,7 @@ private:
 	bool ClipRayToCustom( const Ray_t& ray, unsigned int fMask, ICollideable *pCollideable, trace_t* pTrace );
 
 	// Perform vphysics trace
-	bool ClipRayToVPhysics( const Ray_t &ray, unsigned int fMask, ICollideable *pCollideable, studiohdr_t *pStudioHdr, trace_t *pTrace );
+	bool ClipRayToVPhysics( const Ray_t &ray, unsigned int fMask, ICollideable *pCollideable, IStudioHdr *pStudioHdr, trace_t *pTrace );
 
 	// Perform hitbox trace
 	bool ClipRayToHitboxes( const Ray_t& ray, unsigned int fMask, ICollideable *pCollideable, trace_t* pTrace );
@@ -818,7 +818,7 @@ private:
 class CStudioConvexInfo : public IConvexInfo
 {
 public:
-	CStudioConvexInfo( studiohdr_t *pStudioHdr )
+	CStudioConvexInfo( IStudioHdr *pStudioHdr )
 	{
 		m_pStudioHdr = pStudioHdr;
 	}
@@ -827,7 +827,7 @@ public:
 	{
 		if ( convexGameData == 0 )
 		{
-			return m_pStudioHdr->contents;
+			return m_pStudioHdr->contents();
 		}
 
 		Assert( convexGameData <= m_pStudioHdr->numbones );
@@ -836,14 +836,14 @@ public:
 	}
 
 private:
-	studiohdr_t *m_pStudioHdr;
+	IStudioHdr *m_pStudioHdr;
 };
 
 
 //-----------------------------------------------------------------------------
 // Perform vphysics trace
 //-----------------------------------------------------------------------------
-bool CEngineTrace::ClipRayToVPhysics( const Ray_t &ray, unsigned int fMask, ICollideable *pEntity, studiohdr_t *pStudioHdr, trace_t *pTrace )
+bool CEngineTrace::ClipRayToVPhysics( const Ray_t &ray, unsigned int fMask, ICollideable *pEntity, IStudioHdr *pStudioHdr, trace_t *pTrace )
 {
 	if ( pEntity->GetSolid() != SOLID_VPHYSICS )
 		return false;
@@ -1065,15 +1065,15 @@ void CEngineTrace::ClipRayToCollideable( const Ray_t &ray, unsigned int fMask, I
 
 	const model_t *pModel = pEntity->GetCollisionModel();
 	bool bIsStudioModel = false;
-	studiohdr_t *pStudioHdr = NULL;
+	IStudioHdr *pStudioHdr = NULL;
 	if ( pModel && pModel->type == mod_studio )
 	{
 		bIsStudioModel = true;
-		pStudioHdr = (studiohdr_t *)modelloader->GetExtraData( (model_t*)pModel );
+		pStudioHdr = g_pMDLCache->GetIStudioHdr(pModel->studio);
 		// Cull if the collision mask isn't set + we're not testing hitboxes.
 		if ( (( fMask & CONTENTS_HITBOX ) == 0) )
 		{
-			if ( ( fMask & pStudioHdr->contents ) == 0)
+			if ( ( fMask & pStudioHdr->contents() ) == 0)
 				return;
 		}
 	}
@@ -1131,7 +1131,7 @@ void CEngineTrace::ClipRayToCollideable( const Ray_t &ray, unsigned int fMask, I
 
 	if ( bIsStudioModel && !bTracedHitboxes && pTrace->DidHit() && (!bCustomPerformed || pTrace->surface.surfaceProps == 0) )
 	{
-		pTrace->contents = pStudioHdr->contents;
+		pTrace->contents = pStudioHdr->contents();
 		// use the default surface properties
 		pTrace->surface.name = "**studio**";
 		pTrace->surface.flags = 0;
@@ -1152,6 +1152,7 @@ void CEngineTrace::ClipRayToCollideable( const Ray_t &ray, unsigned int fMask, I
 	Assert( VectorsAreEqual( vecEndTest, pTrace->endpos, 0.1f ) );
 #endif
 	m_pRootMoveParent = pOldRoot;
+	delete pStudioHdr;
 }
 
 

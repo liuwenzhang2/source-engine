@@ -221,7 +221,7 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 			if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 			{
 		
-				studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
+				IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
 				
 				if ( pStudioHdr )
 				{
@@ -293,6 +293,7 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 						}
 					}
 				}
+				delete pStudioHdr;
 			}
 		}
 
@@ -413,7 +414,7 @@ int CParticleSystemQuery::GetControllingObjectHitBoxInfo(
 			if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 			{
 		
-				studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
+				IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
 				
 				if ( pStudioHdr )
 				{
@@ -437,6 +438,7 @@ int CParticleSystemQuery::GetControllingObjectHitBoxInfo(
 						}
 					}
 				}
+				delete pStudioHdr;
 			}
 		}
 		if ( pMoveParent->IsBrushModel() )
@@ -500,7 +502,7 @@ bool CParticleSystemQuery::IsPointInControllingObjectHitBox(
 			if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 			{
 
-				studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
+				IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
 
 				if ( pStudioHdr )
 				{
@@ -517,6 +519,7 @@ bool CParticleSystemQuery::IsPointInControllingObjectHitBox(
 							bSuccess = true;
 					}
 				}
+				delete pStudioHdr;
 			}
 		}
 		else if ( pMoveParent->IsBrushModel() && bInBBox )

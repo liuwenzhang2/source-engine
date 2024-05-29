@@ -1740,8 +1740,6 @@ public:
 	virtualgroup_t( void ) { cache = NULL; };
 	// tool dependant.  In engine this is a model_t, in tool it's a direct pointer
 	void *cache;
-	// converts cache entry into a usable studiohdr_t *
-	const studiohdr_t *GetStudioHdr( void ) const;
 
 	CUtlVector< int > boneMap;				// maps global bone to local bone
 	CUtlVector< int > masterBone;			// maps local bone to global bone
@@ -1750,6 +1748,12 @@ public:
 	CUtlVector< int > masterAttachment;	// maps local attachment to global
 	CUtlVector< int > masterPose;			// maps local pose parameter to global
 	CUtlVector< int > masterNode;			// maps local transition nodes to global
+
+private:
+	friend struct studiohdr_t;
+	friend struct virtualmodel_t;
+	// converts cache entry into a usable studiohdr_t *
+	const studiohdr_t* GetGroupStudioHdr(void) const;
 };
 
 struct virtualsequence_t
@@ -1778,46 +1782,43 @@ struct virtualgeneric_t
 #endif
 };
 
+class IVirtualModel {
+public:
+	virtual void AppendSequences(int group, const studiohdr_t* pStudioHdr) = 0;
+	virtual void AppendAnimations(int group, const studiohdr_t* pStudioHdr) = 0;
+	virtual void AppendAttachments(int ground, const studiohdr_t* pStudioHdr) = 0;
+	virtual void AppendPoseParameters(int group, const studiohdr_t* pStudioHdr) = 0;
+	virtual void AppendBonemap(int group, const studiohdr_t* pStudioHdr) = 0;
+	virtual void AppendNodes(int group, const studiohdr_t* pStudioHdr) = 0;
+	virtual void AppendIKLocks(int group, const studiohdr_t* pStudioHdr) = 0;
+	virtual void AppendModels(int group, const studiohdr_t* pStudioHdr) = 0;
+	virtual void UpdateAutoplaySequences(const studiohdr_t* pStudioHdr) = 0;
+	virtual virtualgroup_t* pAnimGroup(int animation) = 0;
+	virtual int pAnimIndex(int animation) = 0;
+	virtual virtualgroup_t* pSeqGroup(int sequence) = 0;
+	virtual int	pSeqIndex(int animation) = 0;
+	virtual int NumSeq() = 0;
+	virtual int NumPose() = 0;
+	virtual int nPoseGroup(int pose) = 0;
+	virtual int pPoseIndex(int pose) = 0;
+	virtual virtualgroup_t* pPoseGroup(int pose) = 0;
+	virtual int NumAttachment() = 0;
+	virtual virtualgroup_t* pAttachmentGroup(int attachment) = 0;
+	virtual int pAttachmentIndex(int attachment) = 0;
+	virtual int NumNode() = 0;
+	virtual virtualgroup_t* pNodeGroup(int node) = 0;
+	virtual int pNodeIndex(int node) = 0;
+	virtual int NumGroup() = 0;
+	virtual virtualgroup_t* pGroup(int group) = 0;
+	virtual IStudioHdr* GetIStudioHdr(int group) = 0;
+	virtual void* GetUserData(int group) = 0;
+	virtual int NumIKlock() = 0;
+	virtual virtualgroup_t* pIKlockGroup(int iklock) = 0;
+	virtual int pIKlockIndex(int iklock) = 0;
 
-struct virtualmodel_t
-{
-	void AppendSequences( int group, const studiohdr_t *pStudioHdr ); 
-	void AppendAnimations( int group, const studiohdr_t *pStudioHdr );
-	void AppendAttachments( int ground, const studiohdr_t *pStudioHdr );
-	void AppendPoseParameters( int group, const studiohdr_t *pStudioHdr );
-	void AppendBonemap( int group, const studiohdr_t *pStudioHdr );
-	void AppendNodes( int group, const studiohdr_t *pStudioHdr );
-	void AppendTransitions( int group, const studiohdr_t *pStudioHdr );
-	void AppendIKLocks( int group, const studiohdr_t *pStudioHdr );
-	void AppendModels( int group, const studiohdr_t *pStudioHdr );
-	void UpdateAutoplaySequences( const studiohdr_t *pStudioHdr );
-
-	virtualgroup_t *pAnimGroup( int animation ) { return &m_group[ m_anim[ animation ].group ]; } // Note: user must manage mutex for this
-	virtualgroup_t *pSeqGroup( int sequence )
-	{
-		// Check for out of range access that is causing crashes on some servers.
-		// Perhaps caused by sourcemod bugs. Typical sequence in these cases is ~292
-		// when the count is 234. Using unsigned math allows for free range
-		// checking against zero.
-		if ( (unsigned)sequence >= (unsigned)m_seq.Count() )
-		{
-			Assert( 0 );
-			return 0;
-		}
-		return &m_group[ m_seq[ sequence ].group ];
-	} // Note: user must manage mutex for this
-
-    CThreadFastMutex m_Lock;
-
-	CUtlVector< virtualsequence_t > m_seq;
-	CUtlVector< virtualgeneric_t > m_anim;
-	CUtlVector< virtualgeneric_t > m_attachment;
-	CUtlVector< virtualgeneric_t > m_pose;
-	CUtlVector< virtualgroup_t > m_group;
-	CUtlVector< virtualgeneric_t > m_node;
-	CUtlVector< virtualgeneric_t > m_iklock;
-	CUtlVector< unsigned short > m_autoplaySequences;
 };
+
+
 
 // 'thin' vertex data, used to do model decals (see Studio_CreateThinVertexes())
 struct thinModelVertices_t
@@ -2336,7 +2337,7 @@ struct studiohdr_t
 	const mstudioiklock_t &pIKAutoplayLock( int i );
 	int					CountAutoplaySequences() const;
 	int					CopyAutoplaySequences( unsigned short *pOut, int outCount ) const;
-	int					GetAutoplayList( unsigned short **pOut ) const;
+	//int					GetAutoplayList( unsigned short **pOut ) const;
 
 	// The collision model mass that jay wanted
 	float				mass;
@@ -2351,7 +2352,7 @@ struct studiohdr_t
 
 	// implementation specific back pointer to virtual data
 	int                 unused_virtualModel;
-	virtualmodel_t		*GetVirtualModel( void ) const;
+	IVirtualModel		*GetVirtualModel( void ) const;
 
 	// for demand loaded animation blocks
 	int					szanimblocknameindex;	
@@ -2453,7 +2454,7 @@ public:
 	virtual bool IsVirtual(void) = 0;
 	virtual bool IsValid(void) = 0;
 	virtual bool IsReadyForAccess(void) const = 0;
-	virtual virtualmodel_t* GetVirtualModel(void) const = 0;
+	virtual IVirtualModel* GetVirtualModel(void) const = 0;
 	virtual const studiohdr_t* GetRenderHdr(void) const = 0;
 	virtual const studiohdr_t* pSeqStudioHdr(int sequence) = 0;
 	virtual const studiohdr_t* pAnimStudioHdr(int animation) = 0;
@@ -2473,7 +2474,7 @@ public:
 	//virtual int					GetSequenceActivity(int iSequence) = 0;
 	//virtual void				SetSequenceActivity(int iSequence, int iActivity) = 0;
 	virtual int					GetActivityListVersion(void) = 0;
-	virtual void				SetActivityListVersion(int version) = 0;
+	virtual void				SetActivityListVersion(int version) const = 0;
 	virtual int					GetEventListVersion(void) = 0;
 	virtual void				SetEventListVersion(int version) = 0;
 
@@ -2601,6 +2602,17 @@ public:
 	virtual int numcdtextures() = 0;
 	virtual char* pCdtexture(int i) const = 0;
 	virtual mstudiotexture_t* pTexture(int i) const = 0;
+	virtual unsigned char* GetAnimBlock(int nBlock) const = 0;
+	virtual int numincludemodels() = 0;
+	virtual const char* KeyValueText(void) const = 0;
+	virtual int length() = 0;
+	virtual mstudioanimdesc_t* pLocalAnimdesc(int i) const = 0;
+	virtual mstudioseqdesc_t* pLocalSeqdesc(int i) const = 0;
+	virtual mstudioposeparamdesc_t* pLocalPoseParameter(int i) const = 0;
+	virtual mstudioattachment_t* pLocalAttachment(int i) const = 0;
+	virtual char* pszLocalNodeName(int iNode) const = 0;
+	virtual int activitylistversion() const = 0;
+	virtual mstudioiklock_t* pLocalIKAutoplayLock(int i) const = 0;
 
 };
 

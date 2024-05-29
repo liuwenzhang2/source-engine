@@ -492,11 +492,11 @@ bool CStaticProp::Init( int index, StaticPropLump_t &lump, model_t *pModel )
 
 	MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
 
-	studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( m_pModel );
+	IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( m_pModel );
 
 	if ( pStudioHdr )
 	{
-		if ( !( pStudioHdr->flags & STUDIOHDR_FLAGS_STATIC_PROP ) )
+		if ( !( pStudioHdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP))
 		{
 			static int nBitchCount = 0;
 			if( nBitchCount < 100 )
@@ -506,12 +506,12 @@ bool CStaticProp::Init( int index, StaticPropLump_t &lump, model_t *pModel )
 			}
 		}
 
-		if ( pStudioHdr->flags & STUDIOHDR_FLAGS_NO_FORCED_FADE )
+		if ( pStudioHdr->flags() & STUDIOHDR_FLAGS_NO_FORCED_FADE)
 		{
 			m_flForcedFadeScale = 0.0f;
 		}
 	}
-
+	delete pStudioHdr;
 	switch ( m_nSolidType )
 	{
 		// These are valid
@@ -991,12 +991,13 @@ int	CStaticProp::DrawModelSlow( int flags )
 		return 0;
 
 #ifdef _DEBUG
-	studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( m_pModel );
+	IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( m_pModel );
 	Assert( pStudioHdr );
-	if ( !( pStudioHdr->flags & STUDIOHDR_FLAGS_STATIC_PROP ) )
+	if ( !( pStudioHdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP))
 	{
 		return 0;
 	}
+	delete pStudioHdr;
 #endif
 
 	if ( r_colorstaticprops.GetBool() )
@@ -1409,9 +1410,9 @@ void CStaticPropMgr::OutputLevelStats( void )
 			continue;
 		}
 		Assert( pModel->type == mod_studio );
-		studiohdr_t *pStudioHdr = ( studiohdr_t * )modelloader->GetExtraData( pModel );
+		IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( pModel->studio );
 		int bodyPart;
-		for( bodyPart = 0; bodyPart < pStudioHdr->numbodyparts; bodyPart++ )
+		for( bodyPart = 0; bodyPart < pStudioHdr->numbodyparts(); bodyPart++ )
 		{
 			mstudiobodyparts_t *pBodyPart = pStudioHdr->pBodypart( bodyPart );
 			int model;

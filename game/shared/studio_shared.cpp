@@ -15,28 +15,28 @@
 ////////////////////////////////////////////////////////////////////////
 const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *modelname ) const
 {
-	return modelinfo->FindModel( this, cache, modelname );
+	return modelinfo->FindModel( cache, modelname )->GetRenderHdr();
 }
 
-virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
+IVirtualModel *studiohdr_t::GetVirtualModel( void ) const
 {
 	if ( numincludemodels == 0 )
 		return NULL;
 	return modelinfo->GetVirtualModel( this );
 }
 
-const studiohdr_t *virtualgroup_t::GetStudioHdr( ) const
+const studiohdr_t *virtualgroup_t::GetGroupStudioHdr( ) const
 {
-	return modelinfo->FindModel( this->cache );
+	return modelinfo->FindModel( this->cache )->GetRenderHdr();
 }
 
 
 byte *studiohdr_t::GetAnimBlock( int iBlock ) const
 {
-	return modelinfo->GetAnimBlock( this, iBlock );
+	return mdlcache->GetAnimBlock(VoidPtrToMDLHandle(VirtualModel()), iBlock);// modelinfo->GetAnimBlock(this, iBlock);
 }
 
-int	studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
-{
-	return modelinfo->GetAutoplayList( this, pOut );
-}
+//int	studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
+//{
+//	return modelinfo->GetAutoplayList( this, pOut );
+//}

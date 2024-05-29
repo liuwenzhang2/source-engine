@@ -663,12 +663,12 @@ bool CDetailModel::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int 
 	parentTransform[2][3] = vRenderOrigin.z;
 
 	// Just copy it on down baby
-	studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( m_pModel );
-	for (int i = 0; i < pStudioHdr->numbones; i++) 
+	IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( m_pModel );
+	for (int i = 0; i < pStudioHdr->numbones(); i++) 
 	{
 		MatrixCopy( parentTransform, pBoneToWorldOut[i] );
 	}
-
+	delete pStudioHdr;
 	return true;
 }
 

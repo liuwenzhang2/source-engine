@@ -205,7 +205,7 @@ public:
 	virtual studiohwdata_t *GetHardwareData( MDLHandle_t handle ) = 0;
 	virtual vcollide_t *GetVCollide( MDLHandle_t handle ) = 0;
 	virtual unsigned char *GetAnimBlock( MDLHandle_t handle, int nBlock ) = 0;
-	virtual virtualmodel_t *GetVirtualModel( MDLHandle_t handle ) = 0;
+	virtual IVirtualModel *GetVirtualModel( MDLHandle_t handle ) = 0;
 	virtual int GetAutoplayList( MDLHandle_t handle, unsigned short **pOut ) = 0;
 	virtual vertexFileHeader_t *GetVertexData( MDLHandle_t handle ) = 0;
 
@@ -229,7 +229,7 @@ public:
 	virtual const char *GetModelName( MDLHandle_t handle ) = 0;
 
 	// faster access when you already have the studiohdr
-	virtual virtualmodel_t *GetVirtualModelFast( const studiohdr_t *pStudioHdr, MDLHandle_t handle ) = 0;
+	virtual IVirtualModel *GetVirtualModelFast( const studiohdr_t *pStudioHdr, MDLHandle_t handle ) = 0;
 
 	// all cache entries that subsequently allocated or successfully checked 
 	// are considered "locked" and will not be freed when additional memory is needed

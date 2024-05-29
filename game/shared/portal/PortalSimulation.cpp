@@ -2008,10 +2008,11 @@ void CPortalSimulator::CreatePolyhedrons( void )
 					AssertOnce( bIsStudioModel );
 					if( bIsStudioModel )
 					{
-						studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( pModel );
+						IStudioHdr *pStudioHdr = modelinfo->GetStudiomodel( pModel );
 						Assert( pStudioHdr != NULL );
-						NewEntry.iTraceContents = pStudioHdr->contents;						
+						NewEntry.iTraceContents = pStudioHdr->contents();						
 						NewEntry.iTraceSurfaceProps = physprops->GetSurfaceIndex( pStudioHdr->pszSurfaceProp() );
+						delete pStudioHdr;
 					}
 					else
 					{

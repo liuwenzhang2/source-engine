@@ -957,7 +957,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 	const model_t *model = modelinfo->GetModel( modelindex );
 	if ( model )
 	{
-		studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( model ) );
+		studioHdr = modelinfo->GetStudiomodel( model );
 	}
 
 	Vector parentOrigin = vec3_origin;
@@ -1016,7 +1016,7 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 			const model_t *model = modelinfo->GetModel( modelIndex );
 			if ( model )
 			{
-				studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( model ) );
+				studioHdr = modelinfo->GetStudiomodel( model );
 			}
 
 			// Increment the number of breakable props this frame.
@@ -1345,7 +1345,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 	const model_t *model = modelinfo->GetModel( modelindex );
 	if ( model )
 	{
-		studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( model ) );
+		studioHdr = modelinfo->GetStudiomodel( model );
 	}
 
 	Vector parentOrigin = vec3_origin;
@@ -1405,7 +1405,7 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 			const model_t *model = modelinfo->GetModel( modelIndex );
 			if ( model )
 			{
-				studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( model ) );
+				studioHdr = modelinfo->GetStudiomodel( model );
 			}
 
 			// Increment the number of breakable props this frame.

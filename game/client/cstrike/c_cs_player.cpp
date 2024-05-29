@@ -2076,7 +2076,7 @@ void C_CSPlayer::PlayReloadEffect()
 	const model_t *pModel = modelinfo->GetModel( modelinfo->GetModelIndex( info.szViewModel ) );
 	if ( !pModel )
 		return;
-	IStudioHdr* studioHdr = mdlcache->GetIStudioHdr( modelinfo->GetStudiomodel( pModel ));
+	IStudioHdr* studioHdr = modelinfo->GetStudiomodel( pModel );
 	if ( !studioHdr->IsValid() )
 		return;
 

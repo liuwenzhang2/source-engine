@@ -28,13 +28,14 @@ class CGameTrace;
 struct cplane_t;
 typedef CGameTrace trace_t;
 struct studiohdr_t;
-struct virtualmodel_t;
+class IVirtualModel;
 typedef unsigned char byte;
 struct virtualterrainparams_t;
 class CPhysCollide;
 typedef unsigned short MDLHandle_t;
 class CUtlBuffer;
 class IClientRenderable;
+class IStudioHdr;
 
 
 //-----------------------------------------------------------------------------
@@ -130,10 +131,10 @@ public:
 	virtual bool					GetModelKeyValue( const model_t *model, CUtlBuffer &buf ) = 0; // supports keyvalue blocks in submodels
 	virtual float					GetModelRadius( const model_t *model ) = 0;
 
-	virtual const studiohdr_t		*FindModel( const studiohdr_t *pStudioHdr, void **cache, const char *modelname ) const = 0;
-	virtual const studiohdr_t		*FindModel( void *cache ) const = 0;
-	virtual	virtualmodel_t			*GetVirtualModel( const studiohdr_t *pStudioHdr ) const = 0;
-	virtual byte					*GetAnimBlock( const studiohdr_t *pStudioHdr, int iBlock ) const = 0;
+	virtual const IStudioHdr		*FindModel( void **cache, const char *modelname ) const = 0;
+	virtual const IStudioHdr		*FindModel( void *cache ) const = 0;
+	virtual	IVirtualModel			*GetVirtualModel( const studiohdr_t *pStudioHdr ) const = 0;
+	virtual byte					*GetAnimBlock( const IStudioHdr *pStudioHdr, int iBlock ) const = 0;
 
 	// Available on client only!!!
 	virtual void					GetModelMaterialColorAndLighting( const model_t *model, Vector const& origin,
@@ -143,7 +144,7 @@ public:
 										QAngle const& angles, Vector* pLightingCenter ) = 0;
 
 	virtual int						GetModelContents( int modelIndex ) = 0;
-	virtual studiohdr_t				*GetStudiomodel( const model_t *mod ) = 0;
+	virtual IStudioHdr				*GetStudiomodel( const model_t *mod ) = 0;
 	virtual int						GetModelSpriteWidth( const model_t *model ) const = 0;
 	virtual int						GetModelSpriteHeight( const model_t *model ) const = 0;
 
@@ -159,7 +160,7 @@ public:
 	virtual unsigned char			ComputeViewScreenFade( const Vector &vecAbsOrigin, float flRadius, float flFadeScale ) const = 0;
 
 	// both client and server
-	virtual int						GetAutoplayList( const studiohdr_t *pStudioHdr, unsigned short **pAutoplayList ) const = 0;
+	virtual int						GetAutoplayList( const IStudioHdr *pStudioHdr, unsigned short **pAutoplayList ) const = 0;
 
 	// Gets a virtual terrain collision model (creates if necessary)
 	// NOTE: This may return NULL if the terrain model cannot be virtualized

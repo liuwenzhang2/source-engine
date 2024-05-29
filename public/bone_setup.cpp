@@ -892,7 +892,7 @@ static void CalcZeroframeData( const IStudioHdr *pStudioHdr, const studiohdr_t *
 //-----------------------------------------------------------------------------
 // Purpose: Find and decode a sub-frame of animation, remapping the skeleton bone indexes
 //-----------------------------------------------------------------------------
-static void CalcVirtualAnimation( virtualmodel_t *pVModel, const IStudioHdr *pStudioHdr, Vector *pos, Quaternion *q, 
+static void CalcVirtualAnimation( IVirtualModel *pVModel, const IStudioHdr *pStudioHdr, Vector *pos, Quaternion *q, 
 	mstudioseqdesc_t &seqdesc, int sequence, int animation,
 	float cycle, int boneMask )
 {
@@ -1048,7 +1048,7 @@ static void CalcAnimation( const IStudioHdr *pStudioHdr,	Vector *pos, Quaternion
 	pStudioHdr->IncPerfAnimationLayers();
 #endif
 
-	virtualmodel_t *pVModel = pStudioHdr->GetVirtualModel();
+	IVirtualModel *pVModel = pStudioHdr->GetVirtualModel();
 
 	if (pVModel)
 	{
@@ -1286,7 +1286,7 @@ void WorldSpaceSlerp(
 	matrix3x4_t *targetBoneToWorld = g_MatrixPool.Alloc();
 	CBoneBitList targetBoneComputed;
 
-	virtualmodel_t *pVModel = pStudioHdr->GetVirtualModel();
+	IVirtualModel *pVModel = pStudioHdr->GetVirtualModel();
 	const virtualgroup_t *pSeqGroup = NULL;
 	if (pVModel)
 	{
@@ -1407,7 +1407,7 @@ void SlerpBones(
 	}
 
 	int			i, j;
-	virtualmodel_t *pVModel = pStudioHdr->GetVirtualModel();
+	IVirtualModel *pVModel = pStudioHdr->GetVirtualModel();
 	const virtualgroup_t *pSeqGroup = NULL;
 	if (pVModel)
 	{
@@ -1554,7 +1554,7 @@ void BlendBones(
 	int			i, j;
 	Quaternion		q3;
 
-	virtualmodel_t *pVModel = pStudioHdr->GetVirtualModel();
+	IVirtualModel *pVModel = pStudioHdr->GetVirtualModel();
 	const virtualgroup_t *pSeqGroup = NULL;
 	if (pVModel)
 	{
@@ -1654,7 +1654,7 @@ void ScaleBones(
 
 	mstudioseqdesc_t &seqdesc = ((IStudioHdr *)pStudioHdr)->pSeqdesc( sequence );
 
-	virtualmodel_t *pVModel = pStudioHdr->GetVirtualModel();
+	IVirtualModel *pVModel = pStudioHdr->GetVirtualModel();
 	const virtualgroup_t *pSeqGroup = NULL;
 	if (pVModel)
 	{
