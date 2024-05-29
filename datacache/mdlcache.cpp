@@ -3344,7 +3344,7 @@ const IVirtualModel* CStudioHdr::ResetVModel(const IVirtualModel* pVModel) const
 	if (pVModel != NULL)
 	{
 		m_pVModel = (virtualmodel_t*)pVModel;
-		Assert(!pVModel->m_Lock.GetOwnerId());
+		Assert(!m_pVModel->m_Lock.GetOwnerId());
 		m_pStudioHdrCache.SetCount(m_pVModel->m_group.Count());
 
 		int i;
