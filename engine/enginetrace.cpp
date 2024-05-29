@@ -830,7 +830,7 @@ public:
 			return m_pStudioHdr->contents();
 		}
 
-		Assert( convexGameData <= m_pStudioHdr->numbones );
+		Assert( convexGameData <= m_pStudioHdr->numbones() );
 		mstudiobone_t *pBone = m_pStudioHdr->pBone(convexGameData - 1);
 		return pBone->contents;
 	}
