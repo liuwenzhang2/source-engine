@@ -511,7 +511,6 @@ bool CStaticProp::Init( int index, StaticPropLump_t &lump, model_t *pModel )
 			m_flForcedFadeScale = 0.0f;
 		}
 	}
-	delete pStudioHdr;
 	switch ( m_nSolidType )
 	{
 		// These are valid

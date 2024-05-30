@@ -54,7 +54,7 @@ private:
 	// These are either all valid pointers or all NULL.
 	C_BaseAnimating *m_pFollow;
 	IStudioHdr		*m_pFollowHdr;
-	const studiohdr_t	*m_pFollowRenderHdr;
+	const IStudioHdr	*m_pFollowRenderHdr;
 	IStudioHdr		*m_pOwnerHdr;
 
 	// This is the mask we need to use to set up bones on the followed entity to do the bone merge

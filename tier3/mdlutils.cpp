@@ -28,18 +28,18 @@ void GetMDLBoundingBox( Vector *pMins, Vector *pMaxs, MDLHandle_t h, int nSequen
 	pMins->Init( FLT_MAX, FLT_MAX );
 	pMaxs->Init( -FLT_MAX, -FLT_MAX );
 
-	studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( h );
-	if ( !VectorCompare( vec3_origin, pStudioHdr->view_bbmin ) || !VectorCompare( vec3_origin, pStudioHdr->view_bbmax ))
+	IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( h );
+	if ( !VectorCompare( vec3_origin, pStudioHdr->view_bbmin() ) || !VectorCompare( vec3_origin, pStudioHdr->view_bbmax() ))
 	{
 		// look for view clip
-		*pMins = pStudioHdr->view_bbmin;
-		*pMaxs = pStudioHdr->view_bbmax;
+		*pMins = pStudioHdr->view_bbmin();
+		*pMaxs = pStudioHdr->view_bbmax();
 	}
-	else if ( !VectorCompare( vec3_origin, pStudioHdr->hull_min ) || !VectorCompare( vec3_origin, pStudioHdr->hull_max ))
+	else if ( !VectorCompare( vec3_origin, pStudioHdr->hull_min() ) || !VectorCompare( vec3_origin, pStudioHdr->hull_max() ))
 	{
 		// look for hull
-		*pMins = pStudioHdr->hull_min;
-		*pMaxs = pStudioHdr->hull_max;
+		*pMins = pStudioHdr->hull_min();
+		*pMaxs = pStudioHdr->hull_max();
 	}
 
 	// Else use the sequence box
@@ -165,11 +165,11 @@ void CMDL::UnreferenceMDL()
 //-----------------------------------------------------------------------------
 // Gets the studiohdr
 //-----------------------------------------------------------------------------
-studiohdr_t *CMDL::GetStudioHdr()
+IStudioHdr *CMDL::GetStudioHdr()
 {
 	if ( !g_pMDLCache )
 		return NULL;
-	return g_pMDLCache->GetStudioHdr( m_MDLHandle );
+	return g_pMDLCache->GetIStudioHdr( m_MDLHandle );
 }
 
 
@@ -242,12 +242,11 @@ void CMDL::Draw( const matrix3x4_t &rootToWorld )
 	if ( m_MDLHandle == MDLHANDLE_INVALID )
 		return;
 
-	studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( m_MDLHandle );
+	IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( m_MDLHandle );
 
-	matrix3x4_t *pBoneToWorld = g_pStudioRender->LockBoneMatrices( pStudioHdr->numbones );
-	SetUpBones( rootToWorld, pStudioHdr->numbones, pBoneToWorld );
+	matrix3x4_t *pBoneToWorld = g_pStudioRender->LockBoneMatrices( pStudioHdr->numbones() );
+	SetUpBones( rootToWorld, pStudioHdr->numbones(), pBoneToWorld);
 	g_pStudioRender->UnlockBoneMatrices();
-
 	Draw( rootToWorld, pBoneToWorld );
 }
 
@@ -382,7 +381,6 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 		}
 	}
 	Studio_RunBoneFlexDrivers( m_pFlexControls, studioHdr, pos, pBoneToWorld, rootToWorld );
-	delete studioHdr;
 }
 
 //-----------------------------------------------------------------------------

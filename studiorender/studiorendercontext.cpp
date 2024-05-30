@@ -1737,13 +1737,11 @@ int CStudioRenderContext::GetMaterialListFromBodyAndSkin( MDLHandle_t studio, in
 
 					// No more room to store additional materials!
 					if (found >= nCountOutputMaterials) {
-						delete pStudioHdr;
 						return found;
 					}
 				}
 			}
 		}
-		delete pStudioHdr;
 	}
 
 	return found;

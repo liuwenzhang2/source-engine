@@ -158,7 +158,7 @@ void CSequencePicker::RefreshActivitiesAndSequencesList()
 	if ( m_hSelectedMDL == MDLHANDLE_INVALID )
 		return;
 
-	studiohdr_t *hdr = vgui::MDLCache()->GetStudioHdr( m_hSelectedMDL );
+	IStudioHdr *hdr = vgui::MDLCache()->GetIStudioHdr( m_hSelectedMDL );
 
 	CUtlDict<int, unsigned short> activityNames( true, 0, hdr->GetNumSeq() );
 	    
@@ -197,7 +197,6 @@ void CSequencePicker::RefreshActivitiesAndSequencesList()
 			}
 		}
 	}
-
 	if ( m_pSequencesList )
 	{
 		m_pSequencesList->SortList();
@@ -214,7 +213,7 @@ void CSequencePicker::RefreshActivitiesAndSequencesList()
 //-----------------------------------------------------------------------------
 // Purpose: Selects an sequence based on an activity
 //-----------------------------------------------------------------------------
-int SelectWeightedSequence( studiohdr_t *pstudiohdr, int activity, int curSequence )
+int SelectWeightedSequence( IStudioHdr *pstudiohdr, int activity, int curSequence )
 {
 	if (! pstudiohdr)
 		return 0;
@@ -297,7 +296,7 @@ const char *CSequencePicker::GetSelectedSequenceName( )
 //-----------------------------------------------------------------------------
 void CSequencePicker::PlayActivity( const char *pActivityName )
 {
-	studiohdr_t *pstudiohdr = vgui::MDLCache()->GetStudioHdr( m_hSelectedMDL );
+	IStudioHdr *pstudiohdr = vgui::MDLCache()->GetIStudioHdr( m_hSelectedMDL );
 	for ( int i = 0; i < pstudiohdr->GetNumSeq(); i++ )
 	{
 		mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( i );
@@ -316,7 +315,7 @@ void CSequencePicker::PlayActivity( const char *pActivityName )
 //-----------------------------------------------------------------------------
 void CSequencePicker::PlaySequence( const char *pSequenceName )
 {
-	studiohdr_t *pstudiohdr = vgui::MDLCache()->GetStudioHdr( m_hSelectedMDL );
+	IStudioHdr *pstudiohdr = vgui::MDLCache()->GetIStudioHdr( m_hSelectedMDL );
 	for (int i = 0; i < pstudiohdr->GetNumSeq(); i++)
 	{
 		mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( i );

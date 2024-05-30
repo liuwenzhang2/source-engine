@@ -971,7 +971,6 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 	{
 		AngleMatrix( vec3_angle, localToWorld );
 	}
-	delete studioHdr;
 	CUtlVector<breakmodel_t> list;
 
 	BreakModelList( list, modelindex, params.defBurstScale, params.defCollisionGroup );
@@ -1068,7 +1067,6 @@ void PropBreakableCreateAll( int modelindex, IPhysicsObject *pPhysics, const bre
 			int nActualSkin = nSkin;
 			if (!studioHdr || nActualSkin > studioHdr->numskinfamilies() )
 				nActualSkin = 0;
-			delete studioHdr;
 
 			CBaseEntity *pBreakable = NULL;
 			
@@ -1359,7 +1357,6 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 	{
 		AngleMatrix( vec3_angle, localToWorld );
 	}
-	delete studioHdr;
 //	CUtlVector<breakmodel_t> list;
 //	BreakModelList( list, modelindex, params.defBurstScale, params.defCollisionGroup );
 
@@ -1464,7 +1461,6 @@ CBaseEntity *CreateGibsFromList( CUtlVector<breakmodel_t> &list, int modelindex,
 			int nActualSkin = nSkin;
 			if (!studioHdr || nActualSkin > studioHdr->numskinfamilies() )
 				nActualSkin = 0;
-			delete studioHdr;
 
 			CBaseEntity *pBreakable = NULL;
 			

@@ -56,7 +56,7 @@ public:
 	void SetupBonesWithBoneMerge( const IStudioHdr *pMergeHdr, matrix3x4_t *pMergeBoneToWorld, 
 		const IStudioHdr *pFollow, const matrix3x4_t *pFollowBoneToWorld, const matrix3x4_t &matModelToWorld );
 	
-	studiohdr_t *GetStudioHdr();
+	IStudioHdr *GetStudioHdr();
 
 private:
 	void UnreferenceMDL();

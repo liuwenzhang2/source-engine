@@ -248,28 +248,27 @@ void CBaseModelPanel::SetModelAnim( int iAnim )
 	MDLCACHE_CRITICAL_SECTION();
 
 	// Get the studio header of the root model.
-	studiohdr_t *pStudioHdr = m_RootMDL.m_MDL.GetStudioHdr();
+	IStudioHdr *pStudioHdr = m_RootMDL.m_MDL.GetStudioHdr();
 	if ( !pStudioHdr )
 		return;
 
-	IStudioHdr* studioHdr = g_pMDLCache->GetIStudioHdr( pStudioHdr );
+	//IStudioHdr* studioHdr = g_pMDLCache->GetIStudioHdr( pStudioHdr );
 
 	// Do we have an activity or a sequence?
 	int iSequence = ACT_INVALID;
 	if ( m_BMPResData.m_aAnimations[iAnim].m_pszActivity && m_BMPResData.m_aAnimations[iAnim].m_pszActivity[0] )
 	{
-		iSequence = FindSequenceFromActivity( studioHdr, m_BMPResData.m_aAnimations[iAnim].m_pszActivity );
+		iSequence = FindSequenceFromActivity(pStudioHdr, m_BMPResData.m_aAnimations[iAnim].m_pszActivity );
 	}
 	else if ( m_BMPResData.m_aAnimations[iAnim].m_pszSequence && m_BMPResData.m_aAnimations[iAnim].m_pszSequence[0] )
 	{
-		iSequence = LookupSequence( studioHdr, m_BMPResData.m_aAnimations[iAnim].m_pszSequence );
+		iSequence = LookupSequence(pStudioHdr, m_BMPResData.m_aAnimations[iAnim].m_pszSequence );
 	}
 	
 	if ( iSequence != ACT_INVALID )
 	{
 		SetSequence( iSequence, true );
 	}
-	delete studioHdr;
 }
 
 //-----------------------------------------------------------------------------
@@ -278,22 +277,21 @@ void CBaseModelPanel::SetModelAnim( int iAnim )
 void CBaseModelPanel::SetMDL( MDLHandle_t handle, void *pProxyData )
 {
 	MDLCACHE_CRITICAL_SECTION();
-	studiohdr_t *pHdr = g_pMDLCache->GetStudioHdr( handle );
+	IStudioHdr *pHdr = g_pMDLCache->GetIStudioHdr( handle );
 
 	if ( pHdr )
 	{
 		// SetMDL will cause the base CMdl code to set our localtoglobal indices if they aren't set.
 		// We set them up here so that they're left alone by that code.
-		IStudioHdr* studioHdr = g_pMDLCache->GetIStudioHdr( pHdr);
-		if (studioHdr->numflexcontrollers() > 0 && studioHdr->pFlexcontroller( LocalFlexController_t(0) )->localToGlobal == -1)
+		//IStudioHdr* studioHdr = g_pMDLCache->GetIStudioHdr( pHdr);
+		if (pHdr->numflexcontrollers() > 0 && pHdr->pFlexcontroller( LocalFlexController_t(0) )->localToGlobal == -1)
 		{
-			for (LocalFlexController_t i = LocalFlexController_t(0); i < studioHdr->numflexcontrollers(); i++)
+			for (LocalFlexController_t i = LocalFlexController_t(0); i < pHdr->numflexcontrollers(); i++)
 			{
-				int j = C_BaseFlex::AddGlobalFlexController( studioHdr->pFlexcontroller( i )->pszName() );
-				studioHdr->pFlexcontroller( i )->localToGlobal = j;
+				int j = C_BaseFlex::AddGlobalFlexController(pHdr->pFlexcontroller( i )->pszName() );
+				pHdr->pFlexcontroller( i )->localToGlobal = j;
 			}
 		}
-		delete studioHdr;
 	}
 	else 
 	{
@@ -592,7 +590,7 @@ QAngle CBaseModelPanel::GetPlayerAngles() const
 //-----------------------------------------------------------------------------
 void CBaseModelPanel::PlaySequence( const char *pszSequenceName )
 {
-	IStudioHdr* studioHDR = g_pMDLCache->GetIStudioHdr( GetStudioHdr());
+	IStudioHdr* studioHDR = GetStudioHdr();//g_pMDLCache->GetIStudioHdr( )
 	int iSeq = ::LookupSequence( studioHDR, pszSequenceName );
 	if ( iSeq != ACT_INVALID )
 	{
@@ -600,7 +598,6 @@ void CBaseModelPanel::PlaySequence( const char *pszSequenceName )
 		m_flActiveSequenceDuration = Studio_Duration( studioHDR, iSeq, NULL );
 		SetSequence( m_nActiveSequence, true );
 	}
-	delete studioHDR;
 }
 
 //-----------------------------------------------------------------------------

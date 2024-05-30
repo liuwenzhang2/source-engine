@@ -196,7 +196,7 @@ void CMDLSequencePicker::RefreshActivitiesAndSequencesList()
 	m_pActivitiesList->SetEmptyListText(".MDL file contains no activities");
 	m_pSequencesList->SetEmptyListText(".MDL file contains no sequences");
 
-	studiohdr_t *hdr = vgui::MDLCache()->GetStudioHdr( m_hSelectedMDL );
+	IStudioHdr *hdr = vgui::MDLCache()->GetIStudioHdr( m_hSelectedMDL );
 
 	CUtlDict<int, unsigned short> activityNames( true, 0, hdr->GetNumSeq() );
 	    
@@ -254,7 +254,7 @@ void CMDLSequencePicker::OnTextChanged( vgui::Panel *pPanel, const char *pText )
 //-----------------------------------------------------------------------------
 // Purpose: Selects an sequence based on an activity
 //-----------------------------------------------------------------------------
-int SelectWeightedSequence( studiohdr_t *pstudiohdr, int activity, int curSequence )
+int SelectWeightedSequence( IStudioHdr *pstudiohdr, int activity, int curSequence )
 {
 	if (! pstudiohdr)
 		return 0;
@@ -305,7 +305,7 @@ void CMDLSequencePicker::PlaySelectedActivity( )
 	if ( !pActivityName )
 		return;
 
-	studiohdr_t *pstudiohdr = vgui::MDLCache()->GetStudioHdr( m_hSelectedMDL );
+	IStudioHdr *pstudiohdr = vgui::MDLCache()->GetIStudioHdr( m_hSelectedMDL );
 	for ( int i = 0; i < pstudiohdr->GetNumSeq(); i++ )
 	{
 		mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( i );
@@ -333,7 +333,7 @@ void CMDLSequencePicker::PlaySelectedSequence( )
 	if ( !pSequenceName )
 		return;
 
-	studiohdr_t *pstudiohdr = vgui::MDLCache()->GetStudioHdr( m_hSelectedMDL );
+	IStudioHdr *pstudiohdr = vgui::MDLCache()->GetIStudioHdr( m_hSelectedMDL );
 	for (int i = 0; i < pstudiohdr->GetNumSeq(); i++)
 	{
 		mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( i );

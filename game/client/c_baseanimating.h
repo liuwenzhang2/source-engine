@@ -767,7 +767,6 @@ inline void C_BaseAnimating::InvalidateMdlCache()
 	if ( m_pStudioHdr )
 	{
 		UnlockStudioHdr();
-		delete m_pStudioHdr;
 		m_pStudioHdr = NULL;
 	}
 }

@@ -2012,7 +2012,6 @@ void CPortalSimulator::CreatePolyhedrons( void )
 						Assert( pStudioHdr != NULL );
 						NewEntry.iTraceContents = pStudioHdr->contents();						
 						NewEntry.iTraceSurfaceProps = physprops->GetSurfaceIndex( pStudioHdr->pszSurfaceProp() );
-						delete pStudioHdr;
 					}
 					else
 					{

@@ -27,7 +27,7 @@ class QAngle;
 class CGameTrace;
 struct cplane_t;
 typedef CGameTrace trace_t;
-struct studiohdr_t;
+//struct IStudioHdr;
 class IVirtualModel;
 typedef unsigned char byte;
 struct virtualterrainparams_t;
@@ -133,7 +133,7 @@ public:
 
 	virtual const IStudioHdr		*FindModel( void **cache, const char *modelname ) const = 0;
 	virtual const IStudioHdr		*FindModel( void *cache ) const = 0;
-	virtual	IVirtualModel			*GetVirtualModel( const studiohdr_t *pStudioHdr ) const = 0;
+	//virtual	IVirtualModel			*GetVirtualModel( const IStudioHdr *pStudioHdr ) const = 0;
 	virtual byte					*GetAnimBlock( const IStudioHdr *pStudioHdr, int iBlock ) const = 0;
 
 	// Available on client only!!!

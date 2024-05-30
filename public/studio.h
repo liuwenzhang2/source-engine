@@ -48,7 +48,6 @@
 class IMaterial;
 class IMesh;
 class IMorph;
-struct virtualmodel_t;
 struct vertexFileHeader_t;
 struct thinModelVertices_t;
 
@@ -723,6 +722,7 @@ struct mstudioanimsections_t
 	int					animindex;
 };
 
+class IStudioHdr;
 struct mstudioanimdesc_t
 {
 	DECLARE_BYTESWAP_DATADESC();
@@ -746,18 +746,18 @@ struct mstudioanimdesc_t
 
 	int					animblock;
 	int					animindex;	 // non-zero when anim data isn't in sections
-	mstudioanim_t *pAnimBlock( int block, int index ) const; // returns pointer to a specific anim block (local or external)
-	mstudioanim_t *pAnim( int *piFrame, float &flStall ) const; // returns pointer to data and new frame index
-	mstudioanim_t *pAnim( int *piFrame ) const; // returns pointer to data and new frame index
+	mstudioanim_t *pAnimBlock(const IStudioHdr* pStudioHdr, int block, int index ) const; // returns pointer to a specific anim block (local or external)
+	mstudioanim_t *pAnim(const IStudioHdr* pStudioHdr, int *piFrame, float &flStall ) const; // returns pointer to data and new frame index
+	mstudioanim_t *pAnim(const IStudioHdr* pStudioHdr, int *piFrame ) const; // returns pointer to data and new frame index
 
 	int					numikrules;
 	int					ikruleindex;	// non-zero when IK data is stored in the mdl
 	int					animblockikruleindex; // non-zero when IK data is stored in animblock file
-	mstudioikrule_t *pIKRule( int i ) const;
+	mstudioikrule_t *pIKRule(const IStudioHdr* pStudioHdr, int i ) const;
 
 	int					numlocalhierarchy;
 	int					localhierarchyindex;
-	mstudiolocalhierarchy_t *pHierarchy( int i ) const;
+	mstudiolocalhierarchy_t *pHierarchy(const IStudioHdr* pStudioHdr, int i ) const;
 
 	int					sectionindex;
 	int					sectionframes; // number of frames used in each fast lookup section, zero if not used
@@ -1650,10 +1650,10 @@ struct studioloddata_t
 
 struct studiohwdata_t
 {
-	int					m_RootLOD;	// calced and clamped, nonzero for lod culling
-	int					m_NumLODs;
-	studioloddata_t		*m_pLODs;
-	int					m_NumStudioMeshes;
+	int					m_RootLOD = 0;	// calced and clamped, nonzero for lod culling
+	int					m_NumLODs = 0;
+	studioloddata_t		*m_pLODs = 0;
+	int					m_NumStudioMeshes = 0;
 
 	inline float LODMetric( float unitSphereSize ) const { return ( unitSphereSize != 0.0f ) ? (100.0f / unitSphereSize) : 0.0f; }
 	inline int GetLODForMetric( float lodMetric ) const
@@ -1751,9 +1751,6 @@ public:
 
 private:
 	friend struct studiohdr_t;
-	friend struct virtualmodel_t;
-	// converts cache entry into a usable studiohdr_t *
-	const studiohdr_t* GetGroupStudioHdr(void) const;
 };
 
 struct virtualsequence_t
@@ -1784,15 +1781,6 @@ struct virtualgeneric_t
 
 class IVirtualModel {
 public:
-	virtual void AppendSequences(int group, const studiohdr_t* pStudioHdr) = 0;
-	virtual void AppendAnimations(int group, const studiohdr_t* pStudioHdr) = 0;
-	virtual void AppendAttachments(int ground, const studiohdr_t* pStudioHdr) = 0;
-	virtual void AppendPoseParameters(int group, const studiohdr_t* pStudioHdr) = 0;
-	virtual void AppendBonemap(int group, const studiohdr_t* pStudioHdr) = 0;
-	virtual void AppendNodes(int group, const studiohdr_t* pStudioHdr) = 0;
-	virtual void AppendIKLocks(int group, const studiohdr_t* pStudioHdr) = 0;
-	virtual void AppendModels(int group, const studiohdr_t* pStudioHdr) = 0;
-	virtual void UpdateAutoplaySequences(const studiohdr_t* pStudioHdr) = 0;
 	virtual virtualgroup_t* pAnimGroup(int animation) = 0;
 	virtual int pAnimIndex(int animation) = 0;
 	virtual virtualgroup_t* pSeqGroup(int sequence) = 0;
@@ -2113,328 +2101,6 @@ struct vertexFileFixup_t
 // flagged on load to indicate no animation events on this model
 #define STUDIOHDR_FLAGS_VERT_ANIM_FIXED_POINT_SCALE			0x00200000
 
-// NOTE! Next time we up the .mdl file format, remove studiohdr2_t
-// and insert all fields in this structure into studiohdr_t.
-struct studiohdr2_t
-{
-	// NOTE: For forward compat, make sure any methods in this struct
-	// are also available in studiohdr_t so no leaf code ever directly references
-	// a studiohdr2_t structure
-	DECLARE_BYTESWAP_DATADESC();
-	int numsrcbonetransform;
-	int srcbonetransformindex;
-
-	int	illumpositionattachmentindex;
-	inline int			IllumPositionAttachmentIndex() const { return illumpositionattachmentindex; }
-
-	float flMaxEyeDeflection;
-	inline float		MaxEyeDeflection() const { return flMaxEyeDeflection != 0.0f ? flMaxEyeDeflection : 0.866f; } // default to cos(30) if not set
-
-	int linearboneindex;
-	inline mstudiolinearbone_t *pLinearBones() const { return (linearboneindex) ? (mstudiolinearbone_t *)(((byte *)this) + linearboneindex) : NULL; }
-
-	int sznameindex;
-	inline char *pszName() { return (sznameindex) ? (char *)(((byte *)this) + sznameindex ) : NULL; }
-
-	int m_nBoneFlexDriverCount;
-	int m_nBoneFlexDriverIndex;
-	inline mstudioboneflexdriver_t *pBoneFlexDriver( int i ) const { Assert( i >= 0 && i < m_nBoneFlexDriverCount ); return (mstudioboneflexdriver_t *)(((byte *)this) + m_nBoneFlexDriverIndex) + i; }
-
-	mutable serializedstudioptr_t< void	> virtualModel;
-	mutable serializedstudioptr_t< void	> animblockModel;
-
-	serializedstudioptr_t< void> pVertexBase;
-	serializedstudioptr_t< void> pIndexBase;
-
-	int reserved[48];
-};
-
-struct studiohdr_t
-{
-	DECLARE_BYTESWAP_DATADESC();
-	studiohdr_t() = default;
-
-	int					id;
-	int					version;
-
-	int					checksum;		// this has to be the same in the phy and vtx files to load!
-
-	inline const char *	pszName( void ) const { if (studiohdr2index && pStudioHdr2()->pszName()) return pStudioHdr2()->pszName(); else return name; }
-	char				name[64];
-	int					length;
-
-
-	Vector				eyeposition;	// ideal eye position
-
-	Vector				illumposition;	// illumination center
-	
-	Vector				hull_min;		// ideal movement hull size
-	Vector				hull_max;
-
-	Vector				view_bbmin;		// clipping bounding box
-	Vector				view_bbmax;
-
-	int					flags;
-
-	int					numbones;			// bones
-	int					boneindex;
-	inline mstudiobone_t *pBone( int i ) const { Assert( i >= 0 && i < numbones); return (mstudiobone_t *)(((byte *)this) + boneindex) + i; };
-	int					RemapSeqBone( int iSequence, int iLocalBone ) const;	// maps local sequence bone to global bone
-	int					RemapAnimBone( int iAnim, int iLocalBone ) const;		// maps local animations bone to global bone
-
-	int					numbonecontrollers;		// bone controllers
-	int					bonecontrollerindex;
-	inline mstudiobonecontroller_t *pBonecontroller( int i ) const { Assert( i >= 0 && i < numbonecontrollers); return (mstudiobonecontroller_t *)(((byte *)this) + bonecontrollerindex) + i; };
-
-	int					numhitboxsets;
-	int					hitboxsetindex;
-
-	// Look up hitbox set by index
-	mstudiohitboxset_t	*pHitboxSet( int i ) const 
-	{ 
-		Assert( i >= 0 && i < numhitboxsets); 
-		return (mstudiohitboxset_t *)(((byte *)this) + hitboxsetindex ) + i; 
-	};
-
-	// Calls through to hitbox to determine size of specified set
-	inline mstudiobbox_t *pHitbox( int i, int set ) const 
-	{ 
-		mstudiohitboxset_t const *s = pHitboxSet( set );
-		if ( !s )
-			return NULL;
-
-		return s->pHitbox( i );
-	};
-
-	// Calls through to set to get hitbox count for set
-	inline int			iHitboxCount( int set ) const
-	{
-		mstudiohitboxset_t const *s = pHitboxSet( set );
-		if ( !s )
-			return 0;
-
-		return s->numhitboxes;
-	};
-
-	// file local animations? and sequences
-//private:
-	int					numlocalanim;			// animations/poses
-	int					localanimindex;		// animation descriptions
-  	inline mstudioanimdesc_t *pLocalAnimdesc( int i ) const { if (i < 0 || i >= numlocalanim) i = 0; return (mstudioanimdesc_t *)(((byte *)this) + localanimindex) + i; };
-
-	int					numlocalseq;				// sequences
-	int					localseqindex;
-  	inline mstudioseqdesc_t *pLocalSeqdesc( int i ) const { if (i < 0 || i >= numlocalseq) i = 0; return (mstudioseqdesc_t *)(((byte *)this) + localseqindex) + i; };
-
-//public:
-	bool				SequencesAvailable() const;
-	int					GetNumSeq() const;
-	mstudioanimdesc_t	&pAnimdesc( int i ) const;
-	mstudioseqdesc_t	&pSeqdesc( int i ) const;
-	int					iRelativeAnim( int baseseq, int relanim ) const;	// maps seq local anim reference to global anim index
-	int					iRelativeSeq( int baseseq, int relseq ) const;		// maps seq local seq reference to global seq index
-
-//private:
-	mutable int			activitylistversion;	// initialization flag - have the sequences been indexed?
-	mutable int			eventsindexed;
-//public:
-	//int					GetSequenceActivity( int iSequence );
-	//void				SetSequenceActivity( int iSequence, int iActivity );
-	int					GetActivityListVersion( void );
-	void				SetActivityListVersion( int version ) const;
-	int					GetEventListVersion( void );
-	void				SetEventListVersion( int version );
-	
-	// raw textures
-	int					numtextures;
-	int					textureindex;
-	inline mstudiotexture_t *pTexture( int i ) const { Assert( i >= 0 && i < numtextures ); return (mstudiotexture_t *)(((byte *)this) + textureindex) + i; }; 
-
-
-	// raw textures search paths
-	int					numcdtextures;
-	int					cdtextureindex;
-	inline char			*pCdtexture( int i ) const { return (((char *)this) + *((int *)(((byte *)this) + cdtextureindex) + i)); };
-
-	// replaceable textures tables
-	int					numskinref;
-	int					numskinfamilies;
-	int					skinindex;
-	inline short		*pSkinref( int i ) const { return (short *)(((byte *)this) + skinindex) + i; };
-
-	int					numbodyparts;		
-	int					bodypartindex;
-	inline mstudiobodyparts_t	*pBodypart( int i ) const { return (mstudiobodyparts_t *)(((byte *)this) + bodypartindex) + i; };
-
-	// queryable attachable points
-//private:
-	int					numlocalattachments;
-	int					localattachmentindex;
-	inline mstudioattachment_t	*pLocalAttachment( int i ) const { Assert( i >= 0 && i < numlocalattachments); return (mstudioattachment_t *)(((byte *)this) + localattachmentindex) + i; };
-//public:
-	int					GetNumAttachments( void ) const;
-	const mstudioattachment_t &pAttachment( int i ) const;
-	int					GetAttachmentBone( int i );
-	// used on my tools in hlmv, not persistant
-	void				SetAttachmentBone( int iAttachment, int iBone );
-
-	// animation node to animation node transition graph
-//private:
-	int					numlocalnodes;
-	int					localnodeindex;
-	int					localnodenameindex;
-	inline char			*pszLocalNodeName( int iNode ) const { Assert( iNode >= 0 && iNode < numlocalnodes); return (((char *)this) + *((int *)(((byte *)this) + localnodenameindex) + iNode)); }
-	inline byte			*pLocalTransition( int i ) const { Assert( i >= 0 && i < (numlocalnodes * numlocalnodes)); return (byte *)(((byte *)this) + localnodeindex) + i; };
-
-//public:
-	int					EntryNode( int iSequence );
-	int					ExitNode( int iSequence );
-	char				*pszNodeName( int iNode );
-	int					GetTransition( int iFrom, int iTo ) const;
-
-	int					numflexdesc;
-	int					flexdescindex;
-	inline mstudioflexdesc_t *pFlexdesc( int i ) const { Assert( i >= 0 && i < numflexdesc); return (mstudioflexdesc_t *)(((byte *)this) + flexdescindex) + i; };
-
-	int					numflexcontrollers;
-	int					flexcontrollerindex;
-	inline mstudioflexcontroller_t *pFlexcontroller( LocalFlexController_t i ) const { Assert( numflexcontrollers == 0 || ( i >= 0 && i < numflexcontrollers ) ); return (mstudioflexcontroller_t *)(((byte *)this) + flexcontrollerindex) + i; };
-
-	int					numflexrules;
-	int					flexruleindex;
-	inline mstudioflexrule_t *pFlexRule( int i ) const { Assert( i >= 0 && i < numflexrules); return (mstudioflexrule_t *)(((byte *)this) + flexruleindex) + i; };
-
-	int					numikchains;
-	int					ikchainindex;
-	inline mstudioikchain_t *pIKChain( int i ) const { Assert( i >= 0 && i < numikchains); return (mstudioikchain_t *)(((byte *)this) + ikchainindex) + i; };
-
-	int					nummouths;
-	int					mouthindex;
-	inline mstudiomouth_t *pMouth( int i ) const { Assert( i >= 0 && i < nummouths); return (mstudiomouth_t *)(((byte *)this) + mouthindex) + i; };
-
-//private:
-	int					numlocalposeparameters;
-	int					localposeparamindex;
-	inline mstudioposeparamdesc_t *pLocalPoseParameter( int i ) const { Assert( i >= 0 && i < numlocalposeparameters); return (mstudioposeparamdesc_t *)(((byte *)this) + localposeparamindex) + i; };
-//public:
-	int					GetNumPoseParameters( void ) const;
-	const mstudioposeparamdesc_t &pPoseParameter( int i );
-	int					GetSharedPoseParameter( int iSequence, int iLocalPose ) const;
-
-	int					surfacepropindex;
-	inline char * const pszSurfaceProp( void ) const { return ((char *)this) + surfacepropindex; }
-
-	// Key values
-	int					keyvalueindex;
-	int					keyvaluesize;
-	inline const char * KeyValueText( void ) const { return keyvaluesize != 0 ? ((char *)this) + keyvalueindex : NULL; }
-
-	int					numlocalikautoplaylocks;
-	int					localikautoplaylockindex;
-	inline mstudioiklock_t *pLocalIKAutoplayLock( int i ) const { Assert( i >= 0 && i < numlocalikautoplaylocks); return (mstudioiklock_t *)(((byte *)this) + localikautoplaylockindex) + i; };
-
-	int					GetNumIKAutoplayLocks( void ) const;
-	const mstudioiklock_t &pIKAutoplayLock( int i );
-	int					CountAutoplaySequences() const;
-	int					CopyAutoplaySequences( unsigned short *pOut, int outCount ) const;
-	//int					GetAutoplayList( unsigned short **pOut ) const;
-
-	// The collision model mass that jay wanted
-	float				mass;
-	int					contents;
-
-	// external animations, models, etc.
-	int					numincludemodels;
-	int					includemodelindex;
-	inline mstudiomodelgroup_t *pModelGroup( int i ) const { Assert( i >= 0 && i < numincludemodels); return (mstudiomodelgroup_t *)(((byte *)this) + includemodelindex) + i; };
-	// implementation specific call to get a named model
-	const studiohdr_t	*FindModel( void **cache, char const *modelname ) const;
-
-	// implementation specific back pointer to virtual data
-	int                 unused_virtualModel;
-	IVirtualModel		*GetVirtualModel( void ) const;
-
-	// for demand loaded animation blocks
-	int					szanimblocknameindex;	
-	inline char * const pszAnimBlockName( void ) const { return ((char *)this) + szanimblocknameindex; }
-	int					numanimblocks;
-	int					animblockindex;
-	inline mstudioanimblock_t *pAnimBlock( int i ) const { Assert( i > 0 && i < numanimblocks); return (mstudioanimblock_t *)(((byte *)this) + animblockindex) + i; };
-
-    int                 unused_animblockModel;
-	byte *				GetAnimBlock( int i ) const;
-
-	int					bonetablebynameindex;
-	inline const byte	*GetBoneTableSortedByName() const { return (byte *)this + bonetablebynameindex; }
-
-	// used by tools only that don't cache, but persist mdl's peer data
-	// engine uses virtualModel to back link to cache pointers
-    int                 unused_pVertexBase;
-    int                 unused_pIndexBase;
-
-	// if STUDIOHDR_FLAGS_CONSTANT_DIRECTIONAL_LIGHT_DOT is set,
-	// this value is used to calculate directional components of lighting 
-	// on static props
-	byte				constdirectionallightdot;
-
-	// set during load of mdl data to track *desired* lod configuration (not actual)
-	// the *actual* clamped root lod is found in studiohwdata
-	// this is stored here as a global store to ensure the staged loading matches the rendering
-	byte				rootLOD;
-	
-	// set in the mdl data to specify that lod configuration should only allow first numAllowRootLODs
-	// to be set as root LOD:
-	//	numAllowedRootLODs = 0	means no restriction, any lod can be set as root lod.
-	//	numAllowedRootLODs = N	means that lod0 - lod(N-1) can be set as root lod, but not lodN or lower.
-	byte				numAllowedRootLODs;
-
-	byte				unused[1];
-
-	int					unused4; // zero out if version < 47
-
-	int					numflexcontrollerui;
-	int					flexcontrolleruiindex;
-	mstudioflexcontrollerui_t *pFlexControllerUI( int i ) const { Assert( i >= 0 && i < numflexcontrollerui); return (mstudioflexcontrollerui_t *)(((byte *)this) + flexcontrolleruiindex) + i; }
-
-	float				flVertAnimFixedPointScale;
-	inline float		VertAnimFixedPointScale() const { return ( flags & STUDIOHDR_FLAGS_VERT_ANIM_FIXED_POINT_SCALE ) ? flVertAnimFixedPointScale : 1.0f / 4096.0f; }
-
-	int					unused3[1];
-
-	// FIXME: Remove when we up the model version. Move all fields of studiohdr2_t into studiohdr_t.
-	int					studiohdr2index;
-	studiohdr2_t*		pStudioHdr2() const { return (studiohdr2_t *)( ( (byte *)this ) + studiohdr2index ); }
-
-	// Src bone transforms are transformations that will convert .dmx or .smd-based animations into .mdl-based animations
-	int					NumSrcBoneTransforms() const { return studiohdr2index ? pStudioHdr2()->numsrcbonetransform : 0; }
-	const mstudiosrcbonetransform_t* SrcBoneTransform( int i ) const { Assert( i >= 0 && i < NumSrcBoneTransforms()); return (mstudiosrcbonetransform_t *)(((byte *)this) + pStudioHdr2()->srcbonetransformindex) + i; }
-
-	inline int			IllumPositionAttachmentIndex() const { return studiohdr2index ? pStudioHdr2()->IllumPositionAttachmentIndex() : 0; }
-
-	inline float		MaxEyeDeflection() const { return studiohdr2index ? pStudioHdr2()->MaxEyeDeflection() : 0.866f; } // default to cos(30) if not set
-
-	inline mstudiolinearbone_t *pLinearBones() const { return studiohdr2index ? pStudioHdr2()->pLinearBones() : NULL; }
-
-	inline int			BoneFlexDriverCount() const { return studiohdr2index ? pStudioHdr2()->m_nBoneFlexDriverCount : 0; }
-	inline const mstudioboneflexdriver_t* BoneFlexDriver( int i ) const { Assert( i >= 0 && i < BoneFlexDriverCount() ); return studiohdr2index > 0 ? pStudioHdr2()->pBoneFlexDriver( i ) : NULL; }
-
-	void* 				VirtualModel() const { return studiohdr2index ? (void *)( pStudioHdr2()->virtualModel ) : nullptr; }
-	void				SetVirtualModel( void* ptr ) { Assert( studiohdr2index ); if ( studiohdr2index ) { pStudioHdr2()->virtualModel = ptr; } else { Msg("go fuck urself!\n"); } }
-	void*				VertexBase() const { return studiohdr2index ? (void *)( pStudioHdr2()->pVertexBase ) : nullptr; }
-	void				SetVertexBase( void* pVertexBase ) const { Assert( studiohdr2index ); if ( studiohdr2index ) { pStudioHdr2()->pVertexBase = pVertexBase; } }
-	void*				IndexBase() const { return studiohdr2index ? ( void * ) ( pStudioHdr2()->pIndexBase ) : nullptr; }
-	void				SetIndexBase( void* pIndexBase ) const { Assert( studiohdr2index ); if ( studiohdr2index ) { pStudioHdr2()->pIndexBase  = pIndexBase; } }
-
-	// NOTE: No room to add stuff? Up the .mdl file format version 
-	// [and move all fields in studiohdr2_t into studiohdr_t and kill studiohdr2_t],
-	// or add your stuff to studiohdr2_t. See NumSrcBoneTransforms/SrcBoneTransform for the pattern to use.
-	int					unused2[1];
-private:
-	// No copy constructors allowed
-	studiohdr_t(const studiohdr_t& vOther);
-
-	friend struct virtualmodel_t;
-};
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -2446,19 +2112,20 @@ class IMDLCache;
 typedef int (*RandomWeightFunc)(int iMinVal, int iMaxVal);
 
 class IStudioHdr {
-public:
+protected:
 	virtual ~IStudioHdr(){}
-	virtual void Init(studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL) = 0;
-	virtual void Term() = 0;
-
+	//virtual void Init(studiohdr_t* pStudioHdr, IMDLCache* mdlcache = NULL) = 0;
+	//virtual void Term() = 0;
+public:
 	virtual bool IsVirtual(void) = 0;
 	virtual bool IsValid(void) = 0;
 	virtual bool IsReadyForAccess(void) const = 0;
 	virtual IVirtualModel* GetVirtualModel(void) const = 0;
 	virtual const studiohdr_t* GetRenderHdr(void) const = 0;
-	virtual const studiohdr_t* pSeqStudioHdr(int sequence) = 0;
-	virtual const studiohdr_t* pAnimStudioHdr(int animation) = 0;
-
+	virtual const IStudioHdr* pSeqStudioHdr(int sequence) const = 0;
+	virtual const IStudioHdr* pAnimStudioHdr(int animation) const = 0;
+	virtual const IStudioHdr* RealStudioHdr(studiohdr_t* pStudioHdr) const = 0;
+	virtual void FreeRealStudioHdr(const IStudioHdr* pStudioHdr) const = 0;
 	virtual int			numbones(void) const = 0;
 	virtual mstudiobone_t* pBone(int i) const = 0;
 	virtual int					RemapAnimBone(int iAnim, int iLocalBone) const = 0;		// maps local animations bone to global bone
@@ -2603,7 +2270,7 @@ public:
 	virtual char* pCdtexture(int i) const = 0;
 	virtual mstudiotexture_t* pTexture(int i) const = 0;
 	virtual unsigned char* GetAnimBlock(int nBlock) const = 0;
-	virtual int numincludemodels() = 0;
+	virtual int numincludemodels() const = 0;
 	virtual const char* KeyValueText(void) const = 0;
 	virtual int length() = 0;
 	virtual mstudioanimdesc_t* pLocalAnimdesc(int i) const = 0;
@@ -2893,128 +2560,9 @@ inline const mstudioflexcontroller_t *mstudioflexcontrollerui_t::pController( in
 #define STUDIO_AL_POSE		0x4000		// layer blends using a pose parameter instead of parent cycle
 
 
-// Insert this code anywhere that you need to allow for conversion from an old STUDIO_VERSION
-// to a new one.
-// If we only support the current version, this function should be empty.
-inline bool Studio_ConvertStudioHdrToNewVersion( studiohdr_t *pStudioHdr )
-{
-	COMPILE_TIME_ASSERT( STUDIO_VERSION == 49 ); //  put this to make sure this code is updated upon changing version.
 
-	int version = pStudioHdr->version;
-	if ( version == STUDIO_VERSION )
-		return true;
 
-	bool bResult = true;
 
-	if (version < 46)
-	{
-		// some of the anim index data is incompatible
-		for (int i = 0; i < pStudioHdr->numlocalanim; i++)
-		{
-			mstudioanimdesc_t *pAnim = (mstudioanimdesc_t *)pStudioHdr->pLocalAnimdesc( i );
-
-			// old ANI files that used sections (v45 only) are not compatible
-			if ( pAnim->sectionframes != 0 )
-			{
-				// zero most everything out
-				memset( &(pAnim->numframes), 0, (byte *)(pAnim + 1) - (byte *)&(pAnim->numframes) );
-
-				pAnim->numframes = 1;
-				pAnim->animblock = -1; // disable animation fetching
-				bResult = false;
-			}
-		}
-	}
-
-	if (version < 47)
-	{
-		// used to contain zeroframe cache data
-		if (pStudioHdr->unused4 != 0)
-		{
-			pStudioHdr->unused4 = 0;
-			bResult = false;
-		}
-		for (int i = 0; i < pStudioHdr->numlocalanim; i++)
-		{
-			mstudioanimdesc_t *pAnim = (mstudioanimdesc_t *)pStudioHdr->pLocalAnimdesc( i );
-			pAnim->zeroframeindex = 0;
-			pAnim->zeroframespan = 0;
-		}
-	}
-	else if (version == 47)
-	{
-		for (int i = 0; i < pStudioHdr->numlocalanim; i++)
-		{
-			mstudioanimdesc_t *pAnim = (mstudioanimdesc_t *)pStudioHdr->pLocalAnimdesc( i );
-			if (pAnim->zeroframeindex != 0)
-			{
-				pAnim->zeroframeindex = 0;
-				pAnim->zeroframespan = 0;
-				bResult = false;
-			}
-		}
-	}
-
-	// for now, just slam the version number since they're compatible
-
-	// nillerusr: that's stupid, comment this shit
-	//pStudioHdr->version = STUDIO_VERSION;
-
-	return bResult;
-}
-
-// must be run to fixup with specified rootLOD
-inline void Studio_SetRootLOD( studiohdr_t *pStudioHdr, int rootLOD )
-{
-	// honor studiohdr restriction of root lod in case requested root lod exceeds restriction.
-	if ( pStudioHdr->numAllowedRootLODs > 0 &&
-		 rootLOD >= pStudioHdr->numAllowedRootLODs )
-	{
-		rootLOD = pStudioHdr->numAllowedRootLODs - 1;
-	}
-
-	Assert( rootLOD >= 0 && rootLOD < MAX_NUM_LODS );
-	Clamp( rootLOD, 0, MAX_NUM_LODS - 1 );
-
-	// run the lod fixups that culls higher detail lods
-	// vertexes are external, fixups ensure relative offsets and counts are cognizant of shrinking data
-	// indexes are built in lodN..lod0 order so higher detail lod data can be truncated at load
-	// the fixup lookup arrays are filled (or replicated) to ensure all slots valid
-	int vertexindex  = 0;
-	int tangentsindex = 0;
-	int bodyPartID;
-	for ( bodyPartID = 0; bodyPartID < pStudioHdr->numbodyparts; bodyPartID++ )
-	{
-		mstudiobodyparts_t *pBodyPart = pStudioHdr->pBodypart( bodyPartID );
-		int modelID;
-		for ( modelID = 0; modelID < pBodyPart->nummodels; modelID++ )
-		{
-			mstudiomodel_t *pModel = pBodyPart->pModel( modelID );
-			int totalMeshVertexes = 0;
-			int meshID;
-			for ( meshID = 0; meshID < pModel->nummeshes; meshID++ )
-			{
-				mstudiomesh_t *pMesh = pModel->pMesh( meshID );
-
-				// get the fixup, vertexes are reduced
-				pMesh->numvertices  = pMesh->vertexdata.numLODVertexes[rootLOD];
-				pMesh->vertexoffset = totalMeshVertexes;
-				totalMeshVertexes += pMesh->numvertices;
-			}
-
-			// stay in sync
-			pModel->numvertices   = totalMeshVertexes;
-			pModel->vertexindex   = vertexindex;
-			pModel->tangentsindex = tangentsindex;
-
-			vertexindex   += totalMeshVertexes*sizeof(mstudiovertex_t);
-			tangentsindex += totalMeshVertexes*sizeof(Vector4D);
-		}
-	}
-
-	// track the set desired configuration
-	pStudioHdr->rootLOD = rootLOD;
-}
 
 // Determines allocation requirements for vertexes
 inline int Studio_VertexDataSize( const vertexFileHeader_t *pVvdHdr, int rootLOD, bool bNeedsTangentS )

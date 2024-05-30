@@ -42,7 +42,7 @@ class IPhysicsObject;
 class IClientVehicle;
 class CPredictionCopy;
 class C_BasePlayer;
-struct studiohdr_t;
+//struct IStudioHdr;
 class IStudioHdr;
 class CDamageModifier;
 class IRecipientFilter;

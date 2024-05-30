@@ -2993,7 +2993,6 @@ void CMDLCacheNotify::ComputeModelFlags( model_t* pModel, MDLHandle_t handle )
 	{
 		pModel->flags |= MODELFLAG_STUDIOHDR_DO_NOT_CAST_SHADOWS;
 	}
-	delete pStudioHdr;
 	IMaterial *pMaterials[ 128 ];
 	int materialCount = Mod_GetModelMaterials( pModel, ARRAYSIZE( pMaterials ), pMaterials );
 
@@ -3034,7 +3033,6 @@ void CMDLCacheNotify::SetBoundsFromStudioHdr( model_t *pModel, MDLHandle_t handl
 	IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( handle );
 	VectorCopy( pStudioHdr->hull_min(), pModel->mins);
 	VectorCopy( pStudioHdr->hull_max(), pModel->maxs);
-	delete pStudioHdr;
 	pModel->radius = 0.0f;
 	for ( int i = 0; i < 3; i++ )
 	{
@@ -3891,7 +3889,6 @@ void CModelLoader::ReloadFilesInList( IFileList *pFilesToReload )
 						}
 					}
 				}
-				delete pStudioHdr;
 			}
 		}
 	}
@@ -4089,10 +4086,8 @@ void Mod_RecomputeTranslucency( model_t* mod, int nSkin, int nBody, void /*IClie
 		{
 			IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( mod->studio );
 			if (pStudioHdr->flags() & STUDIOHDR_FLAGS_FORCE_OPAQUE) {
-				delete pStudioHdr;
 				return;
 			}
-			delete pStudioHdr;
 			IMaterial *pMaterials[ 128 ];
 			int materialCount = g_pStudioRender->GetMaterialListFromBodyAndSkin( mod->studio, nSkin, nBody, ARRAYSIZE( pMaterials ), pMaterials );
 			for ( int i = 0; i < materialCount; i++ )
@@ -4224,7 +4219,6 @@ int Mod_GetModelMaterials( model_t* pModel, int count, IMaterial** ppMaterials )
 		Assert( 0 );
 		break;
 	}
-	delete pStudioHdr;
 	return found;
 }
 
@@ -5075,7 +5069,6 @@ void CModelLoader::Studio_LoadModel( model_t *pModel, bool bTouchAllData )
 	// Get the studiohdr into the cache
 	IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( pModel->studio );
 	(void) pStudioHdr;
-	delete pStudioHdr;
 
 	// a preloaded model alrady has its physics data resident
 	if ( bLoadPhysics && !bPreLoaded )
@@ -5990,7 +5983,7 @@ const char *CModelLoader::GetActiveMapName( void )
 //				}
 //			}
 //
-//			// Unlock studiohdr_t
+//			// Unlock IStudioHdr
 //			if ( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY )
 //			{
 //				g_pMDLCache->UnlockStudioHdr( pModel->studio );
@@ -6228,7 +6221,6 @@ CON_COMMAND_F( model_list, "Dump model list to file", FCVAR_CHEAT | FCVAR_DONTRE
 					dataSize += pStudioHdr->length(); // Size of MDL file
 					numBones = pStudioHdr->numbones();
 					numParts = pStudioHdr->numbodyparts();
-					delete pStudioHdr;
 					g_pFileSystem->FPrintf( fileHandle, "%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
 						name, dataSize, numVerts, nTriCount, dataSizeLod0, numVertsLod0, nTriCountLod0, numBones, numParts, numLODs, numMeshes );
 				}

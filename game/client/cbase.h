@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-struct studiohdr_t;
+//struct IStudioHdr;
 
 #include <stdio.h>
 #include <stdlib.h>

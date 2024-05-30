@@ -293,7 +293,6 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 						}
 					}
 				}
-				delete pStudioHdr;
 			}
 		}
 
@@ -438,7 +437,6 @@ int CParticleSystemQuery::GetControllingObjectHitBoxInfo(
 						}
 					}
 				}
-				delete pStudioHdr;
 			}
 		}
 		if ( pMoveParent->IsBrushModel() )
@@ -519,7 +517,6 @@ bool CParticleSystemQuery::IsPointInControllingObjectHitBox(
 							bSuccess = true;
 					}
 				}
-				delete pStudioHdr;
 			}
 		}
 		else if ( pMoveParent->IsBrushModel() && bInBBox )

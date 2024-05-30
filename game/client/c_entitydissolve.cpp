@@ -607,10 +607,8 @@ int C_EntityDissolve::DrawModel( int flags )
 
 	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
 	if (set == NULL) {
-		delete pStudioHdr;
 		return false;
 	}
-	delete pStudioHdr;
 	// Make sure the emitter is setup properly
 	SetupEmitter();
 	

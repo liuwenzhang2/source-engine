@@ -122,7 +122,6 @@ IPhysicsObject *PhysModelCreateBox( CBaseEntity *pEntity, const Vector &mins, co
 			{
 				pSurfaceProps = Studio_GetDefaultSurfaceProps( studioHdr );
 			}
-			delete studioHdr;
 		}
 	}
 	Q_strncpy( solid.surfaceprop, pSurfaceProps, sizeof( solid.surfaceprop ) );
@@ -163,7 +162,6 @@ IPhysicsObject *PhysModelCreateOBB( CBaseEntity *pEntity, const Vector &mins, co
 			{
 				pSurfaceProps = Studio_GetDefaultSurfaceProps( studioHdr );
 			}
-			delete studioHdr;
 		}
 	}
 	Q_strncpy( solid.surfaceprop, pSurfaceProps, sizeof( solid.surfaceprop ) );

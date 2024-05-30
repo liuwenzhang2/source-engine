@@ -13,28 +13,28 @@
 #include "tier0/memdbgon.h"
 
 ////////////////////////////////////////////////////////////////////////
-const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *modelname ) const
-{
-	return modelinfo->FindModel( cache, modelname )->GetRenderHdr();
-}
+//const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *modelname ) const
+//{
+//	return modelinfo->FindModel( cache, modelname )->GetRenderHdr();
+//}
 
-IVirtualModel *studiohdr_t::GetVirtualModel( void ) const
-{
-	if ( numincludemodels == 0 )
-		return NULL;
-	return modelinfo->GetVirtualModel( this );
-}
+//IVirtualModel *studiohdr_t::GetVirtualModel( void ) const
+//{
+//	if ( numincludemodels == 0 )
+//		return NULL;
+//	return mdlcache->GetVirtualModelFast(this, VoidPtrToMDLHandle(VirtualModel()));
+//}
 
-const studiohdr_t *virtualgroup_t::GetGroupStudioHdr( ) const
-{
-	return modelinfo->FindModel( this->cache )->GetRenderHdr();
-}
+//const studiohdr_t *virtualgroup_t::GetGroupStudioHdr( ) const
+//{
+//	return modelinfo->FindModel( this->cache )->GetRenderHdr();
+//}
 
 
-byte *studiohdr_t::GetAnimBlock( int iBlock ) const
-{
-	return mdlcache->GetAnimBlock(VoidPtrToMDLHandle(VirtualModel()), iBlock);// modelinfo->GetAnimBlock(this, iBlock);
-}
+//byte *studiohdr_t::GetAnimBlock( int iBlock ) const
+//{
+//	return mdlcache->GetAnimBlock(VoidPtrToMDLHandle(VirtualModel()), iBlock);// modelinfo->GetAnimBlock(this, iBlock);
+//}
 
 //int	studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 //{

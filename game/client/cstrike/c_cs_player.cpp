@@ -2108,7 +2108,6 @@ void C_CSPlayer::PlayReloadEffect()
 			break;
 		}
 	}
-	delete studioHdr;
 }
 
 void C_CSPlayer::DoAnimationEvent( PlayerAnimEvent_t event, int nData )

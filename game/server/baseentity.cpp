@@ -4013,7 +4013,6 @@ IStudioHdr *ModelSoundsCache_LoadModel( const char *filename )
 void ModelSoundsCache_FinishModel( IStudioHdr *hdr )
 {
 	Assert( hdr );
-	delete hdr;
 }
 
 void ModelSoundsCache_PrecacheScriptSound( const char *soundname )
@@ -4317,7 +4316,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 								else
 								{
 									Warning( "-- Error --:  empty soundname, .qc error on AE_CL_PLAYSOUND in model %s, sequence %s, animevent # %i\n", 
-										studioHdr->GetRenderHdr()->pszName(), seq.pszLabel(), j+1 );
+										studioHdr->pszName(), seq.pszLabel(), j+1 );
 								}
 							}
 							break;
@@ -4333,7 +4332,6 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 				}
 			}
 		}
-		delete studioHdr;
 	}
 }
 

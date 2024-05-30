@@ -668,7 +668,6 @@ bool CDetailModel::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int 
 	{
 		MatrixCopy( parentTransform, pBoneToWorldOut[i] );
 	}
-	delete pStudioHdr;
 	return true;
 }
 

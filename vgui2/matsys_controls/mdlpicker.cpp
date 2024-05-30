@@ -1241,7 +1241,7 @@ void CMDLPicker::RefreshActivitiesAndSequencesList()
 	m_pActivitiesList->SetEmptyListText(".MDL file contains no activities");
 	m_pSequencesList->SetEmptyListText(".MDL file contains no sequences");
 
-	studiohdr_t *hdr = vgui::MDLCache()->GetStudioHdr( m_hSelectedMDL[ 0 ] );
+	IStudioHdr *hdr = vgui::MDLCache()->GetIStudioHdr( m_hSelectedMDL[ 0 ] );
 	
 	CUtlDict<int, unsigned short> activityNames( true, 0, hdr->GetNumSeq() );
 
@@ -1472,7 +1472,7 @@ int	CMDLPicker::GetSelectedSkin()
 //-----------------------------------------------------------------------------
 void CMDLPicker::SelectActivity( const char *pActivityName )
 {
-	studiohdr_t *pstudiohdr = vgui::MDLCache()->GetStudioHdr( m_hSelectedMDL[ 0 ] );
+	IStudioHdr *pstudiohdr = vgui::MDLCache()->GetIStudioHdr( m_hSelectedMDL[ 0 ] );
 	for ( int i = 0; i < pstudiohdr->GetNumSeq(); i++ )
 	{
 		mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( i );
@@ -1483,7 +1483,6 @@ void CMDLPicker::SelectActivity( const char *pActivityName )
 			break;
 		}
 	}
-
 	PostActionSignal( new KeyValues( "SequenceSelectionChanged", "activity", pActivityName ) );
 }
 
@@ -1493,7 +1492,7 @@ void CMDLPicker::SelectActivity( const char *pActivityName )
 //-----------------------------------------------------------------------------
 void CMDLPicker::SelectSequence( const char *pSequenceName )
 {
-	studiohdr_t *pstudiohdr = vgui::MDLCache()->GetStudioHdr( m_hSelectedMDL[ 0 ] );
+	IStudioHdr *pstudiohdr = vgui::MDLCache()->GetIStudioHdr( m_hSelectedMDL[ 0 ] );
 	for (int i = 0; i < pstudiohdr->GetNumSeq(); i++)
 	{
 		mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( i );
@@ -1503,7 +1502,6 @@ void CMDLPicker::SelectSequence( const char *pSequenceName )
 			break;
 		}
 	}
-
 	PostActionSignal( new KeyValues( "SequenceSelectionChanged", "sequence", pSequenceName ) );
 }
 
@@ -1619,10 +1617,10 @@ int CMDLPicker::UpdateSkinsList()
 	{
 		m_pSkinsList->RemoveAll();
 
-		studiohdr_t *hdr = vgui::MDLCache()->GetStudioHdr( m_hSelectedMDL[ 0 ] );
+		IStudioHdr *hdr = vgui::MDLCache()->GetIStudioHdr( m_hSelectedMDL[ 0 ] );
 		if ( hdr )
 		{
-			nNumSkins = hdr->numskinfamilies;
+			nNumSkins = hdr->numskinfamilies();
 			for ( int i = 0; i < nNumSkins; i++ )
 			{
 				char skinText[25] = "";
@@ -1638,16 +1636,16 @@ int CMDLPicker::UpdateSkinsList()
 
 void CMDLPicker::UpdateInfoTab()
 {
-	studiohdr_t *hdr = vgui::MDLCache()->GetStudioHdr( m_hSelectedMDL[ 0 ] );
+	IStudioHdr *hdr = vgui::MDLCache()->GetIStudioHdr( m_hSelectedMDL[ 0 ] );
 	if ( !hdr )
 		return;
 	
-	int nMass = hdr->mass;
+	int nMass = hdr->mass();
 	Panel *pTempPanel = m_pInfoPage->FindChildByName("MassValue");
 	char massBuff[10];
 	Q_snprintf( massBuff, 10, "%d", nMass );
 	((vgui::Label *)pTempPanel)->SetText( massBuff );
-	bool bIsStatic = hdr->flags & STUDIOHDR_FLAGS_STATIC_PROP;
+	bool bIsStatic = hdr->flags() & STUDIOHDR_FLAGS_STATIC_PROP;
 	bool bIsPhysics = false;
 	const char* buf = hdr->KeyValueText();
 	Label * pTempLabel = (Label *)m_pInfoPage->FindChildByName("StaticText");
@@ -1685,7 +1683,6 @@ void CMDLPicker::UpdateInfoTab()
 	pTempCheck->SetCheckButtonCheckable( true );
 	pTempCheck->SetSelected( !bIsPhysics );
 	pTempCheck->SetCheckButtonCheckable( false );
-
 
 }
 

@@ -195,7 +195,6 @@ void C_EntityParticleTrail::Update( float fTimeDelta )
 
 		AddParticle( tempDelta, pBox->bbmin, pBox->bbmax, *hitboxbones[pBox->bone] );
 	}
-	delete pStudioHdr;
 	return;
 
 trailNoHitboxes:
@@ -203,7 +202,6 @@ trailNoHitboxes:
 	{
 		AddParticle( tempDelta, pMoveParent->GetOuter()->GetEngineObject()->OBBMins(), pMoveParent->GetOuter()->GetEngineObject()->OBBMaxs(), pMoveParent->EntityToWorldTransform() );
 	}
-	delete pStudioHdr;
 }
 
 

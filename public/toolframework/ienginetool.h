@@ -58,7 +58,7 @@ public:
 #define VENGINETOOLFRAMEWORK_INTERFACE_VERSION	"VENGINETOOLFRAMEWORK003"
 
 struct model_t;
-struct studiohdr_t;
+//struct IStudioHdr;
 
 #include "toolframework/itoolentity.h"
 

@@ -149,7 +149,7 @@ public:
 
 	virtual const IStudioHdr *FindModel( void **cache, char const *modelname ) const;
 	virtual const IStudioHdr *FindModel( void *cache ) const;
-	virtual IVirtualModel *GetVirtualModel( const studiohdr_t *pStudioHdr ) const;
+	//virtual IVirtualModel *GetVirtualModel( const IStudioHdr *pStudioHdr ) const;
 	virtual byte *GetAnimBlock( const IStudioHdr *pStudioHdr, int iBlock ) const;
 
 	byte *LoadAnimBlock( model_t *model, const IStudioHdr *pStudioHdr, int iBlock, cache_user_t *cache ) const;
@@ -440,7 +440,6 @@ void CModelInfo::GetModelRenderBounds( const model_t *model, Vector& mins, Vecto
 				VectorCopy ( pStudioHdr->hull_min(), mins);
 				VectorCopy ( pStudioHdr->hull_max(), maxs);
 			}
-			delete pStudioHdr;
 		}
 		break;
 
@@ -541,11 +540,11 @@ const IStudioHdr *CModelInfo::FindModel( void *cache ) const
 //-----------------------------------------------------------------------------
 // Purpose: Return virtualmodel_t block associated with model_t
 //-----------------------------------------------------------------------------
-IVirtualModel *CModelInfo::GetVirtualModel( const studiohdr_t *pStudioHdr ) const
-{
-	MDLHandle_t handle = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
-	return g_pMDLCache->GetVirtualModelFast( pStudioHdr, handle );
-}
+//IVirtualModel *CModelInfo::GetVirtualModel( const IStudioHdr *pStudioHdr ) const
+//{
+//	MDLHandle_t handle = VoidPtrToMDLHandle( pStudioHdr->VirtualModel() );
+//	return g_pMDLCache->GetVirtualModelFast( pStudioHdr, handle );
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -566,34 +565,34 @@ int CModelInfo::GetAutoplayList( const IStudioHdr *pStudioHdr, unsigned short **
 // Purpose: bind studiohdr_t support functions to engine
 // FIXME: This should be moved into studio.cpp?
 //-----------------------------------------------------------------------------
-const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName ) const
-{
-	MDLHandle_t handle = g_pMDLCache->FindMDL( pModelName );
-	*cache = (void*)(uintp)handle;
-	return g_pMDLCache->GetStudioHdr( handle );
-}
+//const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName ) const
+//{
+//	MDLHandle_t handle = g_pMDLCache->FindMDL( pModelName );
+//	*cache = (void*)(uintp)handle;
+//	return g_pMDLCache->GetStudioHdr( handle );
+//}
 
-IVirtualModel *studiohdr_t::GetVirtualModel( void ) const
-{
-	if ( numincludemodels == 0 )
-		return NULL;
-	return g_pMDLCache->GetVirtualModelFast( this, VoidPtrToMDLHandle( VirtualModel() ) );
-}
+//IVirtualModel *studiohdr_t::GetVirtualModel( void ) const
+//{
+//	if ( numincludemodels == 0 )
+//		return NULL;
+//	return g_pMDLCache->GetVirtualModelFast( this, VoidPtrToMDLHandle( VirtualModel() ) );
+//}
 
-byte *studiohdr_t::GetAnimBlock( int i ) const
-{
-	return g_pMDLCache->GetAnimBlock( VoidPtrToMDLHandle( VirtualModel() ), i );
-}
+//byte *studiohdr_t::GetAnimBlock( int i ) const
+//{
+//	return g_pMDLCache->GetAnimBlock( VoidPtrToMDLHandle( VirtualModel() ), i );
+//}
 
 //int	studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 //{
 //	return g_pMDLCache->GetAutoplayList( VoidPtrToMDLHandle( VirtualModel() ), pOut );
 //}
 
-const studiohdr_t *virtualgroup_t::GetGroupStudioHdr( void ) const
-{
-	return g_pMDLCache->GetStudioHdr( VoidPtrToMDLHandle( cache ) );
-}
+//const studiohdr_t *virtualgroup_t::GetGroupStudioHdr( void ) const
+//{
+//	return g_pMDLCache->GetStudioHdr( VoidPtrToMDLHandle( cache ) );
+//}
 
 
 //-----------------------------------------------------------------------------
@@ -698,7 +697,7 @@ void CModelInfo::GetIlluminationPoint( const model_t *model, IClientRenderable *
 	const QAngle& angles, Vector* pLightingOrigin )
 {
 	Assert( model->type == mod_studio );
-	IStudioHdr* pStudioHdr = g_pMDLCache->GetIStudioHdr(model->studio);//(studiohdr_t*)GetModelExtraData(model);
+	IStudioHdr* pStudioHdr = g_pMDLCache->GetIStudioHdr(model->studio);//(IStudioHdr*)GetModelExtraData(model);
 	if (pStudioHdr)
 	{
 		R_StudioGetLightingCenter( pRenderable, pStudioHdr, origin, angles, pLightingOrigin );
@@ -807,7 +806,6 @@ const char *CModelInfo::GetModelKeyValueText( const model_t *model )
 		return NULL;
 
 	const char* pRet = pStudioHdr->KeyValueText();
-	delete pStudioHdr;
 	return pRet;
 }
 
@@ -839,7 +837,6 @@ bool CModelInfo::GetModelKeyValue( const model_t *model, CUtlBuffer &buf )
 			{
 				buf.PutString( pSubStudioHdr->KeyValueText() );
 			}
-			delete pSubStudioHdr;
 		}
 	}
 	return true;

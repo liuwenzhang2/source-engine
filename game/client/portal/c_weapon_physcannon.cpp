@@ -229,10 +229,8 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 
 		mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
 		if (!set) {
-			delete pStudioHdr;
 			return false;
 		}
-		delete pStudioHdr;
 		int i;
 
 		float fadePerc = 1.0f;

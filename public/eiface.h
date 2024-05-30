@@ -43,7 +43,7 @@ class	SendTable;
 class	ServerClass;
 class	IMoveHelper;
 struct  Ray_t;
-struct	studiohdr_t;
+//struct	IStudioHdr;
 class	CBaseEntity;
 class	variant_t;
 struct	vcollide_t;

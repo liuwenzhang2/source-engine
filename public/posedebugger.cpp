@@ -413,10 +413,11 @@ void CPoseDebuggerImpl::StartBlending( IClientEntity *pEntity, const IStudioHdr 
 	m_pLastModel = pStudioHdr;
 
 	// Go ahead with the new model
-	studiohdr_t const *pRMdl = pStudioHdr->GetRenderHdr();
-	if ( !pRMdl ||
-		 !pRMdl->numincludemodels )
+	IStudioHdr const* pRMdl = pStudioHdr;// ->GetRenderHdr();
+	if (!pRMdl ||
+		!pRMdl->numincludemodels()) {
 		return;
+	}
 
 	// Entity number
 	int iEntNum = pEntity->entindex();
@@ -471,9 +472,9 @@ void CPoseDebuggerImpl::AccumulatePose( const IStudioHdr *pStudioHdr, CIKContext
 // 	if ( !pVMdl )
 // 		return;
 
-	studiohdr_t const *pRMdl = pStudioHdr->GetRenderHdr();
+	IStudioHdr const* pRMdl = pStudioHdr;// ->GetRenderHdr();
 	if ( !pRMdl ||
-		 !pRMdl->numincludemodels )
+		 !pRMdl->numincludemodels() )
 		return;
 
 	MapModel::IndexType_t idxMapModel = m_mapModel.Find( pStudioHdr );

@@ -93,7 +93,7 @@ class IRestore;
 // NPCEvent.h declarations
 struct animevent_t;
 
-struct studiohdr_t;
+//struct IStudioHdr;
 class IStudioHdr;
 
 extern void FireTargets( const char *targetName, CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );

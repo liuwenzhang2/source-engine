@@ -253,12 +253,10 @@ bool ComputeBeamEntPosition( C_BaseEntity *pEnt, int nAttachment, bool bInterpre
 						VectorTransform( vecLocalClosestPt, *hitboxbones[ pHitbox->bone ], pt );
 
 //						MatrixGetColumn( *hitboxbones[ pHitbox->bone ], 3, pt );
-						delete pStudioHdr;
 						return true;
 					}
 				}
 			}
-			delete pStudioHdr;
 		}
 	}
 

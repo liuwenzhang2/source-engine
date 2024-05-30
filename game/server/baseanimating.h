@@ -453,7 +453,6 @@ inline void CBaseAnimating::InvalidateMdlCache()
 	UnlockStudioHdr();
 	if ( m_pStudioHdr != NULL )
 	{
-		delete m_pStudioHdr;
 		m_pStudioHdr = NULL;
 	}
 }

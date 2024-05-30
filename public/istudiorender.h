@@ -26,7 +26,7 @@
 //-----------------------------------------------------------------------------
 // forward declarations
 //-----------------------------------------------------------------------------
-struct studiohdr_t;
+//struct IStudioHdr;
 struct studiomeshdata_t;
 class Vector;
 struct LightDesc_t;
@@ -254,15 +254,15 @@ struct model_array_instance_t
 // implementation can either statically persist data (tools) or lru cache (engine) it.
 // caller returns base pointer to resident data.
 // code expectes data to be dynamic and invokes cache callback prior to iterative access.
-// virtualModel is member passed in via studiohdr_t and passed back for model identification.
+// virtualModel is member passed in via IStudioHdr and passed back for model identification.
 //-----------------------------------------------------------------------------
 //#define STUDIO_DATA_CACHE_INTERFACE_VERSION "VStudioDataCache005"
  
 //abstract_class IStudioDataCache : public IAppSystem
 //{
 //public:
-//	virtual bool VerifyHeaders( studiohdr_t *pStudioHdr ) = 0;
-//	virtual vertexFileHeader_t *CacheVertexData( studiohdr_t *pStudioHdr ) = 0;
+//	virtual bool VerifyHeaders( IStudioHdr *pStudioHdr ) = 0;
+//	virtual vertexFileHeader_t *CacheVertexData( IStudioHdr *pStudioHdr ) = 0;
 //};
 
 

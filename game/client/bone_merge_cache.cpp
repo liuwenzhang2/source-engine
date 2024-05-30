@@ -58,7 +58,7 @@ void CBoneMergeCache::UpdateCache()
 
 	C_BaseAnimating *pTestFollow = m_pOwner->FindFollowedEntity();
 	IStudioHdr *pTestHdr = (pTestFollow ? pTestFollow->GetModelPtr() : NULL);
-	const studiohdr_t *pTestStudioHDR = (pTestHdr ? pTestHdr->GetRenderHdr() : NULL);
+	const IStudioHdr *pTestStudioHDR = (pTestHdr ? pTestHdr : NULL);
 	if ( pTestFollow != m_pFollow || pTestHdr != m_pFollowHdr || pTestStudioHDR != m_pFollowRenderHdr || pOwnerHdr != m_pOwnerHdr )
 	{
 		m_MergedBones.Purge();

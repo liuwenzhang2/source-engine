@@ -583,7 +583,7 @@ void SetupSingleBoneMatrix(
 	mstudioseqdesc_t &seqdesc = pOwnerHdr->pSeqdesc( nSequence );
 	mstudioanimdesc_t &animdesc = pOwnerHdr->pAnimdesc( seqdesc.anim( 0, 0 ) );
 	int iLocalFrame = iFrame;
-	mstudioanim_t *panim = animdesc.pAnim( &iLocalFrame );
+	mstudioanim_t *panim = animdesc.pAnim(pOwnerHdr, &iLocalFrame );
 	float s = 0;
 	mstudiobone_t *pbone = pOwnerHdr->pBone( iBone );
 
@@ -784,7 +784,7 @@ static void CalcLocalHierarchyAnimation(
 // Purpose: Calc Zeroframe Data
 //-----------------------------------------------------------------------------
 
-static void CalcZeroframeData( const IStudioHdr *pStudioHdr, const studiohdr_t *pAnimStudioHdr, const virtualgroup_t *pAnimGroup, const mstudiobone_t *pAnimbone, mstudioanimdesc_t &animdesc, float fFrame, Vector *pos, Quaternion *q, int boneMask, float flWeight )
+static void CalcZeroframeData( const IStudioHdr *pStudioHdr, const IStudioHdr *pAnimStudioHdr, const virtualgroup_t *pAnimGroup, const mstudiobone_t *pAnimbone, mstudioanimdesc_t &animdesc, float fFrame, Vector *pos, Quaternion *q, int boneMask, float flWeight )
 {
 	byte *pData = animdesc.pZeroFrameData();
 
@@ -796,7 +796,7 @@ static void CalcZeroframeData( const IStudioHdr *pStudioHdr, const studiohdr_t *
 	// Msg("zeroframe %s\n", animdesc.pszName() );
 	if (animdesc.zeroframecount == 1)
 	{
-		for (j = 0; j < pAnimStudioHdr->numbones; j++)
+		for (j = 0; j < pAnimStudioHdr->numbones(); j++)
 		{
 			if (pAnimGroup)
 				i = pAnimGroup->masterBone[j];
@@ -841,7 +841,7 @@ static void CalcZeroframeData( const IStudioHdr *pStudioHdr, const studiohdr_t *
 		int i0 = max( index - 1, 0 );
 		int i1 = index;
 		int i2 = min( index + 1, animdesc.zeroframecount - 1 );
-		for (j = 0; j < pAnimStudioHdr->numbones; j++)
+		for (j = 0; j < pAnimStudioHdr->numbones(); j++)
 		{
 			if (pAnimGroup)
 				i = pAnimGroup->masterBone[j];
@@ -900,11 +900,11 @@ static void CalcVirtualAnimation( IVirtualModel *pVModel, const IStudioHdr *pStu
 
 	const mstudiobone_t *pbone;
 	const virtualgroup_t *pSeqGroup;
-	const studiohdr_t *pSeqStudioHdr;
+	const IStudioHdr *pSeqStudioHdr = NULL;
 	const mstudiolinearbone_t *pSeqLinearBones;
 	const mstudiobone_t *pSeqbone;
 	const mstudioanim_t *panim;
-	const studiohdr_t *pAnimStudioHdr;
+	const IStudioHdr *pAnimStudioHdr = NULL;
 	const mstudiolinearbone_t *pAnimLinearBones;
 	const mstudiobone_t *pAnimbone;
 	const virtualgroup_t *pAnimGroup;
@@ -912,11 +912,11 @@ static void CalcVirtualAnimation( IVirtualModel *pVModel, const IStudioHdr *pStu
 	pSeqGroup = pVModel->pSeqGroup( sequence );
 	int baseanimation = pStudioHdr->iRelativeAnim( sequence, animation );
 	mstudioanimdesc_t &animdesc = ((IStudioHdr *)pStudioHdr)->pAnimdesc( baseanimation );
-	pSeqStudioHdr = ((IStudioHdr *)pStudioHdr)->pSeqStudioHdr( sequence );
+	pSeqStudioHdr = pStudioHdr->pSeqStudioHdr( sequence );
 	pSeqLinearBones = pSeqStudioHdr->pLinearBones();
 	pSeqbone = pSeqStudioHdr->pBone( 0 );
 	pAnimGroup = pVModel->pAnimGroup( baseanimation );
-	pAnimStudioHdr = ((IStudioHdr *)pStudioHdr)->pAnimStudioHdr( baseanimation );
+	pAnimStudioHdr = pStudioHdr->pAnimStudioHdr( baseanimation );
 	pAnimLinearBones = pAnimStudioHdr->pLinearBones();
 	pAnimbone = pAnimStudioHdr->pBone( 0 );
 
@@ -930,7 +930,7 @@ static void CalcVirtualAnimation( IVirtualModel *pVModel, const IStudioHdr *pStu
 
 	int iLocalFrame = iFrame;
 	float flStall;
-	panim = animdesc.pAnim( &iLocalFrame, flStall );
+	panim = animdesc.pAnim(pStudioHdr, &iLocalFrame, flStall );
 
 	float *pweight = seqdesc.pBoneweight( 0 );
 	pbone = pStudioHdr->pBone( 0 );
@@ -1006,7 +1006,7 @@ static void CalcVirtualAnimation( IVirtualModel *pVModel, const IStudioHdr *pStu
 		int i;
 		for (i = 0; i < animdesc.numlocalhierarchy; i++)
 		{
-			mstudiolocalhierarchy_t *pHierarchy = animdesc.pHierarchy( i );
+			mstudiolocalhierarchy_t *pHierarchy = animdesc.pHierarchy(pStudioHdr, i );
 
 			if ( !pHierarchy )
 				break;
@@ -1071,7 +1071,7 @@ static void CalcAnimation( const IStudioHdr *pStudioHdr,	Vector *pos, Quaternion
 
 	int iLocalFrame = iFrame;
 	float flStall;
-	mstudioanim_t *panim = animdesc.pAnim( &iLocalFrame, flStall );
+	mstudioanim_t *panim = animdesc.pAnim(pStudioHdr, &iLocalFrame, flStall );
 
 	float *pweight = seqdesc.pBoneweight( 0 );
 
@@ -1097,7 +1097,7 @@ static void CalcAnimation( const IStudioHdr *pStudioHdr,	Vector *pos, Quaternion
 			}
 		}
 
-		CalcZeroframeData( pStudioHdr, pStudioHdr->GetRenderHdr(), NULL, pStudioHdr->pBone( 0 ), animdesc, fFrame, pos, q, boneMask, 1.0 );
+		CalcZeroframeData( pStudioHdr, pStudioHdr, NULL, pStudioHdr->pBone( 0 ), animdesc, fFrame, pos, q, boneMask, 1.0 );
 
 		return;
 	}
@@ -1139,7 +1139,7 @@ static void CalcAnimation( const IStudioHdr *pStudioHdr,	Vector *pos, Quaternion
 	// cross fade in previous zeroframe data
 	if (flStall > 0.0f)
 	{
-		CalcZeroframeData( pStudioHdr, pStudioHdr->GetRenderHdr(), NULL, pStudioHdr->pBone( 0 ), animdesc, fFrame, pos, q, boneMask, flStall );
+		CalcZeroframeData( pStudioHdr, pStudioHdr, NULL, pStudioHdr->pBone( 0 ), animdesc, fFrame, pos, q, boneMask, flStall );
 	}
 
 	if (animdesc.numlocalhierarchy)
@@ -1150,7 +1150,7 @@ static void CalcAnimation( const IStudioHdr *pStudioHdr,	Vector *pos, Quaternion
 		int i;
 		for (i = 0; i < animdesc.numlocalhierarchy; i++)
 		{
-			mstudiolocalhierarchy_t *pHierarchy = animdesc.pHierarchy( i );
+			mstudiolocalhierarchy_t *pHierarchy = animdesc.pHierarchy(pStudioHdr, i );
 
 			if ( !pHierarchy )
 				break;
@@ -3075,7 +3075,7 @@ bool Studio_IKSequenceError( const IStudioHdr *pStudioHdr, mstudioseqdesc_t &seq
 				return false;
 			}
 
-			mstudioikrule_t *pRule = panim[i]->pIKRule( iRule );
+			mstudioikrule_t *pRule = panim[i]->pIKRule(pStudioHdr, iRule );
 			if (pRule == NULL)
 				return false;
 
@@ -3121,9 +3121,9 @@ bool Studio_IKSequenceError( const IStudioHdr *pStudioHdr, mstudioseqdesc_t &seq
 	if (ikRule.flWeight <= 0.001f)
 	{
 		// go ahead and allow IK_GROUND rules a virtual looping section
-		if ( panim[0]->pIKRule( iRule ) == NULL ) 
+		if ( panim[0]->pIKRule(pStudioHdr, iRule ) == NULL ) 
 			return false;
-		if ((panim[0]->flags & STUDIO_LOOPING) && panim[0]->pIKRule( iRule )->type == IK_GROUND && ikRule.end - ikRule.start > 0.75 )
+		if ((panim[0]->flags & STUDIO_LOOPING) && panim[0]->pIKRule(pStudioHdr, iRule )->type == IK_GROUND && ikRule.end - ikRule.start > 0.75 )
 		{
 			ikRule.flWeight = 0.001;
 			flCycle = ikRule.end - 0.001;
@@ -3149,7 +3149,7 @@ bool Studio_IKSequenceError( const IStudioHdr *pStudioHdr, mstudioseqdesc_t &seq
 			Quaternion q1;
 			float w;
 
-			mstudioikrule_t *pRule = panim[i]->pIKRule( iRule );
+			mstudioikrule_t *pRule = panim[i]->pIKRule(pStudioHdr, iRule );
 			if (pRule == NULL)
 				return false;
 
@@ -5978,7 +5978,7 @@ bool Studio_PrefetchSequence( const IStudioHdr *pStudioHdr, int iSequence )
 		{
 			mstudioanimdesc_t &animdesc = ((IStudioHdr *)pStudioHdr)->pAnimdesc( seqdesc.anim( i, j ) );
 			int iFrame = 0;
-			mstudioanim_t *panim = animdesc.pAnim( &iFrame );
+			mstudioanim_t *panim = animdesc.pAnim(pStudioHdr, &iFrame );
 			if ( !panim )
 			{
 				pendingload = true;

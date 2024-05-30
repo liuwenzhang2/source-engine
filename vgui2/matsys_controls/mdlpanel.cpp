@@ -317,7 +317,7 @@ void CMDLPanel::DrawCollisionModel()
 	static color32 color = {255,0,0,0};
 
 	IVPhysicsKeyParser *pParser = g_pPhysicsCollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
-	IStudioHdr* studioHdr = g_pMDLCache->GetIStudioHdr( g_pMDLCache->GetStudioHdr( m_RootMDL.m_MDL.GetMDL() ) );
+	IStudioHdr* studioHdr = g_pMDLCache->GetStudioHdr(m_RootMDL.m_MDL.GetMDL());// g_pMDLCache->GetIStudioHdr();
 
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES];
 	m_RootMDL.m_MDL.SetUpBones( m_RootMDL.m_MDLToWorld, MAXSTUDIOBONES, pBoneToWorld );
@@ -377,7 +377,6 @@ void CMDLPanel::DrawCollisionModel()
 			pParser->SkipBlock();
 		}
 	}
-	delete studioHdr;
 	g_pPhysicsCollision->VPhysicsKeyParserDestroy( pParser );
 }
 
@@ -466,15 +465,15 @@ void CMDLPanel::OnPaint3D()
 			continue;
 
 		// Get the merge studio header.
-		studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( m_aMergeMDLs[iMerge].m_MDL.GetMDL() );
+		IStudioHdr *pStudioHdr = g_pMDLCache->GetIStudioHdr( m_aMergeMDLs[iMerge].m_MDL.GetMDL() );
 		matrix3x4_t *pMergeBoneToWorld = &matMergeBoneToWorld[0];
 
 		// If we have a valid mesh, bonemerge it. If we have an invalid mesh we can't bonemerge because
 		// it'll crash trying to pull data from the missing header.
 		if ( pStudioHdr != NULL )
 		{
-			IStudioHdr* mergeHdr = g_pMDLCache->GetIStudioHdr( pStudioHdr );
-			m_aMergeMDLs[iMerge].m_MDL.SetupBonesWithBoneMerge( mergeHdr, pMergeBoneToWorld, studioHdr, pBoneToWorld, m_RootMDL.m_MDLToWorld );		
+			//IStudioHdr* mergeHdr = g_pMDLCache->GetIStudioHdr( pStudioHdr );
+			m_aMergeMDLs[iMerge].m_MDL.SetupBonesWithBoneMerge(pStudioHdr, pMergeBoneToWorld, studioHdr, pBoneToWorld, m_RootMDL.m_MDLToWorld );
 
 			pOverrideMaterial = GetOverrideMaterial( m_aMergeMDLs[iMerge].m_MDL.GetMDL() );
 			if ( pOverrideMaterial != NULL ) 
@@ -486,8 +485,7 @@ void CMDLPanel::OnPaint3D()
 				g_pStudioRender->ForcedMaterialOverride( NULL );
 
 			// Notify of model render
-			RenderingMergedModel( pRenderContext, mergeHdr, m_aMergeMDLs[iMerge].m_MDL.GetMDL(), pMergeBoneToWorld );
-			delete mergeHdr;
+			RenderingMergedModel( pRenderContext, pStudioHdr, m_aMergeMDLs[iMerge].m_MDL.GetMDL(), pMergeBoneToWorld );
 		}
 	}
 
@@ -502,7 +500,6 @@ void CMDLPanel::OnPaint3D()
 
 	pRenderContext->Flush();
 	StudioRender()->UpdateConfig( oldStudioRenderConfig );
-	delete studioHdr;
 }
 
 
@@ -553,7 +550,6 @@ void CMDLPanel::SetPoseParameters( const float *pPoseParameters, int nCount )
 	{
 		IStudioHdr* studioHdr = g_pMDLCache->GetIStudioHdr( m_RootMDL.m_MDL.GetMDL() );
 		Studio_CalcDefaultPoseParameters( studioHdr, m_PoseParameters, MAXSTUDIOPOSEPARAM );
-		delete studioHdr;
 	}
 }
 
@@ -572,11 +568,9 @@ bool CMDLPanel::SetPoseParameterByName( const char *pszName, float fValue )
 		if ( V_strcasecmp( pszName, Pose.pszName() ) == 0 )
 		{
 			m_PoseParameters[ i ] = fValue;
-			delete studioHdr;
 			return true;
 		}
 	}
-	delete studioHdr;
 	return false;
 }
 
@@ -690,7 +684,6 @@ void CMDLPanel::DoAnimationEvents()
 		//Plat_DebugString( CFmtStr("Animation: time = %f, started = %f, delta = %f\n",m_RootMDL.m_MDL.m_flTime,m_SequenceLayers[ i ].m_flCycleBeganAt,flTime ) );
 		DoAnimationEvents( studioHdr, m_SequenceLayers[ i ].m_nSequenceIndex, flTime, m_SequenceLayers[ i ].m_bNoLoop, &m_SequenceLayerEventState[ i ] );
 	}
-	delete studioHdr;
 }
 
 //-----------------------------------------------------------------------------

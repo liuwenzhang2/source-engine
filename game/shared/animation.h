@@ -9,7 +9,7 @@
 #define ANIMATION_H
 
 struct animevent_t;
-struct studiohdr_t;
+//struct IStudioHdr;
 class IStudioHdr;
 struct mstudioseqdesc_t;
 

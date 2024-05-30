@@ -18,30 +18,30 @@
 //-----------------------------------------------------------------------------
 // FIXME: This trashy glue code is really not acceptable. Figure out a way of making it unnecessary.
 //-----------------------------------------------------------------------------
-const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName ) const
-{
-	MDLHandle_t handle = g_pMDLCache->FindMDL( pModelName );
-	*cache = (void*)(uintp)handle;
-	return g_pMDLCache->GetStudioHdr( handle );
-}
+//const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName ) const
+//{
+//	MDLHandle_t handle = g_pMDLCache->FindMDL( pModelName );
+//	*cache = (void*)(uintp)handle;
+//	return g_pMDLCache->GetStudioHdr( handle );
+//}
 
-IVirtualModel *studiohdr_t::GetVirtualModel( void ) const
-{
-	return g_pMDLCache->GetVirtualModel( VoidPtrToMDLHandle( VirtualModel() ) );
-}
+//IVirtualModel *studiohdr_t::GetVirtualModel( void ) const
+//{
+//	return g_pMDLCache->GetVirtualModel( VoidPtrToMDLHandle( VirtualModel() ) );
+//}
 
-byte *studiohdr_t::GetAnimBlock( int i ) const
-{
-	return g_pMDLCache->GetAnimBlock( VoidPtrToMDLHandle( VirtualModel() ), i );
-}
+//byte *studiohdr_t::GetAnimBlock( int i ) const
+//{
+//	return g_pMDLCache->GetAnimBlock( VoidPtrToMDLHandle( VirtualModel() ), i );
+//}
 
 //int studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 //{
 //	return g_pMDLCache->GetAutoplayList( VoidPtrToMDLHandle( VirtualModel() ), pOut );
 //}
 
-const studiohdr_t *virtualgroup_t::GetGroupStudioHdr( void ) const
-{
-	return g_pMDLCache->GetStudioHdr( VoidPtrToMDLHandle( cache ) );
-}
+//const studiohdr_t *virtualgroup_t::GetGroupStudioHdr( void ) const
+//{
+//	return g_pMDLCache->GetStudioHdr( VoidPtrToMDLHandle( cache ) );
+//}
 

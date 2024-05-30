@@ -19,7 +19,7 @@ class IPhysicsSurfaceProps;
 struct matrix3x4_t;
 
 struct vcollide_t;
-struct studiohdr_t;
+//struct IStudioHdr;
 class IStudioHdr;
 class CBoneAccessor;
 

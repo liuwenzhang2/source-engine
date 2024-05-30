@@ -980,7 +980,6 @@ void C_BaseAnimating::UnlockStudioHdr()
 			mdlcache->UnlockStudioHdr( m_hStudioHdr );
 		}
 		m_hStudioHdr = MDLHANDLE_INVALID;
-		delete m_pStudioHdr;
 		m_pStudioHdr = NULL;
 	}
 }
@@ -1075,7 +1074,7 @@ IStudioHdr *C_BaseAnimating::OnNewModel()
 			SetIdentityMatrix( m_CachedBoneData[i] );
 		}
 	}
-	m_BoneAccessor.Init( this, m_CachedBoneData.Base() ); // Always call this in case the studiohdr_t has changed.
+	m_BoneAccessor.Init( this, m_CachedBoneData.Base() ); // Always call this in case the IStudioHdr has changed.
 
 	// Free any IK data
 	if (m_pIk)

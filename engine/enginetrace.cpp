@@ -1152,7 +1152,6 @@ void CEngineTrace::ClipRayToCollideable( const Ray_t &ray, unsigned int fMask, I
 	Assert( VectorsAreEqual( vecEndTest, pTrace->endpos, 0.1f ) );
 #endif
 	m_pRootMoveParent = pOldRoot;
-	delete pStudioHdr;
 }
 
 

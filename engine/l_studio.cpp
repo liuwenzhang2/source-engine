@@ -1857,7 +1857,6 @@ matrix3x4_t* CModelRender::SetupModelState( IClientRenderable *pRenderable )
 		g_pStudioRender->UnlockBoneMatrices();
 	}
 #endif
-	delete pStudioHdr;
 	return pBoneMatrices;
 }
 
@@ -3675,10 +3674,8 @@ void CModelRender::ValidateStaticPropColorData( ModelInstanceHandle_t handle )
 		// out of sync
 		// mark for debug visualization
 		pInstance->m_nFlags |= MODEL_INSTANCE_DISKCOMPILED_COLOR_BAD;
-		delete pStudioHdr;
 		return;
 	}
-	delete pStudioHdr;
 	// async callback can safely stream data into targets
 	pInstance->m_nFlags &= ~MODEL_INSTANCE_DISKCOMPILED_COLOR_BAD;
 	pInstance->m_nFlags |= MODEL_INSTANCE_HAS_DISKCOMPILED_COLOR;
@@ -4465,7 +4462,6 @@ bool CModelRender::RecomputeStaticLighting( ModelInstanceHandle_t handle )
 
 		return UpdateStaticPropColorData( instance.m_pRenderable->GetIClientUnknown(), handle );
 	}
-	delete pStudioHdr;
 #endif
 	// success
 	return true;

@@ -300,7 +300,6 @@ CBaseAnimating::~CBaseAnimating()
 	Studio_DestroyBoneCache( m_boneCacheHandle );
 	delete m_pIk;
 	UnlockStudioHdr();
-	delete m_pStudioHdr;
 }
 
 void CBaseAnimating::Precache()
@@ -2508,7 +2507,6 @@ void CBaseAnimating::SetModel( const char *szModelName )
 
 	// delete exiting studio model container
 	UnlockStudioHdr();
-	delete m_pStudioHdr;
 	m_pStudioHdr = NULL;
 	
 	if ( szModelName[0] )

@@ -198,10 +198,10 @@ public:
 	virtual int GetRef( MDLHandle_t handle ) = 0;
 
 	virtual IStudioHdr* GetIStudioHdr(MDLHandle_t handle) = 0;
-	virtual IStudioHdr* GetIStudioHdr(studiohdr_t* pStudioHdr) = 0;
+	//virtual IStudioHdr* GetIStudioHdr(studiohdr_t* pStudioHdr) = 0;
 
 	// Gets at the various data associated with a MDL
-	virtual studiohdr_t *GetStudioHdr( MDLHandle_t handle ) = 0;
+	virtual IStudioHdr *GetStudioHdr( MDLHandle_t handle ) = 0;
 	virtual studiohwdata_t *GetHardwareData( MDLHandle_t handle ) = 0;
 	virtual vcollide_t *GetVCollide( MDLHandle_t handle ) = 0;
 	virtual unsigned char *GetAnimBlock( MDLHandle_t handle, int nBlock ) = 0;

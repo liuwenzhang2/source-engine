@@ -315,7 +315,7 @@ struct FileHeader_t
 
 #pragma pack()
 
-void WriteOptimizedFiles( studiohdr_t *phdr, s_bodypart_t *pSrcBodyParts );
+//void WriteOptimizedFiles( IStudioHdr *phdr, s_bodypart_t *pSrcBodyParts );
 
 }; // namespace OptimizedModel
 

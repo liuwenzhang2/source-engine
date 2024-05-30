@@ -5980,7 +5980,7 @@ CPhysicsProp* CreatePhysicsProp( const char *pModelName, const Vector &vTraceSta
 		return NULL;
 
 	// Must have vphysics to place as a physics prop
-	studiohdr_t *pStudioHdr = mdlcache->GetStudioHdr( h );
+	IStudioHdr *pStudioHdr = mdlcache->GetIStudioHdr( h );
 	if ( !pStudioHdr )
 		return NULL;
 
@@ -5989,9 +5989,8 @@ CPhysicsProp* CreatePhysicsProp( const char *pModelName, const Vector &vTraceSta
 		return NULL;
 
 	QAngle angles( 0.0f, 0.0f, 0.0f );
-	Vector vecSweepMins = pStudioHdr->hull_min;
-	Vector vecSweepMaxs = pStudioHdr->hull_max;
-
+	Vector vecSweepMins = pStudioHdr->hull_min();
+	Vector vecSweepMaxs = pStudioHdr->hull_max();
 	trace_t tr;
 	UTIL_TraceHull( vTraceStart, vTraceEnd,
 		vecSweepMins, vecSweepMaxs, MASK_NPCSOLID, pTraceIgnore, COLLISION_GROUP_NONE, &tr );

@@ -14,6 +14,7 @@
 
 //#include "iclientrenderable.h"
 #include "c_baseanimating.h"
+#include "c_prop_portal.h"
 
 class C_PortalGhostRenderable : public C_BaseAnimating//IClientRenderable, public IClientUnknown
 {
@@ -48,7 +49,7 @@ public:
 	// Call this to get the current bone transforms for the model.
 	// currentTime parameter will affect interpolation
 	// nMaxBones specifies how many matrices pBoneToWorldOut can hold. (Should be greater than or
-	// equal to studiohdr_t::numbones. Use MAXSTUDIOBONES to be safe.)
+	// equal to IStudioHdr::numbones. Use MAXSTUDIOBONES to be safe.)
 	virtual bool	SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime );
 
 	// Returns the bounds relative to the origin (render bounds)

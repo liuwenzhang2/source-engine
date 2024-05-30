@@ -1267,10 +1267,8 @@ void FX_BuildTeslaHitbox( const CEffectData &data )
 
 	mstudiohitboxset_t *set = pStudioHdr->pHitboxSet( pAnimating->GetHitboxSet() );
 	if (!set) {
-		delete pStudioHdr;
 		return;
 	}
-	delete pStudioHdr;
 	matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 	if ( !pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 		return;
