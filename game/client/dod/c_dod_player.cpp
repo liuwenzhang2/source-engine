@@ -1414,7 +1414,7 @@ void C_DODPlayer::PopHelmet( Vector vecDir, Vector vecForceOrigin, int iModel )
 #ifdef DEBUG
 		if( vecForceOrigin == vec3_origin )
 		{
-			vecForceOrigin = GetAbsOrigin();
+			vecForceOrigin = GetEngineObject()->GetAbsOrigin();
 		}
 #endif
 

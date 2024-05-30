@@ -917,7 +917,7 @@ void C_BaseAnimating::LockStudioHdr()
 
 	if ( m_hStudioHdr != MDLHANDLE_INVALID || m_pStudioHdr != NULL )
 	{
-		Assert( m_pStudioHdr ? m_pStudioHdr == mdlcache->GetStudioHdr(m_hStudioHdr) : m_hStudioHdr == MDLHANDLE_INVALID );
+		Assert( m_pStudioHdr ? m_pStudioHdr == mdlcache->GetIStudioHdr(m_hStudioHdr) : m_hStudioHdr == MDLHANDLE_INVALID );
 		return;
 	}
 

@@ -166,7 +166,7 @@ public:
 	virtual unsigned char			ComputeLevelScreenFade( const Vector &vecAbsOrigin, float flRadius, float flFadeScale ) const { return 0; }
 	virtual unsigned char			ComputeViewScreenFade( const Vector &vecAbsOrigin, float flRadius, float flFadeScale ) const { return 0; }
 
-	int GetAutoplayList( const IStudioHdr *pStudioHdr, unsigned short **pAutoplayList ) const;
+	//int GetAutoplayList( const IStudioHdr *pStudioHdr, unsigned short **pAutoplayList ) const;
 	CPhysCollide *GetCollideForVirtualTerrain( int index );
 	virtual int GetSurfacepropsForVirtualTerrain( int index ) { return CM_SurfacepropsForDisp(index); }
 
@@ -555,10 +555,10 @@ byte *CModelInfo::GetAnimBlock( const IStudioHdr *pStudioHdr, int nBlock ) const
 	return pStudioHdr->GetAnimBlock( nBlock );
 }
 
-int CModelInfo::GetAutoplayList( const IStudioHdr *pStudioHdr, unsigned short **pAutoplayList ) const
-{
-	return pStudioHdr->GetAutoplayList( pAutoplayList );
-}
+//int CModelInfo::GetAutoplayList( const IStudioHdr *pStudioHdr, unsigned short **pAutoplayList ) const
+//{
+//	return pStudioHdr->GetAutoplayList( pAutoplayList );
+//}
 
 
 //-----------------------------------------------------------------------------

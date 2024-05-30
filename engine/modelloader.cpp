@@ -3570,7 +3570,7 @@ model_t	*CModelLoader::LoadModel( model_t *mod, REFERENCETYPE *pReferencetype )
 	if ( mod->type == mod_studio && !( mod->nLoadFlags & FMODELLOADER_LOADED_BY_PRELOAD ) )
 	{
 		// in cache
-		Verify( g_pMDLCache->GetStudioHdr( mod->studio ) != 0 );
+		Verify( g_pMDLCache->GetIStudioHdr( mod->studio ) != 0 );
 		Assert( FMODELLOADER_LOADED & mod->nLoadFlags );
 
 		if ( bTouchAllData )
@@ -3858,7 +3858,7 @@ void CModelLoader::ReloadFilesInList( IFileList *pFilesToReload )
 			MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
 
 			// Get the studiohdr into the cache
-			g_pMDLCache->GetStudioHdr( pModel->studio );
+			g_pMDLCache->GetIStudioHdr( pModel->studio );
 
 #ifndef _XBOX
 			// force the collision to load
@@ -4942,7 +4942,7 @@ void CModelLoader::Studio_ReloadModels( CModelLoader::ReloadType_t reloadType )
 		MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
 
 		// Get the studiohdr into the cache
-		g_pMDLCache->GetStudioHdr( pModel->studio );
+		g_pMDLCache->GetIStudioHdr( pModel->studio );
 
 		// force the collision to load
 		g_pMDLCache->GetVCollide( pModel->studio );
@@ -5259,7 +5259,7 @@ void *CModelLoader::GetExtraData( model_t *model )
 		break;
 
 	case mod_studio:
-		return g_pMDLCache->GetStudioHdr( model->studio );
+		return g_pMDLCache->GetIStudioHdr( model->studio );
 
 	default:
 	case mod_brush:

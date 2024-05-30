@@ -317,7 +317,7 @@ void CMDLPanel::DrawCollisionModel()
 	static color32 color = {255,0,0,0};
 
 	IVPhysicsKeyParser *pParser = g_pPhysicsCollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
-	IStudioHdr* studioHdr = g_pMDLCache->GetStudioHdr(m_RootMDL.m_MDL.GetMDL());// g_pMDLCache->GetIStudioHdr();
+	IStudioHdr* studioHdr = g_pMDLCache->GetIStudioHdr(m_RootMDL.m_MDL.GetMDL());// g_pMDLCache->GetIStudioHdr();
 
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES];
 	m_RootMDL.m_MDL.SetUpBones( m_RootMDL.m_MDLToWorld, MAXSTUDIOBONES, pBoneToWorld );

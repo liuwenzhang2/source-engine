@@ -160,7 +160,7 @@ public:
 	virtual unsigned char			ComputeViewScreenFade( const Vector &vecAbsOrigin, float flRadius, float flFadeScale ) const = 0;
 
 	// both client and server
-	virtual int						GetAutoplayList( const IStudioHdr *pStudioHdr, unsigned short **pAutoplayList ) const = 0;
+	//virtual int						GetAutoplayList( const IStudioHdr *pStudioHdr, unsigned short **pAutoplayList ) const = 0;
 
 	// Gets a virtual terrain collision model (creates if necessary)
 	// NOTE: This may return NULL if the terrain model cannot be virtualized
