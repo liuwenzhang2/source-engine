@@ -2272,7 +2272,7 @@ public:
 	virtual unsigned char* GetAnimBlock(int nBlock) const = 0;
 	virtual int numincludemodels() const = 0;
 	virtual const char* KeyValueText(void) const = 0;
-	//virtual int length() = 0;
+	virtual int length() = 0;
 	//virtual mstudioanimdesc_t* pLocalAnimdesc(int i) const = 0;
 	//virtual mstudioseqdesc_t* pLocalSeqdesc(int i) const = 0;
 	//virtual mstudioposeparamdesc_t* pLocalPoseParameter(int i) const = 0;
