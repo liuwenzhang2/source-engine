@@ -206,7 +206,7 @@ public:
 	virtual vcollide_t *GetVCollide( MDLHandle_t handle ) = 0;
 	virtual unsigned char *GetAnimBlock( MDLHandle_t handle, int nBlock ) = 0;
 	virtual IVirtualModel *GetVirtualModel( MDLHandle_t handle ) = 0;
-	//virtual int GetAutoplayList( MDLHandle_t handle, unsigned short **pOut ) = 0;
+	virtual int GetAutoplayList( MDLHandle_t handle, unsigned short **pOut ) = 0;
 	virtual vertexFileHeader_t *GetVertexData( MDLHandle_t handle ) = 0;
 
 	// Brings all data associated with an MDL into memory
