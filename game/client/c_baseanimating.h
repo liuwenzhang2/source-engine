@@ -757,7 +757,7 @@ inline IStudioHdr *C_BaseAnimating::GetModelPtr() const
 	{
 		const_cast<C_BaseAnimating *>(this)->LockStudioHdr();
 	}
-	Assert( m_pStudioHdr ? m_pStudioHdr->GetRenderHdr() == mdlcache->GetStudioHdr(m_hStudioHdr) : m_hStudioHdr == MDLHANDLE_INVALID );
+	Assert( m_pStudioHdr ? m_pStudioHdr->GetRenderHdr() == mdlcache->GetIStudioHdr(m_hStudioHdr) : m_hStudioHdr == MDLHANDLE_INVALID );
 	return m_pStudioHdr;
 }
 
