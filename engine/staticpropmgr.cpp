@@ -996,7 +996,6 @@ int	CStaticProp::DrawModelSlow( int flags )
 	{
 		return 0;
 	}
-	delete pStudioHdr;
 #endif
 
 	if ( r_colorstaticprops.GetBool() )
